@@ -2,7 +2,7 @@
 
 import { h, add, mascot, bubble } from '../dom.js';
 import { AVATARS } from '../../store.js';
-import { YEARS, TRACKS } from '../../content/skills.js';
+import { YEARS, TRACKS, hasTrack } from '../../content/skills.js';
 import { currentStreak } from '../../engine/rewards.js';
 
 export function profilesScreen(root, _args, app) {
@@ -32,7 +32,7 @@ export function createProfileScreen(root, _args, app) {
     const go = h('button.btn.primary.wide', {
       disabled: !ready(),
       onclick: () => {
-        app.store.createProfile({ name: form.name.trim(), avatar: form.avatar, year: form.year, track: form.year >= 9 ? form.track : 'unknown' });
+        app.store.createProfile({ name: form.name.trim(), avatar: form.avatar, year: form.year, track: hasTrack(form.year) ? form.track : 'unknown' });
         app.go('skimIntro');
       },
     }, 'C\'est parti !');
@@ -46,7 +46,7 @@ export function createProfileScreen(root, _args, app) {
       h('div.field', h('span', 'Ta classe'), h('div.chip-row', YEARS.map((y) => h(`button.chip${y.id === form.year ? '.selected' : ''}`, {
         type: 'button', onclick: () => { form.year = y.id; draw(); },
       }, h('b', y.label), h('small', y.age))))),
-      form.year >= 9 ? h('div.field', h('span', 'Ton niveau en maths'), h('div.chip-row.wrap', TRACKS.map((t) => h(`button.chip${t.id === form.track ? '.selected' : ''}`, {
+      hasTrack(form.year) ? h('div.field', h('span', 'Ton niveau en maths'), h('div.chip-row.wrap', TRACKS.map((t) => h(`button.chip${t.id === form.track ? '.selected' : ''}`, {
         type: 'button', onclick: () => { form.track = t.id; draw(); },
       }, t.label))), h('small.muted', 'Selon ton canton : A/B/C, VP/VG, LS/LC… Ce n\'est qu\'un point de départ.')) : null,
       go);

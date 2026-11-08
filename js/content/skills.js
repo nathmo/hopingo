@@ -360,12 +360,18 @@ export const skillIndex = (id) => SKILL_BY_ID[id].index;
 
 // Swiss school years offered at profile creation.
 export const YEARS = [
+  { id: 5, label: '5H', age: '8-9 ans' },
+  { id: 6, label: '6H', age: '9-10 ans' },
   { id: 7, label: '7H', age: '10-11 ans' },
   { id: 8, label: '8H', age: '11-12 ans' },
   { id: 9, label: '9H', age: '12-13 ans' },
   { id: 10, label: '10H', age: '13-14 ans' },
   { id: 11, label: '11H', age: '14-15 ans' },
+  { id: 12, label: 'Gymnase', age: '15 ans et +' },
 ];
+
+// The track question only makes sense in secondary I (9H-11H).
+export const hasTrack = (year) => year >= 9 && year <= 11;
 
 // Secondary I tracks (names vary by canton: A/B/C, VP/VG, LS/LC/CT...).
 export const TRACKS = [
@@ -379,7 +385,7 @@ export const TRACKS = [
 // before the student's year.
 export function skimStartIndex(year, trackId) {
   const shift = TRACKS.find((t) => t.id === trackId)?.shift ?? 0;
-  const effective = year + (year >= 9 ? shift : 0);
+  const effective = year + (hasTrack(year) ? shift : 0);
   let idx = 0;
   SKILLS.forEach((s, i) => { if (s.year < effective) idx = i; });
   return idx;
