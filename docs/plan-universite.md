@@ -877,9 +877,8 @@ Raisons de cet ordre :
 - **Étendue de M.** M s'arrête au niveau BA4. L'automatique, Lyapunov, l'ACP et Kalman vont dans [plan-ba5-et-plus.md](plan-ba5-et-plus.md).
 - **Notation.** On suit les cours, et on accepte aussi les autres écritures en saisie : o(xⁿ), × pour ∧, ln pour Log, arctan pour Arctg.
 - **Suivre l'erreur.** Chaque catalogue dit, item par item, où c'est permis. Par défaut : dans les tableaux et les problèmes longs.
-
-**Encore ouvert :**
-- **Langue.** L'Analyse III MT 2021-22 et EE-209 sont en anglais. Faut-il traduire l'app vers l'anglais à partir de BA3 ?
+- **Langue.** Tout reste en français, BA3 et BA4 compris. Une traduction complète de l'app viendra plus tard. Les textes affichés restent donc regroupés dans les fichiers de contenu, pour qu'on puisse les traduire facilement.
+- **Pièges proches.** Les pièges qui se ressemblent mais se réparent à des endroits différents restent séparés.
 
 ## Références
 
