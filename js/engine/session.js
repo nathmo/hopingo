@@ -9,8 +9,11 @@ import {
   finishReview, isUnlocked, isSlow,
 } from './learner.js';
 import { now } from './time.js';
+import { recordFact } from './facts.js';
 
 export const CORE_LENGTH = 10;
+// Fact skills (times tables…) are short questions played as a fast series.
+export const FACT_LENGTH = 15;
 const MAX_RETRIES = 6;
 
 // Multi-step skills give indirect credit to the skill behind each operation
@@ -24,7 +27,7 @@ const OP_SKILL = {
   'root-calc': { '√': 'root-squares', '^': 'pow-def' },
 };
 
-const GUESS = { mcq: 0.3, match: 0.1, shade: 0.05, numberline: 0.08, answer: 0.03, steps: 0.02 };
+const GUESS = { fact: 0.02, mcq: 0.3, match: 0.1, shade: 0.05, numberline: 0.08, answer: 0.03, steps: 0.02 };
 
 export class Lesson {
   // kind: 'smart' continues the path, 'skill' practises one skill,
@@ -40,6 +43,7 @@ export class Lesson {
     this.retries = [];
     this.retryCount = 0;
     this.keys = new Set();
+    this.recent = [];
     this.events = [];
     this.xp = 0;
     this.combo = 0;
@@ -58,10 +62,11 @@ export class Lesson {
     if (this.kind === 'review' || !this.focus) {
       plan = Array.from({ length: CORE_LENGTH }, (_, i) => (hasTraps && i % 3 === 2 ? 'trap' : 'review'));
     } else if (this.kind === 'skill') {
-      plan = Array.from({ length: CORE_LENGTH }, (_, i) => (hasTraps && i === 5 ? 'trap' : 'focus'));
+      plan = Array.from({ length: this.coreLength }, (_, i) => (hasTraps && i === 5 ? 'trap' : 'focus'));
     } else {
       plan = ['focus', 'focus', hasDue ? 'review' : 'focus', 'focus', hasTraps ? 'trap' : 'focus',
         'focus', 'focus', hasDue ? 'review' : 'focus', 'focus', 'focus'];
+      while (plan.length < this.coreLength) plan.push('focus');
     }
     if (this.focus && plan[0] === 'focus' && !skillState(p, practiceSkill(p, this.focus)).introduced) {
       plan.unshift('intro');
@@ -69,7 +74,9 @@ export class Lesson {
     return plan;
   }
 
-  get total() { return this.plan.filter((s) => s !== 'intro').length; }
+  get coreLength() { return SKILL_BY_ID[this.focus]?.facts ? FACT_LENGTH : CORE_LENGTH; }
+
+  get total() { return this.plan.filter((s) => typeof s === 'string' && s !== 'intro').length; }
   get done() { return this.results.filter((r) => !r.retry && r.slot !== 'intro').length; }
   get progress() { return Math.min(1, (this.done) / (this.total + Math.min(this.retries.length, 3) * 0.3)); }
 
@@ -79,13 +86,18 @@ export class Lesson {
     return s && SKILL_BY_ID[s] && isUnlocked(this.profile, s) ? s : null;
   }
 
+  // A new question: not asked yet in this lesson. Fact sets can be small
+  // (10 facts for a 15-question series), so a fact only has to differ from
+  // the last few, never the same one twice in a row.
   generateFresh(skill, level, accept = () => true) {
     let item = null;
     for (let i = 0; i < 25; i++) {
-      item = generate(skill, level, this.rng);
-      if (!this.keys.has(item.key) && accept(item)) break;
+      item = generate(skill, level, this.rng, this.profile);
+      const used = item.type === 'fact' ? this.recent.includes(item.key) : this.keys.has(item.key);
+      if (!used && accept(item)) break;
     }
     this.keys.add(item.key);
+    this.recent = [...this.recent, item.key].slice(-4);
     return item;
   }
 
@@ -105,6 +117,8 @@ export class Lesson {
 
   makeItem(slot) {
     const p = this.profile;
+    // A missed fact comes back a couple of questions later.
+    if (slot.retryOf) return { ...slot.retryOf, retry: true };
     if (slot === 'intro') {
       const skill = practiceSkill(p, this.focus);
       skillState(p, skill).introduced = true;
@@ -179,6 +193,8 @@ export class Lesson {
     }));
 
     // Multi-step work is also evidence for the operations it used.
+    if (item.fact) recordFact(p, item.fact, outcome.correct, outcome.rtSec, item.fluentSec);
+
     if (OP_SKILL[item.skill] && outcome.correct) {
       for (const op of new Set(outcome.ops || [])) {
         const s = OP_SKILL[item.skill][op];
@@ -199,7 +215,9 @@ export class Lesson {
       this.bestCombo = Math.max(this.bestCombo, this.combo);
     } else {
       this.combo = 0;
-      if (!item.retry || item.retryN < 2) this.retries.push({ ...item, retry: true, retryN: (item.retryN || 0) + 1 });
+      const retryN = (item.retryN || 0) + 1;
+      if (item.type === 'fact' && retryN <= 2) this.plan.splice(this.pos + 2, 0, { retryOf: { ...item, retryN } });
+      else if (!item.retry || item.retryN < 2) this.retries.push({ ...item, retry: true, retryN });
     }
     this.xp += xp;
     this.results.push({

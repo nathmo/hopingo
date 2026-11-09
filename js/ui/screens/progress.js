@@ -2,6 +2,8 @@
 
 import { h, html } from '../dom.js';
 import { SKILLS, UNITS, unitSkills } from '../../content/skills.js';
+import { skillFacts } from '../../content/calcul.js';
+import { isAutomatic } from '../../engine/facts.js';
 import { stars, isUnlocked } from '../../engine/learner.js';
 import { BADGES, xpHistory, xpToday, currentStreak } from '../../engine/rewards.js';
 import { topBar, bottomNav, starRow } from './common.js';
@@ -52,10 +54,18 @@ export function progressScreen(root, _args, app) {
           return h(`div.skill-row${unlocked ? '' : '.locked'}`,
             h('span.skill-icon', unlocked ? s.icon : '🔒'),
             h('div.skill-main', h('b', s.title),
+              s.facts ? factCount(p, s.id) : null,
               h('div.meter', h('div.meter-fill', { style: { width: `${Math.round((st?.p ?? 0) * 100)}%` } }))),
             h('div.skill-side', starRow(stars(st)), st ? h('small', st.testedOut && !st.attempts ? 'test' : `niv. ${st.level}`) : null));
         }))))),
     h('section', h('h2', 'Succès'),
       h('div.badges', BADGES.map((b) => h(`div.badge-card${p.badges[b.id] ? '.earned' : ''}`, h('span.badge-icon', p.badges[b.id] ? b.icon : '🔒'), h('b', b.name), h('small', b.desc))))));
   root.append(topBar(app), main, bottomNav(app, 'progress'));
+}
+
+// "32 / 55 faits automatiques" for times tables and other fact skills.
+function factCount(p, skillId) {
+  const keys = skillFacts(skillId);
+  const n = keys.filter((k) => isAutomatic(p, k)).length;
+  return h('div.skill-facts', `${n} / ${keys.length} faits automatiques`);
 }

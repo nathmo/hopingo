@@ -1,17 +1,20 @@
 // All question generators, by skill id.
 
 import { parse, text } from '../math/expr.js';
+import { GEN as CALCUL } from './calcul.js';
 import { GEN as FRACTIONS } from './fractions.js';
 import { GEN as RELATIFS } from './relatifs.js';
 import { GEN as PUISSANCES } from './puissances.js';
 import { GEN as RACINES } from './racines.js';
 
-const GEN = { ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES };
+const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES };
 
-export function generate(skillId, level, rng) {
+// The profile is optional: fact skills use it to pick from the student's
+// fact memory.
+export function generate(skillId, level, rng, profile = null) {
   const g = GEN[skillId];
   if (!g) throw new Error(`Pas de générateur pour ${skillId}`);
-  return g(Math.max(1, Math.min(5, level)), rng);
+  return g(Math.max(1, Math.min(5, level)), rng, profile);
 }
 
 export const hasGenerator = (skillId) => !!GEN[skillId];
@@ -30,6 +33,7 @@ export function describe(item) {
     .replace(/ /g, ' ');
   const lines = [strip(item.prompt)];
   if (item.type === 'steps') lines.push(`  ${text(parse(item.expr))}   [${item.mode}${item.requireIrreducible ? ', irréductible' : ''}] → ${item.answer}`);
+  if (item.type === 'fact') lines.push(`  ${strip(item.left)} [${item.expected}] ${strip(item.right)}`.replace(/\s+\[/, ' [') + (item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''));
   if (item.type === 'answer') lines.push(`  → ${item.expected}${item.form !== 'any' ? ` (${item.form})` : ''}${item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''}`);
   if (item.type === 'mcq') lines.push(`  ${item.options.map((o) => `${o.correct ? '✔' : '·'} ${strip(o.html)}${o.rule ? ` [${o.rule}]` : ''}`).join('   ')}`);
   if (item.type === 'shade') lines.push(`  (figure ${item.figure.shape} en ${item.figure.n} parts, colorier ${item.target.count})`);

@@ -15,13 +15,14 @@ setClock(() => t);
 const profile = (extra = {}) => ({ id: 'x', name: 'Test', year: 9, track: 'mid', createdAt: T0, ...newProfileData(), ...extra });
 
 // Plays a lesson; `know(item)` decides if the simulated student is right.
-function play(p, lesson, know, { rt = 5 } = {}) {
+// Without `rt`, answers take a bit more than half the item's expected time.
+function play(p, lesson, know, { rt } = {}) {
   let item;
   let n = 0;
   while ((item = lesson.next()) && n++ < 40) {
     if (item.type === 'intro') { lesson.answer(item, {}); continue; }
     const correct = know(item);
-    lesson.answer(item, { correct, rtSec: rt, rules: correct ? [] : item.wrongRules || [] });
+    lesson.answer(item, { correct, rtSec: rt ?? Math.min(5, item.expectedSec * 0.6), rules: correct ? [] : item.wrongRules || [] });
   }
   return lesson.finish();
 }

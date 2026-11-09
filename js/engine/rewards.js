@@ -20,6 +20,7 @@ export const BADGES = [
   { id: 'trap', icon: '🪤', name: 'Piège déjoué', desc: 'Déjoue un piège.', check: (p) => Object.values(p.traps).some((t) => t.cleared) },
   { id: 'steps10', icon: '🧠', name: 'Sans brouillon', desc: 'Réussis 10 calculs en plusieurs étapes.', check: (p) => p.stats.steps >= 10 },
   { id: 'xp500', icon: '⭐', name: '500 XP', desc: 'Gagne 500 XP.', check: (p) => p.xp >= 500 },
+  { id: 'calcul', icon: '⚡', name: 'Calcul éclair', desc: 'Maîtrise toutes les compétences de calcul mental.', check: (p) => unitMastered(p, 'calcul') },
   { id: 'fractions', icon: '🏆', name: 'Maître des fractions', desc: 'Maîtrise toutes les compétences sur les fractions.', check: (p) => unitMastered(p, 'fractions') },
   { id: 'relatifs', icon: '🌡️', name: 'Sous zéro', desc: 'Maîtrise toutes les compétences sur les nombres relatifs.', check: (p) => unitMastered(p, 'relatifs') },
   { id: 'puissances', icon: '🚀', name: 'Puissance 10', desc: 'Maîtrise toutes les compétences sur les puissances.', check: (p) => unitMastered(p, 'puissances') },
@@ -34,7 +35,7 @@ export function newProfileData() {
   return {
     xp: 0, xpByDay: {}, dailyGoal: 30,
     streak: { count: 0, best: 0, lastDay: null, freezes: 0, frozenDays: [] },
-    skills: {}, traps: {}, badges: {},
+    skills: {}, traps: {}, badges: {}, facts: {},
     stats: { lessons: 0, perfect: 0, answers: 0, correct: 0, steps: 0, seconds: 0 },
     placement: { done: false },
     settings: { sound: true },

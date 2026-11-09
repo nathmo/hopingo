@@ -4,10 +4,142 @@
 // earlier, track C later), keeping unit order for ties.
 
 export const UNITS = [
+  { id: 'calcul', title: 'Calcul mental', color: '#f08c00', ready: true },
   { id: 'fractions', title: 'Fractions', color: '#7c5cff', ready: true },
   { id: 'relatifs', title: 'Nombres relatifs', color: '#e8590c', ready: true },
   { id: 'puissances', title: 'Puissances', color: '#0ca678', ready: true },
   { id: 'racines', title: 'Racines carrées', color: '#1c7ed6', ready: true },
+];
+
+// Times tables and mental arithmetic. Fact skills are played as fast
+// series (see content/calcul.js); each fact has its own spaced memory.
+const CALCUL = [
+  {
+    id: 'cm-add20', unit: 'calcul', year: 5, prereqs: [], icon: '+', facts: true,
+    title: 'Additions jusqu\'à 20',
+    desc: 'Faire 10, les doubles, les presque-doubles.',
+    intro: {
+      rule: 'Pour dépasser 10, on <b>fait 10</b> d\'abord :<br>8 + 5 = 8 + 2 + 3 = <b>13</b>.<br>Les doubles aident aussi : 6 + 7 = 6 + 6 + 1 = 13.',
+      example: [{ math: '8+5', note: '= 8 + 2 + 3 = 13' }, { math: '6+7', note: '= 6 + 6 + 1 = 13' }],
+    },
+  },
+  {
+    id: 'cm-sub20', unit: 'calcul', year: 5, prereqs: ['cm-add20'], icon: '−', facts: true,
+    title: 'Soustractions jusqu\'à 20',
+    desc: 'Une soustraction est une addition à trou.',
+    intro: {
+      rule: '13 − 8, c\'est « 8 + combien = 13 ? ».<br>Ou on passe par 10 : 13 − 3 = 10, puis 10 − 5 = <b>5</b>.',
+      example: [{ math: '13-8', note: '= 5, car 8 + 5 = 13' }],
+    },
+  },
+  {
+    id: 'cm-add1', unit: 'calcul', year: 5, prereqs: ['cm-sub20'], icon: '±',
+    title: 'Ajouter ou retirer un petit nombre',
+    desc: '47 + 8, 52 − 7 : on passe par la dizaine.',
+    intro: {
+      rule: 'On va d\'abord à la dizaine, puis on continue :<br>47 + 8 = 47 + 3 + 5 = <b>55</b><br>52 − 7 = 52 − 2 − 5 = <b>45</b>',
+      example: [{ math: '47+8', note: '= 50 + 5 = 55' }, { math: '52-7', note: '= 50 − 5 = 45' }],
+    },
+  },
+  {
+    id: 'cm-add2', unit: 'calcul', year: 6, prereqs: ['cm-add1'], icon: '±±',
+    title: 'Ajouter ou retirer un nombre à 2 chiffres',
+    desc: 'Les dizaines puis les unités, ou arrondir et corriger.',
+    intro: {
+      rule: 'Les dizaines, puis les unités : 45 + 32 = 75 + 2 = <b>77</b>.<br>Avec un 7, un 8 ou un 9, on arrondit puis on corrige :<br>47 + 38 = 47 + 40 − 2 = <b>85</b>.',
+      example: [{ math: '47+38', note: '= 87 − 2 = 85' }, { math: '83-47', note: '= 33 + 3 = 36' }],
+    },
+  },
+  {
+    id: 'tab-2510', unit: 'calcul', year: 5, prereqs: [], icon: '×2', facts: true,
+    title: 'Livrets de 2, 5 et 10',
+    desc: 'Les points d\'appui des autres livrets.',
+    intro: {
+      rule: '× 10 : on ajoute un zéro.<br>× 2 : le double.<br>× 5 : la moitié de × 10. 7 × 5 = 70 ÷ 2 = <b>35</b>.',
+      example: [{ math: '7×10', note: '= 70' }, { math: '7×5', note: '= 70 ÷ 2 = 35' }],
+    },
+  },
+  {
+    id: 'tab-349', unit: 'calcul', year: 5, prereqs: ['tab-2510'], icon: '×9', facts: true,
+    title: 'Livrets de 3, 4 et 9',
+    desc: 'Le double du double, 10 fois moins une fois.',
+    intro: {
+      rule: '× 4 : le double du double. 4 × 7 = 14 × 2 = <b>28</b>.<br>× 9 : 10 fois moins une fois. 9 × 6 = 60 − 6 = <b>54</b>.<br>× 3 : le double plus une fois. 3 × 8 = 16 + 8 = <b>24</b>.',
+      example: [{ math: '9×6', note: '= 60 − 6 = 54' }],
+    },
+  },
+  {
+    id: 'tab-678', unit: 'calcul', year: 6, prereqs: ['tab-349'], icon: '×7', facts: true,
+    title: 'Livrets de 6, 7 et 8',
+    desc: 'Les derniers, à partir de ceux que tu connais.',
+    intro: {
+      rule: 'On part de ce qu\'on sait :<br>6 × 7 = 5 × 7 + 7 = <b>42</b><br>8 × 7 = le double de 4 × 7 = <b>56</b><br>7 × 7 = 5 × 7 + 2 × 7 = <b>49</b><br>Et 7 × 8 = 8 × 7 : l\'ordre ne change rien.',
+      example: [{ math: '8×7', note: '= 28 × 2 = 56' }],
+    },
+  },
+  {
+    id: 'tab-div', unit: 'calcul', year: 6, prereqs: ['tab-678'], icon: ':', facts: true,
+    title: 'Divisions des livrets',
+    desc: '56 : 8 = 7, car 8 × 7 = 56.',
+    intro: {
+      rule: 'Chaque division cache une multiplication :<br>56 : 8 = <b>7</b>, car 8 × 7 = 56.',
+      example: [{ math: '56÷8', note: '= 7, car 8 × 7 = 56' }],
+    },
+  },
+  {
+    id: 'tab-1112', unit: 'calcul', year: 7, prereqs: ['tab-678'], icon: '×12', facts: true,
+    title: 'Livrets de 11 et 12',
+    desc: '10 fois plus une fois, 10 fois plus deux fois.',
+    intro: {
+      rule: '× 11 : 10 fois plus une fois. 11 × 7 = 70 + 7 = <b>77</b>.<br>× 12 : 10 fois plus deux fois. 12 × 7 = 70 + 14 = <b>84</b>.',
+      example: [{ math: '12×7', note: '= 70 + 14 = 84' }],
+    },
+  },
+  {
+    id: 'sq-13', unit: 'calcul', year: 7, prereqs: ['tab-678'], icon: 'n²', facts: true,
+    title: 'Carrés jusqu\'à 13²',
+    desc: '1, 4, 9, 16, 25… 144, 169.',
+    intro: {
+      rule: 'Un carré, c\'est un nombre multiplié par lui-même : 13² = 13 × 13 = <b>169</b>.<br>Les connaître par cœur aide beaucoup pour les racines.',
+      example: [{ math: '12^2', note: '= 144' }, { math: '13^2', note: '= 169' }],
+    },
+  },
+  {
+    id: 'sq-25', unit: 'calcul', year: 8, prereqs: ['sq-13', 'cm-add2'], icon: '25²', facts: true,
+    title: 'Carrés jusqu\'à 25²',
+    desc: '(20 + 3)² = 400 + 120 + 9.',
+    intro: {
+      rule: '(20 + 3)² = 400 + 2 × 20 × 3 + 9 = 400 + 120 + 9 = <b>529</b>.<br>Ceux qui finissent par 5 : pour 25², on fait 2 × 3 = 6, puis on écrit 25 : <b>625</b>.',
+      example: [{ math: '23^2', note: '= 400 + 120 + 9 = 529' }, { math: '25^2', note: '= 625' }],
+    },
+  },
+  {
+    id: 'cm-round', unit: 'calcul', year: 7, prereqs: ['cm-add1'], icon: '≈',
+    title: 'Arrondir',
+    desc: 'À la dizaine, à l\'unité, au dixième.',
+    intro: {
+      rule: 'On regarde le chiffre juste après : de 0 à 4, on garde ; de 5 à 9, on monte.<br>3,47 au dixième : le 7 fait monter le 4 → <b>3,5</b>.',
+      example: [{ math: '3,47', note: '≈ 3,5 au dixième' }, { math: '1249', note: '≈ 1 200 à la centaine' }],
+    },
+  },
+  {
+    id: 'cm-estimate', unit: 'calcul', year: 8, prereqs: ['cm-round', 'tab-678'], icon: '~',
+    title: 'Estimer un résultat',
+    desc: 'L\'ordre de grandeur, avant de calculer.',
+    intro: {
+      rule: 'On arrondit chaque nombre à un seul chiffre utile, puis on calcule :<br>49 × 21 ≈ 50 × 20 = <b>1 000</b>.<br>Ça permet de repérer une réponse absurde.',
+      example: [{ math: '50×20', note: '≈ 49 × 21' }],
+    },
+  },
+  {
+    id: 'cm-mix', unit: 'calcul', year: 8, prereqs: ['tab-1112', 'cm-add2'], icon: '★',
+    title: 'Calcul malin',
+    desc: 'Doubles, moitiés, × 5, × 25, × 9, × 11.',
+    intro: {
+      rule: '× 5 = × 10 puis ÷ 2.<br>× 25 = × 100 puis ÷ 4. 36 × 25 = 3 600 ÷ 4 = <b>900</b>.<br>× 9 = 10 fois moins une fois. 23 × 9 = 230 − 23 = <b>207</b>.',
+      example: [{ math: '36×25', note: '= 3 600 ÷ 4 = 900' }],
+    },
+  },
 ];
 
 const FRACTIONS = [
@@ -297,7 +429,7 @@ const PUISSANCES = [
 
 const RACINES = [
   {
-    id: 'root-squares', unit: 'racines', year: 10, prereqs: ['pow-def'], icon: '√',
+    id: 'root-squares', unit: 'racines', year: 10, prereqs: ['pow-def', 'sq-13'], icon: '√',
     title: 'Racines carrées',
     desc: 'Le nombre positif dont le carré est donné.',
     intro: {
@@ -344,7 +476,7 @@ const RACINES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL

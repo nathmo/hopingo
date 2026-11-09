@@ -251,6 +251,26 @@ export function dueSkills(profile, t = now()) {
 
 export const activeTraps = (profile) => Object.entries(profile.traps).filter(([, t]) => t.active).map(([id]) => id);
 
+// Skills added to the app after a student's placement (a new unit) have no
+// state yet. Those from earlier school years are treated as the placement
+// treats known skills: counted as known but due for review at once, so
+// reviews confirm them. The others simply start fresh.
+export function adoptNewSkills(profile) {
+  if (!profile.placement?.done) return false;
+  let changed = false;
+  SKILLS.forEach((s, i) => {
+    if (profile.skills[s.id]) return;
+    changed = true;
+    const st = skillState(profile, s.id);
+    if (s.year < profile.year) {
+      Object.assign(st, {
+        p: MASTERY_P, level: 4, introduced: true, testedOut: true, mastered: true, interval: 1, due: now() + i * 1000,
+      });
+    }
+  });
+  return changed;
+}
+
 // After the placement skim: skills before the boundary count as mastered
 // but are due for review at once, so reviews confirm them; a failed review
 // sends the skill back onto the path.

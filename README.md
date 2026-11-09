@@ -1,6 +1,6 @@
 # Hopingo — le calcul en jouant
 
-A Duolingo-style practice app for fractions, signed numbers, powers and square roots (HarmoS 7H–11H, French). It is fully static, with no server: everything runs in the browser and progress is saved in `localStorage`.
+A Duolingo-style practice app for mental arithmetic and times tables, fractions, signed numbers, powers and square roots (HarmoS 5H–11H and gymnase, French). It is fully static, with no server: everything runs in the browser and progress is saved in `localStorage`.
 
 ## Run it
 
@@ -26,9 +26,10 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 | Solver | `js/math/solver.js` | Canonical step-by-step solutions (signs, powers, roots included), used for guided blanks, hints and worked examples. |
 | Mistakes | `js/math/malrules.js`, `diagnose.js` | Known errors (« pièges ») as rules. A wrong line is replayed under each rule, and under misreadings of its structure (priorities, brackets, −3² vs (−3)², √(a+b) = √a + √b…), to name the mistake. |
 | Judge | `js/math/judge.js` | A line is valid if it keeps the exact value of the previous one, so any method is accepted. |
-| Skills | `js/content/skills.js` | The skill graph: 35 skills in 4 units, prerequisites, intro cards, HarmoS year. The path follows the school year across units. |
-| Questions | `js/content/items.js` and one file per unit: `fractions.js`, `relatifs.js`, `puissances.js`, `racines.js` (merged in `generators.js`) | One generator per skill, 5 levels each. Records which traps each question can catch. |
+| Skills | `js/content/skills.js` | The skill graph: 49 skills in 5 units, prerequisites, intro cards, HarmoS year. The path follows the school year across units. |
+| Questions | `js/content/items.js` and one file per unit: `calcul.js`, `fractions.js`, `relatifs.js`, `puissances.js`, `racines.js` (merged in `generators.js`) | One generator per skill, 5 levels each. Records which traps each question can catch. |
 | Learner | `js/engine/learner.js` | Mastery estimate per skill (Bayesian knowledge tracing), difficulty ladder, repair of prerequisites, spaced review, traps. |
+| Facts | `js/engine/facts.js` | Memory of single number facts (7 × 8, 13²): a Leitner box per fact. A fact is automatic once answered right and fast twice. |
 | Lessons | `js/engine/session.js` | Picks each question as you go: path, reviews, traps, mistakes again at the end. |
 | Placement | `js/engine/placement.js` | Quick binary-search skim from the student's year and track. |
 | Rewards | `js/engine/rewards.js` | XP, daily goal, streak with freezes, badges. |
@@ -39,6 +40,12 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 - **Spaced review:** mastered skills come back for review, and the interval ×2.5 after each success. Skills skipped by the placement skim are due right away, so the reviews confirm them.
 - **Traps:** a mistake becomes a trap after it happens twice. It is beaten by answering the questions that bait it correctly on 3 different days.
 
+**Fast series** (times tables, sums to 20, squares, mental ± ):
+- 15 short questions, no "Vérifier": the answer is judged as soon as it has enough digits, and a right answer moves straight on.
+- The response time is measured but never shown. A fact counts as automatic when it is right in about 3 seconds.
+- Each fact has its own spaced memory. A series mixes about 70 % known facts with a few new or fragile ones, and a missed fact comes back two questions later.
+- A mistake shows the full fact, the trap with the question's own numbers, and a strategy (9 × 6 = 60 − 6).
+
 **Step-by-step modes** (multi-step skills and the operation skills of every unit):
 - **Guided:** fill in the new numbers of each canonical step. A new negative number is one blank, sign included.
 - **Tap then solve:** tap the operation to do next (an operator, an exponent or a root sign). Tapping the wrong one is caught as a priority mistake.
@@ -46,10 +53,11 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 
 ## Content
 
-The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md` and `samples-racines.md`.
+The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-calcul.md`, `samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md` and `samples-racines.md`.
 
 | Unit | Skills | Years |
 |---|---|---|
+| Calcul mental | 14: sums and differences to 20, ± 1 and 2 digits, times tables 2–12 and divisions, squares to 25², rounding, estimating, clever calculation | 5H–8H |
 | Fractions | 16, from reading a fraction to multi-step calculations | 6H–10H |
 | Nombres relatifs | 8: number line, compare, +, −, sums, × and ÷, priorities, signed fractions | 9H–10H |
 | Puissances | 6: definition, priorities, signs, powers of 10, exponent rules, scientific notation | 9H–11H |

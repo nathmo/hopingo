@@ -18,7 +18,8 @@ test('skill graph: prerequisites exist and come earlier', () => {
 });
 
 test('skim starts later for older students', () => {
-  assert.equal(skimStartIndex(7, 'unknown'), 0);
+  assert.equal(skimStartIndex(5, 'unknown'), 0);
+  assert.ok(skimStartIndex(7, 'unknown') > 0, '7H skips the 5H-6H mental arithmetic');
   assert.ok(skimStartIndex(11, 'mid') > skimStartIndex(9, 'mid'));
   assert.ok(skimStartIndex(10, 'high') >= skimStartIndex(10, 'base'));
 });
@@ -43,6 +44,11 @@ test('every generator produces valid, self-consistent items', () => {
           const r = judgeAnswer(evaluate(parse(it.expected)), it.expected, { form: it.form });
           assert.equal(r.kind, 'done', `${where} expected answer rejected: ${r.kind}`);
           for (const t of it.traps) assert.ok(!Q.of(evaluate(parse(t.value))).eq(evaluate(parse(it.expected))), where);
+        }
+        if (it.type === 'fact') {
+          assert.match(it.expected, /^\d+$/, `${where} fact answers are whole numbers`);
+          for (const t of it.traps) assert.notEqual(t.value, it.expected, where);
+          assert.ok(it.strategy, `${where} needs a strategy`);
         }
         if (it.type === 'mcq') {
           assert.equal(it.options.filter((o) => o.correct).length, 1, `${where} needs exactly one right option`);

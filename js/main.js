@@ -2,6 +2,7 @@
 
 import * as store from './store.js';
 import { setSound } from './ui/dom.js';
+import { adoptNewSkills } from './engine/learner.js';
 import { profilesScreen, createProfileScreen } from './ui/screens/profiles.js';
 import { homeScreen } from './ui/screens/home.js';
 import { lessonScreen } from './ui/screens/lesson.js';
@@ -33,7 +34,10 @@ export const app = {
     cleanup?.();
     cleanup = null;
     if (!['profiles', 'create'].includes(name) && !store.activeProfile()) name = store.listProfiles().length ? 'profiles' : 'create';
-    if (store.activeProfile()) setSound(store.activeProfile().settings.sound !== false);
+    if (store.activeProfile()) {
+      setSound(store.activeProfile().settings.sound !== false);
+      if (adoptNewSkills(store.activeProfile())) store.save();
+    }
     root.innerHTML = '';
     root.className = `screen-${name}`;
     const result = SCREENS[name](root, args, app);

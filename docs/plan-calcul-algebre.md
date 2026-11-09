@@ -1,6 +1,6 @@
 # Plan : livrets, arithmétique et algèbre
 
-Proposition du 9 novembre 2026. Rien n'est encore construit ; ce document sert à valider le contenu et l'ordre avant de coder.
+Proposition du 9 novembre 2026. L'étape 1 (livrets et calcul mental) est construite ; le reste est à venir.
 
 ## 1. Le but final, et ce qu'il demande
 
@@ -194,6 +194,7 @@ La dernière ligne comble la limite actuelle de l'unité Racines, où √50 = 5�
 | Aires | Facteur 100 entre unités voisines, ares et hectares | 1 m² = 10 000 cm² |
 | Volumes | Facteur 1 000 ; 1 dm³ = 1 L | 2,5 m³ = … L |
 | Vitesses | km/h ↔ m/s (÷ 3,6) | 90 km/h = … m/s |
+| Aires et volumes avec unités non métriques | Pouce (2,54 cm), pied (30,48 cm), yard, mile, gallon : le facteur se met au carré ou au cube, on ne peut plus « décaler les zéros » | 1 pied² = 30,48² cm² ≈ 929 cm² ; 1 pied³ ≈ 28,3 L |
 | Notation scientifique avec unités | Le pont vers la physique | 3 · 10⁸ m/s |
 
 ### L. Fonctions (9H–11H)
@@ -288,6 +289,7 @@ Même format que [error-catalogue.md](error-catalogue.md). Les étiquettes : [R]
 | Pourcentages | + 10 % puis − 10 % = 0 % | | E |
 | Pourcentages | Retirer 20 % pour annuler une hausse de 20 % | 96 − 20 % au lieu de 96 / 1,2 | E |
 | Unités | Facteur 10 pour les aires ou les volumes | 1 m² = 100 cm² | E |
+| Unités | Facteur linéaire non mis au carré ou au cube | 1 pied² = 30,48 cm² | E |
 | Unités | Heures décimales lues comme des minutes | 1,5 h = 1 h 50 | E |
 | Unités | Conversion dans le mauvais sens | 3 km = 0,003 m | E |
 | Unités | × 3,6 au lieu de ÷ 3,6 | 90 km/h = 324 m/s | E |
@@ -335,7 +337,7 @@ Chaque étape est utilisable seule, testée, puis publiée sur GitHub Pages.
 
 | Étape | Contenu | Taille | Moteur |
 |---|---|---|---|
-| 1 | A. Livrets et calcul mental, avec arrondir et estimer | Moyenne | Série rapide, mémoire par fait |
+| 1 ✅ | A. Livrets et calcul mental, avec arrondir et estimer (fait le 9 novembre 2026) | Moyenne | Série rapide, mémoire par fait |
 | 2 | B. Arithmétique (avec √72 = 6√2) et N. Écritures d'un nombre | Petite | Peu de changements |
 | 3 | J. Proportionnalité et pourcentages, K. Grandeurs et unités | Moyenne | Réponses avec unités |
 | 4 | C. Calcul littéral et D. Factorisation | Grande | Lettres, forme normale, clavier, affichage |
@@ -361,7 +363,7 @@ Relu dans la progression bernoise du cycle 3. Les thèmes de priorité haute et 
 Prises le 9 novembre 2026 :
 - **Années du profil** : 5H, 6H et Gymnase sont ajoutés au profil (fait). Au Gymnase, la question du niveau (A/B/C) n'est plus posée.
 - **Systèmes 2 × 2** : inclus dans l'étape 5.
-- **Chrono des séries rapides** : caché. Le temps est mesuré, jamais affiché ; l'élève ne voit que son propre record.
+- **Chrono des séries rapides** : caché. Le temps est mesuré, jamais affiché ; la page Progrès montre seulement combien de faits sont automatiques (« 32 / 55 »).
 - **Thèmes du PER ajoutés** : proportionnalité et pourcentages, unités, fonctions, géométrie calculée, écritures d'un nombre, arrondir et estimer.
 
 ## Références

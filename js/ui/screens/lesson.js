@@ -144,6 +144,14 @@ export function lessonScreen(root, args, app) {
     if (res.events.some((e) => e.type === 'levelUp' || e.type === 'mastered')) setTimeout(() => play('level'), 300);
     const notes = eventNotes(res.events);
     const wrong = !outcome.correct;
+    // Fast series: a right fact moves straight on, no panel to dismiss.
+    // Events (level up…) are still shown in the end-of-lesson summary.
+    if (!wrong && item.type === 'fact') {
+      canContinue = false;
+      body.classList.add('flash-good');
+      setTimeout(() => { body.classList.remove('flash-good'); canContinue = true; next(); }, 350);
+      return;
+    }
     panel.className = `feedback show ${wrong ? 'bad big' : 'good'}`;
     panel.innerHTML = '';
     panel.scrollTop = 0;

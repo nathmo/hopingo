@@ -143,7 +143,7 @@ The programme warns that part-of-a-whole struggles with fractions above 1, so sh
 
 ## What the app implements
 
-All four units are built. Each rule above is a « piège » in `js/math/malrules.js`, under its own id; `npm run samples` lists the traps of each unit with their tag at the end of each `docs/samples-*.md` file.
+All five units are built (mental arithmetic was added on 2026-11-09). Each rule above is a « piège » in `js/math/malrules.js`, under its own id; `npm run samples` lists the traps of each unit with their tag at the end of each `docs/samples-*.md` file.
 
 Some traps were added while writing the units and are not in the tables above. They are tagged **[E]** and need a teacher's check most:
 
@@ -151,7 +151,10 @@ Some traps were added while writing the units and are not in the tables above. T
 |---|---|
 | Negatives | `sign_of_first` (−3 + 8 = −5), `product_sign_count`, `read_neg_as_pos`, `neg_line_direction`, `opposite_inverse` (opposite of 5 = 1/5) |
 | Powers | `pow_zero_is_base` (5⁰ = 5), `pow_fraction_numerator_only` ((2/3)² = 4/3), `pow_decimal_places` (0,3² = 0,9), `pow_before_product` (2 × 3² = 36), `pow_product_multiply_bases` (2³ × 2⁴ = 4⁷), `pow_quotient_divide_exp`, `pow_ten_count_digits` (1 000 = 10⁴), `exp_sign_small_number` (0,001 = 10³), `sci_count_zeros` |
+| Mental arithmetic | `fact_add_for_sub` (13 − 8 = 21), `fact_mul_for_add` (3 + 4 = 12), `count_off_by_one` (8 + 3 = 12), `forget_carry` (47 + 8 = 45), `compensation_wrong_way` (47 + 38 = 47 + 40 + 2), `square_digits` (23² = 49), `missing_factor_subtract` (7 × … = 56 → 49), `round_truncate` (3,47 → 3,4) |
 | Roots | `sqrt_is_square` (√9 = 81), `sqrt_of_square_sign`, `sqrt_squared_squares` ((√7)² = 49), `sqrt_product_add` (√2 × √8 = √10), `sqrt_forget_root`, `square_negative_solutions` |
+
+Three mental-arithmetic traps come from research: `fact_neighbor` (7 × 8 = 54, a neighbouring fact; Campbell & Graham 1985), `fact_add_for_mul` (3 × 4 = 7) and `sub_smaller_from_larger` (52 − 7 = 55, the « smaller from larger » bug of Brown & Burton 1978). Fact traps are matched on the answer only and explained with the question's own numbers.
 
 Three research rules are recognised by structure rather than by an operation: `neg_power_brackets` (−3² read as (−3)², and the reverse), `pow_distribute_sum` and `sqrt_distribute_sum`, plus their mirror `sqrt_combine_sum`. The minus before brackets (10 − (3 + 2) = 10 − 3 + 2) is its own trap, `minus_before_parens` [P].
 

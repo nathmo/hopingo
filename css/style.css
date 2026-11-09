@@ -404,3 +404,16 @@ textarea.code { width: 100%; font-family: ui-monospace, monospace; font-size: .7
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- fast facts (times tables, mental arithmetic) ---------- */
+.fact-q { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; font-size: 2.6rem; font-weight: 900; margin: 28px 0 8px; }
+.fact-q .m { gap: .25em; }
+.fact-q .mi-display { min-width: 2.6em; min-height: 1.5em; font-size: 2.6rem; padding: 4px 12px; }
+.fact-q .mi-display.good { border-color: var(--green); background: var(--green-soft); color: var(--green-dark); }
+.fact-q .mi-display.bad { border-color: var(--red); background: var(--red-soft); color: var(--red-dark); }
+.lesson-body.flash-good .fact-q { animation: pop .3s; }
+.fact-full { display: inline-flex; align-items: center; gap: .3em; }
+.fact-full .m { gap: .2em; }
+.fact-strategy { background: #fff; border-radius: 12px; padding: 10px 14px; margin: 8px 0; border-left: 5px solid var(--orange); color: var(--ink); }
+.fact-strategy p { margin: 4px 0 0; }
+.skill-facts { font-size: .75rem; color: var(--muted); font-weight: 700; }

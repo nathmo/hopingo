@@ -45,6 +45,14 @@ export const FAMILIES = {
     name: 'Fausse distributivité',
     hint: 'Une puissance ou une racine ne se distribue pas sur une somme : calcule d\'abord la parenthèse.',
   },
+  facts: {
+    name: 'Fait numérique',
+    hint: 'Si tu hésites, pars d\'un fait sûr (× 10, le double, un carré connu) et ajuste.',
+  },
+  place: {
+    name: 'Dizaines et unités',
+    hint: 'Dix unités font une dizaine : quand les unités dépassent 9 (ou manquent), les dizaines changent aussi.',
+  },
 };
 
 // Inline fraction HTML for explanations.
@@ -648,8 +656,76 @@ export const RULES = [
     example: ['x² = −9 donne x = −3', 'pas de solution'],
     explain: () => 'Un carré n\'est jamais négatif : 3² = 9 et (−3)² = 9. L\'équation x² = −9 n\'a pas de solution.',
   },
+  // ---------- mental arithmetic and times tables ----------
+  // Answer rules only (no `op`): they are matched on the final answer of a
+  // fact item, never replayed inside other expressions.
+  {
+    id: 'fact_neighbor', family: 'facts', tag: 'R', skill: 'tab-678', repair: 'tab-349',
+    name: 'Résultat d\'un fait voisin',
+    example: ['7 × 8 = 54', '7 × 8 = 56'],
+    explain: () => 'C\'est le résultat d\'un fait voisin (une fois de plus ou de moins). Retrouve-le depuis un fait sûr : 7 × 8 = 7 × 4 × 2 = 28 × 2 = 56.',
+  },
+  {
+    id: 'fact_add_for_mul', family: 'rule', tag: 'R', skill: 'tab-2510', repair: 'tab-2510',
+    name: 'Additionner au lieu de multiplier',
+    example: ['3 × 4 = 7', '3 × 4 = 12'],
+    explain: () => '× n\'est pas + : 3 × 4, c\'est 4 + 4 + 4 = 12, pas 3 + 4.',
+  },
+  {
+    id: 'fact_mul_for_add', family: 'rule', tag: 'E', skill: 'cm-add20', repair: 'cm-add20',
+    name: 'Multiplier au lieu d\'additionner',
+    example: ['3 + 4 = 12', '3 + 4 = 7'],
+    explain: () => 'Relis le signe : 3 + 4, c\'est 7. Le résultat 12 serait celui de 3 × 4.',
+  },
+  {
+    id: 'fact_add_for_sub', family: 'rule', tag: 'E', skill: 'cm-sub20', repair: 'cm-add20',
+    name: 'Additionner au lieu de soustraire',
+    example: ['13 − 8 = 21', '13 − 8 = 5'],
+    explain: () => 'Relis le signe : 13 − 8, c’est l’écart entre 8 et 13. Pense « 8 + combien = 13 ? » : 5.',
+  },
+  {
+    id: 'count_off_by_one', family: 'facts', tag: 'E', skill: 'cm-add20', repair: 'cm-add20',
+    name: 'Compter une fois de trop ou de moins',
+    example: ['8 + 3 = 12', '8 + 3 = 11'],
+    explain: () => 'En comptant, on compte les sauts, pas le point de départ : 8 + 3 → 9, 10, 11. Mieux encore : fais 10 (8 + 2), puis ajoute le reste (+ 1).',
+  },
+  {
+    id: 'forget_carry', family: 'place', tag: 'E', skill: 'cm-add2', repair: 'cm-add1',
+    name: 'Oublier la retenue',
+    example: ['47 + 8 = 45', '47 + 8 = 55'],
+    explain: () => '7 + 8 = 15 : ça fait 5 unités et <b>une dizaine de plus</b>, donc 47 + 8 = 55. Pour une soustraction, c\'est une dizaine de moins.',
+  },
+  {
+    id: 'sub_smaller_from_larger', family: 'place', tag: 'R', skill: 'cm-add2', repair: 'cm-add1',
+    name: 'Ôter le petit chiffre du grand',
+    example: ['52 − 7 = 55', '52 − 7 = 45'],
+    explain: () => 'On ne peut pas faire « 7 − 2 » aux unités à la place de 2 − 7. On passe par la dizaine : 52 − 2 = 50, puis 50 − 5 = 45.',
+  },
+  {
+    id: 'compensation_wrong_way', family: 'place', tag: 'E', skill: 'cm-add2', repair: 'cm-add1',
+    name: 'Corriger dans le mauvais sens',
+    example: ['47 + 38 = 47 + 40 + 2 = 89', '47 + 40 − 2 = 85'],
+    explain: () => 'Si on ajoute 40 au lieu de 38, on a ajouté 2 de trop : il faut les <b>retirer</b>. 47 + 38 = 47 + 40 − 2 = 85. (Et pour une soustraction, on a retiré trop : on rajoute.)',
+  },
+  {
+    id: 'square_digits', family: 'facts', tag: 'E', skill: 'sq-25', repair: 'sq-13',
+    name: 'Le carré de chaque chiffre',
+    example: ['23² = 49', '23² = 529'],
+    explain: () => 'Un carré ne se fait pas chiffre par chiffre : 23² = 23 × 23 = 400 + 120 + 9 = 529.',
+  },
+  {
+    id: 'missing_factor_subtract', family: 'rule', tag: 'E', skill: 'tab-div', repair: 'tab-678',
+    name: 'Soustraire au lieu de diviser',
+    example: ['7 × … = 56 → 49', '7 × 8 = 56'],
+    explain: () => '7 × … = 56 demande combien de fois 7 dans 56 : c\'est une division, 56 : 7 = 8. Pas une soustraction.',
+  },
+  {
+    id: 'round_truncate', family: 'place', tag: 'E', skill: 'cm-round', repair: 'cm-round',
+    name: 'Couper au lieu d\'arrondir',
+    example: ['3,47 → 3,4', '3,47 → 3,5'],
+    explain: () => 'Arrondir, ce n\'est pas couper : on regarde le chiffre suivant. Dans 3,47 au dixième, le 7 fait monter le 4 : 3,5.',
+  },
 ];
-
 export const RULE_BY_ID = Object.fromEntries(RULES.map((r) => [r.id, r]));
 
 export const OP_RULES = RULES.filter((r) => r.op);

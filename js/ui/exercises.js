@@ -140,6 +140,48 @@ MOUNTS.answer = (item, ctx, body) => {
   };
 };
 
+// ---------- fast fact (times tables, mental arithmetic) ----------
+// No "Vérifier": the answer is judged as soon as it has as many digits as
+// the expected one (or on Enter). The lesson moves straight on when right.
+
+MOUNTS.fact = (item, ctx, body) => {
+  let done = false;
+  const finish = () => {
+    if (done || !input.value) return;
+    done = true;
+    const v = input.value;
+    if (v === item.expected) {
+      input.display.classList.add('good');
+      ctx.complete({ correct: true });
+      return;
+    }
+    input.display.classList.add('bad');
+    const trap = item.traps.find((t) => t.value === v);
+    const full = `${item.left}<span class="m"><span class="m-num">${item.expected}</span></span>${item.right}`;
+    // The trap is explained with this question's numbers when possible.
+    const rule = trap && RULE_BY_ID[trap.rule];
+    const why = rule ? `<div class="trap-explain"><div class="trap-tag">🪤 Piège : ${rule.name}</div><p>${trap.note || rule.explain()}</p></div>` : '';
+    ctx.complete({
+      correct: false,
+      rules: trap ? [trap.rule] : [],
+      ambiguous: 1,
+      answerHtml: `<span class="fact-full">${full}</span>`,
+      explainHtml: `${why}<div class="fact-strategy"><b>💡 Astuce</b><p>${item.strategy}</p></div>`,
+    });
+  };
+  const input = new MathInput({
+    keys: 'int',
+    onChange: (v) => { if (v.length >= item.expected.length) finish(); },
+    onEnter: () => finish(),
+  });
+  body.appendChild(h('div.fact-q', html(item.left), input.display, html(item.right)));
+  return {
+    ownFlow: true,
+    footer: input.keypad(),
+    onKey: (e) => { if (!done) input.handleKey(e); },
+  };
+};
+
 // ---------- shading ----------
 
 MOUNTS.shade = (item, ctx, body) => {
