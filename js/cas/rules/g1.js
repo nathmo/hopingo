@@ -93,10 +93,12 @@ export const RULES = [
     name: 'Mauvaise racine gardée pour f⁻¹ (corrigé MAN 2018, Math 1B, Q2)',
     example: ['x = 1 − √(1 + y)', 'x = 1 + √(1 + y)'],
     check: { judge: { kind: 'solset', v: 'x', domain: '[1;+∞[', params: { y: '[-1;+∞[' } }, prev: 'x=1+sqrt(1+y)∨x=1-sqrt(1+y)', line: 'x=1-sqrt(1+y)' },
-    // One branch of « x = … ou x = … » kept.
-    transform: (prev) => {
+    // One branch of « x = … ou x = … » kept, when y = f(x) is solved for x
+    // (a parameter y).
+    transform: (prev, ctx = {}) => {
       const n = stripParen(prev);
-      if (n.t !== 'logic' || n.op !== 'or') return [];
+      if (!ctx.cfg?.params || n.t !== 'logic' || n.op !== 'or') return [];
+      if (![n.l, n.r].every((s) => stripParen(s).t === 'rel' && stripParen(s).op === '=')) return [];
       return [{ node: n.l, ctx: {} }, { node: n.r, ctx: {} }];
     },
     explain: () => 'Les deux racines ne sont pas dans l\'ensemble de départ : teste une valeur de y. Garde la racine qui est dans l\'ensemble de départ.',

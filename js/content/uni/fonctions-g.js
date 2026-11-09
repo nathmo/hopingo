@@ -312,6 +312,7 @@ function compPairs(rng) {
     { outer: '1/x', inner: af, simple: `1/(${af})` },
     { outer: af, inner: '1/x', simple: `${a}/x${b < 0 ? '' : '+'}${b}` },
     { outer: '|x|', inner: af, simple: `|${af}|` },
+    { outer: `1/(${lin(k)})`, inner: '1/x', simple: `x/(1${k > 0 ? '-' : '+'}${Math.abs(k) === 1 ? '' : Math.abs(k)}x)` },
   ];
 }
 
@@ -325,7 +326,7 @@ function subst(outerText, innerText) {
   for (const path of paths) {
     const parent = path.length ? getAt(outer, path.slice(0, -1)) : null;
     const prodParent = parent && parent.t === 'bin' && parent.op === '×';
-    const group = parent && (['paren', 'abs', 'fn'].includes(parent.t) || (inner.t === 'sqrt' && prodParent) || (inner.t === 'num' && !prodParent));
+    const group = parent && (['paren', 'abs', 'fn'].includes(parent.t) || (['sqrt', 'pow'].includes(inner.t) && prodParent && parent.r === getAt(outer, path)) || (inner.t === 'num' && !prodParent));
     out = replaceAt(out, path, inner.t === 'sym' || group ? inner : { t: 'paren', e: inner });
   }
   // 4·1² and not 41²: a product before a number shows its ×.
@@ -389,7 +390,7 @@ function cmpParts(d, level) {
   ];
   // The raw writing may already be the simple one.
   if (clean(d.raw) !== clean(d.simple)) expr.push(E(d.simple, 'Simplifier', 'simplify', 'simplify'));
-  if (level === 1 && expr[0]) expr[0] = blanked(expr[0], [toText(parse(innerText))], { funcs: ['f', 'g'] });
+  if (level === 1 && expr[0]) expr[0] = blanked(expr[0], [toText(unparen(parse(innerText)))], { funcs: ['f', 'g'] });
   const domCond = domText(d.call, { funcs: ['f', 'g'], defs: d.defs });
   const dom = [E(domCond, 'Domaine : x doit être dans le domaine de la fonction intérieure, et l\'expression brute définie', 'domain', 'domain')];
   return { expr, dom, domCond };
@@ -508,6 +509,7 @@ function invData(rng, kind) {
       const c = nz(rng, -3, 3);
       const d = rng.int(-4, 4);
       if (a * d - b * c === 0 || (b === 0 && d === 0)) continue;
+      if (gcdI(gcdI(a, b), gcdI(c, d)) > 1) continue;
       const num = affine(a, b);
       const den = affine(c, d);
       const f = `(${num})/(${den})`;
@@ -515,9 +517,10 @@ function invData(rng, kind) {
       const lim = q(a, c);
       const A = `ℝ∖{${N(pole)}}`;
       const B = `ℝ∖{${N(lim)}}`;
-      const xy = `(${affY(-d, b)})/(${affY(c, -a)})`;
+      const wrapT = (t) => (/^-?\d*[a-z]?$/.test(t) ? t : `(${t})`);
+      const xy = `${wrapT(affY(-d, b))}/(${affY(c, -a)})`;
       const lines = [
-        E(`${den === 'x' ? 'xy' : `y(${den})`}=${num}`, 'Multiplier par le dénominateur', 'isolate', 'isolate'),
+        E(`${/^-?\d*x$/.test(den) ? `${den}y` : `y(${den})`}=${num}`, 'Multiplier par le dénominateur', 'isolate', 'isolate'),
         E(`x(${affY(c, -a)})=${affY(-d, b)}`, 'Regrouper les termes en x', 'isolate', 'isolate'),
         E(`x=${xy}`, `Diviser : ${toReadable(parse(affY(c, -a)))} ≠ 0 car y ≠ ${fr(N(lim))}`, 'isolate', 'isolate'),
       ];
@@ -651,7 +654,8 @@ function triData(rng, kind = 'two') {
     if (b.d !== 1 || c.d !== 1 || (r1.d === 2 && r2.d === 2 && Math.abs(a) < 4)) continue;
     const cs = [a, b.n, c.n];
     const lead = a === 1 ? '' : a === -1 ? '-' : String(a);
-    return { kind, a, rel, cs, poly: polyText(cs), roots: [r1, r2], factored: `${lead}(${lin(r1)})(${lin(r2)})` };
+    const facs = [r1, r2].sort((u, w) => (u.n === 0 ? -1 : w.n === 0 ? 1 : 0)).map((r) => (r.n === 0 ? 'x' : `(${lin(r)})`)).join('');
+    return { kind, a, rel, cs, poly: polyText(cs), roots: [r1, r2], factored: `${lead}${facs}` };
   }
   return null;
 }
@@ -689,11 +693,11 @@ function triItem(level, rng, opts = {}) {
   const script = [];
   // Level 5: put everything on one side first.
   if (level === 5) {
-    const k = rng.int(-6, 6);
-    const m = rng.int(-3, 3);
-    // a x² + b x + c rel 0  ⇔  a x² rel −b x − c, written with a shift.
-    const right = polyText([0, -d.cs[1] + m, -d.cs[2] + k].slice(1));
-    const left = polyText([d.cs[0], m, k]);
+    // a x² + b x + c rel 0, written as a x² + (b + s)x + (c + t) rel s x + t.
+    const s1 = nz(rng, -3, 3);
+    const t1 = rng.int(-5, 5);
+    const right = polyText([s1, t1]);
+    const left = polyText([d.cs[0], d.cs[1] + s1, d.cs[2] + t1]);
     first = `${left}${d.rel}${right}`;
     script.push(E(start, 'Tout passer à gauche', 'roots', 'move'));
   }
@@ -776,6 +780,7 @@ function sgnData(rng, level) {
     const n = level >= 4 ? rng.int(3, 4) : rng.int(2, 3);
     const roots = [];
     while (roots.length < n) { const r = rng.int(-4, 4); if (!roots.includes(r)) roots.push(r); }
+    roots.sort((u, w) => u - w);
     const even = rng.chance(0.5) ? rng.int(0, n - 1) : -1;
     const den = rng.chance(0.7) ? rng.int(0, n - 1) : -1;
     if (den === even && den >= 0 && rng.chance(0.5)) continue;
@@ -942,7 +947,7 @@ function parBank(rng) {
     { f: `x^5+${a}x^3`, fm: `-x^5-${a}x^3`, kind: 'odd' },
     { f: 'x×cos(x)', fm: '-x×cos(x)', kind: 'odd' },
     { f: `x^3+${a}x^2`, fm: `-x^3+${a}x^2`, kind: 'none' },
-    { f: `x^2${c > 0 ? '+' : ''}${c}x`, fm: `x^2${c > 0 ? '-' : '+'}${Math.abs(c)}x`, kind: 'none' },
+    { f: polyText([1, c, 0]), fm: polyText([1, -c, 0]), kind: 'none' },
     { f: `x^3-x+${b}`, fm: `-x^3+x+${b}`, kind: 'none' },
     { f: `x^2+${a}x+${b}`, fm: `x^2-${a}x+${b}`, kind: 'none' },
   ];
@@ -1118,8 +1123,8 @@ function injBank(rng) {
         steps: [
           `Soient a, b ∈ ${MT(A)} tels que ${MT(`${fa}=${fb}`, AB)}.`,
           `${MT(`(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})`, AB)} (produit en croix)`,
-          `${MT(`${-p * r}a+${qq}b=${-p * r}b+${qq}a`.replace(/\+-/g, '-'), AB)} (pab et ${fr(String(-qq * r))} s'éliminent)`,
-          `${MT(`${k}(b-a)=0`, AB)}, et ${k} ≠ 0, donc a = b.`,
+          `${MT(`${-p * r}a+${qq}b=${-p * r}b+${qq}a`.replace(/\+-/g, '-'), AB)} (les termes en ab et les constantes s'éliminent)`,
+          `${MT(`${k}(b-a)=0`, AB)}, et ${fr(String(k))} ≠ 0, donc a = b.`,
           `Donc f est injective sur ${MT(A)}.`,
         ],
         inputs: [

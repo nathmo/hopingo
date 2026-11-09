@@ -5,7 +5,7 @@
 // Prerequisites of the catalogue resolved to the school skills:
 // @alg:C-developper = lit-polynomial, @alg:E-produit-nul = eq-product;
 // indirect credit @alg:D-trinome = fac-trinomial, @alg:G-equations =
-// rat-equation. g1-inverse (module G1) goes through UNBUILT until G1 is merged.
+// rat-equation.
 
 export const UNIT = { id: 'trigo', title: 'Trigonométrie', color: '#0ca678', ready: true };
 

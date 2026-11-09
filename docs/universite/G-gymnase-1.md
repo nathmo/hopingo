@@ -1005,7 +1005,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
   | # | Ligne | Sous-but |
   |---|---|---|
   | 1 | Bornes : −2, 1, 3 | Zéros et pôle |
-  | 2 | x − 1 : − − 0 + + ; (x + 2)² : + 0 + + + ; 3 − x : + + + 0 − | Une ligne par facteur |
+  | 2 | x − 1 : − − − 0 + + + ; (x + 2)² : + 0 + + + + + ; 3 − x : + + + + + 0 − | Une ligne par facteur (7 colonnes : 4 intervalles et 3 bornes) |
   | 3 | f : − 0 − 0 + ‖ − | Règle des signes |
   | 4 | S = {−2} ∪ [1 ; 3[ | Lire (→ `g9-intervals`) |
 - **Aides** : 1 « Un facteur au carré est toujours ≥ 0. » · 2 « Entre 1 et 3 : (+)(+)/(+) = … » · 3 la ligne 3.

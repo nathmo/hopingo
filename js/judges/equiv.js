@@ -209,6 +209,20 @@ function reachesGoal(node, goal) {
   return equalExact(node, goal) === true && kind(a) === kind(b) && topTerms(a) === topTerms(b) && fns(node) === fns(goal);
 }
 
+// Fractions inside fractions: 1/(1/x − 2) is not simplified yet.
+function fracDepth(n) {
+  let best = 0;
+  const visit = (x, d) => {
+    if (!x || typeof x !== 'object') return;
+    const here = x.t === 'frac' || (x.t === 'bin' && x.op === '÷') ? d + 1 : d;
+    best = Math.max(best, here);
+    for (const k of ['e', 'l', 'r', 'n', 'd', 'b']) if (x[k] && typeof x[k] === 'object') visit(x[k], here);
+    if (Array.isArray(x.args)) x.args.forEach((a) => visit(a, here));
+  };
+  visit(n, 0);
+  return best;
+}
+
 // Nodes of a tree, brackets left out: the size of a writing.
 function size(n) {
   let k = 0;
@@ -219,7 +233,8 @@ function size(n) {
 const TARGETS = {
   // Step U1b (G1): the item's functions f, g are expanded (no call left)
   // and the line is about as short as cfg.goal (1 − x, not 1 − (√x)²).
-  short: (node, cfg) => !contains(node, (x) => x.t === 'fn' && !!cfg.defs?.[x.name]) && size(node) <= size(parseGoal(cfg)) + (cfg.slack ?? 1),
+  short: (node, cfg) => !contains(node, (x) => x.t === 'fn' && !!cfg.defs?.[x.name]) && size(node) <= size(parseGoal(cfg)) + (cfg.slack ?? 1)
+    && fracDepth(node) <= fracDepth(parseGoal(cfg)),
   goal: (node, cfg) => (cfg.goal ? reachesGoal(node, parseGoal(cfg)) : false),
   only: (node, cfg) => {
     const ok = [...symbolsIn(node)].every((s) => (cfg.finalVars || []).includes(s));

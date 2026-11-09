@@ -129,7 +129,7 @@ export const SKILLS = [
       rule: 'On factorise, on place tous les zéros et les valeurs interdites dans l\'ordre, une ligne par facteur, puis la règle des signes.<br>Un facteur au carré ne change pas de signe. Une valeur interdite est marquée ‖.',
       lines: [
         { cas: '(x-1)(x+2)^2/(3-x)', note: 'Bornes −2, 1, 3', noEq: true },
-        { html: 'x − 1 : − − 0 + + ; (x + 2)² : + 0 + + + ; 3 − x : + + + 0 −', note: 'Une ligne par facteur', noEq: true },
+        { html: 'x − 1 : − − − 0 + + + ; (x + 2)² : + 0 + + + + + ; 3 − x : + + + + + 0 −', note: 'Une ligne par facteur', noEq: true },
         { html: 'f : − 0 − 0 + ‖ −', note: 'Règle des signes', noEq: true },
         { cas: '{-2}∪[1;3[', note: 'f(x) ≥ 0', noEq: true },
       ],

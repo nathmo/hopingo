@@ -17,18 +17,21 @@ _Lire et écrire une somme avec Σ, linéarité, formules du cours._
     = 4 + 7 + 10 + □ + □   (trous : 4 + 7 + 10 + 13 + 16)   ← k = 1, 2, …, 5 : 5 termes
     = 50   ← Additionner
   aides : Remplace k par 1, puis 2, … jusqu'à 5. | Pour k = 1 : 4. Pour k = 5 : … | 4 + 7 + 10 + 13 + 16
+  pièges : g3_deg_rad
 
 Écris les termes de Σ_{k=1}^{3} (k + 1) un par un, puis calcule.
   [guided]  Σ_{k=1}^{3} (k + 1)
     = 2 + □ + □   (trous : 2 + 3 + 4)   ← k = 1, 2, …, 3 : 3 termes
     = 9   ← Additionner
   aides : Remplace k par 1, puis 2, … jusqu'à 3. | Pour k = 1 : 2. Pour k = 3 : … | 2 + 3 + 4
+  pièges : g3_deg_rad
 
 Écris les termes de Σ_{k=2}^{4} (4k + 1) un par un, puis calcule.
   [guided]  Σ_{k=2}^{4} (4k + 1)
     = 9 + □ + □   (trous : 9 + 13 + 17)   ← k = 2, 3, …, 4 : 3 termes
     = 39   ← Additionner
   aides : Remplace k par 2, puis 3, … jusqu'à 4. | Pour k = 2 : 9. Pour k = 4 : … | 9 + 13 + 17
+  pièges : g3_deg_rad
 
 ```
 
@@ -64,6 +67,7 @@ Calcule Σ_{k=1}^{5} (2k² − 3k − 1).
     = 2·(5·6·11/6) − 3·(5·6/2) − 5   ← Formules ; 5 termes
     = 60   ← Calculer
   aides : Sépare la somme en sommes de k², de k et de constantes. Σ d'une constante c vaut c × (nombre de termes). | 2Σ_{k=1}^{5} k² − 3Σ_{k=1}^{5} k − Σ_{k=1}^{5} 1 | 2·(5·6·11/6) − 3·(5·6/2) − 5
+  pièges : g3_deg_rad
 
 Calcule Σ_{k=1}^{6} (3k² + k − 3).
   [tap, suivre l'erreur, menu sigma]  Σ_{k=1}^{6} (3k² + k − 3)
@@ -71,6 +75,7 @@ Calcule Σ_{k=1}^{6} (3k² + k − 3).
     = 3·(6·7·13/6) + (6·7/2) − 3·6   ← Formules ; 6 termes
     = 276   ← Calculer
   aides : Sépare la somme en sommes de k², de k et de constantes. Σ d'une constante c vaut c × (nombre de termes). | 3Σ_{k=1}^{6} k² + Σ_{k=1}^{6} k − Σ_{k=1}^{6} 3 | 3·(6·7·13/6) + (6·7/2) − 3·6
+  pièges : g3_deg_rad
 
 Calcule Σ_{k=1}^{16} (2k + 4).
   [tap, suivre l'erreur, menu sigma]  Σ_{k=1}^{16} (2k + 4)
@@ -78,6 +83,7 @@ Calcule Σ_{k=1}^{16} (2k + 4).
     = 2·(16·17/2) + 4·16   ← Formules ; 16 termes
     = 336   ← Calculer
   aides : Sépare la somme en sommes de k², de k et de constantes. Σ d'une constante c vaut c × (nombre de termes). | 2Σ_{k=1}^{16} k + Σ_{k=1}^{16} 4 | 2·(16·17/2) + 4·16
+  pièges : g3_deg_rad
 
 ```
 
@@ -195,7 +201,7 @@ Calcule Σ_{k=1}^{n} ln(1 + 1/k). La décomposition est donnée : ln(1 + 1/k) = 
     = ln(n + 1) − □   (trous : ln(n + 1) − ln(1))   ← Télescoper : il reste le début et la fin
     = ln(n + 1)   ← Réduire
   aides : Écris le terme comme une différence : ln(1 + 1/k) = ln((k + 1)/k) = ln(k + 1) − ln k. | Écris les premiers et les derniers termes : (ln 2 − ln 1) + (ln 3 − ln 2) + … + (ln(n + 1) − ln n). Presque tout s'annule. | ln(n + 1) − ln(1)
-  pièges : g5_reindex_half, g5_telescope_ends
+  pièges : g2_log_sum, g2_log_quotient, g5_reindex_half, g5_telescope_ends
 
 Calcule Σ_{k=1}^{n} 1/(√(k + 1) + √(k)). La décomposition est donnée : 1/(√(k + 1) + √k) = √(k + 1) − √k (multiplier par la quantité conjuguée).
   [guided]  Σ_{k=1}^{n} (√(k + 1) − √(k))
@@ -224,7 +230,7 @@ Calcule Σ_{k=1}^{n} ln(1 + 1/k) en fonction de n (somme télescopique).
     = ln(n + 1) − ln(1)   ← Télescoper : il reste le début et la fin
     = ln(n + 1)   ← Réduire
   aides : Écris le terme comme une différence : ln(1 + 1/k) = ln((k + 1)/k) = ln(k + 1) − ln k. | Écris les premiers et les derniers termes : (ln 2 − ln 1) + (ln 3 − ln 2) + … + (ln(n + 1) − ln n). Presque tout s'annule. | ln(n + 1) − ln(1)
-  pièges : g5_reindex_half
+  pièges : g2_log_sum, g5_reindex_half
 
 Calcule Σ_{k=1}^{n} 1/(√(k + 1) + √(k)) en fonction de n (somme télescopique).
   [tap, suivre l'erreur, menu telescope]  Σ_{k=1}^{n} 1/(√(k + 1) + √(k))
@@ -988,7 +994,7 @@ Montre par récurrence que Σ_{k=1}^{n} k³ = (n(n + 1)/2)² pour tout n ≥ 1.
     = ((n + 1)(n + 2)/2)²   ← C'est la formule au rang n + 1
     (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
   aides : Sépare le terme k = n + 1, puis remplace la somme jusqu'à n par la formule supposée. | Σ_{k=1}^{n + 1} k³ = Σ_{k=1}^{n} k³ + (n + 1)³, puis mets en facteur ce qui est commun. | (n + 1)²(n² + 4n + 4)/4
-  pièges : g5_sum_product
+  pièges : g3_deg_rad, g5_sum_product
 
 Montre par récurrence que Σ_{k=1}^{n} k² = n(n + 1)(2n + 1)/6 pour tout n ≥ 1.
   [free, suivre l'erreur]  Σ_{k=1}^{1} k²
@@ -1001,7 +1007,7 @@ Montre par récurrence que Σ_{k=1}^{n} k² = n(n + 1)(2n + 1)/6 pour tout n ≥
     = (n + 1)(n + 2)(2n + 3)/6   ← C'est la formule au rang n + 1
     (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
   aides : Sépare le terme k = n + 1, puis remplace la somme jusqu'à n par la formule supposée. | Σ_{k=1}^{n + 1} k² = Σ_{k=1}^{n} k² + (n + 1)², puis mets en facteur ce qui est commun. | (n + 1)(2n² + 7n + 6)/6
-  pièges : g5_sum_product
+  pièges : g3_deg_rad, g5_sum_product
 
 Montre par récurrence que Σ_{k=1}^{n} k² = n(n + 1)(2n + 1)/6 pour tout n ≥ 1.
   [free, suivre l'erreur]  Σ_{k=1}^{1} k²
@@ -1014,7 +1020,7 @@ Montre par récurrence que Σ_{k=1}^{n} k² = n(n + 1)(2n + 1)/6 pour tout n ≥
     = (n + 1)(n + 2)(2n + 3)/6   ← C'est la formule au rang n + 1
     (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
   aides : Sépare le terme k = n + 1, puis remplace la somme jusqu'à n par la formule supposée. | Σ_{k=1}^{n + 1} k² = Σ_{k=1}^{n} k² + (n + 1)², puis mets en facteur ce qui est commun. | (n + 1)(2n² + 7n + 6)/6
-  pièges : g5_sum_product
+  pièges : g3_deg_rad, g5_sum_product
 
 ```
 
@@ -1031,7 +1037,7 @@ Montre par récurrence que Σ_{k=1}^{n} k³ = (n(n + 1)/2)² pour tout n ≥ 1.
     = (n + 1)²(n² + 4n + 4)/4   ← Mettre en facteur
     = ((n + 1)(n + 2)/2)²   ← C'est la formule au rang n + 1
     (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
-  pièges : g5_sum_product
+  pièges : g3_deg_rad, g5_sum_product
 
 Montre par récurrence que Σ_{k=1}^{n} k² = n(n + 1)(2n + 1)/6 pour tout n ≥ 1.
   [free, sans aide]  Σ_{k=1}^{1} k²
@@ -1043,7 +1049,7 @@ Montre par récurrence que Σ_{k=1}^{n} k² = n(n + 1)(2n + 1)/6 pour tout n ≥
     = (n + 1)(2n² + 7n + 6)/6   ← Mettre en facteur
     = (n + 1)(n + 2)(2n + 3)/6   ← C'est la formule au rang n + 1
     (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
-  pièges : g5_sum_product
+  pièges : g3_deg_rad, g5_sum_product
 
 Montre par récurrence que Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour tout n ≥ 1.
   [free, sans aide]  Σ_{k=1}^{1} 1/(k(k + 1))
@@ -1055,6 +1061,7 @@ Montre par récurrence que Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour tout n ≥
     = (n² + 2n + 1)/((n + 1)(n + 2))   ← Mettre en facteur
     = (n + 1)/(n + 2)   ← C'est la formule au rang n + 1
     (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
+  pièges : g3_deg_rad
 
 ```
 
@@ -1071,6 +1078,7 @@ Montre par récurrence que Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour tout n ≥
     = (n² + 2n + 1)/((n + 1)(n + 2))   ← Mettre en facteur
     = (n + 1)/(n + 2)   ← C'est la formule au rang n + 1
     (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
+  pièges : g3_deg_rad
 
 ```
 
@@ -1242,17 +1250,16 @@ Montre par récurrence : f(x) = x², f₁ = f et fₙ₊₁ = f ∘ fₙ : fₙ(
     3. Alors fₙ₊₁(x) = f(fₙ(x)) = (x^(2ⁿ))².
     4. (x^(2ⁿ))² = x^(2·2ⁿ) = x^(2ⁿ⁺¹) : P(n + 1) est vraie.   [à écrire : (x^(2ⁿ))² = x^(2^(n+1))]
     5. Conclusion : par récurrence, P(n) est vraie pour tout n ≥ 1.
+    ✗ Alors fₙ₊₁(x) = f(fₙ(x)) = x^(2ⁿ + 2). [g2_power_power]
     ✗ C'est vrai pour n = 1, 2 et 3, donc pour tout n. [g9_proof_by_example]
-    ✗ L'hérédité suffit : P(n) est donc vraie pour tout n, sans initialisation. [g5_induction_no_base]
     ✗ Hérédité : supposons fₙ₊₁(x) = x^(2ⁿ⁺¹). [g5_induction_circular]
+    ✗ L'hérédité suffit : P(n) est donc vraie pour tout n, sans initialisation. [g5_induction_no_base]
   [examen open]
-  pièges : g9_proof_by_example, g5_induction_no_base, g5_induction_circular
+  pièges : g2_power_power, g9_proof_by_example, g5_induction_circular, g5_induction_no_base
 
 Vrai ou faux ?
-  « Si P(n) ⇒ P(n + 1) pour tout n ≥ 0, alors P(n) est vraie pour tout n ≥ 0. » → FAUX
-    contre-exemple (heredity) : P = n>n+1
+  « Si P(0) est vraie et que P(n) ⇒ P(n + 1) pour tout n ≥ 0, alors P(n) est vraie pour tout n ≥ 0. » → VRAI
   [examen tf]
-  pièges : g5_induction_no_base
 
 ```
 
