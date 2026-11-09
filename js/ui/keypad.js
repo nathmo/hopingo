@@ -126,7 +126,8 @@ export class MathInput {
     const pad = h(`div.keypad.keys-${Array.isArray(this.keys) ? 'custom' : this.keys}`);
     for (const k of this.keyList) {
       if (!k) { pad.appendChild(h('span')); continue; }
-      const cls = /^[0-9]$/.test(k) ? 'key' : `key key-fn key-${k === '-' ? 'minus' : k.replace(/[^a-z]/g, '') || 'op'}`;
+      const letter = /^[a-zA-Zπ]$/.test(k);
+      const cls = /^[0-9]$/.test(k) ? 'key' : letter ? 'key key-fn key-letter' : `key key-fn key-${k === '-' ? 'minus' : k.replace(/[^a-z]/g, '') || 'op'}`;
       pad.appendChild(h('button', { class: cls, type: 'button', onclick: () => this.press(k), html: LABEL[k] ?? esc(k) }));
     }
     return pad;

@@ -98,8 +98,65 @@ function readValues(raw, name) {
 }
 const close = (a, b) => Math.abs(a - b) < 1e-6;
 
+const NONE = /aucune|aucun|∅|pas de solution|impossible/i;
+
+// Solutions written with parameters: x = a − 1 ; x = a + 1. Compared at
+// random values of the parameters (where the expected solutions exist).
+export function checkParamset(item, raw) {
+  const s = String(raw).replace(/\s/g, '');
+  const parts = s.split(';').filter(Boolean).map((p) => tryParseAlg(p));
+  if (!parts.length || parts.some((n) => !n)) return { kind: 'stay', message: 'Écris les solutions ainsi : x = … ; x = …' };
+  const exprs = parts.map((n) => (n.t === 'eq' ? (n.l.t === 'var' && n.l.name === 'x' ? n.r : n.r.t === 'var' && n.r.name === 'x' ? n.l : null) : n));
+  if (exprs.some((e) => !e)) return { kind: 'stay', message: 'Écris chaque solution sous la forme x = …' };
+  if (exprs.some((e) => varsIn(e).has('x'))) return { kind: 'stay', message: 'x est encore des deux côtés : la solution ne doit dépendre que des paramètres.' };
+  const want = item.solutions.map((e) => parseAlg(e));
+  let tested = 0;
+  for (let i = 0; i < 12 && tested < 4; i++) {
+    const env = Object.fromEntries(item.params.map(([name, lo, hi], j) => [name, lo + ((i * 0.618 + j * 0.37) % 1) * (hi - lo)]));
+    let w;
+    try { w = want.map((e) => evalAt(e, env)); } catch { continue; }
+    if (w.some((v) => !Number.isFinite(v))) continue;
+    tested += 1;
+    let g;
+    try { g = exprs.map((e) => evalAt(e, env)); } catch { return { kind: 'wrong' }; }
+    const used = new Set();
+    for (const v of g) {
+      const k = w.findIndex((x, idx) => !used.has(idx) && Math.abs(x - v) < 1e-6 * Math.max(1, Math.abs(x)));
+      if (k < 0) return { kind: 'wrong' };
+      used.add(k);
+    }
+    if (used.size < w.length) return { kind: 'stay', message: 'C\'est juste, mais il manque une solution.' };
+  }
+  return tested ? { kind: 'done' } : { kind: 'wrong' };
+}
+
+// An equation rewritten as "… = 0": same solutions as the target, written
+// with everything on one side.
+export function checkEqZero(item, raw) {
+  const node = tryParseAlg(raw);
+  if (!node || node.t !== 'eq') return { kind: 'stay', message: 'Écris une équation de la forme … = 0.' };
+  const zero = (n) => n.t === 'num' && n.v.n === 0;
+  if (!zero(node.r) && !zero(node.l)) return { kind: 'stay', message: 'Ramène tout du même côté : l\'autre côté doit être 0.' };
+  const side = zero(node.r) ? node.l : node.r;
+  const target = parseAlg(item.target);
+  const names = [...new Set([...varsIn(side), ...varsIn(target)])];
+  let ratio = null;
+  for (let i = 0; i < 6; i++) {
+    const env = Object.fromEntries(names.map((n, j) => [n, 0.7 + ((i * 1.3 + j * 0.77) % 3.1)]));
+    let p; let q;
+    try { p = evalAt(side, env); q = evalAt(target, env); } catch { return { kind: 'wrong' }; }
+    if (Math.abs(q) < 1e-9) continue;
+    const r = p / q;
+    if (ratio == null) ratio = r;
+    else if (Math.abs(r - ratio) > 1e-6 * Math.max(1, Math.abs(ratio))) return { kind: 'wrong' };
+  }
+  return ratio && Math.abs(ratio) > 1e-9 ? { kind: 'done' } : { kind: 'wrong' };
+}
+
 // A set of solutions: every value found, none missing, none extra.
 export function checkSolset(item, raw) {
+  if (NONE.test(String(raw))) return item.values.length ? { kind: 'wrong' } : { kind: 'done' };
+  if (!item.values.length) return { kind: 'wrong', rule: (item.setTraps || [])[0]?.rule ?? null };
   const got = readValues(raw, 'x');
   if (!got) return { kind: 'stay', message: 'Écris les solutions ainsi : x = 2 ; x = −1/3' };
   const vals = [...new Set(got.map((g) => Math.round(g.value * 1e9) / 1e9))];
@@ -154,4 +211,5 @@ export function checkIsolate(item, raw) {
 export const CHECKERS = {
   primes: checkPrimes, surd: checkSurd, rounded: checkRounded, alg: checkAlg,
   solset: checkSolset, system: checkSystem, isolate: checkIsolate,
+  paramset: checkParamset, eqzero: checkEqZero,
 };

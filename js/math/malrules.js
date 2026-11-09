@@ -1164,7 +1164,57 @@ export const RULES = [
     example: ['y = x − 3 coupe l\'axe en 3', 'coupe l\'axe en −3'],
     explain: () => 'Pour x = 0, y = b : avec y = x − 3, la droite coupe l\'axe vertical en −3.',
   },
+  // ---------- rational fractions, quadratics ----------
+  {
+    id: 'forbidden_numerator', family: 'meaning', tag: 'E', skill: 'rat-domain', repair: 'rat-domain',
+    name: 'Valeur interdite cherchée au numérateur',
+    example: ['(x + 1)/(x − 2) : x ≠ −1', 'x ≠ 2'],
+    explain: () => 'Seul le <b>dénominateur</b> ne peut pas valoir 0 (on ne divise pas par 0). Le numérateur peut valoir 0 : la fraction vaut alors 0.',
+  },
+  {
+    id: 'cancel_terms', family: 'distribute', tag: 'R', skill: 'rat-simplify', repair: 'fac-common',
+    name: 'Barrer des termes',
+    example: ['(x + 6)/3 = x + 2 … ou (x + 3)/3 = x', '(2x + 6)/2 = x + 3'],
+    explain: () => 'On ne simplifie que des <b>facteurs</b> communs à tout le numérateur et tout le dénominateur. Factorise d\'abord : (2x + 6)/2 = 2(x + 3)/2 = x + 3.',
+  },
+  {
+    id: 'forbidden_value_kept', family: 'meaning', tag: 'R', skill: 'rat-equation', repair: 'rat-domain',
+    name: 'Garder une valeur interdite',
+    example: ['(x² − 4)/(x − 2) = 0 → x = 2 ou −2', 'x = 2 est interdit : x = −2'],
+    explain: () => 'Une solution qui annule un dénominateur n\'en est pas une : l\'équation n\'a pas de sens pour cette valeur. Vérifie toujours les valeurs interdites à la fin.',
+  },
+  {
+    id: 'discriminant_b_sign', family: 'sign', tag: 'E', skill: 'quad-formula', repair: 'pow-sign',
+    name: 'b² négatif quand b est négatif',
+    example: ['b = −3 : b² = −9', '(−3)² = 9'],
+    explain: () => 'b² est toujours positif : (−3)² = 9. Mets b entre parenthèses quand il est négatif.',
+  },
+  {
+    id: 'discriminant_forget_4', family: 'rule', tag: 'E', skill: 'quad-formula', repair: 'quad-formula',
+    name: 'Oublier le 4 de 4ac',
+    example: ['Δ = b² − ac', 'Δ = b² − 4ac'],
+    explain: () => 'Le discriminant est Δ = b² − <b>4</b>ac.',
+  },
+  {
+    id: 'formula_minus_b', family: 'sign', tag: 'E', skill: 'quad-formula', repair: 'quad-formula',
+    name: 'Oublier le − devant b',
+    example: ['x = (b ± √Δ)/(2a)', 'x = (−b ± √Δ)/(2a)'],
+    explain: () => 'La formule commence par <b>−b</b> : si b = −5, −b = 5.',
+  },
+  {
+    id: 'formula_2a_partial', family: 'distribute', tag: 'E', skill: 'quad-formula', repair: 'quad-formula',
+    name: 'Diviser seulement √Δ par 2a',
+    example: ['x = −b ± √Δ/(2a)', 'x = (−b ± √Δ)/(2a)'],
+    explain: () => 'Tout le numérateur −b ± √Δ est divisé par 2a : la barre de fraction est sous les deux termes.',
+  },
+  {
+    id: 'complete_square_half', family: 'rule', tag: 'E', skill: 'quad-complete', repair: 'lit-identities',
+    name: 'Oublier de prendre la moitié',
+    example: ['x² + 6x = (x + 6)² − 36', 'x² + 6x = (x + 3)² − 9'],
+    explain: () => '(x + h)² = x² + 2hx + h² : le coefficient de x est 2h. Pour x² + 6x, h est la <b>moitié</b> de 6, donc 3.',
+  },
 ];
+
 
 
 

@@ -16,6 +16,9 @@ export const UNITS = [
   { id: 'equations', title: 'Équations', color: '#3b5bdb', ready: true },
   { id: 'formules', title: 'Isoler une variable', color: '#5c940d', ready: true },
   { id: 'fonctions', title: 'Fonctions', color: '#0c8599', ready: true },
+  { id: 'second', title: 'Équations du 2e degré', color: '#5f3dc4', ready: true },
+  { id: 'rationnelles', title: 'Fractions rationnelles', color: '#2b8a3e', ready: true },
+  { id: 'synthese', title: 'Synthèse : paramètres', color: '#c92a2a', ready: true },
   { id: 'unites', title: 'Grandeurs et unités', color: '#e67700', ready: true },
   { id: 'geometrie', title: 'Géométrie calculée', color: '#a61e4d', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
@@ -1061,6 +1064,128 @@ const FONCTIONS = [
   },
 ];
 
+// Quadratics, rational fractions, equations with parameters (content/seconddegre.js).
+const SECOND = [
+  {
+    id: 'quad-xk', unit: 'second', year: 11, prereqs: ['root-eq', 'eq-one-step'], icon: 'x²=k',
+    title: 'x² = k',
+    desc: 'Deux, une ou aucune solution.',
+    intro: {
+      rule: 'x² = 49 → x = 7 <b>ou</b> x = −7. x² = 5 → x = ±√5. x² = −4 → <b>aucune</b> solution : un carré n\'est jamais négatif.',
+    },
+  },
+  {
+    id: 'quad-shift', unit: 'second', year: 11, prereqs: ['quad-xk'], icon: '(x−p)²',
+    title: '(x − p)² = k',
+    desc: 'On prend la racine des deux côtés.',
+    intro: {
+      rule: '(x − 3)² = 16 → x − 3 = 4 ou x − 3 = −4 → <b>x = 7 ou x = −1</b>.',
+    },
+  },
+  {
+    id: 'quad-factor', unit: 'second', year: 11, prereqs: ['eq-product', 'fac-trinomial'], icon: 'AB=0',
+    title: 'Résoudre en factorisant',
+    desc: 'Facteur commun, identité, somme et produit.',
+    intro: {
+      rule: 'On ramène tout à gauche, on factorise, puis produit nul :<br>x² − 5x = 0 → x(x − 5) = 0 → <b>x = 0 ou x = 5</b>. Ne divise pas par x : tu perdrais x = 0.',
+    },
+  },
+  {
+    id: 'quad-formula', unit: 'second', year: 11, prereqs: ['quad-factor'], icon: 'Δ',
+    title: 'Discriminant et formule',
+    desc: 'Δ = b² − 4ac, x = (−b ± √Δ)/(2a).',
+    intro: {
+      rule: 'Pour ax² + bx + c = 0 : <b>Δ = b² − 4ac</b>.<br>Δ > 0 : deux solutions x = (−b ± √Δ)/(2a) ; Δ = 0 : une ; Δ < 0 : aucune.<br>Attention : (−3)² = 9, pas −9.',
+    },
+  },
+  {
+    id: 'quad-choose', unit: 'second', year: 11, prereqs: ['quad-formula', 'quad-shift'], icon: '?',
+    title: 'Choisir la méthode',
+    desc: 'La plus rapide selon l\'équation.',
+    intro: {
+      rule: 'La formule marche toujours, mais elle est longue. Regarde d\'abord : x en évidence ? une identité ? somme et produit ? Sinon, la formule.',
+    },
+  },
+  {
+    id: 'quad-complete', unit: 'second', year: 12, prereqs: ['quad-shift', 'lit-identities'], icon: '(x+h)²',
+    title: 'Compléter le carré',
+    desc: 'x² + 6x = (x + 3)² − 9.',
+    intro: {
+      rule: 'x² + 6x + 2 = 0 → x² + 6x = (x + 3)² − 9, donc (x + 3)² − 9 + 2 = 0 → (x + 3)² = 7 → <b>x = −3 ± √7</b>. On prend la <b>moitié</b> du coefficient de x.',
+    },
+  },
+  {
+    id: 'quad-reducible', unit: 'second', year: 12, prereqs: ['quad-formula'], icon: 'x⁴',
+    title: 'Se ramener au 2e degré',
+    desc: 'Changement de variable.',
+    intro: {
+      rule: 'x⁴ − 5x² + 4 = 0 : on pose X = x², donc X² − 5X + 4 = 0, X = 1 ou X = 4, puis x = ±1 ou x = ±2.',
+    },
+  },
+];
+
+const RATIONNELLES = [
+  {
+    id: 'rat-domain', unit: 'rationnelles', year: 12, prereqs: ['eq-one-step', 'fac-identities'], icon: 'x≠',
+    title: 'Valeurs interdites',
+    desc: 'Le dénominateur ne peut pas valoir 0.',
+    intro: {
+      rule: 'Dans (x + 1)/(x² − 4), le dénominateur s\'annule pour x = 2 et x = −2 : ce sont les <b>valeurs interdites</b>. Le numérateur, lui, peut valoir 0.',
+    },
+  },
+  {
+    id: 'rat-simplify', unit: 'rationnelles', year: 12, prereqs: ['rat-domain', 'fac-trinomial'], icon: '÷/÷',
+    title: 'Simplifier une fraction rationnelle',
+    desc: 'Factoriser, puis simplifier des facteurs.',
+    intro: {
+      rule: 'On factorise d\'abord : (x² − 9)/(x + 3) = (x − 3)(x + 3)/(x + 3) = <b>x − 3</b>.<br>On ne barre que des <b>facteurs</b>, jamais des termes : (x + 3)/3 n\'est pas x.',
+    },
+  },
+  {
+    id: 'rat-operations', unit: 'rationnelles', year: 12, prereqs: ['rat-simplify', 'frac-add-any'], icon: '+/×',
+    title: 'Opérations sur les fractions rationnelles',
+    desc: 'Mêmes règles qu\'avec les nombres.',
+    intro: {
+      rule: 'Multiplier : numérateurs entre eux, dénominateurs entre eux, puis simplifier.<br>Additionner : même dénominateur d\'abord. 1/x + 1/(x + 1) = (x + 1 + x)/(x(x + 1)).',
+    },
+  },
+  {
+    id: 'rat-equation', unit: 'rationnelles', year: 12, prereqs: ['rat-operations', 'quad-factor'], icon: '=/',
+    title: 'Équations rationnelles',
+    desc: 'Multiplier par les dénominateurs, puis vérifier.',
+    intro: {
+      rule: 'On note les valeurs interdites, on multiplie par les dénominateurs, on résout, puis on <b>retire</b> les solutions interdites.<br>(x² − 4)/(x − 2) = 0 : x = 2 est interdit, il reste x = −2.',
+    },
+  },
+];
+
+const SYNTHESE = [
+  {
+    id: 'param-linear', unit: 'synthese', year: 12, prereqs: ['iso-formula', 'eq-both-sides'], icon: 'ax=b',
+    title: 'Équations du 1er degré à paramètres',
+    desc: 'Résoudre pour x avec des lettres.',
+    intro: {
+      rule: 'Les lettres a, b, c se traitent comme des nombres : ax + b = cx → (a − c)x = −b → <b>x = b/(c − a)</b>, à condition que a ≠ c.',
+    },
+  },
+  {
+    id: 'param-quadratic', unit: 'synthese', year: 12, prereqs: ['param-linear', 'quad-formula'], icon: 'x²+a',
+    title: 'Équations du 2e degré à paramètres',
+    desc: 'Identités, facteurs, formule… avec des lettres.',
+    intro: {
+      rule: 'x² − 2ax + a² = 1 → (x − a)² = 1 → <b>x = a − 1 ou x = a + 1</b>. Les solutions dépendent des paramètres.',
+    },
+  },
+  {
+    id: 'param-final', unit: 'synthese', year: 12, prereqs: ['param-quadratic', 'rat-simplify'], icon: '★',
+    title: 'Le problème final',
+    desc: 'ax² + bx/(3cx) = (6x + 2)².',
+    intro: {
+      rule: 'Tout ensemble : conditions (x ≠ 0, c ≠ 0), simplification de bx/(3cx), identité remarquable, tout ramener à … = 0, puis la formule avec Δ. On y va une étape à la fois.',
+    },
+  },
+];
+
 // Geometry by formula (content/equations.js).
 const GEOMETRIE = [
   {
@@ -1151,7 +1276,7 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...FONCTIONS, ...GEOMETRIE, ...MELANGES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...FONCTIONS, ...SECOND, ...RATIONNELLES, ...SYNTHESE, ...GEOMETRIE, ...MELANGES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL

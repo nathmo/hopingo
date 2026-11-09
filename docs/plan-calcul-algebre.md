@@ -1,6 +1,6 @@
 # Plan : livrets, arithmétique et algèbre
 
-Proposition du 9 novembre 2026. L'étape 1 (livrets et calcul mental) est construite ; le reste est à venir.
+Proposition du 9 novembre 2026. Toutes les étapes sont construites (9 novembre 2026) ; les pièges [E] attendent la relecture d'un enseignant.
 
 ## 1. Le but final, et ce qu'il demande
 
@@ -344,7 +344,7 @@ Chaque étape est utilisable seule, testée, puis publiée sur GitHub Pages.
 | 4 ✅ | C. Calcul littéral et D. Factorisation (fait le 9 novembre 2026) | Grande | Lettres, forme normale, clavier, affichage |
 | 5 ✅ | E. Équations (avec systèmes 2 × 2), F. Isoler une variable, M. Géométrie calculée (fait le 9 novembre 2026) | Grande | Lignes d'équation ; aux niveaux 1-2 le coup à jouer est affiché au lieu d'être choisi |
 | 6 ✅ | L. Fonctions (fait le 9 novembre 2026) | Moyenne | Repère interactif |
-| 7 | G. Rationnelles, H. 2e degré et I. Synthèse | Grande | Valeurs interdites, ±, comparaison par valeurs |
+| 7 ✅ | G. Rationnelles, H. 2e degré et I. Synthèse (fait le 9 novembre 2026) | Grande | Valeurs interdites, ±, comparaison par valeurs |
 
 Proportionnalité et unités viennent tôt (étape 3) : ils n'ont pas besoin des lettres, ils servent dès 9H et ils préparent la physique. La géométrie calculée vient avec « isoler une variable », parce qu'elle s'en sert (A = πr² → r).
 

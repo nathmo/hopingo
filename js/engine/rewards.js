@@ -33,6 +33,9 @@ export const BADGES = [
   { id: 'formules', icon: '🔧', name: 'Démonteur de formules', desc: 'Maîtrise l\'isolation de variables.', check: (p) => unitMastered(p, 'formules') },
   { id: 'geometrie', icon: '📐', name: 'Géomètre', desc: 'Maîtrise la géométrie calculée.', check: (p) => unitMastered(p, 'geometrie') },
   { id: 'fonctions', icon: '📈', name: 'Lecteur de courbes', desc: 'Maîtrise les fonctions.', check: (p) => unitMastered(p, 'fonctions') },
+  { id: 'second', icon: '🎯', name: 'Discriminant', desc: 'Maîtrise les équations du 2e degré.', check: (p) => unitMastered(p, 'second') },
+  { id: 'rationnelles', icon: '➗', name: 'Sans division par zéro', desc: 'Maîtrise les fractions rationnelles.', check: (p) => unitMastered(p, 'rationnelles') },
+  { id: 'synthese', icon: '🏔️', name: 'Le sommet', desc: 'Résous le problème final avec paramètres.', check: (p) => unitMastered(p, 'synthese') },
   { id: 'melanges', icon: '🧩', name: 'Touche-à-tout', desc: 'Maîtrise les calculs mélangés.', check: (p) => unitMastered(p, 'melanges') },
   { id: 'racines', icon: '🌳', name: 'Aux racines', desc: 'Maîtrise toutes les compétences sur les racines carrées.', check: (p) => unitMastered(p, 'racines') },
 ];

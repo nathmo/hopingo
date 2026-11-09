@@ -12,8 +12,9 @@ import { GEN as PROPORTION } from './proportion.js';
 import { GEN as ALGEBRE } from './algebre.js';
 import { GEN as EQUATIONS } from './equations.js';
 import { GEN as FONCTIONS } from './fonctions.js';
+import { GEN as SECONDDEGRE } from './seconddegre.js';
 
-const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS, ...FONCTIONS };
+const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS, ...FONCTIONS, ...SECONDDEGRE };
 
 // The profile is optional: fact skills use it to pick from the student's
 // fact memory.
