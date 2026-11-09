@@ -7,10 +7,23 @@
 //               numbers multiplied out (§5.2, G6 catalogue)
 //   'partial-fractions'  a polynomial part plus c/(x − a)ᵏ and (bx + c)/(x² + px + q)
 //               with Δ < 0, each denominator once (G0 catalogue)
+// Step U1b (G2 catalogue):
+//   'goal'      the line is cfg.goal (sinh(2x), 1): an identity to reach
+//   'only'      only the letters cfg.finalVars are left (t = tanh x), tidy
+//   'powers'    a number times one power per letter, exponents written as
+//               numbers (a^(1/2)·b^(−3), ab)
+//   'log-expanded'  a sum of numbers and c·ln(u), u a letter, x + c or a
+//               prime number, each u once (ln(x³√(x + 1)) developed)
+//   'log-single'    a single logarithm, nothing around it
+//   'constant'  a number written out
+// cfg.subst = {t: 'tanh(x)'}: letters standing for an expression, replaced
+// in both lines before they are compared.
 
 import { expandDerivs, hasDeriv } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
-import { numValue, stripParen } from '../cas/ast.js';
+import { numValue, stripParen, symbolsIn, contains } from '../cas/ast.js';
+import { parse } from '../cas/parse.js';
+import { substSyms } from '../cas/sets.js';
 import { toText } from '../cas/print.js';
 import { polyOf, qCoeffs, discriminant, sumTerms, productFactors } from '../cas/polyx.js';
 import { diagnoseLine } from './diagnose.js';
@@ -94,7 +107,72 @@ function factoredDen(node) {
   return true;
 }
 
+const sym = (n) => n.t === 'sym' && !n.sub;
+const isLn = (n) => n.t === 'fn' && ['ln', 'log', 'Log'].includes(n.name);
+const literal = (n) => { n = stripParen(n); if (n.t === 'neg') n = stripParen(n.e); return n.t === 'num' || (n.t === 'frac' && stripParen(n.n).t === 'num' && stripParen(n.d).t === 'num'); };
+const isPrime = (k) => { if (k < 2) return false; for (let d = 2; d * d <= k; d++) if (k % d === 0) return false; return true; };
+
+// a·x^p·y^q…: one power per letter, exponents literal.
+function powersForm(node) {
+  const seen = new Set();
+  let nums = 0;
+  const visit = (n, top) => {
+    n = stripParen(n);
+    if (n.t === 'neg' && top) return visit(n.e, false);
+    if (n.t === 'bin' && n.op === '×') return visit(n.l, false) && visit(n.r, false);
+    if (n.t === 'frac' && !literal(n)) return visit(n.n, false) && visit(n.d, false);
+    if (literal(n)) { nums++; return true; }
+    let b = n;
+    if (n.t === 'pow') {
+      if (!literal(n.e) || numValue(stripParen(n.e))?.eq(1)) return false;
+      b = stripParen(n.b);
+    }
+    if (!sym(b) || seen.has(b.name)) return false;
+    seen.add(b.name);
+    return true;
+  };
+  if (!visit(node, true)) return false;
+  return nums <= 1 ? (presentationIssue(node) ?? true) : 'Multiplie les nombres entre eux.';
+}
+
+// c + a·ln(u) + …, each u a letter, x + c or a prime number, once.
+function logExpanded(node) {
+  const args = new Set();
+  let consts = 0;
+  for (let t of sumTerms(node)) {
+    t = stripParen(t.t === 'neg' ? t.e : t);
+    if (literal(t)) { consts++; continue; }
+    const fs = productFactors(t);
+    const lns = fs.factors.filter((f) => isLn(stripParen(f.node)));
+    if (lns.length !== 1 || lns[0].k !== 1 || fs.factors.length !== 1) return false;
+    const u = stripParen(stripParen(lns[0].node).args[0]);
+    const k = numValue(u);
+    if (k) {
+      if (k.eq(1)) return 'ln 1 = 0 : enlève ce terme.';
+      if (!k.isInt() || !isPrime(k.n)) return false;
+    } else if (!sym(u)) {
+      const p = polyOf(u);
+      const cs = p && qCoeffs(p);
+      if (!cs || cs.length !== 2) return false;
+    }
+    const key = toText(u);
+    if (args.has(key)) return 'Regroupe les termes qui ont le même logarithme.';
+    args.add(key);
+  }
+  if (consts > 1) return 'Additionne les nombres entre eux.';
+  return presentationIssue(node) ?? true;
+}
+
 const TARGETS = {
+  goal: (node, cfg) => (cfg.goal ? sameLine(node, parseGoal(cfg)) : false),
+  only: (node, cfg) => {
+    const ok = [...symbolsIn(node)].every((s) => (cfg.finalVars || []).includes(s));
+    return ok ? (presentationIssue(node) ?? true) : false;
+  },
+  powers: (node) => powersForm(node),
+  'log-expanded': (node) => logExpanded(node),
+  'log-single': (node) => { const n = stripParen(node); return isLn(n) && !contains(n.args[0], (x) => isLn(x)); },
+  constant: (node) => literal(node),
   any: () => true,
   'factored-den': (node) => factoredDen(node),
   'partial-fractions': (node) => partialFractions(node),
@@ -110,6 +188,19 @@ export function isFinal(cfg, node) {
 }
 
 export const start = (cfg) => cfg.start;
+
+const GOALS = new Map();
+function parseGoal(cfg) {
+  if (!GOALS.has(cfg.goal)) GOALS.set(cfg.goal, parse(cfg.goal, { vars: cfg.vars }));
+  return GOALS.get(cfg.goal);
+}
+const SUBSTS = new Map();
+function substOf(cfg) {
+  if (!cfg.subst) return null;
+  const key = JSON.stringify(cfg.subst);
+  if (!SUBSTS.has(key)) SUBSTS.set(key, Object.fromEntries(Object.entries(cfg.subst).map(([k, t]) => [k, parse(t, { vars: cfg.vars })])));
+  return SUBSTS.get(key);
+}
 
 function witnessMessage(r, cfg) {
   if (r.undecided) return 'Je n\'arrive pas à comparer cette ligne avec la précédente : vérifie qu\'elle est définie.';
@@ -127,9 +218,11 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression, sans « = » au milieu.' };
   if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
   const opts = { vars: cfg.vars, domain: cfg.domain, seed: cfg.seed ?? seedOf(toText(prev)) };
-  const r = equivalent(expandDerivs(prev), expandDerivs(node), opts);
+  const map = substOf(cfg);
+  const S = (n) => (map ? substSyms(expandDerivs(n), map) : expandDerivs(n));
+  const r = equivalent(S(prev), S(node), opts);
   if (!r.equal) {
-    const same = (cand, line) => equivalent(expandDerivs(cand), expandDerivs(line), opts).equal;
+    const same = (cand, line) => equivalent(S(cand), S(line), opts).equal;
     const diag = diagnoseLine('equiv', prev, node, cfg, same);
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: r.witness ?? null, message: witnessMessage(r, cfg) };
   }

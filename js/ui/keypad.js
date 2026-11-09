@@ -40,10 +40,12 @@ const KEYSETS = {
   logic: ['∀', '∃', '¬', '⇒', '⇔', '∧', '∨', '∈', '(', ')', ',', 'back'],
   cplx: ['i', '(', ')', 'left', 'right', 'back'],
   letters: ['a', 'b', 'c', 'd', 'A', 'B', 'N', 'D', 'λ', '=', ';', 'back'],
+  // Step U1b (G2): exponentials, logarithms in a base, hyperbolic functions.
+  explog: ['e^(', 'ln(', 'log_', 'sinh(', 'cosh(', 'tanh(', 'argsh(', 'argch(', 'argth(', '√(', '(', ')', 'left', 'right', 'back'],
 };
 
 // Tab names of the keypads.
-const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc' };
+const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', explog: 'eˣ ln' };
 
 const LABEL = {
   back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )',

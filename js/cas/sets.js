@@ -25,7 +25,7 @@ import { parse } from './parse.js';
 import { toText } from './print.js';
 import { mapNode, stripParen, lit, neg, add, sub, mul, sqrt, num, contains } from './ast.js';
 import { exactValue, toRatFun } from './normal.js';
-import { evalFloat } from './numeric.js';
+import { evalFloat, compileFloat } from './numeric.js';
 import { diff } from './diff.js';
 import { qCoeffs, rationalRoots, discriminant } from './polyx.js';
 
@@ -295,7 +295,7 @@ function numericRoots(f, v) {
   const out = [];
   const N = SCAN_STEPS;
   const h = (2 * SCAN) / N;
-  const F = (x) => evalFloat(f, { [v]: x });
+  const F = compileFloat(f, v);
   let x0 = -SCAN;
   let y0 = F(x0);
   let xm = NaN; // the point before x0, for double roots (tangencies)
@@ -327,7 +327,7 @@ function touch(F, a, b, f, v) {
   // First the sign change of f′ (exact to the last digit), else the minimum.
   try {
     const d = diff(f, v);
-    const D = (x) => evalFloat(d, { [v]: x });
+    const D = compileFloat(d, v);
     const da = D(a);
     const db = D(b);
     if (Number.isFinite(da) && Number.isFinite(db) && da * db < 0) {

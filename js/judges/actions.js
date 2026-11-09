@@ -9,7 +9,7 @@ import { strip, walkF, lexFor } from '../cas/logic.js';
 import { stripParen as sp, contains } from '../cas/ast.js';
 import { polyOf, qCoeffs, productFactors, discriminant, rationalRoots, splitByDivisor } from '../cas/polyx.js';
 import { parse } from '../cas/parse.js';
-import { toReadable } from '../cas/print.js';
+import { toReadable, toText } from '../cas/print.js';
 import { mul, lit, num, pow } from '../cas/ast.js';
 
 function derivRules(prev, v) {
@@ -157,6 +157,18 @@ ACTIONS.polydiv = (prev, cfg) => {
     { id: 'sign', label: `Terme suivant du quotient : ${term(t.neg(), k)}`, valid: false, why: 'Le signe : le terme dominant du reste divisé par celui de B.' },
     { id: 'deg', label: `Terme suivant du quotient : ${term(t, k + 1)}`, valid: false, why: `Le degré : x^${dR} divisé par x^${dB} donne x^${k}.` },
   ];
+};
+
+// Menus written by the generator for each reference line (cfg.menus:
+// [{at: text of the line before, options}]): the one whose line is the
+// student's previous line, else cfg.menu, else none (free line).
+ACTIONS.steps = (prev, cfg) => {
+  const key = toText(sp(prev));
+  for (const m of cfg.menus || []) {
+    if (!m.key) m.key = toText(sp(parse(m.at, { vars: cfg.vars })));
+    if (m.key === key) return m.options;
+  }
+  return cfg.menu || [];
 };
 
 // The menu written by the generator for this part (cfg.menu).
