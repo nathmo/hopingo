@@ -5,6 +5,9 @@ import { GEN as LOGIQUE } from './logique.js';
 import { GEN as POLYNOMES } from './polynomes.js';
 import { GEN as ANALYSE0 } from './analyse0.js';
 import { GEN as EXPLOG } from './explog.js';
+import { GEN as TRIGO } from './trigo.js';
+import { GEN as TRIGO_EQ } from './trigo-eq.js';
+import { GEN as TRIGO_TRI } from './trigo-tri.js';
 import { GEN as RECURRENCE } from './recurrence.js';
 
-export const UNI_GEN = { ...LOGIQUE, ...POLYNOMES, ...ANALYSE0, ...EXPLOG, ...RECURRENCE };
+export const UNI_GEN = { ...LOGIQUE, ...POLYNOMES, ...ANALYSE0, ...EXPLOG, ...TRIGO, ...TRIGO_EQ, ...TRIGO_TRI, ...RECURRENCE };

@@ -12,9 +12,10 @@ import * as logique from './logique.skills.js';
 import * as polynomes from './polynomes.skills.js';
 import * as analyse0 from './analyse0.skills.js';
 import * as explog from './explog.skills.js';
+import * as trigo from './trigo.skills.js';
 import * as recurrence from './recurrence.skills.js';
 
-const MODULES = [logique, polynomes, analyse0, explog, recurrence];
+const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence];
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);

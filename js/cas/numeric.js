@@ -123,53 +123,57 @@ export function sample(vars, domain = {}, rng, k = 12) {
   return out;
 }
 
-// evalFloat(node, {[v]: x}) compiled once into a function of x (no guard):
-// the numeric scans of sets.js call it thousands of times.
-export function compileFloat(node, v) {
-  const C = (n) => compileFloat(n, v);
+// The same evaluation compiled once into closures (no guard), for scans
+// that evaluate one expression at thousands of points (js/cas/sets.js).
+// compileFloat(node) → (env) => number.
+export function compileFloat(node) {
+  const C = compileFloat;
   switch (node.t) {
-    case 'num': { const c = node.v.n / node.v.d; return () => c; }
-    case 'float': { const c = node.x; return () => c; }
-    case 'const': { const c = evalFloat(node, {}); return () => c; }
-    case 'sym': return !node.sub && node.name === v ? (x) => x : () => NaN;
+    case 'num': { const v = node.v.n / node.v.d; return () => v; }
+    case 'float': return () => node.x;
+    case 'const': { const v = evalFloat(node, {}); return () => v; }
+    case 'sym': { const key = node.sub ? `${node.name}_` : node.name; return (env) => (key in env ? env[key] : NaN); }
     case 'paren': return C(node.e);
-    case 'neg': { const e = C(node.e); return (x) => -e(x); }
+    case 'neg': { const e = C(node.e); return (env) => -e(env); }
     case 'bin': {
       const a = C(node.l);
       const b = C(node.r);
-      if (node.op === '+') return (x) => a(x) + b(x);
-      if (node.op === '-') return (x) => a(x) - b(x);
-      if (node.op === '×') return (x) => a(x) * b(x);
-      return (x) => a(x) / b(x);
+      if (node.op === '+') return (env) => a(env) + b(env);
+      if (node.op === '-') return (env) => a(env) - b(env);
+      if (node.op === '×') return (env) => a(env) * b(env);
+      return (env) => a(env) / b(env);
     }
-    case 'frac': { const a = C(node.n); const b = C(node.d); return (x) => a(x) / b(x); }
-    case 'sqrt': { const e = C(node.e); return (x) => { const y = e(x); return y < 0 ? NaN : Math.sqrt(y); }; }
-    case 'abs': { const e = C(node.e); return (x) => Math.abs(e(x)); }
-    case 'pow': {
-      const b = C(node.b);
-      const e = C(node.e);
-      const oddDen = node.e.t === 'frac' ? evalFloat(node.e.d, {}) : null;
-      const odd = Number.isInteger(oddDen) && oddDen % 2 === 1;
-      return (x) => {
-        const bb = b(x);
-        const ee = e(x);
-        if (bb < 0 && !Number.isInteger(ee)) return odd ? -((-bb) ** ee) : NaN;
-        if (bb === 0 && ee < 0) return NaN;
-        return bb ** ee;
-      };
-    }
+    case 'frac': { const a = C(node.n); const b = C(node.d); return (env) => a(env) / b(env); }
+    case 'sqrt': { const e = C(node.e); return (env) => { const x = e(env); return x < 0 ? NaN : Math.sqrt(x); }; }
+    case 'abs': { const e = C(node.e); return (env) => Math.abs(e(env)); }
     case 'fn': {
       const name = canonFn(node.name);
       if (name === 'logb' && node.args.length === 2) {
         const b = C(node.args[0]);
         const a = C(node.args[1]);
-        return (x) => { const bb = b(x); const aa = a(x); return !(bb > 0) || bb === 1 || !(aa > 0) ? NaN : Math.log(aa) / Math.log(bb); };
+        return (env) => { const bb = b(env); const aa = a(env); return !(bb > 0) || bb === 1 || !(aa > 0) ? NaN : Math.log(aa) / Math.log(bb); };
       }
       const f = REAL_FN[name];
-      if (!f || node.args.length !== 1) return () => NaN;
+      if (!f || node.args.length !== 1) break;
       const a = C(node.args[0]);
-      return (x) => f(a(x));
+      return (env) => f(a(env));
     }
-    default: return (x) => evalFloat(node, { [v]: x });
+    case 'pow': {
+      const b = C(node.b);
+      const e = C(node.e);
+      const d = node.e.t === 'frac' ? C(node.e.d) : null;
+      return (env) => {
+        const x = b(env);
+        const y = e(env);
+        if (x < 0 && !Number.isInteger(y)) {
+          const q = d ? d(env) : null;
+          return q && Number.isInteger(q) && q % 2 === 1 ? -((-x) ** y) : NaN;
+        }
+        if (x === 0 && y < 0) return NaN;
+        return x ** y;
+      };
+    }
+    default: break;
   }
+  return (env) => evalFloat(node, env);
 }

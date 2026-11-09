@@ -57,6 +57,7 @@ export function toMathML(node, opts = {}) {
       case 'paren': return paren(M(n.e));
       case 'neg': return row(mo('−'), prec(n.e) <= 1 || n.e.t === 'neg' ? paren(M(n.e)) : M(n.e));
       case 'bin': {
+        if (n.deg) return row(wrap(n.l, 6), mo('°', ' lspace="0"'));
         if (n.op === '+' || n.op === '-') {
           const r = n.r.t === 'neg' || prec(n.r) < (n.op === '-' ? 2 : 1) ? paren(M(n.r)) : M(n.r);
           return row(M(n.l), mo(n.op === '-' ? '−' : '+'), r);

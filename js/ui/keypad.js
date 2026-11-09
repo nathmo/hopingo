@@ -39,6 +39,9 @@ const KEYSETS = {
   set: [']', '[', ';', '{', '}', '∪', '∩', '∖', '∞', '∈', 'ℝ', 'ℕ', 'ℤ', '∅', '∧', '∨', '¬', 'back'],
   logic: ['∀', '∃', '¬', '⇒', '⇔', '∧', '∨', '∈', '(', ')', ',', 'back'],
   cplx: ['i', '(', ')', 'left', 'right', 'back'],
+  // Trigonometry (G3): the integer k of families, degrees, cot, the letters
+  // of substitutions (X = cos x, t = tan(x/2)) and « ou ».
+  trig: ['k', '°', 'π', 'cot(', 'X', 't', '∨', 'back'],
   letters: ['a', 'b', 'c', 'd', 'A', 'B', 'N', 'D', 'λ', '=', ';', 'back'],
   // Step U1b: sums and sequences. Σ writes sum(terme, k, début, fin).
   seq: ['n', 'k', 'j', 'sum(', ',', '(', ')', 'u', '_', 'q', 'r', 'back'],
@@ -47,7 +50,7 @@ const KEYSETS = {
 };
 
 // Tab names of the keypads.
-const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln' };
+const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', trig: 'kπ' };
 
 const LABEL = {
   back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )', 'sum(': 'Σ( , k, , )',

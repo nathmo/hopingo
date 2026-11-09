@@ -26,7 +26,7 @@ import { checkTable } from '../js/judges/iter.js';
 import { parse } from '../js/cas/parse.js';
 import { expandDerivs } from '../js/cas/diff.js';
 import { pretty } from '../js/cas/normal.js';
-import { solutionSet, setToNode, union, minus, contains01 } from '../js/cas/sets.js';
+import { solutionSet, contains01, isSetNode } from '../js/cas/sets.js';
 import { toText } from '../js/cas/print.js';
 import { parse as parseSchool, evaluate } from '../js/math/expr.js';
 
@@ -36,16 +36,20 @@ const UNI = UNI_SKILLS.map((s) => s.id);
 function wrongLine(cfg, final) {
   if (cfg.kind === 'logic') return `¬(${final})`;
   if (cfg.kind === 'solset') {
-    // With parameters, the bounds hold letters: add a far point.
-    let S = null;
-    try { S = solutionSet(parse(final, parseOpts(cfg)), cfg); } catch { S = null; }
-    if (!S) return `${final}∪{1000}`.replace(/^([^{\[\]∅ℝ].*)∪\{1000\}$/, `($1)∨${cfg.v || 'x'}=1000`);
-    const out = ['1000', '-1000', '1/7', '-55'].find((x) => !contains01(S, Number(x.includes('/') ? 1 / 7 : x)));
-    if (!out) return toText(setToNode(minus(S, solutionSet(parse('{0}'), cfg))));
-    // Added to the line as written (its bounds may be floats).
-    const n = parse(final, parseOpts(cfg));
-    const isSet = ['set', 'setop'].includes(n.t);
-    return isSet ? `${final}∪{${out}}` : `(${final})∨${cfg.v || 'x'}=${out}`;
+    const S = solutionSet(parse(final, parseOpts(cfg)), cfg);
+    // A number the judge looks at (inside the domain or the window of a
+    // periodic cfg) and outside the set.
+    const W = solutionSet(parse('ℝ'), cfg);
+    const val = (x) => (x.includes('/') ? Number(x.split('/')[0]) / Number(x.split('/')[1]) : Number(x));
+    const CANDS = ['1000', '-1000', '1/7', '-55', '7/3', '-5/2', '11/9', '4', '-4', '3', '1', '-1', '5/2', '7/2', '9/2', '11/2', '6', '0'];
+    const out = CANDS.find((x) => !contains01(S, val(x)) && contains01(W, val(x)));
+    const inside = CANDS.find((x) => contains01(S, val(x)));
+    // Written from the final line itself (its set may hold numbers that
+    // only print as long decimals).
+    const v = cfg.v || 'x';
+    const asSet = isSetNode(parse(final, parseOpts(cfg)), cfg);
+    if (!out) return asSet ? `(${final})∖{${inside ?? 0}}` : `(${final})∧${v}≠${inside ?? 0}`;
+    return asSet ? `(${final})∪{${out}}` : `(${final})∨${v}=${out}`;
   }
   return `${final}+1`;
 }

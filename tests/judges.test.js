@@ -556,11 +556,75 @@ test('per-line menus (steps) and the compiled numeric scan', async () => {
   assert.deepEqual(actionsFor('steps', P('t^2-t-6=0', { vars: ['t'] }), cfg), []);
   const { compileFloat, evalFloat } = await import('../js/cas/numeric.js');
   for (const t of ['log_(1/3)(2x-1)+x^(1/3)', 'cosh(x)^2-sqrt(x+1)/x', '(x^2)^x-x^(x^2)', '|x-2|×e^(-x)']) {
-    const f = compileFloat(P(t), 'x');
+    const f = compileFloat(P(t));
     for (const x of [-1.5, -0.3, 0.7, 2, 3.1]) {
-      const a = f(x);
+      const a = f({ x });
       const b = evalFloat(P(t), { x });
       assert.ok((Number.isNaN(a) && Number.isNaN(b)) || Math.abs(a - b) < 1e-12, `${t} at ${x}`);
     }
   }
+});
+
+// ---------- step U1, part b: trigonometry (G3) ----------
+
+const PER = (extra = {}) => ({ kind: 'solset', v: 'x', periodic: true, ...extra });
+const JP = (cfg, prev, line, state = {}) => JUDGES.solset.judgeLine(cfg, P(prev, { vars: ['x', 'k', 'X', 't'] }), line, state);
+
+test('solset (G3): families with k, compared on a window, final forms', () => {
+  assert.equal(JP(PER(), 'cos(2x-π/3)=1/2', '2x-π/3=π/3+2kπ ∨ 2x-π/3=-π/3+2kπ').kind, 'ok');
+  assert.equal(JP(PER(), '2x=(2π)/3+2kπ ∨ 2x=2kπ', 'x=π/3+kπ ∨ x=kπ').kind, 'done');
+  const w = JP(PER(), '2x=(2π)/3+2kπ ∨ 2x=2kπ', 'x=π/3+2kπ ∨ x=2kπ');
+  assert.equal(w.kind, 'wrong');
+  assert.equal(w.rule, 'g3_period_divide');
+  assert.equal(JP(PER(), 'sin(x)=1/2', '{π/6+2kπ;(5π)/6+2kπ}').kind, 'done', 'a set of families');
+  assert.equal(JP(PER(), 'sin(x)=1', 'x=π/2+2kπ').kind, 'done', 'a root where sin touches 1');
+  assert.equal(JP(PER(), '2x=(2π)/3+2kπ', 'x=π/3+kπ ; k∈ℤ').kind, 'done', '« k ∈ ℤ » may follow');
+  // On an interval: families are not final, the list is; nothing outside.
+  const I = PER({ domain: '[0;2π]' });
+  assert.equal(JP(I, 'cos(x+π/3)≥1/2', '-(2π)/3+2kπ≤x≤2kπ').kind, 'ok');
+  assert.equal(JP(I, '-(2π)/3+2kπ≤x≤2kπ', '{0}∪[(4π)/3;2π]').kind, 'done');
+  assert.equal(JP(I, '-(2π)/3+2kπ≤x≤2kπ', '[-(2π)/3;0]∪[(4π)/3;2π]').kind, 'stay', 'written outside the interval');
+  assert.equal(JP(I, '-(2π)/3+2kπ≤x≤2kπ', '[-(2π)/3;0]').rule, 'g3_ineq_window');
+  // Substitutions X = cos x and t = tan(x/2).
+  assert.equal(JP(PER({ subst: { X: 'cos(x)' } }), '2cos(x)^2-3cos(x)+1=0', '(2X-1)(X-1)=0').kind, 'ok');
+  const bio = PER({ subst: { t: 'tan(x/2)' }, onDomain: true, onDomainOf: 'tan(x/2)' });
+  const st = {};
+  assert.equal(JP(bio, '2sin(x)-cos(x)=1', '4t/(1+t^2)-(1-t^2)/(1+t^2)=1', st).kind, 'ok', 'x = π + 2kπ set aside');
+  const lost = JP(bio, 't=1/2', 'x=2arctan(1/2)+2kπ', st);
+  assert.equal(lost.kind, 'wrong');
+  assert.equal(lost.rule, 'g3_bioche_pi');
+  assert.equal(JP(bio, 't=1/2', 'x=2arctan(1/2)+2kπ ∨ x=π+2kπ', st).kind, 'done');
+});
+
+test('value and equiv (G3): exact forms, degrees with a tolerance, goals', () => {
+  const ex = { kind: 'value', form: 'exact' };
+  assert.equal(JUDGES.value.judgeLine(ex, P('12×30°'), '12×π/6').kind, 'ok');
+  assert.equal(JUDGES.value.judgeLine(ex, P('12×30°'), '2π').kind, 'done');
+  assert.equal(JUDGES.value.judgeLine(ex, P('√8/2+0'), '√8/2').kind, 'stay', 'a root to simplify');
+  const deg = { kind: 'value', form: 'deg', tolDeg: 0.01 };
+  assert.equal(JUDGES.value.judgeLine(deg, P('arccos(11/14)'), '38,21°').kind, 'done');
+  assert.equal(JUDGES.value.judgeLine(deg, P('arccos(11/14)'), '38,3°').kind, 'wrong');
+  assert.equal(JUDGES.value.judgeLine(deg, P('arccos(11/14)'), '0,6669').kind, 'stay', 'the unit is asked');
+  const EX = { kind: 'equiv', vars: [], target: 'exact' };
+  assert.equal(JUDGES.equiv.judgeLine(EX, P('cos((11π)/12)'), '(-1/2)(√2/2)-(√3/2)(√2/2)').kind, 'ok');
+  assert.equal(JUDGES.equiv.judgeLine(EX, P('cos((11π)/12)'), '-(√2+√6)/4').kind, 'done');
+  assert.equal(JUDGES.equiv.judgeLine(EX, P('cos((11π)/12)'), '(√6-√2)/4').kind, 'wrong');
+  const one = { kind: 'equiv', vars: ['x'], target: 'one-trig' };
+  assert.equal(JUDGES.equiv.judgeLine(one, P('cos(7π-x)'), 'cos(π-x)').kind, 'ok');
+  assert.equal(JUDGES.equiv.judgeLine(one, P('cos(π-x)'), '-cos(x)').kind, 'done');
+  const goal = { kind: 'equiv', vars: ['x'], target: 'goal', goal: '2sin(2x)cos(x)', domain: { x: [-1.4, 1.4] } };
+  assert.equal(JUDGES.equiv.judgeLine(goal, P('sin(3x)+sin(x)'), '2sin((3x+x)/2)cos((3x-x)/2)').kind, 'ok', 'not yet written as the goal');
+  assert.equal(JUDGES.equiv.judgeLine(goal, P('2sin((3x+x)/2)cos((3x-x)/2)'), '2cos(x)sin(2x)').kind, 'done', 'factors in any order');
+});
+
+test('action menus (G3): reduce an angle, exact values', () => {
+  const valid = (kind, t) => actionsFor(kind, P(t), {}).filter((o) => o.valid).map((o) => o.id);
+  assert.deepEqual(valid('trig', 'cos((53π)/6)'), ['tours']);
+  assert.deepEqual(valid('trig', 'cos((5π)/6)'), ['assoc']);
+  assert.deepEqual(valid('trig', '-cos(π/6)'), ['value']);
+  assert.deepEqual(valid('trig', 'arccos(cos(-(3π)/4))'), ['assoc']);
+  assert.deepEqual(valid('trig', 'cos(7π-x)'), ['tours']);
+  assert.deepEqual(valid('exact', 'cos((11π)/12)'), ['decompose']);
+  assert.deepEqual(valid('exact', 'cos((2π)/3+π/4)'), ['add']);
+  assert.deepEqual(valid('exact', 'cos((2π)/3)cos(π/4)-sin((2π)/3)sin(π/4)'), ['values']);
 });

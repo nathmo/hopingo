@@ -16,7 +16,7 @@ export function prec(n) {
     case 'not': return PREC.not;
     case 'rel': case 'chain': case 'in': return PREC.rel;
     case 'setop': return n.op === '∪' ? PREC.union : PREC.inter;
-    case 'bin': return n.op === '+' || n.op === '-' ? PREC.sum : PREC.prod;
+    case 'bin': return n.deg ? PREC.pow : n.op === '+' || n.op === '-' ? PREC.sum : PREC.prod;
     case 'neg': return PREC.neg;
     case 'frac': return PREC.frac;
     case 'pow': return PREC.pow;
@@ -76,6 +76,7 @@ function printer(style, opts) {
         return `${MINUS}${prec(e) <= PREC.sum || e.t === 'neg' ? `(${P(e)})` : P(e)}`;
       }
       case 'bin': {
+        if (n.deg) return `${wrap(n.l, PREC.atom)}°`;
         if (n.op === '+' || n.op === '-') {
           const r = n.r.t === 'neg' || prec(n.r) < (n.op === '-' ? PREC.prod : PREC.sum) ? `(${P(n.r)})` : P(n.r);
           const op = n.op === '-' ? MINUS : '+';
