@@ -273,11 +273,16 @@ function branchHeads(pool) {
   return heads;
 }
 
-// Units the student has started and not finished.
+// Units the student has started and not finished: at most MAX_BRANCHES,
+// the most recently practised ones (a profile from the linear path may
+// have started more).
 export function activeBranches(profile) {
   const heads = branchHeads(playable(profile));
+  const lastSeen = (u) => Math.max(0, ...unitPath(u).map((s) => profile.skills[s.id]?.lastSeen || 0));
   return Object.keys(heads)
     .filter((u) => unitPath(u).some((s) => (profile.skills[s.id]?.attempts || 0) > 0))
+    .sort((a, b) => lastSeen(b) - lastSeen(a) || UNIT_RANK[a] - UNIT_RANK[b])
+    .slice(0, MAX_BRANCHES)
     .sort((a, b) => UNIT_RANK[a] - UNIT_RANK[b]);
 }
 

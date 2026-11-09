@@ -162,3 +162,13 @@ test('a lesson of long items stops after about 15 minutes (§9.7)', () => {
   assert.ok(skillState(p, 'g6-deriv-rules').attempts > 0);
   assert.ok(MASTERY_P > 0.9);
 });
+
+test('a profile from the linear path keeps only its 3 most recent branches', () => {
+  const p = profile(10);
+  const heads = ['frac-read', 'rel-read', 'u-length', 'tab-2510', 'lit-write'];
+  heads.forEach((id, i) => Object.assign(skillState(p, id), { attempts: 2, lastSeen: T0 + i }));
+  const active = activeBranches(p);
+  assert.equal(active.length, 3);
+  // u-length waits for tab-2510: the unites branch has nothing open.
+  assert.deepEqual(active, ['calcul', 'relatifs', 'algebre']);
+});
