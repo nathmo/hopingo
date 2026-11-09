@@ -1644,7 +1644,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ---
 # G3. Trigonométrie
 
-Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : à faire
+Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre 2026 (étape U1, partie b). Le niveau 5 est l'item le plus difficile sans aide, en attendant le type `problem` (U4) ; le bouton « Formulaire » viendra avec lui. Simplifications : banque de 12 identités (au lieu de 25) ; le cas ambigu des triangles avec α = 30° seulement ; pas de conversion en degrés et minutes ; les inéquations a sin x + b cos x passent par la forme R sin(x + φ) dans le corrigé (toute forme juste est acceptée, car chaque ligne est jugée par son ensemble de solutions).
 
 **Sources** : MAN, examen Math 1A 2017 (Q7 triangle, Q8 équation, Q9 inéquation a·sin + b·cos, 11 pts, Q11 valeurs exactes et fonctions arc) et examen blanc 1A 2018 (Q3 équation, Q4 inéquation, Q6 vrai/faux sur tan et arccot), formulaire M1A ; CMS, Analyse II, séries 1 (radians) à 9 (fonctions arc et bijections) ; Analyse I GM, série 0 de 2019 (ex. 15 à 17).
 **Notation** : angles en radians, sauf pour les triangles (degrés, « ° » obligatoire). Familles « π/6 + 2kπ, k ∈ ℤ » ; `k` est réservé. Arctg et arctan acceptés. Le formulaire M1A (addition, bissection, t = tan(x/2), somme-produit, sinus et cosinus) est disponible dans les items `problem` (bouton « Formulaire »), comme à l'examen.

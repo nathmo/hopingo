@@ -203,8 +203,8 @@ const LINE_RULES = [
     id: 'g3_bioche_pi', family: 'method', tag: 'E', skill: 'g3-bioche', repair: 'g3-bioche', judges: ['solset'],
     name: 'x = π + 2kπ oublié avec t = tan(x/2)',
     example: ['2 sin x − cos x = 1 : S = {2 arctan(1/2) + 2kπ}', 'S = {2 arctan(1/2) + 2kπ} ∪ {π + 2kπ}'],
-    check: { judge: { kind: 'solset', v: 'x', periodic: true }, prev: '2sin(x)-cos(x)=1', line: 'x=2arctan(1/2)+2kπ' },
-    transform: (prev) => (hasSym(prev, 'x') || hasSym(prev, 't') ? [{ node: andNot0(prev, parse('cos(x/2)')), ctx: {} }] : []),
+    check: { judge: { kind: 'solset', v: 'x', periodic: true, subst: { t: 'tan(x/2)' } }, prev: '2sin(x)-cos(x)=1', line: 'x=2arctan(1/2)+2kπ' },
+    transform: (prev, ctx = {}) => (ctx.cfg?.subst?.t && (hasSym(prev, 'x') || hasSym(prev, 't')) ? [{ node: andNot0(prev, parse('cos(x/2)')), ctx: {} }] : []),
     explain: () => 'tan(x/2) n\'existe pas pour x = π : la substitution oublie ces valeurs. Or 2 sin π − cos π = 1 : x = π + 2kπ est solution. Teste toujours x = π + 2kπ à part.',
   },
   {
@@ -215,11 +215,14 @@ const LINE_RULES = [
     transform: (prev) => {
       const seen = new Set();
       const out = [];
+      // A trig function that is a factor of a product: what one would divide by.
       walk(prev, (n) => {
-        if (n.t === 'fn' && TRIG.has(n.name) && hasSym(n.args[0], 'x')) {
-          const key = toReadable(n);
-          if (!seen.has(key)) { seen.add(key); out.push({ node: andNot0(prev, n), ctx: { f: n } }); }
-          return false;
+        if (n.t !== 'bin' || n.op !== '×') return true;
+        for (const f of [stripParen(n.l), stripParen(n.r)]) {
+          if (f.t === 'fn' && TRIG.has(f.name) && hasSym(f.args[0], 'x')) {
+            const key = toReadable(f);
+            if (!seen.has(key)) { seen.add(key); out.push({ node: andNot0(prev, f), ctx: { f } }); }
+          }
         }
         return true;
       });
@@ -314,7 +317,11 @@ const LINE_RULES = [
 
 // The solution-set traps of this module only replay on periodic lines
 // (trigonometry): elsewhere, « a family dropped » would name any lost root.
+// Trig formulas are not tried on lines that still hold derivatives (G6).
+const NO_DERIV = new Set(['g3_linear', 'g3_add_sign', 'g3_reduce_swap']);
 const PERIODIC_ONLY = new Set(['g3_family_missing', 'g3_sin_family', 'g3_period_divide', 'g3_bioche_pi', 'g3_divide_zero', 'g3_rphi', 'g3_ineq_arc', 'g3_ineq_window']);
-export const RULES = LINE_RULES.map((r) => (PERIODIC_ONLY.has(r.id)
-  ? { ...r, transform: (prev, ctx = {}) => (ctx.cfg?.periodic ? r.transform(prev, ctx) : []) }
-  : r));
+export const RULES = LINE_RULES.map((r) => {
+  if (PERIODIC_ONLY.has(r.id)) return { ...r, transform: (prev, ctx = {}) => (ctx.cfg?.periodic ? r.transform(prev, ctx) : []) };
+  if (NO_DERIV.has(r.id)) return { ...r, transform: (prev, ctx = {}) => (contains(prev, (n) => n.t === 'deriv') ? [] : r.transform(prev, ctx)) };
+  return r;
+});

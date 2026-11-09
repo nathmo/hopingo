@@ -146,7 +146,7 @@ function basicItem(level, rng, opts = {}) {
     start, judge: PERIODIC(), mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     hints: [
       { level: 1, html: `${FORMULA[d.f]}${d.m.eq(1) ? '' : ' ; puis on divise aussi la période'}.` },
-      { level: 2, html: MT(lines[0].math, XK) },
+      { level: 2, html: `Ici α = ${fr(piT(d.fams[0][0]))}${d.m.eq(1) && d.phi.n === 0 ? '' : ` pour u = ${fr(d.U)}`}${d.m.eq(1) ? '' : ', puis on divise aussi la période'}.` },
       { level: 3, html: MT(lines[lines.length - 1].math, XK) },
     ],
     subgoals: BASIC_SUB, keys: KEYS, tapActions: level === 3 ? 'solset' : null, key: `${BASIC}:${start}:${I?.text ?? ''}`, exam,
@@ -339,7 +339,7 @@ function eqItem(level, rng, opts = {}) {
     skill: EQ, level, prompt: `Résous ${MT(shown)}${I ? ` dans ${I.html}` : ' dans ℝ'}.`,
     start: d.start, judge: PERIODIC(d.subst ? { subst: d.subst } : {}), mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     hints: level >= 5 ? [] : [
-      { level: 1, html: kind === 'one' ? 'C\'est un trinôme en cos x (ou sin x) : pose X = cos x.' : kind === 'factor' ? 'Écris sin 2x = 2 sin x cos x, puis mets cos x en facteur : ne divise pas.' : 'Vérifie que cos x = 0 n\'est pas solution, puis divise par cos²x.' },
+      { level: 1, html: kind === 'one' ? `C'est un trinôme en ${d.f} x : pose X = ${d.f} x.` : kind === 'factor' ? 'Écris sin 2x = 2 sin x cos x, puis mets cos x en facteur : ne divise pas.' : 'Vérifie que cos x = 0 n\'est pas solution, puis divise par cos²x.' },
       { level: 2, html: MT(d.lines[Math.max(0, d.lines.length - 3)].math, vars) },
       { level: 3, html: MT(d.lines[d.lines.length - 2].math, vars) },
     ],
@@ -521,7 +521,8 @@ function bioData(rng) {
     }
     if (![a, b, c].every(Number.isInteger) || !a || !b || [a, b, c].some((x) => Math.abs(x) > 9)) continue;
     if (b + c === 0 && !pi) continue;
-    return { a, b, c, roots, pi: c === -b };
+    const g = gcd(gcd(a, b), c);
+    return { a: a / g, b: b / g, c: c / g, roots, pi: c === -b };
   }
   return { a: 2, b: -1, c: 1, roots: [q(1, 2)], pi: true, fallback: true };
 }

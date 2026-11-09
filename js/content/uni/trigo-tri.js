@@ -101,7 +101,7 @@ function ineqItem(level, rng, opts = {}) {
     lines.push({ math: `sin(${U})${d.op}${d.s}`, note: 'Diviser par R', subgoal: 'form' });
   } else start = `${d.f}(${U})${d.op}${d.s}`;
   lines.push({ math: chainT(U, d.A, d.B, q(2), strict), note: 'Arc solution, + 2kπ', subgoal: 'arc' });
-  if (d.phi.n !== 0) lines.push({ math: chainT(X, d.A.sub(d.phi), d.B.sub(d.phi), q(2), strict), note: `Retirer ${fr(piT(d.phi))}`, subgoal: 'isolate' });
+  if (d.phi.n !== 0) lines.push({ math: chainT(X, d.A.sub(d.phi), d.B.sub(d.phi), q(2), strict), note: d.phi.n > 0 ? `Retirer ${fr(piT(d.phi))}` : `Ajouter ${fr(piT(d.phi.neg()))}`, subgoal: 'isolate' });
   if (!d.m.eq(1)) lines.push({ math: chainT('x', d.r.lo, d.r.hi, d.r.P, strict), note: 'Diviser aussi la période', subgoal: 'isolate' });
   lines.push({ math: piecesT(d.r.pieces), note: `Garder ce qui tombe dans ${d.I.html}, k par k`, subgoal: 'restrict' });
   const script = lines.map((l) => ({ kind: 'eq', ...l }));
@@ -169,7 +169,7 @@ const TRI_SUB = [
 const TRIPLES = [[5, 8, 60, 7], [3, 8, 60, 7], [8, 15, 60, 13], [7, 15, 60, 13], [5, 21, 60, 19], [3, 5, 120, 7], [7, 8, 120, 13], [5, 16, 120, 19], [6, 10, 120, 14], [9, 15, 120, 21], [3, 4, 90, 5], [6, 8, 90, 10], [5, 12, 90, 13]];
 const COS = { 60: [1, 2], 90: [0, 1], 120: [-1, 2] };
 const deg2 = (x) => Math.round(x * 100) / 100;
-const degT = (x) => `${String(deg2(x)).replace('.', ',')}°`;
+const degT = (x) => `${deg2(x).toFixed(2).replace(/\.00$/, '').replace('.', ',')}°`;
 const acosDeg = (v) => (Math.acos(v) * 180) / Math.PI;
 const asinDeg = (v) => (Math.asin(v) * 180) / Math.PI;
 const gcd = (x, y) => (y ? gcd(y, x % y) : Math.abs(x));
@@ -259,7 +259,7 @@ function triItem(level, rng, opts = {}) {
     prompt = `Triangle ABC avec a = ${d.a}, c = ${d.c} et α = 30°. Calcule les valeurs possibles de γ (à 0,01° près).`;
     key = `${TRI}:ssa:${d.a}:${d.c}`;
   } else {
-    const t = rng.pick(TRIPLES);
+    const t = rng.pick(level === 2 ? TRIPLES.filter((x) => x[2] !== 90) : TRIPLES);
     parts = cosLawParts(t, level <= 2);
     prompt = `Triangle ABC avec a = ${t[0]}, b = ${t[1]} et γ = ${t[2]}°. Calcule c, puis α et β (angles à 0,01° près).`;
     key = `${TRI}:${t.join(':')}`;
@@ -289,10 +289,11 @@ function triItem(level, rng, opts = {}) {
 
 function triMan(rng, exam) {
   const [b, c, a] = rng.pick(SIXTY);
+  const cd = b % 2 ? `${b}√6/2` : `${b / 2}√6`;
   const parts = [
     { ask: 'cos α =', html: '', start: `(${b}^2+${c}^2-${a}^2)/(2×${b}×${c})`, judge: { kind: 'value' }, lines: [{ math: '1/2', note: 'Théorème du cosinus, puis simplifier', subgoal: 'law' }] },
     { ask: 'α =', html: 'L\'angle α :', start: 'arccos(1/2)', judge: DEG(), lines: [{ math: '60°', note: 'Valeur exacte', subgoal: 'exact' }] },
-    { ask: 'sin δ =', html: `Dans le triangle ADC (CD = ${b}√6/2), théorème du sinus :`, start: `${b}×sin(60°)/((${b}√6)/2)`, judge: { kind: 'value', form: 'exact' }, lines: [{ math: '√2/2', note: 'sin δ = AC·sin α / CD', subgoal: 'exact' }] },
+    { ask: 'sin δ =', html: `Dans le triangle ADC (CD = ${cd}), théorème du sinus :`, start: `${b}×sin(60°)/((${b}√6)/2)`, judge: { kind: 'value', form: 'exact' }, lines: [{ math: '√2/2', note: 'sin δ = AC·sin α / CD', subgoal: 'exact' }] },
     { ask: 'δ =', html: 'L\'angle δ :', start: 'arcsin(√2/2)', judge: DEG(), lines: [{ math: '45°', note: '135° + 60° > 180° : δ = 45°', subgoal: 'angle' }],
       decision: { kind: 'decision', prompt: 'sin δ = √2/2 : δ = 45° ou δ = 135° ?', options: [
         { id: '45', label: 'δ = 45° : 135° + 60° dépasse 180°', valid: true },
@@ -301,7 +302,7 @@ function triMan(rng, exam) {
   ];
   const { start, judge, script } = triScript(parts, 5, null);
   return linesItem({
-    skill: TRI, level: 5, prompt: `Triangle ABC avec a = ${a}, b = ${b}, c = ${c}. (a) Calcule α. (b) D est sur le segment AB et CD = ${b}√6/2. Calcule δ = ∠ADC.`,
+    skill: TRI, level: 5, prompt: `Triangle ABC avec a = ${a}, b = ${b}, c = ${c}. (a) Calcule α. (b) D est sur le segment AB et CD = ${cd}. Calcule δ = ∠ADC.`,
     start, judge, mode: 'free', script, hints: [], subgoals: TRI_SUB, keys: KEYS, key: `${TRI}:man:${a}:${b}:${c}`, exam,
   });
 }
@@ -364,7 +365,7 @@ function arcTheta(rng, F, maxTurns, mustMove) {
     const d = rng.pick([3, 4, 6]);
     const th = q(rng.int(-maxTurns * d, maxTurns * d), d);
     if (F === 'tan' && th.mul(2).d === 1 && th.mul(2).n % 2 !== 0) continue;
-    if (th.n === 0) continue;
+    if (th.n === 0 || th.d === 1) continue;
     const { value } = arcLines(F, th);
     if (mustMove && value.eq(th)) continue;
     return th;
@@ -422,8 +423,8 @@ function arcTf(rng, level, noHints) {
   const bank = [
     { s: 'Pour tout x réel, arccos(cos x) = x.', truth: false, quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'arccos(cos(x))=x', ans: { x: '-1' }, expl: 'Faux : arccos(cos(−1)) = 1, car arccos donne un angle de [0 ; π].' },
     { s: 'Pour tout x ∈ [−π/2 ; π/2], arcsin(sin x) = x.', truth: true, expl: 'Vrai : arcsin est la réciproque de sin restreint à [−π/2 ; π/2].' },
-    { s: 'Pour tous α, β ∈ ]−π/2 ; π/2[, tan α > tan β ⇔ α > β.', truth: true, expl: 'Vrai : tan est strictement croissante sur ]−π/2 ; π/2[.' },
-    { s: 'cot est décroissante sur ]−π/2 ; 0[ ∪ ]0 ; π/2[ : si a < b, alors cot a > cot b.', truth: false, quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }],
+    { s: 'Pour tous α, β ∈ ]−π/2 ; π/2[, tan α &gt; tan β ⇔ α &gt; β.', truth: true, expl: 'Vrai : tan est strictement croissante sur ]−π/2 ; π/2[.' },
+    { s: 'cot est décroissante sur ]−π/2 ; 0[ ∪ ]0 ; π/2[ : si a &lt; b, alors cot a &gt; cot b.', truth: false, quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }],
       pred: '(a<b∧a≠0∧b≠0∧-π/2<a<π/2∧-π/2<b<π/2)⇒cot(a)>cot(b)', hyp: 'a<b∧a≠0∧b≠0∧-π/2<a<π/2∧-π/2<b<π/2', ans: { a: '-π/4', b: 'π/4' }, expl: 'Faux : cot(−π/4) = −1 < cot(π/4) = 1. Elle décroît sur chaque morceau, pas sur la réunion.' },
     { s: 'Pour tout x réel, arctan(tan x) = x dès que tan x existe.', truth: false, quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'cos(x)=0 ∨ arctan(tan(x))=x', ans: { x: 'π' }, expl: 'Faux : arctan(tan π) = arctan 0 = 0 ≠ π.' },
   ];
@@ -537,7 +538,7 @@ function compItem(level, rng, opts = {}) {
     { id: 'formula', label: 'Appliquer une formule (quotient, angle double)', valid: p !== first },
     { id: 'cancel', label: `Simplifier ${OWN[d.g]}(${d.g}(a)) = a partout`, valid: false, why: 'Ce n\'est vrai que pour la fonction de l\'arc.' },
   ];
-  for (const p of rest) script.push({ kind: 'segment', html: '', ask: p.ask, start: { math: p.start }, judge: { kind: 'value', form: 'exact', ...(level === 3 ? { menu: menu(p) } : {}) } }, ...p.lines.map((l) => ({ kind: 'eq', ...l })));
+  for (const p of rest) script.push({ kind: 'segment', html: 'Puis :', ask: p.ask, start: { math: p.start }, judge: { kind: 'value', form: 'exact', ...(level === 3 ? { menu: menu(p) } : {}) } }, ...p.lines.map((l) => ({ kind: 'eq', ...l })));
   return linesItem({
     skill: COMP, level, prompt: `Calcule ${MT(start)}.`, start: first.start, judge: { kind: 'value', form: 'exact', ...(level === 3 ? { menu: menu(first) } : {}) },
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,

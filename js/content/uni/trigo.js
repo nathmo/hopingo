@@ -350,6 +350,8 @@ const FORMULAS = {
   pyth: 'cos²u + sin²u = 1',
   quot: 'tan u = sin u / cos u',
   sumprod: 'Somme-produit : sin p ± sin q, cos p ± cos q',
+  expand: 'Développer (identité remarquable)',
+  factor: 'Factoriser a² − b² = (a − b)(a + b)',
 };
 
 // A bank of identities, u = x, 2x or 3x where it reads well. Each line has
@@ -364,11 +366,11 @@ function identity(rng) {
     () => ({ start: D('sin(D)/(1+cos(D))'), goal: U('tan(U)'), lines: [
       [U(D('2sin(U)cos(U)/(1+cos(D))')), 'double'], [U('2sin(U)cos(U)/(2cos(U)^2)'), 'double'], [U('sin(U)/cos(U)'), 'quot'], [U('tan(U)'), 'quot']] }),
     () => ({ start: U('cos(U)^4-sin(U)^4'), goal: D('cos(D)'), lines: [
-      [U('(cos(U)^2-sin(U)^2)(cos(U)^2+sin(U)^2)'), 'pyth'], [U('cos(U)^2-sin(U)^2'), 'pyth'], [D('cos(D)'), 'double']] }),
+      [U('(cos(U)^2-sin(U)^2)(cos(U)^2+sin(U)^2)'), 'factor'], [U('cos(U)^2-sin(U)^2'), 'pyth'], [D('cos(D)'), 'double']] }),
     () => ({ start: 'sin(3x)', goal: '3sin(x)-4sin(x)^3', lines: [
       ['sin(2x)cos(x)+cos(2x)sin(x)', 'add'], ['2sin(x)cos(x)^2+(1-2sin(x)^2)sin(x)', 'double'], ['2sin(x)(1-sin(x)^2)+sin(x)-2sin(x)^3', 'pyth'], ['3sin(x)-4sin(x)^3', 'pyth']] }),
     () => ({ start: U('(sin(U)+cos(U))^2'), goal: D('1+sin(D)'), lines: [
-      [U('sin(U)^2+2sin(U)cos(U)+cos(U)^2'), 'pyth'], [U('1+2sin(U)cos(U)'), 'pyth'], [D('1+sin(D)'), 'double']] }),
+      [U('sin(U)^2+2sin(U)cos(U)+cos(U)^2'), 'expand'], [U('1+2sin(U)cos(U)'), 'pyth'], [D('1+sin(D)'), 'double']] }),
     () => ({ start: D('(1-cos(D))/sin(D)'), goal: U('tan(U)'), lines: [
       [U('2sin(U)^2/sin(') + D('D)'), 'double'], [U('2sin(U)^2/(2sin(U)cos(U))'), 'double'], [U('sin(U)/cos(U)'), 'quot'], [U('tan(U)'), 'quot']] }),
     () => ({ start: `cos(x+${b[0]})+cos(x-${b[0]})`, goal: `${b[2]}cos(x)`, lines: [
@@ -389,7 +391,7 @@ function identity(rng) {
   return { ...id, key: `${pick}:${u}:${b[0]}` };
 }
 
-const ID_RULE = { double: 'Angle double', add: 'Formule d\'addition', pyth: 'cos² + sin² = 1', quot: 'tan = sin/cos', sumprod: 'Somme-produit' };
+const ID_RULE = { double: 'Angle double', add: 'Formule d\'addition', pyth: 'cos² + sin² = 1', quot: 'tan = sin/cos', sumprod: 'Somme-produit', expand: 'Développer', factor: 'Factoriser a² − b²' };
 
 function idItem(level, rng, opts = {}) {
   const exam = opts.exam ? { format: opts.exam, points: 3 } : false;
@@ -527,14 +529,17 @@ function exactData(rng) {
     const k = q(n, 12);
     // a ± b with a, b known
     const pairs = [];
-    for (const a of KNOWN) for (const b of KNOWN) { if (a.add(b).eq(k)) pairs.push([a, b, '+']); if (a.sub(b).eq(k) && b.valueOf() < a.valueOf()) pairs.push([a, b, '-']); }
+    for (const a of KNOWN) for (const b of KNOWN) { if (a.add(b).eq(k) && a.cmp(b) >= 0) pairs.push([a, b, '+']); if (a.sub(b).eq(k)) pairs.push([a, b, '-']); }
+    // Small angles first: π/3 + π/4 rather than 3π/4 + 5π/6.
+    pairs.sort((u, w) => Math.max(u[0].valueOf(), u[1].valueOf()) - Math.max(w[0].valueOf(), w[1].valueOf()));
     // Larger angles: reduce first by 2π (k ∈ ]0 ; 2π[).
     const r = modQ(k, q(2));
     for (const a of KNOWN) for (const b of KNOWN) { if (!r.eq(k) && a.add(b).eq(r)) pairs.push([a, b, '+', true]); }
     if (!pairs.length) continue;
     const ok = pairs.filter((p) => f !== 'tan' || (trigVal('tan', p[0]) !== null && trigVal('tan', p[1]) !== null));
     if (!ok.length) continue;
-    const [a, b, s, reduced] = rng.pick(ok);
+    const best = Math.max(ok[0][0].valueOf(), ok[0][1].valueOf());
+    const [a, b, s, reduced] = rng.pick(ok.filter((p) => Math.max(p[0].valueOf(), p[1].valueOf()) === best));
     return { f, k, a, b, s, reduced, val: exactVal(f, k) };
   }
   return { f: 'cos', k: q(11, 12), a: q(2, 3), b: q(1, 4), s: '+', val: '-(√6+√2)/4', fallback: true };
@@ -577,10 +582,10 @@ function exactItem(level, rng, opts = {}) {
     script = script.map((l, i) => (l.subgoal === 'value' ? { ...l, ...tpl(l.math, (n) => [n.r.t === 'bin' ? n.r.r : n.r]) } : l));
   }
   if (level === 2) {
-    script.unshift({ kind: 'decision', prompt: `Comment écrire ${MT(piT(d.k))} ?`, options: [
-      { id: 'sum', label: `${MT(piT(d.a))} ${d.s === '+' ? '+' : '−'} ${MT(piT(d.b))}`, valid: true },
-      { id: 'half', label: `La moitié de ${MT(piT(d.k.mul(2)))}`, valid: false, why: 'C\'est possible, mais la bissection donne une racine dans une racine : la somme d\'angles connus est plus simple ici.' },
-      { id: 'lin', label: `${d.f}(${fr(piT(d.a))}) ${d.s} ${d.f}(${fr(piT(d.b))})`, valid: false, rule: 'g3_linear', why: `${d.f} n'est pas linéaire : il faut la formule d'addition.` },
+    script.unshift({ kind: 'decision', prompt: `Comment écrire ${fr(piT(d.k))} ?`, options: [
+      { id: 'sum', label: `${fr(piT(d.a))} ${d.s === '+' ? '+' : '−'} ${fr(piT(d.b))}`, valid: true },
+      { id: 'half', label: `La moitié de ${fr(piT(d.k.mul(2)))}`, valid: false, why: 'C\'est possible, mais la bissection donne une racine dans une racine : la somme d\'angles connus est plus simple ici.' },
+      { id: 'lin', label: `${d.f}(${fr(piT(d.a))}) ${d.s === '+' ? '+' : '−'} ${d.f}(${fr(piT(d.b))})`, valid: false, rule: 'g3_linear', why: `${d.f} n'est pas linéaire : il faut la formule d'addition.` },
     ] });
   }
   const mode = level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free';
