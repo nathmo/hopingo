@@ -77,6 +77,7 @@ export function toMathML(node, opts = {}) {
       case 'root': return `<mroot>${M(stripP(n.e))}${M(n.n)}</mroot>`;
       case 'abs': return row(mo('|', ' stretchy="false"'), M(n.e), mo('|', ' stretchy="false"'));
       case 'fn': {
+        if (n.name === 'logb') return row(`<msub><mi>log</mi>${M(stripP(n.args[0]))}</msub>`, mo('&#x2061;'), paren(M(n.args[1])));
         const name = `<mi>${esc(FN_NAMES[n.name] ?? n.name)}</mi>`;
         return row(name, mo('&#x2061;'), paren(n.args.map(M).join(mo(','))));
       }

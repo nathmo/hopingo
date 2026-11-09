@@ -201,6 +201,12 @@ export function mountLines(item, ctx, body) {
       b.addEventListener('click', () => {
         if (locked()) return;
         run.decide(line, o.id);
+        if (o.valid && o.then) {
+          play('tap');
+          clearSay();
+          addNote(`✔ ${o.label}`, 'decided');
+          return thenTask(o, index);
+        }
         if (o.valid) {
           play('good');
           clearSay();
@@ -219,6 +225,25 @@ export function mountLines(item, ctx, body) {
     }
     stage.append(h('div.step-label', line.prompt), list);
     setFooter();
+  }
+
+  // The typed follow-up of a decision (§5.3 `then`): « t = … ».
+  function thenTask(opt, index) {
+    stage.replaceChildren();
+    input = new MathInput({ keysets, placeholder: opt.then.ask, onEnter: () => submit() });
+    stage.append(h('div.step-line.current', h('span.eq', opt.then.ask), input.display));
+    submit = () => {
+      if (!input.value || locked()) return;
+      const r = run.answerThen(opt, input.value);
+      if (r.kind === 'parse') { input.flash(); say(`<p>${r.message}</p>`); return; }
+      if (r.kind === 'wrong') { play('bad'); say(`<p>${r.message}</p>`, 'bad'); return; }
+      play('good');
+      clearSay();
+      addNote(`${opt.then.ask} ${input.value}`, 'decided');
+      run.passScript(index);
+      nextTask();
+    };
+    setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider'));
   }
 
   // Tap mode: the action first, then the line.

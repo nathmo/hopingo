@@ -59,6 +59,7 @@ export function normalizeText(text) {
     .replace(/[*·⋅]/g, '×')
     .replace(/:/g, '÷')
     .replace(/²/g, '^2').replace(/³/g, '^3').replace(/⁴/g, '^4')
+    .replace(/[₀-₉]+/g, (m) => `_${[...m].map((c) => c.charCodeAt(0) - 0x2080).join('')}`)
     .replace(/″/g, "''").replace(/[′’]/g, "'")
     .replace(/<=/g, '≤').replace(/>=/g, '≥').replace(/!=/g, '≠');
 }
@@ -273,6 +274,31 @@ export function parse(text, opts = {}) {
   }
   function call(name) {
     const at = p - 1;
+    // log_2(x), log_10(x), log_(1/3)(x): the logarithm in base a (step U1).
+    if (name === 'log' && isOp(peek(), '_')) {
+      p++;
+      const s = toks[p];
+      if (!s) fail('Il manque la base du logarithme.');
+      let base;
+      if (isOp(s, '(')) {
+        p++;
+        base = { t: 'paren', e: sum() };
+        expect(')', 'Une parenthèse n\'est pas fermée.');
+      } else if (s.k === 'num') {
+        p++;
+        base = { t: 'num', s: s.s, v: Q.fromDecimal(s.s.replace('.', ',')) };
+      } else if (s.k === 'name' && !FUNCS.includes(s.s)) {
+        p++;
+        base = s.s === 'e' ? { t: 'const', name: 'e' } : { t: 'sym', name: s.s };
+      } else fail('Écris la base du logarithme : log_2(x).');
+      let arg;
+      if (isOp(peek(), '(')) {
+        p++;
+        arg = sum();
+        expect(')', 'Une parenthèse n\'est pas fermée.');
+      } else arg = bareArg('log').args[0];
+      return primes({ t: 'fn', name: 'logb', args: [base, arg] });
+    }
     if (name === 'd') {
       const a = args('d');
       if (a.length > 3) fail('d(f, x) prend au plus trois arguments.', at);

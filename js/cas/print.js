@@ -7,6 +7,7 @@ const PREC = {
   list: -5, imp: -4, or: -3, and: -2, not: -1, rel: 0, union: 0.3, inter: 0.6, sum: 1, prod: 2, neg: 3, frac: 4, pow: 5, atom: 6,
 };
 export { PREC };
+const SUB = { 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄', 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉' };
 
 export function prec(n) {
   switch (n.t) {
@@ -103,7 +104,15 @@ function printer(style, opts) {
       case 'sqrt': return `√${wrap(n.e, PREC.atom)}`;
       case 'root': { inArgs++; const s = `root(${P(n.n)},${P(n.e)})`; inArgs--; return s; }
       case 'abs': return `|${P(n.e)}|`;
-      case 'fn': return `${n.name}(${n.args.map(P).join(',')})`;
+      case 'fn': {
+        if (n.name === 'logb') {
+          const b = n.args[0].t === 'paren' ? n.args[0].e : n.args[0];
+          const simple = b.t === 'num' || b.t === 'sym' || b.t === 'const';
+          if (readable && b.t === 'num' && /^\d+$/.test(b.s)) return `log${[...b.s].map((c) => SUB[c]).join('')}(${P(n.args[1])})`;
+          return `log_${simple ? P(b) : `(${P(b)})`}(${P(n.args[1])})`;
+        }
+        return `${n.name}(${n.args.map(P).join(',')})`;
+      }
       case 'deriv': {
         if (n.e.t === 'paren') return body({ ...n, e: n.e.e });
         if (readable) {

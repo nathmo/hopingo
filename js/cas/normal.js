@@ -26,6 +26,21 @@ const AT_ZERO = { sin: 0, tan: 0, arcsin: 0, arctan: 0, sinh: 0, tanh: 0, argsh:
 
 const newCtx = () => ({ atoms: new Map(), opaque: false });
 
+// log_b(x) when it is rational: b^r = x with r = n/d, d ≤ 12 (log₄ 8 = 3/2).
+function logRational(b, x) {
+  if (b.n <= 0 || b.eq(1) || x.n <= 0) return null;
+  const r = Math.log(x.n / x.d) / Math.log(b.n / b.d);
+  for (let d = 1; d <= 12; d++) {
+    const n = Math.round(r * d);
+    if (Math.abs(n / d - r) > 1e-9 || Math.abs(n) > 60) continue;
+    // x^d = b^n, exactly.
+    const lhs = x.pow(d);
+    const rhs = n >= 0 ? b.pow(n) : new Q(1).div(b.pow(-n));
+    if (lhs.eq(rhs)) return new Q(n, d);
+  }
+  return null;
+}
+
 function atom(ctx, key, node) {
   ctx.opaque = true;
   if (!ctx.atoms.has(key)) ctx.atoms.set(key, node);
@@ -98,6 +113,15 @@ function toRF(node, ctx) {
       return atom(ctx, `abs(${u.canon()})`, node);
     }
     case 'fn': {
+      if (node.name === 'logb' && node.args.length === 2) {
+        const b = toRF(node.args[0], ctx);
+        const u = toRF(node.args[1], ctx);
+        if (b.isConst && u.isConst) {
+          const r = logRational(b.constValue(), u.constValue());
+          if (r) return RatFun.const(r);
+        }
+        return atom(ctx, `logb(${b.canon()},${u.canon()})`, node);
+      }
       if (node.args.length !== 1) throw new NotExact();
       const name = canonFn(node.name);
       const u = toRF(node.args[0], ctx);

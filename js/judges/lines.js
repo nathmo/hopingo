@@ -7,15 +7,21 @@
 //         followError, hints, noHints, subgoals:[{id, label, skill}], tapActions, keys}
 // ScriptLine:
 //   {kind:'eq', math, subgoal?, note?, blanks?:[[i, j]]}   blanks: token ranges of math
-//   {kind:'decision', prompt, options:[{id, label, valid, quality?, why?, rule?}]}
+//   {kind:'decision', prompt, options:[{id, label, valid, quality?, why?, rule?, state?, then?, ref?}]}
 //       an invalid option with a `rule` names that trap (g0_pfd_form); a
 //       valid option with quality 'poor' lets the student go on, and its
-//       `why` comes with the next accepted line (§5.3)
+//       `why` comes with the next accepted line (§5.3). A valid option's
+//       `state` is merged into the judge's state (solset: {superset: true}
+//       after squaring without condition). `then: {ask, expect, vars,
+//       store?}`: the student then types what the choice needs (« t = » eˣ),
+//       judged by equivalence (answerThen); `ref` marks the option the
+//       reference solution takes (else the first valid, not poor).
 //   {kind:'note', html}
 //   {kind:'rule', ask, options:[{id, label}], correct}      self-explanation
 //   {kind:'segment', html, start:{math}, judge:{kind, …}}   a new part: its own judge (§16.2)
 
-import { tokenize } from '../cas/parse.js';
+import { tokenize, tryParse, parse } from '../cas/parse.js';
+import { equivalent, seedOf } from '../cas/equiv.js';
 import { toText } from '../cas/print.js';
 import { judgeFor, readWith } from './index.js';
 
@@ -154,7 +160,25 @@ export class LinesRun {
       if (opt.rule) { this.rules.push(opt.rule); this.diag = { rules: [opt.rule], ambiguous: 1, ctx: {} }; }
     }
     if (opt?.valid && opt.quality === 'poor') this.poorNote = opt.why || null;
+    if (opt?.valid && opt.state) Object.assign(this.state, opt.state);
     return opt;
+  }
+
+  // The typed follow-up of a decision (§5.3 `then`). → {kind:'ok'|'wrong'|'parse', node?, message?}
+  answerThen(opt, input) {
+    const t = opt.then;
+    const node = tryParse(String(input ?? ''), { vars: t.vars || ['x'] });
+    if (!node) return { kind: 'parse', message: "Je n'arrive pas à lire ta saisie." };
+    const want = parse(t.expect, { vars: t.vars || ['x'] });
+    const domain = t.domain || Object.fromEntries((t.vars || ['x']).map((v) => [v, [0.2, 2.5]]));
+    let ok = false;
+    try { ok = equivalent(node, want, { vars: t.vars || ['x'], domain, seed: seedOf(t.expect) }).equal; } catch { ok = false; }
+    if (!ok) {
+      this.mistakes += 1;
+      return { kind: 'wrong', node, message: t.why || "Ce n'est pas ce qu'il faut ici." };
+    }
+    if (t.store) this.state[t.store] = node;
+    return { kind: 'ok', node };
   }
 
   // Skip non-eq script lines the UI has shown (decisions, notes, rules).
@@ -184,10 +208,26 @@ export function checkScript(item) {
   for (let s = 0; s < segs.length; s++) {
     const eqs = segs[s].lines.filter((l) => l.kind === 'eq');
     if (!eqs.length) return { ok: false, log: [...log, { seg: s, kind: 'empty' }] };
-    for (let k = 0; k < eqs.length; k++) {
-      const v = run.submit(eqs[k].math, { guided: item.mode === 'guided' });
-      log.push({ seg: s, math: eqs[k].math, kind: v.kind, message: v.message });
+    let k = 0;
+    for (const line of segs[s].lines) {
+      if (line.kind === 'decision') {
+        // The reference takes the option marked `ref`, else the first valid
+        // one that is not poor, and types its follow-up.
+        const opt = line.options.find((o) => o.ref) ?? line.options.find((o) => o.valid && o.quality !== 'poor') ?? line.options.find((o) => o.valid);
+        if (!opt) return { ok: false, log: [...log, { seg: s, kind: 'decision' }] };
+        run.decide(line, opt.id);
+        if (opt.then) {
+          const r = run.answerThen(opt, opt.then.expect);
+          log.push({ seg: s, math: opt.then.expect, kind: r.kind, message: r.message });
+          if (r.kind !== 'ok') return { ok: false, log };
+        }
+        continue;
+      }
+      if (line.kind !== 'eq') continue;
+      const v = run.submit(line.math, { guided: item.mode === 'guided' });
+      log.push({ seg: s, math: line.math, kind: v.kind, message: v.message });
       const want = k === eqs.length - 1 ? 'done' : 'ok';
+      k++;
       if (v.kind !== want) return { ok: false, log };
     }
   }

@@ -22,14 +22,17 @@
 
 import { Q } from '../math/rational.js';
 import { parse } from './parse.js';
+import { toText } from './print.js';
 import { mapNode, stripParen, lit, neg, add, sub, mul, sqrt, num, contains } from './ast.js';
 import { exactValue, toRatFun } from './normal.js';
 import { evalFloat } from './numeric.js';
+import { diff } from './diff.js';
 import { qCoeffs, rationalRoots, discriminant } from './polyx.js';
 
 const TOL = 1e-9;
 const RANGE = 60; // integers of ℕ, ℤ considered
 const SCAN = 120; // numeric scan of [−SCAN ; SCAN]
+const SCAN_STEPS = 24000;
 const near = (a, b) => a === b || (Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= TOL * (1 + Math.abs(a) + Math.abs(b)));
 
 const INF = { x: Infinity };
@@ -141,8 +144,11 @@ const SET_NODES = new Set(['set', 'setop']);
 export function isSetNode(node, cfg = {}) {
   const n = stripParen(node);
   if (SET_NODES.has(n.t)) return true;
-  return n.t === 'sym' && !n.sub && !!cfg.sets?.[n.name];
+  return n.t === 'sym' && !!cfg.sets?.[setName(n)];
 }
+
+// The name of a set letter: A, or S_1 for S₁.
+export const setName = (n) => (n.sub ? `${n.name}_${n.sub.s ?? n.sub.name ?? ''}` : n.name);
 
 function namedSet(name, ctx) {
   if (name === '∅') return EMPTY;
@@ -154,7 +160,7 @@ function namedSet(name, ctx) {
 
 function evalSet(node, ctx) {
   const n = stripParen(node);
-  if (n.t === 'sym' && ctx.sets?.[n.name]) return evalSet(ctx.sets[n.name], ctx);
+  if (n.t === 'sym' && ctx.sets?.[setName(n)]) return evalSet(ctx.sets[setName(n)], ctx);
   if (n.t === 'setop') {
     const a = evalSet(n.l, ctx);
     const b = evalSet(n.r, ctx);
@@ -287,11 +293,13 @@ export function holds(node, ctx, b) {
 
 function numericRoots(f, v) {
   const out = [];
-  const N = 24000;
+  const N = SCAN_STEPS;
   const h = (2 * SCAN) / N;
   const F = (x) => evalFloat(f, { [v]: x });
   let x0 = -SCAN;
   let y0 = F(x0);
+  let xm = NaN; // the point before x0, for double roots (tangencies)
+  let ym = NaN;
   for (let i = 1; i <= N; i++) {
     const x1 = -SCAN + i * h;
     const y1 = F(x1);
@@ -300,10 +308,43 @@ function numericRoots(f, v) {
     if (d0 && d1 && y1 === 0) out.push(x1);
     else if (d0 && d1 && y0 * y1 < 0) out.push(bisect(F, x0, x1, (y) => y < 0, y0 < 0));
     else if (d0 !== d1) out.push(bisect(F, x0, x1, (y) => Number.isFinite(y), d0));
+    else if (d0 && d1 && Number.isFinite(ym) && y0 !== 0 && Math.abs(y0) < 1e-2 && Math.abs(y0) < Math.abs(ym) && Math.abs(y0) <= Math.abs(y1) && ym * y0 > 0 && y0 * y1 > 0) {
+      // |f| has a small local minimum: a root where f touches 0 (sin x = 1).
+      const t = touch(F, xm, x1, f, v);
+      if (t !== null) out.push(t);
+    }
+    xm = x0;
+    ym = y0;
     x0 = x1;
     y0 = y1;
   }
   return out;
+}
+
+// A root of f in ]a ; b[ where f does not change sign: the minimum of |f|
+// (golden section), kept if f vanishes there.
+function touch(F, a, b, f, v) {
+  // First the sign change of f′ (exact to the last digit), else the minimum.
+  try {
+    const d = diff(f, v);
+    const D = (x) => evalFloat(d, { [v]: x });
+    const da = D(a);
+    const db = D(b);
+    if (Number.isFinite(da) && Number.isFinite(db) && da * db < 0) {
+      const x = bisect(D, a, b, (y) => y < 0, da < 0);
+      if (Math.abs(F(x)) < 1e-11) return x;
+    }
+  } catch { /* no derivative: golden section */ }
+  const g = (Math.sqrt(5) - 1) / 2;
+  let c = b - g * (b - a);
+  let d = a + g * (b - a);
+  for (let k = 0; k < 90; k++) {
+    if (Math.abs(F(c)) < Math.abs(F(d))) b = d; else a = c;
+    c = b - g * (b - a);
+    d = a + g * (b - a);
+  }
+  const x = (a + b) / 2;
+  return Math.abs(F(x)) < 1e-11 ? x : null;
 }
 
 function bisect(F, a, b, test, atA) {
@@ -370,9 +411,22 @@ function surdRoots([, c1, c2], D) {
   });
 }
 
+// k·π written as in the course: π/2, −3π/4, 2π.
+export function piNode(k) {
+  const PI = { t: 'const', name: 'pi' };
+  const a = Math.abs(k.n);
+  const top = a === 1 ? PI : { t: 'bin', op: '×', l: num(a), r: PI, implicit: true };
+  const body = k.d === 1 ? top : { t: 'frac', n: top, d: num(k.d) };
+  return k.n < 0 ? neg(body) : body;
+}
+
 function snapped(x) {
   const q = snap(x);
-  return q ? bq(q) : { x };
+  if (q) return bq(q);
+  // A rational multiple of π (trigonometry): exact writing kept.
+  const k = snap(x / Math.PI);
+  if (k && k.n !== 0) return { x, node: piNode(k) };
+  return { x };
 }
 
 function condBreakpoints(node, ctx) {
@@ -424,6 +478,87 @@ function solveCond(node, ctx, within = null) {
   return within ? intersect(S, within) : S;
 }
 
+// ---------- where an expression is defined ----------
+
+const depends = (n, v) => contains(n, (x) => x.t === 'sym' && x.name === v && !x.sub);
+const R = (op, l, r) => ({ t: 'rel', op, l, r });
+const ZERO = num(0);
+const ONE = num(1);
+
+// The conditions for node to be defined, as relations in v: denominators
+// ≠ 0, radicands ≥ 0, logarithms > 0, tan and cot away from their poles,
+// arcsin and arccos in [−1 ; 1], real powers of a positive base.
+export function domainConds(node, v = 'x') {
+  const out = [];
+  const visit = (n) => {
+    if (!n || typeof n !== 'object') return;
+    switch (n.t) {
+      case 'frac': if (depends(n.d, v)) out.push(R('≠', n.d, ZERO)); break;
+      case 'bin': if (n.op === '÷' && depends(n.r, v)) out.push(R('≠', n.r, ZERO)); break;
+      case 'sqrt': if (depends(n.e, v)) out.push(R('≥', n.e, ZERO)); break;
+      case 'root': {
+        const k = exactValue(n.n);
+        if (depends(n.e, v) && (!k || k.n % 2 === 0)) out.push(R('≥', n.e, ZERO));
+        break;
+      }
+      case 'pow': {
+        if (!depends(n.b, v)) {
+          if (depends(n.e, v)) {
+            const b = exactValue(n.b);
+            if (b && b.n <= 0) out.push(R('>', n.b, ZERO));
+          }
+          break;
+        }
+        const e = exactValue(n.e);
+        if (e === null) { out.push(R('>', n.b, ZERO)); break; }
+        if (e.d % 2 === 0) out.push(R(e.n < 0 ? '>' : '≥', n.b, ZERO));
+        else if (e.n < 0) out.push(R('≠', n.b, ZERO));
+        break;
+      }
+      case 'fn': {
+        const name = n.name === 'logb' ? 'logb' : canonFnName(n.name);
+        const a = n.name === 'logb' ? n.args[1] : n.args[0];
+        if (name === 'logb' && depends(n.args[0], v)) out.push(R('>', n.args[0], ZERO), R('≠', n.args[0], ONE));
+        if (!a || !depends(a, v)) break;
+        if (name === 'ln' || name === 'logb') out.push(R('>', a, ZERO));
+        else if (name === 'tan') out.push(R('≠', { t: 'fn', name: 'cos', args: [a] }, ZERO));
+        else if (name === 'cot') out.push(R('≠', { t: 'fn', name: 'sin', args: [a] }, ZERO));
+        else if (name === 'arcsin' || name === 'arccos') out.push({ t: 'chain', items: [neg(ONE), a, ONE], ops: ['≤', '≤'] });
+        else if (name === 'argch') out.push(R('≥', a, ONE));
+        else if (name === 'argth') out.push({ t: 'chain', items: [neg(ONE), a, ONE], ops: ['<', '<'] });
+        break;
+      }
+      default: break;
+    }
+  };
+  mapNode(node, (n) => { visit(n); return n; });
+  return out;
+}
+
+const FN_CANON = { Log: 'ln', log: 'ln', tg: 'tan', cotan: 'cot', Arctg: 'arctan', arctg: 'arctan', Arctan: 'arctan', Arcsin: 'arcsin', Arccos: 'arccos', sh: 'sinh', ch: 'cosh', th: 'tanh' };
+const canonFnName = (name) => FN_CANON[name] ?? name;
+
+// The conjunction of the conditions, or null when node is defined on ℝ.
+export function domainNode(node, v = 'x') {
+  const cs = domainConds(node, v);
+  return cs.length ? cs.reduce((acc, c) => (acc ? { t: 'logic', op: 'and', l: acc, r: c } : c), null) : null;
+}
+
+// The set where node (an expression, or each side of a condition) is defined.
+export function domainOf(node, cfg = {}) {
+  const ctx = cfg.isCtx ? cfg : makeCtx(cfg);
+  const cond = domainNode(node, ctx.v);
+  const S = cond ? solveCond(cond, ctx) : (ctx.universe ? integersIn(ctx.universe.lo, ctx.universe.hi) : REALS);
+  return ctx.within ? intersect(S, ctx.within) : S;
+}
+
+// Letters standing for an expression of the variable (t = eˣ): replaced
+// before the set is computed. map: {t: node}.
+export function substSyms(node, map) {
+  if (!map || !Object.keys(map).length) return node;
+  return mapNode(node, (n) => (n.t === 'sym' && !n.sub && map[n.name] ? { t: 'paren', e: map[n.name] } : n));
+}
+
 // ---------- the entry point ----------
 
 const asNode = (x) => (typeof x === 'string' ? parse(x) : x);
@@ -438,8 +573,23 @@ export function makeCtx(cfg = {}) {
 
 // What a line says, as a set: a set expression, « A = {…} », « x ∈ … » or
 // a condition on v.
+const CACHE = new Map();
+const CACHE_MAX = 600;
+
 export function solutionSet(node, cfg = {}) {
-  const ctx = cfg.isCtx ? cfg : makeCtx(cfg);
+  if (cfg.isCtx) return solutionSetIn(node, cfg);
+  let key = null;
+  try { key = `${JSON.stringify(cfg)}§${toText(node)}`; } catch { key = null; }
+  if (key && CACHE.has(key)) return CACHE.get(key);
+  const S = solutionSetIn(node, makeCtx(cfg));
+  if (key) {
+    if (CACHE.size >= CACHE_MAX) CACHE.delete(CACHE.keys().next().value);
+    CACHE.set(key, S);
+  }
+  return S;
+}
+
+function solutionSetIn(node, ctx) {
   let n = stripParen(node);
   if (n.t === 'rel' && n.op === '=' && isSetNode(n.r, ctx)) n = stripParen(n.r); // « A ∖ B = {1 ; 3} »
   if (n.t === 'in' && stripParen(n.l).t === 'sym' && stripParen(n.l).name === ctx.v && isSetNode(n.r, ctx)) n = stripParen(n.r);
@@ -475,8 +625,10 @@ export function setToNode(S) {
 }
 
 // A number written out: 3, −3, 3/4, √2, (1 + √5)/2, ±∞.
-function isNumberWritten(n) {
+function isNumberWritten(n, loose = false) {
   n = stripParen(n);
+  if (loose && stripParen(n.t === 'neg' ? n.e : n).t === 'const') return true;
+  if (loose) return !contains(n, (x) => x.t === 'sym') && (exactValue(n) !== null || Number.isFinite(evalFloat(n, {})));
   if (n.t === 'neg') return isNumberWritten(n.e);
   if (n.t === 'const') return true;
   if (n.t === 'num') return true;
@@ -502,7 +654,7 @@ export function finalForm(node, cfg = {}) {
   const collect = (x) => {
     x = stripParen(x);
     if (x.t === 'logic' && x.op === 'or') return collect(x.l) && collect(x.r);
-    if (x.t === 'rel' && x.op === '=' && stripParen(x.l).t === 'sym' && stripParen(x.l).name === v && isNumberWritten(x.r)) { eqs.push(x.r); return true; }
+    if (x.t === 'rel' && x.op === '=' && stripParen(x.l).t === 'sym' && stripParen(x.l).name === v && isNumberWritten(x.r, cfg.loose)) { eqs.push(x.r); return true; }
     return false;
   };
   if (collect(n)) return true;
@@ -512,9 +664,9 @@ export function finalForm(node, cfg = {}) {
   if (parts.some((p) => p.kind === 'named' && !['∅', 'ℝ'].includes(p.name))) return false;
   if (parts.length > 1 && parts.some((p) => p.kind === 'named')) return 'Simplifie la réunion : ∅ ou ℝ ne s\'écrivent pas avec d\'autres morceaux.';
   for (const p of parts) {
-    if (p.kind === 'finite' && !p.items.every(isNumberWritten)) return false;
+    if (p.kind === 'finite' && !p.items.every((x) => isNumberWritten(x, cfg.loose))) return false;
     if (p.kind === 'interval') {
-      if (!isNumberWritten(p.lo) || !isNumberWritten(p.hi)) return false;
+      if (!isNumberWritten(p.lo, cfg.loose) || !isNumberWritten(p.hi, cfg.loose)) return false;
       const infClosed = (b, open) => !open && stripParen(b.t === 'neg' ? b.e : b).t === 'const' && stripParen(b.t === 'neg' ? b.e : b).name === 'inf';
       if (infClosed(p.lo, p.loOpen) || infClosed(p.hi, p.hiOpen)) return '∞ n\'est pas un nombre : le crochet est toujours ouvert de son côté, ]−∞ ou +∞[.';
     }

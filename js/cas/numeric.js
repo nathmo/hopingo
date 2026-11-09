@@ -68,6 +68,12 @@ export function evalFloat(node, env = {}, opts = {}) {
     case 'abs': return Math.abs(E(node.e));
     case 'fn': {
       const name = canonFn(node.name);
+      if (name === 'logb' && node.args.length === 2) {
+        const b = E(node.args[0]);
+        const x = E(node.args[1]);
+        if (!(b > 0) || b === 1 || !(x > 0) || (guard && x < 1e-6)) return NaN;
+        return Math.log(x) / Math.log(b);
+      }
       const f = REAL_FN[name];
       if (!f || node.args.length !== 1) return NaN;
       const x = E(node.args[0]);

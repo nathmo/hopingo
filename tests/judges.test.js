@@ -348,3 +348,90 @@ test('the parser reads sets, chains of inequalities and connectives', () => {
   assert.equal(P('x<1 et x>0').t, 'logic', '« et » is ∧');
   assert.throws(() => P(']1;2'), /Ferme/);
 });
+
+// ---------- step U1, part b ----------
+
+const J = (cfg, prev, line, state = {}) => JUDGES.solset.judgeLine({ kind: 'solset', ...cfg }, P(prev, { vars: [cfg.v || 'x', ...Object.keys(cfg.subst || {}), ...Object.keys(cfg.params || {})] }), line, state);
+
+test('solset (U1b): substitution t = eˣ, undefined numbers', () => {
+  const cfg = { v: 'x', subst: { t: 'e^x' } };
+  assert.equal(J(cfg, 'e^(2x)-e^x-6=0', 't^2-t-6=0').kind, 'ok');
+  assert.equal(J(cfg, 't^2-t-6=0', 't=3 ou t=-2').kind, 'ok', 't = −2 gives no x');
+  assert.equal(J(cfg, 't=3', 'e^x=3').kind, 'ok');
+  assert.equal(J(cfg, 'e^x=3', 'x=ln(3)').kind, 'done');
+  assert.equal(J(cfg, 'e^x=3', 'x=ln(2)').kind, 'wrong');
+  const bad = J(cfg, 'e^x=3', 'x=ln(3) ou x=ln(-2)');
+  assert.equal(bad.kind, 'wrong');
+  assert.match(bad.message, /n'existe pas/);
+  assert.equal(J(cfg, 't^2-t-6=0', 't=3').kind, 'ok', 'a line in t is not final');
+});
+
+test('solset (U1b): domain line, comparison on the domain, final line checked', () => {
+  const cfg = { v: 'x', onDomain: true };
+  const st = {};
+  assert.equal(J(cfg, 'log_2(x-1)+log_2(x+1)=3', 'D=]1;+∞[', st).kind, 'ok');
+  assert.equal(J(cfg, 'D=]1;+∞[', 'log_2((x-1)(x+1))=3', st).kind, 'ok', 'merged: the domain widens');
+  assert.equal(J(cfg, 'log_2((x-1)(x+1))=3', 'x^2-1=8', st).kind, 'ok');
+  assert.equal(J(cfg, 'x^2-1=8', 'x=3 ou x=-3', st).kind, 'ok', 'still to sort');
+  assert.equal(J(cfg, 'x=3 ou x=-3', '{3}', st).kind, 'done');
+  assert.equal(J(cfg, 'x=3 ou x=-3', '{-3;3}', st).kind, 'wrong', 'outside the domain');
+  const d = J(cfg, 'log_2(x-1)+log_2(x+1)=3', 'D=]-1;+∞[', {});
+  assert.equal(d.kind, 'wrong');
+  assert.match(d.message, /domaine/);
+});
+
+test('solset (U1b): squaring without condition, parameters, domains, cases', () => {
+  const st = { superset: true };
+  assert.equal(J({ v: 'x' }, 'sqrt(x+7)=x+1', 'x+7=(x+1)^2', st).kind, 'ok');
+  const v = J({ v: 'x' }, 'x+7=(x+1)^2', 'x=2 ou x=-3', st);
+  assert.equal(v.kind, 'ok');
+  assert.match(v.note, /Vérifie/);
+  assert.equal(J({ v: 'x' }, 'x=2 ou x=-3', 'x=2', st).kind, 'done');
+  assert.equal(J({ v: 'x' }, 'x=2 ou x=-3', 'x=-3', st).kind, 'wrong', 'a solution lost');
+  // A parameter m in a case of the discussion.
+  assert.equal(J({ v: 'x', params: { m: ']1;+∞[' } }, '(m-1)x≤m^2-1', 'x≤m+1').kind, 'ok');
+  assert.equal(J({ v: 'x', params: { m: ']1;+∞[' } }, 'x≤m+1', ']-∞;m+1]').kind, 'done');
+  const w = J({ v: 'x', params: { m: ']1;+∞[' } }, '(m-1)x≤m^2-1', 'x≥m+1');
+  assert.equal(w.kind, 'wrong');
+  assert.match(w.message, /Pour m = /);
+  assert.equal(J({ v: 'x', params: { m: ']-∞;1[' } }, '(m-1)x≤m^2-1', 'x≥m+1').kind, 'ok');
+  assert.equal(J({ v: 'x', params: { m: '{1}' } }, '(m-1)x≤m^2-1', 'ℝ').kind, 'done');
+  // An expression stands for its domain (g1-domain).
+  const ex = { v: 'x', exprDomain: true };
+  assert.equal(J(ex, 'sqrt(x+3)/(x^2-4)', 'x+3≥0 et x^2-4≠0').kind, 'ok');
+  assert.equal(J(ex, 'x+3≥0 et x^2-4≠0', '[-3;-2[∪]-2;2[∪]2;+∞[').kind, 'done');
+  assert.equal(J(ex, 'sqrt(x+3)/(x^2-4)', 'x^2-4≠0').kind, 'wrong');
+  // A case is a part on a smaller domain; S₁ ∪ S₂ joins the cases.
+  assert.equal(J({ v: 'x', domain: '[3/2;+∞[' }, '|2x-3|=x+1', '2x-3=x+1').kind, 'ok');
+  assert.equal(J({ v: 'x', sets: { S_1: '{4}', S_2: '{2/3}' } }, 'S₁∪S₂', '{2/3;4}').kind, 'done');
+  // Roots where the function touches 0, and multiples of π.
+  assert.equal(J({ v: 'x', domain: '[-7;7]' }, 'sin(x)=1', 'x=π/2 ou x=-3π/2').kind, 'done');
+});
+
+test('the parser reads log_a; exact values of logarithms', () => {
+  assert.equal(toText(P('log_2(x-1)+log_(1/3)(x)')), 'log_2(x-1)+log_(1/3)(x)');
+  const r = JUDGES.value.judgeLine({ kind: 'value', form: 'irreducible' }, P('log_2(1/16)'), '-4');
+  assert.equal(r.kind, 'done');
+  assert.equal(JUDGES.value.judgeLine({ kind: 'value', form: 'irreducible' }, P('log_4(8)'), '3/2').kind, 'done');
+});
+
+test('lines: a decision sets the judge state and asks its follow-up (then)', () => {
+  const item = {
+    type: 'lines', mode: 'guided', start: { math: 'sqrt(x+7)=x+1' }, judge: { kind: 'solset', v: 'x' },
+    script: [
+      { kind: 'decision', prompt: 'Comment ?', options: [
+        { id: 'sq', label: 'Élever au carré', valid: true, quality: 'poor', ref: true, state: { superset: true }, then: { ask: 'On élève au carré :', expect: '(x+1)^2', vars: ['x'] } },
+        { id: 'cond', label: 'Condition puis carré', valid: true }] },
+      { kind: 'eq', math: 'x+7=(x+1)^2' },
+      { kind: 'eq', math: 'x=2 ou x=-3' },
+      { kind: 'eq', math: 'x=2' },
+    ],
+    subgoals: [],
+  };
+  assert.ok(checkScript(item).ok, JSON.stringify(checkScript(item).log));
+  const run = new LinesRun(item);
+  const opt = run.decide(item.script[0], 'sq');
+  assert.equal(run.answerThen(opt, 'x+2').kind, 'wrong');
+  assert.equal(run.answerThen(opt, 'x^2+2x+1').kind, 'ok');
+  assert.equal(run.state.superset, true);
+});
