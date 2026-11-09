@@ -230,14 +230,16 @@ function valueAt(node, v, b) {
 
 // Sign of l − r at b: −1, 0, 1, or NaN where undefined.
 function signAt(l, r, v, b) {
+  const x = evalFloat(l, { [v]: b.x });
+  const y = evalFloat(r, { [v]: b.x });
+  // Undefined stays undefined, even when an exact factor 0 hides it (0·√(−1)).
+  if (Number.isNaN(x) || Number.isNaN(y)) return NaN;
   if (b.q) {
-    const at = (n) => mapNode(n, (x) => (x.t === 'sym' && x.name === v && !x.sub ? lit(b.q) : x));
+    const at = (n) => mapNode(n, (z) => (z.t === 'sym' && z.name === v && !z.sub ? lit(b.q) : z));
     const a = exactValue(at(l));
     const c = exactValue(at(r));
     if (a && c) return a.cmp(c);
   }
-  const x = evalFloat(l, { [v]: b.x });
-  const y = evalFloat(r, { [v]: b.x });
   if (!Number.isFinite(x) || !Number.isFinite(y)) return NaN;
   if (Math.abs(x - y) <= 1e-9 * (1 + Math.abs(x) + Math.abs(y))) return 0;
   return x < y ? -1 : 1;
@@ -597,6 +599,20 @@ export function domainOf(node, cfg = {}) {
 export function substSyms(node, map) {
   if (!map || !Object.keys(map).length) return node;
   return mapNode(node, (n) => (n.t === 'sym' && !n.sub && map[n.name] ? { t: 'paren', e: map[n.name] } : n));
+}
+
+// Functions declared by the item (f(x) = √x, g(x) = 1 − x²): each call
+// f(a) is replaced by the definition with v replaced by (a). defs: {f: node
+// or text}. The expansion keeps the raw writing, so the domain of g(f(x))
+// is the domain of 1 − (√x)², not of 1 − x.
+export function expandFns(node, defs, v = 'x') {
+  if (!defs || !Object.keys(defs).length) return node;
+  const D = Object.fromEntries(Object.entries(defs).map(([k, d]) => [k, asNode(d)]));
+  return mapNode(node, (n) => {
+    if (n.t !== 'fn' || !D[n.name] || n.args.length !== 1) return n;
+    const a = n.args[0];
+    return { t: 'paren', e: mapNode(D[n.name], (y) => (y.t === 'sym' && y.name === v && !y.sub ? { t: 'paren', e: a } : y)) };
+  });
 }
 
 // ---------- the entry point ----------

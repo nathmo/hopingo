@@ -14,8 +14,9 @@ import * as analyse0 from './analyse0.skills.js';
 import * as explog from './explog.skills.js';
 import * as trigo from './trigo.skills.js';
 import * as recurrence from './recurrence.skills.js';
+import * as fonctionsg from './fonctions-g.skills.js';
 
-const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence];
+const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence, fonctionsg];
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -23,13 +24,8 @@ export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
 export const UNBUILT = {
   // g6-deriv-usual (step U2 builds G6) ← g2-real-powers, g3-radians.
   'g6-deriv-usual': ['g2-real-powers', 'g3-radians'],
-  // g1-compose ← g1-domain ← @alg:G-valeurs-interdites = rat-domain.
-  'g1-compose': ['rat-domain'],
   // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
   'g8-algebraic': ['lit-identities'],
-  // G1 skills built in parallel (step U1b), needed by G2.
-  'g1-domain': ['g9-intervals', 'rat-domain'], // TEMP u1b-merge
-  'g1-trinome-sign': ['g9-intervals', 'quad-formula'], // TEMP u1b-merge
-  'g1-inverse': ['rat-domain', 'iso-formula'], // TEMP u1b-merge
-  'g1-parity-period': ['rat-domain', 'g9-counterexample'], // TEMP u1b-merge
+  // G1, second half, built in parallel (step U1b).
+  'g1-irr-ineq': ['quad-formula', 'g9-intervals'], // TEMP u1b-merge
 };

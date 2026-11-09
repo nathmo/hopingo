@@ -171,7 +171,7 @@ export const RULES = [
     explain: (ctx = {}) => (ctx.t ? `eˣ est toujours > 0 : eˣ = ${toReadable(boundNode(ctx.t))} n'a pas de solution. Cette racine du trinôme est à rejeter.` : 'eˣ est toujours > 0 : une racine t ≤ 0 du trinôme ne donne aucun x.'),
   },
   {
-    id: 'g2_log_domain', family: 'method', tag: 'E', skill: 'g2-log-eq', repair: 'g2-log-eq', judges: ['solset'], // TEMP u1b-merge: repair 'g1-domain' once G1 is merged
+    id: 'g2_log_domain', family: 'method', tag: 'E', skill: 'g2-log-eq', repair: 'g1-domain', judges: ['solset'],
     name: 'Solutions gardées hors du domaine',
     example: ['S = {−3 ; 3}', 'S = {3}'],
     check: { judge: { kind: 'solset', v: 'x', onDomain: true }, prev: 'log_2(x-1)+log_2(x+1)=3', line: '{-3;3}' },

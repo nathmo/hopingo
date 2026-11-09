@@ -14,6 +14,16 @@
 //   {kind:'truth', letters, columns: [formula | null]}
 //                                   rows are the values of the letters
 //   {kind:'grid', xs, ys, pred}     cell (x, y): is pred(x, y) true?
+//   {kind:'signs', v, bounds, factors: [{id, f, den?, even?}]}  (step U1b,
+//                                   tableau de signes) columns alternate an
+//                                   interval and a bound (2m + 1 columns for
+//                                   m bounds); a factor row holds the sign of
+//                                   its factor (+ − 0); row 'f' is judged from
+//                                   the student's factor rows: ‖ where a
+//                                   denominator vanishes, 0 where a numerator
+//                                   does, else the product of the signs. An
+//                                   input row 'bounds' (odd columns) asks the
+//                                   zeros and poles in increasing order.
 // checkTable(item, values) → {ok, cells: {rowId: [true|false|null]}, rule?, message?}
 
 import { Q } from '../math/rational.js';
@@ -151,8 +161,77 @@ function checkGrid(item, values) {
   return { ok, cells, rule: null };
 }
 
+// A sign cell: '+', '−' ('-'), '0' or '‖' ('||', '|').
+export const sign = (t) => {
+  const x = String(t ?? '').trim();
+  if (x === '+') return '+';
+  if (x === '−' || x === '-') return '−';
+  if (x === '0') return '0';
+  if (x === '‖' || x === '||' || x === '|') return '‖';
+  return null;
+};
+
+function checkSigns(item, values) {
+  const phi = item.judge.phi;
+  const v = phi.v || 'x';
+  const g = grid(item, values);
+  const bounds = phi.bounds.map((b) => num(b));
+  const m = bounds.length;
+  const at = (f, x) => {
+    const node = mapNode(parse(f, { vars: [v] }), (n) => (n.t === 'sym' && n.name === v ? { t: 'paren', e: lit(x) } : n));
+    const val = exactValue(node);
+    return val ? (val.n === 0 ? '0' : val.n > 0 ? '+' : '−') : null;
+  };
+  // The point of column j: a bound, or a number inside an interval.
+  const point = (j) => {
+    if (j % 2 === 1) return bounds[(j - 1) / 2];
+    const k = j / 2;
+    if (m === 0) return new Q(0);
+    if (k === 0) return bounds[0].sub(new Q(1));
+    if (k === m) return bounds[m - 1].add(new Q(1));
+    return bounds[k - 1].add(bounds[k]).div(new Q(2));
+  };
+  const cells = {};
+  let rule = null;
+  let message = null;
+  const boundsRow = item.table.rows.find((r) => r.id === 'bounds');
+  if (boundsRow) cells.bounds = boundsRow.cells.map((c, j) => (c?.input ? eqQ(num(g.bounds[j]), bounds[(j - 1) / 2]) : null));
+  for (const f of phi.factors) {
+    const row = item.table.rows.find((r) => r.id === f.id);
+    const want = row.cells.map((c, j) => at(f.f, point(j)));
+    cells[f.id] = row.cells.map((c, j) => (c?.input ? sign(g[f.id][j]) === want[j] : null));
+    // A square read as if it changed sign at its root.
+    if (f.even && cells[f.id].some((x) => x === false)) {
+      const z = want.indexOf('0');
+      const flipped = want.map((w, j) => (j > z && w !== '0' ? (w === '+' ? '−' : '+') : w));
+      const flippedL = want.map((w, j) => (j < z && w !== '0' ? (w === '+' ? '−' : '+') : w));
+      const mine = g[f.id].map(sign);
+      if (z >= 0 && (mine.every((x, j) => x === flipped[j]) || mine.every((x, j) => x === flippedL[j]))) {
+        rule = 'g1_sign_even_root';
+        message = 'Un carré est toujours ≥ 0 : il ne change pas de signe en sa racine.';
+      }
+    }
+  }
+  const fRow = item.table.rows.find((r) => r.id === 'f');
+  if (fRow) {
+    cells.f = fRow.cells.map((c, j) => {
+      if (!c?.input) return null;
+      const signs = phi.factors.map((f) => ({ s: sign(g[f.id][j]), den: !!f.den }));
+      if (signs.some((x) => x.s === null || x.s === '‖')) return false;
+      let want;
+      if (signs.some((x) => x.den && x.s === '0')) want = '‖';
+      else if (signs.some((x) => x.s === '0')) want = '0';
+      else want = signs.filter((x) => x.s === '−').length % 2 ? '−' : '+';
+      return sign(g.f[j]) === want;
+    });
+  }
+  const ok = Object.values(cells).every((row) => row.every((x) => x !== false)) && allFilled(item, values);
+  return { ok, cells, rule, message };
+}
+
 export function checkTable(item, values) {
   switch (item.judge.phi.kind) {
+    case 'signs': return checkSigns(item, values);
     case 'horner': case 'horner-repeat': return checkHorner(item, values);
     case 'truth': return checkTruth(item, values);
     case 'grid': return checkGrid(item, values);

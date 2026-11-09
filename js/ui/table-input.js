@@ -1,4 +1,5 @@
 // Tables (spec §6 `table`, §11, step U1): Horner's scheme, truth tables,
+// tableaux de signes (sign cells cycle through + − 0 ‖, step U1b),
 // grids of a predicate. Number cells are small text fields, true/false
 // cells toggle V/F. js/judges/iter.js judges each cell from the student's
 // own cells. After the table, `then` (an item) is asked in the same place.
@@ -26,6 +27,19 @@ export function mountTable(item, ctx, body) {
       const b = h('button.tf-cell', { type: 'button' }, '?');
       b.addEventListener('click', () => {
         const next = values[rowId][j] === 'V' ? 'F' : 'V';
+        values[rowId][j] = next;
+        b.textContent = next;
+        b.classList.remove('right', 'wrong');
+        play('tap');
+      });
+      return b;
+    }
+    if (cell.kind === 'sign') {
+      // A sign of a tableau de signes: each tap gives the next of + − 0 ‖.
+      const CYCLE = ['+', '−', '0', '‖'];
+      const b = h('button.tf-cell', { type: 'button' }, '?');
+      b.addEventListener('click', () => {
+        const next = CYCLE[(CYCLE.indexOf(values[rowId][j]) + 1) % CYCLE.length];
         values[rowId][j] = next;
         b.textContent = next;
         b.classList.remove('right', 'wrong');

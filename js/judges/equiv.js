@@ -22,12 +22,15 @@
 //   'constant'  a number written out
 // cfg.subst = {t: 'tanh(x)'}: letters standing for an expression, replaced
 // in both lines before they are compared.
+// Step U1b (G1): cfg.defs = {f: 'sqrt(x)', g: '1-x^2'} with cfg.funcs: the
+// item's functions, expanded before comparing (g(f(x)) = 1 − (√x)²);
+// target 'short': no f or g left and a writing about as short as cfg.goal.
 
 import { expandDerivs, hasDeriv } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
 import { numValue, stripParen, symbolsIn, contains, equalsStructural, unparen, walk } from '../cas/ast.js';
 import { parse } from '../cas/parse.js';
-import { substSyms } from '../cas/sets.js';
+import { substSyms, expandFns } from '../cas/sets.js';
 import { equalExact } from '../cas/normal.js';
 import { exactForm, trigForm } from '../cas/exactform.js';
 import { toText } from '../cas/print.js';
@@ -206,7 +209,17 @@ function reachesGoal(node, goal) {
   return equalExact(node, goal) === true && kind(a) === kind(b) && topTerms(a) === topTerms(b) && fns(node) === fns(goal);
 }
 
+// Nodes of a tree, brackets left out: the size of a writing.
+function size(n) {
+  let k = 0;
+  walk(unparen(n), () => { k++; return true; });
+  return k;
+}
+
 const TARGETS = {
+  // Step U1b (G1): the item's functions f, g are expanded (no call left)
+  // and the line is about as short as cfg.goal (1 − x, not 1 − (√x)²).
+  short: (node, cfg) => !contains(node, (x) => x.t === 'fn' && !!cfg.defs?.[x.name]) && size(node) <= size(parseGoal(cfg)) + (cfg.slack ?? 1),
   goal: (node, cfg) => (cfg.goal ? reachesGoal(node, parseGoal(cfg)) : false),
   only: (node, cfg) => {
     const ok = [...symbolsIn(node)].every((s) => (cfg.finalVars || []).includes(s));
@@ -275,7 +288,8 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
   const opts = { vars: cfg.vars, domain: cfg.domain, seed: cfg.seed ?? seedOf(toText(prev)) };
   const map = substOf(cfg);
-  const S = (n) => (map ? substSyms(expandDerivs(n), map) : expandDerivs(n));
+  const D = (n) => (cfg.defs ? expandFns(n, cfg.defs, cfg.vars?.[0] || 'x') : n);
+  const S = (n) => (map ? substSyms(expandDerivs(D(n)), map) : expandDerivs(D(n)));
   const r = equivalent(S(prev), S(node), opts);
   if (!r.equal) {
     const same = (cand, line) => equivalent(S(cand), S(line), opts).equal;

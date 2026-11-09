@@ -7,5 +7,6 @@ import { RULES as G0 } from './g0.js';
 import { RULES as G2 } from './g2.js';
 import { RULES as G3 } from './g3.js';
 import { RULES as G5 } from './g5.js';
+import { RULES as G1 } from './g1.js';
 
-export const CAS_RULES = [...G6, ...G9, ...G0, ...G2, ...G3, ...G5];
+export const CAS_RULES = [...G6, ...G9, ...G0, ...G2, ...G3, ...G5, ...G1];

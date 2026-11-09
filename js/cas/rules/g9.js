@@ -85,7 +85,9 @@ export const RULES = [
     name: '« et » et « ou » confondus (∩ et ∪)',
     example: ['x < −1 ou x > 2 : ]−∞ ; −1[ ∩ ]2 ; +∞[', 'x < −1 ou x > 2 : ]−∞ ; −1[ ∪ ]2 ; +∞['],
     check: { judge: { kind: 'solset', v: 'x', domain: 'R' }, prev: 'x<-1 ∨ x>2', line: ']-∞;-1[∩]2;+∞[' },
-    transform: (prev) => nodePaths(prev, (n) => (n.t === 'setop' && n.op !== '∖') || (n.t === 'logic' && (n.op === 'and' || n.op === 'or'))).map((path) => {
+    // « x = a ou x = b » is not turned into « et » (an empty set nobody
+    // writes, which would hide the traps that keep one solution).
+    transform: (prev) => nodePaths(prev, (n) => (n.t === 'setop' && n.op !== '∖') || (n.t === 'logic' && (n.op === 'and' || (n.op === 'or' && !(stripParen(n.l).t === 'rel' && stripParen(n.l).op === '=' && stripParen(n.r).t === 'rel' && stripParen(n.r).op === '='))))).map((path) => {
       const n = getAt(prev, path);
       const swapped = n.t === 'setop' ? { ...n, op: n.op === '∪' ? '∩' : '∪' } : { ...n, op: n.op === 'and' ? 'or' : 'and' };
       return { node: replaceAt(prev, path, swapped), ctx: { from: n.t === 'setop' ? n.op : n.op === 'and' ? '∩' : '∪' } };

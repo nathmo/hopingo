@@ -23,6 +23,8 @@
 //                        compared on the window [−13 ; 13] (cfg.window);
 //                        final form in families, or without k on a bounded
 //                        domain.
+//   defs: {f: text}     functions declared by the item (with cfg.funcs):
+//                        expanded before the set is computed (g1-compose)
 //   params: {m: set}     a parameter: the lines are compared for sample
 //                        values of m in its set (a case of the discussion);
 //                        interval bounds may hold m.
@@ -35,7 +37,7 @@
 // out, ∅, or « v = 3 » (a single solution).
 
 import {
-  solutionSet, setEqual, setWitness, finalForm, domainOf, substSyms, intersect, minus, union, isSetNode,
+  solutionSet, setEqual, setWitness, finalForm, domainOf, substSyms, expandFns, intersect, minus, union, isSetNode,
 } from '../cas/sets.js';
 import { parse } from '../cas/parse.js';
 import { toText, toReadable } from '../cas/print.js';
@@ -98,7 +100,7 @@ const isDomainLine = (node) => {
 
 // The solution set of a line, for parameter values env.
 function lineSet(node, cfg, env = {}) {
-  let n = substSyms(withParams(node, env), substMap(cfg));
+  let n = substSyms(withParams(cfg.defs ? expandFns(node, cfg.defs, cfg.v || 'x') : node, env), substMap(cfg));
   if (isDomainLine(n)) n = stripParen(n).r;
   if (cfg.exprDomain && !isCondition(n) && !isSetNode(n, baseCfg(cfg))) return domainOf(n, baseCfg(cfg));
   return solutionSet(n, baseCfg(cfg));

@@ -88,7 +88,8 @@ function printer(style, opts) {
         const rProd = n.r.t === 'bin' && n.r.op === '×';
         const juxt = n.implicit === true
           || (n.implicit === undefined && n.l.t === 'num' && startsWithLetter(n.r) && (prec(n.r) >= PREC.pow || rProd || prec(n.r) === PREC.sum));
-        if (juxt) return `${l}${prec(n.r) < PREC.frac && !rProd && n.r.t !== 'sum' ? `(${P(n.r)})` : P(n.r)}`;
+        // 2|x| does not read back (the bar would close a bracket): 2(|x|).
+        if (juxt) return `${l}${(prec(n.r) < PREC.frac && !rProd && n.r.t !== 'sum') || (!readable && n.r.t === 'abs') ? `(${P(n.r)})` : P(n.r)}`;
         const r = n.r.t === 'neg' || (prec(n.r) < PREC.neg && n.r.t !== 'sum' && !(rProd && n.implicit === undefined)) ? `(${P(n.r)})` : P(n.r);
         return `${l}${readable ? '·' : '×'}${r}`;
       }

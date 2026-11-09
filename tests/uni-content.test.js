@@ -143,7 +143,7 @@ function checkItem(it, where) {
       // One wrong cell is seen.
       const row = it.table.rows.find((x) => x.cells.some((c) => c?.input));
       const j = row.cells.findIndex((c) => c?.input);
-      const bad = { ...it.answers, [row.id]: it.answers[row.id].map((x, k) => (k === j ? (row.cells[j].kind === 'tf' ? (x === 'V' ? 'F' : 'V') : `${x}+1`) : x)) };
+      const bad = { ...it.answers, [row.id]: it.answers[row.id].map((x, k) => (k === j ? (row.cells[j].kind === 'tf' ? (x === 'V' ? 'F' : 'V') : row.cells[j].kind === 'sign' ? (x === '+' ? '−' : '+') : `${x}+1`) : x)) };
       assert.equal(checkTable(it, bad).ok, false, `${where}: a wrong cell is accepted`);
       if (it.then) checkItem(it.then, `${where} (puis)`);
       break;
