@@ -32,8 +32,8 @@ export function generate(skillId, level, rng, profile = null, opts = undefined) 
 export const hasGenerator = (skillId) => !!GEN[skillId];
 
 // MathML (university content) as text: its alttext.
-const mathText = (h) => String(h).replace(/<math[^>]*?alttext="([^"]*)"[^>]*>[\s\S]*?<\/math>/g, (m, alt) => alt
-  .replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'));
+// Entities stay encoded here: strip() removes the tags, then decodes them.
+const mathText = (h) => String(h).replace(/<math[^>]*?alttext="([^"]*)"[^>]*>[\s\S]*?<\/math>/g, (m, alt) => alt.replace(/&quot;/g, '"'));
 
 // The script of a `lines` item, one line per step.
 function describeLines(item) {
@@ -45,7 +45,7 @@ function describeLines(item) {
     if (cfg.kind === 'logic') { try { return textWith(cfg, readWith(cfg, t)); } catch { return t; } }
     try { return toReadable(parseCas(t, { ...opts, complex: cfg.complex }), opts); } catch { return t; }
   };
-  out.push(`  [${item.mode}${item.noHints ? ', sans aide' : ''}${item.followError ? ', suivre l\'erreur' : ''}${item.exam ? `, examen ${item.exam.format}` : ''}${item.tapActions ? `, menu ${item.tapActions}` : ''}]  ${show(item.start.math)}`);
+  out.push(`  [${item.mode}${item.noHints ? ', sans aide' : ''}${item.followError ? ', suivre l\'erreur' : ''}${item.exam ? `, examen ${item.exam.format}` : ''}${item.mode === 'tap' && item.tapActions ? `, menu ${item.tapActions}` : ''}]  ${show(item.start.math)}`);
   segmentsOf(item).forEach((seg, k) => {
     cfg = seg.judge;
     if (k > 0) out.push(`  — ${strip(mathText(seg.html))}  [juge ${seg.judge.kind}]  départ : ${show(seg.start.math)}`);

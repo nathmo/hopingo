@@ -46,7 +46,7 @@ const SETS_SUB = [
 // {n ∈ ℕ | an + b < c}: lines an < c − b, n < (c − b)/a, then the set.
 function setsLinear(rng) {
   const a = rng.int(1, 4);
-  const b = rng.int(-3, 5);
+  const b = rng.chance(0.5) ? rng.int(1, 5) : -rng.int(1, 3);
   const k = rng.int(3, 8);
   const strict = rng.chance(0.7);
   // n < (c − b)/a has k solutions in ℕ: (k − 1)·a < c − b ≤ k·a (strict).
@@ -455,10 +455,12 @@ function stepNote(prev) {
     if (note) return false;
     if (n.t !== 'not') return true;
     const e = strip(n.e);
+    // ¬P on a letter stays as it is: it is not a step.
+    if (e.t === 'atom' && !/[<>=≤≥≠∈]|est /.test(e.key)) return true;
     note = e.t === 'q' ? `Franchir ${e.q}${e.bind.text}` : e.t === 'imp' ? 'Nier l\'implication : A ∧ ¬B' : e.t === 'and' || e.t === 'or' ? 'De Morgan' : e.t === 'not' ? 'Double négation' : 'Nier le morceau';
     return false;
   });
-  return note;
+  return note ?? 'Faire entrer ¬';
 }
 
 // Pieces: the formula's own, plus decoys (strict negations, negated
@@ -963,18 +965,20 @@ function qreadItem(level, rng, opts) {
 const QWRITE = 'g9-quant-write';
 
 // Definitions: the formula, its pieces, and decoy pieces.
+// Decoys are never equivalent to the definition: |f(x)| < M would define
+// « bornée » just as well, so it is not offered as a wrong piece.
 const DEFS = [
-  { name: 'f est majorée sur ℝ', target: '∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M', decoys: ['f(x) < M', '∀M ∈ ℝ'] },
-  { name: 'f est minorée sur ℝ', target: '∃m ∈ ℝ ∀x ∈ ℝ, f(x) ≥ m', decoys: ['f(x) > m', '∀m ∈ ℝ'] },
-  { name: 'f est bornée sur ℝ', target: '∃M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≤ M', decoys: ['f(x) ≤ M', '|f(x)| < M'] },
-  { name: 'f est croissante sur I', target: '∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y)', decoys: ['f(x) ≥ f(y)', 'x ≤ y'] },
-  { name: 'f est décroissante sur I', target: '∀x, y ∈ I, x < y ⇒ f(x) ≥ f(y)', decoys: ['f(x) ≤ f(y)', 'x ≤ y'] },
+  { name: 'f est majorée sur ℝ', target: '∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M', decoys: ['f(x) ≥ M', '∀M ∈ ℝ'] },
+  { name: 'f est minorée sur ℝ', target: '∃m ∈ ℝ ∀x ∈ ℝ, f(x) ≥ m', decoys: ['f(x) ≤ m', '∀m ∈ ℝ'] },
+  { name: 'f est bornée sur ℝ', target: '∃M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≤ M', decoys: ['f(x) ≤ M', '|f(x)| ≥ M'] },
+  { name: 'f est croissante sur I', target: '∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y)', decoys: ['f(x) ≥ f(y)', 'x > y'] },
+  { name: 'f est décroissante sur I', target: '∀x, y ∈ I, x < y ⇒ f(x) ≥ f(y)', decoys: ['f(x) ≤ f(y)', 'x > y'] },
   { name: 'f est injective sur I', target: '∀x, y ∈ I, f(x) = f(y) ⇒ x = y', decoys: ['f(x) ≠ f(y)', 'x ≠ y'] },
   { name: 'f est paire', target: '∀x ∈ ℝ, f(-x) = f(x)', decoys: ['f(-x) = -f(x)', '∃x ∈ ℝ'] },
   { name: 'f est périodique', target: '∃T > 0 ∀x ∈ ℝ, f(x + T) = f(x)', decoys: ['∀T > 0', 'T ≥ 0'] },
   { name: 'A ⊂ B', target: '∀x ∈ A, x ∈ B', decoys: ['∃x ∈ A', 'x ∉ B'] },
-  { name: 'A = B (dans E)', target: '∀x ∈ E, x ∈ A ⇔ x ∈ B', decoys: ['x ∈ A ⇒ x ∈ B', '∃x ∈ E'] },
-  { name: '(uₙ) converge vers L', target: '∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − L| < ε', decoys: ['|u_n − L| ≤ ε', '∀N ∈ ℕ', 'ε ≥ 0'] },
+  { name: 'A = B (dans E)', target: '∀x ∈ E, x ∈ A ⇔ x ∈ B', decoys: ['x ∉ B', '∃x ∈ E'] },
+  { name: '(uₙ) converge vers L', target: '∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − L| < ε', decoys: ['|u_n − L| > ε', '∀N ∈ ℕ', 'ε ≥ 0'] },
 ];
 
 // Pieces of a definition: binds and atoms as written in the target.
@@ -1017,9 +1021,10 @@ function defBlocks(level, rng) {
   }));
   blocks.push({ id: 'body', html: `<span class="blk-math">, ${body}</span>`, needs: [`q${parts.length - 1}`], earlyWhy: 'Place d\'abord tous les quantificateurs.' });
   blocks[0].earlyWhy = undefined;
-  // The first block must come first: the others need it.
-  const decoy = D.decoys.find((x) => /^[∀∃]/.test(x)) ?? D.decoys[0];
-  blocks.push({ id: 'd1', html: `<span class="blk-math">${/^[∀∃]/.test(decoy) ? decoy : `, ${decoy}`}</span>`, needs: [], distractor: /^[∀∃]/.test(decoy) ? 'g9_quant_order' : 'g9_neg_strict', why: 'Ce morceau ne donne pas la bonne définition.' });
+  // The decoy: a quantifier of the wrong kind (∀M for ∃M).
+  const first = parts[0];
+  const decoy = D.decoys.find((x) => /^[∀∃]/.test(x)) ?? `${first[0] === '∀' ? '∃' : '∀'}${first.slice(1)}`;
+  blocks.push({ id: 'd1', html: `<span class="blk-math">${decoy}</span>`, needs: [], distractor: 'g9_quant_order', why: 'Ce quantificateur ne donne pas la bonne définition : qui est choisi, et pour combien de valeurs ?' });
   return blocksItem({
     skill: QWRITE, level, mode: 'define', prompt: `Construis la définition : « ${D.name} ». Touche les morceaux dans l'ordre.`,
     blocks: rng.shuffle(blocks), goal: 'body', order: [...parts.map((_, i) => `q${i}`), 'body'],
@@ -1077,7 +1082,7 @@ function negBank(rng) {
   const c = rng.int(6, 14);
   return [
     { id: 'cont', q: 3, imp: true, name: `f est continue en ${a}`, S: `∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − ${a}| < δ ⇒ |f(x) − f(${a})| < ε` },
-    { id: 'lim', q: 3, imp: false, name: `(uₙ) tend vers ${L}`, S: `∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, ${uL} < ε` },
+    { id: 'lim', q: 3, imp: false, name: `(uₙ) tend vers ${fr(String(L))}`, S: `∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, ${uL} < ε` },
     { id: 'maj', q: 2, imp: false, name: 'f est majorée', S: '∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M' },
     { id: 'crois', q: 1, imp: true, name: 'f est croissante sur I', S: '∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y)' },
     { id: 'fin1', q: 2, imp: false, name: 'A = {1 ; 2 ; 3}', S: `∀x ∈ A ∃y ∈ A, x² + y < ${c}` },
@@ -1215,7 +1220,7 @@ function counterBank(rng) {
     { s: '∀x ∈ ℝ, √(x²) = x', truth: false, quants: [['∀', 'x', 'R']], pred: '√(x^2)=x', answer: { x: '-1' }, why: 'x = −1 donne √1 = 1 ≠ −1.' },
     { s: '∀a, b ∈ ℝ, (a + b)² = a² + b²', truth: false, quants: [['∀', 'a', 'R'], ['∀', 'b', 'R']], pred: '(a+b)^2=a^2+b^2', answer: { a: '1', b: '1' }, why: 'a = b = 1 : 4 ≠ 2.' },
     { s: '∀x > 0, 1/x < 1', truth: false, quants: [['∀', 'x', 'R+']], pred: '1/x<1', answer: { x: '1/2' }, why: 'x = 1/2 donne 2, qui n\'est pas < 1.' },
-    { s: `∀n ∈ ℕ, n² + n + ${k} est premier`, truth: false, composite: { expr: `n^2+n+${k}`, v: 'n' }, answer: { n: String(k - 1) }, why: `n = ${k - 1} donne ${k}², qui n'est pas premier.`, rule: 'g9_proof_by_example' },
+    { s: `∀n ∈ ℕ, n² + n + ${k} est premier`, truth: false, composite: { expr: `n^2+n+${k}`, v: 'n' }, answer: { n: String(k - 1) }, why: `n = ${k - 1} donne ${k}², qui n'est pas premier.`, rule: 'g9_proof_by_example', hint: `Cherche un n qui rend n² + n + ${k} divisible par ${k} : par exemple n = ${k}.` },
     { s: `∀x ∈ ℝ, x² > ${a * a} ⇒ x > ${a}`, truth: false, quants: [['∀', 'x', 'R']], pred: `x^2>${a * a}⇒x>${a}`, hyp: `x^2>${a * a}`, answer: { x: String(-a - 1) }, why: `x = ${-a - 1} : x² = ${(a + 1) ** 2} > ${a * a}, mais x ≤ ${a}.`, imp: true },
     { s: '∀x ∈ ℝ, x² ≥ x ⇒ x ≥ 1', truth: false, quants: [['∀', 'x', 'R']], pred: 'x^2≥x⇒x≥1', hyp: 'x^2≥x', answer: { x: '-1' }, why: 'x = −1 : 1 ≥ −1, mais −1 < 1.', imp: true },
     { s: `∀x ∈ ℝ, x < ${a} ⇒ x² < ${a * a}`, truth: false, quants: [['∀', 'x', 'R']], pred: `x<${a}⇒x^2<${a * a}`, hyp: `x<${a}`, answer: { x: String(-a - 1) }, why: `x = ${-a - 1} < ${a}, mais x² = ${(a + 1) ** 2} ≥ ${a * a}.`, imp: true },
@@ -1227,10 +1232,11 @@ function counterBank(rng) {
   ];
 }
 
+const SET_HINT = 'Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}.';
 const SETS_COUNTER = [
-  { s: 'Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅', pred: 'A∪B=A⇒B=∅', hyp: 'A∪B=A', answer: { A: '{1}', B: '{1}' }, why: 'A = B = {1} : A ∪ B = A, mais B ≠ ∅.' },
-  { s: 'Pour tous ensembles A, B : (A ∪ B) ∖ B = A', pred: '(A∪B)∖B=A', answer: { A: '{1}', B: '{1}' }, why: 'A = B = {1} : (A ∪ B) ∖ B = ∅ ≠ A.' },
-  { s: 'Pour tous ensembles A, B : A ∖ B = B ∖ A', pred: 'A∖B=B∖A', answer: { A: '{1}', B: '∅' }, why: 'A = {1}, B = ∅ : A ∖ B = {1}, B ∖ A = ∅.' },
+  { s: 'Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅', pred: 'A∪B=A⇒B=∅', hyp: 'A∪B=A', answer: { A: '{1}', B: '{1}' }, why: 'A = B = {1} : A ∪ B = A, mais B ≠ ∅.', hint: SET_HINT, imp: true },
+  { s: 'Pour tous ensembles A, B : (A ∪ B) ∖ B = A', pred: '(A∪B)∖B=A', answer: { A: '{1}', B: '{1}' }, why: 'A = B = {1} : (A ∪ B) ∖ B = ∅ ≠ A.', hint: SET_HINT },
+  { s: 'Pour tous ensembles A, B : A ∖ B = B ∖ A', pred: 'A∖B=B∖A', answer: { A: '{1}', B: '∅' }, why: 'A = {1}, B = ∅ : A ∖ B = {1}, B ∖ A = ∅.', hint: SET_HINT },
 ];
 
 function counterOf(c) {
@@ -1257,7 +1263,7 @@ function counterTf(level, rng, opts = {}) {
     ruleIfTrue: c.truth ? null : c.rule ?? 'g9_proof_by_example',
     hints: [
       { level: 1, html: c.imp ? 'Cherche un x qui vérifie l\'hypothèse mais pas la conclusion.' : 'Un seul exemple qui ne marche pas suffit à montrer qu\'un « pour tout » est faux.' },
-      { level: 2, html: c.truth ? 'Essaie quelques valeurs : trouves-tu un exemple qui ne marche pas ?' : 'Essaie une valeur négative, ou entre 0 et 1.' },
+      { level: 2, html: c.hint ?? (c.truth ? 'Essaie quelques valeurs : trouves-tu un exemple qui ne marche pas ?' : 'Essaie une valeur négative, ou entre 0 et 1.') },
       { level: 3, html: c.truth ? esc(c.why) : `${Object.entries(c.answer).map(([v, t]) => `${v} = ${fr(t)}`).join(', ')}` },
     ],
     noHints: level === 5 || !!opts.exam,

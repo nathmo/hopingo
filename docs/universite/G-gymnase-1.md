@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.1 complexes partout (`solset` sur ℂ, G0) ; §16.2 `solset` avec cas, substitution et paramètres (G1, G2, G3), `equiv` avec `rel` (lignes d'inégalités, `g1-bound`), `signs` (tableaux de signes), `value` avec `tol` (triangles), `poly` avec paramètre (G0), `logic` avec table de négation (G9) ; §16.3 échelle des niveaux `blocks` et `tokens`, compétences de l'école (`pow-rules`, `root-rules`), générateur qui suit les progrès, plan `cms-controle`, au moins 2 exemples d'examen par module ; §16.4 familles nouvelles (`logic`, `method`, `notation`), tag C, pièges partagés (`g9_proof_by_example`, `g9_quant_order`, `g1_ineq_not_flipped`, `g1_inverse_reciprocal`, `g2_log_power`, `g0_conj_missing` servent aussi plus loin).
 
-Statut : à faire. Ce catalogue est construit à l'étape **U1** ([README](README.md) §14).
+Statut : G9 et G0 faits le 9 novembre 2026 (étape U1, partie a) ; G1, G2, G3 et G5 à faire (partie b). Ce catalogue est construit à l'étape **U1** ([README](README.md) §14).
 
 Ce fichier contient six modules, dans l'ordre où le moteur les débloque : G9 (logique), G0 (polynômes), G1 (fonctions et inéquations), G2 (exponentielles, logarithmes, hyperboliques), G3 (trigonométrie), G5 (suites et récurrence). Chaque module suit le gabarit du README §15. Les conventions communes sont ici, une seule fois.
 
@@ -86,7 +86,7 @@ Mise à niveau (MAN) de l'EPFL : examens Math 1A et 1B de 2017, examens blancs 1
 ---
 # G9. Logique et langage mathématique
 
-Unité `logique` · préfixe `g9-` · pièges `g9_` · Statut : à faire
+Unité `logique` · préfixe `g9-` · pièges `g9_` · Statut : fait le 9 novembre 2026 (étape U1, partie a). Le niveau 5 est l'item le plus difficile sans aide, en attendant le type `problem` (U4).
 
 **Sources** : CMS, séries « Langage ensembliste » et « Logique et méthodes de preuve » (Algèbre linéaire, semestre 1, 2018–2019) ; MAN, examen Math 1A 2017 (Q1) et examen blanc 1A 2018 (Q5) ; Analyse I GM, corrigé de la série 3 (2017, irrationalité de √3).
 **Notation** : ℕ = {0 ; 1 ; 2 ; …}, ℕ* = ℕ ∖ {0}. Intervalles `]a ; b[` avec un point-virgule. Ensemble fini `{1 ; 2 ; 3}`. Complémentaire de A dans B : C_B(A) = B ∖ A. Les énoncés quantifiés s'écrivent « ∀x ∈ ℝ, P(x) » avec une virgule après le quantificateur.
@@ -100,6 +100,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-sets` — Ensembles : écrire et opérer
 - **Année** 12 · **Prérequis** `@alg:N-ensembles` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `@alg:N-ensembles` : notation des ensembles de nombres ℕ, ℤ, ℚ, ℝ dans chaque énoncé.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : un ensemble se donne en extension {0 ; 2 ; 4} ou en compréhension {n ∈ ℕ | n < 5}. A ∩ B : dans les deux. A ∪ B : dans l'un ou l'autre. A ∖ B : dans A mais pas dans B. Exemple : A = {n ∈ ℕ | 2n + 1 < 12} ; 2n < 11, donc n ≤ 5 ; A = {0 ; 1 ; 2 ; 3 ; 4 ; 5}.
 - **Juge** : `solset` `{v:'n', domain:'N'}` pour les ensembles d'entiers ; `mcq` pour les opérations · **Forme finale** : ensemble fini en extension, ou `∅`.
 - **Niveaux** :
@@ -125,6 +126,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-intervals` — Intervalles et parties de ℝ
 - **Année** 12 · **Prérequis** `g9-sets` · **Étiquettes** CMS, MAN · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-sets` : intersection et réunion d'intervalles.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le sous-but « ôter la valeur absolue » sera crédité à `g1-abs-eq` quand G1 sera construit (U1, partie b).
 - **Intro** : un crochet tourné vers le nombre l'inclut : [2 ; 5[ contient 2, pas 5. ∞ est toujours exclu. Exemple : {x ∈ ℝ | |x − 1| < 3 et x ≥ 0} = ]−2 ; 4[ ∩ [0 ; +∞[ = [0 ; 4[.
 - **Juge** : `solset` `{v:'x', domain:'R'}` · **Forme finale** : union d'intervalles disjoints, triés, sans ∩.
 - **Niveaux** :
@@ -149,6 +151,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 
 ### `g9-connectives` — Connecteurs et tables de vérité
 - **Année** 12 · **Prérequis** — · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le contre-exemple de « ¬(P ⇒ Q) ≡ ¬P ⇒ ¬Q » est P et Q vrais (ou faux tous les deux) : avec P faux et Q vrai, les deux côtés valent faux.
 - **Intro** : P ⇒ Q est faux seulement quand P est vrai et Q faux. Donc P ⇒ Q ≡ ¬P ∨ Q. De Morgan : ¬(P ∧ Q) ≡ ¬P ∨ ¬Q et ¬(P ∨ Q) ≡ ¬P ∧ ¬Q. Exemple : ¬(P ∧ ¬Q) ≡ ¬P ∨ Q ≡ P ⇒ Q.
 - **Juge** : `logic` `{}` (lignes de formules) ; table de vérité en `table` avec `judge:{kind:'iter', phi: évaluation de la colonne, tol:0}` · **Forme finale** : la formule cible (`target`), ou la colonne complète.
 - **Niveaux** :
@@ -173,6 +176,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-implication` — Implication, réciproque, contraposée
 - **Année** 12 · **Prérequis** `g9-connectives` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-connectives` : la négation P ∧ ¬Q et l'équivalence se lisent sur la table de vérité.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : pour P ⇒ Q : la réciproque est Q ⇒ P ; la contraposée est ¬Q ⇒ ¬P et lui est équivalente ; la négation est P ∧ ¬Q. Exemple : « si n² est pair, n est pair » a pour contraposée « si n est impair, n² est impair ».
 - **Juge** : `tokens` avec `judge:'logic'` (cible : la formule demandée) · **Forme finale** : pas de ¬ devant ⇒, ∧, ∨ ou un quantificateur.
 - **Niveaux** :
@@ -198,6 +202,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-quant-read` — Lire un énoncé quantifié
 - **Année** 12 · **Prérequis** `g9-sets` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-sets` : chaque quantificateur porte sur un ensemble (x ∈ ℝ, n ∈ ℕ).
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Les énoncés faux en ∃y ∀x demandent un x qui fait échouer chaque y, éventuellement en fonction de y (x = 1 − y).
 - **Intro** : ∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x. Exemple : « ∀x ∈ ℝ ∃y ∈ ℝ, x + y = 0 » est vrai (y = −x) ; « ∃y ∈ ℝ ∀x ∈ ℝ, x + y = 0 » est faux.
 - **Juge** : `tf` avec `counter` ; `mcq` (traduction en français) · **Forme finale** : vrai/faux, puis témoin ou contre-exemple.
 - **Niveaux** :
@@ -223,6 +228,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-quant-write` — Écrire une définition avec des quantificateurs
 - **Année** 12 · **Prérequis** `g9-quant-read` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g9-quant-read` : relire la définition écrite : portée et ordre de ∀ et ∃.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Les leurres sont toujours faux : la « version stricte » |f(x)| < M n'est pas proposée, car elle définit aussi « bornée ».
 - **Intro** : « f est majorée sur I » : ∃M ∈ ℝ ∀x ∈ I, f(x) ≤ M. L'ordre compte : M est choisi avant x. « f est croissante sur I » : ∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y).
 - **Juge** : `tokens` avec `judge:'logic'` (L3–L4) ; `blocks` `mode:'define'` (L1–L2) · **Forme finale** : formule équivalente à la cible.
 - **Niveaux** : échelle des conventions (blocs puis jetons). Définitions : majorée, minorée, bornée, croissante, décroissante, injective, paire, périodique, A ⊂ B, A = B, suite convergente vers L.
@@ -242,6 +248,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-negate` — Nier un énoncé quantifié
 - **Année** 12 · **Prérequis** `g9-quant-read`, `g9-implication` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `g9-quant-read` : lire la portée de chaque quantificateur avant de nier.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le niveau 1 est un QCM « quelle est la ligne suivante ? ».
 - **Intro** : on fait entrer ¬ de gauche à droite. Chaque ∀ devient ∃, chaque ∃ devient ∀, la restriction (ε > 0) ne change pas, et la propriété à la fin est niée. Exemple : ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |uₙ − L| < ε) ≡ ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |uₙ − L| ≥ ε.
 - **Juge** : `logic` `{}` en lignes (L3–L4), `tokens` (L2) · **Forme finale** : aucun ¬ devant un quantificateur ou un connecteur ; les atomes niés selon la table.
 - **Niveaux** :
@@ -267,6 +274,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-counterexample` — Réfuter par un contre-exemple
 - **Année** 12 · **Prérequis** `g9-negate` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-negate` : un contre-exemple réalise la négation ∃x, ¬P(x).
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : pour montrer qu'un énoncé « ∀x, P(x) » est faux, **un** x qui ne vérifie pas P suffit. Pour le montrer vrai, des exemples ne suffisent jamais. Exemple : « ∀x ∈ ℝ, x² ≥ x » est faux : x = 1/2 donne 1/4 < 1/2.
 - **Juge** : `tf` avec `counter` ; `example` (`property:{kind:'refutes', statement}`) vérifié par `judges/examples.js` · **Forme finale** : vrai/faux, plus contre-exemple accepté.
 - **Niveaux** :
@@ -291,6 +299,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-proof-contra` — Preuve directe et par contraposée
 - **Année** 12 · **Prérequis** `g9-implication` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-implication` : la contraposée ¬Q ⇒ ¬P est équivalente à P ⇒ Q.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le niveau 1 est un QCM « quel bloc manque ? ». Le choix « preuve directe » est valide mais pauvre : la raison s'affiche après le bloc suivant.
 - **Intro** : preuve directe : on suppose P, on arrive à Q. Par contraposée : on suppose ¬Q, on arrive à ¬P. On choisit la contraposée quand ¬Q donne une écriture utile (n impair : n = 2k + 1). Exemple : n² pair ⇒ n pair, prouvé par « n impair ⇒ n² impair ».
 - **Juge** : `blocks` `mode:'order'` puis `'frame'`; les lignes de calcul dans un bloc à trous sont jugées par `equiv` `{vars:['k'], domain:{k:'Z'}}` · **Forme finale** : bloc conclusion placé, tous les `needs` satisfaits.
 - **Niveaux** : échelle des conventions. L3 ajoute une **décision** « Preuve directe ou par contraposée ? » (`quality:'poor'` pour la directe sur « n² pair ⇒ n pair », avec message : « Depuis n² = 2m, on ne sait pas écrire n. »). L4 : charpente avec le calcul (2k + 1)² à écrire.
@@ -314,6 +323,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-proof-absurd` — Preuve par l'absurde
 - **Année** 12 · **Prérequis** `g9-negate` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g9-negate` : on suppose la négation de l'énoncé.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le niveau 1 est un QCM « quel bloc manque ? ».
 - **Intro** : on suppose la **négation** de ce qu'on veut montrer, et on arrive à une contradiction. Exemple : √3 irrationnel. On suppose √3 = p/q avec pgcd(p, q) = 1 ; alors p² = 3q², donc 3 | p, puis 3 | q : contradiction.
 - **Juge** : `blocks` ; les calculs internes par `equiv` · **Forme finale** : bloc « contradiction » puis conclusion.
 - **Niveaux** : échelle des conventions. L3 : décision « Que suppose-t-on ? » (4 choix : la négation ✓, l'énoncé, la réciproque, un exemple). L4 : charpente avec p² = 3q² à écrire.
@@ -401,7 +411,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ---
 # G0. Polynômes
 
-Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
+Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : fait le 9 novembre 2026 (étape U1, partie a). Les variantes `open` sont des `lines` sans aide, en attendant le type `problem` (U4).
 
 **Sources** : MAN, examen Math 1A 2017 (Q4, polynôme défini par des conditions) et examen blanc 1A 2018 (Q2, divisibilité avec paramètre) ; CMS, Analyse II, séries 18 et 19 (racines communes, polynômes complexes) et Analyse I, série 20 (éléments simples) ; Analyse I GM, série 0 de 2019 (division polynomiale).
 **Notation** : P(x) ordonné selon les puissances décroissantes. Division euclidienne : A = BQ + R avec deg R < deg B. Polynôme unitaire : coefficient dominant 1. Le PGCD est rendu unitaire.
@@ -412,6 +422,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 
 ### `g0-identify` — Identifier des coefficients
 - **Année** 12 · **Prérequis** `@alg:C-developper`, `@alg:E-systemes` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : deux polynômes sont égaux pour tout x si et seulement si leurs coefficients sont égaux, degré par degré. On développe, on ordonne, puis on écrit une équation par puissance de x.
 - **Juge** : `poly` `{v:'x', params:['a','b','c']}`. Une ligne d'identité doit être la même identité que la précédente (mêmes polynômes en x sur ℚ(a, b, c)). Une ligne « système » est jugée par `solset` `{vars:['a','b','c']}` contre le système des coefficients. La ligne finale « a = …, b = …, c = … » est juste si elle rend l'identité vraie. · **Forme finale** : valeurs de tous les paramètres.
 - **Niveaux** :
@@ -436,6 +447,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-horner` — Schéma de Horner : valeur et division par x − a
 - **Année** 12 · **Prérequis** `@alg:C-developper` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `@alg:C-developper` : écrire P développé et ordonné pour lire tous les coefficients.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : on écrit **tous** les coefficients, 0 compris. On descend le premier. Ensuite : multiplier par a, ajouter au coefficient suivant. La dernière case est P(a) ; les autres sont les coefficients du quotient, de degré un de moins. Pour x + 2, a = −2.
 - **Juge** : `table` (colonnes = coefficients aₙ…a₀ ; lignes « a·b » et « b »), jugé par `iter` `{phi: bₖ = aₖ + a·bₖ₋₁, tol:0}`, puis `then` : « Q(x) = … ; R = … » jugé par `poly` `{v:'x'}` (A = (x − a)Q + R). · **Forme finale** : Q et R donnés.
 - **Niveaux** :
@@ -460,6 +472,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-long-div` — Division euclidienne
 - **Année** 12 · **Prérequis** `@alg:C-developper` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `@alg:C-developper` : soustraire B multiplié par le terme du quotient, termes ordonnés.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : on divise le terme dominant de A par celui de B, on multiplie B par ce terme, on soustrait, et on recommence tant que deg R ≥ deg B. Chaque étape s'écrit A = BQ + R : c'est une identité qu'on peut vérifier.
 - **Juge** : `poly` `{v:'x'}` · **Forme finale** : A = BQ + R avec deg R < deg B ; sinon `stay` « Le reste a encore un degré ≥ deg B : continue. »
 - **Niveaux** :
@@ -483,6 +496,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 
 ### `g0-factor-thm` — Théorème du reste, racine évidente
 - **Année** 12 · **Prérequis** `g0-horner` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : le reste de P par x − a est P(a). Donc a est racine si et seulement si x − a divise P. Si P est à coefficients entiers et unitaire, une racine entière divise le terme constant : on essaie ±1, ±2… Exemple : P = x³ − 2x² − 5x + 6, P(1) = 0, donc x − 1 divise P.
 - **Juge** : `value` pour P(a) ; `poly` `{v:'x'}` pour la factorisation · **Forme finale** : reste demandé, ou P écrit (x − a)·Q.
 - **Niveaux** :
@@ -508,6 +522,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-multiplicity` — Multiplicité d'une racine
 - **Année** 12 · **Prérequis** `g0-factor-thm` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g0-factor-thm` : a racine ⇔ (x − a) divise P.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : a est racine de multiplicité k si (x − a)ᵏ divise P mais pas (x − a)ᵏ⁺¹. On applique Horner en a plusieurs fois de suite, tant que le reste est nul.
 - **Juge** : `table` Horner enchaîné (`iter`), puis `poly` pour la factorisation · **Forme finale** : multiplicité, et P = (x − a)ᵏ·Q avec Q(a) ≠ 0.
 - **Niveaux** :
@@ -533,6 +548,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-factor-real` — Factoriser sur ℝ
 - **Année** 12 · **Prérequis** `@alg:H-discriminant`, `@alg:D-factoriser-completement`, `g0-factor-thm` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `@alg:D-factoriser-completement` : facteur commun et groupements avant de chercher des racines.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : sur ℝ, un polynôme se factorise en facteurs du 1er degré et en trinômes à Δ < 0. On cherche d'abord un facteur commun ou un groupement, puis des racines évidentes, puis on teste Δ des trinômes restants.
 - **Juge** : `poly` `{v:'x', target:'factored-R'}` · **Forme finale** : produit de facteurs unitaires du 1er degré (puissances regroupées), de trinômes à Δ < 0 et d'une constante. Un trinôme à Δ ≥ 0 restant donne `stay`.
 - **Niveaux** :
@@ -558,6 +574,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-factor-complex` — Factoriser sur ℂ, racines conjuguées
 - **Année** 12.5 · **Prérequis** `g0-factor-real`, `g8-algebraic`, `g0-long-div` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g0-factor-real` : on factorise sur ℝ, puis chaque trinôme à Δ < 0 sur ℂ.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Tant que `g8-algebraic` n'est pas construit (U4), le parcours le remplace par `lit-identities` (`UNBUILT`).
 - **Intro** : si P est à coefficients **réels** et z une racine non réelle, alors z̄ est aussi racine, et (x − z)(x − z̄) = x² − 2Re(z)x + |z|² est un trinôme réel. Sur ℂ, tout polynôme de degré n a n racines comptées avec multiplicité.
 - **Juge** : `poly` `{v:'x', complex:true, target:'factored-C'}` · **Forme finale** : produit de facteurs (x − zᵢ) et d'une constante.
 - **Niveaux** :
@@ -584,6 +601,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-conditions` — Polynôme défini par des conditions
 - **Année** 12.5 · **Prérequis** `g0-factor-complex`, `g0-factor-thm`, `g0-identify` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g0-identify` : les conditions restantes se traduisent par identification des coefficients.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : on écrit d'abord la **forme** que les conditions imposent (degré, unitaire, racines connues), avec des inconnues. Chaque condition restante donne une équation. Exemple : réel, unitaire, degré 3, racine 2 + i : P = (x² − 4x + 5)(x − c).
 - **Juge** : `poly` `{v:'x', params:['c']}` pour les lignes de forme ; `solset` `{v:'c'}` pour l'équation en c ; `poly` pour le P final · **Forme finale** : P développé et ordonné.
 - **Niveaux** :
@@ -611,6 +629,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-div-param` — Divisibilité avec un paramètre
 - **Année** 12.5 · **Prérequis** `g0-factor-thm`, `g0-long-div`, `g0-factor-real` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g0-long-div` : quand B n'a pas de racines simples, on divise et on annule le reste.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : B divise P si et seulement si le reste est nul. Si B = (x − a)(x − b) avec a ≠ b, cela revient à P(a) = 0 **et** P(b) = 0. On résout les deux conditions et on garde les paramètres communs.
 - **Juge** : `solset` `{v:'λ'}` pour les conditions ; ou `poly` `{v:'x', params:['λ']}` pour le chemin par la division ; `poly` pour la factorisation finale · **Forme finale** : valeurs de λ, puis racines de P.
 - **Niveaux** :
@@ -639,6 +658,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-gcd` — PGCD de polynômes, racines communes
 - **Année** 12.5 · **Prérequis** `g0-long-div`, `g0-factor-real` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g0-factor-real` : les racines communes se lisent sur le PGCD factorisé.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Pas encore fait : le gabarit « PGCD = 1 » et le niveau 5 avec paramètre (CMS série 18).
 - **Intro** : algorithme d'Euclide : on divise A par B, puis B par le reste, et ainsi de suite. Le dernier reste non nul, rendu unitaire, est le PGCD. Ses racines sont les racines communes de A et B.
 - **Juge** : `poly` `{v:'x'}` pour chaque division ; `poly` `{target:'monic'}` pour le PGCD · **Forme finale** : PGCD unitaire.
 - **Niveaux** :
@@ -664,6 +684,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ### `g0-pfd-simple` — Éléments simples : facteurs du 1er degré distincts
 - **Année** 12.5 · **Prérequis** `g0-identify`, `g0-factor-real`, `@alg:G-additionner` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g0-factor-real` : factoriser le dénominateur (degré 3 : racine évidente) ; `@alg:G-additionner` : vérifier la décomposition en remettant au même dénominateur.
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le niveau 5 ne s'enchaîne pas encore avec une primitive (A1, étape U2).
 - **Intro** : si deg N < deg D et D = (x − a)(x − b) avec a ≠ b, alors N/D = A/(x − a) + B/(x − b). A = N(a)/(a − b) : on « cache » le facteur x − a et on remplace x par a. Cette décomposition prépare les primitives (A1) et Laplace (F).
 - **Juge** : décision « forme : A/(x − 2) + B/(x + 1) » (structure comparée à la forme attendue) ; puis `equiv` `{vars:['x'], target:'partial-fractions'}` · **Forme finale** : somme d'éléments simples à coefficients numériques.
 - **Niveaux** :
@@ -689,6 +710,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 
 ### `g0-pfd-general` — Éléments simples : facteurs répétés, trinômes irréductibles, partie entière
 - **Année** 12.5 · **Prérequis** `g0-pfd-simple`, `g0-long-div` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a).
 - **Intro** : si deg N ≥ deg D, on divise d'abord. Un facteur (x − a)² demande deux termes : A/(x − a) + B/(x − a)². Un trinôme irréductible demande (Bx + C)/(x² + px + q).
 - **Juge** : comme `g0-pfd-simple` ; la forme est contrôlée terme par terme · **Forme finale** : partie entière + éléments simples.
 - **Niveaux** :
@@ -783,7 +805,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : à faire
 ---
 # G1. Fonctions et inéquations
 
-Unité `fonctions` · préfixe `g1-` · pièges `g1_` · Statut : à faire
+Unité `fonctions` · préfixe `g1-` · pièges `g1_` · Statut : à faire. L'id `fonctions` est déjà celui d'une unité de l'école : prendre `fonctions-g` (README §8.1).
 
 **Sources** : MAN, examen Math 1A 2017 (Q2, inéquation irrationnelle, 11 pts), examen Math 1B 2017 (Q3, bijection, 11 pts), examen blanc 1A 2018 (Q1, valeur absolue) et examen blanc 1B 2018 avec son corrigé (Q2, bijection, 7 pts) ; CMS, Analyse I, séries 1 à 4 (inéquations, paramètres, Viète, irrationnelles) et 7 (parité) ; Analyse I GM, série 0 de 2019 (ex. 11, 14, 19) et corrigé de la série 3 de 2017 (valeur absolue par cas).
 **Notation** : D_f pour le domaine. Ensembles de solutions en intervalles `]a ; b]`, union `∪`, ensemble fini `{2/3 ; 4}`. Une ligne de cas s'écrit « Cas x ≥ 3/2 : ». Tableau de signes : `+`, `−`, `0`, `‖`.

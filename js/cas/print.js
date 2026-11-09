@@ -27,6 +27,8 @@ export function prec(n) {
 const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹', '-': '⁻' };
 const CONST_TEXT = { pi: 'π', e: 'e', i: 'i', inf: '∞' };
 export const LOGIC_SYMBOL = { and: '∧', or: '∨', imp: '⇒', iff: '⇔' };
+// Conditions on a variable read as words, as in the course: x > 0 et x < 3.
+export const LOGIC_WORD = { and: 'et', or: 'ou', imp: '⇒', iff: '⇔' };
 
 // Can this right factor follow a number without a × sign? (3x, 2sin(x), 5(x+1))
 function startsWithLetter(n) {
@@ -128,7 +130,7 @@ function printer(style, opts) {
         const right = n.t === 'logic' && (n.op === 'imp' || n.op === 'iff');
         const l = prec(n.l) < me || (right && prec(n.l) === me) ? `(${P(n.l)})` : P(n.l);
         const r = prec(n.r) < me || (!right && prec(n.r) === me) ? `(${P(n.r)})` : P(n.r);
-        const op = n.t === 'logic' ? LOGIC_SYMBOL[n.op] : n.op;
+        const op = n.t === 'logic' ? (readable ? LOGIC_WORD[n.op] : LOGIC_SYMBOL[n.op]) : n.op;
         return readable ? `${l} ${op} ${r}` : `${l}${op}${r}`;
       }
       case 'set': {

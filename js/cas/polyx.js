@@ -222,8 +222,11 @@ export function isExpanded(node, v = 'x', opts = {}) {
 
 // A coefficient (Poly in the parameters and I_) as a node.
 function coefNode(c) {
-  // Highest degree first, a positive term in front: b − 2a rather than −2a + b.
-  const terms = [...c.terms.values()].sort((a, b) => (keyDeg(b.m) - keyDeg(a.m)) || ((a.c.n < 0) - (b.c.n < 0)) || (a.m.map((x) => x[0]).join() < b.m.map((x) => x[0]).join() ? -1 : 1));
+  // Highest degree first, then by letter; a positive term leads when there
+  // is one: b − 2a rather than −2a + b, 4a − 2b + c.
+  const terms = [...c.terms.values()].sort((a, b) => (keyDeg(b.m) - keyDeg(a.m)) || (a.m.map((x) => x[0]).join() < b.m.map((x) => x[0]).join() ? -1 : 1));
+  const lead = terms.findIndex((t) => t.c.n > 0);
+  if (lead > 0 && keyDeg(terms[lead].m) === keyDeg(terms[0].m)) terms.unshift(...terms.splice(lead, 1));
   let out = null;
   for (const { m, c: q } of terms) {
     let body = lit(q.n < 0 ? q.neg() : q);

@@ -67,21 +67,21 @@ Calcule f′(x) pour f(x) = (2x + 1)³.
 
 ```
 Calcule f′(x) pour f(x) = cos(2x² + 1).
-  [tap, suivre l'erreur]  (cos(2x² + 1))′
+  [tap, suivre l'erreur, menu deriv]  (cos(2x² + 1))′
     = −sin(2x² + 1)·(2x² + 1)′   ← Règle de chaîne
     = −4x·sin(2x² + 1)   ← Simplifier
   aides : C'est une composée f(g(x)) avec g(x) = 2x² + 1 : (f∘g)′ = f′(g)·g′. | = −sin(2x² + 1)·□ | = −4x·sin(2x² + 1)
   pièges : g6_chain_forgot
 
 Calcule f′(x) pour f(x) = cos(x²).
-  [tap, suivre l'erreur]  (cos(x²))′
+  [tap, suivre l'erreur, menu deriv]  (cos(x²))′
     = −sin(x²)·(x²)′   ← Règle de chaîne
     = −2x·sin(x²)   ← Simplifier
   aides : C'est une composée f(g(x)) avec g(x) = x² : (f∘g)′ = f′(g)·g′. | = −sin(x²)·□ | = −2x·sin(x²)
   pièges : g6_chain_forgot
 
 Calcule f′(x) pour f(x) = (x − 1)·e^(3x).
-  [tap, suivre l'erreur]  ((x − 1)·e^(3x))′
+  [tap, suivre l'erreur, menu deriv]  ((x − 1)·e^(3x))′
     = (x − 1)′·e^(3x) + (x − 1)·(e^(3x))′   ← Règle du produit
     = e^(3x) + (x − 1)·e^(3x)·(3x)′   ← Règle de chaîne, avec les dérivées usuelles
     = e^(3x) + 3(x − 1)·e^(3x)   ← Simplifier
@@ -128,7 +128,7 @@ Soit f(x) = (3x + 3)/(x² + 2). Dérive f, puis calcule f′(1).
   [free, sans aide]  ((3x + 3)/(x² + 2))′
     = ((3x + 3)′·(x² + 2) − (3x + 3)·(x² + 2)′)/(x² + 2)²   ← Règle du quotient
     = (−3x² − 6x + 6)/(x² + 2)²   ← Simplifier
-  — Calcule maintenant f′(1).  [juge value]
+  — Calcule maintenant f′(1).  [juge value]  départ : (−3·1² − 6·1 + 6)/(1² + 2)²
     = −1/3   ← f′(1) = −1/3
   pièges : g6_quotient_sign, g6_quotient_no_square
 
@@ -137,7 +137,7 @@ Soit f(x) = e^(3x)·cos(2x). Dérive f, puis calcule f′(0).
     = (e^(3x))′·cos(2x) + e^(3x)·(cos(2x))′   ← Règle du produit
     = e^(3x)·(3x)′·cos(2x) − e^(3x)·sin(2x)·(2x)′   ← Règle de chaîne
     = 3e^(3x)·cos(2x) − 2e^(3x)·sin(2x)   ← Simplifier
-  — Calcule maintenant f′(0).  [juge value]
+  — Calcule maintenant f′(0).  [juge value]  départ : 3e^(3·0)·cos(2·0) − 2e^(3·0)·sin(2·0)
     = 3   ← f′(0) = 3
   pièges : g6_product_naive, g6_chain_forgot
 
@@ -146,7 +146,7 @@ Soit f(x) = e^(3x)/(x² + 2). Dérive f, puis calcule f′(0).
     = ((e^(3x))′·(x² + 2) − e^(3x)·(x² + 2)′)/(x² + 2)²   ← Règle du quotient
     = (e^(3x)·(3x)′·(x² + 2) − 2x·e^(3x))/(x² + 2)²   ← Règle de chaîne, avec les dérivées usuelles
     = (3e^(3x)·(x² + 2) − 2x·e^(3x))/(x² + 2)²   ← Simplifier
-  — Calcule maintenant f′(0).  [juge value]
+  — Calcule maintenant f′(0).  [juge value]  départ : (3e^(3·0)·(0² + 2) − 2·0e^(3·0))/(0² + 2)²
     = 3/2   ← f′(0) = 3/2
   pièges : g6_chain_forgot, g6_quotient_sign, g6_quotient_no_square
 
@@ -157,17 +157,19 @@ Soit f(x) = e^(3x)/(x² + 2). Dérive f, puis calcule f′(0).
 ```
 Quelle est la dérivée de f(x) = cos(x²) ?
   · −sin(x²) [g6_chain_forgot]   ✔ −2x·sin(x²)   · 2x·cos(x²)   · 2x·sin(x²)
+  [examen mcq]
   pièges : g6_chain_forgot
 
 Vrai ou faux ? ((3x + 1)·e^(4x))′ = 12e^(4x)
   · Vrai [g6_product_naive]   ✔ Faux
+  [examen tf]
   pièges : g6_product_naive
 
 Soit f(x) = x²/(x + 3). Dérive f, puis calcule f′(0).
   [free, sans aide, examen coef]  (x²/(x + 3))′
     = ((x²)′·(x + 3) − x²·(x + 3)′)/(x + 3)²   ← Règle du quotient
     = (x² + 6x)/(x + 3)²   ← Simplifier
-  — Calcule maintenant f′(0).  [juge value]
+  — Calcule maintenant f′(0).  [juge value]  départ : (0² + 6·0)/(0 + 3)²
     = 0   ← f′(0) = 0
   pièges : g6_quotient_sign, g6_quotient_no_square
 

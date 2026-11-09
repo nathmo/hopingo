@@ -8,7 +8,7 @@
 // Explicit × shows as ·, a number before a letter as an invisible product,
 // derivatives as (…)′.
 
-import { prec, toReadable, PREC, LOGIC_SYMBOL } from './print.js';
+import { prec, toReadable, PREC, LOGIC_SYMBOL, LOGIC_WORD } from './print.js';
 import { getAt } from './ast.js';
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -101,7 +101,8 @@ export function toMathML(node, opts = {}) {
         const right = n.t === 'logic' && (n.op === 'imp' || n.op === 'iff');
         const l = prec(n.l) < me || (right && prec(n.l) === me) ? paren(M(n.l)) : M(n.l);
         const r = prec(n.r) < me || (!right && prec(n.r) === me) ? paren(M(n.r)) : M(n.r);
-        return row(l, mo(n.t === 'logic' ? LOGIC_SYMBOL[n.op] : n.op), r);
+        const word = n.t === 'logic' && LOGIC_WORD[n.op] !== LOGIC_SYMBOL[n.op];
+        return row(l, word ? `<mtext>&#x2004;${LOGIC_WORD[n.op]}&#x2004;</mtext>` : mo(n.t === 'logic' ? LOGIC_SYMBOL[n.op] : n.op), r);
       }
       case 'set': {
         const fence = (s) => mo(s, ' stretchy="false"');

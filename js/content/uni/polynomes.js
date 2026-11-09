@@ -37,8 +37,15 @@ const prodPoly = (rs) => rs.reduce((p, r) => p.mul(P1(r)), Poly.const(1));
 // P with x replaced by a, as text: (−1)^3 − 2×(−1)^2 …
 // P with x replaced by a: brackets around negative values only (always,
 // with brackets: when the coefficients hold a parameter, (λ − 2)(3)).
-const at = (p, a, always = false) => toText(mapNode(polyNode(p), (n) => (n.t === 'sym' && n.name === V
-  ? (always || Q.of(a).n < 0 || Q.of(a).d > 1 ? { t: 'paren', e: lit(Q.of(a)) } : lit(Q.of(a))) : n)));
+const at = (p, a, always = false) => {
+  const lead = qCoeffs(p)?.at(-1);
+  const wrap = always || Q.of(a).n < 0 || Q.of(a).d > 1 || (lead && lead.n < 0);
+  return toText(mapNode(polyNode(p), (n) => (n.t === 'sym' && n.name === V ? (wrap ? { t: 'paren', e: lit(Q.of(a)) } : lit(Q.of(a))) : n)));
+};
+// x − r as a factor in a sentence: (x − 2), or x alone.
+const facR = (r) => (r === 0 ? 'x' : `(${RT(lin(r))})`);
+// a − (b) written with its sign: 5 − 3, 5 − (−3).
+const minus = (a, b) => `${lit0(a)}-${Q.of(b).n < 0 ? `(${lit0(b)})` : lit0(b)}`;
 const tpl = (math, holes) => blankLine(parse(math), holes);
 const RT = (t) => toReadable(parse(t));
 
@@ -202,7 +209,7 @@ function hornerThen(d, level, rng, opts = {}) {
     script: [{ kind: 'eq', math: final, note: 'Lire Q et R', subgoal: 'read' }],
     hints: [
       { level: 1, html: 'Les cases b, sauf la dernière, sont les coefficients de Q, de degré un de moins que P. La dernière case est R = P(a).' },
-      { level: 2, html: `(${RT(B)})(…) + ${fr(lit0(d.R))}` },
+      { level: 2, html: `(${RT(B)})(…) ${d.R.n < 0 ? '−' : '+'} ${fr(lit0(d.R.n < 0 ? d.R.neg() : d.R))}` },
       { level: 3, html: MT(final) },
     ],
     noHints: level >= 5 || !!opts.exam,
@@ -1098,7 +1105,7 @@ function dparamItem(level, rng, opts = {}) {
   if (level === 1) script.push({ kind: 'note', html: `Première condition déjà faite : P(${fr(String(d.a))}) = 0 donne λ ∈ {${fr(String(Math.min(d.r1, d.r2)))} ; ${fr(String(Math.max(d.r1, d.r2)))}}.` });
   if (level === 2) {
     script.push({ kind: 'decision', prompt: `Comment traduire « ${RT(Bt)} divise P » ?`, options: [
-      { id: 'roots', label: `${RT(Bt)} = (${RT(lin(d.a))})(${RT(lin(d.b))}) : P(${fr(String(d.a))}) = 0 et P(${fr(String(d.b))}) = 0`, valid: true },
+      { id: 'roots', label: `${RT(Bt)} = ${facR(d.a)}${facR(d.b)} : P(${fr(String(d.a))}) = 0 et P(${fr(String(d.b))}) = 0`, valid: true },
       { id: 'div', label: 'Diviser P par B et annuler le reste', valid: true, why: 'Juste aussi, mais plus long : les racines de B suffisent.' },
       { id: 'one', label: `Seulement P(${fr(String(d.a))}) = 0`, valid: false, rule: 'g0_param_one_cond', why: 'Il faut que les deux racines de B annulent P.' },
     ] });
@@ -1113,7 +1120,7 @@ function dparamItem(level, rng, opts = {}) {
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     declares: { vars: [V, 'λ'] },
     hints: [
-      { level: 1, html: `${RT(Bt)} = (${RT(lin(d.a))})(${RT(lin(d.b))}) : P(${fr(String(d.a))}) et P(${fr(String(d.b))}) doivent être nuls.` },
+      { level: 1, html: `${RT(Bt)} = ${facR(d.a)}${facR(d.b)} : P(${fr(String(d.a))}) et P(${fr(String(d.b))}) doivent être nuls.` },
       { level: 2, html: MT(lam(d.b), { vars: ['λ'] }) },
       { level: 3, html: `λ = ${fr(String(d.r2))}` },
     ],
@@ -1189,7 +1196,7 @@ function gcdItem(level, rng, opts = {}) {
   const [first, ...rest] = segs;
   script.push(...first.lines);
   for (const s of rest) script.push({ kind: 'segment', html: s.html, start: { math: s.start }, judge: { ...s.judge, ...(level === 3 ? { menu: menuFor(s) } : {}) } }, ...s.lines);
-  const roots = d.roots.map((r) => fr(String(r))).join(' et ');
+  const roots = [...d.roots].sort((a, b) => a - b).map((r) => fr(String(r))).join(' et ');
   return linesItem({
     skill: GCD, level, prompt: `Trouve le PGCD de A = ${MP(d.A)} et B = ${MP(d.B)}, puis leurs racines communes.`,
     start: first.start, judge: { ...first.judge, ...(level === 3 ? { menu: menuFor(first) } : {}) },
@@ -1394,9 +1401,9 @@ function pfdGeneralItem(level, rng, opts = {}) {
     segs.push(value('A', d.A, `(${at(d.N, d.a)})/(${at(d.T, d.a)})`, { num: PT(d.N), den: PT(d.T), at: d.a }, `Cache ${RT(lin(d.a))}, pose x = ${fr(String(d.a))}`));
     // x² : coefficient of N = A + B ; constant : N(0) = A·s − C·a.
     const Nc = qCoeffs(d.N);
-    segs.push(value('B', d.B, `${lit0(Nc[2] ?? 0)}-(${lit0(d.A)})`, null, 'Coefficient de x² : A + B'));
-    const cNum = `${lit0(d.A * d.s)}-(${lit0(Nc[0])})`;
-    segs.push(value('C', d.C, d.a === 1 ? cNum : `(${cNum})/(${lit0(d.a)})`, null, `Terme constant : N(0) = ${d.s}A ${d.a > 0 ? '−' : '+'} ${Math.abs(d.a) === 1 ? '' : Math.abs(d.a)}C`));
+    segs.push(value('B', d.B, minus(Nc[2] ?? 0, d.A), null, 'Coefficient de x² : A + B'));
+    const cNum = minus(d.A * d.s, Nc[0]);
+    segs.push(value('C', d.C, d.a === 1 ? cNum : `(${cNum})/(${lit0(d.a)})`, null, `Terme constant : N(0) = ${d.s === 1 ? '' : d.s}A ${d.a > 0 ? '−' : '+'} ${Math.abs(d.a) === 1 ? '' : Math.abs(d.a)}C`));
   } else if (d.kind === 'K2') {
     forms = [
       { id: 'right', label: `A/${denR(d.a)} + B/${denR(d.b)} + C/${denR(d.b, 2)}`, valid: true },
@@ -1406,7 +1413,7 @@ function pfdGeneralItem(level, rng, opts = {}) {
     segs.push(value('A', d.A, `(${at(d.N, d.a)})/(${at(P1(d.b).pow(2), d.a)})`, { num: PT(d.N), den: PT(P1(d.b).pow(2)), at: d.a }, `Cache ${RT(lin(d.a))}, pose x = ${fr(String(d.a))}`));
     segs.push(value('C', d.C, `(${at(d.N, d.b)})/(${at(P1(d.a), d.b)})`, { num: PT(d.N), den: lin(d.a), at: d.b }, `Cache ${denR(d.b, 2)}, pose x = ${fr(String(d.b))}`));
     const Nc = qCoeffs(d.N);
-    segs.push(value('B', d.B, `${lit0(Nc[2] ?? 0)}-(${lit0(d.A)})`, null, 'Coefficient de x² : A + B'));
+    segs.push(value('B', d.B, minus(Nc[2] ?? 0, d.A), null, 'Coefficient de x² : A + B'));
   } else {
     forms = [
       { id: 'right', label: `D'abord diviser : ${RT(PT(d.Ep))} + A/${denR(d.a)} + B/${denR(d.b)}`, valid: true },
