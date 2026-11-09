@@ -24,6 +24,8 @@ import { judgeTokens } from '../js/judges/logic.js';
 import { checkBlocks, placeBlock } from '../js/judges/blocks.js';
 import { checkTable } from '../js/judges/iter.js';
 import { parse } from '../js/cas/parse.js';
+import { mapNode, lit } from '../js/cas/ast.js';
+import { paramSamples } from '../js/judges/solset.js';
 import { expandDerivs } from '../js/cas/diff.js';
 import { pretty } from '../js/cas/normal.js';
 import { solutionSet, contains01, isSetNode } from '../js/cas/sets.js';
@@ -35,6 +37,14 @@ const UNI = UNI_SKILLS.map((s) => s.id);
 // A line every judge must refuse, built from the last line of the first part.
 function wrongLine(cfg, final) {
   if (cfg.kind === 'logic') return `¬(${final})`;
+  // A bound (equiv with rel): a constant far below or above.
+  if (cfg.rel) return cfg.rel === '≥' ? `${final}+1000` : `${final}-1000`;
+  if (cfg.kind === 'solset' && cfg.params) {
+    // Parameters in the bounds: the line written for the first sample of m.
+    const env = paramSamples(cfg)[0];
+    const n = mapNode(parse(final, parseOpts(cfg)), (x) => (x.t === 'sym' && !x.sub && env[x.name] ? { t: 'paren', e: lit(env[x.name]) } : x));
+    return wrongLine({ ...cfg, params: undefined }, toText(n));
+  }
   if (cfg.kind === 'solset') {
     const S = solutionSet(parse(final, parseOpts(cfg)), cfg);
     // A number the judge looks at (inside the domain or the window of a

@@ -28,7 +28,8 @@ import { equivalent, seedOf } from '../cas/equiv.js';
 import { numValue, stripParen, symbolsIn, contains, equalsStructural, unparen, walk } from '../cas/ast.js';
 import { parse } from '../cas/parse.js';
 import { substSyms } from '../cas/sets.js';
-import { equalExact } from '../cas/normal.js';
+import { equalExact, exactValue } from '../cas/normal.js';
+import { evalFloat } from '../cas/numeric.js';
 import { exactForm, trigForm } from '../cas/exactform.js';
 import { toText } from '../cas/print.js';
 import { polyOf, qCoeffs, discriminant, sumTerms, productFactors, isExpanded } from '../cas/polyx.js';
@@ -207,6 +208,8 @@ function reachesGoal(node, goal) {
 }
 
 const TARGETS = {
+  // Step U1b (G1): an expanded polynomial in the first variable (f(k) in m).
+  expanded: (node, cfg) => (!!polyOf(node) && isExpanded(node, cfg.vars?.[0] || 'x') ? (presentationIssue(node) ?? true) : false),
   goal: (node, cfg) => (cfg.goal ? reachesGoal(node, parseGoal(cfg)) : false),
   only: (node, cfg) => {
     const ok = [...symbolsIn(node)].every((s) => (cfg.finalVars || []).includes(s));
@@ -273,6 +276,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const { node } = read;
   if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression, sans « = » au milieu.' };
   if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (cfg.rel) return judgeBound(cfg, prev, node);
   const opts = { vars: cfg.vars, domain: cfg.domain, seed: cfg.seed ?? seedOf(toText(prev)) };
   const map = substOf(cfg);
   const S = (n) => (map ? substSyms(expandDerivs(n), map) : expandDerivs(n));
@@ -287,4 +291,52 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
+}
+
+// ---------- chains of inequalities (step U1b, G1 catalogue « ajout 4 ») ----------
+// cfg.rel '≤' (or '≥'): a line is right if prev ≤ line (or ≥) at every point
+// of the domain {v: [lo, hi]}: 400 points and the ends. Final form: a number
+// written out, within cfg.bound when the question gives one.
+
+const BOUND_POINTS = 400;
+function boundPoints(cfg) {
+  const v = cfg.vars?.[0] || 'x';
+  const [lo, hi] = cfg.domain?.[v] || [-3, 3];
+  const xs = [];
+  for (let i = 0; i <= BOUND_POINTS; i++) xs.push(lo + ((hi - lo) * i) / BOUND_POINTS);
+  return { v, xs };
+}
+
+// The first point where the line is not a bound of prev, or null.
+export function boundWitness(cfg, prev, node) {
+  const { v, xs } = boundPoints(cfg);
+  const sign = cfg.rel === '≥' ? -1 : 1;
+  for (const x of xs) {
+    const a = evalFloat(expandDerivs(prev), { [v]: x });
+    if (!Number.isFinite(a)) continue;
+    const b = evalFloat(expandDerivs(node), { [v]: x });
+    if (!Number.isFinite(b) || sign * (a - b) > 1e-9 * (1 + Math.abs(a) + Math.abs(b))) return { [v]: x, a, b };
+  }
+  return null;
+}
+
+function judgeBound(cfg, prev, node) {
+  const w = boundWitness(cfg, prev, node);
+  const v = cfg.vars?.[0] || 'x';
+  if (w) {
+    const opts = { vars: cfg.vars, domain: cfg.domain, seed: seedOf(toText(prev)) };
+    const same = (cand, line) => equivalent(cand, line, opts).equal;
+    const diag = diagnoseLine('equiv', prev, node, cfg, same);
+    const word = cfg.rel === '≥' ? 'plus grande' : 'plus petite';
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: `En ${v} = ${frNum(w[v])}, ta ligne vaut ${frNum(w.b)}, ${word} que la précédente (${frNum(w.a)}) : ce n'est pas une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}.` };
+  }
+  if (contains(node, (x) => x.t === 'sym' && x.name === v)) return { kind: 'ok', node };
+  const q = exactValue(node);
+  const val = q ? q.valueOf() : evalFloat(node, {});
+  if (cfg.bound !== undefined) {
+    const B = exactValue(parse(String(cfg.bound)))?.valueOf();
+    if ((cfg.rel === '≥' ? val < B : val > B) && Math.abs(val - B) > 1e-12) return { kind: 'stay', node, message: `C'est une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}, mais elle ${cfg.rel === '≥' ? 'est plus petite' : 'dépasse'} la borne demandée : sois plus précis.` };
+  }
+  if (!TARGETS.constant(node)) return { kind: 'stay', node, message: "C'est juste, mais calcule ce nombre." };
+  return { kind: 'done', node };
 }

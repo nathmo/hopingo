@@ -14,8 +14,9 @@ import * as analyse0 from './analyse0.skills.js';
 import * as explog from './explog.skills.js';
 import * as trigo from './trigo.skills.js';
 import * as recurrence from './recurrence.skills.js';
+import * as fonctionsG2 from './fonctions-g2.skills.js';
 
-const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence];
+const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence, fonctionsG2];
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -32,4 +33,5 @@ export const UNBUILT = {
   'g1-trinome-sign': ['g9-intervals', 'quad-formula'], // TEMP u1b-merge
   'g1-inverse': ['rat-domain', 'iso-formula'], // TEMP u1b-merge
   'g1-parity-period': ['rat-domain', 'g9-counterexample'], // TEMP u1b-merge
+  'g1-sign-table': ['g9-intervals', 'fac-complete'], // TEMP u1b-merge
 };

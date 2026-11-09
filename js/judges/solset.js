@@ -23,6 +23,8 @@
 //                        compared on the window [−13 ; 13] (cfg.window);
 //                        final form in families, or without k on a bounded
 //                        domain.
+//   inCase: true         with domain = a case: a final line must lie inside
+//                        the case to end the part (else `ok`, to intersect)
 //   params: {m: set}     a parameter: the lines are compared for sample
 //                        values of m in its set (a case of the discussion);
 //                        interval bounds may hold m.
@@ -60,7 +62,7 @@ const lineCfg = (cfg) => ({
 // Sample values of the parameters, in their sets: whole numbers and halves
 // in [−6 ; 6], the closed ends included. → [{m: Q}]
 const SAMPLE_CACHE = new Map();
-function paramSamples(cfg) {
+export function paramSamples(cfg) {
   const names = paramNames(cfg);
   if (!names.length) return [{}];
   const key = JSON.stringify(cfg.params);
@@ -249,6 +251,16 @@ export function judgeLine(cfg, prevIn, input, state = {}) {
   }
   state.lastEq = node;
   if (note) return { kind: 'ok', node, note };
+  // A case (cfg.inCase, domain = the case): a set or « x = 4 » ends the part
+  // only once it lies inside the case ([−4 ; 3] in the case x ≥ 5 is still
+  // to intersect).
+  if (fin === true && cfg.inCase && cfg.domain) {
+    for (const env of paramSamples(cfg)) {
+      const raw = lineSet(node, { ...cfg, domain: undefined }, env);
+      const C = lineSet(parse('ℝ'), cfg, env);
+      if (minus(raw, C).parts.length) return { kind: 'ok', node, note: 'Garde seulement les solutions qui sont dans le cas.' };
+    }
+  }
   if (fin === true) return { kind: 'done', node };
   if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
   return { kind: 'ok', node };

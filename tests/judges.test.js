@@ -628,3 +628,34 @@ test('action menus (G3): reduce an angle, exact values', () => {
   assert.deepEqual(valid('exact', 'cos((2π)/3+π/4)'), ['add']);
   assert.deepEqual(valid('exact', 'cos((2π)/3)cos(π/4)-sin((2π)/3)sin(π/4)'), ['values']);
 });
+
+// ---------- step U1, part b: module G1 (second half) ----------
+
+test('equiv with rel ≤ (G1): chains of bounds, a constant in the end', () => {
+  const j = JUDGES.equiv;
+  const cfg = { kind: 'equiv', vars: ['x'], domain: { x: [0, 2] }, rel: '≤', target: 'constant', bound: '3' };
+  const prev = P('|x^2-1|');
+  assert.equal(j.judgeLine(cfg, prev, '|x-1|×|x+1|').kind, 'ok', 'equal is fine');
+  assert.equal(j.judgeLine(cfg, P('|x-1|×|x+1|'), '1×|x+1|').kind, 'ok');
+  assert.equal(j.judgeLine(cfg, P('1×|x+1|'), '3').kind, 'done');
+  const w = j.judgeLine(cfg, P('1×|x+1|'), '2');
+  assert.equal(w.kind, 'wrong');
+  assert.match(w.message, /majoration/);
+  assert.equal(j.judgeLine(cfg, P('1×|x+1|'), '4').kind, 'stay', 'above the asked bound');
+  assert.equal(j.judgeLine({ ...cfg, rel: '≥', bound: undefined }, P('x+1'), '1').kind, 'done', 'a lower bound');
+  assert.equal(j.isFinal(cfg, P('3')), true);
+});
+
+test('solset (G1): a case ends inside the case; f(k) expanded in m', () => {
+  const J1 = (cfg, prev, line) => JUDGES.solset.judgeLine({ kind: 'solset', v: 'x', ...cfg }, P(prev), line, {});
+  const c = { domain: '[5;+∞[', inCase: true };
+  assert.equal(J1(c, 'x^2+|x-5|≤7', 'x^2+x-12≤0').kind, 'ok');
+  const raw = J1(c, 'x^2+x-12≤0', '[-4;3]');
+  assert.equal(raw.kind, 'ok', 'right in the case, but not the set of the case');
+  assert.match(raw.note, /cas/);
+  assert.equal(J1(c, '[-4;3]', '∅').kind, 'done');
+  assert.equal(J1(c, 'x^2+x-12≤0', '[5;6]').kind, 'wrong');
+  const e = { kind: 'equiv', vars: ['m'], domain: { m: [-3, 3] }, target: 'expanded' };
+  assert.equal(JUDGES.equiv.judgeLine(e, P('(m-2)×2^2-2m×2+m+3', { vars: ['m'] }), 'm-5').kind, 'done');
+  assert.equal(JUDGES.equiv.judgeLine(e, P('(m-2)×2^2-2m×2+m+3', { vars: ['m'] }), 'm-3').kind, 'wrong');
+});

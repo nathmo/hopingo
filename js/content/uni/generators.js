@@ -9,5 +9,6 @@ import { GEN as TRIGO } from './trigo.js';
 import { GEN as TRIGO_EQ } from './trigo-eq.js';
 import { GEN as TRIGO_TRI } from './trigo-tri.js';
 import { GEN as RECURRENCE } from './recurrence.js';
+import { GEN as FONCTIONS_G2 } from './fonctions-g2.js';
 
-export const UNI_GEN = { ...LOGIQUE, ...POLYNOMES, ...ANALYSE0, ...EXPLOG, ...TRIGO, ...TRIGO_EQ, ...TRIGO_TRI, ...RECURRENCE };
+export const UNI_GEN = { ...LOGIQUE, ...POLYNOMES, ...ANALYSE0, ...EXPLOG, ...TRIGO, ...TRIGO_EQ, ...TRIGO_TRI, ...RECURRENCE, ...FONCTIONS_G2 };

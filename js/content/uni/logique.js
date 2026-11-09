@@ -228,7 +228,7 @@ function setsTf(rng) {
 
 const INTER = 'g9-intervals';
 const INTER_SUB = [
-  { id: 'abs', label: 'ôter la valeur absolue', skill: INTER },
+  { id: 'abs', label: 'ôter la valeur absolue', skill: 'g1-abs-eq' },
   { id: 'solve', label: 'isoler x', skill: INTER },
   { id: 'translate', label: 'traduire en intervalles', skill: INTER },
   { id: 'op', label: 'intersecter ou réunir', skill: SETS },

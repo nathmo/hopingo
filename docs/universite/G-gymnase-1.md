@@ -126,7 +126,7 @@ Le module se joue surtout avec les types `tokens`, `blocks`, `tf` et `example`. 
 ### `g9-intervals` — Intervalles et parties de ℝ
 - **Année** 12 · **Prérequis** `g9-sets` · **Étiquettes** CMS, MAN · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-sets` : intersection et réunion d'intervalles.
-- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le sous-but « ôter la valeur absolue » sera crédité à `g1-abs-eq` quand G1 sera construit (U1, partie b).
+- **Statut** : fait le 9 novembre 2026 (étape U1, partie a). Le sous-but « ôter la valeur absolue » est crédité à `g1-abs-eq` depuis l'étape U1, partie b.
 - **Intro** : un crochet tourné vers le nombre l'inclut : [2 ; 5[ contient 2, pas 5. ∞ est toujours exclu. Exemple : {x ∈ ℝ | |x − 1| < 3 et x ≥ 0} = ]−2 ; 4[ ∩ [0 ; +∞[ = [0 ; 4[.
 - **Juge** : `solset` `{v:'x', domain:'R'}` · **Forme finale** : union d'intervalles disjoints, triés, sans ∩.
 - **Niveaux** :
