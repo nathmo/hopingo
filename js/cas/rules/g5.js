@@ -155,7 +155,7 @@ export const RULES = [
       return [{ node: q(a.u1 + a.n * a.r), ctx: { a, term: true } }];
     },
     explain: (ctx = {}) => (ctx.term
-      ? `De u₁ à u${ctx.a ? `(${ctx.a.n})` : 'ₙ'}, on ajoute r une fois de moins que le rang : ${ctx.a ? ctx.a.n - 1 : 'n − 1'} fois.`
+      ? `De u₁ à uₙ, on ajoute r une fois de moins que le rang : n − 1 fois${ctx.a ? `, ici ${ctx.a.n - 1} fois` : ''}.`
       : 'Avec 2 termes, 3 + 7 = 10 = 2·(3 + 7)/2. Sans le /2, on compte tout deux fois.'),
   },
   {

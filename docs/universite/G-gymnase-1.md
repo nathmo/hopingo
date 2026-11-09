@@ -2030,7 +2030,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : à faire
 ---
 # G5. Suites, sommes, récurrence
 
-Unité `recurrence` · préfixe `g5-` · pièges `g5_` · Statut : à faire
+Unité `recurrence` · préfixe `g5-` · pièges `g5_` · Statut : fait le 9 novembre 2026 (étape U1, partie b). Une somme se tape `sum(terme, k, début, fin)` (touche Σ). Simplifications : l'écriture avec Σ (`g5-sigma` L2) est une ligne jugée par ses termes, pas des jetons ; le niveau 5 de `g5-reindex` demande S(N) au lieu de la limite ; `g5-induction-sum` n'a pas Σ k·2ᵏ (sa formule au rang n + 1 n'est pas un produit) ; les inégalités de `g5-induction-more` sont des blocs avec un calcul tapé, pas des lignes `equiv` avec `rel` ; pas d'étape « conjecturer » au niveau 5 ; les variantes `open` sont des items sans aide, en attendant le type `problem` (U4) ; `g2_power_power` sera proposé quand G2 sera fusionné.
 
 **Sources** : MAN, examen blanc Math 1B 2018 avec son corrigé (Q1, chemin de projections et somme géométrique, 6 pts) ; Analyse I 2021 (récurrence fₙ = f ∘ fₙ₋₁) ; cours d'Analyse I (principe de récurrence, exemple n ≤ n²) ; CMS, Analyse I, séries sur les suites.
 **Notation** : Σ_{k=p}^{n} uₖ ; suites indexées à partir de 0 ou de 1, comme l'énoncé le dit. Récurrence : « Initialisation », « Hérédité », « Conclusion » ; P(n) désigne la propriété au rang n.

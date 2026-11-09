@@ -194,7 +194,7 @@ ACTIONS.telescope = (prev) => {
   return [
     { id: 'decompose', label: 'Décomposer le terme en une différence', valid: ss.length > 0 && !diff, why: diff ? 'Le terme est déjà une différence.' : 'Il n’y a plus de Σ.' },
     { id: 'telescope', label: 'Écrire les termes et télescoper', valid: diff, why: ss.length ? 'Décompose d’abord le terme en une différence aₖ − aₖ₊₁.' : 'Il n’y a plus de Σ.' },
-    { id: 'reduce', label: 'Réduire au même dénominateur', valid: !ss.length && topSum(prev), why: ss.length ? 'Il reste une Σ.' : 'C’est déjà réduit.' },
+    { id: 'reduce', label: 'Simplifier ou réduire au même dénominateur', valid: !ss.length && topSum(prev), why: ss.length ? 'Il reste une Σ.' : 'C’est déjà réduit.' },
   ];
 };
 

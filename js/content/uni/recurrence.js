@@ -23,6 +23,7 @@ import {
 const q = (n, d = 1) => new Q(n, d);
 const QT = (x) => toText(lit(Q.of(x)));
 const NO = { vars: ['n'] };
+const RD = (t, vars = ['n', 'k', 'j']) => toReadable(parse(t, { vars }));
 const MN = (t) => MT(t, NO);
 const MK = (t) => MT(t, { vars: ['n', 'k'] });
 const EQN = (extra = {}) => ({ kind: 'equiv', vars: ['n'], domain: { n: { int: [1, 12] } }, target: 'no-sum', ...extra });
@@ -107,23 +108,25 @@ function sigmaItem(level, rng, opts = {}) {
     const a = rng.int(1, 4);
     const b = rng.int(-3, 5);
     const m = rng.int(3, 5);
+    const lo = rng.pick([0, 1, 1, 2]);
+    const hi = lo + m - 1;
     const term = polyText(`${a}k+${b}`, 'k');
-    const terms = Array.from({ length: m }, (_, i) => q(a * (i + 1) + b));
+    const terms = Array.from({ length: m }, (_, i) => q(a * (lo + i) + b));
     const line1 = joinSigned(terms);
     const total = terms.reduce((s, x) => s.add(x), q(0));
     const node = parse(line1);
     const lv = leaves(node);
-    const start = sumT(term, 1, m);
+    const start = sumT(term, lo, hi);
     return linesItem({
-      skill: SIGMA, level, prompt: `Écris les termes de ${SIG(term, 1, m)} un par un, puis calcule.`,
+      skill: SIGMA, level, prompt: `Écris les termes de ${SIG(term, lo, hi)} un par un, puis calcule.`,
       start, judge: VAL(), mode: 'guided',
       script: [
-        { kind: 'eq', ...blankLine(node, lv.slice(-2)), note: `k = 1, 2, …, ${m} : ${m} termes`, subgoal: 'develop' },
+        { kind: 'eq', ...blankLine(node, lv.slice(-2)), note: `k = ${lo}, ${lo + 1}, …, ${hi} : ${m} termes`, subgoal: 'develop' },
         { kind: 'eq', math: QT(total), note: 'Additionner', subgoal: 'reduce' },
       ],
       hints: [
-        { level: 1, html: `Remplace k par 1, puis 2, … jusqu'à ${m}.` },
-        { level: 2, html: `Pour k = 1 : ${fr(QT(terms[0]))}. Pour k = ${m} : …` },
+        { level: 1, html: `Remplace k par ${lo}, puis ${lo + 1}, … jusqu'à ${hi}.` },
+        { level: 2, html: `Pour k = ${lo} : ${fr(QT(terms[0]))}. Pour k = ${hi} : …` },
         { level: 3, html: MT(line1) },
       ],
       subgoals: SIG_SUB, keys: KEYS, key: `${SIGMA}:dev:${start}`,
@@ -273,7 +276,7 @@ function shiftData(rng) {
   return {
     c, kc, hi, start, sq,
     lines: [
-      { math: sumT(sq ? 'j^2' : 'j', 1, 'n', 'j'), note: `j = ${fr(kc)} : k = ${1 + c} donne j = 1`, subgoal: 'shift' },
+      { math: sumT(sq ? 'j^2' : 'j', 1, 'n', 'j'), note: `j = ${RD(kc)} : k = ${1 + c} donne j = 1`, subgoal: 'shift' },
       { math: sq ? 'n(n+1)(2n+1)/6' : 'n(n+1)/2', note: 'Formule du cours', subgoal: 'formula' },
     ],
   };
@@ -333,7 +336,7 @@ function reindexItem(level, rng, opts = {}) {
     const node = parse(d.lines[0].math, NO);
     const first = level === 1 ? { ...d.lines[0], ...blankLine(node, [node.lo, node.hi], NO) } : d.lines[0];
     return linesItem({
-      skill: REIDX, level, prompt: `Pose j = ${fr(d.kc)} pour écrire ${MN(d.start)} avec une formule du cours.`,
+      skill: REIDX, level, prompt: `Pose j = ${RD(d.kc)} pour écrire ${MN(d.start)} avec une formule du cours.`,
       start: d.start, judge: EQN({ factored: true }), mode: level === 1 ? 'guided' : 'free',
       script: [{ kind: 'eq', ...first }, { kind: 'eq', ...d.lines[1] }],
       hints: [
@@ -392,7 +395,7 @@ function reindexMcq(rng) {
       { html: MN(sumT(f, 1, 'n+1', 'j')), correct: false },
     ];
     return mcq({
-      skill: REIDX, level: 4, prompt: `Avec j = ${fr(d.kc)}, ${MN(d.start)} =`, options: options.filter((o, i, x) => x.findIndex((y) => y.html === o.html) === i), key: `mcq:${d.start}`,
+      skill: REIDX, level: 4, prompt: `Avec j = ${RD(d.kc)}, ${MN(d.start)} =`, options: options.filter((o, i, x) => x.findIndex((y) => y.html === o.html) === i), key: `mcq:${d.start}`,
       exam: { format: 'mcq', points: 1 }, solution: [{ html: MN(d.lines[0].math), note: 'Le terme et les bornes changent' }],
     }, rng);
   }
@@ -480,7 +483,7 @@ function arithItem(level, rng, opts = {}) {
   const d = arithData(rng);
   const hints = [
     { level: 1, html: `De u₁ à ${uN(d.n)}, on ajoute ${d.n - 1} fois r. Puis : nombre de termes × (premier + dernier)/2.` },
-    { level: 2, html: `${uN(d.n)} = ${fr(d.u1)} + ${d.n - 1}·(${fr(d.r)})` },
+    { level: 2, html: `${uN(d.n)} = ${fr(d.u1)} + ${d.n - 1}·${d.r < 0 ? `(${fr(d.r)})` : d.r}` },
     { level: 3, html: MT(plusT(d.u1, timesT(d.n - 1, d.r))) },
   ];
   if (level === 1) {
@@ -512,7 +515,7 @@ function arithItem(level, rng, opts = {}) {
       mode: 'guided',
       hints: [
         { level: 1, html: `Entre ${uN(a)} et ${uN(b)}, on ajoute ${b - a} fois r.` },
-        { level: 2, html: `r = (${fr(ub)} − ${fr(ua)})/(${b} − ${a})` },
+        { level: 2, html: `r = (${fr(ub)} − ${ua < 0 ? `(${fr(ua)})` : ua})/(${b} − ${a})` },
         { level: 3, html: MT(rLine) },
       ],
       subgoals: ARITH_SUB, key: `${ARITH}:2:${a}:${b}:${ua}:${ub}`,
@@ -548,10 +551,10 @@ function arithItem(level, rng, opts = {}) {
     });
   }
   // Level 5: an arithmetic and a geometric placement compared.
-  const N = rng.int(5, 8);
+  const N = rng.int(6, 9);
   const a1 = 10 * rng.int(5, 15);
   const ra = 10 * rng.int(1, 5);
-  const g0 = rng.int(2, 9);
+  const g0 = rng.int(3, 12);
   const SA = q(N * (2 * a1 + (N - 1) * ra), 2);
   const SB = q(g0 * (2 ** N - 1));
   return partsItem({
@@ -580,7 +583,7 @@ function arithMcq(rng) {
   const options = [
     { html: fr(QT(S)), correct: true },
     { html: fr(QT(S.mul(q(2)))), correct: false, rule: 'g5_arith_half' },
-    { html: fr(QT(q((d.n - 1) * (d.u1 + un), 2))), correct: false, rule: 'g5_count_terms' },
+    { html: fr(QT(q((d.n - 1) * (2 * d.u1 + (d.n - 2) * d.r), 2))), correct: false, rule: 'g5_count_terms' },
     { html: fr(QT(q(d.n * (2 * d.u1 + d.n * d.r), 2))), correct: false, rule: 'g5_arith_half' },
   ];
   return mcq({
@@ -616,15 +619,16 @@ function geomData(rng) {
   return { u0: 5, q: q(2), N: 6, fallback: true };
 }
 // u₀ + u₀q + … + u₀q^(N − 1), shown with its first terms and its last one.
-const shownSum = (g) => `${fr(QT(termOf(g, 0)))} + ${fr(QT(termOf(g, 1)))} + … + ${fr(String(g.u0))}·${fr(qT(g.q))}${['⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸'][g.N - 1]}`.replace(/\+ −/g, '− ').replace(/^1·/, '');
+const SUPS = (k) => [...String(k)].map((c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join('');
+const shownSum = (g) => `${fr(QT(termOf(g, 0)))} + ${fr(QT(termOf(g, 1)))} + … + ${g.u0 === 1 ? '' : `${g.u0}·`}${fr(qT(g.q))}${SUPS(g.N - 1)}`.replace(/\+ −/g, '− ');
 
 function geomItem(level, rng, opts = {}) {
   const g = geomData(rng);
   const S = geomSum(g, g.N);
-  const sumLine = `${g.u0}(${qT(g.q)}^${g.N}-1)/(${qT(g.q)}-1)`.replace(/^1\(/, '(');
+  const sumLine = `${g.u0}(${qT(g.q)}^${g.N}-1)/(${QT(g.q)}-1)`.replace(/^1\(/, '(');
   const sumJudge = VAL({ expect: QT(S), geom: { u0: g.u0, q: g.q, n: g.N } });
   const hints = [
-    { level: 1, html: `Compte les termes : de q⁰ à q^${g.N - 1}, il y en a ${g.N}.` },
+    { level: 1, html: `Compte les termes : de q⁰ à q${SUPS(g.N - 1)}, il y en a ${g.N}.` },
     { level: 2, html: `S = u₀(q^N − 1)/(q − 1) avec N = …` },
     { level: 3, html: MT(sumLine) },
   ];
@@ -655,8 +659,8 @@ function geomItem(level, rng, opts = {}) {
     walkPow(node, exp);
     const before = level === 3 ? [{ kind: 'decision', prompt: 'Quel exposant dans u₀(q^N − 1)/(q − 1) ?', options: [
       { id: 'N', label: `N = ${g.N}`, valid: true },
-      { id: 'N-1', label: `N = ${g.N - 1}`, valid: false, rule: 'g5_geom_offset', why: `De q⁰ à q^${g.N - 1}, il y a ${g.N} termes.` },
-      { id: 'N+1', label: `N = ${g.N + 1}`, valid: false, rule: 'g5_geom_offset', why: `De q⁰ à q^${g.N - 1}, il y a ${g.N} termes, pas ${g.N + 1}.` },
+      { id: 'N-1', label: `N = ${g.N - 1}`, valid: false, rule: 'g5_geom_offset', why: `De q⁰ à q${SUPS(g.N - 1)}, il y a ${g.N} termes.` },
+      { id: 'N+1', label: `N = ${g.N + 1}`, valid: false, rule: 'g5_geom_offset', why: `De q⁰ à q${SUPS(g.N - 1)}, il y a ${g.N} termes, pas ${g.N + 1}.` },
     ] }] : [];
     return linesItem({
       skill: GEOM, level, prompt: sumPrompt, start: 'S', judge: sumJudge, mode: level === 2 ? 'guided' : level === 3 ? 'tap' : 'free',
@@ -729,7 +733,7 @@ function geomMcq(rng) {
   return mcq({
     skill: GEOM, level: 4, prompt: `Suite géométrique, u₀ = ${g.u0}, q = ${fr(QT(g.q))}. S = ${shownSum(g)} vaut :`,
     options: options.filter((o, i, x) => x.findIndex((y) => y.html === o.html) === i), key: `mcq:${g.u0}:${QT(g.q)}:${g.N}`,
-    exam: { format: 'mcq', points: 1 }, solution: [{ html: `${g.N} termes : ${MT(`${g.u0}(${qT(g.q)}^${g.N}-1)/(${qT(g.q)}-1)`)} = ${fr(QT(S))}`, note: '' }],
+    exam: { format: 'mcq', points: 1 }, solution: [{ html: `${g.N} termes : ${MT(`${g.u0}(${qT(g.q)}^${g.N}-1)/(${QT(g.q)}-1)`)} = ${fr(QT(S))}`, note: '' }],
   }, rng);
 }
 
@@ -767,7 +771,7 @@ function frameBank(rng) {
         'n² + 2n + 1 = (n + 1)² : P(n + 1) est vraie.',
         'Conclusion : par récurrence, P(n) est vraie pour tout n ≥ 1.',
       ],
-      input: { at: 2, kind: 'expr', vars: ['n'], expect: 'n^2+2(n+1)-1', ask: `${S_HTML('(2k − 1)', 'n+1')} = n² + (2(n + 1) − 1) =`, answer: 'n^2+2n+1' },
+      input: { at: 2, kind: 'expr', vars: ['n'], expect: 'n^2+2(n+1)-1', ask: 'n² + (2(n + 1) − 1) =', answer: 'n^2+2n+1' },
       circular: `Hérédité : supposons ${S_HTML('(2k − 1)', 'n+1')} = (n + 1)².`,
       wrong: `Alors ${S_HTML('(2k − 1)', 'n+1')} = n² + (2n − 1).`,
     },
@@ -941,7 +945,7 @@ function moreBank(rng) {
     ],
     input: { at: 2, kind: 'expr', vars: ['n'], expect: a === 2 ? '2(2^(n+1)-1)+1' : '3(2×3^n-1)+2', ask: `${a}(${un}) + ${b} =`, answer: a === 2 ? '2^(n+2)-1' : '2×3^(n+1)-1', domain: { n: { int: [0, 8] } } },
     circular: `Hérédité : supposons uₙ₊₁ = ${un1}.`,
-    wrong: `Alors uₙ₊₁ = ${a}uₙ + ${b} = ${a}·${un} + ${b}, sans parenthèses.`,
+    wrong: `Alors uₙ₊₁ = ${a}uₙ + ${b} = ${a}·${un} + ${b}.`,
     subgoals: [{ id: 'powers', label: 'puissances', skill: 'g2-real-powers' }],
   };
 }
