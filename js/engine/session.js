@@ -25,6 +25,11 @@ const OP_SKILL = {
   'pow-priority': { '^': 'pow-def' },
   'pow-sign': { '^': 'pow-def', '×': 'rel-mul' },
   'root-calc': { '√': 'root-squares', '^': 'pow-def' },
+  'root-frac': { '√': 'root-squares', '^': 'pow-frac', '×': 'frac-mul', '+': 'frac-add-any', '-': 'frac-add-any' },
+  'pow-frac': { '^': 'pow-sign', '×': 'frac-mul', '+': 'frac-add-any', '-': 'frac-add-any' },
+  'mix-9': { '+': 'rel-add', '-': 'rel-sub', '×': 'frac-mul-int', '^': 'pow-def' },
+  'mix-10': { '+': 'frac-add-any', '-': 'frac-add-any', '×': 'rel-mul', '÷': 'frac-div', '^': 'pow-sign' },
+  'mix-11': { '+': 'frac-add-any', '-': 'frac-add-any', '×': 'frac-mul', '÷': 'frac-div', '^': 'pow-frac', '√': 'root-frac' },
 };
 
 const GUESS = { fact: 0.02, mcq: 0.3, match: 0.1, shade: 0.05, numberline: 0.08, answer: 0.03, steps: 0.02 };

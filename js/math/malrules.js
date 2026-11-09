@@ -472,6 +472,15 @@ export const RULES = [
     explain: (A, E) => `Un exposant négatif ne rend pas le nombre négatif : il donne l'inverse. ${A ? `${P(A, E.n)} = 1 / ${P(A, -E.n)} = ${V(qv(A).pow(E.n))}` : '10⁻² = 1 / 10² = 0,01'}.`,
   },
   {
+    id: 'pow_neg_exp_forget_power', family: 'symbol', tag: 'E', op: '^', skill: 'pow-frac', repair: 'pow-ten',
+    name: 'Inverser sans garder l\'exposant',
+    example: ['(2/3)⁻² = 3/2', '(2/3)⁻² = (3/2)² = 9/4'],
+    apply: (A, E) => (E.int && E.n < -1 && A.n !== 0 ? [new Q(1).div(qv(A))] : []),
+    explain: (A, E) => (A
+      ? `Le − de l'exposant donne l'inverse, mais l'exposant ${-E.n} reste : ${P(A, E.n)} = ${P(new Q(1).div(qv(A)), -E.n)} = ${V(qv(A).pow(E.n))}.`
+      : 'Le − de l\'exposant donne l\'inverse, mais l\'exposant reste : (2/3)⁻² = (3/2)² = 9/4, pas 3/2.'),
+  },
+  {
     id: 'pow_neg_base_sign', family: 'sign', tag: 'E', op: '^', skill: 'pow-sign', repair: 'rel-mul',
     name: 'Mauvais signe pour la puissance d\'un négatif',
     example: ['(−2)⁴ = −16', '(−2)⁴ = 16'],
@@ -588,6 +597,17 @@ export const RULES = [
       const h = qv(A).div(2);
       return `La racine carrée n'est pas la moitié : √${V(A)} est le nombre positif qui, multiplié par LUI-MÊME, donne ${V(A)}. Or ${V(h)} × ${V(h)} = ${V(h.mul(h))}.`;
     },
+  },
+  {
+    id: 'sqrt_numerator_only', family: 'rule', tag: 'E', op: '√', skill: 'root-frac', repair: 'root-squares',
+    name: 'Racine du numérateur seulement',
+    example: ['√(9/16) = 3/16', '√(9/16) = 3/4'],
+    apply: (A) => {
+      const v = qv(A);
+      const r = Math.round(Math.sqrt(v.n));
+      return v.d > 1 && v.n > 0 && r * r === v.n ? [new Q(r, v.d)] : [];
+    },
+    explain: () => 'La racine porte sur toute la fraction, le numérateur ET le dénominateur : √(9/16) = √9 / √16 = 3/4.',
   },
   {
     id: 'sqrt_is_square', family: 'symbol', tag: 'E', op: '√', skill: 'root-squares', repair: 'pow-def',

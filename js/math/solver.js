@@ -141,6 +141,18 @@ function powerSteps(node, { expandPowers = false, underMinus = false } = {}) {
   const decimal = litParts(node.b).decimal;
   const result = decimal && value.toDecimal() && value.n >= 0 ? { t: 'num', s: value.toDecimal(), v: value } : lit(value);
   if (k === 0) return [{ node: num(1), label: 'Un nombre (non nul) à la puissance 0 vaut 1.' }];
+  if (k === -1) {
+    const inv = new Q(1).div(base);
+    return [{ node: lit(inv), label: `L'exposant −1 donne l'inverse : ${b}⁻¹ = ${showQ(inv)}.` }];
+  }
+  if (k < 0 && !base.isInt()) {
+    // (2/3)⁻² = (3/2)²: invert the fraction, keep the exponent positive.
+    const inv = new Q(1).div(base);
+    return [{
+      node: { t: 'pow', b: { t: 'paren', e: lit(inv) }, e: num(-k) },
+      label: `Un exposant négatif : on prend l'inverse et l'exposant devient positif. ${b}${sup(k)} = (${showQ(inv)})${sup(-k)}.`,
+    }];
+  }
   if (k < 0) {
     const pos = { t: 'pow', b: node.b, e: num(-k) };
     return [{ node: { t: 'frac', n: num(1), d: pos }, label: `Un exposant négatif donne l'inverse : ${b}${sup(k)} = 1 / ${b}${sup(-k)}.` }];

@@ -24,6 +24,7 @@ export const BADGES = [
   { id: 'fractions', icon: '🏆', name: 'Maître des fractions', desc: 'Maîtrise toutes les compétences sur les fractions.', check: (p) => unitMastered(p, 'fractions') },
   { id: 'relatifs', icon: '🌡️', name: 'Sous zéro', desc: 'Maîtrise toutes les compétences sur les nombres relatifs.', check: (p) => unitMastered(p, 'relatifs') },
   { id: 'puissances', icon: '🚀', name: 'Puissance 10', desc: 'Maîtrise toutes les compétences sur les puissances.', check: (p) => unitMastered(p, 'puissances') },
+  { id: 'melanges', icon: '🧩', name: 'Touche-à-tout', desc: 'Maîtrise les calculs mélangés.', check: (p) => unitMastered(p, 'melanges') },
   { id: 'racines', icon: '🌳', name: 'Aux racines', desc: 'Maîtrise toutes les compétences sur les racines carrées.', check: (p) => unitMastered(p, 'racines') },
 ];
 

@@ -311,15 +311,15 @@ Complète : 100 000 = 10^?
 ```
 Écris 10^−5 sous forme décimale.
   → 0,00001 (decimal)
-  pièges : pow_neg_exp_negative
+  pièges : pow_neg_exp_negative, pow_neg_exp_forget_power
 
 Écris 10^−4 sous forme décimale.
   → 0,0001 (decimal)
-  pièges : pow_neg_exp_negative
+  pièges : pow_neg_exp_negative, pow_neg_exp_forget_power
 
 Écris 10^−2 sous forme décimale.
   → 0,01 (decimal)
-  pièges : pow_neg_exp_negative
+  pièges : pow_neg_exp_negative, pow_neg_exp_forget_power
 
 ```
 
@@ -508,7 +508,7 @@ Quelle est la notation scientifique de 1 400 ?
 
 Écris 7,3×10^−3 sous forme décimale.
   → 0,0073 (decimal)
-  pièges : pow_before_product, pow_neg_exp_negative
+  pièges : pow_before_product, pow_neg_exp_negative, pow_neg_exp_forget_power
 
 Écris 9,1×10^5 sous forme décimale.
   → 910000 (decimal)
@@ -533,12 +533,102 @@ Complète : (2 × 10^4)^2 = ? × 10^8
 
 ```
 
+## Puissances de fractions (`pow-frac`, 10H)
+
+_(2/3)², (−1/2)³ et les exposants négatifs : (2/3)⁻² = 9/4._
+
+### Niveau 1
+
+```
+Calcule.
+  (1/2)^3   [guided, irréductible] → 1/8
+  pièges : pow_fraction_numerator_only
+
+Calcule.
+  (1/5)^2   [guided, irréductible] → 1/25
+  pièges : pow_fraction_numerator_only
+
+Calcule.
+  (1/2)^2   [guided, irréductible] → 1/4
+  pièges : pow_fraction_numerator_only
+
+```
+
+### Niveau 2
+
+```
+Calcule.
+  (−1/2)^3   [guided, irréductible] → -1/8
+  pièges : pow_fraction_numerator_only, pow_neg_base_sign
+
+Calcule.
+  (−2/5)^3   [guided, irréductible] → -8/125
+  pièges : pow_fraction_numerator_only, pow_neg_base_sign
+
+Calcule.
+  (−1/2)^3   [guided, irréductible] → -1/8
+  pièges : pow_fraction_numerator_only, pow_neg_base_sign
+
+```
+
+### Niveau 3
+
+```
+Combien vaut 2^−3 ?
+  · −8 [pow_neg_exp_negative]   · −1/8   ✔ 1/8   · 1/2 [pow_neg_exp_forget_power]
+  pièges : pow_neg_exp_negative, pow_neg_exp_forget_power
+
+Combien vaut (2/3)^−2 ?
+  ✔ 9/4   · 3/2 [pow_neg_exp_forget_power]   · −4/9 [pow_neg_exp_negative]   · −9/4
+  pièges : pow_neg_exp_negative, pow_neg_exp_forget_power
+
+Combien vaut (1/2)^−1 ?
+  · −1/2 [pow_neg_exp_negative]   · 3   · −2   ✔ 2
+  pièges : pow_neg_exp_negative
+
+```
+
+### Niveau 4
+
+```
+Calcule et donne le résultat sous forme irréductible.
+  2^−2   [free, irréductible] → 1/4
+  pièges : pow_neg_exp_negative, pow_neg_exp_forget_power
+
+Calcule et donne le résultat sous forme irréductible.
+  (−1/2)^−2   [free, irréductible] → 4
+  pièges : neg_power_brackets, pow_neg_exp_forget_power, pow_neg_exp_negative
+
+Calcule et donne le résultat sous forme irréductible.
+  (1/2)^−2 × 5   [free, irréductible] → 20
+  pièges : pow_neg_exp_negative, pow_neg_exp_forget_power
+
+```
+
+### Niveau 5
+
+```
+Calcule et donne le résultat sous forme irréductible.
+  (−1/6)^−2 + 1/4   [free, irréductible] → 145/4
+  pièges : neg_power_brackets, pow_neg_exp_forget_power, int_plus_frac, pow_neg_exp_negative, add_sizes_keep_minus
+
+Calcule et donne le résultat sous forme irréductible.
+  2^−1 + (1/2)^2   [free, irréductible] → 3/4
+  pièges : add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, pow_neg_exp_negative
+
+Calcule et donne le résultat sous forme irréductible.
+  (−3/4)^−2 + 1/2   [free, irréductible] → 41/18
+  pièges : neg_power_brackets, pow_neg_exp_forget_power, add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, pow_neg_exp_negative, add_sizes_keep_minus
+
+```
+
 ## Pièges de cette unité
 
 - **Multiplier par l'exposant** (`pow_times_exponent`, R) : 3² = 6 au lieu de 3² = 9
 - **Puissance 0 égale 0** (`pow_zero_is_zero`, R) : 5⁰ = 0 au lieu de 5⁰ = 1
 - **Puissance 0 égale le nombre** (`pow_zero_is_base`, E) : 5⁰ = 5 au lieu de 5⁰ = 1
 - **Exposant négatif, nombre négatif** (`pow_neg_exp_negative`, R) : 10⁻² = −100 au lieu de 10⁻² = 1/100 = 0,01
+- **Inverser sans garder l'exposant** (`pow_neg_exp_forget_power`, E) : (2/3)⁻² = 3/2 au lieu de (2/3)⁻² = (3/2)² = 9/4
 - **Mauvais signe pour la puissance d'un négatif** (`pow_neg_base_sign`, E) : (−2)⁴ = −16 au lieu de (−2)⁴ = 16
 - **Élever seulement le numérateur** (`pow_fraction_numerator_only`, E) : (2/3)² = 4/3 au lieu de (2/3)² = 4/9
 - **Oublier des décimales en élevant au carré** (`pow_decimal_places`, E) : 0,3² = 0,9 au lieu de 0,3² = 0,09

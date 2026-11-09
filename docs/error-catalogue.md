@@ -151,6 +151,7 @@ Some traps were added while writing the units and are not in the tables above. T
 |---|---|
 | Negatives | `sign_of_first` (−3 + 8 = −5), `product_sign_count`, `read_neg_as_pos`, `neg_line_direction`, `opposite_inverse` (opposite of 5 = 1/5) |
 | Powers | `pow_zero_is_base` (5⁰ = 5), `pow_fraction_numerator_only` ((2/3)² = 4/3), `pow_decimal_places` (0,3² = 0,9), `pow_before_product` (2 × 3² = 36), `pow_product_multiply_bases` (2³ × 2⁴ = 4⁷), `pow_quotient_divide_exp`, `pow_ten_count_digits` (1 000 = 10⁴), `exp_sign_small_number` (0,001 = 10³), `sci_count_zeros` |
+| Mixed calculations | `pow_neg_exp_forget_power` ((2/3)⁻² = 3/2), `sqrt_numerator_only` (√(9/16) = 3/16) |
 | Mental arithmetic | `fact_add_for_sub` (13 − 8 = 21), `fact_mul_for_add` (3 + 4 = 12), `count_off_by_one` (8 + 3 = 12), `forget_carry` (47 + 8 = 45), `compensation_wrong_way` (47 + 38 = 47 + 40 + 2), `square_digits` (23² = 49), `missing_factor_subtract` (7 × … = 56 → 49), `round_truncate` (3,47 → 3,4) |
 | Roots | `sqrt_is_square` (√9 = 81), `sqrt_of_square_sign`, `sqrt_squared_squares` ((√7)² = 49), `sqrt_product_add` (√2 × √8 = √10), `sqrt_forget_root`, `square_negative_solutions` |
 

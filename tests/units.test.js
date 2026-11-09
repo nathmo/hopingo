@@ -63,9 +63,11 @@ test('diagnosis names sign, power and root mistakes', () => {
     ['√16', 8, 'sqrt_half'],
     ['√(9+16)', 7, 'sqrt_distribute_sum'],
     ['√9+√16', 5, 'sqrt_combine_sum'],
+    ['(2/3)^-2', [3, 2], 'pow_neg_exp_forget_power'],
+    ['√(9/16)', [3, 16], 'sqrt_numerator_only'],
   ];
   for (const [expr, wrong, rule] of cases) {
-    const d = diagnose(parse(expr), new Q(wrong));
+    const d = diagnose(parse(expr), Array.isArray(wrong) ? new Q(...wrong) : new Q(wrong));
     assert.ok(d, `${expr} → ${wrong} not diagnosed`);
     assert.deepEqual(d.rules, [rule], `${expr} → ${wrong}`);
   }

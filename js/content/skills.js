@@ -9,6 +9,7 @@ export const UNITS = [
   { id: 'relatifs', title: 'Nombres relatifs', color: '#e8590c', ready: true },
   { id: 'puissances', title: 'Puissances', color: '#0ca678', ready: true },
   { id: 'racines', title: 'Racines carrées', color: '#1c7ed6', ready: true },
+  { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
 ];
 
 // Times tables and mental arithmetic. Fact skills are played as fast
@@ -425,6 +426,15 @@ const PUISSANCES = [
       example: [{ math: '3,4×10^4', note: '= 34 000' }, { math: '5,2×10^-3', note: '= 0,0052' }],
     },
   },
+  {
+    id: 'pow-frac', unit: 'puissances', year: 10, prereqs: ['pow-sign', 'pow-ten', 'frac-mul'], icon: '(⅔)²',
+    title: 'Puissances de fractions',
+    desc: '(2/3)², (−1/2)³ et les exposants négatifs : (2/3)⁻² = 9/4.',
+    intro: {
+      rule: 'Toute la fraction est élevée : (2/3)² = 2/3 × 2/3 = <b>4/9</b>.<br>Le signe suit la règle des facteurs : (−1/2)³ = <b>−1/8</b>.<br>Un exposant négatif donne l\'inverse, et l\'exposant reste : (2/3)⁻² = (3/2)² = <b>9/4</b>.',
+      solve: '(2/3)^-2',
+    },
+  },
 ];
 
 const RACINES = [
@@ -473,10 +483,50 @@ const RACINES = [
       solve: '√2×√8',
     },
   },
+  {
+    id: 'root-frac', unit: 'racines', year: 11, prereqs: ['root-calc', 'frac-mul'], icon: '√⅔',
+    title: 'Racines et fractions',
+    desc: '√(9/16) = 3/4, puis dans des calculs.',
+    intro: {
+      rule: 'La racine porte sur toute la fraction : √(9/16) = √9 / √16 = <b>3/4</b>.<br>Dans un calcul, on la traite comme une puissance : avant × et ÷.',
+      solve: '√(9/16)×(-2)^2',
+    },
+  },
+];
+
+// Calculations that mix the chapters above (content/melanges.js).
+const MELANGES = [
+  {
+    id: 'mix-9', unit: 'melanges', year: 9, prereqs: ['rel-chain', 'frac-add-any', 'frac-mul-int', 'pow-def'], icon: '🧩',
+    title: 'Calculs mélangés 9H',
+    desc: 'Nombres relatifs, fractions et carrés dans un même calcul.',
+    intro: {
+      rule: 'Plusieurs chapitres dans un seul calcul : on garde les priorités.<br>D\'abord les parenthèses, puis les puissances, puis × et ÷, puis + et −.',
+      solve: '4^2-(-3)',
+    },
+  },
+  {
+    id: 'mix-10', unit: 'melanges', year: 10, prereqs: ['mix-9', 'rel-frac', 'pow-sign'], icon: '🧩',
+    title: 'Calculs mélangés 10H',
+    desc: 'Fractions relatives et puissances de négatifs.',
+    intro: {
+      rule: 'Les règles des signes et des fractions se combinent. Avance une opération à la fois, dans l\'ordre des priorités.',
+      solve: '(-1/2)^2+3/4×(-2)',
+    },
+  },
+  {
+    id: 'mix-11', unit: 'melanges', year: 11, prereqs: ['mix-10', 'root-frac', 'pow-frac'], icon: '🧩',
+    title: 'Calculs mélangés 11H',
+    desc: 'Tout ensemble : racines, exposants négatifs, fractions relatives.',
+    intro: {
+      rule: 'Racines et puissances passent avant × et ÷. Un exposant négatif donne l\'inverse.',
+      solve: '(-1/2)^2-3/4×√(16/9)',
+    },
+  },
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL

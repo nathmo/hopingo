@@ -69,7 +69,7 @@ Calcule √14400.
 
 Calcule √(49/100).
   → 7/10
-  pièges : sqrt_half, sqrt_is_square
+  pièges : sqrt_half, sqrt_numerator_only, sqrt_is_square
 
 ```
 
@@ -185,7 +185,7 @@ _√(9 + 16) n'est pas √9 + √16._
 ```
 Calcule √1,44.
   → 1,2 (decimal)
-  pièges : sqrt_half, sqrt_is_square
+  pièges : sqrt_half, sqrt_numerator_only, sqrt_is_square
 
 Calcule √0,16.
   → 0,4 (decimal)
@@ -193,7 +193,7 @@ Calcule √0,16.
 
 Calcule √1,21.
   → 1,1 (decimal)
-  pièges : sqrt_half, sqrt_is_square
+  pièges : sqrt_half, sqrt_numerator_only, sqrt_is_square
 
 ```
 
@@ -443,9 +443,99 @@ Calcule (2×√3)^2.
 
 ```
 
+## Racines et fractions (`root-frac`, 11H)
+
+_√(9/16) = 3/4, puis dans des calculs._
+
+### Niveau 1
+
+```
+Calcule √(25/81).
+  → 5/9   pièges attendus : 5/81 [sqrt_numerator_only]
+  pièges : sqrt_numerator_only, sqrt_half, sqrt_is_square
+
+Calcule √(4/9).
+  → 2/3   pièges attendus : 2/9 [sqrt_numerator_only]
+  pièges : sqrt_numerator_only, sqrt_half, sqrt_is_square
+
+Calcule √(9/100).
+  → 3/10   pièges attendus : 3/100 [sqrt_numerator_only]
+  pièges : sqrt_numerator_only, sqrt_half, sqrt_is_square
+
+```
+
+### Niveau 2
+
+```
+Calcule et donne le résultat sous forme irréductible.
+  √(36/49) × 5   [guided, irréductible] → 30/7
+  pièges : int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
+
+Calcule et donne le résultat sous forme irréductible.
+  √(1/36) × 4   [guided, irréductible] → 2/3
+  pièges : int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
+
+Calcule et donne le résultat sous forme irréductible.
+  √(9/25) + 3/4   [guided, irréductible] → 27/20
+  pièges : add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, sqrt_half, sqrt_numerator_only, sqrt_is_square
+
+```
+
+### Niveau 3
+
+```
+Calcule et donne le résultat sous forme irréductible.
+  √81 × √(1/36)   [tap, irréductible] → 3/2
+  pièges : int_times_both, sqrt_half, sqrt_is_square, sqrt_numerator_only
+
+Calcule et donne le résultat sous forme irréductible.
+  5 × √(9/49) − 1/6   [tap, irréductible] → 83/42
+  pièges : sub_across, ignore_denominators, forget_amplify, int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
+
+Calcule et donne le résultat sous forme irréductible.
+  √25 × √(9/16)   [tap, irréductible] → 15/4
+  pièges : int_times_both, sqrt_half, sqrt_is_square, sqrt_numerator_only
+
+```
+
+### Niveau 4
+
+```
+Calcule et donne le résultat sous forme irréductible.
+  (√(16/25) − 1/5) × (−4)   [free, irréductible] → -12/5
+  pièges : ignore_parentheses, int_times_both, mul_sign_dropped, sqrt_half, sqrt_numerator_only, sqrt_is_square, sub_neg_subtracts
+
+Calcule et donne le résultat sous forme irréductible.
+  (√(1/16) − 4/5) × 4   [free, irréductible] → -11/5
+  pièges : ignore_parentheses, ignore_denominators, int_times_both, mul_sign_dropped, sub_across, forget_amplify, sqrt_half, sqrt_is_square, reverse_subtraction, sqrt_numerator_only
+
+Calcule et donne le résultat sous forme irréductible.
+  (−5/6)^2 ÷ √(9/16)   [free, irréductible] → 25/27
+  pièges : neg_power_brackets, mult_across_division, invert_first, pow_fraction_numerator_only, sqrt_half, sqrt_numerator_only, sqrt_is_square
+
+```
+
+### Niveau 5
+
+```
+Calcule et donne le résultat sous forme irréductible.
+  √36 − (−1/2)^−1 × √(1/4)   [free, irréductible] → 7
+  pièges : priority_left_to_right, sub_neg_subtracts, sqrt_half, sqrt_is_square, int_times_both, pow_neg_exp_negative, sqrt_numerator_only
+
+Calcule et donne le résultat sous forme irréductible.
+  (−5/6)^2 ÷ √(4/9) − 2/3   [free, irréductible] → 3/8
+  pièges : neg_power_brackets, sub_across, ignore_denominators, forget_amplify, mult_across_division, invert_first, pow_fraction_numerator_only, sqrt_half, sqrt_is_square, minus_minus_positive
+
+Calcule et donne le résultat sous forme irréductible.
+  √81 − (−1/6)^−1 × √(1/25)   [free, irréductible] → 51/5
+  pièges : priority_left_to_right, sub_neg_subtracts, sqrt_half, sqrt_is_square, int_times_both, pow_neg_exp_negative, sqrt_numerator_only
+
+```
+
 ## Pièges de cette unité
 
 - **Racine carrée égale la moitié** (`sqrt_half`, R) : √16 = 8 au lieu de √16 = 4
+- **Racine du numérateur seulement** (`sqrt_numerator_only`, E) : √(9/16) = 3/16 au lieu de √(9/16) = 3/4
 - **Élever au carré au lieu de prendre la racine** (`sqrt_is_square`, E) : √9 = 81 au lieu de √9 = 3
 - **Distribuer la racine sur une somme** (`sqrt_distribute_sum`, R) : √(9 + 16) = 3 + 4 = 7 au lieu de √(9 + 16) = √25 = 5
 - **Regrouper une somme sous une seule racine** (`sqrt_combine_sum`, R) : √9 + √16 = √25 = 5 au lieu de √9 + √16 = 3 + 4 = 7
