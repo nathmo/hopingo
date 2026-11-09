@@ -508,3 +508,59 @@ test('tap menus for sums follow the student\'s line', () => {
   assert.deepEqual(valid('induction', 'sum(k,k,1,n)+n+1'), ['hyp']);
   assert.deepEqual(valid('induction', 'n(n+1)/2+n+1'), ['factor']);
 });
+
+// ---------- step U1, part b: module G2 ----------
+
+test('equiv (G2): powers, logarithms, an identity to reach, letters standing for tanh x', () => {
+  const j = JUDGES.equiv;
+  const E2 = (cfg, prev, line) => j.judgeLine({ kind: 'equiv', ...cfg }, P(prev, { vars: cfg.vars }), line);
+  const pw = { vars: ['a', 'b'], domain: { a: [0.2, 4], b: [0.2, 4] }, target: 'powers' };
+  assert.equal(E2(pw, '(a^(1/2)b^(-1/3))^6/(a^2b^(-3))', 'a^3b^(-2)/(a^2b^(-3))').kind, 'ok');
+  assert.equal(E2(pw, 'a^(3-2)b^(-2+3)', 'ab').kind, 'done');
+  assert.equal(E2(pw, 'a^(3-2)b^(-2+3)', 'a^(13/2)b').kind, 'wrong');
+  const ln = { vars: ['x'], domain: { x: [0.2, 5] }, target: 'log-expanded' };
+  assert.equal(E2(ln, 'ln(e^2×sqrt(x)/x^3)', 'ln(e^2)+ln(sqrt(x))-ln(x^3)').kind, 'ok');
+  const st = E2(ln, 'ln(e^2)+ln(sqrt(x))-ln(x^3)', '2+(1/2)ln(x)-3ln(x)');
+  assert.equal(st.kind, 'stay');
+  assert.match(st.message, /même logarithme/);
+  assert.equal(E2(ln, 'ln(e^2)+ln(sqrt(x))-ln(x^3)', '2-(5/2)ln(x)').kind, 'done');
+  const w = E2(ln, 'ln(x^3)', 'ln(x)^3');
+  assert.equal(w.kind, 'wrong');
+  assert.equal(w.rule, 'g2_log_power');
+  assert.equal(E2({ ...ln, target: 'log-single' }, '2ln(x)-ln(x+1)+3', 'ln(e^3x^2/(x+1))').kind, 'done');
+  const goal = { vars: ['x'], domain: { x: [-2, 2] }, target: 'goal', goal: 'sinh(2x)' };
+  assert.equal(E2(goal, '2sinh(x)cosh(x)', '(e^(2x)-e^(-2x))/2').kind, 'ok');
+  assert.equal(E2(goal, '(e^(2x)-e^(-2x))/2', 'sinh(2x)').kind, 'done');
+  const t = { vars: ['x', 't'], domain: { x: [-2, 2] }, target: 'only', finalVars: ['t'], subst: { t: 'tanh(x)' } };
+  assert.equal(E2(t, 'cosh(2x)', 'cosh(x)^2+sinh(x)^2').kind, 'ok');
+  assert.equal(E2(t, '(1+tanh(x)^2)/(1-tanh(x)^2)', '(1+t^2)/(1-t^2)').kind, 'done');
+  const s = E2(t, 'cosh(2x)', 'cosh(x)^2-sinh(x)^2');
+  assert.equal(s.kind, 'wrong');
+  assert.equal(s.rule, 'g2_hyp_trig_sign');
+});
+
+test('value (G2): real powers through the CAS, a logarithm as final form', () => {
+  const j = JUDGES.value;
+  assert.equal(j.judgeLine({ kind: 'value' }, P('8^(2/3)'), '(8^(1/3))^2').kind, 'ok');
+  assert.equal(j.judgeLine({ kind: 'value' }, P('(8^(1/3))^2'), '4').kind, 'done');
+  assert.equal(j.judgeLine({ kind: 'value' }, P('8^(2/3)'), '(8^(1/2))^3').kind, 'wrong');
+  const lg = { kind: 'value', form: 'log' };
+  assert.equal(j.judgeLine(lg, P('argsh(3/4)'), 'ln(3/4+5/4)').kind, 'ok');
+  assert.equal(j.judgeLine(lg, P('ln(3/4+5/4)'), 'ln(2)').kind, 'done');
+  assert.equal(j.judgeLine(lg, P('argsh(3/4)'), 'ln(3)').kind, 'wrong');
+});
+
+test('per-line menus (steps) and the compiled numeric scan', async () => {
+  const cfg = { kind: 'solset', v: 'x', menus: [{ at: 'e^(2x)-e^x-6=0', options: [{ id: 'a', valid: true }, { id: 'b', valid: false }] }] };
+  assert.equal(actionsFor('steps', P('e^(2x)-e^x-6=0'), cfg).find((o) => o.valid).id, 'a');
+  assert.deepEqual(actionsFor('steps', P('t^2-t-6=0', { vars: ['t'] }), cfg), []);
+  const { compileFloat, evalFloat } = await import('../js/cas/numeric.js');
+  for (const t of ['log_(1/3)(2x-1)+x^(1/3)', 'cosh(x)^2-sqrt(x+1)/x', '(x^2)^x-x^(x^2)', '|x-2|×e^(-x)']) {
+    const f = compileFloat(P(t), 'x');
+    for (const x of [-1.5, -0.3, 0.7, 2, 3.1]) {
+      const a = f(x);
+      const b = evalFloat(P(t), { x });
+      assert.ok((Number.isNaN(a) && Number.isNaN(b)) || Math.abs(a - b) < 1e-12, `${t} at ${x}`);
+    }
+  }
+});

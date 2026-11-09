@@ -31,7 +31,7 @@ Calcule f′(x) pour f(x) = e^(3x + 3).
     (C'est une composée f(g(x)) avec g(x) = 3x + 3 : (f∘g)′ = f′(g)·g′.)
     = e^(3x + 3)·□   (trous : e^(3x + 3)·3)   ← Règle de chaîne, avec les dérivées usuelles
   aides : C'est une composée f(g(x)) avec g(x) = 3x + 3 : (f∘g)′ = f′(g)·g′. | = e^(3x + 3)·□ | = 3e^(3x + 3)
-  pièges : g6_chain_forgot
+  pièges : g6_chain_forgot, g2_exp_sum
 
 ```
 

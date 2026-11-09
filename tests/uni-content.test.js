@@ -36,10 +36,16 @@ const UNI = UNI_SKILLS.map((s) => s.id);
 function wrongLine(cfg, final) {
   if (cfg.kind === 'logic') return `¬(${final})`;
   if (cfg.kind === 'solset') {
-    const S = solutionSet(parse(final, parseOpts(cfg)), cfg);
+    // With parameters, the bounds hold letters: add a far point.
+    let S = null;
+    try { S = solutionSet(parse(final, parseOpts(cfg)), cfg); } catch { S = null; }
+    if (!S) return `${final}∪{1000}`.replace(/^([^{\[\]∅ℝ].*)∪\{1000\}$/, `($1)∨${cfg.v || 'x'}=1000`);
     const out = ['1000', '-1000', '1/7', '-55'].find((x) => !contains01(S, Number(x.includes('/') ? 1 / 7 : x)));
     if (!out) return toText(setToNode(minus(S, solutionSet(parse('{0}'), cfg))));
-    return toText(setToNode(union(S, solutionSet(parse(`{${out}}`), cfg))));
+    // Added to the line as written (its bounds may be floats).
+    const n = parse(final, parseOpts(cfg));
+    const isSet = ['set', 'setop'].includes(n.t);
+    return isSet ? `${final}∪{${out}}` : `(${final})∨${cfg.v || 'x'}=${out}`;
   }
   return `${final}+1`;
 }
@@ -145,6 +151,10 @@ function checkItem(it, where) {
   }
 }
 
+// Items per level: 40, fewer (never under 15) for skills whose lines are
+// all judged by the numeric scan of sets.js.
+const COUNT = { 'g2-exp-eq': 25, 'g2-ineq': 25 };
+
 test('every university skill: 5 levels and exam variants, 40 items each', () => {
   const rng = makeRng(17);
   for (const id of UNI) {
@@ -154,7 +164,7 @@ test('every university skill: 5 levels and exam variants, 40 items each', () => 
     const runs = [...[1, 2, 3, 4, 5].map((level) => ({ level })), ...(s.exam || []).map((exam) => ({ level: 4, exam }))];
     for (const { level, exam } of runs) {
       const modes = new Set();
-      for (let i = 0; i < 40; i++) {
+      for (let i = 0; i < (COUNT[id] ?? 40); i++) {
         const it = generate(id, level, rng, null, exam ? { exam } : undefined);
         const where = `${id} L${level}${exam ? ` ${exam}` : ''}: ${it.key}`;
         total++;

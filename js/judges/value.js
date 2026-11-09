@@ -2,7 +2,8 @@
 // the previous one. Lines made of numbers only are handed to the school
 // judge (js/math/judge.js), with its diagnosis of calculation traps; the
 // others (π, sin 0, √2) are compared exactly when possible, else in
-// floating point. cfg: {form: 'irreducible' (default) | 'any', expect?}.
+// floating point. cfg: {form: 'irreducible' (default) | 'any' | 'log', expect?}.
+// form 'log': a number or the logarithm of a whole number (ln 2, −ln 3) is final.
 // With cfg.expect (text), a line is right if it has that value, whatever
 // the previous line: the segment asks for a number (« A = ? »).
 // With cfg.terms (texts of numbers), the line must be a Σ whose terms are
@@ -30,8 +31,20 @@ function isLiteral(n) {
   return n.t === 'num' || (n.t === 'frac' && n.n.t === 'num' && n.d.t === 'num');
 }
 
+// ln(2), −ln(3), 3·ln(2): a logarithm of a whole number (form 'log', G2).
+function isLogLiteral(n) {
+  n = stripParen(n);
+  if (n.t === 'neg') n = stripParen(n.e);
+  if (n.t === 'bin' && n.op === '×' && isLiteral(n.l)) n = stripParen(n.r);
+  if (n.t === 'frac' && isLiteral(n.d)) n = stripParen(n.n);
+  if (n.t !== 'fn' || !['ln', 'log', 'Log'].includes(n.name)) return false;
+  const k = numValue(stripParen(n.args[0]));
+  return !!k && k.isInt() && k.n >= 2;
+}
+
 export function isFinal(cfg, node) {
   if (cfg.terms) return !!sumTerms(node);
+  if (cfg.form === 'log' && !isLiteral(node)) return isLogLiteral(node);
   if (!isLiteral(node)) return false;
   if ((cfg.form ?? 'irreducible') === 'any') return true;
   const n = stripParen(node.t === 'neg' ? node.e : node);
@@ -126,8 +139,13 @@ export function judgeLine(cfg, prev, input) {
   const prevText = toText(prev);
   const text = toText(node);
   if (tryParseSchool(prevText) && tryParseSchool(text)) {
-    const r = schoolJudge(parseSchool(prevText), text, { requireIrreducible: (cfg.form ?? 'irreducible') !== 'any' });
+    let r;
+    try {
+      r = schoolJudge(parseSchool(prevText), text, { requireIrreducible: (cfg.form ?? 'irreducible') !== 'any' });
+    } catch { return casJudge(cfg, prev, node); }
     const kind = KIND[r.kind] ?? r.kind;
+    // The school evaluator knows no real powers (8^(1/3)): the CAS decides.
+    if (kind === 'parse') return casJudge(cfg, prev, node);
     const out = { kind, node, diag: r.diag ?? null, rule: r.diag?.rules?.[0] ?? null };
     if (kind === 'stay') out.message = 'C\'est juste, mais simplifie encore.';
     if (kind === 'done' && !isSchoolLiteral(r.node)) out.kind = 'ok';
@@ -138,9 +156,13 @@ export function judgeLine(cfg, prev, input) {
       const diag = moduleTrap(cfg, prev, node);
       if (diag) Object.assign(out, { rule: diag.rules[0], diag });
     }
-    if (kind === 'parse') out.message = r.message;
     return out;
   }
+  return casJudge(cfg, prev, node);
+}
+
+// Exact comparison by the CAS, else in floating point.
+function casJudge(cfg, prev, node) {
   if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
   const a = valueOf(prev);
   const b = valueOf(node);

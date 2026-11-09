@@ -1309,7 +1309,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ---
 # G2. Exponentielles, logarithmes, fonctions hyperboliques
 
-Unité `explog` · préfixe `g2-` · pièges `g2_` · Statut : à faire
+Unité `explog` · préfixe `g2-` · pièges `g2_` · Statut : fait le 9 novembre 2026 (étape U1, partie b). Le niveau 5 est l'item le plus difficile sans aide, en attendant le type `problem` (U4) : `g2-exp-eq` sans l'inéquation associée, `g2-arg` sans l'enchaînement avec `g1-surjective`. Les graphes de `g2-hyp-def` (L3) sont des QCM en mots. Le V/F « (−8)^(1/3) » (convention, sans contre-exemple vérifiable) est remplacé par d'autres énoncés sur les puissances.
 
 **Sources** : MAN, examen Math 1A 2017 (Q10, inéquation logarithmique avec base 1/10, 8 pts ; Q11d, nombre de solutions de cosh x = −x + 1) et formulaire M1A (trigonométrie hyperbolique) ; CMS, Analyse II, séries 11 (logarithmes), 12 (inéquations exp/log, équations du type xˣ) et 13 (formules et équations hyperboliques).
 **Notation** : ln et Log acceptés (logarithme naturel) ; log_a pour une autre base ; log₁₀ écrit `log_10`. Puissance réelle aˣ seulement pour a > 0. Fonctions réciproques : argsh, argch, argth (arg sinh, arg cosh, arg tanh acceptés à la saisie).

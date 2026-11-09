@@ -173,7 +173,7 @@ export function judgeLine(cfg, prevIn, input, state = {}) {
   if (sameLine(node, prevIn)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
   const bad = undefinedPart(node, cfg);
   if (bad) {
-    const diag = diagnoseLine('solset', prev, node, cfg, (cand, line) => sameSet(cand, line, cfg));
+    const diag = diagnoseLine('solset', prev, node, cfg, (cand, line) => !!undefinedPart(cand, cfg) && sameSet(cand, line, cfg));
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `${toReadable(bad)} n'existe pas : ${bad.t === 'sqrt' ? 'on ne prend la racine que d\'un nombre ≥ 0' : 'regarde le signe de ce qui est dedans'}.` };
   }
   // A domain line: checked against the domain of the first line.

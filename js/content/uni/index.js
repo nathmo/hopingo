@@ -11,9 +11,10 @@
 import * as logique from './logique.skills.js';
 import * as polynomes from './polynomes.skills.js';
 import * as analyse0 from './analyse0.skills.js';
+import * as explog from './explog.skills.js';
 import * as recurrence from './recurrence.skills.js';
 
-const MODULES = [logique, polynomes, analyse0, recurrence];
+const MODULES = [logique, polynomes, analyse0, explog, recurrence];
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -26,6 +27,9 @@ export const UNBUILT = {
   'g1-compose': ['rat-domain'],
   // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
   'g8-algebraic': ['lit-identities'],
-  // TEMP u1b-merge: g2-real-powers (module G2, built in parallel) ← pow-rules, root-rules.
-  'g2-real-powers': ['pow-rules', 'root-rules'],
+  // G1 skills built in parallel (step U1b), needed by G2.
+  'g1-domain': ['g9-intervals', 'rat-domain'], // TEMP u1b-merge
+  'g1-trinome-sign': ['g9-intervals', 'quad-formula'], // TEMP u1b-merge
+  'g1-inverse': ['rat-domain', 'iso-formula'], // TEMP u1b-merge
+  'g1-parity-period': ['rat-domain', 'g9-counterexample'], // TEMP u1b-merge
 };
