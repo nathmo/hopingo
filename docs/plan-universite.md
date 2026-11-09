@@ -8,6 +8,8 @@ La révision s'appuie sur des notes de cours réelles :
 - le recueil d'exercices de Douchet (vol. 1 et 2) ;
 - les cours de BA5 et du master qui utilisent les matrices. Ils servent à définir le module d'analyse matricielle.
 
+**Pour construire :** la spécification d'implémentation est dans [universite/README.md](universite/README.md). Elle couvre l'architecture, les formats, les juges, le mode examen et les étapes avec leurs critères de fin. Elle est complétée par un catalogue détaillé par module, compétence par compétence, dans [universite/](universite/). Ce qui dépasse la 2e année est dans [plan-ba5-et-plus.md](plan-ba5-et-plus.md).
+
 ## 1. Le but, et le chemin
 
 L'objectif est qu'un étudiant MT ou GM puisse faire, pas à pas et avec un retour à chaque ligne, les exercices de mathématiques des deux premières années de l'EPFL. Il doit aussi arriver prêt aux cours qui utilisent les matrices ensuite (automatique, signaux, robotique).
@@ -19,7 +21,8 @@ L'objectif est qu'un étudiant MT ou GM puisse faire, pas à pas et avec un reto
 | BA2 | Analyse II, avec les équations différentielles | A2 |
 | BA3 | Analyse III ; Probabilités et statistique (GM, MATH-234) | V, C, F (selon l'année), P |
 | BA4 | Analyse IV ; Analyse numérique (MT : « et optimisation ») ; Statistique pour data science (MT, EE-209) | V, C, F ; N ; P |
-| Pont vers BA5 et plus | Automatique, signaux et systèmes, régression, commande prédictive (MPC), robotique | **M. Analyse matricielle** |
+| BA4, transversal | Ce que l'analyse numérique, la statistique et les systèmes dynamiques utilisent sur les matrices | **M. Analyse matricielle** |
+| BA5 et plus | Automatique, signaux et systèmes, MPC, robotique, apprentissage automatique | Plan séparé : [plan-ba5-et-plus.md](plan-ba5-et-plus.md) |
 
 **Analyse III et IV changent selon la section et l'année.** C'est pourquoi le plan les découpe par thème plutôt que par cours :
 - **V** : analyse vectorielle ;
@@ -32,7 +35,9 @@ L'objectif est qu'un étudiant MT ou GM puisse faire, pas à pas et avec un reto
 | MT 2021-22 (cours en anglais) | V + séries et transformée de Fourier, applications | C + Laplace + EDP + distributions |
 | GM (livre de Dacorogna et Tanteri, 2020 et après) | V + Fourier + Laplace + EDO/EDP (Sturm-Liouville) | C + transformées |
 
-Le profil demande la section et l'année. L'app choisit l'ordre des modules en fonction, mais les compétences sont les mêmes.
+**L'app ne demande pas la section.** Les contenus suivent MT en année normale : V et C en BA3, F en BA4. Ce qui est propre à une section porte une étiquette (`GM`, `MT/SV`) mais reste obligatoire, par exemple les distributions et Sturm-Liouville.
+
+Les deux cours de probabilités et statistique sont couverts : MATH-234 (GM) et EE-209 (MT).
 
 Le chemin dans l'app :
 
@@ -43,10 +48,11 @@ Hopingo aujourd'hui (5H–11H) → plan calcul-algèbre (C–N, jusqu'au Gym)
     → BA1 : A1 Analyse I, L Algèbre linéaire
       → BA2 : A2 Analyse II (avec les EDO)
         → BA3–BA4 : V, C, F, P, N
-          → M Analyse matricielle (pont vers BA5+)
+          → M Analyse matricielle (niveau BA4)
+            → plan séparé BA5 et plus
 ```
 
-Cela fait environ **450 nouvelles compétences**, détaillées au §7.
+Cela fait **487 nouvelles compétences** et 859 pièges, résumés au §7 et détaillés un par un dans les catalogues de [universite/](universite/) (tableau complet : [universite/INDEX.md](universite/INDEX.md)).
 
 ## 2. Ce que montrent les notes de cours
 
@@ -54,7 +60,7 @@ Ces constats changent la forme des exercices autant que leur contenu.
 
 | Constat | Source | Conséquence pour l'app |
 |---|---|---|
-| **Les examens de BA1–BA2 sont surtout des QCM et des vrai/faux, avec des points négatifs.** Algèbre linéaire 2021 : 16 QCM (+3/0/−1) et 16 vrai/faux (+1/0/−1), aucune partie ouverte. Analyse I GM : QCM et vrai/faux, plus 2 ou 3 questions ouvertes de 2 à 7 points. Analyse II 2019–2021 : seulement des QCM et des vrai/faux. | Examens GM et MT 2018–2022 | L'app entraîne aux deux : le calcul pas à pas pour comprendre, puis le format d'examen. Un vrai/faux demande un contre-exemple, parce qu'un tiers des points se perd sur ces questions. |
+| **Les examens de BA1–BA2 sont surtout des QCM et des vrai/faux, avec des points négatifs.** Algèbre linéaire 2021 : 16 QCM (+3/0/−1) et 16 vrai/faux (+1/0/−1), aucune partie ouverte. Analyse I GM : QCM et vrai/faux, plus 2 ou 3 questions ouvertes de 2 à 7 points. Analyse II 2019–2021 : seulement des QCM et des vrai/faux. | Examens GM et MT 2018–2022 | L'app entraîne aux deux : le calcul pas à pas pour comprendre, puis le format d'examen. Un vrai/faux demande un contre-exemple, parce qu'un tiers des points se perd sur ces questions. Un **mode examen** reprend le format de chaque cours : barème avec points négatifs, minuteur, aucune aide. Il dit ensuite si l'élève est prêt (spécification, §10). |
 | **Un QCM demande souvent *un seul coefficient* d'un long calcul.** « b₃₂ de A⁻¹ », « ℓ₄₂ de L », « r₃₃ de QR », « x₁ de la solution des moindres carrés ». | Algèbre linéaire 2021 ; les notes de révision personnelles « Pool Question Examen » | Nouveau type d'exercice, « Trouver un coefficient ». Les lignes pas à pas restent les mêmes, seule la dernière ligne change (§6). |
 | **Les problèmes longs existent encore**, avec des points par étape (0,5 à 2 points). Exemples : suite récurrente par l'étude de fonction (Analyse I MT 2014, 13 pts) ; SVD complète (Algèbre linéaire MT 2017, 14 pts) ; vérifier le théorème de Stokes (Analyse III 2021, 14 pts). | MAN, CMS, partie spécifique MT, Analyse III et IV | Le barème par étape correspond exactement au jugement ligne par ligne. |
 | **En analyse numérique, l'examen ne fait presque jamais faire de tableaux d'itérations à la main.** Il demande de lire un tableau d'erreurs, de compléter des lignes de Matlab, et de prouver l'ordre d'une formule par Taylor. | Examens 2019–2022 (sur papier, sans calculatrice) | Le module N mise sur la lecture de tableaux, le code à compléter et les preuves d'ordre. Les itérations à la main servent à comprendre, pas à préparer l'examen. |
@@ -113,7 +119,7 @@ Pour l'université, chaque type d'exercice définit quatre choses :
 | Statistique | Valeur avec tolérance | Même valeur | Numérique ; Φ et t calculés par l'app | Décision, phrase d'interprétation, IC arrondi selon la règle des chiffres significatifs |
 | Itérations numériques | Ligne d'un tableau | x(k+1) = Φ(x_k), **calculé à partir de la ligne de l'élève** | Flottants avec tolérance | Critère d'arrêt atteint |
 | Tableau d'erreurs à lire | Ordre, constante, stabilité | Cohérent avec les données | Pente en échelle log-log, rapports | Réponse justifiée par deux lignes du tableau |
-| Ligne de code à compléter | Une expression Matlab ou pseudo-code | Le programme produit le bon résultat | L'app l'exécute sur des cas tests (petit interpréteur) | Tous les tests passent |
+| Ligne de code à compléter | Une expression ou une ligne Python | Le programme produit le bon résultat | L'app l'exécute sur des cas tests, avec un petit interpréteur Python écrit à la main | Tous les tests passent |
 | Intégrale curviligne ou de surface | Paramétrisation, puis intégrale en t (ou u, v), puis valeur | Même valeur ; paramétrisation valide (bonne courbe, bon sens, bonnes bornes) | Numérique, et contrôle de quelques points | Valeur exacte |
 | Bord d'une surface | Liste de morceaux de courbe orientés | Les morceaux qui se réduisent à un point ou qui s'annulent sont retirés | Comparaison géométrique | Bord orienté |
 | Analyse complexe | Expression complexe, pôles, résidus | Même valeur | ℚ(i) exact, contrôle numérique | Valeur |
@@ -207,7 +213,7 @@ On utilise la convention du cours : l'ordre se lit sur les **incréments** |x(k+
 
 Chaque ligne est recalculée à partir de la ligne précédente de l'élève. Le rapport se stabilise, donc l'ordre est 2.
 
-La 2e partie a le format de l'examen : un tableau produit par un programme pour f(x) = (x − 1)². L'élève doit voir que l'ordre tombe à 1, parce que la racine est double. Il complète ensuite la ligne Matlab `x = x - ??? ;`.
+La 2e partie a le format de l'examen : un tableau produit par un programme pour f(x) = (x − 1)². L'élève doit voir que l'ordre tombe à 1, parce que la racine est double. Il complète ensuite la ligne Python `x = x - ???`.
 
 Erreurs reconnues :
 - x − f′/f ;
@@ -282,7 +288,7 @@ En plus de ceux du plan d'algèbre :
 
 ## 7. Les modules
 
-Chaque ligne d'un tableau est une compétence, ou un petit groupe de compétences proches, à exercer en 5 à 10 minutes. La colonne « Source » renvoie aux notes ; « Douchet » désigne le recueil d'exercices. Les étiquettes : **MT** ou **GM** = seulement dans cette section ; **opt.** = peu présent dans les cours, à faire en dernier.
+Chaque ligne d'un tableau est une compétence, ou un petit groupe de compétences proches, à exercer en 5 à 10 minutes. La colonne « Source » renvoie aux notes ; « Douchet » désigne le recueil d'exercices. Les étiquettes **MT** et **GM** disent dans quelle section le sujet est enseigné, et **opt.** qu'il est peu présent dans les cours. Ces étiquettes sont informatives. Tout reste obligatoire, sauf les applications conformes, qu'aucun cours n'exerce. Le catalogue détaillé de chaque module est dans [universite/](universite/).
 
 ### G. Niveau maturité et CMS
 
@@ -669,13 +675,7 @@ Cholesky, le conditionnement et la méthode de la puissance sont dans le module 
 
 ### M. Analyse matricielle (nouveau)
 
-Aucun cours ne porte ce nom. Ce module rassemble ce que les cours de BA4 et des années suivantes utilisent sans le réenseigner :
-- analyse numérique et optimisation ;
-- automatique (ME-326) ;
-- systèmes dynamiques (ME-221) ;
-- signaux et systèmes ;
-- statistique pour data science ;
-- commande prédictive (MPC), robotique, apprentissage automatique.
+Aucun cours ne porte ce nom. Ce module rassemble ce que les cours de BA4 utilisent sans le réenseigner : analyse numérique et optimisation, statistique pour data science, systèmes dynamiques (ME-221). Les usages de BA5 et plus sont dans [plan-ba5-et-plus.md](plan-ba5-et-plus.md) : forme d'état, fonction de transfert, commandabilité, placement de pôles, Lyapunov, ACP, Kalman.
 
 Prérequis : L et les EDO de A2.
 
@@ -692,18 +692,10 @@ Prérequis : L et les EDO de A2.
 | SVD à la main ; image de la sphère ; approximation de rang k | A = [[3, 1, 1], [−1, 3, 1]] → σ = √12 et √10 | Algèbre linéaire MT, compression |
 | Normes matricielles, conditionnement κ | κ₂([[2, −1], [−1, 2]]) = 3 | Analyse numérique |
 | Disques de Gershgorin (opt.) | | Analyse numérique GM |
-| Mettre une EDO sous forme d'état | ÿ + cẏ + 4y = u → A = [[0, 1], [−4, −c]], B = [0 ; 1] | Automatique |
-| Linéariser par la jacobienne | Pendule en θ = 0 | Systèmes dynamiques |
-| Solution par modes propres ; stabilité par Re λ < 0 | | Automatique, analyse numérique |
+| Système x′ = Ax obtenu à partir d'une EDO d'ordre 2 | ÿ + 3ẏ + 2y = 0 → A = [[0, 1], [−2, −3]] | Systèmes dynamiques, analyse numérique |
+| Solution par modes propres ; stabilité par Re λ < 0 | | Systèmes dynamiques, analyse numérique |
 | Exponentielle de matrice, y compris pour une valeur propre double | [[−1, 1], [0, −1]] → e^(−t)·[[1, t], [0, 1]] | Systèmes dynamiques |
-| Fonction de transfert C(sI − A)⁻¹B + D ; pôles = valeurs propres | | Automatique |
-| Commandabilité et observabilité | [B AB] = [[1, −2], [0, 1]], det ≠ 0 | Automatique |
-| Polynôme de matrice p(A) ; placement de pôles (Ackermann) ; observateur | Polynôme cible s² + 7,9s + 98 → K | Automatique |
-| Systèmes discrets x⁺ = Ax : stables si \|λ\| < 1 ; Aᵏ | | MPC, chaînes de Markov |
-| Équation de Lyapunov discrète AᵀPA − P = −Q | a = −0,5 → p = 4q/3 | MPC |
-| Covariance et ACP | Σ = [[2, 1], [1, 2]] → 75 % de la variance sur (1, 1)/√2 | Apprentissage automatique, statistique |
-| Covariance d'un filtre de Kalman (opt.) | | Robotique mobile |
-| Non-normalité : ‖e^(At)‖ peut croître au début (opt.) | | Master |
+| Systèmes discrets x⁺ = Ax : stables si \|λ\| < 1 ; Aᵏ | | Chaînes de Markov, schémas numériques |
 
 ## 8. Pièges à reconnaître
 
@@ -818,16 +810,14 @@ Ce plan ajoute :
    Il reconnaît aussi l'opération élémentaire faite entre deux lignes.
 5. **Probabilités et statistique.** Rationnels exacts, Φ et la loi de Student calculées par l'app, simulation, règle d'arrondi des IC.
 6. **Flottants.** Ceux du navigateur, plus une arithmétique simulée à 4 chiffres.
-7. **Petit interpréteur de code.** Un sous-ensemble de Matlab ou de pseudo-code pour les exercices « compléter le code » : boucles, indices, opérations sur les vecteurs. L'app exécute la ligne de l'élève sur des cas tests.
+7. **Petit interpréteur Python.** Un sous-ensemble de Python écrit à la main, sans `eval` : listes, boucles, fonctions, module `math`. Il sert aux exercices « compléter le code ». L'app exécute la ligne de l'élève sur des cas tests.
 8. **Saisie et affichage.**
    - Le clavier gagne ∫, Σ, lim, d/dx, ∂, ∧, les lettres grecques, une grille de matrice et des indices.
    - L'affichage passe par **MathML**, que les navigateurs affichent sans bibliothèque.
    - Une ligne de Gauss se saisit comme « L2 ← L2 − 3L1 ».
 9. **Lignes de décision, report d'erreur, sous-buts, aides sur demande, problème entier sans aide** (§4).
-10. **Format d'examen.**
-    - Mode QCM et vrai/faux avec le barème du cours (+3/0/−1, ou +1/0/−1), seulement dans un mode « examen ».
-    - Mode « trouver un coefficient ».
-11. **Profil.** La section (MT ou GM) et l'année, qui fixent l'ordre de V, C, F et P.
+10. **Mode examen.** Un examen blanc par cours, au format réel : QCM, vrai/faux et questions ouvertes, barème avec points négatifs, minuteur, aucune aide. Le bilan donne une note estimée, dit si l'élève est « prêt », « presque » ou « pas encore », et liste les compétences à reprendre. En dehors du mode examen, il n'y a jamais de points négatifs.
+11. **Profil.** Les années BA1 à BA4 s'ajoutent. Il n'y a pas de question sur la section.
 12. **Générateurs « à l'envers ».** On part de la réponse pour que les nombres tombent juste :
     - P et D choisis d'abord, puis A = PDP⁻¹ ;
     - les racines d'abord, puis le polynôme ;
@@ -842,7 +832,7 @@ Ce plan ajoute :
     - Laplace → éléments simples (G0) ;
     - Newton → dérivées ;
     - moindres carrés → L, P, N et M ;
-    - forme d'état → EDO (A2) et valeurs propres (L).
+    - systèmes x′ = Ax (M) → EDO (A2) et valeurs propres (L).
 
 ## 10. Ordre de construction
 
@@ -853,20 +843,22 @@ Ces étapes viennent après l'étape 7 du plan d'algèbre. Chaque étape est uti
 | U0 | Fonctions, juge numérique, dérivation symbolique, MathML, nouveau clavier, aides sur demande | Grande | Le socle |
 | U1 | G9 Logique, G0 Polynômes, G1 Fonctions et inéquations, G2 Exp, log, hyperboliques, G3 Trigonométrie, G5 Suites | Grande | |
 | U2 | G6, puis A1 : dérivées, DL, intégrales | Grande | Séries tronquées ; primitives vérifiées par dérivation |
-| U3 | L Algèbre linéaire | Grande | Moteur matriciel ; QCM « trouver un coefficient » |
+| U3 | L Algèbre linéaire, et le mode examen | Grande | Moteur matriciel ; QCM « trouver un coefficient » ; examens blancs |
 | U4 | A1 : réels, complexes (G8), suites, séries, limites, ε-δ, séries entières ; preuves en blocs ; définitions | Grande | Limites ; *Proof Blocks* ; trouver δ |
 | U5 | G4 Géométrie analytique, G10 Coniques | Moyenne | Repère : coniques, courbes paramétrées |
 | U6 | A2 Analyse II, avec les EDO | Grande | Plusieurs variables ; « décrire le domaine » ; juge d'EDO |
-| U7 | G7, puis P | Grande | Lois, simulation, mode examen |
-| U8 | N Analyse numérique | Moyenne | Tableaux ; interpréteur de code |
-| U9 | M Analyse matricielle | Moyenne | Factorisations, exponentielle de matrice |
+| U7 | G7, puis P | Grande | Lois, simulation |
+| U8 | M Analyse matricielle | Moyenne | Factorisations, exponentielle de matrice |
+| U9 | N Analyse numérique | Moyenne | Tableaux ; interpréteur Python |
 | U10 | V, C, F | Grande | Paramétrisations, bord orienté, ℚ(i), transformées |
 
 Raisons de cet ordre :
 - Les dérivées et les intégrales viennent en premier (U2), parce que tout le reste s'en sert et qu'elles sont faciles à vérifier.
 - L'algèbre linéaire (U3) peut être construite en parallèle de U2.
 - Les coniques (U5) viennent après L, parce qu'il faut les valeurs propres pour réduire une conique.
-- M (U9) vient après N, pour ne pas construire deux fois Cholesky et la méthode de la puissance.
+- M (U8) vient avant N (U9) : M possède Cholesky, la méthode de la puissance et le conditionnement, et N s'en sert.
+
+**Un parcours en branches, pas une ligne.** Les étapes de construction ont un ordre ; le parcours de l'élève n'en a pas. Après le calcul de base, une compétence s'ouvre dès que ses vrais prérequis sont acquis, c'est-à-dire ceux que ses exercices utilisent. Plusieurs branches sont ouvertes en même temps, et « Continuer » passe de l'une à l'autre. L'année n'est qu'une indication. Tout est obligatoire par défaut, y compris ce qui n'est enseigné que dans une autre section : apprendre plus que le strict nécessaire est voulu.
 
 ## 11. Limites, et décisions à prendre
 
@@ -876,14 +868,17 @@ Raisons de cet ordre :
 - L'intégrale de Lebesgue et l'analyse de la section de mathématiques.
 - Remplacer le cours. L'app remplace les séries d'exercices et leur corrigé tardif.
 
-**Décisions à prendre :**
-- **Section par défaut.** MT, en année normale (C en Analyse III, F en Analyse IV) ? Le contenu de GM serait couvert aussi, avec une étiquette.
-- **Probabilités et statistique.** Couvrir MATH-234 (GM) et EE-209 (MT), comme proposé, ou seulement EE-209 pour MT ?
-- **Points négatifs.** Les reproduire seulement en mode examen, comme proposé, ou jamais ?
-- **Langage du code à compléter.** Matlab, comme dans les examens d'analyse numérique, Python, comme dans les TP de statistique et les cours récents, ou un pseudo-code neutre ?
-- **Étendue de M.** Les compétences d'automatique (placement de pôles, Lyapunov, ACP) dépassent la 2e année. Faut-il les garder dans ce plan, ou en faire un plan « BA5 et plus » séparé, à relier au futur module de physique ?
-- **Suivre l'erreur.** Partout, ou seulement dans les tableaux et les longs problèmes ?
-- **Notation.** Ce plan suit les cours : xⁿ·ε(x), dl, ∧, 1/√(2π), a₀/2, Log, Arctg. Faut-il accepter aussi les autres notations (o(xⁿ), ds, ×) ?
+**Décisions prises le 9 novembre 2026 :**
+- **Section.** L'app ne pose pas la question. Les contenus suivent MT. Ce qui est propre à une section est étiqueté, mais reste **obligatoire** : le but est que les maths soient agréables, pas d'en faire le minimum.
+- **Parcours.** Il se ramifie après le calcul de base, avec seulement de vrais prérequis (§10).
+- **Probabilités et statistique.** Les deux cours sont couverts, MATH-234 et EE-209.
+- **Points négatifs.** Seulement dans le mode examen, qui sert à mesurer si l'élève est prêt.
+- **Code à compléter.** Python.
+- **Étendue de M.** M s'arrête au niveau BA4. L'automatique, Lyapunov, l'ACP et Kalman vont dans [plan-ba5-et-plus.md](plan-ba5-et-plus.md).
+- **Notation.** On suit les cours, et on accepte aussi les autres écritures en saisie : o(xⁿ), × pour ∧, ln pour Log, arctan pour Arctg.
+- **Suivre l'erreur.** Chaque catalogue dit, item par item, où c'est permis. Par défaut : dans les tableaux et les problèmes longs.
+
+**Encore ouvert :**
 - **Langue.** L'Analyse III MT 2021-22 et EE-209 sont en anglais. Faut-il traduire l'app vers l'anglais à partir de BA3 ?
 
 ## Références
