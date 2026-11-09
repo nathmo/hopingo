@@ -1,6 +1,6 @@
 # Hopingo — le calcul en jouant
 
-A Duolingo-style practice app for mental arithmetic and times tables, fractions, signed numbers, powers and square roots (HarmoS 5H–11H and gymnase, French). It is fully static, with no server: everything runs in the browser and progress is saved in `localStorage`.
+A Duolingo-style practice app for mental arithmetic and times tables, fractions, signed numbers, powers and square roots (HarmoS 5H–11H and gymnase, French), now growing towards the first two years of EPFL (BA1–BA4, see `docs/plan-universite.md` and the implementation spec `docs/universite/README.md`). It is fully static, with no server: everything runs in the browser and progress is saved in `localStorage`.
 
 ## Run it
 
@@ -8,7 +8,7 @@ ES modules don't load from `file://`, so serve the folder:
 
 ```sh
 npm run serve        # python -m http.server 8080, then open http://localhost:8080
-npm test             # math core, content generators, learner engine
+npm test             # math core, symbolic core, judges, content generators, learner engine
 npm run samples      # writes docs/samples-<unit>.md for content review
 ```
 
@@ -26,15 +26,19 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 | Solver | `js/math/solver.js` | Canonical step-by-step solutions (signs, powers, roots included), used for guided blanks, hints and worked examples. |
 | Mistakes | `js/math/malrules.js`, `diagnose.js` | Known errors (« pièges ») as rules. A wrong line is replayed under each rule, and under misreadings of its structure (priorities, brackets, −3² vs (−3)², √(a+b) = √a + √b…), to name the mistake. |
 | Judge | `js/math/judge.js` | A line is valid if it keeps the exact value of the previous one, so any method is accepted. |
-| Skills | `js/content/skills.js` | The skill graph: 136 skills in 18 units, prerequisites, intro cards, HarmoS year. The path follows the school year across units. |
+| Skills | `js/content/skills.js` | The skill graph: 137 skills in 19 units, prerequisites, intro cards, year (HarmoS 5–11, 12 gymnase, 12.5 CMS, 13–16 BA1–BA4). The global order is topological: a prerequisite always comes first. University units register in `js/content/uni/index.js`. |
 | Questions | `js/content/items.js` and one file per unit: `calcul.js`, `fractions.js`, `relatifs.js`, `puissances.js`, `racines.js`, `arithmetique.js`, `proportion.js`, `algebre.js`, `equations.js`, `fonctions.js`, `seconddegre.js`, `melanges.js` (merged in `generators.js`) | One generator per skill, 5 levels each. Records which traps each question can catch. |
 | Algebra | `js/math/algebra.js`, `checkers.js` | Expressions with letters: parser (3x, 2(x+1), x^2), exact polynomials and rational fractions, equivalence (numeric probing when a root appears), and form checks: « développé réduit », « factorisé (complètement) ». The checker says what is left to do and names the trap. |
 | Equations | `js/math/equations.js` | Solution sets (degree ≤ 2, forbidden values removed), judging an equation line by line (same solutions = valid line), the next move for hints, and the classic wrong moves to name the mistake. |
-| Learner | `js/engine/learner.js` | Mastery estimate per skill (Bayesian knowledge tracing), difficulty ladder, repair of prerequisites, spaced review, traps. |
+| Symbolic core | `js/cas/` | For the university units: parser (a superset of `expr.js`: letters, functions, d(f), primes, relations), printers (keypad text, readable text, MathML), sparse polynomials and rational functions over ℚ, exact normal form, numeric sampling, equivalence (exact first, else 12 sampled points), symbolic derivatives. University traps are in `js/cas/rules/`. |
+| Line judges | `js/judges/` | One judge per kind of line (`value`, `equiv` so far), a registry, trap diagnosis by replay, and the `lines` engine: segments, decisions, sub-goals, « continue with my line ». |
+| Learner | `js/engine/learner.js` | Mastery estimate per skill (Bayesian knowledge tracing), difficulty ladder, repair of prerequisites, spaced review, traps, hints, validation alone (`needsSolo`), and the branching path (`nextFocus`). |
 | Facts | `js/engine/facts.js` | Memory of single number facts (7 × 8, 13²): a Leitner box per fact. A fact is automatic once answered right and fast twice. |
 | Lessons | `js/engine/session.js` | Picks each question as you go: path, reviews, traps, mistakes again at the end. |
-| Placement | `js/engine/placement.js` | Quick binary-search skim from the student's year and track. |
+| Placement | `js/engine/placement.js` | Quick binary-search skim from the student's year and track. From BA1 on, and with « Je connais déjà ce module » on the map, the search runs unit by unit. |
 | Rewards | `js/engine/rewards.js` | XP, daily goal, streak with freezes, badges. |
+
+**The path branches.** After the first mental arithmetic, several units are open at once. « Continuer » keeps up to 3 active branches and moves from one to the next at each lesson, so topics mix; a new branch starts with the skill that opens the most others, at the student's current level. A branch can be pinned on the map, any open skill can be started, and a closed skill shows the prerequisite it waits for. Prerequisites are only the skills the exercises really use.
 
 **Adapting to the student:**
 - **Difficulty:** each skill has a level from 1 to 5. Two fast correct answers move it up a level. Two mistakes, or three slow answers, move it down. "Slow" is measured against the student's own pace on that skill.
@@ -55,7 +59,7 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 
 ## Content
 
-The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-calcul.md`, `samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md`, `samples-racines.md`, `samples-arithmetique.md`, `samples-proportion.md`, `samples-unites.md`, `samples-algebre.md`, `samples-factorisation.md`, `samples-equations.md`, `samples-formules.md`, `samples-fonctions.md`, `samples-second.md`, `samples-rationnelles.md`, `samples-synthese.md`, `samples-geometrie.md` and `samples-melanges.md`.
+The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-analyse0.md`, `docs/samples-calcul.md`, `samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md`, `samples-racines.md`, `samples-arithmetique.md`, `samples-proportion.md`, `samples-unites.md`, `samples-algebre.md`, `samples-factorisation.md`, `samples-equations.md`, `samples-formules.md`, `samples-fonctions.md`, `samples-second.md`, `samples-rationnelles.md`, `samples-synthese.md`, `samples-geometrie.md` and `samples-melanges.md`.
 
 | Unit | Skills | Years |
 |---|---|---|
@@ -77,11 +81,12 @@ The research behind the mistakes and the skill order is in `docs/error-catalogue
 | Synthèse : paramètres | 3: linear equations with parameters, quadratics with parameters, and the final problem ax² + bx/(3cx) = (6x + 2)² in five steps (domain, simplify, identity, … = 0, formula with Δ). Solutions with letters are checked at random values of the parameters. | Gym |
 | Géométrie calculée | 6: areas, volumes, Pythagoras, enlarging (k, k², k³), Thalès and similar figures, missing length | 9H–11H |
 | Calculs mélangés | 3 (9H, 10H, 11H): one expression mixing signed numbers, fractions, powers and roots. Also new: powers of fractions with negative exponents ((2/3)⁻² = 9/4) and roots of fractions (√(9/16) × (−2)²) | 9H–11H |
+| Analyse de base (G6) | 1 so far, the pilot of the university extension: product, quotient and chain rules. Each derivative is written line by line, d(…) or (…)′ marking what is left to differentiate; each line is checked against the previous one. Levels: guided lines with blanks, a decision « Quelle règle d'abord ? », choose the action then write the line, free lines with hints, then alone with f′(a). Traps: product of the derivatives, chain rule forgotten, sign and square of the quotient rule. Exam variants: multiple choice, true/false, f′(a), open. | Gymnase |
 
 Square roots stay exact: questions only use roots that come out whole or rational (√49, √(9/16), √2 × √8). Simplifying √50 = 5√2 is not covered.
 
 To add a skill:
-1. Add it to its unit's list in `js/content/skills.js`, with its year, prerequisites and intro.
-2. Add a generator to `GEN` in the unit's file in `js/content/`.
-3. Add any new mistakes to `RULES` in `js/math/malrules.js`, with a general explanation for when no numbers are available.
-4. Run `npm test`. It generates 200 items per skill and checks they are consistent, and checks every trap points to a real skill.
+1. Add it to its unit's list in `js/content/skills.js` (a university skill: `js/content/uni/<unit>.skills.js`), with its year, prerequisites and intro.
+2. Add a generator to `GEN` in the unit's file in `js/content/` (university: `js/content/uni/<unit>.js`; a new unit is listed in `js/content/uni/index.js` and `uni/generators.js`).
+3. Add any new mistakes to `RULES` in `js/math/malrules.js` (university: `js/cas/rules/<module>.js`, with a `transform` that replays the mistake on the previous line), with a general explanation for when no numbers are available.
+4. Run `npm test`. It generates 200 items per skill and checks they are consistent, and checks every trap points to a real skill. For university skills it also replays every reference solution through its own judge, and checks each trap names its own example.

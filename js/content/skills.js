@@ -1,7 +1,14 @@
-// The skill graph. Each unit lists its skills in map order. The global path
-// (what "Continuer" follows, and what the placement skim searches) sorts all
-// skills by `year`, the HarmoS year where the skill is usually met (track A
-// earlier, track C later), keeping unit order for ties.
+// The skill graph. Each unit lists its skills in map order. SKILLS, the
+// global order (placement skim, reviews), is a topological order of the
+// prerequisites: among the skills available, the smallest key (year, unit,
+// map order) comes first, so a prerequisite always comes earlier. `year` is
+// the HarmoS year where the skill is usually met (13-16 = BA1-BA4); it is a
+// hint for placement and ties, never a lock (spec §8.4).
+//
+// Prerequisites are only the skills the exercises really use (§8.2). The
+// path branches after mental arithmetic: see nextFocus in engine/learner.js.
+
+import { UNI_UNITS, UNI_SKILLS, UNBUILT } from './uni/index.js';
 
 export const UNITS = [
   { id: 'calcul', title: 'Calcul mental', color: '#f08c00', ready: true },
@@ -22,6 +29,7 @@ export const UNITS = [
   { id: 'unites', title: 'Grandeurs et unités', color: '#e67700', ready: true },
   { id: 'geometrie', title: 'Géométrie calculée', color: '#a61e4d', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
+  ...UNI_UNITS,
 ];
 
 // Times tables and mental arithmetic. Fact skills are played as fast
@@ -100,7 +108,7 @@ const CALCUL = [
     },
   },
   {
-    id: 'tab-1112', unit: 'calcul', year: 7, prereqs: ['tab-678'], icon: '×12', facts: true,
+    id: 'tab-1112', unit: 'calcul', year: 7, prereqs: ['tab-2510'], icon: '×12', facts: true,
     title: 'Livrets de 11 et 12',
     desc: '10 fois plus une fois, 10 fois plus deux fois.',
     intro: {
@@ -127,7 +135,7 @@ const CALCUL = [
     },
   },
   {
-    id: 'cm-round', unit: 'calcul', year: 7, prereqs: ['cm-add1'], icon: '≈',
+    id: 'cm-round', unit: 'calcul', year: 7, prereqs: [], icon: '≈',
     title: 'Arrondir',
     desc: 'À la dizaine, à l\'unité, au dixième.',
     intro: {
@@ -362,7 +370,7 @@ const RELATIFS = [
     },
   },
   {
-    id: 'rel-mul', unit: 'relatifs', year: 10, prereqs: ['rel-add'], icon: '×',
+    id: 'rel-mul', unit: 'relatifs', year: 10, prereqs: ['rel-read', 'tab-div'], icon: '×',
     title: 'Multiplier et diviser',
     desc: 'La règle des signes.',
     intro: {
@@ -456,7 +464,7 @@ const PROPORTION = [
     },
   },
   {
-    id: 'pct-successive', unit: 'proportion', year: 11, prereqs: ['pct-reverse'], icon: '%%',
+    id: 'pct-successive', unit: 'proportion', year: 11, prereqs: ['pct-change'], icon: '%%',
     title: 'Pourcentages successifs',
     desc: '+10 % puis −10 % ne font pas 0 %.',
     intro: {
@@ -620,7 +628,7 @@ const ARITHMETIQUE = [
 
 const PUISSANCES = [
   {
-    id: 'pow-def', unit: 'puissances', year: 9, prereqs: [], icon: 'x²',
+    id: 'pow-def', unit: 'puissances', year: 9, prereqs: ['tab-678'], icon: 'x²',
     title: 'Les puissances',
     desc: 'Carrés, cubes : un produit de facteurs égaux.',
     intro: {
@@ -733,7 +741,7 @@ const RACINES = [
     },
   },
   {
-    id: 'nb-sets', unit: 'racines', year: 10, prereqs: ['rel-frac'], icon: 'ℚ',
+    id: 'nb-sets', unit: 'racines', year: 10, prereqs: ['rel-read', 'frac-decimal'], icon: 'ℚ',
     title: 'Ensembles de nombres',
     desc: 'ℕ, ℤ, ℚ, ℝ : où vit chaque nombre ?',
     intro: {
@@ -791,7 +799,7 @@ const ALGEBRE = [
     },
   },
   {
-    id: 'lit-write', unit: 'algebre', year: 9, prereqs: ['lit-value'], icon: '✎x',
+    id: 'lit-write', unit: 'algebre', year: 9, prereqs: [], icon: '✎x',
     title: 'Traduire en expression',
     desc: 'Des mots aux lettres.',
     intro: {
@@ -883,7 +891,7 @@ const FACTORISATION = [
     },
   },
   {
-    id: 'fac-trinomial', unit: 'factorisation', year: 11, prereqs: ['fac-common', 'lit-expand2'], icon: 'x²+bx+c',
+    id: 'fac-trinomial', unit: 'factorisation', year: 11, prereqs: ['lit-expand2'], icon: 'x²+bx+c',
     title: 'Trinôme x² + bx + c',
     desc: 'Somme et produit.',
     intro: {
@@ -1091,7 +1099,7 @@ const SECOND = [
     },
   },
   {
-    id: 'quad-formula', unit: 'second', year: 11, prereqs: ['quad-factor'], icon: 'Δ',
+    id: 'quad-formula', unit: 'second', year: 11, prereqs: ['quad-xk', 'pow-sign'], icon: 'Δ',
     title: 'Discriminant et formule',
     desc: 'Δ = b² − 4ac, x = (−b ± √Δ)/(2a).',
     intro: {
@@ -1207,7 +1215,7 @@ const GEOMETRIE = [
     },
   },
   {
-    id: 'geo-pythagore', unit: 'geometrie', year: 10, prereqs: ['root-squares', 'geo-area'], icon: 'a²+b²',
+    id: 'geo-pythagore', unit: 'geometrie', year: 10, prereqs: ['root-squares'], icon: 'a²+b²',
     title: 'Théorème de Pythagore',
     desc: 'Dans un triangle rectangle : a² + b² = c².',
     intro: {
@@ -1225,7 +1233,7 @@ const GEOMETRIE = [
     },
   },
   {
-    id: 'geo-thales', unit: 'geometrie', year: 11, prereqs: ['prop-rule3', 'geo-pythagore'], icon: '∥',
+    id: 'geo-thales', unit: 'geometrie', year: 11, prereqs: ['prop-rule3'], icon: '∥',
     title: 'Thalès et figures semblables',
     desc: 'Des rapports égaux.',
     intro: {
@@ -1276,19 +1284,68 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...FONCTIONS, ...SECOND, ...RATIONNELLES, ...SYNTHESE, ...GEOMETRIE, ...MELANGES];
+const DECLARED = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...FONCTIONS, ...SECOND, ...RATIONNELLES, ...SYNTHESE, ...GEOMETRIE, ...MELANGES, ...UNI_SKILLS];
 
-// The global path: by school year, then unit, then map order.
-export const SKILLS = ALL
-  .map((s, i) => ({ s, i }))
-  .sort((a, b) => a.s.year - b.s.year || UNIT_ORDER.indexOf(a.s.unit) - UNIT_ORDER.indexOf(b.s.unit) || a.i - b.i)
-  .map(({ s }) => s);
+// Prerequisites on skills of modules not built yet stand for built ones
+// (content/uni/index.js). The catalogue's list stays in `declaredPrereqs`.
+const BUILT = new Set(DECLARED.map((s) => s.id));
+function resolvePrereq(id, seen = new Set()) {
+  if (BUILT.has(id)) return [id];
+  if (!UNBUILT[id] || seen.has(id)) throw new Error(`Prérequis inconnu : ${id}`);
+  seen.add(id);
+  return UNBUILT[id].flatMap((p) => resolvePrereq(p, seen));
+}
+const ALL = DECLARED.map((s) => {
+  if (s.prereqs.every((p) => BUILT.has(p))) return s;
+  return { ...s, declaredPrereqs: s.prereqs, prereqs: [...new Set(s.prereqs.flatMap((p) => resolvePrereq(p)))] };
+});
+
+// Topological order (Kahn): among the skills whose prerequisites are all
+// placed, the smallest key (year, unit order, map order) goes next.
+function topological(skills) {
+  const key = (s, i) => [s.year, UNIT_ORDER.indexOf(s.unit), i];
+  const less = (a, b) => { for (let k = 0; k < 3; k++) if (a[k] !== b[k]) return a[k] < b[k]; return false; };
+  const placed = new Set();
+  const out = [];
+  const left = skills.map((s, i) => ({ s, k: key(s, i) }));
+  while (left.length) {
+    let best = -1;
+    left.forEach((x, j) => {
+      if (x.s.prereqs.every((p) => placed.has(p)) && (best < 0 || less(x.k, left[best].k))) best = j;
+    });
+    if (best < 0) throw new Error(`Cycle dans les prérequis : ${left.map((x) => x.s.id).join(', ')}`);
+    const [x] = left.splice(best, 1);
+    placed.add(x.s.id);
+    out.push(x.s);
+  }
+  return out;
+}
+
+export const SKILLS = topological(ALL);
 
 // Skills of one unit, in map order.
 export const unitSkills = (unitId) => ALL.filter((s) => s.unit === unitId);
 
+// Skills of one unit in the global (topological) order: the per-unit
+// placement searches along it.
+export const unitPath = (unitId) => SKILLS.filter((s) => s.unit === unitId);
+
 export const SKILL_BY_ID = Object.fromEntries(SKILLS.map((s, i) => [s.id, { ...s, index: i }]));
 export const skillIndex = (id) => SKILL_BY_ID[id].index;
+
+// Skills that block nothing and that the path skips (spec §8.2).
+export const isOptional = (id) => !!SKILL_BY_ID[id]?.optional;
+
+// Mastery waits for a level-5 item done alone (spec §9.2). Default: from
+// the CMS year (12.5) on.
+export const needsSolo = (id) => {
+  const s = SKILL_BY_ID[id];
+  return !!s && (s.needsSolo ?? s.year >= 12.5);
+};
+
+// Skills that list this one as a prerequisite.
+export const DEPENDENTS = Object.fromEntries(SKILLS.map((s) => [s.id, []]));
+for (const s of SKILLS) for (const p of s.prereqs) DEPENDENTS[p].push(s.id);
 
 // Swiss school years offered at profile creation.
 export const YEARS = [
@@ -1300,7 +1357,15 @@ export const YEARS = [
   { id: 10, label: '10H', age: '13-14 ans' },
   { id: 11, label: '11H', age: '14-15 ans' },
   { id: 12, label: 'Gymnase', age: '15 ans et +' },
+  { id: 12.5, label: 'CMS', age: 'cours de mise à niveau' },
+  { id: 13, label: 'BA1', age: '1re année uni / EPF' },
+  { id: 14, label: 'BA2', age: '1re année, 2e semestre' },
+  { id: 15, label: 'BA3', age: '2e année uni' },
+  { id: 16, label: 'BA4', age: '2e année, 2e semestre' },
 ];
+
+// From BA1 on, the placement is done unit by unit (spec §8.4).
+export const isUniversity = (year) => year >= 13;
 
 // The track question only makes sense in secondary I (9H-11H).
 export const hasTrack = (year) => year >= 9 && year <= 11;

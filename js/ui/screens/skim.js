@@ -5,7 +5,7 @@ import { mountExercise } from '../exercises.js';
 import { Skim } from '../../engine/placement.js';
 import { applyPlacement, isSlow, newSkillState } from '../../engine/learner.js';
 import { makeRng } from '../../content/random.js';
-import { SKILL_BY_ID, SKILLS } from '../../content/skills.js';
+import { SKILL_BY_ID, SKILLS, UNITS } from '../../content/skills.js';
 
 export function skimIntroScreen(root, _args, app) {
   const p = app.profile;
@@ -17,14 +17,16 @@ export function skimIntroScreen(root, _args, app) {
     }, 'Commencer depuis le début')));
 }
 
-export function skimScreen(root, _args, app) {
+// args.unit: the placement of one unit only (« Je connais déjà ce module »).
+export function skimScreen(root, args, app) {
   const p = app.profile;
-  const skim = new Skim(p, makeRng());
+  const unit = args?.unit ? UNITS.find((u) => u.id === args.unit) : null;
+  const skim = new Skim(p, makeRng(), { unit: unit?.id ?? null });
   const bar = h('div.progress', h('div.progress-fill'));
   const body = h('main.lesson-body');
   const foot = h('footer.lesson-foot');
   const panel = h('div.feedback');
-  root.append(h('header.lesson-top', h('span.skim-title', 'Test rapide'), bar), body, foot, panel);
+  root.append(h('header.lesson-top', h('span.skim-title', unit ? `Test : ${unit.title}` : 'Test rapide'), bar), body, foot, panel);
   let item;
   let ctrl;
   let t0;
@@ -79,7 +81,7 @@ export function skimScreen(root, _args, app) {
     const { skill } = skim.finish();
     app.save();
     play('done');
-    const known = SKILLS.filter((s) => p.skills[s.id]?.testedOut).length;
+    const known = SKILLS.filter((s) => p.skills[s.id]?.testedOut && (!unit || s.unit === unit.id)).length;
     body.append(h('div.done',
       bubble(skill
         ? `Merci ! ${known ? `Tu connais déjà <b>${known} étape${known > 1 ? 's' : ''}</b> du chemin : je les mets de côté (on les révisera vite fait). ` : ''}On commence par : <b>${SKILL_BY_ID[skill].title}</b>.`

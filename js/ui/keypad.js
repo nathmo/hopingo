@@ -1,5 +1,8 @@
 // Math input: a calculator-style line with a caret, shown with stacked
 // fractions as you type, plus an on-screen keypad and keyboard support.
+// A key may insert several characters at once (« sin( »); it is then one
+// chunk for the caret and for ⌫. With `keysets`, tabs switch between
+// several keypads (spec §11).
 
 import { h, play } from './dom.js';
 import { esc } from '../math/expr.js';
@@ -24,19 +27,32 @@ const KEYSETS = {
   algeq: ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', '=', 'left', '0', 'right', 'back', ',', '√'],
   // Free lines with powers and roots.
   opsx: ['7', '8', '9', 'frac', '+', '4', '5', '6', '(', '-', '1', '2', '3', ')', '×', '^', '0', '√', ',', '÷', '', 'left', 'right', 'back', ''],
+  // University (spec §11). calc: numbers, operations, x y t, π, e; the
+  // functions are in calcfn. calcx adds d(…) and ′ (∫ Σ lim ε come with U2).
+  calc: ['7', '8', '9', 'x', '(', ')', 'back', '4', '5', '6', 'y', '+', '-', '×', '1', '2', '3', 't', 'frac', '^', '√', '0', ',', 'π', 'e', 'left', 'right', ''],
+  calcx: ['7', '8', '9', 'x', '(', ')', 'back', '4', '5', '6', '+', '-', '×', 'frac', '1', '2', '3', '^', '√', 'd(', "'", '0', ',', 'π', 'e', 'left', 'right', ''],
+  calcfn: ['sin(', 'cos(', 'tan(', 'exp(', 'ln(', 'Log(', 'sinh(', 'cosh(', 'tanh(', 'arctan(', 'arcsin(', 'arccos(', '√(', '|', 'left', 'back'],
+  relation: ['=', '<', '≤', '>', '≥', '≠'],
+  greek: ['ε', 'δ', 'λ', 'θ', 'φ', 'α', 'β', 'μ', 'σ', 'ω', 'ρ', 'back'],
 };
 
+// Tab names of the keypads.
+const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ' };
+
 const LABEL = {
-  back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√',
+  back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )',
   '^': '<span class="key-pow">▢<sup>n</sup></span>',
   frac: '<span class="key-frac"><span>▢</span><span>▢</span></span>',
 };
 
 export class MathInput {
-  constructor({ keys = 'frac', placeholder = '', onChange, onEnter } = {}) {
+  constructor({ keys = 'frac', keysets = null, placeholder = '', onChange, onEnter } = {}) {
     this.chars = [];
     this.caret = 0;
-    this.keys = keys;
+    // An item may give a list of keypad names: they become tabs.
+    if (!keysets && Array.isArray(keys) && keys.length && keys.every((k) => k.length > 1 && KEYSETS[k])) keysets = keys;
+    this.keysets = keysets;
+    this.keys = keysets ? keysets[0] : keys;
     this.onChange = onChange;
     this.onEnter = onEnter;
     this.display = h('div.mi-display', { tabindex: 0, role: 'textbox', 'aria-label': 'Ta réponse' });
@@ -60,7 +76,7 @@ export class MathInput {
   }
 
   press(k) {
-    const prev = this.chars[this.caret - 1];
+    const prev = (this.chars[this.caret - 1] ?? '').slice(-1) || undefined;
     if (k === 'back') {
       if (this.caret > 0) { this.chars.splice(this.caret - 1, 1); this.caret--; }
     } else if (k === 'left') this.caret = Math.max(0, this.caret - 1);
@@ -96,7 +112,7 @@ export class MathInput {
 
   // Keyboard: digits, / + - * x : ( ) , . ^ r (root) ² Backspace, arrows, Enter.
   handleKey(e) {
-    const allowed = new Set(this.keyList);
+    const allowed = new Set(this.keysets ? this.keysets.flatMap((n) => KEYSETS[n]) : this.keyList);
     const letters = [...allowed].some((k) => /^[a-zA-Zπ]$/.test(k));
     const map = { '*': '×', ':': '÷', '/': 'frac', '.': ',', Backspace: 'back', ArrowLeft: 'left', ArrowRight: 'right', Enter: 'enter' };
     // Without letters on the keypad, x means × and r or v mean √.
@@ -123,14 +139,41 @@ export class MathInput {
   }
 
   keypad() {
+    if (this.keysets) return this.tabbedKeypad();
     const pad = h(`div.keypad.keys-${Array.isArray(this.keys) ? 'custom' : this.keys}`);
     for (const k of this.keyList) {
       if (!k) { pad.appendChild(h('span')); continue; }
-      const letter = /^[a-zA-Zπ]$/.test(k);
-      const cls = /^[0-9]$/.test(k) ? 'key' : letter ? 'key key-fn key-letter' : `key key-fn key-${k === '-' ? 'minus' : k.replace(/[^a-z]/g, '') || 'op'}`;
-      pad.appendChild(h('button', { class: cls, type: 'button', onclick: () => this.press(k), html: LABEL[k] ?? esc(k) }));
+      const letter = /^[a-zA-Zπα-ωΑ-Ω]$/.test(k);
+      const word = k.length > 1 && /[a-z]/i.test(k) && !LABEL[k];
+      const cls = /^[0-9]$/.test(k) ? 'key' : letter ? 'key key-fn key-letter' : word ? 'key key-fn key-word' : `key key-fn key-${k === '-' ? 'minus' : k.replace(/[^a-z]/g, '') || 'op'}`;
+      pad.appendChild(h('button', { class: cls, type: 'button', onclick: () => this.press(k), html: LABEL[k] ?? esc(word ? k.replace(/\($/, '') : k) }));
     }
     return pad;
+  }
+
+  // Tabs over several keypads; the panel is redrawn on each switch.
+  tabbedKeypad() {
+    const box = h('div.keypad-tabs');
+    const tabs = h('div.keytab-row');
+    const panel = h('div.keytab-panel');
+    const show = (name) => {
+      this.keys = name;
+      panel.replaceChildren(this.keypadOnly());
+      tabs.querySelectorAll('button').forEach((b) => b.classList.toggle('active', b.dataset.set === name));
+    };
+    if (this.keysets.length > 1) {
+      for (const name of this.keysets) tabs.appendChild(h('button.keytab', { type: 'button', 'data-set': name, onclick: () => show(name) }, TAB_LABEL[name] || name));
+      box.appendChild(tabs);
+    }
+    box.appendChild(panel);
+    show(this.keysets[0]);
+    return box;
+  }
+
+  keypadOnly() {
+    const sets = this.keysets;
+    this.keysets = null;
+    try { return this.keypad(); } finally { this.keysets = sets; }
   }
 }
 
@@ -189,7 +232,18 @@ export function renderChars(chars, caret) {
       i = k;
       continue;
     }
-    if (/[a-zA-Zπ]/.test(c)) {
+    if (c.length > 1) {
+      // A chunk typed with one key: sin(, d(…
+      out += `${gap(i)}<span class="m-fn" data-i="${i}">${esc(c === 'd(' ? 'd(' : c)}</span>`;
+      i++;
+      continue;
+    }
+    if (c === "'") {
+      out += `${gap(i)}<span class="m-op" data-i="${i}">′</span>`;
+      i++;
+      continue;
+    }
+    if (/[a-zA-Zπα-ωΑ-Ω]/.test(c)) {
       out += `${gap(i)}<i class="m-var" data-i="${i}">${c}</i>`;
       i++;
       continue;

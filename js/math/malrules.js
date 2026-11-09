@@ -15,6 +15,7 @@
 // recognised from a final answer, and must then stay general.
 
 import { Q, lcm } from './rational.js';
+import { CAS_RULES } from '../cas/rules/index.js';
 
 export const FAMILIES = {
   whole: {
@@ -49,6 +50,16 @@ export const FAMILIES = {
     name: 'Fait numérique',
     hint: 'Si tu hésites, pars d\'un fait sûr (× 10, le double, un carré connu) et ajuste.',
   },
+  // Families of the university modules (spec §16.4).
+  calculus: { name: 'Dérivées, primitives, limites', hint: "Applique une règle à la fois, de l'extérieur vers l'intérieur, et contrôle sur un cas simple (x·x = x²)." },
+  linear: { name: 'Matrices et systèmes', hint: 'Une opération sur les lignes doit garder les mêmes solutions : refais-la ligne par ligne.' },
+  proba: { name: 'Événements et lois', hint: "Écris l'événement en mots avant de calculer sa probabilité." },
+  stats: { name: 'Tests et intervalles', hint: "Relis ce que dit l'hypothèse, et quelle loi suit la statistique." },
+  numeric: { name: 'Erreurs et ordres', hint: "Compare les erreurs successives : leur rapport donne l'ordre de la méthode." },
+  logic: { name: 'Quantificateurs et implications', hint: 'La négation échange ∀ et ∃, puis nie la propriété qui suit.' },
+  notation: { name: 'Écriture mal lue', hint: 'Relis le symbole : que veut-il dire exactement ?' },
+  geometry: { name: 'Objets et repères', hint: "Fais un croquis : il montre souvent l'erreur." },
+  method: { name: 'Méthode juste mais mal choisie', hint: 'Le calcul est juste, mais une autre méthode mène plus vite au but.' },
   place: {
     name: 'Dizaines et unités',
     hint: 'Dix unités font une dizaine : quand les unités dépassent 9 (ou manquent), les dizaines changent aussi.',
@@ -86,7 +97,7 @@ const P = (A, k) => {
   return `${b}<sup>${String(k).replace('-', '−')}</sup>`;
 };
 
-export const RULES = [
+const SCHOOL_RULES = [
   // ----- addition and subtraction -----
   {
     id: 'add_across', family: 'whole', tag: 'R', op: '+', skill: 'frac-add-any', repair: 'frac-equiv',
@@ -1219,6 +1230,9 @@ export const RULES = [
 
 
 
+
+// The university traps (js/cas/rules) share the catalogue.
+export const RULES = [...SCHOOL_RULES, ...CAS_RULES];
 
 export const RULE_BY_ID = Object.fromEntries(RULES.map((r) => [r.id, r]));
 

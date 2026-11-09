@@ -10,6 +10,8 @@ import { SKILL_BY_ID } from '../../content/skills.js';
 import { RULE_BY_ID } from '../../math/malrules.js';
 import { solve } from '../../math/solver.js';
 import { parse, print } from '../../math/expr.js';
+import { parse as parseCas } from '../../cas/parse.js';
+import { toMathML } from '../../cas/mathml.js';
 import { starRow } from './common.js';
 
 const PRAISE = ['Bravo !', 'Excellent !', 'Parfait !', 'Bien joué !', 'Super !', 'Exact !'];
@@ -104,6 +106,11 @@ export function lessonScreen(root, args, app) {
     if (def.intro.example) {
       card.append(h('div.intro-example', def.intro.example.map((e) => h('div.sol-line', html(M(e.math)), h('span.sol-note', e.note)))));
     }
+    if (def.intro.lines) {
+      // A worked example of the university units: one line per step.
+      card.append(h('div.intro-example', def.intro.lines.map((l, i) => h('div.sol-line',
+        i ? h('span.eq', '=') : null, html(toMathML(parseCas(l.cas))), h('span.sol-note', l.note)))));
+    }
     if (def.intro.solve) {
       const lines = solve(parse(def.intro.solve), def.intro.solveOpts);
       card.append(h('div.intro-example',
@@ -141,6 +148,7 @@ export function lessonScreen(root, args, app) {
     const rtSec = (performance.now() - t0) / 1000;
     const res = lesson.answer(item, {
       correct: outcome.correct, rtSec, rules: outcome.rules || [], ambiguous: outcome.ambiguous || 1, ops: outcome.ops,
+      hintsUsed: outcome.hintsUsed || 0, subgoals: outcome.subgoals || [], solo: !!outcome.solo,
     });
     app.save();
     setProgress();

@@ -1,11 +1,12 @@
 // A lesson: about ten questions chosen one at a time, so difficulty follows
-// the student's answers as they come. Mistakes come back at the end.
+// the student's answers as they come. Mistakes come back at the end. A
+// lesson also stops once its questions add up to 15 minutes (spec §9.7).
 
 import { SKILLS, SKILL_BY_ID } from '../content/skills.js';
 import { generate } from '../content/generators.js';
 import { RULE_BY_ID } from '../math/malrules.js';
 import {
-  skillState, recordAnswer, recordTraps, frontier, practiceSkill, dueSkills, activeTraps,
+  skillState, recordAnswer, recordTraps, nextFocus, noteLessonBranch, practiceSkill, dueSkills, activeTraps,
   finishReview, isUnlocked, isSlow,
 } from './learner.js';
 import { now } from './time.js';
@@ -15,9 +16,12 @@ export const CORE_LENGTH = 10;
 // Fact skills (times tables…) are short questions played as a fast series.
 export const FACT_LENGTH = 15;
 const MAX_RETRIES = 6;
+// Expected seconds after which a lesson ends (spec §9.7).
+export const MAX_LESSON_SEC = 900;
 
 // Multi-step skills give indirect credit to the skill behind each operation
-// the student performed.
+// the student performed. Items with sub-goals (`lines`) credit the skill of
+// each sub-goal the student reached instead (spec §9.3).
 const OP_SKILL = {
   'frac-multistep': { '+': 'frac-add-any', '-': 'frac-add-any', '×': 'frac-mul', '÷': 'frac-div' },
   'rel-multistep': { '+': 'rel-add', '-': 'rel-sub', '×': 'rel-mul', '÷': 'rel-mul' },
@@ -32,7 +36,8 @@ const OP_SKILL = {
   'mix-11': { '+': 'frac-add-any', '-': 'frac-add-any', '×': 'frac-mul', '÷': 'frac-div', '^': 'pow-frac', '√': 'root-frac' },
 };
 
-const GUESS = { fact: 0.02, mcq: 0.3, match: 0.1, shade: 0.05, numberline: 0.08, answer: 0.03, steps: 0.02 };
+const GUESS = { fact: 0.02, mcq: 0.3, match: 0.1, shade: 0.05, numberline: 0.08, answer: 0.03, steps: 0.02, lines: 0.02 };
+const WORKED = new Set(['steps', 'lines']);
 
 export class Lesson {
   // kind: 'smart' continues the path, 'skill' practises one skill,
@@ -42,7 +47,9 @@ export class Lesson {
     this.profile = profile;
     this.kind = kind;
     this.rng = rng;
-    this.focus = skill || frontier(profile);
+    this.focus = skill || nextFocus(profile);
+    if (kind === 'smart' && this.focus) noteLessonBranch(profile, this.focus);
+    this.secs = 0;
     this.startedAt = now();
     this.results = [];
     this.retries = [];
@@ -109,9 +116,14 @@ export class Lesson {
   // Next item, or null when the lesson is over.
   next() {
     while (this.pos < this.plan.length) {
+      // Long items (worked solutions) make shorter lessons.
+      if (this.secs >= MAX_LESSON_SEC && this.kind !== 'trap') { this.plan.splice(this.pos); break; }
       const slot = this.plan[this.pos++];
       const item = this.makeItem(slot);
-      if (item) return item;
+      if (item) {
+        if (item.type !== 'intro') this.secs += item.expectedSec || 0;
+        return item;
+      }
     }
     if (this.retries.length && this.retryCount < MAX_RETRIES) {
       this.retryCount += 1;
@@ -139,7 +151,7 @@ export class Lesson {
     if (slot === 'focus') {
       // Mastered mid-lesson: skip ahead to the next skill on the path.
       if (this.kind === 'smart' && skillState(p, this.focus).mastered) {
-        const nxt = frontier(p);
+        const nxt = nextFocus(p, { unit: SKILL_BY_ID[this.focus].unit });
         if (nxt && nxt !== this.focus) {
           this.focus = nxt;
           this.events.push({ type: 'skipAhead', skill: nxt });
@@ -154,7 +166,10 @@ export class Lesson {
       return { ...this.generateFresh(skill, skillState(p, skill).level), slot };
     }
     if (slot === 'review') {
-      const due = dueSkills(p).filter((id) => !this.reviewed[id] || this.reviewed[id].n < 2);
+      // The direct prerequisites of the skill being learnt come first (§9.8).
+      const near = new Set(this.focus ? SKILL_BY_ID[practiceSkill(p, this.focus)].prereqs : []);
+      const due = dueSkills(p).filter((id) => !this.reviewed[id] || this.reviewed[id].n < 2)
+        .sort((a, b) => (near.has(b) ? 1 : 0) - (near.has(a) ? 1 : 0));
       let skill = due[0];
       if (!skill) {
         // Nothing due: a light review of the least recently seen known skill.
@@ -177,7 +192,7 @@ export class Lesson {
     return null;
   }
 
-  // outcome = {correct, rtSec, rules, ambiguous, ops}
+  // outcome = {correct, rtSec, rules, ambiguous, ops, hintsUsed, subgoals, solo}
   // Returns {xp, events, slow}.
   answer(item, outcome) {
     const p = this.profile;
@@ -194,7 +209,7 @@ export class Lesson {
       rtSec: outcome.rtSec, expectedSec: item.expectedSec,
       guess: item.type === 'mcq' ? 1 / item.options.length : GUESS[item.type] ?? 0.05,
       rules: outcome.rules, ambiguous: outcome.ambiguous, baits: item.baits,
-      weight, review: !!item.review,
+      weight, review: !!item.review, hintsUsed: outcome.hintsUsed || 0, solo: !!outcome.solo,
     }));
 
     // Multi-step work is also evidence for the operations it used.
@@ -206,6 +221,10 @@ export class Lesson {
         if (s && p.skills[s]) recordAnswer(p, { skill: s, level: 0, correct: true, rtSec: 0, expectedSec: 1, weight: 0.3 });
       }
     }
+    // Sub-goals reached, even in a failed item (« continue with my line »).
+    for (const s of new Set(outcome.subgoals || [])) {
+      if (s !== item.skill && SKILL_BY_ID[s]) recordAnswer(p, { skill: s, level: 0, correct: true, rtSec: 0, expectedSec: 1, weight: 0.3 });
+    }
 
     if (item.review) {
       const r = (this.reviewed[item.skill] ||= { n: 0, ok: 0 });
@@ -215,7 +234,7 @@ export class Lesson {
 
     let xp = 0;
     if (outcome.correct) {
-      xp = item.retry ? 1 : 2 + (slow ? 0 : 1) + (item.type === 'steps' ? 2 : 0);
+      xp = item.retry ? 1 : 2 + (slow ? 0 : 1) + (WORKED.has(item.type) ? 2 : 0);
       this.combo += 1;
       this.bestCombo = Math.max(this.bestCombo, this.combo);
     } else {
@@ -252,7 +271,7 @@ export class Lesson {
       seconds: Math.round((now() - this.startedAt) / 1000),
       events: this.events,
       bestCombo: this.bestCombo,
-      steps: core.filter((r) => r.type === 'steps' && r.correct).length,
+      steps: core.filter((r) => WORKED.has(r.type) && r.correct).length,
     };
   }
 }

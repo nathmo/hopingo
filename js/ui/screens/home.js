@@ -1,8 +1,14 @@
-// The path: skills of each unit as a winding trail of stops.
+// The map: each unit is a branch, its skills a winding trail of stops.
+// « Continuer » follows nextFocus (several branches in turn). A branch can
+// be pinned, and « Je connais déjà ce module » runs that unit's placement.
+// A closed skill shows the prerequisite it waits for, and leads to it.
 
 import { h, sheet, bubble } from '../dom.js';
 import { UNITS, SKILL_BY_ID, unitSkills } from '../../content/skills.js';
-import { stars, isUnlocked, frontier, dueSkills, activeTraps, isDue, practiceSkill } from '../../engine/learner.js';
+import {
+  stars, isUnlocked, nextFocus, dueSkills, activeTraps, isDue, practiceSkill, missingPrereqs,
+  activeBranches, pathState, pinBranch,
+} from '../../engine/learner.js';
 import { currentStreak } from '../../engine/rewards.js';
 import { topBar, bottomNav, starRow } from './common.js';
 
@@ -10,7 +16,9 @@ const LEVEL_NAMES = ['', 'Découverte', 'Facile', 'Moyen', 'Difficile', 'Expert'
 
 export function homeScreen(root, _args, app) {
   const p = app.profile;
-  const next = frontier(p);
+  const next = nextFocus(p);
+  const active = new Set(activeBranches(p));
+  const pinned = pathState(p).pinned;
   const due = dueSkills(p);
   const traps = activeTraps(p);
   const streak = currentStreak(p);
@@ -36,8 +44,16 @@ export function homeScreen(root, _args, app) {
 
   for (const unit of UNITS) {
     const skills = unitSkills(unit.id);
-    const section = h('section.unit', { style: { '--unit': unit.color } },
-      h('div.unit-head', h('h2', unit.title), unit.ready ? h('span.unit-count', `${skills.filter((s) => p.skills[s.id]?.mastered).length}/${skills.length} 👑`) : h('span.soon', 'Bientôt')));
+    const done = skills.filter((s) => p.skills[s.id]?.mastered).length;
+    const section = h(`section.unit#unit-${unit.id}`, { style: { '--unit': unit.color } },
+      h('div.unit-head',
+        h('div.unit-title', h('h2', unit.title),
+          active.has(unit.id) ? h('small.unit-tag', 'en cours') : null,
+          pinned === unit.id ? h('small.unit-tag', '📌 épinglée') : null),
+        unit.ready ? h('span.unit-count', `${done}/${skills.length} 👑`) : h('span.soon', 'Bientôt')),
+      unit.ready && done < skills.length ? h('div.unit-tools',
+        h('button.btn.small.ghost', { type: 'button', onclick: () => { pinBranch(p, unit.id); app.save(); app.go('home'); } }, pinned === unit.id ? 'Désépingler' : '📌 Épingler cette branche'),
+        h('button.btn.small.ghost', { type: 'button', onclick: () => app.go('skim', { unit: unit.id }) }, 'Je connais déjà ce module')) : null);
     if (!unit.ready) {
       section.classList.add('locked');
       section.append(h('div.path', [0, 1, 2].map((i) => h('div.node-wrap', { style: { '--x': `${[0, 1, -1][i] * 70}px` } }, h('div.node.locked', '🔒')))));
@@ -57,7 +73,7 @@ export function homeScreen(root, _args, app) {
       const repairing = Object.values(p.skills).some((x) => x.repair === s.id);
       if (repairing) classes.push('repair');
       const x = Math.round(Math.sin(i * 0.9) * 80);
-      const node = h(`button.${classes.join('.')}`, { type: 'button', onclick: () => openNode(app, s.id), 'aria-label': s.title },
+      const node = h(`button.${classes.join('.')}`, { type: 'button', onclick: () => openNode(app, s.id), 'aria-label': s.title, 'data-skill': s.id },
         h('span.node-icon', unlocked ? s.icon : '🔒'),
         st && isDue(st) ? h('span.badge-due', '⏰') : null,
         repairing ? h('span.badge-repair', '🩹') : null,
@@ -79,7 +95,13 @@ function openNode(app, id) {
   const s = SKILL_BY_ID[id];
   const st = p.skills[id];
   const unlocked = isUnlocked(p, id);
-  const missing = s.prereqs.filter((q) => !isUnlocked(p, q) || stars(p.skills[q]) < 1).map((q) => SKILL_BY_ID[q].title);
+  const missing = missingPrereqs(p, id);
+  // A missing prerequisite leads to its own stop on the map.
+  const goTo = (q) => {
+    close();
+    document.querySelector(`[data-skill="${q}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    setTimeout(() => openNode(app, q), 250);
+  };
   let close;
   const go = (args) => { close(); app.go('lesson', args); };
   close = sheet(h('div.node-sheet',
@@ -89,5 +111,5 @@ function openNode(app, id) {
     st?.testedOut && !st.attempts ? h('p.note', '✔ Validé par le test rapide. Une révision le confirmera.') : null,
     unlocked
       ? h('button.btn.primary.wide', { onclick: () => go({ kind: 'skill', skill: id }) }, st?.mastered ? 'S\'entraîner encore' : 'S\'entraîner')
-      : h('p.note', `🔒 Termine d'abord : ${missing.join(', ')}.`)));
+      : h('div.note', h('p', '🔒 Il faut d\'abord :'), h('div.missing-list', missing.map((q) => h('button.btn.small.secondary', { type: 'button', onclick: () => goTo(q) }, `${SKILL_BY_ID[q].icon} ${SKILL_BY_ID[q].title}`))))));
 }

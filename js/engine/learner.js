@@ -9,8 +9,14 @@
 //   due     spaced review date once mastered; the interval grows on success.
 // Traps (known mistakes) activate after repeated evidence and clear after
 // correct answers to baiting questions on 3 different days.
+// Hints (spec §9.1): a right answer after a hint is not « fast », so it does
+// not raise the level; after two hints it counts as wrong for the mastery
+// estimate, but not as a mistake for the ladder. Skills with needsSolo are
+// mastered only after a level-5 item done without help (st.solo).
 
-import { SKILLS, SKILL_BY_ID } from '../content/skills.js';
+import {
+  SKILLS, SKILL_BY_ID, UNITS, DEPENDENTS, isOptional, needsSolo, unitPath,
+} from '../content/skills.js';
 import { RULE_BY_ID } from '../math/malrules.js';
 import { now, dayKey, DAY } from './time.js';
 
@@ -46,12 +52,16 @@ export function stars(st) {
   return 0;
 }
 
+// A prerequisite is satisfied with one star, or when the placement test
+// counted it as known.
+export const isSatisfied = (st) => !!st && (st.testedOut || stars(st) >= 1);
+
 export function isUnlocked(profile, id) {
-  return SKILL_BY_ID[id].prereqs.every((p) => {
-    const st = profile.skills[p];
-    return st && (st.testedOut || stars(st) >= 1);
-  });
+  return SKILL_BY_ID[id].prereqs.every((p) => isSatisfied(profile.skills[p]));
 }
+
+// The prerequisites still missing, for the map.
+export const missingPrereqs = (profile, id) => SKILL_BY_ID[id].prereqs.filter((p) => !isSatisfied(profile.skills[p]));
 
 export const isDue = (st, t = now()) => st.mastered && st.due && st.due <= t;
 
@@ -89,27 +99,34 @@ function weakestPrereq(profile, id) {
 // {type: levelUp|levelDown|mastered|repair|repairDone|trapNew|trapCleared, ...}
 //
 // a = {skill, level, correct, rtSec, expectedSec, guess, rules, ambiguous,
-//      baits, weight, review}
+//      baits, weight, review, hintsUsed, solo}
 export function recordAnswer(profile, a) {
   const events = [];
   const st = skillState(profile, a.skill);
   const weight = a.weight ?? 1;
   const t = now();
+  const hints = a.hintsUsed || 0;
 
-  // Mastery estimate.
-  const p2 = bkt(st.p, a.correct, a.guess ?? 0.05);
+  // Mastery estimate. Two hints or more: the answer is not evidence of
+  // knowing the skill.
+  const known = a.correct && hints < 2;
+  const p2 = bkt(st.p, known, a.guess ?? 0.05);
   st.p += weight * (p2 - st.p);
   st.attempts += 1;
   if (a.correct) st.correct += 1;
   st.lastSeen = t;
+  if (a.solo && a.correct && a.level >= 5) st.solo = true;
 
   if (weight >= 1) {
     const slow = isSlow(st, a.rtSec, a.expectedSec);
-    if (a.correct && !slow) st.rts = [...st.rts, a.rtSec].slice(-10);
+    if (a.correct && !slow && !hints) st.rts = [...st.rts, a.rtSec].slice(-10);
 
     // Difficulty ladder, only when practising at the current level.
     const atLevel = a.level >= st.level;
-    if (a.correct && !slow) {
+    if (a.correct && hints) {
+      // Right with help: neither a step up nor a mistake.
+      st.bad = 0;
+    } else if (a.correct && !slow) {
       st.bad = 0;
       st.slow = 0;
       if (atLevel) st.good += 1;
@@ -145,7 +162,7 @@ export function recordAnswer(profile, a) {
   }
 
   // Mastery and its loss.
-  if (!st.mastered && st.level >= 4 && st.p >= MASTERY_P) {
+  if (!st.mastered && st.level >= 4 && st.p >= MASTERY_P && (!needsSolo(a.skill) || st.solo)) {
     st.mastered = true;
     st.interval = 2;
     st.due = t + st.interval * DAY;
@@ -165,7 +182,8 @@ export function recordAnswer(profile, a) {
     }
   }
 
-  events.push(...recordTraps(profile, a));
+  // A hinted answer does not beat a trap.
+  if (!(hints && a.correct)) events.push(...recordTraps(profile, a));
   return events;
 }
 
@@ -219,18 +237,99 @@ export function finishReview(profile, skill, ratio) {
   }
 }
 
-// What to practise next: a skill waiting on repair, else the first unlocked
-// skill not yet mastered, else null (everything mastered).
-export function frontier(profile) {
-  for (const s of SKILLS) {
-    if (profile.skills[s.id]?.repair) return s.id;
-  }
-  for (const s of SKILLS) {
+// ---------- the branching path (spec §8.4) ----------
+//
+// Each unit is a branch. nextFocus picks what « Continuer » practises:
+//   1. a skill waiting on repair;
+//   2. else the next skill of the branch the student pinned on the map;
+//   3. else it keeps at most 3 active branches (units started and not
+//      finished) and moves from one to the next at each lesson, so topics
+//      mix. In a branch it takes the open, unmastered skill that comes
+//      first in the global order. A new branch opens while fewer than 3 are
+//      active; it starts with the skill that opens the most others, then the
+//      smallest year.
+// The year is a hint: a new branch only opens on skills of the student's
+// current level (the smallest year among the open skills), so a 5H student
+// does mental arithmetic first, and fractions and lengths join it at 6H.
+
+export const MAX_BRANCHES = 3;
+const ORDER = Object.fromEntries(SKILLS.map((s, i) => [s.id, i]));
+const UNIT_RANK = Object.fromEntries(UNITS.map((u, i) => [u.id, i]));
+
+export const pathState = (profile) => (profile.path ||= { pinned: null, last: null });
+
+// Open, not mastered, on the path (not optional), not counted as known.
+function playable(profile) {
+  return SKILLS.filter((s) => {
     const st = profile.skills[s.id];
-    if (isUnlocked(profile, s.id) && !(st?.mastered)) return s.id;
-  }
-  return null;
+    return !isOptional(s.id) && !st?.mastered && !st?.testedOut && isUnlocked(profile, s.id);
+  });
 }
+
+// The first playable skill of each unit.
+function branchHeads(pool) {
+  const heads = {};
+  for (const s of pool) if (!heads[s.unit]) heads[s.unit] = s;
+  return heads;
+}
+
+// Units the student has started and not finished.
+export function activeBranches(profile) {
+  const heads = branchHeads(playable(profile));
+  return Object.keys(heads)
+    .filter((u) => unitPath(u).some((s) => (profile.skills[s.id]?.attempts || 0) > 0))
+    .sort((a, b) => UNIT_RANK[a] - UNIT_RANK[b]);
+}
+
+// How many skills would open once this one has a star.
+function unlockCount(profile, id) {
+  return DEPENDENTS[id].filter((d) => !isUnlocked(profile, d)
+    && SKILL_BY_ID[d].prereqs.every((p) => p === id || isSatisfied(profile.skills[p]))).length;
+}
+
+// The skill a new branch would start with, or null.
+export function newBranchSkill(profile, { pool = playable(profile), active = activeBranches(profile) } = {}) {
+  if (!pool.length) return null;
+  const level = Math.min(...pool.map((s) => s.year));
+  const heads = Object.values(branchHeads(pool)).filter((s) => !active.includes(s.unit) && s.year <= level);
+  if (!heads.length) return null;
+  heads.sort((a, b) => unlockCount(profile, b.id) - unlockCount(profile, a.id) || a.year - b.year || ORDER[a.id] - ORDER[b.id]);
+  return heads[0].id;
+}
+
+// opts.unit: stay in this unit if it still has something to practise.
+export function nextFocus(profile, { unit = null } = {}) {
+  for (const s of SKILLS) if (profile.skills[s.id]?.repair) return s.id;
+  const pool = playable(profile);
+  if (!pool.length) return null;
+  const heads = branchHeads(pool);
+  if (unit && heads[unit]) return heads[unit].id;
+  const path = pathState(profile);
+  if (path.pinned && heads[path.pinned]) return heads[path.pinned].id;
+  const active = activeBranches(profile);
+  if (active.length < MAX_BRANCHES) {
+    const fresh = newBranchSkill(profile, { pool, active });
+    if (fresh) return fresh;
+  }
+  if (!active.length) return pool[0].id;
+  // Rotate: the active branch after the one of the last lesson.
+  const i = active.indexOf(path.last);
+  return heads[active[(i + 1) % active.length]].id;
+}
+
+// Called when a lesson on the path starts: the next one moves on.
+export function noteLessonBranch(profile, skillId) {
+  if (SKILL_BY_ID[skillId]) pathState(profile).last = SKILL_BY_ID[skillId].unit;
+}
+
+export function pinBranch(profile, unitId) {
+  const path = pathState(profile);
+  path.pinned = path.pinned === unitId ? null : unitId;
+  return path.pinned;
+}
+
+// Kept for older callers: the next skill of the path.
+export const frontier = (profile) => nextFocus(profile);
 
 // The skill actually practised for a focus skill (its repair target if any).
 export function practiceSkill(profile, id) {
@@ -274,15 +373,28 @@ export function adoptNewSkills(profile) {
 // After the placement skim: skills before the boundary count as mastered
 // but are due for review at once, so reviews confirm them; a failed review
 // sends the skill back onto the path.
+function markKnown(profile, id, i) {
+  const st = skillState(profile, id);
+  Object.assign(st, {
+    p: Math.max(st.p, MASTERY_P), level: Math.max(st.level, 4), introduced: true,
+    testedOut: true, mastered: true, interval: 1, due: now() + i * 1000,
+  });
+}
+
 export function applyPlacement(profile, boundary) {
   SKILLS.forEach((s, i) => {
-    const st = skillState(profile, s.id);
-    if (i < boundary) {
-      Object.assign(st, {
-        p: Math.max(st.p, MASTERY_P), level: Math.max(st.level, 4), introduced: true,
-        testedOut: true, mastered: true, interval: 1, due: now() + i * 1000,
-      });
-    }
+    skillState(profile, s.id);
+    if (i < boundary) markKnown(profile, s.id, i);
   });
-  profile.placement = { done: true, boundary, at: now() };
+  profile.placement = { ...(profile.placement || {}), done: true, boundary, at: now() };
+}
+
+// The placement of one unit (« Je connais déjà ce module », and the
+// university years): its skills before the boundary, in the unit's
+// topological order, count as known. They open the skills that depend on
+// them even if a prerequisite from another unit is not worked yet.
+export function applyUnitPlacement(profile, unitId, boundary) {
+  unitPath(unitId).forEach((s, i) => { if (i < boundary) markKnown(profile, s.id, i); });
+  const pl = (profile.placement ||= { done: true });
+  (pl.units ||= {})[unitId] = { boundary, at: now() };
 }

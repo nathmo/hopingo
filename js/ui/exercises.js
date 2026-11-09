@@ -23,6 +23,7 @@ import { CHECKERS } from '../math/checkers.js';
 import { graphSvg } from '../math/graph.js';
 import { parseAlg, algHtml, printAlg } from '../math/algebra.js';
 import { judgeEquationLine, nextMove, solveLines, isolatedValue } from '../math/equations.js';
+import { mountLines } from './lines.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -33,7 +34,11 @@ export function explainRule(ruleId, diag) {
   const r = RULE_BY_ID[ruleId];
   if (!r) return '';
   let body = '';
-  try { body = r.op && diag?.A ? r.explain(diag.A, diag.B, diag.op) : r.explain(); } catch { body = ''; }
+  try {
+    // University traps explain themselves with the student's line (diag.ctx).
+    if (r.transform) body = r.explain(diag?.ctx ?? {});
+    else body = r.op && diag?.A ? r.explain(diag.A, diag.B, diag.op) : r.explain();
+  } catch { body = ''; }
   if (!body) body = `Erreur typique : <b>${r.example[0]}</b> ✗ — juste : ${r.example[1]}. ${FAMILIES[r.family]?.hint ?? ''}`;
   return `<div class="trap-explain"><div class="trap-tag">🪤 Piège : ${r.name}</div><p>${body}</p></div>`;
 }
@@ -67,6 +72,9 @@ export function mountExercise(item, ctx) {
 }
 
 const MOUNTS = {};
+
+// Worked solutions line by line (university units, spec §6).
+MOUNTS.lines = (item, ctx, body) => mountLines(item, ctx, body);
 
 // ---------- multiple choice ----------
 

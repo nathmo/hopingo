@@ -388,7 +388,7 @@ Les pièges de calcul de l'école (signes, fractions, priorités) restent actifs
 |---|---|---|---|---|---|
 | G9 | `logique` | Logique et langage | `g9-` | `g9_` | 12 |
 | G0 | `polynomes` | Polynômes | `g0-` | `g0_` | 12 |
-| G1 | `fonctions` | Fonctions et inéquations | `g1-` | `g1_` | 12, 12.5 |
+| G1 | `fonctions` ⚠ | Fonctions et inéquations | `g1-` | `g1_` | 12, 12.5 |
 | G2 | `explog` | Exponentielles, logarithmes, hyperboliques | `g2-` | `g2_` | 12, 12.5 |
 | G3 | `trigo` | Trigonométrie | `g3-` | `g3_` | 12, 12.5 |
 | G5 | `recurrence` | Suites, sommes, récurrence | `g5-` | `g5_` | 12 |
@@ -407,6 +407,7 @@ Les pièges de calcul de l'école (signes, fractions, priorités) restent actifs
 | N | `numerique` | Analyse numérique | `n-` | `n_` | 16 |
 | M | `matrices` | Analyse matricielle | `m-` | `m_` | 16 |
 
+- ⚠ L'id `fonctions` est déjà celui d'une unité de l'école (`js/content/skills.js`). L'étape U1 doit donner un autre id à G1, par exemple `fonctions-g`.
 - `year` est un nombre : 12 = maturité, 12.5 = niveau CMS, 13 = BA1, 14 = BA2, 15 = BA3, 16 = BA4. C'est une indication pour le placement et pour départager deux compétences ouvertes, jamais un verrou (§8.4).
 - On ajoute à `YEARS` : `{id:13, label:'BA1', age:'1re année uni / EPF'}`, `{id:14, label:'BA2', …}`, `{id:15, label:'BA3', …}`, `{id:16, label:'BA4', …}`.
 - `hasTrack` reste faux pour ces années.
@@ -456,6 +457,7 @@ C'est un changement du moteur, fait à l'étape U0. Il vaut pour **toute l'app**
   1. une compétence en réparation, s'il y en a une ;
   2. sinon, la compétence suivante de la **branche épinglée** par l'élève sur la carte, s'il en a épinglé une ;
   3. sinon, l'app garde **au plus 3 branches actives**, c'est-à-dire des unités commencées et pas finies, et passe de l'une à l'autre d'une leçon à l'autre, ce qui mélange les sujets. Dans une branche, elle prend la compétence ouverte non maîtrisée de plus petite clé. Pour ouvrir une nouvelle branche, elle préfère la compétence qui **ouvre le plus d'autres compétences**, puis la plus petite année.
+  4. (Ajouté en U0.) Une nouvelle branche ne s'ouvre que sur une compétence du **niveau actuel** de l'élève : la plus petite année parmi les compétences ouvertes. Sans cette limite, un élève de 5H commencerait les relatifs (9H) avant les livrets. Ainsi, le calcul mental vient d'abord, puis les fractions et les longueurs le rejoignent au niveau 6H.
 - **Carte.** Chaque unité est une branche. Une compétence fermée affiche le prérequis qui manque, et un toucher y mène. L'élève peut commencer n'importe quelle compétence ouverte, et épingler une branche.
 - **Placement.** Pour les années BA1 à BA4, le test de placement se fait **par unité** : une recherche binaire dans l'ordre topologique de l'unité, en commençant par les unités des années antérieures. Sur la carte, un bouton « Je connais déjà ce module » lance le test de placement de cette unité seulement.
   - Les unités dépendent les unes des autres en boucle (G0 → G8 → G10 → L → G0), mais les compétences, elles, n'ont pas de cycle.
@@ -540,15 +542,15 @@ Plans à créer. Les durées et barèmes viennent des notes ; quand ils sont inc
 ## 11. Saisie et affichage
 
 - **Claviers** (`KEYSETS` dans `keypad.js`) :
-  - `calc` : chiffres, opérations, x, y, t, ^, √, ( ), fonctions dans un panneau (sin cos tan exp Log sinh cosh Arctg…), π, e ;
+  - `calc` : chiffres, opérations, x, y, t, ^, √, ( ), π, e ; les fonctions sont dans le panneau `calcfn` (sin cos tan exp ln Log sinh cosh tanh arctan arcsin arccos √( |) ;
   - `calcx` : comme `calc`, plus ∫ Σ lim d/dx ′ ε ;
   - `greek` : ε δ λ θ φ α β μ σ ω ρ ;
   - `set` : ] [ ; ∪ ∞ k ∅ ;
-  - `rel` : = < ≤ > ≥ ≠ ;
+  - `relation` : = < ≤ > ≥ ≠ (`rel` est déjà le clavier des nombres relatifs de l'école) ;
   - `logic` : ∀ ∃ ¬ ⇒ ⇔ ∧ ∨ ∈ ;
   - `cplx` : i, conj, Re, Im, arg, |·|.
 
-  Chaque item déclare ses claviers. Un onglet passe de l'un à l'autre.
+  Chaque item déclare ses claviers dans `keys` (une liste de noms, par exemple `['calcx', 'calcfn']`). Un onglet passe de l'un à l'autre. Une touche peut écrire plusieurs caractères d'un coup (« sin( ») : c'est un seul morceau pour le curseur et pour ⌫.
 - **Grille de matrice** (`ui/matrix-input.js`). Les dimensions sont fixées par l'item, ou réglables par ± si l'item le permet. Le curseur passe de case en case avec ▶. Pour Gauss, une barre d'opération propose `Lᵢ ↔ Lⱼ`, `Lᵢ ← k·Lᵢ` et `Lᵢ ← Lᵢ + k·Lⱼ` ; l'élève choisit i, j et k, l'app calcule la nouvelle matrice et l'affiche pour qu'il la vérifie.
 - **Affichage.** Le contenu universitaire passe par `cas/mathml.js` (`<math display="block">`). Les unités de l'école gardent leur rendu HTML. Une partie mise en valeur (la sous-expression qui a changé) reçoit `mathbackground` grâce au chemin de l'AST.
 - **Code** (`ui/code-input.js`). Le code est affiché en police à chasse fixe. Chaque `???` devient un champ. Sur téléphone, un petit clavier ajoute `( ) [ ] : = + - * / ** < > ,` et les noms de variables du programme.
@@ -603,7 +605,7 @@ Chaque étape suit le même protocole :
 
 | Étape | Contenu | Moteur à construire | Critères de fin |
 |---|---|---|---|
-| **U0** | Socle, plus une compétence pilote : `g6-deriv-rules` | `cas/` : ast, parse, print, mathml, poly, ratfun, normal, numeric, equiv, diff. `judges/` : index, value, equiv, diagnose. Type `lines` avec décisions, aides, sous-buts, `followError`. Claviers `calc`, `rel`, `greek`. MathML. Années 13–16. **Parcours en branches (§8.4)** : tri topologique, `nextFocus`, épinglage, carte, placement par unité, relecture des prérequis des unités de l'école. `optional`. `needsSolo`. Aides dans `learner`. | Tests existants verts (sauf ceux qui supposaient le parcours en ligne, qu'on adapte) ; `cas.test.js` et `judges.test.js` verts ; la compétence pilote jouable de bout en bout aux 5 niveaux ; un nouvel élève de 7H voit au moins 2 branches ouvertes après le calcul mental |
+| **U0** (fait le 9 novembre 2026, voir §17) | Socle, plus une compétence pilote : `g6-deriv-rules` | `cas/` : ast, parse, print, mathml, poly, ratfun, normal, numeric, equiv, diff. `judges/` : index, value, equiv, diagnose. Type `lines` avec décisions, aides, sous-buts, `followError`. Claviers `calc`, `rel`, `greek`. MathML. Années 13–16. **Parcours en branches (§8.4)** : tri topologique, `nextFocus`, épinglage, carte, placement par unité, relecture des prérequis des unités de l'école. `optional`. `needsSolo`. Aides dans `learner`. | Tests existants verts (sauf ceux qui supposaient le parcours en ligne, qu'on adapte) ; `cas.test.js` et `judges.test.js` verts ; la compétence pilote jouable de bout en bout aux 5 niveaux ; un nouvel élève de 7H voit au moins 2 branches ouvertes après le calcul mental |
 | **U1** | Catalogue `G-gymnase-1.md` : G9, G0, G1, G2, G3, G5 | `sets.js` et juge `solset` (inéquations, familles trigonométriques). `logic.js` avec le juge `logic` et les types `tokens` et `blocks`. Juge `poly` (Horner, division). Type `table` pour le schéma de Horner. | Toutes les compétences du catalogue, avec leurs pièges ; samples relus |
 | **U2** | Catalogue `G-gymnase-2.md`, partie G6 ; `A1-analyse-1.md`, parties dérivées, DL et intégrales | `series.js`, juges `series`, `antideriv`, `definite`, `limit` (partie séries). Décisions `quality:'poor'`. | Idem, plus la vérification des primitives par dérivation sur tout le catalogue |
 | **U3** | `L-M-algebre-lineaire.md`, partie L ; **mode examen** | `matrix.js`, `matrix-input.js`. Juges `rowops`, `eigvec`, `span`, `factor` (LU, QR, PDP, orthodiagonalisation, SVD sur des cas construits). Types `tf`, `example`, `matrix`, `askCoef`. `engine/exam.js`, écran examen, plan `ba1-alglin`. | Un examen blanc d'algèbre linéaire complet et noté ; `exam.test.js` vert |
@@ -753,3 +755,34 @@ En écrivant les catalogues, les agents ont trouvé des cas que les §4 à §7 n
 ### 16.5 Prérequis entre catalogues
 
 Les catalogues ont été écrits en parallèle. Leurs prérequis vers d'autres modules utilisaient d'abord la forme `@<MODULE>:"<titre de la ligne du plan>"`. Une passe de réconciliation les a remplacés par les ids réels. Seuls les `@alg:…` restent : ils pointent vers le plan d'algèbre, pas encore construit, et sont résolus à l'implémentation (§8.2).
+
+---
+
+## 17. Ce que U0 a construit (interfaces pour les étapes suivantes)
+
+Cette section décrit le code tel qu'il est, là où il précise ou corrige les §4 à §9.
+
+**Noyau `js/cas/`.** `ast.js` (nœuds, constructeurs qui replient les nombres et retirent ·1 et +0, `rebuild`, `walk`, `mapNode`, `equalsStructural`, `canonFn` pour les alias Arctg, Log, sh…), `parse.js` (`parse`, `tryParse`, `tokenize`, `ParseError` avec `pos`), `print.js` (`toText`, `toReadable`), `mathml.js` (`toMathML`, avec `alttext` = texte lisible), `poly.js`, `ratfun.js`, `normal.js` (`equalExact`, `normalize`, `canonKey`, `exactValue`, `pretty` pour l'affichage), `numeric.js` (`evalFloat`, `sample`), `equiv.js` (`equivalent`, `seedOf`), `diff.js` (`diff`, `pdiff`, `expandDerivs`, `ruleOf`, `stepDeriv` : une règle à la fois, les dérivées intérieures restent en `d(…)`).
+- Les sous-expressions non rationnelles (sin 3x, e^(2x), √x) sont des variables opaques nommées par leur propre forme normale : `equalExact` décide alors « égal », mais répond `null` (et non `false`) quand la différence ne s'annule pas.
+- `diff(node, v, hooks)` accepte des règles fausses (`product`, `quotient`, `chain`) : c'est ainsi que les pièges rejouent l'erreur.
+- Dans les arguments de `d` et de `root`, la virgule sépare les arguments ; ailleurs, elle est décimale.
+
+**Juges `js/judges/`.** `index.js` exporte `JUDGES = {value, equiv}` et `judgeFor(cfg)`. `isFinal(cfg, node)` rend `true`, `false` (pas encore fini : la ligne est `ok`) ou un message (juste, mais à finir : `stay`). Un verdict `wrong` d'`equiv` porte `witness` (le point où les lignes diffèrent) et un message qui le cite. `diagnose.js` : `diagnoseLine(kind, prev, node, cfg, same)` et `trapAnswers` (distracteurs de QCM). `actions.js` : menus du mode « choisir l'action » calculés sur la ligne de l'élève (`ACTIONS.deriv`). `lines.js` : `LinesRun` (moteur sans DOM d'un item `lines`), `checkScript` (rejoue le corrigé), `blankLine`, `templateOf`, `fillBlanks`, `blankAnswers`.
+
+**Pièges.** `transform(prev, ctx)` rend `[{node, ctx}]` : le `ctx` de chaque candidat (u, v, la fonction extérieure…) est donné à `explain(ctx)`. `explain()` sans argument doit rester lisible. Les règles de `js/cas/rules/*.js` sont listées dans `rules/index.js`, puis ajoutées à `RULES` et `RULE_BY_ID` par `js/math/malrules.js`. Les familles du §16.4 sont dans `FAMILIES`.
+
+**Item `lines`.** Champs du §6, plus :
+- `script` peut contenir `{kind:'segment', html, ask, start:{math}, judge:{kind, …}}` : une nouvelle partie avec son propre juge (le « juge par segment » du §16.2). Exemple : dériver (`equiv`), puis `f′(0) =` (`value`).
+- `blanks` est une liste d'intervalles de jetons `[i, j]` de `math` (jetons de `tokenize`). Les générateurs les produisent avec `blankLine(node, trous)`.
+- `keys` : la liste des claviers ; `answerHtml` : la bonne réponse affichée en cas d'échec ; `tapActions` : le nom du menu d'actions (`'deriv'`).
+- En mode guidé, une ligne juste mais pas finie (`stay`) est acceptée : la ligne suivante du corrigé la termine.
+- Crédit des sous-buts : ligne par ligne en mode guidé ; à la fin de chaque partie en modes libres, car les lignes de l'élève ne correspondent pas une à une au corrigé.
+- L'issue envoyée au moteur : `{correct, rules, ambiguous, hintsUsed, subgoals: [skillId], solo}`.
+
+**Enregistrer un module.** `js/content/uni/<unit>.skills.js` exporte `UNIT` et `SKILLS` ; `js/content/uni/<unit>.js` exporte `GEN` (`(level, rng, profile, opts) => item`). On ajoute le module à `MODULES` dans `js/content/uni/index.js` et son `GEN` dans `js/content/uni/generators.js`. Les prérequis vers des compétences pas encore construites passent par `UNBUILT` (même fichier) : chacune est remplacée par ses propres prérequis déjà construits. Une étape qui construit une de ces compétences retire sa ligne de `UNBUILT`. Un prérequis ni construit ni listé fait échouer le chargement.
+
+**Moteur.** `nextFocus(profile, {unit})` remplace `frontier` (gardé comme alias) ; `profile.path = {pinned, last}` ; `pinBranch`, `activeBranches`, `missingPrereqs`. Placement : `new Skim(profile, rng, {unit})`, `placementPlan(profile)`, `applyUnitPlacement` (`profile.placement.units[unit]`). `recordAnswer` lit `hintsUsed` et `solo`. Une leçon s'arrête à 900 s de `expectedSec` cumulés (`MAX_LESSON_SEC`).
+
+**Prérequis de l'école revus en U0** (ordre de cours retiré, prérequis utilisés gardés) : `tab-1112` ← `tab-2510` ; `cm-round` sans prérequis ; `pow-def` ← `tab-678` ; `rel-mul` ← `rel-read`, `tab-div` ; `pct-successive` ← `pct-change` ; `nb-sets` ← `rel-read`, `frac-decimal` ; `lit-write` sans prérequis ; `fac-trinomial` ← `lit-expand2` ; `quad-formula` ← `quad-xk`, `pow-sign` ; `geo-pythagore` ← `root-squares` ; `geo-thales` ← `prop-rule3`.
+
+**Pas encore fait** (pour les étapes suivantes) : les nœuds et juges des autres sortes ; les pièges de l'école sur les sous-expressions numériques d'une ligne avec des lettres (seul le juge `value` les essaie, sur des lignes sans lettres) ; `quality:'poor'` et `then` des décisions ; la sauvegarde en cours d'item (`profile.pending`) ; les types `tf` et `problem` (les variantes `tf` et `open` de la pilote sont un QCM Vrai/Faux et un `lines` sans aide, en attendant U3 et U4) ; le chronométrage de l'examen.
