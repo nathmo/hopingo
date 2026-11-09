@@ -343,7 +343,7 @@ Chaque étape est utilisable seule, testée, puis publiée sur GitHub Pages.
 | 3 ✅ | J. Proportionnalité et pourcentages, K. Grandeurs et unités, avec pieds et pouces (fait le 9 novembre 2026) | Moyenne | Réponses avec unités |
 | 4 ✅ | C. Calcul littéral et D. Factorisation (fait le 9 novembre 2026) | Grande | Lettres, forme normale, clavier, affichage |
 | 5 ✅ | E. Équations (avec systèmes 2 × 2), F. Isoler une variable, M. Géométrie calculée (fait le 9 novembre 2026) | Grande | Lignes d'équation ; aux niveaux 1-2 le coup à jouer est affiché au lieu d'être choisi |
-| 6 | L. Fonctions | Moyenne | Repère interactif |
+| 6 ✅ | L. Fonctions (fait le 9 novembre 2026) | Moyenne | Repère interactif |
 | 7 | G. Rationnelles, H. 2e degré et I. Synthèse | Grande | Valeurs interdites, ±, comparaison par valeurs |
 
 Proportionnalité et unités viennent tôt (étape 3) : ils n'ont pas besoin des lettres, ils servent dès 9H et ils préparent la physique. La géométrie calculée vient avec « isoler une variable », parce qu'elle s'en sert (A = πr² → r).

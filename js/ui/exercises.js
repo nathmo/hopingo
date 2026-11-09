@@ -20,6 +20,7 @@ import { diagnose } from '../math/diagnose.js';
 import { judgeAnswer, judgeLine, performedOps } from '../math/judge.js';
 import { RULE_BY_ID, FAMILIES } from '../math/malrules.js';
 import { CHECKERS } from '../math/checkers.js';
+import { graphSvg } from '../math/graph.js';
 import { parseAlg, algHtml, printAlg } from '../math/algebra.js';
 import { judgeEquationLine, nextMove, solveLines, isolatedValue } from '../math/equations.js';
 
@@ -309,6 +310,36 @@ MOUNTS.numberline = (item, ctx, body) => {
       return wrongOutcome(item, {
         answerHtml: M(item.target),
         extra: `<p>Tu as placé ${M(picked.toString())}.</p>${right.el.outerHTML}`,
+      });
+    },
+  };
+};
+
+// ---------- point on a grid ----------
+
+MOUNTS.graphpoint = (item, ctx, body) => {
+  let picked = null;
+  const box = h('div.graph-box.pickable', { html: graphSvg({ ...item.grid, picks: true }) });
+  body.append(box, h('p.hint-small', 'Touche le point sur le quadrillage.'));
+  box.querySelectorAll('.g-pick').forEach((c) => c.addEventListener('click', () => {
+    box.querySelectorAll('.g-pick.on').forEach((o) => o.classList.remove('on'));
+    c.classList.add('on');
+    picked = [Number(c.dataset.x), Number(c.dataset.y)];
+    play('tap');
+    ctx.ready(true);
+  }));
+  const show = (v) => String(v).replace('-', '−');
+  return {
+    check() {
+      if (!picked) return null;
+      box.classList.add('locked');
+      const [X, Y] = item.target;
+      if (picked[0] === X && picked[1] === Y) return { correct: true };
+      const swapped = picked[0] === Y && picked[1] === X;
+      return wrongOutcome(item, {
+        rules: swapped ? ['graph_xy_swap'] : [],
+        answerHtml: `(${show(X)} ; ${show(Y)})`,
+        extra: `<p>Tu as placé (${show(picked[0])} ; ${show(picked[1])}).</p><div class="graph-box">${graphSvg({ ...item.grid, points: [[X, Y, '✓']] })}</div>`,
       });
     },
   };

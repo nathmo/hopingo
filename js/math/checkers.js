@@ -120,6 +120,7 @@ export function checkSystem(item, raw) {
   const y = byName.y ?? got[1].value;
   const [X, Y] = item.pair;
   if (close(x, X) && close(y, Y)) return { kind: 'done' };
+  if (close(x, Y) && close(y, X) && !close(X, Y)) return { kind: 'wrong', rule: 'graph_xy_swap' };
   // Right for one equation only.
   const fits = (e) => close(e[0] * x + e[1] * y, e[2]);
   return { kind: 'wrong', rule: item.eqs.some(fits) ? 'system_one_equation' : null };
@@ -146,7 +147,7 @@ export function checkIsolate(item, raw) {
     return true;
   };
   if (same(other, parseAlg(item.target))) return { kind: 'done' };
-  const trap = (item.isoTraps || []).find((t) => same(other, parseAlg(t.expr)));
+  const trap = (item.isoTraps || []).find((t) => { try { return same(other, parseAlg(t.expr)); } catch { return false; } });
   return { kind: 'wrong', rule: trap?.rule ?? null };
 }
 

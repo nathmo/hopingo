@@ -1133,7 +1133,39 @@ export const RULES = [
     example: ['grand ÷ petit appliqué au grand côté', 'même rapport dans le même sens'],
     explain: () => 'Écris les rapports dans le même sens : grand triangle sur petit triangle, pour chaque paire de côtés qui se correspondent.',
   },
+  // ---------- functions and graphs ----------
+  {
+    id: 'graph_xy_swap', family: 'symbol', tag: 'R', skill: 'fn-read', repair: 'fn-point',
+    name: 'Inverser x et y',
+    example: ['A(2 ; −3) placé en (−3 ; 2)', 'x = 2 horizontal, y = −3 vertical'],
+    explain: () => 'La première coordonnée est x, sur l\'axe horizontal ; la deuxième est y, sur l\'axe vertical. f(2) se lit en partant de x = 2.',
+  },
+  {
+    id: 'slope_y_over_x', family: 'rule', tag: 'E', skill: 'fn-linear', repair: 'prop-rule3',
+    name: 'Lire y au lieu de la pente',
+    example: ['passe par (2 ; 6) → a = 6', 'a = 6 ÷ 2 = 3'],
+    explain: () => 'La pente, c\'est ce que y gagne quand x augmente de <b>1</b>. Si la droite passe par (2 ; 6), alors a = 6 ÷ 2.',
+  },
+  {
+    id: 'slope_intercept_swap', family: 'symbol', tag: 'E', skill: 'fn-affine', repair: 'fn-affine',
+    name: 'Échanger la pente et l\'ordonnée à l\'origine',
+    example: ['y = 2x + 3 : coupe l\'axe en 2', 'coupe l\'axe en 3, pente 2'],
+    explain: () => 'Dans y = ax + b, le nombre <b>devant x</b> est la pente a ; le nombre <b>seul</b>, b, est là où la droite coupe l\'axe vertical (pour x = 0).',
+  },
+  {
+    id: 'slope_sign', family: 'sign', tag: 'E', skill: 'fn-affine', repair: 'fn-linear',
+    name: 'Mauvais signe de pente',
+    example: ['y = −2x + 1 qui monte', 'y = −2x + 1 descend'],
+    explain: () => 'Une pente négative fait <b>descendre</b> la droite quand on va vers la droite ; une pente positive la fait monter.',
+  },
+  {
+    id: 'intercept_sign', family: 'sign', tag: 'E', skill: 'fn-affine', repair: 'fn-read',
+    name: 'Mauvais signe de l\'ordonnée à l\'origine',
+    example: ['y = x − 3 coupe l\'axe en 3', 'coupe l\'axe en −3'],
+    explain: () => 'Pour x = 0, y = b : avec y = x − 3, la droite coupe l\'axe vertical en −3.',
+  },
 ];
+
 
 
 

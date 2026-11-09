@@ -426,3 +426,21 @@ textarea.code { width: 100%; font-family: ui-monospace, monospace; font-size: .7
 .ptable { border-collapse: collapse; margin: 10px auto 0; font-weight: 800; }
 .ptable td { border: 2px solid var(--line); padding: 6px 12px; text-align: center; min-width: 2.4em; background: #fff; }
 .ptable tr td:first-child { background: var(--violet-soft); color: var(--violet-dark); }
+
+/* ---------- coordinate grids (functions) ---------- */
+.graph-box { display: flex; justify-content: center; margin: 10px 0 4px; }
+.fig-graph { background: #fff; border-radius: 12px; border: 2px solid var(--line); max-width: 100%; height: auto; }
+.fig-graph.small { border-width: 1px; }
+.fig-graph .g-grid { stroke: #e9e5f7; stroke-width: 1; }
+.fig-graph .g-axis { stroke: #8f86b0; stroke-width: 2; }
+.fig-graph .g-lab { font-size: 11px; fill: var(--muted); text-anchor: middle; font-weight: 700; }
+.fig-graph .g-name { font-style: italic; font-size: 13px; }
+.fig-graph .g-line { stroke: var(--violet); stroke-width: 3; fill: none; }
+.fig-graph .g-c1 { stroke: var(--orange); }
+.fig-graph .g-pt { fill: var(--violet-dark); }
+.fig-graph .g-ptlab { fill: var(--green-dark); font-size: 14px; }
+.fig-graph .g-pick { fill: transparent; cursor: pointer; }
+.fig-graph .g-pick:hover { fill: rgba(124, 92, 255, .15); }
+.fig-graph .g-pick.on { fill: var(--violet); }
+.graph-box.locked .g-pick { pointer-events: none; }
+.choice-body .fig-graph.small { width: 120px; height: 120px; }

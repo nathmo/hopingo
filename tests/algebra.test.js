@@ -72,3 +72,19 @@ test('equation lines: valid moves, named wrong moves', async () => {
   assert.equal(judgeEquationLine('2x+6=10', 'x+6=5').rule, 'eq_divide_one_term');
   assert.equal(judgeEquationLine('3x=15', '3x=15').kind, 'same');
 });
+
+test('every trap expression of the algebra checkers parses', async () => {
+  const { generate } = await import('../js/content/generators.js');
+  const { makeRng } = await import('../js/content/random.js');
+  const { SKILLS } = await import('../js/content/skills.js');
+  const rng = makeRng(5);
+  for (const s of SKILLS) {
+    for (let level = 1; level <= 5; level++) {
+      for (let i = 0; i < 20; i++) {
+        const it = generate(s.id, level, rng);
+        for (const t of [...(it.algTraps || []), ...(it.isoTraps || [])]) assert.doesNotThrow(() => P(t.expr), `${it.key}: ${t.expr}`);
+        if (it.target && (it.checker === 'alg' || it.checker === 'isolate')) assert.doesNotThrow(() => P(it.target), it.key);
+      }
+    }
+  }
+});

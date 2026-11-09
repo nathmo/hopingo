@@ -26,8 +26,8 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 | Solver | `js/math/solver.js` | Canonical step-by-step solutions (signs, powers, roots included), used for guided blanks, hints and worked examples. |
 | Mistakes | `js/math/malrules.js`, `diagnose.js` | Known errors (« pièges ») as rules. A wrong line is replayed under each rule, and under misreadings of its structure (priorities, brackets, −3² vs (−3)², √(a+b) = √a + √b…), to name the mistake. |
 | Judge | `js/math/judge.js` | A line is valid if it keeps the exact value of the previous one, so any method is accepted. |
-| Skills | `js/content/skills.js` | The skill graph: 115 skills in 14 units, prerequisites, intro cards, HarmoS year. The path follows the school year across units. |
-| Questions | `js/content/items.js` and one file per unit: `calcul.js`, `fractions.js`, `relatifs.js`, `puissances.js`, `racines.js`, `arithmetique.js`, `proportion.js`, `algebre.js`, `equations.js`, `melanges.js` (merged in `generators.js`) | One generator per skill, 5 levels each. Records which traps each question can catch. |
+| Skills | `js/content/skills.js` | The skill graph: 122 skills in 15 units, prerequisites, intro cards, HarmoS year. The path follows the school year across units. |
+| Questions | `js/content/items.js` and one file per unit: `calcul.js`, `fractions.js`, `relatifs.js`, `puissances.js`, `racines.js`, `arithmetique.js`, `proportion.js`, `algebre.js`, `equations.js`, `fonctions.js`, `melanges.js` (merged in `generators.js`) | One generator per skill, 5 levels each. Records which traps each question can catch. |
 | Algebra | `js/math/algebra.js`, `checkers.js` | Expressions with letters: parser (3x, 2(x+1), x^2), exact polynomials and rational fractions, equivalence (numeric probing when a root appears), and form checks: « développé réduit », « factorisé (complètement) ». The checker says what is left to do and names the trap. |
 | Equations | `js/math/equations.js` | Solution sets (degree ≤ 2, forbidden values removed), judging an equation line by line (same solutions = valid line), the next move for hints, and the classic wrong moves to name the mistake. |
 | Learner | `js/engine/learner.js` | Mastery estimate per skill (Bayesian knowledge tracing), difficulty ladder, repair of prerequisites, spaced review, traps. |
@@ -55,7 +55,7 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 
 ## Content
 
-The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-calcul.md`, `samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md`, `samples-racines.md`, `samples-arithmetique.md`, `samples-proportion.md`, `samples-unites.md`, `samples-algebre.md`, `samples-factorisation.md`, `samples-equations.md`, `samples-formules.md`, `samples-geometrie.md` and `samples-melanges.md`.
+The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-calcul.md`, `samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md`, `samples-racines.md`, `samples-arithmetique.md`, `samples-proportion.md`, `samples-unites.md`, `samples-algebre.md`, `samples-factorisation.md`, `samples-equations.md`, `samples-formules.md`, `samples-fonctions.md`, `samples-geometrie.md` and `samples-melanges.md`.
 
 | Unit | Skills | Years |
 |---|---|---|
@@ -71,6 +71,7 @@ The research behind the mistakes and the skill order is in `docs/error-catalogue
 | Factorisation | 6: common factor, common bracket, identities backwards, x² + bx + c, ax² + bx + c (gymnase), factorise completely | 11H–Gym |
 | Équations | 10: meaning of « = », one-step, two-step, unknown on both sides, brackets, cross product, fractions, word problems, zero product, 2×2 systems. Equations are solved line by line: each line must keep the same solutions; at low levels the move is shown (« Soustrais 5 des deux côtés »). | 10H–11H |
 | Isoler une variable | 1 skill, 5 levels: d = vt → t, P = 2(L + l) → l, A = (B + b)h/2 → h, A = πr² → r, E = ½mv² → v, ax + b = cx → x, physics formulas. The keypad shows the letters of the formula. | 11H |
+| Fonctions | 7: read a graph, tables of values, place a point (tap on a grid), linear functions, affine functions (which graph? four small graphs as options), from the graph to y = ax + b, intersection of two lines. Graphs are SVG markup built by `js/math/graph.js`. | 9H–11H |
 | Géométrie calculée | 6: areas, volumes, Pythagoras, enlarging (k, k², k³), Thalès and similar figures, missing length | 9H–11H |
 | Calculs mélangés | 3 (9H, 10H, 11H): one expression mixing signed numbers, fractions, powers and roots. Also new: powers of fractions with negative exponents ((2/3)⁻² = 9/4) and roots of fractions (√(9/16) × (−2)²) | 9H–11H |
 

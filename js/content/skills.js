@@ -15,6 +15,7 @@ export const UNITS = [
   { id: 'factorisation', title: 'Factorisation', color: '#d6336c', ready: true },
   { id: 'equations', title: 'Équations', color: '#3b5bdb', ready: true },
   { id: 'formules', title: 'Isoler une variable', color: '#5c940d', ready: true },
+  { id: 'fonctions', title: 'Fonctions', color: '#0c8599', ready: true },
   { id: 'unites', title: 'Grandeurs et unités', color: '#e67700', ready: true },
   { id: 'geometrie', title: 'Géométrie calculée', color: '#a61e4d', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
@@ -1000,6 +1001,66 @@ const FORMULES = [
   },
 ];
 
+// Functions and graphs (content/fonctions.js).
+const FONCTIONS = [
+  {
+    id: 'fn-read', unit: 'fonctions', year: 9, prereqs: ['rel-read'], icon: '📈',
+    title: 'Lire un graphique',
+    desc: 'f(2) = ? et pour quel x ?',
+    intro: {
+      rule: 'Pour lire <b>f(2)</b> : on part de x = 2 sur l\'axe horizontal, on va jusqu\'à la courbe, puis on lit la hauteur sur l\'axe vertical.<br>Attention à ne pas inverser x (horizontal) et y (vertical).',
+    },
+  },
+  {
+    id: 'fn-table', unit: 'fonctions', year: 9, prereqs: ['lit-value'], icon: 'x|f(x)',
+    title: 'Tableau de valeurs',
+    desc: 'Calculer f(x) pour quelques x.',
+    intro: {
+      rule: 'f(x) = 2x − 1 : pour x = 3, f(3) = 2 × 3 − 1 = <b>5</b>.<br>Avec un x négatif, on met des parenthèses : f(−2) = 2 × (−2) − 1 = −5.',
+    },
+  },
+  {
+    id: 'fn-point', unit: 'fonctions', year: 9, prereqs: ['rel-read'], icon: '•',
+    title: 'Placer des points',
+    desc: 'A(2 ; −3) : d\'abord x, puis y.',
+    intro: {
+      rule: 'Un point A(2 ; −3) : la première coordonnée est <b>x</b> (horizontal), la deuxième est <b>y</b> (vertical). On avance de 2, puis on descend de 3.',
+    },
+  },
+  {
+    id: 'fn-linear', unit: 'fonctions', year: 10, prereqs: ['fn-read', 'prop-rule3'], icon: 'ax',
+    title: 'Fonction linéaire',
+    desc: 'f(x) = ax : une droite par l\'origine.',
+    intro: {
+      rule: 'Une fonction <b>linéaire</b> f(x) = ax représente une situation proportionnelle : sa droite passe par l\'origine (0 ; 0).<br>Si elle passe par (2 ; 6), alors a = 6 ÷ 2 = <b>3</b>.',
+    },
+  },
+  {
+    id: 'fn-affine', unit: 'fonctions', year: 10, prereqs: ['fn-linear', 'fn-table'], icon: 'ax+b',
+    title: 'Fonction affine',
+    desc: 'f(x) = ax + b : pente et ordonnée à l\'origine.',
+    intro: {
+      rule: 'f(x) = ax + b : la droite coupe l\'axe vertical en <b>b</b>, et elle monte de <b>a</b> quand x augmente de 1 (elle descend si a est négatif).',
+    },
+  },
+  {
+    id: 'fn-from-graph', unit: 'fonctions', year: 11, prereqs: ['fn-affine'], icon: 'y=?',
+    title: 'Du graphique à l\'expression',
+    desc: 'Lire a et b sur la droite.',
+    intro: {
+      rule: 'On lit <b>b</b> là où la droite coupe l\'axe vertical, puis <b>a</b> : de combien y change quand x augmente de 1. On écrit y = ax + b.',
+    },
+  },
+  {
+    id: 'fn-intersection', unit: 'fonctions', year: 11, prereqs: ['fn-from-graph', 'eq-systems'], icon: '✕',
+    title: 'Intersection de deux droites',
+    desc: 'Le point commun : même x, même y.',
+    intro: {
+      rule: 'Au point d\'intersection, les deux droites ont le même y : on résout ax + b = cx + d pour trouver x, puis on calcule y. On peut aussi le lire sur le graphique.',
+    },
+  },
+];
+
 // Geometry by formula (content/equations.js).
 const GEOMETRIE = [
   {
@@ -1090,7 +1151,7 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...GEOMETRIE, ...MELANGES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...FONCTIONS, ...GEOMETRIE, ...MELANGES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL
