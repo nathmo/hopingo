@@ -58,7 +58,7 @@ function baseEq(prev) {
 }
 const fam = (U, alpha, period) => ({ t: 'rel', op: '=', l: U, r: { t: 'bin', op: '+', l: F(alpha), r: { t: 'bin', op: '×', l: F(period), r: sym('k') } } });
 
-export const RULES = [
+const LINE_RULES = [
   {
     id: 'g3_deg_rad', family: 'notation', tag: 'E', skill: 'g3-radians', repair: 'g3-radians', judges: ['value', 'solset'],
     name: 'Degrés et radians mélangés',
@@ -204,7 +204,7 @@ export const RULES = [
     name: 'x = π + 2kπ oublié avec t = tan(x/2)',
     example: ['2 sin x − cos x = 1 : S = {2 arctan(1/2) + 2kπ}', 'S = {2 arctan(1/2) + 2kπ} ∪ {π + 2kπ}'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true }, prev: '2sin(x)-cos(x)=1', line: 'x=2arctan(1/2)+2kπ' },
-    transform: (prev) => (hasSym(prev, 'x') && contains(prev, (n) => n.t === 'fn' && TRIG.has(n.name)) ? [{ node: andNot0(prev, parse('cos(x/2)')), ctx: {} }] : []),
+    transform: (prev) => (hasSym(prev, 'x') || hasSym(prev, 't') ? [{ node: andNot0(prev, parse('cos(x/2)')), ctx: {} }] : []),
     explain: () => 'tan(x/2) n\'existe pas pour x = π : la substitution oublie ces valeurs. Or 2 sin π − cos π = 1 : x = π + 2kπ est solution. Teste toujours x = π + 2kπ à part.',
   },
   {
@@ -311,3 +311,10 @@ export const RULES = [
     explain: () => 'θ = arcsin(−3/5) est dans [−π/2 ; 0] : son cosinus est positif. Le signe de la racine vient de l\'intervalle de θ, pas du signe de a.',
   },
 ];
+
+// The solution-set traps of this module only replay on periodic lines
+// (trigonometry): elsewhere, « a family dropped » would name any lost root.
+const PERIODIC_ONLY = new Set(['g3_family_missing', 'g3_sin_family', 'g3_period_divide', 'g3_bioche_pi', 'g3_divide_zero', 'g3_rphi', 'g3_ineq_arc', 'g3_ineq_window']);
+export const RULES = LINE_RULES.map((r) => (PERIODIC_ONLY.has(r.id)
+  ? { ...r, transform: (prev, ctx = {}) => (ctx.cfg?.periodic ? r.transform(prev, ctx) : []) }
+  : r));

@@ -105,7 +105,9 @@ function lineSet(node, cfg, env = {}) {
 }
 
 // The domain of the part's first line (onDomain).
-const startDomain = (start, cfg, env = {}) => domainOf(substSyms(withParams(start, env), substMap(cfg)), baseCfg(cfg));
+// cfg.onDomainOf (text): the lines are compared where this expression is
+// defined instead (t = tan(x/2): away from x = π + 2kπ, G3).
+const startDomain = (start, cfg, env = {}) => domainOf(cfg.onDomainOf ? asNode(cfg.onDomainOf) : substSyms(withParams(start, env), substMap(cfg)), baseCfg(cfg));
 
 export const setOf = (node, cfg) => lineSet(node, cfg);
 

@@ -651,10 +651,12 @@ function exactExam(rng, exam) {
   }, rng);
 }
 
+
 export const GEN = {
   [RAD]: (level, rng, profile, opts = {}) => (opts.exam ? radExam(rng) : radItem(level, rng, opts)),
   [RED]: (level, rng, profile, opts = {}) => (opts.exam ? redExam(rng, opts.exam) : redItem(level, rng, opts)),
   [IDS]: (level, rng, profile, opts = {}) => (opts.exam ? idExam(rng, opts.exam) : idItem(level, rng, opts)),
   [EXACT]: (level, rng, profile, opts = {}) => (opts.exam ? exactExam(rng, opts.exam) : exactItem(level, rng, opts)),
 };
+// Shared with trigo-eq.js and trigo-tri.js (the other G3 generators).
 export { q, PERIODIC, KEYS, lit0, tpl, famsT, famsHtml, modQ, valueFloat, assoc, neg, RED, IDS, EXACT };

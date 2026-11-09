@@ -25,7 +25,7 @@ import { parse } from './parse.js';
 import { toText } from './print.js';
 import { mapNode, stripParen, lit, neg, add, sub, mul, sqrt, num, contains } from './ast.js';
 import { exactValue, toRatFun } from './normal.js';
-import { evalFloat } from './numeric.js';
+import { evalFloat, compileFloat } from './numeric.js';
 import { diff } from './diff.js';
 import { qCoeffs, rationalRoots, discriminant } from './polyx.js';
 
@@ -298,9 +298,10 @@ let scanRange = null;
 function numericRoots(f, v) {
   const out = [];
   const [lo, hi] = scanRange ?? [-SCAN, SCAN];
-  const N = Math.max(400, Math.min(SCAN_STEPS, Math.round((hi - lo) / 0.01)));
+  const N = Math.max(400, Math.min(SCAN_STEPS, Math.round((hi - lo) / (scanRange ? 0.02 : 0.01))));
   const h = (hi - lo) / N;
-  const F = (x) => evalFloat(f, { [v]: x });
+  const G = compileFloat(f);
+  const F = (x) => G({ [v]: x });
   let x0 = lo;
   let y0 = F(x0);
   let xm = NaN; // the point before x0, for double roots (tangencies)
@@ -353,7 +354,7 @@ function touch(F, a, b, f, v) {
 }
 
 function bisect(F, a, b, test, atA) {
-  for (let k = 0; k < 80; k++) {
+  for (let k = 0; k < 80 && b - a > 1e-15 * (1 + Math.abs(a)); k++) {
     const m = (a + b) / 2;
     if (test(F(m)) === atA) a = m; else b = m;
   }
@@ -619,9 +620,36 @@ const WINDOW = 13; // not a nice multiple of π: no family point falls on its en
 
 // A family (k ∈ ℤ): the union over k of the set with k replaced, for every
 // k whose part meets the window. Two empty k in a row end each side.
-function familySet(n, ctx) {
-  const inner = { ...ctx, k: null };
-  const at = (k) => solutionSetIn(mapNode(n, (x) => (x.t === 'sym' && !x.sub && x.name === ctx.k ? { t: 'paren', e: lit(new Q(k)) } : x)), inner);
+function familySet(node, ctx) {
+  const n = stripParen(node);
+  // One family at a time: the parts of « ou », of a union, of a finite set.
+  const split = (parts) => parts.reduce((S, p) => union(S, hasK(p, ctx.k) ? familySet(p, ctx) : solutionSetIn(p, { ...ctx, k: null })), EMPTY);
+  if (n.t === 'logic' && n.op === 'or') return split([n.l, n.r]);
+  if (n.t === 'setop' && n.op === '∪') return split([n.l, n.r]);
+  if (n.t === 'set' && n.kind === 'finite' && n.items.length > 1) return split(n.items.map((it) => ({ t: 'set', kind: 'finite', items: [it] })));
+  const subK = (k, within) => solutionSetIn(mapNode(n, (x) => (x.t === 'sym' && !x.sub && x.name === ctx.k ? { t: 'paren', e: lit(new Q(k)) } : x)), { ...ctx, k: null, within });
+  // A family whose set moves by T when k grows by 1: translate the set of
+  // k = 0 (computed on all of ℝ) instead of solving again for each k.
+  const S0 = subK(0, null);
+  const S1 = subK(1, null);
+  const T = S0.parts.length && S1.parts.length ? S1.parts[0].lo.x - S0.parts[0].lo.x : NaN;
+  const shift = (S, t) => ({ parts: S.parts.map((p) => ({ ...p, lo: shiftB(p.lo, t), hi: shiftB(p.hi, t) })) });
+  const bounded = S0.parts.every((p) => Number.isFinite(p.lo.x) && Number.isFinite(p.hi.x));
+  if (Number.isFinite(T) && Math.abs(T) > 1e-9 && bounded && setEqual(shift(S0, T), S1) && setEqual(shift(S0, -T), subK(-1, null)) && ctx.within) {
+    const W = ctx.within.parts;
+    const lo = W[0].lo.x;
+    const hi = W[W.length - 1].hi.x;
+    const a = S0.parts[0].lo.x;
+    const b = S0.parts[S0.parts.length - 1].hi.x;
+    const step = Math.abs(T);
+    const j0 = Math.floor((lo - b) / step) - 1;
+    const j1 = Math.ceil((hi - a) / step) + 1;
+    const parts = [];
+    for (let j = j0; j <= j1; j++) parts.push(...shift(S0, j * step).parts);
+    return intersect(normalize(parts), ctx.within);
+  }
+  // Otherwise: k by k, until two k in a row give nothing in the window.
+  const at = (k) => subK(k, ctx.within);
   let S = at(0);
   for (const dir of [1, -1]) {
     let empty = 0;
@@ -632,6 +660,7 @@ function familySet(n, ctx) {
   }
   return S;
 }
+const shiftB = (b, t) => (Number.isFinite(b.x) ? { x: b.x + t } : b);
 
 export const hasK = (node, k = 'k') => contains(node, (x) => x.t === 'sym' && !x.sub && x.name === k);
 

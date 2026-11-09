@@ -26,7 +26,7 @@ import { checkTable } from '../js/judges/iter.js';
 import { parse } from '../js/cas/parse.js';
 import { expandDerivs } from '../js/cas/diff.js';
 import { pretty } from '../js/cas/normal.js';
-import { solutionSet, setToNode, union, minus, contains01 } from '../js/cas/sets.js';
+import { solutionSet, contains01, isSetNode } from '../js/cas/sets.js';
 import { toText } from '../js/cas/print.js';
 import { parse as parseSchool, evaluate } from '../js/math/expr.js';
 
@@ -42,8 +42,12 @@ function wrongLine(cfg, final) {
     const W = solutionSet(parse('ℝ'), cfg);
     const val = (x) => (x.includes('/') ? Number(x.split('/')[0]) / Number(x.split('/')[1]) : Number(x));
     const out = ['1000', '-1000', '1/7', '-55', '7/3', '-5/2', '11/9'].find((x) => !contains01(S, val(x)) && contains01(W, val(x)));
-    if (!out) return toText(setToNode(minus(S, solutionSet(parse('{0}'), cfg))));
-    return toText(setToNode(union(S, solutionSet(parse(`{${out}}`), cfg))));
+    // Written from the final line itself (its set may hold numbers that
+    // only print as long decimals).
+    const v = cfg.v || 'x';
+    const asSet = isSetNode(parse(final, parseOpts(cfg)), cfg);
+    if (!out) return asSet ? `(${final})∖{0}` : `(${final})∧${v}≠0`;
+    return asSet ? `(${final})∪{${out}}` : `(${final})∨${v}=${out}`;
   }
   return `${final}+1`;
 }

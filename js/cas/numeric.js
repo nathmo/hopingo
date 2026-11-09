@@ -110,3 +110,53 @@ export function sample(vars, domain = {}, rng, k = 12) {
   }
   return out;
 }
+
+// The same evaluation compiled once into closures (no guard), for scans
+// that evaluate one expression at thousands of points (js/cas/sets.js).
+// compileFloat(node) → (env) => number.
+export function compileFloat(node) {
+  const C = compileFloat;
+  switch (node.t) {
+    case 'num': { const v = node.v.n / node.v.d; return () => v; }
+    case 'float': return () => node.x;
+    case 'const': { const v = evalFloat(node, {}); return () => v; }
+    case 'sym': { const key = node.sub ? `${node.name}_` : node.name; return (env) => (key in env ? env[key] : NaN); }
+    case 'paren': return C(node.e);
+    case 'neg': { const e = C(node.e); return (env) => -e(env); }
+    case 'bin': {
+      const a = C(node.l);
+      const b = C(node.r);
+      if (node.op === '+') return (env) => a(env) + b(env);
+      if (node.op === '-') return (env) => a(env) - b(env);
+      if (node.op === '×') return (env) => a(env) * b(env);
+      return (env) => a(env) / b(env);
+    }
+    case 'frac': { const a = C(node.n); const b = C(node.d); return (env) => a(env) / b(env); }
+    case 'sqrt': { const e = C(node.e); return (env) => { const x = e(env); return x < 0 ? NaN : Math.sqrt(x); }; }
+    case 'abs': { const e = C(node.e); return (env) => Math.abs(e(env)); }
+    case 'fn': {
+      const name = canonFn(node.name);
+      const f = REAL_FN[name];
+      if (!f || node.args.length !== 1) break;
+      const a = C(node.args[0]);
+      return (env) => f(a(env));
+    }
+    case 'pow': {
+      const b = C(node.b);
+      const e = C(node.e);
+      const d = node.e.t === 'frac' ? C(node.e.d) : null;
+      return (env) => {
+        const x = b(env);
+        const y = e(env);
+        if (x < 0 && !Number.isInteger(y)) {
+          const q = d ? d(env) : null;
+          return q && Number.isInteger(q) && q % 2 === 1 ? -((-x) ** y) : NaN;
+        }
+        if (x === 0 && y < 0) return NaN;
+        return x ** y;
+      };
+    }
+    default: break;
+  }
+  return (env) => evalFloat(node, env);
+}
