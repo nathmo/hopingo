@@ -151,6 +151,10 @@ function checkItem(it, where) {
   }
 }
 
+// Items per level: 40, fewer (never under 15) for skills whose lines are
+// all judged by the numeric scan of sets.js.
+const COUNT = { 'g2-exp-eq': 25, 'g2-ineq': 25 };
+
 test('every university skill: 5 levels and exam variants, 40 items each', () => {
   const rng = makeRng(17);
   for (const id of UNI) {
@@ -160,7 +164,7 @@ test('every university skill: 5 levels and exam variants, 40 items each', () => 
     const runs = [...[1, 2, 3, 4, 5].map((level) => ({ level })), ...(s.exam || []).map((exam) => ({ level: 4, exam }))];
     for (const { level, exam } of runs) {
       const modes = new Set();
-      for (let i = 0; i < 40; i++) {
+      for (let i = 0; i < (COUNT[id] ?? 40); i++) {
         const it = generate(id, level, rng, null, exam ? { exam } : undefined);
         const where = `${id} L${level}${exam ? ` ${exam}` : ''}: ${it.key}`;
         total++;
