@@ -769,6 +769,8 @@ export function finalForm(node, cfg = {}) {
   // Disjoint, sorted, not touching: each piece read alone, in order.
   const ctx = cfg.isCtx ? cfg : makeCtx(cfg);
   const sets = parts.map((p) => evalSet(p, ctx));
+  // On a given interval (periodic cfgs), nothing written outside it.
+  if (cfg.periodic && ctx.within && cfg.domain && cfg.domain !== 'R' && minus(sets.reduce((acc, S) => union(acc, S), EMPTY), ctx.within).parts.length) return "Garde seulement la partie qui est dans l'intervalle.";
   if (sets.some((S, i) => !S.parts.length && parts[i].kind !== 'named')) return 'Un des morceaux est vide : enlève-le.';
   for (let i = 0; i + 1 < sets.length; i++) {
     const a = sets[i];
@@ -814,7 +816,7 @@ function familyFinal(node, cfg) {
     const parts = unionParts(n);
     ok = parts.every((p) => p.t === 'set' && ((p.kind === 'finite' && p.items.every(written)) || (p.kind === 'interval' && written(p.lo) && written(p.hi))));
   }
-  if (ok && bounded) return 'Garde seulement les solutions qui sont dans l\'intervalle, et écris-les sans k.';
+  if (ok && bounded) return false; // on an interval: the solutions are listed without k
   return ok;
 }
 

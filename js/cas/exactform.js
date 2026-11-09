@@ -11,7 +11,11 @@ import { numValue } from './ast.js';
 
 const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
 
+// A number written out: 3, 3/4 (not a product of numbers to compute).
+const literal = (n) => { n = stripParen(n); if (n.t === 'neg') n = stripParen(n.e); return n.t === 'num' || (n.t === 'frac' && stripParen(n.n).t === 'num' && stripParen(n.d).t === 'num'); };
 function intOf(n) {
+  const m = stripParen(n);
+  if (!(m.t === 'num' || (m.t === 'neg' && stripParen(m.e).t === 'num'))) return null;
   const q = numValue(stripParen(n));
   return q && q.d === 1 ? q.n : null;
 }
@@ -45,7 +49,7 @@ function termOf(t) {
   let x = stripParen(t);
   let sign = 1;
   if (x.t === 'neg') { sign = -1; x = stripParen(x.e); }
-  const q = numValue(x);
+  const q = literal(x) ? numValue(x) : null;
   if (q) {
     if (x.t === 'frac' && gcd(q.n, q.d) === 1 && intOf(x.d) !== q.d) return null;
     return { c: sign * q.n, d: q.d, kind: '1' };

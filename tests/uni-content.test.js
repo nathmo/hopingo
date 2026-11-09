@@ -41,12 +41,14 @@ function wrongLine(cfg, final) {
     // periodic cfg) and outside the set.
     const W = solutionSet(parse('ℝ'), cfg);
     const val = (x) => (x.includes('/') ? Number(x.split('/')[0]) / Number(x.split('/')[1]) : Number(x));
-    const out = ['1000', '-1000', '1/7', '-55', '7/3', '-5/2', '11/9'].find((x) => !contains01(S, val(x)) && contains01(W, val(x)));
+    const CANDS = ['1000', '-1000', '1/7', '-55', '7/3', '-5/2', '11/9', '4', '-4', '3', '1', '-1', '5/2', '7/2', '9/2', '11/2', '6', '0'];
+    const out = CANDS.find((x) => !contains01(S, val(x)) && contains01(W, val(x)));
+    const inside = CANDS.find((x) => contains01(S, val(x)));
     // Written from the final line itself (its set may hold numbers that
     // only print as long decimals).
     const v = cfg.v || 'x';
     const asSet = isSetNode(parse(final, parseOpts(cfg)), cfg);
-    if (!out) return asSet ? `(${final})∖{0}` : `(${final})∧${v}≠0`;
+    if (!out) return asSet ? `(${final})∖{${inside ?? 0}}` : `(${final})∧${v}≠${inside ?? 0}`;
     return asSet ? `(${final})∪{${out}}` : `(${final})∨${v}=${out}`;
   }
   return `${final}+1`;
