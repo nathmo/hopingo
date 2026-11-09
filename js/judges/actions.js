@@ -11,6 +11,7 @@ import { polyOf, qCoeffs, productFactors, discriminant, rationalRoots, splitByDi
 import { parse } from '../cas/parse.js';
 import { toReadable } from '../cas/print.js';
 import { mul, lit, num, pow } from '../cas/ast.js';
+import { evalFloat } from '../cas/numeric.js';
 
 function derivRules(prev, v) {
   const rules = new Set();
@@ -163,3 +164,63 @@ ACTIONS.polydiv = (prev, cfg) => {
 ACTIONS.menu = (prev, cfg) => cfg.menu || [];
 
 export const actionsFor = (kind, prev, cfg) => (ACTIONS[kind] ? ACTIONS[kind](prev, cfg) : []);
+
+// ---------- step U1, part b (G3) ----------
+
+// Trigonometry: reduce f(θ) (remove turns, associated angle, known value),
+// and arccos(cos θ) (remove turns, angle with the same value in the image,
+// conclude). Computed on the first trig function of the line; θ may hold x
+// (cos(7π − x)): its constant part is read.
+const TRIG_FNS = new Set(['sin', 'cos', 'tan', 'cot']);
+const ARC_FNS = { arcsin: [-0.5, 0.5], arccos: [0, 1], arctan: [-0.5, 0.5], Arctg: [-0.5, 0.5], arctg: [-0.5, 0.5] };
+ACTIONS.trig = (prev) => {
+  let target = null;
+  let arc = null;
+  walk(prev, (n) => {
+    if (target) return false;
+    if (n.t === 'fn' && ARC_FNS[n.name] && sp(n.args[0]).t === 'fn' && TRIG_FNS.has(sp(n.args[0]).name)) { arc = n.name; target = sp(n.args[0]); return false; }
+    if (n.t === 'fn' && TRIG_FNS.has(n.name)) { target = n; return false; }
+    return true;
+  });
+  if (!target) return [];
+  const arg = target.args[0];
+  const c0 = evalFloat(arg, { x: 0 }) / Math.PI;
+  const slope = evalFloat(arg, { x: 1 }) / Math.PI - c0;
+  const eps = 1e-9;
+  const half = target.name === 'tan' || target.name === 'cot';
+  let tours;
+  let assoc;
+  if (arc) {
+    const [lo, hi] = ARC_FNS[arc];
+    tours = half ? !(c0 > -0.5 + eps && c0 < 0.5 + eps) : !(c0 > -1 + eps && c0 <= 1 + eps);
+    assoc = !(c0 >= lo - eps && c0 <= hi + eps);
+  } else {
+    const P = half ? 1 : 2;
+    tours = c0 < -eps || c0 >= P - eps;
+    assoc = Math.abs(slope) > eps ? Math.abs(c0) > eps : c0 > 0.5 + eps;
+  }
+  return [
+    { id: 'tours', label: half ? 'Retirer des multiples de π' : 'Retirer des tours de 2π', valid: tours, why: 'L\'angle est déjà dans un seul tour.' },
+    { id: 'assoc', label: arc ? 'Prendre l\'angle de même valeur dans l\'image de la fonction arc' : 'Utiliser un angle associé (π − x, π + x, π/2 ± x…)', valid: !tours && assoc, why: tours ? 'Retire d\'abord les tours entiers.' : 'L\'angle est déjà dans le bon intervalle.' },
+    { id: 'value', label: arc ? 'Conclure : l\'angle est dans l\'image' : 'Écrire la valeur connue', valid: !tours && !assoc, why: 'Réduis d\'abord l\'angle.' },
+  ];
+};
+
+// Exact values (g3-exact): decompose the angle, addition formula, known
+// values, simplify — read on the student's line.
+const KNOWN_DEN = new Set([1, 2, 3, 4, 6]);
+ACTIONS.exact = (prev) => {
+  const fns = [];
+  walk(prev, (n) => { if (n.t === 'fn' && TRIG_FNS.has(n.name)) { fns.push(n); return false; } return true; });
+  const den = (a) => { const k = evalFloat(a, {}) / Math.PI; for (let d = 1; d <= 24; d++) if (Math.abs(Math.round(k * d) - k * d) < 1e-9) return d; return null; };
+  const sum = fns.some((f) => { const a = sp(f.args[0]); return a.t === 'bin' && (a.op === '+' || a.op === '-'); });
+  const unknown = !sum && fns.some((f) => !KNOWN_DEN.has(den(f.args[0])));
+  const known = !sum && !unknown && fns.length > 0;
+  return [
+    { id: 'decompose', label: 'Écrire l\'angle comme somme ou différence d\'angles connus', valid: unknown, why: 'Les angles de la ligne sont déjà des angles connus.' },
+    { id: 'add', label: 'Formule d\'addition', valid: sum, why: 'Aucun sinus ou cosinus de la ligne ne porte sur une somme.' },
+    { id: 'values', label: 'Remplacer par les valeurs connues', valid: known, why: unknown || sum ? 'Il reste un angle qui n\'est pas dans la table.' : 'Il n\'y a plus de sinus ni de cosinus.' },
+    { id: 'simplify', label: 'Simplifier les racines et les fractions', valid: !fns.length, why: 'Il reste des fonctions trigonométriques à calculer.' },
+    { id: 'half', label: 'Formule de bissection', valid: false, why: 'Ici l\'angle s\'écrit comme une somme d\'angles connus : la formule d\'addition suffit.' },
+  ];
+};

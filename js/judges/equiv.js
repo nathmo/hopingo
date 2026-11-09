@@ -10,8 +10,9 @@
 
 import { expandDerivs, hasDeriv } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
-import { numValue, stripParen, equalsStructural, unparen } from '../cas/ast.js';
+import { numValue, stripParen, equalsStructural, unparen, walk } from '../cas/ast.js';
 import { parse } from '../cas/parse.js';
+import { equalExact } from '../cas/normal.js';
 import { exactForm, trigForm } from '../cas/exactform.js';
 import { toText } from '../cas/print.js';
 import { polyOf, qCoeffs, discriminant, sumTerms, productFactors } from '../cas/polyx.js';
@@ -96,6 +97,20 @@ function factoredDen(node) {
   return true;
 }
 
+// The line is the goal, up to the order of factors and terms: exactly
+// equal (sin x and cos x as letters), the same top operation and as many
+// terms (2 sin x cos²x + … is not yet 3 sin x − 4 sin³x).
+const topTerms = (n) => { n = stripParen(n); return n.t === 'bin' && (n.op === '+' || n.op === '-') ? topTerms(n.l) + 1 : 1; };
+function reachesGoal(node, goal) {
+  if (equalsStructural(unparen(node), unparen(goal), { parens: false })) return true;
+  const a = stripParen(node);
+  const b = stripParen(goal);
+  const kind = (n) => (n.t === 'bin' ? (n.op === '+' || n.op === '-' ? 'sum' : 'prod') : n.t);
+  // The functions are written as in the goal: cos((3x + x)/2) is not yet cos 2x.
+  const fns = (n) => { const out = new Set(); walk(unparen(n), (y) => { if (y.t === 'fn') { out.add(toText(y)); return false; } return true; }); return [...out].sort().join('|'); };
+  return equalExact(node, goal) === true && kind(a) === kind(b) && topTerms(a) === topTerms(b) && fns(node) === fns(goal);
+}
+
 const TARGETS = {
   any: () => true,
   // Step U1b (G3): an exact number written out (radicals, π); a single
@@ -103,7 +118,7 @@ const TARGETS = {
   // cfg.goal (proving an identity: one side is turned into the other).
   exact: (node) => exactForm(node),
   'one-trig': (node, cfg) => trigForm(node, cfg.vars?.[0] || 'x') || (exactForm(node) === true),
-  goal: (node, cfg) => equalsStructural(unparen(node), unparen(parse(cfg.goal, { vars: cfg.vars })), { parens: false }),
+  goal: (node, cfg) => reachesGoal(node, parse(cfg.goal, { vars: cfg.vars })),
   'factored-den': (node) => factoredDen(node),
   'partial-fractions': (node) => partialFractions(node),
   'no-prime': (node) => {

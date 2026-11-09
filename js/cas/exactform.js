@@ -1,7 +1,8 @@
 // Exact numbers in final form (step U1b, G3): integers, reduced fractions,
 // c·√m with m squarefree, c·π, and sums of such terms, each kind once,
 // possibly over one denominator: −(√2 + √6)/4, 3√3/2, 2π/3, 1 − √2.
-//   exactForm(node) → true | false (not a number written out) | message
+//   exactForm(node) → true | false (not yet: go on) | message (a radical
+//   to simplify, a root in a denominator, like terms to group)
 // trigForm(node, v) → true | false: a single trigonometric function of the
 // variable, with a sign and a coefficient (−cos x, 2 sin x), or an exact number.
 
@@ -46,30 +47,29 @@ function termOf(t) {
   if (x.t === 'neg') { sign = -1; x = stripParen(x.e); }
   const q = numValue(x);
   if (q) {
-    if (x.t === 'frac' && gcd(q.n, q.d) === 1 && intOf(x.d) !== q.d) return 'Simplifie la fraction.';
+    if (x.t === 'frac' && gcd(q.n, q.d) === 1 && intOf(x.d) !== q.d) return null;
     return { c: sign * q.n, d: q.d, kind: '1' };
   }
   if (x.t === 'frac') {
     const d = intOf(x.d);
-    if (d === null) return contains(x.d, (y) => y.t === 'sqrt') ? 'Enlève la racine du dénominateur : multiplie en haut et en bas par cette racine.' : null;
+    if (d === null) return termOf(x.d)?.kind?.startsWith?.('√') ? 'Enlève la racine du dénominateur : multiplie en haut et en bas par cette racine.' : null;
     const top = termOf(x.n);
     if (!top || typeof top === 'string') return top;
     if (top.d !== 1) return null;
-    if (gcd(top.c, d) !== 1) return 'Simplifie la fraction.';
-    if (d === 1) return 'Enlève le « /1 ».';
+    if (gcd(top.c, d) !== 1 || d === 1) return null;
     return { c: sign * top.c, d, kind: top.kind };
   }
   if (x.t === 'bin' && x.op === '×') {
     const c = intOf(x.l);
     if (c === null) return null;
-    if (c === 1 || c === 0) return 'Enlève le facteur 1 ou 0.';
+    if (c === 1 || c === 0) return null;
     const r = stripParen(x.r);
     if (r.t === 'frac') {
       // 4π/3 is read 4·(π/3); 2√2/3 is 2·(√2/3).
       const d = intOf(r.d);
       const k = kindOf(r.n);
       if (d === null || !isKind(k)) return isKind(k) ? null : k;
-      if (gcd(c, d) !== 1) return 'Simplifie la fraction.';
+      if (gcd(c, d) !== 1) return null;
       return { c: sign * c, d, kind: k };
     }
     const k = kindOf(x.r);
@@ -108,11 +108,11 @@ export function exactForm(node) {
   if (n.t === 'neg') n = stripParen(n.e);
   if (n.t === 'frac' && stripParen(n.n).t === 'bin' && ['+', '-'].includes(stripParen(n.n).op)) {
     const d = intOf(n.d);
-    if (d === null) return contains(n.d, (y) => y.t === 'sqrt') ? 'Enlève la racine du dénominateur.' : false;
+    if (d === null) return false;
     const ts = sumOf(n.n);
     if (!Array.isArray(ts)) return ts ?? false;
-    if (ts.some((t) => t.d !== 1)) return 'Écris une seule fraction.';
-    if (ts.reduce((g, t) => gcd(g, t.c), d) !== 1) return 'Simplifie la fraction.';
+    if (ts.some((t) => t.d !== 1)) return false;
+    if (ts.reduce((g, t) => gcd(g, t.c), d) !== 1) return false;
     return true;
   }
   const ts = sumOf(n);

@@ -4,5 +4,6 @@
 import { RULES as G6 } from './g6.js';
 import { RULES as G9 } from './g9.js';
 import { RULES as G0 } from './g0.js';
+import { RULES as G3 } from './g3.js';
 
-export const CAS_RULES = [...G6, ...G9, ...G0];
+export const CAS_RULES = [...G6, ...G9, ...G0, ...G3];

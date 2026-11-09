@@ -11,8 +11,9 @@
 import * as logique from './logique.skills.js';
 import * as polynomes from './polynomes.skills.js';
 import * as analyse0 from './analyse0.skills.js';
+import * as trigo from './trigo.skills.js';
 
-const MODULES = [logique, polynomes, analyse0];
+const MODULES = [logique, polynomes, analyse0, trigo];
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -25,4 +26,7 @@ export const UNBUILT = {
   'g1-compose': ['rat-domain'],
   // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
   'g8-algebraic': ['lit-identities'],
+  // TEMP u1b-merge: g1-inverse (module G1, built in parallel) ← g1-compose,
+  // @alg:F-isoler; resolved to built skills until the branches are merged.
+  'g1-inverse': ['rat-domain', 'eq-both-sides'],
 };
