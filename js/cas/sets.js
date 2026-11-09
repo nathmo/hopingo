@@ -291,17 +291,22 @@ export function holds(node, ctx, b) {
 
 // ---------- boundaries of a condition ----------
 
+// The scanned interval: [−SCAN ; SCAN], or the hull of the domain (plus a
+// margin of 1) when the item gives a bounded one (periodic cfgs).
+let scanRange = null;
+
 function numericRoots(f, v) {
   const out = [];
-  const N = SCAN_STEPS;
-  const h = (2 * SCAN) / N;
+  const [lo, hi] = scanRange ?? [-SCAN, SCAN];
+  const N = Math.max(400, Math.min(SCAN_STEPS, Math.round((hi - lo) / 0.01)));
+  const h = (hi - lo) / N;
   const F = (x) => evalFloat(f, { [v]: x });
-  let x0 = -SCAN;
+  let x0 = lo;
   let y0 = F(x0);
   let xm = NaN; // the point before x0, for double roots (tangencies)
   let ym = NaN;
   for (let i = 1; i <= N; i++) {
-    const x1 = -SCAN + i * h;
+    const x1 = lo + i * h;
     const y1 = F(x1);
     const d0 = Number.isFinite(y0);
     const d1 = Number.isFinite(y1);
@@ -386,6 +391,8 @@ function breakpoints(f, v) {
       return out;
     }
   } catch { /* not rational: numeric */ }
+  const fit = lowDegreeRoots(f, v);
+  if (fit) return fit.map(snapped);
   for (const x of numericRoots(f, v)) out.push(snapped(x));
   // Kinks and edges inside |…| and √: zeros of their arguments.
   mapNode(f, (n) => {
@@ -393,6 +400,33 @@ function breakpoints(f, v) {
     return n;
   });
   return out;
+}
+
+// f of degree ≤ 2 in v with constant coefficients that are not rational
+// (π, √3): read by sampling, its roots solved directly. null otherwise.
+function lowDegreeRoots(f, v) {
+  const vIn = (e) => contains(e, (y) => y.t === 'sym' && y.name === v && !y.sub);
+  const bad = contains(f, (n) => (['fn', 'abs', 'sqrt', 'root'].includes(n.t) && vIn(n)) || (n.t === 'frac' && vIn(n.d)) || (n.t === 'bin' && n.op === '÷' && vIn(n.r)) || (n.t === 'pow' && (vIn(n.e) || (vIn(n.b) && stripParen(n.e).t !== 'num'))));
+  if (bad) return null;
+  const F = (x) => evalFloat(f, { [v]: x });
+  const f0 = F(0);
+  const f1 = F(1);
+  const fm = F(-1);
+  if (![f0, f1, fm].every(Number.isFinite)) return null;
+  const a = (f1 + fm) / 2 - f0;
+  const b = (f1 - fm) / 2;
+  const c = f0;
+  const P = (x) => a * x * x + b * x + c;
+  for (const x of [2, -3, 0.5, 7.25, -11.5]) {
+    const y = F(x);
+    if (!Number.isFinite(y) || Math.abs(y - P(x)) > 1e-9 * (1 + Math.abs(y) + Math.abs(a * x * x) + Math.abs(b * x) + Math.abs(c))) return null;
+  }
+  const scale = Math.abs(a) + Math.abs(b) + Math.abs(c);
+  if (Math.abs(a) <= 1e-12 * scale) return Math.abs(b) <= 1e-12 * scale ? [] : [-c / b];
+  const D = b * b - 4 * a * c;
+  if (D < -1e-12 * b * b) return [];
+  if (Math.abs(D) <= 1e-12 * (b * b + Math.abs(4 * a * c))) return [-b / (2 * a)];
+  return [(-b - Math.sqrt(D)) / (2 * a), (-b + Math.sqrt(D)) / (2 * a)];
 }
 
 // (−b ± √Δ)/(2a) = A ± B√m, with √Δ simplified: exact node, float value.
@@ -455,7 +489,11 @@ function solveCond(node, ctx, within = null) {
     const base = within ?? integersIn(ctx.universe.lo, ctx.universe.hi);
     return normalize(points(base).filter((b) => holds(node, ctx, b)).map((b) => ({ lo: b, hi: b, loC: true, hiC: true })));
   }
-  const bs = condBreakpoints(node, ctx).sort((a, b) => a.x - b.x);
+  const hull = ctx.within && ctx.within.parts.length ? [ctx.within.parts[0].lo.x, ctx.within.parts[ctx.within.parts.length - 1].hi.x] : null;
+  const saved = scanRange;
+  if (hull && Number.isFinite(hull[0]) && Number.isFinite(hull[1])) scanRange = [hull[0] - 1, hull[1] + 1];
+  let bs;
+  try { bs = condBreakpoints(node, ctx).sort((a, b) => a.x - b.x); } finally { scanRange = saved; }
   const uniq = [];
   for (const b of bs) {
     const last = uniq[uniq.length - 1];
@@ -568,8 +606,34 @@ export function makeCtx(cfg = {}) {
   for (const [k, t] of Object.entries(cfg.sets || {})) sets[k] = asNode(t);
   const ctx = { v: cfg.v || 'x', sets, universe: universeOf(cfg.domain), isCtx: true };
   if (cfg.domain && !ctx.universe && cfg.domain !== 'R') ctx.within = evalSet(asNode(cfg.domain), { ...ctx });
+  // Periodic sets (trigonometry): the letter k is an integer, and sets on ℝ
+  // are compared on the window [−W ; W].
+  if (cfg.periodic) {
+    ctx.k = cfg.kVar || 'k';
+    if (!ctx.within && !ctx.universe) ctx.within = { parts: [{ lo: { x: -(cfg.window || WINDOW) }, hi: { x: cfg.window || WINDOW }, loC: true, hiC: true }] };
+  }
   return ctx;
 }
+
+const WINDOW = 13; // not a nice multiple of π: no family point falls on its ends
+
+// A family (k ∈ ℤ): the union over k of the set with k replaced, for every
+// k whose part meets the window. Two empty k in a row end each side.
+function familySet(n, ctx) {
+  const inner = { ...ctx, k: null };
+  const at = (k) => solutionSetIn(mapNode(n, (x) => (x.t === 'sym' && !x.sub && x.name === ctx.k ? { t: 'paren', e: lit(new Q(k)) } : x)), inner);
+  let S = at(0);
+  for (const dir of [1, -1]) {
+    let empty = 0;
+    for (let j = 1; j <= 160 && (empty < 2 || j <= 3); j++) {
+      const P = at(dir * j);
+      if (P.parts.length) { S = union(S, P); empty = 0; } else empty++;
+    }
+  }
+  return S;
+}
+
+export const hasK = (node, k = 'k') => contains(node, (x) => x.t === 'sym' && !x.sub && x.name === k);
 
 // What a line says, as a set: a set expression, « A = {…} », « x ∈ … » or
 // a condition on v.
@@ -591,6 +655,7 @@ export function solutionSet(node, cfg = {}) {
 
 function solutionSetIn(node, ctx) {
   let n = stripParen(node);
+  if (ctx.k && hasK(n, ctx.k)) return familySet(n, ctx);
   if (n.t === 'rel' && n.op === '=' && isSetNode(n.r, ctx)) n = stripParen(n.r); // « A ∖ B = {1 ; 3} »
   if (n.t === 'in' && stripParen(n.l).t === 'sym' && stripParen(n.l).name === ctx.v && isSetNode(n.r, ctx)) n = stripParen(n.r);
   let S = isSetNode(n, ctx) ? evalSet(n, ctx) : solveCond(n, ctx);
@@ -647,6 +712,7 @@ function unionParts(n, out = []) {
 export function finalForm(node, cfg = {}) {
   let n = stripParen(node);
   const v = cfg.v || 'x';
+  if (cfg.periodic && hasK(n, cfg.kVar || 'k')) return familyFinal(n, cfg);
   if (n.t === 'rel' && n.op === '=' && isSetNode(n.r, cfg)) n = stripParen(n.r);
   if (n.t === 'in' && stripParen(n.l).t === 'sym' && stripParen(n.l).name === v) n = stripParen(n.r);
   // v = 3, or v = 1 ∨ v = 2
@@ -689,6 +755,38 @@ export function finalForm(node, cfg = {}) {
     if (all.parts.length < count) return 'Des morceaux se chevauchent ou se touchent : réunis-les en un seul intervalle.';
   }
   return true;
+}
+
+// Families written out: x = π/6 + 2kπ ou x = 5π/6 + 2kπ ; {π/6 + 2kπ ; …} ;
+// ]π/6 + 2kπ ; 5π/6 + 2kπ[ ∪ … ; π/6 + 2kπ < x < 5π/6 + 2kπ ; « k ∈ ℤ »
+// may follow. On a bounded domain, the solutions are listed without k.
+function familyFinal(node, cfg) {
+  const v = cfg.v || 'x';
+  const k = cfg.kVar || 'k';
+  const bounded = cfg.domain && cfg.domain !== 'R';
+  const isKinZ = (x) => { x = stripParen(x); return x.t === 'in' && stripParen(x.l).t === 'sym' && stripParen(x.l).name === k; };
+  let n = stripParen(node);
+  if (n.t === 'list') { const items = n.items.filter((x) => !isKinZ(x)); if (items.length !== 1) return false; n = stripParen(items[0]); }
+  if (n.t === 'logic' && n.op === 'and' && isKinZ(n.r)) n = stripParen(n.l);
+  const at0 = (e) => mapNode(e, (x) => (x.t === 'sym' && !x.sub && x.name === k ? num(0) : x));
+  const written = (e) => !contains(e, (x) => x.t === 'sym' && !x.sub && x.name === v) && isNumberWritten(at0(e), true);
+  const isV = (e) => stripParen(e).t === 'sym' && stripParen(e).name === v && !stripParen(e).sub;
+  const piece = (x) => {
+    x = stripParen(x);
+    if (x.t === 'logic' && x.op === 'or') return piece(x.l) && piece(x.r);
+    if (x.t === 'rel' && x.op === '=' && isV(x.l)) return written(x.r);
+    if (x.t === 'chain' && x.items.length === 3 && isV(x.items[1])) return written(x.items[0]) && written(x.items[2]);
+    return false;
+  };
+  let ok = piece(n);
+  if (!ok) {
+    if (n.t === 'rel' && n.op === '=' && isSetNode(n.r, cfg)) n = stripParen(n.r);
+    if (n.t === 'in' && isV(n.l)) n = stripParen(n.r);
+    const parts = unionParts(n);
+    ok = parts.every((p) => p.t === 'set' && ((p.kind === 'finite' && p.items.every(written)) || (p.kind === 'interval' && written(p.lo) && written(p.hi))));
+  }
+  if (ok && bounded) return 'Garde seulement les solutions qui sont dans l\'intervalle, et écris-les sans k.';
+  return ok;
 }
 
 export const toSet = (text, cfg) => solutionSet(asNode(text), cfg);

@@ -108,7 +108,7 @@ export function tokenize(text, opts = {}) {
       continue;
     }
     if (GREEK.includes(c) || c === 'π' || c === '∞') { out.push({ k: 'name', s: c, pos: i }); i++; continue; }
-    if ('+-×÷/^()|\'√_,;□'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
+    if ('+-×÷/^()|\'√_,;□°'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
       if (c === '(') {
         const prev = out[out.length - 1];
         stack.push(prev?.k === 'name' && MULTI_ARG.has(prev.s) ? 'args' : 'group');
@@ -251,8 +251,14 @@ export function parse(text, opts = {}) {
     while (isOp(peek(), '/')) { p++; n = { t: 'frac', n, d: power() }; }
     return n;
   }
+  // 30° is 30·π/180: a product marked `deg`, printed back with its sign.
+  const degrees = (b) => {
+    if (!isOp(peek(), '°')) return b;
+    p++;
+    return { t: 'bin', op: '×', l: b, r: { t: 'frac', n: { t: 'const', name: 'pi' }, d: { t: 'num', s: '180', v: new Q(180) } }, deg: true };
+  };
   function power() {
-    const b = atom();
+    const b = degrees(atom());
     if (!isOp(peek(), '^')) return b;
     p++;
     if (!peek()) fail('Il manque l\'exposant.');

@@ -37,7 +37,11 @@ function wrongLine(cfg, final) {
   if (cfg.kind === 'logic') return `¬(${final})`;
   if (cfg.kind === 'solset') {
     const S = solutionSet(parse(final, parseOpts(cfg)), cfg);
-    const out = ['1000', '-1000', '1/7', '-55'].find((x) => !contains01(S, Number(x.includes('/') ? 1 / 7 : x)));
+    // A number the judge looks at (inside the domain or the window of a
+    // periodic cfg) and outside the set.
+    const W = solutionSet(parse('ℝ'), cfg);
+    const val = (x) => (x.includes('/') ? Number(x.split('/')[0]) / Number(x.split('/')[1]) : Number(x));
+    const out = ['1000', '-1000', '1/7', '-55', '7/3', '-5/2', '11/9'].find((x) => !contains01(S, val(x)) && contains01(W, val(x)));
     if (!out) return toText(setToNode(minus(S, solutionSet(parse('{0}'), cfg))));
     return toText(setToNode(union(S, solutionSet(parse(`{${out}}`), cfg))));
   }

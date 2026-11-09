@@ -17,6 +17,12 @@
 //                        must give the true solution set. A line « D = … »
 //                        (or D_f) is checked against D₀ and does not replace
 //                        the equation.
+//   periodic: true       trigonometry (step U1b, G3): the letter k is an
+//                        integer; x = π/6 + 2kπ, {π/6 + 2kπ ; …} and
+//                        ]a + 2kπ ; b + 2kπ[ are families. Sets on ℝ are
+//                        compared on the window [−13 ; 13] (cfg.window);
+//                        final form in families, or without k on a bounded
+//                        domain.
 //   params: {m: set}     a parameter: the lines are compared for sample
 //                        values of m in its set (a case of the discussion);
 //                        interval bounds may hold m.
@@ -48,7 +54,7 @@ const paramNames = (cfg) => Object.keys(cfg.params || {});
 const lineCfg = (cfg) => ({
   ...cfg,
   vars: [cfg.v || 'x', ...Object.keys(cfg.subst || {})],
-  params: [...Object.keys(cfg.sets || {}).map((k) => (k.includes('_') ? `${k.split('_')[0]}_` : k)), ...paramNames(cfg), 'D', 'D_'],
+  params: [...Object.keys(cfg.sets || {}).map((k) => (k.includes('_') ? `${k.split('_')[0]}_` : k)), ...paramNames(cfg), 'D', 'D_', ...(cfg.periodic ? [cfg.kVar || 'k'] : [])],
 });
 
 // Sample values of the parameters, in their sets: whole numbers and halves
@@ -82,7 +88,7 @@ function paramSamples(cfg) {
 }
 
 const withParams = (node, env) => mapNode(node, (n) => (n.t === 'sym' && !n.sub && env[n.name] ? { t: 'paren', e: lit(env[n.name]) } : n));
-const baseCfg = (cfg) => ({ v: cfg.v || 'x', domain: cfg.domain, sets: cfg.sets });
+const baseCfg = (cfg) => ({ v: cfg.v || 'x', domain: cfg.domain, sets: cfg.sets, ...(cfg.periodic ? { periodic: true, window: cfg.window, kVar: cfg.kVar } : {}) });
 
 const isCondition = (n) => ['rel', 'chain', 'in', 'not', 'logic', 'list'].includes(stripParen(n).t);
 const isDomainLine = (node) => {

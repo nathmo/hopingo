@@ -10,7 +10,9 @@
 
 import { expandDerivs, hasDeriv } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
-import { numValue, stripParen } from '../cas/ast.js';
+import { numValue, stripParen, equalsStructural, unparen } from '../cas/ast.js';
+import { parse } from '../cas/parse.js';
+import { exactForm, trigForm } from '../cas/exactform.js';
 import { toText } from '../cas/print.js';
 import { polyOf, qCoeffs, discriminant, sumTerms, productFactors } from '../cas/polyx.js';
 import { diagnoseLine } from './diagnose.js';
@@ -96,6 +98,12 @@ function factoredDen(node) {
 
 const TARGETS = {
   any: () => true,
+  // Step U1b (G3): an exact number written out (radicals, π); a single
+  // trigonometric function of x (cos(7π − x) = −cos x); the line given as
+  // cfg.goal (proving an identity: one side is turned into the other).
+  exact: (node) => exactForm(node),
+  'one-trig': (node, cfg) => trigForm(node, cfg.vars?.[0] || 'x') || (exactForm(node) === true),
+  goal: (node, cfg) => equalsStructural(unparen(node), unparen(parse(cfg.goal, { vars: cfg.vars })), { parens: false }),
   'factored-den': (node) => factoredDen(node),
   'partial-fractions': (node) => partialFractions(node),
   'no-prime': (node) => {
