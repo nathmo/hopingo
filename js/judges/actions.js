@@ -86,12 +86,16 @@ ACTIONS.solset = (prev, cfg) => {
   let solved = true;
   contains(n, (x) => { if ((x.t === 'rel' || x.t === 'chain') && !isolated(x)) solved = false; return false; });
   const builder = n.t === 'set' && n.kind === 'builder';
+  // An image set {3n + 1 | n ≤ 3}: the elements are listed, not solved for.
+  const image = builder && sp(n.head).t !== 'in';
+  const toCompute = n.t === 'set' && n.kind === 'finite' && n.items.some((x) => contains(x, (y) => y.t === 'bin' || y.t === 'pow'));
   return [
-    { id: 'abs', label: 'Ôter la valeur absolue', valid: hasAbs, why: 'Il n\'y a pas de valeur absolue.' },
-    { id: 'not', label: 'Écrire la négation sans ¬', valid: hasNot && !hasAbs, why: hasAbs ? 'Commence par la valeur absolue.' : 'Il n\'y a pas de ¬ dans la ligne.' },
-    { id: 'solve', label: `Isoler ${v}`, valid: (!solved || builder) && !hasAbs && !hasNot, why: 'La variable est déjà seule de son côté.' },
-    { id: 'write', label: 'Écrire l\'ensemble (intervalles ou éléments)', valid: !isSet && solved && !hasAbs && !hasNot, why: isSet ? 'C\'est déjà un ensemble.' : 'Isole d\'abord la variable.' },
-    { id: 'op', label: 'Calculer ∩, ∪ ou ∖', valid: hasSetop, why: 'Il n\'y a pas d\'opération entre ensembles dans la ligne.' },
+    { id: 'abs', label: 'Ôter la valeur absolue', valid: hasAbs, why: "Il n'y a pas de valeur absolue." },
+    { id: 'not', label: 'Écrire la négation sans ¬', valid: hasNot && !hasAbs, why: hasAbs ? 'Commence par la valeur absolue.' : "Il n'y a pas de ¬ dans la ligne." },
+    { id: 'solve', label: `Isoler ${v}`, valid: ((!solved && !isSet) || (builder && !image)) && !hasAbs && !hasNot, why: 'La variable est déjà seule de son côté.' },
+    { id: 'write', label: "Écrire l'ensemble (intervalles ou éléments)", valid: image || (!isSet && solved && !hasAbs && !hasNot), why: isSet ? "C'est déjà un ensemble." : "Isole d'abord la variable." },
+    { id: 'compute', label: 'Calculer les éléments', valid: toCompute, why: 'Les éléments sont déjà calculés.' },
+    { id: 'op', label: 'Calculer ∩, ∪ ou ∖', valid: hasSetop, why: "Il n'y a pas d'opération entre ensembles dans la ligne." },
   ];
 };
 

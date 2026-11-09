@@ -10,14 +10,16 @@
 
 import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
+import { TokenInput } from './tokens.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { LinesRun, templateOf, fillBlanks } from '../judges/lines.js';
 import { actionsFor } from '../judges/actions.js';
 import { parseOpts } from '../judges/common.js';
+import { readWith, showWith, textWith } from '../judges/index.js';
 import { parse, tryParse } from '../cas/parse.js';
 import { toMathML } from '../cas/mathml.js';
-import { toText } from '../cas/print.js';
 import { unparen } from '../cas/ast.js';
+import { lexFor } from '../cas/logic.js';
 
 const MM = (node, opts) => toMathML(unparen(node), opts);
 // The MathML of a typed text, without the <math> wrapper (to put in a blank).
@@ -62,9 +64,11 @@ export function mountLines(item, ctx, body) {
     feedback.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
   };
 
+  // Each judge shows its own lines (the logic judge writes formulas).
+  const eqSign = () => (run.cfg.kind === 'equiv' || run.cfg.kind === 'value' ? '=' : '→');
   const addLine = (node, cls, note = '', eq = true) => {
-    history.appendChild(h(`div.step-line.${cls}`, eq ? h('span.eq', '=') : null,
-      html(MM(node, { dvar: run.cfg.dvar })), note ? h('span.step-note', note) : null));
+    history.appendChild(h(`div.step-line.${cls}`, eq ? h('span.eq', eqSign()) : null,
+      html(showWith(run.cfg, node)), note ? h('span.step-note', note) : null));
     history.scrollTop = history.scrollHeight;
   };
   const addNote = (text, cls = '') => history.appendChild(h(`div.lines-note${cls ? `.${cls}` : ''}`, html(text)));
@@ -72,7 +76,7 @@ export function mountLines(item, ctx, body) {
 
   // ---------- tools ----------
   const hintBtn = canHint ? h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }) : null;
-  const copyBtn = h('button.btn.small.ghost', { type: 'button', onclick: () => input?.set(toText(run.prev, { dvar: run.cfg.dvar })) }, '⧉ Recopier la ligne');
+  const copyBtn = h('button.btn.small.ghost', { type: 'button', onclick: () => input?.set(textWith(run.cfg, run.prev)) }, '⧉ Recopier la ligne');
   const paintTools = () => {
     tools.replaceChildren(...[item.mode !== 'guided' && run.seg === 0 ? copyBtn : null, hintBtn].filter(Boolean));
     if (hintBtn) {
@@ -96,14 +100,17 @@ export function mountLines(item, ctx, body) {
     nextBlank = null;
     paintTools();
     const seg = run.segment;
+    // Notes and decisions written before the next line are shown in every
+    // mode (in free modes, those at the start of a part: the cursor only
+    // moves on with them).
+    let k = run.cursor;
+    while (k < seg.lines.length && seg.lines[k].kind === 'note') { addNote(seg.lines[k].html); run.passScript(k); k++; }
+    if (k < seg.lines.length && seg.lines[k].kind === 'decision') return decisionTask(seg.lines[k], k);
     if (item.mode === 'guided') {
-      let k = run.cursor;
-      while (k < seg.lines.length && seg.lines[k].kind === 'note') { addNote(seg.lines[k].html); run.passScript(k); k++; }
-      if (k < seg.lines.length && seg.lines[k].kind === 'decision') return decisionTask(seg.lines[k], k);
       const next = run.nextScript();
       if (next && next.line.blanks?.length) return blanksTask(next);
     }
-    if (item.mode === 'tap' && run.cfg.kind === 'equiv' && !tapChoice) return actionTask();
+    if (item.mode === 'tap' && item.tapActions && !tapChoice && actionsFor(item.tapActions, run.prev, run.cfg).length) return actionTask();
     return freeTask();
   }
 
@@ -114,10 +121,23 @@ export function mountLines(item, ctx, body) {
   // One free line: "= [input]", with a preview of how the line is read.
   function freeTask() {
     const ask = run.segment.ask;
-    input = new MathInput({ keysets, placeholder: 'écris la ligne suivante', onEnter: () => submit(), onChange: (v) => preview(v) });
     const prev = h('div.lines-preview');
-    const preview = (v) => { const m = v ? innerMath(v, popts()) : null; prev.innerHTML = m ? `<math>${m}</math>` : ''; };
-    stage.append(h('div.step-line.current', h('span.eq', ask || '='), input.display), prev);
+    let preview;
+    if (run.cfg.kind === 'logic') {
+      // Formulas are built from the item's pieces and the logic symbols.
+      const lex = lexFor(run.cfg);
+      const pieces = [...new Set([...lex.texts.values()].map((t) => t.text))];
+      input = new TokenInput({ pieces, onEnter: () => submit(), onChange: (v) => preview(v) });
+      preview = () => {};
+    } else {
+      input = new MathInput({ keysets, placeholder: 'écris la ligne suivante', onEnter: () => submit(), onChange: (v) => preview(v) });
+      preview = (v) => {
+        let m = null;
+        if (v) { try { m = showWith(run.cfg, readWith(run.cfg, v)); } catch { m = innerMath(v, popts()); m = m ? `<math>${m}</math>` : null; } }
+        prev.innerHTML = m ?? '';
+      };
+    }
+    stage.append(h('div.step-line.current', h('span.eq', ask || eqSign()), input.display), prev);
     submit = () => {
       if (!input.value || locked()) return;
       handle(run.submit(input.value));
@@ -254,6 +274,8 @@ export function mountLines(item, ctx, body) {
     play('good');
     clearSay();
     addLine(v.node, 'ok', note || v.note || '');
+    // A valid but poor decision (§5.3): its reason comes after the next line.
+    if (v.later) say(`<p>${v.later}</p>`, 'info');
     tapChoice = null;
     tries = 0;
     afterAccept(v);

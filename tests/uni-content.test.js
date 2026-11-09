@@ -17,6 +17,7 @@ import { RULE_BY_ID } from '../js/math/malrules.js';
 import { LinesRun, checkScript, segmentsOf, templateOf, blankAnswers } from '../js/judges/lines.js';
 import { parseOpts } from '../js/judges/common.js';
 import { trapAnswers } from '../js/judges/diagnose.js';
+import { actionsFor } from '../js/judges/actions.js';
 import { JUDGES, readWith } from '../js/judges/index.js';
 import { checkCounter, judgeTf } from '../js/judges/examples.js';
 import { judgeTokens } from '../js/judges/logic.js';
@@ -57,6 +58,17 @@ function checkLinesItem(it, where) {
     for (const l of seg.lines.filter((x) => x.kind === 'decision')) {
       assert.ok(l.options.some((o) => o.valid), `${where}: a decision needs a valid option`);
       for (const o of l.options) if (o.rule) assert.ok(RULE_BY_ID[o.rule], `${where}: decision rule ${o.rule}`);
+    }
+  }
+  // In the « choose the action » mode, each reference line has a valid action.
+  if (it.mode === 'tap' && it.tapActions) {
+    for (const seg of segs) {
+      let prev = seg.start.math;
+      for (const l of seg.lines.filter((x) => x.kind === 'eq')) {
+        const menu = actionsFor(it.tapActions, readWith(seg.judge, prev), seg.judge);
+        if (menu.length) assert.ok(menu.some((o) => o.valid), `${where}: no valid action before ${l.math}`);
+        prev = l.math;
+      }
     }
   }
   // A typical wrong line is refused, and the traps' answers are named.

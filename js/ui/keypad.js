@@ -34,10 +34,16 @@ const KEYSETS = {
   calcfn: ['sin(', 'cos(', 'tan(', 'exp(', 'ln(', 'Log(', 'sinh(', 'cosh(', 'tanh(', 'arctan(', 'arcsin(', 'arccos(', '√(', '|', 'left', 'back'],
   relation: ['=', '<', '≤', '>', '≥', '≠'],
   greek: ['ε', 'δ', 'λ', 'θ', 'φ', 'α', 'β', 'μ', 'σ', 'ω', 'ρ', 'back'],
+  // Step U1: sets and intervals, connectives, complex numbers, the letters
+  // of an identity or a division.
+  set: [']', '[', ';', '{', '}', '∪', '∩', '∖', '∞', '∈', 'ℝ', 'ℕ', 'ℤ', '∅', '∧', '∨', '¬', 'back'],
+  logic: ['∀', '∃', '¬', '⇒', '⇔', '∧', '∨', '∈', '(', ')', ',', 'back'],
+  cplx: ['i', '(', ')', 'left', 'right', 'back'],
+  letters: ['a', 'b', 'c', 'd', 'A', 'B', 'N', 'D', 'λ', '=', ';', 'back'],
 };
 
 // Tab names of the keypads.
-const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ' };
+const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc' };
 
 const LABEL = {
   back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )',

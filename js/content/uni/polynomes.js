@@ -132,7 +132,7 @@ function identItem(level, rng, opts = {}) {
       { level: 2, html: MT(system) },
       { level: 3, html: MT(values) },
     ],
-    subgoals: IDENT_SUB, keys: ['calc', 'relation'], tapActions: level === 3 ? 'identify' : null,
+    subgoals: IDENT_SUB, keys: ['calc', 'letters'], tapActions: level === 3 ? 'identify' : null,
     key: `${IDENT}:${start}`, exam: opts.exam ? { format: opts.exam, points: 2 } : false,
   });
 }
@@ -354,7 +354,7 @@ function longDivItem(level, rng, opts = {}) {
       { level: 3, html: MT(first.math) },
     ],
     subgoals: [{ id: 'step', label: 'une étape de division', skill: LONGDIV }],
-    keys: ['calc'], tapActions: level === 3 ? 'polydiv' : null,
+    keys: ['calc', 'letters'], tapActions: level === 3 ? 'polydiv' : null,
     key: `${LONGDIV}:${PT(d.A)}:${PT(d.B)}`, exam: opts.exam ? { format: opts.exam, points: 2 } : false,
   });
 }
@@ -995,7 +995,7 @@ function condItem(level, rng, opts = {}) {
       { id: 'solve', label: 'résoudre', skill: IDENT },
       { id: 'expand', label: 'développer', skill: 'lit-polynomial' },
     ],
-    keys: ['calc', 'cplx', 'relation'], tapActions: level === 3 ? 'menu' : null,
+    keys: ['calc', 'cplx', 'letters', 'relation'], tapActions: level === 3 ? 'menu' : null,
     key: `${COND}:${PT(d.P)}:${d.a}`, exam,
   });
 }
@@ -1118,7 +1118,7 @@ function dparamItem(level, rng, opts = {}) {
       { level: 3, html: `λ = ${fr(String(d.r2))}` },
     ],
     subgoals: [{ id: 'cond', label: 'conditions P(a) = 0', skill: FTHM }, { id: 'factor', label: 'factoriser', skill: FREAL }],
-    keys: ['calc', 'greek', 'set', 'relation'], tapActions: level === 3 ? 'menu' : null,
+    keys: ['calc', 'letters', 'set', 'relation'], tapActions: level === 3 ? 'menu' : null,
     key: `${DPARAM}:${PTxt}`, exam: opts.exam ? { format: opts.exam, points: 4 } : false,
   });
 }
@@ -1200,7 +1200,7 @@ function gcdItem(level, rng, opts = {}) {
       { level: 3, html: `PGCD = ${MP(d.D)} : racines communes ${roots}` },
     ],
     subgoals: [{ id: 'div', label: 'division', skill: LONGDIV }, { id: 'gcd', label: 'PGCD', skill: GCD }],
-    keys: ['calc'], tapActions: level === 3 ? 'menu' : null,
+    keys: ['calc', 'letters'], tapActions: level === 3 ? 'menu' : null,
     key: `${GCD}:${At}:${Bt}`, exam: opts.exam ? { format: opts.exam, points: 5 } : false,
   });
 }
@@ -1438,7 +1438,7 @@ function pfdGeneralItem(level, rng, opts = {}) {
       { id: 'cover', label: 'méthode du cache', skill: PFD1 }, { id: 'identify', label: 'identifier', skill: IDENT },
       { id: 'div', label: 'diviser', skill: LONGDIV }, { id: 'write', label: 'écrire', skill: PFD2 },
     ],
-    keys: ['calc'], tapActions: level === 3 ? 'menu' : null,
+    keys: ['calc', 'letters'], tapActions: level === 3 ? 'menu' : null,
     key: `${PFD2}:${ND}`, exam: opts.exam ? { format: opts.exam, points: 4 } : false,
   });
 }

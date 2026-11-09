@@ -24,6 +24,10 @@ import { graphSvg } from '../math/graph.js';
 import { parseAlg, algHtml, printAlg } from '../math/algebra.js';
 import { judgeEquationLine, nextMove, solveLines, isolatedValue } from '../math/equations.js';
 import { mountLines } from './lines.js';
+import { mountTokens } from './tokens.js';
+import { mountTf } from './tf.js';
+import { mountBlocks } from './blocks.js';
+import { mountTable } from './table-input.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -75,6 +79,11 @@ const MOUNTS = {};
 
 // Worked solutions line by line (university units, spec §6).
 MOUNTS.lines = (item, ctx, body) => mountLines(item, ctx, body);
+// Step U1: true/false with a counter-example, tokens, blocks, tables.
+MOUNTS.tf = (item, ctx, body) => mountTf(item, ctx, body);
+MOUNTS.tokens = (item, ctx, body) => mountTokens(item, ctx, body);
+MOUNTS.blocks = (item, ctx, body) => mountBlocks(item, ctx, body);
+MOUNTS.table = (item, ctx, body) => mountTable(item, ctx, body);
 
 // ---------- multiple choice ----------
 
