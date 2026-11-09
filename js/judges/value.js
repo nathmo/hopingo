@@ -5,6 +5,8 @@
 // floating point. cfg: {form: 'irreducible' (default) | 'any', expect?}.
 // With cfg.expect (text), a line is right if it has that value, whatever
 // the previous line: the segment asks for a number (« A = ? »).
+// With cfg.terms (texts of numbers), the line must be a Σ whose terms are
+// exactly these, in order (writing 2 + 5 + … + 29 with Σ, G5).
 // When the school judge names no trap, the traps of the university modules
 // that list `value` in their judges are tried (g0_rem_sign…).
 
@@ -12,8 +14,8 @@ import { parse as parseSchool, tryParse as tryParseSchool, isLiteral as isSchool
 import { judgeLine as schoolJudge } from '../math/judge.js';
 import { toText } from '../cas/print.js';
 import { parse } from '../cas/parse.js';
-import { numValue, stripParen } from '../cas/ast.js';
-import { exactValue } from '../cas/normal.js';
+import { numValue, stripParen, lit } from '../cas/ast.js';
+import { exactValue, atIndex } from '../cas/normal.js';
 import { evalFloat } from '../cas/numeric.js';
 import { close } from '../cas/equiv.js';
 import { readLine, sameLine } from './common.js';
@@ -29,6 +31,7 @@ function isLiteral(n) {
 }
 
 export function isFinal(cfg, node) {
+  if (cfg.terms) return !!sumTerms(node);
   if (!isLiteral(node)) return false;
   if ((cfg.form ?? 'irreducible') === 'any') return true;
   const n = stripParen(node.t === 'neg' ? node.e : node);
@@ -70,10 +73,54 @@ function judgeExpect(cfg, prev, node) {
   return { kind: 'ok', node };
 }
 
+// The terms of a Σ with whole-number bounds, as exact numbers (or null).
+export function sumTerms(node) {
+  const n = stripParen(node);
+  if (n.t !== 'sum') return null;
+  const lo = exactValue(n.lo);
+  const hi = exactValue(n.hi);
+  if (!lo || !hi || !lo.isInt() || !hi.isInt() || hi.n - lo.n > 200) return null;
+  const out = [];
+  for (let j = lo.n; j <= hi.n; j++) {
+    const q = exactValue(atIndex(n, j));
+    if (!q) return null;
+    out.push(q);
+  }
+  return out;
+}
+
+function judgeTerms(cfg, prev, node) {
+  if (sameLine(node, prev)) return { kind: 'same', node, message: "Avance d'au moins une étape." };
+  const want = cfg.terms.map((t) => exactValue(parse(String(t))));
+  const got = sumTerms(node);
+  if (!got) {
+    // Not a Σ: wrong if its value is not the sum's, else to rewrite with Σ.
+    const v = exactValue(node);
+    const total = want.reduce((acc, x) => acc.add(x), want[0].sub(want[0]));
+    if (v && !v.eq(total)) return { kind: 'wrong', node, message: 'Ta ligne ne vaut pas la somme demandée.' };
+    return { kind: 'form', node, message: 'Écris la somme avec Σ : sum(terme, k, début, fin), avec des bornes entières.' };
+  }
+  const same = (a, b) => a.length === b.length && a.every((q, i) => q.eq(b[i]));
+  if (same(got, want)) return { kind: 'done', node };
+  // One term too many or too few: the count of the terms.
+  const off = (got.length === want.length - 1 && same(got, want.slice(0, -1))) || (got.length === want.length + 1 && same(got.slice(0, -1), want))
+    || (got.length === want.length - 1 && same(got, want.slice(1)));
+  const shown = (q) => toText(lit(q)).replace('-', '−');
+  let message;
+  if (got.length !== want.length) message = `Ta somme a ${got.length} termes, il en faut ${want.length}.`;
+  else {
+    const i = got.findIndex((q, k) => !q.eq(want[k]));
+    message = `Le terme n° ${i + 1} de ta somme vaut ${shown(got[i])}, il faut ${shown(want[i])}.`;
+  }
+  const rule = off ? 'g5_count_terms' : null;
+  return { kind: 'wrong', node, rule, diag: rule ? { rules: [rule], ambiguous: 1, ctx: { got: got.length, want: want.length } } : null, message };
+}
+
 export function judgeLine(cfg, prev, input) {
   const read = readLine({ ...cfg, vars: [] }, input);
   if (read.error) return read.error;
   const { node } = read;
+  if (cfg.terms) return judgeTerms(cfg, prev, node);
   if (cfg.expect !== undefined) return judgeExpect(cfg, prev, node);
   // Numbers only: the school judge, which names the calculation traps.
   const prevText = toText(prev);

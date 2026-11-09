@@ -38,11 +38,11 @@ export class ParseError extends Error {
 export const FUNCS = [
   'arcsin', 'arccos', 'arctan', 'Arcsin', 'Arccos', 'Arctan', 'Arctg', 'arctg', 'argsh', 'argch', 'argth',
   'cotan', 'sinh', 'cosh', 'tanh', 'sqrt', 'root', 'conj', 'sin', 'cos', 'tan', 'cot', 'exp', 'Log', 'log', 'abs',
-  'ln', 'Re', 'Im', 'arg',
+  'ln', 'Re', 'Im', 'arg', 'sum',
 ];
 // Read as functions only when "(" follows: they also look like products of letters.
 const SHORT_FUNCS = ['sh', 'ch', 'th', 'tg', 'd'];
-const MULTI_ARG = new Set(['d', 'root']);
+const MULTI_ARG = new Set(['d', 'root', 'sum', 'Σ']);
 const GREEK = 'αβγδεζηθικλμνξρστυφχψωΓΔΘΛΞΠΣΦΨΩ';
 const RELOPS = new Set(['=', '<', '>', '≤', '≥', '≠']);
 // Set and logic symbols (step U1).
@@ -308,6 +308,14 @@ export function parse(text, opts = {}) {
       if (n && (n.t !== 'num' || !n.v.isInt() || n.v.n < 1)) fail('Dans d(f, x, n), n est un entier ≥ 1.', at);
       return primes({ t: 'deriv', e: a[0], v: v ? v.name : dvar, n: n ? n.v.n : 1 });
     }
+    if (name === 'sum') {
+      // sum(f, k, a, b) = Σ_{k=a}^{b} f (the Σ key writes it).
+      const a = args('sum');
+      if (a.length !== 4) fail('Écris sum(terme, k, début, fin), par exemple sum(2k+1, k, 1, n).', at);
+      const k = a[1];
+      if (k.t !== 'sym' || k.sub) fail("Dans sum(terme, k, début, fin), le 2e argument est l'indice.", at);
+      return { t: 'sum', e: a[0], k: k.name, lo: a[2], hi: a[3] };
+    }
     if (name === 'root') {
       const a = args('root');
       if (a.length !== 2) fail('Écris root(3, x) pour la racine cubique de x.', at);
@@ -371,6 +379,7 @@ export function parse(text, opts = {}) {
     }
     const name = t.s;
     if (name === 'pi' || name === 'π') return { t: 'const', name: 'pi' };
+    if (name === 'Σ' && isOp(peek(), '(')) return call('sum');
     if (name === '∞') return { t: 'const', name: 'inf' };
     if (name === 'e') return { t: 'const', name: 'e' };
     if (name === 'i' && opts.complex) return { t: 'const', name: 'i' };

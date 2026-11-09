@@ -84,6 +84,18 @@ export function evalFloat(node, env = {}, opts = {}) {
       }
       return f(x);
     }
+    case 'sum': {
+      // Σ_{k=lo}^{hi} e, the bounds rounded to whole numbers (empty if hi < lo).
+      const lo = E(node.lo);
+      const hi = E(node.hi);
+      if (!Number.isFinite(lo) || !Number.isFinite(hi)) return NaN;
+      const a = Math.round(lo);
+      const b = Math.round(hi);
+      if (Math.abs(a - lo) > 1e-9 || Math.abs(b - hi) > 1e-9 || b - a > 100000) return NaN;
+      let s = 0;
+      for (let j = a; j <= b; j++) s += evalFloat(node.e, { ...env, [node.k]: j }, opts);
+      return s;
+    }
     case 'deriv': {
       let e = node.e;
       for (let i = 0; i < node.n; i++) e = diff(e, node.v);

@@ -6,7 +6,8 @@
 // item = {type:'blocks', mode:'order'|'frame'|'define', blocks, goal, order}
 // block = {id, html, needs:[ids], distractor?: ruleId, why?, orderRule?,
 //          input?: {kind:'expr'|'rel', vars, expect, mod?, rem?, ask}}
-//   expr: the typed expression must equal `expect`; with mod and rem, it
+//   expr: the typed expression must equal `expect` (on spec.domain, by
+//         default whole numbers in [−9 ; 9]); with mod and rem, it
 //         must also read mod·(…) + rem (n² = 2(2k² + 2k) + 1 is odd)
 //   rel:  the typed relation must be the same equation as `expect`
 //         (sides moved or multiplied by a number)
@@ -35,7 +36,8 @@ function checkInput(spec, text) {
     return prop ? { kind: 'ok' } : { kind: 'wrong', message: 'Ce n\'est pas l\'égalité attendue : refais le calcul.' };
   }
   const want = parse(spec.expect, { vars: spec.vars });
-  const domain = Object.fromEntries((spec.vars || []).map((v) => [v, { int: [-9, 9] }]));
+  // spec.domain: {n: {int: [1, 8]}, x: [0.5, 1.5]} (default: whole numbers in [−9 ; 9]).
+  const domain = { ...Object.fromEntries((spec.vars || []).map((v) => [v, { int: [-9, 9] }])), ...(spec.domain || {}) };
   const r = equivalent(node, want, { vars: spec.vars, domain, seed: seedOf(spec.expect) });
   if (!r.equal) return { kind: 'wrong', message: 'Ton calcul n\'est pas égal à l\'expression de départ.' };
   if (spec.mod) {

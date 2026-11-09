@@ -21,6 +21,7 @@ export function prec(n) {
     case 'frac': return PREC.frac;
     case 'pow': return PREC.pow;
     case 'float': return n.x < 0 ? PREC.neg : PREC.atom;
+    case 'sum': return PREC.prod; // Σ reads like a prefix: (Σ k)² keeps its brackets
     default: return PREC.atom;
   }
 }
@@ -34,7 +35,7 @@ export const LOGIC_WORD = { and: 'et', or: 'ou', imp: '⇒', iff: '⇔' };
 // Can this right factor follow a number without a × sign? (3x, 2sin(x), 5(x+1))
 function startsWithLetter(n) {
   switch (n.t) {
-    case 'sym': case 'const': case 'fn': case 'sqrt': case 'paren': case 'deriv': case 'root': return true;
+    case 'sym': case 'const': case 'fn': case 'sqrt': case 'paren': case 'deriv': case 'root': case 'sum': return true;
     case 'pow': return startsWithLetter(n.b) && n.b.t !== 'num';
     case 'bin':
       if (n.op === '+' || n.op === '-') return true; // printed in brackets
@@ -86,8 +87,8 @@ function printer(style, opts) {
         const rProd = n.r.t === 'bin' && n.r.op === '×';
         const juxt = n.implicit === true
           || (n.implicit === undefined && n.l.t === 'num' && startsWithLetter(n.r) && (prec(n.r) >= PREC.pow || rProd || prec(n.r) === PREC.sum));
-        if (juxt) return `${l}${prec(n.r) < PREC.frac && !rProd ? `(${P(n.r)})` : P(n.r)}`;
-        const r = n.r.t === 'neg' || (prec(n.r) < PREC.neg && !(rProd && n.implicit === undefined)) ? `(${P(n.r)})` : P(n.r);
+        if (juxt) return `${l}${prec(n.r) < PREC.frac && !rProd && n.r.t !== 'sum' ? `(${P(n.r)})` : P(n.r)}`;
+        const r = n.r.t === 'neg' || (prec(n.r) < PREC.neg && n.r.t !== 'sum' && !(rProd && n.implicit === undefined)) ? `(${P(n.r)})` : P(n.r);
         return `${l}${readable ? '·' : '×'}${r}`;
       }
       case 'frac': return `${wrap(n.n, PREC.pow)}/${wrap(n.d, PREC.pow)}`;
@@ -103,6 +104,13 @@ function printer(style, opts) {
       }
       case 'sqrt': return `√${wrap(n.e, PREC.atom)}`;
       case 'root': { inArgs++; const s = `root(${P(n.n)},${P(n.e)})`; inArgs--; return s; }
+      case 'sum': {
+        if (readable) return `Σ_{${n.k}=${P(n.lo)}}^{${P(n.hi)}} ${prec(n.e) < PREC.prod || n.e.t === 'neg' ? `(${P(n.e)})` : P(n.e)}`;
+        inArgs++;
+        const s = `sum(${P(n.e)},${n.k},${P(n.lo)},${P(n.hi)})`;
+        inArgs--;
+        return s;
+      }
       case 'abs': return `|${P(n.e)}|`;
       case 'fn': {
         if (n.name === 'logb') {

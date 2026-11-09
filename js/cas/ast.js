@@ -12,6 +12,7 @@
 //   {t:'deriv', e, v, n}         nth derivative of e with respect to v
 //   {t:'rel', op, l, r}          = < ≤ > ≥ ≠
 //   {t:'blank', id}              a hole in a guided line (display only)
+//   {t:'sum', e, k, lo, hi}      Σ_{k=lo}^{hi} e; k (a name) is bound inside e (step U1b)
 // Sets and conditions (step U1, js/cas/sets.js):
 //   {t:'set', kind:'interval', lo, hi, loOpen, hiOpen}   ]a ; b]
 //   {t:'set', kind:'finite', items}                       {1 ; 2 ; 3}
@@ -28,7 +29,7 @@ import { Q } from '../math/rational.js';
 
 const CHILD_KEYS = {
   neg: ['e'], paren: ['e'], bin: ['l', 'r'], frac: ['n', 'd'], pow: ['b', 'e'], sqrt: ['e'],
-  root: ['n', 'e'], abs: ['e'], deriv: ['e'], rel: ['l', 'r'],
+  root: ['n', 'e'], abs: ['e'], deriv: ['e'], rel: ['l', 'r'], sum: ['e', 'lo', 'hi'],
   not: ['e'], logic: ['l', 'r'], setop: ['l', 'r'], in: ['l', 'r'],
 };
 // Nodes whose children are a list: key → field.
@@ -111,7 +112,19 @@ export function contains(node, pred) {
 export const dependsOn = (node, v) => contains(node, (n) => n.t === 'sym' && n.name === v && !n.sub);
 
 export function symbolsIn(node, out = new Set()) {
-  walk(node, (n) => { if (n.t === 'sym') out.add(n.sub ? `${n.name}_` : n.name); });
+  walk(node, (n) => {
+    if (n.t === 'sym') out.add(n.sub ? `${n.name}_` : n.name);
+    if (n.t === 'sum') {
+      // The index of a Σ is bound: it is not a letter of the line.
+      symbolsIn(n.lo, out);
+      symbolsIn(n.hi, out);
+      const inner = symbolsIn(n.e);
+      inner.delete(n.k);
+      for (const x of inner) out.add(x);
+      return false;
+    }
+    return true;
+  });
   return out;
 }
 
@@ -136,6 +149,7 @@ export function equalsStructural(a, b, { parens = true } = {}) {
       break;
     case 'fn': if (a.name !== b.name || a.args.length !== b.args.length) return false; break;
     case 'deriv': if (a.v !== b.v || a.n !== b.n) return false; break;
+    case 'sum': if (a.k !== b.k) return false; break;
     case 'blank': return a.id === b.id;
     default: break;
   }
@@ -291,6 +305,7 @@ export function rebuild(node, keep = new Set()) {
     case 'fn': return { ...node, args: node.args.map(R) };
     case 'sqrt': case 'abs': case 'deriv': return { ...node, e: R(node.e) };
     case 'root': return { ...node, n: R(node.n), e: R(node.e) };
+    case 'sum': return { ...node, e: R(node.e), lo: R(node.lo), hi: R(node.hi) };
     default: return node;
   }
 }

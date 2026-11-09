@@ -40,13 +40,15 @@ const KEYSETS = {
   logic: ['∀', '∃', '¬', '⇒', '⇔', '∧', '∨', '∈', '(', ')', ',', 'back'],
   cplx: ['i', '(', ')', 'left', 'right', 'back'],
   letters: ['a', 'b', 'c', 'd', 'A', 'B', 'N', 'D', 'λ', '=', ';', 'back'],
+  // Step U1b: sums and sequences. Σ writes sum(terme, k, début, fin).
+  seq: ['n', 'k', 'j', 'sum(', ',', '(', ')', 'u', '_', 'q', 'r', 'back'],
 };
 
 // Tab names of the keypads.
-const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc' };
+const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n' };
 
 const LABEL = {
-  back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )',
+  back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )', 'sum(': 'Σ( , k, , )',
   '^': '<span class="key-pow">▢<sup>n</sup></span>',
   frac: '<span class="key-frac"><span>▢</span><span>▢</span></span>',
 };

@@ -435,3 +435,76 @@ test('lines: a decision sets the judge state and asks its follow-up (then)', () 
   assert.equal(run.answerThen(opt, 'x^2+2x+1').kind, 'ok');
   assert.equal(run.state.superset, true);
 });
+
+// ---------- step U1, part b: sums (G5) ----------
+
+test('Σ: parse, print, exact value, numeric value at whole n', async () => {
+  const { exactValue } = await import('../js/cas/normal.js');
+  const { evalFloat } = await import('../js/cas/numeric.js');
+  const { symbolsIn } = await import('../js/cas/ast.js');
+  for (const t of ['sum(3k+2,k,1,20)', '3sum(k,k,1,n)+sum(2,k,1,n)', 'sum((k-1)^2,k,2,n+1)', '(sum(k,k,1,n))^2']) {
+    assert.equal(toText(P(toText(P(t)))), toText(P(t)), t);
+  }
+  assert.equal(toText(P('Σ(k,k,1,20)')), 'sum(k,k,1,20)', 'the Σ key');
+  assert.equal(exactValue(P('sum(3k+2,k,1,20)')).n, 670);
+  assert.equal(evalFloat(P('sum(k^2,k,1,n)'), { n: 4 }), 30);
+  assert.equal(evalFloat(P('sum(k,k,3,2)'), {}), 0, 'empty sum');
+  assert.deepEqual([...symbolsIn(P('sum(k^2,k,1,n)'))], ['n'], 'the index is bound');
+});
+
+test('equiv on whole n: sums, closed forms, final form « no-sum »', () => {
+  const cfg = { kind: 'equiv', vars: ['n'], domain: { n: { int: [1, 12] } }, target: 'no-sum', factored: true };
+  const j = JUDGES.equiv;
+  const prev = P('sum(1/(k(k+1)),k,1,n)', { vars: ['n'] });
+  assert.equal(j.judgeLine(cfg, prev, 'sum(1/k-1/(k+1),k,1,n)').kind, 'ok');
+  assert.equal(j.judgeLine(cfg, prev, '1-1/(n+1)').kind, 'ok', 'not reduced yet');
+  assert.equal(j.judgeLine(cfg, prev, 'n/(n+1)').kind, 'done');
+  const w = j.judgeLine(cfg, P('sum(1/k-1/(k+1),k,1,n)', { vars: ['n'] }), '1-1/n');
+  assert.equal(w.kind, 'wrong');
+  assert.equal(w.rule, 'g5_telescope_ends');
+  const sq = P('sum(k^2,k,1,n)', { vars: ['n'] });
+  const ex = { ...cfg, factored: false, expanded: true };
+  assert.equal(j.judgeLine(ex, sq, 'n(n+1)(2n+1)/6').kind, 'ok', 'expand it');
+  assert.equal(j.judgeLine(ex, sq, '1/3n^3+1/2n^2+1/6n').kind, 'done');
+  assert.equal(j.isFinal(cfg, P('(n+1)(n/2+1)', { vars: ['n'] })), false);
+  assert.equal(j.isFinal(cfg, P('(n+1)(n+2)/2', { vars: ['n'] })), true);
+});
+
+test('value: writing a sum with Σ (terms), arithmetic and geometric traps', () => {
+  const j = JUDGES.value;
+  const cfg = { kind: 'value', terms: ['2', '5', '8', '11'] };
+  assert.equal(j.judgeLine(cfg, P('S'), 'sum(3k-1,k,1,4)').kind, 'done');
+  assert.equal(j.judgeLine(cfg, P('S'), 'sum(3k+2,k,0,3)').kind, 'done', 'other bounds, same terms');
+  const short = j.judgeLine(cfg, P('S'), 'sum(3k-1,k,1,3)');
+  assert.equal(short.kind, 'wrong');
+  assert.equal(short.rule, 'g5_count_terms');
+  assert.equal(j.judgeLine(cfg, P('S'), '26').kind, 'form', 'the value alone is not a Σ');
+  const ar = { kind: 'value', expect: '79', arith: { u1: 3, r: 4, n: 20 } };
+  assert.equal(j.judgeLine(ar, P('u_20'), '3+19×4').kind, 'ok');
+  assert.equal(j.judgeLine(ar, P('u_20'), '83').rule, 'g5_arith_half');
+});
+
+test('blocks: a typed calculation on its own domain; heredity counter-examples', () => {
+  const item = {
+    type: 'blocks', mode: 'frame', goal: 'b1', order: ['b0', 'b1'],
+    blocks: [{ id: 'b0', html: 'f₁', needs: [] }, { id: 'b1', html: 'fₙ₊₁', needs: ['b0'], input: { kind: 'expr', vars: ['x', 'n'], expect: '(x^(2^n))^2', domain: { n: { int: [1, 3] }, x: [0.9, 1.1] } } }],
+  };
+  assert.equal(placeBlock(item, ['b0'], 'b1', 'x^(2^(n+1))').kind, 'done');
+  assert.equal(placeBlock(item, ['b0'], 'b1', 'x^(2^n+2)').kind, 'wrong');
+  const c = { kind: 'heredity', v: 'n', from: 0 };
+  assert.equal(checkCounter(c, { P: 'n>n+1' }).ok, true);
+  assert.equal(checkCounter(c, { P: 'n≤5' }).ok, false, 'heredity fails at 5');
+  assert.equal(checkCounter(c, { P: 'n≥0' }).ok, false, 'true for every n');
+});
+
+test('tap menus for sums follow the student\'s line', () => {
+  const valid = (kind, t) => actionsFor(kind, P(t, { vars: ['n'] }), {}).filter((o) => o.valid).map((o) => o.id);
+  assert.deepEqual(valid('sigma', 'sum(3k+2,k,1,20)'), ['linear']);
+  assert.deepEqual(valid('sigma', '3sum(k,k,1,20)+sum(2,k,1,20)'), ['formula']);
+  assert.deepEqual(valid('sigma', '3×20×21/2+40'), ['compute']);
+  assert.deepEqual(valid('telescope', 'sum(1/(k(k+1)),k,1,n)'), ['decompose']);
+  assert.deepEqual(valid('telescope', 'sum(1/k-1/(k+1),k,1,n)'), ['telescope']);
+  assert.deepEqual(valid('induction', 'sum(k,k,1,n+1)'), ['split']);
+  assert.deepEqual(valid('induction', 'sum(k,k,1,n)+n+1'), ['hyp']);
+  assert.deepEqual(valid('induction', 'n(n+1)/2+n+1'), ['factor']);
+});

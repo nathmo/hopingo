@@ -13,7 +13,7 @@ import { Q } from '../math/rational.js';
 import { Poly } from './poly.js';
 import { RatFun } from './ratfun.js';
 import {
-  num, lit, sym, fn, neg, add, sub, mul, div, pow, numValue, stripParen, canonFn,
+  num, lit, sym, fn, neg, add, sub, mul, div, pow, numValue, stripParen, canonFn, mapNode,
 } from './ast.js';
 import { expandDerivs } from './diff.js';
 import { toText } from './print.js';
@@ -40,6 +40,9 @@ function logRational(b, x) {
   }
   return null;
 }
+
+// The term of a Σ for the index value j.
+export const atIndex = (node, j) => mapNode(node.e, (x) => (x.t === 'sym' && !x.sub && x.name === node.k ? { t: 'paren', e: lit(Q.of(j)) } : x));
 
 function atom(ctx, key, node) {
   ctx.opaque = true;
@@ -133,6 +136,24 @@ function toRF(node, ctx) {
       return atom(ctx, `${name}(${u.canon()})`, node);
     }
     case 'deriv': return toRF(expandDerivs(node), ctx);
+    case 'sum': {
+      // Σ with whole-number bounds: added term by term; with a bound in n,
+      // an opaque atom (compared at sampled whole n by equiv.js).
+      const lo = toRF(node.lo, ctx);
+      const hi = toRF(node.hi, ctx);
+      if (lo.isConst && hi.isConst) {
+        const a = lo.constValue();
+        const b = hi.constValue();
+        if (a.isInt() && b.isInt() && b.n - a.n <= 400) {
+          let out = RatFun.const(0);
+          for (let j = a.n; j <= b.n; j++) out = out.add(toRF(atIndex(node, j), ctx));
+          return out;
+        }
+      }
+      let inner;
+      try { inner = toRF(node.e, newCtx()).canon(); } catch { inner = toText(node.e); }
+      return atom(ctx, `sum(${inner};${node.k};${lo.canon()};${hi.canon()})`, node);
+    }
     default: throw new NotExact();
   }
 }
@@ -333,6 +354,7 @@ export function pretty(node) {
     case 'fn': return fn(node.name, ...node.args.map(pretty));
     case 'sqrt': return { t: 'sqrt', e: pretty(node.e) };
     case 'abs': return { t: 'abs', e: pretty(node.e) };
+    case 'sum': return { ...node, e: pretty(node.e) };
     case 'neg': {
       const inner = stripParen(node.e);
       if (inner.t === 'frac') return neg(pretty(inner));

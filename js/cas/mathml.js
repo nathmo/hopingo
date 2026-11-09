@@ -63,7 +63,7 @@ export function toMathML(node, opts = {}) {
         }
         if (n.op === '÷') return row(wrap(n.l, 2), mo('÷'), n.r.t === 'neg' ? paren(M(n.r)) : wrap(n.r, 3));
         const rProd = n.r.t === 'bin' && n.r.op === '×';
-        const r = n.r.t === 'neg' || (prec(n.r) < 3 && !(rProd && n.implicit === undefined)) ? paren(M(n.r)) : M(n.r);
+        const r = n.r.t === 'neg' || (prec(n.r) < 3 && n.r.t !== 'sum' && !(rProd && n.implicit === undefined)) ? paren(M(n.r)) : M(n.r);
         const bothNumbers = startsWithNumber(n.r) && (n.l.t === 'num' || n.l.t === 'float' || n.l.t === 'frac');
         const invisible = !bothNumbers && (n.implicit === true || (n.l.t === 'num' && n.implicit === undefined));
         return row(wrap(n.l, 2), mo(invisible ? '&#x2062;' : bothNumbers ? '×' : '·'), r);
@@ -75,6 +75,11 @@ export function toMathML(node, opts = {}) {
       }
       case 'sqrt': return `<msqrt>${M(stripP(n.e))}</msqrt>`;
       case 'root': return `<mroot>${M(stripP(n.e))}${M(n.n)}</mroot>`;
+      case 'sum': {
+        const sigma = `<munderover><mo>∑</mo>${row(`<mi>${esc(n.k)}</mi>`, mo('='), M(stripP(n.lo)))}${M(stripP(n.hi))}</munderover>`;
+        const e = stripP(n.e);
+        return row(sigma, prec(e) < PREC.prod || e.t === 'neg' ? paren(M(e)) : M(e));
+      }
       case 'abs': return row(mo('|', ' stretchy="false"'), M(n.e), mo('|', ' stretchy="false"'));
       case 'fn': {
         if (n.name === 'logb') return row(`<msub><mi>log</mi>${M(stripP(n.args[0]))}</msub>`, mo('&#x2061;'), paren(M(n.args[1])));

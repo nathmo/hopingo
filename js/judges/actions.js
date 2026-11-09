@@ -159,6 +159,56 @@ ACTIONS.polydiv = (prev, cfg) => {
   ];
 };
 
+// ---------- step U1b: sums (G5) ----------
+
+function sumNodes(prev) {
+  const out = [];
+  walk(prev, (n) => { if (n.t === 'sum') out.push(n); return true; });
+  return out;
+}
+const hasIndex = (s, e = s.e) => contains(e, (x) => x.t === 'sym' && !x.sub && x.name === s.k);
+// A term the formulas of the course read directly: k, k², or a constant.
+function plainTerm(s) {
+  const e = sp(s.e);
+  if (!hasIndex(s)) return true;
+  if (e.t === 'sym' && e.name === s.k) return true;
+  return e.t === 'pow' && sp(e.b).t === 'sym' && sp(e.b).name === s.k && sp(e.e).t === 'num';
+}
+const topSum = (n) => { n = sp(n); if (n.t === 'neg') n = sp(n.e); return n.t === 'bin' && (n.op === '+' || n.op === '-'); };
+
+// Σ by linearity and the formulas of the course (g5-sigma).
+ACTIONS.sigma = (prev) => {
+  const ss = sumNodes(prev);
+  const linear = ss.some((s) => !plainTerm(s));
+  return [
+    { id: 'linear', label: 'Linéarité : séparer la somme et sortir les constantes', valid: linear, why: ss.length ? 'Chaque somme est déjà une somme de k, de k² ou d’une constante.' : 'Il n’y a plus de Σ.' },
+    { id: 'formula', label: 'Formules du cours : Σ k, Σ k², Σ c', valid: ss.length > 0 && !linear, why: ss.length ? 'Sépare d’abord la somme : les formules portent sur Σ k, Σ k² et Σ c.' : 'Il n’y a plus de Σ.' },
+    { id: 'compute', label: 'Calculer et réduire', valid: !ss.length, why: 'Il reste des Σ à remplacer par leur formule.' },
+  ];
+};
+
+// Telescoping sums (g5-reindex).
+ACTIONS.telescope = (prev) => {
+  const ss = sumNodes(prev);
+  const diff = ss.some((s) => { const e = sp(s.e); return e.t === 'bin' && e.op === '-'; });
+  return [
+    { id: 'decompose', label: 'Décomposer le terme en une différence', valid: ss.length > 0 && !diff, why: diff ? 'Le terme est déjà une différence.' : 'Il n’y a plus de Σ.' },
+    { id: 'telescope', label: 'Écrire les termes et télescoper', valid: diff, why: ss.length ? 'Décompose d’abord le terme en une différence aₖ − aₖ₊₁.' : 'Il n’y a plus de Σ.' },
+    { id: 'reduce', label: 'Réduire au même dénominateur', valid: !ss.length && topSum(prev), why: ss.length ? 'Il reste une Σ.' : 'C’est déjà réduit.' },
+  ];
+};
+
+// The heredity of a sum formula (g5-induction-sum): split, hypothesis, factor.
+ACTIONS.induction = (prev) => {
+  const ss = sumNodes(prev);
+  const top = ss.some((s) => { const h = sp(s.hi); return h.t === 'bin' && h.op === '+'; });
+  return [
+    { id: 'split', label: 'Séparer le dernier terme (k = n + 1)', valid: top, why: 'La somme s’arrête déjà à n.' },
+    { id: 'hyp', label: 'Remplacer la somme jusqu’à n par l’hypothèse de récurrence', valid: ss.length > 0 && !top, why: top ? 'Sépare d’abord le dernier terme : l’hypothèse parle de la somme jusqu’à n.' : 'Il n’y a plus de Σ.' },
+    { id: 'factor', label: 'Mettre en facteur pour retrouver la formule au rang n + 1', valid: !ss.length, why: 'Il reste une Σ à remplacer.' },
+  ];
+};
+
 // The menu written by the generator for this part (cfg.menu).
 ACTIONS.menu = (prev, cfg) => cfg.menu || [];
 

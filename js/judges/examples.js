@@ -17,6 +17,9 @@
 //              {at, eq} P(at) = eq, {at, ne} P(at) ≠ ne, {degree}, {noRealRoot},
 //              {mult: {at, k}} multiplicity of at equal to k, {minMult: {at, k}}
 //   composite  {expr, v}: n ∈ ℕ with expr(n) not prime
+//   heredity   {v, from}: a property P(n) (a condition in n) whose heredity
+//              P(n) ⇒ P(n + 1) holds for n = from … from + 40, but which is
+//              false for some n: heredity alone proves nothing (answer: {P})
 // checkCounter(counter, answers) → {ok, message?, rule?}
 
 import { Q } from '../math/rational.js';
@@ -218,8 +221,25 @@ function checkComposite(counter, answers) {
   return isPrime(k.n) ? { ok: false, message: `Pour ${v} = ${val.q}, on obtient ${k.n}, qui est premier.` } : { ok: true };
 }
 
+function checkHeredity(counter, answers) {
+  const v = counter.v || 'n';
+  const text = String(answers?.P ?? '').replace(/^\s*P\(\s*n\s*\)\s*:?/, '');
+  const node = tryParse(text, { vars: [v] });
+  if (!node || !['rel', 'chain', 'logic', 'not'].includes(node.t)) return { ok: false, message: `Écris une propriété de ${v}, par exemple une inégalité.` };
+  const at = (k) => closedHolds(mapNode(node, (n) => (n.t === 'sym' && n.name === v && !n.sub ? { t: 'paren', e: lit(new Q(k)) } : n)), {});
+  const from = counter.from ?? 0;
+  let vals;
+  try { vals = Array.from({ length: 42 }, (_, i) => at(from + i)); } catch { return { ok: false, message: 'Je n’arrive pas à calculer ta propriété.' }; }
+  for (let i = 0; i + 1 < vals.length; i++) {
+    if (vals[i] && !vals[i + 1]) return { ok: false, message: `Ton hérédité est fausse : P(${from + i}) est vraie, mais P(${from + i + 1}) est fausse.` };
+  }
+  if (vals.every(Boolean)) return { ok: false, message: 'Ta propriété est vraie pour tout n : ce n’est pas un contre-exemple.' };
+  return { ok: true };
+}
+
 export function checkCounter(counter, answers) {
   switch (counter.kind) {
+    case 'heredity': return checkHeredity(counter, answers);
     case 'refute': return checkRefute(counter, answers);
     case 'truth': return checkTruth(counter, answers);
     case 'poly': return checkPoly(counter, answers);

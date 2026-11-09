@@ -5,14 +5,18 @@
 //   'any'       every right line is final
 //   'no-prime'  no d(…) or ′ left, and a tidy product: no ·1, no 0·,
 //               numbers multiplied out (§5.2, G6 catalogue)
+//   'no-sum'    no Σ (and no d(…)) left (G5 catalogue); with cfg.factored,
+//               a product or quotient of first-degree factors with whole
+//               coefficients ((n + 1)(n + 2)/2, n/(n + 1)); with
+//               cfg.expanded, an expanded polynomial in the variable
 //   'partial-fractions'  a polynomial part plus c/(x − a)ᵏ and (bx + c)/(x² + px + q)
 //               with Δ < 0, each denominator once (G0 catalogue)
 
 import { expandDerivs, hasDeriv } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
-import { numValue, stripParen } from '../cas/ast.js';
+import { numValue, stripParen, contains } from '../cas/ast.js';
 import { toText } from '../cas/print.js';
-import { polyOf, qCoeffs, discriminant, sumTerms, productFactors } from '../cas/polyx.js';
+import { polyOf, qCoeffs, discriminant, sumTerms, productFactors, isExpanded } from '../cas/polyx.js';
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine, frNum } from './common.js';
 
@@ -94,8 +98,39 @@ function factoredDen(node) {
   return true;
 }
 
+// A product, quotient or power whose factors are whole-coefficient
+// polynomials of degree ≤ 1 in v (or other sums without fractions): the
+// closed form of a sum written « as f(n + 1) », (n + 1)(n + 2)/2, and not
+// (n + 1)(n/2 + 1), (n + 1)(2n² + 7n + 6)/6 nor 1 − 1/(n + 1).
+function closedProduct(node, v) {
+  let n = stripParen(node);
+  if (n.t === 'neg') n = stripParen(n.e);
+  if (n.t === 'bin' && (n.op === '+' || n.op === '-')) return false;
+  const bad = (f) => {
+    f = stripParen(f);
+    if (f.t === 'bin' && f.op === '×') return bad(f.l) || bad(f.r);
+    if (f.t === 'frac') return bad(f.n) || bad(f.d);
+    if (f.t === 'pow') return bad(f.b);
+    if (f.t === 'neg') return bad(f.e);
+    if (f.t !== 'bin') return false;
+    if (contains(f, (x) => x.t === 'frac')) return true;
+    const p = polyOf(f);
+    const cs = p && [...p.vars()].every((x) => x === v) ? qCoeffs(p, v) : null;
+    return !!cs && (cs.length > 2 || cs.some((c) => c.d !== 1));
+  };
+  return !bad(n);
+}
+
 const TARGETS = {
   any: () => true,
+  'no-sum': (node, cfg) => {
+    if (hasDeriv(node) || contains(node, (x) => x.t === 'sum')) return false;
+    const v = cfg.vars?.[0] || 'n';
+    if (cfg.factored && !closedProduct(node, v)) return false;
+    if (cfg.expanded && !(polyOf(node) && isExpanded(node, v))) return false;
+    // Numbers still to multiply out: a line on the way, not a final one.
+    return !presentationIssue(node);
+  },
   'factored-den': (node) => factoredDen(node),
   'partial-fractions': (node) => partialFractions(node),
   'no-prime': (node) => {
