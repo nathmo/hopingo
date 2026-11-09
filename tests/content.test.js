@@ -7,6 +7,7 @@ import { parse, evaluate } from '../js/math/expr.js';
 import { judgeAnswer } from '../js/math/judge.js';
 import { RULE_BY_ID } from '../js/math/malrules.js';
 import { Q } from '../js/math/rational.js';
+import { CHECKERS } from '../js/math/checkers.js';
 
 test('skill graph: prerequisites exist and come earlier', () => {
   SKILLS.forEach((s, i) => {
@@ -40,7 +41,9 @@ test('every generator produces valid, self-consistent items', () => {
           assert.equal(v.toString(), it.answer, where);
           assert.ok(it.solution.length > 0 || parse(it.expr).t === 'num', where);
         }
-        if (it.type === 'answer') {
+        if (it.type === 'answer' && it.checker) {
+          assert.equal(CHECKERS[it.checker](it, it.expected).kind, 'done', `${where} expected answer rejected by its checker`);
+        } else if (it.type === 'answer') {
           const r = judgeAnswer(evaluate(parse(it.expected)), it.expected, { form: it.form });
           assert.equal(r.kind, 'done', `${where} expected answer rejected: ${r.kind}`);
           for (const t of it.traps) assert.ok(!Q.of(evaluate(parse(t.value))).eq(evaluate(parse(it.expected))), where);

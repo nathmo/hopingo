@@ -99,3 +99,18 @@ test('every trap points to a real skill and explains itself', () => {
     if (!r.skill.startsWith('frac-')) assert.ok(general, `${r.id}: no general explanation`);
   }
 });
+
+test('prime factorisations and simplified roots are checked by form', async () => {
+  const { checkPrimes, checkSurd } = await import('../js/math/checkers.js');
+  const f = { target: 360 };
+  assert.equal(checkPrimes(f, '2^3×3^2×5').kind, 'done');
+  assert.equal(checkPrimes(f, '2×2×2×3×3×5').kind, 'done', 'repeated factors are fine');
+  assert.equal(checkPrimes(f, '5×3^2×2^3').kind, 'done', 'any order');
+  assert.equal(checkPrimes(f, '2^3×45').kind, 'stay', '45 is not prime');
+  assert.equal(checkPrimes(f, '2^3×3×5').kind, 'wrong');
+  const r = { target: 72, surd: [6, 2] };
+  assert.equal(checkSurd(r, '6√2').kind, 'done');
+  assert.equal(checkSurd(r, '2√18').kind, 'stay', 'a square is left under the root');
+  assert.equal(checkSurd(r, '36√2').rule, 'surd_forget_root');
+  assert.equal(checkSurd(r, '3√2').kind, 'wrong');
+});

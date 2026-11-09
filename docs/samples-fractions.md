@@ -1396,6 +1396,89 @@ Calcule et donne le résultat sous forme irréductible.
 
 ```
 
+## Décimal, fraction, pourcentage (`nb-convert`, 9H)
+
+_0,375 = 3/8 = 37,5 %._
+
+### Niveau 1
+
+```
+Écris 0,375 sous forme de fraction irréductible.
+  → 3/8 (irreducible)
+
+Écris 0,35 sous forme de fraction irréductible.
+  → 7/20 (irreducible)
+
+Écris 0,375 sous forme de fraction irréductible.
+  → 3/8 (irreducible)
+
+```
+
+### Niveau 2
+
+```
+Écris 3/8 sous forme décimale.
+  → 0,375 (decimal)   pièges attendus : 19/50 [frac_decimal_digits]
+  pièges : frac_decimal_digits
+
+Écris 3/50 sous forme décimale.
+  → 0,06 (decimal)   pièges attendus : 7/20 [frac_decimal_digits]
+  pièges : frac_decimal_digits
+
+Écris 3/4 sous forme décimale.
+  → 0,75 (decimal)   pièges attendus : 17/50 [frac_decimal_digits]
+  pièges : frac_decimal_digits
+
+```
+
+### Niveau 3
+
+```
+Écris 0,05 en pourcentage.
+  → 5   pièges attendus : 1/2 [percent_shift]
+  pièges : percent_shift
+
+Écris 0,08 en pourcentage.
+  → 8   pièges attendus : 4/5 [percent_shift]
+  pièges : percent_shift
+
+Écris 0,03 en pourcentage.
+  → 3   pièges attendus : 3/10 [percent_shift]
+  pièges : percent_shift
+
+```
+
+### Niveau 4
+
+```
+Écris 1/4 en pourcentage.
+  → 25
+
+Écris 11/20 en pourcentage.
+  → 55
+
+Écris 11/20 en pourcentage.
+  → 55
+
+```
+
+### Niveau 5
+
+```
+Quelle fraction vaut 0,6666… ?
+  · 7/10 [repeating_as_finite]   · 3/20   · 67/100 [repeating_as_finite]   ✔ 2/3
+  pièges : repeating_as_finite
+
+Quelle fraction vaut 0,6666… ?
+  · 3/20   ✔ 2/3   · 7/10 [repeating_as_finite]   · 67/100 [repeating_as_finite]
+  pièges : repeating_as_finite
+
+Quelle fraction vaut 0,6666… ?
+  · 7/10 [repeating_as_finite]   ✔ 2/3   · 67/100 [repeating_as_finite]   · 3/20
+  pièges : repeating_as_finite
+
+```
+
 ## Pièges de cette unité
 
 - **Additionner en haut et en bas** (`add_across`, R) : 1/2 + 1/3 = 2/5 au lieu de 1/2 + 1/3 = 5/6
@@ -1426,3 +1509,6 @@ Calcule et donne le résultat sous forme irréductible.
 - **Toujours diviser le grand par le petit** (`quotient_larger_by_smaller`, R) : 4 pizzas pour 6 enfants → 6/4 au lieu de 4/6
 - **Écrire les chiffres côte à côte** (`decimal_digits`, E) : 1/4 = 1,4 au lieu de 1/4 = 0,25
 - **Enlever l'entier au lieu des parts** (`mixed_subtract_whole`, E) : 17/5 = 3 + 14/5 au lieu de 17/5 = 3 + 2/5
+- **Recopier les chiffres de la fraction** (`frac_decimal_digits`, E) : 1/4 = 0,4 au lieu de 1/4 = 0,25
+- **Pourcentage décalé d'un rang** (`percent_shift`, E) : 35 % = 3,5 au lieu de 35 % = 0,35
+- **Arrêter une écriture qui ne s'arrête pas** (`repeating_as_finite`, E) : 0,333… = 3/10 au lieu de 0,333… = 1/3

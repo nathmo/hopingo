@@ -19,6 +19,7 @@ import { solve, nextStep } from '../math/solver.js';
 import { diagnose } from '../math/diagnose.js';
 import { judgeAnswer, judgeLine, performedOps } from '../math/judge.js';
 import { RULE_BY_ID, FAMILIES } from '../math/malrules.js';
+import { CHECKERS } from '../math/checkers.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -38,7 +39,7 @@ export function solutionHtml(solution) {
   if (!solution?.length) return '';
   // Always open: the correction is the point of a mistake, not an option.
   return `<div class="solution"><div class="sol-title">La correction</div>${solution
-    .map((l) => `<div class="sol-line">${M(l.math)}<span class="sol-note">${l.note || ''}</span></div>`).join('')}</div>`;
+    .map((l) => `<div class="sol-line">${l.html ?? M(l.math)}<span class="sol-note">${l.note || ''}</span></div>`).join('')}</div>`;
 }
 
 function rulesFromDiag(diag) {
@@ -111,12 +112,20 @@ MOUNTS.answer = (item, ctx, body) => {
     onEnter: () => ctx.submit(),
   });
   body.appendChild(h('div.answer-row', input.display, item.suffix ? h('span.suffix', item.suffix) : null));
-  const expected = evaluate(parse(item.expected));
+  // Checker answers (2^3×3, 6√2) are not a single number.
+  const expected = item.checker ? null : evaluate(parse(item.expected));
   return {
     footer: input.keypad(),
     onKey: (e) => input.handleKey(e),
     check() {
       if (!input.value) return null;
+      // Answers that are not one number (2^3×3, 6√2) have their own checker.
+      if (item.checker) {
+        const r = CHECKERS[item.checker](item, input.value);
+        if (r.kind === 'done') return { correct: true };
+        if (r.kind === 'stay') { input.flash(); return { stayOpen: true, message: r.message }; }
+        return wrongOutcome(item, { rules: r.rule ? [r.rule] : [], answerHtml: item.expectedHtml });
+      }
       if (item.exact) {
         const node = parse(input.value.includes('/') ? input.value : `${input.value}/1`);
         const ok = node.t === 'frac' && node.n.v.n === item.exact[0] && node.d.v.n === item.exact[1];

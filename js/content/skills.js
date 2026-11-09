@@ -7,6 +7,7 @@ export const UNITS = [
   { id: 'calcul', title: 'Calcul mental', color: '#f08c00', ready: true },
   { id: 'fractions', title: 'Fractions', color: '#7c5cff', ready: true },
   { id: 'relatifs', title: 'Nombres relatifs', color: '#e8590c', ready: true },
+  { id: 'arithmetique', title: 'Diviseurs et nombres premiers', color: '#2f9e44', ready: true },
   { id: 'puissances', title: 'Puissances', color: '#0ca678', ready: true },
   { id: 'racines', title: 'Racines carrées', color: '#1c7ed6', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
@@ -290,6 +291,15 @@ const FRACTIONS = [
       solve: '1/2+1/3×3/4',
     },
   },
+  {
+    id: 'nb-convert', unit: 'fractions', year: 9, prereqs: ['frac-decimal', 'frac-simplify'], icon: '%',
+    title: 'Décimal, fraction, pourcentage',
+    desc: '0,375 = 3/8 = 37,5 %.',
+    intro: {
+      rule: '0,375 = 375 millièmes = 375/1000 = <b>3/8</b>.<br>Pour cent veut dire « sur 100 » : 35 % = 0,35.<br>Certaines fractions ne s\'arrêtent jamais : 1/3 = 0,333…',
+      example: [{ math: '375/1000', note: '= 3/8' }, { math: '35/100', note: '= 0,35 = 35 %' }],
+    },
+  },
 ];
 
 const RELATIFS = [
@@ -365,6 +375,64 @@ const RELATIFS = [
     intro: {
       rule: 'Une fraction peut être négative : −2/3. Les règles des fractions ne changent pas, et les signes suivent les règles des relatifs.',
       solve: '-2/3+1/2',
+    },
+  },
+];
+
+// Divisibility, primes, GCD and LCM (content/arithmetique.js).
+const ARITHMETIQUE = [
+  {
+    id: 'ar-div', unit: 'arithmetique', year: 9, prereqs: ['tab-div'], icon: '÷?',
+    title: 'Critères de divisibilité',
+    desc: 'Par 2, 3, 4, 5, 9 et 10, sans poser la division.',
+    intro: {
+      rule: 'Par 2, 5, 10 : on regarde le dernier chiffre.<br>Par 4 : les deux derniers chiffres.<br>Par 3 et 9 : on additionne les chiffres. 4 152 → 4 + 1 + 5 + 2 = 12, multiple de 3, donc <b>4 152 est divisible par 3</b>.',
+      example: [{ math: '4+1+5+2', note: '= 12 : divisible par 3, pas par 9' }],
+    },
+  },
+  {
+    id: 'ar-divisors', unit: 'arithmetique', year: 9, prereqs: ['ar-div'], icon: 'a|b',
+    title: 'Multiples et diviseurs',
+    desc: 'Lister les diviseurs, reconnaître un multiple.',
+    intro: {
+      rule: '3 est un <b>diviseur</b> de 12 car 12 : 3 = 4 sans reste. 12 est un <b>multiple</b> de 3.<br>On trouve les diviseurs par paires : 12 = 1 × 12 = 2 × 6 = 3 × 4.',
+      example: [{ math: '12', note: 'diviseurs : 1, 2, 3, 4, 6, 12' }],
+    },
+  },
+  {
+    id: 'ar-prime', unit: 'arithmetique', year: 9, prereqs: ['ar-divisors'], icon: 'p',
+    title: 'Nombres premiers',
+    desc: 'Exactement deux diviseurs : 1 et lui-même.',
+    intro: {
+      rule: 'Un nombre <b>premier</b> a exactement deux diviseurs : 1 et lui-même. 2, 3, 5, 7, 11, 13…<br>1 n\'est pas premier. Et impair ne suffit pas : 51 = 3 × 17.',
+      example: [{ math: '51', note: '= 3 × 17 : pas premier' }],
+    },
+  },
+  {
+    id: 'ar-factor', unit: 'arithmetique', year: 9, prereqs: ['ar-prime'], icon: '2³·3',
+    title: 'Décomposer en facteurs premiers',
+    desc: '360 = 2³ × 3² × 5.',
+    intro: {
+      rule: 'On divise par le plus petit nombre premier possible, encore et encore :<br>360 = 2 × 180 = 2 × 2 × 90 = … = <b>2³ × 3² × 5</b>.<br>Tape le produit avec × et ^ : 2^3×3^2×5.',
+      example: [{ math: '2×180', note: '360 = 2 × 180' }, { math: '2^3×3^2×5', note: 'tous les facteurs sont premiers' }],
+    },
+  },
+  {
+    id: 'ar-gcd', unit: 'arithmetique', year: 9, prereqs: ['ar-factor'], icon: 'PGDC',
+    title: 'PGDC et PPMC',
+    desc: 'Le plus grand diviseur commun, le plus petit multiple commun.',
+    intro: {
+      rule: '12 = 2² × 3 et 18 = 2 × 3².<br><b>PGDC</b> : les facteurs communs, avec le plus petit exposant : 2 × 3 = <b>6</b>.<br><b>PPMC</b> : tous les facteurs, avec le plus grand exposant : 2² × 3² = <b>36</b>.',
+      example: [{ math: '2×3', note: 'PGDC(12 ; 18) = 6' }, { math: '2^2×3^2', note: 'PPMC(12 ; 18) = 36' }],
+    },
+  },
+  {
+    id: 'ar-fractions', unit: 'arithmetique', year: 9, prereqs: ['ar-gcd', 'frac-add-any', 'frac-simplify'], icon: 'a/b',
+    title: 'Fractions avec PGDC et PPMC',
+    desc: 'Simplifier d\'un coup, trouver le plus petit dénominateur commun.',
+    intro: {
+      rule: 'Diviser par le PGDC simplifie en une seule étape : PGDC(84 ; 126) = 42, donc 84/126 = <b>2/3</b>.<br>Le plus petit dénominateur commun est le PPMC des dénominateurs.',
+      solve: '84/126',
     },
   },
 ];
@@ -484,6 +552,42 @@ const RACINES = [
     },
   },
   {
+    id: 'nb-sets', unit: 'racines', year: 10, prereqs: ['rel-frac'], icon: 'ℚ',
+    title: 'Ensembles de nombres',
+    desc: 'ℕ, ℤ, ℚ, ℝ : où vit chaque nombre ?',
+    intro: {
+      rule: '<b>ℕ</b> : 0, 1, 2… &nbsp; <b>ℤ</b> : aussi les entiers négatifs.<br><b>ℚ</b> : les quotients d\'entiers (3/7, 0,25). &nbsp; <b>ℝ</b> : aussi les irrationnels (√2, π).<br>On juge la valeur, pas l\'écriture : −12/4 = −3 est dans ℤ.',
+      example: [{ math: '-12/4', note: '= −3 : dans ℤ' }],
+    },
+  },
+  {
+    id: 'ar-surd', unit: 'racines', year: 11, prereqs: ['ar-factor', 'root-squares'], icon: '6√2',
+    title: 'Sortir un carré de la racine',
+    desc: '√72 = √(36 × 2) = 6√2.',
+    intro: {
+      rule: 'On cherche le plus grand carré qui divise le nombre :<br>√72 = √(36 × 2) = √36 × √2 = <b>6√2</b>.<br>Tape-le avec la touche √ : 6√2.',
+      example: [{ math: '√(36×2)', note: '= 6√2' }],
+    },
+  },
+  {
+    id: 'nb-irrational', unit: 'racines', year: 11, prereqs: ['nb-sets', 'root-estimate'], icon: 'π',
+    title: 'Rationnel ou irrationnel ?',
+    desc: '√49 = 7 est rationnel, √50 ne l\'est pas.',
+    intro: {
+      rule: 'Un nombre <b>irrationnel</b> ne s\'écrit pas comme un quotient d\'entiers : √2, √50, π.<br>Mais √49 = 7 et √(9/16) = 3/4 sont rationnels.',
+      example: [{ math: '√49', note: '= 7 : rationnel' }],
+    },
+  },
+  {
+    id: 'nb-cube', unit: 'racines', year: 11, prereqs: ['root-squares', 'pow-sign'], icon: '∛',
+    title: 'Racines cubiques',
+    desc: '∛64 = 4, ∛(−8) = −2.',
+    intro: {
+      rule: '<b>∛64</b> est le nombre qui, au cube, donne 64 : 4³ = 64, donc ∛64 = 4.<br>Un cube garde le signe : (−2)³ = −8, donc ∛(−8) = <b>−2</b>.',
+      example: [{ math: '4^3', note: '= 64' }],
+    },
+  },
+  {
     id: 'root-frac', unit: 'racines', year: 11, prereqs: ['root-calc', 'frac-mul'], icon: '√⅔',
     title: 'Racines et fractions',
     desc: '√(9/16) = 3/4, puis dans des calculs.',
@@ -526,7 +630,7 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PUISSANCES, ...RACINES, ...MELANGES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL

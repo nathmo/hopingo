@@ -443,6 +443,341 @@ Calcule (2×√3)^2.
 
 ```
 
+## Ensembles de nombres (`nb-sets`, 10H)
+
+_ℕ, ℤ, ℚ, ℝ : où vit chaque nombre ?_
+
+### Niveau 1
+
+```
+Quel est le plus petit ensemble qui contient 3/7 ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ
+
+Quel est le plus petit ensemble qui contient 8/2 ?
+  ✔ ℕ   · ℤ   · ℚ [set_by_writing]   · ℝ
+  pièges : set_by_writing
+
+Quel est le plus petit ensemble qui contient 0 ?
+  ✔ ℕ   · ℤ   · ℚ   · ℝ
+
+```
+
+### Niveau 2
+
+```
+Quel est le plus petit ensemble qui contient −2,5 ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ
+
+Quel est le plus petit ensemble qui contient −2,5 ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ
+
+Quel est le plus petit ensemble qui contient −3 ?
+  ✔ ℤ   · ℕ   · ℚ   · ℝ
+
+```
+
+### Niveau 3
+
+```
+Quel est le plus petit ensemble qui contient −2,5 ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ
+
+Quel est le plus petit ensemble qui contient 1/3 ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ
+
+Quel est le plus petit ensemble qui contient √(4/9) ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ [root_always_irrational]
+  pièges : root_always_irrational
+
+```
+
+### Niveau 4
+
+```
+Quel est le plus petit ensemble qui contient √16 ?
+  ✔ ℕ   · ℤ   · ℚ   · ℝ [root_always_irrational]
+  pièges : root_always_irrational
+
+Quel est le plus petit ensemble qui contient −2,5 ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ
+
+Quel est le plus petit ensemble qui contient −√9 ?
+  ✔ ℤ   · ℕ   · ℚ   · ℝ [root_always_irrational]
+  pièges : root_always_irrational
+
+```
+
+### Niveau 5
+
+```
+Quel est le plus petit ensemble qui contient 8/2 ?
+  ✔ ℕ   · ℤ   · ℚ [set_by_writing]   · ℝ
+  pièges : set_by_writing
+
+Quel est le plus petit ensemble qui contient 3/7 ?
+  ✔ ℚ   · ℕ   · ℤ   · ℝ
+
+Quel est le plus petit ensemble qui contient π ?
+  ✔ ℝ   · ℕ   · ℤ   · ℚ
+
+```
+
+## Sortir un carré de la racine (`ar-surd`, 11H)
+
+_√72 = √(36 × 2) = 6√2._
+
+### Niveau 1
+
+```
+Écris √28 sous la forme a√b, avec b le plus petit possible.
+  → 2√7
+  pièges : surd_forget_root
+
+Écris √24 sous la forme a√b, avec b le plus petit possible.
+  → 2√6
+  pièges : surd_forget_root
+
+Écris √28 sous la forme a√b, avec b le plus petit possible.
+  → 2√7
+  pièges : surd_forget_root
+
+```
+
+### Niveau 2
+
+```
+Écris √54 sous la forme a√b, avec b le plus petit possible.
+  → 3√6
+  pièges : surd_forget_root
+
+Écris √175 sous la forme a√b, avec b le plus petit possible.
+  → 5√7
+  pièges : surd_forget_root
+
+Écris √54 sous la forme a√b, avec b le plus petit possible.
+  → 3√6
+  pièges : surd_forget_root
+
+```
+
+### Niveau 3
+
+```
+Écris √160 sous la forme a√b, avec b le plus petit possible.
+  → 4√10
+  pièges : surd_forget_root
+
+Écris √176 sous la forme a√b, avec b le plus petit possible.
+  → 4√11
+  pièges : surd_forget_root
+
+Écris √160 sous la forme a√b, avec b le plus petit possible.
+  → 4√10
+  pièges : surd_forget_root
+
+```
+
+### Niveau 4
+
+```
+Écris √24 sous la forme a√b, avec b le plus petit possible.
+  → 2√6
+  pièges : surd_forget_root
+
+Écris √72 sous la forme a√b, avec b le plus petit possible.
+  → 6√2
+  pièges : surd_forget_root
+
+Écris √99 sous la forme a√b, avec b le plus petit possible.
+  → 3√11
+  pièges : surd_forget_root
+
+```
+
+### Niveau 5
+
+```
+Écris √275 sous la forme a√b, avec b le plus petit possible.
+  → 5√11
+  pièges : surd_forget_root
+
+Écris √468 sous la forme a√b, avec b le plus petit possible.
+  → 6√13
+  pièges : surd_forget_root
+
+Écris √325 sous la forme a√b, avec b le plus petit possible.
+  → 5√13
+  pièges : surd_forget_root
+
+```
+
+## Rationnel ou irrationnel ? (`nb-irrational`, 11H)
+
+_√49 = 7 est rationnel, √50 ne l'est pas._
+
+### Niveau 1
+
+```
+Lequel de ces nombres est irrationnel ?
+  ✔ π   · 0,25   · 2/3   · √100 [root_always_irrational]
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · 0,25   · 1,5   ✔ √5   · √0,01 [root_always_irrational]
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · √(9/16) [root_always_irrational]   ✔ √20   · √49 [root_always_irrational]   · −5
+  pièges : root_always_irrational
+
+```
+
+### Niveau 2
+
+```
+Lequel de ces nombres est irrationnel ?
+  · √100 [root_always_irrational]   ✔ √20   · 1,5   · √0,01 [root_always_irrational]
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · −5   ✔ 2√3   · √0,01 [root_always_irrational]   · 2/3
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  ✔ π   · 2/3   · 0,25   · 1,5
+
+```
+
+### Niveau 3
+
+```
+Lequel de ces nombres est irrationnel ?
+  · 2/3   ✔ √10   · 0,25   · √49 [root_always_irrational]
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · √0,01 [root_always_irrational]   · 1,5   · 0,25   ✔ √5
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · √(9/16) [root_always_irrational]   ✔ 2√3   · 2/3   · −5
+  pièges : root_always_irrational
+
+```
+
+### Niveau 4
+
+```
+Lequel de ces nombres est irrationnel ?
+  · 0,25   · 1,5   ✔ √50   · √(9/16) [root_always_irrational]
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · −5   · 1,5   · √100 [root_always_irrational]   ✔ 2√3
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  ✔ 2√3   · √(9/16) [root_always_irrational]   · 0,25   · √0,01 [root_always_irrational]
+  pièges : root_always_irrational
+
+```
+
+### Niveau 5
+
+```
+Lequel de ces nombres est irrationnel ?
+  · √(9/16) [root_always_irrational]   · √49 [root_always_irrational]   · 0,25   ✔ √20
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · √49 [root_always_irrational]   ✔ √2   · −5   · 0,25
+  pièges : root_always_irrational
+
+Lequel de ces nombres est irrationnel ?
+  · √0,01 [root_always_irrational]   ✔ √3   · √(9/16) [root_always_irrational]   · 2/3
+  pièges : root_always_irrational
+
+```
+
+## Racines cubiques (`nb-cube`, 11H)
+
+_∛64 = 4, ∛(−8) = −2._
+
+### Niveau 1
+
+```
+Calcule ∛64.
+  → 4
+
+Calcule ∛64.
+  → 4
+
+Calcule ∛1.
+  → 1
+
+```
+
+### Niveau 2
+
+```
+Calcule ∛512.
+  → 8
+
+Calcule ∛729.
+  → 9   pièges attendus : 243 [cube_root_third]
+  pièges : cube_root_third
+
+Calcule ∛64.
+  → 4
+
+```
+
+### Niveau 3
+
+```
+Calcule ∛(−64).
+  → -4   pièges attendus : 4 [cube_root_negative]
+  pièges : cube_root_negative
+
+Calcule ∛(−216).
+  → -6   pièges attendus : -72 [cube_root_third], 6 [cube_root_negative]
+  pièges : cube_root_third, cube_root_negative
+
+Calcule ∛(−27).
+  → -3   pièges attendus : -9 [cube_root_third], 3 [cube_root_negative]
+  pièges : cube_root_third, cube_root_negative
+
+```
+
+### Niveau 4
+
+```
+Calcule ∛(−64).
+  → -4   pièges attendus : 4 [cube_root_negative]
+  pièges : cube_root_negative
+
+Calcule ∛1000.
+  → 10
+
+Calcule ∛64.
+  → 4
+
+```
+
+### Niveau 5
+
+```
+Calcule ∛(−8/27).
+  → -2/3 (irreducible)
+
+Calcule ∛(1/27).
+  → 1/3 (irreducible)
+
+Calcule ∛(1/8).
+  → 1/2 (irreducible)
+
+```
+
 ## Racines et fractions (`root-frac`, 11H)
 
 _√(9/16) = 3/4, puis dans des calculs._
@@ -450,16 +785,16 @@ _√(9/16) = 3/4, puis dans des calculs._
 ### Niveau 1
 
 ```
-Calcule √(25/81).
-  → 5/9   pièges attendus : 5/81 [sqrt_numerator_only]
+Calcule √(1/4).
+  → 1/2   pièges attendus : 1/4 [sqrt_numerator_only]
   pièges : sqrt_numerator_only, sqrt_half, sqrt_is_square
 
-Calcule √(4/9).
-  → 2/3   pièges attendus : 2/9 [sqrt_numerator_only]
+Calcule √(16/81).
+  → 4/9   pièges attendus : 4/81 [sqrt_numerator_only]
   pièges : sqrt_numerator_only, sqrt_half, sqrt_is_square
 
-Calcule √(9/100).
-  → 3/10   pièges attendus : 3/100 [sqrt_numerator_only]
+Calcule √(36/49).
+  → 6/7   pièges attendus : 6/49 [sqrt_numerator_only]
   pièges : sqrt_numerator_only, sqrt_half, sqrt_is_square
 
 ```
@@ -468,16 +803,16 @@ Calcule √(9/100).
 
 ```
 Calcule et donne le résultat sous forme irréductible.
-  √(36/49) × 5   [guided, irréductible] → 30/7
+  √(1/25) × 6   [guided, irréductible] → 6/5
   pièges : int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
 
 Calcule et donne le résultat sous forme irréductible.
-  √(1/36) × 4   [guided, irréductible] → 2/3
-  pièges : int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
+  √(25/36) × 2^2   [guided, irréductible] → 10/3
+  pièges : pow_before_product, int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
 
 Calcule et donne le résultat sous forme irréductible.
-  √(9/25) + 3/4   [guided, irréductible] → 27/20
-  pièges : add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, sqrt_half, sqrt_numerator_only, sqrt_is_square
+  √(16/25) × 5   [guided, irréductible] → 4
+  pièges : int_times_both, sqrt_half, sqrt_is_square
 
 ```
 
@@ -485,16 +820,16 @@ Calcule et donne le résultat sous forme irréductible.
 
 ```
 Calcule et donne le résultat sous forme irréductible.
-  √81 × √(1/36)   [tap, irréductible] → 3/2
-  pièges : int_times_both, sqrt_half, sqrt_is_square, sqrt_numerator_only
+  √(1/4) + (1/6)^2   [tap, irréductible] → 19/36
+  pièges : add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, sqrt_half, sqrt_numerator_only, sqrt_is_square, pow_fraction_numerator_only
 
 Calcule et donne le résultat sous forme irréductible.
-  5 × √(9/49) − 1/6   [tap, irréductible] → 83/42
-  pièges : sub_across, ignore_denominators, forget_amplify, int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
+  √(1/25) + (3/5)^2   [tap, irréductible] → 14/25
+  pièges : add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, sqrt_half, sqrt_is_square
 
 Calcule et donne le résultat sous forme irréductible.
-  √25 × √(9/16)   [tap, irréductible] → 15/4
-  pièges : int_times_both, sqrt_half, sqrt_is_square, sqrt_numerator_only
+  √(9/16) + (1/3)^2   [tap, irréductible] → 31/36
+  pièges : add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, sqrt_half, sqrt_numerator_only, sqrt_is_square, pow_fraction_numerator_only
 
 ```
 
@@ -502,16 +837,16 @@ Calcule et donne le résultat sous forme irréductible.
 
 ```
 Calcule et donne le résultat sous forme irréductible.
-  (√(16/25) − 1/5) × (−4)   [free, irréductible] → -12/5
-  pièges : ignore_parentheses, int_times_both, mul_sign_dropped, sqrt_half, sqrt_numerator_only, sqrt_is_square, sub_neg_subtracts
-
-Calcule et donne le résultat sous forme irréductible.
-  (√(1/16) − 4/5) × 4   [free, irréductible] → -11/5
-  pièges : ignore_parentheses, ignore_denominators, int_times_both, mul_sign_dropped, sub_across, forget_amplify, sqrt_half, sqrt_is_square, reverse_subtraction, sqrt_numerator_only
-
-Calcule et donne le résultat sous forme irréductible.
-  (−5/6)^2 ÷ √(9/16)   [free, irréductible] → 25/27
+  (−1/4)^2 ÷ √(1/9)   [free, irréductible] → 3/16
   pièges : neg_power_brackets, mult_across_division, invert_first, pow_fraction_numerator_only, sqrt_half, sqrt_numerator_only, sqrt_is_square
+
+Calcule et donne le résultat sous forme irréductible.
+  √(1/36) × 6^3 + 3/4   [free, irréductible] → 147/4
+  pièges : pow_before_product, int_plus_frac, int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square
+
+Calcule et donne le résultat sous forme irréductible.
+  (4/5)^2 ÷ √(1/36)   [free, irréductible] → 96/25
+  pièges : mult_across_division, invert_first, pow_fraction_numerator_only, sqrt_half, sqrt_numerator_only, sqrt_is_square
 
 ```
 
@@ -519,16 +854,16 @@ Calcule et donne le résultat sous forme irréductible.
 
 ```
 Calcule et donne le résultat sous forme irréductible.
-  √36 − (−1/2)^−1 × √(1/4)   [free, irréductible] → 7
-  pièges : priority_left_to_right, sub_neg_subtracts, sqrt_half, sqrt_is_square, int_times_both, pow_neg_exp_negative, sqrt_numerator_only
-
-Calcule et donne le résultat sous forme irréductible.
-  (−5/6)^2 ÷ √(4/9) − 2/3   [free, irréductible] → 3/8
+  (−3/4)^2 ÷ √(4/9) − 3/4   [free, irréductible] → 3/32
   pièges : neg_power_brackets, sub_across, ignore_denominators, forget_amplify, mult_across_division, invert_first, pow_fraction_numerator_only, sqrt_half, sqrt_is_square, minus_minus_positive
 
 Calcule et donne le résultat sous forme irréductible.
-  √81 − (−1/6)^−1 × √(1/25)   [free, irréductible] → 51/5
-  pièges : priority_left_to_right, sub_neg_subtracts, sqrt_half, sqrt_is_square, int_times_both, pow_neg_exp_negative, sqrt_numerator_only
+  √(9/25) × (1/6)^−1 + 1/6   [free, irréductible] → 113/30
+  pièges : add_across, ignore_denominators, forget_amplify, mult_rule_for_addition, int_times_both, sqrt_half, sqrt_numerator_only, sqrt_is_square, pow_neg_exp_negative
+
+Calcule et donne le résultat sous forme irréductible.
+  √25 − (1/3)^−1 × √(4/25)   [free, irréductible] → 19/5
+  pièges : priority_left_to_right, int_plus_frac, sqrt_half, sqrt_is_square, int_times_both, pow_neg_exp_negative
 
 ```
 
@@ -547,3 +882,8 @@ Calcule et donne le résultat sous forme irréductible.
 - **Oublier la racine à la fin** (`sqrt_forget_root`, E) : √2 × √8 = 16 au lieu de √2 × √8 = √16 = 4
 - **Oublier la solution négative** (`square_eq_one_solution`, E) : x² = 25 donne seulement x = 5 au lieu de x = 5 ou x = −5
 - **Des solutions à x² = un nombre négatif** (`square_negative_solutions`, E) : x² = −9 donne x = −3 au lieu de pas de solution
+- **Sortir le carré sans prendre sa racine** (`surd_forget_root`, E) : √72 = 36√2 au lieu de √72 = 6√2
+- **Juger l'ensemble à l'écriture** (`set_by_writing`, E) : −12/4 est dans ℚ seulement au lieu de −12/4 = −3, dans ℤ
+- **Une racine est toujours irrationnelle** (`root_always_irrational`, E) : √16 est irrationnel au lieu de √16 = 4
+- **Racine cubique égale le tiers** (`cube_root_third`, E) : ∛27 = 9 au lieu de ∛27 = 3
+- **Oublier le signe de la racine cubique** (`cube_root_negative`, E) : ∛(−8) = 2 au lieu de ∛(−8) = −2

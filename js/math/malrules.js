@@ -745,7 +745,93 @@ export const RULES = [
     example: ['3,47 → 3,4', '3,47 → 3,5'],
     explain: () => 'Arrondir, ce n\'est pas couper : on regarde le chiffre suivant. Dans 3,47 au dixième, le 7 fait monter le 4 : 3,5.',
   },
+  // ---------- arithmetic and writings of a number (answer rules) ----------
+  {
+    id: 'div_last_digit', family: 'place', tag: 'E', skill: 'ar-div', repair: 'ar-div',
+    name: 'Regarder seulement le dernier chiffre',
+    example: ['73 est divisible par 3 (il finit par 3)', '7 + 3 = 10 : non'],
+    explain: () => 'Le dernier chiffre suffit pour 2, 5 et 10 seulement. Pour 3 et 9, on additionne tous les chiffres ; pour 4, on regarde les deux derniers.',
+  },
+  {
+    id: 'divisors_forget_ends', family: 'meaning', tag: 'E', skill: 'ar-divisors', repair: 'ar-divisors',
+    name: 'Oublier 1 et le nombre lui-même',
+    example: ['12 a 4 diviseurs', '12 a 6 diviseurs : 1, 2, 3, 4, 6, 12'],
+    explain: () => '1 et le nombre lui-même sont toujours des diviseurs : 12 = 1 × 12. Ils comptent.',
+  },
+  {
+    id: 'one_is_prime', family: 'meaning', tag: 'E', skill: 'ar-prime', repair: 'ar-divisors',
+    name: '1 est premier',
+    example: ['1 est premier', '1 n\'est pas premier'],
+    explain: () => 'Un nombre premier a exactement <b>deux</b> diviseurs : 1 et lui-même. 1 n\'en a qu\'un seul, donc il n\'est pas premier.',
+  },
+  {
+    id: 'odd_is_prime', family: 'meaning', tag: 'E', skill: 'ar-prime', repair: 'ar-divisors',
+    name: 'Impair, donc premier',
+    example: ['51 est premier', '51 = 3 × 17'],
+    explain: () => 'Impair ne veut pas dire premier : 51 = 3 × 17, 91 = 7 × 13. Essaie de diviser par 3, 7, 11, 13…',
+  },
+  {
+    id: 'gcd_lcm_swap', family: 'rule', tag: 'E', skill: 'ar-gcd', repair: 'ar-factor',
+    name: 'Confondre PGDC et PPMC',
+    example: ['PGDC(12 ; 18) = 36', 'PGDC(12 ; 18) = 6'],
+    explain: () => 'Le PGDC est le plus grand <b>diviseur</b> commun : il est plus petit que les deux nombres. Le PPMC est le plus petit <b>multiple</b> commun : il est plus grand qu\'eux.',
+  },
+  {
+    id: 'lcm_product', family: 'rule', tag: 'E', skill: 'ar-gcd', repair: 'ar-factor',
+    name: 'Le PPMC, c\'est le produit',
+    example: ['PPMC(12 ; 18) = 216', 'PPMC(12 ; 18) = 36'],
+    explain: () => 'Le produit est un multiple commun, mais pas toujours le plus petit : 12 et 18 ont déjà 36 en commun. Prends chaque facteur premier avec son plus grand exposant.',
+  },
+  {
+    id: 'surd_forget_root', family: 'symbol', tag: 'E', skill: 'ar-surd', repair: 'root-squares',
+    name: 'Sortir le carré sans prendre sa racine',
+    example: ['√72 = 36√2', '√72 = 6√2'],
+    explain: () => '√72 = √(36 × 2) = √36 × √2 = 6√2. C\'est la <b>racine</b> de 36 qui sort, pas 36.',
+  },
+  {
+    id: 'frac_decimal_digits', family: 'whole', tag: 'E', skill: 'nb-convert', repair: 'frac-decimal',
+    name: 'Recopier les chiffres de la fraction',
+    example: ['1/4 = 0,4', '1/4 = 0,25'],
+    explain: () => 'La barre de fraction veut dire « divisé par » : 1/4 = 1 ÷ 4 = 0,25. Et 0,4 = 4 dixièmes = 2/5.',
+  },
+  {
+    id: 'percent_shift', family: 'place', tag: 'E', skill: 'nb-convert', repair: 'frac-decimal',
+    name: 'Pourcentage décalé d\'un rang',
+    example: ['35 % = 3,5', '35 % = 0,35'],
+    explain: () => 'Pour cent veut dire « sur 100 » : 35 % = 35 / 100 = 0,35. On divise par 100, pas par 10.',
+  },
+  {
+    id: 'repeating_as_finite', family: 'meaning', tag: 'E', skill: 'nb-convert', repair: 'frac-decimal',
+    name: 'Arrêter une écriture qui ne s\'arrête pas',
+    example: ['0,333… = 3/10', '0,333… = 1/3'],
+    explain: () => '0,333… continue sans fin : c\'est 1 ÷ 3 = 1/3. 3/10 = 0,3 tout court, un peu moins.',
+  },
+  {
+    id: 'set_by_writing', family: 'meaning', tag: 'E', skill: 'nb-sets', repair: 'nb-sets',
+    name: 'Juger l\'ensemble à l\'écriture',
+    example: ['−12/4 est dans ℚ seulement', '−12/4 = −3, dans ℤ'],
+    explain: () => 'On regarde la valeur, pas l\'écriture : −12/4 = −3 est un entier, donc dans ℤ.',
+  },
+  {
+    id: 'root_always_irrational', family: 'meaning', tag: 'E', skill: 'nb-irrational', repair: 'root-squares',
+    name: 'Une racine est toujours irrationnelle',
+    example: ['√16 est irrationnel', '√16 = 4'],
+    explain: () => 'La racine d\'un carré parfait tombe juste : √16 = 4, √(9/16) = 3/4. Seules les racines qui ne tombent pas juste (√2, √50) sont irrationnelles.',
+  },
+  {
+    id: 'cube_root_third', family: 'symbol', tag: 'E', skill: 'nb-cube', repair: 'pow-def',
+    name: 'Racine cubique égale le tiers',
+    example: ['∛27 = 9', '∛27 = 3'],
+    explain: () => '∛27 est le nombre qui, multiplié 3 fois par lui-même, donne 27 : 3 × 3 × 3 = 27. Ce n\'est pas 27 ÷ 3.',
+  },
+  {
+    id: 'cube_root_negative', family: 'sign', tag: 'E', skill: 'nb-cube', repair: 'pow-sign',
+    name: 'Oublier le signe de la racine cubique',
+    example: ['∛(−8) = 2', '∛(−8) = −2'],
+    explain: () => 'Un cube garde le signe : (−2)³ = −8. Donc ∛(−8) = −2. Contrairement à la racine carrée, la racine cubique d\'un négatif existe.',
+  },
 ];
+
 export const RULE_BY_ID = Object.fromEntries(RULES.map((r) => [r.id, r]));
 
 export const OP_RULES = RULES.filter((r) => r.op);
