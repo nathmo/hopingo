@@ -26,8 +26,9 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 | Solver | `js/math/solver.js` | Canonical step-by-step solutions (signs, powers, roots included), used for guided blanks, hints and worked examples. |
 | Mistakes | `js/math/malrules.js`, `diagnose.js` | Known errors (« pièges ») as rules. A wrong line is replayed under each rule, and under misreadings of its structure (priorities, brackets, −3² vs (−3)², √(a+b) = √a + √b…), to name the mistake. |
 | Judge | `js/math/judge.js` | A line is valid if it keeps the exact value of the previous one, so any method is accepted. |
-| Skills | `js/content/skills.js` | The skill graph: 83 skills in 9 units, prerequisites, intro cards, HarmoS year. The path follows the school year across units. |
-| Questions | `js/content/items.js` and one file per unit: `calcul.js`, `fractions.js`, `relatifs.js`, `puissances.js`, `racines.js`, `arithmetique.js`, `proportion.js`, `melanges.js` (merged in `generators.js`) | One generator per skill, 5 levels each. Records which traps each question can catch. |
+| Skills | `js/content/skills.js` | The skill graph: 98 skills in 11 units, prerequisites, intro cards, HarmoS year. The path follows the school year across units. |
+| Questions | `js/content/items.js` and one file per unit: `calcul.js`, `fractions.js`, `relatifs.js`, `puissances.js`, `racines.js`, `arithmetique.js`, `proportion.js`, `algebre.js`, `melanges.js` (merged in `generators.js`) | One generator per skill, 5 levels each. Records which traps each question can catch. |
+| Algebra | `js/math/algebra.js`, `checkers.js` | Expressions with letters: parser (3x, 2(x+1), x^2), exact polynomials and rational fractions, equivalence (numeric probing when a root appears), and form checks: « développé réduit », « factorisé (complètement) ». The checker says what is left to do and names the trap. |
 | Learner | `js/engine/learner.js` | Mastery estimate per skill (Bayesian knowledge tracing), difficulty ladder, repair of prerequisites, spaced review, traps. |
 | Facts | `js/engine/facts.js` | Memory of single number facts (7 × 8, 13²): a Leitner box per fact. A fact is automatic once answered right and fast twice. |
 | Lessons | `js/engine/session.js` | Picks each question as you go: path, reviews, traps, mistakes again at the end. |
@@ -53,7 +54,7 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 
 ## Content
 
-The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-calcul.md`, `samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md`, `samples-racines.md`, `samples-arithmetique.md`, `samples-proportion.md`, `samples-unites.md` and `samples-melanges.md`.
+The research behind the mistakes and the skill order is in `docs/error-catalogue.md`. Example questions for review are in `docs/samples-calcul.md`, `samples-fractions.md`, `samples-relatifs.md`, `samples-puissances.md`, `samples-racines.md`, `samples-arithmetique.md`, `samples-proportion.md`, `samples-unites.md`, `samples-algebre.md`, `samples-factorisation.md` and `samples-melanges.md`.
 
 | Unit | Skills | Years |
 |---|---|---|
@@ -65,6 +66,8 @@ The research behind the mistakes and the skill order is in `docs/error-catalogue
 | Diviseurs et nombres premiers | 6: divisibility rules, multiples and divisors, primes, prime factorisation (typed as 2^3×3^2×5), GCD and LCM, fractions with them. Also new: decimal ↔ fraction ↔ percent (fractions unit), number sets, rational or irrational, cube roots and √72 = 6√2 (roots unit) | 9H–11H |
 | Proportionnalité et pourcentages | 10: proportional or not (including the illusion of linearity), rule of three, scales, percent of, which percent, increase and decrease, back to the start value, successive percentages, average speed, slope | 9H–11H |
 | Grandeurs et unités | 8: lengths, masses and capacities, durations, areas, volumes, speeds, feet and inches (the factor must be squared or cubed, answers rounded and checked within the precision asked), scientific notation with units | 6H–11H |
+| Calcul littéral | 9: value of an expression, writing an expression from words, « Égal ou pas ? » (fast), reduce, multiply monomials, distributivity, double distributivity, identities, expand-reduce-order | 9H–11H |
+| Factorisation | 6: common factor, common bracket, identities backwards, x² + bx + c, ax² + bx + c (gymnase), factorise completely | 11H–Gym |
 | Calculs mélangés | 3 (9H, 10H, 11H): one expression mixing signed numbers, fractions, powers and roots. Also new: powers of fractions with negative exponents ((2/3)⁻² = 9/4) and roots of fractions (√(9/16) × (−2)²) | 9H–11H |
 
 Square roots stay exact: questions only use roots that come out whole or rational (√49, √(9/16), √2 × √8). Simplifying √50 = 5√2 is not covered.

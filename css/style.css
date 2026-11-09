@@ -329,7 +329,7 @@ textarea.code { width: 100%; font-family: ui-monospace, monospace; font-size: .7
 .feedback.big .sol-line { font-size: 1.35rem; }
 .feedback.big .sol-note { font-size: .95rem; }
 .feedback.big > .btn { position: sticky; bottom: 0; margin-top: 10px; font-size: 1.15rem; padding: 15px; }
-.btn.waiting { position: relative; overflow: hidden; opacity: .75; }
+.btn.waiting { position: relative; overflow: hidden; opacity: .75; cursor: default; }
 .btn.waiting::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 0; background: rgba(255, 255, 255, .35); animation: fill-wait var(--wait, 4s) linear forwards; }
 @keyframes fill-wait { to { width: 100%; } }
 .step-feedback.bad { font-size: 1.08rem; border: 2px solid var(--red); }

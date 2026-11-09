@@ -921,6 +921,97 @@ export const RULES = [
     example: ['1 pied² = 30,48 cm²', '1 pied² = 30,48² cm² ≈ 929 cm²'],
     explain: () => 'Pour une aire, le facteur de longueur se met au <b>carré</b> ; pour un volume, au <b>cube</b>. 1 pied = 30,48 cm, donc 1 pied² = 30,48 × 30,48 cm².',
   },
+  // ---------- algebra with letters (answer rules) ----------
+  {
+    id: 'subst_juxtapose', family: 'symbol', tag: 'R', skill: 'lit-value', repair: 'lit-value',
+    name: 'Coller le nombre à côté du coefficient',
+    example: ['3x pour x = 4 → 34', '3 × 4 = 12'],
+    explain: () => '3x veut dire 3 × x. Pour x = 4, 3x = 3 × 4 = 12, pas « 34 ».',
+  },
+  {
+    id: 'translate_order', family: 'order', tag: 'E', skill: 'lit-write', repair: 'lit-write',
+    name: 'Parenthèses mal placées en traduisant',
+    example: ['le double de (x + 3) → 2x + 3', '2(x + 3)'],
+    explain: () => 'Traduis dans l\'ordre des mots : « le double de la somme » demande d\'abord la somme, entre parenthèses, puis le double.',
+  },
+  {
+    id: 'conjoin_terms', family: 'rule', tag: 'R', skill: 'lit-reduce', repair: 'lit-equal',
+    name: 'Coller des termes différents',
+    example: ['2x + 3 = 5x', '2x + 3 ne se réduit pas'],
+    explain: () => 'On n\'additionne que des termes de même sorte : 2x + 3x = 5x, mais 2x + 3 reste 2x + 3. Essaie x = 1 : 2 + 3 = 5, alors que 5x = 5… et x = 2 : 7 ≠ 10.',
+  },
+  {
+    id: 'alg_x_plus_x', family: 'rule', tag: 'E', skill: 'lit-equal', repair: 'lit-reduce',
+    name: 'x + x = x²',
+    example: ['x + x = x²', 'x + x = 2x'],
+    explain: () => 'x + x, c\'est deux fois x : 2x. Le carré, x², c\'est x × x.',
+  },
+  {
+    id: 'alg_x_times_x', family: 'rule', tag: 'E', skill: 'lit-monomial', repair: 'lit-equal',
+    name: 'x × x = 2x',
+    example: ['x × x = 2x', 'x × x = x²'],
+    explain: () => 'x × x, c\'est x au carré : x². 2x, c\'est x + x.',
+  },
+  {
+    id: 'alg_coeff_power', family: 'symbol', tag: 'E', skill: 'lit-monomial', repair: 'pow-def',
+    name: 'Oublier d\'élever le coefficient',
+    example: ['(2x)² = 2x²', '(2x)² = 4x²'],
+    explain: () => 'L\'exposant porte sur toute la parenthèse : (2x)² = 2x × 2x = 4x².',
+  },
+  {
+    id: 'alg_coeff_add', family: 'rule', tag: 'E', skill: 'lit-monomial', repair: 'lit-reduce',
+    name: 'Additionner les coefficients d\'un produit',
+    example: ['3x × 4x = 7x²', '3x × 4x = 12x²'],
+    explain: () => 'Dans un produit, on multiplie les nombres : 3 × 4 = 12. On ne les additionne que pour réduire une somme.',
+  },
+  {
+    id: 'distribute_partial', family: 'distribute', tag: 'R', skill: 'lit-expand1', repair: 'lit-expand1',
+    name: 'Distribuer sur un seul terme',
+    example: ['3(x + 2) = 3x + 2', '3(x + 2) = 3x + 6'],
+    explain: () => 'Le facteur multiplie <b>chaque</b> terme de la parenthèse : 3(x + 2) = 3 × x + 3 × 2 = 3x + 6.',
+  },
+  {
+    id: 'double_distribution_partial', family: 'distribute', tag: 'R', skill: 'lit-expand2', repair: 'lit-expand1',
+    name: 'Double distributivité incomplète',
+    example: ['(x + 2)(x + 3) = x² + 6', 'x² + 3x + 2x + 6'],
+    explain: () => 'Il y a <b>quatre</b> produits : chaque terme de la première parenthèse avec chaque terme de la deuxième. (x + 2)(x + 3) = x² + 3x + 2x + 6.',
+  },
+  {
+    id: 'identity_middle_term', family: 'distribute', tag: 'E', skill: 'lit-identities', repair: 'lit-expand2',
+    name: 'Oublier le 2 du double produit',
+    example: ['(x + 3)² = x² + 3x + 9', '(x + 3)² = x² + 6x + 9'],
+    explain: () => '(a + b)² = a² + 2ab + b² : le terme du milieu est le <b>double</b> produit, 2 × x × 3 = 6x.',
+  },
+  {
+    id: 'identity_sign_square', family: 'sign', tag: 'E', skill: 'lit-identities', repair: 'lit-expand2',
+    name: 'Mauvais signe dans une identité',
+    example: ['(x − 3)² = x² − 6x − 9', '(x − 3)² = x² − 6x + 9'],
+    explain: () => 'Un carré est toujours positif : (−3)² = +9. Et (a + b)(a − b) = a² − b², avec un moins.',
+  },
+  {
+    id: 'fac_forget_one', family: 'rule', tag: 'E', skill: 'fac-common', repair: 'lit-expand1',
+    name: 'Oublier le 1 en factorisant',
+    example: ['x² + x = x(x)', 'x² + x = x(x + 1)'],
+    explain: () => 'Quand on sort x de x, il reste 1 : x = x × 1. Donc x² + x = x(x + 1). Vérifie en redéveloppant.',
+  },
+  {
+    id: 'fac_forget_divide', family: 'rule', tag: 'E', skill: 'fac-common', repair: 'lit-expand1',
+    name: 'Ne pas diviser tous les termes',
+    example: ['6x + 9 = 3(2x + 9)', '6x + 9 = 3(2x + 3)'],
+    explain: () => 'Dans la parenthèse, <b>chaque</b> terme est divisé par le facteur sorti. Redéveloppe pour vérifier : 3(2x + 9) = 6x + 27, pas 6x + 9.',
+  },
+  {
+    id: 'fac_diff_squares_as_square', family: 'symbol', tag: 'E', skill: 'fac-identities', repair: 'lit-identities',
+    name: 'a² − b² = (a − b)²',
+    example: ['x² − 9 = (x − 3)²', 'x² − 9 = (x − 3)(x + 3)'],
+    explain: () => '(x − 3)² = x² − 6x + 9, pas x² − 9. Une différence de deux carrés donne (a − b)(a + b).',
+  },
+  {
+    id: 'fac_trinomial_signs', family: 'sign', tag: 'E', skill: 'fac-trinomial', repair: 'lit-expand2',
+    name: 'Signes inversés dans un trinôme',
+    example: ['x² − x − 6 = (x + 3)(x − 2)', 'x² − x − 6 = (x − 3)(x + 2)'],
+    explain: () => 'Redéveloppe pour vérifier : (x + 3)(x − 2) = x² + x − 6. Le terme du milieu doit avoir le bon signe : les deux nombres ont une somme égale à b.',
+  },
 ];
 
 

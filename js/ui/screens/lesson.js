@@ -48,7 +48,11 @@ export function lessonScreen(root, args, app) {
   let t0 = 0;
   let checkBtn = null;
   let phase = 'answer'; // answer | feedback
-  let canContinue = true; // false while a mistake's correction must stay on screen
+  // A mistake's correction must stay on screen until this time. Based on the
+  // clock, not only on a timer: browsers slow timers down in background tabs.
+  let holdUntil = 0;
+  let canContinue = true;
+  const mayContinue = () => canContinue && Date.now() >= holdUntil;
 
   async function quit() {
     if (lesson.done === 0 || await confirmBox('Quitter la leçon ? Tes réponses comptent, mais tu ne gagnes pas les XP de fin.', 'Quitter')) {
@@ -155,7 +159,7 @@ export function lessonScreen(root, args, app) {
     panel.className = `feedback show ${wrong ? 'bad big' : 'good'}`;
     panel.innerHTML = '';
     panel.scrollTop = 0;
-    const cont = h(`button.btn.wide.${wrong ? 'danger' : 'success'}`, { onclick: () => { if (canContinue) next(); } }, 'Continuer');
+    const cont = h(`button.btn.wide.${wrong ? 'danger' : 'success'}`, { onclick: () => { if (mayContinue()) next(); } }, 'Continuer');
     add(panel,
       h('div.fb-head',
         h('span.fb-icon', wrong ? '✖' : '✔'),
@@ -168,7 +172,7 @@ export function lessonScreen(root, args, app) {
     foot.querySelectorAll('button').forEach((b) => { if (b !== checkBtn) b.disabled = true; });
     if (checkBtn) checkBtn.style.visibility = 'hidden';
     if (wrong) holdCorrection(cont);
-    else { canContinue = true; cont.focus({ preventScroll: true }); }
+    else { canContinue = true; holdUntil = 0; cont.focus({ preventScroll: true }); }
   }
 
   // After a mistake, the correction stays on screen long enough to be read:
@@ -176,19 +180,22 @@ export function lessonScreen(root, args, app) {
   function holdCorrection(cont) {
     const words = panel.textContent.trim().split(/\s+/).length;
     const ms = Math.min(10000, Math.max(3500, 2000 + words * 200));
-    canContinue = false;
-    cont.disabled = true;
+    canContinue = true;
+    holdUntil = Date.now() + ms;
+    cont.setAttribute('aria-disabled', 'true');
     cont.classList.add('waiting');
     cont.style.setProperty('--wait', `${ms}ms`);
     cont.textContent = 'Lis la correction…';
-    setTimeout(() => {
-      if (!cont.isConnected) return;
-      canContinue = true;
-      cont.disabled = false;
+    const release = () => {
+      if (!cont.isConnected || !cont.classList.contains('waiting')) return;
+      if (Date.now() < holdUntil) { setTimeout(release, holdUntil - Date.now() + 20); return; }
+      cont.removeAttribute('aria-disabled');
       cont.classList.remove('waiting');
       cont.textContent = 'Continuer';
       cont.focus({ preventScroll: true });
-    }, ms);
+    };
+    setTimeout(release, ms);
+    document.addEventListener('visibilitychange', release, { once: true });
   }
 
   function done() {
@@ -223,7 +230,7 @@ export function lessonScreen(root, args, app) {
 
   const onKey = (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-    if (phase === 'feedback' && e.key === 'Enter') { e.preventDefault(); if (canContinue) next(); return; }
+    if (phase === 'feedback' && e.key === 'Enter') { e.preventDefault(); if (mayContinue()) next(); return; }
     if (phase === 'intro' && e.key === 'Enter') { e.preventDefault(); lesson.answer(item, {}); next(); return; }
     if (phase !== 'answer' || !ctrl) return;
     if (e.key === 'Enter' && !ctrl.ownFlow) { e.preventDefault(); check(); return; }

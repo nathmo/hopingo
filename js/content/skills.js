@@ -11,6 +11,8 @@ export const UNITS = [
   { id: 'proportion', title: 'Proportionnalité et pourcentages', color: '#0b7285', ready: true },
   { id: 'puissances', title: 'Puissances', color: '#0ca678', ready: true },
   { id: 'racines', title: 'Racines carrées', color: '#1c7ed6', ready: true },
+  { id: 'algebre', title: 'Calcul littéral', color: '#9c36b5', ready: true },
+  { id: 'factorisation', title: 'Factorisation', color: '#d6336c', ready: true },
   { id: 'unites', title: 'Grandeurs et unités', color: '#e67700', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
 ];
@@ -770,6 +772,135 @@ const RACINES = [
   },
 ];
 
+// Algebra with letters (content/algebre.js). Answers are expressions.
+const ALGEBRE = [
+  {
+    id: 'lit-value', unit: 'algebre', year: 9, prereqs: ['rel-chain', 'pow-def'], icon: 'x=2',
+    title: 'Valeur d\'une expression',
+    desc: 'Remplacer la lettre par un nombre.',
+    intro: {
+      rule: '3x veut dire 3 × x. Pour x = 4 : 3x = 3 × 4 = <b>12</b> (pas 34 !).<br>Si le nombre est négatif, on le met entre parenthèses : pour x = −2, 3x² − 7 = 3 × (−2)² − 7 = <b>5</b>.',
+      example: [{ math: '3×(-2)^2-7', note: '= 12 − 7 = 5' }],
+    },
+  },
+  {
+    id: 'lit-write', unit: 'algebre', year: 9, prereqs: ['lit-value'], icon: '✎x',
+    title: 'Traduire en expression',
+    desc: 'Des mots aux lettres.',
+    intro: {
+      rule: '« Le double de x, augmenté de 3 » : d\'abord le double, 2x, puis + 3 : <b>2x + 3</b>.<br>« Le double de la somme de x et 3 » : la somme d\'abord, entre parenthèses : <b>2(x + 3)</b>.',
+    },
+  },
+  {
+    id: 'lit-equal', unit: 'algebre', year: 9, prereqs: ['lit-write'], icon: '≟',
+    title: 'Égal ou pas ?',
+    desc: 'Exercice éclair : deux écritures, même valeur ?',
+    intro: {
+      rule: 'Deux expressions sont égales si elles donnent le même résultat pour <b>toutes</b> les valeurs de x.<br>Pour vérifier vite : essaie x = 3. Si les résultats diffèrent, elles ne sont pas égales.',
+    },
+  },
+  {
+    id: 'lit-reduce', unit: 'algebre', year: 10, prereqs: ['lit-equal', 'rel-add'], icon: 'Σx',
+    title: 'Réduire',
+    desc: 'Regrouper les termes de même sorte.',
+    intro: {
+      rule: 'On regroupe ce qui se ressemble : les x ensemble, les nombres ensemble.<br>3x + 5 − x + 2 = (3 − 1)x + (5 + 2) = <b>2x + 7</b>.<br>2x + 3 ne se réduit pas en 5x : ce ne sont pas des termes de même sorte.',
+    },
+  },
+  {
+    id: 'lit-monomial', unit: 'algebre', year: 10, prereqs: ['lit-reduce', 'pow-rules'], icon: 'x·x',
+    title: 'Multiplier des monômes',
+    desc: '3x² × 4x = 12x³.',
+    intro: {
+      rule: 'On multiplie les nombres entre eux, puis les lettres : 3x² × 4x = (3 × 4) × x² × x = <b>12x³</b>.<br>x × x = x², pas 2x. Et (2x)² = 4x², pas 2x².',
+    },
+  },
+  {
+    id: 'lit-expand1', unit: 'algebre', year: 10, prereqs: ['lit-reduce', 'rel-mul'], icon: 'k(a+b)',
+    title: 'Développer : distributivité',
+    desc: 'k(a + b) = ka + kb, avec les signes.',
+    intro: {
+      rule: 'Le facteur multiplie <b>chaque</b> terme : 3(x + 2) = 3x + 6.<br>Avec un moins devant, tous les signes changent : −(x − 3) = −x + 3.',
+    },
+  },
+  {
+    id: 'lit-expand2', unit: 'algebre', year: 11, prereqs: ['lit-expand1'], icon: '(a+b)(c+d)',
+    title: 'Double distributivité',
+    desc: '(x + 3)(2x − 1) : quatre produits.',
+    intro: {
+      rule: '(a + b)(c + d) = ac + ad + bc + bd : chaque terme de la première parenthèse multiplie chaque terme de la deuxième.<br>(x + 3)(2x − 1) = 2x² − x + 6x − 3 = <b>2x² + 5x − 3</b>.',
+    },
+  },
+  {
+    id: 'lit-identities', unit: 'algebre', year: 11, prereqs: ['lit-expand2'], icon: '(a+b)²',
+    title: 'Identités remarquables',
+    desc: '(a ± b)² et (a + b)(a − b).',
+    intro: {
+      rule: '(a + b)² = a² + <b>2ab</b> + b²<br>(a − b)² = a² − 2ab + b²<br>(a + b)(a − b) = a² − b²<br>(x + 3)² n\'est pas x² + 9 : il manque le double produit 6x.',
+    },
+  },
+  {
+    id: 'lit-polynomial', unit: 'algebre', year: 11, prereqs: ['lit-identities'], icon: 'P(x)',
+    title: 'Développer, réduire, ordonner',
+    desc: 'Tout ensemble, du plus grand degré au plus petit.',
+    intro: {
+      rule: 'On développe chaque morceau (attention aux signes devant les parenthèses), on regroupe, puis on écrit les termes du plus grand exposant au plus petit : ax² + bx + c.',
+    },
+  },
+];
+
+// Factorisation (content/algebre.js).
+const FACTORISATION = [
+  {
+    id: 'fac-common', unit: 'factorisation', year: 11, prereqs: ['lit-expand1', 'ar-gcd'], icon: 'k(…)',
+    title: 'Mettre en évidence',
+    desc: '6x + 9 = 3(2x + 3).',
+    intro: {
+      rule: 'On cherche le plus grand facteur commun à tous les termes, et on le sort devant une parenthèse :<br>6x + 9 = <b>3(2x + 3)</b> ; 4x² − 6x = <b>2x(2x − 3)</b>.<br>Vérifie toujours en redéveloppant. Et x² + x = x(x + 1) : n\'oublie pas le 1 !',
+    },
+  },
+  {
+    id: 'fac-bracket', unit: 'factorisation', year: 11, prereqs: ['fac-common'], icon: '(…)·',
+    title: 'Parenthèse en facteur commun',
+    desc: '(x + 1)(x − 2) + 3(x + 1).',
+    intro: {
+      rule: 'Une parenthèse entière peut être le facteur commun :<br>(x + 1)(x − 2) + 3(x + 1) = (x + 1)[(x − 2) + 3] = <b>(x + 1)(x + 1)</b>.',
+    },
+  },
+  {
+    id: 'fac-identities', unit: 'factorisation', year: 11, prereqs: ['fac-common', 'lit-identities'], icon: 'a²−b²',
+    title: 'Identités à l\'envers',
+    desc: '9x² − 25 = (3x − 5)(3x + 5).',
+    intro: {
+      rule: 'a² − b² = (a − b)(a + b) : 9x² − 25 = <b>(3x − 5)(3x + 5)</b>.<br>a² + 2ab + b² = (a + b)² : x² + 6x + 9 = <b>(x + 3)²</b>.<br>x² + 9 ne se factorise pas : c\'est une somme, pas une différence.',
+    },
+  },
+  {
+    id: 'fac-trinomial', unit: 'factorisation', year: 11, prereqs: ['fac-common', 'lit-expand2'], icon: 'x²+bx+c',
+    title: 'Trinôme x² + bx + c',
+    desc: 'Somme et produit.',
+    intro: {
+      rule: 'Pour x² + bx + c, on cherche deux nombres de <b>somme b</b> et de <b>produit c</b>.<br>x² − x − 6 : −3 et 2 (somme −1, produit −6), donc <b>(x − 3)(x + 2)</b>.',
+    },
+  },
+  {
+    id: 'fac-trinomial-a', unit: 'factorisation', year: 12, prereqs: ['fac-trinomial'], icon: 'ax²+bx+c',
+    title: 'Trinôme ax² + bx + c',
+    desc: 'La méthode ac.',
+    intro: {
+      rule: '6x² + x − 2 : a·c = −12. Deux nombres de produit −12 et de somme 1 : 4 et −3.<br>6x² + 4x − 3x − 2 = 2x(3x + 2) − (3x + 2) = <b>(2x − 1)(3x + 2)</b>.',
+    },
+  },
+  {
+    id: 'fac-complete', unit: 'factorisation', year: 11, prereqs: ['fac-identities', 'fac-trinomial'], icon: '∏',
+    title: 'Factoriser complètement',
+    desc: 'Facteur commun, puis identité ou trinôme.',
+    intro: {
+      rule: 'D\'abord le facteur commun, puis on regarde ce qui reste :<br>2x³ − 8x = 2x(x² − 4) = <b>2x(x − 2)(x + 2)</b>.<br>On s\'arrête quand plus aucune parenthèse ne se factorise.',
+    },
+  },
+];
+
 // Calculations that mix the chapters above (content/melanges.js).
 const MELANGES = [
   {
@@ -802,7 +933,7 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...MELANGES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...MELANGES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL
