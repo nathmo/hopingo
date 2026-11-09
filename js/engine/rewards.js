@@ -25,6 +25,8 @@ export const BADGES = [
   { id: 'relatifs', icon: '🌡️', name: 'Sous zéro', desc: 'Maîtrise toutes les compétences sur les nombres relatifs.', check: (p) => unitMastered(p, 'relatifs') },
   { id: 'puissances', icon: '🚀', name: 'Puissance 10', desc: 'Maîtrise toutes les compétences sur les puissances.', check: (p) => unitMastered(p, 'puissances') },
   { id: 'arithmetique', icon: '🔢', name: 'Chasseur de premiers', desc: 'Maîtrise les diviseurs et les nombres premiers.', check: (p) => unitMastered(p, 'arithmetique') },
+  { id: 'proportion', icon: '⚖️', name: 'Juste proportion', desc: 'Maîtrise la proportionnalité et les pourcentages.', check: (p) => unitMastered(p, 'proportion') },
+  { id: 'unites', icon: '📏', name: 'Grand convertisseur', desc: 'Maîtrise les grandeurs et les unités.', check: (p) => unitMastered(p, 'unites') },
   { id: 'melanges', icon: '🧩', name: 'Touche-à-tout', desc: 'Maîtrise les calculs mélangés.', check: (p) => unitMastered(p, 'melanges') },
   { id: 'racines', icon: '🌳', name: 'Aux racines', desc: 'Maîtrise toutes les compétences sur les racines carrées.', check: (p) => unitMastered(p, 'racines') },
 ];

@@ -8,8 +8,9 @@ import { GEN as PUISSANCES } from './puissances.js';
 import { GEN as RACINES } from './racines.js';
 import { GEN as MELANGES } from './melanges.js';
 import { GEN as ARITHMETIQUE } from './arithmetique.js';
+import { GEN as PROPORTION } from './proportion.js';
 
-const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE };
+const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION };
 
 // The profile is optional: fact skills use it to pick from the student's
 // fact memory.

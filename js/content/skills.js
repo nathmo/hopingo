@@ -8,8 +8,10 @@ export const UNITS = [
   { id: 'fractions', title: 'Fractions', color: '#7c5cff', ready: true },
   { id: 'relatifs', title: 'Nombres relatifs', color: '#e8590c', ready: true },
   { id: 'arithmetique', title: 'Diviseurs et nombres premiers', color: '#2f9e44', ready: true },
+  { id: 'proportion', title: 'Proportionnalité et pourcentages', color: '#0b7285', ready: true },
   { id: 'puissances', title: 'Puissances', color: '#0ca678', ready: true },
   { id: 'racines', title: 'Racines carrées', color: '#1c7ed6', ready: true },
+  { id: 'unites', title: 'Grandeurs et unités', color: '#e67700', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
 ];
 
@@ -379,6 +381,176 @@ const RELATIFS = [
   },
 ];
 
+// Proportionality and percentages (content/proportion.js).
+const PROPORTION = [
+  {
+    id: 'prop-detect', unit: 'proportion', year: 9, prereqs: ['tab-678'], icon: '∝',
+    title: 'Proportionnel ou pas ?',
+    desc: 'Multiplier par le même nombre, pas ajouter.',
+    intro: {
+      rule: 'Une situation est <b>proportionnelle</b> si on passe d\'une grandeur à l\'autre en multipliant toujours par le même nombre.<br>Attention : l\'aire d\'un carré n\'est pas proportionnelle à son côté (côté × 2 → aire × 4).',
+      example: [{ math: '3×2', note: 'prix de 2 kg à 3 CHF le kg = 6 CHF' }],
+    },
+  },
+  {
+    id: 'prop-rule3', unit: 'proportion', year: 9, prereqs: ['prop-detect'], icon: '3→1→5',
+    title: 'Règle de trois',
+    desc: 'Passer par l\'unité.',
+    intro: {
+      rule: '3 kg coûtent 7,50 CHF. Pour 1 kg : 7,50 ÷ 3 = 2,50 CHF. Pour 5 kg : 2,50 × 5 = <b>12,50 CHF</b>.<br>Si c\'est inversement proportionnel (plus d\'ouvriers, moins de jours), on fait l\'inverse.',
+      example: [{ math: '7,5÷3', note: '= 2,50 CHF pour 1 kg' }, { math: '2,5×5', note: '= 12,50 CHF pour 5 kg' }],
+    },
+  },
+  {
+    id: 'prop-scale', unit: 'proportion', year: 9, prereqs: ['prop-rule3', 'u-length'], icon: '1:n',
+    title: 'Échelles',
+    desc: 'Plans et cartes, dans les deux sens.',
+    intro: {
+      rule: 'Au 1 : 25 000, 1 cm sur la carte = 25 000 cm en vrai = 250 m.<br>4 cm → 4 × 25 000 = 100 000 cm = <b>1 km</b>. Les aires, elles, sont multipliées par 25 000².',
+      example: [{ math: '4×25000', note: '= 100 000 cm = 1 km' }],
+    },
+  },
+  {
+    id: 'pct-of', unit: 'proportion', year: 9, prereqs: ['prop-rule3', 'nb-convert'], icon: '%',
+    title: 'Pourcentage d\'une quantité',
+    desc: '15 % de 80.',
+    intro: {
+      rule: '15 % = 15/100 = 0,15. Donc 15 % de 80 = 0,15 × 80 = <b>12</b>.<br>En tête : 10 % de 80 = 8, 5 % = 4, donc 15 % = 12.',
+      example: [{ math: '0,15×80', note: '= 12' }],
+    },
+  },
+  {
+    id: 'pct-which', unit: 'proportion', year: 9, prereqs: ['pct-of'], icon: '?%',
+    title: 'Quel pourcentage ?',
+    desc: 'Une part du total, en %.',
+    intro: {
+      rule: 'On divise la part par le total, puis × 100 : 12 sur 48 → 12 ÷ 48 = 0,25 = <b>25 %</b>.',
+      example: [{ math: '12÷48', note: '= 0,25 = 25 %' }],
+    },
+  },
+  {
+    id: 'pct-change', unit: 'proportion', year: 10, prereqs: ['pct-of'], icon: '↗%',
+    title: 'Hausse et baisse en %',
+    desc: 'Multiplier par 1,2 ou par 0,85.',
+    intro: {
+      rule: 'Augmenter de 20 %, c\'est multiplier par <b>1,2</b> (100 % + 20 %).<br>Baisser de 15 %, c\'est multiplier par <b>0,85</b> (100 % − 15 %).',
+      example: [{ math: '80×0,85', note: '= 68 : 80 CHF après −15 %' }],
+    },
+  },
+  {
+    id: 'pct-reverse', unit: 'proportion', year: 10, prereqs: ['pct-change'], icon: '↶%',
+    title: 'Retrouver la valeur de départ',
+    desc: 'Diviser par le coefficient.',
+    intro: {
+      rule: 'Après +20 %, un prix vaut 96 CHF. Le départ a été multiplié par 1,2 : on divise, 96 ÷ 1,2 = <b>80 CHF</b>.<br>Retirer 20 % de 96 ne marche pas : les 20 % portaient sur 80.',
+      example: [{ math: '96÷1,2', note: '= 80' }],
+    },
+  },
+  {
+    id: 'pct-successive', unit: 'proportion', year: 11, prereqs: ['pct-reverse'], icon: '%%',
+    title: 'Pourcentages successifs',
+    desc: '+10 % puis −10 % ne font pas 0 %.',
+    intro: {
+      rule: 'On multiplie les coefficients : +10 % puis −10 % → × 1,1 × 0,9 = × <b>0,99</b>, soit −1 %.',
+      example: [{ math: '1,1×0,9', note: '= 0,99' }],
+    },
+  },
+  {
+    id: 'speed', unit: 'proportion', year: 10, prereqs: ['prop-rule3', 'u-time'], icon: 'km/h',
+    title: 'Vitesse moyenne',
+    desc: 'd = v × t, avec les bonnes unités.',
+    intro: {
+      rule: 'Vitesse = distance ÷ temps. 150 km en 1 h 30 min : 1 h 30 = <b>1,5 h</b> (pas 1,3 h !), donc 150 ÷ 1,5 = 100 km/h.',
+      example: [{ math: '150÷1,5', note: '= 100 km/h' }],
+    },
+  },
+  {
+    id: 'slope', unit: 'proportion', year: 10, prereqs: ['pct-which'], icon: '⟋',
+    title: 'Pente',
+    desc: 'Dénivelé ÷ distance horizontale.',
+    intro: {
+      rule: 'Une route de pente <b>6 %</b> monte de 6 m pour 100 m à l\'horizontale.<br>Pente = dénivelé ÷ distance horizontale × 100.',
+      example: [{ math: '12÷200×100', note: '= 6 %' }],
+    },
+  },
+];
+
+// Quantities and units (content/proportion.js).
+const UNITES = [
+  {
+    id: 'u-length', unit: 'unites', year: 6, prereqs: ['tab-2510'], icon: 'm',
+    title: 'Longueurs',
+    desc: 'km, m, dm, cm, mm.',
+    intro: {
+      rule: 'Chaque unité vaut 10 fois la suivante : 1 m = 10 dm = 100 cm = 1 000 mm, et 1 km = 1 000 m.<br>Vers une unité plus petite, le nombre grandit.',
+      example: [{ math: '3,4×1000', note: '3,4 km = 3 400 m' }],
+    },
+  },
+  {
+    id: 'u-mass', unit: 'unites', year: 6, prereqs: ['u-length'], icon: 'kg',
+    title: 'Masses et capacités',
+    desc: 't, kg, g, mg ; L, dL, cL, mL.',
+    intro: {
+      rule: '1 t = 1 000 kg, 1 kg = 1 000 g, 1 g = 1 000 mg.<br>1 L = 10 dL = 100 cL = 1 000 mL.',
+      example: [{ math: '250÷1000', note: '250 mL = 0,25 L' }],
+    },
+  },
+  {
+    id: 'u-time', unit: 'unites', year: 7, prereqs: ['tab-678'], icon: '⏱',
+    title: 'Durées',
+    desc: 'Une heure a 60 minutes, pas 100.',
+    intro: {
+      rule: '1 h = 60 min, 1 min = 60 s.<br>1,5 h = 1 h + la moitié de 60 min = <b>1 h 30 min</b>. Et 45 min = 0,75 h.',
+      example: [{ math: '1,5×60', note: '= 90 min' }],
+    },
+  },
+  {
+    id: 'u-area', unit: 'unites', year: 8, prereqs: ['u-length', 'sq-13'], icon: 'm²',
+    title: 'Aires',
+    desc: 'Facteur 100 entre unités voisines.',
+    intro: {
+      rule: 'Un carré de 1 m de côté = 100 cm × 100 cm = <b>10 000 cm²</b>.<br>Entre deux unités d\'aire voisines, le facteur est 100. 1 a = 100 m², 1 ha = 10 000 m².',
+      example: [{ math: '100×100', note: '= 10 000 : 1 m² = 10 000 cm²' }],
+    },
+  },
+  {
+    id: 'u-volume', unit: 'unites', year: 9, prereqs: ['u-area'], icon: 'm³',
+    title: 'Volumes',
+    desc: 'Facteur 1 000 ; 1 dm³ = 1 L.',
+    intro: {
+      rule: 'Un cube de 1 m d\'arête = 10 dm × 10 dm × 10 dm = <b>1 000 dm³</b>.<br>Et 1 dm³ = 1 L : un cube de 10 cm de côté contient un litre.',
+      example: [{ math: '10×10×10', note: '= 1 000 : 1 m³ = 1 000 L' }],
+    },
+  },
+  {
+    id: 'u-speed', unit: 'unites', year: 10, prereqs: ['u-time', 'prop-rule3'], icon: 'm/s',
+    title: 'Vitesses',
+    desc: 'km/h ↔ m/s : ÷ 3,6 ou × 3,6.',
+    intro: {
+      rule: '90 km/h = 90 000 m en 3 600 s = <b>25 m/s</b>. De km/h vers m/s, on divise par 3,6 ; dans l\'autre sens, on multiplie.',
+      example: [{ math: '90÷3,6', note: '= 25 m/s' }],
+    },
+  },
+  {
+    id: 'u-imperial', unit: 'unites', year: 10, prereqs: ['u-area', 'u-volume'], icon: 'ft',
+    title: 'Pieds et pouces',
+    desc: 'Le facteur se met au carré ou au cube.',
+    intro: {
+      rule: '1 pouce = 2,54 cm, 1 pied = 30,48 cm.<br>Pour une aire, le facteur se met au <b>carré</b> : 1 pied² = 30,48² cm² ≈ 929 cm². Pour un volume, au <b>cube</b> : 1 pied³ ≈ 28,3 L.<br>Ici, pas de virgule à décaler : il faut calculer.',
+      example: [{ math: '30,48^2', note: '≈ 929 cm² dans 1 pied²' }],
+    },
+  },
+  {
+    id: 'u-sci', unit: 'unites', year: 11, prereqs: ['pow-sci', 'u-length'], icon: '10ⁿ',
+    title: 'Notation scientifique et unités',
+    desc: 'Changer d\'unité en jouant sur l\'exposant.',
+    intro: {
+      rule: '1,5 × 10⁸ km = 1,5 × 10⁸ × 10³ m = <b>1,5 × 10¹¹ m</b>.<br>Vers une unité plus petite, l\'exposant augmente.',
+      example: [{ math: '10^8×10^3', note: '= 10¹¹' }],
+    },
+  },
+];
+
 // Divisibility, primes, GCD and LCM (content/arithmetique.js).
 const ARITHMETIQUE = [
   {
@@ -630,7 +802,7 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PUISSANCES, ...RACINES, ...MELANGES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...MELANGES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL

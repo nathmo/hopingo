@@ -340,7 +340,7 @@ Chaque étape est utilisable seule, testée, puis publiée sur GitHub Pages.
 | 1 ✅ | A. Livrets et calcul mental, avec arrondir et estimer (fait le 9 novembre 2026) | Moyenne | Série rapide, mémoire par fait |
 | 1b ✅ | Mélanges : puissances de fractions et exposants négatifs, racines de fractions, unité « Calculs mélangés » 9H–11H | Petite | Aucun |
 | 2 ✅ | B. Arithmétique (avec √72 = 6√2) et N. Écritures d'un nombre (fait le 9 novembre 2026) | Petite | Peu de changements |
-| 3 | J. Proportionnalité et pourcentages, K. Grandeurs et unités | Moyenne | Réponses avec unités |
+| 3 ✅ | J. Proportionnalité et pourcentages, K. Grandeurs et unités, avec pieds et pouces (fait le 9 novembre 2026) | Moyenne | Réponses avec unités |
 | 4 | C. Calcul littéral et D. Factorisation | Grande | Lettres, forme normale, clavier, affichage |
 | 5 | E. Équations (avec systèmes 2 × 2), F. Isoler une variable, M. Géométrie calculée | Grande | Lignes d'équation, mode « choisir l'action » |
 | 6 | L. Fonctions | Moyenne | Repère interactif |

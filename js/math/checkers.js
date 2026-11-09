@@ -4,6 +4,8 @@
 //
 // Result: {kind: 'done'} | {kind: 'stay', message} | {kind: 'wrong', rule?}
 
+import { parseAlg, tryParseAlg, equivalent, isReducedForm, factoredProblem } from './algebra.js';
+
 const isPrime = (n) => {
   if (n < 2) return false;
   for (let d = 2; d * d <= n; d++) if (n % d === 0) return false;
@@ -44,4 +46,37 @@ export function checkSurd(item, raw) {
   return { kind: 'done' };
 }
 
-export const CHECKERS = { primes: checkPrimes, surd: checkSurd };
+// A rounded measure (1 pied² ≈ 0,09 m²): any value within half a unit of
+// the requested precision counts. Traps are matched the same way.
+export function checkRounded(item, raw) {
+  const s = clean(raw).replace(',', '.');
+  if (!/^-?\d+(\.\d+)?$/.test(s)) return { kind: 'stay', message: 'Écris un nombre, avec une virgule si besoin.' };
+  const v = Number(s);
+  const tol = 0.5 * 10 ** -item.decimals + 1e-9;
+  if (Math.abs(v - item.exactValue) <= tol) return { kind: 'done' };
+  const trap = (item.approxTraps || []).find((t) => Math.abs(v - t.exact) <= Math.max(tol, Math.abs(t.exact) * 0.01));
+  return { kind: 'wrong', rule: trap?.rule ?? null };
+}
+
+// An expression with letters: equal to the target for every value of the
+// letters, and in the form asked (reduced, factored…).
+export function checkAlg(item, raw) {
+  const node = tryParseAlg(raw);
+  if (!node) return { kind: 'stay', message: 'Je n\'arrive pas à lire cette expression.' };
+  if (node.t === 'eq') return { kind: 'stay', message: 'Écris seulement l\'expression, sans « = ».' };
+  const target = parseAlg(item.target);
+  let same;
+  try { same = equivalent(node, target); } catch { return { kind: 'stay', message: 'Je n\'arrive pas à calculer cette expression.' }; }
+  if (!same) {
+    const trap = (item.algTraps || []).find((t) => { try { return equivalent(node, parseAlg(t.expr)); } catch { return false; } });
+    return { kind: 'wrong', rule: trap?.rule ?? null };
+  }
+  if (item.form === 'reduced' && !isReducedForm(node)) return { kind: 'stay', message: 'C\'est égal, mais développe et réduis encore : un seul terme de chaque sorte, sans parenthèses.' };
+  if (item.form === 'factored' || item.form === 'common') {
+    const problem = factoredProblem(node, { complete: item.form === 'factored' });
+    if (problem) return { kind: 'stay', message: problem.startsWith('Écris') ? problem : `C'est égal, mais ce n'est pas fini : ${problem}` };
+  }
+  return { kind: 'done' };
+}
+
+export const CHECKERS = { primes: checkPrimes, surd: checkSurd, rounded: checkRounded, alg: checkAlg };

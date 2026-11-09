@@ -830,7 +830,100 @@ export const RULES = [
     example: ['∛(−8) = 2', '∛(−8) = −2'],
     explain: () => 'Un cube garde le signe : (−2)³ = −8. Donc ∛(−8) = −2. Contrairement à la racine carrée, la racine cubique d\'un négatif existe.',
   },
+  // ---------- proportionality, percentages, units (answer rules) ----------
+  {
+    id: 'additive_reasoning', family: 'meaning', tag: 'R', skill: 'prop-rule3', repair: 'prop-detect',
+    name: 'Ajouter au lieu de multiplier',
+    example: ['3 → 5, donc 6 → 8', '3 → 5, donc 6 → 10'],
+    explain: () => 'Dans une situation proportionnelle, on <b>multiplie</b> par le même nombre : si la quantité double, le prix double. Ajouter la même différence ne marche pas.',
+  },
+  {
+    id: 'linearity_illusion', family: 'meaning', tag: 'R', skill: 'prop-detect', repair: 'prop-detect',
+    name: 'Tout croire proportionnel',
+    example: ['côté × 2, donc aire × 2', 'côté × 2, donc aire × 4'],
+    explain: () => 'Toutes les situations ne sont pas proportionnelles. Une aire varie comme le carré des longueurs (× 4 quand on double), un volume comme le cube (× 8).',
+  },
+  {
+    id: 'rule3_inverted', family: 'rule', tag: 'E', skill: 'prop-rule3', repair: 'prop-rule3',
+    name: 'Règle de trois à l\'envers',
+    example: ['3 kg = 6 CHF, donc 5 kg = 3,60 CHF', '5 kg = 10 CHF'],
+    explain: () => 'Passe par l\'unité : prix pour 1, puis multiplie. Et vérifie le sens : plus de kilos coûtent plus cher. (Sauf si c\'est inversement proportionnel, comme des ouvriers et des jours.)',
+  },
+  {
+    id: 'scale_forget_convert', family: 'place', tag: 'E', skill: 'prop-scale', repair: 'u-length',
+    name: 'Oublier de convertir avec l\'échelle',
+    example: ['1 : 25 000, 4 cm → 100 000 km', '4 cm → 100 000 cm = 1 km'],
+    explain: () => 'Avec l\'échelle, le résultat est dans la <b>même unité</b> que la mesure sur la carte (des cm). Convertis ensuite : 100 000 cm = 1 km.',
+  },
+  {
+    id: 'convert_wrong_direction', family: 'place', tag: 'E', skill: 'u-length', repair: 'u-length',
+    name: 'Convertir dans le mauvais sens',
+    example: ['3 km = 0,003 m', '3 km = 3 000 m'],
+    explain: () => 'Vers une unité plus petite, il en faut <b>plus</b> : le nombre grandit. 1 km = 1 000 m, donc 3 km = 3 000 m.',
+  },
+  {
+    id: 'percent_as_amount', family: 'meaning', tag: 'E', skill: 'pct-change', repair: 'pct-of',
+    name: 'Prendre le pourcentage pour un montant',
+    example: ['80 CHF − 15 % = 65 CHF', '80 × 0,85 = 68 CHF'],
+    explain: () => '15 % n\'est pas 15 CHF : c\'est 15 centièmes du prix. 15 % de 80 = 12, donc 80 − 12 = 68 CHF.',
+  },
+  {
+    id: 'percent_inverted', family: 'rule', tag: 'E', skill: 'pct-which', repair: 'pct-of',
+    name: 'Diviser à l\'envers',
+    example: ['12 sur 48 = 400 %', '12 sur 48 = 25 %'],
+    explain: () => 'La part se divise par le total : 12 ÷ 48 = 0,25 = 25 %. Une part ne peut pas dépasser 100 % du total.',
+  },
+  {
+    id: 'percent_reverse_subtract', family: 'meaning', tag: 'E', skill: 'pct-reverse', repair: 'pct-change',
+    name: 'Retirer le pourcentage pour revenir en arrière',
+    example: ['après +20 %, 96 → 96 − 20 % = 76,80', '96 ÷ 1,2 = 80'],
+    explain: () => 'Les 20 % portaient sur l\'ancien prix, pas sur le nouveau. On défait la multiplication : nouveau ÷ 1,2.',
+  },
+  {
+    id: 'percent_add_successive', family: 'meaning', tag: 'E', skill: 'pct-successive', repair: 'pct-change',
+    name: 'Additionner des pourcentages successifs',
+    example: ['+10 % puis −10 % = 0 %', '× 1,1 × 0,9 = × 0,99 : −1 %'],
+    explain: () => 'La deuxième variation porte sur un prix qui a déjà changé. On multiplie les coefficients : × 1,1 puis × 0,9 = × 0,99.',
+  },
+  {
+    id: 'time_decimal_minutes', family: 'place', tag: 'E', skill: 'u-time', repair: 'u-time',
+    name: 'Heures décimales lues comme des minutes',
+    example: ['1,5 h = 1 h 50 min', '1,5 h = 1 h 30 min'],
+    explain: () => 'Une heure a 60 minutes, pas 100. 0,5 h = la moitié de 60 min = 30 min ; 1 h 30 = 1,5 h.',
+  },
+  {
+    id: 'slope_inverted', family: 'rule', tag: 'E', skill: 'slope', repair: 'pct-which',
+    name: 'Pente calculée à l\'envers',
+    example: ['12 m sur 200 m : 200 ÷ 12', '12 ÷ 200 = 6 %'],
+    explain: () => 'Pente = dénivelé ÷ distance horizontale. Une route de 6 % monte de 6 m pour 100 m.',
+  },
+  {
+    id: 'area_factor_10', family: 'place', tag: 'E', skill: 'u-area', repair: 'u-length',
+    name: 'Facteur 10 pour les aires',
+    example: ['1 m² = 100 cm²', '1 m² = 10 000 cm²'],
+    explain: () => 'Un carré de 1 m de côté mesure 100 cm × 100 cm = 10 000 cm². Entre deux unités d\'aire voisines, le facteur est 100, pas 10.',
+  },
+  {
+    id: 'volume_factor_10', family: 'place', tag: 'E', skill: 'u-volume', repair: 'u-area',
+    name: 'Facteur 10 pour les volumes',
+    example: ['1 m³ = 10 dm³', '1 m³ = 1 000 dm³ = 1 000 L'],
+    explain: () => 'Un cube de 1 m d\'arête mesure 10 dm × 10 dm × 10 dm = 1 000 dm³. Entre deux unités de volume voisines, le facteur est 1 000.',
+  },
+  {
+    id: 'speed_factor_wrong_way', family: 'place', tag: 'E', skill: 'u-speed', repair: 'u-time',
+    name: '× 3,6 au lieu de ÷ 3,6',
+    example: ['90 km/h = 324 m/s', '90 km/h = 25 m/s'],
+    explain: () => 'De km/h vers m/s, on divise par 3,6 : 90 km en une heure, c\'est 90 000 m en 3 600 s, donc 25 m/s. Une voiture ne va pas à 324 m/s !',
+  },
+  {
+    id: 'imperial_linear_factor', family: 'place', tag: 'E', skill: 'u-imperial', repair: 'u-area',
+    name: 'Facteur de longueur pour une aire ou un volume',
+    example: ['1 pied² = 30,48 cm²', '1 pied² = 30,48² cm² ≈ 929 cm²'],
+    explain: () => 'Pour une aire, le facteur de longueur se met au <b>carré</b> ; pour un volume, au <b>cube</b>. 1 pied = 30,48 cm, donc 1 pied² = 30,48 × 30,48 cm².',
+  },
 ];
+
+
 
 export const RULE_BY_ID = Object.fromEntries(RULES.map((r) => [r.id, r]));
 

@@ -17,6 +17,9 @@ const KEYSETS = {
   // A product of prime factors (2^3×3^2×5) and a simplified root (6√2).
   prod: ['7', '8', '9', '4', '5', '6', '1', '2', '3', '×', '0', '^', 'left', 'back', 'right'],
   surd: ['7', '8', '9', '4', '5', '6', '1', '2', '3', '√', '0', 'back'],
+  // Algebra: letters, brackets, powers, = for equations.
+  alg: ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', 'a', 'left', '0', 'right', 'back', ',', 'b'],
+  algeq: ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', '=', 'left', '0', 'right', 'back', ',', '√'],
   // Free lines with powers and roots.
   opsx: ['7', '8', '9', 'frac', '+', '4', '5', '6', '(', '-', '1', '2', '3', ')', '×', '^', '0', '√', ',', '÷', '', 'left', 'right', 'back', ''],
 };
@@ -63,11 +66,11 @@ export class MathInput {
       // start another fraction.
       let j = this.caret - 1;
       while (j >= 0 && /[0-9,]/.test(this.chars[j])) j--;
-      if (!/[0-9)]/.test(prev ?? '') || this.chars[j] === '/') { this.flash(); return; }
+      if (!/[0-9)a-z]/.test(prev ?? '') || this.chars[j] === '/') { this.flash(); return; }
       this.insert('/');
     } else if (k === '^') {
       // An exponent needs something to raise, and only one at a time.
-      if (!/[0-9)]/.test(prev ?? '') || this.chars.slice(0, this.caret).join('').match(/\^-?\d*$/)) { this.flash(); return; }
+      if (!/[0-9)a-z]/.test(prev ?? '') || this.chars.slice(0, this.caret).join('').match(/\^-?\d*$/)) { this.flash(); return; }
       this.insert('^');
     } else if (k) this.insert(k);
     play('tap');
@@ -88,9 +91,14 @@ export class MathInput {
 
   // Keyboard: digits, / + - * x : ( ) , . ^ r (root) ² Backspace, arrows, Enter.
   handleKey(e) {
-    const map = { '*': '×', x: '×', ':': '÷', '/': 'frac', '.': ',', r: '√', v: '√', Backspace: 'back', ArrowLeft: 'left', ArrowRight: 'right', Enter: 'enter' };
-    let k = map[e.key] ?? e.key;
     const allowed = new Set(KEYSETS[this.keys]);
+    const letters = allowed.has('x');
+    const map = { '*': '×', ':': '÷', '/': 'frac', '.': ',', Backspace: 'back', ArrowLeft: 'left', ArrowRight: 'right', Enter: 'enter' };
+    // Without letters on the keypad, x means × and r or v mean √.
+    if (!letters) Object.assign(map, { x: '×', r: '√', v: '√' });
+    let k = map[e.key] ?? e.key;
+    // With letters, any letter of the alphabet can be typed.
+    if (letters && /^[a-z]$/.test(k)) { e.preventDefault(); this.press(k); return; }
     allowed.add('enter'); allowed.add('back'); allowed.add('left'); allowed.add('right');
     if (k === '÷' && !allowed.has('÷')) k = null;
     if (k === '²' && allowed.has('^')) {
@@ -173,6 +181,11 @@ export function renderChars(chars, caret) {
       if (k === i + 1) sup = `<span class="mi-empty">${sup}</span>`;
       out += `${gap(i)}<sup class="m-sup" data-i="${i}">${sup}</sup>`;
       i = k;
+      continue;
+    }
+    if (/[a-z]/.test(c)) {
+      out += `${gap(i)}<i class="m-var" data-i="${i}">${c}</i>`;
+      i++;
       continue;
     }
     const show = c === '-' ? '−' : c;
