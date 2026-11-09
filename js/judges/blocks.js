@@ -16,7 +16,7 @@
 import { parse, tryParse } from '../cas/parse.js';
 import { stripParen, sub } from '../cas/ast.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
-import { polyOf, productFactors, sumTerms, leadCoeff } from '../cas/polyx.js';
+import { polyOf, productFactors, sumTerms } from '../cas/polyx.js';
 import { exactValue } from '../cas/normal.js';
 
 function checkInput(spec, text) {
@@ -29,10 +29,11 @@ function checkInput(spec, text) {
     const a = polyOf(sub({ t: 'paren', e: n.l }, { t: 'paren', e: n.r }));
     const b = polyOf(sub({ t: 'paren', e: want.l }, { t: 'paren', e: want.r }));
     if (!a || !b || a.isZero) return { kind: 'wrong', message: 'Ce n\'est pas l\'égalité attendue.' };
-    const v = [...b.vars()].sort()[0];
-    const la = leadCoeff(a, v);
-    const lb = leadCoeff(b, v);
-    const prop = la?.isConst && lb?.isConst && a.scale(lb.constValue()).equals(b.scale(la.constValue()));
+    // Proportional: compare the coefficients of one monomial of b (works
+    // with several letters, (a − b)(ab − 4) = 0, step U1b).
+    const [key, tb] = [...b.terms.entries()][0];
+    const ta = a.terms.get(key);
+    const prop = !!ta && a.scale(tb.c).equals(b.scale(ta.c));
     return prop ? { kind: 'ok' } : { kind: 'wrong', message: 'Ce n\'est pas l\'égalité attendue : refais le calcul.' };
   }
   const want = parse(spec.expect, { vars: spec.vars });

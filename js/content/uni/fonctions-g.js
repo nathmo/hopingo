@@ -17,8 +17,9 @@
 import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { toText, toReadable } from '../../cas/print.js';
-import { walk, lit, unparen, getAt, replaceAt } from '../../cas/ast.js';
-import { solutionSet, setToNode, domainOf, setEqual } from '../../cas/sets.js';
+import { walk, lit, unparen, getAt, replaceAt, mapNode } from '../../cas/ast.js';
+import { solutionSet, setToNode, domainOf, setEqual, union } from '../../cas/sets.js';
+import { exactValue } from '../../cas/normal.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { expandFns } from '../../cas/sets.js';
 import { blankLine } from '../../judges/lines.js';
@@ -42,6 +43,7 @@ const lin = (r) => { const R = Q.of(r); return R.n === 0 ? 'x' : R.n < 0 ? `x+${
 function affine(p, c) {
   const P = Q.of(p);
   const C = Q.of(c);
+  if (P.n === 0) return N(C);
   const head = P.eq(1) ? 'x' : P.eq(-1) ? '-x' : `${N(P)}x`;
   if (C.n === 0) return head;
   return C.n < 0 ? `${head}-${N(C.neg())}` : `${head}+${N(C)}`;
@@ -322,10 +324,13 @@ function subst(outerText, innerText) {
   let out = outer;
   for (const path of paths) {
     const parent = path.length ? getAt(outer, path.slice(0, -1)) : null;
-    const group = parent && (['paren', 'abs', 'fn'].includes(parent.t) || (inner.t === 'sqrt' && parent.t === 'bin' && parent.op === '×'));
+    const prodParent = parent && parent.t === 'bin' && parent.op === '×';
+    const group = parent && (['paren', 'abs', 'fn'].includes(parent.t) || (inner.t === 'sqrt' && prodParent) || (inner.t === 'num' && !prodParent));
     out = replaceAt(out, path, inner.t === 'sym' || group ? inner : { t: 'paren', e: inner });
   }
-  return toText(out);
+  // 4·1² and not 41²: a product before a number shows its ×.
+  const numFirst = (n) => n.t === 'num' || (n.t === 'pow' && numFirst(n.b));
+  return toText(mapNode(out, (n) => (n.t === 'bin' && n.op === '×' && numFirst(n.r) ? { ...n, implicit: false } : n)));
 }
 // Do two functions commute? Compared at a few points.
 function commute(f, g) {
@@ -454,9 +459,908 @@ function cmpExam(rng, exam) {
   }, rng);
 }
 
+
+// ======================================================================
+// g1-inverse
+// ======================================================================
+
+const INV = 'g1-inverse';
+const INV_SUB = [
+  { id: 'pose', label: 'poser y = f(x)', skill: INV },
+  { id: 'isolate', label: 'isoler x', skill: 'iso-formula' },
+  { id: 'solve', label: 'résoudre le 2e degré', skill: 'quad-formula' },
+  { id: 'branch', label: 'choisir la solution de l\'ensemble de départ', skill: INV },
+  { id: 'rename', label: 'renommer', skill: INV },
+];
+const INV_CHOICES = [
+  { id: 'isolate', label: 'Isoler x (regrouper les termes en x)' },
+  { id: 'square', label: 'Faire apparaître un carré' },
+  { id: 'solve', label: 'Résoudre en x (les deux racines)' },
+  { id: 'branch', label: 'Garder la solution de l\'ensemble de départ' },
+];
+// The same affine text in the letter y.
+const affY = (p, c) => affine(p, c).replace(/x/g, 'y');
+// h ± √(rad): the text of a root.
+const plusRoot = (h, sign, rad) => {
+  const r = `sqrt(${rad})`;
+  if (h === 0) return sign > 0 ? r : `-${r}`;
+  return `${h}${sign > 0 ? '+' : '-'}${r}`;
+};
+const plusK = (k) => (k ? (k > 0 ? `+${k}` : `${k}`) : '');
+
+function invData(rng, kind) {
+  for (let i = 0; i < 200; i++) {
+    if (kind === 'affine') {
+      const a = nz(rng, -4, 4);
+      if (Math.abs(a) === 1) continue;
+      const b = nz(rng, -6, 6);
+      const f = affine(a, b);
+      const xy = a > 0 ? `(${affY(1, -b)})/${a}` : `(${affY(-1, b)})/${-a}`;
+      const lines = [
+        E(`${affine(a, 0)}=${affY(1, -b)}`, b > 0 ? `Soustraire ${b}` : `Ajouter ${-b}`, 'isolate', 'isolate'),
+        E(`x=${xy}`, `Diviser par ${fr(N(a))}`, 'isolate', 'isolate'),
+      ];
+      return { kind, f, A: 'ℝ', B: 'ℝ', start: `${f}=y`, lines, xy, inv: xy.replace(/y/g, 'x'), dom: [-3, 3], den: String(Math.abs(a)) };
+    }
+    if (kind === 'homog') {
+      const a = nz(rng, -4, 4);
+      const b = rng.int(-4, 4);
+      const c = nz(rng, -3, 3);
+      const d = rng.int(-4, 4);
+      if (a * d - b * c === 0 || (b === 0 && d === 0)) continue;
+      const num = affine(a, b);
+      const den = affine(c, d);
+      const f = `(${num})/(${den})`;
+      const pole = q(-d, c);
+      const lim = q(a, c);
+      const A = `ℝ∖{${N(pole)}}`;
+      const B = `ℝ∖{${N(lim)}}`;
+      const xy = `(${affY(-d, b)})/(${affY(c, -a)})`;
+      const lines = [
+        E(`${den === 'x' ? 'xy' : `y(${den})`}=${num}`, 'Multiplier par le dénominateur', 'isolate', 'isolate'),
+        E(`x(${affY(c, -a)})=${affY(-d, b)}`, 'Regrouper les termes en x', 'isolate', 'isolate'),
+        E(`x=${xy}`, `Diviser : ${toReadable(parse(affY(c, -a)))} ≠ 0 car y ≠ ${fr(N(lim))}`, 'isolate', 'isolate'),
+      ];
+      const lo = lim.valueOf() + 0.3;
+      return { kind, f, A, B, start: `${f}=y`, lines, xy, inv: xy.replace(/y/g, 'x'), dom: [lo, lo + 3], pole, lim };
+    }
+    if (kind === 'square' || kind === 'squareX') {
+      const h = rng.int(-3, 3);
+      const k = rng.int(-3, 3);
+      if (kind === 'squareX' && h === 0) continue;
+      const right = rng.chance(0.6);
+      const sq = h === 0 ? 'x^2' : `(${lin(h)})^2`;
+      const f = kind === 'squareX' ? polyText([1, -2 * h, h * h + k]) : `${sq}${plusK(k)}`;
+      const A = right ? `[${h};+∞[` : `]-∞;${h}]`;
+      const B = `[${k};+∞[`;
+      const rad = lin(k).replace('x', 'y');
+      const keep = plusRoot(h, right ? 1 : -1, rad);
+      const lose = plusRoot(h, right ? -1 : 1, rad);
+      const lines = [];
+      if (kind === 'squareX') lines.push(E(`${sq}${plusK(k)}=y`, 'Faire apparaître un carré', 'isolate', 'square'));
+      if (k !== 0) lines.push(E(`${sq}=${rad}`, 'Isoler le carré', 'isolate', 'square'));
+      lines.push(
+        E(`x=${keep}∨x=${lose}`, 'Deux racines', 'solve', 'solve'),
+        E(`x=${keep}`, `x ${right ? '≥' : '≤'} ${fr(String(h))} : on garde la racine ${right ? '+' : '−'}`, 'branch', 'branch'),
+      );
+      return { kind, f, A, B, start: `${f}=y`, lines, xy: keep, inv: keep.replace(/y/g, 'x'), lose: lose.replace(/y/g, 'x'), dom: [k + 0.1, k + 4], h, k, right };
+    }
+    // √(x − a) + b on [a ; +∞[
+    const a = rng.int(-4, 4);
+    const b = nz(rng, -3, 3);
+    const f = `sqrt(${lin(a)})${plusK(b)}`;
+    const yb = lin(b).replace('x', 'y');
+    const xy = `(${yb})^2${plusK(a)}`;
+    const lines = [
+      E(`sqrt(${lin(a)})=${yb}`, 'Isoler la racine', 'isolate', 'isolate'),
+      E(`${lin(a)}=(${yb})^2`, `Élever au carré : y ≥ ${fr(String(b))}, les deux membres sont ≥ 0`, 'isolate', 'square'),
+    ];
+    if (a !== 0) lines.push(E(`x=${xy}`, 'Isoler x', 'isolate', 'isolate'));
+    return { kind: 'sqrt', f, A: `[${a};+∞[`, B: `[${b};+∞[`, start: `${f}=y`, lines, xy, inv: xy.replace(/y/g, 'x'), dom: [b + 0.1, b + 4] };
+  }
+  return null;
+}
+
+function invItem(level, rng, opts = {}) {
+  const kind = level === 1 ? 'affine' : level === 2 ? 'homog' : level === 3 ? rng.pick(['square', 'squareX']) : level === 4 ? rng.pick(['homog', 'square', 'squareX', 'sqrt']) : rng.pick(['squareX', 'homog', 'sqrt']);
+  const d = invData(rng, kind);
+  const judge = { kind: 'solset', v: V, ...(d.A === 'ℝ' ? {} : { domain: d.A }), params: { y: d.B } };
+  const rename = { kind: 'equiv', vars: [V], subst: { y: 'x' }, fx: d.f, domain: { x: d.dom }, target: 'only', finalVars: [V] };
+  let lines = d.lines;
+  if (level === 1) lines = lines.map((l, i) => (i === lines.length - 1 ? blanked(l, [d.den], { vars: [V, 'y'] }) : l));
+  const script = [];
+  if (level === 3) {
+    const at = lines.findIndex((l) => l.act === 'branch');
+    script.push(...lines.slice(0, at), { kind: 'decision', prompt: 'Quelle racine garder ?', options: [
+      { id: 'keep', label: `x = ${RT(d.xy)}`, valid: true },
+      { id: 'lose', label: `x = ${RT(d.lose.replace(/x/g, 'y'))}`, valid: false, rule: 'g1_inverse_branch', why: `Cette racine est ${d.right ? '≤' : '≥'} ${fr(String(d.h))} : elle n'est pas dans l'ensemble de départ.` },
+      { id: 'both', label: 'Les deux', valid: false, why: 'f⁻¹(y) est un seul nombre : f est injective sur son ensemble de départ.' },
+    ] }, ...lines.slice(at));
+  } else script.push(...lines);
+  script.push({ kind: 'segment', html: 'Renomme la variable :', ask: 'f⁻¹(x) =', start: { math: d.xy }, judge: rename }, E(d.inv, 'Renommer y en x', 'rename'));
+  const YO = { vars: [V, 'y'] };
+  return linesItem({
+    skill: INV, level,
+    prompt: `f : ${MT(d.A)} → ${MT(d.B)}, f(x) = ${MU(d.f)} est bijective. Résous y = f(x) en x, puis explicite f⁻¹.`,
+    start: d.start, judge: withMenus(judge, level, d.start, lines, INV_CHOICES), mode: modeOf(level), script,
+    declares: { vars: [V, 'y'] },
+    hints: H(`Résous y = f(x) en x${d.A === 'ℝ' ? '' : `, puis garde la solution qui est dans ${fr(d.A)}`}.`, MT(lines[Math.max(0, lines.length - 2)].math, YO), MT(lines[lines.length - 1].math, YO)),
+    subgoals: INV_SUB, keys: [...KEYS, 'letters'], tapActions: level === 3 ? 'steps' : null,
+    key: `${INV}:${level}:${d.f}:${d.A}`, exam: examOf(opts, 3),
+  });
+}
+
+function invMcq(rng) {
+  const d = invData(rng, rng.pick(['square', 'squareX', 'homog']));
+  const options = [
+    { html: MU(d.inv), correct: true },
+    { html: MU(`1/(${d.f})`), correct: false, rule: 'g1_inverse_reciprocal' },
+  ];
+  if (d.lose) options.push({ html: MU(d.lose), correct: false, rule: 'g1_inverse_branch' });
+  options.push({ html: MU(d.f), correct: false });
+  return mcq({
+    skill: INV, level: 4, prompt: `f : ${MT(d.A)} → ${MT(d.B)}, f(x) = ${MU(d.f)}. Alors f⁻¹(x) =`,
+    options: uniq(options), key: `mcq:${d.f}:${d.A}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: `y = f(x) donne x = ${MT(d.xy, { vars: [V, 'y'] })} ; donc f⁻¹(x) = ${MU(d.inv)}.`, note: '' }],
+  }, rng);
+}
+
+
+// ======================================================================
+// g1-trinome-sign
+// ======================================================================
+
+const TRI = 'g1-trinome-sign';
+const TRI_SUB = [
+  { id: 'delta', label: 'discriminant', skill: 'quad-formula' },
+  { id: 'roots', label: 'racines', skill: 'quad-formula' },
+  { id: 'sign', label: 'signe du trinôme', skill: TRI },
+  { id: 'write', label: 'écrire l\'ensemble', skill: 'g9-intervals' },
+];
+const TRI_CHOICES = [
+  { id: 'roots', label: 'Factoriser avec les racines' },
+  { id: 'sign', label: 'Signe de a : entre ou à l\'extérieur des racines' },
+  { id: 'write', label: 'Écrire S en intervalles' },
+  { id: 'move', label: 'Tout passer à gauche' },
+];
+const RELS = ['<', '≤', '>', '≥'];
+const STRICT = { '<': true, '>': true, '≤': false, '≥': false };
+const paren = (x) => (Q.of(x).n < 0 ? `(${N(x)})` : N(x));
+
+// a(x − r₁)(x − r₂) with integer coefficients, r₁ < r₂ whole or halves.
+function triData(rng, kind = 'two') {
+  for (let i = 0; i < 300; i++) {
+    const rel = rng.pick(RELS);
+    const a = rng.pick([1, -1, 2, -2, 3, -3]);
+    if (kind === 'none') {
+      const h = rng.int(-3, 3);
+      const m = Math.sign(a) * rng.int(1, 4);
+      const cs = [a, -2 * a * h, a * h * h + m];
+      return { kind, a, rel, cs, poly: polyText(cs), roots: [] };
+    }
+    if (kind === 'double') {
+      const r = nz(rng, -4, 4);
+      const cs = [a, -2 * a * r, a * r * r];
+      return { kind, a, rel, cs, poly: polyText(cs), roots: [q(r)], factored: `${a === 1 ? '' : a === -1 ? '-' : a}(${lin(r)})^2` };
+    }
+    const r1 = q(rng.int(-10, 9), rng.pick([1, 2, 2]));
+    const r2 = q(rng.int(-10, 10), rng.pick([1, 1, 2]));
+    if (r1.cmp(r2) >= 0 || Math.abs(r1.valueOf()) > 5 || Math.abs(r2.valueOf()) > 5) continue;
+    const b = r1.add(r2).mul(q(-a));
+    const c = r1.mul(r2).mul(q(a));
+    if (b.d !== 1 || c.d !== 1 || (r1.d === 2 && r2.d === 2 && Math.abs(a) < 4)) continue;
+    const cs = [a, b.n, c.n];
+    const lead = a === 1 ? '' : a === -1 ? '-' : String(a);
+    return { kind, a, rel, cs, poly: polyText(cs), roots: [r1, r2], factored: `${lead}(${lin(r1)})(${lin(r2)})` };
+  }
+  return null;
+}
+
+// The sign step: « −1 ≤ x ≤ 3/2 » or « x < −1 ou x > 3/2 ».
+function triSignLine(d) {
+  const [r1, r2] = d.roots;
+  const inside = (d.a > 0) === (d.rel === '<' || d.rel === '≤');
+  const s = STRICT[d.rel];
+  if (inside) return `${N(r1)}${s ? '<' : '≤'}x${s ? '<' : '≤'}${N(r2)}`;
+  return `x${s ? '<' : '≤'}${N(r1)}∨x${s ? '>' : '≥'}${N(r2)}`;
+}
+
+const deltaText = (cs) => `${paren(cs[1])}^2-4×${paren(cs[0])}×${paren(cs[2])}`;
+const deltaOf = (cs) => cs[1] * cs[1] - 4 * cs[0] * cs[2];
+
+function triItem(level, rng, opts = {}) {
+  let kind = 'two';
+  if (level === 4 && rng.chance(0.25)) kind = rng.pick(['none', 'double']);
+  const d = triData(rng, kind);
+  const start = `${d.poly}${d.rel}0`;
+  const S = setText(setOf(start));
+  const judge = { kind: 'solset', v: V };
+  let lines;
+  if (kind === 'none') lines = [E(S, `Δ = ${fr(String(deltaOf(d.cs)))} < 0 : le trinôme a partout le signe de a = ${fr(String(d.a))}`, 'sign', 'write')];
+  else if (kind === 'double') lines = [E(`${d.factored}${d.rel}0`, 'Δ = 0 : une racine double', 'roots', 'roots'), E(S, 'Un carré est ≥ 0', 'sign', 'write')];
+  else {
+    lines = [
+      E(`${d.factored}${d.rel}0`, `Racines ${fr(N(d.roots[0]))} et ${fr(N(d.roots[1]))}`, 'roots', 'roots'),
+      E(triSignLine(d), d.a > 0 ? 'a > 0 : négatif entre les racines, positif à l\'extérieur' : 'a < 0 : positif entre les racines, négatif à l\'extérieur', 'sign', 'sign'),
+      E(S, 'Écrire S', 'write', 'write'),
+    ];
+  }
+  let first = start;
+  const script = [];
+  // Level 5: put everything on one side first.
+  if (level === 5) {
+    const k = rng.int(-6, 6);
+    const m = rng.int(-3, 3);
+    // a x² + b x + c rel 0  ⇔  a x² rel −b x − c, written with a shift.
+    const right = polyText([0, -d.cs[1] + m, -d.cs[2] + k].slice(1));
+    const left = polyText([d.cs[0], m, k]);
+    first = `${left}${d.rel}${right}`;
+    script.push(E(start, 'Tout passer à gauche', 'roots', 'move'));
+  }
+  const withDelta = level >= 2 && level <= 3 && kind === 'two';
+  if (level === 1) {
+    const inside = (d.a > 0) === (d.rel === '<' || d.rel === '≤');
+    script.push({ kind: 'note', html: `Les racines de ${MT(d.poly)} sont ${fr(N(d.roots[0]))} et ${fr(N(d.roots[1]))}.` });
+    script.push({ kind: 'decision', prompt: `Où ${RT(d.poly)} est-il ${d.rel === '<' || d.rel === '≤' ? 'négatif' : 'positif'} ?`, options: [
+      { id: 'in', label: 'Entre les racines', valid: inside, rule: inside ? undefined : 'g1_trinome_sign_swap', why: `a = ${fr(String(d.a))} : entre les racines, le trinôme a le signe de −a.` },
+      { id: 'out', label: 'À l\'extérieur des racines', valid: !inside, rule: inside ? 'g1_trinome_sign_swap' : undefined, why: `a = ${fr(String(d.a))} : à l'extérieur des racines, le trinôme a le signe de a.` },
+    ] });
+    script.push(blanked(lines[2], d.roots.map((r) => N(r))));
+  } else if (level === 2) {
+    script.push(blanked(lines[0], d.roots.map((r) => N(r))), lines[1], lines[2]);
+  } else script.push(...lines);
+  const deltaSeg = { kind: 'value', expect: String(deltaOf(d.cs)) };
+  const segs = [];
+  let mainStart = first;
+  let mainScript = script;
+  if (withDelta) {
+    segs.push({ kind: 'segment', html: `Résous ${MT(start)}.`, start: { math: first }, judge: withMenus(judge, level, first, lines, TRI_CHOICES) }, ...script);
+    mainStart = deltaText(d.cs);
+    mainScript = [E(String(deltaOf(d.cs)), 'Δ = b² − 4ac', 'delta')];
+  }
+  return linesItem({
+    skill: TRI, level, prompt: `Résous dans ℝ : ${MT(first)}.`,
+    start: mainStart, judge: withDelta ? deltaSeg : withMenus(judge, level, first, level === 5 ? script : lines, TRI_CHOICES), mode: modeOf(level),
+    script: [...mainScript, ...segs],
+    hints: H('Le trinôme a le signe de a à l\'extérieur des racines, le signe contraire entre elles.', kind === 'two' ? MT(`${d.factored}${d.rel}0`) : `Δ = ${deltaOf(d.cs)}`, MT(lines[lines.length - 1].math)),
+    subgoals: TRI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
+    key: `${TRI}:${level}:${first}`, exam: examOf(opts),
+  });
+}
+
+function triExam(rng, exam) {
+  if (exam === 'tf') {
+    const bank = [
+      { s: 'x² + x + 1 > 0 pour tout x ∈ ℝ.', truth: true, why: 'Vrai : Δ = −3 < 0 et a = 1 > 0.' },
+      { s: '−x² + 4x − 5 < 0 pour tout x ∈ ℝ.', truth: true, why: 'Vrai : Δ = −4 < 0 et a = −1 < 0.' },
+      { s: 'x² − 3x + 2 > 0 pour tout x ∈ ℝ.', truth: false, pred: 'x^2-3x+2>0', ans: '3/2', why: 'Faux : entre les racines 1 et 2, le trinôme est négatif. En x = 3/2 : −1/4.', rule: 'g1_trinome_sign_swap' },
+      { s: 'x² ≥ 4 équivaut à x ≥ 2.', truth: false, pred: 'x^2≥4⇒x≥2', hyp: 'x^2≥4', ans: '-3', why: 'Faux : x = −3 vérifie x² ≥ 4. S = ]−∞ ; −2] ∪ [2 ; +∞[.' },
+      { s: '2x² − 8x + 8 ≤ 0 n\'a qu\'une solution.', truth: true, why: 'Vrai : 2(x − 2)² ≤ 0 seulement pour x = 2.' },
+    ];
+    const b = rng.pick(bank);
+    const counter = b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, ...(b.hyp ? { hyp: b.hyp } : {}), ask: [{ v: 'x', label: 'x =' }], answer: { x: b.ans } };
+    return tfItem({ skill: TRI, level: 4, statement: b.s, truth: b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+  }
+  const d = triData(rng);
+  const start = `${d.poly}${d.rel}0`;
+  const S = setText(setOf(start));
+  const swap = { '≥': '≤', '>': '≤', '≤': '≥', '<': '≥' };
+  const options = [
+    { html: MT(S), correct: true },
+    { html: MT(setText(setOf(`${d.poly}${swap[d.rel]}0`))), correct: false, rule: 'g1_trinome_sign_swap' },
+    { html: MT(setText(setOf(`${d.poly}${{ '≥': '>', '>': '≥', '≤': '<', '<': '≤' }[d.rel]}0`))), correct: false, rule: 'g9_bracket' },
+    { html: MT(`{${N(d.roots[0])};${N(d.roots[1])}}`), correct: false },
+  ];
+  return mcq({
+    skill: TRI, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: `${MT(`${d.factored}${d.rel}0`)} : ${MT(S)}`, note: '' }],
+  }, rng);
+}
+
+
+// ======================================================================
+// g1-sign-table
+// ======================================================================
+
+const SGN = 'g1-sign-table';
+const SGN_SUB = [
+  { id: 'bounds', label: 'zéros et valeurs interdites', skill: SGN },
+  { id: 'rows', label: 'signe de chaque facteur', skill: TRI },
+  { id: 'read', label: 'lire l\'ensemble', skill: 'g9-intervals' },
+];
+
+// 2 to 4 factors x − r or r − x, one squared half of the time, one in the
+// denominator; roots whole and distinct in [−4 ; 4].
+function sgnData(rng, level) {
+  for (let i = 0; i < 200; i++) {
+    const n = level >= 4 ? rng.int(3, 4) : rng.int(2, 3);
+    const roots = [];
+    while (roots.length < n) { const r = rng.int(-4, 4); if (!roots.includes(r)) roots.push(r); }
+    const even = rng.chance(0.5) ? rng.int(0, n - 1) : -1;
+    const den = rng.chance(0.7) ? rng.int(0, n - 1) : -1;
+    if (den === even && den >= 0 && rng.chance(0.5)) continue;
+    const factors = roots.map((r, k) => {
+      const flip = k !== even && rng.chance(0.33);
+      const base = flip ? (r === 0 ? '-x' : `${r}-x`) : lin(r);
+      const f = k === even ? (base === 'x' ? 'x^2' : `(${base})^2`) : base;
+      return { id: `f${k}`, r, f, den: k === den, even: k === even, label: RT(f) };
+    });
+    const num = factors.filter((f) => !f.den);
+    if (!num.length) continue;
+    const prod = (fs) => fs.map((f) => (f.f.includes('^') || f.f === 'x' || fs.length === 1 ? f.f : `(${f.f})`)).join('');
+    const numT = prod(num);
+    const denF = factors.filter((f) => f.den);
+    const expr = denF.length ? `${numT === 'x' || numT === 'x^2' ? numT : `(${numT})`}/(${prod(denF)})` : numT;
+    const rel = rng.pick(['≥', '>', '≤', '<']);
+    const S = setOf(`${expr}${rel}0`);
+    if (!S.parts.length) continue;
+    const bounds = [...roots].sort((a, b) => a - b);
+    return { factors, expr, rel, S, Stext: setText(S), bounds };
+  }
+  return null;
+}
+
+const signOf = (val) => (val.n === 0 ? '0' : val.n > 0 ? '+' : '−');
+function factorSigns(f, bounds) {
+  const pts = [];
+  for (let j = 0; j <= 2 * bounds.length; j++) {
+    if (j % 2 === 1) pts.push(q(bounds[(j - 1) / 2]));
+    else {
+      const k = j / 2;
+      pts.push(k === 0 ? q(bounds[0] - 1) : k === bounds.length ? q(bounds[bounds.length - 1] + 1) : q(bounds[k - 1] + bounds[k], 2));
+    }
+  }
+  return pts.map((x) => signOf(exactValue(parse(f.f.replace(/x/g, `(${N(x)})`)))));
+}
+
+function sgnTable(level, rng, opts = {}) {
+  const d = sgnData(rng, level);
+  const m = d.bounds.length;
+  const ncol = 2 * m + 1;
+  const boundsInput = level >= 3;
+  const cols = Array.from({ length: ncol }, (_, j) => (j % 2 ? (boundsInput ? '·' : fr(String(d.bounds[(j - 1) / 2]))) : ''));
+  const rows = [];
+  const answers = {};
+  if (boundsInput) {
+    rows.push({ id: 'bounds', label: 'x', cells: cols.map((_, j) => (j % 2 ? { input: true } : null)) });
+    answers.bounds = cols.map((_, j) => (j % 2 ? String(d.bounds[(j - 1) / 2]) : null));
+  }
+  for (const f of d.factors) {
+    const signs = factorSigns(f, d.bounds);
+    const given = level === 1;
+    rows.push({ id: f.id, label: `${f.label}${f.den ? ' (dén.)' : ''}`, cells: signs.map((s) => (given ? { given: s } : { input: true, kind: 'sign' })) });
+    answers[f.id] = signs.map((s) => (given ? null : s));
+    f.signs = signs;
+  }
+  const fSigns = cols.map((_, j) => {
+    if (d.factors.some((f) => f.den && f.signs[j] === '0')) return '‖';
+    if (d.factors.some((f) => f.signs[j] === '0')) return '0';
+    return d.factors.filter((f) => f.signs[j] === '−').length % 2 ? '−' : '+';
+  });
+  rows.push({ id: 'f', label: 'f(x)', cells: fSigns.map(() => ({ input: true, kind: 'sign' })) });
+  answers.f = fSigns;
+  const then = linesItem({
+    skill: SGN, level, prompt: `Lis le tableau : résous ${MT(`${d.expr}${d.rel}0`)}.`,
+    start: `${d.expr}${d.rel}0`, judge: { kind: 'solset', v: V }, mode: 'free', noHints: true,
+    script: [E(d.Stext, 'Lire le tableau', 'read')], hints: [], subgoals: SGN_SUB, keys: KEYS,
+    key: `${SGN}:then:${d.expr}${d.rel}`, exam: examOf(opts),
+  });
+  const hasEven = d.factors.some((f) => f.even);
+  const line = (sig) => sig.join(' ');
+  return tableItem({
+    skill: SGN, level,
+    prompt: `Tableau de signes de f(x) = ${MU(d.expr)}.${boundsInput ? ' Place d\'abord les zéros et les valeurs interdites dans l\'ordre (ligne x).' : ''} Touche une case pour choisir + , − , 0 ou ‖.`,
+    table: { cols, rows }, phi: { kind: 'signs', v: V, bounds: d.bounds.map(String), factors: d.factors.map((f) => ({ id: f.id, f: f.f, den: f.den, even: f.even })) },
+    answers, then,
+    hints: H('Une ligne par facteur : il change de signe en sa racine, sauf s\'il est au carré. ‖ sous une valeur interdite.', `${d.factors[0].label} : ${line(d.factors[0].signs)}`, `f(x) : ${line(fSigns)}`),
+    baits: hasEven ? ['g1_sign_even_root'] : [],
+    subgoals: SGN_SUB, key: `${d.expr}:${level}`, exam: examOf(opts),
+    solution: [...d.factors.map((f) => ({ html: `${f.label} : ${line(f.signs)}`, note: '' })), { html: `f(x) : ${line(fSigns)}`, note: 'Règle des signes' }, { html: MT(d.Stext), note: `f(x) ${d.rel} 0` }],
+    noHints: level === 5 || !!opts.exam,
+  });
+}
+
+// Level 5: an inequality to factor first (the sign table is the tool).
+function sgnLevel5(rng, opts) {
+  for (let i = 0; i < 100; i++) {
+    const rs = [];
+    while (rs.length < 3) { const r = rng.int(-4, 4); if (!rs.includes(r)) rs.push(r); }
+    rs.sort((a, b) => a - b);
+    const cs = [1, -(rs[0] + rs[1] + rs[2]), rs[0] * rs[1] + rs[0] * rs[2] + rs[1] * rs[2], -rs[0] * rs[1] * rs[2]];
+    if (cs.some((c) => Math.abs(c) > 30)) continue;
+    const rel = rng.pick(['≥', '>', '≤', '<']);
+    const start = `${polyText(cs)}${rel}0`;
+    const fac = rs.map((r) => (r === 0 ? 'x' : `(${lin(r)})`)).join('');
+    const S = setText(setOf(start));
+    return linesItem({
+      skill: SGN, level: 5, prompt: `Résous dans ℝ : ${MT(start)}.`,
+      start, judge: { kind: 'solset', v: V }, mode: 'free',
+      script: [E(`${fac}${rel}0`, 'Factoriser (racine évidente)', 'bounds'), E(S, 'Tableau de signes, puis lire', 'read')],
+      hints: [], subgoals: [...SGN_SUB, { id: 'factor', label: 'factoriser', skill: 'fac-complete' }], keys: KEYS,
+      key: `${SGN}:5:${start}`, exam: examOf(opts, 3),
+    });
+  }
+  return null;
+}
+
+function sgnMcq(rng) {
+  let d;
+  for (let i = 0; i < 50; i++) { d = sgnData(rng, 3); if (d.factors.some((f) => f.even) && d.factors.some((f) => f.den)) break; }
+  const start = `${d.expr}${d.rel}0`;
+  const options = [{ html: MT(d.Stext), correct: true }];
+  const ev = d.factors.find((f) => f.even);
+  if (ev) {
+    const odd = d.expr.replace(ev.f, ev.f.replace(/\^2$/, ''));
+    try { options.push({ html: MT(setText(setOf(`${odd}${d.rel}0`))), correct: false, rule: 'g1_sign_even_root' }); } catch { /* skip */ }
+  }
+  const pole = d.factors.find((f) => f.den);
+  if (pole) options.push({ html: MT(setText(union(d.S, setOf(`{${pole.r}}`)))), correct: false });
+  const strict = { '≥': '>', '>': '≥', '≤': '<', '<': '≤' }[d.rel];
+  options.push({ html: MT(setText(setOf(`${d.expr}${strict}0`))), correct: false, rule: 'g9_bracket' });
+  return mcq({
+    skill: SGN, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options: uniq(options).slice(0, 4), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: `Tableau de signes : ${MT(d.Stext)}`, note: '' }],
+  }, rng);
+}
+
+
+// ======================================================================
+// g1-parity-period
+// ======================================================================
+
+const PAR = 'g1-parity-period';
+const PAR_SUB = [
+  { id: 'domain', label: 'domaine symétrique', skill: DOM },
+  { id: 'fmx', label: 'calculer f(−x)', skill: PAR },
+  { id: 'counter', label: 'contre-exemple', skill: 'g9-counterexample' },
+  { id: 'period', label: 'période', skill: 'g3-reduce' },
+];
+const PAR_CHOICES = [
+  { id: 'subst', label: 'Calculer f(−x) : remplacer x par −x' },
+  { id: 'simplify', label: 'Simplifier f(−x)' },
+  { id: 'test', label: 'Tester une valeur' },
+  { id: 'domain', label: 'Vérifier le domaine' },
+];
+const PARITY = { even: 'paire', odd: 'impaire', none: 'ni paire ni impaire' };
+
+// A bank of functions: f, f(−x) simplified, parity.
+function parBank(rng) {
+  const a = rng.int(2, 5);
+  const b = rng.int(1, 6);
+  const c = nz(rng, -4, 4);
+  return [
+    { f: `x^4-${a}x^2+${b}`, fm: `x^4-${a}x^2+${b}`, kind: 'even' },
+    { f: `|x|+${b}`, fm: `|x|+${b}`, kind: 'even' },
+    { f: `x^2×|x|`, fm: `x^2×|x|`, kind: 'even' },
+    { f: `x×sin(x)`, fm: `x×sin(x)`, kind: 'even' },
+    { f: `cos(${a}x)+x^2`, fm: `cos(${a}x)+x^2`, kind: 'even' },
+    { f: `${a}/(x^2+${b})`, fm: `${a}/(x^2+${b})`, kind: 'even' },
+    { f: `x^3-${a}x`, fm: `-x^3+${a}x`, kind: 'odd' },
+    { f: 'x×|x|', fm: '-x×|x|', kind: 'odd' },
+    { f: `x/(x^2+${b})`, fm: `-x/(x^2+${b})`, kind: 'odd' },
+    { f: `sin(${a}x)+x`, fm: `-sin(${a}x)-x`, kind: 'odd' },
+    { f: `x^5+${a}x^3`, fm: `-x^5-${a}x^3`, kind: 'odd' },
+    { f: 'x×cos(x)', fm: '-x×cos(x)', kind: 'odd' },
+    { f: `x^3+${a}x^2`, fm: `-x^3+${a}x^2`, kind: 'none' },
+    { f: `x^2${c > 0 ? '+' : ''}${c}x`, fm: `x^2${c > 0 ? '-' : '+'}${Math.abs(c)}x`, kind: 'none' },
+    { f: `x^3-x+${b}`, fm: `-x^3+x+${b}`, kind: 'none' },
+    { f: `x^2+${a}x+${b}`, fm: `x^2-${a}x+${b}`, kind: 'none' },
+  ];
+}
+
+// A value x₀ where f(−x₀) is neither f(x₀) nor −f(x₀).
+function witness(f) {
+  const node = parse(f);
+  for (const x of [1, 2, 3]) {
+    const u = evalFloat(node, { x });
+    const w = evalFloat(node, { x: -x });
+    if (Math.abs(u - w) > 1e-9 && Math.abs(u + w) > 1e-9 && Number.isInteger(u) && Number.isInteger(w)) return x;
+  }
+  return null;
+}
+
+function parData(rng, kinds) {
+  for (let i = 0; i < 100; i++) {
+    const e = rng.pick(parBank(rng).filter((x) => kinds.includes(x.kind)));
+    if (e.kind === 'none' && !witness(e.f)) continue;
+    return { ...e, raw: subst(e.f, '-x'), x0: e.kind === 'none' ? witness(e.f) : null };
+  }
+  return null;
+}
+
+// Periods of sin(ax) + cos(bx), in units of π.
+const gcdI = (a, b) => (b ? gcdI(b, a % b) : Math.abs(a));
+const piText = (k) => (k.d === 1 ? (k.n === 1 ? 'π' : `${k.n}π`) : `${k.n === 1 ? '' : k.n}π/${k.d}`);
+function perData(rng) {
+  for (let i = 0; i < 100; i++) {
+    const [a, b] = [rng.pick([q(1), q(2), q(3), q(4), q(1, 2)]), rng.pick([q(1), q(2), q(3), q(4), q(1, 2)])];
+    if (a.eq(b)) continue;
+    const p1 = q(2).div(a);
+    const p2 = q(2).div(b);
+    const T = new Q((p1.n * p2.n) / gcdI(p1.n, p2.n), gcdI(p1.d, p2.d));
+    const arg = (k) => (k.eq(1) ? 'x' : k.d === 1 ? `${k.n}x` : 'x/2');
+    return { a, b, p1, p2, T, f: `sin(${arg(a)})+cos(${arg(b)})`, s1: `sin(${arg(a)})`, s2: `cos(${arg(b)})` };
+  }
+  return null;
+}
+
+function perItem(level, rng, opts) {
+  const d = perData(rng);
+  const val = (t) => ({ kind: 'value', form: 'exact', expect: t });
+  const script = [
+    E(piText(d.p1), `Période de ${RT(d.s1)} : 2π/|a|`, 'period'),
+    { kind: 'segment', html: `Période de ${MT(d.s2)} :`, ask: 'T₂ =', start: { math: 'T_2' }, judge: val(piText(d.p2)) },
+    E(piText(d.p2), 'Période : 2π/|b|', 'period'),
+    { kind: 'segment', html: 'Plus petite période commune :', ask: 'T =', start: { math: 'T' }, judge: val(piText(d.T)) },
+    E(piText(d.T), 'Le plus petit nombre qui est un multiple des deux périodes', 'period'),
+  ];
+  return linesItem({
+    skill: PAR, level, prompt: `Trouve la plus petite période de f(x) = ${MT(d.f)}.`, start: 'T_1', judge: val(piText(d.p1)), mode: level <= 2 ? 'guided' : 'free', script,
+    hints: H('La période de sin(ax) et de cos(ax) est 2π/|a|. Une somme a pour période le plus petit multiple commun.', `${piText(d.p1)} et ${piText(d.p2)}`, piText(d.T)),
+    subgoals: PAR_SUB, keys: [...KEYS, 'trig'], key: `${PAR}:per:${d.f}`, exam: examOf(opts),
+  });
+}
+
+function parItem(level, rng, opts = {}) {
+  if ((level === 4 && rng.chance(0.4)) || (level === 5 && rng.chance(0.5))) return perItem(level, rng, opts);
+  if (level === 1) return parMcq1(rng);
+  const kinds = level === 5 ? ['none', 'odd'] : level === 2 ? ['even', 'odd'] : ['even', 'odd', 'none'];
+  const d = parData(rng, kinds);
+  const defs = { f: d.f };
+  const judge = { kind: 'equiv', vars: [V], funcs: ['f'], defs, domain: { x: [0.3, 2.5] }, target: 'short', goal: d.fm, slack: 0 };
+  const lines = [E(d.raw, 'Remplacer x par −x', 'fmx', 'subst')];
+  if (toText(unparen(parse(d.raw))) !== toText(unparen(parse(d.fm)))) lines.push(E(d.fm, 'Simplifier', 'fmx', 'simplify'));
+  if (level === 2) lines[0] = blanked(lines[0], ['-x']);
+  const script = [...lines];
+  const decision = { kind: 'decision', prompt: 'Donc f est :', options: [
+    { id: 'even', label: 'paire', valid: d.kind === 'even', why: d.kind === 'odd' ? 'f(−x) = −f(x) : c\'est la définition d\'une fonction impaire.' : 'f(−x) n\'est pas égal à f(x) pour tout x.' },
+    { id: 'odd', label: 'impaire', valid: d.kind === 'odd', why: d.kind === 'even' ? 'f(−x) = f(x) : c\'est la définition d\'une fonction paire.' : 'f(−x) n\'est pas égal à −f(x) pour tout x.' },
+    { id: 'none', label: 'ni paire ni impaire', valid: d.kind === 'none', why: 'Compare f(−x) avec f(x) et avec −f(x).' },
+  ] };
+  if (d.kind === 'none') {
+    const x0 = d.x0;
+    script.push(
+      { kind: 'segment', html: `Contre-exemple : calcule f(${x0}) et f(−${x0}).`, ask: `f(${x0}) =`, start: { math: subst(d.f, String(x0)) }, judge: { kind: 'value' } }, decision,
+      E(N(evalFloat(parse(d.f), { x: x0 })), `f(${x0})`, 'counter'),
+      { kind: 'segment', html: '', ask: `f(−${x0}) =`, start: { math: subst(d.f, `-${x0}`) }, judge: { kind: 'value' } },
+      E(N(evalFloat(parse(d.f), { x: -x0 })), `f(−${x0}) n'est ni f(${x0}) ni −f(${x0})`, 'counter'),
+    );
+  } else {
+    const comb = d.kind === 'even' ? 'f(-x)-f(x)' : 'f(-x)+f(x)';
+    script.push({ kind: 'segment', html: d.kind === 'even' ? 'Vérifie : f(−x) − f(x) =' : 'Vérifie : f(−x) + f(x) =', ask: d.kind === 'even' ? 'f(−x) − f(x) =' : 'f(−x) + f(x) =', start: { math: comb }, judge: { kind: 'equiv', vars: [V], funcs: ['f'], defs, domain: { x: [0.3, 2.5] }, target: 'constant' } }, decision, E('0', 'Pour tout x : f est ' + PARITY[d.kind], 'fmx'));
+  }
+  return linesItem({
+    skill: PAR, level, prompt: `f(x) = ${MU(d.f)}, définie sur ℝ. Calcule f(−x), puis dis si f est paire, impaire ou ni l'une ni l'autre.`,
+    start: 'f(-x)', judge: withMenus(judge, level, 'f(-x)', lines, PAR_CHOICES), mode: modeOf(level), script,
+    declares: { vars: [V], funcs: ['f'] },
+    hints: H('Calcule f(−x) et compare à f(x) et à −f(x).', MT(d.raw), MT(d.fm)),
+    subgoals: PAR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
+    key: `${PAR}:${level}:${d.f}`, exam: examOf(opts),
+  });
+}
+
+// Level 1: f(−x) is computed; the student compares.
+function parMcq1(rng) {
+  const nonSym = rng.chance(0.2);
+  if (nonSym) {
+    const a = rng.int(1, 4);
+    const f = rng.pick([`x^2/(x-${a})`, `sqrt(x)+x^2`, `x^3/(x+${a})`]);
+    return mcq({
+      skill: PAR, level: 1, prompt: `f(x) = ${MU(f)}. f est :`,
+      options: [
+        { html: 'ni paire ni impaire : son domaine n\'est pas symétrique', correct: true },
+        { html: 'paire', correct: false }, { html: 'impaire', correct: false },
+      ], key: `par1:${f}`, solution: [{ html: `D_f = ${MT(domText(f))} n'est pas symétrique par rapport à 0.`, note: '' }],
+    }, rng);
+  }
+  const d = parData(rng, ['even', 'odd', 'none']);
+  return mcq({
+    skill: PAR, level: 1, prompt: `f(x) = ${MU(d.f)} sur ℝ, et f(−x) = ${MU(d.fm)}. f est :`,
+    options: ['even', 'odd', 'none'].map((k) => ({ html: PARITY[k], correct: k === d.kind })), key: `par1:${d.f}`,
+    solution: [{ html: `f(−x) = ${MU(d.fm)} ${d.kind === 'even' ? '= f(x)' : d.kind === 'odd' ? '= −f(x)' : 'n\'est ni f(x) ni −f(x)'}.`, note: '' }],
+  }, rng);
+}
+
+function parExam(rng, exam) {
+  if (exam === 'tf') {
+    const a = rng.int(1, 3);
+    const bank = [
+      { s: `f(x) = x³ − ${a * a}x vérifie f(−${a}) = f(${a}). Donc f est paire.`, truth: false, pred: `(-x)^3-${a * a}(-x)=x^3-${a * a}x`, ans: String(a + 1), why: `Faux : une valeur ne suffit pas. f(−${a + 1}) = ${-((a + 1) ** 3 - a * a * (a + 1))} et f(${a + 1}) = ${(a + 1) ** 3 - a * a * (a + 1)}.`, rule: 'g1_parity_point' },
+      { s: 'x ↦ x·|x| est impaire.', truth: true, why: 'Vrai : (−x)·|−x| = −x·|x|.' },
+      { s: 'x ↦ cos(x) + x est paire.', truth: false, pred: 'cos(-x)+(-x)=cos(x)+x', ans: '1', why: 'Faux : f(−1) = cos 1 − 1 ≠ cos 1 + 1 = f(1).' },
+      { s: 'Une fonction impaire définie en 0 vérifie f(0) = 0.', truth: true, why: 'Vrai : f(0) = f(−0) = −f(0), donc f(0) = 0.' },
+    ];
+    const b = rng.pick(bank);
+    const counter = b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, ask: [{ v: 'x', label: 'x =' }], answer: { x: b.ans } };
+    return tfItem({ skill: PAR, level: 4, statement: b.s, truth: b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+  }
+  const d = perData(rng);
+  const max = d.p1.cmp(d.p2) > 0 ? d.p1 : d.p2;
+  const min = d.p1.cmp(d.p2) > 0 ? d.p2 : d.p1;
+  const options = [{ html: piText(d.T), correct: true }];
+  for (const w of [max, min, d.p1.mul(d.p2)]) if (!w.eq(d.T)) options.push({ html: piText(w), correct: false, rule: 'g1_period_sum' });
+  if (options.length < 3) options.push({ html: piText(d.T.mul(q(2))), correct: false });
+  return mcq({
+    skill: PAR, level: 4, prompt: `Plus petite période de f(x) = ${MT(d.f)} :`, options: uniq(options), key: `mcq:${d.f}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: `Périodes ${piText(d.p1)} et ${piText(d.p2)} ; plus petit multiple commun : ${piText(d.T)}.`, note: '' }],
+  }, rng);
+}
+
+
+// ======================================================================
+// g1-injective, g1-surjective: proofs in blocks
+// ======================================================================
+
+const INJ = 'g1-injective';
+const SURJ = 'g1-surjective';
+const AB = { vars: ['a', 'b'] };
+const XY = { vars: ['x', 'y'] };
+const sq = (c) => Math.round(Math.sqrt(c));
+
+// Injectivity proofs: f(a) = f(b), a calculation, then a = b.
+function injBank(rng) {
+  const kind = rng.pick(['homog', 'square', 'man']);
+  if (kind === 'homog') {
+    for (;;) {
+      const p = nz(rng, -3, 3);
+      const qq = nz(rng, -5, 5);
+      const r = nz(rng, -4, 4);
+      if (p * r + qq === 0) continue;
+      const num = affine(p, qq);
+      const f = `(${num})/(${lin(r)})`;
+      const fa = f.replace(/x/g, 'a');
+      const fb = f.replace(/x/g, 'b');
+      const k = p * r + qq;
+      const A = `ℝ∖{${r}}`;
+      return {
+        kind, f, A, id: `h:${f}`,
+        statement: `f(x) = ${MU(f)} est injective sur ${MT(A)}`,
+        steps: [
+          `Soient a, b ∈ ${MT(A)} tels que ${MT(`${fa}=${fb}`, AB)}.`,
+          `${MT(`(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})`, AB)} (produit en croix)`,
+          `${MT(`${-p * r}a+${qq}b=${-p * r}b+${qq}a`.replace(/\+-/g, '-'), AB)} (pab et ${fr(String(-qq * r))} s'éliminent)`,
+          `${MT(`${k}(b-a)=0`, AB)}, et ${k} ≠ 0, donc a = b.`,
+          `Donc f est injective sur ${MT(A)}.`,
+        ],
+        inputs: [
+          { at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})`, ask: 'Produit en croix :', answer: `(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})` },
+          { at: 3, kind: 'rel', vars: ['a', 'b'], expect: `${k}(b-a)=0`, ask: 'Factorise :', answer: `${k}(b-a)=0` },
+        ],
+        decoys: [
+          { html: 'f(0) ≠ f(1), donc f est injective.', rule: 'g9_proof_by_example', why: 'Deux valeurs ne prouvent pas un « pour tous a, b ».' },
+          { html: 'Si a = b, alors f(a) = f(b) : f est injective.', rule: 'g9_converse_contra', why: 'C\'est la réciproque : elle est vraie pour toute fonction. Il faut f(a) = f(b) ⇒ a = b.' },
+        ],
+        sub: { id: 'cross', label: 'produit en croix', skill: 'eq-proportion' },
+      };
+    }
+  }
+  if (kind === 'square') {
+    const h = rng.int(-3, 3);
+    const p = -2 * h;
+    const right = rng.chance(0.5);
+    const f = polyText([1, p, 0]);
+    const A = right ? `[${h};+∞[` : `]-∞;${h}]`;
+    const fa = f.replace(/x/g, 'a');
+    const fb = f.replace(/x/g, 'b');
+    const s2 = polyText([1, p]).replace('x', 'a+b');
+    return {
+      kind, f, A, id: `s:${f}:${A}`,
+      statement: `f(x) = ${MU(f)} est injective sur ${MT(A)}`,
+      steps: [
+        `Soient a, b ∈ ${MT(A)} tels que ${MT(`${fa}=${fb}`, AB)}.`,
+        `${MT(`(a-b)(${s2})=0`, AB)} (tout à gauche, puis factoriser)`,
+        `Sur ${MT(A)}, a ${right ? '≥' : '≤'} ${fr(String(h))} et b ${right ? '≥' : '≤'} ${fr(String(h))}, donc ${MT(s2, AB)} ${right ? '≥' : '≤'} 0, avec égalité seulement si a = b = ${fr(String(h))}.`,
+        'Dans les deux cas, a − b = 0 : a = b.',
+        `Donc f est injective sur ${MT(A)}.`,
+      ],
+      inputs: [{ at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(a-b)(${s2})=0`, ask: 'Tout à gauche et factorise :', answer: `(a-b)(${s2})=0` }],
+      decoys: [
+        { html: `${MT(`(a-b)(${s2})=0`, AB)}, donc a = b.`, rule: 'g1_inj_square', why: `Un produit nul : a = b <b>ou</b> ${toReadable(parse(s2))} = 0. Il faut utiliser l'ensemble ${fr(A)} pour écarter le second cas.` },
+        { html: 'f(0) ≠ f(1), donc f est injective.', rule: 'g9_proof_by_example', why: 'Deux valeurs ne prouvent pas un « pour tous a, b ».' },
+      ],
+      sub: { id: 'factor', label: 'factoriser', skill: 'fac-common' },
+    };
+  }
+  const c = rng.pick([1, 4, 9]);
+  const s = sq(c);
+  const right = rng.chance(0.5);
+  const f = `x+${c}/x`;
+  const A = right ? `[${s};+∞[` : `]-∞;${-s}]`;
+  return {
+    kind: 'man', f, A, id: `m:${c}:${right}`,
+    statement: `f(x) = ${MU(f)} est injective sur ${MT(A)}`,
+    steps: [
+      `Soient a, b ∈ ${MT(A)} tels que ${MT(`a+${c}/a=b+${c}/b`, AB)}.`,
+      `${MT(`(a-b)(ab-${c})=0`, AB)} (multiplier par ab, puis factoriser)`,
+      `Sur ${MT(A)}, a et b ont le même signe et |a|, |b| ≥ ${s}, donc ab ≥ ${c}, avec ab = ${c} seulement si a = b = ${fr(String(right ? s : -s))}.`,
+      'Dans les deux cas, a − b = 0 : a = b.',
+      `Donc f est injective sur ${MT(A)}.`,
+    ],
+    inputs: [{ at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(a-b)(ab-${c})=0`, ask: 'Multiplie par ab et factorise :', answer: `(a-b)(ab-${c})=0` }],
+    decoys: [
+      { html: `${MT(`(a-b)(ab-${c})=0`, AB)}, donc a = b.`, rule: 'g1_inj_square', why: `Un produit nul : a = b <b>ou</b> ab = ${c}. Il faut l'ensemble de départ pour écarter ab = ${c}.` },
+      { html: 'f(0) ≠ f(1), donc f est injective.', rule: 'g9_proof_by_example', why: 'f n\'est même pas définie en 0, et deux valeurs ne prouvent rien.' },
+    ],
+    sub: { id: 'factor', label: 'factoriser', skill: 'fac-common' },
+  };
+}
+
+// The proof with one block missing, two choices (level 1 of the scale).
+function holeMcq(skill, pr, rng, k) {
+  const shown = pr.steps.map((s, i) => (i === k ? '<b>…</b>' : s)).map((s) => `<div class="proof-line">${s}</div>`).join('');
+  const d = pr.decoys[0];
+  return mcq({
+    skill, level: 1, prompt: `Preuve : ${pr.statement}.${shown}Quel bloc manque ?`,
+    options: [{ html: pr.steps[k], correct: true }, { html: d.html, correct: false, rule: d.rule }],
+    key: `hole:${pr.id}:${k}`, solution: pr.steps.map((s) => ({ html: s, note: '' })),
+  }, rng);
+}
+
+function proofBlocks(skill, pr, level, rng, opts, extra = {}) {
+  const withInput = level >= 4 || !!opts.exam;
+  const blocks = pr.steps.map((html, i) => ({ id: `b${i}`, html, needs: i ? [`b${i - 1}`] : [] }));
+  if (withInput) for (const inp of pr.inputs) blocks[inp.at].input = { ...inp };
+  const n = level === 2 ? 1 : level >= 5 || opts.exam ? pr.decoys.length : 2;
+  pr.decoys.slice(0, n).forEach((d, i) => blocks.push({ id: `d${i}`, html: d.html, needs: [], distractor: d.rule, why: d.why }));
+  return blocksItem({
+    skill, level: opts.exam ? 4 : level, mode: withInput ? 'frame' : 'order',
+    prompt: `Montre que ${pr.statement}. Touche les blocs dans l'ordre de la preuve${withInput ? ' et complète les calculs' : ''}.`,
+    blocks: rng.shuffle(blocks), goal: `b${pr.steps.length - 1}`, order: pr.steps.map((_, i) => `b${i}`),
+    decision: extra.decision || null,
+    hints: extra.hints, noHints: level === 5 || !!opts.exam,
+    key: `${pr.id}:${level}`, exam: opts.exam ? { format: opts.exam, points: extra.points || 3 } : false,
+    subgoals: extra.subgoals || [],
+  });
+}
+
+function injItem(level, rng, opts = {}) {
+  const pr = injBank(rng);
+  if (level === 1) return holeMcq(INJ, pr, rng, pr.kind === 'homog' ? 3 : 1);
+  if (level === 2 && pr.kind === 'homog' && rng.chance(0.5)) pr.decoys.reverse();
+  const decision = level === 3 ? { prompt: `f(x) = ${toReadable(parse(pr.f))} est-elle injective sur ${fr(pr.A)} ?`, options: [
+    { id: 'yes', label: 'Oui : je pars de f(a) = f(b)', valid: true },
+    { id: 'no', label: 'Non : je cherche a ≠ b avec f(a) = f(b)', valid: false, why: 'Sur cet ensemble, f(a) = f(b) force a = b : elle est injective.' },
+  ] } : null;
+  return proofBlocks(INJ, pr, level, rng, opts, {
+    decision,
+    hints: [
+      { level: 1, html: 'Pars de f(a) = f(b) et cherche à obtenir a = b.' },
+      { level: 2, html: pr.steps[1] },
+      { level: 3, html: pr.steps[2] },
+    ],
+    subgoals: [pr.sub],
+  });
+}
+
+function injTf(rng) {
+  const bank = [
+    () => ({ s: `x ↦ x² est injective sur ${fr('[-1;2]')}.`, f: 'a^2', g: 'b^2', A: '[-1;2]', ans: { a: '-1', b: '1' }, why: 'Faux : f(−1) = f(1) = 1 avec −1 ≠ 1.', rule: 'g1_inj_square' }),
+    () => {
+      const h = rng.int(-2, 2);
+      const d = rng.int(1, 2);
+      const A = `[${h - d - 1};${h + d + 1}]`;
+      const f = polyText([1, -2 * h, 0]);
+      return { s: `x ↦ ${toReadable(parse(f))} est injective sur ${fr(A)}.`, f: f.replace(/x/g, 'a'), g: f.replace(/x/g, 'b'), A, ans: { a: String(h - d), b: String(h + d) }, why: `Faux : f(${h - d}) = f(${h + d}), deux points symétriques par rapport à ${h}.`, rule: 'g1_inj_square' };
+    },
+    () => ({ s: 'x ↦ x³ est injective sur ℝ.', truth: true, why: 'Vrai : a³ = b³ ⇒ (a − b)(a² + ab + b²) = 0, et a² + ab + b² > 0 sauf si a = b = 0.' }),
+    () => ({ s: 'x ↦ (2x + 1)/(x − 3) est injective sur ℝ ∖ {3}.', truth: true, why: 'Vrai : f(a) = f(b) donne 7(b − a) = 0.' }),
+    () => ({ s: 'x ↦ |x − 1| est injective sur [0 ; 3].', f: '|a-1|', g: '|b-1|', A: '[0;3]', ans: { a: '0', b: '2' }, why: 'Faux : f(0) = f(2) = 1.' }),
+  ];
+  const b = rng.pick(bank)();
+  const counter = b.truth ? null : {
+    kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }],
+    pred: `(a∈${b.A}∧b∈${b.A}∧${b.f}=${b.g})⇒a=b`, hyp: `a∈${b.A}∧b∈${b.A}∧${b.f}=${b.g}`,
+    ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: b.ans,
+  };
+  return tfItem({ skill: INJ, level: 4, statement: b.s, truth: !!b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+}
+
+// Surjectivity proofs: y in B, an antecedent x, and x in A.
+function surjBank(rng) {
+  if (rng.chance(0.55)) {
+    const c = rng.pick([1, 4]);
+    const s = sq(c);
+    const m = 2 * s;
+    const right = rng.chance(0.6);
+    const A = right ? `[${s};+∞[` : `]-∞;${-s}]`;
+    const B = right ? `[${m};+∞[` : `]-∞;${-m}]`;
+    const sg = right ? '+' : '-';
+    const inv = `(x${sg}sqrt(x^2-${4 * c}))/2`;
+    return {
+      kind: 'man', f: `x+${c}/x`, A, B, id: `sm:${c}:${right}`,
+      statement: `f : ${MT(A)} → ${MT(B)}, f(x) = ${MU(`x+${c}/x`)} est surjective, et explicite f⁻¹`,
+      steps: [
+        `Soit y ${right ? '≥' : '≤'} ${fr(String(right ? m : -m))}. On cherche x ∈ ${MT(A)} avec ${MT(`x+${c}/x=y`, XY)}.`,
+        `${MT(`x^2-yx+${c}=0`, XY)} (multiplier par x ≠ 0)`,
+        `Δ = ${MT(`y^2-${4 * c}`, XY)} ≥ 0, car |y| ≥ ${m}.`,
+        `${MT(`x=(y+sqrt(y^2-${4 * c}))/2`, XY)} ou ${MT(`x=(y-sqrt(y^2-${4 * c}))/2`, XY)}.`,
+        `${MT(`(y${sg}sqrt(y^2-${4 * c}))/2`, XY)} ${right ? '≥' : '≤'} y/2 ${right ? '≥' : '≤'} ${fr(String(right ? s : -s))} : cette solution est dans ${MT(A)}.`,
+        'Donc f est surjective ; elle est aussi injective, donc bijective.',
+        `f⁻¹(x) = ${MU(inv)}, x ∈ ${MT(B)}.`,
+      ],
+      inputs: [
+        { at: 1, kind: 'rel', vars: ['x', 'y'], expect: `x^2-yx+${c}=0`, ask: 'Équation en x :', answer: `x^2-yx+${c}=0` },
+        { at: 2, kind: 'expr', vars: ['y'], expect: `y^2-${4 * c}`, ask: 'Δ =', answer: `y^2-${4 * c}` },
+      ],
+      decoys: [
+        { html: 'Δ ≥ 0 : une solution existe, donc f est surjective.', rule: 'g1_surj_domain', why: `Une solution existe, mais est-elle dans ${fr(A)} ? Il faut un antécédent dans l'ensemble de départ.` },
+        { html: `f⁻¹(x) = ${MU(`(x${right ? '-' : '+'}sqrt(x^2-${4 * c}))/2`)}.`, rule: 'g1_inverse_branch', why: `Cette racine n'est pas dans ${fr(A)}.` },
+        { html: `f⁻¹(x) = ${MU(`1/(x+${c}/x)`)}.`, rule: 'g1_inverse_reciprocal', why: 'f⁻¹ n\'est pas 1/f.' },
+      ],
+      choices: [B, right ? `[${s};+∞[` : `]-∞;${-s}]`, 'ℝ'],
+      disc: true,
+    };
+  }
+  for (;;) {
+    const p = nz(rng, -3, 3);
+    const qq = nz(rng, -5, 5);
+    const r = nz(rng, -4, 4);
+    if (p * r + qq === 0) continue;
+    const f = `(${affine(p, qq)})/(${lin(r)})`;
+    const A = `ℝ∖{${r}}`;
+    const B = `ℝ∖{${p}}`;
+    const top = affY(r, qq);
+    const bot = affY(1, -p);
+    return {
+      kind: 'homog', f, A, B, id: `sh:${f}`,
+      statement: `f : ${MT(A)} → ${MT(B)}, f(x) = ${MU(f)} est surjective, et explicite f⁻¹`,
+      steps: [
+        `Soit y ≠ ${fr(String(p))}. On cherche x ≠ ${fr(String(r))} avec ${MT(`${f}=y`, XY)}.`,
+        `${MT(`y(${lin(r)})=${affine(p, qq)}`, XY)}`,
+        `${MT(`x(${bot})=${top}`, XY)}`,
+        `y ≠ ${fr(String(p))}, donc ${MT(`x=(${top})/(${bot})`, XY)}.`,
+        `x ≠ ${fr(String(r))} : sinon ${MT(`${top}=${r}(${bot})`, XY)}, soit ${fr(String(p * r + qq))} = 0, impossible. La solution est dans ${MT(A)}.`,
+        'Donc f est surjective ; elle est aussi injective, donc bijective.',
+        `f⁻¹(x) = ${MU(`(${top.replace(/y/g, 'x')})/(${bot.replace(/y/g, 'x')})`)}, x ≠ ${fr(String(p))}.`,
+      ],
+      inputs: [
+        { at: 1, kind: 'rel', vars: ['x', 'y'], expect: `y(${lin(r)})=${affine(p, qq)}`, ask: 'Multiplie par le dénominateur :', answer: `y(${lin(r)})=${affine(p, qq)}` },
+        { at: 2, kind: 'rel', vars: ['x', 'y'], expect: `x(${bot})=${top}`, ask: 'Regroupe les termes en x :', answer: `x(${bot})=${top}` },
+      ],
+      decoys: [
+        { html: 'On trouve une solution x, donc f est surjective.', rule: 'g1_surj_domain', why: `Cette solution est-elle différente de ${fr(String(r))} ? Il faut un antécédent dans l'ensemble de départ.` },
+        { html: `f⁻¹(x) = ${MU(`(${lin(r)})/(${affine(p, qq)})`)}.`, rule: 'g1_inverse_reciprocal', why: 'f⁻¹ n\'est pas 1/f.' },
+      ],
+      choices: [B, 'ℝ', `ℝ∖{${r}}`],
+      disc: false,
+    };
+  }
+}
+
+const SURJ_SUB = [
+  { id: 'disc', label: 'existence (discriminant)', skill: 'quad-formula' },
+  { id: 'inA', label: 'la solution est dans A', skill: 'g1-irr-ineq' },
+  { id: 'inv', label: 'réciproque', skill: INV },
+];
+
+function surjItem(level, rng, opts = {}) {
+  const pr = surjBank(rng);
+  if (level === 1) return holeMcq(SURJ, pr, rng, 4);
+  let decision = null;
+  if (level === 3) {
+    decision = { prompt: `Pour quel ensemble d'arrivée B la fonction f(x) = ${toReadable(parse(pr.f))}, définie sur ${fr(pr.A)}, est-elle surjective ?`, options: pr.choices.map((B, i) => ({ id: `B${i}`, label: fr(B), valid: i === 0, why: i === 0 ? '' : `Certains y de ${fr(B)} n'ont pas d'antécédent dans ${fr(pr.A)}.` })) };
+    if (pr.choices[1] === pr.choices[0]) decision.options.splice(1, 1);
+  }
+  return proofBlocks(SURJ, pr, level, rng, opts, {
+    decision,
+    hints: [
+      { level: 1, html: `Il faut un antécédent <b>dans ${fr(pr.A)}</b>, pas seulement une solution.` },
+      { level: 2, html: pr.steps[3] },
+      { level: 3, html: pr.steps[4] },
+    ],
+    subgoals: SURJ_SUB, points: 7,
+  });
+}
+
 // ======================================================================
 
 export const GEN = {
+  [INJ]: (level, rng, profile, opts = {}) => (opts.exam === 'tf' ? injTf(rng) : injItem(opts.exam ? 5 : level, rng, opts)),
+  [SURJ]: (level, rng, profile, opts = {}) => surjItem(opts.exam ? 5 : level, rng, opts),
+  [PAR]: (level, rng, profile, opts = {}) => (opts.exam ? parExam(rng, opts.exam) : parItem(level, rng, opts)),
+  [SGN]: (level, rng, profile, opts = {}) => (opts.exam === 'mcq' ? sgnMcq(rng) : level === 5 ? sgnLevel5(rng, opts) : sgnTable(level, rng, opts)),
+  [TRI]: (level, rng, profile, opts = {}) => (opts.exam ? triExam(rng, opts.exam) : triItem(level, rng, opts)),
+  [INV]: (level, rng, profile, opts = {}) => (opts.exam === 'mcq' ? invMcq(rng) : invItem(opts.exam ? 5 : level, rng, opts)),
   [DOM]: (level, rng, profile, opts = {}) => (opts.exam ? domExam(rng, opts.exam) : domItem(level, rng, opts)),
   [CMP]: (level, rng, profile, opts = {}) => (opts.exam ? cmpExam(rng, opts.exam) : cmpItem(level, rng, opts)),
 };

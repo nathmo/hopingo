@@ -628,3 +628,56 @@ test('action menus (G3): reduce an angle, exact values', () => {
   assert.deepEqual(valid('exact', 'cos((2π)/3+π/4)'), ['add']);
   assert.deepEqual(valid('exact', 'cos((2π)/3)cos(π/4)-sin((2π)/3)sin(π/4)'), ['values']);
 });
+
+// ---------- step U1, part b: module G1 (first half) ----------
+
+test('equiv and solset (G1): the item\'s functions f, g, the target short, the domain of g ∘ f', () => {
+  const defs = { f: 'sqrt(x)', g: '1-x^2' };
+  const cfg = { kind: 'equiv', vars: ['x'], funcs: ['f', 'g'], defs, domain: { x: [0.1, 0.9] }, target: 'short', goal: '1-x' };
+  const PF = (t) => P(t, { vars: ['x'], funcs: ['f', 'g'] });
+  assert.equal(JUDGES.equiv.judgeLine(cfg, PF('g(f(x))'), 'g(√x)').kind, 'ok');
+  assert.equal(JUDGES.equiv.judgeLine(cfg, PF('g(√x)'), '1-(√x)^2').kind, 'ok', 'not short yet');
+  assert.equal(JUDGES.equiv.judgeLine(cfg, PF('1-(√x)^2'), '1-x').kind, 'done');
+  const w = JUDGES.equiv.judgeLine(cfg, PF('g(f(x))'), 'sqrt(1-x^2)');
+  assert.equal(w.kind, 'wrong');
+  assert.equal(w.rule, 'g1_compose_order');
+  const dom = { kind: 'solset', v: 'x', funcs: ['f', 'g'], defs, exprDomain: true, simplified: '1-x' };
+  assert.equal(JUDGES.solset.judgeLine(dom, PF('g(f(x))'), '[0;+∞[').kind, 'done');
+  assert.equal(JUDGES.solset.judgeLine(dom, PF('g(f(x))'), 'ℝ').rule, 'g1_compose_domain');
+});
+
+test('tables (G1): a sign table judged from the student\'s own factor rows', () => {
+  const item = {
+    table: { cols: ['', '−2', '', '1', '', '3', ''], rows: [
+      { id: 'f0', cells: Array(7).fill({ input: true, kind: 'sign' }) },
+      { id: 'f1', cells: Array(7).fill({ input: true, kind: 'sign' }) },
+      { id: 'f2', cells: Array(7).fill({ input: true, kind: 'sign' }) },
+      { id: 'f', cells: Array(7).fill({ input: true, kind: 'sign' }) },
+    ] },
+    judge: { kind: 'iter', phi: { kind: 'signs', v: 'x', bounds: ['-2', '1', '3'], factors: [{ id: 'f0', f: 'x-1' }, { id: 'f1', f: '(x+2)^2', even: true }, { id: 'f2', f: '3-x', den: true }] } },
+  };
+  const right = {
+    f0: ['−', '−', '−', '0', '+', '+', '+'], f1: ['+', '0', '+', '+', '+', '+', '+'], f2: ['+', '+', '+', '+', '+', '0', '−'],
+    f: ['−', '0', '−', '0', '+', '‖', '−'],
+  };
+  assert.equal(checkTable(item, right).ok, true);
+  const badF = { ...right, f: ['−', '0', '−', '0', '+', '0', '−'] };
+  assert.equal(checkTable(item, badF).ok, false, 'a pole marked 0');
+  assert.equal(checkTable(item, badF).cells.f[5], false);
+  const square = { ...right, f1: ['−', '0', '+', '+', '+', '+', '+'] };
+  const r = checkTable(item, square);
+  assert.equal(r.ok, false);
+  assert.equal(r.rule, 'g1_sign_even_root');
+  // The last row follows the student's rows (error carried forward).
+  assert.equal(r.cells.f[0], false, 'f is − with the student\'s rows only if their product says so');
+  assert.equal(checkTable(item, { ...square, f: ['+', '0', '−', '0', '+', '‖', '−'] }).cells.f[0], true);
+});
+
+test('solset (G1): inverse with a parameter y, the branch kept', () => {
+  const cfg = { kind: 'solset', v: 'x', domain: '[1;+∞[', params: { y: '[-1;+∞[' } };
+  const PY = (t) => P(t, { vars: ['x', 'y'] });
+  assert.equal(JUDGES.solset.judgeLine(cfg, PY('x^2-2x=y'), '(x-1)^2=y+1').kind, 'ok');
+  assert.equal(JUDGES.solset.judgeLine(cfg, PY('(x-1)^2=y+1'), 'x=1+sqrt(y+1)∨x=1-sqrt(y+1)').kind, 'ok');
+  assert.equal(JUDGES.solset.judgeLine(cfg, PY('x=1+sqrt(y+1)∨x=1-sqrt(y+1)'), 'x=1+sqrt(y+1)').kind, 'done');
+  assert.equal(JUDGES.solset.judgeLine(cfg, PY('x=1+sqrt(y+1)∨x=1-sqrt(y+1)'), 'x=1-sqrt(y+1)').rule, 'g1_inverse_branch');
+});
