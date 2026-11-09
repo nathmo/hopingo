@@ -72,11 +72,11 @@ function paramSamples(cfg) {
       const q = new Q(k, 2);
       if (S.parts.some((p) => (p.lo.x < q.valueOf() || (p.loC && p.lo.x === q.valueOf())) && (q.valueOf() < p.hi.x || (p.hiC && p.hi.x === q.valueOf())))) vals.push(q);
     }
-    // Spread: whole numbers first, at most 5 values.
+    // Whole numbers first, spread over the set; halves when there are few.
     const ints = vals.filter((q) => q.d === 1);
-    const pick = [...ints, ...vals.filter((q) => q.d !== 1)];
-    const out = [];
-    for (const q of pick) { if (out.length < 5 && !out.some((x) => x.eq(q))) out.push(q); }
+    const spread = (xs, k) => (xs.length <= k ? xs : Array.from({ length: k }, (_, i) => xs[Math.round((i * (xs.length - 1)) / (k - 1))]));
+    const out = spread(ints, 5);
+    for (const q of vals) { if (out.length < 5 && !out.some((x) => x.eq(q))) out.push(q); }
     return out.map((q) => [m, q]);
   });
   // One sample per value of the first parameter, the others cycling.

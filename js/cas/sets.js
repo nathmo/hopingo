@@ -298,7 +298,7 @@ let scanRange = null;
 function numericRoots(f, v) {
   const out = [];
   const [lo, hi] = scanRange ?? [-SCAN, SCAN];
-  const N = Math.max(400, Math.min(SCAN_STEPS, Math.round((hi - lo) / (scanRange ? 0.02 : 0.01))));
+  const N = Math.max(400, Math.min(SCAN_STEPS, Math.round((hi - lo) / (scanRange ? 0.02 : 0.04))));
   const h = (hi - lo) / N;
   const G = compileFloat(f);
   const F = (x) => G({ [v]: x });

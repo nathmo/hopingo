@@ -757,6 +757,8 @@ const DECOYS = (b) => [
   { key: 'circ', html: b.circular, rule: 'g5_induction_circular', why: 'P(n + 1) est ce qu\'on veut montrer : on ne peut pas le supposer. On suppose P(n).' },
   { key: 'base', html: 'L\'hérédité suffit : P(n) est donc vraie pour tout n, sans initialisation.', rule: 'g5_induction_no_base', why: '« n > n + 1 » a une hérédité vraie, mais n\'est vraie pour aucun n. Il faut un point de départ.' },
   { key: 'ex', html: `C'est vrai pour n = ${b.n0}, ${b.n0 + 1} et ${b.n0 + 2}, donc pour tout n.`, rule: 'g9_proof_by_example', why: 'Des exemples ne prouvent pas un « pour tout ».' },
+  // Iterates of x ↦ xᵖ: a power of a power adds the exponents (G2 trap).
+  ...(/^iter\d$/.test(b.id) ? [{ key: 'pow', html: b.wrong, rule: 'g2_power_power', why: '(aᵐ)ᵖ = aᵐ·ᵖ : une puissance de puissance multiplie les exposants.' }] : []),
 ];
 
 // Proofs of g5-induction-frame: the five blocks, the typed calculation.

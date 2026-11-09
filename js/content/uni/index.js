@@ -21,9 +21,8 @@ export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
 
 export const UNBUILT = {
-  // g6-deriv-usual ← g2-real-powers ← pow-rules, root-rules (and g3-radians,
-  // which the derivative exercises of U0 do not use).
-  'g6-deriv-usual': ['pow-rules', 'root-rules'],
+  // g6-deriv-usual (step U2 builds G6) ← g2-real-powers, g3-radians.
+  'g6-deriv-usual': ['g2-real-powers', 'g3-radians'],
   // g1-compose ← g1-domain ← @alg:G-valeurs-interdites = rat-domain.
   'g1-compose': ['rat-domain'],
   // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
