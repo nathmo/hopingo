@@ -20,6 +20,8 @@ import { diagnose } from '../math/diagnose.js';
 import { judgeAnswer, judgeLine, performedOps } from '../math/judge.js';
 import { RULE_BY_ID, FAMILIES } from '../math/malrules.js';
 import { CHECKERS } from '../math/checkers.js';
+import { parseAlg, algHtml, printAlg } from '../math/algebra.js';
+import { judgeEquationLine, nextMove, solveLines, isolatedValue } from '../math/equations.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -146,6 +148,81 @@ MOUNTS.answer = (item, ctx, body) => {
       if (r.diag) return wrongOutcome(item, { ...rulesFromDiag(r.diag), diag: r.diag, answerHtml: M(item.expected) });
       return wrongOutcome(item, { answerHtml: M(item.exact ? `${item.exact[0]}/${item.exact[1]}` : item.expected) });
     },
+  };
+};
+
+// ---------- equations, line by line ----------
+// Each line must keep the same solutions as the equation. At low levels the
+// move to make is shown ("Soustrais 5 des deux côtés"); later it is only
+// a hint. Finished when the unknown is alone: x = 5.
+
+MOUNTS.eqlines = (item, ctx, body) => {
+  const x = item.unknown || 'x';
+  const state = { mistakes: 0, rules: [], revealed: false, lockedUntil: 0 };
+  let last = item.equation;
+  const history = h('div.steps-history', h('div.step-line.first', html(algHtml(item.equation))));
+  const move = h('div.step-label');
+  const input = new MathInput({ keys: 'algeq', placeholder: 'écris l\'équation suivante', onEnter: () => submit() });
+  const row = h('div.step-line.current', h('span.eq', '⇔'), input.display);
+  const feedback = h('div.step-feedback');
+  let hintLevel = 0;
+  const showMove = () => { move.textContent = item.showMoves ? (nextMove(parseAlg(last), x) || '') : ''; };
+  const say = (msg, kind = 'info') => { feedback.className = `step-feedback ${kind}`; feedback.innerHTML = msg; };
+  const tools = h('div.step-tools',
+    h('button.btn.small.ghost', { type: 'button', onclick: () => input.set(last) }, '⧉ Recopier la ligne'),
+    h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }, '💡 Indice'));
+  body.append(history, move, row, tools, feedback);
+  showMove();
+  const addLine = (src, cls, note = '') => {
+    history.appendChild(h(`div.step-line.${cls}`, h('span.eq', '⇔'), html(algHtml(src)), note ? h('span.step-note', note) : null));
+  };
+  const finish = () => {
+    const correct = state.mistakes === 0 && !state.revealed;
+    ctx.complete(correct ? { correct: true } : {
+      ...wrongOutcome(item, { rules: state.rules, answerHtml: algHtml(item.answer) }),
+      softWrong: state.mistakes === 0,
+    });
+  };
+  const hint = () => {
+    const step = solveLines(last, x)[0];
+    if (!step) return;
+    if (hintLevel === 0) { hintLevel = 1; say(`<p><b>Indice :</b> ${step.note}</p>`); return; }
+    state.revealed = true;
+    hintLevel = 0;
+    last = step.math;
+    addLine(step.math, 'shown', step.note);
+    input.set('');
+    showMove();
+    say('<p>Voilà cette étape. À toi pour la suite !</p>');
+    if (isolatedValue(parseAlg(last), x)) finish();
+  };
+  const submit = () => {
+    if (!input.value || Date.now() < state.lockedUntil) return;
+    const r = judgeEquationLine(last, input.value, { x, original: item.equation });
+    if (r.kind === 'parse' || r.kind === 'same') { input.flash(); say(`<p>${r.message}</p>`); return; }
+    if (r.kind === 'wrong') {
+      state.mistakes += 1;
+      if (r.rule) state.rules.push(r.rule);
+      play('bad');
+      const why = r.rule ? explainRule(r.rule, null) : '<p>Cette équation n\'a plus les mêmes solutions. Fais <b>la même opération des deux côtés</b>.</p>';
+      say(why, 'bad');
+      state.lockedUntil = Date.now() + 2500;
+      return;
+    }
+    play('good');
+    last = printAlg(r.node);
+    addLine(last, 'ok');
+    input.set('');
+    feedback.className = 'step-feedback';
+    feedback.innerHTML = '';
+    hintLevel = 0;
+    showMove();
+    if (r.kind === 'done') finish();
+  };
+  return {
+    ownFlow: true,
+    footer: h('div.steps-footer', input.keypad(), h('button.btn.primary.wide', { onclick: submit }, 'Valider la ligne')),
+    onKey: (e) => { if (Date.now() >= state.lockedUntil) input.handleKey(e); },
   };
 };
 

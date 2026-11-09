@@ -255,8 +255,10 @@ textarea.code { width: 100%; font-family: ui-monospace, monospace; font-size: .7
 .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
 .keypad.keys-fracdec { grid-template-columns: repeat(4, 1fr); }
 .keypad.keys-ops, .keypad.keys-opsx { grid-template-columns: repeat(5, 1fr); }
-.keypad.keys-alg, .keypad.keys-algeq { grid-template-columns: repeat(6, 1fr); }
-.keypad .key-x, .keypad .key-a, .keypad .key-b { font-style: italic; font-family: Georgia, 'Times New Roman', serif; }
+.keypad.keys-alg, .keypad.keys-algeq, .keypad.keys-custom { grid-template-columns: repeat(6, 1fr); }
+.keypad.keys-eqset, .keypad.keys-sys { grid-template-columns: repeat(5, 1fr); }
+.system { display: inline-block; border-left: 3px solid var(--violet); padding: 4px 10px; margin: 8px 0; line-height: 1.9; }
+.keypad .key-x, .keypad .key-y, .keypad .key-a, .keypad .key-b { font-style: italic; font-family: Georgia, 'Times New Roman', serif; }
 .keypad.keys-relfrac, .keypad.keys-reldec { grid-template-columns: repeat(4, 1fr); }
 .key-pow { font-size: 1rem; }
 .key-pow sup { font-size: .7em; }

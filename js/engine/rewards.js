@@ -29,6 +29,9 @@ export const BADGES = [
   { id: 'unites', icon: '📏', name: 'Grand convertisseur', desc: 'Maîtrise les grandeurs et les unités.', check: (p) => unitMastered(p, 'unites') },
   { id: 'algebre', icon: '🔤', name: 'Lettres en folie', desc: 'Maîtrise le calcul littéral.', check: (p) => unitMastered(p, 'algebre') },
   { id: 'factorisation', icon: '🧲', name: 'Mise en évidence', desc: 'Maîtrise la factorisation.', check: (p) => unitMastered(p, 'factorisation') },
+  { id: 'equations', icon: '⚖', name: 'Équilibriste', desc: 'Maîtrise les équations.', check: (p) => unitMastered(p, 'equations') },
+  { id: 'formules', icon: '🔧', name: 'Démonteur de formules', desc: 'Maîtrise l\'isolation de variables.', check: (p) => unitMastered(p, 'formules') },
+  { id: 'geometrie', icon: '📐', name: 'Géomètre', desc: 'Maîtrise la géométrie calculée.', check: (p) => unitMastered(p, 'geometrie') },
   { id: 'melanges', icon: '🧩', name: 'Touche-à-tout', desc: 'Maîtrise les calculs mélangés.', check: (p) => unitMastered(p, 'melanges') },
   { id: 'racines', icon: '🌳', name: 'Aux racines', desc: 'Maîtrise toutes les compétences sur les racines carrées.', check: (p) => unitMastered(p, 'racines') },
 ];

@@ -10,8 +10,9 @@ import { GEN as MELANGES } from './melanges.js';
 import { GEN as ARITHMETIQUE } from './arithmetique.js';
 import { GEN as PROPORTION } from './proportion.js';
 import { GEN as ALGEBRE } from './algebre.js';
+import { GEN as EQUATIONS } from './equations.js';
 
-const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE };
+const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS };
 
 // The profile is optional: fact skills use it to pick from the student's
 // fact memory.
@@ -37,6 +38,7 @@ export function describe(item) {
     .replace(/ /g, ' ');
   const lines = [strip(item.prompt)];
   if (item.type === 'steps') lines.push(`  ${text(parse(item.expr))}   [${item.mode}${item.requireIrreducible ? ', irréductible' : ''}] → ${item.answer}`);
+  if (item.type === 'eqlines') lines.push(`  ${item.equation}   [${item.showMoves ? 'coups montrés' : 'lignes libres'}] → ${item.answer}`);
   if (item.type === 'fact') lines.push(`  ${strip(item.left)} [${item.expected}] ${strip(item.right)}`.replace(/\s+\[/, ' [') + (item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''));
   if (item.type === 'answer') lines.push(`  → ${item.expected}${item.form !== 'any' ? ` (${item.form})` : ''}${item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''}`);
   if (item.type === 'mcq') lines.push(`  ${item.options.map((o) => `${o.correct ? '✔' : '·'} ${strip(o.html)}${o.rule ? ` [${o.rule}]` : ''}`).join('   ')}`);

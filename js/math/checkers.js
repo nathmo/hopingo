@@ -4,7 +4,7 @@
 //
 // Result: {kind: 'done'} | {kind: 'stay', message} | {kind: 'wrong', rule?}
 
-import { parseAlg, tryParseAlg, equivalent, isReducedForm, factoredProblem } from './algebra.js';
+import { parseAlg, tryParseAlg, equivalent, isReducedForm, factoredProblem, evalAt, varsIn } from './algebra.js';
 
 const isPrime = (n) => {
   if (n < 2) return false;
@@ -79,4 +79,78 @@ export function checkAlg(item, raw) {
   return { kind: 'done' };
 }
 
-export const CHECKERS = { primes: checkPrimes, surd: checkSurd, rounded: checkRounded, alg: checkAlg };
+// Numbers typed as "x=2;x=-1/3" or "2;-1/3" (the order does not matter).
+function readValues(raw, name) {
+  const parts = String(raw).replace(/\s/g, '').replace(/−/g, '-').split(';').filter(Boolean);
+  const out = [];
+  for (const part of parts) {
+    const node = tryParseAlg(part);
+    if (!node) return null;
+    let v = node;
+    if (node.t === 'eq') {
+      const left = node.l.t === 'var' ? node.l : node.r.t === 'var' ? node.r : null;
+      if (!left || (name && left.name !== name)) return null;
+      v = node.l.t === 'var' ? node.r : node.l;
+    }
+    try { out.push({ name: node.t === 'eq' ? (node.l.t === 'var' ? node.l.name : node.r.name) : null, value: evalAt(v, {}) }); } catch { return null; }
+  }
+  return out;
+}
+const close = (a, b) => Math.abs(a - b) < 1e-6;
+
+// A set of solutions: every value found, none missing, none extra.
+export function checkSolset(item, raw) {
+  const got = readValues(raw, 'x');
+  if (!got) return { kind: 'stay', message: 'Écris les solutions ainsi : x = 2 ; x = −1/3' };
+  const vals = [...new Set(got.map((g) => Math.round(g.value * 1e9) / 1e9))];
+  const want = item.values;
+  const allRight = vals.every((v) => want.some((w) => close(v, w)));
+  if (allRight && vals.length === want.length) return { kind: 'done' };
+  if (allRight && vals.length < want.length) return { kind: 'stay', message: `C'est juste, mais il manque ${want.length - vals.length === 1 ? 'une solution' : 'des solutions'}.` };
+  const trap = (item.setTraps || []).find((t) => vals.some((v) => t.values.some((w) => close(v, w))));
+  return { kind: 'wrong', rule: trap?.rule ?? null };
+}
+
+// A 2×2 system: x = … ; y = … (or the pair in order).
+export function checkSystem(item, raw) {
+  const got = readValues(raw, null);
+  if (!got || got.length !== 2) return { kind: 'stay', message: 'Écris la réponse ainsi : x = 2 ; y = −1' };
+  const byName = Object.fromEntries(got.filter((g) => g.name).map((g) => [g.name, g.value]));
+  const x = byName.x ?? got[0].value;
+  const y = byName.y ?? got[1].value;
+  const [X, Y] = item.pair;
+  if (close(x, X) && close(y, Y)) return { kind: 'done' };
+  // Right for one equation only.
+  const fits = (e) => close(e[0] * x + e[1] * y, e[2]);
+  return { kind: 'wrong', rule: item.eqs.some(fits) ? 'system_one_equation' : null };
+}
+
+// "v = d/t": the variable alone on one side, not on the other, and the
+// same formula as the expected one (checked with random positive values).
+export function checkIsolate(item, raw) {
+  const node = tryParseAlg(raw);
+  if (!node || node.t !== 'eq') return { kind: 'stay', message: `Écris ta réponse ainsi : ${item.variable} = …` };
+  const v = item.variable;
+  const isV = (n) => n.t === 'var' && n.name === v;
+  const other = isV(node.l) ? node.r : isV(node.r) ? node.l : null;
+  if (!other) return { kind: 'stay', message: `Il faut ${v} tout seul d'un côté du « = ».` };
+  if (varsIn(other).has(v)) return { kind: 'stay', message: `${v} est encore des deux côtés : regroupe les termes en ${v}, puis mets ${v} en évidence.` };
+  const same = (a, b) => {
+    const names = [...new Set([...varsIn(a), ...varsIn(b)])];
+    for (let i = 0; i < 4; i++) {
+      const env = Object.fromEntries(names.map((n, j) => [n, 1.3 + ((i * 7 + j * 3) % 11) * 0.73]));
+      let p; let q;
+      try { p = evalAt(a, env); q = evalAt(b, env); } catch { return false; }
+      if (!Number.isFinite(p) || !Number.isFinite(q) || Math.abs(p - q) > 1e-7 * Math.max(1, Math.abs(p))) return false;
+    }
+    return true;
+  };
+  if (same(other, parseAlg(item.target))) return { kind: 'done' };
+  const trap = (item.isoTraps || []).find((t) => same(other, parseAlg(t.expr)));
+  return { kind: 'wrong', rule: trap?.rule ?? null };
+}
+
+export const CHECKERS = {
+  primes: checkPrimes, surd: checkSurd, rounded: checkRounded, alg: checkAlg,
+  solset: checkSolset, system: checkSystem, isolate: checkIsolate,
+};

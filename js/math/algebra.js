@@ -57,7 +57,7 @@ export function parseAlg(src) {
     let n = unary();
     for (;;) {
       const t = peek();
-      if (t?.k === '×' || t?.k === '÷') { p++; n = { t: 'bin', op: t.k, l: n, r: unary() }; } else if (startsFactor(t)) n = { t: 'bin', op: '×', l: n, r: power(), implicit: true };
+      if (t?.k === '×' || t?.k === '÷') { p++; n = { t: 'bin', op: t.k, l: n, r: unary() }; } else if (startsFactor(t)) n = { t: 'bin', op: '×', l: n, r: frac(), implicit: true };
       else return n;
     }
   }

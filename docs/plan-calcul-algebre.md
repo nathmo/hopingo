@@ -342,7 +342,7 @@ Chaque étape est utilisable seule, testée, puis publiée sur GitHub Pages.
 | 2 ✅ | B. Arithmétique (avec √72 = 6√2) et N. Écritures d'un nombre (fait le 9 novembre 2026) | Petite | Peu de changements |
 | 3 ✅ | J. Proportionnalité et pourcentages, K. Grandeurs et unités, avec pieds et pouces (fait le 9 novembre 2026) | Moyenne | Réponses avec unités |
 | 4 ✅ | C. Calcul littéral et D. Factorisation (fait le 9 novembre 2026) | Grande | Lettres, forme normale, clavier, affichage |
-| 5 | E. Équations (avec systèmes 2 × 2), F. Isoler une variable, M. Géométrie calculée | Grande | Lignes d'équation, mode « choisir l'action » |
+| 5 ✅ | E. Équations (avec systèmes 2 × 2), F. Isoler une variable, M. Géométrie calculée (fait le 9 novembre 2026) | Grande | Lignes d'équation ; aux niveaux 1-2 le coup à jouer est affiché au lieu d'être choisi |
 | 6 | L. Fonctions | Moyenne | Repère interactif |
 | 7 | G. Rationnelles, H. 2e degré et I. Synthèse | Grande | Valeurs interdites, ±, comparaison par valeurs |
 

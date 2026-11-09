@@ -41,3 +41,34 @@ test('the algebra checker names traps and asks to finish', () => {
   assert.equal(checkAlg(fac, 'x(x)').rule, 'fac_forget_one');
   assert.equal(checkAlg(fac, 'x^2+x').kind, 'stay');
 });
+
+test('equations: each generated equation is solved by its worked lines', async () => {
+  const { generate } = await import('../js/content/generators.js');
+  const { makeRng } = await import('../js/content/random.js');
+  const { solutionSet, judgeEquationLine } = await import('../js/math/equations.js');
+  const rng = makeRng(11);
+  for (const skill of ['eq-one-step', 'eq-two-step', 'eq-both-sides', 'eq-brackets', 'eq-fractions', 'eq-proportion']) {
+    for (let level = 1; level <= 5; level++) {
+      for (let i = 0; i < 15; i++) {
+        const it = generate(skill, level, rng);
+        const s = solutionSet(P(it.equation));
+        assert.equal(s.kind, 'set', it.key);
+        assert.equal(s.values.length, 1, it.key);
+        assert.ok(Math.abs(s.values[0].n / s.values[0].d - Number(eval(it.answer.slice(2)))) < 1e-9, `${it.key} answer ${it.answer}`);
+        assert.equal(judgeEquationLine(it.equation, it.answer, { original: it.equation }).kind, 'done', `${it.key}: typing the answer finishes`);
+        const last = it.solution[it.solution.length - 1];
+        assert.ok(last, `${it.key} has worked lines`);
+      }
+    }
+  }
+});
+
+test('equation lines: valid moves, named wrong moves', async () => {
+  const { judgeEquationLine } = await import('../js/math/equations.js');
+  assert.equal(judgeEquationLine('5x-3=2x+9', '3x-3=9').kind, 'ok');
+  assert.equal(judgeEquationLine('5x-3=2x+9', '3x=12').kind, 'ok', 'two moves at once are fine');
+  assert.equal(judgeEquationLine('3x+5=20', '3x=25').rule, 'eq_move_no_sign');
+  assert.equal(judgeEquationLine('3x=15', 'x=12').rule, 'eq_inverse_op');
+  assert.equal(judgeEquationLine('2x+6=10', 'x+6=5').rule, 'eq_divide_one_term');
+  assert.equal(judgeEquationLine('3x=15', '3x=15').kind, 'same');
+});

@@ -1012,7 +1012,129 @@ export const RULES = [
     example: ['x² − x − 6 = (x + 3)(x − 2)', 'x² − x − 6 = (x − 3)(x + 2)'],
     explain: () => 'Redéveloppe pour vérifier : (x + 3)(x − 2) = x² + x − 6. Le terme du milieu doit avoir le bon signe : les deux nombres ont une somme égale à b.',
   },
+  // ---------- equations, formulas, geometry (answer rules) ----------
+  {
+    id: 'equals_as_result', family: 'meaning', tag: 'R', skill: 'eq-meaning', repair: 'eq-meaning',
+    name: '« = » lu comme « voici le résultat »',
+    example: ['8 + 4 = … + 5 → 12', '8 + 4 = 7 + 5'],
+    explain: () => 'Le signe = dit que les deux côtés ont la même valeur. 8 + 4 vaut 12, donc il faut … + 5 = 12 : c\'est 7.',
+  },
+  {
+    id: 'eq_move_no_sign', family: 'sign', tag: 'E', skill: 'eq-two-step', repair: 'eq-one-step',
+    name: 'Passer de l\'autre côté sans changer l\'opération',
+    example: ['3x + 5 = 20 → 3x = 25', '3x = 20 − 5 = 15'],
+    explain: () => 'On ne « déplace » pas un terme : on fait <b>la même opération des deux côtés</b>. Pour enlever + 5, on retire 5 des deux côtés : 3x + 5 − 5 = 20 − 5.',
+  },
+  {
+    id: 'eq_inverse_op', family: 'rule', tag: 'R', skill: 'eq-one-step', repair: 'eq-meaning',
+    name: 'Mauvaise opération inverse',
+    example: ['3x = 15 → x = 15 − 3', '3x = 15 → x = 15 ÷ 3 = 5'],
+    explain: () => '3x veut dire 3 × x. Pour défaire une multiplication, on <b>divise</b> les deux côtés par 3 : x = 15 ÷ 3. Vérifie : 3 × 5 = 15.',
+  },
+  {
+    id: 'eq_change_side_sign_mult', family: 'sign', tag: 'E', skill: 'eq-two-step', repair: 'eq-one-step',
+    name: '« Changer de côté, changer de signe » pour un ×',
+    example: ['3x = 15 → x = −15/3', '3x = 15 → x = 5'],
+    explain: () => 'On divise les deux côtés par 3, sans changer de signe : x = 15 ÷ 3 = 5. Le raccourci « on change de signe » ne vaut que pour + et −, et il vaut mieux penser « même opération des deux côtés ».',
+  },
+  {
+    id: 'eq_divide_one_term', family: 'distribute', tag: 'R', skill: 'eq-two-step', repair: 'lit-expand1',
+    name: 'Diviser un seul terme',
+    example: ['2x + 6 = 10 → x + 6 = 5', '2x + 6 = 10 → x + 3 = 5'],
+    explain: () => 'Diviser un côté par 2, c\'est diviser <b>tous</b> ses termes : (2x + 6) ÷ 2 = x + 3. Plus simple : retire d\'abord 6 des deux côtés.',
+  },
+  {
+    id: 'eq_one_side_only', family: 'rule', tag: 'R', skill: 'eq-two-step', repair: 'eq-meaning',
+    name: 'Opérer d\'un seul côté',
+    example: ['x + 5 = 12 → x = 12 + 5', 'x + 5 − 5 = 12 − 5'],
+    explain: () => 'Une équation est une balance : ce qu\'on fait à gauche, on le fait aussi à droite, sinon l\'égalité n\'est plus vraie.',
+  },
+  {
+    id: 'zero_product_misuse', family: 'rule', tag: 'R', skill: 'eq-product', repair: 'eq-product',
+    name: 'Produit nul utilisé quand le produit n\'est pas nul',
+    example: ['(x − 2)(x + 3) = 6 → x = 8 ou x = 3', 'on développe d\'abord'],
+    explain: () => 'La règle « un des facteurs est nul » ne marche que si le produit vaut <b>0</b>. Sinon, on développe, on ramène tout d\'un côté, et on factorise à nouveau.',
+  },
+  {
+    id: 'zero_product_sign', family: 'sign', tag: 'E', skill: 'eq-product', repair: 'eq-one-step',
+    name: 'Solutions avec le mauvais signe',
+    example: ['(x − 2)(x + 3) = 0 → x = −2 ou x = 3', 'x = 2 ou x = −3'],
+    explain: () => 'x − 2 = 0 donne x = 2 (on ajoute 2), et x + 3 = 0 donne x = −3. Vérifie : (2 − 2) × … = 0.',
+  },
+  {
+    id: 'zero_product_forget_zero', family: 'rule', tag: 'E', skill: 'eq-product', repair: 'fac-common',
+    name: 'Oublier la solution x = 0',
+    example: ['x(2x − 6) = 0 → x = 3', 'x = 0 ou x = 3'],
+    explain: () => 'Le facteur x est un facteur comme les autres : x = 0 rend le produit nul. Ne divise pas par x, tu perdrais cette solution.',
+  },
+  {
+    id: 'system_one_equation', family: 'rule', tag: 'E', skill: 'eq-systems', repair: 'eq-two-step',
+    name: 'Vérifier une seule équation',
+    example: ['x + y = 7, x − y = 1 → (5 ; 2)', '(4 ; 3) vérifie les deux'],
+    explain: () => 'La solution d\'un système doit vérifier <b>les deux</b> équations en même temps. Remplace x et y dans chacune.',
+  },
+  {
+    id: 'iso_wrong_inverse', family: 'rule', tag: 'E', skill: 'iso-formula', repair: 'eq-one-step',
+    name: 'Mauvaise opération pour isoler',
+    example: ['d = vt → t = dv', 'd = vt → t = d/v'],
+    explain: () => 'Dans d = vt, t est multiplié par v. On défait la multiplication en <b>divisant</b> les deux côtés par v : t = d/v. Vérifie avec des nombres : 100 = 50 × 2.',
+  },
+  {
+    id: 'iso_sum_invert', family: 'distribute', tag: 'R', skill: 'iso-formula', repair: 'frac-add-any',
+    name: 'Inverser une somme terme à terme',
+    example: ['1/f = 1/a + 1/b → f = a + b', 'f = ab/(a + b)'],
+    explain: () => 'L\'inverse d\'une somme n\'est pas la somme des inverses : 1/2 + 1/2 = 1, mais 2 + 2 ≠ 1. On réduit d\'abord au même dénominateur.',
+  },
+  {
+    id: 'iso_forget_root', family: 'symbol', tag: 'E', skill: 'iso-formula', repair: 'root-squares',
+    name: 'Oublier la racine',
+    example: ['A = πr² → r = A/π', 'r = √(A/π)'],
+    explain: () => 'A/π donne r², pas r. Pour défaire le carré, on prend la racine carrée : r = √(A/π).',
+  },
+  {
+    id: 'iso_var_both_sides', family: 'rule', tag: 'E', skill: 'iso-formula', repair: 'fac-common',
+    name: 'La lettre reste des deux côtés',
+    example: ['ax + b = cx → x = (cx − b)/a', 'x = b/(c − a)'],
+    explain: () => 'Si la lettre est encore à droite, elle n\'est pas isolée. Rassemble les termes en x d\'un côté, puis mets x en évidence : (c − a)x = b.',
+  },
+  {
+    id: 'triangle_forget_half', family: 'rule', tag: 'E', skill: 'geo-area', repair: 'geo-area',
+    name: 'Oublier le ÷ 2 du triangle',
+    example: ['triangle 6 × 4 → 24', '6 × 4 ÷ 2 = 12'],
+    explain: () => 'Un triangle est la moitié d\'un rectangle de même base et même hauteur : A = b × h ÷ 2.',
+  },
+  {
+    id: 'circle_formula_swap', family: 'rule', tag: 'E', skill: 'geo-area', repair: 'geo-area',
+    name: 'Confondre 2πr et πr²',
+    example: ['aire d\'un disque = 2πr', 'aire = πr², périmètre = 2πr'],
+    explain: () => 'L\'aire se mesure en cm² : elle contient un <b>carré</b>, πr². Le périmètre est une longueur : 2πr.',
+  },
+  {
+    id: 'radius_diameter', family: 'meaning', tag: 'E', skill: 'geo-area', repair: 'geo-area',
+    name: 'Confondre rayon et diamètre',
+    example: ['diamètre 10 → A = π × 10²', 'rayon 5 → A = π × 5²'],
+    explain: () => 'Le rayon est la moitié du diamètre. Les formules utilisent le rayon r.',
+  },
+  {
+    id: 'pyramid_forget_third', family: 'rule', tag: 'E', skill: 'geo-volume', repair: 'geo-volume',
+    name: 'Oublier le ÷ 3 de la pyramide',
+    example: ['pyramide : base × h', 'base × h ÷ 3'],
+    explain: () => 'Une pyramide (ou un cône) remplit le tiers du prisme (ou du cylindre) de même base et même hauteur : V = base × h ÷ 3.',
+  },
+  {
+    id: 'pythagore_hypotenuse', family: 'rule', tag: 'E', skill: 'geo-pythagore', repair: 'geo-pythagore',
+    name: 'Mauvais côté pour l\'hypoténuse',
+    example: ['hypoténuse 10, côté 6 → √(10² + 6²)', '√(10² − 6²) = 8'],
+    explain: () => 'L\'hypoténuse est le plus grand côté. Si on la connaît, on <b>soustrait</b> : côté² = hypoténuse² − autre côté².',
+  },
+  {
+    id: 'thales_ratio_mismatch', family: 'rule', tag: 'E', skill: 'geo-thales', repair: 'prop-rule3',
+    name: 'Rapport pris à l\'envers',
+    example: ['grand ÷ petit appliqué au grand côté', 'même rapport dans le même sens'],
+    explain: () => 'Écris les rapports dans le même sens : grand triangle sur petit triangle, pour chaque paire de côtés qui se correspondent.',
+  },
 ];
+
 
 
 

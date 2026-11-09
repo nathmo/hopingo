@@ -13,7 +13,10 @@ export const UNITS = [
   { id: 'racines', title: 'Racines carrées', color: '#1c7ed6', ready: true },
   { id: 'algebre', title: 'Calcul littéral', color: '#9c36b5', ready: true },
   { id: 'factorisation', title: 'Factorisation', color: '#d6336c', ready: true },
+  { id: 'equations', title: 'Équations', color: '#3b5bdb', ready: true },
+  { id: 'formules', title: 'Isoler une variable', color: '#5c940d', ready: true },
   { id: 'unites', title: 'Grandeurs et unités', color: '#e67700', ready: true },
+  { id: 'geometrie', title: 'Géométrie calculée', color: '#a61e4d', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
 ];
 
@@ -901,6 +904,160 @@ const FACTORISATION = [
   },
 ];
 
+// Equations, systems (content/equations.js).
+const EQUATIONS = [
+  {
+    id: 'eq-meaning', unit: 'equations', year: 10, prereqs: ['lit-value'], icon: '=',
+    title: 'Le sens de « = »',
+    desc: 'Les deux côtés ont la même valeur.',
+    intro: {
+      rule: 'Le signe = ne veut pas dire « voici le résultat » : il dit que les deux côtés ont <b>la même valeur</b>.<br>8 + 4 = … + 5 : il faut 7, car 8 + 4 = 12 = 7 + 5.<br>x = 3 est solution de 2x + 1 = 7 si 2 × 3 + 1 donne bien 7.',
+    },
+  },
+  {
+    id: 'eq-one-step', unit: 'equations', year: 10, prereqs: ['eq-meaning'], icon: 'x+a',
+    title: 'Équations en une étape',
+    desc: 'x + 5 = 12, 3x = 12, x/4 = 3.',
+    intro: {
+      rule: 'On fait <b>la même opération des deux côtés</b> pour garder l\'égalité :<br>x + 5 = 12 → on retire 5 des deux côtés → x = 7.<br>3x = 12 → on divise les deux côtés par 3 → x = 4.',
+    },
+  },
+  {
+    id: 'eq-two-step', unit: 'equations', year: 10, prereqs: ['eq-one-step', 'rel-mul'], icon: 'ax+b',
+    title: 'Équations en deux étapes',
+    desc: '3x + 5 = 20.',
+    intro: {
+      rule: 'D\'abord le nombre seul, puis le coefficient :<br>3x + 5 = 20 → −5 des deux côtés → 3x = 15 → ÷3 → <b>x = 5</b>.<br>Écris une ligne par opération.',
+    },
+  },
+  {
+    id: 'eq-both-sides', unit: 'equations', year: 10, prereqs: ['eq-two-step', 'lit-reduce'], icon: 'x=x',
+    title: 'Inconnue des deux côtés',
+    desc: '5x − 3 = 2x + 9.',
+    intro: {
+      rule: 'On rassemble les x d\'un côté : 5x − 3 = 2x + 9 → −2x des deux côtés → 3x − 3 = 9 → +3 → 3x = 12 → <b>x = 4</b>.',
+    },
+  },
+  {
+    id: 'eq-brackets', unit: 'equations', year: 10, prereqs: ['eq-both-sides', 'lit-expand1'], icon: '(…)=',
+    title: 'Équations avec parenthèses',
+    desc: '3(x − 2) = x + 4.',
+    intro: {
+      rule: 'On développe d\'abord : 3(x − 2) = x + 4 → 3x − 6 = x + 4, puis on résout comme d\'habitude : <b>x = 5</b>.',
+    },
+  },
+  {
+    id: 'eq-proportion', unit: 'equations', year: 10, prereqs: ['eq-two-step', 'prop-rule3'], icon: 'a/b=c/d',
+    title: 'Produit en croix',
+    desc: '(x + 1)/3 = 5/2.',
+    intro: {
+      rule: 'Si a/b = c/d, alors <b>a × d = b × c</b>. (x + 1)/3 = 5/2 → 2(x + 1) = 15 → 2x + 2 = 15 → x = 13/2.',
+    },
+  },
+  {
+    id: 'eq-fractions', unit: 'equations', year: 11, prereqs: ['eq-brackets', 'frac-add-any'], icon: 'x/3',
+    title: 'Équations avec fractions',
+    desc: 'x/3 + x/4 = 7.',
+    intro: {
+      rule: 'On multiplie <b>tous</b> les termes par le dénominateur commun : x/3 + x/4 = 7 → ×12 → 4x + 3x = 84 → 7x = 84 → <b>x = 12</b>.',
+    },
+  },
+  {
+    id: 'eq-problems', unit: 'equations', year: 11, prereqs: ['eq-brackets'], icon: '✎=',
+    title: 'Mettre en équation',
+    desc: 'Des mots à l\'équation.',
+    intro: {
+      rule: 'On appelle <b>x</b> ce qu\'on cherche, on traduit l\'énoncé en équation, on la résout, puis on vérifie dans l\'énoncé.<br>« Le triple d\'un nombre augmenté de 7 vaut 34 » → 3x + 7 = 34 → x = 9.',
+    },
+  },
+  {
+    id: 'eq-product', unit: 'equations', year: 11, prereqs: ['fac-common', 'eq-two-step'], icon: 'AB=0',
+    title: 'Équation produit nul',
+    desc: '(x − 2)(3x + 1) = 0.',
+    intro: {
+      rule: 'Un produit est nul si <b>l\'un des facteurs</b> est nul : (x − 2)(3x + 1) = 0 → x − 2 = 0 ou 3x + 1 = 0 → <b>x = 2 ou x = −1/3</b>.<br>Ça ne marche que si le produit vaut 0 !',
+    },
+  },
+  {
+    id: 'eq-systems', unit: 'equations', year: 11, prereqs: ['eq-brackets'], icon: '{',
+    title: 'Systèmes 2 × 2',
+    desc: 'Deux équations, deux inconnues.',
+    intro: {
+      rule: 'x + y = 7 et x − y = 1. On additionne : 2x = 8, donc x = 4, puis y = 3.<br>Ou on isole une lettre et on la remplace dans l\'autre équation (substitution). Vérifie toujours dans les deux.',
+    },
+  },
+];
+
+// Isolating a variable in a formula (content/equations.js).
+const FORMULES = [
+  {
+    id: 'iso-formula', unit: 'formules', year: 11, prereqs: ['eq-brackets', 'lit-expand1'], icon: 'v=d/t',
+    title: 'Isoler une variable',
+    desc: 'De d = v·t à t = d/v, jusqu\'à E = ½mv².',
+    intro: {
+      rule: 'On défait les opérations qui entourent la lettre, <b>dans l\'ordre inverse</b>, en faisant la même chose des deux côtés.<br>d = vt → on divise par v → <b>t = d/v</b>.<br>A = πr² → r² = A/π → <b>r = √(A/π)</b> (une longueur est positive).',
+    },
+  },
+];
+
+// Geometry by formula (content/equations.js).
+const GEOMETRIE = [
+  {
+    id: 'geo-area', unit: 'geometrie', year: 9, prereqs: ['u-area'], icon: '▱',
+    title: 'Aires',
+    desc: 'Triangle, trapèze, disque.',
+    intro: {
+      rule: 'Triangle : A = base × hauteur ÷ 2. Trapèze : A = (B + b) × h ÷ 2.<br>Disque : A = π × r² ; cercle : P = 2 × π × r. Ne confonds pas les deux !',
+      example: [{ math: '6×4÷2', note: '= 12 : triangle de base 6 et de hauteur 4' }],
+    },
+  },
+  {
+    id: 'geo-volume', unit: 'geometrie', year: 9, prereqs: ['geo-area', 'u-volume'], icon: '⬚',
+    title: 'Volumes',
+    desc: 'Prismes, cylindres, pyramides, cônes.',
+    intro: {
+      rule: 'Prisme et cylindre : V = aire de la base × hauteur.<br>Pyramide et cône : le tiers, V = aire de la base × hauteur ÷ 3.',
+      example: [{ math: '3×4×5', note: '= 60 : pavé de 3 × 4 × 5' }],
+    },
+  },
+  {
+    id: 'geo-pythagore', unit: 'geometrie', year: 10, prereqs: ['root-squares', 'geo-area'], icon: 'a²+b²',
+    title: 'Théorème de Pythagore',
+    desc: 'Dans un triangle rectangle : a² + b² = c².',
+    intro: {
+      rule: 'Dans un triangle rectangle, le carré de l\'<b>hypoténuse</b> (le plus grand côté, en face de l\'angle droit) est la somme des carrés des deux autres : c² = a² + b².<br>3, 4 → √(9 + 16) = √25 = 5, et pas 3 + 4 !',
+      example: [{ math: '3^2+4^2', note: '= 25, donc c = 5' }],
+    },
+  },
+  {
+    id: 'geo-scale', unit: 'geometrie', year: 10, prereqs: ['geo-volume', 'prop-detect'], icon: 'k³',
+    title: 'Agrandir et réduire',
+    desc: 'Longueurs × k, aires × k², volumes × k³.',
+    intro: {
+      rule: 'Si toutes les longueurs sont multipliées par k, les aires sont multipliées par <b>k²</b> et les volumes par <b>k³</b>.<br>Doubler les côtés d\'un cube multiplie son volume par 8.',
+      example: [{ math: '2^3', note: '= 8' }],
+    },
+  },
+  {
+    id: 'geo-thales', unit: 'geometrie', year: 11, prereqs: ['prop-rule3', 'geo-pythagore'], icon: '∥',
+    title: 'Thalès et figures semblables',
+    desc: 'Des rapports égaux.',
+    intro: {
+      rule: 'Dans deux triangles semblables (ou avec des droites parallèles, Thalès), les côtés qui se correspondent sont <b>proportionnels</b> : on trouve le rapport k, puis on multiplie.',
+      example: [{ math: '6÷3', note: '= 2 : rapport d\'agrandissement' }],
+    },
+  },
+  {
+    id: 'geo-missing', unit: 'geometrie', year: 11, prereqs: ['geo-volume', 'iso-formula'], icon: '?',
+    title: 'Longueur manquante',
+    desc: 'Retrouver une longueur à partir d\'une aire ou d\'un volume.',
+    intro: {
+      rule: 'On part de la formule, on isole la longueur cherchée, puis on calcule.<br>Disque d\'aire 50 cm² : A = πr² → r = √(A/π) = √(50/π) ≈ 4,0 cm.',
+      example: [{ math: '50÷3,1416', note: '≈ 15,9 = r²' }],
+    },
+  },
+];
+
 // Calculations that mix the chapters above (content/melanges.js).
 const MELANGES = [
   {
@@ -933,7 +1090,7 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...MELANGES];
+const ALL = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...GEOMETRIE, ...MELANGES];
 
 // The global path: by school year, then unit, then map order.
 export const SKILLS = ALL

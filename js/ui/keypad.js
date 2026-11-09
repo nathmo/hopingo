@@ -19,6 +19,8 @@ const KEYSETS = {
   surd: ['7', '8', '9', '4', '5', '6', '1', '2', '3', '√', '0', 'back'],
   // Algebra: letters, brackets, powers, = for equations.
   alg: ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', 'a', 'left', '0', 'right', 'back', ',', 'b'],
+  eqset: ['7', '8', '9', 'x', '=', '4', '5', '6', '-', ';', '1', '2', '3', 'frac', ',', 'left', '0', 'right', 'back', ''],
+  sys: ['7', '8', '9', 'x', 'y', '4', '5', '6', '=', ';', '1', '2', '3', '-', 'frac', 'left', '0', 'right', 'back', ''],
   algeq: ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', '=', 'left', '0', 'right', 'back', ',', '√'],
   // Free lines with powers and roots.
   opsx: ['7', '8', '9', 'frac', '+', '4', '5', '6', '(', '-', '1', '2', '3', ')', '×', '^', '0', '√', ',', '÷', '', 'left', 'right', 'back', ''],
@@ -48,6 +50,9 @@ export class MathInput {
 
   get value() { return this.chars.join(''); }
 
+  // A named keyset, or a list of keys given by the question (letters of a formula).
+  get keyList() { return Array.isArray(this.keys) ? this.keys : KEYSETS[this.keys]; }
+
   set(str) {
     this.chars = [...String(str).replace(/−/g, '-')];
     this.caret = this.chars.length;
@@ -66,11 +71,11 @@ export class MathInput {
       // start another fraction.
       let j = this.caret - 1;
       while (j >= 0 && /[0-9,]/.test(this.chars[j])) j--;
-      if (!/[0-9)a-z]/.test(prev ?? '') || this.chars[j] === '/') { this.flash(); return; }
+      if (!/[0-9)a-zA-Zπ]/.test(prev ?? '') || this.chars[j] === '/') { this.flash(); return; }
       this.insert('/');
     } else if (k === '^') {
       // An exponent needs something to raise, and only one at a time.
-      if (!/[0-9)a-z]/.test(prev ?? '') || this.chars.slice(0, this.caret).join('').match(/\^-?\d*$/)) { this.flash(); return; }
+      if (!/[0-9)a-zA-Zπ]/.test(prev ?? '') || this.chars.slice(0, this.caret).join('').match(/\^-?\d*$/)) { this.flash(); return; }
       this.insert('^');
     } else if (k) this.insert(k);
     play('tap');
@@ -91,14 +96,14 @@ export class MathInput {
 
   // Keyboard: digits, / + - * x : ( ) , . ^ r (root) ² Backspace, arrows, Enter.
   handleKey(e) {
-    const allowed = new Set(KEYSETS[this.keys]);
-    const letters = allowed.has('x');
+    const allowed = new Set(this.keyList);
+    const letters = [...allowed].some((k) => /^[a-zA-Zπ]$/.test(k));
     const map = { '*': '×', ':': '÷', '/': 'frac', '.': ',', Backspace: 'back', ArrowLeft: 'left', ArrowRight: 'right', Enter: 'enter' };
     // Without letters on the keypad, x means × and r or v mean √.
     if (!letters) Object.assign(map, { x: '×', r: '√', v: '√' });
     let k = map[e.key] ?? e.key;
     // With letters, any letter of the alphabet can be typed.
-    if (letters && /^[a-z]$/.test(k)) { e.preventDefault(); this.press(k); return; }
+    if (letters && /^[a-zA-Z]$/.test(k)) { e.preventDefault(); this.press(k); return; }
     allowed.add('enter'); allowed.add('back'); allowed.add('left'); allowed.add('right');
     if (k === '÷' && !allowed.has('÷')) k = null;
     if (k === '²' && allowed.has('^')) {
@@ -118,8 +123,8 @@ export class MathInput {
   }
 
   keypad() {
-    const pad = h(`div.keypad.keys-${this.keys}`);
-    for (const k of KEYSETS[this.keys]) {
+    const pad = h(`div.keypad.keys-${Array.isArray(this.keys) ? 'custom' : this.keys}`);
+    for (const k of this.keyList) {
       if (!k) { pad.appendChild(h('span')); continue; }
       const cls = /^[0-9]$/.test(k) ? 'key' : `key key-fn key-${k === '-' ? 'minus' : k.replace(/[^a-z]/g, '') || 'op'}`;
       pad.appendChild(h('button', { class: cls, type: 'button', onclick: () => this.press(k), html: LABEL[k] ?? esc(k) }));
@@ -183,7 +188,7 @@ export function renderChars(chars, caret) {
       i = k;
       continue;
     }
-    if (/[a-z]/.test(c)) {
+    if (/[a-zA-Zπ]/.test(c)) {
       out += `${gap(i)}<i class="m-var" data-i="${i}">${c}</i>`;
       i++;
       continue;
