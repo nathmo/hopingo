@@ -12,9 +12,16 @@ import { RULE_BY_ID, FAMILIES } from '../js/math/malrules.js';
 import { SKILL_BY_ID } from '../js/content/skills.js';
 import { parse } from '../js/cas/parse.js';
 import { toText } from '../js/cas/print.js';
+import { readWith } from '../js/judges/index.js';
+import { checkCounter, judgeTf } from '../js/judges/examples.js';
+import { judgeTokens } from '../js/judges/logic.js';
+import { placeBlock, checkBlocks } from '../js/judges/blocks.js';
+import { checkTable } from '../js/judges/iter.js';
+import { generate } from '../js/content/generators.js';
+import { makeRng } from '../js/content/random.js';
 
 const EQ = { kind: 'equiv', vars: ['x'], dvar: 'x', target: 'no-prime', domain: { x: [-2.5, 2.5] }, seed: 1 };
-const P = (s) => parse(s);
+const P = (s, o) => parse(s, o);
 
 test('equiv: right, wrong, unfinished, final, same, unreadable', () => {
   const j = JUDGES.equiv;
@@ -61,6 +68,9 @@ test('every university trap names its own example, and explains itself', () => {
     assert.ok(FAMILIES[r.family], `${r.id}: family ${r.family}`);
     assert.ok(SKILL_BY_ID[r.skill] && SKILL_BY_ID[r.repair], `${r.id}: skills exist`);
     assert.match(r.id, /^[a-z0-9]+_/);
+    assert.ok(r.explain().length > 20, `${r.id}: general explanation`);
+    if (r.check) { checkTrap(r); continue; }
+    // Step U0 traps: example[0] is « start = wrong line » for the equiv judge.
     const rel = P(r.example[0]);
     assert.equal(rel.t, 'rel', `${r.id}: example[0] is « start = wrong line »`);
     for (const kind of r.judges) {
@@ -71,9 +81,35 @@ test('every university trap names its own example, and explains itself', () => {
     }
     const right = P(r.example[1]);
     assert.notEqual(JUDGES.equiv.judgeLine(EQ, right.l, right.r).kind, 'wrong', `${r.id}: example[1] is right`);
-    assert.ok(r.explain().length > 20, `${r.id}: general explanation`);
   }
 });
+
+// Step U1 traps say how their example[0] is replayed (js/cas/rules/g9.js):
+// a wrong line diagnosed as the trap, a counter-example it names, or a
+// bait offered by the items of its skill (decoy blocks, options).
+function checkTrap(r) {
+  const c = r.check;
+  if (c.judge) {
+    const prev = readWith(c.judge, c.prev);
+    const v = JUDGES[c.judge.kind].judgeLine(c.judge, prev, c.line);
+    assert.equal(v.kind, 'wrong', `${r.id}: example is wrong`);
+    assert.equal(v.rule, r.id, `${r.id}: diagnosed as ${v.diag?.all}`);
+    assert.ok(r.explain(v.diag.ctx).length > 20, r.id);
+    assert.ok(r.judges.includes(c.judge.kind), `${r.id}: judge ${c.judge.kind} listed`);
+  } else if (c.counter) {
+    const v = checkCounter(c.counter, c.answers);
+    assert.equal(v.ok, false, r.id);
+    assert.equal(v.rule, r.id, r.id);
+  } else if (c.bait) {
+    const rng = makeRng(3);
+    let found = false;
+    for (let i = 0; i < 40 && !found; i++) {
+      const it = generate(c.bait.skill, c.bait.level ?? 4, rng, null, c.bait.exam ? { exam: c.bait.exam } : undefined);
+      found = it.baits.includes(r.id);
+    }
+    assert.ok(found, `${r.id}: offered as a bait by ${c.bait.skill}`);
+  } else assert.fail(`${r.id}: check`);
+}
 
 test('a wrong line inside a longer derivation is still diagnosed', () => {
   const j = JUDGES.equiv;
@@ -158,4 +194,157 @@ test('lines: guided blanks, reveal, decisions', () => {
   const r = run.reveal();
   assert.ok(r.finished);
   assert.equal(run.outcome().correct, false);
+});
+
+// ---------- step U1: solset, logic, poly, tables, blocks, tokens ----------
+
+test('solset: same set, wrong set with a witness, final form', () => {
+  const j = JUDGES.solset;
+  const cfg = { kind: 'solset', v: 'x', domain: 'R' };
+  const prev = P('|x-1|<3 ∧ x≥0');
+  assert.equal(j.judgeLine(cfg, prev, '-3<x-1<3 ∧ x≥0').kind, 'ok');
+  assert.equal(j.judgeLine(cfg, prev, ']-2;4[∩[0;+∞[').kind, 'ok');
+  assert.equal(j.judgeLine(cfg, prev, '[0;4[').kind, 'done');
+  const w = j.judgeLine(cfg, prev, ']0;4[');
+  assert.equal(w.kind, 'wrong');
+  assert.match(w.message, /x = 0/);
+  assert.equal(w.rule, 'g9_bracket');
+  assert.equal(j.judgeLine(cfg, P('x<-1 ∨ x>2'), ']2;+∞[∪]-∞;-1[').kind, 'stay', 'not sorted');
+  assert.equal(j.judgeLine(cfg, P('x≥1'), '[1;+∞]').kind, 'stay', '∞ is never included');
+  assert.equal(j.judgeLine(cfg, prev, 'y<2').kind, 'parse', 'unknown letter');
+  // Integers, set-builder notation, named sets.
+  const n = { kind: 'solset', v: 'n', domain: 'N', sets: { A: '{0;1;2;3;4;5}', B: '{2k|k∈ℕ}' } };
+  assert.equal(j.judgeLine(n, P('{n∈ℕ|2n+1<12}'), '{0;1;2;3;4;5}').kind, 'done');
+  assert.equal(j.judgeLine(n, P('A∖B'), '{1;3;5}').kind, 'done');
+  assert.equal(j.judgeLine(n, P('A∖B'), '{1;3}').kind, 'wrong');
+  // A parameter: λ = 2 is final.
+  const l = { kind: 'solset', v: 'λ' };
+  assert.equal(j.judgeLine(l, P('λ^2-3λ+2=0'), 'λ∈{1;2}').kind, 'done');
+  assert.equal(j.judgeLine(l, P('{1;2}∩{2;3}'), 'λ=2').kind, 'done');
+});
+
+test('logic: equivalent formulas, a typical wrong line, the final form', () => {
+  const j = JUDGES.logic;
+  const pq = { kind: 'logic', letters: ['P', 'Q'], maxSize: 3 };
+  const prev = j.parseLine(pq, '¬(P∧¬Q)');
+  assert.equal(j.judgeLine(pq, prev, '¬P∨¬¬Q').kind, 'ok');
+  assert.equal(j.judgeLine(pq, prev, '¬P∨Q').kind, 'ok', 'right, but longer than P ⇒ Q');
+  assert.equal(j.judgeLine(pq, prev, 'P⇒Q').kind, 'done');
+  const w = j.judgeLine(pq, prev, '¬P∧Q');
+  assert.equal(w.kind, 'wrong');
+  assert.equal(w.rule, 'g9_demorgan');
+  assert.equal(j.judgeLine(pq, prev, 'P⇒').kind, 'parse');
+  // Quantifiers with restrictions, atoms negated by the table.
+  const cfg = { kind: 'logic', pieces: [{ text: 'ε > 0' }, { text: 'N ∈ ℕ' }, { text: 'n ≥ N' }, { text: '|u_n − L| < ε' }] };
+  const neg = j.parseLine(cfg, '¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − L| < ε)');
+  assert.equal(j.judgeLine(cfg, neg, '∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n − L| < ε)').kind, 'ok');
+  assert.equal(j.judgeLine(cfg, neg, '∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, ¬(|u_n − L| < ε)').kind, 'stay', 'negate the atom by the table');
+  assert.equal(j.judgeLine(cfg, neg, '∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n − L| ≥ ε').kind, 'done');
+  assert.equal(j.judgeLine(cfg, neg, '∃ε > 0 ∃N ∈ ℕ ∃n ≥ N, |u_n − L| ≥ ε').rule, 'g9_neg_one_quant');
+});
+
+test('poly: same polynomial, Euclidean division, identification, final forms', () => {
+  const j = JUDGES.poly;
+  const f = { kind: 'poly', v: 'x', target: 'factored-R' };
+  const prev = P('x^3-2x^2-5x+6');
+  assert.equal(j.judgeLine(f, prev, '(x-1)(x^2-x-6)').kind, 'ok');
+  assert.equal(j.judgeLine(f, prev, '(x-1)(x-3)(x+2)').kind, 'done');
+  assert.equal(j.judgeLine(f, prev, '(x-1)(x-3)(x-2)').kind, 'wrong');
+  assert.equal(j.judgeLine(f, P('x^4-x^3-x+1'), '(x-1)(x-1)(x^2+x+1)').kind, 'stay', 'equal factors grouped');
+  assert.equal(j.judgeLine(f, P('x^2+4'), '(x-2)(x+2)').rule, 'g0_irred_split');
+  // Division A = BQ + R.
+  const d = {
+    kind: 'poly', mode: 'div', v: 'x', dividend: '2x^4+x^3-3x+1', divisor: 'x^2+x-1',
+    names: { A: '2x^4+x^3-3x+1', B: 'x^2+x-1' }, divisorName: 'B',
+  };
+  const a = P('A=2x^4+x^3-3x+1');
+  assert.equal(j.judgeLine(d, a, 'A=B×2x^2+(-x^3+2x^2-3x+1)').kind, 'ok', 'deg R ≥ deg B: go on');
+  assert.equal(j.judgeLine(d, a, 'A=B×(2x^2-x+3)+(-7x+4)').kind, 'done');
+  assert.equal(j.judgeLine(d, a, 'A=(x^2+x-1)(2x^2-x+3)-7x+4').kind, 'done', 'B written out');
+  assert.equal(j.judgeLine(d, a, 'A=B×2x^2+(-x^3-2x^2-3x+1)').rule, 'g0_div_subtract');
+  // Identification of coefficients.
+  const id = { kind: 'poly', mode: 'identity', v: 'x', params: ['a', 'b', 'c'], solution: { a: '2', b: '1', c: '-1' } };
+  const s = P('(x-2)(ax^2+bx+c)=2x^3-3x^2-3x+2', { vars: ['x', 'a', 'b', 'c'] });
+  assert.equal(j.judgeLine(id, s, 'ax^3+(b-2a)x^2+(c-2b)x-2c=2x^3-3x^2-3x+2').kind, 'ok');
+  assert.equal(j.judgeLine(id, s, 'a=2;b-2a=-3;c-2b=-3;-2c=2').kind, 'ok');
+  assert.equal(j.judgeLine(id, s, 'a=2;b=1;c=-1').kind, 'done');
+  assert.equal(j.judgeLine(id, s, 'a=2;b=1').kind, 'stay', 'c is not fixed');
+  assert.equal(j.judgeLine(id, s, 'a=2;b=-1;c=1').kind, 'wrong');
+  // Complex coefficients; the gcd made monic.
+  const c = { kind: 'poly', v: 'x', complex: true, target: 'factored-C' };
+  assert.equal(j.judgeLine(c, P('x^2+4'), '(x-2i)(x+2i)').kind, 'done');
+  const m = { kind: 'poly', mode: 'monic', v: 'x', target: 'monic' };
+  assert.equal(j.judgeLine(m, P('-x^2+3x-2'), 'x^2-3x+2').kind, 'done');
+  assert.equal(j.judgeLine(m, P('-x^2+3x-2'), 'x^2-3x+1').kind, 'wrong');
+});
+
+test('value: an asked number (expect) and the module traps', () => {
+  const j = JUDGES.value;
+  const cfg = { kind: 'value', expect: '3', coverup: { num: 'x+7', den: 'x+1', at: 2 } };
+  assert.equal(j.judgeLine(cfg, P('A'), '(2+7)/(2+1)').kind, 'ok');
+  assert.equal(j.judgeLine(cfg, P('A'), '3').kind, 'done');
+  assert.equal(j.judgeLine(cfg, P('A'), '-5').rule, 'g0_coverup_sign');
+});
+
+test("tables: Horner and truth tables judged from the student's own cells", () => {
+  const item = {
+    table: {
+      cols: ['x³', 'x²', 'x', '1'], root: { input: true },
+      rows: [
+        { id: 'coef', cells: [{ given: '1' }, { given: '0' }, { given: '-3' }, { given: '2' }] },
+        { id: 'prod', cells: [null, { input: true }, { input: true }, { input: true }] },
+        { id: 'b', cells: [{ input: true }, { input: true }, { input: true }, { input: true }] },
+      ],
+    },
+    judge: { kind: 'iter', phi: { kind: 'horner', root: '1', coeffs: ['1', '0', '-3', '2'] } },
+  };
+  const right = { root: '1', prod: [null, '1', '1', '-2'], b: ['1', '1', '-2', '0'] };
+  assert.ok(checkTable(item, right).ok);
+  const wrong = checkTable(item, { ...right, b: ['1', '1', '-1', '0'] });
+  assert.equal(wrong.ok, false);
+  assert.deepEqual(wrong.cells.b, [true, true, false, true], "the next cell is judged from the student's cell");
+  assert.equal(wrong.cells.prod[3], false, "a·b₂ uses the student's b₂");
+  assert.equal(checkTable(item, { ...right, root: '-1' }).rule, 'g0_horner_sign');
+  const truth = {
+    table: { cols: ['P', 'Q', 'P ⇒ Q'], rows: [{ id: 'r', env: { P: true, Q: false }, cells: [{ given: 'V' }, { given: 'F' }, { input: true, kind: 'tf' }] }] },
+    judge: { kind: 'iter', phi: { kind: 'truth', letters: ['P', 'Q'], columns: [null, null, 'P⇒Q'] } },
+  };
+  assert.ok(checkTable(truth, { r: [null, null, 'F'] }).ok);
+  assert.equal(checkTable(truth, { r: [null, null, 'V'] }).ok, false);
+});
+
+test('blocks, tokens and true/false with a counter-example', () => {
+  const rng = makeRng(2);
+  const b = generate('g9-proof-contra', 4, rng);
+  assert.ok(checkBlocks(b).ok);
+  const [first, second] = b.order;
+  assert.equal(placeBlock(b, [], second).kind, 'early', 'a block before the one it needs');
+  assert.equal(placeBlock(b, [], first).kind, 'ok');
+  const decoy = b.blocks.find((x) => x.distractor);
+  assert.equal(placeBlock(b, [first], decoy.id).rule, decoy.distractor);
+  const withInput = b.blocks.find((x) => x.input);
+  if (withInput) {
+    const placed = b.order.slice(0, b.order.indexOf(withInput.id));
+    assert.equal(placeBlock(b, placed, withInput.id).kind, 'input');
+    assert.equal(placeBlock(b, placed, withInput.id, withInput.input.answer).kind, 'ok');
+    assert.equal(placeBlock(b, placed, withInput.id, '1').kind, 'wrong');
+  }
+  for (let i = 0; i < 10; i++) {
+    const t = generate('g9-implication', 3, rng);
+    assert.equal(judgeTokens(t, t.answer).kind, 'done');
+    if (t.task === 'contra') assert.equal(judgeTokens(t, t.start).kind, 'stay', 'equivalent, but not the contrapositive');
+  }
+  const tf = { truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x^2≥x' }, ruleIfTrue: 'g9_proof_by_example' };
+  assert.equal(judgeTf(tf, true).rule, 'g9_proof_by_example');
+  assert.equal(judgeTf(tf, false, { x: '1/2' }).correct, true);
+  assert.equal(judgeTf(tf, false, { x: '2' }).correct, false);
+});
+
+test('the parser reads sets, chains of inequalities and connectives', () => {
+  for (const s of [']-2;4[∩[0;+∞[', '{n∈ℕ|2n+1<12}', '{3n+1|n∈ℕ∧n≤3}', '-3<x-1<3∧x≥0', '¬(-1≤x<3)', 'a=2;b-2a=-3', 'ℝ∖]0;1]', 'λ∈{1;2}']) {
+    const n = P(s);
+    assert.equal(toText(P(toText(n))), toText(n), s);
+  }
+  assert.equal(P('x<1 et x>0').t, 'logic', '« et » is ∧');
+  assert.throws(() => P(']1;2'), /Ferme/);
 });

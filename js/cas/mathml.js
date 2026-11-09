@@ -8,7 +8,7 @@
 // Explicit × shows as ·, a number before a letter as an invisible product,
 // derivatives as (…)′.
 
-import { prec, toReadable } from './print.js';
+import { prec, toReadable, PREC, LOGIC_SYMBOL } from './print.js';
 import { getAt } from './ast.js';
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -17,6 +17,7 @@ const row = (...xs) => `<mrow>${xs.join('')}</mrow>`;
 const paren = (s) => row(mo('(', ' stretchy="false"'), s, mo(')', ' stretchy="false"'));
 const CONSTS = { pi: '<mi>π</mi>', e: '<mi>e</mi>', i: '<mi>i</mi>', inf: '<mi mathvariant="normal">∞</mi>' };
 const FN_NAMES = { Log: 'Log', log: 'log', ln: 'ln' };
+const REL = { '=': '=', '<': '&lt;', '>': '&gt;', '≤': '≤', '≥': '≥', '≠': '≠' };
 
 function startsWithNumber(n) {
   if (n.t === 'num' || n.t === 'float') return true;
@@ -90,6 +91,28 @@ export function toMathML(node, opts = {}) {
       case 'rel': {
         const op = { '=': '=', '<': '&lt;', '>': '&gt;', '≤': '≤', '≥': '≥', '≠': '≠' }[n.op];
         return row(M(n.l), mo(op), M(n.r));
+      }
+      case 'chain': return row(...n.items.map((x, i) => (i ? mo(REL[n.ops[i - 1]]) + M(x) : M(x))));
+      case 'in': return row(M(n.l), mo(n.op), M(n.r));
+      case 'list': return row(...n.items.map((x, i) => (i ? mo(';', ' separator="true"') + '<mspace width="0.5em"/>' + M(x) : M(x))));
+      case 'not': return row(mo('¬'), prec(n.e) < PREC.sum ? paren(M(n.e)) : M(n.e));
+      case 'logic': case 'setop': {
+        const me = prec(n);
+        const right = n.t === 'logic' && (n.op === 'imp' || n.op === 'iff');
+        const l = prec(n.l) < me || (right && prec(n.l) === me) ? paren(M(n.l)) : M(n.l);
+        const r = prec(n.r) < me || (!right && prec(n.r) === me) ? paren(M(n.r)) : M(n.r);
+        return row(l, mo(n.t === 'logic' ? LOGIC_SYMBOL[n.op] : n.op), r);
+      }
+      case 'set': {
+        const fence = (s) => mo(s, ' stretchy="false"');
+        if (n.kind === 'named') return `<mi mathvariant="normal">${n.name}</mi>`;
+        const B = (b) => (b.t === 'const' && b.name === 'inf' ? row(mo('+'), M(b)) : M(b));
+        if (n.kind === 'interval') return row(fence(n.loOpen ? ']' : '['), B(n.lo), mo(';'), B(n.hi), fence(n.hiOpen ? '[' : ']'));
+        if (n.kind === 'finite') {
+          if (!n.items.length) return row(fence('{'), fence('}'));
+          return row(fence('{'), ...n.items.map((x, i) => (i ? mo(';') + M(x) : M(x))), fence('}'));
+        }
+        return row(fence('{'), M(n.head), mo('|'), M(n.cond), fence('}'));
       }
       default: return `<mtext>${esc(n.t)}</mtext>`;
     }

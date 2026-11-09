@@ -12,6 +12,15 @@
 //   {t:'deriv', e, v, n}         nth derivative of e with respect to v
 //   {t:'rel', op, l, r}          = < ≤ > ≥ ≠
 //   {t:'blank', id}              a hole in a guided line (display only)
+// Sets and conditions (step U1, js/cas/sets.js):
+//   {t:'set', kind:'interval', lo, hi, loOpen, hiOpen}   ]a ; b]
+//   {t:'set', kind:'finite', items}                       {1 ; 2 ; 3}
+//   {t:'set', kind:'named', name}                         ℝ ℕ ℤ ℚ ℂ ∅
+//   {t:'set', kind:'builder', head, cond}                 {n ∈ ℕ | 2n + 1 < 12}, {3n + 1 | n ≤ 3}
+//   {t:'setop', op:'∪'|'∩'|'∖', l, r}   {t:'in', op:'∈'|'∉', l, r}
+//   {t:'chain', items, ops}      −2 < x ≤ 4 (inequalities in one direction)
+//   {t:'not', e}  {t:'logic', op:'and'|'or'|'imp'|'iff', l, r}   ¬ ∧ ∨ ⇒ ⇔
+//   {t:'list', items}            a = 2 ; b = 1 (a system, or several answers)
 // Parsed trees keep `paren` nodes; trees built by the constructors below
 // have none, and printers add brackets where precedence needs them.
 
@@ -20,11 +29,21 @@ import { Q } from '../math/rational.js';
 const CHILD_KEYS = {
   neg: ['e'], paren: ['e'], bin: ['l', 'r'], frac: ['n', 'd'], pow: ['b', 'e'], sqrt: ['e'],
   root: ['n', 'e'], abs: ['e'], deriv: ['e'], rel: ['l', 'r'],
+  not: ['e'], logic: ['l', 'r'], setop: ['l', 'r'], in: ['l', 'r'],
 };
+// Nodes whose children are a list: key → field.
+const LIST_KEY = { chain: 'items', list: 'items' };
 
 // The children of a node as [key, child] pairs ('args.0' for function arguments).
 export function children(node) {
   if (node.t === 'fn') return node.args.map((a, i) => [`args.${i}`, a]);
+  if (LIST_KEY[node.t]) return node.items.map((a, i) => [`items.${i}`, a]);
+  if (node.t === 'set') {
+    if (node.kind === 'interval') return [['lo', node.lo], ['hi', node.hi]];
+    if (node.kind === 'finite') return node.items.map((a, i) => [`items.${i}`, a]);
+    if (node.kind === 'builder') return [['head', node.head], ['cond', node.cond]];
+    return [];
+  }
   const out = [];
   for (const k of CHILD_KEYS[node.t] || []) out.push([k, node[k]]);
   if (node.t === 'sym' && node.sub && typeof node.sub === 'object') out.push(['sub', node.sub]);
@@ -32,10 +51,12 @@ export function children(node) {
 }
 
 const setChild = (node, key, child) => {
-  if (key.startsWith('args.')) {
-    const args = [...node.args];
-    args[Number(key.slice(5))] = child;
-    return { ...node, args };
+  const dot = key.indexOf('.');
+  if (dot > 0) {
+    const field = key.slice(0, dot);
+    const list = [...node[field]];
+    list[Number(key.slice(dot + 1))] = child;
+    return { ...node, [field]: list };
   }
   return { ...node, [key]: child };
 };
@@ -48,7 +69,10 @@ export function walk(node, fn, path = []) {
 }
 
 export function getAt(node, path) {
-  return path.reduce((n, k) => (k.startsWith('args.') ? n.args[Number(k.slice(5))] : n[k]), node);
+  return path.reduce((n, k) => {
+    const dot = k.indexOf('.');
+    return dot > 0 ? n[k.slice(0, dot)][Number(k.slice(dot + 1))] : n[k];
+  }, node);
 }
 
 export function replaceAt(node, path, repl) {
@@ -105,7 +129,11 @@ export function equalsStructural(a, b, { parens = true } = {}) {
       if (!a.sub) return true;
       if (typeof a.sub !== 'object' || typeof b.sub !== 'object') return a.sub === b.sub;
       return equalsStructural(a.sub, b.sub, { parens });
-    case 'bin': case 'rel': if (a.op !== b.op) return false; break;
+    case 'bin': case 'rel': case 'logic': case 'setop': case 'in': if (a.op !== b.op) return false; break;
+    case 'chain': if (a.ops.join() !== b.ops.join()) return false; break;
+    case 'set':
+      if (a.kind !== b.kind || a.name !== b.name || a.loOpen !== b.loOpen || a.hiOpen !== b.hiOpen) return false;
+      break;
     case 'fn': if (a.name !== b.name || a.args.length !== b.args.length) return false; break;
     case 'deriv': if (a.v !== b.v || a.n !== b.n) return false; break;
     case 'blank': return a.id === b.id;

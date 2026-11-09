@@ -3,11 +3,18 @@
 // constructors, which have no brackets of their own). toReadable gives a
 // display text: x², ·, −, ′ (for review files and short messages).
 
-const PREC = { rel: 0, sum: 1, prod: 2, neg: 3, frac: 4, pow: 5, atom: 6 };
+const PREC = {
+  list: -5, imp: -4, or: -3, and: -2, not: -1, rel: 0, union: 0.3, inter: 0.6, sum: 1, prod: 2, neg: 3, frac: 4, pow: 5, atom: 6,
+};
+export { PREC };
 
 export function prec(n) {
   switch (n.t) {
-    case 'rel': return PREC.rel;
+    case 'list': return PREC.list;
+    case 'logic': return n.op === 'and' ? PREC.and : n.op === 'or' ? PREC.or : PREC.imp;
+    case 'not': return PREC.not;
+    case 'rel': case 'chain': case 'in': return PREC.rel;
+    case 'setop': return n.op === '∪' ? PREC.union : PREC.inter;
     case 'bin': return n.op === '+' || n.op === '-' ? PREC.sum : PREC.prod;
     case 'neg': return PREC.neg;
     case 'frac': return PREC.frac;
@@ -19,6 +26,7 @@ export function prec(n) {
 
 const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹', '-': '⁻' };
 const CONST_TEXT = { pi: 'π', e: 'e', i: 'i', inf: '∞' };
+export const LOGIC_SYMBOL = { and: '∧', or: '∨', imp: '⇒', iff: '⇔' };
 
 // Can this right factor follow a number without a × sign? (3x, 2sin(x), 5(x+1))
 function startsWithLetter(n) {
@@ -110,6 +118,26 @@ function printer(style, opts) {
       case 'rel': {
         const op = readable ? ` ${n.op} ` : n.op;
         return `${P(n.l)}${op}${P(n.r)}`;
+      }
+      case 'chain': return n.items.map((x, i) => (i ? `${readable ? ` ${n.ops[i - 1]} ` : n.ops[i - 1]}${P(x)}` : P(x))).join('');
+      case 'in': return `${P(n.l)}${readable ? ` ${n.op} ` : n.op}${P(n.r)}`;
+      case 'list': return n.items.map(P).join(readable ? ' ; ' : ';');
+      case 'not': return `¬${prec(n.e) < PREC.sum ? `(${P(n.e)})` : P(n.e)}`;
+      case 'logic': case 'setop': {
+        const me = prec(n);
+        const right = n.t === 'logic' && (n.op === 'imp' || n.op === 'iff');
+        const l = prec(n.l) < me || (right && prec(n.l) === me) ? `(${P(n.l)})` : P(n.l);
+        const r = prec(n.r) < me || (!right && prec(n.r) === me) ? `(${P(n.r)})` : P(n.r);
+        const op = n.t === 'logic' ? LOGIC_SYMBOL[n.op] : n.op;
+        return readable ? `${l} ${op} ${r}` : `${l}${op}${r}`;
+      }
+      case 'set': {
+        const sep = readable ? ' ; ' : ';';
+        if (n.kind === 'named') return n.name;
+        const B = (b) => (b.t === 'const' && b.name === 'inf' ? '+∞' : P(b));
+        if (n.kind === 'interval') return `${n.loOpen ? ']' : '['}${B(n.lo)}${sep}${B(n.hi)}${n.hiOpen ? '[' : ']'}`;
+        if (n.kind === 'finite') return `{${n.items.map(P).join(sep)}}`;
+        return `{${P(n.head)}${readable ? ' | ' : '|'}${P(n.cond)}}`;
       }
       default: throw new Error(`Cannot print node ${n.t}`);
     }

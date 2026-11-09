@@ -8,9 +8,11 @@
 // that exist. js/content/skills.js applies it; a prerequisite that is
 // neither built nor listed here is an error.
 
+import * as logique from './logique.skills.js';
+import * as polynomes from './polynomes.skills.js';
 import * as analyse0 from './analyse0.skills.js';
 
-const MODULES = [analyse0];
+const MODULES = [logique, polynomes, analyse0];
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -21,4 +23,6 @@ export const UNBUILT = {
   'g6-deriv-usual': ['pow-rules', 'root-rules'],
   // g1-compose ← g1-domain ← @alg:G-valeurs-interdites = rat-domain.
   'g1-compose': ['rat-domain'],
+  // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
+  'g8-algebraic': ['lit-identities'],
 };

@@ -2,14 +2,21 @@
 // as it is for the school units.
 //
 // Grammar, loosest to tightest:
-//   relation  sum [= < ≤ > ≥ ≠ sum]           one relation per line
+//   list      formula {; formula}              a system, or several answers
+//   formula   disj [(⇒|⇔) formula]             « et », « ou », « non » are read as ∧ ∨ ¬
+//   disj      conj {∨ conj}     conj  lneg {∧ lneg}     lneg  ¬ lneg | relation
+//   relation  setexpr [rel setexpr]            one relation per line, except a
+//                                              chain of inequalities −2 < x ≤ 4;
+//             setexpr (∈|∉) setexpr
+//   setexpr   setterm {∪ setterm}   setterm  sum {(∩|∖) sum}
 //   sum       term {(+|-) term}
 //   term      unary {(×|÷) unary | implicit factor}   2x, x(x+1), 3sin(x)
 //   unary     - unary | + unary | fraction
 //   fraction  power {/ power}                 "/" is the fraction bar and binds
 //                                             tighter than ×, as in expr.js
 //   power     atom [^ [-] atom]               x^2, e^(2x), x^-1
-//   atom      number | (sum) | |sum| | √atom | name | call, then primes ′
+//   atom      number | (formula) | |sum| | √atom | name | call, then primes ′
+//             | interval ]a ; b[ | {a ; b} | {head | cond} | ℝ ℕ ℤ ℚ ℂ ∅
 // Numbers take a decimal comma ("1,5") or point. Inside the arguments of
 // a function with several arguments (d, root) the comma separates them.
 // Names: known functions are read first (sinx = sin x), the other letters
@@ -38,9 +45,15 @@ const SHORT_FUNCS = ['sh', 'ch', 'th', 'tg', 'd'];
 const MULTI_ARG = new Set(['d', 'root']);
 const GREEK = 'αβγδεζηθικλμνξρστυφχψωΓΔΘΛΞΠΣΦΨΩ';
 const RELOPS = new Set(['=', '<', '>', '≤', '≥', '≠']);
+// Set and logic symbols (step U1).
+const SET_NAMES = new Set(['ℝ', 'ℕ', 'ℤ', 'ℚ', 'ℂ', '∅']);
+const SYMBOL_OPS = '[]{}∪∩∖∈∉⊂∧∨¬⇒⇔ℝℕℤℚℂ∅';
 
 export function normalizeText(text) {
   return String(text)
+    .replace(/<=>/g, '⇔').replace(/=>/g, '⇒')
+    .replace(/\s+et\s+/g, '∧').replace(/\s+ou\s+/g, '∨').replace(/(^|[\s(])non\s*(?=\()/g, '$1¬')
+    .replace(/\\/g, '∖')
     .replace(/\s+/g, '')
     .replace(/[−–]/g, '-')
     .replace(/[*·⋅]/g, '×')
@@ -94,7 +107,7 @@ export function tokenize(text, opts = {}) {
       continue;
     }
     if (GREEK.includes(c) || c === 'π' || c === '∞') { out.push({ k: 'name', s: c, pos: i }); i++; continue; }
-    if ('+-×÷/^()|\'√_,;□'.includes(c) || RELOPS.has(c)) {
+    if ('+-×÷/^()|\'√_,;□'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
       if (c === '(') {
         const prev = out[out.length - 1];
         stack.push(prev?.k === 'name' && MULTI_ARG.has(prev.s) ? 'args' : 'group');
@@ -125,16 +138,86 @@ export function parse(text, opts = {}) {
   };
   const expect = (s, msg) => { if (!isOp(peek(), s)) fail(msg); p++; };
 
-  function relation() {
-    const l = sum();
-    const t = peek();
-    if (t && t.k === 'op' && RELOPS.has(t.s)) {
-      p++;
-      const r = sum();
-      if (peek() && peek().k === 'op' && RELOPS.has(peek().s)) fail('Écris une seule relation par ligne.');
-      return { t: 'rel', op: t.s, l, r };
+  function list() {
+    const first = formula();
+    if (!isOp(peek(), ';')) return first;
+    const items = [first];
+    while (isOp(peek(), ';')) { p++; items.push(formula()); }
+    return { t: 'list', items };
+  }
+  function formula() {
+    const l = disj();
+    if (isOp(peek(), '⇒') || isOp(peek(), '⇔')) {
+      const op = toks[p++].s === '⇒' ? 'imp' : 'iff';
+      return { t: 'logic', op, l, r: formula() };
     }
     return l;
+  }
+  function disj() {
+    let n = conj();
+    while (isOp(peek(), '∨')) { p++; n = { t: 'logic', op: 'or', l: n, r: conj() }; }
+    return n;
+  }
+  function conj() {
+    let n = lneg();
+    while (isOp(peek(), '∧')) { p++; n = { t: 'logic', op: 'and', l: n, r: lneg() }; }
+    return n;
+  }
+  function lneg() {
+    if (isOp(peek(), '¬')) { p++; return { t: 'not', e: lneg() }; }
+    return relation();
+  }
+  const UP = new Set(['<', '≤']);
+  const DOWN = new Set(['>', '≥']);
+  function relation() {
+    const l = setexpr();
+    const t = peek();
+    if (isOp(t, '∈') || isOp(t, '∉')) { p++; return { t: 'in', op: t.s, l, r: setexpr() }; }
+    if (t && t.k === 'op' && RELOPS.has(t.s)) {
+      p++;
+      const r = setexpr();
+      if (!(peek() && peek().k === 'op' && RELOPS.has(peek().s))) return { t: 'rel', op: t.s, l, r };
+      // A chain of inequalities in one direction: −2 < x ≤ 4.
+      const items = [l, r];
+      const ops = [t.s];
+      while (peek() && peek().k === 'op' && RELOPS.has(peek().s)) { ops.push(toks[p++].s); items.push(setexpr()); }
+      if (!(ops.every((o) => UP.has(o)) || ops.every((o) => DOWN.has(o)))) fail('Écris une seule relation par ligne.');
+      return { t: 'chain', items, ops };
+    }
+    return l;
+  }
+  function setexpr() {
+    let n = setterm();
+    while (isOp(peek(), '∪')) { p++; n = { t: 'setop', op: '∪', l: n, r: setterm() }; }
+    return n;
+  }
+  function setterm() {
+    let n = sum();
+    while (isOp(peek(), '∩') || isOp(peek(), '∖')) { const op = toks[p++].s; n = { t: 'setop', op, l: n, r: sum() }; }
+    return n;
+  }
+  function interval(open) {
+    const lo = sum();
+    expect(';', 'Sépare les deux bornes par « ; ».');
+    const hi = sum();
+    const c = peek();
+    if (!(isOp(c, ']') || isOp(c, '['))) fail("Ferme l'intervalle avec ] ou [.");
+    p++;
+    return { t: 'set', kind: 'interval', lo, hi, loOpen: open, hiOpen: c.s === '[' };
+  }
+  function braces() {
+    if (isOp(peek(), '}')) { p++; return { t: 'set', kind: 'finite', items: [] }; }
+    const first = formula();
+    if (isOp(peek(), '|')) {
+      p++;
+      const cond = formula();
+      expect('}', "Une accolade n'est pas fermée.");
+      return { t: 'set', kind: 'builder', head: first, cond };
+    }
+    const items = [first];
+    while (isOp(peek(), ';')) { p++; items.push(formula()); }
+    expect('}', "Une accolade n'est pas fermée. Sépare les éléments par « ; ».");
+    return { t: 'set', kind: 'finite', items };
   }
   function sum() {
     let n = term();
@@ -240,7 +323,7 @@ export function parse(text, opts = {}) {
     }
     if (t.k === 'op') {
       if (t.s === '(') {
-        const e = sum();
+        const e = formula();
         expect(')', 'Une parenthèse n\'est pas fermée.');
         return primes({ t: 'paren', e });
       }
@@ -254,6 +337,9 @@ export function parse(text, opts = {}) {
         return { t: 'sqrt', e: atom() };
       }
       if (t.s === '□') return { t: 'blank', id: blanks++ };
+      if (t.s === '[' || t.s === ']') return interval(t.s === ']');
+      if (t.s === '{') return braces();
+      if (SET_NAMES.has(t.s)) return { t: 'set', kind: 'named', name: t.s };
       if (t.s === ')') fail('Il y a une parenthèse fermante de trop.', p - 1);
       fail(`Il manque quelque chose avant « ${t.s} ».`, p - 1);
     }
@@ -292,7 +378,7 @@ export function parse(text, opts = {}) {
   }
 
   if (!toks.length) throw new ParseError('Rien à lire.', 0);
-  const node = relation();
+  const node = list();
   if (p < toks.length) {
     const t = toks[p];
     if (isOp(t, ')')) fail('Il y a une parenthèse fermante de trop.');

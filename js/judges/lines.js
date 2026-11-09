@@ -7,15 +7,17 @@
 //         followError, hints, noHints, subgoals:[{id, label, skill}], tapActions, keys}
 // ScriptLine:
 //   {kind:'eq', math, subgoal?, note?, blanks?:[[i, j]]}   blanks: token ranges of math
-//   {kind:'decision', prompt, options:[{id, label, valid, quality?, why?}]}
+//   {kind:'decision', prompt, options:[{id, label, valid, quality?, why?, rule?}]}
+//       an invalid option with a `rule` names that trap (g0_pfd_form); a
+//       valid option with quality 'poor' lets the student go on, and its
+//       `why` comes with the next accepted line (§5.3)
 //   {kind:'note', html}
 //   {kind:'rule', ask, options:[{id, label}], correct}      self-explanation
 //   {kind:'segment', html, start:{math}, judge:{kind, …}}   a new part: its own judge (§16.2)
 
-import { parse, tokenize } from '../cas/parse.js';
+import { tokenize } from '../cas/parse.js';
 import { toText } from '../cas/print.js';
-import { judgeFor } from './index.js';
-import { parseOpts } from './common.js';
+import { judgeFor, readWith } from './index.js';
 
 export function segmentsOf(item) {
   const segs = [{ start: item.start, judge: item.judge, html: null, lines: [] }];
@@ -49,7 +51,7 @@ export class LinesRun {
     this.seg = i;
     const s = this.segments[i];
     this.cfg = s.judge;
-    this.prev = parse(s.start.math, parseOpts(this.cfg));
+    this.prev = readWith(this.cfg, s.start.math);
     this.state = {};
     this.cursor = 0; // index in s.lines of the next line to play
     this.history.push({ seg: i, node: this.prev, how: 'start' });
@@ -109,6 +111,7 @@ export class LinesRun {
     }
     if (guided && v.kind === 'stay') { v.kind = 'ok'; v.note = v.message; delete v.message; }
     if (v.kind !== 'ok' && v.kind !== 'done') return v;
+    if (this.poorNote) { v.later = this.poorNote; this.poorNote = null; }
     const next = guided ? this.nextScript() : null;
     this.accept(v.node, 'ok', next ? next.index : null);
     const last = guided && !this.nextScript();
@@ -136,7 +139,7 @@ export class LinesRun {
     const next = this.nextScript();
     if (!next) return null;
     this.revealed = true;
-    const node = parse(next.line.math, parseOpts(this.cfg));
+    const node = readWith(this.cfg, next.line.math);
     this.accept(node, 'shown', next.index);
     const out = { line: next.line, node, segmentDone: false };
     if (!this.nextScript()) { this.finishSegment(); out.segmentDone = true; out.finished = this.done; }
@@ -146,7 +149,11 @@ export class LinesRun {
   // A decision line: a wrong choice counts as a mistake, without a trap.
   decide(line, optionId) {
     const opt = line.options.find((o) => o.id === optionId);
-    if (opt && !opt.valid) this.mistakes += 1;
+    if (opt && !opt.valid) {
+      this.mistakes += 1;
+      if (opt.rule) { this.rules.push(opt.rule); this.diag = { rules: [opt.rule], ambiguous: 1, ctx: {} }; }
+    }
+    if (opt?.valid && opt.quality === 'poor') this.poorNote = opt.why || null;
     return opt;
   }
 

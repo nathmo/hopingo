@@ -15,6 +15,7 @@ import { GEN as FONCTIONS } from './fonctions.js';
 import { GEN as SECONDDEGRE } from './seconddegre.js';
 import { UNI_GEN } from './uni/generators.js';
 import { segmentsOf, templateOf } from '../judges/lines.js';
+import { readWith, textWith } from '../judges/index.js';
 import { parse as parseCas } from '../cas/parse.js';
 import { toReadable } from '../cas/print.js';
 
@@ -38,10 +39,16 @@ const mathText = (h) => String(h).replace(/<math[^>]*?alttext="([^"]*)"[^>]*>[\s
 function describeLines(item) {
   const out = [];
   const opts = { vars: item.judge?.vars, dvar: item.judge?.dvar };
-  const show = (t) => { try { return toReadable(parseCas(t, opts), opts); } catch { return t; } };
-  out.push(`  [${item.mode}${item.noHints ? ', sans aide' : ''}${item.followError ? ', suivre l\'erreur' : ''}${item.exam ? `, examen ${item.exam.format}` : ''}]  ${show(item.start.math)}`);
+  let cfg = item.judge;
+  // Lines the core reads are shown readable; the logic judge writes its own.
+  const show = (t) => {
+    if (cfg.kind === 'logic') { try { return textWith(cfg, readWith(cfg, t)); } catch { return t; } }
+    try { return toReadable(parseCas(t, { ...opts, complex: cfg.complex }), opts); } catch { return t; }
+  };
+  out.push(`  [${item.mode}${item.noHints ? ', sans aide' : ''}${item.followError ? ', suivre l\'erreur' : ''}${item.exam ? `, examen ${item.exam.format}` : ''}${item.tapActions ? `, menu ${item.tapActions}` : ''}]  ${show(item.start.math)}`);
   segmentsOf(item).forEach((seg, k) => {
-    if (k > 0) out.push(`  — ${strip(mathText(seg.html))}  [juge ${seg.judge.kind}]`);
+    cfg = seg.judge;
+    if (k > 0) out.push(`  — ${strip(mathText(seg.html))}  [juge ${seg.judge.kind}]  départ : ${show(seg.start.math)}`);
     for (const l of seg.lines) {
       if (l.kind === 'eq') {
         const shown = l.blanks?.length ? `${show(templateOf(l, opts))}   (trous : ${show(l.math)})` : show(l.math);
@@ -53,6 +60,46 @@ function describeLines(item) {
     }
   });
   if (item.hints?.length) out.push(`  aides : ${item.hints.map((h) => strip(mathText(h.html))).join(' | ')}`);
+  return out;
+}
+
+// Step U1 types: true/false, tokens, blocks, tables.
+const T = (h) => strip(mathText(h));
+const NL = String.fromCharCode(10);
+function describeTf(item) {
+  const out = [`  « ${T(item.statement)} »${item.decided ? ' (faux, contre-exemple demandé)' : ''} → ${item.truth ? 'VRAI' : 'FAUX'}`];
+  if (item.counter) {
+    const ans = item.counter.answer;
+    const txt = typeof ans === 'object' ? Object.entries(ans).map(([k, v]) => `${k} = ${typeof v === 'boolean' ? (v ? 'V' : 'F') : v}`).join(', ') : ans;
+    out.push(`    contre-exemple (${item.counter.kind}) : ${txt}`);
+  }
+  if (item.hints?.length) out.push(`  aides : ${item.hints.map((h) => T(h.html)).join(' | ')}`);
+  return out;
+}
+function describeTokens(item) {
+  return [
+    `  [jetons${item.noHints ? ', sans aide' : ''}] palette : ${item.palette.join(' · ')}`,
+    `    → ${textWith(item.judge, readWith(item.judge, item.answer))}`,
+    ...(item.hints?.length ? [`  aides : ${item.hints.map((h) => T(h.html)).join(' | ')}`] : []),
+  ];
+}
+function describeBlocks(item) {
+  const out = [`  [blocs ${item.mode}${item.noHints ? ', sans aide' : ''}]`];
+  if (item.decision) out.push(`    ? ${item.decision.prompt} ${item.decision.options.map((o) => `${o.valid ? (o.quality === 'poor' ? '~' : '✔') : '·'} ${o.label}`).join(' / ')}`);
+  item.order.forEach((id, i) => {
+    const b = item.blocks.find((x) => x.id === id);
+    out.push(`    ${i + 1}. ${T(b.html)}${b.input ? `   [à écrire : ${b.input.ask} ${b.input.answer}]` : ''}`);
+  });
+  for (const b of item.blocks.filter((x) => x.distractor)) out.push(`    ✗ ${T(b.html)} [${b.distractor}]`);
+  return out;
+}
+function describeTable(item) {
+  const out = [`  [tableau ${item.judge.phi.kind}]  colonnes : ${item.table.cols.map(T).join(' | ')}`];
+  if (item.table.root) out.push(`    a = ${item.table.root.given ?? `(${item.answers.root})`}`);
+  for (const r of item.table.rows) {
+    out.push(`    ${T(r.label || '').padEnd(8)} ${r.cells.map((c, j) => (!c ? '·' : c.given !== undefined ? c.given : `(${item.answers[r.id][j]})`)).join('  ')}`);
+  }
+  if (item.then) out.push(`  puis : ${describe(item.then).split(NL).join(`${NL}    `)}`);
   return out;
 }
 
@@ -79,6 +126,11 @@ export function describe(item) {
   if (item.type === 'answer') lines.push(`  → ${item.expected}${item.form !== 'any' ? ` (${item.form})` : ''}${item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''}`);
   if (item.type === 'mcq') lines.push(`  ${item.options.map((o) => `${o.correct ? '✔' : '·'} ${strip(mathText(o.html))}${o.rule ? ` [${o.rule}]` : ''}`).join('   ')}`);
   if (item.type === 'lines') lines.push(...describeLines(item));
+  if (item.type === 'tf') lines.push(...describeTf(item));
+  if (item.type === 'tokens') lines.push(...describeTokens(item));
+  if (item.type === 'blocks') lines.push(...describeBlocks(item));
+  if (item.type === 'table') lines.push(...describeTable(item));
+  if (item.exam && item.type !== 'lines') lines.push(`  [examen ${item.exam.format}]`);
   if (item.type === 'shade') lines.push(`  (figure ${item.figure.shape} en ${item.figure.n} parts, colorier ${item.target.count})`);
   if (item.type === 'numberline') lines.push(`  (droite ${item.line.min ?? 0} → ${item.line.max}, graduée en ${item.line.den}es) → ${item.target}`);
   if (item.type === 'match') lines.push(`  ${item.pairs.map(([a, b]) => `${strip(a)} ↔ ${strip(b)}`).join('   ')}`);

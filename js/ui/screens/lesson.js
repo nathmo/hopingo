@@ -109,7 +109,7 @@ export function lessonScreen(root, args, app) {
     if (def.intro.lines) {
       // A worked example of the university units: one line per step.
       card.append(h('div.intro-example', def.intro.lines.map((l, i) => h('div.sol-line',
-        i ? h('span.eq', '=') : null, html(toMathML(parseCas(l.cas))), h('span.sol-note', l.note)))));
+        i && !l.noEq ? h('span.eq', '=') : null, html(l.html ?? toMathML(parseCas(l.cas))), h('span.sol-note', l.note)))));
     }
     if (def.intro.solve) {
       const lines = solve(parse(def.intro.solve), def.intro.solveOpts);

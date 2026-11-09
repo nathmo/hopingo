@@ -35,6 +35,7 @@ export class Poly {
   }
 
   static variable(name, exp = 1) {
+    if (exp === 0) return Poly.const(1);
     const m = [[name, exp]];
     return new Poly(new Map([[keyOf(m), { m, c: ONE }]]));
   }
