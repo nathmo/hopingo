@@ -193,7 +193,7 @@ function seqLines(level, rng, opts = {}) {
     skill: SK, level, mode: modeOf(level), start: parts[0].start, judge: withMenus(parts[0].judge, level, parts[0].start, parts[0].lines, CHOICES), script,
     prompt: `${seqML(d.comps)}. Simplifie chaque composante de la sous-suite ${sub} (une expression en k, sans n), puis donne la limite de celle des deux suites ${sub} ou ${MT(`(-1)^k×a_(${N})`, K)} qui converge.${tableNote}`,
     hints: H(`Remplace n par ${N.replace(/k/, 'k')}, puis simplifie avec la période : ${per || '(−1)ⁿ change de signe à chaque pas'}.`,
-      `${MT(d.S[0].lines[0], { vars: ['k'] })} = ${MT(d.S[0].final, { vars: ['k'] })}`,
+      (() => { const s = d.S.find((x) => x.lines.length > 1) ?? d.S[0]; return `${MT(s.lines[0], { vars: ['k'] })} = ${MT(s.final, { vars: ['k'] })}`; })(),
       `${sub} = ${vecR(d.S.map((s) => s.final)).replace(/×/g, '·')} ; ${kind === 'plain' ? 'elle converge' : `elle diverge, et ${MT(`(-1)^k×a_(${N})`, K)} → ${vecR(d.limit)}`}.`),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     baits: ['a2_seq_one_component'],

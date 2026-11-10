@@ -673,7 +673,7 @@ function bdTf(level, rng, { exam = false, pick = null, noHints = false } = {}) {
   const T = pick || rng.pick(BD_TF);
   const counter = T.truth ? null : { kind: 'a2', prop: 'bdReal', params: { test: T.test }, ask: askOf(Object.keys(T.answer)), answer: T.answer };
   return tfItem({
-    skill: BD, level, statement: `${forAll(T.s)} : ${T.s.charAt(0).toLowerCase()}${T.s.slice(1)}`, truth: T.truth, counter,
+    skill: BD, level, statement: `${forAll(T.s)} : ${/^[A-Z][a-zé]/.test(T.s) ? T.s.charAt(0).toLowerCase() : T.s.charAt(0)}${T.s.slice(1)}`, truth: T.truth, counter,
     prompt: T.truth ? undefined : 'Vrai ou faux ? Si c\'est faux, donne un contre-exemple dans ℝ (n = 1) : des intervalles, et le point p qui pose problème.',
     ruleIfTrue: T.rule || null,
     hints: H('Essaie avec des intervalles de ℝ qui se touchent, ou un intervalle ouvert.', T.truth ? 'Pense à la définition : chaque boule touche E et son complémentaire.' : `Essaie ${Object.entries(T.answer).filter(([k]) => k !== 'p').map(([k, v]) => `${k} = ${v.replace(/-/g, '−')}`).join(', ')}.`, T.why),

@@ -63,7 +63,7 @@ function component(kind, a = 1, b = 1) {
   const A = a === 1 ? '' : a === -1 ? '-' : String(a);
   switch (kind) {
     case 't': return { text: 't', show: 't', d: [{ math: '1', act: 'table' }], f: (t) => t.poly, df: () => P(1), trig: false };
-    case 'lin': return { text: `${a}t`, show: `${a}t`, d: [{ math: String(a), act: 'table' }], f: (t) => pmul(t.poly, a), df: () => P(a), trig: false };
+    case 'lin': return { text: `${coefT(a)}t`, show: `${fr(coefT(a))}t`, d: [{ math: String(a), act: 'table' }], f: (t) => pmul(t.poly, a), df: () => P(a), trig: false };
     case 't2': return { text: 't^2', show: 't²', d: [{ math: '2t', act: 'table' }], f: (t) => ptimes(t.poly, t.poly), df: (t) => pmul(t.poly, 2), trig: false };
     case 't3': return { text: 't^3', show: 't³', d: [{ math: '3t^2', act: 'table' }], f: (t) => (t.j === null ? P(1) : null), df: (t) => (t.j === null ? P(3) : null), trig: false, only1: true };
     case 'exp': return { text: 'e^t', show: 'eᵗ', d: [{ math: 'e^t', act: 'table' }], f: () => P(1), df: () => P(1), trig: false, only0: true };
@@ -277,7 +277,7 @@ function lengthData(rng, { family = null } = {}) {
     const [b, L] = rng.pick([['1', '√3e-√3'], ['ln(2)', '√3'], ['ln(3)', '2√3']]);
     return {
       f, comps: ['e^t×cos(t)', 'e^t×sin(t)', 'e^t'], d: ['e^t×(cos(t)-sin(t))', 'e^t×(sin(t)+cos(t))', 'e^t'],
-      sq: 'e^(2t)(cos(t)-sin(t))^2+e^(2t)(sin(t)+cos(t))^2+e^(2t)', goal: '3e^(2t)', speed: '√3×e^t', a: '0', b, L,
+      sq: '2e^(2t)+e^(2t)', goal: '3e^(2t)', speed: '√3×e^t', a: '0', b, L,
       sum: 'e^t×(cos(t)-sin(t))+e^t×(sin(t)+cos(t))+e^t', prim: '√3×e^t',
     };
   }
@@ -354,7 +354,7 @@ function clLines(level, rng, opts = {}) {
   const first = d.speed.split('+')[0];
   if (level === 1 && first !== d.speed && !/[(√]/.test(first)) Object.assign(sqLines[2], tpl(d.goal, [first], TV));
   const I0 = `int(√(${d.sq}),t,${d.a},${d.b})`;
-  const Lp = [E(`int(${d.speed},t,${d.a},${d.b})`, `‖γ′(t)‖ = ${fr(d.speed)}${d.f === 'cyc' ? ' (sin(t/2) ≥ 0 sur l\'intervalle)' : d.f === 'astro' || d.f === 'cusp' ? ' (positif sur l\'intervalle)' : ''}`, 'setup', 'root'),
+  const Lp = [E(`int(${d.speed},t,${d.a},${d.b})`, `‖γ′(t)‖ = ${sup(d.speed).replace(/×/g, '·')}${d.f === 'cyc' ? ' (sin(t/2) ≥ 0 sur l\'intervalle)' : d.f === 'astro' || d.f === 'cusp' ? ' (positif sur l\'intervalle)' : ''}`, 'setup', 'root'),
     E(`bracket(${d.prim},t,${d.a},${d.b})`, 'Une primitive', 'integrate', 'prim'),
     E(d.L, 'Les bornes', 'integrate', 'prim')];
   if (level === 1) Object.assign(Lp[0], tpl(Lp[0].math, [d.speed], TV));
