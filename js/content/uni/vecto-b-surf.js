@@ -9,7 +9,7 @@
 import {
   KEYS, q, qs, cm, sum, poly, piT, fr, pick, SG, H, MT, PML, VML,
   revSurf, sphSurf, paramJudge, vecJudge, defJudge, eqJudge, partsItem, examTag,
-  choice, opt, decision, menu,
+  choice, opt, decision, menu, normalBlank,
 } from './vecto-b-kit.js';
 
 // ---------- surfaces of the catalogue ----------
@@ -38,7 +38,7 @@ function surface(rng, o = {}) {
     const a = pick(rng, [1, 2]);
     const rho = pick(rng, [1, 2]);
     const s = revSurf({ h: [0, 0, a], rho: String(rho), rho2: sq(rho), order: o.order });
-    return { s, kind, id: `parab${a}${rho}`, orient: 'vers le haut', html: `Σ = {z = ${a === 1 ? '' : a}(x² + y²), z ≤ ${a * rho * rho}}`, hint: `z ≤ ${a * rho * rho} donne r ≤ ${rho}` };
+    return { s, kind, id: `parab${a}${rho}`, orient: 'vers le haut', html: `Σ = {z = ${a === 1 ? 'x² + y²' : `${a}(x² + y²)`}, z ≤ ${a * rho * rho}}`, hint: `z ≤ ${a * rho * rho} donne r ≤ ${rho}` };
   }
   if (kind === 'cap') {
     const rho = pick(rng, [1, 2, 3]);
@@ -76,7 +76,7 @@ function orientDecision(d) {
     ]);
   }
   return decision(`Vers où pointe la normale ${s.du} ?`, [
-    { id: 'up', label: `Vers le haut : sa 3e composante vaut ${s.up ? 'r' : '−r'}`, valid: s.up, ref: s.up, why: 'Sa 3e composante vaut −r < 0 : elle pointe vers le bas.', ...(s.up ? {} : { rule: 'v_cross_order' }) },
+    { id: 'up', label: 'Vers le haut', valid: s.up, ref: s.up, why: 'Sa 3e composante vaut −r < 0 : elle pointe vers le bas.', ...(s.up ? {} : { rule: 'v_cross_order' }) },
     { id: 'down', label: 'Vers le bas', valid: !s.up, ref: !s.up, why: 'Sa 3e composante vaut r > 0 : elle pointe vers le haut.', ...(s.up ? { rule: 'v_cross_order' } : {}) },
   ]);
 }
@@ -102,7 +102,7 @@ function surfaceParts(d, level, o = {}) {
     start: s.label, judge: paramJudge(s, paramTraps),
     decisions: level >= 3 && !o.noType ? [decision('Quelle paramétrisation ?', TYPE_OPTIONS(d), [3, 4, 5])] : [],
     menu: menu('Écrire σ et le domaine A', [{ label: 'Prendre φ ∈ [0 ; 2π] sans regarder les conditions', why: d.wrongPhi ? 'y ≥ 0 veut dire sin φ ≥ 0 : φ ∈ [0 ; π].' : 'Regarde d\'abord les conditions sur Σ.', rule: 'v_surf_domain' }]),
-    lines: [{ math: s.bare, subgoal: 'param', note: d.hint, blank: [H0], blank2: ivs }],
+    lines: [{ math: s.bare, subgoal: 'param', note: d.hint, blank: H0.length > 1 ? [H0] : ivs, after: H0.length > 1 ? '=' : '∈', blank2: ivs, after2: '∈' }],
   }];
   if (!o.noPartials) {
     parts.push({
@@ -120,7 +120,7 @@ function surfaceParts(d, level, o = {}) {
     html: `Normale ${s.du} :`, ask: `${s.du} =`, start: s.du, judge: vecJudge(s.N, s.params, { v_cross_order: crossTraps(s.N) }),
     decisions: o.noOrient ? [] : [orientDecision(d)],
     menu: menu('Produit vectoriel, dans l\'ordre des paramètres', [{ label: 'Produit vectoriel dans l\'autre ordre', rule: 'v_cross_order', why: `L'ordre des paramètres de σ(${s.params.join(', ')}) fixe ${s.du}.` }]),
-    lines: [{ math: `${s.du} = ${s.N}`, subgoal: 'cross', blank: [lastComp(s.N)], note: d.kind === 'sph' ? `${s.R === 1 ? '' : `${s.R * s.R} `}sin θ · (sin θ cos φ, sin θ sin φ, cos θ)` : '' }],
+    lines: [{ math: `${s.du} = ${s.N}`, subgoal: 'cross', blank: [normalBlank(s)], note: d.kind === 'sph' ? `${s.R === 1 ? '' : `${s.R * s.R} `}sin θ · (sin θ cos φ, sin θ sin φ, cos θ)` : '' }],
   });
   return parts;
 }
@@ -192,13 +192,13 @@ function areaData(rng, o = {}) {
     const fourA2 = a.mul(a).mul(4);
     return {
       kind, s, id: `parab${qs(a)}:${c.rho2}`, f: '1', fText: 'aire(Σ)',
-      html: `Σ = {z = ${a.eq(1) ? '' : fr(qs(a))}(x² + y²), z ≤ ${fr(qs(zMax))}}`,
+      html: `Σ = {z = ${a.eq(1) ? 'x² + y²' : a.d === 1 ? `${a.n}(x² + y²)` : `(x² + y²)/${a.d}`}, z ≤ ${fr(qs(zMax))}}`,
       norm: `r sqrt(1+${qs(fourA2)}r^2)`.replace('+1r', '+r'),
       inner: `r sqrt(1+${qs(fourA2)}r^2)`.replace('+1r', '+r'),
-      value: piT(val), valQ: val,
+      value: piT(val), valQ: val, scaled: (k) => piT(val.mul(k)),
       areaA: `2π${c.rho.replace(/^sqrt\((.*)\)$/, '√($1)')}`, // ∬_A dr dφ (v_jacobian_surface)
       third: `π·${qs(c.rho2)}`, // ∬ (σ_r ∧ σ_φ)₃ = πρ² (v_normal_not_norm)
-      rIv: [0, c.rho], hint: `z ≤ ${fr(qs(zMax))} donne r ≤ ${fr(c.rho.replace(/^sqrt/, '√'))}`,
+      rIv: [0, c.rho], hint: `z ≤ ${fr(qs(zMax))} donne r ≤ ${c.rho.replace(/^sqrt\((\d+)\)$/, '√$1').replace(/^sqrt/, '√')}`,
     };
   }
   if (kind === 'cone') {
@@ -209,7 +209,7 @@ function areaData(rng, o = {}) {
     const root = 1 + k * k;
     return {
       kind, s, id: `cone${k}${rho}`, f: '1', fText: 'aire(Σ)', html: `Σ = {z = ${k === 1 ? '' : k}√(x² + y²), z ≤ ${k * rho}}`,
-      norm: `r sqrt(${root})`, inner: `r sqrt(${root})`, value: `${rho * rho === 1 ? '' : rho * rho}π√${root}`,
+      norm: `r sqrt(${root})`, inner: `r sqrt(${root})`, value: `${rho * rho === 1 ? '' : rho * rho}π√${root}`, scaled: (k) => `${cm(q(rho * rho).mul(k), 'π')}√${root}`,
       areaA: `${piT(2 * rho)}`, third: piT(rho * rho), rIv: [0, String(rho)], hint: `z ≤ ${k * rho} donne r ≤ ${rho}`,
     };
   }
@@ -219,7 +219,7 @@ function areaData(rng, o = {}) {
     const s = sphSurf({ R, top: 'π/2' });
     return {
       kind, s, id: `zhemi${R}`, f: cm(R, 'cos(θ)'), fText: '∬_Σ z ds', html: `Σ = {x² + y² + z² = ${R2}, z ≥ 0}`,
-      norm: s.norm, inner: `${cm(R, 'cos(θ)')}·${s.norm}`, value: piT(R * R2), areaA: piT(2 * R), // ∬_A z dθ dφ = 2πR
+      norm: s.norm, inner: `${cm(R, 'cos(θ)')}·${s.norm}`, value: piT(R * R2), scaled: (k) => piT(q(R * R2).mul(k)), areaA: piT(2 * R), // ∬_A z dθ dφ = 2πR
       third: piT(q(2 * R * R2, 3)), rIv: null, hint: 'z ≥ 0 donne θ ∈ [0 ; π/2]',
     };
   }
@@ -227,7 +227,7 @@ function areaData(rng, o = {}) {
   const s = sphSurf({ R, top: half ? 'π/2' : 'π' });
   return {
     kind, s, id: `sph${R}${half}`, f: '1', fText: 'aire(Σ)', html: half ? `Σ = {x² + y² + z² = ${R2}, z ≥ 0}` : `Σ = {x² + y² + z² = ${R2}}`,
-    norm: s.norm, inner: s.norm, value: piT(half ? 2 * R2 : 4 * R2), areaA: half ? `π^2` : `2π^2`, third: half ? piT(R2) : '0',
+    norm: s.norm, inner: s.norm, value: piT(half ? 2 * R2 : 4 * R2), scaled: (k) => piT(q(half ? 2 * R2 : 4 * R2).mul(k)), areaA: half ? `π^2` : `2π^2`, third: half ? piT(R2) : '0',
     hint: half ? 'z ≥ 0 donne θ ∈ [0 ; π/2]' : 'θ ∈ [0 ; π]',
   };
 }
@@ -282,7 +282,7 @@ function surfAreaItem(level, rng, opts) {
   });
   return partsItem({
     skill: 'v-surf-area', level, parts, keys: KEYS,
-    prompt: `${d.fText === 'aire(Σ)' ? 'Calcule l\'aire de' : 'Calcule ∬_Σ z ds pour'} ${d.html}.${level <= 2 ? ` On donne ${PML(s.line, s.params)} et ${VML(`${s.du} = ${s.kind === 'sph' ? s.Nout : s.Nup}`, s.params)}.` : ''}`,
+    prompt: `${d.fText === 'aire(Σ)' ? 'Calcule l\'aire de' : 'Calcule ∬_Σ z ds pour'} ${d.html}.${level <= 2 ? ` On donne ${PML(s.line, s.params)}${level === 1 ? ` et ${VML(`${s.du} = ${s.kind === 'sph' ? s.Nout : s.Nup}`, s.params)}` : ''}.` : ''}`,
     hints: H('ds = |σ_u ∧ σ_v| du dv : calcule la norme de la normale, puis intègre sur A.',
       `|${s.du}| = ${MT(d.norm, { vars })}.`,
       `${d.fText} = ${MT(I, { vars })}.`),
@@ -298,7 +298,7 @@ function surfAreaMcq(level, rng, opts) {
     skill: 'v-surf-area', level, key: `v-surf-area:mcq:${d.id}`, exam: examTag(opts),
     prompt: `Aire de ${d.html} :`,
     right: show(d.value),
-    wrongs: [opt(show(d.areaA), 'v_jacobian_surface'), opt(show(d.third), 'v_normal_not_norm'), opt(show(`2(${d.value})`)), opt(show(`(${d.value})/2`))],
+    wrongs: [opt(show(d.areaA), 'v_jacobian_surface'), opt(show(d.third), 'v_normal_not_norm'), opt(show(d.scaled(2))), opt(show(d.scaled(q(1, 2))))],
     solution: [{ html: `${PML(s.line, s.params)} ; |${s.du}| = ${MT(d.norm, { vars: s.params })} ; aire = ${MT(areaIntegral(d), { vars: s.params })} = ${show(d.value)}.`, note: '' }],
     expectedSec: 180,
   }, rng);
@@ -335,7 +335,7 @@ function fluxData(rng, o = {}) {
   if (kind === 'parab') {
     const a = pick(rng, [1, 2]);
     const rho = pick(rng, [1, 2]);
-    s0 = { h: [0, 0, a], rho, html: `Σ = {z = ${a === 1 ? '' : a}(x² + y²), z ≤ ${a * rho * rho}}` };
+    s0 = { h: [0, 0, a], rho, html: `Σ = {z = ${a === 1 ? 'x² + y²' : `${a}(x² + y²)`}, z ≤ ${a * rho * rho}}` };
   } else if (kind === 'cap') {
     const rho = pick(rng, [1, 2]);
     s0 = { h: [rho * rho, 0, -1], rho, html: `Σ = {z = ${rho * rho} − x² − y², z ≥ 0}` };

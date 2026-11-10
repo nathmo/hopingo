@@ -283,8 +283,8 @@ export const menu = (right, wrongs = []) => [{ id: 'ok', label: right, valid: tr
 
 // Blanks searched after the first « = » of the line (a label σ(r, φ), σ_r
 // or σ_r ∧ σ_φ is never blanked), else in the whole line.
-export function blanksEq(math, parts) {
-  const i = math.indexOf('=');
+export function blanksEq(math, parts, after = '=') {
+  const i = math.indexOf(after);
   if (i < 0) return blanks(math, parts);
   const nHead = tokenize(math.slice(0, i + 1), {}).length;
   const r = blanks(math.slice(i + 1), parts);
@@ -293,7 +293,8 @@ export function blanksEq(math, parts) {
 
 // partsItem of geo-kit.js, with the blanks of blanksEq: parts: [{html, ask,
 // start, judge, notes?, decisions?, menu?, lines: [{math, note, subgoal,
-// blank?, blank2?, from?}]}].
+// blank?, blank2?, after?, after2? (the blanks are searched after this
+// text, default « = »), from?}]}].
 export function partsItem(o) {
   const { level, parts } = o;
   const guided = level <= 2;
@@ -317,7 +318,7 @@ export function partsItem(o) {
       if (l.from && level < l.from) continue;
       const line = { kind: 'eq', math: l.math, note: l.note || '', subgoal: l.subgoal };
       const b = level === 1 ? l.blank : (l.blank2 ?? l.blank);
-      if (guided && b?.length) Object.assign(line, blanksEq(l.math, b));
+      if (guided && b?.length) Object.assign(line, blanksEq(l.math, b, (level === 1 ? l.after : (l.after2 ?? l.after)) || '='));
       script.push(line);
     }
   });
@@ -328,3 +329,10 @@ export function partsItem(o) {
     baits: o.baits,
   });
 }
+
+// The component of σ_u ∧ σ_v left blank in a guided line (never a lone
+// letter, which would match the label).
+export const normalBlank = (s) => {
+  const cs = s.N.slice(1, -1).split(' ; ');
+  return s.kind === 'sph' ? cs[2] : cs[0];
+};

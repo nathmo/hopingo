@@ -6,7 +6,7 @@
 import {
   KEYS, q, cm, sum, piT, fr, pick, SG, H, MT, PML, VML,
   revSurf, sphSurf, paramJudge, vecJudge, defJudge, partsItem, examTag, choice, opt, decision, menu,
-  boundaryOf, boundaryJudge, boundaryLines, kept, pieceLine, sidesHtml,
+  boundaryOf, boundaryJudge, boundaryLines, kept, pieceLine, sidesHtml, normalBlank,
 } from './vecto-b-kit.js';
 
 // ---------- surfaces with a boundary ----------
@@ -184,7 +184,7 @@ function stokesParts(d, level, o = {}) {
     lines: [{ math: `(0 ; 0 ; ${d.c})`, subgoal: 'rot', blank: [String(d.c)] }],
   }, {
     html: `Normale ${s.du} :`, ask: `${s.du} =`, start: s.du, judge: vecJudge(s.N, params),
-    lines: [{ math: `${s.du} = ${s.N}`, subgoal: 'normal', blank: [s.N.slice(1, -1).split(' ; ').at(-1)] }],
+    lines: [{ math: `${s.du} = ${s.N}`, subgoal: 'normal', blank: [normalBlank(s)] }],
   });
   if (!o.noFlux) {
     parts.push({
@@ -201,7 +201,12 @@ function stokesParts(d, level, o = {}) {
     });
   }
   if (o.circ) {
-    parts.push({
+    // The boundary σ(∂A) first (judge `boundary`), then the work along it.
+    const sides = boundaryOf(s);
+    const bp = boundaryPart({ s }, sides, level);
+    bp.html = `Le bord ∂Σ = σ(∂A) (côtés de ∂A : ${sidesHtml(sides)}) :`;
+    bp.ask = '∂Σ :';
+    parts.push(bp, {
       html: `∮_∂Σ F · dl sur le cercle (${d.R} cos t, ${d.R} sin t, 0), t ∈ [0 ; 2π] :`, ask: '∮ F · dl =', start: d.circ,
       judge: defJudge({ v_boundary_orient: [piT(d.val.neg())] }),
       lines: [{ math: piT(d.val), subgoal: 'circulation' }],
