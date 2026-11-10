@@ -52,6 +52,21 @@ export const DEFS = {
     },
     check: { judge: { kind: 'mat', expect: '[[1,0],[0,1]]', names: { A_11: '[[2,1],[1,1]]', A_12: '[[1,0],[1,1]]', A_21: '[[0,1],[1,1]]', A_22: '[[2,2],[1,2]]' }, schur: { A11: '[[2,1],[1,1]]', A12: '[[1,0],[1,1]]', A21: '[[0,1],[1,1]]', A22: '[[2,2],[1,2]]' } }, prev: 'S', line: '[[3,4],[2,3]]' },
   },
+  m_householder_factor: {
+    name: 'Symétrie de Householder écrite I − P',
+    judges: ['mat'],
+    transform(prev, ctx) {
+      const u = ctx?.cfg?.householder?.u;
+      const v = u ? matQ(u) : null;
+      if (!v) return [];
+      const col = v.map((r) => r[0]);
+      const uu = MX.dot(col, col);
+      if (uu.n === 0) return [];
+      const P = col.map((a) => col.map((b) => a.mul(b).div(uu)));
+      return [{ node: mline(fromQ(MX.sub(MX.identity(col.length), P))), ctx: {} }];
+    },
+    check: { judge: { kind: 'mat', expect: '[[7/9,-4/9,-4/9],[-4/9,1/9,-8/9],[-4/9,-8/9,1/9]]', householder: { u: '(1 ; 2 ; 2)' } }, prev: 'H', line: '[[8/9,-2/9,-2/9],[-2/9,5/9,-4/9],[-2/9,-4/9,5/9]]' },
+  },
 };
 
 export { matQ, mline, R, Q, Mx, S, valueText, radicalNode, lit, sqrtNode, num };

@@ -329,8 +329,269 @@ function schurExam(rng, exam) {
 }
 
 // ======================================================================
+// m-rank1-proj
+// ======================================================================
+
+const RANK1_SUB = [
+  { id: 'outer', label: 'produit uuᵀ', skill: 'l-mat-product' },
+  { id: 'proj', label: 'projection', skill: 'l-orth-proj' },
+  { id: 'projector', label: 'projecteur', skill: RANK1 },
+];
+
+// Whole vectors u: of whole norm (3, 7, 9) or not.
+const U_INT = [[1, 2, 2], [2, 3, 6], [1, 4, 8], [2, 1, 2]];
+const U_NON = [[1, 1], [1, 2], [2, 1], [1, -1], [1, 3], [1, 1, 1], [1, -1, 2], [1, 2, -1], [1, 1, 2]];
+const isqrt = (n) => { const r = Math.round(Math.sqrt(n)); return r * r === n ? r : null; };
+const rootT = (n) => (isqrt(n) !== null ? String(isqrt(n)) : `√${n}`);
+
+function signsPerm(u, rng) {
+  const p = rng.shuffle([...u]);
+  return p.map((x) => (rng.chance(0.3) ? -x : x));
+}
+
+function projData(rng, { whole = rng.chance(0.4), dim = null } = {}) {
+  for (let t = 0; t < 200; t++) {
+    let u = signsPerm(rng.pick(whole && !dim ? U_INT : U_NON.filter((v) => !dim || v.length === dim)), rng);
+    if (u.every((x) => x <= 0)) u = u.map((x) => -x);
+    u = u.map((x) => q(x));
+    const n = u.length;
+    const y = Array.from({ length: n }, () => q(rng.int(-3, 3)));
+    const uy = dot(u, y);
+    const uu = dot(u, u);
+    if (uy.n === 0 || y.every((x) => x.n === 0)) continue;
+    if (MX.rank([u, y]) < 2) continue;
+    const P = scaleM(outer(u, u), q(1).div(uu));
+    const c = uy.div(uu);
+    const Py = u.map((x) => x.mul(c));
+    if (Py.some((x) => x.d > 9)) continue;
+    const I = MX.identity(n);
+    const H = MX.sub(I, scaleM(P, 2));
+    const Hy = y.map((x, i) => x.sub(Py[i].mul(2)));
+    return { u, y, n, uu, uy, P, Py, c, rest: y.map((x, i) => x.sub(Py[i])), H, Hy, IP: MX.sub(I, P), uut: outer(u, u) };
+  }
+  const u = [q(1), q(2), q(2)];
+  const y = [q(3), q(0), q(3)];
+  const P = scaleM(outer(u, u), q(1, 9));
+  const H = MX.sub(MX.identity(3), scaleM(P, 2));
+  return { u, y, n: 3, uu: q(9), uy: q(9), P, Py: [q(1), q(2), q(2)], c: q(1), rest: [q(2), q(-2), q(1)], H, Hy: [q(1), q(-4), q(-1)], IP: MX.sub(MX.identity(3), P), uut: outer(u, u), fallback: true };
+}
+
+// « (1/9)·[[1,2,2],…] »: the projector before the division is done.
+const scaledT = (d) => `(${qt(q(1).div(d.uu))})·${mt(d.uut)}`;
+const uR = (d) => ML(vt(d.u));
+const projHints = (d) => hints(
+  'P = uuᵀ/(uᵀu) ; pour Py, calcule d\'abord le nombre u · y, puis Py = (u · y)/(uᵀu)·u.',
+  `P = (1/${d.uu})·□, où □ = uuᵀ ; puis Py = (□/${d.uu})·u`,
+  `P = ${MLm(d.P)}`,
+);
+
+function projSegs(d, rng, { outerFirst = false, house = false } = {}) {
+  const segs = [];
+  const projCfg = { orth: [d.u.map(Number)], y: d.y.map(Number) };
+  if (outerFirst) {
+    segs.push({
+      start: 'u·u^T', judge: { kind: 'mat', expect: mt(d.uut) },
+      lines: [{ math: mt(d.uut), note: 'Case (i, j) : uᵢuⱼ', subgoal: 'outer', grid: d.uut }],
+    });
+  }
+  segs.push({
+    html: outerFirst ? `Divise par uᵀu = ${d.uu}.` : 'Le projecteur P sur Span{u}.', ask: 'P =', start: 'P', judge: { kind: 'mat', expect: mt(d.P) },
+    decision: {
+      kind: 'decision', prompt: `u = ${R(vt(d.u))} n'est pas unitaire (uᵀu = ${d.uu}). Quelle formule donne P ?`, options: rng.shuffle([
+        { id: 'ok', label: 'P = uuᵀ/(uᵀu)', valid: true },
+        { id: 'nodiv', label: 'P = uuᵀ', valid: false, rule: 'g4_proj_no_square', why: `uuᵀ n'est un projecteur que si ‖u‖ = 1 : ici (uuᵀ)² = ${d.uu}·uuᵀ ≠ uuᵀ.` },
+        { id: 'norm', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: 'On divise par ‖u‖² = uᵀu, pas par ‖u‖ : chacun des deux u de uuᵀ porte un facteur ‖u‖.' },
+      ]),
+    },
+    menu: menuOf(rng, 'P = uuᵀ/(uᵀu)', [
+      { id: 'nodiv', label: 'P = uuᵀ', valid: false, rule: 'g4_proj_no_square', why: 'u n\'est pas unitaire : il faut diviser par uᵀu.' },
+      { id: 'norm', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: 'On divise par ‖u‖², pas par ‖u‖.' },
+    ]),
+    lines: [{ math: scaledT(d), note: `uᵀu = ${d.uu}`, subgoal: 'projector' }, { math: mt(d.P), note: '', subgoal: 'projector', grid: d.P }],
+  });
+  if (house) {
+    segs.push({
+      html: 'La symétrie de Householder H par rapport à u⊥.', ask: 'H =', start: 'H', judge: { kind: 'mat', expect: mt(d.H), names: { P: mt(d.P) }, householder: { u: vt(d.u) } },
+      menu: menuOf(rng, 'H = I − 2P', [{ id: 'once', label: 'H = I − P', valid: false, rule: 'm_householder_factor', why: 'I − P projette sur u⊥ ; la symétrie enlève deux fois la composante selon u.' }]),
+      lines: [{ math: 'I - 2P', note: 'On enlève deux fois la composante selon u', subgoal: 'projector' }, { math: mt(d.H), note: '', subgoal: 'projector', grid: d.H }],
+    });
+  }
+  segs.push({
+    html: `La projection de y = ${R(vt(d.y))}.`, ask: 'Py =', start: 'Py', judge: { kind: 'mat', expect: vt(d.Py), names: { P: mt(d.P) }, proj: projCfg },
+    menu: menuOf(rng, 'Py = (u · y)/(uᵀu)·u', [{ id: 'nodiv', label: 'Py = (u · y)·u', valid: false, rule: 'g4_proj_no_square', why: 'Il faut diviser par uᵀu.' }]),
+    lines: [{ math: `(${qt(d.uy)}/${d.uu})·${vt(d.u)}`, note: `u · y = ${fq(d.uy)} : on projette sans former P`, subgoal: 'proj' }, { math: vt(d.Py), note: '', subgoal: 'proj', grid: d.Py.map((x) => [x]) }],
+  });
+  if (house) {
+    segs.push({
+      html: 'L\'image de y par la symétrie.', ask: 'Hy =', start: 'Hy', judge: { kind: 'mat', expect: vt(d.Hy), names: { H: mt(d.H) } },
+      menu: menuOf(rng, 'Hy = y − 2Py', [{ id: 'once', label: 'Hy = y − Py', valid: false, rule: 'm_householder_factor', why: 'y − Py est la projection sur u⊥ ; la symétrie va deux fois plus loin.' }]),
+      lines: [{ math: `${vt(d.y)} - 2·${vt(d.Py)}`, note: 'Hy = y − 2Py', subgoal: 'projector' }, { math: vt(d.Hy), note: `‖Hy‖ = ‖y‖ = ${rootT(dot(d.y, d.y).valueOf())}`, subgoal: 'projector', grid: d.Hy.map((x) => [x]) }],
+    });
+  } else {
+    segs.push({
+      html: 'La composante de y orthogonale à u.', ask: '(I − P)y =', start: '(I-P)y', judge: { kind: 'mat', expect: vt(d.rest), names: { P: mt(d.P) } },
+      menu: menuOf(rng, '(I − P)y = y − Py', [{ id: 'py', label: '(I − P)y = Py', valid: false, why: 'I − P enlève la composante selon u : y − Py.' }]),
+      lines: [{ math: `${vt(d.y)} - ${vt(d.Py)}`, note: 'y − Py', subgoal: 'proj' }, { math: vt(d.rest), note: 'Orthogonal à u : u · (I − P)y = 0', subgoal: 'proj', grid: d.rest.map((x) => [x]) }],
+    });
+  }
+  return segs;
+}
+
+// Level 4, template (c): the projector on Col A, A(AᵀA)⁻¹Aᵀ, and its trace.
+function colProjData(rng) {
+  for (let t = 0; t < 300; t++) {
+    const A = randM(3, 2, rng, -2, 2);
+    if (MX.rank(A) < 2 || A.some((r) => r.every((x) => x.n === 0))) continue;
+    const G = MX.mul(MX.transpose(A), A);
+    const Gi = MX.inverse(G);
+    const P = MX.mul(MX.mul(A, Gi), MX.transpose(A));
+    if (P.flat().some((x) => x.d > 12) || isInt(P) || MX.det(G).valueOf() > 30) continue;
+    return { A, G, Gi, P };
+  }
+  const A = MX.mat([[1, 0], [1, 1], [0, 1]]);
+  const G = MX.mul(MX.transpose(A), A);
+  const Gi = MX.inverse(G);
+  return { A, G, Gi, P: MX.mul(MX.mul(A, Gi), MX.transpose(A)), fallback: true };
+}
+
+function colProjItem(rng) {
+  const d = colProjData(rng);
+  const names = { A: mt(d.A) };
+  const segs = [
+    { start: 'A^T·A', judge: { kind: 'mat', expect: mt(d.G), names }, lines: [{ math: mt(d.G), note: 'Produits scalaires des colonnes de A', subgoal: 'proj' }] },
+    { html: 'Son inverse.', start: '(A^T·A)^(-1)', judge: { kind: 'mat', expect: mt(d.Gi), names }, lines: [{ math: mt(d.Gi), note: `det AᵀA = ${MX.det(d.G)}`, subgoal: 'proj' }] },
+    {
+      html: 'Le projecteur sur Col A.', ask: 'P =', start: 'P', judge: { kind: 'mat', expect: mt(d.P), names: { ...names, G: mt(d.G) } },
+      lines: [{ math: 'A·G^(-1)·A^T', note: 'P = A(AᵀA)⁻¹Aᵀ, avec G = AᵀA', subgoal: 'projector' }, { math: mt(d.P), note: '', subgoal: 'projector' }],
+    },
+    {
+      html: 'Le rang de P, par sa trace (les valeurs propres de P sont 1, 1 et 0).', ask: 'tr P =', start: 'tr P', judge: { kind: 'mat', expect: '2', names: { P: mt(d.P) } },
+      lines: [{ math: 'tr(P)', note: 'Somme des cases diagonales', subgoal: 'projector' }, { math: '2', note: 'tr P = rang P = dim Col A' }],
+    },
+  ];
+  return partsItem(4, rng, segs, {
+    skill: RANK1, key: `${RANK1}:col:${mt(d.A)}`, fallback: d.fallback, subgoals: RANK1_SUB,
+    prompt: `A = ${MLm(d.A)} a deux colonnes libres. Calcule le projecteur orthogonal P = A(AᵀA)⁻¹Aᵀ sur le plan Col A, puis sa trace.`,
+    hints: hints('P = A(AᵀA)⁻¹Aᵀ : commence par la matrice 2 × 2 G = AᵀA et son inverse.', `AᵀA = ${MLm(d.G)}, (AᵀA)⁻¹ = □`, `P = ${MLm(d.P)}`),
+  });
+}
+
+// Level 5 (half the time): the proof « uuᵀ is the projector on Span{u} »
+// in blocks, without help.
+const PROOF_P = [
+  'Soit u unitaire (uᵀu = 1), P = uuᵀ, et x ∈ ℝⁿ.',
+  'Px = u(uᵀx) = (u · x)u : Px est dans Span{u}.',
+  'u · (x − Px) = u · x − (u · x)(u · u) = 0, car u · u = 1 : x − Px est orthogonal à u.',
+  'Donc x = Px + (x − Px), avec Px ∈ Span{u} et x − Px ⊥ u.',
+  'Par unicité de la décomposition orthogonale, Px est la projection orthogonale de x sur Span{u}.',
+];
+function projProof(rng) {
+  const ids = PROOF_P.map((_, i) => `b${i}`);
+  const blocks = PROOF_P.map((h, i) => ({ id: ids[i], html: h, needs: i ? [ids[i - 1]] : [], earlyWhy: i ? 'Pas encore : ce bloc s\'appuie sur le bloc précédent.' : undefined }));
+  blocks.push({ id: 'd0', html: 'Comme P est la projection sur Span{u}, Px est dans Span{u}.', needs: [], distractor: 'l_proof_circular', why: 'Ce bloc suppose ce qu\'on veut montrer.' });
+  blocks.push({ id: 'd1', html: 'Avec u = e₁, P = diag(1, 0) projette bien sur l\'axe des x.', needs: [], distractor: 'g9_proof_by_example', why: 'Un exemple ne prouve pas l\'énoncé pour tout u.' });
+  return blocksItem({
+    skill: RANK1, level: 5, mode: 'order',
+    prompt: 'Montre que si u est unitaire, P = uuᵀ est la projection orthogonale sur Span{u}. Touche les blocs dans l\'ordre de la preuve.',
+    blocks: rng.shuffle(blocks), goal: ids.at(-1), order: ids, placed: [],
+    hints: [], noHints: true,
+    solution: PROOF_P.map((s) => ({ html: s, note: '' })),
+    subgoals: [{ id: 'projector', label: 'projecteur', skill: RANK1 }, { id: 'proj', label: 'projection', skill: 'l-orth-proj' }, { id: 'outer', label: 'produit uuᵀ', skill: 'l-mat-product' }],
+    key: `${RANK1}:proof`, expectedSec: 140,
+  });
+}
+
+function rank1Item(level, rng) {
+  if (level === 5 && rng.chance(0.4)) return projProof(rng);
+  if (level === 4 && rng.chance(0.5)) return colProjItem(rng);
+  const house = level >= 3 && rng.chance(0.6);
+  const d = projData(rng);
+  const segs = projSegs(d, rng, { outerFirst: level === 1, house });
+  const ask = house ? 'P, la symétrie de Householder H = I − 2P, puis Py et Hy' : 'P, puis Py et (I − P)y';
+  return partsItem(level, rng, segs, {
+    skill: RANK1, key: `${RANK1}:${level}:${vt(d.u)}:${vt(d.y)}:${house}`, fallback: d.fallback, subgoals: RANK1_SUB, noHints: level === 5,
+    prompt: `u = ${uR(d)} et y = ${ML(vt(d.y))}. Calcule le projecteur orthogonal ${ask}.${level === 1 ? ' Commence par la matrice uuᵀ.' : ''}${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
+    hints: level === 5 ? [] : projHints(d), baits: ['g4_proj_no_square', ...(house ? ['m_householder_factor'] : [])],
+  });
+}
+
+function rank1Exam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const k = rng.int(0, 3);
+    if (k === 0) return tfL({ skill: RANK1, key: 'eig01', truth: true, exam: tag, statement: 'Les valeurs propres d\'un projecteur orthogonal P (P² = P, Pᵀ = P) sont 0 et 1.', explanation: 'Vrai : si Pv = λv avec v ≠ 0, alors λv = P²v = λ²v, donc λ² = λ.' });
+    if (k === 1) return tfL({ skill: RANK1, key: 'trace', truth: true, exam: tag, statement: 'Pour tout vecteur u ∈ ℝⁿ, tr(uuᵀ) = ‖u‖².', explanation: 'Vrai : la diagonale de uuᵀ porte u₁², …, uₙ², dont la somme vaut ‖u‖².' });
+    const d = projData(rng, { dim: 2 });
+    return tfL({
+      skill: RANK1, key: `inv:${vt(d.u)}`, truth: false, exam: tag,
+      statement: 'Un projecteur orthogonal P (P² = P, Pᵀ = P) de ℝ² est toujours inversible.',
+      counter: { kind: 'mx', prop: 'projNotInvertible', params: { n: 2 }, ask: [{ v: 'A', label: 'P =', shape: [2, 2] }], answer: { A: mt(d.P) } },
+      explanation: `Faux : seul P = I est inversible. Par exemple P = ${MLm(d.P)}, la projection sur Span{${R(vt(d.u))}}, envoie ${ML(vt([d.u[1].neg(), d.u[0]]))} sur 0.`,
+    });
+  }
+  const d = projData(rng);
+  if (exam === 'coef') {
+    const house = rng.chance(0.4);
+    const M = house ? d.H : d.P;
+    const cells = [];
+    M.forEach((r, i) => r.forEach((x, j) => { if (x.n !== 0 && j >= i) cells.push([i, j]); }));
+    const [i, j] = rng.pick(cells);
+    const name = house ? 'h' : 'p';
+    return coefItem({
+      skill: RANK1, exam: tag, label: `${name}_${i + 1}${j + 1}`, value: qt(M[i][j]), key: `${name}:${vt(d.u)}:${i}${j}`, fallback: d.fallback,
+      prompt: `u = ${uR(d)}. ${house ? 'H = I − 2uuᵀ/(uᵀu) est la symétrie de Householder par rapport à u⊥.' : 'P est le projecteur orthogonal sur Span{u}.'} Que vaut ${name}${sub(i + 1)}${sub(j + 1)} ?`,
+      traps: house ? [{ rule: 'm_householder_factor' }, { rule: 'g4_proj_no_square' }] : [{ rule: 'g4_proj_no_square' }],
+      solution: [{ html: `P = ${MLm(d.P)}${house ? `, H = I − 2P = ${MLm(d.H)}` : ''}`, note: '' }], subgoals: RANK1_SUB,
+    });
+  }
+  const pick = rng.int(0, 2);
+  const nrm = isqrt(d.uu.valueOf());
+  if (pick === 0) {
+    return mcqDistinct({
+      skill: RANK1, level: 4, key: `mcqP:${vt(d.u)}`, exam: tag, fallback: d.fallback,
+      prompt: `u = ${uR(d)}. Quel est le projecteur orthogonal sur Span{u} ?`,
+      right: MLm(d.P),
+      wrongs: [
+        { html: MLm(d.uut), rule: 'g4_proj_no_square' },
+        nrm ? { html: MLm(scaleM(d.uut, q(1, nrm))), rule: 'g4_proj_no_square' } : null,
+        { html: MLm(d.IP), rule: null },
+      ].filter(Boolean),
+      fillers: [{ html: MLm(d.H) }, { html: MLm(scaleM(d.P, 2)) }],
+      solution: [{ html: `P = uuᵀ/(uᵀu) = ${MLm(d.P)}`, note: `uᵀu = ${d.uu}` }],
+    }, rng);
+  }
+  if (pick === 1) {
+    return mcqDistinct({
+      skill: RANK1, level: 4, key: `mcqH:${vt(d.u)}`, exam: tag, fallback: d.fallback,
+      prompt: `u = ${uR(d)}. Quelle est la matrice de la symétrie orthogonale par rapport à l'hyperplan u⊥ (Householder) ?`,
+      right: MLm(d.H),
+      wrongs: [
+        { html: MLm(d.IP), rule: 'm_householder_factor' },
+        { html: MLm(MX.sub(MX.identity(d.n), scaleM(d.uut, 2))), rule: 'g4_proj_no_square' },
+        { html: MLm(scaleM(d.H, -1)), rule: null },
+      ],
+      fillers: [{ html: MLm(d.P) }],
+      solution: [{ html: `H = I − 2P = ${MLm(d.H)}`, note: `P = ${MLm(d.P)}` }],
+    }, rng);
+  }
+  return mcqDistinct({
+    skill: RANK1, level: 4, key: `mcqPy:${vt(d.u)}:${vt(d.y)}`, exam: tag, fallback: d.fallback,
+    prompt: `u = ${uR(d)} et y = ${ML(vt(d.y))}. Quelle est la projection orthogonale de y sur Span{u} ?`,
+    right: ML(vt(d.Py)),
+    wrongs: [
+      { html: ML(vt(d.u.map((x) => x.mul(d.uy)))), rule: 'g4_proj_no_square' },
+      nrm ? { html: ML(vt(d.u.map((x) => x.mul(d.uy).div(nrm)))), rule: 'g4_proj_no_square' } : null,
+      { html: ML(vt(d.rest)), rule: null },
+    ].filter(Boolean),
+    fillers: [{ html: ML(vt(d.Hy)) }, { html: ML(vt(d.Py.map((x) => x.mul(2)))) }],
+    solution: [{ html: `Py = (u · y)/(uᵀu)·u = (${fq(d.uy)}/${d.uu})·${uR(d)} = ${ML(vt(d.Py))}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [RANK1]: (level, rng, profile, opts = {}) => (opts.exam ? rank1Exam(rng, opts.exam) : rank1Item(level, rng)),
   [SCHUR]: (level, rng, profile, opts = {}) => (opts.exam ? schurExam(rng, opts.exam) : schurItem(level, rng)),
 };
 
