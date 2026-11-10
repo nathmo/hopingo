@@ -56,7 +56,7 @@ const pct = (x) => String((Math.round(x * 1000) / 1000).toFixed(3)).replace('.',
 export function simulateBox(item) {
   const spec = item.simulate;
   const box = h('div.lines-note', { style: { 'margin-top': '10px' } });
-  const btn = h('button.btn.small.secondary', { type: 'button' }, `🎲 Vérifier en simulant (${(spec.n ?? 10000).toLocaleString('fr-CH')} fois)`);
+  const btn = h('button.btn.small.secondary', { type: 'button' }, `🎲 Vérifier en simulant (${(spec.draws ?? 10000).toLocaleString('fr-CH')} fois)`);
   btn.addEventListener('click', () => {
     btn.disabled = true;
     const r = simulate(spec, seedOfKey(item.key));

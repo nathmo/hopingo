@@ -16,7 +16,7 @@ export const RULES = [
     id: 'p_sd_n', family: 'numeric', tag: 'C', skill: 'p-desc-summary', repair: 'p-desc-summary',
     name: "Variance divisée par n",
     example: ["s² = 60/7", "60/6"],
-    wrong: ['60/6', '60/7'],
+    wrong: ['10', '60/7'],
     // W : SS/n au lieu de SS/(n − 1) ; aussi pour σ̂ dans les tests
     explain: (c) => fill("Tu as divisé {SS} par n = {n}. La variance empirique du cours divise par n − 1 = {n−1}.", c),
   }),
@@ -64,7 +64,7 @@ export const RULES = [
     id: 'p_boxplot_range', family: 'notation', tag: 'E', skill: 'p-desc-boxplot', repair: 'p-desc-boxplot',
     name: "Étendue au lieu de l'EIQ",
     example: ["EIQ = 31 − 3", "13 − 6"],
-    wrong: ['6', '3'],
+    wrong: ['7', '28'],
     // W : max − min
     explain: (c) => fill("max − min est l'étendue. L'EIQ ne prend que la boîte : q̂(0,75) − q̂(0,25) = {q3} − {q1}.", c),
   }),
@@ -113,7 +113,7 @@ export const RULES = [
     id: 'p_binom_without_replacement', family: 'method', tag: 'E', skill: 'p-count', repair: 'p-binom',
     name: "Binomiale sans remise",
     example: ["C(4, 2)(1/8)²(7/8)²", "C(4, 2)C(28, 2)/C(32, 4)"],
-    wrong: ['4', '7/8'],
+    wrong: ['567/8990', '147/2048'],
     // W : binom(n, k, K/N)
     explain: (c) => "Sans remise, les tirages ne sont pas indépendants : la probabilité d'une dame change à chaque carte. On compte.",
   }),
@@ -163,7 +163,7 @@ export const RULES = [
     id: 'p_bayes_joint', family: 'proba', tag: 'E', skill: 'p-bayes-freq', repair: 'p-bayes-freq',
     name: "Probabilité conjointe au lieu de conditionnelle",
     example: ["9/1 000", "9/108"],
-    wrong: ['9/108', '000'],
+    wrong: ['1/12', '9/1000'],
     // W : Pr(M ∩ +)
     explain: (c) => "9/1 000 est la part des malades positifs dans toute la population. On ne regarde que les positifs : 9 sur 108.",
   }),
@@ -171,7 +171,7 @@ export const RULES = [
     id: 'p_two_tests_square', family: 'proba', tag: 'E', skill: 'p-bayes-formula', repair: 'p-bayes-formula',
     name: "A posteriori élevé au carré",
     example: ["(1/12)²", "9/20"],
-    wrong: ['9/20', '1/12'],
+    wrong: ['9/20', '1/144'],
     // W : Pr(M | +)²
     explain: (c) => "Un second test positif doit <b>augmenter</b> la probabilité d'être malade ; (1/12)² la diminue. Ce sont les vraisemblances qui s'élèvent au carré.",
   }),
@@ -179,7 +179,7 @@ export const RULES = [
     id: 'p_two_tests_uncond', family: 'proba', tag: 'E', skill: 'p-bayes-formula', repair: 'p-indep',
     name: "Tests indépendants sans condition",
     example: ["Pr(+, +) = 0,108²", "0,0081 + 0,0099"],
-    wrong: ['0.0099', '0.108'],
+    wrong: ['0.018', '0.011664'],
     // T : remplacer Pr(+, +) par Pr(+)²
     explain: (c) => "Les tests sont indépendants <b>sachant l'état</b>, pas en général : Pr(+, +) = Σ Pr(+ | état)²·Pr(état).",
   }),
@@ -203,7 +203,7 @@ export const RULES = [
     id: 'p_atleast_one_np', family: 'proba', tag: 'E', skill: 'p-indep', repair: 'p-binom',
     name: "« Au moins un » calculé par n·p",
     example: ["Pr(au moins un) = n·p", "1 − (1 − p)ⁿ"],
-    check: { bait: { skill: 'p-indep' } },
+    wrong: ['0.271', '0.3'],
     // W : n·p, 1 − pⁿ
     explain: (c) => fill("{n} · {p} = {v} peut dépasser 1. « Au moins un » est le contraire de « aucun » : 1 − (1 − p)ⁿ.", c),
   }),
@@ -211,7 +211,7 @@ export const RULES = [
     id: 'p_series_parallel', family: 'proba', tag: 'E', skill: 'p-indep', repair: 'p-indep',
     name: "Série et parallèle échangés",
     example: ["parallèle = Π pᵢ", "1 − Π(1 − pᵢ)"],
-    check: { bait: { skill: 'p-indep' } },
+    wrong: ['0.999', '0.729'],
     // W : formules échangées
     explain: (c) => "En parallèle, le système marche si <b>au moins un</b> composant marche ; Π pᵢ est la formule du montage en série.",
   }),
@@ -219,7 +219,7 @@ export const RULES = [
     id: 'p_cdf_strict', family: 'notation', tag: 'E', skill: 'p-disc-pmf', repair: 'p-disc-pmf',
     name: "Inégalité stricte dans F",
     example: ["Pr(X < 2) = F(2)", "F(1)"],
-    wrong: ['1', '2'],
+    wrong: ['0.4', '0.8'],
     // T : décaler l'indice de F d'un cran
     explain: (c) => "F(x) = Pr(X ≤ x) inclut x. Pour une variable discrète, Pr(X < 2) = F(1).",
   }),
@@ -235,7 +235,7 @@ export const RULES = [
     id: 'p_geom_support', family: 'notation', tag: 'C', skill: 'p-disc-pmf', repair: 'p-disc-pmf',
     name: "Convention de la loi géométrique",
     example: ["E = 1/p", "(1 − p)/p (MATH-234)"],
-    wrong: ['-234', '1'],
+    wrong: ['3', '4'],
     // W : formules de l'autre convention
     explain: (c) => "Ici X compte les échecs avant le premier succès (x = 0, 1, …) : E[X] = (1 − p)/p. La version qui compte les essais a E = 1/p.",
   }),
@@ -251,7 +251,7 @@ export const RULES = [
     id: 'p_binom_swap_p', family: 'proba', tag: 'E', skill: 'p-binom', repair: 'p-binom',
     name: "p et 1 − p échangés",
     example: ["0,4³ · 0,6²", "0,6³ · 0,4²"],
-    wrong: ['0.4', '0.6'],
+    wrong: ['0.3456', '0.2304'],
     // T : échanger p et 1 − p
     explain: (c) => fill("p = {p} va avec le nombre de succès {k}.", c),
   }),
@@ -259,7 +259,7 @@ export const RULES = [
     id: 'p_poisson_rate_scale', family: 'proba', tag: 'E', skill: 'p-poisson', repair: 'p-poisson',
     name: "Taux de Poisson pas mis à l'échelle",
     example: ["λ = 2 par heure pour 3 h", "λ = 6"],
-    wrong: ['6', '3'],
+    wrong: ['6', '2'],
     // W : formule avec λ non changé d'échelle
     explain: (c) => fill("{λ} est le taux par {unité}. Sur {t} {unité}s, le taux est {t} · {λ}.", c),
   }),

@@ -225,6 +225,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-desc-summary` — Moyenne, médiane, variance empirique
 - **Année** 15 · **Prérequis** `@alg:A-arrondir` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Une partie par grandeur nommée (x̄, méd, Σ(xᵢ − x̄)², s², s), avec report d'erreur ($xbar). La somme des données est dans la note de la première ligne (`42/7`). Niveau 5 : la série complète sans aide, ou le changement d'unité y = a·x + b (aussi 1 fois sur 4 au niveau 4). Non faits : l'item `code` (le type `code` vient avec U9), le gabarit (b) valeur/effectif, la comparaison de deux séries.
 - **Intro** : on trie les données, puis : moyenne x̄ = Σxᵢ/n ; médiane x₍⌈n/2⌉₎ ; variance empirique s² = Σ(xᵢ − x̄)²/(**n − 1**) ; écart-type s = √s². Si yᵢ = a·xᵢ + b : ȳ = a·x̄ + b, méd(y) = a·méd(x) + b, s_y = |a|·s_x. Exemple : `2, 4, 4, 5, 7, 9, 11` (note : n = 7, x̄ = 42/7 = 6) ; `méd = x₍₄₎ = 5` ; `s² = 60/6 = 10` (note : 60 = somme des écarts au carré).
 - **Juge** : lignes étiquetées. `x̄`, `méd`, `Σ(xᵢ − x̄)²`, `s²` : `prob` (valeurs exactes) ; `s` : `stat {decimals: 2}` · **Forme finale** : x̄, médiane et s² exactes (entier, fraction ou décimal fini), s à 0,01 près.
 - **Niveaux** :
@@ -248,6 +249,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-desc-boxplot` — Quartiles, résumé en 5 valeurs, boîte à moustaches
 - **Année** 15 · **Prérequis** `p-desc-summary` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties q̂(0,25), méd, q̂(0,75), EIQ, seuils (intervalle) et moustaches (intervalle [a ; b], juge `prob`) ; les valeurs aberrantes sont une décision. Le résumé en 5 valeurs n'est pas une ligne à part. Non faits : le dessin de la boîte (L4), la comparaison de deux boîtes (L5 : tout le calcul sans aide, données non triées) et le gabarit (c) boîte dessinée.
 - **Intro** : q̂(α) = x₍⌈nα⌉₎. Résumé en 5 valeurs : min, q̂(0,25), médiane, q̂(0,75), max. EIQ = q̂(0,75) − q̂(0,25), C = 1,5·EIQ. Les moustaches vont jusqu'aux **données** les plus extrêmes à l'intérieur de [q̂(0,25) − C ; q̂(0,75) + C] ; les données hors de cet intervalle sont des points (valeurs aberrantes). Exemple : n = 11, `⌈11 · 0,25⌉ = 3` (note : q̂(0,25) = x₍₃₎) ; `C = 1,5 · 7 = 10,5`.
 - **Juge** : lignes étiquetées, `value` (positions entières, valeurs exactes) ; dernière ligne `moustaches = [a ; b] ; aberrantes = {…}` comparée comme ensemble · **Forme finale** : résumé en 5 valeurs, extrémités des moustaches, liste des valeurs aberrantes (∅ accepté).
 - **Niveaux** :
@@ -272,6 +274,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-events` — Axiomes, complément, inclusion-exclusion
 - **Année** 15 · **Prérequis** `g9-sets` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Aux niveaux 1 et 2 la formule est une note, la ligne avec les nombres est à trous ; la ligne de formule (avec les symboles Pr(…)) apparaît dès le niveau 3. `p_conjunction` est une option de décision (« A seulement », Pr(A ∩ B)). Niveau 5 : les quatre questions enchaînées, sans le tableau 2 × 2. Gabarit (c) (catégories d'un tableau) non fait.
 - **Pourquoi ces prérequis** : `g9-sets` : réunion, intersection et complément d'événements.
 - **Intro** : 0 ≤ Pr(A) ≤ 1, Pr(Ω) = 1, et Pr de réunions disjointes = somme. On en tire Pr(Aᶜ) = 1 − Pr(A), Pr(A ∪ B) = Pr(A) + Pr(B) − Pr(A ∩ B), Pr(A ∩ Bᶜ) = Pr(A) − Pr(A ∩ B), et A ⊂ B ⇒ Pr(A) ≤ Pr(B). Exemple : `Pr(A ∪ B) = 0,5 + 0,7 − 0,3 = 0,9` ; `Pr(aucun) = 1 − 0,9 = 0,1`.
 - **Juge** : `prob` `{symbols: {'Pr(A)': '1/2', 'Pr(B)': '7/10', 'Pr(A∩B)': '3/10'}}` · **Forme finale** : décimal fini ou fraction irréductible.
@@ -294,6 +297,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-count` — Équiprobabilité et dénombrement
 - **Année** 15 · **Prérequis** `p-events`, `g7-combinations`, `g7-which-count` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits cartes (32, 36, 52), comité, lot ; Pr(A) en fraction irréductible avec « ≈ » pour la valeur approchée. Niveau 5 (et 3 fois sur 10 au niveau 4) : « au moins 2 » par le complément. Non faits : le gabarit (d) anniversaires (fractions trop grandes pour le calcul exact) et « 4 cartes de la même couleur ». Simulation : l'urne tirée 10 000 fois.
 - **Pourquoi ces prérequis** : `p-events` : Pr(A) = |A|/|Ω| et passage au complément.
 - **Intro** : si tous les résultats sont équiprobables, Pr(A) = |A|/|Ω|. Tirage simultané (sans ordre, sans remise) de n objets parmi N : |Ω| = C(N, n). « Exactement k marqués » : C(K, k)·C(N − K, n − k). On compte Ω et A **de la même façon** (les deux ordonnés ou les deux non ordonnés). Exemple : `|Ω| = C(32, 4) = 35 960` ; `|A| = C(4, 2) · C(28, 2) = 2 268`.
 - **Juge** : `prob` ; `C(n, k)` est lu comme un nombre exact · **Forme finale** : fraction irréductible (le décimal à 4 chiffres est accepté en plus, pas à la place).
@@ -316,6 +320,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-cond-total` — Conditionnement et probabilités totales
 - **Année** 15 · **Prérequis** `p-events` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits test médical, urnes à pile ou face, trois machines (Pr(A) totale) ; Pr(A | B) à partir des valeurs données (niveau 4) ; niveau 5 : univers réduit avec deux dés, ou probabilité totale puis Pr(M | +). L'arbre des niveaux 1 et 2 est remplacé par la ligne à trous. Non faits : la double faute au tennis, le coiffeur, la clé de Julie.
 - **Pourquoi ces prérequis** : `p-events` : Pr(A ∩ B) et partitions de Ω.
 - **Intro** : Pr(A | B) = Pr(A ∩ B)/Pr(B) ; donc Pr(A ∩ B) = Pr(A | B)·Pr(B). Si B₁, …, B_k partitionnent Ω : Pr(A) = Σ Pr(A | Bᵢ)·Pr(Bᵢ) (une branche de l'arbre par Bᵢ). Exemple : `Pr(+) = 0,9 · 0,1 + 0,2 · 0,9` (note : une branche « malade », une branche « sain ») ; `= 0,27`.
 - **Juge** : `prob` `{symbols}` ; l'arbre (L1–L2) est un `table` de branches · **Forme finale** : décimal fini ou fraction irréductible.
@@ -338,6 +343,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-bayes-freq` — Bayes par les fréquences naturelles
 - **Année** 15 · **Prérequis** `p-cond-total`, `@alg:J-pourcentage` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Cinq parties (malades, malades positifs, sains positifs, positifs, Pr(M | +)), le pourcentage dans la note et après « ≈ ». Gabarits test médical, filtre anti-spam, contrôle de qualité. « Interpréter » et la simulation (10 000 personnes) sont branchés. Non faits : la population choisie par l'élève (L4), le curseur « prédire puis calculer » (L5 : tout le calcul sans aide), le gabarit (d) Pr(sain | négatif).
 - **Intro** : on imagine 1 000 personnes et on remplit le tableau malades/sains × positif/négatif. Pr(malade | positif) = (malades positifs)/(tous les positifs). Exemple (1 %, 90 %, 10 %) : `10 malades, 990 sains` ; `9 malades positifs, 99 sains positifs` ; `Pr(M | +) = 9/108 = 1/12` (note : 8,3 %, pas 90 %).
 - **Juge** : lignes étiquetées. Effectifs : `value` (entiers) ; dernière ligne : `prob` · **Forme finale** : fraction irréductible et pourcentage à 0,1 % près.
 - **Niveaux** :
@@ -361,6 +367,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-bayes-formula` — Formule de Bayes, deux tests
 - **Année** 15 · **Prérequis** `p-bayes-freq` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties Pr(+), Pr(M | +), Pr(M | +, +) et, au niveau 5 et en variante `open` (10 points : 9 pour les lignes, 1 pour « Interpréter »), la vérification par mise à jour successive. Non faits : les gabarits (c) test négatif, (d) trois machines, (e) pièce biaisée.
 - **Pourquoi ces prérequis** : `p-bayes-freq` : même tableau des fréquences naturelles.
 - **Intro** : Pr(M | +) = Pr(+ | M)·Pr(M) / [Pr(+ | M)·Pr(M) + Pr(+ | Mᶜ)·Pr(Mᶜ)]. Le dénominateur est Pr(+), par les probabilités totales ; c'est la colonne « positifs » du tableau. Deux tests indépendants **sachant l'état** : Pr(+, + | M) = Pr(+ | M)². Exemple : `Pr(M | +) = 0,9 · 0,01/(0,9 · 0,01 + 0,1 · 0,99) = 1/12` (note : même nombre que 9/108) ; `Pr(M | +, +) = 0,9² · 0,01/(0,9² · 0,01 + 0,1² · 0,99) = 9/20`.
 - **Juge** : `prob` `{symbols: {'Pr(M)': '1/100', 'Pr(+|M)': '9/10', 'Pr(+|Mᶜ)': '1/10'}}` · **Forme finale** : fraction irréductible et pourcentage.
@@ -386,6 +393,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-indep` — Indépendance, incompatibilité, systèmes redondants
 - **Année** 15 · **Prérequis** `p-cond-total` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits dés (indépendants deux à deux, pas mutuellement), tableau 2 × 2 (décision appuyée sur Pr(A)·Pr(B)), systèmes série, parallèle et mixte, « au moins un 6 ». Niveau 5 : les dés, puis le nombre minimal de composants en parallèle. Gabarit (e) (pile puis face) non fait. Le V/F « deux à deux ⇒ mutuellement » n'est pas posé (pas de contre-exemple vérifiable en nombres) : `p_pairwise_mutual` est une option de décision.
 - **Pourquoi ces prérequis** : `p-cond-total` : Pr(A | B) = Pr(A).
 - **Intro** : A et B indépendants ⇔ Pr(A ∩ B) = Pr(A)·Pr(B) ⇔ Pr(A | B) = Pr(A). Incompatibles : Pr(A ∩ B) = 0 ; deux événements incompatibles de probabilités non nulles sont **dépendants**. Trois événements sont mutuellement indépendants si les quatre égalités tiennent. Système en série : Π pᵢ ; en parallèle : 1 − Π(1 − pᵢ). Exemple : `parallèle, 3 × 0,9 : 1 − 0,1³ = 0,999` ; `série : 0,9³ = 0,729`.
 - **Juge** : décisions (« indépendants ? ») appuyées sur des lignes `prob` · **Forme finale** : décision justifiée par une égalité ou une inégalité calculée ; ou probabilité de fonctionnement exacte.
@@ -409,6 +417,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-disc-pmf` — Variable discrète : fonction de masse, de répartition, quantile
 - **Année** 15 · **Prérequis** `p-events`, `a1-ser-geo-tele` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits tableau (c, F(m − 1), Pr(a ≤ X < b) avec F, médiane), c·k, géométrique (convention MATH-234 : c, Pr(X ≥ k), E[X]) et maximum de deux dés (niveau 5). F n'est pas saisie en entier dans un tableau : une valeur F(k). Non fait : c·k².
 - **Pourquoi ces prérequis** : `p-events` : la somme des probabilités vaut 1.
 - **Intro** : fonction de masse f(xᵢ) = Pr(X = xᵢ) ≥ 0, de somme 1. Fonction de répartition F(x) = Pr(X ≤ x), en escalier, continue à droite. Quantile : F⁻¹(α) = min{x : F(x) ≥ α}. Pr(a < X ≤ b) = F(b) − F(a) ; attention à < et ≤. Géométrique (MATH-234) : Pr(X = x) = (1 − p)ˣ·p, x = 0, 1, … ; sans mémoire. Exemple : `c = 1 − 0,8 = 0,2` ; `méd = min{x : F(x) ≥ 0,5} = 2`.
 - **Juge** : `prob` (constante, probabilités, valeurs de F) ; `value` (quantile) ; F se saisit par morceaux dans un `table` · **Forme finale** : nombre exact ; F avec ses sauts.
@@ -431,6 +440,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-binom` — Bernoulli et binomiale
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `g7-binomial` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Une partie p (avec la décision « binomiale ? »), puis Pr(X = k) ; aux niveaux 4 et 5, E[X], var(X) et Pr(X ≤ 1) ou Pr(X ≥ 2). Non fait : la comparaison des systèmes à 5 et à 3 composants (« pour quels p ? »). Simulation : B(n, p) tirée 10 000 fois.
 - **Pourquoi ces prérequis** : `p-disc-pmf` : fonction de masse et de répartition.
 - **Intro** : n essais indépendants, même probabilité p de succès : X ~ B(n, p), Pr(X = k) = C(n, k)·pᵏ(1 − p)^(n−k), E[X] = np, var(X) = np(1 − p). B(1, p) = B(p). « Au moins un » : 1 − (1 − p)ⁿ. Exemple : `X ~ B(5 ; 0,6)` ; `Pr(X = 3) = C(5, 3) · 0,6³ · 0,4² = 0,3456`.
 - **Juge** : `prob` si p est rationnel (exact), sinon `stat {decimals: 4}` · **Forme finale** : valeur exacte ou décimal à 4 chiffres.
@@ -453,6 +463,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-poisson` — Loi de Poisson, lien avec la binomiale
 - **Année** 15 · **Prérequis** `p-binom` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits taux × durée, approximation de la binomiale (λ = np, avec la décision Poisson ou normale), deux sources indépendantes ; Pr(X = k) ou Pr(X ≤ k) par `stat` à 0,001. Non faits : les anniversaires (λ = 247/365) et la comparaison avec la valeur binomiale exacte (L5).
 - **Intro** : X ~ Poiss(λ) : Pr(X = k) = λᵏe^(−λ)/k!, E = var = λ. Si X₁ ~ Poiss(λ₁) et X₂ ~ Poiss(λ₂) sont indépendantes, X₁ + X₂ ~ Poiss(λ₁ + λ₂). Le taux suit la durée (λ par heure → 3λ en 3 h). Loi des petits nombres : n grand et p petit ⇒ B(n, p) ≈ Poiss(np). Exemple : `B(200 ; 0,01) ≈ Poiss(2)` ; `Pr(X ≤ 1) = 3e^(−2) ≈ 0,406`.
 - **Juge** : `stat {decimals: 3}` ; une expression exacte (`3e^(-2)`) est acceptée par `equiv` numérique · **Forme finale** : décimal à 3 chiffres.
 - **Niveaux** :
@@ -473,6 +484,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-hypergeom` — Loi hypergéométrique
 - **Année** 15 · **Prérequis** `p-count`, `p-binom`, `p-cond-total` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits urne et lot ; Pr(X = k), puis Pr(X ≥ 1) (niveau 4) et Pr(X = k | X ≥ 1) (niveau 5). La comparaison avec la binomiale (gabarit c) n'est qu'un distracteur (`p_binom_without_replacement`).
 - **Pourquoi ces prérequis** : `p-binom` : approximation B(n, K/N) quand N est grand.
 - **Intro** : N objets dont K marqués ; on en tire n **sans** remise : Pr(X = k) = C(K, k)·C(N − K, n − k)/C(N, n), E[X] = nK/N. Si N est grand devant n, X ≈ B(n, K/N). Exemple : `6 rouges, 4 bleues, 3 tirées` ; `Pr(X = 2) = C(6, 2) · C(4, 1)/C(10, 3) = 60/120 = 1/2`.
 - **Juge** : `prob` · **Forme finale** : fraction irréductible.

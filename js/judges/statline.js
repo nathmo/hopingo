@@ -188,9 +188,12 @@ const valueCache = new Map();
 function textValue(cfg, text) {
   if (typeof text === 'number') return { q: Number.isInteger(text) ? new Q(text) : null, x: text };
   const key = String(text);
-  if (valueCache.has(key)) return valueCache.get(key);
+  // A text with $names depends on cfg.ref: not cached.
+  const named = key.includes('$');
+  if (!named && valueCache.has(key)) return valueCache.get(key);
   let v = null;
   try { v = statValue(cfg, readMember({ vars: [] }, key, { items: [], blanks: 0 }), {}); } catch { v = null; }
+  if (named) return v;
   if (valueCache.size > 2000) valueCache.clear();
   valueCache.set(key, v);
   return v;
