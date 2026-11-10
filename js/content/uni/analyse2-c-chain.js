@@ -14,6 +14,9 @@ import { parse } from '../../cas/parse.js';
 import { JUDGES, readWith } from '../../judges/index.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { ML as MLmat } from './alglin-kit.js';
+import { readable } from './geo-kit.js';
+
+const tidy = (t) => t.replace(/(^|; |= |\()− /g, '$1−');
 import { joinSum, piText } from './analyse1-e-kit.js';
 import {
   q, qt, fq, H, nz, ML, polyT, polyD, polyAt, ptT, vecT, rowT,
@@ -86,7 +89,7 @@ function chainData(rng) {
   return { g, a: [1, 1], b: [q(2), q(0)], P: '2x', Q: '2y', fb: [q(4), q(0)], fa: [q(2), q(2)], Jgs: [['1', '1'], ['1', '-1']], Jg: [[q(1), q(1)], [q(1), q(-1)]], Jh: [q(4), q(4)], JhA: [q(4), q(0)], f: 'x^2+y^2', fallback: true };
 }
 const gML = (d) => `g(u, v) = (${d.g.map((c) => ML(polyT(c, UV))).join(', ')})`;
-const jfML = (d) => `J_f(x, y) = (${ML(d.P)}  ${ML(d.Q)})`;
+const jfML = (d) => `J_f(x, y) = (${ML(d.P)}, ${ML(d.Q)})`;
 // The entry j of the traps' values: J_f(a)·J_g(a), one term kept, J_g·J_fᵀ.
 function chainWrongs(d, j) {
   const { fb, fa, Jg } = d;
@@ -151,7 +154,7 @@ function chainItem(level, rng, opts = {}) {
   return partsItem({
     skill: CH, level, parts, subgoals: CH_SUB, key: `${CH}:${d.f}:${d.g.map((c) => polyT(c, UV)).join('|')}:${d.a}`, fallback: d.fallback,
     prompt: `Soit ${gML(d)} et f : ℝ² → ℝ différentiable, de jacobienne ${jfML(d)}. On pose h = f ∘ g. Calcule J_h${ptT(d.a)}.`,
-    hints: H('J_h(a) = J_f(g(a))·J_g(a) : commence par calculer g(a).', `J_f${ptT(d.b)} = ${MLmat(outer)}`, `J_h${ptT(d.a)} = ${MLmat(`${outer}·${JgNum}`)} = ${MLmat(prod)}`),
+    hints: H('J_h(a) = J_f(g(a))·J_g(a) : commence par calculer g(a).', `J_f${ptT(d.b)} = ${MLmat(outer)}`, `J_h${ptT(d.a)} = ${MLmat(outer)}·${MLmat(JgNum)} = ${MLmat(prod)}`),
   });
 }
 
@@ -234,7 +237,7 @@ class F {
     if (this.a.n === 0) return `${R.neg ? '-' : ''}${R.t}`;
     return `${qt(this.a)}${R.neg ? '-' : '+'}${R.t}`;
   }
-  show() { return this.text().replace(/-/g, '−'); }
+  show() { return this.text().replace(/(.)([+-])/g, '$1 $2 ').replace(/-/g, '−'); }
   value() { return this.a.valueOf() + this.b.valueOf() * Math.sqrt(this.s); }
 }
 // cos and sin of an angle in degrees (multiples of 30° and 45°).
@@ -334,7 +337,7 @@ function polarItem(level, rng, opts = {}) {
   return partsItem({
     skill: CP, level, parts, subgoals: CP_SUB, key: `${CP}:${d.F}:${d.r0}:${d.deg}`, fallback: d.fallback,
     prompt: `Soit f : ℝ² → ℝ différentiable et f̃(r, φ) = f(r cos φ, r sin φ). On sait que J_f̃(r, φ) = (${ML(d.fr)}, ${ML(d.fp)}). Calcule ∇f${pt}.`,
-    hints: H('Écris le point en polaires, puis f̃_r = cos φ·f_x + sin φ·f_y et f̃_φ = −r sin φ·f_x + r cos φ·f_y ; résous pour f_x et f_y.', `En φ = ${phiT.replace(/-/g, '−')} : cos φ = ${d.c.show()}, sin φ = ${d.sn.show()} ; f̃_r = ${d.R.show()}, f̃_φ = ${d.P.show()}`, `${sys.replace(/-/g, '−')}`),
+    hints: H('Écris le point en polaires, puis f̃_r = cos φ·f_x + sin φ·f_y et f̃_φ = −r sin φ·f_x + r cos φ·f_y ; résous pour f_x et f_y.', `En φ = ${phiT.replace(/-/g, '−')} : cos φ = ${d.c.show()}, sin φ = ${d.sn.show()} ; f̃_r = ${d.R.show()}, f̃_φ = ${d.P.show()}`, tidy(readable(sys))),
   });
 }
 
@@ -365,7 +368,7 @@ function polarMcq(level, rng, opts) {
       { html: V(d.c.mul(d.R).add(d.sn.mul(d.P).div(r)), d.sn.mul(d.R).sub(d.c.mul(d.P).div(r))), rule: null },
       { html: V(d.fx.neg(), d.fy), rule: null },
     ],
-    solution: [{ html: `r = ${r}, φ = ${piText(new Q(d.deg, 180)).replace(/-/g, '−')} ; ${polarSystem(d).replace(/-/g, '−')} ; ∇f${pt} = ${V(d.fx, d.fy)}.`, note: '' }],
+    solution: [{ html: `r = ${r}, φ = ${piText(new Q(d.deg, 180)).replace(/-/g, '−')} ; ${tidy(readable(polarSystem(d)))} ; ∇f${pt} = ${V(d.fx, d.fy)}.`, note: '' }],
   }, rng, opts);
 }
 function polarTf(rng, opts) {
@@ -434,7 +437,10 @@ function cartOf(G, n) {
   const R2 = n === 2 ? 'x^2+y^2' : 'x^2+y^2+z^2';
   if (G.kind === 'ln') return `ln(√(${R2}))`;
   if (G.kind === 'gauss') return `e^(-(${R2}))`;
-  if (G.a % 2 === 0) return G.a > 0 ? `(${R2})^${G.a / 2}` : `1/(${R2})^${-G.a / 2}`;
+  if (G.a === 2) return R2;
+  if (G.a === -2) return `1/(${R2})`;
+  if (G.a === -1) return `1/√(${R2})`;
+  if (G.a % 2 === 0) return `(${R2})^${G.a / 2}`;
   return G.a > 0 ? `(${R2})^(${G.a}/2)` : `1/(${R2})^(${-G.a}/2)`;
 }
 const formulaT = (k) => (k === 0 ? 'g″' : `g″ + (${k}/r)·g′`);
@@ -487,13 +493,13 @@ function alphaItem(level, rng, n = rng.pick([2, 3])) {
         { math: `${factor}r^(α-2)`, note: 'r^(α−2) en facteur', subgoal: 'combine' },
       ] },
     { html: 'Δf = 0 pour r > 0 :', ask: '', start: eq, judge: { kind: 'solset', v: 'α' }, menu: [{ id: 'solve', label: 'Résoudre en α (r^(α−2) ≠ 0)', valid: true }],
-      lines: [{ math: sol, note: n === 2 ? 'Seule la constante r⁰ = 1 : en dimension 2, c\'est ln r qui est harmonique' : `r⁰ = 1 et r^${2 - n} = 1/r`, subgoal: 'formula' }] },
+      lines: [{ math: sol, note: n === 2 ? 'Seule la constante r⁰ = 1 : en dimension 2, c\'est ln r qui est harmonique' : 'r⁰ = 1 et r⁻¹ = 1/r', subgoal: 'formula' }] },
   ];
   const R = n === 2 ? 'x² + y²' : 'x² + y² + z²';
   return partsItem({
     skill: LR, level, parts, subgoals: LR_SUB, key: `${LR}:alpha:${n}`,
     prompt: `Dans ℝ${n === 2 ? '²' : '³'} privé de 0, pour quelles valeurs de α la fonction f = (${R})^(α/2) = r^α vérifie-t-elle Δf = 0 ? Calcule d'abord Δf.`,
-    hints: H('f = g(r) avec g = r^α : Δf = g″ + ((n − 1)/r)·g′.', `Δf = ${ML(`α(α-1)r^(α-2)+${k}αr^(α-2)`)}`, `Δf = ${ML(`${factor}r^(α-2)`)} = 0`),
+    hints: H('f = g(r) avec g = r^α : Δf = g″ + ((n − 1)/r)·g′.', `Δf = ${ML(`α(α-1)r^(α-2)+${k === 1 ? '' : k}αr^(α-2)`)}`, `Δf = ${ML(`${factor}r^(α-2)`)} = 0`),
   });
 }
 
@@ -553,7 +559,7 @@ function lapTf(rng, opts) {
 function lapGen(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return lapMcq(4, rng, opts);
   if (opts.exam === 'tf') return lapTf(rng, opts);
-  if (level === 5) return alphaItem(5, rng, 3);
+  if (level === 5) return rng.chance(0.5) ? alphaItem(5, rng, rng.pick([2, 3])) : radialItem(5, rng);
   if (level === 4) { const t = rng.int(0, 2); if (t === 1) return alphaItem(level, rng); if (t === 2) return polarLapItem(level, rng); }
   return radialItem(level, rng);
 }

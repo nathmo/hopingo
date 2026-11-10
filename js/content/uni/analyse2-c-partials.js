@@ -55,7 +55,7 @@ function polyComp(rng, n, maxDeg = 3) {
 }
 // sin(k·v_i·v_j), e^(k·v_i·v_j), v_i/v_j, (1 + x²)^y.
 function specialComp(rng, n, kind) {
-  const [i, j] = rng.shuffle([...Array(n).keys()]).slice(0, 2);
+  const [i, j] = rng.shuffle([...Array(n).keys()]).slice(0, 2).sort((A, B) => A - B);
   const vi = VARS[i];
   const vj = VARS[j];
   const k = rng.pick([1, 1, 2]);
@@ -383,7 +383,7 @@ function graphItem(level, rng, opts = {}) {
         { id: 'nof', label: 'z = f_x(a, b)(x − a) + f_y(a, b)(y − b)', valid: false, why: 'Le plan doit passer par (a, b, f(a, b)) : il manque f(a, b).' },
       ],
       lines: planeLines(
-        { math: plane, note: 'z = f(a, b) + f_x(a, b)(x − a) + f_y(a, b)(y − b)', subgoal: 'plane', blank: [qt(fx), qt(fy)], blank2: [shiftT('x', a), shiftT('y', b)].filter((s) => s.length > 1) },
+        { math: plane, note: 'z = f(a, b) + f_x(a, b)(x − a) + f_y(a, b)(y − b)', subgoal: 'plane', blank: [termT(fx, shiftT('x', a), true), termT(fy, shiftT('y', b), true)].filter(Boolean), blank2: [shiftT('x', a), shiftT('y', b)].filter((s) => s.length > 1) },
         { math: fin, note: 'Développé', subgoal: 'simplify' },
       ) },
   ];
@@ -391,7 +391,7 @@ function graphItem(level, rng, opts = {}) {
   if (level >= 3) { parts[1].html = 'La dérivée partielle par rapport à x, au point :'; parts[2].html = 'La dérivée partielle par rapport à y, au point :'; }
   return partsItem({
     skill: TG, level, parts, subgoals: TG_SUB, key: `${TG}:${d.f}:${a},${b}`, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(d.f)}. Donne une équation du plan tangent au graphe de f au point d'abscisse ${pt}.`,
+    prompt: `Soit f(x, y) = ${ML(d.f)}. Donne une équation du plan tangent au graphe de f au point (${fq(a)}, ${fq(b)}, f(${fq(a)}, ${fq(b)})).`,
     hints: H('Il faut f(a, b), f_x(a, b) et f_y(a, b).', `z = ${fq(c)} + (…)(${RD(shiftT('x', a))}) + (…)(${RD(shiftT('y', b))})`, ML(plane)),
   });
 }
@@ -529,7 +529,7 @@ const gcd2 = (a, b) => (b ? gcd2(b, a % b) : Math.abs(a));
 const gcdOf = (xs) => xs.reduce((g, x) => gcd2(g, x), 0);
 const levelPlane = (n, p) => `${[0, 1, 2].map((i) => termT(n[i], shiftT(VARS[i], p[i]), i === 0)).join('').replace(/^\+/, '')} = 0`;
 function levelFinal(n, p, rhsShift = 0) {
-  const w = prim(n.map((x) => q(x)));
+  const w = prim(n.map((x) => q(x)), true);
   const k = q(n.find((x) => x !== 0)).div(w.find((x) => x.n !== 0));
   const rhs = w.reduce((s, x, i) => s.add(x.mul(p[i])), q(0)).add(q(rhsShift).div(k));
   return `${polyT(w.map((x, i) => ({ c: x, e: [0, 1, 2].map((j) => (j === i ? 1 : 0)) })))} = ${qt(rhs)}`;

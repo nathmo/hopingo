@@ -477,26 +477,36 @@ function judgeJet(cfg, prev, node) {
   return { kind: 'ok', node };
 }
 
-// A term c·Xⁱ·Yʲ: its degree, or null when it is not one (X = x or x − a).
-function monoDegree(t, vars) {
+// A term c·Xⁱ·Yʲ: {deg, key} (key: the monomial, written), or null when it is
+// not one (X = x or x − a).
+function monoOf(t, vars) {
   const { factors } = productFactors(t);
   let deg = 0;
+  const parts = [];
   for (const f of factors) {
     const n = stripParen(f.node);
     const isVarNode = (x) => x.t === 'sym' && !x.sub && vars.includes(x.name);
     const shifted = n.t === 'bin' && (n.op === '+' || n.op === '-') && isVarNode(stripParen(n.l)) && numValue(stripParen(n.r));
     if (!isVarNode(n) && !shifted) return null;
     deg += f.k;
+    parts.push(`${toText(n)}^${f.k}`);
   }
-  return deg;
+  return { deg, key: parts.sort().join('·') };
+}
+// The terms of a sum, a bracketed sum kept whole ((y + 1) is one term).
+function termsTop(n, out = []) {
+  if (n.t === 'bin' && (n.op === '+' || n.op === '-')) { termsTop(n.l, out); termsTop(n.r, out); } else if (n.t === 'neg') termsTop(n.e, out);
+  else out.push(n);
+  return out;
 }
 function taylorForm(node, cfg) {
   if (hasDeriv(node)) return false;
   const vars = cfg.vars || ['x', 'y'];
   const order = cfg.jet?.order ?? 2;
-  const degs = sumTerms(node).map((t) => monoDegree(t, vars));
-  if (degs.some((d) => d === null)) return false;
-  if (degs.some((d) => d > order)) return `Tronque : garde seulement les termes de degré ≤ ${order}.`;
+  const ms = termsTop(stripParen(node)).map((t) => monoOf(t, vars));
+  if (ms.some((m) => m === null)) return false;
+  if (ms.some((m) => m.deg > order)) return `Tronque : garde seulement les termes de degré ≤ ${order}.`;
+  if (new Set(ms.map((m) => m.key)).size < ms.length) return 'Regroupe les termes semblables.';
   return presentationIssue(node) ?? true;
 }
 TARGETS.taylor2 = (node, cfg) => taylorForm(node, cfg);

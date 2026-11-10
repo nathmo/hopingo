@@ -12,8 +12,9 @@
 
 import { Q } from '../../math/rational.js';
 import { JUDGES, readWith } from '../../judges/index.js';
+import { sameLine } from '../../judges/common.js';
 import {
-  q, qt, fq, H, nz, ML, polyT, ptT,
+  q, qt, fq, H, nz, ML, RD, polyT, ptT,
   partsItem, examMcq, tfItem, vfMcq, a2Counter, coefLines, examTag,
 } from './analyse2-c-kit.js';
 
@@ -33,7 +34,7 @@ const PHIS = {
   cos: { c: [1, 0, q(-1, 2)], f: (u) => `cos(${u})`, dl: 'cos(u)', name: 'cos u' },
   sin: { c: [0, 1, 0], f: (u) => `sin(${u})`, dl: 'sin(u)', name: 'sin u' },
   exp: { c: [1, 1, q(1, 2)], f: (u) => `e^(${u})`, dl: 'e^u', name: 'eᵘ' },
-  ln: { c: [0, 1, q(-1, 2)], f: (u) => `ln(1+${u})`, dl: 'ln(1+u)', name: 'ln(1 + u)' },
+  ln: { c: [0, 1, q(-1, 2)], f: (u) => (u.startsWith('-') ? `ln(1${u})` : `ln(1+${u})`), dl: 'ln(1+u)', name: 'ln(1 + u)' },
   inv: { c: [1, 1, 1], f: (u) => `1/(1-(${u}))`, dl: '1/(1-u)', name: '1/(1 − u)' },
 };
 
@@ -68,15 +69,25 @@ function uData(rng) {
   for (const k of keys) u2[k] = nz(rng, -2, 2);
   return { X: a1, Y: b1, ...u2 };
 }
-// u written in x, y around (a, b): a1·(x − a) + … expanded.
-function uText(u, a, b) {
+// u written in x, y around (a, b): a1·(x − a) + … expanded, as terms.
+function uTerms(u, a, b) {
   const x2 = q(u.XX);
   const xy = q(u.XY);
   const y2 = q(u.YY);
   const x1 = q(u.X).sub(x2.mul(2 * a)).sub(xy.mul(b));
   const y1 = q(u.Y).sub(y2.mul(2 * b)).sub(xy.mul(a));
   const c0 = q(-u.X * a - u.Y * b).add(x2.mul(a * a)).add(xy.mul(a * b)).add(y2.mul(b * b));
-  return polyT([{ c: x2, e: [2, 0] }, { c: xy, e: [1, 1] }, { c: y2, e: [0, 2] }, { c: x1, e: [1, 0] }, { c: y1, e: [0, 1] }, { c: c0, e: [0, 0] }], XY);
+  return [{ c: x1, e: [1, 0] }, { c: y1, e: [0, 1] }, { c: x2, e: [2, 0] }, { c: xy, e: [1, 1] }, { c: y2, e: [0, 2] }, { c: c0, e: [0, 0] }];
+}
+const uText = (u, a, b) => polyT(uTerms(u, a, b), XY);
+// f = φ(u) as text; ln(1 + u) and 1/(1 − u) with their constant merged: ln(4 − 2x + …).
+function fText(kind, u, a, b) {
+  const ts = uTerms(u, a, b);
+  const c0 = ts[5].c;
+  const rest = ts.slice(0, 5);
+  if (kind === 'ln') return `ln(${polyT([{ c: c0.add(1), e: [0, 0] }, ...rest], XY)})`;
+  if (kind === 'inv') return `1/(${polyT([{ c: q(1).sub(c0), e: [0, 0] }, ...rest.map((t) => ({ c: t.c.neg(), e: t.e }))], XY)})`;
+  return PHIS[kind].f(polyT(ts, XY));
 }
 
 function taylorData(rng, { at = [0, 0], kinds = ['cos', 'exp', 'ln', 'inv', 'exp', 'ln', 'cos', 'sin'], needXY = false } = {}) {
@@ -97,7 +108,7 @@ function taylorData(rng, { at = [0, 0], kinds = ['cos', 'exp', 'ln', 'inv', 'exp
     const [a, b] = at;
     const U = uText(u, a, b);
     const U1 = polyT([{ c: q(u.X), e: [1, 0] }, { c: q(u.Y), e: [0, 1] }], XY);
-    const f = P.f(U);
+    const f = fText(kind, u, a, b);
     return { kind, P, u, U, U1, k, a, b, f, c: [c0, c1, c2], d: { f: c0, fx: k.X, fy: k.Y, fxx: k.XX.mul(2), fxy: k.XY, fyy: k.YY.mul(2) } };
   }
   // Secours (2020 Q11): cos(2x + 3y + y²) → 1 − 2x² − 6xy − 9y²/2.
@@ -127,14 +138,14 @@ function dlLines(d, level) {
   const head = (rest) => `${c0.n === 0 ? '' : qt(c0)}${rest}`.replace(/^\+/, '');
   const lines = [];
   const uFull = cterm(c1, `(${d.U})`, c0.n === 0) + (c2.n === 0 ? '' : cterm(c2, `(${d.U})^2`, c0.n === 0 && c1.n === 0));
-  lines.push({ math: head(uFull), note: `${d.P.name} avec u = ${ML(d.U)}`, subgoal: 'inner', blank: level === 1 ? [`(${d.U})`] : [] });
+  lines.push({ math: head(uFull), note: `${d.P.name} avec u = ${RD(d.U, XY)}`, subgoal: 'inner', blank: level === 1 ? [`(${d.U})`] : [] });
   const quad = d.u.XX || d.u.XY || d.u.YY;
   if (c2.n !== 0 && quad) {
-    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${d.U1})^2`, c0.n === 0 && c1.n === 0)), note: `u² = (${ML(d.U1)})² + (degré ≥ 3)`, subgoal: 'truncate', blank: level === 1 ? [`(${d.U1})^2`] : [] });
+    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${d.U1})^2`, c0.n === 0 && c1.n === 0)), note: `u² = (${RD(d.U1, XY)})² + (degré ≥ 3)`, subgoal: 'truncate', blank: level === 1 ? [`(${d.U1})^2`] : [] });
   }
-  if (c2.n !== 0) {
+  if (c2.n !== 0 && d.u.X !== 0 && d.u.Y !== 0) {
     const sq = polyT([{ c: q(d.u.X * d.u.X), e: [2, 0] }, { c: q(2 * d.u.X * d.u.Y), e: [1, 1] }, { c: q(d.u.Y * d.u.Y), e: [0, 2] }], XY);
-    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${sq})`, c0.n === 0 && c1.n === 0)), note: `(${ML(d.U1)})² développé`, subgoal: 'compose' });
+    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${sq})`, c0.n === 0 && c1.n === 0)), note: `(${RD(d.U1, XY)})² développé`, subgoal: 'compose' });
   }
   lines.push({ math: final(d), note: 'Termes regroupés', subgoal: 'collect' });
   // A line equal to the previous one (nothing to develop) is dropped, and
@@ -142,7 +153,12 @@ function dlLines(d, level) {
   const cfg = jetJudge(d);
   const fin = (l) => JUDGES.equiv.isFinal(cfg, readWith(cfg, l.math));
   // (A line « right but to tidy » is left out: the next one tidies it.)
-  const out = lines.filter((l, i) => (i === 0 || l.math !== lines[i - 1].math) && typeof fin(l) !== 'string');
+  const out = [];
+  for (const l of lines.filter((x) => typeof fin(x) !== 'string')) {
+    // Two lines that differ only by brackets are one step: keep the later.
+    if (out.length && sameLine(readWith(cfg, l.math), readWith(cfg, out[out.length - 1].math))) out.pop();
+    out.push(l);
+  }
   const end = out.findIndex((l) => fin(l) === true);
   return end >= 0 ? out.slice(0, end + 1) : out;
 }
@@ -205,7 +221,7 @@ function derivItem(level, rng) {
   ];
   return partsItem({
     skill: TY, level, parts, subgoals: TY_SUB, key: `${TY}:derivs:${d.f}:${at}`, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(d.f)}. Calcule les dérivées partielles d'ordre 1 et 2 de f en ${pt}, puis son polynôme de Taylor d'ordre 2 en ${pt}${a || b ? ', en puissances de X = x − a et Y = y − b' : ''}.`,
+    prompt: `Soit f(x, y) = ${ML(d.f)}. Calcule les dérivées partielles d'ordre 1 et 2 de f en ${pt}, puis son polynôme de Taylor d'ordre 2 en ${pt}${a || b ? `, en puissances de ${RD(M.X.replace(/^\((.*)\)$/, '$1'), XY)} et ${RD(M.Y.replace(/^\((.*)\)$/, '$1'), XY)}` : ''}.`,
     hints: H('p₂ = f + f_x·X + f_y·Y + ½(f_xx·X² + 2f_xy·XY + f_yy·Y²), toutes les dérivées prises au point.', `f${pt} = ${fq(D.f)}, ∂f/∂x${pt} = ${fq(D.fx)}, ∂f/∂y${pt} = ${fq(D.fy)}`, `p₂ = ${ML(final(d))}`),
   });
 }
