@@ -141,8 +141,7 @@ export const RULES = [
     explain: () => 'Montre d\'abord que f′(x₀) existe, avec le taux d\'accroissement. Ensuite seulement, on vérifie que f′(x) → f′(x₀). La limite de f′ ne remplace pas la définition.',
   },
   {
-    // U4 merge: repair a1-seq-squeeze
-    id: 'a1_bounded_times_zero', family: 'rule', tag: 'C', skill: 'a1-fn-limits', repair: 'a1-fn-limits',
+    id: 'a1_bounded_times_zero', family: 'rule', tag: 'C', skill: 'a1-fn-limits', repair: 'a1-seq-squeeze',
     judges: [],
     name: '0 × (borné) pris pour une forme indéterminée (résumé « Calcul de limites »)',
     example: ['lim x·sin(1/x) « n\'existe pas »', 'lim x·sin(1/x) = 0'],

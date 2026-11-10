@@ -1,7 +1,7 @@
 // Module G8, part b (unit `complexes`, step U4): polynomials, loci, ratios, transformations, inversion.
 // Catalogue: docs/universite/G-gymnase-2.md. Skills: g8-poly, g8-locus, g8-ratio-angle, g8-transform, g8-inversion.
 // Year 12.5 (niveau CMS): needsSolo. G4 and G10 (step U5) are stand-ins
-// (js/content/uni/unbuilt-u4.js); the loci are judged by the mode 'locus'
+// in UNBUILT (js/content/uni/index.js); the loci are judged by the mode 'locus'
 // of the poly judge (js/judges/locus.js) until the geom judge of U5.
 
 const S = (id, rest) => ({ id, unit: 'complexes', year: 12.5, optional: false, needsSolo: true, tags: ['MAN', 'CMS'], examWeight: 1, ...rest });

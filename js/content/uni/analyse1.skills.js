@@ -2,15 +2,14 @@
 // docs/universite/A1-analyse-1.md. Step U2 built the derivatives, the
 // développements limités and the integrals, in five parts whose
 // definitions and generators are in analyse1-a … analyse1-e (.skills.js
-// and .js); step U4 builds the rest (reals, complex numbers, sequences,
-// series, limits of functions, ε-δ, power series, definitions, proofs).
+// and .js); step U4 built the rest (reals, complex numbers, sequences,
+// series, limits of functions, ε-δ, IVT, power series, definitions,
+// proofs) in parts f to l.
 //
 // Prerequisites of the catalogue resolved to the school skills:
 // @alg:E-systemes = eq-systems, @alg:C-developper = lit-polynomial,
 // @alg:H-discriminant = quad-formula (credit), @alg:G-simplifier =
-// rat-simplify. The A1 skills of step U4 (a1-fn-limits, a1-fn-onesided,
-// a1-fn-extension, a1-fn-image, a1-seq-squeeze, a1-ser-compare…) go
-// through UNBUILT (js/content/uni/index.js).
+// rat-simplify.
 
 import { SKILLS as PART_A } from './analyse1-a.skills.js';
 import { SKILLS as PART_B } from './analyse1-b.skills.js';

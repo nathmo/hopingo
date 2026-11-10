@@ -18,7 +18,6 @@ import * as fonctionsg from './fonctions-g.skills.js';
 import * as analyse1 from './analyse1.skills.js';
 // Step U4: module G8 (unit complexes).
 import * as complexes from './complexes.skills.js';
-import { U4_STANDINS } from './unbuilt-u4.js';
 
 const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence, fonctionsg, analyse1];
 MODULES.push(complexes);
@@ -27,24 +26,15 @@ export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
 
 export const UNBUILT = {
-  // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
-  'g8-algebraic': ['lit-identities'],
   // Step U2: module G4 (step U5) for g6-tangent: g4-line2 ← g4-vectors,
   // @alg:L-affine = fn-affine, @alg:E-systemes-2x2 = eq-systems.
   'g4-line2': ['g4-vectors', 'fn-affine', 'eq-systems'],
   'g4-vectors': ['eq-systems'],
-  // Step U2: the A1 skills of step U4 that the derivatives, DL and
-  // integrals need. @alg:G-simplifier = rat-simplify.
-  'a1-seq-limits': ['rat-simplify', 'g2-log-rules'],
-  'a1-seq-squeeze': ['a1-seq-limits', 'g1-bound'],
-  'a1-fn-limits': ['a1-seq-limits', 'g3-identities'],
-  'a1-fn-onesided': ['a1-fn-limits'],
-  'a1-fn-extension': ['a1-fn-onesided', 'rat-simplify'],
-  'a1-fn-ivt': ['a1-fn-extension', 'a1-deriv-rules'],
-  'a1-fn-image': ['a1-fn-ivt', 'g6-deriv-rules'],
-  'a1-ser-compare': ['a1-seq-limits'],
+  // Step U4: modules G4 and G10 (step U5) for g8-locus: g4-bisectors ←
+  // g4-line2, g4-dot, g1-abs-eq; g4-dot ← g4-vectors, @alg:M-pythagore =
+  // geo-pythagore, g3-arc-def; g10-circle-eq ← g4-bisectors,
+  // @alg:H-completer-carre = quad-complete.
+  'g4-bisectors': ['g4-line2', 'g4-dot', 'g1-abs-eq'],
+  'g4-dot': ['g4-vectors', 'geo-pythagore', 'g3-arc-def'],
+  'g10-circle-eq': ['g4-bisectors', 'quad-complete'],
 };
-
-// Step U4: stand-ins while the parts of A1 and G8 are built in parallel
-// (removed once they are all merged; G4 and G10, step U5, stay).
-Object.assign(UNBUILT, U4_STANDINS);

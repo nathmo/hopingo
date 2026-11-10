@@ -76,7 +76,7 @@ export const RULES = [
   },
   {
     id: 'a1_rec_limit_without_convergence', family: 'logic', tag: 'C', skill: 'a1-seq-rec-fixed',
-    repair: 'a1-seq-rec-fixed', // U4 merge: repair a1-seq-monotone
+    repair: 'a1-seq-monotone',
     judges: ['value', 'limit'],
     name: 'Point fixe pris pour la limite sans prouver la convergence',
     example: ['« L = f(L) ⇒ L = 2, donc aₙ → 2 »', 'la convergence d\'abord : monotone et bornée'],

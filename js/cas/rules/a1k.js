@@ -80,7 +80,8 @@ export const RULES = [
         if (!isInfSum(n)) return true;
         const lo = Math.round(evalFloat(n.lo, {}));
         if (!Number.isFinite(lo)) return true;
-        const starts = [...new Set([0, lo - 1, lo + 1])].filter((s) => s >= 0 && s !== lo);
+        // Only starts where the term exists (2/(k(k + 2)) has no term k = 0).
+        const starts = [...new Set([0, lo - 1, lo + 1])].filter((s) => s >= 0 && s !== lo && Number.isFinite(evalFloat(n.e, { [n.k]: s })));
         for (const s of starts) out.push({ node: replaceAt(prev, path, { ...n, lo: lit(new Q(s)) }), ctx: { k0: lo, from: s, term: n } });
         return false;
       });

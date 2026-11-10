@@ -27,8 +27,7 @@ export const RULES = [
     explain: () => 'Σ 1/nᵖ converge si et seulement si p > 1 strictement. p = 1 : série harmonique, divergente ; Σ 1/n^(3/2) converge déjà.',
   },
   {
-    // U4 merge: repair a1-seq-ratio (built by another part).
-    id: 'a1_ratio_one', family: 'rule', tag: 'E', skill: 'a1-ser-ratio-root', repair: 'a1-ser-ratio-root',
+    id: 'a1_ratio_one', family: 'rule', tag: 'E', skill: 'a1-ser-ratio-root', repair: 'a1-seq-ratio',
     judges: [],
     name: 'ρ = 1, donc « converge » (ou « diverge »)',
     example: ['ρ = 1, donc la série converge', 'aucune conclusion'],

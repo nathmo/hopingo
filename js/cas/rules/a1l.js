@@ -10,10 +10,8 @@
 // solutions, a decoy block of a proof) are carried by options and blocks
 // (check: {bait}).
 //
-// U4 merge: the catalogue repairs a1_cplx_ik_mod and a1_conj_arg_sign in
-// g8-algebraic, a1_polar_r_negative in g8-polar, a1_cauchy_consecutive in
-// a1-seq-monotone and a1_equiv_zero_limit in a1-ser-compare (other parts):
-// the closest skill of this part stands in until the merge.
+// Repairs in other modules and parts, as in the catalogue: g8-algebraic,
+// g8-polar, a1-seq-monotone, a1-ser-compare.
 
 import { parse } from '../parse.js';
 import { walk, replaceAt, stripParen, contains } from '../ast.js';
@@ -68,14 +66,18 @@ function withoutZero(prev) {
 
 export const RULES = [
   {
-    id: 'a1_cplx_ik_mod', family: 'facts', tag: 'C', skill: 'a1-cplx-exam', repair: 'a1-cplx-exam', // U4 merge: repair g8-algebraic
+    id: 'a1_cplx_ik_mod', family: 'facts', tag: 'C', skill: 'a1-cplx-exam', repair: 'g8-algebraic',
     judges: ['complex'],
     name: 'iᵏ réduit avec un mauvais modulo',
     example: ['i¹⁵ = i', 'i¹⁵ = i³ = −i'],
     check: { judge: { kind: 'complex', complex: true }, prev: 'i^15', line: 'i' },
-    // Each i^k replaced by i^(k mod 2), i^(k mod 3) or −i^(k mod 4).
+    // Each i^k replaced by i^(k mod 2), i^(k mod 3) or −i^(k mod 4). Only
+    // with an exponent above 2: i² read as 1 is g8_i_squared (module G8).
     transform: (prev) => {
       const out = [];
+      let big = false;
+      walk(prev, (n) => { if (ipow(n) && intOf(n.e) > 2) big = true; return true; });
+      if (!big) return out;
       for (const [fn, how] of [[(k) => iTo(k % 2), 2], [(k) => iTo(k % 3), 3], [(k) => iTo(k % 4, true), -4]]) {
         const node = allPowers(prev, fn);
         if (node) out.push({ node, ctx: { how } });
@@ -85,7 +87,7 @@ export const RULES = [
     explain: () => 'On réduit l\'exposant de i modulo 4, car i⁴ = 1 : 15 = 4·3 + 3, donc i¹⁵ = i³ = −i. Les puissances de i reviennent tous les 4 : i, −1, −i, 1.',
   },
   {
-    id: 'a1_polar_r_negative', family: 'notation', tag: 'C', skill: 'a1-cplx-exam', repair: 'a1-cplx-exam', // U4 merge: repair g8-polar
+    id: 'a1_polar_r_negative', family: 'notation', tag: 'C', skill: 'a1-cplx-exam', repair: 'g8-polar',
     judges: ['complex'],
     name: 'Module négatif dans une forme polaire',
     example: ['−1 + i√3 = −2e^(−iπ/3), lu « r = 2, φ = −π/3 »', '−1 + i√3 = 2e^(2iπ/3)'],
@@ -138,7 +140,7 @@ export const RULES = [
     explain: () => 'z̄ et |z| ne sont pas des polynômes en z : le théorème fondamental de l\'algèbre (n racines pour un polynôme de degré n) ne s\'applique pas. Il faut compter : z⁵ = |z| a 6 solutions, 0 et les 5 racines cinquièmes de 1.',
   },
   {
-    id: 'a1_conj_arg_sign', family: 'sign', tag: 'E', skill: 'a1-cplx-zn-conj', repair: 'a1-cplx-zn-conj', // U4 merge: repair g8-algebraic
+    id: 'a1_conj_arg_sign', family: 'sign', tag: 'E', skill: 'a1-cplx-zn-conj', repair: 'g8-algebraic',
     judges: ['complex'],
     name: 'Conjugué écrit sans changer le signe de l\'argument',
     example: ['z̄ = r·e^(iφ)', 'z̄ = r·e^(−iφ)'],
@@ -155,7 +157,7 @@ export const RULES = [
     explain: () => 'Le conjugué change le signe de l\'argument : si z = r·e^(iφ), alors z̄ = r·e^(−iφ) (et a + bi devient a − bi). Avec le mauvais signe, zⁿ = z̄ devient zⁿ = z : ce n\'est plus la même équation.',
   },
   {
-    id: 'a1_cauchy_consecutive', family: 'logic', tag: 'E', skill: 'a1-defs', repair: 'a1-defs', // U4 merge: repair a1-seq-monotone
+    id: 'a1_cauchy_consecutive', family: 'logic', tag: 'E', skill: 'a1-defs', repair: 'a1-seq-monotone',
     judges: ['logic'],
     name: 'Cauchy réduit à deux termes consécutifs',
     example: ['(aₙ) de Cauchy ⇔ aₙ₊₁ − aₙ → 0', '∀ε > 0 ∃N ∀m, n ≥ N, |aₘ − aₙ| ≤ ε'],
@@ -174,7 +176,7 @@ export const RULES = [
     explain: () => 'Cauchy compare deux termes quelconques aₘ et aₙ au-delà du rang N, pas seulement deux voisins : Log(n + 1) − Log n → 0, mais Log n → +∞ n\'est pas de Cauchy.',
   },
   {
-    id: 'a1_equiv_zero_limit', family: 'rule', tag: 'E', skill: 'a1-proofs', repair: 'a1-proofs', // U4 merge: repair a1-ser-compare
+    id: 'a1_equiv_zero_limit', family: 'rule', tag: 'E', skill: 'a1-proofs', repair: 'a1-ser-compare',
     judges: [],
     name: 'Équivalent ℓ/n³ avec ℓ = 0',
     example: ['bₙ → ℓ, donc bₙ/n³ ~ ℓ/n³', 'si ℓ = 0, passer par la borne |bₙ| ≤ M'],
