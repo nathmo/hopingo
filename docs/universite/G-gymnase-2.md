@@ -1252,6 +1252,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-angular-points` — Points anguleux et de rebroussement
 - **Année** 12.5 · **Prérequis** `g6-sign-variation`, `g6-limits`, `g1-abs-eq` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g6-sign-variation` : dire si le point anguleux est un extremum.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Le rebroussement n'est qu'une option des décisions et des QCM (pas de gabarit ∛, ni le |x + 4|·∛x du CMS : remplacé par |x − a|·(x − b)) ; pas d'esquisse locale (pas de `plot` avant U5). Niveau 5 et variante `open` (E4, |x³ − a³| ± 3b²x) : f′(a⁻) et f′(a⁺) se jugent par `equiv` (x remplacé par a), les cas limites sont des décisions, et la partie (b) (inflexion, esquisse) est laissée de côté. Le V/F « f′(a⁻) ≠ f′(a⁺) ⇒ extremum » devient « pour tout c, |x − a| + cx a un extremum en a » (contre-exemple c donné, sorte `refute`).
 - **Intro** : on écrit f par morceaux (sans valeur absolue). Au point de raccord a, f doit être continue ; on calcule f′(a⁻) et f′(a⁺). Différentes et finies : point anguleux. Infinies de signes opposés : point de rebroussement. Le point anguleux est un extremum si f′ change de signe en a ; attention au cas limite où une des dérivées latérales est nulle.
 - **Juge** : `equiv` pour les morceaux et leurs dérivées ; `value` (ou `limit`) pour f′(a⁻), f′(a⁺) ; décisions « anguleux / rebroussement / dérivable » et « extremum ou non » · **Forme finale** : nature du point, extremum ou non, avec les demi-tangentes.
 - **Niveaux** :
@@ -1277,6 +1278,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 
 ### `g6-asymptotes` — Asymptotes verticales, horizontales, obliques ; branches paraboliques
 - **Année** 12.5 · **Prérequis** `g6-limits`, `g0-long-div` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). La droite « y = mx + h » est jugée par `equiv`, m et h étant des lettres données (pas encore de `geom`) ; la position est une décision. Gabarits : fraction rationnelle, √(x² + 2βx + c) (+ x) des deux côtés, et mx + k√x ou mx + k ln x (branche parabolique) ; x·e^(1/x) n'est pas proposé, et la branche de direction Oy n'est qu'une option de décision.
 - **Intro** : verticale x = a si f → ±∞ en a. Horizontale y = ℓ si f → ℓ en ±∞. Oblique y = mx + h : m = lim f(x)/x (fini, non nul), puis h = lim (f(x) − mx) (fini). Si f(x)/x → ±∞, ou si m est fini mais f(x) − mx → ±∞ : branche parabolique (de direction Oy, ou y = mx). Pour une fraction rationnelle, la division euclidienne donne tout d'un coup.
 - **Juge** : `limit` pour m et h ; `geom` `{object:'line2'}` pour chaque asymptote ; décisions pour les branches · **Forme finale** : liste des asymptotes et branches, de chaque côté (±∞ séparément).
 - **Niveaux** :
@@ -1303,6 +1305,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-study-full` — Étude de fonction complète et esquisse
 - **Année** 12.5 · **Prérequis** `g6-convexity`, `g6-asymptotes`, `g6-angular-points`, `g1-parity-period` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-parity-period` : les symétries réduisent l'étude.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Pas de tableau ni d'esquisse (`plot` en U5) : symétrie, position par rapport à l'asymptote, nature des extrema, concavité et inflexion sont des décisions, les valeurs du tableau des lignes `value`. Gabarit (1) aux niveaux 1 à 4 ; au niveau 5, une variante du (2), |x − a| + k/x (point anguleux, deux asymptotes obliques, une verticale), sans f″ ; gabarits (3) et (4) absents. Le niveau 5 et la variante `open` sont des items `lines` sans aide (le type `problem` arrive en U4).
 - **Intro** : l'ordre : domaine et symétries ; limites et asymptotes ; f′, variation, extrema, points anguleux ; f″, concavité, inflexions ; tableau récapitulatif ; esquisse. L'esquisse place d'abord les asymptotes et les points remarquables, puis relie en respectant les variations.
 - **Juge** : par segments (les juges des compétences prérequises), puis `plot` `task:'curve'` pour l'esquisse · **Forme finale** : tableau de variation complet et esquisse acceptée.
 - **Niveaux** :
@@ -1328,6 +1331,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 
 ### `g6-param-tangent` — Arcs paramétrés : vitesse, tangente, points stationnaires
 - **Année** 12.5 · **Prérequis** `g6-tangent`, `g6-limits` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). La tangente est une ligne « y = » développée (`equiv`, pas de `geom`) ; pas de tableau de variation conjoint ni de gabarit avec arctan et ln. Niveau 5 : soit l'étude complète sans aide, soit le gabarit 3 (a, b, c pour un point stationnaire à tangente verticale, résolus par `solset`).
 - **Intro** : M(t) = (x(t) ; y(t)), vecteur vitesse (ẋ ; ẏ). Pente de la tangente : ẏ/ẋ. ẋ = 0 et ẏ ≠ 0 : tangente verticale. ẏ = 0 et ẋ ≠ 0 : tangente horizontale. ẋ = ẏ = 0 : point stationnaire ; la pente est la limite de ẏ/ẋ.
 - **Juge** : `equiv` `{vars:['t']}` pour ẋ, ẏ ; `solset` `{v:'t'}` pour les zéros ; `limit` `{v:'t'}` pour la pente au point stationnaire ; `geom` `{object:'line2'}` pour la tangente · **Forme finale** : points à tangente horizontale, verticale, stationnaires, avec leurs tangentes.
 - **Niveaux** :
@@ -1354,6 +1358,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-param-branches` — Arcs paramétrés : branches infinies et esquisse
 - **Année** 12.5 · **Prérequis** `g6-param-tangent`, `g6-asymptotes` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g6-param-tangent` : dérivées x′(t), y′(t) et tableau des variations conjointes.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Pas d'esquisse ni de tableau conjoint (`plot` en U5). Gabarit 1 sans paramètre, gabarit 3 avec logarithmes (MAN 2017 Q7, asymptote oblique y = (k + 1)x, verticale x = ln c). E5 (niveau 5 et variante `open`) : le juge `limit` ne connaît pas de paramètre, donc les limites quand t → −1 sont des lignes `equiv` en t et a où t est remplacé par −1 ; les cas a = 0 et a = −1 sont des décisions. Item `lines` sans aide (pas encore de `problem`).
 - **Intro** : on regarde chaque borne t₀ du domaine (et ±∞). x → ∞ et y → ℓ : asymptote horizontale. x → k et y → ∞ : verticale. Les deux → ∞ : m = lim y/x, puis h = lim (y − mx) ; si les deux sont finis, asymptote oblique ; sinon branche parabolique. x et y finis : pas de branche infinie (le point tend vers un point).
 - **Juge** : `limit` `{v:'t', to, dir}` ; `geom` pour les asymptotes ; décisions pour chaque borne ; `plot` `task:'curve'` pour l'esquisse · **Forme finale** : liste des branches infinies par borne, puis esquisse.
 - **Niveaux** :
