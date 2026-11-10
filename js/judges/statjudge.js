@@ -188,7 +188,7 @@ export function makeJudge(kind) {
       const w = statValue(cfg, c.ast, {});
       if (!w) return false;
       if (w.interval || v.interval) return !!(w.interval && v.interval) && Math.abs(w.lo - v.lo) <= tol && Math.abs(w.hi - v.hi) <= tol;
-      if (w.q && v.q) return w.q.eq(v.q);
+      if (w.q && v.q && kind === 'prob') return w.q.eq(v.q);
       return close(w.x, v.x) || Math.abs(w.x - v.x) <= tol;
     };
     return diagnoseLine(kind, prev, node, cfg, (cand) => same(cand));
