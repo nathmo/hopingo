@@ -193,7 +193,7 @@ function simpleMcq(rng, opts) {
   return choice({
     skill: RS, level: 4, key: `${RS}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
     prompt: `Soit f(z) = ${fML(d)}. Res(f ; ${CM(d.z0T)}) =${multi ? ' (plusieurs réponses possibles)' : ''}`,
-    right: CM(niceC(d.res) || d.res), rights: multi ? [CM(d.sub)] : [],
+    right: CM(niceC(d.res) || d.res), rightText: d.res, rights: multi ? [CM(d.sub)] : [],
     wrongs: [d.noExp && opt(niceC(d.noExp) || d.noExp, 'c_essential_factor'), scaledOpt('-1', d.res), inv && opt(inv), scaledOpt('2', d.res)],
     fillers: [scaledOpt('i', d.res), scaledOpt('1/2', d.res), scaledOpt('-i', d.res)],
     solution: [{ html: `Pôle simple : Res = p(z₀)/q′(z₀) = ${CM(d.sub)} = ${CM(d.res)}.`, note: '' }],
@@ -407,8 +407,8 @@ function multipleMcq(rng, opts) {
   return choice({
     skill: RM, level: 4, key: `${RM}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
     prompt: `Soit f(z) = ${CM(d.f)}. Res(f ; ${CM(String(d.a))}) =${multi ? ' (plusieurs réponses possibles)' : ''}`,
-    right: CM(niceC(d.res) || d.res), rights: multi && F > 1 ? [CM(`(1/${F})(${d.dAt})`)] : [],
-    wrongs, fillers: [scaledOpt('2', d.res), nice(`(${d.res})+1`), scaledOpt('1/2', d.res), scaledOpt('-2', d.res)],
+    right: CM(niceC(d.res) || d.res), rightText: d.res, rights: multi && F > 1 ? [CM(`(1/${F})(${d.dAt})`)] : [],
+    wrongs, fillers: [scaledOpt('2', d.res), nice(`(${d.res})+1`), scaledOpt('1/2', d.res), scaledOpt('-2', d.res), scaledOpt('3', d.res), scaledOpt('-1/2', d.res)],
     solution: [{ html: `Pôle d'ordre ${d.m} : φ(z) = ${CM(d.phi)}, φ${d.m === 2 ? '′' : '″'}(z) = ${CM(d.der)}, Res = ${CM(d.res)}.`, note: '' }],
     expectedSec: 150,
   }, rng);

@@ -232,7 +232,7 @@ function thmMcq(rng, opts) {
   return choice({
     skill: SK, level: 4, key: `${SK}:mcq:${d.id}`, exam: examTag(opts, 2),
     prompt: `${prompt(d)} ∮_Γ f(z) dz =`,
-    right: CM(v),
+    right: CM(v), rightText: v,
     wrongs: [opt(twoPiI(d.Sall), 'c_pole_outside_counted'), opt(cT(d.S), 'c_residue_2pii'), opt(piC(d.S.mul(cq(0, 1))), 'c_residue_2pii'), opt(twoPiI(d.S.neg()))],
     fillers: [opt(twoPiI(d.S.mul(2))), opt('0')],
     solution: [{ html: `Pôles intérieurs : ${d.ins.map((i) => CM(cT(d.poles[i]))).join(', ')} ; ∮ = 2πi × (${d.ins.map((i) => CM(cT(d.res[i]))).join(' + ')}) = ${CM(v)}.`, note: '' }],

@@ -192,7 +192,7 @@ function laurentMcq(rng, opts) {
   return choice({
     skill: SK, level: 4, key: `${SK}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
     prompt: multi ? `Pour h(z) = ${CM(d.h)} en z₀ = ${CM(d.z0T)}, quelles affirmations sont vraies ?` : `Soit h(z) = ${CM(d.h)}. Res(h ; ${CM(d.z0T)}) =`,
-    right: multi ? `Res(h ; z₀) = ${CM(d.res)}` : CM(d.res),
+    right: multi ? `Res(h ; z₀) = ${CM(d.res)}` : CM(d.res), rightText: multi ? null : d.res,
     rights: multi ? ['z₀ est une singularité essentielle'] : [],
     wrongs: multi
       ? [{ html: 'z₀ est un pôle simple', rule: 'c_essential_lim' }, { html: `Res(h ; z₀) = ${CM(r.n ? '0' : '1')}`, rule: r.n ? 'c_essential_lim' : null }, { html: `Res(h ; z₀) = ${CM(String(r.neg().n ? r.neg() : q(1, 2)))}` }]

@@ -181,7 +181,7 @@ export function checkValue(text, expected, env = {}) {
 // A float as a fraction with a small denominator, or null.
 export function ratQ(x) {
   if (!Number.isFinite(x)) return null;
-  for (let m = 1; m <= 60; m++) {
+  for (let m = 1; m <= 2000; m++) {
     const k = x * m;
     if (Math.abs(k - Math.round(k)) < 1e-9 * Math.max(1, Math.abs(k)) && Math.abs(k) < 1e6) return q(Math.round(k), m);
   }
@@ -206,7 +206,12 @@ export function niceC(text) {
   let v;
   try { v = evalComplex(parse(text, { complex: true }), {}); } catch { v = null; }
   if (!v) return null;
-  const Es = ['', ...new Set(String(text).match(/e\^\([^()]*\)/g) || []), ...(String(text).includes('π') ? ['π'] : [])];
+  const T = String(text);
+  const Es = ['', ...new Set(T.match(/e\^\([^()]*\)/g) || []), ...(T.includes('π') ? ['π'] : [])];
+  // e alone, and e^k for small whole k, when the text has an exponential.
+  // Radicals: π√k and √k.
+  for (const k of [2, 3, 5]) if (T.includes(`√${k}`)) Es.push(...(T.includes('π') ? [`π√${k}`] : []), `√${k}`);
+  if (/e/.test(T.replace(/sec|sin|cos|exp/g, ''))) for (const k of [1, -1, 2, -2, 3, -3, 4, -4, 6, -6]) Es.push(k === 1 ? 'e' : `e^(${k})`);
   for (const E of Es) {
     const ev = E ? evalComplex(parse(E, { complex: true }), {}) : { re: 1, im: 0 };
     const m = ev.re * ev.re + ev.im * ev.im;
@@ -218,7 +223,7 @@ export function niceC(text) {
   return null;
 }
 // An option for k·value (k a text: '-1', '2', 'i', '1/2'), when it has a nice text.
-export const scaledOpt = (k, text, rule = null) => { const t = niceC(`(${k})(${text})`); return t ? { html: CM(t), rule } : null; };
+export const scaledOpt = (k, text, rule = null) => { const t = niceC(`(${k})(${text})`); return t ? { html: CM(t), rule, text: t } : null; };
 
 // ---------- items ----------
 
@@ -251,14 +256,18 @@ export const L = (math, note, subgoal, extra = {}) => ({ math, note, subgoal, ..
 export function choice(o, rng) {
   const options = [];
   for (const r of [o.right, ...(o.rights || [])]) if (r && !options.some((x) => x.html === r)) options.push({ html: r, correct: true });
+  // A wrong option worth the right value (o.rightText) is left out.
+  const val = (t) => { try { return evalComplex(parse(t, { complex: true }), {}); } catch { return null; } };
+  const R = o.rightText ? val(o.rightText) : null;
+  const same = (w) => { if (!R || !w.text) return false; const v = val(w.text); return !!v && Math.abs(v.re - R.re) + Math.abs(v.im - R.im) < 1e-9 * (1 + Math.abs(R.re) + Math.abs(R.im)); };
   for (const w of [...(o.wrongs || []), ...(o.fillers || [])]) {
     if (options.length >= (o.count || 4)) break;
-    if (!w || !w.html || options.some((x) => x.html === w.html)) continue;
+    if (!w || !w.html || options.some((x) => x.html === w.html) || same(w)) continue;
     options.push({ html: w.html, correct: false, rule: w.rule ?? null });
   }
   return mcq({ ...o, options }, rng);
 }
-export const opt = (text, rule = null) => ({ html: CM(text), rule });
+export const opt = (text, rule = null) => ({ html: CM(text), rule, text });
 
 // A random pick that keeps the generator's own order of draws.
 export const pick = (rng, xs) => xs[rng.int(0, xs.length - 1)];

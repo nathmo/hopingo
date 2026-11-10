@@ -225,7 +225,7 @@ function fourierMcq(rng, opts) {
   return choice({
     skill: SK, level: 4, key: `${SK}:mcq:${a}:${al}`, exam: examTag(opts, 2),
     prompt: `∫_ℝ ${CM(R)} dx =`,
-    right: CM(val),
+    right: CM(val), rightText: val,
     wrongs: [opt(`πe^(${k})${div}`, 'c_jordan_alpha_sign'), opt(`π${div}`), opt(`πcosh(${k})${div}`, 'c_eiax_cos'), opt(`-πe^(${-k})${div}`, 'c_upper_half_lower_pole')],
     fillers: [opt(`2πe^(${-k})${div}`)],
     solution: [{ html: `∫ = Re ∫ e^(iαx)/(x² + a²) dx = Re(2πi · e^(−|α|a)/(2ai)) = ${CM(val)}.`, note: '' }],

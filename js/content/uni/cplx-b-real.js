@@ -152,7 +152,7 @@ function ratMcq(rng, opts) {
   return choice({
     skill: SR, level: 4, key: `${SR}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
     prompt: multi ? `Pour I = ∫_ℝ ${CM(d.f)} dx, quelles affirmations sont vraies ? (plusieurs réponses possibles)` : `∫_ℝ ${CM(d.f)} dx =`,
-    right: multi ? `I = ${CM(d.value)}` : CM(d.value),
+    right: multi ? `I = ${CM(d.value)}` : CM(d.value), rightText: multi ? null : d.value,
     rights: multi ? [`I = 2πi (${d.ups.map((z) => `Res(f ; ${CM(cT(z))})`).join(' + ')})`] : [],
     wrongs: multi
       ? [{ html: `I = 2πi (${d.lows.map((z) => `Res(f ; ${CM(cT(z))})`).join(' + ')})`, rule: 'c_upper_half_lower_pole' }, { html: 'I = 0, car la somme de tous les résidus est nulle', rule: 'c_pole_outside_counted' }, { html: `I = ${CM(cT(d.S))}`, rule: 'c_residue_2pii' }]
@@ -301,7 +301,7 @@ function trigMcq(rng, opts) {
   return choice({
     skill: ST, level: 4, key: `${ST}:mcq:${d.id}`, exam: examTag(opts, 2),
     prompt: `∫₀^{2π} ${CM(d.f)} dθ =`,
-    right: CM(d.R.val),
+    right: CM(d.R.val), rightText: d.R.val,
     wrongs: [scaledOpt('1/2', d.R.val, 'c_trig_sub'), scaledOpt('2', d.R.val), scaledOpt('-1', d.R.val), scaledOpt('i', d.R.val, 'c_residue_2pii')],
     fillers: [opt('0', 'c_pole_outside_counted'), opt('π')],
     solution: [{ html: `I = ∮ ${CM(d.g)} dz, résidu ${CM(d.R.res)} en ${CM(d.zin)}, I = ${CM(d.R.val)}.`, note: '' }],
