@@ -125,6 +125,8 @@ export function dependsOn(node, v) {
   walk(node, (n) => {
     if (found) return false;
     if ((n.t === 'sym' && n.name === v && !n.sub) || (n.t === 'eps' && n.v === v)) { found = true; return false; }
+    // ∫ h dv (indefinite) is a function of v, even when h is a number (∫1 dx = x).
+    if (n.t === 'int' && !n.lo && n.v === v) { found = true; return false; }
     if ((((n.t === 'int' && n.lo) || n.t === 'bracket' || n.t === 'lim') && n.v === v) || (n.t === 'sum' && n.k === v)) {
       found = ['lo', 'hi', 'to'].some((k) => n[k] && dependsOn(n[k], v));
       return false;
