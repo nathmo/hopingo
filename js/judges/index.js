@@ -90,3 +90,5 @@ import * as param from './param.js';
 import * as boundary from './boundary.js';
 
 Object.assign(JUDGES, { param, boundary });
+import { cvalue, cfamily } from './cplx-ca.js'; // step U10, module C part a: complex values with ∫ and Σ, families z₀ + 2kπi
+Object.assign(JUDGES, { cvalue, cfamily });

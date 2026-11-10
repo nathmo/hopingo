@@ -634,6 +634,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-elem-fn` — Fonctions élémentaires : e^z, cos z, Log z, z^α
 - **Année** 15 · **Prérequis** `g8-polar`, `g2-hyp-def` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g2-hyp-def` : cos(iy) = cosh y.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties jugées par `cvalue` (nouveau juge, `js/judges/cplx-ca.js` : même valeur que `complex`, formes finales du cours comme e^(−π/2), ln √2 − 3πi/4, cosh 2). L'argument se saisit `arg(…)` (le noyau ne lit pas `Arg`). Gabarits : Log z (|z|, Arg z, puis Log), z^α, cos(bi), sin(bi), |e^z| ; pas de dérivées (Log(z² + 1))′ au niveau 4. L5 : un problème (|cos(x + iy)|² ou |sin(x + iy)|² jugé par `cvalue` en x, y, puis un QCM « borné ? ») ou des lignes sans aide. QCM multi : 5 affirmations.
 - **Intro** : e^(x+iy) = eˣ(cos y + i sin y), |e^z| = e^(Re z), e^z est 2πi-périodique. cos z = (e^(iz) + e^(−iz))/2 n'est **pas borné** : cos(iy) = cosh y. Log z = ln|z| + i Arg z avec Arg ∈ ]−π ; π] ; z^α = e^(α Log z) ; (z^α)′ = αz^(α−1) hors de ]−∞ ; 0]. Exemple : `math: Log(−1 − i) = ln √2 + i·(−3π/4)`, `note: Arg dans ]−π ; π]` ; `math: i^i = e^(i·Log i) = e^(i·iπ/2) = e^(−π/2)`, `note: un nombre réel`.
 - **Juge** : `complex` `{form:'a+bi'}` (valeurs exactes avec ln, π, e) · **Forme finale** : a + bi, ou r·e^(iθ) si demandé.
 - **Niveaux** :
@@ -654,6 +655,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-equations` — Équations dans ℂ
 - **Année** 15 · **Prérequis** `c-elem-fn`, `g8-quadratic` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Nouveau juge `cfamily` (`js/judges/cplx-ca.js`) pour l'équation en w (« multiplier par 2w ») et pour les familles z₀ + 2kπi (« ; k ∈ ℤ » ou « , k ∈ ℤ ») ; les racines w par `complex` (ensemble). Gabarits : a cosh z + b sinh z = c (racines parmi ±1, ±i, ±2, ±1/2, ±i/2, ±1/3, ±i/3, ±3, ±3i, ±1 ± i) et q cos z = p, q sin z = p (racines réelles ou imaginaires) ; pas de mélange a cos z + b sin z. L3 : décision w = e^z ou w = e^(iz). L5 et `open` : le même calcul en problème de 3 points (2 au catalogue : le plan `ba3-analyse3` tire de 3 à 14 points), sans l'enchaînement avec la série de Taylor de GM 2015.
 - **Intro** : pour une équation en cosh, sinh, cos, sin, on pose w = e^z (ou w = e^(iz)), on résout un polynôme en w, puis e^z = w donne z = Log w + 2kπi. Exemple : 2 cosh z + sinh z = i ; `math: 3w² − 2iw + 1 = 0`, `note: après multiplication par 2w` ; `math: w = i ou w = −i/3`.
 - **Juge** : `equiv` pour la ligne polynomiale en w (multiplication par w ≠ 0 annoncée) ; `complex` pour les racines ; `solset` `{v:'z', domain:'C', periodic:'2πi'}` pour l'ensemble final (familles) · **Forme finale** : ensemble écrit en familles z = z₀ + 2kπi, k ∈ ℤ.
 - **Niveaux** :
@@ -676,6 +678,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-cauchy-riemann` — Cauchy-Riemann et holomorphie
 - **Année** 15 · **Prérequis** `c-elem-fn`, `a2-partials` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-elem-fn` : u et v de e^z, z² et Log z.
+- **Statut** : fait le 10 novembre 2026 (étape U10). u + iv par `cvalue` (z = x + iy, finale : un seul terme en i), les quatre dérivées par `equiv`, puis f′(z) en z (fonction holomorphe) ou le système de Cauchy-Riemann résolu par `system` (un seul point : holomorphe sur aucun ouvert) ; la comparaison est une décision (piège `c_cr_sign`). Fonctions : z² + pz, z³, e^z, sinh z, cosh z ; |z − c|², z·Re z, |z|² + i(px + qy), z̄². z/|z|² et z̄ (aucun point) restent dans les QCM. L5 et `open` : deux fonctions, 3 points chacune (2,5 au catalogue : une étape par dérivée, au moins un demi-point chacune).
 - **Intro** : f = u + iv, avec u, v ∈ C¹, est holomorphe sur un ouvert si et seulement si u_x = v_y et u_y = −v_x partout sur cet ouvert. On écrit u et v, on calcule les quatre dérivées, on compare. Exemple : `math: f(z) = sinh z : u = sinh x cos y, v = cosh x sin y` ; `math: u_x = cosh x cos y = v_y ; u_y = −sinh x sin y = −v_x`, `note: holomorphe sur ℂ`.
 - **Juge** : `equiv` `{vars:['x','y']}` pour u, v et les dérivées ; décision finale (holomorphe partout, nulle part, sur un ensemble) jugée comme un `mcq` · **Forme finale** : u, v, les 4 dérivées, la comparaison, la conclusion.
 - **Niveaux** :
@@ -698,6 +701,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-harmonic-conj` — Construire f holomorphe à partir de v
 - **Année** 15 · **Prérequis** `c-cauchy-riemann` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-cauchy-riemann` : u_x = v_y et u_y = −v_x.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Δv par `equiv` (cible `constant`), u par `antideriv` avec `grad` (`name: 'u'`), f en z par `cvalue` (z = x + iy, la constante C est une lettre réelle échantillonnée) après la décision « C réelle » (`c_harmonic_const_imag`). La ligne f(x) = u(x, 0) + i v(x, 0) est dans la note, pas une ligne jugée ; pas de gabarit « u donné ». L5 et `open` : v = 3x²y − y³ + e^(x² − y²) sin 2xy (+ cy), 5 points (1 + 2 + 2).
 - **Intro** : v doit être harmonique (Δv = 0). On trouve u par u_x = v_y, puis u_y = −v_x fixe la « constante » α(y). Pour écrire f en z : f(x) = u(x, 0) + i v(x, 0) sur l'axe réel, puis on remplace x par z. La constante est **réelle** si v est imposée. Exemple (2022) : `math: v = 3x²y − y³ + e^(x² − y²) sin(2xy)` ; `math: f(z) = z³ + e^(z²) + c, c ∈ ℝ`, `note: Im(z³) = 3x²y − y³, Im(e^(z²)) = e^(x²−y²) sin 2xy`.
 - **Juge** : `antideriv` gradient (comme `v-pot-find`) pour u à partir de (v_y, −v_x) ; `equiv` pour la forme en z (comparaison de f(x + iy) avec u + iv sur 12 points) · **Forme finale** : f(z) explicite en z, plus une constante réelle.
 - **Niveaux** :
@@ -720,6 +724,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-contour-param` — Intégrales de contour par paramétrisation
 - **Année** 15 · **Prérequis** `c-elem-fn`, `v-curve-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-elem-fn` : e^(it) et fonctions de z évaluées sur le contour.
+- **Statut** : fait le 10 novembre 2026 (étape U10). γ par `param` (courbe complexe, segment ou cercle), puis γ′(t), f(γ(t))γ′(t) (`cvalue` en t, la valeur demandée quelle que soit la ligne : une ligne sans γ′ nomme `c_contour_dz_forgot`) et l'intégrale (`cvalue`, ∫ calculée numériquement). Fonctions z̄, Re z, Im z, |z|², z², 1/z ; pas de (z − z₀)ⁿ. L1 : γ donné. L5 : un problème (z̄ sur le demi-cercle et sur le segment de 2a à 0, puis un QCM « pourquoi ? ») ou des lignes sans aide.
 - **Intro** : ∫_γ f(z) dz = ∫ₐᵇ f(γ(t)) γ′(t) dt, avec γ à valeurs complexes. Cercle de centre z₀ et rayon R : γ(t) = z₀ + R e^(it), γ′ = iRe^(it). Exemple : `math: ∮_{|z|=1} z̄ dz = ∫₀^{2π} e^(−it) · i e^(it) dt = 2πi`, `note: z̄ n'est pas holomorphe, ∮ ≠ 0`.
 - **Juge** : `param` (courbe dans ℂ ≅ ℝ²) ; `complex` pour la valeur · **Forme finale** : a + bi exact.
 - **Niveaux** :
@@ -741,6 +746,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-cauchy-thm` — Théorème de Cauchy
 - **Année** 15 · **Prérequis** `c-cauchy-riemann` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-cauchy-riemann` : f holomorphe sur Ω.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Singularités par `complex` (ensemble) ou `cfamily` (cos z = 0, période π), place de chacune et conclusion par des décisions (`c_pole_outside_counted`, `c_pole_on_contour`), puis ∮ = 0 (`cvalue`). Les leçons n'ont que des fonctions dont toutes les singularités sont hors du disque fermé ; « sur Γ » et « dedans » sont des QCM (L5 : un problème de 4 QCM, examen). Pas de dessin au niveau 1.
 - **Intro** : si f est holomorphe sur un ouvert simplement connexe Ω qui contient la courbe fermée Γ, alors ∮_Γ f dz = 0. On vérifie donc où sont les singularités : à l'intérieur, sur Γ (intégrale non définie), ou dehors. Exemple : `math: ∮_{|z|=1} dz/(z + 2)² = 0`, `note: la seule singularité, −2, est hors du disque`.
 - **Juge** : décision par fonction (`mcq`) : « singularités dans / sur / hors de Γ », puis valeur `complex` · **Forme finale** : 0 justifié, ou « non défini », ou renvoi aux résidus.
 - **Niveaux** :
@@ -763,6 +769,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-cauchy-formula` — Formule intégrale de Cauchy
 - **Année** 15 · **Prérequis** `c-cauchy-thm` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-cauchy-thm` : placer les singularités par rapport à Γ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). n par une décision (`c_cauchy_n_factor`), g⁽ⁿ⁾(z) par `cvalue` (z échantillonné dans ℂ), puis la valeur 2πi g⁽ⁿ⁾(z₀)/n! (`cvalue`, les fausses valeurs du piège dans la configuration). g parmi e^(az), cos z, sin z, z^k, 1/(z − b) ; z₀ ∈ {0, 1, i}. L5 : un problème (QCM sur la formule, puis un calcul).
 - **Intro** : f holomorphe, z₀ à l'intérieur de Γ : f^(n)(z₀) = n!/(2πi) ∮_Γ f(z)/(z − z₀)^(n+1) dz. On lit donc ∮ g/(z − z₀)^(n+1) = 2πi g^(n)(z₀)/n!. Exemple : `math: ∮_{|z|=1} e^(2z)/z³ dz = 2πi · (e^(2z))″(0)/2!`, `note: n = 2, puissance n + 1 = 3` ; `math: = 2πi · 4/2 = 4πi`.
 - **Juge** : `complex` · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -783,6 +790,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-taylor` — Série de Taylor et rayon de convergence
 - **Année** 15 · **Prérequis** `a1-pow-domain`, `a1-ser-geo-tele` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-ser-geo-tele` : série géométrique 1/(1 − u).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les Σ sont jugées par `cvalue` sur l'axe réel, dans le disque (le juge `series` n'a que des coefficients réels et pas de Σ) ; une série fausse est refusée avec un témoin. Rayon : une valeur (`c_taylor_radius`). Gabarits 1/(a ± z²), 1/(a ± z), 1/(1 + bz), z/(1 − z)² ; au niveau 4 aussi a₀…a₃ d'un quotient (dont 1/(sin z + 2 cos z − 3), GM 2015) par `series`. `coef` : a₂ ou a₃ d'un quotient. Pas de e^z/(1 − z) en terme général ; L5 : des lignes sans aide.
 - **Intro** : une fonction holomorphe sur le disque |z − z₀| < R est égale à sa série de Taylor sur ce disque ; le rayon est la **distance de z₀ à la singularité la plus proche**. Pour une fraction, on se ramène à 1/(1 − w) = Σ wⁿ, |w| < 1. Exemple (2022) : `math: 1/(3 + z²) = (1/3) · 1/(1 + z²/3) = Σ (−1)ⁿ z^(2n)/3^(n+1)` ; `math: rayon √3`, `note: singularités ±i√3`.
 - **Juge** : `series` `{v:'z', at:0, order:k}` (coefficients complexes) ; `value` pour le rayon · **Forme finale** : terme général (ou premiers coefficients demandés) et rayon.
 - **Niveaux** :
@@ -804,6 +812,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-laurent` — Série de Laurent dans une couronne donnée
 - **Année** 15 · **Prérequis** `c-taylor`, `g0-pfd-simple` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-taylor` : développer en série autour de z₀.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Pôles réels seulement (a, b ∈ {0, ±1, ±2, ±3}) : chaque série est comparée par `cvalue` sur un segment réel de la couronne ; une série de l'autre couronne y diverge et est comparée là où elle converge (`c_laurent_wrong_annulus`). Éléments simples par `cvalue` (finale « éléments simples »). L4 : aussi autour de z₀ = 1. L5 : un problème (les trois régions, puis a₋₃ ou a₋₄ : a₋₂ vaut toujours 1 hors des deux pôles). `coef` : un coefficient, ou e^(1/z), z² sin(1/z), cos(1/z). Pas de e^(1/z) en lignes.
 - **Intro** : dans une couronne r < |z − z₀| < R, f = Σ_{n∈ℤ} aₙ(z − z₀)ⁿ. On décompose en éléments simples, puis chaque terme 1/(z − a) se développe selon la couronne : si |z| < |a|, en puissances de z/a ; si |z| > |a|, en puissances de a/z. Exemple : `math: 1/(1 − z) = Σ_{n≥0} zⁿ (|z| < 1)` ; `math: 1/(1 − z) = −Σ_{n≥1} z^(−n) (|z| > 1)`, `note: même fonction, deux séries`.
 - **Juge** : `series` `{v:'z', at:z0, annulus:[r, R]}` (Laurent : puissances négatives admises ; contrôle numérique en 6 points de la couronne) · **Forme finale** : Σ avec terme général, ou les coefficients demandés.
 - **Niveaux** :
@@ -826,6 +835,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-singularities` — Classer les singularités
 - **Année** 15 · **Prérequis** `c-laurent`, `a1-dl-usual` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-laurent` : lire la plus basse puissance de la série de Laurent.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Ordres des zéros par `series` (en h = z − a quand z₀ = a ≠ 0, le juge `series` ne finissant pas une ligne « (z − a) + o(z − a) »), nature par une décision (`c_removable_as_pole`), ordre du pôle par `cvalue` (`c_order_pole_numerator`) ; toutes les réponses vérifiées par `singularityType`. Pas de z₀ = π dans les lignes. Essentielles (e^(1/z), z² sin(1/z), sin(1/(1 − 2z)), cos(1/z)) en QCM. L5 : un problème de QCM (les deux singularités d'une fonction) ; `open` : deux fonctions, 1,5 point chacune.
 - **Intro** : singularité isolée z₀ : **apparente** (pas de puissance négative ; lim finie), **pôle d'ordre m** (la plus basse puissance est (z − z₀)^(−m)), **essentielle** (une infinité de puissances négatives). Pour un quotient, ordre du pôle = ordre du zéro du dénominateur − ordre du zéro du numérateur. Exemple : `math: g = (e^(z−π) − 1)/sin²z en π`, `note: numérateur : zéro d'ordre 1 ; dénominateur : zéro d'ordre 2` ; `math: pôle simple`.
 - **Juge** : item `mcq` (type de singularité) suivi d'un `answer` pour l'ordre ; lignes d'ordre des zéros jugées par `series` (premier coefficient non nul) · **Forme finale** : type, et ordre si pôle.
 - **Niveaux** :
@@ -1085,17 +1095,17 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 | `c_exp_periodic` | rule | E | `c-equations` | `c-elem-fn` | e^z = i ⟹ z = iπ/2 → z = iπ/2 + 2kπi | Supprimer la famille + 2kπi (une seule solution). | « e^z est périodique de période 2πi : toutes les solutions sont {z0} + 2kπi, k ∈ ℤ. » |
 | `c_sqrt_i` | rule | C | `c-equations` | `g8-algebraic` | √(−16) = −4 ou √(z₁z₂) = √z₁ √z₂ → ±4i, et pas de règle de produit | Remplacer √(−a) par −√a, ou appliquer √(ab) = √a√b à des nombres non positifs. | « Dans ℂ, "√" n'a pas de règle de produit : √(−1)·√(−1) ≠ √1. Écris Δ = (4i)², donc les racines carrées de Δ sont ±4i. » (Plan §8 : i sous une racine.) |
 | `c_cr_sign` | sign | E | `c-cauchy-riemann` | `c-cauchy-riemann` | u_y = v_x → u_y = −v_x | Comparer u_y à +v_x (ou u_x à −v_y). | « Les équations sont u_x = v_y et u_y = **−** v_x. Avec le bon signe, {got} devient {want}. » |
-| `c_conj_not_holo` | rule | E | `c-cauchy-riemann` | `c-cauchy-riemann` | ∮_{|z|=1} z̄ dz = 0 → 2πi | `wrongValues` : 0 pour les intégrales de z̄, |z|², Re z sur un contour fermé ; « holomorphe » pour z̄. | « z̄ ne vérifie pas Cauchy-Riemann (u_x = 1, v_y = −1) : le théorème de Cauchy ne s'applique pas. » |
+| `c_conj_not_holo` | rule | E | `c-cauchy-riemann` | `c-cauchy-riemann` | ∮_{\|z\|=1} z̄ dz = 0 → 2πi | `wrongValues` : 0 pour les intégrales de z̄, \|z\|², Re z sur un contour fermé ; « holomorphe » pour z̄. | « z̄ ne vérifie pas Cauchy-Riemann (u_x = 1, v_y = −1) : le théorème de Cauchy ne s'applique pas. » |
 | `c_harmonic_const_imag` | rule | E | `c-harmonic-conj` | `c-harmonic-conj` | f = z² + 3z + c avec c ∈ ℂ → c ∈ ℝ | Constante c complexe (partie imaginaire libre). | « Im f = v est imposée : une constante ic changerait v. La constante est réelle. » |
 | `c_contour_dz_forgot` | calculus | E | `c-contour-param` | `c-contour-param` | ∫₀¹ t dt = 1/2 → ∫₀¹ t (1 + i) dt | Supprimer γ′(t) de l'intégrande. | « dz = γ′(t) dt = {gp} dt : ce facteur manque. » |
-| `c_pole_on_contour` | method | C | `c-cauchy-thm` | `c-cauchy-thm` | ∮_{|z|=1} dz/(z(z + 1)) = 2πi → non définie | `wrongValues` : appliquer les résidus en ignorant la singularité située sur Γ. | « −1 est **sur** le cercle |z| = 1 : l'intégrale n'est pas définie. » (Corrigé MT/SV 2021.) |
+| `c_pole_on_contour` | method | C | `c-cauchy-thm` | `c-cauchy-thm` | ∮_{\|z\|=1} dz/(z(z + 1)) = 2πi → non définie | `wrongValues` : appliquer les résidus en ignorant la singularité située sur Γ. | « −1 est **sur** le cercle \|z\| = 1 : l'intégrale n'est pas définie. » (Corrigé MT/SV 2021.) |
 | `c_pole_outside_counted` | method | C | `c-res-theorem` | `c-cauchy-thm` | 2πi(Res₀ + Res₁ + Res₃) → 2πi(Res₀ + Res₁) | Ajouter les résidus des singularités extérieures à Γ. | « {z} est à distance {d} du centre, plus que le rayon {R} : il est dehors et ne compte pas. » (Astuces d'Analyse IV GM ; plan §8.) |
 | `c_cos_bounded` | rule | C | `c-arc-estimate` | `c-elem-fn` | « |cos z| ≤ 1 sur l'arc » → |cos(x + iy)|² = cos²x + sinh²y | Leurre du `blocks` ; `wrongValues` : arc → 0 pour une fonction en cos(αz). | « cos z n'est pas borné sur ℂ : cos(iy) = cosh y → ∞. Utilise e^(iαz), borné dans le demi-plan supérieur. » (Plan §8.) |
 | `c_eiax_cos` | method | C | `c-int-fourier` | `c-arc-estimate` | ∮ cos(2z)/(z² + 1) → ∮ e^(2iz)/(z² + 1), puis Re | Remplacer e^(iαz) par cos(αz) dans le contour ; valeur produite π cosh α /… (résidu de cos(αz)/(z² + 1) en i). | « Sur l'arc, cos(αz) contient e^(−iαz), qui explose en haut : l'arc ne tend pas vers 0. » (Même remarque que `c_cos_bounded`.) |
 | `c_cauchy_n_factor` | rule | C | `c-cauchy-formula` | `c-cauchy-formula` | f^(n)(z₀) = n!/(2πi) ∮ f/(z − z₀)ⁿ → (z − z₀)^(n+1) | Puissance n au lieu de n + 1, ou n! oublié. | « Pour la dérivée n-ième, la puissance est n + 1 : avec n = {n}, on divise par (z − z₀)^{n+1}. » (Corrigé MT/SV 2021, QCM.) |
 | `c_laurent_sign` | sign | C | `c-taylor` | `a1-ser-geo-tele` | 1/(1 + z) = Σ zⁿ → Σ (−1)ⁿ zⁿ | Supprimer le facteur (−1)ⁿ (ou les signes alternés du DL de sin). | « 1/(1 + z) = 1/(1 − (−z)) : la raison est −z, d'où (−1)ⁿ. » (Corrigé MT/SV 2021, QCM.) |
-| `c_laurent_wrong_annulus` | method | E | `c-laurent` | `c-laurent` | dans |z| > 1 : 1/(z − 1) = −Σ zⁿ → Σ_{n≥1} z^(−n) | Prendre le développement en puissances de z quand il faut celui en 1/z (ou l'inverse). | « Dans {annulus}, |z| > {a} : |z/a| > 1 et la série en z/a diverge. Écris 1/(z − a) = (1/z) · 1/(1 − a/z). » |
-| `c_taylor_radius` | method | E | `c-taylor` | `c-taylor` | rayon de 1/(3 + z²) = 3 → √3 | Prendre |z₀ − singularité|² ou la constante au lieu de la distance. | « Le rayon est la distance de {z0} à la singularité la plus proche, ici {pole} : |{pole}| = {R}. » |
+| `c_laurent_wrong_annulus` | method | E | `c-laurent` | `c-laurent` | dans \|z\| > 1 : 1/(z − 1) = −Σ zⁿ → Σ_{n≥1} z^(−n) | Prendre le développement en puissances de z quand il faut celui en 1/z (ou l'inverse). | « Dans {annulus}, \|z\| > {a} : \|z/a\| > 1 et la série en z/a diverge. Écris 1/(z − a) = (1/z) · 1/(1 − a/z). » |
+| `c_taylor_radius` | method | E | `c-taylor` | `c-taylor` | rayon de 1/(3 + z²) = 3 → √3 | Prendre \|z₀ − singularité\|² ou la constante au lieu de la distance. | « Le rayon est la distance de {z0} à la singularité la plus proche, ici {pole} : \|{pole}\| = {R}. » |
 | `c_removable_as_pole` | method | E | `c-singularities` | `c-singularities` | sin z/z a un pôle en 0 → singularité apparente | Classer « pôle d'ordre m » sans tenir compte du zéro du numérateur. | « sin z/z → 1 quand z → 0 : la singularité est apparente, son résidu est 0. » |
 | `c_order_pole_numerator` | method | E | `c-singularities` | `c-singularities` | (e^(z−π) − 1)/sin²z : pôle double → pôle simple | Ordre = ordre du zéro du dénominateur seulement. | « Le numérateur s'annule aussi en π (ordre 1) : l'ordre du pôle est 2 − 1 = 1. » |
 | `c_simple_formula_double` | rule | E | `c-res-multiple` | `c-res-simple` | Res(1/(z²(z − 1)), 0) = lim z · f → limite infinie | Appliquer lim (z − z₀) f ou p/q′ en un pôle d'ordre ≥ 2 (q′(z₀) = 0 : `wrongValues` « ∞ » ou un nombre obtenu en simplifiant mal). | « 0 est un pôle **double** : la formule du pôle simple donne une limite infinie. Multiplie par z² puis dérive une fois. » (Plan §8.) |
