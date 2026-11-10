@@ -12,9 +12,9 @@
 // typed input (the bound M/nᵖ, the value of the bound, an index, e); L5
 // and the `open` variant: a problem, one part per stage of the proof with
 // the points of the catalogue.
-// Decoys whose trap belongs to another part (a1_series_term_to_zero,
-// a1_ivt_no_continuity, a1_abs_conv_confused, a1_sum_n_terms_as_one) are
-// offered only once the trap exists (after the U4 merge).
+// Decoys may carry the traps of other skills (a1_series_term_to_zero,
+// a1_ivt_no_continuity, a1_abs_conv_confused, a1_sum_n_terms_as_one); a
+// decoy is offered only if its trap exists (RULE_BY_ID).
 
 import { RULE_BY_ID } from '../../math/malrules.js';
 import { Q } from '../../math/rational.js';

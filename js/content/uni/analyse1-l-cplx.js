@@ -321,13 +321,16 @@ function exPowerMcq(level, rng, exam) {
   const Q0 = `(${d.num.text})/(1${s > 0 ? '+' : '-'}i)`;
   const right = d.zm;
   const opt = (c, extra) => ({ html: MT(gaussText(c.re.valueOf(), c.im.valueOf()), CX), ...extra });
-  // iᵏ reduced as −i^(k mod 4): the numerator changes sign term by term.
-  const wrongNum = d.num.terms.reduce((acc, t) => acc.add(new CQ(0, 1).pow(t.p % 4).mul(-t.a)), new CQ(0));
+  // iᵏ reduced modulo 2 (else modulo 3) instead of 4.
+  const numWith = (mod) => d.num.terms.reduce((acc, t) => acc.add(new CQ(0, 1).pow(t.p % mod).mul(t.a)), new CQ(0));
+  const wrongNum = numWith(2).eq(d.N) ? numWith(3) : numWith(2);
   const wrongZ = wrongNum.div(new CQ(1, s));
   const cands = [
     opt(right, { correct: true }),
     opt(wrongZ.pow(m), { correct: false, rule: 'a1_cplx_ik_mod' }),
-    ...(m % 2 === 1 ? [opt(right.neg(), { correct: false, rule: 'a1_polar_r_negative' })] : []),
+    // Odd m: −zᵐ, the power of −z. With Re z < 0, that is the argument taken
+    // as arctan(b/a) (quadrant not corrected); else a module read negative.
+    ...(m % 2 === 1 ? [opt(right.neg(), { correct: false, rule: z.a < 0 ? 'g8_arg_quadrant' : 'a1_polar_r_negative' })] : []),
     opt(right.conj(), { correct: false }),
     opt(right.mul(new CQ(0, 1)), { correct: false }),
     opt(right.neg(), { correct: false }),

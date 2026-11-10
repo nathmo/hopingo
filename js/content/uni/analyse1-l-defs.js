@@ -9,10 +9,10 @@
 // random, without help (a problem). Exam: `open` (one definition, a
 // problem) and `tf`.
 //
-// Each decoy names its trap. The traps of other parts (a1_sup_in_set,
-// a1_series_term_to_zero, a1_abs_conv_confused, a1_epsdelta_swapped,
-// a1_bounded_implies_convergent) are offered only once they exist
-// (RULE_BY_ID): after the U4 merge, without change here.
+// Each decoy names its trap, those of other skills included
+// (a1_sup_in_set, a1_series_term_to_zero, a1_abs_conv_confused,
+// a1_epsdelta_swapped, a1_bounded_implies_convergent); a decoy is offered
+// only if its trap exists (RULE_BY_ID).
 
 import { RULE_BY_ID } from '../../math/malrules.js';
 import { blocksItem, tokensItem, tfItem, FM } from './kit.js';
