@@ -276,6 +276,17 @@ const WANT_ONE = {
     const same = ka.length === kb.length && (ka.length === 0 || MX.rank(MX.fromCols([...ka, ...kb])) === ka.length);
     return !same || 'Les lignes de A et de B ont ici les mêmes relations.';
   },
+  // section det
+  // det A ≠ 0: then det(Aᵀ) ≠ −det A, a swap changes det, det(2A) ≠ 2·det A.
+  detNonZero: ({ A }) => (sq(A) ? MX.det(A).n !== 0 || 'Ici det A = 0 : l\'égalité est vraie pour cette matrice. Prends A inversible, par exemple I.' : 'A doit être carrée.'),
+  // det A < 0: the area of the image of the unit square is |det A| ≠ det A.
+  detNegative: ({ A }) => (sq(A) ? MX.det(A).n < 0 || `Ici det A = ${MX.det(A)} : il faut un déterminant négatif.` : 'A doit être carrée.'),
+  // det A = 0 with no zero row and no zero column.
+  singularNoZeroLine: ({ A }) => {
+    if (!sq(A)) return 'A doit être carrée.';
+    if (A.some((r) => r.every((x) => x.n === 0)) || MX.transpose(A).some((c) => c.every((x) => x.n === 0))) return 'A ne doit avoir ni ligne nulle ni colonne nulle.';
+    return MX.det(A).n === 0 || 'Ici det A ≠ 0.';
+  },
 };
 
 // (λ − r)·P, P as coefficients from λ⁰.
