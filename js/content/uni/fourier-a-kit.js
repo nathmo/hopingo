@@ -25,6 +25,8 @@ import { tpl, stepMenus, modeOf, H } from './analyse1-e-kit.js';
 import { parseOpts } from '../../judges/common.js';
 import { parse } from '../../cas/parse.js';
 import { complexValue } from '../../cas/complex.js';
+import { evalFloat } from '../../cas/numeric.js';
+import { judgeFor, readWith } from '../../judges/index.js';
 
 export { MT, H, modeOf };
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
@@ -81,7 +83,8 @@ function termText(c, pat, e, k, v = 'n') {
 }
 
 // The closed form of a value, as text for the CAS.
-export function vText(a) {
+// split: each (−1)ⁿ term apart (another writing of the same value).
+export function vText(a, { split = false } = {}) {
   if (vZero(a)) return '0';
   const groups = new Map();
   for (const [kk, x] of a) {
@@ -94,6 +97,7 @@ export function vText(a) {
   const list = [...groups.values()].sort((x, y) => x.k - y.k || y.e - x.e);
   for (const { e, k, A, B } of list) {
     if (B.n === 0) terms.push([A, '', e, k]);
+    else if (split && A.n !== 0) { terms.push([A, '', e, k]); terms.push(B.n < 0 ? [B.neg(), '(-1)^(n+1)', e, k] : [B, '(-1)^n', e, k]); }
     else if (A.n === 0) {
       if (B.n < 0) terms.push([B.neg(), '(-1)^(n+1)', e, k]); else terms.push([B, '(-1)^n', e, k]);
     } else if (A.eq(B.neg())) terms.push(A.n < 0 ? [A.neg(), '((-1)^n-1)', e, k] : [A, '(1-(-1)^n)', e, k]);
@@ -182,13 +186,13 @@ function times(t, rest) {
 }
 const integrand = (p, trig, arg) => times(pText(p), `${trig}(${arg})`);
 
-// The same with the sign of the first « tout intégré » term of a sine step
+// The same with the sign of every « tout intégré » term of a sine step
 // changed (trap f_ipp_sign: the primitive of sin taken as +cos/a).
 export function ipvWrong(p, trig, L) {
   if (pIsZero(p)) return V();
   const { inv } = freq(L);
   const dp = pDeriv(p);
-  if (trig === 'sin') return vAdd(vNeg(bracketValue(p, 'sin', L)), vMul(inv, ipv(dp, 'cos', L)));
+  if (trig === 'sin') return vAdd(vNeg(bracketValue(p, 'sin', L)), vMul(inv, ipvWrong(dp, 'cos', L)));
   return vNeg(vMul(inv, ipvWrong(dp, 'sin', L)));
 }
 
@@ -268,6 +272,7 @@ const STATIC = new Set(['prob', 'fcomplex', 'eigen', 'complex', 'stat']);
 // A trap value equal to the value asked is no trap: dropped (parts with
 // `expect`, judges value and fcomplex).
 function cleanTraps(judge) {
+  if (judge.traps && judge.kind === 'equiv' && judge.goal) return cleanEquiv(judge);
   if (!judge.traps || judge.expect === undefined || !['value', 'fcomplex'].includes(judge.kind)) return judge;
   const val = (t) => complexValue(parse(String(t), { complex: true, vars: judge.vars }));
   let want;
@@ -281,6 +286,44 @@ function cleanTraps(judge) {
     if (keep.length) traps[id] = keep;
   }
   return { ...judge, traps };
+}
+
+// The same for a coefficient in n (or k): equal to the goal at n = 1 … 6.
+function cleanEquiv(judge) {
+  const v = judge.vars[0];
+  const at = (t) => { const node = parse(String(t), { vars: judge.vars }); return [1, 2, 3, 4, 5, 6].map((n) => evalFloat(node, { [v]: n })); };
+  let want;
+  try { want = at(judge.goal); } catch { return judge; }
+  const traps = {};
+  for (const [id, list] of Object.entries(judge.traps)) {
+    const keep = list.filter((x) => { try { const got = at(typeof x === 'string' ? x : x.line); return got.some((g, i) => !(Math.abs(g - want[i]) <= 1e-9 * (1 + Math.abs(want[i])))); } catch { return true; } });
+    if (keep.length) traps[id] = keep;
+  }
+  return { ...judge, traps };
+}
+
+// The reference lines a judge takes as steps: a line before the last that
+// the judge finds « right, to tidy » is dropped, and one it already finds
+// final ends the part (the judges value and equiv accept (π + 0)/2, or a
+// line without ∫, as an answer).
+function prune(p) {
+  const lines = p.lines;
+  if (lines.length < 2) return lines;
+  const j = cleanTraps(p.judge);
+  let prev;
+  try { prev = readWith(j, p.start); } catch { return lines; }
+  const out = [];
+  let stop = false;
+  lines.forEach((l, i) => {
+    if (stop) return;
+    if (i === lines.length - 1) { out.push(l); return; }
+    let v;
+    try { v = judgeFor(j).judgeLine(j, prev, l.math, {}); } catch { v = { kind: 'parse' }; }
+    if (v.kind === 'ok') { out.push(l); prev = v.node ?? prev; }
+    // Already an answer: it ends the part (its blanks are kept).
+    if (v.kind === 'done') { out.push({ ...l, subgoal: lines[lines.length - 1].subgoal ?? l.subgoal }); stop = true; }
+  });
+  return out;
 }
 
 export function build(o) {
@@ -299,7 +342,8 @@ export function build(o) {
     return { ...p.judge, menus: stepMenus(p.start, lines, choices) };
   };
   const script = [];
-  o.parts.forEach((p, k) => {
+  o.parts.forEach((p0, k) => {
+    const p = { ...p0, lines: prune({ ...p0, lines: p0.lines.filter((l) => !(l.from && level < l.from)) }) };
     if (k > 0) script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge: judgeAt(p) });
     else if (p.html) script.push({ kind: 'note', html: p.html });
     for (const x of p.pre || []) {
