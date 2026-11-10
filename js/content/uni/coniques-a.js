@@ -23,7 +23,7 @@ import {
 import { coefItem } from './alglin-kit.js';
 
 const KEYS = ['calc', 'geo', 'pts'];
-const Rd = (t) => readable(t).replace(/\(− /g, '(−').replace(/= − /g, '= −').replace(/^− /, '−');
+const Rd = (t) => readable(t).replace(/; − /g, '; −').replace(/\(− /g, '(−').replace(/= − /g, '= −').replace(/^− /, '−');
 const M = (t) => MT(t, { vars: ['x', 'y'] });
 const sq = (x) => x * x;
 
@@ -1016,6 +1016,7 @@ function plusRoot(h, x2, sign) {
   if (q(h).n === 0) return sign > 0 ? r : `-${r}`;
   return `${qt(h)} ${sign > 0 ? '+' : '-'} ${r}`;
 }
+const over = (sqx, d) => (d === 1 ? sqx : `${sqx}/${d}`);
 const pt2 = (P) => `(${P[0]} ; ${P[1]})`;
 const viewAround = (h, k, span) => ({ x: [Math.floor(h - span), Math.ceil(h + span)], y: [Math.floor(k - span), Math.ceil(k + span)] });
 const conicPart = (o) => ({ ...o, judge: { kind: 'conic', equation: o.eq, ...(o.els ? { ask: o.els } : { target: 'standard' }) } });
@@ -1056,7 +1057,7 @@ function ellData(rng) {
   const dirT = (s) => `${vertical ? 'y' : 'x'} = ${plusRoot(vertical ? k : h, dirV, s)}`;
   return {
     A, B, vertical, h, k, ax, ay, coefs: c, eq: eqOf(c), c2,
-    std: `${sqT('x', h)}/${ax * ax} + ${sqT('y', k)}/${ay * ay} = 1`,
+    std: `${over(sqT('x', h), ax * ax)} + ${over(sqT('y', k), ay * ay)} = 1`,
     cT: rootT(c2), eT: rootT(q(c2, A * A)), F: [foc(1), foc(-1)], dirs: [dirT(1), dirT(-1)],
   };
 }
@@ -1092,7 +1093,7 @@ function ellParts(d, level, kind) {
   parts.push(conicPart(first({
     html: 'Le centre et les demi-axes.', ask: 'Ω, a, b :', start: 'E', eq, els: ['Ω', 'a', 'b'], menu: ELL_MENU.el,
     decisions: [AXIS_DEC(d.vertical, 'Le grand axe')],
-    lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.A} ; b = ${d.B}`, note: `Grand axe ${d.vertical ? 'vertical' : 'horizontal'} : a² = ${d.A * d.A} sous ${d.vertical ? 'y' : 'x'}`, subgoal: 'el', blank: [String(d.A), String(d.B)] }],
+    lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.A} ; b = ${d.B}`, note: `Grand axe ${d.vertical ? 'vertical' : 'horizontal'} : a² = ${d.A * d.A} sous ${d.vertical ? 'y' : 'x'}`, subgoal: 'el', blank: [{ after: 'a=', text: String(d.A) }, { after: 'b=', text: String(d.B) }] }],
   })));
   parts.push(conicPart({
     html: 'Les foyers.', ask: 'c, F, F′ :', start: 'E', eq, els: kind === 'foci' ? ['c', 'F', 'e'] : ['c', 'F'], menu: ELL_MENU.foc,
@@ -1123,7 +1124,7 @@ function ellItem(level, rng, opts = {}) {
     prompt: level === 1
       ? `L'ellipse E a pour forme réduite ${M(d.std)}. Donne son centre, a et b, ses foyers${kind === 'all' ? ', son excentricité et ses directrices' : ''}.`
       : `Pour l'ellipse E : ${M(d.eq)}, trouve la forme réduite, le centre, a et b, les foyers${kind === 'all' ? ', l\'excentricité et les directrices' : ' et l\'excentricité'}.`,
-    hints: H(`Mets ${d.coefs[0]} en facteur dans les x, ${d.coefs[2]} dans les y, complète, puis divise par le second membre.`, `c² = a² − b² = □`, `F = ${Rd(pt2(d.F[0]))} et F′ = ${Rd(pt2(d.F[1]))}`),
+    hints: H(level === 1 ? 'Le grand axe est du côté du plus grand dénominateur ; c² = a² − b² ; e = c/a.' : `Mets ${d.coefs[0]} en facteur dans les x, ${d.coefs[2]} dans les y, complète, puis divise par le second membre.`, `c² = a² − b² = □`, `F = ${Rd(pt2(d.F[0]))} et F′ = ${Rd(pt2(d.F[1]))}`),
     key: `${ELL}:${kind}:${d.eq}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -1206,7 +1207,7 @@ function hypData(rng, kind = 'all') {
   // Asymptotes: b(x − h) = ±a(y − k) (horizontal), a(x − h) = ±b(y − k) (vertical).
   const [p, r] = vertical ? [a, b] : [b, a];
   const asym = [lineRow(p, -r, -p * h + r * k), lineRow(p, r, -p * h - r * k)];
-  const std = vertical ? `${sqT('y', k)}/${a * a} - ${sqT('x', h)}/${b * b} = 1` : `${sqT('x', h)}/${a * a} - ${sqT('y', k)}/${b * b} = 1`;
+  const std = vertical ? `${over(sqT('y', k), a * a)} - ${over(sqT('x', h), b * b)} = 1` : `${over(sqT('x', h), a * a)} - ${over(sqT('y', k), b * b)} = 1`;
   // Before dividing: α(x − h)² + β(y − k)² = rhs.
   const sides = `${sumT([[coefs[0], sqT('x', h)], [coefs[2], sqT('y', k)]])} = ${qt(-(coefs[5] - coefs[0] * h * h - coefs[2] * k * k))}`;
   return {
@@ -1249,7 +1250,7 @@ function hypParts(d, level, kind) {
     parts.push(conicPart(first({
       html: 'Le centre, a, b et c.', ask: 'Ω, a, b, c :', start: 'H', eq: d.eq, els: ['Ω', 'a', 'b', 'c'], menu: HYP_MENU.el,
       decisions: [AXIS_DEC(d.vertical, 'L\'axe réel')],
-      lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.a} ; b = ${d.b} ; c = ${d.cT}`, note: `Axe réel ${d.vertical ? 'vertical' : 'horizontal'} ; c² = a² + b² = ${d.c2}`, subgoal: 'el', blank: [String(d.a), String(d.b)] }],
+      lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.a} ; b = ${d.b} ; c = ${d.cT}`, note: `Axe réel ${d.vertical ? 'vertical' : 'horizontal'} ; c² = a² + b² = ${d.c2}`, subgoal: 'el', blank: [{ after: 'a=', text: String(d.a) }, { after: 'b=', text: String(d.b) }] }],
     })));
     parts.push(conicPart({
       html: 'Les foyers et l\'excentricité.', ask: 'F, F′, e :', start: 'H', eq: d.eq, els: ['F', 'e'], menu: HYP_MENU.foc,
@@ -1402,7 +1403,7 @@ function parItem(level, rng, opts = {}) {
         }],
         lines: [
           { math: d.completed, note: 'Compléter le carré', subgoal: 'sq', blank: [{ after: d.vertical ? sqT('x', d.h) : sqT('y', d.k), text: qt((d.vertical ? d.h : d.k) ** 2) }].filter((b) => b.text !== '0') },
-          { math: d.std, note: 'Isoler le carré et mettre 2p en facteur', subgoal: 'sq', blank: [String(2 * d.p)] },
+          { math: d.std, note: 'Isoler le carré et mettre 2p en facteur', subgoal: 'sq', blank: [{ after: '=', text: String(2 * d.p) }] },
         ],
       }));
     }
@@ -1435,15 +1436,16 @@ function parItem(level, rng, opts = {}) {
     const [u, v, w] = d.vertical ? [0, 1, d.h] : [1, 0, d.k];
     const dA = A[u] - w;
     const dB = B[u] - w;
+    const nm = d.vertical ? 'k' : 'h';
     parts.push(
       {
         start: '2p', judge: { kind: 'value', expect: String(2 * d.p) },
-        notes: [`A et B donnent ${Rd(`${par(dA)}^2 = 2p(${A[v]} - k)`)} et ${Rd(`${par(dB)}^2 = 2p(${B[v]} - k)`)}.`.replace(/\^2/g, '²')],
+        notes: [`A et B donnent ${Rd(`${par(dA)}^2 = 2p(${A[v]} - ${nm})`)} et ${Rd(`${par(dB)}^2 = 2p(${B[v]} - ${nm})`)}.`.replace(/\^2/g, '²')],
         lines: [{ math: `(${par(dA)}^2-${par(dB)}^2)/(${A[v]}-${par(B[v])})`, note: 'Soustraire les deux équations', subgoal: 'sq' }, { math: String(2 * d.p), note: '', subgoal: 'sq' }],
       },
       {
-        html: 'Puis k.', ask: 'k =', start: 'k', judge: { kind: 'value', expect: String(d.vertical ? d.k : d.h) },
-        lines: [{ math: `${A[v]}-${par(dA)}^2/${par(2 * d.p)}`, note: `De ${Rd(`${par(dA)}^2`).replace('^2', '²')} = 2p(${A[v]} − k)`, subgoal: 'sq' }, { math: String(d.vertical ? d.k : d.h), note: '', subgoal: 'sq' }],
+        html: `Puis ${nm}.`, ask: `${nm} =`, start: nm, judge: { kind: 'value', expect: String(d.vertical ? d.k : d.h) },
+        lines: [{ math: `${A[v]}-${par(dA)}^2/${par(2 * d.p)}`, note: `De ${Rd(`${par(dA)}^2`).replace('^2', '²')} = 2p(${A[v]} − ${nm})`, subgoal: 'sq' }, { math: String(d.vertical ? d.k : d.h), note: '', subgoal: 'sq' }],
       },
       conicPart({ html: 'L\'équation.', ask: 'P :', start: 'P', eq: d.eq, lines: [{ math: d.std, note: '', subgoal: 'sq' }] }),
     );
