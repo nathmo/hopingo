@@ -3,4 +3,4 @@
 import { test } from 'node:test';
 import { checkSkills } from './uni-check.js';
 
-test('unit matrices (b): every skill, 5 levels and exam variants', () => checkSkills(['m-cholesky'], 17, { 'm-cholesky': 20 }));
+test('unit matrices (b): every skill, 5 levels and exam variants', () => checkSkills(['m-cholesky', 'm-rayleigh'], 17, { 'm-cholesky': 20, 'm-rayleigh': 20 }));
