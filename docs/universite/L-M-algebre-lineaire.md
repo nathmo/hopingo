@@ -957,7 +957,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
   - L3 (choisir l'action) : enchaîner (vecteur unitaire, puis angle).
   - L4 (libre) : ℝ⁴, avec un paramètre (« pour quel a u ⊥ v ? »).
   - L5 (seul) : vrai/faux sur les identités (2021 Q27) et un calcul de distance, sans aide.
-- **Générateur** : vecteurs entiers à normes entières (triplets et quadruplets pythagoriciens : (1, 2, 2), (2, 3, 6), (1, 4, 8), (2, 4, 4, 5), (1, 1, 1, 1)…), produits scalaires non nuls. Gabarits : (a) calculs ; (b) orthogonalité avec paramètre ; (c) vrai/faux.
+- **Générateur** : vecteurs entiers à normes entières (triplets et quadruplets pythagoriciens : (1, 2, 2), (2, 3, 6), (1, 4, 8), (1, 2, 2, 4), (1, 1, 1, 1)…), produits scalaires non nuls. Gabarits : (a) calculs ; (b) orthogonalité avec paramètre ; (c) vrai/faux.
 - **Corrigé type** : u = (1 ; 2 ; 2), v = (3 ; 0 ; −4).
   1. u · v = 3 + 0 − 8 = −5 — *produit scalaire*
   2. ‖u‖ = √9 = 3, ‖v‖ = √25 = 5 — *normes*

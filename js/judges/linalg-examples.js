@@ -444,6 +444,35 @@ const WANT_FAMILY = {
     const s = x.map((_, k) => B.reduce((acc, b, j) => acc.add(b[k].mul(c[j])), q(0)));
     if (!s.every((y, k) => y.eq(x[k]))) return 'Avec ces coordonnées, c₁b₁ + c₂b₂ + … ne redonne pas le vecteur.';
     return !c[p.i].eq(q(p.claim)) || 'Avec ces coordonnées, la composante est bien celle de l’énoncé.';
+  // section orth
+  // x ∈ W = Span{params.basis} closer to params.y than params.w (answer x).
+  closerInW: (ans, p) => {
+    const y = readQ(p.y).vec;
+    const w = readQ(p.w).vec;
+    const B = p.basis.map((t) => readQ(t).vec);
+    const x = readQ(ans.x)?.vec;
+    if (!x || x.length !== y.length) return `Écris un vecteur x à ${y.length} composantes.`;
+    if (MX.rank(MX.fromCols([...B, x])) !== MX.rank(MX.fromCols(B))) return 'x doit être dans W : une combinaison des vecteurs de la base.';
+    const d2 = (a) => { const r = y.map((v, i) => v.sub(a[i])); return MX.dot(r, r); };
+    return d2(w).sub(d2(x)).n > 0 || 'Ce point n\'est pas plus proche de y que w.';
+  },
+  // A basis of ℝⁿ that Gram-Schmidt (normalised) does not send to e₁, …, eₙ (answer F).
+  gsNotCanonical: (ans, p) => {
+    const vs = readFamily(ans.F);
+    if (!vs || vs.length !== p.n || vs.some((v) => v.length !== p.n)) return `Écris ${p.n} vecteurs de ℝ${'⁰¹²³⁴⁵⁶'[p.n]}.`;
+    const g = MX.qrGS(MX.fromCols(vs));
+    if (!g) return 'Ta famille doit être une base : ses vecteurs doivent être libres.';
+    const V = MX.transpose(g.V);
+    return V.some((v, j) => v.some((x, i) => (i === j ? x.n <= 0 : x.n !== 0))) || 'Gram-Schmidt donne ici e₁, …, eₙ (après normalisation).';
+  },
+  // p ≠ 0 of degree ≤ params.deg, zero at every point of params.points (answer p, in t).
+  polyNullAtPoints: (ans, p) => {
+    const cs = coordsOf(ans.p, { poly: true, n: p.deg + 1 });
+    if (!cs) return `Écris un polynôme en t de degré au plus ${p.deg}.`;
+    if (cs.every((c) => c.n === 0)) return 'p doit être non nul.';
+    const at = (x) => cs.reduceRight((s, c) => s.mul(q(x)).add(c), q(0));
+    const bad = p.points.find((x) => at(x).n !== 0);
+    return bad === undefined || `Il faut p(${bad}) = 0.`;
   },
 };
 
