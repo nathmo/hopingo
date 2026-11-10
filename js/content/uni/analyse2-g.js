@@ -9,9 +9,14 @@
 import { polarInt } from './analyse2-g-polar.js';
 import { cylSph } from './analyse2-g-space.js';
 import { improperMulti } from './analyse2-g-improper.js';
+import { volume } from './analyse2-g-volume.js';
+import { massCenter } from './analyse2-g-mass.js';
 
 export const GEN = {
   'a2-polar-int': (level, rng, profile, opts = {}) => polarInt(level, rng, opts),
   'a2-cyl-sph': (level, rng, profile, opts = {}) => cylSph(level, rng, opts),
   'a2-improper-multi': (level, rng, profile, opts = {}) => improperMulti(level, rng, opts),
+  'a2-volume': (level, rng, profile, opts = {}) => volume(level, rng, opts),
+  // No exam variant (catalogue): exam weight 0.
+  'a2-mass-center': (level, rng) => massCenter(level, rng),
 };

@@ -123,7 +123,14 @@ function termOf(t) {
       keys.push(below ? `/${k}` : k);
     }
   }
-  if (nums > 2 || (nums === 2 && !(ups.some((f) => qOf(f)) && downs.length === 1 && qOf(downs[0])))) return 'Multiplie les nombres entre eux.';
+  // Step U6: one number above and one below, atoms around them: 8/(3π).
+  if (nums > 2 || (nums === 2 && !(ups.some((f) => qOf(f)) && downs.filter((f) => qOf(f)).length === 1))) return 'Multiplie les nombres entre eux.';
+  if (nums === 2 && downs.length > 1) {
+    const g = (x, y) => (y ? g(y, x % y) : Math.abs(x));
+    const [u] = ups.filter((f) => qOf(f)).map(qOf);
+    const [w] = downs.filter((f) => qOf(f)).map(qOf);
+    if (u.d !== 1 || w.d !== 1 || g(u.n, w.n) !== 1) return 'Simplifie la fraction.';
+  }
   return { q, key: keys.sort().join('·') };
 }
 
