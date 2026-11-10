@@ -32,6 +32,10 @@ import { diagnoseLine } from './diagnose.js';
 
 export const sign = '⇔';
 
+// The tokenizer of guided lines spells « : » as « ÷ » (fillBlanks, templateOf):
+// « axe ÷ x = 3 » is « axe : x = 3 ».
+const colon = (t) => t.replace(/(^|;)\s*(asymptotes?|directrices?|axe)\s*÷/g, '$1$2 :');
+
 const AN = new WeakMap();
 export function analysis(cfg) {
   if (!AN.has(cfg)) {
@@ -88,7 +92,7 @@ function readElement(name, body) {
 }
 
 function readStrict(cfg, text) {
-  const t = normGeomText(text).replace(/^=\s*/, '');
+  const t = colon(normGeomText(text)).replace(/^=\s*/, '');
   const items = splitTop(t, ';').map((s) => s.trim()).filter(Boolean);
   const els = items.map((it) => ELEMENT.exec(it));
   if (els.every(Boolean)) {
@@ -126,7 +130,7 @@ const toML = (n) => toMathML(n).replace(/^<math[^>]*>/, '').replace(/<\/math>$/,
 // A line (or a guided template with blanks □) as MathML, as written.
 function lineML(t, bl = {}) {
   const counter = { n: 0 };
-  const items = splitTop(normGeomText(t), ';').map((s) => s.trim()).filter(Boolean);
+  const items = splitTop(colon(normGeomText(t)), ';').map((s) => s.trim()).filter(Boolean);
   const els = items.map((it) => ELEMENT.exec(it));
   if (els.every(Boolean)) {
     return els.map((m) => {
