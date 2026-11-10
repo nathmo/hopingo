@@ -19,7 +19,10 @@ export const LETTERS = ['z', 'w', 't', 'x', 'y', 'n', 'k', 'C', 'u', 'v', 'h', '
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
 export const cq = (a, b = 0) => new CQ(q(a), q(b));
 // MathML of a text (i the imaginary unit).
-export const M = (text, display = false) => MT(text, { complex: true, vars: LETTERS }, display);
+// conj(z) is shown z̄.
+const ZBAR = '<mi>conj</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo></mrow>';
+export const M = (text, display = false) => MT(text, { complex: true, vars: LETTERS }, display)
+  .split(ZBAR).join('<mover accent="true"><mi>z</mi><mo>¯</mo></mover>').replace(/conj\(z\)/g, 'z̄');
 // Readable text: − for -, spaces around + and − between terms.
 export const rd = (t) => String(t).replace(/-/g, '−');
 export const zt = (z) => toText(z.toNode());

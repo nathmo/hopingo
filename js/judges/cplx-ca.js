@@ -16,7 +16,8 @@
 //       asked, whatever the previous line), raw?: {text, html} (a start that
 //       is not a value: « ∮_Γ f dz », shown as html), alt?: {v: [lo, hi]}
 //       (where the traps of a series are compared when the line diverges),
-//       final?: 'closed' (default) | 'any' | 'z' (no x, y left) | 'series'
+//       final?: 'closed' (default) | 'any' | 'z' (no x, y left) | 'split'
+//       (one term in i: u + i·v) | 'series'
 //       | 'pfd' | 'number', goal?: text (a final line is at most about as
 //       long), traps?: {id: [texts]} (wrong lines written by the generator)}
 //
@@ -379,6 +380,8 @@ export function cvFinal(cfg, node) {
   if (f === 'z' && contains(node, (x) => x.t === 'sym' && (x.name === 'x' || x.name === 'y'))) return false;
   if (f === 'number' && symbolsIn(node).size) return false;
   if (!tidy(node, letters)) return false;
+  // u + iv: the imaginary part in one term.
+  if (f === 'split' && termsOf(node).filter(hasI).length > 1) return false;
   // Numbers still to add or multiply (√(1 + 3), 2π·4/2, 3!).
   if (contains(node, (x) => x.t === 'fn' && x.name === 'fact')) return false;
   if (contains(node, (x) => x.t === 'bin' && (x.op === '+' || x.op === '-') && !!exactValue(x.l) && !!exactValue(x.r))) return false;

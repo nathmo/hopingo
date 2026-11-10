@@ -8,5 +8,6 @@
 // (c-taylor, c-laurent, c-singularities); helpers: cplx-a-kit.js.
 
 import { GEN as ELEM } from './cplx-a-elem.js';
+import { GEN as CR } from './cplx-a-cr.js';
 
-export const GEN = { ...ELEM };
+export const GEN = { ...ELEM, ...CR };
