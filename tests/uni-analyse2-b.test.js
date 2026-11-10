@@ -5,7 +5,7 @@ import { checkSkills } from './uni-check.js';
 import { SKILLS } from '../js/content/uni/analyse2-b.skills.js';
 
 // Skills whose generators are not written yet (emptied when the part is done).
-const STUBBED = new Set(["a2-dir-deriv-def", "a2-diff-def", "a2-diff-implications"]);
+const STUBBED = new Set([]);
 // Items per level for heavy skills (never under 15).
 const COUNTS = { 'a2-lim-paths': 20, 'a2-lim-polar': 20, 'a2-continuity': 20 };
 

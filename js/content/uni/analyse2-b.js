@@ -5,5 +5,6 @@
 // differentiability, implications and the problem E6: analyse2-b-diff.js.
 
 import { GEN_LIM } from './analyse2-b-lim.js';
+import { GEN_DIFF } from './analyse2-b-diff.js';
 
-export const GEN = { ...GEN_LIM };
+export const GEN = { ...GEN_LIM, ...GEN_DIFF };

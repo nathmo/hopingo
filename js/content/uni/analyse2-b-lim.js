@@ -86,7 +86,7 @@ const LP_CHOICES = [
   { id: 'polar', label: 'Passer en coordonnées polaires', why: 'Les polaires servent à montrer qu\'une limite existe ; ici, on cherche deux chemins.' },
 ];
 
-const eqv = (vars, goal) => ({ kind: 'equiv', vars, domain: Object.fromEntries(vars.map((v) => [v, [-1.5, 1.5]])), target: 'short', goal, slack: 2 });
+const eqv = (vars, goal) => ({ kind: 'equiv', vars, domain: Object.fromEntries(vars.map((v) => [v, [-2, 2]])), target: 'short', goal, slack: 2 });
 const limCfg = (v, value, vars) => ({ kind: 'limit', v, to: '0', ...(vars ? { vars } : {}), ...(value !== undefined ? { value } : {}) });
 const gapCfg = (gap) => ({ kind: 'value', expect: gap, form: 'irreducible' });
 
@@ -390,7 +390,7 @@ const PO_CHOICES = [
   { id: 'limit', label: 'Faire tendre r vers 0' },
   { id: 'paths', label: 'Essayer deux chemins', why: 'Deux chemins montrent qu\'une limite n\'existe pas, jamais qu\'elle existe.' },
 ];
-const polarCfg = (goal) => ({ kind: 'equiv', vars: PV, domain: { r: [0.01, 1], φ: [0, 6.28] }, target: 'short', goal, slack: 2 });
+const polarCfg = (goal) => ({ kind: 'equiv', vars: PV, domain: { r: [0.2, 1.5], φ: [0, 6.28] }, target: 'short', goal, slack: 2 });
 const BOUND = { kind: 'bound', vars: PV };
 const LIMR = { kind: 'limit', v: 'r', to: '0', dir: '+' };
 
