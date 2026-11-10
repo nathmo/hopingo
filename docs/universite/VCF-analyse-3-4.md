@@ -1515,6 +1515,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-table` — Transformée de Laplace par la table et les propriétés
 - **Année** 16 · **Prérequis** `a1-improper-calc`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-improper-calc` : F(z) = ∫₀^∞ f(t)e^(−tz) dt ; `g8-polar` : e^(iωt), cos ωt et sin ωt dans la table.
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 à L3 : deux parties, la parenthèse (ou g) par la table, puis la propriété (décalage LP4 ou −F′ pour t·g, LP5) ; le choix de la ligne et de la propriété sont des décisions (aux niveaux 2 et 3), pas des menus. Le demi-plan est une ligne « Re z > γ₀ » avant F(z), ou sur la même ligne (`halfPlane` du juge `transform`). L4 : décalage, t·g, somme de 2 ou 3 lignes de la table, ou carré à développer ((t² + e^(at))²…). L5 : fonction retardée (LP7) ou carré ; (1 − e^(−t))/t n'est pas fait (il demande ∫ F). `open` : problème de 4 points (un item de niveau 4). QCM d'examen à plusieurs réponses (F(z), demi-plan ; distracteurs `f_lap_shift_sign`, `f_lap_tf_sign`, `f_lap_abscissa`).
 - **Intro** : on décompose f en lignes de la table (L1 à L14) et on applique les propriétés : décalage e^(−bt) f ↦ F(z + b), L(t f) = −F′(z), primitive, retard. Chaque ligne a son demi-plan. Exemple (2022) : `math: L(sin ωt) = ω/(z² + ω²)` (L4) ; `math: L(t sin ωt) = −d/dz [ω/(z² + ω²)] = 2ωz/(z² + ω²)²`, `note: LP5`.
 - **Juge** : `transform` `{kind:'laplace', of, v:'t', s:'z', dir:'forward'}` (contrôle numérique en 6 valeurs réelles de z > γ₀ + 1) · **Forme finale** : F(z) sans 𝓛, simplifiée, avec son demi-plan (voir `f-lap-abscissa`).
 - **Niveaux** :
@@ -1536,6 +1537,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-abscissa` — Abscisse de convergence
 - **Année** 16 · **Prérequis** `f-lap-table` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-lap-table` : demi-plan de chaque ligne de la table.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `value` pour γ₀, avec une ligne « max(… ; …) » des abscisses des termes (ou des parties réelles des pôles). Les lignes de preuve du corrigé type (majoration de |t sin ωt|e^(−γt), divergence pour γ ≤ 0) ne sont pas demandées. L1 : abscisses données en note ; L2 : à lire, décision « maximum / minimum / toujours 0 » ; L3 : décision « par les termes » ou « par les pôles » ; L4 : somme de termes ou F rationnelle (pôles par le juge `complex`, forme `set`, puis γ₀) ; L5 : F rationnelle sans aide, ou un QCM à une réponse. QCM d'examen à plusieurs réponses (`f_lap_abscissa` sur les mauvaises options).
 - **Intro** : γ₀ = inf des γ tels que ∫₀^∞ |f(t)| e^(−γt) dt < ∞. Pour une somme, c'est le maximum des abscisses des termes ; e^(αt) déplace de α ; tⁿ ne change rien ; cosh(ωt) donne |ω|. Pour F rationnelle, γ₀ est la plus grande partie réelle des pôles. Exemple : `math: f = (t² + e^(−t))² = t⁴ + 2t² e^(−t) + e^(−2t)` ; `math: abscisses 0, −1, −2 : γ₀ = 0`.
 - **Juge** : `value` pour γ₀ ; item `mcq` pour la justification · **Forme finale** : γ₀ et « Re z > γ₀ ».
 - **Niveaux** :
@@ -1557,6 +1559,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-inv-des` — Laplace inverse par éléments simples
 - **Année** 16 · **Prérequis** `f-lap-table`, `g0-pfd-general` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `f-lap-table` : reconnaître chaque terme dans la table.
+- **Statut** : fait le 10 novembre 2026 (étape U10). La décomposition est une ligne « F(z) = … » du juge `transform` (inverse), pas du juge `equiv` : la cible `partial-fractions` ne connaît que la variable x. Le système des coefficients (lignes 2 et 3 du corrigé type) n'est pas demandé : la décomposition s'écrit directement, sa forme est une décision aux niveaux 2 et 3 (`g0_pfd_form`), puis une ligne « forme de la table » (A(z − a) + Bω) aux niveaux 1 à 4. Gabarits : deux trinômes z² + ω², pôles réels simples, carré complété avec un pôle réel ; L5 : pôle double et trinôme. `open` : problème de 4 points. QCM d'examen à plusieurs réponses (`f_sin_omega_factor`, `f_lap_shift_sign`).
 - **Intro** : on décompose F en éléments simples réels, on reconnaît chaque terme dans la table (en complétant le carré si besoin), on additionne. Exemple (test blanc 2017) : `math: (z³ + 4z − 5)/((z² + 4)(z² + 9)) = −1/(z² + 4) + (z + 1)/(z² + 9)` ; `math: f(t) = −½ sin 2t + cos 3t + ⅓ sin 3t`.
 - **Juge** : `equiv` `{vars:['z']}` pour la DES ; `transform` `{kind:'laplace', dir:'inverse'}` pour f · **Forme finale** : f(t) réelle explicite.
 - **Niveaux** :
@@ -1579,6 +1582,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-inv-res` — Laplace inverse par les résidus
 - **Année** 16 · **Prérequis** `c-res-multiple`, `c-res-theorem` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-res-theorem` : f(t) est la somme de tous les résidus de F(z)e^(zt).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Pôles par le juge `complex` (forme `set`) ; chaque résidu par un nouveau juge `lapres` (`js/judges/lapres.js`) : une ligne est une fonction de t comparée au résidu en 6 valeurs de t, une ligne qui contient encore z est lue en z = z₀ (après ses d(…, z)), d'où la formule du pôle simple, (z − z₀)F(z)e^(zt), et celle du pôle double, d/dz[(z − z₀)²F(z)e^(zt)] ; la somme par le juge `transform` (inverse). Les résidus sont exacts (décomposition dans ℚ(i)) et le test de la partie les compare aux coefficients de Laurent numériques. L3 : décisions « quelle formule » (`c_simple_formula_double`) et « quels résidus » (`f_lap_conj_pole`). L5 : niveau 4 sans aide ; le contour de Bromwich est dans `f-lap-problem`. γ₀ n'est demandé que dans le QCM. `open` : problème de 5 points.
 - **Intro** : pour F rationnelle de degré < 0, f(t) = Σ Res(F(z) e^(zt), z_k), sur **tous** les pôles (les pôles conjugués donnent des termes conjugués). Exemple (2019) : `math: F = 1/(z²(z² − 2z + 2))`, `note: pôles 0 (double), 1 ± i` ; `math: f(t) = (t + 1)/2 − e^t cos t/2`.
 - **Juge** : `equiv` `{vars:['t'], complex:true}` pour chaque résidu (fonction de t) ; `transform` `dir:'inverse'` pour f · **Forme finale** : f(t) réelle.
 - **Niveaux** :
@@ -1600,6 +1604,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-lap-ode` — EDO avec conditions initiales par Laplace
 - **Année** 16 · **Prérequis** `f-lap-inv-des` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Un seul juge, `transform` avec l'inconnue Y, en deux parties (transformer et isoler Y ; décomposer et inverser) ; y est comparée à la solution en 8 points au lieu du juge `ode`. Le juge ne diagnostique pas une ligne d'équation : `f_lap_deriv_ic` est reconnu sur la ligne Y = … (ou y = …) qui suit l'erreur, et par une décision au niveau 3. Gabarits des leçons : racines caractéristiques réelles distinctes, double ou complexes, second membre constant, e^(ct) ou cos ωt, sans résonance. L5 : ordre 3 avec résonance ((z + c)⁴) ou y⁽⁴⁾ − ω⁴y = 0. `open` : problème de 6 points. QCM d'examen à plusieurs réponses.
 - **Intro** : on transforme l'équation avec LP2 (les conditions initiales entrent ici), on isole Y(z), on inverse. Exemple (2021) : `math: y″ + 2y′ + y = 1, y(0) = y′(0) = 1` ; `math: Y = (z² + 3z + 1)/(z(z + 1)²) = 1/z + 1/(z + 1)²` ; `math: y = 1 + t e^(−t)`.
 - **Juge** : `equiv` `{vars:['z']}` pour l'équation transformée et Y ; `ode` `{eq, unknown:'y', v:'t', ic}` pour la solution · **Forme finale** : y(t) qui vérifie l'équation et les conditions.
 - **Niveaux** :
@@ -1622,6 +1627,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-integro` — Équations intégro-différentielles (GM)
 - **Année** 16 · **Prérequis** `f-lap-ode` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-lap-ode` : même méthode : transformer, isoler, inverser.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Trois parties : le noyau (juge `transform`, ℒ(e^(at))), l'équation transformée et U (juge `transform` avec l'inconnue U), l'inverse. L'équation intégrale est contrôlée numériquement en 6 valeurs de t (`integroResidual` de `fourier-c-kit.js`, dans le générateur et le test de la partie). L2 et L3 : décisions « quel noyau » (`f_lap_integro_kernel`) et « LP6 ou LP3 ». L5 et `open` : problème de 3 points.
 - **Intro** : ∫₀ᵗ u(s) g(t − s) ds = (u ∗ g)(t) se transforme en U(z) G(z) (LP6). Exemple (2022) : `math: u′ + 2u + 20 ∫₀ᵗ u(s) e^(2(t−s)) ds = 10 e^(2t), u(0) = 1` ; `math: zU − 1 + 2U + 20U/(z − 2) = 10/(z − 2)` ; `math: U = (z + 8)/(z² + 16), u = cos 4t + 2 sin 4t`.
 - **Juge** : comme `f-lap-ode` ; `ode` remplacé par un contrôle numérique de l'équation intégrale en 6 valeurs de t · **Forme finale** : u(t) explicite.
 - **Niveaux** :
@@ -1639,6 +1645,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-lap-problem` — Problème : EDO par Laplace, puis inverse par les résidus
 - **Année** 16 · **Prérequis** `f-lap-ode`, `f-lap-inv-res`, `c-arc-estimate` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 à L4 : un item `lines` en quatre parties (transformée et Y, résidu simple, résidu double, somme), l'arc de Bromwich étant une décision (`c_arc_triangle`, et l'estimation ML insuffisante). L5 et `open` : `problem` de 10 points en trois parties : lignes (transformée et Y : 4 points, car une ligne d'équation ne peut pas finir une partie du juge `transform` ; résidus : 1 + 2), blocs de l'arc avec un leurre `c_arc_triangle` (2 points), y(t) jugée par `ode` avec les conditions initiales (1 point). L'estimation de l'arc passe par le lemme de Jordan (voir la correction de la ligne 4).
 - **Intro** : le problème complet : transformer, isoler Y, inverser par résidus en justifiant (contour de Bromwich : droite Re z = γ > γ₀ fermée à gauche par un arc, dont l'intégrale tend vers 0), vérifier.
 - **Juge** : `problem` ; parties comme `f-lap-ode`, `f-lap-inv-res`, `c-arc-estimate` · **Forme finale** : y(t) vérifiée.
 - **Niveaux** :
@@ -1650,7 +1657,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
   1. `z²Y − z + 3(zY − 1) + 2Y = 2/(z + 1)` — sous-but `transform` (2 pts)
   2. `Y = (z² + 4z + 5)/((z + 1)²(z + 2))` — sous-but `isolate` (2 pts)
   3. `Res_(−2) = e^(−2t)` ; `Res_(−1) = d/dz[(z² + 4z + 5)e^(zt)/(z + 2)] en −1 = 2t e^(−t)` — sous-but `residues` (3 pts)
-  4. arc gauche : |e^(zt)| ≤ e^(γt), |Y| ≤ C/R, longueur ~ πR : l'intégrale tend vers 0 — sous-but `arc` (2 pts)
+  4. arc gauche z = γ + Re^(iθ), θ ∈ [π/2 ; 3π/2] : |e^(zt)| = e^(γt)e^(tR cos θ), |Y| ≤ C/R ; la longueur πR seule ne suffit pas (πR · C/R ne tend pas vers 0), mais le lemme de Jordan ∫ e^(tR cos θ) dθ ≤ π/(tR) donne une borne en 1/R : l'intégrale tend vers 0 pour t > 0 — sous-but `arc` (2 pts)
   5. `y = e^(−2t) + 2t e^(−t)`, y(0) = 1, y′(0) = 0 — sous-but `check` (1 pt)
 - **Aides** : aucune en L5.
 - **Variantes d'examen** : `open` (2021, 2019 : 8 à 10 pts).

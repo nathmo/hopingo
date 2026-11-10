@@ -98,3 +98,5 @@ import { FA_JUDGES } from './fourier-a-judges.js'; // step U10, part fa: fcomple
 Object.assign(JUDGES, FA_JUDGES);
 import * as distrib from './distrib.js'; // step U10, part fb: distributions (module F, MT/SV)
 Object.assign(JUDGES, { distrib });
+import * as lapres from './lapres.js'; // step U10, part fc: residues of F(z)e^(zt) in t
+Object.assign(JUDGES, { lapres });
