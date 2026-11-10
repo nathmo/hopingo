@@ -1399,8 +1399,180 @@ function luExam(rng, exam) {
 }
 
 // ======================================================================
+// l-mat-blocks
+// ======================================================================
+
+const BLK = 'l-mat-blocks';
+const BLK_SUB = [
+  { id: 'invBlock', label: 'inverser un bloc', skill: INV },
+  { id: 'formula', label: 'formule du bloc', skill: BLK },
+];
+
+// [[X, Y], [Z, W]] from four 2 × 2 blocks.
+const blk = (X, Y, Z, W) => [...X.map((r, i) => [...r, ...Y[i]]), ...Z.map((r, i) => [...r, ...W[i]])];
+const Z2 = MX.zeros(2, 2);
+const I2 = MX.identity(2);
+
+// A whole 2 × 2 with det in dets.
+function det2(rng, dets, lim = 3) {
+  for (;;) {
+    const A = randM(2, 2, rng, -lim, lim);
+    if (dets.includes(MX.det(A).valueOf()) && A.flat().filter((x) => x.n === 0).length <= 1) return A;
+  }
+}
+
+// M = [[A, B], [0, D]]: A and D of det ±1 (or D = 3I), M⁻¹ = [[A⁻¹, X], [0, D⁻¹]], X = −A⁻¹BD⁻¹.
+function blocksData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const A = det2(rng, [1, -1]);
+    const D = rng.chance(0.25) ? MX.scale(I2, 3) : det2(rng, [1, -1, 3, -3]);
+    const B = randM(2, 2, rng, -3, 3);
+    if (B.flat().filter((x) => x.n === 0).length > 1) continue;
+    const Ai = MX.inverse(A);
+    const Di = MX.inverse(D);
+    const X = MX.scale(MX.mul(MX.mul(Ai, B), Di), -1);
+    const Xbad = MX.scale(MX.mul(MX.mul(Di, B), Ai), -1);
+    if (MX.equal(X, Xbad) || maxAbs(X) > 9 || X.flat().some((x) => x.d > 3) || X.flat().every((x) => x.n === 0)) continue;
+    const M = blk(A, B, Z2, D);
+    const Mi = blk(Ai, X, Z2, Di);
+    if (!MX.equal(MX.mul(M, Mi), MX.identity(4))) continue;
+    return { A, B, D, Ai, Di, X, Xbad, M, Mi };
+  }
+  const A = MX.mat([[1, 2], [0, 1]]);
+  const D = MX.scale(I2, 3);
+  const B = MX.mat([[1, 0], [1, 1]]);
+  const Ai = MX.inverse(A); const Di = MX.inverse(D);
+  const X = MX.scale(MX.mul(MX.mul(Ai, B), Di), -1);
+  return { A, B, D, Ai, Di, X, Xbad: MX.scale(MX.mul(MX.mul(Di, B), Ai), -1), M: blk(A, B, Z2, D), Mi: blk(Ai, X, Z2, Di), fallback: true };
+}
+
+const blkNames = (d) => ({ A: mt(d.A), B: mt(d.B), D: mt(d.D) });
+const blkAbout = (d) => ({ blocks: blkNames(d) });
+
+// The line « (1/det)·[[d, −b], [−c, a]] » of a 2 × 2 inverse, when det ≠ 1.
+function inv2Lines(A, subgoal) {
+  const det = MX.det(A);
+  const adj = [[A[1][1], A[0][1].neg()], [A[1][0].neg(), A[0][0]]];
+  const out = det.eq(1) ? [] : [{ math: `(${qt(q(1).div(det))})·${mt(adj)}`, note: `det = ${fq(det)}`, subgoal }];
+  return [...out, { math: mt(MX.inverse(A)), note: '', subgoal, grid: GRID2 }];
+}
+
+function blocksItem(level, rng) {
+  if (level === 5) return blocksAlone(rng);
+  const d = blocksData(rng);
+  const names = blkNames(d);
+  const Bi = MX.inverse(d.B);
+  const decision = {
+    kind: 'decision', prompt: 'Quel est le bloc X₁₂ de M⁻¹ ?', options: rng.shuffle([
+      { id: 'ok', label: '−A⁻¹BD⁻¹', valid: true },
+      { id: 'order', label: '−D⁻¹BA⁻¹', valid: false, rule: 'l_blocks_order', why: 'Écris M·M⁻¹ = I bloc par bloc : A·X₁₂ + B·D⁻¹ = 0, donc X₁₂ = −A⁻¹BD⁻¹. Les blocs ne commutent pas.' },
+      Bi ? { id: 'each', label: 'B⁻¹', valid: false, rule: 'l_blocks_inverse_each', why: 'On n\'inverse pas une matrice par blocs case par case : A·B⁻¹ + B·D⁻¹ ≠ 0.' } : { id: 'sign', label: 'A⁻¹BD⁻¹', valid: false, why: 'A·X₁₂ + B·D⁻¹ = 0 donne un signe moins : X₁₂ = −A⁻¹BD⁻¹.' },
+    ]),
+  };
+  const menu = (valid, others) => rng.shuffle([{ id: 'ok', label: valid, valid: true }, ...others]);
+  const segs = [
+    { start: 'X_11', judge: { kind: 'mat', expect: mt(d.Ai), about: { inverse: mt(d.A) } },
+      menu: menu('Inverser le bloc A', [{ id: 'each', label: 'Recopier A', valid: false, why: 'M·M⁻¹ = I donne A·X₁₁ = I : X₁₁ = A⁻¹.' }]),
+      lines: inv2Lines(d.A, 'invBlock').map((l) => ({ ...l, note: l.note || 'X₁₁ = A⁻¹' })) },
+    { html: 'Le bloc X₂₂ = D⁻¹.', start: 'X_22', judge: { kind: 'mat', expect: mt(d.Di), about: { inverse: mt(d.D) } },
+      menu: menu('Inverser le bloc D', [{ id: 'zero', label: 'Bloc nul', valid: false, why: 'D·X₂₂ = I : X₂₂ = D⁻¹, qui n\'est pas nul.' }]),
+      lines: inv2Lines(d.D, 'invBlock').map((l) => ({ ...l, note: l.note || 'X₂₂ = D⁻¹' })) },
+    { html: 'Le bloc X₁₂ (en haut à droite).', start: 'X_12', judge: { kind: 'mat', expect: mt(d.X), names, about: blkAbout(d) }, decision,
+      menu: menu('Formule du bloc : X₁₂ = −A⁻¹BD⁻¹', [
+        { id: 'order', label: 'X₁₂ = −D⁻¹BA⁻¹', valid: false, rule: 'l_blocks_order', why: 'A·X₁₂ + B·D⁻¹ = 0 donne X₁₂ = −A⁻¹BD⁻¹.' },
+        { id: 'zero', label: 'Bloc nul', valid: false, why: 'Le bloc nul est en bas à gauche ; en haut à droite, A·X₁₂ + B·D⁻¹ = 0.' },
+      ]),
+      lines: [
+        { math: '-A^(-1)·B·D^(-1)', note: 'A·X₁₂ + B·D⁻¹ = 0', subgoal: 'formula' },
+        { math: mt(d.X), note: '', subgoal: 'formula', grid: GRID2 },
+      ] },
+    { html: 'Assemble M⁻¹.', start: 'M^(-1)', judge: { kind: 'mat', expect: mt(d.Mi), about: blkAbout(d) },
+      menu: menu('Assembler [[X₁₁, X₁₂], [0, X₂₂]]', [{ id: 'each', label: 'Inverser chaque bloc de M', valid: false, rule: 'l_blocks_inverse_each', why: 'Le bloc haut droit n\'est pas B⁻¹ mais −A⁻¹BD⁻¹.' }]),
+      lines: [{ math: mt(d.Mi), note: 'Contrôle : M·M⁻¹ = I₄', subgoal: 'formula', grid: [[0, 0], [0, 0]] }] },
+  ];
+  // The 4 × 4 line: blanks in the top right block.
+  const item = partsItem(level, rng, segs, {
+    skill: BLK, subgoals: BLK_SUB, key: `${BLK}:inv:${mt(d.M)}`, fallback: d.fallback,
+    prompt: `M = [[A, B], [0, D]] = ${MLm(d.M)}, avec A = ${MLm(d.A)}, B = ${MLm(d.B)} et D = ${MLm(d.D)}. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.`,
+    hints: [
+      { level: 1, html: 'Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0.' },
+      { level: 2, html: 'X₁₂ = −A⁻¹·B·□' },
+      { level: 3, html: `X₁₂ = ${MLm(d.X)}` },
+    ],
+  });
+  const last = item.script[item.script.length - 1];
+  if (last.cells) last.cells = [[0, 2], [0, 3], [1, 2], [1, 3]];
+  return item;
+}
+
+// Level 5: [[I, X], [0, I]]ᵏ = [[I, kX], [0, I]], or the product
+// [[I, 0], [X, I]]·[[A, B], [0, D]] = [[A, B], [XA, XB + D]].
+function blocksAlone(rng) {
+  const X = randM(2, 2, rng, -3, 3);
+  if (rng.chance(0.5)) {
+    const k = rng.int(2, 4);
+    const M = blk(I2, X, Z2, I2);
+    const P = blk(I2, MX.scale(X, k), Z2, I2);
+    return matLines({
+      skill: BLK, level: 5, prompt: `Soit M = [[I, X], [0, I]] = ${MLm(M)} (blocs 2 × 2). Calcule M${'⁰¹²³⁴⁵'[k]} par blocs.`,
+      start: `M^${k}`, judge: { kind: 'mat', expect: mt(P) }, mode: 'free',
+      script: [{ kind: 'eq', math: mt(P), note: `[[I, X], [0, I]]ᵏ = [[I, kX], [0, I]] : ici k = ${k}`, subgoal: 'formula' }],
+      hints: [], subgoals: BLK_SUB, key: `${BLK}:pow:${mt(X)}:${k}`,
+    });
+  }
+  const d = blocksData(rng);
+  const N = blk(I2, Z2, X, I2);
+  const P = MX.mul(N, d.M);
+  return matLines({
+    skill: BLK, level: 5,
+    prompt: `Soit N = [[I, 0], [X, I]] = ${MLm(N)} et M = [[A, B], [0, D]] = ${MLm(d.M)} (blocs 2 × 2). Calcule NM par blocs.`,
+    start: 'NM', judge: { kind: 'mat', expect: mt(P), names: { X: mt(X), A: mt(d.A), B: mt(d.B), D: mt(d.D) } }, mode: 'free',
+    script: [{ kind: 'eq', math: mt(P), note: 'NM = [[A, B], [XA, XB + D]]', subgoal: 'formula' }],
+    hints: [], subgoals: BLK_SUB, key: `${BLK}:prod:${mt(X)}:${mt(d.M)}`, fallback: d.fallback,
+  });
+}
+
+const BLOCK_DET = ['[[0,0,1,0],[0,0,0,1],[1,0,0,0],[0,1,0,0]]', '[[1,0,1,0],[0,1,0,1],[1,0,0,0],[0,1,0,0]]', '[[0,1,1,0],[1,0,0,1],[1,0,0,0],[0,1,0,0]]'];
+
+function blocksExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.pick(['det', 'detFalse', 'detFalse', 'diag']);
+    if (which === 'detFalse') {
+      const A = rng.pick(BLOCK_DET);
+      return tfL({
+        skill: BLK, key: `det:${A}`, truth: false, exam: tag,
+        statement: 'Pour des blocs A, B, C, D de taille 2 × 2, det [[A, B], [C, D]] = det A · det D − det B · det C.',
+        counter: { kind: 'matOne', params: { want: 'blockDet', n: 4 }, ask: [{ v: 'A', label: 'M =', shape: [4, 4] }], answer: { A } },
+        explanation: `Faux : la formule « ad − bc » ne vaut pas pour des blocs. Par exemple ${ML(A)} : la formule ne donne pas son déterminant.`,
+      });
+    }
+    const T = {
+      det: ['Pour A et D carrées, det [[A, B], [0, D]] = det A · det D.', 'Vrai : une matrice triangulaire par blocs a pour déterminant le produit des déterminants des blocs diagonaux.'],
+      diag: ['Si A et D sont inversibles, [[A, 0], [0, D]]⁻¹ = [[A⁻¹, 0], [0, D⁻¹]].', 'Vrai : le produit par blocs donne [[AA⁻¹, 0], [0, DD⁻¹]] = I.'],
+    }[which];
+    return tfL({ skill: BLK, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1] });
+  }
+  const d = blocksData(rng);
+  const Bi = MX.inverse(d.B);
+  return mcqDistinct({
+    skill: BLK, level: 4, key: `mcq:${mt(d.M)}`, exam: tag,
+    prompt: `M = [[A, B], [0, D]] avec A = ${MLm(d.A)}, B = ${MLm(d.B)} et D = ${MLm(d.D)}. Quel est le bloc (1, 2) de M⁻¹ ?`,
+    right: MLm(d.X),
+    wrongs: [
+      { html: MLm(d.Xbad), rule: 'l_blocks_order' },
+      Bi ? { html: MLm(Bi), rule: 'l_blocks_inverse_each' } : null,
+      { html: MLm(MX.scale(d.X, -1)), rule: null },
+    ].filter(Boolean),
+    fillers: [{ html: MLm(MX.scale(MX.mul(d.Ai, d.B), -1)) }, { html: MLm(MX.scale(MX.mul(d.B, d.Di), -1)) }],
+    solution: [{ html: `X₁₂ = −A⁻¹BD⁻¹ = ${MLm(d.X)}`, note: 'A·X₁₂ + B·D⁻¹ = 0' }], fallback: d.fallback,
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [BLK]: (level, rng, profile, opts = {}) => (opts.exam ? blocksExam(rng, opts.exam) : blocksItem(level, rng)),
   [LU]: (level, rng, profile, opts = {}) => (opts.exam ? luExam(rng, opts.exam) : luItem(level, rng)),
   [ELEM]: (level, rng, profile, opts = {}) => (opts.exam ? elemExam(rng, opts.exam) : elemItem(level, rng)),
   [IMT]: (level, rng, profile, opts = {}) => (opts.exam ? imtExam(rng, opts.exam) : imtItem(level, rng)),
