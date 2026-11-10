@@ -5,7 +5,7 @@ import { checkSkills } from './uni-check.js';
 import { SKILLS } from '../js/content/uni/cplx-a.skills.js';
 
 // Skills whose generators are not written yet (emptied when the part is done).
-const STUBBED = new Set(["c-taylor", "c-laurent", "c-singularities"]);
+const STUBBED = new Set([]);
 // Items per level: 20 (never under 15).
 const COUNTS = Object.fromEntries(SKILLS.map((s) => [s.id, 20]));
 

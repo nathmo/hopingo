@@ -433,7 +433,7 @@ function ctProblem(level, rng, opts) {
   const order = pickK(rng, pick, 4);
   const parts = order.map(([f, w], i) => ({
     item: choice({
-      skill: CT, level, key: `5:${f}`, prompt: `${oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>')} pour ${M(`f(z) = ${f}`)} :`, keepOrder: true,
+      skill: CT, level, key: `5:${f}`, prompt: `${oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>')} pour ${M(`f(z) = ${f}`)} :`,
       right: w === 'zero' ? 'vaut 0 par le théorème de Cauchy' : w === 'undef' ? 'n\'est pas définie : une singularité est sur le cercle' : 'demande les résidus : une singularité est dans le disque',
       wrongs: [
         w !== 'zero' ? { html: 'vaut 0 par le théorème de Cauchy', rule: w === 'undef' ? 'c_pole_on_contour' : null } : null,

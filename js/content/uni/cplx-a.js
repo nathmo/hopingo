@@ -10,5 +10,6 @@
 import { GEN as ELEM } from './cplx-a-elem.js';
 import { GEN as CR } from './cplx-a-cr.js';
 import { GEN as CONTOUR } from './cplx-a-contour.js';
+import { GEN as SERIES } from './cplx-a-series.js';
 
-export const GEN = { ...ELEM, ...CR, ...CONTOUR };
+export const GEN = { ...ELEM, ...CR, ...CONTOUR, ...SERIES };

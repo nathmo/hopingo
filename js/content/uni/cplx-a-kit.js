@@ -80,10 +80,10 @@ export const linesOf = (o) => partsItem({ keys: KEYS, ...o });
 // distinct options. With multi: options [{html, correct, rule?}], at
 // least one right, all kept.
 export function choice(o, rng) {
-  if (o.multi) {
+  if (o.multi || o.options) {
     const seen = new Set();
     const options = o.options.filter((x) => (seen.has(x.html) ? false : seen.add(x.html)));
-    return mcq({ ...o, options, multi: true }, rng);
+    return mcq({ ...o, options, multi: !!o.multi }, rng);
   }
   const options = [{ html: o.right, correct: true }];
   for (const w of [...(o.wrongs || []), ...(o.fillers || [])]) {
