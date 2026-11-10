@@ -1779,7 +1779,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 | `f_ft_shift_sign` | sign | E | `f-ft-table` | `f-ft-table` | F(g(x − 1)) = e^(iα) ĝ → e^(−iα) ĝ | Signe de l'exponentielle de translation. | « Décaler de +a à droite multiplie par e^(−iaα). » |
 | `f_ft_deriv_sign` | sign | E | `f-ft-table` | `f-ft-table` | F(u″) = α² û → −α² û | Oublier i² = −1, ou écrire −iα pour la dérivée première. | « F(f′) = iα f̂, donc F(f″) = (iα)² f̂ = −α² f̂. » |
 | `f_ft_scale` | calculus | E | `f-ft-table` | `f-ft-table` | e^(−3x²) : w = 3 → w = √3 | Lire w au lieu de w² dans une ligne en w²y². | « La ligne F8 est e^(−w²y²) : ici w² = 3. » |
-| `f_plancherel_factor` | calculus | E | `f-plancherel` | `f-plancherel` | ∫ f² = 2π ∫ |f̂|² → ∫ f² = ∫ |f̂|² | Ajouter un facteur 2π ou 1/(2π). | « Avec la convention 1/√(2π), Plancherel n'a pas de facteur. » |
+| `f_plancherel_factor` | calculus | E | `f-plancherel` | `f-plancherel` | ∫ f² = 2π ∫ \|f̂\|² → ∫ f² = ∫ \|f̂\|² | Ajouter un facteur 2π ou 1/(2π). | « Avec la convention 1/√(2π), Plancherel n'a pas de facteur. » |
 | `f_ode_shift_phase` | calculus | E | `f-periodic-ode` | `f-coef-complex` | u(t − π) ↦ cₙ → (−1)ⁿ cₙ | Ignorer le facteur e^(−inπ). | « Décaler de π multiplie cₙ par e^(−inπ) = (−1)ⁿ. » |
 | `f_sl_eigen_zero` | method | E | `f-sturm-liouville` | `f-sturm-liouville` | λ = 0 oublié (Neumann) ou retenu à tort (Dirichlet) | Ajouter ou retirer le cas λ = 0. | « Pour λ = 0, u = A + Bx : vérifie les conditions aux bords. » |
 | `f_lap_abscissa` | notation | C | `f-lap-table` | `f-lap-abscissa` | L(e^(2t)) = 1/(z − 2) sans domaine → Re z > 2 | Ligne finale sans demi-plan, ou Re z > 0 pour tout terme. | « La transformée n'existe que pour Re z > {g0}. » (Plan §8.) Le juge renvoie `stay`. |

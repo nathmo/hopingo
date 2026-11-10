@@ -90,3 +90,5 @@ import * as param from './param.js';
 import * as boundary from './boundary.js';
 
 Object.assign(JUDGES, { param, boundary });
+import * as distrib from './distrib.js'; // step U10, part fb: distributions (module F, MT/SV)
+Object.assign(JUDGES, { distrib });

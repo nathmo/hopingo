@@ -313,3 +313,4 @@ TAB_LABEL.vecto = 'σ ∈ Γ';
 KEYSETS.transf = ['ℱ(', 'ℒ(', 'α', 'z', 'û', 'Y', 'U', 'H(', 'δ', '|', 'e^(', '√(2π)', ', Re z > ', 'back'];
 TAB_LABEL.transf = 'ℱ ℒ';
 Object.assign(LABEL, { ', Re z > ': 'Re z >', 'H(': 'H( )', 'ℱ(': 'ℱ( )', 'ℒ(': 'ℒ( )' });
+KEYSETS.distrib = ['⟨', ',', '⟩', 'φ', "'", 'δ', '_', 'T_', 'D', 'H(', 'int(', '∞', 'C', 'back']; // step U10, part fb: distributions
