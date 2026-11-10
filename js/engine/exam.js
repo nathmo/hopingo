@@ -9,7 +9,14 @@
 //           questions: [{n, section, kind, skill, item, max}]}
 // scoreQuestion(question, scoring, response) → {state: 'right'|'wrong'|'blank'|'partial', points, rule}
 //   responses: mcq → index of the option (or [indices] if multi); tf → true/false;
-//   coef → the typed text; null or undefined → blank.
+//   coef → the typed text; open → the log of the problem run (js/judges/
+//   problem.js), replayed to score it step by step; null or undefined → blank.
+// An open question is worth scoring.right points, the problem's score
+// got/max scaled to them; with scoring.byStep it is worth the problem's own
+// points (item.total) and scores what the run got.
+// Section pools: the skills of pool.units and pool.extraSkills whose exam
+// variants include the section's kind; pool.skills, if given, keeps only
+// those; pool.points: [min, max] bounds the points of an open problem.
 // scoreExam(exam, responses, profile) → result {score, max, pct, grade,
 //   verdict, perSkill, traps, toWork, prediction, questions}
 // gradeOf(score, max) = 1 + 5·max(0, score)/max, rounded to the quarter.
@@ -25,6 +32,7 @@ import { EXAM_BY_ID } from '../content/uni/exams.js';
 import { recordAnswer } from './learner.js';
 import { judgeFor, readWith } from '../judges/index.js';
 import { now as clock } from './time.js';
+import { ProblemRun } from '../judges/problem.js';
 
 // ---------- the pool of a section ----------
 
@@ -32,8 +40,9 @@ import { now as clock } from './time.js';
 export function sectionPool(section) {
   const units = new Set(section.pool?.units || []);
   const extra = new Set(section.pool?.extraSkills || []);
+  const only = section.pool?.skills ? new Set(section.pool.skills) : null;
   return SKILLS
-    .filter((s) => (units.has(s.unit) || extra.has(s.id)) && (s.exam || []).includes(section.kind))
+    .filter((s) => (units.has(s.unit) || extra.has(s.id)) && (!only || only.has(s.id)) && (s.exam || []).includes(section.kind))
     .map((s) => ({ id: s.id, weight: s.examWeight ?? 1 }))
     .filter((s) => s.weight > 0);
 }
@@ -65,7 +74,34 @@ function drawSkills(pool, count, rng, avoid = null) {
   return out;
 }
 
-const maxOf = (section) => (section.multi ? 1 : section.scoring.right);
+// The points of a problem: its total, else the sum of its steps.
+const problemTotal = (item) => item.total ?? (item.points || []).flat().reduce((s, x) => s + x, 0);
+
+function maxOf(section, item) {
+  if (section.kind === 'open' && section.scoring.byStep) return problemTotal(item);
+  return section.multi ? 1 : section.scoring.right;
+}
+
+// Some true/false variants of steps U1–U4 are multiple choice « Vrai » /
+// « Faux » with the statement in the prompt: a tf item for the exam.
+function asTf(item) {
+  const [v, f] = item.options;
+  const m = /^Vrai ou faux \?\s*(?:<br>)?\s*([\s\S]*)$/.exec(item.prompt || '');
+  return {
+    ...item, type: 'tf', prompt: 'Vrai ou faux ?', statement: m && m[1] ? m[1] : item.prompt,
+    truth: !!v.correct, ruleIfTrue: v.rule ?? null, ruleIfFalse: f.rule ?? null, options: undefined,
+  };
+}
+const isVfMcq = (item) => item.type === 'mcq' && item.options?.length === 2 && item.options[0].html === 'Vrai' && item.options[1].html === 'Faux';
+
+// An open question must be a problem, within pool.points if given.
+function fits(section, item) {
+  if (section.kind !== 'open') return true;
+  if (item.type !== 'problem') return false;
+  const [lo, hi] = section.pool?.points || [0, Infinity];
+  const t = problemTotal(item);
+  return t >= lo && t <= hi;
+}
 
 export function buildExam(blueprint, { rng, profile = null, now = clock() } = {}) {
   const bp = typeof blueprint === 'string' ? EXAM_BY_ID[blueprint] : blueprint;
@@ -76,16 +112,18 @@ export function buildExam(blueprint, { rng, profile = null, now = clock() } = {}
     if (!pool.length) throw new Error(`Examen ${bp.id} : aucune compétence pour la section ${section.kind}.`);
     for (const skill of drawSkills(pool, section.count, rng, last)) {
       let item = null;
-      // A generator that fails gives its place to another skill of the pool.
-      for (let t = 0; t < 5 && !item; t++) {
+      // A generator that fails (or a problem of the wrong size) gives its
+      // place to another skill of the pool.
+      for (let t = 0; t < 8 && !item; t++) {
         const id = t === 0 ? skill : pool[Math.floor(rng.next() * pool.length)].id;
         try {
-          const it = generate(id, 4, rng, profile, { exam: section.kind });
-          if (it && !it.stub && it.exam?.format === section.kind) item = it;
+          let it = generate(id, 4, rng, profile, { exam: section.kind });
+          if (section.kind === 'tf' && it && isVfMcq(it)) it = asTf(it);
+          if (it && !it.stub && it.exam?.format === section.kind && fits(section, it)) item = it;
         } catch { item = null; }
       }
       if (!item) throw new Error(`Examen ${bp.id} : impossible de produire une question ${section.kind}.`);
-      questions.push({ n: questions.length + 1, section: si, kind: section.kind, skill: item.skill, item, max: maxOf(section) });
+      questions.push({ n: questions.length + 1, section: si, kind: section.kind, skill: item.skill, item, max: maxOf(section, item) });
       last = item.skill;
     }
   });
@@ -142,7 +180,21 @@ export function scoreQuestion(question, scoring, response) {
     } catch { done = false; }
     return done ? { state: 'right', points: scoring.right, rule: null } : { state: 'wrong', points: scoring.wrong, rule: null };
   }
-  // `open` problems are marked step by step from step U4 on.
+  if (question.kind === 'open' && it.type === 'problem' && Array.isArray(response)) {
+    // The run replayed from its log: the points of the steps done right.
+    let sc;
+    let rule = null;
+    try {
+      const run = new ProblemRun(it, response);
+      sc = run.score();
+      rule = run.rules[0] ?? null;
+    } catch {
+      sc = { got: 0, max: problemTotal(it) };
+    }
+    const points = scoring.byStep ? sc.got : sc.max > 0 ? Math.round((4 * question.max * sc.got) / sc.max) / 4 : 0;
+    const state = sc.max > 0 && sc.got >= sc.max ? 'right' : sc.got > 0 ? 'partial' : 'wrong';
+    return { state, points, rule };
+  }
   return { state: 'wrong', points: 0, rule: null };
 }
 

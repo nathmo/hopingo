@@ -3,15 +3,16 @@
 // until the end, questions to skip and to flag, then the report: estimated
 // grade, verdict, prediction against the real score, skills to rework,
 // traps, and the corrections. The run is saved in the profile after each
-// answer, so a reload resumes it.
+// answer, so a reload resumes it. An open question is a `problem` item
+// (step U4), mounted as in a lesson: its response is the run's log.
 
-import { h, html, play, sheet } from '../dom.js';
+import { h, html, play, sheet, add, clear } from '../dom.js';
 import { EXAM_BY_ID } from '../../content/uni/exams.js';
 import { SKILL_BY_ID } from '../../content/skills.js';
 import { RULE_BY_ID } from '../../math/malrules.js';
 import { startRun, answerRun, finishRun, timeLeft, maxScore } from '../../engine/exam.js';
 import { makeRng } from '../../content/random.js';
-import { explainRule, solutionHtml } from '../exercises.js';
+import { explainRule, solutionHtml, mountExercise } from '../exercises.js';
 import { topBar } from './common.js';
 
 const fr = (x) => String(x).replace('.', ',').replace('-', '−');
@@ -22,7 +23,11 @@ const clock = (ms) => {
   const ss = s % 60;
   return `${hh ? `${hh}:` : ''}${String(mm).padStart(hh ? 2 : 1, '0')}:${String(ss).padStart(2, '0')}`;
 };
-const scoringText = (sc) => (sc.perRight ? 'plusieurs réponses : +1/N par bonne case, −1/M par mauvaise, plancher 0' : `${fr(sc.right)} juste, ${fr(sc.blank ?? 0)} vide, ${fr(sc.wrong)} faux`);
+const scoringText = (sc, kind) => {
+  if (sc.byStep) return 'points du barème, notés par étape';
+  if (kind === 'open') return `${fr(sc.right)} points, notés par étape`;
+  return sc.perRight ? 'plusieurs réponses : +1/N par bonne case, −1/M par mauvaise, plancher 0' : `${fr(sc.right)} juste, ${fr(sc.blank ?? 0)} vide, ${fr(sc.wrong)} faux`;
+};
 const KIND = { mcq: 'QCM', tf: 'Vrai ou faux', coef: 'Réponse courte', open: 'Problème' };
 const date = (t) => new Date(t).toLocaleDateString('fr-CH', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -44,11 +49,11 @@ export function examScreen(root, args, app) {
   function showIntro(resume) {
     stop();
     const past = (p.exams || []).filter((e) => e.id === bp.id).slice(-5).reverse();
-    main.replaceChildren(
+    add(clear(main),
       h('h1', `📝 Examen blanc : ${bp.title}`),
       h('div.exam-info',
         h('p', `Durée : ${bp.durationMin} minutes. ${bp.documents === 'none' ? 'Sans document, sans calculatrice.' : 'Formulaire autorisé.'}`),
-        h('ul', bp.sections.map((s) => h('li', `${s.count} ${KIND[s.kind]} (${scoringText(s.scoring)})`))),
+        h('ul', bp.sections.map((s) => h('li', `${s.count} ${KIND[s.kind]} (${scoringText(s.scoring, s.kind)})`))),
         h('p.muted', 'Pas d\'aide ni de correction avant la fin. Tu peux sauter une question, la marquer, et revenir. Une réponse vide vaut 0 ; une réponse fausse peut coûter des points.'),
         h('p.muted', `Note estimée à la fin : 1 + 5 × score / maximum. ${bp.source ?? ''}`)),
       resume
@@ -68,6 +73,7 @@ export function examScreen(root, args, app) {
     const nav = h('div.exam-nav');
     const card = h('div.exam-card');
     const foot = h('div.exam-foot');
+    let qctrl = null; // the mount of an open problem, for its keys
     main.replaceChildren(h('div.exam-head', h('b', exam.title), timeEl), nav, card, foot);
 
     const tick = () => {
@@ -108,9 +114,25 @@ export function examScreen(root, args, app) {
       const it = q.item;
       const section = exam.sections[q.section];
       const resp = st.responses[cur];
-      const head = h('div.exam-qhead', h('b', `Question ${q.n} / ${exam.questions.length}`), h('small.muted', `${KIND[q.kind]} · ${scoringText(section.scoring)}`));
-      const body = [h('div.prompt', html(it.prompt))];
-      if (q.kind === 'mcq') {
+      const head = h('div.exam-qhead', h('b', `Question ${q.n} / ${exam.questions.length}`), h('small.muted', `${KIND[q.kind]} · ${scoringText(section.scoring, q.kind)}${section.scoring.byStep ? ` · ${fr(q.max)} points` : ''}`));
+      // A problem draws its own prompt.
+      const body = it.type === 'problem' ? [] : [h('div.prompt', html(it.prompt))];
+      qctrl = null;
+      if (it.type === 'problem') {
+        // A problem, resumed from its log; every action saves the log.
+        const n = cur;
+        const done = h('p.note', 'Problème terminé : tu peux passer à la question suivante.');
+        let over = false; // a finished problem completes while it mounts
+        qctrl = mountExercise({ ...it, resumeLog: st.responses[n] || [] }, {
+          ready: () => {},
+          submit: () => {},
+          save: (pending) => { st.responses[n] = pending.log.length ? pending.log : null; answerRun(p, n, st.responses[n]); save(); paintNav(); },
+          complete: () => { over = true; if (qctrl && !done.isConnected) qctrl.el.append(done); },
+        });
+        if (over) qctrl.el.append(done);
+        body.push(qctrl.el);
+        if (qctrl.footer) body.push(qctrl.footer);
+      } else if (q.kind === 'mcq') {
         if (it.multi) body.push(h('small.muted', 'Plusieurs réponses possibles : coche toutes les bonnes.'));
         const picked = (k) => (Array.isArray(resp) ? resp.includes(k) : resp === k);
         body.push(h('div.choices', it.options.map((o, k) => h(`button.choice${picked(k) ? '.selected' : ''}`, { type: 'button', onclick: () => choose(k), html: `<span class="choice-body">${o.html}</span>` }, h('span.choice-key', String(k + 1))))));
@@ -126,7 +148,7 @@ export function examScreen(root, args, app) {
         h('div.row.exam-tools',
           h('button.btn.small.ghost', { type: 'button', onclick: () => { st.flags[cur] = !st.flags[cur]; save(); paint(); } }, st.flags[cur] ? '🚩 Marquée' : '🏳 Marquer'),
           resp !== null ? h('button.btn.small.ghost', { type: 'button', onclick: () => { st.responses[cur] = null; save(); paint(); } }, 'Effacer ma réponse') : null));
-      foot.replaceChildren(
+      add(clear(foot),
         h('button.btn.secondary', { type: 'button', disabled: cur === 0, onclick: () => go(cur - 1) }, '◀ Précédente'),
         cur < exam.questions.length - 1
           ? h('button.btn.primary', { type: 'button', onclick: () => go(cur + 1) }, 'Suivante ▶')
@@ -159,6 +181,8 @@ export function examScreen(root, args, app) {
     const onKey = (e) => {
       if (e.target.tagName === 'INPUT') return;
       const q = exam.questions[cur];
+      // A problem takes every key (its lines are typed on the keyboard).
+      if (qctrl) { if (e.key === 'Enter') e.preventDefault(); qctrl.onKey?.(e); return; }
       const n = Number(e.key);
       if (q.kind === 'mcq' && n >= 1 && n <= q.item.options.length) choose(n - 1);
       if (q.kind === 'tf' && (e.key === 'v' || e.key === 'f')) choose(e.key === 'v');
@@ -182,12 +206,13 @@ export function examScreen(root, args, app) {
       if (q.kind === 'tf') return resp ? 'Vrai' : 'Faux';
       if (q.kind === 'mcq' && Array.isArray(resp)) return resp.map((k) => q.item.options[k]?.html).join(' ; ');
       if (q.kind === 'mcq') return q.item.options[resp]?.html ?? '—';
+      if (q.item.type === 'problem') return `un problème rédigé, noté par étape (${fr(Math.round(r.questions[q.n - 1].points * 100) / 100)} / ${fr(q.max)} points)`;
       return String(resp);
     };
     const rightText = (q) => (q.kind === 'tf' ? (q.item.truth ? 'Vrai' : 'Faux') : q.kind === 'mcq' ? q.item.options.filter((o) => o.correct).map((o) => o.html).join(' ; ') : q.item.answerHtml ?? '');
     const pts = (x) => `${x > 0 ? '+' : ''}${fr(Math.round(x * 100) / 100)}`;
     const skills = Object.entries(r.perSkill).sort((a, b) => (a[1].points / a[1].max) - (b[1].points / b[1].max));
-    main.replaceChildren(
+    add(clear(main),
       h('h1', `Résultat : ${exam.title}`),
       timeUp ? h('p.note', '⏱ Le temps est écoulé : ta copie a été rendue.') : null,
       h('div.exam-grade',

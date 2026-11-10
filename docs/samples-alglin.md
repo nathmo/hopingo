@@ -7896,24 +7896,26 @@ Soit A = [[-1,2],[-4,5]] = PDP⁻¹ avec P = [[1,1],[1,2]] et D = diag(1, 3). Qu
   pièges : l_powers_entrywise, l_pdp_inverse_side, l_pd_order
 
 Soit la suite définie par u₀ = 5, u₁ = 7 et uk+2 = 2uk+1 + 3uk. Trouve uk en fonction de k, puis la limite de uk/3ᵏ.
-  [free, sans aide, examen open]  M
-    (xk = (uk+1 ; uk) vérifie xk+1 = Mxk. Écris M.)
-    = [[2,3],[1,0]]   ← Ligne 1 : la récurrence ; ligne 2 : u<sub>k+1</sub> = u<sub>k+1</sub>
-  — Valeurs propres de M.  [juge det]  départ : det(M − λI)
-    = det[[2-λ,3],[1,-λ]]   ← λ soustrait sur toute la diagonale
-    = (2 − λ)(−λ) − 3   ← Diagonale moins antidiagonale
-    = λ² − 2λ − 3   ← λ² − (tr A)λ + det A
-    = (λ + 1)(λ − 3)   ← Factoriser le trinôme
-  — Un vecteur propre v₁ de M pour λ = 3.  [juge eigvec]  départ : v_1
-    = (3 ; 1)   ← De la ligne 2 : x₁ = λx₂
-  — Un vecteur propre v₂ de M pour λ = −1.  [juge eigvec]  départ : v_2
-    = (-1 ; 1)   ← De la ligne 2 : x₁ = λx₂
-  — Décompose x₀ = (u₁ ; u₀) = (7 ; 5) = c₁v₁ + c₂v₂.  [juge mat]  départ : c
-    = (3 ; 2)   ← Résoudre le système 2 × 2
-  — xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante).  [juge mat]  départ : u_k
-    = 3·3^k + 2·(−1)^k   ← Contrôle : u₂ = 29
-  — Que vaut la limite de uk/3ᵏ quand k → ∞ ?  [juge value]  départ : L
-    = 3   ← u<sub>k</sub>/3ᵏ = 3 + 2·(−1/3)ᵏ → 3, car |−1/3| &lt; 1
+  [problème, examen open, 8 points]
+  partie 1 (Début du problème : 1 ; Valeurs propres de M. : 2 ; Un vecteur propre v₁ de M pour λ = 3. : 1 ; Un vecteur propre v₂ de M pour λ = −1. : 1 ; Décompose x₀ = (u₁ ; u₀) = (7 ; 5) = c₁v₁ + c₂v₂. : 1 ; xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante). : 1 ; Que vaut la limite de uk/3ᵏ quand k → ∞ ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  M
+      (xk = (uk+1 ; uk) vérifie xk+1 = Mxk. Écris M.)
+      = [[2,3],[1,0]]   ← Ligne 1 : la récurrence ; ligne 2 : u<sub>k+1</sub> = u<sub>k+1</sub>
+    — Valeurs propres de M.  [juge det]  départ : det(M − λI)
+      = det[[2-λ,3],[1,-λ]]   ← λ soustrait sur toute la diagonale
+      = (2 − λ)(−λ) − 3   ← Diagonale moins antidiagonale
+      = λ² − 2λ − 3   ← λ² − (tr A)λ + det A
+      = (λ + 1)(λ − 3)   ← Factoriser le trinôme
+    — Un vecteur propre v₁ de M pour λ = 3.  [juge eigvec]  départ : v_1
+      = (3 ; 1)   ← De la ligne 2 : x₁ = λx₂
+    — Un vecteur propre v₂ de M pour λ = −1.  [juge eigvec]  départ : v_2
+      = (-1 ; 1)   ← De la ligne 2 : x₁ = λx₂
+    — Décompose x₀ = (u₁ ; u₀) = (7 ; 5) = c₁v₁ + c₂v₂.  [juge mat]  départ : c
+      = (3 ; 2)   ← Résoudre le système 2 × 2
+    — xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante).  [juge mat]  départ : u_k
+      = 3·3^k + 2·(−1)^k   ← Contrôle : u₂ = 29
+    — Que vaut la limite de uk/3ᵏ quand k → ∞ ?  [juge value]  départ : L
+      = 3   ← u<sub>k</sub>/3ᵏ = 3 + 2·(−1/3)ᵏ → 3, car |−1/3| &lt; 1
 
 Vrai ou faux ?
   « Pour toute matrice carrée A, A² est la matrice des carrés des coefficients de A. » → FAUX
@@ -10628,17 +10630,19 @@ Vrai ou faux ?
   [examen tf]
 
 W ⊂ ℝ⁴ est l'hyperplan x₁ + x₂ + x₃ + 3x₄ = 0, et A = [[-4,-1,-1,-3],[-1,-4,-1,-3],[-1,-1,-4,-3],[-3,-3,-3,-12]]. (a) Applique Gram-Schmidt à la base (1 ; −1 ; 0 ; 0), (1 ; 0 ; −1 ; 0), (3 ; 0 ; 0 ; −1) de W. (b) Calcule le polynôme caractéristique de A. (c) Donne des bases orthonormées des espaces propres. (d)–(e) Écris A = QDQᵀ.
-  [free, sans aide, examen open]  (1 ; -1 ; 0 ; 0), (1 ; 0 ; -1 ; 0), (3 ; 0 ; 0 ; -1)
-    = (1 ; -1 ; 0 ; 0), (1 ; 1 ; -2 ; 0), (1 ; 1 ; 1 ; -1)   ← Gram-Schmidt, vecteurs remis à l'échelle
-  — (b) Le polynôme caractéristique de A, factorisé.  [juge det]  départ : det(A − λI)
-    = (−15 − λ)(−3 − λ)³
-  — (c) Une base orthonormée de E₋₃ (c'est W).  [juge span]  départ : E_(−3)
-    = (1/√2 ; -1/√2 ; 0 ; 0), (1/√6 ; 1/√6 ; -2/√6 ; 0), (1/2 ; 1/2 ; 1/2 ; -1/2)
-  — (c) Une base orthonormée de E₋₁₅.  [juge span]  départ : E_(−15)
-    = (1/(2√3) ; 1/(2√3) ; 1/(2√3) ; 3/(2√3))
-  — (d)–(e) Q orthogonale et D diagonale avec A = QDQᵀ.  [juge factor]  départ : A = QDQᵀ
-    = Q = [[1/(2√3),1/√2,1/√6,1/2],[1/(2√3),-1/√2,1/√6,1/2],[1/(2√3),0,-2/√6,1/2],[3/(2√3),0,0,-1/2]]
-    = D = diag(-15,-3,-3,-3)
+  [problème, examen open, 14 points]
+  partie 1 (Début du problème : 2,5 ; (b) Le polynôme caractéristique de A, factorisé. : 2,5 ; (c) Une base orthonormée de E₋₃ (c'est W). : 2,5 ; (c) Une base orthonormée de E₋₁₅. : 2,5 ; (d)–(e) Q orthogonale et D diagonale avec A = QDQᵀ. : 4)
+    [free, sans aide, suivre l'erreur, examen open]  (1 ; -1 ; 0 ; 0), (1 ; 0 ; -1 ; 0), (3 ; 0 ; 0 ; -1)
+      = (1 ; -1 ; 0 ; 0), (1 ; 1 ; -2 ; 0), (1 ; 1 ; 1 ; -1)   ← Gram-Schmidt, vecteurs remis à l'échelle
+    — (b) Le polynôme caractéristique de A, factorisé.  [juge det]  départ : det(A − λI)
+      = (−15 − λ)(−3 − λ)³
+    — (c) Une base orthonormée de E₋₃ (c'est W).  [juge span]  départ : E_(−3)
+      = (1/√2 ; -1/√2 ; 0 ; 0), (1/√6 ; 1/√6 ; -2/√6 ; 0), (1/2 ; 1/2 ; 1/2 ; -1/2)
+    — (c) Une base orthonormée de E₋₁₅.  [juge span]  départ : E_(−15)
+      = (1/(2√3) ; 1/(2√3) ; 1/(2√3) ; 3/(2√3))
+    — (d)–(e) Q orthogonale et D diagonale avec A = QDQᵀ.  [juge factor]  départ : A = QDQᵀ
+      = Q = [[1/(2√3),1/√2,1/√6,1/2],[1/(2√3),-1/√2,1/√6,1/2],[1/(2√3),0,-2/√6,1/2],[3/(2√3),0,0,-1/2]]
+      = D = diag(-15,-3,-3,-3)
 
 ```
 
@@ -11234,22 +11238,24 @@ Vrai ou faux ?
   [examen tf]
 
 Soit A = [[3,-3,1,1],[1,-1,3,3]] et W = Ker A ⊂ ℝ⁴. (a) Trouve une base de W, puis une base orthonormée de W. (b) Calcule B = AᵀA. (c) Son polynôme caractéristique. (d) Des vecteurs propres de B pour ses valeurs propres non nulles. (e) Écris A = UΣVᵀ.
-  [free, sans aide, examen open]  KerA
-    = (1 ; 1 ; 0 ; 0), (0 ; 0 ; 1 ; -1)   ← Réduction de A
-  — (a) Une base orthonormée de W (Gram-Schmidt, puis normaliser).  [juge span]  départ : (1 ; 1 ; 0 ; 0), (0 ; 0 ; 1 ; -1)
-    = (1/√2 ; 1/√2 ; 0 ; 0), (0 ; 0 ; 1/√2 ; -1/√2)
-  — (b) B = AᵀA.  [juge mat]  départ : B
-    = [[10,-10,6,6],[-10,10,-6,-6],[6,-6,10,10],[6,-6,10,10]]
-  — (c) Le polynôme caractéristique de B, factorisé.  [juge det]  départ : det(B − λI)
-    = λ²(8 − λ)(32 − λ)
-  — (d) Un vecteur propre de B pour λ = 32.  [juge eigvec]  départ : v_1
-    = (1 ; -1 ; 1 ; 1)
-  — (d) Un vecteur propre de B pour λ = 8.  [juge eigvec]  départ : v_2
-    = (1 ; -1 ; -1 ; -1)
-  — (e) U, Σ et V avec A = UΣVᵀ (les deux dernières colonnes de V : la base de (a)).  [juge factor]  départ : A = UΣVᵀ
-    = Σ = [[4√2,0,0,0],[0,2√2,0,0]]
-    = V = [[1/2,1/2,1/√2,0],[-1/2,-1/2,1/√2,0],[1/2,-1/2,0,1/√2],[1/2,-1/2,0,-1/√2]]
-    = U = (1/√2)·[[1,1],[1,-1]]
+  [problème, examen open, 14 points]
+  partie 1 (Début du problème : 2 ; (a) Une base orthonormée de W (Gram-Schmidt, puis normaliser). : 2 ; (b) B = AᵀA. : 1,5 ; (c) Le polynôme caractéristique de B, factorisé. : 1,5 ; (d) Un vecteur propre de B pour λ = 32. : 1,5 ; (d) Un vecteur propre de B pour λ = 8. : 1,5 ; (e) U, Σ et V avec A = UΣVᵀ (les deux dernières colonnes de V : la base de (a)). : 4)
+    [free, sans aide, suivre l'erreur, examen open]  KerA
+      = (1 ; 1 ; 0 ; 0), (0 ; 0 ; 1 ; -1)   ← Réduction de A
+    — (a) Une base orthonormée de W (Gram-Schmidt, puis normaliser).  [juge span]  départ : (1 ; 1 ; 0 ; 0), (0 ; 0 ; 1 ; -1)
+      = (1/√2 ; 1/√2 ; 0 ; 0), (0 ; 0 ; 1/√2 ; -1/√2)
+    — (b) B = AᵀA.  [juge mat]  départ : B
+      = [[10,-10,6,6],[-10,10,-6,-6],[6,-6,10,10],[6,-6,10,10]]
+    — (c) Le polynôme caractéristique de B, factorisé.  [juge det]  départ : det(B − λI)
+      = λ²(8 − λ)(32 − λ)
+    — (d) Un vecteur propre de B pour λ = 32.  [juge eigvec]  départ : v_1
+      = (1 ; -1 ; 1 ; 1)
+    — (d) Un vecteur propre de B pour λ = 8.  [juge eigvec]  départ : v_2
+      = (1 ; -1 ; -1 ; -1)
+    — (e) U, Σ et V avec A = UΣVᵀ (les deux dernières colonnes de V : la base de (a)).  [juge factor]  départ : A = UΣVᵀ
+      = Σ = [[4√2,0,0,0],[0,2√2,0,0]]
+      = V = [[1/2,1/2,1/√2,0],[-1/2,-1/2,1/√2,0],[1/2,-1/2,0,1/√2],[1/2,-1/2,0,-1/√2]]
+      = U = (1/√2)·[[1,1],[1,-1]]
 
 ```
 
@@ -11516,18 +11522,20 @@ A = [[1,-5],[5,-1]] a les valeurs singulières 6 et 4, et U = [u₁ u₂] avec u
   pièges : l_svd_sphere_boundary, l_svd_sigma_is_eig
 
 Soit A = [[5,1,5],[-1,7,-1]]. Décris l'image de la sphère unité de ℝ³ par A (valeurs singulières, axes, nature).
-  [free, sans aide, examen open]  det(AAᵀ-λI)
-    (Les valeurs propres de AAᵀ (polynôme caractéristique factorisé).)
-    = (48 − λ)(54 − λ)
-  — Le grand demi-axe : σ₁.  [juge value]  départ : σ_1
-    = 3√6   ← √54
-  — Le petit demi-axe : σ₂.  [juge value]  départ : σ_2
-    = 4√3   ← √48
-  — La direction du grand axe : u₁, vecteur propre de AAᵀ pour λ = 54.  [juge eigvec]  départ : u_1
-    = (1 ; -1)
-  — La direction du petit axe : u₂, vecteur propre de AAᵀ pour λ = 48.  [juge eigvec]  départ : u_2
-    ? L'image de la sphère unité de ℝ³ par A est… · une ellipse (la courbe seulement) / ✔ une ellipse pleine (le bord et l'intérieur) / · un segment
-    = (1 ; 1)   ← Ellipse pleine, de demi-axes 3√6 selon (1 ; −1) et 4√3 selon (1 ; 1)
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; Le grand demi-axe : σ₁. : 1 ; Le petit demi-axe : σ₂. : 0,5 ; La direction du grand axe : u₁, vecteur propre de AAᵀ pour λ = 54. : 0,5 ; La direction du petit axe : u₂, vecteur propre de AAᵀ pour λ = 48. : 1)
+    [free, sans aide, suivre l'erreur, examen open]  det(AAᵀ-λI)
+      (Les valeurs propres de AAᵀ (polynôme caractéristique factorisé).)
+      = (48 − λ)(54 − λ)
+    — Le grand demi-axe : σ₁.  [juge value]  départ : σ_1
+      = 3√6   ← √54
+    — Le petit demi-axe : σ₂.  [juge value]  départ : σ_2
+      = 4√3   ← √48
+    — La direction du grand axe : u₁, vecteur propre de AAᵀ pour λ = 54.  [juge eigvec]  départ : u_1
+      = (1 ; -1)
+    — La direction du petit axe : u₂, vecteur propre de AAᵀ pour λ = 48.  [juge eigvec]  départ : u_2
+      ? L'image de la sphère unité de ℝ³ par A est… · une ellipse (la courbe seulement) / ✔ une ellipse pleine (le bord et l'intérieur) / · un segment
+      = (1 ; 1)   ← Ellipse pleine, de demi-axes 3√6 selon (1 ; −1) et 4√3 selon (1 ; 1)
   pièges : l_charpoly_sign, l_lambda_one_entry, l_svd_sphere_boundary
 
 ```
@@ -11706,14 +11714,16 @@ Montre que si T : ℝⁿ → ℝⁿ linéaire est surjective, alors elle est inj
 
 ```
 Montre que si A est symétrique et inversible, alors A⁻¹ est symétrique. Touche les blocs dans l'ordre de la preuve.
-  [blocs order, sans aide]
-    1. Hypothèses : Aᵀ = A et AA⁻¹ = I.
-    2. On transpose AA⁻¹ = I : (A⁻¹)ᵀAᵀ = Iᵀ = I.
-    3. Comme Aᵀ = A : (A⁻¹)ᵀA = I.
-    4. Donc (A⁻¹)ᵀ est l'inverse de A : (A⁻¹)ᵀ = A⁻¹, et A⁻¹ est symétrique.
-    ✗ A⁻¹ est symétrique, donc (A⁻¹)ᵀ = A⁻¹. [l_proof_circular]
-    ✗ Avec A = [[2, 1], [1, 1]], A⁻¹ = [[1, −1], [−1, 2]] est symétrique. [g9_proof_by_example]
-  [examen open]
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 4)
+    [blocs order, sans aide]
+      1. Hypothèses : Aᵀ = A et AA⁻¹ = I.
+      2. On transpose AA⁻¹ = I : (A⁻¹)ᵀAᵀ = Iᵀ = I.
+      3. Comme Aᵀ = A : (A⁻¹)ᵀA = I.
+      4. Donc (A⁻¹)ᵀ est l'inverse de A : (A⁻¹)ᵀ = A⁻¹, et A⁻¹ est symétrique.
+      ✗ A⁻¹ est symétrique, donc (A⁻¹)ᵀ = A⁻¹. [l_proof_circular]
+      ✗ Avec A = [[2, 1], [1, 1]], A⁻¹ = [[1, −1], [−1, 2]] est symétrique. [g9_proof_by_example]
+    [examen open]
   pièges : l_proof_circular, g9_proof_by_example
 
 ```
@@ -11892,14 +11902,16 @@ Montre que si ‖u‖ = 1, la matrice A = uuᵀ est la projection orthogonale su
 
 ```
 Montre que si ‖u‖ = 1, la matrice A = uuᵀ est la projection orthogonale sur Span{u}. Touche les blocs dans l'ordre de la preuve.
-  [blocs order, sans aide]
-    1. Au = u(uᵀu) = u‖u‖² = u : u est vecteur propre pour la valeur propre 1.
-    2. Chaque colonne de uuᵀ est un multiple de u : rang A = 1 et Col A = Span{u}.
-    3. Si x ⊥ u, Ax = u(uᵀx) = (u · x)u = 0 : u⊥ ⊂ Ker A, et dim Ker A = n − 1, donc Ker A = u⊥.
-    4. Pour tout x, Ax = (u · x)u : c'est la projection orthogonale de x sur Span{u}, car ‖u‖ = 1.
-    ✗ A est symétrique, donc AᵀA = I : A conserve les longueurs. [l_sym_orth_confusion]
-    ✗ A est la projection sur Span{u}, donc Au = u. [l_proof_circular]
-  [examen open]
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 4)
+    [blocs order, sans aide]
+      1. Au = u(uᵀu) = u‖u‖² = u : u est vecteur propre pour la valeur propre 1.
+      2. Chaque colonne de uuᵀ est un multiple de u : rang A = 1 et Col A = Span{u}.
+      3. Si x ⊥ u, Ax = u(uᵀx) = (u · x)u = 0 : u⊥ ⊂ Ker A, et dim Ker A = n − 1, donc Ker A = u⊥.
+      4. Pour tout x, Ax = (u · x)u : c'est la projection orthogonale de x sur Span{u}, car ‖u‖ = 1.
+      ✗ A est symétrique, donc AᵀA = I : A conserve les longueurs. [l_sym_orth_confusion]
+      ✗ A est la projection sur Span{u}, donc Au = u. [l_proof_circular]
+    [examen open]
   pièges : l_sym_orth_confusion, l_proof_circular
 
 ```
@@ -11996,4 +12008,3 @@ Montre que si ‖u‖ = 1, la matrice A = uuᵀ est la projection orthogonale su
 - **Ellipse pleine ou bord seul** (`l_svd_sphere_boundary`, E) : image de la sphère de ℝ³ par A 2 × 3 = ellipse (le bord seul) au lieu de 
 - **Preuve qui suppose sa conclusion** (`l_proof_circular`, E) : bloc qui utilise la conclusion au lieu de 
 - **Symétrique et orthogonale confondues** (`l_sym_orth_confusion`, E) : « A symétrique, donc AᵀA = I » au lieu de 
-- **Division par ‖v‖ au lieu de ‖v‖²** (`g4_proj_no_square`, E) : (u·v/‖v‖)·v au lieu de (u·v/‖v‖²)·v

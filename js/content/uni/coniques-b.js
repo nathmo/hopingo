@@ -17,6 +17,7 @@ import {
 import { coefItem, mt, MLm } from './alglin-kit.js';
 import { analyzeConic } from '../../cas/conic.js';
 import { reduceData } from './coniques-b-kit.js';
+import { asProblem } from './kit-problem.js';
 import { GEN as NATURE } from './coniques-b-nature.js';
 import { GEN as FRAME } from './coniques-b-frame.js';
 import { GEN as DATA } from './coniques-b-data.js';
@@ -239,7 +240,9 @@ export const GEN = {
   ...FAMILY,
   ...NATURE,
   ...FRAME,
-  [RED]: (level, rng, profile, opts = {}) => (opts.exam ? reduceExam(rng, opts.exam) : reduceItem(level, rng)),
+  // Level 5 is the long problem of the catalogue (E2), a `problem` item since
+  // step U4, with the points of its open variant.
+  [RED]: (level, rng, profile, opts = {}) => (opts.exam ? reduceExam(rng, opts.exam) : level === 5 ? asProblem(reduceItem(5, rng), 7.5) : reduceItem(level, rng)),
 };
 
 export { CML, mcqD, rootT, add, sub, scale };

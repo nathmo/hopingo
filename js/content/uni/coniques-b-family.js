@@ -16,6 +16,7 @@
 // then t = 0 and y = 1: the points at infinity (solset in x).
 
 import { Q } from '../../math/rational.js';
+import { asProblem } from './kit-problem.js';
 import {
   q, qt, fq, nz, H, vt, vr, sumT, eqT, rootT, partsItem, mcqD, examTag, MT, readable,
 } from './geo-kit.js';
@@ -548,7 +549,9 @@ function homogExam(rng, exam) {
 }
 
 export const GEN = {
-  [FAM]: (level, rng, profile, opts = {}) => (opts.exam ? familyExam(rng, opts.exam) : familyItem(level, rng)),
+  // Level 5 is the long problem of the catalogue (E3), a `problem` item since
+  // step U4, with the points of its open variant.
+  [FAM]: (level, rng, profile, opts = {}) => (opts.exam ? familyExam(rng, opts.exam) : level === 5 ? asProblem(familyItem(5, rng), 5) : familyItem(level, rng)),
   [LOC]: (level, rng, profile, opts = {}) => (opts.exam ? locusExam(rng, opts.exam) : locusItem(level, rng)),
   [HOM]: (level, rng, profile, opts = {}) => (opts.exam ? homogExam(rng, opts.exam) : homogItem(level, rng)),
 };

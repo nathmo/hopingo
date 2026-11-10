@@ -11,6 +11,7 @@ import {
   q, qt, fq, H, add, sub, scale, vt, vr, sumT, eqT, rootT, partsItem, mcqD, examTag, MT, prim, linT,
 } from './geo-kit.js';
 import { reduceData } from './coniques-b-kit.js';
+import { asProblem } from './kit-problem.js';
 import { coefItem } from './alglin-kit.js';
 import { analyzeConic } from '../../cas/conic.js';
 import { referenceAnswer } from '../../judges/plot.js';
@@ -235,5 +236,7 @@ function frameExam(rng, exam) {
 }
 
 export const GEN = {
-  [FB]: (level, rng, profile, opts = {}) => (opts.exam ? frameExam(rng, opts.exam) : frameItem(level, rng)),
+  // Level 5 is the long problem of the catalogue (E2 c), a `problem` item since
+  // step U4, with the points of its open variant.
+  [FB]: (level, rng, profile, opts = {}) => (opts.exam ? frameExam(rng, opts.exam) : level === 5 ? asProblem(frameItem(5, rng), 3.5) : frameItem(level, rng)),
 };

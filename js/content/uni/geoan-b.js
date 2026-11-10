@@ -20,6 +20,7 @@ import {
   niceVec, normI, randVec, orthTo, par, parR, crossT, crossComps, dotT, squaresT, squarefree, partsB,
 } from './geoan-b-kit.js';
 import { coefItem } from './alglin-kit.js';
+import { asProblem } from './kit-problem.js';
 
 const txt = (v) => v.map(qt);
 const absQ = (x) => (q(x).n < 0 ? q(x).neg() : q(x));
@@ -1135,7 +1136,9 @@ export const GEN = {
   [CR]: (level, rng, profile, opts = {}) => (opts.exam ? crossExam(rng, opts.exam) : crossItem(level, rng)),
   [TR]: (level, rng, profile, opts = {}) => (opts.exam ? tripleExam(rng, opts.exam) : tripleItem(level, rng)),
   [DP]: (level, rng, profile, opts = {}) => (opts.exam ? distPointExam(rng, opts.exam) : distPointItem(level, rng)),
-  [DS]: (level, rng, profile, opts = {}) => (opts.exam ? distSkewExam(rng, opts.exam) : distSkewItem(level, rng)),
+  // Level 5 is the long problem of the catalogue (E7), a `problem` item since
+  // step U4, with the points of its open variant.
+  [DS]: (level, rng, profile, opts = {}) => (opts.exam ? distSkewExam(rng, opts.exam) : level === 5 ? asProblem(distSkewItem(5, rng), 6) : distSkewItem(level, rng)),
   [CP]: (level, rng, profile, opts = {}) => (opts.exam ? commonPerpExam(rng, opts.exam) : commonPerpItem(level, rng)),
   [LS]: (level, rng, profile, opts = {}) => (opts.exam ? twoSkewExam(rng, opts.exam) : twoSkewItem(level, rng)),
   [SP]: (level, rng, profile, opts = {}) => (opts.exam ? sphereExam(rng, opts.exam) : sphereItem(level, rng)),

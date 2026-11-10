@@ -1,6 +1,6 @@
 // Exam blueprint of Analyse I (BA1), spec §10.1, step U4. The exam engine
-// comes with step U3 (js/engine/exam.js, js/content/uni/exams.js): this file
-// only holds the plan, to be added to EXAMS when U3 is merged.
+// comes with step U3 (js/engine/exam.js); js/content/uni/exams.js lists
+// this plan in EXAMS.
 //
 // Format (spec §10.1 table, plan « Examens »): GM exams of January 2018 to
 // 2022 and MT 2014 — multiple choice (+3 / 0 / −1), true/false (+1 / 0 / −1),

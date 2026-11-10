@@ -4,10 +4,14 @@
 //
 // {id, title, year, durationMin, documents: 'none' | 'formulaire' | 'tables',
 //  sections: [{kind: 'mcq' | 'tf' | 'coef' | 'open', count, multi?,
-//              scoring: {right, wrong, blank} | {perRight: '1/N', perWrong: '-1/M', floor},
-//              pool: {units: [unitId], extraSkills: [skillId]}}],
+//              scoring: {right, wrong, blank} | {perRight: '1/N', perWrong: '-1/M', floor}
+//                       | {byStep: true} (open: the problem's own points),
+//              pool: {units: [unitId], extraSkills: [skillId], skills?: [skillId],
+//                     points?: [min, max]}}],
 //  passMark (share of the points for the grade 4, estimate), source}
-// Later steps (U4–U10) add their blueprints to this list.
+// Later steps (U6–U10) add their blueprints to this list.
+
+import { EXAM_ANALYSE1 } from './exams-analyse1.js';
 
 export const EXAMS = [
   {
@@ -28,8 +32,11 @@ export const EXAMS = [
       { kind: 'open', count: 4, scoring: { right: 5, wrong: 0, blank: 0 }, pool: { units: ['geoan', 'coniques', 'analyse0', 'fonctions-g', 'explog', 'trigo', 'polynomes', 'recurrence', 'complexes'] } },
     ],
     passMark: 0.6,
-    source: 'CMS, contrôles 2018 : 105 minutes, 3 ou 4 problèmes pour 20 points (à vérifier : ici 4 problèmes de 5 points, notés par étape à partir de l\'étape U4).',
+    source: 'CMS, contrôles 2018 : 105 minutes, 3 ou 4 problèmes pour 20 points (à vérifier : ici 4 problèmes de 5 points, notés par étape).',
   },
+  // Step U4: Analyse I, multiple choice, true/false and open problems
+  // marked with their own points.
+  EXAM_ANALYSE1,
 ];
 
 export const EXAM_BY_ID = Object.fromEntries(EXAMS.map((e) => [e.id, e]));

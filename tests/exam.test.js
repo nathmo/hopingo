@@ -12,6 +12,8 @@ import {
 import { makeRng } from '../js/content/random.js';
 import { newProfileData } from '../js/engine/rewards.js';
 import { skillState } from '../js/engine/learner.js';
+import { ProblemRun, referenceLog } from '../js/judges/problem.js';
+import { LONG_PROBLEMS_ANALYSE1 } from '../js/content/uni/exams-analyse1.js';
 
 const BA1 = EXAM_BY_ID['ba1-alglin'];
 const profile = () => ({ id: 'x', name: 'Test', year: 13, track: 'mid', createdAt: 0, ...newProfileData() });
@@ -164,4 +166,70 @@ test('cms-controle: four open problems drawn from several G units', () => {
   assert.ok(units.has('geoan') && units.has('coniques'), `G4 and G10 in the draw: ${[...units]}`);
   assert.ok(examsForUnit('coniques').some((e) => e.id === 'cms-controle'));
   assert.ok(examsForUnit('geoan').some((e) => e.id === 'cms-controle'));
+});
+
+// Step U4: Analyse I, 12 multiple choice, 12 true/false and 3 open problems
+// of 2 to 7 points, each worth its own points (scoring.byStep).
+test('ba1-analyse1: a complete exam, open problems of 2 to 7 points', () => {
+  const bp = EXAM_BY_ID['ba1-analyse1'];
+  assert.ok(EXAMS.includes(bp));
+  assert.ok(examsForUnit('analyse1').some((e) => e.id === 'ba1-analyse1'));
+  for (const seed of [1, 2, 3, 4]) {
+    const exam = buildExam(bp, { rng: makeRng(seed), now: 0 });
+    assert.equal(exam.questions.filter((q) => q.kind === 'mcq').length, 12);
+    assert.equal(exam.questions.filter((q) => q.kind === 'tf').length, 12);
+    const open = exam.questions.filter((q) => q.kind === 'open');
+    assert.equal(open.length, 3);
+    for (const q of open) {
+      assert.equal(q.item.type, 'problem', q.item.key);
+      assert.ok(q.max >= 2 && q.max <= 7, `${q.item.key}: ${q.max} points`);
+      assert.equal(q.max, q.item.total);
+      assert.ok(!LONG_PROBLEMS_ANALYSE1.includes(q.skill), `${q.skill}: a long MT problem`);
+      assert.ok(bp.sections[2].pool.skills.includes(q.skill));
+    }
+    assert.equal(maxScore(exam), 12 * 3 + 12 + open.reduce((s, q) => s + q.max, 0));
+    assert.ok(exam.questions.every((q) => SKILL_BY_ID[q.skill].unit === 'analyse1'));
+  }
+});
+
+// An open question answered with the reference solution scores its full
+// points; half of it scores part of them; a blank scores 0. The response
+// is the log of the problem run, as the exam screen saves it.
+test('open questions are marked step by step from the problem run', () => {
+  for (const id of ['ba1-analyse1', 'cms-controle']) {
+    const bp = EXAM_BY_ID[id];
+    for (const seed of [5, 6]) {
+      const exam = buildExam(bp, { rng: makeRng(seed), now: 0 });
+      const responses = exam.questions.map((q) => (q.kind === 'open' ? referenceLog(q.item) : right(q)));
+      const all = scoreExam(exam, responses);
+      assert.equal(all.score, maxScore(exam), `${id}: every point`);
+      assert.equal(all.grade, 6);
+      for (const q of exam.questions.filter((x) => x.kind === 'open')) {
+        const sc = exam.sections[q.section].scoring;
+        const log = referenceLog(q.item);
+        const full = scoreQuestion(q, sc, log);
+        assert.deepEqual([full.state, full.points], ['right', q.max], q.item.key);
+        assert.equal(scoreQuestion(q, sc, null).points, 0);
+        assert.equal(scoreQuestion(q, sc, []).state, 'blank');
+        // The log up to the first step that earns points, then nothing:
+        // some points, not all (unless the problem has a single step).
+        const run = new ProblemRun(q.item);
+        const first = [];
+        for (const e of log) {
+          if (run.score().got > 0) break;
+          run.apply(e);
+          first.push(e);
+        }
+        const part = scoreQuestion(q, sc, JSON.parse(JSON.stringify(first)));
+        assert.ok(part.points > 0, `${q.item.key}: no point for the first step`);
+        if (q.item.points.flat().length > 1) {
+          assert.ok(part.points < q.max, `${q.item.key}: ${part.points} / ${q.max}`);
+          assert.equal(part.state, 'partial');
+        }
+      }
+    }
+  }
+  // cms-controle: 5 points per problem, the run's score scaled to them.
+  const exam = buildExam(EXAM_BY_ID['cms-controle'], { rng: makeRng(8), now: 0 });
+  assert.ok(exam.questions.every((q) => q.max === 5));
 });

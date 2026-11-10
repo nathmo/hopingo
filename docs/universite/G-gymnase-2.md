@@ -497,7 +497,7 @@ Ajouté à l'étape U5 (§16.3 : au moins 2 exemples par module). On donne d₁ 
 | 4. Équation de la perpendiculaire commune | (x ; y ; z) = (1 ; 0 ; 0) + k(1 ; 2 ; 2) | 1 | `g4-common-perp` |
 | 5. Contrôle | ‖PQ⃗‖ = ‖(1 ; 2 ; 2)‖ = 3 = d | 0,5 | `g4-dist-skew` |
 
-Item `problem` : 5 parties `lines`, `points: [[0.5, 0.5], [0.5, 1], [0.5, 0.5, 1], [1], [0.5]]`. En attendant le type `problem`, c'est le niveau 5 et la variante `open` de `g4-dist-skew` (distance puis perpendiculaire commune).
+Item `problem` : 5 parties `lines`, `points: [[0.5, 0.5], [0.5, 1], [0.5, 0.5, 1], [1], [0.5]]`. C'est le niveau 5 et la variante `open` de `g4-dist-skew` (distance puis perpendiculaire commune), un item `problem` de 6 points depuis la fusion de U4 (une partie, les étapes réparties sur ses segments).
 
 ---
 
