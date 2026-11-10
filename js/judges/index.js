@@ -13,6 +13,13 @@ import * as equiv from './equiv.js';
 import * as solset from './solset.js';
 import * as logic from './logic.js';
 import * as poly from './poly.js';
+// Step U3: linear algebra.
+import * as rowops from './rowops.js';
+import * as mat from './mat.js';
+import * as det from './det.js';
+import * as eigvec from './eigvec.js';
+import * as span from './span.js';
+import * as factor from './factor.js';
 import { parse } from '../cas/parse.js';
 import { toMathML } from '../cas/mathml.js';
 import { toText } from '../cas/print.js';
@@ -20,6 +27,7 @@ import { unparen } from '../cas/ast.js';
 import { parseOpts } from './common.js';
 
 export const JUDGES = { value, equiv, solset, logic, poly };
+Object.assign(JUDGES, { rowops, mat, det, eigvec, span, factor });
 
 export function judgeFor(cfg) {
   const j = JUDGES[cfg.kind];
