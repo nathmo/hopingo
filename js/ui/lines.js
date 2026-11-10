@@ -140,7 +140,7 @@ export function mountLines(item, ctx, body) {
     stage.append(h('div.step-line.current', h('span.eq', ask || eqSign()), input.display), prev);
     submit = () => {
       if (!input.value || locked()) return;
-      handle(run.submit(input.value));
+      handle(run.submit(input.value, { guided: item.mode === 'guided' }));
     };
     setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider la ligne'));
   }
