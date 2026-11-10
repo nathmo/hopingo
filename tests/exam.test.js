@@ -142,3 +142,26 @@ test('a run: saved answers, history, mastery updated but not the level, predicti
   assert.notEqual(skillState(p, skill).p, 0.99, 'the mastery is updated');
   assert.ok(result.overestimated, 'predicted 6, got less');
 });
+
+// Step U5: the CMS test, four long problems (5 points each, 105 minutes)
+// drawn from several G units, G4 and G10 among them.
+test('cms-controle: four open problems drawn from several G units', () => {
+  const bp = EXAM_BY_ID['cms-controle'];
+  const units = new Set();
+  for (const seed of [1, 2, 3, 4, 5, 6]) {
+    const exam = buildExam(bp, { rng: makeRng(seed), now: 0 });
+    assert.equal(exam.questions.length, 4);
+    assert.equal(maxScore(exam), 20);
+    assert.equal(exam.endsAt - exam.startedAt, 105 * 60000);
+    for (const q of exam.questions) {
+      assert.equal(q.kind, 'open');
+      assert.equal(q.item.exam.format, 'open', q.item.key);
+      assert.ok(q.item.noHints, `${q.item.key}: no hints`);
+      units.add(SKILL_BY_ID[q.skill].unit);
+    }
+  }
+  assert.ok(units.size >= 3, `several units: ${[...units]}`);
+  assert.ok(units.has('geoan') && units.has('coniques'), `G4 and G10 in the draw: ${[...units]}`);
+  assert.ok(examsForUnit('coniques').some((e) => e.id === 'cms-controle'));
+  assert.ok(examsForUnit('geoan').some((e) => e.id === 'cms-controle'));
+});

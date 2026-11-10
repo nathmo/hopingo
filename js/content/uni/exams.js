@@ -20,6 +20,16 @@ export const EXAMS = [
     passMark: 0.5,
     source: 'Format des examens 2018–2021 (partie commune GM et MT) : 144 minutes, 16 QCM (+3 / 0 / −1) et 16 vrai/faux (+1 / 0 / −1), sans document.',
   },
+  // Step U5: the CMS test, long problems drawn from several G units (§16.3).
+  {
+    id: 'cms-controle', title: 'Contrôle du CMS', year: 12.5, durationMin: 105,
+    documents: 'none',
+    sections: [
+      { kind: 'open', count: 4, scoring: { right: 5, wrong: 0, blank: 0 }, pool: { units: ['geoan', 'coniques', 'analyse0', 'fonctions-g', 'explog', 'trigo', 'polynomes', 'recurrence', 'complexes'] } },
+    ],
+    passMark: 0.6,
+    source: 'CMS, contrôles 2018 : 105 minutes, 3 ou 4 problèmes pour 20 points (à vérifier : ici 4 problèmes de 5 points, notés par étape à partir de l\'étape U4).',
+  },
 ];
 
 export const EXAM_BY_ID = Object.fromEntries(EXAMS.map((e) => [e.id, e]));

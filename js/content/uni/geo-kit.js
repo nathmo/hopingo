@@ -124,7 +124,9 @@ export function blanks(math, parts) {
   let compact = '';
   for (const t of toks) { starts.push(compact.length); compact += t.s; }
   const out = [];
-  let from = 0;
+  // A label « u_2 = … » is never blanked.
+  const lab = /^([A-Za-zΩα-ω_0-9']+)=/.exec(compact);
+  let from = lab ? lab[0].length : 0;
   for (const p of parts) {
     let pc;
     try { pc = tokenize(p, {}).map((t) => t.s).join(''); } catch { continue; }
@@ -142,6 +144,48 @@ export function blanks(math, parts) {
 }
 
 // ---------- items ----------
+
+// A lines item made of parts, each with its own judge (§16.2):
+// parts: [{html, ask, start, judge, notes?: [html], decisions?: [decision line]
+//          (level 1: shown as a note; levels: [2, 3] to restrict), menu?: [options]
+//          (level 3), lines: [{math, note, subgoal, blank?: [texts] (level 1),
+//          blank2?: [texts] (level 2, else blank), from?: level (shown from it on)}]}]
+export function partsItem(o) {
+  const { level, parts } = o;
+  const guided = level <= 2;
+  const judgeAt = (p) => (level === 3 && p.menu ? { ...p.judge, menu: p.menu } : p.judge);
+  const script = [];
+  parts.forEach((p, k) => {
+    if (k > 0) script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge: judgeAt(p) });
+    else if (p.html) script.push({ kind: 'note', html: p.html });
+    for (const n of p.notes || []) script.push({ kind: 'note', html: n });
+    for (const dec of p.decisions || []) {
+      if (o.exam || (dec.levels && !dec.levels.includes(level))) continue;
+      if (level === 1) {
+        const ok = dec.options.find((x) => x.ref) ?? dec.options.find((x) => x.valid && x.quality !== 'poor');
+        script.push({ kind: 'note', html: `${dec.prompt} ${ok.label}.` });
+      } else {
+        const { levels, ...line } = dec;
+        script.push(line);
+      }
+    }
+    for (const l of p.lines) {
+      if (l.from && level < l.from) continue;
+      const line = { kind: 'eq', math: l.math, note: l.note || '', subgoal: l.subgoal };
+      const b = level === 1 ? l.blank : (l.blank2 ?? l.blank);
+      if (guided && b?.length) Object.assign(line, blanks(l.math, b));
+      const cells = level === 1 ? l.cells : (l.cells2 ?? l.cells);
+      if (guided && cells?.length) line.cells = cells; // grid of a matrix judge
+      script.push(line);
+    }
+  });
+  return linesItem({
+    skill: o.skill, level, prompt: o.prompt, start: parts[0].start, judge: judgeAt(parts[0]),
+    mode: modeOf(level), script, hints: o.hints, subgoals: o.subgoals, keys: o.keys || ['calc', 'geo', 'pts'],
+    key: o.key, tapActions: level === 3 ? 'menu' : null, fallback: o.fallback, exam: o.exam || false, noHints: o.noHints,
+    baits: o.baits,
+  });
+}
 
 // Multiple choice with four distinct options (the right one first).
 export function mcqD(o, rng) {
