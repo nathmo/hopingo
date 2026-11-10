@@ -39,6 +39,7 @@ export const DEFS = {
   f_lap_abscissa: {
     name: 'Demi-plan de convergence oublié ou faux',
     judges: ['transform', 'value'],
+    explain: (ctx = {}) => `« La transformée n'existe que pour Re z > ${ctx.g0 ?? 'γ₀'} : γ₀ est la plus grande abscisse des termes (la plus grande partie réelle des pôles). »`.replace(/-/g, '−'),
     transform: fromCfg('f_lap_abscissa'),
     check: { judge: LAP({ f: 'e^(2t)', F: '1/(z-2)', gamma0: 2, halfPlane: true }), prev: 'ℒ(e^(2t))', line: 'F(z) = 1/(z-2), Re z > 0' },
   },
@@ -73,6 +74,7 @@ export const DEFS = {
   f_lap_conj_pole: {
     name: 'Pôle conjugué oublié',
     judges: ['transform'],
+    explain: (ctx = {}) => `« Ton f(t) n'est pas réel : le pôle conjugué ${ctx.zbar ?? 'z̄₀'} donne le résidu conjugué, et la somme des deux vaut 2 Re. »`,
     transform: fromCfg('f_lap_conj_pole'),
     check: {
       judge: LAP({ dir: 'inverse', f: '(t+1)/2-e^t cos(t)/2', F: '1/(z^4-2z^3+2z^2)', traps: { f_lap_conj_pole: [{ line: '(t+1)/2-(1/4)e^((1+i)t)', ctx: { zbar: '1 − i' } }] } }),
@@ -82,6 +84,7 @@ export const DEFS = {
   f_lap_deriv_ic: {
     name: 'Conditions initiales mal placées dans ℒ(y″)',
     judges: ['transform'],
+    explain: () => '« ℒ(y″) = z²Y − z y(0) − y′(0) : la plus haute puissance de z va avec y(0). Avec les conditions échangées ou oubliées, Y est faux. »',
     transform: fromCfg('f_lap_deriv_ic'),
     check: {
       // y″ + 2y′ + y = 1, y(0) = 1, y′(0) = 2: with z²Y − y(0) − z y′(0)
