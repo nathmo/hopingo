@@ -867,9 +867,406 @@ function propsExam(rng, exam) {
 }
 
 // ======================================================================
+// l-det-area
+// ======================================================================
+
+const AREA = 'l-det-area';
+const AREA_SUB = [
+  { id: 'det', label: 'calculer le déterminant', skill: COF },
+  { id: 'area', label: 'aire ou volume', skill: AREA },
+];
+const parR = (x) => par(x).replace(/-/g, '−');
+const ptT = (P) => `(${P.map(fq).join(' ; ')})`;
+const vsub = (P, Q) => P.map((x, i) => x.sub(Q[i]));
+// det[u v] (u, v in columns) as CAS text, and its value.
+const det2T = (u, v) => `${par(u[0])}·${par(v[1])}-${par(v[0])}·${par(u[1])}`;
+const det2 = (u, v) => u[0].mul(v[1]).sub(v[0].mul(u[1]));
+const randPt = (rng, lo, hi, n = 2) => Array.from({ length: n }, () => q(rng.int(lo, hi)));
+const qAbs = (x) => (x.n < 0 ? x.neg() : x);
+
+// Wrong values of l_area_half_abs, different from the area.
+function areaTraps(area, list) {
+  const seen = new Set([qt(area)]);
+  const out = [];
+  for (const w of list) {
+    const t = typeof w.value === 'string' ? w.value : qt(w.value);
+    if (seen.has(t)) continue;
+    seen.add(t);
+    out.push({ value: t, ctx: w.ctx });
+  }
+  return out.length ? { l_area_half_abs: out } : {};
+}
+
+function triData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const [P, Q, Rr] = [randPt(rng, -5, 5), randPt(rng, -5, 5), randPt(rng, -5, 5)];
+    const u = vsub(Q, P);
+    const v = vsub(Rr, P);
+    const d = det2(u, v);
+    if (d.n === 0 || Math.abs(d.valueOf()) > 60 || u.some((x) => x.n === 0) && v.some((x) => x.n === 0)) continue;
+    return { P, Q, R: Rr, u, v, d, area: qAbs(d).div(2) };
+  }
+  const [P, Q, Rr] = [[1, 1], [4, 2], [2, 5]].map((p) => p.map((x) => q(x)));
+  return { P, Q, R: Rr, u: vsub(Q, P), v: vsub(Rr, P), d: q(11), area: q(11, 2), fallback: true };
+}
+
+// A 2 × 2 matrix with |det| in [2 ; 12].
+function mapData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const A = [[rng.int(-3, 4), rng.int(-3, 4)], [rng.int(-3, 4), rng.int(-3, 4)]].map((r) => r.map((x) => q(x)));
+    const d = MX.det(A);
+    if (Math.abs(d.valueOf()) < 2 || Math.abs(d.valueOf()) > 12 || A.flat().filter((x) => x.n === 0).length > 1) continue;
+    return { A, d };
+  }
+  return { A: MX.mat([[2, 1], [1, -1]]), d: q(-3), fallback: true };
+}
+const detAT = (A) => det2T([A[0][0], A[1][0]], [A[0][1], A[1][1]]);
+
+// The parts of an area item: prompt, lines, traps, the shape (for the menu).
+function areaParts(kind, rng) {
+  if (kind === 'tri' || kind === 'par') {
+    const d = triData(rng);
+    const tri = kind === 'tri';
+    const area = tri ? d.area : qAbs(d.d);
+    const line1 = tri ? `(1/2)·|${det2T(d.u, d.v)}|` : `|${det2T(d.u, d.v)}|`;
+    const M = [[d.u[0], d.v[0]], [d.u[1], d.v[1]]];
+    return {
+      d, area, shape: kind, M, id: [d.P, d.Q, d.R].map(ptT).join(''),
+      prompt: tri
+        ? `Calcule l'aire S du triangle de sommets P = ${ptT(d.P)}, Q = ${ptT(d.Q)} et R = ${ptT(d.R)}.`
+        : `Calcule l'aire S du parallélogramme construit sur u = ${ptT(d.u)} et v = ${ptT(d.v)}.`,
+      lines: [
+        { kind: 'eq', math: line1, subgoal: 'det', note: tri ? `u = Q − P = ${ptT(d.u)}, v = R − P = ${ptT(d.v)} ; aire = ½·|det[u v]|` : 'aire = |det[u v]|' },
+        { kind: 'eq', math: qt(area), subgoal: 'area', note: tri ? `det[u v] = ${fq(d.d)} : la moitié, en valeur absolue` : `det[u v] = ${fq(d.d)} : en valeur absolue` },
+      ],
+      traps: areaTraps(area, tri
+        ? [{ value: d.d, ctx: { half: true, d: fq(d.d), area: fq(area) } }, { value: d.d.div(2), ctx: { half: true, d: fq(d.d), area: fq(area) } }, { value: qAbs(d.d), ctx: { half: true, d: fq(d.d), area: fq(area) } }]
+        : [{ value: d.d, ctx: { d: fq(d.d), area: fq(area) } }]),
+      hint2: tri ? `S = ½·|det${MLm(M)}| avec u = Q − P et v = R − P en colonnes : S = ½·|${parR(d.u[0])}·□ − □·${parR(d.u[1])}|.` : `S = |det${MLm(M)}| = |${parR(d.u[0])}·□ − □·${parR(d.u[1])}|.`,
+      blanks: [qt(d.v[1]), qt(d.v[0])],
+      fallback: d.fallback,
+    };
+  }
+  if (kind === 'square' || kind === 'disc' || kind === 'ellipse' || kind === 'imgtri') {
+    const m = mapData(rng);
+    const A = m.A;
+    const dA = qAbs(m.d);
+    let area; let base; let lineTail; let what; let exact = false; let factor;
+    if (kind === 'square') { area = dA; lineTail = ''; what = 'du carré unité [0 ; 1]²'; base = '1'; } else if (kind === 'disc') {
+      const r = rng.int(1, 3);
+      area = dA.mul(r * r); lineTail = `·π·${r}^2`; what = `du disque de centre 0 et de rayon ${r}`; exact = true; base = `π·${r}²`;
+    } else if (kind === 'ellipse') {
+      const [p, s] = [rng.int(1, 4), rng.int(1, 4)];
+      area = dA.mul(p * s); lineTail = `·π·${p}·${s}`; what = `de l'ellipse x²/${p * p} + y²/${s * s} ≤ 1 (d'aire π·${p}·${s})`; exact = true; base = `π·${p}·${s}`;
+      factor = null;
+    } else {
+      const t = triData(rng);
+      area = dA.mul(t.area); lineTail = `·(1/2)·|${det2T(t.u, t.v)}|`; what = `du triangle de sommets ${ptT(t.P)}, ${ptT(t.Q)} et ${ptT(t.R)}`; base = fq(t.area);
+    }
+    const val = exact ? `${qt(area)}π` : qt(area);
+    const wrongDet = exact ? `${qt(m.d.mul(area.div(dA)))}π` : m.d.mul(area.div(dA));
+    return {
+      area: val, exact, shape: 'img', M: A, id: `${mt(A)}:${lineTail}`,
+      prompt: `L'application x ↦ Ax, avec A = ${MLm(A)}, transforme la région ${what}. Calcule l'aire S de son image.`,
+      lines: [
+        { kind: 'eq', math: `|${detAT(A)}|${lineTail}`, subgoal: 'det', note: `aire de l'image = |det A|·aire de départ ; det A = ${fq(m.d)}` },
+        { kind: 'eq', math: val, subgoal: 'area', note: '' },
+      ],
+      traps: m.d.n < 0 ? areaTraps(exact ? q(-1) : area, [{ value: wrongDet, ctx: { d: fq(m.d), area: fq(dA), factor: base } }]) : {},
+      hint2: `S = |det A|·(${base}), avec det A = ${parR(A[0][0])}·□ − □·${parR(A[1][0])}.`,
+      blanks: [qt(A[1][1]), qt(A[0][1])],
+      fallback: m.fallback,
+    };
+  }
+  // 3D: tetrahedron (1/6) or parallelepiped.
+  for (let t = 0; t < 200; t++) {
+    const P = Array.from({ length: 4 }, () => randPt(rng, -3, 3, 3));
+    const cols = [1, 2, 3].map((k) => vsub(P[k], P[0]));
+    const M = [0, 1, 2].map((i) => cols.map((c) => c[i]));
+    const d = MX.det(M);
+    if (d.n === 0 || Math.abs(d.valueOf()) > 60) continue;
+    // A row with a zero, to expand along it.
+    if (!M[0].some((x) => x.n === 0)) continue;
+    const tet = kind === 'tet';
+    const vol = tet ? qAbs(d).div(6) : qAbs(d);
+    return {
+      area: qt(vol), shape: kind, M, d, P, three: true, id: mt(M),
+      prompt: tet
+        ? `Calcule le volume V du tétraèdre de sommets ${P.map(ptT).join(', ')}.`
+        : `Calcule le volume V du parallélépipède construit sur u = ${ptT(cols[0])}, v = ${ptT(cols[1])} et w = ${ptT(cols[2])}.`,
+      lines: [
+        { kind: 'eq', math: tet ? `(1/6)·|${qt(d)}|` : `|${qt(d)}|`, subgoal: 'area', note: tet ? 'Un tétraèdre : 1/6 du parallélépipède' : 'Valeur absolue' },
+        { kind: 'eq', math: qt(vol), subgoal: 'area', note: '' },
+      ],
+      traps: areaTraps(vol, [{ value: d, ctx: { d: fq(d), area: fq(qAbs(d)), factor: tet ? '1/6' : null } }, ...(tet ? [{ value: qAbs(d), ctx: { d: fq(d), area: fq(qAbs(d)), factor: '1/6' } }, { value: qAbs(d).div(2), ctx: { d: fq(d), area: fq(qAbs(d)), factor: '1/6' } }] : [])]),
+      hint2: `Les arêtes issues du premier sommet, en colonnes : V = ${tet ? '(1/6)·' : ''}|det${MLm(M)}|.`,
+      blanks: [],
+    };
+  }
+  return areaParts('tri', rng);
+}
+
+// The det of a 3 × 3 along its first row: a·det[…] − b·det[…] + c·det[…].
+function firstRowLine(M) {
+  const terms = [];
+  M[0].forEach((a, j) => {
+    if (a.n === 0) return;
+    const c = a.mul(sgn(0, j));
+    const abs = c.n < 0 ? c.neg() : c;
+    terms.push(`${c.n < 0 ? '-' : '+'}${abs.eq(1) ? '' : `${qt(abs)}·`}det${mt(minorOf(M, 0, j))}`);
+  });
+  return terms.join('').replace(/^\+/, '');
+}
+
+const AREA_MENU = (shape) => [
+  { id: 'tri', label: 'Triangle : ½·|det[u v]|', valid: shape === 'tri', why: 'Ce n\'est pas un triangle.' },
+  { id: 'par', label: 'Parallélogramme : |det[u v]|', valid: shape === 'par', why: shape === 'tri' ? 'Un triangle est la moitié du parallélogramme.' : 'Ce n\'est pas un parallélogramme donné par ses côtés.' },
+  { id: 'img', label: 'Image par A : |det A|·aire de départ', valid: shape === 'img', why: 'Aucune application n\'est appliquée ici.' },
+  { id: 'nohalf', label: 'Triangle : det[u v]', valid: false, rule: 'l_area_half_abs', why: 'Un triangle est la moitié du parallélogramme, et une aire est positive : ½·|det[u v]|.' },
+];
+
+function areaItem(level, rng) {
+  const kind = level <= 2 ? 'tri' : level === 3 ? rng.pick(['tri', 'par', 'square']) : level === 4 ? rng.pick(['tet', 'box', 'disc', 'tri']) : rng.pick(['ellipse', 'imgtri']);
+  const a = areaParts(kind, rng);
+  const judge = { kind: 'value', expect: a.area, trapValues: a.traps };
+  if (a.exact) judge.form = 'exact';
+  if (level === 3) judge.menu = AREA_MENU(a.shape);
+  const script = [];
+  let start = 'S';
+  if (a.three) {
+    // The determinant first (judge det), then the volume.
+    start = `det${mt(a.M)}`;
+    script.push(
+      { kind: 'eq', math: firstRowLine(a.M), subgoal: 'det', note: 'Développer selon la ligne 1' },
+      { kind: 'eq', math: qt(a.d), subgoal: 'det', note: 'Les arêtes en colonnes' },
+      { kind: 'segment', html: `Le déterminant vaut ${fq(a.d)}. Le volume ?`, ask: 'V =', start: { math: 'V' }, judge },
+    );
+  }
+  const [l1, l2] = a.lines;
+  if (level === 2) {
+    const d = a.d;
+    script.push({
+      kind: 'decision', prompt: 'Quels vecteurs mettre dans le déterminant ?', options: rng.shuffle([
+        { id: 'sides', label: 'u = Q − P et v = R − P : deux côtés issus de P', valid: true, ref: true },
+        { id: 'sides2', label: 'u = Q − P et v = R − Q : deux côtés qui se suivent', valid: true, quality: 'poor', why: 'Juste aussi (det[Q − P, R − Q] = det[Q − P, R − P]), mais on prend d\'habitude deux côtés issus du même sommet.' },
+        { id: 'points', label: `u = P et v = Q : les sommets eux-mêmes`, valid: false, why: `Un sommet n'est pas un côté : il faut des différences de sommets. Ici det[P Q] = ${fq(det2(d.P, d.Q))}.` },
+      ]),
+    });
+  }
+  script.push(level <= 2 ? { ...l1, ...tpl(l1.math, level === 1 ? a.blanks.slice(0, 1) : a.blanks) } : l1, l2);
+  const hints = H(
+    a.three ? 'Les trois arêtes issues d\'un même sommet en colonnes, puis |det| (et 1/6 pour un tétraèdre).' : a.shape === 'img' ? 'x ↦ Ax multiplie les aires par |det A|.' : 'Deux côtés issus du même sommet, puis |det| (et ½ pour un triangle).',
+    a.hint2,
+    MT(l1.math),
+  );
+  return linesItem({
+    skill: AREA, level,
+    prompt: level === 1 && a.shape === 'tri' ? `${a.prompt} Les côtés issus de P sont u = ${ptT(a.d.u)} et v = ${ptT(a.d.v)}.` : a.prompt,
+    start: a.three ? start : 'S', judge: a.three ? { kind: 'det', target: 'number' } : judge, mode: modeOf(level), script, hints, subgoals: AREA_SUB, keys: ['calc'],
+    key: `${AREA}:${kind}:${a.id}`, tapActions: level === 3 ? 'menu' : null, fallback: a.fallback,
+  });
+}
+
+function areaExam(rng, exam) {
+  if (exam === 'tf') {
+    const which = rng.int(0, 3);
+    if (which < 2) {
+      const st = [
+        ['Le volume du parallélépipède construit sur les colonnes d\'une matrice A de taille 3 × 3 vaut |det A|.', 'Vrai : c\'est l\'interprétation géométrique du déterminant.'],
+        ['Si det A = 0, l\'image du carré unité par x ↦ Ax est d\'aire nulle.', 'Vrai : l\'aire de l\'image vaut |det A|·1 = 0 (le carré est écrasé sur une droite ou un point).'],
+      ][which];
+      return tfL({ skill: AREA, key: `true:${which}`, truth: true, exam: examTag({ exam }), statement: st[0], explanation: st[1] });
+    }
+    if (which === 2) {
+      const A = rng.pick([[[0, 1], [1, 0]], [[1, 2], [3, 4]], [[2, 1], [3, 1]], [[1, 0], [0, -2]]]);
+      return tfL({
+        skill: AREA, key: `square:${mt(MX.mat(A))}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'l_area_half_abs',
+        statement: 'Pour toute matrice A de taille 2 × 2, l\'aire de l\'image du carré unité par x ↦ Ax vaut det A.',
+        counter: { kind: 'matOne', params: { want: 'detNegative', n: 2 }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)) } },
+        explanation: `Faux : l'aire vaut |det A|. Pour A = ${MLm(MX.mat(A))}, det A = ${fq(MX.det(MX.mat(A)))} < 0, mais une aire est positive.`,
+      });
+    }
+    return tfL({
+      skill: AREA, key: 'triangle', truth: false, exam: examTag({ exam }), ruleIfTrue: 'l_area_half_abs',
+      statement: 'L\'aire du triangle de sommets 0, u et v (dans ℝ²) vaut |det[u v]|.',
+      counter: { kind: 'matOne', params: { want: 'detNonZero', n: 2 }, ask: [{ v: 'A', label: '[u v] =', shape: [2, 2] }], answer: { A: '[[1,0],[0,1]]' } },
+      explanation: 'Faux : c\'est la moitié, ½·|det[u v]|. Avec u = (1 ; 0) et v = (0 ; 1), le triangle a une aire de 1/2, et |det[u v]| = 1.',
+    });
+  }
+  const d = triData(rng);
+  return mcqDistinct({
+    skill: AREA, level: 4, key: `mcq:${[d.P, d.Q, d.R].map(ptT).join('')}`, exam: examTag({ exam }),
+    prompt: `Quelle est l'aire du triangle de sommets ${ptT(d.P)}, ${ptT(d.Q)} et ${ptT(d.R)} ?`,
+    right: fq(d.area),
+    wrongs: [{ html: fq(d.d), rule: 'l_area_half_abs' }, { html: fq(d.d.div(2).neg()), rule: 'l_area_half_abs' }, { html: fq(qAbs(d.d)), rule: 'l_area_half_abs' }, { html: fq(d.d.div(2)), rule: 'l_area_half_abs' }],
+    fillers: [{ html: fq(d.area.add(1)) }, { html: fq(d.area.mul(4)) }],
+    solution: [{ html: `u = ${ptT(d.u)}, v = ${ptT(d.v)}, det[u v] = ${fq(d.d)}, aire = ½·|${fq(d.d)}| = ${fq(d.area)}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-det-cramer
+// ======================================================================
+
+const CR = 'l-det-cramer';
+const CR_SUB = [
+  { id: 'det', label: 'calculer un déterminant', skill: COF },
+  { id: 'cramer', label: 'règle de Cramer', skill: CR },
+];
+const XN = (n) => Array.from({ length: n }, (_, i) => `x_${i + 1}`);
+const xName = (i) => `x${sub(i + 1)}`;
+const withCol = (A, i, b) => A.map((r, k) => r.map((x, j) => (j === i ? b[k] : x)));
+const withRow = (A, i, b) => A.map((r, k) => (k === i ? [...b] : r));
+
+// The system as MathML (one equation per row; coefficient texts may hold a).
+function sysML(rowsT, bT, names, vars = []) {
+  const eqs = rowsT.map((r, i) => {
+    let s = '';
+    r.forEach((c, j) => {
+      if (c === '0') return;
+      const neg = c.startsWith('-');
+      const abs = neg ? c.slice(1) : c;
+      const coef = abs === '1' ? '' : /^[\d/]+$/.test(abs) ? abs : /^[a-zλ]$/.test(abs) ? `${abs}·` : `(${abs})·`;
+      s += `${neg ? '-' : s ? '+' : ''}${coef}${names[j]}`;
+    });
+    return `${s || '0'}=${bT[i]}`;
+  });
+  return MT(eqs.join(';'), { vars: [...names, ...vars] }, true);
+}
+
+function crData(n, rng) {
+  const DETS_OK = [1, -1, 2, -2, 5, -5, 10];
+  for (let t = 0; t < 300; t++) {
+    const A = Array.from({ length: n }, () => Array.from({ length: n }, () => q(n === 2 ? rng.int(-4, 6) : rng.int(-3, 4))));
+    const d = MX.det(A);
+    if (!DETS_OK.includes(d.valueOf())) continue;
+    if (A.flat().filter((x) => x.n === 0).length > (n === 2 ? 0 : 3)) continue;
+    const x = Array.from({ length: n }, () => q(rng.int(-4, 5)));
+    const b = MX.matVec(A, x);
+    if (b.some((v) => Math.abs(v.valueOf()) > 30)) continue;
+    // The row trap gives other values.
+    const rowVals = x.map((_, i) => MX.det(withRow(A, i, b)).div(d));
+    if (rowVals.some((v, i) => v.eq(x[i]))) continue;
+    return { A, b, x, d, rowVals, n };
+  }
+  const A = MX.mat([[3, 2], [1, 4]]);
+  const b = [q(7), q(9)];
+  return { A, b, x: [q(1), q(2)], d: q(10), rowVals: [q(19, 10), q(-1, 10)].map((v, i) => MX.det(withRow(A, i, b)).div(q(10))), n: 2, fallback: true };
+}
+
+const crMenu = () => [
+  { id: 'cramer', label: 'Règle de Cramer : xᵢ = det Aᵢ(b) / det A', valid: true },
+  { id: 'row', label: 'Remplacer la ligne i de A par b', valid: false, rule: 'l_cramer_row', why: 'Cramer remplace la colonne de l\'inconnue, pas une ligne.' },
+  { id: 'gauss', label: 'Échelonner [A | b] (Gauss)', valid: false, why: 'Gauss marche aussi, mais pour une seule inconnue Cramer est plus court : c\'est la méthode demandée ici.' },
+];
+
+// The determinant of A as reference lines (judge det).
+function detLinesOf(A, d) {
+  if (A.length === 2) return [{ kind: 'eq', math: `${par(A[0][0])}·${par(A[1][1])}-${par(A[0][1])}·${par(A[1][0])}`, subgoal: 'det', note: 'Diagonale moins antidiagonale' }, { kind: 'eq', math: qt(d), subgoal: 'det', note: '' }];
+  return [{ kind: 'eq', math: firstRowLine(A), subgoal: 'det', note: 'Développer selon la ligne 1' }, { kind: 'eq', math: qt(d), subgoal: 'det', note: '' }];
+}
+
+function crItem(level, rng) {
+  if (level === 5) return crParamItem(rng);
+  const n = level === 4 ? 3 : 2;
+  const d = crData(n, rng);
+  const names = XN(n);
+  const asked = n === 2 ? (level <= 2 ? [rng.int(0, 1)] : [0, 1]) : [rng.int(0, 2)];
+  const menu = level === 3 ? crMenu() : null;
+  const detJudge = { kind: 'det', target: 'number', ...(menu ? { menu } : {}) };
+  const script = [...detLinesOf(d.A, d.d)];
+  for (const i of asked) {
+    const Ai = withCol(d.A, i, d.b);
+    const judge = { kind: 'mat', expect: qt(d.x[i]), trapValues: { l_cramer_row: [{ value: qt(d.rowVals[i]), ctx: { i: i + 1 } }] }, ...(menu ? { menu } : {}) };
+    script.push({ kind: 'segment', html: `${xName(i)} = det A${sub(i + 1)}(b) / det A, où A${sub(i + 1)}(b) est A avec la colonne ${i + 1} remplacée par b.`, ask: `${xName(i)} =`, start: { math: `x_${i + 1}` }, judge });
+    if (level === 2) {
+      script.push({
+        kind: 'decision', prompt: `Que remplacer par b pour calculer ${xName(i)} ?`, options: rng.shuffle([
+          { id: 'col', label: `La colonne ${i + 1} de A`, valid: true },
+          { id: 'row', label: `La ligne ${i + 1} de A`, valid: false, rule: 'l_cramer_row', why: `Cramer remplace la colonne des coefficients de ${xName(i)}, pas une ligne.` },
+          { id: 'other', label: `La colonne ${(i + 1) % n + 1} de A`, valid: false, why: `La colonne ${(i + 1) % n + 1} porte les coefficients de ${xName((i + 1) % n)}, pas de ${xName(i)}.` },
+        ]),
+      });
+    }
+    const l = { kind: 'eq', math: `det${mt(Ai)}/${par(d.d)}`, subgoal: 'cramer', note: `Colonne ${i + 1} remplacée par b ; det A${sub(i + 1)}(b) = ${fq(MX.det(Ai))}` };
+    script.push(level <= 2 ? withCells(l, d.A.map((_, r) => [r, i]).slice(0, level === 1 ? 2 : n)) : l, { kind: 'eq', math: qt(d.x[i]), subgoal: 'cramer', note: '' });
+  }
+  const i0 = asked[0];
+  const A0 = withCol(d.A, i0, d.b).map((r) => r.map((x, j) => (j === i0 ? '□' : fq(x))));
+  const hints = H(
+    'D\'abord det A ; puis remplace la colonne de l\'inconnue par b : xᵢ = det Aᵢ(b) / det A.',
+    `${xName(i0)} = det[${A0.map((r) => `[${r.join(', ')}]`).join(', ')}] / ${fq(d.d)}`,
+    MLd(`det${mt(withCol(d.A, i0, d.b))}/${par(d.d)}`),
+  );
+  const bT = d.b.map(qt);
+  return matLines({
+    skill: CR, level,
+    prompt: `Résous par la règle de Cramer le système ${sysML(d.A.map((r) => r.map(qt)), bT, names)}, de matrice A = ${MLm(d.A)} : calcule det A, puis ${asked.map(xName).join(' et ')}.`,
+    start: `det${mt(d.A)}`, judge: detJudge, mode: modeOf(level), script, hints, subgoals: CR_SUB, keys: ['mat', 'calc'],
+    key: `${CR}:${mt(d.A)}:${bT.join(',')}:${asked.join('')}`, tapActions: level === 3 ? 'menu' : null, fallback: d.fallback,
+  });
+}
+
+// x₂ in terms of a: A = [[a, p], [r, s]] (or a in another cell).
+function crParamData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const [p, r, s] = [nz(rng, -3, 4), nz(rng, -3, 4), nz(rng, -3, 4)];
+    const b = [rng.int(-5, 6), nz(rng, -5, 6)];
+    // det A = s·a − p·r ; x₂ = (a·b₂ − r·b₁)/(s·a − p·r)
+    const num = [-r * b[0], b[1]];
+    const den = [-p * r, s];
+    if (num[0] * den[1] === num[1] * den[0]) continue;
+    const rowNum = b[0] * s - b[1] * r; // det[[b₁, b₂], [r, s]]
+    if (rowNum === 0) continue;
+    return { p, r, s, b, num, den, rowNum };
+  }
+  return { p: 2, r: 1, s: 4, b: [7, 9], num: [-7, 9], den: [-2, 4], rowNum: 19, fallback: true };
+}
+
+function crParamItem(rng) {
+  const d = crParamData(rng);
+  const v = 'a';
+  const A = `[[a,${d.p}],[${d.r},${d.s}]]`;
+  const detT = lin(d.den[0], d.den[1], v);
+  const x2 = `(${lin(d.num[0], d.num[1], v)})/(${detT})`;
+  const root = q(-d.den[0], d.den[1]);
+  const script = [
+    { kind: 'eq', math: `a·${par(q(d.s))}-${par(q(d.p))}·${par(q(d.r))}`, subgoal: 'det', note: 'Diagonale moins antidiagonale' },
+    { kind: 'segment', html: `Pour a ≠ ${fq(root)}, det A ≠ 0 : x₂ = det A₂(b) / det A.`, ask: 'x₂ =', start: { math: 'x_2' }, judge: { kind: 'mat', vars: [v], expect: x2, trapValues: { l_cramer_row: [{ value: `(${d.rowNum})/(${detT})`, ctx: { i: 2 } }] } } },
+    { kind: 'eq', math: `det[[a,${d.b[0]}],[${d.r},${d.b[1]}]]/(${detT})`, subgoal: 'cramer', note: 'Colonne 2 remplacée par b' },
+    { kind: 'eq', math: x2, subgoal: 'cramer', note: '' },
+  ];
+  return matLines({
+    skill: CR, level: 5,
+    prompt: `Soit le système ${sysML([['a', String(d.p)], [String(d.r), String(d.s)]], d.b.map(String), XN(2), [v])}, de matrice A = ${ML(A, { vars: [v] })}. Calcule det A, puis x₂ en fonction de a.`,
+    start: `det${A}`, judge: { kind: 'det', vars: [v], target: 'factored' }, mode: 'free', script, hints: [], subgoals: CR_SUB, keys: ['mat', 'calc'],
+    key: `${CR}:param:${A}:${d.b.join(',')}`, fallback: d.fallback,
+  });
+}
+
+function crExam(rng, exam) {
+  const n = rng.pick([2, 3]);
+  const d = crData(n, rng);
+  const i = n === 2 ? 1 : rng.int(0, 2);
+  const names = XN(n);
+  const Ai = withCol(d.A, i, d.b);
+  const x1 = d.x[(i + 1) % n];
+  return mcqDistinct({
+    skill: CR, level: 4, key: `mcq:${mt(d.A)}:${d.b.map(qt).join(',')}:${i}`, exam: examTag({ exam }),
+    prompt: `Soit le système ${sysML(d.A.map((r) => r.map(qt)), d.b.map(qt), names)}. Par la règle de Cramer, que vaut ${xName(i)} ?`,
+    right: fq(d.x[i]),
+    wrongs: [{ html: fq(d.rowVals[i]), rule: 'l_cramer_row' }, { html: fq(MX.det(Ai)), rule: null }, { html: fq(x1), rule: null }],
+    fillers: [{ html: fq(d.x[i].neg()) }, { html: fq(d.x[i].add(1)) }, { html: fq(d.x[i].sub(2)) }],
+    solution: [{ html: `det A = ${fq(d.d)} ; ${xName(i)} = det${MLm(Ai)} / ${fq(d.d)} = ${fq(d.x[i])}`, note: `Colonne ${i + 1} remplacée par b` }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
   [COF]: (level, rng, profile, opts = {}) => (opts.exam ? cofExam(rng, opts.exam) : cofItem(level, rng)),
   [RO]: (level, rng, profile, opts = {}) => (opts.exam ? roExam(rng, opts.exam) : roItem(level, rng)),
   [PROPS]: (level, rng, profile, opts = {}) => (opts.exam ? propsExam(rng, opts.exam) : propsItem(level, rng)),
+  [AREA]: (level, rng, profile, opts = {}) => (opts.exam ? areaExam(rng, opts.exam) : areaItem(level, rng)),
+  [CR]: (level, rng, profile, opts = {}) => (opts.exam ? crExam(rng, opts.exam) : crItem(level, rng)),
 };
