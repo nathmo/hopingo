@@ -1356,6 +1356,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-int-estimate` — Encadrer une intégrale ; parité et moyenne
 - **Année** 13 · **Prérequis** `a1-int-direct`, `a1-fn-image` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-int-direct` : calculer l'intégrale de comparaison.
+- **Statut** : fait le 10 novembre 2026 (étape U2). L'encadrement passe par la monotonie : f′ (equiv), puis m et M comme valeurs (`definite`), puis m(b − a) et M(b − a), sans lignes d'inégalités ni `solset` ; gabarit (c) parité en lignes `definite` ; le gabarit « moyenne » (aₙ → 1) n'est qu'en vrai/faux ; le V/F « f bijective » est un QCM Vrai/Faux (aucun vérificateur de contre-exemple ne prend une fonction). L5 : le QCM d'examen.
 - **Intro** : si m ≤ f ≤ M sur [a ; b], alors `m(b − a) ≤ ∫ₐᵇ f ≤ M(b − a)` (théorème de la moyenne : la valeur moyenne est atteinte si f est continue). Si f est impaire, `∫₋ₐᵃ f = 0` ; si elle est paire, `∫₋ₐᵃ f = 2∫₀ᵃ f`. Pas besoin de primitive : e^(x²) n'en a pas d'élémentaire.
 - **Juge** : `solset` pour l'image de f sur [a ; b] ; `definite` `{value}` pour les bornes m(b − a), M(b − a) ; `mcq` pour l'encadrement final · **Forme finale** : encadrement juste, ou valeur par symétrie.
 - **Niveaux** :
@@ -1376,6 +1377,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-ftc` — Théorème fondamental ; dériver ∫ₐ^(g(x)) f(t) dt
 - **Année** 13 · **Prérequis** `a1-deriv-rules` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Pas de ligne « G(x) = F(x³) − F(1) » avec une fonction abstraite F : c'est une décision (L2, L3) ; L5 : deux bornes variables, puis G′(1) (`definite`), sans la limite par BH ni la tangente ; le V/F « ∫₀^|x| » est un QCM Vrai/Faux, et un V/F « sans la règle de chaîne » a un contre-exemple x (`refute`).
 - **Intro** : si f est continue, `F(x) = ∫ₐˣ f(t) dt` est dérivable et `F′ = f`. Avec des bornes variables : `d/dx ∫_{h(x)}^{g(x)} f(t) dt = f(g(x))·g′(x) − f(h(x))·h′(x)`. La variable d'intégration t est muette.
 - **Juge** : `equiv` `{target:'no-prime'}` · **Forme finale** : expression sans ∫ ni ′.
 - **Niveaux** :
@@ -1399,6 +1401,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-improper-calc` — Intégrale généralisée : calculer par une limite (bornes 0⁺, 1⁻, +∞)
 - **Année** 13 · **Prérequis** `a1-int-subst`, `a1-int-parts`, `a1-fn-limits` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-int-parts` : primitives par parties (x·e^(−x), Log x).
+- **Statut** : fait le 10 novembre 2026 (étape U2). Le repérage est une décision (méthode, ou couper en 0), pas une ligne `solset` ; une intégrale divergente s'écrit d'abord comme fonction de sa borne b ou ε (`equiv`), puis une limite (`limit`) ; le verdict de la convention 5 ouvre la partie « Conclusion », où l'on réécrit la valeur I ; L5 : le QCM d'examen ; les V/F à énoncé fixe sont des QCM Vrai/Faux.
 - **Intro** : on repère **chaque** point problème (borne infinie, f non bornée en une borne, ou **à l'intérieur**). On écrit `∫ de a⁺ à b = lim_{ε→a⁺} ∫_ε^b`, on calcule l'intégrale propre, puis la limite. Avec deux points problèmes, on coupe en deux et les deux morceaux doivent converger.
 - **Juge** : ligne de repérage (`solset` des points problèmes sur [a ; b]) ; `definite` `{value}` pour les lignes avec bornes 0⁺, 1⁻, +∞ (nœud `side`) ; `limit` pour la limite finale · **Forme finale** : valeur exacte, ou « diverge » avec la limite infinie.
 - **Niveaux** :
@@ -1422,6 +1425,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-improper-compare` — Convergence d'une intégrale généralisée par comparaison, sans la calculer
 - **Année** 13 · **Prérequis** `a1-improper-calc`, `a1-ser-compare` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). Le repérage et le choix de g sont des décisions (α tapé après le choix de g, `then`) ; chaque point est une limite de f(x)·(x − a)ᵅ (`limit`) ; le verdict de la convention 5 précède la limite qui justifie le dernier point (une décision ne peut venir qu'en tête d'une partie) ; les gabarits (c) 1/(x Log x) (calculé dans `a1-improper-calc`), (d) sin x/x², (e) xᵖe^(−x) et (f) 1/(2 + cosh x) ne sont qu'en V/F et QCM ; la valeur (L5) seulement pour (a) et (b) ; le V/F « pics » est un QCM Vrai/Faux ; la variante `open` est la partie (a) d'un problème rationnel (2 points).
 - **Intro** : références : `∫ de 0⁺ à 1 de dx/xᵅ` converge ⇔ **α < 1** ; `∫₁^∞ dx/xᵅ` converge ⇔ **α > 1**. Pour f ≥ 0, si `f(x)/g(x) → L ∈ ]0 ; +∞[` au point problème, même nature. On traite chaque point problème séparément (couper l'intervalle). Ne pas confondre avec les séries : f peut ne pas tendre vers 0 et ∫ converger quand même.
 - **Juge** : ligne de repérage (`solset`) ; décision « g = 1/(x − a)ᵅ » par point problème (saisie jugée par `limit` du quotient) ; verdict + critère (convention 5) · **Forme finale** : verdict global et α de chaque comparaison.
 - **Niveaux** :
@@ -1444,6 +1448,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-improper-rational` — Intégrale généralisée d'une fraction rationnelle (problème long)
 - **Année** 13 · **Prérequis** `a1-int-rational`, `a1-improper-compare`, `g0-horner` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Problème long sous forme d'item `lines` sans aide (le type `problem` arrive en U4), une partie par étape : convergence (`limit` de x²f, verdict de la convention 5), factorisation et DES dans une même partie (`equiv`, cible `partial-fractions`), primitive (`antideriv`), limite en +∞ (`limit` : une ligne qui écrit ∞ − ∞ reste « à réécrire », +∞ ou −∞ est diagnostiqué), valeur (`definite`) ; facteur irréductible (x + r)² + d avec d ∈ {1 ; 4} seulement (Arctg sans √2) ; pas de sauvegarde en cours d'item ; pas de barème par étape.
 - **Intro** : c'est le problème de 12 points de l'examen MT. (a) Convergence : `deg Q − deg P ≥ 2` ⇒ converge en +∞ (comparaison à 1/x²), et Q sans racine sur [a ; +∞[. (b) Valeur : DES, primitives (Log et Arctg), puis **regrouper les Log avant la limite** : `−2Log(x + 1) + Log(x² + 2x + 2) = Log((x² + 2x + 2)/(x + 1)²) → 0`.
 - **Juge** : type `problem` ; parties : (a) verdict + critère (convention 5) ; (b) `equiv` pour la factorisation et la DES, `antideriv` pour la primitive, `limit` pour la limite en +∞ (une ligne « Log(…) − Log(…) → » doit regrouper : `stay` si la ligne écrit ∞ − ∞), `definite` pour la valeur · **Forme finale** : verdict justifié et valeur exacte.
 - **Niveaux** :
@@ -1471,6 +1476,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-int-applications` — Applications : volumes, longueurs d'arc, aires de révolution
 - **Année** 13 · **Prérequis** `a1-int-subst`, `a1-int-hyper` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-int-subst` : changement de variable dans les intégrales de longueur et de volume.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Le choix de la formule est une décision aux niveaux 2 et 3 pour les longueurs et les aires (les volumes partent directement de π∫ f² dx) ; le gabarit aire de x³ sur [0 ; 1] n'est pas fait ; L5 et la variante `open` : une longueur ou une aire (cosh, sphère, x²/(8β) − β Log x), pas l'aire de sinh²x.
 - **Intro** : autour de l'axe Ox, pour y = f(x) sur [a ; b] : volume `V = π∫ₐᵇ f(x)² dx` ; longueur `L = ∫ₐᵇ √(1 + f′(x)²) dx` ; aire de révolution `A = 2π∫ₐᵇ |f(x)|·√(1 + f′(x)²) dx`. Les exercices sont construits pour que la racine se simplifie (cosh, carrés parfaits).
 - **Juge** : décision (quelle formule) ; `equiv` pour 1 + f′² simplifié ; `definite` `{value}` · **Forme finale** : valeur exacte (multiple de π, rationnel, Log).
 - **Niveaux** :
