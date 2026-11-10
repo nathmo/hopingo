@@ -595,7 +595,7 @@ function liConj(rng, to) {
   return {
     f, to, value, b, c,
     lines: [
-      E(`${wrapP(top)}/(√(${P})${plus ? '+' : '-'}x)`, 'Multiplier et diviser par la conjuguée', 'conj', 'conj'),
+      E(`(${top})/(√(${P})${plus ? '+' : '-'}x)`, 'Multiplier et diviser par la conjuguée', 'conj', 'conj'),
       E(`${wrapP(nTop)}/(${plus ? '' : '-'}√(${inner})${plus ? '+' : '-'}1)`, plus ? 'Diviser par x (x > 0)' : 'Diviser par x : x < 0, donc √(x²) = −x', 'simplify', 'divide'),
       E(N(value), 'Passer à la limite', 'limit', 'limit'),
     ],
@@ -708,7 +708,7 @@ function liItem(level, rng, opts = {}) {
   return linesItem({
     skill: LI, level, prompt: rng.pick([`Calcule ${MT(`lim(${d.f},x,${d.to})`)}.`, `Calcule la limite de f(x) = ${MT(d.f)} quand x → ${fr(d.to)}.`]),
     start: d.f, judge: level === 3 ? { ...LIM(d.to), menus: stepMenus(d.f, eqs, LI_CHOICES) } : LIM(d.to), mode: modeOf(level), script: lines,
-    hints: H(methodHint, `= ${MT(eqs[0].math)}`, `La limite vaut ${fr(N(d.value))}.`),
+    hints: H(methodHint, `= ${tmpl(blanked(eqs[0], d.holes[0]))}`, `= ${MT(eqs[0].math)}, et la limite vaut ${fr(N(d.value))}.`),
     subgoals: LI_SUB, keys: LKEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${LI}:${gab}:${level}:${d.f}:${d.to}`, exam: examOf(opts), fallback: d.fallback, expectedSec: 120,
   });

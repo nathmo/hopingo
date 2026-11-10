@@ -13,9 +13,10 @@ import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
 import { solutionSet, setToNode } from '../../cas/sets.js';
+import { templateOf } from '../../judges/lines.js';
 import { MT, linesItem, mcq, tableItem } from './kit.js';
 import {
-  V, q, N, nz, modeOf, H, E, NOTE, examOf, fr, blanked, partsItem, polyText, fromRoots, dPoly, iPoly, evalPoly, at, valueAt,
+  V, q, N, nz, modeOf, H, E, NOTE, examOf, fr, tpl, blanked, partsItem, polyText, fromRoots, dPoly, iPoly, evalPoly, at, valueAt,
   lin, factoredText, tangentText, tangentFinal, tangentCfg, tangentLines, pre,
 } from './analyse0-a-kit.js';
 
@@ -185,7 +186,7 @@ function svItem(level, rng, opts = {}) {
   const parts = svParts(d, level);
   return partsItem({
     skill: SV, level, parts, choices: SV_CHOICES, prompt: svPrompt(rng, d),
-    hints: H('Factorise f′, puis fais le tableau de signes : f croît où f′ > 0. Un extremum demande que f′ <b>change de signe</b>.', `f′(x) = ${MT(d.fac)}`, d.crit.map((c) => `en ${R(c.r)} : ${NATURE[c.kind]}, f(${R(c.r)}) = ${R(c.fr)}`).join(' ; ')),
+    hints: H('Factorise f′, puis fais le tableau de signes : f croît où f′ > 0. Un extremum demande que f′ <b>change de signe</b>.', `f′(x) = ${MT(templateOf(tpl(d.fac, [lin(d.crit.at(-1).r)])))}`, d.crit.map((c) => `en ${R(c.r)} : ${NATURE[c.kind]}, f(${R(c.r)}) = ${R(c.fr)}`).join(' ; ')),
     subgoals: SV_SUB, keys: KEYS, key: `${SV}:${level}:${d.f}`, exam: examOf(opts, 3), fallback: d.fallback, expectedSec: 60 + 40 * parts.length,
   });
 }
