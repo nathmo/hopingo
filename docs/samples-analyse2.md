@@ -7147,14 +7147,8 @@ En coordonnées polaires, D̃ = {(r, φ) : π/4 ≤ φ ≤ π/2, 0 ≤ r ≤ 3/s
   aides : Écris chaque inégalité avec x = r cos φ et y = r sin φ, puis dessine D. | C'est le triangle 0 ≤ x ≤ y ≤ 3 (r sin φ ≤ 3 veut dire y ≤ 3). | 0 ≤ x ≤ 3 ; x ≤ y ≤ 3
   pièges : a2_fubini_outer_var, a2_domain_curve_order
 
-D est la région bornée par y = x³ et y = x, avec x ≥ 0 : D = {(x, y) : y ≥ x³, y ≤ x, x ≥ 0}. Décris D en type I (x à l'extérieur), puis en type II (y à l'extérieur). D'abord, où les courbes se coupent-elles ? (x³ = x)
-  [free, suivre l'erreur]  x³ = x
-    = x = −1 ou x = 0 ou x = 1   ← Intersections
-  — Décris D en type I : x à l'extérieur.  [juge domain]  départ : y ≥ x³ ; y ≤ x ; x ≥ 0
-    = 0 ≤ x ≤ 1 ; x³ ≤ y ≤ x   ← Type I
-  — Décris D en type II : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 1 ; x³ ≤ y ≤ x
-    = 0 ≤ y ≤ 1 ; y ≤ x ≤ root(3,y)   ← Type II
-  aides : Dessine les courbes et trouve leurs points d'intersection. Les bornes extérieures sont des nombres. | x va de 0 à … ; y va de … à x | 0 ≤ x ≤ 1 ; x³ ≤ y ≤ x puis 0 ≤ y ≤ 1 ; y ≤ x ≤ root(3,y)
+D est la région bornée par x = √y, x = 0 et y = 4 : D = {(x, y) : x ≥ 0, x ≤ √y, y ≤ 4}. Écris les bornes de D en type II (y à l’extérieur).
+  [bornes typeII] → 0 ≤ y ≤ 4 ; 0 ≤ x ≤ √y
   pièges : a2_fubini_outer_var, a2_domain_curve_order
 
 ```
@@ -7162,27 +7156,27 @@ D est la région bornée par y = x³ et y = x, avec x ≥ 0 : D = {(x, y) : y �
 ### Niveau 5
 
 ```
-D est la région bornée par y = √x, y = 0 et x = 4. Laquelle de ces écritures est égale à ∫_{0}^{4} ∫_{0}^{√x} e^(x + y) dy dx ?
-  · ∫_{0}^{√x} ∫_{0}^{4} e^(x + y) dx dy [a2_fubini_outer_var]   · ∫_{0}^{2} ∫_{4}^{y²} e^(x + y) dx dy [a2_domain_curve_order]   · ∫_{0}^{4} ∫_{y²}^{4} e^(x + y) dx dy   ✔ ∫_{0}^{2} ∫_{y²}^{4} e^(x + y) dx dy
+D est la région bornée par les droites y = 0, y = 2x et x = 3. Laquelle de ces écritures est égale à ∫_{0}^{3} ∫_{0}^{2x} (x + y) dy dx ?
+  · ∫_{0}^{6} ∫_{3}^{y/2} (x + y) dx dy [a2_domain_curve_order]   ✔ ∫_{0}^{6} ∫_{y/2}^{3} (x + y) dx dy   · ∫_{0}^{3} ∫_{y/2}^{3} (x + y) dx dy   · ∫_{0}^{2x} ∫_{0}^{3} (x + y) dx dy [a2_fubini_outer_var]
   pièges : a2_domain_curve_order, a2_fubini_outer_var
 
-D est la région bornée par y = x² et y = −x + 2 : D = {(x, y) : y ≥ x², y ≤ −x + 2}. Laquelle de ces écritures est égale à ∬D x + y dx dy ?
-  · ∫_{−2}^{1} ∫_{−x + 2}^{x²} (x + y) dy dx [a2_domain_curve_order]   ✔ ∫_{−2}^{1} ∫_{x²}^{−x + 2} (x + y) dy dx   · ∫_{x²}^{−x + 2} ∫_{−2}^{1} (x + y) dx dy [a2_fubini_outer_var]   · ∫_{0}^{1} ∫_{x²}^{−x + 2} (x + y) dy dx
+D est la région bornée par les droites x = 0, x = 3y et y = 1. Laquelle de ces écritures est égale à ∫_{0}^{3} ∫_{x/3}^{1} y dy dx ?
+  · ∫_{0}^{3} ∫_{0}^{3y} y dx dy   · ∫_{x/3}^{1} ∫_{0}^{3} y dx dy [a2_fubini_outer_var]   ✔ ∫_{0}^{1} ∫_{0}^{3y} y dx dy   · ∫_{0}^{1} ∫_{3y}^{0} y dx dy [a2_domain_curve_order]
   pièges : a2_domain_curve_order, a2_fubini_outer_var
 
-D est la région bornée par le cercle x² + y² = 1 et l'axe Oy (x ≥ 0). Laquelle de ces écritures est égale à ∫_{−1}^{1} ∫_{0}^{√(1 − y²)} x dx dy ?
-  · ∫_{0}^{1} ∫_{√(1 − x²)}^{−√(1 − x²)} x dy dx [a2_domain_curve_order]   ✔ ∫_{0}^{1} ∫_{−√(1 − x²)}^{√(1 − x²)} x dy dx   · ∫_{−1}^{1} ∫_{0}^{√(1 − x²)} x dy dx [a2_fubini_swap_same]   · ∫_{0}^{√(1 − y²)} ∫_{−1}^{1} x dy dx [a2_fubini_outer_var]
-  pièges : a2_domain_curve_order, a2_fubini_outer_var, a2_fubini_swap_same
+D est la région bornée par les droites x = 0, x = 2y et y = 3. Laquelle de ces écritures est égale à ∫_{0}^{3} ∫_{0}^{2y} xy² dx dy ?
+  · ∫_{0}^{3} ∫_{x/2}^{3} xy² dy dx   · ∫_{0}^{6} ∫_{3}^{x/2} xy² dy dx [a2_domain_curve_order]   · ∫_{0}^{3} ∫_{0}^{2x} xy² dy dx [a2_fubini_swap_same]   ✔ ∫_{0}^{6} ∫_{x/2}^{3} xy² dy dx
+  pièges : a2_domain_curve_order, a2_fubini_swap_same
 
 ```
 
 ### Variantes d'examen
 
 ```
-D est la région bornée par le cercle x² + y² = 4 et l'axe Oy (x ≥ 0). Laquelle de ces écritures est égale à ∫_{−2}^{2} ∫_{0}^{√(4 − y²)} (x + y) dx dy ?
-  ✔ ∫_{0}^{2} ∫_{−√(4 − x²)}^{√(4 − x²)} (x + y) dy dx   · ∫_{−2}^{2} ∫_{−√(4 − x²)}^{√(4 − x²)} (x + y) dy dx   · ∫_{0}^{2} ∫_{√(4 − x²)}^{−√(4 − x²)} (x + y) dy dx [a2_domain_curve_order]   · ∫_{0}^{√(4 − y²)} ∫_{−2}^{2} (x + y) dy dx [a2_fubini_outer_var]
+D est la région bornée par x = y³ et x = y, avec y ≥ 0. Laquelle de ces écritures est égale à ∫_{0}^{1} ∫_{x}^{root(3,x)} x² dy dx ?
+  · ∫_{0}^{1} ∫_{y}^{y³} x² dx dy [a2_domain_curve_order]   · ∫_{x}^{root(3,x)} ∫_{0}^{1} x² dx dy [a2_fubini_outer_var]   · ∫_{0}^{1} ∫_{y}^{root(3,y)} x² dx dy [a2_fubini_swap_same]   ✔ ∫_{0}^{1} ∫_{y³}^{y} x² dx dy
   [examen mcq]
-  pièges : a2_fubini_outer_var, a2_domain_curve_order
+  pièges : a2_fubini_outer_var, a2_fubini_swap_same, a2_domain_curve_order
 
 ```
 
@@ -7193,34 +7187,34 @@ _Quand l'intégrale intérieure n'a pas de primitive : dessiner D et le décrire
 ### Niveau 1
 
 ```
-Calcule ∫_{0}^{1} ∫_{y}^{1} ye^(x³) dx dy. e^(x³) n'a pas de primitive élémentaire : change l'ordre d'intégration. Ici D = {(x, y) : 0 ≤ y ≤ 1, y ≤ x ≤ 1}. Décris D avec x à l'extérieur.
-  [guided]  0 ≤ y ≤ 1 ; y ≤ x ≤ 1
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x)   ← D dans l'autre ordre : x à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x} ye^(x³) dy dx
-    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} x²e^(x³)/2 dx)   ← Intégrale en y
-    = [e^(x³)/6]_{0}^{1}   ← Primitive
-    = e/6 − 1/6   ← Calculer
-  aides : e^(x³) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 1, y ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x
-  pièges : a2_fubini_swap_same, a2_fubini_outer_var
-
-Calcule ∫_{0}^{1} ∫_{root(3,y)}^{1} 1/(1 + x⁴) dx dy. 1/(1 + x⁴) n'a pas de primitive élémentaire : change l'ordre d'intégration. Ici D = {(x, y) : 0 ≤ y ≤ 1, root(3,y) ≤ x ≤ 1}. Décris D avec x à l'extérieur.
-  [guided]  0 ≤ y ≤ 1 ; root(3,y) ≤ x ≤ 1
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x³)   ← D dans l'autre ordre : x à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x³} 1/(1 + x⁴) dy dx
-    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} x³/(1 + x⁴) dx)   ← Intégrale en y
-    = [ln(1 + x⁴)/4]_{0}^{1}   ← Primitive
-    = ln(2)/4   ← Calculer
-  aides : 1/(1 + x⁴) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 1, root(3,y) ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x³
-  pièges : a2_fubini_swap_same, a2_fubini_outer_var
-
-Calcule ∫_{0}^{1} ∫_{y}^{1} y²/(1 + x⁴) dx dy. 1/(1 + x⁴) n'a pas de primitive élémentaire : change l'ordre d'intégration. Ici D = {(x, y) : 0 ≤ y ≤ 1, y ≤ x ≤ 1}. Décris D avec x à l'extérieur.
-  [guided]  0 ≤ y ≤ 1 ; y ≤ x ≤ 1
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x)   ← D dans l'autre ordre : x à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x} y²/(1 + x⁴) dy dx
-    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} x³/(3(1 + x⁴)) dx)   ← Intégrale en y
-    = [ln(1 + x⁴)/12]_{0}^{1}   ← Primitive
+Calcule ∫_{0}^{1} ∫_{x}^{1} x²/(1 + y⁴) dy dx. 1/(1 + y⁴) n'a pas de primitive élémentaire : change l'ordre d'intégration. Ici D = {(x, y) : 0 ≤ x ≤ 1, x ≤ y ≤ 1}. Décris D avec y à l'extérieur.
+  [guided]  0 ≤ x ≤ 1 ; x ≤ y ≤ 1
+    = 0 ≤ y ≤ 1 ; 0 ≤ x ≤ □   (trous : 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y)   ← D dans l'autre ordre : y à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y} x²/(1 + y⁴) dx dy
+    = ∫_{0}^{1} □ dy   (trous : ∫_{0}^{1} y³/(3(1 + y⁴)) dy)   ← Intégrale en x
+    = [ln(1 + y⁴)/12]_{0}^{1}   ← Primitive
     = ln(2)/12   ← Calculer
-  aides : 1/(1 + x⁴) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 1, y ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x
+  aides : 1/(1 + y⁴) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y
+  pièges : a2_fubini_swap_same, a2_fubini_outer_var
+
+Calcule ∫_{0}^{1} ∫_{x}^{1} e^(y²) dy dx. e^(y²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Ici D = {(x, y) : 0 ≤ x ≤ 1, x ≤ y ≤ 1}. Décris D avec y à l'extérieur.
+  [guided]  0 ≤ x ≤ 1 ; x ≤ y ≤ 1
+    = 0 ≤ y ≤ 1 ; 0 ≤ x ≤ □   (trous : 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y)   ← D dans l'autre ordre : y à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y} e^(y²) dx dy
+    = ∫_{0}^{1} □ dy   (trous : ∫_{0}^{1} ye^(y²) dy)   ← Intégrale en x
+    = [e^(y²)/2]_{0}^{1}   ← Primitive
+    = e/2 − 1/2   ← Calculer
+  aides : e^(y²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y
+  pièges : a2_fubini_swap_same, a2_fubini_outer_var
+
+Calcule ∫_{0}^{1} ∫_{x}^{1} 1/(1 + y⁴) dy dx. 1/(1 + y⁴) n'a pas de primitive élémentaire : change l'ordre d'intégration. Ici D = {(x, y) : 0 ≤ x ≤ 1, x ≤ y ≤ 1}. Décris D avec y à l'extérieur.
+  [guided]  0 ≤ x ≤ 1 ; x ≤ y ≤ 1
+    = 0 ≤ y ≤ 1 ; 0 ≤ x ≤ □   (trous : 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y)   ← D dans l'autre ordre : y à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y} 1/(1 + y⁴) dx dy
+    = ∫_{0}^{1} □ dy   (trous : ∫_{0}^{1} y/(1 + y⁴) dy)   ← Intégrale en x
+    = [arctan(y²)/2]_{0}^{1}   ← Primitive
+    = π/8   ← Calculer
+  aides : 1/(1 + y⁴) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
 ```
@@ -7228,40 +7222,40 @@ Calcule ∫_{0}^{1} ∫_{y}^{1} y²/(1 + x⁴) dx dy. 1/(1 + x⁴) n'a pas de pr
 ### Niveau 2
 
 ```
-Calcule ∫_{0}^{1} ∫_{x}^{1} x³/(1 + y⁵) dy dx. 1/(1 + y⁵) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
-  [guided]  ∫_{0}^{1} ∫_{x}^{1} x³/(1 + y⁵) dy dx
-    = 0 ≤ x ≤ 1 ; x ≤ y ≤ 1   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 1 ; x ≤ y ≤ 1
-    = 0 ≤ y ≤ □ ; 0 ≤ x ≤ □   (trous : 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y)   ← D dans l'autre ordre : y à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y} x³/(1 + y⁵) dx dy
-    = ∫_{0}^{1} y⁴/(4(1 + y⁵)) dy   ← Intégrale en x
-    = [□]_{0}^{1}   (trous : [ln(1 + y⁵)/20]_{0}^{1})   ← Primitive
-    = ln(2)/20   ← Calculer
-  aides : 1/(1 + y⁵) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y
+Calcule ∫_{0}^{√(π)} ∫_{x}^{√(π)} sin(y²) dy dx. sin(y²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
+  [guided]  ∫_{0}^{√(π)} ∫_{x}^{√(π)} sin(y²) dy dx
+    = 0 ≤ x ≤ √(π) ; x ≤ y ≤ √(π)   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ √(π) ; x ≤ y ≤ √(π)
+    = 0 ≤ y ≤ □ ; 0 ≤ x ≤ □   (trous : 0 ≤ y ≤ √(π) ; 0 ≤ x ≤ y)   ← D dans l'autre ordre : y à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{√(π)} ∫_{0}^{y} sin(y²) dx dy
+    = ∫_{0}^{√(π)} ysin(y²) dy   ← Intégrale en x
+    = [□]_{0}^{√(π)}   (trous : [−cos(y²)/2]_{0}^{√(π)})   ← Primitive
+    = 1   ← Calculer
+  aides : sin(y²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ √(π), x ≤ y ≤ √(π)}. | y va de 0 à √(π) ; x va de 0 à … | 0 ≤ y ≤ √(π) ; 0 ≤ x ≤ y
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
-Calcule ∫_{0}^{1} ∫_{x}^{1} x/(1 + y³) dy dx. 1/(1 + y³) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
-  [guided]  ∫_{0}^{1} ∫_{x}^{1} x/(1 + y³) dy dx
-    = 0 ≤ x ≤ 1 ; x ≤ y ≤ 1   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 1 ; x ≤ y ≤ 1
-    = 0 ≤ y ≤ □ ; 0 ≤ x ≤ □   (trous : 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y)   ← D dans l'autre ordre : y à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y} x/(1 + y³) dx dy
-    = ∫_{0}^{1} y²/(2(1 + y³)) dy   ← Intégrale en x
-    = [□]_{0}^{1}   (trous : [ln(1 + y³)/6]_{0}^{1})   ← Primitive
-    = ln(2)/6   ← Calculer
-  aides : 1/(1 + y³) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y
+Calcule ∫_{0}^{√(π/2)} ∫_{y}^{√(π/2)} cos(x²) dx dy. cos(x²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (y à l'extérieur, comme dans l'intégrale).
+  [guided]  ∫_{0}^{√(π/2)} ∫_{y}^{√(π/2)} cos(x²) dx dy
+    = 0 ≤ y ≤ √(π/2) ; y ≤ x ≤ √(π/2)   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : x à l'extérieur.  [juge domain]  départ : 0 ≤ y ≤ √(π/2) ; y ≤ x ≤ √(π/2)
+    = 0 ≤ x ≤ □ ; 0 ≤ y ≤ □   (trous : 0 ≤ x ≤ √(π/2) ; 0 ≤ y ≤ x)   ← D dans l'autre ordre : x à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{√(π/2)} ∫_{0}^{x} cos(x²) dy dx
+    = ∫_{0}^{√(π/2)} xcos(x²) dx   ← Intégrale en y
+    = [□]_{0}^{√(π/2)}   (trous : [sin(x²)/2]_{0}^{√(π/2)})   ← Primitive
+    = 1/2   ← Calculer
+  aides : cos(x²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ √(π/2), y ≤ x ≤ √(π/2)}. | x va de 0 à √(π/2) ; y va de 0 à … | 0 ≤ x ≤ √(π/2) ; 0 ≤ y ≤ x
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
-Calcule ∫_{0}^{2} ∫_{y/2}^{1} e^(x²) dx dy. e^(x²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (y à l'extérieur, comme dans l'intégrale).
-  [guided]  ∫_{0}^{2} ∫_{y/2}^{1} e^(x²) dx dy
-    = 0 ≤ y ≤ 2 ; y/2 ≤ x ≤ 1   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : x à l'extérieur.  [juge domain]  départ : 0 ≤ y ≤ 2 ; y/2 ≤ x ≤ 1
-    = 0 ≤ x ≤ □ ; 0 ≤ y ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2x)   ← D dans l'autre ordre : x à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{2x} e^(x²) dy dx
-    = ∫_{0}^{1} 2xe^(x²) dx   ← Intégrale en y
-    = [□]_{0}^{1}   (trous : [e^(x²)]_{0}^{1})   ← Primitive
-    = e − 1   ← Calculer
-  aides : e^(x²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 2, y/2 ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2x
+Calcule ∫_{0}^{1} ∫_{√x}^{1} e^(y³) dy dx. e^(y³) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
+  [guided]  ∫_{0}^{1} ∫_{√x}^{1} e^(y³) dy dx
+    = 0 ≤ x ≤ 1 ; √x ≤ y ≤ 1   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 1 ; √x ≤ y ≤ 1
+    = 0 ≤ y ≤ □ ; 0 ≤ x ≤ □   (trous : 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y²)   ← D dans l'autre ordre : y à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y²} e^(y³) dx dy
+    = ∫_{0}^{1} y²e^(y³) dy   ← Intégrale en x
+    = [□]_{0}^{1}   (trous : [e^(y³)/3]_{0}^{1})   ← Primitive
+    = e/3 − 1/3   ← Calculer
+  aides : e^(y³) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, √x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y²
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
 ```
@@ -7269,52 +7263,22 @@ Calcule ∫_{0}^{2} ∫_{y/2}^{1} e^(x²) dx dy. e^(x²) n'a pas de primitive é
 ### Niveau 3
 
 ```
-Calcule ∫_{0}^{1} ∫_{√x}^{1} e^(y³) dy dx. e^(y³) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
-  [tap, suivre l'erreur, menu steps]  ∫_{0}^{1} ∫_{√x}^{1} e^(y³) dy dx
-    ? Comment calculer ? · Intégrer tel quel, d'abord en y / ✔ Changer l'ordre d'intégration
-    = 0 ≤ x ≤ 1 ; √x ≤ y ≤ 1   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 1 ; √x ≤ y ≤ 1
-    = 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y²   ← D dans l'autre ordre : y à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y²} e^(y³) dx dy
-    = ∫_{0}^{1} y²e^(y³) dy   ← Intégrale en x
-    = [e^(y³)/3]_{0}^{1}   ← Primitive
-    = e/3 − 1/3   ← Calculer
-  aides : e^(y³) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, √x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y²
+Calcule ∫_{0}^{2} ∫_{y/2}^{1} e^(x²) dx dy. e^(x²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (y à l'extérieur, comme dans l'intégrale).
+  [tap, suivre l'erreur, menu steps]  ∫_{0}^{2} ∫_{y/2}^{1} e^(x²) dx dy
+    ? Comment calculer ? · Intégrer tel quel, d'abord en x / ✔ Changer l'ordre d'intégration
+    = 0 ≤ y ≤ 2 ; y/2 ≤ x ≤ 1   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : x à l'extérieur.  [juge domain]  départ : 0 ≤ y ≤ 2 ; y/2 ≤ x ≤ 1
+    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2x   ← D dans l'autre ordre : x à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{2x} e^(x²) dy dx
+    = ∫_{0}^{1} 2xe^(x²) dx   ← Intégrale en y
+    = [e^(x²)]_{0}^{1}   ← Primitive
+    = e − 1   ← Calculer
+  aides : e^(x²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 2, y/2 ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2x
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
-Calcule ∫_{0}^{1} ∫_{x}^{1} e^(y²) dy dx. e^(y²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
-  [tap, suivre l'erreur, menu steps]  ∫_{0}^{1} ∫_{x}^{1} e^(y²) dy dx
-    ? Comment calculer ? · Intégrer tel quel, d'abord en y / ✔ Changer l'ordre d'intégration
-    = 0 ≤ x ≤ 1 ; x ≤ y ≤ 1   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 1 ; x ≤ y ≤ 1
-    = 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y   ← D dans l'autre ordre : y à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y} e^(y²) dx dy
-    = ∫_{0}^{1} ye^(y²) dy   ← Intégrale en x
-    = [e^(y²)/2]_{0}^{1}   ← Primitive
-    = e/2 − 1/2   ← Calculer
-  aides : e^(y²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y
-  pièges : a2_fubini_swap_same, a2_fubini_outer_var
-
-Calcule ∫_{0}^{√(π/2)} ∫_{x}^{√(π/2)} cos(y²) dy dx. cos(y²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
-  [tap, suivre l'erreur, menu steps]  ∫_{0}^{√(π/2)} ∫_{x}^{√(π/2)} cos(y²) dy dx
-    ? Comment calculer ? · Intégrer tel quel, d'abord en y / ✔ Changer l'ordre d'intégration
-    = 0 ≤ x ≤ √(π/2) ; x ≤ y ≤ √(π/2)   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ √(π/2) ; x ≤ y ≤ √(π/2)
-    = 0 ≤ y ≤ √(π/2) ; 0 ≤ x ≤ y   ← D dans l'autre ordre : y à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{√(π/2)} ∫_{0}^{y} cos(y²) dx dy
-    = ∫_{0}^{√(π/2)} ycos(y²) dy   ← Intégrale en x
-    = [sin(y²)/2]_{0}^{√(π/2)}   ← Primitive
-    = 1/2   ← Calculer
-  aides : cos(y²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ √(π/2), x ≤ y ≤ √(π/2)}. | y va de 0 à √(π/2) ; x va de 0 à … | 0 ≤ y ≤ √(π/2) ; 0 ≤ x ≤ y
-  pièges : a2_fubini_swap_same, a2_fubini_outer_var
-
-```
-
-### Niveau 4
-
-```
 Calcule ∫_{0}^{2} ∫_{x}^{2} e^(y²) dy dx. e^(y²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
-  [free, suivre l'erreur]  ∫_{0}^{2} ∫_{x}^{2} e^(y²) dy dx
+  [tap, suivre l'erreur, menu steps]  ∫_{0}^{2} ∫_{x}^{2} e^(y²) dy dx
+    ? Comment calculer ? · Intégrer tel quel, d'abord en y / ✔ Changer l'ordre d'intégration
     = 0 ≤ x ≤ 2 ; x ≤ y ≤ 2   ← Lire D sur les bornes
   — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 2 ; x ≤ y ≤ 2
     = 0 ≤ y ≤ 2 ; 0 ≤ x ≤ y   ← D dans l'autre ordre : y à l'extérieur
@@ -7325,28 +7289,58 @@ Calcule ∫_{0}^{2} ∫_{x}^{2} e^(y²) dy dx. e^(y²) n'a pas de primitive él�
   aides : e^(y²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 2, x ≤ y ≤ 2}. | y va de 0 à 2 ; x va de 0 à … | 0 ≤ y ≤ 2 ; 0 ≤ x ≤ y
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
-Calcule ∫_{0}^{1} ∫_{x}^{1} 1/(1 + y⁴) dy dx. 1/(1 + y⁴) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
-  [free, suivre l'erreur]  ∫_{0}^{1} ∫_{x}^{1} 1/(1 + y⁴) dy dx
-    = 0 ≤ x ≤ 1 ; x ≤ y ≤ 1   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 1 ; x ≤ y ≤ 1
-    = 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y   ← D dans l'autre ordre : y à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{y} 1/(1 + y⁴) dx dy
-    = ∫_{0}^{1} y/(1 + y⁴) dy   ← Intégrale en x
-    = [arctan(y²)/2]_{0}^{1}   ← Primitive
-    = π/8   ← Calculer
-  aides : 1/(1 + y⁴) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 1, x ≤ y ≤ 1}. | y va de 0 à 1 ; x va de 0 à … | 0 ≤ y ≤ 1 ; 0 ≤ x ≤ y
+Calcule ∫_{0}^{2} ∫_{x}^{2} e^(y²) dy dx. e^(y²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
+  [tap, suivre l'erreur, menu steps]  ∫_{0}^{2} ∫_{x}^{2} e^(y²) dy dx
+    ? Comment calculer ? · Intégrer tel quel, d'abord en y / ✔ Changer l'ordre d'intégration
+    = 0 ≤ x ≤ 2 ; x ≤ y ≤ 2   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ 2 ; x ≤ y ≤ 2
+    = 0 ≤ y ≤ 2 ; 0 ≤ x ≤ y   ← D dans l'autre ordre : y à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{2} ∫_{0}^{y} e^(y²) dx dy
+    = ∫_{0}^{2} ye^(y²) dy   ← Intégrale en x
+    = [e^(y²)/2]_{0}^{2}   ← Primitive
+    = e⁴/2 − 1/2   ← Calculer
+  aides : e^(y²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ 2, x ≤ y ≤ 2}. | y va de 0 à 2 ; x va de 0 à … | 0 ≤ y ≤ 2 ; 0 ≤ x ≤ y
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
-Calcule ∫_{0}^{1} ∫_{root(3,y)}^{1} 1/(1 + x⁴) dx dy. 1/(1 + x⁴) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (y à l'extérieur, comme dans l'intégrale).
-  [free, suivre l'erreur]  ∫_{0}^{1} ∫_{root(3,y)}^{1} 1/(1 + x⁴) dx dy
-    = 0 ≤ y ≤ 1 ; root(3,y) ≤ x ≤ 1   ← Lire D sur les bornes
-  — Décris D dans l'autre ordre : x à l'extérieur.  [juge domain]  départ : 0 ≤ y ≤ 1 ; root(3,y) ≤ x ≤ 1
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x³   ← D dans l'autre ordre : x à l'extérieur
-  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x³} 1/(1 + x⁴) dy dx
-    = ∫_{0}^{1} x³/(1 + x⁴) dx   ← Intégrale en y
-    = [ln(1 + x⁴)/4]_{0}^{1}   ← Primitive
-    = ln(2)/4   ← Calculer
-  aides : 1/(1 + x⁴) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 1, root(3,y) ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x³
+```
+
+### Niveau 4
+
+```
+Calcule ∫_{0}^{1} ∫_{y}^{1} y³/(1 + x⁵) dx dy. 1/(1 + x⁵) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (y à l'extérieur, comme dans l'intégrale).
+  [free, suivre l'erreur]  ∫_{0}^{1} ∫_{y}^{1} y³/(1 + x⁵) dx dy
+    = 0 ≤ y ≤ 1 ; y ≤ x ≤ 1   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : x à l'extérieur.  [juge domain]  départ : 0 ≤ y ≤ 1 ; y ≤ x ≤ 1
+    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x   ← D dans l'autre ordre : x à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x} y³/(1 + x⁵) dy dx
+    = ∫_{0}^{1} x⁴/(4(1 + x⁵)) dx   ← Intégrale en y
+    = [ln(1 + x⁵)/20]_{0}^{1}   ← Primitive
+    = ln(2)/20   ← Calculer
+  aides : 1/(1 + x⁵) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 1, y ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x
+  pièges : a2_fubini_swap_same, a2_fubini_outer_var
+
+Calcule ∫_{0}^{√(π/2)} ∫_{x}^{√(π/2)} cos(y²) dy dx. cos(y²) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (x à l'extérieur, comme dans l'intégrale).
+  [free, suivre l'erreur]  ∫_{0}^{√(π/2)} ∫_{x}^{√(π/2)} cos(y²) dy dx
+    = 0 ≤ x ≤ √(π/2) ; x ≤ y ≤ √(π/2)   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : y à l'extérieur.  [juge domain]  départ : 0 ≤ x ≤ √(π/2) ; x ≤ y ≤ √(π/2)
+    = 0 ≤ y ≤ √(π/2) ; 0 ≤ x ≤ y   ← D dans l'autre ordre : y à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{√(π/2)} ∫_{0}^{y} cos(y²) dx dy
+    = ∫_{0}^{√(π/2)} ycos(y²) dy   ← Intégrale en x
+    = [sin(y²)/2]_{0}^{√(π/2)}   ← Primitive
+    = 1/2   ← Calculer
+  aides : cos(y²) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ x ≤ √(π/2), x ≤ y ≤ √(π/2)}. | y va de 0 à √(π/2) ; x va de 0 à … | 0 ≤ y ≤ √(π/2) ; 0 ≤ x ≤ y
+  pièges : a2_fubini_swap_same, a2_fubini_outer_var
+
+Calcule ∫_{0}^{1} ∫_{y}^{1} y²/(1 + x⁴) dx dy. 1/(1 + x⁴) n'a pas de primitive élémentaire : change l'ordre d'intégration. Écris d'abord D avec ses inégalités (y à l'extérieur, comme dans l'intégrale).
+  [free, suivre l'erreur]  ∫_{0}^{1} ∫_{y}^{1} y²/(1 + x⁴) dx dy
+    = 0 ≤ y ≤ 1 ; y ≤ x ≤ 1   ← Lire D sur les bornes
+  — Décris D dans l'autre ordre : x à l'extérieur.  [juge domain]  départ : 0 ≤ y ≤ 1 ; y ≤ x ≤ 1
+    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x   ← D dans l'autre ordre : x à l'extérieur
+  — Calcule l'intégrale dans le nouvel ordre :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x} y²/(1 + x⁴) dy dx
+    = ∫_{0}^{1} x³/(3(1 + x⁴)) dx   ← Intégrale en y
+    = [ln(1 + x⁴)/12]_{0}^{1}   ← Primitive
+    = ln(2)/12   ← Calculer
+  aides : 1/(1 + x⁴) n'a pas de primitive : change l'ordre. Dessine D = {0 ≤ y ≤ 1, y ≤ x ≤ 1}. | x va de 0 à 1 ; y va de 0 à … | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ x
   pièges : a2_fubini_swap_same, a2_fubini_outer_var
 
 ```
@@ -7354,27 +7348,27 @@ Calcule ∫_{0}^{1} ∫_{root(3,y)}^{1} 1/(1 + x⁴) dx dy. 1/(1 + x⁴) n'a pas
 ### Niveau 5
 
 ```
-1/(1 + y⁴) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{1} ∫_{x}^{1} x²/(1 + y⁴) dy dx ?
-  · ∫_{x}^{1} ∫_{0}^{1} x²/(1 + y⁴) dx dy [a2_fubini_outer_var]   · ∫_{0}^{1} ∫_{y}^{0} x²/(1 + y⁴) dx dy [a2_domain_curve_order]   · ∫_{0}^{1} ∫_{y}^{1} x²/(1 + y⁴) dx dy [a2_fubini_swap_same]   ✔ ∫_{0}^{1} ∫_{0}^{y} x²/(1 + y⁴) dx dy
-  pièges : a2_fubini_outer_var, a2_domain_curve_order, a2_fubini_swap_same
-
-e^(x²) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{2} ∫_{y/2}^{1} e^(x²) dx dy ?
-  · ∫_{0}^{1} ∫_{2x}^{0} e^(x²) dy dx [a2_domain_curve_order]   · ∫_{0}^{2} ∫_{x/2}^{1} e^(x²) dy dx [a2_fubini_swap_same]   ✔ ∫_{0}^{1} ∫_{0}^{2x} e^(x²) dy dx   · ∫_{y/2}^{1} ∫_{0}^{2} e^(x²) dy dx [a2_fubini_outer_var]
-  pièges : a2_fubini_swap_same, a2_domain_curve_order, a2_fubini_outer_var
-
-1/(1 + y³) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{1} ∫_{x}^{1} x/(1 + y³) dy dx ?
-  · ∫_{x}^{1} ∫_{0}^{1} x/(1 + y³) dx dy [a2_fubini_outer_var]   ✔ ∫_{0}^{1} ∫_{0}^{y} x/(1 + y³) dx dy   · ∫_{0}^{1} ∫_{y}^{1} x/(1 + y³) dx dy [a2_fubini_swap_same]   · ∫_{0}^{1} ∫_{y}^{0} x/(1 + y³) dx dy [a2_domain_curve_order]
+sin(x²) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{√(π/2)} ∫_{y}^{√(π/2)} sin(x²) dx dy ?
+  · ∫_{0}^{√(π/2)} ∫_{x}^{0} sin(x²) dy dx [a2_domain_curve_order]   · ∫_{y}^{√(π/2)} ∫_{0}^{√(π/2)} sin(x²) dy dx [a2_fubini_outer_var]   · ∫_{0}^{√(π/2)} ∫_{x}^{√(π/2)} sin(x²) dy dx [a2_fubini_swap_same]   ✔ ∫_{0}^{√(π/2)} ∫_{0}^{x} sin(x²) dy dx
   pièges : a2_domain_curve_order, a2_fubini_outer_var, a2_fubini_swap_same
+
+cos(x²) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{√(π/2)} ∫_{y}^{√(π/2)} cos(x²) dx dy ?
+  · ∫_{y}^{√(π/2)} ∫_{0}^{√(π/2)} cos(x²) dy dx [a2_fubini_outer_var]   · ∫_{0}^{√(π/2)} ∫_{x}^{√(π/2)} cos(x²) dy dx [a2_fubini_swap_same]   · ∫_{0}^{√(π/2)} ∫_{x}^{0} cos(x²) dy dx [a2_domain_curve_order]   ✔ ∫_{0}^{√(π/2)} ∫_{0}^{x} cos(x²) dy dx
+  pièges : a2_domain_curve_order, a2_fubini_swap_same, a2_fubini_outer_var
+
+e^(y³) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{1} ∫_{√x}^{1} e^(y³) dy dx ?
+  · ∫_{√x}^{1} ∫_{0}^{1} e^(y³) dx dy [a2_fubini_outer_var]   ✔ ∫_{0}^{1} ∫_{0}^{y²} e^(y³) dx dy   · ∫_{0}^{1} ∫_{√y}^{1} e^(y³) dx dy [a2_fubini_swap_same]   · ∫_{0}^{1} ∫_{y²}^{0} e^(y³) dx dy [a2_domain_curve_order]
+  pièges : a2_fubini_outer_var, a2_domain_curve_order, a2_fubini_swap_same
 
 ```
 
 ### Variantes d'examen
 
 ```
-e^(x²) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{2} ∫_{y}^{2} e^(x²) dx dy ?
-  · ∫_{y}^{2} ∫_{0}^{2} e^(x²) dy dx [a2_fubini_outer_var]   · ∫_{0}^{2} ∫_{x}^{0} e^(x²) dy dx [a2_domain_curve_order]   · ∫_{0}^{2} ∫_{x}^{2} e^(x²) dy dx [a2_fubini_swap_same]   ✔ ∫_{0}^{2} ∫_{0}^{x} e^(x²) dy dx
+e^(y²) n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ∫_{0}^{2} ∫_{x}^{2} e^(y²) dy dx ?
+  · ∫_{x}^{2} ∫_{0}^{2} e^(y²) dx dy [a2_fubini_outer_var]   ✔ ∫_{0}^{2} ∫_{0}^{y} e^(y²) dx dy   · ∫_{0}^{2} ∫_{y}^{2} e^(y²) dx dy [a2_fubini_swap_same]   · ∫_{0}^{2} ∫_{y}^{0} e^(y²) dx dy [a2_domain_curve_order]
   [examen mcq]
-  pièges : a2_fubini_swap_same, a2_fubini_outer_var, a2_domain_curve_order
+  pièges : a2_domain_curve_order, a2_fubini_outer_var, a2_fubini_swap_same
 
 ```
 
@@ -7385,28 +7379,28 @@ _z entre deux surfaces, puis la projection décrite comme en 2D._
 ### Niveau 1
 
 ```
-Calcule ID = ∭D yz dV, où D est le tétraèdre x, y, z ≥ 0, x + y + z ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x + y + z ≤ 1}. Les bornes sont 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y.
+Calcule ID = ∭D z dV, où D est le solide au-dessus du rectangle [0 ; 1] × [0 ; 2] et sous le plan z = 2 + 2x + y : D = {(x, y, z) : 0 ≤ x ≤ 1, 0 ≤ y ≤ 2, z ≥ 0, z ≤ 2 + 2x + y}. Les bornes sont 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2 ; 0 ≤ z ≤ 2 + 2x + y.
   [guided]  I_D
-    = ∫_{0}^{1} ∫_{0}^{1 − x} □ dy dx   (trous : ∫_{0}^{1} ∫_{0}^{1 − x} y(1 − x − y)²/2 dy dx)   ← Intégrale en z
-    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} (1 − x)⁴/24 dx)   ← Intégrale en y
-    = 1/120   ← Intégrale en x
-  aides : En z : z va du sol au plan x + y + z = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y, puis ∫_{0}^{1} ∫_{0}^{1 − x} y(1 − x − y)²/2 dy dx | = ∫_{0}^{1} (1 − x)⁴/24 dx = 1/120
+    = ∫_{0}^{1} ∫_{0}^{2} □ dy dx   (trous : ∫_{0}^{1} ∫_{0}^{2} (2 + 2x + y)²/2 dy dx)   ← Intégrale en z
+    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} (4x² + 12x + 28/3) dx)   ← Intégrale en y
+    = 50/3   ← Intégrale en x
+  aides : En z : z va de 0 au plan z = 2 + 2x + y ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2 ; 0 ≤ z ≤ 2 + 2x + y, puis ∫_{0}^{1} ∫_{0}^{2} (2 + 2x + y)²/2 dy dx | = ∫_{0}^{1} (4x² + 12x + 28/3) dx = 50/3
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D x dV, où D est le tétraèdre x, y, z ≥ 0, x + y/2 + z/3 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x + y/2 + z/3 ≤ 1}. Les bornes sont 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2 − 2x ; 0 ≤ z ≤ 3 − 3x − 3y/2.
+Calcule ID = ∭D z dV, où D est le solide au-dessus du rectangle [0 ; 2] × [0 ; 2] et sous le plan z = 1 + x + y : D = {(x, y, z) : 0 ≤ x ≤ 2, 0 ≤ y ≤ 2, z ≥ 0, z ≤ 1 + x + y}. Les bornes sont 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 2 ; 0 ≤ z ≤ 1 + x + y.
   [guided]  I_D
-    = ∫_{0}^{1} ∫_{0}^{2 − 2x} □ dy dx   (trous : ∫_{0}^{1} ∫_{0}^{2 − 2x} x(3 − 3x − 3y/2) dy dx)   ← Intégrale en z
-    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} 3x(1 − x)² dx)   ← Intégrale en y
-    = 1/4   ← Intégrale en x
-  aides : En z : z va du sol au plan x + y/2 + z/3 = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2 − 2x ; 0 ≤ z ≤ 3 − 3x − 3y/2, puis ∫_{0}^{1} ∫_{0}^{2 − 2x} x(3 − 3x − 3y/2) dy dx | = ∫_{0}^{1} 3x(1 − x)² dx = 1/4
+    = ∫_{0}^{2} ∫_{0}^{2} □ dy dx   (trous : ∫_{0}^{2} ∫_{0}^{2} (1 + x + y)²/2 dy dx)   ← Intégrale en z
+    = ∫_{0}^{2} □ dx   (trous : ∫_{0}^{2} (x² + 4x + 13/3) dx)   ← Intégrale en y
+    = 58/3   ← Intégrale en x
+  aides : En z : z va de 0 au plan z = 1 + x + y ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 2 ; 0 ≤ z ≤ 1 + x + y, puis ∫_{0}^{2} ∫_{0}^{2} (1 + x + y)²/2 dy dx | = ∫_{0}^{2} (x² + 4x + 13/3) dx = 58/3
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D z² dV, où D est le prisme de hauteur 1 sur le triangle x, y ≥ 0, x/3 + y/2 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x/3 + y/2 ≤ 1, z ≥ 0, z ≤ 1}. Les bornes sont 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 2 − 2x/3 ; 0 ≤ z ≤ 1.
+Calcule ID = ∭D  dV, où D est le solide au-dessus du rectangle [0 ; 1] × [0 ; 2] et sous le plan z = 1 + 2x + y : D = {(x, y, z) : 0 ≤ x ≤ 1, 0 ≤ y ≤ 2, z ≥ 0, z ≤ 1 + 2x + y}. Les bornes sont 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2 ; 0 ≤ z ≤ 1 + 2x + y.
   [guided]  I_D
-    = ∫_{0}^{3} ∫_{0}^{2 − 2x/3} □ dy dx   (trous : ∫_{0}^{3} ∫_{0}^{2 − 2x/3} 1/3 dy dx)   ← Intégrale en z
-    = ∫_{0}^{3} □ dx   (trous : ∫_{0}^{3} (2/3)(1 − x/3) dx)   ← Intégrale en y
-    = 1   ← Intégrale en x
-  aides : En z : z va de 0 à 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 2 − 2x/3 ; 0 ≤ z ≤ 1, puis ∫_{0}^{3} ∫_{0}^{2 − 2x/3} 1/3 dy dx | = ∫_{0}^{3} (2/3)(1 − x/3) dx = 1
+    = ∫_{0}^{1} ∫_{0}^{2} (1 + 2x + y) dy dx   ← Intégrale en z
+    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} (4x + 4) dx)   ← Intégrale en y
+    = 6   ← Intégrale en x
+  aides : En z : z va de 0 au plan z = 1 + 2x + y ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 2 ; 0 ≤ z ≤ 1 + 2x + y, puis ∫_{0}^{1} ∫_{0}^{2} (1 + 2x + y) dy dx | = ∫_{0}^{1} (4x + 4) dx = 6
   pièges : a2_fubini_outer_var
 
 ```
@@ -7414,34 +7408,34 @@ Calcule ID = ∭D z² dV, où D est le prisme de hauteur 1 sur le triangle x, y 
 ### Niveau 2
 
 ```
-Calcule ID = ∭D y dV, où D est le prisme de hauteur 1 sur le triangle x, y ≥ 0, x/2 + y ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x/2 + y ≤ 1, z ≥ 0, z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [guided]  x ≥ 0 ; y ≥ 0 ; x/2 + y ≤ 1 ; z ≥ 0 ; z ≤ 1
-    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 − x/2 ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 − x/2 ; 0 ≤ z ≤ 1)   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{2} ∫_{0}^{1 − x/2} ∫_{0}^{1} y dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{2} ∫_{0}^{1 − x/2} y dy dx   ← Intégrale en z
-    = ∫_{0}^{2} □ dx   (trous : ∫_{0}^{2} (1 − x/2)²/2 dx)   ← Intégrale en y
-    = 1/3   ← Intégrale en x
-  aides : En z : z va de 0 à 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 − x/2 ; 0 ≤ z ≤ 1, puis ∫_{0}^{2} ∫_{0}^{1 − x/2} y dy dx | = ∫_{0}^{2} (1 − x/2)²/2 dx = 1/3
+Calcule ID = ∭D  dV, où D est le tétraèdre x, y, z ≥ 0, x + y + z ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x + y + z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [guided]  x ≥ 0 ; y ≥ 0 ; z ≥ 0 ; x + y + z ≤ 1
+    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y)   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{1} ∫_{0}^{1 − x} ∫_{0}^{1 − x − y} 1 dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{1} ∫_{0}^{1 − x} (1 − x − y) dy dx   ← Intégrale en z
+    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} (1 − x)²/2 dx)   ← Intégrale en y
+    = 1/6   ← Intégrale en x
+  aides : En z : z va du sol au plan x + y + z = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y, puis ∫_{0}^{1} ∫_{0}^{1 − x} (1 − x − y) dy dx | = ∫_{0}^{1} (1 − x)²/2 dx = 1/6
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D y dV, où D est le prisme de hauteur 1 sur le triangle x, y ≥ 0, x + y/3 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x + y/3 ≤ 1, z ≥ 0, z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [guided]  x ≥ 0 ; y ≥ 0 ; x + y/3 ≤ 1 ; z ≥ 0 ; z ≤ 1
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x ; 0 ≤ z ≤ 1)   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{1} ∫_{0}^{3 − 3x} ∫_{0}^{1} y dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{1} ∫_{0}^{3 − 3x} y dy dx   ← Intégrale en z
-    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} (9/2)(1 − x)² dx)   ← Intégrale en y
-    = 3/2   ← Intégrale en x
-  aides : En z : z va de 0 à 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x ; 0 ≤ z ≤ 1, puis ∫_{0}^{1} ∫_{0}^{3 − 3x} y dy dx | = ∫_{0}^{1} (9/2)(1 − x)² dx = 3/2
+Calcule ID = ∭D x dV, où D est le solide au-dessus du rectangle [0 ; 1] × [0 ; 3] et sous le plan z = 3 + y : D = {(x, y, z) : 0 ≤ x ≤ 1, 0 ≤ y ≤ 3, z ≥ 0, z ≤ 3 + y}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [guided]  0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 ; z ≥ 0 ; z ≤ 3 + y
+    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 ; 0 ≤ z ≤ 3 + y)   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{1} ∫_{0}^{3} ∫_{0}^{3 + y} x dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{1} ∫_{0}^{3} x(3 + y) dy dx   ← Intégrale en z
+    = ∫_{0}^{1} □ dx   (trous : ∫_{0}^{1} 27x/2 dx)   ← Intégrale en y
+    = 27/4   ← Intégrale en x
+  aides : En z : z va de 0 au plan z = 3 + y ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 ; 0 ≤ z ≤ 3 + y, puis ∫_{0}^{1} ∫_{0}^{3} x(3 + y) dy dx | = ∫_{0}^{1} 27x/2 dx = 27/4
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D z² dV, où D est le prisme de hauteur 3 sur le triangle x, y ≥ 0, x/3 + y/3 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x/3 + y/3 ≤ 1, z ≥ 0, z ≤ 3}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [guided]  x ≥ 0 ; y ≥ 0 ; x/3 + y/3 ≤ 1 ; z ≥ 0 ; z ≤ 3
-    = 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 3 − x ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 3 − x ; 0 ≤ z ≤ 3)   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{3} ∫_{0}^{3 − x} ∫_{0}^{3} z² dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{3} ∫_{0}^{3 − x} 9 dy dx   ← Intégrale en z
-    = ∫_{0}^{3} □ dx   (trous : ∫_{0}^{3} 27(1 − x/3) dx)   ← Intégrale en y
-    = 81/2   ← Intégrale en x
-  aides : En z : z va de 0 à 3 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 3 − x ; 0 ≤ z ≤ 3, puis ∫_{0}^{3} ∫_{0}^{3 − x} 9 dy dx | = ∫_{0}^{3} 27(1 − x/3) dx = 81/2
+Calcule ID = ∭D z² dV, où D est le prisme de hauteur 3 sur le triangle x, y ≥ 0, x/2 + y/2 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x/2 + y/2 ≤ 1, z ≥ 0, z ≤ 3}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [guided]  x ≥ 0 ; y ≥ 0 ; x/2 + y/2 ≤ 1 ; z ≥ 0 ; z ≤ 3
+    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 2 − x ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 2 − x ; 0 ≤ z ≤ 3)   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{2} ∫_{0}^{2 − x} ∫_{0}^{3} z² dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{2} ∫_{0}^{2 − x} 9 dy dx   ← Intégrale en z
+    = ∫_{0}^{2} □ dx   (trous : ∫_{0}^{2} 18(1 − x/2) dx)   ← Intégrale en y
+    = 18   ← Intégrale en x
+  aides : En z : z va de 0 à 3 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 2 − x ; 0 ≤ z ≤ 3, puis ∫_{0}^{2} ∫_{0}^{2 − x} 9 dy dx | = ∫_{0}^{2} 18(1 − x/2) dx = 18
   pièges : a2_fubini_outer_var
 
 ```
@@ -7460,26 +7454,26 @@ Calcule ID = ∭D y dV, où D est le tétraèdre x, y, z ≥ 0, x + y + z ≤ 1 
   aides : En z : z va du sol au plan x + y + z = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y, puis ∫_{0}^{1} ∫_{0}^{1 − x} y(1 − x − y) dy dx | = ∫_{0}^{1} (1 − x)³/6 dx = 1/24
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D z dV, où D est le solide au-dessus du rectangle [0 ; 2] × [0 ; 1] et sous le plan z = 2 + x : D = {(x, y, z) : 0 ≤ x ≤ 2, 0 ≤ y ≤ 1, z ≥ 0, z ≤ 2 + x}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [tap, suivre l'erreur, menu steps]  0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 ; z ≥ 0 ; z ≤ 2 + x
-    ? Quelle variable à l'intérieur ? ✔ z : z va de 0 au plan z = 2 + x / ✔ x
-    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 ; 0 ≤ z ≤ 2 + x   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{2} ∫_{0}^{1} ∫_{0}^{2 + x} z dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{2} ∫_{0}^{1} (2 + x)²/2 dy dx   ← Intégrale en z
-    = ∫_{0}^{2} (x²/2 + 2x + 2) dx   ← Intégrale en y
-    = 28/3   ← Intégrale en x
-  aides : En z : z va de 0 au plan z = 2 + x ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 ; 0 ≤ z ≤ 2 + x, puis ∫_{0}^{2} ∫_{0}^{1} (2 + x)²/2 dy dx | = ∫_{0}^{2} (x²/2 + 2x + 2) dx = 28/3
+Calcule ID = ∭D  dV, où D est le solide au-dessus du rectangle [0 ; 2] × [0 ; 3] et sous le plan z = 1 + x : D = {(x, y, z) : 0 ≤ x ≤ 2, 0 ≤ y ≤ 3, z ≥ 0, z ≤ 1 + x}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [tap, suivre l'erreur, menu steps]  0 ≤ x ≤ 2 ; 0 ≤ y ≤ 3 ; z ≥ 0 ; z ≤ 1 + x
+    ? Quelle variable à l'intérieur ? ✔ z : z va de 0 au plan z = 1 + x / ✔ x
+    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 3 ; 0 ≤ z ≤ 1 + x   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{2} ∫_{0}^{3} ∫_{0}^{1 + x} 1 dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{2} ∫_{0}^{3} (1 + x) dy dx   ← Intégrale en z
+    = ∫_{0}^{2} (3x + 3) dx   ← Intégrale en y
+    = 12   ← Intégrale en x
+  aides : En z : z va de 0 au plan z = 1 + x ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 3 ; 0 ≤ z ≤ 1 + x, puis ∫_{0}^{2} ∫_{0}^{3} (1 + x) dy dx | = ∫_{0}^{2} (3x + 3) dx = 12
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D z dV, où D est le tétraèdre x, y, z ≥ 0, x + y + z ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x + y + z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [tap, suivre l'erreur, menu steps]  x ≥ 0 ; y ≥ 0 ; z ≥ 0 ; x + y + z ≤ 1
-    ? Quelle variable à l'intérieur ? ✔ z : z va du sol au plan x + y + z = 1 / ✔ x
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{1} ∫_{0}^{1 − x} ∫_{0}^{1 − x − y} z dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{1} ∫_{0}^{1 − x} (1 − x − y)²/2 dy dx   ← Intégrale en z
-    = ∫_{0}^{1} (1 − x)³/6 dx   ← Intégrale en y
-    = 1/24   ← Intégrale en x
-  aides : En z : z va du sol au plan x + y + z = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y, puis ∫_{0}^{1} ∫_{0}^{1 − x} (1 − x − y)²/2 dy dx | = ∫_{0}^{1} (1 − x)³/6 dx = 1/24
+Calcule ID = ∭D  dV, où D est le tétraèdre x, y, z ≥ 0, x/2 + y + z ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x/2 + y + z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [tap, suivre l'erreur, menu steps]  x ≥ 0 ; y ≥ 0 ; z ≥ 0 ; x/2 + y + z ≤ 1
+    ? Quelle variable à l'intérieur ? ✔ z : z va du sol au plan x/2 + y + z = 1 / ✔ x
+    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 − x/2 ; 0 ≤ z ≤ 1 − x/2 − y   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{2} ∫_{0}^{1 − x/2} ∫_{0}^{1 − x/2 − y} 1 dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{2} ∫_{0}^{1 − x/2} (1 − x/2 − y) dy dx   ← Intégrale en z
+    = ∫_{0}^{2} (1 − x/2)²/2 dx   ← Intégrale en y
+    = 1/3   ← Intégrale en x
+  aides : En z : z va du sol au plan x/2 + y + z = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 1 − x/2 ; 0 ≤ z ≤ 1 − x/2 − y, puis ∫_{0}^{2} ∫_{0}^{1 − x/2} (1 − x/2 − y) dy dx | = ∫_{0}^{2} (1 − x/2)²/2 dx = 1/3
   pièges : a2_fubini_outer_var
 
 ```
@@ -7487,34 +7481,34 @@ Calcule ID = ∭D z dV, où D est le tétraèdre x, y, z ≥ 0, x + y + z ≤ 1 
 ### Niveau 4
 
 ```
-Calcule ID = ∭D z dV, où D est le tétraèdre x, y, z ≥ 0, x + y/3 + z/3 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x + y/3 + z/3 ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [free, suivre l'erreur]  x ≥ 0 ; y ≥ 0 ; z ≥ 0 ; x + y/3 + z/3 ≤ 1
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x ; 0 ≤ z ≤ 3 − 3x − y   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{1} ∫_{0}^{3 − 3x} ∫_{0}^{3 − 3x − y} z dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{1} ∫_{0}^{3 − 3x} (3 − 3x − y)²/2 dy dx   ← Intégrale en z
-    = ∫_{0}^{1} (9/2)(1 − x)³ dx   ← Intégrale en y
-    = 9/8   ← Intégrale en x
-  aides : En z : z va du sol au plan x + y/3 + z/3 = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x ; 0 ≤ z ≤ 3 − 3x − y, puis ∫_{0}^{1} ∫_{0}^{3 − 3x} (3 − 3x − y)²/2 dy dx | = ∫_{0}^{1} (9/2)(1 − x)³ dx = 9/8
+Calcule ID = ∭D xy dV, où D est le prisme de hauteur 2 sur le triangle x, y ≥ 0, x/2 + y/2 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x/2 + y/2 ≤ 1, z ≥ 0, z ≤ 2}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [free, suivre l'erreur]  x ≥ 0 ; y ≥ 0 ; x/2 + y/2 ≤ 1 ; z ≥ 0 ; z ≤ 2
+    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 2 − x ; 0 ≤ z ≤ 2   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{2} ∫_{0}^{2 − x} ∫_{0}^{2} xy dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{2} ∫_{0}^{2 − x} 2xy dy dx   ← Intégrale en z
+    = ∫_{0}^{2} 4x(1 − x/2)² dx   ← Intégrale en y
+    = 4/3   ← Intégrale en x
+  aides : En z : z va de 0 à 2 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 2 − x ; 0 ≤ z ≤ 2, puis ∫_{0}^{2} ∫_{0}^{2 − x} 2xy dy dx | = ∫_{0}^{2} 4x(1 − x/2)² dx = 4/3
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D xy dV, où D est le tétraèdre x, y, z ≥ 0, x + y + z ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x + y + z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [free, suivre l'erreur]  x ≥ 0 ; y ≥ 0 ; z ≥ 0 ; x + y + z ≤ 1
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{1} ∫_{0}^{1 − x} ∫_{0}^{1 − x − y} xy dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{1} ∫_{0}^{1 − x} xy(1 − x − y) dy dx   ← Intégrale en z
-    = ∫_{0}^{1} x(1 − x)³/6 dx   ← Intégrale en y
-    = 1/120   ← Intégrale en x
-  aides : En z : z va du sol au plan x + y + z = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 1 − x ; 0 ≤ z ≤ 1 − x − y, puis ∫_{0}^{1} ∫_{0}^{1 − x} xy(1 − x − y) dy dx | = ∫_{0}^{1} x(1 − x)³/6 dx = 1/120
+Calcule ID = ∭D x dV, où D est le prisme de hauteur 1 sur le triangle x, y ≥ 0, x/2 + y/3 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x/2 + y/3 ≤ 1, z ≥ 0, z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [free, suivre l'erreur]  x ≥ 0 ; y ≥ 0 ; x/2 + y/3 ≤ 1 ; z ≥ 0 ; z ≤ 1
+    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 3 − 3x/2 ; 0 ≤ z ≤ 1   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{2} ∫_{0}^{3 − 3x/2} ∫_{0}^{1} x dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{2} ∫_{0}^{3 − 3x/2} x dy dx   ← Intégrale en z
+    = ∫_{0}^{2} 3x(1 − x/2) dx   ← Intégrale en y
+    = 2   ← Intégrale en x
+  aides : En z : z va de 0 à 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 2 ; 0 ≤ y ≤ 3 − 3x/2 ; 0 ≤ z ≤ 1, puis ∫_{0}^{2} ∫_{0}^{3 − 3x/2} x dy dx | = ∫_{0}^{2} 3x(1 − x/2) dx = 2
   pièges : a2_fubini_outer_var
 
-Calcule ID = ∭D y dV, où D est le tétraèdre x, y, z ≥ 0, x/3 + y + z ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, z ≥ 0, x/3 + y + z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
-  [free, suivre l'erreur]  x ≥ 0 ; y ≥ 0 ; z ≥ 0 ; x/3 + y + z ≤ 1
-    = 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 1 − x/3 ; 0 ≤ z ≤ 1 − x/3 − y   ← z entre deux surfaces ; projection
-  — Calcule ID = ∫_{0}^{3} ∫_{0}^{1 − x/3} ∫_{0}^{1 − x/3 − y} y dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
-    = ∫_{0}^{3} ∫_{0}^{1 − x/3} y(1 − x/3 − y) dy dx   ← Intégrale en z
-    = ∫_{0}^{3} (1 − x/3)³/6 dx   ← Intégrale en y
-    = 1/8   ← Intégrale en x
-  aides : En z : z va du sol au plan x/3 + y + z = 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 1 − x/3 ; 0 ≤ z ≤ 1 − x/3 − y, puis ∫_{0}^{3} ∫_{0}^{1 − x/3} y(1 − x/3 − y) dy dx | = ∫_{0}^{3} (1 − x/3)³/6 dx = 1/8
+Calcule ID = ∭D z dV, où D est le prisme de hauteur 1 sur le triangle x, y ≥ 0, x/3 + y/3 ≤ 1 : D = {(x, y, z) : x ≥ 0, y ≥ 0, x/3 + y/3 ≤ 1, z ≥ 0, z ≤ 1}. Écris d'abord les bornes : x à l'extérieur, puis y, puis z.
+  [free, suivre l'erreur]  x ≥ 0 ; y ≥ 0 ; x/3 + y/3 ≤ 1 ; z ≥ 0 ; z ≤ 1
+    = 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 3 − x ; 0 ≤ z ≤ 1   ← z entre deux surfaces ; projection
+  — Calcule ID = ∫_{0}^{3} ∫_{0}^{3 − x} ∫_{0}^{1} z dz dy dx, de l'intérieur vers l'extérieur (d'abord en z) :  [juge definite]  départ : I_D
+    = ∫_{0}^{3} ∫_{0}^{3 − x} 1/2 dy dx   ← Intégrale en z
+    = ∫_{0}^{3} (3/2)(1 − x/3) dx   ← Intégrale en y
+    = 9/4   ← Intégrale en x
+  aides : En z : z va de 0 à 1 ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D. | 0 ≤ x ≤ 3 ; 0 ≤ y ≤ 3 − x ; 0 ≤ z ≤ 1, puis ∫_{0}^{3} ∫_{0}^{3 − x} 1/2 dy dx | = ∫_{0}^{3} (3/2)(1 − x/3) dx = 9/4
   pièges : a2_fubini_outer_var
 
 ```
@@ -7523,15 +7517,15 @@ Calcule ID = ∭D y dV, où D est le tétraèdre x, y, z ≥ 0, x/3 + y + z ≤ 
 
 ```
 Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta x² dV ?
-  · a⁶/60   · (a − x)⁵/60 [a2_fubini_outer_var]   · a⁵/12   ✔ a⁵/60
+  ✔ a⁵/60   · a⁶/60   · a⁵/12   · (a − x)⁵/60 [a2_fubini_outer_var]
   pièges : a2_fubini_outer_var
 
-Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta z² dV ?
-  ✔ a⁵/60   · a⁵/12   · (a − x)⁵/60 [a2_fubini_outer_var]   · a⁵/30
+Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta  dV ?
+  · a³/12   · a³/2   ✔ a³/6   · (a − x)³/6 [a2_fubini_outer_var]
   pièges : a2_fubini_outer_var
 
-Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta xz dV ?
-  ✔ a⁵/120   · a⁴/120   · a⁵/24   · (a − x)⁵/120 [a2_fubini_outer_var]
+Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta z dV ?
+  · (a − x)⁴/24 [a2_fubini_outer_var]   · a⁴/12   ✔ a⁴/24   · a⁵/24
   pièges : a2_fubini_outer_var
 
 ```
@@ -7539,8 +7533,8 @@ Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta 
 ### Variantes d'examen
 
 ```
-Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta x² dV ?
-  · (a − x)⁵/60 [a2_fubini_outer_var]   · a⁶/60   · a⁵/12   ✔ a⁵/60
+Soit a > 0 et Ta = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭Ta xyz dV ?
+  · a⁵/720   · a⁶/120   ✔ a⁶/720   · (a − x)⁶/720 [a2_fubini_outer_var]
   [examen mcq]
   pièges : a2_fubini_outer_var
 
@@ -7553,9 +7547,9 @@ _D̃ en (u, v), det ∂(u, v)/∂(x, y), puis dx dy = du dv/|det ∂(u, v)/∂(x
 ### Niveau 1
 
 ```
-Calcule ID = ∬D xy dx dy, où D = {(x, y) : 2 ≤ xy ≤ 5, x ≤ y ≤ 2x, x > 0}. Pose u = xy, v = y/x : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [guided]  2 ≤ xy ≤ 5 ; x ≤ y ≤ 2x ; x > 0
-    = 2 ≤ u ≤ □ ; 1 ≤ v ≤ □   (trous : 2 ≤ u ≤ 5 ; 1 ≤ v ≤ 2)   ← D̃ : les inégalités de D, avec u et v
+Calcule ID = ∬D y/x dx dy, où D = {(x, y) : 1 ≤ xy ≤ 3, x ≤ y ≤ 2x, x > 0}. Pose u = xy, v = y/x : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [guided]  1 ≤ xy ≤ 3 ; x ≤ y ≤ 2x ; x > 0
+    = 1 ≤ u ≤ □ ; 1 ≤ v ≤ □   (trous : 1 ≤ u ≤ 3 ; 1 ≤ v ≤ 2)   ← D̃ : les inégalités de D, avec u et v
   — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (xy)·∂/∂y (y/x) − ∂/∂y (xy)·∂/∂x (y/x)
     = y·1/x − x·(□)   (trous : y·1/x − x·(−y/x²))   ← Dérivées partielles
     = 2y/x   ← Simplifier
@@ -7563,29 +7557,15 @@ Calcule ID = ∬D xy dx dy, où D = {(x, y) : 2 ≤ xy ≤ 5, x ≤ y ≤ 2x, x 
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
     = 1/(□)   (trous : 1/(2v))   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{2}^{5} ∫_{1}^{2} □ dv du   (trous : ∫_{2}^{5} ∫_{1}^{2} u/(2v) dv du)   ← L'intégrale sur D̃
-    = ∫_{2}^{5} u du·(∫_{1}^{2} 1/(2v) dv)   ← Séparer
-    = 21ln(2)/4   ← Calculer
-  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 2 ≤ u ≤ 5 ; 1 ≤ v ≤ 2 ; I = ∫_{2}^{5} ∫_{1}^{2} u/(2v) dv du
+    = ∫_{1}^{3} ∫_{1}^{2} □ dv du   (trous : ∫_{1}^{3} ∫_{1}^{2} 1/2 dv du)   ← L'intégrale sur D̃
+    = ∫_{1}^{3} 1/2 du·(∫_{1}^{2} 1 dv)   ← Séparer
+    = 1   ← Calculer
+  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 1 ≤ u ≤ 3 ; 1 ≤ v ≤ 2 ; I = ∫_{1}^{3} ∫_{1}^{2} 1/2 dv du
   pièges : a2_jacobian_inverse
 
-Calcule ID = ∬D (x − y)² dx dy, où D = {(x, y) : 1 ≤ x − y ≤ 2, −1 ≤ x + 2y ≤ 1}. Pose u = x − y, v = x + 2y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [guided]  1 ≤ x − y ≤ 2 ; −1 ≤ x + 2y ≤ 1
-    = 1 ≤ u ≤ □ ; −1 ≤ v ≤ □   (trous : 1 ≤ u ≤ 2 ; −1 ≤ v ≤ 1)   ← D̃ : les inégalités de D, avec u et v
-  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x − y)·∂/∂y (x + 2y) − ∂/∂y (x − y)·∂/∂x (x + 2y)
-    = 3   ← Dérivées partielles
-  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
-    = 1/□   (trous : 1/3)   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
-  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{1}^{2} ∫_{−1}^{1} □ dv du   (trous : ∫_{1}^{2} ∫_{−1}^{1} u²/3 dv du)   ← L'intégrale sur D̃
-    = ∫_{1}^{2} u²/3 du·(∫_{−1}^{1} 1 dv)   ← Séparer
-    = 14/9   ← Calculer
-  aides : Les inégalités de D parlent de x − y et de x + 2y : avec u = x − y, v = x + 2y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 3, donc dx dy = du dv/|3| | 1 ≤ u ≤ 2 ; −1 ≤ v ≤ 1 ; I = ∫_{1}^{2} ∫_{−1}^{1} u²/3 dv du
-  pièges : a2_jacobian_inverse
-
-Calcule ID = ∬D y² dx dy, où D = {(x, y) : 2 ≤ xy ≤ 3, x ≤ y ≤ 3x, x > 0}. Pose u = xy, v = y/x : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [guided]  2 ≤ xy ≤ 3 ; x ≤ y ≤ 3x ; x > 0
-    = 2 ≤ u ≤ □ ; 1 ≤ v ≤ □   (trous : 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 3)   ← D̃ : les inégalités de D, avec u et v
+Calcule ID = ∬D xy dx dy, où D = {(x, y) : 2 ≤ xy ≤ 3, x ≤ y ≤ 2x, x > 0}. Pose u = xy, v = y/x : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [guided]  2 ≤ xy ≤ 3 ; x ≤ y ≤ 2x ; x > 0
+    = 2 ≤ u ≤ □ ; 1 ≤ v ≤ □   (trous : 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 2)   ← D̃ : les inégalités de D, avec u et v
   — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (xy)·∂/∂y (y/x) − ∂/∂y (xy)·∂/∂x (y/x)
     = y·1/x − x·(□)   (trous : y·1/x − x·(−y/x²))   ← Dérivées partielles
     = 2y/x   ← Simplifier
@@ -7593,10 +7573,26 @@ Calcule ID = ∬D y² dx dy, où D = {(x, y) : 2 ≤ xy ≤ 3, x ≤ y ≤ 3x, x
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
     = 1/(□)   (trous : 1/(2v))   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{2}^{3} ∫_{1}^{3} □ dv du   (trous : ∫_{2}^{3} ∫_{1}^{3} u/2 dv du)   ← L'intégrale sur D̃
-    = ∫_{2}^{3} u/2 du·(∫_{1}^{3} 1 dv)   ← Séparer
-    = 5/2   ← Calculer
-  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 3 ; I = ∫_{2}^{3} ∫_{1}^{3} u/2 dv du
+    = ∫_{2}^{3} ∫_{1}^{2} □ dv du   (trous : ∫_{2}^{3} ∫_{1}^{2} u/(2v) dv du)   ← L'intégrale sur D̃
+    = ∫_{2}^{3} u du·(∫_{1}^{2} 1/(2v) dv)   ← Séparer
+    = 5ln(2)/4   ← Calculer
+  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 2 ; I = ∫_{2}^{3} ∫_{1}^{2} u/(2v) dv du
+  pièges : a2_jacobian_inverse
+
+Calcule ID = ∬D x²y² dx dy, où D = {(x, y) : 1 ≤ xy ≤ 2, x ≤ y ≤ 3x, x > 0}. Pose u = xy, v = y/x : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [guided]  1 ≤ xy ≤ 2 ; x ≤ y ≤ 3x ; x > 0
+    = 1 ≤ u ≤ □ ; 1 ≤ v ≤ □   (trous : 1 ≤ u ≤ 2 ; 1 ≤ v ≤ 3)   ← D̃ : les inégalités de D, avec u et v
+  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (xy)·∂/∂y (y/x) − ∂/∂y (xy)·∂/∂x (y/x)
+    = y·1/x − x·(□)   (trous : y·1/x − x·(−y/x²))   ← Dérivées partielles
+    = 2y/x   ← Simplifier
+    = 2v   ← Simplifier
+  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
+    = 1/(□)   (trous : 1/(2v))   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
+  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
+    = ∫_{1}^{2} ∫_{1}^{3} □ dv du   (trous : ∫_{1}^{2} ∫_{1}^{3} u²/(2v) dv du)   ← L'intégrale sur D̃
+    = ∫_{1}^{2} u² du·(∫_{1}^{3} 1/(2v) dv)   ← Séparer
+    = 7ln(3)/6   ← Calculer
+  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 1 ≤ u ≤ 2 ; 1 ≤ v ≤ 3 ; I = ∫_{1}^{2} ∫_{1}^{3} u²/(2v) dv du
   pièges : a2_jacobian_inverse
 
 ```
@@ -7604,48 +7600,46 @@ Calcule ID = ∬D y² dx dy, où D = {(x, y) : 2 ≤ xy ≤ 3, x ≤ y ≤ 3x, x
 ### Niveau 2
 
 ```
-Calcule ID = ∬D y/x dx dy, où D = {(x, y) : 1 ≤ xy ≤ 4, x ≤ y ≤ 3x, x > 0}. Pose u = xy, v = y/x : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [guided]  1 ≤ xy ≤ 4 ; x ≤ y ≤ 3x ; x > 0
-    = 1 ≤ u ≤ 4 ; □ ≤ v ≤ 3   (trous : 1 ≤ u ≤ 4 ; 1 ≤ v ≤ 3)   ← D̃ : les inégalités de D, avec u et v
-  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (xy)·∂/∂y (y/x) − ∂/∂y (xy)·∂/∂x (y/x)
-    = y·1/x − x·(−y/x²)   ← Dérivées partielles
-    = 2y/x   ← Simplifier
-    = 2v   ← Simplifier
+Calcule ID = ∬D (x + y)(x − y) dx dy, où D = {(x, y) : 1 ≤ x + y ≤ 3, 0 ≤ x − y ≤ 2}. Pose u = x + y, v = x − y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [guided]  1 ≤ x + y ≤ 3 ; 0 ≤ x − y ≤ 2
+    = 1 ≤ u ≤ 3 ; □ ≤ v ≤ 2   (trous : 1 ≤ u ≤ 3 ; 0 ≤ v ≤ 2)   ← D̃ : les inégalités de D, avec u et v
+  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x + y)·∂/∂y (x − y) − ∂/∂y (x + y)·∂/∂x (x − y)
+    = −2   ← Dérivées partielles
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
-    = 1/(2v)   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
+    = 1/2   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{1}^{4} ∫_{1}^{3} □ dv du   (trous : ∫_{1}^{4} ∫_{1}^{3} 1/2 dv du)   ← L'intégrale sur D̃
-    = ∫_{1}^{4} 1/2 du·(∫_{1}^{3} 1 dv)   ← Séparer
-    = 3   ← Calculer
-  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 1 ≤ u ≤ 4 ; 1 ≤ v ≤ 3 ; I = ∫_{1}^{4} ∫_{1}^{3} 1/2 dv du
+    = ∫_{1}^{3} ∫_{0}^{2} □ dv du   (trous : ∫_{1}^{3} ∫_{0}^{2} uv/2 dv du)   ← L'intégrale sur D̃
+    = ∫_{1}^{3} u/2 du·(∫_{0}^{2} v dv)   ← Séparer
+    = 4   ← Calculer
+  aides : Les inégalités de D parlent de x + y et de x − y : avec u = x + y, v = x − y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = −2, donc dx dy = du dv/|−2| | 1 ≤ u ≤ 3 ; 0 ≤ v ≤ 2 ; I = ∫_{1}^{3} ∫_{0}^{2} uv/2 dv du
   pièges : a2_jacobian_inverse
 
-Calcule ID = ∬D (x + 2y)(x − y) dx dy, où D = {(x, y) : 0 ≤ x + 2y ≤ 1, −1 ≤ x − y ≤ 0}. Pose u = x + 2y, v = x − y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [guided]  0 ≤ x + 2y ≤ 1 ; −1 ≤ x − y ≤ 0
-    = 0 ≤ u ≤ 1 ; □ ≤ v ≤ 0   (trous : 0 ≤ u ≤ 1 ; −1 ≤ v ≤ 0)   ← D̃ : les inégalités de D, avec u et v
-  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x + 2y)·∂/∂y (x − y) − ∂/∂y (x + 2y)·∂/∂x (x − y)
-    = −3   ← Dérivées partielles
-  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
-    = 1/3   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
-  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{0}^{1} ∫_{−1}^{0} □ dv du   (trous : ∫_{0}^{1} ∫_{−1}^{0} uv/3 dv du)   ← L'intégrale sur D̃
-    = ∫_{0}^{1} u/3 du·(∫_{−1}^{0} v dv)   ← Séparer
-    = −1/12   ← Calculer
-  aides : Les inégalités de D parlent de x + 2y et de x − y : avec u = x + 2y, v = x − y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = −3, donc dx dy = du dv/|−3| | 0 ≤ u ≤ 1 ; −1 ≤ v ≤ 0 ; I = ∫_{0}^{1} ∫_{−1}^{0} uv/3 dv du
-  pièges : a2_jacobian_inverse
-
-Calcule ID = ∬D (x − y)(x + y) dx dy, où D = {(x, y) : 0 ≤ x − y ≤ 1, 0 ≤ x + y ≤ 1}. Pose u = x − y, v = x + y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [guided]  0 ≤ x − y ≤ 1 ; 0 ≤ x + y ≤ 1
-    = 0 ≤ u ≤ 1 ; □ ≤ v ≤ 1   (trous : 0 ≤ u ≤ 1 ; 0 ≤ v ≤ 1)   ← D̃ : les inégalités de D, avec u et v
+Calcule ID = ∬D  dx dy, où D = {(x, y) : 0 ≤ x − y ≤ 2, 1 ≤ x + y ≤ 3}. Pose u = x − y, v = x + y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [guided]  0 ≤ x − y ≤ 2 ; 1 ≤ x + y ≤ 3
+    = 0 ≤ u ≤ 2 ; □ ≤ v ≤ 3   (trous : 0 ≤ u ≤ 2 ; 1 ≤ v ≤ 3)   ← D̃ : les inégalités de D, avec u et v
   — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x − y)·∂/∂y (x + y) − ∂/∂y (x − y)·∂/∂x (x + y)
     = 2   ← Dérivées partielles
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
     = 1/2   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{0}^{1} ∫_{0}^{1} □ dv du   (trous : ∫_{0}^{1} ∫_{0}^{1} uv/2 dv du)   ← L'intégrale sur D̃
-    = ∫_{0}^{1} u/2 du·(∫_{0}^{1} v dv)   ← Séparer
-    = 1/8   ← Calculer
-  aides : Les inégalités de D parlent de x − y et de x + y : avec u = x − y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2, donc dx dy = du dv/|2| | 0 ≤ u ≤ 1 ; 0 ≤ v ≤ 1 ; I = ∫_{0}^{1} ∫_{0}^{1} uv/2 dv du
+    = ∫_{0}^{2} ∫_{1}^{3} □ dv du   (trous : ∫_{0}^{2} ∫_{1}^{3} 1/2 dv du)   ← L'intégrale sur D̃
+    = ∫_{0}^{2} 1/2 du·(∫_{1}^{3} 1 dv)   ← Séparer
+    = 2   ← Calculer
+  aides : Les inégalités de D parlent de x − y et de x + y : avec u = x − y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2, donc dx dy = du dv/|2| | 0 ≤ u ≤ 2 ; 1 ≤ v ≤ 3 ; I = ∫_{0}^{2} ∫_{1}^{3} 1/2 dv du
+  pièges : a2_jacobian_inverse
+
+Calcule ID = ∬D x + y dx dy, où D = {(x, y) : −1 ≤ x + 3y ≤ 1, 1 ≤ x + y ≤ 3}. Pose u = x + 3y, v = x + y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [guided]  −1 ≤ x + 3y ≤ 1 ; 1 ≤ x + y ≤ 3
+    = −1 ≤ u ≤ 1 ; □ ≤ v ≤ 3   (trous : −1 ≤ u ≤ 1 ; 1 ≤ v ≤ 3)   ← D̃ : les inégalités de D, avec u et v
+  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x + 3y)·∂/∂y (x + y) − ∂/∂y (x + 3y)·∂/∂x (x + y)
+    = −2   ← Dérivées partielles
+  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
+    = 1/2   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
+  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
+    = ∫_{−1}^{1} ∫_{1}^{3} □ dv du   (trous : ∫_{−1}^{1} ∫_{1}^{3} v/2 dv du)   ← L'intégrale sur D̃
+    = ∫_{−1}^{1} 1/2 du·(∫_{1}^{3} v dv)   ← Séparer
+    = 4   ← Calculer
+  aides : Les inégalités de D parlent de x + 3y et de x + y : avec u = x + 3y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = −2, donc dx dy = du dv/|−2| | −1 ≤ u ≤ 1 ; 1 ≤ v ≤ 3 ; I = ∫_{−1}^{1} ∫_{1}^{3} v/2 dv du
   pièges : a2_jacobian_inverse
 
 ```
@@ -7653,39 +7647,22 @@ Calcule ID = ∬D (x − y)(x + y) dx dy, où D = {(x, y) : 0 ≤ x − y ≤ 1,
 ### Niveau 3
 
 ```
-Calcule ID = ∬D x²y² dx dy, où D = {(x, y) : 1 ≤ xy ≤ 3, x ≤ y ≤ 2x, x > 0}. Choisis un changement de variables (u, v) qui rend D rectangulaire : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [tap, suivre l'erreur, menu steps]  1 ≤ xy ≤ 3 ; x ≤ y ≤ 2x ; x > 0
-    ? Quel changement de variables ? ✔ u = xy, v = y/x / · u = x + y, v = x − y / · u = x² − y², v = xy / · Coordonnées polaires
-    = 1 ≤ u ≤ 3 ; 1 ≤ v ≤ 2   ← D̃ : les inégalités de D, avec u et v
-  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (xy)·∂/∂y (y/x) − ∂/∂y (xy)·∂/∂x (y/x)
-    = y·1/x − x·(−y/x²)   ← Dérivées partielles
-    = 2y/x   ← Simplifier
-    = 2v   ← Simplifier
-  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
-    = 1/(2v)   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
-  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{1}^{3} ∫_{1}^{2} u²/(2v) dv du   ← L'intégrale sur D̃
-    = ∫_{1}^{3} u² du·(∫_{1}^{2} 1/(2v) dv)   ← Séparer
-    = 13ln(2)/3   ← Calculer
-  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 1 ≤ u ≤ 3 ; 1 ≤ v ≤ 2 ; I = ∫_{1}^{3} ∫_{1}^{2} u²/(2v) dv du
-  pièges : a2_jacobian_inverse
-
-Calcule ID = ∬D (x² + y²)xy dx dy, où D = {(x, y) : 0 ≤ x² − y² ≤ 1, 1 ≤ xy ≤ 3, x > 0, y > 0}. Choisis un changement de variables (u, v) qui rend D rectangulaire : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [tap, suivre l'erreur, menu steps]  0 ≤ x² − y² ≤ 1 ; 1 ≤ xy ≤ 3 ; x > 0 ; y > 0
+Calcule ID = ∬D x² + y² dx dy, où D = {(x, y) : 0 ≤ x² − y² ≤ 2, 1 ≤ xy ≤ 2, x > 0, y > 0}. Choisis un changement de variables (u, v) qui rend D rectangulaire : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [tap, suivre l'erreur, menu steps]  0 ≤ x² − y² ≤ 2 ; 1 ≤ xy ≤ 2 ; x > 0 ; y > 0
     ? Quel changement de variables ? · u = xy, v = y/x / · u = x + y, v = x − y / ✔ u = x² − y², v = xy / · Coordonnées polaires
-    = 0 ≤ u ≤ 1 ; 1 ≤ v ≤ 3   ← D̃ : les inégalités de D, avec u et v
+    = 0 ≤ u ≤ 2 ; 1 ≤ v ≤ 2   ← D̃ : les inégalités de D, avec u et v
   — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x² − y²)·∂/∂y (xy) − ∂/∂y (x² − y²)·∂/∂x (xy)
     = 2x² + 2y²   ← Dérivées partielles
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
     = 1/(2x² + 2y²)   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{0}^{1} ∫_{1}^{3} v/2 dv du   ← L'intégrale sur D̃
-    = ∫_{0}^{1} 1/2 du·(∫_{1}^{3} v dv)   ← Séparer
-    = 2   ← Calculer
-  aides : Les inégalités de D parlent de x² − y² et de xy : avec u = x² − y², v = xy, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2x² + 2y², donc dx dy = du dv/|2x² + 2y²| | 0 ≤ u ≤ 1 ; 1 ≤ v ≤ 3 ; I = ∫_{0}^{1} ∫_{1}^{3} v/2 dv du
+    = ∫_{0}^{2} ∫_{1}^{2} 1/2 dv du   ← L'intégrale sur D̃
+    = ∫_{0}^{2} 1/2 du·(∫_{1}^{2} 1 dv)   ← Séparer
+    = 1   ← Calculer
+  aides : Les inégalités de D parlent de x² − y² et de xy : avec u = x² − y², v = xy, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2x² + 2y², donc dx dy = du dv/|2x² + 2y²| | 0 ≤ u ≤ 2 ; 1 ≤ v ≤ 2 ; I = ∫_{0}^{2} ∫_{1}^{2} 1/2 dv du
   pièges : a2_jacobian_inverse
 
-Calcule ID = ∬D x + y dx dy, où D = {(x, y) : −1 ≤ 3x + y ≤ 1, −1 ≤ x + y ≤ 0}. Choisis un changement de variables (u, v) qui rend D rectangulaire : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+Calcule ID = ∬D (3x + y)² dx dy, où D = {(x, y) : −1 ≤ 3x + y ≤ 1, −1 ≤ x + y ≤ 0}. Choisis un changement de variables (u, v) qui rend D rectangulaire : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
   [tap, suivre l'erreur, menu steps]  −1 ≤ 3x + y ≤ 1 ; −1 ≤ x + y ≤ 0
     ? Quel changement de variables ? · u = xy, v = y/x / ✔ u = 3x + y, v = x + y / · u = x² − y², v = xy / · Coordonnées polaires
     = −1 ≤ u ≤ 1 ; −1 ≤ v ≤ 0   ← D̃ : les inégalités de D, avec u et v
@@ -7694,10 +7671,27 @@ Calcule ID = ∬D x + y dx dy, où D = {(x, y) : −1 ≤ 3x + y ≤ 1, −1 ≤
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
     = 1/2   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{−1}^{1} ∫_{−1}^{0} v/2 dv du   ← L'intégrale sur D̃
-    = ∫_{−1}^{1} 1/2 du·(∫_{−1}^{0} v dv)   ← Séparer
-    = −1/2   ← Calculer
-  aides : Les inégalités de D parlent de 3x + y et de x + y : avec u = 3x + y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2, donc dx dy = du dv/|2| | −1 ≤ u ≤ 1 ; −1 ≤ v ≤ 0 ; I = ∫_{−1}^{1} ∫_{−1}^{0} v/2 dv du
+    = ∫_{−1}^{1} ∫_{−1}^{0} u²/2 dv du   ← L'intégrale sur D̃
+    = ∫_{−1}^{1} u²/2 du·(∫_{−1}^{0} 1 dv)   ← Séparer
+    = 1/3   ← Calculer
+  aides : Les inégalités de D parlent de 3x + y et de x + y : avec u = 3x + y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2, donc dx dy = du dv/|2| | −1 ≤ u ≤ 1 ; −1 ≤ v ≤ 0 ; I = ∫_{−1}^{1} ∫_{−1}^{0} u²/2 dv du
+  pièges : a2_jacobian_inverse
+
+Calcule ID = ∬D x²y² dx dy, où D = {(x, y) : 2 ≤ xy ≤ 3, x ≤ y ≤ 2x, x > 0}. Choisis un changement de variables (u, v) qui rend D rectangulaire : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [tap, suivre l'erreur, menu steps]  2 ≤ xy ≤ 3 ; x ≤ y ≤ 2x ; x > 0
+    ? Quel changement de variables ? ✔ u = xy, v = y/x / · u = x + y, v = x − y / · u = x² − y², v = xy / · Coordonnées polaires
+    = 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 2   ← D̃ : les inégalités de D, avec u et v
+  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (xy)·∂/∂y (y/x) − ∂/∂y (xy)·∂/∂x (y/x)
+    = y·1/x − x·(−y/x²)   ← Dérivées partielles
+    = 2y/x   ← Simplifier
+    = 2v   ← Simplifier
+  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
+    = 1/(2v)   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
+  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
+    = ∫_{2}^{3} ∫_{1}^{2} u²/(2v) dv du   ← L'intégrale sur D̃
+    = ∫_{2}^{3} u² du·(∫_{1}^{2} 1/(2v) dv)   ← Séparer
+    = 19ln(2)/6   ← Calculer
+  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 2 ; I = ∫_{2}^{3} ∫_{1}^{2} u²/(2v) dv du
   pièges : a2_jacobian_inverse
 
 ```
@@ -7705,46 +7699,48 @@ Calcule ID = ∬D x + y dx dy, où D = {(x, y) : −1 ≤ 3x + y ≤ 1, −1 ≤
 ### Niveau 4
 
 ```
-Calcule ID = ∬D (x + y)² dx dy, où D = {(x, y) : 0 ≤ 2x − y ≤ 2, 1 ≤ x + y ≤ 2}. Pose u = 2x − y, v = x + y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [free, suivre l'erreur]  0 ≤ 2x − y ≤ 2 ; 1 ≤ x + y ≤ 2
-    = 0 ≤ u ≤ 2 ; 1 ≤ v ≤ 2   ← D̃ : les inégalités de D, avec u et v
-  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (2x − y)·∂/∂y (x + y) − ∂/∂y (2x − y)·∂/∂x (x + y)
-    = 3   ← Dérivées partielles
+Calcule ID = ∬D (x + y)² dx dy, où D = {(x, y) : 1 ≤ 3x + y ≤ 2, 1 ≤ x + y ≤ 3}. Pose u = 3x + y, v = x + y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [free, suivre l'erreur]  1 ≤ 3x + y ≤ 2 ; 1 ≤ x + y ≤ 3
+    = 1 ≤ u ≤ 2 ; 1 ≤ v ≤ 3   ← D̃ : les inégalités de D, avec u et v
+  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (3x + y)·∂/∂y (x + y) − ∂/∂y (3x + y)·∂/∂x (x + y)
+    = 2   ← Dérivées partielles
+  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
+    = 1/2   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
+  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
+    = ∫_{1}^{2} ∫_{1}^{3} v²/2 dv du   ← L'intégrale sur D̃
+    = ∫_{1}^{2} 1/2 du·(∫_{1}^{3} v² dv)   ← Séparer
+    = 13/3   ← Calculer
+  aides : Les inégalités de D parlent de 3x + y et de x + y : avec u = 3x + y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2, donc dx dy = du dv/|2| | 1 ≤ u ≤ 2 ; 1 ≤ v ≤ 3 ; I = ∫_{1}^{2} ∫_{1}^{3} v²/2 dv du
+  pièges : a2_jacobian_inverse
+
+Calcule ID = ∬D (x + 2y)(x − y) dx dy, où D = {(x, y) : 0 ≤ x + 2y ≤ 2, 0 ≤ x − y ≤ 1}. Pose u = x + 2y, v = x − y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [free, suivre l'erreur]  0 ≤ x + 2y ≤ 2 ; 0 ≤ x − y ≤ 1
+    = 0 ≤ u ≤ 2 ; 0 ≤ v ≤ 1   ← D̃ : les inégalités de D, avec u et v
+  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x + 2y)·∂/∂y (x − y) − ∂/∂y (x + 2y)·∂/∂x (x − y)
+    = −3   ← Dérivées partielles
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
     = 1/3   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{0}^{2} ∫_{1}^{2} v²/3 dv du   ← L'intégrale sur D̃
-    = ∫_{0}^{2} 1/3 du·(∫_{1}^{2} v² dv)   ← Séparer
-    = 14/9   ← Calculer
-  aides : Les inégalités de D parlent de 2x − y et de x + y : avec u = 2x − y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 3, donc dx dy = du dv/|3| | 0 ≤ u ≤ 2 ; 1 ≤ v ≤ 2 ; I = ∫_{0}^{2} ∫_{1}^{2} v²/3 dv du
+    = ∫_{0}^{2} ∫_{0}^{1} uv/3 dv du   ← L'intégrale sur D̃
+    = ∫_{0}^{2} u/3 du·(∫_{0}^{1} v dv)   ← Séparer
+    = 1/3   ← Calculer
+  aides : Les inégalités de D parlent de x + 2y et de x − y : avec u = x + 2y, v = x − y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = −3, donc dx dy = du dv/|−3| | 0 ≤ u ≤ 2 ; 0 ≤ v ≤ 1 ; I = ∫_{0}^{2} ∫_{0}^{1} uv/3 dv du
   pièges : a2_jacobian_inverse
 
-Calcule ID = ∬D (x² + y²)xy dx dy, où D = {(x, y) : 1 ≤ x² − y² ≤ 3, 1 ≤ xy ≤ 3, x > 0, y > 0}. Pose u = x² − y², v = xy : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [free, suivre l'erreur]  1 ≤ x² − y² ≤ 3 ; 1 ≤ xy ≤ 3 ; x > 0 ; y > 0
-    = 1 ≤ u ≤ 3 ; 1 ≤ v ≤ 3   ← D̃ : les inégalités de D, avec u et v
-  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (x² − y²)·∂/∂y (xy) − ∂/∂y (x² − y²)·∂/∂x (xy)
-    = 2x² + 2y²   ← Dérivées partielles
+Calcule ID = ∬D y/x dx dy, où D = {(x, y) : 2 ≤ xy ≤ 3, x ≤ y ≤ 3x, x > 0}. Pose u = xy, v = y/x : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
+  [free, suivre l'erreur]  2 ≤ xy ≤ 3 ; x ≤ y ≤ 3x ; x > 0
+    = 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 3   ← D̃ : les inégalités de D, avec u et v
+  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (xy)·∂/∂y (y/x) − ∂/∂y (xy)·∂/∂x (y/x)
+    = y·1/x − x·(−y/x²)   ← Dérivées partielles
+    = 2y/x   ← Simplifier
+    = 2v   ← Simplifier
   — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
-    = 1/(2x² + 2y²)   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
+    = 1/(2v)   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
   — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{1}^{3} ∫_{1}^{3} v/2 dv du   ← L'intégrale sur D̃
-    = ∫_{1}^{3} 1/2 du·(∫_{1}^{3} v dv)   ← Séparer
-    = 4   ← Calculer
-  aides : Les inégalités de D parlent de x² − y² et de xy : avec u = x² − y², v = xy, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2x² + 2y², donc dx dy = du dv/|2x² + 2y²| | 1 ≤ u ≤ 3 ; 1 ≤ v ≤ 3 ; I = ∫_{1}^{3} ∫_{1}^{3} v/2 dv du
-  pièges : a2_jacobian_inverse
-
-Calcule ID = ∬D x + y dx dy, où D = {(x, y) : −1 ≤ 2x + y ≤ 0, 1 ≤ x + y ≤ 2}. Pose u = 2x + y, v = x + y : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.
-  [free, suivre l'erreur]  −1 ≤ 2x + y ≤ 0 ; 1 ≤ x + y ≤ 2
-    = −1 ≤ u ≤ 0 ; 1 ≤ v ≤ 2   ← D̃ : les inégalités de D, avec u et v
-  — Le jacobien du changement (u, v) en fonction de (x, y) :  [juge equiv]  départ : ∂/∂x (2x + y)·∂/∂y (x + y) − ∂/∂y (2x + y)·∂/∂x (x + y)
-    = 1   ← Dérivées partielles
-  — Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :  [juge equiv]  départ : J
-    = 1   ← |det J_G| = 1/|det ∂(u, v)/∂(x, y)|
-  — L'intégrale sur D̃, puis sa valeur :  [juge definite]  départ : I_D
-    = ∫_{−1}^{0} ∫_{1}^{2} v dv du   ← L'intégrale sur D̃
-    = ∫_{−1}^{0} 1 du·(∫_{1}^{2} v dv)   ← Séparer
-    = 3/2   ← Calculer
-  aides : Les inégalités de D parlent de 2x + y et de x + y : avec u = 2x + y, v = x + y, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 1, donc dx dy = du dv/|1| | −1 ≤ u ≤ 0 ; 1 ≤ v ≤ 2 ; I = ∫_{−1}^{0} ∫_{1}^{2} v dv du
+    = ∫_{2}^{3} ∫_{1}^{3} 1/2 dv du   ← L'intégrale sur D̃
+    = ∫_{2}^{3} 1/2 du·(∫_{1}^{3} 1 dv)   ← Séparer
+    = 1   ← Calculer
+  aides : Les inégalités de D parlent de xy et de y/x : avec u = xy, v = y/x, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|. | det ∂(u, v)/∂(x, y) = 2v, donc dx dy = du dv/|2v| | 2 ≤ u ≤ 3 ; 1 ≤ v ≤ 3 ; I = ∫_{2}^{3} ∫_{1}^{3} 1/2 dv du
   pièges : a2_jacobian_inverse
 
 ```
@@ -7752,25 +7748,25 @@ Calcule ID = ∬D x + y dx dy, où D = {(x, y) : −1 ≤ 2x + y ≤ 0, 1 ≤ x 
 ### Niveau 5
 
 ```
-Soit G(u, v) = (u + 2v ; u − v) et D = [−1 ; 2] × [−1 ; 1] dans le plan (x, y). Pour écrire ∬D f(x, y) dx dy = ∬D̃ f(G(u, v))·|det J_G| du dv, quel est D̃ ?
-  ✔ D̃ = {(u, v) : −1 ≤ u + 2v ≤ 2, −1 ≤ u − v ≤ 1}   · D̃ = {(u, v) : −1 ≤ u/3 + 2v/3 ≤ 2, −1 ≤ u/3 − v/3 ≤ 1} [a2_changevar_domain_direction]   · D̃ = {(u, v) : −1 ≤ u − v ≤ 2, −1 ≤ u + 2v ≤ 1}   · D̃ = {(u, v) : −1 ≤ u ≤ 2, −1 ≤ v ≤ 1}
-  pièges : a2_changevar_domain_direction
-
-Soit G(u, v) = (2u − v ; u + v) et D = [0 ; 2] × [0 ; 1] dans le plan (x, y). Pour écrire ∬D f(x, y) dx dy = ∬D̃ f(G(u, v))·|det J_G| du dv, quel est D̃ ?
-  · D̃ = {(u, v) : 0 ≤ u ≤ 2, 0 ≤ v ≤ 1}   ✔ D̃ = {(u, v) : 0 ≤ 2u − v ≤ 2, 0 ≤ u + v ≤ 1}   · D̃ = {(u, v) : 0 ≤ u/3 + v/3 ≤ 2, 0 ≤ −u/3 + 2v/3 ≤ 1} [a2_changevar_domain_direction]   · D̃ = {(u, v) : 0 ≤ u + v ≤ 2, 0 ≤ 2u − v ≤ 1}
-  pièges : a2_changevar_domain_direction
-
 Soit G(u, v) = (u − v ; u + 2v) et D = [0 ; 1] × [−1 ; 1] dans le plan (x, y). Pour écrire ∬D f(x, y) dx dy = ∬D̃ f(G(u, v))·|det J_G| du dv, quel est D̃ ?
   ✔ D̃ = {(u, v) : 0 ≤ u − v ≤ 1, −1 ≤ u + 2v ≤ 1}   · D̃ = {(u, v) : 0 ≤ u ≤ 1, −1 ≤ v ≤ 1}   · D̃ = {(u, v) : 0 ≤ 2u/3 + v/3 ≤ 1, −1 ≤ −u/3 + v/3 ≤ 1} [a2_changevar_domain_direction]   · D̃ = {(u, v) : 0 ≤ u + 2v ≤ 1, −1 ≤ u − v ≤ 1}
   pièges : a2_changevar_domain_direction
+
+Soit G(u, v) = (u + 2v ; 2u + v) et D = [0 ; 2] × [0 ; 1] dans le plan (x, y). Pour écrire ∬D f(x, y) dx dy = ∬D̃ f(G(u, v))·|det J_G| du dv, quel est D̃ ?
+  · D̃ = {(u, v) : 0 ≤ −u/3 + 2v/3 ≤ 2, 0 ≤ 2u/3 − v/3 ≤ 1} [a2_changevar_domain_direction]   ✔ D̃ = {(u, v) : 0 ≤ u + 2v ≤ 2, 0 ≤ 2u + v ≤ 1}   · D̃ = {(u, v) : 0 ≤ 2u + v ≤ 2, 0 ≤ u + 2v ≤ 1}   · D̃ = {(u, v) : 0 ≤ u ≤ 2, 0 ≤ v ≤ 1}
+  pièges : a2_changevar_domain_direction
+
+Vrai ou faux ?
+  « Pour tous réels a, b non nuls, avec G(u, v) = (au ; bv), D̃ = [0 ; 1] × [0 ; 1] et D = G(D̃) : ∬D dx dy = ∬D̃ det J_G du dv. » → FAUX
+    contre-exemple (refute) : a = -1, b = 1
 
 ```
 
 ### Variantes d'examen
 
 ```
-Soit G(u, v) = (u + 2v ; 2u + v) et D = [0 ; 2] × [0 ; 1] dans le plan (x, y). Pour écrire ∬D f(x, y) dx dy = ∬D̃ f(G(u, v))·|det J_G| du dv, quel est D̃ ?
-  · D̃ = {(u, v) : 0 ≤ −u/3 + 2v/3 ≤ 2, 0 ≤ 2u/3 − v/3 ≤ 1} [a2_changevar_domain_direction]   ✔ D̃ = {(u, v) : 0 ≤ u + 2v ≤ 2, 0 ≤ 2u + v ≤ 1}   · D̃ = {(u, v) : 0 ≤ 2u + v ≤ 2, 0 ≤ u + 2v ≤ 1}   · D̃ = {(u, v) : 0 ≤ u ≤ 2, 0 ≤ v ≤ 1}
+Soit G(u, v) = (u + 3v ; u + v) et D = [0 ; 1] × [−1 ; 1] dans le plan (x, y). Pour écrire ∬D f(x, y) dx dy = ∬D̃ f(G(u, v))·|det J_G| du dv, quel est D̃ ?
+  · D̃ = {(u, v) : 0 ≤ u ≤ 1, −1 ≤ v ≤ 1}   · D̃ = {(u, v) : 0 ≤ −u/2 + 3v/2 ≤ 1, −1 ≤ u/2 − v/2 ≤ 1} [a2_changevar_domain_direction]   ✔ D̃ = {(u, v) : 0 ≤ u + 3v ≤ 1, −1 ≤ u + v ≤ 1}   · D̃ = {(u, v) : 0 ≤ u + v ≤ 1, −1 ≤ u + 3v ≤ 1}
   [examen mcq]
   pièges : a2_changevar_domain_direction
 
@@ -7787,34 +7783,34 @@ _Disques, anneaux, secteurs : bornes en (r, φ), et dx dy = r dr dφ._
 ### Niveau 1
 
 ```
-Calcule I = ∬D y(x² + y²) dx dy, avec D = {x² + y² ≤ 9 ; y ≥ 0}. En polaires : 0 ≤ φ ≤ π ; 0 ≤ r ≤ 3.
-  [guided]  y(x² + y²)
-    = r·sin(φ)·r²·□   (trous : r·sin(φ)·r²·r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{3} r⁴·sin(φ) dr dφ
-    = ∫_{0}^{3} □ dr·(∫_{0}^{π} sin(φ) dφ)   (trous : ∫_{0}^{3} r⁴ dr·(∫_{0}^{π} sin(φ) dφ))   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
-    = [□]_{0}^{3}·([−cos(φ)]_{0}^{π})   (trous : [r⁵/5]_{0}^{3}·([−cos(φ)]_{0}^{π}))   ← Primitives
-    = 486/5   ← 243/5 · 2
-  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{0}^{π} ∫_{0}^{3} r⁴·sin(φ) dr dφ, puis sépare en produit. | 0 ≤ φ ≤ π ; 0 ≤ r ≤ 3 et l'intégrande r⁴·sin(φ).
-  pièges : a2_jacobian_forgot
-
-Calcule I = ∬D 1/(1 + x² + y²) dx dy, avec D = {x² + y² ≤ 1 ; 0 ≤ y ≤ √3·x}. En polaires : 0 ≤ φ ≤ π/3 ; 0 ≤ r ≤ 1.
-  [guided]  1/(1 + x² + y²)
-    = 1/(1 + r²)·□   (trous : 1/(1 + r²)·r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/3} ∫_{0}^{1} r/(1 + r²) dr dφ
-    = ∫_{0}^{1} □ dr·(∫_{0}^{π/3} 1 dφ)   (trous : ∫_{0}^{1} r/(1 + r²) dr·(∫_{0}^{π/3} 1 dφ))   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
-    = [□]_{0}^{1}·([φ]_{0}^{π/3})   (trous : [ln(1 + r²)/2]_{0}^{1}·([φ]_{0}^{π/3}))   ← Primitives
-    = πln(2)/6   ← ln(2)/2 · π/3
-  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{0}^{π/3} ∫_{0}^{1} r/(1 + r²) dr dφ, puis sépare en produit. | 0 ≤ φ ≤ π/3 ; 0 ≤ r ≤ 1 et l'intégrande r/(1 + r²).
-  pièges : a2_jacobian_forgot
-
-Calcule I = ∬D x² dx dy, avec D = {1 ≤ x² + y² ≤ e² ; x ≥ 0 ; y ≥ 0}. En polaires : 0 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e.
+Calcule I = ∬D x² dx dy, avec D = {1 ≤ x² + y² ≤ e² ; 0 ≤ x ≤ y}. En polaires : π/4 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e.
   [guided]  x²
     = (r·cos(φ))²·□   (trous : (r·cos(φ))²·r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{1}^{e} r³·cos(φ)² dr dφ
-    = ∫_{1}^{e} □ dr·(∫_{0}^{π/2} cos(φ)² dφ)   (trous : ∫_{1}^{e} r³ dr·(∫_{0}^{π/2} cos(φ)² dφ))   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
-    = [□]_{1}^{e}·([φ/2 + sin(2φ)/4]_{0}^{π/2})   (trous : [r⁴/4]_{1}^{e}·([φ/2 + sin(2φ)/4]_{0}^{π/2}))   ← Primitives
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{π/4}^{π/2} ∫_{1}^{e} r³·cos(φ)² dr dφ
+    = ∫_{1}^{e} □ dr·(∫_{π/4}^{π/2} cos(φ)² dφ)   (trous : ∫_{1}^{e} r³ dr·(∫_{π/4}^{π/2} cos(φ)² dφ))   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
+    = [□]_{1}^{e}·([φ/2 + sin(2φ)/4]_{π/4}^{π/2})   (trous : [r⁴/4]_{1}^{e}·([φ/2 + sin(2φ)/4]_{π/4}^{π/2}))   ← Primitives
+    = πe⁴/32 + 1/16 − e⁴/16 − π/32   ← (e⁴/4 − 1/4) · (π/8 − 1/4)
+  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{π/4}^{π/2} ∫_{1}^{e} r³·cos(φ)² dr dφ, puis sépare en produit. | π/4 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e et l'intégrande r³·cos(φ)².
+  pièges : a2_jacobian_forgot
+
+Calcule I = ∬D √(x² + y²) dx dy, avec D = {4 ≤ x² + y² ≤ 9 ; x ≥ 0}. En polaires : −π/2 ≤ φ ≤ π/2 ; 2 ≤ r ≤ 3.
+  [guided]  √(x² + y²)
+    = r·□   (trous : r·r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{−π/2}^{π/2} ∫_{2}^{3} r² dr dφ
+    = ∫_{2}^{3} □ dr·(∫_{−π/2}^{π/2} 1 dφ)   (trous : ∫_{2}^{3} r² dr·(∫_{−π/2}^{π/2} 1 dφ))   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
+    = [□]_{2}^{3}·([φ]_{−π/2}^{π/2})   (trous : [r³/3]_{2}^{3}·([φ]_{−π/2}^{π/2}))   ← Primitives
+    = 19π/3   ← 19/3 · π
+  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{−π/2}^{π/2} ∫_{2}^{3} r² dr dφ, puis sépare en produit. | −π/2 ≤ φ ≤ π/2 ; 2 ≤ r ≤ 3 et l'intégrande r².
+  pièges : a2_jacobian_forgot
+
+Calcule I = ∬D (x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e² ; 0 ≤ y ≤ x}. En polaires : 0 ≤ φ ≤ π/4 ; 1 ≤ r ≤ e.
+  [guided]  x² + y²
+    = r²·□   (trous : r²·r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/4} ∫_{1}^{e} r³ dr dφ
+    = ∫_{1}^{e} □ dr·(∫_{0}^{π/4} 1 dφ)   (trous : ∫_{1}^{e} r³ dr·(∫_{0}^{π/4} 1 dφ))   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
+    = [□]_{1}^{e}·([φ]_{0}^{π/4})   (trous : [r⁴/4]_{1}^{e}·([φ]_{0}^{π/4}))   ← Primitives
     = πe⁴/16 − π/16   ← (e⁴/4 − 1/4) · π/4
-  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{0}^{π/2} ∫_{1}^{e} r³·cos(φ)² dr dφ, puis sépare en produit. | 0 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e et l'intégrande r³·cos(φ)².
+  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{0}^{π/4} ∫_{1}^{e} r³ dr dφ, puis sépare en produit. | 0 ≤ φ ≤ π/4 ; 1 ≤ r ≤ e et l'intégrande r³.
   pièges : a2_jacobian_forgot
 
 ```
@@ -7822,30 +7818,6 @@ Calcule I = ∬D x² dx dy, avec D = {1 ≤ x² + y² ≤ e² ; x ≥ 0 ; y ≥ 
 ### Niveau 2
 
 ```
-Calcule I = ∬D 1/(1 + x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ 9 ; x ≥ 0}.
-  [guided]  1 ≤ x² + y² ≤ 9 ; x ≥ 0
-    = −π/2 ≤ φ ≤ □ ; 1 ≤ r ≤ □   (trous : −π/2 ≤ φ ≤ π/2 ; 1 ≤ r ≤ 3)   ← Rayon entre les cercles, angle entre les demi-droites
-  — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : 1/(1 + x² + y²)
-    = r/(1 + r²)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{−π/2}^{π/2} ∫_{1}^{3} r/(1 + r²) dr dφ
-    = ∫_{1}^{3} r/(1 + r²) dr·(∫_{−π/2}^{π/2} 1 dφ)   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
-    = [ln(1 + r²)/2]_{1}^{3}·([□]_{−π/2}^{π/2})   (trous : [ln(1 + r²)/2]_{1}^{3}·([φ]_{−π/2}^{π/2}))   ← Primitives
-    = πln(5)/2   ← ln(5)/2 · π
-  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{−π/2}^{π/2} ∫_{1}^{3} r/(1 + r²) dr dφ, puis sépare en produit. | −π/2 ≤ φ ≤ π/2 ; 1 ≤ r ≤ 3 et l'intégrande r/(1 + r²).
-  pièges : a2_polar_angle_bounds
-
-Calcule I = ∬D (x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e² ; 0 ≤ y ≤ x}.
-  [guided]  1 ≤ x² + y² ≤ e² ; 0 ≤ y ≤ x
-    = 0 ≤ φ ≤ □ ; 1 ≤ r ≤ □   (trous : 0 ≤ φ ≤ π/4 ; 1 ≤ r ≤ e)   ← Rayon entre les cercles, angle entre les demi-droites
-  — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : x² + y²
-    = □   (trous : r³)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/4} ∫_{1}^{e} r³ dr dφ
-    = ∫_{1}^{e} r³ dr·(∫_{0}^{π/4} 1 dφ)   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
-    = [r⁴/4]_{1}^{e}·([□]_{0}^{π/4})   (trous : [r⁴/4]_{1}^{e}·([φ]_{0}^{π/4}))   ← Primitives
-    = πe⁴/16 − π/16   ← (e⁴/4 − 1/4) · π/4
-  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{0}^{π/4} ∫_{1}^{e} r³ dr dφ, puis sépare en produit. | 0 ≤ φ ≤ π/4 ; 1 ≤ r ≤ e et l'intégrande r³.
-  pièges : a2_polar_angle_bounds
-
 Calcule I = ∬D √(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e² ; 0 ≤ x ≤ y}.
   [guided]  1 ≤ x² + y² ≤ e² ; 0 ≤ x ≤ y
     = π/4 ≤ φ ≤ □ ; 1 ≤ r ≤ □   (trous : π/4 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e)   ← Rayon entre les cercles, angle entre les demi-droites
@@ -7858,37 +7830,35 @@ Calcule I = ∬D √(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e² ; 0 ≤
   aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{π/4}^{π/2} ∫_{1}^{e} r² dr dφ, puis sépare en produit. | π/4 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e et l'intégrande r².
   pièges : a2_polar_angle_bounds
 
-```
-
-### Niveau 3
-
-```
 Calcule I = ∬D x² dx dy, avec D = {4 ≤ x² + y² ≤ 9 ; x ≤ 0 ; y ≥ 0}.
-  [tap, suivre l'erreur, menu steps]  4 ≤ x² + y² ≤ 9 ; x ≤ 0 ; y ≥ 0
-    ? Quelles coordonnées ? ✔ Polaires : D est un morceau de disque ou d'anneau / · Cartésiennes
-    = π/2 ≤ φ ≤ π ; 2 ≤ r ≤ 3   ← Rayon entre les cercles, angle entre les demi-droites
+  [guided]  4 ≤ x² + y² ≤ 9 ; x ≤ 0 ; y ≥ 0
+    = π/2 ≤ φ ≤ □ ; 2 ≤ r ≤ □   (trous : π/2 ≤ φ ≤ π ; 2 ≤ r ≤ 3)   ← Rayon entre les cercles, angle entre les demi-droites
   — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : x²
-    = r³·cos(φ)²   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
+    = □·cos(φ)²   (trous : r³·cos(φ)²)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
   — Calcule l'intégrale :  [juge definite]  départ : ∫_{π/2}^{π} ∫_{2}^{3} r³·cos(φ)² dr dφ
     = ∫_{2}^{3} r³ dr·(∫_{π/2}^{π} cos(φ)² dφ)   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
-    = [r⁴/4]_{2}^{3}·([φ/2 + sin(2φ)/4]_{π/2}^{π})   ← Primitives
+    = [r⁴/4]_{2}^{3}·([□]_{π/2}^{π})   (trous : [r⁴/4]_{2}^{3}·([φ/2 + sin(2φ)/4]_{π/2}^{π}))   ← Primitives
     = 65π/16   ← 65/4 · π/4
   aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{π/2}^{π} ∫_{2}^{3} r³·cos(φ)² dr dφ, puis sépare en produit. | π/2 ≤ φ ≤ π ; 2 ≤ r ≤ 3 et l'intégrande r³·cos(φ)².
   pièges : a2_polar_angle_bounds
 
 Calcule I = ∬D √(x² + y²) dx dy, avec D = {x² + y² ≤ e²}.
-  [tap, suivre l'erreur, menu steps]  x² + y² ≤ e²
-    ? Quelles coordonnées ? ✔ Polaires : D est un morceau de disque ou d'anneau / · Cartésiennes
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ e   ← Rayon entre les cercles, angle entre les demi-droites
+  [guided]  x² + y² ≤ e²
+    = 0 ≤ φ ≤ □ ; 0 ≤ r ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ e)   ← Rayon entre les cercles, angle entre les demi-droites
   — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : √(x² + y²)
-    = r²   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
+    = □   (trous : r²)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
   — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{e} r² dr dφ
     = ∫_{0}^{e} r² dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
-    = [r³/3]_{0}^{e}·([φ]_{0}^{2π})   ← Primitives
+    = [r³/3]_{0}^{e}·([□]_{0}^{2π})   (trous : [r³/3]_{0}^{e}·([φ]_{0}^{2π}))   ← Primitives
     = 2πe³/3   ← e³/3 · 2π
   aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{0}^{2π} ∫_{0}^{e} r² dr dφ, puis sépare en produit. | 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ e et l'intégrande r².
   pièges : a2_polar_angle_bounds
 
+```
+
+### Niveau 3
+
+```
 Calcule I = ∬D y² dx dy, avec D = {4 ≤ x² + y² ≤ 9 ; x ≥ 0}.
   [tap, suivre l'erreur, menu steps]  4 ≤ x² + y² ≤ 9 ; x ≥ 0
     ? Quelles coordonnées ? ✔ Polaires : D est un morceau de disque ou d'anneau / · Cartésiennes
@@ -7902,13 +7872,9 @@ Calcule I = ∬D y² dx dy, avec D = {4 ≤ x² + y² ≤ 9 ; x ≥ 0}.
   aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{−π/2}^{π/2} ∫_{2}^{3} r³·sin(φ)² dr dφ, puis sépare en produit. | −π/2 ≤ φ ≤ π/2 ; 2 ≤ r ≤ 3 et l'intégrande r³·sin(φ)².
   pièges : a2_polar_angle_bounds
 
-```
-
-### Niveau 4
-
-```
 Calcule I = ∬D e^(−(x² + y²)) dx dy, avec D = {x² + y² ≤ 4 ; 0 ≤ y ≤ x}.
-  [free, suivre l'erreur]  x² + y² ≤ 4 ; 0 ≤ y ≤ x
+  [tap, suivre l'erreur, menu steps]  x² + y² ≤ 4 ; 0 ≤ y ≤ x
+    ? Quelles coordonnées ? ✔ Polaires : D est un morceau de disque ou d'anneau / · Cartésiennes
     = 0 ≤ φ ≤ π/4 ; 0 ≤ r ≤ 2   ← Rayon entre les cercles, angle entre les demi-droites
   — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : e^(−(x² + y²))
     = r·e^(−r²)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
@@ -7920,7 +7886,8 @@ Calcule I = ∬D e^(−(x² + y²)) dx dy, avec D = {x² + y² ≤ 4 ; 0 ≤ y �
   pièges : a2_polar_angle_bounds
 
 Calcule I = ∬D √(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ 9}.
-  [free, suivre l'erreur]  1 ≤ x² + y² ≤ 9
+  [tap, suivre l'erreur, menu steps]  1 ≤ x² + y² ≤ 9
+    ? Quelles coordonnées ? ✔ Polaires : D est un morceau de disque ou d'anneau / · Cartésiennes
     = 0 ≤ φ ≤ 2π ; 1 ≤ r ≤ 3   ← Rayon entre les cercles, angle entre les demi-droites
   — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : √(x² + y²)
     = r²   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
@@ -7931,6 +7898,11 @@ Calcule I = ∬D √(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ 9}.
   aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{0}^{2π} ∫_{1}^{3} r² dr dφ, puis sépare en produit. | 0 ≤ φ ≤ 2π ; 1 ≤ r ≤ 3 et l'intégrande r².
   pièges : a2_polar_angle_bounds
 
+```
+
+### Niveau 4
+
+```
 Calcule I = ∬D x² dx dy, avec D = {1 ≤ x² + y² ≤ 4 ; 0 ≤ x ≤ y}.
   [free, suivre l'erreur]  1 ≤ x² + y² ≤ 4 ; 0 ≤ x ≤ y
     = π/4 ≤ φ ≤ π/2 ; 1 ≤ r ≤ 2   ← Rayon entre les cercles, angle entre les demi-droites
@@ -7943,57 +7915,81 @@ Calcule I = ∬D x² dx dy, avec D = {1 ≤ x² + y² ≤ 4 ; 0 ≤ x ≤ y}.
   aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{π/4}^{π/2} ∫_{1}^{2} r³·cos(φ)² dr dφ, puis sépare en produit. | π/4 ≤ φ ≤ π/2 ; 1 ≤ r ≤ 2 et l'intégrande r³·cos(φ)².
   pièges : a2_polar_angle_bounds
 
+Calcule I = ∬D √(x² + y²) dx dy, avec D = {x² + y² ≤ e² ; x ≥ 0}.
+  [free, suivre l'erreur]  x² + y² ≤ e² ; x ≥ 0
+    = −π/2 ≤ φ ≤ π/2 ; 0 ≤ r ≤ e   ← Rayon entre les cercles, angle entre les demi-droites
+  — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : √(x² + y²)
+    = r²   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{−π/2}^{π/2} ∫_{0}^{e} r² dr dφ
+    = ∫_{0}^{e} r² dr·(∫_{−π/2}^{π/2} 1 dφ)   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
+    = [r³/3]_{0}^{e}·([φ]_{−π/2}^{π/2})   ← Primitives
+    = πe³/3   ← e³/3 · π
+  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{−π/2}^{π/2} ∫_{0}^{e} r² dr dφ, puis sépare en produit. | −π/2 ≤ φ ≤ π/2 ; 0 ≤ r ≤ e et l'intégrande r².
+  pièges : a2_polar_angle_bounds
+
+Calcule I = ∬D (x² + y²) dx dy, avec D = {x² + y² ≤ 1 ; x ≥ 0}.
+  [free, suivre l'erreur]  x² + y² ≤ 1 ; x ≥ 0
+    = −π/2 ≤ φ ≤ π/2 ; 0 ≤ r ≤ 1   ← Rayon entre les cercles, angle entre les demi-droites
+  — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : x² + y²
+    = r³   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{−π/2}^{π/2} ∫_{0}^{1} r³ dr dφ
+    = ∫_{0}^{1} r³ dr·(∫_{−π/2}^{π/2} 1 dφ)   ← Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales
+    = [r⁴/4]_{0}^{1}·([φ]_{−π/2}^{π/2})   ← Primitives
+    = π/4   ← 1/4 · π
+  aides : D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ). | ∫_{−π/2}^{π/2} ∫_{0}^{1} r³ dr dφ, puis sépare en produit. | −π/2 ≤ φ ≤ π/2 ; 0 ≤ r ≤ 1 et l'intégrande r³.
+  pièges : a2_polar_angle_bounds
+
 ```
 
 ### Niveau 5
 
 ```
-Calcule ∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ 4}.
+Calcule ∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ 9}.
   [problème, 8 points]
   partie 1 (Bornes en (r, φ) : 1,5 ; Écris l'intégrande en polaires, jacobien compris : 1,5 ; Sépare : l'intégrale en φ se calcule tout de suite. : 1 ; Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) : 2 ; Valeur de l'intégrale : 2)
-    [free, sans aide, suivre l'erreur]  1 ≤ x² + y² ≤ 4
-      = 0 ≤ φ ≤ 2π ; 1 ≤ r ≤ 2   ← Rayon entre les cercles, angle entre les demi-droites
+    [free, sans aide, suivre l'erreur]  1 ≤ x² + y² ≤ 9
+      = 0 ≤ φ ≤ 2π ; 1 ≤ r ≤ 3   ← Rayon entre les cercles, angle entre les demi-droites
     — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : ln(x² + y²)
       = 2r·ln(r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-    — Sépare : l'intégrale en φ se calcule tout de suite.  [juge equiv]  départ : ∫_{0}^{2π} ∫_{1}^{2} 2r·ln(r) dr dφ
-      = 2π·(∫_{1}^{2} 2r·ln(r) dr)   ← ∫ dφ = 2π
+    — Sépare : l'intégrale en φ se calcule tout de suite.  [juge equiv]  départ : ∫_{0}^{2π} ∫_{1}^{3} 2r·ln(r) dr dφ
+      = 2π·(∫_{1}^{3} 2r·ln(r) dr)   ← ∫ dφ = 2π
     — Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) :  [juge antideriv]  départ : ∫ 2r·ln(r) dr
       = r²·ln(r) − ∫ r dr   ← u = ln r, v = r² : ∫ uv′ = uv − ∫ u′v
       = r²·ln(r) − r²/2 + C   ← Primitive de r
-    — Valeur de l'intégrale :  [juge definite]  départ : 2π·([r²·ln(r) − r²/2]_{1}^{2})
-      = 8πln(2) − 3π   ← F(R) − F(1)
+    — Valeur de l'intégrale :  [juge definite]  départ : 2π·([r²·ln(r) − r²/2]_{1}^{3})
+      = 18πln(3) − 8π   ← F(R) − F(1)
   pièges : a2_polar_angle_bounds
 
-Calcule ∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ 4 ; x ≤ 0 ; y ≥ 0}.
+Calcule ∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e² ; x ≥ 0 ; y ≥ 0}.
   [problème, 8 points]
   partie 1 (Bornes en (r, φ) : 1,5 ; Écris l'intégrande en polaires, jacobien compris : 1,5 ; Sépare : l'intégrale en φ se calcule tout de suite. : 1 ; Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) : 2 ; Valeur de l'intégrale : 2)
-    [free, sans aide, suivre l'erreur]  1 ≤ x² + y² ≤ 4 ; x ≤ 0 ; y ≥ 0
-      = π/2 ≤ φ ≤ π ; 1 ≤ r ≤ 2   ← Rayon entre les cercles, angle entre les demi-droites
+    [free, sans aide, suivre l'erreur]  1 ≤ x² + y² ≤ e² ; x ≥ 0 ; y ≥ 0
+      = 0 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e   ← Rayon entre les cercles, angle entre les demi-droites
     — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : ln(x² + y²)
       = 2r·ln(r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-    — Sépare : l'intégrale en φ se calcule tout de suite.  [juge equiv]  départ : ∫_{π/2}^{π} ∫_{1}^{2} 2r·ln(r) dr dφ
-      = (π/2)·(∫_{1}^{2} 2r·ln(r) dr)   ← ∫ dφ = π/2
+    — Sépare : l'intégrale en φ se calcule tout de suite.  [juge equiv]  départ : ∫_{0}^{π/2} ∫_{1}^{e} 2r·ln(r) dr dφ
+      = (π/2)·(∫_{1}^{e} 2r·ln(r) dr)   ← ∫ dφ = π/2
     — Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) :  [juge antideriv]  départ : ∫ 2r·ln(r) dr
       = r²·ln(r) − ∫ r dr   ← u = ln r, v = r² : ∫ uv′ = uv − ∫ u′v
       = r²·ln(r) − r²/2 + C   ← Primitive de r
-    — Valeur de l'intégrale :  [juge definite]  départ : (π/2)·([r²·ln(r) − r²/2]_{1}^{2})
-      = 2πln(2) − 3π/4   ← F(R) − F(1)
+    — Valeur de l'intégrale :  [juge definite]  départ : (π/2)·([r²·ln(r) − r²/2]_{1}^{e})
+      = πe²/4 + π/4   ← F(R) − F(1)
   pièges : a2_polar_angle_bounds
 
-Calcule ∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e² ; x ≥ 0}.
+Calcule ∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e²}.
   [problème, 8 points]
   partie 1 (Bornes en (r, φ) : 1,5 ; Écris l'intégrande en polaires, jacobien compris : 1,5 ; Sépare : l'intégrale en φ se calcule tout de suite. : 1 ; Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) : 2 ; Valeur de l'intégrale : 2)
-    [free, sans aide, suivre l'erreur]  1 ≤ x² + y² ≤ e² ; x ≥ 0
-      = −π/2 ≤ φ ≤ π/2 ; 1 ≤ r ≤ e   ← Rayon entre les cercles, angle entre les demi-droites
+    [free, sans aide, suivre l'erreur]  1 ≤ x² + y² ≤ e²
+      = 0 ≤ φ ≤ 2π ; 1 ≤ r ≤ e   ← Rayon entre les cercles, angle entre les demi-droites
     — Écris l'intégrande en polaires, jacobien compris :  [juge equiv]  départ : ln(x² + y²)
       = 2r·ln(r)   ← x = r cos φ, y = r sin φ, et dx dy = r dr dφ
-    — Sépare : l'intégrale en φ se calcule tout de suite.  [juge equiv]  départ : ∫_{−π/2}^{π/2} ∫_{1}^{e} 2r·ln(r) dr dφ
-      = π·(∫_{1}^{e} 2r·ln(r) dr)   ← ∫ dφ = π
+    — Sépare : l'intégrale en φ se calcule tout de suite.  [juge equiv]  départ : ∫_{0}^{2π} ∫_{1}^{e} 2r·ln(r) dr dφ
+      = 2π·(∫_{1}^{e} 2r·ln(r) dr)   ← ∫ dφ = 2π
     — Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) :  [juge antideriv]  départ : ∫ 2r·ln(r) dr
       = r²·ln(r) − ∫ r dr   ← u = ln r, v = r² : ∫ uv′ = uv − ∫ u′v
       = r²·ln(r) − r²/2 + C   ← Primitive de r
-    — Valeur de l'intégrale :  [juge definite]  départ : π·([r²·ln(r) − r²/2]_{1}^{e})
-      = πe²/2 + π/2   ← F(R) − F(1)
+    — Valeur de l'intégrale :  [juge definite]  départ : 2π·([r²·ln(r) − r²/2]_{1}^{e})
+      = πe² + π   ← F(R) − F(1)
   pièges : a2_polar_angle_bounds
 
 ```
@@ -8001,10 +7997,10 @@ Calcule ∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ e² ; x ≥ 0}.
 ### Variantes d'examen
 
 ```
-∬D ln(x² + y²) dx dy, avec D = {1 ≤ x² + y² ≤ 4 ; x ≥ 0}, vaut :
-  ✔ 4πln(2) − 3π/2   · 3πln(2) − 9π/8 [a2_polar_angle_bounds]   · 4πln(2) − 2π [a2_jacobian_forgot]   · 2πln(2) − 3π/4 [g2_log_power]
+∬D 1 dx dy, avec D = {1 ≤ x² + y² ≤ 4 ; x ≤ 0 ; y ≥ 0}, vaut :
+  ✔ 3π/4   · 9π/4 [a2_polar_angle_bounds]   · π/2 [a2_jacobian_forgot]   · 3π/2 [a2_polar_angle_bounds]
   [examen mcq]
-  pièges : a2_jacobian_forgot, a2_polar_angle_bounds, g2_log_power
+  pièges : a2_jacobian_forgot, a2_polar_angle_bounds
 
 ```
 
@@ -8015,41 +8011,41 @@ _dV = r dr dφ dz ; dV = r² sin θ dr dθ dφ, θ mesuré depuis l'axe z._
 ### Niveau 1
 
 ```
-Calcule ∭D (x² + y²) dV, avec D = {√(x² + y²) ≤ z ≤ 3 ; y ≥ 0}. En coordonnées cylindriques.
-  [guided]  √(x² + y²) ≤ z ≤ 3 ; y ≥ 0
-    = 0 ≤ φ ≤ π ; 0 ≤ r ≤ □ ; r ≤ z ≤ □   (trous : 0 ≤ φ ≤ π ; 0 ≤ r ≤ 3 ; r ≤ z ≤ 3)   ← φ et r décrivent l'ombre de D sur le plan xy, puis z va du bas au haut
+Calcule ∭D (x² + y²) dV, avec D = {√(x² + y²) ≤ z ≤ 3}. En coordonnées cylindriques.
+  [guided]  √(x² + y²) ≤ z ≤ 3
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ □ ; r ≤ z ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; r ≤ z ≤ 3)   ← φ et r décrivent l'ombre de D sur le plan xy, puis z va du bas au haut
   — Écris l'intégrande en cylindriques, jacobien compris :  [juge equiv]  départ : x² + y²
     = r²·□   (trous : r²·r)   ← x = r cos φ, y = r sin φ, z = z ; dV = r dr dφ dz
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{3} ∫_{r}^{3} r³ dz dr dφ
-    = ∫_{0}^{π} ∫_{0}^{3} (3r³ − r⁴) dr dφ   ← On intègre d'abord en z, de r à 3
-    = ∫_{0}^{3} (3r³ − r⁴) dr·(∫_{0}^{π} 1 dφ)   ← Plus rien ne dépend de φ : produit
-    = [□]_{0}^{3}·([φ]_{0}^{π})   (trous : [3r⁴/4 − r⁵/5]_{0}^{3}·([φ]_{0}^{π}))   ← Primitives
-    = 243π/20   ← Évaluer
-  aides : z entre deux surfaces au-dessus d'un disque : cylindriques, avec dV = r dr dφ dz. | z va de r à 3 ; l'intégrande devient r³. | 0 ≤ φ ≤ π ; 0 ≤ r ≤ 3 ; r ≤ z ≤ 3
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} ∫_{r}^{3} r³ dz dr dφ
+    = ∫_{0}^{2π} ∫_{0}^{3} (3r³ − r⁴) dr dφ   ← On intègre d'abord en z, de r à 3
+    = ∫_{0}^{3} (3r³ − r⁴) dr·(∫_{0}^{2π} 1 dφ)   ← Plus rien ne dépend de φ : produit
+    = [□]_{0}^{3}·([φ]_{0}^{2π})   (trous : [3r⁴/4 − r⁵/5]_{0}^{3}·([φ]_{0}^{2π}))   ← Primitives
+    = 243π/10   ← Évaluer
+  aides : z entre deux surfaces au-dessus d'un disque : cylindriques, avec dV = r dr dφ dz. | z va de r à 3 ; l'intégrande devient r³. | 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; r ≤ z ≤ 3
   pièges : a2_polar_angle_bounds
 
-Calcule ∭D 1/√(x² + y² + z²) dV, avec D = {x² + y² + z² ≤ 9 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0}. En coordonnées sphériques (θ depuis l'axe z).
-  [guided]  x² + y² + z² ≤ 9 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0
-    = 0 ≤ r ≤ □ ; 0 ≤ θ ≤ □ ; 0 ≤ φ ≤ π/2   (trous : 0 ≤ r ≤ 3 ; 0 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ π/2)   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
-  — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : 1/√(x² + y² + z²)
-    = 1/r·□   (trous : 1/r·(r²·sin(θ)))   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{π/2} ∫_{0}^{3} r·sin(θ) dr dθ dφ
-    = ∫_{0}^{3} r dr·(∫_{0}^{π/2} sin(θ) dθ)·(∫_{0}^{π/2} 1 dφ)   ← Bornes constantes et intégrande produit : trois intégrales
-    = [r²/2]_{0}^{3}·([□]_{0}^{π/2})·([φ]_{0}^{π/2})   (trous : [r²/2]_{0}^{3}·([−cos(θ)]_{0}^{π/2})·([φ]_{0}^{π/2}))   ← Primitives
-    = 9π/4   ← Évaluer
-  aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : 0 ≤ θ ≤ π/2 ; l'intégrande devient r·sin(θ). | 0 ≤ r ≤ 3 ; 0 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ π/2
+Calcule ∭D 1 dV, avec D = {x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)}. En coordonnées sphériques (θ depuis l'axe z).
+  [guided]  x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)
+    = 0 ≤ r ≤ □ ; 0 ≤ θ ≤ □ ; 0 ≤ φ ≤ π/2   (trous : 0 ≤ r ≤ 1 ; 0 ≤ θ ≤ π/4 ; 0 ≤ φ ≤ π/2)   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
+  — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : 1
+    = □   (trous : r²·sin(θ))   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{0}^{1} r²·sin(θ) dr dθ dφ
+    = ∫_{0}^{1} r² dr·(∫_{0}^{π/4} sin(θ) dθ)·(∫_{0}^{π/2} 1 dφ)   ← Bornes constantes et intégrande produit : trois intégrales
+    = [r³/3]_{0}^{1}·([□]_{0}^{π/4})·([φ]_{0}^{π/2})   (trous : [r³/3]_{0}^{1}·([−cos(θ)]_{0}^{π/4})·([φ]_{0}^{π/2}))   ← Primitives
+    = π/6 − √2π/12   ← Évaluer
+  aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : 0 ≤ θ ≤ π/4 ; l'intégrande devient r²·sin(θ). | 0 ≤ r ≤ 1 ; 0 ≤ θ ≤ π/4 ; 0 ≤ φ ≤ π/2
   pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
 
-Calcule ∭D √(x² + y² + z²) dV, avec D = {1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0}. En coordonnées sphériques (θ depuis l'axe z).
-  [guided]  1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0
-    = 1 ≤ r ≤ □ ; 0 ≤ θ ≤ □ ; 0 ≤ φ ≤ π/2   (trous : 1 ≤ r ≤ 2 ; 0 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ π/2)   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
-  — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : √(x² + y² + z²)
-    = r·□   (trous : r·(r²·sin(θ)))   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{π/2} ∫_{1}^{2} r³·sin(θ) dr dθ dφ
-    = ∫_{1}^{2} r³ dr·(∫_{0}^{π/2} sin(θ) dθ)·(∫_{0}^{π/2} 1 dφ)   ← Bornes constantes et intégrande produit : trois intégrales
-    = [r⁴/4]_{1}^{2}·([□]_{0}^{π/2})·([φ]_{0}^{π/2})   (trous : [r⁴/4]_{1}^{2}·([−cos(θ)]_{0}^{π/2})·([φ]_{0}^{π/2}))   ← Primitives
+Calcule ∭D z dV, avec D = {1 ≤ x² + y² + z² ≤ 4 ; 0 ≤ z ≤ √(x² + y²)}. En coordonnées sphériques (θ depuis l'axe z).
+  [guided]  1 ≤ x² + y² + z² ≤ 4 ; 0 ≤ z ≤ √(x² + y²)
+    = 1 ≤ r ≤ □ ; π/4 ≤ θ ≤ □ ; 0 ≤ φ ≤ 2π   (trous : 1 ≤ r ≤ 2 ; π/4 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ 2π)   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
+  — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : z
+    = r·cos(θ)·□   (trous : r·cos(θ)·(r²·sin(θ)))   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{2π} ∫_{π/4}^{π/2} ∫_{1}^{2} r³·cos(θ)·sin(θ) dr dθ dφ
+    = ∫_{1}^{2} r³ dr·(∫_{π/4}^{π/2} cos(θ)·sin(θ) dθ)·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes et intégrande produit : trois intégrales
+    = [r⁴/4]_{1}^{2}·([□]_{π/4}^{π/2})·([φ]_{0}^{2π})   (trous : [r⁴/4]_{1}^{2}·([sin(θ)²/2]_{π/4}^{π/2})·([φ]_{0}^{2π}))   ← Primitives
     = 15π/8   ← Évaluer
-  aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : 0 ≤ θ ≤ π/2 ; l'intégrande devient r³·sin(θ). | 1 ≤ r ≤ 2 ; 0 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ π/2
+  aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : π/4 ≤ θ ≤ π/2 ; l'intégrande devient r³·cos(θ)·sin(θ). | 1 ≤ r ≤ 2 ; π/4 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ 2π
   pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
 
 ```
@@ -8057,30 +8053,6 @@ Calcule ∭D √(x² + y² + z²) dV, avec D = {1 ≤ x² + y² + z² ≤ 4 ; x 
 ### Niveau 2
 
 ```
-Calcule ∭D 1 dV, avec D = {x² + y² ≤ 1 ; 0 ≤ z ≤ 4}. En coordonnées cylindriques.
-  [guided]  x² + y² ≤ 1 ; 0 ≤ z ≤ 4
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; 0 ≤ z ≤ 4   ← φ et r décrivent l'ombre de D sur le plan xy, puis z va du bas au haut
-  — Écris l'intégrande en cylindriques, jacobien compris :  [juge equiv]  départ : 1
-    = □   (trous : r)   ← x = r cos φ, y = r sin φ, z = z ; dV = r dr dφ dz
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} ∫_{0}^{4} r dz dr dφ
-    = ∫_{0}^{1} r dr·(∫_{0}^{2π} 1 dφ)·(∫_{0}^{4} 1 dz)   ← Bornes constantes : trois intégrales
-    = [r²/2]_{0}^{1}·([φ]_{0}^{2π})·([z]_{0}^{4})   ← Primitives
-    = 4π   ← Évaluer
-  aides : z entre deux surfaces au-dessus d'un disque : cylindriques, avec dV = r dr dφ dz. | z va de 0 à 4 ; l'intégrande devient r. | 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; 0 ≤ z ≤ 4
-  pièges : a2_polar_angle_bounds
-
-Calcule ∭D z dV, avec D = {1 ≤ x² + y² + z² ≤ 4 ; 0 ≤ z ≤ √(x² + y²)}. En coordonnées sphériques (θ depuis l'axe z).
-  [guided]  1 ≤ x² + y² + z² ≤ 4 ; 0 ≤ z ≤ √(x² + y²)
-    = 1 ≤ r ≤ 2 ; π/4 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ 2π   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
-  — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : z
-    = r·cos(θ)·□   (trous : r·cos(θ)·(r²·sin(θ)))   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
-  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{2π} ∫_{π/4}^{π/2} ∫_{1}^{2} r³·cos(θ)·sin(θ) dr dθ dφ
-    = ∫_{1}^{2} r³ dr·(∫_{π/4}^{π/2} cos(θ)·sin(θ) dθ)·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes et intégrande produit : trois intégrales
-    = [r⁴/4]_{1}^{2}·([sin(θ)²/2]_{π/4}^{π/2})·([φ]_{0}^{2π})   ← Primitives
-    = 15π/8   ← Évaluer
-  aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : π/4 ≤ θ ≤ π/2 ; l'intégrande devient r³·cos(θ)·sin(θ). | 1 ≤ r ≤ 2 ; π/4 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ 2π
-  pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
-
 Calcule ∭D z dV, avec D = {x² + y² ≤ 1 ; 0 ≤ z ≤ 1}. En coordonnées cylindriques.
   [guided]  x² + y² ≤ 1 ; 0 ≤ z ≤ 1
     = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; 0 ≤ z ≤ 1   ← φ et r décrivent l'ombre de D sur le plan xy, puis z va du bas au haut
@@ -8093,17 +8065,11 @@ Calcule ∭D z dV, avec D = {x² + y² ≤ 1 ; 0 ≤ z ≤ 1}. En coordonnées c
   aides : z entre deux surfaces au-dessus d'un disque : cylindriques, avec dV = r dr dφ dz. | z va de 0 à 1 ; l'intégrande devient r·z. | 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; 0 ≤ z ≤ 1
   pièges : a2_polar_angle_bounds
 
-```
-
-### Niveau 3
-
-```
-Calcule ∭D z dV, avec D = {1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)}.
-  [tap, suivre l'erreur, menu steps]  1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)
-    ? Quelles coordonnées ? ✔ Sphériques : boule, coquille, cône depuis l'origine / · Cylindriques : cylindre, paraboloïde, z entre deux surfaces
+Calcule ∭D z dV, avec D = {1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)}. En coordonnées sphériques (θ depuis l'axe z).
+  [guided]  1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)
     = 1 ≤ r ≤ 2 ; 0 ≤ θ ≤ π/4 ; 0 ≤ φ ≤ π/2   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
   — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : z
-    = r³·cos(θ)·sin(θ)   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
+    = r·cos(θ)·□   (trous : r·cos(θ)·(r²·sin(θ)))   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
   — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{1}^{2} r³·cos(θ)·sin(θ) dr dθ dφ
     = ∫_{1}^{2} r³ dr·(∫_{0}^{π/4} cos(θ)·sin(θ) dθ)·(∫_{0}^{π/2} 1 dφ)   ← Bornes constantes et intégrande produit : trois intégrales
     = [r⁴/4]_{1}^{2}·([sin(θ)²/2]_{0}^{π/4})·([φ]_{0}^{π/2})   ← Primitives
@@ -8111,12 +8077,11 @@ Calcule ∭D z dV, avec D = {1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z
   aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : 0 ≤ θ ≤ π/4 ; l'intégrande devient r³·cos(θ)·sin(θ). | 1 ≤ r ≤ 2 ; 0 ≤ θ ≤ π/4 ; 0 ≤ φ ≤ π/2
   pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
 
-Calcule ∭D √(x² + y² + z²) dV, avec D = {x² + y² + z² ≤ 4 ; z ≤ 0}.
-  [tap, suivre l'erreur, menu steps]  x² + y² + z² ≤ 4 ; z ≤ 0
-    ? Quelles coordonnées ? ✔ Sphériques : boule, coquille, cône depuis l'origine / · Cylindriques : cylindre, paraboloïde, z entre deux surfaces
+Calcule ∭D √(x² + y² + z²) dV, avec D = {x² + y² + z² ≤ 4 ; z ≤ 0}. En coordonnées sphériques (θ depuis l'axe z).
+  [guided]  x² + y² + z² ≤ 4 ; z ≤ 0
     = 0 ≤ r ≤ 2 ; π/2 ≤ θ ≤ π ; 0 ≤ φ ≤ 2π   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
   — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : √(x² + y² + z²)
-    = r³·sin(θ)   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
+    = r·□   (trous : r·(r²·sin(θ)))   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
   — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{2π} ∫_{π/2}^{π} ∫_{0}^{2} r³·sin(θ) dr dθ dφ
     = ∫_{0}^{2} r³ dr·(∫_{π/2}^{π} sin(θ) dθ)·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes et intégrande produit : trois intégrales
     = [r⁴/4]_{0}^{2}·([−cos(θ)]_{π/2}^{π})·([φ]_{0}^{2π})   ← Primitives
@@ -8124,6 +8089,11 @@ Calcule ∭D √(x² + y² + z²) dV, avec D = {x² + y² + z² ≤ 4 ; z ≤ 0}
   aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : π/2 ≤ θ ≤ π ; l'intégrande devient r³·sin(θ). | 0 ≤ r ≤ 2 ; π/2 ≤ θ ≤ π ; 0 ≤ φ ≤ 2π
   pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
 
+```
+
+### Niveau 3
+
+```
 Calcule ∭D (x² + y²) dV, avec D = {z ≥ 0 ; z ≤ 4 − x² − y²}.
   [tap, suivre l'erreur, menu steps]  z ≥ 0 ; z ≤ 4 − x² − y²
     ? Quelles coordonnées ? · Sphériques : boule, coquille, cône depuis l'origine / ✔ Cylindriques : cylindre, paraboloïde, z entre deux surfaces
@@ -8138,13 +8108,9 @@ Calcule ∭D (x² + y²) dV, avec D = {z ≥ 0 ; z ≤ 4 − x² − y²}.
   aides : z entre deux surfaces au-dessus d'un disque : cylindriques, avec dV = r dr dφ dz. | z va de 0 à 4 − r² ; l'intégrande devient r³. | 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; 0 ≤ z ≤ 4 − r²
   pièges : a2_polar_angle_bounds
 
-```
-
-### Niveau 4
-
-```
 Calcule ∭D z dV, avec D = {x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)}.
-  [free, suivre l'erreur]  x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)
+  [tap, suivre l'erreur, menu steps]  x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)
+    ? Quelles coordonnées ? ✔ Sphériques : boule, coquille, cône depuis l'origine / · Cylindriques : cylindre, paraboloïde, z entre deux surfaces
     = 0 ≤ r ≤ 1 ; 0 ≤ θ ≤ π/4 ; 0 ≤ φ ≤ π/2   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
   — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : z
     = r³·cos(θ)·sin(θ)   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
@@ -8156,7 +8122,8 @@ Calcule ∭D z dV, avec D = {x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ �
   pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
 
 Calcule ∭D √(x² + y² + z²) dV, avec D = {x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0}.
-  [free, suivre l'erreur]  x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0
+  [tap, suivre l'erreur, menu steps]  x² + y² + z² ≤ 1 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0
+    ? Quelles coordonnées ? ✔ Sphériques : boule, coquille, cône depuis l'origine / · Cylindriques : cylindre, paraboloïde, z entre deux surfaces
     = 0 ≤ r ≤ 1 ; 0 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ π/2   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
   — Écris l'intégrande en sphériques, jacobien compris :  [juge equiv]  départ : √(x² + y² + z²)
     = r³·sin(θ)   ← x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ
@@ -8167,6 +8134,11 @@ Calcule ∭D √(x² + y² + z²) dV, avec D = {x² + y² + z² ≤ 1 ; x ≥ 0 
   aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : 0 ≤ θ ≤ π/2 ; l'intégrande devient r³·sin(θ). | 0 ≤ r ≤ 1 ; 0 ≤ θ ≤ π/2 ; 0 ≤ φ ≤ π/2
   pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
 
+```
+
+### Niveau 4
+
+```
 Calcule ∭D z dV, avec D = {x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)}.
   [free, suivre l'erreur]  x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)
     = 0 ≤ r ≤ 2 ; 0 ≤ θ ≤ π/4 ; 0 ≤ φ ≤ π/2   ← r entre les sphères, θ depuis l'axe z, φ autour de l'axe z
@@ -8179,37 +8151,61 @@ Calcule ∭D z dV, avec D = {x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ �
   aides : Une boule, une coquille ou un cône depuis l'origine : sphériques, avec dV = r² sin θ dr dθ dφ. | θ part de l'axe z : 0 ≤ θ ≤ π/4 ; l'intégrande devient r³·cos(θ)·sin(θ). | 0 ≤ r ≤ 2 ; 0 ≤ θ ≤ π/4 ; 0 ≤ φ ≤ π/2
   pièges : a2_polar_angle_bounds, a2_sph_theta_from_plane
 
+Calcule ∭D 1 dV, avec D = {x² + y² ≤ 1 ; 0 ≤ z ≤ 2 ; x ≥ 0 ; y ≥ 0}.
+  [free, suivre l'erreur]  x² + y² ≤ 1 ; 0 ≤ z ≤ 2 ; x ≥ 0 ; y ≥ 0
+    = 0 ≤ φ ≤ π/2 ; 0 ≤ r ≤ 1 ; 0 ≤ z ≤ 2   ← φ et r décrivent l'ombre de D sur le plan xy, puis z va du bas au haut
+  — Écris l'intégrande en cylindriques, jacobien compris :  [juge equiv]  départ : 1
+    = r   ← x = r cos φ, y = r sin φ, z = z ; dV = r dr dφ dz
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{1} ∫_{0}^{2} r dz dr dφ
+    = ∫_{0}^{1} r dr·(∫_{0}^{π/2} 1 dφ)·(∫_{0}^{2} 1 dz)   ← Bornes constantes : trois intégrales
+    = [r²/2]_{0}^{1}·([φ]_{0}^{π/2})·([z]_{0}^{2})   ← Primitives
+    = π/2   ← Évaluer
+  aides : z entre deux surfaces au-dessus d'un disque : cylindriques, avec dV = r dr dφ dz. | z va de 0 à 2 ; l'intégrande devient r. | 0 ≤ φ ≤ π/2 ; 0 ≤ r ≤ 1 ; 0 ≤ z ≤ 2
+  pièges : a2_polar_angle_bounds
+
+Calcule ∭D z dV, avec D = {z ≥ 0 ; z ≤ 9 − x² − y²}.
+  [free, suivre l'erreur]  z ≥ 0 ; z ≤ 9 − x² − y²
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; 0 ≤ z ≤ 9 − r²   ← φ et r décrivent l'ombre de D sur le plan xy, puis z va du bas au haut
+  — Écris l'intégrande en cylindriques, jacobien compris :  [juge equiv]  départ : z
+    = r·z   ← x = r cos φ, y = r sin φ, z = z ; dV = r dr dφ dz
+  — Calcule l'intégrale :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} ∫_{0}^{9 − r²} r·z dz dr dφ
+    = ∫_{0}^{2π} ∫_{0}^{3} (81r/2 − 9r³ + r⁵/2) dr dφ   ← On intègre d'abord en z, de 0 à 9−r^2
+    = ∫_{0}^{3} (81r/2 − 9r³ + r⁵/2) dr·(∫_{0}^{2π} 1 dφ)   ← Plus rien ne dépend de φ : produit
+    = [81r²/4 − 9r⁴/4 + r⁶/12]_{0}^{3}·([φ]_{0}^{2π})   ← Primitives
+    = 243π/2   ← Évaluer
+  aides : z entre deux surfaces au-dessus d'un disque : cylindriques, avec dV = r dr dφ dz. | z va de 0 à 9 − r² ; l'intégrande devient r·z. | 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; 0 ≤ z ≤ 9 − r²
+  pièges : a2_polar_angle_bounds
+
 ```
 
 ### Niveau 5
 
 ```
-Soit D = {x² + y² + z² ≤ 4}. En sphériques (θ mesuré depuis l'axe z), ∭D (x² + y²) dV est égale à :
-  ✔ ∫_{0}^{2π} ∫_{0}^{π} ∫_{0}^{2} r⁴·sin(θ)³ dr dθ dφ   · ∫_{0}^{2π} ∫_{0}^{π} ∫_{0}^{2} r²·sin(θ)² dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{2π} ∫_{0}^{π} ∫_{0}^{2} r³·sin(θ)² dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{π} ∫_{0}^{π} ∫_{0}^{2} r⁴·sin(θ)³ dr dθ dφ [a2_polar_angle_bounds]
-  pièges : a2_polar_angle_bounds, a2_jacobian_forgot
+Soit D = {1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)}. En sphériques (θ mesuré depuis l'axe z), ∭D (x² + y²) dV est égale à :
+  · ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{1}^{2} r⁴·cos(θ)³ dr dθ dφ [a2_sph_theta_from_plane]   · ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{1}^{2} r³·sin(θ)² dr dθ dφ [a2_jacobian_forgot]   ✔ ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{1}^{2} r⁴·sin(θ)³ dr dθ dφ   · ∫_{0}^{π} ∫_{0}^{π/4} ∫_{1}^{2} r⁴·sin(θ)³ dr dθ dφ [a2_polar_angle_bounds]
+  pièges : a2_jacobian_forgot, a2_polar_angle_bounds, a2_sph_theta_from_plane
 
-Soit D = {x² + y² + z² ≤ 1 ; z ≥ 0}. En sphériques (θ mesuré depuis l'axe z), ∭D 1 dV est égale à :
-  · ∫_{0}^{2π} ∫_{0}^{π/2} ∫_{0}^{1} 1 dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{2π} ∫_{0}^{π/4} ∫_{0}^{1} r²·sin(θ) dr dθ dφ [a2_polar_angle_bounds]   ✔ ∫_{0}^{2π} ∫_{0}^{π/2} ∫_{0}^{1} r²·sin(θ) dr dθ dφ   · ∫_{0}^{π} ∫_{0}^{π/2} ∫_{0}^{1} r²·sin(θ) dr dθ dφ [a2_polar_angle_bounds]
-  pièges : a2_polar_angle_bounds, a2_jacobian_forgot
+Soit D = {x² + y² + z² ≤ 9 ; z ≤ 0}. En sphériques (θ mesuré depuis l'axe z), ∭D (x² + y²) dV est égale à :
+  · ∫_{0}^{2π} ∫_{π/2}^{π} ∫_{0}^{3} r³·sin(θ)² dr dθ dφ [a2_jacobian_forgot]   ✔ ∫_{0}^{2π} ∫_{π/2}^{π} ∫_{0}^{3} r⁴·sin(θ)³ dr dθ dφ   · ∫_{0}^{2π} ∫_{π/2}^{π} ∫_{0}^{3} r²·sin(θ)² dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{2π} ∫_{π/2}^{π} ∫_{0}^{3} r⁴·cos(θ)³ dr dθ dφ [a2_sph_theta_from_plane]
+  pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
 
-Soit D = {x² + y² + z² ≤ 1 ; z ≥ √(x² + y²)}. En sphériques (θ mesuré depuis l'axe z), ∭D 1/√(x² + y² + z²) dV est égale à :
-  · ∫_{0}^{2π} ∫_{0}^{π/4} ∫_{0}^{1} 1 dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{2π} ∫_{0}^{π/4} ∫_{0}^{1} r·cos(θ) dr dθ dφ [a2_sph_theta_from_plane]   ✔ ∫_{0}^{2π} ∫_{0}^{π/4} ∫_{0}^{1} r·sin(θ) dr dθ dφ   · ∫_{0}^{2π} ∫_{0}^{π/2} ∫_{0}^{1} r·sin(θ) dr dθ dφ [a2_polar_angle_bounds]
-  pièges : a2_jacobian_forgot, a2_sph_theta_from_plane, a2_polar_angle_bounds
+Soit D = {x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ √(x² + y²)}. En sphériques (θ mesuré depuis l'axe z), ∭D z² dV est égale à :
+  · ∫_{0}^{π/2} ∫_{0}^{π/2} ∫_{0}^{2} r⁴·cos(θ)²·sin(θ) dr dθ dφ [a2_polar_angle_bounds]   ✔ ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{0}^{2} r⁴·cos(θ)²·sin(θ) dr dθ dφ   · ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{0}^{2} r³·cos(θ)² dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{0}^{2} r⁴·sin(θ)²·cos(θ) dr dθ dφ [a2_sph_theta_from_plane]
+  pièges : a2_polar_angle_bounds, a2_jacobian_forgot, a2_sph_theta_from_plane
 
 ```
 
 ### Variantes d'examen
 
 ```
-Soit D = {x² + y² + z² ≤ 4 ; 0 ≤ z ≤ √(x² + y²)}. En sphériques (θ mesuré depuis l'axe z), ∭D (x² + y²) dV est égale à :
-  ✔ ∫_{0}^{2π} ∫_{π/4}^{π/2} ∫_{0}^{2} r⁴·sin(θ)³ dr dθ dφ   · ∫_{0}^{π} ∫_{π/4}^{π/2} ∫_{0}^{2} r⁴·sin(θ)³ dr dθ dφ [a2_polar_angle_bounds]   · ∫_{0}^{2π} ∫_{π/4}^{π/2} ∫_{0}^{2} r³·sin(θ)² dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{2π} ∫_{π/4}^{π/2} ∫_{0}^{2} r²·sin(θ)² dr dθ dφ [a2_jacobian_forgot]
+Soit D = {1 ≤ x² + y² + z² ≤ 4 ; x ≥ 0 ; y ≥ 0 ; z ≥ 0}. En sphériques (θ mesuré depuis l'axe z), ∭D 1 dV est égale à :
+  · ∫_{0}^{π/2} ∫_{0}^{π/2} ∫_{1}^{2} 1 dr dθ dφ [a2_jacobian_forgot]   · ∫_{0}^{π/2} ∫_{0}^{π/4} ∫_{1}^{2} r²·sin(θ) dr dθ dφ [a2_polar_angle_bounds]   ✔ ∫_{0}^{π/2} ∫_{0}^{π/2} ∫_{1}^{2} r²·sin(θ) dr dθ dφ   · ∫_{0}^{π/2} ∫_{0}^{π/2} ∫_{1}^{2} r dr dθ dφ [a2_jacobian_forgot]
   [examen mcq]
   pièges : a2_jacobian_forgot, a2_polar_angle_bounds
 
-Vrai ou faux ? « En sphériques, z = r sin θ. »
-  · Vrai [a2_sph_theta_from_plane]   ✔ Faux
+Vrai ou faux ? « En sphériques, le cône z ≥ √(x² + y²) devient 0 ≤ θ ≤ π/4. »
+  ✔ Vrai   · Faux
   [examen tf]
-  pièges : a2_sph_theta_from_plane
 
 ```
 
@@ -8220,6 +8216,15 @@ _Sur la boule B_R, puis R → ∞ ; le seuil de ‖x‖^(−α) est la dimension
 ### Niveau 1
 
 ```
+Étudie ∫‖x‖ ≥ 1 1/(x² + y²) dx dy (dans ℝ²) : intègre sur la boule B_R, puis fais R → +∞. En polaires, f·r = r^−1.
+  [guided]  ∫_{0}^{2π} ∫_{1}^{R} r^(−1) dr dφ
+    = 2π·(∫_{1}^{R} r^(−1) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
+    = 2π·([□]_{1}^{R})   (trous : 2π·([ln(r)]_{1}^{R}))   ← Primitive en r
+    = 2π·ln(R)   ← Évaluer entre les bornes
+  — Fais tendre R → +∞ :  [juge limit]  départ : 2π·ln(R)
+    = □   (trous : ∞)   ← La limite est infinie : l'intégrale diverge.
+  aides : Intègre sur la boule de rayon R en polaires, puis prends la limite. | I = 2π·ln(R) ; reste la limite. | r^−1 ; les angles donnent 2π.
+
 Étudie ∫ℝ³ 1/(1 + x² + y² + z²)² dV : intègre sur la boule B_R, puis fais R → +∞. En sphériques, f·r² sin θ = r²·sin(θ)/(1 + r²)².
   [guided]  4π·(∫_{0}^{R} r²/(1 + r²)² dr)
     (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
@@ -8229,53 +8234,43 @@ _Sur la boule B_R, puis R → ∞ ; le seuil de ‖x‖^(−α) est la dimension
     = □   (trous : π²)   ← R → +∞
   aides : Intègre sur la boule de rayon R en sphériques, puis prends la limite. | I = 2π·(arctan(R) − R/(1 + R²)) ; reste la limite. | r²·sin(θ)/(1 + r²)² ; les angles donnent 4π.
 
-Étudie ∫ℝ² e^(−(x² + y²)) dx dy : intègre sur la boule B_R, puis fais R → +∞. En polaires, f·r = r·e^(−r²).
-  [guided]  ∫_{0}^{2π} ∫_{0}^{R} r·e^(−r²) dr dφ
-    = 2π·(∫_{0}^{R} r·e^(−r²) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
-    = 2π·([□]_{0}^{R})   (trous : 2π·([−e^(−r²)/2]_{0}^{R}))   ← Primitive en r
-    = π·(1 − e^(−R²))   ← Évaluer entre les bornes
-  — Fais tendre R → +∞ :  [juge limit]  départ : π·(1 − e^(−R²))
-    = □   (trous : π)   ← R → +∞
-  aides : Intègre sur la boule de rayon R en polaires, puis prends la limite. | I = π·(1 − e^(−R²)) ; reste la limite. | r·e^(−r²) ; les angles donnent 2π.
-
-Étudie ∫0 < ‖x‖ ≤ 1 1/(x² + y²) dx dy (dans ℝ²) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺. En polaires, f·r = r^−1.
-  [guided]  ∫_{0}^{2π} ∫_{ε}^{1} r^(−1) dr dφ
-    = 2π·(∫_{ε}^{1} r^(−1) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
-    = 2π·([□]_{ε}^{1})   (trous : 2π·([ln(r)]_{ε}^{1}))   ← Primitive en r
-    = −2π·ln(ε)   ← Évaluer entre les bornes
-  — Fais tendre ε → 0⁺ :  [juge limit]  départ : −2π·ln(ε)
+Étudie ∫0 < ‖x‖ ≤ 1 1/(x² + y² + z²)² dV (dans ℝ³) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺. En sphériques, f·r² sin θ = r^−2·sin(θ).
+  [guided]  4π·(∫_{ε}^{1} r^(−2) dr)
+    (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
+    = 4π·([□]_{ε}^{1})   (trous : 4π·([−r^(−1)]_{ε}^{1}))   ← Primitive en r
+    = 4π·(ε^(−1) − 1)   ← Évaluer entre les bornes
+  — Fais tendre ε → 0⁺ :  [juge limit]  départ : 4π·(ε^(−1) − 1)
     = □   (trous : ∞)   ← La limite est infinie : l'intégrale diverge.
-  aides : Intègre sur ε ≤ r ≤ 1 en polaires, puis prends la limite. | I = −2π·ln(ε) ; reste la limite. | r^−1 ; les angles donnent 2π.
+  aides : Intègre sur ε ≤ r ≤ 1 en sphériques, puis prends la limite. | I = 4π·(ε^−1 − 1) ; reste la limite. | r^−2·sin(θ) ; les angles donnent 4π.
 
 ```
 
 ### Niveau 2
 
 ```
-Étudie ∫ℝ³ 1/(1 + x² + y² + z²)² dV : intègre sur la boule B_R, puis fais R → +∞.
-  [guided]  1/(1 + x² + y² + z²)²
-    = r²·sin(θ)/(1 + r²)²   ← dV = r² sin θ dr dθ dφ
-  — On intègre sur la boule B_R :  [juge equiv]  départ : 4π·(∫_{0}^{R} r²/(1 + r²)² dr)
+Étudie ∫ℝ³ √(x² + y² + z²)·e^(−(x² + y² + z²)) dV : intègre sur la boule B_R, puis fais R → +∞.
+  [guided]  √(x² + y² + z²)·e^(−(x² + y² + z²))
+    = r³·sin(θ)·e^(−r²)   ← dV = r² sin θ dr dθ dφ
+  — On intègre sur la boule B_R :  [juge equiv]  départ : 4π·(∫_{0}^{R} r³·e^(−r²) dr)
     (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
-    = 4π·([(arctan(r) − r/(1 + r²))/2]_{0}^{R})   ← Primitive en r
-    = 2π·(arctan(R) − R/(1 + R²))   ← Évaluer entre les bornes
-  — Fais tendre R → +∞ :  [juge limit]  départ : 2π·(arctan(R) − R/(1 + R²))
-    = π²   ← R → +∞
-  aides : Intègre sur la boule de rayon R en sphériques, puis prends la limite. | I = 2π·(arctan(R) − R/(1 + R²)) ; reste la limite. | r²·sin(θ)/(1 + r²)² ; les angles donnent 4π.
+    = 4π·([−(r² + 1)·e^(−r²)/2]_{0}^{R})   ← Primitive en r
+    = 2π·(1 − (1 + R²)·e^(−R²))   ← Évaluer entre les bornes
+  — Fais tendre R → +∞ :  [juge limit]  départ : 2π·(1 − (1 + R²)·e^(−R²))
+    = 2π   ← R → +∞
+  aides : Intègre sur la boule de rayon R en sphériques, puis prends la limite. | I = 2π·(1 − (1 + R²)·e^(−R²)) ; reste la limite. | r³·sin(θ)·e^(−r²) ; les angles donnent 4π.
   pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
 
-Étudie ∫‖x‖ ≥ 1 1/(x² + y²) dx dy (dans ℝ²) : intègre sur la boule B_R, puis fais R → +∞.
-  [guided]  1/(x² + y²)
-    ? Avant de calculer : l'intégrale converge-t-elle ? (α = 2, n = 2) · Elle converge / ✔ Elle diverge
-    = r^(−1)   ← dx dy = r dr dφ
-  — On intègre sur la boule B_R privée de B_1 :  [juge equiv]  départ : ∫_{0}^{2π} ∫_{1}^{R} r^(−1) dr dφ
-    = 2π·(∫_{1}^{R} r^(−1) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
-    = 2π·([ln(r)]_{1}^{R})   ← Primitive en r
-    = 2π·ln(R)   ← Évaluer entre les bornes
-  — Fais tendre R → +∞ :  [juge limit]  départ : 2π·ln(R)
-    = ∞   ← La limite est infinie : l'intégrale diverge.
-  aides : Intègre sur la boule de rayon R en polaires, puis prends la limite. | I = 2π·ln(R) ; reste la limite. | r^−1 ; les angles donnent 2π.
-  pièges : a2_jacobian_forgot, a2_improper_exponent
+Étudie ∫ℝ³ √(x² + y² + z²)·e^(−(x² + y² + z²)) dV : intègre sur la boule B_R, puis fais R → +∞.
+  [guided]  √(x² + y² + z²)·e^(−(x² + y² + z²))
+    = r³·sin(θ)·e^(−r²)   ← dV = r² sin θ dr dθ dφ
+  — On intègre sur la boule B_R :  [juge equiv]  départ : 4π·(∫_{0}^{R} r³·e^(−r²) dr)
+    (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
+    = 4π·([−(r² + 1)·e^(−r²)/2]_{0}^{R})   ← Primitive en r
+    = 2π·(1 − (1 + R²)·e^(−R²))   ← Évaluer entre les bornes
+  — Fais tendre R → +∞ :  [juge limit]  départ : 2π·(1 − (1 + R²)·e^(−R²))
+    = 2π   ← R → +∞
+  aides : Intègre sur la boule de rayon R en sphériques, puis prends la limite. | I = 2π·(1 − (1 + R²)·e^(−R²)) ; reste la limite. | r³·sin(θ)·e^(−r²) ; les angles donnent 4π.
+  pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
 
 Étudie ∫0 < ‖x‖ ≤ 1 (x² + y²)^(−3/2) dx dy (dans ℝ²) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
   [guided]  (x² + y²)^(−3/2)
@@ -8295,44 +8290,44 @@ _Sur la boule B_R, puis R → ∞ ; le seuil de ‖x‖^(−α) est la dimension
 ### Niveau 3
 
 ```
-Étudie ∫0 < ‖x‖ ≤ 1 (x² + y²)^(−3/4) dx dy (dans ℝ²) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
-  [tap, suivre l'erreur, menu steps]  (x² + y²)^(−3/4)
-    ? Avant de calculer : l'intégrale converge-t-elle ? (α = 3/2, n = 2) ✔ Elle converge / · Elle diverge
-    = r^(−1/2)   ← dx dy = r dr dφ
-  — On intègre sur ε ≤ ‖x‖ ≤ 1 :  [juge equiv]  départ : ∫_{0}^{2π} ∫_{ε}^{1} r^(−1/2) dr dφ
-    = 2π·(∫_{ε}^{1} r^(−1/2) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
-    = 2π·([2r^(1/2)]_{ε}^{1})   ← Primitive en r
-    = 4π·(1 − ε^(1/2))   ← Évaluer entre les bornes
-  — Fais tendre ε → 0⁺ :  [juge limit]  départ : 4π·(1 − ε^(1/2))
-    = 4π   ← ε → 0⁺
-  aides : Intègre sur ε ≤ r ≤ 1 en polaires, puis prends la limite. | I = 4π·(1 − ε^(1/2)) ; reste la limite. | r^(−1/2) ; les angles donnent 2π.
-  pièges : a2_jacobian_forgot, a2_improper_exponent
+Étudie ∫‖x‖ ≥ 1 (x² + y²)^(−5/4) dx dy (dans ℝ²) : intègre sur la boule B_R, puis fais R → +∞.
+  [tap, suivre l'erreur, menu steps]  (x² + y²)^(−5/4)
+    ? Avant de calculer : l'intégrale converge-t-elle ? (α = 5/2, n = 2) ✔ Elle converge / · Elle diverge
+    = r^(−3/2)   ← dx dy = r dr dφ
+  — On intègre sur la boule B_R privée de B_1 :  [juge equiv]  départ : ∫_{0}^{2π} ∫_{1}^{R} r^(−3/2) dr dφ
+    = 2π·(∫_{1}^{R} r^(−3/2) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
+    = 2π·([−2r^(−1/2)]_{1}^{R})   ← Primitive en r
+    = 4π·(1 − R^(−1/2))   ← Évaluer entre les bornes
+  — Fais tendre R → +∞ :  [juge limit]  départ : 4π·(1 − R^(−1/2))
+    = 4π   ← R → +∞
+  aides : Intègre sur la boule de rayon R en polaires, puis prends la limite. | I = 4π·(1 − R^(−1/2)) ; reste la limite. | r^(−3/2) ; les angles donnent 2π.
+  pièges : a2_jacobian_forgot
 
-Étudie ∫0 < ‖x‖ ≤ 1 1/(x² + y² + z²)² dV (dans ℝ³) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
-  [tap, suivre l'erreur, menu steps]  1/(x² + y² + z²)²
-    ? Avant de calculer : l'intégrale converge-t-elle ? (α = 4, n = 3) · Elle converge / ✔ Elle diverge
-    = r^(−2)·sin(θ)   ← dV = r² sin θ dr dθ dφ
-  — On intègre sur ε ≤ ‖x‖ ≤ 1 (en sphériques) :  [juge equiv]  départ : 4π·(∫_{ε}^{1} r^(−2) dr)
+Étudie ∫0 < ‖x‖ ≤ 1 (x² + y² + z²)^(−3/2) dV (dans ℝ³) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
+  [tap, suivre l'erreur, menu steps]  (x² + y² + z²)^(−3/2)
+    ? Avant de calculer : l'intégrale converge-t-elle ? (α = 3, n = 3) · Elle converge / ✔ Elle diverge
+    = r^(−1)·sin(θ)   ← dV = r² sin θ dr dθ dφ
+  — On intègre sur ε ≤ ‖x‖ ≤ 1 (en sphériques) :  [juge equiv]  départ : 4π·(∫_{ε}^{1} r^(−1) dr)
     (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
-    = 4π·([−r^(−1)]_{ε}^{1})   ← Primitive en r
-    = 4π·(ε^(−1) − 1)   ← Évaluer entre les bornes
-  — Fais tendre ε → 0⁺ :  [juge limit]  départ : 4π·(ε^(−1) − 1)
+    = 4π·([ln(r)]_{ε}^{1})   ← Primitive en r
+    = −4π·ln(ε)   ← Évaluer entre les bornes
+  — Fais tendre ε → 0⁺ :  [juge limit]  départ : −4π·ln(ε)
     = ∞   ← La limite est infinie : l'intégrale diverge.
-  aides : Intègre sur ε ≤ r ≤ 1 en sphériques, puis prends la limite. | I = 4π·(ε^−1 − 1) ; reste la limite. | r^−2·sin(θ) ; les angles donnent 4π.
+  aides : Intègre sur ε ≤ r ≤ 1 en sphériques, puis prends la limite. | I = −4π·ln(ε) ; reste la limite. | r^−1·sin(θ) ; les angles donnent 4π.
   pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
 
-Étudie ∫0 < ‖x‖ ≤ 1 (x² + y² + z²)^(−5/4) dV (dans ℝ³) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
-  [tap, suivre l'erreur, menu steps]  (x² + y² + z²)^(−5/4)
-    ? Avant de calculer : l'intégrale converge-t-elle ? (α = 5/2, n = 3) ✔ Elle converge / · Elle diverge
-    = r^(−1/2)·sin(θ)   ← dV = r² sin θ dr dθ dφ
-  — On intègre sur ε ≤ ‖x‖ ≤ 1 (en sphériques) :  [juge equiv]  départ : 4π·(∫_{ε}^{1} r^(−1/2) dr)
+Étudie ∫‖x‖ ≥ 1 1/(x² + y² + z²)² dV (dans ℝ³) : intègre sur la boule B_R, puis fais R → +∞.
+  [tap, suivre l'erreur, menu steps]  1/(x² + y² + z²)²
+    ? Avant de calculer : l'intégrale converge-t-elle ? (α = 4, n = 3) ✔ Elle converge / · Elle diverge
+    = r^(−2)·sin(θ)   ← dV = r² sin θ dr dθ dφ
+  — On intègre sur la boule B_R privée de B_1 :  [juge equiv]  départ : 4π·(∫_{1}^{R} r^(−2) dr)
     (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
-    = 4π·([2r^(1/2)]_{ε}^{1})   ← Primitive en r
-    = 8π·(1 − ε^(1/2))   ← Évaluer entre les bornes
-  — Fais tendre ε → 0⁺ :  [juge limit]  départ : 8π·(1 − ε^(1/2))
-    = 8π   ← ε → 0⁺
-  aides : Intègre sur ε ≤ r ≤ 1 en sphériques, puis prends la limite. | I = 8π·(1 − ε^(1/2)) ; reste la limite. | r^(−1/2)·sin(θ) ; les angles donnent 4π.
-  pièges : a2_jacobian_forgot, a2_sph_theta_from_plane, a2_improper_exponent
+    = 4π·([−r^(−1)]_{1}^{R})   ← Primitive en r
+    = 4π·(1 − R^(−1))   ← Évaluer entre les bornes
+  — Fais tendre R → +∞ :  [juge limit]  départ : 4π·(1 − R^(−1))
+    = 4π   ← R → +∞
+  aides : Intègre sur la boule de rayon R en sphériques, puis prends la limite. | I = 4π·(1 − R^−1) ; reste la limite. | r^−2·sin(θ) ; les angles donnent 4π.
+  pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
 
 ```
 
@@ -8351,68 +8346,66 @@ _Sur la boule B_R, puis R → ∞ ; le seuil de ‖x‖^(−α) est la dimension
   aides : Intègre sur la boule de rayon R en sphériques, puis prends la limite. | I = 2π·(arctan(R) − R/(1 + R²)) ; reste la limite. | r²·sin(θ)/(1 + r²)² ; les angles donnent 4π.
   pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
 
-Étudie ∫0 < ‖x‖ ≤ 1 (x² + y²)^(−3/4) dx dy (dans ℝ²) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
-  [free, suivre l'erreur]  (x² + y²)^(−3/4)
-    = r^(−1/2)   ← dx dy = r dr dφ
-  — On intègre sur ε ≤ ‖x‖ ≤ 1 :  [juge equiv]  départ : ∫_{0}^{2π} ∫_{ε}^{1} r^(−1/2) dr dφ
-    = 2π·(∫_{ε}^{1} r^(−1/2) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
-    = 2π·([2r^(1/2)]_{ε}^{1})   ← Primitive en r
-    = 4π·(1 − ε^(1/2))   ← Évaluer entre les bornes
-  — Fais tendre ε → 0⁺ :  [juge limit]  départ : 4π·(1 − ε^(1/2))
-    = 4π   ← ε → 0⁺
-  aides : Intègre sur ε ≤ r ≤ 1 en polaires, puis prends la limite. | I = 4π·(1 − ε^(1/2)) ; reste la limite. | r^(−1/2) ; les angles donnent 2π.
-  pièges : a2_jacobian_forgot
-
-Étudie ∫0 < ‖x‖ ≤ 1 (x² + y²)^(−5/4) dx dy (dans ℝ²) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
-  [free, suivre l'erreur]  (x² + y²)^(−5/4)
-    = r^(−3/2)   ← dx dy = r dr dφ
-  — On intègre sur ε ≤ ‖x‖ ≤ 1 :  [juge equiv]  départ : ∫_{0}^{2π} ∫_{ε}^{1} r^(−3/2) dr dφ
-    = 2π·(∫_{ε}^{1} r^(−3/2) dr)   ← Rien ne dépend de φ : ∫₀^{2π} dφ = 2π.
-    = 2π·([−2r^(−1/2)]_{ε}^{1})   ← Primitive en r
-    = 4π·(ε^(−1/2) − 1)   ← Évaluer entre les bornes
-  — Fais tendre ε → 0⁺ :  [juge limit]  départ : 4π·(ε^(−1/2) − 1)
+Étudie ∫0 < ‖x‖ ≤ 1 (x² + y² + z²)^(−3/2) dV (dans ℝ³) : intègre sur ε ≤ ‖x‖ ≤ 1, puis fais ε → 0⁺.
+  [free, suivre l'erreur]  (x² + y² + z²)^(−3/2)
+    = r^(−1)·sin(θ)   ← dV = r² sin θ dr dθ dφ
+  — On intègre sur ε ≤ ‖x‖ ≤ 1 (en sphériques) :  [juge equiv]  départ : 4π·(∫_{ε}^{1} r^(−1) dr)
+    (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
+    = 4π·([ln(r)]_{ε}^{1})   ← Primitive en r
+    = −4π·ln(ε)   ← Évaluer entre les bornes
+  — Fais tendre ε → 0⁺ :  [juge limit]  départ : −4π·ln(ε)
     = ∞   ← La limite est infinie : l'intégrale diverge.
-  aides : Intègre sur ε ≤ r ≤ 1 en polaires, puis prends la limite. | I = 4π·(ε^(−1/2) − 1) ; reste la limite. | r^(−3/2) ; les angles donnent 2π.
-  pièges : a2_jacobian_forgot
+  aides : Intègre sur ε ≤ r ≤ 1 en sphériques, puis prends la limite. | I = −4π·ln(ε) ; reste la limite. | r^−1·sin(θ) ; les angles donnent 4π.
+  pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
+
+Étudie ∫‖x‖ ≥ 1 (x² + y² + z²)^(−3/2) dV (dans ℝ³) : intègre sur la boule B_R, puis fais R → +∞.
+  [free, suivre l'erreur]  (x² + y² + z²)^(−3/2)
+    = r^(−1)·sin(θ)   ← dV = r² sin θ dr dθ dφ
+  — On intègre sur la boule B_R privée de B_1 :  [juge equiv]  départ : 4π·(∫_{1}^{R} r^(−1) dr)
+    (Les angles donnent ∫₀^{2π} dφ · ∫₀^π sin θ dθ = 2π · 2 = 4π.)
+    = 4π·([ln(r)]_{1}^{R})   ← Primitive en r
+    = 4π·ln(R)   ← Évaluer entre les bornes
+  — Fais tendre R → +∞ :  [juge limit]  départ : 4π·ln(R)
+    = ∞   ← La limite est infinie : l'intégrale diverge.
+  aides : Intègre sur la boule de rayon R en sphériques, puis prends la limite. | I = 4π·ln(R) ; reste la limite. | r^−1·sin(θ) ; les angles donnent 4π.
+  pièges : a2_jacobian_forgot, a2_sph_theta_from_plane
 
 ```
 
 ### Niveau 5
 
 ```
+Sachant que ∫_ℝ e^(−x²) dx = √π, calcule ∫_ℝ x² e^(−x²) dx (par parties).
+  [free, sans aide]  ∫_{−∞}^{∞} x²·e^(−x²) dx
+    = [−x·e^(−x²)/2]_{−∞}^{∞} + (∫_{−∞}^{∞} e^(−x²) dx)/2   ← u = x, v′ = x e^(−x²), v = −e^(−x²)/2
+    = √π/2   ← Le crochet est nul ; Gauss
+  pièges : a1_ibp_plus, a1_ibp_boundary_term
+
+Sachant que ∫_ℝ e^(−x²) dx = √π, calcule ∫_ℝ x² e^(−x²) dx (par parties).
+  [free, sans aide]  ∫_{−∞}^{∞} x²·e^(−x²) dx
+    = [−x·e^(−x²)/2]_{−∞}^{∞} + (∫_{−∞}^{∞} e^(−x²) dx)/2   ← u = x, v′ = x e^(−x²), v = −e^(−x²)/2
+    = √π/2   ← Le crochet est nul ; Gauss
+  pièges : a1_ibp_plus, a1_ibp_boundary_term
+
 Sachant que ∫_ℝ e^(−x²) dx = √π, calcule ∫_ℝ e^(−x² + 2x) dx.
   [free, sans aide]  ∫_{−∞}^{∞} e^(−x² + 2x) dx
     = e·(∫_{−∞}^{∞} e^(−(x − 1)²) dx)   ← −x² + 2x = 1 − (x − 1)²
     = e·(∫_{−∞}^{∞} e^(−u²) du)   ← u = x − 1
     = e√π   ← Gauss
 
-Calcule ∬_{ℝ²} (x² + y²) e^(−(x² + y²)) dx dy.
-  [free, sans aide]  ∫_{−∞}^{∞} ∫_{−∞}^{∞} (x² + y²)·e^(−(x² + y²)) dx dy
-    = ∫_{0}^{2π} ∫_{0}^{∞} r³·e^(−r²) dr dφ   ← En polaires, avec le jacobien r
-    = 2π·(∫_{0}^{∞} r³·e^(−r²) dr)   ← Les angles donnent 2π
-    = 2π·([−(r² + 1)·e^(−r²)/2]_{0}^{∞})   ← Par parties (ou t = r²)
-    = π   ← Évaluer
-
-Sachant que ∫_ℝ e^(−x²) dx = √π, calcule ∫₀^∞ x² e^(−x²) dx.
-  [free, sans aide]  ∫_{0}^{∞} x²·e^(−x²) dx
-    = [−x·e^(−x²)/2]_{0}^{∞} + (∫_{0}^{∞} e^(−x²) dx)/2   ← Par parties
-    = √π/4   ← ∫₀^∞ e^(−x²) dx = √π/2 (fonction paire)
-  pièges : a1_ibp_plus, a1_ibp_boundary_term
-
 ```
 
 ### Variantes d'examen
 
 ```
-∫0 < ‖x‖ ≤ 1 1/√(x² + y² + z²) dV (dans ℝ³) :
-  · 4π [a2_jacobian_forgot]   · diverge [a2_jacobian_forgot]   ✔ 2π   · 12π [a2_jacobian_forgot]
+∫‖x‖ ≥ 1 1/√(x² + y²) dx dy (dans ℝ²) :
+  · −2π [a2_improper_exponent]   ✔ diverge   · 2π [a2_jacobian_forgot]   · 6π [a2_jacobian_forgot]
   [examen mcq]
-  pièges : a2_jacobian_forgot
+  pièges : a2_improper_exponent, a2_jacobian_forgot
 
-Vrai ou faux ? « Dans ℝ³, ∫0 < ‖x‖ ≤ 1 (x² + y² + z²)^(−3/4) converge. »
-  ✔ Vrai   · Faux [a2_improper_exponent]
+Vrai ou faux ? « Dans ℝ², ∫‖x‖ ≥ 1 (x² + y²)^(−5/4) converge. »
+  ✔ Vrai   · Faux
   [examen tf]
-  pièges : a2_improper_exponent
 
 ```
 
@@ -8423,34 +8416,34 @@ _Vol = ∬ (dessus − dessous) sur la projection R._
 ### Niveau 1
 
 ```
-Calcule le volume du solide compris entre les surfaces z = √(2 − x² − y²) et z = √(x² + y²). La projection est le disque R : x² + y² ≤ 1, et z = √(2 − x² − y²) est au-dessus.
-  [guided]  √(2 − x² − y²) − √(x² + y²)
-    = (√(2 − r²) − r)·□   (trous : (√(2 − r²) − r)·r)   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} (√(2 − r²) − r)·r dr dφ
-    = ∫_{0}^{1} (√(2 − r²) − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [□]_{0}^{1}·([φ]_{0}^{2π})   (trous : [−(2 − r²)^(3/2)/3 − r³/3]_{0}^{1}·([φ]_{0}^{2π}))   ← Primitives
-    = 4√2π/3 − 4π/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 1 ; la hauteur est √(2 − x² − y²) − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{1} (√(2 − r²) − r)·r dr dφ
+Calcule le volume du solide compris entre les surfaces z = 28 − (x² + y²) et z = 1 + 2(x² + y²). La projection est le disque R : x² + y² ≤ 9, et z = 28 − (x² + y²) est au-dessus.
+  [guided]  27 − 3(x² + y²)
+    = (27 − 3r²)·□   (trous : (27 − 3r²)·r)   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} (27 − 3r²)·r dr dφ
+    = ∫_{0}^{3} (27 − 3r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [□]_{0}^{3}·([φ]_{0}^{2π})   (trous : [27r²/2 − 3r⁴/4]_{0}^{3}·([φ]_{0}^{2π}))   ← Primitives
+    = 243π/2   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 9 ; la hauteur est 27 − 3(x² + y²). | ∫_{0}^{2π} ∫_{0}^{3} (27 − 3r²)·r dr dφ
   pièges : a2_jacobian_forgot, a2_volume_surfaces_swapped
 
-Calcule le volume du solide compris entre les surfaces z = √(8 − x² − y²) et z = √(x² + y²). La projection est le disque R : x² + y² ≤ 4, et z = √(8 − x² − y²) est au-dessus.
-  [guided]  √(8 − x² − y²) − √(x² + y²)
-    = (√(8 − r²) − r)·□   (trous : (√(8 − r²) − r)·r)   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (√(8 − r²) − r)·r dr dφ
-    = ∫_{0}^{2} (√(8 − r²) − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [□]_{0}^{2}·([φ]_{0}^{2π})   (trous : [−(8 − r²)^(3/2)/3 − r³/3]_{0}^{2}·([φ]_{0}^{2π}))   ← Primitives
-    = 32√2π/3 − 32π/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est √(8 − x² − y²) − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{2} (√(8 − r²) − r)·r dr dφ
+Calcule le volume du solide compris entre les surfaces z = 38 − 2(x² + y²) et z = 2 + 2(x² + y²). La projection est le disque R : x² + y² ≤ 9, et z = 38 − 2(x² + y²) est au-dessus.
+  [guided]  36 − 4(x² + y²)
+    = (36 − 4r²)·□   (trous : (36 − 4r²)·r)   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} (36 − 4r²)·r dr dφ
+    = ∫_{0}^{3} (36 − 4r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [□]_{0}^{3}·([φ]_{0}^{2π})   (trous : [18r² − r⁴]_{0}^{3}·([φ]_{0}^{2π}))   ← Primitives
+    = 162π   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 9 ; la hauteur est 36 − 4(x² + y²). | ∫_{0}^{2π} ∫_{0}^{3} (36 − 4r²)·r dr dφ
   pièges : a2_jacobian_forgot, a2_volume_surfaces_swapped
 
-Calcule le volume du solide compris entre les surfaces z = 1 et z = x² + y². La projection est le disque R : x² + y² ≤ 1, et z = 1 est au-dessus.
-  [guided]  1 − (x² + y²)
-    = (1 − r²)·□   (trous : (1 − r²)·r)   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} (1 − r²)·r dr dφ
-    = ∫_{0}^{1} (1 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [□]_{0}^{1}·([φ]_{0}^{2π})   (trous : [r²/2 − r⁴/4]_{0}^{1}·([φ]_{0}^{2π}))   ← Primitives
-    = π/2   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 1 ; la hauteur est 1 − (x² + y²). | ∫_{0}^{2π} ∫_{0}^{1} (1 − r²)·r dr dφ
+Calcule le volume du solide compris entre les surfaces z = 2 et z = √(x² + y²). La projection est le disque R : x² + y² ≤ 4, et z = 2 est au-dessus.
+  [guided]  2 − √(x² + y²)
+    = (2 − r)·□   (trous : (2 − r)·r)   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
+    = ∫_{0}^{2} (2 − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [□]_{0}^{2}·([φ]_{0}^{2π})   (trous : [r² − r³/3]_{0}^{2}·([φ]_{0}^{2π}))   ← Primitives
+    = 8π/3   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est 2 − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
   pièges : a2_jacobian_forgot, a2_volume_surfaces_swapped
 
 ```
@@ -8458,139 +8451,140 @@ Calcule le volume du solide compris entre les surfaces z = 1 et z = x² + y². L
 ### Niveau 2
 
 ```
-Calcule le volume du tétraèdre sous le plan z = 3 − 3x − y, dans le premier octant (x, y, z ≥ 0).
-  [guided]  z = 3 − 3x − y ; z = 0 ; x ≥ 0 ; y ≥ 0
-    = 0 ≤ x ≤ □ ; 0 ≤ y ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x)   ← Le plan coupe z = 0 sur la droite 3−3x−y = 0 : un triangle
-  — Décris le solide D : z entre le dessous et le dessus.  [juge domain]  départ : z = 3 − 3x − y ; z = 0 ; x ≥ 0 ; y ≥ 0
-    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ 3 − 3x ; 0 ≤ z ≤ 3 − 3x − y)   ← z va du plan z = 0 au plan incliné
-  — Vol = ∬_R (dessus − dessous) dx dy :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{3 − 3x} (3 − 3x − y) dy dx
-    = ∫_{0}^{1} (3 − 3x)^□/2 dx   (trous : ∫_{0}^{1} (3 − 3x)²/2 dx)   ← On intègre d'abord en y
-    = [−(3 − 3x)³/18]_{0}^{1}   ← Primitive en x
-    = 3/2   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R : 0 ≤ x ≤ 1, 0 ≤ y ≤ 3−3x ; la hauteur est 3 − 3x − y. | ∫_{0}^{1} ∫_{0}^{3 − 3x} (3 − 3x − y) dy dx
-
-Calcule le volume du solide compris entre les surfaces z = 2 et z = √(x² + y²).
-  [guided]  z = 2 ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2)   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 2 ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; □ ≤ z ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; r ≤ z ≤ 2)   ← Sur R, 2 ≥ r : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2 − √(x² + y²)
-    = (2 − r)·□   (trous : (2 − r)·r)   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
-    = ∫_{0}^{2} (2 − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [□]_{0}^{2}·([φ]_{0}^{2π})   (trous : [r² − r³/3]_{0}^{2}·([φ]_{0}^{2π}))   ← Primitives
-    = 8π/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est 2 − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
+Calcule le volume du solide compris entre les surfaces z = √(2 − x² − y²) et z = √(x² + y²).
+  [guided]  z = √(2 − x² − y²) ; z = √(x² + y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1)   ← Les surfaces se coupent en r = 1 : R est le disque x² + y² ≤ 1
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(2 − x² − y²) ; z = √(x² + y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; □ ≤ z ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; r ≤ z ≤ √(2 − r²))   ← Sur R, √(2−r²) ≥ r : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : √(2 − x² − y²) − √(x² + y²)
+    = (√(2 − r²) − r)·□   (trous : (√(2 − r²) − r)·r)   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} (√(2 − r²) − r)·r dr dφ
+    = ∫_{0}^{1} (√(2 − r²) − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [□]_{0}^{1}·([φ]_{0}^{2π})   (trous : [−(2 − r²)^(3/2)/3 − r³/3]_{0}^{1}·([φ]_{0}^{2π}))   ← Primitives
+    = 4√2π/3 − 4π/3   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 1 ; la hauteur est √(2 − x² − y²) − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{1} (√(2 − r²) − r)·r dr dφ
   pièges : a2_polar_angle_bounds
 
-Calcule le volume du solide compris entre les surfaces z = √(8 − x² − y²) et z = √(x² + y²).
-  [guided]  z = √(8 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2)   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(8 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; □ ≤ z ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; r ≤ z ≤ √(8 − r²))   ← Sur R, √(8−r²) ≥ r : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : √(8 − x² − y²) − √(x² + y²)
-    = (√(8 − r²) − r)·□   (trous : (√(8 − r²) − r)·r)   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (√(8 − r²) − r)·r dr dφ
-    = ∫_{0}^{2} (√(8 − r²) − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [□]_{0}^{2}·([φ]_{0}^{2π})   (trous : [−(8 − r²)^(3/2)/3 − r³/3]_{0}^{2}·([φ]_{0}^{2π}))   ← Primitives
-    = 32√2π/3 − 32π/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est √(8 − x² − y²) − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{2} (√(8 − r²) − r)·r dr dφ
+Calcule le volume du solide compris entre les surfaces z = 1 et z = √(x² + y²).
+  [guided]  z = 1 ; z = √(x² + y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1)   ← Les surfaces se coupent en r = 1 : R est le disque x² + y² ≤ 1
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 1 ; z = √(x² + y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; □ ≤ z ≤ □   (trous : 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; r ≤ z ≤ 1)   ← Sur R, 1 ≥ r : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 1 − √(x² + y²)
+    = (1 − r)·□   (trous : (1 − r)·r)   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} (1 − r)·r dr dφ
+    = ∫_{0}^{1} (1 − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [□]_{0}^{1}·([φ]_{0}^{2π})   (trous : [r²/2 − r³/3]_{0}^{1}·([φ]_{0}^{2π}))   ← Primitives
+    = π/3   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 1 ; la hauteur est 1 − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{1} (1 − r)·r dr dφ
   pièges : a2_polar_angle_bounds
+
+Calcule le volume du tétraèdre sous le plan z = 2 − 2x − 2y, dans le premier octant (x, y, z ≥ 0).
+  [guided]  z = 2 − 2x − 2y ; z = 0 ; x ≥ 0 ; y ≥ 0
+    = 0 ≤ x ≤ □ ; 0 ≤ y ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ (2 − 2x)/2)   ← Le plan coupe z = 0 sur la droite 2−2x−2y = 0 : un triangle
+  — Décris le solide D : z entre le dessous et le dessus.  [juge domain]  départ : z = 2 − 2x − 2y ; z = 0 ; x ≥ 0 ; y ≥ 0
+    = 0 ≤ x ≤ 1 ; 0 ≤ y ≤ (2 − 2x)/2 ; 0 ≤ z ≤ □   (trous : 0 ≤ x ≤ 1 ; 0 ≤ y ≤ (2 − 2x)/2 ; 0 ≤ z ≤ 2 − 2x − 2y)   ← z va du plan z = 0 au plan incliné
+  — Vol = ∬_R (dessus − dessous) dx dy :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{(2 − 2x)/2} (2 − 2x − 2y) dy dx
+    = ∫_{0}^{1} (2 − 2x)²/□ dx   (trous : ∫_{0}^{1} (2 − 2x)²/4 dx)   ← On intègre d'abord en y
+    = [−(2 − 2x)³/24]_{0}^{1}   ← Primitive en x
+    = 1/3   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R : 0 ≤ x ≤ 1, 0 ≤ y ≤ (2−2x)/2 ; la hauteur est 2 − 2x − 2y. | ∫_{0}^{1} ∫_{0}^{(2 − 2x)/2} (2 − 2x − 2y) dy dx
 
 ```
 
 ### Niveau 3
 
 ```
-Calcule le volume du solide compris entre les surfaces z = 2 et z = √(x² + y²).
-  [tap, suivre l'erreur, menu steps]  z = 2 ; z = √(x² + y²)
+Calcule le volume du solide compris entre les surfaces z = 9 − x² − y² et z = 0.
+  [tap, suivre l'erreur, menu steps]  z = 9 − x² − y² ; z = 0
     ? Quelles coordonnées pour R ? ✔ Polaires / · Cartésiennes
-    ? Au-dessus de R, quelle surface est en haut ? ✔ z = 2 / · z = √(x²+y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 2 ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; r ≤ z ≤ 2   ← Sur R, 2 ≥ r : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2 − √(x² + y²)
-    = (2 − r)·r   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
-    = ∫_{0}^{2} (2 − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [r² − r³/3]_{0}^{2}·([φ]_{0}^{2π})   ← Primitives
-    = 8π/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est 2 − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
-  pièges : a2_polar_angle_bounds, a2_volume_surfaces_swapped
-
-Calcule le volume du solide compris entre les surfaces z = √(9 − x² − y²) et z = −√(9 − x² − y²).
-  [tap, suivre l'erreur, menu steps]  z = √(9 − x² − y²) ; z = −√(9 − x² − y²)
-    ? Quelles coordonnées pour R ? ✔ Polaires / · Cartésiennes
-    ? Au-dessus de R, quelle surface est en haut ? ✔ z = √(9−x²−y²) / · z = −√(9−x²−y²)
+    ? Au-dessus de R, quelle surface est en haut ? ✔ z = 9−x²−y² / · z = 0
     = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3   ← Les surfaces se coupent en r = 3 : R est le disque x² + y² ≤ 9
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(9 − x² − y²) ; z = −√(9 − x² − y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; −√(9 − r²) ≤ z ≤ √(9 − r²)   ← Sur R, √(9−r²) ≥ −√(9−r²) : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2√(9 − x² − y²)
-    = 2√(9 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} 2√(9 − r²)·r dr dφ
-    = ∫_{0}^{3} 2√(9 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [−(2/3)(9 − r²)^(3/2)]_{0}^{3}·([φ]_{0}^{2π})   ← Primitives
-    = 36π   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 9 ; la hauteur est 2√(9 − x² − y²). | ∫_{0}^{2π} ∫_{0}^{3} 2√(9 − r²)·r dr dφ
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 9 − x² − y² ; z = 0
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; 0 ≤ z ≤ 9 − r²   ← Sur R, 9−r² ≥ 0 : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 9 − x² − y²
+    = (9 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} (9 − r²)·r dr dφ
+    = ∫_{0}^{3} (9 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [9r²/2 − r⁴/4]_{0}^{3}·([φ]_{0}^{2π})   ← Primitives
+    = 81π/2   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 9 ; la hauteur est 9 − x² − y². | ∫_{0}^{2π} ∫_{0}^{3} (9 − r²)·r dr dφ
   pièges : a2_polar_angle_bounds, a2_volume_surfaces_swapped
 
-Calcule le volume du tétraèdre sous le plan z = 4 − 2x − 2y, dans le premier octant (x, y, z ≥ 0).
-  [tap, suivre l'erreur, menu steps]  z = 4 − 2x − 2y ; z = 0 ; x ≥ 0 ; y ≥ 0
-    ? Quelles coordonnées pour R ? · Polaires / ✔ Cartésiennes
-    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ (4 − 2x)/2   ← Le plan coupe z = 0 sur la droite 4−2x−2y = 0 : un triangle
-  — Décris le solide D : z entre le dessous et le dessus.  [juge domain]  départ : z = 4 − 2x − 2y ; z = 0 ; x ≥ 0 ; y ≥ 0
-    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ (4 − 2x)/2 ; 0 ≤ z ≤ 4 − 2x − 2y   ← z va du plan z = 0 au plan incliné
-  — Vol = ∬_R (dessus − dessous) dx dy :  [juge definite]  départ : ∫_{0}^{2} ∫_{0}^{(4 − 2x)/2} (4 − 2x − 2y) dy dx
-    = ∫_{0}^{2} (4 − 2x)²/4 dx   ← On intègre d'abord en y
-    = [−(4 − 2x)³/24]_{0}^{2}   ← Primitive en x
-    = 8/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R : 0 ≤ x ≤ 2, 0 ≤ y ≤ (4−2x)/2 ; la hauteur est 4 − 2x − 2y. | ∫_{0}^{2} ∫_{0}^{(4 − 2x)/2} (4 − 2x − 2y) dy dx
+Calcule le volume du solide compris entre les surfaces z = 3 et z = √(x² + y²).
+  [tap, suivre l'erreur, menu steps]  z = 3 ; z = √(x² + y²)
+    ? Quelles coordonnées pour R ? ✔ Polaires / · Cartésiennes
+    ? Au-dessus de R, quelle surface est en haut ? ✔ z = 3 / · z = √(x²+y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3   ← Les surfaces se coupent en r = 3 : R est le disque x² + y² ≤ 9
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 3 ; z = √(x² + y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; r ≤ z ≤ 3   ← Sur R, 3 ≥ r : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 3 − √(x² + y²)
+    = (3 − r)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} (3 − r)·r dr dφ
+    = ∫_{0}^{3} (3 − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [3r²/2 − r³/3]_{0}^{3}·([φ]_{0}^{2π})   ← Primitives
+    = 9π   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 9 ; la hauteur est 3 − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{3} (3 − r)·r dr dφ
+  pièges : a2_polar_angle_bounds, a2_volume_surfaces_swapped
+
+Calcule le volume du solide compris entre les surfaces z = √(4 − x² − y²) et z = −√(4 − x² − y²).
+  [tap, suivre l'erreur, menu steps]  z = √(4 − x² − y²) ; z = −√(4 − x² − y²)
+    ? Quelles coordonnées pour R ? ✔ Polaires / · Cartésiennes
+    ? Au-dessus de R, quelle surface est en haut ? ✔ z = √(4−x²−y²) / · z = −√(4−x²−y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(4 − x² − y²) ; z = −√(4 − x² − y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; −√(4 − r²) ≤ z ≤ √(4 − r²)   ← Sur R, √(4−r²) ≥ −√(4−r²) : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2√(4 − x² − y²)
+    = 2√(4 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} 2√(4 − r²)·r dr dφ
+    = ∫_{0}^{2} 2√(4 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [−(2/3)(4 − r²)^(3/2)]_{0}^{2}·([φ]_{0}^{2π})   ← Primitives
+    = 32π/3   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est 2√(4 − x² − y²). | ∫_{0}^{2π} ∫_{0}^{2} 2√(4 − r²)·r dr dφ
+  pièges : a2_polar_angle_bounds, a2_volume_surfaces_swapped
 
 ```
 
 ### Niveau 4
 
 ```
-Calcule le volume du solide compris entre les surfaces z = 2 et z = √(x² + y²).
-  [free, suivre l'erreur]  z = 2 ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 2 ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; r ≤ z ≤ 2   ← Sur R, 2 ≥ r : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2 − √(x² + y²)
-    = (2 − r)·r   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
-    = ∫_{0}^{2} (2 − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [r² − r³/3]_{0}^{2}·([φ]_{0}^{2π})   ← Primitives
-    = 8π/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est 2 − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{2} (2 − r)·r dr dφ
+Calcule le volume du solide compris entre les surfaces z = 9 et z = x² + y².
+  [free, suivre l'erreur]  z = 9 ; z = x² + y²
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3   ← Les surfaces se coupent en r = 3 : R est le disque x² + y² ≤ 9
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 9 ; z = x² + y²
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; r² ≤ z ≤ 9   ← Sur R, 9 ≥ r² : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 9 − (x² + y²)
+    = (9 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} (9 − r²)·r dr dφ
+    = ∫_{0}^{3} (9 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [9r²/2 − r⁴/4]_{0}^{3}·([φ]_{0}^{2π})   ← Primitives
+    = 81π/2   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 9 ; la hauteur est 9 − (x² + y²). | ∫_{0}^{2π} ∫_{0}^{3} (9 − r²)·r dr dφ
   pièges : a2_polar_angle_bounds
 
-Calcule le volume du solide compris entre les surfaces z = √(8 − x² − y²) et z = √(x² + y²).
-  [free, suivre l'erreur]  z = √(8 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(8 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; r ≤ z ≤ √(8 − r²)   ← Sur R, √(8−r²) ≥ r : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : √(8 − x² − y²) − √(x² + y²)
-    = (√(8 − r²) − r)·r   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (√(8 − r²) − r)·r dr dφ
-    = ∫_{0}^{2} (√(8 − r²) − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [−(8 − r²)^(3/2)/3 − r³/3]_{0}^{2}·([φ]_{0}^{2π})   ← Primitives
-    = 32√2π/3 − 32π/3   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est √(8 − x² − y²) − √(x² + y²). | ∫_{0}^{2π} ∫_{0}^{2} (√(8 − r²) − r)·r dr dφ
-  pièges : a2_polar_angle_bounds
+Calcule le volume du tétraèdre sous le plan z = 4 − x − y, dans le premier octant (x, y, z ≥ 0).
+  [free, suivre l'erreur]  z = 4 − x − y ; z = 0 ; x ≥ 0 ; y ≥ 0
+    = 0 ≤ x ≤ 4 ; 0 ≤ y ≤ 4 − x   ← Le plan coupe z = 0 sur la droite 4−x−y = 0 : un triangle
+  — Décris le solide D : z entre le dessous et le dessus.  [juge domain]  départ : z = 4 − x − y ; z = 0 ; x ≥ 0 ; y ≥ 0
+    = 0 ≤ x ≤ 4 ; 0 ≤ y ≤ 4 − x ; 0 ≤ z ≤ 4 − x − y   ← z va du plan z = 0 au plan incliné
+  — Vol = ∬_R (dessus − dessous) dx dy :  [juge definite]  départ : ∫_{0}^{4} ∫_{0}^{4 − x} (4 − x − y) dy dx
+    = ∫_{0}^{4} (4 − x)²/2 dx   ← On intègre d'abord en y
+    = [−(4 − x)³/6]_{0}^{4}   ← Primitive en x
+    = 32/3   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R : 0 ≤ x ≤ 4, 0 ≤ y ≤ 4−x ; la hauteur est 4 − x − y. | ∫_{0}^{4} ∫_{0}^{4 − x} (4 − x − y) dy dx
 
-Calcule le volume du solide compris entre les surfaces z = 4 − x² − y² et z = 0.
-  [free, suivre l'erreur]  z = 4 − x² − y² ; z = 0
+Calcule le volume du solide compris entre les surfaces z = √(4 − x² − y²) et z = −√(4 − x² − y²).
+  [free, suivre l'erreur]  z = √(4 − x² − y²) ; z = −√(4 − x² − y²)
     = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 4 − x² − y² ; z = 0
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; 0 ≤ z ≤ 4 − r²   ← Sur R, 4−r² ≥ 0 : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 4 − x² − y²
-    = (4 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (4 − r²)·r dr dφ
-    = ∫_{0}^{2} (4 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [2r² − r⁴/4]_{0}^{2}·([φ]_{0}^{2π})   ← Primitives
-    = 8π   ← Évaluer
-  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est 4 − x² − y². | ∫_{0}^{2π} ∫_{0}^{2} (4 − r²)·r dr dφ
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(4 − x² − y²) ; z = −√(4 − x² − y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; −√(4 − r²) ≤ z ≤ √(4 − r²)   ← Sur R, √(4−r²) ≥ −√(4−r²) : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2√(4 − x² − y²)
+    = 2√(4 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} 2√(4 − r²)·r dr dφ
+    = ∫_{0}^{2} 2√(4 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [−(2/3)(4 − r²)^(3/2)]_{0}^{2}·([φ]_{0}^{2π})   ← Primitives
+    = 32π/3   ← Évaluer
+  aides : Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces. | R est le disque x² + y² ≤ 4 ; la hauteur est 2√(4 − x² − y²). | ∫_{0}^{2π} ∫_{0}^{2} 2√(4 − r²)·r dr dφ
   pièges : a2_polar_angle_bounds
 
 ```
@@ -8598,51 +8592,54 @@ Calcule le volume du solide compris entre les surfaces z = 4 − x² − y² et 
 ### Niveau 5
 
 ```
-Calcule le volume du solide compris entre les surfaces z = √(18 − x² − y²) et z = √(x² + y²).
-  [free, sans aide]  z = √(18 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3   ← Les surfaces se coupent en r = 3 : R est le disque x² + y² ≤ 9
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(18 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 3 ; r ≤ z ≤ √(18 − r²)   ← Sur R, √(18−r²) ≥ r : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : √(18 − x² − y²) − √(x² + y²)
-    = (√(18 − r²) − r)·r   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{3} (√(18 − r²) − r)·r dr dφ
-    = ∫_{0}^{3} (√(18 − r²) − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [−(18 − r²)^(3/2)/3 − r³/3]_{0}^{3}·([φ]_{0}^{2π})   ← Primitives
-    = 36√2π − 36π   ← Évaluer
+Calcule le volume du solide compris entre les surfaces z = √(1 − x² − y²) et z = −√(1 − x² − y²).
+  [free, sans aide]  z = √(1 − x² − y²) ; z = −√(1 − x² − y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1   ← Les surfaces se coupent en r = 1 : R est le disque x² + y² ≤ 1
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(1 − x² − y²) ; z = −√(1 − x² − y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; −√(1 − r²) ≤ z ≤ √(1 − r²)   ← Sur R, √(1−r²) ≥ −√(1−r²) : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2√(1 − x² − y²)
+    = 2√(1 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} 2√(1 − r²)·r dr dφ
+    = ∫_{0}^{1} 2√(1 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [−(2/3)(1 − r²)^(3/2)]_{0}^{1}·([φ]_{0}^{2π})   ← Primitives
+    = 4π/3   ← Évaluer
   pièges : a2_polar_angle_bounds
 
-Calcule le volume du solide compris entre les surfaces z = √(8 − x² − y²) et z = √(x² + y²).
-  [free, sans aide]  z = √(8 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2   ← Les surfaces se coupent en r = 2 : R est le disque x² + y² ≤ 4
-  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = √(8 − x² − y²) ; z = √(x² + y²)
-    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; r ≤ z ≤ √(8 − r²)   ← Sur R, √(8−r²) ≥ r : z va du dessous au dessus
-  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : √(8 − x² − y²) − √(x² + y²)
-    = (√(8 − r²) − r)·r   ← Hauteur dessus − dessous, en polaires, fois r
-  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{2} (√(8 − r²) − r)·r dr dφ
-    = ∫_{0}^{2} (√(8 − r²) − r)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
-    = [−(8 − r²)^(3/2)/3 − r³/3]_{0}^{2}·([φ]_{0}^{2π})   ← Primitives
-    = 32√2π/3 − 32π/3   ← Évaluer
+Calcule le volume du solide compris entre les surfaces z = 3 − (x² + y²) et z = 1 + (x² + y²).
+  [free, sans aide]  z = 3 − (x² + y²) ; z = 1 + (x² + y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1   ← Les surfaces se coupent en r = 1 : R est le disque x² + y² ≤ 1
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 3 − (x² + y²) ; z = 1 + (x² + y²)
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; 1 + r² ≤ z ≤ 3 − r²   ← Sur R, 3−r² ≥ 1+r² : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 2 − 2(x² + y²)
+    = (2 − 2r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} (2 − 2r²)·r dr dφ
+    = ∫_{0}^{1} (2 − 2r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [r² − r⁴/2]_{0}^{1}·([φ]_{0}^{2π})   ← Primitives
+    = π   ← Évaluer
   pièges : a2_polar_angle_bounds
 
-Calcule le volume du tétraèdre sous le plan z = 6 − 3x − 3y, dans le premier octant (x, y, z ≥ 0).
-  [free, sans aide]  z = 6 − 3x − 3y ; z = 0 ; x ≥ 0 ; y ≥ 0
-    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ (6 − 3x)/3   ← Le plan coupe z = 0 sur la droite 6−3x−3y = 0 : un triangle
-  — Décris le solide D : z entre le dessous et le dessus.  [juge domain]  départ : z = 6 − 3x − 3y ; z = 0 ; x ≥ 0 ; y ≥ 0
-    = 0 ≤ x ≤ 2 ; 0 ≤ y ≤ (6 − 3x)/3 ; 0 ≤ z ≤ 6 − 3x − 3y   ← z va du plan z = 0 au plan incliné
-  — Vol = ∬_R (dessus − dessous) dx dy :  [juge definite]  départ : ∫_{0}^{2} ∫_{0}^{(6 − 3x)/3} (6 − 3x − 3y) dy dx
-    = ∫_{0}^{2} (6 − 3x)²/6 dx   ← On intègre d'abord en y
-    = [−(6 − 3x)³/54]_{0}^{2}   ← Primitive en x
-    = 4   ← Évaluer
+Calcule le volume du solide compris entre les surfaces z = 1 et z = x² + y².
+  [free, sans aide]  z = 1 ; z = x² + y²
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1   ← Les surfaces se coupent en r = 1 : R est le disque x² + y² ≤ 1
+  — Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.  [juge domain]  départ : z = 1 ; z = x² + y²
+    = 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 1 ; r² ≤ z ≤ 1   ← Sur R, 1 ≥ r² : z va du dessous au dessus
+  — La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :  [juge equiv]  départ : 1 − (x² + y²)
+    = (1 − r²)·r   ← Hauteur dessus − dessous, en polaires, fois r
+  — Calcule le volume :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{1} (1 − r²)·r dr dφ
+    = ∫_{0}^{1} (1 − r²)·r dr·(∫_{0}^{2π} 1 dφ)   ← Bornes constantes : produit
+    = [r²/2 − r⁴/4]_{0}^{1}·([φ]_{0}^{2π})   ← Primitives
+    = π/2   ← Évaluer
+  pièges : a2_polar_angle_bounds
 
 ```
 
 ### Variantes d'examen
 
 ```
-Le volume du solide compris entre z = √(18 − x² − y²) et z = √(x² + y²) vaut :
-  · 72√2π − 72π [a2_jacobian_forgot]   · 36π − 36√2π [a2_volume_surfaces_swapped]   · 18√2π − 18π [a2_volume_surfaces_swapped]   ✔ 36√2π − 36π
+Le volume du solide compris entre z = 36 − 2(x² + y²) et z = 2(x² + y²) vaut :
+  ✔ 162π   · 324π [a2_jacobian_forgot]   · −162π [a2_volume_surfaces_swapped]   · 144π [a2_jacobian_forgot]
   [examen mcq]
-  pièges : a2_volume_surfaces_swapped, a2_jacobian_forgot
+  pièges : a2_jacobian_forgot, a2_volume_surfaces_swapped
 
 ```
 
@@ -8653,43 +8650,43 @@ _M = ∬ ρ, x̄ = (1/M)∬ x ρ ; la symétrie donne une coordonnée._
 ### Niveau 1
 
 ```
-Une plaque occupe le demi-disque D = {x² + y² ≤ 4 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ). La masse est M = 8π/3.
-  [guided]  y√(x² + y²)
+Une plaque occupe le demi-disque D = {x² + y² ≤ 1 ; y ≥ 0}, avec la densité ρ(x, y) = y. Trouve son centre de masse (x̄, ȳ). La masse est M = 2/3.
+  [guided]  y²
     (Par symétrie (x ↦ −x), x̄ = 0 : il reste ȳ.)
-    = r·sin(φ)·r·□   (trous : r·sin(φ)·r·r)   ← y = r sin φ, et le jacobien r
-  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{2} r³·sin(φ) dr dφ
-    = ∫_{0}^{2} r³ dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
-    = [□]_{0}^{2}·([−cos(φ)]_{0}^{π})   (trous : [r⁴/4]_{0}^{2}·([−cos(φ)]_{0}^{π}))   ← Primitives
-    = 8   ← Évaluer
-  — ȳ = moment / masse :  [juge definite]  départ : 8/(8π/3)
-    = □   (trous : 3/π)   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{2} r³·sin(φ) dr dφ = 8 | M = 8π/3 et le moment vaut 8.
+    = (r·sin(φ))²·□   (trous : (r·sin(φ))²·r)   ← y = r sin φ, et le jacobien r
+  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{1} r³·sin(φ)² dr dφ
+    = ∫_{0}^{1} r³ dr·(∫_{0}^{π} sin(φ)² dφ)   ← Produit de deux intégrales
+    = [□]_{0}^{1}·([φ/2 − sin(2φ)/4]_{0}^{π})   (trous : [r⁴/4]_{0}^{1}·([φ/2 − sin(2φ)/4]_{0}^{π}))   ← Primitives
+    = π/8   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : (π/8)/(2/3)
+    = □   (trous : 3π/16)   ← Moment divisé par la masse
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{1} r³·sin(φ)² dr dφ = π/8 | M = 2/3 et le moment vaut π/8.
   pièges : a2_jacobian_forgot
 
-Une plaque occupe le demi-disque D = {x² + y² ≤ 1 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ). La masse est M = π/3.
+Une plaque occupe le demi-disque D = {x² + y² ≤ 9 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ). La masse est M = 9π.
   [guided]  y√(x² + y²)
     (Par symétrie (x ↦ −x), x̄ = 0 : il reste ȳ.)
     = r·sin(φ)·r·□   (trous : r·sin(φ)·r·r)   ← y = r sin φ, et le jacobien r
-  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{1} r³·sin(φ) dr dφ
-    = ∫_{0}^{1} r³ dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
-    = [□]_{0}^{1}·([−cos(φ)]_{0}^{π})   (trous : [r⁴/4]_{0}^{1}·([−cos(φ)]_{0}^{π}))   ← Primitives
-    = 1/2   ← Évaluer
-  — ȳ = moment / masse :  [juge definite]  départ : (1/2)/(π/3)
+  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{3} r³·sin(φ) dr dφ
+    = ∫_{0}^{3} r³ dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
+    = [□]_{0}^{3}·([−cos(φ)]_{0}^{π})   (trous : [r⁴/4]_{0}^{3}·([−cos(φ)]_{0}^{π}))   ← Primitives
+    = 81/2   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : (81/2)/9π
+    = □   (trous : 9/(2π))   ← Moment divisé par la masse
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{3} r³·sin(φ) dr dφ = 81/2 | M = 9π et le moment vaut 81/2.
+  pièges : a2_jacobian_forgot
+
+Une plaque occupe le quart de disque D = {x² + y² ≤ 1 ; x ≥ 0 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ). La masse est M = π/6.
+  [guided]  x√(x² + y²)
+    (Par symétrie (x ↔ y), ȳ = x̄ : il suffit de calculer x̄.)
+    = r·cos(φ)·r·□   (trous : r·cos(φ)·r·r)   ← x = r cos φ, et le jacobien r
+  — Calcule le moment ∬ x·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ
+    = ∫_{0}^{1} r³ dr·(∫_{0}^{π/2} cos(φ) dφ)   ← Produit de deux intégrales
+    = [□]_{0}^{1}·([sin(φ)]_{0}^{π/2})   (trous : [r⁴/4]_{0}^{1}·([sin(φ)]_{0}^{π/2}))   ← Primitives
+    = 1/4   ← Évaluer
+  — x̄ = moment / masse :  [juge definite]  départ : (1/4)/(π/6)
     = □   (trous : 3/(2π))   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{1} r³·sin(φ) dr dφ = 1/2 | M = π/3 et le moment vaut 1/2.
-  pièges : a2_jacobian_forgot
-
-Une plaque occupe le demi-disque D = {x² + y² ≤ 1 ; y ≥ 0}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ). La masse est M = π/2.
-  [guided]  y
-    (Par symétrie (x ↦ −x), x̄ = 0 : il reste ȳ.)
-    = r·sin(φ)·□   (trous : r·sin(φ)·r)   ← y = r sin φ, et le jacobien r
-  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{1} r²·sin(φ) dr dφ
-    = ∫_{0}^{1} r² dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
-    = [□]_{0}^{1}·([−cos(φ)]_{0}^{π})   (trous : [r³/3]_{0}^{1}·([−cos(φ)]_{0}^{π}))   ← Primitives
-    = 2/3   ← Évaluer
-  — ȳ = moment / masse :  [juge definite]  départ : (2/3)/(π/2)
-    = □   (trous : 4/(3π))   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{1} r²·sin(φ) dr dφ = 2/3 | M = π/2 et le moment vaut 2/3.
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ = 1/4 | M = π/6 et le moment vaut 1/4.
   pièges : a2_jacobian_forgot
 
 ```
@@ -8697,56 +8694,56 @@ Une plaque occupe le demi-disque D = {x² + y² ≤ 1 ; y ≥ 0}, avec la densit
 ### Niveau 2
 
 ```
-Une plaque occupe le demi-disque D = {x² + y² ≤ 4 ; y ≥ 0}, avec la densité ρ(x, y) = y. Trouve son centre de masse (x̄, ȳ).
-  [guided]  ∫_{0}^{π} ∫_{0}^{2} r²·sin(φ) dr dφ
+Une plaque occupe le demi-disque D = {x² + y² ≤ 4 ; y ≥ 0}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ).
+  [guided]  ∫_{0}^{π} ∫_{0}^{2} r dr dφ
     ? Quelle coordonnée du centre de masse est nulle par symétrie ? ✔ x̄ = 0 / · ȳ = 0 / · Aucune
-    = ∫_{0}^{2} r² dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
-    = [r³/3]_{0}^{2}·([−cos(φ)]_{0}^{π})   ← Primitives
-    = 16/3   ← Évaluer
-  — Le moment ∬ y·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : y²
-    = (r·sin(φ))²·□   (trous : (r·sin(φ))²·r)   ← y = r sin φ, et le jacobien r
-  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{2} r³·sin(φ)² dr dφ
-    = ∫_{0}^{2} r³ dr·(∫_{0}^{π} sin(φ)² dφ)   ← Produit de deux intégrales
-    = [□]_{0}^{2}·([φ/2 − sin(2φ)/4]_{0}^{π})   (trous : [r⁴/4]_{0}^{2}·([φ/2 − sin(2φ)/4]_{0}^{π}))   ← Primitives
+    = ∫_{0}^{2} r dr·(∫_{0}^{π} 1 dφ)   ← Produit de deux intégrales
+    = [r²/2]_{0}^{2}·([φ]_{0}^{π})   ← Primitives
     = 2π   ← Évaluer
-  — ȳ = moment / masse :  [juge definite]  départ : 2π/(16/3)
-    = 3π/8   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{2} r³·sin(φ)² dr dφ = 2π | M = 16/3 et le moment vaut 2π.
-  pièges : a2_jacobian_forgot
-
-Une plaque occupe le demi-disque D = {x² + y² ≤ 9 ; y ≥ 0}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ).
-  [guided]  ∫_{0}^{π} ∫_{0}^{3} r dr dφ
-    ? Quelle coordonnée du centre de masse est nulle par symétrie ? ✔ x̄ = 0 / · ȳ = 0 / · Aucune
-    = ∫_{0}^{3} r dr·(∫_{0}^{π} 1 dφ)   ← Produit de deux intégrales
-    = [r²/2]_{0}^{3}·([φ]_{0}^{π})   ← Primitives
-    = 9π/2   ← Évaluer
   — Le moment ∬ y·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : y
     = r·sin(φ)·□   (trous : r·sin(φ)·r)   ← y = r sin φ, et le jacobien r
-  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{3} r²·sin(φ) dr dφ
-    = ∫_{0}^{3} r² dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
-    = [□]_{0}^{3}·([−cos(φ)]_{0}^{π})   (trous : [r³/3]_{0}^{3}·([−cos(φ)]_{0}^{π}))   ← Primitives
-    = 18   ← Évaluer
-  — ȳ = moment / masse :  [juge definite]  départ : 18/(9π/2)
-    = 4/π   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{3} r²·sin(φ) dr dφ = 18 | M = 9π/2 et le moment vaut 18.
+  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{2} r²·sin(φ) dr dφ
+    = ∫_{0}^{2} r² dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
+    = [□]_{0}^{2}·([−cos(φ)]_{0}^{π})   (trous : [r³/3]_{0}^{2}·([−cos(φ)]_{0}^{π}))   ← Primitives
+    = 16/3   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : (16/3)/2π
+    = 8/(3π)   ← Moment divisé par la masse
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{2} r²·sin(φ) dr dφ = 16/3 | M = 2π et le moment vaut 16/3.
   pièges : a2_jacobian_forgot
 
-Une plaque occupe le demi-disque D = {x² + y² ≤ 1 ; y ≥ 0}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ).
-  [guided]  ∫_{0}^{π} ∫_{0}^{1} r dr dφ
-    ? Quelle coordonnée du centre de masse est nulle par symétrie ? ✔ x̄ = 0 / · ȳ = 0 / · Aucune
-    = ∫_{0}^{1} r dr·(∫_{0}^{π} 1 dφ)   ← Produit de deux intégrales
-    = [r²/2]_{0}^{1}·([φ]_{0}^{π})   ← Primitives
-    = π/2   ← Évaluer
-  — Le moment ∬ y·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : y
-    = r·sin(φ)·□   (trous : r·sin(φ)·r)   ← y = r sin φ, et le jacobien r
-  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{1} r²·sin(φ) dr dφ
-    = ∫_{0}^{1} r² dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
-    = [□]_{0}^{1}·([−cos(φ)]_{0}^{π})   (trous : [r³/3]_{0}^{1}·([−cos(φ)]_{0}^{π}))   ← Primitives
-    = 2/3   ← Évaluer
-  — ȳ = moment / masse :  [juge definite]  départ : (2/3)/(π/2)
-    = 4/(3π)   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{1} r²·sin(φ) dr dφ = 2/3 | M = π/2 et le moment vaut 2/3.
-  pièges : a2_jacobian_forgot
+Une plaque occupe le quart de disque D = {x² + y² ≤ 4 ; x ≥ 0 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
+  [guided]  ∫_{0}^{π/2} ∫_{0}^{2} r² dr dφ
+    ? Que dit la symétrie de D et ρ par rapport à la droite y = x ? ✔ x̄ = ȳ / · x̄ = ȳ = 0 / · Rien
+    = ∫_{0}^{2} r² dr·(∫_{0}^{π/2} 1 dφ)   ← Produit de deux intégrales
+    = [r³/3]_{0}^{2}·([φ]_{0}^{π/2})   ← Primitives
+    = 4π/3   ← Évaluer
+  — Le moment ∬ x·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : x√(x² + y²)
+    = r·cos(φ)·r·□   (trous : r·cos(φ)·r·r)   ← x = r cos φ, et le jacobien r
+  — Calcule le moment ∬ x·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{2} r³·cos(φ) dr dφ
+    = ∫_{0}^{2} r³ dr·(∫_{0}^{π/2} cos(φ) dφ)   ← Produit de deux intégrales
+    = [□]_{0}^{2}·([sin(φ)]_{0}^{π/2})   (trous : [r⁴/4]_{0}^{2}·([sin(φ)]_{0}^{π/2}))   ← Primitives
+    = 4   ← Évaluer
+  — x̄ = moment / masse :  [juge definite]  départ : 4/(4π/3)
+    = 3/π   ← Moment divisé par la masse
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{2} r³·cos(φ) dr dφ = 4 | M = 4π/3 et le moment vaut 4.
+  pièges : a1_volume_no_square, a2_jacobian_forgot
+
+Une plaque occupe le quart de disque D = {x² + y² ≤ 1 ; x ≥ 0 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
+  [guided]  ∫_{0}^{π/2} ∫_{0}^{1} r² dr dφ
+    ? Que dit la symétrie de D et ρ par rapport à la droite y = x ? ✔ x̄ = ȳ / · x̄ = ȳ = 0 / · Rien
+    = ∫_{0}^{1} r² dr·(∫_{0}^{π/2} 1 dφ)   ← Produit de deux intégrales
+    = [r³/3]_{0}^{1}·([φ]_{0}^{π/2})   ← Primitives
+    = π/6   ← Évaluer
+  — Le moment ∬ x·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : x√(x² + y²)
+    = r·cos(φ)·r·□   (trous : r·cos(φ)·r·r)   ← x = r cos φ, et le jacobien r
+  — Calcule le moment ∬ x·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ
+    = ∫_{0}^{1} r³ dr·(∫_{0}^{π/2} cos(φ) dφ)   ← Produit de deux intégrales
+    = [□]_{0}^{1}·([sin(φ)]_{0}^{π/2})   (trous : [r⁴/4]_{0}^{1}·([sin(φ)]_{0}^{π/2}))   ← Primitives
+    = 1/4   ← Évaluer
+  — x̄ = moment / masse :  [juge definite]  départ : (1/4)/(π/6)
+    = 3/(2π)   ← Moment divisé par la masse
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ = 1/4 | M = π/6 et le moment vaut 1/4.
+  pièges : a1_volume_no_square, a2_jacobian_forgot
 
 ```
 
@@ -8770,51 +8767,9 @@ Une plaque occupe le quart de disque D = {x² + y² ≤ 4 ; x ≥ 0 ; y ≥ 0}, 
   aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{2} r³·cos(φ) dr dφ = 4 | M = 4π/3 et le moment vaut 4.
   pièges : a1_volume_no_square, a2_jacobian_forgot
 
-Une plaque occupe le triangle D = {0 ≤ y ≤ x ≤ 1}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ).
-  [tap, suivre l'erreur, menu steps]  ∫_{0}^{1} ∫_{0}^{x} 1 dy dx
-    ? Le triangle 0 ≤ y ≤ x ≤ a a-t-il une symétrie qui donne une coordonnée ? ✔ Non : il faut calculer x̄ et ȳ / · Oui, x̄ = ȳ
-    = ∫_{0}^{1} x dx   ← On intègre d'abord en y, de 0 à x
-    = [x²/2]_{0}^{1}   ← Primitive en x
-    = 1/2   ← Évaluer
-  — Le moment ∬ x·ρ :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x} x dy dx
-    = ∫_{0}^{1} x² dx   ← On intègre d'abord en y, de 0 à x
-    = [x³/3]_{0}^{1}   ← Primitive en x
-    = 1/3   ← Évaluer
-  — x̄ = moment / masse :  [juge definite]  départ : (1/3)/(1/2)
-    = 2/3   ← Diviser
-  — Le moment ∬ y·ρ :  [juge definite]  départ : ∫_{0}^{1} ∫_{0}^{x} y dy dx
-    = ∫_{0}^{1} x²/2 dx   ← On intègre d'abord en y, de 0 à x
-    = [x³/6]_{0}^{1}   ← Primitive en x
-    = 1/6   ← Évaluer
-  — ȳ = moment / masse :  [juge definite]  départ : (1/6)/(1/2)
-    = 1/3   ← Diviser
-  aides : x̄ = (1/M)∬ x·ρ et ȳ = (1/M)∬ y·ρ ; ici aucune symétrie ne donne une coordonnée. | D : 0 ≤ x ≤ 1, 0 ≤ y ≤ x ; M = 1/2. | x̄ = 2/3 et ȳ = 1/3.
-
-Une plaque occupe le quart de disque D = {x² + y² ≤ 1 ; x ≥ 0 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
-  [tap, suivre l'erreur, menu steps]  ∫_{0}^{π/2} ∫_{0}^{1} r² dr dφ
-    ? Que dit la symétrie de D et ρ par rapport à la droite y = x ? ✔ x̄ = ȳ / · x̄ = ȳ = 0 / · Rien
-    = ∫_{0}^{1} r² dr·(∫_{0}^{π/2} 1 dφ)   ← Produit de deux intégrales
-    = [r³/3]_{0}^{1}·([φ]_{0}^{π/2})   ← Primitives
-    = π/6   ← Évaluer
-  — Le moment ∬ x·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : x√(x² + y²)
-    = r³·cos(φ)   ← x = r cos φ, et le jacobien r
-  — Calcule le moment ∬ x·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ
-    = ∫_{0}^{1} r³ dr·(∫_{0}^{π/2} cos(φ) dφ)   ← Produit de deux intégrales
-    = [r⁴/4]_{0}^{1}·([sin(φ)]_{0}^{π/2})   ← Primitives
-    = 1/4   ← Évaluer
-  — x̄ = moment / masse :  [juge definite]  départ : (1/4)/(π/6)
-    = 3/(2π)   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ = 1/4 | M = π/6 et le moment vaut 1/4.
-  pièges : a1_volume_no_square, a2_jacobian_forgot
-
-```
-
-### Niveau 4
-
-```
 Une plaque occupe le demi-disque D = {x² + y² ≤ 4 ; y ≥ 0}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ).
-  [free, suivre l'erreur]  ∫_{0}^{π} ∫_{0}^{2} r dr dφ
-    (Par symétrie (x ↦ −x), x̄ = 0 : il reste ȳ.)
+  [tap, suivre l'erreur, menu steps]  ∫_{0}^{π} ∫_{0}^{2} r dr dφ
+    ? Quelle coordonnée du centre de masse est nulle par symétrie ? ✔ x̄ = 0 / · ȳ = 0 / · Aucune
     = ∫_{0}^{2} r dr·(∫_{0}^{π} 1 dφ)   ← Produit de deux intégrales
     = [r²/2]_{0}^{2}·([φ]_{0}^{π})   ← Primitives
     = 2π   ← Évaluer
@@ -8829,55 +8784,103 @@ Une plaque occupe le demi-disque D = {x² + y² ≤ 4 ; y ≥ 0}, avec la densit
   aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{2} r²·sin(φ) dr dφ = 16/3 | M = 2π et le moment vaut 16/3.
   pièges : a2_jacobian_forgot
 
-Une plaque occupe le quart de disque D = {x² + y² ≤ 4 ; x ≥ 0 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
-  [free, suivre l'erreur]  ∫_{0}^{π/2} ∫_{0}^{2} r² dr dφ
-    (Par symétrie (x ↔ y), ȳ = x̄ : il suffit de calculer x̄.)
-    = ∫_{0}^{2} r² dr·(∫_{0}^{π/2} 1 dφ)   ← Produit de deux intégrales
-    = [r³/3]_{0}^{2}·([φ]_{0}^{π/2})   ← Primitives
-    = 4π/3   ← Évaluer
-  — Le moment ∬ x·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : x√(x² + y²)
-    = r³·cos(φ)   ← x = r cos φ, et le jacobien r
-  — Calcule le moment ∬ x·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{2} r³·cos(φ) dr dφ
-    = ∫_{0}^{2} r³ dr·(∫_{0}^{π/2} cos(φ) dφ)   ← Produit de deux intégrales
-    = [r⁴/4]_{0}^{2}·([sin(φ)]_{0}^{π/2})   ← Primitives
-    = 4   ← Évaluer
-  — x̄ = moment / masse :  [juge definite]  départ : 4/(4π/3)
+Une plaque occupe le quart de disque D = {x² + y² ≤ 4 ; x ≥ 0 ; y ≥ 0}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ).
+  [tap, suivre l'erreur, menu steps]  ∫_{0}^{π/2} ∫_{0}^{2} r dr dφ
+    ? Que dit la symétrie de D et ρ par rapport à la droite y = x ? ✔ x̄ = ȳ / · x̄ = ȳ = 0 / · Rien
+    = ∫_{0}^{2} r dr·(∫_{0}^{π/2} 1 dφ)   ← Produit de deux intégrales
+    = [r²/2]_{0}^{2}·([φ]_{0}^{π/2})   ← Primitives
+    = π   ← Évaluer
+  — Le moment ∬ x·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : x
+    = r²·cos(φ)   ← x = r cos φ, et le jacobien r
+  — Calcule le moment ∬ x·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{2} r²·cos(φ) dr dφ
+    = ∫_{0}^{2} r² dr·(∫_{0}^{π/2} cos(φ) dφ)   ← Produit de deux intégrales
+    = [r³/3]_{0}^{2}·([sin(φ)]_{0}^{π/2})   ← Primitives
+    = 8/3   ← Évaluer
+  — x̄ = moment / masse :  [juge definite]  départ : (8/3)/π
+    = 8/(3π)   ← Moment divisé par la masse
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{2} r²·cos(φ) dr dφ = 8/3 | M = π et le moment vaut 8/3.
+  pièges : a2_jacobian_forgot
+
+```
+
+### Niveau 4
+
+```
+Une plaque occupe le demi-disque D = {x² + y² ≤ 4 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
+  [free, suivre l'erreur]  ∫_{0}^{π} ∫_{0}^{2} r² dr dφ
+    (Par symétrie (x ↦ −x), x̄ = 0 : il reste ȳ.)
+    = ∫_{0}^{2} r² dr·(∫_{0}^{π} 1 dφ)   ← Produit de deux intégrales
+    = [r³/3]_{0}^{2}·([φ]_{0}^{π})   ← Primitives
+    = 8π/3   ← Évaluer
+  — Le moment ∬ y·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : y√(x² + y²)
+    = r³·sin(φ)   ← y = r sin φ, et le jacobien r
+  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{2} r³·sin(φ) dr dφ
+    = ∫_{0}^{2} r³ dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
+    = [r⁴/4]_{0}^{2}·([−cos(φ)]_{0}^{π})   ← Primitives
+    = 8   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : 8/(8π/3)
     = 3/π   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{2} r³·cos(φ) dr dφ = 4 | M = 4π/3 et le moment vaut 4.
+  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π} ∫_{0}^{2} r³·sin(φ) dr dφ = 8 | M = 8π/3 et le moment vaut 8.
   pièges : a1_volume_no_square, a2_jacobian_forgot
 
-Une plaque occupe le quart de disque D = {x² + y² ≤ 1 ; x ≥ 0 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
-  [free, suivre l'erreur]  ∫_{0}^{π/2} ∫_{0}^{1} r² dr dφ
-    (Par symétrie (x ↔ y), ȳ = x̄ : il suffit de calculer x̄.)
-    = ∫_{0}^{1} r² dr·(∫_{0}^{π/2} 1 dφ)   ← Produit de deux intégrales
-    = [r³/3]_{0}^{1}·([φ]_{0}^{π/2})   ← Primitives
-    = π/6   ← Évaluer
-  — Le moment ∬ x·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : x√(x² + y²)
-    = r³·cos(φ)   ← x = r cos φ, et le jacobien r
-  — Calcule le moment ∬ x·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ
-    = ∫_{0}^{1} r³ dr·(∫_{0}^{π/2} cos(φ) dφ)   ← Produit de deux intégrales
-    = [r⁴/4]_{0}^{1}·([sin(φ)]_{0}^{π/2})   ← Primitives
-    = 1/4   ← Évaluer
-  — x̄ = moment / masse :  [juge definite]  départ : (1/4)/(π/6)
-    = 3/(2π)   ← Moment divisé par la masse
-  aides : Centre = moment divisé par la masse ; une coordonnée est donnée par la symétrie. | ∫_{0}^{π/2} ∫_{0}^{1} r³·cos(φ) dr dφ = 1/4 | M = π/6 et le moment vaut 1/4.
-  pièges : a1_volume_no_square, a2_jacobian_forgot
+Une plaque occupe le triangle D = {0 ≤ y ≤ x ≤ 6}, avec la densité ρ = 1. Trouve son centre de masse (x̄, ȳ).
+  [free, suivre l'erreur]  ∫_{0}^{6} ∫_{0}^{x} 1 dy dx
+    = ∫_{0}^{6} x dx   ← On intègre d'abord en y, de 0 à x
+    = [x²/2]_{0}^{6}   ← Primitive en x
+    = 18   ← Évaluer
+  — Le moment ∬ x·ρ :  [juge definite]  départ : ∫_{0}^{6} ∫_{0}^{x} x dy dx
+    = ∫_{0}^{6} x² dx   ← On intègre d'abord en y, de 0 à x
+    = [x³/3]_{0}^{6}   ← Primitive en x
+    = 72   ← Évaluer
+  — x̄ = moment / masse :  [juge definite]  départ : 72/18
+    = 4   ← Diviser
+  — Le moment ∬ y·ρ :  [juge definite]  départ : ∫_{0}^{6} ∫_{0}^{x} y dy dx
+    = ∫_{0}^{6} x²/2 dx   ← On intègre d'abord en y, de 0 à x
+    = [x³/6]_{0}^{6}   ← Primitive en x
+    = 36   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : 36/18
+    = 2   ← Diviser
+  aides : x̄ = (1/M)∬ x·ρ et ȳ = (1/M)∬ y·ρ ; ici aucune symétrie ne donne une coordonnée. | D : 0 ≤ x ≤ 6, 0 ≤ y ≤ x ; M = 18. | x̄ = 4 et ȳ = 2.
+
+Une plaque occupe le triangle D = {0 ≤ y ≤ x ≤ 3}, avec la densité ρ(x, y) = x. Trouve son centre de masse (x̄, ȳ).
+  [free, suivre l'erreur]  ∫_{0}^{3} ∫_{0}^{x} x dy dx
+    = ∫_{0}^{3} x² dx   ← On intègre d'abord en y, de 0 à x
+    = [x³/3]_{0}^{3}   ← Primitive en x
+    = 9   ← Évaluer
+  — Le moment ∬ x·ρ :  [juge definite]  départ : ∫_{0}^{3} ∫_{0}^{x} x² dy dx
+    = ∫_{0}^{3} x³ dx   ← On intègre d'abord en y, de 0 à x
+    = [x⁴/4]_{0}^{3}   ← Primitive en x
+    = 81/4   ← Évaluer
+  — x̄ = moment / masse :  [juge definite]  départ : (81/4)/9
+    = 9/4   ← Diviser
+  — Le moment ∬ y·ρ :  [juge definite]  départ : ∫_{0}^{3} ∫_{0}^{x} x·y dy dx
+    = ∫_{0}^{3} x³/2 dx   ← On intègre d'abord en y, de 0 à x
+    = [x⁴/8]_{0}^{3}   ← Primitive en x
+    = 81/8   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : (81/8)/9
+    = 9/8   ← Diviser
+  aides : x̄ = (1/M)∬ x·ρ et ȳ = (1/M)∬ y·ρ ; ici aucune symétrie ne donne une coordonnée. | D : 0 ≤ x ≤ 3, 0 ≤ y ≤ x ; M = 9. | x̄ = 9/4 et ȳ = 9/8.
 
 ```
 
 ### Niveau 5
 
 ```
-Trouve le centre de masse de la demi-boule homogène D = {x² + y² + z² ≤ 16 ; z ≥ 0}.
-  [free, sans aide]  ∫_{0}^{2π} ∫_{0}^{π/2} ∫_{0}^{4} r²·sin(θ) dr dθ dφ
-    (Par symétrie autour de l'axe z, x̄ = ȳ = 0 : il reste z̄.)
-    = ∫_{0}^{4} r² dr·(∫_{0}^{π/2} sin(θ) dθ)·(∫_{0}^{2π} 1 dφ)   ← Produit
-    = 128π/3   ← Évaluer
-  — Le moment ∭ z dV :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{π/2} ∫_{0}^{4} r³·cos(θ)·sin(θ) dr dθ dφ
-    = ∫_{0}^{4} r³ dr·(∫_{0}^{π/2} cos(θ)·sin(θ) dθ)·(∫_{0}^{2π} 1 dφ)   ← Produit
-    = 64π   ← Évaluer
-  — z̄ = moment / masse :  [juge definite]  départ : 64π/(128π/3)
-    = 3/2   ← Diviser
+Une plaque occupe le demi-disque D = {x² + y² ≤ 9 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
+  [free, sans aide]  ∫_{0}^{π} ∫_{0}^{3} r² dr dφ
+    (Par symétrie (x ↦ −x), x̄ = 0 : il reste ȳ.)
+    = ∫_{0}^{3} r² dr·(∫_{0}^{π} 1 dφ)   ← Produit de deux intégrales
+    = [r³/3]_{0}^{3}·([φ]_{0}^{π})   ← Primitives
+    = 9π   ← Évaluer
+  — Le moment ∬ y·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : y√(x² + y²)
+    = r³·sin(φ)   ← y = r sin φ, et le jacobien r
+  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{3} r³·sin(φ) dr dφ
+    = ∫_{0}^{3} r³ dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
+    = [r⁴/4]_{0}^{3}·([−cos(φ)]_{0}^{π})   ← Primitives
+    = 81/2   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : (81/2)/9π
+    = 9/(2π)   ← Moment divisé par la masse
+  pièges : a1_volume_no_square, a2_jacobian_forgot
 
 Une plaque occupe le demi-disque D = {x² + y² ≤ 1 ; y ≥ 0}, avec la densité ρ(x, y) = y. Trouve son centre de masse (x̄, ȳ).
   [free, sans aide]  ∫_{0}^{π} ∫_{0}^{1} r²·sin(φ) dr dφ
@@ -8895,16 +8898,21 @@ Une plaque occupe le demi-disque D = {x² + y² ≤ 1 ; y ≥ 0}, avec la densit
     = 3π/16   ← Moment divisé par la masse
   pièges : a2_jacobian_forgot
 
-Trouve le centre de masse de la demi-boule homogène D = {x² + y² + z² ≤ 9 ; z ≥ 0}.
-  [free, sans aide]  ∫_{0}^{2π} ∫_{0}^{π/2} ∫_{0}^{3} r²·sin(θ) dr dθ dφ
-    (Par symétrie autour de l'axe z, x̄ = ȳ = 0 : il reste z̄.)
-    = ∫_{0}^{3} r² dr·(∫_{0}^{π/2} sin(θ) dθ)·(∫_{0}^{2π} 1 dφ)   ← Produit
-    = 18π   ← Évaluer
-  — Le moment ∭ z dV :  [juge definite]  départ : ∫_{0}^{2π} ∫_{0}^{π/2} ∫_{0}^{3} r³·cos(θ)·sin(θ) dr dθ dφ
-    = ∫_{0}^{3} r³ dr·(∫_{0}^{π/2} cos(θ)·sin(θ) dθ)·(∫_{0}^{2π} 1 dφ)   ← Produit
-    = 81π/4   ← Évaluer
-  — z̄ = moment / masse :  [juge definite]  départ : (81π/4)/18π
-    = 9/8   ← Diviser
+Une plaque occupe le demi-disque D = {x² + y² ≤ 4 ; y ≥ 0}, avec la densité ρ(x, y) = √(x² + y²). Trouve son centre de masse (x̄, ȳ).
+  [free, sans aide]  ∫_{0}^{π} ∫_{0}^{2} r² dr dφ
+    (Par symétrie (x ↦ −x), x̄ = 0 : il reste ȳ.)
+    = ∫_{0}^{2} r² dr·(∫_{0}^{π} 1 dφ)   ← Produit de deux intégrales
+    = [r³/3]_{0}^{2}·([φ]_{0}^{π})   ← Primitives
+    = 8π/3   ← Évaluer
+  — Le moment ∬ y·ρ dx dy : écris l'intégrande en polaires, jacobien compris.  [juge equiv]  départ : y√(x² + y²)
+    = r³·sin(φ)   ← y = r sin φ, et le jacobien r
+  — Calcule le moment ∬ y·ρ dx dy :  [juge definite]  départ : ∫_{0}^{π} ∫_{0}^{2} r³·sin(φ) dr dφ
+    = ∫_{0}^{2} r³ dr·(∫_{0}^{π} sin(φ) dφ)   ← Produit de deux intégrales
+    = [r⁴/4]_{0}^{2}·([−cos(φ)]_{0}^{π})   ← Primitives
+    = 8   ← Évaluer
+  — ȳ = moment / masse :  [juge definite]  départ : 8/(8π/3)
+    = 3/π   ← Moment divisé par la masse
+  pièges : a1_volume_no_square, a2_jacobian_forgot
 
 ```
 
@@ -8915,167 +8923,68 @@ _f continue : une solution ; Lipschitz en y : elle est unique, sur |t| ≤ min(a
 ### Niveau 1
 
 ```
-Problème de Cauchy y′ = f(t, y) = ycos(t), y(0) = 0 sur le rectangle R : |t| ≤ 2, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [guided]  ∂/∂y (ycos(t))
-    = cos(t)   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|cos t| ≤ 1, |y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
-    = □   (trous : 1)   ← Majorer chaque facteur
-  — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = □·1   (trous : 1·1)   ← Majorer chaque terme
-    = 1   ← Calculer
-  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(2,1/1)   ← min(a, b/K)
-    = 1   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |cos t| ≤ 1, |y| ≤ 1. Par exemple |∂f/∂y| ≤ 1. | M = 1, K = 1, h = min(2, 1/1) = 1.
-
-Problème de Cauchy y′ = f(t, y) = ysin(t) + t, y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 2. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+Problème de Cauchy y′ = f(t, y) = ysin(t) + t, y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
   [guided]  ∂/∂y (ysin(t) + t)
     = sin(t)   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|sin t| ≤ 1, |y| ≤ 2, |t| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
+  — Majore |∂f/∂y| sur R (|sin t| ≤ 1, |y| ≤ 1, |t| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
     = □   (trous : 1)   ← Majorer chaque facteur
   — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = □·1 + 1   (trous : 2·1 + 1)   ← Majorer chaque terme
-    = 3   ← Calculer
+    = □·1 + 1   (trous : 1·1 + 1)   ← Majorer chaque terme
+    = 2   ← Calculer
   — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(1,2/3)   ← min(a, b/K)
-    = 2/3   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |sin t| ≤ 1, |y| ≤ 2, |t| ≤ 1. Par exemple |∂f/∂y| ≤ 1. | M = 1, K = 3, h = min(1, 2/3) = 2/3.
+    = min(1,1/2)   ← min(a, b/K)
+    = 1/2   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |sin t| ≤ 1, |y| ≤ 1, |t| ≤ 1. Par exemple |∂f/∂y| ≤ 1. | M = 1, K = 2, h = min(1, 1/2) = 1/2.
 
-Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = 0 sur le rectangle R : |t| ≤ 2, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = 0 sur le rectangle R : |t| ≤ 2, |y| ≤ 2. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
   [guided]  ∂/∂y (tsin(y) + y²)
     = tcos(y) + 2y   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 2, |cos y| ≤ 1, |y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
-    = 2·□ + 2·□   (trous : 2·1 + 2·1)   ← Majorer chaque facteur
-    = 4   ← Calculer
+  — Majore |∂f/∂y| sur R (|t| ≤ 2, |cos y| ≤ 1, |y| ≤ 2) : f est M-Lipschitz en y.  [juge value]  départ : M
+    = □·□ + 2·2   (trous : 2·1 + 2·2)   ← Majorer chaque facteur
+    = 6   ← Calculer
   — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 2·□ + 1²   (trous : 2·1 + 1²)   ← Majorer chaque terme
-    = 3   ← Calculer
+    = □·1 + 2²   (trous : 2·1 + 2²)   ← Majorer chaque terme
+    = 6   ← Calculer
   — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(2,1/3)   ← min(a, b/K)
+    = min(2,2/6)   ← min(a, b/K)
     = 1/3   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |cos y| ≤ 1, |y| ≤ 1. Par exemple |∂f/∂y| ≤ 2·1+2·1. | M = 4, K = 3, h = min(2, 1/3) = 1/3.
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |cos y| ≤ 1, |y| ≤ 2. Par exemple |∂f/∂y| ≤ 2·1+2·2. | M = 6, K = 6, h = min(2, 2/6) = 1/3.
+
+Problème de Cauchy y′ = f(t, y) = ty², y(0) = 1 sur le rectangle R : |t| ≤ 1, |y − 1| ≤ 2 (donc |y| ≤ 3). Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+  [guided]  ∂/∂y (ty²)
+    = 2ty   ← Dériver en y (t est une constante)
+  — Majore |∂f/∂y| sur R (|t| ≤ 1, |y| ≤ 3) : f est M-Lipschitz en y.  [juge value]  départ : M
+    = 2·□·□   (trous : 2·1·3)   ← Majorer chaque facteur
+    = 6   ← Calculer
+  — Majore |f| sur R : borne K.  [juge value]  départ : K
+    = 1·□²   (trous : 1·3²)   ← Majorer chaque terme
+    = 9   ← Calculer
+  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
+    = min(1,2/9)   ← min(a, b/K)
+    = 2/9   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |y| ≤ 3. Par exemple |∂f/∂y| ≤ 2·1·3. | M = 6, K = 9, h = min(1, 2/9) = 2/9.
 
 ```
 
 ### Niveau 2
 
 ```
-Problème de Cauchy y′ = f(t, y) = tcos(y), y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 2. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [guided]  ∂/∂y (tcos(y))
-    = −tsin(y)   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 1, |sin y| ≤ 1, |cos y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
-    = 1·1   ← Majorer chaque facteur
-    = 1   ← Calculer
-  — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 1·1   ← Majorer chaque terme
-    = 1   ← Calculer
-  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(1,2/1)   ← min(a, b/K)
-    = 1   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |sin y| ≤ 1, |cos y| ≤ 1. Par exemple |∂f/∂y| ≤ 1·1. | M = 1, K = 1, h = min(1, 2/1) = 1.
-
-Problème de Cauchy y′ = f(t, y) = t² + y², y(0) = 0 sur le rectangle R : |t| ≤ 2, |y| ≤ 2. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [guided]  ∂/∂y (t² + y²)
-    = 2y   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 2, |y| ≤ 2) : f est M-Lipschitz en y.  [juge value]  départ : M
-    = 2·2   ← Majorer chaque facteur
-    = 4   ← Calculer
-  — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 2² + 2²   ← Majorer chaque terme
-    = 8   ← Calculer
-  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(2,2/8)   ← min(a, b/K)
-    = 1/4   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |y| ≤ 2. Par exemple |∂f/∂y| ≤ 2·2. | M = 4, K = 8, h = min(2, 2/8) = 1/4.
-
-Problème de Cauchy y′ = f(t, y) = tcos(y), y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 2. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [guided]  ∂/∂y (tcos(y))
-    = −tsin(y)   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 1, |sin y| ≤ 1, |cos y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
-    = 1·1   ← Majorer chaque facteur
-    = 1   ← Calculer
-  — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 1·1   ← Majorer chaque terme
-    = 1   ← Calculer
-  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(1,2/1)   ← min(a, b/K)
-    = 1   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |sin y| ≤ 1, |cos y| ≤ 1. Par exemple |∂f/∂y| ≤ 1·1. | M = 1, K = 1, h = min(1, 2/1) = 1.
-
-```
-
-### Niveau 3
-
-```
-Problème de Cauchy y′ = f(t, y) = t² + y², y(0) = 0 sur le rectangle R : |t| ≤ 2, |y| ≤ 2. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [tap, suivre l'erreur, menu steps]  ∂/∂y (t² + y²)
-    = 2y   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 2, |y| ≤ 2) : f est M-Lipschitz en y.  [juge value]  départ : M
-    ? Quelle hypothèse donne l'unicité de la solution ? ✔ f est Lipschitz en y sur R (par exemple ∂f/∂y bornée) / · f est continue sur R / · f est bornée par K sur R
-    = 2·2   ← Majorer chaque facteur
-    = 4   ← Calculer
-  — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 2² + 2²   ← Majorer chaque terme
-    = 8   ← Calculer
-  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(2,2/8)   ← min(a, b/K)
-    = 1/4   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |y| ≤ 2. Par exemple |∂f/∂y| ≤ 2·2. | M = 4, K = 8, h = min(2, 2/8) = 1/4.
-  pièges : a2_ode_continuity_unique
-
-Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = 1 sur le rectangle R : |t| ≤ 1, |y − 1| ≤ 1 (donc |y| ≤ 2). Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [tap, suivre l'erreur, menu steps]  ∂/∂y (tsin(y) + y²)
+Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = -1 sur le rectangle R : |t| ≤ 2, |y + 1| ≤ 2 (donc |y| ≤ 3). Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+  [guided]  ∂/∂y (tsin(y) + y²)
     = tcos(y) + 2y   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 1, |cos y| ≤ 1, |y| ≤ 2) : f est M-Lipschitz en y.  [juge value]  départ : M
-    ? Quelle hypothèse donne l'unicité de la solution ? ✔ f est Lipschitz en y sur R (par exemple ∂f/∂y bornée) / · f est continue sur R / · f est bornée par K sur R
-    = 1·1 + 2·2   ← Majorer chaque facteur
-    = 5   ← Calculer
+  — Majore |∂f/∂y| sur R (|t| ≤ 2, |cos y| ≤ 1, |y| ≤ 3) : f est M-Lipschitz en y.  [juge value]  départ : M
+    = 2·1 + 2·3   ← Majorer chaque facteur
+    = 8   ← Calculer
   — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 1·1 + 2²   ← Majorer chaque terme
-    = 5   ← Calculer
+    = 2·1 + 3²   ← Majorer chaque terme
+    = 11   ← Calculer
   — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(1,1/5)   ← min(a, b/K)
-    = 1/5   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |cos y| ≤ 1, |y| ≤ 2. Par exemple |∂f/∂y| ≤ 1·1+2·2. | M = 5, K = 5, h = min(1, 1/5) = 1/5.
-  pièges : a2_ode_continuity_unique
-
-Problème de Cauchy y′ = f(t, y) = t² + y², y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [tap, suivre l'erreur, menu steps]  ∂/∂y (t² + y²)
-    = 2y   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 1, |y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
-    ? Quelle hypothèse donne l'unicité de la solution ? ✔ f est Lipschitz en y sur R (par exemple ∂f/∂y bornée) / · f est continue sur R / · f est bornée par K sur R
-    = 2·1   ← Majorer chaque facteur
-    = 2   ← Calculer
-  — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 1² + 1²   ← Majorer chaque terme
-    = 2   ← Calculer
-  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(1,1/2)   ← min(a, b/K)
-    = 1/2   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |y| ≤ 1. Par exemple |∂f/∂y| ≤ 2·1. | M = 2, K = 2, h = min(1, 1/2) = 1/2.
-  pièges : a2_ode_continuity_unique
-
-```
-
-### Niveau 4
-
-```
-Problème de Cauchy y′ = f(t, y) = tcos(y), y(0) = 1 sur le rectangle R : |t| ≤ 1, |y − 1| ≤ 2 (donc |y| ≤ 3). Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [free, suivre l'erreur]  ∂/∂y (tcos(y))
-    = −tsin(y)   ← Dériver en y (t est une constante)
-  — Majore |∂f/∂y| sur R (|t| ≤ 1, |sin y| ≤ 1, |cos y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
-    = 1·1   ← Majorer chaque facteur
-    = 1   ← Calculer
-  — Majore |f| sur R : borne K.  [juge value]  départ : K
-    = 1·1   ← Majorer chaque terme
-    = 1   ← Calculer
-  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
-    = min(1,2/1)   ← min(a, b/K)
-    = 1   ← Calculer
-  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |sin y| ≤ 1, |cos y| ≤ 1. Par exemple |∂f/∂y| ≤ 1·1. | M = 1, K = 1, h = min(1, 2/1) = 1.
+    = min(2,2/11)   ← min(a, b/K)
+    = 2/11   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |cos y| ≤ 1, |y| ≤ 3. Par exemple |∂f/∂y| ≤ 2·1+2·3. | M = 8, K = 11, h = min(2, 2/11) = 2/11.
 
 Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
-  [free, suivre l'erreur]  ∂/∂y (tsin(y) + y²)
+  [guided]  ∂/∂y (tsin(y) + y²)
     = tcos(y) + 2y   ← Dériver en y (t est une constante)
   — Majore |∂f/∂y| sur R (|t| ≤ 1, |cos y| ≤ 1, |y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
     = 1·1 + 2·1   ← Majorer chaque facteur
@@ -9088,11 +8997,98 @@ Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = 0 sur le rectangle R 
     = 1/2   ← Calculer
   aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |cos y| ≤ 1, |y| ≤ 1. Par exemple |∂f/∂y| ≤ 1·1+2·1. | M = 3, K = 2, h = min(1, 1/2) = 1/2.
 
-Vrai ou faux ?
-  « Si f est continue et bornée, le problème y′ = f(y), y(0) = 0 a une unique solution locale. » → FAUX
-    contre-exemple (a2) : y1 = 0, y2 = t^3
-  aides : Existence : f continue. Unicité locale : f Lipschitz en y. Rien de global. | Pense à y′ = 3y^(2/3) (deux solutions) et à y′ = y² (explosion). | L'énoncé est faux : Faux : y′ = 3y^(2/3) (tronquée pour être bornée) a les solutions y = 0 et y = t³. La continuité ne donne que l'existence ; l'unicité demande f Lipschitz en y.
+Problème de Cauchy y′ = f(t, y) = ycos(t), y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+  [guided]  ∂/∂y (ycos(t))
+    = cos(t)   ← Dériver en y (t est une constante)
+  — Majore |∂f/∂y| sur R (|cos t| ≤ 1, |y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
+    = 1   ← Majorer chaque facteur
+  — Majore |f| sur R : borne K.  [juge value]  départ : K
+    = 1·1   ← Majorer chaque terme
+    = 1   ← Calculer
+  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
+    = min(1,1/1)   ← min(a, b/K)
+    = 1   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |cos t| ≤ 1, |y| ≤ 1. Par exemple |∂f/∂y| ≤ 1. | M = 1, K = 1, h = min(1, 1/1) = 1.
+
+```
+
+### Niveau 3
+
+```
+Problème de Cauchy y′ = f(t, y) = tcos(y), y(0) = 0 sur le rectangle R : |t| ≤ 2, |y| ≤ 2. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+  [tap, suivre l'erreur, menu steps]  ∂/∂y (tcos(y))
+    = −tsin(y)   ← Dériver en y (t est une constante)
+  — Majore |∂f/∂y| sur R (|t| ≤ 2, |sin y| ≤ 1, |cos y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
+    ? Quelle hypothèse donne l'unicité de la solution ? ✔ f est Lipschitz en y sur R (par exemple ∂f/∂y bornée) / · f est continue sur R / · f est bornée par K sur R
+    = 2·1   ← Majorer chaque facteur
+    = 2   ← Calculer
+  — Majore |f| sur R : borne K.  [juge value]  départ : K
+    = 2·1   ← Majorer chaque terme
+    = 2   ← Calculer
+  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
+    = min(2,2/2)   ← min(a, b/K)
+    = 1   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |sin y| ≤ 1, |cos y| ≤ 1. Par exemple |∂f/∂y| ≤ 2·1. | M = 2, K = 2, h = min(2, 2/2) = 1.
   pièges : a2_ode_continuity_unique
+
+Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = 1 sur le rectangle R : |t| ≤ 2, |y − 1| ≤ 1 (donc |y| ≤ 2). Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+  [tap, suivre l'erreur, menu steps]  ∂/∂y (tsin(y) + y²)
+    = tcos(y) + 2y   ← Dériver en y (t est une constante)
+  — Majore |∂f/∂y| sur R (|t| ≤ 2, |cos y| ≤ 1, |y| ≤ 2) : f est M-Lipschitz en y.  [juge value]  départ : M
+    ? Quelle hypothèse donne l'unicité de la solution ? ✔ f est Lipschitz en y sur R (par exemple ∂f/∂y bornée) / · f est continue sur R / · f est bornée par K sur R
+    = 2·1 + 2·2   ← Majorer chaque facteur
+    = 6   ← Calculer
+  — Majore |f| sur R : borne K.  [juge value]  départ : K
+    = 2·1 + 2²   ← Majorer chaque terme
+    = 6   ← Calculer
+  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
+    = min(2,1/6)   ← min(a, b/K)
+    = 1/6   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |cos y| ≤ 1, |y| ≤ 2. Par exemple |∂f/∂y| ≤ 2·1+2·2. | M = 6, K = 6, h = min(2, 1/6) = 1/6.
+  pièges : a2_ode_continuity_unique
+
+Problème de Cauchy y′ = f(t, y) = tsin(y) + y², y(0) = 0 sur le rectangle R : |t| ≤ 2, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+  [tap, suivre l'erreur, menu steps]  ∂/∂y (tsin(y) + y²)
+    = tcos(y) + 2y   ← Dériver en y (t est une constante)
+  — Majore |∂f/∂y| sur R (|t| ≤ 2, |cos y| ≤ 1, |y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
+    ? Quelle hypothèse donne l'unicité de la solution ? ✔ f est Lipschitz en y sur R (par exemple ∂f/∂y bornée) / · f est continue sur R / · f est bornée par K sur R
+    = 2·1 + 2·1   ← Majorer chaque facteur
+    = 4   ← Calculer
+  — Majore |f| sur R : borne K.  [juge value]  départ : K
+    = 2·1 + 1²   ← Majorer chaque terme
+    = 3   ← Calculer
+  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
+    = min(2,1/3)   ← min(a, b/K)
+    = 1/3   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 2, |cos y| ≤ 1, |y| ≤ 1. Par exemple |∂f/∂y| ≤ 2·1+2·1. | M = 4, K = 3, h = min(2, 1/3) = 1/3.
+  pièges : a2_ode_continuity_unique
+
+```
+
+### Niveau 4
+
+```
+Vrai ou faux ?
+  « Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution. » → VRAI
+  aides : Existence : f continue. Unicité locale : f Lipschitz en y. Rien de global. | Pense à y′ = 3y^(2/3) (deux solutions) et à y′ = y² (explosion). | L'énoncé est vrai.
+
+Problème de Cauchy y′ = f(t, y) = ty², y(0) = 0 sur le rectangle R : |t| ≤ 1, |y| ≤ 1. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.
+  [free, suivre l'erreur]  ∂/∂y (ty²)
+    = 2ty   ← Dériver en y (t est une constante)
+  — Majore |∂f/∂y| sur R (|t| ≤ 1, |y| ≤ 1) : f est M-Lipschitz en y.  [juge value]  départ : M
+    = 2·1·1   ← Majorer chaque facteur
+    = 2   ← Calculer
+  — Majore |f| sur R : borne K.  [juge value]  départ : K
+    = 1·1²   ← Majorer chaque terme
+    = 1   ← Calculer
+  — Solution unique sur |t| ≤ h, avec h = min(a, b/K) :  [juge value]  départ : h
+    = min(1,1/1)   ← min(a, b/K)
+    = 1   ← Calculer
+  aides : Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K). | Sur R : |t| ≤ 1, |y| ≤ 1. Par exemple |∂f/∂y| ≤ 2·1·1. | M = 2, K = 1, h = min(1, 1/1) = 1.
+
+Vrai ou faux ?
+  « Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution. » → VRAI
+  aides : Existence : f continue. Unicité locale : f Lipschitz en y. Rien de global. | Pense à y′ = 3y^(2/3) (deux solutions) et à y′ = y² (explosion). | L'énoncé est vrai.
 
 ```
 
@@ -9103,53 +9099,53 @@ Vrai ou faux ? 4 énoncés, un point chacun.
   [problème, 4 points]
   partie 1 (Énoncé 1 : 1)
   Vrai ou faux ?
-    « Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution. » → VRAI
+    « Si f est continue sur ℝ², le problème y′ = f(t, y), y(t₀) = y₀ a au moins une solution locale. » → VRAI
   partie 2 (Énoncé 2 : 1)
   Vrai ou faux ?
-    « Si f ∈ C¹(ℝ²), le problème y′ = f(t, y), y(t₀) = y₀ a une unique solution locale. » → VRAI
+    « Si f ∈ C¹(ℝ²), la solution de y′ = f(t, y), y(0) = 1 est définie pour tout t ∈ ℝ. » → FAUX
+      contre-exemple (a2) : f = y^2, y = 1/(1-t)
   partie 3 (Énoncé 3 : 1)
   Vrai ou faux ?
     « L'équation y‴ = f(t, y, y′, y″) demande trois conditions initiales, y(t₀), y′(t₀) et y″(t₀), pour une solution unique. » → VRAI
   partie 4 (Énoncé 4 : 1)
   Vrai ou faux ?
-    « Si f ∈ C¹(ℝ²), la solution de y′ = f(t, y), y(0) = 1 est définie pour tout t ∈ ℝ. » → FAUX
-      contre-exemple (a2) : f = y^2, y = 1/(1-t)
+    « Si f ∈ C¹(ℝ²), le problème y′ = f(t, y), y(t₀) = y₀ a une unique solution locale. » → VRAI
   pièges : a2_ode_local_global
 
 Vrai ou faux ? 4 énoncés, un point chacun.
   [problème, 4 points]
   partie 1 (Énoncé 1 : 1)
   Vrai ou faux ?
-    « Si f ∈ C¹(ℝ²), le problème y′ = f(t, y), y(t₀) = y₀ a une unique solution locale. » → VRAI
+    « Si f est continue sur ℝ², le problème y′ = f(t, y), y(t₀) = y₀ a au moins une solution locale. » → VRAI
   partie 2 (Énoncé 2 : 1)
+  Vrai ou faux ?
+    « Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution. » → VRAI
+  partie 3 (Énoncé 3 : 1)
   Vrai ou faux ?
     « Si f est continue, le problème y′ = f(y), y(0) = 0 a une unique solution sur [0 ; 1]. » → FAUX
       contre-exemple (a2) : y1 = 0, y2 = t^2
-  partie 3 (Énoncé 3 : 1)
-  Vrai ou faux ?
-    « Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution. » → VRAI
   partie 4 (Énoncé 4 : 1)
   Vrai ou faux ?
-    « Si f est continue sur ℝ², le problème y′ = f(t, y), y(t₀) = y₀ a au moins une solution locale. » → VRAI
+    « L'équation y‴ = f(t, y, y′, y″) demande trois conditions initiales, y(t₀), y′(t₀) et y″(t₀), pour une solution unique. » → VRAI
   pièges : a2_ode_continuity_unique
 
 Vrai ou faux ? 4 énoncés, un point chacun.
   [problème, 4 points]
   partie 1 (Énoncé 1 : 1)
   Vrai ou faux ?
-    « Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution. » → VRAI
+    « Si f est continue, le problème y′ = f(y), y(0) = 0 a une unique solution sur [0 ; 1]. » → FAUX
+      contre-exemple (a2) : y1 = 0, y2 = t^2
   partie 2 (Énoncé 2 : 1)
   Vrai ou faux ?
-    « Si f ∈ C¹(ℝ²), la solution de y′ = f(t, y), y(0) = 1 est définie pour tout t ∈ ℝ. » → FAUX
-      contre-exemple (a2) : f = y^2, y = 1/(1-t)
+    « Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution. » → VRAI
   partie 3 (Énoncé 3 : 1)
   Vrai ou faux ?
     « Si f est continue et bornée, le problème y′ = f(y), y(0) = 0 a une unique solution locale. » → FAUX
       contre-exemple (a2) : y1 = 0, y2 = t^3
   partie 4 (Énoncé 4 : 1)
   Vrai ou faux ?
-    « L'équation y‴ = f(t, y, y′, y″) demande trois conditions initiales, y(t₀), y′(t₀) et y″(t₀), pour une solution unique. » → VRAI
-  pièges : a2_ode_local_global, a2_ode_continuity_unique
+    « Si f est continue sur ℝ², le problème y′ = f(t, y), y(t₀) = y₀ a au moins une solution locale. » → VRAI
+  pièges : a2_ode_continuity_unique
 
 ```
 
@@ -9157,13 +9153,15 @@ Vrai ou faux ? 4 énoncés, un point chacun.
 
 ```
 Une condition suffisante pour que y‴ = y″·f₂(x) + f₀(y), y(0) = a, y′(0) = b, y″(0) = c ait une unique solution locale est :
-  · f₂ et f₀ continues [a2_ode_continuity_unique]   · f₂ et f₀ bornées   · f₀ Lipschitz, sans condition sur f₂   ✔ f₂ continue et f₀ Lipschitz
+  · f₂ et f₀ bornées   ✔ f₂ continue et f₀ Lipschitz   · f₂ et f₀ continues [a2_ode_continuity_unique]   · f₀ Lipschitz, sans condition sur f₂
   [examen mcq]
   pièges : a2_ode_continuity_unique
 
 Vrai ou faux ?
-  « Si f est continue sur ℝ², le problème y′ = f(t, y), y(t₀) = y₀ a au moins une solution locale. » → VRAI
+  « Si f ∈ C¹(ℝ²), la solution de y′ = f(t, y), y(0) = 1 est définie pour tout t ∈ ℝ. » → FAUX
+    contre-exemple (a2) : f = y^2, y = 1/(1-t)
   [examen tf]
+  pièges : a2_ode_local_global
 
 ```
 
@@ -9174,68 +9172,78 @@ _Solutions constantes d'abord, puis dy/h(y) = g(x) dx et une seule constante._
 ### Niveau 1
 
 ```
-Résous y′ = 3x²y, y(0) = 1. Les solutions constantes sont y = 0 ; y(0) = 1 n'en est pas une.
-  [guided]  y′ = 3x²y
-    = dy/y = 3x²dx   ← Séparer
-    = ∫ 1/y dy = ∫ 3x² dx   ← Intégrer des deux côtés
-    = □ = x³ + C   (trous : ln(|y|) = x³ + C)   ← Primitives, une seule constante
-    = C = 0   ← y(0) = 1
-    = y = □   (trous : y = e^(x³))   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = x³, plus une seule constante. | ln(|y|) = x³ + C, puis C = 0.
+Résous y′ = y, y(0) = −1. Les solutions constantes sont y = 0 ; y(0) = −1 n'en est pas une.
+  [guided]  y′ = y
+    = dy/y = dx   ← Séparer
+    = ∫ 1/y dy = ∫ 1 dx   ← Intégrer des deux côtés
+    = □ = x + C   (trous : ln(|y|) = x + C)   ← Primitives, une seule constante
+    = C = 0   ← y(0) = −1
+    = y = □   (trous : y = −e^(x))   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = x, plus une seule constante. | ln(|y|) = x + C, puis C = 0.
 
-Résous y′ = ((2 + x)/2)(9 − y²), y(0) = −3.
-  [guided]  9 − y² = 0
-    = y = 3 ou y = −3   ← Zéros de h
-  — y(0) = −3 annule h : quelle est la solution ?  [juge ode]  départ : y′ = ((2 + x)/2)(9 − y²)
-    = y = −3   ← y ≡ −3 est une solution, et la seule (unicité)
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/6) ln|(3 + y)/(3 − y)| et ∫ g(x) dx = x+(1/4)x², plus une seule constante. | y(0) = −3 annule h : y ≡ −3.
+Résous y′ = 6x⁵y², y(0) = −2. Les solutions constantes sont y = 0 ; y(0) = −2 n'en est pas une.
+  [guided]  y′ = 6x⁵y²
+    = dy/y² = 6x⁵dx   ← Séparer
+    = ∫ 1/y² dy = ∫ 6x⁵ dx   ← Intégrer des deux côtés
+    = □ = x⁶ + C   (trous : −1/y = x⁶ + C)   ← Primitives, une seule constante
+    = C = 1/2   ← y(0) = −2
+    = y = □   (trous : y = 1/(−1/2 − x⁶))   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = −1/y et ∫ g(x) dx = x⁶, plus une seule constante. | −1/y = x⁶ + C, puis C = 1/2.
 
-Résous y′ = 4xy, y(0) = 0.
-  [guided]  y′ = 4xy
-    (h(y) = y s'annule en y = 0 : y ≡ 0 est une solution constante.)
-    = y = 0   ← y ≡ 0 est une solution, et la seule (unicité)
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = 2x², plus une seule constante. | y(0) = 0 annule h : y ≡ 0.
+Résous y′ = 6x⁵y, y(0) = 2. Les solutions constantes sont y = 0 ; y(0) = 2 n'en est pas une.
+  [guided]  y′ = 6x⁵y
+    = dy/y = 6x⁵dx   ← Séparer
+    = ∫ 1/y dy = ∫ 6x⁵ dx   ← Intégrer des deux côtés
+    = □ = x⁶ + C   (trous : ln(|y|) = x⁶ + C)   ← Primitives, une seule constante
+    = C = ln(2)   ← y(0) = 2
+    = y = □   (trous : y = 2e^(x⁶))   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = x⁶, plus une seule constante. | ln(|y|) = x⁶ + C, puis C = ln(2).
 
 ```
 
 ### Niveau 2
 
 ```
-Résous y′ = (1 + x)(4 − y²), y(0) = 2.
-  [guided]  4 − y² = 0
-    ? Avant de diviser par h(y) = 4 − y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
-    = y = 2 ou y = −2   ← Zéros de h
-  — y(0) = 2 annule h : quelle est la solution ?  [juge ode]  départ : y′ = (1 + x)(4 − y²)
-    = y = 2   ← y ≡ 2 est une solution, et la seule (unicité)
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/4) ln|(2 + y)/(2 − y)| et ∫ g(x) dx = x+(1/2)x², plus une seule constante. | y(0) = 2 annule h : y ≡ 2.
-  pièges : a2_ode_sep_lost_constant
-
-Résous y′ = y, y(0) = 3.
-  [guided]  y′ = y
-    ? Avant de diviser par h(y) = y, que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
-    (h(y) = y s'annule en y = 0 : y ≡ 0 est une solution constante. Ici y(0) = 3 ≠ 0.)
-    = dy/y = dx   ← Séparer
-    = ∫ 1/y dy = ∫ 1 dx   ← Intégrer des deux côtés
-    = ln(|y|) = □ + C   (trous : ln(|y|) = x + C)   ← Primitives, une seule constante
-    = C = ln(3)   ← y(0) = 3
-    = y = 3e^(x)   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = x, plus une seule constante. | ln(|y|) = x + C, puis C = ln(3).
-  pièges : a2_ode_sep_lost_constant
-
-Résous y′ = cos(x)·(4 − y²), y(0) = 0.
-  [guided]  4 − y² = 0
-    ? Avant de diviser par h(y) = 4 − y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
-    = y = 2 ou y = −2   ← Zéros de h
-  — Décompose 1/(4 − y²) en éléments simples.  [juge equiv]  départ : 1/(4 − y²)
-    = (1/4)(1/(2 − y) + 1/(2 + y))   ← Éléments simples
-  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = cos(x)·(4 − y²)
-    = dy/(4 − y²) = cos(x)dx   ← Séparer
-    = ∫ 1/(4 − y²) dy = ∫ cos(x) dx   ← Intégrer des deux côtés
-    = (1/4)ln(|(2 + y)/(2 − y)|) = □ + C   (trous : (1/4)ln(|(2 + y)/(2 − y)|) = sin(x) + C)   ← Primitives, une seule constante
+Résous y′ = cos(x)·(1 + y²), y(0) = 0.
+  [guided]  1 + y² = 0
+    ? Avant de diviser par h(y) = 1 + y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
+    = ∅   ← Zéros de h
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = cos(x)·(1 + y²)
+    = dy/(1 + y²) = cos(x)dx   ← Séparer
+    = ∫ 1/(1 + y²) dy = ∫ cos(x) dx   ← Intégrer des deux côtés
+    = arctan(y) = □ + C   (trous : arctan(y) = sin(x) + C)   ← Primitives, une seule constante
     = C = 0   ← y(0) = 0
-    = (2 + y)/(2 − y) = e^(4sin(x))   ← Le quotient est positif en x = 0 : on enlève |…| avec le signe +
-    = y = 2(e^(4sin(x)) − 1)/(e^(4sin(x)) + 1)   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/4) ln|(2 + y)/(2 − y)| et ∫ g(x) dx = sin(x), plus une seule constante. | (1/4)ln(|(2 + y)/(2 − y)|) = sin(x) + C, puis C = 0.
+    = y = tan(sin(x))   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = arctan y et ∫ g(x) dx = sin(x), plus une seule constante. | arctan(y) = sin(x) + C, puis C = 0.
+  pièges : a2_ode_sep_lost_constant
+
+Résous y′ = cos(x)·(1 − y²), y(0) = 0.
+  [guided]  1 − y² = 0
+    ? Avant de diviser par h(y) = 1 − y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
+    = y = 1 ou y = −1   ← Zéros de h
+  — Décompose 1/(1 − y²) en éléments simples.  [juge equiv]  départ : 1/(1 − y²)
+    = (1/2)(1/(1 − y) + 1/(1 + y))   ← Éléments simples
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = cos(x)·(1 − y²)
+    = dy/(1 − y²) = cos(x)dx   ← Séparer
+    = ∫ 1/(1 − y²) dy = ∫ cos(x) dx   ← Intégrer des deux côtés
+    = (1/2)ln(|(1 + y)/(1 − y)|) = □ + C   (trous : (1/2)ln(|(1 + y)/(1 − y)|) = sin(x) + C)   ← Primitives, une seule constante
+    = C = 0   ← y(0) = 0
+    = (1 + y)/(1 − y) = e^(2sin(x))   ← Le quotient est positif en x = 0 : on enlève |…| avec le signe +
+    = y = (e^(2sin(x)) − 1)/(e^(2sin(x)) + 1)   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/2) ln|(1 + y)/(1 − y)| et ∫ g(x) dx = sin(x), plus une seule constante. | (1/2)ln(|(1 + y)/(1 − y)|) = sin(x) + C, puis C = 0.
+  pièges : a2_ode_sep_lost_constant
+
+Résous y′ = 3x²y², y(0) = 2.
+  [guided]  y² = 0
+    ? Avant de diviser par h(y) = y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
+    = y = 0   ← Zéros de h
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 3x²y²
+    = dy/y² = 3x²dx   ← Séparer
+    = ∫ 1/y² dy = ∫ 3x² dx   ← Intégrer des deux côtés
+    = −1/y = □ + C   (trous : −1/y = x³ + C)   ← Primitives, une seule constante
+    = C = −1/2   ← y(0) = 2
+    = y = 1/(1/2 − x³)   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = −1/y et ∫ g(x) dx = x³, plus une seule constante. | −1/y = x³ + C, puis C = −1/2.
   pièges : a2_ode_sep_lost_constant
 
 ```
@@ -9243,42 +9251,40 @@ Résous y′ = cos(x)·(4 − y²), y(0) = 0.
 ### Niveau 3
 
 ```
-Résous y′ = cos(x)·y², y(0) = 1.
-  [tap, suivre l'erreur, menu steps]  y² = 0
-    ? Avant de diviser par h(y) = y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
-    = y = 0   ← Zéros de h
-  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = cos(x)·y²
-    = ∫ 1/y² dy = ∫ cos(x) dx   ← Séparer et intégrer
-    = −1/y = sin(x) + C   ← Primitives, une seule constante
-    ? Appliquer la condition initiale maintenant, ou après avoir isolé y ? ✔ Maintenant : la constante est plus simple à trouver / ✔ Après avoir isolé y
-    = C = −1   ← y(0) = 1
-    = y = 1/(1 − sin(x))   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = −1/y et ∫ g(x) dx = sin(x), plus une seule constante. | −1/y = sin(x) + C, puis C = −1.
-  pièges : a2_ode_sep_lost_constant
-
-Résous y′ = 2(4 − y²), y(0) = 0.
-  [tap, suivre l'erreur, menu steps]  4 − y² = 0
-    ? Avant de diviser par h(y) = 4 − y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
-    = y = 2 ou y = −2   ← Zéros de h
-  — Décompose 1/(4 − y²) en éléments simples.  [juge equiv]  départ : 1/(4 − y²)
-    = (1/4)(1/(2 − y) + 1/(2 + y))   ← Éléments simples
-  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 2(4 − y²)
-    = ∫ 1/(4 − y²) dy = ∫ 2 dx   ← Séparer et intégrer
-    = (1/4)ln(|(2 + y)/(2 − y)|) = 2x + C   ← Primitives, une seule constante
+Résous y′ = 4x(1 − y²), y(0) = 0.
+  [tap, suivre l'erreur, menu steps]  1 − y² = 0
+    ? Avant de diviser par h(y) = 1 − y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
+    = y = 1 ou y = −1   ← Zéros de h
+  — Décompose 1/(1 − y²) en éléments simples.  [juge equiv]  départ : 1/(1 − y²)
+    = (1/2)(1/(1 − y) + 1/(1 + y))   ← Éléments simples
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 4x(1 − y²)
+    = ∫ 1/(1 − y²) dy = ∫ 4x dx   ← Séparer et intégrer
+    = (1/2)ln(|(1 + y)/(1 − y)|) = 2x² + C   ← Primitives, une seule constante
     ? Appliquer la condition initiale maintenant, ou après avoir isolé y ? ✔ Maintenant : la constante est plus simple à trouver / ✔ Après avoir isolé y
     = C = 0   ← y(0) = 0
-    = (2 + y)/(2 − y) = e^(8x)   ← Le quotient est positif en x = 0 : on enlève |…| avec le signe +
-    = y = 2(e^(8x) − 1)/(e^(8x) + 1)   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/4) ln|(2 + y)/(2 − y)| et ∫ g(x) dx = 2x, plus une seule constante. | (1/4)ln(|(2 + y)/(2 − y)|) = 2x + C, puis C = 0.
+    = (1 + y)/(1 − y) = e^(4x²)   ← Le quotient est positif en x = 0 : on enlève |…| avec le signe +
+    = y = (e^(4x²) − 1)/(e^(4x²) + 1)   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/2) ln|(1 + y)/(1 − y)| et ∫ g(x) dx = 2x², plus une seule constante. | (1/2)ln(|(1 + y)/(1 − y)|) = 2x² + C, puis C = 0.
   pièges : a2_ode_sep_lost_constant
 
-Résous y′ = (9 − y²), y(0) = 3.
-  [tap, suivre l'erreur, menu steps]  9 − y² = 0
-    ? Avant de diviser par h(y) = 9 − y², que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
-    = y = 3 ou y = −3   ← Zéros de h
-  — y(0) = 3 annule h : quelle est la solution ?  [juge ode]  départ : y′ = (9 − y²)
-    = y = 3   ← y ≡ 3 est une solution, et la seule (unicité)
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/6) ln|(3 + y)/(3 − y)| et ∫ g(x) dx = x, plus une seule constante. | y(0) = 3 annule h : y ≡ 3.
+Résous y′ = cos(x)·y, y(0) = 1.
+  [tap, suivre l'erreur, menu steps]  y′ = cos(x)·y
+    ? Avant de diviser par h(y) = y, que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
+    (h(y) = y s'annule en y = 0 : y ≡ 0 est une solution constante. Ici y(0) = 1 ≠ 0.)
+    = ∫ 1/y dy = ∫ cos(x) dx   ← Séparer et intégrer
+    = ln(|y|) = sin(x) + C   ← Primitives, une seule constante
+    ? Appliquer la condition initiale maintenant, ou après avoir isolé y ? ✔ Maintenant : la constante est plus simple à trouver / ✔ Après avoir isolé y
+    = C = 0   ← y(0) = 1
+    = y = e^(sin(x))   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = sin(x), plus une seule constante. | ln(|y|) = sin(x) + C, puis C = 0.
+  pièges : a2_ode_sep_lost_constant
+
+Résous y′ = 3x²y, y(0) = 0.
+  [tap, suivre l'erreur, menu steps]  y′ = 3x²y
+    ? Avant de diviser par h(y) = y, que faut-il faire ? ✔ Chercher les zéros de h : ce sont des solutions constantes / · Rien : on divise directement
+    (h(y) = y s'annule en y = 0 : y ≡ 0 est une solution constante.)
+    = y = 0   ← y ≡ 0 est une solution, et la seule (unicité)
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = x³, plus une seule constante. | y(0) = 0 annule h : y ≡ 0.
   pièges : a2_ode_sep_lost_constant
 
 ```
@@ -9286,78 +9292,75 @@ Résous y′ = (9 − y²), y(0) = 3.
 ### Niveau 4
 
 ```
-Résous y′ = 3x²y², y(0) = 2.
-  [free, suivre l'erreur]  y² = 0
-    = y = 0   ← Zéros de h
-  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 3x²y²
-    = dy/y² = 3x²dx   ← Séparer
-    = −1/y = x³ + C   ← Primitives, une seule constante
-    = C = −1/2   ← y(0) = 2
-    = y = 1/(1/2 − x³)   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = −1/y et ∫ g(x) dx = x³, plus une seule constante. | −1/y = x³ + C, puis C = −1/2.
-
-Résous y′ = 4x(1 − y²), y(0) = 0.
+Résous y′ = 6x⁵(1 − y²), y(0) = 0.
   [free, suivre l'erreur]  1 − y² = 0
     = y = 1 ou y = −1   ← Zéros de h
   — Décompose 1/(1 − y²) en éléments simples.  [juge equiv]  départ : 1/(1 − y²)
     = (1/2)(1/(1 − y) + 1/(1 + y))   ← Éléments simples
-  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 4x(1 − y²)
-    = dy/(1 − y²) = 4xdx   ← Séparer
-    = (1/2)ln(|(1 + y)/(1 − y)|) = 2x² + C   ← Primitives, une seule constante
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 6x⁵(1 − y²)
+    = dy/(1 − y²) = 6x⁵dx   ← Séparer
+    = (1/2)ln(|(1 + y)/(1 − y)|) = x⁶ + C   ← Primitives, une seule constante
     = C = 0   ← y(0) = 0
-    = (1 + y)/(1 − y) = e^(4x²)   ← Le quotient est positif en x = 0 : on enlève |…| avec le signe +
-    = y = (e^(4x²) − 1)/(e^(4x²) + 1)   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/2) ln|(1 + y)/(1 − y)| et ∫ g(x) dx = 2x², plus une seule constante. | (1/2)ln(|(1 + y)/(1 − y)|) = 2x² + C, puis C = 0.
+    = (1 + y)/(1 − y) = e^(2x⁶)   ← Le quotient est positif en x = 0 : on enlève |…| avec le signe +
+    = y = (e^(2x⁶) − 1)/(e^(2x⁶) + 1)   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = (1/2) ln|(1 + y)/(1 − y)| et ∫ g(x) dx = x⁶, plus une seule constante. | (1/2)ln(|(1 + y)/(1 − y)|) = x⁶ + C, puis C = 0.
 
-Résous y′ = cos(x)·y, y(0) = 1.
-  [free, suivre l'erreur]  y′ = cos(x)·y
-    (h(y) = y s'annule en y = 0 : y ≡ 0 est une solution constante. Ici y(0) = 1 ≠ 0.)
-    = dy/y = cos(x)dx   ← Séparer
-    = ln(|y|) = sin(x) + C   ← Primitives, une seule constante
-    = C = 0   ← y(0) = 1
-    = y = e^(sin(x))   ← Isoler y
-  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = ln|y| et ∫ g(x) dx = sin(x), plus une seule constante. | ln(|y|) = sin(x) + C, puis C = 0.
+Résous y′ = 4x(1 + y²), y(0) = −1.
+  [free, suivre l'erreur]  1 + y² = 0
+    = ∅   ← Zéros de h
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 4x(1 + y²)
+    = dy/(1 + y²) = 4xdx   ← Séparer
+    = arctan(y) = 2x² + C   ← Primitives, une seule constante
+    = C = −π/4   ← y(0) = −1
+    = y = tan(2x² − π/4)   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = arctan y et ∫ g(x) dx = 2x², plus une seule constante. | arctan(y) = 2x² + C, puis C = −π/4.
+
+Résous y′ = 3x²(1 + y²), y(0) = −1.
+  [free, suivre l'erreur]  1 + y² = 0
+    = ∅   ← Zéros de h
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 3x²(1 + y²)
+    = dy/(1 + y²) = 3x²dx   ← Séparer
+    = arctan(y) = x³ + C   ← Primitives, une seule constante
+    = C = −π/4   ← y(0) = −1
+    = y = tan(x³ − π/4)   ← Isoler y
+  aides : Repère les solutions constantes (zéros de h), puis mets les y d'un côté et les x de l'autre. | ∫ dy/h(y) = arctan y et ∫ g(x) dx = x³, plus une seule constante. | arctan(y) = x³ + C, puis C = −π/4.
 
 ```
 
 ### Niveau 5
 
 ```
-La solution de y′ = 1 − y², y(0) = 0 vérifie aussi y(ln(3)/2) =
-  · 2 [a2_ode_sign_abs]   ✔ 1/2   · −1/2   · 1
-  pièges : a2_ode_sign_abs
+La solution de y′ = e^(−y), y(0) = 0 vérifie aussi y(1) =
+  · ln(1)   · −ln(2)   ✔ ln(2)   · 2
 
-Résous y′ = (1 + x)y, y(0) = −1.
-  [free, sans aide]  y′ = (1 + x)y
-    (h(y) = y s'annule en y = 0 : y ≡ 0 est une solution constante. Ici y(0) = −1 ≠ 0.)
-    = dy/y = (1 + x)dx   ← Séparer
-    = ln(|y|) = x + (1/2)x² + C   ← Primitives, une seule constante
-    = C = 0   ← y(0) = −1
-    = y = −e^(x + (1/2)x²)   ← Isoler y
+Résous y′ = 3x²(1 − y²), y(0) = 0.
+  [free, sans aide]  1 − y² = 0
+    = y = 1 ou y = −1   ← Zéros de h
+  — Décompose 1/(1 − y²) en éléments simples.  [juge equiv]  départ : 1/(1 − y²)
+    = (1/2)(1/(1 − y) + 1/(1 + y))   ← Éléments simples
+  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 3x²(1 − y²)
+    = dy/(1 − y²) = 3x²dx   ← Séparer
+    = (1/2)ln(|(1 + y)/(1 − y)|) = x³ + C   ← Primitives, une seule constante
+    = C = 0   ← y(0) = 0
+    = (1 + y)/(1 − y) = e^(2x³)   ← Le quotient est positif en x = 0 : on enlève |…| avec le signe +
+    = y = (e^(2x³) − 1)/(e^(2x³) + 1)   ← Isoler y
 
-Résous y′ = 3y², y(0) = 1.
-  [free, sans aide]  y² = 0
-    = y = 0   ← Zéros de h
-  — Sépare, intègre, puis applique la condition initiale.  [juge ode]  départ : y′ = 3y²
-    = dy/y² = 3dx   ← Séparer
-    = −1/y = 3x + C   ← Primitives, une seule constante
-    = C = −1   ← y(0) = 1
-    = y = 1/(1 − 3x)   ← Isoler y
+La solution de y′ = 2y², y(0) = −2 vérifie aussi y(1/3) =
+  · 6   · 6/7   · 2/3   ✔ −6/7
 
 ```
 
 ### Variantes d'examen
 
 ```
-La solution de y′ = 3(1 + y²), y(0) = 0 vérifie aussi y(π/12) =
-  · arctan(π/4)   · π/4   · −1   ✔ 1
+La solution de y′ = 3(1 − y²), y(0) = 0 vérifie aussi y(ln(3)/6) =
+  · −1/2   · 1   ✔ 1/2   · 2 [a2_ode_sign_abs]
   [examen mcq]
+  pièges : a2_ode_sign_abs
 
 Vrai ou faux ?
-  « Toutes les solutions de y′ = y² sont de la forme y = −1/(x + C). » → FAUX
-    contre-exemple (a2) : y = 0
+  « La solution générale de y′ = cos(t)·e^(−y) est y = ln(sin t + C). » → VRAI
   [examen tf]
-  pièges : a2_ode_sep_lost_constant
 
 ```
 
@@ -9368,34 +9371,34 @@ _Normaliser, μ = e^(∫a), (μy)′ = μb, intégrer._
 ### Niveau 1
 
 ```
-Résous 3y′ + 3y = −3, y(0) = 1. Forme normalisée : y′ + y = −1.
-  [guided]  y′ + y = −1
-    = μ = □   (trous : μ = e^x)   ← μ = e^(∫ a), a = 1
-    = (e^xy)′ = □   (trous : (e^xy)′ = −e^x)   ← (μy)′ = μ·b
-    = e^xy = −e^x + C   ← Intégrer
-    = C = 2   ← y(0) = 1
-    = y = −1 + 2e^(−x)   ← Isoler y
-  aides : Divise par 3 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 1, donc μ = e^x ; puis (μy)′ = μ·b et ∫ −e^x dx. | (e^xy)′ = −e^x
-  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
-
-Résous (x² + 1)y′ + y = 1, y(0) = −1. Forme normalisée : y′ + y/(x² + 1) = 1/(x² + 1).
-  [guided]  y′ + y/(x² + 1) = 1/(x² + 1)
-    = μ = □   (trous : μ = e^(arctan(x)))   ← μ = e^(∫ a), a = 1/(x²+1)
-    = (e^(arctan(x))y)′ = □   (trous : (e^(arctan(x))y)′ = e^(arctan(x))/(x² + 1))   ← (μy)′ = μ·b
-    = e^(arctan(x))y = e^(arctan(x)) + C   ← Intégrer
-    = C = −2   ← y(0) = −1
-    = y = 1 − 2e^(−arctan(x))   ← Isoler y
-  aides : Divise par x²+1 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 1/(x²+1), donc μ = e^(arctan(x)) ; puis (μy)′ = μ·b et ∫ e^(arctan x)/(x² + 1) dx. | (e^(arctan(x))y)′ = e^(arctan(x))/(x² + 1)
-  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
-
-Résous 2y′ − 2y = −8e^(−3x), y(0) = −1. Forme normalisée : y′ − y = −4e^(−3x).
-  [guided]  y′ − y = −4e^(−3x)
+Résous 2y′ − 2y = −2, y(0) = −1. Forme normalisée : y′ − y = −1.
+  [guided]  y′ − y = −1
     = μ = □   (trous : μ = e^(−x))   ← μ = e^(∫ a), a = −1
-    = (e^(−x)y)′ = □   (trous : (e^(−x)y)′ = −4e^(−4x))   ← (μy)′ = μ·b
-    = e^(−x)y = e^(−4x) + C   ← Intégrer
+    = (e^(−x)y)′ = □   (trous : (e^(−x)y)′ = −e^(−x))   ← (μy)′ = μ·b
+    = e^(−x)y = e^(−x) + C   ← Intégrer
     = C = −2   ← y(0) = −1
-    = y = e^(−3x) − 2e^x   ← Isoler y
-  aides : Divise par 2 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = −1, donc μ = e^(−x) ; puis (μy)′ = μ·b et ∫ −4e^(−4x) dx. | (e^(−x)y)′ = −4e^(−4x)
+    = y = 1 − 2e^x   ← Isoler y
+  aides : Divise par 2 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = −1, donc μ = e^(−x) ; puis (μy)′ = μ·b et ∫ −e^(−x) dx. | (e^(−x)y)′ = −e^(−x)
+  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
+
+Résous xy′ + 2y = 10x³, y(1) = 0, pour x > 0. Forme normalisée : y′ + (2/x)y = 10x².
+  [guided]  y′ + (2/x)y = 10x²
+    = μ = □   (trous : μ = x²)   ← μ = e^(∫ a), a = 2/x
+    = (x²y)′ = □   (trous : (x²y)′ = 10x⁴)   ← (μy)′ = μ·b
+    = x²y = 2x⁵ + C   ← Intégrer
+    = C = −2   ← y(1) = 0
+    = y = 2x³ − 2/x²   ← Isoler y
+  aides : Divise par x pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 2/x, donc μ = x² ; puis (μy)′ = μ·b et ∫ 10x⁴ dx. | (x²y)′ = 10x⁴
+  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
+
+Résous cos(x)y′ + sin(x)y = cos(x)³, y(0) = 3. Forme normalisée : y′ + tan(x)y = cos(x)².
+  [guided]  y′ + tan(x)y = cos(x)²
+    = μ = □   (trous : μ = 1/cos(x))   ← μ = e^(∫ a), a = tan(x)
+    = (y/□)′ = cos(x)   (trous : (y/cos(x))′ = cos(x))   ← (μy)′ = μ·b
+    = y/cos(x) = sin(x) + C   ← Intégrer
+    = C = 3   ← y(0) = 3
+    = y = (sin(x) + 3)cos(x)   ← Isoler y
+  aides : Divise par cos(x) pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = tan(x), donc μ = 1/cos(x) ; puis (μy)′ = μ·b et ∫ cos x dx. | (y/cos(x))′ = cos(x)
   pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
 
 ```
@@ -9403,36 +9406,36 @@ Résous 2y′ − 2y = −8e^(−3x), y(0) = −1. Forme normalisée : y′ − 
 ### Niveau 2
 
 ```
-Résous y′ + 2y = e^(−x), y(0) = 2.
-  [guided]  y′ + 2y = e^(−x)
-    = μ = e^(2x)   ← μ = e^(∫ a), a = 2
-    = (e^(2x)y)′ = e^x   ← (μy)′ = μ·b
-    = e^(2x)y = □ + C   (trous : e^(2x)y = e^x + C)   ← Intégrer
-    = C = 1   ← y(0) = 2
-    = y = e^(−x) + e^(−2x)   ← Isoler y
-  aides : Multiplie par μ = e^(∫ a) : le membre de gauche devient (μy)′. | a(x) = 2, donc μ = e^(2x) ; puis (μy)′ = μ·b et ∫ e^x dx. | (e^(2x)y)′ = e^x
+Résous y′ + xy = 3x, y(0) = 2.
+  [guided]  y′ + xy = 3x
+    = μ = e^(x²/2)   ← μ = e^(∫ a), a = x
+    = (e^(x²/2)y)′ = 3xe^(x²/2)   ← (μy)′ = μ·b
+    = e^(x²/2)y = □ + C   (trous : e^(x²/2)y = 3e^(x²/2) + C)   ← Intégrer
+    = C = −1   ← y(0) = 2
+    = y = 3 − e^(−x²/2)   ← Isoler y
+  aides : Multiplie par μ = e^(∫ a) : le membre de gauche devient (μy)′. | a(x) = x, donc μ = e^(x²/2) ; puis (μy)′ = μ·b et ∫ 3xe^(x²/2) dx. | (e^(x²/2)y)′ = 3xe^(x²/2)
   pièges : a2_ode_if_sign, a2_ode_if_rhs
 
-Résous 2y′ + 2y = 6e^(2x), y(0) = 0.
-  [guided]  2y′ + 2y = 6e^(2x)
-    = y′ + y = 3e^(2x)   ← Diviser par 2
-    = μ = e^x   ← μ = e^(∫ a), a = 1
-    = (e^xy)′ = 3e^(3x)   ← (μy)′ = μ·b
-    = e^xy = □ + C   (trous : e^xy = e^(3x) + C)   ← Intégrer
-    = C = −1   ← y(0) = 0
-    = y = e^(2x) − e^(−x)   ← Isoler y
-  aides : Divise par 2 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 1, donc μ = e^x ; puis (μy)′ = μ·b et ∫ 3e^(3x) dx. | (e^xy)′ = 3e^(3x)
+Résous cos(x)y′ + sin(x)y = cos(x)², y(0) = 1.
+  [guided]  cos(x)y′ + sin(x)y = cos(x)²
+    = y′ + tan(x)y = cos(x)   ← Diviser par cos(x)
+    = μ = 1/cos(x)   ← μ = e^(∫ a), a = tan(x)
+    = (y/cos(x))′ = 1   ← (μy)′ = μ·b
+    = y/cos(□) = x + C   (trous : y/cos(x) = x + C)   ← Intégrer
+    = C = 1   ← y(0) = 1
+    = y = (x + 1)cos(x)   ← Isoler y
+  aides : Divise par cos(x) pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = tan(x), donc μ = 1/cos(x) ; puis (μy)′ = μ·b et ∫ 1 dx. | (y/cos(x))′ = 1
   pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
 
-Résous (x² + 1)y′ + y = 2, y(0) = −2.
-  [guided]  (x² + 1)y′ + y = 2
-    = y′ + y/(x² + 1) = 2/(x² + 1)   ← Diviser par x²+1
-    = μ = e^(arctan(x))   ← μ = e^(∫ a), a = 1/(x²+1)
-    = (e^(arctan(x))y)′ = 2e^(arctan(x))/(x² + 1)   ← (μy)′ = μ·b
-    = e^(arctan(x))y = □ + C   (trous : e^(arctan(x))y = 2e^(arctan(x)) + C)   ← Intégrer
-    = C = −4   ← y(0) = −2
-    = y = 2 − 4e^(−arctan(x))   ← Isoler y
-  aides : Divise par x²+1 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 1/(x²+1), donc μ = e^(arctan(x)) ; puis (μy)′ = μ·b et ∫ 2e^(arctan x)/(x² + 1) dx. | (e^(arctan(x))y)′ = 2e^(arctan(x))/(x² + 1)
+Résous 2y′ − 2y = 16e^(−3x), y(0) = −2.
+  [guided]  2y′ − 2y = 16e^(−3x)
+    = y′ − y = 8e^(−3x)   ← Diviser par 2
+    = μ = e^(−x)   ← μ = e^(∫ a), a = −1
+    = (e^(−x)y)′ = 8e^(−4x)   ← (μy)′ = μ·b
+    = e^(−x)y = □ + C   (trous : e^(−x)y = −2e^(−4x) + C)   ← Intégrer
+    = C = 0   ← y(0) = −2
+    = y = −2e^(−3x)   ← Isoler y
+  aides : Divise par 2 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = −1, donc μ = e^(−x) ; puis (μy)′ = μ·b et ∫ 8e^(−4x) dx. | (e^(−x)y)′ = 8e^(−4x)
   pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
 
 ```
@@ -9440,59 +9443,9 @@ Résous (x² + 1)y′ + y = 2, y(0) = −2.
 ### Niveau 3
 
 ```
-Résous xy′ + y = 12x³, y(1) = −2, pour x > 0.
-  [tap, suivre l'erreur, menu steps]  xy′ + y = 12x³
-    ? Quelle méthode ? ✔ Facteur intégrant / · Décalage vers l'équilibre (a et b constants) / · Variables séparables
-    = y′ + (1/x)y = 12x²   ← Diviser par x
-    = μ = x   ← μ = e^(∫ a), a = 1/x
-    = (xy)′ = 12x³   ← (μy)′ = μ·b
-    = xy = 3x⁴ + C   ← Intégrer
-    = C = −5   ← y(1) = −2
-    = y = 3x³ − 5/x   ← Isoler y
-  aides : Divise par x pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 1/x, donc μ = x ; puis (μy)′ = μ·b et ∫ 12x³ dx. | (xy)′ = 12x³
-  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs, a2_ode_method_separable_sum
-
-Résous y′ + xy = −2e^(−x²/2), y(0) = 3.
-  [tap, suivre l'erreur, menu steps]  y′ + xy = −2e^(−x²/2)
-    ? Quelle méthode ? ✔ Facteur intégrant / · Décalage vers l'équilibre (a et b constants) / · Variables séparables
-    = μ = e^(x²/2)   ← μ = e^(∫ a), a = x
-    = (e^(x²/2)y)′ = −2   ← (μy)′ = μ·b
-    = e^(x²/2)y = −2x + C   ← Intégrer
-    = C = 3   ← y(0) = 3
-    = y = (−2x + 3)e^(−x²/2)   ← Isoler y
-  aides : Multiplie par μ = e^(∫ a) : le membre de gauche devient (μy)′. | a(x) = x, donc μ = e^(x²/2) ; puis (μy)′ = μ·b et ∫ -2 dx. | (e^(x²/2)y)′ = −2
-  pièges : a2_ode_if_sign, a2_ode_if_rhs, a2_ode_method_separable_sum
-
-Résous xy′ + y = 4x³, y(1) = 0, pour x > 0.
-  [tap, suivre l'erreur, menu steps]  xy′ + y = 4x³
-    ? Quelle méthode ? ✔ Facteur intégrant / · Décalage vers l'équilibre (a et b constants) / · Variables séparables
-    = y′ + (1/x)y = 4x²   ← Diviser par x
-    = μ = x   ← μ = e^(∫ a), a = 1/x
-    = (xy)′ = 4x³   ← (μy)′ = μ·b
-    = xy = x⁴ + C   ← Intégrer
-    = C = −1   ← y(1) = 0
-    = y = x³ − 1/x   ← Isoler y
-  aides : Divise par x pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 1/x, donc μ = x ; puis (μy)′ = μ·b et ∫ 4x³ dx. | (xy)′ = 4x³
-  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs, a2_ode_method_separable_sum
-
-```
-
-### Niveau 4
-
-```
-Résous 2y′ − 2y = 16e^(−3x), y(0) = −2.
-  [free, suivre l'erreur]  2y′ − 2y = 16e^(−3x)
-    = y′ − y = 8e^(−3x)   ← Diviser par 2
-    = μ = e^(−x)   ← μ = e^(∫ a), a = −1
-    = (e^(−x)y)′ = 8e^(−4x)   ← (μy)′ = μ·b
-    = e^(−x)y = −2e^(−4x) + C   ← Intégrer
-    = C = 0   ← y(0) = −2
-    = y = −2e^(−3x)   ← Isoler y
-  aides : Divise par 2 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = −1, donc μ = e^(−x) ; puis (μy)′ = μ·b et ∫ 8e^(−4x) dx. | (e^(−x)y)′ = 8e^(−4x)
-  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
-
 Résous y′ + xy = 3x, y(0) = −1.
-  [free, suivre l'erreur]  y′ + xy = 3x
+  [tap, suivre l'erreur, menu steps]  y′ + xy = 3x
+    ? Quelle méthode ? ✔ Facteur intégrant / · Décalage vers l'équilibre (a et b constants) / ✔ Variables séparables
     = μ = e^(x²/2)   ← μ = e^(∫ a), a = x
     = (e^(x²/2)y)′ = 3xe^(x²/2)   ← (μy)′ = μ·b
     = e^(x²/2)y = 3e^(x²/2) + C   ← Intégrer
@@ -9502,30 +9455,80 @@ Résous y′ + xy = 3x, y(0) = −1.
   pièges : a2_ode_if_sign, a2_ode_if_rhs
 
 Résous y′ + (3/x)y = −5x, y(1) = 3, pour x > 0.
-  [free, suivre l'erreur]  y′ + (3/x)y = −5x
+  [tap, suivre l'erreur, menu steps]  y′ + (3/x)y = −5x
+    ? Quelle méthode ? ✔ Facteur intégrant / · Décalage vers l'équilibre (a et b constants) / · Variables séparables
     = μ = x³   ← μ = e^(∫ a), a = 3/x
     = (x³y)′ = −5x⁴   ← (μy)′ = μ·b
     = x³y = −x⁵ + C   ← Intégrer
     = C = 4   ← y(1) = 3
     = y = −x² + 4/x³   ← Isoler y
   aides : Multiplie par μ = e^(∫ a) : le membre de gauche devient (μy)′. | a(x) = 3/x, donc μ = x³ ; puis (μy)′ = μ·b et ∫ −5x⁴ dx. | (x³y)′ = −5x⁴
+  pièges : a2_ode_if_sign, a2_ode_if_rhs, a2_ode_method_separable_sum
+
+Résous 2y′ + 4y = 6e^x, y(0) = 2.
+  [tap, suivre l'erreur, menu steps]  2y′ + 4y = 6e^x
+    ? Quelle méthode ? ✔ Facteur intégrant / · Décalage vers l'équilibre (a et b constants) / · Variables séparables
+    = y′ + 2y = 3e^x   ← Diviser par 2
+    = μ = e^(2x)   ← μ = e^(∫ a), a = 2
+    = (e^(2x)y)′ = 3e^(3x)   ← (μy)′ = μ·b
+    = e^(2x)y = e^(3x) + C   ← Intégrer
+    = C = 1   ← y(0) = 2
+    = y = e^x + e^(−2x)   ← Isoler y
+  aides : Divise par 2 pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 2, donc μ = e^(2x) ; puis (μy)′ = μ·b et ∫ 3e^(3x) dx. | (e^(2x)y)′ = 3e^(3x)
+  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs, a2_ode_method_separable_sum
+
+```
+
+### Niveau 4
+
+```
+Résous y′ − 2y = 10e^(−3x), y(0) = −1.
+  [free, suivre l'erreur]  y′ − 2y = 10e^(−3x)
+    = μ = e^(−2x)   ← μ = e^(∫ a), a = −2
+    = (e^(−2x)y)′ = 10e^(−5x)   ← (μy)′ = μ·b
+    = e^(−2x)y = −2e^(−5x) + C   ← Intégrer
+    = C = 1   ← y(0) = −1
+    = y = −2e^(−3x) + e^(2x)   ← Isoler y
+  aides : Multiplie par μ = e^(∫ a) : le membre de gauche devient (μy)′. | a(x) = −2, donc μ = e^(−2x) ; puis (μy)′ = μ·b et ∫ 10e^(−5x) dx. | (e^(−2x)y)′ = 10e^(−5x)
   pièges : a2_ode_if_sign, a2_ode_if_rhs
+
+Résous xy′ + 2y = 9x, y(1) = 0, pour x > 0.
+  [free, suivre l'erreur]  xy′ + 2y = 9x
+    = y′ + (2/x)y = 9   ← Diviser par x
+    = μ = x²   ← μ = e^(∫ a), a = 2/x
+    = (x²y)′ = 9x²   ← (μy)′ = μ·b
+    = x²y = 3x³ + C   ← Intégrer
+    = C = −3   ← y(1) = 0
+    = y = 3x − 3/x²   ← Isoler y
+  aides : Divise par x pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 2/x, donc μ = x² ; puis (μy)′ = μ·b et ∫ 9x² dx. | (x²y)′ = 9x²
+  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
+
+Résous xy′ + 2y = 9x, y(1) = −1, pour x > 0.
+  [free, suivre l'erreur]  xy′ + 2y = 9x
+    = y′ + (2/x)y = 9   ← Diviser par x
+    = μ = x²   ← μ = e^(∫ a), a = 2/x
+    = (x²y)′ = 9x²   ← (μy)′ = μ·b
+    = x²y = 3x³ + C   ← Intégrer
+    = C = −4   ← y(1) = −1
+    = y = 3x − 4/x²   ← Isoler y
+  aides : Divise par x pour avoir y′ seul, puis multiplie par μ = e^(∫ a). | a(x) = 2/x, donc μ = x² ; puis (μy)′ = μ·b et ∫ 9x² dx. | (x²y)′ = 9x²
+  pièges : a2_ode_if_not_normalized, a2_ode_if_sign, a2_ode_if_rhs
 
 ```
 
 ### Niveau 5
 
 ```
-La solution de 2y′ + 4y = 12, y(0) = −2 est :
-  ✔ y = 3 − 5e^(−2x)   · y = 3 − 2e^(−2x) [a2_ode_ic_before_particular]   · y = −3 + e^(2x) [a2_ode_if_sign]   · y = (6x − 2)e^(−2x) [a2_ode_if_rhs]
+La solution de y′ − 2y = −3e^(−x), y(0) = 0 est :
+  · y = e^(−x) [a2_ode_ic_before_particular]   ✔ y = e^(−x) − e^(2x)   · y = 3e^x − 3e^(2x) [a2_ode_if_rhs]   · y = −3e^(−x) + 3e^(−2x) [a2_ode_if_sign]
   pièges : a2_ode_ic_before_particular, a2_ode_if_sign, a2_ode_if_rhs
 
-La solution de y′ + 3y = 10e^(2x), y(0) = 1 est :
-  ✔ y = 2e^(2x) − e^(−3x)   · y = −10e^(2x) + 11e^(3x) [a2_ode_if_sign]   · y = 5e^(−x) − 4e^(−3x) [a2_ode_if_rhs]   · y = 2e^(2x) + e^(−3x) [a2_ode_ic_before_particular]
+La solution de xy′ + 2y = 15x³, y(1) = 3 (x > 0) est :
+  · y = 3x³ + 3/x² [a2_ode_ic_before_particular]   · y = 15x³ − 12x² [a2_ode_if_sign]   ✔ y = 3x³   · y = 5x − 2/x² [a2_ode_if_rhs]
   pièges : a2_ode_ic_before_particular, a2_ode_if_sign, a2_ode_if_rhs
 
-La solution de xy′ + y = 4x, y(1) = 2 (x > 0) est :
-  · y = 2x + 2/x [a2_ode_ic_before_particular]   · y = 4 − 2/x [a2_ode_if_rhs]   ✔ y = 2x   · y = −(2x)
+La solution de xy′ + y = 6x, y(1) = 1 (x > 0) est :
+  · y = −(3x − 2/x)   ✔ y = 3x − 2/x   · y = 3x + 1/x [a2_ode_ic_before_particular]   · y = 6 − 5/x [a2_ode_if_rhs]
   pièges : a2_ode_ic_before_particular, a2_ode_if_rhs
 
 ```
@@ -9533,16 +9536,14 @@ La solution de xy′ + y = 4x, y(1) = 2 (x > 0) est :
 ### Variantes d'examen
 
 ```
-La solution de xy′ + 2y = 15x³, y(1) = 1 (x > 0) est :
-  · y = 3x³ + 1/x² [a2_ode_ic_before_particular]   ✔ y = 3x³ − 2/x²   · y = 5x − 4/x² [a2_ode_if_rhs]   · y = 15x³ − 14x² [a2_ode_if_sign]
+La solution de (x² + 1)y′ + y = 1, y(0) = 0 est :
+  ✔ y = 1 − e^(−arctan(x))   · y = (arctan(x))e^(−arctan(x)) [a2_ode_if_rhs]   · y = 1 [a2_ode_ic_before_particular]   · y = −1 + e^(arctan(x)) [a2_ode_if_sign]
   [examen mcq]
   pièges : a2_ode_ic_before_particular, a2_ode_if_sign, a2_ode_if_rhs
 
 Vrai ou faux ?
-  « Toutes les solutions de y′ + 2y = 6 sont de la forme y = 3 + e^(-2x) + C. » → FAUX
-    contre-exemple (a2) : y = 3+2e^(-2x)
+  « Si y₁ et y₂ sont deux solutions de y′ + a(x)y = b(x), alors y₁ − y₂ est une solution de y′ + a(x)y = 0. » → VRAI
   [examen tf]
-  pièges : a2_ode_sep_constant_late
 
 ```
 
@@ -9553,62 +9554,48 @@ _y′ = F(y/x) : y = xv, y′ = v + xv′, l'équation en v est séparable._
 ### Niveau 1
 
 ```
-Résous xy′ − y = xcos(y/x)², y(1) = π/4, pour x > 0. On pose y = x·v(x) : y′ = v + x·v′.
+Résous xy′ = y + x, y(1) = 0, pour x > 0. On pose y = x·v(x) : y′ = v + x·v′.
+  [guided]  x(v + xv′) = xv + x
+    = xv′ = □   (trous : xv′ = 1)   ← Simplifier
+    = dv = dx/x   ← Séparer
+    = v = ln(x) + C   ← Intégrer
+    = C = 0   ← v(1) = y(1)/1 = 0
+    = v = ln(x)   ← Isoler v
+  — Reviens à y = x·v.  [juge ode]  départ : y = xv
+    = y = xln(x)   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 1 ; ∫ dv/(1) = v. | xv′ = 1, puis v = ln(x) + C.
+
+Résous xy′ − y = xcos(y/x)², y(1) = −π/4, pour x > 0. On pose y = x·v(x) : y′ = v + x·v′.
   [guided]  x(v + xv′) − xv = xcos(v)²
     = xv′ = □   (trous : xv′ = cos(v)²)   ← Simplifier
     = dv/cos(v)² = dx/x   ← Séparer
     = tan(v) = ln(x) + C   ← Intégrer
-    = C = 1   ← v(1) = y(1)/1 = π/4
-    = v = arctan(ln(x) + 1)   ← Isoler v
+    = C = −1   ← v(1) = y(1)/1 = −π/4
+    = v = arctan(ln(x) − 1)   ← Isoler v
   — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xarctan(ln(x) + 1)   ← y = x·v
+    = y = xarctan(ln(x) − 1)   ← y = x·v
   aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = cos(v)² ; ∫ dv/(cos(v)²) = tan v. | xv′ = cos(v)², puis tan(v) = ln(x) + C.
 
-Résous xy′ = y + xe^(−y/x), y(1) = 0, pour x > 0. On pose y = x·v(x) : y′ = v + x·v′.
-  [guided]  x(v + xv′) = xv + xe^(−v)
-    = xv′ = □   (trous : xv′ = e^(−v))   ← Simplifier
-    = e^vdv = dx/x   ← Séparer
-    = e^v = ln(x) + C   ← Intégrer
-    = C = 1   ← v(1) = y(1)/1 = 0
-    = v = ln(ln(x) + 1)   ← Isoler v
+Résous y′ = y/x + cos(y/x)², y(1) = 0, pour x > 0. On pose y = x·v(x) : y′ = v + x·v′.
+  [guided]  v + xv′ = v + cos(v)²
+    = xv′ = □   (trous : xv′ = cos(v)²)   ← Simplifier
+    = dv/cos(v)² = dx/x   ← Séparer
+    = tan(v) = ln(x) + C   ← Intégrer
+    = C = 0   ← v(1) = y(1)/1 = 0
+    = v = arctan(ln(x))   ← Isoler v
   — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xln(ln(x) + 1)   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = e^(−v) ; ∫ dv/(e^(−v)) = e^v. | xv′ = e^(−v), puis e^v = ln(x) + C.
-
-Résous xy′ = y + y²/x, y(1) = 1, pour x > 0. On pose y = x·v(x) : y′ = v + x·v′.
-  [guided]  x(v + xv′) = xv + xv²
-    = xv′ = □   (trous : xv′ = v²)   ← Simplifier
-    = dv/v² = dx/x   ← Séparer
-    = −1/v = ln(x) + C   ← Intégrer
-    = C = −1   ← v(1) = y(1)/1 = 1
-    = v = −1/(ln(x) − 1)   ← Isoler v
-  — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = −x/(ln(x) − 1)   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = v² ; ∫ dv/(v²) = −1/v. | xv′ = v², puis −1/v = ln(x) + C.
+    = y = xarctan(ln(x))   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = cos(v)² ; ∫ dv/(cos(v)²) = tan v. | xv′ = cos(v)², puis tan(v) = ln(x) + C.
 
 ```
 
 ### Niveau 2
 
 ```
-Résous x²y′ = x² + xy + y², y(1) = 0, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+Résous y′ = y/x + sin(y/x), y(1) = π/2, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
   [guided]  (xv)′
     = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x²(v + xv′) = x² + x²v + x²v²
-    = xv′ = 1 + v²   ← Simplifier
-    = dv/(1 + v²) = dx/x   ← Séparer
-    = □ = ln(x) + C   (trous : arctan(v) = ln(x) + C)   ← Intégrer
-    = C = 0   ← v(1) = y(1)/1 = 0
-    = v = tan(ln(x))   ← Isoler v
-  — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xtan(ln(x))   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 1+v² ; ∫ dv/(1+v²) = arctan v. | xv′ = 1 + v², puis arctan(v) = ln(x) + C.
-  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
-
-Résous xy′ = y + xsin(y/x), y(1) = π/2, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
-  [guided]  (xv)′
-    = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) = xv + xsin(v)
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : v + xv′ = v + sin(v)
     = xv′ = sin(v)   ← Simplifier
     = dv/sin(v) = dx/x   ← Séparer
     = □ = ln(x) + C   (trous : ln(|tan(v/2)|) = ln(x) + C)   ← Intégrer
@@ -9620,18 +9607,32 @@ Résous xy′ = y + xsin(y/x), y(1) = π/2, pour x > 0. Pose y = x·v(x), puis �
   aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = sin(v) ; ∫ dv/(sin(v)) = ln|tan(v/2)|. | xv′ = sin(v), puis ln(|tan(v/2)|) = ln(x) + C.
   pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
 
-Résous y′ = y/x + e^(−y/x), y(1) = ln(2), pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+Résous xy′ = y + x, y(1) = 2, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
   [guided]  (xv)′
     = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : v + xv′ = v + e^(−v)
-    = xv′ = e^(−v)   ← Simplifier
-    = e^vdv = dx/x   ← Séparer
-    = □ = ln(x) + C   (trous : e^v = ln(x) + C)   ← Intégrer
-    = C = 2   ← v(1) = y(1)/1 = ln(2)
-    = v = ln(ln(x) + 2)   ← Isoler v
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) = xv + x
+    = xv′ = 1   ← Simplifier
+    = dv = dx/x   ← Séparer
+    = □ = ln(x) + C   (trous : v = ln(x) + C)   ← Intégrer
+    = C = 2   ← v(1) = y(1)/1 = 2
+    = v = ln(x) + 2   ← Isoler v
   — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xln(ln(x) + 2)   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = e^(−v) ; ∫ dv/(e^(−v)) = e^v. | xv′ = e^(−v), puis e^v = ln(x) + C.
+    = y = xln(x) + 2x   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 1 ; ∫ dv/(1) = v. | xv′ = 1, puis v = ln(x) + C.
+  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
+
+Résous xy′ − y = 2x, y(1) = 2, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+  [guided]  (xv)′
+    = v + xv′   ← Règle du produit
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) − xv = 2x
+    = xv′ = 2   ← Simplifier
+    = dv = (2/x)dx   ← Séparer
+    = □ = 2ln(x) + C   (trous : v = 2ln(x) + C)   ← Intégrer
+    = C = 2   ← v(1) = y(1)/1 = 2
+    = v = 2ln(x) + 2   ← Isoler v
+  — Reviens à y = x·v.  [juge ode]  départ : y = xv
+    = y = 2xln(x) + 2x   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 2 ; ∫ dv/(2) = v/2. | xv′ = 2, puis v = 2ln(x) + C.
   pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
 
 ```
@@ -9639,13 +9640,77 @@ Résous y′ = y/x + e^(−y/x), y(1) = ln(2), pour x > 0. Pose y = x·v(x), pui
 ### Niveau 3
 
 ```
-Résous x²y′ = x² + xy + y², y(1) = 0, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+Résous xy′ = y + xsin(y/x), y(1) = π/2, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
   [tap, suivre l'erreur, menu steps]  (xv)′
-    ? L'équation s'écrit-elle y′ = F(y/x) ? ✔ Oui : y′ = y/x + 1+(y/x)² / · Non, il faut une autre méthode
+    ? L'équation s'écrit-elle y′ = F(y/x) ? ✔ Oui : y′ = y/x + sin((y/x)) / · Non, il faut une autre méthode
     = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x²(v + xv′) = x² + x²v + x²v²
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) = xv + xsin(v)
+    = xv′ = sin(v)   ← Simplifier
+    = ∫ 1/(sin(v)) dv = ∫ 1/x dx   ← Séparer
+    = ln(|tan(v/2)|) = ln(x) + C   ← Intégrer
+    = C = 0   ← v(1) = y(1)/1 = π/2
+    = tan(v/2) = x   ← Enlever ln et |…|
+    = v = 2arctan(x)   ← Isoler v
+  — Reviens à y = x·v.  [juge ode]  départ : y = xv
+    = y = 2xarctan(x)   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = sin(v) ; ∫ dv/(sin(v)) = ln|tan(v/2)|. | xv′ = sin(v), puis ln(|tan(v/2)|) = ln(x) + C.
+  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
+
+Résous xy′ − y = xcos(y/x)², y(1) = π/4, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+  [tap, suivre l'erreur, menu steps]  (xv)′
+    ? L'équation s'écrit-elle y′ = F(y/x) ? ✔ Oui : y′ = y/x + cos((y/x))² / · Non, il faut une autre méthode
+    = v + xv′   ← Règle du produit
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) − xv = xcos(v)²
+    = xv′ = cos(v)²   ← Simplifier
+    = ∫ 1/(cos(v)²) dv = ∫ 1/x dx   ← Séparer
+    = tan(v) = ln(x) + C   ← Intégrer
+    = C = 1   ← v(1) = y(1)/1 = π/4
+    = v = arctan(ln(x) + 1)   ← Isoler v
+  — Reviens à y = x·v.  [juge ode]  départ : y = xv
+    = y = xarctan(ln(x) + 1)   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = cos(v)² ; ∫ dv/(cos(v)²) = tan v. | xv′ = cos(v)², puis tan(v) = ln(x) + C.
+  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
+
+Résous x²y′ = xy + y², y(1) = −1, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+  [tap, suivre l'erreur, menu steps]  (xv)′
+    ? L'équation s'écrit-elle y′ = F(y/x) ? ✔ Oui : y′ = y/x + (y/x)² / · Non, il faut une autre méthode
+    = v + xv′   ← Règle du produit
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x²(v + xv′) = x²v + x²v²
+    = xv′ = v²   ← Simplifier
+    = ∫ 1/(v²) dv = ∫ 1/x dx   ← Séparer
+    = −1/v = ln(x) + C   ← Intégrer
+    = C = 1   ← v(1) = y(1)/1 = −1
+    = v = −1/(ln(x) + 1)   ← Isoler v
+  — Reviens à y = x·v.  [juge ode]  départ : y = xv
+    = y = −x/(ln(x) + 1)   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = v² ; ∫ dv/(v²) = −1/v. | xv′ = v², puis −1/v = ln(x) + C.
+  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
+
+```
+
+### Niveau 4
+
+```
+Résous xy′ = x + y + y²/x, y(1) = 1, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+  [free, suivre l'erreur]  (xv)′
+    = v + xv′   ← Règle du produit
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) = x + xv + xv²
     = xv′ = 1 + v²   ← Simplifier
-    = ∫ 1/(1 + v²) dv = ∫ 1/x dx   ← Séparer
+    = dv/(1 + v²) = dx/x   ← Séparer
+    = arctan(v) = ln(x) + C   ← Intégrer
+    = C = π/4   ← v(1) = y(1)/1 = 1
+    = v = tan(ln(x) + π/4)   ← Isoler v
+  — Reviens à y = x·v.  [juge ode]  départ : y = xv
+    = y = xtan(ln(x) + π/4)   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 1+v² ; ∫ dv/(1+v²) = arctan v. | xv′ = 1 + v², puis arctan(v) = ln(x) + C.
+  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
+
+Résous xy′ = x + y + y²/x, y(1) = 0, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+  [free, suivre l'erreur]  (xv)′
+    = v + xv′   ← Règle du produit
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) = x + xv + xv²
+    = xv′ = 1 + v²   ← Simplifier
+    = dv/(1 + v²) = dx/x   ← Séparer
     = arctan(v) = ln(x) + C   ← Intégrer
     = C = 0   ← v(1) = y(1)/1 = 0
     = v = tan(ln(x))   ← Isoler v
@@ -9654,81 +9719,18 @@ Résous x²y′ = x² + xy + y², y(1) = 0, pour x > 0. Pose y = x·v(x), puis �
   aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 1+v² ; ∫ dv/(1+v²) = arctan v. | xv′ = 1 + v², puis arctan(v) = ln(x) + C.
   pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
 
-Résous xy′ − y = xcos(y/x)², y(1) = −π/4, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
-  [tap, suivre l'erreur, menu steps]  (xv)′
-    ? L'équation s'écrit-elle y′ = F(y/x) ? ✔ Oui : y′ = y/x + cos((y/x))² / · Non, il faut une autre méthode
-    = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) − xv = xcos(v)²
-    = xv′ = cos(v)²   ← Simplifier
-    = ∫ 1/(cos(v)²) dv = ∫ 1/x dx   ← Séparer
-    = tan(v) = ln(x) + C   ← Intégrer
-    = C = −1   ← v(1) = y(1)/1 = −π/4
-    = v = arctan(ln(x) − 1)   ← Isoler v
-  — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xarctan(ln(x) − 1)   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = cos(v)² ; ∫ dv/(cos(v)²) = tan v. | xv′ = cos(v)², puis tan(v) = ln(x) + C.
-  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
-
-Résous xy′ − y = xcos(y/x)², y(1) = −π/4, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
-  [tap, suivre l'erreur, menu steps]  (xv)′
-    ? L'équation s'écrit-elle y′ = F(y/x) ? ✔ Oui : y′ = y/x + cos((y/x))² / · Non, il faut une autre méthode
-    = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) − xv = xcos(v)²
-    = xv′ = cos(v)²   ← Simplifier
-    = ∫ 1/(cos(v)²) dv = ∫ 1/x dx   ← Séparer
-    = tan(v) = ln(x) + C   ← Intégrer
-    = C = −1   ← v(1) = y(1)/1 = −π/4
-    = v = arctan(ln(x) − 1)   ← Isoler v
-  — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xarctan(ln(x) − 1)   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = cos(v)² ; ∫ dv/(cos(v)²) = tan v. | xv′ = cos(v)², puis tan(v) = ln(x) + C.
-  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
-
-```
-
-### Niveau 4
-
-```
-Résous xy′ − y = 2x, y(1) = 0, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+Résous y′ = y/x + cos(y/x)², y(1) = 0, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
   [free, suivre l'erreur]  (xv)′
     = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) − xv = 2x
-    = xv′ = 2   ← Simplifier
-    = dv = (2/x)dx   ← Séparer
-    = v = 2ln(x) + C   ← Intégrer
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : v + xv′ = v + cos(v)²
+    = xv′ = cos(v)²   ← Simplifier
+    = dv/cos(v)² = dx/x   ← Séparer
+    = tan(v) = ln(x) + C   ← Intégrer
     = C = 0   ← v(1) = y(1)/1 = 0
-    = v = 2ln(x)   ← Isoler v
+    = v = arctan(ln(x))   ← Isoler v
   — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = 2xln(x)   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 2 ; ∫ dv/(2) = v/2. | xv′ = 2, puis v = 2ln(x) + C.
-  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
-
-Résous xy′ = y + 3x, y(1) = 1, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
-  [free, suivre l'erreur]  (xv)′
-    = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) = xv + 3x
-    = xv′ = 3   ← Simplifier
-    = dv = (3/x)dx   ← Séparer
-    = v = 3ln(x) + C   ← Intégrer
-    = C = 1   ← v(1) = y(1)/1 = 1
-    = v = 3ln(x) + 1   ← Isoler v
-  — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = 3xln(x) + x   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = 3 ; ∫ dv/(3) = v/3. | xv′ = 3, puis v = 3ln(x) + C.
-  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
-
-Résous y′ = y/x + e^(−y/x), y(1) = ln(2), pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
-  [free, suivre l'erreur]  (xv)′
-    = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : v + xv′ = v + e^(−v)
-    = xv′ = e^(−v)   ← Simplifier
-    = e^vdv = dx/x   ← Séparer
-    = e^v = ln(x) + C   ← Intégrer
-    = C = 2   ← v(1) = y(1)/1 = ln(2)
-    = v = ln(ln(x) + 2)   ← Isoler v
-  — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xln(ln(x) + 2)   ← y = x·v
-  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = e^(−v) ; ∫ dv/(e^(−v)) = e^v. | xv′ = e^(−v), puis e^v = ln(x) + C.
+    = y = xarctan(ln(x))   ← y = x·v
+  aides : Pose y = xv et dérive avec la règle du produit ; l'équation devient séparable en v. | y′ = v + x·v′, puis x·v′ = cos(v)² ; ∫ dv/(cos(v)²) = tan v. | xv′ = cos(v)², puis tan(v) = ln(x) + C.
   pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
 
 ```
@@ -9736,43 +9738,34 @@ Résous y′ = y/x + e^(−y/x), y(1) = ln(2), pour x > 0. Pose y = x·v(x), pui
 ### Niveau 5
 
 ```
-Résous x²y′ = xy + y², y(1) = −1, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
-  [free, sans aide]  (xv)′
-    = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x²(v + xv′) = x²v + x²v²
-    = xv′ = v²   ← Simplifier
-    = dv/v² = dx/x   ← Séparer
-    = −1/v = ln(x) + C   ← Intégrer
-    = C = 1   ← v(1) = y(1)/1 = −1
-    = v = −1/(ln(x) + 1)   ← Isoler v
-  — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = −x/(ln(x) + 1)   ← y = x·v
-  pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
+La solution de xy′ = y + xe^(−y/x), y(1) = 0, pour x > 0, est :
+  · y = 0 [a2_ode_homog_derivative]   ✔ y = xln(ln(x) + 1)   · y = ln(ln(x) + 1)   · y = x²ln(ln(x) + 1)
+  pièges : a2_ode_homog_derivative
 
-Résous y′ = y/x + e^(−y/x), y(1) = 0, pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
+La solution de xy′ − y = xcos(y/x)², y(1) = π/4, pour x > 0, est :
+  · y = π/4x [a2_ode_homog_derivative]   · y = xarctan(ln(x)) + π/4 [a2_ode_sep_constant_late]   ✔ y = xarctan(ln(x) + 1)   · y = arctan(ln(x) + 1)
+  pièges : a2_ode_homog_derivative, a2_ode_sep_constant_late
+
+Résous xy′ = y + xe^(−y/x), y(1) = ln(2), pour x > 0. Pose y = x·v(x), puis écris y′ = (xv)′.
   [free, sans aide]  (xv)′
     = v + xv′   ← Règle du produit
-  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : v + xv′ = v + e^(−v)
+  — Remplace y par xv et y′ par v + xv′ : l'équation en v.  [juge ode]  départ : x(v + xv′) = xv + xe^(−v)
     = xv′ = e^(−v)   ← Simplifier
     = e^vdv = dx/x   ← Séparer
     = e^v = ln(x) + C   ← Intégrer
-    = C = 1   ← v(1) = y(1)/1 = 0
-    = v = ln(ln(x) + 1)   ← Isoler v
+    = C = 2   ← v(1) = y(1)/1 = ln(2)
+    = v = ln(ln(x) + 2)   ← Isoler v
   — Reviens à y = x·v.  [juge ode]  départ : y = xv
-    = y = xln(ln(x) + 1)   ← y = x·v
+    = y = xln(ln(x) + 2)   ← y = x·v
   pièges : g6_implicit_xy, g6_implicit_yprime_forgot, a2_ode_homog_derivative
-
-La solution de x²y′ = xy + y², y(1) = −1, pour x > 0, est :
-  ✔ y = −x/(ln(x) + 1)   · y = −1x [a2_ode_homog_derivative]   · y = x² − 1/(ln(x) + 1)   · y = −1/(ln(x) + 1)
-  pièges : a2_ode_homog_derivative
 
 ```
 
 ### Variantes d'examen
 
 ```
-La solution de xy′ = x + y + y²/x, y(1) = 0, pour x > 0, est :
-  · y = tan(ln(x))   · y = 0 [a2_ode_homog_derivative]   · y = x²tan(ln(x))   ✔ y = xtan(ln(x))
+La solution de y′ = y/x + e^(−y/x), y(1) = ln(2), pour x > 0, est :
+  · y = x²ln(ln(x) + 2)   · y = ln(2)x [a2_ode_homog_derivative]   · y = ln(ln(x) + 2)   ✔ y = xln(ln(x) + 2)
   [examen mcq]
   pièges : a2_ode_homog_derivative
 
@@ -9785,115 +9778,114 @@ _y = y_h + y_p ; superposition des seconds membres._
 ### Niveau 1
 
 ```
-Solution générale de y′′ − 16y = −48 + e^(3x) : une solution particulière par morceau du second membre, puis superposition. La solution homogène est y_h = C_1e^(−4x) + C_2e^(4x).
-  [guided]  y′′ − 16y = −48
+Solution générale de y′′ + y = e^(−2x) + 3 : une solution particulière par morceau du second membre, puis superposition. La solution homogène est y_h = C_1cos(x) + C_2sin(x).
+  [guided]  y′′ + y = e^(−2x)
+    = y_p = (□)e^(−2x)   (trous : y_p = (1/5)e^(−2x))   ← On essaie A·e^(−2x)
+  — Une solution particulière pour 3 :  [juge ode]  départ : y′′ + y = 3
     = y_p = □   (trous : y_p = 3)   ← On essaie A (une constante)
-  — Une solution particulière pour e^(3x) :  [juge ode]  départ : y′′ − 16y = e^(3x)
-    = y_p = −(1/7)e^(3x)   ← On essaie A·e^(3x)
-  — Superposition : la solution générale.  [juge ode]  départ : y′′ − 16y = −48 + e^(3x)
-    = y = C_1e^(−4x) + C_2e^(4x) + 3 − (1/7)e^(3x)   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour e^(3x), essaie y_p = A·e^(3x) et remplace dans y′′ − 16y = e^(3x). | y = C_1e^(−4x) + C_2e^(4x) + 3 − (1/7)e^(3x)
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ + y = e^(−2x) + 3
+    = y = C_1cos(x) + C_2sin(x) + (1/5)e^(−2x) + 3   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 3, essaie y_p = A (une constante) et remplace dans y′′ + y = 3. | y = C_1cos(x) + C_2sin(x) + (1/5)e^(−2x) + 3
 
-Solution générale de y′′ − 2y′ + 10y = −20x + 4 + 3e^(3x) : une solution particulière par morceau du second membre, puis superposition. La solution homogène est y_h = e^x(C_1cos(3x) + C_2sin(3x)).
-  [guided]  y′′ − 2y′ + 10y = −20x + 4
-    = y_p = □   (trous : y_p = −2x)   ← On essaie Ax + B
-  — Une solution particulière pour 3e^(3x) :  [juge ode]  départ : y′′ − 2y′ + 10y = 3e^(3x)
-    = y_p = (□)e^(3x)   (trous : y_p = (3/13)e^(3x))   ← On essaie A·e^(3x)
-  — Superposition : la solution générale.  [juge ode]  départ : y′′ − 2y′ + 10y = −20x + 4 + 3e^(3x)
-    = y = e^x(C_1cos(3x) + C_2sin(3x)) − 2x + (3/13)e^(3x)   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 3e^(3x), essaie y_p = A·e^(3x) et remplace dans y′′ − 2y′ + 10y = 3e^(3x). | y = e^x(C_1cos(3x) + C_2sin(3x)) − 2x + (3/13)e^(3x)
+Solution générale de y′′ − 2y′ + 2y = 3e^x + 6x − 6 : une solution particulière par morceau du second membre, puis superposition. La solution homogène est y_h = e^x(C_1cos(x) + C_2sin(x)).
+  [guided]  y′′ − 2y′ + 2y = 3e^x
+    = y_p = □e^x   (trous : y_p = 3e^x)   ← On essaie A·e^x
+  — Une solution particulière pour 6x − 6 :  [juge ode]  départ : y′′ − 2y′ + 2y = 6x − 6
+    = y_p = □   (trous : y_p = 3x)   ← On essaie Ax + B
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ − 2y′ + 2y = 3e^x + 6x − 6
+    = y = e^x(C_1cos(x) + C_2sin(x)) + 3e^x + 3x   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 6x − 6, essaie y_p = Ax + B et remplace dans y′′ − 2y′ + 2y = 6x − 6. | y = e^x(C_1cos(x) + C_2sin(x)) + 3e^x + 3x
 
-Solution générale de y′′ + 2y′ + 5y = 3e^(−x) + 15x + 1 : une solution particulière par morceau du second membre, puis superposition. La solution homogène est y_h = e^(−x)(C_1cos(2x) + C_2sin(2x)).
-  [guided]  y′′ + 2y′ + 5y = 3e^(−x)
-    = y_p = (□)e^(−x)   (trous : y_p = (3/4)e^(−x))   ← On essaie A·e^(−x)
-  — Une solution particulière pour 15x + 1 :  [juge ode]  départ : y′′ + 2y′ + 5y = 15x + 1
-    = y_p = □   (trous : y_p = 3x − 1)   ← On essaie Ax + B
-  — Superposition : la solution générale.  [juge ode]  départ : y′′ + 2y′ + 5y = 3e^(−x) + 15x + 1
-    = y = e^(−x)(C_1cos(2x) + C_2sin(2x)) + (3/4)e^(−x) + 3x − 1   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 15x + 1, essaie y_p = Ax + B et remplace dans y′′ + 2y′ + 5y = 15x + 1. | y = e^(−x)(C_1cos(2x) + C_2sin(2x)) + (3/4)e^(−x) + 3x − 1
+Solution générale de y′′ + 4y′ + 8y = 2e^(−x) + 24 : une solution particulière par morceau du second membre, puis superposition. La solution homogène est y_h = e^(−2x)(C_1cos(2x) + C_2sin(2x)).
+  [guided]  y′′ + 4y′ + 8y = 2e^(−x)
+    = y_p = (□)e^(−x)   (trous : y_p = (2/5)e^(−x))   ← On essaie A·e^(−x)
+  — Une solution particulière pour 24 :  [juge ode]  départ : y′′ + 4y′ + 8y = 24
+    = y_p = □   (trous : y_p = 3)   ← On essaie A (une constante)
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ + 4y′ + 8y = 2e^(−x) + 24
+    = y = e^(−2x)(C_1cos(2x) + C_2sin(2x)) + (2/5)e^(−x) + 3   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 24, essaie y_p = A (une constante) et remplace dans y′′ + 4y′ + 8y = 24. | y = e^(−2x)(C_1cos(2x) + C_2sin(2x)) + (2/5)e^(−x) + 3
 
 ```
 
 ### Niveau 2
 
 ```
-Solution générale de y′′ + 4y′ + 5y = −5x + 1 + 2e^(−x) : une solution particulière par morceau du second membre, puis superposition.
-  [guided]  y′′ + 4y′ + 5y = 0
-    = y_h = e^(−2x)(C_1cos(x) + C_2sin(x))   ← Racines : r = −2+i, r = −2−i
-  — Une solution particulière pour le second membre −5x + 1 :  [juge ode]  départ : y′′ + 4y′ + 5y = −5x + 1
-    = y_p = −x + 1   ← On essaie Ax + B
-  — Une solution particulière pour 2e^(−x) :  [juge ode]  départ : y′′ + 4y′ + 5y = 2e^(−x)
-    = y_p = e^(−x)   ← On essaie A·e^(−x)
-  — Superposition : la solution générale.  [juge ode]  départ : y′′ + 4y′ + 5y = −5x + 1 + 2e^(−x)
-    = y = e^(−2x)(C_1cos(x) + C_2sin(x)) − x + 1 + e^(−x)   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 2e^(−x), essaie y_p = A·e^(−x) et remplace dans y′′ + 4y′ + 5y = 2e^(−x). | y = e^(−2x)(C_1cos(x) + C_2sin(x)) − x + 1 + e^(−x)
+Solution générale de y′ + 2y = 3e^(−x) + 6x + 3 : une solution particulière par morceau du second membre, puis superposition.
+  [guided]  y′ + 2y = 0
+    = y_h = Ce^(−2x)   ← Équation homogène
+  — Une solution particulière pour le second membre 3e^(−x) :  [juge ode]  départ : y′ + 2y = 3e^(−x)
+    = y_p = 3e^(−x)   ← On essaie A·e^(−x)
+  — Une solution particulière pour 6x + 3 :  [juge ode]  départ : y′ + 2y = 6x + 3
+    = y_p = 3x   ← On essaie Ax + B
+  — Superposition : la solution générale.  [juge ode]  départ : y′ + 2y = 3e^(−x) + 6x + 3
+    = y = Ce^(−2x) + 3e^(−x) + 3x   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 6x + 3, essaie y_p = Ax + B et remplace dans y′ + 2y = 6x + 3. | y = Ce^(−2x) + 3e^(−x) + 3x
+
+Solution générale de y′′ − 9y = −18 + 3e^(2x) : une solution particulière par morceau du second membre, puis superposition.
+  [guided]  y′′ − 9y = 0
+    = y_h = C_1e^(−3x) + C_2e^(3x)   ← Racines : r = −3, r = 3
+  — Une solution particulière pour le second membre −18 :  [juge ode]  départ : y′′ − 9y = −18
+    = y_p = 2   ← On essaie A (une constante)
+  — Une solution particulière pour 3e^(2x) :  [juge ode]  départ : y′′ − 9y = 3e^(2x)
+    = y_p = −(3/5)e^(2x)   ← On essaie A·e^(2x)
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ − 9y = −18 + 3e^(2x)
+    = y = C_1e^(−3x) + C_2e^(3x) + 2 − (3/5)e^(2x)   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 3e^(2x), essaie y_p = A·e^(2x) et remplace dans y′′ − 9y = 3e^(2x). | y = C_1e^(−3x) + C_2e^(3x) + 2 − (3/5)e^(2x)
   pièges : a2_ode_constant_count
 
-Solution générale de y′′ − 4y′ + 13y = −13 + e^(3x) : une solution particulière par morceau du second membre, puis superposition.
-  [guided]  y′′ − 4y′ + 13y = 0
-    = y_h = e^(2x)(C_1cos(3x) + C_2sin(3x))   ← Racines : r = 2+3i, r = 2−3i
-  — Une solution particulière pour le second membre −13 :  [juge ode]  départ : y′′ − 4y′ + 13y = −13
-    = y_p = −1   ← On essaie A (une constante)
-  — Une solution particulière pour e^(3x) :  [juge ode]  départ : y′′ − 4y′ + 13y = e^(3x)
-    = y_p = (1/10)e^(3x)   ← On essaie A·e^(3x)
-  — Superposition : la solution générale.  [juge ode]  départ : y′′ − 4y′ + 13y = −13 + e^(3x)
-    = y = e^(2x)(C_1cos(3x) + C_2sin(3x)) − 1 + (1/10)e^(3x)   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour e^(3x), essaie y_p = A·e^(3x) et remplace dans y′′ − 4y′ + 13y = e^(3x). | y = e^(2x)(C_1cos(3x) + C_2sin(3x)) − 1 + (1/10)e^(3x)
-  pièges : a2_ode_constant_count
-
-Solution générale de y′ + y = 2e^x + x + 3 : une solution particulière par morceau du second membre, puis superposition.
-  [guided]  y′ + y = 0
-    = y_h = Ce^(−x)   ← Équation homogène
-  — Une solution particulière pour le second membre 2e^x :  [juge ode]  départ : y′ + y = 2e^x
+Solution générale de y′ + 2y = 3e^x − 4x − 2 : une solution particulière par morceau du second membre, puis superposition.
+  [guided]  y′ + 2y = 0
+    = y_h = Ce^(−2x)   ← Équation homogène
+  — Une solution particulière pour le second membre 3e^x :  [juge ode]  départ : y′ + 2y = 3e^x
     = y_p = e^x   ← On essaie A·e^x
-  — Une solution particulière pour x + 3 :  [juge ode]  départ : y′ + y = x + 3
-    = y_p = x + 2   ← On essaie Ax + B
-  — Superposition : la solution générale.  [juge ode]  départ : y′ + y = 2e^x + x + 3
-    = y = Ce^(−x) + e^x + x + 2   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour x + 3, essaie y_p = Ax + B et remplace dans y′ + y = x + 3. | y = Ce^(−x) + e^x + x + 2
+  — Une solution particulière pour −4x − 2 :  [juge ode]  départ : y′ + 2y = −4x − 2
+    = y_p = −2x   ← On essaie Ax + B
+  — Superposition : la solution générale.  [juge ode]  départ : y′ + 2y = 3e^x − 4x − 2
+    = y = Ce^(−2x) + e^x − 2x   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour −4x − 2, essaie y_p = Ax + B et remplace dans y′ + 2y = −4x − 2. | y = Ce^(−2x) + e^x − 2x
 
 ```
 
 ### Niveau 3
 
 ```
-Solution générale de y′ + 3y = −3 + 3e^(2x) : une solution particulière par morceau du second membre, puis superposition.
-  [tap, suivre l'erreur, menu steps]  y′ + 3y = 0
-    = y_h = Ce^(−3x)   ← Équation homogène
-  — Une solution particulière pour le second membre −3 :  [juge ode]  départ : y′ + 3y = −3
-    = y_p = −1   ← On essaie A (une constante)
-  — Une solution particulière pour 3e^(2x) :  [juge ode]  départ : y′ + 3y = 3e^(2x)
-    = y_p = (3/5)e^(2x)   ← On essaie A·e^(2x)
-  — Superposition : la solution générale.  [juge ode]  départ : y′ + 3y = −3 + 3e^(2x)
-    ? y = y_h + 2·y_p1 + y_p2 est-elle aussi une solution de l’équation ? ✔ Non : L(2y_p1) = 2b₁ / · Oui : on peut multiplier une solution par une constante
-    = y = Ce^(−3x) − 1 + (3/5)e^(2x)   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 3e^(2x), essaie y_p = A·e^(2x) et remplace dans y′ + 3y = 3e^(2x). | y = Ce^(−3x) − 1 + (3/5)e^(2x)
-  pièges : a2_ode_superposition_nonhom
-
-Solution générale de y′ + 3y = 3e^(−x) + 9 : une solution particulière par morceau du second membre, puis superposition.
-  [tap, suivre l'erreur, menu steps]  y′ + 3y = 0
-    = y_h = Ce^(−3x)   ← Équation homogène
-  — Une solution particulière pour le second membre 3e^(−x) :  [juge ode]  départ : y′ + 3y = 3e^(−x)
-    = y_p = (3/2)e^(−x)   ← On essaie A·e^(−x)
-  — Une solution particulière pour 9 :  [juge ode]  départ : y′ + 3y = 9
+Solution générale de y′′ − 4y′ + 5y = e^x + 15 : une solution particulière par morceau du second membre, puis superposition.
+  [tap, suivre l'erreur, menu steps]  y′′ − 4y′ + 5y = 0
+    = y_h = e^(2x)(C_1cos(x) + C_2sin(x))   ← Racines : r = 2+i, r = 2−i
+  — Une solution particulière pour le second membre e^x :  [juge ode]  départ : y′′ − 4y′ + 5y = e^x
+    = y_p = (1/2)e^x   ← On essaie A·e^x
+  — Une solution particulière pour 15 :  [juge ode]  départ : y′′ − 4y′ + 5y = 15
     = y_p = 3   ← On essaie A (une constante)
-  — Superposition : la solution générale.  [juge ode]  départ : y′ + 3y = 3e^(−x) + 9
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ − 4y′ + 5y = e^x + 15
     ? y = y_h + 2·y_p1 + y_p2 est-elle aussi une solution de l’équation ? ✔ Non : L(2y_p1) = 2b₁ / · Oui : on peut multiplier une solution par une constante
-    = y = Ce^(−3x) + (3/2)e^(−x) + 3   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 9, essaie y_p = A (une constante) et remplace dans y′ + 3y = 9. | y = Ce^(−3x) + (3/2)e^(−x) + 3
+    = y = e^(2x)(C_1cos(x) + C_2sin(x)) + (1/2)e^x + 3   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 15, essaie y_p = A (une constante) et remplace dans y′′ − 4y′ + 5y = 15. | y = e^(2x)(C_1cos(x) + C_2sin(x)) + (1/2)e^x + 3
+  pièges : a2_ode_constant_count, a2_ode_superposition_nonhom
+
+Solution générale de y′ + 3y = −6 + 2e^(3x) : une solution particulière par morceau du second membre, puis superposition.
+  [tap, suivre l'erreur, menu steps]  y′ + 3y = 0
+    = y_h = Ce^(−3x)   ← Équation homogène
+  — Une solution particulière pour le second membre −6 :  [juge ode]  départ : y′ + 3y = −6
+    = y_p = −2   ← On essaie A (une constante)
+  — Une solution particulière pour 2e^(3x) :  [juge ode]  départ : y′ + 3y = 2e^(3x)
+    = y_p = (1/3)e^(3x)   ← On essaie A·e^(3x)
+  — Superposition : la solution générale.  [juge ode]  départ : y′ + 3y = −6 + 2e^(3x)
+    ? y = y_h + 2·y_p1 + y_p2 est-elle aussi une solution de l’équation ? ✔ Non : L(2y_p1) = 2b₁ / · Oui : on peut multiplier une solution par une constante
+    = y = Ce^(−3x) − 2 + (1/3)e^(3x)   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 2e^(3x), essaie y_p = A·e^(3x) et remplace dans y′ + 3y = 2e^(3x). | y = Ce^(−3x) − 2 + (1/3)e^(3x)
   pièges : a2_ode_superposition_nonhom
 
-Solution générale de y′′ + 5y′ + 6y = 2e^(−x) + 18x + 15 : une solution particulière par morceau du second membre, puis superposition.
-  [tap, suivre l'erreur, menu steps]  y′′ + 5y′ + 6y = 0
-    = y_h = C_1e^(−3x) + C_2e^(−2x)   ← Racines : r = −3, r = −2
-  — Une solution particulière pour le second membre 2e^(−x) :  [juge ode]  départ : y′′ + 5y′ + 6y = 2e^(−x)
-    = y_p = e^(−x)   ← On essaie A·e^(−x)
-  — Une solution particulière pour 18x + 15 :  [juge ode]  départ : y′′ + 5y′ + 6y = 18x + 15
-    = y_p = 3x   ← On essaie Ax + B
-  — Superposition : la solution générale.  [juge ode]  départ : y′′ + 5y′ + 6y = 2e^(−x) + 18x + 15
+Solution générale de y′′ − 3y′ + 2y = e^(3x) − 4 : une solution particulière par morceau du second membre, puis superposition.
+  [tap, suivre l'erreur, menu steps]  y′′ − 3y′ + 2y = 0
+    = y_h = C_1e^x + C_2e^(2x)   ← Racines : r = 1, r = 2
+  — Une solution particulière pour le second membre e^(3x) :  [juge ode]  départ : y′′ − 3y′ + 2y = e^(3x)
+    = y_p = (1/2)e^(3x)   ← On essaie A·e^(3x)
+  — Une solution particulière pour −4 :  [juge ode]  départ : y′′ − 3y′ + 2y = −4
+    = y_p = −2   ← On essaie A (une constante)
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ − 3y′ + 2y = e^(3x) − 4
     ? y = y_h + 2·y_p1 + y_p2 est-elle aussi une solution de l’équation ? ✔ Non : L(2y_p1) = 2b₁ / · Oui : on peut multiplier une solution par une constante
-    = y = C_1e^(−3x) + C_2e^(−2x) + e^(−x) + 3x   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 18x + 15, essaie y_p = Ax + B et remplace dans y′′ + 5y′ + 6y = 18x + 15. | y = C_1e^(−3x) + C_2e^(−2x) + e^(−x) + 3x
+    = y = C_1e^x + C_2e^(2x) + (1/2)e^(3x) − 2   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour −4, essaie y_p = A (une constante) et remplace dans y′′ − 3y′ + 2y = −4. | y = C_1e^x + C_2e^(2x) + (1/2)e^(3x) − 2
   pièges : a2_ode_constant_count, a2_ode_superposition_nonhom
 
 ```
@@ -9901,24 +9893,40 @@ Solution générale de y′′ + 5y′ + 6y = 2e^(−x) + 18x + 15 : une solutio
 ### Niveau 4
 
 ```
-Vrai ou faux ?
-  « Si y_p résout L(y) = b, alors y_h + y_p résout L(y) = b pour toute solution y_h de L(y) = 0. » → VRAI
-  aides : Écris L(y₁ + y₂) ou L(y₀ + Cy₁) avec la linéarité de L. | L(y₀ + Cy₁) = L(y₀) + C·L(y₁) = 0 + C·b. | Un énoncé faux se réfute avec un exemple simple : constantes, exponentielles.
-
-Solution générale de y′ + 2y = 6x + 5 − e^(−x) : une solution particulière par morceau du second membre, puis superposition.
-  [free, suivre l'erreur]  y′ + 2y = 0
-    = y_h = Ce^(−2x)   ← Équation homogène
-  — Une solution particulière pour le second membre 6x + 5 :  [juge ode]  départ : y′ + 2y = 6x + 5
-    = y_p = 3x + 1   ← On essaie Ax + B
-  — Une solution particulière pour −e^(−x) :  [juge ode]  départ : y′ + 2y = −e^(−x)
+Solution générale de y′ − 2y = 3e^(−x) + 4 : une solution particulière par morceau du second membre, puis superposition.
+  [free, suivre l'erreur]  y′ − 2y = 0
+    = y_h = Ce^(2x)   ← Équation homogène
+  — Une solution particulière pour le second membre 3e^(−x) :  [juge ode]  départ : y′ − 2y = 3e^(−x)
     = y_p = −e^(−x)   ← On essaie A·e^(−x)
-  — Superposition : la solution générale.  [juge ode]  départ : y′ + 2y = 6x + 5 − e^(−x)
-    = y = Ce^(−2x) + 3x + 1 − e^(−x)   ← y = y_h + y_p1 + y_p2
-  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour −e^(−x), essaie y_p = A·e^(−x) et remplace dans y′ + 2y = −e^(−x). | y = Ce^(−2x) + 3x + 1 − e^(−x)
+  — Une solution particulière pour 4 :  [juge ode]  départ : y′ − 2y = 4
+    = y_p = −2   ← On essaie A (une constante)
+  — Superposition : la solution générale.  [juge ode]  départ : y′ − 2y = 3e^(−x) + 4
+    = y = Ce^(2x) − e^(−x) − 2   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 4, essaie y_p = A (une constante) et remplace dans y′ − 2y = 4. | y = Ce^(2x) − e^(−x) − 2
 
-Vrai ou faux ?
-  « La différence de deux solutions de L(y) = b est une solution de L(y) = 0. » → VRAI
-  aides : Écris L(y₁ + y₂) ou L(y₀ + Cy₁) avec la linéarité de L. | L(y₀ + Cy₁) = L(y₀) + C·L(y₁) = 0 + C·b. | Un énoncé faux se réfute avec un exemple simple : constantes, exponentielles.
+Solution générale de y′′ + y = 3e^(−2x) + 3x : une solution particulière par morceau du second membre, puis superposition.
+  [free, suivre l'erreur]  y′′ + y = 0
+    = y_h = C_1cos(x) + C_2sin(x)   ← Racines : r = i, r = −i
+  — Une solution particulière pour le second membre 3e^(−2x) :  [juge ode]  départ : y′′ + y = 3e^(−2x)
+    = y_p = (3/5)e^(−2x)   ← On essaie A·e^(−2x)
+  — Une solution particulière pour 3x :  [juge ode]  départ : y′′ + y = 3x
+    = y_p = 3x   ← On essaie Ax + B
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ + y = 3e^(−2x) + 3x
+    = y = C_1cos(x) + C_2sin(x) + (3/5)e^(−2x) + 3x   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour 3x, essaie y_p = Ax + B et remplace dans y′′ + y = 3x. | y = C_1cos(x) + C_2sin(x) + (3/5)e^(−2x) + 3x
+  pièges : a2_ode_constant_count
+
+Solution générale de y′′ + 9y = e^(3x) − 9 : une solution particulière par morceau du second membre, puis superposition.
+  [free, suivre l'erreur]  y′′ + 9y = 0
+    = y_h = C_1cos(3x) + C_2sin(3x)   ← Racines : r = 3i, r = −3i
+  — Une solution particulière pour le second membre e^(3x) :  [juge ode]  départ : y′′ + 9y = e^(3x)
+    = y_p = (1/18)e^(3x)   ← On essaie A·e^(3x)
+  — Une solution particulière pour −9 :  [juge ode]  départ : y′′ + 9y = −9
+    = y_p = −1   ← On essaie A (une constante)
+  — Superposition : la solution générale.  [juge ode]  départ : y′′ + 9y = e^(3x) − 9
+    = y = C_1cos(3x) + C_2sin(3x) + (1/18)e^(3x) − 1   ← y = y_h + y_p1 + y_p2
+  aides : Une solution particulière par morceau du second membre, puis on additionne avec y_h. | Pour −9, essaie y_p = A (une constante) et remplace dans y′′ + 9y = −9. | y = C_1cos(3x) + C_2sin(3x) + (1/18)e^(3x) − 1
+  pièges : a2_ode_constant_count
 
 ```
 
@@ -9929,42 +9937,43 @@ Vrai ou faux ? 3 énoncés, un point chacun.
   [problème, 3 points]
   partie 1 (Énoncé 1 : 1)
   Vrai ou faux ?
-    « Si y₁ et y₂ résolvent y″ + 4y = 1, alors y₁ + y₂ aussi. » → FAUX
-      contre-exemple (a2) : y1 = 1/4, y2 = 1/4+cos(2x)
+    « Si p et q sont continues sur I, les solutions de y″ + p(x)y′ + q(x)y = 0 sur I forment un espace vectoriel de dimension 2. » → VRAI
+  partie 2 (Énoncé 2 : 1)
+  Vrai ou faux ?
+    « Si y₀ résout y′ + 3y = 0 et y₁ résout y′ + 3y = 3, alors y₀ + C·y₁ résout y′ + 3y = 3 pour tout réel C. » → FAUX
+      contre-exemple (a2) : y0 = e^(-3x), y1 = 1, C = 2
+  partie 3 (Énoncé 3 : 1)
+  Vrai ou faux ?
+    « La différence de deux solutions de L(y) = b est une solution de L(y) = 0. » → VRAI
+  pièges : a2_ode_superposition_nonhom
+
+Vrai ou faux ? 3 énoncés, un point chacun.
+  [problème, 3 points]
+  partie 1 (Énoncé 1 : 1)
+  Vrai ou faux ?
+    « La différence de deux solutions de L(y) = b est une solution de L(y) = 0. » → VRAI
   partie 2 (Énoncé 2 : 1)
   Vrai ou faux ?
     « Si p et q sont continues sur I, les solutions de y″ + p(x)y′ + q(x)y = 0 sur I forment un espace vectoriel de dimension 2. » → VRAI
   partie 3 (Énoncé 3 : 1)
   Vrai ou faux ?
-    « La différence de deux solutions de L(y) = b est une solution de L(y) = 0. » → VRAI
-  pièges : a2_ode_superposition_nonhom
+    « y = C·e^(2x) est la solution générale de y″ − 3y′ + 2y = 0. » → FAUX
+      contre-exemple (a2) : y = e^x
+  pièges : a2_ode_constant_count
 
 Vrai ou faux ? 3 énoncés, un point chacun.
   [problème, 3 points]
   partie 1 (Énoncé 1 : 1)
   Vrai ou faux ?
-    « Si y_p résout L(y) = b, alors y_h + y_p résout L(y) = b pour toute solution y_h de L(y) = 0. » → VRAI
+    « Si y₁ et y₂ résolvent y″ + 9y = 1, alors y₁ + y₂ aussi. » → FAUX
+      contre-exemple (a2) : y1 = 1/9, y2 = 1/9+cos(3x)
   partie 2 (Énoncé 2 : 1)
   Vrai ou faux ?
-    « La différence de deux solutions de L(y) = b est une solution de L(y) = 0. » → VRAI
-  partie 3 (Énoncé 3 : 1)
-  Vrai ou faux ?
-    « Si y₀ résout y′ + y = 0 et y₁ résout y′ + y = 1, alors y₀ + C·y₁ résout y′ + y = 1 pour tout réel C. » → FAUX
-      contre-exemple (a2) : y0 = e^(-x), y1 = 1, C = 2
-  pièges : a2_ode_superposition_nonhom
-
-Vrai ou faux ? 3 énoncés, un point chacun.
-  [problème, 3 points]
-  partie 1 (Énoncé 1 : 1)
-  Vrai ou faux ?
-    « Si y₀ résout y′ + y = 0 et y₁ résout y′ + y = 1, alors y₀ + C·y₁ résout y′ + y = 1 pour tout réel C. » → FAUX
-      contre-exemple (a2) : y0 = e^(-x), y1 = 1, C = 2
-  partie 2 (Énoncé 2 : 1)
-  Vrai ou faux ?
-    « La différence de deux solutions de L(y) = b est une solution de L(y) = 0. » → VRAI
-  partie 3 (Énoncé 3 : 1)
-  Vrai ou faux ?
     « Si y_p résout L(y) = b, alors y_h + y_p résout L(y) = b pour toute solution y_h de L(y) = 0. » → VRAI
+  partie 3 (Énoncé 3 : 1)
+  Vrai ou faux ?
+    « Si y₀ résout y′ + 3y = 0 et y₁ résout y′ + 3y = 6, alors y₀ + C·y₁ résout y′ + 3y = 6 pour tout réel C. » → FAUX
+      contre-exemple (a2) : y0 = e^(-3x), y1 = 2, C = 2
   pièges : a2_ode_superposition_nonhom
 
 ```
@@ -9973,7 +9982,7 @@ Vrai ou faux ? 3 énoncés, un point chacun.
 
 ```
 Vrai ou faux ?
-  « La différence de deux solutions de L(y) = b est une solution de L(y) = 0. » → VRAI
+  « Si p et q sont continues sur I, les solutions de y″ + p(x)y′ + q(x)y = 0 sur I forment un espace vectoriel de dimension 2. » → VRAI
   [examen tf]
 
 ```
@@ -9985,35 +9994,35 @@ _Équation caractéristique, puis la forme selon le signe de Δ._
 ### Niveau 1
 
 ```
-Donne la solution générale de y′′ + y′ = 0. Équation caractéristique : r² + r = 0.
-  [guided]  r² + r = 0
-    = (r + 1)(r) = 0   ← Factoriser (ou Δ)
-    = r = −1 ou r = □   (trous : r = −1 ou r = 0)   ← Racines
-  — Solution générale :  [juge ode]  départ : y′′ + y′ = 0
-    = y = C_1□ + C_2   (trous : y = C_1e^(−x) + C_2)   ← Forme de la solution
-  aides : Remplace y par e^(rx) : tu obtiens r² + r = 0. | Racines : r = −1 ou r = 0 ; donc y = … | y = C_1e^(−x) + C_2
+Résous y′′ − 2y′ + y = 0, y(0) = 0, y′(0) = −2. Équation caractéristique : r² − 2r + 1 = 0.
+  [guided]  r² − 2r + 1 = 0
+    = (r − 1)² = 0   ← Factoriser (ou Δ)
+    = r = □   (trous : r = 1)   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ − 2y′ + y = 0
+    = y = (C_1 + C_2x)□   (trous : y = (C_1 + C_2x)e^x)   ← Forme de la solution
+    = C_1 = 0 ; C_2 = −2   ← y(0) = 0, y′(0) = −2
+    = y = −2xe^x   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens r² − 2r + 1 = 0. | Racines : r = 1 ; donc y = … | y = (C_1 + C_2x)e^x
   pièges : a2_ode_char_sign
 
-Résous 3y′′ + 3y′ − 6y = 0, y(0) = 3, y′(0) = −3. Équation caractéristique : 3r² + 3r − 6 = 0.
-  [guided]  3r² + 3r − 6 = 0
-    = 3(r + 2)(r − 1) = 0   ← Factoriser (ou Δ)
-    = r = −2 ou r = □   (trous : r = −2 ou r = 1)   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 3y′′ + 3y′ − 6y = 0
-    = y = C_1□ + C_2□   (trous : y = C_1e^(−2x) + C_2e^x)   ← Forme de la solution
-    = C_1 = 2 ; C_2 = 1   ← y(0) = 3, y′(0) = −3
-    = y = 2e^(−2x) + e^x   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 3r² + 3r − 6 = 0. | Racines : r = −2 ou r = 1 ; donc y = … | y = C_1e^(−2x) + C_2e^x
+Résous 3y′′ + 12y′ + 39y = 0, y(0) = 1, y′(0) = 4. Équation caractéristique : 3r² + 12r + 39 = 0.
+  [guided]  3r² + 12r + 39 = 0
+    = 3((r + 2)² + 9) = 0   ← Factoriser (ou Δ)
+    = r = −2 + □ ou r = −2 − 3i   (trous : r = −2 + 3i ou r = −2 − 3i)   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 3y′′ + 12y′ + 39y = 0
+    = y = e^(−2x)(C_1□ + C_2□)   (trous : y = e^(−2x)(C_1cos(3x) + C_2sin(3x)))   ← Forme de la solution
+    = C_1 = 1 ; C_2 = 2   ← y(0) = 1, y′(0) = 4
+    = y = e^(−2x)(cos(3x) + 2sin(3x))   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens 3r² + 12r + 39 = 0. | Racines : r = −2 + 3i ou r = −2 − 3i ; donc y = … | y = e^(−2x)(C_1cos(3x) + C_2sin(3x))
   pièges : a2_ode_char_sign
 
-Résous 2y′′ + 4y′ + 2y = 0, y(0) = −1, y′(0) = −1. Équation caractéristique : 2r² + 4r + 2 = 0.
-  [guided]  2r² + 4r + 2 = 0
-    = 2(r + 1)² = 0   ← Factoriser (ou Δ)
-    = r = □   (trous : r = −1)   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 2y′′ + 4y′ + 2y = 0
-    = y = (C_1 + C_2x)□   (trous : y = (C_1 + C_2x)e^(−x))   ← Forme de la solution
-    = C_1 = −1 ; C_2 = −2   ← y(0) = −1, y′(0) = −1
-    = y = (−1 − 2x)e^(−x)   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 2r² + 4r + 2 = 0. | Racines : r = −1 ; donc y = … | y = (C_1 + C_2x)e^(−x)
+Donne la solution générale de y′′ − y′ − 12y = 0. Équation caractéristique : r² − r − 12 = 0.
+  [guided]  r² − r − 12 = 0
+    = (r + 3)(r − 4) = 0   ← Factoriser (ou Δ)
+    = r = −3 ou r = □   (trous : r = −3 ou r = 4)   ← Racines
+  — Solution générale :  [juge ode]  départ : y′′ − y′ − 12y = 0
+    = y = C_1□ + C_2□   (trous : y = C_1e^(−3x) + C_2e^(4x))   ← Forme de la solution
+  aides : Remplace y par e^(rx) : tu obtiens r² − r − 12 = 0. | Racines : r = −3 ou r = 4 ; donc y = … | y = C_1e^(−3x) + C_2e^(4x)
   pièges : a2_ode_char_sign
 
 ```
@@ -10021,98 +10030,96 @@ Résous 2y′′ + 4y′ + 2y = 0, y(0) = −1, y′(0) = −1. Équation caract
 ### Niveau 2
 
 ```
-Résous 2y′′ + 8y′ + 16y = 0, y(0) = 1, y′(0) = −3. Remplace d'abord y par e^(rx).
-  [guided]  2((e^(rx))′)′ + 8(e^(rx))′ + 16e^(rx)
-    = 2r²e^(rx) + 8re^(rx) + 16e^(rx)   ← Dériver e^(rx)
-    = (2r² + 8r + 16)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 2r² + 8r + 16 = 0
-    = 2((r + 2)² + 4) = 0   ← Factoriser (ou Δ)
-    = r = −2 + 2i ou r = −2 − 2i   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 2y′′ + 8y′ + 16y = 0
+Donne la solution générale de y′′ + 9y = 0. Remplace d'abord y par e^(rx).
+  [guided]  ((e^(rx))′)′ + 9e^(rx)
+    = r²e^(rx) + 9e^(rx)   ← Dériver e^(rx)
+    = (r² + 9)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² + 9 = 0
+    = r² = −9   ← Factoriser (ou Δ)
+    = r = 3i ou r = −3i   ← Racines
+  — Solution générale :  [juge ode]  départ : y′′ + 9y = 0
     ? Quelle forme ? · Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / ✔ Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
-    = y = e^(−2x)(C_1cos(2x) + C_2sin(2x))   ← Forme de la solution
-    = C_1 = 1 ; C_2 = −1/2   ← y(0) = 1, y′(0) = −3
-    = y = e^(−2x)(cos(2x) − (1/2)sin(2x))   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 2r² + 8r + 16 = 0. | Racines : r = −2 + 2i ou r = −2 − 2i ; donc y = … | y = e^(−2x)(C_1cos(2x) + C_2sin(2x))
+    = y = C_1cos(3x) + C_2sin(3x)   ← Forme de la solution
+  aides : Remplace y par e^(rx) : tu obtiens r² + 9 = 0. | Racines : r = 3i ou r = −3i ; donc y = … | y = C_1cos(3x) + C_2sin(3x)
+  pièges : g6_chain_forgot
+
+Résous y′′ + 2y′ + 10y = 0, y(0) = −2, y′(0) = −2. Remplace d'abord y par e^(rx).
+  [guided]  ((e^(rx))′)′ + 2(e^(rx))′ + 10e^(rx)
+    = r²e^(rx) + 2re^(rx) + 10e^(rx)   ← Dériver e^(rx)
+    = (r² + 2r + 10)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² + 2r + 10 = 0
+    = ((r + 1)² + 9) = 0   ← Factoriser (ou Δ)
+    = r = −1 + 3i ou r = −1 − 3i   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ + 2y′ + 10y = 0
+    ? Quelle forme ? · Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / ✔ Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
+    = y = e^(−x)(C_1cos(3x) + C_2sin(3x))   ← Forme de la solution
+    = C_1 = −2 ; C_2 = −4/3   ← y(0) = −2, y′(0) = −2
+    = y = e^(−x)(−2cos(3x) − (4/3)sin(3x))   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens r² + 2r + 10 = 0. | Racines : r = −1 + 3i ou r = −1 − 3i ; donc y = … | y = e^(−x)(C_1cos(3x) + C_2sin(3x))
   pièges : g6_chain_forgot, g6_power_rule_exp
 
-Donne la solution générale de 3y′′ + 21y′ + 36y = 0. Remplace d'abord y par e^(rx).
-  [guided]  3((e^(rx))′)′ + 21(e^(rx))′ + 36e^(rx)
-    = 3r²e^(rx) + 21re^(rx) + 36e^(rx)   ← Dériver e^(rx)
-    = (3r² + 21r + 36)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 3r² + 21r + 36 = 0
-    = 3(r + 4)(r + 3) = 0   ← Factoriser (ou Δ)
-    = r = −4 ou r = −3   ← Racines
-  — Solution générale :  [juge ode]  départ : 3y′′ + 21y′ + 36y = 0
-    ? Quelle forme ? ✔ Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / · Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
-    = y = C_1e^(−4x) + C_2e^(−3x)   ← Forme de la solution
-  aides : Remplace y par e^(rx) : tu obtiens 3r² + 21r + 36 = 0. | Racines : r = −4 ou r = −3 ; donc y = … | y = C_1e^(−4x) + C_2e^(−3x)
+Donne la solution générale de y′′ − 4y′ + 8y = 0. Remplace d'abord y par e^(rx).
+  [guided]  ((e^(rx))′)′ − 4(e^(rx))′ + 8e^(rx)
+    = r²e^(rx) − 4re^(rx) + 8e^(rx)   ← Dériver e^(rx)
+    = (r² − 4r + 8)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² − 4r + 8 = 0
+    = ((r − 2)² + 4) = 0   ← Factoriser (ou Δ)
+    = r = 2 + 2i ou r = 2 − 2i   ← Racines
+  — Solution générale :  [juge ode]  départ : y′′ − 4y′ + 8y = 0
+    ? Quelle forme ? · Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / ✔ Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
+    = y = e^(2x)(C_1cos(2x) + C_2sin(2x))   ← Forme de la solution
+  aides : Remplace y par e^(rx) : tu obtiens r² − 4r + 8 = 0. | Racines : r = 2 + 2i ou r = 2 − 2i ; donc y = … | y = e^(2x)(C_1cos(2x) + C_2sin(2x))
   pièges : g6_chain_forgot, g6_power_rule_exp
-
-Donne la solution générale de y′′ − 6y′ + 9y = 0. Remplace d'abord y par e^(rx).
-  [guided]  ((e^(rx))′)′ − 6(e^(rx))′ + 9e^(rx)
-    = r²e^(rx) − 6re^(rx) + 9e^(rx)   ← Dériver e^(rx)
-    = (r² − 6r + 9)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² − 6r + 9 = 0
-    = (r − 3)² = 0   ← Factoriser (ou Δ)
-    = r = 3   ← Racines
-  — Solution générale :  [juge ode]  départ : y′′ − 6y′ + 9y = 0
-    ? Quelle forme ? · Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / ✔ Racine double : (C₁ + C₂x)e^(rx) / · Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
-    = y = (C_1 + C_2x)e^(3x)   ← Forme de la solution
-  aides : Remplace y par e^(rx) : tu obtiens r² − 6r + 9 = 0. | Racines : r = 3 ; donc y = … | y = (C_1 + C_2x)e^(3x)
-  pièges : g6_chain_forgot, g6_power_rule_exp, a2_ode_double_root
 
 ```
 
 ### Niveau 3
 
 ```
-Résous 3y′′ − 6y′ + 15y = 0, y(0) = 0, y′(0) = −3. Remplace d'abord y par e^(rx).
-  [tap, suivre l'erreur, menu steps]  3((e^(rx))′)′ − 6(e^(rx))′ + 15e^(rx)
-    = 3r²e^(rx) − 6re^(rx) + 15e^(rx)   ← Dériver e^(rx)
-    = (3r² − 6r + 15)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 3r² − 6r + 15 = 0
-    ? Le discriminant de 3r²−6r+15 est : · Δ > 0 : deux racines réelles / · Δ = 0 : une racine double / ✔ Δ < 0 : deux racines complexes conjuguées
-    = 3((r − 1)² + 4) = 0   ← Factoriser (ou Δ)
-    = r = 1 + 2i ou r = 1 − 2i   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 3y′′ − 6y′ + 15y = 0
+Résous y′′ + 4y′ + 13y = 0, y(0) = 0, y′(0) = −1. Remplace d'abord y par e^(rx).
+  [tap, suivre l'erreur, menu steps]  ((e^(rx))′)′ + 4(e^(rx))′ + 13e^(rx)
+    = r²e^(rx) + 4re^(rx) + 13e^(rx)   ← Dériver e^(rx)
+    = (r² + 4r + 13)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² + 4r + 13 = 0
+    ? Le discriminant de r²+4r+13 est : · Δ > 0 : deux racines réelles / · Δ = 0 : une racine double / ✔ Δ < 0 : deux racines complexes conjuguées
+    = ((r + 2)² + 9) = 0   ← Factoriser (ou Δ)
+    = r = −2 + 3i ou r = −2 − 3i   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ + 4y′ + 13y = 0
     ? Quelle forme ? · Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / ✔ Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
-    = y = e^x(C_1cos(2x) + C_2sin(2x))   ← Forme de la solution
-    = C_1 = 0 ; C_2 = −3/2   ← y(0) = 0, y′(0) = −3
-    = y = e^x(−(3/2)sin(2x))   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 3r² − 6r + 15 = 0. | Racines : r = 1 + 2i ou r = 1 − 2i ; donc y = … | y = e^x(C_1cos(2x) + C_2sin(2x))
+    = y = e^(−2x)(C_1cos(3x) + C_2sin(3x))   ← Forme de la solution
+    = C_1 = 0 ; C_2 = −1/3   ← y(0) = 0, y′(0) = −1
+    = y = e^(−2x)(−(1/3)sin(3x))   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens r² + 4r + 13 = 0. | Racines : r = −2 + 3i ou r = −2 − 3i ; donc y = … | y = e^(−2x)(C_1cos(3x) + C_2sin(3x))
   pièges : g6_chain_forgot, g6_power_rule_exp
 
-Résous 2y′′ + 8y′ + 10y = 0, y(0) = 1, y′(0) = 2. Remplace d'abord y par e^(rx).
-  [tap, suivre l'erreur, menu steps]  2((e^(rx))′)′ + 8(e^(rx))′ + 10e^(rx)
-    = 2r²e^(rx) + 8re^(rx) + 10e^(rx)   ← Dériver e^(rx)
-    = (2r² + 8r + 10)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 2r² + 8r + 10 = 0
-    ? Le discriminant de 2r²+8r+10 est : · Δ > 0 : deux racines réelles / · Δ = 0 : une racine double / ✔ Δ < 0 : deux racines complexes conjuguées
-    = 2((r + 2)² + 1) = 0   ← Factoriser (ou Δ)
-    = r = −2 + i ou r = −2 − i   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 2y′′ + 8y′ + 10y = 0
-    ? Quelle forme ? · Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / ✔ Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
-    = y = e^(−2x)(C_1cos(x) + C_2sin(x))   ← Forme de la solution
-    = C_1 = 1 ; C_2 = 4   ← y(0) = 1, y′(0) = 2
-    = y = e^(−2x)(cos(x) + 4sin(x))   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 2r² + 8r + 10 = 0. | Racines : r = −2 + i ou r = −2 − i ; donc y = … | y = e^(−2x)(C_1cos(x) + C_2sin(x))
-  pièges : g6_chain_forgot, g6_power_rule_exp
-
-Résous 3y′′ − 15y′ + 12y = 0, y(0) = −2, y′(0) = 1. Remplace d'abord y par e^(rx).
-  [tap, suivre l'erreur, menu steps]  3((e^(rx))′)′ − 15(e^(rx))′ + 12e^(rx)
-    = 3r²e^(rx) − 15re^(rx) + 12e^(rx)   ← Dériver e^(rx)
-    = (3r² − 15r + 12)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 3r² − 15r + 12 = 0
-    ? Le discriminant de 3r²−15r+12 est : ✔ Δ > 0 : deux racines réelles / · Δ = 0 : une racine double / · Δ < 0 : deux racines complexes conjuguées
-    = 3(r − 1)(r − 4) = 0   ← Factoriser (ou Δ)
-    = r = 1 ou r = 4   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 3y′′ − 15y′ + 12y = 0
+Résous y′′ + 6y′ + 8y = 0, y(0) = −1, y′(0) = −3. Remplace d'abord y par e^(rx).
+  [tap, suivre l'erreur, menu steps]  ((e^(rx))′)′ + 6(e^(rx))′ + 8e^(rx)
+    = r²e^(rx) + 6re^(rx) + 8e^(rx)   ← Dériver e^(rx)
+    = (r² + 6r + 8)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² + 6r + 8 = 0
+    ? Le discriminant de r²+6r+8 est : ✔ Δ > 0 : deux racines réelles / · Δ = 0 : une racine double / · Δ < 0 : deux racines complexes conjuguées
+    = (r + 4)(r + 2) = 0   ← Factoriser (ou Δ)
+    = r = −4 ou r = −2   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ + 6y′ + 8y = 0
     ? Quelle forme ? ✔ Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / · Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
-    = y = C_1e^x + C_2e^(4x)   ← Forme de la solution
-    = C_1 = −3 ; C_2 = 1   ← y(0) = −2, y′(0) = 1
-    = y = −3e^x + e^(4x)   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 3r² − 15r + 12 = 0. | Racines : r = 1 ou r = 4 ; donc y = … | y = C_1e^x + C_2e^(4x)
+    = y = C_1e^(−4x) + C_2e^(−2x)   ← Forme de la solution
+    = C_1 = 5/2 ; C_2 = −7/2   ← y(0) = −1, y′(0) = −3
+    = y = (5/2)e^(−4x) − (7/2)e^(−2x)   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens r² + 6r + 8 = 0. | Racines : r = −4 ou r = −2 ; donc y = … | y = C_1e^(−4x) + C_2e^(−2x)
+  pièges : g6_chain_forgot, g6_power_rule_exp
+
+Donne la solution générale de 3y′′ − 6y′ + 6y = 0. Remplace d'abord y par e^(rx).
+  [tap, suivre l'erreur, menu steps]  3((e^(rx))′)′ − 6(e^(rx))′ + 6e^(rx)
+    = 3r²e^(rx) − 6re^(rx) + 6e^(rx)   ← Dériver e^(rx)
+    = (3r² − 6r + 6)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 3r² − 6r + 6 = 0
+    ? Le discriminant de 3r²−6r+6 est : · Δ > 0 : deux racines réelles / · Δ = 0 : une racine double / ✔ Δ < 0 : deux racines complexes conjuguées
+    = 3((r − 1)² + 1) = 0   ← Factoriser (ou Δ)
+    = r = 1 + i ou r = 1 − i   ← Racines
+  — Solution générale :  [juge ode]  départ : 3y′′ − 6y′ + 6y = 0
+    ? Quelle forme ? · Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x) / · Racine double : (C₁ + C₂x)e^(rx) / ✔ Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)
+    = y = e^x(C_1cos(x) + C_2sin(x))   ← Forme de la solution
+  aides : Remplace y par e^(rx) : tu obtiens 3r² − 6r + 6 = 0. | Racines : r = 1 + i ou r = 1 − i ; donc y = … | y = e^x(C_1cos(x) + C_2sin(x))
   pièges : g6_chain_forgot, g6_power_rule_exp
 
 ```
@@ -10120,73 +10127,65 @@ Résous 3y′′ − 15y′ + 12y = 0, y(0) = −2, y′(0) = 1. Remplace d'abor
 ### Niveau 4
 
 ```
-Résous y′′ − 4y′ = 0, y(0) = 2, y′(0) = 1. Remplace d'abord y par e^(rx).
-  [free, suivre l'erreur]  ((e^(rx))′)′ − 4(e^(rx))′
-    = (r² − 4r)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² − 4r = 0
-    = r = 0 ou r = 4   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ − 4y′ = 0
-    = y = C_1 + C_2e^(4x)   ← Forme de la solution
-    = C_1 = 7/4 ; C_2 = 1/4   ← y(0) = 2, y′(0) = 1
-    = y = 7/4 + (1/4)e^(4x)   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens r² − 4r = 0. | Racines : r = 0 ou r = 4 ; donc y = … | y = C_1 + C_2e^(4x)
+Résous y′′ − 3y′ − 4y = 0, y(0) = −2, y′(0) = −1. Remplace d'abord y par e^(rx).
+  [free, suivre l'erreur]  ((e^(rx))′)′ − 3(e^(rx))′ − 4e^(rx)
+    = (r² − 3r − 4)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² − 3r − 4 = 0
+    = r = −1 ou r = 4   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ − 3y′ − 4y = 0
+    = y = C_1e^(−x) + C_2e^(4x)   ← Forme de la solution
+    = C_1 = −7/5 ; C_2 = −3/5   ← y(0) = −2, y′(0) = −1
+    = y = −(7/5)e^(−x) − (3/5)e^(4x)   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens r² − 3r − 4 = 0. | Racines : r = −1 ou r = 4 ; donc y = … | y = C_1e^(−x) + C_2e^(4x)
   pièges : g6_chain_forgot, g6_power_rule_exp
 
-Résous 2y′′ − 6y′ + 4y = 0, y(0) = 2, y′(0) = −3. Remplace d'abord y par e^(rx).
-  [free, suivre l'erreur]  2((e^(rx))′)′ − 6(e^(rx))′ + 4e^(rx)
-    = (2r² − 6r + 4)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 2r² − 6r + 4 = 0
-    = r = 1 ou r = 2   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 2y′′ − 6y′ + 4y = 0
-    = y = C_1e^x + C_2e^(2x)   ← Forme de la solution
-    = C_1 = 7 ; C_2 = −5   ← y(0) = 2, y′(0) = −3
-    = y = 7e^x − 5e^(2x)   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 2r² − 6r + 4 = 0. | Racines : r = 1 ou r = 2 ; donc y = … | y = C_1e^x + C_2e^(2x)
+Résous 3y′′ + 12y′ + 9y = 0, y(0) = 2, y′(0) = 1. Remplace d'abord y par e^(rx).
+  [free, suivre l'erreur]  3((e^(rx))′)′ + 12(e^(rx))′ + 9e^(rx)
+    = (3r² + 12r + 9)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 3r² + 12r + 9 = 0
+    = r = −3 ou r = −1   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 3y′′ + 12y′ + 9y = 0
+    = y = C_1e^(−3x) + C_2e^(−x)   ← Forme de la solution
+    = C_1 = −3/2 ; C_2 = 7/2   ← y(0) = 2, y′(0) = 1
+    = y = −(3/2)e^(−3x) + (7/2)e^(−x)   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens 3r² + 12r + 9 = 0. | Racines : r = −3 ou r = −1 ; donc y = … | y = C_1e^(−3x) + C_2e^(−x)
   pièges : g6_chain_forgot, g6_power_rule_exp
 
-Résous 3y′′ − 6y′ + 15y = 0, y(0) = −2, y′(0) = −1. Remplace d'abord y par e^(rx).
-  [free, suivre l'erreur]  3((e^(rx))′)′ − 6(e^(rx))′ + 15e^(rx)
-    = (3r² − 6r + 15)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 3r² − 6r + 15 = 0
-    = 3((r − 1)² + 4) = 0   ← Factoriser (ou Δ)
-    = r = 1 + 2i ou r = 1 − 2i   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 3y′′ − 6y′ + 15y = 0
-    = y = e^x(C_1cos(2x) + C_2sin(2x))   ← Forme de la solution
-    = C_1 = −2 ; C_2 = 1/2   ← y(0) = −2, y′(0) = −1
-    = y = e^x(−2cos(2x) + (1/2)sin(2x))   ← Solution du problème
-  aides : Remplace y par e^(rx) : tu obtiens 3r² − 6r + 15 = 0. | Racines : r = 1 + 2i ou r = 1 − 2i ; donc y = … | y = e^x(C_1cos(2x) + C_2sin(2x))
-  pièges : g6_chain_forgot, g6_power_rule_exp
+Résous y′′ − 4y = 0, y(0) = 1, y′(0) = −1. Remplace d'abord y par e^(rx).
+  [free, suivre l'erreur]  ((e^(rx))′)′ − 4e^(rx)
+    = (r² − 4)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² − 4 = 0
+    = r = −2 ou r = 2   ← Racines
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ − 4y = 0
+    = y = C_1e^(−2x) + C_2e^(2x)   ← Forme de la solution
+    = C_1 = 3/4 ; C_2 = 1/4   ← y(0) = 1, y′(0) = −1
+    = y = (3/4)e^(−2x) + (1/4)e^(2x)   ← Solution du problème
+  aides : Remplace y par e^(rx) : tu obtiens r² − 4 = 0. | Racines : r = −2 ou r = 2 ; donc y = … | y = C_1e^(−2x) + C_2e^(2x)
+  pièges : g6_chain_forgot
 
 ```
 
 ### Niveau 5
 
 ```
-La solution générale de y′′ − 2y′ + y = 0 est :
-  · y = C_1cos(x) + C_2sin(x)   · y = C_1e^x + C_2e^x [a2_ode_double_root]   · y = (C_1 + C_2x)e^(−x) [a2_ode_char_sign]   ✔ y = (C_1 + C_2x)e^x
+La solution générale de 2y′′ + 4y′ + 2y = 0 est :
+  · y = C_1e^(−x) + C_2e^(−x) [a2_ode_double_root]   · y = (C_1 + C_2x)e^x [a2_ode_char_sign]   ✔ y = (C_1 + C_2x)e^(−x)   · y = C_1cos(x) + C_2sin(x)
   pièges : a2_ode_double_root, a2_ode_char_sign
 
-Résous y′′ + 3y′ = 0, y(0) = 2, y′(0) = 3. Remplace d'abord y par e^(rx).
-  [free, sans aide]  ((e^(rx))′)′ + 3(e^(rx))′
-    = (r² + 3r)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² + 3r = 0
-    = r = −3 ou r = 0   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ + 3y′ = 0
-    = y = C_1e^(−3x) + C_2   ← Forme de la solution
-    = C_1 = −1 ; C_2 = 3   ← y(0) = 2, y′(0) = 3
-    = y = −e^(−3x) + 3   ← Solution du problème
-  pièges : g6_chain_forgot, g6_power_rule_exp
+La solution générale de 3y′′ + 9y′ + 6y = 0 est :
+  · y = (C_1 + C_2x)e^(−2x)   · y = C_1e^(2x) + C_2e^x [a2_ode_char_sign]   · y = e^(−2x)(C_1cos(x) + C_2sin(x))   ✔ y = C_1e^(−2x) + C_2e^(−x)
+  pièges : a2_ode_char_sign
 
-Résous y′′ + 4y = 0, y(0) = 3, y′(0) = 2. Remplace d'abord y par e^(rx).
-  [free, sans aide]  ((e^(rx))′)′ + 4e^(rx)
-    = (r² + 4)e^(rx)   ← Mettre e^(rx) en facteur
-  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : r² + 4 = 0
+Résous 3y′′ + 12y = 0, y(0) = 3, y′(0) = −3. Remplace d'abord y par e^(rx).
+  [free, sans aide]  3((e^(rx))′)′ + 12e^(rx)
+    = (3r² + 12)e^(rx)   ← Mettre e^(rx) en facteur
+  — e^(rx) ≠ 0 : équation caractéristique. Ses racines :  [juge complex]  départ : 3r² + 12 = 0
     = r² = −4   ← Factoriser (ou Δ)
     = r = 2i ou r = −2i   ← Racines
-  — Solution générale, puis les conditions initiales.  [juge ode]  départ : y′′ + 4y = 0
+  — Solution générale, puis les conditions initiales.  [juge ode]  départ : 3y′′ + 12y = 0
     = y = C_1cos(2x) + C_2sin(2x)   ← Forme de la solution
-    = C_1 = 3 ; C_2 = 1   ← y(0) = 3, y′(0) = 2
-    = y = 3cos(2x) + sin(2x)   ← Solution du problème
+    = C_1 = 3 ; C_2 = −3/2   ← y(0) = 3, y′(0) = −3
+    = y = 3cos(2x) − (3/2)sin(2x)   ← Solution du problème
   pièges : g6_chain_forgot
 
 ```
@@ -10194,16 +10193,16 @@ Résous y′′ + 4y = 0, y(0) = 3, y′(0) = 2. Remplace d'abord y par e^(rx).
 ### Variantes d'examen
 
 ```
-La solution générale de y′′ − 2y′ + 2y = 0 est :
-  · y = e^x(C_1cos(2x) + C_2sin(2x))   ✔ y = e^x(C_1cos(x) + C_2sin(x))   · y = C_1e^(2x) + C_2   · y = e^(−x)(C_1cos(x) + C_2sin(x)) [a2_ode_char_sign]
+La solution générale de 3y′′ + 18y′ + 27y = 0 est :
+  · y = C_1cos(3x) + C_2sin(3x)   ✔ y = (C_1 + C_2x)e^(−3x)   · y = (C_1 + C_2x)e^(3x) [a2_ode_char_sign]   · y = C_1e^(−3x) + C_2e^(−3x) [a2_ode_double_root]
   [examen mcq]
-  pièges : a2_ode_char_sign
+  pièges : a2_ode_double_root, a2_ode_char_sign
 
 Vrai ou faux ?
-  « Toute solution de y″ − 2y′ + 5y = 0 tend vers 0 en +∞. » → FAUX
-    contre-exemple (a2) : y = e^x cos(2x)
+  « La solution générale de y″ − 4y′ + 4y = 0 est y = C₁e^(2x) + C₂e^(2x). » → FAUX
+    contre-exemple (a2) : y = x e^(2x)
   [examen tf]
-  pièges : a2_ode_char_sign
+  pièges : a2_ode_double_root
 
 ```
 
@@ -10214,45 +10213,78 @@ _Abel : W = W₀e^(−∫p), puis (y₂/y₁)′ = W/y₁²._
 ### Niveau 1
 
 ```
-On considère t²y′′ − ty′ + y = 0 (t > 0). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale. Le wronskien (formule d'Abel) vaut W = t.
-  [guided]  t²(t′)′ − tt′ + t
-    = t²·0 − t·1 + t   ← Dériver y₁
+On considère y′′ − 2y′ + y = 0. Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale. Le wronskien (formule d'Abel) vaut W = e^(2t).
+  [guided]  ((e^t)′)′ − 2(e^t)′ + e^t
+    = e^t − 2e^t + e^t   ← Dériver y₁
     = 0   ← Simplifier
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (t)/(t)²
-    = 1/t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ − ty′ + y = 0
-    = y_2 = □   (trous : y_2 = tln(t))   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = (C_1 + C_2ln(t))t   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −1/t, W = t ; (y₂/y₁)′ = W/y₁² = (t)/(t)². | (y₂/y₁)′ = 1/t, donc y₂ = tln(t).
-
-On considère y′′ − 3y′ + 2y = 0. Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale. Le wronskien (formule d'Abel) vaut W = e^(3t).
-  [guided]  ((e^t)′)′ − 3(e^t)′ + 2e^t
-    = e^t − 3e^t + 2e^t   ← Dériver y₁
-    = 0   ← Simplifier
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(3t))/(e^t)²
-    = e^t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : y′′ − 3y′ + 2y = 0
-    = y_2 = □   (trous : y_2 = e^(2t))   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = C_1e^t + C_2e^(2t)   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −3, W = e^(3t) ; (y₂/y₁)′ = W/y₁² = (e^(3t))/(e^t)². | (y₂/y₁)′ = e^t, donc y₂ = e^(2t).
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(2t))/(e^t)²
+    = 1   ← Simplifier
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : y′′ − 2y′ + y = 0
+    = y_2 = □   (trous : y_2 = te^t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = (C_1 + C_2t)e^t   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −2, W = e^(2t) ; (y₂/y₁)′ = W/y₁² = (e^(2t))/(e^t)². | (y₂/y₁)′ = 1, donc y₂ = te^t.
   pièges : g6_power_rule_exp
 
-On considère t²y′′ − ty′ + y = 0 (t > 0). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale. Le wronskien (formule d'Abel) vaut W = t.
-  [guided]  t²(t′)′ − tt′ + t
-    = t²·0 − t·1 + t   ← Dériver y₁
+On considère ty′′ + (1 − 2t)y′ + (t − 1)y = 0 (t > 0). Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale. Le wronskien (formule d'Abel) vaut W = e^(2t)/t.
+  [guided]  t((e^t)′)′ + (1 − 2t)(e^t)′ + (t − 1)e^t
+    = te^t + (1 − 2t)e^t + (t − 1)e^t   ← Dériver y₁
     = 0   ← Simplifier
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (t)/(t)²
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(2t)/t)/(e^t)²
     = 1/t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ − ty′ + y = 0
-    = y_2 = □   (trous : y_2 = tln(t))   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = (C_1 + C_2ln(t))t   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −1/t, W = t ; (y₂/y₁)′ = W/y₁² = (t)/(t)². | (y₂/y₁)′ = 1/t, donc y₂ = tln(t).
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : ty′′ + (1 − 2t)y′ + (t − 1)y = 0
+    = y_2 = □   (trous : y_2 = e^tln(t))   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = (C_1 + C_2ln(t))e^t   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = 1/t−2, W = e^(2t)/t ; (y₂/y₁)′ = W/y₁² = (e^(2t)/t)/(e^t)². | (y₂/y₁)′ = 1/t, donc y₂ = e^tln(t).
+  pièges : g6_power_rule_exp
+
+On considère y′′ − 2y′ + y = 0. Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale. Le wronskien (formule d'Abel) vaut W = e^(2t).
+  [guided]  ((e^t)′)′ − 2(e^t)′ + e^t
+    = e^t − 2e^t + e^t   ← Dériver y₁
+    = 0   ← Simplifier
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(2t))/(e^t)²
+    = 1   ← Simplifier
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : y′′ − 2y′ + y = 0
+    = y_2 = □   (trous : y_2 = te^t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = (C_1 + C_2t)e^t   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −2, W = e^(2t) ; (y₂/y₁)′ = W/y₁² = (e^(2t))/(e^t)². | (y₂/y₁)′ = 1, donc y₂ = te^t.
+  pièges : g6_power_rule_exp
 
 ```
 
 ### Niveau 2
 
 ```
+On considère (t − 1)y′′ − ty′ + y = 0 (t > 1). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
+  [guided]  (t − 1)(t′)′ − tt′ + t
+    = (t − 1)·0 − t·1 + t   ← Dériver y₁
+    = 0   ← Simplifier
+  — Divise par t−1 : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (−t)/(t − 1)
+    = −t/(t − 1)   ← Simplifier
+  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −t/(t − 1) dt)
+    = W = (t − 1)e^t   ← W = e^(−∫p)
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : ((t − 1)e^t)/(t)²
+    = (t − 1)e^t/t²   ← Simplifier
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : (t − 1)y′′ − ty′ + y = 0
+    = y_2 = □   (trous : y_2 = e^t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = C_1t + C_2e^t   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −t/(t−1), W = (t − 1)e^t ; (y₂/y₁)′ = W/y₁² = ((t − 1)e^t)/(t)². | (y₂/y₁)′ = (t − 1)e^t/t², donc y₂ = e^t.
+
+On considère ty′′ + (1 − 2t)y′ + (t − 1)y = 0 (t > 0). Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
+  [guided]  t((e^t)′)′ + (1 − 2t)(e^t)′ + (t − 1)e^t
+    = te^t + (1 − 2t)e^t + (t − 1)e^t   ← Dériver y₁
+    = 0   ← Simplifier
+  — Divise par t : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (1 − 2t)/(t)
+    = 1/t − 2   ← Simplifier
+  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ (1/t − 2) dt)
+    = W = e^(2t)/t   ← W = e^(−∫p)
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(2t)/t)/(e^t)²
+    = 1/t   ← Simplifier
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : ty′′ + (1 − 2t)y′ + (t − 1)y = 0
+    = y_2 = □   (trous : y_2 = e^tln(t))   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = (C_1 + C_2ln(t))e^t   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = 1/t−2, W = e^(2t)/t ; (y₂/y₁)′ = W/y₁² = (e^(2t)/t)/(e^t)². | (y₂/y₁)′ = 1/t, donc y₂ = e^tln(t).
+  pièges : g6_power_rule_exp
+
 On considère t²y′′ − 2ty′ + 2y = 0 (t > 0). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
   [guided]  t²(t′)′ − 2tt′ + 2t
     = t²·0 − 2t·1 + 2t   ← Dériver y₁
@@ -10268,56 +10300,39 @@ On considère t²y′′ − 2ty′ + 2y = 0 (t > 0). Vérifie que y₁ = t est 
     = y = C_1t + C_2t²   ← y = C₁y₁ + C₂y₂
   aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −2/t, W = t² ; (y₂/y₁)′ = W/y₁² = (t²)/(t)². | (y₂/y₁)′ = 1, donc y₂ = t².
 
-On considère t²y′′ + ty′ − y = 0 (t > 0). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [guided]  t²(t′)′ + tt′ − t
-    = t²·0 + t·1 − t   ← Dériver y₁
-    = 0   ← Simplifier
-  — Divise par t² : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (t)/(t²)
-    = 1/t   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ 1/t dt)
-    = W = 1/t   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (1/t)/(t)²
-    = 1/t³   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ + ty′ − y = 0
-    = y_2 = □   (trous : y_2 = −1/(2t))   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = C_1t + C_2/t   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = 1/t, W = 1/t ; (y₂/y₁)′ = W/y₁² = (1/t)/(t)². | (y₂/y₁)′ = 1/t³, donc y₂ = −1/(2t).
-
-On considère t²y′′ − 3ty′ + 4y = 0 (t > 0). Vérifie que y₁ = t² est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [guided]  t²((t²)′)′ − 3t(t²)′ + 4t²
-    = t²·2 − 3t·2t + 4t²   ← Dériver y₁
-    = 0   ← Simplifier
-  — Divise par t² : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (−3t)/(t²)
-    = −3/t   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −3/t dt)
-    = W = t³   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (t³)/(t²)²
-    = 1/t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ − 3ty′ + 4y = 0
-    = y_2 = □   (trous : y_2 = t²ln(t))   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = (C_1 + C_2ln(t))t²   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −3/t, W = t³ ; (y₂/y₁)′ = W/y₁² = (t³)/(t²)². | (y₂/y₁)′ = 1/t, donc y₂ = t²ln(t).
-
 ```
 
 ### Niveau 3
 
 ```
-On considère ty′′ + (1 − 2t)y′ + (t − 1)y = 0 (t > 0). Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [tap, suivre l'erreur, menu steps]  t((e^t)′)′ + (1 − 2t)(e^t)′ + (t − 1)e^t
-    = te^t + (1 − 2t)e^t + (t − 1)e^t   ← Dériver y₁
+On considère y′′ − 3y′ + 2y = 0. Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
+  [tap, suivre l'erreur, menu steps]  ((e^t)′)′ − 3(e^t)′ + 2e^t
+    = e^t − 3e^t + 2e^t   ← Dériver y₁
     = 0   ← Simplifier
-  — Divise par t : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (1 − 2t)/(t)
-    = 1/t − 2   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ (1/t − 2) dt)
+  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −3 dt)
     ? Comment trouver une deuxième solution y₂ ? ✔ Formule d'Abel, puis (y₂/y₁)′ = W/y₁² / ✔ Poser y = y₁·u et remplacer dans l'équation
-    = W = e^(2t)/t   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(2t)/t)/(e^t)²
-    = 1/t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : ty′′ + (1 − 2t)y′ + (t − 1)y = 0
-    = y_2 = e^tln(t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = (C_1 + C_2ln(t))e^t   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = 1/t−2, W = e^(2t)/t ; (y₂/y₁)′ = W/y₁² = (e^(2t)/t)/(e^t)². | (y₂/y₁)′ = 1/t, donc y₂ = e^tln(t).
+    = W = e^(3t)   ← W = e^(−∫p)
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(3t))/(e^t)²
+    = e^t   ← Simplifier
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : y′′ − 3y′ + 2y = 0
+    = y_2 = e^(2t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = C_1e^t + C_2e^(2t)   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −3, W = e^(3t) ; (y₂/y₁)′ = W/y₁² = (e^(3t))/(e^t)². | (y₂/y₁)′ = e^t, donc y₂ = e^(2t).
+  pièges : g6_power_rule_exp
+
+On considère y′′ − 2y′ + y = 0. Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
+  [tap, suivre l'erreur, menu steps]  ((e^t)′)′ − 2(e^t)′ + e^t
+    = e^t − 2e^t + e^t   ← Dériver y₁
+    = 0   ← Simplifier
+  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −2 dt)
+    ? Comment trouver une deuxième solution y₂ ? ✔ Formule d'Abel, puis (y₂/y₁)′ = W/y₁² / ✔ Poser y = y₁·u et remplacer dans l'équation
+    = W = e^(2t)   ← W = e^(−∫p)
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(2t))/(e^t)²
+    = 1   ← Simplifier
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : y′′ − 2y′ + y = 0
+    = y_2 = te^t   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = (C_1 + C_2t)e^t   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −2, W = e^(2t) ; (y₂/y₁)′ = W/y₁² = (e^(2t))/(e^t)². | (y₂/y₁)′ = 1, donc y₂ = te^t.
   pièges : g6_power_rule_exp
 
 On considère t²y′′ − 3ty′ + 4y = 0 (t > 0). Vérifie que y₁ = t² est une solution, puis trouve une deuxième solution y₂ et la solution générale.
@@ -10336,66 +10351,28 @@ On considère t²y′′ − 3ty′ + 4y = 0 (t > 0). Vérifie que y₁ = t² es
     = y = (C_1 + C_2ln(t))t²   ← y = C₁y₁ + C₂y₂
   aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −3/t, W = t³ ; (y₂/y₁)′ = W/y₁² = (t³)/(t²)². | (y₂/y₁)′ = 1/t, donc y₂ = t²ln(t).
 
-On considère y′′ − 2y′ + y = 0. Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [tap, suivre l'erreur, menu steps]  ((e^t)′)′ − 2(e^t)′ + e^t
-    = e^t − 2e^t + e^t   ← Dériver y₁
-    = 0   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −2 dt)
-    ? Comment trouver une deuxième solution y₂ ? ✔ Formule d'Abel, puis (y₂/y₁)′ = W/y₁² / ✔ Poser y = y₁·u et remplacer dans l'équation
-    = W = e^(2t)   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(2t))/(e^t)²
-    = 1   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : y′′ − 2y′ + y = 0
-    = y_2 = te^t   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = (C_1 + C_2t)e^t   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −2, W = e^(2t) ; (y₂/y₁)′ = W/y₁² = (e^(2t))/(e^t)². | (y₂/y₁)′ = 1, donc y₂ = te^t.
-  pièges : g6_power_rule_exp
-
 ```
 
 ### Niveau 4
 
 ```
-On considère t²y′′ − ty′ + y = 0 (t > 0). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [free, suivre l'erreur]  t²(t′)′ − tt′ + t
-    = t²·0 − t·1 + t   ← Dériver y₁
+On considère t²y′′ + ty′ − y = 0 (t > 0). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
+  [free, suivre l'erreur]  t²(t′)′ + tt′ − t
+    = t²·0 + t·1 − t   ← Dériver y₁
     = 0   ← Simplifier
-  — Divise par t² : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (−t)/(t²)
-    = −1/t   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −1/t dt)
-    = W = t   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (t)/(t)²
+  — Divise par t² : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (t)/(t²)
     = 1/t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ − ty′ + y = 0
-    = y_2 = tln(t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = (C_1 + C_2ln(t))t   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −1/t, W = t ; (y₂/y₁)′ = W/y₁² = (t)/(t)². | (y₂/y₁)′ = 1/t, donc y₂ = tln(t).
+  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ 1/t dt)
+    = W = 1/t   ← W = e^(−∫p)
+  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (1/t)/(t)²
+    = 1/t³   ← Simplifier
+  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ + ty′ − y = 0
+    = y_2 = −1/(2t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
+    = y = C_1t + C_2/t   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = 1/t, W = 1/t ; (y₂/y₁)′ = W/y₁² = (1/t)/(t)². | (y₂/y₁)′ = 1/t³, donc y₂ = −1/(2t).
 
-Vrai ou faux ? « t² et t|t| ont un wronskien nul sur ℝ, donc elles sont linéairement dépendantes sur [−1 ; 1]. »
-  · Vrai   ✔ Faux
-
-On considère t²y′′ − ty′ + y = 0 (t > 0). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [free, suivre l'erreur]  t²(t′)′ − tt′ + t
-    = t²·0 − t·1 + t   ← Dériver y₁
-    = 0   ← Simplifier
-  — Divise par t² : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (−t)/(t²)
-    = −1/t   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −1/t dt)
-    = W = t   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (t)/(t)²
-    = 1/t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ − ty′ + y = 0
-    = y_2 = tln(t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = (C_1 + C_2ln(t))t   ← y = C₁y₁ + C₂y₂
-  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −1/t, W = t ; (y₂/y₁)′ = W/y₁² = (t)/(t)². | (y₂/y₁)′ = 1/t, donc y₂ = tln(t).
-
-```
-
-### Niveau 5
-
-```
 On considère t²y′′ − 3ty′ + 4y = 0 (t > 0). Vérifie que y₁ = t² est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [free, sans aide]  t²((t²)′)′ − 3t(t²)′ + 4t²
+  [free, suivre l'erreur]  t²((t²)′)′ − 3t(t²)′ + 4t²
     = t²·2 − 3t·2t + 4t²   ← Dériver y₁
     = 0   ← Simplifier
   — Divise par t² : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (−3t)/(t²)
@@ -10407,33 +10384,25 @@ On considère t²y′′ − 3ty′ + 4y = 0 (t > 0). Vérifie que y₁ = t² es
   — Une deuxième solution, puis la solution générale.  [juge ode]  départ : t²y′′ − 3ty′ + 4y = 0
     = y_2 = t²ln(t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
     = y = (C_1 + C_2ln(t))t²   ← y = C₁y₁ + C₂y₂
+  aides : Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁². | p = −3/t, W = t³ ; (y₂/y₁)′ = W/y₁² = (t³)/(t²)². | (y₂/y₁)′ = 1/t, donc y₂ = t²ln(t).
 
-On considère (t − 1)y′′ − ty′ + y = 0 (t > 1). Vérifie que y₁ = t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [free, sans aide]  (t − 1)(t′)′ − tt′ + t
-    = (t − 1)·0 − t·1 + t   ← Dériver y₁
-    = 0   ← Simplifier
-  — Divise par t−1 : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.  [juge equiv]  départ : (−t)/(t − 1)
-    = −t/(t − 1)   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −t/(t − 1) dt)
-    = W = (t − 1)e^t   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : ((t − 1)e^t)/(t)²
-    = (t − 1)e^t/t²   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : (t − 1)y′′ − ty′ + y = 0
-    = y_2 = e^t   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = C_1t + C_2e^t   ← y = C₁y₁ + C₂y₂
+Vrai ou faux ? « Pour y″ + p(t)y′ + q(t)y = 0, W(t) = W(t₀)·e^(+∫ de t₀ à t de p). »
+  · Vrai [a2_wronskian_abel_sign]   ✔ Faux
+  pièges : a2_wronskian_abel_sign
 
-On considère y′′ − 3y′ + 2y = 0. Vérifie que y₁ = e^t est une solution, puis trouve une deuxième solution y₂ et la solution générale.
-  [free, sans aide]  ((e^t)′)′ − 3(e^t)′ + 2e^t
-    = e^t − 3e^t + 2e^t   ← Dériver y₁
-    = 0   ← Simplifier
-  — Formule d'Abel : W = e^(−∫p) (à une constante près).  [juge ode]  départ : W = e^(−∫ −3 dt)
-    = W = e^(3t)   ← W = e^(−∫p)
-  — Réduction d'ordre : (y₂/y₁)′ = W/y₁².  [juge equiv]  départ : (e^(3t))/(e^t)²
-    = e^t   ← Simplifier
-  — Une deuxième solution, puis la solution générale.  [juge ode]  départ : y′′ − 3y′ + 2y = 0
-    = y_2 = e^(2t)   ← y₂ = y₁·∫ W/y₁² (sans constante)
-    = y = C_1e^t + C_2e^(2t)   ← y = C₁y₁ + C₂y₂
-  pièges : g6_power_rule_exp
+```
+
+### Niveau 5
+
+```
+On considère t²y′′ − 2ty′ + 2y = 0 (t > 0). A : t est une solution. B : la solution générale est y = C_1t + C_2t².
+  ✔ A vraie, B vraie   · A vraie, B fausse   · A fausse, B vraie   · A fausse, B fausse
+
+On considère ty′′ + (1 − 2t)y′ + (t − 1)y = 0 (t > 0). A : e^t est une solution. B : la solution générale est y = (C_1 + C_2ln(t))e^t.
+  ✔ A vraie, B vraie   · A vraie, B fausse   · A fausse, B vraie   · A fausse, B fausse
+
+On considère y′′ − 3y′ + 2y = 0. A : e^t est une solution. B : la solution générale est y = C_1e^t + C_2e^(−2t).
+  · A vraie, B vraie   ✔ A vraie, B fausse   · A fausse, B vraie   · A fausse, B fausse
 
 ```
 
@@ -10444,10 +10413,9 @@ On considère ty′′ + (1 − 2t)y′ + (t − 1)y = 0 (t > 0). A : e^t est un
   ✔ A vraie, B vraie   · A vraie, B fausse   · A fausse, B vraie   · A fausse, B fausse
   [examen mcq]
 
-Vrai ou faux ? « Pour y″ + p(t)y′ + q(t)y = 0, W(t) = W(t₀)·e^(+∫ de t₀ à t de p). »
-  · Vrai [a2_wronskian_abel_sign]   ✔ Faux
+Vrai ou faux ? « t² et t|t| ont un wronskien nul sur ℝ, donc elles sont linéairement dépendantes sur [−1 ; 1]. »
+  · Vrai   ✔ Faux
   [examen tf]
-  pièges : a2_wronskian_abel_sign
 
 ```
 
@@ -10458,42 +10426,41 @@ _Forme de y_p selon le second membre, résonance (facteur x), puis y = y_h + y_p
 ### Niveau 1
 
 ```
-Trouve la solution générale de y′′ + y = −4sin(x). Solution homogène : y_h = C_1cos(x) + C_2sin(x).
+Trouve la solution générale de y′′ − 4y = −16e^(2x). Solution homogène : y_h = C_1e^(−2x) + C_2e^(2x).
+  [guided]  (Axe^(2x))′′ − 4(Axe^(2x))
+    (Remplace y_p = Axe^(2x) dans le membre de gauche :)
+    = □Ae^(2x)   (trous : 4Ae^(2x))   ← y_p = A x e^(2x) remplacée dans le membre de gauche
+  — Identifie les coefficients de 4Ae^(2x) = −16e^(2x) :  [juge system]  départ : 4A = −16
+    = A = −4   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ − 4y = −16e^(2x)
+    = y_p = □xe^(2x)   (trous : y_p = −4xe^(2x))   ← Les coefficients dans la forme
+  — La solution générale :  [juge ode]  départ : y′′ − 4y = −16e^(2x)
+    = y = C_1e^(−2x) + C_2e^(2x)□   (trous : y = C_1e^(−2x) + C_2e^(2x) − 4xe^(2x))   ← y = y_h + y_p
+  aides : Racines de l'équation caractéristique : r = −2 ou r = 2. 2 est racine : multiplie la forme habituelle par x. | y_p = Axe^(2x), et 4Ae^(2x) = −16e^(2x). | y_p = −4xe^(2x)
+
+Trouve la solution générale de y′′ + y = 2sin(x). Solution homogène : y_h = C_1cos(x) + C_2sin(x).
   [guided]  (x(Acos(x) + Bsin(x)))′′ + (x(Acos(x) + Bsin(x)))
     (Remplace y_p = x(Acos(x) + Bsin(x)) dans le membre de gauche :)
     = □Bcos(x) − 2Asin(x)   (trous : 2Bcos(x) − 2Asin(x))   ← y_p = x(A cos(x)+B sin(x)) remplacée dans le membre de gauche
-  — Identifie les coefficients de 2Bcos(x) − 2Asin(x) = −4sin(x) :  [juge system]  départ : −2A = −4 ; 2B = 0
-    = A = 2 ; B = 0   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ + y = −4sin(x)
-    = y_p = □xcos(x)   (trous : y_p = 2xcos(x))   ← Les coefficients dans la forme
-  — La solution générale :  [juge ode]  départ : y′′ + y = −4sin(x)
-    = y = C_1cos(x) + C_2sin(x) + □   (trous : y = C_1cos(x) + C_2sin(x) + 2xcos(x))   ← y = y_h + y_p
-  aides : Racines de l'équation caractéristique : r = i ou r = −i. i est racine : multiplie la forme habituelle par x. | y_p = x(Acos(x) + Bsin(x)), et 2Bcos(x) − 2Asin(x) = −4sin(x). | y_p = 2xcos(x)
+  — Identifie les coefficients de 2Bcos(x) − 2Asin(x) = 2sin(x) :  [juge system]  départ : −2A = 2 ; 2B = 0
+    = A = −1 ; B = 0   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ + y = 2sin(x)
+    = y_p = −xcos(x)   ← Les coefficients dans la forme
+  — La solution générale :  [juge ode]  départ : y′′ + y = 2sin(x)
+    = y = C_1cos(x) + C_2sin(x)□   (trous : y = C_1cos(x) + C_2sin(x) − xcos(x))   ← y = y_h + y_p
+  aides : Racines de l'équation caractéristique : r = i ou r = −i. i est racine : multiplie la forme habituelle par x. | y_p = x(Acos(x) + Bsin(x)), et 2Bcos(x) − 2Asin(x) = 2sin(x). | y_p = −xcos(x)
 
-Trouve la solution générale de y′′ + 2y′ + 2y = 17e^(3x). Solution homogène : y_h = e^(−x)(C_1cos(x) + C_2sin(x)).
-  [guided]  (Ae^(3x))′′ + 2(Ae^(3x))′ + 2(Ae^(3x))
-    (Remplace y_p = Ae^(3x) dans le membre de gauche :)
-    = □Ae^(3x)   (trous : 17Ae^(3x))   ← y_p = A e^(3x) remplacée dans le membre de gauche
-  — Identifie les coefficients de 17Ae^(3x) = 17e^(3x) :  [juge system]  départ : 17A = 17
-    = A = 1   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ + 2y′ + 2y = 17e^(3x)
-    = y_p = e^(3x)   ← Les coefficients dans la forme
-  — La solution générale :  [juge ode]  départ : y′′ + 2y′ + 2y = 17e^(3x)
-    = y = e^(−x)(C_1cos(x) + C_2sin(x)) + □   (trous : y = e^(−x)(C_1cos(x) + C_2sin(x)) + e^(3x))   ← y = y_h + y_p
-  aides : Racines de l'équation caractéristique : r = −1 + i ou r = −1 − i. 3 n'est pas racine : la forme habituelle suffit. | y_p = Ae^(3x), et 17Ae^(3x) = 17e^(3x). | y_p = e^(3x)
-  pièges : g6_chain_forgot, g6_power_rule_exp
-
-Trouve la solution générale de y′′ + 2y′ + 5y = −10sin(x). Solution homogène : y_h = e^(−x)(C_1cos(2x) + C_2sin(2x)).
-  [guided]  (Acos(x) + Bsin(x))′′ + 2(Acos(x) + Bsin(x))′ + 5(Acos(x) + Bsin(x))
+Trouve la solution générale de y′′ + 4y′ + 13y = 40sin(x). Solution homogène : y_h = e^(−2x)(C_1cos(3x) + C_2sin(3x)).
+  [guided]  (Acos(x) + Bsin(x))′′ + 4(Acos(x) + Bsin(x))′ + 13(Acos(x) + Bsin(x))
     (Remplace y_p = Acos(x) + Bsin(x) dans le membre de gauche :)
-    = (□A + 2B)cos(x) + (−2A + 4B)sin(x)   (trous : (4A + 2B)cos(x) + (−2A + 4B)sin(x))   ← y_p = A cos(x)+B sin(x) remplacée dans le membre de gauche
-  — Identifie les coefficients de (4A + 2B)cos(x) + (−2A + 4B)sin(x) = −10sin(x) :  [juge system]  départ : 4A + 2B = 0 ; −2A + 4B = −10
-    = A = 1 ; B = −2   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ + 2y′ + 5y = −10sin(x)
-    = y_p = cos(x)□sin(x)   (trous : y_p = cos(x) − 2sin(x))   ← Les coefficients dans la forme
-  — La solution générale :  [juge ode]  départ : y′′ + 2y′ + 5y = −10sin(x)
-    = y = e^(−x)(C_1cos(2x) + C_2sin(2x)) + □   (trous : y = e^(−x)(C_1cos(2x) + C_2sin(2x)) + cos(x) − 2sin(x))   ← y = y_h + y_p
-  aides : Racines de l'équation caractéristique : r = −1 + 2i ou r = −1 − 2i. i n'est pas racine : la forme habituelle suffit. | y_p = Acos(x) + Bsin(x), et (4A + 2B)cos(x) + (−2A + 4B)sin(x) = −10sin(x). | y_p = cos(x) − 2sin(x)
+    = (□A + 4B)cos(x) + (−4A + 12B)sin(x)   (trous : (12A + 4B)cos(x) + (−4A + 12B)sin(x))   ← y_p = A cos(x)+B sin(x) remplacée dans le membre de gauche
+  — Identifie les coefficients de (12A + 4B)cos(x) + (−4A + 12B)sin(x) = 40sin(x) :  [juge system]  départ : 12A + 4B = 0 ; −4A + 12B = 40
+    = A = −1 ; B = 3   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ + 4y′ + 13y = 40sin(x)
+    = y_p = −cos(x) + □sin(x)   (trous : y_p = −cos(x) + 3sin(x))   ← Les coefficients dans la forme
+  — La solution générale :  [juge ode]  départ : y′′ + 4y′ + 13y = 40sin(x)
+    = y = e^(−2x)(C_1cos(3x) + C_2sin(3x))□   (trous : y = e^(−2x)(C_1cos(3x) + C_2sin(3x)) − cos(x) + 3sin(x))   ← y = y_h + y_p
+  aides : Racines de l'équation caractéristique : r = −2 + 3i ou r = −2 − 3i. i n'est pas racine : la forme habituelle suffit. | y_p = Acos(x) + Bsin(x), et (12A + 4B)cos(x) + (−4A + 12B)sin(x) = 40sin(x). | y_p = −cos(x) + 3sin(x)
   pièges : g6_cos_sign
 
 ```
@@ -10501,58 +10468,94 @@ Trouve la solution générale de y′′ + 2y′ + 5y = −10sin(x). Solution ho
 ### Niveau 2
 
 ```
-Trouve la solution générale de y′′ + 2y′ + 10y = 37cos(3x).
-  [guided]  y′′ + 2y′ + 10y = 37cos(3x)
-    (Solution de l'équation homogène y′′ + 2y′ + 10y = 0 :)
-    = y_h = e^(−x)(C_1cos(3x) + C_2sin(3x))   ← Solution de l'équation homogène
-  — Remplace y_p = Acos(3x) + Bsin(3x) dans le membre de gauche :  [juge equiv]  départ : (Acos(3x) + Bsin(3x))′′ + 2(Acos(3x) + Bsin(3x))′ + 10(Acos(3x) + Bsin(3x))
-    ? Quelle forme pour y_p ? ✔ <math alttext="Acos(3x) + Bsin(3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / · <math alttext="Acos(3x)"><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> / · <math alttext="x(Acos(3x) + Bsin(3x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
-    = (A + □B)cos(3x) + (□A + B)sin(3x)   (trous : (A + 6B)cos(3x) + (−6A + B)sin(3x))   ← y_p = A cos(3x)+B sin(3x) remplacée dans le membre de gauche
-  — Identifie les coefficients de (A + 6B)cos(3x) + (−6A + B)sin(3x) = 37cos(3x) :  [juge system]  départ : A + 6B = 37 ; −6A + B = 0
-    = A = 1 ; B = 6   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ + 2y′ + 10y = 37cos(3x)
-    = y_p = cos(3x) + □sin(3x)   (trous : y_p = cos(3x) + 6sin(3x))   ← Les coefficients dans la forme
-  — La solution générale :  [juge ode]  départ : y′′ + 2y′ + 10y = 37cos(3x)
-    = y = e^(−x)(C_1cos(3x) + C_2sin(3x)) + cos(3x) + 6sin(3x)   ← y = y_h + y_p
-  aides : Racines de l'équation caractéristique : r = −1 + 3i ou r = −1 − 3i. 3i n'est pas racine : la forme habituelle suffit. | y_p = Acos(3x) + Bsin(3x), et (A + 6B)cos(3x) + (−6A + B)sin(3x) = 37cos(3x). | y_p = cos(3x) + 6sin(3x)
-  pièges : a2_ode_ic_before_particular, a2_ode_yp_incomplete
-
-Trouve la solution générale de y′′ − 2y′ + 2y = −5sin(x).
-  [guided]  y′′ − 2y′ + 2y = −5sin(x)
-    (Solution de l'équation homogène y′′ − 2y′ + 2y = 0 :)
-    = y_h = e^x(C_1cos(x) + C_2sin(x))   ← Solution de l'équation homogène
-  — Remplace y_p = Acos(x) + Bsin(x) dans le membre de gauche :  [juge equiv]  départ : (Acos(x) + Bsin(x))′′ − 2(Acos(x) + Bsin(x))′ + 2(Acos(x) + Bsin(x))
-    ? Quelle forme pour y_p ? ✔ <math alttext="Acos(x) + Bsin(x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / · <math alttext="Asin(x)"><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math> / · <math alttext="x(Acos(x) + Bsin(x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
-    = (A□B)cos(x) + (□A + B)sin(x)   (trous : (A − 2B)cos(x) + (2A + B)sin(x))   ← y_p = A cos(x)+B sin(x) remplacée dans le membre de gauche
-  — Identifie les coefficients de (A − 2B)cos(x) + (2A + B)sin(x) = −5sin(x) :  [juge system]  départ : A − 2B = 0 ; 2A + B = −5
-    = A = −2 ; B = −1   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ − 2y′ + 2y = −5sin(x)
-    = y_p = □cos(x) − sin(x)   (trous : y_p = −2cos(x) − sin(x))   ← Les coefficients dans la forme
-  — La solution générale :  [juge ode]  départ : y′′ − 2y′ + 2y = −5sin(x)
-    = y = e^x(C_1cos(x) + C_2sin(x)) − 2cos(x) − sin(x)   ← y = y_h + y_p
-  aides : Racines de l'équation caractéristique : r = 1 + i ou r = 1 − i. i n'est pas racine : la forme habituelle suffit. | y_p = Acos(x) + Bsin(x), et (A − 2B)cos(x) + (2A + B)sin(x) = −5sin(x). | y_p = −2cos(x) − sin(x)
-  pièges : a2_ode_ic_before_particular, a2_ode_yp_incomplete
-
-Trouve la solution générale de y′′ − 7y′ + 12y = e^(4x).
-  [guided]  y′′ − 7y′ + 12y = e^(4x)
-    (Solution de l'équation homogène y′′ − 7y′ + 12y = 0 :)
-    = y_h = C_1e^(3x) + C_2e^(4x)   ← Solution de l'équation homogène
-  — Remplace y_p = Axe^(4x) dans le membre de gauche :  [juge equiv]  départ : (Axe^(4x))′′ − 7(Axe^(4x))′ + 12(Axe^(4x))
-    ? Quelle forme pour y_p ? · <math alttext="Ae^(4x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / ✔ <math alttext="Axe^(4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Ax²e^(4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>
-    = Ae^(4x)   ← y_p = A x e^(4x) remplacée dans le membre de gauche
-  — La solution particulière :  [juge ode]  départ : y′′ − 7y′ + 12y = e^(4x)
-    = y_p = xe^(4x)   ← Les coefficients dans la forme
-  — La solution générale :  [juge ode]  départ : y′′ − 7y′ + 12y = e^(4x)
-    = y = C_1e^(3x) + C_2e^(4x) + xe^(4x)   ← y = y_h + y_p
-  aides : Racines de l'équation caractéristique : r = 3 ou r = 4. 4 est racine : multiplie la forme habituelle par x. | y_p = Axe^(4x), et Ae^(4x) = e^(4x). | y_p = xe^(4x)
+Trouve la solution générale de y′′ − 3y′ + 2y = −3e^x.
+  [guided]  y′′ − 3y′ + 2y = −3e^x
+    (Solution de l'équation homogène y′′ − 3y′ + 2y = 0 :)
+    = y_h = C_1e^x + C_2e^(2x)   ← Solution de l'équation homogène
+  — Remplace y_p = Axe^x dans le membre de gauche :  [juge equiv]  départ : (Axe^x)′′ − 3(Axe^x)′ + 2(Axe^x)
+    ? Quelle forme pour y_p ? · <math alttext="Ae^x"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mi>x</mi></msup></mrow></math> / ✔ <math alttext="Axe^x"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mi>x</mi></msup></mrow></math> / · <math alttext="Ax²e^x"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mi>x</mi></msup></mrow></math>
+    = −Ae^x   ← y_p = A x e^x remplacée dans le membre de gauche
+  — Identifie les coefficients de −Ae^x = −3e^x :  [juge system]  départ : −A = −3
+    = A = 3   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ − 3y′ + 2y = −3e^x
+    = y_p = □xe^x   (trous : y_p = 3xe^x)   ← Les coefficients dans la forme
+  — La solution générale :  [juge ode]  départ : y′′ − 3y′ + 2y = −3e^x
+    = y = C_1e^x + C_2e^(2x) + 3xe^x   ← y = y_h + y_p
+  aides : Racines de l'équation caractéristique : r = 1 ou r = 2. 1 est racine : multiplie la forme habituelle par x. | y_p = Axe^x, et −Ae^x = −3e^x. | y_p = 3xe^x
   pièges : a2_ode_ic_before_particular, a2_ode_resonance_no_x
+
+Trouve la solution générale de y′′ − 4y′ = 15e^(−x).
+  [guided]  y′′ − 4y′ = 15e^(−x)
+    (Solution de l'équation homogène y′′ − 4y′ = 0 :)
+    = y_h = C_1 + C_2e^(4x)   ← Solution de l'équation homogène
+  — Remplace y_p = Ae^(−x) dans le membre de gauche :  [juge equiv]  départ : (Ae^(−x))′′ − 4(Ae^(−x))′
+    ? Quelle forme pour y_p ? ✔ <math alttext="Ae^(−x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Axe^(−x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Ax²e^(−x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mo>−</mo><mi>x</mi></mrow></msup></mrow></math>
+    = □Ae^(−x)   (trous : 5Ae^(−x))   ← y_p = A e^(-x) remplacée dans le membre de gauche
+  — Identifie les coefficients de 5Ae^(−x) = 15e^(−x) :  [juge system]  départ : 5A = 15
+    = A = 3   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ − 4y′ = 15e^(−x)
+    = y_p = □e^(−x)   (trous : y_p = 3e^(−x))   ← Les coefficients dans la forme
+  — La solution générale :  [juge ode]  départ : y′′ − 4y′ = 15e^(−x)
+    = y = C_1 + C_2e^(4x) + 3e^(−x)   ← y = y_h + y_p
+  aides : Racines de l'équation caractéristique : r = 0 ou r = 4. -1 n'est pas racine : la forme habituelle suffit. | y_p = Ae^(−x), et 5Ae^(−x) = 15e^(−x). | y_p = 3e^(−x)
+  pièges : a2_ode_ic_before_particular
+
+Trouve la solution générale de y′′ + 4y′ + 13y = −40cos(3x).
+  [guided]  y′′ + 4y′ + 13y = −40cos(3x)
+    (Solution de l'équation homogène y′′ + 4y′ + 13y = 0 :)
+    = y_h = e^(−2x)(C_1cos(3x) + C_2sin(3x))   ← Solution de l'équation homogène
+  — Remplace y_p = Acos(3x) + Bsin(3x) dans le membre de gauche :  [juge equiv]  départ : (Acos(3x) + Bsin(3x))′′ + 4(Acos(3x) + Bsin(3x))′ + 13(Acos(3x) + Bsin(3x))
+    ? Quelle forme pour y_p ? ✔ <math alttext="Acos(3x) + Bsin(3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / · <math alttext="Acos(3x)"><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> / · <math alttext="x(Acos(3x) + Bsin(3x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
+    = (□A + □B)cos(3x) + (−12A + 4B)sin(3x)   (trous : (4A + 12B)cos(3x) + (−12A + 4B)sin(3x))   ← y_p = A cos(3x)+B sin(3x) remplacée dans le membre de gauche
+  — Identifie les coefficients de (4A + 12B)cos(3x) + (−12A + 4B)sin(3x) = −40cos(3x) :  [juge system]  départ : 4A + 12B = −40 ; −12A + 4B = 0
+    = A = −1 ; B = −3   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ + 4y′ + 13y = −40cos(3x)
+    = y_p = −cos(3x)□sin(3x)   (trous : y_p = −cos(3x) − 3sin(3x))   ← Les coefficients dans la forme
+  — La solution générale :  [juge ode]  départ : y′′ + 4y′ + 13y = −40cos(3x)
+    = y = e^(−2x)(C_1cos(3x) + C_2sin(3x)) − cos(3x) − 3sin(3x)   ← y = y_h + y_p
+  aides : Racines de l'équation caractéristique : r = −2 + 3i ou r = −2 − 3i. 3i n'est pas racine : la forme habituelle suffit. | y_p = Acos(3x) + Bsin(3x), et (4A + 12B)cos(3x) + (−12A + 4B)sin(3x) = −40cos(3x). | y_p = −cos(3x) − 3sin(3x)
+  pièges : a2_ode_ic_before_particular, a2_ode_yp_incomplete
 
 ```
 
 ### Niveau 3
 
 ```
-Résous y′′ + 4y = 8cos(2x) avec y(0) = −2 et y′(0) = −2.
+Résous y′′ + y′ − 6y = −15e^(−3x) avec y(0) = 1 et y′(0) = 0.
+  [tap, suivre l'erreur, menu steps]  y′′ + y′ − 6y = −15e^(−3x)
+    (Solution de l'équation homogène y′′ + y′ − 6y = 0 :)
+    = y_h = C_1e^(−3x) + C_2e^(2x)   ← Solution de l'équation homogène
+  — Remplace y_p = Axe^(−3x) dans le membre de gauche :  [juge equiv]  départ : (Axe^(−3x))′′ + (Axe^(−3x))′ − 6(Axe^(−3x))
+    ? Le second membre est <math alttext="−15e^(−3x)"><mrow><mrow><mo>−</mo><mn>15</mn></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>3</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>. Est-ce un cas de résonance ? · m = -3 n'est pas racine de l'équation caractéristique / ✔ m = -3 est racine simple / · m = -3 est racine double
+    ? Quelle forme pour y_p ? · <math alttext="Ae^(−3x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>3</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / ✔ <math alttext="Axe^(−3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>3</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Ax²e^(−3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>3</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>
+    = −5Ae^(−3x)   ← y_p = A x e^(-3x) remplacée dans le membre de gauche
+  — La solution particulière :  [juge ode]  départ : y′′ + y′ − 6y = −15e^(−3x)
+    = y_p = 3xe^(−3x)   ← Les coefficients dans la forme
+  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ + y′ − 6y = −15e^(−3x)
+    = y = C_1e^(−3x) + C_2e^(2x) + 3xe^(−3x)   ← y = y_h + y_p
+    = C_1 = 1 ; C_2 = 0   ← y(0) = 1, y′(0) = 0
+    = y = e^(−3x) + 3xe^(−3x)   ← La solution du problème de Cauchy
+  aides : Racines de l'équation caractéristique : r = −3 ou r = 2. -3 est racine : multiplie la forme habituelle par x. | y_p = Axe^(−3x), et −5Ae^(−3x) = −15e^(−3x). | y_p = 3xe^(−3x)
+  pièges : a2_ode_ic_before_particular, a2_ode_resonance_no_x
+
+Résous y′′ − 6y′ + 8y = 4e^(4x) avec y(0) = −1 et y′(0) = 0.
+  [tap, suivre l'erreur, menu steps]  y′′ − 6y′ + 8y = 4e^(4x)
+    (Solution de l'équation homogène y′′ − 6y′ + 8y = 0 :)
+    = y_h = C_1e^(2x) + C_2e^(4x)   ← Solution de l'équation homogène
+  — Remplace y_p = Axe^(4x) dans le membre de gauche :  [juge equiv]  départ : (Axe^(4x))′′ − 6(Axe^(4x))′ + 8(Axe^(4x))
+    ? Le second membre est <math alttext="4e^(4x)"><mrow><mn>4</mn><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>. Est-ce un cas de résonance ? · m = 4 n'est pas racine de l'équation caractéristique / ✔ m = 4 est racine simple / · m = 4 est racine double
+    ? Quelle forme pour y_p ? · <math alttext="Ae^(4x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / ✔ <math alttext="Axe^(4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Ax²e^(4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>
+    = 2Ae^(4x)   ← y_p = A x e^(4x) remplacée dans le membre de gauche
+  — La solution particulière :  [juge ode]  départ : y′′ − 6y′ + 8y = 4e^(4x)
+    = y_p = 2xe^(4x)   ← Les coefficients dans la forme
+  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ − 6y′ + 8y = 4e^(4x)
+    = y = C_1e^(2x) + C_2e^(4x) + 2xe^(4x)   ← y = y_h + y_p
+    = C_1 = −1 ; C_2 = 0   ← y(0) = −1, y′(0) = 0
+    = y = −e^(2x) + 2xe^(4x)   ← La solution du problème de Cauchy
+  aides : Racines de l'équation caractéristique : r = 2 ou r = 4. 4 est racine : multiplie la forme habituelle par x. | y_p = Axe^(4x), et 2Ae^(4x) = 4e^(4x). | y_p = 2xe^(4x)
+  pièges : a2_ode_ic_before_particular, a2_ode_resonance_no_x
+
+Résous y′′ + 4y = 8cos(2x) avec y(0) = −2 et y′(0) = 6.
   [tap, suivre l'erreur, menu steps]  y′′ + 4y = 8cos(2x)
     (Solution de l'équation homogène y′′ + 4y = 0 :)
     = y_h = C_1cos(2x) + C_2sin(2x)   ← Solution de l'équation homogène
@@ -10564,100 +10567,68 @@ Résous y′′ + 4y = 8cos(2x) avec y(0) = −2 et y′(0) = −2.
     = y_p = 2xsin(2x)   ← Les coefficients dans la forme
   — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ + 4y = 8cos(2x)
     = y = C_1cos(2x) + C_2sin(2x) + 2xsin(2x)   ← y = y_h + y_p
-    = C_1 = −2 ; C_2 = −1   ← y(0) = −2, y′(0) = −2
-    = y = −2cos(2x) − sin(2x) + 2xsin(2x)   ← La solution du problème de Cauchy
+    = C_1 = −2 ; C_2 = 3   ← y(0) = −2, y′(0) = 6
+    = y = −2cos(2x) + 3sin(2x) + 2xsin(2x)   ← La solution du problème de Cauchy
   aides : Racines de l'équation caractéristique : r = 2i ou r = −2i. 2i est racine : multiplie la forme habituelle par x. | y_p = x(Acos(2x) + Bsin(2x)), et 4Bcos(2x) − 4Asin(2x) = 8cos(2x). | y_p = 2xsin(2x)
   pièges : a2_ode_resonance_no_x
-
-Résous y′′ − 4y = 8cos(2x) avec y(0) = −2 et y′(0) = 2.
-  [tap, suivre l'erreur, menu steps]  y′′ − 4y = 8cos(2x)
-    (Solution de l'équation homogène y′′ − 4y = 0 :)
-    = y_h = C_1e^(−2x) + C_2e^(2x)   ← Solution de l'équation homogène
-  — Remplace y_p = Acos(2x) + Bsin(2x) dans le membre de gauche :  [juge equiv]  départ : (Acos(2x) + Bsin(2x))′′ − 4(Acos(2x) + Bsin(2x))
-    ? Le second membre est <math alttext="8cos(2x)"><mrow><mn>8</mn><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math>. Est-ce un cas de résonance ? ✔ 2i n'est pas racine de l'équation caractéristique / · 2i est racine simple
-    ? Quelle forme pour y_p ? ✔ <math alttext="Acos(2x) + Bsin(2x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / · <math alttext="x(Acos(2x) + Bsin(2x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
-    = −8Acos(2x) − 8Bsin(2x)   ← y_p = A cos(2x)+B sin(2x) remplacée dans le membre de gauche
-  — La solution particulière :  [juge ode]  départ : y′′ − 4y = 8cos(2x)
-    = y_p = −cos(2x)   ← Les coefficients dans la forme
-  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ − 4y = 8cos(2x)
-    = y = C_1e^(−2x) + C_2e^(2x) − cos(2x)   ← y = y_h + y_p
-    = C_1 = −1 ; C_2 = 0   ← y(0) = −2, y′(0) = 2
-    = y = −e^(−2x) − cos(2x)   ← La solution du problème de Cauchy
-  aides : Racines de l'équation caractéristique : r = −2 ou r = 2. 2i n'est pas racine : la forme habituelle suffit. | y_p = Acos(2x) + Bsin(2x), et −8Acos(2x) − 8Bsin(2x) = 8cos(2x). | y_p = −cos(2x)
-  pièges : a2_ode_ic_before_particular
-
-Trouve la solution générale de y′′ − 7y′ + 12y = 4e^(4x).
-  [tap, suivre l'erreur, menu steps]  y′′ − 7y′ + 12y = 4e^(4x)
-    (Solution de l'équation homogène y′′ − 7y′ + 12y = 0 :)
-    = y_h = C_1e^(3x) + C_2e^(4x)   ← Solution de l'équation homogène
-  — Remplace y_p = Axe^(4x) dans le membre de gauche :  [juge equiv]  départ : (Axe^(4x))′′ − 7(Axe^(4x))′ + 12(Axe^(4x))
-    ? Le second membre est <math alttext="4e^(4x)"><mrow><mn>4</mn><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>. Est-ce un cas de résonance ? · m = 4 n'est pas racine de l'équation caractéristique / ✔ m = 4 est racine simple / · m = 4 est racine double
-    ? Quelle forme pour y_p ? · <math alttext="Ae^(4x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / ✔ <math alttext="Axe^(4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Ax²e^(4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>
-    = Ae^(4x)   ← y_p = A x e^(4x) remplacée dans le membre de gauche
-  — La solution particulière :  [juge ode]  départ : y′′ − 7y′ + 12y = 4e^(4x)
-    = y_p = 4xe^(4x)   ← Les coefficients dans la forme
-  — La solution générale :  [juge ode]  départ : y′′ − 7y′ + 12y = 4e^(4x)
-    = y = C_1e^(3x) + C_2e^(4x) + 4xe^(4x)   ← y = y_h + y_p
-  aides : Racines de l'équation caractéristique : r = 3 ou r = 4. 4 est racine : multiplie la forme habituelle par x. | y_p = Axe^(4x), et Ae^(4x) = 4e^(4x). | y_p = 4xe^(4x)
-  pièges : a2_ode_ic_before_particular, a2_ode_resonance_no_x
 
 ```
 
 ### Niveau 4
 
 ```
-Résous y′′ − 5y′ + 4y = 12x − 3 avec y(0) = 5 et y′(0) = 2.
-  [free, suivre l'erreur]  y′′ − 5y′ + 4y = 12x − 3
-    (Solution de l'équation homogène y′′ − 5y′ + 4y = 0 :)
-    = y_h = C_1e^x + C_2e^(4x)   ← Solution de l'équation homogène
-  — Remplace y_p = Ax + B dans le membre de gauche :  [juge equiv]  départ : (Ax + B)′′ − 5(Ax + B)′ + 4(Ax + B)
+Résous y′′ − 4y′ + 3y = −6x + 2 avec y(0) = −2 et y′(0) = 0.
+  [free, suivre l'erreur]  y′′ − 4y′ + 3y = −6x + 2
+    (Solution de l'équation homogène y′′ − 4y′ + 3y = 0 :)
+    = y_h = C_1e^x + C_2e^(3x)   ← Solution de l'équation homogène
+  — Remplace y_p = Ax + B dans le membre de gauche :  [juge equiv]  départ : (Ax + B)′′ − 4(Ax + B)′ + 3(Ax + B)
     ? Quelle forme pour y_p ? ✔ <math alttext="Ax + B"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>+</mo><mi>B</mi></mrow></math> / · <math alttext="Ax"><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow></math> / · <math alttext="x(Ax + B)"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>+</mo><mi>B</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
-    = 4Ax − 5A + 4B   ← y_p = A x+B remplacée dans le membre de gauche
-  — Identifie les coefficients de 4Ax − 5A + 4B = 12x − 3 :  [juge system]  départ : −5A + 4B = −3 ; 4A = 12
-    = A = 3 ; B = 3   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ − 5y′ + 4y = 12x − 3
-    = y_p = 3x + 3   ← Les coefficients dans la forme
-  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ − 5y′ + 4y = 12x − 3
-    = y = C_1e^x + C_2e^(4x) + 3x + 3   ← y = y_h + y_p
-    = C_1 = 3 ; C_2 = −1   ← y(0) = 5, y′(0) = 2
-    = y = 3e^x − e^(4x) + 3x + 3   ← La solution du problème de Cauchy
-  aides : Racines de l'équation caractéristique : r = 1 ou r = 4. 0 n'est pas racine : la forme habituelle suffit. | y_p = Ax + B, et 4Ax − 5A + 4B = 12x − 3. | y_p = 3x + 3
+    = 3Ax − 4A + 3B   ← y_p = A x+B remplacée dans le membre de gauche
+  — Identifie les coefficients de 3Ax − 4A + 3B = −6x + 2 :  [juge system]  départ : −4A + 3B = 2 ; 3A = −6
+    = A = −2 ; B = −2   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ − 4y′ + 3y = −6x + 2
+    = y_p = −2x − 2   ← Les coefficients dans la forme
+  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ − 4y′ + 3y = −6x + 2
+    = y = C_1e^x + C_2e^(3x) − 2x − 2   ← y = y_h + y_p
+    = C_1 = −1 ; C_2 = 1   ← y(0) = −2, y′(0) = 0
+    = y = −e^x + e^(3x) − 2x − 2   ← La solution du problème de Cauchy
+  aides : Racines de l'équation caractéristique : r = 1 ou r = 3. 0 n'est pas racine : la forme habituelle suffit. | y_p = Ax + B, et 3Ax − 4A + 3B = −6x + 2. | y_p = −2x − 2
   pièges : a2_ode_ic_before_particular, a2_ode_yp_incomplete
 
-Résous y′′ + y′ − 12y = −14e^(−4x) avec y(0) = 6 et y′(0) = −1.
-  [free, suivre l'erreur]  y′′ + y′ − 12y = −14e^(−4x)
-    (Solution de l'équation homogène y′′ + y′ − 12y = 0 :)
-    = y_h = C_1e^(−4x) + C_2e^(3x)   ← Solution de l'équation homogène
-  — Remplace y_p = Axe^(−4x) dans le membre de gauche :  [juge equiv]  départ : (Axe^(−4x))′′ + (Axe^(−4x))′ − 12(Axe^(−4x))
-    ? Quelle forme pour y_p ? · <math alttext="Ae^(−4x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>4</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / ✔ <math alttext="Axe^(−4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>4</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Ax²e^(−4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>4</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>
-    = −7Ae^(−4x)   ← y_p = A x e^(-4x) remplacée dans le membre de gauche
-  — Identifie les coefficients de −7Ae^(−4x) = −14e^(−4x) :  [juge system]  départ : −7A = −14
-    = A = 2   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ + y′ − 12y = −14e^(−4x)
-    = y_p = 2xe^(−4x)   ← Les coefficients dans la forme
-  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ + y′ − 12y = −14e^(−4x)
-    = y = C_1e^(−4x) + C_2e^(3x) + 2xe^(−4x)   ← y = y_h + y_p
-    = C_1 = 3 ; C_2 = 3   ← y(0) = 6, y′(0) = −1
-    = y = 3e^(−4x) + 3e^(3x) + 2xe^(−4x)   ← La solution du problème de Cauchy
-  aides : Racines de l'équation caractéristique : r = −4 ou r = 3. -4 est racine : multiplie la forme habituelle par x. | y_p = Axe^(−4x), et −7Ae^(−4x) = −14e^(−4x). | y_p = 2xe^(−4x)
-  pièges : a2_ode_ic_before_particular, a2_ode_resonance_no_x
+Résous y′′ + 4y′ + 4y = 25cos(x) avec y(0) = 0 et y′(0) = 7.
+  [free, suivre l'erreur]  y′′ + 4y′ + 4y = 25cos(x)
+    (Solution de l'équation homogène y′′ + 4y′ + 4y = 0 :)
+    = y_h = (C_1 + C_2x)e^(−2x)   ← Solution de l'équation homogène
+  — Remplace y_p = Acos(x) + Bsin(x) dans le membre de gauche :  [juge equiv]  départ : (Acos(x) + Bsin(x))′′ + 4(Acos(x) + Bsin(x))′ + 4(Acos(x) + Bsin(x))
+    ? Quelle forme pour y_p ? ✔ <math alttext="Acos(x) + Bsin(x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / · <math alttext="Acos(x)"><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></math> / · <math alttext="x(Acos(x) + Bsin(x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
+    = (3A + 4B)cos(x) + (−4A + 3B)sin(x)   ← y_p = A cos(x)+B sin(x) remplacée dans le membre de gauche
+  — Identifie les coefficients de (3A + 4B)cos(x) + (−4A + 3B)sin(x) = 25cos(x) :  [juge system]  départ : 3A + 4B = 25 ; −4A + 3B = 0
+    = A = 3 ; B = 4   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ + 4y′ + 4y = 25cos(x)
+    = y_p = 3cos(x) + 4sin(x)   ← Les coefficients dans la forme
+  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ + 4y′ + 4y = 25cos(x)
+    = y = (C_1 + C_2x)e^(−2x) + 3cos(x) + 4sin(x)   ← y = y_h + y_p
+    = C_1 = −3 ; C_2 = −3   ← y(0) = 0, y′(0) = 7
+    = y = −3e^(−2x) − 3xe^(−2x) + 3cos(x) + 4sin(x)   ← La solution du problème de Cauchy
+  aides : Racines de l'équation caractéristique : r = −2. i n'est pas racine : la forme habituelle suffit. | y_p = Acos(x) + Bsin(x), et (3A + 4B)cos(x) + (−4A + 3B)sin(x) = 25cos(x). | y_p = 3cos(x) + 4sin(x)
+  pièges : a2_ode_ic_before_particular, a2_ode_yp_incomplete
 
-Résous y′′ − 6y′ + 9y = −2e^(3x) avec y(0) = 0 et y′(0) = −1.
-  [free, suivre l'erreur]  y′′ − 6y′ + 9y = −2e^(3x)
-    (Solution de l'équation homogène y′′ − 6y′ + 9y = 0 :)
-    = y_h = (C_1 + C_2x)e^(3x)   ← Solution de l'équation homogène
-  — Remplace y_p = Ax²e^(3x) dans le membre de gauche :  [juge equiv]  départ : (Ax²e^(3x))′′ − 6(Ax²e^(3x))′ + 9(Ax²e^(3x))
-    ? Quelle forme pour y_p ? · <math alttext="Ae^(3x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Axe^(3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / ✔ <math alttext="Ax²e^(3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>
-    = 2Ae^(3x)   ← y_p = A x^2 e^(3x) remplacée dans le membre de gauche
-  — Identifie les coefficients de 2Ae^(3x) = −2e^(3x) :  [juge system]  départ : 2A = −2
-    = A = −1   ← Résoudre
-  — La solution particulière :  [juge ode]  départ : y′′ − 6y′ + 9y = −2e^(3x)
-    = y_p = −x²e^(3x)   ← Les coefficients dans la forme
-  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ − 6y′ + 9y = −2e^(3x)
-    = y = (C_1 + C_2x)e^(3x) − x²e^(3x)   ← y = y_h + y_p
-    = C_1 = 0 ; C_2 = −1   ← y(0) = 0, y′(0) = −1
-    = y = −xe^(3x) − x²e^(3x)   ← La solution du problème de Cauchy
-  aides : Racines de l'équation caractéristique : r = 3. 3 est racine double : multiplie la forme habituelle par x². | y_p = Ax²e^(3x), et 2Ae^(3x) = −2e^(3x). | y_p = −x²e^(3x)
+Résous y′′ + 4y = −4cos(2x) avec y(0) = −3 et y′(0) = 6.
+  [free, suivre l'erreur]  y′′ + 4y = −4cos(2x)
+    (Solution de l'équation homogène y′′ + 4y = 0 :)
+    = y_h = C_1cos(2x) + C_2sin(2x)   ← Solution de l'équation homogène
+  — Remplace y_p = x(Acos(2x) + Bsin(2x)) dans le membre de gauche :  [juge equiv]  départ : (x(Acos(2x) + Bsin(2x)))′′ + 4(x(Acos(2x) + Bsin(2x)))
+    ? Quelle forme pour y_p ? · <math alttext="Acos(2x) + Bsin(2x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / ✔ <math alttext="x(Acos(2x) + Bsin(2x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> / · <math alttext="x²(Acos(2x) + Bsin(2x))"><mrow><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
+    = 4Bcos(2x) − 4Asin(2x)   ← y_p = x(A cos(2x)+B sin(2x)) remplacée dans le membre de gauche
+  — Identifie les coefficients de 4Bcos(2x) − 4Asin(2x) = −4cos(2x) :  [juge system]  départ : −4A = 0 ; 4B = −4
+    = A = 0 ; B = −1   ← Résoudre
+  — La solution particulière :  [juge ode]  départ : y′′ + 4y = −4cos(2x)
+    = y_p = −xsin(2x)   ← Les coefficients dans la forme
+  — La solution générale, puis les conditions initiales :  [juge ode]  départ : y′′ + 4y = −4cos(2x)
+    = y = C_1cos(2x) + C_2sin(2x) − xsin(2x)   ← y = y_h + y_p
+    = C_1 = −3 ; C_2 = 3   ← y(0) = −3, y′(0) = 6
+    = y = −3cos(2x) + 3sin(2x) − xsin(2x)   ← La solution du problème de Cauchy
+  aides : Racines de l'équation caractéristique : r = 2i ou r = −2i. 2i est racine : multiplie la forme habituelle par x. | y_p = x(Acos(2x) + Bsin(2x)), et 4Bcos(2x) − 4Asin(2x) = −4cos(2x). | y_p = −xsin(2x)
   pièges : a2_ode_resonance_no_x
 
 ```
@@ -10665,16 +10636,73 @@ Résous y′′ − 6y′ + 9y = −2e^(3x) avec y(0) = 0 et y′(0) = −1.
 ### Niveau 5
 
 ```
-Soit u la solution de u′′ − 2u′ + 5u = −17sin(2x) avec u(0) = −3 et u′(0) = −5. Alors u(π) vaut :
-  · 4 − 7e^π   · −4 − 3e^π [a2_ode_ic_before_particular]   ✔ −4 + e^π   · −2 − e^π
-  pièges : a2_ode_ic_before_particular
+Trouve la solution de u′′ + 9u = −6sin(3x) avec u(0) = 0 et u′(0) = 10, puis calcule u(π/2).
+  [problème, 10 points]
+  partie 1 (Début du problème : 1 ; Solution de l'équation homogène u′′ + 9u = 0 : 1 ; Remplace u_p = x(Acos(3x) + Bsin(3x)) dans le membre de gauche : 2 ; Identifie les coefficients de 6Bcos(3x) − 6Asin(3x) = −6sin(3x) : 1 ; La solution particulière : 1 ; La solution générale, puis les conditions initiales : 3 ; La valeur demandée : 1)
+    [free, sans aide, suivre l'erreur]  r² + 9 = 0
+      (Équation caractéristique : ses racines.)
+      = r = 3i ou r = −3i   ← Racines de l'équation caractéristique
+    — Solution de l'équation homogène u′′ + 9u = 0 :  [juge ode]  départ : u′′ + 9u = −6sin(3x)
+      = u_h = C_1cos(3x) + C_2sin(3x)   ← Solution de l'équation homogène
+    — Remplace u_p = x(Acos(3x) + Bsin(3x)) dans le membre de gauche :  [juge equiv]  départ : (x(Acos(3x) + Bsin(3x)))′′ + 9(x(Acos(3x) + Bsin(3x)))
+      ? Quelle forme pour u_p ? · <math alttext="Acos(3x) + Bsin(3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / ✔ <math alttext="x(Acos(3x) + Bsin(3x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> / · <math alttext="x²(Acos(3x) + Bsin(3x))"><mrow><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
+      = 6Bcos(3x) − 6Asin(3x)   ← u_p = x(A cos(3x)+B sin(3x)) remplacée dans le membre de gauche
+    — Identifie les coefficients de 6Bcos(3x) − 6Asin(3x) = −6sin(3x) :  [juge system]  départ : −6A = −6 ; 6B = 0
+      = A = 1 ; B = 0   ← Résoudre
+    — La solution particulière :  [juge ode]  départ : u′′ + 9u = −6sin(3x)
+      = u_p = xcos(3x)   ← Les coefficients dans la forme
+    — La solution générale, puis les conditions initiales :  [juge ode]  départ : u′′ + 9u = −6sin(3x)
+      = u = C_1cos(3x) + C_2sin(3x) + xcos(3x)   ← y = y_h + y_p
+      = C_1 = 0 ; C_2 = 3   ← u(0) = 0, u′(0) = 10
+      = u = 3sin(3x) + xcos(3x)   ← La solution du problème de Cauchy
+    — La valeur demandée :  [juge value]  départ : u(π/2)
+      = −3   ← Remplacer x par π/2
+  pièges : a2_ode_resonance_no_x
 
-Soit u la solution de u′′ − 6u′ + 9u = 9x + 21 avec u(0) = 2 et u′(0) = 0. Alors u(1) vaut :
-  ✔ 4 + e³   · 4 − 4e³ [a2_ode_ic_before_particular]   · 2 − 3e³/2   · −4 − 9e³
-  pièges : a2_ode_ic_before_particular
+Trouve la solution de u′′ + 7u′ + 12u = 2e^(−4x) avec u(0) = −1 et u′(0) = 4, puis calcule u(1).
+  [problème, 10 points]
+  partie 1 (Début du problème : 1 ; Solution de l'équation homogène u′′ + 7u′ + 12u = 0 : 1 ; Remplace u_p = Axe^(−4x) dans le membre de gauche : 2 ; Identifie les coefficients de −Ae^(−4x) = 2e^(−4x) : 1 ; La solution particulière : 1 ; La solution générale, puis les conditions initiales : 3 ; La valeur demandée : 1)
+    [free, sans aide, suivre l'erreur]  r² + 7r + 12 = 0
+      (Équation caractéristique : ses racines.)
+      = r = −4 ou r = −3   ← Racines de l'équation caractéristique
+    — Solution de l'équation homogène u′′ + 7u′ + 12u = 0 :  [juge ode]  départ : u′′ + 7u′ + 12u = 2e^(−4x)
+      = u_h = C_1e^(−4x) + C_2e^(−3x)   ← Solution de l'équation homogène
+    — Remplace u_p = Axe^(−4x) dans le membre de gauche :  [juge equiv]  départ : (Axe^(−4x))′′ + 7(Axe^(−4x))′ + 12(Axe^(−4x))
+      ? Quelle forme pour u_p ? · <math alttext="Ae^(−4x)"><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>4</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / ✔ <math alttext="Axe^(−4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mi>x</mi></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>4</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math> / · <math alttext="Ax²e^(−4x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mrow><mo>−</mo><mn>4</mn></mrow><mo>&#x2062;</mo><mi>x</mi></mrow></msup></mrow></math>
+      = −Ae^(−4x)   ← u_p = A x e^(-4x) remplacée dans le membre de gauche
+    — Identifie les coefficients de −Ae^(−4x) = 2e^(−4x) :  [juge system]  départ : −A = 2
+      = A = −2   ← Résoudre
+    — La solution particulière :  [juge ode]  départ : u′′ + 7u′ + 12u = 2e^(−4x)
+      = u_p = −2xe^(−4x)   ← Les coefficients dans la forme
+    — La solution générale, puis les conditions initiales :  [juge ode]  départ : u′′ + 7u′ + 12u = 2e^(−4x)
+      = u = C_1e^(−4x) + C_2e^(−3x) − 2xe^(−4x)   ← y = y_h + y_p
+      = C_1 = −3 ; C_2 = 2   ← u(0) = −1, u′(0) = 4
+      = u = −3e^(−4x) + 2e^(−3x) − 2xe^(−4x)   ← La solution du problème de Cauchy
+    — La valeur demandée :  [juge value]  départ : u(1)
+      = −5e^(−4) + 2e^(−3)   ← Remplacer x par 1
+  pièges : a2_ode_resonance_no_x
 
-Soit u la solution de u′′ + 9u = 6sin(3x) avec u(0) = 2 et u′(0) = −4. Alors u(π) vaut :
-  · −2 − π   · −2 + π/2   · −2 [a2_ode_resonance_no_x]   ✔ −2 + π
+Trouve la solution de u′′ + 9u = 12cos(3x) avec u(0) = 1 et u′(0) = 6, puis calcule u(π).
+  [problème, 10 points]
+  partie 1 (Début du problème : 1 ; Solution de l'équation homogène u′′ + 9u = 0 : 1 ; Remplace u_p = x(Acos(3x) + Bsin(3x)) dans le membre de gauche : 2 ; Identifie les coefficients de 6Bcos(3x) − 6Asin(3x) = 12cos(3x) : 1 ; La solution particulière : 1 ; La solution générale, puis les conditions initiales : 3 ; La valeur demandée : 1)
+    [free, sans aide, suivre l'erreur]  r² + 9 = 0
+      (Équation caractéristique : ses racines.)
+      = r = 3i ou r = −3i   ← Racines de l'équation caractéristique
+    — Solution de l'équation homogène u′′ + 9u = 0 :  [juge ode]  départ : u′′ + 9u = 12cos(3x)
+      = u_h = C_1cos(3x) + C_2sin(3x)   ← Solution de l'équation homogène
+    — Remplace u_p = x(Acos(3x) + Bsin(3x)) dans le membre de gauche :  [juge equiv]  départ : (x(Acos(3x) + Bsin(3x)))′′ + 9(x(Acos(3x) + Bsin(3x)))
+      ? Quelle forme pour u_p ? · <math alttext="Acos(3x) + Bsin(3x)"><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow></math> / ✔ <math alttext="x(Acos(3x) + Bsin(3x))"><mrow><mi>x</mi><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math> / · <math alttext="x²(Acos(3x) + Bsin(3x))"><mrow><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mi>A</mi><mo>&#x2062;</mo><mrow><mi>cos</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow><mo>+</mo><mrow><mi>B</mi><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></math>
+      = 6Bcos(3x) − 6Asin(3x)   ← u_p = x(A cos(3x)+B sin(3x)) remplacée dans le membre de gauche
+    — Identifie les coefficients de 6Bcos(3x) − 6Asin(3x) = 12cos(3x) :  [juge system]  départ : −6A = 0 ; 6B = 12
+      = A = 0 ; B = 2   ← Résoudre
+    — La solution particulière :  [juge ode]  départ : u′′ + 9u = 12cos(3x)
+      = u_p = 2xsin(3x)   ← Les coefficients dans la forme
+    — La solution générale, puis les conditions initiales :  [juge ode]  départ : u′′ + 9u = 12cos(3x)
+      = u = C_1cos(3x) + C_2sin(3x) + 2xsin(3x)   ← y = y_h + y_p
+      = C_1 = 1 ; C_2 = 2   ← u(0) = 1, u′(0) = 6
+      = u = cos(3x) + 2sin(3x) + 2xsin(3x)   ← La solution du problème de Cauchy
+    — La valeur demandée :  [juge value]  départ : u(π)
+      = −1   ← Remplacer x par π
   pièges : a2_ode_resonance_no_x
 
 ```
@@ -10682,12 +10710,12 @@ Soit u la solution de u′′ + 9u = 6sin(3x) avec u(0) = 2 et u′(0) = −4. A
 ### Variantes d'examen
 
 ```
-Soit y la solution de y′′ + 4y = −8sin(2x) avec y(0) = −3 et y′(0) = 8. Alors y(π/2) vaut :
-  ✔ 3 − π   · 3 [a2_ode_resonance_no_x]   · 3 + π   · 3 − π/2
+Soit u la solution de u′′ − 2u′ + 10u = −20e^(2x) avec u(0) = 1 et u′(0) = 5. Alors u(π) vaut :
+  · −2e^π − e^(2π)   ✔ −3e^π − 2e^(2π)   · e^π + 2e^(2π)   · −e^π − 2e^(2π) [a2_ode_ic_before_particular]
   [examen mcq]
-  pièges : a2_ode_resonance_no_x
+  pièges : a2_ode_ic_before_particular
 
-Vrai ou faux ? « Pour y′′ + 4y′ + 5y = −26e^(3x), il existe une solution particulière de la forme y_p = Ae^(3x). »
+Vrai ou faux ? « Pour y′′ − 2y′ − 8y = 24x − 10, il existe une solution particulière de la forme y_p = Ax + B. »
   ✔ Vrai   · Faux
   [examen tf]
 
@@ -10700,27 +10728,100 @@ _Ordre, séparable, linéaire, homogène : la case de l'organigramme, puis la m�
 ### Niveau 1
 
 ```
-Choisis la méthode, puis résous y′ = cos(x)y (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
-  [guided]  y′ = cos(x)y
-    ? Est-ce une équation d'ordre 2 à coefficients constants ? · Oui / ✔ Non
-    ? Est-elle séparable : y′ = g(x)·h(y) ? ✔ Oui / · Non
-    ? Est-elle linéaire : y′ = a(x)y + b(x) ? ✔ Oui / · Non
-    = y = Ce^(sin(x))   ← y = Ce^{∫a}
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire sans second membre : y = Ce^{∫a}. | y = Ce^(sin(x))
+Choisis la méthode, puis résous y′′ − 4y′ + 3y = 0 (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
+  [guided]  y′′ − 4y′ + 3y = 0
+    ? Est-ce une équation d'ordre 2 à coefficients constants ? ✔ Oui / · Non
+    (Équation caractéristique : r² − 4r + 3 = 0.)
+    = y = C_1e^x + C_2e^(3x)   ← Racines r = 1 et r = 3
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Coefficients constants : équation caractéristique. | y = C_1e^x + C_2e^(3x)
 
-Choisis la méthode, puis résous y′ = 3x²y (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
-  [guided]  y′ = 3x²y
-    ? Est-ce une équation d'ordre 2 à coefficients constants ? · Oui / ✔ Non
-    ? Est-elle séparable : y′ = g(x)·h(y) ? ✔ Oui / · Non
-    ? Est-elle linéaire : y′ = a(x)y + b(x) ? ✔ Oui / · Non
-    = y = Ce^(x³)   ← y = Ce^{∫a}
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire sans second membre : y = Ce^{∫a}. | y = Ce^(x³)
-
-Choisis la méthode, puis résous y′ = y + x (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
-  [guided]  y′ = y + x
+Choisis la méthode, puis résous y′ = y + 2x (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
+  [guided]  y′ = y + 2x
     ? Est-ce une équation d'ordre 2 à coefficients constants ? · Oui / ✔ Non
     ? Est-elle séparable : y′ = g(x)·h(y) ? · Oui / ✔ Non
     ? Est-elle linéaire : y′ = a(x)y + b(x) ? ✔ Oui / · Non
+    = y′ − y = □x   (trous : y′ − y = 2x)   ← Forme y′ + a(x)y = b(x)
+    = μ = e^(−x)   ← Facteur intégrant
+    = y = Ce^x − □x − 2   (trous : y = Ce^x − 2x − 2)   ← (μy)′ = μb, intégrer par parties
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire : facteur intégrant μ. | y′ − y = 2x
+  pièges : a2_ode_method_separable_sum
+
+Choisis la méthode, puis résous y′ = (xy + 2y²)/x² (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
+  [guided]  y′ = (xy + 2y²)/x²
+    ? Est-ce une équation d'ordre 2 à coefficients constants ? · Oui / ✔ Non
+    ? Est-elle séparable : y′ = g(x)·h(y) ? · Oui / ✔ Non
+    ? Est-elle linéaire : y′ = a(x)y + b(x) ? · Oui / ✔ Non
+    ? Est-elle homogène : y′ = F(y/x) ? ✔ Oui / · Non
+    (Avec y = xv, y′ = v + xv′ : l'équation devient xv′ = 2v².)
+    = dv/v² = (2/x)dx   ← Séparer
+    = −1/v = □ln(x) + C   (trous : −1/v = 2ln(x) + C)   ← Intégrer
+    = v = −1/(2ln(x) + C)   ← Isoler v
+  — Retour à y = xv :  [juge ode]  départ : y′ = (xy + 2y²)/x²
+    = y = −x/(2ln(x) + C)   ← y = xv
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Homogène : poser y = xv. | dv/v² = (2/x)dx
+  pièges : a2_ode_method_linear_nonlinear
+
+```
+
+### Niveau 2
+
+```
+Choisis la méthode, puis résous y′ = 3y − 6 (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
+  [guided]  z′ = 3z
+    (La solution constante est y = 2 ; on pose y = 2 + z :)
+    ? Quelle méthode ? ✔ Linéaire à coefficients constants : décaler vers la solution constante / ✔ Séparer les variables / ✔ Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique
+    = z = Ce^(3x)   ← z′ = az
+  — Retour à y :  [juge ode]  départ : y′ = 3y − 6
+    = y = 2 + Ce^(3x)   ← y = 2 + z
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire à coefficients constants : décaler vers la solution constante. | z = Ce^(3x)
+
+Choisis la méthode, puis résous y′ = 2y − 4x (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
+  [guided]  y′ = 2y − 4x
+    ? Quelle méthode ? ✔ Linéaire : facteur intégrant μ / · Séparer les variables / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
+    = y′ − □y = −□x   (trous : y′ − 2y = −4x)   ← Forme y′ + a(x)y = b(x)
+    = μ = e^(−2x)   ← Facteur intégrant
+    = y = Ce^(2x) + □x + 1   (trous : y = Ce^(2x) + 2x + 1)   ← (μy)′ = μb, intégrer par parties
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire : facteur intégrant μ. | y′ − 2y = −4x
+  pièges : a2_ode_method_separable_sum
+
+Choisis la méthode, puis résous y′ = 3y − 9 (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
+  [guided]  z′ = 3z
+    (La solution constante est y = 3 ; on pose y = 3 + z :)
+    ? Quelle méthode ? ✔ Linéaire à coefficients constants : décaler vers la solution constante / ✔ Séparer les variables / ✔ Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique
+    = z = Ce^(3x)   ← z′ = az
+  — Retour à y :  [juge ode]  départ : y′ = 3y − 9
+    = y = 3 + Ce^(3x)   ← y = 3 + z
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire à coefficients constants : décaler vers la solution constante. | z = Ce^(3x)
+
+```
+
+### Niveau 3
+
+```
+Choisis la méthode, puis résous y′ = −cos(x)(1 + y²) (solution générale).
+  [tap, suivre l'erreur, menu steps]  y′ = −cos(x)(1 + y²)
+    ? Quelle méthode ? ✔ Séparer les variables / · Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
+    = dy/(1 + y²) = −cos(x)dx   ← Séparer
+    = arctan(y) = −sin(x) + C   ← Intégrer
+    = y = tan(−sin(x) + C)   ← Isoler y
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Séparer les variables. | dy/(1 + y²) = −cos(x)dx
+  pièges : a2_ode_method_linear_nonlinear
+
+Choisis la méthode, puis résous y′ = (xy + 2y²)/x² (solution générale).
+  [tap, suivre l'erreur, menu steps]  y′ = (xy + 2y²)/x²
+    ? Quelle méthode ? ✔ Homogène : poser y = xv / · Linéaire : facteur intégrant μ / · Séparer les variables / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
+    (Avec y = xv, y′ = v + xv′ : l'équation devient xv′ = 2v².)
+    = dv/v² = (2/x)dx   ← Séparer
+    = −1/v = 2ln(x) + C   ← Intégrer
+    = v = −1/(2ln(x) + C)   ← Isoler v
+  — Retour à y = xv :  [juge ode]  départ : y′ = (xy + 2y²)/x²
+    = y = −x/(2ln(x) + C)   ← y = xv
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Homogène : poser y = xv. | dv/v² = (2/x)dx
+  pièges : a2_ode_method_linear_nonlinear
+
+Choisis la méthode, puis résous y′ = y + x (solution générale).
+  [tap, suivre l'erreur, menu steps]  y′ = y + x
+    ? Quelle méthode ? ✔ Linéaire : facteur intégrant μ / · Séparer les variables / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
     = y′ − y = x   ← Forme y′ + a(x)y = b(x)
     = μ = e^(−x)   ← Facteur intégrant
     = y = Ce^x − x − 1   ← (μy)′ = μb, intégrer par parties
@@ -10729,129 +10830,66 @@ Choisis la méthode, puis résous y′ = y + x (solution générale). L'organigr
 
 ```
 
-### Niveau 2
-
-```
-Choisis la méthode, puis résous y′ = y − 3 (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
-  [guided]  z′ = z
-    (La solution constante est y = 3 ; on pose y = 3 + z :)
-    ? Quelle méthode ? ✔ Linéaire à coefficients constants : décaler vers la solution constante / ✔ Séparer les variables / ✔ Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique
-    = z = Ce^x   ← z′ = az
-  — Retour à y :  [juge ode]  départ : y′ = y − 3
-    = y = 3 + Ce^x   ← y = 3 + z
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire à coefficients constants : décaler vers la solution constante. | z = Ce^x
-
-Choisis la méthode, puis résous y′ = y/x (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
-  [guided]  y′ = y/x
-    ? Quelle méthode ? ✔ Linéaire sans second membre : y = Ce^{∫a} / ✔ Séparer les variables / ✔ Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique
-    = y = Cx   ← y = Ce^{∫a}
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire sans second membre : y = Ce^{∫a}. | y = Cx
-
-Choisis la méthode, puis résous y′ = y/x + (y/x)² (solution générale). L'organigramme :Ordre ? Ordre 2 linéaire à coefficients constants : équation caractéristique.Séparable ? y′ = g(x)·h(y) : noter les zéros de h, séparer, intégrer.Linéaire ? y′ = a(x)y + b(x) : si b = 0, y = Ce^{∫a} ; si a et b sont constants, décaler vers la solution constante ; sinon, facteur intégrant.Homogène ? y′ = F(y/x) : poser y = xv.
-  [guided]  y′ = y/x + (y/x)²
-    ? Quelle méthode ? ✔ Homogène : poser y = xv / · Linéaire : facteur intégrant μ / · Séparer les variables / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
-    (Avec y = xv, y′ = v + xv′ : l'équation devient xv′ = v².)
-    = dv/v² = (1/x)dx   ← Séparer
-    = −1/v = ln(x) + C   ← Intégrer
-    = v = −1/(ln(x) + C)   ← Isoler v
-  — Retour à y = xv :  [juge ode]  départ : y′ = y/x + (y/x)²
-    = y = −x/(ln(x) + C)   ← y = xv
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Homogène : poser y = xv. | dv/v² = (1/x)dx
-  pièges : a2_ode_method_linear_nonlinear
-
-```
-
-### Niveau 3
-
-```
-Choisis la méthode, puis résous y′ = (xy + 3y²)/x² (solution générale).
-  [tap, suivre l'erreur, menu steps]  y′ = (xy + 3y²)/x²
-    ? Quelle méthode ? ✔ Homogène : poser y = xv / · Linéaire : facteur intégrant μ / · Séparer les variables / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
-    (Avec y = xv, y′ = v + xv′ : l'équation devient xv′ = 3v².)
-    = dv/v² = (3/x)dx   ← Séparer
-    = −1/v = 3ln(x) + C   ← Intégrer
-    = v = −1/(3ln(x) + C)   ← Isoler v
-  — Retour à y = xv :  [juge ode]  départ : y′ = (xy + 3y²)/x²
-    = y = −x/(3ln(x) + C)   ← y = xv
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Homogène : poser y = xv. | dv/v² = (3/x)dx
-  pièges : a2_ode_method_linear_nonlinear
-
-Choisis la méthode, puis résous y′ = 2xy² (solution générale).
-  [tap, suivre l'erreur, menu steps]  y′ = 2xy²
-    ? Quelle méthode ? ✔ Séparer les variables / · Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
-    = dy/y² = 2xdx   ← Séparer (y = 0 est aussi solution)
-    = −1/y = x² + C   ← Intégrer
-    = y = −1/(x² + C)   ← Isoler y
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Séparer les variables. | dy/y² = 2xdx
-  pièges : a2_ode_method_linear_nonlinear
-
-Choisis la méthode, puis résous y′ = −y + 2x (solution générale).
-  [tap, suivre l'erreur, menu steps]  y′ = −y + 2x
-    ? Quelle méthode ? ✔ Linéaire : facteur intégrant μ / · Séparer les variables / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
-    = y′ + y = 2x   ← Forme y′ + a(x)y = b(x)
-    = μ = e^x   ← Facteur intégrant
-    = y = Ce^(−x) + 2x − 2   ← (μy)′ = μb, intégrer par parties
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire : facteur intégrant μ. | y′ + y = 2x
-  pièges : a2_ode_method_separable_sum
-
-```
-
 ### Niveau 4
 
 ```
-Choisis la méthode, puis résous y′′ + y′ = 0 (solution générale).
-  [free, suivre l'erreur]  y′′ + y′ = 0
-    ? Quelle méthode ? ✔ Coefficients constants : équation caractéristique / · Séparer les variables / · Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Linéaire à coefficients constants : décaler vers la solution constante
-    (Équation caractéristique : r² + r = 0.)
-    = y = C_1e^(−x) + C_2   ← Racines r = −1 et r = 0
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Coefficients constants : équation caractéristique. | y = C_1e^(−x) + C_2
-
-Choisis la méthode, puis résous y′ = 2xy² (solution générale).
-  [free, suivre l'erreur]  y′ = 2xy²
-    ? Quelle méthode ? ✔ Séparer les variables / · Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
-    = dy/y² = 2xdx   ← Séparer (y = 0 est aussi solution)
-    = −1/y = x² + C   ← Intégrer
-    = y = −1/(x² + C)   ← Isoler y
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Séparer les variables. | dy/y² = 2xdx
+Choisis la méthode, puis résous y′ = (xy − y²)/x² (solution générale).
+  [free, suivre l'erreur]  y′ = (xy − y²)/x²
+    ? Quelle méthode ? ✔ Homogène : poser y = xv / · Linéaire : facteur intégrant μ / · Séparer les variables / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
+    (Avec y = xv, y′ = v + xv′ : l'équation devient xv′ = −v².)
+    = dv/v² = (−1/x)dx   ← Séparer
+    = −1/v = −ln(x) + C   ← Intégrer
+    = v = −1/(−ln(x) + C)   ← Isoler v
+  — Retour à y = xv :  [juge ode]  départ : y′ = (xy − y²)/x²
+    = y = −x/(−ln(x) + C)   ← y = xv
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Homogène : poser y = xv. | dv/v² = (−1/x)dx
   pièges : a2_ode_method_linear_nonlinear
 
-Choisis la méthode, puis résous y′ = y/x (solution générale).
-  [free, suivre l'erreur]  y′ = y/x
-    ? Quelle méthode ? ✔ Linéaire sans second membre : y = Ce^{∫a} / ✔ Séparer les variables / ✔ Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique
-    = y = Cx   ← y = Ce^{∫a}
-  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Linéaire sans second membre : y = Ce^{∫a}. | y = Cx
+Choisis la méthode, puis résous y′′ − 5y′ + 6y = 0 (solution générale).
+  [free, suivre l'erreur]  y′′ − 5y′ + 6y = 0
+    ? Quelle méthode ? ✔ Coefficients constants : équation caractéristique / · Séparer les variables / · Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Linéaire à coefficients constants : décaler vers la solution constante
+    (Équation caractéristique : r² − 5r + 6 = 0.)
+    = y = C_1e^(2x) + C_2e^(3x)   ← Racines r = 2 et r = 3
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Coefficients constants : équation caractéristique. | y = C_1e^(2x) + C_2e^(3x)
+
+Choisis la méthode, puis résous y′ = e^x(1 + y²) (solution générale).
+  [free, suivre l'erreur]  y′ = e^x(1 + y²)
+    ? Quelle méthode ? ✔ Séparer les variables / · Linéaire : facteur intégrant μ / · Homogène : poser y = xv / · Coefficients constants : équation caractéristique / · Linéaire à coefficients constants : décaler vers la solution constante
+    = dy/(1 + y²) = e^xdx   ← Séparer
+    = arctan(y) = e^x + C   ← Intégrer
+    = y = tan(e^x + C)   ← Isoler y
+  aides : Suis l'organigramme : ordre, puis séparable ?, puis linéaire ?, puis homogène ? | Ici : Séparer les variables. | dy/(1 + y²) = e^xdx
+  pièges : a2_ode_method_linear_nonlinear
 
 ```
 
 ### Niveau 5
 
 ```
-Résous y′ = e^xy² (solution générale).
-  [free, sans aide]  y′ = e^xy²
-    = dy/y² = e^xdx   ← Séparer (y = 0 est aussi solution)
-    = −1/y = e^x + C   ← Intégrer
-    = y = −1/(e^x + C)   ← Isoler y
+Résous y′ = −e^xy² (solution générale).
+  [free, sans aide]  y′ = −e^xy²
+    = dy/y² = −e^xdx   ← Séparer (y = 0 est aussi solution)
+    = −1/y = −e^x + C   ← Intégrer
+    = y = 1/(e^x + C)   ← Isoler y
   pièges : a2_ode_method_linear_nonlinear
 
-Résous y′ = cos(x)y (solution générale).
-  [free, sans aide]  y′ = cos(x)y
-    = y = Ce^(sin(x))   ← y = Ce^{∫a}
+Résous y′ = y/x (solution générale).
+  [free, sans aide]  y′ = y/x
+    = y = Cx   ← y = Ce^{∫a}
 
-Résous y′ = 3y − 6 (solution générale).
-  [free, sans aide]  z′ = 3z
-    (La solution constante est y = 2 ; on pose y = 2 + z :)
-    = z = Ce^(3x)   ← z′ = az
-  — Retour à y :  [juge ode]  départ : y′ = 3y − 6
-    = y = 2 + Ce^(3x)   ← y = 2 + z
+Résous y′ = 3x²y (solution générale).
+  [free, sans aide]  y′ = 3x²y
+    = y = Ce^(x³)   ← y = Ce^{∫a}
 
 ```
 
 ### Variantes d'examen
 
 ```
-Quelle est la méthode la plus directe pour résoudre y′ = −y + 1 ?
-  · Coefficients constants : équation caractéristique   · Homogène : poser y = xv   ✔ Linéaire à coefficients constants : décaler vers la solution constante
+Quelle est la méthode la plus directe pour résoudre y′ = −2x(1 + y²) ?
+  · Homogène : poser y = xv   · Linéaire : facteur intégrant μ [a2_ode_method_linear_nonlinear]   ✔ Séparer les variables   · Coefficients constants : équation caractéristique
   [examen mcq]
+  pièges : a2_ode_method_linear_nonlinear
 
 ```
 
@@ -10862,69 +10900,69 @@ _Toutes les solutions de y″ + py′ + qy = 0 tendent vers 0 ⇔ p > 0 et q > 0
 ### Niveau 1
 
 ```
-Pour quelles valeurs de a toutes les solutions de y′′ + (1 − a)y′ + (a² − 2a − 3)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [guided]  ((e^(rx))′′ + (1 − a)(e^(rx))′ + (a² − 2a − 3)e^(rx))/e^(rx)
-    = r² + (1 − a)r + a² − 2a − 3   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : 1 − a > 0 et a² − 2a − 3 > 0
-    (Critère : toutes les solutions tendent vers 0 ⇔ 1 − a > 0 et a² − 2a − 3 > 0 (bornes exclues).)
-    = a < □ et (a < □ ou a > 3)   (trous : a < 1 et (a < −1 ou a > 3))   ← Chaque inégalité
-    = ]−∞ ; □[   (trous : ]−∞ ; −1[)   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 1 − a > 0 et a² − 2a − 3 > 0, puis l'intersection. | a < 1 et (a < −1 ou a > 3), donc a ∈ ]−∞ ; −1[.
+Pour quelles valeurs de a toutes les solutions de y′′ + (3 − a)y′ + 4y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [guided]  ((e^(rx))′′ + (3 − a)(e^(rx))′ + 4e^(rx))/e^(rx)
+    = r² + (3 − a)r + 4   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : 3 − a > 0 et 4 > 0
+    (Critère : toutes les solutions tendent vers 0 ⇔ 3 − a > 0 et 4 > 0 (bornes exclues).)
+    = a < □   (trous : a < 3)   ← Chaque inégalité
+    = ]−∞ ; □[   (trous : ]−∞ ; 3[)   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 3 − a > 0 et 4 > 0, puis l'intersection. | a < 3, donc a ∈ ]−∞ ; 3[.
 
-Pour quelles valeurs de a toutes les solutions de y′′ + (1 − a)y′ + (a² − 5a + 6)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [guided]  ((e^(rx))′′ + (1 − a)(e^(rx))′ + (a² − 5a + 6)e^(rx))/e^(rx)
-    = r² + (1 − a)r + a² − 5a + 6   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : 1 − a > 0 et a² − 5a + 6 > 0
-    (Critère : toutes les solutions tendent vers 0 ⇔ 1 − a > 0 et a² − 5a + 6 > 0 (bornes exclues).)
-    = a < □ et (a < □ ou a > 3)   (trous : a < 1 et (a < 2 ou a > 3))   ← Chaque inégalité
-    = ]−∞ ; □[   (trous : ]−∞ ; 1[)   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 1 − a > 0 et a² − 5a + 6 > 0, puis l'intersection. | a < 1 et (a < 2 ou a > 3), donc a ∈ ]−∞ ; 1[.
+Pour quelles valeurs de a toutes les solutions de y′′ + (a − 2)y′ + (−a² + 5a − 6)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [guided]  ((e^(rx))′′ + (a − 2)(e^(rx))′ + (−a² + 5a − 6)e^(rx))/e^(rx)
+    = r² + (a − 2)r − a² + 5a − 6   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : a − 2 > 0 et −a² + 5a − 6 > 0
+    (Critère : toutes les solutions tendent vers 0 ⇔ a − 2 > 0 et −a² + 5a − 6 > 0 (bornes exclues).)
+    = a > □ et □ < a < 3   (trous : a > 2 et 2 < a < 3)   ← Chaque inégalité
+    = ]□ ; 3[   (trous : ]2 ; 3[)   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a − 2 > 0 et −a² + 5a − 6 > 0, puis l'intersection. | a > 2 et 2 < a < 3, donc a ∈ ]2 ; 3[.
 
-Pour quelles valeurs de a toutes les solutions de y′′ + ay′ + (−a² + 2a)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [guided]  ((e^(rx))′′ + a(e^(rx))′ + (−a² + 2a)e^(rx))/e^(rx)
-    = r² + ar − a² + 2a   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : a > 0 et −a² + 2a > 0
-    (Critère : toutes les solutions tendent vers 0 ⇔ a > 0 et −a² + 2a > 0 (bornes exclues).)
-    = a > □ et □ < a < 2   (trous : a > 0 et 0 < a < 2)   ← Chaque inégalité
-    = ]□ ; 2[   (trous : ]0 ; 2[)   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a > 0 et −a² + 2a > 0, puis l'intersection. | a > 0 et 0 < a < 2, donc a ∈ ]0 ; 2[.
+Pour quelles valeurs de a toutes les solutions de y′′ + (a + 1)y′ + 2y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [guided]  ((e^(rx))′′ + (a + 1)(e^(rx))′ + 2e^(rx))/e^(rx)
+    = r² + (a + 1)r + 2   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : a + 1 > 0 et 2 > 0
+    (Critère : toutes les solutions tendent vers 0 ⇔ a + 1 > 0 et 2 > 0 (bornes exclues).)
+    = a > □   (trous : a > −1)   ← Chaque inégalité
+    = ]□ ; +∞[   (trous : ]−1 ; +∞[)   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a + 1 > 0 et 2 > 0, puis l'intersection. | a > −1, donc a ∈ ]−1 ; +∞[.
 
 ```
 
 ### Niveau 2
 
 ```
-Pour quelles valeurs de a toutes les solutions de y′′ + (1 − a)y′ + 4y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [guided]  ((e^(rx))′′ + (1 − a)(e^(rx))′ + 4e^(rx))/e^(rx)
-    = r² + (1 − a)r + 4   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : 1 − a > 0 et 4 > 0
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="1 − a &gt; 0"><mrow><mrow><mn>1</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="4 &gt; 0"><mrow><mn>4</mn><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(1 − a)² − 16"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mn>16</mn></mrow></math> < 0 / · <math alttext="1 − a &gt; 0"><mrow><mrow><mn>1</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = 1, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±2i est racine, y = cos(2x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = a < □   (trous : a < 1)   ← Chaque inégalité
-    = ]□ ; □[   (trous : ]−∞ ; 1[)   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 1 − a > 0 et 4 > 0, puis l'intersection. | a < 1, donc a ∈ ]−∞ ; 1[.
-  pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
-
-Pour quelles valeurs de a toutes les solutions de y′′ + (3 − a)y′ + 4y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [guided]  ((e^(rx))′′ + (3 − a)(e^(rx))′ + 4e^(rx))/e^(rx)
-    = r² + (3 − a)r + 4   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : 3 − a > 0 et 4 > 0
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="4 &gt; 0"><mrow><mn>4</mn><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(3 − a)² − 16"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mn>16</mn></mrow></math> < 0 / · <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = 3, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±2i est racine, y = cos(2x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = a < □   (trous : a < 3)   ← Chaque inégalité
-    = ]□ ; □[   (trous : ]−∞ ; 3[)   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 3 − a > 0 et 4 > 0, puis l'intersection. | a < 3, donc a ∈ ]−∞ ; 3[.
-  pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
-
-Pour quelles valeurs de a toutes les solutions de y′′ + (a + 2)y′ + (−a² + 4a − 3)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [guided]  ((e^(rx))′′ + (a + 2)(e^(rx))′ + (−a² + 4a − 3)e^(rx))/e^(rx)
-    = r² + (a + 2)r − a² + 4a − 3   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : a + 2 > 0 et −a² + 4a − 3 > 0
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a + 2 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>2</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="−a² + 4a − 3 &gt; 0"><mrow><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(a + 2)² − 4(−a² + 4a − 3)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>+</mo><mn>2</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="a + 2 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>2</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="−a² + 4a − 3 &gt; 0"><mrow><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+Pour quelles valeurs de a toutes les solutions de y′′ + ay′ + (−a² + 4a − 3)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [guided]  ((e^(rx))′′ + a(e^(rx))′ + (−a² + 4a − 3)e^(rx))/e^(rx)
+    = r² + ar − a² + 4a − 3   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : a > 0 et −a² + 4a − 3 > 0
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a &gt; 0"><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="−a² + 4a − 3 &gt; 0"><mrow><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="a² − 4(−a² + 4a − 3)"><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="a &gt; 0"><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="−a² + 4a − 3 &gt; 0"><mrow><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
     ? En a = 1, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = 0 est racine, y = 1 ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = a > □ et □ < a < □   (trous : a > −2 et 1 < a < 3)   ← Chaque inégalité
+    = a > □ et □ < a < □   (trous : a > 0 et 1 < a < 3)   ← Chaque inégalité
     = ]□ ; □[   (trous : ]1 ; 3[)   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a + 2 > 0 et −a² + 4a − 3 > 0, puis l'intersection. | a > −2 et 1 < a < 3, donc a ∈ ]1 ; 3[.
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a > 0 et −a² + 4a − 3 > 0, puis l'intersection. | a > 0 et 1 < a < 3, donc a ∈ ]1 ; 3[.
+  pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
+
+Pour quelles valeurs de a toutes les solutions de y′′ + (2 − a)y′ + (a² − 2a)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [guided]  ((e^(rx))′′ + (2 − a)(e^(rx))′ + (a² − 2a)e^(rx))/e^(rx)
+    = r² + (2 − a)r + a² − 2a   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : 2 − a > 0 et a² − 2a > 0
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="2 − a &gt; 0"><mrow><mrow><mn>2</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="a² − 2a &gt; 0"><mrow><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(2 − a)² − 4(a² − 2a)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="2 − a &gt; 0"><mrow><mrow><mn>2</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="a² − 2a &gt; 0"><mrow><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = 0, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = 0 est racine, y = 1 ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = a < □ et (a < □ ou a > □)   (trous : a < 2 et (a < 0 ou a > 2))   ← Chaque inégalité
+    = ]□ ; □[   (trous : ]−∞ ; 0[)   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 2 − a > 0 et a² − 2a > 0, puis l'intersection. | a < 2 et (a < 0 ou a > 2), donc a ∈ ]−∞ ; 0[.
+  pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
+
+Pour quelles valeurs de a toutes les solutions de y′′ + (−2 − a)y′ + (−a)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [guided]  ((e^(rx))′′ + (−2 − a)(e^(rx))′ + (−a)e^(rx))/e^(rx)
+    = r² + (−2 − a)r − a   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : −2 − a > 0 et −a > 0
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="−2 − a &gt; 0"><mrow><mrow><mrow><mo>−</mo><mn>2</mn></mrow><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="−a &gt; 0"><mrow><mrow><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(−2 − a)² − 4(−a)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>−</mo><mn>2</mn></mrow><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="−2 − a &gt; 0"><mrow><mrow><mrow><mo>−</mo><mn>2</mn></mrow><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="−a &gt; 0"><mrow><mrow><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = −2, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±i√2 est racine, y = cos(√2 x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = a < □ et a < □   (trous : a < −2 et a < 0)   ← Chaque inégalité
+    = ]□ ; □[   (trous : ]−∞ ; −2[)   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | −2 − a > 0 et −a > 0, puis l'intersection. | a < −2 et a < 0, donc a ∈ ]−∞ ; −2[.
   pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
 
 ```
@@ -10932,40 +10970,40 @@ Pour quelles valeurs de a toutes les solutions de y′′ + (a + 2)y′ + (−a�
 ### Niveau 3
 
 ```
-Pour quelles valeurs de a toutes les solutions de y′′ + ay′ + (1 − a²)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [tap, suivre l'erreur, menu steps]  ((e^(rx))′′ + a(e^(rx))′ + (1 − a²)e^(rx))/e^(rx)
-    = r² + ar + 1 − a²   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : a > 0 et 1 − a² > 0
+Pour quelles valeurs de a toutes les solutions de y′′ + (a − 3)y′ + (a² − 3a)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [tap, suivre l'erreur, menu steps]  ((e^(rx))′′ + (a − 3)(e^(rx))′ + (a² − 3a)e^(rx))/e^(rx)
+    = r² + (a − 3)r + a² − 3a   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : a − 3 > 0 et a² − 3a > 0
     ? Comment décider ? ✔ Critère des coefficients : p > 0 et q > 0 / ✔ Calculer les racines selon le signe de Δ
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a &gt; 0"><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="1 − a² &gt; 0"><mrow><mrow><mn>1</mn><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="a² − 4(1 − a²)"><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="a &gt; 0"><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="1 − a² &gt; 0"><mrow><mrow><mn>1</mn><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = 0, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±i est racine, y = cos(x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = a > 0 et −1 < a < 1   ← Chaque inégalité
-    = ]0 ; 1[   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a > 0 et 1 − a² > 0, puis l'intersection. | a > 0 et −1 < a < 1, donc a ∈ ]0 ; 1[.
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a − 3 &gt; 0"><mrow><mrow><mi>a</mi><mo>−</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="a² − 3a &gt; 0"><mrow><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(a − 3)² − 4(a² − 3a)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>−</mo><mn>3</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="a − 3 &gt; 0"><mrow><mrow><mi>a</mi><mo>−</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="a² − 3a &gt; 0"><mrow><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = 3, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = 0 est racine, y = 1 ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = a > 3 et (a < 0 ou a > 3)   ← Chaque inégalité
+    = ]3 ; +∞[   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a − 3 > 0 et a² − 3a > 0, puis l'intersection. | a > 3 et (a < 0 ou a > 3), donc a ∈ ]3 ; +∞[.
   pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
 
-Pour quelles valeurs de a toutes les solutions de y′′ + (a + 2)y′ + (−a² + 3a)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [tap, suivre l'erreur, menu steps]  ((e^(rx))′′ + (a + 2)(e^(rx))′ + (−a² + 3a)e^(rx))/e^(rx)
-    = r² + (a + 2)r − a² + 3a   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : a + 2 > 0 et −a² + 3a > 0
+Pour quelles valeurs de a toutes les solutions de y′′ + (3 − a)y′ + (−a² + 5a − 6)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [tap, suivre l'erreur, menu steps]  ((e^(rx))′′ + (3 − a)(e^(rx))′ + (−a² + 5a − 6)e^(rx))/e^(rx)
+    = r² + (3 − a)r − a² + 5a − 6   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : 3 − a > 0 et −a² + 5a − 6 > 0
     ? Comment décider ? ✔ Critère des coefficients : p > 0 et q > 0 / ✔ Calculer les racines selon le signe de Δ
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a + 2 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>2</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="−a² + 3a &gt; 0"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(a + 2)² − 4(−a² + 3a)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>+</mo><mn>2</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="a + 2 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>2</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="−a² + 3a &gt; 0"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = 0, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = 0 est racine, y = 1 ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = a > −2 et 0 < a < 3   ← Chaque inégalité
-    = ]0 ; 3[   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a + 2 > 0 et −a² + 3a > 0, puis l'intersection. | a > −2 et 0 < a < 3, donc a ∈ ]0 ; 3[.
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="−a² + 5a − 6 &gt; 0"><mrow><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>5</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>6</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(3 − a)² − 4(−a² + 5a − 6)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>5</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>6</mn></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="−a² + 5a − 6 &gt; 0"><mrow><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>5</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><mn>6</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = 2, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = 0 est racine, y = 1 ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = a < 3 et 2 < a < 3   ← Chaque inégalité
+    = ]2 ; 3[   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 3 − a > 0 et −a² + 5a − 6 > 0, puis l'intersection. | a < 3 et 2 < a < 3, donc a ∈ ]2 ; 3[.
   pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
 
-Pour quelles valeurs de a toutes les solutions de y′′ + (3 − a)y′ + (3 + 2a − a²)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [tap, suivre l'erreur, menu steps]  ((e^(rx))′′ + (3 − a)(e^(rx))′ + (3 + 2a − a²)e^(rx))/e^(rx)
-    = r² + (3 − a)r + 3 + 2a − a²   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : 3 − a > 0 et 3 + 2a − a² > 0
+Pour quelles valeurs de a toutes les solutions de y′′ + (−3 − a)y′ + 9y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [tap, suivre l'erreur, menu steps]  ((e^(rx))′′ + (−3 − a)(e^(rx))′ + 9e^(rx))/e^(rx)
+    = r² + (−3 − a)r + 9   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : −3 − a > 0 et 9 > 0
     ? Comment décider ? ✔ Critère des coefficients : p > 0 et q > 0 / ✔ Calculer les racines selon le signe de Δ
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="3 + 2a − a² &gt; 0"><mrow><mrow><mrow><mn>3</mn><mo>+</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(3 − a)² − 4(3 + 2a − a²)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mn>3</mn><mo>+</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="3 + 2a − a² &gt; 0"><mrow><mrow><mrow><mn>3</mn><mo>+</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = −1, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = 0 est racine, y = 1 ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = a < 3 et −1 < a < 3   ← Chaque inégalité
-    = ]−1 ; 3[   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 3 − a > 0 et 3 + 2a − a² > 0, puis l'intersection. | a < 3 et −1 < a < 3, donc a ∈ ]−1 ; 3[.
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="−3 − a &gt; 0"><mrow><mrow><mrow><mo>−</mo><mn>3</mn></mrow><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="9 &gt; 0"><mrow><mn>9</mn><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(−3 − a)² − 36"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>−</mo><mn>3</mn></mrow><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mn>36</mn></mrow></math> < 0 / · <math alttext="−3 − a &gt; 0"><mrow><mrow><mrow><mo>−</mo><mn>3</mn></mrow><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = −3, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±3i est racine, y = cos(3x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = a < −3   ← Chaque inégalité
+    = ]−∞ ; −3[   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | −3 − a > 0 et 9 > 0, puis l'intersection. | a < −3, donc a ∈ ]−∞ ; −3[.
   pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
 
 ```
@@ -10973,34 +11011,34 @@ Pour quelles valeurs de a toutes les solutions de y′′ + (3 − a)y′ + (3 +
 ### Niveau 4
 
 ```
-Pour quelles valeurs de a toutes les solutions de y′′ + (1 − a)y′ + 9y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [free, suivre l'erreur]  ((e^(rx))′′ + (1 − a)(e^(rx))′ + 9e^(rx))/e^(rx)
-    = r² + (1 − a)r + 9   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : 1 − a > 0 et 9 > 0
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="1 − a &gt; 0"><mrow><mrow><mn>1</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="9 &gt; 0"><mrow><mn>9</mn><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(1 − a)² − 36"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mn>1</mn><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mn>36</mn></mrow></math> < 0 / · <math alttext="1 − a &gt; 0"><mrow><mrow><mn>1</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = 1, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±3i est racine, y = cos(3x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = ]−∞ ; 1[   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 1 − a > 0 et 9 > 0, puis l'intersection. | a < 1, donc a ∈ ]−∞ ; 1[.
+Pour quelles valeurs de a toutes les solutions de y′′ + (a + 3)y′ + 2y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [free, suivre l'erreur]  ((e^(rx))′′ + (a + 3)(e^(rx))′ + 2e^(rx))/e^(rx)
+    = r² + (a + 3)r + 2   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : a + 3 > 0 et 2 > 0
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a + 3 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="2 &gt; 0"><mrow><mn>2</mn><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(a + 3)² − 8"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>+</mo><mn>3</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mn>8</mn></mrow></math> < 0 / · <math alttext="a + 3 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = −3, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±i√2 est racine, y = cos(√2 x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = ]−3 ; +∞[   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a + 3 > 0 et 2 > 0, puis l'intersection. | a > −3, donc a ∈ ]−3 ; +∞[.
   pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
 
-Pour quelles valeurs de a toutes les solutions de y′′ + (3 − a)y′ + 9y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [free, suivre l'erreur]  ((e^(rx))′′ + (3 − a)(e^(rx))′ + 9e^(rx))/e^(rx)
-    = r² + (3 − a)r + 9   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : 3 − a > 0 et 9 > 0
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="9 &gt; 0"><mrow><mn>9</mn><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(3 − a)² − 36"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mn>36</mn></mrow></math> < 0 / · <math alttext="3 − a &gt; 0"><mrow><mrow><mn>3</mn><mo>−</mo><mi>a</mi></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = 3, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±3i est racine, y = cos(3x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = ]−∞ ; 3[   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | 3 − a > 0 et 9 > 0, puis l'intersection. | a < 3, donc a ∈ ]−∞ ; 3[.
+Pour quelles valeurs de a toutes les solutions de y′′ + (a + 3)y′ + 9y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [free, suivre l'erreur]  ((e^(rx))′′ + (a + 3)(e^(rx))′ + 9e^(rx))/e^(rx)
+    = r² + (a + 3)r + 9   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : a + 3 > 0 et 9 > 0
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a + 3 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="9 &gt; 0"><mrow><mn>9</mn><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(a + 3)² − 36"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>+</mo><mn>3</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mn>36</mn></mrow></math> < 0 / · <math alttext="a + 3 &gt; 0"><mrow><mrow><mi>a</mi><mo>+</mo><mn>3</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = −3, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±3i est racine, y = cos(3x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = ]−3 ; +∞[   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a + 3 > 0 et 9 > 0, puis l'intersection. | a > −3, donc a ∈ ]−3 ; +∞[.
   pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
 
-Pour quelles valeurs de a toutes les solutions de y′′ + (a − 2)y′ + (−a² + 3a)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
-  [free, suivre l'erreur]  ((e^(rx))′′ + (a − 2)(e^(rx))′ + (−a² + 3a)e^(rx))/e^(rx)
-    = r² + (a − 2)r − a² + 3a   ← y = e^{rx}, puis diviser par e^{rx}
-  — L'ensemble des valeurs de a :  [juge solset]  départ : a − 2 > 0 et −a² + 3a > 0
-    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a − 2 &gt; 0"><mrow><mrow><mi>a</mi><mo>−</mo><mn>2</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="−a² + 3a &gt; 0"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="(a − 2)² − 4(−a² + 3a)"><mrow><msup><mrow><mo stretchy="false">(</mo><mrow><mi>a</mi><mo>−</mo><mn>2</mn></mrow><mo stretchy="false">)</mo></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="a − 2 &gt; 0"><mrow><mrow><mi>a</mi><mo>−</mo><mn>2</mn></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="−a² + 3a &gt; 0"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
-    ? En a = 2, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = ±i√2 est racine, y = cos(√2 x) ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
-    = ]2 ; 3[   ← Intersection, bornes exclues
-  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a − 2 > 0 et −a² + 3a > 0, puis l'intersection. | a > 2 et 0 < a < 3, donc a ∈ ]2 ; 3[.
+Pour quelles valeurs de a toutes les solutions de y′′ + ay′ + (−a² + 2a)y = 0 tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par e^(rx)).
+  [free, suivre l'erreur]  ((e^(rx))′′ + a(e^(rx))′ + (−a² + 2a)e^(rx))/e^(rx)
+    = r² + ar − a² + 2a   ← y = e^{rx}, puis diviser par e^{rx}
+  — L'ensemble des valeurs de a :  [juge solset]  départ : a > 0 et −a² + 2a > 0
+    ? Toutes les solutions tendent vers 0 si et seulement si : ✔ <math alttext="a &gt; 0"><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow></math> et <math alttext="−a² + 2a &gt; 0"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> / · Δ = <math alttext="a² − 4(−a² + 2a)"><mrow><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mrow><mo stretchy="false">(</mo><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo stretchy="false">)</mo></mrow></mrow></mrow></math> < 0 / · <math alttext="a &gt; 0"><mrow><mi>a</mi><mo>&gt;</mo><mn>0</mn></mrow></math> seulement / · <math alttext="−a² + 2a &gt; 0"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>a</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mi>a</mi></mrow></mrow><mo>&gt;</mo><mn>0</mn></mrow></math> seulement
+    ? En a = 0, les solutions tendent-elles toutes vers 0 ? ✔ Non : r = 0 est racine, y = 1 ne tend pas vers 0. Inégalités strictes. / · Oui : on garde les bornes
+    = ]0 ; 2[   ← Intersection, bornes exclues
+  aides : Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues). | a > 0 et −a² + 2a > 0, puis l'intersection. | a > 0 et 0 < a < 2, donc a ∈ ]0 ; 2[.
   pièges : a2_ode_stability_discriminant, a2_ode_stability_one_coef, a2_ode_stability_boundary
 
 ```
@@ -11008,16 +11046,16 @@ Pour quelles valeurs de a toutes les solutions de y′′ + (a − 2)y′ + (−
 ### Niveau 5
 
 ```
-Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (a + 1)y′ + (3 + 2a − a²)y = 0 tendent vers 0 en +∞. Alors X =
-  · ]−1 ; +∞[ [a2_ode_stability_one_coef]   ✔ ]−1 ; 3[   · ]−1 ; 11/5[ [a2_ode_stability_discriminant]   · [−1 ; 3] [a2_ode_stability_boundary]
+Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (a + 2)y′ + (1 − a²)y = 0 tendent vers 0 en +∞. Alors X =
+  · ]−2 ; +∞[ [a2_ode_stability_one_coef]   ✔ ]−1 ; 1[   · [−1 ; 1] [a2_ode_stability_boundary]   · ]−4/5 ; 0[ [a2_ode_stability_discriminant]
   pièges : a2_ode_stability_boundary, a2_ode_stability_one_coef, a2_ode_stability_discriminant
 
-Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (a + 1)y′ + 2y = 0 tendent vers 0 en +∞. Alors X =
-  · ℝ [a2_ode_stability_one_coef]   · [−1 ; +∞[ [a2_ode_stability_boundary]   ✔ ]−1 ; +∞[   · ]−1 − 2√2 ; −1 + 2√2[ [a2_ode_stability_discriminant]
-  pièges : a2_ode_stability_boundary, a2_ode_stability_one_coef, a2_ode_stability_discriminant
+Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (3 − a)y′ + (a − 1)y = 0 tendent vers 0 en +∞. Alors X =
+  · [1 ; 3] [a2_ode_stability_boundary]   ✔ ]1 ; 3[   · ]−∞ ; 3[ [a2_ode_stability_one_coef]   · ]1 ; +∞[ [a2_ode_stability_one_coef]
+  pièges : a2_ode_stability_boundary, a2_ode_stability_one_coef
 
-Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (a + 1)y′ + y = 0 tendent vers 0 en +∞. Alors X =
-  · [−1 ; +∞[ [a2_ode_stability_boundary]   · ]−3 ; 1[ [a2_ode_stability_discriminant]   ✔ ]−1 ; +∞[   · ℝ [a2_ode_stability_one_coef]
+Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (a + 3)y′ + 4y = 0 tendent vers 0 en +∞. Alors X =
+  · [−3 ; +∞[ [a2_ode_stability_boundary]   ✔ ]−3 ; +∞[   · ℝ [a2_ode_stability_one_coef]   · ]−7 ; 1[ [a2_ode_stability_discriminant]
   pièges : a2_ode_stability_boundary, a2_ode_stability_one_coef, a2_ode_stability_discriminant
 
 ```
@@ -11025,10 +11063,10 @@ Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + 
 ### Variantes d'examen
 
 ```
-Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (−3 − a)y′ + (a² − 5a + 6)y = 0 tendent vers 0 en +∞. Alors X =
-  · ]−∞ ; 13/3 − 2/3·√31[ ∪ ]13/3 + 2/3·√31 ; +∞[ [a2_ode_stability_discriminant]   · ]−∞ ; 2[ ∪ ]3 ; +∞[ [a2_ode_stability_one_coef]   · ]−∞ ; −3] [a2_ode_stability_boundary]   ✔ ]−∞ ; −3[
+Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de y′′ + (3 − a)y′ + (a² − 5a + 6)y = 0 tendent vers 0 en +∞. Alors X =
+  ✔ ]−∞ ; 2[   · ]−∞ ; 2] [a2_ode_stability_boundary]   · ]−∞ ; 2[ ∪ ]3 ; +∞[ [a2_ode_stability_one_coef]   · ]−∞ ; 3[ [a2_ode_stability_one_coef]
   [examen mcq]
-  pièges : a2_ode_stability_boundary, a2_ode_stability_one_coef, a2_ode_stability_discriminant
+  pièges : a2_ode_stability_boundary, a2_ode_stability_one_coef
 
 Vrai ou faux ?
   « Si q > 0, toutes les solutions de y″ + py′ + qy = 0 tendent vers 0 en +∞. » → FAUX
@@ -11045,96 +11083,96 @@ _Bernoulli : z = y^{1−α} rend l'équation linéaire ; Euler : x = eᵗ donne 
 ### Niveau 1
 
 ```
-Résous x²y′′ − 4xy′ + 6y = 2x pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-  [guided]  x²y′′ − 4xy′ + 6y = 2x
+Résous x²y′′ = 4x² pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+  [guided]  x²y′′ = 4x²
     (Euler : on pose x = eᵗ, et y devient une fonction de t.)
-    = y′′□y′ + 6y = 2e^t   (trous : y′′ − 5y′ + 6y = 2e^t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-    = y = C_1e^(2t) + C_2e^(3t) + e^t   ← Coefficients constants
-  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − 4xy′ + 6y = 2x
-    = y = C_1x² + C_2x³ + x   ← e^{mt} = x^m
-  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 5y′ + 6y = … | y′′ − 5y′ + 6y = 2e^t
+    = y′′ − y′ = 4e^(2t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+    = y = C_1 + C_2e^t + 2e^(2t)   ← Coefficients constants
+  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ = 4x²
+    = y = C_1 + C_2x + 2x²   ← e^{mt} = x^m
+  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − y′ = … | y′′ − y′ = 4e^(2t)
 
-Résous y′ + 2y = y² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
-  [guided]  y′ + 2y = y²
-    (Bernoulli avec α = 2 : on pose z = 1/y.)
-    = z′ = 2z□   (trous : z′ = 2z − 1)   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
-    = z = Ce^(2x) + □   (trous : z = Ce^(2x) + 1/2)   ← Équation linéaire en z
-  — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ + 2y = y²
-    = y = 1/(Ce^(2x) + 1/2)   ← Revenir à y
-  aides : Bernoulli avec α = 2 : pose z = 1/y. | z′ = −y′/y², puis remplace y′ par son expression : une équation linéaire en z. | z′ = 2z − 1
+Résous y′ + 2y = 6√y (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
+  [guided]  y′ + 2y = 6√y
+    (Bernoulli avec α = 1/2 : on pose z = √y.)
+    = z′ = 3□   (trous : z′ = 3 − z)   ← z = √y, z′ en fonction de y et y′, puis remplacer
+    = z = Ce^(−x) + □   (trous : z = Ce^(−x) + 3)   ← Équation linéaire en z
+  — Reviens à y (z = √y) :  [juge ode]  départ : y′ + 2y = 6√y
+    = y = (Ce^(−x) + 3)²   ← Revenir à y
+  aides : Bernoulli avec α = 1/2 : pose z = √y. | z′ = y′/(2√y), puis remplace y′ par son expression : une équation linéaire en z. | z′ = 3 − z
 
-Résous x²y′′ − 2xy′ + 2y = −2x³ pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-  [guided]  x²y′′ − 2xy′ + 2y = −2x³
+Résous x²y′′ + 2xy′ = 18x² pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+  [guided]  x²y′′ + 2xy′ = 18x²
     (Euler : on pose x = eᵗ, et y devient une fonction de t.)
-    = y′′□y′ + 2y = −2e^(3t)   (trous : y′′ − 3y′ + 2y = −2e^(3t))   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-    = y = C_1e^t + C_2e^(2t) − e^(3t)   ← Coefficients constants
-  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − 2xy′ + 2y = −2x³
-    = y = C_1x + C_2x² − x³   ← e^{mt} = x^m
-  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 3y′ + 2y = … | y′′ − 3y′ + 2y = −2e^(3t)
+    = y′′ + y′ = 18e^(2t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+    = y = C_1e^(−t) + C_2 + 3e^(2t)   ← Coefficients constants
+  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ + 2xy′ = 18x²
+    = y = C_1/x + C_2 + 3x²   ← e^{mt} = x^m
+  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ + y′ = … | y′′ + y′ = 18e^(2t)
 
 ```
 
 ### Niveau 2
 
 ```
-Résous y′ + 3y = e^xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
-  [guided]  y′ + 3y = e^xy²
-    ? Quelle substitution ? ✔ Bernoulli, α = 2 : z = 1/y / · Homogène : y = xv / · Euler : x = eᵗ / · Aucune : elle est linéaire
-    = z′ = □   (trous : z′ = 3z − e^x)   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
-    = z = Ce^(3x) + □   (trous : z = Ce^(3x) + (1/2)e^x)   ← Équation linéaire en z
-  — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ + 3y = e^xy²
-    = y = 1/(Ce^(3x) + (1/2)e^x)   ← Revenir à y
-  aides : Bernoulli avec α = 2 : pose z = 1/y. | z′ = −y′/y², puis remplace y′ par son expression : une équation linéaire en z. | z′ = 3z − e^x
-
-Résous x²y′′ − 4xy′ + 6y = 2x pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-  [guided]  x²y′′ − 4xy′ + 6y = 2x
+Résous x²y′′ − xy′ = −2x pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+  [guided]  x²y′′ − xy′ = −2x
     ? Quelle substitution ? ✔ Euler : x = eᵗ / · Bernoulli : z = y^(1−α) / · Homogène : y = xv
-    = y′′□y′ + □y = 2e^t   (trous : y′′ − 5y′ + 6y = 2e^t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-    = y = C_1e^(2t) + C_2e^(3t) + e^t   ← Coefficients constants
-  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − 4xy′ + 6y = 2x
-    = y = C_1x² + C_2x³ + x   ← e^{mt} = x^m
-  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 5y′ + 6y = … | y′′ − 5y′ + 6y = 2e^t
+    = y′′□y′ = −2e^t   (trous : y′′ − 2y′ = −2e^t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+    = y = C_1 + C_2e^(2t) + 2e^t   ← Coefficients constants
+  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − xy′ = −2x
+    = y = C_1 + C_2x² + 2x   ← e^{mt} = x^m
+  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 2y′ = … | y′′ − 2y′ = −2e^t
 
-Résous y′ + 2y = xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
-  [guided]  y′ + 2y = xy²
+Résous y′ − y = e^xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
+  [guided]  y′ − y = e^xy²
     ? Quelle substitution ? ✔ Bernoulli, α = 2 : z = 1/y / · Homogène : y = xv / · Euler : x = eᵗ / · Aucune : elle est linéaire
-    = z′ = □   (trous : z′ = 2z − x)   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
-    = z = Ce^(2x) + □   (trous : z = Ce^(2x) + (1/2)x + 1/4)   ← Équation linéaire en z
-  — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ + 2y = xy²
-    = y = 1/(Ce^(2x) + (1/2)x + 1/4)   ← Revenir à y
-  aides : Bernoulli avec α = 2 : pose z = 1/y. | z′ = −y′/y², puis remplace y′ par son expression : une équation linéaire en z. | z′ = 2z − x
+    = z′ = □   (trous : z′ = −z − e^x)   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
+    = z = Ce^(−x)□   (trous : z = Ce^(−x) − (1/2)e^x)   ← Équation linéaire en z
+  — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ − y = e^xy²
+    = y = 1/(Ce^(−x) − (1/2)e^x)   ← Revenir à y
+  aides : Bernoulli avec α = 2 : pose z = 1/y. | z′ = −y′/y², puis remplace y′ par son expression : une équation linéaire en z. | z′ = −z − e^x
+
+Résous x²y′′ − xy′ = 6x³ pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+  [guided]  x²y′′ − xy′ = 6x³
+    ? Quelle substitution ? ✔ Euler : x = eᵗ / · Bernoulli : z = y^(1−α) / · Homogène : y = xv
+    = y′′□y′ = 6e^(3t)   (trous : y′′ − 2y′ = 6e^(3t))   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+    = y = C_1 + C_2e^(2t) + 2e^(3t)   ← Coefficients constants
+  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − xy′ = 6x³
+    = y = C_1 + C_2x² + 2x³   ← e^{mt} = x^m
+  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 2y′ = … | y′′ − 2y′ = 6e^(3t)
 
 ```
 
 ### Niveau 3
 
 ```
-Résous x²y′′ − 2xy′ + 2y = 2x³ pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-  [tap, suivre l'erreur, menu steps]  x²y′′ − 2xy′ + 2y = 2x³
+Résous x²y′′ − xy′ = 6x³ pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+  [tap, suivre l'erreur, menu steps]  x²y′′ − xy′ = 6x³
     ? Quelle substitution ? ✔ Euler : x = eᵗ / · Bernoulli : z = y^(1−α) / · Homogène : y = xv
-    = y′′ − 3y′ + 2y = 2e^(3t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-    = y = C_1e^t + C_2e^(2t) + e^(3t)   ← Coefficients constants
-  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − 2xy′ + 2y = 2x³
-    = y = C_1x + C_2x² + x³   ← e^{mt} = x^m
-  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 3y′ + 2y = … | y′′ − 3y′ + 2y = 2e^(3t)
+    = y′′ − 2y′ = 6e^(3t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+    = y = C_1 + C_2e^(2t) + 2e^(3t)   ← Coefficients constants
+  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − xy′ = 6x³
+    = y = C_1 + C_2x² + 2x³   ← e^{mt} = x^m
+  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 2y′ = … | y′′ − 2y′ = 6e^(3t)
 
-Résous x²y′′ + xy′ − y = 3x² pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-  [tap, suivre l'erreur, menu steps]  x²y′′ + xy′ − y = 3x²
-    ? Quelle substitution ? ✔ Euler : x = eᵗ / · Bernoulli : z = y^(1−α) / · Homogène : y = xv
-    = y′′ − y = 3e^(2t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-    = y = C_1e^(−t) + C_2e^t + e^(2t)   ← Coefficients constants
-  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ + xy′ − y = 3x²
-    = y = C_1/x + C_2x + x²   ← e^{mt} = x^m
-  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − y = … | y′′ − y = 3e^(2t)
-
-Résous y′ + 3y = e^xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
-  [tap, suivre l'erreur, menu steps]  y′ + 3y = e^xy²
+Résous y′ + 2y = e^xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
+  [tap, suivre l'erreur, menu steps]  y′ + 2y = e^xy²
     ? Quelle substitution ? ✔ Bernoulli, α = 2 : z = 1/y / · Homogène : y = xv / · Euler : x = eᵗ / · Aucune : elle est linéaire
-    = z′ = 3z − e^x   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
-    = z = Ce^(3x) + (1/2)e^x   ← Équation linéaire en z
-  — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ + 3y = e^xy²
-    = y = 1/(Ce^(3x) + (1/2)e^x)   ← Revenir à y
-  aides : Bernoulli avec α = 2 : pose z = 1/y. | z′ = −y′/y², puis remplace y′ par son expression : une équation linéaire en z. | z′ = 3z − e^x
+    = z′ = 2z − e^x   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
+    = z = Ce^(2x) + e^x   ← Équation linéaire en z
+  — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ + 2y = e^xy²
+    = y = 1/(Ce^(2x) + e^x)   ← Revenir à y
+  aides : Bernoulli avec α = 2 : pose z = 1/y. | z′ = −y′/y², puis remplace y′ par son expression : une équation linéaire en z. | z′ = 2z − e^x
+
+Résous x²y′′ = 4x² pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+  [tap, suivre l'erreur, menu steps]  x²y′′ = 4x²
+    ? Quelle substitution ? ✔ Euler : x = eᵗ / · Bernoulli : z = y^(1−α) / · Homogène : y = xv
+    = y′′ − y′ = 4e^(2t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+    = y = C_1 + C_2e^t + 2e^(2t)   ← Coefficients constants
+  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ = 4x²
+    = y = C_1 + C_2x + 2x²   ← e^{mt} = x^m
+  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − y′ = … | y′′ − y′ = 4e^(2t)
 
 ```
 
@@ -11150,14 +11188,14 @@ Résous y′ + 3y = y² (Bernoulli) : écris l'équation vérifiée par z, réso
     = y = 1/(Ce^(3x) + 1/3)   ← Revenir à y
   aides : Bernoulli avec α = 2 : pose z = 1/y. | z′ = −y′/y², puis remplace y′ par son expression : une équation linéaire en z. | z′ = 3z − 1
 
-Résous x²y′′ + 2xy′ − 2y = 30x³ pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-  [free, suivre l'erreur]  x²y′′ + 2xy′ − 2y = 30x³
+Résous x²y′′ − xy′ − 3y = 4x pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+  [free, suivre l'erreur]  x²y′′ − xy′ − 3y = 4x
     ? Quelle substitution ? ✔ Euler : x = eᵗ / · Bernoulli : z = y^(1−α) / · Homogène : y = xv
-    = y′′ + y′ − 2y = 30e^(3t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-    = y = C_1e^(−2t) + C_2e^t + 3e^(3t)   ← Coefficients constants
-  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ + 2xy′ − 2y = 30x³
-    = y = C_1/x² + C_2x + 3x³   ← e^{mt} = x^m
-  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ + y′ − 2y = … | y′′ + y′ − 2y = 30e^(3t)
+    = y′′ − 2y′ − 3y = 4e^t   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+    = y = C_1e^(−t) + C_2e^(3t) − e^t   ← Coefficients constants
+  — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − xy′ − 3y = 4x
+    = y = C_1/x + C_2x³ − x   ← e^{mt} = x^m
+  aides : Pose x = eᵗ : x·y′ devient dy/dt et x²·y″ devient d²y/dt² − dy/dt. | y′′ − 2y′ − 3y = … | y′′ − 2y′ − 3y = 4e^t
 
 Résous y′ + 3y = y² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
   [free, suivre l'erreur]  y′ + 3y = y²
@@ -11175,6 +11213,23 @@ Résous y′ + 3y = y² (Bernoulli) : écris l'équation vérifiée par z, réso
 ```
 Deux équations à ramener à une équation linéaire : Bernoulli, puis Euler.
   [problème, 6 points]
+  partie 1 (Bernoulli : 2 ; Reviens à y (z = 1/y) : 1)
+  Résous y′ + 3y = e^xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
+    [free, sans aide, suivre l'erreur]  y′ + 3y = e^xy²
+      = z′ = 3z − e^x   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
+      = z = Ce^(3x) + (1/2)e^x   ← Équation linéaire en z
+    — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ + 3y = e^xy²
+      = y = 1/(Ce^(3x) + (1/2)e^x)   ← Revenir à y
+  partie 2 (Euler : 2 ; Reviens à x (eᵗ = x) : 1)
+  Résous x²y′′ − 3xy′ + 3y = −x² pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+    [free, sans aide, suivre l'erreur]  x²y′′ − 3xy′ + 3y = −x²
+      = y′′ − 4y′ + 3y = −e^(2t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+      = y = C_1e^t + C_2e^(3t) + e^(2t)   ← Coefficients constants
+    — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − 3xy′ + 3y = −x²
+      = y = C_1x + C_2x³ + x²   ← e^{mt} = x^m
+
+Deux équations à ramener à une équation linéaire : Bernoulli, puis Euler.
+  [problème, 6 points]
   partie 1 (Bernoulli : 2 ; Reviens à y (z = √y) : 1)
   Résous y′ + 2y = 6√y (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
     [free, sans aide, suivre l'erreur]  y′ + 2y = 6√y
@@ -11183,55 +11238,39 @@ Deux équations à ramener à une équation linéaire : Bernoulli, puis Euler.
     — Reviens à y (z = √y) :  [juge ode]  départ : y′ + 2y = 6√y
       = y = (Ce^(−x) + 3)²   ← Revenir à y
   partie 2 (Euler : 2 ; Reviens à x (eᵗ = x) : 1)
-  Résous x²y′′ + 2xy′ = 24x³ pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-    [free, sans aide, suivre l'erreur]  x²y′′ + 2xy′ = 24x³
-      = y′′ + y′ = 24e^(3t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-      = y = C_1e^(−t) + C_2 + 2e^(3t)   ← Coefficients constants
-    — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ + 2xy′ = 24x³
-      = y = C_1/x + C_2 + 2x³   ← e^{mt} = x^m
-
-Deux équations à ramener à une équation linéaire : Bernoulli, puis Euler.
-  [problème, 6 points]
-  partie 1 (Bernoulli : 2 ; Reviens à y (z = √y) : 1)
-  Résous y′ + 2y = 4√y (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
-    [free, sans aide, suivre l'erreur]  y′ + 2y = 4√y
-      = z′ = 2 − z   ← z = √y, z′ en fonction de y et y′, puis remplacer
-      = z = Ce^(−x) + 2   ← Équation linéaire en z
-    — Reviens à y (z = √y) :  [juge ode]  départ : y′ + 2y = 4√y
-      = y = (Ce^(−x) + 2)²   ← Revenir à y
-  partie 2 (Euler : 2 ; Reviens à x (eᵗ = x) : 1)
-  Résous x²y′′ + 3xy′ = −8x² pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-    [free, sans aide, suivre l'erreur]  x²y′′ + 3xy′ = −8x²
-      = y′′ + 2y′ = −8e^(2t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-      = y = C_1e^(−2t) + C_2 − e^(2t)   ← Coefficients constants
-    — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ + 3xy′ = −8x²
-      = y = C_1/x² + C_2 − x²   ← e^{mt} = x^m
+  Résous x²y′′ + 3xy′ = 30x³ pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+    [free, sans aide, suivre l'erreur]  x²y′′ + 3xy′ = 30x³
+      = y′′ + 2y′ = 30e^(3t)   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+      = y = C_1e^(−2t) + C_2 + 2e^(3t)   ← Coefficients constants
+    — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ + 3xy′ = 30x³
+      = y = C_1/x² + C_2 + 2x³   ← e^{mt} = x^m
 
 Deux équations à ramener à une équation linéaire : Bernoulli, puis Euler.
   [problème, 6 points]
   partie 1 (Bernoulli : 2 ; Reviens à y (z = 1/y) : 1)
-  Résous y′ + 2y = xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
-    [free, sans aide, suivre l'erreur]  y′ + 2y = xy²
-      = z′ = 2z − x   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
-      = z = Ce^(2x) + (1/2)x + 1/4   ← Équation linéaire en z
-    — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ + 2y = xy²
-      = y = 1/(Ce^(2x) + (1/2)x + 1/4)   ← Revenir à y
+  Résous y′ − y = e^xy² (Bernoulli) : écris l'équation vérifiée par z, résous-la, puis reviens à y.
+    [free, sans aide, suivre l'erreur]  y′ − y = e^xy²
+      = z′ = −z − e^x   ← z = 1/y, z′ en fonction de y et y′, puis remplacer
+      = z = Ce^(−x) − (1/2)e^x   ← Équation linéaire en z
+    — Reviens à y (z = 1/y) :  [juge ode]  départ : y′ − y = e^xy²
+      = y = 1/(Ce^(−x) − (1/2)e^x)   ← Revenir à y
   partie 2 (Euler : 2 ; Reviens à x (eᵗ = x) : 1)
-  Résous x²y′′ − 4xy′ + 6y = 4x pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
-    [free, sans aide, suivre l'erreur]  x²y′′ − 4xy′ + 6y = 4x
-      = y′′ − 5y′ + 6y = 4e^t   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
-      = y = C_1e^(2t) + C_2e^(3t) + 2e^t   ← Coefficients constants
-    — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − 4xy′ + 6y = 4x
-      = y = C_1x² + C_2x³ + 2x   ← e^{mt} = x^m
+  Résous x²y′′ − 6y = −6x pour x > 0 (Euler) : écris l'équation en t (x = eᵗ), résous-la, puis reviens à x.
+    [free, sans aide, suivre l'erreur]  x²y′′ − 6y = −6x
+      = y′′ − y′ − 6y = −6e^t   ← x = eᵗ : xy′ = dy/dt, x²y″ = d²y/dt² − dy/dt
+      = y = C_1e^(−2t) + C_2e^(3t) + e^t   ← Coefficients constants
+    — Reviens à x (eᵗ = x) :  [juge ode]  départ : x²y′′ − 6y = −6x
+      = y = C_1/x² + C_2x³ + x   ← e^{mt} = x^m
 
 ```
 
 ### Variantes d'examen
 
 ```
-La solution générale de x²y′′ + 4xy′ + 2y = 40x³ (x > 0) est :
-  · y = C_1/x² + C_2/x − 2x³   ✔ y = C_1/x² + C_2/x + 2x³   · y = C_1e^(−2x) + C_2e^(−x) + 2e^(3x)   · y = C_1/x² + C_2/x
+La solution générale de y′ + y = y² est :
+  ✔ y = 1/(Ce^x + 1)   · y = Ce^x + 1   · y = 1/(Ce^x)   · y = 1/(Ce^(−x) + 1) [a2_ode_homog_derivative]
   [examen mcq]
+  pièges : a2_ode_homog_derivative
 
 ```
 
@@ -11242,55 +11281,55 @@ _M dx + N dy = 0 avec M_y = N_x : H_x = M, H_y = N, et H(x, y) = C._
 ### Niveau 1
 
 ```
-Résous (2xy − 2x) dx + (x² + 4y) dy = 0 avec y(−1) = −1 : la solution vérifie une relation H(x, y) = C.
-  [guided]  ∂/∂y (2xy − 2x)
-    (Teste l'exactitude : ∂M/∂y avec M = 2xy − 2x.)
-    = 2x   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = x² + 4y :  [juge equiv]  départ : ∂/∂x (x² + 4y)
-    = 2x   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (2xy − 2x) dx
-    = x²y − x² + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(x²y − x²) :  [juge equiv]  départ : x² + 4y − ∂/∂y (x²y − x²)
+Résous (3y + 9x²) dx + (3x + 4y) dy = 0 avec y(−1) = 2 : la solution vérifie une relation H(x, y) = C.
+  [guided]  ∂/∂y (3y + 9x²)
+    (Teste l'exactitude : ∂M/∂y avec M = 3y + 9x².)
+    = 3   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = 3x + 4y :  [juge equiv]  départ : ∂/∂x (3x + 4y)
+    = 3   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (3y + 9x²) dx
+    = 3xy + 3x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(3xy + 3x³) :  [juge equiv]  départ : 3x + 4y − ∂/∂y (3xy + 3x³)
     = □y   (trous : 4y)   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (2xy − 2x) + (x² + 4y)y′ = 0
-    = x²y − x² + □ = C   (trous : x²y − x² + 2y² = C)   ← Les solutions vérifient H(x, y) = C
-    = C = □   (trous : C = 0)   ← y(−1) = −1
-    = x²y − x² + 2y² = 0   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = x²y − x² + φ(y), et H_y doit valoir x² + 4y. | φ(y) = 2y² : x²y − x² + 2y² = C.
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (3y + 9x²) + (3x + 4y)y′ = 0
+    = 3xy + 3x³ + □ = C   (trous : 3xy + 3x³ + 2y² = C)   ← Les solutions vérifient H(x, y) = C
+    = C = □   (trous : C = −1)   ← y(−1) = 2
+    = 3xy + 3x³ + 2y² = −1   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 3xy + 3x³ + φ(y), et H_y doit valoir 3x + 4y. | φ(y) = 2y² : 3xy + 3x³ + 2y² = C.
   pièges : a2_exact_phi_forgot
 
-Résous (−y − 6x²) dx + (−x − 2y) dy = 0 avec y(0) = −1 : la solution vérifie une relation H(x, y) = C.
-  [guided]  ∂/∂y (−y − 6x²)
-    (Teste l'exactitude : ∂M/∂y avec M = −y − 6x².)
-    = −1   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = −x − 2y :  [juge equiv]  départ : ∂/∂x (−x − 2y)
-    = −1   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (−y − 6x²) dx
-    = −xy − 2x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(−xy − 2x³) :  [juge equiv]  départ : −x − 2y − ∂/∂y (−xy − 2x³)
-    = □y   (trous : −2y)   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (−y − 6x²) + (−x − 2y)y′ = 0
-    = −xy − 2x³□ = C   (trous : −xy − 2x³ − y² = C)   ← Les solutions vérifient H(x, y) = C
-    = C = □   (trous : C = −1)   ← y(0) = −1
-    = −xy − 2x³ − y² = −1   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = −xy − 2x³ + φ(y), et H_y doit valoir −x − 2y. | φ(y) = −y² : −xy − 2x³ − y² = C.
+Résous (−2xy + 6x) dx + (−x² − 3y²) dy = 0 avec y(0) = 2 : la solution vérifie une relation H(x, y) = C.
+  [guided]  ∂/∂y (−2xy + 6x)
+    (Teste l'exactitude : ∂M/∂y avec M = −2xy + 6x.)
+    = −2x   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = −x² − 3y² :  [juge equiv]  départ : ∂/∂x (−x² − 3y²)
+    = −2x   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (−2xy + 6x) dx
+    = −x²y + 3x² + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(−x²y + 3x²) :  [juge equiv]  départ : −x² − 3y² − ∂/∂y (−x²y + 3x²)
+    = □y²   (trous : −3y²)   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (−2xy + 6x) + (−x² − 3y²)y′ = 0
+    = −x²y + 3x²□ = C   (trous : −x²y + 3x² − y³ = C)   ← Les solutions vérifient H(x, y) = C
+    = C = □   (trous : C = −8)   ← y(0) = 2
+    = −x²y + 3x² − y³ = −8   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = −x²y + 3x² + φ(y), et H_y doit valoir −x² − 3y². | φ(y) = −y³ : −x²y + 3x² − y³ = C.
   pièges : a2_exact_phi_forgot
 
-Résous (4xy − 2) dx + (2x² − 1) dy = 0 avec y(1) = 1 : la solution vérifie une relation H(x, y) = C.
-  [guided]  ∂/∂y (4xy − 2)
-    (Teste l'exactitude : ∂M/∂y avec M = 4xy − 2.)
-    = 4x   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = 2x² − 1 :  [juge equiv]  départ : ∂/∂x (2x² − 1)
-    = 4x   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (4xy − 2) dx
-    = 2x²y − 2x + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(2x²y − 2x) :  [juge equiv]  départ : 2x² − 1 − ∂/∂y (2x²y − 2x)
-    = −1   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (4xy − 2) + (2x² − 1)y′ = 0
-    = 2x²y − 2x□ = C   (trous : 2x²y − 2x − y = C)   ← Les solutions vérifient H(x, y) = C
-    = C = □   (trous : C = −1)   ← y(1) = 1
-    = 2x²y − 2x − y = −1   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 2x²y − 2x + φ(y), et H_y doit valoir 2x² − 1. | φ(y) = −y : 2x²y − 2x − y = C.
+Résous (y − 2x) dx + (x − 3y²) dy = 0 avec y(0) = 1 : la solution vérifie une relation H(x, y) = C.
+  [guided]  ∂/∂y (y − 2x)
+    (Teste l'exactitude : ∂M/∂y avec M = y − 2x.)
+    = 1   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = x − 3y² :  [juge equiv]  départ : ∂/∂x (x − 3y²)
+    = 1   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (y − 2x) dx
+    = xy − x² + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(xy − x²) :  [juge equiv]  départ : x − 3y² − ∂/∂y (xy − x²)
+    = □y²   (trous : −3y²)   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (y − 2x) + (x − 3y²)y′ = 0
+    = xy − x²□ = C   (trous : xy − x² − y³ = C)   ← Les solutions vérifient H(x, y) = C
+    = C = □   (trous : C = −1)   ← y(0) = 1
+    = xy − x² − y³ = −1   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = xy − x² + φ(y), et H_y doit valoir x − 3y². | φ(y) = −y³ : xy − x² − y³ = C.
   pièges : a2_exact_phi_forgot
 
 ```
@@ -11298,43 +11337,43 @@ Résous (4xy − 2) dx + (2x² − 1) dy = 0 avec y(1) = 1 : la solution vérifi
 ### Niveau 2
 
 ```
-Résous (4xy + 4x) dx + (2x² + 2y) dy = 0 avec y(1) = 1 : la solution vérifie une relation H(x, y) = C.
-  [guided]  ∂/∂y (4xy + 4x)
-    (Teste l'exactitude : ∂M/∂y avec M = 4xy + 4x.)
-    = 4x   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = 2x² + 2y :  [juge equiv]  départ : ∂/∂x (2x² + 2y)
-    = 4x   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (4xy + 4x) dx
+Résous (y² − 6x²) dx + (2xy + 4y) dy = 0 avec y(−1) = 1 : la solution vérifie une relation H(x, y) = C.
+  [guided]  ∂/∂y (y² − 6x²)
+    (Teste l'exactitude : ∂M/∂y avec M = y² − 6x².)
+    = 2y   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = 2xy + 4y :  [juge equiv]  départ : ∂/∂x (2xy + 4y)
+    = 2y   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (y² − 6x²) dx
     ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
-    = 2x²y + 2x² + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(2x²y + 2x²) :  [juge equiv]  départ : 2x² + 2y − ∂/∂y (2x²y + 2x²)
-    = □y   (trous : 2y)   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (4xy + 4x) + (2x² + 2y)y′ = 0
-    = 2x²y + 2x² + y² = C   ← Les solutions vérifient H(x, y) = C
-    = C = □   (trous : C = 5)   ← y(1) = 1
-    = 2x²y + 2x² + y² = 5   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 2x²y + 2x² + φ(y), et H_y doit valoir 2x² + 2y. | φ(y) = y² : 2x²y + 2x² + y² = C.
+    = xy² − 2x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(xy² − 2x³) :  [juge equiv]  départ : 2xy + 4y − ∂/∂y (xy² − 2x³)
+    = □y   (trous : 4y)   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (y² − 6x²) + (2xy + 4y)y′ = 0
+    = xy² − 2x³ + 2y² = C   ← Les solutions vérifient H(x, y) = C
+    = C = □   (trous : C = 3)   ← y(−1) = 1
+    = xy² − 2x³ + 2y² = 3   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = xy² − 2x³ + φ(y), et H_y doit valoir 2xy + 4y. | φ(y) = 2y² : xy² − 2x³ + 2y² = C.
   pièges : a2_exact_phi_forgot
 
-Résous (3y² − 3x²) dx + (6xy − 2y) dy = 0 avec y(0) = −1 : la solution vérifie une relation H(x, y) = C.
-  [guided]  ∂/∂y (3y² − 3x²)
-    (Teste l'exactitude : ∂M/∂y avec M = 3y² − 3x².)
-    = 6y   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = 6xy − 2y :  [juge equiv]  départ : ∂/∂x (6xy − 2y)
-    = 6y   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (3y² − 3x²) dx
+Résous (y + 6x²) dx + (x − 3y²) dy = 0 avec y(−1) = 2 : la solution vérifie une relation H(x, y) = C.
+  [guided]  ∂/∂y (y + 6x²)
+    (Teste l'exactitude : ∂M/∂y avec M = y + 6x².)
+    = 1   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = x − 3y² :  [juge equiv]  départ : ∂/∂x (x − 3y²)
+    = 1   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (y + 6x²) dx
     ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
-    = 3xy² − x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(3xy² − x³) :  [juge equiv]  départ : 6xy − 2y − ∂/∂y (3xy² − x³)
-    = □y   (trous : −2y)   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (3y² − 3x²) + (6xy − 2y)y′ = 0
-    = 3xy² − x³ − y² = C   ← Les solutions vérifient H(x, y) = C
-    = C = □   (trous : C = −1)   ← y(0) = −1
-    = 3xy² − x³ − y² = −1   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 3xy² − x³ + φ(y), et H_y doit valoir 6xy − 2y. | φ(y) = −y² : 3xy² − x³ − y² = C.
+    = xy + 2x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(xy + 2x³) :  [juge equiv]  départ : x − 3y² − ∂/∂y (xy + 2x³)
+    = □y²   (trous : −3y²)   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (y + 6x²) + (x − 3y²)y′ = 0
+    = xy + 2x³ − y³ = C   ← Les solutions vérifient H(x, y) = C
+    = C = □   (trous : C = −12)   ← y(−1) = 2
+    = xy + 2x³ − y³ = −12   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = xy + 2x³ + φ(y), et H_y doit valoir x − 3y². | φ(y) = −y³ : xy + 2x³ − y³ = C.
   pièges : a2_exact_phi_forgot
 
-Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(1) = −1 : la solution vérifie une relation H(x, y) = C.
+Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(0) = 1 : la solution vérifie une relation H(x, y) = C.
   [guided]  ∂/∂y (2x/(1 + (x² + y)²))
     (Teste l'exactitude : ∂M/∂y avec M = 2x/(1 + (x² + y)²).)
     = −4x(x² + y)/(1 + (x² + y)²)²   ← Dériver M par rapport à y
@@ -11347,8 +11386,8 @@ Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(1) = −
     = 0   ← φ′(y) = N − ∂/∂y(∫ M dx)
   — Les solutions, puis la condition initiale :  [juge ode]  départ : (2x/(1 + (x² + y)²)) + (1/(1 + (x² + y)²))y′ = 0
     = arctan(x² + y) = C   ← Les solutions vérifient H(x, y) = C
-    = C = □   (trous : C = 0)   ← y(1) = −1
-    = arctan(x² + y) = 0   ← La relation cherchée
+    = C = □   (trous : C = π/4)   ← y(0) = 1
+    = arctan(x² + y) = π/4   ← La relation cherchée
   aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = arctan(x² + y) + φ(y), et H_y doit valoir 1/(1 + (x² + y)²). | φ(y) = 0 : arctan(x² + y) = C.
   pièges : a2_exact_phi_forgot
 
@@ -11357,61 +11396,61 @@ Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(1) = −
 ### Niveau 3
 
 ```
-Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(−1) = 1 : la solution vérifie une relation H(x, y) = C.
-  [tap, suivre l'erreur, menu steps]  ∂/∂y (2x/(1 + (x² + y)²))
-    (Teste l'exactitude : ∂M/∂y avec M = 2x/(1 + (x² + y)²).)
-    = −4x(x² + y)/(1 + (x² + y)²)²   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = 1/(1 + (x² + y)²) :  [juge equiv]  départ : ∂/∂x (1/(1 + (x² + y)²))
-    = −4x(x² + y)/(1 + (x² + y)²)²   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ 2x/(1 + (x² + y)²) dx
-    ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
-    ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
-    = arctan(x² + y) + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(arctan(x² + y)) :  [juge equiv]  départ : 1/(1 + (x² + y)²) − ∂/∂y (arctan(x² + y))
-    = 0   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (2x/(1 + (x² + y)²)) + (1/(1 + (x² + y)²))y′ = 0
-    = arctan(x² + y) = C   ← Les solutions vérifient H(x, y) = C
-    = C = arctan(2)   ← y(−1) = 1
-    = arctan(x² + y) = arctan(2)   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = arctan(x² + y) + φ(y), et H_y doit valoir 1/(1 + (x² + y)²). | φ(y) = 0 : arctan(x² + y) = C.
-  pièges : a2_exact_phi_forgot
-
-Résous (ye^(xy)) dx + (xe^(xy) − 2y) dy = 0 avec y(1) = −1 : la solution vérifie une relation H(x, y) = C.
-  [tap, suivre l'erreur, menu steps]  ∂/∂y (ye^(xy))
-    (Teste l'exactitude : ∂M/∂y avec M = ye^(xy).)
-    = e^(xy) + xye^(xy)   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = xe^(xy) − 2y :  [juge equiv]  départ : ∂/∂x (xe^(xy) − 2y)
-    = e^(xy) + xye^(xy)   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ ye^(xy) dx
-    ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
-    ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
-    = e^(xy) + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(e^(xy)) :  [juge equiv]  départ : xe^(xy) − 2y − ∂/∂y (e^(xy))
-    = −2y   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (ye^(xy)) + (xe^(xy) − 2y)y′ = 0
-    = e^(xy) − y² = C   ← Les solutions vérifient H(x, y) = C
-    = C = e^(−1) − 1   ← y(1) = −1
-    = e^(xy) − y² = e^(−1) − 1   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = e^(xy) + φ(y), et H_y doit valoir xe^(xy) − 2y. | φ(y) = −y² : e^(xy) − y² = C.
-  pièges : a2_exact_phi_forgot
-
-Résous (2xy + 3) dx + (x² + 6y²) dy = 0 avec y(0) = 1 : la solution vérifie une relation H(x, y) = C.
-  [tap, suivre l'erreur, menu steps]  ∂/∂y (2xy + 3)
-    (Teste l'exactitude : ∂M/∂y avec M = 2xy + 3.)
+Résous (2xy + 3x²) dx + (x² − 3y²) dy = 0 avec y(−1) = 2 : la solution vérifie une relation H(x, y) = C.
+  [tap, suivre l'erreur, menu steps]  ∂/∂y (2xy + 3x²)
+    (Teste l'exactitude : ∂M/∂y avec M = 2xy + 3x².)
     = 2x   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = x² + 6y² :  [juge equiv]  départ : ∂/∂x (x² + 6y²)
+  — ∂N/∂x avec N = x² − 3y² :  [juge equiv]  départ : ∂/∂x (x² − 3y²)
     = 2x   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (2xy + 3) dx
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (2xy + 3x²) dx
     ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
     ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
-    = x²y + 3x + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(x²y + 3x) :  [juge equiv]  départ : x² + 6y² − ∂/∂y (x²y + 3x)
-    = 6y²   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (2xy + 3) + (x² + 6y²)y′ = 0
-    = x²y + 3x + 2y³ = C   ← Les solutions vérifient H(x, y) = C
-    = C = 2   ← y(0) = 1
-    = x²y + 3x + 2y³ = 2   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = x²y + 3x + φ(y), et H_y doit valoir x² + 6y². | φ(y) = 2y³ : x²y + 3x + 2y³ = C.
+    = x²y + x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(x²y + x³) :  [juge equiv]  départ : x² − 3y² − ∂/∂y (x²y + x³)
+    = −3y²   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (2xy + 3x²) + (x² − 3y²)y′ = 0
+    = x²y + x³ − y³ = C   ← Les solutions vérifient H(x, y) = C
+    = C = −7   ← y(−1) = 2
+    = x²y + x³ − y³ = −7   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = x²y + x³ + φ(y), et H_y doit valoir x² − 3y². | φ(y) = −y³ : x²y + x³ − y³ = C.
+  pièges : a2_exact_phi_forgot
+
+Résous (−2xy + 2) dx + (−x² − 3y²) dy = 0 avec y(0) = 2 : la solution vérifie une relation H(x, y) = C.
+  [tap, suivre l'erreur, menu steps]  ∂/∂y (−2xy + 2)
+    (Teste l'exactitude : ∂M/∂y avec M = −2xy + 2.)
+    = −2x   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = −x² − 3y² :  [juge equiv]  départ : ∂/∂x (−x² − 3y²)
+    = −2x   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (−2xy + 2) dx
+    ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
+    ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
+    = −x²y + 2x + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(−x²y + 2x) :  [juge equiv]  départ : −x² − 3y² − ∂/∂y (−x²y + 2x)
+    = −3y²   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (−2xy + 2) + (−x² − 3y²)y′ = 0
+    = −x²y + 2x − y³ = C   ← Les solutions vérifient H(x, y) = C
+    = C = −8   ← y(0) = 2
+    = −x²y + 2x − y³ = −8   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = −x²y + 2x + φ(y), et H_y doit valoir −x² − 3y². | φ(y) = −y³ : −x²y + 2x − y³ = C.
+  pièges : a2_exact_phi_forgot
+
+Résous (6xy − 4x) dx + (3x² + 3y²) dy = 0 avec y(0) = −1 : la solution vérifie une relation H(x, y) = C.
+  [tap, suivre l'erreur, menu steps]  ∂/∂y (6xy − 4x)
+    (Teste l'exactitude : ∂M/∂y avec M = 6xy − 4x.)
+    = 6x   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = 3x² + 3y² :  [juge equiv]  départ : ∂/∂x (3x² + 3y²)
+    = 6x   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (6xy − 4x) dx
+    ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
+    ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
+    = 3x²y − 2x² + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(3x²y − 2x²) :  [juge equiv]  départ : 3x² + 3y² − ∂/∂y (3x²y − 2x²)
+    = 3y²   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (6xy − 4x) + (3x² + 3y²)y′ = 0
+    = 3x²y − 2x² + y³ = C   ← Les solutions vérifient H(x, y) = C
+    = C = −1   ← y(0) = −1
+    = 3x²y − 2x² + y³ = −1   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 3x²y − 2x² + φ(y), et H_y doit valoir 3x² + 3y². | φ(y) = y³ : 3x²y − 2x² + y³ = C.
   pièges : a2_exact_phi_forgot
 
 ```
@@ -11419,61 +11458,61 @@ Résous (2xy + 3) dx + (x² + 6y²) dy = 0 avec y(0) = 1 : la solution vérifie 
 ### Niveau 4
 
 ```
-Résous (3y² + 6x) dx + (6xy + 4y) dy = 0 avec y(−1) = 2 : la solution vérifie une relation H(x, y) = C.
-  [free, suivre l'erreur]  ∂/∂y (3y² + 6x)
-    (Teste l'exactitude : ∂M/∂y avec M = 3y² + 6x.)
-    = 6y   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = 6xy + 4y :  [juge equiv]  départ : ∂/∂x (6xy + 4y)
-    = 6y   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (3y² + 6x) dx
+Résous (ye^(xy)) dx + (xe^(xy) + 2y) dy = 0 avec y(1) = 2 : la solution vérifie une relation H(x, y) = C.
+  [free, suivre l'erreur]  ∂/∂y (ye^(xy))
+    (Teste l'exactitude : ∂M/∂y avec M = ye^(xy).)
+    = e^(xy) + xye^(xy)   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = xe^(xy) + 2y :  [juge equiv]  départ : ∂/∂x (xe^(xy) + 2y)
+    = e^(xy) + xye^(xy)   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ ye^(xy) dx
     ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
     ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
-    = 3xy² + 3x² + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(3xy² + 3x²) :  [juge equiv]  départ : 6xy + 4y − ∂/∂y (3xy² + 3x²)
-    = 4y   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (3y² + 6x) + (6xy + 4y)y′ = 0
-    = 3xy² + 3x² + 2y² = C   ← Les solutions vérifient H(x, y) = C
-    = C = −1   ← y(−1) = 2
-    = 3xy² + 3x² + 2y² = −1   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 3xy² + 3x² + φ(y), et H_y doit valoir 6xy + 4y. | φ(y) = 2y² : 3xy² + 3x² + 2y² = C.
+    = e^(xy) + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(e^(xy)) :  [juge equiv]  départ : xe^(xy) + 2y − ∂/∂y (e^(xy))
+    = 2y   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (ye^(xy)) + (xe^(xy) + 2y)y′ = 0
+    = e^(xy) + y² = C   ← Les solutions vérifient H(x, y) = C
+    = C = e^(2) + 4   ← y(1) = 2
+    = e^(xy) + y² = e^(2) + 4   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = e^(xy) + φ(y), et H_y doit valoir xe^(xy) + 2y. | φ(y) = y² : e^(xy) + y² = C.
   pièges : a2_exact_phi_forgot
 
-Résous (2xy − 2x) dx + (x² − 2y) dy = 0 avec y(1) = −1 : la solution vérifie une relation H(x, y) = C.
-  [free, suivre l'erreur]  ∂/∂y (2xy − 2x)
-    (Teste l'exactitude : ∂M/∂y avec M = 2xy − 2x.)
-    = 2x   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = x² − 2y :  [juge equiv]  départ : ∂/∂x (x² − 2y)
-    = 2x   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (2xy − 2x) dx
+Résous (y² + 3) dx + (2xy + 3y²) dy = 0 avec y(−1) = 2 : la solution vérifie une relation H(x, y) = C.
+  [free, suivre l'erreur]  ∂/∂y (y² + 3)
+    (Teste l'exactitude : ∂M/∂y avec M = y² + 3.)
+    = 2y   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = 2xy + 3y² :  [juge equiv]  départ : ∂/∂x (2xy + 3y²)
+    = 2y   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (y² + 3) dx
     ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
     ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
-    = x²y − x² + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(x²y − x²) :  [juge equiv]  départ : x² − 2y − ∂/∂y (x²y − x²)
-    = −2y   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (2xy − 2x) + (x² − 2y)y′ = 0
-    = x²y − x² − y² = C   ← Les solutions vérifient H(x, y) = C
-    = C = −3   ← y(1) = −1
-    = x²y − x² − y² = −3   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = x²y − x² + φ(y), et H_y doit valoir x² − 2y. | φ(y) = −y² : x²y − x² − y² = C.
+    = xy² + 3x + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(xy² + 3x) :  [juge equiv]  départ : 2xy + 3y² − ∂/∂y (xy² + 3x)
+    = 3y²   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (y² + 3) + (2xy + 3y²)y′ = 0
+    = xy² + 3x + y³ = C   ← Les solutions vérifient H(x, y) = C
+    = C = 1   ← y(−1) = 2
+    = xy² + 3x + y³ = 1   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = xy² + 3x + φ(y), et H_y doit valoir 2xy + 3y². | φ(y) = y³ : xy² + 3x + y³ = C.
   pièges : a2_exact_phi_forgot
 
-Résous (4xy − 3x²) dx + (2x² + 6y²) dy = 0 avec y(0) = 1 : la solution vérifie une relation H(x, y) = C.
-  [free, suivre l'erreur]  ∂/∂y (4xy − 3x²)
-    (Teste l'exactitude : ∂M/∂y avec M = 4xy − 3x².)
-    = 4x   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = 2x² + 6y² :  [juge equiv]  départ : ∂/∂x (2x² + 6y²)
-    = 4x   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (4xy − 3x²) dx
+Résous (2y + 1) dx + (2x + 2y) dy = 0 avec y(−1) = −1 : la solution vérifie une relation H(x, y) = C.
+  [free, suivre l'erreur]  ∂/∂y (2y + 1)
+    (Teste l'exactitude : ∂M/∂y avec M = 2y + 1.)
+    = 2   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = 2x + 2y :  [juge equiv]  départ : ∂/∂x (2x + 2y)
+    = 2   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (2y + 1) dx
     ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
     ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
-    = 2x²y − x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(2x²y − x³) :  [juge equiv]  départ : 2x² + 6y² − ∂/∂y (2x²y − x³)
-    = 6y²   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (4xy − 3x²) + (2x² + 6y²)y′ = 0
-    = 2x²y − x³ + 2y³ = C   ← Les solutions vérifient H(x, y) = C
-    = C = 2   ← y(0) = 1
-    = 2x²y − x³ + 2y³ = 2   ← La relation cherchée
-  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 2x²y − x³ + φ(y), et H_y doit valoir 2x² + 6y². | φ(y) = 2y³ : 2x²y − x³ + 2y³ = C.
+    = 2xy + x + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(2xy + x) :  [juge equiv]  départ : 2x + 2y − ∂/∂y (2xy + x)
+    = 2y   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (2y + 1) + (2x + 2y)y′ = 0
+    = 2xy + x + y² = C   ← Les solutions vérifient H(x, y) = C
+    = C = 2   ← y(−1) = −1
+    = 2xy + x + y² = 2   ← La relation cherchée
+  aides : Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y). | H = 2xy + x + φ(y), et H_y doit valoir 2x + 2y. | φ(y) = y² : 2xy + x + y² = C.
   pièges : a2_exact_phi_forgot
 
 ```
@@ -11481,7 +11520,7 @@ Résous (4xy − 3x²) dx + (2x² + 6y²) dy = 0 avec y(0) = 1 : la solution vé
 ### Niveau 5
 
 ```
-Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(1) = 1 : la solution vérifie une relation H(x, y) = C.
+Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(0) = −1 : la solution vérifie une relation H(x, y) = C.
   [free, sans aide]  ∂/∂y (2x/(1 + (x² + y)²))
     (Teste l'exactitude : ∂M/∂y avec M = 2x/(1 + (x² + y)²).)
     = −4x(x² + y)/(1 + (x² + y)²)²   ← Dériver M par rapport à y
@@ -11495,11 +11534,11 @@ Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(1) = 1 :
     = 0   ← φ′(y) = N − ∂/∂y(∫ M dx)
   — Les solutions, puis la condition initiale :  [juge ode]  départ : (2x/(1 + (x² + y)²)) + (1/(1 + (x² + y)²))y′ = 0
     = arctan(x² + y) = C   ← Les solutions vérifient H(x, y) = C
-    = C = arctan(2)   ← y(1) = 1
-    = arctan(x² + y) = arctan(2)   ← La relation cherchée
+    = C = −π/4   ← y(0) = −1
+    = arctan(x² + y) = −π/4   ← La relation cherchée
   pièges : a2_exact_phi_forgot
 
-Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(1) = 1 : la solution vérifie une relation H(x, y) = C.
+Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(0) = −1 : la solution vérifie une relation H(x, y) = C.
   [free, sans aide]  ∂/∂y (2x/(1 + (x² + y)²))
     (Teste l'exactitude : ∂M/∂y avec M = 2x/(1 + (x² + y)²).)
     = −4x(x² + y)/(1 + (x² + y)²)²   ← Dériver M par rapport à y
@@ -11513,26 +11552,26 @@ Résous (2x/(1 + (x² + y)²)) dx + (1/(1 + (x² + y)²)) dy = 0 avec y(1) = 1 :
     = 0   ← φ′(y) = N − ∂/∂y(∫ M dx)
   — Les solutions, puis la condition initiale :  [juge ode]  départ : (2x/(1 + (x² + y)²)) + (1/(1 + (x² + y)²))y′ = 0
     = arctan(x² + y) = C   ← Les solutions vérifient H(x, y) = C
-    = C = arctan(2)   ← y(1) = 1
-    = arctan(x² + y) = arctan(2)   ← La relation cherchée
+    = C = −π/4   ← y(0) = −1
+    = arctan(x² + y) = −π/4   ← La relation cherchée
   pièges : a2_exact_phi_forgot
 
-Résous (ye^(xy)) dx + (xe^(xy) + 4y) dy = 0 avec y(−1) = 2 : la solution vérifie une relation H(x, y) = C.
-  [free, sans aide]  ∂/∂y (ye^(xy))
-    (Teste l'exactitude : ∂M/∂y avec M = ye^(xy).)
-    = e^(xy) + xye^(xy)   ← Dériver M par rapport à y
-  — ∂N/∂x avec N = xe^(xy) + 4y :  [juge equiv]  départ : ∂/∂x (xe^(xy) + 4y)
-    = e^(xy) + xye^(xy)   ← Dériver N par rapport à x
-  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ ye^(xy) dx
+Résous (−y − 6x²) dx + (−x − 2y) dy = 0 avec y(0) = −1 : la solution vérifie une relation H(x, y) = C.
+  [free, sans aide]  ∂/∂y (−y − 6x²)
+    (Teste l'exactitude : ∂M/∂y avec M = −y − 6x².)
+    = −1   ← Dériver M par rapport à y
+  — ∂N/∂x avec N = −x − 2y :  [juge equiv]  départ : ∂/∂x (−x − 2y)
+    = −1   ← Dériver N par rapport à x
+  — H = ∫ M dx (à une fonction φ(y) près) :  [juge antideriv]  départ : ∫ (−y − 6x²) dx
     ? ∂M/∂y = ∂N/∂x ? ✔ Oui : l'équation est exacte / · Non : elle n'est pas exacte
     ? Pour trouver H : ✔ intégrer M par rapport à x, puis ajuster φ(y) / ✔ intégrer N par rapport à y, puis ajuster ψ(x) / · H = ∫ M dx, sans rien ajouter
-    = e^(xy) + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
-  — H_y doit valoir N : φ′(y) = N − ∂/∂y(e^(xy)) :  [juge equiv]  départ : xe^(xy) + 4y − ∂/∂y (e^(xy))
-    = 4y   ← φ′(y) = N − ∂/∂y(∫ M dx)
-  — Les solutions, puis la condition initiale :  [juge ode]  départ : (ye^(xy)) + (xe^(xy) + 4y)y′ = 0
-    = e^(xy) + 2y² = C   ← Les solutions vérifient H(x, y) = C
-    = C = e^(−2) + 8   ← y(−1) = 2
-    = e^(xy) + 2y² = e^(−2) + 8   ← La relation cherchée
+    = −xy − 2x³ + C   ← Primitive en x : la constante C peut dépendre de y (c'est φ(y))
+  — H_y doit valoir N : φ′(y) = N − ∂/∂y(−xy − 2x³) :  [juge equiv]  départ : −x − 2y − ∂/∂y (−xy − 2x³)
+    = −2y   ← φ′(y) = N − ∂/∂y(∫ M dx)
+  — Les solutions, puis la condition initiale :  [juge ode]  départ : (−y − 6x²) + (−x − 2y)y′ = 0
+    = −xy − 2x³ − y² = C   ← Les solutions vérifient H(x, y) = C
+    = C = −1   ← y(0) = −1
+    = −xy − 2x³ − y² = −1   ← La relation cherchée
   pièges : a2_exact_phi_forgot
 
 ```
@@ -11540,8 +11579,8 @@ Résous (ye^(xy)) dx + (xe^(xy) + 4y) dy = 0 avec y(−1) = 2 : la solution vér
 ### Variantes d'examen
 
 ```
-La solution de (−y + 6x²) + (−x + 1)y′ = 0 avec y(0) = 1 vérifie :
-  · −xy + 2x³ + 2y = 1   ✔ −xy + 2x³ + y = 1   · −xy + 2x³ + y = −1   · −xy + 2x³ = 0 [a2_exact_phi_forgot]
+La solution de (4xy − 2) + (2x² − 1)y′ = 0 avec y(1) = 1 vérifie :
+  · 2x²y − 2x − 2y = −1   ✔ 2x²y − 2x − y = −1   · 2x²y − 2x − y = 1   · 2x²y − 2x = 0 [a2_exact_phi_forgot]
   [examen mcq]
   pièges : a2_exact_phi_forgot
 
@@ -11554,43 +11593,43 @@ _A diagonalisable : X(t) = Σ Cᵢe^{λᵢt}vᵢ, les constantes par X(0)._
 ### Niveau 1
 
 ```
-Résous X′ = AX avec A = [[-1,4],[0,1]] et X(0) = (-1 ; -1), X = (x ; y). Écris chaque composante : x = … ; y = …. Les valeurs propres de A sont 1 et −1.
+Résous X′ = AX avec A = [[0,-1],[-1,0]] et X(0) = (0 ; 4), X = (x ; y). Écris chaque composante : x = … ; y = …. Les valeurs propres de A sont −1 et 1.
   [guided]  v_1
-    (Un vecteur propre v₁ pour λ₁ = 1 :)
-    = (2 ; 1)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = −1 :  [juge eigvec]  départ : v_2
-    = (1 ; 0)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −x + 4y ; y′ = y
-    = x = □C_1e^t + C_2e^(−t) ; y = C_1e^t   (trous : x = 2C_1e^t + C_2e^(−t) ; y = C_1e^t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = −1 ; C_2 = □   (trous : C_1 = −1 ; C_2 = 1)   ← X(0) = (−1 ; −1)
-    = x = −2e^t + e^(−t) ; y = −e^t   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 1 et −1, de vecteurs propres (2 ; 1) et (1 ; 0). | x = 2C_1e^t + C_2e^(−t) ; y = C_1e^t
+    (Un vecteur propre v₁ pour λ₁ = −1 :)
+    = (1 ; 1)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = 1 :  [juge eigvec]  départ : v_2
+    = (-1 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −y ; y′ = −x
+    = x = C_1□ − C_2e^t ; y = C_1e^(−t) + C_2e^t   (trous : x = C_1e^(−t) − C_2e^t ; y = C_1e^(−t) + C_2e^t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 2 ; C_2 = □   (trous : C_1 = 2 ; C_2 = 2)   ← X(0) = (0 ; 4)
+    = x = 2e^(−t) − 2e^t ; y = 2e^(−t) + 2e^t   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −1 et 1, de vecteurs propres (1 ; 1) et (−1 ; 1). | x = C_1e^(−t) − C_2e^t ; y = C_1e^(−t) + C_2e^t
   pièges : a2_ode_system_order
 
-Résous X′ = AX avec A = [[2,-2],[0,1]] et X(0) = (-3 ; -2), X = (x ; y). Écris chaque composante : x = … ; y = …. Les valeurs propres de A sont 2 et 1.
+Résous X′ = AX avec A = [[1,2],[0,2]] et X(0) = (0 ; -1), X = (x ; y). Écris chaque composante : x = … ; y = …. Les valeurs propres de A sont 2 et 1.
   [guided]  v_1
     (Un vecteur propre v₁ pour λ₁ = 2 :)
-    = (1 ; 0)   ← (A − λ₁I)v₁ = 0
+    = (2 ; 1)   ← (A − λ₁I)v₁ = 0
   — Un vecteur propre v₂ pour λ₂ = 1 :  [juge eigvec]  départ : v_2
-    = (2 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 2x − 2y ; y′ = y
-    = x = C_1□ + 2C_2e^t ; y = C_2e^t   (trous : x = C_1e^(2t) + 2C_2e^t ; y = C_2e^t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = 1 ; C_2 = □   (trous : C_1 = 1 ; C_2 = −2)   ← X(0) = (−3 ; −2)
-    = x = e^(2t) − 4e^t ; y = −2e^t   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 2 et 1, de vecteurs propres (1 ; 0) et (2 ; 1). | x = C_1e^(2t) + 2C_2e^t ; y = C_2e^t
+    = (1 ; 0)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = x + 2y ; y′ = 2y
+    = x = □C_1e^(2t) + C_2e^t ; y = C_1e^(2t)   (trous : x = 2C_1e^(2t) + C_2e^t ; y = C_1e^(2t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = −1 ; C_2 = □   (trous : C_1 = −1 ; C_2 = 2)   ← X(0) = (0 ; −1)
+    = x = −2e^(2t) + 2e^t ; y = −e^(2t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 2 et 1, de vecteurs propres (2 ; 1) et (1 ; 0). | x = 2C_1e^(2t) + C_2e^t ; y = C_1e^(2t)
   pièges : a2_ode_system_order
 
-Résous X′ = AX avec A = [[-6,8],[-4,6]] et X(0) = (4 ; 3), X = (x ; y). Écris chaque composante : x = … ; y = …. Les valeurs propres de A sont −2 et 2.
+Résous X′ = AX avec A = [[3,-2],[1,0]] et X(0) = (3 ; 2), X = (x ; y). Écris chaque composante : x = … ; y = …. Les valeurs propres de A sont 1 et 2.
   [guided]  v_1
-    (Un vecteur propre v₁ pour λ₁ = −2 :)
-    = (2 ; 1)   ← (A − λ₁I)v₁ = 0
+    (Un vecteur propre v₁ pour λ₁ = 1 :)
+    = (1 ; 1)   ← (A − λ₁I)v₁ = 0
   — Un vecteur propre v₂ pour λ₂ = 2 :  [juge eigvec]  départ : v_2
-    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −6x + 8y ; y′ = −4x + 6y
-    = x = □C_1e^(−2t) + C_2e^(2t) ; y = C_1e^(−2t) + C_2e^(2t)   (trous : x = 2C_1e^(−2t) + C_2e^(2t) ; y = C_1e^(−2t) + C_2e^(2t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = 1 ; C_2 = □   (trous : C_1 = 1 ; C_2 = 2)   ← X(0) = (4 ; 3)
-    = x = 2e^(−2t) + 2e^(2t) ; y = e^(−2t) + 2e^(2t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −2 et 2, de vecteurs propres (2 ; 1) et (1 ; 1). | x = 2C_1e^(−2t) + C_2e^(2t) ; y = C_1e^(−2t) + C_2e^(2t)
+    = (2 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 3x − 2y ; y′ = x
+    = x = C_1□ + 2C_2e^(2t) ; y = C_1e^t + C_2e^(2t)   (trous : x = C_1e^t + 2C_2e^(2t) ; y = C_1e^t + C_2e^(2t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 1 ; C_2 = □   (trous : C_1 = 1 ; C_2 = 1)   ← X(0) = (3 ; 2)
+    = x = e^t + 2e^(2t) ; y = e^t + e^(2t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 1 et 2, de vecteurs propres (1 ; 1) et (2 ; 1). | x = C_1e^t + 2C_2e^(2t) ; y = C_1e^t + C_2e^(2t)
   pièges : a2_ode_system_order
 
 ```
@@ -11598,49 +11637,49 @@ Résous X′ = AX avec A = [[-6,8],[-4,6]] et X(0) = (4 ; 3), X = (x ; y). Écri
 ### Niveau 2
 
 ```
-Résous X′ = AX avec A = [[3,-2],[0,2]] et X(0) = (3 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [guided]  (3 − λ)(2 − λ) = 0
+Résous X′ = AX avec A = [[1,0],[3,-2]] et X(0) = (1 ; 0), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [guided]  (1 − λ)(−2 − λ) = 0
     (Les valeurs propres de A :)
-    = λ = 2 ou λ = 3   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = 3 :  [juge eigvec]  départ : v_1
-    = (1 ; 0)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = 2 :  [juge eigvec]  départ : v_2
-    = (2 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 3x − 2y ; y′ = 2y
-    = x = C_1e^(3t) + □C_2e^(2t) ; y = C_2e^(2t)   (trous : x = C_1e^(3t) + 2C_2e^(2t) ; y = C_2e^(2t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = □ ; C_2 = □   (trous : C_1 = 1 ; C_2 = 1)   ← X(0) = (3 ; 1)
-    = x = e^(3t) + 2e^(2t) ; y = e^(2t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 3 et 2, de vecteurs propres (1 ; 0) et (2 ; 1). | x = C_1e^(3t) + 2C_2e^(2t) ; y = C_2e^(2t)
+    = λ = −2 ou λ = 1   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = 1 :  [juge eigvec]  départ : v_1
+    = (1 ; 1)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = −2 :  [juge eigvec]  départ : v_2
+    = (0 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = x ; y′ = 3x − 2y
+    = x = C_1□ ; y = C_1□ + C_2e^(−2t)   (trous : x = C_1e^t ; y = C_1e^t + C_2e^(−2t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = □ ; C_2 = □   (trous : C_1 = 1 ; C_2 = −1)   ← X(0) = (1 ; 0)
+    = x = e^t ; y = e^t − e^(−2t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 1 et −2, de vecteurs propres (1 ; 1) et (0 ; 1). | x = C_1e^t ; y = C_1e^t + C_2e^(−2t)
   pièges : a2_ode_system_order
 
-Résous X′ = AX avec A = [[-1,2],[2,-1]] et X(0) = (2 ; 0), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [guided]  (−1 − λ)(−1 − λ) − 4 = 0
+Résous X′ = AX avec A = [[5,-6],[4,-5]] et X(0) = (1 ; 0), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [guided]  (5 − λ)(−5 − λ) + 24 = 0
     (Les valeurs propres de A :)
-    = λ = −3 ou λ = 1   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = −3 :  [juge eigvec]  départ : v_1
-    = (1 ; -1)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = 1 :  [juge eigvec]  départ : v_2
-    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −x + 2y ; y′ = 2x − y
-    = x = C_1□ + C_2□ ; y = −C_1e^(−3t) + C_2e^t   (trous : x = C_1e^(−3t) + C_2e^t ; y = −C_1e^(−3t) + C_2e^t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = □ ; C_2 = □   (trous : C_1 = 1 ; C_2 = 1)   ← X(0) = (2 ; 0)
-    = x = e^(−3t) + e^t ; y = −e^(−3t) + e^t   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −3 et 1, de vecteurs propres (1 ; −1) et (1 ; 1). | x = C_1e^(−3t) + C_2e^t ; y = −C_1e^(−3t) + C_2e^t
-  pièges : a2_ode_system_order
-
-Résous X′ = AX avec A = [[-1,-2],[0,-2]] et X(0) = (0 ; -1), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [guided]  (−1 − λ)(−2 − λ) = 0
-    (Les valeurs propres de A :)
-    = λ = −2 ou λ = −1   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = −2 :  [juge eigvec]  départ : v_1
-    = (2 ; 1)   ← (A − λ₁I)v₁ = 0
+    = λ = −1 ou λ = 1   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = 1 :  [juge eigvec]  départ : v_1
+    = (3 ; 2)   ← (A − λ₁I)v₁ = 0
   — Un vecteur propre v₂ pour λ₂ = −1 :  [juge eigvec]  départ : v_2
-    = (1 ; 0)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −x − 2y ; y′ = −2y
-    = x = □C_1e^(−2t) + C_2e^(−t) ; y = C_1e^(−2t)   (trous : x = 2C_1e^(−2t) + C_2e^(−t) ; y = C_1e^(−2t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = □ ; C_2 = □   (trous : C_1 = −1 ; C_2 = 2)   ← X(0) = (0 ; −1)
-    = x = −2e^(−2t) + 2e^(−t) ; y = −e^(−2t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −2 et −1, de vecteurs propres (2 ; 1) et (1 ; 0). | x = 2C_1e^(−2t) + C_2e^(−t) ; y = C_1e^(−2t)
+    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 5x − 6y ; y′ = 4x − 5y
+    = x = □C_1e^t + C_2e^(−t) ; y = 2C_1e^t + C_2e^(−t)   (trous : x = 3C_1e^t + C_2e^(−t) ; y = 2C_1e^t + C_2e^(−t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = □ ; C_2 = □   (trous : C_1 = 1 ; C_2 = −2)   ← X(0) = (1 ; 0)
+    = x = 3e^t − 2e^(−t) ; y = 2e^t − 2e^(−t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 1 et −1, de vecteurs propres (3 ; 2) et (1 ; 1). | x = 3C_1e^t + C_2e^(−t) ; y = 2C_1e^t + C_2e^(−t)
+  pièges : a2_ode_system_order
+
+Résous X′ = AX avec A = [[-3,0],[-4,-1]] et X(0) = (1 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [guided]  (−3 − λ)(−1 − λ) = 0
+    (Les valeurs propres de A :)
+    = λ = −3 ou λ = −1   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = −3 :  [juge eigvec]  départ : v_1
+    = (1 ; 2)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = −1 :  [juge eigvec]  départ : v_2
+    = (0 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −3x ; y′ = −4x − y
+    = x = C_1e^(−3t) ; y = □C_1e^(−3t) + C_2e^(−t)   (trous : x = C_1e^(−3t) ; y = 2C_1e^(−3t) + C_2e^(−t))   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = □ ; C_2 = □   (trous : C_1 = 1 ; C_2 = −1)   ← X(0) = (1 ; 1)
+    = x = e^(−3t) ; y = 2e^(−3t) − e^(−t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −3 et −1, de vecteurs propres (1 ; 2) et (0 ; 1). | x = C_1e^(−3t) ; y = 2C_1e^(−3t) + C_2e^(−t)
   pièges : a2_ode_system_order
 
 ```
@@ -11648,52 +11687,52 @@ Résous X′ = AX avec A = [[-1,-2],[0,-2]] et X(0) = (0 ; -1), X = (x ; y). Éc
 ### Niveau 3
 
 ```
-Résous X′ = AX avec A = [[1,-4],[2,-5]] et X(0) = (3 ; 2), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [tap, suivre l'erreur, menu steps]  (1 − λ)(−5 − λ) + 8 = 0
+Résous X′ = AX avec A = [[0,-3],[2,-5]] et X(0) = (2 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [tap, suivre l'erreur, menu steps]  (−λ)(−5 − λ) + 6 = 0
+    (Les valeurs propres de A :)
+    ? Comment résoudre le système ? ✔ Diagonaliser A : X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂ / ✔ Éliminer y : une équation d'ordre 2 en x
+    = λ = −3 ou λ = −2   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = −2 :  [juge eigvec]  départ : v_1
+    = (3 ; 2)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = −3 :  [juge eigvec]  départ : v_2
+    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −3y ; y′ = 2x − 5y
+    = x = 3C_1e^(−2t) + C_2e^(−3t) ; y = 2C_1e^(−2t) + C_2e^(−3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 1 ; C_2 = −1   ← X(0) = (2 ; 1)
+    = x = 3e^(−2t) − e^(−3t) ; y = 2e^(−2t) − e^(−3t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −2 et −3, de vecteurs propres (3 ; 2) et (1 ; 1). | x = 3C_1e^(−2t) + C_2e^(−3t) ; y = 2C_1e^(−2t) + C_2e^(−3t)
+  pièges : a2_ode_system_order
+
+Résous X′ = AX avec A = [[0,2],[-1,3]] et X(0) = (5 ; 3), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [tap, suivre l'erreur, menu steps]  (−λ)(3 − λ) + 2 = 0
+    (Les valeurs propres de A :)
+    ? Comment résoudre le système ? ✔ Diagonaliser A : X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂ / ✔ Éliminer y : une équation d'ordre 2 en x
+    = λ = 1 ou λ = 2   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = 2 :  [juge eigvec]  départ : v_1
+    = (1 ; 1)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = 1 :  [juge eigvec]  départ : v_2
+    = (2 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 2y ; y′ = −x + 3y
+    = x = C_1e^(2t) + 2C_2e^t ; y = C_1e^(2t) + C_2e^t   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 1 ; C_2 = 2   ← X(0) = (5 ; 3)
+    = x = e^(2t) + 4e^t ; y = e^(2t) + 2e^t   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 2 et 1, de vecteurs propres (1 ; 1) et (2 ; 1). | x = C_1e^(2t) + 2C_2e^t ; y = C_1e^(2t) + C_2e^t
+  pièges : a2_ode_system_order
+
+Résous X′ = AX avec A = [[-1,0],[4,-3]] et X(0) = (-1 ; -3), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [tap, suivre l'erreur, menu steps]  (−1 − λ)(−3 − λ) = 0
     (Les valeurs propres de A :)
     ? Comment résoudre le système ? ✔ Diagonaliser A : X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂ / ✔ Éliminer y : une équation d'ordre 2 en x
     = λ = −3 ou λ = −1   ← det(A − λI) = 0
   — Un vecteur propre v₁ pour λ₁ = −1 :  [juge eigvec]  départ : v_1
-    = (2 ; 1)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = −3 :  [juge eigvec]  départ : v_2
-    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = x − 4y ; y′ = 2x − 5y
-    = x = 2C_1e^(−t) + C_2e^(−3t) ; y = C_1e^(−t) + C_2e^(−3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = 1 ; C_2 = 1   ← X(0) = (3 ; 2)
-    = x = 2e^(−t) + e^(−3t) ; y = e^(−t) + e^(−3t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −1 et −3, de vecteurs propres (2 ; 1) et (1 ; 1). | x = 2C_1e^(−t) + C_2e^(−3t) ; y = C_1e^(−t) + C_2e^(−3t)
-  pièges : a2_ode_system_order
-
-Résous X′ = AX avec A = [[-7,8],[-4,5]] et X(0) = (3 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [tap, suivre l'erreur, menu steps]  (−7 − λ)(5 − λ) + 32 = 0
-    (Les valeurs propres de A :)
-    ? Comment résoudre le système ? ✔ Diagonaliser A : X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂ / ✔ Éliminer y : une équation d'ordre 2 en x
-    = λ = −3 ou λ = 1   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = 1 :  [juge eigvec]  départ : v_1
-    = (1 ; 1)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = −3 :  [juge eigvec]  départ : v_2
-    = (2 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −7x + 8y ; y′ = −4x + 5y
-    = x = C_1e^t + 2C_2e^(−3t) ; y = C_1e^t + C_2e^(−3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = −1 ; C_2 = 2   ← X(0) = (3 ; 1)
-    = x = −e^t + 4e^(−3t) ; y = −e^t + 2e^(−3t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 1 et −3, de vecteurs propres (1 ; 1) et (2 ; 1). | x = C_1e^t + 2C_2e^(−3t) ; y = C_1e^t + C_2e^(−3t)
-  pièges : a2_ode_system_order
-
-Résous X′ = AX avec A = [[1,0],[-4,3]] et X(0) = (-1 ; -4), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [tap, suivre l'erreur, menu steps]  (1 − λ)(3 − λ) = 0
-    (Les valeurs propres de A :)
-    ? Comment résoudre le système ? ✔ Diagonaliser A : X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂ / ✔ Éliminer y : une équation d'ordre 2 en x
-    = λ = 1 ou λ = 3   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = 1 :  [juge eigvec]  départ : v_1
     = (1 ; 2)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = 3 :  [juge eigvec]  départ : v_2
+  — Un vecteur propre v₂ pour λ₂ = −3 :  [juge eigvec]  départ : v_2
     = (0 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = x ; y′ = −4x + 3y
-    = x = C_1e^t ; y = 2C_1e^t + C_2e^(3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = −1 ; C_2 = −2   ← X(0) = (−1 ; −4)
-    = x = −e^t ; y = −2e^t − 2e^(3t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 1 et 3, de vecteurs propres (1 ; 2) et (0 ; 1). | x = C_1e^t ; y = 2C_1e^t + C_2e^(3t)
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −x ; y′ = 4x − 3y
+    = x = C_1e^(−t) ; y = 2C_1e^(−t) + C_2e^(−3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = −1 ; C_2 = −1   ← X(0) = (−1 ; −3)
+    = x = −e^(−t) ; y = −2e^(−t) − e^(−3t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −1 et −3, de vecteurs propres (1 ; 2) et (0 ; 1). | x = C_1e^(−t) ; y = 2C_1e^(−t) + C_2e^(−3t)
   pièges : a2_ode_system_order
 
 ```
@@ -11701,58 +11740,23 @@ Résous X′ = AX avec A = [[1,0],[-4,3]] et X(0) = (-1 ; -4), X = (x ; y). Écr
 ### Niveau 4
 
 ```
-Résous X′ = AX avec A = [[1,2],[2,1]] et X(0) = (0 ; 2), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [free, suivre l'erreur]  (1 − λ)(1 − λ) − 4 = 0
-    (Les valeurs propres de A :)
-    = λ = −1 ou λ = 3   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = 3 :  [juge eigvec]  départ : v_1
-    = (1 ; 1)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = −1 :  [juge eigvec]  départ : v_2
-    = (1 ; -1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = x + 2y ; y′ = 2x + y
-    = x = C_1e^(3t) + C_2e^(−t) ; y = C_1e^(3t) − C_2e^(−t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = 1 ; C_2 = −1   ← X(0) = (0 ; 2)
-    = x = e^(3t) − e^(−t) ; y = e^(3t) + e^(−t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 3 et −1, de vecteurs propres (1 ; 1) et (1 ; −1). | x = C_1e^(3t) + C_2e^(−t) ; y = C_1e^(3t) − C_2e^(−t)
-  pièges : a2_ode_system_order
-
-Résous X′ = AX avec A = [[1,-4],[2,-5]] et X(0) = (0 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [free, suivre l'erreur]  (1 − λ)(−5 − λ) + 8 = 0
+Résous X′ = AX avec A = [[-3,4],[0,-1]] et X(0) = (3 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [free, suivre l'erreur]  (−3 − λ)(−1 − λ) = 0
     (Les valeurs propres de A :)
     = λ = −3 ou λ = −1   ← det(A − λI) = 0
   — Un vecteur propre v₁ pour λ₁ = −1 :  [juge eigvec]  départ : v_1
     = (2 ; 1)   ← (A − λ₁I)v₁ = 0
   — Un vecteur propre v₂ pour λ₂ = −3 :  [juge eigvec]  départ : v_2
-    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = x − 4y ; y′ = 2x − 5y
-    = x = 2C_1e^(−t) + C_2e^(−3t) ; y = C_1e^(−t) + C_2e^(−3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = −1 ; C_2 = 2   ← X(0) = (0 ; 1)
-    = x = −2e^(−t) + 2e^(−3t) ; y = −e^(−t) + 2e^(−3t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −1 et −3, de vecteurs propres (2 ; 1) et (1 ; 1). | x = 2C_1e^(−t) + C_2e^(−3t) ; y = C_1e^(−t) + C_2e^(−3t)
+    = (1 ; 0)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −3x + 4y ; y′ = −y
+    = x = 2C_1e^(−t) + C_2e^(−3t) ; y = C_1e^(−t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 1 ; C_2 = 1   ← X(0) = (3 ; 1)
+    = x = 2e^(−t) + e^(−3t) ; y = e^(−t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −1 et −3, de vecteurs propres (2 ; 1) et (1 ; 0). | x = 2C_1e^(−t) + C_2e^(−3t) ; y = C_1e^(−t)
   pièges : a2_ode_system_order
 
-Résous X′ = AX avec A = [[-2,0],[-5,3]] et X(0) = (2 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [free, suivre l'erreur]  (−2 − λ)(3 − λ) = 0
-    (Les valeurs propres de A :)
-    = λ = −2 ou λ = 3   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = −2 :  [juge eigvec]  départ : v_1
-    = (1 ; 1)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = 3 :  [juge eigvec]  départ : v_2
-    = (0 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −2x ; y′ = −5x + 3y
-    = x = C_1e^(−2t) ; y = C_1e^(−2t) + C_2e^(3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = 2 ; C_2 = −1   ← X(0) = (2 ; 1)
-    = x = 2e^(−2t) ; y = 2e^(−2t) − e^(3t)   ← X(t)
-  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −2 et 3, de vecteurs propres (1 ; 1) et (0 ; 1). | x = C_1e^(−2t) ; y = C_1e^(−2t) + C_2e^(3t)
-  pièges : a2_ode_system_order
-
-```
-
-### Niveau 5
-
-```
-Résous X′ = AX avec A = [[-3,1],[0,-2]] et X(0) = (3 ; 2), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [free, sans aide]  (−3 − λ)(−2 − λ) = 0
+Résous X′ = AX avec A = [[-3,1],[0,-2]] et X(0) = (4 ; 2), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [free, suivre l'erreur]  (−3 − λ)(−2 − λ) = 0
     (Les valeurs propres de A :)
     = λ = −3 ou λ = −2   ← det(A − λI) = 0
   — Un vecteur propre v₁ pour λ₁ = −3 :  [juge eigvec]  départ : v_1
@@ -11761,36 +11765,71 @@ Résous X′ = AX avec A = [[-3,1],[0,-2]] et X(0) = (3 ; 2), X = (x ; y). Écri
     = (1 ; 1)   ← (A − λ₂I)v₂ = 0
   — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −3x + y ; y′ = −2y
     = x = C_1e^(−3t) + C_2e^(−2t) ; y = C_2e^(−2t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = 1 ; C_2 = 2   ← X(0) = (3 ; 2)
-    = x = e^(−3t) + 2e^(−2t) ; y = 2e^(−2t)   ← X(t)
+    = C_1 = 2 ; C_2 = 2   ← X(0) = (4 ; 2)
+    = x = 2e^(−3t) + 2e^(−2t) ; y = 2e^(−2t)   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont −3 et −2, de vecteurs propres (1 ; 0) et (1 ; 1). | x = C_1e^(−3t) + C_2e^(−2t) ; y = C_2e^(−2t)
   pièges : a2_ode_system_order
 
-Résous X′ = AX avec A = [[-1,-1],[0,-2]] et X(0) = (3 ; 2), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [free, sans aide]  (−1 − λ)(−2 − λ) = 0
+Résous X′ = AX avec A = [[2,0],[1,1]] et X(0) = (2 ; 4), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [free, suivre l'erreur]  (2 − λ)(1 − λ) = 0
     (Les valeurs propres de A :)
-    = λ = −2 ou λ = −1   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = −1 :  [juge eigvec]  départ : v_1
-    = (1 ; 0)   ← (A − λ₁I)v₁ = 0
-  — Un vecteur propre v₂ pour λ₂ = −2 :  [juge eigvec]  départ : v_2
-    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −x − y ; y′ = −2y
-    = x = C_1e^(−t) + C_2e^(−2t) ; y = C_2e^(−2t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = 1 ; C_2 = 2   ← X(0) = (3 ; 2)
-    = x = e^(−t) + 2e^(−2t) ; y = 2e^(−2t)   ← X(t)
-  pièges : a2_ode_system_order
-
-Résous X′ = AX avec A = [[0,-2],[-2,0]] et X(0) = (-2 ; 0), X = (x ; y). Écris chaque composante : x = … ; y = ….
-  [free, sans aide]  (−λ)(−λ) − 4 = 0
-    (Les valeurs propres de A :)
-    = λ = −2 ou λ = 2   ← det(A − λI) = 0
-  — Un vecteur propre v₁ pour λ₁ = −2 :  [juge eigvec]  départ : v_1
+    = λ = 1 ou λ = 2   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = 2 :  [juge eigvec]  départ : v_1
     = (1 ; 1)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = 1 :  [juge eigvec]  départ : v_2
+    = (0 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 2x ; y′ = x + y
+    = x = C_1e^(2t) ; y = C_1e^(2t) + C_2e^t   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 2 ; C_2 = 2   ← X(0) = (2 ; 4)
+    = x = 2e^(2t) ; y = 2e^(2t) + 2e^t   ← X(t)
+  aides : Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v. | Les valeurs propres sont 2 et 1, de vecteurs propres (1 ; 1) et (0 ; 1). | x = C_1e^(2t) ; y = C_1e^(2t) + C_2e^t
+  pièges : a2_ode_system_order
+
+```
+
+### Niveau 5
+
+```
+Résous X′ = AX avec A = [[3,-1],[0,2]] et X(0) = (0 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [free, sans aide]  (3 − λ)(2 − λ) = 0
+    (Les valeurs propres de A :)
+    = λ = 2 ou λ = 3   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = 3 :  [juge eigvec]  départ : v_1
+    = (1 ; 0)   ← (A − λ₁I)v₁ = 0
   — Un vecteur propre v₂ pour λ₂ = 2 :  [juge eigvec]  départ : v_2
-    = (-1 ; 1)   ← (A − λ₂I)v₂ = 0
-  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −2y ; y′ = −2x
-    = x = C_1e^(−2t) − C_2e^(2t) ; y = C_1e^(−2t) + C_2e^(2t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
-    = C_1 = −1 ; C_2 = 1   ← X(0) = (−2 ; 0)
-    = x = −e^(−2t) − e^(2t) ; y = −e^(−2t) + e^(2t)   ← X(t)
+    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 3x − y ; y′ = 2y
+    = x = C_1e^(3t) + C_2e^(2t) ; y = C_2e^(2t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = −1 ; C_2 = 1   ← X(0) = (0 ; 1)
+    = x = −e^(3t) + e^(2t) ; y = e^(2t)   ← X(t)
+  pièges : a2_ode_system_order
+
+Résous X′ = AX avec A = [[2,2],[0,3]] et X(0) = (0 ; 1), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [free, sans aide]  (2 − λ)(3 − λ) = 0
+    (Les valeurs propres de A :)
+    = λ = 2 ou λ = 3   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = 3 :  [juge eigvec]  départ : v_1
+    = (2 ; 1)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = 2 :  [juge eigvec]  départ : v_2
+    = (1 ; 0)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = 2x + 2y ; y′ = 3y
+    = x = 2C_1e^(3t) + C_2e^(2t) ; y = C_1e^(3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 1 ; C_2 = −2   ← X(0) = (0 ; 1)
+    = x = 2e^(3t) − 2e^(2t) ; y = e^(3t)   ← X(t)
+  pièges : a2_ode_system_order
+
+Résous X′ = AX avec A = [[0,-3],[-3,0]] et X(0) = (2 ; 0), X = (x ; y). Écris chaque composante : x = … ; y = ….
+  [free, sans aide]  (−λ)(−λ) − 9 = 0
+    (Les valeurs propres de A :)
+    = λ = −3 ou λ = 3   ← det(A − λI) = 0
+  — Un vecteur propre v₁ pour λ₁ = 3 :  [juge eigvec]  départ : v_1
+    = (1 ; -1)   ← (A − λ₁I)v₁ = 0
+  — Un vecteur propre v₂ pour λ₂ = −3 :  [juge eigvec]  départ : v_2
+    = (1 ; 1)   ← (A − λ₂I)v₂ = 0
+  — Les composantes de X, puis les constantes :  [juge ode]  départ : x′ = −3y ; y′ = −3x
+    = x = C_1e^(3t) + C_2e^(−3t) ; y = −C_1e^(3t) + C_2e^(−3t)   ← Chaque couple (λ, v) donne une solution e^{λt}v
+    = C_1 = 1 ; C_2 = 1   ← X(0) = (2 ; 0)
+    = x = e^(3t) + e^(−3t) ; y = −e^(3t) + e^(−3t)   ← X(t)
   pièges : a2_ode_system_order
 
 ```

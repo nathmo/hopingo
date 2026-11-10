@@ -9,7 +9,7 @@ import { parse } from '../../cas/parse.js';
 import { stripParen } from '../../cas/ast.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { blankLine } from '../../judges/lines.js';
-import { MT, linesItem, examTag, H, E, SEG, modeOf, blanked, stepMenus, A2_KEYS } from './a2-kit.js';
+import { MT, linesItem, examTag, H, E, SEG, modeOf, blanked, stepMenus, A2_KEYS, domainItem } from './a2-kit.js';
 import { q, val, vText, vFloat, vScale, linT, swapXY, mcqV, R } from './analyse2-f-kit.js';
 
 const DD = 'a2-domain-describe';
@@ -264,9 +264,29 @@ function describeMcq(rng, opts, level = 4) {
   return null;
 }
 
+// Level 4 (step U6, type `domain`): the bounds typed in boxes, one row per
+// variable, in the order asked.
+function boundsItem(level, rng, opts) {
+  const d = regionData(rng);
+  const types = [['typeI', d.I], ['typeII', d.II]].filter(([, t]) => t);
+  const [shape, line] = rng.pick(types);
+  const cs = chainTexts(line);
+  const [o, i] = cs;
+  return domainItem({
+    skill: DD, level, prompt: `D est la région bornée par ${d.curves} : ${regionText(d)}. Écris les bornes de D ${shape === 'typeI' ? 'en type I (x à l’extérieur)' : 'en type II (y à l’extérieur)'}.`,
+    judge: domCfg(d, shape), answer: Object.fromEntries(cs.map((c) => [c.v, [c.lo, c.hi]])),
+    hints: H(`Dessine les courbes${d.inter ? ' et trouve leurs points d’intersection' : ''}. Les bornes de ${o.v}, à l'extérieur, sont des nombres.`,
+      `${o.v} va de ${R(o.lo)} à … ; ${i.v} va de … à ${R(i.hi)}`, MT(line, XY)),
+    subgoals: DD_SUB.filter((g) => g.id === shape || g.id === 'order'),
+    key: `${d.kind}:${line}:${d.mirror}`, exam: examTag(opts),
+    baits: ['a2_fubini_outer_var', 'a2_domain_curve_order'],
+  });
+}
+
 export function domainDescribe(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq' || level === 5) return describeMcq(rng, opts, opts.exam ? 4 : 5);
   if (level === 4 && rng.chance(0.35)) return polarItem(level, rng, opts);
+  if (level === 4 && !opts.exam && rng.chance(0.4)) return boundsItem(level, rng, opts);
   if (level === 3 && rng.chance(0.2)) return polarItem(level, rng, opts);
   return cartItem(level, rng, opts);
 }
