@@ -4,10 +4,26 @@
 // by module P (p-count, p-hypergeom).
 
 import { trap } from './stattrap.js';
+import { parse } from '../parse.js';
+
+// Literal lines (a simplification of factorials, an expansion of a
+// binomial) are judged by `equiv`: the generator writes the trap's wrong
+// lines in cfg.eqTraps = {id: [texts]} (expressions in cfg.vars).
+function eqAware(rule) {
+  const own = rule.transform;
+  return {
+    ...rule,
+    judges: ['equiv', ...rule.judges],
+    transform: (prev, ctx) => {
+      if (ctx?.cfg?.kind !== 'equiv') return own(prev, ctx);
+      return (ctx.cfg.eqTraps?.[rule.id] || []).map((t) => parse(t, { vars: ctx.cfg.vars }));
+    },
+  };
+}
 
 const n = (x, d) => (x === undefined || x === null ? d : String(x).replace('.', ',').replace('-', '−'));
 
-export const RULES = [
+const LIST = [
   trap({
     id: 'g7_add_instead_multiply', family: 'proba', tag: 'E', skill: 'g7-mult-principle', repair: 'g7-mult-principle',
     name: 'Additionner au lieu de multiplier',
@@ -81,3 +97,5 @@ export const RULES = [
     explain: (c) => `Sans remise, après une boule tirée il en reste ${c.left ?? 'une de moins'} : les probabilités du 2e niveau changent${c.second ? ` (${c.second})` : ''}.`,
   }),
 ];
+
+export const RULES = LIST.map(eqAware);

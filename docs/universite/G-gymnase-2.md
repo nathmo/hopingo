@@ -1490,7 +1490,7 @@ f(x) = |x³ − a³| − 12x, a ∈ ℝ. (a) Pour quels a le graphe a-t-il un po
 
 # G7. Combinatoire et probabilités élémentaires
 
-Unité `combi` · préfixe `g7-` · pièges `g7_` · Statut : à faire
+Unité `combi` · préfixe `g7-` · pièges `g7_` · Statut : fait le 10 novembre 2026 (étape U7). Chaque compétence a son statut. Les nombres et les probabilités sont jugés par `prob` (C(n, k), A(n, k) et n! exacts) ; les simplifications littérales et les développements par `equiv` (forme `expanded`, pièges dans `cfg.eqTraps`).
 
 **Sources** : CMS, Algèbre linéaire, semestre 1, chapitre « Analyse combinatoire » (calculs de factorielles, simplifications, identités sur les C(n, k), équations dans ℕ) ; CMS, Analyse I, chapitre 1 (binôme de Newton) ; plan, module P (« 4 cartes parmi 32, exactement 2 dames », réutilisé ici). Les probabilités de Laplace et les arbres sont absents du CMS : ces deux compétences portent l'étiquette `opt`, qui est seulement informative. Elles restent obligatoires (README §1).
 **Notation** : factorielle `n!` ; combinaisons `C(n, k)`, affichées comme le coefficient binomial vertical (le CMS écrit aussi Cₙᵏ) ; arrangements `A(n, k)` = n!/(n − k)! ; permutations `P(n) = n!`. Probabilités : `P(A)`, fractions irréductibles.
@@ -1503,6 +1503,7 @@ Le juge `value` reçoit ici l'extension `n!`, `C(n, k)`, `A(n, k)` (voir les con
 
 ### `g7-mult-principle` — Principe multiplicatif
 - **Année** 12 · **Prérequis** — · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : plaques, codes (sans contrainte, chiffres distincts, premier chiffre non nul), menus, tenues, mots à lettres distinctes, deux cas qui s'excluent (somme), « au moins un chiffre » (complémentaire). Le calcul final est une étape de la même partie (pas de calculatrice intégrée). Le V/F dont l'énoncé est faux demande le bon nombre de menus comme contre-exemple (sorte `refute`).
 - **Intro** : un choix en plusieurs étapes indépendantes (« et ») : on **multiplie** les nombres de possibilités. Des cas qui s'excluent (« ou ») : on **additionne**. Un arbre ou des cases à remplir aident à compter.
 - **Juge** : `value` `{form:'integer'}` · **Forme finale** : un entier (la ligne `26²·9·10²` est acceptée comme étape, la forme finale est le nombre).
 - **Niveaux** :
@@ -1526,6 +1527,7 @@ Le juge `value` reçoit ici l'extension `n!`, `C(n, k)`, `A(n, k)` (voir les con
 
 ### `g7-perm-arr` — Factorielles, permutations, arrangements, anagrammes
 - **Année** 12 · **Prérequis** `g7-mult-principle` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : podium ou postes (A(n, k)), file (n!), anagrammes (16 mots), simplification (n + p)!/(n + q)! avec 1 ≤ p − q ≤ 3 (juge `equiv`, polynôme développé, une partie par ligne de calcul ; aux niveaux 3 et 4 seulement). Niveau 5 : anagrammes qui commencent par une lettre donnée (la contrainte « voyelles ensemble » n'est pas faite). La différence (n + 2)! − (n + 1)! n'est pas proposée (sa forme finale n'est pas un polynôme).
 - **Pourquoi ces prérequis** : `g7-mult-principle` : n! et A(n, k) viennent du principe multiplicatif.
 - **Intro** : n objets distincts en ligne : n! façons. k places parmi n, ordre compté, sans répétition : A(n, k) = n·(n − 1)···(n − k + 1) = n!/(n − k)!. Anagrammes d'un mot avec des lettres répétées : n!/(n₁!·n₂!···). Simplifier : (n + 1)! = (n + 1)·n!.
 - **Juge** : `value` `{form:'integer'}` ; `equiv` `{vars:['n'], domain:{n:'entiers ≥ 2'}}` pour les simplifications littérales · **Forme finale** : entier, ou polynôme en n développé.
@@ -1551,6 +1553,7 @@ Le juge `value` reçoit ici l'extension `n!`, `C(n, k)`, `A(n, k)` (voir les con
 
 ### `g7-combinations` — Combinaisons, triangle de Pascal
 - **Année** 12 · **Prérequis** `g7-perm-arr` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : comité dans deux groupes, cartes (32, 36 ou 52, exactement j dames, as ou rois), équation C(n, 2) = m ou C(n, 3) = m (deux parties `prob` : n(n − 1)… = k!·m, puis n ; pas de juge `solset`). Niveau 5 et variante `open` (4 points) : « au moins une femme » par le complémentaire, en trois parties.
 - **Pourquoi ces prérequis** : `g7-perm-arr` : C(n, k) = A(n, k)/k!.
 - **Intro** : choisir k objets parmi n, sans ordre : C(n, k) = n!/(k!(n − k)!) = A(n, k)/k!. C(n, k) = C(n, n − k). Pascal : C(n, k) = C(n − 1, k − 1) + C(n − 1, k). Choix dans plusieurs groupes : on multiplie les C.
 - **Juge** : `value` `{form:'integer'}` ; `solset` `{v:'n', domain:'entiers'}` pour les équations en n · **Forme finale** : entier ; ou ensemble des n solutions.
@@ -1575,6 +1578,7 @@ Le juge `value` reçoit ici l'extension `n!`, `C(n, k)`, `A(n, k)` (voir les con
 
 ### `g7-which-count` — Ordonné ou pas ? Avec ou sans remise ? (exercice éclair)
 - **Année** 12 · **Prérequis** `g7-combinations` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1 · **needsSolo** false
+- **Statut** : fait le 10 novembre 2026 (étape U7). Banque de 18 situations paramétrées (pas 40), 5 par case et 3 pour C(n + k − 1, k) (niveaux 4 et 5). Niveau 1 : « l'ordre compte-t-il ? » avec l'indice en gras ; niveau 2 : les deux questions (4 cases) ; niveau 3 : la formule ; niveau 4 : la formule et sa valeur (QCM), ou le nombre seul (item `answer` dont les autres cases sont les pièges) ; niveau 5 : comme le 4 en QCM. La série de 8 énoncés en temps limité est remplacée par des items isolés (le moteur enchaîne les items de la leçon) ; le gabarit 3 (paire d'énoncés presque identiques) n'est pas fait.
 - **Intro** : deux questions avant tout calcul. L'ordre compte-t-il (podium, code) ou non (main de cartes, comité) ? Peut-on reprendre le même objet (code, dé lancé plusieurs fois) ou non (tirage sans remise, personnes) ? Quatre cases : nᵏ (ordre, avec remise), A(n, k) (ordre, sans remise), C(n, k) (sans ordre, sans remise), C(n + k − 1, k) (sans ordre, avec remise ; seulement en L4–L5).
 - **Juge** : `mcq` (pas de lignes) ; en L3 et plus, `answer` jugé par `value` · **Forme finale** : la bonne case, puis le nombre.
 - **Niveaux** (exercice éclair, séries de 8 énoncés courts) :
@@ -1598,6 +1602,7 @@ Le juge `value` reçoit ici l'extension `n!`, `C(n, k)`, `A(n, k)` (voir les con
 
 ### `g7-binomial` — Binôme de Newton
 - **Année** 12 · **Prérequis** `g7-combinations`, `g5-sigma`, `@alg:C-identites` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits 1 et 2 : trois parties, la puissance de x en k (`prob` en expression, variable k), k, puis le coefficient ; 1 item sur 4 aux niveaux 3 et 4 demande une puissance impossible (décision « k entier ? », réponse 0). Gabarit 3 (développement complet de (x + c)ⁿ, n ≤ 5) au niveau 4, jugé par `equiv` (forme développée). Le terme général n'est pas une ligne à écrire (C(n, k) avec k libre n'est pas évaluable) : il est donné en note aux niveaux 1 et 2. La somme Σ C(n, k)·2ᵏ = 3ⁿ n'est pas faite ; niveau 5 : terme indépendant de x.
 - **Pourquoi ces prérequis** : `@alg:C-identites` : (a + b)² et (a − b)² sont les cas n = 2.
 - **Intro** : (a + b)ⁿ = Σₖ₌₀ⁿ C(n, k)·aⁿ⁻ᵏ·bᵏ. Pour un terme précis : on écrit le terme général, avec **tous** ses facteurs (coefficients et signes de a et b), on cherche k qui donne la bonne puissance de x, puis on calcule.
 - **Juge** : `equiv` `{vars:['x','k']}` pour le terme général ; `value` pour k et le coefficient · **Forme finale** : le coefficient (entier ou fraction).
@@ -1623,6 +1628,7 @@ Le juge `value` reçoit ici l'extension `n!`, `C(n, k)`, `A(n, k)` (voir les con
 
 ### `g7-laplace` — Probabilité de Laplace
 - **Année** 12 · **Prérequis** `g7-which-count` · **Étiquettes** opt · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : urne (exactement j rouges), cartes (exactement j dames), deux dés (somme, piège de l'équiprobabilité des sommes). Trois parties |Ω|, |A| et P(A) ; P(A) est calculé à partir des valeurs de l'élève (report d'erreur). Niveau 5 : « au moins une rouge » par le complémentaire. « Vérifier en simulant » : urne ou dés, 10 000 tirages.
 - **Pourquoi ces prérequis** : `g7-which-count` : même modèle (ordre, remise) pour les cas favorables et possibles.
 - **Intro** : si toutes les issues sont **équiprobables**, P(A) = (nombre de cas favorables)/(nombre de cas possibles). On compte les deux de la même façon (avec ou sans ordre, mais pareil en haut et en bas). P(non A) = 1 − P(A).
 - **Juge** : `prob` `{symbols:{}}` (valeurs exactes avec `C(n, k)`) · **Forme finale** : fraction irréductible.
@@ -1647,6 +1653,7 @@ Le juge `value` reçoit ici l'extension `n!`, `C(n, k)`, `A(n, k)` (voir les con
 
 ### `g7-tree` — Arbres de probabilité
 - **Année** 12 · **Prérequis** `g7-laplace` · **Étiquettes** opt · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : urne de r et b boules (r + b ≤ 10), deux tirages avec ou sans remise, « même couleur », « au moins une rouge », « la 2e est rouge » ; test médical (gabarit 3). Une partie par chemin, puis la somme (ou le complément). L'arbre n'est pas dessiné : les chemins sont nommés (P(RR), P(BB)). Niveau 5 : trois tirages sans remise, même couleur (le « sachant que » n'est pas fait ici, il est en P). Simulation sauf pour « la 2e est rouge ».
 - **Pourquoi ces prérequis** : `g7-laplace` : probabilité de chaque branche par équiprobabilité.
 - **Intro** : on multiplie le long d'un chemin, on additionne les chemins qui mènent à l'événement. Sans remise, les probabilités du 2e niveau **changent** (il reste une boule de moins). Les branches issues d'un même nœud ont une somme 1. Prépare Bayes (module P).
 - **Juge** : `prob` · **Forme finale** : fraction irréductible.

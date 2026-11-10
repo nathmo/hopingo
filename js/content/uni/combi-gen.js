@@ -187,8 +187,15 @@ function mpTf(rng, opts) {
   });
 }
 
+// The other skills: counting (combi-count.js), binomial theorem and first
+// probabilities (combi-prob.js).
+import { GEN as COUNT } from './combi-count.js';
+import { GEN as PROB } from './combi-prob.js';
+
 export const GEN = {
   [MP]: mpItem,
+  ...COUNT,
+  ...PROB,
 };
 
 void coefItem; void num;
