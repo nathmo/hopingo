@@ -20,6 +20,7 @@
 import * as MX from '../../cas/matrix.js';
 import { parse } from '../../cas/parse.js';
 import { walk } from '../../cas/ast.js';
+import { exprML, parseExpr } from '../../cas/matexpr.js';
 import { blankLine } from '../../judges/lines.js';
 import {
   q, mt, vt, ML, MLm, opR, fq, qt, sub, rrefWith, orthRational, gsReverse, lsqReverse, opLines, pickCells,
@@ -71,7 +72,10 @@ const prods = (u, v) => u.map((x, i) => q(x).mul(q(v[i])));
 const squares = (u) => u.map((x) => q(x).mul(q(x)));
 
 // Σ cₖ·vₖ as text (judges) and to read: (1 ; 2) - 2·(0 ; 1), 2·u₁ − u₂.
-function combT(cs, vs, show = vt) {
+function combT(cs0, vs0, show = vt) {
+  const keep = cs0.map((c, k) => k === 0 || q(c).n !== 0);
+  const cs = cs0.filter((_, k) => keep[k]);
+  const vs = vs0.filter((_, k) => keep[k]);
   return cs.map((c0, k) => {
     const c = q(c0);
     const abs = c.n < 0 ? c.neg() : c;
@@ -734,11 +738,321 @@ function projExam(rng, exam) {
 }
 
 // ======================================================================
+// l-orth-matrices
+// ======================================================================
+
+const MATS = 'l-orth-matrices';
+const MATS_SUB = [
+  { id: 'dots', label: 'produits scalaires des colonnes', skill: DOT },
+  { id: 'inv', label: 'inverse', skill: MATS },
+];
+
+// U = (1/d)·D, D whole (orthRational); its columns cᵢ = Dᵢ/d.
+function matsData(rng, n = 3) {
+  const U = orthRational(n, rng);
+  const d = denOf(U);
+  const D = U.map((r) => r.map((x) => x.mul(q(d))));
+  return { U, d, D, n, uT: `(1/${d})·${mt(D)}`, cols: MX.transpose(D) };
+}
+// A matrix expression as written, (1/3)·[[1, 2, 2], …] (not computed).
+const MLx = (text) => { try { return `<math>${exprML(parseExpr(text))}</math>`; } catch { return ML(text); } };
+const uML = (m) => MLx(m.uT);
+const colDot = (m, i, j, guided = null) => {
+  const s = `(${sumT(prods(m.cols[i], m.cols[j]))})/${m.d * m.d}`;
+  const want = i === j ? '1' : '0';
+  return {
+    judge: { kind: 'value', expect: want }, start: `c_${i + 1}·c_${j + 1}`, html: i === j ? `‖c${SUBS[i + 1]}‖² = c${SUBS[i + 1]} · c${SUBS[i + 1]}` : `c${SUBS[i + 1]} · c${SUBS[j + 1]}`, ask: i === j ? `‖c${SUBS[i + 1]}‖² =` : `c${SUBS[i + 1]} · c${SUBS[j + 1]} =`,
+    lines: [guided ? eqG(s, guided, 'Produits des colonnes, sur ' + m.d * m.d, 'dots') : eq(s, 'Produits des colonnes, sur ' + m.d * m.d, 'dots'), eq(want, i === j ? 'Norme 1' : 'Orthogonales', 'dots')],
+  };
+};
+const utuPart = (m, rng = null, names = true) => {
+  const I = mt(MX.identity(m.n));
+  return {
+    judge: { kind: 'mat', expect: I, ...(names ? { names: { U: m.uT } } : {}) }, start: 'UᵀU', html: 'Le test : UᵀU', ask: 'UᵀU =',
+    lines: [rng ? withCells(eq(I, 'Colonnes orthonormées', 'dots'), pickCells(MX.identity(m.n), [0, 1], 2, rng)) : eq(I, 'Colonnes orthonormées', 'dots')],
+  };
+};
+const invPart = (m, rng = null) => {
+  const Ut = MX.transpose(m.U);
+  return {
+    judge: { kind: 'mat', expect: mt(Ut), names: { U: m.uT } }, start: 'U^(-1)', html: 'L\'inverse : U⁻¹ = Uᵀ', ask: 'U⁻¹ =',
+    lines: [rng ? withCells(eq(mt(Ut), 'Transposer', 'inv'), pickCells(Ut, [0, 1], 3, rng)) : eq(mt(Ut), 'Transposer', 'inv')],
+  };
+};
+// Ux = b ⇒ x = Uᵀb (b whole, x as simple as possible).
+function solvePart(m, rng) {
+  let b = null;
+  let x = null;
+  for (let t = 0; t < 60; t++) {
+    const bb = Array.from({ length: m.n }, () => q(rng.int(-3, 3)));
+    if (isZeroV(bb)) continue;
+    const xx = MX.matVec(MX.transpose(m.U), bb);
+    if (!x || denOf(xx) < denOf(x)) { b = bb; x = xx; }
+    if (denOf(xx) === 1) break;
+  }
+  return {
+    b, x,
+    part: {
+      judge: { kind: 'mat', expect: vt(x), names: { U: m.uT } }, start: 'x', html: `Résoudre Ux = ${vR(b)} sans Gauss : x = Uᵀb`, ask: 'x =',
+      lines: [eq(`U^T·${vt(b)}`, 'x = U⁻¹b = Uᵀb', 'inv'), eq(vt(x), '', 'inv')],
+    },
+  };
+}
+
+function matsItem(level, rng) {
+  if (level === 5 && rng.chance(0.5)) return matsExam(rng, 'mcq', 5);
+  if (level === 4) return matsComplete(rng);
+  const m = matsData(rng, 3);
+  const key = `${MATS}:${m.uT}:${level}`;
+  const hints = hints3(
+    'Teste UᵀU = I : les produits scalaires des colonnes (0 pour deux colonnes différentes, 1 pour une colonne avec elle-même).',
+    `c₁ · c₂ = (${sumR(prods(m.cols[0], m.cols[1])).replace(/\d+$/, '□')})/${m.d * m.d}`,
+    'UᵀU = I : U est orthogonale, et U⁻¹ = Uᵀ.',
+  );
+  const base = { skill: MATS, level, subgoals: MATS_SUB, key, hints, mode: modeOf(level) };
+  const U = `U = ${uML(m)}`;
+  if (level === 1) {
+    return partsItem({ ...base, prompt: `Soit ${U}. Vérifie que ses colonnes c₁, c₂, c₃ sont orthonormées (quelques produits scalaires), puis donne U⁻¹.` },
+      [colDot(m, 0, 1, [1, -1]), colDot(m, 1, 2, [0, -1]), colDot(m, 0, 0, [1, 2]), invPart(m, rng)]);
+  }
+  if (level === 2) {
+    const decision = {
+      kind: 'decision', prompt: 'Comment savoir si U est orthogonale ?', options: rng.shuffle(menu('Vérifier UᵀU = I (colonnes orthogonales et de norme 1)', [
+        ['Vérifier que les colonnes sont orthogonales deux à deux', 'Il faut aussi des colonnes de norme 1 : avec U = 2I, les colonnes sont orthogonales mais UᵀU = 4I.', 'l_orth_cols_only'],
+        ['Vérifier que det U = 1', 'det U = ±1 pour une matrice orthogonale, mais la réciproque est fausse : [[2, 0], [0, 1/2]] a det 1.', 'l_orth_det_one'],
+      ])),
+    };
+    return partsItem({ ...base, prompt: `Soit ${U}. Est-elle orthogonale ? Fais le test, puis donne U⁻¹.`, before: [decision] }, [utuPart(m, rng), invPart(m, rng)]);
+  }
+  const s = solvePart(m, rng);
+  const parts = [utuPart(m, null, level !== 3), invPart(m), s.part];
+  if (level === 3) {
+    parts[0] = withMenu(parts[0], menu('Calculer UᵀU', [['Calculer det U', 'det U = ±1 ne suffit pas : il faut UᵀU = I.', 'l_orth_det_one'], ['Vérifier seulement c₁ · c₂ = 0', 'Il faut toutes les paires de colonnes, et des colonnes de norme 1.', 'l_orth_cols_only']]));
+    parts[1] = withMenu(parts[1], menu('U⁻¹ = Uᵀ', [['U⁻¹ = (1/det U)·U', 'Cette formule n\'existe pas ; pour une matrice orthogonale, U⁻¹ = Uᵀ.']]));
+    parts[2] = withMenu(parts[2], menu('x = Uᵀb', [['x = Ub', 'Ux = b donne x = U⁻¹b = Uᵀb.']]));
+  }
+  return partsItem({ ...base, prompt: `Soit ${U}. Vérifie qu'elle est orthogonale, donne U⁻¹, puis résous Ux = ${vR(s.b)}.`, tapActions: level === 3 ? 'menu' : null }, parts);
+}
+
+// Level 4: complete an orthonormal family into an orthonormal basis.
+function matsComplete(rng) {
+  const n = rng.chance(0.7) ? 3 : 4;
+  const m = matsData(rng, n);
+  const cols = MX.transpose(m.U);
+  const given = cols.slice(0, n - 1 - (n === 4 ? 1 : 0));
+  const rest = cols.slice(given.length);
+  const ints = rest.map((c) => scaleV(c, denOf(c)));
+  const parts = [
+    { judge: { kind: 'span', basis: rest.map(vt), require: n === 3 ? 'basis' : 'orthogonal' }, start: 'w', html: 'Des vecteurs orthogonaux à la famille donnée', ask: n === 3 ? 'w =' : 'w₁, w₂ =', lines: [eq(ints.map(vt).join(', '), n === 3 ? 'Orthogonal à c₁ et c₂ : un système homogène' : 'Une base orthogonale du complément', 'dots')] },
+    { judge: { kind: 'span', basis: rest.map(vt), require: 'orthonormal' }, start: 'c', html: 'Normaliser', ask: n === 3 ? 'c₃ =' : 'c₃, c₄ =', lines: [eq(rest.map(vt).join(', '), 'Diviser par la norme', 'inv')] },
+  ];
+  return partsItem({
+    skill: MATS, level: 4, subgoals: MATS_SUB, key: `${MATS}:complete:${m.uT}`, mode: 'free',
+    prompt: `Les vecteurs ${famR(given)} forment une famille orthonormée de ℝ${n === 3 ? '³' : '⁴'}. Complète-la en une base orthonormée de ℝ${n === 3 ? '³' : '⁴'} : trouve ${n === 3 ? 'un vecteur orthogonal aux deux' : 'deux vecteurs orthogonaux entre eux et aux deux autres'}, puis normalise.`,
+    hints: hints3('Un vecteur w orthogonal à la famille vérifie cᵢ · w = 0 pour chaque cᵢ : résous ce système homogène, puis divise par la norme.', `Par exemple w = ${vR(ints[0]).replace(/\d+\)$/, '□)')}`, `${famR(rest)}`),
+  }, parts);
+}
+
+const ORTH_TRUE = ['U⁻¹ = Uᵀ', '‖Ux‖ = ‖x‖ pour tout x', 'Les lignes de U sont orthonormées', '(Ux) · (Uy) = x · y pour tous x, y', 'UUᵀ = I', '|det U| = 1'];
+function matsExam(rng, exam, level = 4) {
+  const tag = level === 5 ? false : examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which === 0) {
+      const A = rng.pick([[[1, 0], [0, -1]], [[0, 1], [1, 0]], [[-1, 0], [0, 1]]]);
+      return tfL({
+        skill: MATS, key: `det:${mt(MX.mat(A))}`, truth: false, exam: tag, ruleIfTrue: 'l_orth_det_one',
+        statement: 'Une matrice orthogonale a un déterminant égal à 1.',
+        counter: { kind: 'matOne', params: { want: 'detMinus1Orth' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)) } },
+        explanation: `Faux : det U = ±1. ${MLm(MX.mat(A))} est orthogonale (une symétrie) et son déterminant vaut −1.`,
+      });
+    }
+    if (which === 1) {
+      const k = rng.pick([2, 3]);
+      return tfL({
+        skill: MATS, key: `cols:${k}`, truth: false, exam: tag, ruleIfTrue: 'l_orth_cols_only',
+        statement: 'Si les colonnes d\'une matrice carrée A sont orthogonales deux à deux et non nulles, alors A⁻¹ = Aᵀ.',
+        counter: { kind: 'matOne', params: { want: 'orthCols' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt([[k, 0], [0, k]]) } },
+        explanation: `Faux : il faut aussi des colonnes de norme 1. Avec A = ${k}I, AᵀA = ${k * k}I, donc A⁻¹ = (1/${k})I ≠ Aᵀ.`,
+      });
+    }
+    return tfL({
+      skill: MATS, key: 'prod', truth: true, exam: tag,
+      statement: 'Le produit de deux matrices orthogonales n × n est une matrice orthogonale.',
+      explanation: 'Vrai : (UV)ᵀ(UV) = VᵀUᵀUV = VᵀV = I.',
+    });
+  }
+  // 2019 Q5: which one is not always true?
+  const trueOnes = rng.shuffle(ORTH_TRUE).slice(0, 3);
+  if (rng.chance(0.5)) {
+    return mcqDistinct({
+      skill: MATS, level, key: `mcq:notalways:${trueOnes.join('|')}`, exam: tag,
+      prompt: 'Soit U une matrice n × n orthogonale. Laquelle de ces affirmations n\'est <b>pas</b> forcément vraie ?',
+      right: 'det U = 1',
+      wrongs: trueOnes.map((html) => ({ html, rule: null })),
+      solution: [{ html: 'det U = ±1 : une symétrie, comme [[1, 0], [0, −1]], est orthogonale de déterminant −1. Les trois autres affirmations sont toujours vraies.', note: '' }],
+    }, rng);
+  }
+  return mcqDistinct({
+    skill: MATS, level, key: `mcq:always:${trueOnes[0]}`, exam: tag,
+    prompt: 'Soit U une matrice n × n orthogonale. Laquelle de ces affirmations est toujours vraie ?',
+    right: trueOnes[0],
+    wrongs: [{ html: 'det U = 1', rule: 'l_orth_det_one' }, { html: 'U est symétrique', rule: null }, { html: 'U + Uᵀ = 2I', rule: null }, { html: 'Les valeurs propres de U valent 1', rule: null }],
+    solution: [{ html: `${trueOnes[0]} : vrai pour toute matrice orthogonale. det U vaut ±1, pas forcément 1.`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-orth-gs
+// ======================================================================
+
+const GS = 'l-orth-gs';
+const GS_SUB = [
+  { id: 'proj', label: 'projeter', skill: PROJ },
+  { id: 'sub', label: 'soustraire', skill: GS },
+  { id: 'check', label: 'vérifier', skill: DOT },
+];
+
+// x₁, x₂, x₃ ∈ ℝ⁴ from an orthogonal family (gsReverse): Gram-Schmidt gives
+// back v₁, v₂, v₃ with whole coefficients cᵢⱼ. nice: ‖vᵢ‖ whole.
+function gsData(rng, { nice = false, k = 3 } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const vs = nice ? niceOrth(4, k, rng) : orthInts(4, k, rng, { max: 8 });
+    if (!vs) continue;
+    const { xs, C } = gsReverse(vs, rng, { lo: -2, hi: 2 });
+    if (maxAbs(xs) > 7) continue;
+    if (k === 3 && (C[0][2] === 0 || C[1][2] === 0)) continue;
+    return { vs, xs, C: C.map((r) => r.map((x) => q(x))) };
+  }
+  const vs = [[1, 1, 0, 1], [2, -1, 1, -1], [0, 1, 0, -1]].map(Qv).slice(0, k);
+  const C = [[0, 2, 1], [0, 0, -1], [0, 0, 0]].map((r) => r.map((x) => q(x)));
+  const xs = [Qv([1, 1, 0, 1]), Qv([4, 1, 1, 1]), Qv([-1, 3, -1, 1])].slice(0, k);
+  return { vs, xs, C, fallback: true };
+}
+const gsCfg = (d, j) => ({ xs: d.xs.map((v) => v.map(qt)), vs: d.vs.map((v) => v.map(qt)), j });
+// vⱼ = xⱼ − Σ cᵢⱼ vᵢ (mat).
+const gsVecPart = (d, j, rng = null) => ({
+  judge: { kind: 'mat', expect: vt(d.vs[j]), gs: gsCfg(d, j) }, start: `v_${j + 1}`, html: `${vi(j)} = ${xi(j)} − ${d.vs.slice(0, j).map((_, i) => `(${xi(j)} · ${vi(i)} / ${vi(i)} · ${vi(i)}) ${vi(i)}`).join(' − ')}`, ask: `${vi(j)} =`,
+  lines: [
+    eq(combT([1, ...d.vs.slice(0, j).map((_, i) => d.C[i][j].neg())], [d.xs[j], ...d.vs.slice(0, j)]), 'Retirer les projections sur les vᵢ déjà obtenus', 'sub'),
+    rng ? withCells(eq(vt(d.vs[j]), '', 'sub'), vecCells(d.vs[j], 2, rng)) : eq(vt(d.vs[j]), '', 'sub'),
+  ],
+});
+// cᵢⱼ = xⱼ · vᵢ / vᵢ · vᵢ (value).
+const gsCoefPart = (d, i, j, guided = null) => {
+  const s = `(${sumT(prods(d.xs[j], d.vs[i]))})/(${sumT(squares(d.vs[i]))})`;
+  return {
+    judge: { kind: 'value', expect: qt(d.C[i][j]), pc: { y: d.xs[j].map(qt), u: d.vs[i].map(qt) } }, start: `x_${j + 1}·v_${i + 1}/(v_${i + 1}·v_${i + 1})`,
+    html: `Coefficient ${xi(j)} · ${vi(i)} / ${vi(i)} · ${vi(i)}`, ask: `c${SUBS[i + 1]}${SUBS[j + 1]} =`,
+    lines: [guided ? eqG(s, guided, 'Produits scalaires', 'proj') : eq(s, 'Produits scalaires', 'proj'), eq(qt(d.C[i][j]), '', 'proj')],
+  };
+};
+const gsFamPart = (d, rng = null, normalize = false) => {
+  const fam = normalize ? d.vs.map((v) => scaleV(v, q(1).div(q(Math.round(Math.sqrt(n2(v).valueOf())))))) : d.vs;
+  const line = eq(fam.map(vt).join(', '), normalize ? 'Chaque vᵢ divisé par sa norme' : 'Base orthogonale, dans l\'ordre', 'check');
+  return {
+    judge: { kind: 'span', basis: d.xs.map(vt), require: normalize ? 'orthonormal' : 'orthogonal', nested: true }, start: 'B', html: normalize ? 'La base orthonormée (u₁, u₂, u₃)' : 'La base orthogonale (v₁, v₂, v₃)', ask: normalize ? '(u₁, u₂, u₃) =' : '(v₁, v₂, v₃) =',
+    lines: [rng ? withCells(line, famCells(fam, 2, rng)) : line],
+  };
+};
+
+function gsItem(level, rng) {
+  const normalize = level >= 4 && rng.chance(0.3);
+  const d = gsData(rng, { nice: normalize });
+  const X = `x₁ = ${vR(d.xs[0])}, x₂ = ${vR(d.xs[1])}, x₃ = ${vR(d.xs[2])}`;
+  const key = `${GS}:${d.xs.map(vt).join('')}:${level}`;
+  const hints = hints3(
+    'v₁ = x₁. Retire de x₂ sa projection sur v₁, puis de x₃ ses projections sur v₁ et sur v₂ (pas sur x₁, x₂).',
+    `v₃ = x₃ − (□/${fq(n2(d.vs[0]))})v₁ − (□/${fq(n2(d.vs[1]))})v₂`,
+    `v₂ = ${vR(d.vs[1])}, v₃ = ${vR(d.vs[2])}`,
+  );
+  const base = { skill: GS, level, subgoals: GS_SUB, key, fallback: d.fallback, hints, mode: modeOf(level) };
+  const prompt = `Applique Gram-Schmidt à ${X}${normalize ? ', puis normalise' : ' (sans normaliser)'}.`;
+  if (level === 1) {
+    return partsItem({ ...base, prompt: `${prompt} v₁ = x₁ ; v₁ · v₁ = ${fq(n2(d.vs[0]))}.` },
+      [gsCoefPart(d, 0, 1, [0, -1]), gsVecPart(d, 1, rng), gsCoefPart(d, 0, 2, [0, -2]), gsCoefPart(d, 1, 2, [1, -1]), gsVecPart(d, 2, rng), gsFamPart(d, rng)]);
+  }
+  if (level === 2) {
+    const decision = {
+      kind: 'decision', prompt: 'Pour obtenir v₃, sur quels vecteurs projette-t-on x₃ ?', options: rng.shuffle(menu('Sur v₁ et v₂, déjà orthogonaux', [
+        ['Sur x₁ et x₂', 'x₁ et x₂ ne sont pas orthogonaux entre eux : les deux projections se recouvrent, et le résultat n\'est pas orthogonal à v₂.', 'l_gs_use_x'],
+      ])),
+    };
+    const parts = [gsCoefPart(d, 0, 1, [0, 1, -1]), gsVecPart(d, 1, rng), gsCoefPart(d, 0, 2, [0, 1, -1]), gsCoefPart(d, 1, 2, [0, 1, -1]), gsVecPart(d, 2, rng), gsFamPart(d, rng)];
+    parts[2] = { ...parts[2], pre: [decision] };
+    return partsItem({ ...base, prompt: `${prompt} v₁ = x₁.` }, parts);
+  }
+  if (level === 3) {
+    const m2 = menu('v₂ = x₂ − (x₂ · v₁ / v₁ · v₁) v₁', [
+      ['v₂ = x₂ + (x₂ · v₁ / v₁ · v₁) v₁', 'On retire la composante selon v₁ : avec +, v₂ · v₁ ≠ 0.', 'l_gs_sign'],
+      ['v₂ = x₂ − (x₂ · v₁ / ‖v₁‖) v₁', 'Il faut diviser par ‖v₁‖² = v₁ · v₁.', 'g4_proj_no_square'],
+    ]);
+    const m3 = menu('Retirer de x₃ ses projections sur v₁ et v₂', [
+      ['Retirer de x₃ ses projections sur x₁ et x₂', 'x₁ et x₂ ne sont pas orthogonaux : on projette sur v₁ et v₂.', 'l_gs_use_x'],
+      ['Retirer de x₃ sa projection sur v₂ seulement', 'Il faut aussi retirer la composante selon v₁.'],
+    ]);
+    const m4 = menu('Écrire la famille (v₁, v₂, v₃)', [['Écrire (x₁, x₂, x₃)', 'Les xᵢ ne sont pas orthogonaux.']]);
+    return partsItem({ ...base, prompt: `${prompt} Choisis chaque étape.`, tapActions: 'menu' }, [withMenu(gsVecPart(d, 1), m2), withMenu(gsVecPart(d, 2), m3), withMenu(gsFamPart(d), m4)]);
+  }
+  return partsItem({ ...base, prompt }, [gsVecPart(d, 1), gsVecPart(d, 2), gsFamPart(d, null, normalize)]);
+}
+
+function gsExam(rng, exam) {
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which === 0) {
+      const F = rng.pick([[[1, 1, 0], [0, 1, 0], [0, 0, 1]], [[1, 2, 0], [0, 1, 0], [0, 0, 1]], [[0, 1, 0], [1, 0, 0], [0, 0, 1]], [[1, 0, 1], [0, 1, 0], [0, 0, 1]]]);
+      return tfL({
+        skill: GS, key: `canon:${F.map(vt).join('')}`, truth: false, exam: examTag({ exam }),
+        statement: 'Gram-Schmidt (suivi d\'une normalisation) transforme toute base de ℝ³ en la base canonique (e₁, e₂, e₃).',
+        counter: { kind: 'vecFamily', params: { want: 'gsNotCanonical', n: 3 }, ask: [{ v: 'F', label: 'x₁, x₂, x₃ =', keys: ['mat'] }], answer: { F: F.map(vt).join(', ') } },
+        explanation: `Faux : v₁ = x₁ garde la direction de x₁. Avec x₁ = ${vR(F[0])}, le premier vecteur obtenu est ${vR(F[0])}/‖x₁‖ ≠ e₁ (ou l'ordre des eᵢ change).`,
+      });
+    }
+    return tfL({
+      skill: GS, key: `true:${which}`, truth: true, exam: examTag({ exam }),
+      statement: which === 1 ? 'Appliqué à une base {x₁, x₂} d\'un plan W, Gram-Schmidt donne une base orthogonale de W.' : 'Gram-Schmidt sur (x₁, …, x_k) donne des vᵢ tels que Span{v₁, …, vⱼ} = Span{x₁, …, xⱼ} pour chaque j.',
+      explanation: 'Vrai : chaque vⱼ est xⱼ moins une combinaison des vecteurs précédents, donc les espaces engendrés restent les mêmes à chaque étape.',
+    });
+  }
+  const d = gsData(rng, { nice: true });
+  const x3 = d.xs[2];
+  const [v1, v2] = d.vs;
+  const nrm = (v) => q(Math.round(Math.sqrt(n2(v).valueOf())));
+  const useX = comb2([[1, x3], ...d.xs.slice(0, 2).map((x) => [dotQ(x3, x).div(n2(x)).neg(), x])]);
+  const sign = comb2([[1, x3], [d.C[0][2], v1], [d.C[1][2], v2]]);
+  const g4 = comb2([[1, x3], [dotQ(x3, v1).div(nrm(v1)).neg(), v1], [dotQ(x3, v2).div(nrm(v2)).neg(), v2]]);
+  if (rng.chance(0.5)) {
+    return mcqDistinct({
+      skill: GS, level: 4, key: `mcq:v3:${d.xs.map(vt).join('')}`, exam: examTag({ exam }),
+      prompt: `Gram-Schmidt sur x₁ = ${vR(d.xs[0])}, x₂ = ${vR(d.xs[1])}, x₃ = ${vR(x3)}, sans changer l'ordre et sans normaliser, donne v₁ = x₁, v₂ = ${vR(v2)} et v₃ =`,
+      right: vR(d.vs[2]),
+      wrongs: [{ html: vR(useX), rule: 'l_gs_use_x' }, { html: vR(sign), rule: 'l_gs_sign' }, { html: vR(g4), rule: 'g4_proj_no_square' }],
+      fillers: [{ html: vR(addV(d.vs[2], v1)) }, { html: vR(scaleV(d.vs[2], -2)) }],
+      solution: [{ html: `v₃ = x₃ − (${fq(dotQ(x3, v1))}/${fq(n2(v1))})v₁ − (${fq(dotQ(x3, v2))}/${fq(n2(v2))})v₂ = ${vR(d.vs[2])}`, note: 'Projeter sur v₁ et v₂' }],
+    }, rng);
+  }
+  // 2018 Q4: v₃ = x₃ + a·v₁ + b·v₂.
+  const ab = (a, b) => `a = ${fq(a)}, b = ${fq(b)}`;
+  const ux = d.xs.slice(0, 2).map((x) => dotQ(x3, x).div(n2(x)).neg());
+  return mcqDistinct({
+    skill: GS, level: 4, key: `mcq:ab:${d.xs.map(vt).join('')}`, exam: examTag({ exam }),
+    prompt: `Gram-Schmidt sur x₁ = ${vR(d.xs[0])}, x₂ = ${vR(d.xs[1])}, x₃ = ${vR(x3)} donne v₁ = x₁, v₂ = ${vR(v2)}, puis v₃ = x₃ + a·v₁ + b·v₂ avec :`,
+    right: ab(d.C[0][2].neg(), d.C[1][2].neg()),
+    wrongs: [{ html: ab(d.C[0][2], d.C[1][2]), rule: 'l_gs_sign' }, { html: ab(dotQ(x3, v1).div(nrm(v1)).neg(), dotQ(x3, v2).div(nrm(v2)).neg()), rule: 'g4_proj_no_square' }, { html: ab(ux[0], ux[1]), rule: 'l_gs_use_x' }],
+    fillers: [{ html: ab(d.C[1][2].neg(), d.C[0][2].neg()) }, { html: ab(d.C[0][2].neg(), d.C[1][2]) }],
+    solution: [{ html: `a = −x₃ · v₁ / v₁ · v₁ = ${fq(d.C[0][2].neg())}, b = −x₃ · v₂ / v₂ · v₂ = ${fq(d.C[1][2].neg())}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
   [DOT]: (level, rng, profile, opts = {}) => (opts.exam ? dotExam(rng, opts.exam) : dotItem(level, rng)),
   [PERP]: (level, rng, profile, opts = {}) => (opts.exam ? perpExam(rng, opts.exam) : perpItem(level, rng)),
   [PROJ]: (level, rng, profile, opts = {}) => (opts.exam ? projExam(rng, opts.exam) : projItem(level, rng)),
+  [MATS]: (level, rng, profile, opts = {}) => (opts.exam ? matsExam(rng, opts.exam) : matsItem(level, rng)),
+  [GS]: (level, rng, profile, opts = {}) => (opts.exam ? gsExam(rng, opts.exam) : gsItem(level, rng)),
 };
 
 export { dotQ, n2, rootT, Qv };
