@@ -145,7 +145,22 @@ const isInf = (n) => { n = stripParen(n); return n.t === 'const' && n.name === '
 // N = 2ʲ up to 2¹⁷, then Richardson's extrapolation in 1/N and Aitken's Δ²;
 // the estimate whose last two values agree best, if they agree to 1e−7.
 // NaN for a divergent series, or one that converges too slowly to tell.
+// Step U4 (part h): the values are kept (500 at most): a judge evaluates
+// the same Σ for the line, the previous line and each trap's candidate.
+const SUMS = new Map();
 export function seriesSum(node, env = {}) {
+  let key = null;
+  try { key = JSON.stringify([node.e, node.k, node.lo, env]); } catch { key = null; }
+  if (key !== null && SUMS.has(key)) return SUMS.get(key);
+  const v = sumOnce(node, env);
+  if (key !== null) {
+    if (SUMS.size >= 500) SUMS.clear();
+    SUMS.set(key, v);
+  }
+  return v;
+}
+
+function sumOnce(node, env) {
   const lo = Math.round(evalFloat(node.lo, env));
   if (!Number.isFinite(lo)) return NaN;
   const c = compileFloat(node.e);
@@ -154,13 +169,25 @@ export function seriesSum(node, env = {}) {
   const S = [];
   let s = 0;
   let n = lo;
+  let last = Infinity;
+  let tiny = 0;
   for (let j = 1; j <= 17; j++) {
     const N = lo + 2 ** j;
     for (; n < N; n++) {
       e[k] = n;
       const t = c(e);
-      if (!Number.isFinite(t)) return NaN;
+      // Step U4 (part h): a term like (1 + 2ᵏ)/3ᵏ overflows (∞/∞) long
+      // after the terms have become negligible: the sum is reached. So it
+      // is after 50 terms in a row below 1e−18 of the sum (a geometric
+      // series, in a few hundred terms instead of 2¹⁷).
+      if (!Number.isFinite(t)) {
+        if (Math.abs(last) < 1e-20 * (1 + Math.abs(s))) { n = Infinity; break; }
+        return NaN;
+      }
+      last = t;
       s += t;
+      tiny = Math.abs(t) < 1e-18 * (1 + Math.abs(s)) ? tiny + 1 : 0;
+      if (tiny >= 50) { n = Infinity; break; }
     }
     S.push(s);
   }
