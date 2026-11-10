@@ -66,3 +66,8 @@ import { RULES as PD } from './pd.js';
 import { RULES as PE } from './pe.js';
 
 CAS_RULES.push(...G7, ...PA, ...PB, ...PC, ...PD, ...PE);
+
+// Step U8: module M.
+import { RULES as M } from './m.js';
+
+CAS_RULES.push(...M);

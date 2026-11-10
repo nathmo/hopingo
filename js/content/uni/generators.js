@@ -57,3 +57,8 @@ import { GEN as COMBI } from './combi.js';
 import { GEN as PROBA } from './proba.js';
 
 Object.assign(UNI_GEN, COMBI, PROBA);
+
+// Step U8: module M.
+import { GEN as MATRICES } from './matrices.js';
+
+Object.assign(UNI_GEN, MATRICES);

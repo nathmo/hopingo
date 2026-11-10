@@ -80,3 +80,8 @@ import * as prob from './prob.js';
 import * as stat from './stat.js';
 
 Object.assign(JUDGES, { prob, stat });
+
+// Step U8: x′ = Ax and x_{k+1} = Ax_k with vector and matrix lines (module M).
+import * as odevec from './odevec.js';
+
+Object.assign(JUDGES, { odevec });

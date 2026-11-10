@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.1 matrices à paramètres (`cases`), complexes partout (`eigvec` avec `complex: true`), nœuds `det`, `tr`, `norm` ; §16.2 `rowops` avec `params` et `track: 'det' | 'lu'`, `span` avec `nested` et `affine`, `factor` avec `askCoef.convention`, `poly` avec paramètre λ, `ode` à inconnue vectorielle (M) ; §16.3 QCM à plusieurs réponses, QCM « réponse courte », contre-exemples (`matPair`, `matOne`…), `matrix` à cases symboliques, `plot`, au moins 2 exemples d'examen par module ; §16.4 familles nouvelles (`linear`, `logic`), tag C, réparation dans un autre module, pièges partagés (réutilise `g4_proj_no_square`, `g9_proof_by_example` ; `l_compose_order` et `l_lsq_normal_aat` servent aussi en A2 et M).
 
-Unité `alglin` · préfixe `l-` · pièges `l_` · Statut : L fait le 10 novembre 2026 (étape U3) ; M à faire (étape U8). Les cases à remplir des lignes guidées sont des cases de la grille (`cells`) ; le niveau 5 et les variantes `open` sont des items sans aide, en attendant le type `problem` (U4).
+Unité `alglin` · préfixe `l-` · pièges `l_` · Statut : L fait le 10 novembre 2026 (étape U3) ; M fait le 10 novembre 2026 (étape U8). Les cases à remplir des lignes guidées sont des cases de la grille (`cells`) ; le niveau 5 et les variantes `open` sont des items sans aide, en attendant le type `problem` (U4).
 
 > Ce fichier contient deux catalogues : **L** (algèbre linéaire de BA1, ci-dessous) et **M** (analyse matricielle, niveau BA4, plus bas). Chacun suit le gabarit du §15 du [README](README.md). Les briques communes (générateurs à l'envers, contre-exemples, QCM « coefficient ») sont décrites une seule fois, au début de L, et M les réutilise.
 
@@ -1502,7 +1502,7 @@ Barème : +1 juste, 0 vide, −1 faux. Hors examen, une réponse « faux » just
 
 # M. Analyse matricielle
 
-Unité `matrices` · préfixe `m-` · pièges `m_` · Statut : à faire
+Unité `matrices` · préfixe `m-` · pièges `m_` · Statut : fait le 10 novembre 2026 (étape U8, voir README §17)
 
 > **Portée : niveau BA4 seulement.** Ce module rassemble ce que les cours de BA4 utilisent sans le réenseigner. **Ne sont pas ici** et vont dans le plan séparé `plan-ba5-et-plus.md` : la forme d'état avec entrée et sortie (B, C, D), les fonctions de transfert, la commandabilité et l'observabilité, le placement de pôles (Ackermann) et les observateurs, l'équation de Lyapunov, l'ACP, le filtre de Kalman et la non-normalité. On garde seulement la matrice compagne d'une EDO **homogène** (x = (y ; ẏ), sans entrée), parce qu'elle relie les EDO de A2 aux systèmes x′ = Ax.
 >
@@ -1554,6 +1554,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `coef` S ou un bloc de A⁻¹ = `[[A₁₁⁻¹ + YS⁻¹X, −YS⁻¹], [−S⁻¹X, S⁻¹]]` ; `mcq` (distracteurs : `m_schur_order`, `m_schur_sign`, `l_blocks_inverse_each`). `tf` : « Si A₁₁ et A sont inversibles, S est inversible » (vrai) ; « det A = det A₁₁ · det A₂₂ » (faux : `matOne` 3 × 3).
 - **Pièges** : `m_schur_order`, `m_schur_sign`, `l_blocks_inverse_each`, `l_blocks_order`.
 - **Sous-buts → crédit** : inverser le bloc → `l-mat-inverse` ; S → `m-blocks-schur` ; det → `l-det-props`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Lignes du juge `mat` avec les blocs nommés (`A_11`, `A_12`, `A_21`, `A_22`, `X`, `Y`) ; deux formes, 3 × 3 (S un nombre : un produit ligne × colonne 1 × 1 compte comme un nombre dans `matexpr.js`) et 4 × 4 (blocs 2 × 2, S de déterminant ±1 ou ±2, seule forme où `m_schur_order` a un sens). L1 : A₁₁⁻¹ donnée, cases de Y, X, S et det A à remplir ; L2 : décision « quelle formule pour S » (ordre inversé, signe +) ; L3 : menus ; L4 : la factorisation complète, ou le système par blocs (gabarit c, y scalaire) ; L5 : système KKT 3 × 3 (H⁻¹, S = −CH⁻¹Cᵀ, det K), sans la preuve en blocs. QCM : S, ou le bloc en bas à droite de A⁻¹ (S⁻¹, leurre A₂₂⁻¹ : `l_blocks_inverse_each`) ; `coef` : S, sᵢⱼ ou b₃₃ = 1/S ; V/F faux « det A = det A₁₁ · det A₂₂ » avec une 3 × 3 (`mx` `schurDetA22`). `l_blocks_order` est l'option fausse des menus de X et Y.
 
 ### `m-rank1-proj` — Matrices de rang 1 et projecteurs
 - **Année** 16 · **Prérequis** `l-orth-proj`, `l-vs-rank` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1576,6 +1577,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` P ou Py (distracteurs : `g4_proj_no_square`, `m_householder_factor`). `coef` pᵢⱼ. `tf` : « Un projecteur orthogonal est inversible » (faux, sauf P = I) ; « Les valeurs propres d'un projecteur sont 0 et 1 » (vrai) ; « tr(uuᵀ) = ‖u‖² » (vrai).
 - **Pièges** : `g4_proj_no_square`, `m_householder_factor`.
 - **Sous-buts → crédit** : produit uuᵀ → `l-mat-product` ; projection → `l-orth-proj` ; projecteur → `m-rank1-proj`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). u entier, de norme entière ou non ; P, H, Py, (I − P)y et Hy en lignes `mat` (la ligne « (1/9)·uuᵀ » avant P). L1 : uuᵀ à remplir, puis P ; L2 : décision « uuᵀ, uuᵀ/‖u‖ ou uuᵀ/(uᵀu) » (u jamais unitaire, pour que la décision ait un sens) ; L3 : menus (P, H, Py) ; L4 : Householder, ou le projecteur A(AᵀA)⁻¹Aᵀ sur un plan de ℝ³ et sa trace (= rang) ; L5 : preuve en 5 blocs « uuᵀ est la projection sur Span{u} » (2 leurres) ou le calcul de H et Hy, sans aide (pas les deux enchaînés). `g4_proj_no_square` est diagnostiqué sur la ligne Py (`cfg.proj`) et proposé dans les décisions, menus et QCM ; `m_householder_factor` sur la ligne H. V/F faux : un projecteur non inversible de ℝ² (`mx` `projNotInvertible`).
 
 ### `m-spectral` — Décomposition spectrale et fonctions de matrices symétriques
 - **Année** 16 · **Prérequis** `l-sym-orthodiag`, `m-rank1-proj` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1597,6 +1599,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_spectral_entrywise` → `[[√5, 2], [2, √5]]`, `l_orthodiag_no_normalize`). `tf` : « Toute matrice symétrique a une racine carrée réelle symétrique » (faux : `[[−1, 0], [0, 1]]`) ; « Les projecteurs uᵢuᵢᵀ de la décomposition sont deux à deux de produit nul » (vrai).
 - **Pièges** : `m_spectral_entrywise`, `l_orthodiag_no_normalize`.
 - **Sous-buts → crédit** : orthodiagonaliser → `l-sym-orthodiag` ; projecteurs → `m-rank1-proj` ; f(A) → `m-spectral`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Pas de juge `factor` `spectral` : les projecteurs Pᵢ = vᵢvᵢᵀ/(vᵢᵀvᵢ) sont des lignes `mat`, puis f(A) = Σ f(λᵢ)Pᵢ avec les Pᵢ nommés. 2 × 2 à partir d'une base orthogonale entière ((1, 1), (1, 2), (1, 3)…), f = √ (λ carrés), inverse ou cube ; 3 × 3 de la forme cI + μvvᵀ (P₂ = I − P₁) au niveau 4. L1 : valeurs et vecteurs propres donnés, cases des projecteurs et de f(A) ; L2 : décision « f sur les valeurs propres ou sur les cases » (`m_spectral_entrywise`) ; L3 : polynôme caractéristique (`det`), vecteurs propres (`eigvec`), projecteurs, f(A), puis le contrôle R² = A ; L5 : A = λ₁u₁u₁ᵀ + λ₂u₂u₂ᵀ donnée (2018 Q11), polynôme caractéristique puis √A ou A⁻¹. Le gabarit « Aᵏ » prend k = 3. V/F faux : une symétrique de valeur propre négative (`mx` `symNegEig`).
 
 ### `m-posdef` — Matrices définies positives : critères
 - **Année** 16 · **Prérequis** `l-sym-quadform`, `m-spectral` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
@@ -1618,6 +1621,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` nature ou « définie positive si et seulement si a ∈ … » (distracteurs : `l_posdef_diag`, `m_sylvester_semidef`, `m_sylvester_negdef`). `tf` : « Si les mineurs dominants sont ≥ 0, A est semi-définie positive » (faux : `[[0, 0], [0, −1]]`) ; « Une matrice définie positive est inversible » (vrai) ; « AᵀA est semi-définie positive pour toute A » (vrai).
 - **Pièges** : `l_posdef_diag`, `m_sylvester_semidef`, `m_sylvester_negdef`.
 - **Sous-buts → crédit** : mineurs → `l-det-cofactor` ; nature → `m-posdef` ; somme de carrés → `l-sym-quadform`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). A = LDLᵀ (L entière unipotente, pivots D choisis selon la nature), 2 × 2 ou 3 × 3, parfois tridiagonale ; Δ₂ et Δ₃ par le juge `det`, puis une décision à 5 options (définie ou semi-définie positive ou négative, indéfinie ; pièges `l_posdef_diag`, `m_sylvester_negdef`), puis le contrôle par les pivots dₖ = Δₖ/Δₖ₋₁ (au lieu de la somme de carrés). L2 : décision « quel critère » ; L4 : paramètre [[p, a], [a, r]] avec pr carré (`det` en a, puis `solset` en a) ; L5 : 3 × 3 tridiagonale à paramètre, sans aide (sans le V/F sur la semi-définie, qui est une variante d'examen). La complétion du carré (gabarit c) n'est pas construite. QCM : nature (dont un leurre [[vvᵀ, 0], [0, −k]] à mineurs ≥ 0 mais indéfini : `m_sylvester_semidef`) ou l'intervalle de a ; V/F faux : `mx` `minorsNotSemidef` ([[0, 0], [0, −k]]).
 
 ### `m-cholesky` — Factorisation de Cholesky pas à pas
 - **Année** 16 · **Prérequis** `m-posdef`, `l-mat-lu` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
@@ -1640,6 +1644,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `coef` ℓᵢⱼ ; `mcq` (distracteurs : `m_chol_no_sqrt`, `m_chol_sum_sign`, `l_coef_index_swap`). `tf` : « Toute matrice symétrique inversible a une factorisation de Cholesky » (faux : `[[1, 2], [2, 1]]`) ; « det A = (Π ℓᵢᵢ)² » (vrai).
 - **Pièges** : `m_chol_no_sqrt`, `m_chol_sum_sign`, `l_coef_index_swap`.
 - **Sous-buts → crédit** : première colonne → `m-cholesky` ; résoudre Ly = b → `l-mat-lu`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Une partie `value` par ℓᵢⱼ (départ l₁₁, l₂₁…, la ligne de calcul puis la valeur), puis L jugée par `factor` ; L1 : 2 × 2 ou 3 × 3, formules dans les titres, un nombre et la valeur à trous ; L2 : deux décisions (formule de ℓ₂₂, formule de ℓ₃₂) ; L3 : menus « racine », « division », « assembler » ; L4 : 3 × 3, puis Ly = b et Lᵀx = y une fois sur deux ; L5 : ℓ₃₂ (ou ℓ₃₃, ℓ₂₂) seul, ou un problème : Cholesky jusqu'à ℓ₃₃² ≤ 0, puis un QCM de conclusion (leurre `l_posdef_diag`). Variante `open` : l'exemple d'examen 2 (7 points), où (a) note les six ℓᵢⱼ (sans la ligne L) et (d) est un QCM. Le distracteur « division oubliée » n'a pas de piège ; `l_coef_index_swap` (ℓ₂₃ = 0) n'apparaît que si le QCM a encore une place. Pas de gabarit tridiagonal en O(n) (renvoi à N).
 
 ### `m-quad-gradient` — Gradient et hessienne d'une forme quadratique
 - **Année** 16 · **Prérequis** `m-posdef`, `a2-partials`, `a2-hessian-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1662,6 +1667,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` ∇f ou x* (distracteurs : `m_grad_factor`, `m_grad_nonsym`). `tf` : « ∇(xᵀMx) = 2Mx pour toute M carrée » (faux : `matOne` non symétrique) ; « Si A est définie positive, ½xᵀAx − bᵀx a un unique minimum » (vrai).
 - **Pièges** : `m_grad_factor`, `m_grad_nonsym`, `l_quadform_offdiag`.
 - **Sous-buts → crédit** : gradient → `a2-partials` ; résoudre → `l-mat-inverse` ; nature → `m-posdef`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Parties : A et b (`mat`), ∇f comme vecteur de polynômes (`mat` avec `vars`, une seule ligne au lieu d'un `equiv` par composante), x* (`mat`), puis la nature (décision ; les mineurs sont donnés aux niveaux 1 et 2) et f(x*) (`value`). Une fois sur quatre, A indéfinie (point selle, leurre `l_posdef_diag` si la diagonale est positive) ou définie négative. L2 : décision Ax − b / 2Ax − b / ½Ax − b ; L4 : trois variables, ou f = xᵀMx − bᵀx avec M non symétrique (S = (M + Mᵀ)/2 avec `l_quadform_offdiag`, ∇f avec `m_grad_nonsym`) ; L5 : f = ‖Ax − b‖² (hessienne 2AᵀA, gradient, x*). QCM : ∇f, x* ou la matrice symétrique d'une forme xᵀSx.
 
 ### `m-normal-eq` — Équations normales, matrice de design, Var(β̂)
 - **Année** 16 · **Prérequis** `l-orth-lsq`, `m-quad-gradient`, `p-lin-combo` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1685,6 +1691,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` β̂ⱼ ou Var(β̂ⱼ) (distracteurs : `l_lsq_normal_aat`, `m_var_no_inverse`, `p_reg_sigma_n`). `tf` : « Si les colonnes de X sont orthogonales, les β̂ⱼ se calculent séparément » (vrai) ; « Var(β̂) = σ²XᵀX » (faux).
 - **Pièges** : `l_lsq_normal_aat`, `m_var_no_inverse`, `p_reg_sigma_n`, `l_lsq_line_swap`.
 - **Sous-buts → crédit** : X → `m-normal-eq` ; normales → `l-orth-lsq` ; variance → `m-normal-eq`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Les données sont une liste de points (xᵢ ; yᵢ) ; parties X, XᵀX, Xᵀy, β̂, résidus (`mat`, avec `cfg.lsq` pour les pièges de L), σ̂² et Var̂(β̂ⱼ) (`value`). Niveaux 1 à 3 : x centrés ; L2 : décision sur les colonnes de X ; L3 : jusqu'à Var̂(β̂ⱼ), en menus ; L4 : parabole à 4 ou 5 points, jusqu'à σ̂² ; L5 : un problème, la régression complète puis le QCM « quel coefficient est le plus précis ? ». Le gabarit (c) (XᵀX donnée) est le QCM de variance. `p_reg_sigma_n` (module P, étape U7) n'est nommé par l'option RSS/n que lorsque P est fusionné. Le vrai/faux « Var(β̂) = σ²XᵀX » demande une matrice X (propriété `varNotXtX`).
 
 ### `m-rayleigh` — Quotient de Rayleigh
 - **Année** 16 · **Prérequis** `m-spectral` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1706,6 +1713,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_rayleigh_no_denominator` → 19, √5 au dénominateur). `tf` : « R(x) ≤ λ_max pour tout x ≠ 0 » (vrai, A symétrique).
 - **Pièges** : `m_rayleigh_no_denominator`.
 - **Sous-buts → crédit** : produit → `l-mat-product` ; quotient → `m-rayleigh`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Parties Ax (`mat`), xᵀAx, xᵀx, R(x) (`value`) ; l'encadrement est une décision (valeurs propres données). L2 : décision sur le dénominateur ; L3 : menus ; L4 : 3 × 3, ou (3 fois sur 5) max et min de xᵀAx sur la sphère : det(A − λI), les valeurs, et un point unitaire (`span` orthonormé) ; L5 : un problème, x proche d'un vecteur propre, R(x) et le rapport (Ax)ᵢ/xᵢ, puis le QCM « laquelle est la plus proche ? ». Un vrai/faux faux s'ajoute : sans symétrie, R(x) peut sortir de [λ_min ; λ_max] (contre-exemple A, x, propriété `rayleighOutside`).
 
 ### `m-power-method` — Méthode de la puissance et puissance inverse
 - **Année** 16 · **Prérequis** `m-rayleigh`, `l-eig-powers` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
@@ -1728,6 +1736,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_power_ratio`, `m_inverse_power_value`). `readtable`. `tf` : « La méthode de la puissance converge vers la plus petite valeur propre » (faux) ; « La puissance inverse sans décalage converge vers la valeur propre de plus petit module » (vrai).
 - **Pièges** : `m_power_ratio`, `m_inverse_power_value`, `m_rayleigh_no_denominator`.
 - **Sous-buts → crédit** : produit → `l-mat-product` ; itération → `m-power-method` ; Rayleigh → `m-rayleigh`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Matrices symétriques 2 × 2 à valeurs propres entières, y₀ un vecteur de la base canonique (pas de 3 × 3 : les fractions grandissent trop vite). L1 : tableau (juge `iter`, phi `power` : chaque case recalculée à partir des cases de l'élève), lignes 0 et 1 données, ligne 2 à remplir, puis le QCM « vers quoi tendent les μₖ ? » ; L2 : les mêmes pas en lignes guidées, avec la décision de la normalisation (par la norme : juste, `quality: 'poor'`) ; L3 : une itération, R(y₁), la vitesse (menus) ; L4 : tableau de la puissance inverse avec décalage (z jugé comme solution de (A − σI)z = y), puis λ = σ + 1/μ ; L5 : un tableau de μₖ dans l'énoncé (λ₁, |λ₂/λ₁| à 0,02 près, λ₂), ou le problème de l'exemple d'examen 3. Les types `readtable` et `code` (« y = z / ??? ») viendront avec l'étape U9. QCM : la vitesse, ou la valeur trouvée par la puissance inverse ; `open` : l'exemple d'examen 3 (7 points) avec d'autres nombres. Vrai/faux faux : contre-exemples `mx` `powerDominant` et `powerFails` (valeurs propres λ et −λ).
 
 ### `m-svd-lowrank` — SVD en somme de rangs 1, approximation de rang k, image de la sphère
 - **Année** 16 · **Prérequis** `l-svd-compute`, `m-rank1-proj` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1749,6 +1758,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` erreur (distracteurs : `m_rankk_wrong_sigma`, σ₂², `l_svd_sigma_is_eig`). `tf` : « ‖A‖₂ = σ₁ » (vrai) ; « A_k s'obtient en mettant à 0 les plus petits coefficients de A » (faux).
 - **Pièges** : `m_rankk_wrong_sigma`, `l_svd_sigma_is_eig`, `l_svd_sphere_boundary`.
 - **Sous-buts → crédit** : SVD → `l-svd-compute` ; rang 1 → `m-rank1-proj` ; erreurs → `m-svd-lowrank`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). A = Σ sᵢpᵢqᵢᵀ avec des familles orthogonales entières (2 × 2, 2 × 3, 3 × 2, 3 × 3). L1 : A₁ (cases de la grille) et ‖A − A₁‖₂, la SVD donnée ; L2 : les termes écrits dans le désordre, décision « quel terme garder ? » ; L3 : A₁, les deux erreurs, le stockage (menus) ; L4 : σ₁ et v₁ par AᵀA, puis A₁ = Av₁v₁ᵀ et l'erreur (U n'est pas redemandée) ; L5 : k minimal pour une erreur relative de Frobenius ≤ 10, 20 ou 30 % d'une 4 × 4 donnée par ses valeurs singulières, puis ‖A − A_k‖₂. L'image de la sphère est un QCM (ellipse pleine ou courbe seule, piège `l_svd_sphere_boundary`), sans esquisse. Vrai/faux faux : `mx` `lowRankNotZeroing` (2 × 2) et `frobNotSigma` (3 × 3).
 
 ### `m-norms` — Normes matricielles
 - **Année** 16 · **Prérequis** `l-svd-compute` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1770,6 +1780,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_norm_1_inf_swap`, `m_norm2_eig`, la plus grande case). `tf` : « ‖A‖₂ = max |λᵢ(A)| pour toute A » (faux : `[[0, 1], [0, 0]]`) ; « ρ(A) ≤ ‖A‖∞ » (vrai).
 - **Pièges** : `m_norm_1_inf_swap`, `m_norm2_eig`.
 - **Sous-buts → crédit** : AᵀA → `l-mat-product` ; valeurs propres → `l-eig-charpoly` ; norme → `m-norms`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Matrices 2 × 2 non symétriques dont AᵀA a des valeurs propres entières. Les nombres demandés sont nommés N₁, N∞, N₂, N_F dans les lignes (‖·‖ n'est pas lu par le CAS). L1 : sommes par colonne et par ligne à trous, max(|a| + |c| ; …), puis Frobenius ; L2 : décision « que somme-t-on ? » avant ‖A‖₁ ; L3 : les quatre normes (menus) ; L4 : ‖A‖₂ par AᵀA, puis ‖A‖_F (le gabarit « inégalités » n'est pas construit) ; L5 : problème, ‖A‖₂ puis deux vrai/faux sur les normes et ρ(A). Vrai/faux faux : `matOne` `svNotAbsEig` ([[0, 1], [0, 0]]), `mx` `norm1NeInf` et `frobNeTwo`.
 
 ### `m-cond` — Conditionnement
 - **Année** 16 · **Prérequis** `m-norms` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1790,6 +1801,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_cond_eig_nonsym`, `m_cond_det`, 1/κ). `tf` : « Si det A est proche de 0, A est mal conditionnée » (faux : 10⁻³I) ; « κ(A) ≥ 1 » (vrai) ; « κ₂(Q) = 1 pour Q orthogonale » (vrai).
 - **Pièges** : `m_cond_eig_nonsym`, `m_cond_det`.
 - **Sous-buts → crédit** : normes → `m-norms` ; borne → `m-cond`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). L1 et L2 : κ₂ d'une symétrique définie positive (valeurs propres données) ou d'une triangulaire (valeurs propres de AᵀA données), L2 avec la décision de la formule (pièges `m_cond_det`, `m_cond_eig_nonsym`) ; L3 : κ₂, ‖δb‖/‖b‖, la borne, puis ‖δx‖/‖x‖ (b sur le vecteur propre dominant, δb sur l'autre : la borne est atteinte) ; L4 : κ∞ ou κ₁ par A⁻¹ ; L5 : un tableau de trois perturbations dans l'énoncé (pas de `readtable`), κ₂ et le numéro de la perturbation qui atteint la borne. Vrai/faux faux : `mx` `smallDetGoodCond` ((1/20)·I) et `condNotEigRatio` ([[1, 2], [0, 1]]).
 
 ### `m-gershgorin` — Disques de Gershgorin
 - **Année** 16 · **Prérequis** `l-eig-charpoly` · **Étiquettes** `opt`, `GM` · **Optionnelle** non · **Poids d'examen** 0
@@ -1811,6 +1823,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_gersh_radius_diag`). `tf` : « Chaque disque contient une valeur propre » (faux si les disques se chevauchent : `matOne`).
 - **Pièges** : `m_gersh_radius_diag`.
 - **Sous-buts → crédit** : disques → `m-gershgorin`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Pas de dessin (la tâche `plot` `region` n'existe pas) : les disques s'écrivent D(centre ; rayon), les rayons sont des lignes `value` et les conclusions des décisions. Matrices 3 × 3 à diagonale espacée ; chaque disque isolé est vérifié numériquement (`linalg-float.js`). L1 : rayons à trous ; L2 : disques par lignes qui se chevauchent, décision « par colonnes », rayons des colonnes ; L3 : rayons (menus), puis « A est-elle inversible ? » ; L4 : encadrement λ_min ≥ …, λ_max ≤ … (A symétrique) ; L5 : diagonale strictement dominante, la marge minᵢ(|aᵢᵢ| − Rᵢ), inversibilité (renvoi à Jacobi, module N). Vrai/faux faux : `mx` `gershEmptyDisc` ([[0, 1], [4, 0]]).
 
 ### `m-ode-modes` — Systèmes x′ = Ax : modes propres et stabilité
 - **Année** 16 · **Prérequis** `l-eig-diag`, `a2-ode-const2`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
@@ -1834,6 +1847,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` stabilité ou y(t) (distracteurs : `m_stab_discrete_in_cont`, `m_modes_c_equals_x0`, `m_companion_sign`). `tf` : « Si toutes les valeurs propres de A ont |λ| < 1, ẋ = Ax est stable » (faux : λ = 1/2) ; « λ = ±2i : les solutions restent bornées sans tendre vers 0 » (vrai).
 - **Pièges** : `m_companion_sign`, `m_modes_c_equals_x0`, `m_stab_discrete_in_cont`, `m_stab_imag_part`.
 - **Sous-buts → crédit** : polynôme → `l-eig-charpoly` ; modes → `l-eig-space` ; coefficients → `l-sys-solution` ; stabilité → `m-ode-modes`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Parties : matrice compagne (`mat`, le piège `m_companion_sign` rejoué sur la ligne), det(A − λI) (`det`), vecteurs propres (`eigvec`), puis x(t) avec le juge vectoriel `odevec` (solution générale en c₁, c₂, constantes, solution ; lignes vecteur par vecteur, `c = x(0)` diagnostiqué), y(t) au niveau 3 (`ode` de A2), et la stabilité : une décision (options fausses `m_stab_discrete_in_cont`, `m_stab_imag_part`) suivie de α = max Re λ (`value`). L1 : vecteurs propres, c (grille), x(t), décision en note ; L2 : trous et cases ; L3 : menus ; L4 : valeurs propres complexes a ± ib (juge `complex`, modes réels e^{at}S(cos bt ; sin bt)), toujours ; L5 : le paramètre de ÿ + cẏ + 4y = 0 (stabilité par une décision, oscillations par `solset` sur Δ = c² − 16 < 0, puis la solution pour c = ±5), ou un L4 sans aide. Le gabarit (d) « paramètre » n'est qu'au niveau 5. QCM : y(t) (distracteur `m_modes_c_equals_x0`) ou la stabilité (options du raisonnement) ; V/F : quatre énoncés, dont deux faux avec contre-exemple matriciel (`mx` : `absLessOneUnstable`, `traceNegUnstable`).
 
 ### `m-expm` — Exponentielle de matrice, y compris pour une valeur propre double
 - **Année** 16 · **Prérequis** `m-ode-modes`, `a1-pow-sums` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1856,6 +1870,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_expm_entrywise`, `m_expm_double_no_t`). `coef` une case de e^{At} pour t donné. `tf` : « e^{A+B} = e^A e^B pour toutes A, B » (faux : `matPair` qui ne commutent pas) ; « e^{At} est toujours inversible » (vrai : son inverse est e^{−At}).
 - **Pièges** : `m_expm_entrywise`, `m_expm_sum`, `m_expm_double_no_t`.
 - **Sous-buts → crédit** : polynôme → `l-eig-charpoly` ; N → `m-expm` ; diagonaliser → `l-eig-diag`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). e^{At} est jugée par `odevec` (`want: 'expm'` : M(0) = I et M′ = AM ; forme finale écrite case par case, éventuellement e^{λt}·[[…]]). Cas diagonalisable : P et D (`factor`), puis P·diag(e^{λt})·P⁻¹ ; cas double : N = A − λI (`mat`), N² = 0, e^{λt}(I + tN). L1 : P et P⁻¹ données, D puis e^{Dt} (cases) puis e^{At} ; L2 : décision de méthode (`m_expm_entrywise`, `m_expm_double_no_t`) ; L3 : menus ; L4 : valeur double non triangulaire, puis x(t) ; L5 : problème (e^{At} et x(t), 8 points, puis un V/F, 1 point). `coef` : une case de e^{A} (t = 1), forme close avec e. `open` : l'exemple d'examen 1 (10 points, barème 1-1-1-3-2-2 ; N² = 0 est dans la note de (c)). QCM : distracteurs `m_expm_entrywise`, `m_expm_double_no_t`, `l_pdp_inverse_side`. V/F : e^{A+B} (contre-exemple `mx` `expSumFails`), e^{At} inversible, « case par case » (`expEntrywise`), AB = BA.
 
 ### `m-discrete` — Systèmes discrets x_{k+1} = Ax_k
 - **Année** 16 · **Prérequis** `l-eig-powers` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1877,6 +1892,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_stab_cont_in_discrete`, `m_discrete_exp`). `tf` : « Si les valeurs propres de A sont −3 et −1, ẋ = Ax est stable mais x_{k+1} = Ax_k ne l'est pas » (vrai) ; « Si Re λ < 0 pour toutes les valeurs propres, x_{k+1} = Ax_k est stable » (faux : λ = −2).
 - **Pièges** : `m_stab_cont_in_discrete`, `m_discrete_exp`, `l_powers_entrywise`.
 - **Sous-buts → crédit** : valeurs propres → `l-eig-charpoly` ; décomposer → `l-eig-powers` ; stabilité → `m-discrete`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Valeurs propres dans {±1/2, ±1/4, ±3/4, 1, ±2}, A = PDP⁻¹ (cases en quarts). x_k est jugée par `odevec` (`discrete: true` : x_{k+1} = Ax_k pour k = 0 … 6, x₀) ; les modes e^{λk} sont diagnostiqués (`m_discrete_exp`, avec `modes` dans la configuration). La stabilité : décision (option fausse `m_stab_cont_in_discrete`) et ρ(A) = max |λ| (`value`). L1 : valeurs et vecteurs propres donnés, c (grille), x_k ; L2 : trous et décision ; L3 : menus ; L4 : la même A en continu et en discret, avec des conclusions différentes ; L5 : problème (calcul complet, 7 points, puis un V/F croisé, 1 point). Le gabarit (d) Markov n'est qu'un V/F. QCM : x_k (distracteurs `m_discrete_exp`, `l_powers_entrywise`, `m_modes_c_equals_x0`) ou la stabilité.
 
 ## Pièges du module
 
@@ -1979,3 +1995,9 @@ Pièges suivis : `m_power_ratio`, `m_inverse_power_value`, `m_rayleigh_no_denomi
 - 3 : `span` avec `nested` et `affine`, `eigvec` avec `complex`, `rowops` avec `track: 'det'` existent. Pas de `track: 'lu'` : les ℓᵢⱼ sont dans les notes et dans L, jugée par `factor`. `askCoef = {label, path, convention?}` : le générateur fixe la convention dans l'énoncé et calcule le coefficient.
 - 5 : pas de plan `ba1-alglin-mt` : les problèmes `open` existent comme items en lignes sans aide ; le plan viendra avec le type `problem` (U4).
 - 12 : `examWeight: 0` veut dire « jamais tiré » (`sectionPool` de `js/engine/exam.js`).
+
+**Tranché à l'étape U8** (voir [README](README.md) §17) :
+- 4 : un nouveau juge, `odevec` (`js/judges/odevec.js`), lit des lignes vectorielles et matricielles dans la langue de `matexpr.js` : x(t) = c₁e^{λ₁t}v₁ + …, e^{At} = e^{λt}(I + tN), x_k = Σ cᵢλᵢᵏvᵢ. Une ligne vectorielle vérifie x′ = Ax (ou x_{k+1} = Ax_k) ; une ligne matricielle vérifie M(0) = I et M′ = AM. Les lignes « x = … ; y = … » restent au juge `ode` avec `system` (U6).
+- 6 : pas de plan d'examen propre à M. Chaque compétence a ses variantes (`mcq`, `tf`, et `coef` ou `open` quand le catalogue les donne). Le plan `ba4-numerique` de U9 reprendra `m-cholesky`, `m-power-method`, `m-rayleigh`, `m-norms`, `m-cond` et `m-svd-lowrank` par `extraSkills`.
+- 7 : M est construit avant N. Cholesky (exact dans `matrix.js`, flottant dans `linalg-float.js`), la puissance, Rayleigh, les normes et le conditionnement sont dans M ; N n'a qu'à s'y référer.
+

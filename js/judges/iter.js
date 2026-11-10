@@ -41,6 +41,7 @@ import { exactValue } from '../cas/normal.js';
 import { mapNode, lit } from '../cas/ast.js';
 import { lexicon, parseFormula, truthOf } from '../cas/logic.js';
 import { closedHolds } from '../cas/sets.js';
+import { checkPower } from './iter-power.js'; // step U8: the power method
 
 export const num = (t) => {
   if (t === null || t === undefined || String(t).trim() === '') return null;
@@ -283,6 +284,7 @@ function checkBisection(item, values) {
 
 export function checkTable(item, values) {
   switch (item.judge.phi.kind) {
+    case 'power': return checkPower(item, values); // step U8 (js/judges/iter-power.js)
     case 'bisection': return checkBisection(item, values);
     case 'signs': return checkSigns(item, values);
     case 'horner': case 'horner-repeat': return checkHorner(item, values);

@@ -47,3 +47,9 @@ import * as proba from './proba.skills.js';
 
 UNI_UNITS.push(combi.UNIT, proba.UNIT);
 UNI_SKILLS.push(...combi.SKILLS, ...proba.SKILLS);
+
+// Step U8: module M (analyse matricielle).
+import * as matrices from './matrices.skills.js';
+
+UNI_UNITS.push(matrices.UNIT);
+UNI_SKILLS.push(...matrices.SKILLS);
