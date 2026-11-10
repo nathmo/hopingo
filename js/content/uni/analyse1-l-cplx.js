@@ -225,7 +225,7 @@ function exQuotientLines(level, rng, opts) {
   // Part 1: z in a + bi.
   const l1 = [
     E(`(${d.num.reduced})/${den}`, 'Réduire iᵏ modulo 4', 'alg', 'ik'),
-    E(`(${Ntext})${conj}/2`, `Multiplier haut et bas par ${fr(conj.slice(1, -1))}`, 'alg', 'conj'),
+    E(`${/[+-]/.test(Ntext.slice(1)) ? `(${Ntext})` : Ntext}${conj}/2`, `Multiplier haut et bas par ${s > 0 ? '1 − i' : '1 + i'}`, 'alg', 'conj'),
     E(zText, 'Forme algébrique', 'alg', 'alg'),
   ];
   if (level === 1) l1[0] = blankBy(l1[0], (n) => termsOf(strip(n).n));
@@ -252,21 +252,21 @@ function exQuotientLines(level, rng, opts) {
   if (level === 2) l3[1] = blankBy(l3[1], polarHoles);
   const powDecision = { kind: 'decision', prompt: `Pour calculer z^${m} :`, options: [
     { id: 'moivre', label: 'Forme polaire, puis Moivre', valid: true, ref: true },
-    { id: 'binom', label: `Développer (${fr(zText)})^${m} avec le binôme`, valid: true, quality: 'poor', why: `Juste, mais il y a ${m + 1} termes à calculer : la forme polaire va plus vite.` },
-    { id: 'split', label: `Élever ${fr(String(z.a))} et ${fr(String(z.b))}i à la puissance ${m} séparément`, valid: false, why: 'Une puissance ne se distribue pas sur une somme.' },
+    { id: 'binom', label: `Développer (${fr(zText)})${sup(`^${m}`)} avec le binôme`, valid: true, quality: 'poor', why: `Juste, mais il y a ${m + 1} termes à calculer : la forme polaire va plus vite.` },
+    { id: 'split', label: `Élever ${fr(gaussText(z.a, 0))} et ${fr(gaussText(0, z.b))} à la puissance ${m} séparément`, valid: false, why: 'Une puissance ne se distribue pas sur une somme.' },
   ] };
   const parts = [
     { start: Q0, judge: cA, lines: l1 },
     { html: 'Forme polaire de z (r > 0, φ dans ]−π ; π]) :', ask: 'z =', start: zText, judge: cP, pre: level === 2 ? [polarDecision] : [], lines: l2 },
-    { html: `Calcule z^${m} et écris-le sous la forme a + bi :`, ask: `z^${m} =`, start: `(${zText})^${m}`, judge: cA, pre: level === 2 ? [powDecision] : [], lines: l3 },
+    { html: `Calcule z${sup(`^${m}`)} et écris-le sous la forme a + bi :`, ask: `z${sup(`^${m}`)} =`, start: zText === "i" ? `i^${m}` : `(${zText})^${m}`, judge: cA, pre: level === 2 ? [powDecision] : [], lines: l3 },
   ];
   const { start, judge, script } = partsScript(parts, level, EX_CHOICES);
   return linesItem({
     skill: EX, level, mode: modeOf(level), start, judge, script,
     prompt: `Soit z = ${MT(Q0, CX)}. Écris z sous la forme a + bi, puis sous forme polaire, et calcule ${MT(`z^${m}`, { vars: ['z'] })}.`,
     hints: H('Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0.',
-      `z = ${MT(zText, CX)} = ${fr(z.r)}·e^(i·▢), puis z^${m} = ${fr(R.text)}·e^(i·▢).`,
-      `z = ${MT(zText, CX)} = ${MT(polar, CX)}, donc z^${m} = ${MT(polarText(R.text, d.Th), CX)} = ${MT(finalText, CX)}.`),
+      `z = ${MT(zText, CX)} = ${z.r === '1' ? '' : `${fr(z.r)}·`}e^(i·▢), puis z${sup(`^${m}`)} = ${R.text === '1' ? '' : `${fr(R.text)}·`}e^(i·▢).`,
+      `z = ${MT(zText, CX)} = ${MT(polar, CX)}, donc z${sup(`^${m}`)} = ${MT(polarText(R.text, d.Th), CX)} = ${MT(finalText, CX)}.`),
     subgoals: EX_SUB, keys: ['cplx', 'calc'], tapActions: level === 3 ? 'steps' : null,
     key: `${EX}:${level}:${Q0}:${m}`, exam: false, fallback: !!d.fallback, noHints: level >= 5 || !!opts.noHints,
   });
@@ -300,14 +300,14 @@ function exPartLines(level, rng, opts) {
   if (level === 2) l2[2] = blankBy(l2[2], (n) => [strip(n).r ?? n]);
   const parts = [
     { start: w, judge: cP, lines: l1 },
-    { html: `Calcule ${part}(w^${m}) :`, ask: `${part}(w^${m}) =`, start: `${part}((${w})^${m})`, judge: cR, lines: l2 },
+    { html: `Calcule ${part}(w${sup(`^${m}`)}) :`, ask: `${part}(w${sup(`^${m}`)}) =`, start: `${part}((${w})^${m})`, judge: cR, lines: l2 },
   ];
   const { start, judge, script } = partsScript(parts, level, EX_CHOICES);
   return linesItem({
     skill: EX, level, mode: modeOf(level), start, judge, script,
     prompt: `Soit w = ${MT(w, CX)}. Écris w sous forme polaire, puis calcule ${part === 'Re' ? 'la partie réelle' : 'la partie imaginaire'} de ${MT(`w^${m}`, { vars: ['w'] })}.`,
     hints: H(`Passe en forme polaire : |w| = 2. Puis Moivre, et ${part}(r·e^(iθ)) = r·${fn} θ.`,
-      `w = 2·e^(i·▢), donc w^${m} = ${R}·e^(i·▢).`,
+      `w = 2·e^(i·▢), donc w${sup(`^${m}`)} = ${R}·e^(i·▢).`,
       `${MT(`${part}(${polarText(String(R), Th)})`, CX)} = ${MT(`${R}${fn}(${piText(Th)})`)} = ${MT(value)}.`),
     subgoals: EX_SUB, keys: ['cplx', 'calc'], tapActions: level === 3 ? 'steps' : null,
     key: `${EX}:${level}:part:${w}:${m}:${part}`, exam: false, noHints: level >= 5 || !!opts.noHints,
@@ -331,12 +331,15 @@ function exPowerMcq(level, rng, exam) {
     opt(right.conj(), { correct: false }),
     opt(right.mul(new CQ(0, 1)), { correct: false }),
     opt(right.neg(), { correct: false }),
+    opt(right.mul(new CQ(0, -1)), { correct: false }),
+    opt(right.mul(2), { correct: false }),
+    opt(new CQ(z.a, z.b).pow(m - 1), { correct: false }),
   ];
   const options = uniqHtml(cands).filter((o, i, a) => o.correct || !a.some((x, j) => j < i && x.correct && x.html === o.html)).slice(0, 4);
   return mcq({
     skill: EX, level, prompt: `Soit z = ${MT(Q0, CX)}. Alors ${MT(`z^${m}`, { vars: ['z'] })} =`, options,
     key: `${EX}:mcq:${Q0}:${m}`, expectedSec: 240, exam, fallback: !!d.fallback,
-    solution: [{ html: `z = ${MT(gaussText(z.a, z.b), CX)} = ${MT(polarText(z.r, z.phi), CX)}, donc z^${m} = ${MT(polarText(d.R.text, d.Th), CX)} = ${MT(gaussText(right.re.valueOf(), right.im.valueOf()), CX)}.`, note: '' }],
+    solution: [{ html: `z = ${MT(gaussText(z.a, z.b), CX)} = ${MT(polarText(z.r, z.phi), CX)}, donc z${sup(`^${m}`)} = ${MT(polarText(d.R.text, d.Th), CX)} = ${MT(gaussText(right.re.valueOf(), right.im.valueOf()), CX)}.`, note: '' }],
   }, rng);
 }
 
@@ -499,6 +502,7 @@ function znSet(d) {
   for (let k = 0; k < d.m; k++) items.push(rootText(d.r0, principal(q(2 * k, d.m))));
   return `{${items.join(' ; ')}}`;
 }
+const rPowT = (k) => (k === 1 ? 'r' : `r${sup(`^${k}`)}`);
 const cSub = { kind: 'complex', complex: true, form: 'any', vars: ['r', 'φ'], domain: { r: [0.5, 3], φ: [-3, 3] } };
 const cSet = { kind: 'complex', complex: true, form: 'set', itemForm: 'any' };
 
@@ -508,8 +512,9 @@ function znLines(level, rng, opts) {
   const sR = { kind: 'solset', v: 'r', domain: rDom };
   const sPhi = { kind: 'solset', v: 'φ', periodic: true };
   const set = znSet(d);
-  const l0 = [E(d.subst[1], d.f === 'abs' ? '|z| = r' : 'Le conjugué change le signe de φ', 'polar', 'subst')];
-  const lr = d.rLines.map((t, i) => E(t, i === 0 && d.zero ? 'Cas r = 0, puis r > 0' : 'r ≥ 0', 'r0', i === 0 && d.zero ? 'case' : 'mod'));
+  const l0 = [E(d.subst[1], d.f === 'abs' ? '|z| = r' : d.f === 'inv' ? '1/z̄ = 1/(r·e^(−iφ))' : 'Le conjugué change le signe de φ', 'polar', 'subst')];
+  const rNote = (i) => (d.zero ? (i === 0 ? 'Cas r = 0, puis r > 0' : 'r ≥ 0') : (i === 0 && d.rLines.length > 1 ? 'Multiplier par r > 0' : 'r > 0'));
+  const lr = d.rLines.map((t, i) => E(t, rNote(i), 'r0', i === 0 && d.zero ? 'case' : 'mod'));
   const la = d.argLines.map((t, i) => E(t, i === d.argLines.length - 1 ? 'Isoler φ' : 'Regrouper', 'polar', i === d.argLines.length - 1 ? 'solve' : 'arg'));
   const ls = [E(set, d.zero ? 'z = 0, et les racines' : 'Les racines', 'list', 'list')];
   const lc = [E(String(d.count), `${d.zero ? '1 + ' : ''}${d.m} solutions`, 'list', 'count')];
@@ -545,7 +550,7 @@ function znLines(level, rng, opts) {
     skill: ZN, level, mode: modeOf(level), start, judge, script,
     prompt: `Résous dans ℂ l'équation ${d.eqText}. Pose z = r·e^(iφ) (r ≥ 0) : écris ${d.f === 'abs' ? '|z|' : d.f === 'inv' ? '1/z̄' : d.f === 'cconj' ? `${d.c}z̄` : 'z̄'} en r et φ, résous en r, puis en φ, liste les solutions et compte-les.`,
     hints: H(d.zero ? 'Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche.' : 'Pose z = r·e^(iφ). Ici z = 0 est exclu, donc r > 0.',
-      `r > 0 : r${sup(`^${d.f === 'inv' ? d.n + 1 : d.n - 1}`)} = ${d.f === 'cconj' ? d.c : 1} et e^(i·▢·φ) = 1.`,
+      `r > 0 : ${rPowT(d.f === 'inv' ? d.n + 1 : d.n - 1)} = ${d.f === 'cconj' ? d.c : 1} et e^(i·▢·φ) = 1.`,
       `r = ${d.r0} et φ = ${fr(d.argLines[d.argLines.length - 1].slice(2))}${d.zero ? ` ; avec z = 0, cela fait ${d.count} solutions` : ` : ${d.count} solutions`}.`),
     subgoals: ZN_SUB, keys: ['cplx', 'trig', 'calc'], tapActions: level === 3 ? 'steps' : null,
     key: `${ZN}:${level}:${d.f}:${d.n}:${d.c ?? 1}`, exam: false, noHints: level >= 5,
@@ -584,6 +589,9 @@ function znCountMcq(level, rng, exam) {
     { v: d.count + 1, correct: false },
     { v: 2 * d.n, correct: false },
     { v: d.n - 1, correct: false },
+    { v: d.n + 1, correct: false },
+    { v: d.n + 2, correct: false },
+    { v: d.count + 2, correct: false },
   ];
   const seen = new Set();
   const options = [];

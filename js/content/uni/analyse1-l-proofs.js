@@ -17,6 +17,7 @@
 // offered only once the trap exists (after the U4 merge).
 
 import { RULE_BY_ID } from '../../math/malrules.js';
+import { Q } from '../../math/rational.js';
 import { blocksItem } from './kit.js';
 import { problemItem } from './kit-problem.js';
 import { sup } from './analyse1-e-kit.js';
@@ -66,6 +67,10 @@ function proofB(rng) {
     const c = rng.int(1, 9);
     const end = c - k * L;
     if (end >= 0 || end < -9) continue;
+    // The example of g9_proof_by_example: f(x) = c − k(x − a), zero a + c/k.
+    const ex = `${c} − ${k === 1 ? '' : k}${a === 0 ? 'x' : `(x − ${a})`}`;
+    const zq = new Q(a * k + c, k);
+    const zero = zq.d === 1 ? String(zq.n) : `${zq.n}/${zq.d}`;
     return {
       id: `b${a}${b}${k}${c}`, statement: `Soit f : [${a} ; ${b}] → ℝ continue, dérivable sur ]${a} ; ${b}[, avec f(${a}) = ${c} et f′(x) ≤ −${k} pour tout x ∈ ]${a} ; ${b}[. Montrer que f s'annule sur ]${a} ; ${b}[.`,
       blocks: [
@@ -81,13 +86,14 @@ function proofB(rng) {
         { html: `f(${a}) > 0 et f′ < 0, donc f décroît et finit par s'annuler.`, rule: 'a1_ivt_no_continuity', why: 'Décroître ne suffit pas à atteindre 0 : il faut f(b) < 0, puis la continuité (TVI).' },
         { html: `f′ ≤ −${k}, donc f(${b}) ≤ −${k}.`, rule: 'a1_mvt_endpoints_values', why: 'Le TAF relie f(b) − f(a) à f′(ξ)·(b − a) : f(b) ≤ f(a) − k(b − a).' },
         { html: `Par Rolle, il existe ξ ∈ ]${a} ; ${b}[ tel que f′(ξ) = 0.`, rule: 'a1_rolle_without_hyp', why: 'Rolle demande f(a) = f(b), qui n\'est pas donné ; et ici f′ ≤ −k < 0 partout.' },
-        { html: `Avec f(x) = ${c} − ${k}(x − ${a}), f s'annule en x = ${a} + ${c}/${k} : c'est vrai.`, rule: 'g9_proof_by_example', why: 'Un exemple de f ne prouve pas l\'énoncé pour toutes les f.' },
+        { html: `Avec f(x) = ${ex}, f s'annule en x = ${zero} : c'est vrai.`, rule: 'g9_proof_by_example', why: 'Un exemple de f ne prouve pas l\'énoncé pour toutes les f.' },
         { html: `Il existe ξ ∈ ]${a} ; ${b}[ tel que, pour toute f, f(${b}) − f(${a}) = f′(ξ)·(${b} − ${a}).`, rule: 'g9_quant_order', why: 'ξ dépend de f : le TAF dit « pour f donnée, il existe ξ ».' },
+        { html: 'TVI : il existe x₀ ∈ ]α ; β[ tel que toute g continue sur [α ; β], avec g(α) et g(β) de signes opposés, vérifie g(x₀) = 0.', rule: 'g9_quant_order', why: 'Le point x₀ dépend de g : « pour toute g, il existe x₀ », pas l\'inverse.' },
       ],
       stages: [
         { title: 'Énoncer le TAF et vérifier ses hypothèses', ids: ['h', 'taf'], points: 1, decoys: [2] },
         { title: `Appliquer le TAF : signe de f(${b})`, ids: ['bound'], points: 1.5, decoys: [1] },
-        { title: 'Énoncer le TVI', ids: ['tvi'], points: 1, decoys: [4] },
+        { title: 'Énoncer le TVI', ids: ['tvi'], points: 1, decoys: [5] },
         { title: 'Vérifier les hypothèses du TVI', ids: ['check'], points: 1, decoys: [0] },
         { title: 'Conclure', ids: ['concl'], points: 0.5, decoys: [3] },
       ],

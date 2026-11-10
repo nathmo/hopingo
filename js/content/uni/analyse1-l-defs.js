@@ -152,7 +152,7 @@ function defBlocks(level, rng, D, { noHints = false, exam = false } = {}) {
   const all = D.blocks.join(' ');
   return blocksItem({
     skill: SK, level, mode: 'define',
-    prompt: `Écris la définition : « ${D.name} ». ${D.frame}${placed.length ? ' Le début est placé : touche le bloc qui suit.' : ' Touche les blocs dans l\'ordre.'}`,
+    prompt: `Construis la définition de « ${D.name} »${placed.length ? ` : le début est placé, touche ${order.length === 1 ? 'le bloc qui manque' : 'les blocs qui manquent'}` : ' : touche les blocs dans l\'ordre'}.<br>${D.frame}`,
     blocks: rng.shuffle([...blocks, ...used]), goal: order[order.length - 1], order, placed,
     hints: H(D.hint, `${D.blocks[0]} …`, all),
     noHints: noHints || level === 5, exam,
@@ -170,7 +170,7 @@ function defTokens(level, rng, D, { noHints = false, exam = false } = {}) {
   const cfg = { pieces };
   return tokensItem({
     skill: SK, level,
-    prompt: `Écris avec des quantificateurs la définition : « ${D.name} ». ${D.frame}`,
+    prompt: `Écris avec des quantificateurs la définition de « ${D.name} ».<br>${D.frame}`,
     pieces, palette: rng.shuffle(pieces.map((p) => p.text)), target: F.target, start: F.target,
     hints: H(D.hint, `${F.target.split(/[,∧]/)[0]} …`, FM(F.target, cfg)),
     noHints: noHints || level === 5, exam,
