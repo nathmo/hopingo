@@ -112,7 +112,7 @@ function paItem(level, rng, opts = {}) {
   if (level === 2) { s1[1] = blanked(s1[1], [`(λ+${d.b})^2`], L); s1[s1.length - 1] = blanked(s1.at(-1), [s1.at(-1).math], L); }
   const qAt = (r) => `${d.a === 1 ? '' : `${d.a}×`}${QT(r)}/(${QT(r)}+${d.b})`;
   const qLine = (v) => {
-    const l = E(String(v), `q = ${v}`, 'bounds', 'bound');
+    const l = E(String(v), `q = ${fr(String(v))}`, 'bounds', 'bound');
     return level === 1 ? blanked(l, [String(v)], L) : l;
   };
   const parts = [{ start, judge: SS, pre: level === 2 || level === 3 ? [critDecision(d)] : [], lines: s1 }];
@@ -124,9 +124,9 @@ function paItem(level, rng, opts = {}) {
   const given = level === 1 ? ' C\'est une géométrique : elle converge si et seulement si |q| < 1.' : '';
   return linesItem({
     skill: PA, level, mode: modeOf(level), start: st, judge, script,
-    prompt: `Pour quels λ ≠ ${-d.b} la série ${MT(`sum((${d.qt})^n,n,0,∞)`, { vars: ['n', 'λ'] })} converge-t-elle ?${given}`,
+    prompt: `Pour quels λ ≠ −${d.b} la série ${MT(`sum((${d.qt})^n,n,0,∞)`, { vars: ['n', 'λ'] })} converge-t-elle ?${given}`,
     hints: H('C\'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part.',
-      d.lin ? `λ² < (λ + ${d.b})² ⇔ ▢ > 0` : `(${fr(lm(d.hi))})(λ ▢) < 0`,
+      d.lin ? `Développe (λ + ${d.b})² : λ² se simplifie, et il reste ${2 * d.b}λ + ▢ > 0.` : `(${fr(lm(d.hi))})(λ ▢) < 0`,
       `${ivHtml(iv(d.lo, d.hi))}, bornes exclues (|q| = 1).`),
     subgoals: PA_SUB, keys: ['calcx', 'greek', 'set', 'ineq'], tapActions: level === 3 ? 'steps' : null,
     key: `${PA}:${level}:${d.qt}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -157,7 +157,7 @@ function paMcq(rng) {
       { html: ivHtml(`]−∞ ; ${lo}[`), correct: false },
     ];
     return mcq({
-      skill: PA, level: 4, prompt: `Ensemble des λ ≠ ${-d.b} pour lesquels ${MT(`sum((${d.qt})^n,n,0,∞)`, { vars: ['n', 'λ'] })} converge :`, options, key: `${PA}:mcq:${d.qt}`, expectedSec: 240, exam,
+      skill: PA, level: 4, prompt: `Ensemble des λ ≠ −${d.b} pour lesquels ${MT(`sum((${d.qt})^n,n,0,∞)`, { vars: ['n', 'λ'] })} converge :`, options, key: `${PA}:mcq:${d.qt}`, expectedSec: 240, exam,
       solution: [{ html: `Géométrique : |λ| < |λ + ${d.b}| ⇔ λ² < (λ + ${d.b})² ⇔ ${2 * d.b}λ + ${d.b * d.b} > 0 ⇔ λ > ${fr(lo)}. En λ = ${fr(lo)}, q = −1 : diverge.`, note: '' }],
     }, rng);
   }
@@ -169,7 +169,7 @@ function paMcq(rng) {
     { html: ivHtml(`]${N(d.lo)} ; ${N(d.hi)}]`), correct: false, rule: 'a1_ratio_one' },
   ];
   return mcq({
-    skill: PA, level: 4, prompt: `Ensemble des λ ≠ ${-d.b} pour lesquels ${MT(`sum((${d.qt})^n,n,0,∞)`, { vars: ['n', 'λ'] })} converge :`, options, key: `${PA}:mcq:${d.qt}`, expectedSec: 240, exam,
+    skill: PA, level: 4, prompt: `Ensemble des λ ≠ −${d.b} pour lesquels ${MT(`sum((${d.qt})^n,n,0,∞)`, { vars: ['n', 'λ'] })} converge :`, options, key: `${PA}:mcq:${d.qt}`, expectedSec: 240, exam,
     solution: [{ html: `Géométrique : |q| < 1 ⇔ ${d.a * d.a}λ² < (λ + ${d.b})² ⇔ ${fr(N(d.lo))} < λ < ${N(d.hi)}. Aux bornes, q = −1 et q = 1 : le terme général ne tend pas vers 0, les bornes sont exclues.`, note: '' }],
   }, rng);
 }
@@ -206,20 +206,24 @@ function e6Problem(rng, level, opts) {
   const m = rng.pick([2, 3, 3, 4]);
   const b = m - 1;
   const ba = b === 1 ? 'α' : `${b}α`;
+  const kba = b === 1 ? 'k^α' : `k^(${ba})`;
+  const ka1 = b === 1 ? '(k+1)^α' : `(k+1)^(${ba})`;
+  const kfrac = b === 1 ? '((k+1)/k)^α' : `((k+1)/k)^(${ba})`;
+  const expoHtml = `${m} − ${ba}`;
   const kb = b === 1 ? 'k' : `k^${b}`;
   const sg = rng.pick(['(-1)^k', '(-1)^(k+1)']);
-  const u = `${sg}×k^(${ba})/(α^k+k^${m})`;
-  const abs = `k^(${ba})/(α^k+k^${m})`;
+  const u = `${sg}×${kba}/(α^k+k^${m})`;
+  const abs = `${kba}/(α^k+k^${m})`;
   const K = { vars: ['k', 'α'] };
   const eqv = (lo, hi) => ({ kind: 'equiv', vars: ['k', 'α'], domain: { k: [1, 20], α: [lo, hi] }, target: 'goal' });
   const P = (it) => it;
   // α > 1: d'Alembert on |uₖ|.
-  const goalA = `((k+1)/k)^(${ba})×(1+k^${m}/α^k)/(α+(k+1)^${m}/α^k)`;
+  const goalA = `${kfrac}×(1+k^${m}/α^k)/(α+(k+1)^${m}/α^k)`;
   const A1 = P(linesItem({
-    skill: PA, level, mode: 'free', start: `(k+1)^(${ba})/(α^(k+1)+(k+1)^${m})×(α^k+k^${m})/k^(${ba})`,
+    skill: PA, level, mode: 'free', start: `${ka1}/(α^(k+1)+(k+1)^${m})×(α^k+k^${m})/${kba}`,
     judge: { ...eqv(1.2, 3), goal: goalA },
     script: [
-      E(`((k+1)/k)^(${ba})×(α^k+k^${m})/(α^(k+1)+(k+1)^${m})`, 'Regrouper les puissances de k', 'crit', 'simplify'),
+      E(`${kfrac}×(α^k+k^${m})/(α^(k+1)+(k+1)^${m})`, 'Regrouper les puissances de k', 'crit', 'simplify'),
       E(goalA, 'Diviser en haut et en bas par αᵏ', 'crit', 'simplify'),
     ],
     prompt: `Cas α > 1. Simplifie le rapport |uₖ₊₁|/|uₖ| de d'Alembert jusqu'à ${MT(goalA, K)}.`,
@@ -234,7 +238,7 @@ function e6Problem(rng, level, opts) {
       { html: 'α', correct: false },
       { html: '0', correct: false },
     ],
-    solution: [{ html: `((k + 1)/k)^(${b === 1 ? '' : b}α) → 1, k${sup(m)}/αᵏ → 0 et (k + 1)${sup(m)}/αᵏ → 0 (α > 1) : le rapport tend vers 1/α.`, note: '' }],
+    solution: [{ html: `((k + 1)/k)^(${ba}) → 1, k${sup(m)}/αᵏ → 0 et (k + 1)${sup(m)}/αᵏ → 0 (α > 1) : le rapport tend vers 1/α.`, note: '' }],
   }, rng);
   const verdict = (prompt, right, key, why, rules = {}) => mcq({
     skill: PA, level, prompt, key: `${PA}:e6:${key}:${m}`, keepOrder: true,
@@ -253,17 +257,17 @@ function e6Problem(rng, level, opts) {
   const B1 = linesItem({
     skill: PA, level, mode: 'free', start: `k^(${expo})×${abs}`, judge: { ...eqv(0.2, 0.9), goal: goalB },
     script: [
-      { kind: 'note', html: '0 < α < 1 : αᵏ → 0, donc |uₖ| ~ k^(' + fr(`${ba}`) + `)/k${sup(m)} = 1/k^(${fr(expo)}).` },
-      E(goalB, `k^(${fr(expo)})·k^(${ba}) = k${sup(m)}, puis diviser par k${sup(m)} : → 1`, 'cmp', 'simplify'),
-      { kind: 'segment', html: `Pour quels α ∈ ]0 ; 1[ l'exposant ${fr(expo)} est-il > 1 ?`, ask: 'α ∈', start: { math: `${expo}>1` }, judge: { kind: 'solset', v: 'α', domain: ']0 ; 1[' } },
+      { kind: 'note', html: `0 < α < 1 : αᵏ → 0, donc |uₖ| ~ ${b === 1 ? 'kᵅ' : `k^(${ba})`}/k${sup(m)} = 1/k^(${expoHtml}).` },
+      E(goalB, `k^(${expoHtml})·${b === 1 ? 'kᵅ' : `k^(${ba})`} = k${sup(m)}, puis diviser par k${sup(m)} : → 1`, 'cmp', 'simplify'),
+      { kind: 'segment', html: `Pour quels α ∈ ]0 ; 1[ l'exposant ${expoHtml} est-il > 1 ?`, ask: 'α ∈', start: { math: `${expo}>1` }, judge: { kind: 'solset', v: 'α', domain: ']0 ; 1[' } },
       E('α<1', 'Résoudre', 'cmp', 'solve'),
       E(']0 ; 1[', 'Toujours, sur ]0 ; 1[', 'cmp', 'solve'),
     ],
-    prompt: `Cas 0 < α < 1. Compare |uₖ| à 1/k^(${fr(expo)}) : simplifie k^(${fr(expo)})·|uₖ| jusqu'à ${MT(goalB, K)}, puis étudie l'exposant.`,
+    prompt: `Cas 0 < α < 1. Compare |uₖ| à 1/k^(${expoHtml}) : simplifie k^(${expoHtml})·|uₖ| jusqu'à ${MT(goalB, K)}, puis étudie l'exposant.`,
     hints: [], subgoals: [{ id: 'cmp', label: 'comparaison', skill: 'a1-ser-compare' }], keys: ['calcx', 'greek', 'seq', 'set'],
     key: `${PA}:e6:B:${m}`, noHints: true,
   });
-  const B2 = verdict('Cas 0 < α < 1 : la série est', 'abs', 'Bv', `|uₖ| ~ 1/k^(${fr(expo)}) avec ${fr(expo)} > 1 : la série converge absolument (comparaison).`, { semi: 'a1_abs_conv_confused' });
+  const B2 = verdict('Cas 0 < α < 1 : la série est', 'abs', 'Bv', `|uₖ| ~ 1/k^(${expoHtml}) avec ${expoHtml} > 1 : la série converge absolument (comparaison).`, { semi: 'a1_abs_conv_confused' });
   // α = 1: k·|uₖ| → 1, then Leibniz.
   const xk = `${kb}/(1+k^${m})`;
   const xk1 = `${b === 1 ? '(k+1)' : `(k+1)^${b}`}/(1+(k+1)^${m})`;

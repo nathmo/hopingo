@@ -87,7 +87,7 @@ function neData(rng, kind) {
     case 'exp': {
       const u = `(1+${k}/n)^n`;
       const L = k === 1 ? 'e' : `e^${k}`;
-      return { u, start: u, L, lines: [E(`e^(n×ln(1+${k}/n))`, 'Forme 1^∞ : e^(n·Log(1 + k/n))', 'lim', 'exp'), E(L, `n·Log(1 + ${k}/n) → ${k}`, 'lim', 'lim')] };
+      return { u, start: u, L, lines: [E(`e^(n×ln(1+${k}/n))`, `Forme 1^∞ : e^(n·Log(1 + ${k}/n))`, 'lim', 'exp'), E(L, `n·Log(1 + ${k}/n) → ${k}`, 'lim', 'lim')] };
     }
     case 'cos': {
       const u = `cos(${k}/n)`;
@@ -124,8 +124,8 @@ function neVerdict(d) {
   const div = !d.zero;
   return { kind: 'decision', prompt: 'Que dit la condition nécessaire ?', options: [
     { id: 'div', label: 'La série diverge : son terme général ne tend pas vers 0', valid: div, why: 'uₙ → 0 : la condition nécessaire est remplie, elle ne dit rien de plus.' },
-    { id: 'unknown', label: 'On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère', valid: !div, why: `${d.abs ? '|uₙ|' : 'uₙ'} → ${fr(d.L)} ≠ 0 : la série diverge, sans autre critère.` },
-    { id: 'conv', label: 'La série converge, car uₙ → 0', valid: false, ...(div ? {} : { rule: 'a1_series_term_to_zero' }), why: div ? `uₙ ne tend pas vers 0 (${d.abs ? '|uₙ|' : 'uₙ'} → ${fr(d.L)}).` : 'Σ 1/n diverge alors que 1/n → 0 : uₙ → 0 est nécessaire, pas suffisant.' },
+    { id: 'unknown', label: 'On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère', valid: !div, why: `${d.abs ? '|uₙ|' : 'uₙ'} → ${sup(d.L)} ≠ 0 : la série diverge, sans autre critère.` },
+    { id: 'conv', label: 'La série converge, car uₙ → 0', valid: false, ...(div ? {} : { rule: 'a1_series_term_to_zero' }), why: div ? `uₙ ne tend pas vers 0 (${d.abs ? '|uₙ|' : 'uₙ'} → ${sup(d.L)}).` : 'Σ 1/n diverge alors que 1/n → 0 : uₙ → 0 est nécessaire, pas suffisant.' },
   ] };
 }
 
@@ -134,7 +134,7 @@ function neItem(level, rng, opts = {}) {
   if (level === 4 && rng.next() < 0.5) return neMcq(rng);
   const d = neData(rng, rng.next() < 0.3 ? rng.pick(NE_ZERO) : rng.pick(NE_DIV));
   const lines = guidedLines(d.lines, level);
-  const concl = [E(d.L, d.zero ? 'uₙ → 0 : il faudra un autre critère' : `Limite ${fr(d.L)} ≠ 0`, 'verdict', 'lim')];
+  const concl = [E(d.L, d.zero ? 'uₙ → 0 : il faudra un autre critère' : `Limite ${sup(d.L)} ≠ 0`, 'verdict', 'lim')];
   const parts = [
     { start: d.start, judge: LIM, lines },
     { html: 'Conclusion : rappelle la limite du terme général.', ask: d.abs ? 'lim |uₙ| =' : 'lim uₙ =', start: beforeLast(d.start, d.lines), judge: LIM, pre: [neVerdict(d)], lines: level === 1 ? concl.map(blankAll) : concl },
@@ -145,7 +145,7 @@ function neItem(level, rng, opts = {}) {
     skill: NE, level, mode: modeOf(level), start, judge, script,
     prompt: `Que dit la condition nécessaire sur ${SER(d.u)} ? ${what}`,
     hints: H('Regarde d\'abord si le terme général tend vers 0.', `${d.abs ? '|uₙ|' : 'uₙ'} → ▢`,
-      d.zero ? 'uₙ → 0 : la condition nécessaire ne dit rien, il faut un autre critère.' : `${d.abs ? '|uₙ|' : 'uₙ'} → ${fr(d.L)} ≠ 0 : la série diverge.`),
+      d.zero ? 'uₙ → 0 : la condition nécessaire ne dit rien, il faut un autre critère.' : `${d.abs ? '|uₙ|' : 'uₙ'} → ${sup(d.L)} ≠ 0 : la série diverge.`),
     subgoals: NE_SUB, keys: KEYS_S, tapActions: level === 3 ? 'steps' : null,
     key: `${NE}:${level}:${d.u}`, exam: examTag(opts),
   });
@@ -170,7 +170,7 @@ function neMcq(rng) {
     : 'Pour une seule de ces séries, la condition nécessaire ne permet pas de conclure. Laquelle ?';
   return mcq({
     skill: NE, level: 4, prompt, options, key: `${NE}:mcq:${picks.map((d) => d.u).join('|')}`, expectedSec: 90,
-    solution: [{ html: `${right.abs ? '|uₙ|' : 'uₙ'} = ${MT(right.start, { vars: ['n'] })} → ${fr(right.L)}${oneDiv ? ' ≠ 0 : cette série diverge. Les autres termes tendent vers 0 : il faut un autre critère.' : ' : il faut un autre critère. Les autres termes ne tendent pas vers 0 : ces séries divergent.'}`, note: '' }],
+    solution: [{ html: `${right.abs ? '|uₙ|' : 'uₙ'} = ${MT(right.start, { vars: ['n'] })} → ${sup(right.L)}${oneDiv ? ' ≠ 0 : cette série diverge. Les autres termes tendent vers 0 : il faut un autre critère.' : ' : il faut un autre critère. Les autres termes ne tendent pas vers 0 : ces séries divergent.'}`, note: '' }],
   }, rng);
 }
 
@@ -265,7 +265,7 @@ function cpData(rng, kind) {
     const r = `${k === 1 ? '' : `${k}×`}${an}/(${u})`;
     return {
       kind, a: an, p: String(m), L: String(k), start: `${npw(m)}×${an}`,
-      lines: [E(r, `${fn === 'sin' ? 'sin u/u' : 'Log(1 + u)/u'} avec u = ${fr(u)} → 0`, 'quot', 'equiv'), E(String(k), `${fn === 'sin' ? 'sin u/u' : 'Log(1 + u)/u'} → 1`, 'quot', 'lim')],
+      lines: [E(r, `${fn === 'sin' ? 'sin u/u' : 'Log(1 + u)/u'} avec u = ${sup(u)} → 0`, 'quot', 'equiv'), E(String(k), `${fn === 'sin' ? 'sin u/u' : 'Log(1 + u)/u'} → 1`, 'quot', 'lim')],
     };
   }
   if (kind === 'cos') {
@@ -455,7 +455,7 @@ function rrData(rng, kind) {
     const p = rng.pick([1, 2]);
     const c = rng.pick([2, 3, 5]);
     return {
-      kind: 'ratio', html: `${p === 1 ? 'n' : 'n²'}·${c}ⁿ/n!`, formed: `${c}(n+1)^${p}/(${npw(p)}(n+1))`, rho: '0', conv: true,
+      kind: 'ratio', html: `${p === 1 ? 'n' : 'n²'}·${c}ⁿ/n!`, formed: p === 1 ? `${c}(n+1)/(n(n+1))` : `${c}(n+1)^2/(n^2(n+1))`, rho: '0', conv: true,
       lines: [E(p === 1 ? `${c}/n` : `${c}(n+1)/n^2`, 'Simplifier par n + 1', 'simplify', 'simplify'), E('0', 'Passer à la limite', 'simplify', 'lim')],
     };
   }
@@ -480,12 +480,10 @@ function rrData(rng, kind) {
 const RR_KINDS = ['fact2', 'fact2', 'factpow', 'powfact', 'rootfrac', 'rootfrac', 'rooteuler'];
 const rhoHtml = (rho) => fr(rho.replace('e^(-1)/2', '1/(2e)').replace('e^(-1)', '1/e'));
 
-function rrCriterion(d, level) {
-  const ask = d.kind === 'ratio' ? 'aₙ₊₁/aₙ =' : 'ⁿ√|aₙ| =';
-  const then = level >= 3 ? { then: { ask, expect: d.formed, vars: ['n'], domain: { n: [1, 12] }, why: d.kind === 'ratio' ? 'Écris aₙ₊₁ en remplaçant n par n + 1, puis divise par aₙ et simplifie les factorielles.' : 'Prends la racine n-ième : la puissance n disparaît.' } } : {};
+function rrCriterion(d) {
   return { kind: 'decision', prompt: 'Quel critère choisis-tu ?', options: [
-    { id: 'ratio', label: 'd\'Alembert : |aₙ₊₁/aₙ|', valid: d.kind === 'ratio', ...(d.kind === 'ratio' ? { ...then, ref: true } : {}), why: 'Pas de factorielle, mais une puissance n-ième : prends la racine n-ième (Cauchy).' },
-    { id: 'root', label: 'Cauchy : ⁿ√|aₙ|', valid: d.kind === 'root', ...(d.kind === 'root' ? { ...then, ref: true } : {}), why: 'Des factorielles : ⁿ√(n!) ne se simplifie pas. Forme aₙ₊₁/aₙ (d\'Alembert).' },
+    { id: 'ratio', label: 'd\'Alembert : |aₙ₊₁/aₙ|', valid: d.kind === 'ratio', ...(d.kind === 'ratio' ? { ref: true } : {}), why: 'Pas de factorielle, mais une puissance n-ième : prends la racine n-ième (Cauchy).' },
+    { id: 'root', label: 'Cauchy : ⁿ√|aₙ|', valid: d.kind === 'root', ...(d.kind === 'root' ? { ref: true } : {}), why: 'Des factorielles : ⁿ√(n!) ne se simplifie pas. Forme aₙ₊₁/aₙ (d\'Alembert).' },
     { id: 'cmp', label: 'Comparer à une série de Riemann', valid: false, why: 'aₙ n\'a pas d\'équivalent simple en 1/nᵖ : factorielles et puissances n-ièmes demandent d\'Alembert ou Cauchy.' },
   ] };
 }
@@ -503,13 +501,13 @@ function rrItem(level, rng, opts = {}) {
   });
   const concl = [E(rhoQ, d.conv ? 'ρ < 1' : 'ρ > 1', 'verdict', 'lim')];
   const parts = [
-    { start: d.formed, judge: LIM, pre: level >= 2 ? [rrCriterion(d, level)] : [], lines },
+    { start: d.formed, judge: LIM, pre: level >= 2 ? [rrCriterion(d)] : [], lines },
     { html: 'Conclusion : rappelle ρ.', ask: 'ρ =', start: beforeLast(d.formed, d.lines), judge: LIM, pre: [nat, criterionDecision(d.kind, ['term', 'cmp', d.kind === 'ratio' ? 'root' : 'ratio'])], lines: level === 1 ? concl.map(blankAll) : concl },
   ];
   const { start, judge, script } = partsScript(parts, level, RR_CHOICES);
   const formedNote = level === 1
     ? ` Par ${d.kind === 'ratio' ? 'd\'Alembert : aₙ₊₁/aₙ' : 'Cauchy : ⁿ√|aₙ|'} = ${MT(d.formed, { vars: ['n'] })}.`
-    : level === 2 ? ` Le critère choisi, la ligne de départ est ${d.kind === 'ratio' ? 'aₙ₊₁/aₙ' : 'ⁿ√|aₙ|'}.` : '';
+    : level === 2 ? ` Choisis le critère : la ligne de départ est alors ${d.kind === 'ratio' ? 'aₙ₊₁/aₙ' : 'ⁿ√|aₙ|'}, déjà formé.` : '';
   return linesItem({
     skill: RR, level, mode: modeOf(level), start, judge, script,
     prompt: `Nature de ${SERX(sup(d.html))} ?${formedNote}`,
@@ -606,7 +604,7 @@ function lbData(rng, kind) {
     return {
       kind, html: `${sg}/(${p === '1/2' ? '√n' : p === '1' ? 'n' : 'n²'} + ${c})`, x, p, nature: p === '2' ? 'abs' : 'semi',
       cmp: { start: `${np}/(${np}+${c})`, lines: [E(`1/(1+${c}/${np})`, `Diviser par ${p === '1/2' ? '√n' : p === '1' ? 'n' : 'n²'}`, 'cmp', 'dominant'), E('1', 'Passer à la limite', 'cmp', 'lim')] },
-      dec: { start: `${x}-1/(${np1}+${c})`, lines: decLines },
+      dec: { start: `${x}-${p === '1' ? `1/(n+${c + 1})` : `1/(${np1}+${c})`}`, lines: decLines },
     };
   }
   if (kind === 'sin') {
@@ -614,7 +612,7 @@ function lbData(rng, kind) {
     const u = p === '1' ? '1/n' : '1/n^2';
     return {
       kind, html: `${sg}·sin(1/n${p === '2' ? '²' : ''})`, x: `sin(${u})`, p, nature: p === '2' ? 'abs' : 'semi',
-      cmp: { start: `${nPow(p)}×sin(${u})`, lines: [E(`sin(${u})/(${u})`, `sin u/u avec u = ${fr(u)}`, 'cmp', 'equiv'), E('1', 'sin u/u → 1', 'cmp', 'lim')] },
+      cmp: { start: `${nPow(p)}×sin(${u})`, lines: [E(`sin(${u})/(${u})`, `sin u/u avec u = ${sup(u)}`, 'cmp', 'equiv'), E('1', 'sin u/u → 1', 'cmp', 'lim')] },
       dec: { start: 'sin(1/n)-sin(1/(n+1))', lines: [E('0', 'sin croît sur [0 ; 1] et 1/(n + 1) < 1/n : c\'est positif', 'dec', 'sign')] },
     };
   }
@@ -665,7 +663,7 @@ function lbItem(level, rng, opts = {}) {
       start: d.dec.start, judge: { kind: 'equiv', rel: '≥', vars: ['n'], from: 1 }, pre: [lbAbs(d), ...(level === 2 || level === 3 ? [lbHyp()] : [])], lines: guidedLines(d.dec.lines, level),
     });
     parts.push({
-      html: 'Leibniz : xₙ → 0 ? Puis conclus.', ask: 'lim xₙ =', start: d.x, judge: LIM,
+      html: 'Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.', ask: 'lim xₙ =', start: d.x, judge: LIM,
       pre: [natureDecision('semi', { rules: { abs: 'a1_abs_conv_confused', div: 'a1_abs_conv_confused' }, whys: { abs: 'Leibniz donne la convergence, pas la convergence absolue : Σ |aₙ| diverge.', div: 'Σ |aₙ| diverge, mais Leibniz s\'applique : la série converge.' } }), criterionDecision('leibniz', ['term', 'cmp', 'ratio'])],
       lines: guidedLines([E('0', 'xₙ → 0', 'leibniz', 'lim')], level),
     });
@@ -711,9 +709,9 @@ function lbMcq(rng, level, exam) {
   }
   const d = lbData(rng, rng.pick(['pow', 'pow', 'sin', 'ln', 'div']));
   const R = {
-    abs: { html: 'Converge absolument.', why: `|aₙ| ~ ${d.p ? bHtml(d.p) : ''}` },
-    semi: { html: 'Converge, mais pas absolument (semi-convergente).' },
-    div: { html: 'Diverge.' },
+    abs: { html: 'Converge absolument :' },
+    semi: { html: 'Converge, mais pas absolument (semi-convergente) :' },
+    div: { html: 'Diverge :' },
   };
   let options;
   if (d.nature === 'semi') {
