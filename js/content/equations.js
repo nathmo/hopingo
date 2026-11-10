@@ -283,7 +283,7 @@ GEN['iso-formula'] = (level, rng) => {
     skill: 'iso-formula', level, type: 'answer',
     prompt: `Isole <i class="m-var">${v}</i> dans ${algHtml(formula)}. Écris ${v} = …`,
     expected: `${v}=${ans}`, form: 'any', exact: null, tree: null, traps: [], suffix: '', figure: null,
-    keys: ['7', '8', '9', '(', ')', '4', '5', '6', '+', '-', '1', '2', '3', '×', 'frac', '0', '^', '√', '=', 'back', ...letters, 'left', 'right'],
+    keys: ['7', '8', '9', '(', ')', '^', '4', '5', '6', '+', '-', '√', '1', '2', '3', '×', 'frac', '=', 'left', '0', 'right', 'back', ...letters],
     baits: [...new Set(traps.map(([, r]) => r))],
     solution: [{ html: algHtml(`${v}=${ans}`), note: 'On défait les opérations autour de la lettre, dans l\'ordre inverse, en faisant la même chose des deux côtés.' }],
     expectedSec: 60, key: `iso:${formula}:${v}`, start: { math: formula },

@@ -133,7 +133,7 @@ GEN['fn-from-graph'] = (level, rng) => {
     skill: 'fn-from-graph', level, type: 'answer',
     prompt: `Écris l'expression de la fonction affine représentée : y = …${fig({ lines: [{ a, b }], points: [[0, b], [1, a + b]] })}`,
     expected: `y=${lin(a, b)}`, form: 'any', exact: null, tree: null, traps: [], suffix: '', figure: null,
-    keys: ['7', '8', '9', 'x', 'y', '4', '5', '6', '+', '-', '1', '2', '3', '=', 'frac', 'left', '0', 'right', 'back', ''],
+    keys: ['7', '8', '9', 'x', 'y', '=', '4', '5', '6', '+', '-', 'frac', '1', '2', '3', 'left', 'right', 'back', '', '0'],
     baits: ['slope_intercept_swap', 'slope_sign', 'slope_inverted'],
     solution: [{ html: algHtml(`y=${lin(a, b)}`), note: `b = ${show(b)} (la droite coupe l'axe vertical en ${show(b)}) ; a = ${show(a)} (de x = 0 à x = 1, y change de ${show(a)}).` }],
     expectedSec: 45, key: `fg:${a}:${b}`,

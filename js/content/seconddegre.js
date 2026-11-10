@@ -10,7 +10,7 @@ const show = (x) => String(x).replace('-', '−');
 const fix = (x) => Math.round(x * 1e9) / 1e9;
 const canon = (e) => polyText(toPoly(parseAlg(e)), ['x']);
 // Both keypads have the fraction, the power, √ and both brackets.
-const KEYS_SOL = ['7', '8', '9', 'x', '=', '4', '5', '6', '-', ';', '1', '2', '3', '+', 'frac', '√', '0', '(', ')', 'back', 'left', 'right', ',', '^'];
+const KEYS_SOL = ['7', '8', '9', 'x', '=', ';', '4', '5', '6', '+', '-', '^', '1', '2', '3', 'frac', '√', '(', 'left', '0', 'right', 'back', ',', ')'];
 const KEYS_ALG = ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', '=', 'left', '0', 'right', 'back', ',', '√'];
 
 function frac(v) {

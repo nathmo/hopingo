@@ -350,3 +350,29 @@ test('a line is drawn in 2D like the question', () => {
   assert.equal(text(inner(q, 'm-d')), text(inner(draw('x+12/x=7'), 'm-d')));
   assert.equal(text(inner(q, 'm-n')), text(inner(draw('x+12/x=7'), 'm-n')));
 });
+
+// The digits of a keypad keep the phone layout: 7 8 9 on one row, 4 5 6 right
+// under them, 1 2 3 under those. Columns: as in css/style.css (.keypad
+// .keys-<name>), a custom list of keys is 6 wide.
+test('keypads keep the digit block 7 8 9 / 4 5 6 / 1 2 3', () => {
+  const COLS = { fracdec: 4, ops: 5, opsx: 5, alg: 6, algeq: 6, eqset: 5, sys: 5 };
+  const aligned = (keys, cols) => {
+    const pos = (k) => { const i = keys.indexOf(k); return i < 0 ? null : [Math.floor(i / cols), i % cols]; };
+    const p = Object.fromEntries('123456789'.split('').map((d) => [d, pos(d)]));
+    if (Object.values(p).some((x) => !x)) return true;
+    const [r, c] = p['7'];
+    return ['789', '456', '123'].every((row, k) => row.split('').every((d, i) => p[d][0] === r + k && p[d][1] === c + i));
+  };
+  const bad = [];
+  for (const [name, cols] of Object.entries(COLS)) if (!aligned(KEYSETS[name], cols)) bad.push(name);
+  const rng = makeRng(3);
+  for (const s of SKILLS) {
+    if (!hasGenerator(s.id)) continue;
+    for (const level of [1, 2, 3, 4, 5]) {
+      let it;
+      try { it = generate(s.id, level, rng); } catch { continue; }
+      if (Array.isArray(it?.keys) && !it.keys.every((k) => k.length > 1) && !aligned(it.keys, 6)) bad.push(`${s.id} L${level}`);
+    }
+  }
+  assert.deepEqual([...new Set(bad)], []);
+});
