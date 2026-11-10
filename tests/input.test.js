@@ -5,9 +5,8 @@
 // the previous line.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  renderChars, layoutChars, MathModel, KEYSETS, keysForItem, typedTexts, planKeys, keyNormal, promptKeys,
-} from '../js/ui/keypad.js';
+import { renderChars, layoutChars, MathModel, KEYSETS } from '../js/ui/keypad.js';
+import { keysForItem, typedTexts, planKeys, keyNormal, promptKeys } from '../js/ui/keys-needed.js';
 import { StepChain, stepSpecOf } from '../js/judges/steps.js';
 import { LinesRun } from '../js/judges/lines.js';
 import { SKILLS } from '../js/content/skills.js';

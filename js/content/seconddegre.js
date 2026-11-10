@@ -9,8 +9,9 @@ const sgn = (x) => (x < 0 ? `-${-x}` : `+${x}`);
 const show = (x) => String(x).replace('-', '−');
 const fix = (x) => Math.round(x * 1e9) / 1e9;
 const canon = (e) => polyText(toPoly(parseAlg(e)), ['x']);
-const KEYS_SOL = ['7', '8', '9', 'x', '=', '4', '5', '6', '-', ';', '1', '2', '3', '+', 'frac', '√', '0', '(', ')', 'back', 'left', 'right', ',', ''];
-const KEYS_ALG = ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', '=', 'left', '0', 'right', 'back', ',', ''];
+// Both keypads have the fraction, the power, √ and both brackets.
+const KEYS_SOL = ['7', '8', '9', 'x', '=', '4', '5', '6', '-', ';', '1', '2', '3', '+', 'frac', '√', '0', '(', ')', 'back', 'left', 'right', ',', '^'];
+const KEYS_ALG = ['7', '8', '9', 'x', '(', ')', '4', '5', '6', '+', '-', '^', '1', '2', '3', '×', 'frac', '=', 'left', '0', 'right', 'back', ',', '√'];
 
 function frac(v) {
   if (Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v));

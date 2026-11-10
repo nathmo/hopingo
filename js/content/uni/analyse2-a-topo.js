@@ -336,6 +336,9 @@ function topoMcq(level, rng, { exam = false, pTriv = 0.3, dim = null, explain = 
 // Level 2: two sets in a table (ouvert, fermé, borné, compact), then why
 // one of them is not closed (or not open).
 const V = (b) => (b ? 'V' : 'F');
+// A MathML alttext taken out of its attribute is plain text again: the row
+// labels of a table are shown as text, so « &lt; » would show as such.
+const unescapeAlt = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
 function topoTable(level, rng) {
   const Ts = [topoSet(rng, { pTriv: 0 }), topoSet(rng, { pTriv: 0 })];
   if (JSON.stringify(Ts[0].S) === JSON.stringify(Ts[1].S)) Ts[1] = topoSet(rng, { pTriv: 0, dim: Ts[0].dim === 2 ? 3 : 2 });
@@ -555,7 +558,7 @@ function bdPiecesTable(level, rng) {
   if (!B.main.lo) decoys.push({ html: 'l\'origine (0 ; 0)', in: false });
   else if (!B.extras.some((e) => e.kind === 'point' && e.p[0] === 0 && e.p[1] === 0) && !B.extras.some((e) => e.kind === 'circle' && e.r === 1)) decoys.push({ html: 'l\'origine (0 ; 0)', in: false });
   const all = rng.shuffle([...pcs, ...decoys.slice(0, 2)]);
-  const strip = (h) => h.replace(/<math[^>]*alttext="([^"]*)"[\s\S]*?<\/math>/g, '$1');
+  const strip = (h) => unescapeAlt(h.replace(/<math[^>]*alttext="([^"]*)"[\s\S]*?<\/math>/g, '$1'));
   const rows = all.map((p, i) => ({ id: `r${i}`, label: strip(p.html), env: { B: p.in }, cells: [{ input: true, kind: 'tf' }] }));
   const answers = Object.fromEntries(rows.map((r) => [r.id, [V(r.env.B)]]));
   return tableItem({
@@ -626,7 +629,7 @@ function bdPointTable(level, rng) {
 // Level 4: for each piece, is it in ∂E, in int E, in adh E?
 function bdThreeTable(level, rng) {
   const B = drawBd(rng, { isolated: 0.7 });
-  const strip = (h) => h.replace(/<math[^>]*alttext="([^"]*)"[\s\S]*?<\/math>/g, '$1');
+  const strip = (h) => unescapeAlt(h.replace(/<math[^>]*alttext="([^"]*)"[\s\S]*?<\/math>/g, '$1'));
   const items = bdPieces(B).map((p) => ({ label: strip(p.html), d: true, i: false, a: true }));
   items.push({ label: strip(interiorT(B)), d: false, i: true, a: true });
   const mid = B.main.lo ? SQ(B.main.lo) + 1 : Math.max(1, SQ(B.main.hi) - 1);

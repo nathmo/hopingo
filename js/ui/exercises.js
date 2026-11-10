@@ -9,6 +9,7 @@
 
 import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
+import { keysForItem } from './keys-needed.js';
 import { figure, shadeFigure, numberLine } from './figures.js';
 import { Q } from '../math/rational.js';
 import {
@@ -151,8 +152,8 @@ MOUNTS.mcq = (item, ctx, body) => {
 MOUNTS.answer = (item, ctx, body) => {
   let steps = null;
   const input = new MathInput({
-    keys: item.keys,
-    item,
+    // The item's keypad, and a « + » tab with what the question uses.
+    keysets: keysForItem(item),
     placeholder: 'Ta réponse',
     onChange: (v) => ctx.ready(v.length > 0 || !!steps?.chain.lines.length),
     onEnter: () => ctx.submit(),
@@ -217,7 +218,7 @@ MOUNTS.eqlines = (item, ctx, body) => {
   let last = item.equation;
   const history = h('div.steps-history', h('div.step-line.first', html(algHtml(item.equation))));
   const move = h('div.step-label');
-  const input = new MathInput({ keys: 'algeq', item, placeholder: 'écris l\'équation suivante', onEnter: () => submit() });
+  const input = new MathInput({ keysets: keysForItem(item, 'algeq'), placeholder: 'écris l\'équation suivante', onEnter: () => submit() });
   const row = h('div.step-line.current', h('span.eq', '⇔'), input.display);
   const feedback = h('div.step-feedback');
   let hintLevel = 0;
@@ -719,7 +720,7 @@ MOUNTS.steps = (item, ctx, body) => {
     let last = start;
     let wrongHere = 0;
     let hintLevel = 0;
-    const input = new MathInput({ keys: item.keys || 'ops', item, placeholder: 'écris la ligne suivante', onEnter: () => submit() });
+    const input = new MathInput({ keysets: keysForItem(item, item.keys || 'ops'), placeholder: 'écris la ligne suivante', onEnter: () => submit() });
     const row = h('div.step-line.current', h('span.eq', '='), input.display);
     const tools = h('div.step-tools',
       h('button.btn.small.ghost', { type: 'button', onclick: () => { input.set(print(last)); } }, '⧉ Recopier la ligne'),

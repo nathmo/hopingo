@@ -10,9 +10,12 @@ ES modules don't load from `file://`, so serve the folder:
 npm run serve        # python -m http.server 8080, then open http://localhost:8080
 npm test             # math core, symbolic core, judges, content generators, learner engine
 npm run samples      # writes docs/samples-<unit>.md for content review
+npm run smoke        # drives the app in headless Edge (dev tool, not in npm test): see tools/browser-smoke.js
 ```
 
 There are no dependencies and no build step.
+
+**Test mode.** A profile named `nathmo` with the bee avatar (🐝) can open every skill on the map, to try any part of the tree. Everything else works as usual: answers are judged, mastery and traps are recorded, and the map still shows in grey (🔓) the skills the normal path would not have unlocked yet. See `isTester` and `canOpen` in `js/engine/learner.js`.
 
 ## Deploy on GitHub Pages
 

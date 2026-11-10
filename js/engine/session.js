@@ -7,7 +7,7 @@ import { generate } from '../content/generators.js';
 import { RULE_BY_ID } from '../math/malrules.js';
 import {
   skillState, recordAnswer, recordTraps, nextFocus, noteLessonBranch, practiceSkill, dueSkills, activeTraps,
-  finishReview, isUnlocked, isSlow,
+  finishReview, isUnlocked, canOpen, isSlow,
 } from './learner.js';
 import { now } from './time.js';
 import { recordFact } from './facts.js';
@@ -43,8 +43,11 @@ export class Lesson {
   // kind: 'smart' continues the path, 'skill' practises one skill,
   // 'review' does due reviews and traps, 'trap' works on one trap,
   // 'resume' finishes the problem saved in profile.pending (step U4).
-  constructor(profile, { kind = 'smart', skill = null, rule = null } = {}, rng) {
+  // 'items' plays the given items in turn: a debug entry point for
+  // tools/browser-smoke.js, never reached from the app's screens.
+  constructor(profile, { kind = 'smart', skill = null, rule = null, items = null } = {}, rng) {
     this.trapRule = rule;
+    this.given = items || [];
     this.profile = profile;
     this.kind = kind;
     this.rng = rng;
@@ -72,6 +75,7 @@ export class Lesson {
     const hasTraps = activeTraps(p).some((r) => this.trapSkill(r));
     let plan;
     if (this.kind === 'trap') return Array(8).fill('trap');
+    if (this.kind === 'items') return this.given.map((item) => ({ given: item }));
     // Step U4: the problem saved in profile.pending, then the lesson goes on.
     if (this.kind === 'resume') return p.pending ? ['resume'] : [];
     if (this.kind === 'review' || !this.focus) {
@@ -98,7 +102,7 @@ export class Lesson {
   // The skill a trap can be practised on, if the student has reached it.
   trapSkill(rule) {
     const s = RULE_BY_ID[rule]?.skill;
-    return s && SKILL_BY_ID[s] && isUnlocked(this.profile, s) ? s : null;
+    return s && SKILL_BY_ID[s] && canOpen(this.profile, s) ? s : null;
   }
 
   // A new question: not asked yet in this lesson. Fact sets can be small
@@ -139,6 +143,7 @@ export class Lesson {
     const p = this.profile;
     // A missed fact comes back a couple of questions later.
     if (slot.retryOf) return { ...slot.retryOf, retry: true };
+    if (slot.given) return { ...slot.given, slot: 'given' };
     if (slot === 'resume') {
       const pd = p.pending;
       if (!pd?.item) return null;

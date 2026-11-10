@@ -5,12 +5,10 @@
 // parsers do (js/math/algebra.js, js/cas/parse.js). A key may insert
 // several characters at once (« sin( »); it is then one chunk for the caret
 // and for ⌫. With `keysets`, tabs switch between several keypads (spec
-// §11); with `item`, keysForItem adds a tab for what the question uses.
+// §11); js/ui/keys-needed.js adds the keys the item needs (keysForItem).
 
 import { h, play } from './dom.js';
 import { esc } from '../math/expr.js';
-import { segmentsOf } from '../judges/lines.js';
-import { judgeFor } from '../judges/index.js';
 
 export const KEYSETS = {
   int: ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'back', '0', 'ok'],
@@ -95,11 +93,11 @@ Object.assign(LABEL, { 'C(': 'C(n, k)', 'A(': 'A(n, k)', 'Φ(': 'Φ( )', 'Φ⁻�
 // MathModel holds the characters and the caret, without the DOM, so that
 // tests can press keys. MathInput draws it and adds the keypad.
 
-const NAV = new Set(['back', 'left', 'right', 'ok', 'enter', '']);
+export const NAV = new Set(['back', 'left', 'right', 'ok', 'enter', '']);
 // Function names typed letter by letter (« sin » then « ( »): drawn upright.
-const FN_NAMES = new Set(['sin', 'cos', 'tan', 'cot', 'exp', 'ln', 'log', 'Log', 'sinh', 'cosh', 'tanh', 'arcsin', 'arccos', 'arctan', 'argsh', 'argch', 'argth', 'sh', 'ch', 'th', 'Re', 'Im', 'arg', 'conj', 'det', 'tr', 'max', 'min', 'sgn', 'lim', 'int', 'sum', 'vec', 'pd', 'Pr', 'Var', 'Cov']);
+export const FN_NAMES = new Set(['sin', 'cos', 'tan', 'cot', 'exp', 'ln', 'log', 'Log', 'sinh', 'cosh', 'tanh', 'arcsin', 'arccos', 'arctan', 'argsh', 'argch', 'argth', 'sh', 'ch', 'th', 'Re', 'Im', 'arg', 'conj', 'det', 'tr', 'max', 'min', 'sgn', 'lim', 'int', 'sum', 'vec', 'pd', 'Pr', 'Var', 'Cov']);
 const isNumChar = (c) => /^[0-9,.]$/.test(c);
-const isLetter = (c) => c.length === 1 && (/\p{L}/u.test(c) || c === '∞');
+export const isLetter = (c) => c.length === 1 && (/\p{L}/u.test(c) || c === '∞');
 const isOpenChunk = (c) => c.length > 1 && c.endsWith('(');
 
 // The structure of the typed characters, read the way the parsers read
@@ -331,13 +329,11 @@ export class MathModel {
 }
 
 export class MathInput extends MathModel {
-  constructor({ keys = 'frac', keysets = null, item = null, placeholder = '', onChange, onEnter } = {}) {
+  constructor({ keys = 'frac', keysets = null, placeholder = '', onChange, onEnter } = {}) {
     super();
-    // An item may give a list of keypad names: they become tabs. With the
-    // item, a tab is added for what the question uses and the keypad lacks.
-    let tabs = tabsOf(keysets || keys);
-    if (item) tabs = keysForItem(item, tabs);
-    this.tabs = tabs;
+    // An item may give a list of keypad names, or tabs {id, keys} (the
+    // « + » tab of keysForItem): they become tabs.
+    this.tabs = tabsOf(keysets || keys);
     this.tab = 0;
     this.onChange = onChange;
     this.onEnter = onEnter;
@@ -381,8 +377,9 @@ export class MathInput extends MathModel {
     // Without letters on the keypad, x means × and r or v mean √.
     if (!letters) Object.assign(map, { x: '×', r: '√', v: '√' });
     let k = map[e.key] ?? e.key;
-    // With letters, any letter of the alphabet can be typed.
-    if (letters && /^[a-zA-Z]$/.test(k)) { e.preventDefault(); this.press(k); return; }
+    // With letters, any letter of the alphabet can be typed, and spaces:
+    // « x = 1 ou x = 2 » needs them around « ou ».
+    if (letters && /^[a-zA-Z ]$/.test(k)) { e.preventDefault(); this.press(k); return; }
     allowed.add('enter'); allowed.add('back'); allowed.add('left'); allowed.add('right');
     if (k === '√' && !allowed.has('√') && allowed.has('√(')) k = '√(';
     if (k === '÷' && !allowed.has('÷')) k = null;
@@ -432,7 +429,7 @@ export class MathInput extends MathModel {
   }
 }
 
-// ---------- key sets of an item ----------
+// ---------- tabs ----------
 
 // Tabs from a keypad name, a list of names or a list of keys.
 export function tabsOf(keys) {
@@ -445,130 +442,6 @@ export function tabsOf(keys) {
 function tabLabel(t, i) {
   if (t.id === 'auto') return `+ ${t.keys.filter((k) => !NAV.has(k)).slice(0, 3).map((k) => (k === 'frac' ? '½' : k === '^' ? 'xⁿ' : k.replace(/\($/, '').trim())).join(' ')}`;
   return TAB_LABEL[t.id] || (i === 0 ? '123' : t.id);
-}
-
-// What a key writes.
-const keyText = (k) => (k === 'frac' ? '/' : k);
-// A typed text as the keypad writes it: no spaces, except in the words of
-// the keypad (« ou », « et »); − as -.
-export const keyNormal = (text) => String(text).replace(/−/g, '-').replace(/\s+(ou|et)\s+/g, '\u0001$1\u0001').replace(/\s+/g, '').replace(/\u0001/g, ' ');
-
-// The key that writes what starts at i, when the keypad has none.
-function naturalKey(text, i) {
-  for (const w of [' ou ', ' et ']) if (text.startsWith(w, i)) return w;
-  const c = String.fromCodePoint(text.codePointAt(i));
-  if (c === '/') return 'frac';
-  // A function name: « cos( » in « Bcos( » is B then cos(.
-  const m = /^([a-zA-Z]{2,})\(/.exec(text.slice(i));
-  if (m && !FN_NAMES.has(m[1]) && [...FN_NAMES].some((f) => m[1].endsWith(f))) return c;
-  if (m) return m[0];
-  return c;
-}
-
-// The keys to press to write text, longest key first. → {keys, missing}:
-// missing are the keys the keypad would need (natural keys).
-export function planKeys(text, keys) {
-  const t = keyNormal(text);
-  const outs = [...new Set(keys)].filter((k) => !NAV.has(k)).map((k) => [k, keyText(k)]).sort((a, b) => b[1].length - a[1].length);
-  const plan = [];
-  const missing = [];
-  for (let i = 0; i < t.length;) {
-    const hit = outs.find(([, o]) => t.startsWith(o, i));
-    if (hit) { plan.push(hit[0]); i += hit[1].length; continue; }
-    const k = naturalKey(t, i);
-    missing.push(k);
-    plan.push(k);
-    i += keyText(k).length;
-  }
-  return { keys: plan, missing };
-}
-
-// The texts a student types for an item: the answer, the start line to
-// copy and change, the reference lines (school steps, university lines and
-// their typed decisions).
-export function typedTexts(item) {
-  const out = [];
-  const push = (t) => { if (t != null && String(t).trim()) out.push(String(t)); };
-  if (item.type === 'answer') {
-    // « aucune » is also written ∅ (the checker reads both).
-    push(item.expected === 'aucune' ? '∅' : item.expected);
-    push(item.start?.math);
-    // Reference lines written as text (a line drawn from `html` is not typed).
-    for (const l of item.solution || []) if (!l.html) push(l.math);
-  } else if (item.type === 'eqlines') {
-    push(item.equation);
-    push(item.answer);
-  } else if (item.type === 'steps') {
-    push(item.expr);
-    for (const l of item.solution || []) push(l.math);
-  } else if (item.type === 'lines') {
-    for (const seg of segmentsOf(item)) {
-      if (!typedJudge(seg.judge)) continue;
-      for (const l of seg.lines) {
-        if (l.kind === 'eq') push(l.math);
-        if (l.kind === 'decision') for (const o of l.options) if (o.valid && o.then) push(o.then.expect);
-      }
-    }
-  }
-  return out;
-}
-
-// Lines of a judge typed on the keypad (not a matrix grid, not tokens).
-function typedJudge(cfg) {
-  if (!cfg || cfg.kind === 'logic') return false;
-  try { return judgeFor(cfg).input !== 'matrix'; } catch { return true; }
-}
-
-// What the question shows, from its markup (school spans and MathML):
-// fraction, power, root, π, letters, function names, |·|, relations.
-export function promptKeys(html) {
-  const s = String(html || '').replace(/<details[\s\S]*?<\/details>/g, '');
-  const out = new Set();
-  const maths = [...s.matchAll(/<math[\s\S]*?<\/math>/g)].map((m) => m[0]).join(' ');
-  if (/class="m-frac"|<mfrac/.test(s)) out.add('frac');
-  if (/class="m-sup"|<msup/.test(s)) out.add('^');
-  if (/class="m-rad"|<msqrt|<mroot/.test(s)) out.add('√');
-  for (const [, v] of s.matchAll(/<i class="m-var">([^<]+)<\/i>/g)) for (const c of v) if (isLetter(c)) out.add(c);
-  for (const [, v] of maths.matchAll(/<mi[^>]*>([^<]+)<\/mi>/g)) {
-    const t = v.trim();
-    if ([...t].length === 1 && isLetter(t)) out.add(t);
-    else if (FN_NAMES.has(t)) out.add(`${t}(`);
-  }
-  for (const [, v] of maths.matchAll(/<mo[^>]*>([^<]+)<\/mo>/g)) {
-    const t = v.trim();
-    if (['=', '<', '>', '≤', '≥', '≠', ';', '|'].includes(t)) out.add(t);
-  }
-  if (/π/.test(maths) || /<span class="m"[^]*?π/.test(s)) out.add('π');
-  return [...out];
-}
-
-const ALG_CHECKERS = new Set(['alg', 'solset', 'system', 'isolate', 'paramset', 'eqzero']);
-// An item whose answers are expressions or equations with letters.
-const isAlgebraic = (item) => ALG_CHECKERS.has(item.checker) || item.type === 'eqlines' || (item.type === 'lines' && typedJudge(item.judge));
-
-// The keypad of an item when it does not name one.
-export function baseKeysOf(item) {
-  if (item.type === 'eqlines') return 'algeq';
-  if (item.type === 'steps') return item.keys || 'ops';
-  if (item.type === 'lines') return item.keys?.length ? item.keys : ['calcx', 'calcfn'];
-  return item.keys || 'frac';
-}
-
-// The tabs of an item's keypad: its own key sets, then a tab « + … » with
-// what the question uses (fraction, power, √, π, e, functions, |·|, its
-// letters, relations, « ; ») and the keypad lacks, so that the answer,
-// the start line and every reference line can be typed on the keypad.
-export function keysForItem(item, base = baseKeysOf(item)) {
-  const tabs = tabsOf(base);
-  const have = new Set(tabs.flatMap((t) => t.keys));
-  const missing = [];
-  const add = (k) => { if (k && !have.has(k) && !missing.includes(k)) missing.push(k); };
-  for (const k of promptKeys(item.prompt)) if (!(k === '√' && have.has('√('))) add(k);
-  if (isAlgebraic(item)) for (const k of ['frac', '^', '(', ')']) add(k);
-  if (isAlgebraic(item) && !have.has('√(')) add('√');
-  for (const t of typedTexts(item)) for (const k of planKeys(t, [...have, ...missing]).missing) add(k);
-  if (missing.length) tabs.push({ id: 'auto', keys: [...missing, 'left', 'right', 'back'] });
-  return tabs;
 }
 
 // ---------- drawing ----------
@@ -658,16 +531,16 @@ export function renderChars(chars, caret = -1) {
 
 // Step U6 (A2): several variables (∂ writes pd(f, x)), polar and spherical
 // letters, the constants of differential equations, systems with « ou ».
-KEYSETS.a2 = ['x', 'y', 'z', 'pd(', ',', 'r', 'φ', 'θ', 'λ', 'C', '_', ';', '≤', '|', ' ou ', 'back'];
+KEYSETS.a2 = ['x', 'y', 'z', 'pd(', ',', 'r', 'φ', 'θ', 'λ', 'C', '_', ';', '=', '≤', '|', ' ou ', 'back'];
 TAB_LABEL.a2 = 'xy ∂';
 Object.assign(LABEL, { 'pd(': '∂( , x)' });
 
 // Step U10 (V, C, F): parametrisations and boundaries (σ(r, φ), t ∈ [a ; b],
 // Γ₁ : point), and transforms (ℱ, ℒ, the transform û of the unknown,
-// Heaviside H, δ, the half-plane Re z > …).
+// Heaviside H, δ, the half-plane Re z > …; û, ŷ and f̂ of the transformed equations).
 KEYSETS.vecto = ['(', ';', ')', 't', 'r', 'φ', 'θ', 'σ', 'γ', '∈', '[', ']', '×', '∧', 'Γ', '_', ':', 'point', ' et ', "s'annulent", 'back'];
 TAB_LABEL.vecto = 'σ ∈ Γ';
-KEYSETS.transf = ['ℱ(', 'ℒ(', 'α', 'z', 'û', 'Y', 'U', 'H(', 'δ', '|', 'e^(', '√(2π)', ', Re z > ', 'back'];
+KEYSETS.transf = ['ℱ(', 'ℒ(', 'α', 'z', 'û', 'ŷ', 'f̂', 'Y', 'U', 'H(', 'δ', '|', 'e^(', '√(2π)', ', Re z > ', 'back'];
 TAB_LABEL.transf = 'ℱ ℒ';
 Object.assign(LABEL, { ', Re z > ': 'Re z >', 'H(': 'H( )', 'ℱ(': 'ℱ( )', 'ℒ(': 'ℒ( )' });
 // Residues and arcs (C, part b), distributions (F, part b).

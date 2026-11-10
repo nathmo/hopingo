@@ -7,7 +7,7 @@ import { h, sheet, bubble } from '../dom.js';
 import { UNITS, SKILL_BY_ID, unitSkills } from '../../content/skills.js';
 import {
   stars, isUnlocked, nextFocus, dueSkills, activeTraps, isDue, practiceSkill, missingPrereqs,
-  activeBranches, pathState, pinBranch,
+  activeBranches, pathState, pinBranch, isTester,
 } from '../../engine/learner.js';
 import { currentStreak } from '../../engine/rewards.js';
 import { topBar, bottomNav, starRow } from './common.js';
@@ -50,6 +50,8 @@ export function homeScreen(root, _args, app) {
     main.append(bubble(`Ta série de ${streak.lost} jours s'est arrêtée. On en recommence une ?`, 'sad'));
   }
   main.append(cta);
+  // Test mode (isTester): every skill opens; the colours still show the path.
+  if (isTester(p)) main.append(h('p.note.tester-note', '🐝 Mode test : tout l\'arbre est ouvert. Les étapes grises (🔓) sont celles que le parcours n\'aurait pas encore débloquées.'));
   // A mock exam under way (step U3): resume it.
   if (p.examRun && EXAM_BY_ID[p.examRun.exam.id]) {
     main.append(h('button.btn.secondary.wide.exam-resume', { onclick: () => app.go('exam', { id: p.examRun.exam.id }) }, `📝 Reprendre l'examen blanc : ${EXAM_BY_ID[p.examRun.exam.id].title}`));
@@ -89,7 +91,7 @@ export function homeScreen(root, _args, app) {
       if (repairing) classes.push('repair');
       const x = Math.round(Math.sin(i * 0.9) * 80);
       const node = h(`button.${classes.join('.')}`, { type: 'button', onclick: () => openNode(app, s.id), 'aria-label': s.title, 'data-skill': s.id },
-        h('span.node-icon', unlocked ? s.icon : '🔒'),
+        h('span.node-icon', unlocked ? s.icon : isTester(p) ? '🔓' : '🔒'),
         st && isDue(st) ? h('span.badge-due', '⏰') : null,
         repairing ? h('span.badge-repair', '🩹') : null,
         st?.repair ? h('span.badge-repair', '🧱') : null);
@@ -124,7 +126,9 @@ function openNode(app, id) {
     st ? h('div.node-stats', starRow(stars(st)), h('span', `Niveau ${st.level}/5 · ${LEVEL_NAMES[st.level]}`), h('span', `${Math.round(st.p * 100)} % maîtrisé`)) : null,
     st?.repair ? h('p.note', `🧱 On consolide d'abord : ${SKILL_BY_ID[st.repair].title}.`) : null,
     st?.testedOut && !st.attempts ? h('p.note', '✔ Validé par le test rapide. Une révision le confirmera.') : null,
-    unlocked
+    unlocked || isTester(p)
       ? h('button.btn.primary.wide', { onclick: () => go({ kind: 'skill', skill: id }) }, st?.mastered ? 'S\'entraîner encore' : 'S\'entraîner')
-      : h('div.note', h('p', '🔒 Il faut d\'abord :'), h('div.missing-list', missing.map((q) => h('button.btn.small.secondary', { type: 'button', onclick: () => goTo(q) }, `${SKILL_BY_ID[q].icon} ${SKILL_BY_ID[q].title}`))))));
+      : null,
+    unlocked ? null
+      : h('div.note', h('p', isTester(p) ? '🔓 Mode test. Le parcours demanderait d\'abord :' : '🔒 Il faut d\'abord :'), h('div.missing-list', missing.map((q) => h('button.btn.small.secondary', { type: 'button', onclick: () => goTo(q) }, `${SKILL_BY_ID[q].icon} ${SKILL_BY_ID[q].title}`))))));
 }

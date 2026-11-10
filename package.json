@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "samples": "node tools/samples.js",
-    "serve": "python -m http.server 8080"
+    "serve": "python -m http.server 8080",
+    "smoke": "node tools/browser-smoke.js"
   }
 }

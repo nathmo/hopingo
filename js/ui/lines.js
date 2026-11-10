@@ -12,7 +12,8 @@ import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
 import { TokenInput } from './tokens.js';
 import { explainRule, solutionHtml } from './exercises.js';
-import { LinesRun, templateOf, fillBlanks } from '../judges/lines.js';
+import { LinesRun, templateOf, fillBlanks, blankRanges } from '../judges/lines.js';
+import { keysForItem } from './keys-needed.js';
 import { LoggedLinesRun, isLongLines, pendingOf, resumeRun } from '../judges/problem.js';
 import { actionsFor } from '../judges/actions.js';
 import { parseOpts } from '../judges/common.js';
@@ -48,7 +49,9 @@ export function mountLines(item, ctx, body, opts = {}) {
   if (!run) run = new LinesRun(item);
   if (!opts.run && run instanceof LoggedLinesRun && ctx.save) run.onChange = () => ctx.save(pendingOf(run));
   const popts = () => parseOpts(run.cfg);
-  const keysets = item.keys?.length ? item.keys : ['calcx', 'calcfn'];
+  // The item's keypads, the small keypads its lines need, and a « + » tab
+  // with what is still missing (js/ui/keys-needed.js).
+  const keysets = keysForItem(item);
   const canHint = !item.noHints && item.hints?.length > 0;
 
   const history = h('div.steps-history.lines-history');
@@ -85,8 +88,14 @@ export function mountLines(item, ctx, body, opts = {}) {
   const eqSign = () => signOf(run.cfg);
   const addLine = (node, cls, note = '', eq = true, cfg = run.cfg) => {
     history.appendChild(h(`div.step-line.${cls}`, eq ? h('span.eq', signOf(cfg)) : null,
-      html(showWith(cfg, node)), note ? h('span.step-note', note) : null));
+      html(showWith(cfg, node)), note ? h('span.step-note', rich(note)) : null));
     history.scrollTop = history.scrollHeight;
+  };
+  // The judge of the last line the run kept: once a part is finished, run.cfg
+  // is already the judge of the next part, which cannot show that line.
+  const keptCfg = () => {
+    const e = run.history.findLast((x) => x.how !== 'start');
+    return e ? run.segments[e.seg].judge : run.cfg;
   };
   const addNote = (text, cls = '') => history.appendChild(h(`div.lines-note${cls ? `.${cls}` : ''}`, html(text)));
   // The lines so far (a resumed run), else the first line.
@@ -169,7 +178,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       input = new TokenInput({ pieces, onEnter: () => submit(), onChange: (v) => preview(v) });
       preview = () => {};
     } else {
-      input = new MathInput({ keysets, item, placeholder: 'écris la ligne suivante', onEnter: () => submit(), onChange: (v) => preview(v) });
+      input = new MathInput({ keysets, placeholder: 'écris la ligne suivante', onEnter: () => submit(), onChange: (v) => preview(v) });
       preview = (v) => {
         let m = null;
         if (v) { try { m = showWith(run.cfg, readWith(run.cfg, v)); } catch { m = innerMath(v, popts()); m = m ? `<math>${m}</math>` : null; } }
@@ -192,7 +201,7 @@ export function mountLines(item, ctx, body, opts = {}) {
     tries = 0;
     input = new MatrixInput({ cfg: run.cfg, prev: run.prev, onEnter: () => submit() });
     if (!input.guided(line.math, line.cells)) return freeTask();
-    if (line.note) stage.append(h('div.step-label', line.note));
+    if (line.note) stage.append(h('div.step-label', rich(line.note)));
     stage.append(h('div.step-line.current', h('span.eq', eqSign()), input.display));
     const grid = input;
     setTimeout(() => grid.focus?.(), 0);
@@ -204,7 +213,7 @@ export function mountLines(item, ctx, body, opts = {}) {
         wrong(v, { follow: false });
         if (tries >= 2) {
           const r = run.reveal();
-          if (r) { addLine(r.node, 'shown', line.note); say('<p>Voilà cette ligne. À toi pour la suite !</p>'); afterAccept(r); }
+          if (r) { addLine(r.node, 'shown', line.note, true, keptCfg()); say('<p>Voilà cette ligne. À toi pour la suite !</p>'); afterAccept(r); }
         }
         return;
       }
@@ -219,7 +228,7 @@ export function mountLines(item, ctx, body, opts = {}) {
     // A judge with its own line language draws its template (step U5).
     const own = judgeFor(run.cfg).templateML;
     const template = own ? null : parse(templateOf(line, opts), opts);
-    const n = line.blanks.length;
+    const n = blankRanges(line).length;
     const values = Array(n).fill('');
     let active = 0;
     tries = 0;
@@ -231,9 +240,9 @@ export function mountLines(item, ctx, body, opts = {}) {
       box.querySelectorAll('[data-blank]').forEach((el) => el.addEventListener('click', () => select(Number(el.dataset.blank))));
     };
     const select = (i) => { active = i; input.set(values[i]); paint(); };
-    input = new MathInput({ keysets, item, placeholder: 'case active', onEnter: () => submit(), onChange: (v) => { values[active] = v; paint(); } });
+    input = new MathInput({ keysets, placeholder: 'case active', onEnter: () => submit(), onChange: (v) => { values[active] = v; paint(); } });
     stage.append(box, h('div.lines-blank-input', h('small.muted', n > 1 ? 'Touche une case pour la remplir.' : 'Remplis la case.'), input.display));
-    if (line.note) stage.prepend(h('div.step-label', line.note));
+    if (line.note) stage.prepend(h('div.step-label', rich(line.note)));
     paint();
     nextBlank = () => select((active + 1) % n);
     submit = () => {
@@ -252,7 +261,7 @@ export function mountLines(item, ctx, body, opts = {}) {
         if (tries >= 2) {
           const r = run.reveal();
           if (r) {
-            addLine(r.node, 'shown', line.note);
+            addLine(r.node, 'shown', line.note, true, keptCfg());
             say('<p>Voilà cette ligne. À toi pour la suite !</p>');
             afterAccept(r);
           }
@@ -300,7 +309,7 @@ export function mountLines(item, ctx, body, opts = {}) {
   // The typed follow-up of a decision (§5.3 `then`): « t = … ».
   function thenTask(opt, index) {
     stage.replaceChildren();
-    input = new MathInput({ keysets, item, placeholder: opt.then.ask, onEnter: () => submit() });
+    input = new MathInput({ keysets, placeholder: opt.then.ask, onEnter: () => submit() });
     stage.append(h('div.step-line.current', h('span.eq', opt.then.ask), input.display));
     submit = () => {
       if (!input.value || locked()) return;
@@ -368,7 +377,7 @@ export function mountLines(item, ctx, body, opts = {}) {
     if (v.kind === 'wrong') { wrong(v, { follow: item.followError }); return; }
     play('good');
     clearSay();
-    addLine(v.node, 'ok', note || v.note || '');
+    addLine(v.node, 'ok', note || v.note || '', true, keptCfg());
     // A valid but poor decision (§5.3): its reason comes after the next line.
     if (v.later) say(`<p>${v.later}</p>`, 'info');
     tapChoice = null;
@@ -403,7 +412,7 @@ export function mountLines(item, ctx, body, opts = {}) {
     if (!r) return;
     lockedUntil = 0;
     clearSay();
-    addLine(node, 'followed', 'ta ligne');
+    addLine(node, 'followed', 'ta ligne', true, keptCfg());
     tapChoice = null;
     afterAccept(r);
   }

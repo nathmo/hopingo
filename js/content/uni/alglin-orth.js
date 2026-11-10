@@ -244,7 +244,9 @@ function partsItem(o, parts) {
   const script = [...(o.before || []), ...first.lines];
   for (const p of rest) script.push(seg(p.html, p.ask, p.start, p.judge), ...(p.pre || []), ...p.lines);
   const grid = parts.some((p) => ['mat', 'rowops', 'span', 'factor'].includes(p.judge.kind));
-  return matLines({ ...o, start: first.start, judge: first.judge, script, keys: o.keys || (grid ? ['mat'] : ['calc']) });
+  // A part solved for a letter (« a = −1 ») needs the letters and « = ».
+  const letters = parts.some((p) => p.judge.kind === 'solset') ? ['letters'] : [];
+  return matLines({ ...o, start: first.start, judge: first.judge, script, keys: o.keys || [grid ? 'mat' : 'calc', ...letters] });
 }
 const withMenu = (p, m) => ({ ...p, judge: { ...p.judge, menu: m } });
 

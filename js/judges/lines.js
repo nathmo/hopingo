@@ -20,7 +20,7 @@
 //   {kind:'rule', ask, options:[{id, label}], correct}      self-explanation
 //   {kind:'segment', html, start:{math}, judge:{kind, …}}   a new part: its own judge (§16.2)
 
-import { tokenize, tryParse, parse } from '../cas/parse.js';
+import { tokenize, tryParse, parse, normalizeText } from '../cas/parse.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
 import { toText } from '../cas/print.js';
 import { judgeFor, readWith } from './index.js';
@@ -263,31 +263,88 @@ export function blankLine(node, holes, opts = {}) {
   return { math, blanks };
 }
 
+// The blanks of a line in order, a blank inside another one dropped (a
+// generator may mark both −2 and its 2): the screen draws one box for it.
+export function blankRanges(line) {
+  const out = [];
+  for (const r of [...(line.blanks || [])].sort((x, y) => x[0] - y[0] || y[1] - x[1])) if (!out.length || r[0] >= out[out.length - 1][1]) out.push(r);
+  return out;
+}
+
 // The text of a guided line: '□' for each blank (for display).
 export function templateOf(line, opts = {}) {
+  const ranges = blankRanges(line);
   const toks = tokenize(line.math, opts);
   const out = [];
   for (let k = 0; k < toks.length; k++) {
-    const b = line.blanks?.find(([i]) => i === k);
+    const b = ranges.find(([i]) => i === k);
     if (b) { out.push('□'); k = b[1] - 1; } else out.push(toks[k].s);
   }
   return out.join('');
 }
 
-// The line with the student's entries in the blanks, each in brackets.
-export function fillBlanks(line, values, opts = {}) {
-  const toks = tokenize(line.math, opts);
-  const out = [];
-  let n = 0;
-  for (let k = 0; k < toks.length; k++) {
-    const b = line.blanks?.find(([i]) => i === k);
-    if (b) { out.push(`(${values[n++] ?? ''})`); k = b[1] - 1; } else out.push(toks[k].s);
+// The line with the student's entries in the blanks. The rest of the line
+// keeps its own spelling (« · » is a dot product for the vector judges, not
+// « × » as the tokenizer spells it). An entry is put in brackets, unless it
+// is the blank's own text, a number or a letter, or already in brackets: a
+// blank need not be a whole sub-expression (« −3z » of « −3z^2 », « 2y^2 −
+// yz » after a minus). A blank that starts with the minus between two
+// terms keeps it as « + (…) », else « 3x(−6(y + 1)) » would be a product.
+const NO_BRACKETS = /^(\d+([.,]\d+)?|[A-Za-zα-ωΑ-Ω](_\d+)?)$/;
+const BEFORE_SIGN = new Set(['(', '[', '{', '=', '+', '-', '×', '÷', '/', '^', ',', ';', '<', '>', '≤', '≥', '≠', '∧', '∨', '⇒', '⇔']);
+const wrapped = (v) => {
+  if (!/^\(.*\)$/.test(v)) return false;
+  let depth = 0;
+  for (let i = 0; i < v.length; i++) {
+    if (v[i] === '(') depth++;
+    if (v[i] === ')') depth--;
+    if (depth === 0 && i < v.length - 1) return false;
   }
-  return out.join('');
+  return true;
+};
+export function fillBlanks(line, values, opts = {}) {
+  const text = String(line.math);
+  const toks = tokenize(text, opts);
+  const norm = normalizeText(text);
+  const starts = [];
+  let len = 0;
+  for (const t of toks) { starts.push(len); len += t.s.length; }
+  // The place in the original text whose normalized prefix is the first p
+  // characters (the first such place, or the last one: spaces lie between).
+  const at = (p, last) => {
+    const want = norm.slice(0, p);
+    let found = -1;
+    for (let L = 0; L <= text.length; L++) {
+      const nz = normalizeText(text.slice(0, L));
+      if (nz === want) { found = L; if (!last) break; } else if (found >= 0 || nz.length > p + 2) break;
+    }
+    return found;
+  };
+  const blanks = blankRanges(line);
+  let out = '';
+  let from = 0;
+  let n = 0;
+  for (const [i, j] of blanks) {
+    const a = at(starts[i], true);
+    const b = j < toks.length ? at(starts[j], false) : text.length;
+    // A spelling the normalizer changes around the blank: the tokens' own.
+    if (a < from || b < a) return toks.map((t, k) => { const bl = blanks.findIndex(([x]) => x === k); return bl >= 0 ? `(${values[bl] ?? ''})` : (blanks.some(([x, y]) => k > x && k < y) ? '' : t.s); }).join('');
+    const ref = text.slice(a, b).trim();
+    const v = String(values[n++] ?? '').trim();
+    const whole = i === 0 && j >= toks.length;
+    const binaryMinus = toks[i].s === '-' && i > 0 && !BEFORE_SIGN.has(toks[i - 1].s);
+    let put;
+    if (v.replace(/\s+/g, '') === ref.replace(/\s+/g, '') || whole || wrapped(v)) put = v;
+    else if (NO_BRACKETS.test(v)) put = binaryMinus ? `+${v}` : v;
+    else put = `${binaryMinus ? '+' : ''}(${v})`;
+    out += text.slice(from, a) + put;
+    from = b;
+  }
+  return out + text.slice(from);
 }
 
 // The expected text of each blank.
 export function blankAnswers(line, opts = {}) {
   const toks = tokenize(line.math, opts);
-  return (line.blanks || []).map(([i, j]) => toks.slice(i, j).map((t) => t.s).join(''));
+  return blankRanges(line).map(([i, j]) => toks.slice(i, j).map((t) => t.s).join(''));
 }
