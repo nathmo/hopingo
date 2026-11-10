@@ -78,7 +78,7 @@ export const minusU = (u) => (u.startsWith('-') ? `+${u.slice(1)}` : `-${u}`);
 // f(u) as text.
 export function fText(F, u, alpha) {
   switch (F) {
-    case 'exp': return `e^(${u})`;
+    case 'exp': return u === 'x' ? 'e^x' : `e^(${u})`;
     case 'ln': return `ln(1${plusU(u)})`;
     case 'geom': return `1/(1${minusU(u)})`;
     case 'pow': {

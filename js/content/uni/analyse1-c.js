@@ -10,6 +10,5 @@
 import { GEN as DL } from './analyse1-c-dl.js';
 import { GEN as OPS } from './analyse1-c-ops.js';
 import { GEN as LIM } from './analyse1-c-lim.js';
-import { stubGen } from './stub.js';
 
-export const GEN = { ...stubGen(['a1-dl-limits', 'a1-dl-read', 'a1-taylor-rest']), ...DL, ...OPS, ...LIM };
+export const GEN = { ...DL, ...OPS, ...LIM };
