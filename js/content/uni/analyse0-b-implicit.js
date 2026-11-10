@@ -191,7 +191,7 @@ function imShape(d) {
   const lead = d.q2[0];
   const quad = polyText(lead.n < 0 ? d.q2.map((c) => c.neg()).reverse() : [...d.q2].reverse(), 'y');
   const yFactor = `${lead.n < 0 ? '-' : ''}${d.y0 === 0 ? 'y' : `(${xMinus(d.y0, 'y')})`}(${quad})=0`;
-  const tangentStart = `${qText(d.y0)}+${vText(d.slope)}(${xMinus(d.x0)})`.replace(/^0\+/, '');
+  const tangentStart = `${qText(d.y0)}+(${qText(d.slope)})${d.x0 === 0 ? 'x' : `(${xMinus(d.x0)})`}`.replace(/^0\+/, '');
   const tangent = polyText([d.h, d.slope]);
   return { P, eq, derived, FxT, FyT, negFx, pEq, isolated, pFinal, slopeStart, yEq, yFactor, tangentStart, tangent };
 }
@@ -445,7 +445,7 @@ function ctItem(level, rng, profile, opts = {}) {
   const xJudge = { kind: 'solset', v: 'x', subst: { y: polyText([q(d.h), q(d.m)]) } };
   const pJudge = { kind: 'solset', v: 'p', subst: { x: String(d.x0), y: String(d.y0) } };
   const derive = E(s.derived, 'Dériver implicitement', 'derive', 'derive');
-  const xLines = [E(s.Ex, 'y′ = ' + fr(d.m) + ', et y = ' + fr(polyText([q(d.h), q(d.m)])) + ' (T sur t)', 'slope', 'slope'), E(s.fac, 'Factoriser', 'solve', 'solve'), E(s.sols, 'Produit nul', 'solve', 'solve')];
+  const xLines = [E(s.Ex, `y′ = ${fr(d.m)}, et y = ${MT(polyText([q(d.h), q(d.m)]))} (T sur t)`, 'slope', 'slope'), E(s.fac, 'Factoriser', 'solve', 'solve'), E(s.sols, 'Produit nul', 'solve', 'solve')];
   const pLines = [...(s.PT.n === 0 ? [] : [E(`${qText(s.PT)}+p=0`, `T${T} sur Γ`, 'param', 'param')]), E(`p=${qText(d.p)}`, 'Isoler p', 'param', 'param')];
   const pickT = {
     kind: 'decision', prompt: 'Quel point T retiens-tu ?', options: [

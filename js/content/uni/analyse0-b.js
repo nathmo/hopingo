@@ -261,8 +261,12 @@ function adLevel2(rng, opts) {
       { id: 'nodiv', label: MT(`x^${pw.n.n + 1}`), valid: false, why: `Dérive x^${pw.n.n + 1} : tu obtiens ${pw.n.n + 1}x^${pw.n.n}. Il faut encore diviser par ${pw.n.n + 1}.` },
     ] };
   // The rewrite with one term left blank.
-  const first = T[0];
-  const rw = blanked(rwLine(s), [termText({ ...first, c: first.c.n < 0 ? first.c.neg() : first.c })]);
+  let rw = rwLine(s);
+  for (const t of T) {
+    if (rw.blanks) break;
+    rw = blanked(rw, [termText({ ...t, c: t.c.n < 0 ? t.c.neg() : t.c })]);
+    if (!rw.blanks) rw = blanked(rw, [termText(t)]);
+  }
   return adItemOf(2, rng, opts, s, { rw, intLines: [decision, ...lines], fallback: d.fallback });
 }
 
@@ -445,7 +449,7 @@ function arShape(d) {
   const eq = axis ? `${fT}=0` : `${fT}=${gT}`;
   const diffT = polyText(d.diffP);
   const lead = d.k === 1 ? '' : d.k === -1 ? '-' : `${d.k}`;
-  const factored = `${lead}${d.roots.map((r) => (r === 0 ? 'x' : `(${xMinus(r)})`)).join('')}`.replace(/^(-?\d*)x\(/, '$1x(');
+  const factored = `${lead}${[...d.roots].sort((a, b) => (a === 0 ? -1 : b === 0 ? 1 : a - b)).map((r) => (r === 0 ? 'x' : `(${xMinus(r)})`)).join('')}`;
   const sols = d.roots.map((r) => `x=${r}`).join(' ou ');
   const inter = [
     ...(axis ? [] : [E(`${diffT}=0`, 'Tout du même côté', 'inter', 'inter')]),
@@ -465,14 +469,14 @@ function arShape(d) {
     pieces.push({ a, b, sgn, integrand, P, Fb, Fa, value: Fb.sub(Fa), top: sgn > 0 ? 'f' : 'g' });
   }
   const area = pieces.reduce((s, p) => s.add(p.value), q(0));
-  const absText = axis ? `|${fT}|` : `|${fT}-(${gT})|`;
+  const absText = axis ? `|${fT}|` : /[+-]/.test(gT.slice(1)) ? `|${fT}-(${gT})|` : `|${fT}-${gT}|`.replace('--', '+');
   const start = pieces.map((p) => `int(${absText},x,${p.a},${p.b})`).join('+');
   const intLine = pieces.map((p) => `int(${polyText(p.integrand)},x,${p.a},${p.b})`).join('+');
   const brLine = pieces.map((p) => `bracket(${polyText(p.P)},x,${p.a},${p.b})`).join('+');
   const negPar = (x) => (x.n < 0 ? `(${qText(x)})` : qText(x));
   const pieceText = (p) => (p.Fa.n === 0 ? qText(p.Fb) : `${qText(p.Fb)}-${negPar(p.Fa)}`);
   const numLine = pieces.length === 1 ? pieceText(pieces[0])
-    : pieces.map((p, j) => (j > 0 || /.-/.test(pieceText(p)) ? `(${pieceText(p)})` : pieceText(p))).join('+');
+    : pieces.map((p) => (/.-/.test(pieceText(p)) ? `(${pieceText(p)})` : pieceText(p))).join('+');
   const areaLines = [
     E(intLine, pieces.length > 1 ? 'Courbe du haut sur chaque morceau' : 'Courbe du haut : intégrer (haut − bas)', 'top', 'top'),
     E(brLine, 'Primitive', 'prim', 'prim'),
