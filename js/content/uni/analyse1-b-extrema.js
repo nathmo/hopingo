@@ -31,6 +31,10 @@ const CHOICES = [
 ];
 
 const fac = (c) => (c === 0 ? 'x' : `(${lin(c)})`);
+// Two factors, x first: x(x − 2), (x − 1)(x + 3).
+const facs = (c1, c2) => (c2 === 0 ? `x${fac(c1)}` : `${fac(c1)}${fac(c2)}`);
+// Brackets around a sum only.
+const br = (t) => (/[+-]/.test(t.slice(1)) ? `(${t})` : t);
 const nice = (v) => v.d <= 30 && Math.abs(v.n) <= 300;
 // f(a) as text: the variable replaced by the number.
 const atText = (f, a) => f.replace(/(\d)x/g, '$1×x').replace(/x/g, a < 0 ? `(${N(a)})` : N(a));
@@ -58,7 +62,7 @@ function linData(rng) {
   const I = interval(rng, c1, [c2, -r]);
   if (!I) return null;
   const den = joinSum(['x', N(r)]);
-  return { kind: 'lin', c1, c2, ...I, f: `(${joinSum(['x^2', N(s)])})/(${den})`, num: joinSum(['x^2', kx(2 * r), N(-s)]), A: 1, den, fp: `(${fac(c1)}${fac(c2)})/(${den})^2`, pole: -r };
+  return { kind: 'lin', c1, c2, ...I, f: `${br(joinSum(['x^2', N(s)]))}/${br(den)}`, num: joinSum(['x^2', kx(2 * r), N(-s)]), A: 1, den, fp: `(${facs(c1, c2)})/${den === 'x' ? 'x^2' : `(${den})^2`}`, pole: -r };
 }
 function cubicData(rng) {
   const c1 = rng.int(-3, 3);
@@ -69,7 +73,7 @@ function cubicData(rng) {
   const e = rng.int(-5, 5);
   const I = interval(rng, c1, [c2]);
   if (!I) return null;
-  return { kind: 'cubic', c1, c2, ...I, f: joinSum(['x^3', kx(p, 'x^2'), kx(qq), N(e)]), num: joinSum(['3x^2', kx(2 * p), N(qq)]), A: 3, fp: `3${fac(c1)}${fac(c2)}` };
+  return { kind: 'cubic', c1, c2, ...I, f: joinSum(['x^3', kx(p, 'x^2'), kx(qq), N(e)]), num: joinSum(['3x^2', kx(2 * p), N(qq)]), A: 3, fp: `3${facs(c1, c2)}` };
 }
 function quadData(rng) {
   const p = rng.int(-4, 4);
@@ -91,8 +95,8 @@ function quadData(rng) {
   if (!I) return null;
   const den = joinSum(['x^2', kx(r), N(s)]);
   return {
-    kind: 'quad', c1, c2, ...I, f: `(${joinSum(['x^2', kx(p), N(qq)])})/(${den})`, num: joinSum([kx(A, 'x^2'), kx(B), N(C)]), A, den,
-    fp: `(${kx(A, `${fac(c1)}${fac(c2)}`)})/(${den})^2`, delta: { r, s, D: r * r - 4 * s },
+    kind: 'quad', c1, c2, ...I, f: `${br(joinSum(['x^2', kx(p), N(qq)]))}/(${den})`, num: joinSum([kx(A, 'x^2'), kx(B), N(C)]), A, den,
+    fp: `(${kx(A, facs(c1, c2))})/(${den})^2`, delta: { r, s, D: r * r - 4 * s },
   };
 }
 
@@ -168,12 +172,12 @@ function extremaParts(d, level, { open = false } = {}) {
   const roots = E(`x=${N(r1)} ou x=${N(r2)}`, 'Racines', 'crit', 'crit');
   parts.push({
     start: `${d.num}=0`, judge: { kind: 'solset', v: 'x' }, html: level === 1 ? `f′(x) = ${ML(d.fp)}. Résous f′(x) = 0 :` : 'Résous f′(x) = 0 :',
-    lines: guided ? [E(`${d.kind === 'quad' ? kx(d.A, `${fac(d.c1)}${fac(d.c2)}`) : d.kind === 'cubic' ? `3${fac(d.c1)}${fac(d.c2)}` : `${fac(d.c1)}${fac(d.c2)}`}=0`, 'Factoriser', 'crit', 'crit'), level === 1 ? blanked(roots, [N(r1), N(r2)]) : roots] : [roots],
+    lines: guided ? [E(`${d.kind === 'quad' ? kx(d.A, facs(d.c1, d.c2)) : d.kind === 'cubic' ? `3${facs(d.c1, d.c2)}` : facs(d.c1, d.c2)}=0`, 'Factoriser', 'crit', 'crit'), level === 1 ? blanked(roots, [N(r1), N(r2)]) : roots] : [roots],
   });
   const pre = level === 2 || level >= 4 || open ? [candidatesDecision(d)] : [{ kind: 'note', html: `Candidats : les bornes ${RD(d.a)} et ${RD(d.b)}, et ${RD(d.c1)} (${RD(d.c2)} est hors de ${S(d)}).` }];
   [d.a, d.c1, d.b].forEach((x, i) => {
     parts.push({
-      start: atText(d.f, x), judge: { kind: 'value', form: 'irreducible' }, html: i === 0 ? `Évalue f aux candidats :` : null, ask: `f(${RD(x)}) =`,
+      start: atText(d.f, x), judge: { kind: 'value', form: 'irreducible' }, html: i === 0 ? 'Évalue f aux candidats :' : 'Candidat suivant :', ask: `f(${RD(x)}) =`,
       pre: i === 0 ? pre : [], lines: [E(N([d.fa, d.fc, d.fb][i]), 'Calculer', 'values', 'eval')],
     });
   });
@@ -195,7 +199,7 @@ function extremaLines(level, rng, opts) {
     : `Trouve le maximum et le minimum de f(x) = ${ML(d.f)} sur le segment ${S(d)}${open ? ' : montre d\'abord que f y est bien définie et continue' : ''}.`;
   return partsItem({
     skill: SK, level: open ? 4 : level, prompt, parts, before, choices: CHOICES,
-    hints: H('Trois sortes de candidats : les bornes, les points où f′ = 0, les points où f′ n\'existe pas.', `f′(x) = ${d.fp.replace(fac(d.c1), '▢').replace(/×/g, '·')}`, `Compare f(${RD(d.a)}) = ${RD(N(d.fa))}, f(${RD(d.c1)}) = ${RD(N(d.fc))} et f(${RD(d.b)}) = ${RD(N(d.fb))} : max ${RD(N(ex.max.y))}, min ${RD(N(ex.min.y))}.`),
+    hints: H('Trois sortes de candidats : les bornes, les points où f′ = 0, les points où f′ n\'existe pas.', `f′(x) = ${d.fp.replace(fac(d.c1), '▢').replace(/\^2/g, '²').replace(/-/g, ' − ').replace(/\+/g, ' + ')}`, `Compare f(${RD(d.a)}) = ${RD(N(d.fa))}, f(${RD(d.c1)}) = ${RD(N(d.fc))} et f(${RD(d.b)}) = ${RD(N(d.fb))} : max ${RD(N(ex.max.y))}, min ${RD(N(ex.min.y))}.`),
     subgoals: SUB, keys: KEYS, key: `${SK}:${d.f}:${d.a}:${d.b}:${level}`,
     exam: open ? examOf(opts, 7) : false, noHints: open || level === 5, fallback: d.fallback,
     expectedSec: open ? 600 : undefined,

@@ -28,7 +28,7 @@ const CHOICES = [
   { id: 'quot', label: 'Dériver le quotient f/g', rule: 'a1_bh_quotient_rule', why: 'BH dérive le haut et le bas séparément, pas le quotient.' },
 ];
 const FORMS = { '0/0': '0/0', inf: '∞/∞', none: 'pas indéterminé', '0inf': '0·∞' };
-const E_ = (a) => `e^(${kx(a)})`;
+const E_ = (a) => (a === 1 ? 'e^x' : `e^(${kx(a)})`);
 
 // Each template: {to, dir?, start, form, steps: [{math, act, holes?, form?}], L}.
 // form of a BH step: the form of the line before it.
@@ -106,7 +106,7 @@ const T = {
       to: '+∞', start: `${c === 1 ? '' : c}ln(x)/${xn}`, form: 'inf', k: 1, L: q(0),
       steps: [
         { math: `(${c}/x)/${n === 1 ? '1' : `(${n}${n === 2 ? 'x' : `x^${n - 1}`})`}`, act: 'bh', holes: [`${c}/x`], form: 'inf' },
-        { math: `${c}/(${n}${xn})`.replace('/(1x)', '/x'), act: 'simp' },
+        { math: (() => { const r = q(c, n); return r.d === 1 ? `${r.n}/${xn}` : `${r.n}/(${r.d}${xn})`; })(), act: 'simp' },
         { math: '0', act: 'subst' },
       ],
     };
@@ -221,7 +221,7 @@ function bhLines(level, rng, opts) {
     ? 'Une forme 0·∞ : écris le produit comme un quotient (ln x en haut), puis vérifie 0/0 ou ∞/∞.'
     : 'Vérifie la forme ; si c\'est 0/0 ou ∞/∞, dérive le haut et le bas séparément.';
   const h2 = first ? `Après BH : ${blankText(first)}` : `En 0, le haut vaut ${RD(d.num0)} et le bas vaut ${RD(d.den0)} : substitue x = 0.`;
-  const h3 = `${d.k ? `${d.k === 1 ? 'Une fois' : `${d.k} fois`} BH, puis ` : ''}la limite vaut ${RD(N(d.L))}.`;
+  const h3 = `${d.k ? `${d.k === 1 ? 'Une fois' : `${d.k} fois`} BH, puis la` : 'La'} limite vaut ${RD(N(d.L))}.`;
   return partsItem({
     skill: SK, level, prompt,
     parts: [{ start: d.start, judge: judgeOf(d), lines }],

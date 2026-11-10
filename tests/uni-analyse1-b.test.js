@@ -4,5 +4,4 @@ import { test } from 'node:test';
 import { checkSkills } from './uni-check.js';
 import { SKILLS } from '../js/content/uni/analyse1-b.skills.js';
 
-const ONLY = process.env.A1B_ONLY ? process.env.A1B_ONLY.split(',') : null;
-test('unit analyse1, part b: every skill, 5 levels and exam variants', () => checkSkills(SKILLS.map((s) => s.id).filter((id) => !ONLY || ONLY.includes(id))));
+test('unit analyse1, part b: every skill, 5 levels and exam variants', () => checkSkills(SKILLS.map((s) => s.id)));

@@ -88,7 +88,7 @@ function mvtLines(level, rng, opts) {
     minLines = [E(N(D.lo), 'c² ≥ 0', 'conclude', 'min')];
     maxLines = [E(N(D.hi), `c² ≤ ${D.far * D.far} sur ${I(D)}`, 'conclude', 'max')];
   }
-  const derive = { start: `d(${f})`, judge: { kind: 'equiv', vars: ['x'], domain: { x: [-3, 3] }, target: 'no-prime' }, lines: [level === 2 ? blanked(E(fp, 'Dériver', 'deriv', 'deriv'), [kx(2 * D.a, 'x')]) : E(fp, 'Dériver', 'deriv', 'deriv')] };
+  const derive = { start: `d(${f})`, html: 'Dérive f :', judge: { kind: 'equiv', vars: ['x'], domain: { x: [-3, 3] }, target: 'no-prime' }, lines: [level === 2 ? blanked(E(fp, 'Dériver', 'deriv', 'deriv'), [kx(2 * D.a, 'x')]) : E(fp, 'Dériver', 'deriv', 'deriv')] };
   const minPart = { start: fc, judge: bound('≥'), html: `Pour c ∈ ${I(D)}, minore f′(c) au plus juste :`, ask: 'f′(c) ≥', lines: minLines };
   const maxPart = { start: fc, judge: bound('≤'), html: `Pour c ∈ ${I(D)}, majore f′(c) au plus juste :`, ask: 'f′(c) ≤', lines: maxLines };
   const parts = level === 1 ? [minPart, maxPart] : [derive, minPart, maxPart];

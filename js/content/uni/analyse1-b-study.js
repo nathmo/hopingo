@@ -64,16 +64,18 @@ function texts(D) {
 
 const fAt = (D, x) => Q.of(x).add(D.m).add(Q.of(D.K).div(x - D.d));
 
+const uniqLabels = (opts) => opts.filter((o, i) => opts.findIndex((x) => x.label === o.label) === i);
+
 function obliqueDecision(D) {
   const y = (p) => `y = ${RD(joinSum(['x', N(p)]))}`;
   return {
     kind: 'decision', prompt: 'Asymptote oblique en ±∞ :',
-    options: [
+    options: uniqLabels([
       { id: 'ok', label: y(D.m), valid: true },
       { id: 'slope', label: 'y = x', valid: false, rule: 'a1_oblique_asymptote_slope_only', why: `La pente 1 ne suffit pas : f(x) − x → ${RD(N(D.m))}.` },
-      { id: 'rest', label: y(D.m + D.K), valid: false, why: `Le reste ${RD(N(D.K))}/(x − ${RD(N(D.d))}) tend vers 0 : il ne compte pas dans l'asymptote.` },
+      { id: 'rest', label: y(D.m + D.K), valid: false, why: `Le reste ${RD(`${D.K}/(${lin(D.d)})`)} tend vers 0 : il ne compte pas dans l'asymptote.` },
       { id: 'none', label: 'Pas d\'asymptote oblique', valid: false, why: 'f(x) − (x + p) tend vers 0 : il y en a une.' },
-    ],
+    ]),
   };
 }
 
@@ -88,10 +90,10 @@ function studyItem(level, rng, opts) {
     vminus: { start: T.f, judge: { kind: 'limit', v: 'x', vars: ['x'], to: vtTo, dir: '-' }, html: `Puis quand x → ${RD(D.d)}⁻`, ask: 'lim f =', lines: [E(sideInf('-'), 'Le bas tend vers 0⁻', 'asym', 'vert')] },
     div: { start: T.f, judge: { kind: 'equiv', vars: ['x'], domain: { x: [-5, 5] }, target: 'partial-fractions' }, html: 'Division euclidienne :', ask: 'f(x) =', lines: [level === 2 ? blanked(E(T.div, 'Quotient x + m, reste K', 'div', 'div'), [N(Math.abs(D.K))]) : E(T.div, 'Division euclidienne', 'div', 'div')] },
     fp: { start: `d(${T.div})`, judge: { kind: 'equiv', vars: ['x'], domain: { x: [-5, 5] }, target: 'no-prime' }, html: 'Dérive f (sous la forme divisée) :', ask: 'f′(x) =', lines: [E(T.fp, 'Dériver', 'mono', 'deriv')] },
-    mono: { start: `${T.fp}>0`, judge: { kind: 'solset', v: 'x' }, html: 'f est croissante là où f′(x) > 0 :', lines: D.s ? [E(`${T.fact}>0`, 'Même dénominateur, factoriser', 'mono', 'sign'), g ? blanked(E(T.incr, 'Signe des facteurs', 'mono', 'sign'), [N(T.r1), N(T.r2)]) : E(T.incr, 'Signe des facteurs', 'mono', 'sign')] : [E(T.incr, `f′(x) = 1 + ${-D.K}/(x − ${RD(N(D.d))})² > 0`, 'mono', 'sign')] },
-    ext: D.s && { start: `${P0(T.r1)}+${P0(D.m)}+${D.K}/(${P0(T.r1)}-${P0(D.d)})`.replace(/\+-/g, '-'), judge: { kind: 'value', form: 'irreducible' }, html: `Maximum local en x = ${RD(N(T.r1))} :`, ask: `f(${RD(N(T.r1))}) =`, lines: [E(N(T.max), 'Calculer', 'mono', 'eval')] },
+    mono: { start: `${T.fp}>0`, judge: { kind: 'solset', v: 'x' }, html: 'f est croissante là où f′(x) > 0 :', lines: D.s ? [E(`${T.fact}>0`, 'Même dénominateur, factoriser', 'mono', 'sign'), g ? blanked(E(T.incr, 'Signe des facteurs', 'mono', 'sign'), [N(T.r1), N(T.r2)]) : E(T.incr, 'Signe des facteurs', 'mono', 'sign')] : [E(T.incr, `f′(x) = ${RD(T.fp)} > 0`, 'mono', 'sign')] },
+    ext: D.s && { start: T.f.replace(/(\d)x/g, '$1×x').replace(/x/g, P0(T.r1)), judge: { kind: 'value', form: 'irreducible' }, html: `Maximum local en x = ${RD(N(T.r1))} :`, ask: `f(${RD(N(T.r1))}) =`, lines: [E(N(T.max), 'Calculer', 'mono', 'eval')] },
     f2: { start: `d(${T.fp})`, judge: { kind: 'equiv', vars: ['x'], domain: { x: [-5, 5] }, target: 'no-prime' }, html: 'Dérive encore :', ask: 'f″(x) =', lines: [E(T.f2, 'Dériver', 'conv', 'deriv')] },
-    conv: { start: `${T.f2}>0`, judge: { kind: 'solset', v: 'x' }, html: 'f est convexe là où f″(x) > 0 :', lines: [g ? blanked(E(T.convex, `Signe de (x − ${RD(N(D.d))})³`, 'conv', 'sign'), [N(D.d)]) : E(T.convex, `Signe de (x − ${RD(N(D.d))})³`, 'conv', 'sign')] },
+    conv: { start: `${T.f2}>0`, judge: { kind: 'solset', v: 'x' }, html: 'f est convexe là où f″(x) > 0 :', lines: [g ? blanked(E(T.convex, `Signe de ${RD(`(${lin(D.d)})^3`)}`, 'conv', 'sign'), [N(D.d)]) : E(T.convex, `Signe de ${RD(`(${lin(D.d)})^3`)}`, 'conv', 'sign')] },
   };
   const seq = {
     1: ['mono', 'conv'],
@@ -111,7 +113,7 @@ function studyItem(level, rng, opts) {
     : `Soit f(x) = ${ML(T.f)}, définie sur ℝ ∖ {${RD(N(D.d))}}. Fais son étude${level === 1 ? ' (monotonie et convexité)' : ''}.`;
   return partsItem({
     skill: SK, level, prompt, parts, choices: CHOICES,
-    hints: H(`Divise ${RD(T.f.split('/(')[0].slice(1, -1))} par x − ${RD(N(D.d))} : le quotient donne l'asymptote oblique.`, `f(x) = ${RD(joinSum(['x', N(D.m)]))} + ▢/(x − ${RD(N(D.d))})`, `f″(x) = ${ML(T.f2)}`),
+    hints: H(`Divise ${RD(T.f.split('/(')[0].slice(1, -1))} par ${RD(lin(D.d))} : le quotient donne l'asymptote oblique.`, `f(x) = ${RD(joinSum(['x', N(D.m)]))} + ▢/(${RD(lin(D.d))})`, `f″(x) = ${ML(T.f2)}`),
     subgoals: SUB, keys: KEYS, key: `${SK}:${T.f}:${level}`, exam: examOf(opts), fallback: D.fallback,
   });
 }

@@ -99,8 +99,8 @@ function pcItem(level, rng, opts) {
   const parts = seq.map((k) => ({ ...P[k] }));
   if (level === 1 && !open) parts[0].html = `ẋ = ${T(D.dx)}, ẏ = ${T(D.dy)}. ${P.slope.html}`;
   const prompt = rng.chance(0.5)
-    ? `Soit la courbe γ(t) = (${T(D.x)} ; ${T(D.y)}), t ∈ ℝ. Trouve ses tangentes horizontales et verticales${level === 5 || open ? ' et son point double' : ''}.`
-    : `Étudie la courbe paramétrée x(t) = ${T(D.x)}, y(t) = ${T(D.y)} : pente, tangentes horizontales et verticales${level === 5 || open ? ', point double' : ''}.`;
+    ? `Soit la courbe γ(t) = (${T(D.x)} ; ${T(D.y)}), t ∈ ℝ. Trouve ses tangentes horizontales et verticales${seq.includes('double') ? ' et son point double' : ''}.`
+    : `Étudie la courbe paramétrée x(t) = ${T(D.x)}, y(t) = ${T(D.y)} : ${seq.includes('slope') ? 'pente, ' : ''}tangentes horizontales et verticales${seq.includes('double') ? ', point double' : ''}.`;
   const tH = D.swap ? '0' : `±${D.b}`;
   return partsItem({
     skill: PC, level: open ? 4 : level, prompt, parts, choices: PC_CHOICES,
@@ -167,7 +167,7 @@ function poData(rng) {
       kind, a, rho: `${a}tan(φ/2)`, dom: '[0 ; π[', domSet: '[0;π[',
       xs: [`${a}tan(φ/2)×cos(φ)`, '-∞'],
       ys: [`${a}tan(φ/2)×sin(φ)`, `${a}sin(φ)^2/(1+cos(φ))`, `${a}(1-cos(φ))`, String(2 * a)],
-      rhoDot: { start: `d(${a}tan(φ/2),φ)`, mid: `(${a}/2)(1+tan(φ/2)^2)`, goal: `${a}/(1+cos(φ))` },
+      rhoDot: { start: `d(${a}tan(φ/2),φ)`, mid: a === 2 ? '1+tan(φ/2)^2' : a % 2 ? `(${a}/2)(1+tan(φ/2)^2)` : `${a / 2}(1+tan(φ/2)^2)`, goal: `${a}/(1+cos(φ))` },
       slope: {
         start: `(${a}/(1+cos(φ))×sin(φ)+${a}tan(φ/2)×cos(φ))/(${a}/(1+cos(φ))×cos(φ)-${a}tan(φ/2)×sin(φ))`,
         mid: '(sin(φ)+sin(φ)cos(φ))/(cos(φ)-sin(φ)^2)', goal: 'sin(φ)(1+cos(φ))/(cos(φ)^2+cos(φ)-1)',
@@ -237,7 +237,7 @@ function poItem(level, rng, opts) {
   const eqP = (goal) => ({ kind: 'equiv', vars: ['φ'], dvar: 'φ', domain: { φ: D.kind === 'tan' ? [0.1, 3] : [-3, 3] }, target: 'goal', goal });
   const yLines = D.ys.slice(1).map((m, i, arr) => {
     const last = i === arr.length - 1;
-    const line = E(m, last ? 'Passer à la limite' : 'tan(φ/2) = sin φ/(1 + cos φ)', last ? 'lim' : 'trig', last ? 'lim' : 'trig');
+    const line = E(m, last ? 'Passer à la limite' : i === 1 ? 'sin²φ = (1 − cos φ)(1 + cos φ)' : 'tan(φ/2) = sin φ/(1 + cos φ)', last ? 'lim' : 'trig', last ? 'lim' : 'trig');
     if (!g) return line;
     if (!last && i === arr.length - 2 && D.kind === 'tan') return blanked(line, ['cos(φ)']);
     if (last && L === 1) return blanked(line, [m.replace('+', '')]);
