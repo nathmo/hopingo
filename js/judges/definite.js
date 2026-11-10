@@ -4,7 +4,7 @@
 // exactly when both are exact, else by quadrature (relative 1e−7; a
 // singular end costs about 1e−8 in double precision). cfg:
 //   {vars?: letters allowed, seq?: {J: 'int(x^n×e^x, x, 0, 1)'}, param?: 'n',
-//    nRange?: [1, 6], recurrence?: true}
+//    nRange?: [1, 6], recurrence?: true, known?: {text: value}}
 // seq and param (recurrence formulas Iₙ = … Iₙ₋₁, catalogue A1 E4): J_n,
 // J_(n−1), J_0 stand for the integral with n replaced; a line with n is
 // compared for every n of nRange.
@@ -48,13 +48,29 @@ function expand(cfg, node, n) {
 }
 
 // The value of a line: {q} exact, or {x} a float (NaN if unknown).
+// Step U6 (A2, part g): the values of lines with integrals are kept (a
+// triple integral costs about 0,3 s, and the start of a part is compared
+// with each line).
+const VALUES = new Map();
 function valueOf(cfg, node, n) {
   const e = expand(cfg, node, n);
   if (!contains(e, (x) => x.t === 'int' || x.t === 'lim')) {
     const q = exactValue(e);
     if (q) return { q, x: q.valueOf() };
   }
-  return { x: evalFloat(e, {}) };
+  const key = toText(e);
+  // cfg.known = {line text: exact value text}: a value the generator
+  // computed (the start of a part, a triple integral).
+  if (cfg.known?.[key]) {
+    const k = parse(cfg.known[key]);
+    const q = exactValue(k);
+    return q ? { q, x: q.valueOf() } : { x: evalFloat(k, {}) };
+  }
+  if (VALUES.has(key)) return { x: VALUES.get(key) };
+  const x = evalFloat(e, {});
+  if (VALUES.size >= 2000) VALUES.clear();
+  VALUES.set(key, x);
+  return { x };
 }
 
 const nsOf = (cfg) => {
@@ -78,7 +94,13 @@ function compare(cfg, a, b) {
 }
 
 export function sameValue(cfg, a, b) {
-  try { return compare(cfg, a, b).equal; } catch { return false; }
+  try {
+    // Step U6: a trap's candidate whose value is unknown (a primitive taken
+    // at ±∞ that diverges) matches no line.
+    if (sameLine(a, b)) return true;
+    if (nsOf(cfg).every((n) => !Number.isFinite(valueOf(cfg, a, n).x))) return false;
+    return compare(cfg, a, b).equal;
+  } catch { return false; }
 }
 
 // cfg.recurrence (with seq and param): the part asks for the recurrence
