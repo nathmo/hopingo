@@ -196,7 +196,7 @@ export function doubleSystem(rng, { lams = [-3, -2, -1, 1, 2], tri = true, max =
     const A = N.map((r, i) => r.map((x, j) => (i === j ? x.add(l) : x)));
     if (maxAbs(A) > max) continue;
     const x0 = [q(rng.int(-2, 3)), q(rng.int(-2, 3))];
-    if (x0.every((x) => x.n === 0)) continue;
+    if (MX.matVec(N, x0).every((x) => x.n === 0)) continue; // x0 not an eigenvector
     return { A, l, N, x0 };
   }
   const N = MX.mat([[-1, 1], [-1, 1]]);

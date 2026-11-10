@@ -28,7 +28,7 @@ export const SKILLS = [
     intro: {
       rule: 'Si A = PDP⁻¹ (valeurs propres λᵢ, vecteurs propres vᵢ), la solution de ẋ = Ax est <b>x(t) = Σ cᵢe^{λᵢt}vᵢ</b>, avec Pc = x(0).<br>Stable (x(t) → 0 pour tout x(0)) si toutes les <b>Re λᵢ &lt; 0</b> ; une Re λ &gt; 0 : instable. λ = a ± ib donne des oscillations e^{at}(cos bt, sin bt).<br>ÿ + aẏ + by = 0 devient, avec x = (y ; ẏ), ẋ = Ax avec la matrice compagne A = [[0, 1], [−b, −a]].',
       lines: L([
-        [`${C("y''+5y'+6y=0")} : ${M('A = [[0,1],[-6,-5]]')}`, 'Matrice compagne : ÿ = −6y − 5ẏ'],
+        [`ÿ + 5ẏ + 6y = 0 : ${M('A = [[0,1],[-6,-5]]')}`, 'Matrice compagne : ÿ = −6y − 5ẏ'],
         [C('λ^2+5λ+6=(λ+2)(λ+3)'), 'Valeurs propres −2 et −3'],
         [M('x(t) = c_1e^(-2t)(1 ; -2) + c_2e^(-3t)(1 ; -3)'), 'Un mode par valeur propre'],
         [M('x(t) = 3e^(-2t)(1 ; -2) - 2e^(-3t)(1 ; -3)'), 'c₁ + c₂ = 1, −2c₁ − 3c₂ = 0 pour x(0) = (1 ; 0)'],

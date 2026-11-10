@@ -156,7 +156,15 @@ const MODES_SUB = [
 ];
 
 const odeT = (a, b) => { const s = lin([[a, "y'"], [b, 'y']]); return `y''${s.startsWith('-') ? '' : '+'}${s}=0`; };
-const odeR = (a, b) => { const s = lin([[a, 'ẏ'], [b, 'y']]); return R(`ÿ ${s.startsWith('-') ? '' : '+ '}${s} = 0`).replace(/([^ ])([+−])/g, '$1 $2 ').replace(/ {2,}/g, ' '); };
+// Readable sums: ÿ − 4ẏ + 3y, −3y + 4ẏ.
+const sumR = (head, pairs) => pairs.reduce((acc, [c0, m]) => {
+  const c = q(c0);
+  if (c.n === 0) return acc;
+  const a = c.n < 0 ? c.neg() : c;
+  const t = `${a.eq(1) ? '' : fq(a)}${m}`;
+  return acc ? `${acc} ${c.n < 0 ? '−' : '+'} ${t}` : `${c.n < 0 ? '−' : ''}${t}`;
+}, head);
+const odeR = (a, b) => `${sumR('ÿ', [[a, 'ẏ'], [b, 'y']])} = 0`;
 const odecfg = (d, want = 'solution') => ({ kind: 'odevec', A: mt(d.A), x0: vt(d.x0), want, vars: ['t', 'c'] });
 
 function companionPart(d, level, rng) {
@@ -164,7 +172,7 @@ function companionPart(d, level, rng) {
   return {
     html: `La matrice A de ẋ = Ax, avec x = (y ; ẏ).`, ask: 'A =', start: 'A',
     judge: { kind: 'mat', expect: mt(d.A), companion: [qt(a), qt(b)] },
-    lines: [{ math: mt(d.A), note: R(`ÿ = ${lin([[b.neg(), 'y'], [a.neg(), 'ẏ']])}`), subgoal: 'companion', cells: level <= 2 ? [[1, 0], [1, 1]] : null }],
+    lines: [{ math: mt(d.A), note: `ÿ = ${sumR('', [[b.neg(), 'y'], [a.neg(), 'ẏ']])}`, subgoal: 'companion', cells: level <= 2 ? [[1, 0], [1, 1]] : null }],
     menu: MENU.companion,
   };
 }
@@ -178,7 +186,7 @@ function vecParts(d, level, rng) {
     return {
       html: `Un vecteur propre pour λ = ${fq(l)}.`, ask: `v${'₁₂'[i]} =`, start: `v_${i + 1}`,
       judge: { kind: 'eigvec', A: mt(d.A), lambda: qt(l) },
-      lines: [{ math: vt(v), note: `Noyau de A ${l.n < 0 ? '+' : '−'} ${fq(l.n < 0 ? l.neg() : l).replace(/^1$/, '')}I`, subgoal: 'modes', cells: level <= 2 ? vcells(v, 1, rng) : null }],
+      lines: [{ math: vt(v), note: `Noyau de A ${l.n < 0 ? '+' : '−'} ${((a) => (a.eq(1) ? '' : a.d > 1 ? `(${fq(a)})` : fq(a)))(l.n < 0 ? l.neg() : l)}I`, subgoal: 'modes', cells: level <= 2 ? vcells(v, 1, rng) : null }],
       menu: MENU.kernel,
     };
   });
@@ -250,10 +258,10 @@ function modesReal(level, rng) {
     if (level === 3 && d.companion) parts.push(yPart(d));
   }
   parts.push(stabPart(eigs, { level }));
-  const given = level === 1 ? ` Les valeurs propres de A${d.companion ? ` = ${MLm(d.A)}` : ''} sont ${listFr(d.eigs.map(fq))}.` : '';
+  const given = level === 1 ? ` Avec x = (y ; ẏ), ẋ = Ax${d.companion ? ` où A = ${MLm(d.A)}` : ''}. Les valeurs propres de A sont ${listFr(d.eigs.map(fq))}.` : '';
   return partsItem({
     skill: MODES, level, parts, hints: modesHints(d), subgoals: MODES_SUB, key: `${MODES}:${mt(d.A)}:${vt(d.x0)}:${level}`, fallback: d.fallback,
-    prompt: modesPrompt(d, `${d.companion ? 'Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve' : 'Trouve'} les modes propres, la solution x(t), et dis si le système est stable.${given}${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`),
+    prompt: modesPrompt(d, `${d.companion && level > 1 ? 'Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve' : 'Trouve'} les modes propres, la solution x(t), et dis si le système est stable.${given}${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`),
   });
 }
 
@@ -476,7 +484,7 @@ function expmItem(level, rng) {
     const [l1, l2] = d.eigs;
     const eD = `[[${modeT(l1)},0],[0,${modeT(l2)}]]`;
     const parts = [
-      { html: 'D = P⁻¹AP : les valeurs propres, dans l’ordre des colonnes de P.', ask: 'D =', start: 'D', judge: { kind: 'mat', names: { A: mt(d.A), P: mt(d.P) }, expect: 'P^(-1)·A·P' }, lines: [{ math: mt(MX.diag([l1, l2])), note: `Av₁ = ${fq(l1)}v₁, Av₂ = ${fq(l2)}v₂`, subgoal: 'diag', cells: [[0, 0], [1, 1]] }] },
+      { html: 'D = P⁻¹AP : les valeurs propres, dans l’ordre des colonnes de P.', ask: 'D =', start: 'D', judge: { kind: 'mat', names: { A: mt(d.A), P: mt(d.P) }, expect: 'P^(-1)·A·P' }, lines: [{ math: mt(MX.diag([l1, l2])), note: `λ₁ = ${fq(l1)} et λ₂ = ${fq(l2)}`, subgoal: 'diag', cells: [[0, 0], [1, 1]] }] },
       { html: 'e^{Dt} pour D diagonale : l\'exponentielle de chaque valeur propre.', ask: 'e^{Dt} =', start: 'e^(Dt)', judge: { kind: 'mat', vars: ['t'], expect: eD }, lines: [{ math: eD, note: 'D est diagonale : e^{Dt} = diag(e^{λ₁t}, e^{λ₂t})', subgoal: 'expm', cells: [[rng.int(0, 1), rng.int(0, 1)]].map(([i]) => [i, i]) }] },
       {
         html: 'e^{At} = P·e^{Dt}·P⁻¹.', ask: 'e^{At} =', start: 'e^(At)', judge: ecfg(d.A, { P: mt(d.P) }),
@@ -675,7 +683,7 @@ function discItem(level, rng) {
 }
 
 // Level 4: the same A, continuous and discrete (catalogue L4).
-const CMP = [[-3, -1], [-2, q(-1, 2)], [-3, -2], [q(-1, 2), q(1, 2)], [q(-3, 2), q(-1, 2)], [q(1, 2), q(1, 4)], [-2, q(1, 2)], [2, q(-1, 2)]];
+const CMP = [[-3, -1], [-2, q(-1, 2)], [-3, -2], [q(-1, 2), q(1, 2)], [q(-3, 2), q(-1, 2)], [q(1, 2), q(1, 4)], [-4, -2], [q(1, 4), q(-1, 4)]];
 function discCompare(rng, { noHints = false } = {}) {
   let d;
   for (let t = 0; t < 50; t++) {
