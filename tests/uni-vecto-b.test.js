@@ -5,7 +5,7 @@ import { checkSkills } from './uni-check.js';
 import { SKILLS } from '../js/content/uni/vecto-b.skills.js';
 
 // Skills whose generators are not written yet (emptied when the part is done).
-const STUBBED = new Set(["v-green", "v-green-flux", "v-surf-param", "v-surf-area", "v-flux", "v-boundary", "v-div-thm", "v-stokes", "v-verify-stokes", "v-verify-div", "v-proof-identity"]);
+const STUBBED = new Set([]);
 // Items per level: 20 (never under 15).
 const COUNTS = Object.fromEntries(SKILLS.map((s) => [s.id, 20]));
 
