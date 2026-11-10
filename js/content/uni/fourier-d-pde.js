@@ -36,7 +36,7 @@ function heatIssue(s, u, series) {
   const a = s.a ? fnOf(s.a, ['t']) : () => s.k ?? 1;
   const c = s.c || 0;
   const h1 = 1e-4;
-  const h2 = 2e-3;
+  const h2 = 5e-4;
   for (const [fx, t] of [[0.23, 0.07], [0.41, 0.19], [0.66, 0.31], [0.87, 0.45]]) {
     const x = fx * L;
     const U = u({ x, t });
@@ -71,7 +71,7 @@ function waveIssue(s, u) {
   const c2 = s.c * s.c;
   const ic = fnOf(s.ic, ['x']);
   const ic1 = fnOf(s.ic1 ?? '0', ['x']);
-  const h = 2e-3;
+  const h = 5e-4;
   const xs = L ? [0.21 * L, 0.48 * L, 0.77 * L] : [-1.3, 0.2, 0.9];
   for (const x of xs) {
     for (const t of [0.13, 0.42]) {
@@ -93,7 +93,7 @@ function diskIssue(s, u, vars) {
   const g = fnOf(s.g, ['θ']);
   const polar = vars[0] === 'r';
   const at = (r, th) => (polar ? u({ r, 'θ': th }) : u({ x: r * Math.cos(th), y: r * Math.sin(th) }));
-  const h = 2e-3;
+  const h = 5e-4;
   for (const [x, y] of [[0.2, 0.1], [-0.3, 0.4], [0.5, -0.2]]) {
     const r = Math.hypot(x, y);
     const th = Math.atan2(y, x);
@@ -107,7 +107,7 @@ function diskIssue(s, u, vars) {
 
 function halfIssue(s, u) {
   const g = fnOf(s.g, ['y']);
-  const h = 2e-3;
+  const h = 5e-4;
   for (const [x, y] of [[0.3, 0.2], [1.1, -0.7], [2.2, 1.4]]) {
     const U = u({ x, y });
     const lap = (u({ x: x + h, y }) + u({ x: x - h, y }) + u({ x, y: y + h }) + u({ x, y: y - h }) - 4 * U) / (h * h);

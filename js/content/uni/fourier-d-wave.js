@@ -26,9 +26,9 @@ const prodT = (c, body) => argT(q(c), body);
 
 // The initial conditions u₀ of the table (w = 1): text, its transform, the line.
 const U0 = [
-  { f: 'e^(-x^2)', F: '(1/√2)e^(-α^2/4)', line: 'F8', at: (y) => `e^(-(${y})^2)` },
-  { f: '1/(1+x^2)', F: '√(π/2)e^(-|α|)', line: 'F6', at: (y) => `1/(1+(${y})^2)` },
-  { f: 'e^(-|x|)', F: '√(2/π)/(1+α^2)', line: 'F7', at: (y) => `e^(-|${y}|)` },
+  { f: 'e^(-x^2)', F: '(1/√2)e^(-α^2/4)', line: 'F8', at: (y) => `e^(-(${y})^2)`, times: (k) => `(1/√2)e^(-α^2/4)${k}` },
+  { f: '1/(1+x^2)', F: '√(π/2)e^(-|α|)', line: 'F6', at: (y) => `1/(1+(${y})^2)`, times: (k) => `√(π/2)e^(-|α|)${k}` },
+  { f: 'e^(-|x|)', F: '√(2/π)/(1+α^2)', line: 'F7', at: (y) => `e^(-|${y}|)`, times: (k) => `√(2/π)${k}/(1+α^2)` },
 ];
 
 // u_tt = c²u_xx as HTML: « u_tt − ¼u_xx = 0 » for c = ½ (2021), « u_tt = 4u_xx ».
@@ -49,7 +49,7 @@ function lineData(rng, o = {}) {
   const shift = (k) => [`x+${prodT(k, 't')}`, `x-${prodT(k, 't')}`];
   const [p, m] = shift(c);
   const u = `(${U.at(p)}+${U.at(m)})/2`;
-  const uhat = `${U.F}${cos(c)}`;
+  const uhat = U.times(cos(c));
   const ode = term(c2.neg(), 'α^2û');
   const same = c.eq(1);
   const [p2, m2] = shift(c2);
@@ -58,7 +58,7 @@ function lineData(rng, o = {}) {
     wrong: {
       c: same ? [] : [qt(c2)],
       ode: same ? [] : [term(c.neg(), 'α^2û'), '-α^2û'].filter((t) => t !== ode),
-      uhat: same ? [] : [`${U.F}${cos(c2)}`],
+      uhat: same ? [] : [U.times(cos(c2))],
       u: [`(${U.at(p)}+${U.at(m)})/4`, ...(same ? [] : [`(${U.at(p2)}+${U.at(m2)})/2`])],
     },
     id: `R:${qt(c)}:${U.line}`,

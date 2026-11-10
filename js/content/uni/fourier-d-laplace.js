@@ -141,10 +141,12 @@ function halfData(rng) {
   const A = rng.chance(0.5) ? w : rng.pick([1, 2, 4].filter((x) => x !== w));
   const k = q(A, w);
   const g = `${A}/(y^2+${w * w})`;
+  // k·body as text: 'body', '2body', 'body/2', '3body/2'.
+  const kOf = (body) => `${k.n === 1 ? '' : k.n}${body}${k.d === 1 ? '' : `/${k.d}`}`;
   const kT = k.eq(1) ? '' : k.d === 1 ? `${k.n}` : `(${qt(k)})`;
-  const ghat = `${kT}√(π/2)e^(-${w === 1 ? '' : w}|α|)`;
-  const uhat = `${kT}√(π/2)e^(-(x+${w})|α|)`;
-  const u = `${kT}(x+${w})/(y^2+(x+${w})^2)`;
+  const ghat = kOf(`√(π/2)e^(-${w === 1 ? '' : w}|α|)`);
+  const uhat = kOf(`√(π/2)e^(-(x+${w})|α|)`);
+  const u = k.d === 1 ? `${k.n === 1 ? '' : k.n}(x+${w})/(y^2+(x+${w})^2)` : `${k.n === 1 ? '' : k.n}(x+${w})/(${k.d}(y^2+(x+${w})^2))`;
   return {
     w, A, k, g, ghat, uhat, u,
     wrong: { uhat: [`${kT}√(π/2)e^(-${w === 1 ? '' : w}|α|)e^(|α|x)`] },

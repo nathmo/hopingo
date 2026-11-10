@@ -147,8 +147,8 @@ const zeroDecision = () => ({
 const readDecision = (trig) => ({
   prompt: 'La condition initiale est-elle déjà une somme de modes ?', levels: [2, 3], options: trig
     ? [
-      { id: 'read', label: 'Oui : on lit les coefficients bₙ(0)', valid: true, ref: true },
-      { id: 'int', label: 'Non : on calcule bₙ(0) = (2/L)∫₀ᴸ u(x, 0) sin(nπx/L) dx', valid: true, quality: 'poor', why: 'Juste, mais inutile : les intégrales redonnent les coefficients qu\'on lit.' },
+      { id: 'read', label: 'Oui : on lit ses coefficients sur les modes', valid: true, ref: true },
+      { id: 'int', label: 'Non : on calcule ses coefficients par des intégrales (2/L)∫₀ᴸ…', valid: true, quality: 'poor', why: 'Juste, mais inutile : les intégrales redonnent les coefficients qu\'on lit.' },
     ]
     : [
       { id: 'int', label: 'Non : on calcule bₙ(0) par la série en sinus', valid: true, ref: true },
@@ -159,7 +159,8 @@ const readDecision = (trig) => ({
 // The lines item of a trigonometric initial condition (levels 1 to 4).
 function trigItem(level, rng, opts, o = {}) {
   const d = trigData(rng, o);
-  const decided = level >= 2 && !opts.exam;
+  // The coefficients: bₙ (sines) or aₙ (cosines, a₀/2 the constant term).
+  const co = d.bc === 'N' ? 'a' : 'b';
   const nDom = { n: { int: [d.nFrom, 30] } };
   const xDom = { x: [0, Lnum(d.L)] };
   const parts = [];
@@ -185,7 +186,7 @@ function trigItem(level, rng, opts, o = {}) {
     const rateTraps = [lin, ...(d.L !== 'pi' ? [noPi] : [])].filter((t) => t !== d.rate);
     parts.push({
       label: 'λ_n', shown: 'λₙ', name: 'lambda', vars: ['n'], domain: nDom, expect: d.rate,
-      title: `Chaque coefficient vérifie bₙ′ = −λₙ bₙ, donc bₙ(t) = bₙ(0) e<sup>−λₙt</sup>`,
+      title: `Chaque coefficient vérifie ${co}ₙ′ = −λₙ ${co}ₙ, donc ${co}ₙ(t) = ${co}ₙ(0) e<sup>−λₙt</sup>`,
       action: 'Résoudre l\'EDO de chaque coefficient',
       traps: { f_heat_rate: rateTraps },
       wrongActions: [{ label: 'Décroissance e^(−nt), linéaire en n', rule: 'f_heat_rate', why: 'u_xx dérive deux fois Xₙ : le mode n décroît comme e^(−k(nπ/L)²t).' }],
@@ -205,10 +206,10 @@ function trigItem(level, rng, opts, o = {}) {
     lines: [{ math: d.u, subgoal: 'assemble', blank: rates.length ? [rates[rates.length - 1]] : [d.modes[0].n === 1 ? 'x' : String(d.modes[0].n)], blank2: rates.length > 1 ? rates : undefined }],
   });
   const prompt = `Résous ${pdeHtml(d.k, d.c, d.a)} sur ]0 ; ${LT[d.L]}[, avec ${bcHtml(d.bc, d.L)} et <i>u</i>(<i>x</i>, 0) = ${MT(d.ic)}.`;
-  const hint2 = d.a ? `bₙ(t) = bₙ(0) e<sup>−n²A(t)</sup>, avec A(t) = ∫₀ᵗ (${rd(d.a.html)}) ds.` : `bₙ(t) = bₙ(0) e<sup>−λₙt</sup> avec λₙ = ${rateR(d.rate)}.`;
+  const hint2 = d.a ? `bₙ(t) = bₙ(0) e<sup>−n²A(t)</sup>, avec A(t) = ∫₀ᵗ (${rd(d.a.html)}) ds.` : `${co}ₙ(t) = ${co}ₙ(0) e<sup>−λₙt</sup> avec λₙ = ${rateR(d.rate)}.`;
   return fdItem({
     skill: SEP, level, key: `${level}:${d.id}`, prompt, parts, exam: opts.exam ? examTag(opts) : false,
-    hints: H(d.bc === 'D' ? 'Dirichlet : des sinus sin(nπx/L), n ≥ 1. Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne bₙ(0).' : 'Neumann : des cosinus cos(nπx/L), n = 0 compris. Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne aₙ(0).',
+    hints: H(d.bc === 'D' ? 'Dirichlet : des sinus sin(nπx/L), n ≥ 1. Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne bₙ(0).' : 'Neumann : des cosinus cos(nπx/L), n = 0 compris (le terme constant a₀/2). Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne aₙ(0).',
       hint2, `u(x, t) = ${MT(d.u)}`),
     subgoals: [SUB.modes, SUB.ode, SUB.assemble], keys: KEYS,
     pde: { spec: d.spec, u: d.u },
