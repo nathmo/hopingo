@@ -30,25 +30,27 @@ function sumData(rng) {
   const A = coef(a);
   const B = coef(b);
   const L = q(a, b);
-  const lo = `${A}n^2/(${B}n^2+n)`;
-  const hi = `${A}n^2/(${B}n^2+1)`;
+  const An = A ? `(${A}n)` : 'n';
+  const An2 = A ? `(${A}n^2)` : 'n^2';
+  const lo = `${An2}/(${B}n^2+n)`;
+  const hi = `${An2}/(${B}n^2+1)`;
   return {
     kind: 'sum', name: 'S_n', nameH: 'Sₙ', L, lo, hi, zero: '0',
-    start: `sum(${A}n/(${B}n^2+k),k,1,n)`,
-    lo1: `${A}n/(${B}n^2+n)`, hi1: `${A}n/(${B}n^2+1)`,
-    loLines: [E(`sum(${A}n/(${B}n^2+n),k,1,n)`, 'Chaque terme est au moins le plus petit (k = n)', 'bound', 'smallest'), E(lo, 'Il y a n termes égaux', 'bound', 'count')],
-    hiLines: [E(`sum(${A}n/(${B}n^2+1),k,1,n)`, 'Chaque terme est au plus le plus grand (k = 1)', 'bound', 'largest'), E(hi, 'Il y a n termes égaux', 'bound', 'count')],
+    start: `sum(${An}/(${B}n^2+k),k,1,n)`,
+    lo1: `${An}/(${B}n^2+n)`, hi1: `${An}/(${B}n^2+1)`,
+    loLines: [E(`sum(${An}/(${B}n^2+n),k,1,n)`, 'Chaque terme est au moins le plus petit (k = n)', 'bound', 'smallest'), E(lo, 'Il y a n termes égaux', 'bound', 'count')],
+    hiLines: [E(`sum(${An}/(${B}n^2+1),k,1,n)`, 'Chaque terme est au plus le plus grand (k = 1)', 'bound', 'largest'), E(hi, 'Il y a n termes égaux', 'bound', 'count')],
     loLim: [E(`${a}/(${b}+1/n)`, 'Diviser par n²', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
     hiLim: [E(`${a}/(${b}+1/n^2)`, 'Diviser par n²', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
     blankLo: [`${B}n^2+n`], blankHi: [`${B}n^2+1`], blankLim: ['1/n', '1/n^2'],
     lowChoice: {
       prompt: 'Pour minorer Sₙ, on remplace chaque terme par :',
-      ok: `le plus petit, ${M(`${A}n/(${B}n^2+n)`)} (k = n)`,
-      bad: `le plus grand, ${M(`${A}n/(${B}n^2+1)`)} (k = 1)`,
+      ok: `le plus petit, ${M(`${An}/(${B}n^2+n)`)} (k = n)`,
+      bad: `le plus grand, ${M(`${An}/(${B}n^2+1)`)} (k = 1)`,
     },
     hints: [
       'Chaque terme est entre le plus petit (k = n) et le plus grand (k = 1). Il y a n termes.',
-      `${M(`n×${A}n/(${B}n^2+□)`)} ≤ Sₙ ≤ ${M(`n×${A}n/(${B}n^2+□)`)}`,
+      `${M(`n×${An}/(${B}n^2+□)`)} ≤ Sₙ ≤ ${M(`n×${An}/(${B}n^2+□)`)}`,
       `${M(lo)} ≤ Sₙ ≤ ${M(hi)}, et les deux bornes tendent vers ${qh(L)}.`,
     ],
     choices: [
@@ -74,13 +76,14 @@ function logData(rng) {
     const den = `${R}n+${s}`;
     const L = q(p, r);
     const nq = qq === 1 ? 'n' : `n^${qq}`;
-    const lo = `${P}n/(${den})`;
+    const nqH = ['n', 'n', 'n²', 'n³'][qq];
+    const lo = `${P ? `(${P}n)` : 'n'}/(${den})`;
     const hi = `(${P}n+ln(2))/(${den})`;
     return {
       kind: 'log', name: 'a_n', nameH: 'aₙ', L, lo, hi, zero: '0', gone: ['ln'],
       start: `ln(e^(${P}n)+${nq})/(${den})`,
-      loLines: [E(`ln(e^(${P}n))/(${den})`, `Log est croissant et ${nq.replace('^', '')} ≥ 0`, 'bound', 'logLow'), E(lo, `Log(e^(${P}n)) = ${cv(p)}`, 'bound', 'simplify')],
-      hiLines: [E(`ln(2e^(${P}n))/(${den})`, `${nq} ≤ e^(${P}n) pour n ≥ 1`, 'bound', 'logHigh'), E(hi, `Log(2e^(${P}n)) = ${cv(p)} + Log 2`, 'bound', 'simplify')],
+      loLines: [E(`ln(e^(${P}n))/(${den})`, `Log est croissant et ${nqH} ≥ 0`, 'bound', 'logLow'), E(lo, `Log(e^(${P}n)) = ${cv(p)}`, 'bound', 'simplify')],
+      hiLines: [E(`ln(2e^(${P}n))/(${den})`, `${nqH} ≤ e^(${cv(p)}) pour n ≥ 1`, 'bound', 'logHigh'), E(hi, `Log(2e^(${P}n)) = ${cv(p)} + Log 2`, 'bound', 'simplify')],
       loLim: [E(`${p}/(${r}+${s}/n)`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
       hiLim: [E(`(${p}+ln(2)/n)/(${r}+${s}/n)`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
       blankLo: [`${P}n`], blankHi: ['ln(2)'], blankLim: [`${s}/n`],
@@ -90,13 +93,13 @@ function logData(rng) {
         bad: `${M(`ln(2e^(${P}n))`)}, car ${M(nq)} ≤ ${M(`e^(${P}n)`)}`,
       },
       hints: [
-        `Coince ce qui est dans le Log : e^(${cv(p)}) ≤ e^(${cv(p)}) + ${nq} ≤ 2e^(${cv(p)}), puis Log est croissant.`,
+        `Coince ce qui est dans le Log : e^(${cv(p)}) ≤ e^(${cv(p)}) + ${nqH} ≤ 2e^(${cv(p)}), puis Log est croissant.`,
         `${M(`ln(e^(${P}n))/(${den})`)} ≤ aₙ ≤ ${M(`ln(□×e^(${P}n))/(${den})`)}`,
         `${M(lo)} ≤ aₙ ≤ ${M(hi)} : les deux bornes tendent vers ${qh(L)}.`,
       ],
       choices: [
-        { id: 'logLow', label: `Retirer ${nq} dans le Log` },
-        { id: 'logHigh', label: `Majorer ${nq} par e^(${cv(p)}) dans le Log` },
+        { id: 'logLow', label: `Retirer ${nqH} dans le Log` },
+        { id: 'logHigh', label: `Majorer ${nqH} par e^(${cv(p)}) dans le Log` },
         { id: 'simplify', label: 'Simplifier Log(e^(…))' },
         { id: 'divide', label: 'Diviser le haut et le bas par n' },
         { id: 'limit', label: 'Passer à la limite' },
@@ -122,7 +125,7 @@ function trigData(rng) {
   return {
     kind: 'trig', name: 'a_n', nameH: 'aₙ', L, lo, hi, zero: `-${c}/(${den})`, gone: ['sin', 'cos'], T,
     start: `(${A}n+${c}${T}(n))/(${den})`,
-    loLines: [E(lo, `${T} n ≥ −1 (et ${lin(d, e).replace('-', '−')} > 0)`, 'bound', 'trig')],
+    loLines: [E(lo, `${T} n ≥ −1 (et ${coef(d)}n ${e < 0 ? '−' : '+'} ${Math.abs(e)} > 0)`, 'bound', 'trig')],
     hiLines: [E(hi, `${T} n ≤ 1`, 'bound', 'trig')],
     loLim: [E(`(${a}-${c}/n)/(${d}${eTxt})`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
     hiLim: [E(`(${a}+${c}/n)/(${d}${eTxt})`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],

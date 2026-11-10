@@ -8,7 +8,7 @@
 
 import { linesItem, mcq, tfItem } from './kit.js';
 import { modeOf, H, E, assemble, blanked, uniq } from './analyse1-c-kit.js';
-import { M, LIMN, EQN, q, qt, qh, cv, lin, coef, seqCounter } from './analyse1-g-kit.js';
+import { M, LIMN, EQN, q, qt, qh, cv, lin, coef, fr, seqCounter } from './analyse1-g-kit.js';
 
 const OI = 'a1-seq-1inf';
 const KEYS = ['calc', 'calcfn', 'seq'];
@@ -30,7 +30,7 @@ function dataA(rng) {
   const base = `(${lin(1, a)})/${nb}`;
   const cn = cv(c);
   return {
-    kind: 'a', start: `(${base})^(${cn})`, exp: `e^(${cn}×ln(${base}))`, K: q(c * D),
+    kind: 'a', start: `(${base})^${c === 1 ? 'n' : `(${cn})`}`, exp: `e^(${cn}×ln(${base}))`, K: q(c * D),
     eStart: `${cn}×ln(${base})`,
     eLines: [
       E(`${cn}×ln(1${sg(D)}/${nb})`, 'Faire apparaître 1 + h, avec h → 0', 'lim', 'oneh'),
@@ -38,7 +38,7 @@ function dataA(rng) {
       E(String(c * D), 'Limite de l\'exposant', 'lim', 'lim'),
     ],
     blankH: [`${Math.abs(D)}/${nb}`],
-    hints: [`Base → 1, exposant → ∞ : passe en e^(${cn}·Log(…)) et écris la base 1 + h.`, `${M(base)} = 1 + □/${M(nb)}`, `${M(`${cn}×ln(1${sg(D)}/${nb})`)} ~ ${M(`${cn}×(${D})/${nb}`)} → ${c * D}`],
+    hints: [`Base → 1, exposant → ∞ : passe en e^(${cn}·Log(…)) et écris la base 1 + h.`, `${M(base)} = 1 + □/${M(nb)}`, `${M(`${cn}×ln(1${sg(D)}/${nb})`)} ~ ${M(`${cn}×(${D})/${nb}`)} → ${fr(c * D)}`],
   };
 }
 
@@ -49,7 +49,7 @@ function dataB(rng) {
   const inner = `1+${p}/n${sg(qq)}/n^2`;
   const rn = cv(r);
   return {
-    kind: 'b', start: `(${inner})^(${rn})`, exp: `e^(${rn}×ln(${inner}))`, K: q(p * r),
+    kind: 'b', start: `(${inner})^${r === 1 ? 'n' : `(${rn})`}`, exp: `e^(${rn}×ln(${inner}))`, K: q(p * r),
     eStart: `${rn}×ln(${inner})`,
     eLines: [
       E(`${rn}×(${p}/n${sg(qq)}/n^2)`, 'Log(1 + h) = h + h·ε(h), h → 0', 'lim', 'equiv'),
@@ -70,7 +70,7 @@ function dataC(rng) {
     kind: 'c', start: `e^(${eStart})`, exp: null, K, eStart, dl2: true,
     eLines: [
       E(`n^2×(${p}/n-${p * p}/(2n^2))-${P}n`, 'Log(1 + h) = h − h²/2 + h²·ε(h) : l\'ordre 2 est nécessaire', 'lim', 'dl2'),
-      E(qt(K), 'Simplifier : il reste −p²/2', 'lim', 'lim'),
+      E(qt(K), 'Simplifier', 'lim', 'lim'),
     ],
     blankH: [`${p * p}/(2n^2)`],
     hints: [`À l'ordre 1, n²·(${p}/n) − ${cv(p)} = 0 ne dit rien : il faut Log(1 + h) = h − h²/2 + h²·ε(h).`, `${M(`n^2×(${p}/n-□)-${P}n`)}`, `${M(`n^2×(${p}/n-${p * p}/(2n^2))-${P}n`)} = ${qh(K)}`],
@@ -101,7 +101,7 @@ function dataE(rng) {
   const cn = cv(c);
   const K = q(a * c, b);
   return {
-    kind: 'e', start: `(${inner})^(${cn})`, exp: `e^(${cn}×ln(${inner}))`, K,
+    kind: 'e', start: `(${inner})^${c === 1 ? 'n' : `(${cn})`}`, exp: `e^(${cn}×ln(${inner}))`, K,
     eStart: `${cn}×ln(${inner})`,
     eLines: [
       E(`${cn}×(${a}+1/n)/(${b}n)`, 'Log(1 + h) = h + h·ε(h), h → 0', 'lim', 'equiv'),

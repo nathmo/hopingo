@@ -21,28 +21,31 @@ const SUB = [
 const FACT1 = { prompt: '(n + 1)!/n! =', ok: 'n + 1', bad: [{ label: 'n!', why: '(n + 1)! = (n + 1)·n! : le quotient vaut n + 1.' }, { label: '1', why: '(n + 1)! = (n + 1)·n! : il reste le facteur n + 1.' }] };
 const FACT2 = { prompt: '(2n + 2)!/(2n)! =', ok: '(2n + 2)(2n + 1)', bad: [{ label: '2n + 2', rule: 'a1_factorial_ratio', why: 'Entre (2n)! et (2n + 2)!, il y a deux facteurs : (2n + 1) et (2n + 2).' }, { label: '2', why: 'On ne simplifie pas les « n » d\'une factorielle : (2n + 2)! = (2n + 2)(2n + 1)·(2n)!.' }] };
 
+// Each template: aₙ, the ratio as first written, the ratio rearranged (la),
+// with the factorials simplified (lb), simplified (goal); its limit lines.
+// Numerators of several factors are in brackets: « / » binds tighter than
+// the product.
 function t1(rng) {
   const c = rng.int(2, 7);
   const p = rng.int(0, 3);
-  const np = (k) => (p === 0 ? '' : `${pw(p, k)}×`);
   const n1p = p === 0 ? '' : p === 1 ? '(n+1)' : `(n+1)^${p}`;
-  const a = `${np('n')}${c}^n/n!`;
-  const start = `(${n1p ? `${n1p}×` : ''}${c}^(n+1)/(n+1)!)/(${a})`;
-  const la = `${c}^(n+1)${n1p}×n!/((n+1)!×${c}^n${p ? `×${pw(p)}` : ''})`;
-  const lb = p === 0 ? `${c}/(n+1)` : `${c}${n1p}/((n+1)${pw(p)})`;
-  const goal = p === 0 ? `${c}/(n+1)` : p === 1 ? `${c}/n` : `${c}${p === 2 ? '(n+1)' : `(n+1)^${p - 1}`}/n^${p}`;
-  const lim = p >= 2 ? [E(`${c}${p === 2 ? '(1+1/n)' : `(1+1/n)^${p - 1}`}/n`, 'Diviser par la plus grande puissance', 'lim', 'divide'), E('0', 'Limite du rapport', 'lim', 'lim')] : [E('0', 'Limite du rapport', 'lim', 'lim')];
-  return { kind: 't1', a, start, la, lb, goal, lim, q: '0', verdict: '0', fact: FACT1, blank: p === 0 ? ['n+1'] : [`(n+1)${pw(p)}`], qWord: '0' };
+  const a = p === 0 ? `${c}^n/n!` : `(${pw(p)}×${c}^n)/n!`;
+  const a1 = p === 0 ? `${c}^(n+1)/(n+1)!` : `(${n1p}×${c}^(n+1))/(n+1)!`;
+  const la = `(${c}^(n+1)${n1p}×n!)/((n+1)!×${c}^n${p ? `×${pw(p)}` : ''})`;
+  const lb = p === 0 ? `${c}/(n+1)` : `(${c}${n1p})/((n+1)${pw(p)})`;
+  const goal = p === 0 ? `${c}/(n+1)` : p === 1 ? `${c}/n` : `(${c}${p === 2 ? '(n+1)' : `(n+1)^${p - 1}`})/n^${p}`;
+  const lim = p >= 2 ? [E(`(${c}${p === 2 ? '(1+1/n)' : `(1+1/n)^${p - 1}`})/n`, 'Diviser par la plus grande puissance', 'lim', 'divide'), E('0', 'Limite du rapport', 'lim', 'lim')] : [E('0', 'Limite du rapport', 'lim', 'lim')];
+  return { kind: 't1', a, start: `(${a1})/(${a})`, la, lb, goal, lim, q: '0', verdict: '0', fact: FACT1, blank: p === 0 ? ['n+1'] : [`(n+1)${pw(p)}`], qWord: '0' };
 }
 
 function t2(rng) {
   const c = rng.pick([2, 3, 5, 6, 7]);
-  const a = `${c}^n(n!)^2/(2n)!`;
-  const start = `(${c}^(n+1)((n+1)!)^2/(2n+2)!)/(${a})`;
+  const a = `(${c}^n(n!)^2)/(2n)!`;
   const L = q(c, 4);
   return {
-    kind: 't2', a, start, la: `${c}^(n+1)((n+1)!)^2(2n)!/((2n+2)!×${c}^n(n!)^2)`, lb: `${c}(n+1)^2/((2n+2)(2n+1))`, goal: `${c}(n+1)/(4n+2)`,
-    lim: [E(`${c}(1+1/n)/(4+2/n)`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Limite du rapport', 'lim', 'lim')],
+    kind: 't2', a, start: `((${c}^(n+1)((n+1)!)^2)/(2n+2)!)/(${a})`,
+    la: `(${c}^(n+1)((n+1)!)^2(2n)!)/((2n+2)!×${c}^n(n!)^2)`, lb: `(${c}(n+1)^2)/((2n+2)(2n+1))`, goal: `(${c}(n+1))/(4n+2)`,
+    lim: [E(`(${c}(1+1/n))/(4+2/n)`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Limite du rapport', 'lim', 'lim')],
     q: qt(L), qWord: qh(L), verdict: c < 4 ? '0' : '+∞', fact: FACT2, blank: ['(2n+2)(2n+1)'], two: true,
   };
 }
@@ -51,7 +54,7 @@ function t3(rng) {
   const c = rng.pick([2, 3]);
   const a = `${c}^(n^2)/(n!)^2`;
   return {
-    kind: 't3', a, start: `(${c}^((n+1)^2)/((n+1)!)^2)/(${a})`, la: `${c}^((n+1)^2)(n!)^2/(((n+1)!)^2×${c}^(n^2))`, lb: null,
+    kind: 't3', a, start: `(${c}^((n+1)^2)/((n+1)!)^2)/(${a})`, la: `(${c}^((n+1)^2)(n!)^2)/(((n+1)!)^2×${c}^(n^2))`, lb: null,
     goal: `${c}^(2n+1)/(n+1)^2`, lim: [E('+∞', 'Croissances comparées', 'lim', 'lim')], q: '+∞', qWord: '+∞', verdict: '+∞', fact: FACT1, blank: ['2n+1'], dom: [1, 8],
   };
 }
@@ -59,15 +62,14 @@ function t3(rng) {
 function t4(rng) {
   const c = rng.pick([1, 2, 3]);
   const C = coef(c);
-  const a = `${c === 1 ? '' : `${c}^n×`}n!/n^n`;
-  const cn1 = c === 1 ? '' : `${c}^(n+1)`;
-  const start = `(${cn1 ? `${cn1}×` : ''}(n+1)!/(n+1)^(n+1))/(${a})`;
-  const la = `${cn1}(n+1)!×n^n/((n+1)^(n+1)${c === 1 ? '' : `×${c}^n`}×n!)`;
-  const lb = `${C}(n+1)n^n/(n+1)^(n+1)`;
+  const a = c === 1 ? 'n!/n^n' : `(${c}^n×n!)/n^n`;
+  const a1 = c === 1 ? '(n+1)!/(n+1)^(n+1)' : `(${c}^(n+1)(n+1)!)/(n+1)^(n+1)`;
+  const la = `(${c === 1 ? '' : `${c}^(n+1)`}(n+1)!×n^n)/((n+1)^(n+1)${c === 1 ? '' : `×${c}^n`}×n!)`;
+  const lb = `(${C}(n+1)n^n)/(n+1)^(n+1)`;
   const goal = `${C}(n/(n+1))^n`;
   const qq = c === 1 ? 'e^(-1)' : `${c}/e`;
   return {
-    kind: 't4', a, start, la, lb, goal,
+    kind: 't4', a, start: `(${a1})/(${a})`, la, lb, goal,
     lim: [E(`${c}/(1+1/n)^n`, '(n/(n + 1))ⁿ = 1/(1 + 1/n)ⁿ', 'lim', 'divide'), E(qq, '(1 + 1/n)ⁿ → e', 'lim', 'lim')],
     q: qq, qWord: c === 1 ? '1/e' : `${c}/e`, verdict: c < 3 ? '0' : '+∞', fact: FACT1, blank: ['(n+1)^(n+1)'],
   };
@@ -77,8 +79,8 @@ function t5(rng) {
   const c = rng.int(2, 5);
   const a = `(2n)!/${c}^(n^2)`;
   return {
-    kind: 't5', a, start: `((2n+2)!/${c}^((n+1)^2))/(${a})`, la: `(2n+2)!×${c}^(n^2)/(${c}^((n+1)^2)(2n)!)`, lb: null,
-    goal: `(2n+2)(2n+1)/${c}^(2n+1)`, lim: [E('0', 'Croissances comparées : l\'exponentielle l\'emporte', 'lim', 'lim')], q: '0', qWord: '0', verdict: '0', fact: FACT2, blank: ['(2n+2)(2n+1)'], two: true,
+    kind: 't5', a, start: `((2n+2)!/${c}^((n+1)^2))/(${a})`, la: `((2n+2)!×${c}^(n^2))/(${c}^((n+1)^2)(2n)!)`, lb: null,
+    goal: `((2n+2)(2n+1))/${c}^(2n+1)`, lim: [E('0', 'Croissances comparées : l\'exponentielle l\'emporte', 'lim', 'lim')], q: '0', qWord: '0', verdict: '0', fact: FACT2, blank: ['(2n+2)(2n+1)'], two: true,
   };
 }
 

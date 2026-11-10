@@ -26,8 +26,8 @@ function dataA(rng) {
   const p = rng.int(1, 5);
   const qq = rng.int(1, 4);
   const r = rng.int(1, 4);
-  const P = coef(p);
-  const a = `(-1)^n×${P}n/(n+${qq})+${r}/n`;
+  const a = `(-1)^n×${p === 1 ? 'n' : `(${p}n)`}/(n+${qq})+${r}/n`;
+  const W = (t) => (p === 1 ? t : `(${p}${t})`);
   // The sup of the terms (exact): attained at a small even n when it
   // clearly exceeds p.
   let sup = null;
@@ -40,12 +40,12 @@ function dataA(rng) {
     kind: 'a', a, split: 2, hi: String(p), lo: String(-p), hiH: String(p), loH: fr(-p), sup: supOk ? qt(sup) : null, supH: supOk ? qh(sup) : null,
     subs: [
       {
-        name: 'a₂ₘ', raw: `(-1)^(2m)×${P}(2m)/(2m+${qq})+${r}/(2m)`, simp: `${2 * p}m/(2m+${qq})+${r}/(2m)`,
+        name: 'a₂ₘ', raw: `(-1)^(2m)×${W('(2m)')}/(2m+${qq})+${r}/(2m)`, simp: `(${2 * p}m)/(2m+${qq})+${r}/(2m)`,
         lim: [E(`${2 * p}/(2+${qq}/m)+${r}/(2m)`, 'Diviser par m', 'lim', 'divide'), E(String(p), 'Limite', 'lim', 'lim')], L: String(p), blank: [`${qq}/m`],
       },
       {
-        name: 'a₂ₘ₊₁', raw: `(-1)^(2m+1)×${P}(2m+1)/(2m+1+${qq})+${r}/(2m+1)`, simp: `-${P}(2m+1)/(2m+${qq + 1})+${r}/(2m+1)`,
-        lim: [E(`-${P}(2+1/m)/(2+${qq + 1}/m)+${r}/(2m+1)`, 'Diviser par m', 'lim', 'divide'), E(String(-p), 'Limite', 'lim', 'lim')], L: String(-p), blank: [`${qq + 1}/m`],
+        name: 'a₂ₘ₊₁', raw: `(-1)^(2m+1)×${W('(2m+1)')}/(2m+1+${qq})+${r}/(2m+1)`, simp: `-${W('(2m+1)')}/(2m+${qq + 1})+${r}/(2m+1)`,
+        lim: [E(`-${W('(2+1/m)')}/(2+${qq + 1}/m)+${r}/(2m+1)`, 'Diviser par m', 'lim', 'divide'), E(String(-p), 'Limite', 'lim', 'lim')], L: String(-p), blank: [`${qq + 1}/m`],
       },
     ],
     hints: ['(−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément.', `a₂ₘ → □, a₂ₘ₊₁ → □`, `lim sup aₙ = ${p}, lim inf aₙ = ${fr(-p)}`],
@@ -57,7 +57,7 @@ function dataB(rng) {
   const c = rng.pick([2, 3, 5, 6, 7]);
   const k = rng.pick([1, 2, 3]);
   return {
-    kind: 'b', def: `aₙ = ${M(`${c}^(1/n)`)} si n est pair, aₙ = ${M(`1/n^${k}`)} si n est impair`, split: 2,
+    kind: 'b', def: `aₙ = ${M(`${c}^(1/n)`)} si n est pair, aₙ = ${M(k === 1 ? '1/n' : `1/n^${k}`)} si n est impair`, split: 2,
     hi: '1', lo: '0', hiH: '1', loH: '0', sup: `√${c}`, supH: `√${c}`,
     subs: [
       { name: 'a₂ₘ', raw: null, simp: `${c}^(1/(2m))`, lim: [E(`e^(ln(${c})/(2m))`, 'Écrire en exponentielle', 'lim', 'expo'), E('1', 'Limite', 'lim', 'lim')], L: '1', blank: [`ln(${c})`] },
