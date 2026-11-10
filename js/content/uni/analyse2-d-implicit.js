@@ -17,6 +17,8 @@
 //   solve     g_uu (`value`; cfg.imp.wrong2 feeds a2_implicit_second_const)
 
 import { Q } from '../../math/rational.js';
+import { parse } from '../../cas/parse.js';
+import { toReadable } from '../../cas/print.js';
 import { MT, linesItem, mcq, tfItem, examTag } from './kit.js';
 import { modeOf, H, E, blanked, partsScript, fr, A2_KEYS } from './a2-kit.js';
 
@@ -59,6 +61,7 @@ export function valueAt(ts, env) {
   return s;
 }
 
+const RD = (text) => toReadable(parse(text, { vars: VARS }));
 const qText = (x) => { const v = Q.of(x); return v.d === 1 ? String(v.n) : `${v.n}/${v.d}`; };
 const qPar = (x) => { const v = Q.of(x); return v.n >= 0 && v.d === 1 ? String(v.n) : `(${qText(v)})`; };
 const deg = (t) => t.e[0] + t.e[1] + t.e[2] + t.ex;
@@ -233,7 +236,7 @@ function implicitParts(d, level, names, { g1Label, g2Label, g2Start, sub = [] })
   });
   if (level >= 2) {
     parts.push({
-      html: `Dérive l'identité F_${u} + F_${w}·p = 0 par rapport à ${u}, avec ${w} = g(…), p = ${g1Label.replace(/\(.*$/, '')} et q = ${g2Label.replace(/\(.*$/, '')} (d(…) est la dérivée totale, y′ = p) :`,
+      html: `Dérive l'identité F_${u} + F_${w}·p = 0 par rapport à ${u}, en se souvenant que ${w} = g(…) dépend de ${u} ; on note p = ${g1Label.replace(/\(.*$/, '')} et q = ${g2Label.replace(/\(.*$/, '')} :`,
       ask: '0 =', start: idStart, judge: idJudge(d), lines: [E(idLine, `F_${u}${u} + 2F_${u}${w}·p + F_${w}${w}·p² + F_${w}·q`, 'second-id', 'derive')],
     });
     parts.push({
@@ -259,7 +262,8 @@ function guide(parts, level) {
 }
 // The first k whole numbers (coefficients) of a line left blank.
 function blankFirstNumbers(l, k) {
-  const nums = (l.math.match(/\d+/g) || []).filter((s, i, a) => a.indexOf(s) === i).slice(0, k);
+  const exps = new Set((l.math.match(/\^\d+/g) || []).map((x) => x.slice(1)));
+  const nums = (l.math.match(/\d+/g) || []).filter((x, i, a) => a.indexOf(x) === i && !exps.has(x)).slice(0, k);
   return nums.length ? blanked(l, nums, { vars: VARS }) : l;
 }
 
@@ -441,7 +445,7 @@ function i3Lines(level, rng, opts, d) {
   // F_u(p) and F_v(p) (partials), then g_v after g_u.
   const partial = (n, ts, val) => ({
     html: `F_${n}${P} :`, ask: `F_${n}${P} =`, start: `F_${n}`, judge: valueJ(val),
-    lines: [...(literal(atText(ts, d.pt)) ? [] : [E(atText(ts, d.pt), `F_${n} = ${polyText(ts)}`, 'partials', 'partial')]), E(qText(val), 'Calculer', 'partials', 'partial')],
+    lines: [...(literal(atText(ts, d.pt)) ? [] : [E(atText(ts, d.pt), `F_${n} = ${RD(polyText(ts))}`, 'partials', 'partial')]), E(qText(val), 'Calculer', 'partials', 'partial')],
   });
   const sub = level >= 2 ? [partial(u, d.Fu, d.FuV), partial(v, d.Fv, d.FvV)] : [];
   const { parts, idText, subst } = implicitParts(d, level, names, { g1Label, g2Label: `g_${u}${u}(${others})`, sub });

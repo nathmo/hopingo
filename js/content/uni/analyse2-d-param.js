@@ -14,10 +14,10 @@
 // cfg.leib = {noInt, sign, inner} names a wrong final line (rules/a2d.js).
 
 import { parse } from '../../cas/parse.js';
-import { toText } from '../../cas/print.js';
+import { toReadable } from '../../cas/print.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { MT, linesItem, mcq, tfItem, examTag } from './kit.js';
-import { modeOf, H, E, blanked, partsScript, fr, A2_KEYS } from './a2-kit.js';
+import { modeOf, H, E, blanked, partsScript, fr, sup, A2_KEYS } from './a2-kit.js';
 import { problemItem } from './kit-problem.js';
 
 const K = { vars: ['x', 't'] };
@@ -175,7 +175,7 @@ function piFeynman(level, rng, opts) {
   const form = rng.pick(['a', 'a', 'b']);
   const k = rng.pick([1, 2, 3]);
   const at = k === 1 ? 't' : `${k}t`;
-  const f = form === 'a' ? `(x^${k === 1 ? 't' : `(${at})`}-1)/ln(x)` : `(x^t-x^${k})/ln(x)`;
+  const f = form === 'a' ? `(x^${k === 1 ? 't' : `(${at})`}-1)/ln(x)` : `(x^t-x${k === 1 ? '' : `^${k}`})/ln(x)`;
   const t0 = form === 'a' ? '0' : String(k);
   const df = form === 'a' ? (k === 1 ? 'x^t' : `${k}x^(${k}t)`) : 'x^t';
   const prim = form === 'a' ? `${k === 1 ? '' : k}x^(${at}+1)/(${at}+1)` : 'x^(t+1)/(t+1)';
@@ -206,7 +206,9 @@ function piFeynman(level, rng, opts) {
 }
 
 function piMcq(rng, level, opts) {
-  const d = piData(rng);
+  // A draw where ∂f/∂x differs from ∂f/∂t (the trap's option exists).
+  let d = piData(rng);
+  for (let i = 0; i < 20 && !d.wv; i++) d = piData(rng);
   const options = distinctOptions([
     { text: d.Fp, correct: true },
     { text: d.wv, rule: 'a2_leibniz_wrong_var' },
@@ -349,8 +351,8 @@ const E4 = () => pbOf(PHI[2], BOUNDS[2]);
 
 const bJudge = (goal, d, leib = false) => ({ kind: 'equiv', vars: ['t'], domain: { t: [0.3, 2] }, target: 'no-int', goal, ...(leib ? { leib: d.leib } : {}) });
 const hypB = (d) => ({
-  kind: 'decision', prompt: 'Peut-on appliquer la règle de Leibniz pour t ∈ [1/2 ; 2] ?', options: [
-    { id: 'yes', label: `Oui : f(x, t) = ${fr(toText(parse(d.f, K)))} et ∂f/∂t sont continues pour x > 0, et les bornes sont dérivables et > 0`, valid: true, ref: true },
+  kind: 'decision', prompt: 'Peut-on appliquer la règle de Leibniz pour t > 0 ?', options: [
+    { id: 'yes', label: `Oui : f(x, t) = ${toReadable(parse(d.f, K))} et ∂f/∂t sont continues pour x > 0, et les bornes sont dérivables et > 0`, valid: true, ref: true },
     { id: 'no', label: 'Non : les bornes dépendent de t', valid: false, why: 'Des bornes dérivables sont permises : elles donnent les deux termes de bord.' },
   ],
 });
@@ -363,16 +365,16 @@ function pbParts(d, level, { value = null } = {}) {
     lines: [E(d.formula, 'f(b, t)·b′ − f(a, t)·a′ + ∫ ∂f/∂t dx', 'leibniz', 'formula')],
   };
   const upper = {
-    html: `Borne du haut : f(${fr(bd.b)}, t)·(${fr(bd.b)})′ =`, ask: '=', start: d.upRaw, judge: bJudge(d.up, d),
+    html: `Borne du haut : f(${sup(bd.b)}, t)·(${sup(bd.b)})′ =`, ask: '=', start: d.upRaw, judge: bJudge(d.up, d),
     lines: [E(d.up, 'Simplifier', 'upper', 'upper')],
   };
   const lower = {
-    html: `Borne du bas : f(${fr(bd.a)}, t)·(${fr(bd.a)})′ =`, ask: '=', start: d.lowRaw, judge: bJudge(d.low, d),
+    html: `Borne du bas : f(${sup(bd.a)}, t)·(${sup(bd.a)})′ =`, ask: '=', start: d.lowRaw, judge: bJudge(d.low, d),
     lines: [E(d.low, 'Simplifier', 'lower', 'lower')],
   };
   const inner = {
-    html: `Intégrale : ∫ de ${fr(bd.a)} à ${fr(bd.b)} de ∂f/∂t dx =`, ask: '=', start: d.innerInt, judge: bJudge(d.inner, d),
-    lines: [E(d.innerDf, `∂f/∂t = ${fr(toText(parse(d.p.df, K)))}`, 'inner', 'inner'), E(d.innerB, 'Primitive en x', 'inner', 'prim'), E(d.inner, 'Évaluer entre les bornes', 'inner', 'prim')],
+    html: `Intégrale : ∫ de ${sup(bd.a)} à ${sup(bd.b)} de ∂f/∂t dx =`, ask: '=', start: d.innerInt, judge: bJudge(d.inner, d),
+    lines: [E(d.innerDf, `∂f/∂t = ${toReadable(parse(d.p.df, K))}`, 'inner', 'inner'), E(d.innerB, 'Primitive en x', 'inner', 'prim'), E(d.inner, 'Évaluer entre les bornes', 'inner', 'prim')],
   };
   const sum = {
     html: 'Somme des trois termes (le terme du bas est retranché) :', ask: 'F′(t) =', start: `${d.up}-${d.low}+${d.inner}`, judge: bJudge(d.final, d, true),
@@ -415,9 +417,9 @@ function pbLines(level, rng, opts) {
   const { start, judge, script } = partsScript(parts, level, PB_CHOICES);
   return linesItem({
     skill: PB, level, mode: modeOf(level), start, judge, script,
-    prompt: `F(t) = ${M(d.I)} pour t ∈ [1/2 ; 2]. Calcule F′(t) par la règle de Leibniz${level === 1 ? ' : F′(t) = f(b(t), t)·b′(t) − f(a(t), t)·a′(t) + ∫ ∂f/∂t dx' : ''}.`,
+    prompt: `F(t) = ${M(d.I)} pour t > 0. Calcule F′(t) par la règle de Leibniz${level === 1 ? ' : F′(t) = f(b(t), t)·b′(t) − f(a(t), t)·a′(t) + ∫ ∂f/∂t dx' : ''}.`,
     hints: H('Trois termes : borne du haut, borne du bas (retranchée), et l\'intégrale de la dérivée en t.',
-      `Borne du haut : f(${fr(bd.b)}, t)·(${fr(bd.b)})′ = ${M(d.upRaw)} ; ∂f/∂t = ${M(d.p.df)}.`,
+      `Borne du haut : f(${sup(bd.b)}, t)·(${sup(bd.b)})′ = ${M(d.upRaw)} ; ∂f/∂t = ${M(d.p.df)}.`,
       `F′(t) = ${M(d.formula)}`),
     subgoals: PB_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, declares: K,
     key: `${PB}:${level}:${d.I}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -469,7 +471,7 @@ function pbCoef(rng, opts) {
   const item = linesItem({
     skill: PB, level: 4, mode: 'free', prompt: `Soit F(t) = ${M(d.I)} pour t > 0. F′(${t0}) vaut :`,
     start: "F'", judge: { kind: 'value', expect: value, form: 'closed' },
-    script: [E(value, `F′(t) = ${fr(toText(parse(d.final, KT)))}`, 'collect', 'value')],
+    script: [E(value, `F′(t) = ${toReadable(parse(d.final, KT))}`, 'collect', 'value')],
     hints: [], noHints: true, subgoals: PB_SUB, keys: KEYS,
     key: `${PB}:coef:${d.I}:${t0}`, exam: { format: 'coef', points: 1 }, fallback: !!d.fallback, expectedSec: 240,
     baits: ['a2_leibniz_no_integral', 'a2_leibniz_sign'],
