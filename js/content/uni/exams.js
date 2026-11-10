@@ -40,3 +40,9 @@ export const EXAMS = [
 ];
 
 export const EXAM_BY_ID = Object.fromEntries(EXAMS.map((e) => [e.id, e]));
+
+// Step U7: probability and statistics, both courses (MATH-234 and EE-209).
+import { EXAM_PROBA, EXAM_STAT } from './exams-proba.js';
+
+EXAMS.push(EXAM_PROBA, EXAM_STAT);
+Object.assign(EXAM_BY_ID, { [EXAM_PROBA.id]: EXAM_PROBA, [EXAM_STAT.id]: EXAM_STAT });

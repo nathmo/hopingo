@@ -297,11 +297,12 @@ export function phiAccepted(z) {
 
 // Table 2 (MATH-234): Φ⁻¹(p), with as many decimals as p has (0,95 → 1,64 ;
 // 0,975 → 1,960 ; 0,9935 → 2,4838 ; 0,99901 → 3,09322).
+// p may be a text, to keep its trailing zeros (« 0.990 » → 3 decimals).
 export function phiInvTable(p) {
-  const s = String(p);
+  const s = String(p).replace(',', '.');
   const dec = s.includes('.') ? s.split('.')[1].length : 0;
   const d = Math.max(2, dec);
-  return roundTo(PhiInv(p), d);
+  return roundTo(PhiInv(Number(s)), d);
 }
 
 // Table 3 (MATH-234): s_α of Student, α = 5, 1, 0,1 (two-sided, in %).

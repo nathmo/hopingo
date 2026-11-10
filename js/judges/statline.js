@@ -288,7 +288,13 @@ export function expected(cfg, state) {
   const text = String(cfg.expect);
   let ast = expectCache.get(text);
   if (!ast) {
-    ast = readMember({ vars: [] }, text, { items: [], blanks: 0 });
+    try {
+      ast = readMember({ vars: [] }, text, { items: [], blanks: 0 });
+    } catch {
+      // A decimal too long for an exact rational (0,123456789012345678): a float.
+      const x = Number(text.replace(',', '.'));
+      return Number.isFinite(x) ? { q: null, x } : null;
+    }
     if (expectCache.size > 2000) expectCache.clear();
     expectCache.set(text, ast);
   }
