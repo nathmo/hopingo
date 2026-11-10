@@ -968,6 +968,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-deriv-usual` — Dérivées usuelles
 - **Année** 12 · **Prérequis** `g2-real-powers`, `g3-radians` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g3-radians` : sin′ = cos seulement en radians.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Le niveau 2 demande « Quelle règle ? » par une décision (le mode guidé ne pose pas les lignes d'auto-explication). Le niveau 5 est une série de six dérivées, une partie par fonction, sans chronomètre ; arcsin n'est pas tiré.
 - **Intro** : la table : (xⁿ)′ = nxⁿ⁻¹ (n réel), (√x)′ = 1/(2√x), (1/x)′ = −1/x², (eˣ)′ = eˣ, (aˣ)′ = aˣ·ln a, (ln x)′ = 1/x, sin′ = cos, cos′ = −sin, tan′ = 1 + tan² = 1/cos², arctan′ = 1/(1 + x²), arcsin′ = 1/√(1 − x²), sinh′ = cosh, cosh′ = sinh. La dérivée d'une somme est la somme des dérivées, et les constantes sortent.
 - **Juge** : `equiv` `{vars:['x'], domain:{x:[0.2, 3]}, target:'no-prime'}` · **Forme finale** : plus de `′` ni de `d(…)` ; puissances négatives ou racines acceptées.
 - **Niveaux** :
@@ -1018,6 +1019,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 
 ### `g6-tangent` — Tangente et approximation linéaire
 - **Année** 12 · **Prérequis** `g6-deriv-rules`, `g4-line2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Pas encore de juge `geom` : la tangente est une partie « y = » jugée par `equiv` (y vaut la bonne droite), forme finale y = mx + p développée. Le niveau 5 enchaîne la tangente et f(a ± 0,1) approché par elle, au lieu de g∘f ; l'approximation du gabarit 3 porte sur √x seulement.
 - **Intro** : la tangente au graphe de f en a est y = f(a) + f′(a)(x − a). L'approximation linéaire de f(a + h) est f(a) + f′(a)·h. On calcule f(a) et f′(a) **en a**, puis on écrit la droite.
 - **Juge** : segments `value` pour f(a), f′(a) ; `geom` `{object:'line2'}` pour la tangente ; `value` pour l'approximation · **Forme finale** : y = mx + p (ou cartésienne), ou la valeur approchée exacte.
 - **Niveaux** :
@@ -1044,6 +1046,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-limits` — Limites de fonctions pour l'étude de fonction
 - **Année** 12.5 · **Prérequis** `@alg:G-simplifier`, `g1-domain` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g1-domain` : les bornes du domaine donnent les limites à étudier.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Le V/F est un QCM Vrai/Faux (aucun vérificateur de contre-exemple ne prend une limite). Un pôle commence par la valeur du numérateur, puis une partie par côté ; « n'existe pas » n'est pas demandé. Le niveau 5 prend un pôle simple ou double d'une fraction de degré 1 ou 2.
 - **Intro** : compétence ajoutée pour la progression (le plan n'a pas de ligne « limites » en G). En ±∞ : on met en évidence le terme dominant. En un zéro du dénominateur : numérateur ≠ 0 donne ±∞, avec le signe à gauche et à droite. Forme ∞ − ∞ avec une racine : on multiplie par l'expression conjuguée. Bernoulli-l'Hôpital et les DL sont en A1.
 - **Juge** : `limit` `{v:'x', to, dir}` · **Forme finale** : nombre, `+∞`, `−∞`, ou « n'existe pas » (avec les deux limites latérales).
 - **Niveaux** :
@@ -1069,6 +1072,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-sign-variation` — Signe de f′, tableau de variation, extrema locaux
 - **Année** 12 · **Prérequis** `g6-deriv-rules`, `g1-sign-table` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g6-deriv-rules` : calculer f′.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Niveau 1 : le tableau de signes de f′ (item `table`), puis la valeur aux points critiques ; la ligne de variation (↗↘) n'est pas dans le tableau, et le niveau 4 est en lignes libres. Le V/F est un QCM Vrai/Faux (pas de contre-exemple de type fonction). Gabarit 3 : (x² + m²)/x seulement.
 - **Intro** : on factorise f′, on fait son tableau de signes, et on lit la variation. Un extremum local en a demande que f′ **change de signe** en a (f′(a) = 0 ne suffit pas : x³ en 0).
 - **Juge** : `equiv` pour f′ factorisée ; `solset` `{v:'x'}` pour {f′ > 0} ; `value` pour les extrema (x, f(x)) ; décisions « max », « min », « ni l'un ni l'autre » · **Forme finale** : liste des extrema avec leur nature, intervalles de croissance.
 - **Niveaux** :
@@ -1094,6 +1098,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-convexity` — Concavité et points d'inflexion
 - **Année** 12 · **Prérequis** `g6-sign-variation`, `g6-tangent` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g6-sign-variation` : même tableau de signes, appliqué à f″.
+- **Statut** : fait le 10 novembre 2026 (étape U2). La tangente d'inflexion est une partie « y = » jugée par `equiv`. Le V/F est un QCM Vrai/Faux. Le QCM prend x⁵ − 5x⁴ + … (inflexion en 3 seulement) ou un zéro double de f″.
 - **Intro** : f″ > 0 : convexe (le graphe est au-dessus de ses tangentes). f″ < 0 : concave. Un point d'inflexion est un point où **la concavité change** : f″ change de signe (f″(a) = 0 ne suffit pas : x⁴ en 0). La tangente d'inflexion traverse le graphe.
 - **Juge** : `equiv` pour f″ ; `solset` pour {f″ > 0} ; `value` pour le point d'inflexion ; `geom` `{object:'line2'}` pour la tangente d'inflexion · **Forme finale** : intervalles de convexité, points d'inflexion, tangente demandée.
 - **Niveaux** :
@@ -1119,6 +1124,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-optim` — Optimisation
 - **Année** 12 · **Prérequis** `g6-sign-variation`, `g1-domain` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g1-domain` : domaine de la variable (contraintes physiques).
+- **Statut** : fait le 10 novembre 2026 (étape U2). Gabarits : boîte, rectangle sous la parabole y = 3k² − x², enclos le long d'un mur (pas de cylindre ni de demi-cercle : leurs optimums sont irrationnels). Le niveau 5 et la variante `open` sont des items `lines` sans aide (le type `problem` arrive en U4).
 - **Intro** : 1. Nommer la variable et son domaine (contraintes physiques). 2. Écrire la grandeur à optimiser en fonction d'**une seule** variable. 3. Dériver, chercher les zéros **dans le domaine**. 4. Justifier le maximum (tableau, ou bornes du domaine). 5. Répondre à la question posée (souvent une longueur, pas la valeur optimale).
 - **Juge** : segments `equiv` pour V(x) et V′(x) ; `solset` pour le domaine ; `value` pour x* et V(x*) · **Forme finale** : la réponse à la question, avec la justification du maximum (décision).
 - **Niveaux** :

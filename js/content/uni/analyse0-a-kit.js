@@ -117,6 +117,8 @@ export const evalPoly = (cs, x) => cs.reduce((acc, c) => acc.mul(Q.of(x)).add(Q.
 export const lin = (r, v = V) => { const R = Q.of(r); return R.n === 0 ? v : R.n < 0 ? `${v}+${N(R.neg())}` : `${v}-${N(R)}`; };
 // k·Π(x − r)^m written factored: 3(x+1)(x-3), -4x^2(x-3), 12(x-1)^2.
 export function factoredText(k, roots, v = V) {
+  // A lone x comes first: 4x²(x − 3), not 4(x − 3)x².
+  roots = [...roots].sort((u, w) => (Q.of(u[0]).n === 0 ? -1 : 0) - (Q.of(w[0]).n === 0 ? -1 : 0));
   const fs = roots.map(([r, m]) => {
     const b = lin(r, v);
     const base = Q.of(r).n === 0 ? b : `(${b})`;
@@ -135,3 +137,36 @@ export function at(text, x, v = V) {
   return toText(mapNode(node, (n) => (n.t === 'bin' && n.op === '×' ? { ...n, implicit: undefined } : n)));
 }
 export const valueAt = (text, x) => exactValue(parse(at(text, x)));
+
+// A coefficient in front of a term: '', '-', 3, -(1/2).
+export const pre = (k) => { const K = Q.of(k); return K.eq(1) ? '' : K.eq(-1) ? '-' : K.d === 1 ? N(K) : `${K.n < 0 ? '-' : ''}(${N(K.n < 0 ? K.neg() : K)})`; };
+// k/x^j and k/√x… : a number over something, sign in front.
+export const over = (k, den) => { const K = Q.of(k); return `${K.n < 0 ? '-' : ''}${N(K.n < 0 ? K.neg() : K)}/${den}`; };
+
+// ---------- tangents ----------
+
+// y = f(a) + f′(a)(x − a) as text, and its expanded form y = mx + p.
+export function tangentText(fa, dfa, a) {
+  const slope = Q.of(a).n === 0 ? `${pre(dfa)}x` : `${pre(dfa)}(${lin(a)})`;
+  return joinSum([Q.of(fa).n ? N(fa) : '', slope]);
+}
+export const tangentFinal = (fa, dfa, a) => polyText([dfa, Q.of(fa).sub(Q.of(dfa).mul(a))]);
+
+// The part « y = »: the letter y stands for the tangent (any writing of
+// it is right, the final one is expanded); cfg.tangent feeds the trap
+// g6_tangent_slope_function. d = {fa, dfa, a, df (f′(x) as text), dom}.
+export function tangentCfg(d) {
+  return {
+    kind: 'equiv', vars: [V, 'y'], subst: { y: tangentText(d.fa, d.dfa, d.a) }, domain: { x: d.dom }, target: 'expanded',
+    tangent: { fa: N(d.fa), dfx: d.df, dfa: N(d.dfa), a: N(d.a) },
+  };
+}
+
+// The lines of « y = »: the formula, then y = mx + p; the formula alone
+// when it is already expanded (a = 0 or f(a) = 0).
+export function tangentLines(fa, dfa, a, subgoal, word = 'f') {
+  const fin = tangentFinal(fa, dfa, a);
+  const rule = `y = ${word}(a) + ${word}′(a)(x − a)`;
+  if (Q.of(a).n === 0 || Q.of(fa).n === 0) return [E(fin, rule, subgoal, 'line')];
+  return [E(tangentText(fa, dfa, a), rule, subgoal, 'line'), E(fin, 'Développer', subgoal, 'expand')];
+}

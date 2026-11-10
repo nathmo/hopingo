@@ -23,12 +23,12 @@ import { templateOf } from '../../judges/lines.js';
 import { MT, linesItem, mcq, tfItem, answerItem } from './kit.js';
 import {
   V, q, N, nz, modeOf, H, E, NOTE, examOf, fr, blanked, partsItem, stepMenus, fromRoots, polyText, dPoly, evalPoly, joinSum, at, valueAt, lin,
+  pre, over, tangentText, tangentFinal, tangentCfg,
 } from './analyse0-a-kit.js';
 import { GEN as STUDY } from './analyse0-a-study.js';
 
 const KEYS = ['calcx', 'calcfn'];
 const LKEYS = ['calcx', 'calcfn', 'anal'];
-const pre = (k) => { const K = Q.of(k); return K.eq(1) ? '' : K.eq(-1) ? '-' : K.d === 1 ? N(K) : `${K.n < 0 ? '-' : ''}(${N(K.n < 0 ? K.neg() : K)})`; };
 const tmpl = (line) => MT(line.blanks?.length ? templateOf(line) : line.math);
 
 // ======================================================================
@@ -49,8 +49,6 @@ function powForm(k, m) {
   if (M.d === 1 && M.n > 0) return `${pre(k)}${M.n === 1 ? 'x' : `x^${M.n}`}`;
   return `${pre(k)}x^(${N(M)})`;
 }
-// k/x^j and k/√x… : a number over something, sign in front.
-const over = (k, den) => { const K = Q.of(k); return `${K.n < 0 ? '-' : ''}${N(K.n < 0 ? K.neg() : K)}/${den}`; };
 // c·x^m written nicely: 3x^2, -5/x^2, 3/√x, (3/2)√x, -1/(x√x).
 function niceForm(k, m) {
   const M = Q.of(m);
@@ -188,7 +186,8 @@ function duItem(level, rng, opts = {}) {
   // Template 3 (level 4): f′(a) at a point where the value is exact.
   let prompt = rng.pick([`Dérive f(x) = ${MT(f)}.`, `Calcule f′(x) pour f(x) = ${MT(f)}, à l'aide de la table.`]);
   if (level === 4 && rng.chance(0.4)) {
-    const a = [4, 1, 0].find((x) => ts.every((t) => (t.kind === 'two' ? false : t.kind === 'pow' ? x > 0 : t.kind === 'ln' ? x > 0 : true)) && valueAt(final, x));
+    const nice = (v) => v && Math.abs(v.n) <= 300 && v.d <= 16;
+    const a = rng.shuffle([4, 1, 1, 0]).find((x) => ts.every((t) => (t.kind === 'two' ? false : t.kind === 'pow' || t.kind === 'ln' ? x > 0 : true)) && nice(valueAt(final, x)));
     if (a !== undefined) {
       script.push({ kind: 'segment', html: `Calcule f′(${a}).`, ask: `f′(${a}) =`, start: { math: at(final, a) }, judge: { kind: 'value', form: 'irreducible' } },
         E(N(valueAt(final, a)), `f′(${a})`, 'value'));
@@ -342,19 +341,6 @@ function tgFunction(rng, family) {
   }
 }
 
-// y = f(a) + f′(a)(x − a) as text, and its expanded form.
-function tangentText(fa, dfa, a) {
-  const slope = Q.of(a).n === 0 ? `${pre(dfa)}x` : `${pre(dfa)}(${lin(a)})`;
-  return joinSum([Q.of(fa).n ? N(fa) : '', slope]);
-}
-const tangentFinal = (fa, dfa, a) => polyText([dfa, Q.of(fa).sub(Q.of(dfa).mul(a))]);
-
-function tangentCfg(d) {
-  return {
-    kind: 'equiv', vars: [V, 'y'], subst: { y: tangentText(d.fa, d.dfa, d.a) }, domain: { x: d.dom }, target: 'expanded',
-    tangent: { fa: N(d.fa), dfx: d.df, dfa: N(d.dfa), a: N(d.a) },
-  };
-}
 const derivCfg = (dom) => ({ kind: 'equiv', vars: [V], dvar: V, target: 'no-prime', domain: { x: dom } });
 
 const TG_CHOICES = [
