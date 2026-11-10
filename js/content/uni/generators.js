@@ -27,3 +27,9 @@ import { GEN as ANALYSE1_E } from './analyse1-e.js';
 
 Object.assign(UNI_GEN, ANALYSE0_A, ANALYSE0_B, ANALYSE0_C, ANALYSE1_A, ANALYSE1_B, ANALYSE1_C, ANALYSE1_D, ANALYSE1_E);
 Object.assign(UNI_GEN, ALGLIN); // step U3
+
+// Step U5: modules G4 and G10.
+import { GEN as GEOAN } from './geoan.js';
+import { GEN as CONIQUES } from './coniques.js';
+
+Object.assign(UNI_GEN, GEOAN, CONIQUES);

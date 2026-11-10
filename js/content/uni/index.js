@@ -17,9 +17,12 @@ import * as recurrence from './recurrence.skills.js';
 import * as fonctionsg from './fonctions-g.skills.js';
 import * as analyse1 from './analyse1.skills.js';
 import * as alglin from './alglin.skills.js';
+import * as geoan from './geoan.skills.js';
+import * as coniques from './coniques.skills.js';
 
 const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence, fonctionsg, analyse1];
 MODULES.push(alglin); // step U3
+MODULES.push(geoan, coniques); // step U5
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -27,10 +30,6 @@ export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
 export const UNBUILT = {
   // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
   'g8-algebraic': ['lit-identities'],
-  // Step U2: module G4 (step U5) for g6-tangent: g4-line2 ← g4-vectors,
-  // @alg:L-affine = fn-affine, @alg:E-systemes-2x2 = eq-systems.
-  'g4-line2': ['g4-vectors', 'fn-affine', 'eq-systems'],
-  'g4-vectors': ['eq-systems'],
   // Step U2: the A1 skills of step U4 that the derivatives, DL and
   // integrals need. @alg:G-simplifier = rat-simplify.
   'a1-seq-limits': ['rat-simplify', 'g2-log-rules'],
@@ -42,9 +41,7 @@ export const UNBUILT = {
   'a1-fn-image': ['a1-fn-ivt', 'g6-deriv-rules'],
   'a1-ser-compare': ['a1-seq-limits'],
 };
-// Step U3 (module L): G4 is built at step U5, G8 at step U4.
+// Step U3 (module L): G8 is built at step U4.
 Object.assign(UNBUILT, {
-  'g4-vectors': ['eq-systems'],
-  'g4-line2': ['eq-systems', 'fn-affine'],
   'g8-polar': ['lit-identities', 'g3-exact'],
 });

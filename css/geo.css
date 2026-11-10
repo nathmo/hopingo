@@ -1,0 +1,19 @@
+/* Step U5: the plane of the `plot` items (js/ui/plot.js), for conics.
+   Uses the variables of style.css. */
+
+.plot-tools { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 8px 0 2px; }
+.plot-tool.on { background: var(--violet); color: #fff; border-color: var(--violet); }
+.plot-svg { cursor: crosshair; touch-action: manipulation; }
+.plot-box.locked .plot-svg { cursor: default; }
+.plot-status { display: block; text-align: center; min-height: 1.4em; }
+.plot-pt { fill: var(--violet-dark); stroke: #fff; stroke-width: 2; }
+.plot-lab { font-size: 13px; font-weight: 800; fill: var(--violet-dark); }
+.plot-line { stroke: var(--violet); stroke-width: 2.5; fill: none; }
+.plot-pending { fill: none; stroke: var(--violet); stroke-width: 2; stroke-dasharray: 3 2; }
+.plot-c1.plot-pt, .plot-c1.plot-lab { fill: var(--orange); } .plot-c1.plot-line { stroke: var(--orange); }
+.plot-c2.plot-pt, .plot-c2.plot-lab { fill: #0ca678; } .plot-c2.plot-line { stroke: #0ca678; }
+.plot-c3.plot-pt, .plot-c3.plot-lab { fill: #e64980; } .plot-c3.plot-line { stroke: #e64980; }
+.plot-c4.plot-pt, .plot-c4.plot-lab { fill: #1971c2; } .plot-c4.plot-line { stroke: #1971c2; }
+.plot-curve { stroke: var(--green-dark, #2b8a3e); stroke-width: 2.5; fill: none; }
+.plot-want { fill: none; stroke: var(--green-dark, #2b8a3e); stroke-width: 2.5; }
+.plot-want-line { stroke: var(--green-dark, #2b8a3e); stroke-width: 1.5; stroke-dasharray: 5 4; }

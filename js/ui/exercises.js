@@ -29,6 +29,7 @@ import { mountTf } from './tf.js';
 import { mountBlocks } from './blocks.js';
 import { mountTable } from './table-input.js';
 import { mountMatrix, mountExample } from './matrix-items.js';
+import { mountPlot } from './plot.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -88,6 +89,8 @@ MOUNTS.table = (item, ctx, body) => mountTable(item, ctx, body);
 // Step U3: one answer in a grid, an example to give.
 MOUNTS.matrix = (item, ctx, body) => mountMatrix(item, ctx, body);
 MOUNTS.example = (item, ctx, body) => mountExample(item, ctx, body);
+// Step U5: elements placed on the plane (conics).
+MOUNTS.plot = (item, ctx, body) => mountPlot(item, ctx, body);
 
 // ---------- multiple choice ----------
 

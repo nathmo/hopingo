@@ -51,3 +51,10 @@ import * as limit from './limit.js';
 
 Object.assign(JUDGES, { series, antideriv, definite, limit });
 export const signOf = (cfg) => (cfg.rel || judgeFor(cfg).sign) ?? (cfg.kind === 'equiv' || cfg.kind === 'value' ? '=' : '→');
+
+// Step U5: points and vectors, lines and planes, conics (G4, G10).
+import * as vector from './vector.js';
+import * as geom from './geom.js';
+import * as conic from './conic.js';
+
+Object.assign(JUDGES, { vector, geom, conic });

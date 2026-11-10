@@ -194,7 +194,9 @@ export function mountLines(item, ctx, body) {
   // A reference line with blanks: the keypad fills the active blank.
   function blanksTask({ line }) {
     const opts = popts();
-    const template = parse(templateOf(line, opts), opts);
+    // A judge with its own line language draws its template (step U5).
+    const own = judgeFor(run.cfg).templateML;
+    const template = own ? null : parse(templateOf(line, opts), opts);
     const n = line.blanks.length;
     const values = Array(n).fill('');
     let active = 0;
@@ -203,7 +205,7 @@ export function mountLines(item, ctx, body) {
     const paint = () => {
       const blanks = {};
       for (let i = 0; i < n; i++) blanks[i] = { html: values[i] ? innerMath(values[i], opts) ?? undefined : undefined, text: values[i], active: i === active };
-      box.innerHTML = `<span class="eq">=</span>${toMathML(template, { blanks })}`;
+      box.innerHTML = `<span class="eq">${own ? eqSign() : '='}</span>${own ? own(run.cfg, templateOf(line, opts), blanks) : toMathML(template, { blanks })}`;
       box.querySelectorAll('[data-blank]').forEach((el) => el.addEventListener('click', () => select(Number(el.dataset.blank))));
     };
     const select = (i) => { active = i; input.set(values[i]); paint(); };

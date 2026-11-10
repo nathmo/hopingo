@@ -32,6 +32,7 @@ import { lexicon, parseFormula, truthOf } from '../cas/logic.js';
 import { polyOf, coeffs, qCoeffs, degree, divide, I } from '../cas/polyx.js';
 import { Poly, gcdPoly } from '../cas/poly.js';
 import { checkLinalg } from './linalg-examples.js';
+import { checkGeo } from './geo-examples.js';
 
 const SAMPLES = {
   R: ['-3', '-2', '-1', '-1/2', '0', '1/3', '1/2', '1', '2', '5/2', '3', '7'],
@@ -245,6 +246,7 @@ export function checkCounter(counter, answers) {
     case 'truth': return checkTruth(counter, answers);
     case 'poly': return checkPoly(counter, answers);
     case 'composite': return checkComposite(counter, answers);
+    case 'geo': return checkGeo(counter, answers); // step U5
     default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }

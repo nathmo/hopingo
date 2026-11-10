@@ -54,10 +54,18 @@ const KEYSETS = {
   anal: ['int(', 'bracket(', 'lim(', ',', 'C', 'ε(x)', 'o(', '⁺', '⁻', '∞', 't', '(', ')', 'left', 'right', 'back'],
 };
 // Step U3: lines of matrices typed as text (« (1 ; 2) », det, Aᵀ, A⁻¹).
+// Step U5: analytic geometry: coordinates, parameters, points and vectors
+// (vec(A,B), ·, ∧, ‖ ‖), « ou », the reduced frame X, Y, names Ω F S.
+KEYSETS.geo = ['x', 'y', 'z', '=', ';', 't', 's', 'vec(', ',', '·', '∧', '‖', 'X', 'Y', 'Ω', 'F', ':', ' ou ', 'λ', 'back'];
+KEYSETS.pts = ['A', 'B', 'C', 'D', 'M', 'P', 'Q', 'H', 'I', 'T', 'u', 'v', 'w', 'n', "'", '_', 'back'];
 KEYSETS.mat = ['7', '8', '9', '(', ')', ';', 'back', '4', '5', '6', '+', '-', '×', 'frac', '1', '2', '3', '^', '√', 'λ', '0', ',', '[', ']', '|', 'left', 'right'];
 
 // Tab names of the keypads.
 const TAB_LABEL = { anal: '∫ lim', mat: '[ ]', calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
+
+// Step U5.
+TAB_LABEL.geo = 'xyz ‖‖';
+TAB_LABEL.pts = 'A B u';
 
 const LABEL = {
   'int(': '∫( , x)', 'bracket(': '[F]ₐᵇ', 'lim(': 'lim( , x, a)', 'o(': 'o( )',
@@ -65,6 +73,8 @@ const LABEL = {
   '^': '<span class="key-pow">▢<sup>n</sup></span>',
   frac: '<span class="key-frac"><span>▢</span><span>▢</span></span>',
 };
+// Step U5.
+Object.assign(LABEL, { 'vec(': 'AB⃗', ' ou ': 'ou' });
 
 export class MathInput {
   constructor({ keys = 'frac', keysets = null, placeholder = '', onChange, onEnter } = {}) {

@@ -30,3 +30,11 @@ import { RULES as A1E } from './a1e.js';
 CAS_RULES.push(...G6A, ...G6B, ...G6C, ...A1A, ...A1C, ...A1B, ...A1D, ...A1E);
 // Step U3: module L.
 CAS_RULES.push(...L);
+
+// Step U5: modules G4 and G10.
+import { RULES as G4A } from './g4a.js';
+import { RULES as G4B } from './g4b.js';
+import { RULES as G10A } from './g10a.js';
+import { RULES as G10B } from './g10b.js';
+
+CAS_RULES.push(...G4A, ...G4B, ...G10A, ...G10B);
