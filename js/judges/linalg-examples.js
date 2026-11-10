@@ -276,6 +276,25 @@ const WANT_ONE = {
     const same = ka.length === kb.length && (ka.length === 0 || MX.rank(MX.fromCols([...ka, ...kb])) === ka.length);
     return !same || 'Les lignes de A et de B ont ici les mêmes relations.';
   },
+  // section sym
+  // Diagonalisable over ℝ (rational eigenvalues) but not symmetric: not
+  // diagonalisable in an orthonormal basis.
+  diagNotSym: ({ A }) => {
+    if (!sq(A)) return 'A doit être carrée.';
+    if (MX.isSymmetric(A)) return 'Cette matrice est symétrique : elle est diagonalisable en base orthonormée.';
+    const d = diagonalisable(A);
+    if (d === null) return 'Choisis une matrice à valeurs propres entières (triangulaire, par exemple).';
+    return d || 'Cette matrice n\'est pas diagonalisable.';
+  },
+  // Real eigenvalues, singular values ≠ their absolute values: the
+  // eigenvalues of AᵀA (σᵢ²) are not those of A² (λᵢ²).
+  svNotAbsEig: ({ A }) => {
+    if (!sq(A)) return 'A doit être carrée.';
+    if (!splitEig(A)) return 'Choisis une matrice à valeurs propres entières (triangulaire, par exemple).';
+    const a = MX.charpoly(MX.mul(MX.transpose(A), A));
+    const b = MX.charpoly(MX.mul(A, A));
+    return !a.every((c, i) => c.eq(b[i])) || 'Pour cette matrice, les valeurs singulières sont bien les |λᵢ| (elle est symétrique, par exemple).';
+  },
 };
 
 // (λ − r)·P, P as coefficients from λ⁰.
