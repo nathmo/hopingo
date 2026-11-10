@@ -40,6 +40,10 @@ function exprOf(counter, prop, nodes) {
   if (!base) return null;
   return mapNode(base, (n) => {
     if (n.t === 'sym' && !n.sub && nodes[n.name]) return { t: 'paren', e: nodes[n.name] };
+    // A shifted term a_(n+1) (step U4, a1-defs): the sequence at that index.
+    if (n.t === 'sym' && n.sub && typeof n.sub === 'object' && nodes[n.name]) {
+      return { t: 'paren', e: mapNode(nodes[n.name], (m) => (m.t === 'sym' && !m.sub && m.name === v ? { t: 'paren', e: n.sub } : m)) };
+    }
     if (n.t === 'fn' && nodes[n.name]) return { t: 'paren', e: nodes[n.name] };
     return n;
   });
