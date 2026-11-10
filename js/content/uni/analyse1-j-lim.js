@@ -307,12 +307,29 @@ function ipeStem(rng) {
 }
 
 function flMcq(rng, opts) {
-  const kind = rng.pick(['tpl', 'tpl', 'ipe', 'bh', 'bounded']);
+  const kind = rng.pick(['tpl', 'tpl', 'ipe', 'bh', 'bounded', 'oneinf', 'infinf']);
   let start;
   let cfg;
   let L;
   let fallback = false;
+  // Options named by a trap of another part (1^∞ read as 1, ∞ − ∞ as 0).
+  const named = [];
   if (kind === 'ipe') ({ start, cfg, L } = ipeStem(rng));
+  else if (kind === 'oneinf') {
+    const a = rng.pick([1, 2, 3, -1, -2]);
+    const b = rng.pick([1, 2, 3]);
+    const ab = a * b;
+    start = `(1+${kx(a)})^(${b}/x)`.replace('+-', '-');
+    cfg = LIM('0');
+    L = ab === 1 ? 'e' : `e^${ab < 0 ? `(${ab})` : ab}`;
+    named.push({ html: MT('1'), correct: false, rule: 'a1_indet_one_inf' });
+  } else if (kind === 'infinf') {
+    const a = rng.pick([2, 4, 6, 8, 3, 5]);
+    start = `√(x^2+${a}x)-x`;
+    cfg = LIM('+∞');
+    L = q(a, 2);
+    named.push({ html: MT('0'), correct: false, rule: 'a1_indet_inf_minus_inf' });
+  }
   else if (kind === 'bh') {
     const a = rng.int(2, 5);
     const b = rng.int(1, 4);
@@ -327,7 +344,7 @@ function flMcq(rng, opts) {
     L = d.L;
   }
   const right = typeof L === 'string' ? MT(L) : MT(qt(L));
-  const options = [{ html: right, correct: true }];
+  const options = [{ html: right, correct: true }, ...named];
   for (const t of trapAnswers('limit', parse(start), cfg)) {
     const v = valueOf(t.node, cfg);
     if (v === null || typeof v === 'number') continue;
