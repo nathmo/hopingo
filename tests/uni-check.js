@@ -62,6 +62,8 @@ function wrongLine(cfg, final) {
     if (!out) return asSet ? `(${final})∖{${inside ?? 0}}` : `(${final})∧${v}≠${inside ?? 0}`;
     return asSet ? `(${final})∪{${out}}` : `(${final})∨${v}=${out}`;
   }
+  // A primitive plus 1 is still a primitive (step U2): add x instead.
+  if (cfg.kind === 'antideriv') return `${final}+${cfg.v || 'x'}`;
   return `${final}+1`;
 }
 

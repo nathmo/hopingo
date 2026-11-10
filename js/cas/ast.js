@@ -104,7 +104,7 @@ export function mapNode(node, fn) {
 // Spellings of the same function (spec §1 and §16.1): Arctg = arctan, Log = ln…
 const FN_ALIASES = {
   Log: 'ln', log: 'ln', tg: 'tan', cotan: 'cot', Arctg: 'arctan', arctg: 'arctan', Arctan: 'arctan',
-  Arcsin: 'arcsin', Arccos: 'arccos', sh: 'sinh', ch: 'cosh', th: 'tanh',
+  Arcsin: 'arcsin', Arccos: 'arccos', sh: 'sinh', ch: 'cosh', th: 'tanh', Argsh: 'argsh', Argch: 'argch', Argth: 'argth',
 };
 export const canonFn = (name) => FN_ALIASES[name] ?? name;
 

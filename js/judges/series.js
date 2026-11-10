@@ -124,7 +124,8 @@ export function dlForm(cfg, node) {
     const t = termOf(ts[i].node, cfg);
     if (!t) return false;
     if (t.rem) { if (remAt >= 0) return 'Un seul reste suffit.'; remAt = i; continue; }
-    if (seen.includes(t.k)) return `Regroupe les termes en ${t.k === 0 ? 'constante' : `puissance ${t.k}`}.`;
+    // Like terms or a coefficient still to compute: a line on the way.
+    if (seen.includes(t.k)) return false;
     if (seen.length && t.k < seen[seen.length - 1]) return 'Range les termes par puissances croissantes.';
     seen.push(t.k);
     // The coefficient must be computed: 1/2 − 1/6 is not yet 1/3.
@@ -132,9 +133,9 @@ export function dlForm(cfg, node) {
     const nums = factors.filter((f) => numValue(stripParen(f)) !== null).length;
     if (factors.some((f) => stripParen(f).t === 'bin' && ['+', '-'].includes(stripParen(f).op))) {
       const sum = factors.find((f) => stripParen(f).t === 'bin' && ['+', '-'].includes(stripParen(f).op));
-      if (closedNumber(sum) !== true || exactValue(sum)) return 'Calcule chaque coefficient.';
+      if (closedNumber(sum) !== true || exactValue(sum)) return false;
     }
-    if (nums > 2) return 'Calcule chaque coefficient.';
+    if (nums > 2) return false;
   }
   if (remAt < 0) return false;
   if (remAt !== ts.length - 1) return 'Mets le reste à la fin.';

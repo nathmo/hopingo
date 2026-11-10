@@ -152,6 +152,11 @@ export function diff(node, v = 'x', hooks = {}) {
       if (dependsOn(b, v) && dependsOn(e, v)) {
         return mul(node, add(mul(D(e), fn('ln', paren(b))), div(mul(e, D(b)), paren(b))));
       }
+      // Step U2: xⁿ with a letter n (recurrences Iₙ): n·xⁿ⁻¹·x′.
+      if (dependsOn(b, v) && !numValue(e) && !dependsOn(e, v)) {
+        const inner = mul(e, pow(b, { t: 'paren', e: sub(e, num(1)) }));
+        return stripParen(b).t === 'sym' && stripParen(b).name === v ? inner : mul(inner, D(b));
+      }
       return chain(node, D, hooks, v);
     }
     case 'sqrt': case 'root': case 'abs': case 'fn': return chain(node, D, hooks, v);

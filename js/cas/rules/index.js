@@ -23,4 +23,7 @@ import { RULES as A1C } from './a1c.js';
 import { RULES as A1D } from './a1d.js';
 import { RULES as A1E } from './a1e.js';
 
-CAS_RULES.push(...G6A, ...G6B, ...G6C, ...A1A, ...A1B, ...A1C, ...A1D, ...A1E);
+// The DL traps (A1C) come before those of l'Hôpital (A1B): with the limit
+// judge, a line « 0 » after (x − sin x)/x³ is a sine replaced in a sum,
+// although (f/g)′ has the same limit.
+CAS_RULES.push(...G6A, ...G6B, ...G6C, ...A1A, ...A1C, ...A1B, ...A1D, ...A1E);

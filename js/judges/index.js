@@ -40,4 +40,4 @@ import * as definite from './definite.js';
 import * as limit from './limit.js';
 
 Object.assign(JUDGES, { series, antideriv, definite, limit });
-export const signOf = (cfg) => judgeFor(cfg).sign ?? (cfg.kind === 'equiv' || cfg.kind === 'value' ? '=' : '→');
+export const signOf = (cfg) => (cfg.rel || judgeFor(cfg).sign) ?? (cfg.kind === 'equiv' || cfg.kind === 'value' ? '=' : '→');

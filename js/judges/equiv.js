@@ -367,6 +367,9 @@ export function boundWitness(cfg, prev, node) {
   return null;
 }
 
+// Small values (errors of a Taylor bound) keep three significant digits.
+const small = (x) => (x !== 0 && Math.abs(x) < 0.01 ? x.toPrecision(3).replace('.', ',').replace('-', '−') : frNum(x));
+
 function judgeBound(cfg, prev, node) {
   const w = boundWitness(cfg, prev, node);
   const v = cfg.vars?.[0] || 'x';
@@ -375,7 +378,7 @@ function judgeBound(cfg, prev, node) {
     const same = (cand, line) => equivalent(cand, line, opts).equal;
     const diag = diagnoseLine('equiv', prev, node, cfg, same);
     const word = cfg.rel === '≥' ? 'plus grande' : 'plus petite';
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: `En ${v} = ${frNum(w[v])}, ta ligne vaut ${frNum(w.b)}, ${word} que la précédente (${frNum(w.a)}) : ce n'est pas une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}.` };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: `En ${v} = ${frNum(w[v])}, ta ligne vaut ${small(w.b)}, ${word} que la précédente (${small(w.a)}) : ce n'est pas une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}.` };
   }
   if (contains(node, (x) => x.t === 'sym' && x.name === v)) return { kind: 'ok', node };
   const q = exactValue(node);

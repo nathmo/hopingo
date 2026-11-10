@@ -40,7 +40,7 @@ export class ParseError extends Error {
 
 // Function names, longest first so the lexer reads "sinh" before "sin".
 export const FUNCS = [
-  'arcsin', 'arccos', 'arctan', 'Arcsin', 'Arccos', 'Arctan', 'Arctg', 'arctg', 'argsh', 'argch', 'argth',
+  'arcsin', 'arccos', 'arctan', 'Arcsin', 'Arccos', 'Arctan', 'Arctg', 'arctg', 'argsh', 'argch', 'argth', 'Argsh', 'Argch', 'Argth',
   'cotan', 'sinh', 'cosh', 'tanh', 'sqrt', 'root', 'conj', 'sin', 'cos', 'tan', 'cot', 'exp', 'Log', 'log', 'abs',
   'ln', 'Re', 'Im', 'arg', 'sum',
 ];
