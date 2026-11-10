@@ -17,7 +17,16 @@ import { SKILLS as PART_B } from './analyse1-b.skills.js';
 import { SKILLS as PART_C } from './analyse1-c.skills.js';
 import { SKILLS as PART_D } from './analyse1-d.skills.js';
 import { SKILLS as PART_E } from './analyse1-e.skills.js';
+// Step U4: the rest of the catalogue, in parts f to l.
+import { SKILLS as PART_F } from './analyse1-f.skills.js';
+import { SKILLS as PART_G } from './analyse1-g.skills.js';
+import { SKILLS as PART_H } from './analyse1-h.skills.js';
+import { SKILLS as PART_I } from './analyse1-i.skills.js';
+import { SKILLS as PART_J } from './analyse1-j.skills.js';
+import { SKILLS as PART_K } from './analyse1-k.skills.js';
+import { SKILLS as PART_L } from './analyse1-l.skills.js';
 
 export const UNIT = { id: 'analyse1', title: 'Analyse I', color: '#5c940d', ready: true };
 
 export const SKILLS = [...PART_A, ...PART_B, ...PART_C, ...PART_D, ...PART_E];
+SKILLS.push(...PART_F, ...PART_G, ...PART_H, ...PART_I, ...PART_J, ...PART_K, ...PART_L);

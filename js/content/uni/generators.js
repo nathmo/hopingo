@@ -25,3 +25,16 @@ import { GEN as ANALYSE1_D } from './analyse1-d.js';
 import { GEN as ANALYSE1_E } from './analyse1-e.js';
 
 Object.assign(UNI_GEN, ANALYSE0_A, ANALYSE0_B, ANALYSE0_C, ANALYSE1_A, ANALYSE1_B, ANALYSE1_C, ANALYSE1_D, ANALYSE1_E);
+
+// Step U4: A1 (parts f to l) and G8 (unit complexes, parts a and b).
+import { GEN as ANALYSE1_F } from './analyse1-f.js';
+import { GEN as ANALYSE1_G } from './analyse1-g.js';
+import { GEN as ANALYSE1_H } from './analyse1-h.js';
+import { GEN as ANALYSE1_I } from './analyse1-i.js';
+import { GEN as ANALYSE1_J } from './analyse1-j.js';
+import { GEN as ANALYSE1_K } from './analyse1-k.js';
+import { GEN as ANALYSE1_L } from './analyse1-l.js';
+import { GEN as COMPLEXES_A } from './complexes-a.js';
+import { GEN as COMPLEXES_B } from './complexes-b.js';
+
+Object.assign(UNI_GEN, ANALYSE1_F, ANALYSE1_G, ANALYSE1_H, ANALYSE1_I, ANALYSE1_J, ANALYSE1_K, ANALYSE1_L, COMPLEXES_A, COMPLEXES_B);

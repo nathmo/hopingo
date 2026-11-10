@@ -16,8 +16,12 @@ import * as trigo from './trigo.skills.js';
 import * as recurrence from './recurrence.skills.js';
 import * as fonctionsg from './fonctions-g.skills.js';
 import * as analyse1 from './analyse1.skills.js';
+// Step U4: module G8 (unit complexes).
+import * as complexes from './complexes.skills.js';
+import { U4_STANDINS } from './unbuilt-u4.js';
 
 const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence, fonctionsg, analyse1];
+MODULES.push(complexes);
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -40,3 +44,7 @@ export const UNBUILT = {
   'a1-fn-image': ['a1-fn-ivt', 'g6-deriv-rules'],
   'a1-ser-compare': ['a1-seq-limits'],
 };
+
+// Step U4: stand-ins while the parts of A1 and G8 are built in parallel
+// (removed once they are all merged; G4 and G10, step U5, stay).
+Object.assign(UNBUILT, U4_STANDINS);

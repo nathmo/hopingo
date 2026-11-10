@@ -27,3 +27,16 @@ import { RULES as A1E } from './a1e.js';
 // judge, a line « 0 » after (x − sin x)/x³ is a sine replaced in a sum,
 // although (f/g)′ has the same limit.
 CAS_RULES.push(...G6A, ...G6B, ...G6C, ...A1A, ...A1C, ...A1B, ...A1D, ...A1E);
+
+// Step U4: A1 (parts f to l) and G8 (parts a and b).
+import { RULES as A1F } from './a1f.js';
+import { RULES as A1G } from './a1g.js';
+import { RULES as A1H } from './a1h.js';
+import { RULES as A1I } from './a1i.js';
+import { RULES as A1J } from './a1j.js';
+import { RULES as A1K } from './a1k.js';
+import { RULES as A1L } from './a1l.js';
+import { RULES as G8A } from './g8a.js';
+import { RULES as G8B } from './g8b.js';
+
+CAS_RULES.push(...A1F, ...A1G, ...A1H, ...A1I, ...A1J, ...A1K, ...A1L, ...G8A, ...G8B);
