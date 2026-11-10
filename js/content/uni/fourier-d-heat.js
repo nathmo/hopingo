@@ -314,17 +314,18 @@ function sepMcq(rng, opts) {
   const lim = d.bc === 'D' || !d.m ? '0' : qt(d.m);
   const limWrong = d.bc === 'D' ? (d.modes[0].b ? qt(d.modes[0].b) : '1') : d.m ? '0' : qt(d.modes[0].b);
   const rateN = d.L === 'pi' ? term(d.k, 'n^2') : rateGen(d.L, d.k, 0);
+  const co = d.bc === 'N' ? 'a' : 'b';
   const wrongs = [
     { html: `u(x, t) = ${MT(d.wrongs.rateLin)}`, rule: 'f_heat_rate' },
     d.wrongs.sine && { html: `u(x, t) = ${MT(d.wrongs.sine)}`, rule: 'f_neumann_sine' },
     d.wrongs.cosine && { html: `u(x, t) = ${MT(d.wrongs.cosine)}` },
     d.wrongs.rateNoPi && { html: `u(x, t) = ${MT(d.wrongs.rateNoPi)}`, rule: 'f_heat_rate' },
     { html: `Pour tout x, u(x, t) → ${MT(limWrong)} quand t → ∞.` },
-    { html: `Le coefficient du mode n vérifie bₙ′ = −${MT(d.L === 'pi' ? 'n' : 'nπ')}·bₙ.`, rule: 'f_heat_rate' },
+    { html: `Le coefficient du mode n vérifie ${co}ₙ′ = −${MT(d.L === 'pi' ? 'n' : 'nπ')}·${co}ₙ.`, rule: 'f_heat_rate' },
   ].filter(Boolean);
   const right = [`u(x, t) = ${MT(d.u)}`];
   if (rng.chance(0.6)) right.push(`Pour tout x, u(x, t) → ${MT(lim)} quand t → ∞.`);
-  else right.push(`Le coefficient du mode n vérifie bₙ′ = −${MT(`(${rateN})`)}·bₙ.`);
+  else right.push(`Le coefficient du mode n vérifie ${co}ₙ′ = −${MT(`(${rateN})`)}·${co}ₙ.`);
   return mcqMulti({
     skill: SEP, level: 4, key: `mcq:${d.id}`, exam: examTag(opts),
     prompt: `On résout ${pdeHtml(d.k, 0)} sur ]0 ; ${LT[d.L]}[, avec ${bcHtml(d.bc, d.L)} et <i>u</i>(<i>x</i>, 0) = ${MT(d.ic)}. Cochez les affirmations vraies.`,
