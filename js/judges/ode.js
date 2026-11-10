@@ -30,7 +30,9 @@
 // Final form: an explicit y = … (no ∫ nor derivative left) that is the
 // general solution (no ic) or satisfies ic; with cfg.final 'implicit', a
 // relation without constant that holds at the initial point (or with C
-// when there is no ic); 'homog' and 'particular': a y_h or y_p line.
+// when there is no ic); 'homog' and 'particular': a y_h or y_p line;
+// 'one' (step U6, part h): any one solution without constant, when there
+// is no ic (Abel's W = e^(−∫p), defined up to a factor).
 
 import { parse } from '../cas/parse.js';
 import { toMathML } from '../cas/mathml.js';
@@ -390,6 +392,7 @@ function analyse(cfg, node, state = {}) {
         if (!ic.ok) return { kind: 'wrong', message: `C'est une solution de l'équation, mais ${ic.which ? `${u}′` : u}(${ftext(ic.x0)}) = ${ftext(ic.got)} au lieu de ${ftext(ic.want)}.` };
         return { kind: clean(phi) ? 'done' : 'ok' };
       }
+      if (cfg.final === 'one') return { kind: clean(phi) ? 'done' : 'ok' };
       return { kind: 'stay', message: `C'est une solution, mais pas la solution générale : il faut ${order} constante${order > 1 ? 's' : ''}.` };
     }
     case 'mu': {
