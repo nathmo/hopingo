@@ -1046,6 +1046,341 @@ function gsExam(rng, exam) {
 }
 
 // ======================================================================
+// l-orth-qr
+// ======================================================================
+
+const QR = 'l-orth-qr';
+const QR_SUB = [
+  { id: 'gs', label: 'Gram-Schmidt', skill: GS },
+  { id: 'norm', label: 'normaliser', skill: MATS },
+  { id: 'r', label: 'R = QᵀA', skill: QR },
+];
+
+// A = [x₁ x₂ x₃] (4 × 3) from an orthogonal family of whole norms (2 or 3):
+// Q has entries k/2, k/3 and R is whole (rᵢⱼ = cᵢⱼ‖vᵢ‖, rᵢᵢ = ‖vᵢ‖).
+function qrData(rng) {
+  const d = gsData(rng, { nice: true });
+  const r = d.vs.map((v) => q(Math.round(Math.sqrt(n2(v).valueOf()))));
+  const A = MX.fromCols(d.xs);
+  const R = d.vs.map((_, i) => d.vs.map((__, j) => (j < i ? q(0) : j === i ? r[i] : d.C[i][j].mul(r[i]))));
+  const Q = MX.fromCols(d.vs.map((v, i) => scaleV(v, q(1).div(r[i]))));
+  return { ...d, r, A, R, Q };
+}
+const rName = (i, j) => `r${SUBS[i + 1]}${SUBS[j + 1]}`;
+const qrNormPart = (d, i, guided = null) => {
+  const s = `√(${sumT(squares(d.vs[i]))})`;
+  return {
+    judge: { kind: 'value', expect: qt(d.r[i]), form: 'exact' }, start: `√(v_${i + 1}·v_${i + 1})`, html: `${rName(i, i)} = ‖${vi(i)}‖`, ask: `‖${vi(i)}‖ =`,
+    lines: [guided ? eqG(s, guided, 'Somme des carrés', 'norm') : eq(s, 'Somme des carrés', 'norm'), eq(qt(d.r[i]), '', 'norm')],
+  };
+};
+// rᵢⱼ = qᵢ · xⱼ = (vᵢ · xⱼ)/‖vᵢ‖.
+const qrRPart = (d, i, j, guided = null) => {
+  const s = `(${sumT(prods(d.vs[i], d.xs[j]))})/${qt(d.r[i])}`;
+  return {
+    judge: { kind: 'value', expect: qt(d.R[i][j]), qrc: { A: d.A.map((row) => row.map(qt)), i, j } }, start: `q_${i + 1}·x_${j + 1}`, html: `${rName(i, j)} = q${SUBS[i + 1]} · ${xi(j)} = ${vi(i)} · ${xi(j)} / ‖${vi(i)}‖`, ask: `${rName(i, j)} =`,
+    lines: [guided ? eqG(s, guided, 'qᵢ = vᵢ/‖vᵢ‖', 'r') : eq(s, 'qᵢ = vᵢ/‖vᵢ‖', 'r'), eq(qt(d.R[i][j]), '', 'r')],
+  };
+};
+const qrFactorPart = (d, rng = null) => ({
+  judge: { kind: 'factor', A: mt(d.A), of: 'QR' }, start: 'A', html: 'La factorisation A = QR', ask: '',
+  lines: [eq(`Q = ${mt(d.Q)}`, 'Colonnes vᵢ/‖vᵢ‖', 'norm'), rng ? withCells(eq(`R = ${mt(d.R)}`, 'R = QᵀA, triangulaire supérieure', 'r'), pickCells(d.R, [0, 1], 2, rng)) : eq(`R = ${mt(d.R)}`, 'R = QᵀA, triangulaire supérieure', 'r')],
+});
+
+function qrItem(level, rng) {
+  if (level === 5) return qrCoef(rng, 5);
+  const d = qrData(rng);
+  const key = `${QR}:${mt(d.A)}:${level}`;
+  const hints = hints3(
+    'Q : les vecteurs de Gram-Schmidt divisés par leur norme. R = QᵀA : rᵢⱼ = qᵢ · xⱼ ; les cases diagonales sont les normes ‖vᵢ‖.',
+    `${rName(1, 2)} = q₂ · x₃ = □`,
+    `R = ${MLm(d.R)}`,
+  );
+  const base = { skill: QR, level, subgoals: QR_SUB, key, fallback: d.fallback, hints, mode: modeOf(level) };
+  const A = `A = ${MLm(d.A)}`;
+  const vsR = `v₁ = ${vR(d.vs[0])}, v₂ = ${vR(d.vs[1])}, v₃ = ${vR(d.vs[2])}`;
+  if (level === 1) {
+    return partsItem({ ...base, prompt: `Soit ${A}. Gram-Schmidt sur ses colonnes a donné ${vsR}. Calcule les normes, ${rName(1, 2)}, puis écris A = QR.` },
+      [qrNormPart(d, 0, [0, -1]), qrNormPart(d, 1, [1]), qrNormPart(d, 2, [-1]), qrRPart(d, 1, 2, [0, -1]), qrFactorPart(d, rng)]);
+  }
+  if (level === 2) {
+    const decision = {
+      kind: 'decision', prompt: 'Comment calculer rᵢⱼ (i < j) ?', options: rng.shuffle(menu('rᵢⱼ = qᵢ · xⱼ (avec qᵢ = vᵢ/‖vᵢ‖)', [
+        ['rᵢⱼ = cᵢⱼ, le coefficient de Gram-Schmidt', 'Avec Q normée, rᵢⱼ = cᵢⱼ·‖vᵢ‖ : le coefficient de Gram-Schmidt doit être multiplié par la norme.', 'l_qr_r_from_gs'],
+        ['rᵢⱼ = vᵢ · xⱼ', 'vᵢ n\'est pas unitaire : il faut qᵢ = vᵢ/‖vᵢ‖, donc diviser par ‖vᵢ‖.'],
+      ])),
+    };
+    return partsItem({ ...base, prompt: `Soit ${A}. Gram-Schmidt sur ses colonnes a donné ${vsR}, de normes ${d.r.map(fq).join(', ')}. Calcule les rᵢⱼ, puis écris A = QR.`, before: [decision] },
+      [qrRPart(d, 0, 1, [0, 1, -1]), qrRPart(d, 0, 2, [0, 1, -1]), qrRPart(d, 1, 2, [0, 1, -1]), qrFactorPart(d, rng)]);
+  }
+  if (level === 3) {
+    const m2 = menu('v₂ = x₂ − (x₂ · v₁ / v₁ · v₁) v₁', [['v₂ = x₂ + (x₂ · v₁ / v₁ · v₁) v₁', 'On retire la composante selon v₁.', 'l_gs_sign']]);
+    const m3 = menu('Retirer de x₃ ses projections sur v₁ et v₂', [['Retirer de x₃ ses projections sur x₁ et x₂', 'x₁ et x₂ ne sont pas orthogonaux : on projette sur v₁ et v₂.', 'l_gs_use_x']]);
+    const mf = menu('Normaliser les vᵢ, puis R = QᵀA', [['R = la matrice des coefficients de Gram-Schmidt', 'Avec Q normée, rᵢⱼ = cᵢⱼ·‖vᵢ‖ et rᵢᵢ = ‖vᵢ‖.', 'l_qr_r_from_gs']]);
+    return partsItem({ ...base, prompt: `Soit ${A}. Fais Gram-Schmidt sur ses colonnes, normalise, puis écris A = QR.`, tapActions: 'menu' },
+      [withMenu(gsVecPart(d, 1), m2), withMenu(gsVecPart(d, 2), m3), withMenu(qrFactorPart(d), mf)]);
+  }
+  return partsItem({ ...base, prompt: `Soit ${A}. Calcule la factorisation A = QR (Gram-Schmidt sur les colonnes, puis R = QᵀA).` }, [gsFamPart(d), qrFactorPart(d)]);
+}
+
+// One coefficient of R (exam `coef`, level 5).
+function qrCoef(rng, level, exam = null) {
+  const d = qrData(rng);
+  const [i, j] = level === 5 && rng.chance(0.6) ? [2, 2] : rng.pick([[0, 1], [0, 2], [1, 2], [2, 2], [1, 1]]);
+  const it = coefItem({
+    skill: QR, level: exam ? 4 : 5, prompt: `Soit A = ${MLm(d.A)}, et A = QR sa factorisation QR (Q à colonnes orthonormées, R triangulaire supérieure à diagonale positive). Que vaut ${rName(i, j)} ?`,
+    label: `r_${i + 1}${j + 1}`, value: qt(d.R[i][j]), key: `${mt(d.A)}:${i}${j}`, exam: exam ? examTag({ exam }) : false,
+    askCoef: { label: rName(i, j), path: [i, j], factor: 'R', convention: { diag: 'positive' } },
+    traps: [{ rule: 'l_qr_r_from_gs' }], subgoals: QR_SUB, fallback: d.fallback,
+    solution: [{ html: `Gram-Schmidt : ${famR(d.vs)}`, note: '' }, { html: `R = ${MLm(d.R)}`, note: 'rᵢⱼ = qᵢ · xⱼ, rᵢᵢ = ‖vᵢ‖' }],
+  });
+  it.judge.qrc = { A: d.A.map((row) => row.map(qt)), i, j };
+  return it;
+}
+
+function qrExam(rng, exam) {
+  if (exam === 'coef') return qrCoef(rng, 4, exam);
+  if (exam === 'tf') {
+    if (rng.chance(0.5)) {
+      return tfL({
+        skill: QR, key: 'qta', truth: true, exam: examTag({ exam }),
+        statement: 'Si A = QR avec Q à colonnes orthonormées, alors R = QᵀA.',
+        explanation: 'Vrai : QᵀQ = I, donc QᵀA = QᵀQR = R.',
+      });
+    }
+    const A = rng.pick([[[1, 2, 0], [1, 2, 1], [0, 0, 1], [1, 2, 0]], [[1, 1, 2], [0, 1, 1], [1, 0, 1], [1, 1, 2]], [[1, 0, 1], [1, 1, 2], [0, 1, 1], [2, 0, 2]]]);
+    return tfL({
+      skill: QR, key: `free:${mt(MX.mat(A))}`, truth: false, exam: examTag({ exam }),
+      statement: 'Toute matrice A de taille 4 × 3 s\'écrit A = QR, avec Q à colonnes orthonormées et R triangulaire supérieure à diagonale strictement positive.',
+      counter: { kind: 'matOne', params: { want: 'singularAtA', n: 4, cols: 3 }, ask: [{ v: 'A', label: 'A =', shape: [4, 3] }], answer: { A: mt(MX.mat(A)) } },
+      explanation: `Faux : il faut des colonnes libres. Si A = QR avec R inversible, AᵀA = RᵀR est inversible ; avec ${MLm(MX.mat(A))}, les colonnes sont liées et AᵀA est singulière.`,
+    });
+  }
+  const d = qrData(rng);
+  if (rng.chance(0.6)) {
+    const x3 = d.xs[2];
+    return mcqDistinct({
+      skill: QR, level: 4, key: `mcq:r33:${mt(d.A)}`, exam: examTag({ exam }),
+      prompt: `Soit A = ${MLm(d.A)}. A possède une factorisation QR (Q à colonnes orthonormées, R triangulaire supérieure à diagonale positive) telle que :`,
+      right: `r₃₃ = ${fq(d.r[2])}`,
+      wrongs: [{ html: 'r₃₃ = 1', rule: 'l_qr_r_from_gs' }, { html: `r₃₃ = ${fq(n2(d.vs[2]))}`, rule: null }, { html: `r₃₃ = ${rootT(n2(x3)).replace('-', '−')}`, rule: null }],
+      fillers: [{ html: `r₃₃ = ${fq(d.r[2].add(1))}` }, { html: `r₃₃ = ${fq(d.r[2].neg())}` }],
+      solution: [{ html: `v₃ = ${vR(d.vs[2])}`, note: 'Gram-Schmidt' }, { html: `r₃₃ = ‖v₃‖ = ${fq(d.r[2])}`, note: '' }],
+    }, rng);
+  }
+  const [i, j] = rng.pick([[0, 1], [0, 2], [1, 2]]);
+  const c = d.C[i][j];
+  return mcqDistinct({
+    skill: QR, level: 4, key: `mcq:r${i}${j}:${mt(d.A)}`, exam: examTag({ exam }),
+    prompt: `Soit A = ${MLm(d.A)} et A = QR sa factorisation QR (diagonale de R positive). Que vaut ${rName(i, j)} ?`,
+    right: fq(d.R[i][j]),
+    wrongs: [{ html: fq(c), rule: 'l_qr_r_from_gs' }, { html: fq(c.mul(n2(d.vs[i]))), rule: null }],
+    fillers: [{ html: fq(d.R[i][j].neg()) }, { html: fq(d.R[i][j].add(1)) }, { html: fq(d.R[i][j].sub(1)) }],
+    solution: [{ html: `${rName(i, j)} = q${SUBS[i + 1]} · ${xi(j)} = ${fq(c)}·‖${vi(i)}‖ = ${fq(d.R[i][j])}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-orth-lsq
+// ======================================================================
+
+const LSQ = 'l-orth-lsq';
+const LSQ_SUB = [
+  { id: 'normal', label: 'équations normales', skill: LSQ },
+  { id: 'reduce', label: 'réduire', skill: 'l-sys-rref' },
+  { id: 'check', label: 'vérifier', skill: PERP },
+];
+const LINE_XS = { 4: [[0, 1, 2, 3], [-1, 0, 1, 2], [-2, -1, 1, 2], [0, 1, 2, 4], [-1, 0, 2, 3], [1, 2, 3, 4], [0, 2, 3, 5]], 5: [[-2, -1, 0, 1, 2], [0, 1, 2, 3, 4], [-1, 0, 1, 2, 3], [0, 1, 2, 3, 5]] };
+
+// A (m × n) whole, x̂ whole, r ∈ Ker Aᵀ whole and non-zero, b = Ax̂ + r.
+// kind: 'line' (columns 1 and x), 'gen2' (4 × 2), 'gen3' (4 × 3).
+function lsqData(rng, kind) {
+  for (let t = 0; t < 200; t++) {
+    let A;
+    let xs = null;
+    if (kind === 'line') {
+      xs = rng.pick(LINE_XS[rng.chance(0.6) ? 4 : 5]);
+      A = xs.map((x) => [q(1), q(x)]);
+    } else {
+      const n = kind === 'gen3' ? 3 : 2;
+      A = Array.from({ length: 4 }, () => Array.from({ length: n }, () => q(rng.int(-2, 2))));
+      if (MX.rank(A) < n || A.some((r) => r.every((x) => x.n === 0))) continue;
+    }
+    const n = A[0].length;
+    const xhat = Array.from({ length: n }, () => q(rng.int(-3, 3)));
+    if (xhat.some((x) => x.n === 0)) continue;
+    const r = kerInt(MX.transpose(A), rng);
+    if (!r || maxAbs([r]) > 3) continue;
+    const b = addV(MX.matVec(A, xhat), r);
+    if (maxAbs([b]) > 12) continue;
+    const At = MX.transpose(A);
+    const AtA = MX.mul(At, A);
+    const Atb = MX.matVec(At, b);
+    if (maxAbs([AtA.flat(), Atb]) > 60) continue;
+    const M = AtA.map((row, i) => [...row, Atb[i]]);
+    const red = MX.rref(M);
+    if (red.ops.length > (n === 2 ? 5 : 8)) continue;
+    let X = M;
+    let ok = true;
+    for (const op of red.ops) { X = MX.applyOp(X, op); if ((op.kind === 'add' && op.k.d > 4) || X.flat().some((x) => x.d > 4 || Math.abs(x.valueOf()) > 99)) ok = false; }
+    if (!ok) continue;
+    // The first n equations must have one solution, other than x̂ (trap).
+    const sq = A.slice(0, n);
+    if (MX.det(sq).n === 0) continue;
+    return { A, b, xhat, r, AtA, Atb, M, ops: red.ops, xs, kind, n };
+  }
+  const A = MX.mat([[1, 0], [1, 1], [1, 2], [1, 3]]);
+  const b = Qv([2, 1, 2, 5]);
+  const AtA = MX.mul(MX.transpose(A), A);
+  const Atb = MX.matVec(MX.transpose(A), b);
+  const M = AtA.map((row, i) => [...row, Atb[i]]);
+  return { A, b, xhat: Qv([1, 1]), r: Qv([1, -1, -1, 1]), AtA, Atb, M, ops: MX.rref(M).ops, xs: [0, 1, 2, 3], kind: 'line', n: 2, fallback: true };
+}
+const lsqCfg = (d, ask, extra = {}) => ({ A: d.A.map((r) => r.map(qt)), b: d.b.map(qt), ask, line: d.kind === 'line', ...extra });
+function lineText(b0, b1) {
+  const c1 = q(b1);
+  if (c1.n === 0) return `y = ${fq(b0)}`;
+  const s1 = c1.eq(1) ? 'x' : c1.eq(-1) ? '−x' : `${fq(c1)}x`;
+  if (q(b0).n === 0) return `y = ${s1}`;
+  return `y = ${fq(b0)} ${s1.startsWith('−') ? `− ${s1.slice(1)}` : `+ ${s1}`}`;
+}
+const ptsR = (d) => d.xs.map((x, i) => `(${fq(x)} ; ${fq(d.b[i])})`).join(', ');
+
+const lsqAtAPart = (d, rng = null, names = true) => ({
+  judge: { kind: 'mat', expect: mt(d.AtA), lsq: lsqCfg(d, 'AtA'), ...(names ? { names: { A: mt(d.A) } } : {}) }, start: 'AᵀA', html: 'Équations normales : AᵀA', ask: 'AᵀA =',
+  lines: [...(names && !rng ? [eq('A^T·A', 'Aᵀ à gauche', 'normal')] : []), rng ? withCells(eq(mt(d.AtA), '', 'normal'), pickCells(d.AtA, [0, 1], 2, rng)) : eq(mt(d.AtA), 'Produits des colonnes de A', 'normal')],
+});
+const lsqAtbPart = (d, rng = null, names = true) => ({
+  judge: { kind: 'mat', expect: vt(d.Atb), ...(names ? { names: { A: mt(d.A) } } : {}) }, start: 'Aᵀb', html: 'Équations normales : Aᵀb', ask: 'Aᵀb =',
+  lines: [...(names && !rng ? [eq(`A^T·${vt(d.b)}`, '', 'normal')] : []), rng ? withCells(eq(vt(d.Atb), 'Colonnes de A · b', 'normal'), vecCells(d.Atb, 1, rng)) : eq(vt(d.Atb), 'Colonnes de A · b', 'normal')],
+});
+const lsqRedPart = (d, rng = null, multi = false) => {
+  const lines = opLines(d.M, d.ops, { bar: d.n, note: (op) => (op.kind === 'scale' ? 'Pivot à 1' : op.kind === 'swap' ? 'Échange' : `Réduire : ${opR(op)}`), subgoal: 'reduce' });
+  return {
+    judge: { kind: 'rowops', goal: 'rref', multi }, start: mt(d.M, d.n), html: 'Résoudre AᵀAx = Aᵀb : réduis [AᵀA | Aᵀb].', ask: '',
+    lines: rng ? lines.map((l) => withCells(l, pickCells(l.result, [l.op.i], 2, rng))) : lines,
+  };
+};
+const lsqXPart = (d, rng = null) => ({
+  judge: { kind: 'mat', expect: vt(d.xhat), lsq: lsqCfg(d, 'x') }, start: 'x̂', html: d.kind === 'line' ? 'La solution x̂ = (β₀ ; β₁)' : 'La solution aux moindres carrés x̂', ask: 'x̂ =',
+  lines: [rng ? withCells(eq(vt(d.xhat), d.kind === 'line' ? `Droite ${lineText(d.xhat[0], d.xhat[1])}` : 'Lue sur la forme réduite', 'normal'), vecCells(d.xhat, 1, rng)) : eq(vt(d.xhat), d.kind === 'line' ? `Droite ${lineText(d.xhat[0], d.xhat[1])}` : 'Lue sur la forme réduite', 'normal')],
+});
+const lsqResPart = (d) => ({
+  judge: { kind: 'mat', expect: vt(d.r), names: { A: mt(d.A) } }, start: 'b - Ax̂', html: 'Le résidu b − Ax̂ (orthogonal aux colonnes de A)', ask: 'b − Ax̂ =',
+  lines: [eq(`${vt(d.b)} - A·${vt(d.xhat)}`, '', 'check'), eq(vt(d.r), 'Aᵀ(b − Ax̂) = 0', 'check')],
+});
+const lsqErrPart = (d) => ({
+  judge: { kind: 'value', expect: rootT(n2(d.r)), form: 'exact' }, start: '√(r·r)', html: 'L\'erreur ‖b − Ax̂‖', ask: '‖b − Ax̂‖ =',
+  lines: [eq(`√(${sumT(squares(d.r))})`, '', 'check'), eq(rootT(n2(d.r)), '', 'check')],
+});
+
+function lsqPrompt(d, tail) {
+  if (d.kind === 'line') return `Trouve la droite des moindres carrés y = β₀ + β₁x pour les points ${ptsR(d)}${tail}`;
+  return `Soit A = ${MLm(d.A)} et b = ${vR(d.b)}. Le système Ax = b est incompatible. Trouve la solution aux moindres carrés x̂${tail}`;
+}
+
+function lsqItem(level, rng) {
+  if (level === 5 && rng.chance(0.5)) return lsqCoef(rng, 5);
+  const kind = level === 4 ? rng.pick(['gen3', 'gen2', 'line']) : level === 5 ? 'line' : rng.pick(['line', 'line', 'gen2']);
+  const d = lsqData(rng, kind);
+  const key = `${LSQ}:${mt(d.A)}${vt(d.b)}:${level}`;
+  const hints = hints3('Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution.', `AᵀA = ${rowHoles(d.AtA, 0, null, 1).replace(/^\[/, '[[')}, …]`, `[AᵀA | Aᵀb] = ${MLm(d.M, d.n)} ; x̂ = ${vR(d.xhat)}`);
+  const base = { skill: LSQ, level, subgoals: LSQ_SUB, key, fallback: d.fallback, hints, mode: modeOf(level) };
+  const AandB = d.kind === 'line' ? `A = ${MLm(d.A)} (colonne de 1, colonne des x) et b = ${vR(d.b)}` : '';
+  if (level === 1) {
+    return partsItem({ ...base, prompt: lsqPrompt(d, `. ${AandB ? `Ici ${AandB}. ` : ''}Calcule AᵀA et Aᵀb, puis résous les équations normales.`) },
+      [lsqAtAPart(d, rng), lsqAtbPart(d, rng), lsqRedPart(d, rng), lsqXPart(d, rng)]);
+  }
+  if (level === 2) {
+    const decision = {
+      kind: 'decision', prompt: 'Comment trouver x̂ ?', options: rng.shuffle(menu('Résoudre les équations normales AᵀAx = Aᵀb', [
+        ['Résoudre Ax = b', 'Ax = b est incompatible : b n\'est pas dans Col A. On cherche le x̂ qui rend Ax̂ le plus proche de b.'],
+        ['Résoudre AAᵀx = Ab', 'On multiplie Ax = b à gauche par Aᵀ : AᵀA a la taille de x, AAᵀ celle de b.', 'l_lsq_normal_aat'],
+      ])),
+    };
+    return partsItem({ ...base, prompt: lsqPrompt(d, `. ${AandB ? `Ici ${AandB}.` : ''}`), before: [decision] }, [lsqAtAPart(d, rng), lsqAtbPart(d, rng), lsqRedPart(d, rng), lsqXPart(d, rng)]);
+  }
+  if (level === 3) {
+    const parts = [lsqAtAPart(d, null, false), lsqAtbPart(d, null, false), lsqRedPart(d), lsqXPart(d)];
+    if (d.kind === 'line') {
+      parts.unshift(
+        { judge: { kind: 'mat', expect: mt(d.A) }, start: 'A', html: '', ask: 'A =', lines: [eq(mt(d.A), 'Une colonne de 1, une colonne des x', 'normal')] },
+        { judge: { kind: 'mat', expect: vt(d.b) }, start: 'b', html: 'Le second membre', ask: 'b =', lines: [eq(vt(d.b), 'Les y des points', 'normal')] },
+      );
+    }
+    return partsItem({ ...base, prompt: lsqPrompt(d, d.kind === 'line' ? ' : pose A et b, calcule AᵀA et Aᵀb, puis réduis (choisis chaque opération).' : ' : équations normales, puis réduction (choisis chaque opération).'), tapActions: 'rowops' }, parts);
+  }
+  const parts = [lsqAtAPart(d), lsqAtbPart(d), lsqRedPart(d, null, level >= 4), lsqXPart(d)];
+  if (level === 4 && d.kind !== 'line') parts.push(lsqResPart(d), lsqErrPart(d));
+  return partsItem({ ...base, prompt: lsqPrompt(d, level === 4 && d.kind !== 'line' ? ', puis l\'erreur ‖b − Ax̂‖.' : '.') }, parts);
+}
+
+// One component of x̂ (exam `coef`, level 5).
+function lsqCoef(rng, level, exam = null) {
+  const d = lsqData(rng, rng.pick(['gen2', 'gen3', 'line']));
+  const i = rng.int(0, d.n - 1);
+  const label = d.kind === 'line' ? `β_${i}` : `x_${i + 1}`;
+  const name = d.kind === 'line' ? `β${SUBS[i]}` : `x̂${SUBS[i + 1]}`;
+  const it = coefItem({
+    skill: LSQ, level: exam ? 4 : 5, prompt: lsqPrompt(d, `. Que vaut ${name} ?`).replace('Trouve la droite', 'On cherche la droite').replace('Trouve la solution aux moindres carrés x̂', 'Soit x̂ la solution aux moindres carrés'),
+    label, value: qt(d.xhat[i]), key: `${mt(d.A)}${vt(d.b)}:${i}`, exam: exam ? examTag({ exam }) : false,
+    askCoef: { label: name, path: [i] },
+    traps: [{ rule: 'l_lsq_square_subsystem' }, ...(d.kind === 'line' ? [{ rule: 'l_lsq_line_swap' }] : [])], subgoals: LSQ_SUB, fallback: d.fallback,
+    solution: [{ html: `[AᵀA | Aᵀb] = ${MLm(d.M, d.n)}`, note: 'Équations normales' }, { html: `x̂ = ${vR(d.xhat)}`, note: '' }],
+  });
+  it.judge.lsq = lsqCfg(d, 'x', { i });
+  return it;
+}
+
+function lsqExam(rng, exam) {
+  if (exam === 'coef') return lsqCoef(rng, 4, exam);
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which === 0) {
+      return tfL({
+        skill: LSQ, key: 'min', truth: true, exam: examTag({ exam }),
+        statement: 'Si w est une solution de AᵀAx = Aᵀb, alors ‖b − Aw‖ ≤ ‖b − Au‖ pour tout u.',
+        explanation: 'Vrai : Aw est alors la projection orthogonale de b sur Col A, le point de Col A le plus proche de b.',
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: LSQ, key: 'same', truth: true, exam: examTag({ exam }),
+        statement: 'Si x̂ et x̃ sont deux solutions aux moindres carrés de Ax = b, alors Ax̂ = Ax̃.',
+        explanation: 'Vrai : Ax̂ et Ax̃ sont tous deux la projection orthogonale de b sur Col A, qui est unique.',
+      });
+    }
+    const A = rng.pick([[[1, 2], [1, 2], [1, 2]], [[1, 1], [2, 2], [0, 0]], [[1, 0], [0, 0], [0, 0]], [[2, 4], [1, 2], [0, 0]]]);
+    return tfL({
+      skill: LSQ, key: `ata:${mt(MX.mat(A))}`, truth: false, exam: examTag({ exam }),
+      statement: 'Pour toute matrice A, la matrice AᵀA est inversible.',
+      counter: { kind: 'matOne', params: { want: 'singularAtA' }, ask: [{ v: 'A', label: 'A =', shape: [A.length, 2] }], answer: { A: mt(MX.mat(A)) } },
+      explanation: `Faux : AᵀA est inversible si et seulement si les colonnes de A sont libres. Avec A = ${MLm(MX.mat(A))}, elles sont liées.`,
+    });
+  }
+  const d = lsqData(rng, rng.chance(0.6) ? 'line' : 'gen2');
+  const sub2 = MX.matVec(MX.inverse(d.A.slice(0, 2)), d.b.slice(0, 2));
+  if (d.kind === 'line') {
+    return mcqDistinct({
+      skill: LSQ, level: 4, key: `mcq:${vt(d.b)}${d.xs.join(',')}`, exam: examTag({ exam }),
+      prompt: `La droite des moindres carrés y = β₀ + β₁x pour les points ${ptsR(d)} est :`,
+      right: lineText(d.xhat[0], d.xhat[1]),
+      wrongs: [{ html: lineText(d.xhat[1], d.xhat[0]), rule: 'l_lsq_line_swap' }, { html: lineText(sub2[0], sub2[1]), rule: 'l_lsq_square_subsystem' }],
+      fillers: [{ html: lineText(d.xhat[0].neg(), d.xhat[1]) }, { html: lineText(d.xhat[0], d.xhat[1].neg()) }, { html: lineText(d.xhat[0].add(1), d.xhat[1]) }],
+      solution: [{ html: `[AᵀA | Aᵀb] = ${MLm(d.M, d.n)}`, note: 'Équations normales' }, { html: `β₀ = ${fq(d.xhat[0])}, β₁ = ${fq(d.xhat[1])}`, note: '' }],
+    }, rng);
+  }
+  return mcqDistinct({
+    skill: LSQ, level: 4, key: `mcq:${mt(d.A)}${vt(d.b)}`, exam: examTag({ exam }),
+    prompt: `Soit A = ${MLm(d.A)} et b = ${vR(d.b)}. La solution aux moindres carrés de Ax = b est :`,
+    right: vR(d.xhat),
+    wrongs: [{ html: vR(sub2), rule: 'l_lsq_square_subsystem' }],
+    fillers: [{ html: vR([d.xhat[1], d.xhat[0]]) }, { html: vR(scaleV(d.xhat, -1)) }, { html: vR(addV(d.xhat, [1, 0])) }, { html: vR(addV(d.xhat, [0, 1])) }],
+    solution: [{ html: `[AᵀA | Aᵀb] = ${MLm(d.M, d.n)}`, note: 'Équations normales' }, { html: `x̂ = ${vR(d.xhat)}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
   [DOT]: (level, rng, profile, opts = {}) => (opts.exam ? dotExam(rng, opts.exam) : dotItem(level, rng)),
@@ -1053,6 +1388,8 @@ export const GEN = {
   [PROJ]: (level, rng, profile, opts = {}) => (opts.exam ? projExam(rng, opts.exam) : projItem(level, rng)),
   [MATS]: (level, rng, profile, opts = {}) => (opts.exam ? matsExam(rng, opts.exam) : matsItem(level, rng)),
   [GS]: (level, rng, profile, opts = {}) => (opts.exam ? gsExam(rng, opts.exam) : gsItem(level, rng)),
+  [QR]: (level, rng, profile, opts = {}) => (opts.exam ? qrExam(rng, opts.exam) : qrItem(level, rng)),
+  [LSQ]: (level, rng, profile, opts = {}) => (opts.exam ? lsqExam(rng, opts.exam) : lsqItem(level, rng)),
 };
 
 export { dotQ, n2, rootT, Qv };
