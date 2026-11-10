@@ -7,7 +7,7 @@ import {
   V, q, modeOf, H, E, KEYS, xp, examOf, coefs, isZero, maxDen, maxNum, remText, termAbs, joinTerms,
   polyText, dlText, termCount, valuation, blankDL, blanked, assemble, fitLines, uniq, mulCoefs,
 } from './analyse1-c-kit.js';
-import { boxText, polyFromNode, trapOptions, uText, plusU, fText, rd, substText, USUAL, coefOf } from './analyse1-c-dl.js';
+import { boxText, trapOptions, uText, plusU, fText, rd, substText, USUAL, coefOf } from './analyse1-c-dl.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { parse } from '../../cas/parse.js';
 
@@ -179,7 +179,15 @@ function opItem(level, rng, profile, opts) {
   const d = opData(rng, OPS_BY_LEVEL[level], level === 5 ? { n: rng.pick([4, 5]), den: 720 } : {});
   const b = opBuild(d);
   const judge = { kind: 'series', v: V, at: 0, order: d.n };
-  const parts = [{ start: b.f, judge, lines: opBlanks(b, d, level), choices: OP_CHOICES(d) }];
+  // Level 2: how far to develop each piece.
+  const pre = level !== 2 ? [] : [{
+    kind: 'decision', prompt: d.kind === 'prod' ? 'Jusqu\'où développer chaque facteur ?' : 'Jusqu\'où développer le numérateur et le dénominateur ?', options: rng.shuffle([
+      { id: 'n', label: `Jusqu'à ${xp(d.n + (b.v || 0))}`, valid: true, ref: true },
+      { id: 'early', label: `Jusqu'à ${xp(d.n + (b.v || 0) - 1)}`, valid: false, rule: 'a1_dl_truncate_early', why: `Il manquerait des termes de degré ${d.n} dans le résultat.` },
+      { id: 'deriv', label: `Ne pas développer : dériver ${d.n} fois`, valid: true, quality: 'poor', why: 'Juste (Taylor), mais bien plus long que de combiner les DL usuels.' },
+    ]),
+  }];
+  const parts = [{ start: b.f, judge, lines: opBlanks(b, d, level), pre, choices: OP_CHOICES(d) }];
   const as = assemble(parts, level);
   const method = d.kind === 'prod' ? `Multiplie les deux DL et ne garde que les termes de degré ≤ ${d.n}.` : `Développe le haut et le bas, mets le dénominateur sous la forme c(1 + u), puis 1/(1 + u) = 1 − u + u² − …${b.v ? ' Le dénominateur commence par x : simplifie d\'abord par x (il faut un ordre de plus en haut et en bas).' : ''}`;
   return linesItem({
@@ -349,7 +357,17 @@ const CO_CHOICES = (d) => [
     : { id: 'lead', label: 'Dans uᵏ, ne garder que le premier terme de u', rule: 'a1_dl_truncate_inner', why: 'Dans uᵏ, les autres termes de u donnent aussi des termes de degré ≤ n.' },
 ];
 
-function coParts(d, level) {
+// Level 2: can u = g(x) go straight into the DL of f at 0?
+function coDecision(d, rng) {
+  return {
+    kind: 'decision', prompt: `Peut-on mettre u = ${rd(d.g)} directement dans le DL de ${OUTER[d.Fk].name} en 0 ?`, options: rng.shuffle([
+      { id: 'yes', label: 'Oui : u tend vers 0', valid: !d.c, ...(d.c ? { rule: 'a1_dl_compose_nonzero_inner', why: `${rd(d.g)} tend vers 1, pas vers 0 : il faut recentrer.` } : { ref: true }) },
+      { id: 'no', label: 'Non : u tend vers 1, il faut recentrer', valid: !!d.c, ...(d.c ? { ref: true } : { why: `${rd(d.g)} tend vers 0 : le DL de f en 0 s'applique directement.` }) },
+    ]),
+  };
+}
+
+function coParts(d, level, rng) {
   const b = coBuild(d);
   let lines = b.lines;
   if (level <= 2) {
@@ -363,7 +381,7 @@ function coParts(d, level) {
   const limit = { kind: 'limit', v: V, to: '0' };
   const parts = [
     { start: d.g, judge: limit, lines: [E(String(d.c), d.c ? 'u ne tend pas vers 0 : il faudra recentrer' : 'u → 0 : le DL de f en 0 s\'applique', 'limit')] },
-    { html: `DL d'ordre ${d.n} de ${MT(b.f)} en 0 :`, start: b.f, judge: { kind: 'series', v: V, at: 0, order: d.n }, lines, choices: CO_CHOICES(d) },
+    { html: `DL d'ordre ${d.n} de ${MT(b.f)} en 0 :`, start: b.f, judge: { kind: 'series', v: V, at: 0, order: d.n }, lines, choices: CO_CHOICES(d), pre: level !== 2 ? [] : [coDecision(d, rng)] },
   ];
   return { b, parts };
 }
@@ -373,7 +391,7 @@ function coItem(level, rng, profile, opts) {
   if (opts.exam === 'mcq') return coMcq(rng);
   if (opts.exam === 'coef') return coCoef(rng);
   const d = coData(rng);
-  const { b, parts } = coParts(d, level);
+  const { b, parts } = coParts(d, level, rng);
   const as = assemble(parts, level);
   const O = OUTER[d.Fk];
   const m1 = d.c

@@ -40,7 +40,7 @@ export const maxNum = (cs) => Math.max(0, ...cs.filter(isQ).map((c) => Math.abs(
 
 const SUP = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
 // xᵏ for the student: x³, x¹⁰.
-export const xp = (k) => `x${String(k).split('').map((d) => SUP[d]).join('')}`;
+export const xp = (k) => (k === 1 ? 'x' : `x${String(k).split('').map((d) => SUP[d]).join('')}`);
 export const mono = (k, v = V) => (k === 0 ? '' : k === 1 ? v : `${v}^${k}`);
 export const remText = (n, v = V) => (n === 0 ? `ε(${v})` : `${mono(n, v)}ε(${v})`);
 

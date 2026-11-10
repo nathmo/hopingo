@@ -10,17 +10,16 @@
 // This file: a1-dl-usual, a1-dl-ops, a1-dl-compose, and the products and
 // quotients that analyse1-c-lim.js reuses.
 
-import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { templateOf } from '../../judges/lines.js';
 import { toReadable } from '../../cas/print.js';
-import { MT, linesItem, mcq, tfItem, answerItem } from './kit.js';
-import {
-  V, q, isQ, modeOf, H, E, KEYS, xp, examOf, fact, qPow, coefs, isZero, maxDen, maxNum, mono, remText, termAbs, joinTerms,
-  polyText, dlText, polyOf, termCount, valuation, blankDL, tpl, blanked, assemble, fitLines, uniq,
-} from './analyse1-c-kit.js';
 import { series } from '../../cas/series.js';
+import { MT, linesItem, mcq, tfItem } from './kit.js';
+import {
+  V, q, isQ, modeOf, H, E, KEYS, xp, examOf, fact, qPow, coefs, isZero, maxDen, maxNum, mono, remText, termAbs,
+  joinTerms, polyText, dlText, termCount, blankDL, tpl, assemble, uniq,
+} from './analyse1-c-kit.js';
 
 // Text for the student: x^2/2 → x²/2, − signs.
 export const rd = (t) => toReadable(parse(t));
@@ -29,11 +28,6 @@ export function boxText(line) {
   const t = line.blanks ? templateOf(line) : line.math;
   const sup = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹' };
   return t.replace(/\^(\d)/g, (_, d) => sup[d]).replace(/×/g, '·').replace(/([^(])-/g, '$1 − ').replace(/\+/g, ' + ').replace(/^-/, '−');
-}
-// The options of a multiple choice: a DL node (or text) as MathML.
-export function dlHtml(node) {
-  const n = typeof node === 'string' ? parse(node) : node;
-  return MT(polyFromNode(n));
 }
 // A DL written again with our coefficients (the trap candidates print 1/3×x^3).
 export function polyFromNode(node, n = 8) {
@@ -189,7 +183,14 @@ function usItem(level, rng, profile, opts) {
   const d = usData(rng);
   const { b, lines } = usLines(d, level);
   const judge = { kind: 'series', v: V, at: 0, order: d.n };
-  const parts = [{ start: b.f, judge, lines, choices: US_CHOICES(d, b.U) }];
+  // Level 2: the reference DL to choose.
+  const pre = level !== 2 ? [] : [{
+    kind: 'decision', prompt: 'Quel DL de référence ?', options: rng.shuffle([
+      { id: d.F, label: `${familyWord(d.F, d.alpha)} avec u = ${rd(b.U)}`, valid: true, ref: true },
+      ...rng.shuffle(FAMS.filter((F) => F !== d.F && F !== 'pow')).slice(0, 2).map((F) => ({ id: F, label: `${USUAL[F].name} avec u = ${rd(b.U)}`, valid: false, why: `${rd(b.f)} n'est pas ${USUAL[F].name}.` })),
+    ]),
+  }];
+  const parts = [{ start: b.f, judge, lines, pre, choices: US_CHOICES(d, b.U) }];
   const as = assemble(parts, level);
   return linesItem({
     skill: US, level,

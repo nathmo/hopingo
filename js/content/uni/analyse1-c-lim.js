@@ -4,7 +4,6 @@
 // (Taylor polynomial, f⁽ⁿ⁺¹⁾, a bound of |f⁽ⁿ⁺¹⁾| and Lagrange's bound:
 // `equiv` with rel '≤' on the interval).
 
-import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
 import { walk, replaceAt, stripParen, dependsOn } from '../../cas/ast.js';
@@ -12,7 +11,7 @@ import { limit } from '../../cas/limit.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { MT, linesItem, mcq, tfItem } from './kit.js';
 import {
-  V, q, isQ, modeOf, H, E, KEYS, xp, examOf, fact, coefs, isZero, maxDen, maxNum, termAbs, joinTerms,
+  V, q, isQ, modeOf, H, E, KEYS, xp, examOf, fact, coefs, isZero, termAbs, joinTerms,
   polyText, dlText, valuation, blankDL, blanked, assemble, fitLines, uniq,
 } from './analyse1-c-kit.js';
 import { uText, fText, rd, boxText } from './analyse1-c-dl.js';
@@ -511,6 +510,12 @@ function taParts(d, level) {
   const at0 = T.at0 ? [T.at0().toString(), `${T.at0().toString()}×x^${m}/${fact(m)}`, d.B.div(d.M).mul(T.at0()).toString()] : null;
   parts.push({
     html: `Majore |f${SUPS[m]}(x)| pour x ∈ [0 ; ${decText(x0).replace('.', ',')}] :`, ask: 'M =', start: `|${T.deriv(m)}|`,
+    pre: level !== 2 ? [] : [{
+      kind: 'decision', prompt: `Où majorer |f${SUPS[m]}(c)| ?`, options: [
+        { id: 'all', label: `Sur tout [0 ; ${decText(x0).replace('.', ',')}] : c y est quelque part`, valid: true, ref: true },
+        { id: 'at0', label: 'En 0 seulement : le développement est fait en 0', valid: false, rule: 'a1_taylor_rest_at_a', why: 'c est entre 0 et x, pas forcément en 0 : il faut le maximum sur tout l\'intervalle.' },
+      ],
+    }],
     judge: { kind: 'equiv', vars: [V], domain: { x: [0, x0.valueOf()] }, rel: '≤', target: 'constant', bound: ratAbove(2 * Mopt), ...(at0 ? { taylorAt: at0, taylorX: decText(x0).replace('.', ',') } : {}) },
     lines: level === 1 ? [{ ...Mlines[0], ...blankDL(Mlines[0].math, () => 'term') }] : Mlines, choices,
   });
