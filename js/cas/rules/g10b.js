@@ -12,6 +12,7 @@
 
 import { parse } from '../parse.js';
 import { vl, valueIn } from './g4a.js';
+import { readObject } from '../geomobj.js';
 
 // A line of the judge conic holding an equation (coefficients of x², xy,
 // y², x, y, 1, in X, Y when reduced).
@@ -112,5 +113,53 @@ RULES.push(
     judges: ['vector'], transform: listed('g10_frame_back_transpose'),
     explain: () => 'Les colonnes de P sont u₁ et u₂ : x = Ω + X·u₁ + Y·u₂ = Ω + P·(X ; Y). Avec Pᵀ, tu tournes dans le mauvais sens : ton point n\'est pas sur le bon axe.',
     check: { judge: { kind: 'vector', symbols: { Ω: '(1 ; -1)', u_1: '(2 ; 1)/√5', u_2: '(-1 ; 2)/√5' }, expect: '(3 ; 0)', trapPts: { g10_frame_back_transpose: ['(3 ; -2)'] } }, prev: 'F', line: '(3 ; -2)' },
+  },
+);
+
+// A line of the judge geom from a row [a, b, c] (ax + by + c = 0, numbers or Q).
+function gRow(row) {
+  const t = `(${row[0]})*x + (${row[1]})*y + (${row[2]}) = 0`;
+  try { return { t: 'gline', text: t, obj: readObject(t, { dim: 2 }) }; } catch { return null; }
+}
+
+RULES.push(
+  {
+    id: 'g10_e_inverted', family: 'rule', tag: 'E', skill: 'g10-conic-from-data', repair: 'g10-conic-from-data',
+    example: ['e·MF = d(M, D)', 'MF = e·d(M, D)'], name: 'Excentricité inversée',
+    judges: ['conic'],
+    // cfg.fde = {F: [x, y], D: {v: 'x' | 'y', k}, e: [p, q]}: MF = (q/p)·d instead of (p/q)·d.
+    transform(prev, ctx) {
+      const f = ctx?.cfg?.fde;
+      if (!f || f.e[0] === f.e[1]) return [];
+      const [Fx, Fy] = f.F.map(num);
+      const k = num(f.D.k);
+      const r = (f.e[1] * f.e[1]) / (f.e[0] * f.e[0]);
+      // (x − Fx)² + (y − Fy)² − r·(v − k)².
+      const co = [1, 0, 1, -2 * Fx, -2 * Fy, Fx * Fx + Fy * Fy];
+      if (f.D.v === 'x') { co[0] -= r; co[3] += 2 * r * k; } else { co[2] -= r; co[4] += 2 * r * k; }
+      co[5] -= r * k * k;
+      return [{ node: cl('', co, false), ctx: { e: `${f.e[0]}/${f.e[1]}`, inv: `${f.e[1]}/${f.e[0]}` } }];
+    },
+    explain: (ctx = {}) => `La définition est MF = e·d(M, D)${ctx.e ? `, avec e = ${ctx.e}` : ''}. En échangeant e et 1/e${ctx.inv ? ` (${ctx.inv})` : ''}, une ellipse devient une hyperbole, et inversement.`,
+    check: { judge: { kind: 'conic', equation: '3x^2 + 4y^2 - 48 = 0', target: 'standard', fde: { F: ['2', '0'], D: { v: 'x', k: '8' }, e: [1, 2] } }, prev: '3x^2 + 4y^2 - 48 = 0', line: '3x^2 - 60x - y^2 + 252 = 0' },
+  },
+  {
+    id: 'g10_doubling_wrong', family: 'rule', tag: 'E', skill: 'g10-conic-tangent', repair: 'g10-conic-tangent',
+    example: ['x → x₀ (au lieu de (x + x₀)/2)', 'x → (x + x₀)/2'], name: 'Dédoublement faux',
+    judges: ['geom'],
+    // cfg.dbl = {co: [a, b, c, d, e, f], T: [x₀, y₀]} (texts).
+    transform(prev, ctx) {
+      const g = ctx?.cfg?.dbl;
+      if (!g) return [];
+      const [a, b, c, d, e, f] = g.co.map(num);
+      const [x0, y0] = g.T.map(num);
+      const rows = [
+        [a * x0, c * y0, b * x0 * y0 + d * x0 + e * y0 + f],
+        [a * x0 + (b / 2) * y0 + d, (b / 2) * x0 + c * y0 + e, f],
+      ];
+      return rows.filter((r) => r[0] || r[1]).map(gRow).filter(Boolean).map((node) => ({ node, ctx: {} }));
+    },
+    explain: () => 'On dédouble chaque terme en gardant un x : x² → x₀x, xy → (x₀y + xy₀)/2, x → (x + x₀)/2. Ta droite ne passe pas par T.',
+    check: { judge: { kind: 'geom', object: 'line2', ref: 'x + y - 3 = 0', dbl: { co: ['1', '0', '1', '2', '0', '-7'], T: ['1', '2'] } }, prev: 'x^2 + y^2 + 2x - 7 = 0', line: 'x + 2y - 5 = 0' },
   },
 );
