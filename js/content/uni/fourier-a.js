@@ -11,5 +11,6 @@ import { GEN_COEF } from './fourier-a-coef.js';
 import { GEN_COMPLEX } from './fourier-a-complex.js';
 import { GEN_SINE } from './fourier-a-sine.js';
 import { GEN_DIRICHLET } from './fourier-a-dirichlet.js';
+import { GEN_PROBLEM } from './fourier-a-problem.js';
 
-export const GEN = { ...GEN_COEF, ...GEN_COMPLEX, ...GEN_SINE, ...GEN_DIRICHLET };
+export const GEN = { ...GEN_COEF, ...GEN_COMPLEX, ...GEN_SINE, ...GEN_DIRICHLET, ...GEN_PROBLEM };

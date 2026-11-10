@@ -205,6 +205,11 @@ export function vAtN(a, n) {
   }
   return m;
 }
+export function vEven(a) {
+  const m = new Map();
+  for (const [kk, x] of a) { const [e, k] = kk.split(',').map(Number); vAddTo(m, key(e, k, 0), x); }
+  return m;
+}
 export function vOdd(a) {
   const m = new Map();
   for (const [kk, x] of a) { const [e, k, s] = kk.split(',').map(Number); vAddTo(m, key(e, k, 0), s ? x.neg() : x); }

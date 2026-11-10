@@ -10,7 +10,7 @@
 // odd terms n = 2k + 1 when the even ones vanish. The families and their
 // parts are shared with f-series-problem (fourier-a-problem.js).
 
-import { MT, H, q, fr, V, P, vMul, vScale, vText, pAt, ipp, ipvWrong, freq, build, COEF, COEFK, atN, kText, vOddText, KEYS, mcqMulti } from './fourier-a-kit.js';
+import { MT, H, q, fr, V, P, vMul, vScale, vText, vZero, vEven, pAt, ipp, ipvWrong, freq, build, COEF, COEFK, atN, kText, vOddText, KEYS, mcqMulti } from './fourier-a-kit.js';
 import { examTag } from './kit.js';
 
 const SK = 'f-sine-cosine';
@@ -81,11 +81,12 @@ export function sineCoef(f) {
       wrongSign: `-${4 * a}sin(nπ/2)/(π n^2)`,
       wrong02: `(1/π)(int(${ax} sin(n x), x, 0, π/2)+int((${b}) sin(n x), x, π/2, 2π))`,
       odd: { start: `${4 * a}sin((2k+1)π/2)/(π (2k+1)^2)`, goal: `${4 * a}(-1)^k/(π (2k+1)^2)` },
+      oddK: `${4 * a}(-1)^k/(π (2k+1)^2)`,
     };
   }
   const ch = ipp({ K, Kv, p: f.p, trig: 'sin', L: f.L });
   const goal = vText(ch.value);
-  const pattern = /\(1-\(-1\)\^n\)|\(\(-1\)\^n-1\)/.test(goal);
+  const pattern = vZero(vEven(ch.value));
   const intOf = ch.start.replace(/^\([^)]*\) /, '');
   return {
     start: ch.start, lines: ch.lines, goal, value: ch.value,
@@ -93,6 +94,7 @@ export function sineCoef(f) {
     wrongSign: vText(vMul(Kv, ipvWrong(f.p, 'sin', f.L))),
     wrong02: f.L === 'π' ? `(1/π) ${intOf.replace(', x, 0, π)', ', x, 0, 2π)')}` : null,
     odd: pattern ? { start: atN(goal, '2k+1'), goal: vOddText(ch.value) } : null,
+    oddK: vOddText(ch.value),
   };
 }
 
