@@ -15,7 +15,7 @@
 
 import { Q } from '../../math/rational.js';
 import {
-  q, qt, fq, nz, H, sumT, vt, vr, ptR, rootT, readable, MT, mcqD, tfG, examTag, geoCounter, pickW,
+  q, qt, fq, nz, H, sumT, vt, vr, ptR, rootT, rootR, readable, MT, mcqD, tfG, examTag, geoCounter, pickW,
 } from './geo-kit.js';
 import {
   sqT, linT1, diffT, circleEq, circleRed, circleCompleted, par, parR, normVecs, lineRow, lineText, partsG, conicPlot,
@@ -986,8 +986,513 @@ function polExam(rng, exam) {
 }
 
 // ======================================================================
+// The conics in reduced form: tools
+// ======================================================================
+
+const gcdN = (xs) => xs.reduce((g, x) => { let [a, b] = [Math.abs(g), Math.abs(x)]; while (b) [a, b] = [b, a % b]; return a; }, 0) || 1;
+// α(x − h)² + β(y − k)² + γ = 0, expanded, divided by the gcd, first coefficient > 0.
+function axisConic(alpha, beta, h, k, gamma) {
+  let c = [alpha, 0, beta, -2 * alpha * h, -2 * beta * k, alpha * h * h + beta * k * k + gamma];
+  const g = gcdN(c);
+  c = c.map((x) => x / g);
+  if (c.find((x) => x !== 0) < 0) c = c.map((x) => -x);
+  return c;
+}
+const eqOf = (c) => `${sumT([[c[0], 'x^2'], [c[1], 'xy'], [c[2], 'y^2'], [c[3], 'x'], [c[4], 'y'], [c[5], '']])} = 0`;
+// The squares completed, constants not gathered: 4(x−2)² − 16 + 9(y+3)² − 81 + 61 = 0.
+function completedOf(c, h, k) {
+  const terms = [];
+  if (c[0]) terms.push([c[0], sqT('x', h)], [-c[0] * h * h, '']);
+  else if (c[3]) terms.push([c[3], 'x']);
+  if (c[2]) terms.push([c[2], sqT('y', k)], [-c[2] * k * k, '']);
+  else if (c[4]) terms.push([c[4], 'y']);
+  terms.push([c[5], '']);
+  return `${sumT(terms.filter(([x]) => x !== 0))} = 0`;
+}
+// h ± √x2 as text (x2 ≥ 0 rational): 5, 2 + √5, −√5, 2 − 9√5/5.
+function plusRoot(h, x2, sign) {
+  const r = rootT(x2);
+  if (!/√/.test(r)) { const [n, d] = r.split('/').map(Number); return qt(q(h).add(new Q(n, d || 1).mul(sign))); }
+  if (q(h).n === 0) return sign > 0 ? r : `-${r}`;
+  return `${qt(h)} ${sign > 0 ? '+' : '-'} ${r}`;
+}
+const pt2 = (P) => `(${P[0]} ; ${P[1]})`;
+const viewAround = (h, k, span) => ({ x: [Math.floor(h - span), Math.ceil(h + span)], y: [Math.floor(k - span), Math.ceil(k + span)] });
+const conicPart = (o) => ({ ...o, judge: { kind: 'conic', equation: o.eq, ...(o.els ? { ask: o.els } : { target: 'standard' }) } });
+
+const AXIS_DEC = (vertical, what) => ({
+  levels: [2], kind: 'decision', prompt: `${what} est…`, options: [
+    { id: 'h', label: 'horizontal', valid: !vertical, ref: !vertical, rule: vertical ? 'g10_axis_swap' : null, why: `Non : regarde de quel côté est ${what === 'Le grand axe' ? 'le plus grand dénominateur' : 'le terme positif'}.` },
+    { id: 'v', label: 'vertical', valid: vertical, ref: vertical, rule: vertical ? null : 'g10_axis_swap', why: `Non : regarde de quel côté est ${what === 'Le grand axe' ? 'le plus grand dénominateur' : 'le terme positif'}.` },
+  ],
+});
+const STD_MENU = [
+  { id: 'sq', label: 'Compléter les carrés', valid: true },
+  { id: 'div', label: 'Diviser par le second membre', valid: true },
+  { id: 'read', label: 'Lire les éléments sur l\'équation développée', valid: false, why: 'Les éléments se lisent sur la forme réduite : complète d\'abord les carrés.' },
+];
+
+// ======================================================================
+// g10-ellipse
+// ======================================================================
+
+const ELL = 'g10-ellipse';
+const ELL_SUB = [
+  { id: 'sq', label: 'compléter les carrés', skill: 'quad-complete' },
+  { id: 'el', label: 'lire les éléments', skill: ELL },
+];
+
+function ellData(rng) {
+  const pyth = rng.int(0, 2) > 0;
+  const [A, B] = pyth ? rng.pick([[5, 4], [5, 3]]) : rng.pick([[3, 2], [4, 2], [3, 1], [2, 1], [4, 3], [4, 1]]);
+  const vertical = rng.chance(0.5);
+  let h; let k;
+  do { h = rng.int(-5, 5); k = rng.int(-5, 5); } while (h === 0 && k === 0);
+  const [ax, ay] = vertical ? [B, A] : [A, B];
+  const c = axisConic(ay * ay, ax * ax, h, k, -ax * ax * ay * ay);
+  const c2 = A * A - B * B;
+  const foc = (s) => (vertical ? [qt(h), plusRoot(k, c2, s)] : [plusRoot(h, c2, s), qt(k)]);
+  const dirV = q(A ** 4, c2);
+  const dirT = (s) => `${vertical ? 'y' : 'x'} = ${plusRoot(vertical ? k : h, dirV, s)}`;
+  return {
+    A, B, vertical, h, k, ax, ay, coefs: c, eq: eqOf(c), c2,
+    std: `${sqT('x', h)}/${ax * ax} + ${sqT('y', k)}/${ay * ay} = 1`,
+    cT: rootT(c2), eT: rootT(q(c2, A * A)), F: [foc(1), foc(-1)], dirs: [dirT(1), dirT(-1)],
+  };
+}
+
+const ELL_MENU = {
+  el: [
+    { id: 'read', label: 'Lire Ω, a et b : a sous le plus grand dénominateur', valid: true },
+    { id: 'small', label: 'a sous le premier dénominateur écrit', valid: false, rule: 'g10_axis_swap', why: 'Le grand axe est du côté du plus grand dénominateur, pas du premier écrit.' },
+  ],
+  foc: [
+    { id: 'minus', label: 'c² = a² − b², foyers sur le grand axe', valid: true },
+    { id: 'plus', label: 'c² = a² + b²', valid: false, rule: 'g10_c_wrong_formula', why: 'Pour une ellipse, les foyers sont à l\'intérieur : c < a, donc c² = a² − b².' },
+  ],
+  dir: [
+    { id: 'e', label: 'e = c/a, directrices à a²/c du centre', valid: true },
+    { id: 'inv', label: 'e = a/c', valid: false, why: 'Pour une ellipse, e = c/a < 1.' },
+  ],
+};
+
+function ellParts(d, level, kind) {
+  const eq = d.eq;
+  const parts = [];
+  if (level > 1) {
+    parts.push(conicPart({
+      start: eq, eq, menu: STD_MENU,
+      lines: [
+        { math: completedOf(d.coefs, d.h, d.k), note: 'Compléter les carrés', subgoal: 'sq', blank: [{ after: sqT('x', d.h), text: qt(d.coefs[0] * d.h * d.h) }, { after: sqT('y', d.k), text: qt(d.coefs[2] * d.k * d.k) }].filter((b) => b.text !== '0') },
+        { math: d.std, note: 'Diviser par le second membre', subgoal: 'sq', blank: [String(d.ax * d.ax), String(d.ay * d.ay)] },
+      ],
+    }));
+  }
+  const first = (o) => (parts.length ? o : { ...o, start: d.std, html: null });
+  parts.push(conicPart(first({
+    html: 'Le centre et les demi-axes.', ask: 'Ω, a, b :', start: 'E', eq, els: ['Ω', 'a', 'b'], menu: ELL_MENU.el,
+    decisions: [AXIS_DEC(d.vertical, 'Le grand axe')],
+    lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.A} ; b = ${d.B}`, note: `Grand axe ${d.vertical ? 'vertical' : 'horizontal'} : a² = ${d.A * d.A} sous ${d.vertical ? 'y' : 'x'}`, subgoal: 'el', blank: [String(d.A), String(d.B)] }],
+  })));
+  parts.push(conicPart({
+    html: 'Les foyers.', ask: 'c, F, F′ :', start: 'E', eq, els: kind === 'foci' ? ['c', 'F', 'e'] : ['c', 'F'], menu: ELL_MENU.foc,
+    lines: [
+      { math: `c = ${d.cT}`, note: `c² = a² − b² = ${d.c2}`, subgoal: 'el', blank: [d.cT] },
+      { math: `F = ${pt2(d.F[0])} ; F' = ${pt2(d.F[1])}`, note: `Sur le grand axe, à c du centre`, subgoal: 'el' },
+      ...(kind === 'foci' ? [{ math: `e = ${d.eT}`, note: 'e = c/a', subgoal: 'el' }] : []),
+    ],
+  }));
+  if (kind === 'all') {
+    parts.push(conicPart({
+      html: 'L\'excentricité et les directrices.', ask: 'e, directrices :', start: 'E', eq, els: ['e', 'directrices'], menu: ELL_MENU.dir,
+      lines: [
+        { math: `e = ${d.eT}`, note: 'e = c/a', subgoal: 'el', blank: [d.eT] },
+        { math: `directrices : ${d.dirs[0]} ou ${d.dirs[1]}`, note: `À a²/c = ${rootR(q(d.A ** 4, d.c2))} du centre, perpendiculaires au grand axe`, subgoal: 'el' },
+      ],
+    }));
+  }
+  return parts;
+}
+
+function ellItem(level, rng, opts = {}) {
+  const d = ellData(rng);
+  if (level === 4 && !opts.exam && !opts.lines && rng.int(0, 3) === 0) return ellPlot(level, rng, d);
+  const kind = level === 5 || opts.exam || level <= 2 ? 'all' : rng.pick(['all', 'foci']);
+  return partsG({
+    skill: ELL, level, parts: ellParts(d, level, kind), subgoals: ELL_SUB, keys: KEYS,
+    prompt: level === 1
+      ? `L'ellipse E a pour forme réduite ${M(d.std)}. Donne son centre, a et b, ses foyers${kind === 'all' ? ', son excentricité et ses directrices' : ''}.`
+      : `Pour l'ellipse E : ${M(d.eq)}, trouve la forme réduite, le centre, a et b, les foyers${kind === 'all' ? ', l\'excentricité et les directrices' : ' et l\'excentricité'}.`,
+    hints: H(`Mets ${d.coefs[0]} en facteur dans les x, ${d.coefs[2]} dans les y, complète, puis divise par le second membre.`, `c² = a² − b² = □`, `F = ${Rd(pt2(d.F[0]))} et F′ = ${Rd(pt2(d.F[1]))}`),
+    key: `${ELL}:${kind}:${d.eq}`, exam: opts.exam ? examTag(opts, 5) : false,
+  });
+}
+
+// Gabarit 3: the sketch (plot): Ω, the vertices of the major axis, the foci.
+function ellPlot(level, rng, d = ellData(rng)) {
+  const span = d.A + 1.5;
+  return conicPlot({
+    skill: ELL, level, equation: d.eq, view: viewAround(d.h, d.k, span), key: d.eq,
+    prompt: `Esquisse l'ellipse E : ${M(d.std)}. Place son centre Ω, les sommets du grand axe et les foyers.`,
+    place: [{ id: 'center', label: 'Ω', short: 'Ω', kind: 'point' }, { id: 'vertices', label: 'Sommets', short: 'S', kind: 'point' }, { id: 'foci', label: 'Foyers', short: 'F', kind: 'point' }],
+    hints: H('Le centre se lit sur la forme réduite ; les sommets sont à a du centre sur le grand axe.', `a = ${d.A}, sur l'axe ${d.vertical ? 'vertical' : 'horizontal'} ; c = □`, `Foyers ${Rd(pt2(d.F[0]))} et ${Rd(pt2(d.F[1]))}`),
+    solution: [{ html: `Ω = ${Rd(pt2([d.h, d.k]))}, a = ${d.A}, b = ${d.B}, c = ${Rd(d.cT)} ; foyers ${Rd(pt2(d.F[0]))} et ${Rd(pt2(d.F[1]))}.`, note: '' }],
+    rules: { foci: 'g10_c_wrong_formula', vertices: 'g10_axis_swap' },
+    baits: ['g10_c_wrong_formula', 'g10_axis_swap'],
+    noHints: level === 5,
+  });
+}
+
+function ellExam(rng, exam) {
+  if (exam === 'open') return ellItem(5, rng, { exam });
+  const d = ellData(rng);
+  if (exam === 'coef') {
+    const right = d.vertical ? d.F[0][1] : d.F[0][0];
+    return coefItem({
+      skill: ELL, key: `${d.eq}`, exam: examTag({ exam }), label: d.vertical ? 'y_F' : 'x_F',
+      prompt: `L'ellipse ${M(d.eq)} a un foyer F ${d.vertical ? 'au-dessus de l\'autre' : 'à droite de l\'autre'}. Que vaut ${d.vertical ? 'son ordonnée' : 'son abscisse'} ?`,
+      value: right, traps: [{ rule: 'g10_c_wrong_formula' }, { rule: 'g10_axis_swap' }],
+      solution: [{ html: `${M(d.std)} : a = ${d.A}, b = ${d.B}, c = ${Rd(d.cT)}, F = ${Rd(pt2(d.F[0]))}.`, note: '' }],
+    });
+  }
+  if (exam === 'tf') {
+    if (rng.chance(0.4)) {
+      return tfG({
+        skill: ELL, key: 'e<1', truth: true, exam: examTag({ exam }),
+        statement: 'L\'excentricité e d\'une ellipse (qui n\'est pas un cercle) vérifie 0 < e < 1.',
+        explanation: 'Vrai : e = c/a et c² = a² − b² < a², donc c < a.',
+      });
+    }
+    return tfG({
+      skill: ELL, key: 'foci', truth: false, exam: examTag({ exam }), ruleIfTrue: 'g10_c_wrong_formula',
+      statement: 'Les foyers de l\'ellipse x²/a² + y²/b² = 1 (avec a > b > 0) sont à la distance √(a² + b²) du centre.',
+      counter: geoCounter('ellipseFoci', [['a', 'a ='], ['b', 'b =']], { a: '5', b: '3' }),
+      explanation: 'Faux : c² = a² − b². Pour a = 5 et b = 3, les foyers sont à 4 du centre, pas à √34.',
+    });
+  }
+  const c2w = d.A * d.A + d.B * d.B;
+  const fw = (s) => (d.vertical ? [qt(d.h), plusRoot(d.k, c2w, s)] : [plusRoot(d.h, c2w, s), qt(d.k)]);
+  const fs = (s) => (d.vertical ? [plusRoot(d.h, d.c2, s), qt(d.k)] : [qt(d.h), plusRoot(d.k, d.c2, s)]);
+  const opt = (P, Qq) => `${Rd(pt2(P))} et ${Rd(pt2(Qq))}`;
+  return mcqD({
+    skill: ELL, level: 4, key: `mcq:${d.eq}`, exam: examTag({ exam }),
+    prompt: `Quels sont les foyers de l'ellipse ${M(d.eq)} ?`,
+    right: opt(d.F[0], d.F[1]),
+    wrongs: [{ html: opt(fw(1), fw(-1)), rule: 'g10_c_wrong_formula' }, { html: opt(fs(1), fs(-1)), rule: 'g10_axis_swap' }],
+    fillers: [{ html: opt(d.vertical ? [qt(d.h), qt(d.k + d.A)] : [qt(d.h + d.A), qt(d.k)], d.vertical ? [qt(d.h), qt(d.k - d.A)] : [qt(d.h - d.A), qt(d.k)]) }, { html: opt(d.F[0].map((x) => x.replace(/^-/, '')), d.F[1]) }],
+    solution: [{ html: `${M(d.std)} : c² = a² − b² = ${d.c2}.`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// g10-hyperbola
+// ======================================================================
+
+const HYP = 'g10-hyperbola';
+const HYP_SUB = ELL_SUB.map((s) => (s.id === 'el' ? { ...s, skill: HYP } : s));
+
+function hypData(rng, kind = 'all') {
+  const [a, b] = kind === 'eq' ? rng.pick([[1, 1], [2, 2], [3, 3]])
+    : rng.int(0, 3) > 0 ? rng.pick([[4, 3], [3, 4], [8, 6], [6, 8]]) : rng.pick([[2, 1], [1, 2], [3, 1], [1, 3], [2, 3]]);
+  const vertical = rng.chance(0.5);
+  let h; let k;
+  do { h = rng.int(-5, 5); k = rng.int(-5, 5); } while (h === 0 && k === 0);
+  // Real axis horizontal: b²(x − h)² − a²(y − k)² − a²b² = 0.
+  const coefs = vertical ? axisConic(-a * a, b * b, h, k, -a * a * b * b) : axisConic(b * b, -a * a, h, k, -a * a * b * b);
+  const c2 = a * a + b * b;
+  const foc = (s) => (vertical ? [qt(h), plusRoot(k, c2, s)] : [plusRoot(h, c2, s), qt(k)]);
+  const dirV = q(a ** 4, c2);
+  const dirT = (s) => `${vertical ? 'y' : 'x'} = ${plusRoot(vertical ? k : h, dirV, s)}`;
+  // Asymptotes: b(x − h) = ±a(y − k) (horizontal), a(x − h) = ±b(y − k) (vertical).
+  const [p, r] = vertical ? [a, b] : [b, a];
+  const asym = [lineRow(p, -r, -p * h + r * k), lineRow(p, r, -p * h - r * k)];
+  const std = vertical ? `${sqT('y', k)}/${a * a} - ${sqT('x', h)}/${b * b} = 1` : `${sqT('x', h)}/${a * a} - ${sqT('y', k)}/${b * b} = 1`;
+  // Before dividing: α(x − h)² + β(y − k)² = rhs.
+  const sides = `${sumT([[coefs[0], sqT('x', h)], [coefs[2], sqT('y', k)]])} = ${qt(-(coefs[5] - coefs[0] * h * h - coefs[2] * k * k))}`;
+  return {
+    a, b, vertical, h, k, coefs, eq: eqOf(coefs), c2, std, sides,
+    cT: rootT(c2), eT: rootT(q(c2, a * a)), F: [foc(1), foc(-1)], dirs: [dirT(1), dirT(-1)], asym,
+    asymT: `${lineText(asym[0])} ou ${lineText(asym[1])}`,
+    S: vertical ? [[h, k + a], [h, k - a]] : [[h + a, k], [h - a, k]],
+  };
+}
+
+const HYP_MENU = {
+  el: [
+    { id: 'pos', label: 'L\'axe réel est du côté du terme positif (second membre +1)', valid: true },
+    { id: 'big', label: 'L\'axe réel est du côté du plus grand dénominateur', valid: false, rule: 'g10_axis_swap', why: 'Pour une hyperbole, c\'est le signe qui compte : le terme positif quand le second membre vaut 1.' },
+  ],
+  foc: [
+    { id: 'plus', label: 'c² = a² + b²', valid: true },
+    { id: 'minus', label: 'c² = a² − b²', valid: false, rule: 'g10_c_wrong_formula', why: 'Pour une hyperbole, c > a : c² = a² + b².' },
+  ],
+  asy: [
+    { id: 'ba', label: 'y − k = ±(b/a)(x − h) pour l\'axe réel horizontal', valid: true },
+    { id: 'ab', label: 'y − k = ±(a/b)(x − h) pour l\'axe réel horizontal', valid: false, rule: 'g10_asymptote_ratio', why: 'x²/a² − y²/b² = 0 donne y = ±(b/a)x.' },
+  ],
+  dir: [{ id: 'dir', label: 'Directrices à a²/c du centre, perpendiculaires à l\'axe réel', valid: true }, { id: 'c', label: 'À c du centre', valid: false, why: 'À c du centre, ce sont les foyers.' }],
+};
+
+function hypParts(d, level, kind) {
+  const parts = [];
+  if (level > 1) {
+    parts.push(conicPart({
+      start: d.eq, eq: d.eq, menu: STD_MENU,
+      lines: [
+        { math: completedOf(d.coefs, d.h, d.k), note: 'Compléter les carrés', subgoal: 'sq', blank: [{ after: sqT('x', d.h), text: qt(Math.abs(d.coefs[0] * d.h * d.h)) }, { after: sqT('y', d.k), text: qt(Math.abs(d.coefs[2] * d.k * d.k)) }].filter((b) => b.text !== '0') },
+        { math: d.std, note: `${Rd(d.sides).replace(/\^2/g, '²')}, puis diviser par le second membre (qui devient +1)`, subgoal: 'sq', blank: [String(d.a * d.a), String(d.b * d.b)] },
+      ],
+    }));
+  }
+  const first = (o) => (parts.length ? o : { ...o, start: d.std, html: null });
+  if (kind !== 'asym') {
+    parts.push(conicPart(first({
+      html: 'Le centre, a, b et c.', ask: 'Ω, a, b, c :', start: 'H', eq: d.eq, els: ['Ω', 'a', 'b', 'c'], menu: HYP_MENU.el,
+      decisions: [AXIS_DEC(d.vertical, 'L\'axe réel')],
+      lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.a} ; b = ${d.b} ; c = ${d.cT}`, note: `Axe réel ${d.vertical ? 'vertical' : 'horizontal'} ; c² = a² + b² = ${d.c2}`, subgoal: 'el', blank: [String(d.a), String(d.b)] }],
+    })));
+    parts.push(conicPart({
+      html: 'Les foyers et l\'excentricité.', ask: 'F, F′, e :', start: 'H', eq: d.eq, els: ['F', 'e'], menu: HYP_MENU.foc,
+      lines: [
+        { math: `F = ${pt2(d.F[0])} ; F' = ${pt2(d.F[1])}`, note: 'Sur l\'axe réel, à c du centre', subgoal: 'el' },
+        { math: `e = ${d.eT}`, note: 'e = c/a > 1', subgoal: 'el', blank: [d.eT] },
+      ],
+    }));
+  }
+  parts.push(conicPart(first({
+    html: 'Les asymptotes.', ask: 'asymptotes :', start: 'H', eq: d.eq, els: ['asymptotes'], menu: HYP_MENU.asy,
+    lines: [{ math: `asymptotes : ${d.asymT}`, note: d.vertical ? `y − k = ±(a/b)(x − h) : l'axe réel est vertical` : 'y − k = ±(b/a)(x − h)', subgoal: 'el' }],
+  })));
+  if (kind === 'all' && level >= 4) {
+    parts.push(conicPart({
+      html: 'Les directrices.', ask: 'directrices :', start: 'H', eq: d.eq, els: ['directrices'], menu: HYP_MENU.dir,
+      lines: [{ math: `directrices : ${d.dirs[0]} ou ${d.dirs[1]}`, note: `À a²/c = ${rootR(q(d.a ** 4, d.c2))} du centre`, subgoal: 'el' }],
+    }));
+  }
+  return parts;
+}
+
+function hypItem(level, rng, opts = {}) {
+  if (level === 5 && !opts.exam && rng.chance(0.5)) return hypPlot(level, rng);
+  const kind = level === 5 || opts.exam || level <= 2 ? 'all' : rng.pick(['all', 'asym', 'eq']);
+  const d = hypData(rng, kind === 'eq' ? 'eq' : 'all');
+  const kk = kind === 'eq' ? 'all' : kind;
+  return partsG({
+    skill: HYP, level, parts: hypParts(d, level, kk), subgoals: HYP_SUB, keys: KEYS,
+    prompt: level === 1
+      ? `L'hyperbole H a pour forme réduite ${M(d.std)}. Donne son centre, a, b, c, ses foyers, son excentricité et ses asymptotes.`
+      : `Pour l'hyperbole H : ${M(d.eq)}, trouve la forme réduite${kk === 'asym' ? ' et les asymptotes' : ', le centre, a, b, c, les foyers, l\'excentricité, les asymptotes'}${kk === 'all' && level >= 4 ? ' et les directrices' : ''}.`,
+    hints: H('Pour une hyperbole, c² = a² + b² ; l\'axe réel est du côté du terme positif quand le second membre vaut +1.', `${d.vertical ? 'y − k = ±(□/□)(x − h)' : 'y − k = ±(□/□)(x − h)'}, Ω = ${Rd(pt2([d.h, d.k]))}`, `asymptotes : ${Rd(d.asymT)}`),
+    key: `${HYP}:${kind}:${d.eq}`, exam: opts.exam ? examTag(opts, 5) : false,
+  });
+}
+
+// L5: the sketch: centre, vertices, asymptotes (CMS contrôle 4, Q3 a).
+function hypPlot(level, rng) {
+  const d = hypData(rng);
+  return conicPlot({
+    skill: HYP, level, equation: d.eq, view: viewAround(d.h, d.k, Math.sqrt(d.c2) + 1.5), key: d.eq,
+    prompt: `Esquisse l'hyperbole H : ${M(d.eq)}. Place son centre Ω, ses sommets et ses deux asymptotes (chacune par deux points).`,
+    place: [{ id: 'center', label: 'Ω', short: 'Ω', kind: 'point' }, { id: 'vertices', label: 'Sommets', short: 'S', kind: 'point' }, { id: 'asymptotes', label: 'Asymptotes', short: '', kind: 'line' }],
+    hints: [], noHints: true,
+    solution: [{ html: `${M(d.std)} : Ω = ${Rd(pt2([d.h, d.k]))}, sommets ${d.S.map((P) => Rd(pt2(P))).join(' et ')}, asymptotes ${Rd(d.asymT)}.`, note: '' }],
+    rules: { asymptotes: 'g10_asymptote_ratio', vertices: 'g10_axis_swap' },
+    baits: ['g10_asymptote_ratio', 'g10_axis_swap'],
+  });
+}
+
+function hypExam(rng, exam) {
+  if (exam === 'open') return hypItem(5, rng, { exam });
+  if (exam === 'tf') {
+    return tfG({
+      skill: HYP, key: 'perp', truth: true, exam: examTag({ exam }),
+      statement: 'Les asymptotes de l\'hyperbole x²/a² − y²/b² = 1 sont perpendiculaires si et seulement si a = b.',
+      explanation: 'Vrai : leurs pentes ±b/a ont pour produit −b²/a², qui vaut −1 si et seulement si a = b (hyperbole équilatère).',
+    });
+  }
+  let d;
+  do d = hypData(rng); while (d.a === d.b);
+  const [p, r] = d.vertical ? [d.b, d.a] : [d.a, d.b];
+  const swap = `${lineText(lineRow(p, -r, -p * d.h + r * d.k))} ou ${lineText(lineRow(p, r, -p * d.h - r * d.k))}`;
+  const opt = (t) => Rd(t.replace(' ou ', ' et '));
+  return mcqD({
+    skill: HYP, level: 4, key: `mcq:${d.eq}`, exam: examTag({ exam }),
+    prompt: `Quelles sont les asymptotes de l'hyperbole ${M(d.eq)} ?`,
+    right: opt(d.asymT),
+    wrongs: [{ html: opt(swap), rule: 'g10_asymptote_ratio' }],
+    fillers: [
+      { html: opt(`${lineText(lineRow(d.asym[0][0], d.asym[0][1], d.asym[0][2].neg()))} ou ${lineText(lineRow(d.asym[1][0], d.asym[1][1], d.asym[1][2].neg()))}`) },
+      { html: opt(`${lineText(lineRow(1, -1, -d.h + d.k))} ou ${lineText(lineRow(1, 1, -d.h - d.k))}`) },
+    ],
+    solution: [{ html: `${M(d.std)} : les asymptotes passent par Ω = ${Rd(pt2([d.h, d.k]))}, ${Rd(d.asymT.replace(' ou ', ' et '))}.`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// g10-parabola
+// ======================================================================
+
+const PAR = 'g10-parabola';
+const PAR_SUB = ELL_SUB.map((s) => (s.id === 'el' ? { ...s, skill: PAR } : s));
+
+function parData(rng, { small = false } = {}) {
+  const p = rng.pick(small ? [1, 2] : [1, 2, 3, 4, 6]) * rng.pick([1, -1]);
+  const vertical = rng.chance(0.5);
+  let h; let k;
+  do { h = rng.int(-5, 5); k = rng.int(-5, 5); } while ((vertical ? h : k) === 0);
+  // Vertical: (x − h)² = 2p(y − k).
+  const coefs = vertical ? [1, 0, 0, -2 * h, -2 * p, h * h + 2 * p * k] : [0, 0, 1, -2 * p, -2 * k, k * k + 2 * p * h];
+  const half = q(p, 2);
+  const std = vertical ? `${sqT('x', h)} = ${2 * p}${linT1('y', k)}` : `${sqT('y', k)} = ${2 * p}${linT1('x', h)}`;
+  const completed = vertical
+    ? `${sumT([[1, sqT('x', h)], [-h * h, ''], [-2 * p, 'y'], [coefs[5], '']].filter(([x]) => x !== 0))} = 0`
+    : `${sumT([[1, sqT('y', k)], [-k * k, ''], [-2 * p, 'x'], [coefs[5], '']].filter(([x]) => x !== 0))} = 0`;
+  return {
+    p, vertical, h, k, coefs, eq: eqOf(coefs), std, completed,
+    F: vertical ? [qt(h), qt(q(k).add(half))] : [qt(q(h).add(half)), qt(k)],
+    Fq: vertical ? [q(h), q(k).add(half)] : [q(h).add(half), q(k)],
+    dq: vertical ? q(k).sub(half) : q(h).sub(half),
+    dir: vertical ? `y = ${qt(q(k).sub(half))}` : `x = ${qt(q(h).sub(half))}`,
+    axe: vertical ? `x = ${h}` : `y = ${k}`,
+  };
+}
+
+const PAR_MENU = {
+  S: [{ id: 'read', label: 'Lire le sommet et l\'axe sur la forme réduite', valid: true }, { id: 'focus', label: 'Le sommet est le foyer', valid: false, why: 'Le foyer est à p/2 du sommet, sur l\'axe.' }],
+  p: [{ id: 'half', label: '2p est le coefficient devant (y − k)', valid: true }, { id: 'p', label: 'p est le coefficient devant (y − k)', valid: false, why: 'La forme est (x − h)² = 2p(y − k) : ce coefficient vaut 2p.' }],
+  F: [
+    { id: 'half', label: 'F à p/2 du sommet, directrice à p/2 de l\'autre côté', valid: true },
+    { id: 'p', label: 'F à p du sommet', valid: false, rule: 'g10_parabola_p_half', why: 'Le foyer est à p/2 du sommet, pas à p.' },
+  ],
+  def: [{ id: 'def', label: 'MF² = d(M, D)², puis développer', valid: true }, { id: 'mf', label: 'MF = d(M, D) sans élever au carré', valid: true, quality: 'poor', why: 'Juste, mais avec les racines, on ne peut pas réduire : élève au carré.' }],
+};
+
+function parElements(d, first) {
+  const st = first ? d.std : 'P';
+  return [
+    conicPart({
+      html: first ? null : 'Le sommet et l\'axe.', ask: 'S, axe :', start: st, eq: d.eq, els: ['S', 'axe'], menu: PAR_MENU.S,
+      lines: [{ math: `S = ${pt2([d.h, d.k])} ; axe : ${d.axe}`, note: `Axe ${d.vertical ? 'vertical' : 'horizontal'} : le carré porte sur ${d.vertical ? 'x' : 'y'}`, subgoal: 'el', blank: [String(d.h), String(d.k)] }],
+    }),
+    {
+      html: 'Le paramètre p.', ask: 'p =', start: 'p', judge: { kind: 'value', expect: String(d.p) }, menu: PAR_MENU.p,
+      lines: [{ math: String(d.p), note: `2p = ${d.p * 2}`, subgoal: 'el', blank: [String(d.p)] }],
+    },
+    conicPart({
+      html: 'Le foyer et la directrice.', ask: 'F, directrice :', start: 'P', eq: d.eq, els: ['F', 'directrice'], menu: PAR_MENU.F,
+      lines: [{ math: `F = ${pt2(d.F)} ; directrice : ${d.dir}`, note: 'À p/2 du sommet, de part et d\'autre', subgoal: 'el', blank: [d.vertical ? d.F[1] : d.F[0]] }],
+    }),
+  ];
+}
+
+function parItem(level, rng, opts = {}) {
+  const gab = level === 5 || opts.exam ? rng.pick(['fd', 'pts']) : level === 4 ? rng.pick(['eq', 'fd', 'pts']) : 'eq';
+  const d = parData(rng, { small: gab === 'pts' });
+  const parts = [];
+  let prompt;
+  if (gab === 'eq') {
+    if (level > 1) {
+      parts.push(conicPart({
+        start: d.eq, eq: d.eq, menu: STD_MENU.slice(0, 1).concat([{ id: 'iso', label: 'Isoler le carré, mettre 2p en facteur', valid: true }]),
+        decisions: [{
+          levels: [2], kind: 'decision', prompt: 'L\'axe de la parabole est…', options: [
+            { id: 'v', label: 'vertical (le carré porte sur x)', valid: d.vertical, ref: d.vertical, why: 'Le terme au carré est en y : l\'axe est horizontal.' },
+            { id: 'h', label: 'horizontal (le carré porte sur y)', valid: !d.vertical, ref: !d.vertical, why: 'Le terme au carré est en x : l\'axe est vertical.' },
+          ],
+        }],
+        lines: [
+          { math: d.completed, note: 'Compléter le carré', subgoal: 'sq', blank: [{ after: d.vertical ? sqT('x', d.h) : sqT('y', d.k), text: qt((d.vertical ? d.h : d.k) ** 2) }].filter((b) => b.text !== '0') },
+          { math: d.std, note: 'Isoler le carré et mettre 2p en facteur', subgoal: 'sq', blank: [String(2 * d.p)] },
+        ],
+      }));
+    }
+    parts.push(...parElements(d, level === 1));
+    prompt = level === 1 ? `La parabole P a pour forme réduite ${M(d.std)}. Donne son sommet, son axe, p, son foyer et sa directrice.` : `Pour la parabole P : ${M(d.eq)}, trouve la forme réduite, le sommet, l'axe, p, le foyer et la directrice.`;
+  } else if (gab === 'fd') {
+    const [fx, fy] = d.Fq;
+    const dv = d.dq;
+    const sq1 = d.vertical ? `${sqT('x', fx)} + ${sqT('y', fy)} = ${sqT('y', dv)}` : `${sqT('x', fx)} + ${sqT('y', fy)} = ${sqT('x', dv)}`;
+    parts.push(conicPart({
+      start: 'P', eq: d.eq, menu: PAR_MENU.def,
+      lines: [
+        { math: sq1, note: 'MF² = d(M, D)²', subgoal: 'sq' },
+        { math: d.std, note: 'Développer et réduire', subgoal: 'sq' },
+      ],
+    }));
+    parts.push(parElements(d, false)[0]);
+    prompt = `Trouve l'équation de la parabole P de foyer F${Rd(pt2(d.F))} et de directrice D : ${Rd(d.dir)}, sous la forme réduite, puis son sommet et son axe.`;
+  } else {
+    // Axis and two points: (x − h)² = 2p(y − k), h known.
+    let A; let B;
+    for (;;) {
+      const ts = [rng.int(-6, 6), rng.int(-6, 6)];
+      if (ts.some((t) => !t) || ts[0] * ts[0] === ts[1] * ts[1]) continue;
+      if (ts.some((t) => (t * t) % (2 * d.p) !== 0)) continue;
+      const P = (t) => (d.vertical ? [d.h + t, d.k + (t * t) / (2 * d.p)] : [d.h + (t * t) / (2 * d.p), d.k + t]);
+      [A, B] = ts.map(P);
+      if ([A, B].every((X) => X.every((x) => Math.abs(x) <= 14))) break;
+    }
+    const [u, v, w] = d.vertical ? [0, 1, d.h] : [1, 0, d.k];
+    const dA = A[u] - w;
+    const dB = B[u] - w;
+    parts.push(
+      {
+        start: '2p', judge: { kind: 'value', expect: String(2 * d.p) },
+        notes: [`A et B donnent ${Rd(`${par(dA)}^2 = 2p(${A[v]} - k)`)} et ${Rd(`${par(dB)}^2 = 2p(${B[v]} - k)`)}.`.replace(/\^2/g, '²')],
+        lines: [{ math: `(${par(dA)}^2-${par(dB)}^2)/(${A[v]}-${par(B[v])})`, note: 'Soustraire les deux équations', subgoal: 'sq' }, { math: String(2 * d.p), note: '', subgoal: 'sq' }],
+      },
+      {
+        html: 'Puis k.', ask: 'k =', start: 'k', judge: { kind: 'value', expect: String(d.vertical ? d.k : d.h) },
+        lines: [{ math: `${A[v]}-${par(dA)}^2/${par(2 * d.p)}`, note: `De ${Rd(`${par(dA)}^2`).replace('^2', '²')} = 2p(${A[v]} − k)`, subgoal: 'sq' }, { math: String(d.vertical ? d.k : d.h), note: '', subgoal: 'sq' }],
+      },
+      conicPart({ html: 'L\'équation.', ask: 'P :', start: 'P', eq: d.eq, lines: [{ math: d.std, note: '', subgoal: 'sq' }] }),
+    );
+    prompt = `Une parabole P d'axe ${Rd(d.axe)} passe par ${ptR('A', A)} et ${ptR('B', B)}. Trouve son équation sous la forme ${d.vertical ? `(x − ${fq(d.h)})² = 2p(y − k)` : `(y − ${fq(d.k)})² = 2p(x − h)`}.`.replace(/− −/g, '+ ');
+  }
+  return partsG({
+    skill: PAR, level, parts, subgoals: PAR_SUB, keys: KEYS,
+    prompt,
+    hints: H('Isole le carré d\'un côté, mets le coefficient de l\'autre variable en facteur : (x − h)² = 2p(y − k).', `F = ${Rd(pt2(d.vertical ? [d.h, `${d.k} + □`] : [`${d.h} + □`, d.k]))}`, `${Rd(d.std)} ; F = ${Rd(pt2(d.F))} ; directrice ${Rd(d.dir)}`),
+    key: `${PAR}:${gab}:${d.eq}`, exam: opts.exam ? examTag(opts, 4) : false,
+  });
+}
+
+function parExam(rng, exam) {
+  if (exam === 'open') return parItem(5, rng, { exam });
+  if (exam === 'tf') {
+    const tp = rng.pick([2, 4, 6, 8, 12]);
+    if (rng.chance(0.35)) {
+      return tfG({
+        skill: PAR, key: `true:${tp}`, truth: true, exam: examTag({ exam }),
+        statement: `Le foyer de la parabole x² = ${tp}y est (0 ; ${fq(q(tp, 4))}).`,
+        explanation: `Vrai : 2p = ${tp}, p = ${fq(q(tp, 2))}, et le foyer est à p/2 = ${fq(q(tp, 4))} du sommet O.`,
+      });
+    }
+    return tfG({
+      skill: PAR, key: `false:${tp}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'g10_parabola_p_half',
+      statement: `Le foyer de la parabole x² = ${tp}y est (0 ; ${tp}).`,
+      counter: geoCounter('parabolaFocus', [['F', 'le vrai foyer F =']], { F: `(0 ; ${qt(q(tp, 4))})` }, { fx: 0, fy: tp / 4 }),
+      explanation: `Faux : 2p = ${tp}, donc p = ${fq(q(tp, 2))} et le foyer est à p/2 du sommet : F = (0 ; ${fq(q(tp, 4))}).`,
+    });
+  }
+  const d = parData(rng);
+  const pF = (k) => (d.vertical ? [qt(d.h), qt(q(d.k).add(q(d.p).mul(q(k))))] : [qt(q(d.h).add(q(d.p).mul(q(k)))), qt(d.k)]);
+  return mcqD({
+    skill: PAR, level: 4, key: `mcq:${d.eq}`, exam: examTag({ exam }),
+    prompt: `Quel est le foyer de la parabole ${M(d.eq)} ?`,
+    right: Rd(pt2(d.F)),
+    wrongs: [{ html: Rd(pt2(pF(1))), rule: 'g10_parabola_p_half' }, { html: Rd(pt2(pF(2))), rule: 'g10_parabola_p_half' }, { html: Rd(pt2(pF(q(-1, 2)))), rule: null }],
+    fillers: [{ html: Rd(pt2([d.h, d.k])) }],
+    solution: [{ html: `${M(d.std)} : 2p = ${2 * d.p}, le foyer est à p/2 = ${fq(q(d.p, 2))} du sommet.`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [ELL]: (level, rng, profile, opts = {}) => (opts.exam ? ellExam(rng, opts.exam) : ellItem(level, rng)),
+  [HYP]: (level, rng, profile, opts = {}) => (opts.exam ? hypExam(rng, opts.exam) : hypItem(level, rng)),
+  [PAR]: (level, rng, profile, opts = {}) => (opts.exam ? parExam(rng, opts.exam) : parItem(level, rng)),
   [POL]: (level, rng, profile, opts = {}) => (opts.exam ? polExam(rng, opts.exam) : polItem(level, rng)),
   [POW]: (level, rng, profile, opts = {}) => (opts.exam ? powExam(rng, opts.exam) : powItem(level, rng)),
   [CEQ]: (level, rng, profile, opts = {}) => (opts.exam ? ceqExam(rng, opts.exam) : ceqItem(level, rng)),
