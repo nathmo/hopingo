@@ -4,14 +4,15 @@
 // exactly when both are exact, else by quadrature (relative 1e−7; a
 // singular end costs about 1e−8 in double precision). cfg:
 //   {vars?: letters allowed, seq?: {J: 'int(x^n×e^x, x, 0, 1)'}, param?: 'n',
-//    nRange?: [1, 6]}
+//    nRange?: [1, 6], recurrence?: true}
 // seq and param (recurrence formulas Iₙ = … Iₙ₋₁, catalogue A1 E4): J_n,
 // J_(n−1), J_0 stand for the integral with n replaced; a line with n is
 // compared for every n of nRange.
 // Final form: an exact number in closed form (js/cas/closedform.js).
 
 import { parse } from '../cas/parse.js';
-import { symbolsIn, mapNode, contains, lit } from '../cas/ast.js';
+import { symbolsIn, mapNode, contains, lit, walk } from '../cas/ast.js';
+import { toText } from '../cas/print.js';
 import { exactValue } from '../cas/normal.js';
 import { evalFloat } from '../cas/numeric.js';
 import { closedNumber } from '../cas/closedform.js';
@@ -80,7 +81,19 @@ export function sameValue(cfg, a, b) {
   try { return compare(cfg, a, b).equal; } catch { return false; }
 }
 
+// cfg.recurrence (with seq and param): the part asks for the recurrence
+// formula itself. A line is final when it gives Jₙ from lower indices only:
+// no ∫, bracket or limit left, J only at indices other than n.
+function recurrenceFinal(cfg, node) {
+  if (contains(node, (x) => x.t === 'int' || x.t === 'bracket' || x.t === 'lim')) return false;
+  const seq = seqOf(cfg);
+  const subs = [];
+  walk(node, (x) => { if (x.t === 'sym' && x.sub && seq[x.name]) subs.push(toText(x.sub)); return true; });
+  return subs.length > 0 && !subs.includes(cfg.param);
+}
+
 export function isFinal(cfg, node) {
+  if (cfg.recurrence && cfg.param && cfg.seq) return recurrenceFinal(cfg, node);
   if (cfg.param && symbolsIn(node).has(cfg.param)) return false;
   if (cfg.seq && contains(node, (x) => x.t === 'sym' && !!x.sub)) return false;
   return closedNumber(node);
