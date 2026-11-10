@@ -294,6 +294,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-green` — Théorème de Green et calcul d'une aire
 - **Année** 15 · **Prérequis** `v-line-vector`, `v-ops`, `a2-fubini-rect`, `a2-polar-int` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `v-line-vector` : le membre ∮ F · dl est un travail ; `v-ops` : rot F scalaire en 2D ; `a2-polar-int` : domaines en disque : ∬ en polaires.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `equiv` (rot F, à partir de ∂F₂/∂x − ∂F₁/∂y écrits avec `pd`) et `definite` (∬_D rot F en cartésiennes, en polaires, ou en coordonnées elliptiques pour l'ellipse) ; L1 : ces deux lignes à trous (pas le tableau entier du plan) ; L2 à L4 : décision « Green, paramétrer le bord (`poor`), ou aire » ; L4 tire aussi l'aire d'une ellipse par ½∮(x dy − y dx) (juge `param` pour le bord) et le champ (−y, x)/(x² + y²) (décision « Green s'applique-t-il ? », piège `v_green_singular`) ; L5 : vérifier Green sur un demi-disque pour F = (−by, ax), le diamètre étant une note (F · γ′ = 0) ; pas de triangle en L5. Variante `open` : 3 points (rot F, puis ∮ = rot F × aire) au lieu de 2, le plan `ba3-analyse3` demandant 3 à 14 points.
 - **Intro** : A domaine régulier, ∂A orienté positivement (A à gauche), F ∈ C¹ sur Ā : ∬_A rot F dx dy = ∮_∂A F · dl. Il faut **calculer** rot F : s'il est constant (rot F = 2), ∮ = 2 · aire(A). Aire : ½∮(x dy − y dx). Pas de Green si F a une singularité dans A. Exemple (plan, §5) : F = (−y, x) sur le disque unité ; `math: ∮ F · dl = ∫₀^{2π} 1 dt = 2π` ; `math: rot F = 1 − (−1) = 2, ∬_D 2 dx dy = 2π`, `note: les deux membres sont égaux`.
 - **Juge** : `param` pour le bord ; `definite` `{value}` pour chaque membre ; une ligne de décision « Green s'applique-t-il ? » (singularité, régularité) · **Forme finale** : la valeur, avec rot F calculé.
 - **Niveaux** :
@@ -316,6 +317,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-green-flux` — Forme flux de Green : ∮ F · ν dl = ∬ div F
 - **Année** 15 · **Prérequis** `v-green` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-green` : même théorème, sous forme de flux.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `equiv` (div F, décision « ∬ div F ou ∬ rot F »), `domain` (bornes de type I du triangle ou du carré, dès L2) et `definite` (décision sur l'ordre des intégrales du triangle, piège `v_fubini_bounds`) ; disque en polaires. Gabarit de l'examen 2021 avec a² = π seulement : avec a² = π/2, la valeur ½ + π√(2π)/6 n'est pas une forme close du juge `definite`. L5 : le carré, ∬ div F puis le bord côté par côté (ν du côté x = a par le juge `vector`, piège `v_nu_formula`), les côtés où F · ν = 0 en note. Variante `open` : le problème de L4 (5 points).
 - **Intro** : ν est la normale **extérieure unité** au bord : ν = (γ₂′, −γ₁′)/|γ′| pour un bord orienté positivement. Alors ∮_∂A F · ν dl = ∬_A div F dx dy. Sur un triangle ou un carré, Green évite de découper le bord. Exemple : F = (x², y) sur [0 ; 1]² ; `math: div F = 2x + 1` ; `math: ∬ (2x + 1) dx dy = 1 + 1 = 2`.
 - **Juge** : `equiv` pour div F, `definite` pour l'intégrale double et pour la somme sur les côtés · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -338,6 +340,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-surf-param` — Paramétrer une surface ; normale σ_u ∧ σ_v
 - **Année** 15 · **Prérequis** `a2-cyl-sph`, `g4-cross` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a2-cyl-sph` : sphère et cylindre paramétrés par les coordonnées sphériques et cylindriques.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `param` (σ et A sur une ligne, sans étiquette : l'aide de test `wrongVcf` déplace la parenthèse de l'étiquette σ(r, φ)), `vector` pour σ_u, σ_v et σ_u ∧ σ_v (forme `any`), décision sur le sens de la normale avant σ_u ∧ σ_v ; L3 : décision du type de paramétrisation ; surfaces : révolution (r + p)(q − r) coupée par y ≥ 0, paraboloïdes, calottes, cônes, sphères et hémisphères ; pas de coupe x ≥ 0 ni de cylindre (pas de lettre z parmi les paramètres du juge `param`).
 - **Intro** : graphe z = g(x, y) : σ(x, y) = (x, y, g), σ_x ∧ σ_y = (−g_x, −g_y, 1). Surface de révolution z = h(r) : σ(r, φ) = (r cos φ, r sin φ, h(r)). Sphère de rayon R : σ(θ, φ) avec θ depuis l'axe z ; σ_θ ∧ σ_φ = R² sin θ (sin θ cos φ, sin θ sin φ, cos θ). L'ordre des paramètres fixe le sens de la normale. Exemple : `math: σ(r, φ) = (r cos φ, r sin φ, −r² + 2r + 3), (r, φ) ∈ [0 ; 3] × [0 ; π]`, `note: z = (r + 1)(3 − r), y ≥ 0, z ≥ 0` ; `math: σ_r ∧ σ_φ = ((2r − 2) r cos φ, (2r − 2) r sin φ, r)`.
 - **Juge** : `param` `{surface:{implicit, where}, orientation:'up'|'out'|null}` pour σ et A ; `equiv` `{vars:['u','v']}` pour σ_u, σ_v, σ_u ∧ σ_v · **Forme finale** : σ, A, σ_u ∧ σ_v développé, et le sens de la normale nommé (« vers le haut », « extérieure »).
 - **Niveaux** :
@@ -359,6 +362,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-surf-area` — Aire d'une surface et intégrale ∬ f ds
 - **Année** 15 · **Prérequis** `v-surf-param`, `a2-fubini-rect` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 : |σ_u ∧ σ_v| (juge `equiv`, départ √(N₁² + N₂² + N₃²)) et l'intégrale, σ et la normale donnés ; L2 : la normale puis la norme (décision « norme, vecteur ou 3e composante ») ; L3 et plus : σ et A d'abord ; L5 : ∬ z ds sur un hémisphère (sans l'aire qui suit) ; familles : paraboloïdes à 1 + 4a²ρ² carré parfait, cônes, sphères ; pas de ∬ (x² + y²) ds sur un cylindre.
 - **Intro** : ∬_Σ f ds = ∬_A f(σ(u, v)) |σ_u ∧ σ_v| du dv ; aire = ∬_A |σ_u ∧ σ_v|. Le sens de la normale ne compte pas. Exemple : aire du paraboloïde z = x² + y², z ≤ 2 ; `math: |σ_r ∧ σ_φ| = r √(1 + 4r²)` ; `math: aire = 2π ∫₀^{√2} r √(1 + 4r²) dr = 13π/3`.
 - **Juge** : `param` pour σ, `equiv` pour |σ_u ∧ σ_v|, `definite` ensuite · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -380,6 +384,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-flux` — Flux ∬ F · ds
 - **Année** 15 · **Prérequis** `v-surf-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `param`, `vector` (σ_u ∧ σ_v, puis F(σ) · N), `definite` ; L3 et plus : décision « garder ou échanger l'ordre (r, φ) » quand la normale demandée est vers le bas ; L5 : surface fermée faite d'un cône (normale extérieure) et du disque du haut. Le piège `v_curl_eval` sert dans `v-stokes`, pas ici.
 - **Intro** : ∬_Σ F · ds = ∬_A F(σ) · (σ_u ∧ σ_v) du dv, sans norme. Changer l'ordre de u et v change le signe. Si l'énoncé impose une normale (extérieure, vers le haut), on vérifie le sens de σ_u ∧ σ_v. Exemple : F = (0, 0, z), Σ : z = x² + y², z ≤ 1, normale vers le haut ; `math: σ_r ∧ σ_φ = (−2r² cos φ, −2r² sin φ, r)`, `note: troisième composante > 0 : vers le haut` ; `math: ∬ F · ds = ∫₀^{2π} ∫₀¹ r² · r dr dφ = π/2`.
 - **Juge** : `param` `{surface, orientation}`, `equiv` pour F(σ) · N, `definite` · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -402,6 +407,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-boundary` — Bord orienté ∂Σ = σ(∂A)
 - **Année** 15 · **Prérequis** `v-surf-param`, `v-curve-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-surf-param` : σ et le domaine A des paramètres ; `v-curve-param` : paramétrer chaque morceau du bord.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `boundary`, un côté par ligne (points et paires qui s'annulent d'abord) ; une décision par côté de L1 à L3 (en note au niveau 1) ; dans les lignes guidées, les morceaux sont écrits sans leur nom (le tokenizer du noyau lit « : » comme une division, ce qui casserait les trous) ; la ligne d'union « ∂Σ = … » n'est pas demandée. Surfaces : hémisphère en (θ, φ) ou (φ, θ), révolution (r + p)(q − r) coupée par y ≥ 0 (trois morceaux restants), calotte, en (r, φ) ou (φ, r). L5 et variante `open` (4 points) : le bord, puis ∮ F · dl pour F = c(−y, x, 0) sur un hémisphère ou une calotte.
 - **Intro** : on parcourt ∂A dans le sens positif (A à gauche dans le plan (u, v)), on applique σ à chaque côté, puis on **retire** les côtés dont l'image est un point et les paires parcourues deux fois en sens contraires. Ce qui reste est ∂Σ, avec le sens qui va avec σ_u ∧ σ_v. Exemple (hémisphère, 2022) : `math: θ = 0 ↦ pôle nord`, `note: un point, on le retire` ; `math: φ = 0 et φ = 2π ↦ même méridien, sens contraires`, `note: ils s'annulent` ; `math: θ = π/2 ↦ équateur (3 cos φ, 3 sin φ, 0), φ de 0 à 2π`, `note: c'est le bord`.
 - **Juge** : `boundary` `{surface:{σ, A}}` ; chaque morceau est une ligne `paramètre ↦ courbe, sens` ; les lignes « retiré : point » ou « retirés : s'annulent » sont des décisions · **Forme finale** : liste des morceaux restants, orientés.
 - **Niveaux** :
@@ -425,6 +431,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-div-thm` — Théorème de la divergence
 - **Année** 15 · **Prérequis** `v-flux`, `v-ops`, `a2-cyl-sph` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-flux` : le membre de droite est un flux.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `equiv` (div F), `domain` (bornes en cylindriques z, φ, r, dès L2), `definite` (intégrale triple, valeur connue du générateur, puis la ligne en z après la symétrie, décision « termes impairs nuls ») ; domaines : cylindre et cône (pas de boule ni de demi-boule) ; F = (a x², b y², k z^m) ; L5 : la calotte z = ρ² − r² fermée par le disque z = 0 (normale (0, 0, −1) par le juge `vector`).
 - **Intro** : Ω borné régulier, ν normale extérieure unité, F ∈ C¹ : ∭_Ω div F dx dy dz = ∬_∂Ω F · ν ds. Le côté « volume » est souvent plus simple. Exemple : F = (x, y, z), cylindre x² + y² ≤ 1, 0 ≤ z ≤ 2 ; `math: div F = 3` ; `math: ∭ 3 = 3 · 2π = 6π`.
 - **Juge** : `equiv` pour div F, `definite` pour l'intégrale triple et sa valeur · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -447,6 +454,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-stokes` — Théorème de Stokes
 - **Année** 15 · **Prérequis** `v-flux`, `v-boundary`, `v-line-vector`, `v-ops` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-boundary` : le bord σ(∂A) et son orientation.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `vector` (rot F, rot F(σ), σ_u ∧ σ_v) et `definite` ; F = (−ay, bx, g(z)) sur un hémisphère ou une calotte ; L1 : rot F donné ; L3 : décision du membre (le disque de même bord est `ref`) ; L4 : en plus, le bord par le juge `boundary` et la circulation ; L5 : la courbe intersection d'un cylindre et d'un plan, par le morceau de plan. Pas de F = (0, 0, x² − y²).
 - **Intro** : Σ orientable régulière par morceaux, F ∈ C¹ : ∬_Σ rot F · ds = ∮_∂Σ F · dl, le bord étant σ(∂A) orienté avec σ_u ∧ σ_v. On choisit le membre le plus simple, ou une autre surface de même bord. Exemple : F = (−y, x, z), hémisphère supérieur unité ; `math: rot F = (0, 0, 2)` ; `math: ∬ rot F · ds = 2 · π = 2π`, `note: même valeur que ∮ sur l'équateur`.
 - **Juge** : `equiv` pour rot F ; `boundary` pour ∂Σ ; `definite` pour les intégrales · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -468,6 +476,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-verify-stokes` — Problème : vérifier le théorème de Stokes
 - **Année** 15 · **Prérequis** `v-stokes` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 : rot F et le flux ; L2 : le bord (juge `boundary`) et la circulation ; L3 : σ, la normale et le flux ; L4 : le problème entier en lignes avec aides, hypothèses et sens en décisions ; L5 et `open` : `problem` de 14 points (révolution (r + p)(q − r), y ≥ 0, F ∈ {(0, cx, 0), (−cy, 0, 0)}) ou de 9 points (hémisphère, F = c(−y, x, 0) ou c(y, −x, 0)) ; hypothèses, sens et conclusion sont des QCM ; le flux et la circulation ont deux étapes chacun. Pas de variante en quart de surface.
 - **Intro** : « Vérifier » veut dire calculer **les deux membres** séparément et constater qu'ils sont égaux. On écrit les hypothèses du théorème, rot F, σ, la normale, le flux, puis le bord morceau par morceau. Exemple : la demi-pomme de 2021 donne 9π/2 des deux côtés.
 - **Juge** : `problem` ; parties `lines` jugées par `equiv` (rot F, normale), `param`, `boundary`, `definite` (flux, chaque intégrale du bord), plus une ligne finale « les deux membres valent … » · **Forme finale** : les deux valeurs égales, écrites.
 - **Niveaux** :
@@ -492,6 +501,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-verify-div` — Problème : vérifier le théorème de la divergence
 - **Année** 15 · **Prérequis** `v-div-thm` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Le cône du catalogue seulement, F = (a x², b y², z^m) ; L1 : le disque du haut et la somme ; L2 : la normale extérieure du cône et son flux ; L3 : toutes les faces ; L4 : tout, en lignes avec aides ; L5 et `open` : `problem` de 9 points (∭ div F en deux étapes 1 + 2, disque 2, normale 1,5, flux du cône 1,5, conclusion 1 en QCM).
 - **Intro** : on calcule ∭ div F, puis le flux sortant par **chaque face** du bord (cône et disque, cylindre et deux disques), avec la normale extérieure de chaque face.
 - **Juge** : `problem` ; `equiv`, `param` (orientation `'out'` par face), `definite` · **Forme finale** : les deux valeurs égales.
 - **Niveaux** :
@@ -513,6 +523,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-proof-identity` — Petites preuves (3 points)
 - **Année** 15 · **Prérequis** `v-identities`, `v-pot-test`, `a2-chain`, `g9-proof-contra` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `v-identities` : identités rot grad = 0 et div rot = 0 ; `v-pot-test` : citer : rot F = 0 sur un convexe ⇒ potentiel ; `g9-proof-contra` : rédiger une preuve directe.
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 : blocs sans leurre ; L2 : un leurre (`v_chain_sign` si le gabarit a une règle de chaîne) ; L3 : les lignes de calcul en mode « choisir l'action », avec un champ tiré F = (∂ψ/∂y, −∂ψ/∂x) à la place de F₁, F₂ abstraites (au lieu de compléter le bloc de la règle de chaîne) ; L4 : la ligne rot G libre et les décisions (définition, conclusion), sans les blocs ensuite ; L5 et `open` (3 points) : blocs avec deux leurres, gabarits G = (F₂(x, −y), F₁(x, −y)), G = (F₂, −F₁) et G = (−F₂, F₁) avec rot F = 0 ⇒ div G = 0.
 - **Intro** : une preuve courte enchaîne : écrire la définition (rot G, div F), dériver avec la règle de chaîne, reconnaître l'hypothèse, citer le théorème avec ses hypothèses (ℝ² convexe). Exemple (2021) : div F = 0 et G(x, y) = (F₂(−x, y), F₁(−x, y)) ; `math: rot G = ∂_x[F₁(−x, y)] − ∂_y[F₂(−x, y)] = −∂₁F₁(−x, y) − ∂₂F₂(−x, y)` ; `math: = −div F(−x, y) = 0`, `note: ℝ² convexe, donc G dérive d'un potentiel`.
 - **Juge** : `blocks` `{mode:'order'}` avec `needs` ; à L4, une ligne de calcul jugée par `equiv` avec des fonctions abstraites (F₁, F₂ remplacées par des fonctions tirées au hasard, div F = 0 imposé par construction) · **Forme finale** : la conclusion placée après tous ses blocs nécessaires.
 - **Niveaux** :
@@ -520,7 +531,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
   - L2 : avec un leurre (« rot G = div F »).
   - L3 : compléter la ligne de règle de chaîne.
   - L4 : écrire la ligne de calcul librement, puis les blocs.
-  - L5 : preuve entière, nouvelle identité (G = (F₂(x, −y), −F₁(x, −y)) ou G = (−F₂, F₁) avec rot F = 0 ⇒ div G = 0).
+  - L5 : preuve entière, nouvelle identité (G = (F₂(x, −y), F₁(x, −y)), pour laquelle rot G = div F(x, −y), ou G = (−F₂, F₁) avec rot F = 0 ⇒ div G = 0).
 - **Générateur** : gabarits de G construits à partir de F par symétrie (x ↦ −x, y ↦ −y) et échange de composantes ; on garde ceux où rot G ou div G se ramène à ±(div F ou rot F)(point symétrique). Pour le contrôle `equiv`, F est tiré dans la famille F = (∂_yψ, −∂_xψ) (div F = 0) avec ψ polynôme aléatoire.
 - **Corrigé type** (énoncé 2021) :
   1. `rot G(x, y) = ∂G₂/∂x − ∂G₁/∂y` — sous-but `definition` (0,5 pt)
