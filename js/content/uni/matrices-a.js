@@ -14,6 +14,7 @@ import * as MX from '../../cas/matrix.js';
 import { q, mt, vt, ML, MLm, fq, qt, sub, unimodular, coefItem, mcqDistinct, tfL, examTag, orthIntBasis } from './alglin-kit.js';
 import { blocksItem } from './kit.js';
 import { partsItem, menuOf } from './matrices-a-kit.js';
+import { unitText } from '../../cas/rules/l-sym.js';
 
 const SCHUR = 'm-blocks-schur';
 const RANK1 = 'm-rank1-proj';
@@ -589,8 +590,207 @@ function rank1Exam(rng, exam) {
 }
 
 // ======================================================================
+// m-spectral
+// ======================================================================
+
+const SPEC_SUB = [
+  { id: 'orthodiag', label: 'orthodiagonaliser', skill: 'l-sym-orthodiag' },
+  { id: 'projectors', label: 'projecteurs', skill: RANK1 },
+  { id: 'fA', label: 'f(A) sur les valeurs propres', skill: SPEC },
+];
+
+// Whole orthogonal bases of ℝ² (eigenvectors).
+const FAM2 = [[[1, 1], [1, -1]], [[1, 2], [2, -1]], [[2, 1], [1, -2]], [[1, 3], [3, -1]], [[3, 1], [1, -3]]];
+// Whole vectors of ℝ³ for A = cI + (λ − c)·vvᵀ/‖v‖².
+const V3 = [[1, 2, 2], [2, 1, 2], [2, 2, 1], [1, 1, 1], [1, -1, 1], [2, -2, 1], [1, 2, -2]];
+const FNAME = { sqrt: '√A', inv: 'A⁻¹', pow3: 'A³' };
+const FTEXT = { sqrt: '√A', inv: 'A^(-1)', pow3: 'A^3' };
+const fOf = (f, l) => (f === 'sqrt' ? q(Math.round(Math.sqrt(l.valueOf()))) : f === 'inv' ? q(1).div(l) : l.mul(l).mul(l));
+const proj = (v) => { const vv = dot(v, v); return outer(v, v).map((r) => r.map((x) => x.div(vv))); };
+const combo = (cs, Ps) => Ps.reduce((S, P, i) => addM(S, scaleM(P, cs[i])), Ps[0].map((r) => r.map(() => q(0))));
+// λ for f: perfect squares (sqrt), non-zero (inv), small (pow3).
+const lamFor = (f, rng) => q(f === 'sqrt' ? rng.pick([1, 4, 9, 16, 25, 36]) : f === 'inv' ? nz(rng, -4, 6) : nz(rng, -3, 3));
+
+// n = 2: a whole orthogonal basis and two eigenvalues; n = 3: v, λ (simple)
+// and c (double). A whole, f(A) with small denominators.
+function specData(rng, { n = 2, f = rng.pick(['sqrt', 'sqrt', 'inv', 'pow3']) } = {}) {
+  for (let t = 0; t < 400; t++) {
+    let vs;
+    let lams;
+    let Ps;
+    if (n === 2) {
+      vs = rng.pick(FAM2).map((v) => v.map((x) => q(x)));
+      if (rng.chance(0.5)) vs = [vs[1], vs[0]];
+      lams = [lamFor(f, rng), lamFor(f, rng)];
+      Ps = vs.map(proj);
+    } else {
+      const v = signsPerm(rng.pick(V3), rng).map((x) => q(x));
+      vs = [v];
+      lams = [lamFor(f, rng), lamFor(f, rng)];
+      const P = proj(v);
+      Ps = [P, MX.sub(MX.identity(3), P)];
+    }
+    if (lams[0].eq(lams[1])) continue;
+    const A = combo(lams, Ps);
+    if (!isInt(A) || maxAbs(A) > 40 || MX.isDiagonal(A)) continue;
+    const fl = lams.map((l) => fOf(f, l));
+    const F = combo(fl, Ps);
+    if (F.flat().some((x) => x.d > 12) || maxAbs(F) > 200 || MX.equal(F, A)) continue;
+    if (f === 'sqrt' && A.flat().some((x) => x.n < 0) && rng.chance(0.5)) continue;
+    // The decoys: f on the entries, and the projectors not normalised.
+    const raw = n === 2 ? combo(fl, vs.map((v) => outer(v, v))) : null;
+    return { n, f, vs, lams, Ps, A, fl, F, raw };
+  }
+  const vs = [[q(1), q(1)], [q(1), q(-1)]];
+  const Ps = vs.map(proj);
+  return { n: 2, f: 'sqrt', vs, lams: [q(9), q(1)], Ps, A: MX.mat([[5, 4], [4, 5]]), fl: [q(3), q(1)], F: MX.mat([[2, 1], [1, 2]]), raw: combo([q(3), q(1)], vs.map((v) => outer(v, v))), fallback: true };
+}
+
+// f applied to each entry (the trap), as a value text, or null.
+function entrywise(d) {
+  const ok = d.A.flat().every((x) => (d.f === 'sqrt' ? x.n >= 0 : d.f === 'inv' ? x.n !== 0 : true));
+  if (!ok) return null;
+  return `[${d.A.map((r) => `[${r.map((x) => (d.f === 'sqrt' ? (isqrt(x.valueOf()) !== null ? String(isqrt(x.valueOf())) : `√${x}`) : d.f === 'inv' ? qt(q(1).div(x)) : qt(x.mul(x).mul(x)))).join(',')}]`).join(',')}]`;
+}
+
+const lamR = (l) => R(qt(l));
+const charT = (lams) => lams.map((l) => `(${qt(l)}-λ)`).join('') + (lams.length === 2 && lams[0] === lams[1] ? '' : '');
+const fLam = (d, i) => (d.f === 'sqrt' ? `√${lamR(d.lams[i])} = ${lamR(d.fl[i])}` : d.f === 'inv' ? `1/${parR(d.lams[i])} = ${lamR(d.fl[i])}` : `${parR(d.lams[i])}³ = ${lamR(d.fl[i])}`);
+
+function specSegs(d, rng, { charpoly = false, eigen = false, check = false } = {}) {
+  const segs = [];
+  const A = mt(d.A);
+  if (charpoly) {
+    segs.push({
+      start: 'det(A-λI)', judge: { kind: 'det', vars: ['λ'], names: { A }, target: 'factored' },
+      menu: menuOf(rng, 'Polynôme caractéristique', [{ id: 'cases', label: 'Appliquer f à chaque case', valid: false, rule: 'm_spectral_entrywise', why: 'f(A) se calcule sur les valeurs propres : il faut d\'abord les trouver.' }]),
+      lines: [{ math: `${charT(d.lams)}`, note: `Valeurs propres ${lamR(d.lams[0])} et ${lamR(d.lams[1])}`, subgoal: 'orthodiag' }],
+    });
+  }
+  if (eigen) {
+    d.vs.forEach((v, i) => segs.push({
+      html: `Un vecteur propre pour λ = ${lamR(d.lams[i])}.`, ask: 'v =', start: `E_(${qt(d.lams[i])})`, judge: { kind: 'eigvec', A, lambda: qt(d.lams[i]) },
+      menu: menuOf(rng, `Résoudre (A − ${lamR(d.lams[i])}I)v = 0`, [{ id: 'col', label: 'Prendre une colonne de A', valid: false, why: 'Un vecteur propre vérifie (A − λI)v = 0.' }]),
+      lines: [{ math: vt(v), note: '', subgoal: 'orthodiag' }],
+    }));
+  }
+  const names = {};
+  d.Ps.forEach((P, i) => {
+    names[`P_${i + 1}`] = mt(P);
+    const v = d.vs[i];
+    const vv = v ? dot(v, v) : null;
+    segs.push({
+      html: i === 0 ? `Le projecteur P₁ = u₁u₁ᵀ sur l'espace propre de ${lamR(d.lams[0])}.` : (v ? `Le projecteur P₂ = u₂u₂ᵀ sur l'espace propre de ${lamR(d.lams[1])}.` : `Le projecteur P₂ sur l'espace propre de ${lamR(d.lams[1])} (le plan orthogonal à v).`),
+      ask: `P${sub(i + 1)} =`, start: `P_${i + 1}`, judge: { kind: 'mat', expect: mt(P), names: i ? { P_1: mt(d.Ps[0]) } : {} },
+      menu: menuOf(rng, v ? 'P = vvᵀ/(vᵀv)' : 'P₂ = I − P₁', [{ id: 'nodiv', label: v ? 'P = vvᵀ' : 'P₂ = P₁', valid: false, rule: v ? 'l_orthodiag_no_normalize' : null, why: v ? 'Les uᵢ sont normés : uᵢuᵢᵀ = vvᵀ/(vᵀv).' : 'Les deux espaces propres sont orthogonaux : P₁ + P₂ = I.' }]),
+      lines: v
+        ? [{ math: `(${qt(q(1).div(vv))})·${mt(outer(v, v))}`, note: `u = v/‖v‖ avec vᵀv = ${vv}`, subgoal: 'projectors' }, { math: mt(P), note: '', subgoal: 'projectors', grid: P }]
+        : [{ math: 'I - P_1', note: 'P₁ + P₂ = I', subgoal: 'projectors' }, { math: mt(P), note: '', subgoal: 'projectors', grid: P }],
+    });
+  });
+  const ent = entrywise(d);
+  segs.push({
+    html: `${FNAME[d.f]} = Σ f(λᵢ)Pᵢ.`, ask: `${FNAME[d.f]} =`, start: FTEXT[d.f], judge: { kind: 'mat', expect: mt(d.F), names, spectral: { A, f: d.f } },
+    decision: {
+      kind: 'decision', prompt: `Comment calculer ${FNAME[d.f]} ?`, options: rng.shuffle([
+        { id: 'eig', label: 'Appliquer f aux valeurs propres : Σ f(λᵢ)Pᵢ', valid: true },
+        { id: 'cases', label: 'Appliquer f à chaque case de A', valid: false, rule: 'm_spectral_entrywise', why: `f(A) n'est pas f appliquée case par case${ent && d.f === 'sqrt' ? ` : ${R(ent)}² ≠ A` : ''}.` },
+      ]),
+    },
+    menu: menuOf(rng, `Combiner : ${fLam(d, 0).split(' = ')[0]}·P₁ + ${fLam(d, 1).split(' = ')[0]}·P₂`, [
+      { id: 'cases', label: 'Appliquer f à chaque case de A', valid: false, rule: 'm_spectral_entrywise', why: 'f(A) se calcule sur les valeurs propres.' },
+      { id: 'same', label: `Garder ${lamR(d.lams[0])}·P₁ + ${lamR(d.lams[1])}·P₂`, valid: false, why: 'Ça redonne A : il faut remplacer chaque λᵢ par f(λᵢ).' },
+    ]),
+    lines: [
+      { math: `${par(d.fl[0])}·P_1 + ${par(d.fl[1])}·P_2`, note: `f(λ₁) = ${fLam(d, 0)}, f(λ₂) = ${fLam(d, 1)}`, subgoal: 'fA' },
+      { math: mt(d.F), note: '', subgoal: 'fA', grid: d.F },
+    ],
+  });
+  if (check && d.f === 'sqrt') {
+    segs.push({
+      html: 'Contrôle : avec R = √A, R² = A.', ask: 'R² =', start: '(√A)^2', judge: { kind: 'mat', expect: A, names: { R: mt(d.F) } },
+      menu: menuOf(rng, 'Élever au carré', [{ id: 'cases', label: 'Élever chaque case au carré', valid: false, rule: 'm_spectral_entrywise', why: 'B² est le produit B·B, pas le carré de chaque case.' }]),
+      lines: [{ math: 'R·R', note: 'Le produit R·R', subgoal: 'fA' }, { math: A, note: 'On retrouve A' }],
+    });
+  }
+  return segs;
+}
+
+const specHints = (d) => hints(
+  'Remplace chaque λᵢ par f(λᵢ) et garde les projecteurs : f(A) = f(λ₁)P₁ + f(λ₂)P₂.',
+  `${FNAME[d.f]} = ${parR(d.fl[0])}·P₁ + ${parR(d.fl[1])}·P₂ = □`,
+  `${FNAME[d.f]} = ${MLm(d.F)}`,
+);
+
+const eigText = (d) => (d.n === 2
+  ? `λ₁ = ${lamR(d.lams[0])}, de vecteur propre v₁ = ${ML(vt(d.vs[0]))}, et λ₂ = ${lamR(d.lams[1])}, de vecteur propre v₂ = ${ML(vt(d.vs[1]))}`
+  : `λ₁ = ${lamR(d.lams[0])} (simple, vecteur propre v = ${ML(vt(d.vs[0]))}) et λ₂ = ${lamR(d.lams[1])} (double : le plan v⊥)`);
+
+function specItem(level, rng) {
+  if (level === 5) return specAlone(rng);
+  const d = level === 4 && rng.chance(0.5) ? specData(rng, { n: 3, f: rng.pick(['inv', 'sqrt']) }) : specData(rng);
+  const full = level >= 3 && d.n === 2;
+  const segs = specSegs(d, rng, { charpoly: full, eigen: full || (level === 4 && d.n === 3), check: level >= 3 });
+  const given = full ? '' : ` Ses valeurs propres : ${eigText(d)}.`;
+  return partsItem(level, rng, segs, {
+    skill: SPEC, key: `${SPEC}:${level}:${mt(d.A)}:${d.f}`, fallback: d.fallback, subgoals: SPEC_SUB,
+    prompt: `A = ${MLm(d.A)} est symétrique.${given} Écris A = Σ λᵢPᵢ (Pᵢ projecteurs orthogonaux sur les espaces propres), puis calcule ${FNAME[d.f]} par la décomposition spectrale.${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
+    hints: specHints(d), baits: ['m_spectral_entrywise', ...(d.n === 2 ? ['l_orthodiag_no_normalize'] : [])],
+  });
+}
+
+// Level 5 (2018 Q11): A = λ₁u₁u₁ᵀ + λ₂u₂u₂ᵀ given by its orthonormal
+// vectors; its characteristic polynomial, then f(A), without help.
+function specAlone(rng) {
+  const d = specData(rng, { n: 2, f: rng.pick(['sqrt', 'inv']) });
+  const uT = (v) => unitText(v).replace(/-/g, '−');
+  const segs = specSegs(d, rng, { charpoly: true }).filter((s) => !/^P_/.test(s.start));
+  segs[segs.length - 1].judge.names = {};
+  segs[segs.length - 1].lines[0] = { math: `${par(d.fl[0])}·${mt(d.Ps[0])} + ${par(d.fl[1])}·${mt(d.Ps[1])}`, note: 'u₁u₁ᵀ et u₂u₂ᵀ, pondérés par f(λᵢ)', subgoal: 'fA' };
+  return partsItem(5, rng, segs, {
+    skill: SPEC, key: `${SPEC}:5:${mt(d.A)}:${d.f}`, fallback: d.fallback, subgoals: SPEC_SUB, noHints: true,
+    prompt: `Soit A = ${lamR(d.lams[0])}·u₁u₁ᵀ ${d.lams[1].n < 0 ? '−' : '+'} ${lamR(d.lams[1].n < 0 ? d.lams[1].neg() : d.lams[1])}·u₂u₂ᵀ, avec u₁ = ${uT(d.vs[0])} et u₂ = ${uT(d.vs[1])} (base orthonormée). Donne le polynôme caractéristique de A (factorisé), puis ${FNAME[d.f]}.`,
+    hints: [], baits: ['m_spectral_entrywise'],
+  });
+}
+
+function specExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const k = rng.int(0, 3);
+    if (k === 0) return tfL({ skill: SPEC, key: 'proj0', truth: true, exam: tag, statement: 'Si A = Σ λᵢuᵢuᵢᵀ avec (uᵢ) orthonormée, alors (uᵢuᵢᵀ)(uⱼuⱼᵀ) = 0 pour i ≠ j.', explanation: 'Vrai : (uᵢuᵢᵀ)(uⱼuⱼᵀ) = uᵢ(uᵢᵀuⱼ)uⱼᵀ, et uᵢᵀuⱼ = 0.' });
+    if (k === 1) return tfL({ skill: SPEC, key: 'samevec', truth: true, exam: tag, statement: 'Si A est symétrique et inversible, A⁻¹ a les mêmes vecteurs propres que A, de valeurs propres 1/λᵢ.', explanation: 'Vrai : A⁻¹ = Σ (1/λᵢ)uᵢuᵢᵀ.' });
+    const neg = rng.int(-4, -1);
+    const pos = rng.int(1, 5);
+    const Mx = rng.chance(0.5) ? MX.mat([[neg, 0], [0, pos]]) : combo([q(neg), q(pos * 2)], FAM2[0].map((v) => proj(v.map((x) => q(x)))));
+    return tfL({
+      skill: SPEC, key: `sqrt:${mt(Mx)}`, truth: false, exam: tag,
+      statement: 'Toute matrice symétrique réelle a une racine carrée réelle symétrique (une B symétrique avec B² = A).',
+      counter: { kind: 'mx', prop: 'symNegEig', params: { n: 2 }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(Mx) } },
+      explanation: `Faux : B² = BᵀB a des valeurs propres ≥ 0. ${MLm(Mx)} a la valeur propre ${neg} < 0 : elle n'a pas de racine carrée symétrique réelle.`,
+    });
+  }
+  const d = specData(rng, { f: rng.pick(['sqrt', 'inv']) });
+  const ent = entrywise(d);
+  const swap = combo([d.fl[1], d.fl[0]], d.Ps);
+  return mcqDistinct({
+    skill: SPEC, level: 4, key: `mcq:${mt(d.A)}:${d.f}`, exam: tag, fallback: d.fallback,
+    prompt: `A = ${MLm(d.A)} a les valeurs propres ${lamR(d.lams[0])} (vecteur propre ${ML(vt(d.vs[0]))}) et ${lamR(d.lams[1])} (vecteur propre ${ML(vt(d.vs[1]))}). Que vaut ${d.f === 'sqrt' ? 'la racine carrée symétrique positive √A' : 'A⁻¹'} ?`,
+    right: MLm(d.F),
+    wrongs: [
+      ent ? { html: ML(ent), rule: 'm_spectral_entrywise' } : null,
+      { html: MLm(d.raw), rule: 'l_orthodiag_no_normalize' },
+      { html: MLm(swap), rule: null },
+    ].filter(Boolean),
+    fillers: [{ html: MLm(scaleM(d.F, 2)) }, { html: MLm(MX.transpose(d.raw)) }, { html: MLm(addM(d.F, MX.identity(2))) }],
+    solution: [{ html: `${FNAME[d.f]} = ${lamR(d.fl[0])}·P₁ + ${lamR(d.fl[1])}·P₂ = ${MLm(d.F)}`, note: `P₁ = ${MLm(d.Ps[0])}, P₂ = ${MLm(d.Ps[1])}` }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [SPEC]: (level, rng, profile, opts = {}) => (opts.exam ? specExam(rng, opts.exam) : specItem(level, rng)),
   [RANK1]: (level, rng, profile, opts = {}) => (opts.exam ? rank1Exam(rng, opts.exam) : rank1Item(level, rng)),
   [SCHUR]: (level, rng, profile, opts = {}) => (opts.exam ? schurExam(rng, opts.exam) : schurItem(level, rng)),
 };

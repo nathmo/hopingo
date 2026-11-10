@@ -67,6 +67,27 @@ export const DEFS = {
     },
     check: { judge: { kind: 'mat', expect: '[[7/9,-4/9,-4/9],[-4/9,1/9,-8/9],[-4/9,-8/9,1/9]]', householder: { u: '(1 ; 2 ; 2)' } }, prev: 'H', line: '[[8/9,-2/9,-2/9],[-2/9,5/9,-4/9],[-2/9,-4/9,5/9]]' },
   },
+  m_spectral_entrywise: {
+    name: 'f(A) calculée case par case',
+    judges: ['mat'],
+    transform(prev, ctx) {
+      const s = ctx?.cfg?.spectral;
+      const A = s ? matQ(s.A) : null;
+      if (!A) return [];
+      const f = s.f;
+      if (f === 'sqrt' && A.flat().some((x) => x.n < 0)) return [];
+      if (f === 'inv' && A.flat().some((x) => x.n === 0)) return [];
+      const cell = (x) => {
+        if (f === 'inv') return lit(Q.of(1).div(x));
+        if (f === 'pow3') return lit(x.mul(x).mul(x));
+        const r = radicalNode(Math.sqrt(x.valueOf()));
+        return r ?? sqrtNode(lit(x));
+      };
+      const M = Mx(A.map((r) => r.map(cell)));
+      return [{ node: mline(M), ctx: { 'ta matrice': R(valueText(M)) } }];
+    },
+    check: { judge: { kind: 'mat', expect: '[[2,1],[1,2]]', spectral: { A: '[[5,4],[4,5]]', f: 'sqrt' } }, prev: '√A', line: '[[√5,2],[2,√5]]' },
+  },
 };
 
 export { matQ, mline, R, Q, Mx, S, valueText, radicalNode, lit, sqrtNode, num };
