@@ -157,18 +157,32 @@ function teleLines(level, rng, opts) {
   });
 }
 
+// Divergent telescoping series: Σ ln((k + 1)/k) (S_N = ln(N + 1)) or
+// Σ (√(k + 1) − √k) written 1/(√(k + 1) + √k) (S_N = √(N + 1) − 1).
+const DIVERGENT = {
+  ln: {
+    term: 'ln((k+1)/k)', split: 'ln(k+1)-ln(k)', sn: 'ln(N+1)', splitNote: 'ln(a/b) = ln a − ln b', snNote: 'Télescoper : ln 1 = 0', blank: 'N+1',
+    hints: ['ln((k + 1)/k) = ln(k + 1) − ln k : la somme télescope.', 'S_N = ln(N + 1) − ln ▢', 'S_N = ln(N + 1) → +∞ : la série diverge, même si ses termes tendent vers 0.'],
+  },
+  sqrt: {
+    term: '1/(√(k+1)+√(k))', split: '√(k+1)-√(k)', sn: '√(N+1)-1', splitNote: 'Multiplier par la quantité conjuguée √(k + 1) − √k', snNote: 'Télescoper : il reste −√1 et √(N + 1)', blank: '√(N+1)',
+    hints: ['Multiplie par la quantité conjuguée : 1/(√(k + 1) + √k) = √(k + 1) − √k, puis la somme télescope.', 'S_N = ▢ − 1', 'S_N = √(N + 1) − 1 → +∞ : la série diverge, même si ses termes tendent vers 0.'],
+  },
+};
+
 function lnLines(level, rng, opts) {
-  const start = S('ln((k+1)/k)', 1);
+  const kind = rng.pick(['ln', 'sqrt']);
+  const D = DIVERGENT[kind];
+  const start = S(D.term, 1);
   const parts = [
-    part('Somme partielle :', 'S_N =', S('ln((k+1)/k)', 1, 'N'), SN,
-      level <= 3 ? [E(S('ln(k+1)-ln(k)', 1, 'N'), 'ln(a/b) = ln a − ln b', 'shift', 'des'), E('ln(N+1)', 'Télescoper : ln 1 = 0', 'shift', 'sn')] : [E('ln(N+1)', 'Télescoper', 'shift', 'sn')]),
-    part('Passe à la limite :', 'lim S_N =', 'ln(N+1)', LIMN, [E('+∞', 'S_N → +∞ : la série diverge', 'lim', 'lim')]),
+    part('Somme partielle :', 'S_N =', S(D.term, 1, 'N'), SN,
+      level <= 3 ? [E(S(D.split, 1, 'N'), D.splitNote, 'shift', 'des'), E(D.sn, D.snNote, 'shift', 'sn')] : [E(D.sn, 'Télescoper', 'shift', 'sn')]),
+    part('Passe à la limite :', 'lim S_N =', D.sn, LIMN, [E('+∞', 'S_N → +∞ : la série diverge', 'lim', 'lim')]),
   ];
-  if (level <= 2) parts[0].lines[1] = blanked(parts[0].lines[1], ['N+1']);
+  if (level <= 2) parts[0].lines[1] = blanked(parts[0].lines[1], [D.blank]);
   return partsItem({
     skill: GT, level, prompt: `La série ${MN(start)} converge-t-elle ? Calcule ses sommes partielles S_N.`, parts, choices: CHOICES,
-    hints: H('ln((k + 1)/k) = ln(k + 1) − ln k : la somme télescope.', 'S_N = ln(N + 1) − ln ▢', 'S_N = ln(N + 1) → +∞ : la série diverge, même si ses termes tendent vers 0.'),
-    subgoals: SUB, keys: KEYS, key: `${GT}:${level}:ln`, exam: examOf(opts),
+    hints: H(...D.hints), subgoals: SUB, keys: KEYS, key: `${GT}:${level}:${kind}`, exam: examOf(opts),
   });
 }
 
@@ -273,7 +287,7 @@ export function seriesItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return seriesMcq(rng, opts);
   if (opts.exam === 'tf') return seriesTf(rng, opts);
   if (level === 5) return rng.chance(0.3) ? seriesMcq(rng, opts, 5) : mixedLines(rng, opts);
-  const kind = rng.pick(['geo', 'geo', 'combo', 'tele', 'tele', 'tele', 'ln']);
+  const kind = rng.pick(['geo', 'geo', 'geo', 'combo', 'combo', 'tele', 'tele', 'tele', 'tele', 'ln']);
   if (kind === 'geo') return geoLines(level, rng, opts);
   if (kind === 'combo') return comboLines(level, rng, opts);
   if (kind === 'ln') return lnLines(level, rng, opts);

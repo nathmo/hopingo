@@ -108,7 +108,7 @@ export const RULES = [
       const t = [0, 1, 2, 3].map((j) => val(n.e, n.k, { t: 'paren', e: { t: 'bin', op: '+', l: n.lo, r: lit(Q.of(j)) } }));
       if (!t.every(Number.isFinite) || t[0] === 0 || !close(t[1] / t[0], t[2] / t[1]) || !close(t[2] / t[1], t[3] / t[2])) return [];
       const lo = exactValue(n.lo);
-      return [{ node: replaceAt(prev, path, { ...n, lo: lit(Q.of(0)) }), ctx: { t0: fr(toReadable(at(n.e, n.k, n.lo))), k0: lo ? fr(lo) : '' } }];
+      return [{ node: replaceAt(prev, path, { ...n, lo: lit(Q.of(0)) }), ctx: { t0: fr(exactValue(at(n.e, n.k, n.lo))?.toString() ?? toReadable(at(n.e, n.k, n.lo))), k0: lo ? fr(lo) : '' } }];
     }),
     explain: (ctx = {}) => `1/(1 − q) vaut pour une somme qui commence à k = 0.${ctx.t0 ? ` Ici le premier terme est ${ctx.t0}` : ' Ici le premier terme est q^(k₀)'} : premier terme sur (1 − raison).`,
   },
