@@ -212,7 +212,7 @@ function finalOne(cfg, node, form) {
     const re = stripParen(parts.re);
     const im = stripParen(parts.im);
     const zero = (x) => x.t === 'num' && x.v.n === 0;
-    if (zero(re) && contains(n, (x) => x === parts.re && x.t === 'num')) return 'Inutile d\'écrire 0 + … : écris seulement la partie imaginaire.';
+    if (zero(re) && !zero(im) && contains(n, (x) => x === parts.re && x.t === 'num')) return 'Inutile d\'écrire 0 + … : écris seulement la partie imaginaire.';
     if (zero(im) && contains(n, (x) => x.t === 'const' && x.name === 'i')) return 'La partie imaginaire est nulle : écris seulement le réel.';
     return true;
   }
