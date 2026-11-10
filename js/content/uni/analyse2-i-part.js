@@ -221,9 +221,25 @@ function finish(d, rng) {
     res: d.res ? [`${u} = ${d.info.yh}`, d.wrong.res.text] : [],
     icBefore: d.wrong.icBefore ? [d.wrong.icBefore.consts, d.wrong.icBefore.text] : [],
     incomplete: d.wrong.incomplete ? [`${u}_p = ${d.wrong.incomplete.yp}`] : [],
-    ctx: { 'x₀': '0', valeur: d.wrong.icBefore ? fr(N(initial(d.wrong.icBefore.terms)[0])) : '…', 'y₀': fr(N(y0)) },
+    ctx: { ...resCtx(d), ...icCtx(d) },
   };
   return d;
+}
+
+// The initial condition the constants fitted on y_h alone break (a2_ode_ic_before_particular).
+function icCtx(d) {
+  if (!d.wrong.icBefore) return {};
+  const [v0, v1] = initial(d.wrong.icBefore.terms);
+  if (!v0.eq(d.y0)) return { which: d.u, valeur: fr(N(v0)), want: fr(N(d.y0)) };
+  return { which: `${d.u}′`, valeur: fr(N(v1)), want: fr(N(d.y1)) };
+}
+
+// The form without x and its root, for the explanation of a2_ode_resonance_no_x.
+function resCtx(d) {
+  if (!d.res) return {};
+  const noX = d.rhs === 'exp' ? `A${basisText(T(1, 0, d.m))}` : d.form.text.replace(/^x\(/, '').replace(/\)$/, '');
+  const root = d.rhs === 'exp' ? String(d.m) : `${d.k === 1 ? '' : d.k}i`;
+  return { noX: fr(noX.replace(/\^\(([^)]*)\)/g, '^{$1}').replace(/\^x/g, '^{x}')), root: fr(root), withX: fr(d.form.text.replace(/\^\(([^)]*)\)/g, '^{$1}')) };
 }
 
 // y_p from a form without one of its terms (A sin kx alone for sin kx; A x

@@ -31,8 +31,9 @@ export const DEFS = {
     judges: ['ode'],
     transform: (prev, ctx) => all(ctx.cfg?._p?.icBefore, ctx.cfg?._p?.ctx, odeV(ctx)),
     wrongValues: (item) => item.wrong?.icBefore || [],
+    explain: (ctx = {}) => `Les conditions initiales portent sur la solution entière y = y_h + y_p, pas sur y_h seule.${ctx.which ? ` Avec ta solution, ${ctx.which}(0) = ${ctx.valeur} au lieu de ${ctx.want}.` : ' Écris d’abord y = y_h + y_p, puis fixe C₁ et C₂.'}`,
     check: {
-      judge: { ...PART, eq: "u''+u=x", ic: { x: 0, y: 1, dy: 0 }, _p: { icBefore: ['C_1 = 1 ; C_2 = 0', 'u = cos(x)+x'], ctx: { 'x₀': '0', valeur: '…', 'y₀': '1' } } },
+      judge: { ...PART, eq: "u''+u=x", ic: { x: 0, y: 1, dy: 0 }, _p: { icBefore: ['C_1 = 1 ; C_2 = 0', 'u = cos(x)+x'], ctx: { which: 'u′', valeur: '1', want: '0' } } },
       prev: 'u = C_1 cos(x)+C_2 sin(x)+x', line: 'C_1 = 1 ; C_2 = 0',
     },
   },
@@ -41,6 +42,9 @@ export const DEFS = {
     judges: ['ode'],
     transform: (prev, ctx) => all(ctx.cfg?._p?.res, ctx.cfg?._p?.ctx, odeV(ctx)),
     wrongValues: (item) => item.wrong?.res || [],
+    explain: (ctx = {}) => (ctx.noX
+      ? `${ctx.noX} est une solution de l'équation homogène : remplacée dans l'équation, elle donne 0, jamais le second membre. Comme ${ctx.root} est racine de l'équation caractéristique, multiplie la forme par x : ${ctx.withX}.`
+      : 'A cos 3x + B sin 3x est une solution de l’équation homogène : elle donne 0. Comme 3i est racine, multiplie par x.'),
     check: {
       judge: { ...PART, _p: { res: ['u = C_1 cos(3x)+C_2 sin(3x)', 'u = (π/6)cos(3x)-(1/18)sin(3x)'] } },
       prev: "u''+9u=sin(3x)", line: 'u = C_1 cos(3x) + C_2 sin(3x)',
@@ -117,8 +121,11 @@ export const DEFS = {
     name: 'Vecteurs propres associés aux mauvaises valeurs propres',
     judges: ['ode'],
     transform: (prev, ctx) => (ctx.cfg?.system?.swapped ? [{ node: P(ctx.cfg.system.swapped, 't'), ctx: ctx.cfg.system.ctx || {} }] : []),
+    explain: (ctx = {}) => (ctx.v
+      ? `${ctx.v} est vecteur propre pour λ = ${ctx.l} : il va avec e^{${ctx.l}t}. Vérifie : A${ctx.v} = ${ctx.Av} = ${ctx.l}·${ctx.v}.`
+      : 'Chaque exponentielle e^{λt} va avec un vecteur propre de la même valeur propre λ : (1, −1) est vecteur propre pour −1, il va avec e^{−t}.'),
     check: {
-      judge: { kind: 'ode', v: 't', system: { A: [['1', '2'], ['2', '1']], names: ['x', 'y'], X0: ['2', '0'], swapped: 'x = C_1 e^(3t)+C_2 e^(-t) ; y = -C_1 e^(3t)+C_2 e^(-t)', ctx: { Av: '(−1 ; 1)' } } },
+      judge: { kind: 'ode', v: 't', system: { A: [['1', '2'], ['2', '1']], names: ['x', 'y'], X0: ['2', '0'], swapped: 'x = C_1 e^(3t)+C_2 e^(-t) ; y = -C_1 e^(3t)+C_2 e^(-t)', ctx: { v: '(1 ; −1)', l: '−1', Av: '(−1 ; 1)' } } },
       prev: "x' = x+2y ; y' = 2x+y", line: 'x = C_1 e^(3t)+C_2 e^(-t) ; y = -C_1 e^(3t)+C_2 e^(-t)',
     },
   },

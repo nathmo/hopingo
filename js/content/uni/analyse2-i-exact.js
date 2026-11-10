@@ -228,7 +228,7 @@ function systemItem(level, rng, opts, d) {
   const swapped = `x = ${comp(b, a, d)} ; y = ${comp(e, c, d)}`;
   const final = `x = ${compN(c1 * a, c2 * b, d)} ; y = ${compN(c1 * c, c2 * e, d)}`;
   const Av = [A[0][0] * b + A[0][1] * e, A[1][0] * b + A[1][1] * e];
-  const ode = { kind: 'ode', v: 't', system: { A: A.map((r) => r.map(String)), names: ['x', 'y'], X0: X0.map(String), swapped, ctx: { Av: fr(vecT(Av[0], Av[1])) } } };
+  const ode = { kind: 'ode', v: 't', system: { A: A.map((r) => r.map(String)), names: ['x', 'y'], X0: X0.map(String), swapped, ctx: { v: fr(vecT(b, e)), l: fr(l2), Av: fr(vecT(Av[0], Av[1])) } } };
   const bc = A[0][1] * A[1][0];
   const charT = `(${sum([String(A[0][0]), '-λ'])})(${sum([String(A[1][1]), '-λ'])})${bc === 0 ? '' : `${bc > 0 ? '-' : '+'}${Math.abs(bc)}`}=0`;
   const gl = E(general, 'Chaque couple (λ, v) donne une solution e^{λt}v', 'general', 'general');
