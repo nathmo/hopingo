@@ -83,6 +83,9 @@ export function radicalNode(x) {
 }
 
 const SAMPLE = [0.37, -1.29, 2.03, 0.81, -0.53];
+// Section eig: letters that are whole numbers (opts.ints: the k of
+// Aᵏ = PDᵏP⁻¹, where (−2)ᵏ has no real value at k = 0.37).
+const INT_SAMPLE = [3, 2, 5, 4, 7];
 
 // Equal scalars: exactly when the CAS decides, else in floating point at a
 // few values of the parameters. With complex entries, as polynomials in i.
@@ -98,6 +101,7 @@ export function sameScalar(a, b, opts = {}) {
   for (let s = 0; s < 4; s++) {
     const env = {};
     vars.forEach((v, i) => { env[v] = SAMPLE[(s + i) % SAMPLE.length]; });
+    for (const v of opts.ints || []) env[v] = INT_SAMPLE[s % INT_SAMPLE.length];
     const x = evalFloat(a, env);
     const y = evalFloat(b, env);
     if (!Number.isFinite(x) || !Number.isFinite(y)) continue;

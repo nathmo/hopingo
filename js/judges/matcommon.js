@@ -16,7 +16,7 @@ import { evalFloat } from '../cas/numeric.js';
 import { stripParen } from '../cas/ast.js';
 import * as M from '../cas/matrix.js';
 
-export const mopts = (cfg = {}) => ({ vars: cfg.vars || [], complex: !!cfg.complex, names: cfg.names });
+export const mopts = (cfg = {}) => ({ vars: cfg.vars || [], complex: !!cfg.complex, names: cfg.names, ints: cfg.ints });
 
 // Is the text a plain scalar expression (no matrix, vector, name or det)?
 const plainScalar = (t) => !/[[\]{};|←↔]|det|diag|\btr\b|[A-ZΣ]/.test(t) && !/\(\s*[^()]*;/.test(t);

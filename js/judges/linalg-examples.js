@@ -276,6 +276,29 @@ const WANT_ONE = {
     const same = ka.length === kb.length && (ka.length === 0 || MX.rank(MX.fromCols([...ka, ...kb])) === ka.length);
     return !same || 'Les lignes de A et de B ont ici les mêmes relations.';
   },
+  // section eig
+  // u and w eigenvectors of A, u + w not (answers A, u, w).
+  sumNotEigvec: ({ A }, p, ans) => {
+    const [u, w] = ['u', 'w'].map((k) => readQ(ans[k])?.vec);
+    if (!sq(A) || !u || !w || u.length !== A.length || w.length !== A.length) return 'Écris A carrée et deux vecteurs u, w de la bonne taille.';
+    const prop = (v) => v.some((x) => x.n !== 0) && MX.rank(MX.fromCols([v, MX.matVec(A, v)])) <= 1;
+    if (!prop(u) || !prop(w)) return 'u et w doivent être des vecteurs propres de A (non nuls, Au = λu).';
+    return !prop(u.map((x, i) => x.add(w[i]))) || 'Ici, u + w est encore un vecteur propre.';
+  },
+  // A² is not the matrix of the squares of the entries.
+  entrywiseSquare: ({ A }) => {
+    if (!sq(A)) return 'A doit être carrée.';
+    return !eqM(MX.mul(A, A), A.map((r) => r.map((x) => x.mul(x)))) || 'Pour cette matrice, A² est bien la matrice des carrés.';
+  },
+  // A 2 × 2 stochastic matrix (columns of sum 1, entries ≥ 0) whose x_k
+  // does not tend to a limit independent of x₀ (other eigenvalue ±1).
+  stochNoUniqueLimit: ({ A }) => {
+    if (A.length !== 2 || A[0].length !== 2) return 'Écris une matrice 2×2.';
+    if (A.flat().some((x) => x.n < 0)) return 'Les coefficients sont des probabilités : positifs.';
+    if (MX.transpose(A).some((c) => !c[0].add(c[1]).eq(q(1)))) return 'Chaque colonne doit sommer à 1.';
+    const mu = MX.trace(A).sub(q(1));
+    return Math.abs(mu.valueOf()) === 1 || `Ici l'autre valeur propre vaut ${mu} : |μ| < 1, et x_k tend vers le même état stationnaire pour tout x₀.`;
+  },
 };
 
 // (λ − r)·P, P as coefficients from λ⁰.
