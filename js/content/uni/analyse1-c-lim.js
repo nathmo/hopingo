@@ -391,7 +391,8 @@ function reMcq(rng) {
     const right = NATURE.find((x) => x.id === kind);
     return mcq({
       skill: RE, level: 4, prompt: `f est de classe C⁴ et f(x) = ${MT(dl)} au voisinage de ${a}. En ${a}, f a :`,
-      options: NATURE.map((x) => ({ html: x.html, correct: x.id === kind })), keepOrder: true, key: `nature:${dl}`,
+      // A flat point (a₂ = 0, a₃ ≠ 0) taken for an extremum.
+      options: NATURE.map((x) => ({ html: x.html, correct: x.id === kind, ...(kind === 'flat' && (x.id === 'min' || x.id === 'max') ? { rule: 'g6_critical_is_extremum' } : {}) })), keepOrder: true, key: `nature:${dl}`,
       exam: { format: 'mcq', points: 1 }, expectedSec: 240,
       solution: [{ html: kind === 'none' ? `a₁ = ${qt(c1)} ≠ 0 : f′(${a}) ≠ 0.` : kind === 'flat' ? `a₁ = a₂ = 0 et a₃ ≠ 0 : f(x) − f(${a}) change de signe en ${a}, avec une tangente horizontale.` : `a₁ = 0 et a₂ = ${qt(c2)} ${c2.n > 0 ? '>' : '<'} 0 : ${right.html}.`, note: '' }],
     }, rng);

@@ -95,8 +95,9 @@ function extDecision(x0, kind, sL, sR) {
   const w = (s) => (s < 0 ? 'f′ &lt; 0' : 'f′ > 0');
   const why = `Juste à gauche de ${fr(x0)}, ${w(sL)} ; juste à droite, ${w(sR)} : ${KIND_WORD[kind]}.`;
   return D(`En x = ${fr(x0)}, f′ s'annule. Ce point est :`, [
-    { id: 'max', label: 'un maximum local', valid: kind === 'max', why },
-    { id: 'min', label: 'un minimum local', valid: kind === 'min', why },
+    // A zero of f′ without a change of sign taken for an extremum.
+    { id: 'max', label: 'un maximum local', valid: kind === 'max', why, ...(kind === 'none' ? { rule: 'g6_critical_is_extremum' } : {}) },
+    { id: 'min', label: 'un minimum local', valid: kind === 'min', why, ...(kind === 'none' ? { rule: 'g6_critical_is_extremum' } : {}) },
     { id: 'none', label: 'pas un extremum', valid: kind === 'none', why },
   ]);
 }
@@ -249,8 +250,8 @@ function item2(level, rng, opts) {
       [E(`x^2=${d.s * d.s}`, 'Isoler x²', 'variation'), E(zText, `Garder les solutions ${d.side === '+' ? 'plus grandes' : 'plus petites'} que ${fr(a)}`, 'variation')]),
     ...d.zeros.map((z) => part(`Valeur en x = ${fr(z.x)} :`, `f(${fr(z.x)}) =`, atText(d.f, V, z.x), { kind: 'value' }, [E(N(z.y), 'Calculer', 'table')],
       [D(`En x = ${fr(z.x)}, f′ s'annule. Ce point est :`, [
-        { id: 'max', label: 'un maximum local', valid: z.kind === 'max', why: `Juste à gauche, ${w(z.sL)} ; juste à droite, ${w(z.sR)}.` },
-        { id: 'min', label: 'un minimum local', valid: z.kind === 'min', why: `Juste à gauche, ${w(z.sL)} ; juste à droite, ${w(z.sR)}.` },
+        { id: 'max', label: 'un maximum local', valid: z.kind === 'max', why: `Juste à gauche, ${w(z.sL)} ; juste à droite, ${w(z.sR)}.`, ...(z.kind === 'none' ? { rule: 'g6_critical_is_extremum' } : {}) },
+        { id: 'min', label: 'un minimum local', valid: z.kind === 'min', why: `Juste à gauche, ${w(z.sL)} ; juste à droite, ${w(z.sR)}.`, ...(z.kind === 'none' ? { rule: 'g6_critical_is_extremum' } : {}) },
         { id: 'none', label: 'pas un extremum', valid: z.kind === 'none', why: `Juste à gauche, ${w(z.sL)} ; juste à droite, ${w(z.sR)}.` },
       ])])),
   ];

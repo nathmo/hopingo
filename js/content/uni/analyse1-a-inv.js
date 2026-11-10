@@ -174,7 +174,7 @@ const LOG_CHOICES = [
   { id: 'eval', label: 'Évaluer en x₀' },
   { id: 'simplify', label: 'Simplifier' },
   { id: 'base', label: '(aᵛ)′ = aᵛ·Log a·v′, avec a = u', rule: 'a1_exp_rule_var_base', why: 'La base u dépend de x : cette règle ne vaut que pour une base constante.' },
-  { id: 'power', label: '(xⁿ)′ = n·xⁿ⁻¹, avec n = v', why: 'L\'exposant dépend de x : la règle des puissances ne vaut que pour un exposant constant.' },
+  { id: 'power', label: '(xⁿ)′ = n·xⁿ⁻¹, avec n = v', rule: 'g6_power_rule_exp', why: 'L\'exposant dépend de x : la règle des puissances ne vaut que pour un exposant constant.' },
 ];
 
 // u and v: text, derivative, value at x₀ (whole numbers).
@@ -294,7 +294,7 @@ function logMcq(rng, opts) {
   const options = uniqOptions([
     { html: MT(d.value), correct: true },
     { html: MT(wrong1), correct: false, rule: 'a1_exp_rule_var_base' },
-    { html: MT(wrong2), correct: false },
+    { html: MT(wrong2), correct: false, rule: 'g6_power_rule_exp' },
     ...others.map((t) => ({ html: MT(t), correct: false })),
   ].filter((o, i) => i === 0 || o.html !== MT(d.value))).slice(0, 4);
   return mcq({

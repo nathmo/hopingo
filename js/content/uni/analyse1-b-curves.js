@@ -221,7 +221,7 @@ const SLOPE_DECISION = {
     { id: 'ok', label: 'y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ)', valid: true },
     { id: 'rho', label: 'y′ = ρ̇', valid: false, rule: 'a1_polar_slope_naive', why: 'ρ̇ dit comment le rayon change, pas la pente.' },
     { id: 'ratio', label: 'y′ = ρ̇/ρ', valid: false, rule: 'a1_polar_slope_naive', why: 'ρ̇/ρ n\'est pas une pente dans le plan : dérive x et y.' },
-    { id: 'inv', label: 'y′ = ẋ/ẏ', valid: false, why: 'La pente est ẏ/ẋ : « monter » divisé par « avancer ».' },
+    { id: 'inv', label: 'y′ = ẋ/ẏ', valid: false, rule: 'g6_param_slope_inverted', why: 'La pente est ẏ/ẋ : « monter » divisé par « avancer ».' },
   ],
 };
 function sketchDecision(D) {

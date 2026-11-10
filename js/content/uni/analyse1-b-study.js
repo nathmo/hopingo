@@ -161,14 +161,14 @@ function mcqVariant(rng, opts) {
 
 const FIXED_TF = [
   { statement: 'f(x) = e^(x⁴/4 + x²/2) a un seul minimum local.', truth: true, why: 'Vrai : f′(x) = (x³ + x)·e^(…) = x(x² + 1)·e^(…) ne s\'annule qu\'en 0, où elle passe de − à +.' },
-  { statement: 'Si f est dérivable et f′(x₀) = 0, alors f a un extremum local en x₀.', truth: false, why: 'Faux : f(x) = x³ en 0. f′ doit changer de signe.' },
+  { statement: 'Si f est dérivable et f′(x₀) = 0, alors f a un extremum local en x₀.', truth: false, rule: 'g6_critical_is_extremum', why: 'Faux : f(x) = x³ en 0. f′ doit changer de signe.' },
   { statement: 'f(x) = (x − 1)²(x − 3)⁴·∛(x + 5) possède au moins 4 extrema locaux.', truth: true, why: 'Vrai : f ≥ 0 sur [−5 ; +∞[ et f(1) = f(3) = 0 donnent deux minima ; entre −5 et 1, puis entre 1 et 3, f > 0 atteint un maximum.' },
 ];
 
 function tfVariant(rng, opts) {
   if (rng.chance(0.4)) {
     const s = rng.pick(FIXED_TF);
-    return vfItem({ skill: SK, statement: s.statement, truth: s.truth, why: s.why, key: s.statement, exam: examOf(opts) }, rng);
+    return vfItem({ skill: SK, statement: s.statement, truth: s.truth, rule: s.rule, why: s.why, key: s.statement, exam: examOf(opts) }, rng);
   }
   const D = draw(rng, null);
   const T = texts(D);
