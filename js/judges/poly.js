@@ -24,6 +24,8 @@ import {
 import { Poly } from '../cas/poly.js';
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine } from './common.js';
+// Step U4 (G8): loci of the complex plane, cfg.mode 'locus' (js/judges/locus.js).
+import * as LOCUS from './locus.js';
 
 const V = (cfg) => cfg.v || 'x';
 
@@ -69,7 +71,7 @@ const proportional = (a, b, v) => {
 // {q, r, hasB}: the terms with the divisor as a factor give Q, the others R.
 export function splitDivision(node, cfg) {
   const { names, divisor } = prep(cfg);
-  return splitByDivisor(bodyOf(node, cfg), divisor, { names, complex: cfg.complex, divisorName: cfg.divisorName });
+  return splitByDivisor(bodyOf(node, cfg), divisor, { names, complex: cfg.complex, divisorName: cfg.divisorName, v: V(cfg) });
 }
 
 // ---------- identification (g0-identify) ----------
@@ -219,6 +221,7 @@ function monic(expr, cfg) {
 }
 
 export function isFinal(cfg, node) {
+  if (cfg.mode === 'locus') return LOCUS.isFinal(cfg, node);
   const expr = bodyOf(node, cfg);
   switch (cfg.target || 'any') {
     case 'expanded': {
@@ -235,7 +238,7 @@ export function isFinal(cfg, node) {
 }
 
 export const start = (cfg) => cfg.start;
-export const parseLine = (cfg, t) => parse(t, { complex: cfg.complex, vars: [V(cfg), ...(cfg.params || [])] });
+export const parseLine = (cfg, t) => (cfg.mode === 'locus' ? LOCUS.parseLine(cfg, t) : parse(t, { complex: cfg.complex, vars: [V(cfg), ...(cfg.params || [])] }));
 export const text = (cfg, node) => toText(node);
 
 // A point where two polynomials differ, for the message.
@@ -252,6 +255,7 @@ function witness(a, b, v) {
 const fmt = (y) => String(Math.round(y * 1000) / 1000).replace('.', ',').replace('-', '−');
 
 export function judgeLine(cfg, prev, input) {
+  if (cfg.mode === 'locus') return LOCUS.judgeLine(cfg, prev, input);
   const read = readLine({ ...cfg, vars: [V(cfg)], params: [...(cfg.params || []), ...Object.keys(cfg.names || {}), 'P', 'Q', 'R', 'A', 'B', 'D'] }, input);
   if (read.error) return read.error;
   const { node } = read;

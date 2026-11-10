@@ -165,7 +165,7 @@ export const csub = (a, b) => C(a.re - b.re, a.im - b.im);
 export const cmul = (a, b) => C(a.re * b.re - a.im * b.im, a.re * b.im + a.im * b.re);
 export const cconj = (a) => C(a.re, -a.im);
 export const cabs = (a) => Math.hypot(a.re, a.im);
-export const carg = (a) => Math.atan2(a.im, a.re);
+export const carg = (a) => Math.atan2(a.im + 0, a.re); // + 0: arg(−2) = π, not −π (a −0 imaginary part)
 export function cdiv(a, b) {
   const m = b.re * b.re + b.im * b.im;
   if (m === 0) return C(NaN, NaN);
