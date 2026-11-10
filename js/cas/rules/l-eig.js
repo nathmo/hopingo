@@ -151,7 +151,7 @@ export const DEFS = {
     judges: ['value'],
     transform(prev, ctx) {
       const e = ctx?.cfg?.eig;
-      if (!e || !['inv', 'inv2'].includes(e.rule)) return [];
+      if (!e || !['inv'].includes(e.rule)) return [];
       return [{ node: parse(`-(${e.lambda})`), ctx: { l: String(e.lambda).replace('-', '−') } }];
     },
     explain: (ctx = {}) => `Si Av = λv, alors v = λA⁻¹v, donc A⁻¹v = (1/λ)v : c'est l'inverse${ctx.l ? ` 1/${ctx.l}` : ''}, pas l'opposé.`,
