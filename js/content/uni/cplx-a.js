@@ -9,5 +9,6 @@
 
 import { GEN as ELEM } from './cplx-a-elem.js';
 import { GEN as CR } from './cplx-a-cr.js';
+import { GEN as CONTOUR } from './cplx-a-contour.js';
 
-export const GEN = { ...ELEM, ...CR };
+export const GEN = { ...ELEM, ...CR, ...CONTOUR };

@@ -263,25 +263,33 @@ function tidy(node, letters = []) {
   }
   for (const t of termsOf(n)) {
     const { up, down } = factorsOf(t);
-    if (down.some(hasI)) return false;
+    if (down.some((f) => hasI(f) && !contains(f, (y) => y.t === 'sym'))) return false;
     const cx = up.filter(hasI);
-    if (cx.length > 1) return false;
     for (const f of [...up, ...down].filter((x) => !hasI(x))) if (!realTidy(f, letters)) return false;
-    if (!cx.length) continue;
-    const f = stripParen(cx[0]);
-    if (f.t === 'const' && f.name === 'i') continue;
-    if (f.t === 'bin' && (f.op === '+' || f.op === '-')) { if (!termsOf(f).every((u) => tidy(u, letters) && !termsOf(u).some((w) => w !== u))) return false; continue; }
-    if (f.t === 'pow' && stripParen(f.b).t === 'const' && stripParen(f.b).name === 'e') {
-      if (!tidy(f.e, letters)) return false;
-      // e^(iπ/4): a known angle, to write as cos + i sin.
-      if (!contains(f.e, (y) => y.t === 'sym')) {
-        const x = evalComplex(f.e, {});
-        const v = x ? x.im / Math.PI : NaN;
-        if (Number.isFinite(v) && [1, 2, 3, 4, 6].some((d) => Math.abs(v * d - Math.round(v * d)) < 1e-9)) return false;
+    // At most one i or one complex bracket per term; e^(a + ib) factors besides.
+    let consts = 0;
+    let sums = 0;
+    for (const f0 of cx) {
+      const f = stripParen(f0);
+      if (f.t === 'const' && f.name === 'i') { consts++; continue; }
+      if (f.t === 'bin' && (f.op === '+' || f.op === '-')) {
+        sums++;
+        if (!termsOf(f).every((u) => tidy(u, letters) && !termsOf(u).some((w) => w !== u))) return false;
+        continue;
       }
-      continue;
+      if (f.t === 'pow' && stripParen(f.b).t === 'const' && stripParen(f.b).name === 'e') {
+        if (!tidy(f.e, letters)) return false;
+        // e^(iπ/4): a known angle, to write as cos + i sin.
+        if (!contains(f.e, (y) => y.t === 'sym')) {
+          const x = evalComplex(f.e, {});
+          const v = x ? x.im / Math.PI : NaN;
+          if (Number.isFinite(v) && [1, 2, 3, 4, 6].some((d) => Math.abs(v * d - Math.round(v * d)) < 1e-9)) return false;
+        }
+        continue;
+      }
+      return false;
     }
-    return false;
+    if (consts + sums > 1) return false;
   }
   return true;
 }
@@ -508,8 +516,11 @@ function classify(cfg, node) {
   let n = stripParen(node);
   let hasK = false;
   if (n.t === 'list') {
-    const rest = n.items.filter((x) => !(stripParen(x).t === 'in' && stripParen(stripParen(x).l || stripParen(x).e || x).name === 'k'));
-    hasK = rest.length < n.items.length;
+    const isK = (x) => { x = stripParen(x); return x.t === 'in' && stripParen(x.l).t === 'sym' && stripParen(x.l).name === 'k'; };
+    const rest = n.items.filter((x) => !isK(x));
+    const ks = n.items.filter(isK);
+    if (ks.some((x) => { const r = stripParen(stripParen(x).r); return stripParen(x).op === '∉' || r.t !== 'set' || r.name !== 'ℤ'; })) return { kind: 'badK' };
+    hasK = ks.length > 0;
     if (rest.length !== 1) return null;
     n = stripParen(rest[0]);
   }
@@ -592,6 +603,7 @@ function cfCompare(cfg, node) {
   const c = classify(cfg, node);
   const ref = refOf(cfg);
   if (!c) return { ok: false, unread: true, message: 'Je n\'arrive pas à lire cette ligne : une équation en z ou en w, ou « z = … + 2kπi ; k ∈ ℤ ».' };
+  if (c.kind === 'badK') return { ok: false, message: 'k parcourt les entiers : écris « k ∈ ℤ ».' };
   if (c.kind === 'family') {
     const fams = familiesOf(c.items);
     if (!fams) return { ok: false, message: 'Une famille s\'écrit z₀ + 2kπi : je n\'arrive pas à lire la tienne.' };
@@ -625,7 +637,7 @@ function cfSame(cfg, a, b) {
   try {
     const A = classify(cfg, a);
     const B = classify(cfg, b);
-    if (!A || !B || A.kind !== B.kind) return false;
+    if (!A || !B || A.kind !== B.kind || A.kind === 'badK') return false;
     if (A.kind === 'family') {
       const fa = familiesOf(A.items);
       const fb = familiesOf(B.items);
@@ -648,7 +660,7 @@ function cfSame(cfg, a, b) {
 
 function cfFinal(cfg, node) {
   const c = classify(cfg, node);
-  if (!c) return false;
+  if (!c || c.kind === 'badK') return false;
   if ((cfg.final || 'family') === 'poly') {
     if (c.kind !== 'weq' || c.node.t !== 'rel') return false;
     const r = stripParen(c.node.r);
