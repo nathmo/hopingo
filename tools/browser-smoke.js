@@ -1028,12 +1028,15 @@ function pageLib() {
     S.trace = { issues: [], untypable: [], steps: 0 };
     S.takeErrors();
     const el = S.mount(item);
-    const text = M.idx.textWith(cfg, t.node);
+    let text = '';
+    try { text = t.node.text ?? M.idx.textWith(cfg, t.node); } catch { text = ''; }
+    if (!text) return null;
     const stage = el.querySelector('.lines-stage');
     if (stage.querySelector('.lines-choices')) {
       // Tap mode: the right action first.
       const run = runOf(window.__hopingoItem);
       const o = M.actions.actionsFor(item.tapActions, run.prev, run.cfg).find((x) => x.valid);
+      if (!o) return null;
       choiceByLabel(stage, o.label)?.click();
       await wait(0);
     }
@@ -1328,6 +1331,95 @@ async function phaseExams() {
   }
 }
 
+// Wrong answers: per unit, a typical wrong line (a trap of the judge) and a
+// multiple choice answered with an option that carries a trap.
+async function phaseWrong() {
+  log('\n== wrong: typical mistakes are shown and named');
+  await load();
+  await ensureProfile();
+  const skills = await skillList();
+  const units = [...new Set(skills.map((s) => s.unit))];
+  let lines = 0;
+  let choices = 0;
+  for (const u of units) {
+    const list = skills.filter((s) => s.unit === u);
+    let doneLine = false;
+    let doneChoice = false;
+    for (const s of list) {
+      if (!doneLine) {
+        for (const level of [4, 5]) {
+          const r = await cdp.call('wrongLine', s.id, level, SEED + level);
+          if (!r) continue;
+          doneLine = true;
+          lines++;
+          const at = `${s.id} L${level} ${r.key}: « ${r.line} » (${r.rule})`;
+          if (r.err) fail('wrong', at, r.err);
+          else if (!r.bad) fail('wrong', at, 'the wrong line is not shown as wrong');
+          else if (!r.named) fail('wrong', at, `the trap « ${r.name} » is not named (shown: « ${r.tag} »)`);
+          for (const x of [...(r.scan || []), ...(r.errors || [])]) fail('wrong', at, x);
+          break;
+        }
+      }
+      if (!doneChoice) {
+        const r = await cdp.call('wrongChoice', s.id, SEED);
+        if (r) {
+          doneChoice = true;
+          choices++;
+          const at = `${s.id} mcq ${r.key} (${r.rule})`;
+          if (!r.bad) fail('wrong', at, 'the wrong option is not marked wrong');
+          else if (!r.named) fail('wrong', at, `the trap « ${r.name} » is not named in the panel`);
+          if (!r.cont) fail('wrong', at, 'no « Continuer » in the panel');
+          for (const x of [...r.scan, ...r.errors]) fail('wrong', at, x);
+        }
+      }
+      if (doneLine && doneChoice) break;
+    }
+  }
+  log(`  ${lines} wrong lines, ${choices} wrong choices in ${units.length} units`);
+  await shot('wrong-choice');
+}
+
+// A long problem: half of it, a reload, « Reprendre le problème » on the
+// home screen, the rest.
+async function phaseProblem() {
+  log('\n== problem: saved halfway, resumed after a reload');
+  await load();
+  await ensureProfile();
+  const cases = [['m-cholesky', 4, 'open'], ['a1-ser-param', 4, 'open'], ['n-ode-euler-global', 5, null]];
+  for (const [skill, level, exam] of cases) {
+    const a = await cdp.call('problemHalf', skill, level, exam, SEED);
+    if (a.err) { fail('problem', skill, a.err); continue; }
+    if (a.r !== 'stopped') fail('problem', `${skill} ${a.key}`, `first half: ${a.r} ${a.issues.join(' ; ')}`);
+    if (!a.pending) fail('problem', `${skill} ${a.key}`, 'nothing saved in profile.pending');
+    for (const x of [...a.errors, ...a.scan]) fail('problem', skill, x);
+    await shot(`problem-${skill}-half`);
+    await load();
+    const b = await cdp.call('problemResume');
+    if (b.err) { fail('problem', skill, b.err); continue; }
+    report.counts.played++;
+    if (b.correct && b.cont && !b.pendingAfter) report.counts.playedRight++;
+    else fail('problem', `${skill} ${a.key}`, `resumed: correct ${b.correct}, Continuer ${b.cont}, still pending ${b.pendingAfter}: ${b.panel} ${b.issues.join(' ; ')}`);
+    for (const x of [...b.errors, ...b.scan]) fail('problem', skill, x);
+    log(`  ${skill}: ${a.parts} parts, ${a.half} played, ${a.log} actions saved; resumed with « ${b.board.slice(0, 80)} »; ${b.correct ? 'right' : 'not right'}`);
+    await shot(`problem-${skill}-end`);
+  }
+}
+
+// School units: a lesson of fractions and one of equations, to the end.
+async function phaseSchool() {
+  log('\n== school: a lesson of fractions and one of equations');
+  await load();
+  await cdp.eval(`(async () => { const a = window.__smoke.M.app; a.store.createProfile({name: 'École', avatar: '🐼', year: 9, track: 'unknown'}); const { applyPlacement } = await import('/js/engine/learner.js'); applyPlacement(a.profile, 0); a.save(); })()`);
+  for (const skill of ['frac-add-any', 'eq-both-sides']) {
+    const r = await cdp.call('schoolLesson', skill);
+    log(`  ${skill}: ${r.seen.join(', ')} → ${r.done ? r.title : 'not finished'}`);
+    if (!r.done) fail('school', skill, 'the lesson did not end');
+    for (const x of [...r.issues, ...r.errors, ...r.scan]) fail('school', skill, x);
+    for (const u of r.untypable) fail('school', skill, `cannot type « ${u.missed} » in « ${u.text} »`);
+    await shot(`school-${skill}`);
+  }
+}
+
 // A debug aid: mounts one item (--skill, --level, --exam, --seed) and prints
 // the elements whose text looks wrong, with a screenshot.
 async function phaseDump() {
@@ -1361,7 +1453,7 @@ async function main() {
     if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error') report.console.push(`log: ${m.params.entry.text} ${m.params.entry.url ?? ''}`);
   });
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: `(${pageLib.toString()})();` });
-  const PH = { start: phaseStart, mount: phaseMount, play: phasePlay, exams: phaseExams, dump: phaseDump };
+  const PH = { start: phaseStart, mount: phaseMount, play: phasePlay, wrong: phaseWrong, exams: phaseExams, problem: phaseProblem, school: phaseSchool, dump: phaseDump };
   for (const name of [...PHASES, 'dump'].filter((p) => ONLY.includes(p))) {
     if (!PH[name]) continue;
     const n0 = report.failures.length;
