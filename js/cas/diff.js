@@ -157,6 +157,8 @@ export function diff(node, v = 'x', hooks = {}) {
         const inner = mul(e, pow(b, { t: 'paren', e: sub(e, num(1)) }));
         return stripParen(b).t === 'sym' && stripParen(b).name === v ? inner : mul(inner, D(b));
       }
+      // Step U6 (A2): a base free of v that is not a number, (1 + x²)^y in y: a^u·ln(a)·u′.
+      if (!dependsOn(b, v) && !numValue(b) && stripParen(b).t !== 'const') return mul(node, mul(D(e), fn('ln', paren(b))));
       return chain(node, D, hooks, v);
     }
     case 'sqrt': case 'root': case 'abs': case 'fn': return chain(node, D, hooks, v);
