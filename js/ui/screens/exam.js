@@ -90,7 +90,13 @@ export function examScreen(root, args, app) {
     function go(i) { keepTime(); cur = Math.min(exam.questions.length - 1, Math.max(0, i)); paint(); }
 
     function choose(value) {
-      st.responses[cur] = st.responses[cur] === value ? null : value;
+      const multi = exam.questions[cur].item.multi;
+      if (multi) {
+        // Several boxes may be ticked (§16.3): the answer is a list.
+        const set = new Set(st.responses[cur] || []);
+        if (set.has(value)) set.delete(value); else set.add(value);
+        st.responses[cur] = set.size ? [...set].sort((a, b) => a - b) : null;
+      } else st.responses[cur] = st.responses[cur] === value ? null : value;
       answerRun(p, cur, st.responses[cur]);
       play('tap');
       save();
@@ -105,7 +111,9 @@ export function examScreen(root, args, app) {
       const head = h('div.exam-qhead', h('b', `Question ${q.n} / ${exam.questions.length}`), h('small.muted', `${KIND[q.kind]} · ${scoringText(section.scoring)}`));
       const body = [h('div.prompt', html(it.prompt))];
       if (q.kind === 'mcq') {
-        body.push(h('div.choices', it.options.map((o, k) => h(`button.choice${resp === k ? '.selected' : ''}`, { type: 'button', onclick: () => choose(k), html: `<span class="choice-body">${o.html}</span>` }, h('span.choice-key', String(k + 1))))));
+        if (it.multi) body.push(h('small.muted', 'Plusieurs réponses possibles : coche toutes les bonnes.'));
+        const picked = (k) => (Array.isArray(resp) ? resp.includes(k) : resp === k);
+        body.push(h('div.choices', it.options.map((o, k) => h(`button.choice${picked(k) ? '.selected' : ''}`, { type: 'button', onclick: () => choose(k), html: `<span class="choice-body">${o.html}</span>` }, h('span.choice-key', String(k + 1))))));
       } else if (q.kind === 'tf') {
         body.push(h('div.tf-statement', html(it.statement)));
         body.push(h('div.choices.tf-choices', [['Vrai', true], ['Faux', false]].map(([label, v]) => h(`button.choice${resp === v ? '.selected' : ''}`, { type: 'button', onclick: () => choose(v) }, label))));
@@ -172,10 +180,11 @@ export function examScreen(root, args, app) {
     const answerText = (q, resp) => {
       if (resp === null || resp === undefined) return '— (vide)';
       if (q.kind === 'tf') return resp ? 'Vrai' : 'Faux';
+      if (q.kind === 'mcq' && Array.isArray(resp)) return resp.map((k) => q.item.options[k]?.html).join(' ; ');
       if (q.kind === 'mcq') return q.item.options[resp]?.html ?? '—';
       return String(resp);
     };
-    const rightText = (q) => (q.kind === 'tf' ? (q.item.truth ? 'Vrai' : 'Faux') : q.kind === 'mcq' ? q.item.options.find((o) => o.correct)?.html : q.item.answerHtml ?? '');
+    const rightText = (q) => (q.kind === 'tf' ? (q.item.truth ? 'Vrai' : 'Faux') : q.kind === 'mcq' ? q.item.options.filter((o) => o.correct).map((o) => o.html).join(' ; ') : q.item.answerHtml ?? '');
     const pts = (x) => `${x > 0 ? '+' : ''}${fr(Math.round(x * 100) / 100)}`;
     const skills = Object.entries(r.perSkill).sort((a, b) => (a[1].points / a[1].max) - (b[1].points / b[1].max));
     main.replaceChildren(

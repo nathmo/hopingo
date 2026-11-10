@@ -11233,7 +11233,7 @@ Vrai ou faux ?
     contre-exemple (matOne) : A = [[0,1],[0,0]]
   [examen tf]
 
-Soit A = [[3,-3,1,1],[1,-1,3,3]] et W = Ker A ⊂ ℝ⁴. (a) Trouve une base de W, puis une base orthonormée de W. (b) Calcule B = AᵀA. (c) Son polynôme caractéristique. (d) Des vecteurs propres de B pour ses valeurs propres non nulles. (f) Écris A = UΣVᵀ.
+Soit A = [[3,-3,1,1],[1,-1,3,3]] et W = Ker A ⊂ ℝ⁴. (a) Trouve une base de W, puis une base orthonormée de W. (b) Calcule B = AᵀA. (c) Son polynôme caractéristique. (d) Des vecteurs propres de B pour ses valeurs propres non nulles. (e) Écris A = UΣVᵀ.
   [free, sans aide, examen open]  KerA
     = (1 ; 1 ; 0 ; 0), (0 ; 0 ; 1 ; -1)   ← Réduction de A
   — (a) Une base orthonormée de W (Gram-Schmidt, puis normaliser).  [juge span]  départ : (1 ; 1 ; 0 ; 0), (0 ; 0 ; 1 ; -1)
@@ -11246,7 +11246,7 @@ Soit A = [[3,-3,1,1],[1,-1,3,3]] et W = Ker A ⊂ ℝ⁴. (a) Trouve une base de
     = (1 ; -1 ; 1 ; 1)
   — (d) Un vecteur propre de B pour λ = 8.  [juge eigvec]  départ : v_2
     = (1 ; -1 ; -1 ; -1)
-  — (f) U, Σ et V avec A = UΣVᵀ (les deux dernières colonnes de V : la base de (a)).  [juge factor]  départ : A = UΣVᵀ
+  — (e) U, Σ et V avec A = UΣVᵀ (les deux dernières colonnes de V : la base de (a)).  [juge factor]  départ : A = UΣVᵀ
     = Σ = [[4√2,0,0,0],[0,2√2,0,0]]
     = V = [[1/2,1/2,1/√2,0],[-1/2,-1/2,1/√2,0],[1/2,-1/2,0,1/√2],[1/2,-1/2,0,-1/√2]]
     = U = (1/√2)·[[1,1],[1,-1]]
@@ -11760,7 +11760,7 @@ Montre que si U est orthogonale et Ux = λx avec x ≠ 0 et λ réel, alors λ =
     ✗ U est orthogonale, donc Uᵀ = U et ses valeurs propres sont réelles. [l_sym_orth_confusion]
   pièges : l_sym_orth_confusion
 
-Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordre.
+Construis l'énoncé de le théorème spectral : touche les morceaux dans l'ordre.
   [blocs define]
     1. Une matrice réelle A (n × n)
     2. est diagonalisable en base orthonormée,
@@ -11770,7 +11770,7 @@ Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordr
     ✗ A est orthogonale (AᵀA = I). [l_sym_orth_confusion]
   pièges : l_sym_orth_confusion
 
-Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordre.
+Construis l'énoncé de le théorème spectral : touche les morceaux dans l'ordre.
   [blocs define]
     1. Une matrice réelle A (n × n)
     2. est diagonalisable en base orthonormée,
@@ -11785,7 +11785,7 @@ Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordr
 ### Niveau 3
 
 ```
-Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordre.
+Construis l'énoncé de le théorème spectral : touche les morceaux dans l'ordre.
   [blocs define]
     ? Le sens « A = QDQᵀ ⇒ A symétrique » vient de… ✔ Aᵀ = (QDQᵀ)ᵀ = QDᵀQᵀ = QDQᵀ = A / · QᵀQ = I, donc AᵀA = I / · D est inversible
     1. Une matrice réelle A (n × n)
@@ -11806,7 +11806,7 @@ Montre que si U est orthogonale et Ux = λx avec x ≠ 0 et λ réel, alors λ =
     ✗ U est orthogonale, donc Uᵀ = U et ses valeurs propres sont réelles. [l_sym_orth_confusion]
   pièges : l_sym_orth_confusion
 
-Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordre.
+Construis l'énoncé de le théorème spectral : touche les morceaux dans l'ordre.
   [blocs define]
     ? Le sens « A = QDQᵀ ⇒ A symétrique » vient de… ✔ Aᵀ = (QDQᵀ)ᵀ = QDᵀQᵀ = QDQᵀ = A / · QᵀQ = I, donc AᵀA = I / · D est inversible
     1. Une matrice réelle A (n × n)
@@ -11822,7 +11822,7 @@ Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordr
 ### Niveau 4
 
 ```
-Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordre.
+Construis l'énoncé de le théorème spectral : touche les morceaux dans l'ordre.
   [blocs define]
     1. est diagonalisable en base orthonormée,
     2. c'est-à-dire A = QDQᵀ avec Q orthogonale et D diagonale,
@@ -11832,7 +11832,7 @@ Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordr
     ✗ A est orthogonale (AᵀA = I). [l_sym_orth_confusion]
   pièges : l_sym_needed, l_sym_orth_confusion
 
-Construis l'énoncé du le théorème spectral : touche les morceaux dans l'ordre.
+Construis l'énoncé de le théorème spectral : touche les morceaux dans l'ordre.
   [blocs define]
     1. est diagonalisable en base orthonormée,
     2. c'est-à-dire A = QDQᵀ avec Q orthogonale et D diagonale,
