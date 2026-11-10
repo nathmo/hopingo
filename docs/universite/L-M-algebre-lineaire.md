@@ -1644,6 +1644,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `coef` ℓᵢⱼ ; `mcq` (distracteurs : `m_chol_no_sqrt`, `m_chol_sum_sign`, `l_coef_index_swap`). `tf` : « Toute matrice symétrique inversible a une factorisation de Cholesky » (faux : `[[1, 2], [2, 1]]`) ; « det A = (Π ℓᵢᵢ)² » (vrai).
 - **Pièges** : `m_chol_no_sqrt`, `m_chol_sum_sign`, `l_coef_index_swap`.
 - **Sous-buts → crédit** : première colonne → `m-cholesky` ; résoudre Ly = b → `l-mat-lu`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Une partie `value` par ℓᵢⱼ (départ l₁₁, l₂₁…, la ligne de calcul puis la valeur), puis L jugée par `factor` ; L1 : 2 × 2 ou 3 × 3, formules dans les titres, un nombre et la valeur à trous ; L2 : deux décisions (formule de ℓ₂₂, formule de ℓ₃₂) ; L3 : menus « racine », « division », « assembler » ; L4 : 3 × 3, puis Ly = b et Lᵀx = y une fois sur deux ; L5 : ℓ₃₂ (ou ℓ₃₃, ℓ₂₂) seul, ou un problème : Cholesky jusqu'à ℓ₃₃² ≤ 0, puis un QCM de conclusion (leurre `l_posdef_diag`). Variante `open` : l'exemple d'examen 2 (7 points), où (a) note les six ℓᵢⱼ (sans la ligne L) et (d) est un QCM. Le distracteur « division oubliée » n'a pas de piège ; `l_coef_index_swap` (ℓ₂₃ = 0) n'apparaît que si le QCM a encore une place. Pas de gabarit tridiagonal en O(n) (renvoi à N).
 
 ### `m-quad-gradient` — Gradient et hessienne d'une forme quadratique
 - **Année** 16 · **Prérequis** `m-posdef`, `a2-partials`, `a2-hessian-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1666,6 +1667,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` ∇f ou x* (distracteurs : `m_grad_factor`, `m_grad_nonsym`). `tf` : « ∇(xᵀMx) = 2Mx pour toute M carrée » (faux : `matOne` non symétrique) ; « Si A est définie positive, ½xᵀAx − bᵀx a un unique minimum » (vrai).
 - **Pièges** : `m_grad_factor`, `m_grad_nonsym`, `l_quadform_offdiag`.
 - **Sous-buts → crédit** : gradient → `a2-partials` ; résoudre → `l-mat-inverse` ; nature → `m-posdef`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Parties : A et b (`mat`), ∇f comme vecteur de polynômes (`mat` avec `vars`, une seule ligne au lieu d'un `equiv` par composante), x* (`mat`), puis la nature (décision ; les mineurs sont donnés aux niveaux 1 et 2) et f(x*) (`value`). Une fois sur quatre, A indéfinie (point selle, leurre `l_posdef_diag` si la diagonale est positive) ou définie négative. L2 : décision Ax − b / 2Ax − b / ½Ax − b ; L4 : trois variables, ou f = xᵀMx − bᵀx avec M non symétrique (S = (M + Mᵀ)/2 avec `l_quadform_offdiag`, ∇f avec `m_grad_nonsym`) ; L5 : f = ‖Ax − b‖² (hessienne 2AᵀA, gradient, x*). QCM : ∇f, x* ou la matrice symétrique d'une forme xᵀSx.
 
 ### `m-normal-eq` — Équations normales, matrice de design, Var(β̂)
 - **Année** 16 · **Prérequis** `l-orth-lsq`, `m-quad-gradient`, `p-lin-combo` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1689,6 +1691,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` β̂ⱼ ou Var(β̂ⱼ) (distracteurs : `l_lsq_normal_aat`, `m_var_no_inverse`, `p_reg_sigma_n`). `tf` : « Si les colonnes de X sont orthogonales, les β̂ⱼ se calculent séparément » (vrai) ; « Var(β̂) = σ²XᵀX » (faux).
 - **Pièges** : `l_lsq_normal_aat`, `m_var_no_inverse`, `p_reg_sigma_n`, `l_lsq_line_swap`.
 - **Sous-buts → crédit** : X → `m-normal-eq` ; normales → `l-orth-lsq` ; variance → `m-normal-eq`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Les données sont une liste de points (xᵢ ; yᵢ) ; parties X, XᵀX, Xᵀy, β̂, résidus (`mat`, avec `cfg.lsq` pour les pièges de L), σ̂² et Var̂(β̂ⱼ) (`value`). Niveaux 1 à 3 : x centrés ; L2 : décision sur les colonnes de X ; L3 : jusqu'à Var̂(β̂ⱼ), en menus ; L4 : parabole à 4 ou 5 points, jusqu'à σ̂² ; L5 : un problème, la régression complète puis le QCM « quel coefficient est le plus précis ? ». Le gabarit (c) (XᵀX donnée) est le QCM de variance. `p_reg_sigma_n` (module P, étape U7) n'est nommé par l'option RSS/n que lorsque P est fusionné. Le vrai/faux « Var(β̂) = σ²XᵀX » demande une matrice X (propriété `varNotXtX`).
 
 ### `m-rayleigh` — Quotient de Rayleigh
 - **Année** 16 · **Prérequis** `m-spectral` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1710,6 +1713,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_rayleigh_no_denominator` → 19, √5 au dénominateur). `tf` : « R(x) ≤ λ_max pour tout x ≠ 0 » (vrai, A symétrique).
 - **Pièges** : `m_rayleigh_no_denominator`.
 - **Sous-buts → crédit** : produit → `l-mat-product` ; quotient → `m-rayleigh`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Parties Ax (`mat`), xᵀAx, xᵀx, R(x) (`value`) ; l'encadrement est une décision (valeurs propres données). L2 : décision sur le dénominateur ; L3 : menus ; L4 : 3 × 3, ou (3 fois sur 5) max et min de xᵀAx sur la sphère : det(A − λI), les valeurs, et un point unitaire (`span` orthonormé) ; L5 : un problème, x proche d'un vecteur propre, R(x) et le rapport (Ax)ᵢ/xᵢ, puis le QCM « laquelle est la plus proche ? ». Un vrai/faux faux s'ajoute : sans symétrie, R(x) peut sortir de [λ_min ; λ_max] (contre-exemple A, x, propriété `rayleighOutside`).
 
 ### `m-power-method` — Méthode de la puissance et puissance inverse
 - **Année** 16 · **Prérequis** `m-rayleigh`, `l-eig-powers` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
