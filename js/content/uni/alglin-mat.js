@@ -15,6 +15,7 @@
 
 import * as MX from '../../cas/matrix.js';
 import { readWith, showWith } from '../../judges/index.js';
+import { parseExpr, evalAst, valueText } from '../../cas/matexpr.js';
 import {
   q, mt, vt, ML, MLm, fq, qt, sub, unimodular, luPair, opLines, pickCells, withCells,
   matLines, coefItem, mcqDistinct, tfL, examTag, rowHoles, opR, opT,
@@ -33,7 +34,38 @@ const par = (x) => (q(x).n < 0 ? `(${qt(x)})` : qt(x));
 const parR = (x) => (q(x).n < 0 ? `(${fq(x)})` : fq(x));
 const sizeR = (A) => `${A.length} × ${A[0].length}`;
 const ij = (i, j) => `${sub(i + 1)}${sub(j + 1)}`;
-const tf = (x) => x;
+// Exact values of expressions with roots (geometry): their text and MathML.
+const EV = (text) => evalAst(parseExpr(text), {}, {});
+const VT = (text) => valueText(EV(text));
+const negT = (t) => (t === '0' ? '0' : t.startsWith('-') ? t.slice(1) : `-${t}`);
+const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
+const GRID2 = [[0, 0], [0, 0]];
+
+// Lines of several parts, assembled for a level: segs = [{html, ask?,
+// start, judge, decision?, lines: [{math, note, subgoal, grid?}]}]. Guided
+// levels blank `blanks` cells of each line with a grid; level 3 gives each
+// part its menu (tapActions 'menu').
+function partsItem(level, rng, segs, o) {
+  const script = [];
+  const judgeOf = (s) => (level === 3 && s.menu ? { ...s.judge, menu: s.menu } : s.judge);
+  segs.forEach((s, k) => {
+    if (k > 0) script.push({ kind: 'segment', html: s.html, ask: s.ask, start: { math: s.start }, judge: judgeOf(s) });
+    if (s.decision && level === 2) script.push(s.decision);
+    for (const l of s.lines) {
+      const line = { kind: 'eq', math: l.math, note: l.note || '', subgoal: l.subgoal };
+      if (level <= 2 && l.grid) {
+        const rows = [...Array(l.grid.length).keys()];
+        const k2 = Math.min(l.grid.length * l.grid[0].length, level === 1 ? (o.blanks ?? 2) : (o.blanks2 ?? 3));
+        script.push(withCells(line, pickCells(l.grid, rows, k2, rng)));
+      } else script.push(line);
+    }
+  });
+  return matLines({
+    skill: o.skill, level, prompt: o.prompt, start: segs[0].start, judge: judgeOf(segs[0]),
+    mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null,
+    script, hints: o.hints, subgoals: o.subgoals, key: o.key, fallback: o.fallback,
+  });
+}
 
 // ======================================================================
 // l-mat-product
@@ -531,8 +563,360 @@ function invExam(rng, exam) {
 }
 
 // ======================================================================
+// l-map-geom
+// ======================================================================
+
+const GEOM = 'l-map-geom';
+const GEOM_SUB = [
+  { id: 'images', label: 'images de e₁ et e₂', skill: 'l-map-std-matrix' },
+  { id: 'trig', label: 'cos θ et sin θ', skill: 'g3-exact' },
+  { id: 'dir', label: 'vecteur directeur d\'une droite', skill: 'g4-line2' },
+  { id: 'invP', label: 'inverser P', skill: INV },
+  { id: 'compose', label: 'recomposer', skill: GEOM },
+];
+
+const THETA = [
+  { t: 'π/6', c: '√3/2', s: '1/2' }, { t: 'π/4', c: '√2/2', s: '√2/2' }, { t: 'π/3', c: '1/2', s: '√3/2' },
+  { t: 'π/2', c: '0', s: '1' }, { t: '2π/3', c: '-1/2', s: '√3/2' }, { t: '3π/4', c: '-√2/2', s: '√2/2' },
+  { t: '5π/6', c: '-√3/2', s: '1/2' }, { t: 'π', c: '-1', s: '0' }, { t: '−π/2', c: '0', s: '-1' }, { t: '−π/3', c: '1/2', s: '-√3/2' },
+];
+const RAT_THETA = THETA.filter((x) => !/√/.test(x.c + x.s));
+const rotT = (th) => `[[${th.c},${negT(th.s)}],[${th.s},${th.c}]]`;
+const rotTT = (th) => `[[${th.c},${th.s}],[${negT(th.s)},${th.c}]]`;
+// A scalar with a root, as matexpr reads it alone: (√2)/2 (« √2/2 » alone is misread).
+const rootP = (t) => t.replace(/√(\d+)/g, '(√$1)');
+const rotR = (th) => `la rotation d'angle ${th.t} (de centre O)`;
+
+// « ax + by = 0 », readable (a ≥ 0).
+function lineEq(a, b) {
+  if (a < 0 || (a === 0 && b < 0)) { a = -a; b = -b; }
+  const term = (c, v, first) => (c === 0 ? '' : `${c < 0 ? (first ? '−' : ' − ') : first ? '' : ' + '}${Math.abs(c) === 1 ? '' : Math.abs(c)}${v}`);
+  return `${term(a, 'x', true)}${term(b, 'y', a === 0)} = 0`;
+}
+// A direction (p ; q), p > 0, q ≠ 0, coprime, entries ≤ 3.
+function direction(rng) {
+  for (;;) {
+    const p = rng.int(1, 3);
+    const qq = nz(rng, -3, 3);
+    if (gcd(p, qq) === 1) return [p, qq];
+  }
+}
+
+// Projection on the line of direction u, and the symmetry.
+function projData(rng) {
+  const [p, r] = direction(rng);
+  const n2 = p * p + r * r;
+  const uu = MX.mat([[p * p, p * r], [p * r, r * r]]);
+  const P = MX.scale(uu, q(1, n2));
+  const S = MX.sub(MX.scale(P, 2), MX.identity(2));
+  return { u: [p, r], n2, uu, P, S, eq: lineEq(r, -p) };
+}
+
+// Affinity of axis Span{a}, direction Span{u}, ratio k: M = P·diag(1, k)·P⁻¹.
+const KS = [q(-2), q(-1, 2), q(2, 3), q(-2, 3), q(3), q(2), q(1, 2)];
+function affData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const a = direction(rng).map((x, i) => (i === 0 ? x * rng.pick([1, -1]) : x));
+    const u = [rng.int(-3, 3), rng.int(-3, 3)];
+    if (u.every((x) => x === 0) || gcd(u[0], u[1]) !== 1) continue;
+    const det = a[0] * u[1] - a[1] * u[0];
+    if (![1, -1, 2, -2, 3, -3, 5, -5].includes(det)) continue;
+    const k = rng.pick(KS);
+    const P = MX.mat([[a[0], u[0]], [a[1], u[1]]]);
+    const Pi = MX.inverse(P);
+    const M = MX.mul(MX.mul(P, MX.diag([1, k])), Pi);
+    if (M.flat().some((x) => x.d > 15 || Math.abs(x.valueOf()) > 6) || MX.isDiagonal(M)) continue;
+    return { a, u, k, P, Pi, M, det: q(det), axis: lineEq(a[1], -a[0]), dir: lineEq(u[1], -u[0]) };
+  }
+  const P = MX.mat([[2, 3], [-1, 1]]);
+  const Pi = MX.inverse(P);
+  const k = q(-2, 3);
+  return { a: [2, -1], u: [3, 1], k, P, Pi, M: MX.mul(MX.mul(P, MX.diag([1, k])), Pi), det: q(5), axis: 'x + 2y = 0', dir: 'x − 3y = 0', fallback: true };
+}
+
+// The matrix of a map « first, then second »: second·first.
+const SIMPLE_SYM = [
+  { M: '[[1,0],[0,-1]]', r: 'la symétrie d\'axe Ox' }, { M: '[[-1,0],[0,1]]', r: 'la symétrie d\'axe Oy' }, { M: '[[0,1],[1,0]]', r: 'la symétrie d\'axe y = x' },
+];
+function compData(rng) {
+  const th = rng.pick(rng.chance(0.5) ? RAT_THETA : THETA);
+  let S;
+  if (!/√/.test(th.c + th.s) && rng.chance(0.6)) {
+    const p = projData(rng);
+    S = rng.chance(0.5) ? { M: mt(p.S), r: `la symétrie orthogonale d'axe ${p.eq}`, p } : { M: mt(p.P), r: `la projection orthogonale sur la droite ${p.eq}`, p };
+  } else S = rng.pick(SIMPLE_SYM);
+  const R = { M: rotT(th), r: rotR(th), th };
+  const rFirst = rng.chance(0.5);
+  const [first, second] = rFirst ? [R, S] : [S, R];
+  const expr = `${second.M}·${first.M}`;
+  return { th, R, S, first, second, expr, M: VT(expr), rFirst };
+}
+
+const geomCfg = (expect, about) => ({ kind: 'mat', expect, ...(about ? { about } : {}) });
+
+// The parts of each kind of map.
+function rotParts(th, rng) {
+  const a = th.t.replace('−', '-');
+  const exact = () => rng.shuffle([
+    { id: 'ok', label: 'La valeur exacte, lue sur le cercle trigonométrique', valid: true },
+    { id: 'approx', label: 'Une valeur approchée à la calculatrice', valid: false, why: 'La matrice demande des valeurs exactes, avec des racines.' },
+  ]);
+  return [
+    { start: `cos(${a})`, judge: geomCfg(rootP(th.c)), menu: exact(),
+      lines: [{ math: th.c, note: `cos θ, abscisse du point d'angle ${th.t} du cercle`, subgoal: 'trig' }] },
+    { html: 'sin θ.', start: `sin(${a})`, judge: geomCfg(rootP(th.s)), menu: exact(),
+      lines: [{ math: th.s, note: `sin θ, ordonnée du même point`, subgoal: 'trig' }] },
+    { html: 'La matrice R de la rotation.', start: 'R', judge: geomCfg(rotT(th), { rotation: true }),
+      menu: rng.shuffle([
+        { id: 'ok', label: 'R·e₁ et R·e₂ en colonnes', valid: true },
+        { id: 'rows', label: 'R·e₁ et R·e₂ en lignes', valid: false, rule: 'l_rot_transpose', why: 'Les colonnes d\'une matrice sont les images des vecteurs de base : en lignes, on obtient la rotation d\'angle −θ.' },
+      ]),
+      decision: {
+        kind: 'decision', prompt: 'Quelle est la matrice de la rotation d\'angle θ ?', options: rng.shuffle([
+          { id: 'ok', label: '[[cos θ, −sin θ], [sin θ, cos θ]]', valid: true },
+          { id: 'tr', label: '[[cos θ, sin θ], [−sin θ, cos θ]]', valid: false, rule: 'l_rot_transpose', why: 'Sa première colonne est (cos θ ; −sin θ) : c\'est la rotation d\'angle −θ.' },
+          { id: 'sc', label: '[[sin θ, −cos θ], [cos θ, sin θ]]', valid: false, why: 'Sa première colonne doit être l\'image de e₁, (cos θ ; sin θ).' },
+        ]),
+      },
+      lines: [{ math: rotT(th), note: 'Colonnes : R·e₁ et R·e₂', subgoal: 'images', grid: GRID2 }] },
+  ];
+}
+
+function projParts(p, sym, rng) {
+  const parts = [
+    { start: 'u', judge: { kind: 'span', basis: [vt(p.u.map((x) => q(x)))], require: 'basis' },
+      menu: rng.shuffle([
+        { id: 'ok', label: 'Pour ax + by = 0 : u = (−b ; a)', valid: true },
+        { id: 'n', label: 'Pour ax + by = 0 : u = (a ; b)', valid: false, why: '(a ; b) est un vecteur normal : il est orthogonal à la droite.' },
+      ]),
+      lines: [{ math: vt(p.u.map((x) => q(x))), note: `Un vecteur directeur de ${p.eq}`, subgoal: 'dir' }] },
+    { html: 'La matrice P de la projection orthogonale sur la droite.', start: 'P', judge: geomCfg(mt(p.P)),
+      menu: rng.shuffle([
+        { id: 'ok', label: 'P = uuᵀ/(uᵀu)', valid: true },
+        { id: 'sq', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: 'Il faut diviser par ‖u‖² = uᵀu : P·u doit redonner u.' },
+        { id: 'ut', label: 'P = uᵀu/(uuᵀ)', valid: false, why: 'uᵀu est un nombre, et on ne divise pas par une matrice.' },
+      ]),
+      decision: {
+        kind: 'decision', prompt: 'Quelle formule donne la projection orthogonale sur la droite de direction u ?', options: rng.shuffle([
+          { id: 'ok', label: 'P = uuᵀ/(uᵀu)', valid: true },
+          { id: 'sq', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: 'Il faut diviser par ‖u‖² = uᵀu : alors P·u = u.' },
+          { id: 'ut', label: 'P = uᵀu/(uuᵀ)', valid: false, why: 'uᵀu est un nombre, uuᵀ une matrice : on ne divise pas par une matrice.' },
+        ]),
+      },
+      lines: [
+        { math: `(1/${p.n2})·${mt(p.uu)}`, note: `uuᵀ divisé par uᵀu = ${p.n2}`, subgoal: 'compose' },
+        { math: mt(p.P), note: '', subgoal: 'compose', grid: GRID2 },
+      ] },
+  ];
+  if (sym) {
+    parts.push({
+      html: 'La matrice S de la symétrie orthogonale d\'axe la droite.', start: 'S', judge: geomCfg(mt(p.S)),
+      menu: rng.shuffle([
+        { id: 'ok', label: 'S = 2P − I', valid: true },
+        { id: 'pi', label: 'S = P − I', valid: false, why: 'Le symétrique de x est P(x) + (P(x) − x) = 2P(x) − x.' },
+        { id: 'ip', label: 'S = I − 2P', valid: false, why: 'I − 2P est la symétrie d\'axe la droite perpendiculaire.' },
+      ]),
+      lines: [
+        { math: `2·${mt(p.P)}-I`, note: 'S = 2P − I', subgoal: 'compose' },
+        { math: mt(p.S), note: '', subgoal: 'compose', grid: GRID2 },
+      ],
+    });
+  }
+  return parts;
+}
+
+function affParts(d, given, rng) {
+  const vec = (v) => vt(v.map((x) => q(x)));
+  const mDecision = {
+    kind: 'decision', prompt: 'Comment écrire M ?', options: rng.shuffle([
+      { id: 'ok', label: 'M = P·diag(1, k)·P⁻¹', valid: true },
+      { id: 'inv', label: 'M = P⁻¹·diag(1, k)·P', valid: false, rule: 'l_pdp_inverse_side', why: 'Les colonnes de P sont a et u : MP = P·diag(1, k), donc M = P·diag(1, k)·P⁻¹.' },
+      { id: 'k1', label: 'M = P·diag(k, 1)·P⁻¹', valid: false, why: 'M fixe a (1re colonne de P) et multiplie u par k : diag(1, k).' },
+    ]),
+  };
+  const mMenu = rng.shuffle([
+    { id: 'ok', label: 'M = P·diag(1, k)·P⁻¹ avec P = [a | u]', valid: true },
+    { id: 'inv', label: 'M = P⁻¹·diag(1, k)·P', valid: false, rule: 'l_pdp_inverse_side', why: 'MP = P·diag(1, k), donc M = P·diag(1, k)·P⁻¹.' },
+    { id: 'k1', label: 'M = P·diag(k, 1)·P⁻¹', valid: false, why: 'Le rapport k s\'applique à la direction u, pas à l\'axe.' },
+  ]);
+  const prod = { math: `${mt(d.P)}·diag(1,${qt(d.k)})·${mt(d.Pi)}`, note: `M = P·diag(1, ${fq(d.k)})·P⁻¹`, subgoal: 'compose' };
+  const mPart = { html: 'Recompose M = P·diag(1, k)·P⁻¹.', start: 'M', judge: geomCfg(mt(d.M)), decision: mDecision, menu: mMenu,
+    lines: [prod, { math: mt(d.M), note: `Contrôle : M·a = a et M·u = ${parR(d.k)}·u`, subgoal: 'compose', grid: GRID2 }] };
+  const dirMenu = (what) => rng.shuffle([
+    { id: 'ok', label: `Un vecteur ${what} : (−b ; a) pour ax + by = 0`, valid: true },
+    { id: 'n', label: 'Le vecteur normal (a ; b)', valid: false, why: '(a ; b) est orthogonal à la droite, il n\'est pas sur elle.' },
+  ]);
+  if (!given) {
+    return [
+      { start: 'a', judge: { kind: 'span', basis: [vec(d.a)], require: 'basis' }, menu: dirMenu('de l\'axe'),
+        lines: [{ math: vec(d.a), note: `Sur l'axe ${d.axis} : M·a = a`, subgoal: 'dir' }] },
+      { html: 'Un vecteur u de la direction.', start: 'u', judge: { kind: 'span', basis: [vec(d.u)], require: 'basis' }, menu: dirMenu('de la direction'),
+        lines: [{ math: vec(d.u), note: `Sur la droite ${d.dir} : M·u = k·u`, subgoal: 'dir' }] },
+      mPart,
+    ];
+  }
+  const adj = [[q(d.u[1]), q(-d.u[0])], [q(-d.a[1]), q(d.a[0])]];
+  return [
+    { start: 'P', judge: geomCfg(mt(d.P)), menu: rng.shuffle([{ id: 'ok', label: 'P = [a | u] : a et u en colonnes', valid: true }, { id: 'rows', label: 'a et u en lignes', valid: false, why: 'MP = P·diag(1, k) demande a et u en colonnes.' }]),
+      lines: [{ math: mt(d.P), note: 'a et u en colonnes', subgoal: 'compose', grid: GRID2 }] },
+    { html: 'Inverse P.', start: 'P^(-1)', judge: geomCfg(mt(d.Pi), { inverse: mt(d.P) }),
+      menu: rng.shuffle([{ id: 'ok', label: 'Formule 2 × 2 : (1/det P)·[[d, −b], [−c, a]]', valid: true }, { id: 'each', label: 'Inverser chaque case', valid: false, rule: 'l_inv_entrywise', why: 'L\'inverse d\'une matrice n\'est pas la matrice des inverses.' }]),
+      lines: [
+        ...(d.det.eq(1) ? [] : [{ math: `(${qt(q(1).div(d.det))})·${mt(adj)}`, note: `det P = ${fq(d.det)}`, subgoal: 'invP' }]),
+        { math: mt(d.Pi), note: '', subgoal: 'invP', grid: GRID2 },
+      ] },
+    mPart,
+  ];
+}
+
+function compParts(c, rng) {
+  const one = (x, name) => ({
+    html: name === 'R' ? 'La matrice R de la rotation.' : 'La matrice S de l\'autre application.', start: name,
+    judge: geomCfg(x.M, name === 'R' ? { rotation: true } : null),
+    menu: rng.shuffle([{ id: 'ok', label: 'Les images de e₁ et e₂ en colonnes', valid: true }, { id: 'rows', label: 'Les images de e₁ et e₂ en lignes', valid: false, rule: name === 'R' ? 'l_rot_transpose' : null, why: 'La colonne j est l\'image de eⱼ.' }]),
+    lines: [{ math: x.M, note: name === 'R' ? `Rotation d'angle ${c.th.t}` : '', subgoal: 'images', grid: GRID2 }],
+  });
+  const fn = c.rFirst ? 'R' : 'S';
+  const sn = c.rFirst ? 'S' : 'R';
+  return [
+    ...(/√/.test(c.R.M) ? [one(c.S, 'S'), one(c.R, 'R')] : [one(c.R, 'R'), one(c.S, 'S')]),
+    { html: `La matrice M de la composée (d'abord ${fn}, puis ${sn}).`, start: 'M', judge: geomCfg(c.M, { compose: [c.first.M, c.second.M] }),
+      decision: {
+        kind: 'decision', prompt: `On applique d'abord ${fn}, puis ${sn}. Quelle est la matrice de la composée ?`, options: rng.shuffle([
+          { id: 'ok', label: `${sn}·${fn}`, valid: true },
+          { id: 'rev', label: `${fn}·${sn}`, valid: false, rule: 'l_compose_order', why: `${sn}(${fn}(x)) = (${sn}${fn})x : la matrice appliquée en premier est à droite.` },
+        ]),
+      },
+      menu: rng.shuffle([
+        { id: 'ok', label: `${sn}·${fn} : la première appliquée est à droite`, valid: true },
+        { id: 'rev', label: `${fn}·${sn} : dans l'ordre de l'énoncé`, valid: false, rule: 'l_compose_order', why: `${sn}(${fn}(x)) = (${sn}${fn})x.` },
+      ]),
+      lines: [{ math: c.expr, note: `${sn}·${fn}`, subgoal: 'compose' }, { math: c.M, note: '', subgoal: 'compose', grid: GRID2 }] },
+  ];
+}
+
+function geomItem(level, rng) {
+  const kinds = { 1: ['aff', 'aff', 'rot'], 2: ['rot', 'proj', 'sym', 'aff', 'comp'], 3: ['rot', 'proj', 'sym', 'aff', 'comp'], 4: ['proj', 'sym', 'aff', 'comp', 'rot'], 5: ['aff', 'comp'] }[level];
+  const kind = rng.pick(kinds);
+  const o = { skill: GEOM, subgoals: GEOM_SUB };
+  if (kind === 'rot') {
+    const th = rng.pick(THETA);
+    return partsItem(level, rng, rotParts(th, rng), {
+      ...o, prompt: `Écris la matrice de ${rotR(th)} dans ℝ², en passant par les images de e₁ et e₂.`, key: `${GEOM}:rot:${th.t}`, blanks: 2,
+      hints: level === 5 ? [] : [
+        { level: 1, html: 'Les colonnes de R sont les images de e₁ et e₂ : e₁ tourné de θ donne (cos θ ; sin θ), e₂ tourné donne (−sin θ ; cos θ).' },
+        { level: 2, html: `R = [[cos(${th.t}), □], [□, cos(${th.t})]]` },
+        { level: 3, html: `R = ${ML(rotT(th))}` },
+      ],
+    });
+  }
+  if (kind === 'proj' || kind === 'sym') {
+    const p = projData(rng);
+    const sym = kind === 'sym';
+    return partsItem(level, rng, projParts(p, sym, rng), {
+      ...o, key: `${GEOM}:${kind}:${p.eq}`,
+      prompt: `Écris la matrice de la ${sym ? 'symétrie orthogonale d\'axe' : 'projection orthogonale sur'} la droite d : ${p.eq}${sym ? ', en passant par la projection P sur d' : ''}. Commence par un vecteur directeur u de d.`,
+      hints: [
+        { level: 1, html: `Un vecteur directeur u de d, puis P = uuᵀ/(uᵀu)${sym ? ', puis S = 2P − I' : ''}.` },
+        { level: 2, html: `u = ${vt(p.u.map((x) => q(x))).replace(/-/g, '−')}, P = (1/□)·${MLm(p.uu)}` },
+        { level: 3, html: `${sym ? `S = ${MLm(p.S)}` : `P = ${MLm(p.P)}`}` },
+      ],
+    });
+  }
+  if (kind === 'aff') {
+    const d = affData(rng);
+    const given = level <= 2;
+    return partsItem(level, rng, affParts(d, given, rng), {
+      ...o, key: `${GEOM}:aff:${mt(d.P)}:${qt(d.k)}`, fallback: d.fallback,
+      prompt: `Écris la matrice M de l'affinité d'axe ${d.axis}, de direction ${d.dir} et de rapport ${fq(d.k)}.${given ? ` On prend a = ${vt(d.a.map((x) => q(x))).replace(/-/g, '−')} sur l'axe, u = ${vt(d.u.map((x) => q(x))).replace(/-/g, '−')} dans la direction et P = [a | u].` : ' Cherche un vecteur a de l\'axe et un vecteur u de la direction.'}`,
+      hints: level === 5 ? [] : [
+        { level: 1, html: 'Cherche deux vecteurs dont tu connais l\'image : a sur l\'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u].' },
+        { level: 2, html: `M = ${MLm(d.P)}·diag(1, □)·P⁻¹` },
+        { level: 3, html: `M = ${MLm(d.M)}` },
+      ],
+    });
+  }
+  const c = compData(rng);
+  const fn = c.rFirst ? 'R' : 'S';
+  const sn = c.rFirst ? 'S' : 'R';
+  return partsItem(level, rng, compParts(c, rng), {
+    ...o, key: `${GEOM}:comp:${c.expr}`,
+    prompt: `Soit R ${c.R.r} et S ${c.S.r}. Écris la matrice M de l'application qui fait d'abord ${fn}, puis ${sn}.`,
+    hints: level === 5 ? [] : [
+      { level: 1, html: `On applique d'abord ${fn} à x, puis ${sn} au résultat : ${sn}(${fn}(x)) = (${sn}${fn})x. La matrice appliquée en premier est à droite.` },
+      { level: 2, html: 'M = □·□ : écris R et S, puis leur produit dans le bon ordre.' },
+      { level: 3, html: `M = ${ML(c.M)}` },
+    ],
+  });
+}
+
+function geomExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.pick(['inj', 'inv', 'p2', 'sym2', 'rot']);
+    if (which === 'inj' || which === 'inv') {
+      const p = projData(rng);
+      const nrm = vt([q(-p.u[1]), q(p.u[0])]);
+      return tfL({
+        skill: GEOM, key: `${which}:${p.eq}`, truth: false, exam: tag,
+        statement: which === 'inj' ? 'Une projection orthogonale de ℝ² sur une droite est injective.' : 'La matrice d\'une projection orthogonale de ℝ² sur une droite est inversible.',
+        counter: { kind: 'mapWitness', params: { A: mt(p.P) }, ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer: { x: nrm, y: '(0 ; 0)' } },
+        explanation: `Faux : pour la projection sur ${p.eq}, de matrice ${MLm(p.P)}, le vecteur ${nrm.replace(/-/g, '−')} (orthogonal à la droite) et 0 ont la même image 0.`,
+      });
+    }
+    const T = {
+      p2: ['La matrice P d\'une projection orthogonale vérifie P² = P.', 'Vrai : un vecteur déjà projeté sur la droite ne bouge plus.'],
+      sym2: ['La matrice S d\'une symétrie orthogonale d\'axe une droite vérifie S² = I.', 'Vrai : appliquer deux fois la symétrie ramène chaque vecteur à sa place (S = 2P − I et P² = P donnent S² = 4P − 4P + I).'],
+      rot: ['La matrice R d\'une rotation de ℝ² vérifie R⁻¹ = Rᵀ.', 'Vrai : Rᵀ = [[cos θ, sin θ], [−sin θ, cos θ]] est la rotation d\'angle −θ, qui défait R.'],
+    }[which];
+    return tfL({ skill: GEOM, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1] });
+  }
+  const kind = rng.pick(['rot', 'proj', 'sym', 'aff']);
+  if (kind === 'rot') {
+    const th = rng.pick(THETA.filter((x) => x.s !== '0'));
+    const alt = { ...th, c: th.s, s: th.c };
+    return mcqDistinct({
+      skill: GEOM, level: 4, key: `mcq:rot:${th.t}`, exam: tag, prompt: `Quelle est la matrice de ${rotR(th)} ?`,
+      right: ML(rotT(th)),
+      wrongs: [{ html: ML(rotTT(th)), rule: 'l_rot_transpose' }, { html: ML(rotT(alt)), rule: null }, { html: ML(`[[${th.c},${th.s}],[${th.s},${negT(th.c)}]]`), rule: null }],
+      fillers: [{ html: ML(`[[${negT(th.c)},${th.s}],[${negT(th.s)},${negT(th.c)}]]`) }],
+      solution: [{ html: `R = [[cos θ, −sin θ], [sin θ, cos θ]] = ${ML(rotT(th))}`, note: `θ = ${th.t}` }],
+    }, rng);
+  }
+  if (kind === 'proj' || kind === 'sym') {
+    const p = projData(rng);
+    const sym = kind === 'sym';
+    // uuᵀ/‖u‖, written as such.
+    const noSq = `(1/√${p.n2})·${MLm(p.uu)}`;
+    const right = sym ? mt(p.S) : mt(p.P);
+    return mcqDistinct({
+      skill: GEOM, level: 4, key: `mcq:${kind}:${p.eq}`, exam: tag,
+      prompt: `Quelle est la matrice de la ${sym ? 'symétrie orthogonale d\'axe' : 'projection orthogonale sur'} la droite ${p.eq} ?`,
+      right: ML(right),
+      wrongs: sym
+        ? [{ html: MLm(p.P), rule: null }, { html: `(2/√${p.n2})·${MLm(p.uu)} − I`, rule: 'g4_proj_no_square' }, { html: MLm(MX.scale(p.S, -1)), rule: null }]
+        : [{ html: noSq, rule: 'g4_proj_no_square' }, { html: MLm(p.uu), rule: null }, { html: MLm(MX.sub(MX.identity(2), p.P)), rule: null }],
+      fillers: [{ html: MLm(MX.transpose(MX.scale(p.uu, -1))) }],
+      solution: [{ html: `u = ${vt(p.u.map((x) => q(x)))}, P = uuᵀ/(uᵀu) = ${MLm(p.P)}`, note: '' }, ...(sym ? [{ html: `S = 2P − I = ${MLm(p.S)}`, note: '' }] : [])],
+    }, rng);
+  }
+  const d = affData(rng);
+  const wrongInv = MX.mul(MX.mul(d.Pi, MX.diag([1, d.k])), d.P);
+  const swapK = MX.mul(MX.mul(d.P, MX.diag([d.k, 1])), d.Pi);
+  return mcqDistinct({
+    skill: GEOM, level: 4, key: `mcq:aff:${mt(d.P)}:${qt(d.k)}`, exam: tag,
+    prompt: `Quelle est la matrice de l'affinité d'axe ${d.axis}, de direction ${d.dir} et de rapport ${fq(d.k)} ?`,
+    right: MLm(d.M),
+    wrongs: [{ html: MLm(wrongInv), rule: 'l_pdp_inverse_side' }, { html: MLm(swapK), rule: null }, { html: MLm(MX.diag([1, d.k])), rule: null }],
+    fillers: [{ html: MLm(MX.transpose(d.M)) }],
+    solution: [{ html: `P = ${MLm(d.P)}, M = P·diag(1, ${fq(d.k)})·P⁻¹ = ${MLm(d.M)}`, note: '' }], fallback: d.fallback,
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [GEOM]: (level, rng, profile, opts = {}) => (opts.exam ? geomExam(rng, opts.exam) : geomItem(level, rng)),
   [PROD]: (level, rng, profile, opts = {}) => (opts.exam ? prodExam(rng, opts.exam) : prodItem(level, rng)),
   [INV]: (level, rng, profile, opts = {}) => (opts.exam ? invExam(rng, opts.exam) : invItem(level, rng)),
 };
