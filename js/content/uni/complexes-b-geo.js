@@ -45,6 +45,7 @@ const RA_CHOICES = [
   { id: 'mod', label: 'Module : √(a² + b²)' },
   { id: 'arg', label: 'Argument (le quadrant de q)' },
   { id: 'swap', label: 'Calculer (b − a)/(c − a)', rule: 'g8_ratio_order', why: 'L\'angle de AB⃗ vers AC⃗ et le rapport AC/AB sont donnés par (c − a)/(b − a).' },
+  { id: 'parts', label: 'Diviser partie réelle par partie réelle, partie imaginaire par partie imaginaire', rule: 'g8_div_componentwise', why: 'On ne divise pas partie par partie : on multiplie par le conjugué du dénominateur.' },
 ];
 // Quotients with a remarkable argument.
 const QS = [[1, 1], [1, -1], [-1, 1], [-1, -1], [0, 2], [0, -2], [0, 1], [0, -1], [2, 2], [-2, 2], [q(1, 2), q(1, 2)], [q(1, 2), q(-1, 2)], [0, 3], [-3, 3]];
@@ -109,7 +110,7 @@ function ratioItem(level, rng, opts) {
       `q = ${mt(`${cp(d.w)}/${cd(d.u)}`)} : multiplie en haut et en bas par ${cm(d.u.conj())}.`,
       `q = ${cm(d.qq)} : AC/AB = ${fr(modT(d.qq))}, angle ${fr(argT(d.qq))}.`),
     subgoals: RA_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
-    declares: { vars: [], complex: true }, baits: ['g8_ratio_order'],
+    declares: { vars: [], complex: true }, baits: ['g8_ratio_order', 'g8_div_componentwise'],
     key: `${RA}:${level}:1:${ct(d.a)}:${ct(d.b)}:${ct(d.c)}`, exam: examTag(opts), fallback: !!d.fallback,
   });
 }
@@ -130,7 +131,7 @@ function alignItem(level, rng, opts) {
       `q = ${mt(`${cp(d.w)}/${cd(d.u)}`)}.`,
       `q = ${cm(d.qq)}, arg q = ${fr(argT(d.qq))} : ${real ? 'alignés' : 'pas alignés'}.`),
     subgoals: RA_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
-    declares: { vars: [], complex: true }, baits: ['g8_ratio_order'],
+    declares: { vars: [], complex: true }, baits: ['g8_ratio_order', 'g8_div_componentwise'],
     key: `${RA}:${level}:2:${ct(d.a)}:${ct(d.b)}:${ct(d.c)}`, exam: examTag(opts), fallback: !!d.fallback,
   });
 }
@@ -195,7 +196,7 @@ function equilateralItem(level, rng, opts) {
       `c = ${mt(`${cp(d.a)}+(1/2+i√3/2)×${cp(d.u)}`)}`,
       `c = ${mt(final)}`),
     subgoals: RA_SUB, keys: [...KEYS, 'calcfn'], tapActions: level === 3 ? 'steps' : null,
-    declares: { vars: [], complex: true }, baits: ['g8_ratio_order'],
+    declares: { vars: [], complex: true }, baits: ['g8_ratio_order', 'g8_div_componentwise'],
     key: `${RA}:${level}:3:${ct(d.a)}:${ct(d.b)}`, exam: examTag(opts), fallback: !!d.fallback,
   });
 }

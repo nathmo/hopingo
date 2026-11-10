@@ -76,6 +76,7 @@ const LO_CHOICES = [
   { id: 'circle', label: 'Compléter les carrés : centre et rayon' },
   { id: 'line', label: 'Écrire l\'équation de la droite' },
   { id: 'flip', label: 'Remplacer |z + a| par la distance au point +a', rule: 'g8_locus_sign', why: '|z + a| = |z − (−a)| : c\'est la distance au point −a.' },
+  { id: 'nosq', label: 'Écrire |z − a| = (x − a₁) + (y − a₂), sans carrés', rule: 'g8_modulus_no_square', why: 'Le module est une longueur : |z − a|² = (x − a₁)² + (y − a₂)² (Pythagore).' },
 ];
 
 // Médiatrice or half-plane: |z − a| (op) |z − b|.
@@ -140,7 +141,7 @@ function bisectorItem(level, rng, opts, region) {
       `${mxy(`${sqA}${op0}${sqB}`)}, puis développe : x² et y² disparaissent.`,
       `${mxy(final)}.${side}`),
     subgoals: LO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
-    declares: { vars: ['z', 'x', 'y'], complex: true }, baits: ['g8_locus_sign'],
+    declares: { vars: ['z', 'x', 'y'], complex: true }, baits: ['g8_locus_sign', ...(level === 3 ? ['g8_modulus_no_square'] : [])],
     key: `${LO}:${level}:bis:${start}`, exam: examTag(opts), fallback: !!d.fallback,
   });
 }
@@ -197,7 +198,7 @@ function apolloItem(level, rng, opts) {
       `${mxy(`${sqA}=${K}(${sqB})`)}, puis ${mxy(divided)}.`,
       `${mxy(final)} : cercle de centre ${fr(`(${N(d.c[0])} ; ${N(d.c[1])})`)} et de rayon ${fr(absT(Number(d.r2)))}.`),
     subgoals: LO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
-    declares: { vars: ['z', 'x', 'y'], complex: true }, baits: ['g8_locus_sign'],
+    declares: { vars: ['z', 'x', 'y'], complex: true }, baits: ['g8_locus_sign', ...(level === 3 ? ['g8_modulus_no_square'] : [])],
     key: `${LO}:${level}:apo:${start}`, exam: examTag(opts), fallback: !!d.fallback,
   });
 }
@@ -254,7 +255,7 @@ function diskItem(level, rng, opts) {
       `${mxy(line2)}, puis complète le carré.`,
       `${mxy(final)} : ${where} de centre ${fr(`(${center[0]} ; ${center[1]})`)} et de rayon ${fr(absT(d.R))}.`),
     subgoals: LO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
-    declares: { vars: ['z', 'x', 'y'], complex: true }, baits: [],
+    declares: { vars: ['z', 'x', 'y'], complex: true }, baits: level === 3 ? ['g8_modulus_no_square'] : [],
     key: `${LO}:${level}:disk:${start}`, exam: examTag(opts), fallback: !!d.fallback,
   });
 }

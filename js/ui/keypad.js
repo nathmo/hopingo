@@ -38,7 +38,7 @@ const KEYSETS = {
   // of an identity or a division.
   set: [']', '[', ';', '{', '}', '∪', '∩', '∖', '∞', '∈', 'ℝ', 'ℕ', 'ℤ', '∅', '∧', '∨', '¬', 'back'],
   logic: ['∀', '∃', '¬', '⇒', '⇔', '∧', '∨', '∈', '(', ')', ',', 'back'],
-  cplx: ['i', '(', ')', 'left', 'right', 'back'],
+  cplx: ['i', 'conj(', 'Re(', 'Im(', 'arg(', '|', '(', ')', 'left', 'right', 'back'],
   // Trigonometry (G3): the integer k of families, degrees, cot, the letters
   // of substitutions (X = cos x, t = tan(x/2)) and « ou ».
   trig: ['k', '°', 'π', 'cot(', 'X', 't', '∨', 'back'],
