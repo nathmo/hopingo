@@ -10,5 +10,6 @@ import { GEN as DIRECT } from './fourier-b-direct.js';
 import { GEN as TABLE } from './fourier-b-table.js';
 import { GEN as EQ } from './fourier-b-eq.js';
 import { GEN as PLANCH } from './fourier-b-planch.js';
+import { GEN as DISTRIB } from './fourier-b-distrib.js';
 
-export const GEN = { ...DIRECT, ...TABLE, ...EQ, ...PLANCH };
+export const GEN = { ...DIRECT, ...TABLE, ...EQ, ...PLANCH, ...DISTRIB };
