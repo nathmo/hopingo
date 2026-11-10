@@ -20,6 +20,7 @@ import { reduceData } from './coniques-b-kit.js';
 import { GEN as NATURE } from './coniques-b-nature.js';
 import { GEN as FRAME } from './coniques-b-frame.js';
 import { GEN as DATA } from './coniques-b-data.js';
+import { GEN as FAMILY } from './coniques-b-family.js';
 
 // ======================================================================
 // Reductions built backwards
@@ -232,6 +233,7 @@ function reduceExam(rng, exam) {
 
 export const GEN = {
   ...DATA,
+  ...FAMILY,
   ...NATURE,
   ...FRAME,
   [RED]: (level, rng, profile, opts = {}) => (opts.exam ? reduceExam(rng, opts.exam) : reduceItem(level, rng)),

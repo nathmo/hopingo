@@ -6,4 +6,4 @@ import { SKILLS } from '../js/content/uni/coniques-b.skills.js';
 test('unit coniques-b: every skill, 5 levels and exam variants', () => checkSkills(SKILLS.map((s) => s.id).filter((id) => !STUBBED.has(id))));
 
 // Skills whose generators are not written yet (emptied when the part is done).
-const STUBBED = new Set(['g10-conic-family', 'g10-locus', 'g10-homogeneous']);
+const STUBBED = new Set([]);

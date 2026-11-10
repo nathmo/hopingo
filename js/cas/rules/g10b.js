@@ -163,3 +163,33 @@ RULES.push(
     check: { judge: { kind: 'geom', object: 'line2', ref: 'x + y - 3 = 0', dbl: { co: ['1', '0', '1', '2', '0', '-7'], T: ['1', '2'] } }, prev: 'x^2 + y^2 + 2x - 7 = 0', line: 'x + 2y - 5 = 0' },
   },
 );
+
+RULES.push(
+  {
+    id: 'g10_family_division_by_zero', family: 'method', tag: 'E', skill: 'g10-conic-family', repair: 'g10-conic-family',
+    example: ['m = (1 − x)/y sans y ≠ 0', 'traiter y = 0 à part'], name: 'Division par une expression qui peut s\'annuler',
+    judges: [],
+    explain: () => 'Pour isoler m, tu as divisé par une expression en x et y : là où elle s\'annule, le cas est à traiter à part. Vérifie aussi que chaque point du lieu est bien le centre d\'une conique de la famille.',
+    check: { bait: { skill: 'g10-conic-family', level: 3 } },
+  },
+  {
+    id: 'g10_locus_square_condition', family: 'method', tag: 'E', skill: 'g10-locus', repair: 'g1-irr-eq',
+    example: ['l\'hyperbole entière', 'une seule branche'], name: 'Condition de signe oubliée en élevant au carré',
+    judges: [],
+    explain: () => 'En élevant au carré, tu as ajouté les points où le membre de droite est négatif. Regarde la condition de signe : elle peut retirer une partie du lieu (une branche d\'hyperbole).',
+    check: { bait: { skill: 'g10-locus', exam: 'mcq' } },
+  },
+  {
+    id: 'g10_homog_missing_t', family: 'rule', tag: 'E', skill: 'g10-homogeneous', repair: 'g10-homogeneous',
+    example: ['3x − 5', '3xt − 5t²'], name: 'Terme non homogénéisé',
+    judges: ['equiv'],
+    // cfg.homog: the equation before homogenising (text).
+    transform(prev, ctx) {
+      const h = ctx?.cfg?.homog;
+      if (!h) return [];
+      try { return [{ node: parse(h, { vars: ['x', 'y', 't'] }), ctx: {} }]; } catch { return []; }
+    },
+    explain: () => 'Chaque terme doit avoir le même degré : pour une conique, 3x devient 3xt et −5 devient −5t².',
+    check: { judge: { kind: 'equiv', vars: ['x', 'y', 't'], target: 'goal', goal: 'x^2-xy-2y^2+3xt-5t^2', domain: { x: [-2, 2], y: [-2, 2], t: [0.5, 2] }, homog: 'x^2-xy-2y^2+3x-5' }, prev: 't^2·((x/t)^2-(x/t)(y/t)-2(y/t)^2+3(x/t)-5)', line: 'x^2-xy-2y^2+3x-5' },
+  },
+);
