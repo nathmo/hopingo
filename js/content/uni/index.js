@@ -15,8 +15,10 @@ import * as explog from './explog.skills.js';
 import * as trigo from './trigo.skills.js';
 import * as recurrence from './recurrence.skills.js';
 import * as fonctionsg from './fonctions-g.skills.js';
+import * as alglin from './alglin.skills.js';
 
 const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence, fonctionsg];
+MODULES.push(alglin); // step U3
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
@@ -27,3 +29,9 @@ export const UNBUILT = {
   // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
   'g8-algebraic': ['lit-identities'],
 };
+// Step U3 (module L): G4 is built at step U5, G8 at step U4.
+Object.assign(UNBUILT, {
+  'g4-vectors': ['eq-systems'],
+  'g4-line2': ['eq-systems', 'fn-affine'],
+  'g8-polar': ['lit-identities', 'g3-exact'],
+});

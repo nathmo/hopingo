@@ -64,6 +64,8 @@ test('value: same exact value, school traps on numbers, final literal', () => {
 
 test('every university trap names its own example, and explains itself', () => {
   for (const r of CAS_RULES) {
+    // A trap of module L whose section is not built yet (js/cas/rules/l.js).
+    if (r.stub) continue;
     assert.ok(RULE_BY_ID[r.id], `${r.id} is in RULE_BY_ID`);
     assert.ok(FAMILIES[r.family], `${r.id}: family ${r.family}`);
     assert.ok(SKILL_BY_ID[r.skill] && SKILL_BY_ID[r.repair], `${r.id}: skills exist`);

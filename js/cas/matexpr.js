@@ -850,7 +850,10 @@ export function lineML(line, { display } = {}) {
     parts.push(line.assigns.map((a) => `${labelML(a.name)}${a.value ? valueML(a.value) : ''}`).join('<mspace width="1em"/>'));
   } else if (line.value) parts.push(`${line.label ? labelML(line.label) : ''}${valueML(line.value)}`);
   const body = parts.join(line.ops?.length && parts.length > 1 ? '<mo>:</mo>' : '');
-  return `<math${display ? ' display="block"' : ''}><mrow>${body}</mrow></math>`;
+  let alt = '';
+  try { alt = lineText(line); } catch { alt = ''; }
+  const esc = alt.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  return `<math${display ? ' display="block"' : ''}${esc ? ` alttext="${esc}"` : ''}><mrow>${body}</mrow></math>`;
 }
 
 // The MathML of a text the judges read, without evaluating.

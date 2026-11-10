@@ -29,6 +29,7 @@ import {
   readMat, mopts, isMatrix, wrongV, parseLine, show, text, input,
 } from './matcommon.js';
 import * as polyJudge from './poly.js';
+import { ACTIONS } from './actions.js';
 
 export { parseLine, show, text, input };
 
@@ -266,3 +267,48 @@ export function judgeLine(cfg, prev, input, state = {}) {
 }
 
 export { S };
+
+// ---------- the menu of the « choose the action » mode (level 3) ----------
+
+// From the student's matrix: the operations that clear an entry under or
+// above a pivot (valid), the same with the wrong sign, and an operation
+// that would undo a zero already obtained.
+ACTIONS.rowops = (prev, cfg) => {
+  const v = prev?.value;
+  if (!isMatrix(v) || cfg.track === 'det' && v.k !== 'm') return [];
+  const opts = mopts(cfg);
+  const rows = v.rows;
+  const cols = colsOf(cfg, v);
+  const out = [];
+  const ops = candidateOps(rows.map((r) => r.slice(0, cols)), opts)
+    .filter((op) => !cfg.lowerOnly || op.j < op.i);
+  const forward = ops.filter((op) => op.i > op.j);
+  const useful = (cfg.goal === 'rref' ? ops : forward).slice(0, 3);
+  for (const op of useful) out.push({ id: `op${out.length}`, label: opReadable(op), valid: true, op });
+  // A pivot to bring to 1 (reduced form).
+  if (cfg.goal === 'rref') {
+    rows.forEach((r, i) => {
+      const c = r.slice(0, cols).findIndex((x) => !isZeroScalar(x, opts));
+      if (c >= 0 && !sameScalar(r[c], ONE, opts) && out.length < 4) {
+        const op = { kind: 'scale', i, k: simp(div(ONE, r[c])) };
+        out.push({ id: `op${out.length}`, label: opReadable(op), valid: true, op });
+      }
+    });
+  }
+  // A zero pivot: exchange.
+  const firstNon = rows.map((r) => r.slice(0, cols).findIndex((x) => !isZeroScalar(x, opts)));
+  for (let i = 0; i + 1 < rows.length; i++) {
+    if (firstNon[i] < 0 || (firstNon[i + 1] >= 0 && firstNon[i + 1] < firstNon[i])) {
+      const op = { kind: 'swap', i, j: i + 1 };
+      if (!cfg.lowerOnly) out.push({ id: `sw${i}`, label: opReadable(op), valid: true, op });
+      break;
+    }
+  }
+  const wrong = useful[0] ?? ops[0];
+  if (wrong) {
+    const bad = { ...wrong, k: simp(neg(wrong.k)) };
+    out.push({ id: 'sign', label: opReadable(bad), valid: false, rule: 'l_rowop_sign', why: 'Avec ce signe, la case ne devient pas 0 : elle double.' });
+  }
+  if (!out.some((o) => o.valid)) out.push({ id: 'done', label: 'C\'est déjà échelonné', valid: true });
+  return out;
+};

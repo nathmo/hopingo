@@ -11,5 +11,7 @@ import { GEN as TRIGO_TRI } from './trigo-tri.js';
 import { GEN as RECURRENCE } from './recurrence.js';
 import { GEN as FONCTIONSG } from './fonctions-g.js';
 import { GEN as FONCTIONSG_INEQ } from './fonctions-g-ineq.js';
+import { GEN as ALGLIN } from './alglin.js';
 
 export const UNI_GEN = { ...LOGIQUE, ...POLYNOMES, ...ANALYSE0, ...EXPLOG, ...TRIGO, ...TRIGO_EQ, ...TRIGO_TRI, ...RECURRENCE, ...FONCTIONSG, ...FONCTIONSG_INEQ };
+Object.assign(UNI_GEN, ALGLIN); // step U3
