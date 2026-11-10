@@ -6,5 +6,6 @@
 
 import { GEN as CHOL } from './matrices-b-chol.js';
 import { GEN as RAY } from './matrices-b-ray.js';
+import { GEN as QUAD } from './matrices-b-quad.js';
 
-export const GEN = { ...CHOL, ...RAY };
+export const GEN = { ...CHOL, ...QUAD, ...RAY };
