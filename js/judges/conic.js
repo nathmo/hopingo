@@ -73,6 +73,8 @@ function readElement(name, body) {
     const o = readObject(body, { dim: 2 });
     const parts = o.shape === 'union' ? o.parts : [o];
     const lines = parts.map((p) => {
+      // A line with irrational coefficients (x = 2 + 9√5/5) is read numerically.
+      if (p.kind === 'poly' && p.coefs.slice(0, 3).every((c) => Math.abs(c) < 1e-12) && Math.hypot(p.coefs[3], p.coefs[4]) > 1e-12) return normLine(p.coefs.slice(3));
       if (p.kind !== 'affine' || p.rows.length !== 1) throw new Error('Écris une droite : ax + by + c = 0.');
       const r = p.rows[0].map((q) => q.valueOf());
       return normLine(r);
