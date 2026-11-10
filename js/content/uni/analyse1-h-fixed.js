@@ -109,6 +109,7 @@ function conclusionDecisions(d, B, T) {
       { id: 'ok', label: `${up ? 'croît' : 'décroît'} (f(x) ${up ? '>' : '<'} x sur I) et est ${up ? 'majorée' : 'minorée'} par ${B.bound} : elle converge, vers ${B.lim}`, valid: true },
       ...(up ? [] : [{ id: 'fup', label: 'croît, parce que f est croissante', valid: false, rule: 'a1_monotone_by_f_increasing', why: 'f croissante dit seulement que la suite est monotone. Ici a₁ = f(a₀) < a₀ : elle décroît.' }]),
       { id: 'inf', label: `${up ? 'croît' : 'décroît'} et tend vers ${up ? '+∞' : '−∞'}`, valid: false, why: `Elle reste dans ${B.I} : elle est bornée de ce côté.` },
+      { id: 'bounded', label: `est ${B.I.includes('∞') ? `minorée par ${B.bound}` : `bornée (elle reste dans ${B.I})`} : elle converge`, valid: false, rule: 'a1_bounded_implies_convergent', why: 'Bornée ne suffit pas : (−1)ⁿ est bornée et ne converge pas. Il faut aussi la monotonie, donnée par le signe de f(x) − x.' },
       ...(other ? [{ id: 'fixed', label: `converge vers ${other}, l'autre point fixe`, valid: false, rule: 'a1_rec_limit_without_convergence', why: `La suite reste dans ${B.I} et ${up ? 'croît' : 'décroît'} : elle ne peut pas aller vers ${other}.` }] : []),
     ]));
     return out;
