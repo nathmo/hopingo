@@ -174,7 +174,7 @@ export const SKILLS = [
     intro: {
       rule: '(AB)ᵢⱼ = ligne i de A · colonne j de B ; AB existe si le nombre de colonnes de A égale le nombre de lignes de B.<br>En général AB ≠ BA, et AB = 0 n\'entraîne pas A = 0 ou B = 0. (AB)ᵀ = BᵀAᵀ.',
       lines: L([
-        [M('[[1,2],[0,-1],[3,1]]·[[2,0,1],[1,-1,4]]'), 'A 3 × 2, B 2 × 3'],
+        [`${M('[[1,2],[0,-1],[3,1]]')} · ${M('[[2,0,1],[1,-1,4]]')}`, 'A 3 × 2, B 2 × 3'],
         [M('[[4,-2,9],[-1,1,-4],[7,-1,7]]'), 'AB est 3 × 3 ; BA serait 2 × 2', false],
       ]),
     },
@@ -187,8 +187,9 @@ export const SKILLS = [
     intro: {
       rule: 'On réduit [A | I]. Si la partie gauche devient I, la partie droite est A⁻¹ ; sinon, A n\'est pas inversible.<br>Pour une 2 × 2 : [[a, b], [c, d]]⁻¹ = (1/(ad − bc))·[[d, −b], [−c, a]].',
       lines: L([
-        [M('[[1,2],[3,4]]^(-1)'), 'ad − bc = −2'],
-        [M('(1/-2)·[[4,-2],[-3,1]]'), 'Échanger a et d, changer le signe de b et c', false],
+        [`A = ${M('[[1,2],[3,4]]')}`, 'ad − bc = 1·4 − 2·3 = −2'],
+        [`A⁻¹ = (1/(−2))·${M('[[4,-2],[-3,1]]')}`, 'Échanger a et d, changer le signe de b et c'],
+        [M('[[-2,1],[3/2,-1/2]]'), 'Contrôle : AA⁻¹ = I', false],
       ]),
     },
   }),
@@ -199,7 +200,10 @@ export const SKILLS = [
     prereqWhy: { 'l-map-std-matrix': 'les colonnes sont les images de e₁ et e₂', 'l-mat-inverse': 'M = P·diag(1, k)·P⁻¹', 'g3-exact': 'cos θ et sin θ des angles usuels', 'g4-line2': 'axe et direction donnés par une équation de droite' },
     intro: {
       rule: 'Rotation d\'angle θ : [[cos θ, −sin θ], [sin θ, cos θ]]. Projection orthogonale sur la droite de direction u : uuᵀ/(uᵀu). Symétrie : 2·projection − I.<br>Affinité d\'axe d, de direction δ, de rapport k : M = P·diag(1, k)·P⁻¹ avec P = [a | u].',
-      lines: L([[M('(1/5)·[[1,2],[2,4]]'), 'Projection sur y = 2x : u = (1 ; 2)']]),
+      lines: L([
+        [`R = ${M('[[1/2,-√3/2],[√3/2,1/2]]')}`, 'Rotation d\'angle π/3 : colonnes R·e₁ et R·e₂'],
+        [`P = (1/5)·${M('[[1,2],[2,4]]')}`, 'Projection sur y = 2x : u = (1 ; 2), uᵀu = 5'],
+      ]),
     },
   }),
   S('l-mat-imt', {
@@ -220,8 +224,8 @@ export const SKILLS = [
     intro: {
       rule: 'Une matrice élémentaire E est Iₙ après une seule opération ; EA fait cette opération sur les lignes de A. L\'inverse de E fait l\'opération contraire.<br>Si E_k⋯E₁A = I, alors A⁻¹ = E_k⋯E₁ et A = E₁⁻¹⋯E_k⁻¹.',
       lines: L([
-        [M('E = [[1,0,0],[0,1,0],[2,0,1]]'), 'L3 ← L3 + 2L1 appliquée à I'],
-        [M('E^(-1) = [[1,0,0],[0,1,0],[-2,0,1]]'), 'L3 ← L3 − 2L1 la défait'],
+        [`E = ${M('[[1,0,0],[0,1,0],[2,0,1]]')}`, 'L₃ ← L₃ + 2L₁ appliquée à I'],
+        [`E⁻¹ = ${M('[[1,0,0],[0,1,0],[-2,0,1]]')}`, 'L₃ ← L₃ − 2L₁ la défait'],
       ]),
     },
   }),

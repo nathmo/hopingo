@@ -14,11 +14,10 @@
 // its value. cfg.about tells the traps what is asked (js/cas/rules/l-mat.js).
 
 import * as MX from '../../cas/matrix.js';
-import { readWith, showWith } from '../../judges/index.js';
 import { parseExpr, evalAst, valueText } from '../../cas/matexpr.js';
 import {
   q, mt, vt, ML, MLm, fq, qt, sub, unimodular, luPair, opLines, pickCells, withCells,
-  matLines, coefItem, mcqDistinct, tfL, examTag, rowHoles, opR, opT,
+  matLines, coefItem, mcqDistinct, tfL, examTag, rowHoles, opR,
 } from './alglin-kit.js';
 
 const nz = (rng, lo, hi) => { for (;;) { const k = rng.int(lo, hi); if (k) return k; } };
@@ -26,9 +25,7 @@ const maxAbs = (A) => Math.max(...A.flat().map((x) => Math.abs(q(x).valueOf())))
 const randM = (m, n, rng, lo, hi) => Array.from({ length: m }, () => Array.from({ length: n }, () => q(rng.int(lo, hi))));
 const hasZeroRow = (A) => A.some((r) => r.every((x) => x.n === 0));
 const hasZeroCol = (A) => hasZeroRow(MX.transpose(A));
-// A text of the judges shown as written (a name, an expression of names).
-const XCFG = { kind: 'mat', expect: '0' };
-export const XL = (text) => showWith(XCFG, readWith(XCFG, text));
+const sameLines = (A) => A.some((r, i) => A.some((s, k) => k > i && r.every((x, j) => x.eq(s[j]))));
 // A factor in a sum of products: 3, (−1).
 const par = (x) => (q(x).n < 0 ? `(${qt(x)})` : qt(x));
 const parR = (x) => (q(x).n < 0 ? `(${fq(x)})` : fq(x));
@@ -87,7 +84,7 @@ function prodData(rng, { square = false, same = rng.chance(0.6), sizes } = {}) {
     const lim = p === 3 ? 3 : 4;
     const A = randM(m, p, rng, -lim, lim);
     const B = randM(p, n, rng, -lim, lim);
-    if (hasZeroRow(A) || hasZeroCol(B)) continue;
+    if (hasZeroRow(A) || hasZeroCol(B) || sameLines(A) || sameLines(MX.transpose(B))) continue;
     if (A.flat().filter((x) => x.n === 0).length > (m * p) / 3) continue;
     const AB = MX.mul(A, B);
     if (maxAbs(AB) > 20 || AB.flat().filter((x) => x.n === 0).length > 2) continue;
@@ -774,7 +771,7 @@ function compParts(c, rng) {
     html: name === 'R' ? 'La matrice R de la rotation.' : 'La matrice S de l\'autre application.', start: name,
     judge: geomCfg(x.M, name === 'R' ? { rotation: true } : null),
     menu: rng.shuffle([{ id: 'ok', label: 'Les images de e₁ et e₂ en colonnes', valid: true }, { id: 'rows', label: 'Les images de e₁ et e₂ en lignes', valid: false, rule: name === 'R' ? 'l_rot_transpose' : null, why: 'La colonne j est l\'image de eⱼ.' }]),
-    lines: [{ math: x.M, note: name === 'R' ? `Rotation d'angle ${c.th.t}` : '', subgoal: 'images', grid: GRID2 }],
+    lines: [{ math: x.M, note: name === 'R' ? `Rotation d'angle ${c.th.t}` : 'Les images de e₁ et e₂ en colonnes', subgoal: 'images', grid: GRID2 }],
   });
   const fn = c.rFirst ? 'R' : 'S';
   const sn = c.rFirst ? 'S' : 'R';
@@ -1176,13 +1173,13 @@ function elemItem(level, rng) {
   const aR = order.map((k) => `${eName(k)}⁻¹`).join('');
   segs.push({
     html: `A⁻¹ = ${invR}.`, start: 'A^(-1)',
-    judge: { kind: 'mat', expect: mt(d.Ai), about: { compose: d.Es.map(mt) }, ...(useNames ? { names } : {}),
+    judge: { kind: 'mat', expect: mt(d.Ai), about: { compose: d.Es.map((E) => mt(E)) }, ...(useNames ? { names } : {}),
       menu: rng.shuffle([{ id: 'ok', label: `A⁻¹ = ${invR}`, valid: true }, { id: 'rev', label: `A⁻¹ = ${order.map(eName).join('')}`, valid: false, rule: 'l_compose_order', why: `${eName(0)} est faite en premier : elle est à droite.` }]) },
     lines: [{ kind: 'eq', math: prodInv, note: `${invR}·A = I`, subgoal: 'writeE' }, { kind: 'eq', math: mt(d.Ai), note: '', subgoal: 'writeE' }],
   });
   segs.push({
     html: `A = ${aR}.`, start: 'A',
-    judge: { kind: 'mat', expect: mt(d.A), about: { compose: d.Eis.slice().reverse().map(mt) }, ...(useNames ? { names } : {}),
+    judge: { kind: 'mat', expect: mt(d.A), about: { compose: d.Eis.slice().reverse().map((E) => mt(E)) }, ...(useNames ? { names } : {}),
       menu: rng.shuffle([{ id: 'ok', label: `A = ${aR}`, valid: true }, { id: 'rev', label: `A = ${order.slice().reverse().map((k) => `${eName(k)}⁻¹`).join('')}`, valid: false, rule: 'l_compose_order', why: 'A = (E_k⋯E₁)⁻¹ : l\'inverse d\'un produit renverse l\'ordre.' }]) },
     lines: [{ kind: 'eq', math: prodA, note: `(${invR})⁻¹ = ${aR}`, subgoal: 'writeE' }, { kind: 'eq', math: mt(d.A), note: '', subgoal: 'writeE' }],
   });
