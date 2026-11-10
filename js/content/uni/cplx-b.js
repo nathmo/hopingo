@@ -8,5 +8,6 @@ import { GEN as LAU } from './cplx-b-laurent.js';
 import { GEN as THM } from './cplx-b-thm.js';
 import { GEN as ARC } from './cplx-b-arc.js';
 import { GEN as REAL } from './cplx-b-real.js';
+import { GEN as FOU } from './cplx-b-fourier.js';
 
-export const GEN = { ...RES, ...LAU, ...THM, ...ARC, ...REAL };
+export const GEN = { ...RES, ...LAU, ...THM, ...ARC, ...REAL, ...FOU };

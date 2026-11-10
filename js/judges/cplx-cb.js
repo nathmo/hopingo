@@ -148,13 +148,20 @@ function valueForm(cfg, node) {
       const b = stripParen(x.b);
       if (isE(b)) {
         const e = stripParen(x.e);
-        if (hasI(e) && ![...symbolsIn(e)].some((s) => vars.has(s)) && !algebraicParts(e)) issue = 'Calcule l\'exposant : écris-le sous la forme a + bi.';
-      } else if (hasI(b) || (b.t === 'bin' && (b.op === '+' || b.op === '-'))) issue = 'Calcule cette puissance.';
+        if (hasI(e) && ![...symbolsIn(e)].some((s) => vars.has(s)) && !algebraicParts(e)) issue = 'exponent';
+        // 3i(1 + i): a product with a sum inside, still to expand.
+        if (hasI(e) && contains(e, (y) => y.t === 'bin' && y.op === '×' && contains(y, (w) => w.t === 'bin' && (w.op === '+' || w.op === '-')))) issue = 'exponent';
+        // e^((0)t), e^((−1)t): the product in the exponent is to compute.
+        if (contains(e, (y) => y.t === 'paren' && stripParen(y.e).t !== 'sym' && !contains(y, (w) => w.t === 'sym'))) issue = 'exponent';
+      } else if (hasI(b) || (b.t === 'bin' && (b.op === '+' || b.op === '-')) || (b.t === 'num' && stripParen(x.e).t === 'num')) issue = 'power';
     }
-    if (x.t === 'fn' && (x.name === 'exp') && hasI(x.args[0]) && !algebraicParts(stripParen(x.args[0]))) issue = 'Calcule l\'exposant : écris-le sous la forme a + bi.';
+    if (x.t === 'fn' && (x.name === 'exp') && hasI(x.args[0]) && !algebraicParts(stripParen(x.args[0]))) issue = 'exponent';
+    // (0) + 1, ((−1) + 2): numbers still to add.
+    if (x.t === 'bin' && (x.op === '+' || x.op === '-') && !contains(x, (y) => y.t === 'sym' || y.t === 'const')) issue = 'sum';
     return false;
   });
-  return issue ?? true;
+  // Right, not computed yet: a step (ok), not « stay ».
+  return issue ? false : true;
 }
 
 // 'ratz': a single quotient P/Q (a number times it), nothing nested.
@@ -168,7 +175,18 @@ function ratzForm(node) {
   return true;
 }
 
+// closedNumber (js/cas/closedform.js) refuses a leading minus before a
+// product with e^(…) (−πe^(−2), −e^(−2)sin(2)/4) although it accepts
+// −(πe^(−2)): a negated line is final when its opposite is.
 function cvalFinal(cfg, node) {
+  const fin = cvalFinal1(cfg, node);
+  if (fin === true || !node || node.lbl) return fin;
+  const n = stripParen(node);
+  if (n.t === 'neg' && cvalFinal1(cfg, n.e) === true) return true;
+  return fin;
+}
+
+function cvalFinal1(cfg, node) {
   if (node?.lbl) return false;
   const form = cfg.form || 'algebraic';
   if (form === 'any') return true;
