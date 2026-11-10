@@ -568,7 +568,7 @@ function implBlocks(level) {
 function implMcq(level, rng) {
   const ks = ['K1', 'K2', 'K3', 'K4', 'K5'];
   if (level === 3) {
-    const s = rng.pick(BANK.filter((x) => !x.truth));
+    const s = rng.pick(BANK.filter((x) => !x.truth && x.want.length <= 2));
     const right = rng.pick(s.want);
     const others = rng.shuffle(ks.filter((k) => !s.want.includes(k))).slice(0, 3);
     const options = [{ html: K_SHOW[right], correct: true }, ...others.map((k) => ({ html: K_SHOW[k], correct: false }))];
