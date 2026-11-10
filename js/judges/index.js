@@ -73,3 +73,8 @@ import * as bound from './bound.js';
 import * as domain from './domain.js';
 
 Object.assign(JUDGES, { ode, system, bound, domain });
+
+// Step U8: x′ = Ax and x_{k+1} = Ax_k with vector and matrix lines (module M).
+import * as odevec from './odevec.js';
+
+Object.assign(JUDGES, { odevec });

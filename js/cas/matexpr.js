@@ -365,7 +365,7 @@ function matching(text, i) {
   fail(`Il manque « ${close} ».`);
 }
 
-const FNS = ['det', 'diag', 'tr', 'Span', 'Vect', 'span', 'vect', 'rang', 'rg'];
+const FNS = ['det', 'diag', 'tr', 'Span', 'Vect', 'span', 'vect', 'rang', 'rg', 'exp']; // exp: step U8
 
 function tokenizeM(text) {
   const toks = [];
@@ -494,6 +494,8 @@ class P {
       const t = this.next();
       if (!t) fail('Il manque l\'exposant.');
       if (t.k === 'name' && (t.s === 'T')) base = { op: 'T', e: base };
+      // A scalar to the power t (e^t, step U8); a matrix to the power t is Aᵀ.
+      else if (t.k === 'sym' && t.s === 't' && base.op === 'num') base = { op: 'pow', e: base, k: sym('t') };
       else if (t.k === 'sym' && t.s === 't') base = { op: 'T', e: base };
       else if (t.k === 'grp' && t.text.replace(/\s/g, '') === '-1') base = { op: 'inv', e: base };
       else if (t.k === 'op' && t.s === '-') {
@@ -541,6 +543,8 @@ class P {
       case 'sym': {
         if (t.s === 'π') return { op: 'num', n: { t: 'const', name: 'pi' } };
         if (t.s === 'i' && this.opts.complex) return { op: 'num', n: { t: 'const', name: 'i' } };
+        // Euler's e (step U8: e^(2t)·(1 ; -2), e^(-2t)(I + tN)), unless the item names a letter e.
+        if (t.s === 'e' && !this.opts.vars?.includes('e')) return { op: 'num', n: { t: 'const', name: 'e' } };
         const [name, subs] = t.s.split('_');
         if (this.opts.vars && !this.opts.vars.includes(t.s) && !this.opts.vars.includes(name)) fail(`Je ne connais pas la lettre « ${t.s} » ici.`);
         return { op: 'num', n: subs ? sym(name, subs) : sym(name) };
@@ -750,6 +754,11 @@ export function evalAst(ast, env = {}, opts = {}, size = null) {
       break;
     }
     case 'det': { const v = E(ast.e); if (v.k !== 'm') fail('det s\'applique à une matrice.'); return S(ndet(v.rows)); }
+    case 'exp': { // step U8: exp of a scalar only (e^{At} is computed, not written exp(At))
+      const v = E(ast.e);
+      if (v.k !== 's') fail('L\'exponentielle d\'une matrice se calcule : diagonalise, ou écris A = λI + N.');
+      return S(simp({ t: 'fn', name: 'exp', args: [v.n] }));
+    }
     case 'tr': { const v = E(ast.e); if (v.k !== 'm') fail('tr s\'applique à une matrice.'); return S(simp(v.rows.reduce((s, r, i) => add(s, r[i]), ZERO))); }
     case 'rang': {
       const v = E(ast.e);
@@ -882,7 +891,7 @@ export function exprML(ast) {
     case 'T': return `<msup><mrow>${W(ast.e)}</mrow><mi>T</mi></msup>`;
     case 'inv': return `<msup><mrow>${W(ast.e)}</mrow><mrow><mo>−</mo><mn>1</mn></mrow></msup>`;
     case 'pow': return `<msup><mrow>${W(ast.e)}</mrow>${entryML(ast.k)}</msup>`;
-    case 'det': case 'tr': case 'rang': return `<mi>${ast.op}</mi>${W(ast.e)}`;
+    case 'det': case 'tr': case 'rang': case 'exp': return `<mi>${ast.op}</mi>${W(ast.e)}`;
     default: return '<mi>?</mi>';
   }
 }
