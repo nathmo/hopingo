@@ -251,6 +251,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 
 ### `g4-cross` — Produit vectoriel, aires
 - **Année** 12.5 · **Prérequis** `g4-dot` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Juges `vector` (avec `cfg.cross` pour les pièges) puis `value` exact pour l'aire. Gabarits 1 (u⃗ ∧ v⃗, contrôle, aire du triangle construit sur u⃗ et v⃗) aux niveaux 1 à 3, gabarits 2 (triangle ABC) et 3 (bilinéarité) au niveau 4 ; le niveau 5 enchaîne l'aire et la hauteur relative à [AB]. Au niveau 1, le schéma des déterminants est donné et les composantes sont à trous ; au niveau 2, la composante du milieu.
 - **Intro** : u⃗ ∧ v⃗ = (u₂v₃ − u₃v₂ ; u₃v₁ − u₁v₃ ; u₁v₂ − u₂v₁). Il est orthogonal à u⃗ et à v⃗, et ‖u⃗ ∧ v⃗‖ est l'aire du parallélogramme. v⃗ ∧ u⃗ = −u⃗ ∧ v⃗. Aire du triangle ABC : ½‖AB⃗ ∧ AC⃗‖.
 - **Juge** : `value` `{form:'vector'}` puis `value` `{form:'exact'}` pour l'aire · **Forme finale** : vecteur ; aire simplifiée (racine réduite).
 - **Niveaux** :
@@ -275,6 +276,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 
 ### `g4-triple` — Produit mixte, volumes, coplanarité
 - **Année** 12.5 · **Prérequis** `g4-cross` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Le produit mixte est une ligne du juge `vector` (« (−2 ; −1 ; 5)·(0 ; 1 ; 5) = 24 »), le volume une ligne `value`. Gabarits 1 (tétraèdre) et 3 (parallélépipède, au niveau 4) ; le gabarit 2 (coplanarité) est le niveau 5 et la variante `open` : produit mixte en m (juge `vector` avec le paramètre m, forme libre), m par `solset`, puis un volume.
 - **Intro** : [u⃗, v⃗, w⃗] = (u⃗ ∧ v⃗)·w⃗ = det(u⃗, v⃗, w⃗). Volume du parallélépipède : |[u⃗, v⃗, w⃗]|. Volume du tétraèdre ABCD : |[AB⃗, AC⃗, AD⃗]|/6. Quatre points sont coplanaires si et seulement si le produit mixte est nul.
 - **Juge** : `value` `{form:'exact'}` · **Forme finale** : volume (fraction irréductible).
 - **Niveaux** :
@@ -300,6 +302,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-dist-point` — Distance d'un point à un plan ou à une droite, pied de la perpendiculaire
 - **Année** 12 · **Prérequis** `g4-plane`, `g4-dot` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g4-plane` : normale n⃗ lue sur l'équation du plan.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Point-plan : valeur de l'équation en P (juge `vector`), distance (`value`), pied H, contrôle. Point-droite : t = AP⃗·v⃗/(v⃗·v⃗), H, distance ; la méthode avec u⃗ ∧ v⃗ n'est pas proposée. Le niveau 5 et `open` : vrai ou faux justifié sur un point K proposé (décision), après le calcul du pied. Le gabarit 3 (pied proposé, faux par `g4_proj_no_square`) est la variante `tf` ; son contre-exemple est le vrai pied (sorte `geo`, `footOfPlane`).
 - **Intro** : point-plan : d = |ax₀ + by₀ + cz₀ + d| / ‖n⃗‖, et le pied H = P − ((ax₀ + by₀ + cz₀ + d)/‖n⃗‖²)·n⃗. Point-droite (A, v⃗) : H = A + t·v⃗ avec t = AP⃗·v⃗/‖v⃗‖², puis d = PH ; ou d = ‖AP⃗ ∧ v⃗‖/‖v⃗‖ après `g4-cross`.
 - **Juge** : `value` `{form:'exact'}` pour d ; `value` `{form:'point'}` pour H (juge par segment) · **Forme finale** : distance simplifiée et coordonnées de H.
 - **Niveaux** :
@@ -327,6 +330,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-dist-skew` — Distance entre deux droites gauches
 - **Année** 12.5 · **Prérequis** `g4-triple`, `g4-relative-pos` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-relative-pos` : vérifier d'abord que les droites sont gauches.
+- **Statut** : fait le 10 novembre 2026 (étape U5). n⃗ = u⃗ ∧ v⃗, AB⃗, AB⃗·n⃗ (lignes `vector`), puis d (`value`). Gabarit 2 au niveau 4 : d₂ donnée par deux plans, paramétrée d'abord (juge `geom`, forme paramétrique). Le niveau 5 et `open` enchaînent la perpendiculaire commune. Le V/F « distance = AB » a pour contre-exemple deux points P ∈ d₁, Q ∈ d₂ plus proches (sorte `geo`, `skewCloser`).
 - **Intro** : d₁ = (A, u⃗), d₂ = (B, v⃗), gauches. n⃗ = u⃗ ∧ v⃗ est orthogonal aux deux. d = |AB⃗·n⃗| / ‖n⃗‖ = |[AB⃗, u⃗, v⃗]| / ‖u⃗ ∧ v⃗‖. Si le produit mixte est nul, les droites ne sont pas gauches.
 - **Juge** : `value` `{form:'vector'}` puis `{form:'exact'}` · **Forme finale** : distance simplifiée.
 - **Niveaux** :
@@ -351,6 +355,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 
 ### `g4-common-perp` — Perpendiculaire commune à deux droites gauches
 - **Année** 12.5 · **Prérequis** `g4-dist-skew` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). PQ⃗(s, t) est une ligne `vector` avec les paramètres s, t (forme libre : la ligne est finale dès qu'elle a la bonne valeur) ; les deux conditions sont des lignes `equiv` (cible `goal` : l'expression développée) ; s, t par `value` (le système se résout de tête ou au brouillon) ; P, Q (`vector`) ; la droite (PQ) (`geom`). Le contrôle ‖PQ⃗‖ = d est une note. Le gabarit 2 (P et Q seulement) est tiré 2 fois sur 5.
 - **Intro** : P = A + s·u⃗ sur d₁, Q = B + t·v⃗ sur d₂. PQ⃗ est la perpendiculaire commune si PQ⃗·u⃗ = 0 **et** PQ⃗·v⃗ = 0. On résout ce système en s et t. Contrôle : ‖PQ⃗‖ est la distance de `g4-dist-skew`.
 - **Juge** : `value` `{form:'vector', symbols:{s, t}}` pour PQ⃗(s, t) ; `value` pour s, t, P, Q ; `geom` `{object:'line3'}` pour la droite · **Forme finale** : P, Q et une équation de la droite (PQ).
 - **Niveaux** :
@@ -377,6 +382,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 
 ### `g4-line-two-skew` — Droite qui s'appuie sur deux droites gauches
 - **Année** 12.5 · **Prérequis** `g4-relative-pos`, `g4-cross` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Méthode des plans seulement en lignes (la méthode des paramètres n'est qu'une option de la décision du niveau 2) ; a et b sont toujours données en paramétriques (pas de forme cartésienne à convertir) ; gabarit 3 (n par un point M) absent ; au niveau 4, w⃗ est donné une fois sur deux comme normale d'un plan α. Le niveau 5 et `open` commencent par la discussion (décision), la variante `mcq` pose la discussion sur des cas construits (b sécante, parallèle ou contenue dans π).
 - **Intro** : on cherche n, de direction w⃗ donnée (par exemple normale à un plan α), qui coupe a et b. Méthode des plans : π contient a et la direction w⃗ (normale u⃗ ∧ w⃗) ; Q = π ∩ b ; n passe par Q avec la direction w⃗. Méthode des paramètres : Q(t) − P(s) = k·w⃗. Discussion : pas de solution si w⃗ est parallèle au plan qui contient b et la direction de a (π ∥ b) ; une infinité si b ⊂ π.
 - **Juge** : `geom` `{object:'plane'}` pour π ; `value` pour Q ; `geom` `{object:'line3'}` pour n ; décisions pour la discussion · **Forme finale** : équation de n.
 - **Niveaux** :
@@ -404,6 +410,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-sphere` — Sphères : centre, rayon, plan tangent, section
 - **Année** 12.5 · **Prérequis** `g4-dist-point`, `@alg:H-completer-carre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-dist-point` : section et tangence : distance du centre au plan.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Compléter les carrés (juge `geom`, objet `sphere`), C (`vector`) et r (`value`) ; au niveau 4, l'équation est parfois multipliée par 2 ou 3 (diviser d'abord). Gabarits 2 (plan tangent) et 3 (section : δ, puis ρ = √(r² − δ²)) aux niveaux 3 et 4 ; 1 item sur 6 des niveaux 2 à 4 a r² ≤ 0 (point ou vide, une décision). Le niveau 5 et `open` enchaînent centre, rayon, plan tangent et section, au lieu de la sphère tangente à un plan de centre sur une droite. Le V/F faux « … est une sphère » demande la valeur de r² (sorte `geo`, `radiusSquared`).
 - **Intro** : x² + y² + z² + Dx + Ey + Fz + G = 0 : on complète les carrés. Centre (−D/2 ; −E/2 ; −F/2), r² = (D² + E² + F²)/4 − G, si r² > 0. Plan tangent en T : (T − C)·(X − T) = 0. Section par un plan à distance δ < r : cercle de rayon √(r² − δ²), centré au pied de C.
 - **Juge** : `geom` `{object:'sphere'}` ; segments `value` pour C et r, `geom` `{object:'plane'}` pour le plan tangent · **Forme finale** : C, r, puis l'objet demandé.
 - **Niveaux** :
