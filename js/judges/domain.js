@@ -12,6 +12,9 @@
 //    order?: ['y', 'x'] (the shape asked, outer first: type II here),
 //    shape?: 'typeI' | 'typeII' | 'typeI3' | 'polar' | 'cyl' | 'sph' (the
 //           name in messages)}
+// Step U6, part f: coords 'map' with vars ['u', 'v'] and map {u: 'x y',
+// v: 'y/x'}: the letters of the line are functions of the cartesian point
+// (a change of variables: the line describes D̃, the region is D).
 // A line is right if it describes the same set: 600 points of the box, each
 // in both sets or in neither (r ≥ 0; an angle may be read modulo 2π). The
 // bounds of a variable may only use the variables before it: an inner
@@ -63,8 +66,25 @@ export function chainsOf(node, vars) {
   return out;
 }
 
+// coords 'map' (step U6, part f): a cartesian point → {u, v} by cfg.map.
+const MAPS = new Map();
+function mapCoords(cfg) {
+  const key = JSON.stringify([cfg.map, cfg.box?.length]);
+  if (!MAPS.has(key)) {
+    const xs = cfg.box?.length === 3 || cfg.dim === 3 ? ['x', 'y', 'z'] : ['x', 'y'];
+    const fs = Object.entries(cfg.map).map(([k, t]) => [k, compileFloat(parse(t, { vars: xs }))]);
+    MAPS.set(key, (P) => {
+      const env = Object.fromEntries(xs.map((v, i) => [v, P[i]]));
+      return Object.fromEntries(fs.map(([k, f]) => [k, f(env)]));
+    });
+  }
+  return MAPS.get(key);
+}
+const coordsOf = (cfg) => (cfg.coords === 'map' ? mapCoords(cfg) : cfg.coords || 'cart');
+
 // Cartesian point → the coordinates of the line.
 function toCoords(coords, P) {
+  if (typeof coords === 'function') return [coords(P)];
   const [x, y, z = 0] = P;
   if (coords === 'cart') return [P];
   const r2 = Math.hypot(x, y);
@@ -130,7 +150,7 @@ export function domainWitness(cfg, chains) {
   for (let i = 0; i < 600; i++) {
     const P = box.map(([lo, hi]) => lo + (hi - lo) * rng.next());
     const a = ref(P);
-    const b = member(chains, compiled, cfg.coords || 'cart', vars, P);
+    const b = member(chains, compiled, coordsOf(cfg), vars, P);
     if (a !== b) return { P, inRef: a };
   }
   return null;
@@ -148,7 +168,7 @@ export function sameDomain(cfg, a, b) {
   const rng = makeRng(7);
   for (let i = 0; i < 300; i++) {
     const P = box.map(([lo, hi]) => lo + (hi - lo) * rng.next());
-    if (member(A, ca, cfg.coords || 'cart', vars, P) !== member(B, cb, cfg.coords || 'cart', vars, P)) return false;
+    if (member(A, ca, coordsOf(cfg), vars, P) !== member(B, cb, coordsOf(cfg), vars, P)) return false;
   }
   return true;
 }
