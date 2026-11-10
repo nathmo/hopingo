@@ -63,7 +63,7 @@ export function ddData(rng, kinds, { axes = true, mcqSafe = false } = {}) {
       const value = KQ.mul(v1.pow(i)).mul(v2.pow(j));
       const grad = (i === 3 ? KQ.mul(v1) : QS.of(0));
       const g2 = (j === 3 ? KQ.mul(v2) : QS.of(0));
-      d = { kind, f, value, grad: qsAdd(grad, g2), simp: value.text(), mid: `(${value.text()}t)/t`, constant: true };
+      d = { kind, f, value, grad: qsAdd(grad, g2), simp: value.text(), mid: `(${value.fac()}t)/t`, constant: true };
     } else if (kind === 'k2') {
       if (v2.isZero() || v1.isZero()) continue;
       const A = KQ.mul(v1.pow(2)).mul(v2);
@@ -182,15 +182,6 @@ function ddMcq(level, rng, opts = {}) {
   }, rng);
 }
 
-// A true/false as a two-option multiple choice (no checker for these counter-examples).
-function vf(skill, statement, truth, rule, why, rng, key) {
-  return mcq({
-    skill, level: 4, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth, rule: truth ? rule : null }],
-    key: `tf:${key}`, exam: { format: 'tf', points: 1 }, expectedSec: 60, solution: [{ html: why, note: '' }],
-  }, rng);
-}
-
 function ddTf(rng, opts) {
   const kind = rng.pick(['grad', 'grad', 'norm', 'e1', 'scale', 'minus', 'diff']);
   const ex = examTag(opts) || { format: 'tf', points: 1 };
@@ -209,9 +200,14 @@ function ddTf(rng, opts) {
       });
     }
   }
+  const ask = [{ v: 'f', label: 'f(x, y) =', keys: ['calcx', 'calcfn', 'a2'] }];
   if (kind === 'norm') {
-    return vf(DD, 'La dérivée directionnelle de f ∈ C¹ en (0, 0) suivant (1, 1) vaut lim<sub>(h, k)→(0, 0)</sub> (f(h, k) − f(0, 0))/√(h² + k²).', false, null,
-      'Faux : pour f(x, y) = x, ce quotient vaut h/√(h² + k²), qui n\'a pas de limite (1 sur k = 0, 0 sur h = 0). La définition est lim (f(tv) − f(0))/t, sur la droite de direction v.', rng, 'norm');
+    return tfItem({
+      skill: DD, level: 4, truth: false, key: 'norm', exam: ex,
+      statement: 'Si f est de classe C¹, la dérivée directionnelle de f en (0, 0) suivant v = (1 ; 1)/√2 vaut lim<sub>(h, k)→(0, 0)</sub> (f(h, k) − f(0, 0))/√(h² + k²).',
+      counter: { kind: 'a2', prop: 'normQuotient', params: {}, ask, answer: { f: 'x' } },
+      explanation: 'Faux (2016 Q14) : pour f(x, y) = x, ce quotient vaut h/√(h² + k²), qui n\'a pas de limite (1 sur k = 0, 0 sur h = 0). La définition est lim (f(tv) − f(0, 0))/t, sur la droite de direction v.',
+    });
   }
   if (kind === 'e1') {
     return tfItem({
@@ -228,8 +224,12 @@ function ddTf(rng, opts) {
     });
   }
   if (kind === 'minus') {
-    return vf(DD, 'Si D<sub>v</sub>f(a) existe, alors D<sub>−v</sub>f(a) = D<sub>v</sub>f(a).', false, null,
-      'Faux : pour f(x, y) = x et v = (1 ; 0), D<sub>v</sub>f = 1 et D<sub>−v</sub>f = −1. En général, D<sub>−v</sub>f(a) = −D<sub>v</sub>f(a).', rng, 'minus');
+    return tfItem({
+      skill: DD, level: 4, truth: false, key: 'minus', exam: ex,
+      statement: 'Si D<sub>v</sub>f(0, 0) existe pour v = (1 ; 0), alors D<sub>−v</sub>f(0, 0) = D<sub>v</sub>f(0, 0).',
+      counter: { kind: 'a2', prop: 'negDir', params: {}, ask, answer: { f: 'x' } },
+      explanation: 'Faux : pour f(x, y) = x, D<sub>v</sub>f(0, 0) = 1 et D<sub>−v</sub>f(0, 0) = −1. En général, D<sub>−v</sub>f(a) = −D<sub>v</sub>f(a).',
+    });
   }
   return tfItem({
     skill: DD, level: 4, truth: true, key: 'diff', exam: ex, ruleIfFalse: 'a2_dirderiv_gradient',

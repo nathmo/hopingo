@@ -363,7 +363,7 @@ export function polarData(rng, kind) {
   const D = deg === 2 ? 'x^2+y^2' : '(x^2+y^2)^2';
   const P1 = homog(rng, deg + 1, rng.pick([1, 2, 2, 3]));
   const P2 = deg === 2 && rng.chance(0.4) ? homog(rng, deg + 2, 1) : [];
-  const f = `${wrap(joinSum([polyXY(P1), polyXY(P2)]))}/(${D})`;
+  const f = `${wrap(joinSum([polyXY(P1), polyXY(P2)]))}/${deg === 2 ? `(${D})` : D}`;
   const simp = joinSum([rTimes('r', P1), P2.length ? rTimes('r^2', P2) : '']);
   const mid = `(${joinSum([rTimes(`r^${deg + 1}`, P1), P2.length ? rTimes(`r^${deg + 2}`, P2) : ''])})/r^${deg}`;
   const M1 = absSum(P1);

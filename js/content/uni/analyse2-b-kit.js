@@ -54,7 +54,7 @@ export class QS {
     return `${this.q.n < 0 ? '-' : ''}${this.q.d === 1 ? top : `${top}/${this.q.d}`}`;
   }
   // Inside a product: in brackets when negative or a fraction.
-  fac() { const t = this.text(); return /^\d+$/.test(t) || /^\d*√\d+$/.test(t) ? t : `(${t})`; }
+  fac() { const t = this.text(); return /^\d+$/.test(t) ? t : `(${t})`; }
 }
 // Sum of two numbers q·√s with the same root (or one of them 0).
 export function qsAdd(a, b) {
