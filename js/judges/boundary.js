@@ -118,8 +118,8 @@ export function isFinal(cfg, node, state = {}) {
 }
 
 function wrong(node, rule, message, cfg, prev) {
-  const diag = rule ? null : diagnoseLine('boundary', prev, node, cfg, () => false);
-  return { kind: 'wrong', node, rule: rule ?? diag?.rules[0] ?? null, message };
+  const diag = rule ? { rules: [rule], ctx: {}, all: [rule] } : diagnoseLine('boundary', prev, node, cfg, () => false);
+  return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
 }
 
 export function judgeLine(cfg, prev, input, state = {}) {

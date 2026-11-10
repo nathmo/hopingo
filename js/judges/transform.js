@@ -338,7 +338,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (node.half !== null) {
     const g0 = cfg.gamma0 ?? 0;
     if (Math.abs(node.half - g0) > 1e-9) {
-      return { kind: 'wrong', node, rule: 'f_lap_abscissa', message: `La transformée existe pour Re z > ${String(g0).replace('.', ',')}, pas pour Re z > ${String(node.half).replace('.', ',')}.` };
+      return { kind: 'wrong', node, rule: 'f_lap_abscissa', diag: { rules: ['f_lap_abscissa'], ctx: { g0: cfg.gamma0 ?? 0 }, all: ['f_lap_abscissa'] }, message: `La transformée existe pour Re z > ${String(g0).replace('.', ',')}, pas pour Re z > ${String(node.half).replace('.', ',')}.` };
     }
     state.half = node.half;
     if (!node.members.length && !node.eq) return { kind: 'ok', node, message: 'Le demi-plan est juste.' };

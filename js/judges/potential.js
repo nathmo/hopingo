@@ -161,7 +161,8 @@ export function judgePotential(cfg, prev, input, state = {}) {
     const v = valueAtP(cfg, state.last, r.constant);
     if (close(v, num(cfg.at.value))) { state.fixed = true; return { kind: 'ok', node }; }
     const C0 = num(cfg.at.value) - valueAtP(cfg, state.last, 0);
-    return { kind: 'wrong', node, rule: Math.abs(r.constant + C0) < 1e-9 ? 'v_pot_final_const' : null, message: `Avec C = ${String(r.constant).replace('.', ',')}, ${nameOf(cfg)}(P) ne vaut pas ${cfg.at.value}.` };
+    const rule = Math.abs(r.constant + C0) < 1e-9 ? 'v_pot_final_const' : null;
+    return { kind: 'wrong', node, rule, diag: rule ? { rules: [rule], ctx: { C: C0 }, all: [rule] } : null, message: `Avec C = ${String(r.constant).replace('.', ',')}, ${nameOf(cfg)}(P) ne vaut pas ${cfg.at.value}.` };
   }
   const chk = checkPotential(cfg, r.expr);
   if (!chk.ok) {
@@ -172,7 +173,7 @@ export function judgePotential(cfg, prev, input, state = {}) {
     const v = valueAtP(cfg, r.expr);
     if (!close(v, num(cfg.at.value))) {
       const diag = diagnoseLine('antideriv', prev, node, cfg, (cand, line) => toText(cand) === toText(line));
-      return { kind: 'wrong', node, rule: diag?.rules[0] ?? 'v_pot_final_const', message: `${nameOf(cfg)}(P) vaut ${String(Math.round(v * 1e6) / 1e6).replace('.', ',')}, pas ${cfg.at.value} : vérifie la constante.` };
+      return { kind: 'wrong', node, rule: diag?.rules[0] ?? 'v_pot_final_const', diag: diag ?? { rules: ['v_pot_final_const'], ctx: {}, all: ['v_pot_final_const'] }, message: `${nameOf(cfg)}(P) vaut ${String(Math.round(v * 1e6) / 1e6).replace('.', ',')}, pas ${cfg.at.value} : vérifie la constante.` };
     }
   }
   if (symbolsIn(r.expr).has('C')) state.last = r.expr;

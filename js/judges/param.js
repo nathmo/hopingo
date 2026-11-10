@@ -229,7 +229,8 @@ export function judgeLine(cfg, prev, input, state = {}) {
   }
   if (!r.ok) {
     const diag = diagnoseLine('param', prev, { ...node, par }, cfg, (cand, n) => sameObject(cfg, cand, n));
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? r.rule ?? null, diag, message: r.message };
+    const rule = diag?.rules[0] ?? r.rule ?? null;
+    return { kind: 'wrong', node, rule, diag: diag ?? (rule ? { rules: [rule], ctx: {}, all: [rule] } : null), message: r.message };
   }
   state.par = par;
   return { kind: 'done', node };
