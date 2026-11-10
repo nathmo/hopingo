@@ -80,6 +80,9 @@ function atomKey(x) {
     if (name in NICE) {
       const q = qOf(a);
       const ok = q || closedNumber(a) === true;
+      // Step U6 (A2, F′(1) = 2 − 2cos 1): sin, cos, tan of a whole number
+      // or a fraction other than 0 are atoms (the angles with π are not).
+      if (q && q.n !== 0 && (name === 'sin' || name === 'cos' || name === 'tan')) return toText(x);
       if (!ok || name === 'sin' || name === 'cos' || name === 'tan') return null;
       const y = evalFloat(a, {});
       if (NICE[name].some((z) => Math.abs(z - y) < 1e-12)) return `Calcule ${toText(x)} : c'est une valeur connue.`;

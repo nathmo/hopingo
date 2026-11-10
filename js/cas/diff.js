@@ -176,9 +176,12 @@ export function diff(node, v = 'x', hooks = {}) {
         if (node.v === v) return node.e;
         throw new Error('Intégrale par rapport à une autre variable');
       }
-      if (node.v !== v && dependsOn(node.e, v)) throw new Error('Intégrale à paramètre');
       const at = (b) => substVar(node.e, node.v, b);
-      return sub(mul(at(node.hi), D(node.hi)), mul(at(node.lo), D(node.lo)));
+      const ends = sub(mul(at(node.hi), D(node.hi)), mul(at(node.lo), D(node.lo)));
+      // Step U6 (A2, Leibniz's rule): an integrand that depends on v adds
+      // ∫ from h to g of ∂f/∂v.
+      if (node.v !== v && dependsOn(node.e, v)) return add(ends, { t: 'int', e: D(node.e), v: node.v, lo: node.lo, hi: node.hi });
+      return ends;
     }
     case 'bracket': return D(sub(substVar(node.e, node.v, node.hi), substVar(node.e, node.v, node.lo)));
     case 'side': return D(node.e);
