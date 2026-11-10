@@ -439,7 +439,7 @@ function rrData(rng, kind) {
     const c = rng.pick([1, 2, 3, 5, 6, 7]);
     const rho = N(q(c, 4));
     return {
-      kind: 'ratio', html: `${c === 1 ? '' : `${c}ⁿ`}(n!)²/(2n)!`, formed: `${co(c, '(n+1)^2')}/((2n+2)(2n+1))`, rho, conv: c < 4,
+      kind: 'ratio', fact: true, html: `${c === 1 ? '' : `${c}ⁿ`}(n!)²/(2n)!`, formed: `${co(c, '(n+1)^2')}/((2n+2)(2n+1))`, rho, conv: c < 4,
       lines: [E(`${co(c, '(n+1)')}/(2(2n+1))`, 'Simplifier par 2n + 2 = 2(n + 1)', 'simplify', 'simplify'), E(rho, 'Passer à la limite', 'simplify', 'lim')],
     };
   }
@@ -488,6 +488,15 @@ function rrCriterion(d) {
   ] };
 }
 
+// (2n + 2)!/(2n)!, the step of forming aₙ₊₁/aₙ for cⁿ(n!)²/(2n)!.
+function factDecision() {
+  return { kind: 'decision', prompt: 'Pour former aₙ₊₁/aₙ : (2n + 2)!/(2n)! = ?', options: [
+    { id: 'two', label: '(2n + 2)(2n + 1)', valid: true },
+    { id: 'one', label: '2n + 2', valid: false, rule: 'a1_factorial_ratio', why: 'Entre (2n)! et (2n + 2)!, il y a deux facteurs : (2n + 1) et (2n + 2).' },
+    { id: 'nfact', label: '(n + 1)(n + 2)', valid: false, why: '(2n + 2)! = 1·2·…·(2n)·(2n + 1)·(2n + 2) : on divise par (2n)!, il reste (2n + 1)(2n + 2).' },
+  ] };
+}
+
 function rrItem(level, rng, opts = {}) {
   if (opts.exam === 'mcq') return rrMcq(rng, 4, true);
   if (opts.exam === 'tf') return rrTf(rng);
@@ -501,7 +510,7 @@ function rrItem(level, rng, opts = {}) {
   });
   const concl = [E(rhoQ, d.conv ? 'ρ < 1' : 'ρ > 1', 'verdict', 'lim')];
   const parts = [
-    { start: d.formed, judge: LIM, pre: level >= 2 ? [rrCriterion(d)] : [], lines },
+    { start: d.formed, judge: LIM, pre: level >= 2 ? [rrCriterion(d), ...(d.fact ? [factDecision()] : [])] : [], lines },
     { html: 'Conclusion : rappelle ρ.', ask: 'ρ =', start: beforeLast(d.formed, d.lines), judge: LIM, pre: [nat, criterionDecision(d.kind, ['term', 'cmp', d.kind === 'ratio' ? 'root' : 'ratio'])], lines: level === 1 ? concl.map(blankAll) : concl },
   ];
   const { start, judge, script } = partsScript(parts, level, RR_CHOICES);
@@ -542,7 +551,8 @@ function rrMcq(rng, level, exam) {
   const options = [
     { html: 'Absolument convergente', correct: d.conv },
     { html: 'Convergente, mais pas absolument', correct: false },
-    { html: 'Divergente, car |aₙ| → +∞', correct: !d.conv },
+    // With (2n + 2)!/(2n)! read as 2n + 2, the ratio c(n + 1)²/(2n + 2) → +∞.
+    { html: 'Divergente, car |aₙ| → +∞', correct: !d.conv, ...(d.fact && d.conv ? { rule: 'a1_factorial_ratio' } : {}) },
     { html: 'Divergente, car |aₙ| → 1', correct: false },
   ];
   return mcq({
