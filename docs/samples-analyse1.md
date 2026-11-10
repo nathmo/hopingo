@@ -8864,8 +8864,8 @@ Vrai ou faux ?
   « Si aₙ ≠ 0 et |aₙ₊₁/aₙ| → 3, alors |aₙ| → +∞. » → VRAI
   [examen tf]
 
-lim_{n→∞} n!/n^n =
-  · 1   · +∞   · La limite n'existe pas   ✔ 0
+lim_{n→∞} 2^n/n! =
+  · +∞   ✔ 0   · La limite n'existe pas   · 1
   [examen mcq]
 
 ```
@@ -8877,20 +8877,6 @@ _Croissante et majorée ⇒ convergente ; bornée ne suffit pas._
 ### Niveau 1
 
 ```
-Soit u₀ = 0 et uₙ₊₁ = √(6 + uₙ). Montre que (uₙ) est majorée par 3 et croissante, puis calcule sa limite.
-  [guided]  √(6 + u)
-    (u₀ = 0 ≤ 3. Hérédité : si 0 ≤ uₙ ≤ 3, alors uₙ₊₁ = √(6 + uₙ) ≤ ?)
-    = √(□)   (trous : √(6 + 3))   ← u ≤ 3 et √ est croissante
-    = 3   ← Calculer
-  — Croissante : uₙ₊₁ − uₙ = √(6 + u) − u pour 0 ≤ u ≤ 3.  [juge equiv]  départ : √(6 + u) − u
-    = (□)/(√(6 + u) + u)   (trous : (6 + u − u²)/(√(6 + u) + u))   ← Quantité conjuguée
-    = 0   ← 6 + u − u² = (3 − u)(u + 2) ≥ 0 sur [0 ; 3]
-  — Conclusion : la limite ℓ vérifie ℓ = √(6 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
-    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 3 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
-    = 3   ← ℓ² − ℓ − 6 = 0, ℓ ≥ 0
-  aides : Récurrence : si uₙ ≤ 3, alors √(6 + uₙ) ≤ √(6 + 3). Puis le signe de uₙ₊₁ − uₙ. | √(6 + u) − u = (6 + u − u²)/(□) | √(6 + u) ≤ √9 = 3 ; 6 + u − u² = (3 − u)(u + 2) ≥ 0
-  pièges : a1_bounded_implies_convergent
-
 Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 3, et conclus.
   [guided]  Σ_{k=0}^{n + 1} 1/k! − Σ_{k=0}^{n} 1/k!
     = 1/(□)!   (trous : 1/(n + 1)!)   ← Tous les termes s'en vont sauf le dernier
@@ -8919,19 +8905,13 @@ Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par
   aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
   pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
 
-```
-
-### Niveau 2
-
-```
 Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 3, et conclus.
   [guided]  Σ_{k=0}^{n + 1} 1/k! − Σ_{k=0}^{n} 1/k!
-    = 1/(n + 1)!   ← Tous les termes s'en vont sauf le dernier
+    = 1/(□)!   (trous : 1/(n + 1)!)   ← Tous les termes s'en vont sauf le dernier
   — Un majorant :  [juge equiv]  départ : Σ_{k=0}^{n} 1/k!
-    ? Quel majorant de 1/k! (k ≥ 1) donne une somme bornée ? ✔ 1/2^(k−1) / · 1/k / · 1/2^k
     = 1 + Σ_{k=1}^{n} 1/2^(k − 1)   ← 1/k! ≤ 1/2^(k−1) pour k ≥ 1
     = 1 + 2(1 − 1/2^n)   ← Somme géométrique de raison 1/2
-    = 3 − 1/2^(n − 1)   ← Simplifier
+    = 3 − □   (trous : 3 − 1/2^(n − 1))   ← Simplifier
     = 3   ← Majorer par une constante
   — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
     ? Que conclure ? ✔ (uₙ) est croissante et majorée par 3 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
@@ -8939,6 +8919,11 @@ Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 
   aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k! ≤ 1/2^(k−1), donc uₙ ≤ 1 + Σ 1/2^(k−1) | uₙ ≤ 1 + 2(1 − 1/2ⁿ) ≤ 3
   pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
 
+```
+
+### Niveau 2
+
+```
 Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par 2, et conclus.
   [guided]  Σ_{k=1}^{n + 1} 1/k³ − Σ_{k=1}^{n} 1/k³
     = 1/(n + 1)³   ← Tous les termes s'en vont sauf le dernier
@@ -8961,23 +8946,20 @@ Soit u₀ = 0 et uₙ₊₁ = √(20 + uₙ). Montre que (uₙ) est majorée par
     = √(20 + 5)   ← u ≤ 5 et √ est croissante
     = 5   ← Calculer
   — Croissante : uₙ₊₁ − uₙ = √(20 + u) − u pour 0 ≤ u ≤ 5.  [juge equiv]  départ : √(20 + u) − u
+    ? Comment montrer que (uₙ) est croissante ? ✔ Montrer que uₙ₊₁ − uₙ = √(20 + uₙ) − uₙ ≥ 0 / · f(x) = √(20 + x) est croissante, donc (uₙ) est croissante
     = (20 + u − u²)/(√(20 + u) + u)   ← Quantité conjuguée
     = 0   ← 20 + u − u² = (5 − u)(u + 4) ≥ 0 sur [0 ; 5]
   — Conclusion : la limite ℓ vérifie ℓ = √(20 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
     ? Que conclure ? ✔ (uₙ) est croissante et majorée par 5 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
     = 5   ← ℓ² − ℓ − 20 = 0, ℓ ≥ 0
   aides : Récurrence : si uₙ ≤ 5, alors √(20 + uₙ) ≤ √(20 + 5). Puis le signe de uₙ₊₁ − uₙ. | √(20 + u) − u = (20 + u − u²)/(□) | √(20 + u) ≤ √25 = 5 ; 20 + u − u² = (5 − u)(u + 4) ≥ 0
-  pièges : a1_bounded_implies_convergent
+  pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent
 
-```
-
-### Niveau 3
-
-```
 Soit uₙ = Σ_{k=1}^{n} 1/k². Montre que (uₙ) est croissante et majorée par 2, et conclus.
-  [tap, suivre l'erreur, menu steps]  Σ_{k=1}^{n + 1} 1/k² − Σ_{k=1}^{n} 1/k²
+  [guided]  Σ_{k=1}^{n + 1} 1/k² − Σ_{k=1}^{n} 1/k²
     = 1/(n + 1)²   ← Tous les termes s'en vont sauf le dernier
   — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k²
+    ? Quel majorant de 1/k² (k ≥ 2) donne une somme bornée ? ✔ 1/(k − 1) − 1/k / · 1/k / · 1/(k(k + 1))
     = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
     = 2 − 1/n   ← Télescoper
     = 2   ← Majorer par une constante
@@ -8987,18 +8969,24 @@ Soit uₙ = Σ_{k=1}^{n} 1/k². Montre que (uₙ) est croissante et majorée par
   aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
   pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
 
+```
+
+### Niveau 3
+
+```
 Soit u₀ = 0 et uₙ₊₁ = √(2 + uₙ). Montre que (uₙ) est majorée par 2 et croissante, puis calcule sa limite.
   [tap, suivre l'erreur, menu steps]  √(2 + u)
     (u₀ = 0 ≤ 2. Hérédité : si 0 ≤ uₙ ≤ 2, alors uₙ₊₁ = √(2 + uₙ) ≤ ?)
     = 2   ← Calculer
   — Croissante : uₙ₊₁ − uₙ = √(2 + u) − u pour 0 ≤ u ≤ 2.  [juge equiv]  départ : √(2 + u) − u
+    ? Comment montrer que (uₙ) est croissante ? ✔ Montrer que uₙ₊₁ − uₙ = √(2 + uₙ) − uₙ ≥ 0 / · f(x) = √(2 + x) est croissante, donc (uₙ) est croissante
     = (2 + u − u²)/(√(2 + u) + u)   ← Quantité conjuguée
     = 0   ← 2 + u − u² = (2 − u)(u + 1) ≥ 0 sur [0 ; 2]
   — Conclusion : la limite ℓ vérifie ℓ = √(2 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
     ? Que conclure ? ✔ (uₙ) est croissante et majorée par 2 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
     = 2   ← ℓ² − ℓ − 2 = 0, ℓ ≥ 0
   aides : Récurrence : si uₙ ≤ 2, alors √(2 + uₙ) ≤ √(2 + 2). Puis le signe de uₙ₊₁ − uₙ. | √(2 + u) − u = (2 + u − u²)/(□) | √(2 + u) ≤ √4 = 2 ; 2 + u − u² = (2 − u)(u + 1) ≥ 0
-  pièges : a1_bounded_implies_convergent
+  pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent
 
 Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 3, et conclus.
   [tap, suivre l'erreur, menu steps]  Σ_{k=0}^{n + 1} 1/k! − Σ_{k=0}^{n} 1/k!
@@ -9014,13 +9002,8 @@ Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 
   aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k! ≤ 1/2^(k−1), donc uₙ ≤ 1 + Σ 1/2^(k−1) | uₙ ≤ 1 + 2(1 − 1/2ⁿ) ≤ 3
   pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
 
-```
-
-### Niveau 4
-
-```
 Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par 2, et conclus.
-  [free, suivre l'erreur]  Σ_{k=1}^{n + 1} 1/k³ − Σ_{k=1}^{n} 1/k³
+  [tap, suivre l'erreur, menu steps]  Σ_{k=1}^{n + 1} 1/k³ − Σ_{k=1}^{n} 1/k³
     = 1/(n + 1)³   ← Tous les termes s'en vont sauf le dernier
   — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k³
     = Σ_{k=1}^{n} 1/k²   ← 1/k³ ≤ 1/k²
@@ -9028,10 +9011,16 @@ Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par
     = 2 − 1/n   ← Télescoper
     = 2   ← Majorer par une constante
   — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 2 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
     = 2   ← Croissante et majorée
   aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
-  pièges : g5_hered_wrong_term, g5_reindex_half
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
 
+```
+
+### Niveau 4
+
+```
 Soit u₀ = 0 et uₙ₊₁ = √(20 + uₙ). Montre que (uₙ) est majorée par 5 et croissante, puis calcule sa limite.
   [free, suivre l'erreur]  √(20 + u)
     (u₀ = 0 ≤ 5. Hérédité : si 0 ≤ uₙ ≤ 5, alors uₙ₊₁ = √(20 + uₙ) ≤ ?)
@@ -9056,21 +9045,33 @@ Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par
   aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
   pièges : g5_hered_wrong_term, g5_reindex_half
 
+Soit uₙ = Σ_{k=1}^{n} 1/k². Montre que (uₙ) est croissante et majorée par 2, et conclus.
+  [free, suivre l'erreur]  Σ_{k=1}^{n + 1} 1/k² − Σ_{k=1}^{n} 1/k²
+    = 1/(n + 1)²   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k²
+    = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
+    = 2 − 1/n   ← Télescoper
+    = 2   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    = 2   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
+  pièges : g5_hered_wrong_term, g5_reindex_half
+
 ```
 
 ### Niveau 5
 
 ```
 Vrai ou faux ?
-  « Toute suite croissante et positive converge. » → FAUX
-    contre-exemple (sequence) : a = n
-
-Vrai ou faux ?
-  « Toute suite décroissante converge. » → FAUX
-    contre-exemple (sequence) : a = -n
-
-Vrai ou faux ?
   « Toute suite définie par une récurrence aₙ₊₁ = f(aₙ) et bornée est convergente. » → FAUX
+    contre-exemple (sequence) : a = (-1)^n
+  pièges : a1_bounded_implies_convergent
+
+Vrai ou faux ?
+  « Une suite de réels converge si et seulement si elle est de Cauchy. » → VRAI
+
+Vrai ou faux ?
+  « Toute suite bornée est convergente. » → FAUX
     contre-exemple (sequence) : a = (-1)^n
   pièges : a1_bounded_implies_convergent
 
@@ -9080,21 +9081,22 @@ Vrai ou faux ?
 
 ```
 Vrai ou faux ?
-  « Une suite de réels converge si et seulement si elle est de Cauchy. » → VRAI
+  « Toute suite bornée est convergente. » → FAUX
+    contre-exemple (sequence) : a = (-1)^n
   [examen tf]
+  pièges : a1_bounded_implies_convergent
 
-Soit uₙ = Σ_{k=1}^{n} 1/k². Montre que (uₙ) est croissante et majorée par 2, et conclus.
+Soit u₀ = 0 et uₙ₊₁ = √(2 + uₙ). Montre que (uₙ) est majorée par 2 et croissante, puis calcule sa limite.
   [problème, examen open, 2 points]
-  partie 1 (Début du problème : 0,5 ; Un majorant : 1 ; Conclusion : 0,5)
-    [free, sans aide, suivre l'erreur, examen open]  Σ_{k=1}^{n + 1} 1/k² − Σ_{k=1}^{n} 1/k²
-      = 1/(n + 1)²   ← Tous les termes s'en vont sauf le dernier
-    — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k²
-      = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
-      = 2 − 1/n   ← Télescoper
-      = 2   ← Majorer par une constante
-    — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
-      = 2   ← Croissante et majorée
-  pièges : g5_hered_wrong_term, g5_reindex_half
+  partie 1 (Début du problème : 0,5 ; Croissante : uₙ₊₁ − uₙ = √(2 + u) − u pour 0 ≤ u ≤ 2. : 1 ; Conclusion : la limite ℓ vérifie ℓ = √(2 + ℓ) et ℓ ≥ 0. : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  √(2 + u)
+      (u₀ = 0 ≤ 2. Hérédité : si 0 ≤ uₙ ≤ 2, alors uₙ₊₁ = √(2 + uₙ) ≤ ?)
+      = 2   ← Calculer
+    — Croissante : uₙ₊₁ − uₙ = √(2 + u) − u pour 0 ≤ u ≤ 2.  [juge equiv]  départ : √(2 + u) − u
+      = (2 + u − u²)/(√(2 + u) + u)   ← Quantité conjuguée
+      = 0   ← 2 + u − u² = (2 − u)(u + 1) ≥ 0 sur [0 ; 2]
+    — Conclusion : la limite ℓ vérifie ℓ = √(2 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
+      = 2   ← ℓ² − ℓ − 2 = 0, ℓ ≥ 0
 
 ```
 
@@ -9105,6 +9107,34 @@ _Séparer selon la parité, prendre la plus grande et la plus petite limite._
 ### Niveau 1
 
 ```
+Soit aₙ = (−1)^n·(2n)/(n + 3) + 1/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  (4m)/(2m + 3) + 1/(2m)
+    = 4/(2 + □) + 1/(2m)   (trous : 4/(2 + 3/m) + 1/(2m))   ← Diviser par m
+    = □   (trous : 2)   ← Limite
+  — a₂ₘ₊₁ = −(2(2m + 1))/(2m + 4) + 1/(2m + 1) :  [juge limit]  départ : −(2(2m + 1))/(2m + 4) + 1/(2m + 1)
+    = −(2(2 + 1/m))/(2 + □) + 1/(2m + 1)   (trous : −(2(2 + 1/m))/(2 + 4/m) + 1/(2m + 1))   ← Diviser par m
+    = □   (trous : −2)   ← Limite
+  — lim sup :  [juge value]  départ : max(2,−2)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 2 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 2   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(2,−2)
+    = −2   ← La plus petite limite
+  aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 2, lim inf aₙ = −2
+
+Soit aₙ = 3^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  3^(1/(2m))
+    = e^(□/(2m))   (trous : e^(ln(3)/(2m)))   ← Écrire en exponentielle
+    = □   (trous : 1)   ← Limite
+  — a₂ₘ₊₁ = 1/(2m + 1)³ :  [juge limit]  départ : 1/(2m + 1)³
+    = □   (trous : 0)   ← Limite
+  — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √3 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 1   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(1,0)
+    = 0   ← La plus petite limite
+  aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 3^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √3, atteint en n = 2).
+  pièges : a1_limsup_as_sup
+
 Soit aₙ = √(n + (−1)^n) − √n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
   [guided]  √(2m + 1) − √(2m)
     = 1/(□)   (trous : 1/(√(2m + 1) + √(2m)))   ← Quantité conjuguée
@@ -9120,60 +9150,11 @@ Soit aₙ = √(n + (−1)^n) − √n. Calcule la limite de chaque sous-suite, 
   aides : (−1)ⁿ vaut 1 ou −1 selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | √(2m + 1) − √(2m) = 1/(□) | Les deux sous-suites tendent vers 0 : lim sup = lim inf = 0, la suite converge vers 0.
   pièges : g6_infinity_minus_infinity, a1_dl_factorial_missing, a1_sqrt_sum_split
 
-Soit aₙ = (−1)^n·n/(n + 1) + 3/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
-  [guided]  (2m)/(2m + 1) + 3/(2m)
-    = 2/(2 + □) + 3/(2m)   (trous : 2/(2 + 1/m) + 3/(2m))   ← Diviser par m
-    = □   (trous : 1)   ← Limite
-  — a₂ₘ₊₁ = −(2m + 1)/(2m + 2) + 3/(2m + 1) :  [juge limit]  départ : −(2m + 1)/(2m + 2) + 3/(2m + 1)
-    = −(2 + 1/m)/(2 + □) + 3/(2m + 1)   (trous : −(2 + 1/m)/(2 + 2/m) + 3/(2m + 1))   ← Diviser par m
-    = □   (trous : −1)   ← Limite
-  — lim sup :  [juge value]  départ : max(1,−1)
-    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, 5/2 / · la limite de a₂ₘ, quelle qu'elle soit
-    = 1   ← La plus grande limite
-  — lim inf :  [juge value]  départ : min(1,−1)
-    = −1   ← La plus petite limite
-  aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 1, lim inf aₙ = −1
-  pièges : a1_limsup_as_sup
-
-Soit aₙ = (−1)^n·(3n)/(n + 1) + 4/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
-  [guided]  (6m)/(2m + 1) + 4/(2m)
-    = 6/(2 + □) + 4/(2m)   (trous : 6/(2 + 1/m) + 4/(2m))   ← Diviser par m
-    = □   (trous : 3)   ← Limite
-  — a₂ₘ₊₁ = −(3(2m + 1))/(2m + 2) + 4/(2m + 1) :  [juge limit]  départ : −(3(2m + 1))/(2m + 2) + 4/(2m + 1)
-    = −(3(2 + 1/m))/(2 + □) + 4/(2m + 1)   (trous : −(3(2 + 1/m))/(2 + 2/m) + 4/(2m + 1))   ← Diviser par m
-    = □   (trous : −3)   ← Limite
-  — lim sup :  [juge value]  départ : max(3,−3)
-    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 3 / · le plus grand terme de la suite, 4 / · la limite de a₂ₘ, quelle qu'elle soit
-    = 3   ← La plus grande limite
-  — lim inf :  [juge value]  départ : min(3,−3)
-    = −3   ← La plus petite limite
-  aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 3, lim inf aₙ = −3
-  pièges : a1_limsup_as_sup
-
 ```
 
 ### Niveau 2
 
 ```
-Soit aₙ = √(n + (−1)^n) − √n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
-  [guided]  √(2m + (−1)^(2m)) − √(2m)
-    ? Comment découper la suite ? ✔ Selon la parité : n = 2m et n = 2m + 1 / ✔ Modulo 4 : n = 4m, 4m + 1, 4m + 2, 4m + 3 / · Pas besoin : on calcule directement la limite de aₙ
-    = √(2m + 1) − √(2m)   ← Remplacer n, puis simplifier
-  — Limite de a₂ₘ :  [juge limit]  départ : √(2m + 1) − √(2m)
-    = 1/(√(2m + 1) + √(2m))   ← Quantité conjuguée
-    = 0   ← Limite
-  — a₂ₘ₊₁ :  [juge equiv]  départ : √(2m + 1 + (−1)^(2m + 1)) − √(2m + 1)
-    = √(2m) − √(2m + 1)   ← Remplacer n, puis simplifier
-  — Limite de a₂ₘ₊₁ :  [juge limit]  départ : √(2m) − √(2m + 1)
-    = −1/(√(2m) + √(2m + 1))   ← Quantité conjuguée
-    = 0   ← Limite
-  — lim sup :  [juge value]  départ : max(0,0)
-    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 0 / · la limite de a₂ₘ, quelle qu'elle soit
-    = 0   ← La plus grande limite
-  — lim inf :  [juge value]  départ : min(0,0)
-    = 0   ← La plus petite limite
-  aides : (−1)ⁿ vaut 1 ou −1 selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | √(2m + 1) − √(2m) = 1/(□) | Les deux sous-suites tendent vers 0 : lim sup = lim inf = 0, la suite converge vers 0.
-
 Soit aₙ = 7^(1/n) si n est pair, aₙ = 1/n² si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
   [guided]  7^(1/(2m))
     ? Comment découper la suite ? ✔ Selon la parité : n = 2m et n = 2m + 1 / ✔ Modulo 4 : n = 4m, 4m + 1, 4m + 2, 4m + 3 / · Pas besoin : on calcule directement la limite de aₙ
@@ -9204,13 +9185,9 @@ Soit aₙ = 7^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Calcule la limi
   aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 7^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √7, atteint en n = 2).
   pièges : a1_limsup_as_sup
 
-```
-
-### Niveau 3
-
-```
 Soit aₙ = (−1)^n·(3n)/(n + 3) + 4/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
-  [tap, suivre l'erreur, menu steps]  (−1)^(2m)·(3(2m))/(2m + 3) + 4/(2m)
+  [guided]  (−1)^(2m)·(3(2m))/(2m + 3) + 4/(2m)
+    ? Comment découper la suite ? ✔ Selon la parité : n = 2m et n = 2m + 1 / ✔ Modulo 4 : n = 4m, 4m + 1, 4m + 2, 4m + 3 / · Pas besoin : on calcule directement la limite de aₙ
     = (6m)/(2m + 3) + 4/(2m)   ← Remplacer n, puis simplifier
   — Limite de a₂ₘ :  [juge limit]  départ : (6m)/(2m + 3) + 4/(2m)
     = 6/(2 + 3/m) + 4/(2m)   ← Diviser par m
@@ -9228,6 +9205,11 @@ Soit aₙ = (−1)^n·(3n)/(n + 3) + 4/n. Calcule la limite de chaque sous-suite
   aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 3, lim inf aₙ = −3
   pièges : a1_limsup_as_sup
 
+```
+
+### Niveau 3
+
+```
 Soit aₙ = 3^(1/n) si n est pair, aₙ = 1/n si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
   [tap, suivre l'erreur, menu steps]  3^(1/(2m))
     = e^(ln(3)/(2m))   ← Écrire en exponentielle
@@ -9256,23 +9238,25 @@ Soit aₙ = 7^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Calcule la limi
   aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 7^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √7, atteint en n = 2).
   pièges : a1_limsup_as_sup
 
-```
-
-### Niveau 4
-
-```
 Soit aₙ = 6^(1/n) si n est pair, aₙ = 1/n² si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
-  [free, suivre l'erreur]  6^(1/(2m))
+  [tap, suivre l'erreur, menu steps]  6^(1/(2m))
     = e^(ln(6)/(2m))   ← Écrire en exponentielle
     = 1   ← Limite
   — a₂ₘ₊₁ = 1/(2m + 1)² :  [juge limit]  départ : 1/(2m + 1)²
     = 0   ← Limite
   — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √6 / · la limite de a₂ₘ, quelle qu'elle soit
     = 1   ← La plus grande limite
   — lim inf :  [juge value]  départ : min(1,0)
     = 0   ← La plus petite limite
   aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 6^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √6, atteint en n = 2).
+  pièges : a1_limsup_as_sup
 
+```
+
+### Niveau 4
+
+```
 Soit aₙ = (−1)^n·(3n)/(n + 2) + 4/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
   [free, suivre l'erreur]  (−1)^(2m)·(3(2m))/(2m + 2) + 4/(2m)
     = (6m)/(2m + 2) + 4/(2m)   ← Remplacer n, puis simplifier
@@ -9307,32 +9291,50 @@ Soit aₙ = (−1)^n·(2n)/(n + 1) + 4/n. Calcule la limite de chaque sous-suite
     = −2   ← La plus petite limite
   aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 2, lim inf aₙ = −2
 
+Soit aₙ = √(n + (−1)^n) − √n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [free, suivre l'erreur]  √(2m + (−1)^(2m)) − √(2m)
+    = √(2m + 1) − √(2m)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ :  [juge limit]  départ : √(2m + 1) − √(2m)
+    = 1/(√(2m + 1) + √(2m))   ← Quantité conjuguée
+    = 0   ← Limite
+  — a₂ₘ₊₁ :  [juge equiv]  départ : √(2m + 1 + (−1)^(2m + 1)) − √(2m + 1)
+    = √(2m) − √(2m + 1)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ₊₁ :  [juge limit]  départ : √(2m) − √(2m + 1)
+    = −1/(√(2m) + √(2m + 1))   ← Quantité conjuguée
+    = 0   ← Limite
+  — lim sup :  [juge value]  départ : max(0,0)
+    = 0   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(0,0)
+    = 0   ← La plus petite limite
+  aides : (−1)ⁿ vaut 1 ou −1 selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | √(2m + 1) − √(2m) = 1/(□) | Les deux sous-suites tendent vers 0 : lim sup = lim inf = 0, la suite converge vers 0.
+
 ```
 
 ### Niveau 5
 
 ```
-Soit aₙ = √(n + (−1)^n) − √n. Que valent lim sup aₙ et lim inf aₙ ?
-  ✔ lim sup aₙ = 0, lim inf aₙ = 0   · lim sup aₙ = 1, lim inf aₙ = −1   · lim sup et lim inf n'existent pas : la suite oscille
+Soit aₙ = 3(sin(π/4 + n·π/2) + cos(π/4 + n·π/2)). Que valent lim sup aₙ et lim inf aₙ ?
+  · lim sup aₙ = 3√2, lim inf aₙ = 3√2   ✔ lim sup aₙ = 3√2, lim inf aₙ = −3√2   · lim sup aₙ = 6, lim inf aₙ = −6   · lim sup aₙ = −3√2, lim inf aₙ = 3√2
 
-Soit aₙ = (−1)^n·(4n)/(n + 1) + 2/n. Que valent lim sup aₙ et lim inf aₙ ?
-  · lim sup aₙ = −4, lim inf aₙ = 4   · lim sup aₙ = 1, lim inf aₙ = −1   ✔ lim sup aₙ = 4, lim inf aₙ = −4   · lim sup aₙ = 4, lim inf aₙ = 4
+Soit aₙ = (−1)^n·(3n)/(n + 2) + 2/n. Que valent lim sup aₙ et lim inf aₙ ?
+  · lim sup aₙ = 3, lim inf aₙ = 3   · lim sup aₙ = −3, lim inf aₙ = 3   ✔ lim sup aₙ = 3, lim inf aₙ = −3   · lim sup aₙ = 1, lim inf aₙ = −1
 
-Soit aₙ = √(n + (−1)^n) − √n. Que valent lim sup aₙ et lim inf aₙ ?
-  · lim sup et lim inf n'existent pas : la suite oscille   · lim sup aₙ = 1, lim inf aₙ = −1   ✔ lim sup aₙ = 0, lim inf aₙ = 0
+Soit aₙ = 5^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Que valent lim sup aₙ et lim inf aₙ ?
+  ✔ lim sup aₙ = 1, lim inf aₙ = 0   · lim sup aₙ = √5, lim inf aₙ = 0 [a1_limsup_as_sup]   · lim sup aₙ = 0, lim inf aₙ = 1   · lim sup aₙ = 1, lim inf aₙ = 1
+  pièges : a1_limsup_as_sup
 
 ```
 
 ### Variantes d'examen
 
 ```
-Soit aₙ = 5^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Que valent lim sup aₙ et lim inf aₙ ?
-  ✔ lim sup aₙ = 1, lim inf aₙ = 0   · lim sup aₙ = √5, lim inf aₙ = 0 [a1_limsup_as_sup]   · lim sup aₙ = 0, lim inf aₙ = 1   · lim sup aₙ = 1, lim inf aₙ = 1
+Soit aₙ = (−1)^n·n/(n + 2) + 1/n. Que valent lim sup aₙ et lim inf aₙ ?
+  · lim sup aₙ = 1, lim inf aₙ = 1   · lim sup et lim inf n'existent pas : la suite oscille   ✔ lim sup aₙ = 1, lim inf aₙ = −1   · lim sup aₙ = −1, lim inf aₙ = 1
   [examen mcq]
-  pièges : a1_limsup_as_sup
 
 Vrai ou faux ?
-  « Si a₂ₘ → ℓ et a₂ₘ₊₁ → ℓ, alors aₙ → ℓ. » → VRAI
+  « Si (|aₙ|) converge, alors (aₙ) converge. » → FAUX
+    contre-exemple (sequence) : a = (-1)^n
   [examen tf]
 
 ```
@@ -9344,6 +9346,17 @@ _Le point fixe L, l'écart aₙ − L géométrique, puis la limite._
 ### Niveau 1
 
 ```
+a₀ = 9 et a_(n + 1) = a_n/2 + 4. Trouve la formule explicite de aₙ, puis la limite. Le point fixe est L = 8.
+  [guided]  b_0
+    (bₙ = aₙ − 8 est géométrique de raison q = 1/2. Son premier terme :)
+    = 9 − □   (trous : 9 − 8)   ← b₀ = a₀ − L
+    = 1   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 8 + □·(1/2)^n   (trous : 8 + 1·(1/2)^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 8 + 1/2^n
+    = 8   ← qⁿ → 0
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 8 = (1/2)ⁿ·(▢) | aₙ = 8 + 1/2^n
+
 a₀ = 3 et a_(n + 1) = 2a_n + 6. Trouve la formule explicite de aₙ, puis la limite. Le point fixe est L = −6.
   [guided]  b_0
     (bₙ = aₙ + 6 est géométrique de raison q = 2. Son premier terme :)
@@ -9366,22 +9379,27 @@ a₀ = 6 et a_(n + 1) = −a_n/2 + 12. Trouve la formule explicite de aₙ, puis
     = 8   ← qⁿ → 0
   aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 8 = (−1/2)ⁿ·(▢) | aₙ = 8 − 2(−1/2)^n
 
-a₀ = 9 et a_(n + 1) = (3/4)a_n + 2. Trouve la formule explicite de aₙ, puis la limite. Le point fixe est L = 8.
-  [guided]  b_0
-    (bₙ = aₙ − 8 est géométrique de raison q = 3/4. Son premier terme :)
-    = 9 − □   (trous : 9 − 8)   ← b₀ = a₀ − L
-    = 1   ← Calculer
-  — Formule explicite :  [juge equiv]  départ : a(n)
-    = 8 + □·(3/4)^n   (trous : 8 + 1·(3/4)^n)   ← aₙ = L + qⁿ·b₀
-  — Limite de la suite :  [juge limit]  départ : 8 + (3/4)^n
-    = 8   ← qⁿ → 0
-  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 8 = (3/4)ⁿ·(▢) | aₙ = 8 + (3/4)^n
-
 ```
 
 ### Niveau 2
 
 ```
+a₀ = 9 et a_(n + 1) = (3/4)a_n + 2. Trouve la formule explicite de aₙ, puis la limite.
+  [guided]  L = (3/4)L + 2
+    (Point fixe : résous L = qL + c.)
+    = (1/4)L = □   (trous : (1/4)L = 2)   ← Regrouper les L
+    = L = 8   ← Diviser
+  — bₙ = aₙ − 8 est géométrique de raison q = 3/4. Son premier terme :  [juge value]  départ : b_0
+    = 9 − 8   ← b₀ = a₀ − L
+    = 1   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 8 + □·(3/4)^n   (trous : 8 + 1·(3/4)^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 8 + (3/4)^n
+    ? Pourquoi aₙ → 8 ? ✔ |q| = 3/4 < 1, donc qⁿ → 0 / · 8 est le point fixe, donc la suite y tend
+    = 8   ← qⁿ → 0
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 8 = (3/4)ⁿ·(▢) | aₙ = 8 + (3/4)^n
+  pièges : a1_rec_limit_without_convergence
+
 a₀ = −2 et a_(n + 1) = 3a_n + 8. Trouve la formule explicite de aₙ, puis la limite.
   [guided]  L = 3L + 8
     (Point fixe : résous L = qL + c.)
@@ -9414,27 +9432,25 @@ a₀ = 1 et a_(n + 1) = (2/3)a_n − 2. Trouve la formule explicite de aₙ, pui
   aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 6 = (2/3)ⁿ·(▢) | aₙ = −6 + 7(2/3)^n
   pièges : a1_rec_limit_without_convergence
 
-a₀ = 2 et a_(n + 1) = 3a_n − 2. Trouve la formule explicite de aₙ, puis la limite.
-  [guided]  L = 3L − 2
-    (Point fixe : résous L = qL + c.)
-    = □L = −2   (trous : −2L = −2)   ← Regrouper les L
-    = L = 1   ← Diviser
-  — bₙ = aₙ − 1 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
-    = 2 − 1   ← b₀ = a₀ − L
-    = 1   ← Calculer
-  — Formule explicite :  [juge equiv]  départ : a(n)
-    = □ + 1·3^n   (trous : 1 + 1·3^n)   ← aₙ = L + qⁿ·b₀
-  — Limite de la suite :  [juge limit]  départ : 3^n + 1
-    ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart 1·3ⁿ grandit / · Oui : L = 1 vérifie L = qL + c
-    = ∞   ← qⁿ → +∞
-  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 1 = 3ⁿ·(▢) | aₙ = 3^n + 1
-  pièges : a1_rec_limit_without_convergence
-
 ```
 
 ### Niveau 3
 
 ```
+a₀ = 2 et a_(n + 1) = 3a_n − 2. Trouve la formule explicite de aₙ, puis la limite.
+  [tap, suivre l'erreur, menu steps]  L = 3L − 2
+    (Point fixe : résous L = qL + c.)
+    = −2L = −2   ← Regrouper les L
+    = L = 1   ← Diviser
+  — bₙ = aₙ − 1 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = 2 − 1   ← b₀ = a₀ − L
+    = 1   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 1 + 1·3^n   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 3^n + 1
+    = ∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 1 = 3ⁿ·(▢) | aₙ = 3^n + 1
+
 a₀ = −3 et a_(n + 1) = 2a_n + 6. Trouve la formule explicite de aₙ, puis la limite.
   [tap, suivre l'erreur, menu steps]  L = 2L + 6
     (Point fixe : résous L = qL + c.)
@@ -9463,25 +9479,25 @@ a₀ = 7 et a_(n + 1) = 3a_n + 10. Trouve la formule explicite de aₙ, puis la 
     = ∞   ← qⁿ → +∞
   aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 5 = 3ⁿ·(▢) | aₙ = 12·3^n − 5
 
-a₀ = −4 et a_(n + 1) = 3a_n + 4. Trouve la formule explicite de aₙ, puis la limite.
-  [tap, suivre l'erreur, menu steps]  L = 3L + 4
-    (Point fixe : résous L = qL + c.)
-    = −2L = 4   ← Regrouper les L
-    = L = −2   ← Diviser
-  — bₙ = aₙ + 2 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
-    = −4 − (−2)   ← b₀ = a₀ − L
-    = −2   ← Calculer
-  — Formule explicite :  [juge equiv]  départ : a(n)
-    = −2 + (−2)·3^n   ← aₙ = L + qⁿ·b₀
-  — Limite de la suite :  [juge limit]  départ : −2·3^n − 2
-    = −∞   ← qⁿ → +∞
-  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 2 = 3ⁿ·(▢) | aₙ = −2·3^n − 2
-
 ```
 
 ### Niveau 4
 
 ```
+a₀ = −4 et a_(n + 1) = 3a_n + 4. Trouve la formule explicite de aₙ, puis la limite.
+  [free, suivre l'erreur]  L = 3L + 4
+    (Point fixe : résous L = qL + c.)
+    = L = −2   ← Point fixe
+  — bₙ = aₙ + 2 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = −2   ← b₀ = a₀ − L
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −2·3^n − 2   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : −2·3^n − 2
+    ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart −2·3ⁿ grandit / · Oui : L = −2 vérifie L = qL + c
+    = −∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 2 = 3ⁿ·(▢) | aₙ = −2·3^n − 2
+  pièges : a1_rec_limit_without_convergence
+
 a₀ = −7 et a_(n + 1) = 3a_n + 8. Trouve la formule explicite de aₙ, puis la limite.
   [free, suivre l'erreur]  L = 3L + 8
     (Point fixe : résous L = qL + c.)
@@ -9510,8 +9526,13 @@ a₀ = −5 et a_(n + 1) = (2/3)a_n + 2. Trouve la formule explicite de aₙ, pu
   aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 6 = (2/3)ⁿ·(▢) | aₙ = 6 − 11(2/3)^n
   pièges : a1_rec_limit_without_convergence
 
+```
+
+### Niveau 5
+
+```
 a₀ = 1 et a_(n + 1) = 3a_n + 8. Trouve la formule explicite de aₙ, puis la limite.
-  [free, suivre l'erreur]  L = 3L + 8
+  [free, sans aide]  L = 3L + 8
     (Point fixe : résous L = qL + c.)
     = L = −4   ← Point fixe
   — bₙ = aₙ + 4 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
@@ -9521,14 +9542,8 @@ a₀ = 1 et a_(n + 1) = 3a_n + 8. Trouve la formule explicite de aₙ, puis la l
   — Limite de la suite :  [juge limit]  départ : 5·3^n − 4
     ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart 5·3ⁿ grandit / · Oui : L = −4 vérifie L = qL + c
     = ∞   ← qⁿ → +∞
-  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 4 = 3ⁿ·(▢) | aₙ = 5·3^n − 4
   pièges : a1_rec_limit_without_convergence
 
-```
-
-### Niveau 5
-
-```
 a₀ = 7 et a_(n + 1) = 3a_n − 4. Quelle est la formule explicite de aₙ ?
   · 9·3^n − 2   · 7·3^n − 4 [a1_affine_rec_no_fixed_point]   · 7·3^n − 4n [a1_affine_rec_no_fixed_point]   ✔ 5·3^n + 2
   pièges : a1_affine_rec_no_fixed_point
@@ -9546,34 +9561,19 @@ a₀ = −1 et a_(n + 1) = 3a_n − 6. Trouve la formule explicite de aₙ, puis
     = −∞   ← qⁿ → +∞
   pièges : a1_rec_limit_without_convergence
 
-a₀ = 6 et a_(n + 1) = a_n/2 − 1. Trouve la formule explicite de aₙ, puis la limite.
-  [free, sans aide]  L = L/2 − 1
-    (Point fixe : résous L = qL + c.)
-    = L = −2   ← Point fixe
-  — bₙ = aₙ + 2 est géométrique de raison q = 1/2. Son premier terme :  [juge value]  départ : b_0
-    = 8   ← b₀ = a₀ − L
-  — Formule explicite :  [juge equiv]  départ : a(n)
-    = −2 + 8/2^n   ← aₙ = L + qⁿ·b₀
-  — Limite de la suite :  [juge limit]  départ : −2 + 8/2^n
-    ? Pourquoi aₙ → −2 ? ✔ |q| = 1/2 < 1, donc qⁿ → 0 / · −2 est le point fixe, donc la suite y tend
-    = −2   ← qⁿ → 0
-  pièges : a1_rec_limit_without_convergence
-
 ```
 
 ### Variantes d'examen
 
 ```
-a₀ = −1 et a_(n + 1) = a_n/2 + 3. Que peut-on dire de la limite ?
-  · lim aₙ = 3 [a1_affine_rec_no_fixed_point]   · lim aₙ = −1   ✔ lim aₙ = 6   · Elle n'a pas de limite : elle oscille
+a₀ = −6 et a_(n + 1) = (2/3)a_n + 2. Quelle est la formule explicite de aₙ ?
+  · 6 − 6(2/3)^n   ✔ 6 − 12(2/3)^n   · −6(2/3)^n + 2n [a1_affine_rec_no_fixed_point]   · −6(2/3)^n + 2 [a1_affine_rec_no_fixed_point]
   [examen mcq]
   pièges : a1_affine_rec_no_fixed_point
 
 Vrai ou faux ?
-  « Pour tout a₀ ∈ ℝ, la suite a_(n + 1) = 2a_n − 3 converge vers 3, son point fixe. » → FAUX
-    contre-exemple (refute) : a = 4
+  « Pour tout a₀ ∈ ℝ, la suite a_(n + 1) = (3/4)a_n − 2 converge vers −8. » → VRAI
   [examen tf]
-  pièges : a1_rec_limit_without_convergence
 
 ```
 
@@ -9584,37 +9584,37 @@ _Les candidats L = f(L), le sens donné par f(x) − x, la borne donnée par un 
 ### Niveau 1
 
 ```
-On pose a₀ = 0 et a_(n + 1) = (a_n² + 6)/5. Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 2 et 3.
-  [guided]  (x² + 6)/5 − x > 0
+On pose a₀ = 0 et a_(n + 1) = (a_n² + 21)/10. Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 3 et 7.
+  [guided]  (x² + 21)/10 − x > 0
     (Signe de f(x) − x :)
-    = (x² − 5x + 6)/5 > 0   ← Même dénominateur
-    = ]−∞ ; □[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 2[ ∪ ]3 ; +∞[)   ← Signe du trinôme
+    = (x² − 10x + 21)/10 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 3[ ∪ ]7 ; +∞[)   ← Signe du trinôme
   — Conclusion pour a₀ = 0 :  [juge value]  départ : lim_{n→∞} a_n
-    (f est croissante et f(I) ⊂ I pour I = [0 ; 2[ : la suite reste dans I, elle croît et elle est bornée.)
+    (f est croissante et f(I) ⊂ I pour I = [0 ; 3[ : la suite reste dans I, elle croît et elle est bornée.)
+    = 3   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]7 ; +∞[ | aₙ ∈ [0 ; 3[, croissante : aₙ → 3
+  pièges : g9_bracket, g1_trinome_sign_swap
+
+On pose a₀ = 7 et a_(n + 1) = √(7a_n − 12). Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 3 et 4.
+  [guided]  √(7x − 12) − x > 0
+    (Signe de f(x) − x :)
+    = x² − 7x + 12 < 0   ← Les deux membres sont positifs : élever au carré
+    = ]□ ; □[   (trous : ]3 ; 4[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 7 :  [juge value]  départ : lim_{n→∞} a_n
+    (f est croissante et f(I) ⊂ I pour I = ]4 ; +∞[ : la suite reste dans I, elle décroît et elle est bornée.)
+    = 4   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 4[ | aₙ ∈ ]4 ; +∞[, décroissante : aₙ → 4
+  pièges : g9_bracket
+
+On pose a₀ = 6 et a_(n + 1) = (a_n² + 16)/10. Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 2 et 8.
+  [guided]  (x² + 16)/10 − x > 0
+    (Signe de f(x) − x :)
+    = (x² − 10x + 16)/10 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 2[ ∪ ]8 ; +∞[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 6 :  [juge value]  départ : lim_{n→∞} a_n
+    (f est croissante et f(I) ⊂ I pour I = ]2 ; 8[ : la suite reste dans I, elle décroît et elle est bornée.)
     = 2   ← Monotone et bornée : la limite est un point fixe
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]3 ; +∞[ | aₙ ∈ [0 ; 2[, croissante : aₙ → 2
-  pièges : g9_bracket, g1_trinome_sign_swap
-
-On pose a₀ = 7 et a_(n + 1) = a_n²/5. Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 0 et 5.
-  [guided]  x²/5 − x > 0
-    (Signe de f(x) − x :)
-    = (x² − 5x)/5 > 0   ← Même dénominateur
-    = ]−∞ ; □[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 0[ ∪ ]5 ; +∞[)   ← Signe du trinôme
-  — Pour x > 5, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 14/5, donc aₙ ≥ 7 + (14/5)n. Limite de ce minorant :  [juge limit]  départ : 7 + (14/5)n
-    (La suite croît et ne peut tendre vers aucun point fixe.)
-    = ∞   ← aₙ → +∞
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]5 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
-  pièges : g9_bracket, g1_trinome_sign_swap
-
-On pose a₀ = 10 et a_(n + 1) = (a_n² + 28)/11. Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 4 et 7.
-  [guided]  (x² + 28)/11 − x > 0
-    (Signe de f(x) − x :)
-    = (x² − 11x + 28)/11 > 0   ← Même dénominateur
-    = ]−∞ ; □[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 4[ ∪ ]7 ; +∞[)   ← Signe du trinôme
-  — Pour x > 7, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 18/11, donc aₙ ≥ 10 + (18/11)n. Limite de ce minorant :  [juge limit]  départ : 10 + (18/11)n
-    (La suite croît et ne peut tendre vers aucun point fixe.)
-    = ∞   ← aₙ → +∞
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]7 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]8 ; +∞[ | aₙ ∈ ]2 ; 8[, décroissante : aₙ → 2
   pièges : g9_bracket, g1_trinome_sign_swap
 
 ```
@@ -9622,49 +9622,48 @@ On pose a₀ = 10 et a_(n + 1) = (a_n² + 28)/11. Étudie la suite : points fixe
 ### Niveau 2
 
 ```
-On pose a₀ = 9 et a_(n + 1) = √(10a_n − 16). Étudie la suite : points fixes, sens de variation, limite.
-  [guided]  L = √(10L − 16)
+On pose a₀ = 9 et a_(n + 1) = (a_n² + 12)/8. Étudie la suite : points fixes, sens de variation, limite.
+  [guided]  L = (L² + 12)/8
     (Candidats : résous L = f(L).)
-    = L² − 10L + 16 = 0   ← Élever au carré (L ≥ 0)
-    = L = 2 ou L = □   (trous : L = 2 ou L = 8)   ← Racines du trinôme
-  — Signe de f(x) − x :  [juge solset]  départ : √(10x − 16) − x > 0
-    = x² − 10x + 16 < 0   ← Les deux membres sont positifs : élever au carré
-    = ]□ ; 8[   (trous : ]2 ; 8[)   ← Signe du trinôme
-  — Conclusion pour a₀ = 9 :  [juge value]  départ : lim_{n→∞} a_n
-    ? a₀ = 9 ∈ ]8 ; +∞[. Pourquoi aₙ ∈ ]8 ; +∞[ pour tout n ? ✔ f est croissante, f(8) = 8 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]8 ; +∞[ / · Parce que a₀ ∈ ]8 ; +∞[
-    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 8 : elle converge, vers 8 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est minorée par 8 : elle converge / · converge vers 2, l'autre point fixe
-    = 8   ← Monotone et bornée : la limite est un point fixe
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 8[ | aₙ ∈ ]8 ; +∞[, décroissante : aₙ → 8
+    = L² − 8L + 12 = 0   ← Multiplier par 8
+    = L = 2 ou L = □   (trous : L = 2 ou L = 6)   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 12)/8 − x > 0
+    = (x² − 8x + 12)/8 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]6 ; +∞[   (trous : ]−∞ ; 2[ ∪ ]6 ; +∞[)   ← Signe du trinôme
+  — Pour x > 6, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 21/8, donc aₙ ≥ 9 + (21/8)n. Limite de ce minorant :  [juge limit]  départ : 9 + (21/8)n
+    ? a₀ = 9 > 6. La suite (aₙ) : ✔ croît (f(x) > x pour x > 6) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 6, un point fixe / · croît et elle est minorée par 6 : elle converge
+    = ∞   ← aₙ → +∞
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]6 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
+  pièges : a1_rec_limit_without_convergence
+
+On pose a₀ = 3 et a_(n + 1) = √(3a_n − 2). Étudie la suite : points fixes, sens de variation, limite.
+  [guided]  L = √(3L − 2)
+    (Candidats : résous L = f(L).)
+    = L² − 3L + 2 = 0   ← Élever au carré (L ≥ 0)
+    = L = 1 ou L = □   (trous : L = 1 ou L = 2)   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : √(3x − 2) − x > 0
+    = x² − 3x + 2 < 0   ← Les deux membres sont positifs : élever au carré
+    = ]□ ; 2[   (trous : ]1 ; 2[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 3 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 3 ∈ ]2 ; +∞[. Pourquoi aₙ ∈ ]2 ; +∞[ pour tout n ? ✔ f est croissante, f(2) = 2 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]2 ; +∞[ / · Parce que a₀ ∈ ]2 ; +∞[
+    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 2 : elle converge, vers 2 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est minorée par 2 : elle converge / · converge vers 1, l'autre point fixe
+    = 2   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 2[ | aₙ ∈ ]2 ; +∞[, décroissante : aₙ → 2
   pièges : g1_irr_extraneous, a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
 
-On pose a₀ = 4 et a_(n + 1) = √(5a_n). Étudie la suite : points fixes, sens de variation, limite.
-  [guided]  L = √(5L)
+On pose a₀ = 5 et a_(n + 1) = (a_n² + 28)/11. Étudie la suite : points fixes, sens de variation, limite.
+  [guided]  L = (L² + 28)/11
     (Candidats : résous L = f(L).)
-    = L² − 5L = 0   ← Élever au carré (L ≥ 0)
-    = L = 0 ou L = □   (trous : L = 0 ou L = 5)   ← Racines du trinôme
-  — Signe de f(x) − x :  [juge solset]  départ : √(5x) − x > 0
-    = x² − 5x < 0   ← Les deux membres sont positifs : élever au carré
-    = ]□ ; 5[   (trous : ]0 ; 5[)   ← Signe du trinôme
-  — Conclusion pour a₀ = 4 :  [juge value]  départ : lim_{n→∞} a_n
-    ? a₀ = 4 ∈ ]0 ; 5[. Pourquoi aₙ ∈ ]0 ; 5[ pour tout n ? ✔ f est croissante, f(0) = 0 et f(5) = 5 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]0 ; 5[ / · Parce que a₀ ∈ ]0 ; 5[
-    ? Donc la suite (aₙ) : ✔ croît (f(x) > x sur I) et est majorée par 5 : elle converge, vers 5 / · croît et tend vers +∞ / · est bornée (elle reste dans ]0 ; 5[) : elle converge / · converge vers 0, l'autre point fixe
-    = 5   ← Monotone et bornée : la limite est un point fixe
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 5[ | aₙ ∈ ]0 ; 5[, croissante : aₙ → 5
-  pièges : g1_irr_extraneous, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
-
-On pose a₀ = 3 et a_(n + 1) = (a_n² + 10)/7. Étudie la suite : points fixes, sens de variation, limite.
-  [guided]  L = (L² + 10)/7
-    (Candidats : résous L = f(L).)
-    = L² − 7L + 10 = 0   ← Multiplier par 7
-    = L = 2 ou L = □   (trous : L = 2 ou L = 5)   ← Racines du trinôme
-  — Signe de f(x) − x :  [juge solset]  départ : (x² + 10)/7 − x > 0
-    = (x² − 7x + 10)/7 > 0   ← Même dénominateur
-    = ]−∞ ; □[ ∪ ]5 ; +∞[   (trous : ]−∞ ; 2[ ∪ ]5 ; +∞[)   ← Signe du trinôme
-  — Conclusion pour a₀ = 3 :  [juge value]  départ : lim_{n→∞} a_n
-    ? a₀ = 3 ∈ ]2 ; 5[. Pourquoi aₙ ∈ ]2 ; 5[ pour tout n ? ✔ f est croissante, f(2) = 2 et f(5) = 5 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]2 ; 5[ / · Parce que a₀ ∈ ]2 ; 5[
-    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 2 : elle converge, vers 2 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est bornée (elle reste dans ]2 ; 5[) : elle converge / · converge vers 5, l'autre point fixe
-    = 2   ← Monotone et bornée : la limite est un point fixe
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]5 ; +∞[ | aₙ ∈ ]2 ; 5[, décroissante : aₙ → 2
+    = L² − 11L + 28 = 0   ← Multiplier par 11
+    = L = 4 ou L = □   (trous : L = 4 ou L = 7)   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 28)/11 − x > 0
+    = (x² − 11x + 28)/11 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]7 ; +∞[   (trous : ]−∞ ; 4[ ∪ ]7 ; +∞[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 5 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 5 ∈ ]4 ; 7[. Pourquoi aₙ ∈ ]4 ; 7[ pour tout n ? ✔ f est croissante, f(4) = 4 et f(7) = 7 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]4 ; 7[ / · Parce que a₀ ∈ ]4 ; 7[
+    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 4 : elle converge, vers 4 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est bornée (elle reste dans ]4 ; 7[) : elle converge / · converge vers 7, l'autre point fixe
+    = 4   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]7 ; +∞[ | aₙ ∈ ]4 ; 7[, décroissante : aₙ → 4
   pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
 
 ```
@@ -9672,50 +9671,49 @@ On pose a₀ = 3 et a_(n + 1) = (a_n² + 10)/7. Étudie la suite : points fixes,
 ### Niveau 3
 
 ```
-On pose a₀ = 9 et a_(n + 1) = √(8a_n − 7). Étudie la suite : points fixes, sens de variation, limite.
-  [tap, suivre l'erreur, menu steps]  L = √(8L − 7)
+On pose a₀ = 4 et a_(n + 1) = √(2a_n). Étudie la suite : points fixes, sens de variation, limite.
+  [tap, suivre l'erreur, menu steps]  L = √(2L)
     (Candidats : résous L = f(L).)
-    = L² − 8L + 7 = 0   ← Élever au carré (L ≥ 0)
-    = L = 1 ou L = 7   ← Racines du trinôme
-  — Signe de f(x) − x :  [juge solset]  départ : √(8x − 7) − x > 0
-    = x² − 8x + 7 < 0   ← Les deux membres sont positifs : élever au carré
-    = ]1 ; 7[   ← Signe du trinôme
-  — Conclusion pour a₀ = 9 :  [juge value]  départ : lim_{n→∞} a_n
-    ? a₀ = 9 ∈ ]7 ; +∞[. Pourquoi aₙ ∈ ]7 ; +∞[ pour tout n ? ✔ f est croissante, f(7) = 7 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]7 ; +∞[ / · Parce que a₀ ∈ ]7 ; +∞[
-    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 7 : elle converge, vers 7 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est minorée par 7 : elle converge / · converge vers 1, l'autre point fixe
-    = 7   ← Monotone et bornée : la limite est un point fixe
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 7[ | aₙ ∈ ]7 ; +∞[, décroissante : aₙ → 7
+    = L² − 2L = 0   ← Élever au carré (L ≥ 0)
+    = L = 0 ou L = 2   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : √(2x) − x > 0
+    = x² − 2x < 0   ← Les deux membres sont positifs : élever au carré
+    = ]0 ; 2[   ← Signe du trinôme
+  — Conclusion pour a₀ = 4 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 4 ∈ ]2 ; +∞[. Pourquoi aₙ ∈ ]2 ; +∞[ pour tout n ? ✔ f est croissante, f(2) = 2 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]2 ; +∞[ / · Parce que a₀ ∈ ]2 ; +∞[
+    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 2 : elle converge, vers 2 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est minorée par 2 : elle converge / · converge vers 0, l'autre point fixe
+    = 2   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 2[ | aₙ ∈ ]2 ; +∞[, décroissante : aₙ → 2
   pièges : g1_irr_extraneous, a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
 
-On pose a₀ = 2 et a_(n + 1) = a_n²/6. Étudie la suite : points fixes, sens de variation, limite.
-  [tap, suivre l'erreur, menu steps]  L = L²/6
+On pose a₀ = 5 et a_(n + 1) = (a_n² + 12)/7. Étudie la suite : points fixes, sens de variation, limite.
+  [tap, suivre l'erreur, menu steps]  L = (L² + 12)/7
     (Candidats : résous L = f(L).)
-    = L² − 6L = 0   ← Multiplier par 6
-    = L = 0 ou L = 6   ← Racines du trinôme
-  — Signe de f(x) − x :  [juge solset]  départ : x²/6 − x > 0
-    = (x² − 6x)/6 > 0   ← Même dénominateur
-    = ]−∞ ; 0[ ∪ ]6 ; +∞[   ← Signe du trinôme
-  — Conclusion pour a₀ = 2 :  [juge value]  départ : lim_{n→∞} a_n
-    ? a₀ = 2 ∈ ]0 ; 6[. Pourquoi aₙ ∈ ]0 ; 6[ pour tout n ? ✔ f est croissante, f(0) = 0 et f(6) = 6 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]0 ; 6[ / · Parce que a₀ ∈ ]0 ; 6[
-    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 0 : elle converge, vers 0 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est bornée (elle reste dans ]0 ; 6[) : elle converge / · converge vers 6, l'autre point fixe
-    = 0   ← Monotone et bornée : la limite est un point fixe
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]6 ; +∞[ | aₙ ∈ ]0 ; 6[, décroissante : aₙ → 0
-  pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+    = L² − 7L + 12 = 0   ← Multiplier par 7
+    = L = 3 ou L = 4   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 12)/7 − x > 0
+    = (x² − 7x + 12)/7 > 0   ← Même dénominateur
+    = ]−∞ ; 3[ ∪ ]4 ; +∞[   ← Signe du trinôme
+  — Pour x > 4, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 2/7, donc aₙ ≥ 5 + (2/7)n. Limite de ce minorant :  [juge limit]  départ : 5 + (2/7)n
+    ? a₀ = 5 > 4. La suite (aₙ) : ✔ croît (f(x) > x pour x > 4) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 4, un point fixe / · croît et elle est minorée par 4 : elle converge
+    = ∞   ← aₙ → +∞
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]4 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
+  pièges : a1_rec_limit_without_convergence
 
-On pose a₀ = 1 et a_(n + 1) = (a_n² + 4)/4. Étudie la suite : points fixes, sens de variation, limite.
-  [tap, suivre l'erreur, menu steps]  L = (L² + 4)/4
+On pose a₀ = 6 et a_(n + 1) = √(11a_n − 28). Étudie la suite : points fixes, sens de variation, limite.
+  [tap, suivre l'erreur, menu steps]  L = √(11L − 28)
     (Candidats : résous L = f(L).)
-    = L² − 4L + 4 = 0   ← Multiplier par 4
-    = L = 2   ← Racines du trinôme
-  — Signe de f(x) − x :  [juge solset]  départ : (x² + 4)/4 − x > 0
-    = (x − 2)²/4 > 0   ← Même dénominateur
-    = ]−∞ ; 2[ ∪ ]2 ; +∞[   ← Signe du trinôme
-  — Conclusion pour a₀ = 1 :  [juge value]  départ : lim_{n→∞} a_n
-    ? a₀ = 1 ∈ [0 ; 2[. Pourquoi aₙ ∈ [0 ; 2[ pour tout n ? ✔ f est croissante, f(0) = 1 ≥ 0 et f(2) = 2 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur [0 ; 2[ / · Parce que a₀ ∈ [0 ; 2[
-    ? Donc la suite (aₙ) : ✔ croît (f(x) > x sur I) et est majorée par 2 : elle converge, vers 2 / · croît et tend vers +∞ / · est bornée (elle reste dans [0 ; 2[) : elle converge
-    = 2   ← Monotone et bornée : la limite est un point fixe
-  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]2 ; +∞[ | aₙ ∈ [0 ; 2[, croissante : aₙ → 2
-  pièges : a1_bounded_implies_convergent
+    = L² − 11L + 28 = 0   ← Élever au carré (L ≥ 0)
+    = L = 4 ou L = 7   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : √(11x − 28) − x > 0
+    = x² − 11x + 28 < 0   ← Les deux membres sont positifs : élever au carré
+    = ]4 ; 7[   ← Signe du trinôme
+  — Conclusion pour a₀ = 6 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 6 ∈ ]4 ; 7[. Pourquoi aₙ ∈ ]4 ; 7[ pour tout n ? ✔ f est croissante, f(4) = 4 et f(7) = 7 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]4 ; 7[ / · Parce que a₀ ∈ ]4 ; 7[
+    ? Donc la suite (aₙ) : ✔ croît (f(x) > x sur I) et est majorée par 7 : elle converge, vers 7 / · croît et tend vers +∞ / · est bornée (elle reste dans ]4 ; 7[) : elle converge / · converge vers 4, l'autre point fixe
+    = 7   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 7[ | aₙ ∈ ]4 ; 7[, croissante : aₙ → 7
+  pièges : g1_irr_extraneous, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
 
 ```
 
