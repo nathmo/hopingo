@@ -41,3 +41,5 @@ export const qpow = (x, k) => (k === 0 ? q(1) : x.pow(k));
 // a/b for a line: each side in brackets when it is itself a fraction.
 const wrap = (x) => (x.includes('/') || x.startsWith('-') ? `(${x})` : x);
 export const ratio = (a, b) => `${wrap(t(a))}/${wrap(t(b))}`;
+// « 1 dame », « 3 dames » : the words of a plural, made singular for k ≤ 1.
+export const nb = (k, words) => `${k} ${Math.abs(k) <= 1 ? words.split(' ').map((w) => w.replace(/s$/, '')).join(' ') : words}`;

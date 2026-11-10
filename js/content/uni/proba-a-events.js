@@ -4,7 +4,7 @@
 // (judge `prob`): decimals with one or two digits, or fractions.
 
 import { statItem, coefItem, openItem, choice, tf, numCounter, H, examTag } from './proba-kit.js';
-import { q, t, s, M, C, qpow, pct, ratio } from './proba-a-kit.js';
+import { q, t, s, M, C, qpow, pct, ratio, nb } from './proba-a-kit.js';
 
 const tenth = (rng, lo = 1, hi = 9) => q(rng.int(lo, hi), 10);
 
@@ -200,10 +200,10 @@ function ctParts(D) {
   };
   const fa = {
     label: '|A|', name: 'fa', kind: 'prob', expect: String(D.fa), action: `Choisir les ${D.what}, puis le reste, et multiplier`,
-    wrongActions: [{ label: `Compter seulement les ${D.what}`, rule: 'p_count_forget_rest', why: `Il faut aussi choisir les ${D.n - D.k} autres.` }],
+    wrongActions: [{ label: `Compter seulement les ${D.what}`, rule: 'p_count_forget_rest', why: `Il faut aussi choisir ${D.n - D.k > 1 ? `les ${D.n - D.k} autres` : 'l’autre'}.` }],
     traps: { p_count_forget_rest: { values: [String(D.a)], ctx: { k: D.k, 'n−k': D.n - D.k } } },
     lines: [
-      { math: `C(${D.K};${D.k})×C(${D.N - D.K};${D.n - D.k})`, note: `${D.k} ${D.what} parmi ${D.K}, puis ${D.n - D.k} autres parmi ${D.N - D.K}`, subgoal: 'count', blank: [String(D.k), String(D.n - D.k)], blank2: [`C(${D.N - D.K};${D.n - D.k})`] },
+      { math: `C(${D.K};${D.k})×C(${D.N - D.K};${D.n - D.k})`, note: `${nb(D.k, D.what)} parmi ${D.K}, puis ${nb(D.n - D.k, 'autres')} parmi ${D.N - D.K}`, subgoal: 'count', blank: [String(D.k), String(D.n - D.k)], blank2: [`C(${D.N - D.K};${D.n - D.k})`] },
       { math: `${D.a}×${D.b}`, note: 'Calculer chaque facteur', blank: [String(D.b)] },
       { math: String(D.fa), note: 'Multiplier', blank: [String(D.fa)] },
     ].filter((l, i) => !(i === 1 && (D.a === 1 || D.b === 1))),
@@ -257,15 +257,17 @@ function ctItem(level, rng, profile, opts = {}) {
       prompt: `${D.story(D.n)} Quelle est la probabilité d'obtenir au moins deux ${D.what} ?`,
       parts: A.parts, subgoals: CT_SUB,
       hints: H('« Au moins 2 » : le contraire de « 0 ou 1 ». Compte ces deux cas.', M(`1-□-□`), `Pr(X ≥ 2) = ${s(A.v)}`),
+      simulate: { model: 'urn', balls: { K: D.K, O: D.N - D.K }, draw: D.n, replace: false, count: 'K', event: { op: 'ge', k: 2 }, answer: A.v.valueOf(), label: `Au moins deux ${D.what}` },
       exam: examTag(opts),
     });
   }
   const parts = ctParts(D);
-  const prompt = `${D.story(D.n)} Quelle est la probabilité d'obtenir exactement ${D.k} ${D.what} ? Donne |Ω|, |A|, puis Pr(A) en fraction irréductible.`;
-  if (opts.exam === 'coef') return coefItem({ skill: CT, key: `coef:${D.N}:${D.K}:${D.n}:${D.k}`, prompt: `${D.story(D.n)} Probabilité d'obtenir exactement ${D.k} ${D.what} (fraction irréductible) ?`, parts, subgoals: CT_SUB, exam: examTag(opts) });
+  const prompt = `${D.story(D.n)} Quelle est la probabilité d'obtenir exactement ${nb(D.k, D.what)} ? Donne |Ω|, |A|, puis Pr(A) en fraction irréductible.`;
+  if (opts.exam === 'coef') return coefItem({ skill: CT, key: `coef:${D.N}:${D.K}:${D.n}:${D.k}`, prompt: `${D.story(D.n)} Probabilité d'obtenir exactement ${nb(D.k, D.what)} (fraction irréductible) ?`, parts, subgoals: CT_SUB, exam: examTag(opts) });
   return statItem({
     skill: CT, level, key: `${level}:${D.N}:${D.K}:${D.n}:${D.k}`, fallback: D.fallback,
     prompt, parts, subgoals: CT_SUB, exam: examTag(opts),
+    simulate: { model: 'urn', balls: { K: D.K, O: D.N - D.K }, draw: D.n, replace: false, count: 'K', event: { op: 'eq', k: D.k }, answer: D.p.valueOf(), label: `Exactement ${nb(D.k, D.what)}` },
     hints: H(`Choisis les ${D.what}, puis les autres : multiplie les deux comptes. Compte Ω de la même façon (sans ordre).`, M(`C(${D.K};${D.k})×C(□;□)`), `|A| = ${D.a} · ${D.b} = ${D.fa}`),
   });
 }
@@ -274,7 +276,7 @@ function ctMcq(D, rng, opts) {
   const p = q(D.fa, D.om);
   return choice({
     skill: CT, level: 4, key: `mcq:${D.N}:${D.K}:${D.n}:${D.k}`, exam: examTag(opts),
-    prompt: `${D.story(D.n)} Probabilité d'obtenir exactement ${D.k} ${D.what} ?`,
+    prompt: `${D.story(D.n)} Probabilité d'obtenir exactement ${nb(D.k, D.what)} ?`,
     right: s(p), wrongs: [
       { html: s(q(D.a, D.om)), rule: 'p_count_forget_rest' },
       { html: `≈ ${dec4(binomQ(D.n, D.k, D.K, D.N))}`, rule: 'p_binom_without_replacement' },
@@ -352,6 +354,10 @@ function cdTotal(rng, level) {
 function cdTotalPart(T) {
   return {
     label: T.label, name: 'tot', kind: 'prob', expect: t(T.v), symbols: T.sym || undefined, action: 'Une branche par cas : multiplier le long, additionner les branches',
+    decisions: [{ prompt: 'Sur quels cas découper (quelle partition) ?', levels: [2], options: [
+      { id: 'p', label: { test: 'Malade ou sain : deux branches', urn: 'Pile ou face : une branche par urne', machines: 'A, B ou C : une branche par machine' }[T.g], valid: true },
+      { id: 'm', label: 'Seulement le cas le plus probable', valid: false, rule: 'p_total_missing_branch', why: 'Toutes les branches qui mènent à l’événement comptent.' },
+    ] }],
     wrongActions: [{ label: 'Garder seulement la branche principale', rule: 'p_total_missing_branch', why: 'Toutes les branches qui mènent à l\'événement comptent.' }],
     traps: { p_total_missing_branch: { values: T.drop.map(t), ctx: { v: t(T.drop[0]) } } },
     lines: [
@@ -554,11 +560,11 @@ function bfItem(level, rng, profile, opts = {}) {
     });
   }
   const parts = bfParts(D, sc, level);
-  const prompt = `${head} Imagine ${D.N} ${sc.who}. ${sc.q}`;
+  const prompt = `${head} Imagine ${D.N === 1000 ? '1 000' : '10 000'} ${sc.who}. ${sc.q}`;
   if (opts.exam === 'coef') return coefItem({ skill: BF, key: `coef:${sc.id}:${t(D.pi)}:${t(D.se)}:${t(D.fp)}`, prompt: `${head} ${sc.q} (fraction irréductible)`, parts, subgoals: BF_SUB, exam: examTag(opts), fallback: D.fallback });
   return statItem({
     skill: BF, level, key: `${level}:${sc.id}:${t(D.pi)}:${t(D.se)}:${t(D.fp)}`, fallback: D.fallback, prompt, parts, subgoals: BF_SUB, exam: examTag(opts),
-    hints: H(`Commence par répartir les ${D.N} ${sc.who} selon le taux de base, avant de parler du test.`, M(`${D.mp}/(${D.mp}+□)`), `Pr = ${D.mp}/${D.pos} = ${s(D.post)}`),
+    hints: H(`Commence par répartir les ${D.N === 1000 ? '1 000' : '10 000'} ${sc.who} selon le taux de base, avant de parler du test.`, M(`${D.mp}/(${D.mp}+□)`), `Pr = ${D.mp}/${D.pos} = ${s(D.post)}`),
     interpret: bayesInterpret(D, sc),
     simulate: { model: 'bayes', prev: D.pi.valueOf(), sens: D.se.valueOf(), fpr: D.fp.valueOf(), tests: 1, event: { op: 'eq', k: 1 }, given: { positive: true }, answer: D.post.valueOf(), label: `Pr(${sc.M} | +) sur 10 000 ${sc.who} tirées` },
   });
@@ -650,8 +656,8 @@ function byItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') {
     return choice({
       skill: BY, level: 4, key: `mcq:${key}`, exam: examTag(opts), prompt: `${head} Une personne a deux tests positifs (indépendants sachant l'état). Pr(M | +, +) ?`,
-      right: s(D.post2), wrongs: [{ html: s(D.post.mul(D.post)), rule: 'p_two_tests_square' }, { html: s(D.se), rule: 'p_cond_inverse' }, { html: s(D.post), rule: 'p_base_rate' }],
-      fillers: [{ html: s(D.se.mul(D.se)) }],
+      right: s(D.post2), wrongs: [{ html: s(D.post.mul(D.post)), rule: 'p_two_tests_square' }, ...(D.num2.div(D.pp.mul(D.pp)).cmp(1) < 0 ? [{ html: s(D.num2.div(D.pp.mul(D.pp))), rule: 'p_two_tests_uncond' }] : []), { html: s(D.se), rule: 'p_cond_inverse' }],
+      fillers: [{ html: s(D.post) }, { html: s(D.se.mul(D.se)) }],
     }, rng);
   }
   if (opts.exam === 'tf') {
@@ -670,7 +676,7 @@ function byItem(level, rng, profile, opts = {}) {
     hints: H('Numérateur : la branche « malade et positif ». Dénominateur : toutes les branches « positif ».', M(`${t(D.se.mul(D.pi))}/(${t(D.se.mul(D.pi))}+□)`), `Pr(M | +) = ${s(D.post)}`),
     interpret: two ? byInterpret(D) : null,
   };
-  if (opts.exam === 'open') return openItem({ ...o, key: `open:${key}` }, 10, rng);
+  if (opts.exam === 'open') return openItem({ ...o, key: `open:${key}`, title: 'Un test, puis deux' }, 10, rng);
   if (opts.exam === 'coef') return coefItem({ ...o, key: `coef:${key}`, prompt: `${head} Probabilité qu'une personne positive soit malade (fraction irréductible) ?`, part: parts[1], parts });
   return statItem(o);
 }
@@ -734,7 +740,7 @@ function inDice(rng) {
           { id: 'calc', label: 'Il faut encore vérifier Pr(A ∩ B ∩ C) = 1/8', valid: true },
           { id: 'yes', label: 'Oui : les trois paires sont indépendantes', valid: false, rule: 'p_pairwise_mutual', why: 'Indépendants deux à deux ne suffit pas : il faut aussi la condition sur les trois.' },
         ] }],
-        lines: [{ math: t(abc), note: `${abc.n ? 'Sur A ∩ B, la somme est toujours' : 'Sur A ∩ B, la somme n\'est jamais'} ${c} : ${s(abc)} ≠ 1/8, pas mutuellement indépendants`, subgoal: 'dec' }],
+        lines: [{ math: abc.n ? `${abc.n}/${abc.d}` : '0', note: `${abc.n ? 'Sur A ∩ B, la somme est toujours' : 'Sur A ∩ B, la somme n\'est jamais'} ${c} : ${s(abc)} ≠ 1/8, pas mutuellement indépendants`, subgoal: 'dec' }],
       },
     ],
   };
@@ -769,6 +775,7 @@ function inSixes(rng) {
       label: 'Pr(au moins un 6)', name: 'v', kind: 'prob', expect: t(v), action: 'Complément : 1 − Pr(aucun 6)',
       wrongActions: [SYS_WRONG[0]],
       traps: { p_atleast_one_np: { values: [t(q(k, 6)), t(q(1).sub(qpow(q(1, 6), k)))], ctx: { n: k, p: '1/6', v: t(q(k, 6)) } } },
+      simulate: { model: 'dice', dice: k, faces: 6, stat: 'six', event: { op: 'ge', k: 1 }, answer: v.valueOf(), label: 'Au moins un 6' },
       lines: [{ math: `1-(5/6)^${k}`, note: 'Lancers indépendants : aucun 6, c\'est (5/6)ᵏ', subgoal: 'sys', blank: [String(k)] }, { math: `1-${t(qpow(q(5, 6), k))}`, note: 'Puissance' }, { math: t(v), note: 'Calculer' }],
     }],
   };
@@ -805,7 +812,7 @@ function inItem(level, rng, profile, opts = {}) {
   }
   if (opts.exam === 'coef') return coefItem({ skill: IN, key: `coef:${S.story}`, prompt: S.story, parts: S.parts, subgoals: IN_SUB, exam: examTag(opts) });
   return statItem({
-    skill: IN, level, key: `${level}:${kind}:${S.story.length}:${S.parts.map((p) => p.expect).join(',')}`, prompt: S.story, parts: S.parts, subgoals: IN_SUB, exam: examTag(opts),
+    skill: IN, level, key: `${level}:${kind}:${S.story.length}:${S.parts.map((p) => p.expect).join(',')}`, prompt: S.story, parts: S.parts, subgoals: IN_SUB, exam: examTag(opts), simulate: S.parts[0].simulate,
     hints: H('Indépendants : le produit. Incompatibles : l\'intersection vide. Série : tous marchent ; parallèle : au moins un.', M(S.parts[0].lines[0].math.replace(/\d+$/, '□')), `${S.parts[S.parts.length - 1].label} = ${s(evalQ(S.parts[S.parts.length - 1].lines[S.parts[S.parts.length - 1].lines.length - 1].math))}`),
   });
 }

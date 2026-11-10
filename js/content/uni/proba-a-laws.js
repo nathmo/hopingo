@@ -4,7 +4,7 @@
 // `stat` at 0,001.
 
 import { statItem, coefItem, choice, tf, numCounter, H, examTag } from './proba-kit.js';
-import { q, t, s, M, C, qpow, list, ratio } from './proba-a-kit.js';
+import { q, t, s, M, C, qpow, list, ratio, nb } from './proba-a-kit.js';
 
 const fact = (n) => (n <= 1 ? 1 : n * fact(n - 1));
 const f3 = (x) => x.toFixed(3).replace('.', ',');
@@ -281,6 +281,7 @@ function biItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'coef') return coefItem({ skill: BI, key: `coef:${D.g}:${D.n}:${t(D.p)}:${k}`, prompt, parts, part: parts[1], subgoals: BI_SUB, exam: examTag(opts) });
   return statItem({
     skill: BI, level, key: `${level}:${D.g}:${D.n}:${t(D.p)}:${k}:${parts.length}`, prompt, parts, subgoals: BI_SUB, exam: examTag(opts),
+    simulate: { model: 'binom', n: D.n, p: D.p.valueOf(), event: { op: 'eq', k }, answer: v.valueOf(), label: `Pr(X = ${k})` },
     hints: H('C(n, k) compte les places des succès ; ne l\'oublie pas.', M(`C(${D.n};${k})×${pw(D.p, k).replace(/\^\d+$/, '^□')}`), `Pr(X = ${k}) = ${s(v)}`),
   });
 }
@@ -367,6 +368,7 @@ function poItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'coef') return coefItem({ skill: PO, key: `coef:${D.g}:${t(lam)}:${ev}`, prompt, parts, subgoals: PO_SUB, exam: examTag(opts) });
   return statItem({
     skill: PO, level, key: `${level}:${D.g}:${t(lam)}:${ev}`, prompt, parts, subgoals: PO_SUB, exam: examTag(opts),
+    simulate: { model: 'poisson', lambda: lam.valueOf(), event: { op: cum ? 'le' : 'eq', k }, answer: v, label: `Pr(${ev})` },
     hints: H('λ = n·p (ou le taux sur la durée) ; puis Pr(X = k) = λᵏe^(−λ)/k!.', `${M(poisTerm(lam, 0))} + …`, `Pr(${ev}) ≈ ${f3(v)}`),
   });
 }
@@ -396,16 +398,16 @@ function hyItem(level, rng, profile, opts = {}) {
     wrongActions: [{ label: 'Multiplier des probabilités comme pour une binomiale', rule: 'p_binom_without_replacement', why: 'Sans remise, les tirages ne sont pas indépendants : on compte.' }, { label: `Choisir seulement les ${what}`, rule: 'p_count_forget_rest', why: 'Il faut aussi choisir les autres.' }],
     traps: { p_binom_without_replacement: { values: [t(binV)] }, p_count_forget_rest: { values: [t(q(C(r, k), om))].filter((x) => x !== t(v)), ctx: { k, 'n−k': n - k } } },
     lines: [
-      { math: `C(${r};${k})×C(${b};${n - k})/C(${N};${n})`, note: `${k} ${what}, ${n - k} autres, sur toutes les mains`, subgoal: 'count', blank: [String(k), String(n - k)] },
+      { math: `C(${r};${k})×C(${b};${n - k})/C(${N};${n})`, note: `${nb(k, what)}, ${nb(n - k, 'autres')}, sur tous les tirages`, subgoal: 'count', blank: [String(k), String(n - k)] },
       { math: `${fa}/${om}`, note: 'Calculer', blank: [String(om)] },
       ...(v.d === om ? [] : [{ math: t(v), note: 'Simplifier', blank: [t(v)] }]),
     ],
   };
   if (opts.exam === 'mcq') {
-    return choice({ skill: HY, level: 4, key: `mcq:${r}:${b}:${n}:${k}`, exam: examTag(opts), prompt: `${story} Probabilité d'obtenir exactement ${k} ${what} ?`, right: s(v), wrongs: [{ html: s(binV), rule: 'p_binom_without_replacement' }, { html: s(q(C(r, k), om)), rule: 'p_count_forget_rest' }], fillers: [{ html: s(q(k, n)) }, { html: s(q(fa, om * 2)) }] }, rng);
+    return choice({ skill: HY, level: 4, key: `mcq:${r}:${b}:${n}:${k}`, exam: examTag(opts), prompt: `${story} Probabilité d'obtenir exactement ${nb(k, what)} ?`, right: s(v), wrongs: [{ html: s(binV), rule: 'p_binom_without_replacement' }, { html: s(q(C(r, k), om)), rule: 'p_count_forget_rest' }], fillers: [{ html: s(q(k, n)) }, { html: s(q(fa, om * 2)) }] }, rng);
   }
   const parts = [pk];
-  let prompt = `${story} Probabilité d'obtenir exactement ${k} ${what} ?`;
+  let prompt = `${story} Probabilité d'obtenir exactement ${nb(k, what)} ?`;
   if (level >= 4 && !opts.exam) {
     const p0 = q(C(b, n), om);
     const ge = q(1).sub(p0);
@@ -419,6 +421,7 @@ function hyItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'coef') return coefItem({ skill: HY, key: `coef:${r}:${b}:${n}:${k}`, prompt, parts, subgoals: HY_SUB, exam: examTag(opts) });
   return statItem({
     skill: HY, level, key: `${level}:${r}:${b}:${n}:${k}`, prompt, parts, subgoals: HY_SUB, exam: examTag(opts),
+    simulate: { model: 'urn', balls: { R: r, B: b }, draw: n, replace: false, count: 'R', event: { op: 'eq', k }, answer: v.valueOf(), label: `Pr(X = ${k})` },
     hints: H('Sans remise : on compte, on ne multiplie pas des p.', M(`C(${r};${k})×C(${b};□)/C(${N};${n})`), `Pr(X = ${k}) = ${s(v)}`),
   });
 }
