@@ -9,7 +9,7 @@ import { SKILLS } from '../js/content/uni/cplx-b.skills.js';
 import { VERIFY } from '../js/content/uni/cplx-b-kit.js';
 
 // Skills whose generators are not written yet (emptied when the part is done).
-const STUBBED = new Set(["c-int-branch", "c-fourier-residues", "c-conformal"]);
+const STUBBED = new Set([]);
 // Items per level: 20 (never under 15).
 const COUNTS = Object.fromEntries(SKILLS.map((s) => [s.id, 20]));
 
