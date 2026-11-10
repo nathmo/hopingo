@@ -39,7 +39,7 @@ function cdData(rng, kinds) {
     const P = t.div(a).pow(k + 1);
     return {
       kind, k, a, I, c: I.inv(), improper: false,
-      kernel: `x^${k}`, support: `[0 ; ${a}]`, supportT: `0 ≤ x ≤ ${a}`,
+      kernel: k === 1 ? 'x' : `x^${k}`, support: `[0 ; ${a}]`, supportT: `0 ≤ x ≤ ${a}`,
       Ilines: [{ math: `${a}^${k + 1}/${k + 1}`, blank: [`${k + 1}`], note: `∫₀^${a} x^${k} dx = [x^${k + 1}/${k + 1}]₀^${a}`, subgoal: 'int' }, { math: qt(I), blank: [qt(I)] }],
       wrongI: a === 1 ? null : q(1, k + 1),
       F: `(x/${a})^${k + 1}`, Fdom: [0.1 * a, 0.9 * a], Fout: `F(x) = 0 si x < 0 et F(x) = 1 si x > ${a}`,

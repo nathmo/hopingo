@@ -489,6 +489,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-cont-density` — Densité : normaliser, F ↔ f, probabilités
 - **Année** 15 · **Prérequis** `a1-int-direct`, `a1-improper-calc` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties I (intégrale du noyau sur le support), c, puis une probabilité (`prob`, exacte ; `stat` pour l'exponentielle) ; aux niveaux 4 et 5, F sur le support (partie `prob` à variable x) suivie de la décision « hors du support » (`p_cdf_piecewise` est une option de décision : pas de saisie de F par morceaux). Gabarit (b) (F donnée, f par dérivation) au niveau 4, une fois sur trois, avec F puissance ou Pareto (pas la logistique) ; Cauchy seulement nommée dans les QCM d'autres compétences. Niveau 5 : Pareto, F, puis Pr(X > 2 | X < 3). Les lignes de primitive sont écrites en nombres (0 − (−1/3)), pas en crochets.
 - **Intro** : une densité vérifie f ≥ 0 et ∫ f = 1 **sur le support**. Pr(a < X ≤ b) = ∫ₐᵇ f = F(b) − F(a), F′ = f, et Pr(X = a) = 0. Une densité peut dépasser 1. Exemple : f(x) = c·x⁻⁴ pour x ≥ 1 : `c·[−x⁻³/3]₁^∞ = c/3 = 1` (note : donc c = 3) ; `F(x) = 1 − x⁻³ pour x ≥ 1`.
 - **Juge** : `prob` pour c et les probabilités (exactes) ; `equiv` `{vars: ['x'], domain: {x: support}}` pour F et f, avec un contrôle des morceaux (F = 0 avant le support, 1 après) ; `stat {decimals: 3}` si c contient π ou e · **Forme finale** : c exact ; F définie sur tout ℝ (par morceaux) ; probabilité exacte.
 - **Niveaux** :
@@ -512,6 +513,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-cont-quantile` — Quantile d'une loi continue
 - **Année** 15 · **Prérequis** `p-cont-density` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). F (partie à variable x à partir du niveau 2), puis q (`stat`, forme exacte acceptée). Lois : puissance, x²/a², Pareto, exponentielle, uniforme, Rayleigh (θ numérique, niveau 5). Niveau 5 : Rayleigh, exponentielle, Pareto, ou c·x sur [0 ; a] à normaliser puis la médiane a/√2. `p_quantile_from_pdf` et `p_quantile_inverse` sont des valeurs fausses quand elles existent, et des options de décision.
 - **Intro** : le quantile d'ordre α est la solution q de F(q) = α (F inversible). Médiane : α = 1/2 ; quartile supérieur : α = 3/4. On résout sur **F**, pas sur f. Exemple : f(x) = 3x² sur [0 ; 1] : `F(x) = x³` ; `q₀,₇₅ = (3/4)^(1/3) ≈ 0,909`.
 - **Juge** : `equiv` pour F ; `stat {decimals: 3}` pour q, une forme exacte (`(3/4)^(1/3)`) étant acceptée · **Forme finale** : q exact ou à 0,001 près.
 - **Niveaux** :
@@ -532,6 +534,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-unif-exp` — Uniforme et exponentielle, absence de mémoire
 - **Année** 15 · **Prérequis** `p-cont-density`, `p-cond-total` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : attente uniforme (densité, Pr(X > t), variance aux niveaux 4–5), queue exponentielle, absence de mémoire (λ, deux queues, puis le quotient, comparé à e^(−λt) à 0,0015 près pour accepter les queues arrondies), médiane ln 2/λ, premier appel. Durées en années. Le QCM « étonnant ? » du niveau 5 n'est pas posé (le niveau 5 est l'absence de mémoire en quatre parties).
 - **Pourquoi ces prérequis** : `p-cont-density` : F ↔ f et probabilités par intégrales.
 - **Intro** : U(a, b) : f = 1/(b − a), F(x) = (x − a)/(b − a), E = (a + b)/2, var = (b − a)²/12. exp(λ) : f = λe^(−λx), F = 1 − e^(−λx), **E = 1/λ**, var = 1/λ² (λ est un taux, à l'inverse de Poisson). Sans mémoire : Pr(X > s + t | X > s) = Pr(X > t). Exemple : moyenne 10 ans, `λ = 1/10` ; `Pr(X > 12 | X > 2) = Pr(X > 10) = e^(−1) ≈ 0,368`.
 - **Juge** : `stat {decimals: 3}` ; forme exacte acceptée par `equiv` · **Forme finale** : valeur à 0,001 près.
@@ -554,6 +557,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-moments` — Espérance et variance d'une loi
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `p-cont-density` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Lois : tableau discret à 3 ou 4 valeurs, (k + 1)yᵏ sur ]0 ; 1[, Pareto α ∈ 3..5 ; parties E[X], E[X²], var (`prob`). L'existence est une décision (option fausse `p_mean_not_exist`), Cauchy dans le QCM. Niveau 5 : E[e^X], E[e^(2X)] et var(e^X) pour X ~ exp(λ), λ ∈ 3..5 (pas E[X(X − 1)] pour Poisson). Le V/F « toute densité a une espérance » est remplacé par König-Huygens (vrai), faute de contre-exemple numérique.
 - **Pourquoi ces prérequis** : `p-disc-pmf` : E[X] = Σ x·f(x) ; `p-cont-density` : E[X] = ∫ x·f(x) dx.
 - **Intro** : E[X] = Σ x·f(x) ou ∫ x·f(x) dx ; E[g(X)] = ∫ g(x)·f(x) dx, qui n'est pas g(E[X]) ; var(X) = E[X²] − E[X]² ≥ 0. L'espérance existe seulement si l'intégrale converge (Cauchy : non ; Pareto α ≤ 1 : non). Exemple : f(y) = 5y⁴ sur ]0 ; 1[ : `E[Y] = 5/6` ; `E[Y²] = 5/7` ; `var(Y) = 5/7 − 25/36 = 5/252`.
 - **Juge** : `prob` (exact) ; `equiv` si la réponse dépend d'un paramètre (`vars: ['λ']`, domaine du paramètre) · **Forme finale** : fraction irréductible ou expression simplifiée du paramètre.
@@ -575,6 +579,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-family` — Reconnaître Gamma, Beta, Weibull, Pareto, χ²
 - **Année** 15 · **Prérequis** `p-unif-exp`, `p-moments` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : Gamma à θ symbolique (E et var par le juge `prob` à variable θ) ou numérique, Beta (α, β, constante, E), somme d'exponentielles, χ²(r) = Γ(r/2, 2) ; la famille est une décision. Weibull et Pareto ne sont pas proposés à reconnaître sur F (gabarit d) ; la comparaison avec trois intégrations par parties (niveau 5) n'est pas montrée. Variante `open` (10 points) : Gamma symbolique avec la constante Γ(k)θᵏ vérifiée.
 - **Pourquoi ces prérequis** : `p-unif-exp` : l'exponentielle est la loi Γ(1, θ).
 - **Intro** : on lit le **noyau** (la partie qui dépend de x) pour reconnaître la loi et éviter un calcul. x^(k−1)e^(−x/θ) → Γ(k, θ), constante 1/(Γ(k)θᵏ), E = kθ, var = kθ², Γ(n) = (n − 1)!. x^(α−1)(1 − x)^(β−1) sur [0 ; 1] → Beta(α, β), constante Γ(α + β)/(Γ(α)Γ(β)), E = α/(α + β). k·t^(k−1)e^(−tᵏ) → Weibull, F = 1 − e^(−tᵏ). α·x^(−α−1) sur ]1 ; ∞[ → Pareto, F = 1 − x^(−α). χ²(r) = Γ(r/2, 2). Somme de n exp(λ) indépendantes : Γ(n, 1/λ). Exemple : `f ∝ y²e^(−y/θ)` (note : k − 1 = 2) ; `Y ~ Γ(3, θ), E[Y] = 3θ, var(Y) = 3θ²`.
 - **Juge** : décision (famille, puis paramètres dans un menu ou tapés) ; `equiv` `{vars: ['θ'], domain: {θ: [0.5, 5]}}` pour E, var et constante · **Forme finale** : loi nommée avec ses paramètres, puis E et var.
@@ -597,6 +602,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-normal-std` — Loi normale : standardiser, table de Φ
 - **Année** 15 · **Prérequis** `p-cont-density` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties z, Φ(|z|) (lecture de table, voisins de la grille acceptés), probabilité. Gabarits : Pr(X > x), Pr(X < x) avec z < 0, Pr(a < X < b), énoncé avec la variance (σ = √variance, carré parfait au lieu de 63,84), et au niveau 5 la conditionnelle ou Pr(X > Y) pour deux normales indépendantes (triplets pythagoriciens).
 - **Pourquoi ces prérequis** : `p-cont-density` : Pr(X ≤ x) = F(x).
 - **Intro** : X ~ N(μ, σ²) ⇒ Z = (X − μ)/σ ~ N(0, 1), donc Pr(X ≤ x) = Φ((x − μ)/σ). Le 2ᵉ paramètre est la **variance**. Φ(−z) = 1 − Φ(z) ; Pr(X > x) = 1 − Φ(·). aX + b est normale ; une somme de normales indépendantes est normale. Exemple : N(100, 15²) : `z = (130 − 100)/15 = 2` ; `Pr(X > 130) = 1 − Φ(2) = 1 − 0,977 = 0,023`.
 - **Juge** : lignes étiquetées `z = …` (`stat {decimals: 3}`), `Φ(…) = …` (lecture de table, convention 3), probabilité (`stat {decimals: 3}`) · **Forme finale** : probabilité à 0,001 près.
@@ -619,6 +625,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-normal-inverse` — Quantiles normaux, retrouver μ ou σ
 - **Année** 15 · **Prérequis** `p-normal-std` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties « Φ(…) = 1 − part », z = Φ⁻¹ (table 2, avec ses décimales : 0,990 → 2,326), puis σ, μ ou le seuil (`stat`). Niveau 5 et variante `open` (8 points, la partie de l'examen 2020–22, ex. 12) : σ puis Pr(X > c₂) avec ce σ, comparé à 0,002 près. L'intervalle central (gabarit d) n'est pas fait.
 - **Intro** : on lit la table à l'envers : Pr(X > c) = 0,1 ⇒ (c − μ)/σ = Φ⁻¹(0,9) = 1,28 (Table 2). Quantile d'ordre α de N(μ, σ²) : μ + σ·Φ⁻¹(α). Intervalle symétrique de probabilité 0,5 : ±Φ⁻¹(0,75) = ±0,67. Exemple : `Φ(5/σ) = 0,9` ; `5/σ = 1,28, σ ≈ 3,9`.
 - **Juge** : lignes étiquetées ; `Φ⁻¹(…) = …` lecture de table (valeur imprimée, ou exacte ± 0,005) ; résultat `stat {decimals: 1 ou 2}` · **Forme finale** : paramètre ou seuil à la précision demandée.
 - **Niveaux** :
@@ -640,6 +647,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-transform` — Loi de Y = g(X) ; échantillonnage par F⁻¹
 - **Année** 15 · **Prérequis** `p-cont-density`, `a1-deriv-inverse`, `a2-change-var`, `p-family` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : X = −ln(U)/λ (g⁻¹, sa dérivée, f_X, puis reconnaître exp(λ)), Y = X² pour X ~ U(0 ; 1), Y = aX + b pour X exponentielle, et F⁻¹(u) (exponentielle, Pareto, Weibull) ; le support est une décision. Rayleigh → χ²(2), la log-normale et le gabarit à deux dimensions (g) ne sont pas faits ; `a2-change-var` n'est donc pas crédité (raison dans `prereqWhy`). Variante `open` (10 points) : le gabarit (a) ; `coef` : la densité en x = 1.
 - **Pourquoi ces prérequis** : `p-cont-density` : densité f_X et son support.
 - **Intro** : si g est strictement monotone sur le support, f_Y(y) = f_X(g⁻¹(y))·|dg⁻¹/dy| sur g(support), 0 ailleurs. Autre voie : F_Y(y) = Pr(g(X) ≤ y), puis dériver. Cas particuliers : Y = aX ⇒ f_Y(y) = f_X(y/a)/|a| ; Z ~ N(0, 1) ⇒ Z² ~ χ²(1) ; U ~ U(0, 1) ⇒ F⁻¹(U) ~ F (échantillonnage). Exemple : X = −ln(U)/λ : `g⁻¹(x) = e^(−λx)` ; `f_X(x) = 1·|−λe^(−λx)| = λe^(−λx)` (note : exp(λ)).
 - **Juge** : décision (support de Y, méthode) ; `equiv` `{vars: ['y'], domain: {y: support de Y}}` pour g⁻¹, sa dérivée et f_Y ; une ligne « f_Y(y) = … » est contrôlée aussi en dehors du support (doit valoir 0) · **Forme finale** : f_Y simplifiée avec son support ; loi nommée si c'en est une.
@@ -657,12 +665,13 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
   4. `f_X(x) = f_U(e^(−λx))·|−λe^(−λx)| = λe^(−λx) pour x > 0` — formule
   5. `X ~ exp(λ)` — reconnaître
 - **Aides** : 1 « Inverse g, dérive l'inverse, prends la valeur absolue. » · 2 `f_X(x) = 1 · |…|` · 3 `f_X(x) = λe^(−λx)`.
-- **Variantes d'examen** : `open` (MATH-234 : ex. 8, 10 points ; ex. 13.3) ; `coef` (densité en un point) ; `mcq` (distracteurs : `p_transform_jacobian` → f = 1, `p_transform_abs` → −λe^(−λx), `p_transform_support` → support ]0 ; 1[) ; `tf` (EE-209) : « Si Z ~ N(0, 1), Z² ~ χ²(1) » (vrai) ; « Si Y = 2X, alors f_Y(y) = 2f_X(y) » (faux ; contre-exemple X ~ U(0, 1) : 2f_X intègre à 4 sur [0 ; 2]).
+- **Variantes d'examen** : `open` (MATH-234 : ex. 8, 10 points ; ex. 13.3) ; `coef` (densité en un point) ; `mcq` (distracteurs : `p_transform_jacobian` → f = 1, `p_transform_abs` → −λe^(−λx), `p_transform_support` → support ]0 ; 1[) ; `tf` (EE-209) : « Si Z ~ N(0, 1), Z² ~ χ²(1) » (vrai) ; « Si Y = 2X, alors f_Y(y) = 2f_X(y) » (faux ; contre-exemple X ~ U(0, 1) : 2f_X vaut 2 sur [0 ; 1] et intègre à 2, pas à 1).
 - **Pièges** : `p_transform_jacobian`, `p_transform_abs`, `p_transform_support`, `p_scale_density`.
 - **Sous-buts → crédit** : dériver g⁻¹ → `a1-deriv-inverse` ; jacobien (gabarit g) → `a2-change-var` ; reconnaître → `p-family` ; formule → `p-transform`.
 
 ### `p-joint-disc` — Loi conjointe discrète
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `p-indep` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Tableaux 2 × 2 ou 2 × 3 (X ∈ {0 ; 1}) : indépendant, dépendant (perturbation ±0,05) ou « dépendant mais non corrélé » (lignes symétriques, cov = 0) ; parties p_X(1), p_Y(0), Pr(X = 1 | Y = 1) avec la décision d'indépendance qui cite une case, et cov aux niveaux 4–5. Le niveau 5 est le tableau non corrélé, pas le max de deux dés.
 - **Pourquoi ces prérequis** : `p-disc-pmf` : les marginales sont des fonctions de masse ; `p-indep` : indépendance vérifiée case par case.
 - **Intro** : un tableau p(x, y). Marginales : sommes des lignes et des colonnes. Conditionnelle : p(x | y) = p(x, y)/p_Y(y). Indépendance : p(x, y) = p_X(x)·p_Y(y) **pour toutes** les cases (une case fausse suffit pour dire non). cov(X, Y) = E[XY] − E[X]E[Y]. Exemple : `p(0, 0) = 0,1 ≠ 0,4 · 0,3` (note : dépendants) ; `cov = 0,6 − 0,6 · 1 = 0` (note : non corrélés quand même).
 - **Juge** : `prob` ; tableau des marginales en `table` ; décision « indépendants ? » appuyée sur une case · **Forme finale** : marginales, décision justifiée, conditionnelle ou covariance demandée.
@@ -686,6 +695,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-joint-cont` — Densité conjointe : constante, marginales, indépendance
 - **Année** 15 · **Prérequis** `p-cont-density`, `a2-fubini-rect`, `a2-domain-describe`, `a2-improper-multi` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Noyaux w(w + z), w + z, w^p·z^q sur [0 ; A] × [0 ; B] : intégrale intérieure (partie à variable w), I, c, marginale de W et décision d'indépendance ; noyau exponentiel c·y·e^(−ax−by) au niveau 4 (une fois sur trois) ; niveau 5 : le triangle 24xy (marginale, indépendance). Pr(X < Y) n'est pas demandé. A2 n'est pas construit sur cette branche : `a2-*` sont crédités par leurs remplaçants (`UNBUILT`).
 - **Pourquoi ces prérequis** : `p-cont-density` : chaque marginale est une densité.
 - **Intro** : ∬ f = 1 sur le support ; marginale f_X(x) = ∫ f(x, y) dy, avec des bornes qui peuvent dépendre de x ; indépendance ⇔ f(x, y) = f_X(x)·f_Y(y), ce qui demande que f se factorise **et** que le support soit un rectangle. Exemple : f(w, z) = c·w(w + z) sur [0 ; 3]² : `∫₀³ (w² + wz) dz = 3w² + 9w/2` ; `c · 189/4 = 1, c = 4/189`.
 - **Juge** : `prob` pour c et les probabilités ; `equiv` `{vars: ['w'], domain: {w: [0, 3]}}` pour les marginales, avec le contrôle du support ; décision pour l'indépendance · **Forme finale** : c exact ; marginales simplifiées avec support ; décision justifiée.
@@ -710,6 +720,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-lin-combo` — Combinaisons linéaires : espérance, variance, covariance
 - **Année** 15 · **Prérequis** `p-moments` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : portefeuille X_A + aX_B + bX_C (E, cov par E[XY], var, σ) et var(XY) pour X, Y indépendantes (à partir du niveau 3). Le niveau 5 n'est pas le problème à trois variables Z₁, Z₂, Z₃ avec toutes les corrélations : c'est l'un des deux gabarits, sans aide. var(X̄) n'est pas un gabarit.
 - **Pourquoi ces prérequis** : `p-moments` : E et var de chaque variable.
 - **Intro** : E[aX + bY + c] = aE[X] + bE[Y] + c, toujours. var(aX + bY) = a²var(X) + b²var(Y) + 2ab·cov(X, Y). cov(X, Y) = E[XY] − E[X]E[Y] ; indépendants ⇒ cov = 0. Pour X, Y indépendants : var(XY) = E[X²]E[Y²] − (E[X]E[Y])². Moyenne de n variables iid : var(X̄) = σ²/n. Exemple : `E[X] = 2 + 2 · 3 − 1 = 7` ; `var(X) = 3 + 4 · 2 + 6 + 2(0 + 2 · (−2) + 2 · 1) = 13`.
 - **Juge** : `prob` · **Forme finale** : nombres exacts ; écart-type √ simplifiée ou à 0,01.

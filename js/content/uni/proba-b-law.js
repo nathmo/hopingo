@@ -124,7 +124,7 @@ function cqMcq(rng, opts) {
     skill: CQ, level: 4, key: `mcq:${a}`, exam: examTag(opts),
     prompt: `X a pour densité f(x) = c·x pour 0 ≤ x ≤ ${a} (et 0 ailleurs). Quelle est la médiane de X ?`,
     right: med,
-    wrongs: [{ html: qs(q(a * a, 4)), rule: 'p_quantile_from_pdf' }, { html: qs(q(2 * a, 3)), rule: 'p_median_mean' }, { html: qs(q(1, 4 * a * a)), rule: 'p_quantile_inverse' }],
+    wrongs: [{ html: qs(q(a * a, 4)), rule: 'p_quantile_from_pdf' }, { html: qs(q(2 * a, 3)), rule: 'p_median_mean' }, { html: qt(q(1, 4 * a * a)), rule: 'p_quantile_inverse' }],
     fillers: [{ html: qs(q(a, 2)) }],
   }, rng);
 }
@@ -157,6 +157,7 @@ const UE = 'p-unif-exp';
 const UE_SUB = [{ id: 'cond', label: 'conditionner', skill: 'p-cond-total' }, { id: 'tail', label: 'F, queue', skill: UE }];
 const MEANS = [2, 5, 10, 20];
 const unit = () => 'ans';
+const ans = (x) => (x === 1 ? '1 an' : `${fr(x)} ans`);
 
 function ueItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return ueMcq(rng, opts);
@@ -204,7 +205,7 @@ function ueItem(level, rng, profile, opts = {}) {
   const B = Math.exp(-s / m);
   const r = Math.exp(-t / m);
   return statItem({ skill: UE, level, key: `${level}:memo:${m}:${s}:${t}`, exam: examTag(opts),
-    prompt: `La durée de vie X d'une télévision suit une loi exponentielle de moyenne ${m} ${U}. Elle fonctionne déjà depuis ${fr(s)} ${U}. Quelle est la probabilité qu'elle dure encore au moins ${fr(t)} ${U} (au millième) ?`,
+    prompt: `La durée de vie X d'une télévision suit une loi exponentielle de moyenne ${ans(m)}. Elle fonctionne déjà depuis ${ans(s)}. Quelle est la probabilité qu'elle dure encore au moins ${ans(t)} (au millième) ?`,
     parts: [lamPart,
       { label: `Pr(X>${fr(s + t)})`, name: 'A', kind: 'stat', expect: `e^(-$lam*${s + t})`, action: 'Queue Pr(X > s + t)', lines: [{ math: `e^(-${fr(s + t)}/${m})`, subgoal: 'tail', blank: [fr(s + t)] }, { math: dl(A, 3) }] },
       { label: `Pr(X>${fr(s)})`, name: 'B', kind: 'stat', expect: `e^(-$lam*${s})`, action: 'Queue Pr(X > s)', lines: [{ math: `e^(-${fr(s)}/${m})`, subgoal: 'tail', blank: [fr(s)] }, { math: dl(B, 3) }] },
@@ -258,7 +259,7 @@ function ueTf(rng, opts) {
   const m = pickOf(rng, MEANS);
   if (rng.chance(0.5)) {
     return tf({ skill: UE, key: `tv:${m}`, exam: examTag(opts), truth: false, ruleIfTrue: 'p_memoryless_ignored',
-      statement: `La durée de vie d'une télévision suit une loi exponentielle de moyenne ${m} ans. Une télévision qui a déjà ${m / 5} ans a moins de chances de durer encore ${m} ans qu'une neuve.`,
+      statement: `La durée de vie d'une télévision suit une loi exponentielle de moyenne ${m} ans. Une télévision qui a déjà ${m / 5} an${m / 5 > 1 ? 's' : ''} a moins de chances de durer encore ${m} ans qu'une neuve.`,
       explanation: `Faux : Pr(X > ${m / 5 + m} | X > ${m / 5}) = e^(−${fr(m)}/${m}) = Pr(X > ${m}) ≈ 0,368 (absence de mémoire).`,
       counter: numCounter({ vars: [{ v: 'u', label: `Usée : Pr(X > ${fr(m / 5 + m)} | X > ${fr(m / 5)}) =` }, { v: 'n', label: `Neuve : Pr(X > ${m}) =` }], hyp: '|u-0,3679|<0,001∧|n-0,3679|<0,001', pred: 'u<n', answer: { u: 'e^(-1)', n: 'e^(-1)' } }) });
   }
@@ -519,7 +520,7 @@ function faMcq(rng, opts) {
   const k = rng.int(2, 5);
   return choice({ skill: FA, level: 4, key: `mcq:${k}`, exam: examTag(opts),
     prompt: `Y a pour densité f(y) ∝ y${k - 1 === 1 ? '' : `^${k - 1}`}·e^(−y/θ) pour y ≥ 0 (θ > 0). Que vaut E[Y] ?`,
-    right: `${k}θ`, wrongs: [{ html: `${k}/θ`, rule: 'p_gamma_scale_rate' }, { html: `${k - 1}θ`, rule: 'p_gamma_shape_off' }], fillers: [{ html: `${k}θ²` }, { html: 'θ' }] }, rng);
+    right: `${k}θ`, wrongs: [{ html: `${k}/θ`, rule: 'p_gamma_scale_rate' }, { html: k === 2 ? 'θ' : `${k - 1}θ`, rule: 'p_gamma_shape_off' }], fillers: [{ html: `${k}θ²` }, { html: 'θ' }] }, rng);
 }
 
 function faTf(rng, opts) {

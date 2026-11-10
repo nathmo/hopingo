@@ -197,7 +197,7 @@ function jcItem(level, rng, profile, opts = {}) {
       lines: [{ math: fW, subgoal: 'joint', blank: [K.inner] }] },
   ];
   return statItem({ skill: JC, level, key: `${level}:${K.kind}:${K.kern}:${K.A}:${K.B}`, exam: examTag(opts),
-    prompt: `(W, Z) a pour densité f(w, z) = ${W(`c×(${K.kern})`)} sur ${rect}, et 0 ailleurs. Calcule l'intégrale intérieure en z, l'intégrale double I du noyau, c, puis la marginale de W.`,
+    prompt: `(W, Z) a pour densité f(w, z) = ${W(K.kind === 'sum' ? `c×(${K.kern})` : `c×${K.kern}`)} sur ${rect}, et 0 ailleurs. Calcule l'intégrale intérieure en z, l'intégrale double I du noyau, c, puis la marginale de W.`,
     parts, subgoals: JC_SUB.filter((s) => s.id === 'fubini' || s.id === 'joint'),
     hints: H('Intègre d\'abord en z (w fixé), puis en w ; ∬ f = 1 donne c.', `∫₀^${K.B} (${K.kern}) dz = □`, `I = ${qs(K.I)}, c = ${qs(c)}, f_W(w) = ${SM(fW, { vars: ['w'] })}`) });
 }
@@ -270,7 +270,7 @@ function jcTf(rng, opts) {
 function jcCoef(rng) {
   const K = jcKernel(rng, ['wz', 'sum', 'prod']);
   return coefItem({ skill: JC, key: `coef:${K.kind}:${K.kern}:${K.A}:${K.B}`, exam: { format: 'coef', points: 1 },
-    prompt: `(W, Z) a pour densité f(w, z) = ${W(`c×(${K.kern})`)} sur [0 ; ${K.A}] × [0 ; ${K.B}], et 0 ailleurs. Que vaut c ?`,
+    prompt: `(W, Z) a pour densité f(w, z) = ${W(K.kind === 'sum' ? `c×(${K.kern})` : `c×${K.kern}`)} sur [0 ; ${K.A}] × [0 ; ${K.B}], et 0 ailleurs. Que vaut c ?`,
     parts: [{ label: 'c', kind: 'prob', expect: qt(K.I.inv()), traps: K.A === 1 && K.B === 1 ? undefined : { p_normalize_bounds: { values: [qt(K.I01.inv())] } }, lines: [{ math: qt(K.I.inv()) }] }], subgoals: JC_SUB.filter((s) => s.id === 'joint') });
 }
 
