@@ -357,8 +357,8 @@ export const RULES = [
       : '1/(1 − x) tend vers 1, pas vers 0 : le DL de eᵘ en 0 ne s\'applique pas. Sors e¹ : e^(1/(1 − x)) = e·e^(1/(1 − x) − 1).'),
   },
   {
-    // U4: skill a1-fn-limits (the catalogue's skill of this trap).
-    id: 'a1_ipe_in_sum', family: 'rule', tag: 'C', skill: 'a1-dl-limits', repair: 'a1-dl-limits', judges: ['limit'],
+    // Step U4: the catalogue's skill and repair, a1-fn-limits.
+    id: 'a1_ipe_in_sum', family: 'rule', tag: 'C', skill: 'a1-fn-limits', repair: 'a1-fn-limits', judges: ['limit'],
     name: 'Équivalent remplacé dans une somme',
     example: ['(x − sin x)/x³ avec sin x ~ x : (x − x)/x³ → 0', '(x − sin x)/x³ → 1/6'],
     check: { judge: { kind: 'limit', v: 'x', to: '0' }, prev: '(x-sin(x))/x^3', line: '0' },
