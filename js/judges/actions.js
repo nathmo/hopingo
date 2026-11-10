@@ -214,7 +214,9 @@ ACTIONS.induction = (prev) => {
 // [{at: text of the line before, options}]): the one whose line is the
 // student's previous line, else cfg.menu, else none (free line).
 ACTIONS.steps = (prev, cfg) => {
-  const key = toText(sp(prev));
+  // A line the CAS does not print (judge vector, geom: step U6) uses cfg.menu.
+  let key;
+  try { key = toText(sp(prev)); } catch { return cfg.menu || []; }
   for (const m of cfg.menus || []) {
     if (!m.key) m.key = toText(sp(parse(m.at, { vars: cfg.vars })));
     if (m.key === key) return m.options;
