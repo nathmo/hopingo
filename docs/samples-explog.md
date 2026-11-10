@@ -708,7 +708,7 @@ Résous log_(1/10)(2x) > log_(1/10)(x + 3).
     = □ < x + 3   (trous : 2x < x + 3)   ← Base 1/10 < 1 : on retourne
     = x < 3   ← Résoudre
     = ]0 ; 3[   ← Intersecter avec D
-  aides : log_1/10 est décroissante : le plus grand logarithme a le plus petit argument. | 2x < … | 2x < x + 3
+  aides : La fonction log de base 1/10 est décroissante : le plus grand logarithme a le plus petit argument. | 2x < … | 2x < x + 3
   pièges : g9_bracket, g2_log_domain, g2_base_lt1
 
 Résous log_(1/10)(x + 1) ≤ log_(1/10)(2x).
@@ -718,7 +718,7 @@ Résous log_(1/10)(x + 1) ≤ log_(1/10)(2x).
     = □ ≥ 2x   (trous : x + 1 ≥ 2x)   ← Base 1/10 < 1 : on retourne
     = x ≤ 1   ← Résoudre
     = ]0 ; 1]   ← Intersecter avec D
-  aides : log_1/10 est décroissante : le plus grand logarithme a le plus petit argument. | x + 1 ≥ … | x + 1 ≥ 2x
+  aides : La fonction log de base 1/10 est décroissante : le plus grand logarithme a le plus petit argument. | x + 1 ≥ … | x + 1 ≥ 2x
   pièges : g9_bracket, g2_log_domain, g2_base_lt1
 
 Résous log_(1/2)(2x) ≤ log_(1/2)(3x − 5).
@@ -728,7 +728,7 @@ Résous log_(1/2)(2x) ≤ log_(1/2)(3x − 5).
     = □ ≥ 3x − 5   (trous : 2x ≥ 3x − 5)   ← Base 1/2 < 1 : on retourne
     = x ≤ 5   ← Résoudre
     = ]5/3 ; 5]   ← Intersecter avec D
-  aides : log_1/2 est décroissante : le plus grand logarithme a le plus petit argument. | 2x ≥ … | 2x ≥ 3x − 5
+  aides : La fonction log de base 1/2 est décroissante : le plus grand logarithme a le plus petit argument. | 2x ≥ … | 2x ≥ 3x − 5
   pièges : g9_bracket, g2_log_domain, g2_base_lt1
 
 ```
@@ -754,7 +754,7 @@ Résous log_(1/10)(3x + 1) ≤ log_(1/10)(2x + 4).
     = 3x + 1 ≥ 2x + 4   ← Base 1/10 < 1 : on retourne
     = x ≥ 3   ← Résoudre
     = [3 ; +∞[   ← Intersecter avec D
-  aides : log_1/10 est décroissante : le plus grand logarithme a le plus petit argument. | 3x + 1 ≥ … | 3x + 1 ≥ 2x + 4
+  aides : La fonction log de base 1/10 est décroissante : le plus grand logarithme a le plus petit argument. | 3x + 1 ≥ … | 3x + 1 ≥ 2x + 4
   pièges : g9_bracket, g2_log_domain, g2_base_lt1
 
 Résous log₁₀(3x − 5) < log₁₀(x + 5).

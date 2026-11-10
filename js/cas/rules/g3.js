@@ -69,7 +69,7 @@ const LINE_RULES = [
       // 30° read as 30 (no conversion).
       if (contains(prev, (n) => n.t === 'bin' && n.deg)) out.push({ node: mapNode(prev, (n) => (n.t === 'bin' && n.deg ? n.l : n)), ctx: {} });
       // A family with 360 for 2π: π replaced by 180 next to k.
-      if (hasSym(prev, 'k') && (!ctx.cfg?.domain || ctx.cfg.domain === 'R')) {
+      if (ctx.cfg?.periodic && hasSym(prev, 'k') && (!ctx.cfg?.domain || ctx.cfg.domain === 'R')) {
         const swapped = mapNode(prev, (n) => (n.t === 'bin' && n.op === '×' && hasSym(n, 'k') ? mapNode(n, (y) => (y.t === 'const' && y.name === 'pi' ? num(180) : y)) : n));
         out.push({ node: swapped, ctx: {} });
       }
@@ -276,7 +276,7 @@ const LINE_RULES = [
     name: 'Un seul k, pas coupé à l\'intervalle',
     example: ['S = [−2π/3 ; 0]', 'S = {0} ∪ [4π/3 ; 2π]'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true, domain: '[0;2π]' }, prev: '-(2π)/3+2kπ≤x≤2kπ', line: '[-(2π)/3;0]' },
-    transform: (prev) => (hasSym(prev, 'k') ? [0, 1, -1, 2].map((k) => ({ node: mapNode(prev, (y) => (y.t === 'sym' && y.name === 'k' && !y.sub ? { t: 'paren', e: k < 0 ? { t: 'neg', e: num(-k) } : num(k) } : y)), ctx: { k } })) : []),
+    transform: (prev, ctx = {}) => (ctx.cfg?.periodic && hasSym(prev, 'k') ? [0, 1, -1, 2].map((k) => ({ node: mapNode(prev, (y) => (y.t === 'sym' && y.name === 'k' && !y.sub ? { t: 'paren', e: k < 0 ? { t: 'neg', e: num(-k) } : num(k) } : y)), ctx: { k } })) : []),
     explain: (ctx = {}) => `Ta solution${ctx.k !== undefined ? ` ne garde que k = ${ctx.k} et` : ''} sort de l'intervalle ou oublie un k. Teste chaque k (… −1, 0, 1, 2 …) et coupe chaque morceau à l'intervalle.`,
   },
   {

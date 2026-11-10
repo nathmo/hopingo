@@ -855,7 +855,7 @@ function iqSimple(level, rng, opts) {
   if (level === 2) {
     script.push({ kind: 'decision', prompt: 'Quand on enlève les logarithmes, faut-il retourner l\'inégalité ?', options: [
       { id: 'yes', label: `Oui : la base ${d.b.replace(/[()]/g, '')} est < 1`, valid: true },
-      { id: 'no', label: 'Non : on garde le même sens', valid: false, rule: 'g2_base_lt1', why: `log_${d.b.replace(/[()]/g, '')} est décroissante : le plus grand logarithme a le plus petit argument.` },
+      { id: 'no', label: 'Non : on garde le même sens', valid: false, rule: 'g2_base_lt1', why: `La fonction log de base ${d.b.replace(/[()]/g, '')} est décroissante : le plus grand logarithme a le plus petit argument.` },
     ] });
   }
   script.push(level <= 2 ? blanked(lines[1], [linP]) : lines[1], lines[2], lines[3]);
@@ -864,7 +864,7 @@ function iqSimple(level, rng, opts) {
   return linesItem({
     skill: IQ, level, prompt: `Résous ${MT(start)}.`,
     start, judge: withMenus(judge, level, start, sLines, IQ_CHOICES), mode: modeOf(level), script,
-    hints: H(d.lt1 ? `log_${d.b.replace(/[()]/g, '')} est décroissante : le plus grand logarithme a le plus petit argument.` : 'log est croissante si la base est > 1 : on garde le sens.', `${MT(linP)} ${rel} …`, MT(lines[1].math)),
+    hints: H(d.lt1 ? `La fonction log de base ${d.b.replace(/[()]/g, '')} est décroissante : le plus grand logarithme a le plus petit argument.` : 'log est croissante si la base est > 1 : on garde le sens.', `${MT(linP)} ${rel} …`, MT(lines[1].math)),
     subgoals: IQ_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${IQ}:${start}`, exam: examOf(opts, 3),
   });
