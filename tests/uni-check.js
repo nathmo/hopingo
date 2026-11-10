@@ -44,6 +44,8 @@ import { JUDGES } from '../js/judges/index.js';
 import { GEO_JUDGES, wrongGeo, checkOwnTemplate, checkPlotItem } from './uni-check-geo.js';
 // Step U6: the judges of module A2 (tests/uni-check-a2.js).
 import { A2_JUDGES, wrongA2, checkDomainItem } from './uni-check-a2.js';
+// Step U10: the judges of modules V, C and F (tests/uni-check-vcf.js).
+import { VCF_JUDGES, wrongVcf } from './uni-check-vcf.js';
 
 // Step U3: the first number of a matrix or a vector, plus one.
 const MATRIX_JUDGES = ['rowops', 'mat', 'eigvec', 'span', 'factor'];
@@ -78,6 +80,7 @@ function wrongSpanLine(cfg, final) {
 function wrongLine(cfg, final) {
   if (GEO_JUDGES.includes(cfg.kind)) return wrongGeo(cfg, final); // step U5
   if (A2_JUDGES.includes(cfg.kind)) return wrongA2(cfg, final); // step U6
+  if (VCF_JUDGES.includes(cfg.kind)) return wrongVcf(cfg, final); // step U10
   if (cfg.kind === 'eigvec') return `(${final.replace(/^.*=\s*/, '').replace(/[()]/g, '').split(';').map(() => '0').join(' ; ')})`;
   if (cfg.kind === 'span') return wrongSpanLine(cfg, final);
   if (cfg.kind === 'rowops' && cfg.track === 'det' && !/det|\[/.test(final)) return `${final}+1`;

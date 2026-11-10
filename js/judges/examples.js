@@ -39,6 +39,7 @@ import { checkSeqFn } from './counters.js';
 import { checkComplexCounter } from './counters-complex.js';
 
 import { checkA2 } from './a2-examples.js'; // step U6
+import { checkVcf } from './vcf-examples.js'; // step U10
 
 const SAMPLES = {
   R: ['-3', '-2', '-1', '-1/2', '0', '1/3', '1/2', '1', '2', '5/2', '3', '7'],
@@ -259,6 +260,7 @@ export function checkCounter(counter, answers) {
     case 'complex': return checkComplexCounter(counter, answers);
 
     case 'a2': return checkA2(counter, answers); // step U6
+    case 'vcf': return checkVcf(counter, answers); // step U10
     default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }

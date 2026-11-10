@@ -47,3 +47,11 @@ import * as proba from './proba.skills.js';
 
 UNI_UNITS.push(combi.UNIT, proba.UNIT);
 UNI_SKILLS.push(...combi.SKILLS, ...proba.SKILLS);
+
+// Step U10: modules V (unit vecto), C (unit cplx) and F (unit fourier).
+import * as vecto from './vecto.skills.js';
+import * as cplx from './cplx.skills.js';
+import * as fourier from './fourier.skills.js';
+
+UNI_UNITS.push(vecto.UNIT, cplx.UNIT, fourier.UNIT);
+UNI_SKILLS.push(...vecto.SKILLS, ...cplx.SKILLS, ...fourier.SKILLS);

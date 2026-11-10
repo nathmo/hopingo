@@ -19,8 +19,10 @@ import { evalFloat, sample } from '../cas/numeric.js';
 import { makeRng } from '../content/random.js';
 import { toText } from '../cas/print.js';
 import { diagnoseLine } from './diagnose.js';
-import { readLine, sameLine, frNum } from './common.js';
+import { readLine, sameLine, frNum, parseOpts } from './common.js';
 import { presentationIssue } from './equiv.js';
+// Step U10: potentials and harmonic conjugates (cfg.grad).
+import { judgePotential, isFinalPotential, readPotential } from './potential.js';
 
 export const sign = '=';
 const vOf = (cfg) => cfg.v || 'x';
@@ -75,6 +77,7 @@ function undefinedAt(cfg, dprev, node, state = {}) {
 }
 
 export function isFinal(cfg, node, state = {}) {
+  if (cfg.grad) return isFinalPotential(cfg, node, state); // step U10
   if (contains(node, (n) => n.t === 'int')) return false;
   const map = substOf(cfg, state);
   if (map && Object.keys(map).some((t) => dependsOn(node, t))) return false;
@@ -87,7 +90,11 @@ export function isFinal(cfg, node, state = {}) {
 
 export const start = (cfg) => cfg.start;
 
+// Lines are read by the CAS; with cfg.grad, the unknown functions α(y, z)… too.
+export const parseLine = (cfg, text) => (cfg.grad ? readPotential(cfg, text).node : parse(text, parseOpts(cfg)));
+
 export function judgeLine(cfg, prev, input, state = {}) {
+  if (cfg.grad) return judgePotential(cfg, prev, input, state); // step U10: ∇φ = F
   const read = readLine({ ...cfg, vars: varsOf(cfg) }, input);
   if (read.error) return read.error;
   const { node } = read;

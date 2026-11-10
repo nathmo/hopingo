@@ -304,3 +304,12 @@ export function renderChars(chars, caret) {
 KEYSETS.a2 = ['x', 'y', 'z', 'pd(', ',', 'r', 'φ', 'θ', 'λ', 'C', '_', ';', '≤', '|', ' ou ', 'back'];
 TAB_LABEL.a2 = 'xy ∂';
 Object.assign(LABEL, { 'pd(': '∂( , x)' });
+
+// Step U10 (V, C, F): parametrisations and boundaries (σ(r, φ), t ∈ [a ; b],
+// Γ₁ : point), and transforms (ℱ, ℒ, the transform û of the unknown,
+// Heaviside H, δ, the half-plane Re z > …).
+KEYSETS.vecto = ['(', ';', ')', 't', 'r', 'φ', 'θ', 'σ', 'γ', '∈', '[', ']', '×', '∧', 'Γ', '_', ':', 'point', ' et ', "s'annulent", 'back'];
+TAB_LABEL.vecto = 'σ ∈ Γ';
+KEYSETS.transf = ['ℱ(', 'ℒ(', 'α', 'z', 'û', 'Y', 'U', 'H(', 'δ', '|', 'e^(', '√(2π)', ', Re z > ', 'back'];
+TAB_LABEL.transf = 'ℱ ℒ';
+Object.assign(LABEL, { ', Re z > ': 'Re z >', 'H(': 'H( )', 'ℱ(': 'ℱ( )', 'ℒ(': 'ℒ( )' });

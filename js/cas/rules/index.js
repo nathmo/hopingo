@@ -66,3 +66,15 @@ import { RULES as PD } from './pd.js';
 import { RULES as PE } from './pe.js';
 
 CAS_RULES.push(...G7, ...PA, ...PB, ...PC, ...PD, ...PE);
+
+// Step U10: modules V (parts a, b), C (parts a, b) and F (parts a to d).
+import { RULES as VA } from './va.js';
+import { RULES as VB } from './vb.js';
+import { RULES as CA } from './ca.js';
+import { RULES as CB } from './cb.js';
+import { RULES as FA } from './fa.js';
+import { RULES as FB } from './fb.js';
+import { RULES as FC } from './fc.js';
+import { RULES as FD } from './fd.js';
+
+CAS_RULES.push(...VA, ...VB, ...CA, ...CB, ...FA, ...FB, ...FC, ...FD);

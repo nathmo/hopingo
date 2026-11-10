@@ -80,3 +80,13 @@ import * as prob from './prob.js';
 import * as stat from './stat.js';
 
 Object.assign(JUDGES, { prob, stat });
+
+// Step U10: parametrised curves and surfaces, oriented boundaries,
+// Fourier and Laplace transforms (modules V, C and F).
+import * as transform from './transform.js';
+
+Object.assign(JUDGES, { transform });
+import * as param from './param.js';
+import * as boundary from './boundary.js';
+
+Object.assign(JUDGES, { param, boundary });

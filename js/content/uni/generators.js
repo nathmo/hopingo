@@ -57,3 +57,10 @@ import { GEN as COMBI } from './combi.js';
 import { GEN as PROBA } from './proba.js';
 
 Object.assign(UNI_GEN, COMBI, PROBA);
+
+// Step U10: modules V (vecto), C (cplx) and F (fourier).
+import { GEN as VECTO } from './vecto.js';
+import { GEN as CPLX } from './cplx.js';
+import { GEN as FOURIER } from './fourier.js';
+
+Object.assign(UNI_GEN, VECTO, CPLX, FOURIER);

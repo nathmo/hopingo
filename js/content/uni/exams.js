@@ -58,3 +58,9 @@ import { EXAM_PROBA, EXAM_STAT } from './exams-proba.js';
 
 EXAMS.push(EXAM_PROBA, EXAM_STAT);
 Object.assign(EXAM_BY_ID, { [EXAM_PROBA.id]: EXAM_PROBA, [EXAM_STAT.id]: EXAM_STAT });
+
+// Step U10: Analyse III (V and C) and Analyse IV (F, and C in the multiple choice).
+import { EXAM_ANALYSE3, EXAM_ANALYSE4 } from './exams-vcf.js';
+
+EXAMS.push(EXAM_ANALYSE3, EXAM_ANALYSE4);
+Object.assign(EXAM_BY_ID, { [EXAM_ANALYSE3.id]: EXAM_ANALYSE3, [EXAM_ANALYSE4.id]: EXAM_ANALYSE4 });

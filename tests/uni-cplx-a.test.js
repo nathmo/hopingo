@@ -1,0 +1,12 @@
+// Items of the university unit `cplx`, part a (step U10; helpers and
+// checks: tests/uni-check.js).
+import { test } from 'node:test';
+import { checkSkills } from './uni-check.js';
+import { SKILLS } from '../js/content/uni/cplx-a.skills.js';
+
+// Skills whose generators are not written yet (emptied when the part is done).
+const STUBBED = new Set(["c-elem-fn", "c-equations", "c-cauchy-riemann", "c-harmonic-conj", "c-contour-param", "c-cauchy-thm", "c-cauchy-formula", "c-taylor", "c-laurent", "c-singularities"]);
+// Items per level: 20 (never under 15).
+const COUNTS = Object.fromEntries(SKILLS.map((s) => [s.id, 20]));
+
+test('unit cplx, part a: every skill, 5 levels and exam variants', () => checkSkills(SKILLS.map((s) => s.id).filter((id) => !STUBBED.has(id)), 17, COUNTS));

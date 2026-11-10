@@ -1,0 +1,120 @@
+// Module C, part b (unit `cplx`, step U10): residues, the residue theorem, arc estimates, real integrals by residues, branch cuts, Fourier transforms by residues, conformal maps.
+// Catalogue: docs/universite/VCF-analyse-3-4.md. Generators: cplx-b.js.
+// The skeleton (ids, prerequisites, weights, exam variants) comes from the
+// catalogue; the intro, icon and desc of each skill are written with its
+// generators.
+
+const S = (id, rest) => ({ id, unit: 'cplx', year: 15, optional: false, needsSolo: true, tags: [], ...rest });
+const L = (html, note) => ({ html, note, noEq: true });
+void L;
+
+export const SKILLS = [
+  S("c-res-simple", {
+    prereqs: ["c-singularities"],
+    icon: '∂',
+    examWeight: 2,
+    exam: ["mcq", "coef"],
+    title: "Résidu en un pôle simple",
+    desc: '',
+    prereqWhy: {"c-singularities": "vérifier que le pôle est simple"},
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-res-multiple", {
+    prereqs: ["c-singularities"],
+    icon: '∂',
+    examWeight: 2,
+    exam: ["mcq", "coef"],
+    title: "Résidu en un pôle multiple",
+    desc: '',
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-res-laurent", {
+    prereqs: ["c-laurent", "c-singularities"],
+    icon: '∂',
+    examWeight: 1,
+    exam: ["mcq", "coef", "open"],
+    title: "Résidu par la série de Laurent (singularité essentielle)",
+    desc: '',
+    prereqWhy: {"c-singularities": "reconnaître une singularité essentielle"},
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-res-theorem", {
+    prereqs: ["c-res-simple", "c-res-multiple", "c-cauchy-thm"],
+    icon: '∂',
+    examWeight: 3,
+    exam: ["mcq", "open"],
+    title: "Théorème des résidus sur un contour fermé",
+    desc: '',
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-arc-estimate", {
+    prereqs: ["c-contour-param", "g8-algebraic"],
+    icon: '∂',
+    examWeight: 2,
+    exam: ["open"],
+    title: "Montrer qu'une intégrale sur un arc tend vers 0",
+    desc: '',
+    prereqWhy: {"c-contour-param": "longueur de l'arc paramétré", "g8-algebraic": "modules et inégalité triangulaire"},
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-int-rational", {
+    prereqs: ["c-res-theorem", "c-arc-estimate"],
+    icon: '∂',
+    examWeight: 2,
+    exam: ["mcq", "open"],
+    title: "Intégrales rationnelles sur ℝ",
+    desc: '',
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-int-trig", {
+    prereqs: ["c-res-theorem"],
+    icon: '∂',
+    examWeight: 2,
+    exam: ["mcq", "open"],
+    title: "Intégrales trigonométriques sur [0 ; 2π]",
+    desc: '',
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-int-fourier", {
+    prereqs: ["c-res-theorem", "c-arc-estimate"],
+    icon: '∂',
+    examWeight: 2,
+    exam: ["mcq", "open"],
+    title: "Intégrales avec e^(iαx)",
+    desc: '',
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-int-branch", {
+    prereqs: ["c-int-rational", "c-elem-fn"],
+    icon: '∂',
+    examWeight: 1,
+    exam: ["open"],
+    tags: ["GM"],
+    title: "Intégrales avec coupure (GM)",
+    desc: '',
+    prereqWhy: {"c-int-rational": "mêmes résidus de R(z) que pour une intégrale rationnelle", "c-elem-fn": "z^a avec la coupure, argument dans ]0 ; 2π["},
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-fourier-residues", {
+    prereqs: ["c-int-fourier"],
+    icon: '∂',
+    examWeight: 1,
+    exam: ["open"],
+    tags: ["GM"],
+    title: "Transformée de Fourier calculée par les résidus (GM)",
+    desc: '',
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+  S("c-conformal", {
+    prereqs: ["c-elem-fn"],
+    icon: '∂',
+    examWeight: 0,
+    exam: ["mcq"],
+    tags: ["opt"],
+    optional: true,
+    title: "Applications conformes (opt.)",
+    desc: '',
+    prereqWhy: {"c-elem-fn": "homographies et fonctions élémentaires"},
+    intro: { rule: 'À écrire.', lines: [] },
+  }),
+];
