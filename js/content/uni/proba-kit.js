@@ -136,7 +136,8 @@ export function coefItem(o) {
 // (all its parts are steps), then the interpretation as a multiple choice.
 export function openItem(o, points, rng) {
   const lines = statItem({ ...o, level: 5, exam: o.exam || { format: 'open', points }, noHints: true });
-  const parts = [{ item: lines, points: o.interpret ? points - 1 : points, title: o.title }];
+  // The first step is named by the problem's title, else by the first value asked (not by the whole statement).
+  const parts = [{ item: lines, points: o.interpret ? points - 1 : points, title: o.title ?? o.parts[0]?.title ?? o.parts[0]?.label }];
   if (o.interpret) {
     const it = mcq({ skill: o.skill, level: 5, prompt: o.interpret.prompt || 'Interpréter : quelle phrase est juste ?', options: o.interpret.options, key: `${o.key}:interpret`, exam: lines.exam }, rng);
     parts.push({ item: it, points: 1, title: 'Interpréter' });
@@ -145,8 +146,44 @@ export function openItem(o, points, rng) {
 }
 
 // A multiple choice: right (html), wrongs [{html, rule}], fillers [{html}].
+// Plain numbers are written alike: decimals when the right option is a
+// decimal (rounded to 4 decimals at least if they do not end), fractions
+// otherwise (0,25 → 1/4), so that the format never gives the answer away.
+const NUM_FRAC = /^\s*([−-]?)(\d+)\/(\d+)\s*$/;
+const NUM_DEC = /^\s*([−-]?)(\d+),(\d+)\s*$/;
+const NUM_INT = /^\s*[−-]?\d+\s*$/;
+function asQ(t) {
+  let m = NUM_FRAC.exec(t);
+  if (m) return new Q((m[1] ? -1 : 1) * Number(m[2]), Number(m[3]));
+  m = NUM_DEC.exec(t);
+  if (m && m[3].length <= 9) return new Q((m[1] ? -1 : 1) * Number(m[2] + m[3]), 10 ** m[3].length);
+  return null;
+}
+function sameFormat(o) {
+  const right = String(o.right ?? '');
+  const all = [right, ...(o.wrongs || []).map((w) => String(w?.html ?? '')), ...(o.fillers || []).map((w) => String(w?.html ?? ''))];
+  const kinds = all.map((t) => (NUM_FRAC.test(t) ? 'f' : NUM_DEC.test(t) ? 'd' : NUM_INT.test(t) ? 'i' : 'x'));
+  if (!(kinds.includes('f') && kinds.includes('d'))) return o;
+  const toDec = NUM_DEC.test(right);
+  const rd = toDec ? NUM_DEC.exec(right)[3].length : 0;
+  const conv = (t) => {
+    const q = asQ(t);
+    if (!q) return t;
+    if (toDec) {
+      if (!NUM_FRAC.test(t)) return t;
+      const ex = q.toDecimal();
+      if (ex && ex.split(',')[1]?.length <= Math.max(rd, 4) + 2) return ex.replace('-', '−');
+      return num(q.valueOf(), Math.max(rd, 4));
+    }
+    if (!NUM_DEC.test(t)) return t;
+    return (q.d === 1 ? String(q.n) : `${q.n}/${q.d}`).replace('-', '−');
+  };
+  const fix = (w) => (w && w.html !== undefined ? { ...w, html: conv(String(w.html)) } : w);
+  return { ...o, right: conv(right), wrongs: (o.wrongs || []).map(fix), fillers: (o.fillers || []).map(fix) };
+}
+
 export function choice(o, rng) {
-  return mcqD({ ...o, key: `${o.skill}:${o.key}` }, rng);
+  return mcqD({ ...sameFormat(o), key: `${o.skill}:${o.key}` }, rng);
 }
 
 export function tf(o) {

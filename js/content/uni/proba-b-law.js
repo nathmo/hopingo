@@ -32,7 +32,7 @@ function cqLaw(rng, kinds, lev) {
   }
   if (kind === 'scale') {
     const a = rng.int(2, 4);
-    return { kind, f: `2x/${a * a}`, supp: `0 ≤ x ≤ ${a}`, F: `x^2/${a * a}`, Fdom: [0.2, a - 0.2], value: a * Math.sqrt(p), exact: `${a}√(${P})`, eqT: `q²/${a * a} = ${lev.t}`,
+    return { kind, f: a * a === 2 ? 'x' : a % 2 === 0 ? `x/${(a * a) / 2}` : `2x/${a * a}`, supp: `0 ≤ x ≤ ${a}`, F: `x^2/${a * a}`, Fdom: [0.2, a - 0.2], value: a * Math.sqrt(p), exact: `${a}√(${P})`, eqT: `q²/${a * a} = ${lev.t}`,
       pdf: (p * a * a) / 2 <= a ? (p * a * a) / 2 : null, Fp: (p * p) / (a * a), mean: (2 * a) / 3, hole: P };
   }
   if (kind === 'pareto') {
@@ -259,8 +259,8 @@ function ueTf(rng, opts) {
   const m = pickOf(rng, MEANS);
   if (rng.chance(0.5)) {
     return tf({ skill: UE, key: `tv:${m}`, exam: examTag(opts), truth: false, ruleIfTrue: 'p_memoryless_ignored',
-      statement: `La durée de vie d'une télévision suit une loi exponentielle de moyenne ${m} ans. Une télévision qui a déjà ${m / 5} an${m / 5 > 1 ? 's' : ''} a moins de chances de durer encore ${m} ans qu'une neuve.`,
-      explanation: `Faux : Pr(X > ${m / 5 + m} | X > ${m / 5}) = e^(−${fr(m)}/${m}) = Pr(X > ${m}) ≈ 0,368 (absence de mémoire).`,
+      statement: `La durée de vie d'une télévision suit une loi exponentielle de moyenne ${m} ans. Une télévision qui a déjà ${String(m / 5).replace(".", ",")} an${m / 5 >= 2 ? 's' : ''} a moins de chances de durer encore ${m} ans qu'une neuve.`,
+      explanation: `Faux : Pr(X > ${fr(m / 5 + m)} | X > ${fr(m / 5)}) = e^(−${fr(m)}/${m}) = Pr(X > ${m}) ≈ 0,368 (absence de mémoire).`,
       counter: numCounter({ vars: [{ v: 'u', label: `Usée : Pr(X > ${fr(m / 5 + m)} | X > ${fr(m / 5)}) =` }, { v: 'n', label: `Neuve : Pr(X > ${m}) =` }], hyp: '|u-0,3679|<0,001∧|n-0,3679|<0,001', pred: 'u<n', answer: { u: 'e^(-1)', n: 'e^(-1)' } }) });
   }
   return tf({ skill: UE, key: `mean:${m}`, exam: examTag(opts), truth: true,
@@ -344,7 +344,8 @@ function moItem(level, rng, profile, opts = {}) {
         { id: 'kh', label: 'var(X) = E[X²] − E[X]²', valid: true },
         { id: 'bad', label: 'var(X) = E[X²] − E[X]', valid: false, rule: 'p_var_minus_mean', why: 'C\'est E[X]², au carré.' },
       ] }],
-      lines: [{ math: `${ql(d.E2)}-(${ql(d.E)})^2`, blank: [ql(d.E)], subgoal: 'mom' }, { math: ql(V) }] },
+      // E[X] and E[X²] written as their own last lines (5/4, not 1,25).
+      lines: [{ math: `${d.E2lines.at(-1)?.math ?? ql(d.E2)}-(${d.Elines.at(-1)?.math ?? ql(d.E)})^2`, blank: [d.Elines.at(-1)?.math ?? ql(d.E)], subgoal: 'mom' }, { math: ql(V) }] },
   ];
   return statItem({ skill: MO, level, key: `${level}:${d.kind}:${qt(d.E)}:${qt(d.E2)}`, exam: examTag(opts),
     prompt: `${d.desc} Calcule E[X], E[X²] et var(X).`, parts, subgoals: MO_SUB,
@@ -412,9 +413,11 @@ function faGamma(level, rng, opts, numeric) {
   const k = rng.int(2, 5);
   const th = numeric ? pickOf(rng, [q(1, 2), q(2), q(3)]) : null;
   const tht = th ? qt(th) : 'θ';
-  const den = th ? qt(q(fact(k - 1)).mul(th.pow(k))) : `${fact(k - 1)}θ^${k}`;
+  const denQ = th ? q(fact(k - 1)).mul(th.pow(k)) : null;
+  const den = th ? qt(denQ) : `${fact(k - 1)}θ^${k}`;
   const kern = k === 2 ? 'y' : `y^${k - 1}`;
-  const expo = th ? (th.eq(1) ? 'e^(-y)' : `e^(-y/${pq(th)})`) : 'e^(-y/θ)';
+  // θ = 1/2 is written e^(−2y): the student reads the scale 1/2 from the rate 2.
+  const expo = th ? (th.eq(1) ? 'e^(-y)' : th.n === 1 ? `e^(-${th.d}y)` : `e^(-y/${pq(th)})`) : 'e^(-y/θ)';
   const E = th ? qt(th.mul(k)) : `${k}θ`;
   const Vv = th ? qt(th.mul(th).mul(k)) : `${k}θ^2`;
   const exprPart = (o) => (th ? { kind: 'prob', ...o, expect: o.num } : { kind: 'prob', ...TH, ...o, expect: o.sym });
@@ -434,11 +437,11 @@ function faGamma(level, rng, opts, numeric) {
   // Level 5 and open (exam 2020–22, ex. 5): the constant checked, Γ(k)θᵏ.
   if (level === 5 && !th) {
     parts.splice(1, 0, { kind: 'prob', ...TH, label: 'Γ(k)θ^k', name: 'G', expect: `${fact(k - 1)}θ^${k}`, action: 'Vérifier la constante',
-      lines: [{ math: `(${k - 1})!×θ^${k}`, subgoal: 'rec' }] });
+      lines: [{ math: `${k - 1}!×θ^${k}`, subgoal: 'rec' }] });
   }
   return {
     skill: FA, level, key: `${level}:gamma:${k}:${tht}`,
-    prompt: `Y a pour densité ${X(`f(y)=(${kern}×${expo})/(${den})`, 'y')} pour y ≥ 0${th ? '' : ' (θ > 0)'}. Reconnais la loi, puis donne E[Y] et var(Y).`,
+    prompt: `Y a pour densité ${X(th && denQ.d > 1 ? `f(y)=${denQ.d}/${denQ.n}×${kern}×${expo}` : `f(y)=(${kern}×${expo})/(${den})`, 'y')} pour y ≥ 0${th ? '' : ' (θ > 0)'}. Reconnais la loi, puis donne E[Y] et var(Y).`,
     parts, subgoals: FA_SUB,
     hints: H('Repère la puissance de y et ce qui divise y dans l\'exponentielle : y^(k−1)·e^(−y/θ).', `Y ~ Γ(□, ${tht})`, `Y ~ Γ(${k}, ${tht}) : E = ${th ? fr(E) : `${k}θ`}, var = ${th ? fr(Vv) : `${k}θ²`}`),
   };
@@ -459,7 +462,7 @@ function faBeta(level, rng) {
       { label: 'β', name: 'b', kind: 'prob', expect: String(b), action: 'β = exposant de (1 − x), plus 1',
         traps: { p_beta_shape_off: { values: [String(b - 1)] } }, lines: [{ math: `${b - 1}+1`, blank: [String(b - 1)], subgoal: 'rec' }, { math: String(b) }] },
       { label: 'C', name: 'C', kind: 'prob', expect: String(C), action: 'Constante Γ(α + β)/(Γ(α)Γ(β))',
-        lines: [{ math: `(${a + b - 1})!/((${a - 1})!×(${b - 1})!)`, blank: [`(${a + b - 1})!`], subgoal: 'rec' }, { math: String(C) }] },
+        lines: [{ math: `${a + b - 1}!/(${a - 1}!×${b - 1}!)`, blank: [`${a + b - 1}!`], subgoal: 'rec' }, { math: String(C) }] },
       { label: 'E[X]', name: 'E', kind: 'prob', expect: qt(q(a, a + b)), action: 'E = α/(α + β)', lines: [{ math: `${a}/(${a}+${b})`, subgoal: 'mom' }, ...(qt(q(a, a + b)) === `${a}/${a + b}` && a + b < 10 ? [{ math: qt(q(a, a + b)) }] : [{ math: qt(q(a, a + b)) }])] },
     ],
     subgoals: FA_SUB,
@@ -472,7 +475,7 @@ function faSum(level, rng) {
   const lam = pickOf(rng, [2, 3, 4]);
   return {
     skill: FA, level, key: `${level}:sum:${n}:${lam}`,
-    prompt: `X₁, …, X${['₂', '₃', '₄', '₅'][n - 2]} sont indépendantes, de loi exp(λ) avec λ = ${lam}. Quelle est la loi de leur somme S ? Donne la forme k, l'échelle θ et E[S].`,
+    prompt: `${n === 2 ? 'X₁ et X₂' : `X₁, …, X${['₂', '₃', '₄', '₅'][n - 2]}`} sont indépendantes, de loi exp(λ) avec λ = ${lam}. Quelle est la loi de leur somme S ? Donne la forme k, l'échelle θ et E[S].`,
     parts: [
       { label: 'k', name: 'k', kind: 'prob', expect: String(n), action: 'Somme de n exponentielles : Γ(n, 1/λ)', decisions: [famDecision('gamma')], lines: [{ math: String(n), subgoal: 'rec' }] },
       { label: 'θ', name: 'th', kind: 'prob', expect: `1/${lam}`, action: 'Échelle θ = 1/λ',

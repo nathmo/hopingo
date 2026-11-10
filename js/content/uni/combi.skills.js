@@ -18,14 +18,14 @@ export const SKILLS = [
   S('g7-perm-arr', 12, {
     prereqs: ["g7-mult-principle"], icon: "n!", examWeight: 1, exam: ["mcq", "tf"], tags: [],
     title: "Factorielles, permutations, arrangements, anagrammes",
-    desc: "n objets en ligne : n! ; k places parmi n, ordre compté : A(n, k) ; anagrammes : n!/(n₁!·n₂!···).",
+    desc: "Compter des rangements : n! pour n objets en ligne, A(n, k) pour k places ordonnées, n!/(n₁!·n₂!···) pour des anagrammes.",
     prereqWhy: {"g7-mult-principle": "n! et A(n, k) viennent du principe multiplicatif"},
     intro: { rule: "n objets distincts en ligne : n! façons. k places parmi n, ordre compté, sans répétition : A(n, k) = n·(n − 1)···(n − k + 1) = n!/(n − k)!. Anagrammes d'un mot avec des lettres répétées : n!/(n₁!·n₂!···). Simplifier : (n + 1)! = (n + 1)·n!.", lines: [{ html: "Podium de 3 marches, 8 coureurs : A(8, 3) = 8 · 7 · 6 = 336", note: "Ordre compté, pas de répétition", noEq: true }, { html: "RADAR : 5!/(2!·2!) = 120/4 = 30", note: "R et A deux fois chacun", noEq: true }, { html: "(n + 1)!/(n − 1)! = (n + 1)·n = n² + n", note: "Simplifier par (n − 1)!", noEq: true }] },
   }),
   S('g7-combinations', 12, {
     prereqs: ["g7-perm-arr"], icon: "C(n,k)", examWeight: 2, exam: ["mcq", "tf", "open"], tags: [],
     title: "Combinaisons, triangle de Pascal",
-    desc: "Choisir k objets parmi n, sans ordre : C(n, k) = n!/(k!(n − k)!) = A(n, k)/k!.",
+    desc: "Choisir k objets parmi n sans ordre : C(n, k) = n!/(k!(n − k)!), puis multiplier les choix faits dans plusieurs groupes.",
     prereqWhy: {"g7-perm-arr": "C(n, k) = A(n, k)/k!"},
     intro: { rule: "Choisir k objets parmi n, sans ordre : C(n, k) = n!/(k!(n − k)!) = A(n, k)/k!. C(n, k) = C(n, n − k). Pascal : C(n, k) = C(n − 1, k − 1) + C(n − 1, k). Choix dans plusieurs groupes : on multiplie les C.", lines: [{ html: "Comité : 3 femmes parmi 7 et 2 hommes parmi 5", note: "Choisir dans chaque groupe", noEq: true }, { html: "C(7, 3) · C(5, 2) = 35 · 10", note: "C(n, k) = A(n, k)/k!", noEq: true }, { html: "= 350", note: "Multiplier", noEq: true }] },
   }),
@@ -34,14 +34,14 @@ export const SKILLS = [
     needsSolo: false,
     prereqWhy: { 'g7-combinations': 'la case « sans ordre, sans remise » est C(n, k)' },
     title: "Ordonné ou pas ? Avec ou sans remise ? (exercice éclair)",
-    desc: "L'ordre compte-t-il ? Peut-on reprendre le même objet ? Puis la bonne formule : nᵏ, A(n, k), C(n, k).",
+    desc: "Avant de calculer : l'ordre compte-t-il, peut-on reprendre le même objet ? Puis la bonne formule : nᵏ, A(n, k) ou C(n, k).",
     intro: { rule: "Deux questions avant tout calcul. L'ordre compte-t-il (podium, code) ou non (main de cartes, comité) ? Peut-on reprendre le même objet (code, dé lancé plusieurs fois) ou non (tirage sans remise, personnes) ? Quatre cases : nᵏ (ordre, avec remise), A(n, k) (ordre, sans remise), C(n, k) (sans ordre, sans remise), C(n + k − 1, k) (sans ordre, avec remise ; seulement en L4–L5).", lines: [{ html: "Cadenas à 4 molettes de 0 à 9", note: "L'ordre compte (1234 ≠ 4321)", noEq: true }, { html: "Avec répétition (1111 est un code)", note: "Case nᵏ", noEq: true }, { html: "10⁴ = 10 000", note: "Calculer", noEq: true }] },
   }),
   S('g7-binomial', 12, {
     prereqs: ["g7-combinations", "g5-sigma", "lit-identities"], icon: "(a+b)ⁿ", examWeight: 1, exam: ["mcq", "tf"], tags: [],
     prereqWhy: { 'lit-identities': '(a + b)² et (a − b)² sont les cas n = 2', 'g5-sigma': "le développement s'écrit avec Σ" },
     title: "Binôme de Newton",
-    desc: "(a + b)ⁿ = Σₖ₌₀ⁿ C(n, k)·aⁿ⁻ᵏ·bᵏ.",
+    desc: "Développer (a + b)ⁿ avec les C(n, k), et trouver le coefficient d'une puissance de x par le terme général.",
     intro: { rule: "(a + b)ⁿ = Σₖ₌₀ⁿ C(n, k)·aⁿ⁻ᵏ·bᵏ. Pour un terme précis : on écrit le terme général, avec <b>tous</b> ses facteurs (coefficients et signes de a et b), on cherche k qui donne la bonne puissance de x, puis on calcule.", lines: [{ html: "Coefficient de x⁴ dans (2x − 1/x)⁸ : C(8, k)·2⁸⁻ᵏ·(−1)ᵏ·x⁸⁻²ᵏ", note: "Terme général", noEq: true }, { html: "8 − 2k = 4, donc k = 2", note: "Équation en k", noEq: true }, { html: "C(8, 2)·2⁶·(−1)² = 28 · 64 = 1792", note: "Coefficient", noEq: true }] },
   }),
   S('g7-laplace', 12, {

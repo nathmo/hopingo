@@ -42,7 +42,7 @@ function cdData(rng, kinds) {
       kernel: k === 1 ? 'x' : `x^${k}`, support: `[0 ; ${a}]`, supportT: `0 ≤ x ≤ ${a}`,
       Ilines: [{ math: `${a}^${k + 1}/${k + 1}`, blank: [`${k + 1}`], note: `∫₀^${a} x^${k} dx = [x^${k + 1}/${k + 1}]₀^${a}`, subgoal: 'int' }, { math: qt(I), blank: [qt(I)] }],
       wrongI: a === 1 ? null : q(1, k + 1),
-      F: `(x/${a})^${k + 1}`, Fdom: [0.1 * a, 0.9 * a], Fout: `F(x) = 0 si x < 0 et F(x) = 1 si x > ${a}`,
+      F: a === 1 ? `x^${k + 1}` : `(x/${a})^${k + 1}`, Fdom: [0.1 * a, 0.9 * a], Fout: `F(x) = 0 si x < 0 et F(x) = 1 si x > ${a}`,
       prob: { label: `Pr(X≤${qt(t)})`, expect: `$c*(${qt(t)})^${k + 1}/${k + 1}`, value: P, lines: [{ math: `${pq(t.div(a))}^${k + 1}`, blank: [`${k + 1}`] }, { math: qt(P), blank: [qt(P)] }], f: qt(I.inv().mul(t.pow(k))), ft: I.inv().mul(t.pow(k)), F: P },
     };
   }

@@ -49,6 +49,8 @@ function regData(rng, { ns, h = 1, nice = false, test = null } = {}) {
     if (y.some((v) => v < 0)) continue;
     const d = fromXY(x, y, test);
     if (d.Sxy.n === 0 || d.RSS.n <= 0) continue;
+    // A line worth fitting: R² at least 0,15 (a pure cloud gives R² = 0,006).
+    if (!test && d.Sxy.mul(d.Sxy).div(d.Sxx.mul(d.Syy)).valueOf() < 0.15) continue;
     if (nice && !q(d.beta.n * 100, d.beta.d).isInt()) continue;
     if (test) {
       const tt = test === 'alpha' ? d.tA : d.tB;
@@ -174,7 +176,7 @@ function lsMcq(d, rng, opts) {
     const c = d.xbar.sub(dd.mul(d.ybar));
     const line = (cc, ddd) => `x = ${qs(cc)} ${ddd.n < 0 ? '−' : '+'} ${qs(ddd.n < 0 ? ddd.mul(-1) : ddd)}·y`;
     const inv = q(1).div(d.beta);
-    return choice({ skill: LS, level: 4, prompt: `Données : ${dataLine(d)}. La droite de y sur x est y = ${qs(d.alpha)} + ${qs(d.beta)}x. Quelle est la droite de régression de x sur y ?`,
+    return choice({ skill: LS, level: 4, prompt: `Données : ${dataLine(d)}. La droite de y sur x est y = ${qs(d.alpha)} ${d.beta.n < 0 ? '−' : '+'} ${qs(d.beta.n < 0 ? d.beta.neg() : d.beta)}x. Quelle est la droite de régression de x sur y ?`,
       right: line(c, dd), wrongs: [{ html: line(q(0).sub(d.alpha.mul(inv)), inv), rule: 'p_reg_x_on_y' }, { html: line(d.xbar.sub(d.beta.mul(d.ybar)), d.beta), rule: null }],
       fillers: [{ html: line(c.add(1), dd) }, { html: line(q(0), dd) }], key: `mcq:xy:${d.y.join('-')}`, exam: examTag(opts) }, rng);
   }
@@ -390,7 +392,7 @@ function fItem(level, rng, opts) {
   const d = fData(rng);
   const { p, qq, n } = d;
   const reject = d.F.valueOf() > d.quant;
-  const prompt = `n = ${n} observations. Modèle complet à p = ${p} colonnes : SC_p = ${qs(d.SCp)} ; modèle réduit à q = ${qq} colonne${qq > 1 ? 's' : ''} : SC_q = ${qs(d.SCq)}. Test F emboîté au niveau 5 % (H₀ : les ${p - qq} coefficients ajoutés sont nuls). Quantile donné : F_{${p - qq}, ${n - p} ; 0,95} = ${r2(d.quant)}.`;
+  const prompt = `n = ${n} observations. Modèle complet à p = ${p} colonnes : SC_p = ${qs(d.SCp)} ; modèle réduit à q = ${qq} colonne${qq > 1 ? 's' : ''} : SC_q = ${qs(d.SCq)}. Test F emboîté au niveau 5 % (H₀ : ${p - qq === 1 ? 'le coefficient ajouté est nul' : `les ${p - qq} coefficients ajoutés sont nuls`}). Quantile donné : F_{${p - qq}, ${n - p} ; 0,95} = ${r2(d.quant)}.`;
   const Fv = d.F.valueOf();
   const o = {
     skill: RM, level, key: `${level}:F:${n}:${p}:${qq}:${qt(d.SCp)}:${qt(d.SCq)}`, prompt,

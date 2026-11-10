@@ -14,6 +14,11 @@ import { statItem, coefItem, openItem, choice, tf, numCounter, H, SM, examTag } 
 import { Phi } from '../../cas/stats.js';
 import { q, J, T, S, F, FS, FJ, L, finalText, thenValue } from './proba-c-kit.js';
 
+// « iid de loi exp(λ) », but « iid de la loi de densité … ».
+// Exponents written as superscripts in the statements: 2y/θ², 4y³/θ⁴.
+const supT = (t) => String(t).replace(/\^(\d+)/g, (m, d) => [...d].map((c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join(''));
+const densT = (k) => supT(`${k + 1}y${k === 1 ? '' : `^${k}`}/θ^${k + 1}`);
+const ofLaw = (l) => (l.startsWith('la loi') ? `de ${l}` : `de loi ${l}`);
 const GK = ['calc', 'stat', 'greek', 'calcfn'];
 
 // ======================================================================
@@ -60,7 +65,7 @@ function momOne(level, rng, model) {
     lines: thenValue(model.hatLine(m), hat, `${model.E.replace('-', '−')} = x̄, puis isoler ${model.sym}`, 'solve', [T(m)]) });
   return {
     key: `${model.id}:${d.n}:${d.s}`, hat,
-    prompt: `X₁, …, Xₙ (n = ${d.n}) sont iid de loi ${model.law}. On observe Σxᵢ = ${d.s}. Estime ${model.sym} par la méthode des moments.`,
+    prompt: `X₁, …, Xₙ (n = ${d.n}) sont iid ${ofLaw(model.law)}. On observe Σxᵢ = ${d.s}. Estime ${model.sym} par la méthode des moments.`,
     parts,
     hints: H('Égale le moment théorique E[X] au moment empirique x̄, puis isole le paramètre.', `${model.E.replace('-', '−')} = ${S(m)}, donc ${model.sym} = □`, `${model.sym}̂ = ${S(hat)}`),
   };
@@ -120,7 +125,7 @@ function momItem(level, rng, profile, opts = {}) {
     const g = momGamma(4, rng);
     const d = g.parts;
     return choice({ skill: MOM, level: 4, key: `mcq:${g.key}`, exam: examTag(opts),
-      prompt: `${g.prompt.replace('Estime θ et k', 'Que vaut θ̂')}`,
+      prompt: g.prompt.replace('Estime θ et k par la méthode des moments.', 'Que vaut θ̂ par la méthode des moments ?'),
       right: S(g.hat), wrongs: [{ html: S(g.wrongTh), rule: 'p_mom_s2' }],
       fillers: [{ html: S(q(1).div(g.hat)) }, { html: S(g.hat.mul(2)) }, { html: S(g.hat.add(1)) }] }, rng);
     void d;
@@ -165,7 +170,7 @@ const MLE_MODELS = {
   pois: {
     sym: 'λ', dom: [0.3, 6], law: 'Poiss(λ)', sumName: 'Σxᵢ',
     pick: (rng) => { const [n, l] = rng.pick([[25, 1], [50, 2], [18, 2], [36, 4], [20, 5], [64, 4], [100, 4]]); return { n, s: n * l, h: q(l) }; },
-    Lnote: ({ s }) => `L(λ) = Π λ^(xᵢ)e^(−λ)/xᵢ! ∝ λ^${s}·e^(−nλ)`,
+    Lnote: ({ s, n }) => `L(λ) = Π λ^(xᵢ)e^(−λ)/xᵢ! ∝ λ^${s}·e^(−${n ?? 'n'}λ)`,
     ell: ({ n, s }) => `${s}ln(λ)-${n}λ`, d1: ({ n, s }) => `${s}/λ-${n}`, d2: ({ s }) => `-${s}/λ^2`,
     hatLine: ({ n, s }) => `${s}/${n}`, Jexp: ({ s }) => `${s}/$th^2`, Jline: ({ s, h }) => `${s}/${T(h)}^2`,
     lit: { ell: 'S×ln(λ)-n×λ', d1: 'S/λ-n', hat: 'S/n', d2: '-S/λ^2', J: 'n^2/S' },
@@ -293,13 +298,13 @@ function mleItem(level, rng, profile, opts = {}) {
     const v = d.M.sym;
     if (rng.chance(0.5)) {
       return choice({ skill: MLE, level: 4, key: `mcq:${d.kind}:${d.n}:${d.s}`, exam: examTag(opts),
-        prompt: `X₁, …, Xₙ (n = ${d.n}) iid de loi ${d.M.law} ; ${d.M.sumName} = ${d.s}. Que vaut le maximum de vraisemblance ${v}̂ ?`,
+        prompt: `X₁, …, Xₙ (n = ${d.n}) iid ${ofLaw(d.M.law)} ; ${d.M.sumName} = ${d.s}. Que vaut le maximum de vraisemblance ${v}̂ ?`,
         right: S(d.h), wrongs: [{ html: S(q(1).div(d.h)), rule: 'p_mle_solve' }],
         fillers: [{ html: S(d.h.mul(2)) }, { html: S(d.h.div(2)) }, { html: S(d.h.add(1)) }] }, rng);
     }
     const ell = d.M.ell(d);
     return choice({ skill: MLE, level: 4, key: `mcqell:${d.kind}:${d.n}:${d.s}`, exam: examTag(opts),
-      prompt: `X₁, …, Xₙ (n = ${d.n}) iid de loi ${d.M.law} ; ${d.M.sumName} = ${d.s}. Quelle est la log-vraisemblance (à une constante près) ?`,
+      prompt: `X₁, …, Xₙ (n = ${d.n}) iid ${ofLaw(d.M.law)} ; ${d.M.sumName} = ${d.s}. Quelle est la log-vraisemblance (à une constante près) ?`,
       right: `ℓ(${v}) = ${SM(ell, { vars: [v] })}`,
       wrongs: [{ html: `ℓ(${v}) = ${SM(d.kind === 'pois' ? `ln(${v})^${d.s}-${d.n}${v}` : `ln(${v})^${d.n}-${d.s}${v}`, { vars: [v] })}`, rule: 'g2_log_power' },
         { html: `ℓ(${v}) = ${SM(d.kind === 'pois' ? `${d.s}ln(${v})-${d.n}` : `${d.n}ln(${v})-${d.s}`, { vars: [v] })}`, rule: 'p_mle_constant_kept' }],
@@ -317,8 +322,8 @@ function mleItem(level, rng, profile, opts = {}) {
   const v = d.M.sym;
   const parts = mleParts(d, opts.exam === 'open' ? 5 : opts.exam === 'coef' ? 2 : level, literal);
   const prompt = literal
-    ? `X₁, …, Xₙ sont iid de loi ${d.M.law}, et S = ${d.M.sumName === 'Σxᵢ' ? 'Σxᵢ' : 'le nombre de succès'}. Trouve l'estimateur du maximum de vraisemblance de ${v} en fonction de n et S, vérifie que c'est un maximum, et donne J(${v}̂).`
-    : `X₁, …, Xₙ (n = ${d.n}) sont iid de loi ${d.M.law}. On observe ${d.M.sumName} = ${d.s}. Trouve le maximum de vraisemblance ${v}̂${level >= 3 ? `, puis son erreur standard asymptotique${level >= 4 ? ' et l\'IC de Wald à 95 %' : ''}` : ''}.`;
+    ? `X₁, …, Xₙ sont iid ${ofLaw(d.M.law)}, et S = ${d.M.sumName === 'Σxᵢ' ? 'Σxᵢ' : 'le nombre de succès'}. Trouve l'estimateur du maximum de vraisemblance de ${v} en fonction de n et S, vérifie que c'est un maximum, et donne J(${v}̂).`
+    : `X₁, …, Xₙ (n = ${d.n}) sont iid ${ofLaw(d.M.law)}. On observe ${d.M.sumName} = ${d.s}. Trouve le maximum de vraisemblance ${v}̂${level >= 3 ? `, puis son erreur standard asymptotique${level >= 4 ? ' et l\'IC de Wald à 95 %' : ''}` : ''}.`;
   const o = {
     skill: MLE, level, key: `${level}:${d.kind}:${d.n}:${d.s}:${literal}`, prompt, parts, subgoals: MLE_SUB, keys: GK, exam: examTag(opts),
     interpret: !literal && level >= 4 ? MLE_INTERPRET : null,
@@ -326,7 +331,7 @@ function mleItem(level, rng, profile, opts = {}) {
       literal ? `ℓ′(${v}) = ${SM(d.M.lit.d1, { vars: [v, 'n', 'S'] })} = 0, donc ${v} = □` : `ℓ′(${v}) = ${SM(d.M.d1(d), { vars: [v] })} = 0, donc ${v}̂ = □`,
       literal ? `${v}̂ = ${SM(d.M.lit.hat, { vars: ['n', 'S'] })}` : `${v}̂ = ${S(d.h)}`),
   };
-  if (opts.exam === 'coef') return coefItem({ ...o, parts: parts.slice(0, 4) });
+  if (opts.exam === 'coef') return coefItem({ ...o, prompt: prompt.replace(/, puis son erreur standard asymptotique( et l'IC de Wald à 95 %)?\./, '.'), parts: parts.slice(0, 4) });
   if (opts.exam === 'open') return openItem({ ...o, interpret: MLE_INTERPRET, key: `open:${o.key}` }, 10, rng);
   return statItem(o);
 }
@@ -447,7 +452,8 @@ function msItem(level, rng, profile, opts = {}) {
   if (level <= 3 || level === 5) d = msUnif(level, rng, level === 3 && rng.chance(0.3));
   else d = rng.pick([() => msUnif(level, rng, true), () => msShift(level, rng), () => msExp(level, rng), () => msUnif(level, rng)])();
   const o = { skill: MS, level, key: `${level}:${d.key}`, prompt: d.prompt, parts: d.parts, hints: d.hints, subgoals: MS_SUB, exam: examTag(opts) };
-  if (opts.exam === 'coef') return coefItem({ ...o, parts: [d.parts[0]] });
+  // The coef variant asks the last value the prompt names (θ̂, or the MLE of a probability).
+  if (opts.exam === 'coef') return coefItem({ ...o, part: d.parts[d.parts.length - 1] });
   return statItem(o);
 }
 
@@ -509,7 +515,7 @@ function bmDensity(level, rng) {
   }
   return {
     key: `dens:${k}`, k,
-    prompt: `Y₁, …, Yₙ sont iid de densité f(y) = ${k + 1}y^${k}/θ^${k + 1} sur ]0 ; θ[. L'estimateur Ȳ est-il sans biais pour θ ? Corrige-le${level >= 2 ? ' et calcule la variance de l\'estimateur corrigé θ̂ = c·Ȳ' : ''}.`,
+    prompt: `Y₁, …, Yₙ sont iid de densité f(y) = ${densT(k)} sur ]0 ; θ[. L'estimateur Ȳ est-il sans biais pour θ ? Corrige-le${level >= 2 ? ' et calcule la variance de l\'estimateur corrigé θ̂ = c·Ȳ' : ''}.`,
     parts,
     hints: H('var(cȲ) = c²·var(Y)/n ; le biais est E[Ȳ] − θ.', `var(θ̂) = (${S(c)})² · ${S(vY)}θ²/□`, `var(θ̂) = ${mono(vT, 2, true).replace('-', '−')}`),
   };
@@ -524,7 +530,7 @@ function bmMse(level, rng) {
   const b = EY.sub(1);
   return {
     key: `mse:${k}`, k,
-    prompt: `Y₁, …, Yₙ sont iid de densité ${k + 1}y^${k}/θ^${k + 1} sur ]0 ; θ[ : E[Y] = ${mono(EY)} et var(Y) = ${mono(vY, 2)}. Calcule l'erreur quadratique moyenne de Ȳ comme estimateur de θ.`,
+    prompt: `Y₁, …, Yₙ sont iid de densité ${densT(k)} sur ]0 ; θ[ : E[Y] = ${supT(mono(EY))} et var(Y) = ${supT(mono(vY, 2))}. Calcule l'erreur quadratique moyenne de Ȳ comme estimateur de θ.`,
     parts: [
       { label: 'biais(Ȳ)', kind: 'prob', vars: ['θ'], domain: BM_DOM, expect: mono(b), action: 'Biais : E[Ȳ] − θ',
         lines: [L(mono(b), 'E[Ȳ] − θ', 'bias')] },
@@ -567,7 +573,7 @@ function bmItem(level, rng, profile, opts = {}) {
     const c = q(k + 2, k + 1);
     const mk = (x, n) => SM(mono(x, 2, n), { vars: ['θ', 'n'] });
     return choice({ skill: BM, level: 4, key: `mcq:${k}`, exam: examTag(opts),
-      prompt: `Y₁, …, Yₙ iid de densité ${k + 1}y^${k}/θ^${k + 1} sur ]0 ; θ[. On pose θ̂ = (${S(c)})·Ȳ, sans biais. Que vaut var(θ̂) ?`,
+      prompt: `Y₁, …, Yₙ iid de densité ${densT(k)} sur ]0 ; θ[. On pose θ̂ = (${S(c)})·Ȳ, sans biais. Que vaut var(θ̂) ?`,
       right: mk(c.mul(c).mul(vY), true), wrongs: [{ html: mk(c.mul(vY), true), rule: 'p_var_scale' }, { html: mk(c.mul(c).mul(vY), false), rule: 'p_se_forgot_sqrt_n' }],
       fillers: [{ html: mk(vY, true) }, { html: mk(vY.mul(2), true) }] }, rng);
   }
@@ -648,14 +654,14 @@ function fcItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') {
     const sm = (t) => SM(t, { vars: [M.sym, 'n'] });
     return choice({ skill: FC, level: 4, key: `mcq:${M.id}`, exam: examTag(opts),
-      prompt: `X₁, …, Xₙ iid de loi ${M.law} ; I₁(${M.sym}) = ${sm(M.I)}. Quelle est la borne de Cramér-Rao pour un estimateur sans biais de ${M.sym} ?`,
+      prompt: `X₁, …, Xₙ iid ${ofLaw(M.law)} ; I₁(${M.sym}) = ${sm(M.I)}. Quelle est la borne de Cramér-Rao pour un estimateur sans biais de ${M.sym} ?`,
       right: sm(M.CR), wrongs: [{ html: sm(M.CR.replace('/n', '')), rule: 'p_fisher_per_obs' }, { html: sm(`-${M.CR}`), rule: 'p_fisher_sign' }],
       fillers: [{ html: sm(`${M.I}/n`) }, { html: sm(`n×${M.I}`) }] }, rng);
   }
   if (opts.exam === 'tf') {
     if (rng.chance(0.5)) {
       return tf({ skill: FC, key: 'const', exam: examTag(opts), truth: false, ruleIfTrue: 'p_cr_biased',
-        statement: `Pour X₁, …, Xₙ iid de loi ${M.law}, tout estimateur de ${M.sym}, biaisé ou non, a une variance au moins égale à ${M.CR.replace('(1-p)', '(1 − p)')}.`,
+        statement: `Pour X₁, …, Xₙ iid ${ofLaw(M.law)}, tout estimateur de ${M.sym}, biaisé ou non, a une variance au moins égale à ${M.CR.replace('(1-p)', '(1 − p)')}.`,
         explanation: 'L\'estimateur constant (toujours 1) a une variance nulle : la borne de Cramér-Rao ne vaut que pour les estimateurs sans biais.',
         counter: numCounter({ vars: [{ v: 'w', label: 'Variance de l\'estimateur constant θ̂ = 1 :' }], hyp: 'w=0', pred: 'w>0', answer: { w: '0' } }) });
     }
@@ -666,7 +672,7 @@ function fcItem(level, rng, profile, opts = {}) {
   }
   const parts = fcParts(M, level);
   return statItem({ skill: FC, level, key: `${level}:${M.id}`, parts, subgoals: FC_SUB, keys: GK, exam: examTag(opts),
-    prompt: `X₁, …, Xₙ sont iid de loi ${M.law}. Calcule l'information de Fisher I₁(${M.sym}) d'une observation${level >= 2 ? ', puis la borne de Cramér-Rao' : ''}.`,
+    prompt: `X₁, …, Xₙ sont iid ${ofLaw(M.law)}. Calcule l'information de Fisher I₁(${M.sym}) d'une observation${level >= 2 ? ', puis la borne de Cramér-Rao' : ''}.`,
     interpret: level >= 3 ? FC_INTERPRET(M) : null,
     hints: H(`Dérive deux fois ln f en ${M.sym}, puis prends l'espérance de l'opposé.`, `I₁(${M.sym}) = −E[${M.d2.replace(/×/g, '·')}] = □`, `I₁(${M.sym}) = ${M.I}`) });
 }

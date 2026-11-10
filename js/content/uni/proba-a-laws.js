@@ -189,15 +189,16 @@ const BI_SUB = [{ id: 'coef', label: 'C(n, k)', skill: 'g7-binomial' }, { id: 'l
 function biData(rng, level) {
   const g = rng.pick(level <= 2 ? ['urn', 'qcm', 'pieces'] : ['urn', 'qcm', 'pieces', 'urn']);
   if (g === 'urn') {
-    const r = rng.int(2, 7); const b = rng.int(2, 6);
+    // Ten balls: p in tenths, results with at most 6 decimals.
+    const r = rng.int(2, 8); const b = 10 - r;
     const n = rng.int(3, 6);
     return { g, n, p: q(r, r + b), r, b, story: (k) => `Une urne contient ${r} boules rouges et ${b} bleues. On tire ${n} boules <b>avec</b> remise. X = nombre de rouges. Pr(X = ${k}) ?`, what: 'rouges' };
   }
   if (g === 'qcm') {
-    const opt = rng.pick([4, 5]); const n = rng.int(4, 8);
+    const opt = rng.pick([4, 5]); const n = rng.int(4, opt === 5 ? 6 : 8);
     return { g, n, p: q(1, opt), story: (k) => `Un QCM a ${n} questions à ${opt} réponses, dont une juste. Un élève répond au hasard. X = nombre de bonnes réponses. Pr(X = ${k}) ?`, what: 'bonnes réponses' };
   }
-  const n = rng.int(4, 8); const p = q(rng.pick([1, 2]), 10);
+  const n = rng.int(4, 6); const p = q(rng.pick([1, 2]), 10);
   return { g, n, p, story: (k) => `Une machine produit ${pct0(p)} de pièces défectueuses, indépendamment. On prend ${n} pièces. X = nombre de pièces défectueuses. Pr(X = ${k}) ?`, what: 'pièces défectueuses' };
 }
 const pct0 = (x) => `${Math.round(x.valueOf() * 100)} %`;
@@ -238,7 +239,8 @@ function biItem(level, rng, profile, opts = {}) {
     });
   }
   const D = biData(rng, level);
-  const k = rng.int(1, D.n - 1);
+  // A small p with a large k gives tiny probabilities (0,001215): k stays near np.
+  const k = D.p.valueOf() <= 0.25 ? rng.int(1, Math.min(2, D.n - 1)) : rng.int(1, D.n - 1);
   const v = binom(D.n, k, D.p);
   if (opts.exam === 'mcq') {
     const r = q(1).sub(D.p);
@@ -369,7 +371,7 @@ function poItem(level, rng, profile, opts = {}) {
   return statItem({
     skill: PO, level, key: `${level}:${D.g}:${t(lam)}:${ev}`, prompt, parts, subgoals: PO_SUB, exam: examTag(opts),
     simulate: { model: 'poisson', lambda: lam.valueOf(), event: { op: cum ? 'le' : 'eq', k }, answer: v, label: `Pr(${ev})` },
-    hints: H('λ = n·p (ou le taux sur la durée) ; puis Pr(X = k) = λᵏe^(−λ)/k!.', `${M(poisTerm(lam, 0))} + …`, `Pr(${ev}) ≈ ${f3(v)}`),
+    hints: H('λ = n·p (ou le taux sur la durée) ; puis Pr(X = k) = λᵏe^(−λ)/k!.', cum ? `${M(poisTerm(lam, 0))} + …` : `λ = ${t(lam).replace('-', '−')}, puis ${M(expr)}`, `Pr(${ev}) ≈ ${f3(v)}`),
   });
 }
 

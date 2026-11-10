@@ -137,7 +137,11 @@ function ccItem(level, rng, profile, opts = {}) {
       SM(`${P(d.cov)}/(□×□)`), `corr(X, Y) = ${S(d.r)} ; cov(${X}, ${Y}) = ${S(d.cov.mul(d.a * d.c))} ; corr(${X}, ${Y}) = ${S(d.r.mul(d.a * d.c > 0 ? 1 : -1))}`),
     subgoals: CC_SUB, interpret: ccInterpret(d), exam: examTag(opts),
   };
-  if (opts.exam === 'coef') return coefItem(o);
+  if (opts.exam === 'coef') {
+    // The coef variant asks one value, and its prompt says which.
+    const part = parts.find((x) => x.label === 'corr(X, Y)') ?? parts[parts.length - 1];
+    return coefItem({ ...o, part, prompt: `${prompt.split(' Calcule')[0]} Que vaut la corrélation corr(X, Y) ?` });
+  }
   return statItem(o);
 }
 
@@ -257,7 +261,7 @@ function teItem(level, rng, profile, opts = {}) {
     hints: H('Calcule tout sachant l\'examinateur, puis pondère par ses probabilités ; var(N) = E[var(N | ·)] + var(E[N | ·]).',
       SM(`${T(d.pi)}×${T(d.e1)}+${T(d.pj)}×□`), `E[N] = ${S(d.e)} ; var(N) = ${S(d.ev)} + ${S(d.ve)} = ${S(d.v)}`),
   };
-  if (opts.exam === 'coef') return coefItem(o);
+  if (opts.exam === 'coef') return coefItem({ ...o, prompt: o.prompt.replace('Calcule E[N] et var(N).', 'Calcule var(N).') });
   if (opts.exam === 'open') return openItem({ ...o, key: `open:${o.key}` }, 10, rng);
   return statItem(o);
 }
@@ -435,7 +439,7 @@ function mcMarkov(level, rng) {
   const what = rng.pick([['Le temps d\'attente X (en minutes) à un guichet', 'minutes'], ['Le nombre X de clients en une heure', 'clients'], ['La durée de vie X d\'une ampoule (en mois)', 'mois']]);
   return {
     key: `markov:${m}:${a}`,
-    prompt: `${what[0]} est positif, d'espérance ${m}. Majore Pr(X ≥ ${a}).`,
+    prompt: `${what[0]} est ${what[0].startsWith('La ') ? 'positive' : 'positif'}, d'espérance ${m}. Majore Pr(X ≥ ${a}).`,
     parts: [{ label: `Pr(X ≥ ${a})`, name: 'b', kind: 'prob', expect: `${m}/${a}`, action: 'Markov : Pr(X ≥ a) ≤ E[X]/a',
       decisions: [{ prompt: 'Quelle inégalité ?', options: [
         { id: 'm', label: 'Markov : X ≥ 0 et on connaît E[X]', valid: true },
@@ -729,7 +733,7 @@ function cbItem(level, rng, profile, opts = {}) {
   const ev = d.upper ? `X ≥ ${d.k}` : `X ≤ ${d.k}`;
   const story = d.poisson
     ? `Le nombre X de clients d'un magasin en un mois suit ${law}.`
-    : rng.pick([`On lance ${d.n} fois une pièce ; X est le nombre de piles, X ~ ${law}.`, `Dans un sondage, ${d.n} personnes répondent ; chacune est favorable avec la probabilité ${S(d.p)}. X est le nombre de personnes favorables, X ~ ${law}.`]);
+    : rng.pick([d.p.eq?.(q(1, 2)) || Number(d.p) === 0.5 ? `On lance ${d.n} fois une pièce équilibrée ; X est le nombre de piles, X ~ ${law}.` : `Une machine produit des pièces défectueuses avec la probabilité ${S(d.p)}, indépendamment ; sur ${d.n} pièces, X est le nombre de pièces défectueuses, X ~ ${law}.`, `Dans un sondage, ${d.n} personnes répondent ; chacune est favorable avec la probabilité ${S(d.p)}. X est le nombre de personnes favorables, X ~ ${law}.`]);
   if (opts.exam === 'mcq') {
     return choice({ skill: CB, level: 4, key: `mcq:${law}:${d.k}:${d.upper}`, exam: examTag(opts),
       prompt: `${story} Par l'approximation normale (sans correction de continuité), Pr(${ev}) ≈ ?`,

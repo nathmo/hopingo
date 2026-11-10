@@ -21,6 +21,9 @@ const EV_STORIES = [
   { a: 'avoir un chat', b: 'avoir un chien', who: 'On choisit un ménage au hasard dans une ville.' },
 ];
 
+// Feminine nouns (dames, femmes, pièces): « aucune », « une ».
+const fem = (D) => /dames|femmes|pièces/.test(D.what);
+
 function evData(rng, level) {
   for (let k = 0; k < 200; k++) {
     const pA = tenth(rng);
@@ -231,8 +234,8 @@ function ctAtLeast(D) {
   const v = q(1).sub(p0).sub(p1);
   return { p0, p1, p2, v, parts: [
     { label: '|Ω|', name: 'om', kind: 'prob', expect: String(D.om), action: 'Compter Ω', lines: [{ math: `C(${D.N};${D.n})`, subgoal: 'model', note: 'Sans ordre' }, { math: String(D.om), subgoal: 'count', note: 'Calculer' }] },
-    { label: 'Pr(X=0)', name: 'pz', kind: 'prob', expect: t(p0), action: `Aucun : les ${D.n} parmi les ${D.N - D.K} autres`, lines: [{ math: `C(${D.N - D.K};${D.n})/${D.om}`, subgoal: 'count', note: `Aucun des ${D.what}` }, ...(p0.d === D.om ? [] : [{ math: t(p0), note: 'Simplifier' }])].filter((l, i, a) => !(i === 0 && false)) },
-    { label: 'Pr(X=1)', name: 'pu', kind: 'prob', expect: t(p1), action: 'Exactement un', lines: [{ math: `${D.K}×C(${D.N - D.K};${D.n - 1})/${D.om}`, subgoal: 'count', note: 'Exactement un' }, { math: t(p1), note: 'Simplifier' }] },
+    { label: 'Pr(X=0)', name: 'pz', kind: 'prob', expect: t(p0), action: `Aucun${fem(D) ? 'e' : ''} : les ${D.n} parmi les ${D.N - D.K} autres`, lines: [{ math: `C(${D.N - D.K};${D.n})/${D.om}`, subgoal: 'count', note: `Aucun${fem(D) ? 'e' : ''} des ${D.what}` }, ...(p0.d === D.om ? [] : [{ math: t(p0), note: 'Simplifier' }])].filter((l, i, a) => !(i === 0 && false)) },
+    { label: 'Pr(X=1)', name: 'pu', kind: 'prob', expect: t(p1), action: `Exactement un${fem(D) ? 'e' : ''}`, lines: [{ math: `${D.K}×C(${D.N - D.K};${D.n - 1})/${D.om}`, subgoal: 'count', note: `Exactement un${fem(D) ? 'e' : ''}` }, { math: t(p1), note: 'Simplifier' }] },
     {
       label: 'Pr(X≥2)', name: 'pv', kind: 'prob', expect: '1-$pz-$pu', action: 'Complément : 1 − Pr(X = 0) − Pr(X = 1)',
       wrongActions: [{ label: 'Pr(X ≥ 2) = Pr(X = 2)', rule: 'p_exactly_atleast', why: '« Au moins 2 » contient aussi 3, 4, …' }],
@@ -250,8 +253,8 @@ function ctItem(level, rng, profile, opts = {}) {
   if (atLeast) {
     const A = ctAtLeast(D);
     // Pr(X = 0) of one line when the fraction is already irreducible: end there.
-    A.parts[1].lines = A.p0.d === D.om ? [{ math: `${C(D.N - D.K, D.n)}/${D.om}`, subgoal: 'count', note: `Aucun des ${D.what}` }] : A.parts[1].lines;
-    A.parts[2].lines = A.p1.d === D.om ? [{ math: `${D.K * C(D.N - D.K, D.n - 1)}/${D.om}`, subgoal: 'count', note: 'Exactement un' }] : A.parts[2].lines;
+    A.parts[1].lines = A.p0.d === D.om ? [{ math: `${C(D.N - D.K, D.n)}/${D.om}`, subgoal: 'count', note: `Aucun${fem(D) ? 'e' : ''} des ${D.what}` }] : A.parts[1].lines;
+    A.parts[2].lines = A.p1.d === D.om ? [{ math: `${D.K * C(D.N - D.K, D.n - 1)}/${D.om}`, subgoal: 'count', note: `Exactement un${fem(D) ? 'e' : ''}` }] : A.parts[2].lines;
     return statItem({
       skill: CT, level, key: `${level}:atleast:${D.N}:${D.K}:${D.n}`, fallback: D.fallback,
       prompt: `${D.story(D.n)} Quelle est la probabilité d'obtenir au moins deux ${D.what} ?`,
@@ -279,7 +282,7 @@ function ctMcq(D, rng, opts) {
     prompt: `${D.story(D.n)} Probabilité d'obtenir exactement ${nb(D.k, D.what)} ?`,
     right: s(p), wrongs: [
       { html: s(q(D.a, D.om)), rule: 'p_count_forget_rest' },
-      { html: `≈ ${dec4(binomQ(D.n, D.k, D.K, D.N))}`, rule: 'p_binom_without_replacement' },
+      { html: s(binomQ(D.n, D.k, D.K, D.N)), rule: 'p_binom_without_replacement' },
       { html: s(q(D.fa, arrange(D.N, D.n))), rule: 'g7_order_confusion' },
     ], fillers: [{ html: s(q(D.fa, D.om * 2)) }],
   }, rng);
@@ -693,9 +696,13 @@ const SYS_WRONG = [
 ];
 
 function inSystem(rng, level) {
-  const p = q(rng.pick([80, 90, 95, 99]), 100);
-  const n = rng.int(2, level >= 4 ? 4 : 3);
   const kind = level >= 4 && rng.chance(0.4) ? 'mixed' : rng.pick(['parallel', 'series']);
+  // Readable results: at most 6 decimals (0,95⁴ or 1 − 0,01⁴ are not), and
+  // 0,99 in parallel only for two components (1 − 0,01³ = 0,999999).
+  const pp = rng.pick(kind === 'parallel' ? [80, 90, 95] : [80, 90, 95, 99]);
+  const p = q(pp, 100);
+  const dec = pp % 10 ? 2 : 1;
+  const n = rng.int(2, Math.min(level >= 4 ? 4 : 3, Math.floor(6 / dec)));
   const fail = q(1).sub(p);
   if (kind === 'mixed') {
     const r = q(rng.pick([90, 95, 99]), 100);
@@ -740,7 +747,7 @@ function inDice(rng) {
           { id: 'calc', label: 'Il faut encore vérifier Pr(A ∩ B ∩ C) = 1/8', valid: true },
           { id: 'yes', label: 'Oui : les trois paires sont indépendantes', valid: false, rule: 'p_pairwise_mutual', why: 'Indépendants deux à deux ne suffit pas : il faut aussi la condition sur les trois.' },
         ] }],
-        lines: [{ math: abc.n ? `${abc.n}/${abc.d}` : '0', note: `${abc.n ? 'Sur A ∩ B, la somme est toujours' : 'Sur A ∩ B, la somme n\'est jamais'} ${c} : ${s(abc)} ≠ 1/8, pas mutuellement indépendants`, subgoal: 'dec' }],
+        lines: [{ math: abc.n ? `${abc.n}/${abc.d}` : '0', note: `${abc.n ? 'Sur A ∩ B, la somme est toujours' : 'Sur A ∩ B, la somme n\'est jamais'} ${c} : ${abc.n ? `${abc.n}/${abc.d}` : 0} ≠ 1/8, pas mutuellement indépendants`, subgoal: 'dec' }],
       },
     ],
   };

@@ -394,7 +394,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-indep` — Indépendance, incompatibilité, systèmes redondants
 - **Année** 15 · **Prérequis** `p-cond-total` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cond-total` : Pr(A | B) = Pr(A).
-- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits dés (indépendants deux à deux, pas mutuellement), tableau 2 × 2 (décision appuyée sur Pr(A)·Pr(B)), systèmes série, parallèle et mixte, « au moins un 6 ». Niveau 5 : les dés, puis le nombre minimal de composants en parallèle. Gabarit (e) (pile puis face) non fait. Le V/F « deux à deux ⇒ mutuellement » n'est pas posé (pas de contre-exemple vérifiable en nombres) : `p_pairwise_mutual` est une option de décision.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits dés (indépendants deux à deux, pas mutuellement), tableau 2 × 2 (décision appuyée sur Pr(A)·Pr(B)), systèmes série, parallèle et mixte, « au moins un 6 ». Niveau 5 : les dés, puis le nombre minimal de composants en parallèle. Gabarit (e) (pile puis face) non fait. Le V/F « deux à deux ⇒ mutuellement » n'est pas posé (pas de contre-exemple vérifiable en nombres) : `p_pairwise_mutual` est une option de décision. Les fiabilités sont tirées pour que le résultat ait au plus 6 décimales (0,99 en parallèle seulement avec deux composants).
 - **Intro** : A et B indépendants ⇔ Pr(A ∩ B) = Pr(A)·Pr(B) ⇔ Pr(A | B) = Pr(A). Incompatibles : Pr(A ∩ B) = 0 ; deux événements incompatibles de probabilités non nulles sont **dépendants**. Trois événements sont mutuellement indépendants si les quatre égalités tiennent. Système en série : Π pᵢ ; en parallèle : 1 − Π(1 − pᵢ). Exemple : `parallèle, 3 × 0,9 : 1 − 0,1³ = 0,999` ; `série : 0,9³ = 0,729`.
 - **Juge** : décisions (« indépendants ? ») appuyées sur des lignes `prob` · **Forme finale** : décision justifiée par une égalité ou une inégalité calculée ; ou probabilité de fonctionnement exacte.
 - **Niveaux** :
@@ -441,7 +441,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-binom` — Bernoulli et binomiale
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `g7-binomial` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-disc-pmf` : fonction de masse et de répartition.
-- **Statut** : fait le 10 novembre 2026 (étape U7). Une partie p (avec la décision « binomiale ? »), puis Pr(X = k) ; aux niveaux 4 et 5, E[X], var(X) et Pr(X ≤ 1) ou Pr(X ≥ 2). Non fait : la comparaison des systèmes à 5 et à 3 composants (« pour quels p ? »). Simulation : B(n, p) tirée 10 000 fois.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Une partie p (avec la décision « binomiale ? »), puis Pr(X = k) ; aux niveaux 4 et 5, E[X], var(X) et Pr(X ≤ 1) ou Pr(X ≥ 2). Non fait : la comparaison des systèmes à 5 et à 3 composants (« pour quels p ? »). Simulation : B(n, p) tirée 10 000 fois. L'urne a toujours 10 boules (p en dixièmes) et, pour p ≤ 0,25, k vaut 1 ou 2, pour éviter des probabilités minuscules.
 - **Intro** : n essais indépendants, même probabilité p de succès : X ~ B(n, p), Pr(X = k) = C(n, k)·pᵏ(1 − p)^(n−k), E[X] = np, var(X) = np(1 − p). B(1, p) = B(p). « Au moins un » : 1 − (1 − p)ⁿ. Exemple : `X ~ B(5 ; 0,6)` ; `Pr(X = 3) = C(5, 3) · 0,6³ · 0,4² = 0,3456`.
 - **Juge** : `prob` si p est rationnel (exact), sinon `stat {decimals: 4}` · **Forme finale** : valeur exacte ou décimal à 4 chiffres.
 - **Niveaux** :
@@ -1350,7 +1350,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-reg-ls` — Droite des moindres carrés, r et R²
 - **Année** 15 · **Prérequis** `p-cov-corr`, `l-orth-lsq`, `p-desc-summary` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cov-corr` : r = S_xy/√(S_xx·S_yy).
-- **Statut** : fait le 10 novembre 2026 (étape U7). Parties x̄, ȳ, S_xx, S_xy, β̂, α̂, S_yy, R² (`prob`, exactes) ; niveau 4 : une fois sur deux à partir des sommes brutes (sans R²) ; niveau 5 : à partir de r, s_x, s_y et des moyennes, puis la droite de x sur y. Pas d'item `table` ni de `code`. Aux niveaux 1 à 3, β̂ est un décimal à deux chiffres au plus.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties x̄, ȳ, S_xx, S_xy, β̂, α̂, S_yy, R² (`prob`, exactes) ; niveau 4 : une fois sur deux à partir des sommes brutes (sans R²) ; niveau 5 : à partir de r, s_x, s_y et des moyennes, puis la droite de x sur y. Pas d'item `table` ni de `code`. Aux niveaux 1 à 3, β̂ est un décimal à deux chiffres au plus. Les jeux de données ont R² ≥ 0,15 (pas de nuage sans tendance).
 - **Intro** : modèle Yᵢ = α + βxᵢ + εᵢ. β̂ = S_xy/S_xx = Σ(xᵢ − x̄)(yᵢ − ȳ)/Σ(xᵢ − x̄)² = r·s_y/s_x ; α̂ = ȳ − β̂x̄ ; la droite passe par (x̄, ȳ) ; les résidus somment à 0. r = S_xy/√(S_xx·S_yy) ; R² = r² = ESS/TSS. La régression de x sur y n'est **pas** la droite inverse (pente r·s_x/s_y). Exemple : `β̂ = 6/10 = 0,6 ; α̂ = 4 − 0,6 · 3 = 2,2` ; `R² = 36/60 = 0,6`.
 - **Juge** : lignes `x̄`, `ȳ`, `S_xx`, `S_xy`, `S_yy`, `β̂`, `α̂`, `r`, `R²` (`prob` si exact, sinon `stat {decimals: 3}`) · **Forme finale** : droite ŷ = α̂ + β̂x, puis r ou R² demandé.
 - **Niveaux** :

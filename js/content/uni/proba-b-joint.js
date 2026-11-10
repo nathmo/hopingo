@@ -5,6 +5,9 @@
 
 import { statItem, coefItem, choice, tf, numCounter, H, SM, examTag } from './proba-kit.js';
 import { MT } from './kit.js';
+import { parse } from '../../cas/parse.js';
+import { pretty } from '../../cas/normal.js';
+import { toText } from '../../cas/print.js';
 import { q, qt, qs, ql, dl, fr, table } from './proba-b-kit.js';
 
 const pickOf = (rng, xs) => xs[rng.int(0, xs.length - 1)];
@@ -194,7 +197,8 @@ function jcItem(level, rng, profile, opts = {}) {
       decisions: [{ prompt: 'W et Z sont-elles indépendantes ?', levels: [2, 3, 4, 5], options: K.factor
         ? [{ id: 'yes', label: 'Oui : f se factorise en (fonction de w)·(fonction de z) sur un rectangle', valid: true }, { id: 'no', label: 'Non', valid: false, why: 'f(w, z) = c·w^p·z^q sur un rectangle : elle se factorise.' }]
         : [{ id: 'no', label: `Non : ${K.kern} ne se factorise pas en (fonction de w)·(fonction de z)`, valid: true }, { id: 'yes', label: 'Oui, le support est un rectangle', valid: false, rule: 'p_joint_support_indep', why: 'Il faut aussi que f se factorise ; ici elle ne se factorise pas.' }] }],
-      lines: [{ math: fW, subgoal: 'joint', blank: [K.inner] }] },
+      // Guided: c × (the inner integral) with a blank; else simplified (w²/9).
+      lines: [{ math: level <= 2 ? fW : toText(pretty(parse(fW, { vars: ['w'] }))), subgoal: 'joint', blank: [K.inner] }] },
   ];
   return statItem({ skill: JC, level, key: `${level}:${K.kind}:${K.kern}:${K.A}:${K.B}`, exam: examTag(opts),
     prompt: `(W, Z) a pour densité f(w, z) = ${W(K.kind === 'sum' ? `c×(${K.kern})` : `c×${K.kern}`)} sur ${rect}, et 0 ailleurs. Calcule l'intégrale intérieure en z, l'intégrale double I du noyau, c, puis la marginale de W.`,

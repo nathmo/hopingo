@@ -9,6 +9,9 @@ import { dataSet, sum, sqDevs, tq, tqText, ciInterpret, quantileDecision, dec, v
 import { Q } from '../../math/rational.js';
 import { tInv, PhiInv, roundTo, floorTo, ceilTo, sigRound, firstDigit, eeT } from '../../cas/stats.js';
 
+// Indices and exponents of the statements: X₂₀, F(x)²⁰.
+const subT = (k) => [...String(k)].map((c) => '₀₁₂₃₄₅₆₇₈₉'[c]).join('');
+const supT = (k) => [...String(k)].map((c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join('');
 const pick = (rng, xs) => xs[rng.int(0, xs.length - 1)];
 const I = (lo, hi, d = 3) => `[${dec(lo, d)} ; ${dec(hi, d)}]`;
 const IR = (lo, hi, d = 3) => I(lo, hi, d).replace(/-/g, '−');
@@ -590,7 +593,7 @@ function msDensityParts(k, n, withF = true) {
     label: 'F_M(x)', name: 'FM', kind: 'prob', ...XV, expect: `(x/θ)^${N}`, action: 'Maximum : F(x)ⁿ (tous ≤ x)',
     traps: { p_max_min_swap: [`1-(1-${m === 1 ? 'x/θ' : `(x/θ)^${m}`})^${n}`] },
     wrongActions: [{ label: 'Prendre 1 − (1 − F(x))ⁿ', rule: 'p_max_min_swap', why: '« max ≤ x » veut dire « tous ≤ x » : F(x)ⁿ. L’autre formule est celle du minimum.' }],
-    lines: [{ math: `(x/θ)^${N}`, note: `M ≤ x ⇔ les ${n} données ≤ x : F(x)^${n}`, subgoal: 'all', blank: [String(N)] }],
+    lines: [{ math: `(x/θ)^${N}`, note: `M ≤ x ⇔ les ${n} données ≤ x : F(x)${supT(n)}`, subgoal: 'all', blank: [String(N)] }],
   });
   parts.push({
     label: 'f_M(x)', name: 'fM', kind: 'prob', ...XV, expect: `${N}x^${N - 1}/θ^${N}`, action: 'Dériver F_M',
@@ -627,7 +630,7 @@ function msItem(level, rng, profile, opts = {}) {
     const { part, hi } = msCiPart(M, n, alpha);
     const pre = kind === 'plates'
       ? `Sur ${n} plaques vaudoises vues au hasard, le plus grand numéro est M = ${M}. On modélise les numéros par des variables iid U[0, θ].`
-      : `X₁, …, X_${n} iid U[0, θ], et M = max Xᵢ = ${M}.`;
+      : `X₁, …, X${subT(n)} iid U[0, θ], et M = max Xᵢ = ${M}.`;
     const parts = [];
     if (kind === 'plates') parts.push(...msDensityParts(0, n, false).parts.slice(0, 1));
     parts.push(part);
@@ -647,7 +650,7 @@ function msItem(level, rng, profile, opts = {}) {
   const fT = k === 0 ? '1/θ' : `${k + 1}x${k > 1 ? `^${k}` : ''}/θ^${k + 1}`;
   return statItem({
     skill: MS, level, key: `${level}:${k}:${n}`,
-    prompt: `X₁, …, X_${n} iid de densité f(x) = ${SM(fT)} sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].`,
+    prompt: `X₁, …, X${subT(n)} iid de densité f(x) = ${SM(fT)} sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].`,
     parts,
     hints: H('Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive.', SM(`(x/θ)^□`), `f_M(x) = ${SM(`${n * (k + 1)}x^${n * (k + 1) - 1}/θ^${n * (k + 1)}`)}`),
     subgoals: MS_SUB, exam: examTag(opts),
@@ -661,7 +664,7 @@ function msMcq(rng, opts) {
   const F = m === 1 ? 'x/θ' : `(x/θ)^${m}`;
   return choice({
     skill: MS, level: 4, key: `mcq:${n}:${k}`, exam: examTag(opts),
-    prompt: `X₁, …, X_${n} iid de fonction de répartition F(x) = ${SM(F)} sur [0 ; θ]. Quelle est la densité de M = max Xᵢ sur [0 ; θ] ?`,
+    prompt: `X₁, …, X${subT(n)} iid de fonction de répartition F(x) = ${SM(F)} sur [0 ; θ]. Quelle est la densité de M = max Xᵢ sur [0 ; θ] ?`,
     right: SM(`${n * m}x^${n * m - 1}/θ^${n * m}`),
     wrongs: [
       { html: SM(`(${m === 1 ? '1/θ' : `${m}x^${k}/θ^${m}`})^${n}`), rule: 'p_max_density_power' },

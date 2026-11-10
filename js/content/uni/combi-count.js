@@ -65,7 +65,7 @@ function paData(rng, kinds) {
     const value = fact(n);
     const what = rng.pick([['personnes', 'se mettre en file'], ['livres différents', 'être rangés sur une étagère'], ['élèves', 's\'asseoir sur un banc de ' + n + ' places']]);
     return {
-      kind, n, value, story: `De combien de façons ${n} ${what[0]} peuvent-ils ${what[1]} ?`.replace('peuvent-ils s', 'peuvent-ils s'),
+      kind, n, value, story: `De combien de façons ${n} ${what[0]} peuvent-${what[0] === 'personnes' ? 'elles' : 'ils'} ${what[1]} ?`,
       lines: [
         { math: `${n}!`, note: 'Permutation de n objets distincts : n!', subgoal: 'formula', blank: [String(n)] },
         { math: Array.from({ length: n }, (_, i) => n - i).join('×'), note: 'Une case par place', subgoal: 'boxes', blank: ['1'] },

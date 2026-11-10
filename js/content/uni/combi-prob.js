@@ -318,14 +318,17 @@ function trData(rng, kinds) {
   const p1 = (x) => new Q(x === 'R' ? R : B, N);
   const path = (x, y) => p1(x).mul(p2(x, y));
   const wrongPath = (x, y) => p1(x).mul(p1(y));
-  const show = (x, y) => `${fr(p1(x))}×${fr(p2(x, y))}`;
+  // Each branch as the urn shows it (4/8, not 1/2: one ball fewer).
+  const p1t = (x) => `${x === 'R' ? R : B}/${N}`;
+  const p2t = (x, y) => (repl ? p1t(y) : `${(y === 'R' ? R : B) - (x === y ? 1 : 0)}/${N - 1}`);
+  const show = (x, y) => `${p1t(x)}×${p2t(x, y)}`;
   const paths = ev === 'same' ? [['R', 'R'], ['B', 'B']] : ev === 'second' ? [['R', 'R'], ['B', 'R']] : [['B', 'B']];
   const evText = { same: 'que les deux boules soient de la même couleur', atleast: "qu'au moins une boule soit rouge", second: 'que la 2e boule soit rouge' }[ev];
   const parts = paths.map(([x, y]) => ({
     label: `P(${x}${y})`, name: `${x}${y}`, kind: 'prob', expect: fr(path(x, y)), action: `Multiplier le long du chemin ${x}${y}`,
     traps: repl ? undefined : { g7_tree_with_replacement: { values: [fr(wrongPath(x, y))], ctx: { left: `${N - 1} boules`, second: `${fr(p2(x, y))} et non ${fr(p1(y))}` } } },
     wrongActions: repl ? [] : [{ label: 'Garder les mêmes probabilités au 2e tirage', rule: 'g7_tree_with_replacement', why: 'Sans remise, il reste une boule de moins au 2e tirage.' }],
-    lines: [{ math: show(x, y), note: `Chemin ${x} puis ${y}${repl ? '' : ' (sans remise)'}`, subgoal: 'path', blank: [fr(p2(x, y))] }, ...(fr(path(x, y)) === show(x, y) ? [] : [{ math: fr(path(x, y)), note: 'Calculer', blank: [fr(path(x, y))] }])],
+    lines: [{ math: show(x, y), note: `Chemin ${x} puis ${y}${repl ? '' : ' (sans remise)'}`, subgoal: 'path', blank: [p2t(x, y)] }, ...(fr(path(x, y)) === show(x, y) ? [] : [{ math: fr(path(x, y)), note: 'Calculer', blank: [fr(path(x, y))] }])],
   }));
   const P = ev === 'atleast' ? new Q(1).sub(path('B', 'B')) : path(...paths[0]).add(path(...paths[1]));
   const sumT = ev === 'atleast' ? '1-$BB' : `$${paths[0].join('')}+$${paths[1].join('')}`;

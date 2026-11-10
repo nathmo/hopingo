@@ -270,7 +270,8 @@ function bcItem(level, rng, profile, opts = {}) {
         { id: 'dir', label: 'Dirichlet : on ajoute les comptes aux paramètres (loi conjuguée)', valid: true },
         { id: 'mult', label: 'Multinomiale, comme les données', valid: false, why: 'θ est un vecteur de probabilités : la Dirichlet est conjuguée à la multinomiale.' },
       ] }],
-      notes: [`A posteriori : Dir(${d.al.map((a, i) => a + d.N[i]).join(', ')}).`],
+      // Shown only when guided: it would give the answer away.
+      notes: level > 2 ? [] : [`A posteriori : Dir(${d.al.map((a, i) => a + d.N[i]).join(', ')}).`],
       lines: [{ math: `${d.al[0]}+${d.N[0]}`, note: 'α₁ + N₁', subgoal: 'dir', blank: [String(d.N[0])] }, { math: String(d.al[0] + d.N[0]) }] },
     { label: 'α₀+n', name: 'T', kind: 'prob', expect: String(d.a0 + d.n), action: 'Total des paramètres a posteriori α₀ + n',
       lines: [{ math: `${d.a0}+${d.n}`, note: `α₀ = ${d.al.join(' + ')}`, subgoal: 'dir', blank: [String(d.n)] }, { math: String(d.a0 + d.n) }] },
@@ -290,12 +291,14 @@ function bcItem(level, rng, profile, opts = {}) {
 }
 
 // The multinomial probability (level 1, and an exam choice).
+// Quarters and halves stay fractions (3/16 reads better than 0,1875).
+const qf = (x) => (x.d === 1 ? String(x.n) : `${x.n}/${x.d}`).replace('-', '−');
 function multiItem(level, rng, opts) {
   const m = multiData(rng);
-  const story = `Une expérience a ${m.K} issues de probabilités (${m.th.map(qs).join(' ; ')}). On la répète n = ${m.n} fois, indépendamment. Probabilité d'obtenir les comptes (${m.N.join(', ')}) ?`;
+  const story = `Une expérience a ${m.K} issues de probabilités (${m.th.map(qf).join(' ; ')}). On la répète n = ${m.n} fois, indépendamment. Probabilité d'obtenir les comptes (${m.N.join(', ')}) ?`;
   if (opts.exam === 'mcq') {
-    return choice({ skill: BC, level: 4, prompt: story, right: qs(m.P), wrongs: [{ html: qs(m.prod), rule: 'p_multinomial_no_coef' }],
-      fillers: [{ html: qs(m.P.mul(2).cmp(1) < 0 ? m.P.mul(2) : m.P.div(3)) }, { html: qs(m.prod.mul(m.n)) }], key: `mcq:multi:${m.N.join('-')}:${m.th.map(qt).join('-')}`, exam: examTag(opts) }, rng);
+    return choice({ skill: BC, level: 4, prompt: story, right: qf(m.P), wrongs: [{ html: qf(m.prod), rule: 'p_multinomial_no_coef' }],
+      fillers: [{ html: qf(m.P.mul(2).cmp(1) < 0 ? m.P.mul(2) : m.P.div(3)) }, { html: qf(m.prod.mul(m.n)) }], key: `mcq:multi:${m.N.join('-')}:${m.th.map(qt).join('-')}`, exam: examTag(opts) }, rng);
   }
   const fac = `${m.n}!/(${m.N.map((x) => `${x}!`).join('×')})`;
   const pw = m.N.map((x, i) => (x ? `(${qt(m.th[i])})^${x}` : '')).filter(Boolean).join('×');
@@ -309,7 +312,7 @@ function multiItem(level, rng, opts) {
         wrongActions: [{ label: 'Prendre seulement Π θₖ^(Nₖ)', rule: 'p_multinomial_no_coef', why: 'Il faut compter tous les ordres possibles.' }],
         lines: [{ math: `${m.coef}×${pw}`, note: 'Coefficient × produit des probabilités', subgoal: 'multi', blank: [String(m.coef)] }, { math: qt(m.P), blank: [qt(m.P)] }] },
     ],
-    hints: H('Une suite précise a la probabilité Π θₖ^(Nₖ) ; il y a n!/(N₁!···N_K!) suites.', `${fac} × □`, qs(m.P)),
+    hints: H('Une suite précise a la probabilité Π θₖ^(Nₖ) ; il y a n!/(N₁!···N_K!) suites.', `${fac} × □`, qf(m.P)),
     subgoals: BC_SUB, exam: examTag(opts),
   });
 }

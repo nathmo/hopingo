@@ -164,7 +164,7 @@ Vrai ou faux ?
 
 ## Factorielles, permutations, arrangements, anagrammes (`g7-perm-arr`, Gymnase)
 
-_n objets en ligne : n! ; k places parmi n, ordre compté : A(n, k) ; anagrammes : n!/(n₁!·n₂!···)._
+_Compter des rangements : n! pour n objets en ligne, A(n, k) pour k places ordonnées, n!/(n₁!·n₂!···) pour des anagrammes._
 
 ### Niveau 1
 
@@ -326,7 +326,7 @@ Vrai ou faux ?
 
 ## Combinaisons, triangle de Pascal (`g7-combinations`, Gymnase)
 
-_Choisir k objets parmi n, sans ordre : C(n, k) = n!/(k!(n − k)!) = A(n, k)/k!._
+_Choisir k objets parmi n sans ordre : C(n, k) = n!/(k!(n − k)!), puis multiplier les choix faits dans plusieurs groupes._
 
 ### Niveau 1
 
@@ -523,7 +523,7 @@ Un groupe compte 7 femmes et 7 hommes. On choisit un comité de 3 personnes. Com
 
 ## Ordonné ou pas ? Avec ou sans remise ? (exercice éclair) (`g7-which-count`, Gymnase)
 
-_L'ordre compte-t-il ? Peut-on reprendre le même objet ? Puis la bonne formule : nᵏ, A(n, k), C(n, k)._
+_Avant de calculer : l'ordre compte-t-il, peut-on reprendre le même objet ? Puis la bonne formule : nᵏ, A(n, k) ou C(n, k)._
 
 ### Niveau 1
 
@@ -622,7 +622,7 @@ On forme un comité de 4 personnes dans un groupe de 11. Combien de comités ?
 
 ## Binôme de Newton (`g7-binomial`, Gymnase)
 
-_(a + b)ⁿ = Σₖ₌₀ⁿ C(n, k)·aⁿ⁻ᵏ·bᵏ._
+_Développer (a + b)ⁿ avec les C(n, k), et trouver le coefficient d'une puissance de x par le terme général._
 
 ### Niveau 1
 
@@ -1070,7 +1070,7 @@ _On multiplie le long d'un chemin, on additionne les chemins qui mènent à l'é
 ```
 Une urne contient 4 boules rouges et 4 bleues. On tire deux boules, l'une après l'autre, sans remise. Quelle est la probabilité qu'au moins une boule soit rouge ?
   [guided]  P(BB)
-    = 1/2·□   (trous : 1/2·3/7)   ← Chemin B puis B (sans remise)
+    = 4/8·□   (trous : 4/8·3/7)   ← Chemin B puis B (sans remise)
     = □   (trous : 3/14)   ← Calculer
   — Complément  [juge prob]  départ : P
     = 1 − 3/14   ← « Au moins une rouge » = contraire de « BB »
@@ -1080,7 +1080,7 @@ Une urne contient 4 boules rouges et 4 bleues. On tire deux boules, l'une après
 
 Une urne contient 4 boules rouges et 4 bleues. On tire deux boules, l'une après l'autre, avec remise. Quelle est la probabilité qu'au moins une boule soit rouge ?
   [guided]  P(BB)
-    = □·1/2   (trous : 1/2·1/2)   ← Chemin B puis B
+    = □·4/8   (trous : 4/8·4/8)   ← Chemin B puis B
     = □   (trous : 1/4)   ← Calculer
   — Complément  [juge prob]  départ : P
     = 1 − 1/4   ← « Au moins une rouge » = contraire de « BB »
@@ -1089,7 +1089,7 @@ Une urne contient 4 boules rouges et 4 bleues. On tire deux boules, l'une après
 
 Une urne contient 5 boules rouges et 2 bleues. On tire deux boules, l'une après l'autre, sans remise. Quelle est la probabilité que la 2e boule soit rouge ?
   [guided]  P(RR)
-    = 5/7·□   (trous : 5/7·2/3)   ← Chemin R puis R (sans remise)
+    = 5/7·□   (trous : 5/7·4/6)   ← Chemin R puis R (sans remise)
     = □   (trous : 10/21)   ← Calculer
   — P(BR)  [juge prob]  départ : P(BR)
     = 2/7·□   (trous : 2/7·5/6)   ← Chemin B puis R (sans remise)
@@ -1122,7 +1122,7 @@ Une urne contient 3 boules rouges et 5 bleues. On tire deux boules, l'une après
 Une urne contient 5 boules rouges et 5 bleues. On tire deux boules, l'une après l'autre, sans remise. Quelle est la probabilité qu'au moins une boule soit rouge ?
   [guided]  P(BB)
     ? Au 2e tirage, les probabilités… ✔ changent : il reste une boule de moins / · restent celles du 1er tirage
-    = 1/2·□   (trous : 1/2·4/9)   ← Chemin B puis B (sans remise)
+    = 5/10·□   (trous : 5/10·4/9)   ← Chemin B puis B (sans remise)
     = □   (trous : 2/9)   ← Calculer
   — Complément  [juge prob]  départ : P
     = 1 − 2/9   ← « Au moins une rouge » = contraire de « BB »
@@ -1133,7 +1133,7 @@ Une urne contient 5 boules rouges et 5 bleues. On tire deux boules, l'une après
 Une urne contient 4 boules rouges et 4 bleues. On tire deux boules, l'une après l'autre, sans remise. Quelle est la probabilité qu'au moins une boule soit rouge ?
   [guided]  P(BB)
     ? Au 2e tirage, les probabilités… ✔ changent : il reste une boule de moins / · restent celles du 1er tirage
-    = 1/2·□   (trous : 1/2·3/7)   ← Chemin B puis B (sans remise)
+    = 4/8·□   (trous : 4/8·3/7)   ← Chemin B puis B (sans remise)
     = □   (trous : 3/14)   ← Calculer
   — Complément  [juge prob]  départ : P
     = 1 − 3/14   ← « Au moins une rouge » = contraire de « BB »
@@ -1148,7 +1148,7 @@ Une urne contient 4 boules rouges et 4 bleues. On tire deux boules, l'une après
 ```
 Une urne contient 5 boules rouges et 2 bleues. On tire deux boules, l'une après l'autre, sans remise. Quelle est la probabilité que la 2e boule soit rouge ?
   [tap, suivre l'erreur, menu menu]  P(RR)
-    = 5/7·2/3   ← Chemin R puis R (sans remise)
+    = 5/7·4/6   ← Chemin R puis R (sans remise)
     = 10/21   ← Calculer
   — P(BR)  [juge prob]  départ : P(BR)
     = 2/7·5/6   ← Chemin B puis R (sans remise)
@@ -1161,7 +1161,7 @@ Une urne contient 5 boules rouges et 2 bleues. On tire deux boules, l'une après
 
 Une urne contient 6 boules rouges et 4 bleues. On tire deux boules, l'une après l'autre, avec remise. Quelle est la probabilité qu'au moins une boule soit rouge ?
   [tap, suivre l'erreur, menu menu]  P(BB)
-    = 2/5·2/5   ← Chemin B puis B
+    = 4/10·4/10   ← Chemin B puis B
     = 4/25   ← Calculer
   — Complément  [juge prob]  départ : P
     = 1 − 4/25   ← « Au moins une rouge » = contraire de « BB »
@@ -1170,7 +1170,7 @@ Une urne contient 6 boules rouges et 4 bleues. On tire deux boules, l'une après
 
 Une urne contient 6 boules rouges et 2 bleues. On tire deux boules, l'une après l'autre, sans remise. Quelle est la probabilité qu'au moins une boule soit rouge ?
   [tap, suivre l'erreur, menu menu]  P(BB)
-    = 1/4·1/7   ← Chemin B puis B (sans remise)
+    = 2/8·1/7   ← Chemin B puis B (sans remise)
     = 1/28   ← Calculer
   — Complément  [juge prob]  départ : P
     = 1 − 1/28   ← « Au moins une rouge » = contraire de « BB »
