@@ -404,8 +404,8 @@ export const RULES = [
     id: 'a1_hyper_identity_sign', family: 'sign', tag: 'E', skill: 'a1-int-hyper', repair: 'g2-hyp-formulas',
     judges: ['equiv', 'antideriv'],
     name: 'Identité trigonométrique appliquée aux hyperboliques',
-    example: ['1 + sinh²t = 2 − cosh²t', '1 + sinh²t = cosh²t'],
-    check: { judge: { kind: 'equiv', vars: ['t'], domain: { t: [-2, 2] } }, prev: '1+sinh(t)^2', line: '2-cosh(t)^2' },
+    example: ['2cosh²t = 2 − 2sinh²t', '2cosh²t = 2 + 2sinh²t'],
+    check: { judge: { kind: 'equiv', vars: ['t'], domain: { t: [-2, 2] } }, prev: '2cosh(t)^2', line: '2-2sinh(t)^2' },
     // cos² + sin² = 1 used for cosh and sinh: cosh²u → 1 − sinh²u, sinh²u → 1 − cosh²u.
     transform: (prev) => {
       const out = [];

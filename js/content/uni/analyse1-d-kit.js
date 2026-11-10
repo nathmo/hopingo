@@ -190,6 +190,16 @@ export function tpl(math, texts, opts = {}) {
   const holes = [];
   for (const t of texts) {
     // {bound: 'lo' | 'hi'}: a bound of the first integral of the line.
+    // {num: text}: the numerator of that fraction (−a/b: a).
+    if (typeof t === 'object' && t.num) {
+      const want = toText(parse(t.num, opts));
+      let found = null;
+      walk(node, (n) => { if (!found && n.t !== 'paren' && toText(n) === want) found = n; return !found; });
+      let f = found && (found.t === 'neg' ? found.e : found);
+      if (f && f.t === 'paren') f = f.e;
+      if (f && f.t === 'frac') holes.push(f.n.t === 'paren' ? f.n.e : f.n);
+      continue;
+    }
     if (typeof t === 'object') {
       let I = null;
       walk(node, (n) => { if (!I && (n.t === 'int' || n.t === 'bracket') && n.lo) I = n; return !I; });
