@@ -857,6 +857,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-res-simple` — Résidu en un pôle simple
 - **Année** 15 · **Prérequis** `c-singularities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-singularities` : vérifier que le pôle est simple.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les valeurs sont jugées par le nouveau juge `cval` (js/judges/cplx-cb.js : une valeur complexe nommée par son étiquette, « Res(f ; z₀) », comparée à la valeur de référence, puis ligne à ligne comme `complex`) ; q′ et q′(z₀) sont deux parties `cval` (q′ comparée en 6 points réels). Gabarits : z² + a², z⁴ + 4, (z − a)(z − b), z³ − 1 en 1, sin z, cos z ; pas de z⁴ + 1 (racines d'ordre 8). L2 et L3 : décision de méthode ; L3 : menus ; L5 : les résidus d'un demi-plan (z⁴ + 4 ou (z² + a²)(z² + b²)). `coef` : la seule partie « Res ». QCM : 1/q′(z₀) (`c_essential_factor`, comme le catalogue), l'opposé, l'inverse, le double ; QCM multi : la forme p(z₀)/q′(z₀) est aussi juste. `c_sqrt_i` n'est pas proposé.
 - **Intro** : en un pôle simple, Res(f, z₀) = lim (z − z₀) f(z) ; si f = p/q avec q(z₀) = 0, q′(z₀) ≠ 0, p(z₀) ≠ 0 : Res = p(z₀)/q′(z₀). Exemple : `math: Res(1/(z⁴ + 4), 1 + i) = 1/(4(1 + i)³)`, `note: q′ = 4z³` ; `math: (1 + i)³ = −2 + 2i, donc Res = −(1 + i)/16`.
 - **Juge** : `complex` (exact dans ℚ(i), avec e^(…) et sinh si besoin) · **Forme finale** : a + bi simplifié.
 - **Niveaux** :
@@ -876,6 +877,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-res-multiple` — Résidu en un pôle multiple
 - **Année** 15 · **Prérequis** `c-singularities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). φ = (z − z₀)^m f, φ^(m−1) et la valeur sont des parties `cval` (variables z, et t pour la Laplace inverse). L5 : e^(zt)/((z − a)²(z − b)) : résidu double, résidu simple, puis y(t), en `cval` avec la variable t (au lieu de `equiv`). `c_simple_formula_double` : la valeur φ(z₀) (la dérivée oubliée), et l'option fausse de la décision ; `c_multiple_factorial` : sans 1/(m − 1)! ou avec 1/m!.
 - **Intro** : pôle d'ordre m : Res = 1/(m − 1)! · lim_{z→z₀} d^(m−1)/dz^(m−1) [(z − z₀)^m f(z)]. La formule du pôle simple donne une limite infinie. Exemple (2021) : `math: Res(e^(zt)/((z + 1)²(z + 2)), −1) = d/dz[e^(zt)/(z + 2)] en −1`, `note: m = 2, 1/1! = 1` ; `math: = (t e^(zt)(z + 2) − e^(zt))/(z + 2)² en −1 = t e^(−t) − e^(−t)`.
 - **Juge** : `complex` si la valeur est un nombre ; `equiv` `{vars:['t']}` si elle contient t (Laplace inverse) · **Forme finale** : valeur simplifiée.
 - **Niveaux** :
@@ -897,6 +899,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-res-laurent` — Résidu par la série de Laurent (singularité essentielle)
 - **Année** 15 · **Prérequis** `c-laurent`, `c-singularities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-singularities` : reconnaître une singularité essentielle.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Le changement w = z − z₀ est une partie `cval` en w ; les développements en puissances de 1/w ou de 1/z sont jugés par le nouveau juge `laur` (le juge `series` en v → +∞, avec sa propre forme finale : des monômes, chaque puissance une fois, et un reste o(1/vⁿ)), parce que `series` ne développe pas en un point complexe ; le résidu est une partie `cval`. Gabarits : g(1/(a − bz)) avec g ∈ {sin, sinh, exp, cos}, et z^k g(1/z) avec g ∈ {sin, cos, exp, sinh, cosh}. L5 et `open` : un problème de 4 points (nature en QCM, 1 pt ; série, 1 pt ; résidu, 2 pts).
 - **Intro** : le résidu est toujours a₋₁, le coefficient de 1/(z − z₀). Pour une singularité essentielle, c'est la seule méthode. Exemple (2022) : h = sin(1/(2i − 3z)) en z₀ = 2i/3 ; `math: 1/(2i − 3z) = −1/(3(z − 2i/3))` ; `math: h = −1/(3(z − z₀)) + 1/(162 (z − z₀)³) − …`, `note: Res = −1/3`.
 - **Juge** : `series` (Laurent en z₀) pour le développement ; `complex` pour a₋₁ · **Forme finale** : a₋₁, avec la série jusqu'au terme utile.
 - **Niveaux** :
@@ -917,6 +920,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-res-theorem` — Théorème des résidus sur un contour fermé
 - **Année** 15 · **Prérequis** `c-res-simple`, `c-res-multiple`, `c-cauchy-thm` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Une décision « à l'intérieur / à l'extérieur / sur Γ » par pôle (L2 et L3), les résidus intérieurs et la somme en parties `cval` ; le sous-but `locate` est la ligne 2πi(…), qui choisit les résidus. Contours : cercles |z − c| = R (c ∈ {0, i, 1}) ; L5 : carré ou ellipse, 3 ou 4 pôles. Pôles dans ℤ, ℤi et 1 + i (un pôle double possible), numérateurs de degré ≤ 1, dénominateurs ≤ 12. Pas de gabarit « non défini » ni de sin z/z² dans les lignes : le QCM multi « ∮ = 0 ? » (C2) les contient. `open` : le même f sur deux contours, 5 points.
 - **Intro** : on liste les singularités, on garde celles **à l'intérieur** de Γ, on calcule leurs résidus, ∮ = 2πi Σ. Une singularité sur Γ rend l'intégrale non définie. Exemple : `math: ∮_{|z|=2} (z + 1)/(z(z − 1)(z − 3)) dz`, `note: 0 et 1 dedans, 3 dehors` ; `math: = 2πi (1/3 − 1) = −4πi/3`.
 - **Juge** : décision « dedans / dehors / sur » par singularité (`mcq`), `complex` pour chaque résidu et pour la somme · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -939,6 +943,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-arc-estimate` — Montrer qu'une intégrale sur un arc tend vers 0
 - **Année** 15 · **Prérequis** `c-contour-param`, `g8-algebraic` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-contour-param` : longueur de l'arc paramétré ; `g8-algebraic` : modules et inégalité triangulaire.
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 à L3 en blocs (L2 et L3 avec les leurres de `c_cos_bounded`, `c_arc_triangle` et `c_jordan_alpha_sign` ; L3 : la minoration du dénominateur à écrire). L4 : le nouveau juge `arcb` (chaque ligne doit majorer, ou minorer, la précédente en tout point de l'arc : 8 rayons de 3 à 50, 33 angles) au lieu de `equiv` avec `rel`, qui ne connaît qu'une variable ; puis la limite en R (`limit`). L5 : le demi-cercle gauche de la Laplace inverse, t échantillonné. Gabarits : z² + a², z⁴ + 4 (avec ou sans z au numérateur), e^(iαz) avec α ∈ {0, ±1, ±2, 3}. `open` : la version L4 en problème de 3 points.
 - **Intro** : |∫_{C_R} f dz| ≤ longueur(C_R) · max_{C_R} |f|. On majore le numérateur (|e^(iαz)| = e^(−α Im z) ≤ 1 si α > 0 et Im z ≥ 0), on **minore** le dénominateur par l'inégalité triangulaire inverse |z² + 1| ≥ R² − 1, et la longueur vaut πR. Exemple : `math: |∫_{C_R} e^(2iz)/(z² + 1) dz| ≤ πR · 1/(R² − 1)` ; `math: → 0 quand R → ∞`.
 - **Juge** : `blocks` `{mode:'order'}` avec des blocs-inégalités ; à L4, chaque inégalité est vérifiée par `equiv` sur un échantillon (z sur l'arc, R ∈ [3 ; 50]) : l'inégalité doit être vraie partout ; la borne finale par `limit` `{v:'R', to:'inf'}` · **Forme finale** : une borne explicite qui tend vers 0.
 - **Niveaux** :
@@ -947,7 +952,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
   - L3 : compléter la minoration du dénominateur.
   - L4 : écrire la majoration librement.
   - L5 : l'arc C_r du demi-plan gauche pour la Laplace inverse (2021 : |e^(zt)| = e^(t r cos θ) ≤ 1 pour θ ∈ [π/2 ; 3π/2]).
-- **Générateur** : f = p(z)e^(iαz)/q(z) avec deg q ≥ deg p + 1 (α > 0) ou deg q ≥ deg p + 2 (α = 0) ; q = z² + a², z⁴ + 4, (z + 1)²(z + 2) ; arc supérieur, inférieur (α < 0) ou gauche (Laplace).
+- **Générateur** : f = p(z)e^(iαz)/q(z) avec deg q ≥ deg p + 2 (la majoration longueur × max ne tend vers 0 que dans ce cas ; avec deg q = deg p + 1 et α > 0, il faut le lemme de Jordan) ; q = z² + a², z⁴ + 4, (z + 1)²(z + 2) ; arc supérieur, inférieur (α < 0) ou gauche (Laplace).
 - **Corrigé type** (∫_{C_R} e^(2iz)/(z² + 1) dz, C_R demi-cercle supérieur) :
   1. sur C_R : `|e^(2iz)| = e^(−2 Im z) ≤ 1` — sous-but `numerator`
   2. `|z² + 1| ≥ |z|² − 1 = R² − 1` — sous-but `denominator`
@@ -960,6 +965,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-int-rational` — Intégrales rationnelles sur ℝ
 - **Année** 15 · **Prérequis** `c-res-theorem`, `c-arc-estimate` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Résidus en `cval`, arc en `arcb` (L4 et L5), 2πi Σ Res en `cval`, puis la conclusion en `definite` (valeur contrôlée par quadrature). L2 et L3 : décision « quels pôles ? ». L5 : ∫₀^∞ par parité, en `definite`. Gabarits du catalogue, plus 1/(x² + a²) et x²/((x² + a²)(x² + b²)) ; x²/(x⁴ + 1) est remplacé par x²/(x⁴ + 4) (pôles dans ℚ(i)). `open` : la version L4, 7 points.
 - **Intro** : si deg q ≥ deg p + 2 et q sans racine réelle, ∫_ℝ p/q dx = 2πi Σ_{Im z_k > 0} Res(p/q, z_k). Exemple (plan, §5) : `math: ∫_ℝ dx/(1 + x²) = 2πi · Res(1/(1 + z²), i) = 2πi/(2i) = π`.
 - **Juge** : `complex` pour les résidus ; `definite` `{value}` pour la valeur réelle (contrôle par quadrature) · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -981,6 +987,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-int-trig` — Intégrales trigonométriques sur [0 ; 2π]
 - **Année** 15 · **Prérequis** `c-res-theorem` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). L'intégrande en z est une partie `cval` en z (comparaison en 6 points réels de ]−1 ; 1[, forme finale : une seule fraction P(z)/Q(z)) au lieu de `equiv`, qui ne calcule pas avec i ; puis le pôle intérieur (`cval`, l'autre racine nomme `c_pole_outside_counted`), son résidu, 2πi Res, et la conclusion en `definite`. L3 : décision sur la racine à garder. L5 : la moitié des items avec les paramètres a et b (∫₀^{2π} dθ/(a + b sin θ)) ; pas de cos²θ/(a + cos θ). QCM multi au format 2021, avec `c_trig_sub`. `open` : 5 points.
 - **Intro** : z = e^(iθ) transforme ∫₀^{2π} R(cos θ, sin θ) dθ en une intégrale sur le cercle unité : cos θ = (z + 1/z)/2, sin θ = (z − 1/z)/(2i), dθ = dz/(iz). On garde les pôles de |z| < 1. Exemple (2022) : `math: ∫₀^{2π} dθ/(2 − cos θ) = ∮ 2i/(z² − 4z + 1) dz` ; `math: pôle intérieur 2 − √3, résidu −i/√3, donc 2π/√3`.
 - **Juge** : `equiv` `{vars:['z'], complex:true}` pour l'intégrande en z ; `complex` pour les résidus ; `definite` pour la valeur · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -1003,6 +1010,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-int-fourier` — Intégrales avec e^(iαx)
 - **Année** 15 · **Prérequis** `c-res-theorem`, `c-arc-estimate` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). R ∈ {1/(x² + a²), x/(x² + a²), x/(x⁴ + 4), 1/((x² + 1)(x² + 4))} ; α < 0 seulement pour les R paires. Résidus et J en `cval` ; arc en `arcb` (pas pour x/(x² + a²), où il faut le lemme de Jordan, cité dans l'énoncé de la partie) ; la partie réelle ou imaginaire en `definite`, avec la valeur exacte donnée (`known` : la quadrature ne calcule pas une intégrale oscillante sur ℝ). L2 et L3 : décisions « e^(iαz) ou cos(αz) ? » et « quel demi-plan ? ». L5 et `open` : l'exemple d'examen C1 (11 points) en `problem` : contour (QCM, 1 pt), pôles (QCM, 1,5 pt), résidus (3), somme et J (1,5), arc (3), conclusion (1), avec α ∈ {1, 2, 3}.
 - **Intro** : pour ∫_ℝ R(x) cos(αx) dx ou sin(αx), on calcule ∫_ℝ R(x) e^(iαx) dx et on prend la partie réelle ou imaginaire. On ne met **pas** cos(αz) dans le contour : il n'est pas borné. Pour α > 0, on ferme en haut. Exemple : `math: ∫_ℝ cos(2x)/(x² + 1) dx = Re(2πi · e^(−2)/(2i)) = π e^(−2)`.
 - **Juge** : `complex` (résidus avec exponentielles) ; `definite` pour la valeur · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -1027,6 +1035,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-int-branch` — Intégrales avec coupure (GM)
 - **Année** 15 · **Prérequis** `c-int-rational`, `c-elem-fn` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-int-rational` : mêmes résidus de R(z) que pour une intégrale rationnelle ; `c-elem-fn` : z^a avec la coupure, argument dans ]0 ; 2π[.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Le facteur 1 − e^(2πia), les résidus écrits avec des exponentielles explicites et I sont des parties `cval`, puis la conclusion en `definite` (quadrature). L3 : décision sur la détermination de l'argument (`c_log_branch`). Gabarits : 1/(1 + x) et 1/(x + 2) avec a < 0 seulement (convergence), 1/(1 + x²) avec a = ±1/2, ±1/3 ; L5 : 1/(1 + x²). Le contour n'est pas dessiné. `open` : 6 points.
 - **Intro** : pour ∫₀^∞ x^a R(x) dx (−1 < a < 1, a ∉ ℤ), on prend z^a avec l'argument dans ]0 ; 2π[ (coupure sur ℝ₊) et un contour en trou de serrure. Les deux bords de la coupure donnent (1 − e^(2πia)) ∫₀^∞ x^a R(x) dx = 2πi Σ Res. Exemple : `math: ∫₀^∞ dx/(√x (1 + x))`, `note: a = −1/2` ; `math: (1 − e^(−iπ)) I = 2πi · e^(−iπ/2) = 2π, donc I = π`.
 - **Juge** : `complex` (résidus avec z^a, argument dans ]0 ; 2π[) ; `definite` · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -1035,7 +1044,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
   - L3 : choisir la détermination de l'argument.
   - L4 : libre.
   - L5 : ∫₀^∞ x^(1/3)/(1 + x²) dx = π/√3.
-- **Générateur** : a ∈ {−1/2, 1/3, −1/3, 1/2}, R ∈ {1/(1 + x), 1/(1 + x²), 1/(x + 2)} ; valeurs connues (π/sin(πs) et variantes).
+- **Générateur** : a ∈ {−1/2, 1/3, −1/3, 1/2}, R ∈ {1/(1 + x), 1/(1 + x²), 1/(x + 2)}, avec −1 < a < 0 pour 1/(1 + x) et 1/(x + 2) (sinon l'intégrale diverge en +∞) ; valeurs connues (π/sin(πs) et variantes).
 - **Corrigé type** (I = ∫₀^∞ dx/(√x (1 + x))) :
   1. `f(z) = z^(−1/2)/(1 + z)`, arg z ∈ ]0 ; 2π[ — sous-but `branch`
   2. bord inférieur : `z^(−1/2) = x^(−1/2) e^(−iπ)` — sous-but `factor`
@@ -1048,6 +1057,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-fourier-residues` — Transformée de Fourier calculée par les résidus (GM)
 - **Année** 15 · **Prérequis** `c-int-fourier` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les résidus de e^(−iαz)f et f̂(α) pour α > 0 sont des parties `cval` (variable α) ; f̂ pour tout α, avec |α|, est jugée par `transform`. L2 et L3 : décision « quel demi-plan pour α > 0 ? ». Gabarits : 1/(x² + a²), 1/((x² + a²)(x² + b²)) ; L5 : 1/((x² + 4)(x² + 9)) ou 1/(x⁴ + 4) ; pas de x/(x² + a²)². `open` : la version L4, 5 points.
 - **Intro** : f̂(α) = (1/√(2π)) ∫_ℝ f(x) e^(−iαx) dx. Pour α < 0, e^(−iαz) est borné en haut ; pour α > 0, on ferme **en bas**, avec −2πi Σ Res. On traite les deux cas, puis on écrit avec |α|. Exemple : `math: F(1/(1 + x²))(α) = (1/√(2π)) · π e^(−|α|) = √(π/2) e^(−|α|)`, `note: même ligne que la table`.
 - **Juge** : `transform` `{kind:'fourier', of, v:'x', s:'α', dir:'forward'}` pour la ligne finale ; `complex` pour les résidus · **Forme finale** : expression en α avec |α|, sans 𝓕.
 - **Niveaux** :
@@ -1070,6 +1080,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-conformal` — Applications conformes (opt.)
 - **Année** 15 · **Prérequis** `c-elem-fn` · **Étiquettes** `opt` · **Optionnelle** oui · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `c-elem-fn` : homographies et fonctions élémentaires.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Images de points en `cval` (`c_mobius_point` : la division terme à terme) ; L2 : les mêmes calculs, trous plus larges ; L3 : décision « cercle ou droite » et menus ; L4 : l'homographie qui envoie trois points donnés (`cval` en z, une seule fraction) ; L5 et l'examen : QCM d'images de droites et de régions (e^z, z², homographies). L'image d'une droite n'est pas jugée par `geom` (QCM).
 - **Intro** : f holomorphe avec f′ ≠ 0 conserve les angles. Une homographie w = (az + b)/(cz + d) envoie cercles et droites sur des cercles et droites ; on la détermine par l'image de trois points. Exemple : `math: w = (z − i)/(z + i)`, `note: envoie le demi-plan Im z > 0 sur le disque |w| < 1` ; `math: z = 0 ↦ −1, z = 1 ↦ −i, z = ∞ ↦ 1`.
 - **Juge** : `complex` pour les images de points ; `geom` `{object:'circle'}` pour l'image d'une droite ou d'un cercle · **Forme finale** : la transformation, ou l'image demandée.
 - **Niveaux** :
@@ -1100,7 +1111,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 | `c_contour_dz_forgot` | calculus | E | `c-contour-param` | `c-contour-param` | ∫₀¹ t dt = 1/2 → ∫₀¹ t (1 + i) dt | Supprimer γ′(t) de l'intégrande. | « dz = γ′(t) dt = {gp} dt : ce facteur manque. » |
 | `c_pole_on_contour` | method | C | `c-cauchy-thm` | `c-cauchy-thm` | ∮_{\|z\|=1} dz/(z(z + 1)) = 2πi → non définie | `wrongValues` : appliquer les résidus en ignorant la singularité située sur Γ. | « −1 est **sur** le cercle \|z\| = 1 : l'intégrale n'est pas définie. » (Corrigé MT/SV 2021.) |
 | `c_pole_outside_counted` | method | C | `c-res-theorem` | `c-cauchy-thm` | 2πi(Res₀ + Res₁ + Res₃) → 2πi(Res₀ + Res₁) | Ajouter les résidus des singularités extérieures à Γ. | « {z} est à distance {d} du centre, plus que le rayon {R} : il est dehors et ne compte pas. » (Astuces d'Analyse IV GM ; plan §8.) |
-| `c_cos_bounded` | rule | C | `c-arc-estimate` | `c-elem-fn` | « |cos z| ≤ 1 sur l'arc » → |cos(x + iy)|² = cos²x + sinh²y | Leurre du `blocks` ; `wrongValues` : arc → 0 pour une fonction en cos(αz). | « cos z n'est pas borné sur ℂ : cos(iy) = cosh y → ∞. Utilise e^(iαz), borné dans le demi-plan supérieur. » (Plan §8.) |
+| `c_cos_bounded` | rule | C | `c-arc-estimate` | `c-elem-fn` | « \|cos z\| ≤ 1 sur l'arc » → \|cos(x + iy)\|² = cos²x + sinh²y | Leurre du `blocks` ; `wrongValues` : arc → 0 pour une fonction en cos(αz). | « cos z n'est pas borné sur ℂ : cos(iy) = cosh y → ∞. Utilise e^(iαz), borné dans le demi-plan supérieur. » (Plan §8.) |
 | `c_eiax_cos` | method | C | `c-int-fourier` | `c-arc-estimate` | ∮ cos(2z)/(z² + 1) → ∮ e^(2iz)/(z² + 1), puis Re | Remplacer e^(iαz) par cos(αz) dans le contour ; valeur produite π cosh α /… (résidu de cos(αz)/(z² + 1) en i). | « Sur l'arc, cos(αz) contient e^(−iαz), qui explose en haut : l'arc ne tend pas vers 0. » (Même remarque que `c_cos_bounded`.) |
 | `c_cauchy_n_factor` | rule | C | `c-cauchy-formula` | `c-cauchy-formula` | f^(n)(z₀) = n!/(2πi) ∮ f/(z − z₀)ⁿ → (z − z₀)^(n+1) | Puissance n au lieu de n + 1, ou n! oublié. | « Pour la dérivée n-ième, la puissance est n + 1 : avec n = {n}, on divise par (z − z₀)^{n+1}. » (Corrigé MT/SV 2021, QCM.) |
 | `c_laurent_sign` | sign | C | `c-taylor` | `a1-ser-geo-tele` | 1/(1 + z) = Σ zⁿ → Σ (−1)ⁿ zⁿ | Supprimer le facteur (−1)ⁿ (ou les signes alternés du DL de sin). | « 1/(1 + z) = 1/(1 − (−z)) : la raison est −z, d'où (−1)ⁿ. » (Corrigé MT/SV 2021, QCM.) |
@@ -1114,9 +1125,9 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 | `c_essential_factor` | calculus | E | `c-res-laurent` | `c-laurent` | Res(sin(1/(2i − 3z)), 2i/3) = 1 → −1/3 | Oublier le facteur −1/3 de 1/(2i − 3z) = −1/(3(z − z₀)). | « 1/(2i − 3z) = −1/(3(z − 2i/3)) : le coefficient de 1/(z − z₀) est −1/3. » |
 | `c_residue_2pii` | calculus | E | `c-res-theorem` | `c-res-theorem` | ∮ = Σ Res → 2πi Σ Res | Oublier 2πi, ou mettre πi. | « Le théorème des résidus : ∮ = **2πi** × somme des résidus. » |
 | `c_upper_half_lower_pole` | method | E | `c-int-rational` | `c-int-rational` | garder −i au lieu de i → valeur opposée | Prendre les pôles du demi-plan inférieur avec +2πi. | « Le contour ferme en **haut** : seuls les pôles d'Im > 0 sont dedans. » |
-| `c_jordan_alpha_sign` | sign | E | `c-int-fourier` | `c-arc-estimate` | α < 0 et fermeture en haut → fermer en bas | Fermer dans le mauvais demi-plan pour le signe de α. | « |e^(iαz)| = e^(−α Im z) : avec α = {alpha}, il est borné quand Im z {sign} 0. » |
+| `c_jordan_alpha_sign` | sign | E | `c-int-fourier` | `c-arc-estimate` | α < 0 et fermeture en haut → fermer en bas | Fermer dans le mauvais demi-plan pour le signe de α. | « \|e^(iαz)\| = e^(−α Im z) : avec α = {alpha}, il est borné quand Im z {sign} 0. » |
 | `c_trig_sub` | calculus | C | `c-int-trig` | `c-int-trig` | 1/(√5 − sin θ) ↦ 2/(−z² + iz√5 + 1) → 2/(−z² + 2iz√5 + 1) | Oublier dθ = dz/(iz), ou le facteur 2 de sin θ = (z − 1/z)/(2i) en multipliant. | « En multipliant par 2iz, le terme √5 devient 2i√5 z : il manque {missing}. » (Corrigé MT/SV 2021, QCM.) |
-| `c_arc_triangle` | rule | E | `c-arc-estimate` | `g8-algebraic` | 1/|z² + 1| ≤ 1/(R² + 1) → ≤ 1/(R² − 1) | Majorer 1/|q| avec la majoration de |q| (sens inverse). | « Pour majorer 1/|q|, il faut **minorer** |q| : |z² + 1| ≥ R² − 1. » |
+| `c_arc_triangle` | rule | E | `c-arc-estimate` | `g8-algebraic` | 1/\|z² + 1\| ≤ 1/(R² + 1) → ≤ 1/(R² − 1) | Majorer 1/\|q\| avec la majoration de \|q\| (sens inverse). | « Pour majorer 1/\|q\|, il faut **minorer** \|q\| : \|z² + 1\| ≥ R² − 1. » |
 | `c_branch_factor` | calculus | E | `c-int-branch` | `c-elem-fn` | (1 + e^(2πia)) I → (1 − e^(2πia)) I | Signe du bord inférieur, ou argument π au lieu de 2π. | « Sous la coupure, l'argument vaut 2π, donc z^a = x^a e^(2πia), parcouru dans l'autre sens. » |
 | `c_fourier_res_sign` | sign | E | `c-fourier-residues` | `c-int-fourier` | fermer en bas avec +2πi → −2πi | Ne pas changer le signe quand le contour est parcouru dans le sens négatif. | « Le demi-cercle du bas est parcouru dans le sens négatif : ∮ = −2πi Σ Res. » |
 | `c_mobius_point` | calculus | E | `c-conformal` | `g8-algebraic` | (1 − i)/(1 + i) = 1 → −i | Division complexe fausse (numérateurs et dénominateurs divisés terme à terme). | « Multiplie par le conjugué : (1 − i)(1 − i)/2 = −i. » |

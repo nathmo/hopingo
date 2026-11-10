@@ -92,3 +92,5 @@ import * as boundary from './boundary.js';
 Object.assign(JUDGES, { param, boundary });
 import { cvalue, cfamily } from './cplx-ca.js'; // step U10, module C part a: complex values with ∫ and Σ, families z₀ + 2kπi
 Object.assign(JUDGES, { cvalue, cfamily });
+import { cval, arcb, laur } from './cplx-cb.js'; // step U10, part cb: labelled complex values, bounds on an arc, Laurent series in 1/z
+Object.assign(JUDGES, { cval, arcb, laur });
