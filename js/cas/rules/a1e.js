@@ -213,7 +213,7 @@ export const RULES = [
   },
   // U4: skill a1-ser-compare (the catalogue's skill and repair for this trap).
   {
-    id: 'a1_compare_wrong_direction', family: 'logic', tag: 'E', skill: 'a1-improper-compare', repair: 'a1-improper-compare',
+    id: 'a1_compare_wrong_direction', family: 'logic', tag: 'E', skill: 'a1-ser-compare', repair: 'a1-ser-compare',
     judges: [],
     name: 'Comparaison dans le mauvais sens',
     example: ['f ≥ 1/x², ∫ 1/x² converge, donc ∫ f converge', 'il faut f ≤ g'],

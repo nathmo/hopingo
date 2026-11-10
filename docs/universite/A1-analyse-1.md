@@ -433,6 +433,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-ser-necessary` — Condition nécessaire : uₙ → 0
 - **Année** 13 · **Prérequis** `a1-seq-limits` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Une partie « limite du terme général » (juge `limit`, n entier), puis une partie « Conclusion » ouverte par la décision « diverge / on ne sait pas encore / converge », où l'on réécrit la limite ; pour (−1)ⁿ·n/(n + c), on calcule la limite de |uₙ|. Niveau 4 : lignes libres, ou un QCM « laquelle de ces quatre séries… » à une seule réponse (pas de tri en deux groupes) ; niveau 5 : le V/F d'examen, sans aide. Le gabarit (b) Σ sin(πα/2)ⁿ n'est pas fait. Les quatre V/F faux ont un contre-exemple « suite » (aₙ, f(n), ou la paire aₙ, bₙ).
 - **Intro** : si Σ uₙ converge, alors uₙ → 0. La réciproque est **fausse** : Σ 1/n diverge alors que 1/n → 0. Donc : si uₙ ne tend pas vers 0, la série diverge ; si uₙ → 0, il faut un autre critère.
 - **Juge** : `limit` pour uₙ ; décision « diverge (terme général) / on ne sait pas encore » · **Forme finale** : verdict et, s'il diverge, la limite non nulle de uₙ.
 - **Niveaux** :
@@ -452,6 +453,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-ser-compare` — Critère de comparaison et de la limite du quotient
 - **Année** 13 · **Prérequis** `a1-seq-limits` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U4). Une partie « limite de aₙ/bₙ » (juge `limit`), précédée aux niveaux 2 à 4 de la décision « bₙ = 1/nᵖ » parmi 3 (bₙ n'est pas saisi : la ligne de départ nᵖ·aₙ le montre), puis la partie « Conclusion » : verdict et critère (deux décisions : le critère de la convention 5 n'est pas une ligne d'auto-explication, il compte comme une erreur), et p (`value`). Gabarits : fractions rationnelles (p = 1, 2, 3), √(n + a) − √n (p = 1/2) et (√(n + a) − √n)/n (p = 3/2), sin et Log(1 + u) de k/n ou k/n² ; le produit de racines et de sinus au niveau 5 (ou le QCM). 1 − cos(k/n) est laissé de côté (la limite numérique de n²(1 − cos(k/n)) perd ses chiffres). Le QCM a aussi un gabarit k/n − sin(k/n) ou k/n − Log(1 + k/n), pour `a1_ipe_in_sum`. Les V/F faux ont pour contre-exemple une paire de suites, ou une valeur de p.
 - **Intro** : séries à termes positifs. Référence : `Σ 1/nᵖ` converge si et seulement si p > 1. Si `aₙ/bₙ → L ∈ ]0 ; +∞[`, les deux séries ont la même nature. Si `0 ≤ aₙ ≤ bₙ` et Σ bₙ converge, Σ aₙ converge (on majore par une série **convergente**). Exemple : `Σ sin(1/n²)` : `sin(1/n²)/(1/n²) → 1`, et Σ 1/n² converge.
 - **Juge** : décision « bₙ = … » (saisie jugée : `limit` de aₙ/bₙ doit être dans ]0 ; +∞[) ; `limit` pour le quotient ; verdict + critère (convention 5) · **Forme finale** : verdict, critère nommé, et p de la série de Riemann.
 - **Niveaux** :
@@ -474,6 +476,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 ### `a1-ser-ratio-root` — Critères de d'Alembert et de Cauchy pour les séries
 - **Année** 13 · **Prérequis** `a1-seq-ratio`, `a1-seq-1inf`, `a1-ser-necessary` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-ser-necessary` : ρ > 1 : le terme général ne tend pas vers 0.
+- **Statut** : fait le 10 novembre 2026 (étape U4). La saisie ne connaît pas n! : le rapport aₙ₊₁/aₙ (ou ⁿ√|aₙ|) déjà formé est la ligne de départ, après la décision « d'Alembert / Cauchy » (niveaux 2 à 5 ; l'autre critère est faux, pas `poor`) ; on simplifie et on passe à la limite (`limit`), puis « Conclusion » (verdict, critère, ρ réécrit). Gabarits : cⁿ(n!)²/(2n)!, n!/nⁿ et n!/(2n)ⁿ, nᵖcⁿ/n!, (an/(bn + 1))ⁿ, (1 + 1/n)^(n²)/cⁿ ; ni n!/n^(cn) à paramètre, ni item « critère non concluant » en lignes (ρ = 1 est dans le QCM). Le QCM ne propose pas `a1_factorial_ratio` (piège de `a1-seq-ratio`, construite dans une autre partie). Le V/F « aₙ₊₁/aₙ < 1 pour tout n » a pour hypothèses du contre-exemple « aₙ > 0 et décroissante ».
 - **Intro** : d'Alembert : `|aₙ₊₁/aₙ| → ρ` ; Cauchy : `|aₙ|^(1/n) → ρ`. ρ < 1 : convergence absolue ; ρ > 1 : divergence ; ρ = 1 : **aucune conclusion**. Factorielles → d'Alembert ; puissance n-ième → Cauchy.
 - **Juge** : décision « d'Alembert / Cauchy » (les deux sont valides, l'une est `quality:'poor'` selon le gabarit) ; `equiv` pour la simplification ; `limit` pour ρ ; verdict + critère · **Forme finale** : verdict et valeur de ρ.
 - **Niveaux** :
@@ -496,6 +499,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-ser-leibniz-abs` — Leibniz, convergence absolue et semi-convergence
 - **Année** 13 · **Prérequis** `a1-ser-compare` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : |aₙ|·nᵖ → L (`limit`) ; décroissance xₙ − xₙ₊₁ ≥ … ≥ 0 (`equiv` avec `rel: '≥'`, n de 1 à 201 puis 10ᵏ), ouverte par la décision « Σ |aₙ| diverge » ; puis la conclusion (verdict à trois issues, critère) et xₙ → 0. Aux niveaux 2 et 3, deux décisions « par quoi commencer » et « que demande Leibniz » remplacent les trois hypothèses à cocher. Gabarits (−1)ⁿ/(nᵖ + c) (p = 1/2, 1, 2), (−1)ⁿ·sin(1/nᵖ), (−1)ⁿ·Log(1 + 1/n), (−1)ⁿ·n/(n + c) ; (−1)ⁿ/(√n + (−1)ⁿ) seulement dans le QCM (niveau 5 et examen) et dans le V/F « alternée et aₙ → 0 ».
 - **Intro** : on teste d'abord Σ |aₙ| (comparaison, d'Alembert). Si elle diverge et que la série est alternée, Leibniz : `aₙ = (−1)ⁿxₙ` avec xₙ ≥ 0, **décroissante** et **→ 0** ⇒ Σ aₙ converge. Converge sans converger absolument = semi-convergente. Exemple : `Σ (−1)ⁿ/n` est semi-convergente.
 - **Juge** : décision « tester |aₙ| », `limit` et comparaison (`a1-ser-compare`), puis lignes Leibniz : `equiv` `{rel:'≥'}` pour la décroissance (xₙ ≥ xₙ₊₁ sur n ≥ n₀), `limit` pour xₙ → 0 ; verdict à trois issues · **Forme finale** : « converge absolument », « converge, pas absolument » ou « diverge », avec les critères.
 - **Niveaux** :
@@ -519,6 +523,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 ### `a1-ser-param` — Séries à paramètre : ensemble de convergence
 - **Année** 13 · **Prérequis** `a1-ser-ratio-root`, `a1-ser-leibniz-abs`, `g1-sign-table` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-ser-leibniz-abs` : aux valeurs limites, la série est souvent alternée.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Niveaux 1 à 4 : gabarit (a), Σ (aλ/(λ + b))ⁿ et Σ (λ/(λ + b))ⁿ ; |q| < 1 résolu en lignes `solset` en λ, q à chaque borne (`value`), décisions sur Σ (±1)ⁿ, puis l'ensemble réécrit. Niveau 5 et variante `open` : le problème E6 (type `problem`, 9 points : 4 + 3 + 2), Σ (−1)ᵏ k^((m − 1)α)/(αᵏ + kᵐ) avec m ∈ {2 ; 3 ; 4} ; le rapport de d'Alembert est simplifié en lignes (`equiv` en k et α, cible `goal`), sa limite et les trois verdicts sont des QCM, la comparaison pour 0 < α < 1 est une ligne `equiv` puis une ligne `solset` en α, le cas α = 1 une limite et la décroissance de Leibniz. Gabarit (b) en QCM et en V/F ; (c) et (d) ne sont pas faits. `a1_abs_square_ineq` nomme l'option du QCM qui retire les barres ; dans une ligne, la même erreur est nommée par `g1_abs_dropped`.
 - **Intro** : on applique le critère adapté **en gardant le paramètre**, on obtient une inéquation en λ, puis on traite **à part** les valeurs limites (ρ = 1), où le critère ne dit rien. Exemple : `Σ (λ/(1 − λ))ⁿ` est géométrique : converge si |λ| < |1 − λ|, soit λ < 1/2.
 - **Juge** : `solset` `{v:'λ', domain:'ℝ'}` pour l'inéquation et l'ensemble final ; un sous-item par valeur limite (convention 5) · **Forme finale** : ensemble en intervalles, bornes justifiées.
 - **Niveaux** :
