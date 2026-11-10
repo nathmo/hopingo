@@ -538,7 +538,39 @@ function siMcqOf(level, rng, opts, f, z0, truth) {
   return choice({ skill: SI, level, key: `mcq:${f}:${z0}`, exam: examTag(opts, 2), keepOrder: true, prompt: `En z₀ = ${rd(z0)}, ${M(`f(z) = ${f}`)} a :`, options }, rng);
 }
 
+// Several statements « en z₀, f a … », each true or false (opts.multi).
+function siMulti(level, rng, opts) {
+  const NAT = (t) => (t.kind === 'removable' ? 'une singularité apparente' : t.kind === 'essential' ? 'une singularité essentielle' : t.order === 1 ? 'un pôle simple' : t.order === 2 ? 'un pôle double' : `un pôle d'ordre ${t.order}`);
+  const items = [];
+  const seen = new Set();
+  for (let k = 0; k < 40 && items.length < 4; k++) {
+    const d = siData(rng);
+    if (!d || seen.has(d.f)) continue;
+    seen.add(d.f);
+    items.push({ f: d.f, z0: String(d.a), t: d.kind === 'removable' ? { kind: 'removable' } : { kind: 'pole', order: d.m }, d });
+  }
+  const e = rng.pick(ESS);
+  items.push({ f: e.f, z0: e.z0, t: { kind: 'essential' } });
+  const options = items.map((x, i) => {
+    const truth = i % 2 === 0 ? rng.chance(0.7) : rng.chance(0.4);
+    let claim = x.t;
+    let rule = null;
+    if (!truth) {
+      if (x.t.kind === 'removable') { claim = { kind: 'pole', order: x.d ? x.d.qd.ord : 1 }; rule = 'c_removable_as_pole'; } else if (x.t.kind === 'essential') claim = { kind: 'pole', order: 1 };
+      else if (x.d && x.d.p.ord > 0) { claim = { kind: 'pole', order: x.d.qd.ord }; rule = 'c_order_pole_numerator'; } else claim = { kind: 'pole', order: x.t.order + 1 };
+    }
+    const right = NAT(claim) === NAT(x.t);
+    return { html: `en z₀ = ${rd(x.z0)}, ${M(`f(z) = ${x.f}`)} a ${NAT(claim)}`, correct: right, rule: right ? null : rule };
+  });
+  if (!options.some((o) => o.correct)) {
+    const x = items[0];
+    options[0] = { html: `en z₀ = ${rd(x.z0)}, ${M(`f(z) = ${x.f}`)} a ${NAT(x.t)}`, correct: true };
+  }
+  return choice({ skill: SI, level, multi: true, key: `multi:${items.map((x) => x.f).join(',')}`, exam: examTag(opts, 2), prompt: 'Cochez les affirmations vraies.', options }, rng);
+}
+
 function siMcq(level, rng, opts) {
+  if (opts.multi) return siMulti(level, rng, opts);
   if (rng.chance(0.3)) {
     const e = rng.pick(ESS);
     return siMcqOf(level, rng, opts, e.f, e.z0, { kind: 'essential' });
