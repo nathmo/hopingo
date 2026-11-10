@@ -128,7 +128,8 @@ function edTokens(level, rng, opts = {}) {
     hints: H(neg ? 'Nie la définition de la limite : chaque ∀ devient ∃, chaque ∃ devient ∀, et l\'inégalité finale est niée.' : ED_HINT1,
       `${D.qs[0][0]}${D.qs[0][1]} …`, FM(target, cfg)),
     noHints: level === 5 || !!opts.exam,
-    baits: neg ? ['g9_neg_one_quant', 'g9_neg_pred_kept'] : ['g9_quant_order'],
+    // The decoy piece |a_(n+1) − a_n| ≤ ε of a Cauchy definition is a1_cauchy_consecutive.
+    baits: neg ? ['g9_neg_one_quant', 'g9_neg_pred_kept'] : kind === 'cauchy' ? ['g9_quant_order', 'a1_cauchy_consecutive'] : ['g9_quant_order'],
     key: `${D.name}:${level}`, solution: [{ html: FM(target, cfg), note: D.name }],
     exam: opts.exam ? { format: opts.exam, points: 1 } : false,
   });
