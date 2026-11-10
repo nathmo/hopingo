@@ -1,9 +1,12 @@
 // Limits (spec §4.3), step U2: by series first (Laurent expansions at a
 // point, in 1/x at ±∞), else numerically (values along a sequence that
-// approaches the point, Aitken's acceleration). The numeric part is kept
-// simple here; U4 extends it (sequences, oscillations, ε-δ).
+// approaches the point, Aitken's acceleration). Step U4 adds windows of
+// values at shrinking scales: a range that does not shrink is a limit that
+// does not exist (sin(1/x), (−1)ⁿ), a range that shrinks gives the limit
+// even without convergence along one sequence (x·cos(1/x)), and sequences
+// (discrete: true) are sampled at whole n of both parities.
 //
-//   limit(node, v, to, dir, {env}) → {value, method}
+//   limit(node, v, to, dir, {env, discrete}) → {value, method}
 //     to: a number or Q, '+inf' or '-inf'; dir: '+', '-' or undefined.
 //     value: Q (exact), a float, '+inf', '-inf', or 'none' (no limit, or
 //     the two sides differ); method: 'series' | 'numeric' | 'none' (could
@@ -131,27 +134,140 @@ function snap(x) {
   return x;
 }
 
-function numerically(node, v, to, dir, env) {
+// ---------- windows (step U4) ----------
+
+// Fixed pseudo-random numbers in ]0 ; 1[ (deterministic verdicts).
+const U = (() => {
+  const out = [];
+  let x = 0.5;
+  for (let k = 0; k < 60; k++) { x = (x * 9301 + 0.49297) % 1; out.push(0.02 + 0.97 * x); }
+  return out;
+})();
+
+// Values in windows that shrink towards the point: [{min, max, minAbs, maxAbs, pos, negs}].
+function windowsOf(f, to, s, discrete) {
+  const out = [];
+  const inf = to === '+inf' || to === '-inf';
+  const ks = discrete ? [3, 4, 5, 6, 7, 8] : inf ? [2, 3, 4, 5, 6, 7] : [1, 2, 3, 4, 5, 6];
+  for (const k of ks) {
+    const xs = [];
+    if (discrete) {
+      const N = 10 ** k;
+      const sg = to === '-inf' ? -1 : 1;
+      for (let j = 0; j < 24; j++) xs.push(sg * (N + j));
+      for (const u of U.slice(0, 36)) xs.push(sg * (N + Math.floor(u * N)));
+    } else if (inf) {
+      const sg = to === '+inf' ? 1 : -1;
+      for (const u of U) xs.push(sg * 10 ** k * (1 + u));
+    } else {
+      const a = F(to);
+      const h = 10 ** -k * Math.max(1, Math.abs(a));
+      for (const u of U) xs.push(a + s * h * u);
+    }
+    const ys = xs.map(f).filter(Number.isFinite);
+    if (ys.length < xs.length / 2) { out.push(null); continue; }
+    let min = Infinity;
+    let max = -Infinity;
+    let minAbs = Infinity;
+    let maxAbs = 0;
+    let pos = 0;
+    let negs = 0;
+    for (const y of ys) {
+      min = Math.min(min, y);
+      max = Math.max(max, y);
+      minAbs = Math.min(minAbs, Math.abs(y));
+      maxAbs = Math.max(maxAbs, Math.abs(y));
+      if (y > 0) pos++;
+      if (y < 0) negs++;
+    }
+    out.push({ min, max, minAbs, maxAbs, pos, negs });
+  }
+  return out;
+}
+
+// What the windows say: {value: number, tol} | '+inf' | '-inf' | 'none' | null.
+function windowVerdict(ws) {
+  const w = ws.filter(Boolean);
+  if (w.length < 3) return null;
+  const last = w[w.length - 1];
+  const prev = w[w.length - 2];
+  const first = w[w.length - 3];
+  const R = (x) => x.max - x.min;
+  const c = (last.max + last.min) / 2;
+  // Unbounded: one sign means ±∞, both signs means no limit.
+  if (last.maxAbs > 1e4 && last.maxAbs > 10 * first.maxAbs) {
+    if (last.negs === 0 && last.minAbs > first.minAbs && last.minAbs > 1e3) return '+inf';
+    if (last.pos === 0 && last.minAbs > first.minAbs && last.minAbs > 1e3) return '-inf';
+    if (last.pos > 0 && last.negs > 0) return 'none';
+    // Step U4: unbounded, but some values stay small (n(1 + (−1)ⁿ)): no limit.
+    if (last.minAbs <= first.maxAbs) return 'none';
+    return null;
+  }
+  const scale = 1 + Math.abs(c);
+  if (R(last) <= 1e-7 * scale) return { value: c, tol: 1e-7 * scale };
+  // Windows that drift steadily one way (ln n): no verdict here.
+  const mid = (x) => (x.max + x.min) / 2;
+  const d1 = mid(prev) - mid(first);
+  const d2 = mid(last) - mid(prev);
+  if (Math.sign(d1) === Math.sign(d2) && Math.abs(d2) > 0.5 * R(last) && Math.abs(d1) > 0.5 * R(prev)) return null;
+  // Shrinking steadily: the limit is the centre, known to about the range.
+  if (R(last) <= 0.05 * R(first) && R(last) <= 0.5 * R(prev) && R(last) < 1e-2 * scale) return { value: c, tol: 2 * R(last) };
+  // A range that does not shrink: oscillation.
+  if (R(last) > 1e-3 * scale && R(last) >= 0.3 * R(first) && R(prev) >= 0.3 * R(first)) return 'none';
+  return null;
+}
+
+// A float close to a simple fraction (within tol) becomes that fraction.
+function snapTol(x, tol) {
+  if (Math.abs(x) <= tol) return new Q(0);
+  for (let d = 1; d <= 64; d++) {
+    const n = Math.round(x * d);
+    if (Math.abs(n / d - x) <= tol && Number.isSafeInteger(n)) return new Q(n, d);
+  }
+  return x;
+}
+
+// One side: Aitken along a sequence, checked (or replaced) by the windows.
+function side(f, to, s, discrete) {
+  const r = oneSide(f, to, s);
+  const w = windowVerdict(windowsOf(f, to, s, discrete));
+  if (w === 'none') return 'none';
+  if (r === '+inf' || r === '-inf') return w === null || w === r ? r : typeof w === 'object' ? null : r;
+  if (r !== null) {
+    if (w === '+inf' || w === '-inf') return null;
+    if (w && Math.abs(F(r) - w.value) > Math.max(2 * w.tol, 1e-6 * (1 + Math.abs(F(r))))) return null;
+    return r;
+  }
+  if (w === '+inf' || w === '-inf') return w;
+  if (w) return snapTol(w.value, Math.max(w.tol, 1e-9));
+  return null;
+}
+
+function numerically(node, v, to, dir, env, discrete = false) {
   if (contains(node, (n) => n.t === 'eps')) return null;
   let c;
   try { c = compileFloat(node); } catch { return null; }
   const f = (x) => { try { return c({ ...env, [v]: x }); } catch { return NaN; } };
   if (to === '+inf' || to === '-inf') {
-    const r = oneSide(f, to, 1);
+    const r = side(f, to, 1, discrete);
     return r === null ? null : { value: r, method: 'numeric' };
   }
   const sides = dir === '+' ? [1] : dir === '-' ? [-1] : [-1, 1];
-  const rs = sides.map((s) => oneSide(f, to, s));
+  const rs = sides.map((s) => side(f, to, s, false));
+  if (rs.some((r) => r === 'none')) return { value: 'none', method: 'numeric' };
   if (rs.some((r) => r === null)) return null;
   if (rs.length === 2 && !sameValue(rs[0], rs[1])) return { value: 'none', method: 'numeric' };
   return { value: rs[0], method: 'numeric' };
 }
 
-export function limit(node, v, to, dir, { env = {} } = {}) {
+export function limit(node, v, to, dir, { env = {}, discrete = false } = {}) {
   if (to === null || to === undefined) return { value: null, method: 'none' };
-  const s = bySeries(node, v, to, dir, env);
+  // (−1)ⁿ and trigonometric functions of n have no series in 1/n.
+  const oscillating = discrete && contains(node, (n) => (n.t === 'pow' && contains(n.e, (x) => x.t === 'sym' && x.name === v) && evalFloat(n.b, env) < 0)
+    || (n.t === 'fn' && ['sin', 'cos', 'tan'].includes(n.name) && contains(n, (x) => x.t === 'sym' && x.name === v)));
+  const s = oscillating ? null : bySeries(node, v, to, dir, env);
   if (s) return s;
-  return numerically(node, v, to, dir, env) ?? { value: null, method: 'none' };
+  return numerically(node, v, to, dir, env, discrete) ?? { value: null, method: 'none' };
 }
 
 export function limitOfNode(lim, opts) {

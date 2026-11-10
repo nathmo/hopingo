@@ -6,9 +6,7 @@
 // @alg:G-simplifier = rat-simplify, @alg:E-systemes-2x2 = eq-systems,
 // @alg:D-trinome = fac-trinomial, @alg:H-discriminant = quad-formula,
 // @alg:I-parametres = param-quadratic (inequalities with a parameter of
-// degree 2). The A1 skills of step U4 (a1-seq-limsup, a1-fn-limits,
-// a1-fn-extension, a1-seq-squeeze…) and G8 (g8-polar) go through UNBUILT
-// (js/content/uni/index.js).
+// degree 2).
 
 import { SKILLS as PART_A } from './analyse2-a.skills.js';
 import { SKILLS as PART_B } from './analyse2-b.skills.js';

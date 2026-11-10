@@ -1693,7 +1693,7 @@ Pas de problème long : au CMS, la combinatoire est évaluée en questions court
 
 # G8. Nombres complexes
 
-Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
+Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : fait le 10 novembre 2026 (étape U4), chaque compétence a son statut. `g4-bisectors`, `g4-dot` et `g10-circle-eq` (étape U5) restent des remplaçants dans `UNBUILT`.
 
 **Sources** : MAN, Math 1A (examen 2017 : polynôme réel avec une racine complexe, rapport et angle dans le plan complexe, équation du 2e degré à coefficients complexes) ; CMS, Analyse II, séries 14 à 16, 19 et 21 (forme algébrique, carré parfait, module et argument, forme trigonométrique, lieux, triangle équilatéral, polynômes complexes, sin i et cos i).
 **Notation** : i est l'unité imaginaire (l'item déclare `complex: true`). Conjugué `z̄` (touche `conj`). Module `|z|`, argument `arg z` dans ]−π ; π] (une valeur dans [0 ; 2π[ est acceptée et ramenée). Forme exponentielle `r·e^(iθ)` ; forme trigonométrique `r(cos θ + i sin θ)` acceptée. Point du plan d'affixe z = x + iy : (x ; y).
@@ -1706,6 +1706,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-algebraic` — Forme algébrique : opérations, conjugué, module, division
 - **Année** 12 · **Prérequis** `@alg:C-identites` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits z₁·z₂ (+ z₃), (a + bi)² (identité), quotient q·d/d, iⁿ (n de 10 à 2030) et module d'un triplet pythagoricien. Niveau 5 : un produit ou un quotient, plus iⁿ. Les V/F faux se réfutent par des nombres complexes (contre-exemple de sorte `complex`, `js/judges/counters-complex.js`). Variante `coef` : partie réelle ou imaginaire.
 - **Intro** : on calcule comme avec des polynômes en i, puis i² = −1. Puissances de i : cycle de 4 (i, −1, −i, 1). Conjugué de a + bi : a − bi. |a + bi| = √(a² + b²), et z·z̄ = |z|². Pour diviser, on multiplie en haut et en bas par le conjugué du dénominateur.
 - **Juge** : `complex` `{form:'algebraic'}` · **Forme finale** : a + bi avec a, b rationnels simplifiés (b = 0 ou a = 0 acceptés sous forme courte).
 - **Niveaux** :
@@ -1732,6 +1733,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 ### `g8-polar` — Forme polaire et exponentielle
 - **Année** 12 · **Prérequis** `g8-algebraic`, `g3-exact` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g8-algebraic` : module r = |z| et parties a, b.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : module (`complex`, forme réelle), cos θ et sin θ (`value`, niveaux 1 et 3), argument (`complex`, forme réelle, θ dans ]−π ; π]), forme exponentielle (`complex` `exp`) ; les deux sens et le produit ou quotient de formes exponentielles. Niveau 5 : le gabarit en α (série 15) est remplacé par un produit ou un quotient de deux nombres donnés sous forme algébrique, à écrire sous forme exponentielle (θ multiple de π/12). Variante `coef` : θ seul.
 - **Intro** : z = r·e^(iθ) = r(cos θ + i sin θ), avec r = |z|. On trouve θ avec cos θ = a/r **et** sin θ = b/r (les deux, pour le bon quadrant). arctan(b/a) ne suffit pas quand a < 0. e^(iθ)·e^(iφ) = e^(i(θ + φ)).
 - **Juge** : `complex` `{form:'exponential'}` ; segments `value` pour r et θ · **Forme finale** : r·e^(iθ) avec r > 0 et θ exact.
 - **Niveaux** :
@@ -1756,6 +1758,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-moivre` — Puissances par la formule de Moivre
 - **Année** 12 · **Prérequis** `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits zⁿ, quotient de deux puissances de même module, et plus petit n ≥ 1 tel que zⁿ soit un réel positif (partie `value`). Niveau 2 : décision « quel multiple de 2π retirer ». Variante `coef` : la partie de zⁿ qui est rationnelle (réelle ou imaginaire).
 - **Intro** : (r·e^(iθ))ⁿ = rⁿ·e^(inθ). On met z sous forme exponentielle, on élève **le module et l'argument**, puis on ramène l'argument dans ]−π ; π] et on revient à la forme algébrique.
 - **Juge** : `complex` `{form:'algebraic'}` (la forme exponentielle est une étape) · **Forme finale** : a + bi.
 - **Niveaux** :
@@ -1781,6 +1784,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 ### `g8-nth-roots` — Racines n-ièmes
 - **Année** 12.5 · **Prérequis** `g8-moivre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g8-moivre` : zⁿ en forme exponentielle par Moivre.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : forme exponentielle de w, module des racines (`value`), arguments nθ = φ + 2kπ (`solset` en θ avec k, où vit le piège `g8_roots_spacing`), une partie par racine aux niveaux 1 à 3 (n ≤ 4), contrôle (zₖ)ⁿ = w quand une racine a des parties rationnelles, puis l'ensemble des solutions (`complex` `set`). Cet ensemble part de l'équation quand w est dans ℚ(i), sinon des racines écrites r·e^(iθ) : le juge ne lit pas une équation à coefficients irrationnels (z⁴ = −8 + 8i√3). Pas d'esquisse du polygone (`plot`, étape U5). Variante `open` : le niveau 5 (zⁿ = w ou (z − a)ⁿ = w), 4 points.
 - **Intro** : zⁿ = w avec w = ρ·e^(iφ) : |z| = ρ^(1/n) et arg z = φ/n + 2kπ/n, pour k = 0, …, n − 1. Il y a **n** racines, aux sommets d'un polygone régulier centré en 0.
 - **Juge** : `complex` `{form:'set', count:n}` ; segments `value` pour le module et les arguments · **Forme finale** : les n racines (forme algébrique si les valeurs sont remarquables, sinon exponentielle).
 - **Niveaux** :
@@ -1808,6 +1812,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 ### `g8-sqrt-alg` — Racine carrée sous forme algébrique
 - **Année** 12.5 · **Prérequis** `g8-algebraic`, `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g8-algebraic` : développer (x + iy)² et calculer un module.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Le système n'est pas jugé par `equiv` : la ligne (x + iy)² = x² − y² + 2xyi (`complex` avec x et y réels), l'identification en note, puis |w| (`complex`), x² et y² (`value`), la décision des signes et l'ensemble {δ ; −δ} (`complex` `set`). Niveau 5 : enchaîné avec une équation du 2e degré (Δ, δ par x + iy, puis les solutions).
 - **Intro** : on cherche z = x + iy avec z² = a + bi. Trois équations : x² − y² = a, 2xy = b, et x² + y² = |a + bi|. Les deux premières et la troisième donnent x² et y². Le signe de xy est celui de b : il reste **deux** racines opposées. On n'écrit pas √(a + bi) : le symbole √ est réservé aux réels positifs.
 - **Juge** : `equiv` pour le système ; `complex` `{form:'set', count:2}` pour les racines · **Forme finale** : ±(x + iy).
 - **Niveaux** :
@@ -1832,6 +1837,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-quadratic` — Équation du 2e degré à coefficients complexes
 - **Année** 12.5 · **Prérequis** `g8-sqrt-alg`, `@alg:H-discriminant` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : Δ, δ (l'ensemble {δ ; −δ}), z₁ et z₂ par la formule et le contrôle z₁ + z₂ = −b/a (niveaux 1 à 3 ; omis quand les deux racines n'ont qu'un terme), puis l'ensemble des solutions depuis l'équation (niveau 4). Niveau 5 et variante `open` : le problème E6 avec d'autres nombres (a ∈ {1 + i, i, 1 − i, 2}), en 4 parties notées [[1, 1], [1, 1], [1], [1, 1]] : b² puis Δ, |Δ| puis δ, la formule (un QCM), z₁ et z₂ ; le contrôle par Viète à la place d'une simplification n'est pas proposé. Variante `mcq` : les racines (leurre `g8_sqrt_symbol_complex`) ou Δ (leurre `g8_i_squared`).
 - **Intro** : même formule que dans ℝ : Δ = b² − 4ac, puis z = (−b ± δ)/(2a), où δ est **une** racine carrée de Δ (par `g8-sqrt-alg`). Contrôle : z₁ + z₂ = −b/a et z₁z₂ = c/a.
 - **Juge** : par segments : `complex` pour Δ, `complex` `{form:'set', count:2}` pour δ (±), `complex` `{form:'set', count:2}` pour les racines · **Forme finale** : les deux racines sous forme algébrique.
 - **Niveaux** :
@@ -1858,6 +1864,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 ### `g8-poly` — Polynômes complexes, théorème fondamental, racines conjuguées
 - **Année** 12.5 · **Prérequis** `g8-quadratic`, `g0-long-div` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g8-quadratic` : racines des facteurs du 2e degré.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Les trois gabarits ; le gabarit 3 (coefficients non réels, racine imaginaire pure iy) aux niveaux 4 et 5 et en QCM. Parties : facteur réel (juge `poly` complexe, forme développée réelle), condition (mode « identité » du juge `poly` : chaque ligne doit être vérifiée par r, et la dernière est r = …), développement, division (mode « division », qui lit maintenant aussi la variable z), racines (juge `complex`, forme `set`). Pour le gabarit 3, P(iy) = 0 donne deux équations réelles en y, jugées par le mode « identité ». Pas de racine réelle nulle (r ≠ 0). La variante `tf` est un QCM Vrai/Faux : le vérificateur de contre-exemples `poly` ne sait pas encore évaluer P en i. La variante `open` est le problème E7 (7 points), le niveau 5 un enchaînement de parties sans aide.
 - **Intro** : un polynôme de degré n a n racines dans ℂ, comptées avec multiplicité. Si ses coefficients sont **réels**, la conjuguée d'une racine est aussi racine, et (z − w)(z − w̄) = z² − 2Re(w)z + |w|² est un facteur réel. Si les coefficients ne sont pas réels, cette règle ne vaut pas.
 - **Juge** : `poly` `{v:'x'}` (division, identité) ; `complex` `{form:'set'}` pour les racines ; `equiv` pour le polynôme final · **Forme finale** : polynôme développé, ou liste des racines.
 - **Niveaux** :
@@ -1877,13 +1884,14 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
   | 4 | P(1) = 2(1 − r) = 4, donc r = −1 | Condition (reste = P(1)) |
   | 5 | P(x) = x³ − 3x² + x + 5 | Développer |
 - **Aides** : 1 « Pour un polynôme réel, la conjuguée d'une racine est racine. » · 2 « (x − 2)² + 1 = x² − 4x + □ » · 3 « P(x) = (x² − 4x + 5)(x + 1) ».
-- **Variantes d'examen** : `mcq` (distracteurs `g8_conj_root_nonreal`, `g0_conj_missing`) ; `tf` (« Si i est racine de P, alors −i aussi » : faux, contre-exemple P(z) = z − i) ; `open`.
+- **Variantes d'examen** : `mcq` (distracteurs `g8_conj_root_nonreal`, `g0_conj_missing`) ; `tf` (« Si i est racine de P, alors −i aussi » : faux, contre-exemple P(z) = z − i) ; `open` (E7).
 - **Pièges** : `g0_conj_missing`, `g8_conj_root_nonreal`.
 - **Sous-buts → crédit** : condition → `g0-long-div` (théorème du reste).
 
 ### `g8-locus` — Lieux dans le plan complexe
 - **Année** 12.5 · **Prérequis** `g8-algebraic`, `g4-bisectors`, `g10-circle-eq` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g8-algebraic` : écrire |z − a| en x et y.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Pas de juge `geom` avant l'étape U5 : les lignes sont jugées par un mode `locus` du juge `poly` (`js/judges/locus.js`). Une ligne en z (|z − a|, Re, Im, z̄, z·z̄) ou en x, y est juste si elle décrit le même ensemble de points : elle s'annule sur 16 points du cercle ou de la droite de référence et pas sur une quarantaine de points de la grille hors de lui ; pour une inéquation, même côté et même inégalité stricte ou large. Forme finale : (x − a)² + (y − b)² = r² (ou < ≤ > r²) pour un cercle ou un disque ; une équation de droite regroupée (2x + y + 3 = 0, y = −2x − 3), coefficients entiers premiers entre eux, pour une médiatrice ou un demi-plan. Gabarits : médiatrice, cercle d'Apollonius (k = 2 ou 3, centre entier), région (disque de la série 16 du CMS, ou demi-plan |z − a| < |z − b|). Le nom du lieu est une décision au début (niveaux 1 à 3) et une phrase de l'aide, pas une ligne ; pas d'esquisse (`plot`, étape U5). Le lecteur ne lit pas 2|z + 1| : on écrit 2×|z + 1|. La variante `tf` est un QCM Vrai/Faux. `g8_modulus_no_square` (juge `complex`) n'est pas diagnostiqué dans les lignes du mode `locus` : il est un leurre du menu du niveau 3.
 - **Intro** : on pose z = x + iy et on traduit. |z − a| = |z − b| : médiatrice de [AB]. |z − a| = r : cercle. |z − a| = k|z − b| (k ≠ 1) : cercle (d'Apollonius). Re, Im, et z·z̄ = x² + y² donnent des droites et des cercles. On peut souvent lire le lieu sans calcul.
 - **Juge** : `geom` `{object:'line2'|'circle', complexVar:'z'}` · **Forme finale** : équation cartésienne et nom du lieu.
 - **Niveaux** :
@@ -1908,6 +1916,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-ratio-angle` — Rapport de longueurs et angle par un quotient
 - **Année** 12.5 · **Prérequis** `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Trois parties jugées par `complex` : q sous forme a + bi, puis |q| et arg q (nombres réels). Le gabarit 2 finit par arg q, avec la décision « alignés ? ». Le gabarit 3 (triangle équilatéral direct, aussi le niveau 5) prend [AB] horizontal, ou vertical avec a imaginaire pur : chaque partie de c est alors un seul terme, comme le demande la forme finale a + bi du juge (3 + (1 + 2√3)i). La variante `tf` est un QCM Vrai/Faux. `g8_div_componentwise` est diagnostiqué sur les lignes du quotient et proposé dans le menu du niveau 3.
 - **Intro** : avec A, B, C d'affixes a, b, c : q = (c − a)/(b − a). |q| = AC/AB, et arg q est l'angle orienté de AB⃗ vers AC⃗. q réel : A, B, C alignés. q = e^(±iπ/3) : triangle équilatéral.
 - **Juge** : `complex` `{form:'algebraic'}` pour q ; `value` pour |q| et arg q · **Forme finale** : rapport et angle.
 - **Niveaux** :
@@ -1932,6 +1941,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-transform` — Translations, rotations, homothéties, similitudes
 - **Année** 12.5 · **Prérequis** `g8-algebraic`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). a est pris dans ℚ(i) (i, −i, 2, 3, −2, 1/2, 1 ± i, −1 ± i, ±2i, (1 + i)/2) : pas de √3 + i. Le centre est la solution de ω = aω + b (juge `complex`, forme `set`, inconnue ω) ; |a| et arg a sont deux parties réelles ; la nature est une décision, avec l'option « de centre 0 » (piège `g8_rotation_about_origin`). Sens inverse (gabarit 2) : a = r·e^(iθ) en forme algébrique, puis b = ω − aω ; l'expression z′ = az + b n'est pas saisie en entier. La variante `tf` est un QCM Vrai/Faux, la variante `open` un problème à une partie (4 points).
 - **Intro** : z ↦ z + b : translation. z ↦ az + b avec a ≠ 1 : similitude de centre ω (ω = aω + b), de rapport |a| et d'angle arg a ; c'est une rotation si |a| = 1, une homothétie si a est réel. Écrire une rotation de centre ω et d'angle θ : z′ − ω = e^(iθ)(z − ω).
 - **Juge** : `complex` pour ω, a, b ; `value` pour le rapport et l'angle ; `equiv` `{vars:['z'], complex:true}` pour l'expression de la transformation · **Forme finale** : nature, centre, rapport, angle (ou l'expression z′ = …).
 - **Niveaux** :
@@ -1957,6 +1967,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 ### `g8-inversion` — Inversion z ↦ 1/z̄ et z ↦ 1/z
 - **Année** 12.5 · **Prérequis** `g8-locus` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g8-locus` : image d'une droite ou d'un cercle : traduire en x et y.
+- **Statut** : fait le 10 novembre 2026 (étape U4). On pose w = x + iy (et non u + iv : le clavier a les touches x et y). Mode `locus` du juge `poly` avec la lettre w et le point 0 exclu ; le point exclu est une décision avant la dernière ligne. Gabarits : droite a·Re z + b·Im z = c (c ≠ 0) → cercle par 0, cercle |z − c| = |c| → droite, image d'un point (niveaux 1 à 3). Les droites Re z = k, symétriques par rapport à l'axe réel, ne servent pas d'appât pour `g8_inversion_conj` (elles ont la même image par 1/z et par 1/z̄).
 - **Intro** : z ↦ 1/z̄ est l'inversion de centre 0 et de rayon 1 : même argument, module inversé. z ↦ 1/z la compose avec la symétrie par rapport à l'axe réel. Image d'une droite ou d'un cercle : on pose w = 1/z̄, donc z = 1/w̄, et on remplace dans l'équation du lieu. Une droite qui ne passe pas par 0 devient un cercle qui passe par 0 (privé de 0).
 - **Juge** : `geom` `{object:'circle'|'line2', complexVar:'w'}` · **Forme finale** : équation de l'image, nature, et le point exclu.
 - **Niveaux** :
@@ -2012,3 +2023,17 @@ Donner, sous forme algébrique simplifiée, les racines de P(z) = (1 + i)z² + (
 | 4. Simplifier | z₁ = 4i/(2 + 2i) = 1 + i ; z₂ = (−6 − 2i)/(2 + 2i) = −2 + i | 2 | `g8-algebraic` |
 
 `points: [[1, 1], [1, 1], [1], [1, 1]]`. Contrôle accepté à la place d'une étape de simplification : z₁ + z₂ = −(3 − i)/(1 + i) = −1 + 2i.
+
+### E7. Polynôme réel de degré 3 connaissant une racine complexe (d'après MAN Math 1A, 2017, Q4, et CMS, série 19, 7 points)
+
+P est un polynôme à coefficients réels, unitaire, de degré 3. On sait que 1 + 2i est racine de P et que le reste de la division de P par x − 2 vaut 15. (a) Déterminer P sous forme développée. (b) Factoriser P dans ℝ, puis dans ℂ.
+
+| Étape | Attendu | Points | Compétence |
+|---|---|---|---|
+| 1. Racine conjuguée, facteur réel | P est réel : 1 − 2i est racine ; (x − 1 − 2i)(x − 1 + 2i) = (x − 1)² + 4 = x² − 2x + 5 | 2 | `g8-poly` |
+| 2. Condition | P(x) = (x² − 2x + 5)(x − r) ; reste = P(2) = 5(2 − r) = 15, donc r = −1 | 2 | `g0-long-div` |
+| 3. Développer | P(x) = x³ − x² + 3x + 5 | 1 | `g8-poly` |
+| 4. Factoriser dans ℝ | P(x) = (x + 1)(x² − 2x + 5) (Δ = −16 < 0) | 1 | `g8-poly` |
+| 5. Factoriser dans ℂ | P(x) = (x + 1)(x − 1 − 2i)(x − 1 + 2i) | 1 | `g8-poly` |
+
+`points: [[2, 2, 1], [1, 1]]` : partie (a) en trois étapes, partie (b) en deux. C'est la variante `open` de `g8-poly` (étape U4), avec d'autres nombres.

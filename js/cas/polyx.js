@@ -308,7 +308,7 @@ export function factorQ(cs) {
 // B as a factor (B written out, or the name opts.divisorName) give Q, the
 // others R. → {q, r, hasB} or null if a part is not a polynomial.
 export function splitByDivisor(node, divisor, opts = {}) {
-  const { names = {}, complex = false, divisorName = null } = opts;
+  const { names = {}, complex = false, divisorName = null, v = 'x' } = opts;
   const P = (n) => polyOf(n, { complex, names });
   // The ratio factor/divisor when the factor is the divisor up to a number
   // (−x written for the divisor x, the sign gone to the coefficient), or null.
@@ -317,8 +317,8 @@ export function splitByDivisor(node, divisor, opts = {}) {
     if (divisorName && n.t === 'sym' && n.name === divisorName) return new Q(1);
     const p = P(n);
     if (!p || !divisor || p.isZero) return null;
-    const lp = leadCoeff(p);
-    const ld = leadCoeff(divisor);
+    const lp = leadCoeff(p, v);
+    const ld = leadCoeff(divisor, v);
     if (!lp?.isConst || !ld?.isConst) return null;
     const k = lp.constValue().div(ld.constValue());
     return divisor.scale(k).equals(p) ? k : null;

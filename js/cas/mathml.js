@@ -71,7 +71,7 @@ export function toMathML(node, opts = {}) {
       }
       case 'frac': return `<mfrac>${M(stripP(n.n))}${M(stripP(n.d))}</mfrac>`;
       case 'pow': {
-        const b = n.b.t === 'fn' ? M(n.b) : wrap(n.b, 6);
+        const b = n.b.t === 'fn' && n.b.name !== 'fact' ? M(n.b) : wrap(n.b, 6);
         return `<msup>${b.startsWith('<mrow') ? b : row(b)}${M(stripP(n.e))}</msup>`;
       }
       case 'sqrt': return `<msqrt>${M(stripP(n.e))}</msqrt>`;
@@ -98,9 +98,10 @@ export function toMathML(node, opts = {}) {
         return row(`<munder>${mo('lim')}${under}</munder>`, prec(e) < PREC.prod ? paren(M(e)) : M(e));
       }
       case 'fn': {
+        if (n.name === 'fact' && n.args.length === 1) return row(wrap(n.args[0], PREC.atom), mo('!', ' lspace="0" rspace="0"')); // step U4
         if (n.name === 'logb') return row(`<msub><mi>log</mi>${M(stripP(n.args[0]))}</msub>`, mo('&#x2061;'), paren(M(n.args[1])));
         const name = `<mi>${esc(FN_NAMES[n.name] ?? n.name)}</mi>`;
-        return row(name, mo('&#x2061;'), paren(n.args.map(M).join(mo(','))));
+        return row(name, mo('&#x2061;'), paren(n.args.map(M).join(mo(n.name === 'min' || n.name === 'max' ? ';' : ','))));
       }
       case 'deriv': {
         const marks = '′'.repeat(Math.min(n.n, 3));

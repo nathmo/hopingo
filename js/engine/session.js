@@ -36,12 +36,13 @@ const OP_SKILL = {
   'mix-11': { '+': 'frac-add-any', '-': 'frac-add-any', '×': 'frac-mul', '÷': 'frac-div', '^': 'pow-frac', '√': 'root-frac' },
 };
 
-const GUESS = { fact: 0.02, mcq: 0.3, match: 0.1, shade: 0.05, numberline: 0.08, answer: 0.03, steps: 0.02, lines: 0.02 };
-const WORKED = new Set(['steps', 'lines']);
+const GUESS = { fact: 0.02, mcq: 0.3, match: 0.1, shade: 0.05, numberline: 0.08, answer: 0.03, steps: 0.02, lines: 0.02, problem: 0.01 };
+const WORKED = new Set(['steps', 'lines', 'problem']);
 
 export class Lesson {
   // kind: 'smart' continues the path, 'skill' practises one skill,
-  // 'review' does due reviews and traps, 'trap' works on one trap.
+  // 'review' does due reviews and traps, 'trap' works on one trap,
+  // 'resume' finishes the problem saved in profile.pending (step U4).
   constructor(profile, { kind = 'smart', skill = null, rule = null } = {}, rng) {
     this.trapRule = rule;
     this.profile = profile;
@@ -71,6 +72,8 @@ export class Lesson {
     const hasTraps = activeTraps(p).some((r) => this.trapSkill(r));
     let plan;
     if (this.kind === 'trap') return Array(8).fill('trap');
+    // Step U4: the problem saved in profile.pending, then the lesson goes on.
+    if (this.kind === 'resume') return p.pending ? ['resume'] : [];
     if (this.kind === 'review' || !this.focus) {
       plan = Array.from({ length: CORE_LENGTH }, (_, i) => (hasTraps && i % 3 === 2 ? 'trap' : 'review'));
     } else if (this.kind === 'skill') {
@@ -136,6 +139,11 @@ export class Lesson {
     const p = this.profile;
     // A missed fact comes back a couple of questions later.
     if (slot.retryOf) return { ...slot.retryOf, retry: true };
+    if (slot === 'resume') {
+      const pd = p.pending;
+      if (!pd?.item) return null;
+      return { ...pd.item, resumeLog: pd.log || [], slot, resumed: true };
+    }
     if (slot === 'intro') {
       const skill = practiceSkill(p, this.focus);
       skillState(p, skill).introduced = true;
@@ -201,6 +209,8 @@ export class Lesson {
       this.results.push({ slot: 'intro', skill: item.skill, correct: true });
       return { xp: 0, events };
     }
+    // A finished problem is no longer pending (step U4).
+    if (p.pending && (item.resumed || p.pending.item?.key === item.key)) delete p.pending;
     const st = skillState(p, item.skill);
     const slow = isSlow(st, outcome.rtSec, item.expectedSec);
     const weight = item.retry ? 0.3 : item.introTry ? 0.5 : 1;

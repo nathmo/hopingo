@@ -18,15 +18,21 @@ import { segmentsOf, templateOf } from '../judges/lines.js';
 import { readWith, textWith } from '../judges/index.js';
 import { parse as parseCas } from '../cas/parse.js';
 import { toReadable } from '../cas/print.js';
+import { asProblem } from './uni/kit-problem.js';
 
 const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS, ...FONCTIONS, ...SECONDDEGRE, ...UNI_GEN };
 
 // The profile is optional: fact skills use it to pick from the student's
 // fact memory. opts.exam asks for an exam variant (spec §6).
+// Step U4: the `open` exam variant of a university skill is a `problem`
+// (spec §6); an item that is not one yet becomes a one-part problem whose
+// segments are the steps, with its exam points spread over them.
 export function generate(skillId, level, rng, profile = null, opts = undefined) {
   const g = GEN[skillId];
   if (!g) throw new Error(`Pas de générateur pour ${skillId}`);
-  return opts ? g(Math.max(1, Math.min(5, level)), rng, profile, opts) : g(Math.max(1, Math.min(5, level)), rng, profile);
+  const it = opts ? g(Math.max(1, Math.min(5, level)), rng, profile, opts) : g(Math.max(1, Math.min(5, level)), rng, profile);
+  if (opts?.exam === 'open' && UNI_GEN[skillId] && it.type !== 'problem') return asProblem(it, it.exam?.points ?? 1);
+  return it;
 }
 
 export const hasGenerator = (skillId) => !!GEN[skillId];
@@ -105,6 +111,18 @@ function describeTable(item) {
   return out;
 }
 
+// Step U4: a problem, part by part, with the points of each step.
+function describeProblem(item) {
+  const total = item.points.flat().reduce((a, b) => a + b, 0);
+  const out = [`  [problème${item.exam ? `, examen ${item.exam.format}` : ''}, ${String(total).replace('.', ',')} points]`];
+  item.parts.forEach((p, i) => {
+    const bareme = item.points[i].map((x, s) => `${T(item.titles?.[i]?.[s] ?? '') || `étape ${s + 1}`} : ${String(x).replace('.', ',')}`).join(' ; ');
+    out.push(`  partie ${i + 1} (${bareme})`);
+    out.push(...describe(p).split(NL).filter((l) => l.trim() && !l.startsWith('  pièges')).map((l) => `  ${l}`));
+  });
+  return out;
+}
+
 // HTML of the school renderer as plain text.
 const strip = (h) => String(h)
   .replace(/<span class="m-frac"><span class="m-n">(.*?)<\/span><span class="m-d">(.*?)<\/span><\/span>/g, '$1/$2')
@@ -137,7 +155,8 @@ export function describe(item) {
   if (item.type === 'example') lines.push(`  [exemple ${item.property.kind}${item.property.params?.want || item.property.params?.test ? ` ${item.property.params.want ?? item.property.params.test}` : ''}] → ${Object.entries(item.answer || {}).map(([k, v]) => `${k} = ${v}`).join(', ')}`);
   if (item.type === 'plot') lines.push(`  [repère ${item.task}, à placer : ${item.place.map((p) => `${p.label} ×${p.count}`).join(', ')}${item.noHints ? ', sans aide' : ''}]`); // step U5
   if (item.type === 'domain') lines.push(`  [bornes ${item.answerShape || item.judge.coords}${item.noHints ? ', sans aide' : ''}] → ${item.fields.map(({ v }) => `${item.answer[v][0]} ≤ ${v} ≤ ${item.answer[v][1]}`).join(' ; ')}`); // step U6
-  if (item.exam && item.type !== 'lines') lines.push(`  [examen ${item.exam.format}]`);
+  if (item.type === 'problem') lines.push(...describeProblem(item));
+  if (item.exam && item.type !== 'lines' && item.type !== 'problem') lines.push(`  [examen ${item.exam.format}]`);
   if (item.type === 'shade') lines.push(`  (figure ${item.figure.shape} en ${item.figure.n} parts, colorier ${item.target.count})`);
   if (item.type === 'numberline') lines.push(`  (droite ${item.line.min ?? 0} → ${item.line.max}, graduée en ${item.line.den}es) → ${item.target}`);
   if (item.type === 'match') lines.push(`  ${item.pairs.map(([a, b]) => `${strip(a)} ↔ ${strip(b)}`).join('   ')}`);

@@ -39,6 +39,19 @@ import { RULES as G10B } from './g10b.js';
 
 CAS_RULES.push(...G4A, ...G4B, ...G10A, ...G10B);
 
+// Step U4: A1 (parts f to l) and G8 (parts a and b).
+import { RULES as A1F } from './a1f.js';
+import { RULES as A1G } from './a1g.js';
+import { RULES as A1H } from './a1h.js';
+import { RULES as A1I } from './a1i.js';
+import { RULES as A1J } from './a1j.js';
+import { RULES as A1K } from './a1k.js';
+import { RULES as A1L } from './a1l.js';
+import { RULES as G8A } from './g8a.js';
+import { RULES as G8B } from './g8b.js';
+
+CAS_RULES.push(...A1F, ...A1G, ...A1H, ...A1I, ...A1J, ...A1K, ...A1L, ...G8A, ...G8B);
+
 // Step U6: module A2.
 import { RULES as A2 } from './a2.js';
 

@@ -574,9 +574,11 @@ Laquelle est la contraposée de x² > 9 ⇒ x > 3 ?
 
 ```
 Écris la négation de l'énoncé ∀n ∈ ℤ, n² est pair ⇒ n est pair.
-  [jetons, sans aide] palette : n ∈ ℤ · n² est pair · n² est impair · n est pair · n est impair
-    → ∃n ∈ ℤ, n² est pair ∧ n est impair
-  [examen open]
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 2)
+    [jetons, sans aide] palette : n ∈ ℤ · n² est pair · n² est impair · n est pair · n est impair
+      → ∃n ∈ ℤ, n² est pair ∧ n est impair
+    [examen open]
   pièges : g9_neg_implication
 
 Laquelle est la contraposée de ∀A, B, C ⊂ ℕ, A ∩ C = B ∩ C ⇒ A = B ?
@@ -847,9 +849,11 @@ Quelle formule dit « f est majorée sur ℝ » ?
   pièges : g9_quant_order
 
 Écris avec des quantificateurs : « f est injective sur I ».
-  [jetons, sans aide] palette : x, y ∈ I · f(x) = f(y) · x = y · f(x) ≠ f(y) · x ≠ y
-    → ∀x, y ∈ I, f(x) = f(y) ⇒ x = y
-  [examen open]
+  [problème, examen open, 1 points]
+  partie 1 (Début du problème : 1)
+    [jetons, sans aide] palette : x, y ∈ I · f(x) = f(y) · x = y · f(x) ≠ f(y) · x ≠ y
+      → ∀x, y ∈ I, f(x) = f(y) ⇒ x = y
+    [examen open]
   pièges : g9_quant_order
 
 ```
@@ -983,9 +987,11 @@ On nie ∀x ∈ A ∃y ∈ A, x² + y < 9. Première ligne : ∃x ∈ A, ¬(∃y
 
 ```
 Écris la négation de ∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y) (« f est croissante sur I ») : fais entrer ¬, un symbole par ligne.
-  [free, sans aide, examen open]  ¬(∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y))
-    = ∃x, y ∈ I, ¬(x < y ⇒ f(x) ≤ f(y))   ← Franchir ∀x, y ∈ I
-    = ∃x, y ∈ I, x < y ∧ f(x) > f(y)   ← Nier l'implication : A ∧ ¬B
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 2)
+    [free, sans aide, suivre l'erreur, examen open]  ¬(∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y))
+      = ∃x, y ∈ I, ¬(x < y ⇒ f(x) ≤ f(y))   ← Franchir ∀x, y ∈ I
+      = ∃x, y ∈ I, x < y ∧ f(x) > f(y)   ← Nier l'implication : A ∧ ¬B
   pièges : g9_neg_pred_kept, g9_neg_strict
 
 Quelle est la négation de ∃y ∈ A ∀x ∈ A, x + 2y < 9 ?
@@ -1301,16 +1307,18 @@ Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans 
 
 ```
 Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
-  [blocs frame, sans aide]
-    ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
-    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
-    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
-    3. n + m = 2k + 2l + 2 = 2(k + l + 1).   [à écrire : n + m = (2k + 1) + (2l + 1) = 2(k+l+1)]
-    4. Donc n + m est pair.
-    5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
-    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
-  [examen open]
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 3)
+    [blocs frame, sans aide]
+      ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
+      1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
+      2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
+      3. n + m = 2k + 2l + 2 = 2(k + l + 1).   [à écrire : n + m = (2k + 1) + (2l + 1) = 2(k+l+1)]
+      4. Donc n + m est pair.
+      5. La contraposée est vraie, donc l'énoncé l'est aussi.
+      ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
+      ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
+    [examen open]
   pièges : g9_proof_by_example, g9_converse_contra
 
 ```
@@ -1500,17 +1508,19 @@ Montre que √7 est irrationnel. Touche les blocs dans l'ordre de la preuve.
 
 ```
 Montre que √3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
-  [blocs frame, sans aide]
-    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
-    1. Supposons √3 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 3b².   [à écrire : En élevant √3 = a/b au carré : a^2=3b^2]
-    3. 3 divise a², et 3 est premier, donc 3 divise a : a = 3c.
-    4. 9c² = 3b², donc b² = 3c², donc 3 divise b.
-    5. 3 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √3 est irrationnel.
-    ✗ Supposons √3 irrationnel. [g9_absurd_wrong_assumption]
-    ✗ √3 ≈ 1,7321… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
-  [examen open]
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 3)
+    [blocs frame, sans aide]
+      ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
+      1. Supposons √3 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
+      2. Alors a² = 3b².   [à écrire : En élevant √3 = a/b au carré : a^2=3b^2]
+      3. 3 divise a², et 3 est premier, donc 3 divise a : a = 3c.
+      4. 9c² = 3b², donc b² = 3c², donc 3 divise b.
+      5. 3 divise a et b : contradiction avec pgcd(a, b) = 1.
+      6. Donc √3 est irrationnel.
+      ✗ Supposons √3 irrationnel. [g9_absurd_wrong_assumption]
+      ✗ √3 ≈ 1,7321… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
+    [examen open]
   pièges : g9_absurd_wrong_assumption, g9_proof_by_example
 
 ```

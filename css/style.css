@@ -514,3 +514,15 @@ button.blk { cursor: pointer; }
 .num-cell.right, .tf-cell.right { border-color: var(--green); background: var(--green-soft); }
 .num-cell.wrong, .tf-cell.wrong { border-color: var(--red); background: var(--red-soft); }
 .table-root { font-weight: 800; margin: 4px 0; }
+
+/* Step U4: problems in parts (js/ui/problem.js) */
+.problem-board { border: 2px solid var(--line); border-radius: 14px; padding: 8px 12px; margin-bottom: 10px; font-size: .92rem; }
+.problem-head { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.problem-step { display: grid; grid-template-columns: 1.4em 1fr auto; gap: 6px; align-items: baseline; padding: 2px 0; color: var(--muted); }
+.problem-step.current { color: var(--ink); font-weight: 700; }
+.problem-step.right .problem-mark { color: var(--green, #2b8a3e); }
+.problem-step.missed .problem-mark { color: var(--red, #c92a2a); }
+.problem-points { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.problem-sub { border-top: 2px dashed var(--line); padding-top: 8px; }
+.problem-tools { justify-content: flex-end; }
+.cta.resume { margin-bottom: 8px; }
