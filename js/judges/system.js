@@ -3,7 +3,8 @@
 // (∇f = 0, Lagrange). cfg:
 //   {vars: ['x', 'y'] | ['x', 'y', 'λ'], solutions: [['2', '1'], …] (texts,
 //    in the order of vars), elim?: ['λ'] (letters that may disappear from a
-//    line: it is then compared with the solutions' projection), box?: 8}
+//    line: it is then compared with the solutions' projection), box?: 8,
+//    grid?: starting points per axis (default 41, 11, 6 for 1, 2, ≥ 3 unknowns)}
 // A line is a system, or cases joined by « ou »: equations separated by
 // « ; » or « et », brackets to group, « ou » between cases, so that
 // « (x = 0 ou x = −2) ; y = 1 » is two cases. A point list
@@ -95,7 +96,7 @@ export function parseLine(cfg, text) {
   // (2 ; 1), (1 ; 2): points separated by commas.
   s = s.replace(/\)\s*,\s*\(/g, ') ou (');
   const tree = readTree(cfg, s);
-  return { t: 'sys', tree, cases: casesOf(tree) };
+  return { t: 'sys', tree, cases: casesOf(tree), text: treeText(tree) };
 }
 
 const inner = (n) => toMathML(unparen(n)).replace(/^<math[^>]*>/, '').replace(/<\/math>$/, '');
@@ -138,14 +139,14 @@ function satisfies(c, vars, point) {
 }
 
 // Real roots of a case in [−B ; B]ⁿ (Gauss-Newton from a grid of starts).
-function solveCase(c, vars, B) {
+function solveCase(c, vars, B, grid) {
   const F = residuals(c);
   const S = scaleOf(c);
   const n = vars.length;
   const m = F.length;
   const val = (p) => { const env = Object.fromEntries(vars.map((v, i) => [v, p[i]])); return F.map((f) => f(env)); };
   const roots = [];
-  const k = n === 1 ? 41 : n === 2 ? 11 : 6;
+  const k = grid ?? (n === 1 ? 41 : n === 2 ? 11 : 6);
   const starts = [];
   const rec = (pre) => {
     if (pre.length === n) { starts.push(pre); return; }
@@ -236,7 +237,7 @@ export function compare(cfg, node) {
   const B = cfg.box ?? 8;
   for (const c of node.cases) {
     const cvars = vars.filter((v) => c.some((r) => symbolsIn(r).has(v)));
-    const roots = solveCase(c, vars, B);
+    const roots = solveCase(c, vars, B, cfg.grid);
     if (c.length < vars.length || cvars.length < vars.length) {
       // Not enough equations: fine only if the case has no solution.
       if (roots.length || c.length < cvars.length) { short = c; continue; }

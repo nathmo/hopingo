@@ -214,7 +214,9 @@ ACTIONS.induction = (prev) => {
 // [{at: text of the line before, options}]): the one whose line is the
 // student's previous line, else cfg.menu, else none (free line).
 ACTIONS.steps = (prev, cfg) => {
-  const key = toText(sp(prev));
+  // Step U6: a line of the judge `system` (or of a matrix judge) is keyed
+  // by its own text; the generator then writes each menu's `key`.
+  const key = prev?.t === 'sys' || prev?.t === 'mline' ? prev.text : toText(sp(prev));
   for (const m of cfg.menus || []) {
     if (!m.key) m.key = toText(sp(parse(m.at, { vars: cfg.vars })));
     if (m.key === key) return m.options;
