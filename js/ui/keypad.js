@@ -52,10 +52,13 @@ const KEYSETS = {
   // Step U2: integrals int(f, x) and int(f, x, a, b), brackets [F] from a to
   // b, limits, one-sided bounds 0⁺ 1⁻, the constant C, the remainder ε(x).
   anal: ['int(', 'bracket(', 'lim(', ',', 'C', 'ε(x)', 'o(', '⁺', '⁻', '∞', 't', '(', ')', 'left', 'right', 'back'],
+  // Step U4 (A1, sequences): factorials n!, (n + 1)!, the index m of a subsequence.
+  fact: ['!', 'n', 'm', 'k', '(', ')', '^', 'left', 'right', 'back'],
 };
 
 // Tab names of the keypads.
 const TAB_LABEL = { anal: '∫ lim', calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
+TAB_LABEL.fact = 'n!'; // step U4
 
 const LABEL = {
   'int(': '∫( , x)', 'bracket(': '[F]ₐᵇ', 'lim(': 'lim( , x, a)', 'o(': 'o( )',
