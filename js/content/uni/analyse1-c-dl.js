@@ -17,7 +17,7 @@ import { templateOf } from '../../judges/lines.js';
 import { toReadable } from '../../cas/print.js';
 import { MT, linesItem, mcq, tfItem, answerItem } from './kit.js';
 import {
-  V, q, isQ, modeOf, H, E, KEYS, examOf, fact, qPow, coefs, isZero, maxDen, maxNum, mono, remText, termAbs, joinTerms,
+  V, q, isQ, modeOf, H, E, KEYS, xp, examOf, fact, qPow, coefs, isZero, maxDen, maxNum, mono, remText, termAbs, joinTerms,
   polyText, dlText, polyOf, termCount, valuation, blankDL, tpl, blanked, assemble, fitLines, uniq,
 } from './analyse1-c-kit.js';
 import { series } from '../../cas/series.js';
@@ -92,7 +92,7 @@ export function fText(F, u, alpha) {
     default: return `${F}(${u})`;
   }
 }
-const ALPHA_WORD = (alpha) => (alpha.eq(q(1, 2)) ? '√(1 + u) = (1 + u)^(1/2)' : alpha.eq(-1) ? '1/(1 + u) = (1 + u)^(−1)' : `(1 + u)^α avec α = ${alpha.toString().replace('-', '−')}`);
+const ALPHA_WORD = (alpha) => (alpha.eq(q(1, 2)) ? '√(1 + u) = (1 + u)^(1/2)' : alpha.eq(-1) ? '1/(1 + u) = (1 + u)^(−1)' : `(1 + u)^α, α = ${alpha.toString().replace('-', '−')},`);
 export const familyWord = (F, alpha) => (F === 'pow' ? ALPHA_WORD(alpha) : USUAL[F].name);
 
 // c·(U)^k as text, without its sign.
@@ -162,15 +162,15 @@ function usOk(d) {
 
 const US_CHOICES = (d, U) => [
   { id: 'subst', label: `Remplacer u par ${rd(U)} dans le DL de ${familyWord(d.F, d.alpha)}` },
-  { id: 'trunc', label: `Calculer les puissances et garder les termes jusqu'à x^${d.n}` },
+  { id: 'trunc', label: `Calculer les puissances et garder les termes jusqu'à ${xp(d.n)}` },
   { id: 'deriv', label: 'Calculer f′(0), f″(0)… une à une', why: 'Possible, mais bien plus long : le DL usuel donne tous les coefficients d\'un coup.' },
-  { id: 'rem', label: `Écrire le reste x^${d.n - 1}·ε(x)`, rule: 'a1_dl_remainder_wrong_order', why: `Le reste se met à l'ordre demandé : x^${d.n}·ε(x).` },
+  { id: 'rem', label: `Écrire le reste ${xp(d.n - 1)}·ε(x)`, rule: 'a1_dl_remainder_wrong_order', why: `Le reste se met à l'ordre demandé : ${xp(d.n)}·ε(x).` },
 ];
 
 function usLines(d, level) {
   const b = usBuild(d);
   let l1 = E(b.sub, `DL de ${familyWord(d.F, d.alpha)} avec u = ${rd(b.U)}`, 'coef', 'subst');
-  let l2 = E(b.fin, `Puissances calculées, termes jusqu'à x^${d.n}`, 'coef', 'trunc');
+  let l2 = E(b.fin, `Puissances calculées, termes jusqu'à ${xp(d.n)}`, 'coef', 'trunc');
   if (level === 1) {
     l1 = { ...l1, ...tpl(b.sub, [b.U]) };
     l2 = { ...l2, ...blankDL(b.fin, (i) => (i > 0 || isZero(b.cs[0]) ? 'coef' : false)) };

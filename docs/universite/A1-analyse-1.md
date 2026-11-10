@@ -991,6 +991,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-dl-usual` — DL usuels en 0, notation xⁿ·ε(x)
 - **Année** 13 · **Prérequis** `a1-deriv-rules` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-deriv-rules` : coefficients f⁽ᵏ⁾(0)/k!.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Le niveau 1 rappelle la formule de référence dans l'énoncé. La ligne « substituer » non réduite n'est gardée qu'aux niveaux guidés (aux niveaux libres, le juge `series` demande des termes regroupés). Le V/F faux est un énoncé « pour tout a » qu'une valeur de a réfute.
 - **Intro** : `f(x) = a₀ + a₁x + … + aₙxⁿ + xⁿ·ε(x)` avec ε(x) → 0. Si f est de classe Cⁿ, `aₖ = f⁽ᵏ⁾(0)/k!` (Taylor). À connaître à l'ordre n : `eˣ`, `sin x`, `cos x`, `Log(1 + x)`, `(1 + x)^α`, `1/(1 − x)`, `Arctg x`, `sinh x`, `cosh x`. On substitue ensuite `−x`, `2x`, `x²`.
 - **Juge** : `series` `{v:'x', at:0, order:n}` · **Forme finale** : polynôme ordonné par degrés croissants, avec le reste `xⁿ·ε(x)` (ou o(xⁿ)) à l'ordre demandé.
 - **Niveaux** :
@@ -1011,6 +1012,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-dl-ops` — Somme, produit et quotient de DL
 - **Année** 13 · **Prérequis** `a1-dl-usual`, `@alg:C-developper` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). Un quotient s'écrit (1/c)·N·(1 − u + u² − …) ; la ligne « développer sans réduire » n'existe qu'aux niveaux guidés. Le niveau 5 est un `lines` sans aide (quotient d'ordre 4 ou 5), en attendant le type `problem`.
 - **Intro** : on multiplie les parties polynomiales et on **ne garde que les termes de degré ≤ n**. Quotient : on écrit `1/(1 + u) = 1 − u + u² − …` avec u → 0, ou on divise selon les puissances croissantes. Si le dénominateur commence par x, on factorise x d'abord, et il faut un ordre de plus au numérateur.
 - **Juge** : `series` `{v:'x', at:0, order:n}` ; une ligne peut annoncer un ordre plus petit que n (« DL(2) de … »), l'app vérifie qu'il est cohérent · **Forme finale** : DL d'ordre n ordonné.
 - **Niveaux** :
@@ -1032,6 +1034,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-dl-compose` — Composition de DL, y compris une constante intérieure non nulle
 - **Année** 13 · **Prérequis** `a1-dl-ops` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). La vérification « u → 0 » est une partie jugée par `limit` ; le recentrage n'est demandé que pour g(0) = 1 (e¹ en facteur, Log(1 + u), √(1 + u)). Le niveau 5 est un `lines` sans aide plutôt qu'un QCM ; `coef` est une réponse courte.
 - **Intro** : pour f(g(x)), on a besoin de **u = g(x) → 0** pour utiliser le DL de f en 0. Si g(0) = c ≠ 0, on recentre : `e^(g(x)) = e^c·e^(g(x) − c)`, `Log(g(x)) = Log c + Log(1 + (g(x) − c)/c)`. Dans uᵏ, on garde **tous** les termes de degré ≤ n : dans `(x − x³/6)³`, le terme `−x⁵/2` compte à l'ordre 5.
 - **Juge** : `series` `{v:'x', at:0, order:n}` ; une ligne « u = … → 0 » est jugée par `limit` · **Forme finale** : DL d'ordre n.
 - **Niveaux** :
@@ -1054,6 +1057,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-dl-limits` — Calculer une limite par DL
 - **Année** 13 · **Prérequis** `a1-dl-ops`, `a1-bh` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). BH n'est qu'une option de la décision « méthode » (niveaux 4 et 5, `poor` dès k ≥ 3) : la solution par BH n'est pas montrée à côté. Le niveau 5 est un `lines` sans aide, pas un QCM. Le QCM n'a pas le distracteur `a1_bh_quotient_rule` (piège d'une autre partie).
 - **Intro** : on développe numérateur et dénominateur **jusqu'au premier terme non nul**. Si le dénominateur est en x³, le numérateur doit être développé à l'ordre 3 au moins, sinon il reste un ε(x)/x qui ne dit rien. À la fin, l'app montre la solution par BH à côté et demande laquelle était la plus rapide.
 - **Juge** : décision « DL / BH » (les deux valides ; BH est `quality:'poor'` dès que k ≥ 3 applications) ; `series` pour chaque DL ; `limit` pour la fin · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -1076,6 +1080,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-dl-read` — Lire f⁽ⁿ⁾(a) ou la nature d'un point critique sur un DL
 - **Année** 13 · **Prérequis** `a1-dl-ops`, `a1-extrema-global` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). La nature d'un point critique n'est demandée qu'au QCM d'examen, sans piège nommé (`g6_critical_is_extremum` est un piège de la partie g6a). Un V/F faux sur f′(0) + 3f″(0) + f‴(0) est un QCM Vrai/Faux (il n'y a rien à réfuter). `open` est un `lines` sans aide de 7 points.
 - **Intro** : si `f(x) = Σ aₖ(x − a)ᵏ + (x − a)ⁿ·ε(x)` et f est Cⁿ, alors `f⁽ᵏ⁾(a) = k!·aₖ`. Si a₁ = 0 et a₂ ≠ 0 : min local (a₂ > 0) ou max local (a₂ < 0). Si a₂ = 0 et a₃ ≠ 0 : point d'inflexion à tangente horizontale (un « plat »). Une fonction impaire n'a que des puissances impaires.
 - **Juge** : `series` pour le DL ; `value` pour f⁽ᵏ⁾(a) ; `mcq` pour la nature · **Forme finale** : valeurs exactes ou nature.
 - **Niveaux** :
@@ -1099,6 +1104,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-taylor-rest` — Reste de Taylor : majorer l'erreur
 - **Année** 13 · **Prérequis** `a1-dl-usual`, `a1-mvt` · **Étiquettes** opt · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-mvt` : le reste de Lagrange prolonge les accroissements finis (c entre a et x).
+- **Statut** : fait le 10 novembre 2026 (étape U2). f parmi √(1 + x), Log(1 + x), eˣ (majorant M = 2 sur [0 ; x₀]) et sin x (n = 2 seulement) ; une majoration est acceptée si elle est valide et ≤ 2 fois la borne optimale (`equiv` avec `rel: '≤'` et `bound`). Le niveau 5 ajoute « le plus petit n pour une précision 10⁻ᵏ » (sauf pour √(1 + x)).
 - **Intro** : `f(x) = Tₙ(x) + f⁽ⁿ⁺¹⁾(c)/(n + 1)!·(x − a)ⁿ⁺¹` pour un c entre a et x (Lagrange). Pour majorer l'erreur, on majore |f⁽ⁿ⁺¹⁾| **sur tout l'intervalle**, pas seulement en a.
 - **Juge** : `series` pour Tₙ ; `equiv` `{rel:'≤'}` pour la majoration de |f⁽ⁿ⁺¹⁾| ; `value` pour la borne finale (toute borne valide ≤ 2 fois la borne optimale est acceptée) · **Forme finale** : approximation et majorant de l'erreur.
 - **Niveaux** :
@@ -1597,7 +1603,7 @@ Familles : celles de `FAMILIES` (`rule`, `sign`, `distribute`, `meaning`, `facts
 | `a1_dl_truncate_early` | method | E | `a1-dl-ops` | `a1-dl-ops` | eˣ·sin x avec eˣ = 1 + x : x + x² → x + x² + x³/3 | transform : tronquer un facteur à l'ordre n − 1 sans tenir compte de la valuation de l'autre | « sin x commence en x : pour avoir les x³ du produit, il faut eˣ jusqu'à x². » |
 | `a1_dl_cube_coeffs` | distribute | C (examen 2021, V/F) | `a1-dl-ops` | `@alg:C-developper` | (a + bx + cx²)³ = a³ + b³x + c³x² → développer | transform : élever chaque coefficient à la puissance | « Une puissance ne se distribue pas sur une somme : (1 + x)³ = 1 + 3x + 3x² + x³. » |
 | `a1_dl_compose_nonzero_inner` | rule | C (corrigé détaillé 2022) | `a1-dl-compose` | `a1-dl-compose` | e^(1/(1 − x)) = 5/2 + 2x + 5x²/2 → e(1 + x + 3x²/2) | transform : substituer u = g(x) dans le DL de f en 0 alors que g(0) ≠ 0 | « 1/(1 − x) tend vers 1, pas vers 0 : le DL de eᵘ en 0 ne s'applique pas. Sors e¹ : e^(1/(1 − x)) = e·e^(1/(1 − x) − 1). » |
-| `a1_dl_truncate_inner` | method | C (corrigé détaillé 2021) | `a1-dl-compose` | `a1-dl-ops` | sin(sin x) = x − x³/3 + x⁵/120 → x − x³/3 + x⁵/10 | transform : dans uᵏ, ne garder que le terme dominant de u | « Dans (x − x³/6)³, le terme 3·x²·(−x³/6) = −x⁵/2 est d'ordre 5 : il compte. » |
+| `a1_dl_truncate_inner` | method | C (corrigé détaillé 2021) | `a1-dl-compose` | `a1-dl-ops` | sin(sin x) = x − x³/3 + x⁵/60 → x − x³/3 + x⁵/10 | transform : dans uᵏ, ne garder que le terme dominant de u | « Dans (x − x³/6)³, le terme 3·x²·(−x³/6) = −x⁵/2 est d'ordre 5 : il compte. » |
 | `a1_dl_read_factorial` | rule | C (examen MT 2014, distracteurs) | `a1-dl-read` | `a1-dl-read` | f″(1) = −5 → −10 | wrongValues : f⁽ᵏ⁾(a) = aₖ | « Le coefficient vaut f⁽ᵏ⁾(a)/k! : multiplie par {k}! = {kf}. » |
 | `a1_dl_read_divide` | rule | E | `a1-dl-read` | `a1-dl-read` | f⁽⁵⁾(0) = (47/40)/120 → 141 | wrongValues : aₖ/k! | « Tu as divisé par k! au lieu de multiplier : f⁽ᵏ⁾(0) = k!·aₖ. » |
 | `a1_taylor_rest_at_a` | method | E | `a1-taylor-rest` | `a1-taylor-rest` | \|R₂\| ≤ \|f‴(0)\|·x³/6 → max sur [0 ; x] | transform : remplacer max \|f⁽ⁿ⁺¹⁾\| sur l'intervalle par \|f⁽ⁿ⁺¹⁾(a)\| | « c est quelque part entre {a} et {x} : majore \|f⁽ⁿ⁺¹⁾\| sur tout l'intervalle. » |

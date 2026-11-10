@@ -4,7 +4,7 @@
 
 import { MT, linesItem, mcq, tfItem, answerItem } from './kit.js';
 import {
-  V, q, modeOf, H, E, KEYS, examOf, coefs, isZero, maxDen, maxNum, remText, termAbs, joinTerms,
+  V, q, modeOf, H, E, KEYS, xp, examOf, coefs, isZero, maxDen, maxNum, remText, termAbs, joinTerms,
   polyText, dlText, termCount, valuation, blankDL, blanked, assemble, fitLines, uniq, mulCoefs,
 } from './analyse1-c-kit.js';
 import { boxText, polyFromNode, trapOptions, uText, plusU, fText, rd, substText, USUAL, coefOf } from './analyse1-c-dl.js';
@@ -87,7 +87,13 @@ export const OPS = {
   expcos: (r) => ({ kind: 'prod', A: ex(q(r.pick([1, 2, -1, -2]))), B: fn1('cos', q(r.pick([1, 2, 3]))), n: r.int(2, 3) }),
   cosln: (r) => ({ kind: 'prod', A: fn1('cos', q(r.pick([1, 2]))), B: lnp(q(r.pick([1, 2, -1]))), n: r.int(3, 4) }),
   sinln: (r) => ({ kind: 'prod', A: fn1('sin', q(r.pick([1, 2]))), B: lnp(q(r.pick([1, 2, -1]))), n: r.int(3, 4) }),
-  powexp: (r) => ({ kind: 'prod', A: fText('pow', 'x', r.pick([q(1, 2), q(-1), q(-1, 2)])), B: ex(q(r.pick([1, -1, 2]))), n: r.int(2, 3) }),
+  powexp: (r) => {
+    const al = r.pick([q(1, 2), q(-1), q(-1, 2)]);
+    const B = ex(q(r.pick([1, -1, 2])));
+    // e^(2x)/√(1 + x) rather than 1/√(1 + x)·e^(2x).
+    const show = al.n < 0 ? `${B}/${al.eq(-1) ? '(1+x)' : '√(1+x)'}` : null;
+    return { kind: 'prod', A: fText('pow', 'x', al), B, n: r.int(2, 3), ...(show ? { show } : {}) };
+  },
   logistic: (r) => ({ kind: 'quot', N: '1', D: `1+${ex(q(r.pick([-1, 1])))}`, n: r.int(2, 4) }),
   lin: (r) => { const b = r.int(2, 4); const c = r.pick([-3, -2, -1, 1, 2, 3].filter((x) => Math.abs(x) !== b)); return { kind: 'quot', N: '1', D: `${b}${plusU(uText(q(c)))}`, n: r.int(2, 3), exactDen: true }; },
   tan: (r) => { const a = r.pick([1, 1, 2]); return { kind: 'quot', N: fn1('sin', q(a)), D: fn1('cos', q(a)), n: a === 1 ? r.pick([3, 5]) : 3, show: fn1('tan', q(a)) }; },
@@ -100,7 +106,7 @@ const OPS_BY_LEVEL = {
   2: ['expsin', 'cosln', 'powexp', 'lin', 'expfrac'],
   3: ['expsin', 'sinln', 'logistic', 'lin', 'tan', 'sinfrac', 'expfrac'],
   4: ['expsin', 'cosln', 'powexp', 'logistic', 'tan', 'sinfrac', 'lnsin', 'expfrac'],
-  5: ['tan', 'sinfrac', 'lnsin', 'logistic'],
+  5: ['tan', 'sinfrac', 'lnsin', 'logistic', 'expfrac'],
 };
 const OP_FALLBACK = { kind: 'prod', A: 'e^x', B: 'sin(x)', n: 3 };
 
@@ -131,7 +137,7 @@ const OP_CHOICES = (d) => [
   { id: 'factors', label: d.kind === 'quot' ? 'Écrire le DL du numérateur et du dénominateur' : `Écrire le DL de chaque facteur à l'ordre ${d.n}` },
   ...(d.kind === 'quot' ? [{ id: 'xfactor', label: 'Simplifier par la puissance de x du dénominateur' }, { id: 'inverse', label: 'Écrire 1/(1 + u) = 1 − u + u² − … (constante en facteur)' }] : [{ id: 'expand', label: 'Développer le produit, sans encore réduire' }]),
   { id: 'trunc', label: `Développer, réduire et garder les termes de degré ≤ ${d.n}` },
-  { id: 'early', label: `Arrêter un facteur à x^${d.n - 1}`, rule: 'a1_dl_truncate_early', why: 'Il manquerait des termes : chaque facteur doit aller assez loin pour donner tous les termes de degré ≤ n.' },
+  { id: 'early', label: `Arrêter un facteur à ${xp(d.n - 1)}`, rule: 'a1_dl_truncate_early', why: 'Il manquerait des termes : chaque facteur doit aller assez loin pour donner tous les termes de degré ≤ n.' },
 ];
 
 // The terms of a DL text (without the remainder), as texts.
@@ -170,7 +176,7 @@ function opItem(level, rng, profile, opts) {
   opts = opts || {};
   if (opts.exam === 'mcq') return opMcq(rng);
   if (opts.exam === 'tf') return opTf(rng);
-  const d = opData(rng, OPS_BY_LEVEL[level]);
+  const d = opData(rng, OPS_BY_LEVEL[level], level === 5 ? { n: rng.pick([4, 5]), den: 720 } : {});
   const b = opBuild(d);
   const judge = { kind: 'series', v: V, at: 0, order: d.n };
   const parts = [{ start: b.f, judge, lines: opBlanks(b, d, level), choices: OP_CHOICES(d) }];
@@ -258,7 +264,7 @@ const OUTER = {
 const INNER0 = ['sin(x)', 'x/(1-x)', 'x+x^2', 'ln(1+x)', 'e^x-1', 'tan(x)', 'x-x^2', 'sinh(x)'];
 const INNER1 = ['1/(1+x)', '1/(1-x)', 'cos(x)', '1+sin(x)', '1+x+x^2'];
 // f(g) that is a usual DL in disguise (e^(ln(1 + x)) = 1 + x, ln(1/(1 − x))…).
-const BANNED = new Set(['exp|ln(1+x)', 'ln|e^x-1', 'ln|x/(1-x)', 'ln|1/(1+x)', 'ln|1/(1-x)', 'sqrt|1/(1+x)', 'sqrt|1/(1-x)', 'geom|x+x^2', 'geom|x-x^2']);
+const BANNED = new Set(['exp|ln(1+x)', 'ln|e^x-1', 'ln|x/(1-x)', 'ln|1/(1+x)', 'ln|1/(1-x)', 'sqrt|1/(1+x)', 'sqrt|1/(1-x)', 'geom|x+x^2', 'geom|x-x^2', 'geom|x/(1-x)']);
 
 // Σ cₖ·(G)ᵏ (k·v ≤ n) without the remainder.
 const substPoly = (c, G, v, n) => substText(c, G, v, n).replace(/[+-]x(\^\d+)?ε\(x\)$/, '');
@@ -300,7 +306,9 @@ function coData(rng, { exact = false } = {}) {
     try {
       const b = coBuild(d);
       if (termCount(b.gs) < 2 || maxDen(b.cs) > 720 || maxNum(b.cs) > 200 || termCount(b.cs) < 2) continue;
-      if (b.lines.some((l) => l.math.length > 110)) continue;
+      if (b.lines.some((l) => l.math.length > 90)) continue;
+      // A power u², u³… of u counts at this order (else f(g) is just f's first term).
+      if (![2, 3, 4, 5].some((k) => k * b.v <= n && !isZero(OUTER[Fk].c(k)))) continue;
       fitLines({ kind: 'series', v: V, at: 0, order: n }, b.f, b.lines, false);
       return d;
     } catch { /* another draw */ }

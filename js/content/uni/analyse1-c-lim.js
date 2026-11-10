@@ -12,7 +12,7 @@ import { limit } from '../../cas/limit.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { MT, linesItem, mcq, tfItem } from './kit.js';
 import {
-  V, q, isQ, modeOf, H, E, KEYS, examOf, fact, coefs, isZero, maxDen, maxNum, termAbs, joinTerms,
+  V, q, isQ, modeOf, H, E, KEYS, xp, examOf, fact, coefs, isZero, maxDen, maxNum, termAbs, joinTerms,
   polyText, dlText, valuation, blankDL, blanked, assemble, fitLines, uniq,
 } from './analyse1-c-kit.js';
 import { uText, fText, rd, boxText } from './analyse1-c-dl.js';
@@ -122,11 +122,11 @@ const liStart = (d) => `${fx(d.N)}/${d.mono ? d.D : `(${d.D})`}`;
 
 const LI_CHOICES = (d) => [
   { id: 'subst', label: 'Remplacer chaque fonction par son DL' },
-  { id: 'reduce', label: `Réduire : garder les termes jusqu'à x^${d.k}` },
+  { id: 'reduce', label: `Réduire : garder les termes jusqu'à ${xp(d.k)}` },
   { id: 'quot', label: 'Écrire le quotient des deux DL' },
-  { id: 'divide', label: `Diviser le haut et le bas par x^${d.k}` },
+  { id: 'divide', label: `Diviser le haut et le bas par ${xp(d.k)}` },
   { id: 'limit', label: 'Passer à la limite (ε(x) → 0)' },
-  { id: 'low', label: `Développer seulement jusqu'à x^${d.k - 1}`, rule: 'a1_dl_order_too_low', why: `Le dénominateur est en x^${d.k} : il faut le numérateur jusqu'à x^${d.k}.` },
+  { id: 'low', label: `Développer seulement jusqu'à ${xp(d.k - 1)}`, rule: 'a1_dl_order_too_low', why: `Le dénominateur est en ${xp(d.k)} : il faut le numérateur jusqu'à ${xp(d.k)}.` },
 ];
 
 function liParts(d, level, { decision = null } = {}) {
@@ -144,7 +144,7 @@ function liParts(d, level, { decision = null } = {}) {
   const top = d.mono ? `${qt(d.cN)}+ε(x)` : `(${qt(d.cN)}+ε(x))/(${qt(d.cD)}+ε(x))`;
   let lLines = [
     E(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`, 'Remplacer par les DL', 'limit', 'quot'),
-    E(top, `Diviser par x^${d.k}`, 'limit', 'divide'),
+    E(top, `Diviser par ${xp(d.k)}`, 'limit', 'divide'),
     E(qt(d.L), 'ε(x) → 0', 'limit', 'limit'),
   ];
   if (level === 1) lLines = [lLines[0], blanked(lLines[1], [qt(d.cN)]), lLines[2]];
@@ -161,9 +161,9 @@ function liItem(level, rng, profile, opts) {
   if (level === 2) {
     decision = {
       kind: 'decision', prompt: 'À quel ordre développer le numérateur ?', options: rng.shuffle([
-        { id: 'low', label: `Ordre ${d.k - 1}`, valid: false, rule: 'a1_dl_order_too_low', why: `Il resterait ε(x)/x : le dénominateur est en x^${d.k}, il faut aller jusqu'à x^${d.k}.` },
+        { id: 'low', label: `Ordre ${d.k - 1}`, valid: false, rule: 'a1_dl_order_too_low', why: `Il resterait ε(x)/x : le dénominateur est en ${xp(d.k)}, il faut aller jusqu'à ${xp(d.k)}.` },
         { id: 'k', label: `Ordre ${d.k}`, valid: true, ref: true },
-        { id: 'high', label: `Ordre ${d.k + 1}`, valid: true, quality: 'poor', why: `Juste, mais le terme en x^${d.k + 1} disparaît à la limite : l'ordre ${d.k} suffit.` },
+        { id: 'high', label: `Ordre ${d.k + 1}`, valid: true, quality: 'poor', why: `Juste, mais le terme en ${xp(d.k + 1)} disparaît à la limite : l'ordre ${d.k} suffit.` },
       ]),
     };
   } else if (level >= 4) {
@@ -181,7 +181,7 @@ function liItem(level, rng, profile, opts) {
     skill: LI, level,
     prompt: `Calcule ${MT(`lim(${start},x,0)`)} par développements limités.${level === 1 ? ` Développe à l'ordre ${d.k}.` : ''}`,
     ...as, mode: modeOf(level),
-    hints: H(`Le dénominateur commence en x^${d.k} : développe le numérateur jusqu'à x^${d.k}.`, `${rd(d.N)} = □·${rd(`x^${d.k}`)} + ${rd(`x^${d.k}`)}·ε(x)`, `${MT(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`)} → ${MT(qt(d.L))}`),
+    hints: H(`Le dénominateur commence en ${xp(d.k)} : développe le numérateur jusqu'à ${xp(d.k)}.`, `${rd(d.N)} = □·${xp(d.k)} + ${xp(d.k)}·ε(x)`, `${MT(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`)} → ${MT(qt(d.L))}`),
     subgoals: LI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${LI}:${start}`, exam: examOf(opts), fallback: !!d.fallback,
   });
@@ -349,7 +349,7 @@ function reItem(level, rng, profile, opts) {
 function reComputed(level, rng, opts) {
   const exam = opts.exam === 'open';
   const n = exam || level === 5 ? 5 : rng.pick([4, 5]);
-  const kinds = exam ? ['lnsin', 'sinfrac', 'tan'] : ['tan', 'sinfrac', 'lnsin', 'expsin', 'cosln', 'sinln', 'logistic', 'expfrac'];
+  const kinds = exam ? ['lnsin', 'sinfrac', 'tan', 'expfrac', 'logistic'] : ['tan', 'sinfrac', 'lnsin', 'expsin', 'cosln', 'sinln', 'logistic', 'expfrac'];
   const d = opData(rng, kinds, { n, den: 720 });
   const b = opBuild(d);
   const ks = [n - 1, n];
@@ -517,7 +517,7 @@ function taParts(d, level) {
   const Mt = d.M.eq(1) ? '' : `${paren(d.M)}×`;
   const Bopt = Mopt * x0.valueOf() ** m / fact(m);
   let bl = [
-    E(`${Mt}x^${m}/${fact(m)}`, `Lagrange : |R${String.fromCharCode(0x2080 + n)}(x)| ≤ M·x^${m}/${m}!`, 'bound', 'lagrange'),
+    E(`${Mt}x^${m}/${fact(m)}`, `Lagrange : |R${String.fromCharCode(0x2080 + n)}(x)| ≤ M·${xp(m)}/${m}!`, 'bound', 'lagrange'),
     E(`${Mt}${X}^${m}/${fact(m)}`, `x ≤ ${decText(x0).replace('.', ',')}`, 'bound', 'lagrange'),
     E(d.B.toString(), 'Calculer', 'bound', 'compute'),
   ];
@@ -537,7 +537,7 @@ const TA_CHOICES = (d) => [
   { id: 'deriv', label: `Dériver ${d.m} fois` },
   { id: 'max', label: `Majorer |f${SUPS[d.m]}| sur tout l'intervalle` },
   { id: 'at0', label: `Prendre |f${SUPS[d.m]}(0)|`, rule: 'a1_taylor_rest_at_a', why: 'c est quelque part entre 0 et x : il faut majorer sur tout l\'intervalle.' },
-  { id: 'lagrange', label: `Borne de Lagrange M·x^${d.m}/${d.m}!` },
+  { id: 'lagrange', label: `Borne de Lagrange M·${xp(d.m)}/${d.m}!` },
   { id: 'compute', label: 'Calculer' },
 ];
 
@@ -564,7 +564,7 @@ function taItem(level, rng, profile, opts) {
     skill: TA, level,
     prompt: `On approche f(x) = ${MT(d.T.f)} par son polynôme de Taylor T<sub>${d.n}</sub> en 0, pour x ∈ [0 ; ${x0t}].${given} Majore l'erreur avec le reste de Lagrange.`,
     ...as, mode: modeOf(level),
-    hints: H(`Reste de Lagrange : f(x) − T${String.fromCharCode(0x2080 + d.n)}(x) = f${SUPS[d.m]}(c)·x^${d.m}/${d.m}! avec c entre 0 et x. Majore |f${SUPS[d.m]}| sur tout [0 ; ${x0t}].`, `|R${String.fromCharCode(0x2080 + d.n)}| ≤ □·(${x0t})^${d.m}/${fact(d.m)}`, `|R${String.fromCharCode(0x2080 + d.n)}| ≤ ${d.M.toString()}·(${x0t})^${d.m}/${fact(d.m)} = ${d.B.toString()}`),
+    hints: H(`Reste de Lagrange : f(x) − T${String.fromCharCode(0x2080 + d.n)}(x) = f${SUPS[d.m]}(c)·${xp(d.m)}/${d.m}! avec c entre 0 et x. Majore |f${SUPS[d.m]}| sur tout [0 ; ${x0t}].`, `|R${String.fromCharCode(0x2080 + d.n)}| ≤ □·(${x0t})^${d.m}/${fact(d.m)}`, `|R${String.fromCharCode(0x2080 + d.n)}| ≤ ${d.M.toString()}·(${x0t})^${d.m}/${fact(d.m)} = ${d.B.toString()}`),
     subgoals: TA_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${TA}:${d.T.f}:${d.n}:${d.x0.toString()}`, exam: examOf(opts), fallback: !!d.fallback,
   });

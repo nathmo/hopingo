@@ -16,7 +16,7 @@
 import { Q } from '../../math/rational.js';
 import { parse } from '../parse.js';
 import { toText, toReadable } from '../print.js';
-import { stripParen, walk, replaceAt, dependsOn, canonFn, numValue } from '../ast.js';
+import { stripParen, walk, replaceAt, mapNode, dependsOn, canonFn, numValue } from '../ast.js';
 import { series, seriesToNode } from '../series.js';
 
 const ZERO = new Q(0);
@@ -252,6 +252,18 @@ export const RULES = [
         if (!sb || sb.valuation === null || sb.valuation < 1 || !nonZeroBetween(sb, sb.valuation + 1, n)) return null;
         return { repl: P(`(${leadText(sb)})^${k.n}`), ctx: { u: R(s.b) } };
       });
+      // Every power (u)^k of the line at once.
+      let all = 0;
+      const each2 = mapNode(prev, (node) => {
+        const s = stripParen(node);
+        if (s.t !== 'pow') return node;
+        const k = numValue(stripParen(s.e));
+        const sb = k && k.isInt() && k.n >= 2 && sOf(s.b, v, n);
+        if (!sb || sb.valuation === null || sb.valuation < 1 || !nonZeroBetween(sb, sb.valuation + 1, n)) return node;
+        all++;
+        return P(`(${leadText(sb)})^${k.n}`);
+      });
+      if (all > 1) list.push({ node: each2, ctx: {} });
       return asCands(list, v, n);
     },
     explain: (ctx = {}) => `Dans uᵏ, garde tous les termes de degré ≤ n, pas seulement le premier${ctx.u ? ` de u = ${ctx.u}` : ''} : dans (x − x³/6)³, le terme 3·x²·(−x³/6) = −x⁵/2 est d'ordre 5 et compte.`,
@@ -275,6 +287,16 @@ export const RULES = [
         }
         return out;
       });
+      // Both factors of a product cut at the same order.
+      const top = stripParen(prev);
+      if (top.t === 'bin' && top.op === '×') {
+        for (const j of [n - 1, n - 2]) {
+          const sl = sOf(top.l, v, n);
+          const sr = sOf(top.r, v, n);
+          if (j < 0 || !sl || !sr) continue;
+          list.push({ node: P(`(${truncText(sl, j)})×(${truncText(sr, j)})`), ctx: { f: 'chaque facteur', j } });
+        }
+      }
       return asCands(list, v, n);
     },
     explain: (ctx = {}) => (ctx.f
