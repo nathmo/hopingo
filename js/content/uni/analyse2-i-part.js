@@ -350,7 +350,7 @@ function partsOf(d, o) {
   parts.push({
     html: `Remplace ${u}_p = ${M(d.form.text)} dans le membre de gauche :`, ask: `L[${u}_p] =`,
     start: Lstart, judge: { kind: 'equiv', vars, target: 'no-prime' },
-    pre: level >= 2 ? formDecisions(d, level) : [], notes: level === 1 ? [`Forme : ${u}_p = ${M(d.form.text)}.`] : [],
+    pre: level >= 2 ? formDecisions(d, level) : [],
     lines: [derive],
   });
   // Identification.
@@ -403,6 +403,7 @@ export function assemble(parts, level, choices) {
     } else script.push(SEG(p.html, p.ask, p.start, judge));
     for (const n of p.notes || []) script.push({ kind: 'note', html: n });
     for (const dec of p.pre || []) script.push(dec);
+    for (const n of p.after || []) script.push({ kind: 'note', html: n });
     script.push(...p.lines);
   });
   return { ...first, script };

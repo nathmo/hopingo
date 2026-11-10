@@ -158,7 +158,7 @@ function stabItem(level, rng, opts, d) {
   lines.push(E(d.st, 'Intersection, bornes exclues', 'boundary', 'inter'));
   if (level <= 2) {
     if (lines.length > 1) Object.assign(lines[0], blankMatches(lines[0].math, /-?\d+/g, level === 1 ? 2 : 4));
-    Object.assign(lines[lines.length - 1], blankMatches(lines[lines.length - 1].math, /-?\d+|[+-]∞/g, level === 1 ? 1 : 2));
+    Object.assign(lines[lines.length - 1], blankMatches(lines[lines.length - 1].math, level === 1 ? /-?\d+/g : /-?\d+|[+-]∞/g, level === 1 ? 1 : 2));
   }
   const parts = [
     { start: `(d(e^(r x),x,2)+${paren(d.P)} d(e^(r x),x)+${paren(d.Qt)} e^(r x))/e^(r x)`, judge: { kind: 'equiv', vars: ['r', 'a', 'x'], target: 'no-prime' }, lines: [charLine] },

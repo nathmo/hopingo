@@ -65,6 +65,7 @@ function exactData(rng) {
       return {
         kind, x0, y0, H: polyT(Hm), H0: polyT(H0m), phi: polyT(phim), dphi: polyT(dy(phim)), M: polyT(Mm), N: polyT(Nm),
         My: polyT(dy(Mm)), Nx: polyT(dx(Nm)), C0: valAt(Hm, x0, y0), C0noPhi: valAt(H0m, x0, y0), Hy0: polyT(dy(H0m)),
+        H2phi: polyT([...H0m, ...phim.map((m) => ({ ...m, c: 2 * m.c }))]),
       };
     }
     if (kind === 'atan') {
@@ -84,7 +85,7 @@ function exactData(rng) {
     return {
       kind, x0, y0, H: `e^(x y)+${cmul(c, 'y^2')}`.replace('+-', '-'), H0: 'e^(x y)', phi: cmul(c, 'y^2'), dphi: cmul(2 * c, 'y'),
       M: 'y e^(x y)', N: sum(['x e^(x y)', cmul(2 * c, 'y')]), My: 'e^(x y)+x y e^(x y)', Nx: 'e^(x y)+x y e^(x y)',
-      C0, C0noPhi: e0 === 0 ? '1' : e0 === 1 ? 'e' : `e^(${e0})`, Hy0: 'x e^(x y)',
+      C0, C0noPhi: e0 === 0 ? '1' : e0 === 1 ? 'e' : `e^(${e0})`, Hy0: 'x e^(x y)', H2phi: sum(['e^(x y)', cmul(2 * c, 'y^2')]),
     };
   }
   return null;
@@ -156,8 +157,9 @@ function exactMcq(rng, opts, d) {
   const right = M(`${d.H} = ${C0}`);
   const wrongs = [];
   if (d.phi !== '0' && d.C0noPhi !== null) wrongs.push({ html: M(`${d.H0} = ${typeof d.C0noPhi === 'number' ? N(q(d.C0noPhi)) : d.C0noPhi}`), rule: 'a2_exact_phi_forgot' });
-  if (d.phi !== '0') wrongs.push({ html: M(`${sum([d.H0, cmul(2, `(${d.phi})`)])} = ${C0}`) });
-  wrongs.push({ html: M(`${d.H} = ${typeof d.C0 === 'number' ? N(q(-d.C0 || 1)) : `-${C0}`}`) });
+  if (d.H2phi) wrongs.push({ html: M(`${d.H2phi} = ${C0}`) });
+  if (d.kind === 'atan') wrongs.push({ html: M(`${d.H} = ${d.x0 * d.x0 + d.y0}`) });
+  wrongs.push({ html: M(`${d.H} = ${typeof d.C0 === 'number' ? N(q(-d.C0 || 1)) : C0.startsWith('-') ? C0.slice(1) : `-${C0}`}`) });
   const fillers = [{ html: M(`${d.H} = 0`) }, { html: M(`${d.H} = 1`) }, { html: M(`${d.H0} = 0`) }];
   return mcq4({
     skill: EX, level: 4, prompt: `La solution de ${M(`(${d.M})`)} + ${M(`(${d.N})y'`)} = 0 avec y(${fr(d.x0)}) = ${fr(d.y0)} vérifie :`,

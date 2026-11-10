@@ -96,7 +96,7 @@ function chooseData(rng, box) {
     return {
       box, eq, valid: { homog: 'good' },
       parts: [
-        { html: `Avec y = xv, y′ = v + xv′ : l'équation devient ${M(veq)}.`, ask: 'v :', start: veq, judge: { kind: 'ode', eq: veq, unknown: 'v', order: 1, domain: dom, _choose: { mu: [] } }, lines: [
+        { after: [`Avec y = xv, y′ = v + xv′ : l'équation devient ${M(veq)}.`], ask: 'v :', start: eq, judge: { kind: 'ode', eq: veq, unknown: 'v', order: 1, domain: dom, _choose: { mu: [] } }, lines: [
           E(`dv/v^2 = (${k}/x) dx`, 'Séparer', 'homog', 'sep'), E(`-1/v = ${kl} + C`, 'Intégrer', 'homog', 'int'), E(`v = -1/(${kl}+C)`, 'Isoler v', 'homog', 'vfinal')] },
         { html: 'Retour à y = xv :', ask: 'y =', start: eq, judge: { kind: 'ode', eq, order: 1, domain: dom }, lines: [E(`y = -x/(${kl}+C)`, 'y = xv', 'homog', 'final')] },
       ],
@@ -113,10 +113,7 @@ function chooseData(rng, box) {
     const ex = (r) => expText(r);
     return {
       box, eq, valid: { char: 'good' },
-      parts: [
-        { start: `${sum(['r^2', cmul(p, 'r'), N(qq)])}=0`, judge: { kind: 'solset', v: 'r' }, lines: [E(`r = ${r1} ou r = ${r2}`, 'Racines de l\'équation caractéristique', 'const2', 'roots')] },
-        { html: 'La solution générale :', ask: 'y =', start: eq, judge: { kind: 'ode', eq, order: 2 }, lines: [E(`y = ${sum([`C_1${ex(r1) ? ` ${ex(r1)}` : ''}`, `C_2${ex(r2) ? ` ${ex(r2)}` : ''}`])}`, 'Deux racines réelles', 'const2', 'final')] },
-      ],
+      parts: [{ start: eq, judge: { kind: 'ode', eq, order: 2 }, after: [`Équation caractéristique : ${M(`${sum(['r^2', cmul(p, 'r'), N(qq)])}=0`)}.`], lines: [E(`y = ${sum([`C_1${ex(r1) ? ` ${ex(r1)}` : ''}`, `C_2${ex(r2) ? ` ${ex(r2)}` : ''}`])}`, `Racines r = ${fr(r1)} et r = ${fr(r2)}`, 'const2', 'final')] }],
       why: {},
     };
   }
