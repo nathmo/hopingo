@@ -3,7 +3,7 @@
 // (x·e^(xy): y first), and the symmetries (V/F). Judge `definite`: the
 // lines are iterated integrals, brackets and numbers (quadrature).
 
-import { MT, linesItem, examTag, H, E, modeOf, blanked, partsScript, withMenus } from './a2-kit.js';
+import { MT, linesItem, tfItem, examTag, H, E, modeOf, blanked, partsScript, withMenus } from './a2-kit.js';
 import { A2_KEYS } from './a2-kit.js';
 import { problemItem } from './kit-problem.js';
 import { q, val, vRat, vMul, vAdd, vText, vFloat, vRatOf, swapXY, mcqV, vfMcq, R, pickW } from './analyse2-f-kit.js';
@@ -180,34 +180,44 @@ const ODD_Y = ['x y', 'y^3 e^x', 'x^2 y', 'y e^(x^2)', 'x^2 sin(y)', 'sin(x y)']
 const EVEN_Y = ['x^2+y^2', 'x y^2', 'y^2 e^x', '1+x^2 y^2', 'e^(x y^2)'];
 const neg = (c) => `−${c}`;
 
-// One statement: {statement, truth, why, ruleIfTrue, key}.
+// One statement: {kind, statement, truth, why, ruleIfTrue, key, counter?}.
+// The false statements about a rectangle are « for every c > 0 »: the
+// counter-example is a value of c (kind refute, the integral computed).
 export function symStatement(rng, want) {
-  const kind = want ?? pickW(rng, [[3, 'oddSym'], [3, 'oddNotSym'], [2, 'evenSym'], [2, 'disk'], [1, 'ball']]);
+  const kind = want ?? pickW(rng, [[3, 'oddSym'], [3, 'oddNotSym'], [2, 'evenSym'], [2, 'disk']]);
   const b = rng.pick([1, 2]);
   const c = rng.pick([1, 2]);
   const inX = rng.chance(0.4);
   const S = (t) => (inX ? swapXY(t) : t);
   const v = inX ? 'x' : 'y';
-  const box = (sym) => (inX ? `[${sym ? neg(c) : 0} ; ${c}] × [0 ; ${b}]` : `[0 ; ${b}] × [${sym ? neg(c) : 0} ; ${c}]`);
+  const w = inX ? 'y' : 'x';
+  const box = (lo, hi) => (inX ? `[${lo} ; ${hi}] × [0 ; ${b}]` : `[0 ; ${b}] × [${lo} ; ${hi}]`);
+  const forAll = rng.chance(0.5) || kind !== 'oddSym';
+  const counterOf = (F, lo) => ({
+    kind: 'refute', quants: [{ q: '∀', v: 'c', dom: 'R+' }], pred: `int(int(${F},${v},${lo},c),${w},0,${b}) = 0`,
+    ask: [{ v: 'c', label: 'c =' }], answer: { c: '1' },
+  });
   if (kind === 'oddSym' || kind === 'oddNotSym') {
     let f = rng.pick(ODD_Y);
-    if (f === 'sin(x y)' && b * c > 3) f = 'x y';
+    if (f === 'sin(x y)' && b > 1 && kind === 'oddSym') f = 'x y';
     const sym = kind === 'oddSym';
     const F = S(f);
+    const D = forAll ? box(sym ? '−c' : '0', 'c') : box(neg(c), c);
     return {
-      kind, truth: sym, ruleIfTrue: sym ? null : 'a2_symmetry_wrong', key: `${kind}:${F}:${b}:${c}`,
-      statement: `∬<sub>D</sub> ${MT(F)} dx dy = 0, où D = ${box(sym)}`,
+      kind, truth: sym, ruleIfTrue: sym ? null : 'a2_symmetry_wrong', key: `${kind}:${F}:${b}:${forAll ? 'c' : c}`,
+      statement: `${forAll ? 'Pour tout c > 0 : ' : ''}∬<sub>D</sub> ${MT(F)} dx dy = 0, où D = ${D}`,
       why: sym ? `f change de signe quand ${v} devient −${v} (impaire en ${v}), et D est symétrique par rapport à ${v} = 0 : les deux moitiés se compensent.`
-        : `f est impaire en ${v}, mais D va de 0 à ${c} en ${v} : il n'est pas symétrique. Ici f > 0 à l'intérieur de D, donc l'intégrale est strictement positive.`,
-      ctx: { f: R(F), v, a: '0', b: String(c) },
+        : `f est impaire en ${v}, mais D va de 0 à c en ${v} : il n'est pas symétrique. Pour c = 1, f > 0 à l'intérieur de D, donc l'intégrale est strictement positive.`,
+      counter: sym ? null : counterOf(F, '0'),
     };
   }
   if (kind === 'evenSym') {
     const F = S(rng.pick(EVEN_Y));
     return {
-      kind, truth: false, ruleIfTrue: null, key: `${kind}:${F}:${b}:${c}`,
-      statement: `∬<sub>D</sub> ${MT(F)} dx dy = 0, où D = ${box(true)}`,
-      why: `D est symétrique, mais f est paire en ${v} (elle ne change pas quand ${v} devient −${v}) : rien ne se compense. Ici f > 0 sur D, donc l'intégrale est > 0.`,
+      kind, truth: false, ruleIfTrue: null, key: `${kind}:${F}:${b}`,
+      statement: `Pour tout c > 0 : ∬<sub>D</sub> ${MT(F)} dx dy = 0, où D = ${box('−c', 'c')}`,
+      why: `D est symétrique, mais f est paire en ${v} (elle ne change pas quand ${v} devient −${v}) : rien ne se compense. f > 0 sur D, donc l'intégrale est > 0.`,
+      counter: counterOf(F, '-c'),
     };
   }
   if (kind === 'disk') {
@@ -219,18 +229,25 @@ export function symStatement(rng, want) {
       why: 'Le disque est symétrique par rapport aux deux axes. Chaque terme de f est impair en x ou impair en y : son intégrale est nulle.',
     };
   }
+  // The unit ball (2021 Q19): only as a two-option multiple choice.
   const g = rng.pick(['z/(x^2+y^2+z^2+1)', 'z^3', 'x z^2', 'z e^(x^2+y^2)', 'y/(1+z^2)']);
   const k = rng.pick([8, 6, 10]);
   return {
     kind, truth: false, key: `${kind}:${g}:${k}`,
     statement: `∭<sub>B</sub> ${MT(g)} dV ≥ π/${k}, où B est la boule unité x² + y² + z² ≤ 1`,
-    why: 'La boule est symétrique et l\'intégrande est impair en une variable : l\'intégrale vaut 0, qui n\'est pas ≥ π/' + k + '.',
+    why: `La boule est symétrique et l'intégrande est impair en une variable : l'intégrale vaut 0, qui n'est pas ≥ π/${k}.`,
   };
 }
 
-function symMcq(rng, level, exam, want) {
+// A true/false item (the ball: a two-option multiple choice, no counter-example to give).
+function symTf(rng, level, exam, want) {
   const s = symStatement(rng, want);
-  return vfMcq({ skill: SK, level, statement: s.statement, truth: s.truth, key: s.key, why: s.why, ruleIfTrue: s.ruleIfTrue, exam }, rng);
+  if (s.kind === 'ball') return vfMcq({ skill: SK, level, statement: s.statement, truth: s.truth, key: s.key, why: s.why, exam: exam || false }, rng);
+  return tfItem({
+    skill: SK, level, statement: s.statement, truth: s.truth, counter: s.counter, ruleIfTrue: s.ruleIfTrue,
+    explanation: s.why, key: s.key, exam,
+    hints: H('Les deux conditions : f impaire en une variable, et D symétrique dans cette variable.', 'Remplace la variable par son opposé dans f, puis regarde les bornes de D.', s.why),
+  });
 }
 
 // ---------- multiple choice: the exact value ----------
@@ -265,7 +282,7 @@ function valueMcq(rng, opts) {
 // ---------- level 5: three V/F, then a computation ----------
 function soloProblem(rng, opts) {
   const kinds = rng.shuffle(['oddSym', 'oddNotSym', rng.pick(['evenSym', 'disk', 'ball'])]);
-  const vfs = kinds.map((k) => ({ item: symMcq(rng, 5, false, k), points: 1, title: 'Symétrie : vrai ou faux ?' }));
+  const vfs = kinds.map((k) => ({ item: symTf(rng, 5, false, k), points: 1, title: 'Symétrie : vrai ou faux ?' }));
   const calc = rng.chance(0.7) ? sepItem(5, rng, {}) : orderItem(5, rng, {});
   return problemItem({
     skill: SK, level: 5, prompt: 'Trois énoncés de symétrie, puis un calcul d\'intégrale double.',
@@ -276,7 +293,7 @@ function soloProblem(rng, opts) {
 
 export function fubiniRect(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return valueMcq(rng, opts);
-  if (opts.exam === 'tf') return symMcq(rng, 4, { format: 'tf', points: 1 });
+  if (opts.exam === 'tf') return symTf(rng, 4, { format: 'tf', points: 1 });
   if (level === 5) return soloProblem(rng, opts);
   if (level === 1) return sepItem(1, rng, opts);
   return rng.chance(level === 3 ? 0.4 : 0.3) ? orderItem(level, rng, opts) : sepItem(level, rng, opts);

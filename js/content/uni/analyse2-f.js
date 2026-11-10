@@ -11,10 +11,12 @@
 import { fubiniRect } from './analyse2-f-rect.js';
 import { domainDescribe, fubiniSwap } from './analyse2-f-domain.js';
 import { tripleInt } from './analyse2-f-triple.js';
+import { changeVar } from './analyse2-f-change.js';
 
 export const GEN = {
   'a2-fubini-rect': fubiniRect,
   'a2-domain-describe': domainDescribe,
   'a2-fubini-swap': fubiniSwap,
   'a2-triple-int': tripleInt,
+  'a2-change-var': changeVar,
 };
