@@ -21,6 +21,7 @@ import {
 
 // ---------- helpers ----------
 
+const sup = (n) => String(n).split('').map((c) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[c]).join('');
 const xs = (n) => Array.from({ length: n }, (_, i) => `x${sub(i + 1)}`);
 const maxAbs = (A) => Math.max(0, ...A.flat().map((x) => Math.abs(q(x).valueOf())));
 const isInt = (A) => A.flat().every((x) => q(x).d === 1);
@@ -78,13 +79,14 @@ function rrefPart(A, ops, level, rng, { bar = null, cols, subgoal = 'reduce', no
 
 // A reduction whose steps stay simple: few operations, halves at most,
 // entries ≤ 15 on the way.
-function niceOps(A, ops, maxOps) {
+function niceOps(A, ops, maxOps, { whole = false } = {}) {
   if (ops.length > maxOps) return false;
+  const dmax = whole ? 1 : 2;
   let M = A;
   for (const op of ops) {
-    if ((op.k && op.k.d > 2) || (op.c && op.c.d > 2)) return false;
+    if ((op.k && op.k.d > dmax) || (op.c && op.c.d > dmax)) return false;
     M = MX.applyOp(M, op);
-    if (M.flat().some((x) => x.d > 2 || Math.abs(x.valueOf()) > 15)) return false;
+    if (M.flat().some((x) => x.d > dmax || Math.abs(x.valueOf()) > 15)) return false;
   }
   return true;
 }
@@ -617,8 +619,411 @@ function colRowExam(rng, exam) {
   });
 }
 
+// ======================================================================
+// l-vs-basis
+// ======================================================================
+
+const BASIS = 'l-vs-basis';
+const BASIS_SUB = [
+  { id: 'coords', label: 'coordonnées', skill: 'l-vs-coords' },
+  { id: 'echelon', label: 'échelonner', skill: 'l-sys-echelon' },
+  { id: 'extract', label: 'extraire', skill: BASIS },
+];
+
+// Four vectors of P₃ or M₂ₓ₂ (coordinates in the columns of M): a basis,
+// or three free vectors and a combination of them (coefficients ±1, ±2).
+function basisData(rng, { dep = rng.chance(0.6), maxOps = 6 } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const sp = rng.pick(['P3', 'M22']);
+    const U = colsOf(unimodular(4, rng, { max: 2 }));
+    let vs;
+    if (dep) {
+      const base = rng.shuffle(U).slice(0, 3);
+      const co = [rng.int(-2, 2), rng.int(-2, 2), rng.int(-2, 2)];
+      if (co.filter((c) => c).length < 2) continue;
+      const w = base[0].map((_, i) => base.reduce((acc, b, k) => acc.add(b[i].mul(co[k])), q(0)));
+      vs = [...base];
+      vs.splice(rng.int(1, 3), 0, w);
+    } else vs = rng.shuffle(U);
+    const M = MX.fromCols(vs);
+    if (maxAbs(M) > 4 || vs.some((v) => v.every((x) => x.n === 0))) continue;
+    const e = MX.echelon(M);
+    if (e.ops.length < 2 || !niceOps(M, e.ops, maxOps, { whole: true })) continue;
+    const r = e.pivots.length;
+    return { sp, vs, M, E: e.E, ops: e.ops, pivots: e.pivots, r, dep: r < 4 };
+  }
+  const vs = [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [1, 0, 0, 1]].map((v) => v.map((x) => q(x)));
+  const M = MX.fromCols(vs);
+  const e = MX.echelon(M);
+  return { sp: 'P3', vs, M, E: e.E, ops: e.ops, pivots: e.pivots, r: e.pivots.length, dep: true, fallback: true };
+}
+const famShow = (d, vs = d.vs) => vs.map((v) => elShow(d.sp, v)).join(', ');
+
+function basisItem(level, rng) {
+  const d = basisData(rng, { maxOps: level >= 4 ? 8 : 6 });
+  const S = SPACES[d.sp];
+  const coordsLine = { kind: 'eq', math: mt(d.M), note: `Coordonnées en colonnes (${S.what})`, subgoal: 'coords' };
+  const parts = [{
+    judge: { kind: 'mat', expect: mt(d.M) }, start: 'Coordonnées',
+    lines: [level === 1 ? withCells(coordsLine, pickCells(d.M, [0, 1, 2, 3], 4, rng)) : coordsLine],
+  }];
+  const ech = opLines(d.M, d.ops, { note: (op) => (op.kind === 'swap' ? 'Échanger' : `Annuler sous le pivot : ${opR(op)}`), subgoal: 'echelon' });
+  parts.push({
+    judge: { kind: 'rowops', goal: 'echelon', multi: level >= 4 }, start: mt(d.M), html: 'Échelonne la matrice des coordonnées',
+    lines: ech.map((l) => (level <= 2 && l.op.kind !== 'swap' ? withCells(l, pickCells(l.result, [l.op.i], 2, rng)) : l)).map(({ result, op, ...l }) => l),
+  });
+  parts.push({
+    judge: { kind: 'value', expect: String(d.r) }, start: 'r', html: 'Le rang de la famille', ask: 'rang =',
+    lines: [{ kind: 'eq', math: String(d.r), note: d.dep ? `${d.r} pivots pour 4 vecteurs : pas une base de ${S.label}` : `4 pivots : une base de ${S.label}`, subgoal: 'extract' }],
+  });
+  if (d.dep) {
+    const keep = d.pivots.map((j) => d.vs[j]);
+    parts.push({
+      judge: { kind: 'span', basis: keep.map(vt), require: 'basis' }, start: mt(d.M), html: 'Une base du Span de la famille (en coordonnées)', ask: 'base =',
+      lines: [{ kind: 'eq', math: `Span{${famT(keep)}}`, note: `Les vecteurs ${join(d.pivots.map((j) => String(j + 1)))} (colonnes pivots) : dimension ${d.r}`, subgoal: 'extract' }],
+    });
+  }
+  if (level === 2) {
+    parts[0].lines.unshift({
+      kind: 'decision', prompt: `Quel critère décide si ces 4 vecteurs forment une base de ${S.label} (de dimension 4) ?`, options: [
+        { id: 'rank', label: 'Ils sont libres : la matrice des coordonnées a 4 pivots', valid: true },
+        { id: 'count', label: `Il y en a 4 et dim ${S.label} = 4 : c'est toujours une base`, valid: false, rule: 'l_span_count', why: 'Le nombre ne suffit pas : 4 vecteurs peuvent être liés. Il faut 4 pivots.' },
+        { id: 'zero', label: 'Aucun n\'est nul', valid: false, why: 'Des vecteurs non nuls peuvent être liés (l\'un combinaison des autres).' },
+      ],
+    });
+  }
+  const hints = [
+    { level: 1, html: 'Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span.' },
+    { level: 2, html: 'rang = □ : compte les pivots de la forme échelonnée.' },
+    { level: 3, html: d.dep ? `rang ${d.r} : pas une base ; base du Span : les vecteurs ${join(d.pivots.map((j) => String(j + 1)))}` : 'rang 4 : une base' },
+  ];
+  return partsItem({
+    skill: BASIS, level,
+    prompt: `Les vecteurs ${famShow(d)} forment-ils une base de ${S.label} ? Écris leurs coordonnées en colonnes (${S.what}), échelonne, donne le rang${d.dep ? ', puis une base du Span de la famille' : ''}${level === 3 ? ' : choisis chaque opération' : ''}.`,
+    mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
+    hints, subgoals: BASIS_SUB, key: `${BASIS}:${mt(d.M)}`, fallback: d.fallback,
+  }, parts);
+}
+
+function basisExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'mcq') {
+    const d = basisData(rng, { dep: true });
+    const S = SPACES[d.sp];
+    const opt = (k, rule = null) => ({ html: String(k), rule });
+    return mcqDistinct({
+      skill: BASIS, level: 4, key: `mcq:${mt(d.M)}`, exam: tag,
+      prompt: `Quelle est la dimension du sous-espace de ${S.label} engendré par ${famShow(d)} ?`,
+      right: String(d.r),
+      wrongs: [opt(4, 'l_span_count')],
+      fillers: [opt(d.r - 1), opt(d.r + 1), opt(d.r - 2), opt(5)].filter((o) => Number(o.html) >= 1),
+      solution: [{ html: `Coordonnées en colonnes : ${MLm(d.M)}`, note: '' }, { html: `Forme échelonnée : ${MLm(d.E)}`, note: `${d.r} pivots` }],
+    }, rng);
+  }
+  const which = rng.int(0, 2);
+  const n = rng.pick([3, 4]);
+  const R = (k) => `ℝ${sup(k)}`;
+  if (which === 0) {
+    return tfL({
+      skill: BASIS, key: `indep:${n}`, truth: false, exam: tag,
+      statement: `Si dim V = ${n} et si S est une famille libre de V, alors S est une base de V.`,
+      counter: { kind: 'vecFamily', params: { want: 'indepNotBasis', n }, ask: [{ v: 'F', label: 'S =' }], answer: { F: vt(Array.from({ length: n }, (_, i) => (i === 0 ? 1 : 0))) } },
+      explanation: `Faux : une famille libre peut être trop petite. Dans ${R(n)}, S = {e₁} est libre mais n'engendre pas ${R(n)}.`,
+    });
+  }
+  if (which === 1) {
+    const k = rng.pick([4, 5, 6]);
+    return tfL({
+      skill: BASIS, key: `count:${k}`, truth: true, exam: tag,
+      statement: `${k - 1} vecteurs de ${R(k)} ne peuvent pas engendrer ${R(k)}, mais ${k} vecteurs de ${R(k - 1)} peuvent engendrer ${R(k - 1)}.`,
+      explanation: `Vrai : il faut au moins ${k} vecteurs pour engendrer un espace de dimension ${k} ; ${k} vecteurs de ${R(k - 1)} peuvent l'engendrer (une base et un vecteur de plus).`,
+    });
+  }
+  const F = n === 3 ? '(1 ; 0 ; 0), (1 ; 0 ; 0), (0 ; 0 ; 1)' : '(1 ; 0 ; 0 ; 0), (0 ; 1 ; 0 ; 0), (1 ; 1 ; 0 ; 0), (0 ; 0 ; 0 ; 1)';
+  return tfL({
+    skill: BASIS, key: `nvec:${n}`, truth: false, exam: tag, ruleIfTrue: 'l_span_count',
+    statement: `${n} vecteurs de ${R(n)} forment toujours une base de ${R(n)}.`,
+    counter: { kind: 'vecFamily', params: { want: 'spanNotBasis', n }, ask: [{ v: 'F', label: 'vecteurs =' }], answer: { F } },
+    explanation: `Faux : ${n} vecteurs peuvent être liés, par exemple ${ML(F)}.`,
+  });
+}
+
+// ======================================================================
+// l-vs-rank
+// ======================================================================
+
+const RANK = 'l-vs-rank';
+const RANK_SUB = [{ id: 'formula', label: 'théorème du rang', skill: RANK }];
+
+// A value part: a number asked, with the wrong answer of the trap.
+function valPart({ ask, html, value, steps = [], note = '', wrong, ctx, menu: m }) {
+  return {
+    judge: { kind: 'value', expect: String(value), ...(wrong !== undefined && wrong !== value ? { wrong: { l_rank_dim_confusion: [{ text: String(wrong), ctx }] } } : {}), ...(m ? { menu: m } : {}) },
+    start: 'k', html, ask,
+    lines: [...steps, { kind: 'eq', math: String(value), note, subgoal: 'formula' }],
+  };
+}
+
+function rankData(rng) {
+  for (;;) {
+    const m = rng.int(2, 9);
+    const n = rng.int(2, 9);
+    if (m === n) continue;
+    const r = rng.int(1, Math.min(m, n));
+    if (r === Math.min(m, n) && rng.chance(0.5)) continue;
+    return { m, n, r };
+  }
+}
+
+function rankItem(level, rng) {
+  if (level === 4) return rankMapItem(rng);
+  const { m, n, r } = rankData(rng);
+  const ctx = { n, r };
+  const guided = level <= 2;
+  const steps = (a, b) => (guided ? [{ kind: 'eq', math: `${a}-${b}`, blanks: level === 1 ? [[0, 1]] : [[0, 1], [2, 3]], note: '' }] : []);
+  let parts;
+  let prompt;
+  if (guided) {
+    parts = [
+      valPart({ ask: 'dim Ker A =', html: 'dim Ker A', value: n - r, steps: steps(n, r), note: `n − r, avec n = ${n} colonnes`, wrong: m - r, ctx }),
+      valPart({ ask: 'dim Ker Aᵀ =', html: 'dim Ker Aᵀ', value: m - r, steps: steps(m, r), note: `m − r : Aᵀ a ${m} colonnes` }),
+      valPart({ ask: 'dim Lgn A =', html: 'dim Lgn A', value: r, note: 'dim Lgn A = dim Col A = rang A' }),
+    ];
+    prompt = `A est une matrice ${m} × ${n} de rang ${r}. ${level === 1 ? 'Avec rang A + dim Ker A = n (n = nombre de colonnes), donne' : 'Donne'} dim Ker A, dim Ker Aᵀ et dim Lgn A.`;
+    if (level === 2) {
+      parts[0].lines.unshift({
+        kind: 'decision', prompt: 'Quelle formule donne dim Ker A ?', options: [
+          { id: 'n', label: `n − r = ${n} − ${r}`, valid: true },
+          { id: 'm', label: `m − r = ${m} − ${r}`, valid: false, rule: 'l_rank_dim_confusion', why: `Le noyau vit dans l'espace de départ ℝ${sup(n)} : n = ${n}, le nombre de colonnes. m − r est dim Ker Aᵀ.` },
+          { id: 'r', label: `r = ${r}`, valid: false, why: 'r est la dimension de Col A et de Lgn A, pas celle du noyau.' },
+        ],
+      });
+    }
+  } else {
+    const k = n - r;
+    const M3 = level === 3;
+    parts = [
+      valPart({ ask: 'rang A =', html: 'Le rang', value: r, note: `n − dim Ker A = ${n} − ${k}`, wrong: m - k, ctx: { n, r }, menu: M3 ? menu('rang A = n − dim Ker A', { label: 'rang A = m − dim Ker A', rule: 'l_rank_dim_confusion', why: 'Le théorème du rang porte sur les colonnes : rang A + dim Ker A = n.' }) : null }),
+      valPart({ ask: 'dim Ker Aᵀ =', html: 'dim Ker Aᵀ', value: m - r, note: `m − rang A = ${m} − ${r}`, menu: M3 ? menu('dim Ker Aᵀ = m − rang A', { label: 'dim Ker Aᵀ = dim Ker A', why: 'Aᵀ est de taille n × m : son noyau est dans ℝᵐ, sa dimension est m − r.' }) : null }),
+      valPart({ ask: 'dim Lgn A =', html: 'dim Lgn A', value: r, note: 'rang des lignes = rang des colonnes', menu: M3 ? menu('dim Lgn A = rang A', { label: 'dim Lgn A = m', why: 'Les lignes peuvent être liées : la dimension est le rang.' }) : null }),
+    ];
+    prompt = `A est une matrice ${m} × ${n}, et dim Ker A = ${k}. Donne le rang de A, dim Ker Aᵀ et dim Lgn A.`;
+  }
+  const hints = [
+    { level: 1, html: 'n est le nombre de colonnes, la dimension de départ : rang A + dim Ker A = n. Pour Aᵀ (n × m) : rang + dim Ker Aᵀ = m.' },
+    { level: 2, html: guided ? `dim Ker A = □ − ${r}` : `rang A = ${n} − □` },
+    { level: 3, html: guided ? `dim Ker A = ${n - r}` : `rang A = ${r}` },
+  ];
+  return partsItem({
+    skill: RANK, level, prompt, mode: guided ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null,
+    hints, subgoals: RANK_SUB, key: `${RANK}:${m}x${n}:${r}:${level}`, keys: ['calc'],
+  }, parts);
+}
+
+// T : V → W with V among Pₙ and M_{p×q}, W among ℝⁿ, Pₙ, M_{p×q}.
+const VSPACES = [
+  ...[2, 3, 4].map((k) => ({ label: `P${sub(k)}`, dim: k + 1, poly: k })),
+  ...[[2, 2], [2, 3], [3, 2]].map(([a, b]) => ({ label: `M${sub(a)}ₓ${sub(b)}`, dim: a * b })),
+  ...[2, 3, 4, 5].map((k) => ({ label: `ℝ${sup(k)}`, dim: k, rn: true })),
+];
+function rankMapItem(rng) {
+  let V; let W;
+  do { V = rng.pick(VSPACES.filter((x) => !x.rn)); W = rng.pick(VSPACES); } while (W.dim === V.dim);
+  const r = rng.int(1, Math.min(V.dim, W.dim));
+  const parts = [
+    { judge: { kind: 'value', expect: String(V.dim) }, start: 'k', lines: [{ kind: 'eq', math: String(V.dim), note: V.poly ? `Base 1, t, …, t${sup(V.poly)} : ${V.dim} vecteurs` : 'Une coordonnée par case', subgoal: 'formula' }] },
+    valPart({ ask: 'dim Ker T =', html: 'dim Ker T', value: V.dim - r, note: `dim V − dim Im T = ${V.dim} − ${r}`, wrong: W.dim - r, ctx: { n: V.dim, r } }),
+  ];
+  return partsItem({
+    skill: RANK, level: 4,
+    prompt: `T : ${V.label} → ${W.label} est linéaire et dim Im T = ${r}. Donne dim ${V.label}, puis dim Ker T.`,
+    mode: 'free', hints: [
+      { level: 1, html: 'dim Im T + dim Ker T = dim V, la dimension de l\'espace de <b>départ</b>.' },
+      { level: 2, html: `dim Ker T = ${V.dim} − □` },
+      { level: 3, html: `dim Ker T = ${V.dim - r}` },
+    ],
+    subgoals: RANK_SUB, key: `${RANK}:map:${V.label}:${W.label}:${r}`, keys: ['calc'],
+  }, parts);
+}
+
+function rankExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'mcq') {
+    const { m, n, r } = rankData(rng);
+    const opt = (k, rule = null) => ({ html: String(k), rule });
+    return mcqDistinct({
+      skill: RANK, level: 4, key: `mcq:${m}x${n}:${r}`, exam: tag,
+      prompt: `A est une matrice ${m} × ${n} et dim Col A = ${r}. Que vaut dim Ker Aᵀ ?`,
+      right: String(m - r),
+      wrongs: [opt(n - r, 'l_rank_dim_confusion'), opt(r), opt(m)],
+      fillers: [opt(n), opt(m - r + 1), opt(Math.abs(m - n))],
+      solution: [{ html: `Aᵀ est ${n} × ${m}, de rang ${r} : dim Ker Aᵀ = ${m} − ${r} = ${m - r}`, note: '' }],
+    }, rng);
+  }
+  const which = rng.int(0, 3);
+  if (which === 0) {
+    const m = rng.int(6, 9);
+    const n = rng.int(2, 5);
+    return tfL({
+      skill: RANK, key: `kerfull:${m}x${n}`, truth: true, exam: tag,
+      statement: `Si A est une matrice ${m} × ${n} avec dim Ker A = ${n}, alors dim Im A = 0.`,
+      explanation: `Vrai : dim Im A = ${n} − dim Ker A = 0 (A est la matrice nulle).`,
+    });
+  }
+  if (which === 1) {
+    return tfL({
+      skill: RANK, key: 'ata', truth: true, exam: tag,
+      statement: 'Pour toute matrice A, rang A = rang AᵀA.',
+      explanation: 'Vrai : Ker AᵀA = Ker A (si AᵀAx = 0, alors ‖Ax‖² = xᵀAᵀAx = 0), et les deux matrices ont n colonnes.',
+    });
+  }
+  if (which === 2) {
+    const m = rng.int(2, 4);
+    const n = m + rng.int(1, 3);
+    return tfL({
+      skill: RANK, key: `wide:${m}x${n}`, truth: true, exam: tag,
+      statement: `Une matrice ${m} × ${n} a un noyau de dimension au moins ${n - m}.`,
+      explanation: `Vrai : rang A ≤ ${m}, donc dim Ker A = ${n} − rang A ≥ ${n - m}.`,
+    });
+  }
+  return tfL({
+    skill: RANK, key: 'mr', truth: false, exam: tag, ruleIfTrue: 'l_rank_dim_confusion',
+    statement: 'Pour toute matrice A de taille m × n et de rang r, dim Ker A = m − r.',
+    counter: { kind: 'dims', params: { conds: ['m≠n'] }, ask: [{ v: 'm', label: 'm =' }, { v: 'n', label: 'n =' }, { v: 'r', label: 'r =' }], answer: { m: '2', n: '3', r: '1' } },
+    explanation: 'Faux : dim Ker A = n − r. Avec m = 2, n = 3, r = 1 : dim Ker A = 2, mais m − r = 1.',
+  });
+}
+
+// ======================================================================
+// l-vs-coords
+// ======================================================================
+
+const COORD = 'l-vs-coords';
+const COORD_SUB = [
+  { id: 'reduce', label: 'réduire', skill: 'l-sys-rref' },
+  { id: 'identify', label: 'identifier', skill: COORD },
+];
+
+// A basis B of ℝ³ or P₂ (columns of a unimodular matrix), coordinates c
+// whole in [−6 ; 6], x = Bc.
+function coordsData(rng, { sp = rng.pick(['R3', 'P2']), maxOps = 7 } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const B = unimodular(3, rng, { max: 2 });
+    const c = [rng.int(-6, 6), rng.int(-6, 6), rng.int(-6, 6)].map((x) => q(x));
+    if (c.some((x) => x.n === 0) || c.every((x) => Math.abs(x.valueOf()) < 2)) continue;
+    const x = MX.matVec(B, c);
+    if (maxAbs([x]) > 12 || x.filter((xi, i) => !xi.eq(c[i])).length < 2) continue;
+    const Bx = MX.matVec(B, x);
+    if (eqV(Bx, c) || maxAbs([Bx]) > 30) continue;
+    const Ax = B.map((r, i) => [...r, x[i]]);
+    const red = MX.rref(Ax, { cols: 3 });
+    if (red.ops.length < 2 || !niceOps(Ax, red.ops, maxOps, { whole: true })) continue;
+    return { sp, B, c, x, Bx, Ax, ops: red.ops, bs: colsOf(B) };
+  }
+  const B = MX.mat([[1, 1, 0], [0, -1, 1], [0, 0, 1]]);
+  const c = MX.mat([[6, -4, -1]])[0];
+  const x = MX.matVec(B, c);
+  const Ax = B.map((r, i) => [...r, x[i]]);
+  return { sp: 'P2', B, c, x, Bx: MX.matVec(B, x), Ax, ops: MX.rref(Ax, { cols: 3 }).ops, bs: colsOf(B), fallback: true };
+}
+const xName = (d) => (d.sp === 'P2' ? 'p' : 'x');
+const basisShow = (d) => `B = (${d.bs.map((b) => elShow(d.sp, b)).join(', ')})`;
+const ord = (i) => ['1re', '2e', '3e'][i];
+
+function coordsItem(level, rng) {
+  if (level === 5 && rng.chance(0.5)) return coordsBack(rng);
+  const d = coordsData(rng, { maxOps: level >= 4 ? 9 : 7 });
+  const X = xName(d);
+  const parts = [rrefPart(d.Ax, d.ops, level, rng, { bar: 3, subgoal: 'reduce' })];
+  const cLine = { kind: 'eq', math: vt(d.c), note: `${X} = ${linText(d.c, ['b₁', 'b₂', 'b₃'])}`, subgoal: 'identify' };
+  parts.push({
+    judge: { kind: 'mat', expect: vt(d.c), wrong: { l_coords_canonical: [vt(d.x)], l_change_basis_direction: [vt(d.Bx)] } },
+    start: `[${X}]_B = ?`, html: `Les coordonnées de ${X} dans B`, ask: `[${X}]_B =`,
+    lines: [level === 1 ? withCells(cLine, [[0, 0], [1, 0], [2, 0]]) : cLine],
+  });
+  if (level === 2) {
+    parts[0].lines.unshift({
+      kind: 'decision', prompt: `Comment obtenir [${X}]_B ?`, options: [
+        { id: 'solve', label: `Écrire ${X} = c₁b₁ + c₂b₂ + c₃b₃ : réduire [b₁ b₂ b₃ | ${X}]`, valid: true },
+        { id: 'read', label: `Lire les coefficients de ${X}`, valid: false, rule: 'l_coords_canonical', why: `Les coefficients de ${X} sont ses coordonnées dans la base canonique, pas dans B.` },
+      ],
+    });
+  }
+  const hints = [
+    { level: 1, html: `Écris ${X} comme combinaison des vecteurs de B : c'est le système de matrice augmentée [b₁ b₂ b₃ | ${X}]${d.sp === 'P2' ? ', coefficient par coefficient de 1, t, t²' : ''}.` },
+    { level: 2, html: `[${X}]_B = (□ ; □ ; ${fq(d.c[2])})` },
+    { level: 3, html: `[${X}]_B = ${MLv(d.c)}` },
+  ];
+  return partsItem({
+    skill: COORD, level,
+    prompt: `${basisShow(d)} est une base de ${SPACES[d.sp].label}. Trouve les coordonnées de ${X} = ${elShow(d.sp, d.x)} dans B : réduis [b₁ b₂ b₃ | ${X}]${d.sp === 'P2' ? ' (coefficients dans 1, t, t²)' : ''}${level === 3 ? ', en choisissant chaque opération' : ''}.`,
+    mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
+    hints, subgoals: COORD_SUB, key: `${COORD}:${mt(d.Ax)}`, fallback: d.fallback,
+  }, parts);
+}
+
+// From [x]_B to x (série GM 14).
+function coordsBack(rng) {
+  const d = coordsData(rng);
+  const X = xName(d);
+  const comb = d.c.map((ci, j) => `${qt(ci)}·${vt(d.bs[j])}`).join('+').replace(/\+-/g, '-');
+  return partsItem({
+    skill: COORD, level: 5,
+    prompt: `${basisShow(d)} est une base de ${SPACES[d.sp].label}, et [${X}]_B = ${MLv(d.c)}. Trouve ${X}${d.sp === 'P2' ? ' (ses coefficients dans 1, t, t²)' : ''}.`,
+    mode: 'free', hints: [], subgoals: COORD_SUB, key: `${COORD}:back:${mt(d.Ax)}`, fallback: d.fallback,
+  }, [{
+    judge: { kind: 'mat', expect: vt(d.x) }, start: `${X} = ?`,
+    lines: [{ kind: 'eq', math: comb, note: `${X} = c₁b₁ + c₂b₂ + c₃b₃`, subgoal: 'identify' }, { kind: 'eq', math: vt(d.x), note: d.sp === 'P2' ? `${X} = ${polyR(d.x)}` : '', subgoal: 'identify' }],
+  }]);
+}
+
+function coordsExam(rng, exam) {
+  const d = coordsData(rng);
+  const X = xName(d);
+  const tag = examTag({ exam });
+  const q0 = `${basisShow(d)} est une base de ${SPACES[d.sp].label} et ${X} = ${elShow(d.sp, d.x)}.`;
+  const sol = [{ html: `${X} = ${d.c.map((ci, j) => `(${fq(ci)})·${elShow(d.sp, d.bs[j])}`).join(' + ')}`, note: '' }, { html: `[${X}]_B = ${MLv(d.c)}`, note: '' }];
+  if (exam === 'coef') {
+    const i = rng.pick([0, 1, 2].filter((k) => !d.x[k].eq(d.c[k])));
+    return coefItem({
+      skill: COORD, level: 4, prompt: `${q0} Que vaut la ${ord(i)} coordonnée c${sub(i + 1)} de ${X} dans B ?`,
+      label: `c_${i + 1}`, value: qt(d.c[i]), key: `${mt(d.Ax)}:${i}`, exam: tag, askCoef: { label: `c${sub(i + 1)}`, path: [i, 0] },
+      traps: [{ rule: 'l_coords_canonical' }], solution: sol, fallback: d.fallback,
+    });
+  }
+  if (exam === 'mcq') {
+    return mcqDistinct({
+      skill: COORD, level: 4, key: `mcq:${mt(d.Ax)}`, exam: tag,
+      prompt: `${q0} Que vaut [${X}]_B ?`,
+      right: MLv(d.c),
+      wrongs: [{ html: MLv(d.x), rule: 'l_coords_canonical' }, { html: MLv(d.Bx), rule: 'l_change_basis_direction' }],
+      fillers: [{ html: MLv(d.c.map((x, i) => (i === 0 ? x.neg() : x))) }, { html: MLv([d.c[1], d.c[0], d.c[2]]) }, { html: MLv(d.c.map((x, i) => (i === 2 ? x.neg() : x))) }],
+      solution: sol,
+    }, rng);
+  }
+  if (rng.chance(0.25)) {
+    return tfL({
+      skill: COORD, key: 'unique', truth: true, exam: tag,
+      statement: 'Si B est une base de V, chaque vecteur de V a une seule suite de coordonnées dans B.',
+      explanation: 'Vrai : si x = Σcᵢbᵢ = Σdᵢbᵢ, alors Σ(cᵢ − dᵢ)bᵢ = 0, et la famille est libre : cᵢ = dᵢ.',
+    });
+  }
+  const i = rng.int(0, 2);
+  const truth = rng.chance(0.5) || d.x[i].eq(d.c[i]);
+  const claim = truth ? d.c[i] : d.x[i];
+  return tfL({
+    skill: COORD, key: `comp:${mt(d.Ax)}:${i}:${truth}`, truth, exam: tag, ...(truth ? {} : { ruleIfTrue: 'l_coords_canonical' }),
+    statement: `${q0} La ${ord(i)} coordonnée de ${X} dans B vaut ${fq(claim)}.`,
+    ...(truth ? {} : { counter: { kind: 'vecFamily', params: { want: 'coordsWitness', B: d.bs.map(vt), x: vt(d.x), i, claim: claim.valueOf() }, ask: [{ v: 'c', label: `[${X}]_B =` }], answer: { c: vt(d.c) } } }),
+    explanation: `${truth ? 'Vrai' : 'Faux'} : [${X}]_B = ${MLv(d.c)}${truth ? '' : `. ${fq(claim)} est la coordonnée dans la base canonique`}.`,
+  });
+}
+
 export const GEN = {
   [SUBSP]: (level, rng, profile, opts = {}) => (opts.exam ? subspaceExam(rng, opts.exam) : subspaceItem(level, rng)),
   [KER]: (level, rng, profile, opts = {}) => (opts.exam ? kernelExam(rng, opts.exam) : kernelItem(level, rng)),
   [COL]: (level, rng, profile, opts = {}) => (opts.exam ? colRowExam(rng, opts.exam) : colRowItem(level, rng)),
+  [BASIS]: (level, rng, profile, opts = {}) => (opts.exam ? basisExam(rng, opts.exam) : basisItem(level, rng)),
+  [RANK]: (level, rng, profile, opts = {}) => (opts.exam ? rankExam(rng, opts.exam) : rankItem(level, rng)),
+  [COORD]: (level, rng, profile, opts = {}) => (opts.exam ? coordsExam(rng, opts.exam) : coordsItem(level, rng)),
 };
