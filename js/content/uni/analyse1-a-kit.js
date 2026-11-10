@@ -7,7 +7,7 @@ import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
 import { walk, lit } from '../../cas/ast.js';
 import { blankLine, templateOf } from '../../judges/lines.js';
-import { MT } from './kit.js';
+import { MT, mcq } from './kit.js';
 
 export const N = (x) => toText(lit(Q.of(x)));
 export const modeOf = (level) => (level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free');
@@ -24,7 +24,7 @@ export function tpl(math, texts, opts = {}) {
     const want = toText(parse(t, opts));
     let found = null;
     walk(node, (n) => {
-      if (found) return false;
+      if (found || holes.includes(n)) return false;
       if (n.t !== 'paren' && !holes.includes(n) && toText(n) === want) { found = n; return false; }
       return true;
     });
@@ -67,3 +67,14 @@ export function times(k, t) {
 }
 // French number in text (−3/4).
 export const frN = (x) => N(x).replace(/-/g, '−');
+
+// A true/false question as a two-option multiple choice (the statement is
+// about one function: no counter-example to type).
+export function vfMcq(skill, statement, truth, rule, why, rng, key) {
+  return mcq({
+    skill, level: 4, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
+    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth, rule: truth ? rule : null }],
+    key: `tf:${key}`, exam: { format: 'tf', points: 1 }, expectedSec: 60, solution: [{ html: why, note: '' }],
+  }, rng);
+}
+

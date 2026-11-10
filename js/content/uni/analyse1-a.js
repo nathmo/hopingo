@@ -14,29 +14,19 @@
 import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
-import { deriv, stripParen } from '../../cas/ast.js';
-import { stepDeriv } from '../../cas/diff.js';
+import { deriv, stripParen, lit } from '../../cas/ast.js';
+import { stepDeriv, substVar } from '../../cas/diff.js';
 import { pretty, exactValue } from '../../cas/normal.js';
 import { equivalent, seedOf } from '../../cas/equiv.js';
 import { expandDerivs } from '../../cas/diff.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { isFinal as equivFinal } from '../../judges/equiv.js';
 import { MT, MM, linesItem, mcq, tfItem } from './kit.js';
-import { N, modeOf, H, E, examOf, uniqOptions, blanked, boxed, withMenus, segment, frN } from './analyse1-a-kit.js';
+import { N, modeOf, H, E, examOf, uniqOptions, blanked, boxed, withMenus, segment, frN, vfMcq } from './analyse1-a-kit.js';
 import { GEN as INV } from './analyse1-a-inv.js';
 import { GEN as C1 } from './analyse1-a-c1.js';
 import { stubGen } from './stub.js';
 import { SKILLS } from './analyse1-a.skills.js';
-
-// A true/false question as a two-option multiple choice (the statement is
-// about one function: no counter-example to type).
-export function vfMcq(skill, statement, truth, rule, why, rng, key) {
-  return mcq({
-    skill, level: 4, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth, rule: truth ? rule : null }],
-    key: `tf:${key}`, exam: { format: 'tf', points: 1 }, expectedSec: 60, solution: [{ html: why, note: '' }],
-  }, rng);
-}
 
 // ======================================================================
 // a1-deriv-def
@@ -300,9 +290,314 @@ function derivDef(level, rng, profile, opts = {}) {
   return defLines(level, rng, opts);
 }
 
+// ======================================================================
+// a1-deriv-rules
+// ======================================================================
+
+const RUL = 'a1-deriv-rules';
+const RUL_SUB = {
+  rules: { id: 'rules', label: 'produit, quotient, chaîne', skill: 'g6-deriv-rules' },
+  arc: { id: 'arc', label: 'dérivées des fonctions arc', skill: 'g3-arc-def' },
+  hyp: { id: 'hyp', label: 'dérivées hyperboliques', skill: 'g2-hyp-def' },
+};
+const RUL_DOMAIN = { x: [0.2, 0.9] };
+
+// Products of texts: the numbers in front, the other factors joined by ×
+// (a factor with a sum inside gets brackets).
+const isNum = (t) => /^\d+$/.test(t);
+export function hasSum(t) {
+  let depth = 0;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (c === '(') depth++;
+    else if (c === ')') depth--;
+    else if ((c === '+' || c === '-') && depth === 0 && i > 0) return true;
+  }
+  return false;
+}
+// Top-level × factors of a text.
+function splitTimes(t) {
+  const out = [];
+  let depth = 0;
+  let cur = '';
+  for (const c of t) {
+    if (c === '(') depth++;
+    if (c === ')') depth--;
+    if (c === '×' && depth === 0) { out.push(cur); cur = ''; } else cur += c;
+  }
+  out.push(cur);
+  return out;
+}
+const unwrap = (t) => {
+  if (!t.startsWith('(') || !t.endsWith(')')) return t;
+  let depth = 0;
+  for (let i = 0; i < t.length - 1; i++) {
+    if (t[i] === '(') depth++;
+    if (t[i] === ')') depth--;
+    if (depth === 0) return t;
+  }
+  return t.slice(1, -1);
+};
+// The number in front, the power of x next, then the other factors.
+export function mulT(...fs) {
+  let k = 1;
+  let px = 0;
+  const rest = [];
+  for (const g of fs) {
+    for (let f of splitTimes(g)) {
+      f = hasSum(unwrap(f)) ? f : unwrap(f);
+      if (f === '1' || f === '') continue;
+      if (isNum(f)) { k *= Number(f); continue; }
+      const m = /^(\d+)([a-zA-Z√(].*)$/.exec(f);
+      if (m && !hasSum(f)) { k *= Number(m[1]); f = m[2]; }
+      const xp = /^x(?:\^(\d+))?$/.exec(f);
+      if (xp) { px += Number(xp[1] ?? 1); continue; }
+      rest.push(hasSum(f) ? `(${f})` : f);
+    }
+  }
+  const xs = px === 0 ? '' : px === 1 ? 'x' : `x^${px}`;
+  const num = k === 1 && (xs || rest.length) ? '' : String(k);
+  if (!xs && num && rest.length) return `${num}${rest.join('×')}`;
+  return [`${num}${xs}`, ...rest].filter(Boolean).join('×');
+}
+// A fraction {n, d} of texts, written out; the denominator in brackets
+// when it is a product or a sum.
+function topLevel(t) {
+  let out = t;
+  for (let i = 0; i < 6; i++) out = out.replace(/\([^()]*\)/g, '()');
+  return out;
+}
+const bareDen = (d) => { const t = topLevel(d); return !hasSum(d) && !/[×/]/.test(t) && !/\d[a-zA-Z√(]/.test(t); };
+export const fracT = ({ n, d }) => {
+  const D = unwrap(d);
+  return D === '1' ? n : `${hasSum(n) ? `(${n})` : n}/${bareDen(D) ? D : `(${D})`}`;
+};
+const fmul = (a, b) => ({ n: mulT(a.n, b.n), d: mulT(a.d, b.d) });
+const F = (n, d = '1') => ({ n, d });
+
+// Inner functions u: text, u′ as a fraction, u² written out.
+const INNERS = {
+  x: { u: 'x', du: F('1'), u2: 'x^2' },
+  x2: { u: 'x^2', du: F('2x'), u2: 'x^4' },
+  sqrt: { u: '√x', du: F('1', '2√x'), u2: 'x' },
+  half: { u: 'x/2', du: F('1', '2'), u2: 'x^2/4' },
+  third: { u: 'x/3', du: F('1', '3'), u2: 'x^2/9' },
+  two: { u: '2x', du: F('2'), u2: '4x^2' },
+  three: { u: '3x', du: F('3'), u2: '9x^2' },
+};
+// Outer functions: text of f(u), and f′(u) as a fraction; kind: arc or hyp.
+const OUTERS = {
+  arctg: { t: (I) => `Arctg(${I.u})`, d: (I) => F('1', `1+${I.u2}`), kind: 'arc', inners: ['x', 'x2', 'sqrt', 'half', 'two'] },
+  arcsin: { t: (I) => `Arcsin(${I.u})`, d: (I) => F('1', `√(1-${I.u2})`), kind: 'arc', inners: ['x', 'x2', 'sqrt', 'half', 'third'] },
+  argsh: { t: (I) => `argsh(${I.u})`, d: (I) => F('1', `√(${I.u2}+1)`), kind: 'hyp', inners: ['x', 'x2', 'two', 'sqrt'] },
+  sinh: { t: (I) => `sinh(${I.u})`, d: (I) => F(`cosh(${I.u})`), kind: 'hyp', inners: ['x', 'x2', 'two', 'three', 'sqrt'] },
+  cosh: { t: (I) => `cosh(${I.u})`, d: (I) => F(`sinh(${I.u})`), kind: 'hyp', inners: ['x', 'x2', 'two', 'three', 'sqrt'] },
+  exp: { t: (I) => (I.u === 'x' ? 'e^x' : `e^(${I.u})`), d: (I) => F(I.u === 'x' ? 'e^x' : `e^(${I.u})`), kind: null, inners: ['two', 'three', 'x2', 'sqrt'] },
+  sin: { t: (I) => `sin(${I.u})`, d: (I) => F(`cos(${I.u})`), kind: null, inners: ['two', 'three', 'x2'] },
+  ln: { t: (I) => `ln(1+${I.u2})`, d: (I) => F(mulT('2', I.u), `1+${I.u2}`), kind: null, inners: ['x'] },
+};
+// A composition outer(inner): {t, d: fraction, kind}.
+function comp(o, i) {
+  const O = OUTERS[o];
+  const I = INNERS[i];
+  const d = o === 'ln' || I.u === 'x' ? O.d(I) : fmul(O.d(I), I.du);
+  return { t: O.t(I), d, kind: O.kind, I };
+}
+const PLAIN = [
+  { t: 'x^2', d: F('2x') }, { t: 'x', d: F('1') }, { t: 'x^3', d: F('3x^2') },
+  { t: 'e^(2x)', d: F('2e^(2x)') }, { t: 'e^x', d: F('e^x') }, { t: 'sin(2x)', d: F('2cos(2x)') },
+];
+const par = (t) => (hasSum(t) ? `(${t})` : t);
+
+// f, f′ written out, the first rule, the guided rule line and its holes.
+function rulData(rng, shapes) {
+  const arcs = ['arctg', 'arcsin', 'argsh', 'sinh', 'cosh'];
+  for (let tries = 0; tries < 200; tries++) {
+    const shape = rng.pick(shapes);
+    const o = rng.pick(arcs);
+    const A = comp(o, rng.pick(OUTERS[o].inners));
+    let f; let fp; let rule; let parts; let kind = A.kind;
+    if (shape === 'product') {
+      const B = rng.chance(0.5) ? rng.pick(PLAIN) : (() => { const o2 = rng.pick(['exp', 'sin', 'ln']); return comp(o2, rng.pick(OUTERS[o2].inners)); })();
+      if (B.t === A.t) continue;
+      const [U, W] = rng.chance(0.5) ? [A, B] : [B, A];
+      f = mulT(U.t, W.t);
+      fp = `${fracT({ n: mulT(U.d.n, W.t), d: U.d.d })}+${fracT({ n: mulT(U.t, W.d.n), d: W.d.d })}`;
+      rule = 'product';
+      parts = { u: U, v: W, line: `(${fracT(U.d)})×${par(W.t)}+${par(U.t)}×(${fracT(W.d)})`, holes: [fracT(U.d), fracT(W.d)] };
+    } else if (shape === 'quotient') {
+      const T = comp(rng.pick(['sinh', 'cosh', 'exp', 'sin']), rng.pick(['two', 'three']));
+      const den = rng.pick([{ t: 'x^2+1', d: '2x' }, { t: 'x^2+2', d: '2x' }, { t: 'x+1', d: '1' }]);
+      f = `${T.t}/(${den.t})`;
+      fp = `(${mulT(T.d.n, den.t)}-${mulT(den.d, T.t)})/(${den.t})^2`;
+      rule = 'quotient';
+      kind = /sinh|cosh/.test(T.t) ? 'hyp' : null;
+      parts = { u: T, v: { t: den.t, d: F(den.d) }, line: `((${fracT(T.d)})×(${den.t})-${mulT(T.t, den.d)})/(${den.t})^2`, holes: [fracT(T.d)] };
+    } else if (shape === 'chain') {
+      if (A.I.u === 'x') continue;
+      f = A.t;
+      fp = fracT(A.d);
+      rule = 'chain';
+      const O = OUTERS[o].d(A.I);
+      parts = { line: `${fracT(O).includes('/') ? `(${fracT(O)})` : fracT(O)}×(${fracT(A.I.du)})`, holes: [fracT(A.I.du)], outer: O };
+    } else {
+      // An exponential inside an arc: Arctg(e^(2x)), argsh(e^(3x)).
+      const o2 = rng.pick(['arctg', 'argsh']);
+      const k = rng.pick([2, 3]);
+      const I = { u: `e^(${k}x)`, du: F(`${k}e^(${k}x)`), u2: `e^(${2 * k}x)` };
+      const O = OUTERS[o2].d(I);
+      f = OUTERS[o2].t(I);
+      fp = fracT(fmul(O, I.du));
+      rule = 'chain';
+      kind = OUTERS[o2].kind;
+      parts = { line: `(${fracT(O)})×(${fracT(I.du)})`, holes: [fracT(I.du)], outer: O };
+    }
+    const node = parse(fp);
+    if (equivFinal({ target: 'no-prime' }, node) !== true) continue;
+    const ok = equivalent(node, expandDerivs(deriv(parse(f), 'x')), { vars: ['x'], domain: RUL_DOMAIN, seed: seedOf(f) }).equal;
+    if (!ok) throw new Error(`a1-deriv-rules: ${f} ≠ ${fp}`);
+    return { f, fp, rule, parts, kind };
+  }
+  return {
+    f: 'Arctg(√x)×e^(2x)', fp: 'e^(2x)/(2√x×(1+x))+2e^(2x)×Arctg(√x)', rule: 'product', kind: 'arc', fallback: true,
+    parts: { u: { t: 'Arctg(√x)', d: F('1', '2√x×(1+x)') }, v: { t: 'e^(2x)', d: F('2e^(2x)') }, line: '(1/(2√x×(1+x)))×e^(2x)+Arctg(√x)×(2e^(2x))', holes: ['1/(2√x×(1+x))', '2e^(2x)'] },
+  };
+}
+
+const RULE_OPTIONS = [
+  { id: 'product', label: '(uv)′ = u′v + uv′' }, { id: 'quotient', label: '(u/v)′ = (u′v − uv′)/v²' },
+  { id: 'chain', label: '(f∘g)′ = f′(g)·g′' }, { id: 'sum', label: '(u + v)′ = u′ + v′' },
+];
+const RULE_NAME = { product: 'Règle du produit', quotient: 'Règle du quotient', chain: 'Règle de chaîne' };
+const SHAPES = { 1: ['product', 'product', 'chain', 'quotient'], 2: ['product', 'product', 'chain', 'quotient'], 3: ['product', 'product', 'chain', 'quotient', 'chainExp'] };
+
+// f′ at 0 or 1 when it is a fraction (level 5).
+function niceAt(fp, rng) {
+  let zero = null;
+  for (const a of rng.shuffle([0, 1])) {
+    const at = parse(fp.replace(/x/g, `(${a})`).replace(/\(\((\d)\)\)/g, '($1)'));
+    let q = null;
+    try { q = exactValue(at); } catch { q = null; }
+    if (q && Math.abs(q.n) <= 60 && q.d <= 30) {
+      if (q.n !== 0) return { a, at: toText(at), q };
+      zero ||= { a, at: toText(at), q };
+    }
+  }
+  return rng.chance(0.3) ? zero : null;
+}
+
+function rulLines(level, rng, opts) {
+  let d = rulData(rng, SHAPES[Math.min(level, 3)]);
+  let nice = level === 5 ? niceAt(d.fp, rng) : null;
+  for (let i = 0; level === 5 && !nice && i < 60; i++) { d = rulData(rng, SHAPES[3]); nice = niceAt(d.fp, rng); }
+  const fNode = parse(d.f);
+  const start = toText(deriv(fNode, 'x'));
+  const key = `${RUL}:${d.f}:${level}`;
+  const judge = { kind: 'equiv', vars: ['x'], dvar: 'x', domain: RUL_DOMAIN, target: 'no-prime', seed: seedOf(key) };
+  const last = d.kind === 'arc' ? 'arc' : d.kind === 'hyp' ? 'hyp' : 'rules';
+  const finalLine = E(d.fp, 'Assembler', last, 'simplify');
+  const P = d.parts;
+  let script;
+  if (level <= 2) {
+    const ruleLine = E(P.line, RULE_NAME[d.rule], 'rules', d.rule);
+    const firstFinal = equivFinal(judge, parse(ruleLine.math)) === true;
+    const given = d.rule === 'chain'
+      ? `f(x) = ${MT(d.f)} est une composée ; la dérivée extérieure vaut ${MT(fracT(P.outer))}.`
+      : `u = ${MT(P.u.t)}, v = ${MT(P.v.t)}${level === 1 ? `, u′ = ${MT(fracT(P.u.d))}, v′ = ${MT(fracT(P.v.d))}` : ''}.`;
+    const choose = {
+      kind: 'decision', prompt: 'Quelle règle d\'abord ?', options: [
+        { id: 'product', label: 'Règle du produit', valid: d.rule === 'product', why: 'Ce n\'est pas un produit de deux fonctions de x.' },
+        { id: 'quotient', label: 'Règle du quotient', valid: d.rule === 'quotient', why: 'Il n\'y a pas de x au dénominateur.' },
+        { id: 'chain', label: 'Règle de chaîne', valid: d.rule === 'chain', why: 'Regarde l\'opération la plus extérieure : c\'est elle qui décide de la première règle.' },
+      ],
+    };
+    script = [
+      level === 1 ? { kind: 'note', html: `${RULE_NAME[d.rule]} : ${given}` } : choose,
+      ...(level === 2 ? [{ kind: 'note', html: given }] : []),
+      blanked(ruleLine, P.holes),
+      ...(firstFinal ? [] : [finalLine]),
+    ];
+  } else {
+    const st = stepDeriv(fNode, 'x');
+    const l1 = E(toText(st.node), RULE_NAME[d.rule], 'rules', d.rule);
+    script = level === 3
+      ? [l1, { kind: 'rule', ask: 'Quelle règle as-tu utilisée en premier ?', correct: d.rule, options: RULE_OPTIONS }, finalLine]
+      : [l1, finalLine];
+  }
+  const subs = [RUL_SUB.rules, ...(last !== 'rules' ? [RUL_SUB[last]] : [])];
+  let prompt = rng.pick([`Dérive f(x) = ${MT(d.f)} sur ]0 ; 1[.`, `Calcule f′(x) pour f(x) = ${MT(d.f)}, x ∈ ]0 ; 1[.`]);
+  if (nice) {
+    const label = `f′(${nice.a})`;
+    script.push(segment(`Calcule maintenant ${label}.`, `${label} =`, nice.at, { kind: 'value', form: 'irreducible' }));
+    script.push(E(N(nice.q), `${label} = ${frN(nice.q)}`, 'rules', 'simplify'));
+    prompt = `Soit f(x) = ${MT(d.f)}. Dérive f, puis calcule ${label}.`;
+  }
+  return linesItem({
+    skill: RUL, level, prompt, start, judge, mode: modeOf(level), script, keys: ['calcx', 'calcfn', 'explog', 'trig'],
+    declares: { vars: ['x'], dvar: 'x' }, subgoals: subs, tapActions: level === 3 ? 'deriv' : null,
+    hints: H(
+      d.rule === 'product' ? `Produit de deux facteurs : (uv)′ = u′v + uv′, avec u = ${MT(P.u.t)} et v = ${MT(P.v.t)}.`
+        : d.rule === 'quotient' ? `Quotient : (u/v)′ = (u′v − uv′)/v², avec u = ${MT(P.u.t)} et v = ${MT(P.v.t)}.`
+          : 'Composée : (f∘g)′ = f′(g)·g′. Arctg′ = 1/(1 + x²), Arcsin′ = 1/√(1 − x²), Argsh′ = 1/√(1 + x²), sinh′ = cosh.',
+      `= ${boxed(blanked(E(P.line), P.holes))}`,
+      `= ${MT(d.fp)}`,
+    ),
+    key, exam: examOf(opts), fallback: d.fallback,
+  });
+}
+
+function rulMcq(rng) {
+  const d = rulData(rng, ['product', 'product', 'chain']);
+  const start = deriv(parse(d.f), 'x');
+  const judge = { kind: 'equiv', vars: ['x'], dvar: 'x', domain: RUL_DOMAIN, target: 'no-prime', seed: seedOf(d.f) };
+  const eq = { vars: ['x'], domain: RUL_DOMAIN, seed: judge.seed };
+  const right = parse(d.fp);
+  const options = [{ node: right, html: MT(d.fp), correct: true }];
+  const isNew = (n) => options.every((o) => { try { return !equivalent(o.node, n, eq).equal; } catch { return false; } });
+  const finish = (n) => pretty(expandDerivs(n));
+  const cands = trapAnswers('equiv', start, judge, finish);
+  // One option per trap first, the arc table first.
+  const order = ['a1_arc_deriv_table', 'g6_chain_forgot', 'g6_product_naive', 'g6_quotient_sign'];
+  cands.sort((a, b) => (order.indexOf(a.rule) + 10 * (order.indexOf(a.rule) < 0)) - (order.indexOf(b.rule) + 10 * (order.indexOf(b.rule) < 0)));
+  const used = new Set();
+  for (const c of cands) {
+    if (!order.includes(c.rule)) continue;
+    if (options.length < 4 && !used.has(c.rule) && isNew(c.node)) { options.push({ node: c.node, html: MM(c.node), correct: false, rule: c.rule }); used.add(c.rule); }
+  }
+  // Not enough traps: the sign of the second term, the derivative times 2.
+  const extra = [d.fp.replace(/\+(?![^(]*\))/, '-'), `2×(${d.fp})`].map((t) => parse(t));
+  for (const n of extra) if (options.length < 4 && isNew(n)) options.push({ node: n, html: MM(pretty(n)), correct: false });
+  return mcq({
+    skill: RUL, level: 4, prompt: `Quelle est la dérivée de f(x) = ${MT(d.f)} sur ]0 ; 1[ ?`,
+    options: uniqOptions(options.map(({ html, correct, rule }) => ({ html, correct, rule }))), key: `mcq:${d.f}`,
+    exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: d.fallback,
+    solution: [{ html: `f′(x) = ${MT(d.fp)}`, note: RULE_NAME[d.rule] }],
+  }, rng);
+}
+
+const RUL_TF = [
+  { s: 'Si f est dérivable et f′ > 0 sur ]0 ; 1[, alors f est strictement croissante sur ]0 ; 1[.', truth: true, why: 'Vrai : par les accroissements finis, f(y) − f(x) = f′(c)(y − x) > 0 pour x < y.' },
+  { s: 'Une fonction monotone, non constante et dérivable sur ]0 ; 1[ a f′ ≥ 0 partout ou f′ ≤ 0 partout.', truth: true, why: 'Vrai : si f est croissante, ses taux d\'accroissement sont ≥ 0, et leur limite f′(x) aussi.' },
+  { s: '(Arctg x)′ = 1/√(1 − x²) pour |x| < 1.', truth: false, why: 'Faux : (Arctg x)′ = 1/(1 + x²). C\'est Arcsin qui a pour dérivée 1/√(1 − x²).' },
+  { s: '(Arcsin x)′ = 1/(1 + x²) pour |x| < 1.', truth: false, why: 'Faux : (Arcsin x)′ = 1/√(1 − x²). C\'est Arctg qui a pour dérivée 1/(1 + x²).' },
+  { s: '(Argsh x)′ = 1/√(1 + x²).', truth: true, why: 'Vrai : Argsh x = Log(x + √(x² + 1)), de dérivée 1/√(x² + 1).' },
+];
+function rulTf(rng) {
+  const t = rng.pick(RUL_TF);
+  if (!t.truth) return vfMcq(RUL, t.s, false, 'a1_arc_deriv_table', t.why, rng, t.s);
+  return tfItem({ skill: RUL, level: 4, statement: t.s, truth: true, key: t.s, explanation: t.why, exam: { format: 'tf', points: 1 } });
+}
+
+function derivRules(level, rng, profile, opts = {}) {
+  if (opts.exam === 'mcq') return rulMcq(rng);
+  if (opts.exam === 'tf') return rulTf(rng);
+  return rulLines(level, rng, opts);
+}
+
 export const GEN = {
   ...stubGen(SKILLS.map((s) => s.id)),
   [DEF]: derivDef,
+  [RUL]: derivRules,
   ...INV,
   ...C1,
 };
