@@ -562,6 +562,8 @@ class P {
       }
       case 'op':
         if (t.s === '√') {
+          // √2/2 is (√2)/2: a number right after √ is its whole radicand.
+          if (this.peek()?.k === 'num') return { op: 'num', n: sqrtNode(num(Number(this.next().s))) };
           const a = this.atom();
           if (a.op !== 'num') fail('√ s\'applique à un nombre.');
           return { op: 'num', n: sqrtNode(a.n) };
