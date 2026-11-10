@@ -17,6 +17,7 @@
 // free lines without help.
 
 import { parse, tryParse } from '../../cas/parse.js';
+import { toReadable } from '../../cas/print.js';
 import { limitOf } from '../../judges/limit.js';
 import { sameLimit } from '../../cas/limit.js';
 import { MT, MM, FM, linesItem, mcq, tfItem, blocksItem, tokensItem } from './kit.js';
@@ -27,6 +28,10 @@ const ED = 'a1-seq-eps-n-def';
 const EN = 'a1-seq-eps-n';
 const SL = 'a1-seq-limits';
 
+// |aₙ − L| in text (L a number).
+const gapT = (L) => (L === 0 ? '|aₙ|' : L < 0 ? `|aₙ + ${-L}|` : `|aₙ − ${L}|`);
+// A line as readable text (notes are plain text).
+const RD = (t) => toReadable(parse(t, { vars: ['n'] }));
 // Mathematics if the core reads it, else text.
 const ML = (t) => { const n = tryParse(t); return n ? MM(n) : t; };
 const SEQ_KEYS = ['calc', 'seq'];
@@ -272,16 +277,16 @@ function enLines(level, rng, opts = {}, { kinds, problemPart = false } = {}) {
     parts.push({ html: `Majore ${MT(d.goal, V)} par une expression simple c/n${d.p === 2 ? '²' : ''} :`, ask: null, start: d.goal, judge: bJudge, lines: [level <= 2 ? blanked(line, [String(d.k)], V) : line] });
   }
   const last = d.bound || d.goal;
-  const nLine = E(d.N, `${MT(last, V)} ≤ ε dès que n ≥ ${MT(d.N)}`, 'N', 'solve');
+  const nLine = E(d.N, `${RD(last)} ≤ ε dès que n ≥ ${RD(d.N)}`, 'N', 'solve');
   parts.push({ html: `Résous ${MT(last, V)} ≤ ε en n : choisis N(ε).`, ask: 'N =', start: 'N', judge: nJudge, lines: [level === 1 ? blanked(nLine, [String(d.k)]) : nLine] });
   const { start, judge, script } = partsScript(parts, level, EN_CHOICES);
-  script.push({ kind: 'note', html: `Pour tout n ≥ N(ε) = ${MT(d.N)}, |aₙ − ${frT(d.L)}| ≤ ${MT(last, V)} ≤ ε : lim aₙ = ${frT(d.L)}.` });
+  script.push({ kind: 'note', html: `Pour tout n ≥ N(ε) = ${MT(d.N)}, ${gapT(d.L)} ≤ ${MT(last, V)} ≤ ε : lim aₙ = ${frT(d.L)}.` });
   const fShow = MT(d.f, V);
   return linesItem({
     skill: EN, level, mode: problemPart ? 'free' : modeOf(level), start, judge, script,
-    prompt: `${problemPart ? 'Deuxième partie : prouve' : 'Montre'} par la définition que lim aₙ = ${frT(d.L)} pour aₙ = ${fShow} : simplifie |aₙ − ${frT(d.L)}|${d.bound ? `, majore-le par c/n${d.p === 2 ? '²' : ''}` : ''}, puis donne N(ε) tel que |aₙ − ${frT(d.L)}| ≤ ε pour tout n ≥ N(ε).`,
+    prompt: `${problemPart ? 'Deuxième partie : prouve' : 'Montre'} par la définition que lim aₙ = ${frT(d.L)} pour aₙ = ${fShow} : simplifie ${gapT(d.L)}${d.bound ? `, majore-le par c/n${d.p === 2 ? '²' : ''}` : ''}, puis donne N(ε) tel que ${gapT(d.L)} ≤ ε pour tout n ≥ N(ε).`,
     hints: H('Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ».',
-      `|aₙ − ${frT(d.L)}| = ${MT(d.goal, V)}${d.bound ? ` ≤ ${MT(d.bound, V)}` : ''} ≤ ε dès que n ≥ ▢`,
+      `${gapT(d.L)} = ${MT(d.goal, V)}${d.bound ? ` ≤ ${MT(d.bound, V)}` : ''} ≤ ε dès que n ≥ ▢`,
       `${MT(d.goal, V)}${d.bound ? ` ≤ ${MT(d.bound, V)}` : ''} ≤ ε dès que n ≥ ${MT(d.N)} : N(ε) = ${MT(d.N)}`),
     noHints: level === 5 || problemPart || !!opts.exam,
     subgoals: EN_SUB, keys: ['calc', 'greek', 'seq'], tapActions: level === 3 ? 'steps' : null,
@@ -396,8 +401,8 @@ function slPoly(rng, finite) {
     const value = p === qd ? N(r) : p < qd ? '0' : a > 0 ? '+∞' : '-∞';
     const Pt = joinT(P.map(([c, k]) => mono(c, k)));
     const Qt = joinT(Q.map(([c, k]) => mono(c, k)));
-    const start = `(${Pt})/(${Qt})`;
-    const divided = `(${joinT(P.map(([c, k]) => divTerm(c, k, qd)))})/(${joinT(Q.map(([c, k]) => divTerm(c, k, qd)))})`;
+    const start = `${P.length > 1 ? `(${Pt})` : Pt}/(${Qt})`;
+    const divided = `${P.length > 1 ? `(${joinT(P.map(([c, k]) => divTerm(c, k, qd)))})` : `(${divTerm(a, p, qd)})`}/(${joinT(Q.map(([c, k]) => divTerm(c, k, qd)))})`;
     // The lowest terms kept (a1_dominant_term_wrong).
     const lowP = P.length > 1 ? P[1] : P[0];
     const wrongLow = lowP[1] === ib && P.length > 1 ? N(q(lowP[0], b2)) : null;
@@ -435,8 +440,8 @@ function slSqrt(rng) {
       kind: 'sqrt', start: `√(${rad})-n`, value,
       lines: [
         E(`(${rad}-n^2)/(√(${rad})+n)`, 'Multiplier et diviser par la quantité conjuguée √(…) + n', 'simplify', 'conj'),
-        E(`(${top})/(√(${rad})+n)`, 'Simplifier : (√A)² − n² = A − n²', 'simplify', 'simplify'),
-        E(`(${divTop})/(√(${divRad})+1)`, 'Diviser en haut et en bas par n', 'simplify', 'factor'),
+        E(`${r === 0 ? top : `(${top})`}/(√(${rad})+n)`, 'Simplifier : (√A)² − n² = A − n²', 'simplify', 'simplify'),
+        E(`${r === 0 ? divTop : `(${divTop})`}/(√(${divRad})+1)`, 'Diviser en haut et en bas par n', 'simplify', 'factor'),
         E(value, `√(…) → 1 : la limite vaut ${frT(p)}/2`, 'limit', 'limit'),
       ],
       blank: [1, [top]],
@@ -641,10 +646,11 @@ function slLines(level, rng, opts = {}) {
 
 function slMcq(rng, level, opts = {}) {
   const d = slData(rng, SL_KINDS);
-  const options = [{ html: MT(d.value), correct: true }];
+  const show = (t) => (t === '+∞' ? '+∞' : t === '-∞' ? '−∞' : MT(t));
+  const options = [{ html: show(d.value), correct: true }];
   for (const w of d.wrong) {
     if (options.length >= 4) break;
-    const html = MT(w.text);
+    const html = show(w.text);
     if (options.some((o) => o.html === html)) continue;
     options.push({ html, correct: false, rule: w.rule || null });
   }
