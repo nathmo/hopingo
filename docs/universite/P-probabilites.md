@@ -1218,6 +1218,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-chi2-gof` — Test χ² d'adéquation
 - **Année** 15 · **Prérequis** `p-test-setup`, `p-family`, `p-binom` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties `prob`/`stat` : e₁ (ou e), T, r, s₅(r) lu pour le r de l'élève, décision à 5 %, puis s₁(r) pour encadrer la p-valeur, et « Interpréter ». Gabarits : dé, catégories à probabilités fixées (couleurs, groupes sanguins, Mendel 9 : 3 : 3 : 1, jours) ; Poisson ajustée (c = 1) au niveau 5 seulement, effectifs attendus donnés à 0,1 près. Les eᵢ se calculent par une partie (la première classe), les autres sont donnés en note ; pas d'item `table`. T tombe à au moins 0,4 de chaque seuil. Le QQ de la loi fixée « QI en 6 classes » n'est pas repris.
 - **Pourquoi ces prérequis** : `p-test-setup` : hypothèses et p-valeur ; `p-family` : loi χ²(r).
 - **Intro** : k classes, effectifs observés oᵢ, effectifs attendus eᵢ = n·pᵢ (des **effectifs**, pas des proportions). T = Σ(oᵢ − eᵢ)²/eᵢ ~ χ²(r) sous H₀, avec r = k − 1 si les pᵢ sont fixées, r = k − 1 − c si c paramètres sont estimés sur les données. On rejette pour T grand (test unilatéral à droite). Exemple : dé lancé 60 fois : `T = (25 + 4 + 1 + 4 + 0 + 100)/10 = 13,4` ; `r = 5, s₅ = 11,070` (note : rejet à 5 %).
 - **Juge** : protocole d'un test ; `table` pour les eᵢ et les termes (colonne dérivée recalculée à partir des valeurs de l'élève) ; `stat {decimals: 2}` pour T ; `value` pour r · **Forme finale** : décision, encadrement de la p-valeur par la table (0,01 < p < 0,05), interprétation.
@@ -1242,6 +1243,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-chi2-indep` — Test χ² d'indépendance
 - **Année** 15 · **Prérequis** `p-test-chi2-gof`, `p-joint-disc` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties e₁₁, T, r, s₅(r), décision, s₁(r), puis « Interpréter ». Tableaux 2 × 2, 2 × 3, 3 × 2, 3 × 3 construits à l'envers (marges à poids entiers, eᵢⱼ entiers ≥ 5, écarts ±d sur un ou deux blocs 2 × 2) ; l'énoncé « H₀ et H₁ en mots » du niveau 5 est l'interprétation. Le V/F « rejeter montre une cause » est un QCM Vrai/Faux (pas de contre-exemple numérique).
 - **Pourquoi ces prérequis** : `p-test-chi2-gof` : même statistique Σ(o − e)²/e.
 - **Intro** : tableau de contingence h × k ; sous H₀ (indépendance), e_ij = n_i·· n_·j/n ; T = Σ(n_ij − e_ij)²/e_ij ~ χ²((h − 1)(k − 1)). Exemple : tableau `[[30, 20], [20, 30]]` : `e_ij = 50 · 50/100 = 25` ; `T = 4 · 25/25 = 4 > 3,841`.
 - **Juge** : protocole ; `table` (effectifs attendus, termes) ; `stat`, `value` · **Forme finale** : décision et interprétation.
@@ -1261,6 +1263,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-chi2-var` — χ² sur une variance : test et IC
 - **Année** 16 · **Prérequis** `p-test-setup`, `p-family` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Test unilatéral H₁ : σ² > σ₀² seulement ; parties T, r, s₅(r), décision, bornes de l'IC à 95 % pour σ² (quantiles 0,025 et 0,975 fournis), « Interpréter ». Les bornes sont jugées à 0,01 près, sans l'arrondi vers l'extérieur d'EE-209 (c'est `p-ci-round`).
 - **Pourquoi ces prérequis** : `p-test-setup` : H₀, H₁ et région critique.
 - **Intro** : données normales, μ inconnue : T = (n − 1)S²/σ₀² ~ χ²(n − 1) sous H₀ : σ = σ₀. Pour H₁ : σ > σ₀, on rejette si T > χ²_{n−1 ; 1−α}. IC pour σ² : [(n − 1)s²/χ²_{1−α/2} ; (n − 1)s²/χ²_{α/2}] (les deux quantiles sont donnés par l'énoncé ; la Table 4 ne donne que la queue supérieure). Exemple : `T = 10 · 15/10 = 15 < 18,307` (note : pas de rejet).
 - **Juge** : protocole ; `stat {decimals: 2}` ; EE-209 : `ciRule: 'outward'` pour l'IC · **Forme finale** : décision, ou IC pour σ² (ou σ).
@@ -1279,6 +1282,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-interpret` — Interpréter une p-valeur ou un IC
 - **Année** 15 · **Prérequis** `p-ci-mean`, `p-test-setup` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U7). Items `mcq` et `tf` seulement : L1 une phrase « juste ou contresens » (QCM à 2 options), L2 « quelle phrase est juste », L3 et L5 « laquelle est fausse », L4 un IC et une p-valeur avec la dualité test–IC (le classement de 5 hypothèses du catalogue est un QCM). Les phrases fausses viennent des 9 pièges du module. Les V/F faux sur des niveaux ont un contre-exemple numérique (p_obs = 0,07 ; α = 0,01) ; l'intersection d'IC et les tests multiples sont des QCM Vrai/Faux.
 - **Pourquoi ces prérequis** : `p-ci-mean` : l'IC à interpréter ; `p-test-setup` : la p-valeur à interpréter.
 - **Intro** : la p-valeur est Pr(données au moins aussi extrêmes | H₀), pas Pr(H₀ | données). Ne pas rejeter H₀ ne prouve pas H₀. Un IC à 95 % vient d'une **méthode** qui capture θ dans 95 % des répétitions ; une fois calculé, il contient θ ou non. Rejeté à 5 % ⇒ rejeté à 10 %, pas l'inverse. Significatif ne veut pas dire important. Bilatéral : rejet au niveau α ⇔ θ₀ hors de l'IC à 1 − α. Vingt tests à 5 % sur des H₀ vraies donnent environ un rejet par hasard (p-hacking). Exemple : `IC₉₅(p) = [0,2 ; 0,6]` ; `p = 0,7 est rejeté à 5 %` (note : 0,7 est hors de l'IC).
 - **Juge** : items `mcq` (4 options, une juste) et `tf` ; pas de lignes · **Forme finale** : l'option choisie.
@@ -1301,6 +1305,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-reg-ls` — Droite des moindres carrés, r et R²
 - **Année** 15 · **Prérequis** `p-cov-corr`, `l-orth-lsq`, `p-desc-summary` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties x̄, ȳ, S_xx, S_xy, β̂, α̂, S_yy, R² (`prob`, exactes) ; niveau 4 : une fois sur deux à partir des sommes brutes (sans R²) ; niveau 5 : à partir de r, s_x, s_y et des moyennes, puis la droite de x sur y. Pas d'item `table` ni de `code`. Aux niveaux 1 à 3, β̂ est un décimal à deux chiffres au plus.
 - **Pourquoi ces prérequis** : `p-cov-corr` : r = S_xy/√(S_xx·S_yy).
 - **Intro** : modèle Yᵢ = α + βxᵢ + εᵢ. β̂ = S_xy/S_xx = Σ(xᵢ − x̄)(yᵢ − ȳ)/Σ(xᵢ − x̄)² = r·s_y/s_x ; α̂ = ȳ − β̂x̄ ; la droite passe par (x̄, ȳ) ; les résidus somment à 0. r = S_xy/√(S_xx·S_yy) ; R² = r² = ESS/TSS. La régression de x sur y n'est **pas** la droite inverse (pente r·s_x/s_y). Exemple : `β̂ = 6/10 = 0,6 ; α̂ = 4 − 0,6 · 3 = 2,2` ; `R² = 36/60 = 0,6`.
 - **Juge** : lignes `x̄`, `ȳ`, `S_xx`, `S_xy`, `S_yy`, `β̂`, `α̂`, `r`, `R²` (`prob` si exact, sinon `stat {decimals: 3}`) · **Forme finale** : droite ŷ = α̂ + β̂x, puis r ou R² demandé.
@@ -1324,6 +1329,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-reg-test` — Tests t et IC sur les coefficients
 - **Année** 15 · **Prérequis** `p-reg-ls`, `p-test-t1` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Niveaux 1 à 3 : test sur β (RSS, σ̂², se, t_obs, ν, t_c, décision, IC pour β) ; niveaux 4 et 5 et variante `open` (10 points, exemple 3) : test sur α, avec β̂ et α̂ à calculer au niveau 5. Les lignes du corrigé suivent les valeurs arrondies (3 décimales), comme l'élève ; la variante `coef` juge avec ces mêmes valeurs.
 - **Pourquoi ces prérequis** : `p-test-t1` : statistique t et quantile de Student.
 - **Intro** : σ̂² = RSS/(n − 2) avec RSS = Σ(yᵢ − ŷᵢ)² = S_yy − β̂S_xy. se(β̂) = σ̂/√S_xx ; se(α̂) = σ̂·√(1/n + x̄²/S_xx). T = (β̂ − β₀)/se(β̂) ~ t_{n−2} sous H₀ (de même pour α) ; IC β̂ ± t·se(β̂). Exemple : `σ̂² = 2,4/3 = 0,8` ; `t_obs = 0,6/√(0,8/10) ≈ 2,12 < s₅(3) = 3,182`.
 - **Juge** : protocole d'un test ; lignes `RSS`, `σ̂²`, `se`, `t_obs`, `ν`, `t_c` · **Forme finale** : décision et interprétation (et IC si demandé).
@@ -1344,6 +1350,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-reg-multi` — Régression multiple, matrice de design, test F emboîté
 - **Année** 15 · **Prérequis** `p-reg-test`, `l-orth-lsq` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). L1, L2 et la variante `mcq` : choix de la matrice de design (QCM, pas de juge `matrix`) ; L3 : équations normales d'une régression simple (det, b̂, â) ; L4 et L5 : test F emboîté (ν₁, ν₂, F ; décision dans « Interpréter », quantile F donné). Le test t sur un coefficient de la régression multiple n'est pas repris (il est dans `p-reg-test`).
 - **Pourquoi ces prérequis** : `p-reg-test` : test t sur chaque coefficient.
 - **Intro** : y = Xβ + ε ; équations normales XᵀXβ̂ = Xᵀy, β̂ = (XᵀX)⁻¹Xᵀy si les colonnes de X sont indépendantes ; S² = ‖y − Xβ̂‖²/(n − p). Test βᵢ = 0 : T = β̂ᵢ/(S√vᵢᵢ) ~ t_{n−p}, vᵢᵢ = ((XᵀX)⁻¹)ᵢᵢ. Modèles emboîtés (q < p colonnes) : F = ((SC_q − SC_p)/(p − q))/(SC_p/(n − p)) ~ F_{p−q, n−p} (quantile donné). Exemple : `F = (20/2)/(30/16) ≈ 5,33 > F₂,₁₆ ; ₀,₉₅ = 3,63`.
 - **Juge** : `matrix` (matrice de design, jugée colonne par colonne à une permutation près, et refusée si ses colonnes sont dépendantes) ; protocole d'un test pour F et T · **Forme finale** : X, β̂, ou décision.
@@ -1362,6 +1369,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-reg-diag` — Diagnostics d'une régression
 - **Année** 15 · **Prérequis** `p-reg-ls` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Graphiques tracés par l'app (SVG en lecture seule, tirés avec la graine de l'item) : résidus contre ŷ, dans l'ordre, QQ-plot. L1 3 défauts, L2 5, L3 deux graphiques, L4 le remède (les 3 pièges en options), L5 diagnostic et remède. Pas de `match` : QCM successifs. Les V/F faux sont des QCM Vrai/Faux.
 - **Pourquoi ces prérequis** : `p-reg-ls` : résidus de la droite ajustée.
 - **Intro** : les hypothèses se vérifient sur les **résidus** : linéarité (pas de courbure dans résidus contre ŷ), variance constante (pas d'entonnoir), normalité (QQ-plot des résidus aligné), indépendance (pas de structure dans l'ordre, autocovariance), points influents (levier élevé, distance de Cook grande). Un R² élevé ne valide pas le modèle. Exemple : `résidus en entonnoir` → `hétéroscédasticité`.
 - **Juge** : items `mcq` sur des graphiques produits par l'app (`plot`, lecture seule) · **Forme finale** : l'hypothèse violée, puis le remède proposé (QCM).
@@ -1378,6 +1386,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-bayes-beta` — Modèle Beta-Bernoulli : a posteriori, PM, MAP
 - **Année** 16 · **Prérequis** `p-bayes-formula`, `p-family`, `p-mle` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties α′, β′, PM, MAP (et variance aux niveaux 4 et 5, MLE au niveau 5). La mise à jour en deux temps du niveau 5 n'est pas reprise (comparaison avec le MLE à la place). Dénominateurs ≤ 30.
 - **Pourquoi ces prérequis** : `p-bayes-formula` : a posteriori ∝ vraisemblance × a priori.
 - **Intro** : a priori θ ~ Beta(α, β) (uniforme = Beta(1, 1)) ; N succès en n essais de Bernoulli ; a posteriori θ | données ~ Beta(α + N, β + n − N). Moyenne a posteriori PM = (α + N)/(α + β + n) ; MAP = (α + N − 1)/(α + β + n − 2) ; variance a posteriori PM(1 − PM)/(1 + α + β + n). L'a posteriori sert d'a priori pour les données suivantes. Exemple : `uniforme, 2 réussites sur 2 → Beta(3, 1)` ; `Beta(2, 2), 7 sur 10 → Beta(9, 5), PM = 9/14, MAP = 2/3`.
 - **Juge** : décision (famille et paramètres) puis `prob` · **Forme finale** : loi a posteriori nommée ; PM, MAP, variance exactes.
@@ -1401,6 +1410,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-bayes-gauss` — Modèle gaussien-gaussien
 - **Année** 16 · **Prérequis** `p-normal-std` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties 1/τ², n/σ², σ²_post, μ_post ; niveau 5 et variante `mcq` : nombre minimal de mesures (distracteurs : a priori oublié, inégalité mal tournée, variances additionnées).
 - **Pourquoi ces prérequis** : `p-normal-std` : lois normales a priori et a posteriori.
 - **Intro** : a priori θ ~ N(μ₀, τ²) ; données Xᵢ | θ ~ N(θ, σ²), σ² connu. A posteriori N(μ_post, σ²_post) avec μ_post = (nτ²x̄ + σ²μ₀)/(nτ² + σ²) et σ²_post = σ²τ²/(nτ² + σ²) ; autrement dit, les **précisions** s'additionnent : 1/σ²_post = 1/τ² + n/σ², et μ_post est la moyenne de μ₀ et x̄ pondérée par les précisions. MAP = PM = μ_post. Exemple (rhinocéros) : `μ_post = (2,2 + 0,5 · 2,5)/1,5 = 2,3` ; `σ²_post = 0,5/1,5 = 1/3`.
 - **Juge** : `prob` (fractions) ; `value` pour n · **Forme finale** : loi a posteriori N(μ_post, σ²_post), ou n minimal.
@@ -1424,6 +1434,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-bayes-conjugate` — Lois conjuguées ; Dirichlet-multinomiale
 - **Année** 16 · **Prérequis** `p-bayes-beta`, `p-count` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Niveau 1 et une variante `mcq` sur deux : probabilité multinomiale (coefficient, puis produit) ; sinon a posteriori de Dirichlet (α′₁, α₀ + n, PM₁, MAP₁). Le QCM « quelle a priori est conjuguée » est un V/F.
 - **Pourquoi ces prérequis** : `p-bayes-beta` : Beta-Bernoulli est le modèle de référence.
 - **Intro** : une loi a priori est conjuguée si l'a posteriori reste dans la même famille : Beta–Bernoulli, Dirichlet–multinomiale, normale–normale (moyenne), Gamma sur la précision d'une normale. Multinomiale : Pr(N₁, …, N_K) = n!/(N₁!···N_K!)·Π θₖ^(Nₖ). A priori Dir(α₁, …, α_K), comptes Nₖ : a posteriori Dir(α₁ + N₁, …, α_K + N_K), PMₖ = (αₖ + Nₖ)/(α₀ + n) avec α₀ = Σαₖ, MAPₖ = (αₖ + Nₖ − 1)/(α₀ + n − K). Exemple : `Dir(1, 1, 1) et comptes (3, 5, 2) → Dir(4, 6, 3)` ; `PM = (4/13 ; 6/13 ; 3/13)`.
 - **Juge** : décision (famille conjuguée) ; `prob` · **Forme finale** : loi a posteriori, PM, MAP.
