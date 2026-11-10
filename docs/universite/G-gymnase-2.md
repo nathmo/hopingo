@@ -666,6 +666,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-conic-from-data` — Trouver l'équation d'une conique à partir de ses éléments
 - **Année** 12.5 · **Prérequis** `g10-hyperbola`, `g10-parabola`, `g1-irr-eq`, `g10-ellipse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g10-hyperbola` : reconnaître une hyperbole (e > 1) ; `g10-parabola` : reconnaître une parabole (e = 1).
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarit 1 (F, D, e) avec e ∈ {1/2, 2, 1}, pour une directrice entière ; gabarit 2 (centre, foyer, e ∈ {3/5, 4/5, 5/4, 5/3, 1/2, 2}) au niveau 4 ; gabarit 3 (centre, sommet, point) au niveau 5. Toutes les lignes, de la définition MF = e·d(M, D) à la forme réduite, sont jugées par `conic` (l'égalité avec √ et |…| est élevée au carré par le noyau). La reconnaissance (e < 1, = 1, > 1) est une décision posée avant le calcul. Le niveau 5 du catalogue (CMS contrôle 3 Q2) est remplacé par le gabarit 3 ou le gabarit 1 sans aide ; `open` est un item `lines` sans aide (le type `problem` arrive avec U4).
 - **Intro** : définition par foyer, directrice et excentricité : MF = e·d(M, D). On élève au carré (les deux membres sont positifs), on développe, on reconnaît la conique. Ou bien : on écrit la forme réduite à paramètres (centre, a, b) et on traduit chaque condition en équation.
 - **Juge** : `equiv` `{vars:['x','y']}` pour les lignes de calcul ; `conic` `{equation}` pour l'équation finale · **Forme finale** : forme réduite, nature nommée.
 - **Niveaux** :
@@ -692,6 +693,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-conic-tangent` — Tangentes à une conique
 - **Année** 12.5 · **Prérequis** `g10-pole-polar`, `g10-ellipse`, `g10-hyperbola`, `g10-parabola` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g10-hyperbola` : dédoubler l'équation d'une hyperbole ; `g10-parabola` : dédoubler l'équation d'une parabole.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarit 1 (en T) : coniques Ax² ± By² = C à points entiers (niveaux 1 et 3 ; au niveau 3, T est donné par son abscisse et le signe de son ordonnée), translatées (niveau 2) ou avec un terme en xy (niveau 4). Gabarit 2 (depuis Q) au niveau 5 et en `open` : polaire de Q (`geom`), points de contact (`vector`), puis les deux tangentes (`geom`, count 2). Pas de méthode du discriminant en lignes (seulement une option du menu), ni de tangente commune à une conique et un cercle. Le leurre `g10_vertical_tangent_lost` (défini en partie a) n'est pas encore proposé.
 - **Intro** : en T(x₀ ; y₀) de la conique, on **dédouble** : x² → x₀x, y² → y₀y, xy → (x₀y + xy₀)/2, x → (x + x₀)/2, y → (y + y₀)/2. Depuis un point Q extérieur : la polaire de Q coupe la conique aux points de contact ; ou bien on écrit la condition « discriminant nul ».
 - **Juge** : `geom` `{object:'line2'}` (une ou deux droites) ; `value` pour les points de contact · **Forme finale** : équations des tangentes.
 - **Niveaux** :
@@ -717,6 +719,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-conic-nature` — Choisir la méthode : nature d'une conique
 - **Année** 12.5 · **Prérequis** `g10-hyperbola`, `g10-parabola`, `g4-triple` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g10-hyperbola` : conclure au genre hyperbole ; `g10-parabola` : conclure au genre parabole.
+- **Statut** : fait le 10 novembre 2026 (étape U5). L'arbre « Choisir la méthode » est une suite de décisions (README §5.3) : seules celles du vrai chemin de l'item sont posées, puisqu'un mauvais choix est refusé avec sa raison (et son piège) ; le champ `when` n'est donc pas nécessaire. Parties : Δ = det M (juge `det`, développement selon la 1re ligne ; au niveau 4, Δ se tape après la première décision, par `then`), δ (`value`), puis un contrôle par les valeurs propres (`solset` en λ). Tirage : 35 % ellipse réelle, 35 % hyperbole, 15 % parabole, 5 % vide, 10 % dégénérée (deux droites sécantes seulement) ; 1 sur 5 sans terme en xy. Niveau 5 et `open` : la nature puis l'équation réduite λ₁X² + λ₂Y² + Δ/δ = 0 (pas de famille à paramètre). V/F : contre-exemple x² + y² + k = 0 (sorte `geo`).
 - **Intro** : on écrit A (avec **b/2** hors de la diagonale) et M. Δ = det M ≠ 0 : conique non dégénérée. Puis δ = det A = λ₁λ₂ : δ > 0 genre ellipse, δ < 0 genre hyperbole, δ = 0 genre parabole. Une ellipse non dégénérée est réelle si (a + c)·Δ < 0, vide sinon. Les valeurs propres de A (λ² − (a + c)λ + δ = 0) disent la même chose : même signe, signes contraires, une nulle.
 - **Juge** : décisions (arbre ci-dessous) ; segments `value` pour δ et Δ ; `equiv` `{vars:['λ']}` pour le polynôme caractéristique · **Forme finale** : la nature, avec δ et Δ justifiés.
 - **Arbre « Choisir la méthode »** (suite de décisions de l'item ; `valid` dépend de l'item) :
@@ -766,6 +769,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 
 ### `g10-conic-reduce` — Réduire une conique avec un terme en xy
 - **Année** 12.5 · **Prérequis** `g10-conic-nature`, `l-eig-charpoly`, `l-eig-space`, `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U5). Construite à l'envers (λ entières, u₁ ∈ {(1 ; 1)/√2, (2 ; 1)/√5, (1 ; 2)/√5}, Ω entier, f(Ω) entier). Parties : det(A − λI) (`det`), un vecteur propre (`eigvec`), u₁ et u₂ normés (`vector`, au signe près), Ω (`vector` ; les équations du centre sont données), f(Ω) (`value`), l'équation réduite (`conic`, dans le repère donné ou dans tout repère de ses axes). Parabole aux niveaux 4 et 5 : rotation, puis carré complété (λ₁X² + μY = 0 au sommet). La décision « centre d'abord ou rotation d'abord » est remplacée par « la conique a-t-elle un centre ? ». Niveau 5 et `open` : E2 a et c (foyers dans Re) ; l'esquisse (E2 b) est dans g10-conic-frame-back.
 - **Intro** : 1. Valeurs propres λ₁, λ₂ de A, vecteurs propres **normés** u₁, u₂ (repère direct). 2. Centre Ω : ∂f/∂x = ∂f/∂y = 0. 3. Constante f(Ω). 4. Dans Ru = (Ω, u₁, u₂) : λ₁X² + λ₂Y² + f(Ω) = 0. Sans centre (genre parabole), on tourne d'abord, puis on complète le carré.
 - **Juge** : par segments : `equiv` `{vars:['λ']}` (polynôme), `eigvec` `{A, λ}` (vecteurs, normés à la fin), `value` `{form:'point'}` (Ω), `value` (f(Ω)), `conic` `{equation, frame}` (équation réduite) · **Forme finale** : équation réduite et repère Ru.
 - **Niveaux** :
@@ -794,6 +798,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-conic-frame-back` — Revenir au repère initial ; esquisser
 - **Année** 12.5 · **Prérequis** `g10-conic-reduce`, `g10-ellipse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g10-conic-reduce` : le repère Ru vient de la réduction.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarits : foyers (c, puis F et F′ = Ω ± c·u, puis l'axe focal), sommets et axes (`geom`, count 2), esquisse (item `plot` une fois sur trois au niveau 4 : Ω, les deux axes, les sommets, les asymptotes d'une hyperbole ; l'élève place les éléments, l'app trace la courbe après). Coniques de g10-conic-reduce filtrées pour que c·u (ou a·u) soit rationnel. Les asymptotes ne sont demandées que dans l'esquisse.
 - **Intro** : un point (X ; Y) de Ru est en x = Ω + X·u₁ + Y·u₂ dans Re. On calcule foyers, sommets, axes et asymptotes dans Ru, puis on les transporte. Une asymptote Y = mX devient la droite par Ω de direction u₁ + m·u₂.
 - **Juge** : `value` `{form:'point'}` pour les points ; `geom` `{object:'line2'}` pour les droites ; `plot` `task:'conic'` pour l'esquisse · **Forme finale** : éléments demandés **dans Re**, puis esquisse.
 - **Niveaux** :
@@ -819,6 +824,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 
 ### `g10-conic-family` — Familles de coniques à paramètre, lieu des centres
 - **Année** 12.5 · **Prérequis** `g10-conic-nature`, `@alg:I-second-degre-parametres` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarit 1 (genre selon m : δ(m) par `equiv`, puis une partie `solset` en m par genre) et gabarit 2 (lieu des centres : P₂Q₁ − P₁Q₂ = 0 par `conic`, puis développé par `equiv` ; Δ, δ, la nature en décision, puis le point du lieu qui n'est le centre d'aucune conique, Q₁ = Q₂ = 0, en `vector`). Gabarit 3 (cercle, hyperbole équilatère) absent. Au niveau 1, seules les racines de δ(m) sont à trous (un intervalle avec □ ne se lit pas). QCM : la nature pour une valeur de m.
 - **Intro** : δ(m) donne le genre selon m (tableau de signes du trinôme en m). Le centre vérifie ½∂f/∂x = 0 et ½∂f/∂y = 0. On élimine m entre ces deux équations pour obtenir le lieu des centres, puis on étudie sa nature avec `g10-conic-nature`. Les points du lieu qui ne sont le centre d'aucune conique sont à exclure.
 - **Juge** : `equiv` `{vars:['m']}` pour δ(m) ; `solset` `{v:'m'}` pour les intervalles de chaque genre ; `equiv` `{vars:['x','y']}` puis `conic` pour le lieu (équation proportionnelle) · **Forme finale** : genre selon m ; équation du lieu et sa nature.
 - **Niveaux** :
@@ -845,6 +851,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 
 ### `g10-locus` — Lieux géométriques qui donnent une conique
 - **Année** 12.5 · **Prérequis** `g1-irr-eq`, `g10-ellipse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarit 1 (centres des cercles par A tangents intérieurement à un cercle de centre O : ellipse de foyers O et A) à tous les niveaux ; gabarit 3 (point et droite : parabole) aux niveaux 3 et 4 ; le gabarit 2 (branche d'hyperbole) est le QCM d'examen, avec le leurre `g10_locus_square_condition` ; gabarit 4 absent. Les lignes avec des racines sont des notes : le juge `conic` commence à la ligne élevée au carré. La condition de signe est une décision, suivie de l'extremum de la coordonnée sur l'ellipse. Niveau 5 : gabarit 1 sans aide (pas le problème du CMS contrôle 3 Q3).
 - **Intro** : on nomme le point courant M(x ; y), on traduit la condition en équation, on élimine les paramètres auxiliaires, on simplifie. Quand on élève au carré, on note la condition de signe et on vérifie à la fin quels points du lieu la respectent. On reconnaît la conique et on la décrit avec précision.
 - **Juge** : `equiv` `{vars:['x','y'], domain}` pour les lignes (le domaine retient la condition de signe) ; `conic` pour l'équation finale ; décision pour la nature · **Forme finale** : équation réduite, nature, et éléments demandés.
 - **Niveaux** :
@@ -871,6 +878,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 
 ### `g10-homogeneous` — Coordonnées homogènes, points à l'infini
 - **Année** 12.5 · **Prérequis** `g10-conic-nature` · **Étiquettes** opt · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U5). Homogénéisation par `equiv` (cible `goal` : le polynôme homogène), puis t = 0 et y = 1 : l'équation en x (`solset`) donne les points à l'infini, et le genre est une décision. Une droite une fois sur quatre aux niveaux 3 et 4 (point à l'infini = direction, `vector`), la cubique x³ ± c³y³ + kxy = 0 au niveau 5.
 - **Intro** : on remplace x par x/t et y par y/t, puis on multiplie par t² (par tⁿ pour un degré n). Les points à l'infini sont les solutions avec t = 0. Pour une conique : 2 points réels (genre hyperbole, directions des asymptotes), 1 point double (genre parabole, direction de l'axe), aucun point réel (genre ellipse).
 - **Juge** : `equiv` `{vars:['x','y','t']}` pour l'équation homogène ; `value` pour les points (x : y : 0), à un facteur près · **Forme finale** : liste des points à l'infini.
 - **Niveaux** :
