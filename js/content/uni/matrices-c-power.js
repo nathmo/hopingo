@@ -166,7 +166,7 @@ function level2(rng) {
   return matLines({
     skill: PM, level: 2, mode: 'guided', keys: KEYS,
     prompt: `Deux itérations de la méthode de la puissance pour A = ${MLm(d.Aq)}, à partir de y₀ = ${yML(d.rows[0].y)}.`,
-    start, judge, script, subgoals: SUB, key: `${PM}:2:${mt(d.Aq)}:${d.y0.join('')}`,
+    start, judge, script, subgoals: SUB, key: `${PM}:2:${mt(d.Aq)}:${d.y0.join('')}`, baits: [],
     hints: H('Multiplie par A, puis divise par la plus grande composante (en module) : c\'est μ.',
       `Ay₁ = ${R(mt(d.Aq))}·${vR(r1.y)} = (□ ; □)`,
       `Ay₁ = ${vR(r1.z)}, μ₁ = ${fq(r1.mu)}`),
@@ -197,7 +197,7 @@ function level3(rng) {
   return matLines({
     skill: PM, level: 3, mode: 'tap', tapActions: 'menu', keys: KEYS,
     prompt: `A = ${MLm(d.Aq)}, y₀ = ${yML(d.rows[0].y)}. Fais une itération de la puissance, estime λ₁ par le quotient de Rayleigh de y₁, puis donne la vitesse de convergence. Choisis d'abord chaque action.`,
-    start, judge, script, subgoals: SUB, key: `${PM}:3:${mt(d.Aq)}:${d.y0.join('')}`,
+    start, judge, script, subgoals: SUB, key: `${PM}:3:${mt(d.Aq)}:${d.y0.join('')}`, baits: ['m_power_ratio'],
     hints: H('Une itération : z = Ay, μ = la plus grande composante, y ← z/μ. Rayleigh : yᵀAy / yᵀy.',
       `R(y₁) = □ / (${fq(MX.dot(y1, y1))})`,
       `R(y₁) = ${fq(Rq)}, vitesse ${fq(d.ratio)}`),
@@ -207,13 +207,13 @@ function level3(rng) {
 
 // ---------- L4: inverse power with a shift ----------
 
-function invData(rng) {
+function invData(rng, { offs = [1, -1, 2, -2] } = {}) {
   for (let t = 0; t < 200; t++) {
     const d = powerData(rng, { steps: 1 });
     // σ between the eigenvalues, nearer to one of them, not equal.
     const target = rng.chance(0.5) ? d.l1 : d.l2;
     const other = target === d.l1 ? d.l2 : d.l1;
-    const off = rng.pick([1, -1, 2, -2]);
+    const off = rng.pick(offs);
     const sigma = target + off;
     if (sigma === 0 || sigma === target || sigma === other || Math.abs(sigma - target) >= Math.abs(sigma - other)) continue;
     const phi = { kind: 'power', A: d.phi.A, y0: d.y0, inverse: true, shift: String(sigma) };
@@ -233,13 +233,13 @@ function lambdaSeg(d) {
   return [
     { kind: 'segment', html: `En continuant, μ<sub>k</sub> → ${fq(d.muInf)}. Quelle valeur propre de A la méthode a-t-elle trouvée ?`, ask: 'λ =', start: { math: 'λ' }, judge: { kind: 'value', expect: lam, form: 'irreducible', invpow: { sigma: String(d.sigma), mu: qt(d.muInf) } } },
     { kind: 'eq', math: `${d.sigma}+1/(${qt(d.muInf)})`, note: 'μ → 1/(λ − σ), donc λ = σ + 1/μ', subgoal: 'iter' },
-    { kind: 'eq', math: lam, note: `La valeur propre la plus proche de σ = ${d.sigma}`, subgoal: 'iter' },
+    { kind: 'eq', math: lam, note: `La valeur propre la plus proche de σ = ${fq(q(d.sigma))}`, subgoal: 'iter' },
   ];
 }
 
 function level4(rng, opts = {}) {
   const d = invData(rng);
-  const { table, answers } = powerTable(d, 1, 2);
+  const { table, answers } = powerTable(d, 0, 2);
   const then = linesItem({
     skill: PM, level: 4, mode: 'free', keys: KEYS, noHints: true,
     prompt: `Puissance inverse avec σ = ${fq(q(d.sigma))}.`,
@@ -271,7 +271,7 @@ function level5(rng) {
     const mus = it.map((x) => x.mu);
     const e = mus.map((m) => m - d.l1);
     const r = e[7] / e[6];
-    if (!(Math.abs(r - d.l2 / d.l1) < 0.03) || Math.abs(e[3]) < 1e-3) continue;
+    if (!(Math.abs(r - d.l2 / d.l1) < 0.03) || Math.abs(e[3]) < 1e-3 || Math.abs(e[7]) > 0.08) continue;
     const show = (x) => R(x.toFixed(6).replace('.', ','));
     const tbl = `<table class="u-table"><thead><tr><th>k</th>${mus.map((_, k) => `<th>${k}</th>`).join('')}</tr></thead><tbody><tr><th>μ<sub>k</sub></th>${mus.map((m) => `<td>${show(m)}</td>`).join('')}</tr></tbody></table>`;
     const script = [
@@ -288,7 +288,7 @@ function level5(rng) {
       subgoals: SUB, key: `${PM}:5:${mt(d.Aq)}:${d.y0.join('')}`, baits: ['m_power_ratio'],
     });
   }
-  return level3(rng);
+  return { ...examOpen(rng), exam: false, fallback: true };
 }
 
 // ---------- exam ----------
@@ -306,7 +306,7 @@ function examMcq(rng, exam) {
       solution: [{ html: `Après k pas, la part du mode 2 est multipliée par (λ₂/λ₁)ᵏ : vitesse |λ₂/λ₁| = ${fq(r)} (et ${fq(r.mul(r))} avec le quotient de Rayleigh, A étant symétrique).`, note: '' }],
     }, rng);
   }
-  const d = invData(rng);
+  const d = invData(rng, { offs: [2, -2] });
   const mu = d.muInf;
   const s = q(d.sigma);
   return mcqDistinct({
@@ -314,7 +314,7 @@ function examMcq(rng, exam) {
     prompt: `Puissance inverse avec décalage σ = ${fq(s)} : les μ<sub>k</sub> (composantes de plus grand module des solutions de (A − σI)z = y<sub>k</sub>) tendent vers ${fq(mu)}. Quelle valeur propre de A a-t-on trouvée ?`,
     right: fq(s.add(q(1).div(mu))),
     wrongs: [{ html: fq(mu), rule: 'm_inverse_power_value' }, { html: fq(q(1).div(mu)), rule: 'm_inverse_power_value' }, { html: fq(s.add(mu)), rule: 'm_inverse_power_value' }],
-    fillers: [{ html: fq(s.sub(q(1).div(mu))) }, { html: fq(s.sub(mu)) }],
+    fillers: [{ html: fq(s.sub(q(1).div(mu))) }, { html: fq(s.sub(mu)) }, { html: fq(s.add(q(2).div(mu))) }, { html: fq(s.mul(2)) }],
     solution: [{ html: `(A − σI)⁻¹ a les valeurs propres 1/(λ − σ) : μ = 1/(λ − σ), donc λ = σ + 1/μ = ${fq(s.add(q(1).div(mu)))}.`, note: '' }],
   }, rng);
 }
@@ -356,7 +356,7 @@ function examOpen(rng) {
     if (sigma === d.l2 || Math.abs(sigma - d.l2) >= Math.abs(sigma - d.l1)) continue;
     const muInf = q(1, d.l2 - sigma);
     const A = mt(d.Aq);
-    const one = (o) => linesItem({ keys: KEYS, mode: 'free', noHints: true, subgoals: SUB, ...o });
+    const one = (o) => linesItem({ keys: KEYS, mode: 'free', noHints: true, subgoals: SUB, baits: [], ...o });
     const iterPart = one({
       skill: PM, level: 5, prompt: '(a) Deux itérations (normalisation par la plus grande composante).',
       ...splitFirst(iterParts(d, 0, 2, { lastY: false })),
@@ -378,7 +378,7 @@ function examOpen(rng) {
       skill: PM, level: 5, prompt: `(d) Puissance inverse avec σ = ${sigma} : vers quoi tendent les μ<sub>k</sub>, puis quelle valeur propre trouve-t-on ?`,
       start: 'μ', judge: { kind: 'value', expect: qt(muInf), form: 'irreducible' },
       script: [
-        { kind: 'eq', math: qt(muInf), note: `1/(λ − σ) pour la valeur propre la plus proche de ${sigma}`, subgoal: 'iter' },
+        { kind: 'eq', math: qt(muInf), note: `1/(λ − σ) pour la valeur propre la plus proche de ${fq(q(sigma))}`, subgoal: 'iter' },
         { ...iSeg[0], html: 'La valeur propre trouvée.' }, iSeg[2],
       ],
       key: `${PM}:open:d:${A}`,

@@ -100,7 +100,7 @@ const MENU = [
 
 function a1Seg(d, { guided = false, menu = false } = {}) {
   const x = d.terms[0];
-  const line = { kind: 'eq', math: mt(d.A1), note: `${sigR(x)}·${unitR(x.p)}·${unitR(x.qv)}ᵀ : les racines se simplifient`, subgoal: 'rank1' };
+  const line = { kind: 'eq', math: mt(d.A1), note: `σ₁u₁v₁ᵀ = ${sigR(x)}·${unitR(x.p)}·${unitR(x.qv)}ᵀ`, subgoal: 'rank1' };
   return [
     { kind: 'segment', html: 'A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.', ask: 'A₁ =', start: { math: 'A_1' }, judge: { kind: 'mat', expect: mt(d.A1), ...(menu ? { menu: menuOf(MENU, 'first') } : {}) } },
     guided ? withCells(line, [[0, 0], [d.m - 1, d.n - 1]]) : line,
@@ -148,7 +148,7 @@ function level12(rng, level) {
   return matLines({
     skill: LR, level, mode: 'guided', keys: KEYS,
     prompt: `A = ${MLm(d.Aq)} a pour SVD ${sum}. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.`,
-    start, judge, script, subgoals: SUB, key: `${LR}:${level}:${mt(d.Aq)}`,
+    start, judge, script, subgoals: SUB, key: `${LR}:${level}:${mt(d.Aq)}`, baits: ['m_rankk_wrong_sigma'],
     hints: H('Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l\'erreur en norme 2 est la plus grande valeur singulière jetée.',
       `A₁ = ${sigR(d.terms[0])}·${unitR(d.terms[0].p)}·${unitR(d.terms[0].qv)}ᵀ = [[□, …], …]`,
       `A₁ = ${R(mt(d.A1))}, ‖A − A₁‖₂ = ${sigR(d.terms[1])}`),
@@ -171,7 +171,7 @@ function level3(rng) {
   return matLines({
     skill: LR, level: 3, mode: 'tap', tapActions: 'menu', keys: KEYS,
     prompt: `A = ${MLm(d.Aq)} = ${sum}, avec ${termsR(d)}. Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.`,
-    start, judge, script, subgoals: SUB, key: `${LR}:3:${mt(d.Aq)}`,
+    start, judge, script, subgoals: SUB, key: `${LR}:3:${mt(d.Aq)}`, baits: ['m_rankk_wrong_sigma'],
     hints: H('‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés.',
       `‖A − A₁‖_F = √(${d.terms.slice(1).map(() => '□').join(' + ')})`,
       `‖A − A₁‖₂ = ${sigR(d.terms[1])}, ‖A − A₁‖_F = ${radR2(errF2(d, 1))}`),
@@ -185,7 +185,7 @@ function level4(rng) {
   const AtA = MX.mul(MX.transpose(d.Aq), d.Aq);
   const qv = x.qv.map((v) => q(v));
   const parts = [
-    { kind: 'segment', html: 'σ₁, la plus grande valeur singulière (valeurs propres de AᵀA, ou de AAᵀ, plus petite).', ask: 'σ₁ =', start: { math: 'σ_1' }, judge: { kind: 'value', expect: rad(q(x.sig2)), form: 'exact', sigma: true } },
+    { kind: 'segment', html: 'σ₁, la plus grande valeur singulière : la racine de la plus grande valeur propre de AᵀA (ou de AAᵀ, plus petite).', ask: 'σ₁ =', start: { math: 'σ_1' }, judge: { kind: 'value', expect: rad(q(x.sig2)), form: 'exact', sigma: true } },
     { kind: 'eq', math: rad(q(x.sig2)), note: `√${x.sig2}`, subgoal: 'svd' },
     { kind: 'segment', html: `v₁ : un vecteur propre de AᵀA pour λ = ${x.sig2}.`, ask: 'v₁ ∝', start: { math: 'v_1' }, judge: { kind: 'eigvec', A: mt(AtA), lambda: String(x.sig2) } },
     { kind: 'eq', math: vt(qv), note: `(AᵀA − ${x.sig2}I)v = 0`, subgoal: 'svd' },
@@ -196,7 +196,7 @@ function level4(rng) {
   return matLines({
     skill: LR, level: 4, mode: 'free', keys: KEYS,
     prompt: `A = ${MLm(d.Aq)}. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.`,
-    start, judge, script, subgoals: SUB, key: `${LR}:4:${mt(d.Aq)}`,
+    start, judge, script, subgoals: SUB, key: `${LR}:4:${mt(d.Aq)}`, baits: ['l_svd_sigma_is_eig', 'm_rankk_wrong_sigma'],
     hints: H('AᵀA = ' + R(mt(AtA)) + ' : ses valeurs propres sont les σᵢ² (et des 0).',
       `σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire`,
       `σ₁ = ${sigR(x)}, v₁ = ${unitR(x.qv)}, A₁ = ${R(mt(d.A1))}, erreur ${sigR(d.terms[1])}`),
@@ -234,10 +234,10 @@ function level5(rng) {
       skill: LR, level: 5, mode: 'free', keys: KEYS, noHints: true,
       prompt: `Une image 4 × 4 a les valeurs singulières ${sig.map((v) => R(v)).join(', ')}. On veut la compresser par A<sub>k</sub> avec une erreur relative de Frobenius ‖A − A<sub>k</sub>‖_F/‖A‖_F ≤ ${tPct}. Donne ‖A‖_F², le plus petit k, puis ‖A − A<sub>k</sub>‖₂.`,
       start: 'N', judge: { kind: 'value', expect: String(total), form: 'irreducible' }, script: [{ kind: 'note', html: '‖A‖_F² :' }, ...script],
-      subgoals: SUB, key: `${LR}:5:${s.join(',')}:${tt}`,
+      subgoals: SUB, key: `${LR}:5:${s.join(',')}:${tt}`, baits: ['m_rankk_wrong_sigma'],
     });
   }
-  return level3(rng);
+  return { ...level3(rng), level: 5, mode: 'free', noHints: true, hints: [], fallback: true };
 }
 
 function examMcq(rng, exam) {

@@ -8,10 +8,12 @@
 import { genPower } from './matrices-c-power.js';
 import { genLowRank } from './matrices-c-svd.js';
 import { genNorms, genCond } from './matrices-c-norms.js';
+import { genGersh } from './matrices-c-gersh.js';
 
 export const GEN = {
   'm-power-method': genPower,
   'm-svd-lowrank': genLowRank,
   'm-norms': genNorms,
   'm-cond': genCond,
+  'm-gershgorin': genGersh,
 };

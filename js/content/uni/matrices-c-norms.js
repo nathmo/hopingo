@@ -100,7 +100,7 @@ function froSeg(d, { menu = false } = {}) {
   const v = rad(q(fro2(d.A)));
   return [
     seg('‖A‖_F : la racine de la somme des carrés des cases.', '‖A‖_F =', 'N_F', { kind: 'value', expect: v, form: 'exact', ...(menu ? { menu: menuOf(NM_MENU, 'fro') } : {}) }),
-    { kind: 'eq', math: v, note: `√(${d.A.flat().map((x) => `${x < 0 ? `(${x})` : x}²`).join(' + ')}) = √${fro2(d.A)}`, subgoal: 'norm' },
+    { kind: 'eq', math: v, note: R(`√(${d.A.flat().map((x) => `${x < 0 ? `(${x})` : x}²`).join(' + ')}) = √${fro2(d.A)}`), subgoal: 'norm' },
   ];
 }
 
@@ -138,7 +138,7 @@ function normsItem(level, rng) {
   const AtA = MX.mul(MX.transpose(d.Aq), d.Aq);
   return matLines({
     skill: NM, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null, keys: KEYS,
-    prompt, start, judge, script, subgoals: NM_SUB, key: `${NM}:${level}:${mt(d.Aq)}`,
+    prompt, start, judge, script, subgoals: NM_SUB, key: `${NM}:${level}:${mt(d.Aq)}`, baits: level >= 3 ? ['m_norm_1_inf_swap', 'm_norm2_eig'] : ['m_norm_1_inf_swap'],
     hints: level >= 3 ? H('‖A‖₂ n\'est pas lue sur A : c\'est √(λ_max(AᵀA)), sauf si A est symétrique.',
       `AᵀA = [[${fq(AtA[0][0])}, □], [□, ${fq(AtA[1][1])}]]`,
       `‖A‖₂ = ${R(rad(q(d.s1)))}, ‖A‖_F = ${R(rad(q(fro2(d.A))))}`)
@@ -153,7 +153,7 @@ function normsItem(level, rng) {
 function normsProblem(rng) {
   const d = normData(rng, { realEig: true });
   const { start, judge, script } = splitFirst(twoSeg(d));
-  const calc = linesItem({ skill: NM, level: 5, prompt: `‖A‖₂ pour A = ${MLm(d.Aq)}.`, start, judge, script, mode: 'free', keys: KEYS, noHints: true, subgoals: NM_SUB, key: `${NM}:5:${mt(d.Aq)}` });
+  const calc = linesItem({ baits: ['m_norm2_eig'], skill: NM, level: 5, prompt: `‖A‖₂ pour A = ${MLm(d.Aq)}.`, start, judge, script, mode: 'free', keys: KEYS, noHints: true, subgoals: NM_SUB, key: `${NM}:5:${mt(d.Aq)}` });
   const t1 = normsTf(rng, 5);
   let t2 = normsTf(rng, 5);
   for (let i = 0; i < 10 && t2.key === t1.key; i++) t2 = normsTf(rng, 5);
@@ -321,7 +321,7 @@ function condBound(rng, level) {
   return matLines({
     skill: CD, level, mode: level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null, keys: KEYS,
     prompt: `A = ${MLm(d.Aq)} (valeurs propres ${d.l1} et ${d.l2}), Ax = b avec b = ${ML2(b)}, donc x = ${ML2(x)}. On perturbe b de δb = ${ML2(db)}. Calcule κ₂(A), ‖δb‖/‖b‖, la borne sur ‖δx‖/‖x‖, puis ‖δx‖/‖x‖.${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
-    start, judge, script, subgoals: CD_SUB, key: `${CD}:${level}:bound:${mt(d.Aq)}`,
+    start, judge, script, subgoals: CD_SUB, key: `${CD}:${level}:bound:${mt(d.Aq)}`, baits: [],
     hints: H('‖δx‖/‖x‖ ≤ κ(A)·‖δb‖/‖b‖ ; si δb est vecteur propre de la plus petite valeur propre, δx = δb/λ_min.',
       `borne = ${fq(d.kappa)} × □`, `κ₂ = ${fq(d.kappa)}, ‖δb‖/‖b‖ = 1/100, borne = ‖δx‖/‖x‖ = ${fq(relx)}`),
   });
@@ -358,7 +358,7 @@ function condInf(rng) {
     return matLines({
       skill: CD, level: 4, mode: 'free', keys: KEYS,
       prompt: `A = ${MLm(Aq)}. Calcule A⁻¹, puis κ${P}(A) = ‖A‖${P}·‖A⁻¹‖${P}.`,
-      start, judge, script, subgoals: CD_SUB, key: `${CD}:4:${mt(Aq)}:${p}`,
+      start, judge, script, subgoals: CD_SUB, key: `${CD}:4:${mt(Aq)}:${p}`, baits: ['m_norm_1_inf_swap'],
       hints: H(`κ${P} = ‖A‖${P}·‖A⁻¹‖${P} ; ${p === 'inf' ? '‖·‖∞ : lignes' : '‖·‖₁ : colonnes'}.`,
         `A⁻¹ = (1/${fq(q(det))})·[[${A[1][1]}, □], [□, ${A[0][0]}]]`,
         `A⁻¹ = ${R(mt(Ai))}, κ${P} = ${fq(nA)} × ${fq(nAi)} = ${fq(kap)}`),
