@@ -64,3 +64,9 @@ import { EXAM_NUMERIQUE } from './exams-numerique.js';
 
 EXAMS.push(EXAM_NUMERIQUE);
 EXAM_BY_ID[EXAM_NUMERIQUE.id] = EXAM_NUMERIQUE;
+
+// Step U10: Analyse III (V and C) and Analyse IV (F, and C in the multiple choice).
+import { EXAM_ANALYSE3, EXAM_ANALYSE4 } from './exams-vcf.js';
+
+EXAMS.push(EXAM_ANALYSE3, EXAM_ANALYSE4);
+Object.assign(EXAM_BY_ID, { [EXAM_ANALYSE3.id]: EXAM_ANALYSE3, [EXAM_ANALYSE4.id]: EXAM_ANALYSE4 });

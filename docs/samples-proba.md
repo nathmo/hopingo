@@ -11593,10 +11593,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
 
 ```
 200 guérisons avec le traitement A sur n₁ = 400, et 80 avec le traitement B sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [guided]  p̂₁
+  [guided]  p̂_1
     = 200/400
     = 0,5
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 80/200
     = 0,4
   — p̂  [juge prob]  départ : p̂
@@ -11616,10 +11616,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
 
 50 « oui » dans la région 1 sur n₁ = 100, et 130 dans la région 2 sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [guided]  p̂₁
+  [guided]  p̂_1
     = 50/100
     = 0,5
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 130/200
     = 0,65
   — p̂  [juge prob]  départ : p̂
@@ -11639,10 +11639,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
 
 70 pièces défectueuses de la machine 1 sur n₁ = 100, et 240 de la machine 2 sur n₂ = 400. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [guided]  p̂₁
+  [guided]  p̂_1
     = 70/100
     = 0,7
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 240/400
     = 0,6
   — p̂  [juge prob]  départ : p̂
@@ -11667,10 +11667,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
 
 ```
 60 guérisons avec le traitement A sur n₁ = 400, et 20 avec le traitement B sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [guided]  p̂₁
+  [guided]  p̂_1
     = 60/400
     = 0,15
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 20/200
     = 0,1
   — p̂  [juge prob]  départ : p̂
@@ -11690,10 +11690,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 160 « oui » dans la région 1 sur n₁ = 400, et 90 dans la région 2 sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [guided]  p̂₁
+  [guided]  p̂_1
     = 160/400
     = 0,4
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 90/200
     = 0,45
   — p̂  [juge prob]  départ : p̂
@@ -11713,10 +11713,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 200 guérisons avec le traitement A sur n₁ = 400, et 240 avec le traitement B sur n₂ = 400. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [guided]  p̂₁
+  [guided]  p̂_1
     = 200/400
     = 0,5
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 240/400
     = 0,6
   — p̂  [juge prob]  départ : p̂
@@ -11741,10 +11741,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
 
 ```
 50 guérisons avec le traitement A sur n₁ = 100, et 110 avec le traitement B sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [tap, suivre l'erreur, menu menu]  p̂₁
+  [tap, suivre l'erreur, menu menu]  p̂_1
     = 50/100
     = 0,5
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 110/200
     = 0,55
   — p̂  [juge prob]  départ : p̂
@@ -11764,10 +11764,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 260 « oui » dans la région 1 sur n₁ = 400, et 280 dans la région 2 sur n₂ = 400. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [tap, suivre l'erreur, menu menu]  p̂₁
+  [tap, suivre l'erreur, menu menu]  p̂_1
     = 260/400
     = 0,65
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 280/400
     = 0,7
   — p̂  [juge prob]  départ : p̂
@@ -11787,10 +11787,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 140 « oui » dans la région 1 sur n₁ = 400, et 40 dans la région 2 sur n₂ = 100. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [tap, suivre l'erreur, menu menu]  p̂₁
+  [tap, suivre l'erreur, menu menu]  p̂_1
     = 140/400
     = 0,35
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 40/100
     = 0,4
   — p̂  [juge prob]  départ : p̂
@@ -11815,10 +11815,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
 
 ```
 40 guérisons avec le traitement A sur n₁ = 100, et 30 avec le traitement B sur n₂ = 100. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [free, suivre l'erreur]  p̂₁
+  [free, suivre l'erreur]  p̂_1
     = 40/100
     = 0,4
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 30/100
     = 0,3
   — p̂  [juge prob]  départ : p̂
@@ -11838,10 +11838,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 240 guérisons avec le traitement A sur n₁ = 400, et 260 avec le traitement B sur n₂ = 400. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [free, suivre l'erreur]  p̂₁
+  [free, suivre l'erreur]  p̂_1
     = 240/400
     = 0,6
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 260/400
     = 0,65
   — p̂  [juge prob]  départ : p̂
@@ -11861,10 +11861,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 40 pièces défectueuses de la machine 1 sur n₁ = 200, et 70 de la machine 2 sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.
-  [free, suivre l'erreur]  p̂₁
+  [free, suivre l'erreur]  p̂_1
     = 40/200
     = 0,2
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 70/200
     = 0,35
   — p̂  [juge prob]  départ : p̂
@@ -11889,10 +11889,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
 
 ```
 160 pièces défectueuses de la machine 1 sur n₁ = 400, et 60 de la machine 2 sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ > p₂ au niveau 5 %.
-  [free, sans aide]  p̂₁
+  [free, sans aide]  p̂_1
     = 160/400
     = 0,4
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 60/200
     = 0,3
   — p̂  [juge prob]  départ : p̂
@@ -11911,10 +11911,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 200 « oui » dans la région 1 sur n₁ = 400, et 70 dans la région 2 sur n₂ = 200. On teste H₀ : p₁ = p₂ contre H₁ : p₁ > p₂ au niveau 5 %.
-  [free, sans aide]  p̂₁
+  [free, sans aide]  p̂_1
     = 200/400
     = 0,5
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 70/200
     = 0,35
   — p̂  [juge prob]  départ : p̂
@@ -11933,10 +11933,10 @@ _Comparer deux proportions avec la proportion commune estimée sous H₀._
   pièges : p_two_prop_no_pool, p_two_sample_se, p_pvalue_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 300 « oui » dans la région 1 sur n₁ = 400, et 260 dans la région 2 sur n₂ = 400. On teste H₀ : p₁ = p₂ contre H₁ : p₁ > p₂ au niveau 5 %.
-  [free, sans aide]  p̂₁
+  [free, sans aide]  p̂_1
     = 300/400
     = 0,75
-  — p̂₂  [juge prob]  départ : p̂₂
+  — p̂₂  [juge prob]  départ : p̂_2
     = 260/400
     = 0,65
   — p̂  [juge prob]  départ : p̂
@@ -13469,7 +13469,7 @@ On connaît x̄ = 7, ȳ = 14, s_x = 4, s_y = 3 et r = 0,6. Donne la droite de r�
   — Droite de x sur y : pente d̂  [juge prob]  départ : d̂
     = 0,6·4/3   ← d̂ = r·s_x/s_y, pas 1/β̂
     = 0,8
-  — ĉ  [juge prob]  départ : ĉ
+  — ĉ  [juge prob]  départ : ĉ
     = 7 − 0,8·14   ← Par (x̄, ȳ) aussi
     = −4,2
   pièges : p_reg_x_on_y
@@ -13484,7 +13484,7 @@ On connaît x̄ = 4, ȳ = 38, s_x = 5, s_y = 10 et r = 0,6. Donne la droite de r
   — Droite de x sur y : pente d̂  [juge prob]  départ : d̂
     = 0,6·5/10   ← d̂ = r·s_x/s_y, pas 1/β̂
     = 0,3
-  — ĉ  [juge prob]  départ : ĉ
+  — ĉ  [juge prob]  départ : ĉ
     = 4 − 0,3·38   ← Par (x̄, ȳ) aussi
     = −7,4
   pièges : p_reg_x_on_y
@@ -13499,7 +13499,7 @@ On connaît x̄ = 2, ȳ = 37, s_x = 5, s_y = 10 et r = 0,5. Donne la droite de r
   — Droite de x sur y : pente d̂  [juge prob]  départ : d̂
     = 0,5·5/10   ← d̂ = r·s_x/s_y, pas 1/β̂
     = 0,25
-  — ĉ  [juge prob]  départ : ĉ
+  — ĉ  [juge prob]  départ : ĉ
     = 2 − 0,25·37   ← Par (x̄, ȳ) aussi
     = −7,25
   pièges : p_reg_x_on_y
@@ -14016,7 +14016,7 @@ Modèle y = a + bx, données x : 3, 4, 5, 6, 7 ; y : 11, 9, 8, 11, 6. Avec X = [
   — b̂  [juge prob]  départ : b̂
     = (5·217 − 25·45)/50   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
     = −0,8
-  — â  [juge prob]  départ : â
+  — â  [juge prob]  départ : â
     = (135·45 − 25·217)/50   ← Première ligne
     = 13
   aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 5·135 − 25² = □ | b̂ = −0,8, â = 13
@@ -14028,7 +14028,7 @@ Modèle y = a + bx, données x : 3, 4, 5, 6, 7 ; y : 9, 11, 10, 13, 12. Avec X =
   — b̂  [juge prob]  départ : b̂
     = (5·283 − 25·55)/50   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
     = 0,8
-  — â  [juge prob]  départ : â
+  — â  [juge prob]  départ : â
     = (135·55 − 25·283)/50   ← Première ligne
     = 7
   aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 5·135 − 25² = □ | b̂ = 0,8, â = 7
@@ -14040,7 +14040,7 @@ Modèle y = a + bx, données x : 0, 1, 2, 3 ; y : 10, 10, 15, 13. Avec X = [1, x
   — b̂  [juge prob]  départ : b̂
     = (4·79 − 6·48)/20   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
     = 1,4
-  — â  [juge prob]  départ : â
+  — â  [juge prob]  départ : â
     = (14·48 − 6·79)/20   ← Première ligne
     = 9,9
   aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 4·14 − 6² = □ | b̂ = 1,4, â = 9,9

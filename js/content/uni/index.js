@@ -59,3 +59,11 @@ import * as numerique from './numerique.skills.js';
 
 UNI_UNITS.push(numerique.UNIT);
 UNI_SKILLS.push(...numerique.SKILLS);
+
+// Step U10: modules V (unit vecto), C (unit cplx) and F (unit fourier).
+import * as vecto from './vecto.skills.js';
+import * as cplx from './cplx.skills.js';
+import * as fourier from './fourier.skills.js';
+
+UNI_UNITS.push(vecto.UNIT, cplx.UNIT, fourier.UNIT);
+UNI_SKILLS.push(...vecto.SKILLS, ...cplx.SKILLS, ...fourier.SKILLS);

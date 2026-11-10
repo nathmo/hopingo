@@ -77,8 +77,11 @@ export function normalizeText(text) {
     .replace(/²/g, '^2').replace(/³/g, '^3').replace(/⁴/g, '^4')
     .replace(/[₀-₉]+/g, (m) => `_${[...m].map((c) => c.charCodeAt(0) - 0x2080).join('')}`)
     .replace(/″/g, "''").replace(/[′’]/g, "'")
-    .replace(/<=/g, '≤').replace(/>=/g, '≥').replace(/!=/g, '≠');
+    .replace(/<=/g, '≤').replace(/>=/g, '≥').replace(/!=/g, '≠')
+    // Step U10: a letter with a hat (û, f̂, ŷ), the transform of a function.
+    .replace(/[âêîôûŷĝĥĉŝẑÂÊÎÔÛŶĜĤĈŜẐ]/g, (ch) => ch.normalize('NFD'));
 }
+const HAT = '̂';
 
 // Tokens of a normalized text; joining their `s` gives the text back.
 // Kinds: num, name, op. opts.funcs lists the item's own functions (f, g).
@@ -103,9 +106,11 @@ export function tokenize(text, opts = {}) {
       i = j;
       continue;
     }
+    // Step U10: a hatted letter is one name (û, f̂).
+    if (/[A-Za-z]/.test(c) && s[i + 1] === HAT) { out.push({ k: 'name', s: c + HAT, pos: i }); i += 2; continue; }
     if (/[A-Za-z]/.test(c)) {
       let j = i;
-      while (j < s.length && /[A-Za-z]/.test(s[j])) j++;
+      while (j < s.length && /[A-Za-z]/.test(s[j]) && s[j + 1] !== HAT) j++;
       const run = s.slice(i, j);
       let p = 0;
       while (p < run.length) {
@@ -224,7 +229,9 @@ export function parse(text, opts = {}) {
   }
   function braces() {
     if (isOp(peek(), '}')) { p++; return { t: 'set', kind: 'finite', items: [] }; }
+    braceDepth++;
     const first = formula();
+    braceDepth--;
     if (isOp(peek(), '|')) {
       p++;
       const cond = formula();
@@ -244,7 +251,11 @@ export function parse(text, opts = {}) {
     }
     return n;
   }
-  const startsFactor = (t) => t && ((t.k === 'name') || (t.k === 'op' && ['(', '√', '□'].includes(t.s)));
+  // Step U10: « 2|x| » is a product when no bar or brace is open (a bar
+  // inside |…| closes it; « {2n | n ∈ ℕ} » keeps its separator).
+  let absDepth = 0;
+  let braceDepth = 0;
+  const startsFactor = (t) => t && ((t.k === 'name') || (t.k === 'op' && ['(', '√', '□'].includes(t.s)) || (t.k === 'op' && t.s === '|' && absDepth === 0 && braceDepth === 0));
   function term() {
     let n = unary();
     for (;;) {
@@ -422,7 +433,9 @@ export function parse(text, opts = {}) {
         return primes({ t: 'paren', e });
       }
       if (t.s === '|') {
+        absDepth++;
         const e = sum();
+        absDepth--;
         expect('|', 'Une barre de valeur absolue n\'est pas fermée.');
         return primes({ t: 'abs', e });
       }

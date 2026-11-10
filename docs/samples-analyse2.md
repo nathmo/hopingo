@@ -10014,7 +10014,7 @@ Résous 3y′′ + 12y′ + 39y = 0, y(0) = 1, y′(0) = 4. Équation caractéri
     = C_1 = 1 ; C_2 = 2   ← y(0) = 1, y′(0) = 4
     = y = e^(−2x)(cos(3x) + 2sin(3x))   ← Solution du problème
   aides : Remplace y par e^(rx) : tu obtiens 3r² + 12r + 39 = 0. | Racines : r = −2 + 3i ou r = −2 − 3i ; donc y = … | y = e^(−2x)(C_1cos(3x) + C_2sin(3x))
-  pièges : a2_ode_char_sign
+  pièges : a2_ode_char_sign, c_sqrt_i
 
 Donne la solution générale de y′′ − y′ − 12y = 0. Équation caractéristique : r² − r − 12 = 0.
   [guided]  r² − r − 12 = 0
@@ -10657,7 +10657,7 @@ Trouve la solution de u′′ + 9u = −6sin(3x) avec u(0) = 0 et u′(0) = 10, 
       = u = 3sin(3x) + xcos(3x)   ← La solution du problème de Cauchy
     — La valeur demandée :  [juge value]  départ : u(π/2)
       = −3   ← Remplacer x par π/2
-  pièges : a2_ode_resonance_no_x
+  pièges : c_sqrt_i, a2_ode_resonance_no_x
 
 Trouve la solution de u′′ + 7u′ + 12u = 2e^(−4x) avec u(0) = −1 et u′(0) = 4, puis calcule u(1).
   [problème, 10 points]
@@ -10703,7 +10703,7 @@ Trouve la solution de u′′ + 9u = 12cos(3x) avec u(0) = 1 et u′(0) = 6, pui
       = u = cos(3x) + 2sin(3x) + 2xsin(3x)   ← La solution du problème de Cauchy
     — La valeur demandée :  [juge value]  départ : u(π)
       = −1   ← Remplacer x par π
-  pièges : a2_ode_resonance_no_x
+  pièges : c_sqrt_i, a2_ode_resonance_no_x
 
 ```
 

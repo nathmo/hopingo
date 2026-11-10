@@ -460,3 +460,8 @@ export function seriesToNode(s, v = 'x', atPoint = 0) {
   }
   return out ?? num(0);
 }
+
+// Step U10 (module C): Laurent coefficients and residues at any complex
+// point, numerically by Cauchy's formula on a small circle
+// (js/cas/laurent.js).
+export { laurentCoefs, residue, singularityType, zeroOrder } from './laurent.js';

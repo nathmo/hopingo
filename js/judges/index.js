@@ -85,3 +85,21 @@ Object.assign(JUDGES, { prob, stat });
 import * as odevec from './odevec.js';
 
 Object.assign(JUDGES, { odevec });
+
+// Step U10: parametrised curves and surfaces, oriented boundaries,
+// Fourier and Laplace transforms (modules V, C and F), and the judges of
+// the parts: complex values with ∫ and Σ, families z₀ + 2kπi (C, part a:
+// cvalue, cfamily), labelled complex values, bounds on an arc, Laurent
+// series in 1/z (C, part b: cval, arcb, laur), complex coefficients and
+// eigenfunctions (F, part a: fcomplex, eigen), distributions (F, part b),
+// residues of F(z)e^(zt) in t (F, part c: lapres).
+import * as transform from './transform.js';
+import * as param from './param.js';
+import * as boundary from './boundary.js';
+import { cvalue, cfamily } from './cplx-ca.js';
+import { cval, arcb, laur } from './cplx-cb.js';
+import { FA_JUDGES } from './fourier-a-judges.js';
+import * as distrib from './distrib.js';
+import * as lapres from './lapres.js';
+
+Object.assign(JUDGES, { transform, param, boundary, cvalue, cfamily, cval, arcb, laur, distrib, lapres }, FA_JUDGES);

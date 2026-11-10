@@ -117,12 +117,14 @@ export function buildExam(blueprint, { rng, profile = null, now = clock() } = {}
       for (let t = 0; t < 8 && !item; t++) {
         const id = t === 0 ? skill : pool[Math.floor(rng.next() * pool.length)].id;
         try {
-          let it = generate(id, 4, rng, profile, { exam: section.kind });
+          // Step U10: a multiple-answer section asks for multi items (opts.multi).
+          let it = generate(id, 4, rng, profile, section.multi ? { exam: section.kind, multi: true } : { exam: section.kind });
           if (section.kind === 'tf' && it && isVfMcq(it)) it = asTf(it);
           // Step U9: in a section of multiple-answer questions, a question with one
           // right answer is marked the same way (+1/N, −1/M with N = 1).
           if (section.multi && it && it.type === 'mcq' && !it.multi) it = { ...it, multi: true };
-          if (it && !it.stub && it.exam?.format === section.kind && fits(section, it)) item = it;
+          const multiOk = section.kind !== 'mcq' || !!it?.multi === !!section.multi;
+          if (it && !it.stub && it.exam?.format === section.kind && fits(section, it) && multiOk) item = it;
         } catch { item = null; }
       }
       if (!item) throw new Error(`Examen ${bp.id} : impossible de produire une question ${section.kind}.`);

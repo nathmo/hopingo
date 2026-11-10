@@ -72,3 +72,10 @@ Object.assign(UNI_GEN, NUMERIQUE);
 import { GEN as U9_VARIANTS } from './u9-variants.js';
 
 Object.assign(UNI_GEN, U9_VARIANTS);
+
+// Step U10: modules V (vecto), C (cplx) and F (fourier).
+import { GEN as VECTO } from './vecto.js';
+import { GEN as CPLX } from './cplx.js';
+import { GEN as FOURIER } from './fourier.js';
+
+Object.assign(UNI_GEN, VECTO, CPLX, FOURIER);

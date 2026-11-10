@@ -21,7 +21,7 @@ Ce fichier regroupe trois catalogues, un par module, chacun au gabarit du §15 d
 
 # V. Analyse vectorielle
 
-Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
+Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : fait le 10 novembre 2026 (étape U10, voir README §17)
 
 **Sources** : Analyse III MT/SV 2021-22 (cours, séries, série de révision, examen blanc de décembre 2021, examen du 18.01.2022 et son corrigé avec les « Common mistakes ») ; Analyse III MT/SV janvier 2021 (cours du Dr Strütt, énoncé reconstitué et corrigé d'étudiants) ; Analyse III GM (résumés, examens 2013–2015) ; Dacorogna et Tanteri, *Analyse avancée pour ingénieurs*, chapitres 1 à 7 et appendice (courbes, surfaces).
 
@@ -44,6 +44,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-ops` — Gradient, divergence, rotationnel, laplacien
 - **Année** 15 · **Prérequis** `a2-partials`, `g4-cross` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g4-cross` : rot F s'écrit comme le déterminant symbolique de u ∧ v.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Une partie `equiv` par nombre (chaque composante de rot F, div F, Δf), du départ écrit avec ∂ (∂F₃/∂y − ∂F₂/∂z) au résultat développé (cible `goal`) ; la formule de rot est donc donnée par le départ, y compris en L2. L1 : rot F, dérivées à trous ; L2 : rot F ou Δf puis sa valeur en un point ; L3 : décision « quel opérateur ? » (irrotationnel, à divergence nulle, Δf), menus avec l'ordre inversé (`v_rot_sign`) ; L4 : rot F et div F avec un terme sin ou exp d'un monôme de degré 2, ou div F, Δf en un point ; L5 : rot F, div F, puis div(rot F) = 0. Les dérivées partielles créditent `a2-partials`. QCM : Δf (2022, `v_lap_mixed` ajoute les dérivées croisées une ou deux fois) ou rot F (composantes de signe changé).
 - **Intro** : grad f = ∇f est un vecteur, div F = ∇ · F un scalaire, rot F = ∇ ∧ F un vecteur en 3D et un scalaire en 2D, Δf = div grad f. On écrit rot F comme un déterminant symbolique, puis on développe **composante par composante**. Exemple : F = (x²y, yz, xz²) ; `math: rot F = (∂_y(xz²) − ∂_z(yz), ∂_z(x²y) − ∂_x(xz²), ∂_x(yz) − ∂_y(x²y))`, `note: une ligne par composante` ; `math: = (−y, −z², −x²)`, `note: trois nombres, pas une somme`.
 - **Juge** : `equiv` `{vars:['x','y','z'], domain:{x:[-3,3], y:[-3,3], z:[-3,3]}, target:'no-operator'}`, composante par composante quand la ligne est un vecteur · **Forme finale** : vecteur (ou scalaire) sans ∇ ni ∂, chaque composante développée.
 - **Niveaux** :
@@ -65,6 +66,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-identities` — Identités des opérateurs
 - **Année** 15 · **Prérequis** `v-ops` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Seule l'identité div(fF) = f div F + F · ∇f est vérifiée en lignes : trois parties `equiv` (div(fF) après le produit fF, puis f div F + F · ∇f, puis leur différence = 0) ; L3 : décision « quelle identité ? » ; L5 : la moitié des items est le QCM « laquelle de ces identités est fausse ? ». Le gabarit G = ∇f ∧ ∇g et rot(fF) en lignes ne sont pas faits. QCM d'examen : F = g(|x|)·x (série de révision) ou div(fF) sur un exemple.
 - **Intro** : rot(grad f) = 0 ; div(rot F) = 0 ; div(fF) = f div F + F · ∇f ; rot(fF) = f rot F + ∇f ∧ F ; div(∇f) = Δf. On les vérifie sur un exemple avant de s'en servir. Exemple : f = xy, F = (x, y, z) ; `math: div(fF) = div(x²y, xy², xyz) = 5xy`, `note: calcul direct` ; `math: f div F + F · ∇f = 3xy + (x, y, z)·(y, x, 0) = 5xy`, `note: même résultat`.
 - **Juge** : `equiv` `{vars:['x','y','z']}` sur chaque membre ; la ligne finale est une égalité dont les deux membres sont équivalents · **Forme finale** : les deux membres développés et égaux.
 - **Niveaux** :
@@ -86,6 +88,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-curve-param` — Paramétrer une courbe orientée
 - **Année** 15 · **Prérequis** `a2-curve-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `param` pour γ et ses bornes (la première partie d'un item écrit « γ = (…), t ∈ […] », sans « (t) »), `vector` pour γ′(t), `equiv` en t pour |γ′(t)| quand elle est simple (segment, cercle, hélice). L1–L2 : la paramétrisation, puis la ligne avec ses bornes à trous ; L2 : décision « quel type de courbe ? » ; L3 : menu des quatre paramétrisations (sens inversé, bornes doublées, rayon R²) ; L4 : bord d'un triangle (trois segments), arc d'ellipse, graphe ou hélice ; L5 : bord orienté d'un demi-disque, d'un triangle ou d'un quart de couronne, morceau par morceau avec γ′. Arcs de cercle par quarts de tour, dans les deux sens ; pas de repère interactif.
 - **Intro** : une courbe se paramètre par γ : [a ; b] → ℝⁿ, avec un sens. Segment de A à B : γ(t) = A + t(B − A), t ∈ [0 ; 1]. Cercle de centre c et rayon R, sens positif : γ(t) = c + R(cos t, sin t), t ∈ [0 ; 2π]. Graphe y = g(x) : γ(t) = (t, g(t)). Le sens inverse : γ(a + b − t). Exemple : `math: γ(t) = (2 cos t, 2 sin t), t ∈ [0 ; π]`, `note: demi-cercle supérieur, de (2, 0) à (−2, 0)` ; `math: γ′(t) = (−2 sin t, 2 cos t), |γ′(t)| = 2`, `note: γ′ ≠ 0, courbe régulière`.
 - **Juge** : `param` `{curve:{implicit:'x^2+y^2=4', where:'y>=0'}, orientation:{from:[2,0], to:[-2,0]}}` pour la ligne γ ; puis `equiv` `{vars:['t']}` pour γ′ et |γ′| · **Forme finale** : γ(t), l'intervalle de t, γ′(t), |γ′(t)| simplifié.
 - **Niveaux** :
@@ -107,6 +110,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-line-scalar` — Intégrale curviligne d'un champ scalaire ∫ f dl
 - **Année** 15 · **Prérequis** `v-curve-param`, `a1-int-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). La partie `definite` part d'une lettre de valeur connue (I, L ; `cfg.known`) : l'élève écrit lui-même ∫ f(γ(t))·|γ′(t)| dt. Gabarits : segment de longueur entière (3-4-5), cercle centré en 0 avec f polynôme de degré ≤ 2 (valeurs exactes par Wallis), courbe γ′ = (t² ; c ; √(2c)t) à carré parfait caché (c = 1/2, 2, 8 ; en L4, L5 et variante `open` de 4 points), avec ∫ f dl pour f = z/s en L5. L1 : γ donnée ; L3 : décision « |γ′(t)| ou γ′(t) ? ». Le piège `g6_sqrt_x2_abs` n'est pas proposé.
 - **Intro** : ∫_Γ f dl = ∫ₐᵇ f(γ(t)) |γ′(t)| dt ; avec f = 1, c'est la longueur. Le résultat ne dépend ni du sens ni de la paramétrisation. Exemple : longueur de γ(t) = (t³/3, 3t, (√6/2) t²), t ∈ [−1 ; 1] (examen 2021) ; `math: |γ′(t)|² = t⁴ + 6t² + 9 = (t² + 3)²`, `note: carré parfait, c'est voulu` ; `math: long(Γ) = ∫₋₁¹ (t² + 3) dt = 20/3`.
 - **Juge** : `param` pour la ligne γ ; puis `definite` `{value}` pour les lignes en t et la valeur · **Forme finale** : nombre exact simplifié.
 - **Niveaux** :
@@ -128,6 +132,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-line-vector` — Travail ∫ F · dl et orientation
 - **Année** 15 · **Prérequis** `v-curve-param`, `a1-int-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `param`, `vector` (γ′) et `definite` (départ W de valeur connue). Gabarits : champ polynomial de degré ≤ 2 sur un segment, un graphe y = x² ou x³ (dans les deux sens) ou un arc de cercle partant de l'angle 0 ; gabarit trigonométrique F = (ax² + cy ; bxy + dx) sur un quart, un demi ou un cercle entier (sin t cos²t, `v_sincos_sign`). L1 : γ et γ′ donnés ; L2 : γ donnée ; L3 : décision « paramétrer / potentiel / |γ′| en trop » (le champ n'est pas conservatif) ; L5 : bord d'un demi-disque en deux morceaux, puis la somme. Le gabarit γ(t) = (cos 2t ; cos t) n'est pas fait ; le cas « courbe compliquée, F = ∇φ » est dans `v-pot-find` (L5). Variante `open` : 3 points.
 - **Intro** : ∫_Γ F · dl = ∫ₐᵇ F(γ(t)) · γ′(t) dt. Changer de sens change le signe. Pas de |γ′| ici. Exemple : F = (y², x), Γ : y = x² de (0, 0) à (1, 1) ; `math: γ(t) = (t, t²), γ′(t) = (1, 2t)`, `note: t de 0 à 1` ; `math: F(γ(t)) · γ′(t) = t⁴ + 2t²` ; `math: ∫₀¹ (t⁴ + 2t²) dt = 13/15`.
 - **Juge** : `param` `{curve, orientation}` ; puis `definite` `{value}` · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -150,6 +155,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-domain-topo` — Convexe, étoilé, simplement connexe
 - **Année** 15 · **Prérequis** `a2-rn-topology` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a2-rn-topology` : ouverts de ℝ² et ℝ³.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Une banque de 15 domaines (rectangle, disque, demi-plan, intérieur d'une parabole, disque pointé, couronne, ℝ² \ {0}, extérieur d'un disque, plan fendu, disque privé d'un quart, L, deux disques, ℝ³ \ {0}, ℝ³ \ axe z, boule pointée). L1 : une propriété, avec un dessin (SVG du domaine) ; L2 : le profil des quatre propriétés en QCM à une réponse, avec le dessin ; L3 : le même sans dessin (pas de « tracer Ω » au repère interactif) ; L4 : item `example` (deux points dont le segment sort de Ω, `setNotConvex` ; ou une courbe fermée qui entoure le trou, `loopAroundHole` ; vérifiés par échantillonnage, `vcf-examples-va.js`) ; L5 : la question d'examen (sur quel domaine (−y ; x)/(x² + y²) a-t-il un potentiel ?).
 - **Intro** : convexe ⇒ étoilé ⇒ simplement connexe ⇒ connexe, et aucune réciproque. Dans ℝ², simplement connexe = « sans trou ». ℝ² \ {0} et une couronne ne le sont pas ; ℝ³ \ {0} l'est, ℝ³ privé d'un axe ne l'est pas. Exemple : `math: Ω = {1 ≤ x ≤ 3, 2 ≤ y ≤ 10}`, `note: rectangle : convexe` ; `math: Ω = {2 ≤ x² + y² ≤ 4}`, `note: couronne : connexe, pas simplement connexe`.
 - **Juge** : item `mcq` par propriété (cases « convexe », « étoilé », « simplement connexe », « connexe »), puis `example` (`property:{kind:'set-not-convex'}`) : l'élève donne deux points de Ω dont le segment sort de Ω, vérifié par échantillonnage · **Forme finale** : les quatre cases justes ; un contre-exemple vérifié si « non convexe ».
 - **Niveaux** :
@@ -171,6 +177,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-pot-test` — Le test rot F = 0 et son domaine
 - **Année** 15 · **Prérequis** `v-ops`, `v-domain-topo` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les composantes de rot F (`equiv`), puis une partie « Conclusion » : deux décisions (le domaine est-il simplement connexe ? que dit le critère : oui, non, ou il ne conclut pas ?) et rot F écrit comme un vecteur (juge `vector`). Champs : ∇φ polynomial sur ℝ³ ou un domaine convexe, le même perturbé (rot F ≠ 0), ou (a(x, y) + b(−y, x))/(x² + y²) sur un domaine troué ou un demi-plan. Pas de `blocks` de justification ; L5 : problème de trois QCM (trois champs, trois domaines). QCM d'examen : (ax ; b/y) sur {y > 0} (format 2022), ou (ay ; b/y).
 - **Intro** : si F = ∇φ et F ∈ C¹, alors rot F = 0 (condition **nécessaire**). Si de plus Ω est **simplement connexe** (en particulier convexe), rot F = 0 suffit. Si Ω n'est pas simplement connexe, le théorème ne dit rien. Exemple : F = (2xy + z, x², x + 2z) sur ℝ³ ; `math: rot F = (0 − 0, 1 − 1, 2x − 2x) = (0, 0, 0)` ; `note: ℝ³ est convexe, donc F dérive d'un potentiel`.
 - **Juge** : `equiv` pour rot F (comme `v-ops`) ; puis une ligne de décision `{kind:'decision', prompt:'Que peut-on conclure ?', options:[oui (Ω simplement connexe), on ne sait pas encore (Ω non simplement connexe), non (rot F ≠ 0)]}` ; puis un `blocks` de justification à L4–L5 · **Forme finale** : rot F, la propriété du domaine nommée, la conclusion.
 - **Niveaux** :
@@ -193,6 +200,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-pot-find` — Trouver un potentiel pas à pas
 - **Année** 15 · **Prérequis** `v-pot-test`, `a1-int-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-pot-test` : vérifier rot F = 0 sur un domaine adapté avant de chercher φ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `antideriv` avec `grad` ; les comparaisons ∂α/∂y = … sont des notes, les lignes jugées sont les potentiels successifs (φ = G₁ + α(y, z), G₁ + G₂ + β(z), φ + C, C = …, φ final). L2 : décision « par quelle variable commencer ? » ; L3 : menu (intégrer, comparer, fixer la constante ; une constante au lieu de α, les trois primitives additionnées) ; L4 : en 2D ou 3D, avec sin(xz) ou e^(xy), parfois avec φ(P) = 0 ; L5 : φ(P) = 0, puis ∫ F · dl = φ(B) − φ(A) le long de (t ; 2t³ ; t⁹) (décision : potentiel, ou paramétrer `poor`). Variante `open` : 4 points, avec φ(P) = 0.
 - **Intro** : on intègre F₁ en x, avec une « constante » qui dépend des **autres** variables : φ = ∫ F₁ dx + α(y, z). On dérive en y, on compare à F₂, ce qui donne α en fonction de y et z, et ainsi de suite. À la fin, une seule constante C ; on la fixe si une valeur φ(P) est imposée. Exemple : `math: φ = x²y + xz + α(y, z)`, `note: ∫ (2xy + z) dx` ; `math: ∂_yφ = x² + α_y = x²`, `note: donc α = β(z)` ; `math: ∂_zφ = x + β′(z) = x + 2z`, `note: β = z² + C`.
 - **Juge** : `antideriv` étendu au gradient `{grad:['2xy+z','x^2','x+2z'], vars:['x','y','z']}` : une ligne `φ = G + α(variables restantes)` est juste si ∂G/∂v = Fᵥ pour chaque variable v absente des arguments de α ; une ligne `α_y = …` est jugée par `equiv` contre Fᵧ − ∂_yG ; la condition φ(P) = 0 par `value` · **Forme finale** : φ explicite, sans fonction inconnue ; une seule constante, fixée si une condition est donnée. Sinon `stay` : « Il reste une fonction inconnue » ou « La constante n'est pas fixée ».
 - **Niveaux** :
@@ -217,6 +225,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-pot-lambda` — Potentiel avec un paramètre λ
 - **Année** 15 · **Prérequis** `v-pot-find` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `v-pot-find` : une fois λ trouvé, on construit φ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). λ entre dans une ou deux contributions a·m de ∇φ, devenues (kλ + a − kλ₀)·m, de sorte que rot F = (λ − λ₀)·rot B (au moins deux composantes dépendent de λ). Parties : les composantes de rot F (`equiv` en x, y, z, λ, cible `no-int`), puis λ par `solset` à partir des équations des coefficients, avec la décision « composante par composante / additionner » (`v_rot_scalar_sum`) ; φ (avec φ(P) = 0 en L5) en L4 une fois sur deux et en L5. Variante `open` : problème de 6 points (rot 3, λ 1, φ 2) ; le point « domaine » est dans la note de la ligne λ.
 - **Intro** : rot F = 0 est un **système de trois équations**, vraies pour tout (x, y, z). Chacune donne une condition sur λ ; on garde les λ qui les vérifient toutes. Exemple : F = (2xy + λz, λx², x + 2z) ; `math: rot F = (0, λ − 1, 2(λ − 1)x)` ; `math: λ − 1 = 0 et 2(λ − 1)x = 0 pour tout x`, `note: donc λ = 1`.
 - **Juge** : `equiv` pour rot F ; `solset` `{v:'λ', domain:'R'}` pour la ligne « λ ∈ {1} » ; puis le juge de `v-pot-find` · **Forme finale** : la valeur de λ, puis φ.
 - **Niveaux** :
@@ -239,6 +248,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-pot-none` — Prouver qu'il n'y a pas de potentiel
 - **Année** 15 · **Prérequis** `v-line-vector`, `v-pot-test` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-pot-test` : rot F = 0 ne suffit pas sur un domaine troué.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Champ (a(x, y) + b(−y, x))/(x² + y²), ou centré en (c ; 0) ; cercle de rayon 1 ou 2 autour du trou, ∮ = 2πb. L1 : le cercle donné, l'intégrale à trous ; L2–L4 : rot F, puis des décisions (le critère conclut-il ? quelle courbe ?), la paramétrisation, ∮, et une partie « Conclusion » (décision, puis la valeur rappelée) ; L5 : `blocks` de la preuve avec deux leurres (`v_rot_closed_zero`, `v_pot_no_domain`). Variante `open` : 6 points (conversion en problème).
 - **Intro** : si F = ∇φ sur Ω, alors ∮_Γ F · dl = 0 pour **toute** courbe fermée Γ ⊂ Ω. Une seule courbe fermée avec ∮ ≠ 0 suffit donc à prouver « pas de potentiel ». La réciproque avec une seule courbe est fausse. Exemple : F = (−y, x)/(x² + y²) sur ℝ² \ {0} ; `math: rot F = 0`, `note: mais le domaine a un trou` ; `math: ∮_{cercle unité} F · dl = ∫₀^{2π} (sin²t + cos²t) dt = 2π ≠ 0`, `note: donc pas de potentiel`.
 - **Juge** : `param` (la courbe doit être fermée et contenue dans Ω), `definite` pour ∮, puis une décision ; `blocks` à L5 · **Forme finale** : une courbe fermée de Ω, la valeur ∮ ≠ 0, la conclusion.
 - **Niveaux** :
@@ -262,6 +272,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-pot-domain` — Problème : potentiel et discussion du domaine
 - **Année** 15 · **Prérequis** `v-pot-none`, `v-pot-find` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1–L4 : un item `lines` (les QCM du problème deviennent des décisions) : rot F, décision sur le domaine, cercle et ∮, potentiel sur {x > 0} (Arctg(y/x)), puis ∂φ/∂y = F₂ avec la décision « est-ce un potentiel sur Ω ? » (`v_pot_on_restricted`) ; ou le second gabarit (F = ∇(p + (a/2) ln(x² + y²)) sur {x² + y² > 1} : un potentiel malgré le trou). L5 et variante `open` : `problem` de 8 points (barème V2 : rot 2, domaine 1, ∮ 2, conclusion 1, potentiel 1,5, pourquoi pas sur Ω 0,5 ; second gabarit : rot 2, domaine 1, potentiel 3, conclusion 2) ; variante `open` de 6 points (2021) sans le demi-plan. Pas de L4 « problème avec aides » : un `problem` n'a pas d'aide.
 - **Intro** : un même champ peut dériver d'un potentiel sur un domaine et pas sur un autre. Méthode : rot F ; propriété du domaine ; si le domaine n'est pas simplement connexe, ∮ sur une courbe autour du trou ; sur un domaine plus petit (demi-plan), on trouve φ et on vérifie qu'elle y est **définie**. Exemple : `math: φ = Arctg(y/x) + ½ ln(x² + y²)`, `note: n'est définie que pour x ≠ 0 : potentiel sur {x > 0}, pas sur ℝ² \ {0}`.
 - **Juge** : item `problem` dont les parties sont des `lines` jugés par `equiv` (rot), `mcq` (domaine), `definite` (∮), `antideriv` grad (φ), plus un `blocks` de conclusion · **Forme finale** : conclusion pour chaque domaine.
 - **Niveaux** :
@@ -283,6 +294,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-green` — Théorème de Green et calcul d'une aire
 - **Année** 15 · **Prérequis** `v-line-vector`, `v-ops`, `a2-fubini-rect`, `a2-polar-int` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `v-line-vector` : le membre ∮ F · dl est un travail ; `v-ops` : rot F scalaire en 2D ; `a2-polar-int` : domaines en disque : ∬ en polaires.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `equiv` (rot F, à partir de ∂F₂/∂x − ∂F₁/∂y écrits avec `pd`) et `definite` (∬_D rot F en cartésiennes, en polaires, ou en coordonnées elliptiques pour l'ellipse) ; L1 : ces deux lignes à trous (pas le tableau entier du plan) ; L2 à L4 : décision « Green, paramétrer le bord (`poor`), ou aire » ; L4 tire aussi l'aire d'une ellipse par ½∮(x dy − y dx) (juge `param` pour le bord) et le champ (−y, x)/(x² + y²) (décision « Green s'applique-t-il ? », piège `v_green_singular`) ; L5 : vérifier Green sur un demi-disque pour F = (−by, ax), le diamètre étant une note (F · γ′ = 0) ; pas de triangle en L5. Variante `open` : 3 points (rot F, puis ∮ = rot F × aire) au lieu de 2, le plan `ba3-analyse3` demandant 3 à 14 points.
 - **Intro** : A domaine régulier, ∂A orienté positivement (A à gauche), F ∈ C¹ sur Ā : ∬_A rot F dx dy = ∮_∂A F · dl. Il faut **calculer** rot F : s'il est constant (rot F = 2), ∮ = 2 · aire(A). Aire : ½∮(x dy − y dx). Pas de Green si F a une singularité dans A. Exemple (plan, §5) : F = (−y, x) sur le disque unité ; `math: ∮ F · dl = ∫₀^{2π} 1 dt = 2π` ; `math: rot F = 1 − (−1) = 2, ∬_D 2 dx dy = 2π`, `note: les deux membres sont égaux`.
 - **Juge** : `param` pour le bord ; `definite` `{value}` pour chaque membre ; une ligne de décision « Green s'applique-t-il ? » (singularité, régularité) · **Forme finale** : la valeur, avec rot F calculé.
 - **Niveaux** :
@@ -305,6 +317,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-green-flux` — Forme flux de Green : ∮ F · ν dl = ∬ div F
 - **Année** 15 · **Prérequis** `v-green` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-green` : même théorème, sous forme de flux.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `equiv` (div F, décision « ∬ div F ou ∬ rot F »), `domain` (bornes de type I du triangle ou du carré, dès L2) et `definite` (décision sur l'ordre des intégrales du triangle, piège `v_fubini_bounds`) ; disque en polaires. Gabarit de l'examen 2021 avec a² = π seulement : avec a² = π/2, la valeur ½ + π√(2π)/6 n'est pas une forme close du juge `definite`. L5 : le carré, ∬ div F puis le bord côté par côté (ν du côté x = a par le juge `vector`, piège `v_nu_formula`), les côtés où F · ν = 0 en note. Variante `open` : le problème de L4 (5 points).
 - **Intro** : ν est la normale **extérieure unité** au bord : ν = (γ₂′, −γ₁′)/|γ′| pour un bord orienté positivement. Alors ∮_∂A F · ν dl = ∬_A div F dx dy. Sur un triangle ou un carré, Green évite de découper le bord. Exemple : F = (x², y) sur [0 ; 1]² ; `math: div F = 2x + 1` ; `math: ∬ (2x + 1) dx dy = 1 + 1 = 2`.
 - **Juge** : `equiv` pour div F, `definite` pour l'intégrale double et pour la somme sur les côtés · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -327,6 +340,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-surf-param` — Paramétrer une surface ; normale σ_u ∧ σ_v
 - **Année** 15 · **Prérequis** `a2-cyl-sph`, `g4-cross` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a2-cyl-sph` : sphère et cylindre paramétrés par les coordonnées sphériques et cylindriques.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `param` (σ et A sur une ligne, sans étiquette : l'aide de test `wrongVcf` déplace la parenthèse de l'étiquette σ(r, φ)), `vector` pour σ_u, σ_v et σ_u ∧ σ_v (forme `any`), décision sur le sens de la normale avant σ_u ∧ σ_v ; L3 : décision du type de paramétrisation ; surfaces : révolution (r + p)(q − r) coupée par y ≥ 0, paraboloïdes, calottes, cônes, sphères et hémisphères ; pas de coupe x ≥ 0 ni de cylindre (pas de lettre z parmi les paramètres du juge `param`).
 - **Intro** : graphe z = g(x, y) : σ(x, y) = (x, y, g), σ_x ∧ σ_y = (−g_x, −g_y, 1). Surface de révolution z = h(r) : σ(r, φ) = (r cos φ, r sin φ, h(r)). Sphère de rayon R : σ(θ, φ) avec θ depuis l'axe z ; σ_θ ∧ σ_φ = R² sin θ (sin θ cos φ, sin θ sin φ, cos θ). L'ordre des paramètres fixe le sens de la normale. Exemple : `math: σ(r, φ) = (r cos φ, r sin φ, −r² + 2r + 3), (r, φ) ∈ [0 ; 3] × [0 ; π]`, `note: z = (r + 1)(3 − r), y ≥ 0, z ≥ 0` ; `math: σ_r ∧ σ_φ = ((2r − 2) r cos φ, (2r − 2) r sin φ, r)`.
 - **Juge** : `param` `{surface:{implicit, where}, orientation:'up'|'out'|null}` pour σ et A ; `equiv` `{vars:['u','v']}` pour σ_u, σ_v, σ_u ∧ σ_v · **Forme finale** : σ, A, σ_u ∧ σ_v développé, et le sens de la normale nommé (« vers le haut », « extérieure »).
 - **Niveaux** :
@@ -348,6 +362,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-surf-area` — Aire d'une surface et intégrale ∬ f ds
 - **Année** 15 · **Prérequis** `v-surf-param`, `a2-fubini-rect` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 : |σ_u ∧ σ_v| (juge `equiv`, départ √(N₁² + N₂² + N₃²)) et l'intégrale, σ et la normale donnés ; L2 : la normale puis la norme (décision « norme, vecteur ou 3e composante ») ; L3 et plus : σ et A d'abord ; L5 : ∬ z ds sur un hémisphère (sans l'aire qui suit) ; familles : paraboloïdes à 1 + 4a²ρ² carré parfait, cônes, sphères ; pas de ∬ (x² + y²) ds sur un cylindre.
 - **Intro** : ∬_Σ f ds = ∬_A f(σ(u, v)) |σ_u ∧ σ_v| du dv ; aire = ∬_A |σ_u ∧ σ_v|. Le sens de la normale ne compte pas. Exemple : aire du paraboloïde z = x² + y², z ≤ 2 ; `math: |σ_r ∧ σ_φ| = r √(1 + 4r²)` ; `math: aire = 2π ∫₀^{√2} r √(1 + 4r²) dr = 13π/3`.
 - **Juge** : `param` pour σ, `equiv` pour |σ_u ∧ σ_v|, `definite` ensuite · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -369,6 +384,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-flux` — Flux ∬ F · ds
 - **Année** 15 · **Prérequis** `v-surf-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `param`, `vector` (σ_u ∧ σ_v, puis F(σ) · N), `definite` ; L3 et plus : décision « garder ou échanger l'ordre (r, φ) » quand la normale demandée est vers le bas ; L5 : surface fermée faite d'un cône (normale extérieure) et du disque du haut. Le piège `v_curl_eval` sert dans `v-stokes`, pas ici.
 - **Intro** : ∬_Σ F · ds = ∬_A F(σ) · (σ_u ∧ σ_v) du dv, sans norme. Changer l'ordre de u et v change le signe. Si l'énoncé impose une normale (extérieure, vers le haut), on vérifie le sens de σ_u ∧ σ_v. Exemple : F = (0, 0, z), Σ : z = x² + y², z ≤ 1, normale vers le haut ; `math: σ_r ∧ σ_φ = (−2r² cos φ, −2r² sin φ, r)`, `note: troisième composante > 0 : vers le haut` ; `math: ∬ F · ds = ∫₀^{2π} ∫₀¹ r² · r dr dφ = π/2`.
 - **Juge** : `param` `{surface, orientation}`, `equiv` pour F(σ) · N, `definite` · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -391,6 +407,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-boundary` — Bord orienté ∂Σ = σ(∂A)
 - **Année** 15 · **Prérequis** `v-surf-param`, `v-curve-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-surf-param` : σ et le domaine A des paramètres ; `v-curve-param` : paramétrer chaque morceau du bord.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `boundary`, un côté par ligne (points et paires qui s'annulent d'abord) ; une décision par côté de L1 à L3 (en note au niveau 1) ; dans les lignes guidées, les morceaux sont écrits sans leur nom (le tokenizer du noyau lit « : » comme une division, ce qui casserait les trous) ; la ligne d'union « ∂Σ = … » n'est pas demandée. Surfaces : hémisphère en (θ, φ) ou (φ, θ), révolution (r + p)(q − r) coupée par y ≥ 0 (trois morceaux restants), calotte, en (r, φ) ou (φ, r). L5 et variante `open` (4 points) : le bord, puis ∮ F · dl pour F = c(−y, x, 0) sur un hémisphère ou une calotte.
 - **Intro** : on parcourt ∂A dans le sens positif (A à gauche dans le plan (u, v)), on applique σ à chaque côté, puis on **retire** les côtés dont l'image est un point et les paires parcourues deux fois en sens contraires. Ce qui reste est ∂Σ, avec le sens qui va avec σ_u ∧ σ_v. Exemple (hémisphère, 2022) : `math: θ = 0 ↦ pôle nord`, `note: un point, on le retire` ; `math: φ = 0 et φ = 2π ↦ même méridien, sens contraires`, `note: ils s'annulent` ; `math: θ = π/2 ↦ équateur (3 cos φ, 3 sin φ, 0), φ de 0 à 2π`, `note: c'est le bord`.
 - **Juge** : `boundary` `{surface:{σ, A}}` ; chaque morceau est une ligne `paramètre ↦ courbe, sens` ; les lignes « retiré : point » ou « retirés : s'annulent » sont des décisions · **Forme finale** : liste des morceaux restants, orientés.
 - **Niveaux** :
@@ -414,6 +431,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-div-thm` — Théorème de la divergence
 - **Année** 15 · **Prérequis** `v-flux`, `v-ops`, `a2-cyl-sph` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-flux` : le membre de droite est un flux.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `equiv` (div F), `domain` (bornes en cylindriques z, φ, r, dès L2), `definite` (intégrale triple, valeur connue du générateur, puis la ligne en z après la symétrie, décision « termes impairs nuls ») ; domaines : cylindre et cône (pas de boule ni de demi-boule) ; F = (a x², b y², k z^m) ; L5 : la calotte z = ρ² − r² fermée par le disque z = 0 (normale (0, 0, −1) par le juge `vector`).
 - **Intro** : Ω borné régulier, ν normale extérieure unité, F ∈ C¹ : ∭_Ω div F dx dy dz = ∬_∂Ω F · ν ds. Le côté « volume » est souvent plus simple. Exemple : F = (x, y, z), cylindre x² + y² ≤ 1, 0 ≤ z ≤ 2 ; `math: div F = 3` ; `math: ∭ 3 = 3 · 2π = 6π`.
 - **Juge** : `equiv` pour div F, `definite` pour l'intégrale triple et sa valeur · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -436,6 +454,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-stokes` — Théorème de Stokes
 - **Année** 15 · **Prérequis** `v-flux`, `v-boundary`, `v-line-vector`, `v-ops` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `v-boundary` : le bord σ(∂A) et son orientation.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties `vector` (rot F, rot F(σ), σ_u ∧ σ_v) et `definite` ; F = (−ay, bx, g(z)) sur un hémisphère ou une calotte ; L1 : rot F donné ; L3 : décision du membre (le disque de même bord est `ref`) ; L4 : en plus, le bord par le juge `boundary` et la circulation ; L5 : la courbe intersection d'un cylindre et d'un plan, par le morceau de plan. Pas de F = (0, 0, x² − y²).
 - **Intro** : Σ orientable régulière par morceaux, F ∈ C¹ : ∬_Σ rot F · ds = ∮_∂Σ F · dl, le bord étant σ(∂A) orienté avec σ_u ∧ σ_v. On choisit le membre le plus simple, ou une autre surface de même bord. Exemple : F = (−y, x, z), hémisphère supérieur unité ; `math: rot F = (0, 0, 2)` ; `math: ∬ rot F · ds = 2 · π = 2π`, `note: même valeur que ∮ sur l'équateur`.
 - **Juge** : `equiv` pour rot F ; `boundary` pour ∂Σ ; `definite` pour les intégrales · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -457,6 +476,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-verify-stokes` — Problème : vérifier le théorème de Stokes
 - **Année** 15 · **Prérequis** `v-stokes` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 : rot F et le flux ; L2 : le bord (juge `boundary`) et la circulation ; L3 : σ, la normale et le flux ; L4 : le problème entier en lignes avec aides, hypothèses et sens en décisions ; L5 et `open` : `problem` de 14 points (révolution (r + p)(q − r), y ≥ 0, F ∈ {(0, cx, 0), (−cy, 0, 0)}) ou de 9 points (hémisphère, F = c(−y, x, 0) ou c(y, −x, 0)) ; hypothèses, sens et conclusion sont des QCM ; le flux et la circulation ont deux étapes chacun. Pas de variante en quart de surface.
 - **Intro** : « Vérifier » veut dire calculer **les deux membres** séparément et constater qu'ils sont égaux. On écrit les hypothèses du théorème, rot F, σ, la normale, le flux, puis le bord morceau par morceau. Exemple : la demi-pomme de 2021 donne 9π/2 des deux côtés.
 - **Juge** : `problem` ; parties `lines` jugées par `equiv` (rot F, normale), `param`, `boundary`, `definite` (flux, chaque intégrale du bord), plus une ligne finale « les deux membres valent … » · **Forme finale** : les deux valeurs égales, écrites.
 - **Niveaux** :
@@ -481,6 +501,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 
 ### `v-verify-div` — Problème : vérifier le théorème de la divergence
 - **Année** 15 · **Prérequis** `v-div-thm` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Le cône du catalogue seulement, F = (a x², b y², z^m) ; L1 : le disque du haut et la somme ; L2 : la normale extérieure du cône et son flux ; L3 : toutes les faces ; L4 : tout, en lignes avec aides ; L5 et `open` : `problem` de 9 points (∭ div F en deux étapes 1 + 2, disque 2, normale 1,5, flux du cône 1,5, conclusion 1 en QCM).
 - **Intro** : on calcule ∭ div F, puis le flux sortant par **chaque face** du bord (cône et disque, cylindre et deux disques), avec la normale extérieure de chaque face.
 - **Juge** : `problem` ; `equiv`, `param` (orientation `'out'` par face), `definite` · **Forme finale** : les deux valeurs égales.
 - **Niveaux** :
@@ -502,6 +523,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
 ### `v-proof-identity` — Petites preuves (3 points)
 - **Année** 15 · **Prérequis** `v-identities`, `v-pot-test`, `a2-chain`, `g9-proof-contra` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `v-identities` : identités rot grad = 0 et div rot = 0 ; `v-pot-test` : citer : rot F = 0 sur un convexe ⇒ potentiel ; `g9-proof-contra` : rédiger une preuve directe.
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 : blocs sans leurre ; L2 : un leurre (`v_chain_sign` si le gabarit a une règle de chaîne) ; L3 : les lignes de calcul en mode « choisir l'action », avec un champ tiré F = (∂ψ/∂y, −∂ψ/∂x) à la place de F₁, F₂ abstraites (au lieu de compléter le bloc de la règle de chaîne) ; L4 : la ligne rot G libre et les décisions (définition, conclusion), sans les blocs ensuite ; L5 et `open` (3 points) : blocs avec deux leurres, gabarits G = (F₂(x, −y), F₁(x, −y)), G = (F₂, −F₁) et G = (−F₂, F₁) avec rot F = 0 ⇒ div G = 0.
 - **Intro** : une preuve courte enchaîne : écrire la définition (rot G, div F), dériver avec la règle de chaîne, reconnaître l'hypothèse, citer le théorème avec ses hypothèses (ℝ² convexe). Exemple (2021) : div F = 0 et G(x, y) = (F₂(−x, y), F₁(−x, y)) ; `math: rot G = ∂_x[F₁(−x, y)] − ∂_y[F₂(−x, y)] = −∂₁F₁(−x, y) − ∂₂F₂(−x, y)` ; `math: = −div F(−x, y) = 0`, `note: ℝ² convexe, donc G dérive d'un potentiel`.
 - **Juge** : `blocks` `{mode:'order'}` avec `needs` ; à L4, une ligne de calcul jugée par `equiv` avec des fonctions abstraites (F₁, F₂ remplacées par des fonctions tirées au hasard, div F = 0 imposé par construction) · **Forme finale** : la conclusion placée après tous ses blocs nécessaires.
 - **Niveaux** :
@@ -509,7 +531,7 @@ Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
   - L2 : avec un leurre (« rot G = div F »).
   - L3 : compléter la ligne de règle de chaîne.
   - L4 : écrire la ligne de calcul librement, puis les blocs.
-  - L5 : preuve entière, nouvelle identité (G = (F₂(x, −y), −F₁(x, −y)) ou G = (−F₂, F₁) avec rot F = 0 ⇒ div G = 0).
+  - L5 : preuve entière, nouvelle identité (G = (F₂(x, −y), F₁(x, −y)), pour laquelle rot G = div F(x, −y), ou G = (−F₂, F₁) avec rot F = 0 ⇒ div G = 0).
 - **Générateur** : gabarits de G construits à partir de F par symétrie (x ↦ −x, y ↦ −y) et échange de composantes ; on garde ceux où rot G ou div G se ramène à ±(div F ou rot F)(point symétrique). Pour le contrôle `equiv`, F est tiré dans la famille F = (∂_yψ, −∂_xψ) (div F = 0) avec ψ polynôme aléatoire.
 - **Corrigé type** (énoncé 2021) :
   1. `rot G(x, y) = ∂G₂/∂x − ∂G₁/∂y` — sous-but `definition` (0,5 pt)
@@ -534,9 +556,9 @@ Familles : `calculus`, `geometry`, `method`, `notation`, `sign` (existante). Les
 | `v_identity_drop_term` | rule | E | `v-identities` | `v-ops` | div(fF) = f div F → f div F + F · ∇f | Supprimer le terme F · ∇f (ou ∇f ∧ F pour rot). | « C'est une règle du produit : comme (fg)′ = f′g + fg′, il y a deux termes. Il manque {missing}. » |
 | `v_orientation_reversed` | sign | E | `v-line-vector` | `v-curve-param` | ∮ = −2π → 2π | Candidat γ(a + b − t) pour `param` ; opposé de la valeur pour `definite`. | « Ta courbe est parcourue dans l'autre sens : de {to} vers {from}. Changer de sens change le signe du travail. Pour un bord, le domaine doit rester à gauche. » (Plan §5.) |
 | `v_param_bounds` | geometry | E | `v-curve-param` | `v-curve-param` | demi-cercle avec t ∈ [0 ; 2π] → [0 ; π] | Doubler ou diviser par 2 l'intervalle du paramètre. | « Avec t ∈ [{a} ; {b}], ta courbe fait {fraction} tour. L'énoncé ne demande que {wanted}. » |
-| `v_radius_squared` | geometry | E | `v-line-scalar` | `a2-curve-length` | γ(t) = (R² cos t, R² sin t) → (R cos t, R sin t) | Remplacer R par R² dans γ (ou |γ′| = R²). | « Le cercle x² + y² = {R2} a pour rayon √{R2} = {R}, pas {R2}. » |
-| `v_speed_forgot` | calculus | E | `v-line-scalar` | `v-line-scalar` | ∫₀¹ 7t dt = 7/2 → ∫₀¹ 7t · 5 dt = 35/2 | Supprimer le facteur |γ′(t)| de l'intégrande. | « Pour ∫ f dl, chaque morceau de courbe a la longueur |γ′(t)| dt. Ici |γ′(t)| = {speed} : il multiplie {integrand}. » (Plan §8.) |
-| `v_speed_in_work` | calculus | E | `v-line-vector` | `v-line-vector` | ∫ F(γ) · γ′ · |γ′| dt → ∫ F(γ) · γ′ dt | Multiplier l'intégrande par |γ′(t)| en plus. | « Pour le travail, γ′(t) contient déjà la longueur : on ne multiplie pas encore par |γ′(t)| = {speed}. » |
+| `v_radius_squared` | geometry | E | `v-line-scalar` | `a2-curve-length` | γ(t) = (R² cos t, R² sin t) → (R cos t, R sin t) | Remplacer R par R² dans γ (ou \|γ′\| = R²). | « Le cercle x² + y² = {R2} a pour rayon √{R2} = {R}, pas {R2}. » |
+| `v_speed_forgot` | calculus | E | `v-line-scalar` | `v-line-scalar` | ∫₀¹ 7t dt = 7/2 → ∫₀¹ 7t · 5 dt = 35/2 | Supprimer le facteur \|γ′(t)\| de l'intégrande. | « Pour ∫ f dl, chaque morceau de courbe a la longueur \|γ′(t)\| dt. Ici \|γ′(t)\| = {speed} : il multiplie {integrand}. » (Plan §8.) |
+| `v_speed_in_work` | calculus | E | `v-line-vector` | `v-line-vector` | ∫ F(γ) · γ′ · \|γ′\| dt → ∫ F(γ) · γ′ dt | Multiplier l'intégrande par \|γ′(t)\| en plus. | « Pour le travail, γ′(t) contient déjà la longueur : on ne multiplie pas encore par \|γ′(t)\| = {speed}. » |
 | `v_gamma_prime_forgot` | calculus | E | `v-line-vector` | `v-curve-param` | ∫ F(γ(t)) dt → ∫ F(γ(t)) · γ′(t) dt | Deux candidats : F(γ) · γ au lieu de F(γ) · γ′ ; F₁(γ) + F₂(γ) (γ′ remplacé par (1, 1)). | « Le travail se fait **le long** de la courbe : on fait le produit scalaire avec la vitesse γ′(t) = {gp}, pas avec {used}. » (Plan §5.) |
 | `v_sincos_sign` | sign | C | `v-line-vector` | `a1-int-direct` | ∫₀^π sin t cos²t dt = −2/3 → 2/3 | Dans chaque primitive de sin t cosᵏt (ou cos t sinᵏt), changer le signe : +cosᵏ⁺¹t/(k + 1). | « Avec u = cos t, du = −sin t dt : ∫ sin t cos²t dt = −cos³t/3. Ton signe donne {got} au lieu de {want}. » (Corrigé 2022 : erreur la plus fréquente de la question 6.) |
 | `v_simply_connected_wrong` | geometry | E | `v-domain-topo` | `v-domain-topo` | ℝ² \ {0} « simplement connexe » → non | `wrongValues` : inverser la case « simplement connexe » pour ℝ² \ {0}, la couronne, ℝ³ \ axe, ℝ³ \ {0}. | « Le cercle autour de {hole} ne peut pas se réduire à un point sans sortir du domaine. » (ℝ³ \ {0} : la sphère n'est pas un obstacle pour une courbe, il est simplement connexe.) |
@@ -551,15 +573,15 @@ Familles : `calculus`, `geometry`, `method`, `notation`, `sign` (existante). Les
 | `v_green_singular` | method | C | `v-green` | `v-domain-topo` | Green pour (−y, x)/(x² + y²) sur le disque unité : 0 → 2π | `wrongValues` : ∬_A rot F = 0 pris comme valeur de ∮. | « F n'est pas défini en (0, 0), qui est dans le disque : Green ne s'applique pas. Le calcul direct donne {direct}. » (Plan §5 et §8.) |
 | `v_green_no_rot` | method | C | `v-green` | `v-ops` | « par Green, ∮ = aire » → ∮ = ∬ rot F = 2 · aire | Remplacer rot F par 1 dans ∬_A rot F (on obtient l'aire) ; ou ligne « par Green » sans ligne rot : `stay`. | « Green dit ∮ F · dl = ∬ rot F. Il faut écrire rot F = {rot} : c'est parce qu'il vaut une constante que ∮ = {rot} × aire. » (Corrigé 2022 : citer Green sans calculer rot F = 2 ne donne pas les points.) |
 | `v_pot_on_restricted` | method | C | `v-pot-domain` | `v-domain-topo` | « φ = Arctg(y/x) + ½ ln(x² + y²) est un potentiel sur ℝ² \ {0} » → seulement là où x ≠ 0 | Leurre du `blocks` ; `wrongValues` « oui » pour ℝ² \ {0}. | « Ton φ n'est pas défini sur l'axe x = 0, qui fait partie de Ω. C'est un potentiel sur {x > 0}, pas sur Ω. » (Corrigé 2021.) |
-| `v_nu_formula` | sign | E | `v-green-flux` | `v-curve-param` | ν = (−γ₂′, γ₁′)/|γ′| → (γ₂′, −γ₁′)/|γ′| | Rotation dans l'autre sens : flux opposé ; ou ν non normé (facteur |γ′|). | « Pour un bord parcouru avec le domaine à gauche, la normale extérieure est (γ₂′, −γ₁′)/|γ′|. Ta normale pointe vers l'intérieur. » |
+| `v_nu_formula` | sign | E | `v-green-flux` | `v-curve-param` | ν = (−γ₂′, γ₁′)/\|γ′\| → (γ₂′, −γ₁′)/\|γ′\| | Rotation dans l'autre sens : flux opposé ; ou ν non normé (facteur \|γ′\|). | « Pour un bord parcouru avec le domaine à gauche, la normale extérieure est (γ₂′, −γ₁′)/\|γ′\|. Ta normale pointe vers l'intérieur. » |
 | `v_fubini_bounds` | calculus | E | `v-green-flux` | `a2-domain-describe` | ∫₀ˣ ∫₀ᵃ … dx dy → ∫₀ᵃ ∫₀ˣ … dy dx | Échanger l'ordre des intégrales sans changer les bornes. | « La borne {inner} dépend de x : l'intégrale en y doit être à l'intérieur. » (Plan §8, A2.) |
 | `v_cross_order` | sign | E | `v-surf-param` | `g4-cross` | σ_φ ∧ σ_r au lieu de σ_r ∧ σ_φ ; 2e composante sans le signe − | Candidats −N et N avec la 2e composante opposée. | « Le produit vectoriel change de signe si on échange les facteurs. La 2e composante est a₃b₁ − a₁b₃ : vérifie {second}. » |
 | `v_sphere_theta` | notation | E | `v-surf-param` | `a2-cyl-sph` | z = R sin θ → z = R cos θ (θ depuis l'axe z) | Échanger sin θ et cos θ dans σ (latitude au lieu de colatitude), en gardant R² sin θ. | « Dans ce cours, θ se mesure depuis l'axe z : z = R cos θ et le facteur est R² sin θ. » |
 | `v_surf_domain` | geometry | E | `v-surf-param` | `v-surf-param` | φ ∈ [0 ; 2π] avec y ≥ 0 → [0 ; π] | Doubler l'intervalle de φ ; prendre r jusqu'à l'autre racine de z = 0 (r = −1). | « y ≥ 0 veut dire sin φ ≥ 0, donc φ ∈ [0 ; π]. z ≥ 0 donne {r-range}, avec r ≥ 0. » |
-| `v_jacobian_surface` | calculus | E | `v-surf-area` | `v-surf-area` | aire = ∬_A du dv → ∬_A |σ_u ∧ σ_v| du dv | Supprimer |σ_u ∧ σ_v| (on obtient l'aire du domaine A). | « Le domaine A n'a pas la même aire que Σ : chaque petit rectangle du dv devient un parallélogramme d'aire |σ_u ∧ σ_v| du dv = {norm} du dv. » |
-| `v_normal_not_norm` | calculus | E | `v-surf-area` | `v-surf-area` | ∬ f · (σ_u ∧ σ_v)₃ → ∬ f |σ_u ∧ σ_v| | Garder seulement la 3e composante de N (ou N sans norme). | « Pour ∬ f ds, il faut la **norme** de σ_u ∧ σ_v, pas une de ses composantes. » |
+| `v_jacobian_surface` | calculus | E | `v-surf-area` | `v-surf-area` | aire = ∬_A du dv → ∬_A \|σ_u ∧ σ_v\| du dv | Supprimer \|σ_u ∧ σ_v\| (on obtient l'aire du domaine A). | « Le domaine A n'a pas la même aire que Σ : chaque petit rectangle du dv devient un parallélogramme d'aire \|σ_u ∧ σ_v\| du dv = {norm} du dv. » |
+| `v_normal_not_norm` | calculus | E | `v-surf-area` | `v-surf-area` | ∬ f · (σ_u ∧ σ_v)₃ → ∬ f \|σ_u ∧ σ_v\| | Garder seulement la 3e composante de N (ou N sans norme). | « Pour ∬ f ds, il faut la **norme** de σ_u ∧ σ_v, pas une de ses composantes. » |
 | `v_normal_flip` | sign | C | `v-flux` | `v-boundary` | ∬ rot F · ds = −18π → 18π (la normale « corrigée » alors que le bord n'a pas été changé) | Opposé du flux. | « Le cours n'exige pas une normale extérieure pour Stokes : il faut que le bord soit σ(∂A) parcouru avec **la même** paramétrisation. Tu as changé {which} sans changer l'autre. » (Corrigé 2022.) |
-| `v_normal_unit_twice` | calculus | E | `v-flux` | `v-flux` | ∬ F · N/|N| du dv → ∬ F · N du dv | Diviser l'intégrande par |N|. | « Dans ∬ F · ds = ∬ F · (σ_u ∧ σ_v) du dv, la norme se simplifie : ν ds = (σ_u ∧ σ_v) du dv. » |
+| `v_normal_unit_twice` | calculus | E | `v-flux` | `v-flux` | ∬ F · N/\|N\| du dv → ∬ F · N du dv | Diviser l'intégrande par \|N\|. | « Dans ∬ F · ds = ∬ F · (σ_u ∧ σ_v) du dv, la norme se simplifie : ν ds = (σ_u ∧ σ_v) du dv. » |
 | `v_curl_eval` | calculus | C | `v-stokes` | `v-ops` | rot F(σ(θ, φ)) = (0, 0, −6 cos θ) → (0, 0, −2) | Pour rot F constant c, multiplier une composante de c par une composante de σ (candidats c·σ₁, c·σ₂, c·σ₃). | « rot F = {c} ne dépend pas du point : en σ(θ, φ), il vaut encore {c}. » (Corrigé 2022.) |
 | `v_boundary_orient` | sign | C | `v-boundary` | `v-boundary` | (3 cos t, 3 sin t, 0) → (3 cos t, −3 sin t, 0) | Bord parcouru dans l'autre sens : opposé de ∮. | « Avec ta paramétrisation σ(φ, θ), le bord σ(∂A) tourne dans le sens {sense}. Ton cercle tourne dans l'autre sens. » (Corrigé 2022.) |
 | `v_boundary_pieces` | geometry | C | `v-boundary` | `v-boundary` | ∂Σ = méridien + équateur → équateur | Ajouter l'intégrale sur un seul des deux côtés qui s'annulent, ou donner une contribution non nulle au côté réduit à un point. | « Les côtés φ = 0 et φ = 2π ont la même image, parcourue dans les deux sens : ils s'annulent. Le côté θ = 0 devient un point. » (Plan §8.) |
@@ -591,7 +613,7 @@ Format `ba3-analyse3` : 120 min, sans document ni calculatrice ; QCM à une rép
 
 # C. Analyse complexe
 
-Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
+Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : fait le 10 novembre 2026 (étape U10, voir README §17)
 
 **Sources** : Analyse III MT (programme normal : analyse complexe au semestre d'automne) ; Analyse IV MT/SV 2021 (Prof. Picasso : QCM à plusieurs réponses sur Cauchy, Laurent, résidus, intégrale trigonométrique, Laplace inverse par résidus ; corrigé d'étudiants) ; Analyse IV GC/IN/SC/SIE 2022 (Cauchy-Riemann, conjuguée harmonique, Laurent, résidus, intégrales réelles) ; Analyse IV GM (astuces du cours, examens 2015–2016 de P. Metzener : Taylor, couronnes de Laurent) ; Dacorogna et Tanteri, chapitres 9 à 13.
 
@@ -612,6 +634,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-elem-fn` — Fonctions élémentaires : e^z, cos z, Log z, z^α
 - **Année** 15 · **Prérequis** `g8-polar`, `g2-hyp-def` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g2-hyp-def` : cos(iy) = cosh y.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Parties jugées par `cvalue` (nouveau juge, `js/judges/cplx-ca.js` : même valeur que `complex`, formes finales du cours comme e^(−π/2), ln √2 − 3πi/4, cosh 2). L'argument se saisit `arg(…)` (le noyau ne lit pas `Arg`). Gabarits : Log z (|z|, Arg z, puis Log), z^α, cos(bi), sin(bi), |e^z| ; pas de dérivées (Log(z² + 1))′ au niveau 4. L5 : un problème (|cos(x + iy)|² ou |sin(x + iy)|² jugé par `cvalue` en x, y, puis un QCM « borné ? ») ou des lignes sans aide. QCM multi : 5 affirmations.
 - **Intro** : e^(x+iy) = eˣ(cos y + i sin y), |e^z| = e^(Re z), e^z est 2πi-périodique. cos z = (e^(iz) + e^(−iz))/2 n'est **pas borné** : cos(iy) = cosh y. Log z = ln|z| + i Arg z avec Arg ∈ ]−π ; π] ; z^α = e^(α Log z) ; (z^α)′ = αz^(α−1) hors de ]−∞ ; 0]. Exemple : `math: Log(−1 − i) = ln √2 + i·(−3π/4)`, `note: Arg dans ]−π ; π]` ; `math: i^i = e^(i·Log i) = e^(i·iπ/2) = e^(−π/2)`, `note: un nombre réel`.
 - **Juge** : `complex` `{form:'a+bi'}` (valeurs exactes avec ln, π, e) · **Forme finale** : a + bi, ou r·e^(iθ) si demandé.
 - **Niveaux** :
@@ -632,6 +655,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-equations` — Équations dans ℂ
 - **Année** 15 · **Prérequis** `c-elem-fn`, `g8-quadratic` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Nouveau juge `cfamily` (`js/judges/cplx-ca.js`) pour l'équation en w (« multiplier par 2w ») et pour les familles z₀ + 2kπi (« ; k ∈ ℤ » ou « , k ∈ ℤ ») ; les racines w par `complex` (ensemble). Gabarits : a cosh z + b sinh z = c (racines parmi ±1, ±i, ±2, ±1/2, ±i/2, ±1/3, ±i/3, ±3, ±3i, ±1 ± i) et q cos z = p, q sin z = p (racines réelles ou imaginaires) ; pas de mélange a cos z + b sin z. L3 : décision w = e^z ou w = e^(iz). L5 et `open` : le même calcul en problème de 3 points (2 au catalogue : le plan `ba3-analyse3` tire de 3 à 14 points), sans l'enchaînement avec la série de Taylor de GM 2015.
 - **Intro** : pour une équation en cosh, sinh, cos, sin, on pose w = e^z (ou w = e^(iz)), on résout un polynôme en w, puis e^z = w donne z = Log w + 2kπi. Exemple : 2 cosh z + sinh z = i ; `math: 3w² − 2iw + 1 = 0`, `note: après multiplication par 2w` ; `math: w = i ou w = −i/3`.
 - **Juge** : `equiv` pour la ligne polynomiale en w (multiplication par w ≠ 0 annoncée) ; `complex` pour les racines ; `solset` `{v:'z', domain:'C', periodic:'2πi'}` pour l'ensemble final (familles) · **Forme finale** : ensemble écrit en familles z = z₀ + 2kπi, k ∈ ℤ.
 - **Niveaux** :
@@ -654,6 +678,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-cauchy-riemann` — Cauchy-Riemann et holomorphie
 - **Année** 15 · **Prérequis** `c-elem-fn`, `a2-partials` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-elem-fn` : u et v de e^z, z² et Log z.
+- **Statut** : fait le 10 novembre 2026 (étape U10). u + iv par `cvalue` (z = x + iy, finale : un seul terme en i), les quatre dérivées par `equiv`, puis f′(z) en z (fonction holomorphe) ou le système de Cauchy-Riemann résolu par `system` (un seul point : holomorphe sur aucun ouvert) ; la comparaison est une décision (piège `c_cr_sign`). Fonctions : z² + pz, z³, e^z, sinh z, cosh z ; |z − c|², z·Re z, |z|² + i(px + qy), z̄². z/|z|² et z̄ (aucun point) restent dans les QCM. L5 et `open` : deux fonctions, 3 points chacune (2,5 au catalogue : une étape par dérivée, au moins un demi-point chacune).
 - **Intro** : f = u + iv, avec u, v ∈ C¹, est holomorphe sur un ouvert si et seulement si u_x = v_y et u_y = −v_x partout sur cet ouvert. On écrit u et v, on calcule les quatre dérivées, on compare. Exemple : `math: f(z) = sinh z : u = sinh x cos y, v = cosh x sin y` ; `math: u_x = cosh x cos y = v_y ; u_y = −sinh x sin y = −v_x`, `note: holomorphe sur ℂ`.
 - **Juge** : `equiv` `{vars:['x','y']}` pour u, v et les dérivées ; décision finale (holomorphe partout, nulle part, sur un ensemble) jugée comme un `mcq` · **Forme finale** : u, v, les 4 dérivées, la comparaison, la conclusion.
 - **Niveaux** :
@@ -676,6 +701,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-harmonic-conj` — Construire f holomorphe à partir de v
 - **Année** 15 · **Prérequis** `c-cauchy-riemann` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-cauchy-riemann` : u_x = v_y et u_y = −v_x.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Δv par `equiv` (cible `constant`), u par `antideriv` avec `grad` (`name: 'u'`), f en z par `cvalue` (z = x + iy, la constante C est une lettre réelle échantillonnée) après la décision « C réelle » (`c_harmonic_const_imag`). La ligne f(x) = u(x, 0) + i v(x, 0) est dans la note, pas une ligne jugée ; pas de gabarit « u donné ». L5 et `open` : v = 3x²y − y³ + e^(x² − y²) sin 2xy (+ cy), 5 points (1 + 2 + 2).
 - **Intro** : v doit être harmonique (Δv = 0). On trouve u par u_x = v_y, puis u_y = −v_x fixe la « constante » α(y). Pour écrire f en z : f(x) = u(x, 0) + i v(x, 0) sur l'axe réel, puis on remplace x par z. La constante est **réelle** si v est imposée. Exemple (2022) : `math: v = 3x²y − y³ + e^(x² − y²) sin(2xy)` ; `math: f(z) = z³ + e^(z²) + c, c ∈ ℝ`, `note: Im(z³) = 3x²y − y³, Im(e^(z²)) = e^(x²−y²) sin 2xy`.
 - **Juge** : `antideriv` gradient (comme `v-pot-find`) pour u à partir de (v_y, −v_x) ; `equiv` pour la forme en z (comparaison de f(x + iy) avec u + iv sur 12 points) · **Forme finale** : f(z) explicite en z, plus une constante réelle.
 - **Niveaux** :
@@ -698,6 +724,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-contour-param` — Intégrales de contour par paramétrisation
 - **Année** 15 · **Prérequis** `c-elem-fn`, `v-curve-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-elem-fn` : e^(it) et fonctions de z évaluées sur le contour.
+- **Statut** : fait le 10 novembre 2026 (étape U10). γ par `param` (courbe complexe, segment ou cercle), puis γ′(t), f(γ(t))γ′(t) (`cvalue` en t, la valeur demandée quelle que soit la ligne : une ligne sans γ′ nomme `c_contour_dz_forgot`) et l'intégrale (`cvalue`, ∫ calculée numériquement). Fonctions z̄, Re z, Im z, |z|², z², 1/z ; pas de (z − z₀)ⁿ. L1 : γ donné. L5 : un problème (z̄ sur le demi-cercle et sur le segment de 2a à 0, puis un QCM « pourquoi ? ») ou des lignes sans aide.
 - **Intro** : ∫_γ f(z) dz = ∫ₐᵇ f(γ(t)) γ′(t) dt, avec γ à valeurs complexes. Cercle de centre z₀ et rayon R : γ(t) = z₀ + R e^(it), γ′ = iRe^(it). Exemple : `math: ∮_{|z|=1} z̄ dz = ∫₀^{2π} e^(−it) · i e^(it) dt = 2πi`, `note: z̄ n'est pas holomorphe, ∮ ≠ 0`.
 - **Juge** : `param` (courbe dans ℂ ≅ ℝ²) ; `complex` pour la valeur · **Forme finale** : a + bi exact.
 - **Niveaux** :
@@ -719,6 +746,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-cauchy-thm` — Théorème de Cauchy
 - **Année** 15 · **Prérequis** `c-cauchy-riemann` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-cauchy-riemann` : f holomorphe sur Ω.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Singularités par `complex` (ensemble) ou `cfamily` (cos z = 0, période π), place de chacune et conclusion par des décisions (`c_pole_outside_counted`, `c_pole_on_contour`), puis ∮ = 0 (`cvalue`). Les leçons n'ont que des fonctions dont toutes les singularités sont hors du disque fermé ; « sur Γ » et « dedans » sont des QCM (L5 : un problème de 4 QCM, examen). Pas de dessin au niveau 1.
 - **Intro** : si f est holomorphe sur un ouvert simplement connexe Ω qui contient la courbe fermée Γ, alors ∮_Γ f dz = 0. On vérifie donc où sont les singularités : à l'intérieur, sur Γ (intégrale non définie), ou dehors. Exemple : `math: ∮_{|z|=1} dz/(z + 2)² = 0`, `note: la seule singularité, −2, est hors du disque`.
 - **Juge** : décision par fonction (`mcq`) : « singularités dans / sur / hors de Γ », puis valeur `complex` · **Forme finale** : 0 justifié, ou « non défini », ou renvoi aux résidus.
 - **Niveaux** :
@@ -741,6 +769,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-cauchy-formula` — Formule intégrale de Cauchy
 - **Année** 15 · **Prérequis** `c-cauchy-thm` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-cauchy-thm` : placer les singularités par rapport à Γ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). n par une décision (`c_cauchy_n_factor`), g⁽ⁿ⁾(z) par `cvalue` (z échantillonné dans ℂ), puis la valeur 2πi g⁽ⁿ⁾(z₀)/n! (`cvalue`, les fausses valeurs du piège dans la configuration). g parmi e^(az), cos z, sin z, z^k, 1/(z − b) ; z₀ ∈ {0, 1, i}. L5 : un problème (QCM sur la formule, puis un calcul).
 - **Intro** : f holomorphe, z₀ à l'intérieur de Γ : f^(n)(z₀) = n!/(2πi) ∮_Γ f(z)/(z − z₀)^(n+1) dz. On lit donc ∮ g/(z − z₀)^(n+1) = 2πi g^(n)(z₀)/n!. Exemple : `math: ∮_{|z|=1} e^(2z)/z³ dz = 2πi · (e^(2z))″(0)/2!`, `note: n = 2, puissance n + 1 = 3` ; `math: = 2πi · 4/2 = 4πi`.
 - **Juge** : `complex` · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -761,6 +790,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-taylor` — Série de Taylor et rayon de convergence
 - **Année** 15 · **Prérequis** `a1-pow-domain`, `a1-ser-geo-tele` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-ser-geo-tele` : série géométrique 1/(1 − u).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les Σ sont jugées par `cvalue` sur l'axe réel, dans le disque (le juge `series` n'a que des coefficients réels et pas de Σ) ; une série fausse est refusée avec un témoin. Rayon : une valeur (`c_taylor_radius`). Gabarits 1/(a ± z²), 1/(a ± z), 1/(1 + bz), z/(1 − z)² ; au niveau 4 aussi a₀…a₃ d'un quotient (dont 1/(sin z + 2 cos z − 3), GM 2015) par `series`. `coef` : a₂ ou a₃ d'un quotient. Pas de e^z/(1 − z) en terme général ; L5 : des lignes sans aide.
 - **Intro** : une fonction holomorphe sur le disque |z − z₀| < R est égale à sa série de Taylor sur ce disque ; le rayon est la **distance de z₀ à la singularité la plus proche**. Pour une fraction, on se ramène à 1/(1 − w) = Σ wⁿ, |w| < 1. Exemple (2022) : `math: 1/(3 + z²) = (1/3) · 1/(1 + z²/3) = Σ (−1)ⁿ z^(2n)/3^(n+1)` ; `math: rayon √3`, `note: singularités ±i√3`.
 - **Juge** : `series` `{v:'z', at:0, order:k}` (coefficients complexes) ; `value` pour le rayon · **Forme finale** : terme général (ou premiers coefficients demandés) et rayon.
 - **Niveaux** :
@@ -782,6 +812,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-laurent` — Série de Laurent dans une couronne donnée
 - **Année** 15 · **Prérequis** `c-taylor`, `g0-pfd-simple` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-taylor` : développer en série autour de z₀.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Pôles réels seulement (a, b ∈ {0, ±1, ±2, ±3}) : chaque série est comparée par `cvalue` sur un segment réel de la couronne ; une série de l'autre couronne y diverge et est comparée là où elle converge (`c_laurent_wrong_annulus`). Éléments simples par `cvalue` (finale « éléments simples »). L4 : aussi autour de z₀ = 1. L5 : un problème (les trois régions, puis a₋₃ ou a₋₄ : a₋₂ vaut toujours 1 hors des deux pôles). `coef` : un coefficient, ou e^(1/z), z² sin(1/z), cos(1/z). Pas de e^(1/z) en lignes.
 - **Intro** : dans une couronne r < |z − z₀| < R, f = Σ_{n∈ℤ} aₙ(z − z₀)ⁿ. On décompose en éléments simples, puis chaque terme 1/(z − a) se développe selon la couronne : si |z| < |a|, en puissances de z/a ; si |z| > |a|, en puissances de a/z. Exemple : `math: 1/(1 − z) = Σ_{n≥0} zⁿ (|z| < 1)` ; `math: 1/(1 − z) = −Σ_{n≥1} z^(−n) (|z| > 1)`, `note: même fonction, deux séries`.
 - **Juge** : `series` `{v:'z', at:z0, annulus:[r, R]}` (Laurent : puissances négatives admises ; contrôle numérique en 6 points de la couronne) · **Forme finale** : Σ avec terme général, ou les coefficients demandés.
 - **Niveaux** :
@@ -804,6 +835,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-singularities` — Classer les singularités
 - **Année** 15 · **Prérequis** `c-laurent`, `a1-dl-usual` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-laurent` : lire la plus basse puissance de la série de Laurent.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Ordres des zéros par `series` (en h = z − a quand z₀ = a ≠ 0, le juge `series` ne finissant pas une ligne « (z − a) + o(z − a) »), nature par une décision (`c_removable_as_pole`), ordre du pôle par `cvalue` (`c_order_pole_numerator`) ; toutes les réponses vérifiées par `singularityType`. Pas de z₀ = π dans les lignes. Essentielles (e^(1/z), z² sin(1/z), sin(1/(1 − 2z)), cos(1/z)) en QCM. L5 : un problème de QCM (les deux singularités d'une fonction) ; `open` : deux fonctions, 1,5 point chacune.
 - **Intro** : singularité isolée z₀ : **apparente** (pas de puissance négative ; lim finie), **pôle d'ordre m** (la plus basse puissance est (z − z₀)^(−m)), **essentielle** (une infinité de puissances négatives). Pour un quotient, ordre du pôle = ordre du zéro du dénominateur − ordre du zéro du numérateur. Exemple : `math: g = (e^(z−π) − 1)/sin²z en π`, `note: numérateur : zéro d'ordre 1 ; dénominateur : zéro d'ordre 2` ; `math: pôle simple`.
 - **Juge** : item `mcq` (type de singularité) suivi d'un `answer` pour l'ordre ; lignes d'ordre des zéros jugées par `series` (premier coefficient non nul) · **Forme finale** : type, et ordre si pôle.
 - **Niveaux** :
@@ -825,6 +857,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-res-simple` — Résidu en un pôle simple
 - **Année** 15 · **Prérequis** `c-singularities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-singularities` : vérifier que le pôle est simple.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les valeurs sont jugées par le nouveau juge `cval` (js/judges/cplx-cb.js : une valeur complexe nommée par son étiquette, « Res(f ; z₀) », comparée à la valeur de référence, puis ligne à ligne comme `complex`) ; q′ et q′(z₀) sont deux parties `cval` (q′ comparée en 6 points réels). Gabarits : z² + a², z⁴ + 4, (z − a)(z − b), z³ − 1 en 1, sin z, cos z ; pas de z⁴ + 1 (racines d'ordre 8). L2 et L3 : décision de méthode ; L3 : menus ; L5 : les résidus d'un demi-plan (z⁴ + 4 ou (z² + a²)(z² + b²)). `coef` : la seule partie « Res ». QCM : 1/q′(z₀) (`c_essential_factor`, comme le catalogue), l'opposé, l'inverse, le double ; QCM multi : la forme p(z₀)/q′(z₀) est aussi juste. `c_sqrt_i` n'est pas proposé.
 - **Intro** : en un pôle simple, Res(f, z₀) = lim (z − z₀) f(z) ; si f = p/q avec q(z₀) = 0, q′(z₀) ≠ 0, p(z₀) ≠ 0 : Res = p(z₀)/q′(z₀). Exemple : `math: Res(1/(z⁴ + 4), 1 + i) = 1/(4(1 + i)³)`, `note: q′ = 4z³` ; `math: (1 + i)³ = −2 + 2i, donc Res = −(1 + i)/16`.
 - **Juge** : `complex` (exact dans ℚ(i), avec e^(…) et sinh si besoin) · **Forme finale** : a + bi simplifié.
 - **Niveaux** :
@@ -844,6 +877,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-res-multiple` — Résidu en un pôle multiple
 - **Année** 15 · **Prérequis** `c-singularities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). φ = (z − z₀)^m f, φ^(m−1) et la valeur sont des parties `cval` (variables z, et t pour la Laplace inverse). L5 : e^(zt)/((z − a)²(z − b)) : résidu double, résidu simple, puis y(t), en `cval` avec la variable t (au lieu de `equiv`). `c_simple_formula_double` : la valeur φ(z₀) (la dérivée oubliée), et l'option fausse de la décision ; `c_multiple_factorial` : sans 1/(m − 1)! ou avec 1/m!.
 - **Intro** : pôle d'ordre m : Res = 1/(m − 1)! · lim_{z→z₀} d^(m−1)/dz^(m−1) [(z − z₀)^m f(z)]. La formule du pôle simple donne une limite infinie. Exemple (2021) : `math: Res(e^(zt)/((z + 1)²(z + 2)), −1) = d/dz[e^(zt)/(z + 2)] en −1`, `note: m = 2, 1/1! = 1` ; `math: = (t e^(zt)(z + 2) − e^(zt))/(z + 2)² en −1 = t e^(−t) − e^(−t)`.
 - **Juge** : `complex` si la valeur est un nombre ; `equiv` `{vars:['t']}` si elle contient t (Laplace inverse) · **Forme finale** : valeur simplifiée.
 - **Niveaux** :
@@ -865,6 +899,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-res-laurent` — Résidu par la série de Laurent (singularité essentielle)
 - **Année** 15 · **Prérequis** `c-laurent`, `c-singularities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-singularities` : reconnaître une singularité essentielle.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Le changement w = z − z₀ est une partie `cval` en w ; les développements en puissances de 1/w ou de 1/z sont jugés par le nouveau juge `laur` (le juge `series` en v → +∞, avec sa propre forme finale : des monômes, chaque puissance une fois, et un reste o(1/vⁿ)), parce que `series` ne développe pas en un point complexe ; le résidu est une partie `cval`. Gabarits : g(1/(a − bz)) avec g ∈ {sin, sinh, exp, cos}, et z^k g(1/z) avec g ∈ {sin, cos, exp, sinh, cosh}. L5 et `open` : un problème de 4 points (nature en QCM, 1 pt ; série, 1 pt ; résidu, 2 pts).
 - **Intro** : le résidu est toujours a₋₁, le coefficient de 1/(z − z₀). Pour une singularité essentielle, c'est la seule méthode. Exemple (2022) : h = sin(1/(2i − 3z)) en z₀ = 2i/3 ; `math: 1/(2i − 3z) = −1/(3(z − 2i/3))` ; `math: h = −1/(3(z − z₀)) + 1/(162 (z − z₀)³) − …`, `note: Res = −1/3`.
 - **Juge** : `series` (Laurent en z₀) pour le développement ; `complex` pour a₋₁ · **Forme finale** : a₋₁, avec la série jusqu'au terme utile.
 - **Niveaux** :
@@ -885,6 +920,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-res-theorem` — Théorème des résidus sur un contour fermé
 - **Année** 15 · **Prérequis** `c-res-simple`, `c-res-multiple`, `c-cauchy-thm` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Une décision « à l'intérieur / à l'extérieur / sur Γ » par pôle (L2 et L3), les résidus intérieurs et la somme en parties `cval` ; le sous-but `locate` est la ligne 2πi(…), qui choisit les résidus. Contours : cercles |z − c| = R (c ∈ {0, i, 1}) ; L5 : carré ou ellipse, 3 ou 4 pôles. Pôles dans ℤ, ℤi et 1 + i (un pôle double possible), numérateurs de degré ≤ 1, dénominateurs ≤ 12. Pas de gabarit « non défini » ni de sin z/z² dans les lignes : le QCM multi « ∮ = 0 ? » (C2) les contient. `open` : le même f sur deux contours, 5 points.
 - **Intro** : on liste les singularités, on garde celles **à l'intérieur** de Γ, on calcule leurs résidus, ∮ = 2πi Σ. Une singularité sur Γ rend l'intégrale non définie. Exemple : `math: ∮_{|z|=2} (z + 1)/(z(z − 1)(z − 3)) dz`, `note: 0 et 1 dedans, 3 dehors` ; `math: = 2πi (1/3 − 1) = −4πi/3`.
 - **Juge** : décision « dedans / dehors / sur » par singularité (`mcq`), `complex` pour chaque résidu et pour la somme · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -907,6 +943,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-arc-estimate` — Montrer qu'une intégrale sur un arc tend vers 0
 - **Année** 15 · **Prérequis** `c-contour-param`, `g8-algebraic` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-contour-param` : longueur de l'arc paramétré ; `g8-algebraic` : modules et inégalité triangulaire.
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 à L3 en blocs (L2 et L3 avec les leurres de `c_cos_bounded`, `c_arc_triangle` et `c_jordan_alpha_sign` ; L3 : la minoration du dénominateur à écrire). L4 : le nouveau juge `arcb` (chaque ligne doit majorer, ou minorer, la précédente en tout point de l'arc : 8 rayons de 3 à 50, 33 angles) au lieu de `equiv` avec `rel`, qui ne connaît qu'une variable ; puis la limite en R (`limit`). L5 : le demi-cercle gauche de la Laplace inverse, t échantillonné. Gabarits : z² + a², z⁴ + 4 (avec ou sans z au numérateur), e^(iαz) avec α ∈ {0, ±1, ±2, 3}. `open` : la version L4 en problème de 3 points.
 - **Intro** : |∫_{C_R} f dz| ≤ longueur(C_R) · max_{C_R} |f|. On majore le numérateur (|e^(iαz)| = e^(−α Im z) ≤ 1 si α > 0 et Im z ≥ 0), on **minore** le dénominateur par l'inégalité triangulaire inverse |z² + 1| ≥ R² − 1, et la longueur vaut πR. Exemple : `math: |∫_{C_R} e^(2iz)/(z² + 1) dz| ≤ πR · 1/(R² − 1)` ; `math: → 0 quand R → ∞`.
 - **Juge** : `blocks` `{mode:'order'}` avec des blocs-inégalités ; à L4, chaque inégalité est vérifiée par `equiv` sur un échantillon (z sur l'arc, R ∈ [3 ; 50]) : l'inégalité doit être vraie partout ; la borne finale par `limit` `{v:'R', to:'inf'}` · **Forme finale** : une borne explicite qui tend vers 0.
 - **Niveaux** :
@@ -915,7 +952,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
   - L3 : compléter la minoration du dénominateur.
   - L4 : écrire la majoration librement.
   - L5 : l'arc C_r du demi-plan gauche pour la Laplace inverse (2021 : |e^(zt)| = e^(t r cos θ) ≤ 1 pour θ ∈ [π/2 ; 3π/2]).
-- **Générateur** : f = p(z)e^(iαz)/q(z) avec deg q ≥ deg p + 1 (α > 0) ou deg q ≥ deg p + 2 (α = 0) ; q = z² + a², z⁴ + 4, (z + 1)²(z + 2) ; arc supérieur, inférieur (α < 0) ou gauche (Laplace).
+- **Générateur** : f = p(z)e^(iαz)/q(z) avec deg q ≥ deg p + 2 (la majoration longueur × max ne tend vers 0 que dans ce cas ; avec deg q = deg p + 1 et α > 0, il faut le lemme de Jordan) ; q = z² + a², z⁴ + 4, (z + 1)²(z + 2) ; arc supérieur, inférieur (α < 0) ou gauche (Laplace).
 - **Corrigé type** (∫_{C_R} e^(2iz)/(z² + 1) dz, C_R demi-cercle supérieur) :
   1. sur C_R : `|e^(2iz)| = e^(−2 Im z) ≤ 1` — sous-but `numerator`
   2. `|z² + 1| ≥ |z|² − 1 = R² − 1` — sous-but `denominator`
@@ -928,6 +965,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-int-rational` — Intégrales rationnelles sur ℝ
 - **Année** 15 · **Prérequis** `c-res-theorem`, `c-arc-estimate` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Résidus en `cval`, arc en `arcb` (L4 et L5), 2πi Σ Res en `cval`, puis la conclusion en `definite` (valeur contrôlée par quadrature). L2 et L3 : décision « quels pôles ? ». L5 : ∫₀^∞ par parité, en `definite`. Gabarits du catalogue, plus 1/(x² + a²) et x²/((x² + a²)(x² + b²)) ; x²/(x⁴ + 1) est remplacé par x²/(x⁴ + 4) (pôles dans ℚ(i)). `open` : la version L4, 7 points.
 - **Intro** : si deg q ≥ deg p + 2 et q sans racine réelle, ∫_ℝ p/q dx = 2πi Σ_{Im z_k > 0} Res(p/q, z_k). Exemple (plan, §5) : `math: ∫_ℝ dx/(1 + x²) = 2πi · Res(1/(1 + z²), i) = 2πi/(2i) = π`.
 - **Juge** : `complex` pour les résidus ; `definite` `{value}` pour la valeur réelle (contrôle par quadrature) · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -949,6 +987,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-int-trig` — Intégrales trigonométriques sur [0 ; 2π]
 - **Année** 15 · **Prérequis** `c-res-theorem` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). L'intégrande en z est une partie `cval` en z (comparaison en 6 points réels de ]−1 ; 1[, forme finale : une seule fraction P(z)/Q(z)) au lieu de `equiv`, qui ne calcule pas avec i ; puis le pôle intérieur (`cval`, l'autre racine nomme `c_pole_outside_counted`), son résidu, 2πi Res, et la conclusion en `definite`. L3 : décision sur la racine à garder. L5 : la moitié des items avec les paramètres a et b (∫₀^{2π} dθ/(a + b sin θ)) ; pas de cos²θ/(a + cos θ). QCM multi au format 2021, avec `c_trig_sub`. `open` : 5 points.
 - **Intro** : z = e^(iθ) transforme ∫₀^{2π} R(cos θ, sin θ) dθ en une intégrale sur le cercle unité : cos θ = (z + 1/z)/2, sin θ = (z − 1/z)/(2i), dθ = dz/(iz). On garde les pôles de |z| < 1. Exemple (2022) : `math: ∫₀^{2π} dθ/(2 − cos θ) = ∮ 2i/(z² − 4z + 1) dz` ; `math: pôle intérieur 2 − √3, résidu −i/√3, donc 2π/√3`.
 - **Juge** : `equiv` `{vars:['z'], complex:true}` pour l'intégrande en z ; `complex` pour les résidus ; `definite` pour la valeur · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -971,6 +1010,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-int-fourier` — Intégrales avec e^(iαx)
 - **Année** 15 · **Prérequis** `c-res-theorem`, `c-arc-estimate` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). R ∈ {1/(x² + a²), x/(x² + a²), x/(x⁴ + 4), 1/((x² + 1)(x² + 4))} ; α < 0 seulement pour les R paires. Résidus et J en `cval` ; arc en `arcb` (pas pour x/(x² + a²), où il faut le lemme de Jordan, cité dans l'énoncé de la partie) ; la partie réelle ou imaginaire en `definite`, avec la valeur exacte donnée (`known` : la quadrature ne calcule pas une intégrale oscillante sur ℝ). L2 et L3 : décisions « e^(iαz) ou cos(αz) ? » et « quel demi-plan ? ». L5 et `open` : l'exemple d'examen C1 (11 points) en `problem` : contour (QCM, 1 pt), pôles (QCM, 1,5 pt), résidus (3), somme et J (1,5), arc (3), conclusion (1), avec α ∈ {1, 2, 3}.
 - **Intro** : pour ∫_ℝ R(x) cos(αx) dx ou sin(αx), on calcule ∫_ℝ R(x) e^(iαx) dx et on prend la partie réelle ou imaginaire. On ne met **pas** cos(αz) dans le contour : il n'est pas borné. Pour α > 0, on ferme en haut. Exemple : `math: ∫_ℝ cos(2x)/(x² + 1) dx = Re(2πi · e^(−2)/(2i)) = π e^(−2)`.
 - **Juge** : `complex` (résidus avec exponentielles) ; `definite` pour la valeur · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -995,6 +1035,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-int-branch` — Intégrales avec coupure (GM)
 - **Année** 15 · **Prérequis** `c-int-rational`, `c-elem-fn` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `c-int-rational` : mêmes résidus de R(z) que pour une intégrale rationnelle ; `c-elem-fn` : z^a avec la coupure, argument dans ]0 ; 2π[.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Le facteur 1 − e^(2πia), les résidus écrits avec des exponentielles explicites et I sont des parties `cval`, puis la conclusion en `definite` (quadrature). L3 : décision sur la détermination de l'argument (`c_log_branch`). Gabarits : 1/(1 + x) et 1/(x + 2) avec a < 0 seulement (convergence), 1/(1 + x²) avec a = ±1/2, ±1/3 ; L5 : 1/(1 + x²). Le contour n'est pas dessiné. `open` : 6 points.
 - **Intro** : pour ∫₀^∞ x^a R(x) dx (−1 < a < 1, a ∉ ℤ), on prend z^a avec l'argument dans ]0 ; 2π[ (coupure sur ℝ₊) et un contour en trou de serrure. Les deux bords de la coupure donnent (1 − e^(2πia)) ∫₀^∞ x^a R(x) dx = 2πi Σ Res. Exemple : `math: ∫₀^∞ dx/(√x (1 + x))`, `note: a = −1/2` ; `math: (1 − e^(−iπ)) I = 2πi · e^(−iπ/2) = 2π, donc I = π`.
 - **Juge** : `complex` (résidus avec z^a, argument dans ]0 ; 2π[) ; `definite` · **Forme finale** : nombre réel exact.
 - **Niveaux** :
@@ -1003,7 +1044,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
   - L3 : choisir la détermination de l'argument.
   - L4 : libre.
   - L5 : ∫₀^∞ x^(1/3)/(1 + x²) dx = π/√3.
-- **Générateur** : a ∈ {−1/2, 1/3, −1/3, 1/2}, R ∈ {1/(1 + x), 1/(1 + x²), 1/(x + 2)} ; valeurs connues (π/sin(πs) et variantes).
+- **Générateur** : a ∈ {−1/2, 1/3, −1/3, 1/2}, R ∈ {1/(1 + x), 1/(1 + x²), 1/(x + 2)}, avec −1 < a < 0 pour 1/(1 + x) et 1/(x + 2) (sinon l'intégrale diverge en +∞) ; valeurs connues (π/sin(πs) et variantes).
 - **Corrigé type** (I = ∫₀^∞ dx/(√x (1 + x))) :
   1. `f(z) = z^(−1/2)/(1 + z)`, arg z ∈ ]0 ; 2π[ — sous-but `branch`
   2. bord inférieur : `z^(−1/2) = x^(−1/2) e^(−iπ)` — sous-but `factor`
@@ -1016,6 +1057,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 ### `c-fourier-residues` — Transformée de Fourier calculée par les résidus (GM)
 - **Année** 15 · **Prérequis** `c-int-fourier` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les résidus de e^(−iαz)f et f̂(α) pour α > 0 sont des parties `cval` (variable α) ; f̂ pour tout α, avec |α|, est jugée par `transform`. L2 et L3 : décision « quel demi-plan pour α > 0 ? ». Gabarits : 1/(x² + a²), 1/((x² + a²)(x² + b²)) ; L5 : 1/((x² + 4)(x² + 9)) ou 1/(x⁴ + 4) ; pas de x/(x² + a²)². `open` : la version L4, 5 points.
 - **Intro** : f̂(α) = (1/√(2π)) ∫_ℝ f(x) e^(−iαx) dx. Pour α < 0, e^(−iαz) est borné en haut ; pour α > 0, on ferme **en bas**, avec −2πi Σ Res. On traite les deux cas, puis on écrit avec |α|. Exemple : `math: F(1/(1 + x²))(α) = (1/√(2π)) · π e^(−|α|) = √(π/2) e^(−|α|)`, `note: même ligne que la table`.
 - **Juge** : `transform` `{kind:'fourier', of, v:'x', s:'α', dir:'forward'}` pour la ligne finale ; `complex` pour les résidus · **Forme finale** : expression en α avec |α|, sans 𝓕.
 - **Niveaux** :
@@ -1038,6 +1080,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 ### `c-conformal` — Applications conformes (opt.)
 - **Année** 15 · **Prérequis** `c-elem-fn` · **Étiquettes** `opt` · **Optionnelle** oui · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `c-elem-fn` : homographies et fonctions élémentaires.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Images de points en `cval` (`c_mobius_point` : la division terme à terme) ; L2 : les mêmes calculs, trous plus larges ; L3 : décision « cercle ou droite » et menus ; L4 : l'homographie qui envoie trois points donnés (`cval` en z, une seule fraction) ; L5 et l'examen : QCM d'images de droites et de régions (e^z, z², homographies). L'image d'une droite n'est pas jugée par `geom` (QCM).
 - **Intro** : f holomorphe avec f′ ≠ 0 conserve les angles. Une homographie w = (az + b)/(cz + d) envoie cercles et droites sur des cercles et droites ; on la détermine par l'image de trois points. Exemple : `math: w = (z − i)/(z + i)`, `note: envoie le demi-plan Im z > 0 sur le disque |w| < 1` ; `math: z = 0 ↦ −1, z = 1 ↦ −i, z = ∞ ↦ 1`.
 - **Juge** : `complex` pour les images de points ; `geom` `{object:'circle'}` pour l'image d'une droite ou d'un cercle · **Forme finale** : la transformation, ou l'image demandée.
 - **Niveaux** :
@@ -1063,17 +1106,17 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 | `c_exp_periodic` | rule | E | `c-equations` | `c-elem-fn` | e^z = i ⟹ z = iπ/2 → z = iπ/2 + 2kπi | Supprimer la famille + 2kπi (une seule solution). | « e^z est périodique de période 2πi : toutes les solutions sont {z0} + 2kπi, k ∈ ℤ. » |
 | `c_sqrt_i` | rule | C | `c-equations` | `g8-algebraic` | √(−16) = −4 ou √(z₁z₂) = √z₁ √z₂ → ±4i, et pas de règle de produit | Remplacer √(−a) par −√a, ou appliquer √(ab) = √a√b à des nombres non positifs. | « Dans ℂ, "√" n'a pas de règle de produit : √(−1)·√(−1) ≠ √1. Écris Δ = (4i)², donc les racines carrées de Δ sont ±4i. » (Plan §8 : i sous une racine.) |
 | `c_cr_sign` | sign | E | `c-cauchy-riemann` | `c-cauchy-riemann` | u_y = v_x → u_y = −v_x | Comparer u_y à +v_x (ou u_x à −v_y). | « Les équations sont u_x = v_y et u_y = **−** v_x. Avec le bon signe, {got} devient {want}. » |
-| `c_conj_not_holo` | rule | E | `c-cauchy-riemann` | `c-cauchy-riemann` | ∮_{|z|=1} z̄ dz = 0 → 2πi | `wrongValues` : 0 pour les intégrales de z̄, |z|², Re z sur un contour fermé ; « holomorphe » pour z̄. | « z̄ ne vérifie pas Cauchy-Riemann (u_x = 1, v_y = −1) : le théorème de Cauchy ne s'applique pas. » |
+| `c_conj_not_holo` | rule | E | `c-cauchy-riemann` | `c-cauchy-riemann` | ∮_{\|z\|=1} z̄ dz = 0 → 2πi | `wrongValues` : 0 pour les intégrales de z̄, \|z\|², Re z sur un contour fermé ; « holomorphe » pour z̄. | « z̄ ne vérifie pas Cauchy-Riemann (u_x = 1, v_y = −1) : le théorème de Cauchy ne s'applique pas. » |
 | `c_harmonic_const_imag` | rule | E | `c-harmonic-conj` | `c-harmonic-conj` | f = z² + 3z + c avec c ∈ ℂ → c ∈ ℝ | Constante c complexe (partie imaginaire libre). | « Im f = v est imposée : une constante ic changerait v. La constante est réelle. » |
 | `c_contour_dz_forgot` | calculus | E | `c-contour-param` | `c-contour-param` | ∫₀¹ t dt = 1/2 → ∫₀¹ t (1 + i) dt | Supprimer γ′(t) de l'intégrande. | « dz = γ′(t) dt = {gp} dt : ce facteur manque. » |
-| `c_pole_on_contour` | method | C | `c-cauchy-thm` | `c-cauchy-thm` | ∮_{|z|=1} dz/(z(z + 1)) = 2πi → non définie | `wrongValues` : appliquer les résidus en ignorant la singularité située sur Γ. | « −1 est **sur** le cercle |z| = 1 : l'intégrale n'est pas définie. » (Corrigé MT/SV 2021.) |
+| `c_pole_on_contour` | method | C | `c-cauchy-thm` | `c-cauchy-thm` | ∮_{\|z\|=1} dz/(z(z + 1)) = 2πi → non définie | `wrongValues` : appliquer les résidus en ignorant la singularité située sur Γ. | « −1 est **sur** le cercle \|z\| = 1 : l'intégrale n'est pas définie. » (Corrigé MT/SV 2021.) |
 | `c_pole_outside_counted` | method | C | `c-res-theorem` | `c-cauchy-thm` | 2πi(Res₀ + Res₁ + Res₃) → 2πi(Res₀ + Res₁) | Ajouter les résidus des singularités extérieures à Γ. | « {z} est à distance {d} du centre, plus que le rayon {R} : il est dehors et ne compte pas. » (Astuces d'Analyse IV GM ; plan §8.) |
-| `c_cos_bounded` | rule | C | `c-arc-estimate` | `c-elem-fn` | « |cos z| ≤ 1 sur l'arc » → |cos(x + iy)|² = cos²x + sinh²y | Leurre du `blocks` ; `wrongValues` : arc → 0 pour une fonction en cos(αz). | « cos z n'est pas borné sur ℂ : cos(iy) = cosh y → ∞. Utilise e^(iαz), borné dans le demi-plan supérieur. » (Plan §8.) |
+| `c_cos_bounded` | rule | C | `c-arc-estimate` | `c-elem-fn` | « \|cos z\| ≤ 1 sur l'arc » → \|cos(x + iy)\|² = cos²x + sinh²y | Leurre du `blocks` ; `wrongValues` : arc → 0 pour une fonction en cos(αz). | « cos z n'est pas borné sur ℂ : cos(iy) = cosh y → ∞. Utilise e^(iαz), borné dans le demi-plan supérieur. » (Plan §8.) |
 | `c_eiax_cos` | method | C | `c-int-fourier` | `c-arc-estimate` | ∮ cos(2z)/(z² + 1) → ∮ e^(2iz)/(z² + 1), puis Re | Remplacer e^(iαz) par cos(αz) dans le contour ; valeur produite π cosh α /… (résidu de cos(αz)/(z² + 1) en i). | « Sur l'arc, cos(αz) contient e^(−iαz), qui explose en haut : l'arc ne tend pas vers 0. » (Même remarque que `c_cos_bounded`.) |
 | `c_cauchy_n_factor` | rule | C | `c-cauchy-formula` | `c-cauchy-formula` | f^(n)(z₀) = n!/(2πi) ∮ f/(z − z₀)ⁿ → (z − z₀)^(n+1) | Puissance n au lieu de n + 1, ou n! oublié. | « Pour la dérivée n-ième, la puissance est n + 1 : avec n = {n}, on divise par (z − z₀)^{n+1}. » (Corrigé MT/SV 2021, QCM.) |
 | `c_laurent_sign` | sign | C | `c-taylor` | `a1-ser-geo-tele` | 1/(1 + z) = Σ zⁿ → Σ (−1)ⁿ zⁿ | Supprimer le facteur (−1)ⁿ (ou les signes alternés du DL de sin). | « 1/(1 + z) = 1/(1 − (−z)) : la raison est −z, d'où (−1)ⁿ. » (Corrigé MT/SV 2021, QCM.) |
-| `c_laurent_wrong_annulus` | method | E | `c-laurent` | `c-laurent` | dans |z| > 1 : 1/(z − 1) = −Σ zⁿ → Σ_{n≥1} z^(−n) | Prendre le développement en puissances de z quand il faut celui en 1/z (ou l'inverse). | « Dans {annulus}, |z| > {a} : |z/a| > 1 et la série en z/a diverge. Écris 1/(z − a) = (1/z) · 1/(1 − a/z). » |
-| `c_taylor_radius` | method | E | `c-taylor` | `c-taylor` | rayon de 1/(3 + z²) = 3 → √3 | Prendre |z₀ − singularité|² ou la constante au lieu de la distance. | « Le rayon est la distance de {z0} à la singularité la plus proche, ici {pole} : |{pole}| = {R}. » |
+| `c_laurent_wrong_annulus` | method | E | `c-laurent` | `c-laurent` | dans \|z\| > 1 : 1/(z − 1) = −Σ zⁿ → Σ_{n≥1} z^(−n) | Prendre le développement en puissances de z quand il faut celui en 1/z (ou l'inverse). | « Dans {annulus}, \|z\| > {a} : \|z/a\| > 1 et la série en z/a diverge. Écris 1/(z − a) = (1/z) · 1/(1 − a/z). » |
+| `c_taylor_radius` | method | E | `c-taylor` | `c-taylor` | rayon de 1/(3 + z²) = 3 → √3 | Prendre \|z₀ − singularité\|² ou la constante au lieu de la distance. | « Le rayon est la distance de {z0} à la singularité la plus proche, ici {pole} : \|{pole}\| = {R}. » |
 | `c_removable_as_pole` | method | E | `c-singularities` | `c-singularities` | sin z/z a un pôle en 0 → singularité apparente | Classer « pôle d'ordre m » sans tenir compte du zéro du numérateur. | « sin z/z → 1 quand z → 0 : la singularité est apparente, son résidu est 0. » |
 | `c_order_pole_numerator` | method | E | `c-singularities` | `c-singularities` | (e^(z−π) − 1)/sin²z : pôle double → pôle simple | Ordre = ordre du zéro du dénominateur seulement. | « Le numérateur s'annule aussi en π (ordre 1) : l'ordre du pôle est 2 − 1 = 1. » |
 | `c_simple_formula_double` | rule | E | `c-res-multiple` | `c-res-simple` | Res(1/(z²(z − 1)), 0) = lim z · f → limite infinie | Appliquer lim (z − z₀) f ou p/q′ en un pôle d'ordre ≥ 2 (q′(z₀) = 0 : `wrongValues` « ∞ » ou un nombre obtenu en simplifiant mal). | « 0 est un pôle **double** : la formule du pôle simple donne une limite infinie. Multiplie par z² puis dérive une fois. » (Plan §8.) |
@@ -1082,9 +1125,9 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 | `c_essential_factor` | calculus | E | `c-res-laurent` | `c-laurent` | Res(sin(1/(2i − 3z)), 2i/3) = 1 → −1/3 | Oublier le facteur −1/3 de 1/(2i − 3z) = −1/(3(z − z₀)). | « 1/(2i − 3z) = −1/(3(z − 2i/3)) : le coefficient de 1/(z − z₀) est −1/3. » |
 | `c_residue_2pii` | calculus | E | `c-res-theorem` | `c-res-theorem` | ∮ = Σ Res → 2πi Σ Res | Oublier 2πi, ou mettre πi. | « Le théorème des résidus : ∮ = **2πi** × somme des résidus. » |
 | `c_upper_half_lower_pole` | method | E | `c-int-rational` | `c-int-rational` | garder −i au lieu de i → valeur opposée | Prendre les pôles du demi-plan inférieur avec +2πi. | « Le contour ferme en **haut** : seuls les pôles d'Im > 0 sont dedans. » |
-| `c_jordan_alpha_sign` | sign | E | `c-int-fourier` | `c-arc-estimate` | α < 0 et fermeture en haut → fermer en bas | Fermer dans le mauvais demi-plan pour le signe de α. | « |e^(iαz)| = e^(−α Im z) : avec α = {alpha}, il est borné quand Im z {sign} 0. » |
+| `c_jordan_alpha_sign` | sign | E | `c-int-fourier` | `c-arc-estimate` | α < 0 et fermeture en haut → fermer en bas | Fermer dans le mauvais demi-plan pour le signe de α. | « \|e^(iαz)\| = e^(−α Im z) : avec α = {alpha}, il est borné quand Im z {sign} 0. » |
 | `c_trig_sub` | calculus | C | `c-int-trig` | `c-int-trig` | 1/(√5 − sin θ) ↦ 2/(−z² + iz√5 + 1) → 2/(−z² + 2iz√5 + 1) | Oublier dθ = dz/(iz), ou le facteur 2 de sin θ = (z − 1/z)/(2i) en multipliant. | « En multipliant par 2iz, le terme √5 devient 2i√5 z : il manque {missing}. » (Corrigé MT/SV 2021, QCM.) |
-| `c_arc_triangle` | rule | E | `c-arc-estimate` | `g8-algebraic` | 1/|z² + 1| ≤ 1/(R² + 1) → ≤ 1/(R² − 1) | Majorer 1/|q| avec la majoration de |q| (sens inverse). | « Pour majorer 1/|q|, il faut **minorer** |q| : |z² + 1| ≥ R² − 1. » |
+| `c_arc_triangle` | rule | E | `c-arc-estimate` | `g8-algebraic` | 1/\|z² + 1\| ≤ 1/(R² + 1) → ≤ 1/(R² − 1) | Majorer 1/\|q\| avec la majoration de \|q\| (sens inverse). | « Pour majorer 1/\|q\|, il faut **minorer** \|q\| : \|z² + 1\| ≥ R² − 1. » |
 | `c_branch_factor` | calculus | E | `c-int-branch` | `c-elem-fn` | (1 + e^(2πia)) I → (1 − e^(2πia)) I | Signe du bord inférieur, ou argument π au lieu de 2π. | « Sous la coupure, l'argument vaut 2π, donc z^a = x^a e^(2πia), parcouru dans l'autre sens. » |
 | `c_fourier_res_sign` | sign | E | `c-fourier-residues` | `c-int-fourier` | fermer en bas avec +2πi → −2πi | Ne pas changer le signe quand le contour est parcouru dans le sens négatif. | « Le demi-cercle du bas est parcouru dans le sens négatif : ∮ = −2πi Σ Res. » |
 | `c_mobius_point` | calculus | E | `c-conformal` | `g8-algebraic` | (1 − i)/(1 + i) = 1 → −i | Division complexe fausse (numérateurs et dénominateurs divisés terme à terme). | « Multiplie par le conjugué : (1 − i)(1 − i)/2 = −i. » |
@@ -1108,7 +1151,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 # F. Fourier, Laplace, EDP, distributions
 
-Unité `fourier` · préfixe `f-` · pièges `f_` · Statut : à faire
+Unité `fourier` · préfixe `f-` · pièges `f_` · Statut : fait le 10 novembre 2026 (étape U10, voir README §17)
 
 **Sources** : Analyse IV MT/SV (examens 2016, 2017, test blanc 2017, juin 2019, juin 2021 et son corrigé d'étudiants, souvenirs d'examen) ; Analyse III MT/SV 2021-22, qui contenait exceptionnellement les séries et la transformée de Fourier (examen blanc, examen du 18.01.2022 et son corrigé avec les « Common mistakes », série de révision, série 13) ; Analyse III MT/SV janvier 2021 et son corrigé ; Analyse IV GC/IN/SC/SIE 2022 (Laplace, intégro-différentielle, chaleur avec Neumann, Laplace dans un demi-plan) ; Analyse IV GM (examens 2015–2016 de P. Metzener ; Sturm-Liouville) ; fiches « Propriétés de la transformée de Fourier » et « … de Laplace » ; formulaires des transformées (Dacorogna et Tanteri p. 118 et 126, et formulaire MT 2021-22) ; Dacorogna et Tanteri, chapitres 14 à 18.
 
@@ -1180,6 +1223,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-coef` — Coefficients de Fourier, parité, a₀ et petits indices
 - **Année** 16 · **Prérequis** `a1-int-parts`, `g1-parity-period` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Familles c·x, c·x², c·|x| et la marche ±c sur ]−π ; π[ (c ∈ {1, 2, 3}) ; au niveau 4, c·x, c·x², c·|x| sur ]−L ; L[ (L ∈ {1, 2}, T = 2L) avec une décision « ω = 2π/T » (`f_period_omega`). Parité et « a₀ à part » sont des décisions (des notes au niveau 1) ; a₀ par `definite` ; aₙ ou bₙ par `equiv` en n (domaine entier, ∫ par quadrature), lignes d'intégration par parties calculées exactement (`fourier-a-kit.js`, valeurs q·π^e·(−1)ⁿˢ/nᵏ) ; puis n = 2k + 1 (`equiv` en k) quand les termes pairs s'annulent. Niveau 5 : p + q cos(mx) + c|x| ou c·x² (indice spécial m par `value`, `f_a0_separate`). Variantes : `mcq` à plusieurs réponses (affirmations sur a₀, aₘ, bₙ), `coef` (aₙ ou bₙ pour un n donné, `value`), `open` (5 points). Pas de famille « ni paire ni impaire » ici (elle est dans `f-dirichlet`) ; |x| est intégré sur [0 ; π] (la quadrature ne passe pas le coin en 0).
 - **Intro** : d'abord la période T et la parité : f paire ⟹ bₙ = 0 et aₙ = (4/T)∫₀^{T/2} f cos ; f impaire ⟹ aₙ = 0. a₀ se calcule **à part** (la formule générale contient souvent un 1/n²). Si f contient un polynôme trigonométrique (1 + cos 2x), ses coefficients se lisent, et les indices concernés (a₂) se traitent à part. Exemple : f(x) = x² sur [−π ; π] ; `math: f paire : bₙ = 0` ; `math: a₀ = (2/π)∫₀^π x² dx = 2π²/3` ; `math: aₙ = (2/π)∫₀^π x² cos(nx) dx = 4(−1)ⁿ/n²`.
 - **Juge** : `equiv` `{vars:['n'], domain:{n:{int:[1,40]}}}` pour les lignes en n (les ∫ définies sont évaluées par quadrature à chaque n tiré) ; `value` pour a₀ ; une ligne de décision pour la parité · **Forme finale** : a₀, aₙ, bₙ explicites (cas n pair et impair séparés si besoin), sans ∫.
 - **Niveaux** :
@@ -1203,6 +1247,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-coef-complex` — Coefficients complexes cₙ d'une somme d'exponentielles
 - **Année** 16 · **Prérequis** `f-coef`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-coef` : passage aₙ, bₙ ↔ cₙ ; `g8-polar` : e^(ikx) = cos kx + i sin kx.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Polynômes trigonométriques réels : c₀ et deux fréquences k ≤ 7, (aₖ, bₖ) entiers ou demis ; donnés en cos/sin (sens « vers les cₖ ») ou en exponentielles (sens « vers les aₖ, bₖ »). Chaque valeur demandée est une partie du juge `fcomplex` (nouveau, `js/judges/fourier-a-judges.js` : `complex` avec une valeur attendue et une forme finale réduite). Niveau 1 : formules en note ; niveaux 2 à 4 : décision « dans quel sens » (avec `f_coef_complex_convert`) ; niveau 5 : les deux sens dans le même item. Variante `mcq` à plusieurs réponses. La liste « coefficients non nuls » est faite par le QCM, pas par une ligne.
 - **Intro** : cos(kx) = (e^(ikx) + e^(−ikx))/2, sin(kx) = (e^(ikx) − e^(−ikx))/(2i). On lit les cₖ sans intégrer. Passage aux réels : aₙ = cₙ + c₋ₙ, bₙ = i(cₙ − c₋ₙ). Exemple (2022) : `math: g = cos x + 3 sin 3x` ; `math: c₁ = c₋₁ = 1/2, c₃ = 3/(2i) = −3i/2, c₋₃ = 3i/2`, `note: les autres sont nuls`.
 - **Juge** : `complex` par coefficient ; item `mcq` multi pour « lesquels sont non nuls » · **Forme finale** : liste des cₖ non nuls avec leur valeur.
 - **Niveaux** :
@@ -1224,6 +1269,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-sine-cosine` — Séries en sinus et en cosinus sur [0 ; L]
 - **Année** 16 · **Prérequis** `f-coef` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `f-coef` : même calcul de coefficients, sur le prolongement.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Séries en sinus de c·x, c, c·x², c·x(L − x) sur [0 ; L] (L ∈ {π, 1, 2}), c(2πx − x²) et le triangle 2x / 2π − 2x (2019) sur [0 ; π] ; séries en cosinus (≈ 30 % aux niveaux 1 à 4) de c·x, c·x², c·x(L − x) avec a₀ par `definite`. Décisions « quel prolongement » (niveau 3) et « quelle formule » (avec `f_sine_wrong_factor`, `f_interval_02pi`) ; bₙ par `equiv` en n, puis n = 2k + 1. Variantes `mcq` à plusieurs réponses (deux écritures justes, les valeurs des pièges) et `open` (5 points). x cos(x/2) (2016, produit en somme) n'est pas fait.
 - **Intro** : F_s f est la série de Fourier du prolongement **impair** de f, 2L-périodique : bₙ = (2/L)∫₀^L f(x) sin(nπx/L) dx. F_c f, celle du prolongement **pair**. On intègre sur [0 ; L] seulement. Exemple : `math: f(x) = x(π − x) sur [0 ; π]` ; `math: bₙ = (2/π)∫₀^π x(π − x) sin(nx) dx = 4(1 − (−1)ⁿ)/(πn³)`, `note: 8/(πn³) si n impair, 0 si n pair`.
 - **Juge** : `equiv` `{vars:['n'], domain:{n:{int:[1,40]}}}` · **Forme finale** : bₙ (ou aₙ) explicite, cas pair et impair séparés.
 - **Niveaux** :
@@ -1246,6 +1292,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-dirichlet` — Dirichlet : valeur aux sauts, puis une somme numérique
 - **Année** 16 · **Prérequis** `f-coef`, `a1-fn-onesided`, `g5-reindex` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `a1-fn-onesided` : f(x + 0) et f(x − 0).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Scénarios : x² en π et en 0, |x| en 0, −x/π (exemple du catalogue) en 0 (Σ 1/(2k − 1)², ou Σ 1/(k − ½)² au niveau 5), la rampe en π, x et la marche en π/2 (Σ (−1)ᵏ/(2k + 1)), et des sauts sans somme (marche en 0, x en π, série en sinus de c en π). F(x₀) par `value` (`f_dirichlet_skip`, `f_sine_endpoint`), le terme en x₀ pour n = 2k ± 1 par `equiv` en k (décision « k ≥ ? » avec `f_sum_reindex`), S par `value`. La continuité est une décision. L'équation de Dirichlet en S est donnée dans l'énoncé de la dernière partie (la ligne « F(x₀) = a₀/2 + Σ … » n'est pas écrite par l'élève). Niveau 5 : série en sinus de c, F_s f(π), puis π/2. Variantes `mcq` à plusieurs réponses (le catalogue dit « une réponse » : le format F est multiple) et `open` (4 points).
 - **Intro** : si f est C¹ par morceaux, F f(x) = (f(x + 0) + f(x − 0))/2 partout. On compare donc F f et f point par point (sauts, bords de [0 ; L] pour F_s : le prolongement impair vaut 0 en 0 et en L). Pour une somme numérique, on choisit un x où les cos ou sin deviennent ±1 ou 0, on écrit Dirichlet, on isole la somme. Exemple (2021) : `math: F f(0) = (π + 0)/2 = π/2`, `note: f saute en 0 : on ne prend pas f(0)` ; `math: π/2 = 3π/4 − (2/π) Σ_{n impair} 1/n²`, `note: donc Σ 1/(2k − 1)² = π²/8`.
 - **Juge** : `value` pour F f(x₀) (exact) ; `equiv` pour la ligne qui isole la somme ; `value` pour la somme · **Forme finale** : comparaison écrite (F f = f sur … ; en … F f vaut …), puis la somme exacte.
 - **Niveaux** :
@@ -1268,6 +1315,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-parseval` — Parseval et sommes
 - **Année** 16 · **Prérequis** `f-coef` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `f-coef` : les aₙ et bₙ à substituer.
+- **Statut** : fait le 10 novembre 2026 (étape U10). x → Σ 1/n², x² → Σ 1/n⁴, |x| → Σ 1/(2k + 1)⁴, la marche → Σ 1/(2k + 1)² (f multipliée par c ∈ {1, 2, 3}) ; niveau 5 : x³ → Σ 1/n⁶ (2022). Le membre de gauche G est écrit par l'élève (juge `definite`, valeur de G connue ; `f_parseval_factor`, `_bounds`, `_square`), a₀²/2 (`value`, `f_parseval_a0`), le carré du coefficient (`equiv` en n ou k ; `f_parseval_expand` pour x³), les sommes données substituées (`equiv` en S), puis S (`value`). Niveau 3 : décision « Parseval ou Dirichlet ». Variantes `mcq` à plusieurs réponses et `open` (5 points). Les séries Σ cos(2πnx)/qⁿ (série de révision) ne sont pas faites.
 - **Intro** : (2/T) ∫₀^T f² dx = a₀²/2 + Σ (aₙ² + bₙ²), avec les **bornes de la période où f est définie** (]−π ; π[, pas [0 ; 2π] si f est donnée sur ]−π ; π[), le **carré** de f, et le facteur 2/T. Exemple : f(x) = x sur ]−π ; π[, bₙ = 2(−1)ⁿ⁺¹/n ; `math: (1/π)∫_{−π}^{π} x² dx = 2π²/3 = Σ 4/n²`, `note: donc Σ 1/n² = π²/6`.
 - **Juge** : `definite` pour le membre intégral ; `equiv` pour le membre série (développement de bₙ²) ; `value` pour la somme · **Forme finale** : somme exacte.
 - **Niveaux** :
@@ -1289,6 +1337,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-coef-relations` — Relations entre coefficients ; dérivation terme à terme
 - **Année** 16 · **Prérequis** `f-coef` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Paires f = x → g = m·x², x³ → m·x⁴ (2022), 2x sur [−1 ; 1[ → m·x² (test blanc 2017), m ∈ {1/4, 1/2, 1, 2, 4}. La relation et ses hypothèses sont une décision (« tout recalculer » est juste mais `poor`) ; aₙ(h) puis aₙ(g) par le juge `prob` (valeur attendue en n, domaine entier ; `f_coef_relation_factor`), a₀ par `definite`. La question réciproque (niveaux 3 et 5) est une décision « dériver terme à terme ? » (`f_termwise_deriv`). Variantes `mcq` à plusieurs réponses et `open` (4 points).
 - **Intro** : si h est continue, 2π-périodique, C¹ par morceaux, et h′ = f, alors (IPP) aₙ(f) = n bₙ(h) et bₙ(f) = −n aₙ(h), donc aₙ(h) = −bₙ(f)/n et bₙ(h) = aₙ(f)/n ; a₀(h) se calcule à part. On ne dérive terme à terme que la série d'une fonction **continue** périodique. Exemple : `math: x a bₙ = 2(−1)ⁿ⁺¹/n ; h = x²/2 a h′ = x` ; `math: aₙ(x²/2) = −bₙ(x)/n = 2(−1)ⁿ/n²`, `note: donc aₙ(x²) = 4(−1)ⁿ/n²`.
 - **Juge** : `equiv` en n (domaine entier) ; décision « dérivation terme à terme permise ? » · **Forme finale** : coefficients de la nouvelle fonction, a₀ compris.
 - **Niveaux** :
@@ -1310,6 +1359,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-series-problem` — Problème : série en sinus, Dirichlet, somme numérique
 - **Année** 16 · **Prérequis** `f-sine-cosine`, `f-dirichlet` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Exemple F1 du catalogue : f ∈ {c·x(π − x), c(2πx − x²), triangle}, c ∈ {1, 2, 3}. Niveaux 1 à 3 : une des trois parties ; niveau 4 : le problème entier en un item avec aides ; niveau 5 et `open` : `problem` de 9 points (a : 3 + 1, ou 4 sans séparation pair / impair ; b : 2 ; c : 2 + 1). La comparaison (b) est une décision suivie de F_s f(π) par `value` ; en (c), l'équation de Dirichlet en π/2 est donnée et la somme Σ (−1)ᵏ/(2k + 1) = π/4 est fournie pour 2πx − x². x cos(x/2) (2016) n'est pas fait.
 - **Intro** : le problème d'examen le plus fréquent en MT : (a) F_s f ; (b) comparer F_s f et f sur [0 ; π] (Dirichlet, bords compris) ; (c) en déduire une somme numérique.
 - **Juge** : `problem` ; parties jugées comme dans `f-sine-cosine` et `f-dirichlet` · **Forme finale** : les trois réponses.
 - **Niveaux** :
@@ -1330,6 +1380,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-ft-direct` — Transformée de Fourier : définition et calcul direct
 - **Année** 16 · **Prérequis** `a1-improper-calc`, `a1-int-parts`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-improper-calc` : ∫ sur ℝ calculée comme une limite ; `g8-polar` : e^(−iαy) = cos αy − i sin αy.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Gabarits c(b² − x²) et c(b − |x|) sur [−b ; b] (pairs, deux intégrations par parties), c·x (impair, FP3), c·e^(−w|x|) ; les fonctions sans parité (e^(−x) sin x · 1_{x>0}, sin x · 1_[0 ; π]) ne sont pas faites. Parties : la forme par parité (`transform`), l'intégrale (`equiv` en α, cible `no-int`), f̂(α) (`transform`), f̂(0) (`definite`, avec une décision pour `f_ft_alpha_zero`). L1 et L2 : la définition en blocs (`define`, échelle du §16.3) ou le calcul à trous. L5 et `open` : définition (2 pts) puis calcul (3 ou 4 pts). `f_ipp_sign` (partie a) n'est qu'une option du QCM.
 - **Intro** : définition à savoir écrire (examens 2021) : f : ℝ → ℝ continue par morceaux et ∫_ℝ |f| < ∞ ; f̂(α) = (1/√(2π)) ∫_ℝ f(y) e^(−iαy) dy. Si f est paire, f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) dx. α = 0 se traite à part. Exemple : `math: f = e^(−|x|) : f̂(α) = (1/√(2π)) (1/(1 − iα) + 1/(1 + iα))` ; `math: = √(2/π) · 1/(1 + α²)`.
 - **Juge** : `blocks` `{mode:'define'}` pour la définition ; `transform` `{kind:'fourier', of, v:'y', s:'α', dir:'forward'}` pour les lignes de calcul (contrôle numérique en 6 valeurs de α, α = 0 compris si l'item le demande) · **Forme finale** : expression en α sans ∫ ni 𝓕 ; f̂(0) donné à part si la formule a un α au dénominateur.
 - **Niveaux** :
@@ -1352,6 +1403,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-ft-table` — Transformée de Fourier par la table et les propriétés
 - **Année** 16 · **Prérequis** `f-ft-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `f-ft-direct` : définition de f̂ et convention 1/√(2π).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Gabarits : carré complété + translation + F8, e^(−w|x − a|) (F7), (x − a)e^(−k(x − a)²) (F9), g′ (FP4), H(x − a)e^(−w(x − a)) (F3) ; inverses au niveau 4 : c/(α² + w²) (F7), e^(−w|α|) (F6), c/(w + iα) (F3). Pas de changement d'échelle, ni de 𝓕(x f), ni de 𝓕((x g)″) (2019). Les lignes avec 𝓕(…) n'ont pas de trous (le noyau ne lit pas 𝓕). La ligne de la table est une décision (L2 à L5) ou une note (L1), pas une citation « F8, w = √3 » vérifiée. L5 et `open` : deux fonctions (7 pts) ou une (3 ou 4 pts). QCM d'examen : 𝓕(g ∗ h)(0) et ĝ.
 - **Intro** : on ramène f à une ligne de la table avec les propriétés : linéarité, translation F(f(x − a)) = e^(−iaα) f̂, modulation, dérivée F(f′) = iα f̂, F(x f) = i f̂′, changement d'échelle. Chaque ligne de la table a un **domaine** (« si y > 0 », |w|). Exemple (série de révision) : `math: e^(−3x² + 6x + 6) = e⁹ e^(−3(x − 1)²)` ; `math: F(e^(−3x²)) = e^(−α²/12)/√6`, `note: ligne F8, w² = 3` ; `math: F(f) = e⁹ e^(−iα) e^(−α²/12)/√6`, `note: translation de 1`.
 - **Juge** : `transform` `{kind:'fourier', of, v:'x', s:'α', dir:'forward'|'inverse', table:'mt2122'}` ; chaque ligne qui cite une ligne de table (« F8, w = √3 ») est vérifiée · **Forme finale** : expression sans 𝓕 ; pour une inverse, une fonction de x définie **sur tout ℝ** (cas x < 0 compris).
 - **Niveaux** :
@@ -1373,6 +1425,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-ft-eq` — Équations résolues par la transformée de Fourier
 - **Année** 16 · **Prérequis** `f-ft-table`, `@alg:F-variable-deux-fois`, `@alg:G-additionner` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Seulement a·u + b·(f ∗ u) = f avec f = e^(−w|x|) (10 triplets (a, b, w) qui donnent W entier) ; le gabarit avec u″ dans la convolution (2021) n'est pas fait. Parties : f̂ (F7), l'équation transformée puis û isolé (`transform` avec l'inconnue û et le symbole f̂), la fraction simplifiée (`equiv` en α, cible `short` avec le but), le retour en x (`transform`, inverse). Le juge `transform` ne nomme pas une équation transformée fausse : `f_sqrt2pi_conv` et `f_conv_coef_dropped` sont nommés sur la ligne suivante, û = …. `f_no_inverse` et `f_table_half_line` sont des options d'une décision. L5 et `open` : l'exemple F2 (8 pts, définition comprise).
 - **Intro** : on transforme les deux membres (linéarité, F(f ∗ u) = √(2π) f̂ û, F(u″) = −α² û), on isole û, on simplifie la fraction, on reconnaît une ligne de la table, on revient en x. On suppose u et ses dérivées intégrables. Exemple (2022) : `math: 2u + 3 f ∗ u = f, f = e^(−|x|)` ; `math: û = f̂/(2 + 3√(2π) f̂) = (1/2) √(2/π)/(α² + 4)`, `note: f̂ = √(2/π)/(1 + α²)` ; `math: u = e^(−2|x|)/4`, `note: ligne F7, w = 2`.
 - **Juge** : `transform` `{kind:'fourier', of:'u', v:'x', s:'α'}` pour la ligne transformée de l'équation (l'équation en α doit être équivalente à F(équation)) ; `equiv` `{vars:['α']}` pour isoler et simplifier û ; `transform` `dir:'inverse'` pour le retour · **Forme finale** : u(x) explicite sur tout ℝ, sans 𝓕.
 - **Niveaux** :
@@ -1395,6 +1448,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-plancherel` — Plancherel
 - **Année** 16 · **Prérequis** `f-ft-table` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Gabarits F1 (∫ sin²(bα)/α²), F7 (∫ dα/(α² + w²)²), F9 (∫ α² e^(−α²/2), avec ∫ x² e^(−2x²) dx donnée), F6 (dans l'autre sens : ∫ dx/(x² + w²)²). Les intégrales sur ℝ d'une fonction de |x| s'écrivent 2∫₀^∞ (la quadrature du juge `definite` ne converge pas sur ℝ avec un point anguleux) ; la valeur du départ est donnée au juge (`known`). L3 : décision Plancherel ou résidus (les deux justes). L5 : la preuve par f ∗ f̃ en 0 (blocs) ou le calcul sans aide. `open` : 3 pts.
 - **Intro** : ∫_ℝ |f(x)|² dx = ∫_ℝ |f̂(α)|² dα (pas de facteur 2π avec cette convention). Sert à calculer une intégrale en α difficile à partir d'une intégrale en x facile. Exemple : `math: f = e^(−|x|) : ∫ e^(−2|x|) dx = 1` ; `math: ∫ (2/π)/(1 + α²)² dα = 1`, `note: donc ∫ dα/(1 + α²)² = π/2`.
 - **Juge** : `definite` · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -1416,6 +1470,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-periodic-ode` — EDO périodique par séries de Fourier
 - **Année** 16 · **Prérequis** `f-coef-complex` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-coef-complex` : u = Σ cₙe^(int).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Opérateurs u′ + au, u″ + ku (k ≠ m²) et u′(t) + b·u(t − π) (fréquence impaire, pour que `f_ode_shift_phase` change la valeur), second membre c₀ + A cos(mt) + B sin(mt). Parties `fcomplex` : cₘ(f), cₘ(u) = cₘ(f)/P(m), c₀(u), puis u assemblée (forme finale réelle, sans i) ; le facteur de u′, u″ ou du retard est une décision, la forme réelle ou complexe une décision du niveau 3. La solution est jugée contre c₀ + cₘe^(imt) + c₋ₘe^(−imt), pas par le juge `ode` (qui ne lit pas le retard). Niveau 5 : comme le niveau 4, sans aide ; « f quelconque » (forme générale) n'est pas demandé. Variante `open` (4 points).
 - **Intro** : on cherche u périodique sous la forme Σ cₙ e^(int) ; u′ a pour coefficients in cₙ, u(t − τ) a pour coefficients e^(−inτ) cₙ ; on égale coefficient par coefficient avec ceux du second membre. Exemple : `math: u′ + u = sin t` ; `math: (i + 1) c₁ = 1/(2i)`, `note: n = ±1 seulement` ; `math: u = (sin t − cos t)/2`.
 - **Juge** : `complex` pour chaque cₙ ; `ode` `{eq, unknown:'u', v:'t'}` pour la solution (vérifie l'équation) · **Forme finale** : u(t) réelle explicite.
 - **Niveaux** :
@@ -1437,6 +1492,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-sturm-liouville` — Problème de Sturm-Liouville (GM)
 - **Année** 16 · **Prérequis** `f-sine-cosine`, `a2-ode-const2` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-sine-cosine` : les solutions sin(nπx/L) donnent une série en sinus ; `a2-ode-const2` : −u″ = λu : équation caractéristique selon le signe de λ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Conditions (D, D), (D, N), (N, D), (N, N) sur [0 ; π] (et [0 ; L], L ∈ {1, 2}, au niveau 4). Les cas λ < 0, λ = 0 (`f_sl_eigen_zero`), λ = k² > 0, la condition au bord et « n ≥ ? » sont des décisions (des notes au niveau 1) ; λₙ par `prob` (valeur attendue en n) ; uₙ par le juge `eigen` (nouveau : −u″ = λₙu et les deux conditions pour six valeurs de n, tout multiple non nul). La solution générale A cos kx + B sin kx est choisie, pas écrite. Niveau 5 (Dirichlet en 0) : −u″ = f sur les fonctions propres, par `ode` avec u(0) et u′(0). Variante `open` (5 ou 6 points).
 - **Intro** : −u″ = λu sur ]0 ; L[ avec des conditions aux bords : on cherche les λ pour lesquels il existe u ≠ 0. On traite λ < 0, λ = 0, λ > 0 ; seul λ > 0 donne des solutions pour Dirichlet. Exemple : `math: −u″ = λu, u(0) = 0, u′(π) = 0` ; `math: λₙ = (n + ½)², uₙ = sin((n + ½)x), n ≥ 0`.
 - **Juge** : `ode` pour chaque uₙ (vérifie l'équation et les conditions) ; `equiv` en n (domaine entier) pour λₙ · **Forme finale** : λₙ et uₙ, avec les cas λ ≤ 0 écartés.
 - **Niveaux** :
@@ -1459,6 +1515,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-table` — Transformée de Laplace par la table et les propriétés
 - **Année** 16 · **Prérequis** `a1-improper-calc`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-improper-calc` : F(z) = ∫₀^∞ f(t)e^(−tz) dt ; `g8-polar` : e^(iωt), cos ωt et sin ωt dans la table.
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 à L3 : deux parties, la parenthèse (ou g) par la table, puis la propriété (décalage LP4 ou −F′ pour t·g, LP5) ; le choix de la ligne et de la propriété sont des décisions (aux niveaux 2 et 3), pas des menus. Le demi-plan est une ligne « Re z > γ₀ » avant F(z), ou sur la même ligne (`halfPlane` du juge `transform`). L4 : décalage, t·g, somme de 2 ou 3 lignes de la table, ou carré à développer ((t² + e^(at))²…). L5 : fonction retardée (LP7) ou carré ; (1 − e^(−t))/t n'est pas fait (il demande ∫ F). `open` : problème de 4 points (un item de niveau 4). QCM d'examen à plusieurs réponses (F(z), demi-plan ; distracteurs `f_lap_shift_sign`, `f_lap_tf_sign`, `f_lap_abscissa`).
 - **Intro** : on décompose f en lignes de la table (L1 à L14) et on applique les propriétés : décalage e^(−bt) f ↦ F(z + b), L(t f) = −F′(z), primitive, retard. Chaque ligne a son demi-plan. Exemple (2022) : `math: L(sin ωt) = ω/(z² + ω²)` (L4) ; `math: L(t sin ωt) = −d/dz [ω/(z² + ω²)] = 2ωz/(z² + ω²)²`, `note: LP5`.
 - **Juge** : `transform` `{kind:'laplace', of, v:'t', s:'z', dir:'forward'}` (contrôle numérique en 6 valeurs réelles de z > γ₀ + 1) · **Forme finale** : F(z) sans 𝓛, simplifiée, avec son demi-plan (voir `f-lap-abscissa`).
 - **Niveaux** :
@@ -1480,6 +1537,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-abscissa` — Abscisse de convergence
 - **Année** 16 · **Prérequis** `f-lap-table` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-lap-table` : demi-plan de chaque ligne de la table.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `value` pour γ₀, avec une ligne « max(… ; …) » des abscisses des termes (ou des parties réelles des pôles). Les lignes de preuve du corrigé type (majoration de |t sin ωt|e^(−γt), divergence pour γ ≤ 0) ne sont pas demandées. L1 : abscisses données en note ; L2 : à lire, décision « maximum / minimum / toujours 0 » ; L3 : décision « par les termes » ou « par les pôles » ; L4 : somme de termes ou F rationnelle (pôles par le juge `complex`, forme `set`, puis γ₀) ; L5 : F rationnelle sans aide, ou un QCM à une réponse. QCM d'examen à plusieurs réponses (`f_lap_abscissa` sur les mauvaises options).
 - **Intro** : γ₀ = inf des γ tels que ∫₀^∞ |f(t)| e^(−γt) dt < ∞. Pour une somme, c'est le maximum des abscisses des termes ; e^(αt) déplace de α ; tⁿ ne change rien ; cosh(ωt) donne |ω|. Pour F rationnelle, γ₀ est la plus grande partie réelle des pôles. Exemple : `math: f = (t² + e^(−t))² = t⁴ + 2t² e^(−t) + e^(−2t)` ; `math: abscisses 0, −1, −2 : γ₀ = 0`.
 - **Juge** : `value` pour γ₀ ; item `mcq` pour la justification · **Forme finale** : γ₀ et « Re z > γ₀ ».
 - **Niveaux** :
@@ -1501,6 +1559,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-inv-des` — Laplace inverse par éléments simples
 - **Année** 16 · **Prérequis** `f-lap-table`, `g0-pfd-general` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `f-lap-table` : reconnaître chaque terme dans la table.
+- **Statut** : fait le 10 novembre 2026 (étape U10). La décomposition est une ligne « F(z) = … » du juge `transform` (inverse), pas du juge `equiv` : la cible `partial-fractions` ne connaît que la variable x. Le système des coefficients (lignes 2 et 3 du corrigé type) n'est pas demandé : la décomposition s'écrit directement, sa forme est une décision aux niveaux 2 et 3 (`g0_pfd_form`), puis une ligne « forme de la table » (A(z − a) + Bω) aux niveaux 1 à 4. Gabarits : deux trinômes z² + ω², pôles réels simples, carré complété avec un pôle réel ; L5 : pôle double et trinôme. `open` : problème de 4 points. QCM d'examen à plusieurs réponses (`f_sin_omega_factor`, `f_lap_shift_sign`).
 - **Intro** : on décompose F en éléments simples réels, on reconnaît chaque terme dans la table (en complétant le carré si besoin), on additionne. Exemple (test blanc 2017) : `math: (z³ + 4z − 5)/((z² + 4)(z² + 9)) = −1/(z² + 4) + (z + 1)/(z² + 9)` ; `math: f(t) = −½ sin 2t + cos 3t + ⅓ sin 3t`.
 - **Juge** : `equiv` `{vars:['z']}` pour la DES ; `transform` `{kind:'laplace', dir:'inverse'}` pour f · **Forme finale** : f(t) réelle explicite.
 - **Niveaux** :
@@ -1523,6 +1582,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-inv-res` — Laplace inverse par les résidus
 - **Année** 16 · **Prérequis** `c-res-multiple`, `c-res-theorem` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `c-res-theorem` : f(t) est la somme de tous les résidus de F(z)e^(zt).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Pôles par le juge `complex` (forme `set`) ; chaque résidu par un nouveau juge `lapres` (`js/judges/lapres.js`) : une ligne est une fonction de t comparée au résidu en 6 valeurs de t, une ligne qui contient encore z est lue en z = z₀ (après ses d(…, z)), d'où la formule du pôle simple, (z − z₀)F(z)e^(zt), et celle du pôle double, d/dz[(z − z₀)²F(z)e^(zt)] ; la somme par le juge `transform` (inverse). Les résidus sont exacts (décomposition dans ℚ(i)) et le test de la partie les compare aux coefficients de Laurent numériques. L3 : décisions « quelle formule » (`c_simple_formula_double`) et « quels résidus » (`f_lap_conj_pole`). L5 : niveau 4 sans aide ; le contour de Bromwich est dans `f-lap-problem`. γ₀ n'est demandé que dans le QCM. `open` : problème de 5 points.
 - **Intro** : pour F rationnelle de degré < 0, f(t) = Σ Res(F(z) e^(zt), z_k), sur **tous** les pôles (les pôles conjugués donnent des termes conjugués). Exemple (2019) : `math: F = 1/(z²(z² − 2z + 2))`, `note: pôles 0 (double), 1 ± i` ; `math: f(t) = (t + 1)/2 − e^t cos t/2`.
 - **Juge** : `equiv` `{vars:['t'], complex:true}` pour chaque résidu (fonction de t) ; `transform` `dir:'inverse'` pour f · **Forme finale** : f(t) réelle.
 - **Niveaux** :
@@ -1544,6 +1604,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-lap-ode` — EDO avec conditions initiales par Laplace
 - **Année** 16 · **Prérequis** `f-lap-inv-des` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Un seul juge, `transform` avec l'inconnue Y, en deux parties (transformer et isoler Y ; décomposer et inverser) ; y est comparée à la solution en 8 points au lieu du juge `ode`. Le juge ne diagnostique pas une ligne d'équation : `f_lap_deriv_ic` est reconnu sur la ligne Y = … (ou y = …) qui suit l'erreur, et par une décision au niveau 3. Gabarits des leçons : racines caractéristiques réelles distinctes, double ou complexes, second membre constant, e^(ct) ou cos ωt, sans résonance. L5 : ordre 3 avec résonance ((z + c)⁴) ou y⁽⁴⁾ − ω⁴y = 0. `open` : problème de 6 points. QCM d'examen à plusieurs réponses.
 - **Intro** : on transforme l'équation avec LP2 (les conditions initiales entrent ici), on isole Y(z), on inverse. Exemple (2021) : `math: y″ + 2y′ + y = 1, y(0) = y′(0) = 1` ; `math: Y = (z² + 3z + 1)/(z(z + 1)²) = 1/z + 1/(z + 1)²` ; `math: y = 1 + t e^(−t)`.
 - **Juge** : `equiv` `{vars:['z']}` pour l'équation transformée et Y ; `ode` `{eq, unknown:'y', v:'t', ic}` pour la solution · **Forme finale** : y(t) qui vérifie l'équation et les conditions.
 - **Niveaux** :
@@ -1566,6 +1627,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-lap-integro` — Équations intégro-différentielles (GM)
 - **Année** 16 · **Prérequis** `f-lap-ode` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-lap-ode` : même méthode : transformer, isoler, inverser.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Trois parties : le noyau (juge `transform`, ℒ(e^(at))), l'équation transformée et U (juge `transform` avec l'inconnue U), l'inverse. L'équation intégrale est contrôlée numériquement en 6 valeurs de t (`integroResidual` de `fourier-c-kit.js`, dans le générateur et le test de la partie). L2 et L3 : décisions « quel noyau » (`f_lap_integro_kernel`) et « LP6 ou LP3 ». L5 et `open` : problème de 3 points.
 - **Intro** : ∫₀ᵗ u(s) g(t − s) ds = (u ∗ g)(t) se transforme en U(z) G(z) (LP6). Exemple (2022) : `math: u′ + 2u + 20 ∫₀ᵗ u(s) e^(2(t−s)) ds = 10 e^(2t), u(0) = 1` ; `math: zU − 1 + 2U + 20U/(z − 2) = 10/(z − 2)` ; `math: U = (z + 8)/(z² + 16), u = cos 4t + 2 sin 4t`.
 - **Juge** : comme `f-lap-ode` ; `ode` remplacé par un contrôle numérique de l'équation intégrale en 6 valeurs de t · **Forme finale** : u(t) explicite.
 - **Niveaux** :
@@ -1583,6 +1645,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-lap-problem` — Problème : EDO par Laplace, puis inverse par les résidus
 - **Année** 16 · **Prérequis** `f-lap-ode`, `f-lap-inv-res`, `c-arc-estimate` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). L1 à L4 : un item `lines` en quatre parties (transformée et Y, résidu simple, résidu double, somme), l'arc de Bromwich étant une décision (`c_arc_triangle`, et l'estimation ML insuffisante). L5 et `open` : `problem` de 10 points en trois parties : lignes (transformée et Y : 4 points, car une ligne d'équation ne peut pas finir une partie du juge `transform` ; résidus : 1 + 2), blocs de l'arc avec un leurre `c_arc_triangle` (2 points), y(t) jugée par `ode` avec les conditions initiales (1 point). L'estimation de l'arc passe par le lemme de Jordan (voir la correction de la ligne 4).
 - **Intro** : le problème complet : transformer, isoler Y, inverser par résidus en justifiant (contour de Bromwich : droite Re z = γ > γ₀ fermée à gauche par un arc, dont l'intégrale tend vers 0), vérifier.
 - **Juge** : `problem` ; parties comme `f-lap-ode`, `f-lap-inv-res`, `c-arc-estimate` · **Forme finale** : y(t) vérifiée.
 - **Niveaux** :
@@ -1594,7 +1657,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
   1. `z²Y − z + 3(zY − 1) + 2Y = 2/(z + 1)` — sous-but `transform` (2 pts)
   2. `Y = (z² + 4z + 5)/((z + 1)²(z + 2))` — sous-but `isolate` (2 pts)
   3. `Res_(−2) = e^(−2t)` ; `Res_(−1) = d/dz[(z² + 4z + 5)e^(zt)/(z + 2)] en −1 = 2t e^(−t)` — sous-but `residues` (3 pts)
-  4. arc gauche : |e^(zt)| ≤ e^(γt), |Y| ≤ C/R, longueur ~ πR : l'intégrale tend vers 0 — sous-but `arc` (2 pts)
+  4. arc gauche z = γ + Re^(iθ), θ ∈ [π/2 ; 3π/2] : |e^(zt)| = e^(γt)e^(tR cos θ), |Y| ≤ C/R ; la longueur πR seule ne suffit pas (πR · C/R ne tend pas vers 0), mais le lemme de Jordan ∫ e^(tR cos θ) dθ ≤ π/(tR) donne une borne en 1/R : l'intégrale tend vers 0 pour t > 0 — sous-but `arc` (2 pts)
   5. `y = e^(−2t) + 2t e^(−t)`, y(0) = 1, y′(0) = 0 — sous-but `check` (1 pt)
 - **Aides** : aucune en L5.
 - **Variantes d'examen** : `open` (2021, 2019 : 8 à 10 pts).
@@ -1603,6 +1666,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-heat-sep` — Équation de la chaleur par séparation des variables
 - **Année** 16 · **Prérequis** `f-sine-cosine`, `a2-ode-linear1` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Les lignes sont des grandeurs nommées (juge `prob` avec variables, comparées par `equivalent` à la référence) : les modes Xₙ(x) (en x et n entier), le taux λₙ (en n ; la ligne « EDO de chaque coefficient » est λₙ, ou A(t) = ∫₀ᵗ a pour un coefficient a(t)), puis u(x, t) (en x et t ∈ [0 ; ½]). Le juge `ode` n'a pas de mode EDP : `fourier-d-pde.js` vérifie numériquement que chaque u de référence satisfait l'EDP, les conditions aux bords et la condition initiale (test de la partie). Conditions initiales trigonométriques de 2 ou 3 modes aux niveaux 1 à 4 (Dirichlet ou Neumann sur ]0 ; π[, ]0 ; 1[, ]0 ; 2[, coefficient k = 1 ou 2, terme −cu) ; L4 : Neumann avec −cu (GC 2022) ou a(t) (2019) ; L5 et `open` (6 points) : condition initiale 1, x(π − x), x ou π − x (série en sinus : l'intégrale Iₙ par `equiv` jusqu'à une forme sans ∫, puis bₙ(0) = (2/L)Iₙ, puis u en série). Décisions « sinus ou cosinus », « mode n = 0 ? » (L3), « condition initiale déjà développée ? ». Le crédit `initial` → `f-sine-cosine` n'est donné que par les items à série (d'où un `prereqWhy`). `mcq` multi : u juste, limite en t → ∞ ou EDO du mode, contre u avec e^(−nt), des sinus pour Neumann.
 - **Intro** : u = X(x) T(t) ; les conditions aux bords choisissent les modes : Dirichlet → sin(nπx/L), Neumann → cos(nπx/L) (avec n = 0). Chaque coefficient vérifie une EDO en t : bₙ′ = −(nπ/L)² bₙ. La condition initiale donne bₙ(0) (série en sinus ou cosinus). Exemple : `math: u_t = u_xx, u(0, t) = u(π, t) = 0, u(x, 0) = 3 sin x − sin 4x` ; `math: u = 3e^(−t) sin x − e^(−16t) sin 4x`.
 - **Juge** : `ode` pour chaque bₙ(t) ; `equiv` `{vars:['x','t']}` (somme tronquée à 40 termes) pour u ; contrôle numérique de l'EDP et des conditions · **Forme finale** : u(x, t) explicite (somme finie ou série).
 - **Niveaux** :
@@ -1624,6 +1688,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-heat-source` — Problème : chaleur avec terme source
 - **Année** 16 · **Prérequis** `f-heat-sep` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U10). Grandeurs nommées (juge `prob` avec variables) : Iₙ (`equiv` jusqu'à une forme sans ∫) et bₙ(0) (série en sinus), β_k (source), λₙ (EDO bₙ′ + λₙbₙ = βₙ), bₙ(t) pour n ≠ k (en n et t), b_k(t), puis u en série. Sources s·sin(kx), k ∈ {1, 2, 3}, s ∈ {1, 2, 3} sur ]0 ; π[, ou sin(πx), sin(2πx) sur ]0 ; 1[ ; conditions initiales 1, x(π − x), x(1 − x). L1 : β, λₙ et le mode forcé (b_k(0) donné) ; L2 : λₙ, la série de la condition initiale et les modes libres ; L3 : tout sauf u ; L4 : la chaîne entière avec aides ; L5 et `open` : `problem` de 8 points (F4 : 1 + 1 pour la série, 1 source, 1 EDO, 1,5 + 1,5 pour les modes, 1 pour u). Vérification numérique de u (EDP, bords, condition initiale) dans le test de la partie.
 - **Intro** : on développe aussi le terme source sur les modes : bₙ′ + n²bₙ = βₙ, avec bₙ(t) = bₙ(0) e^(−n²t) + (βₙ/n²)(1 − e^(−n²t)). Exemple : `math: u_t − u_xx = sin 2x, u(0, t) = u(π, t) = 0, u(x, 0) = 1`.
 - **Juge** : `problem` ; `ode` par mode ; `equiv` pour u · **Forme finale** : u(x, t) explicite.
 - **Niveaux** :
@@ -1645,6 +1710,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-wave` — Équation des ondes ; d'Alembert par Fourier en x
 - **Année** 16 · **Prérequis** `f-heat-sep`, `f-ft-table` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-heat-sep` : séparation des variables sur ]0 ; L[ ; `f-ft-table` : transformée en x (FP8).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Grandeurs nommées (juge `prob` avec variables). Sur ℝ : c, puis ûₜₜ en α et û (ûₜₜ = −c²α²û), puis û(α, t) = û₀(α)cos(cαt) avec u₀ ∈ {e^(−x²), 1/(1 + x²), e^(−|x|)} (lignes F8, F6, F7 de la table, jointe à l'énoncé), puis d'Alembert ; la décision « ℱ(u_xx) = ? » porte `f_ft_deriv_sign`. Sur ]0 ; π[ avec Dirichlet : ωₙ = cn, puis b_p(t), b_q(t), puis u. L1 : intervalle, L2 : ℝ, L3 et L4 : l'un ou l'autre (décision « séparation ou Fourier » au L3) ; L5 : `problem` (un QCM à une réponse sur û, puis l'intervalle avec u_t(x, 0) ≠ 0), au lieu du QCM multi des leçons. `open` : l'intervalle, 6 points. `mcq` multi : les affirmations de 2021 (EDO transformée, û, d'Alembert) contre c pour c², ¼ pour ½ et le signe de (iα)².
 - **Intro** : sur ℝ, u_tt = c²u_xx : la transformée en x donne û_tt + c²α² û = 0, donc û = û₀(α) cos(cαt) si u_t(x, 0) = 0, puis u = (u₀(x + ct) + u₀(x − ct))/2 (FP8). Sur ]0 ; L[ avec Dirichlet : modes sin(nπx/L), bₙ″ + (cnπ/L)² bₙ = 0. Exemple (2021) : `math: u_tt − ¼ u_xx = 0` ; `math: û_tt + (α²/4) û = 0, û = û₀ cos(αt/2)` ; `math: u = (u₀(x + t/2) + u₀(x − t/2))/2`.
 - **Juge** : `ode` pour û(α, t) ; `equiv` pour u · **Forme finale** : u(x, t).
 - **Niveaux** :
@@ -1666,6 +1732,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-laplace-eq` — Équation de Laplace dans un disque, dans un demi-plan
 - **Année** 16 · **Prérequis** `f-heat-sep`, `f-ft-table`, `a2-laplacian-radial` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-heat-sep` : séparation des variables ; `f-ft-table` : demi-plan : transformée de Fourier en y ; `a2-laplacian-radial` : laplacien en polaires dans le disque.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Grandeurs nommées (juge `prob` avec variables). Disque unité : Rₙ(r) = rⁿ (décision rⁿ ou r⁻ⁿ), u(r, θ), puis u(x, y) développé (à partir du L3) ; bord m + a cos pθ + b sin qθ, p, q ≤ 3 ; L5 : bord sin³θ ou cos³θ (+ constante), linéarisé par deux parties b₁, b₃ (ou a₁, a₃). Demi-plan x > 0 (GC 2022) : ûₓₓ = α²û, ĝ par le juge `transform` (F6, bord A/(y² + w²), w ∈ {1, 2, 3}), la décision « solution bornée » (`f_half_plane_abs`), û(x, α), puis u par F6 avec w = x + w₀ ; la table est jointe à l'énoncé. Bord en F7 non tiré (l'inverse de e^(−|α|x)/(α² + w²) n'est pas dans la table). `open` : le demi-plan, 4 points. Δu = 0 et le bord sont vérifiés numériquement dans le test de la partie.
 - **Intro** : disque unité : u(r, θ) = a₀/2 + Σ rⁿ(aₙ cos nθ + bₙ sin nθ), les coefficients venant de u(1, θ). Demi-plan x > 0 : Fourier en y, û_xx − α²û = 0, la solution bornée est û = û(0, α) e^(−|α|x). Exemple (GC 2022) : `math: u(0, y) = 2/(y² + 4)` ; `math: û = √(π/2) e^(−(x + 2)|α|)` ; `math: u = (x + 2)/(y² + (x + 2)²)`, `note: F6 avec w = x + 2`.
 - **Juge** : `equiv` `{vars:['x','y']}` ; contrôle numérique de Δu = 0 et du bord · **Forme finale** : u explicite.
 - **Niveaux** :
@@ -1687,6 +1754,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-distrib-def` — Distributions : ⟨T_f, φ⟩, δ_a et f·δ_a (MT/SV)
 - **Année** 16 · **Prérequis** `a1-improper-calc` · **Étiquettes** `MT/SV` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-improper-calc` : ⟨T_f, φ⟩ = ∫ fφ sur ℝ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Nouveau juge `distrib` (`js/judges/distrib.js`) : chaque membre d'une ligne est comparé sur 6 fonctions test (des gaussiennes fois des polynômes, pas des bosses à support compact). Gabarits : ⟨T_f + g δ_a, φ⟩ pour f en morceaux (kx puis m/x ; k puis e^(−wx)), et la preuve g δ_a = g(a) δ_a. Les lignes avec ⟨ ⟩ n'ont pas de trous (le noyau ne lit pas les crochets). L5 : enchaîné avec la dérivée (`f-distrib-deriv`). `open` : 3 pts (le catalogue dit 2 : le plan `ba4-analyse4` demande au moins 3).
 - **Intro** : ⟨T_f, φ⟩ = ∫ f φ ; ⟨δ_a, φ⟩ = φ(a) ; ⟨g T, φ⟩ = ⟨T, g φ⟩, donc g δ_a = g(a) δ_a. Exemple (2019) : f = 0 (x < 0), 2x (0 ≤ x ≤ 1), 1/x (x > 1) ; `math: ⟨T_f + δ₁, φ⟩ = ∫₀¹ 2x φ(x) dx + ∫₁^∞ φ(x)/x dx + φ(1)`.
 - **Juge** : `equiv` avec une fonction test : l'expression est évaluée sur 8 fonctions φ tirées (gaussiennes fois polynômes, bosses C^∞) · **Forme finale** : expression en φ sans crochet.
 - **Niveaux** :
@@ -1707,6 +1775,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-distrib-deriv` — Dérivée au sens des distributions (MT/SV)
 - **Année** 16 · **Prérequis** `f-distrib-def`, `a1-int-parts` · **Étiquettes** `MT/SV` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-distrib-def` : ⟨T, φ⟩ et δ_a.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `distrib`. Gabarits : H(t)e^(−wt) (2021), kx puis m/x (2019), k puis e^(−wx), l'indicatrice c·1_[a ; b] ; pas |x| (D|x| = sgn). L3 : décision « par la définition » ou « par la formule des sauts » (les deux justes). L5 et `open` : un problème de 3 pts (L5 : la fonction de 2019).
 - **Intro** : ⟨DT, φ⟩ = −⟨T, φ′⟩. Pour f C¹ par morceaux : D T_f = T_(f′) + Σ (f(a + 0) − f(a − 0)) δ_a. Exemple (2021) : `math: f = e^(−t) pour t > 0, 0 sinon` ; `math: ⟨Df, φ⟩ = −∫₀^∞ e^(−t) φ′ dt = φ(0) − ∫₀^∞ e^(−t) φ dt` ; `math: Df = −f + δ`.
 - **Juge** : `equiv` avec fonctions test (comme `f-distrib-def`) · **Forme finale** : T_(g) + Σ cδ_a.
 - **Niveaux** :
@@ -1728,6 +1797,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-distrib-eq` — Équations avec δ ; transformée de Fourier de cos (MT/SV)
 - **Année** 16 · **Prérequis** `f-distrib-deriv`, `f-ft-table` · **Étiquettes** `MT/SV` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-distrib-deriv` : dérivées avec les δ des sauts ; `f-ft-table` : tables de Fourier D1 à D4.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `distrib` en mode équation (⟨Ly, φ⟩ = ⟨y, L*φ⟩ sur les fonctions test, constantes tirées 3 fois) pour l'essai et la solution générale, en mode distribution pour la dérivée ; `transform` avec l'inconnue ŷ pour la voie de Fourier. Gabarits : y′ + ay = δ_b, y″ + ω²y = δ (solution fondamentale), y″ − ω²y = δ (Fourier) ; L5 et `open` : y″ − ω²y = δ + 1 (2016) ou un gabarit sans aide. La transformée de cos et de g₁ ∗ g₂ (2019) n'est pas faite.
 - **Intro** : y′ + y = δ a pour solution y = H(t) e^(−t) (+ C e^(−t)) ; y″ + y = δ : y = H(x) sin x. Avec les tables D1 à D4 : F(cos x) = √(π/2)(δ₋₁ + δ₁). Exemple (2019) : `math: g₁ = e^(−|x|), g₂ = cos x` ; `math: F(g₁ ∗ g₂) = √(2π) · √(2/π)/(1 + α²) · √(π/2)(δ₋₁ + δ₁)` ; `math: = √(π/2)(δ₋₁ + δ₁) = F(g₂)`, `note: (1/(1 + α²)) δ_(±1) = ½ δ_(±1)`.
 - **Juge** : `equiv` avec fonctions test ; `ode` au sens des distributions pour les solutions (vérifie DT + T = δ sur les fonctions test) · **Forme finale** : solution explicite.
 - **Niveaux** :
@@ -1752,7 +1822,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 |---|---|---|---|---|---|---|---|
 | `f_even_an_zero` | rule | C | `f-coef` | `g1-parity-period` | f paire ⟹ aₙ = 0 → bₙ = 0 | Annuler les aₙ au lieu des bₙ (ou l'inverse pour f impaire). | « f paire : f(x) sin(nx) est impaire, son intégrale est nulle : ce sont les **bₙ** qui valent 0. » (Corrigé 2022.) |
 | `f_a0_separate` | calculus | C | `f-coef` | `f-coef` | a₀ = formule aₙ en n = 0 ; a₂ de cos 2x oublié → a₀ et a₂ à part | Remplacer n par 0 dans la formule générale (division par 0 ou valeur fausse) ; oublier l'apport du polynôme trigonométrique à a₂. | « La formule de aₙ a été obtenue pour n ≥ 1 : a₀ se calcule à part. Le terme cos 2x ajoute {c} à a₂. » (Corrigé 2022.) |
-| `f_interval_02pi` | notation | C | `f-coef` | `f-coef` | |x| sur [0 ; 2π] → |x| sur [−π ; π] | Intégrer la formule de f sur [0 ; 2π] au lieu de la période donnée. | « f = |x| est donnée sur [−π ; π] puis prolongée : sur [π ; 2π], f(x) = 2π − x, pas x. » (Corrigé 2022.) |
+| `f_interval_02pi` | notation | C | `f-coef` | `f-coef` | \|x\| sur [0 ; 2π] → \|x\| sur [−π ; π] | Intégrer la formule de f sur [0 ; 2π] au lieu de la période donnée. | « f = \|x\| est donnée sur [−π ; π] puis prolongée : sur [π ; 2π], f(x) = 2π − x, pas x. » (Corrigé 2022.) |
 | `f_period_omega` | notation | E | `f-coef` | `f-coef` | période 2 : cos(nx) → cos(nπx) | Garder cos(nx) quand T ≠ 2π. | « Avec T = {T}, ω = 2π/T = {omega} : les modes sont cos(nωx). » |
 | `f_coef_complex_convert` | rule | E | `f-coef-complex` | `f-coef-complex` | bₙ = cₙ − c₋ₙ → bₙ = i(cₙ − c₋ₙ) | Oublier le facteur i ou l'échanger avec aₙ. | « cₙ = (aₙ − ibₙ)/2 donne bₙ = i(cₙ − c₋ₙ). » |
 | `f_sine_wrong_factor` | calculus | E | `f-sine-cosine` | `f-sine-cosine` | bₙ = (1/π)∫₀^π → (2/π)∫₀^π | Facteur 1/L au lieu de 2/L. | « Sur [0 ; L], le prolongement impair double l'intégrale : bₙ = (2/L)∫₀^L. » |
@@ -1771,7 +1841,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 | `f_ft_alpha_zero` | calculus | E | `f-ft-direct` | `f-ft-direct` | f̂(0) = formule en α = 0 (division par 0) → calcul direct | Évaluer la formule générale en α = 0. | « La formule contient α³ au dénominateur : f̂(0) = (1/√(2π))∫ f = {want}. » |
 | `f_sqrt2pi_conv` | calculus | C | `f-ft-eq` | `f-ft-table` | F(f ∗ u) = f̂ û → √(2π) f̂ û | Supprimer √(2π) dans la ligne transformée. | « Avec la convention 1/√(2π), F(f ∗ g) = √(2π) f̂ ĝ. » (Corrigé 2022 ; plan §8.) |
 | `f_conv_coef_dropped` | calculus | C | `f-ft-eq` | `@alg:C-reduire` | 2û + √(2π) f̂ û → 2û + 3√(2π) f̂ û | Perdre le coefficient numérique devant la convolution. | « Le 3 devant f ∗ u reste devant sa transformée. » (Corrigé 2022.) |
-| `f_abs_dropped` | notation | C | `f-ft-eq` | `f-ft-table` | u = e^(−2x)/4 → e^(−2|x|)/4 | Remplacer |x| par x dans le résultat d'une ligne paire. | « La ligne F7 donne e^(−w|y|) : sans la valeur absolue, ta fonction explose pour x < 0. » (Corrigé 2022 : erreur la plus fréquente.) |
+| `f_abs_dropped` | notation | C | `f-ft-eq` | `f-ft-table` | u = e^(−2x)/4 → e^(−2\|x\|)/4 | Remplacer \|x\| par x dans le résultat d'une ligne paire. | « La ligne F7 donne e^(−w\|y\|) : sans la valeur absolue, ta fonction explose pour x < 0. » (Corrigé 2022 : erreur la plus fréquente.) |
 | `f_table_line` | method | C | `f-ft-table` | `f-ft-table` | ligne 3 (e^(−wy), y > 0) au lieu de ligne 7 (e^(−\|wy\|)) | Appliquer la ligne voisine : F3 au lieu de F7, F6 au lieu de F7, F1 au lieu de F2. | « Ta transformée {got} n'est pas paire en α ; celle d'une fonction paire l'est. C'est la ligne {want}. » (Corrigé 2022.) |
 | `f_table_half_line` | method | C | `f-ft-eq` | `f-ft-table` | u = e^(−wx) partout → e^(−wx) si x > 0, 0 sinon | Oublier le « 0 sinon » d'une ligne à support demi-droite. | « La ligne F3 décrit une fonction nulle pour x < 0 : écris les deux cas. » (Corrigé 2022.) |
 | `f_no_inverse` | method | C | `f-ft-eq` | `f-ft-table` | réponse û(α) = … → u(x) = … | Arrêter à û (ligne finale contenant encore α). | « On demande u(x) : reviens en x avec la table. » (Corrigé 2022.) Le juge renvoie `stay`. |
@@ -1779,7 +1849,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 | `f_ft_shift_sign` | sign | E | `f-ft-table` | `f-ft-table` | F(g(x − 1)) = e^(iα) ĝ → e^(−iα) ĝ | Signe de l'exponentielle de translation. | « Décaler de +a à droite multiplie par e^(−iaα). » |
 | `f_ft_deriv_sign` | sign | E | `f-ft-table` | `f-ft-table` | F(u″) = α² û → −α² û | Oublier i² = −1, ou écrire −iα pour la dérivée première. | « F(f′) = iα f̂, donc F(f″) = (iα)² f̂ = −α² f̂. » |
 | `f_ft_scale` | calculus | E | `f-ft-table` | `f-ft-table` | e^(−3x²) : w = 3 → w = √3 | Lire w au lieu de w² dans une ligne en w²y². | « La ligne F8 est e^(−w²y²) : ici w² = 3. » |
-| `f_plancherel_factor` | calculus | E | `f-plancherel` | `f-plancherel` | ∫ f² = 2π ∫ |f̂|² → ∫ f² = ∫ |f̂|² | Ajouter un facteur 2π ou 1/(2π). | « Avec la convention 1/√(2π), Plancherel n'a pas de facteur. » |
+| `f_plancherel_factor` | calculus | E | `f-plancherel` | `f-plancherel` | ∫ f² = 2π ∫ \|f̂\|² → ∫ f² = ∫ \|f̂\|² | Ajouter un facteur 2π ou 1/(2π). | « Avec la convention 1/√(2π), Plancherel n'a pas de facteur. » |
 | `f_ode_shift_phase` | calculus | E | `f-periodic-ode` | `f-coef-complex` | u(t − π) ↦ cₙ → (−1)ⁿ cₙ | Ignorer le facteur e^(−inπ). | « Décaler de π multiplie cₙ par e^(−inπ) = (−1)ⁿ. » |
 | `f_sl_eigen_zero` | method | E | `f-sturm-liouville` | `f-sturm-liouville` | λ = 0 oublié (Neumann) ou retenu à tort (Dirichlet) | Ajouter ou retirer le cas λ = 0. | « Pour λ = 0, u = A + Bx : vérifie les conditions aux bords. » |
 | `f_lap_abscissa` | notation | C | `f-lap-table` | `f-lap-abscissa` | L(e^(2t)) = 1/(z − 2) sans domaine → Re z > 2 | Ligne finale sans demi-plan, ou Re z > 0 pour tout terme. | « La transformée n'existe que pour Re z > {g0}. » (Plan §8.) Le juge renvoie `stay`. |
@@ -1794,7 +1864,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 | `f_neumann_sine` | method | E | `f-heat-sep` | `f-heat-sep` | Neumann avec sin(nπx/L) → cos(nπx/L) | Choisir les sinus pour u_x = 0 aux bords. | « u_x = 0 aux bords : ce sont les cosinus qui vérifient cette condition. » |
 | `f_heat_source_steady` | method | E | `f-heat-source` | `f-heat-source` | b₂ = 1/4 → (1 − e^(−4t))/4 | Prendre seulement la solution stationnaire, sans la condition initiale du mode. | « b₂(0) = 0 : la partie stationnaire 1/4 doit être corrigée par −e^(−4t)/4. » |
 | `f_wave_factor` | calculus | C | `f-wave` | `f-wave` | û_tt + α² û = 0 → + (α²/4) û ; u = (…)/4 → (…)/2 | Oublier c² ou mettre un facteur 1/4 dans la formule de d'Alembert. | « Le coefficient ¼ devant u_xx donne c = ½. » (Corrigé MT/SV 2021.) |
-| `f_half_plane_abs` | method | E | `f-laplace-eq` | `f-laplace-eq` | û = A e^(|α|x) + B e^(−|α|x) gardé → B e^(−|α|x) | Garder la solution non bornée. | « e^(|α|x) explose quand x → ∞ : il faut A = 0. » |
+| `f_half_plane_abs` | method | E | `f-laplace-eq` | `f-laplace-eq` | û = A e^(\|α\|x) + B e^(−\|α\|x) gardé → B e^(−\|α\|x) | Garder la solution non bornée. | « e^(\|α\|x) explose quand x → ∞ : il faut A = 0. » |
 | `f_distrib_jump` | rule | C | `f-distrib-deriv` | `f-distrib-deriv` | Df = −f → −f + δ | Oublier les δ des sauts. | « f saute de {h} en {a} : la dérivée contient {h}δ_{a}. » (Options du QCM MT/SV 2021.) |
 | `f_distrib_sign` | sign | E | `f-distrib-deriv` | `f-distrib-deriv` | ⟨DT, φ⟩ = ⟨T, φ′⟩ → −⟨T, φ′⟩ | Oublier le signe moins. | « ⟨DT, φ⟩ = −⟨T, φ′⟩. » |
 | `f_fdelta` | rule | E | `f-distrib-def` | `f-distrib-def` | f δ_a = f(0) δ_a ou f(x) δ_a → f(a) δ_a | Évaluer en 0 au lieu de a, ou ne pas évaluer. | « ⟨f δ_a, φ⟩ = f(a)φ(a). » |

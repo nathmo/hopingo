@@ -76,3 +76,9 @@ CAS_RULES.push(...M);
 import { RULES as N } from './n.js';
 
 CAS_RULES.push(...N);
+
+// Step U10: modules V, C and F (the table is META in rules/vcf.js, each part
+// adds its DEFS in rules/va.js … rules/fd.js).
+import { RULES as VCF } from './vcf.js';
+
+CAS_RULES.push(...VCF);

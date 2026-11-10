@@ -333,3 +333,51 @@ test('ba4-numerique: a complete exam, multiple answers marked +1/N −1/M', () =
   assert.ok(fromM > 0, 'the M skills of extraSkills are drawn');
   assert.ok(examsForUnit('numerique').some((e) => e.id === 'ba4-numerique'));
 });
+
+// Step U10: Analyse III (V and C: single-answer multiple choice +2/0, open
+// problems of 3 to 14 points) and Analyse IV (F, and C in the multiple
+// choice: several answers +1/N, −1/M, floor 0; three open problems of 3 to
+// 12 points). Every question answered with its reference earns all its
+// points; a multiple-answer question with one wrong box ticked does not.
+test('ba3-analyse3 and ba4-analyse4 produce complete exams, marked right with the references', () => {
+  const answer = (q) => {
+    if (q.kind === 'mcq' && q.item.multi) return q.item.options.map((o, i) => (o.correct ? i : -1)).filter((i) => i >= 0);
+    if (q.kind === 'mcq') return q.item.options.findIndex((o) => o.correct);
+    return referenceLog(q.item);
+  };
+  const units = { 'ba3-analyse3': ['vecto', 'cplx'], 'ba4-analyse4': ['fourier', 'cplx'] };
+  for (const id of ['ba3-analyse3', 'ba4-analyse4']) {
+    const bp = EXAM_BY_ID[id];
+    for (const seed of [1, 2, 3]) {
+      const exam = buildExam(bp, { rng: makeRng(seed), now: 0 });
+      assert.equal(exam.questions.length, bp.sections.reduce((s, x) => s + x.count, 0), id);
+      let max = 0;
+      let got = 0;
+      for (const q of exam.questions) {
+        const section = bp.sections[q.section];
+        assert.ok(!q.item.stub, `${q.skill} is built`);
+        assert.ok(units[id].includes(SKILL_BY_ID[q.skill].unit), `${id}: ${q.skill}`);
+        if (q.kind === 'mcq') assert.equal(!!q.item.multi, !!section.multi, `${q.item.key}: multi`);
+        if (q.kind === 'open') {
+          const [lo, hi] = section.pool.points;
+          assert.ok(q.item.type === 'problem' && q.item.total >= lo && q.item.total <= hi, `${q.item.key}: ${q.item.total} points`);
+          if (id === 'ba4-analyse4') assert.equal(SKILL_BY_ID[q.skill].unit, 'fourier');
+        }
+        const r = scoreQuestion(q, section.scoring, answer(q));
+        assert.equal(r.state, 'right', `${id} ${q.kind} ${q.item.key}`);
+        max += q.max;
+        got += r.points;
+        if (q.kind === 'mcq' && q.item.multi) {
+          const bad = q.item.options.findIndex((o) => !o.correct);
+          if (bad >= 0) assert.ok(scoreQuestion(q, section.scoring, [...answer(q), bad]).points < r.points, `${q.item.key}: a wrong box costs`);
+        }
+      }
+      assert.ok(Math.abs(got - max) < 1e-9, `${id}: ${got}/${max}`);
+      assert.equal(gradeOf(got, max), 6);
+    }
+  }
+  assert.deepEqual(EXAM_BY_ID['ba3-analyse3'].sections.map((s) => [s.kind, s.count, !!s.multi]), [['mcq', 10, false], ['open', 3, false]]);
+  assert.deepEqual(EXAM_BY_ID['ba4-analyse4'].sections.map((s) => [s.kind, s.count, !!s.multi]), [['mcq', 10, true], ['open', 3, false]]);
+  assert.deepEqual(examsForUnit('vecto').map((e) => e.id), ['ba3-analyse3']);
+  assert.deepEqual(examsForUnit('fourier').map((e) => e.id), ['ba4-analyse4']);
+});
