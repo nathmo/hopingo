@@ -26,12 +26,19 @@ import { div, mul, neg, num, stripParen, contains } from '../cas/ast.js';
 import { exactValue } from '../cas/normal.js';
 import { diagnoseLine } from './diagnose.js';
 import {
-  readMat, mopts, isMatrix, wrongV, parseLine, show, text, input,
+  readMat, mopts, isMatrix, wrongV, parseLine as parseMatLineNode, show, text, input,
 } from './matcommon.js';
 import * as polyJudge from './poly.js';
 import { ACTIONS } from './actions.js';
 
-export { parseLine, show, text, input };
+export { show, text, input };
+
+// section det: with track 'det', a line « k·det[[…]] » reads as a det line
+// (shown as written, its matrix kept for the menu and the next line).
+export function parseLine(cfg, t) {
+  const node = parseMatLineNode(cfg, t);
+  return cfg.track === 'det' && node.body ? detLine(node, cfg) : node;
+}
 
 const colsOf = (cfg, v) => cfg.cols ?? v.aug ?? v.rows[0]?.length ?? 0;
 
@@ -145,7 +152,9 @@ function legal(op, rows, cfg, opts) {
 }
 
 const diagnose = (cfg, prev, node, ops) => diagnoseLine('rowops', prev, node, { ...cfg, _ops: ops }, (cand, n) => sameValue(cand.value, n.value, mopts(cfg)) && sameDetFactor(cand, n, cfg));
-const sameDetFactor = (a, b, cfg) => (cfg.track !== 'det' ? true : !!a.det === !!b.det && (!a.det || sameScalar(a.factor, b.factor, mopts(cfg))));
+// section det: a candidate without a factor (the row-operation traps of
+// section sys) is compared on its matrix only.
+const sameDetFactor = (a, b, cfg) => (cfg.track !== 'det' || !a.det ? true : !!b.det && sameScalar(a.factor, b.factor, mopts(cfg)));
 
 // ---------- determinant lines (track: 'det') ----------
 
@@ -157,6 +166,8 @@ function detParts(node) {
   const a = strip(b);
   if (a.op === 'det') return { factor: ONE, mat: a.e };
   if (a.op === 'neg' && strip(a.e).op === 'det') return { factor: qn(-1), mat: strip(a.e).e };
+  // section det: « −2·det[[…]] » reads as −(2·det[[…]]).
+  if (a.op === 'neg' && strip(a.e).op === 'mul' && strip(strip(a.e).b).op === 'det' && strip(strip(a.e).a).op === 'num') return { factor: simp(neg(strip(strip(a.e).a).n)), mat: strip(strip(a.e).b).e };
   if (a.op === 'mul' && strip(a.b).op === 'det' && strip(a.a).op === 'num') return { factor: strip(a.a).n, mat: strip(a.b).e };
   if (a.op === 'lit') return { factor: ONE, mat: a, plain: true };
   return null;
