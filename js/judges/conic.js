@@ -230,7 +230,7 @@ function standardShape(cfg, eq) {
     return Math.abs(d) < 1e-9 && Math.abs(e) < 1e-9;
   }
   // In x, y: squares of (x − h) and (y − k), as written.
-  return writtenStandard(eq.sides);
+  return writtenStandard(eq.sides || []);
 }
 
 const isNum = (n) => { n = stripParen(n); if (n.t === 'neg') n = stripParen(n.e); return n.t === 'num' || (n.t === 'frac' && stripParen(n.n).t === 'num' && stripParen(n.d).t === 'num'); };
