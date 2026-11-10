@@ -416,6 +416,8 @@ function pratio(a, b) {
 }
 // Highest degree first, as the courses write it: a^2-a-6, -3a-2.
 function ptext(p, v = 'a') {
+  // 1 − a rather than −a + 1.
+  if (p.length === 2 && p[1].n < 0 && p[0].n > 0) return `${qt(p[0])}-${p[1].eq(-1) ? '' : qt(p[1].neg())}${v}`;
   const parts = [];
   for (let k = p.length - 1; k >= 0; k--) {
     const c = p[k];
@@ -495,6 +497,9 @@ function elimP(A) {
   return { ops, steps, E: R };
 }
 
+// No two proportional rows (no equation written twice).
+const distinctRows = (M) => M.every((r, i) => M.every((s, j) => j <= i || MX.rank([r, s]) === 2));
+
 // a + Σ cᵢ·tᵢ as text: 2+3t, -1-t, s-2t.
 function linT(c0, terms) {
   let s = c0.n !== 0 ? qt(c0) : '';
@@ -531,6 +536,8 @@ function solData(rng, level, { none = false, free: free0, n: n0 } = {}) {
     const { A: M, fallback } = rrefWith(3, n + 1, none ? [...cols, n] : cols, rng, { max: 3 });
     if (fallback) continue;
     if (M.some((r) => r.slice(0, n).every((x) => x.n === 0))) continue;
+    if (!distinctRows(M)) continue;
+    if (solKind(M, n) !== (none ? 'none' : 'inf')) continue;
     const red = MX.rref(M, { cols: n });
     if (red.ops.length < 2 || red.ops.length > (level >= 4 ? 8 : 6)) continue;
     if (red.ops.some((op) => op.kind === 'swap' && level < 3)) continue;
@@ -617,7 +624,7 @@ function solItem(level, rng) {
   ];
   const freeDecision = {
     kind: 'decision', prompt: 'Quelles variables sont libres ?', options: rng.shuffle([
-      { id: 'ok', label: `${d.freeCols.map(xName).join(' et ')} : leur colonne n'a pas de pivot`, valid: true },
+      { id: 'ok', label: `${d.freeCols.map(xName).join(' et ')} : ${d.freeCols.length > 1 ? 'leurs colonnes n\'ont' : 'sa colonne n\'a'} pas de pivot`, valid: true },
       { id: 'first', label: `${xName(d.pivots[0])} : la première variable`, valid: false, why: `La colonne de ${xName(d.pivots[0])} a un pivot : ${xName(d.pivots[0])} s'exprime avec les autres. Les variables libres sont celles des colonnes sans pivot.` },
       { id: 'none', label: 'Aucune : il y a une solution unique', valid: false, rule: 'l_free_var_zero', why: `La colonne de ${xName(d.freeCols[0])} n'a pas de pivot : ${xName(d.freeCols[0])} peut prendre n'importe quelle valeur, il y a une infinité de solutions.` },
     ]),
@@ -688,6 +695,27 @@ function solExam(rng, exam) {
   const sys = systemML(d.M.map((r) => r.slice(0, n)), d.M.map((r) => r[n]), VARS_IDX(n));
   const line = (p, dirs) => MLx(`x = ${p ? vt(p) : ''}${p && dirs.length ? ' + ' : ''}${dirs.map((v, k) => `${ps[k]}${vt(v)}`).join(' + ')}`, ps);
   const signed = d.dirs.map((v) => v.map((x, j) => (d.pivots.includes(j) ? x.neg() : x)));
+  // « Une solution est… »: p + t₀v, among vectors that are not solutions.
+  if (rng.chance(0.4)) {
+    const t0 = rng.pick([1, -1, 2]);
+    const at = (p, v) => p.map((x, j) => x.add(v[j].mul(t0)));
+    const isSol = (x) => MX.matVec(d.M.map((r) => r.slice(0, n)), x).every((y, i) => y.eq(d.M[i][n]));
+    const free = d.freeCols[0];
+    const wrongs = [
+      { x: at(d.p, signed[0]), rule: 'l_ker_sign' },
+      { x: d.dirs[0].map((x) => x.mul(t0)), rule: 'l_rhs_forgotten' },
+      { x: d.p.map((x, j) => (j === free ? q(t0) : x)), rule: null },
+      { x: at(d.p.map((x) => x.neg()), d.dirs[0]), rule: null },
+      { x: d.p.map((x, j) => (j === d.pivots[0] ? x.add(1) : x)), rule: null },
+    ].filter((w) => !isSol(w.x));
+    return mcqDistinct({
+      skill: SOL, level: 4, key: `mcq1:${mt(d.M, n)}:${t0}`, exam: examTag({ exam }),
+      prompt: `Lequel de ces vecteurs est une solution du système ${sys}`,
+      right: MLv(at(d.p, d.dirs[0])),
+      wrongs: wrongs.map((w) => ({ html: MLv(w.x), rule: w.rule })),
+      solution: [{ html: MLx(T.final, ps), note: 'Solution générale' }, { html: `${ps[0]} = ${fq(q(t0))} : ${MLv(at(d.p, d.dirs[0]))}`, note: '' }],
+    }, rng);
+  }
   return mcqDistinct({
     skill: SOL, level: 4, key: `mcq:${mt(d.M, n)}`, exam: examTag({ exam }),
     prompt: `La solution générale du système ${sys} est :`,
@@ -745,7 +773,7 @@ function parData(rng, { quad = false } = {}) {
     if (A.some((r, i) => r.some((p, j) => pdeg(p) > (quad && i === 2 && j === 2 ? 2 : 1)))) continue;
     const withA = A.flat().filter((p) => pdeg(p) >= 1).length;
     if (withA < 2 || withA > 5) continue;
-    if (A.some((r) => r.slice(0, 3).every((p) => !p.length))) continue;
+    if (A.some((r) => r.slice(0, 3).filter((p) => p.length).length < 2)) continue;
     const el = elimP(A);
     if (!el || el.ops.length < 2) continue;
     if (el.steps.flat(2).some((p) => pdeg(p) > 2 || p.some((c) => c.d !== 1 || Math.abs(c.valueOf()) > 9))) continue;
@@ -774,7 +802,7 @@ function parItem(level, rng) {
   const infLine = { kind: 'eq', math: `a=${d.r1}`, note: `Pour a = ${fq(d.r1)}, la dernière ligne devient 0 = 0`, subgoal: 'discuss' };
   const noneSeg = { kind: 'segment', html: 'Pour quelles valeurs de a le système n\'a-t-il aucune solution ?', ask: 'a :', start: { math: 'S' }, judge: caseJudge(d.r2, d.r1) };
   const noneLine = { kind: 'eq', math: `a=${d.r2}`, note: `Pour a = ${fq(d.r2)}, la dernière ligne devient 0 = ${fq(g2)}`, subgoal: 'discuss' };
-  const holed = facT.replace(/\(a[+-]\d\)$|a$/, '(□)');
+  const holed = facT.replace(/\(a[+-]\d\)$|a$/, '(□)').replace(/-/g, '−');
   const hints = [
     { level: 1, html: 'Échelonne sans diviser par une expression en a, puis regarde la dernière ligne [0 0 f(a) | g(a)] : f(a) ≠ 0, unique ; f(a) = 0 et g(a) ≠ 0, aucune ; f(a) = g(a) = 0, une infinité.' },
     { level: 2, html: `f(a) = ${holed} ; une infinité pour a = □ ; aucune pour a = □.` },
@@ -912,9 +940,11 @@ function spanData(rng, level, { kind = 'in', n: n0, k: k0 } = {}) {
     if (kind === 'out') {
       let w = MX.kernel(MX.transpose(V))[0];
       const den = w.reduce((l, x) => (l * x.d) / gcd(l, x.d), 1);
-      w = w.map((x) => x.mul(den * rng.pick([1, -1])));
+      const sign = rng.pick([1, -1]);
+      w = w.map((x) => x.mul(den * sign));
       if (w.some((x) => Math.abs(x.valueOf()) > 3)) continue;
       b = b.map((x, i) => x.add(w[i]));
+      if (MX.rank(V.map((r, i) => [...r, b[i]])) === k) continue;
     }
     if (b.some((x) => Math.abs(x.valueOf()) > 12) || b.every((x) => x.n === 0)) continue;
     const M = V.map((r, i) => [...r, b[i]]);
@@ -925,6 +955,8 @@ function spanData(rng, level, { kind = 'in', n: n0, k: k0 } = {}) {
     let ok = true;
     for (const op of e.ops) { X = MX.applyOp(X, op); if (X.flat().some((x) => x.d > 2 || Math.abs(x.valueOf()) > 15)) ok = false; }
     if (!ok) continue;
+    // The kind of the system, checked: b in the span with weights c, or not.
+    if (MX.rank(V) !== k || (MX.rank(M) === k) !== (kind !== 'out') || (kind !== 'out' && !MX.matVec(V, c).every((x, i) => x.eq(b[i])))) continue;
     const out = { V, c, b, M, ops: e.ops, E: e.E, n, k, kind };
     if (kind === 'param') {
       const p = rng.int(0, n - 1);
@@ -1121,6 +1153,7 @@ function indData(rng, level, { dep, n: n0 } = {}) {
       V = A;
     }
     if (V.flat().some((x) => Math.abs(x.valueOf()) > 6)) continue;
+    if (MX.rank(V) !== (dep ? 2 : 3) || (dep && !MX.matVec(V, rel).every((x) => x.n === 0))) continue;
     if (MX.transpose(V).some((c) => c.every((x) => x.n === 0))) continue;
     const e = MX.echelon(V);
     if (e.ops.length < 2 || e.ops.length > (level >= 4 ? 6 : 4)) continue;
@@ -1295,7 +1328,7 @@ function indExam(rng, exam) {
     skill: IND, level: 4, key: `mcq:${pmt(d.A)}`, exam: tag,
     prompt: `Les vecteurs ${fam} sont linéairement dépendants si et seulement si`,
     right: set([d.r1, d.r2]),
-    wrongs: [{ html: set([d.r2]), rule: 'l_param_divide_zero' }, { html: set([-d.r1, -d.r2]), rule: 'l_rowop_sign' }],
+    wrongs: [{ html: set([d.r2]), rule: 'l_param_divide_zero' }, { html: set([-d.r1, -d.r2]), rule: null }],
     fillers: [{ html: set([d.r1]) }, { html: set([d.r1, d.r2, d.r1 + d.r2]) }, { html: set([d.r1 + 1, d.r2 + 1]) }],
     solution: [{ html: `Échelonnée : ${ML(pmt(d.E), { vars: ['a'] })}`, note: 'Sans diviser' }, { html: `Pivots nuls pour a = ${fq(d.r1)} ou a = ${fq(d.r2)}`, note: '' }],
   }, rng);
@@ -1712,6 +1745,7 @@ function injData(rng, level) {
     const cols = [0, ...rng.shuffle([...Array(n).keys()].slice(1)).slice(0, r - 1)].sort((a, b) => a - b);
     const { A, fallback } = rrefWith(m, n, cols, rng, { max: 3 });
     if (fallback || A.some((row) => row.every((x) => x.n === 0))) continue;
+    if (!distinctRows(A)) continue;
     if (A.flat().some((x) => Math.abs(x.valueOf()) > 7)) continue;
     const e = MX.echelon(A);
     if (e.ops.length < 2 || e.ops.length > (level >= 4 ? 7 : 5)) continue;

@@ -83,7 +83,8 @@ export const SKILLS = [
       rule: 'Sur la forme réduite, chaque colonne sans pivot donne une variable libre. On exprime les variables pivots en fonction des libres, puis x = p + t·v.<br>Une ligne [0 … 0 | c] avec c ≠ 0 : aucune solution.',
       lines: L([
         [M('[[1,0,-3|2],[0,1,1|-1]]'), 'x₁ − 3x₃ = 2 ; x₂ + x₃ = −1'],
-        [M('x = (2 ; -1 ; 0) + t(3 ; -1 ; 1)'), 'x₃ = t est libre'],
+        [M('x = (2 + 3t ; -1 - t ; t)'), 'x₃ = t est libre ; x₁ et x₂ s\'expriment avec t'],
+        [`x = ${M('(2 ; -1 ; 0)')} + t ${M('(3 ; -1 ; 1)')}`, 'Un point, plus t fois un vecteur directeur'],
       ]),
     },
   }),
