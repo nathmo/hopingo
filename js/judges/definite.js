@@ -97,6 +97,7 @@ export function sameValue(cfg, a, b) {
   try {
     // Step U6: a trap's candidate whose value is unknown (a primitive taken
     // at ±∞ that diverges) matches no line.
+    if (sameLine(a, b)) return true;
     if (nsOf(cfg).every((n) => !Number.isFinite(valueOf(cfg, a, n).x))) return false;
     return compare(cfg, a, b).equal;
   } catch { return false; }

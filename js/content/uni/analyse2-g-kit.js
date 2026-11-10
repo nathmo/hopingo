@@ -206,6 +206,7 @@ export const DEF = (extra = {}) => ({ kind: 'definite', ...extra });
 // A `definite` part whose start (an iterated integral) has the exact value
 // the generator computed: the judge does not need its quadrature.
 export const defKnown = (start, value, extra = {}) => ({ kind: 'definite', known: { [toText(parse(start))]: ctext(value) }, ...extra });
+export const defText = (start, valueText, extra = {}) => ({ kind: 'definite', known: { [toText(parse(start))]: valueText }, ...extra });
 // A number equal to the previous one, any writing (a step that leaves
 // integrals in the line: « π·∫₁² 2r ln r dr »).
 export const SAME = { kind: 'equiv', vars: [], target: 'any' };

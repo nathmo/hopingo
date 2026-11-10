@@ -258,6 +258,9 @@ const TARGETS = {
   'log-single': (node) => { const n = stripParen(node); return isLn(n) && !contains(n.args[0], (x) => isLn(x)); },
   constant: (node) => literal(node),
   any: () => true,
+  // Step U6 (A2, part g): no ∫, no [F] and no lim left, a tidy writing
+  // (the integral on the ball B_R as a function of R).
+  'no-int': (node) => (contains(node, (x) => x.t === 'int' || x.t === 'bracket' || x.t === 'lim') ? false : (presentationIssue(node) ?? true)),
   'no-sum': (node, cfg) => {
     if (hasDeriv(node) || contains(node, (x) => x.t === 'sum')) return false;
     const v = cfg.vars?.[0] || 'n';
