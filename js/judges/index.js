@@ -64,3 +64,12 @@ import * as complex from './complex.js';
 import * as delta from './delta.js';
 
 Object.assign(JUDGES, { complex, delta });
+
+// Step U6: differential equations, non-linear systems, polar bounds of a
+// limit in two variables, bounds of a multiple integral (A2).
+import * as ode from './ode.js';
+import * as system from './system.js';
+import * as bound from './bound.js';
+import * as domain from './domain.js';
+
+Object.assign(JUDGES, { ode, system, bound, domain });

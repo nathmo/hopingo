@@ -38,6 +38,8 @@ import { checkGeo } from './geo-examples.js';
 import { checkSeqFn } from './counters.js';
 import { checkComplexCounter } from './counters-complex.js';
 
+import { checkA2 } from './a2-examples.js'; // step U6
+
 const SAMPLES = {
   R: ['-3', '-2', '-1', '-1/2', '0', '1/3', '1/2', '1', '2', '5/2', '3', '7'],
   'R+': ['1/10', '1/3', '1/2', '1', '2', '3', '7/2', '10'],
@@ -255,6 +257,8 @@ export function checkCounter(counter, answers) {
     case 'sequence': case 'function': return checkSeqFn(counter, answers);
     // Step U4 (G8): complex numbers (js/judges/counters-complex.js).
     case 'complex': return checkComplexCounter(counter, answers);
+
+    case 'a2': return checkA2(counter, answers); // step U6
     default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }

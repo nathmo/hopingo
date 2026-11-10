@@ -30,6 +30,10 @@
 // y′ = d(y) being the letter p (listed in cfg.vars). So (x·y + y³)′ =
 // y + x·y′ + 3y²·y′, and a line may write y′ or p. Target 'no-prime'
 // accepts y′ in a final line.
+// Step U6 (A2, part g): cfg.jac = {from, factor}: the start line `from` (an
+// integrand in x, y(, z), given in cfg.subst in the new variables) stands
+// for from·factor, the jacobian of the change of variables (r, r²·sin(θ)):
+// the line after it is the integrand in r, φ(, θ) with its jacobian.
 
 import { expandDerivs, hasDeriv, diff } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
@@ -44,6 +48,7 @@ import { limit, sameLimit } from '../cas/limit.js';
 import { polyOf, qCoeffs, discriminant, sumTerms, productFactors, isExpanded } from '../cas/polyx.js';
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine, frNum } from './common.js';
+import { jet, sameJet, monoText } from '../cas/jet.js';
 
 // Factors of a product, through brackets.
 function factors(n, out = []) {
@@ -274,7 +279,27 @@ const TARGETS = {
     if (hasDeriv(node)) return false;
     return presentationIssue(node) ?? true;
   },
+  // Step U6 (A2, integrals with a parameter; the integral on the ball B_R
+  // as a function of R): no ∫, [F], lim or d(…) left, a tidy writing,
+  // and, with cfg.goal, no more terms written than in the goal (the terms
+  // of F′(t) are collected).
+  'no-int': (node, cfg) => {
+    if (contains(node, (x) => x.t === 'int' || x.t === 'bracket' || x.t === 'lim')) return false;
+    if (cfg.goal && writtenTerms(node) > writtenTerms(parseGoal(cfg))) return false;
+    return TARGETS['no-prime'](node, cfg);
+  },
 };
+
+// Terms as written, sums inside products and numerators counted:
+// 3(1 − cos t⁴)/t has 2, (2 + 2cos t² − 4cos t⁴)/t has 3.
+function writtenTerms(n) {
+  n = stripParen(n);
+  if (n.t === 'bin' && (n.op === '+' || n.op === '-')) return writtenTerms(n.l) + writtenTerms(n.r);
+  if (n.t === 'neg') return writtenTerms(n.e);
+  if (n.t === 'frac') return writtenTerms(n.n);
+  if (n.t === 'bin' && (n.op === '×' || n.op === '÷')) return writtenTerms(n.l) * writtenTerms(n.r);
+  return 1;
+}
 
 // true (final), false (not yet), or a message (right but to tidy).
 export function isFinal(cfg, node) {
@@ -289,6 +314,12 @@ function parseGoal(cfg) {
   return GOALS.get(cfg.goal);
 }
 const SUBSTS = new Map();
+// Step U6 (A2, part g): the start line of cfg.jac times its jacobian.
+export function withJac(cfg, prev) {
+  if (!cfg.jac) return prev;
+  const from = parse(cfg.jac.from, { vars: cfg.vars });
+  return sameLine(prev, from) ? { t: 'bin', op: '×', l: { t: 'paren', e: prev }, r: { t: 'paren', e: parse(cfg.jac.factor, { vars: cfg.vars }) } } : prev;
+}
 function substOf(cfg) {
   if (!cfg.subst) return null;
   const key = JSON.stringify(cfg.subst);
@@ -301,7 +332,10 @@ function witnessMessage(r, cfg) {
   if (!r.witness) return 'Cette ligne n\'est pas égale à la précédente.';
   const [v] = Object.keys(r.witness.env);
   const [a, b] = r.witness.values;
-  const at = v ? `En ${v} = ${frNum(r.witness.env[v])}, ` : '';
+  let at = v ? `En ${v} = ${frNum(r.witness.env[v])}, ` : '';
+  // Step U6: several variables, the point of the plane or of space.
+  const names = Object.keys(r.witness.env);
+  if (names.length > 1) at = `En (${names.join(' ; ')}) = (${names.map((k) => frNum(r.witness.env[k])).join(' ; ')}), `;
   return `${at}la ligne précédente vaut ${frNum(a)}, mais ta ligne vaut ${frNum(b)}.`;
 }
 
@@ -312,11 +346,12 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression, sans « = » au milieu.' };
   if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
   if (cfg.rel) return judgeBound(cfg, prev, node);
+  if (cfg.jet) return judgeJet(cfg, prev, node); // step U6
   const opts = { vars: cfg.vars, domain: cfg.domain, seed: cfg.seed ?? seedOf(toText(prev)) };
   const map = substOf(cfg);
   const D = (n) => (cfg.defs ? expandFns(n, cfg.defs, cfg.vars?.[0] || 'x') : cfg.implicit ? implicitDerivs(n, cfg) : n);
   const S = (n) => (map ? substSyms(expandDerivs(D(n)), map) : expandDerivs(D(n)));
-  const r = equivalent(S(prev), S(node), opts);
+  const r = equivalent(S(withJac(cfg, prev)), S(node), opts);
   if (!r.equal) {
     const same = (cand, line) => equivalent(S(cand), S(line), opts).equal;
     const diag = diagnoseLine('equiv', prev, node, cfg, same);
@@ -436,3 +471,72 @@ function squeezeEnd(cfg, node, v) {
   const at = r.value === '+inf' ? '+∞' : r.value === '-inf' ? '−∞' : r.value === 'none' ? 'aucune limite' : frNum(typeof r.value === 'number' ? r.value : r.value.valueOf());
   return { kind: 'stay', node, message: `C'est une ${word} juste, mais elle tend vers ${at}, et l'autre borne n'a pas cette limite : elle ne coince pas la suite. Cherche une borne plus serrée.` };
 }
+
+// ---------- Taylor polynomials of order 2 (step U6, A2 catalogue, a2-taylor2) ----------
+// cfg.jet = {at: {x: a, y: b}, order: 2} (vars: cfg.vars): two lines are
+// compared by their Taylor polynomials of that order at the point
+// (js/cas/jet.js), so a line may drop the terms of higher degree (the DL
+// method: ln(1 + u) = u − u²/2, u² cut to (2x − y)²). Target 'taylor2': a
+// sum of c·Xⁱ·Yʲ (X = x or x − a), each of degree ≤ order; such a sum
+// with a term of higher degree is `stay` (« Tronque »).
+
+const jetOpts = (cfg) => ({ vars: cfg.vars || ['x', 'y'], at: cfg.jet.at || {}, order: cfg.jet.order ?? 2 });
+const JETS = new Map();
+function jetMemo(node, cfg) {
+  const key = `${toText(node)}|${JSON.stringify(cfg.jet)}`;
+  if (!JETS.has(key)) { if (JETS.size > 400) JETS.clear(); JETS.set(key, jet(node, jetOpts(cfg))); }
+  return JETS.get(key);
+}
+
+function judgeJet(cfg, prev, node) {
+  let a;
+  let b;
+  try { b = jetMemo(node, cfg); } catch { return { kind: 'parse', node, message: 'Je n\'arrive pas à dériver cette ligne : écris-la avec des fonctions usuelles.' }; }
+  try { a = jetMemo(prev, cfg); } catch { a = null; }
+  const k = a ? sameJet(a, b) : null;
+  if (k) {
+    const same = (cand, line) => { try { return !sameJet(jetMemo(cand, cfg), jetMemo(line, cfg)); } catch { return false; } };
+    const diag = diagnoseLine('equiv', prev, node, cfg, same);
+    const o = jetOpts(cfg);
+    const what = k.split(',').every((x) => x === '0') ? 'Le terme constant' : `Le coefficient de ${monoText(k, o.vars, o.at)}`;
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `${what} ne va pas : il vaut ${frNum(a[k])} pour la ligne précédente, ${frNum(b[k])} pour ta ligne (développement d'ordre ${o.order} au point).` };
+  }
+  const fin = isFinal(cfg, node);
+  if (fin === true) return { kind: 'done', node };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: fin };
+  return { kind: 'ok', node };
+}
+
+// A term c·Xⁱ·Yʲ: {deg, key} (key: the monomial, written), or null when it is
+// not one (X = x or x − a).
+function monoOf(t, vars) {
+  const { factors } = productFactors(t);
+  let deg = 0;
+  const parts = [];
+  for (const f of factors) {
+    const n = stripParen(f.node);
+    const isVarNode = (x) => x.t === 'sym' && !x.sub && vars.includes(x.name);
+    const shifted = n.t === 'bin' && (n.op === '+' || n.op === '-') && isVarNode(stripParen(n.l)) && numValue(stripParen(n.r));
+    if (!isVarNode(n) && !shifted) return null;
+    deg += f.k;
+    parts.push(`${toText(n)}^${f.k}`);
+  }
+  return { deg, key: parts.sort().join('·') };
+}
+// The terms of a sum, a bracketed sum kept whole ((y + 1) is one term).
+function termsTop(n, out = []) {
+  if (n.t === 'bin' && (n.op === '+' || n.op === '-')) { termsTop(n.l, out); termsTop(n.r, out); } else if (n.t === 'neg') termsTop(n.e, out);
+  else out.push(n);
+  return out;
+}
+function taylorForm(node, cfg) {
+  if (hasDeriv(node)) return false;
+  const vars = cfg.vars || ['x', 'y'];
+  const order = cfg.jet?.order ?? 2;
+  const ms = termsTop(stripParen(node)).map((t) => monoOf(t, vars));
+  if (ms.some((m) => m === null)) return false;
+  if (ms.some((m) => m.deg > order)) return `Tronque : garde seulement les termes de degré ≤ ${order}.`;
+  if (new Set(ms.map((m) => m.key)).size < ms.length) return 'Regroupe les termes semblables.';
+  return presentationIssue(node) ?? true;
+}
+TARGETS.taylor2 = (node, cfg) => taylorForm(node, cfg);

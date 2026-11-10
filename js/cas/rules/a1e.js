@@ -106,7 +106,9 @@ export const RULES = [
         const at = (b) => (dependsOn(b, v) ? substVar(I.e, I.v, b) : null);
         const g = at(I.hi);
         const h = at(I.lo);
-        const node = g && h ? sub(g, h) : g || { t: 'neg', e: h };
+        let node = g && h ? sub(g, h) : g || { t: 'neg', e: h };
+        // Step U6 (A2, Leibniz's rule): the integral of ∂f/∂v stays.
+        if (I.v !== v && dependsOn(I.e, v)) node = { t: 'bin', op: '+', l: node, r: { t: 'int', e: diff(I.e, v), v: I.v, lo: I.lo, hi: I.hi } };
         const bound = dependsOn(I.hi, v) ? I.hi : I.lo;
         return { node, ctx: { g: bound, dg: diff(bound, v) } };
       });

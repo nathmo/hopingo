@@ -106,6 +106,7 @@ export function toMathML(node, opts = {}) {
       case 'deriv': {
         const marks = '′'.repeat(Math.min(n.n, 3));
         const inner = n.e.t === 'sym' ? M(n.e) : paren(M(stripP(n.e)));
+        if (n.partial) return row(`<mfrac><mi mathvariant="normal">∂</mi>${row('<mi mathvariant="normal">∂</mi>', `<mi>${esc(n.v)}</mi>`)}</mfrac>`, inner); // step U6
         if (n.v === dvar) return row(inner, mo(marks, ' lspace="0" rspace="0"'));
         const d = n.n > 1 ? `<msup><mi mathvariant="normal">d</mi><mn>${n.n}</mn></msup>` : '<mi mathvariant="normal">d</mi>';
         const dv = n.n > 1 ? `<msup><mi>${esc(n.v)}</mi><mn>${n.n}</mn></msup>` : `<mi>${esc(n.v)}</mi>`;

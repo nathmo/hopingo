@@ -25,6 +25,9 @@ import { lexFor } from '../cas/logic.js';
 import { MatrixInput, matrixShape } from './matrix-input.js';
 import { judgeFor } from '../judges/index.js';
 
+// Step U6: decision labels and prompts may hold markup (MathML, <b>, <sub>).
+const rich = (s) => (/<(math|b|i|sub|sup|br|span)\b/.test(String(s)) ? html(s) : s);
+
 const MM = (node, opts) => toMathML(unparen(node), opts);
 // The MathML of a typed text, without the <math> wrapper (to put in a blank).
 const innerMath = (text, opts) => {
@@ -261,7 +264,7 @@ export function mountLines(item, ctx, body, opts = {}) {
   function decisionTask(line, index) {
     const list = h('div.choices.lines-choices');
     for (const o of line.options) {
-      const b = h('button.choice', { type: 'button' }, o.label);
+      const b = h('button.choice', { type: 'button' }, rich(o.label));
       b.addEventListener('click', () => {
         if (locked()) return;
         run.decide(line, o.id);
@@ -287,7 +290,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       });
       list.appendChild(b);
     }
-    stage.append(h('div.step-label', line.prompt), list);
+    stage.append(h('div.step-label', rich(line.prompt)), list);
     setFooter();
   }
 
@@ -315,7 +318,7 @@ export function mountLines(item, ctx, body, opts = {}) {
     const options = actionsFor(item.tapActions, run.prev, run.cfg);
     const list = h('div.choices.lines-choices');
     for (const o of options) {
-      const b = h('button.choice', { type: 'button' }, o.label);
+      const b = h('button.choice', { type: 'button' }, rich(o.label));
       b.addEventListener('click', () => {
         if (locked()) return;
         if (o.valid) {
@@ -343,7 +346,7 @@ export function mountLines(item, ctx, body, opts = {}) {
   function ruleTask(line) {
     const list = h('div.choices.lines-choices');
     for (const o of line.options) {
-      const b = h('button.choice', { type: 'button' }, o.label);
+      const b = h('button.choice', { type: 'button' }, rich(o.label));
       b.addEventListener('click', () => {
         const right = line.options.find((x) => x.id === line.correct);
         if (o.id === line.correct) { play('good'); addNote(`✔ ${o.label}`, 'decided'); } else addNote(`La règle utilisée : ${right.label}`, 'decided');
@@ -351,7 +354,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       });
       list.appendChild(b);
     }
-    stage.replaceChildren(h('div.step-label', line.ask), list);
+    stage.replaceChildren(h('div.step-label', rich(line.ask)), list);
     setFooter();
   }
 

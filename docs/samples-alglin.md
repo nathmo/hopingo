@@ -19,6 +19,7 @@ Le système x_1 + 4x_2 + 2x_3 = 9 ; −4x_1 − 2x_3 = −10 ; x_1 + 4x_2 = 11 s
     = L2 ← L2 + 4L1 : [[1,4,2|9],[0,16,6|26],[1,4,0|11]]   (cases à remplir : (2,2) (2,4))   ← Annuler sous le pivot : L₂ ← L₂ + 4L₁
     = L3 ← L3 - L1 : [[1,4,2|9],[0,16,6|26],[0,0,-2|2]]   (cases à remplir : (3,2) (3,3))   ← Annuler sous le pivot : L₃ ← L₃ − L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ + 4L₁. | L₂ ← L₂ + 4L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 + 4L1 : [[1,4,2|9],[0,16,6|26],[1,4,0|11]]
+  pièges : a2_jacobian_transposed
 
 Le système −x_1 − 4x_2 + 4x_3 = 11 ; 3x_2 − 2x_3 = −8 ; −x_1 − 5x_2 − 5x_3 = 4 s'écrit avec une matrice augmentée. Complète-la, puis annule la première colonne sous le pivot.
   [guided]  Matrice
@@ -26,6 +27,7 @@ Le système −x_1 − 4x_2 + 4x_3 = 11 ; 3x_2 − 2x_3 = −8 ; −x_1 − 5x_2
   — Annule la première colonne sous le pivot.  [juge rowops]  départ : [[-1,-4,4|11],[0,3,-2|-8],[-1,-5,-5|4]]
     = L3 ← L3 - L1 : [[-1,-4,4|11],[0,3,-2|-8],[0,-1,-9|-7]]   (cases à remplir : (3,3) (3,4))   ← Annuler sous le pivot : L₃ ← L₃ − L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₃ ← L₃ − L₁. | L₃ ← L₃ − L₁ : la ligne 3 devient [0, □, □ | □]. | L3 ← L3 - L1 : [[-1,-4,4|11],[0,3,-2|-8],[0,-1,-9|-7]]
+  pièges : a2_jacobian_transposed
 
 Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'écrit avec une matrice augmentée. Complète-la, puis annule la première colonne sous le pivot.
   [guided]  Matrice
@@ -34,6 +36,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
     = L2 ← L2 - 4L1 : [[-1,-2,2|-4],[0,8,-4|12],[-4,5,1|4]]   (cases à remplir : (2,1) (2,3))   ← Annuler sous le pivot : L₂ ← L₂ − 4L₁
     = L3 ← L3 - 4L1 : [[-1,-2,2|-4],[0,8,-4|12],[0,13,-7|20]]   (cases à remplir : (3,3) (3,4))   ← Annuler sous le pivot : L₃ ← L₃ − 4L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 4L₁. | L₂ ← L₂ − 4L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 - 4L1 : [[-1,-2,2|-4],[0,8,-4|12],[-4,5,1|4]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -48,7 +51,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
     = L2 ← L2 - 4L1 : [[1,-4,0|5],[0,16,5|-26],[-4,2,2|-10]]   (cases à remplir : (2,1) (2,3) (2,4))   ← Annuler sous le pivot : L₂ ← L₂ − 4L₁
     = L3 ← L3 + 4L1 : [[1,-4,0|5],[0,16,5|-26],[0,-14,2|10]]   (cases à remplir : (3,2) (3,3) (3,4))   ← Annuler sous le pivot : L₃ ← L₃ + 4L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 4L₁. | L₂ ← L₂ − 4L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 - 4L1 : [[1,-4,0|5],[0,16,5|-26],[-4,2,2|-10]]
-  pièges : l_rowop_sign
+  pièges : a2_jacobian_transposed, l_rowop_sign
 
 Écris la matrice augmentée du système −x_1 + 4x_2 + 4x_3 = −19 ; −3x_1 = 3 ; −3x_1 − 5x_2 + 2x_3 = 14, puis annule la première colonne sous le pivot.
   [guided]  Matrice
@@ -58,7 +61,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
     = L2 ← L2 - 3L1 : [[-1,4,4|-19],[0,-12,-12|60],[-3,-5,2|14]]   (cases à remplir : (2,1) (2,2) (2,3))   ← Annuler sous le pivot : L₂ ← L₂ − 3L₁
     = L3 ← L3 - 3L1 : [[-1,4,4|-19],[0,-12,-12|60],[0,-17,-10|71]]   (cases à remplir : (3,1) (3,2) (3,4))   ← Annuler sous le pivot : L₃ ← L₃ − 3L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 3L₁. | L₂ ← L₂ − 3L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 - 3L1 : [[-1,4,4|-19],[0,-12,-12|60],[-3,-5,2|14]]
-  pièges : l_rowop_sign
+  pièges : a2_jacobian_transposed, l_rowop_sign
 
 Écris la matrice augmentée du système x_1 − x_2 − 2x_3 = 2 ; 4x_1 = −4 ; x_1 + x_2 + x_3 = −2, puis annule la première colonne sous le pivot.
   [guided]  Matrice
@@ -68,7 +71,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
     = L2 ← L2 - 4L1 : [[1,-1,-2|2],[0,4,8|-12],[1,1,1|-2]]   (cases à remplir : (2,1) (2,3) (2,4))   ← Annuler sous le pivot : L₂ ← L₂ − 4L₁
     = L3 ← L3 - L1 : [[1,-1,-2|2],[0,4,8|-12],[0,2,3|-4]]   (cases à remplir : (3,2) (3,3) (3,4))   ← Annuler sous le pivot : L₃ ← L₃ − L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 4L₁. | L₂ ← L₂ − 4L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 - 4L1 : [[1,-1,-2|2],[0,4,8|-12],[1,1,1|-2]]
-  pièges : l_rowop_sign
+  pièges : a2_jacobian_transposed, l_rowop_sign
 
 ```
 
@@ -81,6 +84,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
   — Annule la première colonne sous le pivot.  [juge rowops]  départ : [[-1,-5,-4|-3],[0,2,3|-1],[5,3,1|12]]
     = L3 ← L3 + 5L1 : [[-1,-5,-4|-3],[0,2,3|-1],[0,-22,-19|-3]]   ← Annuler sous le pivot : L₃ ← L₃ + 5L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₃ ← L₃ + 5L₁. | L₃ ← L₃ + 5L₁ : la ligne 3 devient [0, □, □ | □]. | L3 ← L3 + 5L1 : [[-1,-5,-4|-3],[0,2,3|-1],[0,-22,-19|-3]]
+  pièges : a2_jacobian_transposed
 
 Écris la matrice augmentée du système −x_1 − 2x_2 − 4x_3 = 0 ; −5x_1 − 2x_2 = 0 ; x_1 + 2x_2 + 3x_3 = 0, puis annule la première colonne sous le pivot : choisis d'abord l'opération.
   [tap, suivre l'erreur, menu rowops]  Matrice
@@ -89,6 +93,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
     = L2 ← L2 - 5L1 : [[-1,-2,-4|0],[0,8,20|0],[1,2,3|0]]   ← Annuler sous le pivot : L₂ ← L₂ − 5L₁
     = L3 ← L3 + L1 : [[-1,-2,-4|0],[0,8,20|0],[0,0,-1|0]]   ← Annuler sous le pivot : L₃ ← L₃ + L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 5L₁. | L₂ ← L₂ − 5L₁ : la ligne 2 devient [0, □, □ | 0]. | L2 ← L2 - 5L1 : [[-1,-2,-4|0],[0,8,20|0],[1,2,3|0]]
+  pièges : a2_jacobian_transposed
 
 Écris la matrice augmentée du système −x_1 = 0 ; −2x_1 + x_2 + 3x_3 = −11 ; −x_1 + x_3 = −3, puis annule la première colonne sous le pivot : choisis d'abord l'opération.
   [tap, suivre l'erreur, menu rowops]  Matrice
@@ -97,6 +102,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
     = L2 ← L2 - 2L1 : [[-1,0,0|0],[0,1,3|-11],[-1,0,1|-3]]   ← Annuler sous le pivot : L₂ ← L₂ − 2L₁
     = L3 ← L3 - L1 : [[-1,0,0|0],[0,1,3|-11],[0,0,1|-3]]   ← Annuler sous le pivot : L₃ ← L₃ − L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 2L₁. | L₂ ← L₂ − 2L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 - 2L1 : [[-1,0,0|0],[0,1,3|-11],[-1,0,1|-3]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -109,6 +115,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
   — Annule la première colonne sous le pivot.  [juge rowops]  départ : [[1,-1,-2|-3],[1,1,2|-3],[0,-2,-3|1]]
     = L2 ← L2 - L1 : [[1,-1,-2|-3],[0,2,4|0],[0,-2,-3|1]]   ← Annuler sous le pivot : L₂ ← L₂ − L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − L₁. | L₂ ← L₂ − L₁ : la ligne 2 devient [0, □, □ | 0]. | L2 ← L2 - L1 : [[1,-1,-2|-3],[0,2,4|0],[0,-2,-3|1]]
+  pièges : a2_jacobian_transposed
 
 Écris la matrice augmentée du système −x_1 + 4x_2 − 2x_3 = −2 ; −4x_1 + x_2 − 3x_3 = −3 ; −2x_2 − 3x_3 = −3, puis annule la première colonne sous le pivot.
   [free, suivre l'erreur]  Matrice
@@ -116,6 +123,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
   — Annule la première colonne sous le pivot.  [juge rowops]  départ : [[-1,4,-2|-2],[-4,1,-3|-3],[0,-2,-3|-3]]
     = L2 ← L2 - 4L1 : [[-1,4,-2|-2],[0,-15,5|5],[0,-2,-3|-3]]   ← Annuler sous le pivot : L₂ ← L₂ − 4L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 4L₁. | L₂ ← L₂ − 4L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 - 4L1 : [[-1,4,-2|-2],[0,-15,5|5],[0,-2,-3|-3]]
+  pièges : a2_jacobian_transposed
 
 Écris la matrice augmentée du système −x − 4y − 5z = 12 ; −5x − 2y − 3z = 12 ; −3x + 5y + z = 5, puis annule la première colonne sous le pivot.
   [free, suivre l'erreur]  Matrice
@@ -124,6 +132,7 @@ Le système −x − 2y + 2z = −4 ; −4x + 4z = −4 ; −4x + 5y + z = 4 s'�
     = L2 ← L2 - 5L1 : [[-1,-4,-5|12],[0,18,22|-48],[-3,5,1|5]]   ← Annuler sous le pivot : L₂ ← L₂ − 5L₁
     = L3 ← L3 - 3L1 : [[-1,-4,-5|12],[0,18,22|-48],[0,17,16|-31]]   ← Annuler sous le pivot : L₃ ← L₃ − 3L₁
   aides : Choisis k pour que la case sous le pivot devienne 0 : k = a₂₁/a₁₁. Ici, L₂ ← L₂ − 5L₁. | L₂ ← L₂ − 5L₁ : la ligne 2 devient [0, □, □ | □]. | L2 ← L2 - 5L1 : [[-1,-4,-5|12],[0,18,22|-48],[-3,5,1|5]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -135,6 +144,7 @@ Résous le début du système −x − y − z = 4 ; y = −2 ; −x + 2y + 2z =
     = [[-1,-1,-1|4],[0,1,0|-2],[-1,2,2|-2]]   ← Une ligne par équation, b après la barre
   — Annule la première colonne sous le pivot.  [juge rowops]  départ : [[-1,-1,-1|4],[0,1,0|-2],[-1,2,2|-2]]
     = L3 ← L3 - L1 : [[-1,-1,-1|4],[0,1,0|-2],[0,3,3|-6]]   ← Annuler sous le pivot : L₃ ← L₃ − L₁
+  pièges : a2_jacobian_transposed
 
 Résous le début du système x_1 − 4x_2 + 2x_3 = 8 ; x_1 + x_2 − 3x_3 = −2 ; 5x_1 = −10 : sa matrice augmentée, puis la première colonne nettoyée sous le pivot.
   [free, sans aide]  Matrice
@@ -142,6 +152,7 @@ Résous le début du système x_1 − 4x_2 + 2x_3 = 8 ; x_1 + x_2 − 3x_3 = −
   — Annule la première colonne sous le pivot.  [juge rowops]  départ : [[1,-4,2|8],[1,1,-3|-2],[5,0,0|-10]]
     = L2 ← L2 - L1 : [[1,-4,2|8],[0,5,-5|-10],[5,0,0|-10]]   ← Annuler sous le pivot : L₂ ← L₂ − L₁
     = L3 ← L3 - 5L1 : [[1,-4,2|8],[0,5,-5|-10],[0,20,-10|-50]]   ← Annuler sous le pivot : L₃ ← L₃ − 5L₁
+  pièges : a2_jacobian_transposed
 
 Résous le début du système x + 4y = −5 ; −3x + 2y = −13 ; −3x + 4y − 5z = −17 : sa matrice augmentée, puis la première colonne nettoyée sous le pivot.
   [free, sans aide]  Matrice
@@ -149,6 +160,7 @@ Résous le début du système x + 4y = −5 ; −3x + 2y = −13 ; −3x + 4y �
   — Annule la première colonne sous le pivot.  [juge rowops]  départ : [[1,4,0|-5],[-3,2,0|-13],[-3,4,-5|-17]]
     = L2 ← L2 + 3L1 : [[1,4,0|-5],[0,14,0|-28],[-3,4,-5|-17]]   ← Annuler sous le pivot : L₂ ← L₂ + 3L₁
     = L3 ← L3 + 3L1 : [[1,4,0|-5],[0,14,0|-28],[0,16,-5|-32]]   ← Annuler sous le pivot : L₃ ← L₃ + 3L₁
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -648,6 +660,7 @@ Résous le système x_1 − x_2 − 2x_3 = 3 ; x_2 + x_3 + x_4 = 0 ; x_4 = 0 : m
   — Écris la solution sous forme vectorielle.  [juge span]  départ : x
     = x = (3 ; 0 ; 0 ; 0) + t(1 ; -1 ; 1 ; 0)   ← Un point, plus les combinaisons des vecteurs directeurs
   aides : Les variables sans pivot sont libres : pose x₃ = t. | x₁ = 3 + □t, x₂ = 0 + □t, x₄ = 0 | x=(3000)+t(1−110)
+  pièges : a2_jacobian_transposed
 
 Résous le système 2x_1 − 2x_2 + x_3 = 4 ; x_1 − x_2 + x_3 = 3 ; x_1 − x_2 + x_4 = 0 : matrice augmentée, forme réduite, puis solution sous forme vectorielle.
   [free, suivre l'erreur]  Matrice
@@ -664,6 +677,7 @@ Résous le système 2x_1 − 2x_2 + x_3 = 4 ; x_1 − x_2 + x_3 = 3 ; x_1 − x_
   — Écris la solution sous forme vectorielle.  [juge span]  départ : x
     = x = (1 ; 0 ; 2 ; -1) + t(1 ; 1 ; 0 ; 0)   ← Un point, plus les combinaisons des vecteurs directeurs
   aides : Les variables sans pivot sont libres : pose x₂ = t. | x₁ = 1 + □t, x₃ = 2, x₄ = −1 | x=(102−1)+t(1100)
+  pièges : a2_jacobian_transposed
 
 Résous le système x_1 − x_3 = 4 ; x_3 = −2 ; x_2 − 3x_4 = 1 : matrice augmentée, forme réduite, puis solution sous forme vectorielle.
   [free, suivre l'erreur]  Matrice
@@ -676,6 +690,7 @@ Résous le système x_1 − x_3 = 4 ; x_3 = −2 ; x_2 − 3x_4 = 1 : matrice au
   — Écris la solution sous forme vectorielle.  [juge span]  départ : x
     = x = (2 ; 1 ; -2 ; 0) + t(0 ; 3 ; 0 ; 1)   ← Un point, plus les combinaisons des vecteurs directeurs
   aides : Les variables sans pivot sont libres : pose x₄ = t. | x₁ = 2, x₂ = 1 + □t, x₃ = −2 | x=(21−20)+t(0301)
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -693,6 +708,7 @@ Résous le système x_1 + 2x_2 − 2x_3 − x_4 = −4 ; x_4 = 1 ; x_1 + 2x_2 �
     = x = (-3-2s+2t ; s ; t ; 1)   ← x₂ = s, x₃ = t : les variables pivots s'expriment avec s et t
   — Écris la solution sous forme vectorielle.  [juge span]  départ : x
     = x = (-3 ; 0 ; 0 ; 1) + s(-2 ; 1 ; 0 ; 0) + t(2 ; 0 ; 1 ; 0)   ← Un point, plus les combinaisons des vecteurs directeurs
+  pièges : a2_jacobian_transposed
 
 Résous le système −2x_4 = −2 ; −x_1 − 3x_2 − x_3 + x_4 = 2 ; x_1 + 3x_2 + x_3 = −1 : matrice augmentée, forme réduite, puis solution sous forme vectorielle.
   [free, sans aide]  Matrice
@@ -708,6 +724,7 @@ Résous le système −2x_4 = −2 ; −x_1 − 3x_2 − x_3 + x_4 = 2 ; x_1 + 3
     = x = (-1-3s-t ; s ; t ; 1)   ← x₂ = s, x₃ = t : les variables pivots s'expriment avec s et t
   — Écris la solution sous forme vectorielle.  [juge span]  départ : x
     = x = (-1 ; 0 ; 0 ; 1) + s(-3 ; 1 ; 0 ; 0) + t(-1 ; 0 ; 1 ; 0)   ← Un point, plus les combinaisons des vecteurs directeurs
+  pièges : a2_jacobian_transposed
 
 Résous le système −x_1 + x_2 + 2x_3 − x_4 = 2 ; 2x_1 − 2x_2 − 4x_3 + x_4 = −1 ; x_1 − x_2 − 2x_3 = 1 : matrice augmentée, forme réduite, puis solution sous forme vectorielle.
   [free, sans aide]  Matrice
@@ -723,6 +740,7 @@ Résous le système −x_1 + x_2 + 2x_3 − x_4 = 2 ; 2x_1 − 2x_2 − 4x_3 + x
     = x = (1+s+2t ; s ; t ; -3)   ← x₂ = s, x₃ = t : les variables pivots s'expriment avec s et t
   — Écris la solution sous forme vectorielle.  [juge span]  départ : x
     = x = (1 ; 0 ; 0 ; -3) + s(1 ; 1 ; 0 ; 0) + t(2 ; 0 ; 1 ; 0)   ← Un point, plus les combinaisons des vecteurs directeurs
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -1028,7 +1046,7 @@ Soit v₁ = (-1 ; 0 ; 1), v₂ = (2 ; 1 ; 2) et b = (1 ; 2 ; 7). b appartient-il
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (3 ; 2)   ← b = 3v₁ + 2v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₃ ← L₃ + L₁ : la ligne 3 devient [0, □ | □]. | [[-1,2|1],[0,1|2],[1,2|7]] ; b = 3v₁ + 2v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; -1 ; 1), v₂ = (2 ; -1 ; 2) et b = (0 ; 1 ; 0). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice du système, échelonne-la, puis conclus.
   [guided]  Matrice
@@ -1039,7 +1057,7 @@ Soit v₁ = (1 ; -1 ; 1), v₂ = (2 ; -1 ; 2) et b = (0 ; 1 ; 0). b appartient-i
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-2 ; 1)   ← b = −2v₁ + v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ + L₁ : la ligne 2 devient [0, □ | □]. | [[1,2|0],[-1,-1|1],[1,2|0]] ; b = −2v₁ + v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; 1 ; 1), v₂ = (1 ; 0 ; 0) et b = (1 ; -2 ; -2). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice du système, échelonne-la, puis conclus.
   [guided]  Matrice
@@ -1051,7 +1069,7 @@ Soit v₁ = (1 ; 1 ; 1), v₂ = (1 ; 0 ; 0) et b = (1 ; -2 ; -2). b appartient-i
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-2 ; 3)   ← b = −2v₁ + 3v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ − L₁ : la ligne 2 devient [0, □ | □]. | [[1,1|1],[1,0|-2],[1,0|-2]] ; b = −2v₁ + 3v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1069,7 +1087,7 @@ Soit v₁ = (1 ; -2 ; 2), v₂ = (0 ; 2 ; -1) et b = (-1 ; 4 ; -3). b appartient
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-1 ; 1)   ← b = −v₁ + v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ + 2L₁ : la ligne 2 devient [0, □ | □]. | [[1,0|-1],[-2,2|4],[2,-1|-3]] ; b = −v₁ + v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; 0 ; -2), v₂ = (-1 ; 1 ; -2) et b = (-1 ; 3 ; -10). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice du système, échelonne-la, puis conclus.
   [guided]  Matrice
@@ -1081,7 +1099,7 @@ Soit v₁ = (1 ; 0 ; -2), v₂ = (-1 ; 1 ; -2) et b = (-1 ; 3 ; -10). b appartie
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (2 ; 3)   ← b = 2v₁ + 3v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₃ ← L₃ + 2L₁ : la ligne 3 devient [0, □ | □]. | [[1,-1|-1],[0,1|3],[-2,-2|-10]] ; b = 2v₁ + 3v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; -2 ; 1), v₂ = (0 ; 1 ; 1) et b = (2 ; -6 ; 0). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice du système, échelonne-la, puis conclus.
   [guided]  Matrice
@@ -1094,7 +1112,7 @@ Soit v₁ = (1 ; -2 ; 1), v₂ = (0 ; 1 ; 1) et b = (2 ; -6 ; 0). b appartient-i
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (2 ; -2)   ← b = 2v₁ − 2v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ + 2L₁ : la ligne 2 devient [0, □ | □]. | [[1,0|2],[-2,1|-6],[1,1|0]] ; b = 2v₁ − 2v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1110,7 +1128,7 @@ Soit v₁ = (1 ; 0 ; -1), v₂ = (-2 ; 1 ; 1) et b = (2 ; -2 ; 0). b appartient-
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-2 ; -2)   ← b = −2v₁ − 2v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₃ ← L₃ + L₁ : la ligne 3 devient [0, □ | □]. | [[1,-2|2],[0,1|-2],[-1,1|0]] ; b = −2v₁ − 2v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; -1 ; -1), v₂ = (0 ; 1 ; 0) et b = (-3 ; 6 ; 3). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice, puis choisis chaque opération.
   [tap, suivre l'erreur, menu rowops]  Matrice
@@ -1121,7 +1139,7 @@ Soit v₁ = (1 ; -1 ; -1), v₂ = (0 ; 1 ; 0) et b = (-3 ; 6 ; 3). b appartient-
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-3 ; 3)   ← b = −3v₁ + 3v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ + L₁ : la ligne 2 devient [0, □ | □]. | [[1,0|-3],[-1,1|6],[-1,0|3]] ; b = −3v₁ + 3v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; -2 ; -1), v₂ = (0 ; 1 ; 0) et b = (-1 ; -1 ; 1). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice, puis choisis chaque opération.
   [tap, suivre l'erreur, menu rowops]  Matrice
@@ -1132,7 +1150,7 @@ Soit v₁ = (1 ; -2 ; -1), v₂ = (0 ; 1 ; 0) et b = (-1 ; -1 ; 1). b appartient
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-1 ; -3)   ← b = −v₁ − 3v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ + 2L₁ : la ligne 2 devient [0, □ | □]. | [[1,0|-1],[-2,1|-1],[-1,0|1]] ; b = −v₁ − 3v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1148,7 +1166,7 @@ Soit v₁ = (1 ; -1 ; -1), v₂ = (0 ; 1 ; 0) et b = (1 ; 2 ; -1). b appartient-
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (1 ; 3)   ← b = v₁ + 3v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ + L₁ : la ligne 2 devient [0, □ | □]. | [[1,0|1],[-1,1|2],[-1,0|-1]] ; b = v₁ + 3v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (-2 ; 1 ; 2), v₂ = (-1 ; 1 ; 0) et b = (5 ; -3 ; -4). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice du système, échelonne-la, puis conclus.
   [free, suivre l'erreur]  Matrice
@@ -1160,7 +1178,7 @@ Soit v₁ = (-2 ; 1 ; 2), v₂ = (-1 ; 1 ; 0) et b = (5 ; -3 ; -4). b appartient
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-2 ; -1)   ← b = −2v₁ − v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ + (1/2)L₁ : la ligne 2 devient [0, □ | □]. | [[-2,-1|5],[1,1|-3],[2,0|-4]] ; b = −2v₁ − v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; 1 ; -1), v₂ = (0 ; -1 ; 1) et b = (-1 ; 1 ; -1). b appartient-il à Span{v₁, v₂} ? Si oui, avec quels poids ? Écris la matrice du système, échelonne-la, puis conclus.
   [free, suivre l'erreur]  Matrice
@@ -1172,7 +1190,7 @@ Soit v₁ = (1 ; 1 ; -1), v₂ = (0 ; -1 ; 1) et b = (-1 ; 1 ; -1). b appartient
   — Lis les poids : b = c₁v₁ + c₂v₂.  [juge mat]  départ : c
     = (-1 ; -2)   ← b = −v₁ − 2v₂ : b est dans le Span
   aides : Mets les vecteurs en colonnes, et b en dernière colonne : b est dans le Span si et seulement si ce système est compatible. | L₂ ← L₂ − L₁ : la ligne 2 devient [0, □ | □]. | [[1,0|-1],[1,-1|1],[-1,1|-1]] ; b = −v₁ − 2v₂ : b est dans le Span.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1187,7 +1205,7 @@ Soit p₁ = −1 + t², p₂ = 1 + t et q = h + t + 3t². Pour quelle valeur de 
     = L3 ← L3 - L2 : [[-1,1|h],[0,1|1],[0,0|h+2]]   ← Annuler sous le pivot : L₃ ← L₃ − L₂
   — Pour quelle valeur de h le polynôme q est-il dans Span{p₁, p₂} ?  [juge value]  départ : h
     = −2   ← La ligne [0 0 | h+2] doit se lire 0 = 0
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (-2 ; -1 ; 1), v₂ = (1 ; 0 ; 0) et b = (-3 ; -3 ; h). Pour quelle valeur de h le vecteur b appartient-il à Span{v₁, v₂} ? Écris la matrice du système, échelonne-la, puis conclus.
   [free, sans aide]  Matrice
@@ -1198,7 +1216,7 @@ Soit v₁ = (-2 ; -1 ; 1), v₂ = (1 ; 0 ; 0) et b = (-3 ; -3 ; h). Pour quelle 
     = L3 ← L3 + L2 : [[-2,1|-3],[0,-1/2|-3/2],[0,0|h-3]]   ← Annuler sous le pivot : L₃ ← L₃ + L₂
   — Pour quelle valeur de h le vecteur b est-il dans Span{v₁, v₂} ?  [juge value]  départ : h
     = 3   ← La ligne [0 0 | h−3] doit se lire 0 = 0
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit v₁ = (1 ; 0 ; 1), v₂ = (2 ; 1 ; -2) et b = (3 ; 3 ; h). Pour quelle valeur de h le vecteur b appartient-il à Span{v₁, v₂} ? Écris la matrice du système, échelonne-la, puis conclus.
   [free, sans aide]  Matrice
@@ -1208,7 +1226,7 @@ Soit v₁ = (1 ; 0 ; 1), v₂ = (2 ; 1 ; -2) et b = (3 ; 3 ; h). Pour quelle val
     = L3 ← L3 + 4L2 : [[1,2|3],[0,1|3],[0,0|h+9]]   ← Annuler sous le pivot : L₃ ← L₃ + 4L₂
   — Pour quelle valeur de h le vecteur b est-il dans Span{v₁, v₂} ?  [juge value]  départ : h
     = −9   ← La ligne [0 0 | h+9] doit se lire 0 = 0
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1279,7 +1297,7 @@ La famille p₁ = −2 + t − t², p₂ = t, p₃ = 2 + t + t² est-elle libre 
     ? La famille est-elle libre ? · Libre : un pivot dans chaque colonne / ✔ Liée : une colonne sans pivot
     = (1 ; -2 ; 1)   ← p₁ − 2p₂ + p₃ = 0
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₂ ← L₂ + (1/2)L₁ : la ligne 2 devient [0, □, □]. | Forme échelonnée [[-2,0,2],[0,1,2],[0,0,0]] : la 3e colonne n'a pas de pivot ; p₁ − 2p₂ + p₃ = 0.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 La famille v₁ = (1 ; 2 ; 2), v₂ = (1 ; 3 ; 2), v₃ = (0 ; 0 ; 1) est-elle libre ? Si elle est liée, donne une relation entre ses éléments.
   [guided]  Matrice
@@ -1292,7 +1310,7 @@ La famille v₁ = (1 ; 2 ; 2), v₂ = (1 ; 3 ; 2), v₃ = (0 ; 0 ; 1) est-elle l
     ? La famille est-elle libre ? ✔ Libre : un pivot dans chaque colonne / · Liée : une colonne sans pivot
     = 3   ← Un pivot dans chaque colonne : libre
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₂ ← L₂ − 2L₁ : la ligne 2 devient [0, □, 0]. | Forme échelonnée [[1,1,0],[0,1,0],[0,0,1]] : trois pivots, la famille est libre.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 La famille v₁ = (1 ; 0 ; 2), v₂ = (0 ; 1 ; 2), v₃ = (0 ; -1 ; -1) est-elle libre ? Si elle est liée, donne une relation entre ses éléments.
   [guided]  Matrice
@@ -1305,7 +1323,7 @@ La famille v₁ = (1 ; 0 ; 2), v₂ = (0 ; 1 ; 2), v₃ = (0 ; -1 ; -1) est-elle
     ? La famille est-elle libre ? ✔ Libre : un pivot dans chaque colonne / · Liée : une colonne sans pivot
     = 3   ← Un pivot dans chaque colonne : libre
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₃ ← L₃ − 2L₁ : la ligne 3 devient [0, □, □]. | Forme échelonnée [[1,0,0],[0,1,-1],[0,0,1]] : trois pivots, la famille est libre.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1322,7 +1340,7 @@ La famille v₁ = (1 ; 0 ; 2), v₂ = (0 ; 1 ; 2), v₃ = (1 ; 2 ; 6) est-elle l
     ? La famille est-elle libre ? · Libre : un pivot dans chaque colonne / ✔ Liée : une colonne sans pivot
     = (1 ; 2 ; -1)   ← v₁ + 2v₂ − v₃ = 0
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₃ ← L₃ − 2L₁ : la ligne 3 devient [0, □, □]. | Forme échelonnée [[1,0,1],[0,1,2],[0,0,0]] : la 3e colonne n'a pas de pivot ; v₁ + 2v₂ − v₃ = 0.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 La famille v₁ = (1 ; 0 ; -3), v₂ = (-2 ; 1 ; 2), v₃ = (0 ; 0 ; 1) est-elle libre ? Si elle est liée, donne une relation entre ses éléments. Choisis chaque opération.
   [tap, suivre l'erreur, menu rowops]  Matrice
@@ -1334,7 +1352,7 @@ La famille v₁ = (1 ; 0 ; -3), v₂ = (-2 ; 1 ; 2), v₃ = (0 ; 0 ; 1) est-elle
     ? La famille est-elle libre ? ✔ Libre : un pivot dans chaque colonne / · Liée : une colonne sans pivot
     = 3   ← Un pivot dans chaque colonne : libre
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₃ ← L₃ + 3L₁ : la ligne 3 devient [0, □, □]. | Forme échelonnée [[1,-2,0],[0,1,0],[0,0,1]] : trois pivots, la famille est libre.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 La famille v₁ = (1 ; 1 ; 0), v₂ = (0 ; 2 ; 1), v₃ = (-1 ; -3 ; -1) est-elle libre ? Si elle est liée, donne une relation entre ses éléments. Choisis chaque opération.
   [tap, suivre l'erreur, menu rowops]  Matrice
@@ -1346,7 +1364,7 @@ La famille v₁ = (1 ; 1 ; 0), v₂ = (0 ; 2 ; 1), v₃ = (-1 ; -3 ; -1) est-ell
     ? La famille est-elle libre ? · Libre : un pivot dans chaque colonne / ✔ Liée : une colonne sans pivot
     = (1 ; 1 ; 1)   ← v₁ + v₂ + v₃ = 0
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₂ ← L₂ − L₁ : la ligne 2 devient [0, □, □]. | Forme échelonnée [[1,0,-1],[0,2,-2],[0,0,0]] : la 3e colonne n'a pas de pivot ; v₁ + v₂ + v₃ = 0.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1364,7 +1382,7 @@ La famille v₁ = (1 ; -2 ; -2), v₂ = (0 ; -1 ; -3), v₃ = (0 ; 1 ; 2) est-el
     ? La famille est-elle libre ? ✔ Libre : un pivot dans chaque colonne / · Liée : une colonne sans pivot
     = 3   ← Un pivot dans chaque colonne : libre
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₂ ← L₂ + 2L₁ : la ligne 2 devient [0, □, □]. | Forme échelonnée [[1,0,0],[0,-1,1],[0,0,-1]] : trois pivots, la famille est libre.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 La famille v₁ = (-1 ; 1 ; 1), v₂ = (1 ; 0 ; 0), v₃ = (0 ; 1 ; 0) est-elle libre ? Si elle est liée, donne une relation entre ses éléments.
   [free, suivre l'erreur]  Matrice
@@ -1377,7 +1395,7 @@ La famille v₁ = (-1 ; 1 ; 1), v₂ = (1 ; 0 ; 0), v₃ = (0 ; 1 ; 0) est-elle 
     ? La famille est-elle libre ? ✔ Libre : un pivot dans chaque colonne / · Liée : une colonne sans pivot
     = 3   ← Un pivot dans chaque colonne : libre
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₂ ← L₂ + L₁ : la ligne 2 devient [0, □, □]. | Forme échelonnée [[-1,1,0],[0,1,1],[0,0,-1]] : trois pivots, la famille est libre.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 La famille p₁ = −1 − t², p₂ = t − t³, p₃ = 2 + t + 2t² − t³ est-elle libre ? Si elle est liée, donne une relation entre ses éléments.
   [free, suivre l'erreur]  Matrice
@@ -1389,7 +1407,7 @@ La famille p₁ = −1 − t², p₂ = t − t³, p₃ = 2 + t + 2t² − t³ es
     ? La famille est-elle libre ? · Libre : un pivot dans chaque colonne / ✔ Liée : une colonne sans pivot
     = (2 ; -1 ; 1)   ← 2p₁ − p₂ + p₃ = 0
   aides : Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes). | L₃ ← L₃ − L₁ : la ligne 3 devient [0, 0, 0]. | Forme échelonnée [[-1,0,2],[0,1,1],[0,0,0],[0,0,0]] : la 3e colonne n'a pas de pivot ; 2p₁ − p₂ + p₃ = 0.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1405,7 +1423,7 @@ Pour quelles valeurs du paramètre a la famille v₁ = (1 ; 2 ; a+1), v₂ = (2 
     = L3 ← L3 - L2 : [[1,2,0],[0,a+3,-3],[0,0,3-a]]   ← Échelonner sans diviser : L₃ ← L₃ − L₂
   — Pour quelles valeurs de a la famille est-elle liée ?  [juge solset]  départ : S
     = a = −3 ou a = 3   ← Les pivots a + 3 et 3 − a s'annulent
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Pour quelles valeurs du paramètre a la famille v₁ = (1 ; -1 ; a+1), v₂ = (1 ; -a-1 ; 3a+1), v₃ = (0 ; -2 ; a+5) est-elle liée ?
   [free, sans aide]  Matrice
@@ -1416,7 +1434,7 @@ Pour quelles valeurs du paramètre a la famille v₁ = (1 ; -1 ; a+1), v₂ = (1
     = L3 ← L3 + 2L2 : [[1,1,0],[0,-a,-2],[0,0,a+1]]   ← Échelonner sans diviser : L₃ ← L₃ + 2L₂
   — Pour quelles valeurs de a la famille est-elle liée ?  [juge solset]  départ : S
     = a = −1 ou a = 0   ← Les pivots −a et a + 1 s'annulent
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Pour quelles valeurs du paramètre a la famille v₁ = (1 ; -1 ; a), v₂ = (2 ; -a-4 ; -4), v₃ = (-1 ; 1 ; -2) est-elle liée ?
   [free, sans aide]  Matrice
@@ -1427,7 +1445,7 @@ Pour quelles valeurs du paramètre a la famille v₁ = (1 ; -1 ; a), v₂ = (2 ;
     = L3 ← L3 - 2L2 : [[1,2,-1],[0,-a-2,0],[0,0,a-2]]   ← Échelonner sans diviser : L₃ ← L₃ − 2L₂
   — Pour quelles valeurs de a la famille est-elle liée ?  [juge solset]  départ : S
     = a = −2 ou a = 2   ← Les pivots −a − 2 et a − 2 s'annulent
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 ```
 
@@ -1694,19 +1712,19 @@ Soit T : ℝ³ → ℝ³ définie par T(x₁, x₂, x₃) = (-3x_1+4x_2-x_3 ; -4
   [free, sans aide]  A
     ? T est-elle linéaire ? ✔ Oui : chaque composante est une combinaison des xᵢ, sans constante / · Non : on ne peut pas savoir sans tester T(u + v)
     = [[-3,4,-1],[-4,4,0],[-3,-1,-4]]   ← Les images T(e₁), T(e₂), T(e₃) en colonnes
-  pièges : l_matrix_rows_cols, l_map_scaled_image
+  pièges : l_matrix_rows_cols, l_map_scaled_image, a2_jacobian_transposed
 
 Soit T : ℝ³ → ℝ³ définie par T(x₁, x₂, x₃) = (-3x_1+4x_3 ; -4x_1+2x_2-4x_3 ; 3x_2-4x_3). Est-elle linéaire ? Donne sa matrice canonique.
   [free, sans aide]  A
     ? T est-elle linéaire ? ✔ Oui : chaque composante est une combinaison des xᵢ, sans constante / · Non : on ne peut pas savoir sans tester T(u + v)
     = [[-3,0,4],[-4,2,-4],[0,3,-4]]   ← Les images T(e₁), T(e₂), T(e₃) en colonnes
-  pièges : l_matrix_rows_cols, l_map_scaled_image
+  pièges : l_matrix_rows_cols, l_map_scaled_image, a2_jacobian_transposed
 
 Soit T : ℝ³ → ℝ³ définie par T(x₁, x₂, x₃) = (-3x_1+4x_2+x_3 ; -3x_2+6x_3 ; 4x_1+x_2-5x_3). Est-elle linéaire ? Donne sa matrice canonique.
   [free, sans aide]  A
     ? T est-elle linéaire ? ✔ Oui : chaque composante est une combinaison des xᵢ, sans constante / · Non : on ne peut pas savoir sans tester T(u + v)
     = [[-3,4,1],[0,-3,6],[4,1,-5]]   ← Les images T(e₁), T(e₂), T(e₃) en colonnes
-  pièges : l_matrix_rows_cols, l_map_scaled_image
+  pièges : l_matrix_rows_cols, l_map_scaled_image, a2_jacobian_transposed
 
 ```
 
@@ -1846,7 +1864,7 @@ Soit T : ℝ³ → ℝ³ définie par T(x₁, x₂, x₃) = (x_1 ; -x_1+x_2+x_3 
     ? T est-elle injective ? surjective ? ✔ Injective et surjective / · Injective, pas surjective / · Surjective, pas injective / · Ni injective, ni surjective
     = 3   ← Rang 3 : un pivot dans chacune des 3 colonnes, injective ; un pivot dans chacune des 3 lignes, surjective.
   aides : Injective : un pivot dans chaque colonne. Surjective : un pivot dans chaque ligne. | rang = □ ; colonnes : 3 ; lignes : 3. | Rang 3 : un pivot dans chacune des 3 colonnes, injective ; un pivot dans chacune des 3 lignes, surjective.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 T : ℝ⁴ → ℝ³ est linéaire, avec T(e₁) = (1 ; 0 ; -1), T(e₂) = (-1 ; 0 ; 1), T(e₃) = (-2 ; 0 ; 2), T(e₄) = (2 ; 1 ; 0). T est-elle injective ? surjective ? Écris sa matrice A, échelonne-la, puis conclus.
   [free, suivre l'erreur]  A
@@ -1858,7 +1876,7 @@ T : ℝ⁴ → ℝ³ est linéaire, avec T(e₁) = (1 ; 0 ; -1), T(e₂) = (-1 ;
     ? T est-elle injective ? surjective ? · Injective et surjective / · Injective, pas surjective / · Surjective, pas injective / ✔ Ni injective, ni surjective
     = 2   ← Rang 2 : 2 colonnes sans pivot, pas injective ; 1 ligne sans pivot, pas surjective.
   aides : Injective : un pivot dans chaque colonne. Surjective : un pivot dans chaque ligne. | rang = □ ; colonnes : 4 ; lignes : 3. | Rang 2 : 2 colonnes sans pivot, pas injective ; 1 ligne sans pivot, pas surjective.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit T : ℝ³ → ℝ⁴ définie par T(x₁, x₂, x₃) = (-x_1 ; x_2 ; x_3 ; x_1+x_2). T est-elle injective ? surjective ? Écris sa matrice A, échelonne-la, puis conclus.
   [free, suivre l'erreur]  A
@@ -1870,7 +1888,7 @@ Soit T : ℝ³ → ℝ⁴ définie par T(x₁, x₂, x₃) = (-x_1 ; x_2 ; x_3 ;
     ? T est-elle injective ? surjective ? · Injective et surjective / ✔ Injective, pas surjective / · Surjective, pas injective / · Ni injective, ni surjective
     = 3   ← Rang 3 : un pivot dans chacune des 3 colonnes, injective ; 1 ligne sans pivot, pas surjective.
   aides : Injective : un pivot dans chaque colonne. Surjective : un pivot dans chaque ligne. | rang = □ ; colonnes : 3 ; lignes : 4. | Rang 3 : un pivot dans chacune des 3 colonnes, injective ; 1 ligne sans pivot, pas surjective.
-  pièges : l_matrix_rows_cols, l_inj_rows
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed, l_inj_rows
 
 ```
 
@@ -1889,7 +1907,7 @@ Soit T : ℝ⁴ → ℝ⁴ définie par T(x₁, x₂, x₃, x₄) = (x_1+x_2 ; 2
   — Conclus, et justifie par le rang.  [juge value]  départ : r
     ? T est-elle injective ? surjective ? ✔ Injective et surjective / · Injective, pas surjective / · Surjective, pas injective / · Ni injective, ni surjective
     = 4   ← Rang 4 : un pivot dans chacune des 4 colonnes, injective ; un pivot dans chacune des 4 lignes, surjective.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit T : ℝ⁴ → ℝ⁴ définie par T(x₁, x₂, x₃, x₄) = (x_1+x_4 ; -2x_1+x_2-2x_4 ; x_3 ; -x_3+x_4). T est-elle injective ? surjective ? Écris sa matrice A, échelonne-la, puis conclus.
   [free, sans aide]  A
@@ -1900,7 +1918,7 @@ Soit T : ℝ⁴ → ℝ⁴ définie par T(x₁, x₂, x₃, x₄) = (x_1+x_4 ; -
   — Conclus, et justifie par le rang.  [juge value]  départ : r
     ? T est-elle injective ? surjective ? ✔ Injective et surjective / · Injective, pas surjective / · Surjective, pas injective / · Ni injective, ni surjective
     = 4   ← Rang 4 : un pivot dans chacune des 4 colonnes, injective ; un pivot dans chacune des 4 lignes, surjective.
-  pièges : l_matrix_rows_cols
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed
 
 Soit T : ℝ² → ℝ³ définie par T(x₁, x₂) = (-x_1-2x_2 ; x_1+x_2 ; x_1). T est-elle injective ? surjective ? Écris sa matrice A, échelonne-la, puis conclus.
   [free, sans aide]  A
@@ -1912,7 +1930,7 @@ Soit T : ℝ² → ℝ³ définie par T(x₁, x₂) = (-x_1-2x_2 ; x_1+x_2 ; x_1
   — Conclus, et justifie par le rang.  [juge value]  départ : r
     ? T est-elle injective ? surjective ? · Injective et surjective / ✔ Injective, pas surjective / · Surjective, pas injective / · Ni injective, ni surjective
     = 2   ← Rang 2 : un pivot dans chacune des 2 colonnes, injective ; 1 ligne sans pivot, pas surjective.
-  pièges : l_matrix_rows_cols, l_inj_rows
+  pièges : l_matrix_rows_cols, a2_jacobian_transposed, l_inj_rows
 
 ```
 
@@ -1941,18 +1959,19 @@ Soit A = [[3,2],[2,-1]] et B = [[-2,-4],[0,2]]. AB est 2 × 2. Complète le prod
   [guided]  AB
     = [[-6,-8],[-4,-10]]   (cases à remplir : (1,1) (2,1))   ← Case (i, j) : ligne i de A · colonne j de B
   aides : Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme. | (AB)₂₁ = 2·□ + (−1)·□ | (AB)₂₁ = 2·(−2) + (−1)·0 = −4
-  pièges : l_ab_commute, l_product_entrywise
+  pièges : l_ab_commute, l_product_entrywise, a2_jacobian_transposed
 
 Soit A = [[-1,-2,0],[-3,0,2]] et B = [[-2,3],[-2,-1],[2,-3]]. AB est 2 × 2. Complète le produit AB.
   [guided]  AB
     = [[6,-1],[10,-15]]   (cases à remplir : (1,1) (1,2))   ← Case (i, j) : ligne i de A · colonne j de B
   aides : Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme. | (AB)₂₁ = (−3)·□ + 0·□ + 2·□ | (AB)₂₁ = (−3)·(−2) + 0·(−2) + 2·2 = 10
-  pièges : l_ab_commute
+  pièges : l_ab_commute, a2_jacobian_transposed
 
 Soit A = [[-2,3],[0,4]] et B = [[1,-3,2],[-2,-4,-3]]. AB est 2 × 3. Complète le produit AB.
   [guided]  AB
     = [[-8,-6,-13],[-8,-16,-12]]   (cases à remplir : (1,1) (1,2) (1,3))   ← Case (i, j) : ligne i de A · colonne j de B
   aides : Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme. | (AB)₁₂ = (−2)·□ + 3·□ | (AB)₁₂ = (−2)·(−3) + 3·(−4) = −6
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -1964,20 +1983,21 @@ Soit A = [[2,-3,1],[1,-2,1],[-1,1,0]] et B = [[-2,3],[0,-1],[-1,-3]]. Complète 
     ? Quelle est la taille de AB ? · 2 × 3 / · 3 × 3 / ✔ 3 × 2 / · Impossible
     = [[-5,6],[-3,2],[2,-4]]   (cases à remplir : (1,1) (2,1) (2,2) (3,1) (3,2))   ← Case (i, j) : ligne i de A · colonne j de B
   aides : Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme. | (AB)₂₁ = 1·□ + (−2)·□ + 1·□ | (AB)₂₁ = 1·(−2) + (−2)·0 + 1·(−1) = −3
+  pièges : a2_jacobian_transposed
 
 Soit A = [[-2,-3,-2],[1,0,-3]] et B = [[0,2],[-3,1],[3,2]]. Complète le produit AB.
   [guided]  AB
     ? Quelle est la taille de AB ? · 3 × 3 / ✔ 2 × 2 / · Impossible
     = [[3,-11],[-9,-4]]   (cases à remplir : (1,1) (1,2) (2,2))   ← Case (i, j) : ligne i de A · colonne j de B
   aides : Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme. | (AB)₂₁ = 1·□ + 0·□ + (−3)·□ | (AB)₂₁ = 1·0 + 0·(−3) + (−3)·3 = −9
-  pièges : l_ab_commute
+  pièges : l_ab_commute, a2_jacobian_transposed
 
 Soit A = [[0,4],[-4,1]] et B = [[-2,3],[-3,3]]. Complète le produit AB.
   [guided]  AB
     ? Quelle est la taille de AB ? · Impossible / ✔ 2 × 2
     = [[-12,12],[5,-9]]   (cases à remplir : (1,1) (1,2) (2,2))   ← Case (i, j) : ligne i de A · colonne j de B
   aides : Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme. | (AB)₂₁ = (−4)·□ + 1·□ | (AB)₂₁ = (−4)·(−2) + 1·(−3) = 5
-  pièges : l_ab_commute, l_product_entrywise
+  pièges : l_ab_commute, l_product_entrywise, a2_jacobian_transposed
 
 ```
 
@@ -2023,6 +2043,7 @@ Soit A = [[0,3,0],[3,3,2]] et B = [[-1,3,-2,3],[1,0,-2,-3],[-3,1,2,1]]. Calcule 
     = [[-1,1,-3],[3,0,1],[-2,-2,2],[3,-3,1]]·[[0,3],[3,3],[0,2]]   ← (AB)ᵀ = BᵀAᵀ : l'ordre s'inverse
     = [[3,-6],[0,11],[-6,-8],[-9,2]]
   aides : Case (i, j) de AB : ligne i de A fois colonne j de B. Puis (AB)ᵀ = BᵀAᵀ : la transposée renverse l'ordre. | (AB)₂₁ = 3·□ + 3·□ + 2·□ | AB = [[3,0,-6,-9],[-6,11,-8,2]]
+  pièges : a2_jacobian_transposed
 
 Soit A = [[1,-4],[-4,0],[2,-3]] et B = [[-1,4,4],[0,-1,4]]. Calcule AB, puis (AB)ᵀ.
   [free, suivre l'erreur]  AB
@@ -2031,7 +2052,7 @@ Soit A = [[1,-4],[-4,0],[2,-3]] et B = [[-1,4,4],[0,-1,4]]. Calcule AB, puis (AB
     = [[-1,0],[4,-1],[4,4]]·[[1,-4,2],[-4,0,-3]]   ← (AB)ᵀ = BᵀAᵀ : l'ordre s'inverse
     = [[-1,4,-2],[8,-16,11],[-12,-16,-4]]
   aides : Case (i, j) de AB : ligne i de A fois colonne j de B. Puis (AB)ᵀ = BᵀAᵀ : la transposée renverse l'ordre. | (AB)₁₂ = 1·□ + (−4)·□ | AB = [[-1,8,-12],[4,-16,-16],[-2,11,-4]]
-  pièges : l_ab_commute
+  pièges : l_ab_commute, a2_jacobian_transposed
 
 Soit A = [[1,-2,-1],[-2,0,-2]] et B = [[-2,-2],[2,-1],[3,0]]. Calcule AB, puis (AB)ᵀ.
   [free, suivre l'erreur]  AB
@@ -2040,7 +2061,7 @@ Soit A = [[1,-2,-1],[-2,0,-2]] et B = [[-2,-2],[2,-1],[3,0]]. Calcule AB, puis (
     = [[-2,2,3],[-2,-1,0]]·[[1,-2],[-2,0],[-1,-2]]   ← (AB)ᵀ = BᵀAᵀ : l'ordre s'inverse
     = [[-9,-2],[0,4]]
   aides : Case (i, j) de AB : ligne i de A fois colonne j de B. Puis (AB)ᵀ = BᵀAᵀ : la transposée renverse l'ordre. | (AB)₂₁ = (−2)·□ + 0·□ + (−2)·□ | AB = [[-9,0],[-2,4]]
-  pièges : l_ab_commute
+  pièges : l_ab_commute, a2_jacobian_transposed
 
 ```
 
@@ -2051,18 +2072,19 @@ Soit A = [[-1,-2,2],[0,0,-2],[0,-1,2]]. Calcule A² − 2A + I.
   [free, sans aide]  A² − 2A + I
     = [[1,0,6],[0,2,-4],[0,-2,6]]-[[-2,-4,4],[0,0,-4],[0,-2,4]]+I   ← A², puis 2A, puis + I
     = [[4,4,2],[0,3,0],[0,0,3]]
+  pièges : a2_jacobian_transposed
 
 Soit A = [[-1,-2,-2],[0,1,-2],[0,1,1]] et B = [[1,2,-2],[-2,1,1],[-1,-1,-2]]. Calcule AᵀB.
   [free, sans aide]  A^T·B
     = [[-1,0,0],[-2,1,1],[-2,-2,1]]·[[1,2,-2],[-2,1,1],[-1,-1,-2]]   ← Transposer A, puis multiplier
     = [[-1,-2,2],[-5,-4,3],[1,-7,0]]
-  pièges : l_ab_commute, l_product_entrywise
+  pièges : l_ab_commute, l_product_entrywise, a2_jacobian_transposed
 
 Soit A = [[0,-1,0],[-2,0,0],[0,-1,2]] et B = [[2,1,0],[-1,-2,-2],[0,0,2]]. Calcule (A + B)².
   [free, sans aide]  (A + B)²
     = [[2,0,0],[-3,-2,-2],[0,-1,4]]^2   ← (A + B)² = (A + B)(A + B), sans développer
     = [[4,0,0],[0,6,-4],[3,-2,18]]
-  pièges : l_ab_commute, l_product_entrywise
+  pièges : l_ab_commute, l_product_entrywise, a2_jacobian_transposed
 
 ```
 
@@ -2222,21 +2244,21 @@ Calcule l'inverse de A = [[4,-3],[4,-2]] par la formule des matrices 2 × 2.
     = (1/4)·[[-2,3],[-4,4]]   ← ad − bc = 4 ; échanger a et d, changer le signe de b et c
     = [[-1/2,3/4],[-1,1]]
   aides : Pour une 2 × 2 : [[a, b], [c, d]]⁻¹ = (1/(ad − bc))·[[d, −b], [−c, a]]. | ad − bc = 4·(−2) − (−3)·4 = □ | A⁻¹ = (1/4)·[[-2,3],[-4,4]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed
 
 Calcule l'inverse de A = [[-2,-2],[-5,-4]] par la formule des matrices 2 × 2.
   [free, suivre l'erreur]  A^(−1)
     = (-1/2)·[[-4,2],[5,-2]]   ← ad − bc = −2 ; échanger a et d, changer le signe de b et c
     = [[2,-1],[-5/2,1]]
   aides : Pour une 2 × 2 : [[a, b], [c, d]]⁻¹ = (1/(ad − bc))·[[d, −b], [−c, a]]. | ad − bc = (−2)·(−4) − (−2)·(−5) = □ | A⁻¹ = (1/(−2))·[[-4,2],[5,-2]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed
 
 Calcule l'inverse de A = [[-2,3],[-1,4]] par la formule des matrices 2 × 2.
   [free, suivre l'erreur]  A^(−1)
     = (-1/5)·[[4,-3],[1,-2]]   ← ad − bc = −5 ; échanger a et d, changer le signe de b et c
     = [[-4/5,3/5],[-1/5,2/5]]
   aides : Pour une 2 × 2 : [[a, b], [c, d]]⁻¹ = (1/(ad − bc))·[[d, −b], [−c, a]]. | ad − bc = (−2)·4 − 3·(−1) = □ | A⁻¹ = (1/(−5))·[[4,-3],[1,-2]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed
 
 ```
 
@@ -2296,6 +2318,7 @@ _Les images de deux vecteurs bien choisis._
     = [[-1,-2],[1,1]]·diag(1,-1/2)·[[1,2],[-1,-1]]   ← M = P·diag(1, −1/2)·P⁻¹
     = [[-2,-3],[3/2,5/2]]   (cases à remplir : (1,2) (2,2))   ← Contrôle : M·a = a et M·u = (−1/2)·u
   aides : Cherche deux vecteurs dont tu connais l'image : a sur l'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u]. | M = [[-1,-2],[1,1]]·diag(1, □)·P⁻¹ | M = [[-2,-3],[3/2,5/2]]
+  pièges : a2_jacobian_transposed
 
 Écris la matrice M de l'affinité d'axe 3x + y = 0, de direction 3x + 2y = 0 et de rapport 2. On prend a = (−1 ; 3) sur l'axe, u = (2 ; −3) dans la direction et P = [a | u].
   [guided]  P
@@ -2307,6 +2330,7 @@ _Les images de deux vecteurs bien choisis._
     = [[-1,2],[3,-3]]·diag(1,2)·[[1,2/3],[1,1/3]]   ← M = P·diag(1, 2)·P⁻¹
     = [[3,2/3],[-3,0]]   (cases à remplir : (1,1) (2,1))   ← Contrôle : M·a = a et M·u = 2·u
   aides : Cherche deux vecteurs dont tu connais l'image : a sur l'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u]. | M = [[-1,2],[3,-3]]·diag(1, □)·P⁻¹ | M = [[3,2/3],[-3,0]]
+  pièges : a2_jacobian_transposed
 
 Écris la matrice M de l'affinité d'axe x + y = 0, de direction 3x − 2y = 0 et de rapport −1/2. On prend a = (−1 ; 1) sur l'axe, u = (−2 ; −3) dans la direction et P = [a | u].
   [guided]  P
@@ -2318,6 +2342,7 @@ _Les images de deux vecteurs bien choisis._
     = [[-1,-2],[1,-3]]·diag(1,-1/2)·[[-3/5,2/5],[-1/5,-1/5]]   ← M = P·diag(1, −1/2)·P⁻¹
     = [[2/5,-3/5],[-9/10,1/10]]   (cases à remplir : (1,1) (2,2))   ← Contrôle : M·a = a et M·u = (−1/2)·u
   aides : Cherche deux vecteurs dont tu connais l'image : a sur l'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u]. | M = [[-1,-2],[1,-3]]·diag(1, □)·P⁻¹ | M = [[2/5,-3/5],[-9/10,1/10]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -2335,7 +2360,7 @@ _Les images de deux vecteurs bien choisis._
     = [[-2,-1],[-1,-3]]·diag(1,-1/2)·[[-3/5,1/5],[1/5,-2/5]]   ← M = P·diag(1, −1/2)·P⁻¹
     = [[13/10,-3/5],[9/10,-4/5]]   (cases à remplir : (1,2) (2,1) (2,2))   ← Contrôle : M·a = a et M·u = (−1/2)·u
   aides : Cherche deux vecteurs dont tu connais l'image : a sur l'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u]. | M = [[-2,-1],[-1,-3]]·diag(1, □)·P⁻¹ | M = [[13/10,-3/5],[9/10,-4/5]]
-  pièges : l_pdp_inverse_side
+  pièges : a2_jacobian_transposed, l_pdp_inverse_side
 
 Écris la matrice M de l'affinité d'axe 2x + 3y = 0, de direction 3x + 2y = 0 et de rapport 1/2. On prend a = (3 ; −2) sur l'axe, u = (−2 ; 3) dans la direction et P = [a | u].
   [guided]  P
@@ -2348,7 +2373,7 @@ _Les images de deux vecteurs bien choisis._
     = [[3,-2],[-2,3]]·diag(1,1/2)·[[3/5,2/5],[2/5,3/5]]   ← M = P·diag(1, 1/2)·P⁻¹
     = [[7/5,3/5],[-3/5,1/10]]   (cases à remplir : (1,1) (1,2) (2,2))   ← Contrôle : M·a = a et M·u = 1/2·u
   aides : Cherche deux vecteurs dont tu connais l'image : a sur l'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u]. | M = [[3,-2],[-2,3]]·diag(1, □)·P⁻¹ | M = [[7/5,3/5],[-3/5,1/10]]
-  pièges : l_pdp_inverse_side
+  pièges : a2_jacobian_transposed, l_pdp_inverse_side
 
 Soit R la rotation d'angle −π/2 (de centre O) et S la symétrie d'axe y = x. Écris la matrice M de l'application qui fait d'abord S, puis R.
   [guided]  R
@@ -2360,7 +2385,7 @@ Soit R la rotation d'angle −π/2 (de centre O) et S la symétrie d'axe y = x. 
     = [[0,1],[-1,0]]·[[0,1],[1,0]]   ← R·S
     = [[1,0],[0,-1]]   (cases à remplir : (1,1) (1,2) (2,1))
   aides : On applique d'abord S à x, puis R au résultat : R(S(x)) = (RS)x. La matrice appliquée en premier est à droite. | M = □·□ : écris R et S, puis leur produit dans le bon ordre. | M = [[1,0],[0,-1]]
-  pièges : l_rot_transpose, l_compose_order
+  pièges : l_rot_transpose, a2_jacobian_transposed, l_compose_order
 
 ```
 
@@ -2394,7 +2419,7 @@ Soit R la rotation d'angle −π/2 (de centre O) et S la projection orthogonale 
     = [[1/5,-2/5],[-2/5,4/5]]·[[0,1],[-1,0]]   ← S·R
     = [[2/5,1/5],[-4/5,-2/5]]
   aides : On applique d'abord R à x, puis S au résultat : S(R(x)) = (SR)x. La matrice appliquée en premier est à droite. | M = □·□ : écris R et S, puis leur produit dans le bon ordre. | M = [[2/5,1/5],[-4/5,-2/5]]
-  pièges : l_rot_transpose
+  pièges : l_rot_transpose, a2_jacobian_transposed
 
 ```
 
@@ -2442,6 +2467,7 @@ Soit R la rotation d'angle 2π/3 (de centre O) et S la symétrie d'axe Oy. Écri
   — La matrice M de la composée (d'abord S, puis R).  [juge mat]  départ : M
     = [[-1/2,-√3/2],[√3/2,-1/2]]·[[-1,0],[0,1]]   ← R·S
     = [[1/2,-√3/2],[-√3/2,-1/2]]
+  pièges : a2_jacobian_transposed
 
 Soit R la rotation d'angle π (de centre O) et S la symétrie d'axe Ox. Écris la matrice M de l'application qui fait d'abord S, puis R.
   [free, sans aide]  R
@@ -2451,6 +2477,7 @@ Soit R la rotation d'angle π (de centre O) et S la symétrie d'axe Ox. Écris l
   — La matrice M de la composée (d'abord S, puis R).  [juge mat]  départ : M
     = [[-1,0],[0,-1]]·[[1,0],[0,-1]]   ← R·S
     = [[-1,0],[0,1]]
+  pièges : a2_jacobian_transposed
 
 Écris la matrice M de l'affinité d'axe 2x − 3y = 0, de direction x − 3y = 0 et de rapport 3. Cherche un vecteur a de l'axe et un vecteur u de la direction.
   [free, sans aide]  a
@@ -2599,6 +2626,7 @@ E est la matrice élémentaire 3 × 3 de l'opération L₁ ← L₁ + 3L₂. Éc
   — Écris E⁻¹.  [juge mat]  départ : E^(−1)
     = [[1,-3,0],[0,1,0],[0,0,1]]   (cases à remplir : (1,1) (1,3))   ← E⁻¹ fait l'opération contraire : L₁ ← L₁ − 3L₂
   aides : Fais l'opération sur I pour obtenir E ; E⁻¹ fait l'opération contraire. | E⁻¹ fait L₁ ← L₁ − 3L₂ : [□, □, 0] en ligne 1 | E⁻¹ = [[1,-3,0],[0,1,0],[0,0,1]]
+  pièges : a2_jacobian_transposed
 
 E est la matrice élémentaire 3 × 3 de l'opération L₂ ← L₂ + 2L₃. Écris E, puis E⁻¹.
   [guided]  E
@@ -2606,6 +2634,7 @@ E est la matrice élémentaire 3 × 3 de l'opération L₂ ← L₂ + 2L₃. Éc
   — Écris E⁻¹.  [juge mat]  départ : E^(−1)
     = [[1,0,0],[0,1,-2],[0,0,1]]   (cases à remplir : (2,1) (2,2))   ← E⁻¹ fait l'opération contraire : L₂ ← L₂ − 2L₃
   aides : Fais l'opération sur I pour obtenir E ; E⁻¹ fait l'opération contraire. | E⁻¹ fait L₂ ← L₂ − 2L₃ : [0, □, □] en ligne 2 | E⁻¹ = [[1,0,0],[0,1,-2],[0,0,1]]
+  pièges : a2_jacobian_transposed
 
 E est la matrice élémentaire 3 × 3 de l'opération L₃ ← L₃ + L₂. Écris E, puis E⁻¹.
   [guided]  E
@@ -2613,6 +2642,7 @@ E est la matrice élémentaire 3 × 3 de l'opération L₃ ← L₃ + L₂. Écr
   — Écris E⁻¹.  [juge mat]  départ : E^(−1)
     = [[1,0,0],[0,1,0],[0,-1,1]]   (cases à remplir : (3,1) (3,3))   ← E⁻¹ fait l'opération contraire : L₃ ← L₃ − L₂
   aides : Fais l'opération sur I pour obtenir E ; E⁻¹ fait l'opération contraire. | E⁻¹ fait L₃ ← L₃ − L₂ : [0, □, □] en ligne 3 | E⁻¹ = [[1,0,0],[0,1,0],[0,-1,1]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -2624,21 +2654,21 @@ E = [[1,0,0],[0,1,0],[1,0,1]] est une matrice élémentaire. Quelle opération f
     ? Quelle opération E fait-elle sur les lignes ? · L₃ ← L₃ − L₁ / ✔ L₃ ← L₃ + L₁ / · L₁ ← L₁ + L₃
     = [[1,0,0],[0,1,0],[-1,0,1]]   (cases à remplir : (3,1) (3,2) (3,3))   ← E⁻¹ fait l'opération contraire : L₃ ← L₃ − L₁
   aides : Fais l'opération sur I pour obtenir E ; E⁻¹ fait l'opération contraire. | E⁻¹ fait L₃ ← L₃ − L₁ : [□, 0, □] en ligne 3 | E⁻¹ = [[1,0,0],[0,1,0],[-1,0,1]]
-  pièges : l_elementary_inverse
+  pièges : l_elementary_inverse, a2_jacobian_transposed
 
 E = [[0,1,0],[1,0,0],[0,0,1]] est une matrice élémentaire. Quelle opération fait-elle ? Écris ensuite E⁻¹.
   [guided]  E^(−1)
     ? Quelle opération E fait-elle sur les lignes ? · L₃ ↔ L₂ / ✔ L₁ ↔ L₂
     = [[0,1,0],[1,0,0],[0,0,1]]   (cases à remplir : (1,1) (1,3) (2,3))   ← E⁻¹ fait l'opération contraire : L₁ ↔ L₂
   aides : Fais l'opération sur I pour obtenir E ; E⁻¹ fait l'opération contraire. | E⁻¹ fait L₁ ↔ L₂ : [0, □, 0] en ligne 1 | E⁻¹ = [[0,1,0],[1,0,0],[0,0,1]]
-  pièges : l_elementary_inverse
+  pièges : l_elementary_inverse, a2_jacobian_transposed
 
 E = [[2,0,0],[0,1,0],[0,0,1]] est une matrice élémentaire. Quelle opération fait-elle ? Écris ensuite E⁻¹.
   [guided]  E^(−1)
     ? Quelle opération E fait-elle sur les lignes ? · L₁ ← (1/2)L₁ / · L₂ ← 2L₂ / ✔ L₁ ← 2L₁
     = [[1/2,0,0],[0,1,0],[0,0,1]]   (cases à remplir : (1,1) (1,2) (1,3))   ← E⁻¹ fait l'opération contraire : L₁ ← (1/2)L₁
   aides : Fais l'opération sur I pour obtenir E ; E⁻¹ fait l'opération contraire. | E⁻¹ fait L₁ ← (1/2)L₁ : [□, 0, 0] en ligne 1 | E⁻¹ = [[1/2,0,0],[0,1,0],[0,0,1]]
-  pièges : l_elementary_inverse
+  pièges : l_elementary_inverse, a2_jacobian_transposed
 
 ```
 
@@ -2659,6 +2689,7 @@ Réduis A = [[1,2],[3,4]] à I sans échange, en 3 opérations : choisis chaque 
     = [[1,0],[3,1]]·[[1,0],[0,-2]]·[[1,2],[0,1]]   ← (E₃E₂E₁)⁻¹ = E₁⁻¹E₂⁻¹E₃⁻¹
     = [[1,2],[3,4]]
   aides : Fais chaque opération sur I pour obtenir Eₖ. Si E₃E₂E₁·A = I, alors A⁻¹ = E₃E₂E₁ et A = E₁⁻¹E₂⁻¹E₃⁻¹. | E₁⁻¹ = [□, □] en ligne 2 | A⁻¹ = [[-2,1],[3/2,-1/2]]
+  pièges : a2_jacobian_transposed
 
 Réduis A = [[1,-1],[1,-3]] à I sans échange, en 3 opérations : choisis chaque opération et écris sa matrice élémentaire E₁, E₂, E₃. Puis écris A⁻¹ et A comme produits de matrices élémentaires.
   [tap, suivre l'erreur, menu menu]  E_1
@@ -2674,6 +2705,7 @@ Réduis A = [[1,-1],[1,-3]] à I sans échange, en 3 opérations : choisis chaqu
     = [[1,0],[1,1]]·[[1,0],[0,-2]]·[[1,-1],[0,1]]   ← (E₃E₂E₁)⁻¹ = E₁⁻¹E₂⁻¹E₃⁻¹
     = [[1,-1],[1,-3]]
   aides : Fais chaque opération sur I pour obtenir Eₖ. Si E₃E₂E₁·A = I, alors A⁻¹ = E₃E₂E₁ et A = E₁⁻¹E₂⁻¹E₃⁻¹. | E₁⁻¹ = [□, □] en ligne 2 | A⁻¹ = [[3/2,-1/2],[1/2,-1/2]]
+  pièges : a2_jacobian_transposed
 
 Réduis A = [[-1,-4],[1,2]] à I sans échange, en 4 opérations : choisis chaque opération et écris sa matrice élémentaire E₁, E₂, E₃, E₄. Puis écris A⁻¹ et A comme produits de matrices élémentaires.
   [tap, suivre l'erreur, menu menu]  E_1
@@ -2691,6 +2723,7 @@ Réduis A = [[-1,-4],[1,2]] à I sans échange, en 4 opérations : choisis chaqu
     = [[1,0],[-1,1]]·[[1,0],[0,-2]]·[[1,-4],[0,1]]·[[-1,0],[0,1]]   ← (E₄E₃E₂E₁)⁻¹ = E₁⁻¹E₂⁻¹E₃⁻¹E₄⁻¹
     = [[-1,-4],[1,2]]
   aides : Fais chaque opération sur I pour obtenir Eₖ. Si E₄E₃E₂E₁·A = I, alors A⁻¹ = E₄E₃E₂E₁ et A = E₁⁻¹E₂⁻¹E₃⁻¹E₄⁻¹. | E₁⁻¹ = [□, □] en ligne 2 | A⁻¹ = [[1,2],[-1/2,-1/2]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -2711,6 +2744,7 @@ On réduit A = [[-1,2],[-1,3]] à I par E₁ : L₂ ← L₂ − L₁, E₂ : L�
     = E_1^(−1)·E_2^(−1)·E_3^(−1)   ← (E₃E₂E₁)⁻¹ = E₁⁻¹E₂⁻¹E₃⁻¹
     = [[-1,2],[-1,3]]
   aides : Fais chaque opération sur I pour obtenir Eₖ. Si E₃E₂E₁·A = I, alors A⁻¹ = E₃E₂E₁ et A = E₁⁻¹E₂⁻¹E₃⁻¹. | E₁⁻¹ = [□, □] en ligne 2 | A⁻¹ = [[-3,2],[-1,1]]
+  pièges : a2_jacobian_transposed
 
 On réduit A = [[-1,-2],[-1,-1]] à I par E₁ : L₂ ← L₂ − L₁, E₂ : L₁ ← L₁ + 2L₂, E₃ : L₁ ← −L₁. Écris E₁, E₂, E₃, puis A⁻¹ et A comme produits de matrices élémentaires.
   [free, suivre l'erreur]  E_1
@@ -2726,6 +2760,7 @@ On réduit A = [[-1,-2],[-1,-1]] à I par E₁ : L₂ ← L₂ − L₁, E₂ : 
     = E_1^(−1)·E_2^(−1)·E_3^(−1)   ← (E₃E₂E₁)⁻¹ = E₁⁻¹E₂⁻¹E₃⁻¹
     = [[-1,-2],[-1,-1]]
   aides : Fais chaque opération sur I pour obtenir Eₖ. Si E₃E₂E₁·A = I, alors A⁻¹ = E₃E₂E₁ et A = E₁⁻¹E₂⁻¹E₃⁻¹. | E₁⁻¹ = [□, □] en ligne 2 | A⁻¹ = [[1,-2],[-1,1]]
+  pièges : a2_jacobian_transposed
 
 On réduit A = [[-1,1],[2,-4]] à I par E₁ : L₂ ← L₂ + 2L₁, E₂ : L₂ ← −(1/2)L₂, E₃ : L₁ ← L₁ − L₂, E₄ : L₁ ← −L₁. Écris E₁, E₂, E₃, E₄, puis A⁻¹ et A comme produits de matrices élémentaires.
   [free, suivre l'erreur]  E_1
@@ -2743,6 +2778,7 @@ On réduit A = [[-1,1],[2,-4]] à I par E₁ : L₂ ← L₂ + 2L₁, E₂ : L�
     = E_1^(−1)·E_2^(−1)·E_3^(−1)·E_4^(−1)   ← (E₄E₃E₂E₁)⁻¹ = E₁⁻¹E₂⁻¹E₃⁻¹E₄⁻¹
     = [[-1,1],[2,-4]]
   aides : Fais chaque opération sur I pour obtenir Eₖ. Si E₄E₃E₂E₁·A = I, alors A⁻¹ = E₄E₃E₂E₁ et A = E₁⁻¹E₂⁻¹E₃⁻¹E₄⁻¹. | E₁⁻¹ = [□, □] en ligne 2 | A⁻¹ = [[-2,-1/2],[-1,-1/2]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -2991,7 +3027,7 @@ M = [[A, B], [0, D]] = [[1,1,1,3],[0,-1,-3,-3],[0,0,-1,-3],[0,0,1,2]], avec A = 
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[1,1,4,6],[0,-1,-3,-6],[0,0,2,3],[0,0,-1,-1]]   (cases à remplir : (1,3) (1,4) (2,3) (2,4))   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[4,6],[-3,-6]]
-  pièges : l_inv_2x2_swap
+  pièges : l_inv_2x2_swap, a2_jacobian_transposed
 
 M = [[A, B], [0, D]] = [[0,1,1,0],[1,-3,1,3],[0,0,-3,3],[0,0,3,-2]], avec A = [[0,1],[1,-3]], B = [[1,0],[1,3]] et D = [[-3,3],[3,-2]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [guided]  X_11
@@ -3006,7 +3042,7 @@ M = [[A, B], [0, D]] = [[0,1,1,0],[1,-3,1,3],[0,0,-3,3],[0,0,3,-2]], avec A = [[
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[3,1,-17/3,-7],[1,0,-2/3,-1],[0,0,2/3,1],[0,0,1,1]]   (cases à remplir : (1,3) (1,4) (2,3) (2,4))   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[-17/3,-7],[-2/3,-1]]
-  pièges : l_inv_2x2_swap
+  pièges : l_inv_2x2_swap, a2_jacobian_transposed
 
 M = [[A, B], [0, D]] = [[-3,1,-3,-3],[1,0,3,1],[0,0,2,-1],[0,0,-3,0]], avec A = [[-3,1],[1,0]], B = [[-3,-3],[3,1]] et D = [[2,-1],[-3,0]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [guided]  X_11
@@ -3021,7 +3057,7 @@ M = [[A, B], [0, D]] = [[-3,1,-3,-3],[1,0,3,1],[0,0,2,-1],[0,0,-3,0]], avec A = 
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[0,1,1,5/3],[1,3,0,2],[0,0,0,-1/3],[0,0,-1,-2/3]]   (cases à remplir : (1,3) (1,4) (2,3) (2,4))   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[1,5/3],[0,2]]
-  pièges : l_inv_2x2_swap
+  pièges : l_inv_2x2_swap, a2_jacobian_transposed
 
 ```
 
@@ -3042,7 +3078,7 @@ M = [[A, B], [0, D]] = [[2,3,1,-3],[1,1,-1,2],[0,0,0,-3],[0,0,-1,2]], avec A = [
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[-1,3,1/3,-4],[1,-2,-1/3,3],[0,0,-2/3,-1],[0,0,-1/3,0]]   (cases à remplir : (1,3) (1,4) (2,3) (2,4))   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[1/3,-4],[-1/3,3]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap, l_blocks_order, l_blocks_inverse_each
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed, l_blocks_order, l_blocks_inverse_each
 
 M = [[A, B], [0, D]] = [[1,-1,3,2],[-1,0,0,3],[0,0,-1,2],[0,0,0,3]], avec A = [[1,-1],[-1,0]], B = [[3,2],[0,3]] et D = [[-1,2],[0,3]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [guided]  X_11
@@ -3058,7 +3094,7 @@ M = [[A, B], [0, D]] = [[1,-1,3,2],[-1,0,0,3],[0,0,-1,2],[0,0,0,3]], avec A = [[
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[0,-1,0,1],[-1,-1,-3,11/3],[0,0,-1,2/3],[0,0,0,1/3]]   (cases à remplir : (1,3) (1,4) (2,3) (2,4))   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[0,1],[-3,11/3]]
-  pièges : l_inv_2x2_swap, l_blocks_order, l_blocks_inverse_each
+  pièges : l_inv_2x2_swap, a2_jacobian_transposed, l_blocks_order, l_blocks_inverse_each
 
 M = [[A, B], [0, D]] = [[-3,2,-3,-2],[-2,1,1,3],[0,0,-2,-3],[0,0,3,3]], avec A = [[-3,2],[-2,1]], B = [[-3,-2],[1,3]] et D = [[-2,-3],[3,3]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [guided]  X_11
@@ -3073,7 +3109,7 @@ M = [[A, B], [0, D]] = [[-3,2,-3,-2],[-2,1,1,3],[0,0,-2,-3],[0,0,3,3]], avec A =
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[1,-2,-3,-1/3],[2,-3,-4,1/3],[0,0,1,1],[0,0,-1,-2/3]]   (cases à remplir : (1,3) (1,4) (2,3) (2,4))   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[-3,-1/3],[-4,1/3]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap, l_blocks_order, l_blocks_inverse_each
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed, l_blocks_order, l_blocks_inverse_each
 
 ```
 
@@ -3093,7 +3129,7 @@ M = [[A, B], [0, D]] = [[1,-1,-3,-3],[1,-2,-1,-2],[0,0,3,-1],[0,0,3,0]], avec A 
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[2,-1,-4,17/3],[1,-1,-1,5/3],[0,0,0,1/3],[0,0,-1,1]]   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[-4,17/3],[-1,5/3]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed
 
 M = [[A, B], [0, D]] = [[-2,-1,3,3],[-1,0,-1,-1],[0,0,1,3],[0,0,1,0]], avec A = [[-2,-1],[-1,0]], B = [[3,3],[-1,-1]] et D = [[1,3],[1,0]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [tap, suivre l'erreur, menu menu]  X_11
@@ -3108,7 +3144,7 @@ M = [[A, B], [0, D]] = [[-2,-1,3,3],[-1,0,-1,-1],[0,0,1,3],[0,0,1,0]], avec A = 
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[0,-1,-1/3,-2/3],[-1,2,5/3,10/3],[0,0,0,1],[0,0,1/3,-1/3]]   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[-1/3,-2/3],[5/3,10/3]]
-  pièges : l_inv_2x2_swap
+  pièges : l_inv_2x2_swap, a2_jacobian_transposed
 
 M = [[A, B], [0, D]] = [[-1,0,-3,1],[-2,-1,-3,2],[0,0,-2,1],[0,0,3,-2]], avec A = [[-1,0],[-2,-1]], B = [[-3,1],[-3,2]] et D = [[-2,1],[3,-2]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [tap, suivre l'erreur, menu menu]  X_11
@@ -3121,7 +3157,7 @@ M = [[A, B], [0, D]] = [[-1,0,-3,1],[-2,-1,-3,2],[0,0,-2,1],[0,0,3,-2]], avec A 
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[-1,0,3,1],[2,-1,-6,-3],[0,0,-2,-1],[0,0,-3,-2]]   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[3,1],[-6,-3]]
-  pièges : l_inv_2x2_swap
+  pièges : l_inv_2x2_swap, a2_jacobian_transposed
 
 ```
 
@@ -3140,7 +3176,7 @@ M = [[A, B], [0, D]] = [[-1,-2,1,1],[2,3,-3,-2],[0,0,-1,0],[0,0,-2,-3]], avec A 
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[3,2,-7/3,-1/3],[-2,-1,1,0],[0,0,-1,0],[0,0,2/3,-1/3]]   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[-7/3,-1/3],[1,0]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed
 
 M = [[A, B], [0, D]] = [[0,-1,3,2],[-1,-2,3,0],[0,0,1,1],[0,0,0,3]], avec A = [[0,-1],[-1,-2]], B = [[3,2],[3,0]] et D = [[1,1],[0,3]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [free, suivre l'erreur]  X_11
@@ -3155,7 +3191,7 @@ M = [[A, B], [0, D]] = [[0,-1,3,2],[-1,-2,3,0],[0,0,1,1],[0,0,0,3]], avec A = [[
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[2,-1,-3,-1/3],[-1,0,3,-1/3],[0,0,1,-1/3],[0,0,0,1/3]]   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[-3,-1/3],[3,-1/3]]
-  pièges : l_inv_2x2_swap
+  pièges : l_inv_2x2_swap, a2_jacobian_transposed
 
 M = [[A, B], [0, D]] = [[3,-2,3,-2],[-2,1,2,0],[0,0,1,1],[0,0,-2,1]], avec A = [[3,-2],[-2,1]], B = [[3,-2],[2,0]] et D = [[1,1],[-2,1]]. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.
   [free, suivre l'erreur]  X_11
@@ -3170,7 +3206,7 @@ M = [[A, B], [0, D]] = [[3,-2,3,-2],[-2,1,2,0],[0,0,1,1],[0,0,-2,1]], avec A = [
   — Assemble M⁻¹.  [juge mat]  départ : M^(−1)
     = [[-1,-2,1,-3],[-2,-3,4/3,-16/3],[0,0,1/3,-1/3],[0,0,2/3,1/3]]   ← Contrôle : M·M⁻¹ = I₄
   aides : Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0. | X₁₂ = −A⁻¹·B·□ | X₁₂ = [[1,-3],[4/3,-16/3]]
-  pièges : l_inv_entrywise, l_inv_2x2_swap
+  pièges : l_inv_entrywise, l_inv_2x2_swap, a2_jacobian_transposed
 
 ```
 
@@ -3180,14 +3216,17 @@ M = [[A, B], [0, D]] = [[3,-2,3,-2],[-2,1,2,0],[0,0,1,1],[0,0,-2,1]], avec A = [
 Soit M = [[I, X], [0, I]] = [[1,0,-1,1],[0,1,-2,2],[0,0,1,0],[0,0,0,1]] (blocs 2 × 2). Calcule M⁴ par blocs.
   [free, sans aide]  M⁴
     = [[1,0,-4,4],[0,1,-8,8],[0,0,1,0],[0,0,0,1]]   ← [[I, X], [0, I]]ᵏ = [[I, kX], [0, I]] : ici k = 4
+  pièges : a2_jacobian_transposed
 
 Soit N = [[I, 0], [X, I]] = [[1,0,0,0],[0,1,0,0],[1,1,1,0],[-2,0,0,1]] et M = [[A, B], [0, D]] = [[1,-1,1,1],[-1,0,1,-2],[0,0,0,-1],[0,0,1,2]] (blocs 2 × 2). Calcule NM par blocs.
   [free, sans aide]  NM
     = [[1,-1,1,1],[-1,0,1,-2],[0,-1,2,-2],[-2,2,-1,0]]   ← NM = [[A, B], [XA, XB + D]]
+  pièges : a2_jacobian_transposed
 
 Soit M = [[I, X], [0, I]] = [[1,0,-1,1],[0,1,-1,-1],[0,0,1,0],[0,0,0,1]] (blocs 2 × 2). Calcule M² par blocs.
   [free, sans aide]  M²
     = [[1,0,-2,2],[0,1,-2,-2],[0,0,1,0],[0,0,0,1]]   ← [[I, X], [0, I]]ᵏ = [[I, kX], [0, I]] : ici k = 2
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -4692,6 +4731,7 @@ Les vecteurs [[-1,0],[0,1]], [[1,0],[0,0]], [[1,1],[1,-2]], [[-1,1],[1,0]] forme
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[-1,1,1,-1],[0,0,1,1],[0,0,1,1],[1,0,-2,0]]
     = Span{(-1 ; 0 ; 0 ; 1), (1 ; 0 ; 0 ; 0), (1 ; 1 ; 1 ; -2)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 3
+  pièges : a2_jacobian_transposed
 
 Les vecteurs [[0,0],[0,1]], [[-2,0],[1,0]], [[-3,-1],[2,0]], [[1,-1],[0,0]] forment-ils une base de M₂ₓ₂ ? Écris leurs coordonnées en colonnes (coordonnées (a ; b ; c ; d), ligne par ligne), échelonne, donne le rang, puis une base du Span de la famille.
   [guided]  Coordonnées
@@ -4707,6 +4747,7 @@ Les vecteurs [[0,0],[0,1]], [[-2,0],[1,0]], [[-3,-1],[2,0]], [[1,-1],[0,0]] form
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[0,-2,-3,1],[0,0,-1,-1],[0,1,2,0],[1,0,0,0]]
     = Span{(0 ; 0 ; 0 ; 1), (-2 ; 0 ; 1 ; 0), (-3 ; -1 ; 2 ; 0)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 3
+  pièges : a2_jacobian_transposed
 
 Les vecteurs −1 + t + t², t², t³, 1 − t² forment-ils une base de P₃ ? Écris leurs coordonnées en colonnes (coordonnées dans (1, t, t², t³)), échelonne, donne le rang.
   [guided]  Coordonnées
@@ -4720,6 +4761,7 @@ Les vecteurs −1 + t + t², t², t³, 1 − t² forment-ils une base de P₃ ? 
   — Le rang de la famille  [juge value]  départ : r
     = 4   ← 4 pivots : une base de P₃
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 4 : une base
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -4740,7 +4782,7 @@ Les vecteurs 1 + t, t + t³, 1, −1 + 3t + 2t³ forment-ils une base de P₃ ? 
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[1,0,1,-1],[1,1,0,3],[0,0,0,0],[0,1,0,2]]
     = Span{(1 ; 1 ; 0 ; 0), (0 ; 1 ; 0 ; 1), (1 ; 0 ; 0 ; 0)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 3
-  pièges : l_span_count
+  pièges : a2_jacobian_transposed, l_span_count
 
 Les vecteurs [[0,0],[0,1]], [[0,-1],[-1,1]], [[0,0],[1,-1]], [[0,1],[0,0]] forment-ils une base de M₂ₓ₂ ? Écris leurs coordonnées en colonnes (coordonnées (a ; b ; c ; d), ligne par ligne), échelonne, donne le rang, puis une base du Span de la famille.
   [guided]  Coordonnées
@@ -4755,7 +4797,7 @@ Les vecteurs [[0,0],[0,1]], [[0,-1],[-1,1]], [[0,0],[1,-1]], [[0,1],[0,0]] forme
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[0,0,0,0],[0,-1,0,1],[0,-1,1,0],[1,1,-1,0]]
     = Span{(0 ; 0 ; 0 ; 1), (0 ; -1 ; -1 ; 1), (0 ; 0 ; 1 ; -1)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 3
-  pièges : l_span_count
+  pièges : a2_jacobian_transposed, l_span_count
 
 Les vecteurs [[0,0],[1,0]], [[0,1],[0,1]], [[1,0],[1,0]], [[0,0],[0,1]] forment-ils une base de M₂ₓ₂ ? Écris leurs coordonnées en colonnes (coordonnées (a ; b ; c ; d), ligne par ligne), échelonne, donne le rang.
   [guided]  Coordonnées
@@ -4768,7 +4810,7 @@ Les vecteurs [[0,0],[1,0]], [[0,1],[0,1]], [[1,0],[1,0]], [[0,0],[0,1]] forment-
   — Le rang de la famille  [juge value]  départ : r
     = 4   ← 4 pivots : une base de M₂ₓ₂
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 4 : une base
-  pièges : l_span_count
+  pièges : a2_jacobian_transposed, l_span_count
 
 ```
 
@@ -4787,6 +4829,7 @@ Les vecteurs [[0,-1],[0,1]], [[2,1],[0,-1]], [[1,0],[0,0]], [[2,0],[1,0]] formen
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[0,2,1,2],[-1,1,0,0],[0,0,0,1],[1,-1,0,0]]
     = Span{(0 ; -1 ; 0 ; 1), (2 ; 1 ; 0 ; -1), (2 ; 0 ; 1 ; 0)}   ← Les vecteurs 1, 2 et 4 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 4
+  pièges : a2_jacobian_transposed
 
 Les vecteurs [[0,0],[1,0]], [[0,1],[0,0]], [[0,0],[0,1]], [[1,1],[2,1]] forment-ils une base de M₂ₓ₂ ? Écris leurs coordonnées en colonnes (coordonnées (a ; b ; c ; d), ligne par ligne), échelonne, donne le rang : choisis chaque opération.
   [tap, suivre l'erreur, menu rowops]  Coordonnées
@@ -4798,6 +4841,7 @@ Les vecteurs [[0,0],[1,0]], [[0,1],[0,0]], [[0,0],[0,1]], [[1,1],[2,1]] forment-
   — Le rang de la famille  [juge value]  départ : r
     = 4   ← 4 pivots : une base de M₂ₓ₂
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 4 : une base
+  pièges : a2_jacobian_transposed
 
 Les vecteurs [[0,1],[0,0]], [[0,0],[1,1]], [[-1,-2],[0,0]], [[1,0],[0,0]] forment-ils une base de M₂ₓ₂ ? Écris leurs coordonnées en colonnes (coordonnées (a ; b ; c ; d), ligne par ligne), échelonne, donne le rang, puis une base du Span de la famille : choisis chaque opération.
   [tap, suivre l'erreur, menu rowops]  Coordonnées
@@ -4812,6 +4856,7 @@ Les vecteurs [[0,1],[0,0]], [[0,0],[1,1]], [[-1,-2],[0,0]], [[1,0],[0,0]] formen
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[0,0,-1,1],[1,0,-2,0],[0,1,0,0],[0,1,0,0]]
     = Span{(0 ; 1 ; 0 ; 0), (0 ; 0 ; 1 ; 1), (-1 ; -2 ; 0 ; 0)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 3
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -4830,6 +4875,7 @@ Les vecteurs t² + t³, 1 − t² − 2t³, −1 + t + t² + 2t³, t² forment-i
   — Le rang de la famille  [juge value]  départ : r
     = 4   ← 4 pivots : une base de P₃
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 4 : une base
+  pièges : a2_jacobian_transposed
 
 Les vecteurs t², −2 + 2t − 2t² + 2t³, 1 − 2t − t³, t forment-ils une base de P₃ ? Écris leurs coordonnées en colonnes (coordonnées dans (1, t, t², t³)), échelonne, donne le rang, puis une base du Span de la famille.
   [free, suivre l'erreur]  Coordonnées
@@ -4845,6 +4891,7 @@ Les vecteurs t², −2 + 2t − 2t² + 2t³, 1 − 2t − t³, t forment-ils une
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[0,-2,1,0],[0,2,-2,1],[1,-2,0,0],[0,2,-1,0]]
     = Span{(0 ; 0 ; 1 ; 0), (-2 ; 2 ; -2 ; 2), (1 ; -2 ; 0 ; -1)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 3
+  pièges : a2_jacobian_transposed
 
 Les vecteurs 1 + t + t² + t³, t, −t + t², 2t − t² forment-ils une base de P₃ ? Écris leurs coordonnées en colonnes (coordonnées dans (1, t, t², t³)), échelonne, donne le rang, puis une base du Span de la famille.
   [free, suivre l'erreur]  Coordonnées
@@ -4859,6 +4906,7 @@ Les vecteurs 1 + t + t² + t³, t, −t + t², 2t − t² forment-ils une base d
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[1,0,0,0],[1,1,-1,2],[1,0,1,-1],[1,0,0,0]]
     = Span{(1 ; 1 ; 1 ; 1), (0 ; 1 ; 0 ; 0), (0 ; -1 ; 1 ; 0)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
   aides : Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span. | rang = □ : compte les pivots de la forme échelonnée. | rang 3 : pas une base ; base du Span : les vecteurs 1, 2 et 3
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -4877,6 +4925,7 @@ Les vecteurs [[0,1],[-1,-2]], [[-2,1],[-1,-2]], [[1,0],[-1,0]], [[0,0],[1,0]] fo
     = 3   ← 3 pivots pour 4 vecteurs : pas une base de M₂ₓ₂
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[0,-2,1,0],[1,1,0,0],[-1,-1,-1,1],[-2,-2,0,0]]
     = Span{(0 ; 1 ; -1 ; -2), (-2 ; 1 ; -1 ; -2), (1 ; 0 ; -1 ; 0)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
+  pièges : a2_jacobian_transposed
 
 Les vecteurs 1 + t, t³, −1 + 2t + t², t forment-ils une base de P₃ ? Écris leurs coordonnées en colonnes (coordonnées dans (1, t, t², t³)), échelonne, donne le rang.
   [free, sans aide]  Coordonnées
@@ -4888,6 +4937,7 @@ Les vecteurs 1 + t, t³, −1 + 2t + t², t forment-ils une base de P₃ ? Écri
     = L4 ← L4 - 3L3 : [[1,0,-1,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]   ← Annuler sous le pivot : L₄ ← L₄ − 3L₃
   — Le rang de la famille  [juge value]  départ : r
     = 4   ← 4 pivots : une base de P₃
+  pièges : a2_jacobian_transposed
 
 Les vecteurs [[0,1],[0,0]], [[0,0],[0,1]], [[1,0],[0,-1]], [[2,2],[0,0]] forment-ils une base de M₂ₓ₂ ? Écris leurs coordonnées en colonnes (coordonnées (a ; b ; c ; d), ligne par ligne), échelonne, donne le rang, puis une base du Span de la famille.
   [free, sans aide]  Coordonnées
@@ -4901,6 +4951,7 @@ Les vecteurs [[0,1],[0,0]], [[0,0],[0,1]], [[1,0],[0,-1]], [[2,2],[0,0]] forment
     = 3   ← 3 pivots pour 4 vecteurs : pas une base de M₂ₓ₂
   — Une base du Span de la famille (en coordonnées)  [juge span]  départ : [[0,0,1,2],[1,0,0,2],[0,0,0,0],[0,1,-1,0]]
     = Span{(0 ; 1 ; 0 ; 0), (0 ; 0 ; 0 ; 1), (1 ; 0 ; 0 ; -1)}   ← Les vecteurs 1, 2 et 3 (colonnes pivots) : dimension 3
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -5748,6 +5799,7 @@ B = {(0 ; -1), (1 ; 1)} est une base de ℝ², P = [[0,1],[-1,1]], et la matrice
   — A = P·[T]_B·P⁻¹  [juge mat]  départ : A = (P·[T]_B)·P⁻¹ = ?
     = [[-5,2],[-7,4]]   (cases à remplir : (1,2) (2,2))   ← T(x) = (−5x₁ + 2x₂ ; −7x₁ + 4x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[-5,2],[-7,4]]
+  pièges : a2_jacobian_transposed
 
 B = {(0 ; 1), (-1 ; 1)} est une base de ℝ², P = [[0,-1],[1,1]], et la matrice de T dans B est [T]_B = [[0,-1],[-1,-3]]. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.
   [guided]  P⁻¹ = ?
@@ -5758,6 +5810,7 @@ B = {(0 ; 1), (-1 ; 1)} est une base de ℝ², P = [[0,-1],[1,1]], et la matrice
   — A = P·[T]_B·P⁻¹  [juge mat]  départ : A = (P·[T]_B)·P⁻¹ = ?
     = [[-2,1],[3,-1]]   (cases à remplir : (2,1) (2,2))   ← T(x) = (−2x₁ + x₂ ; 3x₁ − x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[-2,1],[3,-1]]
+  pièges : a2_jacobian_transposed
 
 B = {(-1 ; -1), (1 ; 0)} est une base de ℝ², P = [[-1,1],[-1,0]], et la matrice de T dans B est [T]_B = [[0,-2],[3,2]]. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.
   [guided]  P⁻¹ = ?
@@ -5768,6 +5821,7 @@ B = {(-1 ; -1), (1 ; 0)} est une base de ℝ², P = [[-1,1],[-1,0]], et la matri
   — A = P·[T]_B·P⁻¹  [juge mat]  départ : A = (P·[T]_B)·P⁻¹ = ?
     = [[4,-7],[2,-2]]   (cases à remplir : (1,1) (2,2))   ← T(x) = (4x₁ − 7x₂ ; 2x₁ − 2x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[4,-7],[2,-2]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -5784,7 +5838,7 @@ B = {(1 ; 1), (0 ; 1)} est une base de ℝ², P = [[1,0],[1,1]], et la matrice d
     ? Quelle formule donne A ? ✔ A = P·[T]_B·P⁻¹ / · A = P⁻¹·[T]_B·P
     = [[-5,2],[0,-1]]   (cases à remplir : (1,2) (2,1) (2,2))   ← T(x) = (−5x₁ + 2x₂ ; −x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[-5,2],[0,-1]]
-  pièges : l_similar_order
+  pièges : a2_jacobian_transposed, l_similar_order
 
 B = {(1 ; -1), (0 ; 1)} est une base de ℝ², P = [[1,0],[-1,1]], et la matrice de T dans B est [T]_B = [[2,-3],[1,-1]]. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.
   [guided]  P⁻¹ = ?
@@ -5796,7 +5850,7 @@ B = {(1 ; -1), (0 ; 1)} est une base de ℝ², P = [[1,0],[-1,1]], et la matrice
     ? Quelle formule donne A ? ✔ A = P·[T]_B·P⁻¹ / · A = P⁻¹·[T]_B·P
     = [[-1,-3],[1,2]]   (cases à remplir : (1,2) (2,1) (2,2))   ← T(x) = (−x₁ − 3x₂ ; x₁ + 2x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[-1,-3],[1,2]]
-  pièges : l_similar_order
+  pièges : a2_jacobian_transposed, l_similar_order
 
 B = {(0 ; 1), (-1 ; 1)} est une base de ℝ², P = [[0,-1],[1,1]], et la matrice de T dans B est [T]_B = [[-1,-3],[-2,-1]]. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.
   [guided]  P⁻¹ = ?
@@ -5808,7 +5862,7 @@ B = {(0 ; 1), (-1 ; 1)} est une base de ℝ², P = [[0,-1],[1,1]], et la matrice
     ? Quelle formule donne A ? ✔ A = P·[T]_B·P⁻¹ / · A = P⁻¹·[T]_B·P
     = [[1,2],[1,-3]]   (cases à remplir : (1,1) (1,2) (2,2))   ← T(x) = (x₁ + 2x₂ ; x₁ − 3x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[1,2],[1,-3]]
-  pièges : l_similar_order
+  pièges : a2_jacobian_transposed, l_similar_order
 
 ```
 
@@ -5824,6 +5878,7 @@ T : ℝ² → ℝ² a pour matrice canonique A = [[1,5],[-1,4]]. Soit B = {(1 ; 
   — [T]_B = P⁻¹AP  [juge mat]  départ : [T]_B = P⁻¹·(AP) = ?
     = [[2,3],[-1,3]]   ← Contrôle : T(b₁) = A·b₁ = 2b₁ − b₂
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | [T]_B = P⁻¹·(A·P) = P⁻¹·□ | [T]_B = [[2,3],[-1,3]]
+  pièges : a2_jacobian_transposed
 
 T : ℝ² → ℝ² a pour matrice canonique A = [[-4,-3],[3,4]]. Soit B = {(1 ; -1), (0 ; 1)}, et P = [[1,0],[-1,1]] (les vecteurs de B en colonnes). Calcule P⁻¹, A·P, puis [T]_B.
   [tap, suivre l'erreur, menu menu]  P⁻¹ = ?
@@ -5834,6 +5889,7 @@ T : ℝ² → ℝ² a pour matrice canonique A = [[-4,-3],[3,4]]. Soit B = {(1 ;
   — [T]_B = P⁻¹AP  [juge mat]  départ : [T]_B = P⁻¹·(AP) = ?
     = [[-1,-3],[-2,1]]   ← Contrôle : T(b₁) = A·b₁ = −b₁ − 2b₂
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | [T]_B = P⁻¹·(A·P) = P⁻¹·□ | [T]_B = [[-1,-3],[-2,1]]
+  pièges : a2_jacobian_transposed
 
 B = {(-1 ; 0), (-2 ; -1)} est une base de ℝ², P = [[-1,-2],[0,-1]], et la matrice de T dans B est [T]_B = [[-1,-2],[2,-1]]. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.
   [tap, suivre l'erreur, menu menu]  P⁻¹ = ?
@@ -5844,6 +5900,7 @@ B = {(-1 ; 0), (-2 ; -1)} est une base de ℝ², P = [[-1,-2],[0,-1]], et la mat
   — A = P·[T]_B·P⁻¹  [juge mat]  départ : A = (P·[T]_B)·P⁻¹ = ?
     = [[3,-10],[2,-5]]   ← T(x) = (3x₁ − 10x₂ ; 2x₁ − 5x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[3,-10],[2,-5]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -5859,6 +5916,7 @@ B = {(0 ; 1), (-1 ; -2)} est une base de ℝ², P = [[0,-1],[1,-2]], et la matri
   — A = P·[T]_B·P⁻¹  [juge mat]  départ : A = (P·[T]_B)·P⁻¹ = ?
     = [[5,-3],[8,-6]]   ← T(x) = (5x₁ − 3x₂ ; 8x₁ − 6x₂)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[5,-3],[8,-6]]
+  pièges : a2_jacobian_transposed
 
 B = {(1 ; 0 ; 0), (1 ; 1 ; -1), (-1 ; -1 ; 2)} est une base de ℝ³, P = [[1,1,-1],[0,1,-1],[0,-1,2]], et la matrice de T dans B est [T]_B = [[3,2,-2],[0,-2,1],[-2,-3,0]]. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.
   [free, suivre l'erreur]  P⁻¹ = ?
@@ -5869,6 +5927,7 @@ B = {(1 ; 0 ; 0), (1 ; 1 ; -1), (-1 ; -1 ; 2)} est une base de ℝ³, P = [[1,1,
   — A = P·[T]_B·P⁻¹  [juge mat]  départ : A = (P·[T]_B)·P⁻¹ = ?
     = [[5,0,2],[2,1,2],[-4,-5,-5]]   ← T(x) = (5x₁ + 2x₃ ; 2x₁ + x₂ + 2x₃ ; −4x₁ − 5x₂ − 5x₃)
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | A = (P·[T]_B)·□ | A = [[5,0,2],[2,1,2],[-4,-5,-5]]
+  pièges : a2_jacobian_transposed
 
 T : ℝ² → ℝ² a pour matrice canonique A = [[-1,2],[-2,-4]]. Soit B = {(1 ; -1), (1 ; 0)}, et P = [[1,1],[-1,0]] (les vecteurs de B en colonnes). Calcule P⁻¹, A·P, puis [T]_B.
   [free, suivre l'erreur]  P⁻¹ = ?
@@ -5879,6 +5938,7 @@ T : ℝ² → ℝ² a pour matrice canonique A = [[-1,2],[-2,-4]]. Soit B = {(1 
   — [T]_B = P⁻¹AP  [juge mat]  départ : [T]_B = P⁻¹·(AP) = ?
     = [[-2,2],[-1,-3]]   ← Contrôle : T(b₁) = A·b₁ = −2b₁ − b₂
   aides : [T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹. | [T]_B = P⁻¹·(A·P) = P⁻¹·□ | [T]_B = [[-2,2],[-1,-3]]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -5893,6 +5953,7 @@ T : ℝ³ → ℝ³ a pour matrice canonique A = [[-2,-6,10],[5,-7,4],[1,-3,2]].
     = [[-2,-6,-4],[5,-7,-5],[1,-3,-3]]
   — [T]_B = P⁻¹AP  [juge mat]  départ : [T]_B = P⁻¹·(AP) = ?
     = [[-3,-3,-1],[3,-1,1],[1,-3,-3]]   ← Contrôle : T(b₁) = A·b₁ = −3b₁ + 3b₂ + b₃
+  pièges : a2_jacobian_transposed
 
 T : ℝ³ → ℝ³ a pour matrice canonique A = [[0,3,1],[-3,1,2],[1,2,1]]. Soit B = {(-1 ; 0 ; -1), (0 ; 1 ; 0), (1 ; 0 ; 0)}, et P = [[-1,0,1],[0,1,0],[-1,0,0]] (les vecteurs de B en colonnes). Calcule P⁻¹, A·P, puis [T]_B.
   [free, sans aide]  P⁻¹ = ?
@@ -5902,6 +5963,7 @@ T : ℝ³ → ℝ³ a pour matrice canonique A = [[0,3,1],[-3,1,2],[1,2,1]]. Soi
     = [[-1,3,0],[1,1,-3],[-2,2,1]]
   — [T]_B = P⁻¹AP  [juge mat]  départ : [T]_B = P⁻¹·(AP) = ?
     = [[2,-2,-1],[1,1,-3],[1,1,-1]]   ← Contrôle : T(b₁) = A·b₁ = 2b₁ + b₂ + b₃
+  pièges : a2_jacobian_transposed
 
 T : ℝ³ → ℝ³ a pour matrice canonique A = [[0,0,1],[0,-2,0],[-1,3,3]]. Soit B = {(0 ; 0 ; -1), (0 ; 1 ; 0), (1 ; 0 ; 2)}, et P = [[0,0,1],[0,1,0],[-1,0,2]] (les vecteurs de B en colonnes). Calcule P⁻¹, A·P, puis [T]_B.
   [free, sans aide]  P⁻¹ = ?
@@ -5911,6 +5973,7 @@ T : ℝ³ → ℝ³ a pour matrice canonique A = [[0,0,1],[0,-2,0],[-1,3,3]]. So
     = [[-1,0,2],[0,-2,0],[-3,3,5]]
   — [T]_B = P⁻¹AP  [juge mat]  départ : [T]_B = P⁻¹·(AP) = ?
     = [[1,-3,-1],[0,-2,0],[-1,0,2]]   ← Contrôle : T(b₁) = A·b₁ = b₁ − b₃
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -6235,7 +6298,7 @@ Calcule le polynôme caractéristique de A = [[-2,3],[-6,7]], factorise-le, puis
   — Les valeurs propres sont les racines.  [juge solset]  départ : (λ − 1)(λ − 4) = 0
     = λ = 1 ou λ = 4   ← Lire les racines
   aides : Soustrais λ sur toute la diagonale, puis développe : diagonale moins antidiagonale. | (−2−λ)(7−λ) − □ | det(A − λI) = (λ − 1)(λ − 4) : valeurs propres 1, 4.
-  pièges : l_lambda_one_entry
+  pièges : l_lambda_one_entry, a2_jacobian_transposed
 
 Calcule le polynôme caractéristique de A = [[6,6],[-3,-3]], factorise-le, puis donne les valeurs propres de A.
   [guided]  A − λI
@@ -6248,7 +6311,7 @@ Calcule le polynôme caractéristique de A = [[6,6],[-3,-3]], factorise-le, puis
   — Les valeurs propres sont les racines.  [juge solset]  départ : λ(λ − 3) = 0
     = λ = 0 ou λ = 3   ← Lire les racines
   aides : Soustrais λ sur toute la diagonale, puis développe : diagonale moins antidiagonale. | (6−λ)(−3−λ) − □ | det(A − λI) = λ(λ − 3) : valeurs propres 0, 3.
-  pièges : l_lambda_one_entry
+  pièges : l_lambda_one_entry, a2_jacobian_transposed
 
 Calcule le polynôme caractéristique de A = [[4,2],[-4,-2]], factorise-le, puis donne les valeurs propres de A.
   [guided]  A − λI
@@ -6261,7 +6324,7 @@ Calcule le polynôme caractéristique de A = [[4,2],[-4,-2]], factorise-le, puis
   — Les valeurs propres sont les racines.  [juge solset]  départ : λ(λ − 2) = 0
     = λ = 0 ou λ = 2   ← Lire les racines
   aides : Soustrais λ sur toute la diagonale, puis développe : diagonale moins antidiagonale. | (4−λ)(−2−λ) − □ | det(A − λI) = λ(λ − 2) : valeurs propres 0, 2.
-  pièges : l_lambda_one_entry
+  pièges : l_lambda_one_entry, a2_jacobian_transposed
 
 ```
 
@@ -7645,7 +7708,7 @@ A = [[-1,-1],[2,-4]] s'écrit A = PDP⁻¹ avec P = [[1,1],[2,1]], D = diag(−3
     = [[(-3)^k,(-2)^k],[2·(-3)^k,(-2)^k]]·[[-1,1],[2,-1]]   ← P·Dᵏ d'abord
     = [[-(-3)^k+2·(-2)^k,(-3)^k-(-2)^k],[-2·(-3)^k+2·(-2)^k,2·(-3)^k-(-2)^k]]   (cases à remplir : (1,2) (2,1))   ← Puis (PDᵏ)·P⁻¹
   aides : Aᵏ = PDᵏP⁻¹ ; seule D est élevée à la puissance k : Dᵏ = diag(λ₁ᵏ, λ₂ᵏ). | [[(−3)^k,(−2)^k],[2·(−3)^k,(−2)^k]]·[[-1,1],[2,-1]] = [[□, □], [□, □]] | Aᵏ = [[-(-3)^k+2×(-2)^k,(-3)^k-(-2)^k],[-2×(-3)^k+2×(-2)^k,2×(-3)^k-(-2)^k]]
-  pièges : l_pdp_inverse_side, l_powers_entrywise
+  pièges : l_pdp_inverse_side, l_powers_entrywise, a2_jacobian_transposed
 
 A = [[-5,4],[-8,7]] s'écrit A = PDP⁻¹ avec P = [[1,1],[1,2]], D = diag(−1, 3) et P⁻¹ = [[2,-1],[-1,1]]. Calcule Aᵏ.
   [guided]  A^k
@@ -7654,7 +7717,7 @@ A = [[-5,4],[-8,7]] s'écrit A = PDP⁻¹ avec P = [[1,1],[1,2]], D = diag(−1,
     = [[(-1)^k,3^k],[(-1)^k,2·3^k]]·[[2,-1],[-1,1]]   ← P·Dᵏ d'abord
     = [[2·(-1)^k-3^k,-(-1)^k+3^k],[2·(-1)^k-2·3^k,-(-1)^k+2·3^k]]   (cases à remplir : (1,1) (1,2))   ← Puis (PDᵏ)·P⁻¹
   aides : Aᵏ = PDᵏP⁻¹ ; seule D est élevée à la puissance k : Dᵏ = diag(λ₁ᵏ, λ₂ᵏ). | [[(−1)^k,3^k],[(−1)^k,2·3^k]]·[[2,-1],[-1,1]] = [[□, □], [□, □]] | Aᵏ = [[2×(-1)^k-3^k,-(-1)^k+3^k],[2×(-1)^k-2×3^k,-(-1)^k+2×3^k]]
-  pièges : l_pdp_inverse_side, l_powers_entrywise
+  pièges : l_pdp_inverse_side, l_powers_entrywise, a2_jacobian_transposed
 
 A = [[-5,-4],[2,1]] s'écrit A = PDP⁻¹ avec P = [[2,1],[-1,-1]], D = diag(−3, −1) et P⁻¹ = [[1,1],[-1,-2]]. Calcule Aᵏ.
   [guided]  A^k
@@ -7663,7 +7726,7 @@ A = [[-5,-4],[2,1]] s'écrit A = PDP⁻¹ avec P = [[2,1],[-1,-1]], D = diag(−
     = [[2·(-3)^k,(-1)^k],[-(-3)^k,-(-1)^k]]·[[1,1],[-1,-2]]   ← P·Dᵏ d'abord
     = [[2·(-3)^k-(-1)^k,2·(-3)^k-2·(-1)^k],[-(-3)^k+(-1)^k,-(-3)^k+2·(-1)^k]]   (cases à remplir : (1,1) (2,1))   ← Puis (PDᵏ)·P⁻¹
   aides : Aᵏ = PDᵏP⁻¹ ; seule D est élevée à la puissance k : Dᵏ = diag(λ₁ᵏ, λ₂ᵏ). | [[2·(−3)^k,(−1)^k],[−(−3)^k,−(−1)^k]]·[[1,1],[-1,-2]] = [[□, □], [□, □]] | Aᵏ = [[2×(-3)^k-(-1)^k,2×(-3)^k-2×(-1)^k],[-(-3)^k+(-1)^k,-(-3)^k+2×(-1)^k]]
-  pièges : l_pdp_inverse_side, l_powers_entrywise
+  pièges : l_pdp_inverse_side, l_powers_entrywise, a2_jacobian_transposed
 
 ```
 
@@ -7678,7 +7741,7 @@ A = [[5,6],[-3,-4]] s'écrit A = PDP⁻¹ avec P = [[1,2],[-1,-1]], D = diag(−
     = [[(-1)^k,2·2^k],[-(-1)^k,-2^k]]·[[-1,-2],[1,1]]   ← P·Dᵏ d'abord
     = [[-(-1)^k+2·2^k,-2·(-1)^k+2·2^k],[(-1)^k-2^k,2·(-1)^k-2^k]]   (cases à remplir : (1,2) (2,1) (2,2))   ← Puis (PDᵏ)·P⁻¹
   aides : Aᵏ = PDᵏP⁻¹ ; seule D est élevée à la puissance k : Dᵏ = diag(λ₁ᵏ, λ₂ᵏ). | [[(−1)^k,2·2^k],[−(−1)^k,−2^k]]·[[-1,-2],[1,1]] = [[□, □], [□, □]] | Aᵏ = [[-(-1)^k+2×2^k,-2×(-1)^k+2×2^k],[(-1)^k-2^k,2×(-1)^k-2^k]]
-  pièges : l_pdp_inverse_side, l_powers_entrywise
+  pièges : l_pdp_inverse_side, l_powers_entrywise, a2_jacobian_transposed
 
 A = [[-1,-2],[4,5]] s'écrit A = PDP⁻¹ avec P = [[1,1],[-1,-2]], D = diag(1, 3) et P⁻¹ = [[2,1],[-1,-1]]. Calcule Aᵏ.
   [guided]  A^k
@@ -7688,7 +7751,7 @@ A = [[-1,-2],[4,5]] s'écrit A = PDP⁻¹ avec P = [[1,1],[-1,-2]], D = diag(1, 
     = [[1,3^k],[-1,-2·3^k]]·[[2,1],[-1,-1]]   ← P·Dᵏ d'abord
     = [[2-3^k,1-3^k],[2·3^k-2,2·3^k-1]]   (cases à remplir : (1,1) (2,1) (2,2))   ← Puis (PDᵏ)·P⁻¹
   aides : Aᵏ = PDᵏP⁻¹ ; seule D est élevée à la puissance k : Dᵏ = diag(λ₁ᵏ, λ₂ᵏ). | [[1,3^k],[−1,−2·3^k]]·[[2,1],[-1,-1]] = [[□, □], [□, □]] | Aᵏ = [[2-3^k,1-3^k],[2×3^k-2,2×3^k-1]]
-  pièges : l_pdp_inverse_side, l_powers_entrywise
+  pièges : l_pdp_inverse_side, l_powers_entrywise, a2_jacobian_transposed
 
 A = [[5,-4],[8,-7]] s'écrit A = PDP⁻¹ avec P = [[1,1],[2,1]], D = diag(−3, 1) et P⁻¹ = [[-1,1],[2,-1]]. Calcule Aᵏ.
   [guided]  A^k
@@ -7698,7 +7761,7 @@ A = [[5,-4],[8,-7]] s'écrit A = PDP⁻¹ avec P = [[1,1],[2,1]], D = diag(−3,
     = [[(-3)^k,1],[2·(-3)^k,1]]·[[-1,1],[2,-1]]   ← P·Dᵏ d'abord
     = [[2-(-3)^k,(-3)^k-1],[2-2·(-3)^k,2·(-3)^k-1]]   (cases à remplir : (1,1) (1,2) (2,1))   ← Puis (PDᵏ)·P⁻¹
   aides : Aᵏ = PDᵏP⁻¹ ; seule D est élevée à la puissance k : Dᵏ = diag(λ₁ᵏ, λ₂ᵏ). | [[(−3)^k,1],[2·(−3)^k,1]]·[[-1,1],[2,-1]] = [[□, □], [□, □]] | Aᵏ = [[2-(-3)^k,(-3)^k-1],[2-2×(-3)^k,2×(-3)^k-1]]
-  pièges : l_pdp_inverse_side, l_powers_entrywise
+  pièges : l_pdp_inverse_side, l_powers_entrywise, a2_jacobian_transposed
 
 ```
 
@@ -7723,6 +7786,7 @@ Soit la suite définie par u₀ = −1, u₁ = −9 et uk+2 = 3uk+1 + 4uk. Trouv
   — xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante).  [juge mat]  départ : u_k
     = −2·4^k + (−1)^k   ← Contrôle : u₂ = −31
   aides : Avec x_k = (u_{k+1} ; u_k), M = [[a, b], [1, 0]]. Ses valeurs propres sont les racines de λ² − aλ − b ; un vecteur propre est (λ ; 1). Décompose x₀, puis u_k = c₁λ₁ᵏ + c₂λ₂ᵏ. | λ² − 3λ − 4 = (λ − □)(λ − □) | uk = −2·4ᵏ+(−1)ᵏ
+  pièges : a2_jacobian_transposed
 
 Soit la suite définie par u₀ = −3, u₁ = −8 et uk+2 = 5uk+1 − 6uk. Trouve uk en fonction de k (choisis d'abord l'action).
   [tap, suivre l'erreur, menu menu]  M
@@ -7742,6 +7806,7 @@ Soit la suite définie par u₀ = −3, u₁ = −8 et uk+2 = 5uk+1 − 6uk. Tro
   — xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante).  [juge mat]  départ : u_k
     = −2·3^k − 2^k   ← Contrôle : u₂ = −22
   aides : Avec x_k = (u_{k+1} ; u_k), M = [[a, b], [1, 0]]. Ses valeurs propres sont les racines de λ² − aλ − b ; un vecteur propre est (λ ; 1). Décompose x₀, puis u_k = c₁λ₁ᵏ + c₂λ₂ᵏ. | λ² − 5λ + 6 = (λ − □)(λ − □) | uk = −2·3ᵏ−2ᵏ
+  pièges : a2_jacobian_transposed
 
 Soit la suite définie par u₀ = 2, u₁ = 2 et uk+2 = 2uk+1 + 8uk. Trouve uk en fonction de k (choisis d'abord l'action).
   [tap, suivre l'erreur, menu menu]  M
@@ -7761,6 +7826,7 @@ Soit la suite définie par u₀ = 2, u₁ = 2 et uk+2 = 2uk+1 + 8uk. Trouve uk e
   — xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante).  [juge mat]  départ : u_k
     = 4^k + (−2)^k   ← Contrôle : u₂ = 20
   aides : Avec x_k = (u_{k+1} ; u_k), M = [[a, b], [1, 0]]. Ses valeurs propres sont les racines de λ² − aλ − b ; un vecteur propre est (λ ; 1). Décompose x₀, puis u_k = c₁λ₁ᵏ + c₂λ₂ᵏ. | λ² − 2λ − 8 = (λ − □)(λ − □) | uk = 4ᵏ+(−2)ᵏ
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -7800,6 +7866,7 @@ Soit la suite définie par u₀ = 1, u₁ = −10 et uk+2 = uk+1 + 12uk. Trouve 
   — xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante).  [juge mat]  départ : u_k
     = −4^k + 2·(−3)^k   ← Contrôle : u₂ = 2
   aides : Avec x_k = (u_{k+1} ; u_k), M = [[a, b], [1, 0]]. Ses valeurs propres sont les racines de λ² − aλ − b ; un vecteur propre est (λ ; 1). Décompose x₀, puis u_k = c₁λ₁ᵏ + c₂λ₂ᵏ. | λ² − λ − 12 = (λ − □)(λ − □) | uk = −4ᵏ+2·(−3)ᵏ
+  pièges : a2_jacobian_transposed
 
 Soit la suite définie par u₀ = 0, u₁ = −4 et uk+2 = 2uk+1 + 3uk. Trouve uk en fonction de k.
   [free, suivre l'erreur]  M
@@ -7819,6 +7886,7 @@ Soit la suite définie par u₀ = 0, u₁ = −4 et uk+2 = 2uk+1 + 3uk. Trouve u
   — xk = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne uk (la 2e composante).  [juge mat]  départ : u_k
     = −3^k + (−1)^k   ← Contrôle : u₂ = −8
   aides : Avec x_k = (u_{k+1} ; u_k), M = [[a, b], [1, 0]]. Ses valeurs propres sont les racines de λ² − aλ − b ; un vecteur propre est (λ ; 1). Décompose x₀, puis u_k = c₁λ₁ᵏ + c₂λ₂ᵏ. | λ² − 2λ − 3 = (λ − □)(λ − □) | uk = −3ᵏ+(−1)ᵏ
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -7844,6 +7912,7 @@ Soit la suite définie par u₀ = 4, u₁ = 10 et uk+2 = 5uk+1 − 4uk. Trouve u
     = 2·4^k + 2   ← Contrôle : u₂ = 34
   — Que vaut la limite de uk/4ᵏ quand k → ∞ ?  [juge value]  départ : L
     = 2   ← u<sub>k</sub>/4ᵏ = 2 + 2·(1/4)ᵏ → 2, car |1/4| &lt; 1
+  pièges : a2_jacobian_transposed
 
 Soit la suite définie par u₀ = −3, u₁ = −4 et uk+2 = 3uk+1 − 2uk. Trouve uk en fonction de k, puis la limite de uk/2ᵏ.
   [free, sans aide]  M
@@ -7864,6 +7933,7 @@ Soit la suite définie par u₀ = −3, u₁ = −4 et uk+2 = 3uk+1 − 2uk. Tro
     = −2^k − 2   ← Contrôle : u₂ = −6
   — Que vaut la limite de uk/2ᵏ quand k → ∞ ?  [juge value]  départ : L
     = −1   ← u<sub>k</sub>/2ᵏ = −1 − 2·(1/2)ᵏ → −1, car |1/2| &lt; 1
+  pièges : a2_jacobian_transposed
 
 Soit la suite définie par u₀ = 4, u₁ = 7 et uk+2 = 3uk+1 − 2uk. Trouve uk en fonction de k, puis la limite de uk/2ᵏ.
   [free, sans aide]  M
@@ -7884,6 +7954,7 @@ Soit la suite définie par u₀ = 4, u₁ = 7 et uk+2 = 3uk+1 − 2uk. Trouve uk
     = 3·2^k + 1   ← Contrôle : u₂ = 13
   — Que vaut la limite de uk/2ᵏ quand k → ∞ ?  [juge value]  départ : L
     = 3   ← u<sub>k</sub>/2ᵏ = 3 + (1/2)ᵏ → 3, car |1/2| &lt; 1
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -7916,6 +7987,7 @@ Soit la suite définie par u₀ = 5, u₁ = 7 et uk+2 = 2uk+1 + 3uk. Trouve uk e
       = 3·3^k + 2·(−1)^k   ← Contrôle : u₂ = 29
     — Que vaut la limite de uk/3ᵏ quand k → ∞ ?  [juge value]  départ : L
       = 3   ← u<sub>k</sub>/3ᵏ = 3 + 2·(−1/3)ᵏ → 3, car |−1/3| &lt; 1
+  pièges : a2_jacobian_transposed
 
 Vrai ou faux ?
   « Pour toute matrice carrée A, A² est la matrice des carrés des coefficients de A. » → FAUX
@@ -7941,7 +8013,7 @@ Après un jour de soleil, il fait beau le lendemain avec une probabilité de 80 
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (7/9 ; 2/9)   (cases à remplir : (1,1) (2,1))   ← Diviser par 9
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/9 | M = [[4/5,7/10],[1/5,3/10]], q = (7/9 ; 2/9)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Chaque jour, 80 % des cyclistes reprennent le vélo le lendemain, et 70 % des usagers du métro passent au vélo. On note xk = (part « vélo » ; part « métro ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire.
   [guided]  M
@@ -7952,7 +8024,7 @@ Chaque jour, 80 % des cyclistes reprennent le vélo le lendemain, et 70 % des us
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (7/9 ; 2/9)   (cases à remplir : (1,1) (2,1))   ← Diviser par 9
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/9 | M = [[4/5,7/10],[1/5,3/10]], q = (7/9 ; 2/9)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Chaque matin, 70 % des buveurs de café en reprennent le lendemain, et 50 % de ceux qui n'en ont pas bu s'y mettent. On note xk = (part « café » ; part « pas de café ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire.
   [guided]  M
@@ -7963,7 +8035,7 @@ Chaque matin, 70 % des buveurs de café en reprennent le lendemain, et 50 % de c
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (5/8 ; 3/8)   (cases à remplir : (1,1) (2,1))   ← Diviser par 8
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/8 | M = [[7/10,1/2],[3/10,1/2]], q = (5/8 ; 3/8)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 ```
 
@@ -7980,7 +8052,7 @@ Chaque jour, 90 % des cyclistes reprennent le vélo le lendemain, et 60 % des us
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (6/7 ; 1/7)   (cases à remplir : (1,1) (2,1))   ← Diviser par 7
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/7 | M = [[9/10,3/5],[1/10,2/5]], q = (6/7 ; 1/7)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Après un jour de soleil, il fait beau le lendemain avec une probabilité de 90 % ; après un jour de pluie, avec une probabilité de 80 %. On note xk = (part « soleil » ; part « pluie ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire.
   [guided]  M
@@ -7992,7 +8064,7 @@ Après un jour de soleil, il fait beau le lendemain avec une probabilité de 90 
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (8/9 ; 1/9)   (cases à remplir : (1,1) (2,1))   ← Diviser par 9
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/9 | M = [[9/10,4/5],[1/10,1/5]], q = (8/9 ; 1/9)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Chaque matin, 60 % des buveurs de café en reprennent le lendemain, et 30 % de ceux qui n'en ont pas bu s'y mettent. On note xk = (part « café » ; part « pas de café ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire.
   [guided]  M
@@ -8004,7 +8076,7 @@ Chaque matin, 60 % des buveurs de café en reprennent le lendemain, et 30 % de c
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (3/7 ; 4/7)   (cases à remplir : (1,1) (2,1))   ← Diviser par 7
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/7 | M = [[3/5,3/10],[2/5,7/10]], q = (3/7 ; 4/7)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 ```
 
@@ -8020,7 +8092,7 @@ Chaque matin, 90 % des buveurs de café en reprennent le lendemain, et 60 % de c
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (6/7 ; 1/7)   ← Diviser par 7
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/7 | M = [[9/10,3/5],[1/10,2/5]], q = (6/7 ; 1/7)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Chaque matin, 50 % des buveurs de café en reprennent le lendemain, et 80 % de ceux qui n'en ont pas bu s'y mettent. On note xk = (part « café » ; part « pas de café ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire.
   [tap, suivre l'erreur, menu menu]  M
@@ -8031,7 +8103,7 @@ Chaque matin, 50 % des buveurs de café en reprennent le lendemain, et 80 % de c
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (8/13 ; 5/13)   ← Diviser par 13
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/13 | M = [[1/2,4/5],[1/2,1/5]], q = (8/13 ; 5/13)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Chaque jour, 60 % des cyclistes reprennent le vélo le lendemain, et 30 % des usagers du métro passent au vélo. On note xk = (part « vélo » ; part « métro ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire.
   [tap, suivre l'erreur, menu menu]  M
@@ -8042,7 +8114,7 @@ Chaque jour, 60 % des cyclistes reprennent le vélo le lendemain, et 30 % des us
   — L'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.  [juge mat]  départ : q
     = (3/7 ; 4/7)   ← Diviser par 7
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/7 | M = [[3/5,3/10],[2/5,7/10]], q = (3/7 ; 4/7)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 ```
 
@@ -8060,7 +8132,7 @@ Après un jour de soleil, il fait beau le lendemain avec une probabilité de 70 
   — Au départ, x₀ = (0 ; 1). L'autre valeur propre est μ = tr M − 1 = 1/2, de vecteur propre (1 ; −1). Donne xk.  [juge mat]  départ : x_k
     = (2/5-2/5·(1/2)^k ; 3/5+2/5·(1/2)^k)   ← x₀ = q + (−2/5)·(1 ; −1)
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/5 | M = [[7/10,1/5],[3/10,4/5]], q = (2/5 ; 3/5)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Après un jour de soleil, il fait beau le lendemain avec une probabilité de 60 % ; après un jour de pluie, avec une probabilité de 70 %. On note xk = (part « soleil » ; part « pluie ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire et xk.
   [free, suivre l'erreur]  M
@@ -8073,7 +8145,7 @@ Après un jour de soleil, il fait beau le lendemain avec une probabilité de 60 
   — Au départ, x₀ = (1/2 ; 1/2). L'autre valeur propre est μ = tr M − 1 = −1/10, de vecteur propre (1 ; −1). Donne xk.  [juge mat]  départ : x_k
     = (7/11-3/22·(-1/10)^k ; 4/11+3/22·(-1/10)^k)   ← x₀ = q + (−3/22)·(1 ; −1)
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/11 | M = [[3/5,7/10],[2/5,3/10]], q = (7/11 ; 4/11)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Après un jour de soleil, il fait beau le lendemain avec une probabilité de 80 % ; après un jour de pluie, avec une probabilité de 30 %. On note xk = (part « soleil » ; part « pluie ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire et xk.
   [free, suivre l'erreur]  M
@@ -8086,7 +8158,7 @@ Après un jour de soleil, il fait beau le lendemain avec une probabilité de 80 
   — Au départ, x₀ = (0 ; 1). L'autre valeur propre est μ = tr M − 1 = 1/2, de vecteur propre (1 ; −1). Donne xk.  [juge mat]  départ : x_k
     = (3/5-3/5·(1/2)^k ; 2/5+3/5·(1/2)^k)   ← x₀ = q + (−3/5)·(1 ; −1)
   aides : Colonne j : ce que deviennent ceux qui sont dans l'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1. | q = (□ ; □)/5 | M = [[4/5,3/10],[1/5,7/10]], q = (3/5 ; 2/5)
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 ```
 
@@ -8106,7 +8178,7 @@ Après un jour de soleil, il fait beau le lendemain avec une probabilité de 50 
   — À la longue, quelle proportion des jours est dans l'état « soleil » ?  [juge value]  départ : L
     ? Cette limite dépend-elle de x₀ ? ✔ Non / · Oui
     = 3/8   ← ≈ 38 %
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Chaque matin, 70 % des buveurs de café en reprennent le lendemain, et 20 % de ceux qui n'en ont pas bu s'y mettent. On note xk = (part « café » ; part « pas de café ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire et xk, et la part limite.
   [free, sans aide]  M
@@ -8121,7 +8193,7 @@ Chaque matin, 70 % des buveurs de café en reprennent le lendemain, et 20 % de c
   — À la longue, quelle part de la population est dans l'état « café » ?  [juge value]  départ : L
     ? Cette limite dépend-elle de x₀ ? ✔ Non / · Oui
     = 2/5   ← ≈ 40 %
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 Chaque jour, 80 % des cyclistes reprennent le vélo le lendemain, et 30 % des usagers du métro passent au vélo. On note xk = (part « vélo » ; part « métro ») le jour k, et xk+1 = Mxk. Écris M, puis l'état stationnaire et xk, et la part limite.
   [free, sans aide]  M
@@ -8136,7 +8208,7 @@ Chaque jour, 80 % des cyclistes reprennent le vélo le lendemain, et 30 % des us
   — À la longue, quelle part des trajets est dans l'état « vélo » ?  [juge value]  départ : L
     ? Cette limite dépend-elle de x₀ ? ✔ Non / · Oui
     = 3/5   ← ≈ 60 %
-  pièges : l_markov_rows
+  pièges : l_markov_rows, a2_jacobian_transposed
 
 ```
 
@@ -8680,6 +8752,7 @@ Soit W = Span{(0 ; 0 ; 1 ; −1), (1 ; 3 ; 0 ; 3)} ⊂ ℝ⁴. Pose la matrice M
   — Une base de W⊥ (= Ker M).  [juge span]  départ : W⊥
     = Span{(-3 ; 1 ; 0 ; 0), (-3 ; 0 ; 1 ; 1)}   (cases à remplir : (3,1) (4,1))   ← Une variable libre par vecteur
   aides : x ∈ W⊥ ⇔ x · w₁ = 0 et x · w₂ = 0 : c'est le système homogène de matrice M = [w₁ᵀ ; w₂ᵀ] (vecteurs en lignes). | Forme réduite : [[1,3,0,3],[0,0,1,-1]] ; les variables sans pivot sont libres. | W⊥ = (-3 ; 1 ; 0 ; 0), (-3 ; 0 ; 1 ; 1)
+  pièges : a2_jacobian_transposed
 
 Soit W = Span{(0 ; 0 ; −1 ; 2), (1 ; 1 ; 2 ; −3)} ⊂ ℝ⁴. Pose la matrice M, réduis-la, puis donne une base de W⊥.
   [guided]  M
@@ -8691,6 +8764,7 @@ Soit W = Span{(0 ; 0 ; −1 ; 2), (1 ; 1 ; 2 ; −3)} ⊂ ℝ⁴. Pose la matric
   — Une base de W⊥ (= Ker M).  [juge span]  départ : W⊥
     = Span{(-1 ; 1 ; 0 ; 0), (-1 ; 0 ; 2 ; 1)}   (cases à remplir : (4,1) (2,2))   ← Une variable libre par vecteur
   aides : x ∈ W⊥ ⇔ x · w₁ = 0 et x · w₂ = 0 : c'est le système homogène de matrice M = [w₁ᵀ ; w₂ᵀ] (vecteurs en lignes). | Forme réduite : [[1,1,0,1],[0,0,1,-2]] ; les variables sans pivot sont libres. | W⊥ = (-1 ; 1 ; 0 ; 0), (-1 ; 0 ; 2 ; 1)
+  pièges : a2_jacobian_transposed
 
 Soit W = Span{(1 ; −2 ; 1 ; 5), (0 ; 0 ; 1 ; 2)} ⊂ ℝ⁴. Pose la matrice M, réduis-la, puis donne une base de W⊥.
   [guided]  M
@@ -8700,6 +8774,7 @@ Soit W = Span{(1 ; −2 ; 1 ; 5), (0 ; 0 ; 1 ; 2)} ⊂ ℝ⁴. Pose la matrice M
   — Une base de W⊥ (= Ker M).  [juge span]  départ : W⊥
     = Span{(2 ; 1 ; 0 ; 0), (-3 ; 0 ; -2 ; 1)}   (cases à remplir : (2,1) (1,2))   ← Une variable libre par vecteur
   aides : x ∈ W⊥ ⇔ x · w₁ = 0 et x · w₂ = 0 : c'est le système homogène de matrice M = [w₁ᵀ ; w₂ᵀ] (vecteurs en lignes). | Forme réduite : [[1,-2,0,3],[0,0,1,2]] ; les variables sans pivot sont libres. | W⊥ = (2 ; 1 ; 0 ; 0), (-3 ; 0 ; -2 ; 1)
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -8715,7 +8790,7 @@ Soit W = Span{(0 ; 1 ; 0 ; −2), (1 ; 0 ; 1 ; −2)} ⊂ ℝ⁴. Pose la matric
   — Une base de W⊥ (= Ker M).  [juge span]  départ : W⊥
     = Span{(-1 ; 0 ; 1 ; 0), (2 ; 2 ; 0 ; 1)}   (cases à remplir : (2,2) (4,2))   ← Une variable libre par vecteur
   aides : x ∈ W⊥ ⇔ x · w₁ = 0 et x · w₂ = 0 : c'est le système homogène de matrice M = [w₁ᵀ ; w₂ᵀ] (vecteurs en lignes). | Forme réduite : [[1,0,1,-2],[0,1,0,-2]] ; les variables sans pivot sont libres. | W⊥ = (-1 ; 0 ; 1 ; 0), (2 ; 2 ; 0 ; 1)
-  pièges : l_matrix_rows_cols
+  pièges : a2_jacobian_transposed, l_matrix_rows_cols
 
 Soit W = Span{(0 ; −1 ; −2 ; −1), (1 ; 2 ; 5 ; 1)} ⊂ ℝ⁴. Pose la matrice M, réduis-la, puis donne une base de W⊥.
   [guided]  M
@@ -8728,7 +8803,7 @@ Soit W = Span{(0 ; −1 ; −2 ; −1), (1 ; 2 ; 5 ; 1)} ⊂ ℝ⁴. Pose la mat
   — Une base de W⊥ (= Ker M).  [juge span]  départ : W⊥
     = Span{(-1 ; -2 ; 1 ; 0), (1 ; -1 ; 0 ; 1)}   (cases à remplir : (2,2) (4,2))   ← Une variable libre par vecteur
   aides : x ∈ W⊥ ⇔ x · w₁ = 0 et x · w₂ = 0 : c'est le système homogène de matrice M = [w₁ᵀ ; w₂ᵀ] (vecteurs en lignes). | Forme réduite : [[1,0,1,-1],[0,1,2,1]] ; les variables sans pivot sont libres. | W⊥ = (-1 ; -2 ; 1 ; 0), (1 ; -1 ; 0 ; 1)
-  pièges : l_matrix_rows_cols
+  pièges : a2_jacobian_transposed, l_matrix_rows_cols
 
 Soit W = Span{(1 ; −1 ; −4 ; 1), (1 ; 0 ; −2 ; 1)} ⊂ ℝ⁴. Pose la matrice M, réduis-la, puis donne une base de W⊥.
   [guided]  M
@@ -8740,7 +8815,7 @@ Soit W = Span{(1 ; −1 ; −4 ; 1), (1 ; 0 ; −2 ; 1)} ⊂ ℝ⁴. Pose la mat
   — Une base de W⊥ (= Ker M).  [juge span]  départ : W⊥
     = Span{(2 ; -2 ; 1 ; 0), (-1 ; 0 ; 0 ; 1)}   (cases à remplir : (2,2) (3,2))   ← Une variable libre par vecteur
   aides : x ∈ W⊥ ⇔ x · w₁ = 0 et x · w₂ = 0 : c'est le système homogène de matrice M = [w₁ᵀ ; w₂ᵀ] (vecteurs en lignes). | Forme réduite : [[1,0,-2,1],[0,1,2,0]] ; les variables sans pivot sont libres. | W⊥ = (2 ; -2 ; 1 ; 0), (-1 ; 0 ; 0 ; 1)
-  pièges : l_matrix_rows_cols
+  pièges : a2_jacobian_transposed, l_matrix_rows_cols
 
 ```
 
@@ -8789,6 +8864,7 @@ Soit A = [[0,-1],[1,1],[2,3],[-2,-3]]. Donne une base de (Col A)⊥.
   — Une base de (Col A)⊥ = Ker Aᵀ.  [juge span]  départ : W⊥
     = Span{(1 ; -2 ; 1 ; 0), (-1 ; 2 ; 0 ; 1)}   ← Une variable libre par vecteur
   aides : (Col A)⊥ = Ker Aᵀ : les colonnes de A deviennent les lignes de Aᵀ. | Aᵀ = [[0,1,2,-2],[-1,1,3,-3]] | (Col A)⊥ = (1 ; -2 ; 1 ; 0), (-1 ; 2 ; 0 ; 1)
+  pièges : a2_jacobian_transposed
 
 Soit A = [[1,0],[2,1],[4,3],[-3,-2]]. Donne une base de (Col A)⊥.
   [free, suivre l'erreur]  A^T
@@ -8798,6 +8874,7 @@ Soit A = [[1,0],[2,1],[4,3],[-3,-2]]. Donne une base de (Col A)⊥.
   — Une base de (Col A)⊥ = Ker Aᵀ.  [juge span]  départ : W⊥
     = Span{(2 ; -3 ; 1 ; 0), (-1 ; 2 ; 0 ; 1)}   ← Une variable libre par vecteur
   aides : (Col A)⊥ = Ker Aᵀ : les colonnes de A deviennent les lignes de Aᵀ. | Aᵀ = [[1,2,4,-3],[0,1,3,-2]] | (Col A)⊥ = (2 ; -3 ; 1 ; 0), (-1 ; 2 ; 0 ; 1)
+  pièges : a2_jacobian_transposed
 
 Soit W = {x ∈ ℝ⁴ : x₁ − 2x₂ − x₃ − 3x₄ = 0}. Donne une base de W⊥.
   [free, suivre l'erreur]  W⊥
@@ -8822,6 +8899,7 @@ Soit A = [[1,2],[1,1],[-2,-3],[1,0]]. Donne une base de (Col A)⊥.
     = L1 ← L1 - L2 : [[1,0,-1,-1],[0,1,-1,2]]   ← Réduire : L₁ ← L₁ − L₂
   — Une base de (Col A)⊥ = Ker Aᵀ.  [juge span]  départ : W⊥
     = Span{(1 ; 1 ; 1 ; 0), (1 ; -2 ; 0 ; 1)}   ← Une variable libre par vecteur
+  pièges : a2_jacobian_transposed
 
 Soit A = [[-1,-1],[1,2],[-3,-3],[2,2]]. Donne une base de (Col A)⊥.
   [free, sans aide]  A^T
@@ -8832,6 +8910,7 @@ Soit A = [[-1,-1],[1,2],[-3,-3],[2,2]]. Donne une base de (Col A)⊥.
     = L1 ← -L1 : [[1,0,3,-2],[0,1,0,0]]   ← Pivot à 1
   — Une base de (Col A)⊥ = Ker Aᵀ.  [juge span]  départ : W⊥
     = Span{(-3 ; 0 ; 1 ; 0), (2 ; 0 ; 0 ; 1)}   ← Une variable libre par vecteur
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -9225,7 +9304,7 @@ Soit U = 13·[12−22−2−1212]. Est-elle orthogonale ? Fais le test, puis don
   — L'inverse : U⁻¹ = Uᵀ  [juge mat]  départ : U^(−1)
     = [[1/3,2/3,2/3],[2/3,-2/3,1/3],[-2/3,-1/3,2/3]]   (cases à remplir : (1,1) (1,3) (2,1))   ← Transposer
   aides : Teste UᵀU = I : les produits scalaires des colonnes (0 pour deux colonnes différentes, 1 pour une colonne avec elle-même). | c₁ · c₂ = (2 − 4 + □)/9 | UᵀU = I : U est orthogonale, et U⁻¹ = Uᵀ.
-  pièges : l_orth_cols_only, l_orth_det_one
+  pièges : a2_jacobian_transposed, l_orth_cols_only, l_orth_det_one
 
 Soit U = 19·[1844−4781−4]. Est-elle orthogonale ? Fais le test, puis donne U⁻¹.
   [guided]  UᵀU
@@ -9234,7 +9313,7 @@ Soit U = 19·[1844−4781−4]. Est-elle orthogonale ? Fais le test, puis donne 
   — L'inverse : U⁻¹ = Uᵀ  [juge mat]  départ : U^(−1)
     = [[1/9,4/9,8/9],[8/9,-4/9,1/9],[4/9,7/9,-4/9]]   (cases à remplir : (1,1) (2,1) (2,3))   ← Transposer
   aides : Teste UᵀU = I : les produits scalaires des colonnes (0 pour deux colonnes différentes, 1 pour une colonne avec elle-même). | c₁ · c₂ = (8 − 16 + □)/81 | UᵀU = I : U est orthogonale, et U⁻¹ = Uᵀ.
-  pièges : l_orth_det_one, l_orth_cols_only
+  pièges : a2_jacobian_transposed, l_orth_det_one, l_orth_cols_only
 
 Soit U = 19·[4−187−4−4−4−81]. Est-elle orthogonale ? Fais le test, puis donne U⁻¹.
   [guided]  UᵀU
@@ -9243,7 +9322,7 @@ Soit U = 19·[4−187−4−4−4−81]. Est-elle orthogonale ? Fais le test, pu
   — L'inverse : U⁻¹ = Uᵀ  [juge mat]  départ : U^(−1)
     = [[4/9,7/9,-4/9],[-1/9,-4/9,-8/9],[8/9,-4/9,1/9]]   (cases à remplir : (1,2) (1,3) (2,3))   ← Transposer
   aides : Teste UᵀU = I : les produits scalaires des colonnes (0 pour deux colonnes différentes, 1 pour une colonne avec elle-même). | c₁ · c₂ = (−4 − 28 + □)/81 | UᵀU = I : U est orthogonale, et U⁻¹ = Uᵀ.
-  pièges : l_orth_det_one, l_orth_cols_only
+  pièges : a2_jacobian_transposed, l_orth_det_one, l_orth_cols_only
 
 ```
 
@@ -9259,6 +9338,7 @@ Soit U = 17·[−263−32−6−6−32]. Vérifie qu'elle est orthogonale, donne
     = U^T·(1 ; -3 ; 0)   ← x = U⁻¹b = Uᵀb
     = (1 ; 0 ; 3)
   aides : Teste UᵀU = I : les produits scalaires des colonnes (0 pour deux colonnes différentes, 1 pour une colonne avec elle-même). | c₁ · c₂ = (−12 − 6 + □)/49 | UᵀU = I : U est orthogonale, et U⁻¹ = Uᵀ.
+  pièges : a2_jacobian_transposed
 
 Soit U = 17·[−236−3−62−62−3]. Vérifie qu'elle est orthogonale, donne U⁻¹, puis résous Ux = (0 ; −3 ; −2).
   [tap, suivre l'erreur, menu menu]  UᵀU
@@ -9269,6 +9349,7 @@ Soit U = 17·[−236−3−62−62−3]. Vérifie qu'elle est orthogonale, donne
     = U^T·(0 ; -3 ; -2)   ← x = U⁻¹b = Uᵀb
     = (3 ; 2 ; 0)
   aides : Teste UᵀU = I : les produits scalaires des colonnes (0 pour deux colonnes différentes, 1 pour une colonne avec elle-même). | c₁ · c₂ = (−6 + 18 − □)/49 | UᵀU = I : U est orthogonale, et U⁻¹ = Uᵀ.
+  pièges : a2_jacobian_transposed
 
 Soit U = 13·[−1−22−2−1−2−221]. Vérifie qu'elle est orthogonale, donne U⁻¹, puis résous Ux = (0 ; −1 ; 1).
   [tap, suivre l'erreur, menu menu]  UᵀU
@@ -9279,6 +9360,7 @@ Soit U = 13·[−1−22−2−1−2−221]. Vérifie qu'elle est orthogonale, do
     = U^T·(0 ; -1 ; 1)   ← x = U⁻¹b = Uᵀb
     = (0 ; 1 ; 1)
   aides : Teste UᵀU = I : les produits scalaires des colonnes (0 pour deux colonnes différentes, 1 pour une colonne avec elle-même). | c₁ · c₂ = (2 + 2 − □)/9 | UᵀU = I : U est orthogonale, et U⁻¹ = Uᵀ.
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -9867,7 +9949,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (−1 ;
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (2 ; -2)   (cases à remplir : (1,1))   ← Droite y = 2 − 2x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[4, □], …] | [AᵀA | Aᵀb] = [[4,2|4],[2,6|-8]] ; x̂ = (2 ; −2)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; 1), (2 ; 1), (3 ; −1), (5 ; −9). Ici A = [[1,0],[1,2],[1,3],[1,5]] (colonne de 1, colonne des x) et b = (1 ; 1 ; −1 ; −9). Calcule AᵀA et Aᵀb, puis résous les équations normales.
   [guided]  AᵀA
@@ -9882,7 +9964,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; 1)
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (3 ; -2)   (cases à remplir : (1,1))   ← Droite y = 3 − 2x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[4, □], …] | [AᵀA | Aᵀb] = [[4,10|-8],[10,38|-46]] ; x̂ = (3 ; −2)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Soit A = [[0,2],[-2,2],[-2,1],[0,-2]] et b = (−8 ; 2 ; 1 ; 5). Le système Ax = b est incompatible. Trouve la solution aux moindres carrés x̂. Calcule AᵀA et Aᵀb, puis résous les équations normales.
   [guided]  AᵀA
@@ -9897,7 +9979,7 @@ Soit A = [[0,2],[-2,2],[-2,1],[0,-2]] et b = (−8 ; 2 ; 1 ; 5). Le système Ax 
   — La solution aux moindres carrés x̂  [juge mat]  départ : x̂
     = (-3 ; -3)   (cases à remplir : (2,1))   ← Lue sur la forme réduite
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[8, □], …] | [AᵀA | Aᵀb] = [[8,-6|-6],[-6,13|-21]] ; x̂ = (−3 ; −3)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 ```
 
@@ -9918,7 +10000,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; 0)
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (-1 ; -2)   (cases à remplir : (2,1))   ← Droite y = −1 − 2x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[4, □], …] | [AᵀA | Aᵀb] = [[4,6|-16],[6,14|-34]] ; x̂ = (−1 ; −2)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Soit A = [[2,-2],[-1,2],[0,-2],[-1,-2]] et b = (−3 ; 2 ; −3 ; −6). Le système Ax = b est incompatible. Trouve la solution aux moindres carrés x̂.
   [guided]  AᵀA
@@ -9934,7 +10016,7 @@ Soit A = [[2,-2],[-1,2],[0,-2],[-1,-2]] et b = (−3 ; 2 ; −3 ; −6). Le syst
   — La solution aux moindres carrés x̂  [juge mat]  départ : x̂
     = (1 ; 2)   (cases à remplir : (1,1))   ← Lue sur la forme réduite
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[6, □], …] | [AᵀA | Aᵀb] = [[6,-4|-2],[-4,16|28]] ; x̂ = (1 ; 2)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; 2), (1 ; 2), (2 ; −1), (3 ; −2), (4 ; −1). Ici A = [[1,0],[1,1],[1,2],[1,3],[1,4]] (colonne de 1, colonne des x) et b = (2 ; 2 ; −1 ; −2 ; −1).
   [guided]  AᵀA
@@ -9950,7 +10032,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; 2)
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (2 ; -1)   (cases à remplir : (2,1))   ← Droite y = 2 − x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[5, □], …] | [AᵀA | Aᵀb] = [[5,10|0],[10,30|-10]] ; x̂ = (2 ; −1)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 ```
 
@@ -9974,6 +10056,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; 2)
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (1 ; -3)   ← Droite y = 1 − 3x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[4, □], …] | [AᵀA | Aᵀb] = [[4,7|-17],[7,21|-56]] ; x̂ = (1 ; −3)
+  pièges : a2_jacobian_transposed
 
 Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (1 ; −4), (2 ; −3), (3 ; −4), (4 ; −7) : pose A et b, calcule AᵀA et Aᵀb, puis réduis (choisis chaque opération).
   [tap, suivre l'erreur, menu rowops]  A
@@ -9992,6 +10075,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (1 ; �
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (-2 ; -1)   ← Droite y = −2 − x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[4, □], …] | [AᵀA | Aᵀb] = [[4,10|-18],[10,30|-50]] ; x̂ = (−2 ; −1)
+  pièges : a2_jacobian_transposed
 
 Soit A = [[-2,0],[0,-1],[0,-1],[-2,2]] et b = (−5 ; −6 ; −2 ; −1). Le système Ax = b est incompatible. Trouve la solution aux moindres carrés x̂ : équations normales, puis réduction (choisis chaque opération).
   [tap, suivre l'erreur, menu rowops]  AᵀA
@@ -10006,7 +10090,7 @@ Soit A = [[-2,0],[0,-1],[0,-1],[-2,2]] et b = (−5 ; −6 ; −2 ; −1). Le sy
   — La solution aux moindres carrés x̂  [juge mat]  départ : x̂
     = (3 ; 3)   ← Lue sur la forme réduite
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[8, □], …] | [AᵀA | Aᵀb] = [[8,-4|12],[-4,6|6]] ; x̂ = (3 ; 3)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 ```
 
@@ -10028,7 +10112,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (−1 ;
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (1 ; 3)   ← Droite y = 1 + 3x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[4, □], …] | [AᵀA | Aᵀb] = [[4,4|16],[4,14|46]] ; x̂ = (1 ; 3)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Soit A = [[0,1,0],[1,0,2],[1,-1,0],[-1,2,2]] et b = (1 ; 6 ; 0 ; 0). Le système Ax = b est incompatible. Trouve la solution aux moindres carrés x̂, puis l'erreur ‖b − Ax̂‖.
   [free, suivre l'erreur]  AᵀA
@@ -10054,7 +10138,7 @@ Soit A = [[0,1,0],[1,0,2],[1,-1,0],[-1,2,2]] et b = (1 ; 6 ; 0 ; 0). Le système
     = √(0 + 1 + 4 + 1)
     = √6
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[3, □, 0], …] | [AᵀA | Aᵀb] = [[3,-3,0|6],[-3,6,4|1],[0,4,8|12]] ; x̂ = (3 ; 1 ; 1)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (1 ; 4), (2 ; 3), (3 ; 4), (4 ; 7).
   [free, suivre l'erreur]  AᵀA
@@ -10071,7 +10155,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (1 ; 4)
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (2 ; 1)   ← Droite y = 2 + x
   aides : Multiplie Ax = b à gauche par Aᵀ : les équations normales AᵀAx = Aᵀb ont une solution. | AᵀA = [[4, □], …] | [AᵀA | Aᵀb] = [[4,10|18],[10,30|50]] ; x̂ = (2 ; 1)
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 ```
 
@@ -10092,7 +10176,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (−1 ;
     = L1 ← (1/4)L1 : [[1,0|3],[0,1|-1]]   ← Pivot à 1
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (3 ; -1)   ← Droite y = 3 − x
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; −2), (1 ; 3), (2 ; 2), (4 ; 7).
   [free, sans aide]  AᵀA
@@ -10108,7 +10192,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (0 ; �
     = L1 ← (1/4)L1 : [[1,0|-1],[0,1|2]]   ← Pivot à 1
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (-1 ; 2)   ← Droite y = −1 + 2x
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (−1 ; 1), (0 ; −2), (2 ; 6), (3 ; 7).
   [free, sans aide]  AᵀA
@@ -10124,7 +10208,7 @@ Trouve la droite des moindres carrés y = β₀ + β₁x pour les points (−1 ;
     = L1 ← (1/4)L1 : [[1,0|1],[0,1|2]]   ← Pivot à 1
   — La solution x̂ = (β₀ ; β₁)  [juge mat]  départ : x̂
     = (1 ; 2)   ← Droite y = 1 + 2x
-  pièges : l_lsq_normal_aat
+  pièges : l_lsq_normal_aat, a2_jacobian_transposed
 
 ```
 
@@ -10587,6 +10671,7 @@ Une matrice symétrique A a les vecteurs propres orthonormés u₁=(131313) (λ 
   [free, sans aide]  A
     = Q·D·Q^T   ← A = QDQᵀ avec Q = [u₁ … u₃] et D = diag(−7, −4, 0)
     = [[-5,-1,-1],[-1,-3,-3],[-1,-3,-3]]   ← Le produit, case par case
+  pièges : a2_jacobian_transposed
 
 Orthodiagonalise A = [[2,-1,1,-1],[-1,2,1,-1],[1,1,2,1],[-1,-1,1,2]] : trouve Q orthogonale et D diagonale avec A = QDQᵀ (valeurs propres dans l'ordre croissant).
   [free, sans aide]  det(A − λI)
@@ -10609,6 +10694,7 @@ Une matrice symétrique A a les vecteurs propres orthonormés u₁=(12120) (λ =
   [free, sans aide]  A
     = Q·D·Q^T   ← A = QDQᵀ avec Q = [u₁ … u₃] et D = diag(1, 5, 11)
     = [[4,-3,-2],[-3,4,2],[-2,2,9]]   ← Le produit, case par case
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -10660,7 +10746,7 @@ Q(x, y) = −3x² + 12xy + 13y². Écris sa matrice symétrique A. Puis, sachant
     ? Les valeurs propres sont −5 et 15. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −□X² + □Y²   (trous : −5X² + 15Y²)   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[−3, □], [□, 13]] | −5X² + 15Y²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y) = −3x² + 6xy + 5y². Écris sa matrice symétrique A. Puis, sachant que A a les vecteurs propres (3 ; −1) pour λ = −4 et (1 ; 3) pour λ = 6, écris Q dans le repère des axes principaux.
   [guided]  A
@@ -10669,7 +10755,7 @@ Q(x, y) = −3x² + 6xy + 5y². Écris sa matrice symétrique A. Puis, sachant q
     ? Les valeurs propres sont −4 et 6. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −□X² + □Y²   (trous : −4X² + 6Y²)   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[−3, □], [□, 5]] | −4X² + 6Y²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y) = −6x² − 2xy − 6y². Écris sa matrice symétrique A. Puis, sachant que A a les vecteurs propres (1 ; 1) pour λ = −7 et (1 ; −1) pour λ = −5, écris Q dans le repère des axes principaux.
   [guided]  A
@@ -10678,7 +10764,7 @@ Q(x, y) = −6x² − 2xy − 6y². Écris sa matrice symétrique A. Puis, sacha
     ? Les valeurs propres sont −7 et −5. Quelle est la nature de Q ? · définie positive / ✔ définie négative / · indéfinie / · semi-définie positive
     = −□X² − □Y²   (trous : −7X² − 5Y²)   ← Q = λ₁X² + λ₂Y² : définie négative
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[−6, □], [□, −6]] | −7X² − 5Y²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 ```
 
@@ -10695,7 +10781,7 @@ Q(x, y) = 11x² + 12xy + 2y². Écris sa matrice A, trouve ses valeurs propres, 
     ? Les valeurs propres sont −1 et 14. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −X² + □Y²   (trous : −X² + 14Y²)   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[11, □], [□, 2]] | −X² + 14Y²
-  pièges : l_quadform_offdiag, l_posdef_diag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed, l_posdef_diag
 
 Q(x, y) = −x² + 4xy + 2y². Écris sa matrice A, trouve ses valeurs propres, puis écris Q sans terme croisé et donne sa nature.
   [guided]  A
@@ -10707,7 +10793,7 @@ Q(x, y) = −x² + 4xy + 2y². Écris sa matrice A, trouve ses valeurs propres, 
     ? Les valeurs propres sont −2 et 3. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −□X² + □Y²   (trous : −2X² + 3Y²)   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[−1, □], [□, 2]] | −2X² + 3Y²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y) = 6x² + 6xy − 2y². Écris sa matrice A, trouve ses valeurs propres, puis écris Q sans terme croisé et donne sa nature.
   [guided]  A
@@ -10719,7 +10805,7 @@ Q(x, y) = 6x² + 6xy − 2y². Écris sa matrice A, trouve ses valeurs propres, 
     ? Les valeurs propres sont −3 et 7. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −□X² + □Y²   (trous : −3X² + 7Y²)   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[6, □], [□, −2]] | −3X² + 7Y²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 ```
 
@@ -10737,7 +10823,7 @@ Q(x, y) = 11x² − 24xy + 4y². Écris sa matrice A, trouve ses axes principaux
     ? Les valeurs propres sont −5 et 20. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −5X² + 20Y²   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[11, □], [□, 4]] | −5X² + 20Y²
-  pièges : l_quadform_offdiag, l_posdef_diag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed, l_posdef_diag
 
 Q(x, y) = 6x² + 8xy. Écris sa matrice A, trouve ses axes principaux (A = PDPᵀ), puis écris Q sans terme croisé et donne sa nature. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  A
@@ -10750,7 +10836,7 @@ Q(x, y) = 6x² + 8xy. Écris sa matrice A, trouve ses axes principaux (A = PDP�
     ? Les valeurs propres sont −2 et 8. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −2X² + 8Y²   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[6, □], [□, 0]] | −2X² + 8Y²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y) = −11x² − 24xy − 4y². Écris sa matrice A, trouve ses axes principaux (A = PDPᵀ), puis écris Q sans terme croisé et donne sa nature. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  A
@@ -10763,7 +10849,7 @@ Q(x, y) = −11x² − 24xy − 4y². Écris sa matrice A, trouve ses axes princ
     ? Les valeurs propres sont −20 et 5. Quelle est la nature de Q ? · définie positive / · définie négative / ✔ indéfinie / · semi-définie positive
     = −20X² + 5Y²   ← Q = λ₁X² + λ₂Y² : indéfinie
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[−11, □], [□, −4]] | −20X² + 5Y²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 ```
 
@@ -10781,7 +10867,7 @@ Q(x, y, z) = −4x² − 4y² − 4z² − 2xy + 2xz + 2yz. Écris sa matrice A,
     ? Les valeurs propres sont −6 et −3. Quelle est la nature de Q ? · définie positive / ✔ définie négative / · indéfinie / · semi-définie positive
     = −6X² − 3Y² − 3Z²   ← Q = λ₁X² + λ₂Y² + λ₃Z² : définie négative
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[−4, □], [□, −4], …] | −6X² − 3Y² − 3Z²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y, z) = 9x² + 9y² + 6z² − 8xy + 4xz − 4yz. Écris sa matrice A, trouve ses axes principaux (A = PDPᵀ), puis écris Q sans terme croisé et donne sa nature.
   [free, suivre l'erreur]  A
@@ -10794,7 +10880,7 @@ Q(x, y, z) = 9x² + 9y² + 6z² − 8xy + 4xz − 4yz. Écris sa matrice A, trou
     ? Les valeurs propres sont 5 et 14. Quelle est la nature de Q ? ✔ définie positive / · définie négative / · indéfinie / · semi-définie positive
     = 5X² + 5Y² + 14Z²   ← Q = λ₁X² + λ₂Y² + λ₃Z² : définie positive
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[9, □], [□, 9], …] | 5X² + 5Y² + 14Z²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y, z) = 6x² + 9y² + 6z² − 4xy + 2xz − 4yz. Écris sa matrice A, trouve ses axes principaux (A = PDPᵀ), puis écris Q sans terme croisé et donne sa nature.
   [free, suivre l'erreur]  A
@@ -10807,7 +10893,7 @@ Q(x, y, z) = 6x² + 9y² + 6z² − 4xy + 2xz − 4yz. Écris sa matrice A, trou
     ? Les valeurs propres sont 5 et 11. Quelle est la nature de Q ? ✔ définie positive / · définie négative / · indéfinie / · semi-définie positive
     = 5X² + 5Y² + 11Z²   ← Q = λ₁X² + λ₂Y² + λ₃Z² : définie positive
   aides : Le coefficient de x² va en a₁₁ ; la moitié du coefficient de xy va en a₁₂ et en a₂₁. Puis Q = λ₁X² + λ₂Y² avec les valeurs propres de A. | A = [[6, □], [□, 9], …] | 5X² + 5Y² + 11Z²
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 ```
 
@@ -10829,7 +10915,7 @@ Q(x, y) = 4x² − 2xy + 4y². Trouve ses axes principaux et sa forme réduite, 
     = √5   ← X²/5 + Y²/3 = 1
   — Le demi-axe selon (1 ; −1) (l'axe des Y).  [juge value]  départ : b
     = √3
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y) = −12x² − 24xy − 5y². Trouve ses axes principaux et sa forme réduite, puis décris la courbe Q(x, y) = 84 (nature, distance des sommets à l'origine).
   [free, sans aide]  A
@@ -10844,7 +10930,7 @@ Q(x, y) = −12x² − 24xy − 5y². Trouve ses axes principaux et sa forme ré
   — La courbe Q(x, y) = 84 : ses sommets sont sur l'axe dirigé par (3 ; −4). À quelle distance de l'origine ?  [juge value]  départ : a
     ? Quelle est la courbe Q(x, y) = 84 ? · Une ellipse / ✔ Une hyperbole / · Deux droites
     = √21   ← Y²/21 − X²/4 = 1
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 Q(x, y) = 10x² − 4xy + 10y². Trouve ses axes principaux et sa forme réduite, puis décris la courbe Q(x, y) = 96 (nature, longueurs des demi-axes).
   [free, sans aide]  A
@@ -10861,7 +10947,7 @@ Q(x, y) = 10x² − 4xy + 10y². Trouve ses axes principaux et sa forme réduite
     = 2√3   ← X²/12 + Y²/8 = 1
   — Le demi-axe selon (1 ; −1) (l'axe des Y).  [juge value]  départ : b
     = 2√2
-  pièges : l_quadform_offdiag
+  pièges : l_quadform_offdiag, a2_jacobian_transposed
 
 ```
 
@@ -11038,6 +11124,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[4,2],[-2
     = V = (1/√2)·[[1,-1],[1,1]]   ← Les vᵢ normalisés
     = U = [[1/√6,-1/√2,-1/√3],[-1/√6,-1/√2,1/√3],[2/√6,0,1/√3]]   ← u₁ = Av₁/σ₁ = (1 ; −1 ; 2)/√6
   aides : V vient de AᵀA (ses vecteurs propres orthonormés) ; σᵢ = √λᵢ dans l'ordre décroissant ; U se calcule par uᵢ = Avᵢ/σᵢ. | u₁ = A·(1 ; 1)/(√2·□) | U=[16−12−13−16−121326013], Σ=[6&#x2062;300200], V=12·[1−111]
+  pièges : a2_jacobian_transposed
 
 Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-1,2],[1,2],[-2,0]] (3 × 2). Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  AᵀA
@@ -11060,6 +11147,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-1,2],[1
     = V = [[0,1],[1,0]]   ← Les vᵢ normalisés
     = U = [[1/√2,-1/√6,-1/√3],[1/√2,1/√6,1/√3],[0,-2/√6,1/√3]]   ← u₁ = Av₁/σ₁ = (1 ; 1 ; 0)/√2
   aides : V vient de AᵀA (ses vecteurs propres orthonormés) ; σᵢ = √λᵢ dans l'ordre décroissant ; U se calcule par uᵢ = Avᵢ/σᵢ. | u₁ = A·(0 ; 1)/(1·□) | U=[12−16−131216130−2613], Σ=[2&#x2062;200600], V=[0110]
+  pièges : a2_jacobian_transposed
 
 Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-2,-4],[4,2],[-6,-6]] (3 × 2). Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  AᵀA
@@ -11082,6 +11170,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-2,-4],[
     = V = (1/√2)·[[-1,1],[-1,-1]]   ← Les vᵢ normalisés
     = U = [[1/√6,1/√2,1/√3],[-1/√6,1/√2,-1/√3],[2/√6,0,-1/√3]]   ← u₁ = Av₁/σ₁ = (1 ; −1 ; 2)/√6
   aides : V vient de AᵀA (ses vecteurs propres orthonormés) ; σᵢ = √λᵢ dans l'ordre décroissant ; U se calcule par uᵢ = Avᵢ/σᵢ. | u₁ = A·(−1 ; −1)/(√2·□) | U=[161213−1612−13260−13], Σ=[6&#x2062;300200], V=12·[−11−1−1]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -11109,6 +11198,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-3,-4,-2
     = V = [[1/√3,0,-2/√6],[1/√3,-1/√2,1/√6],[1/√3,1/√2,1/√6]]   ← Les vᵢ normalisés
     = U = (1/√2)·[[-1,1],[1,1]]   ← u₁ = Av₁/σ₁ = (−1 ; 1)/√2
   aides : V vient de AᵀA (ses vecteurs propres orthonormés) ; σᵢ = √λᵢ dans l'ordre décroissant ; U se calcule par uᵢ = Avᵢ/σᵢ. | u₁ = A·(1 ; 1 ; 1)/(√3·□) | U=12·[−1111], Σ=[3&#x2062;600020], V=[130−2613−1216131216]
+  pièges : a2_jacobian_transposed
 
 Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[2,2,-2],[-3,6,3]] (2 × 3).
   [free, suivre l'erreur]  AᵀA
@@ -11131,6 +11221,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[2,2,-2],
     = V = [[1/√6,-1/√3,1/√2],[-2/√6,-1/√3,0],[-1/√6,1/√3,1/√2]]   ← Les vᵢ normalisés
     = U = [[0,-1],[-1,0]]   ← u₁ = Av₁/σ₁ = (0 ; −1)/1
   aides : V vient de AᵀA (ses vecteurs propres orthonormés) ; σᵢ = √λᵢ dans l'ordre décroissant ; U se calcule par uᵢ = Avᵢ/σᵢ. | u₁ = A·(1 ; −2 ; −1)/(√6·□) | U=[0−1−10], Σ=[3&#x2062;60002&#x2062;30], V=[16−1312−26−130−161312]
+  pièges : a2_jacobian_transposed
 
 Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-6,6],[4,-2],[-2,4]] (3 × 2).
   [free, suivre l'erreur]  AᵀA
@@ -11153,6 +11244,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-6,6],[4
     = V = (1/√2)·[[-1,1],[1,1]]   ← Les vᵢ normalisés
     = U = [[2/√6,0,-1/√3],[-1/√6,1/√2,-1/√3],[1/√6,1/√2,1/√3]]   ← u₁ = Av₁/σ₁ = (2 ; −1 ; 1)/√6
   aides : V vient de AᵀA (ses vecteurs propres orthonormés) ; σᵢ = √λᵢ dans l'ordre décroissant ; U se calcule par uᵢ = Avᵢ/σᵢ. | u₁ = A·(−1 ; 1)/(√2·□) | U=[260−13−1612−13161213], Σ=[6&#x2062;300200], V=12·[−1111]
+  pièges : a2_jacobian_transposed
 
 ```
 
@@ -11179,6 +11271,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[1,-3],[-
     = Σ = [[3√3,0],[0,√2],[0,0]]   ← Même taille que A
     = V = [[0,1],[1,0]]   ← Les vᵢ normalisés
     = U = [[-1/√3,1/√2,-1/√6],[-1/√3,-1/√2,-1/√6],[-1/√3,0,2/√6]]   ← u₁ = Av₁/σ₁ = (−1 ; −1 ; −1)/√3
+  pièges : a2_jacobian_transposed
 
 Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-2,1,3],[-2,-3,-1]] (2 × 3).
   [free, sans aide]  AᵀA
@@ -11200,6 +11293,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[-2,1,3],
     = Σ = [[4,0,0],[0,2√3,0]]   ← Même taille que A
     = V = [[0,-2/√6,1/√3],[-1/√2,-1/√6,-1/√3],[-1/√2,1/√6,1/√3]]   ← Les vᵢ normalisés
     = U = (1/√2)·[[-1,1],[1,1]]   ← u₁ = Av₁/σ₁ = (−1 ; 1)/√2
+  pièges : a2_jacobian_transposed
 
 Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[1,-2],[1,2],[2,0]] (3 × 2).
   [free, sans aide]  AᵀA
@@ -11221,6 +11315,7 @@ Calcule une décomposition en valeurs singulières A = UΣVᵀ de A = [[1,-2],[1
     = Σ = [[2√2,0],[0,√6],[0,0]]   ← Même taille que A
     = V = [[0,1],[1,0]]   ← Les vᵢ normalisés
     = U = [[-1/√2,1/√6,-1/√3],[1/√2,1/√6,-1/√3],[0,2/√6,1/√3]]   ← u₁ = Av₁/σ₁ = (−1 ; 1 ; 0)/√2
+  pièges : a2_jacobian_transposed
 
 ```
 

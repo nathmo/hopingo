@@ -31,6 +31,7 @@ import { mountTable } from './table-input.js';
 import { mountMatrix, mountExample } from './matrix-items.js';
 import { mountPlot } from './plot.js';
 import { mountProblem } from './problem.js';
+import { mountDomain } from './domain.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -94,6 +95,9 @@ MOUNTS.example = (item, ctx, body) => mountExample(item, ctx, body);
 MOUNTS.plot = (item, ctx, body) => mountPlot(item, ctx, body);
 // Step U4: long problems in parts, each part drawn by its own mount.
 MOUNTS.problem = (item, ctx, body) => mountProblem(item, ctx, body, (p, c, b) => MOUNTS[p.type](p, c, b));
+
+// Step U6: the bounds of an integral.
+MOUNTS.domain = (item, ctx, body) => mountDomain(item, ctx, body);
 
 // ---------- multiple choice ----------
 

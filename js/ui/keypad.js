@@ -293,3 +293,9 @@ export function renderChars(chars, caret) {
   }
   return out + gap(n);
 }
+
+// Step U6 (A2): several variables (∂ writes pd(f, x)), polar and spherical
+// letters, the constants of differential equations, systems with « ou ».
+KEYSETS.a2 = ['x', 'y', 'z', 'pd(', ',', 'r', 'φ', 'θ', 'λ', 'C', '_', ';', '≤', '|', ' ou ', 'back'];
+TAB_LABEL.a2 = 'xy ∂';
+Object.assign(LABEL, { 'pd(': '∂( , x)' });

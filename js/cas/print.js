@@ -157,6 +157,8 @@ function printer(style, opts) {
       }
       case 'deriv': {
         if (n.e.t === 'paren') return body({ ...n, e: n.e.e });
+        if (n.partial && readable) return `∂/∂${n.v} ${n.e.t === 'sym' ? P(n.e) : `(${P(n.e)})`}`; // step U6
+        if (n.partial) { inArgs++; const e = P(n.e); inArgs--; return `pd(${e},${n.v})`; }
         if (readable) {
           const marksN = "'".repeat(n.n).replace(/'/g, '′');
           const inner = n.e.t === 'sym' ? P(n.e) : `(${P(n.e)})`;

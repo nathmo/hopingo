@@ -34,3 +34,9 @@ export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
 // Empty since steps U3, U4 and U5: every prerequisite of the built modules
 // (L, A1, G4, G8, G10) is now built.
 export const UNBUILT = {};
+
+// Step U6: module A2 (analyse II).
+import * as analyse2 from './analyse2.skills.js';
+
+UNI_UNITS.push(analyse2.UNIT);
+UNI_SKILLS.push(...analyse2.SKILLS);

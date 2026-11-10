@@ -46,3 +46,8 @@ import { GEN as COMPLEXES_A } from './complexes-a.js';
 import { GEN as COMPLEXES_B } from './complexes-b.js';
 
 Object.assign(UNI_GEN, ANALYSE1_F, ANALYSE1_G, ANALYSE1_H, ANALYSE1_I, ANALYSE1_J, ANALYSE1_K, ANALYSE1_L, COMPLEXES_A, COMPLEXES_B);
+
+// Step U6: module A2.
+import { GEN as ANALYSE2 } from './analyse2.js';
+
+Object.assign(UNI_GEN, ANALYSE2);

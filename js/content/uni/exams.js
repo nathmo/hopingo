@@ -39,4 +39,16 @@ export const EXAMS = [
   EXAM_ANALYSE1,
 ];
 
+// Step U6: Analyse II (BA2), only multiple choice and true/false since 2019.
+EXAMS.push({
+  id: 'ba2-analyse2', title: 'Analyse II (BA2)', year: 14, durationMin: 144,
+  documents: 'none',
+  sections: [
+    { kind: 'mcq', count: 18, scoring: { right: 3, wrong: -1, blank: 0 }, pool: { units: ['analyse2'], extraSkills: [] } },
+    { kind: 'tf', count: 10, scoring: { right: 1, wrong: -1, blank: 0 }, pool: { units: ['analyse2'] } },
+  ],
+  passMark: 0.5,
+  source: 'Format des examens 2019–2021 (MATH-106) : 144 minutes, 18 QCM (+3 / 0 / −1) et 10 vrai/faux (+1 / 0 / −1), sans partie ouverte ni document.',
+});
+
 export const EXAM_BY_ID = Object.fromEntries(EXAMS.map((e) => [e.id, e]));

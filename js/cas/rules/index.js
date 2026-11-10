@@ -51,3 +51,8 @@ import { RULES as G8A } from './g8a.js';
 import { RULES as G8B } from './g8b.js';
 
 CAS_RULES.push(...A1F, ...A1G, ...A1H, ...A1I, ...A1J, ...A1K, ...A1L, ...G8A, ...G8B);
+
+// Step U6: module A2.
+import { RULES as A2 } from './a2.js';
+
+CAS_RULES.push(...A2);

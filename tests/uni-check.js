@@ -42,6 +42,8 @@ export const skillsOf = (unit) => UNI_SKILLS.filter((s) => s.unit === unit).map(
 // Step U5: judges with their own line language (tests/uni-check-geo.js).
 import { JUDGES } from '../js/judges/index.js';
 import { GEO_JUDGES, wrongGeo, checkOwnTemplate, checkPlotItem } from './uni-check-geo.js';
+// Step U6: the judges of module A2 (tests/uni-check-a2.js).
+import { A2_JUDGES, wrongA2, checkDomainItem } from './uni-check-a2.js';
 
 // Step U3: the first number of a matrix or a vector, plus one.
 const MATRIX_JUDGES = ['rowops', 'mat', 'eigvec', 'span', 'factor'];
@@ -75,6 +77,7 @@ function wrongSpanLine(cfg, final) {
 // A line every judge must refuse, built from the last line of the first part.
 function wrongLine(cfg, final) {
   if (GEO_JUDGES.includes(cfg.kind)) return wrongGeo(cfg, final); // step U5
+  if (A2_JUDGES.includes(cfg.kind)) return wrongA2(cfg, final); // step U6
   if (cfg.kind === 'eigvec') return `(${final.replace(/^.*=\s*/, '').replace(/[()]/g, '').split(';').map(() => '0').join(' ; ')})`;
   if (cfg.kind === 'span') return wrongSpanLine(cfg, final);
   if (cfg.kind === 'rowops' && cfg.track === 'det' && !/det|\[/.test(final)) return `${final}+1`;
@@ -216,6 +219,7 @@ function checkItem(it, where) {
       break;
     }
     case 'plot': checkPlotItem(it, where); break; // step U5
+    case 'domain': checkDomainItem(it, where); break; // step U6
     case 'example': {
       const r = checkCounter(it.property, it.answer);
       assert.ok(r.ok, `${where}: reference example refused: ${r.message}`);
