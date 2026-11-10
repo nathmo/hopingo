@@ -149,7 +149,26 @@ function raLines(level, rng, opts = {}) {
   });
 }
 
+// The « critère non concluant » item of the catalogue: aₙ = (2n)!/(4ⁿ(n!)²),
+// whose ratio (2n + 1)/(2n + 2) tends to 1 (aₙ → 0, like 1/√(πn)).
+function raMcqOne(rng) {
+  const a = '(2n)!/(4^n(n!)^2)';
+  return mcq({
+    skill: RA, level: 4,
+    prompt: `Soit aₙ = ${M(a)}. On trouve aₙ₊₁/aₙ = ${M('(2n+1)/(2n+2)')}. Que permet de dire le critère de d'Alembert ?`,
+    options: [
+      { html: 'Rien : le rapport tend vers 1', correct: true },
+      { html: 'q = 1, donc aₙ ne tend pas vers 0', correct: false, rule: 'a1_ratio_one' },
+      { html: 'aₙ₊₁/aₙ < 1 pour tout n, donc aₙ → 0', correct: false },
+      { html: 'q = 1, donc aₙ → 1', correct: false },
+    ],
+    key: 'mcq:one', exam: { format: 'mcq', points: 1 }, expectedSec: 240,
+    solution: [{ html: 'q = 1 : le critère ne conclut pas. (En fait aₙ → 0, comme 1/√(πn), mais il faut une autre méthode.)', note: 'D\'Alembert' }],
+  }, rng);
+}
+
 function raMcq(rng) {
+  if (rng.chance(0.25)) return raMcqOne(rng);
   const d = raData(rng);
   const zero = d.verdict === '0';
   const opts = [

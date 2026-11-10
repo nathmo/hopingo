@@ -20,7 +20,7 @@ const SUB = [
 
 // The bound parts' judges: cfg.other is the other bound (trap
 // a1_squeeze_wrong_direction), cfg.squeeze the limit to reach.
-const BOUND = (rel, d, other) => ({ kind: 'equiv', vars: ['n'], from: 1, rel, squeeze: { L: qt(d.L), ...(d.gone ? { gone: d.gone } : {}) }, other, ...(d.kind === 'sum' ? { maxN: 1000 } : {}) });
+const BOUND = (rel, d, other) => ({ kind: 'equiv', vars: ['n'], from: 1, rel, squeeze: { L: qt(d.L), ...(d.gone ? { gone: d.gone } : {}) }, other, ...(d.kind === 'sum' ? { span: 60, maxN: 1000 } : {}) });
 
 // ---------- templates ----------
 
