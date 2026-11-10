@@ -58,3 +58,9 @@ import { EXAM_PROBA, EXAM_STAT } from './exams-proba.js';
 
 EXAMS.push(EXAM_PROBA, EXAM_STAT);
 Object.assign(EXAM_BY_ID, { [EXAM_PROBA.id]: EXAM_PROBA, [EXAM_STAT.id]: EXAM_STAT });
+
+// Step U9: analyse numérique (BA4), with skills of module M (extraSkills).
+import { EXAM_NUMERIQUE } from './exams-numerique.js';
+
+EXAMS.push(EXAM_NUMERIQUE);
+EXAM_BY_ID[EXAM_NUMERIQUE.id] = EXAM_NUMERIQUE;

@@ -28,6 +28,7 @@ import { readLine, sameLine } from './common.js';
 import { exactForm } from '../cas/exactform.js';
 import { closedNumber } from '../cas/closedform.js';
 import { diagnoseLine } from './diagnose.js';
+import * as FP from './fpvalue.js'; // step U9: {arith: 'fp', digits}
 
 const KIND = { parse: 'parse', same: 'same', ok: 'ok', done: 'done', wrong: 'wrong', simplify: 'stay' };
 
@@ -56,6 +57,7 @@ const isDegLiteral = (n) => {
 };
 
 export function isFinal(cfg, node) {
+  if (cfg.arith === 'fp') return FP.isFinal(cfg, node); // step U9
   if (cfg.terms) return !!sumTerms(node);
   if (cfg.form === 'log' && !isLiteral(node)) return isLogLiteral(node);
   if (cfg.form === 'exact') return exactForm(node);
@@ -152,6 +154,7 @@ function judgeTerms(cfg, prev, node) {
 }
 
 export function judgeLine(cfg, prev, input) {
+  if (cfg.arith === 'fp') return FP.judgeLine(cfg, prev, input); // step U9
   const read = readLine({ ...cfg, vars: [] }, input);
   if (read.error) return read.error;
   const { node } = read;

@@ -119,6 +119,9 @@ export function buildExam(blueprint, { rng, profile = null, now = clock() } = {}
         try {
           let it = generate(id, 4, rng, profile, { exam: section.kind });
           if (section.kind === 'tf' && it && isVfMcq(it)) it = asTf(it);
+          // Step U9: in a section of multiple-answer questions, a question with one
+          // right answer is marked the same way (+1/N, −1/M with N = 1).
+          if (section.multi && it && it.type === 'mcq' && !it.multi) it = { ...it, multi: true };
           if (it && !it.stub && it.exam?.format === section.kind && fits(section, it)) item = it;
         } catch { item = null; }
       }

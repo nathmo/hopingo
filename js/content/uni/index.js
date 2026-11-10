@@ -53,3 +53,9 @@ import * as matrices from './matrices.skills.js';
 
 UNI_UNITS.push(matrices.UNIT);
 UNI_SKILLS.push(...matrices.SKILLS);
+
+// Step U9: module N (analyse numérique).
+import * as numerique from './numerique.skills.js';
+
+UNI_UNITS.push(numerique.UNIT);
+UNI_SKILLS.push(...numerique.SKILLS);

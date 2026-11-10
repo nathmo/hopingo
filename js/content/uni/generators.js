@@ -62,3 +62,8 @@ Object.assign(UNI_GEN, COMBI, PROBA);
 import { GEN as MATRICES } from './matrices.js';
 
 Object.assign(UNI_GEN, MATRICES);
+
+// Step U9: module N.
+import { GEN as NUMERIQUE } from './numerique.js';
+
+Object.assign(UNI_GEN, NUMERIQUE);

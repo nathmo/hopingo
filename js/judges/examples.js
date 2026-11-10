@@ -35,6 +35,7 @@ import { polyOf, coeffs, qCoeffs, degree, divide, I } from '../cas/polyx.js';
 import { Poly, gcdPoly } from '../cas/poly.js';
 import { checkLinalg } from './linalg-examples.js';
 import { checkMx } from './m-examples.js'; // step U8
+import { checkNum as checkNumCounter } from './n-examples.js'; // step U9
 import { checkGeo } from './geo-examples.js';
 import { checkSeqFn } from './counters.js';
 import { checkComplexCounter } from './counters-complex.js';
@@ -261,6 +262,7 @@ export function checkCounter(counter, answers) {
 
     case 'a2': return checkA2(counter, answers); // step U6
     case 'mx': return checkMx(counter, answers); // step U8 (js/judges/m-examples.js)
+    case 'num': return checkNumCounter(counter, answers); // step U9 (js/judges/n-examples.js)
     default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }

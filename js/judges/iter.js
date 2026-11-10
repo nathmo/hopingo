@@ -42,6 +42,7 @@ import { mapNode, lit } from '../cas/ast.js';
 import { lexicon, parseFormula, truthOf } from '../cas/logic.js';
 import { closedHolds } from '../cas/sets.js';
 import { checkPower } from './iter-power.js'; // step U8: the power method
+import { checkNum, NUM_KINDS } from './iter-num.js'; // step U9: module N
 
 export const num = (t) => {
   if (t === null || t === undefined || String(t).trim() === '') return null;
@@ -283,6 +284,7 @@ function checkBisection(item, values) {
 }
 
 export function checkTable(item, values) {
+  if (NUM_KINDS.has(item.judge.phi.kind)) return checkNum(item, values); // step U9 (js/judges/iter-num.js)
   switch (item.judge.phi.kind) {
     case 'power': return checkPower(item, values); // step U8 (js/judges/iter-power.js)
     case 'bisection': return checkBisection(item, values);

@@ -71,3 +71,8 @@ CAS_RULES.push(...G7, ...PA, ...PB, ...PC, ...PD, ...PE);
 import { RULES as M } from './m.js';
 
 CAS_RULES.push(...M);
+
+// Step U9: module N.
+import { RULES as N } from './n.js';
+
+CAS_RULES.push(...N);

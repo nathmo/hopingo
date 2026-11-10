@@ -8,6 +8,8 @@ import { h, html, play } from './dom.js';
 import { explainRule, solutionHtml, mountExercise } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { checkTable } from '../judges/iter.js';
+import { autoCells, NUM_KINDS } from '../judges/iter-num.js'; // step U9: columns computed by the app
+import { calculator } from './calculator.js'; // step U9
 
 export function mountTable(item, ctx, body) {
   const feedback = h('div.step-feedback');
@@ -21,6 +23,14 @@ export function mountTable(item, ctx, body) {
   let mistakes = 0;
   const rules = [];
   const say = (msg, kind = 'info') => { feedback.className = `step-feedback ${kind}`; feedback.innerHTML = msg; };
+  // Step U9: cells computed by the app (js/judges/iter-num.js autoCells).
+  const autos = [];
+  const refreshAuto = () => {
+    if (!autos.length || !NUM_KINDS.has(item.judge.phi.kind)) return;
+    let out = {};
+    try { out = autoCells(item, values); } catch { out = {}; }
+    for (const a of autos) a.td.textContent = out[a.rowId]?.[a.j] ?? '';
+  };
 
   const cellInput = (rowId, j, cell) => {
     if (cell.kind === 'tf') {
@@ -48,7 +58,7 @@ export function mountTable(item, ctx, body) {
       return b;
     }
     const f = h('input.num-cell', { type: 'text', inputmode: 'text', autocomplete: 'off', size: 4 });
-    f.addEventListener('input', () => { values[rowId][j] = f.value; f.classList.remove('right', 'wrong'); });
+    f.addEventListener('input', () => { values[rowId][j] = f.value; f.classList.remove('right', 'wrong'); refreshAuto(); });
     f.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
     return f;
   };
@@ -73,6 +83,8 @@ export function mountTable(item, ctx, body) {
     const tr = h('tr', h('th.row-label', r.label || ''));
     r.cells.forEach((c, j) => {
       if (!c) { tr.appendChild(h('td.empty')); return; }
+      // Step U9: a column the app computes from the student's cells (δ, r₂).
+      if (c.auto) { const td = h('td.auto'); autos.push({ rowId: r.id, j, td }); tr.appendChild(td); return; }
       if (c.given !== undefined) { tr.appendChild(h('td.given', c.given)); return; }
       const el = cellInput(r.id, j, c);
       fields[r.id][j] = el;
@@ -82,6 +94,8 @@ export function mountTable(item, ctx, body) {
   }
   tbl.appendChild(tb);
   body.append(h('div.table-wrap', tbl), h('div.step-tools', hints.button), hintBox, feedback, after);
+  refreshAuto();
+  if (item.calculator) body.insertBefore(calculator(), feedback); // step U9 (levels 1 to 4 of module N)
 
   const outcome = (correct, extra = {}) => {
     const common = { hintsUsed: hints.used() };

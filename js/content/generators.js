@@ -123,6 +123,30 @@ function describeProblem(item) {
   return out;
 }
 
+// Step U9: a program with holes (the answer of each ??? in brackets, or the
+// options of a choice), then its tests; a table to read, then its question.
+function describeCode(item) {
+  let k = 0;
+  const src = item.source.replace(/\?\?\?/g, () => {
+    const h = item.holes[k++];
+    return h.options ? `⟦${h.options.map((o) => `${o.correct ? '✔' : '·'}${o.text}${o.rule ? ` [${o.rule}]` : ''}`).join(' | ')}⟧` : `⟦${h.answer}⟧`;
+  });
+  const out = [`  [code python, ${item.holes.length} trou${item.holes.length > 1 ? 's' : ''}${item.noHints ? ', sans aide' : ''}]`];
+  out.push(...src.replace(/\n+$/, '').split(NL).map((l) => `    | ${l}`));
+  for (const t of item.tests) out.push(`    test : ${t.setup ? `${t.setup.replace(/\n/g, ' ; ')} ; ` : ''}${t.expr} → ${t.expect}`);
+  if (item.then) out.push(`  puis : ${describe(item.then).split(NL).join(`${NL}    `)}`);
+  return out;
+}
+function describeReadtable(item) {
+  const out = [`  [tableau à lire${item.noHints ? ', sans aide' : ''}]`];
+  if (item.table) {
+    out.push(`    ${item.table.columns.map(T).join(' | ')}`);
+    for (const r of item.table.rows) out.push(`    ${r.map((c) => T(c ?? '')).join(' | ')}`);
+  }
+  out.push(`  question : ${describe(item.question).split(NL).join(`${NL}    `)}`);
+  return out;
+}
+
 // HTML of the school renderer as plain text.
 const strip = (h) => String(h)
   .replace(/<span class="m-frac"><span class="m-n">(.*?)<\/span><span class="m-d">(.*?)<\/span><\/span>/g, '$1/$2')
@@ -156,6 +180,8 @@ export function describe(item) {
   if (item.type === 'plot') lines.push(`  [repère ${item.task}, à placer : ${item.place.map((p) => `${p.label} ×${p.count}`).join(', ')}${item.noHints ? ', sans aide' : ''}]`); // step U5
   if (item.type === 'domain') lines.push(`  [bornes ${item.answerShape || item.judge.coords}${item.noHints ? ', sans aide' : ''}] → ${item.fields.map(({ v }) => `${item.answer[v][0]} ≤ ${v} ≤ ${item.answer[v][1]}`).join(' ; ')}`); // step U6
   if (item.type === 'problem') lines.push(...describeProblem(item));
+  if (item.type === 'code') lines.push(...describeCode(item)); // step U9
+  if (item.type === 'readtable') lines.push(...describeReadtable(item)); // step U9
   if (item.exam && item.type !== 'lines' && item.type !== 'problem') lines.push(`  [examen ${item.exam.format}]`);
   if (item.type === 'shade') lines.push(`  (figure ${item.figure.shape} en ${item.figure.n} parts, colorier ${item.target.count})`);
   if (item.type === 'numberline') lines.push(`  (droite ${item.line.min ?? 0} → ${item.line.max}, graduée en ${item.line.den}es) → ${item.target}`);

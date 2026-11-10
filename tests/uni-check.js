@@ -44,6 +44,8 @@ import { JUDGES } from '../js/judges/index.js';
 import { GEO_JUDGES, wrongGeo, checkOwnTemplate, checkPlotItem } from './uni-check-geo.js';
 // Step U6: the judges of module A2 (tests/uni-check-a2.js).
 import { A2_JUDGES, wrongA2, checkDomainItem } from './uni-check-a2.js';
+// Step U9: items `code` and `readtable` (tests/uni-check-num.js).
+import { checkCode, checkReadtable } from './uni-check-num.js';
 
 // Step U3: the first number of a matrix or a vector, plus one.
 const MATRIX_JUDGES = ['rowops', 'mat', 'eigvec', 'span', 'factor'];
@@ -226,6 +228,8 @@ function checkItem(it, where) {
       break;
     }
     case 'problem': checkProblemItem(it, where); break;
+    case 'code': checkCode(it, where, checkItem); break; // step U9
+    case 'readtable': checkReadtable(it, where, checkItem); break; // step U9
     default: assert.fail(`${where}: type ${it.type}`);
   }
 }

@@ -32,6 +32,8 @@ import { mountMatrix, mountExample } from './matrix-items.js';
 import { mountPlot } from './plot.js';
 import { mountProblem } from './problem.js';
 import { mountDomain } from './domain.js';
+import { mountCode } from './code-input.js';
+import { mountReadtable } from './readtable.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -98,6 +100,10 @@ MOUNTS.problem = (item, ctx, body) => mountProblem(item, ctx, body, (p, c, b) =>
 
 // Step U6: the bounds of an integral.
 MOUNTS.domain = (item, ctx, body) => mountDomain(item, ctx, body);
+
+// Step U9: a Python program with holes, a table to read.
+MOUNTS.code = (item, ctx, body) => mountCode(item, ctx, body);
+MOUNTS.readtable = (item, ctx, body) => mountReadtable(item, ctx, body);
 
 // ---------- multiple choice ----------
 
