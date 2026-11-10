@@ -11,7 +11,11 @@
 //                                  line « μ = … » is right if μ′/μ = a
 //    homog?: "y''+y=0"             the homogeneous equation (default: the
 //                                  equation without its terms free of y)
-//    final?: 'explicit' | 'implicit' | 'homog' | 'particular'}
+//    final?: 'explicit' | 'implicit' | 'homog' | 'particular'
+//    system?: {A, names, X0?}      a vector unknown X′ = AX: js/judges/ode-system.js
+//    firstIntegral?: true          relations H(x, y) = C are checked as first
+//                                  integrals (H_x + H_y·f ≡ 0 everywhere, exact
+//                                  equations), not only on the curve}
 // Lines (each one a relation):
 //   y = φ(x, C…)      explicit: φ satisfies the equation for 3 draws of the
 //                     constants; with constants, they must be `order`
@@ -44,6 +48,7 @@ import { makeRng } from '../content/random.js';
 import { seedOf } from '../cas/equiv.js';
 import { diagnoseLine } from './diagnose.js';
 import { frNum } from './common.js';
+import { analyseSystem, sameHook } from './ode-system.js'; // vector unknown (cfg.system), step U6 part i
 
 export const sign = '';
 
@@ -241,7 +246,9 @@ function constRank(cfg, phi, consts, k) {
       rows.push(row);
     }
     if (!okRow) continue;
-    return rankOf(rows);
+    // Each constant's column scaled to 1 (e^(−3x) and e^(4x) differ by e^14 at x = 2).
+    const big = consts.map((_, j) => Math.max(1e-300, ...rows.map((r) => Math.abs(r[j]))));
+    return rankOf(rows.map((r) => r.map((x, j) => x / big[j])));
   }
   return 0;
 }
@@ -358,6 +365,7 @@ const ftext = (x) => frNum(x, 3);
 // ---------- judging ----------
 
 function analyse(cfg, node, state = {}) {
+  if (cfg.system) return analyseSystem(cfg, node, state);
   const kind = kindOf(cfg, node);
   const u = uOf(cfg);
   const n = stripParen(node);
@@ -431,7 +439,7 @@ function analyse(cfg, node, state = {}) {
       const consts = constsIn(node, cfg);
       if (order !== 1) return { kind: 'wrong', message: `Écris ${u} = … : une relation ne suffit pas ici.` };
       const withInt = contains(G, (x) => x.t === 'int');
-      const r = relationCheck(cfg, G, consts, withInt);
+      const r = relationCheck(cfg, G, consts, withInt || !!cfg.firstIntegral);
       if (!r.ok) {
         if (r.flat) return { kind: 'wrong', message: `Ta relation ne dépend pas de ${u} : elle ne dit rien sur les solutions.` };
         return { kind: 'wrong', message: r.undecided ? 'Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie là où je la teste.' : `Dérive ta relation (avec ${u} = ${u}(${vOf(cfg)})) : elle ne redonne pas l'équation.` };
@@ -488,6 +496,8 @@ export function isFinal(cfg, node) {
 // Two lines that say the same: same right side for « y = … », else the
 // same difference of sides.
 function sameLines(cfg, a, b) {
+  const hooked = sameHook(cfg, a, b);
+  if (hooked !== null) return hooked;
   if (a.t === 'odesep' || b.t === 'odesep') return a.t === b.t && equalsStructural(unparen(a.P), unparen(b.P)) && equalsStructural(unparen(a.Q), unparen(b.Q));
   const A = stripParen(a);
   const B = stripParen(b);
