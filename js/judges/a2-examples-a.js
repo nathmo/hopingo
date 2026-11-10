@@ -21,11 +21,11 @@
 //       does not), 'normConv' (‖aₙ‖ converges, aₙ does not)
 //   curveNotSmooth {dim}  answers {x, y, z?} in t: C¹ on [−3 ; 3] and γ′(t₀) = 0
 //       at some t₀
-//   arcCurve {test: 'sum' | 'chord', a, b}  answers {x, y, z?} in t: the length
-//       differs from ∫ (x′ + y′ + z′) dt, or from ‖γ(b) − γ(a)‖
-//   fnDomain {domain, test: 'unbounded' | 'bounded' | 'noMax'}  answers {f}: f
-//       continuous on D (sampled) and not bounded, bounded, or without a
-//       maximum. domain: {kind: 'interval', a, b} (open, in x) or a part of
+//   arcCurve {test: 'sum' | 'square' | 'chord', a, b}  answers {x, y, z?} in t:
+//       the length differs from ∫ (x′ + y′ + z′) dt, ∫ ‖γ′‖² dt or ‖γ(b) − γ(a)‖
+//   fnDomain {domain, test: 'unbounded' | 'bounded' | 'noMax' | 'noMin'}  answers
+//       {f}: f continuous on D (sampled) and not bounded, bounded, or without
+//       a maximum (minimum). domain: {kind: 'interval', a, b} (open, in x) or a part of
 //       ℝ²: {kind: 'openDisk' | 'punct' | 'R2' | 'half', r?}
 //   imageNotOpen {}  answers {f} in x, y: f(ℝ²) is not open (f reaches a
 //       global minimum or maximum)
@@ -326,6 +326,11 @@ function arcCurve(p, ans) {
     if (Math.abs(L - S) <= 1e-6 * (1 + Math.abs(L))) return { ok: false, message: 'Pour ta courbe, les deux nombres sont égaux : ce n\'est pas un contre-exemple.' };
     return { ok: true };
   }
+  if (p.test === 'square') {
+    const S = quad((t) => r.comps.reduce((s, c) => s + c.d(t) ** 2, 0), a, b);
+    if (Math.abs(L - S) <= 1e-6 * (1 + Math.abs(L))) return { ok: false, message: 'Pour ta courbe, les deux nombres sont égaux : ce n\'est pas un contre-exemple.' };
+    return { ok: true };
+  }
   const chord = Math.sqrt(r.comps.reduce((s, c) => s + (c.f(b) - c.f(a)) ** 2, 0));
   if (L - chord <= 1e-6 * (1 + L)) return { ok: false, message: 'Ta courbe est un segment parcouru une fois : sa longueur est bien ‖γ(b) − γ(a)‖.' };
   return { ok: true };
@@ -368,7 +373,9 @@ function fnDomain(p, ans) {
   const P = domainPoints(D);
   const s = studentFn(ans.f, P.vars);
   if (s.message) return { ok: false, message: s.message };
-  const val = (e) => s.f(e);
+  // noMin: the maximum of −f.
+  const sg = p.test === 'noMin' ? -1 : 1;
+  const val = (e) => sg * s.f(e);
   const baseV = P.base.map(val);
   const near = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => P.approach(k).map(val));
   if (baseV.some((v) => !Number.isFinite(v)) || near.flat().some((v) => !Number.isFinite(v))) {
@@ -386,10 +393,10 @@ function fnDomain(p, ans) {
     case 'bounded':
       if (unbounded || b8 > 2 * b0 + 1) return { ok: false, message: 'Ta fonction n\'est pas bornée sur D.' };
       return { ok: true };
-    case 'noMax': {
+    case 'noMax': case 'noMin': {
       const M0 = Math.max(...baseV, ...near.slice(0, 3).flat());
       const M8 = Math.max(...near[7]);
-      if (!(M8 > M0 + 1e-7)) return { ok: false, message: 'Ta fonction atteint son maximum sur D (ou semble l\'atteindre).' };
+      if (!(M8 > M0 + 1e-7)) return { ok: false, message: `Ta fonction atteint son ${p.test === 'noMin' ? 'minimum' : 'maximum'} sur D (ou semble l'atteindre).` };
       return { ok: true };
     }
     default: return { ok: false, message: 'Contre-exemple non vérifiable.' };
