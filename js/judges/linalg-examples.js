@@ -276,6 +276,31 @@ const WANT_ONE = {
     const same = ka.length === kb.length && (ka.length === 0 || MX.rank(MX.fromCols([...ka, ...kb])) === ka.length);
     return !same || 'Les lignes de A et de B ont ici les mêmes relations.';
   },
+  // section sys
+  // Pivots in every row or not (rowsAll), in every column or not (colsAll),
+  // and the shape: 'wide' (m < n), 'tall' (m > n), 'square'.
+  pivots: ({ A }, p) => {
+    const [m, n] = [A.length, A[0].length];
+    if (p.shape === 'wide' && m >= n) return 'A doit avoir moins de lignes que de colonnes.';
+    if (p.shape === 'tall' && m <= n) return 'A doit avoir plus de lignes que de colonnes.';
+    if (p.shape === 'square' && m !== n) return 'A doit être carrée.';
+    const r = MX.rank(A);
+    if (p.rowsAll === true && r < m) return 'Il faut un pivot dans chaque ligne : Ax = b doit avoir une solution pour tout b.';
+    if (p.rowsAll === false && r === m) return 'Ici, chaque ligne a un pivot : Ax = b a une solution pour tout b.';
+    if (p.colsAll === true && r < n) return 'Il faut un pivot dans chaque colonne : Ax = 0 ne doit avoir que la solution nulle.';
+    if (p.colsAll === false && r === n) return 'Ici, chaque colonne a un pivot : Ax = 0 n\'a que la solution nulle.';
+    return true;
+  },
+  // Ax = 0 has infinitely many solutions and Ax = b none (answers A, b);
+  // wide: m < n.
+  kerNoSolution: ({ A }, p, ans) => {
+    const b = readQ(ans.b)?.vec;
+    if (!b || b.length !== A.length) return `Écris b avec ${A.length} composantes.`;
+    if (p.wide && A.length >= A[0].length) return 'A doit avoir moins de lignes que de colonnes.';
+    const r = MX.rank(A);
+    if (r === A[0].length) return 'Ici, Ax = 0 n\'a que la solution nulle.';
+    return MX.rank(MX.hcat(A, b.map((x) => [x]))) > r || 'Ici, Ax = b a des solutions.';
+  },
 };
 
 // (λ − r)·P, P as coefficients from λ⁰.
@@ -324,6 +349,34 @@ const WANT_FAMILY = {
     if (!vs || vs.some((v) => v.length !== p.n)) return `Écris des vecteurs de ℝ${'⁰¹²³⁴⁵⁶'[p.n]}.`;
     if (MX.rank(MX.fromCols(vs)) !== vs.length) return 'La famille doit être libre.';
     return vs.length < p.n || 'Cette famille est une base.';
+  },
+  // section sys
+  // Three vectors, no two of them proportional, and yet linked.
+  pairwiseFreeDependent: (ans) => {
+    const vs = readFamily(ans.F);
+    if (!vs || vs.length !== 3 || vs.some((v) => v.length !== vs[0].length)) return 'Écris trois vecteurs de même taille.';
+    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) if (MX.rank(MX.fromCols([vs[i], vs[j]])) < 2) return 'Deux de tes vecteurs sont colinéaires.';
+    return MX.rank(MX.fromCols(vs)) < 3 || 'Ces trois vecteurs sont libres.';
+  },
+  // T(x) = (params.T: components in x_1 … x_n) is not linear: u, v with
+  // T(u + v) ≠ T(u) + T(v); or u and a number c with T(cu) ≠ cT(u); or
+  // u = 0 alone with T(0) ≠ 0 (answers u, v, c).
+  notLinear: (ans, p) => {
+    const T = (x) => p.T.map((c) => readQ(c.replace(/x_(\d+)/g, (_, i) => `(${x[Number(i) - 1]})`))?.scalar);
+    const same = (a, b) => a.every((x, i) => x && b[i] && x.eq(b[i]));
+    const u = readQ(ans.u)?.vec;
+    if (!u || u.length !== p.n) return `Écris u avec ${p.n} composantes.`;
+    const cText = String(ans.c ?? '').trim();
+    if (cText) {
+      const c = readQ(cText)?.scalar;
+      if (!c) return 'Je n\'arrive pas à lire c.';
+      return !same(T(u.map((x) => x.mul(c))), T(u).map((y) => y.mul(c))) || 'Ici T(cu) = cT(u).';
+    }
+    const vText = String(ans.v ?? '').trim();
+    if (!vText) return u.every((x) => x.n === 0) ? (!same(T(u), u.map(() => q(0))) ? true : 'Ici T(0) = 0.') : 'Donne u et v (ou u et un nombre c).';
+    const v = readQ(vText)?.vec;
+    if (!v || v.length !== p.n) return `Écris v avec ${p.n} composantes.`;
+    return !same(T(u.map((x, i) => x.add(v[i]))), T(u).map((y, i) => y.add(T(v)[i]))) || 'Ici T(u + v) = T(u) + T(v).';
   },
 };
 

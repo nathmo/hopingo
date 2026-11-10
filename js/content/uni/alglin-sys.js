@@ -11,10 +11,12 @@
 import * as MX from '../../cas/matrix.js';
 import { toMathML } from '../../cas/mathml.js';
 import { parse } from '../../cas/parse.js';
+import { opText as opTextN, opReadable, parseMatLine, exprML, normalizeMatText } from '../../cas/matexpr.js';
 import {
-  q, mt, aug, vt, ML, MLm, opT, opR, fq, qt, sub, unimodular, rrefWith, opLines, pickCells, withCells,
-  matLines, coefItem, mcqDistinct, tfL, examTag, rowHoles,
+  q, mt, aug, vt, ML, MLm, MLv, opT, opR, fq, qt, sub, unimodular, rrefWith, opLines, pickCells, withCells,
+  matLines, coefItem, mcqDistinct, tfL, examTag, rowHoles, polyT, polyR, exampleItem,
 } from './alglin-kit.js';
+import { mcq } from './kit.js';
 
 const nz = (rng, lo, hi) => { for (;;) { const k = rng.int(lo, hi); if (k) return k; } };
 
@@ -387,9 +389,1455 @@ function rrefExam(rng, exam) {
 }
 
 // ======================================================================
+// Shared: polynomials in a parameter, parametric matrices and systems
+// ======================================================================
+
+// A polynomial in one letter: coefficients in ℚ, constant first ([] = 0).
+const ptrim = (p) => { const r = [...p]; while (r.length && r[r.length - 1].n === 0) r.pop(); return r; };
+const pc = (...cs) => ptrim(cs.map((c) => q(c)));
+const padd = (a, b) => ptrim(Array.from({ length: Math.max(a.length, b.length) }, (_, i) => (a[i] ?? q(0)).add(b[i] ?? q(0))));
+const pscale = (a, k) => ptrim(a.map((c) => c.mul(q(k))));
+const pmul = (a, b) => {
+  if (!a.length || !b.length) return [];
+  const r = Array(a.length + b.length - 1).fill(q(0));
+  a.forEach((x, i) => b.forEach((y, j) => { r[i + j] = r[i + j].add(x.mul(y)); }));
+  return ptrim(r);
+};
+const peval = (a, x) => a.reduceRight((s, c) => s.mul(q(x)).add(c), q(0));
+const pdeg = (a) => a.length - 1;
+// a / b when it is a polynomial (b constant, or a = k·b), else null.
+function pratio(a, b) {
+  if (!b.length) return null;
+  if (!a.length) return [];
+  if (b.length === 1) return pscale(a, b[0].inv());
+  if (a.length !== b.length) return null;
+  const k = a[a.length - 1].div(b[b.length - 1]);
+  return a.every((c, i) => c.eq(b[i].mul(k))) ? [k] : null;
+}
+// Highest degree first, as the courses write it: a^2-a-6, -3a-2.
+function ptext(p, v = 'a') {
+  const parts = [];
+  for (let k = p.length - 1; k >= 0; k--) {
+    const c = p[k];
+    if (c.n === 0) continue;
+    const abs = c.n < 0 ? c.neg() : c;
+    const coef = k === 0 ? qt(abs) : abs.eq(1) ? '' : abs.d === 1 ? qt(abs) : `(${qt(abs)})`;
+    parts.push(`${c.n < 0 ? '-' : parts.length ? '+' : ''}${coef}${k === 0 ? '' : k === 1 ? v : `${v}^${k}`}`);
+  }
+  return parts.join('') || '0';
+}
+// The same, readable: a² − a − 6.
+const pR = (p, v = 'a') => ptext(p, v).replace(/\^2/g, '²').replace(/([+-])/g, ' $1 ').replace(/^ - /, '−').replace(/-/g, '−').trim();
+// A matrix with polynomial entries as text: [[1,a|2],[0,1-a|a]].
+const pmt = (rows, bar = null, v = 'a') => `[${rows.map((r) => `[${r.map((x, j) => `${bar !== null && j === bar ? '|' : ''}${ptext(x, v)}`).join(',').replace(/,\|/g, '|')}]`).join(',')}]`;
+// Lᵢ ← Lᵢ + k·Lⱼ with k a polynomial: the text the judges read, readable.
+const pnode = (p, v = 'a') => parse(ptext(p, v), { vars: [v] });
+const popT = (op, v = 'a') => opTextN({ kind: 'add', i: op.i, j: op.j, k: pnode(op.k, v) });
+const popR = (op, v = 'a') => opReadable({ kind: 'add', i: op.i, j: op.j, k: pnode(op.k, v) });
+const applyP = (rows, op) => rows.map((r, i) => (i === op.i ? r.map((x, c) => padd(x, pmul(op.k, rows[op.j][c]))) : r));
+const atP = (rows, x) => rows.map((r) => r.map((p) => peval(p, x)));
+// The factored form s·(a − r₁)(a − r₂): -(a-1)(a+2), a(a-2).
+const fa = (r, v = 'a') => (r === 0 ? v : `(${v}${r > 0 ? '-' : '+'}${Math.abs(r)})`);
+const factoredT = (s, r1, r2, v = 'a') => { const [x, y] = r2 === 0 ? [r2, r1] : [r1, r2]; return `${s < 0 ? '-' : ''}${fa(x, v)}${fa(y, v)}`; };
+const MT = (text, vars = ['a']) => toMathML(parse(text, { vars }));
+// A line shown as written, not evaluated (x = p + t·v keeps its sum).
+function MLx(text, vars = []) {
+  try {
+    const line = parseMatLine(normalizeMatText(text), { vars });
+    return `<math><mrow>${line.label ? `<mi>${line.label}</mi><mo>=</mo>` : ''}${exprML(line.body)}</mrow></math>`;
+  } catch { return text; }
+}
+const MP = (p, v = 'a') => MT(ptext(p, v), [v]);
+const setR = (xs) => `{${xs.map(fq).join(' ; ')}}`;
+
+// Kind of the solutions of a system [A | b] (n unknowns) over ℚ.
+function solKind(M, n) {
+  const rA = MX.rank(M.map((r) => r.slice(0, n)));
+  const rAb = MX.rank(M);
+  return rA !== rAb ? 'none' : rA < n ? 'inf' : 'unique';
+}
+
+// A system as MathML from rows of polynomials (the last entry is the
+// right-hand side): x + (a − 1)y + 2az = 1.
+function systemP(rows, names, v = 'a') {
+  const eqs = rows.map((r) => {
+    let s = '';
+    r.slice(0, -1).forEach((p, j) => {
+      if (!p.length) return;
+      let neg = false;
+      let coef;
+      if (p.length === 1) { neg = p[0].n < 0; const abs = neg ? p[0].neg() : p[0]; coef = abs.eq(1) ? '' : qt(abs); }
+      else if (p.length === 2 && p[0].n === 0) { neg = p[1].n < 0; const abs = neg ? p[1].neg() : p[1]; coef = `${abs.eq(1) ? '' : qt(abs)}${v}`; }
+      else coef = `(${ptext(p, v)})`;
+      s += `${neg ? '-' : s ? '+' : ''}${coef}${names[j]}`;
+    });
+    return `${s || '0'}=${ptext(r[r.length - 1], v)}`;
+  });
+  return toMathML(parse(eqs.join(';'), { vars: [...names, v] }), { display: 'block' });
+}
+
+// Gaussian elimination of a 3-row matrix of polynomials without dividing
+// by the parameter: pivot a₁₁ = ±1, then a₂₂ (a constant, or a polynomial
+// of which the entry below is a constant multiple). → {ops, steps} | null.
+function elimP(A) {
+  if (A[0][0].length !== 1 || Math.abs(A[0][0][0].valueOf()) !== 1) return null;
+  const ops = [];
+  const steps = [];
+  let R = A;
+  const go = (op) => { R = applyP(R, op); ops.push(op); steps.push(R); };
+  for (const i of [1, 2]) if (R[i][0].length) go({ i, j: 0, k: pscale(R[i][0], R[0][0][0].inv().neg()) });
+  if (!R[1][1].length) return null;
+  if (R[2][1].length) {
+    const k = pratio(R[2][1], R[1][1]);
+    if (!k) return null;
+    go({ i: 2, j: 1, k: pscale(k, -1) });
+  }
+  return { ops, steps, E: R };
+}
+
+// a + Σ cᵢ·tᵢ as text: 2+3t, -1-t, s-2t.
+function linT(c0, terms) {
+  let s = c0.n !== 0 ? qt(c0) : '';
+  for (const [c, v] of terms) {
+    if (c.n === 0) continue;
+    const abs = c.n < 0 ? c.neg() : c;
+    const coef = abs.eq(1) ? '' : abs.d === 1 ? qt(abs) : `(${qt(abs)})`;
+    s += `${c.n < 0 ? '-' : s ? '+' : ''}${coef}${v}`;
+  }
+  return s || '0';
+}
+
+// ======================================================================
+// l-sys-solution
+// ======================================================================
+
+const SOL = 'l-sys-solution';
+const SOL_SUB = [
+  { id: 'write', label: 'écrire la matrice augmentée', skill: AUG },
+  { id: 'reduce', label: 'réduire', skill: RREF },
+  { id: 'pivots', label: 'exprimer les variables pivots', skill: SOL },
+  { id: 'vector', label: 'forme vectorielle', skill: SOL },
+];
+
+// [A | b] from its reduced form (rrefWith on the augmented matrix): n
+// unknowns, `free` free variables, or no solution (a pivot in b's column).
+function solData(rng, level, { none = false, free: free0, n: n0 } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const n = n0 ?? (level >= 4 ? 4 : 3);
+    const free = free0 ?? (level === 5 ? 2 : level === 4 ? rng.pick([1, 1, 2]) : 1);
+    const rank = n - free;
+    if (rank < 1 || rank + (none ? 1 : 0) > 3) continue;
+    const cols = [0, ...rng.shuffle([...Array(n).keys()].slice(1)).slice(0, rank - 1)].sort((a, b) => a - b);
+    const { A: M, fallback } = rrefWith(3, n + 1, none ? [...cols, n] : cols, rng, { max: 3 });
+    if (fallback) continue;
+    if (M.some((r) => r.slice(0, n).every((x) => x.n === 0))) continue;
+    const red = MX.rref(M, { cols: n });
+    if (red.ops.length < 2 || red.ops.length > (level >= 4 ? 8 : 6)) continue;
+    if (red.ops.some((op) => op.kind === 'swap' && level < 3)) continue;
+    if (red.ops.some((op) => op.k && op.k.d > 2)) continue;
+    let X = M;
+    let ok = true;
+    for (const op of red.ops) {
+      X = MX.applyOp(X, op);
+      if (X.flat().some((x) => x.d > 2 || Math.abs(x.valueOf()) > 15)) { ok = false; break; }
+    }
+    if (!ok || M.flat().some((x) => Math.abs(x.valueOf()) > 9)) continue;
+    const R = red.R;
+    const freeCols = [...Array(n).keys()].filter((c) => !cols.includes(c));
+    const p = Array.from({ length: n }, () => q(0));
+    cols.forEach((c, r) => { p[c] = R[r][n]; });
+    if (!none && p[0].n === 0) continue;
+    if (!none && R.flat().some((x) => x.d !== 1)) continue;
+    const dirs = freeCols.map((f) => {
+      const v = Array.from({ length: n }, () => q(0));
+      v[f] = q(1);
+      cols.forEach((c, r) => { v[c] = R[r][f].neg(); });
+      return v;
+    });
+    return { M, R, ops: red.ops, n, pivots: cols, freeCols, p, dirs, none };
+  }
+  const M = MX.mat([[1, 2, -1, 0], [1, 3, 0, -1], [2, 1, -5, 3]]);
+  const red = MX.rref(M, { cols: 3 });
+  return { M, R: red.R, ops: red.ops, n: 3, pivots: [0, 1], freeCols: [2], p: MX.mat([[2, -1, 0]])[0], dirs: [MX.mat([[3, -1, 1]])[0]], none: false, fallback: true };
+}
+
+const xName = (j) => `x${sub(j + 1)}`;
+const paramsOf = (k) => (k === 1 ? ['t'] : ['s', 't']);
+// The pieces of the answer: x with the pivots expressed, x = p + t·v.
+function solTexts(d) {
+  const ps = paramsOf(d.freeCols.length);
+  const entries = Array.from({ length: d.n }, (_, j) => {
+    const f = d.freeCols.indexOf(j);
+    if (f >= 0) return ps[f];
+    return linT(d.p[j], d.dirs.map((v, k) => [v[j], ps[k]]));
+  });
+  const vec = `(${entries.join(' ; ')})`;
+  const final = `x = ${vt(d.p)} + ${d.dirs.map((v, k) => `${ps[k]}${vt(v)}`).join(' + ')}`;
+  const freeText = d.freeCols.map((f, k) => `${xName(f)} = ${ps[k]}`).join(', ');
+  return { ps, vec, final, freeText };
+}
+
+function solItem(level, rng) {
+  const none = level === 5 && rng.chance(0.25);
+  const d = solData(rng, level, { none });
+  const n = d.n;
+  const Mtext = mt(d.M, n);
+  const Rtext = mt(d.R, n);
+  const sys = systemML(d.M.map((r) => r.slice(0, n)), d.M.map((r) => r[n]), VARS_IDX(n));
+  const key = `${SOL}:${Mtext}`;
+  const redLines = opLines(d.M, d.ops, {
+    bar: n,
+    note: (op) => (op.kind === 'scale' ? 'Pivot à 1' : op.kind === 'swap' ? 'Échanger deux lignes' : op.i > op.j ? `Descendre : ${opR(op)}` : `Remonter : ${opR(op)}`),
+    subgoal: 'reduce',
+  });
+  const writeSeg = { kind: 'segment', html: 'Réduis la matrice augmentée.', start: { math: Mtext }, judge: { kind: 'rowops', goal: 'rref', multi: level >= 4 } };
+  const writeLine = { kind: 'eq', math: Mtext, note: 'Une ligne par équation, b après la barre', subgoal: 'write' };
+  if (d.none) {
+    const script = [writeLine, writeSeg, ...redLines,
+      { kind: 'segment', html: 'Combien de solutions a ce système ?', ask: 'nombre de solutions =', start: { math: 'N' }, judge: { kind: 'value', expect: '0' } },
+      { kind: 'eq', math: '0', note: 'Une ligne [0 … 0 | c] avec c ≠ 0 se lit 0 = c : aucune solution', subgoal: 'vector' }];
+    return matLines({
+      skill: SOL, level, prompt: `Résous le système ${sys} : matrice augmentée, forme réduite, puis l'ensemble des solutions.`,
+      start: 'Matrice', judge: { kind: 'mat', expect: Mtext }, mode: 'free', script, hints: [], subgoals: SOL_SUB, key, fallback: d.fallback,
+    });
+  }
+  const T = solTexts(d);
+  const ps = T.ps;
+  const vecJudge = { kind: 'mat', vars: ps, expect: T.vec, particular: vt(d.p), free: d.freeCols.map(xName).join(', ') };
+  const spanJudge = { kind: 'span', basis: d.dirs.map(vt), affine: vt(d.p), require: 'basis' };
+  const vecSeg = (html) => ({ kind: 'segment', html, ask: 'x =', start: { math: 'x' }, judge: vecJudge });
+  const vecLine = { kind: 'eq', math: `x = ${T.vec}`, note: `${T.freeText} : les variables pivots s'expriment avec ${ps.length > 1 ? 's et t' : 't'}`, subgoal: 'pivots' };
+  const finalSeg = { kind: 'segment', html: 'Écris la solution sous forme vectorielle.', ask: 'x =', start: { math: 'x' }, judge: spanJudge };
+  const finalLine = { kind: 'eq', math: T.final, note: 'Un point, plus les combinaisons des vecteurs directeurs', subgoal: 'vector' };
+  const pivotHole = d.pivots.map((c, r) => `${xName(c)} = ${fq(d.p[c])}${d.dirs.map((v, k) => (v[c].n ? ` + □${ps[k]}` : '')).join('')}`).join(', ');
+  const hints = [
+    { level: 1, html: `Les variables sans pivot sont libres : pose ${T.freeText}.` },
+    { level: 2, html: pivotHole },
+    { level: 3, html: MLx(T.final, ps) },
+  ];
+  const freeDecision = {
+    kind: 'decision', prompt: 'Quelles variables sont libres ?', options: rng.shuffle([
+      { id: 'ok', label: `${d.freeCols.map(xName).join(' et ')} : leur colonne n'a pas de pivot`, valid: true },
+      { id: 'first', label: `${xName(d.pivots[0])} : la première variable`, valid: false, why: `La colonne de ${xName(d.pivots[0])} a un pivot : ${xName(d.pivots[0])} s'exprime avec les autres. Les variables libres sont celles des colonnes sans pivot.` },
+      { id: 'none', label: 'Aucune : il y a une solution unique', valid: false, rule: 'l_free_var_zero', why: `La colonne de ${xName(d.freeCols[0])} n'a pas de pivot : ${xName(d.freeCols[0])} peut prendre n'importe quelle valeur, il y a une infinité de solutions.` },
+    ]),
+  };
+  // Levels 1–2: the reduced form is given.
+  if (level <= 2) {
+    const cells = d.pivots.map((c) => [c, 0]);
+    const script = [
+      ...(level === 2 ? [freeDecision] : [{ kind: 'note', html: `Pas de pivot dans la colonne de ${d.freeCols.map(xName).join(' et ')} : ${T.freeText}.` }]),
+      withCells(vecLine, level === 1 ? cells.slice(0, 2) : cells),
+      finalSeg, finalLine,
+    ];
+    return matLines({
+      skill: SOL, level,
+      prompt: `La forme échelonnée réduite de la matrice augmentée d'un système est ${MLm(d.R, n)}. Exprime les variables pivots en fonction ${d.freeCols.length > 1 ? 'des variables libres' : 'de la variable libre'}, puis écris la solution sous forme vectorielle.`,
+      start: Rtext, judge: vecJudge, mode: 'guided', script, hints, subgoals: SOL_SUB, key, fallback: d.fallback,
+    });
+  }
+  if (level === 3) {
+    const script = [...redLines, vecSeg('Exprime les variables pivots en fonction des variables libres.'), vecLine, finalSeg, finalLine];
+    return matLines({
+      skill: SOL, level, prompt: `Résous le système de matrice augmentée ${MLm(d.M, n)} : réduis-la (choisis chaque opération), puis écris la solution x = p + t·v.`,
+      start: Mtext, judge: { kind: 'rowops', goal: 'rref' }, mode: 'tap', script, hints, subgoals: SOL_SUB, key, tapActions: 'rowops', fallback: d.fallback,
+    });
+  }
+  const script = [writeLine, writeSeg, ...redLines, vecSeg('Exprime les variables pivots en fonction des variables libres.'), vecLine, finalSeg, finalLine];
+  return matLines({
+    skill: SOL, level, prompt: `Résous le système ${sys} : matrice augmentée, forme réduite, puis solution sous forme vectorielle.`,
+    start: 'Matrice', judge: { kind: 'mat', expect: Mtext }, mode: 'free', script, hints, subgoals: SOL_SUB, key, fallback: d.fallback,
+  });
+}
+
+function solExam(rng, exam) {
+  if (exam === 'tf') {
+    const which = rng.int(0, 3);
+    const tag = examTag({ exam });
+    if (which === 0) {
+      return tfL({
+        skill: SOL, key: 'two-sol', truth: true, exam: tag,
+        statement: 'Si Ax = b a deux solutions distinctes, il en a une infinité.',
+        explanation: 'Vrai : si u et v sont solutions, u − v ≠ 0 vérifie A(u − v) = 0, et u + t(u − v) est solution pour tout t.',
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: SOL, key: 'zero-row', truth: true, exam: tag,
+        statement: 'Si une forme échelonnée de [A | b] a une ligne [0 … 0 | c] avec c ≠ 0, le système n\'a aucune solution.',
+        explanation: 'Vrai : cette ligne se lit 0 = c, une équation impossible.',
+      });
+    }
+    const wide = which === 3;
+    const A = wide ? [[1, 1, 1], [1, 1, 1]] : [[1, 1], [1, 1]];
+    return tfL({
+      skill: SOL, key: wide ? 'wide' : 'ker-b', truth: false, exam: tag,
+      statement: wide ? 'Un système qui a plus d\'inconnues que d\'équations a toujours une infinité de solutions.' : 'Si Ax = 0 a une infinité de solutions, alors Ax = b en a aussi une infinité, pour tout b.',
+      counter: {
+        kind: 'matOne', params: { want: 'kerNoSolution', wide },
+        ask: [{ v: 'A', label: 'A =', shape: [2, wide ? 3 : 2] }, { v: 'b', label: 'b =', shape: [2, 1] }],
+        answer: { A: mt(MX.mat(A)), b: '(0 ; 1)' },
+      },
+      explanation: `Faux : avec A = ${MLm(MX.mat(A))} et b = (0 ; 1), les deux équations disent ${wide ? 'x₁ + x₂ + x₃' : 'x₁ + x₂'} = 0 et = 1 : aucune solution. ${wide ? 'Plus d\'inconnues donne des variables libres, mais seulement si le système est compatible.' : 'Ax = 0 décrit les directions ; encore faut-il que Ax = b ait une solution.'}`,
+    });
+  }
+  const d = solData(rng, 4, { n: rng.pick([3, 4]), free: 1 });
+  const T = solTexts(d);
+  const ps = T.ps;
+  const n = d.n;
+  const sys = systemML(d.M.map((r) => r.slice(0, n)), d.M.map((r) => r[n]), VARS_IDX(n));
+  const line = (p, dirs) => MLx(`x = ${p ? vt(p) : ''}${p && dirs.length ? ' + ' : ''}${dirs.map((v, k) => `${ps[k]}${vt(v)}`).join(' + ')}`, ps);
+  const signed = d.dirs.map((v) => v.map((x, j) => (d.pivots.includes(j) ? x.neg() : x)));
+  return mcqDistinct({
+    skill: SOL, level: 4, key: `mcq:${mt(d.M, n)}`, exam: examTag({ exam }),
+    prompt: `La solution générale du système ${sys} est :`,
+    right: line(d.p, d.dirs),
+    wrongs: [
+      { html: line(d.p, []), rule: 'l_free_var_zero' },
+      { html: line(d.p, signed), rule: 'l_ker_sign' },
+      { html: line(null, d.dirs), rule: 'l_rhs_forgotten' },
+    ],
+    fillers: [{ html: line(d.p.map((x) => x.neg()), d.dirs) }, { html: line(d.p, d.dirs.map((v) => v.map((x, j) => (j === d.pivots[0] ? x.add(1) : x)))) }],
+    solution: [{ html: `Forme réduite : ${MLm(d.R, n)}`, note: '' }, { html: MLx(T.final, ps), note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-sys-param
+// ======================================================================
+
+const PAR = 'l-sys-param';
+const PAR_SUB = [
+  { id: 'down', label: 'descendre', skill: ECH },
+  { id: 'factor', label: 'factoriser', skill: 'fac-trinomial' },
+  { id: 'discuss', label: 'discuter', skill: PAR },
+];
+
+// From the last row [0 0 f(a) | g(a)]: f = s(a − r₁)(a − r₂), g = m(a − r₁)
+// (r₁: infinity, r₂: none). Echelon form E with E₁₁ = 1, A = L·E with L
+// unit lower. quad (level 5, exams): L constant, a² in a₃₃ (2021 Q4,
+// exam example 1); else the multiplier of L₁ in L₃ holds a, so that every
+// entry of A has degree ≤ 1 (the symmetric template x + y + az = 1 …).
+// Each case is checked on the system itself (ranks at r₁ and r₂).
+function parData(rng, { quad = false } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const [r1, r2] = rng.shuffle([-3, -2, -1, 0, 1, 2, 3]).slice(0, 2);
+    const s = quad ? rng.pick([1, 1, -1]) : rng.pick([1, -1]);
+    const f = pscale(pmul(pc(-r1, 1), pc(-r2, 1)), s);
+    const g = pscale(pc(-r1, 1), rng.pick([1, -1, 2, -2]));
+    let E;
+    let L;
+    if (quad) {
+      E = [[pc(1), pc(rng.int(-2, 2)), pc(rng.int(-2, 2)), pc(rng.int(-2, 2))], [[], pc(rng.pick([1, -1])), pc(rng.int(-3, 3)), pc(rng.int(-2, 2))], [[], [], f, g]];
+      L = [pc(rng.pick([1, 2, -1, -2])), pc(rng.pick([1, -1, 2, 0])), pc(rng.pick([1, -1, 2, -2]))];
+    } else {
+      const sigma = rng.pick([1, -1]);
+      E = [
+        [pc(1), pc(rng.pick([1, -1, 2, 0])), pc(rng.int(-1, 1), -s * sigma), pc(rng.int(-2, 2))],
+        [[], rng.chance(0.4) ? pscale(pc(-r1, 1), rng.pick([1, -1])) : pc(rng.pick([1, -1])), pc(rng.int(-2, 2), rng.chance(0.3) ? rng.pick([1, -1]) : 0), pc(rng.int(-2, 2))],
+        [[], [], f, g],
+      ];
+      L = [pc(rng.pick([1, -1, 2, 0, 1])), pc(rng.int(-1, 1), sigma), pc(rng.pick([1, -1, 2, -2]))];
+    }
+    const [l21, l31, l32] = L;
+    const A = [E[0], E[1].map((x, j) => padd(x, pmul(l21, E[0][j]))), E[2].map((x, j) => padd(padd(x, pmul(l31, E[0][j])), pmul(l32, E[1][j])))];
+    if (A.flat().some((p) => p.some((c) => Math.abs(c.valueOf()) > 6))) continue;
+    if (A.some((r, i) => r.some((p, j) => pdeg(p) > (quad && i === 2 && j === 2 ? 2 : 1)))) continue;
+    const withA = A.flat().filter((p) => pdeg(p) >= 1).length;
+    if (withA < 2 || withA > 5) continue;
+    if (A.some((r) => r.slice(0, 3).every((p) => !p.length))) continue;
+    const el = elimP(A);
+    if (!el || el.ops.length < 2) continue;
+    if (el.steps.flat(2).some((p) => pdeg(p) > 2 || p.some((c) => c.d !== 1 || Math.abs(c.valueOf()) > 9))) continue;
+    if (!el.E[2][2].every((c, i) => c.eq(f[i] ?? q(0))) || el.E[2][2].length !== f.length) continue;
+    if (solKind(atP(A, r1), 3) !== 'inf' || solKind(atP(A, r2), 3) !== 'none' || solKind(atP(A, 7), 3) !== 'unique') continue;
+    return { A, ...el, f, g, r1, r2, s };
+  }
+  const A = [[pc(1), pc(1), pc(0, 1), pc(1)], [pc(1), pc(0, 1), pc(1), pc(1)], [pc(0, 1), pc(1), pc(1), pc(1)]];
+  return { A, ...elimP(A), f: pc(2, -1, -1), g: pc(1, -1), r1: 1, r2: -2, s: -1, fallback: true };
+}
+
+function parItem(level, rng) {
+  const d = parData(rng, { quad: level === 5 });
+  const Atext = pmt(d.A, 3);
+  const sys = systemP(d.A, VARS3);
+  const key = `${PAR}:${Atext}`;
+  const lines = d.ops.map((op, k) => ({ kind: 'eq', math: `${popT(op)} : ${pmt(d.steps[k], 3)}`, note: `Descendre sans diviser : ${popR(op)}`, subgoal: 'down', rows: d.steps[k], op }));
+  const fT = ptext(d.f);
+  const facT = factoredT(d.s, d.r1, d.r2);
+  const g2 = peval(d.g, d.r2);
+  const caseJudge = (r, other) => ({ kind: 'solset', v: 'a', sets: { S: `{${r}}` }, swapCase: `a=${other}` });
+  const factorSeg = { kind: 'segment', html: `Le dernier pivot est ${MT(fT)}. Factorise-le.`, ask: 'f(a) =', start: { math: fT }, judge: { kind: 'poly', v: 'a', target: 'factored-R' } };
+  const factorLine = { kind: 'eq', math: facT, note: 'Ses zéros sont les valeurs de a à traiter à part', subgoal: 'factor' };
+  const infSeg = { kind: 'segment', html: 'Pour quelles valeurs de a le système a-t-il une infinité de solutions ?', ask: 'a :', start: { math: 'S' }, judge: caseJudge(d.r1, d.r2) };
+  const uniqueNote = { kind: 'note', html: `Si a ∉ ${setR([d.r1, d.r2])}, le dernier pivot n'est pas nul : une solution unique. Restent ces deux valeurs.` };
+  const infLine = { kind: 'eq', math: `a=${d.r1}`, note: `Pour a = ${fq(d.r1)}, la dernière ligne devient 0 = 0`, subgoal: 'discuss' };
+  const noneSeg = { kind: 'segment', html: 'Pour quelles valeurs de a le système n\'a-t-il aucune solution ?', ask: 'a :', start: { math: 'S' }, judge: caseJudge(d.r2, d.r1) };
+  const noneLine = { kind: 'eq', math: `a=${d.r2}`, note: `Pour a = ${fq(d.r2)}, la dernière ligne devient 0 = ${fq(g2)}`, subgoal: 'discuss' };
+  const holed = facT.replace(/\(a[+-]\d\)$|a$/, '(□)');
+  const hints = [
+    { level: 1, html: 'Échelonne sans diviser par une expression en a, puis regarde la dernière ligne [0 0 f(a) | g(a)] : f(a) ≠ 0, unique ; f(a) = 0 et g(a) ≠ 0, aucune ; f(a) = g(a) = 0, une infinité.' },
+    { level: 2, html: `f(a) = ${holed} ; une infinité pour a = □ ; aucune pour a = □.` },
+    { level: 3, html: `f(a) = ${MT(facT)} ; une infinité pour a = ${fq(d.r1)} ; aucune pour a = ${fq(d.r2)} ; une solution unique sinon.` },
+  ];
+  const divDecision = {
+    kind: 'decision', prompt: `La dernière ligne est [0, 0, ${pR(d.f)} | ${pR(d.g)}]. Que fais-tu ?`, options: rng.shuffle([
+      { id: 'factor', label: 'Factoriser le pivot et traiter à part les valeurs qui l\'annulent', valid: true },
+      { id: 'divide', label: 'Diviser la ligne par le pivot pour avoir un 1', valid: false, rule: 'l_param_divide_zero', why: `Le pivot s'annule pour a = ${fq(d.r1)} et a = ${fq(d.r2)} : on ne divise pas par 0. On traite ces valeurs à part.` },
+    ]),
+  };
+  const judge = { kind: 'rowops', vars: ['a'], goal: 'echelon', multi: level >= 4 };
+  const tail = [factorSeg, ...(level === 2 ? [divDecision] : []), factorLine, infSeg, uniqueNote, infLine, noneSeg, noneLine];
+  const body = level <= 2 ? lines.map((l) => withCells(l, pickCells(l.rows, [l.op.i], level === 1 ? 2 : 3, rng))) : lines;
+  const script = [...body.map(({ rows, op, ...l }) => l), ...tail];
+  return matLines({
+    skill: PAR, level,
+    prompt: `Discute selon le paramètre réel a les solutions du système ${sys} ${level === 3 ? 'Choisis chaque opération de sa matrice augmentée, ' : 'Échelonne sa matrice augmentée sans diviser par une expression de a, '}factorise le dernier pivot, puis trouve les valeurs de a qui donnent une infinité de solutions, et celles qui n'en donnent aucune.`,
+    start: Atext, judge, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
+    hints, subgoals: PAR_SUB, key, tapActions: level === 3 ? 'rowops' : null, fallback: d.fallback, keys: ['mat', 'calc'],
+    // The baits of the row-operation traps, without replaying them (a CAS
+    // computation per entry in ℚ(a)).
+    baits: ['l_rhs_forgotten', 'l_rowop_sign', 'l_rowop_wrong_row', ...(d.ops.some((op) => op.k.length === 1 && Math.abs(op.k[0].valueOf()) !== 1) ? ['l_rowop_partial'] : []), ...(level === 2 ? ['l_param_divide_zero'] : []), 'l_param_none_vs_inf'],
+  });
+}
+
+function parExam(rng, exam) {
+  const d = parData(rng, { quad: rng.chance(0.6) });
+  const sys = systemP(d.A, VARS3);
+  const { r1, r2 } = d;
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which === 0) {
+      return tfL({
+        skill: PAR, key: 'finite', truth: true, exam: tag,
+        statement: 'Un système carré à paramètre a. S\'il a une solution unique pour a = 0, alors il a une solution unique pour tout a, sauf pour un nombre fini de valeurs.',
+        explanation: 'Vrai : det A(a) est un polynôme en a, non nul puisque det A(0) ≠ 0. Il n\'a qu\'un nombre fini de racines.',
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: PAR, key: `none:${pmt(d.A, 3)}`, truth: true, exam: tag, ruleIfFalse: 'l_param_none_vs_inf',
+        statement: `Pour a = ${fq(r2)}, le système ${sys} n'a aucune solution.`,
+        explanation: `Vrai : échelonné sans diviser, la dernière ligne est [0, 0, ${pR(d.f)} | ${pR(d.g)}]. Pour a = ${fq(r2)}, elle devient 0 = ${fq(peval(d.g, r2))}.`,
+      });
+    }
+    return tfL({
+      skill: PAR, key: `unique:${pmt(d.A, 3)}`, truth: false, exam: tag, ruleIfTrue: 'l_param_divide_zero',
+      statement: `Le système ${sys} a une solution unique pour tout a ≠ ${fq(r1)}.`,
+      counter: {
+        kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }], pred: `a=${r1} ∨ ${ptext(d.f)}≠0`,
+        ask: [{ v: 'a', label: 'a =' }], answer: { a: String(r2) },
+      },
+      explanation: `Faux : le dernier pivot vaut ${MT(factoredT(d.s, r1, r2))}, qui s'annule aussi pour a = ${fq(r2)}. Alors la dernière ligne devient 0 = ${fq(peval(d.g, r2))} : aucune solution.`,
+    });
+  }
+  if (exam === 'coef') {
+    const names = VARS3;
+    for (const a0 of rng.shuffle([-4, -3, -2, -1, 0, 1, 2, 3, 4, 5]).filter((x) => x !== r1 && x !== r2)) {
+      const M = atP(d.A, a0);
+      const inv = MX.inverse(M.map((r) => r.slice(0, 3)));
+      const x = MX.matVec(inv, M.map((r) => r[3]));
+      const j = [0, 1, 2].filter((k) => x[k].d <= 12 && Math.abs(x[k].valueOf()) <= 20).sort((u, v) => x[u].d - x[v].d)[0];
+      if (j === undefined) continue;
+      return coefItem({
+        skill: PAR, level: 4, prompt: `Soit le système ${sys} Pour a = ${fq(a0)}, il a une solution unique. Que vaut ${names[j]} ?`,
+        label: names[j], value: qt(x[j]), key: `${pmt(d.A, 3)}:${a0}:${j}`, exam: tag,
+        traps: [{ rule: 'l_rowop_sign' }],
+        solution: [{ html: `Pour a = ${fq(a0)} : ${systemP(d.A.map((r) => r.map((p) => pc(peval(p, a0)))), VARS3)}`, note: '' }, { html: `${names[j]} = ${fq(x[j])}`, note: '' }], fallback: d.fallback,
+      });
+    }
+  }
+  // mcq: one true statement, and three of the traps.
+  const S = (txt, set) => `Le système ${txt} si et seulement si a ${set}.`;
+  const INF = 'a une infinité de solutions';
+  const NONE = 'n\'a aucune solution';
+  const ONE = 'a une solution unique';
+  const ATLEAST = 'a au moins une solution';
+  const both = setR([Math.min(r1, r2), Math.max(r1, r2)]);
+  const trues = [S(INF, `= ${fq(r1)}`), S(NONE, `= ${fq(r2)}`), S(ONE, `∉ ${both}`), S(ATLEAST, `≠ ${fq(r2)}`)];
+  const swaps = [S(INF, `= ${fq(r2)}`), S(NONE, `= ${fq(r1)}`), S(ATLEAST, `≠ ${fq(r1)}`), S(NONE, `∈ ${both}`)];
+  const lost = [S(ONE, `≠ ${fq(r2)}`), S(ONE, `≠ ${fq(r1)}`)];
+  return mcqDistinct({
+    skill: PAR, level: 4, key: `mcq:${pmt(d.A, 3)}`, exam: tag,
+    prompt: `Soit a un paramètre réel et le système ${sys} Une seule affirmation est vraie :`,
+    right: rng.pick(trues),
+    wrongs: [{ html: rng.pick(swaps), rule: 'l_param_none_vs_inf' }, { html: rng.pick(lost), rule: 'l_param_divide_zero' }, { html: S(ATLEAST, `∉ ${both}`), rule: null }],
+    fillers: swaps.map((html) => ({ html, rule: 'l_param_none_vs_inf' })),
+    solution: [
+      { html: `Dernière ligne échelonnée : [0, 0, ${pR(d.f)} | ${pR(d.g)}]`, note: 'Sans diviser' },
+      { html: `a ∉ ${both} : unique ; a = ${fq(r1)} : une infinité ; a = ${fq(r2)} : aucune.`, note: '' },
+    ],
+  }, rng);
+}
+
+// ======================================================================
+// l-vec-span
+// ======================================================================
+
+const SPAN = 'l-vec-span';
+const SPAN_SUB = [
+  { id: 'cols', label: 'mettre en colonnes', skill: SPAN },
+  { id: 'echelon', label: 'échelonner', skill: ECH },
+  { id: 'conclude', label: 'conclure', skill: SPAN },
+];
+
+// The lines of an elimination by constant operations on a matrix whose
+// last column holds polynomials in h: rows of polynomials after each op.
+const constOps = (ops) => ops.map((op) => ({ i: op.i, j: op.j, k: pc(op.k) }));
+function lastZeroRow(left, col, ops) {
+  let rows = left.map((r, i) => [...r.map((x) => pc(x)), col[i]]);
+  for (const op of constOps(ops)) rows = applyP(rows, op);
+  return rows;
+}
+// The value of h that makes the zero rows consistent (one zero row), or null.
+function hRoot(rows, k) {
+  const zero = rows.filter((r) => r.slice(0, k).every((p) => !p.length));
+  if (zero.length !== 1) return null;
+  const p = zero[0][k];
+  if (pdeg(p) !== 1) return null;
+  return p[0].neg().div(p[1]);
+}
+
+// b = Vc (in), b = Vc + w with w ⊥ Col V (out), or one component of b
+// replaced by h (param: b ∈ Span ⇔ h = h*). V = M·[I; 0], M unimodular.
+function spanData(rng, level, { kind = 'in', n: n0, k: k0 } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const n = n0 ?? (level >= 4 && kind === 'in' ? rng.pick([3, 4]) : 3);
+    const k = k0 ?? (n === 4 && rng.chance(0.4) ? 3 : 2);
+    const { A: V, fallback } = rrefWith(n, k, [...Array(k).keys()], rng, { max: 3 });
+    if (fallback || V.flat().some((x) => Math.abs(x.valueOf()) > 5)) continue;
+    const c = Array.from({ length: k }, () => q(nz(rng, -3, 3)));
+    let b = MX.matVec(V, c);
+    if (kind === 'out') {
+      let w = MX.kernel(MX.transpose(V))[0];
+      const den = w.reduce((l, x) => (l * x.d) / gcd(l, x.d), 1);
+      w = w.map((x) => x.mul(den * rng.pick([1, -1])));
+      if (w.some((x) => Math.abs(x.valueOf()) > 3)) continue;
+      b = b.map((x, i) => x.add(w[i]));
+    }
+    if (b.some((x) => Math.abs(x.valueOf()) > 12) || b.every((x) => x.n === 0)) continue;
+    const M = V.map((r, i) => [...r, b[i]]);
+    const e = MX.echelon(M, { cols: k });
+    if (e.ops.length < 2 || e.ops.length > (level >= 4 ? 6 : 4)) continue;
+    if (e.ops.some((op) => op.kind === 'swap' || (op.k && op.k.d > 2))) continue;
+    let X = M;
+    let ok = true;
+    for (const op of e.ops) { X = MX.applyOp(X, op); if (X.flat().some((x) => x.d > 2 || Math.abs(x.valueOf()) > 15)) ok = false; }
+    if (!ok) continue;
+    const out = { V, c, b, M, ops: e.ops, E: e.E, n, k, kind };
+    if (kind === 'param') {
+      const p = rng.int(0, n - 1);
+      const col = b.map((x, i) => (i === p ? pc(0, 1) : pc(x)));
+      const rows = lastZeroRow(V, col, e.ops);
+      const h = hRoot(rows, k);
+      if (!h || !h.eq(b[p])) continue;
+      // The same with the sign of the first operation changed.
+      const bad = { ...e.ops[0], k: e.ops[0].k.neg() };
+      const left2 = MX.applyOp(V, bad);
+      const col2 = applyP(col.map((x) => [x]), { i: bad.i, j: bad.j, k: pc(bad.k) }).map((r) => r[0]);
+      const h2 = hRoot(lastZeroRow(left2, col2, MX.echelon(left2).ops), k);
+      return { ...out, p, h, col, signH: h2 && !h2.eq(h) ? h2 : null };
+    }
+    return out;
+  }
+  const V = MX.mat([[1, 1], [1, -1], [1, 2]]);
+  const b = MX.mat([[3, 1, 4]])[0];
+  const M = V.map((r, i) => [...r, b[i]]);
+  const e = MX.echelon(M, { cols: 2 });
+  return { V, c: [q(2), q(1)], b, M, ops: e.ops, E: e.E, n: 3, k: 2, kind: 'in', fallback: true };
+}
+function gcd(a, b) { return b ? gcd(b, a % b) : Math.abs(a); }
+
+const vName = (i) => `v${sub(i + 1)}`;
+const qabs = (x) => (x.n < 0 ? x.neg() : x);
+// The coefficients of a polynomial of P₂, the one of t^p written h.
+function polyH(cs, p, v = 't') {
+  const parts = [];
+  cs.forEach((c, k) => {
+    const mono = k === 0 ? '' : k === 1 ? v : `${v}${'⁰¹²³'[k]}`;
+    if (k === p) { parts.push({ neg: false, s: k === 0 ? 'h' : `h${mono}` }); return; }
+    if (c.n === 0) return;
+    const abs = c.n < 0 ? c.neg() : c;
+    parts.push({ neg: c.n < 0, s: `${k === 0 || !abs.eq(1) ? fq(abs) : ''}${mono}` });
+  });
+  if (!parts.length) return '0';
+  return parts.map((x, i) => (i === 0 ? `${x.neg ? '−' : ''}${x.s}` : ` ${x.neg ? '−' : '+'} ${x.s}`)).join('');
+}
+
+function spanItem(level, rng) {
+  const kind = level === 5 ? 'param' : level === 4 && rng.chance(0.25) ? 'out' : 'in';
+  const poly = kind !== 'out' && (level === 5 || level === 4) && rng.chance(0.4);
+  const d = spanData(rng, level, { kind, n: poly ? 3 : undefined, k: poly ? 2 : undefined });
+  const { k, n } = d;
+  const vars = d.kind === 'param' ? ['h'] : [];
+  const leftT = (r) => r.map(qt);
+  const Mtext = d.kind === 'param'
+    ? `[${d.V.map((r, i) => `[${leftT(r).join(',')}|${ptext(d.col[i], 'h')}]`).join(',')}]`
+    : mt(d.M, k);
+  const names = [...Array(k).keys()].map(vName);
+  const bText = d.kind === 'param' ? `(${d.col.map((p) => ptext(p, 'h')).join(' ; ')})` : vt(d.b);
+  const isPoly = poly && d.kind !== 'out' && n === 3;
+  const cols = MX.transpose(d.V);
+  const given = isPoly
+    ? `${cols.map((c0, i) => `p${sub(i + 1)} = ${polyR(c0)}`).join(', ')} et q = ${d.kind === 'param' ? polyH(d.b, d.p) : polyR(d.b)}`
+    : `${cols.map((c0, i) => `${vName(i)} = ${MLm(c0.map((x) => [x]))}`).join(', ')} et b = ${ML(bText, { vars })}`;
+  const target = isPoly ? 'q' : 'b';
+  const spanOf = isPoly ? `Span{${cols.map((_, i) => `p${sub(i + 1)}`).join(', ')}}` : `Span{${names.join(', ')}}`;
+  const key = `${SPAN}:${Mtext}`;
+  // Lines of the elimination (the last column with h in the param case).
+  let rows = d.V.map((r, i) => [...r.map((x) => pc(x)), d.kind === 'param' ? d.col[i] : pc(d.b[i])]);
+  const lines = d.ops.map((op) => {
+    const pop = { i: op.i, j: op.j, k: pc(op.k) };
+    rows = applyP(rows, pop);
+    return { kind: 'eq', math: `${opT(op)} : ${pmt(rows, k, 'h')}`, note: `Annuler sous le pivot : ${opR(op)}`, subgoal: 'echelon', rows, op };
+  });
+  const colsSeg = { kind: 'eq', math: Mtext, note: `${isPoly ? 'Les coefficients de chaque polynôme' : 'Les vecteurs'} en colonnes, ${target} après la barre`, subgoal: 'cols' };
+  const ech = { kind: 'segment', html: 'Échelonne cette matrice.', start: { math: Mtext }, judge: { kind: 'rowops', goal: 'echelon', vars, multi: level >= 4 } };
+  const last = rows.find((r) => r.slice(0, k).every((p) => !p.length) && r[k].length) ?? rows[rows.length - 1];
+  let concl;
+  if (d.kind === 'in') {
+    concl = [
+      { kind: 'segment', html: `Lis les poids : ${target} = ${[...Array(k).keys()].map((i) => `c${sub(i + 1)}${isPoly ? `p${sub(i + 1)}` : vName(i)}`).join(' + ')}.`, ask: `(${[...Array(k).keys()].map((i) => `c${sub(i + 1)}`).join(' ; ')}) =`, start: { math: 'c' }, judge: { kind: 'mat', expect: vt(d.c) } },
+      { kind: 'eq', math: vt(d.c), note: `${target} = ${d.c.map((x, i) => `${i ? (x.n < 0 ? ' − ' : ' + ') : x.n < 0 ? '−' : ''}${qabs(x).eq(1) ? '' : fq(qabs(x))}${isPoly ? `p${sub(i + 1)}` : vName(i)}`).join('')} : ${target} est dans le Span`, subgoal: 'conclude' },
+    ];
+  } else if (d.kind === 'out') {
+    concl = [
+      { kind: 'segment', html: 'Combien de solutions a ce système ?', ask: 'nombre de solutions =', start: { math: 'N' }, judge: { kind: 'value', expect: '0' } },
+      { kind: 'eq', math: '0', note: `La ligne [0 … 0 | ${fq(last[k][0] ?? q(0))}] se lit 0 = ${fq(last[k][0] ?? q(0))} : ${target} n'est pas dans ${spanOf}`, subgoal: 'conclude' },
+    ];
+  } else {
+    concl = [
+      { kind: 'segment', html: `Pour quelle valeur de h ${isPoly ? 'le polynôme q' : 'le vecteur b'} est-il dans ${spanOf} ?`, ask: 'h =', start: { math: 'h' }, judge: { kind: 'value', expect: qt(d.h) } },
+      { kind: 'eq', math: qt(d.h), note: `La ligne [0 0 | ${ptext(rows.find((r) => r.slice(0, k).every((p) => !p.length))[k], 'h').replace(/-/g, '−')}] doit se lire 0 = 0`, subgoal: 'conclude' },
+    ];
+  }
+  const firstAdd = lines[0];
+  const hints = [
+    { level: 1, html: `Mets ${isPoly ? 'les coefficients des polynômes' : 'les vecteurs'} en colonnes, et ${target} en dernière colonne : ${target} est dans le Span si et seulement si ce système est compatible.` },
+    { level: 2, html: `${opR(firstAdd.op)} : la ligne ${firstAdd.op.i + 1} devient ${rowHoles(MX.applyOp(d.M, firstAdd.op), firstAdd.op.i, k)}.` },
+    { level: 3, html: `${ML(Mtext, { vars })} ; ${concl[concl.length - 1].note}.` },
+  ];
+  const decision = {
+    kind: 'decision', prompt: 'Comment ranger les données dans la matrice ?', options: rng.shuffle([
+      { id: 'cols', label: `${isPoly ? 'Les coefficients de chaque polynôme' : 'Chaque vecteur'} en colonne, ${target} en dernière colonne`, valid: true },
+      { id: 'rows', label: `${isPoly ? 'Les coefficients de chaque polynôme' : 'Chaque vecteur'} en ligne, ${target} en dernière ligne`, valid: false, rule: 'l_matrix_rows_cols', why: `On cherche des poids c avec c₁${isPoly ? 'p₁' : 'v₁'} + c₂${isPoly ? 'p₂' : 'v₂'} = ${target} : chaque équation porte sur une composante, donc chaque ${isPoly ? 'polynôme' : 'vecteur'} est une colonne.` },
+    ]),
+  };
+  const body = level <= 2 ? lines.map((l) => withCells(l, pickCells(l.rows, [l.op.i], level === 1 ? 2 : 3, rng))) : lines;
+  const script = [
+    ...(level === 2 ? [decision] : []),
+    level === 1 ? withCells(colsSeg, pickCells(d.M, [...Array(n).keys()], 2, rng)) : colsSeg,
+    ech, ...body.map(({ rows: r0, op, ...l }) => l), ...concl,
+  ];
+  const ask = d.kind === 'param' ? `Pour quelle valeur de h ${isPoly ? 'le polynôme q' : 'le vecteur b'} appartient-il à ${spanOf} ?` : `${target} appartient-il à ${spanOf} ? Si oui, avec quels poids ?`;
+  return matLines({
+    skill: SPAN, level,
+    prompt: `Soit ${given}. ${ask} ${level === 3 ? 'Écris la matrice, puis choisis chaque opération.' : 'Écris la matrice du système, échelonne-la, puis conclus.'}`,
+    start: 'Matrice', judge: { kind: 'mat', expect: Mtext, vars, rowsCols: true }, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
+    hints, subgoals: SPAN_SUB, key, tapActions: level === 3 ? 'rowops' : null, fallback: d.fallback,
+  });
+}
+
+function spanExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.int(0, 3);
+    if (which === 0) {
+      return tfL({
+        skill: SPAN, key: 'subspace', truth: true, exam: tag,
+        statement: 'Si un sous-espace H contient p et q, alors il contient p + q et 3p − 2q.',
+        explanation: 'Vrai : un sous-espace est stable par somme et par multiplication par un nombre, donc par toute combinaison linéaire.',
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: SPAN, key: 'zero', truth: true, exam: tag,
+        statement: 'Le vecteur nul appartient à Span{v₁, …, v_k}, quels que soient v₁, …, v_k.',
+        explanation: 'Vrai : 0 = 0·v₁ + … + 0·v_k.',
+      });
+    }
+    if (which === 2) {
+      return tfL({
+        skill: SPAN, key: 'ax', truth: true, exam: tag,
+        statement: 'Pour une matrice A de taille m × n et x dans ℝⁿ, Ax est une combinaison linéaire des colonnes de A.',
+        explanation: 'Vrai : Ax = x₁a₁ + … + xₙaₙ, où a₁, …, aₙ sont les colonnes de A.',
+      });
+    }
+    return tfL({
+      skill: SPAN, key: 'plane', truth: false, exam: tag,
+      statement: 'Pour deux vecteurs u et v de ℝ³, Span{u, v} est toujours un plan.',
+      counter: { kind: 'vecFamily', params: { want: 'spanNotPlane' }, ask: [{ v: 'F', label: 'u, v =' }], answer: { F: '(1 ; 0 ; 0), (2 ; 0 ; 0)' } },
+      explanation: 'Faux : si v = 2u, Span{u, v} = Span{u} est une droite (et un point si u = v = 0).',
+    });
+  }
+  const d = spanData(rng, 4, { kind: 'param', n: 3, k: 2 });
+  const isPoly = rng.chance(0.5);
+  const cols = MX.transpose(d.V);
+  const given = isPoly
+    ? `${cols.map((c0, i) => `p${sub(i + 1)} = ${polyR(c0)}`).join(', ')} et q = ${polyH(d.b, d.p)}`
+    : `${cols.map((c0, i) => `${vName(i)} = ${MLm(c0.map((x) => [x]))}`).join(', ')} et b = ${ML(`(${d.col.map((p) => ptext(p, 'h')).join(' ; ')})`, { vars: ['h'] })}`;
+  const target = isPoly ? 'q' : 'b';
+  const spanOf = isPoly ? 'Span{p₁, p₂}' : 'Span{v₁, v₂}';
+  const right = d.h;
+  const sumC = d.c.reduce((s, x) => s.add(x), q(0));
+  return mcqDistinct({
+    skill: SPAN, level: 4, key: `mcq:${mt(d.M, 2)}:${d.p}`, exam: tag,
+    prompt: `Soit ${given}. ${target} appartient à ${spanOf} lorsque h =`,
+    right: fq(right),
+    wrongs: [d.signH ? { html: fq(d.signH), rule: 'l_rowop_sign' } : null, { html: fq(sumC), rule: null }].filter(Boolean),
+    fillers: [{ html: fq(right.neg()) }, { html: fq(right.add(1)) }, { html: fq(right.sub(1)) }, { html: fq(right.add(2)) }],
+    solution: [{ html: `${target} = ${d.c.map((x, i) => `${i && x.n > 0 ? '+' : ''}${fq(x)}·${isPoly ? `p${sub(i + 1)}` : vName(i)}`).join(' ')} pour h = ${fq(right)}`, note: 'Le système [v₁ v₂ | b] est compatible' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-vec-indep
+// ======================================================================
+
+const IND = 'l-vec-indep';
+const IND_SUB = [
+  { id: 'cols', label: 'vecteurs en colonnes', skill: IND },
+  { id: 'echelon', label: 'échelonner', skill: ECH },
+  { id: 'discuss', label: 'discuter', skill: PAR },
+  { id: 'relation', label: 'relation', skill: IND },
+];
+
+// Free: V = M·[I; 0]. Linked: v₃ = c₁v₁ + c₂v₂. Kernel vector (c₁ ; c₂ ; −1).
+function indData(rng, level, { dep, n: n0 } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const n = n0 ?? (level >= 4 ? rng.pick([3, 4]) : 3);
+    let V;
+    let rel = null;
+    if (dep) {
+      const { A, fallback } = rrefWith(n, 2, [0, 1], rng, { max: 3 });
+      if (fallback) continue;
+      const c = [nz(rng, -2, 2), nz(rng, -2, 2)];
+      V = A.map((r) => [r[0], r[1], r[0].mul(c[0]).add(r[1].mul(c[1]))]);
+      rel = c[0] < 0 ? [q(-c[0]), q(-c[1]), q(1)] : [q(c[0]), q(c[1]), q(-1)];
+    } else {
+      const { A, fallback } = rrefWith(n, 3, [0, 1, 2], rng, { max: 3 });
+      if (fallback) continue;
+      V = A;
+    }
+    if (V.flat().some((x) => Math.abs(x.valueOf()) > 6)) continue;
+    if (MX.transpose(V).some((c) => c.every((x) => x.n === 0))) continue;
+    const e = MX.echelon(V);
+    if (e.ops.length < 2 || e.ops.length > (level >= 4 ? 6 : 4)) continue;
+    if (e.ops.some((op) => op.kind === 'swap' || (op.k && op.k.d > 2))) continue;
+    let X = V;
+    let ok = true;
+    for (const op of e.ops) { X = MX.applyOp(X, op); if (X.flat().some((x) => x.d > 2 || Math.abs(x.valueOf()) > 15)) ok = false; }
+    if (!ok) continue;
+    return { V, ops: e.ops, E: e.E, n, dep: !!dep, rel, rank: e.pivots.length };
+  }
+  const V = MX.mat([[1, 2, 4], [0, 1, 1], [1, 3, 5]]);
+  return { V, ...MX.echelon(V), n: 3, dep: true, rel: [q(2), q(1), q(-1)], rank: 2, fallback: true };
+}
+
+// Pivots 1, σ(a − r₁), τ(a − r₂): A = L·E, L unit lower (its (3, 1)
+// entry may hold a). Linked ⇔ a ∈ {r₁ ; r₂}.
+function indParam(rng) {
+  for (let t = 0; t < 200; t++) {
+    const [r1, r2] = rng.shuffle([-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7]).slice(0, 2);
+    if (Math.abs(r1) > 3 && Math.abs(r2) > 3) continue;
+    const E = [
+      [pc(1), pc(rng.int(-2, 2)), pc(rng.int(-2, 2))],
+      [[], pscale(pc(-r1, 1), rng.pick([1, -1])), pc(rng.int(-3, 3))],
+      [[], [], pscale(pc(-r2, 1), rng.pick([1, -1]))],
+    ];
+    const l21 = pc(rng.pick([0, 1, -1, 2]));
+    const l31 = rng.chance(0.5) ? pc(rng.int(-1, 1), rng.pick([1, -1])) : pc(rng.pick([1, -1, 2, 0]));
+    const l32 = pc(rng.pick([1, -1, 2, -2]));
+    const A = [E[0], E[1].map((x, j) => padd(x, pmul(l21, E[0][j]))), E[2].map((x, j) => padd(padd(x, pmul(l31, E[0][j])), pmul(l32, E[1][j])))];
+    if (A.flat().some((p) => pdeg(p) > 1 || p.some((c) => Math.abs(c.valueOf()) > 7))) continue;
+    const withA = A.flat().filter((p) => pdeg(p) >= 1).length;
+    if (withA < 2 || withA > 5) continue;
+    if (MX.transpose(A).some((c) => c.every((p) => !p.length))) continue;
+    const el = elimP(A);
+    if (!el || el.ops.length < 2) continue;
+    if (el.steps.flat(2).some((p) => pdeg(p) > 2 || p.some((c) => c.d !== 1 || Math.abs(c.valueOf()) > 12))) continue;
+    if (MX.rank(atP(A, r1)) === 3 || MX.rank(atP(A, r2)) === 3 || MX.rank(atP(A, 11)) !== 3) continue;
+    return { A, ...el, r1, r2 };
+  }
+  const A = [[pc(1), pc(2), pc(1)], [[], pc(0, 1), pc(3)], [pc(0, 1), [], pc(1)]];
+  return { A, ...elimP(A), r1: 0, r2: 7, fallback: true };
+}
+
+const D_NAMES = { R: 'v', P: 'p', M: 'M' };
+// The family as the student reads it: vectors of ℝⁿ, polynomials of P₂ or
+// P₃ (coordinates in 1, t, t², t³), matrices of M₂ₓ₂ (row by row).
+function familyHtml(cols, shape) {
+  return cols.map((c, i) => {
+    const name = `${D_NAMES[shape]}${sub(i + 1)}`;
+    if (shape === 'P') return `${name} = ${polyR(c)}`;
+    if (shape === 'M') return `${name} = ${MLm([[c[0], c[1]], [c[2], c[3]]])}`;
+    return `${name} = ${MLm(c.map((x) => [x]))}`;
+  }).join(', ');
+}
+
+function indItem(level, rng) {
+  if (level === 5) return indParamItem(level, rng);
+  const dep = rng.chance(0.55);
+  const d = indData(rng, level, { dep });
+  const n = d.n;
+  const shape = level >= 4 ? rng.pick(['R', 'P', n === 4 ? 'M' : 'P']) : level === 3 ? 'R' : rng.pick(['R', 'R', 'P']);
+  const cols = MX.transpose(d.V);
+  const Vtext = mt(d.V);
+  const name = (i) => `${D_NAMES[shape]}${sub(i + 1)}`;
+  const key = `${IND}:${Vtext}`;
+  const lines = opLines(d.V, d.ops, { note: (op) => `Annuler sous le pivot : ${opR(op)}`, subgoal: 'echelon' });
+  const writeLine = { kind: 'eq', math: Vtext, note: shape === 'R' ? 'Les vecteurs en colonnes' : shape === 'P' ? 'Les coefficients (1, t, t²…) en colonnes' : 'Les coefficients, ligne par ligne, en colonnes', subgoal: 'cols' };
+  const ech = { kind: 'segment', html: 'Échelonne cette matrice.', start: { math: Vtext }, judge: { kind: 'rowops', goal: 'echelon', multi: level >= 4 } };
+  const verdict = {
+    kind: 'decision', prompt: 'La famille est-elle libre ?', options: [
+      { id: 'free', label: 'Libre : un pivot dans chaque colonne', valid: !d.dep, why: d.dep ? 'La 3e colonne n\'a pas de pivot : il y a une variable libre, donc une relation non nulle.' : undefined },
+      { id: 'dep', label: 'Liée : une colonne sans pivot', valid: d.dep, why: d.dep ? undefined : 'Chaque colonne a un pivot : [v₁ v₂ v₃]x = 0 n\'a que la solution nulle.' },
+    ],
+  };
+  const relText = (r) => r.map((x, i) => `${i ? (x.n < 0 ? ' − ' : ' + ') : x.n < 0 ? '−' : ''}${qabs(x).eq(1) ? '' : fq(qabs(x))}${name(i)}`).join('');
+  const concl = d.dep
+    ? [{ kind: 'segment', html: `Donne une relation c₁${name(0)} + c₂${name(1)} + c₃${name(2)} = 0, avec des cᵢ non tous nuls.`, ask: '(c₁ ; c₂ ; c₃) =', start: { math: 'c' }, judge: { kind: 'span', basis: [vt(d.rel)], require: 'basis' } },
+      ...(level >= 2 ? [verdict] : [{ kind: 'note', html: 'La 3e colonne n\'a pas de pivot : la famille est liée.' }]),
+      { kind: 'eq', math: vt(d.rel), note: `${relText(d.rel)} = 0`, subgoal: 'relation' }]
+    : [{ kind: 'segment', html: 'Combien de pivots ?', ask: 'nombre de pivots =', start: { math: 'r' }, judge: { kind: 'value', expect: '3' } },
+      ...(level >= 2 ? [verdict] : [{ kind: 'note', html: 'Un pivot dans chaque colonne : la famille est libre.' }]),
+      { kind: 'eq', math: '3', note: 'Un pivot dans chaque colonne : libre', subgoal: 'relation' }];
+  const method = {
+    kind: 'decision', prompt: 'Quelle méthode ?', options: rng.shuffle([
+      { id: 'gauss', label: 'Échelonner la matrice des vecteurs (en colonnes)', valid: true },
+      ...(n === 3 ? [{ id: 'det', label: 'Calculer le déterminant de cette matrice', valid: true, quality: 'poor', why: 'Juste aussi pour une matrice carrée, mais si la famille est liée, le déterminant ne donne pas la relation.' }] : []),
+      { id: 'pairs', label: 'Vérifier que les vecteurs sont deux à deux non colinéaires', valid: false, why: 'Ça ne suffit pas : trois vecteurs peuvent être liés sans que deux soient colinéaires, comme (1 ; 0), (0 ; 1) et (1 ; 1).' },
+    ]),
+  };
+  const hints = [
+    { level: 1, html: 'Libre ⇔ un pivot dans chaque colonne de la matrice des vecteurs (en colonnes).' },
+    { level: 2, html: `${opR(lines[0].op)} : la ligne ${lines[0].op.i + 1} devient ${rowHoles(lines[0].result, lines[0].op.i)}.` },
+    { level: 3, html: d.dep ? `Forme échelonnée ${MLm(d.E)} : la 3e colonne n'a pas de pivot ; ${relText(d.rel)} = 0.` : `Forme échelonnée ${MLm(d.E)} : trois pivots, la famille est libre.` },
+  ];
+  const fam = familyHtml(cols, shape);
+  if (level === 1) {
+    const script = [...lines.map((l) => withCells(l, pickCells(l.result, [l.op.i], 2, rng))), ...concl];
+    return matLines({
+      skill: IND, level, prompt: `La famille ${fam} est-elle libre ? Échelonne la matrice de ses vecteurs, puis conclus.`,
+      start: Vtext, judge: ech.judge, mode: 'guided', script, hints, subgoals: IND_SUB, key, fallback: d.fallback,
+    });
+  }
+  const body = level === 2 ? lines.map((l) => withCells(l, pickCells(l.result, [l.op.i], 3, rng))) : lines;
+  const script = [...(level === 2 ? [method] : []), writeLine, ech, ...body, ...concl];
+  return matLines({
+    skill: IND, level,
+    prompt: `La famille ${fam} est-elle libre ? Si elle est liée, donne une relation entre ses éléments.${level === 3 ? ' Choisis chaque opération.' : ''}`,
+    start: 'Matrice', judge: { kind: 'mat', expect: Vtext, rowsCols: true }, mode: level === 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
+    hints, subgoals: IND_SUB, key, tapActions: level === 3 ? 'rowops' : null, fallback: d.fallback,
+  });
+}
+
+function indParamItem(level, rng) {
+  const d = indParam(rng);
+  const cols = MX.transpose(d.A);
+  const Atext = pmt(d.A);
+  const fam = cols.map((c, i) => `${vName(i)} = ${ML(`(${c.map((p) => ptext(p)).join(' ; ')})`, { vars: ['a'] })}`).join(', ');
+  const lines = d.ops.map((op, k) => ({ kind: 'eq', math: `${popT(op)} : ${pmt(d.steps[k])}`, note: `Échelonner sans diviser : ${popR(op)}`, subgoal: 'echelon' }));
+  const set = [Math.min(d.r1, d.r2), Math.max(d.r1, d.r2)];
+  const script = [
+    { kind: 'eq', math: Atext, note: 'Les vecteurs en colonnes', subgoal: 'cols' },
+    { kind: 'segment', html: 'Échelonne sans diviser par une expression de a.', start: { math: Atext }, judge: { kind: 'rowops', vars: ['a'], goal: 'echelon', multi: true } },
+    ...lines,
+    { kind: 'segment', html: 'Pour quelles valeurs de a la famille est-elle liée ?', ask: 'a :', start: { math: 'S' }, judge: { kind: 'solset', v: 'a', sets: { S: `{${set.join(';')}}` } } },
+    { kind: 'eq', math: `a=${set[0]} ou a=${set[1]}`, note: `Les pivots ${pR(d.E[1][1])} et ${pR(d.E[2][2])} s'annulent`, subgoal: 'discuss' },
+  ];
+  return matLines({
+    skill: IND, level, prompt: `Pour quelles valeurs du paramètre a la famille ${fam} est-elle liée ?`,
+    start: 'Matrice', judge: { kind: 'mat', expect: Atext, vars: ['a'], rowsCols: true }, mode: 'free', script,
+    hints: [], subgoals: IND_SUB, key: `${IND}:${Atext}`, fallback: d.fallback,
+  });
+}
+
+function indExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.int(0, 3);
+    if (which === 0) {
+      return tfL({
+        skill: IND, key: 'scaled', truth: false, exam: tag, ruleIfTrue: 'l_indep_scaled',
+        statement: 'Si v₁, …, v_k sont linéairement indépendants et α₁, …, α_k sont des réels, alors α₁v₁, …, α_kv_k sont linéairement indépendants.',
+        counter: { kind: 'vecFamily', params: { want: 'scaledDependent' }, ask: [{ v: 'F', label: 'v₁, v₂ =' }, { v: 'alpha', label: 'α₁ ; α₂ =' }], answer: { F: '(1 ; 0), (0 ; 1)', alpha: '0 ; 1' } },
+        explanation: 'Faux : avec α₁ = 0, la famille contient le vecteur nul, elle est liée.',
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: IND, key: 'subfamily', truth: true, exam: tag,
+        statement: 'Toute sous-famille non vide d\'une famille libre est libre.',
+        explanation: 'Vrai : une relation entre quelques vecteurs serait aussi une relation de toute la famille (les autres avec un coefficient 0).',
+      });
+    }
+    if (which === 2) {
+      return tfL({
+        skill: IND, key: 'four', truth: true, exam: tag,
+        statement: 'Quatre vecteurs de ℝ³ sont toujours linéairement dépendants.',
+        explanation: 'Vrai : la matrice 3 × 4 a au plus 3 pivots, donc une colonne sans pivot.',
+      });
+    }
+    return tfL({
+      skill: IND, key: 'pairwise', truth: false, exam: tag,
+      statement: 'Si trois vecteurs sont deux à deux non colinéaires, ils sont linéairement indépendants.',
+      counter: { kind: 'vecFamily', params: { want: 'pairwiseFreeDependent' }, ask: [{ v: 'F', label: 'v₁, v₂, v₃ =' }], answer: { F: '(1 ; 0), (0 ; 1), (1 ; 1)' } },
+      explanation: 'Faux : (1 ; 0), (0 ; 1) et (1 ; 1) ne sont pas colinéaires deux à deux, mais v₃ = v₁ + v₂.',
+    });
+  }
+  const d = indParam(rng);
+  const cols = MX.transpose(d.A);
+  const fam = cols.map((c, i) => `${vName(i)} = ${ML(`(${c.map((p) => ptext(p)).join(' ; ')})`, { vars: ['a'] })}`).join(', ');
+  const set = (xs) => `a ∈ ${setR([...new Set(xs)].sort((x, y) => x - y))}`;
+  return mcqDistinct({
+    skill: IND, level: 4, key: `mcq:${pmt(d.A)}`, exam: tag,
+    prompt: `Les vecteurs ${fam} sont linéairement dépendants si et seulement si`,
+    right: set([d.r1, d.r2]),
+    wrongs: [{ html: set([d.r2]), rule: 'l_param_divide_zero' }, { html: set([-d.r1, -d.r2]), rule: 'l_rowop_sign' }],
+    fillers: [{ html: set([d.r1]) }, { html: set([d.r1, d.r2, d.r1 + d.r2]) }, { html: set([d.r1 + 1, d.r2 + 1]) }],
+    solution: [{ html: `Échelonnée : ${ML(pmt(d.E), { vars: ['a'] })}`, note: 'Sans diviser' }, { html: `Pivots nuls pour a = ${fq(d.r1)} ou a = ${fq(d.r2)}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-sys-pivots-theory
+// ======================================================================
+
+const PIV = 'l-sys-pivots-theory';
+const PIV_SUB = [
+  { id: 'read', label: 'lire les pivots', skill: ECH },
+  { id: 'conclude', label: 'conclure', skill: PIV },
+];
+const sz = (m, n) => `${m} × ${n}`;
+
+// A random echelon matrix m × n with r pivots (first in column 1).
+function echelonOf(rng, m, n, r) {
+  for (let t = 0; t < 50; t++) {
+    const cols = [0, ...rng.shuffle([...Array(n).keys()].slice(1)).slice(0, r - 1)].sort((a, b) => a - b);
+    const E = MX.zeros(m, n);
+    cols.forEach((c, i) => {
+      E[i][c] = q(rng.pick([1, 2, -1, 3, -2]));
+      for (let j = c + 1; j < n; j++) E[i][j] = q(rng.int(-3, 4));
+    });
+    if (MX.rank(E) === r) return E;
+  }
+  return MX.identity(m).map((row) => [...row, ...Array(n - m).fill(q(0))]).slice(0, m).map((row) => row.slice(0, n));
+}
+
+// The four conclusions about Ax = b, from pivots in every row (all b) and
+// in every column (at most one solution).
+const EXIST = [
+  'Ax = b a une solution pour tout b, et elle est unique.',
+  'Ax = b a une solution pour tout b, mais pas unique : une infinité.',
+  'Ax = b n\'a pas de solution pour certains b ; quand il en a une, elle est unique.',
+  'Ax = b n\'a pas de solution pour certains b ; quand il en a, il en a une infinité.',
+];
+const existIndex = (rows, cols) => (rows ? (cols ? 0 : 1) : cols ? 2 : 3);
+function existOptions(m, n, r) {
+  const rows = r === m;
+  const cols = r === n;
+  const right = existIndex(rows, cols);
+  const swapped = existIndex(cols, rows);
+  return EXIST.map((html, i) => ({ html, correct: i === right, rule: i !== right && i === swapped ? 'l_inj_rows' : null }));
+}
+const existWhy = (m, n, r) => `${r} pivot${r > 1 ? 's' : ''} : ${r === m ? `un dans chacune des ${m} lignes, donc une solution pour tout b` : `${m - r} ligne${m - r > 1 ? 's' : ''} sans pivot, donc pas de solution pour certains b`} ; ${r === n ? `un dans chacune des ${n} colonnes, donc au plus une solution` : `${n - r} colonne${n - r > 1 ? 's' : ''} sans pivot (variable${n - r > 1 ? 's' : ''} libre${n - r > 1 ? 's' : ''}), donc une infinité dès qu'il y en a une`}.`;
+
+// The statements of the catalogue (2018 Q6, Q8 ; 2019 Q8 ; série de
+// révision): text, truth, reason ('rows' | 'cols' | 'sizes'), counter.
+function pivStatements(rng) {
+  const [m1, n1] = rng.pick([[2, 3], [3, 4], [3, 5], [2, 4], [4, 6]]);
+  const [m2, n2] = rng.pick([[3, 2], [4, 3], [5, 3], [4, 2]]);
+  const wideCounter = {
+    kind: 'matOne', params: { want: 'kerNoSolution', wide: true },
+    ask: [{ v: 'A', label: 'A =', shape: [2, 3] }, { v: 'b', label: 'b =', shape: [2, 1] }],
+    answer: { A: '[[1,1,1],[0,0,0]]', b: '(0 ; 1)' },
+  };
+  const ontoNotInj = { kind: 'matOne', params: { want: 'pivots', rowsAll: true, colsAll: false }, ask: [{ v: 'A', label: 'A =' }], answer: { A: '[[1,0,0],[0,1,0]]' } };
+  const injNotOnto = { kind: 'matOne', params: { want: 'pivots', rowsAll: false, colsAll: true }, ask: [{ v: 'A', label: 'A =' }], answer: { A: '[[1,0],[0,1],[0,0]]' } };
+  return [
+    { id: 'wide-all', truth: false, reason: 'rows', counter: wideCounter, text: `Soit A de taille ${sz(m1, n1)}. Alors Ax = b a au moins une solution pour tout b.`, why: `Au plus ${m1} pivots, et il en faudrait un dans chaque ligne, ce qui n'est pas garanti : A = [[1, 1, 1], [0, 0, 0]] et b = (0 ; 1).` },
+    { id: 'wide-zero', truth: true, reason: 'sizes', text: `Soit A de taille ${sz(m1, n1)}. Alors Ax = 0 a une infinité de solutions.`, why: `Au plus ${m1} pivots pour ${n1} colonnes : au moins ${n1 - m1} variable${n1 - m1 > 1 ? 's' : ''} libre${n1 - m1 > 1 ? 's' : ''}, et Ax = 0 a toujours la solution 0.` },
+    { id: 'all-ker', truth: false, reason: 'cols', counter: ontoNotInj, ruleIfTrue: 'l_inj_rows', text: 'Si Ax = b a une solution pour tout b, alors Ax = 0 n\'a que la solution triviale.', why: 'Un pivot dans chaque ligne ne donne pas un pivot dans chaque colonne : A = [[1, 0, 0], [0, 1, 0]] a une solution pour tout b, mais x₃ est libre.' },
+    { id: 'span-ker', truth: false, reason: 'cols', counter: ontoNotInj, ruleIfTrue: 'l_inj_rows', text: 'Si les colonnes de A engendrent ℝᵐ, alors Ax = 0 n\'a que la solution triviale.', why: 'Les colonnes engendrent ℝᵐ ⇔ un pivot dans chaque ligne ; l\'unicité demande un pivot dans chaque colonne. A = [[1, 0, 0], [0, 1, 0]].' },
+    { id: 'ker-all', truth: false, reason: 'rows', counter: injNotOnto, ruleIfTrue: 'l_inj_rows', text: 'Si Ax = 0 n\'a que la solution triviale, alors Ax = b a une solution pour tout b.', why: 'Un pivot dans chaque colonne ne donne pas un pivot dans chaque ligne : A = [[1, 0], [0, 1], [0, 0]] et b = (0 ; 0 ; 1).' },
+    { id: 'tall', truth: true, reason: 'sizes', text: `Soit A de taille ${sz(m2, n2)}. Alors il existe un b pour lequel Ax = b n'a pas de solution.`, why: `Au plus ${n2} pivots pour ${m2} lignes : une ligne au moins n'a pas de pivot.` },
+    { id: 'square', truth: true, reason: 'cols', text: 'Si A est carrée et que Ax = 0 n\'a que la solution triviale, alors Ax = b a une solution unique pour tout b.', why: 'Un pivot dans chaque colonne d\'une matrice carrée, c\'est aussi un pivot dans chaque ligne.' },
+    { id: 'tall-unique', truth: false, reason: 'cols', counter: { kind: 'matOne', params: { want: 'pivots', colsAll: false, shape: 'tall' }, ask: [{ v: 'A', label: 'A =' }], answer: { A: '[[1,1],[1,1],[1,1]]' } }, text: 'Si A a plus de lignes que de colonnes, Ax = b a au plus une solution.', why: 'Les tailles ne disent rien des colonnes : A = [[1, 1], [1, 1], [1, 1]] et b = 0 donnent une infinité de solutions.' },
+    { id: 'two', truth: true, reason: 'cols', text: 'Si Ax = b a deux solutions distinctes, alors Ax = 0 a une infinité de solutions.', why: 'Leur différence u − v ≠ 0 vérifie A(u − v) = 0 : une colonne sans pivot, donc une variable libre.' },
+    { id: 'cols-square', truth: false, reason: 'sizes', counter: { kind: 'dims', params: { conds: ['r=n', 'm≠n'] }, ask: [{ v: 'm', label: 'm =' }, { v: 'n', label: 'n =' }, { v: 'r', label: 'rang =' }], answer: { m: '3', n: '2', r: '2' } }, text: 'Si A a un pivot dans chaque colonne, alors A est carrée.', why: 'Une matrice 3 × 2 de rang 2 a un pivot dans chaque colonne.' },
+    { id: 'unique-square', truth: true, reason: 'sizes', text: 'Si Ax = b a une solution unique pour tout b, alors A est carrée.', why: 'Il faut un pivot dans chaque ligne et dans chaque colonne : m = rang = n.' },
+  ];
+}
+
+const REASONS = {
+  rows: 'tout dépend des pivots dans les lignes',
+  cols: 'tout dépend des pivots dans les colonnes',
+  sizes: 'les tailles suffisent à conclure',
+};
+const pivTf = (s, o) => tfL({
+  skill: PIV, key: s.id, truth: s.truth, counter: s.truth ? null : s.counter,
+  ruleIfTrue: s.truth ? null : s.ruleIfTrue ?? null, ruleIfFalse: s.truth ? s.ruleIfFalse ?? null : null,
+  statement: s.text, explanation: `${s.truth ? 'Vrai' : 'Faux'} : ${s.why[0].toLowerCase()}${s.why.slice(1)}`, ...o,
+});
+
+function pivItem(level, rng) {
+  if (level <= 2) {
+    const [m, n] = rng.pick([[3, 3], [3, 4], [4, 3], [3, 5], [2, 4], [4, 4], [4, 2]]);
+    const r = rng.int(Math.max(1, Math.min(m, n) - 1), Math.min(m, n));
+    const E = echelonOf(rng, m, n, r);
+    const prompt = level === 1
+      ? `A est de taille ${sz(m, n)}, et ${MLm(E)} est une forme échelonnée de A. Compte les pivots par ligne et par colonne. Que peut-on dire de l'équation Ax = b ?`
+      : `A est de taille ${sz(m, n)} et de rang ${r} (${r} pivot${r > 1 ? 's' : ''}). Que peut-on dire de l'équation Ax = b ?`;
+    return {
+      ...mcq({ skill: PIV, level, prompt, key: `${PIV}:${level}:${m}${n}${r}:${level === 1 ? mt(E) : ''}`, options: existOptions(m, n, r), keepOrder: true, solution: [{ html: existWhy(m, n, r), note: '' }] }, rng),
+      subgoals: PIV_SUB,
+    };
+  }
+  const all = pivStatements(rng);
+  const s = rng.pick(all);
+  if (level === 3) {
+    const reasons = Object.keys(REASONS);
+    const opts = [];
+    const add = (truth, reason, rule) => { if (!opts.some((o) => o.truth === truth && o.reason === reason)) opts.push({ truth, reason, rule }); };
+    add(s.truth, s.reason, null);
+    add(!s.truth, s.reason, s.truth ? s.ruleIfFalse ?? null : s.ruleIfTrue ?? null);
+    const other = rng.pick(reasons.filter((x) => x !== s.reason));
+    add(s.truth, other, (other === 'rows' && s.reason === 'cols') || (other === 'cols' && s.reason === 'rows') ? 'l_inj_rows' : null);
+    add(!s.truth, rng.pick(reasons.filter((x) => x !== s.reason && x !== other)), null);
+    const options = opts.map((o, i) => ({ html: `${o.truth ? 'Vrai' : 'Faux'} : ${REASONS[o.reason]}.`, correct: i === 0, rule: o.rule }));
+    return {
+      ...mcq({ skill: PIV, level, prompt: `Vrai ou faux, et pourquoi ? « ${s.text} »`, key: `${PIV}:why:${s.id}`, options, solution: [{ html: `${s.truth ? 'Vrai' : 'Faux'} : ${s.why}`, note: '' }] }, rng),
+      subgoals: PIV_SUB,
+    };
+  }
+  const hints = [
+    { level: 1, html: 'Existence pour tout b : un pivot dans chaque ligne. Unicité : un pivot dans chaque colonne. Il y a au plus min(m, n) pivots.' },
+    { level: 2, html: 'Combien de pivots au plus ? □ ; combien de lignes ? □ ; de colonnes ? □. Si c\'est faux, cherche une petite matrice qui le montre.' },
+    { level: 3, html: `${s.truth ? 'Vrai' : 'Faux'} : ${s.why}` },
+  ];
+  if (level === 4 && rng.chance(0.3)) {
+    const ex = rng.pick([
+      { key: 'wide', prompt: 'Donne une matrice A de taille 2 × 3 et un vecteur b de ℝ² tels que Ax = 0 ait une infinité de solutions mais que Ax = b n\'en ait aucune.', property: { kind: 'matOne', params: { want: 'kerNoSolution', wide: true, n: 2, cols: 3 }, ask: [{ v: 'A', label: 'A =', shape: [2, 3] }, { v: 'b', label: 'b =', shape: [2, 1] }], answer: { A: '[[1,2,0],[2,4,0]]', b: '(1 ; 0)' } } },
+      { key: 'onto', prompt: 'Donne une matrice A de taille 2 × 3 telle que Ax = b ait une solution pour tout b, sans que la solution soit unique.', property: { kind: 'matOne', params: { want: 'pivots', rowsAll: true, colsAll: false, n: 2, cols: 3 }, ask: [{ v: 'A', label: 'A =', shape: [2, 3] }], answer: { A: '[[1,0,2],[0,1,1]]' } } },
+      { key: 'inj', prompt: 'Donne une matrice A de taille 3 × 2 telle que Ax = 0 n\'ait que la solution triviale, mais que Ax = b n\'ait pas de solution pour un certain b.', property: { kind: 'matOne', params: { want: 'pivots', rowsAll: false, colsAll: true, n: 3, cols: 2 }, ask: [{ v: 'A', label: 'A =', shape: [3, 2] }], answer: { A: '[[1,0],[0,1],[1,1]]' } } },
+    ]);
+    return exampleItem({
+      skill: PIV, level, prompt: ex.prompt, property: ex.property, key: ex.key, subgoals: PIV_SUB,
+      hints: [hints[0], { level: 2, html: 'Un pivot dans chaque ligne ? dans chaque colonne ? Choisis le rang qui convient, puis écris une matrice échelonnée.' }, { level: 3, html: `Par exemple ${Object.entries(ex.property.answer).map(([k, v]) => `${k} = ${ML(v)}`).join(', ')}.` }],
+      solution: [{ html: Object.entries(ex.property.answer).map(([k, v]) => `${k} = ${ML(v)}`).join(', '), note: '' }],
+    });
+  }
+  return { ...pivTf(s, { level, hints, noHints: level === 5 }), subgoals: PIV_SUB };
+}
+
+function pivExam(rng, exam) {
+  const tag = examTag({ exam });
+  const all = pivStatements(rng);
+  if (exam === 'tf') return pivTf(rng.pick(all), { exam: tag });
+  if (rng.chance(0.3)) {
+    const [m, n] = rng.pick([[3, 5], [2, 5], [3, 7], [4, 6], [2, 4]]);
+    return mcqDistinct({
+      skill: PIV, level: 4, key: `mcq:ker:${m}${n}`, exam: tag,
+      prompt: `A est une matrice de taille ${sz(m, n)}. La plus petite valeur possible de dim Ker A (le nombre de variables libres de Ax = 0) est :`,
+      right: String(n - m),
+      wrongs: [{ html: '0', rule: 'l_rank_dim_confusion' }, { html: String(m), rule: 'l_rank_dim_confusion' }, { html: String(n), rule: 'l_rank_dim_confusion' }],
+      fillers: [{ html: String(n - m + 1) }, { html: '1' }],
+      solution: [{ html: `Au plus ${m} pivots pour ${n} colonnes : au moins ${n} − ${m} = ${n - m} variables libres, atteint quand le rang vaut ${m}.`, note: '' }],
+    }, rng);
+  }
+  const trues = all.filter((s) => s.truth);
+  const falses = rng.shuffle(all.filter((s) => !s.truth));
+  const right = rng.pick(trues);
+  return mcqDistinct({
+    skill: PIV, level: 4, key: `mcq:${right.id}`, exam: tag,
+    prompt: 'A est une matrice de taille m × n. Une seule affirmation est toujours vraie :',
+    right: right.text,
+    wrongs: falses.map((s) => ({ html: s.text, rule: s.ruleIfTrue ?? null })),
+    solution: [{ html: right.why, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-map-std-matrix
+// ======================================================================
+
+const STD = 'l-map-std-matrix';
+const STD_SUB = [
+  { id: 'lin', label: 'linéarité', skill: STD },
+  { id: 'place', label: 'placer les colonnes', skill: STD },
+];
+// Given vectors (coordinates over e₁, e₂, e₃), each with one new basis
+// vector: T(eₖ) follows from T(w) and the images already known.
+const STD_BASIC = [
+  [[1, 0, 0], [0, 2, 0], [0, 1, 1]],
+  [[2, 0, 0], [0, 1, 0], [1, 0, 1]],
+  [[1, 0, 0], [1, 1, 0], [0, 0, 3]],
+];
+const STD_OTHER = [
+  [[1, 0, 0], [1, 1, 0], [1, 1, 1]],
+  [[1, -1, 0], [0, 1, 0], [0, 0, 3]],
+  [[0, 1, 0], [1, 2, 0], [0, 1, -1]],
+  [[1, 0, 0], [0, 1, 0], [1, 1, 2]],
+];
+const eName = (k) => `e${sub(k + 1)}`;
+// 2e₂, e₂ + e₃, e₁ − e₂.
+function wName(w) {
+  let s = '';
+  w.forEach((c, k) => {
+    if (!c) return;
+    const abs = Math.abs(c);
+    s += `${c < 0 ? (s ? ' − ' : '−') : s ? ' + ' : ''}${abs === 1 ? '' : abs}${eName(k)}`;
+  });
+  return s;
+}
+
+// M (entries in [−6 ; 6]) and given vectors (a pattern, coordinates
+// permuted). Steps: for each eₖ not given, T(eₖ) = (T(w) − Σ cⱼT(eⱼ))/c.
+function stdData(rng, level) {
+  for (let t = 0; t < 200; t++) {
+    const pat = rng.pick(level >= 4 ? STD_OTHER : STD_BASIC);
+    const perm = rng.shuffle([0, 1, 2]);
+    const given = rng.shuffle(pat.map((w) => { const v = [0, 0, 0]; w.forEach((c, k) => { v[perm[k]] = c; }); return v; }));
+    const M = Array.from({ length: 3 }, () => Array.from({ length: 3 }, () => q(rng.int(-6, 6))));
+    if (MX.transpose(M).some((c) => c.every((x) => x.n === 0)) || MX.rank(M) < 2) continue;
+    const imgs = given.map((w) => MX.matVec(M, w.map((x) => q(x))));
+    if (imgs.flat().some((x) => Math.abs(x.valueOf()) > 18)) continue;
+    // Derive in order: a given vector with exactly one unknown eₖ.
+    const known = new Set();
+    const steps = [];
+    const used = new Set();
+    let progress = true;
+    while (known.size < 3 && progress) {
+      progress = false;
+      given.forEach((w, gi) => {
+        if (used.has(gi)) return;
+        const unknown = w.map((c, k) => (c && !known.has(k) ? k : -1)).filter((k) => k >= 0);
+        if (unknown.length !== 1) return;
+        const k = unknown[0];
+        used.add(gi);
+        known.add(k);
+        progress = true;
+        const others = w.map((c, j) => (c && j !== k ? j : -1)).filter((j) => j >= 0);
+        steps.push({ k, gi, c: w[k], others: others.map((j) => ({ j, c: w[j] })), direct: !others.length && w[k] === 1 });
+      });
+    }
+    if (known.size < 3) continue;
+    if (steps.filter((s) => !s.direct).length < 2) continue;
+    // The trap: each given image in the column of its new basis vector.
+    const G = MX.transpose([0, 1, 2].map((k) => imgs[steps.find((s) => s.k === k).gi]));
+    if (MX.equal(G, M)) continue;
+    return { M, given, imgs, steps, G };
+  }
+  const M = MX.mat([[2, 2, -1], [-1, 1, 3], [3, -3, 4]]);
+  const given = [[1, 0, 0], [0, 2, 0], [0, 1, 1]];
+  const imgs = given.map((w) => MX.matVec(M, w.map((x) => q(x))));
+  const steps = [{ k: 0, gi: 0, c: 1, others: [], direct: true }, { k: 1, gi: 1, c: 2, others: [], direct: false }, { k: 2, gi: 2, c: 1, others: [{ j: 1, c: 1 }], direct: false }];
+  return { M, given, imgs, steps, G: MX.transpose([imgs[0], imgs[1], imgs[2]]), fallback: true };
+}
+
+// « T(e₃) = T(e₂ + e₃) − T(e₂) », « T(e₂) = ½·T(2e₂) ».
+function stepFormula(d, s) {
+  const tw = `T(${wName(d.given[s.gi])})`;
+  const minus = s.others.map((o) => `${o.c < 0 ? ' + ' : ' − '}${Math.abs(o.c) === 1 ? '' : Math.abs(o.c)}T(${eName(o.j)})`).join('');
+  const body = `${tw}${minus}`;
+  if (s.c === 1) return body;
+  const f = s.c === -1 ? '−' : `${s.c < 0 ? '−' : ''}${{ 2: '½', 3: '⅓' }[Math.abs(s.c)] ?? `(1/${Math.abs(s.c)})`}·`;
+  return s.others.length ? `${f}(${body})` : `${f}${body}`;
+}
+
+function linForm(row, names) {
+  let s = '';
+  row.forEach((c, j) => {
+    if (c.n === 0) return;
+    const abs = c.n < 0 ? c.neg() : c;
+    s += `${c.n < 0 ? '-' : s ? '+' : ''}${abs.eq(1) ? '' : qt(abs)}${names[j]}`;
+  });
+  return s || '0';
+}
+const X3 = ['x_1', 'x_2', 'x_3'];
+// T(x) as a column of linear forms (MathML).
+const formulaML = (M, names = VARS_IDX(M[0].length)) => `T(${names.map((x) => x.replace(/_(\d)/, (_, d) => sub(d))).join(', ')}) = ${ML(`(${M.map((r) => linForm(r, names)).join(' ; ')})`, { vars: names })}`;
+
+function stdItem(level, rng) {
+  const d = stdData(rng, level);
+  const Mtext = mt(d.M);
+  const key = `${STD}:${Mtext}:${d.given.map(wName).join(',')}`;
+  const givenHtml = d.given.map((w, i) => `T(${wName(w)}) = ${MLm(d.imgs[i].map((x) => [x]))}`).join(', ');
+  const matJudge = { kind: 'mat', expect: Mtext, rowsCols: true, given: mt(d.G) };
+  const matLine = { kind: 'eq', math: Mtext, note: 'Les images T(e₁), T(e₂), T(e₃) en colonnes', subgoal: 'place' };
+  const colsMenu = [
+    { id: 'cols', label: 'Placer T(eⱼ) en colonne j', valid: true },
+    { id: 'rows', label: 'Placer T(eⱼ) en ligne j', valid: false, rule: 'l_matrix_rows_cols', why: 'La colonne j de la matrice est l\'image de eⱼ : A·eⱼ redonne la colonne j.' },
+    { id: 'raw', label: 'Placer les images données telles quelles', valid: false, rule: 'l_map_scaled_image', why: 'Les images données ne sont pas toutes celles des eⱼ : il faut d\'abord retrouver T(eⱼ).' },
+  ];
+  if (level === 5) {
+    const matSeg = [
+      { kind: 'decision', prompt: 'T est-elle linéaire ?', options: [
+        { id: 'yes', label: 'Oui : chaque composante est une combinaison des xᵢ, sans constante', valid: true },
+        { id: 'no', label: 'Non : on ne peut pas savoir sans tester T(u + v)', valid: false, why: 'Une formule dont chaque composante est a₁x₁ + a₂x₂ + a₃x₃ est toujours linéaire : c\'est Ax.' },
+      ] },
+      matLine,
+    ];
+    return matLines({
+      skill: STD, level, prompt: `Soit T : ℝ³ → ℝ³ définie par ${formulaML(d.M, X3)}. Est-elle linéaire ? Donne sa matrice canonique.`,
+      start: 'A', judge: matJudge, mode: 'free', script: matSeg, hints: [], subgoals: STD_SUB, key: `${STD}:formula:${Mtext}`, fallback: d.fallback,
+    });
+  }
+  const derived = d.steps.filter((s) => !s.direct);
+  const segs = [];
+  derived.forEach((s, i) => {
+    const col = MX.col(d.M, s.k);
+    const judge = { kind: 'mat', expect: vt(col) };
+    if (level === 3) {
+      judge.menu = rng.shuffle([
+        { id: 'ok', label: `T(${eName(s.k)}) = ${stepFormula(d, s)}`, valid: true },
+        { id: 'raw', label: `T(${eName(s.k)}) = T(${wName(d.given[s.gi])})`, valid: false, rule: 'l_map_scaled_image', why: `T(${wName(d.given[s.gi])}) n'est pas T(${eName(s.k)}) : par linéarité, il faut ${s.c !== 1 ? 'diviser' : 'retirer les autres images'}.` },
+        { id: 'mul', label: `T(${eName(s.k)}) = ${Math.abs(s.c) === 1 ? 2 : Math.abs(s.c)}·T(${wName(d.given[s.gi])})`, valid: false, why: 'Par linéarité, T(c·u) = c·T(u) : pour revenir de T(c·eₖ) à T(eₖ), on divise par c.' },
+      ]);
+    }
+    const line = { kind: 'eq', math: `T(e_${s.k + 1}) = ${vt(col)}`, note: `Linéarité : T(${eName(s.k)}) = ${stepFormula(d, s)}`, subgoal: 'lin' };
+    if (i > 0) segs.push({ kind: 'segment', html: `Trouve T(${eName(s.k)}).`, ask: `T(${eName(s.k)}) =`, start: { math: `T(e_${s.k + 1})` }, judge });
+    else segs.first = { judge, start: `T(e_${s.k + 1})` };
+    segs.push(level <= 2 ? withCells(line, pickCells(col.map((x) => [x]), [0, 1, 2], level === 1 ? 2 : 3, rng).map(([r]) => [r, 0])) : line);
+  });
+  const known = d.steps.filter((s) => s.direct).map((s) => s.k);
+  const matCells = [];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (!known.includes(j)) matCells.push([i, j]);
+  const decision = {
+    kind: 'decision', prompt: 'Comment ranger les images dans la matrice ?', options: rng.shuffle([
+      { id: 'cols', label: 'T(e₁), T(e₂), T(e₃) en colonnes', valid: true },
+      { id: 'rows', label: 'T(e₁), T(e₂), T(e₃) en lignes', valid: false, rule: 'l_matrix_rows_cols', why: 'La colonne j est l\'image de eⱼ : c\'est pour cela que A·eⱼ redonne T(eⱼ).' },
+    ]),
+  };
+  const matJ = level === 3 ? { ...matJudge, menu: colsMenu } : matJudge;
+  const script = [
+    ...segs,
+    { kind: 'segment', html: 'Écris la matrice canonique de T.', ask: 'A =', start: { math: 'A' }, judge: matJ },
+    ...(level === 2 ? [decision] : []),
+    level === 1 ? withCells(matLine, rng.shuffle(matCells).slice(0, 3).sort((a, b) => a[0] - b[0] || a[1] - b[1])) : matLine,
+  ];
+  const s0 = derived[0];
+  const hints = [
+    { level: 1, html: 'Retrouve d\'abord chaque T(eⱼ) par linéarité (T(cu) = cT(u), T(u + v) = T(u) + T(v)), puis mets les images en colonnes.' },
+    { level: 2, html: `T(${eName(s0.k)}) = ${stepFormula(d, s0)} = □` },
+    { level: 3, html: `A = ${MLm(d.M)}` },
+  ];
+  const firstJudge = segs.first.judge;
+  return matLines({
+    skill: STD, level,
+    prompt: `T : ℝ³ → ℝ³ est linéaire, avec ${givenHtml}. Trouve ${derived.map((s) => `T(${eName(s.k)})`).join(' et ')}, puis la matrice canonique de T.${level === 3 ? ' Choisis à chaque fois la bonne règle.' : ''}`,
+    start: segs.first.start, judge: firstJudge, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
+    hints, subgoals: STD_SUB, key, tapActions: level === 3 ? 'menu' : null, fallback: d.fallback,
+  });
+}
+
+function stdExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.int(0, 3);
+    if (which === 0) {
+      return tfL({
+        skill: STD, key: 'unique', truth: true, exam: tag,
+        statement: 'La matrice canonique d\'une application linéaire T : ℝⁿ → ℝᵐ est unique.',
+        explanation: 'Vrai : si Ax = Bx pour tout x, alors avec x = eⱼ les colonnes j de A et de B sont égales.',
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: STD, key: 'zero', truth: true, exam: tag,
+        statement: 'Si T est linéaire, alors T(0) = 0.',
+        explanation: 'Vrai : T(0) = T(0·0) = 0·T(0) = 0.',
+      });
+    }
+    const affine = which === 2;
+    return tfL({
+      skill: STD, key: affine ? 'affine' : 'product', truth: false, exam: tag,
+      statement: affine ? 'L\'application T : ℝ² → ℝ² définie par T(x) = x + (1 ; 0) est linéaire.' : 'L\'application T : ℝ² → ℝ² définie par T(x₁, x₂) = (x₁x₂ ; x₁) est linéaire.',
+      counter: {
+        kind: 'vecFamily', params: { want: 'notLinear', n: 2, T: affine ? ['x_1+1', 'x_2'] : ['x_1x_2', 'x_1'] },
+        ask: [{ v: 'u', label: 'u =' }, { v: 'v', label: 'v =' }, { v: 'c', label: 'ou un nombre c =' }],
+        answer: affine ? { u: '(0 ; 0)', v: '(0 ; 0)' } : { u: '(1 ; 1)', c: '2' },
+      },
+      explanation: affine ? 'Faux : T(0) = (1 ; 0) ≠ 0. Avec u = v = 0 : T(u + v) = (1 ; 0), mais T(u) + T(v) = (2 ; 0).' : 'Faux : T(2·(1 ; 1)) = (4 ; 2), mais 2·T(1 ; 1) = (2 ; 2).',
+    });
+  }
+  const d = stdData(rng, rng.pick([2, 4]));
+  const givenHtml = d.given.map((w, i) => `T(${wName(w)}) = ${MLm(d.imgs[i].map((x) => [x]))}`).join(', ');
+  const prompt = `T : ℝ³ → ℝ³ est linéaire, avec ${givenHtml}.`;
+  if (exam === 'coef') {
+    const s = d.steps.find((x) => !x.direct);
+    const cands = [0, 1, 2].filter((i) => !d.M[i][s.k].eq(d.G[i][s.k]));
+    const i = cands.length ? rng.pick(cands) : 0;
+    const j = s.k;
+    return coefItem({
+      skill: STD, level: 4, prompt: `${prompt} Soit A la matrice canonique de T. Que vaut a${sub(i + 1)}${sub(j + 1)} ?`,
+      label: `a_${i + 1}${j + 1}`, value: qt(d.M[i][j]), key: `${mt(d.M)}:${i}${j}`, exam: tag,
+      askCoef: { label: `a${sub(i + 1)}${sub(j + 1)}`, path: [i, j] },
+      traps: [{ rule: 'l_map_scaled_image' }, { rule: 'l_matrix_rows_cols' }],
+      solution: [{ html: `T(${eName(j)}) = ${stepFormula(d, s)}`, note: '' }, { html: `A = ${MLm(d.M)}`, note: '' }], fallback: d.fallback,
+    });
+  }
+  return mcqDistinct({
+    skill: STD, level: 4, key: `mcq:${mt(d.M)}`, exam: tag,
+    prompt: `${prompt} Sa matrice canonique est :`,
+    right: MLm(d.M),
+    wrongs: [{ html: MLm(d.G), rule: 'l_map_scaled_image' }, { html: MLm(MX.transpose(d.M)), rule: 'l_matrix_rows_cols' }, { html: MLm(MX.transpose(d.G)), rule: 'l_matrix_rows_cols' }],
+    fillers: [{ html: MLm(MX.scale(d.M, -1)) }],
+    solution: d.steps.filter((s) => !s.direct).map((s) => ({ html: `T(${eName(s.k)}) = ${stepFormula(d, s)} = ${MLv(MX.col(d.M, s.k))}`, note: '' })),
+  }, rng);
+}
+
+// ======================================================================
+// l-map-inj-surj
+// ======================================================================
+
+const INJ = 'l-map-inj-surj';
+const INJ_SUB = [
+  { id: 'matrix', label: 'matrice de T', skill: STD },
+  { id: 'echelon', label: 'échelonner', skill: ECH },
+  { id: 'conclude', label: 'conclure', skill: INJ },
+];
+const INJ_SHAPES = [[3, 4], [4, 3], [3, 3], [4, 4], [2, 4], [3, 2]];
+const INJ_LABELS = ['Injective et surjective', 'Injective, pas surjective', 'Surjective, pas injective', 'Ni injective, ni surjective'];
+const injIndex = (inj, surj) => (inj ? (surj ? 0 : 1) : surj ? 2 : 3);
+
+function injData(rng, level) {
+  for (let t = 0; t < 200; t++) {
+    const [m, n] = rng.pick(INJ_SHAPES);
+    const top = Math.min(m, n);
+    const r = rng.chance(0.5) ? top : top - 1;
+    if (r < 1) continue;
+    const cols = [0, ...rng.shuffle([...Array(n).keys()].slice(1)).slice(0, r - 1)].sort((a, b) => a - b);
+    const { A, fallback } = rrefWith(m, n, cols, rng, { max: 3 });
+    if (fallback || A.some((row) => row.every((x) => x.n === 0))) continue;
+    if (A.flat().some((x) => Math.abs(x.valueOf()) > 7)) continue;
+    const e = MX.echelon(A);
+    if (e.ops.length < 2 || e.ops.length > (level >= 4 ? 7 : 5)) continue;
+    if (e.ops.some((op) => op.kind === 'swap' || (op.k && op.k.d > 1))) continue;
+    let X = A;
+    let ok = true;
+    for (const op of e.ops) { X = MX.applyOp(X, op); if (X.flat().some((x) => x.d > 2 || Math.abs(x.valueOf()) > 15)) ok = false; }
+    if (!ok) continue;
+    return { A, E: e.E, ops: e.ops, m, n, r: e.pivots.length };
+  }
+  const A = MX.mat([[1, 2, 0, 1], [2, 4, 1, 3], [0, 0, 1, 1]]);
+  const e = MX.echelon(A);
+  return { A, E: e.E, ops: e.ops, m: 3, n: 4, r: 2, fallback: true };
+}
+
+function injDecision(d) {
+  const inj = d.r === d.n;
+  const surj = d.r === d.m;
+  const right = injIndex(inj, surj);
+  const swapped = injIndex(surj, inj);
+  const why = [
+    `Il faudrait ${d.r < d.n ? `un pivot dans chacune des ${d.n} colonnes` : `un pivot dans chacune des ${d.m} lignes`} : le rang vaut ${d.r}.`,
+  ];
+  return {
+    kind: 'decision', prompt: 'T est-elle injective ? surjective ?', options: INJ_LABELS.map((label, i) => ({
+      id: `c${i}`, label, valid: i === right,
+      ...(i === right ? {} : { rule: i === swapped ? 'l_inj_rows' : undefined, why: i === swapped ? 'Injective, c\'est un pivot dans chaque colonne (pas de variable libre) ; surjective, un pivot dans chaque ligne.' : why[0] }),
+    })),
+  };
+}
+const injWhy = (d) => `Rang ${d.r} : ${d.r === d.n ? `un pivot dans chacune des ${d.n} colonnes, injective` : `${d.n - d.r} colonne${d.n - d.r > 1 ? 's' : ''} sans pivot, pas injective`} ; ${d.r === d.m ? `un pivot dans chacune des ${d.m} lignes, surjective` : `${d.m - d.r} ligne${d.m - d.r > 1 ? 's' : ''} sans pivot, pas surjective`}.`;
+const rn = (k) => `ℝ${'⁰¹²³⁴⁵⁶'[k]}`;
+
+function injItem(level, rng) {
+  const d = injData(rng, level);
+  const Atext = mt(d.A);
+  const key = `${INJ}:${Atext}`;
+  const lines = opLines(d.A, d.ops, { note: (op) => `Annuler sous le pivot : ${opR(op)}`, subgoal: 'echelon' });
+  const concl = [
+    { kind: 'segment', html: 'Conclus, et justifie par le rang.', ask: 'rang A =', start: { math: 'r' }, judge: { kind: 'value', expect: String(d.r) } },
+    injDecision(d),
+    { kind: 'eq', math: String(d.r), note: injWhy(d), subgoal: 'conclude' },
+  ];
+  const sizes = {
+    kind: 'decision', prompt: 'Avant de calculer : les tailles suffisent-elles à conclure ?', options: [
+      { id: 'inj', label: `Oui : ${d.n} colonnes et au plus ${d.m} pivots, donc pas injective`, valid: d.n > d.m, why: d.n > d.m ? undefined : `Ici n = ${d.n} ≤ m = ${d.m} : les tailles ne disent rien sur l'injectivité.` },
+      { id: 'surj', label: `Oui : ${d.m} lignes et au plus ${d.n} pivots, donc pas surjective`, valid: d.m > d.n, rule: d.n > d.m ? 'l_inj_rows' : undefined, why: d.m > d.n ? undefined : `Ici m = ${d.m} ≤ n = ${d.n} : les tailles ne disent rien sur la surjectivité.` },
+      { id: 'calc', label: 'Il faut calculer le rang', valid: d.m === d.n, why: d.m === d.n ? undefined : 'Juste pour l\'autre propriété, mais les tailles en tranchent déjà une.' },
+    ],
+  };
+  const hints = [
+    { level: 1, html: 'Injective : un pivot dans chaque colonne. Surjective : un pivot dans chaque ligne.' },
+    { level: 2, html: `rang = □ ; colonnes : ${d.n} ; lignes : ${d.m}.` },
+    { level: 3, html: injWhy(d) },
+  ];
+  const T = `T : ${rn(d.n)} → ${rn(d.m)}`;
+  if (level === 1) {
+    return matLines({
+      skill: INJ, level, prompt: `${T}, T(x) = Ax, et ${MLm(d.E)} est une forme échelonnée de A. Compte les pivots par ligne et par colonne : T est-elle injective ? surjective ?`,
+      start: 'r', judge: concl[0].judge, mode: 'guided', script: [concl[1], concl[2]], hints, subgoals: INJ_SUB, key, keys: ['calc'], fallback: d.fallback,
+    });
+  }
+  const ech = { kind: 'segment', html: 'Échelonne A.', start: { math: Atext }, judge: { kind: 'rowops', goal: 'echelon', multi: level >= 4 } };
+  if (level <= 3) {
+    const body = level === 2 ? lines.map((l) => withCells(l, pickCells(l.result, [l.op.i], 2, rng))) : lines;
+    return matLines({
+      skill: INJ, level, prompt: `Soit ${T}, T(x) = Ax avec A = ${MLm(d.A)}. T est-elle injective ? surjective ?${level === 3 ? ' Commence par regarder les tailles, puis choisis chaque opération.' : ''}`,
+      start: Atext, judge: ech.judge, mode: level === 2 ? 'guided' : 'tap', script: [...(level === 3 ? [sizes] : []), ...body, ...concl],
+      hints, subgoals: INJ_SUB, key, tapActions: level === 3 ? 'rowops' : null, fallback: d.fallback,
+    });
+  }
+  // Levels 4–5: T given by a formula, or by the images of the eⱼ.
+  const names = VARS_IDX(d.n);
+  const byImages = level === 4 && rng.chance(0.5);
+  const given = byImages
+    ? `${T} est linéaire, avec ${MX.transpose(d.A).map((c, j) => `T(${eName(j)}) = ${MLm(c.map((x) => [x]))}`).join(', ')}.`
+    : `Soit ${T} définie par ${formulaML(d.A, names)}.`;
+  const script = [
+    { kind: 'eq', math: Atext, note: 'Les images T(eⱼ) en colonnes', subgoal: 'matrix' },
+    ech, ...lines, ...concl,
+  ];
+  return matLines({
+    skill: INJ, level, prompt: `${given} T est-elle injective ? surjective ? Écris sa matrice A, échelonne-la, puis conclus.`,
+    start: 'A', judge: { kind: 'mat', expect: Atext, rowsCols: true }, mode: 'free', script,
+    hints, subgoals: INJ_SUB, key, fallback: d.fallback,
+  });
+}
+
+function injExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.int(0, 4);
+    const T = [
+      { truth: true, key: 'dim', statement: 'Si n > m, une application linéaire T : ℝⁿ → ℝᵐ n\'est pas injective.', explanation: 'Vrai : au plus m pivots pour n colonnes, donc une colonne sans pivot.' },
+      { truth: true, key: 'square', statement: 'Si T : ℝⁿ → ℝⁿ est linéaire et surjective, alors elle est injective.', explanation: 'Vrai : un pivot dans chacune des n lignes, donc n pivots, un dans chacune des n colonnes.' },
+      { truth: false, key: 'onto', ruleIfTrue: null, statement: 'Toute application linéaire T : ℝ⁴ → ℝ³ est surjective.', counter: { kind: 'matOne', params: { want: 'pivots', rowsAll: false, n: 3, cols: 4 }, ask: [{ v: 'A', label: 'A =', shape: [3, 4] }], answer: { A: '[[1,0,0,0],[0,1,0,0],[0,0,0,0]]' } }, explanation: 'Faux : la matrice A = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0]] n\'a pas de pivot dans sa 3e ligne. Plus de colonnes que de lignes ne suffit pas.' },
+      { truth: false, key: 'into', statement: 'Toute application linéaire T : ℝ² → ℝ³ est injective.', counter: { kind: 'matOne', params: { want: 'pivots', colsAll: false, n: 3, cols: 2 }, ask: [{ v: 'A', label: 'A =', shape: [3, 2] }], answer: { A: '[[1,1],[1,1],[1,1]]' } }, explanation: 'Faux : A = [[1, 1], [1, 1], [1, 1]] n\'a qu\'un pivot ; T(1 ; −1) = 0.' },
+      { truth: false, key: 'inj-onto', ruleIfTrue: 'l_inj_rows', statement: 'Si une application linéaire T : ℝⁿ → ℝᵐ est injective, alors elle est surjective.', counter: { kind: 'matOne', params: { want: 'pivots', colsAll: true, rowsAll: false }, ask: [{ v: 'A', label: 'A =' }], answer: { A: '[[1,0],[0,1],[0,0]]' } }, explanation: 'Faux : A = [[1, 0], [0, 1], [0, 0]] a un pivot dans chaque colonne (injective) mais pas dans la 3e ligne.' },
+    ][which];
+    return tfL({ skill: INJ, exam: tag, ...T });
+  }
+  const d = injData(rng, 4);
+  const inj = d.r === d.n;
+  const surj = d.r === d.m;
+  const right = injIndex(inj, surj);
+  const swapped = injIndex(surj, inj);
+  const INJ_SENTENCES = ['T est injective et surjective.', 'T est injective, mais pas surjective.', 'T est surjective, mais pas injective.', 'T n\'est ni injective, ni surjective.'];
+  const options = INJ_SENTENCES.map((html, i) => ({ html, correct: i === right, rule: i !== right && i === swapped ? 'l_inj_rows' : null }));
+  return {
+    ...mcq({ skill: INJ, level: 4, prompt: `Soit T : ${rn(d.n)} → ${rn(d.m)}, T(x) = Ax avec A = ${MLm(d.A)}. Alors :`, key: `${INJ}:mcq:${mt(d.A)}`, options, keepOrder: true, solution: [{ html: `Forme échelonnée : ${MLm(d.E)}`, note: '' }, { html: injWhy(d), note: '' }] }, rng),
+    exam: tag,
+  };
+}
+// ======================================================================
+
+const withExam = (item, exam) => (level, rng, profile, opts = {}) => (opts.exam ? exam(rng, opts.exam) : item(level, rng));
 
 export const GEN = {
   [AUG]: (level, rng) => augItem(level, rng),
-  [ECH]: (level, rng, profile, opts = {}) => (opts.exam ? echExam(rng, opts.exam) : echItem(level, rng)),
-  [RREF]: (level, rng, profile, opts = {}) => (opts.exam ? rrefExam(rng, opts.exam) : rrefItem(level, rng)),
+  [ECH]: withExam(echItem, echExam),
+  [RREF]: withExam(rrefItem, rrefExam),
+  [SOL]: withExam(solItem, solExam),
+  [PAR]: withExam(parItem, parExam),
+  [SPAN]: withExam(spanItem, spanExam),
+  [IND]: withExam(indItem, indExam),
+  [PIV]: withExam(pivItem, pivExam),
+  [STD]: withExam(stdItem, stdExam),
+  [INJ]: withExam(injItem, injExam),
 };
