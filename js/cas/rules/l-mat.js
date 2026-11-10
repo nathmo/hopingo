@@ -186,13 +186,16 @@ export const DEFS = {
     transform(prev, ctx) {
       const p = aboutOf(ctx).compose;
       if (!p) return [];
-      const [R, S] = p.map((t) => val(t, ctx.cfg));
-      const RS = tryV(() => val(`(${valueText(R)})·(${valueText(S)})`));
-      const SR = tryV(() => val(`(${valueText(S)})·(${valueText(R)})`));
-      if (RS && SR && sameValue(RS, SR)) return [];
-      return out(RS, ctx);
+      // p lists the maps in the order they are applied: the right matrix
+      // is the product from the last to the first, the trap's from the first.
+      const ms = p.map((t) => val(t, ctx.cfg));
+      const prod = (xs) => xs.slice(1).reduce((acc, x) => acc && tryV(() => val(`(${valueText(acc)})·(${valueText(x)})`)), xs[0]);
+      const wrong = prod(ms);
+      const right = prod([...ms].reverse());
+      if (!wrong || (right && sameValue(wrong, right))) return [];
+      return out(wrong, ctx);
     },
-    explain: () => 'On applique d\'abord R à x, puis S au résultat : S(R(x)) = (SR)x. La matrice appliquée en premier est à droite du produit.',
+    explain: () => 'La matrice appliquée en premier est à droite du produit : on applique d\'abord R à x, puis S au résultat, et S(R(x)) = (SR)x. De même, A⁻¹ = E₃E₂E₁ quand E₁ est faite en premier.',
     check: { judge: { kind: 'mat', expect: '[[0,-1],[-1,0]]', about: { compose: ['[[0,-1],[1,0]]', '[[1,0],[0,-1]]'] } }, prev: 'M', line: '[[0,1],[1,0]]' },
   },
   l_elementary_inverse: {

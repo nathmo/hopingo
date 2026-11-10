@@ -1067,8 +1067,196 @@ function imtExam(rng, exam) {
 }
 
 // ======================================================================
+// l-mat-elementary
+// ======================================================================
+
+const ELEM = 'l-mat-elementary';
+const ELEM_SUB = [
+  { id: 'elim', label: 'éliminer', skill: ECH },
+  { id: 'writeE', label: 'écrire E', skill: ELEM },
+];
+
+// The operation that undoes op.
+const undo = (op) => (op.kind === 'add' ? { ...op, k: op.k.neg() } : op.kind === 'scale' ? { ...op, k: q(1).div(op.k) } : op);
+const elemOf = (n, op) => MX.applyOp(MX.identity(n), op);
+const opWords = (op) => (op.kind === 'add' ? `ajouter ${parR(op.k)} fois la ligne ${op.j + 1} à la ligne ${op.i + 1}` : op.kind === 'scale' ? `multiplier la ligne ${op.i + 1} par ${parR(op.k)}` : `échanger les lignes ${op.i + 1} et ${op.j + 1}`);
+
+// One operation on n rows: Lᵢ ← Lᵢ + kLⱼ (k ∈ {±1, ±2, ±3}), Lᵢ ← kLᵢ or a swap.
+function randOp(n, rng, kinds = ['add', 'add', 'scale', 'swap']) {
+  const kind = rng.pick(kinds);
+  const i = rng.int(0, n - 1);
+  let j = rng.int(0, n - 1);
+  if (j === i) j = (i + 1) % n;
+  if (kind === 'add') return { kind, i, j, k: q(rng.pick([1, -1, 2, -2, 3, -3])) };
+  if (kind === 'scale') return { kind, i, k: rng.pick([q(2), q(3), q(-1), q(1, 2), q(-2), q(1, 3)]) };
+  return { kind: 'swap', i: Math.min(i, j), j: Math.max(i, j) };
+}
+
+// A 2 × 2 whole, det ±1 or ±2, reduced to I by 3 or 4 operations (no swap).
+function decompData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const A = randM(2, 2, rng, -4, 4);
+    const det = MX.det(A).valueOf();
+    if (![1, -1, 2, -2].includes(det) || A.flat().some((x) => x.n === 0) || Math.abs(A[0][0].valueOf()) !== 1) continue;
+    const { ops } = MX.rref(A);
+    if (ops.length < 3 || ops.length > 4 || ops.some((op) => op.kind === 'swap' || op.k.d > 2)) continue;
+    const Es = ops.map((op) => elemOf(2, op));
+    const Eis = ops.map((op) => elemOf(2, undo(op)));
+    return { A, Ai: MX.inverse(A), ops, Es, Eis };
+  }
+  const A = MX.mat([[1, 2], [3, 4]]);
+  const ops = MX.rref(A).ops;
+  return { A, Ai: MX.inverse(A), ops, Es: ops.map((op) => elemOf(2, op)), Eis: ops.map((op) => elemOf(2, undo(op))), fallback: true };
+}
+
+const eName = (k) => `E${sub(k + 1)}`;
+
+function elemItem(level, rng) {
+  if (level <= 2) {
+    const n = 3;
+    const op = randOp(n, rng, level === 1 ? ['add', 'add', 'scale'] : ['add', 'add', 'scale', 'swap']);
+    const E = elemOf(n, op);
+    const Ei = elemOf(n, undo(op));
+    const changed = op.kind === 'swap' ? [op.i, op.j] : [op.i];
+    const invSeg = { start: 'E^(-1)', judge: { kind: 'mat', expect: mt(Ei), about: { elementary: mt(E) } } };
+    const invLine = withCells({ kind: 'eq', math: mt(Ei), note: `E⁻¹ fait l'opération contraire : ${opR(undo(op))}`, subgoal: 'writeE' }, pickCells(Ei, changed, level === 1 ? 2 : 3, rng));
+    const hints = [
+      { level: 1, html: 'Fais l\'opération sur I pour obtenir E ; E⁻¹ fait l\'opération contraire.' },
+      { level: 2, html: `E⁻¹ fait ${opR(undo(op))} : ${rowHoles(Ei, changed[0])} en ligne ${changed[0] + 1}` },
+      { level: 3, html: `E⁻¹ = ${MLm(Ei)}` },
+    ];
+    if (level === 1) {
+      return matLines({
+        skill: ELEM, level, prompt: `E est la matrice élémentaire 3 × 3 de l'opération ${opR(op)}. Écris E, puis E⁻¹.`,
+        start: 'E', judge: { kind: 'mat', expect: mt(E) }, mode: 'guided',
+        script: [
+          withCells({ kind: 'eq', math: mt(E), note: `I₃ après ${opR(op)}`, subgoal: 'writeE' }, pickCells(E, changed, 2, rng)),
+          { kind: 'segment', html: 'Écris E⁻¹.', start: { math: invSeg.start }, judge: invSeg.judge },
+          invLine,
+        ],
+        hints, subgoals: ELEM_SUB, key: `${ELEM}:op:${mt(E)}`,
+      });
+    }
+    // Level 2: E is given; which operation does it do?
+    const other = op.kind === 'add' ? { ...op, i: op.j, j: op.i } : op.kind === 'scale' ? { kind: 'scale', i: (op.i + 1) % n, k: op.k } : { kind: 'swap', i: [0, 1, 2].find((x) => x !== op.i && x !== op.j), j: op.j };
+    const opts = [
+      { id: 'ok', label: opR(op), valid: true },
+      op.kind !== 'swap' ? { id: 'inv', label: opR(undo(op)), valid: false, rule: 'l_elementary_inverse', why: `Ça, c'est l'opération de E⁻¹. E est I après ${opR(op)} : regarde la case qui a changé.` } : null,
+      { id: 'other', label: opR(other), valid: false, why: 'Compare E à I : la ligne qui change est celle de l\'opération, et le coefficient hors diagonale dit quelle ligne on ajoute.' },
+    ].filter(Boolean);
+    return matLines({
+      skill: ELEM, level, prompt: `E = ${MLm(E)} est une matrice élémentaire. Quelle opération fait-elle ? Écris ensuite E⁻¹.`,
+      start: invSeg.start, judge: invSeg.judge, mode: 'guided',
+      script: [{ kind: 'decision', prompt: 'Quelle opération E fait-elle sur les lignes ?', options: rng.shuffle(opts) }, invLine],
+      hints, subgoals: ELEM_SUB, key: `${ELEM}:read:${mt(E)}`,
+    });
+  }
+  if (level === 5 && rng.chance(0.5)) return elemTf(5, rng);
+  // Levels 3–5: decompose a 2 × 2.
+  const d = decompData(rng);
+  const kk = d.ops.length;
+  const names = Object.fromEntries(d.Es.map((E, k) => [`E_${k + 1}`, mt(E)]));
+  const useNames = level === 4;
+  const segs = [];
+  d.ops.forEach((op, k) => {
+    const menu = rng.shuffle([
+      { id: 'ok', label: opR(op), valid: true },
+      op.kind === 'add' ? { id: 'sign', label: opR(undo(op)), valid: false, rule: 'l_rowop_sign', why: 'Avec ce signe, la case ne s\'annule pas.' } : { id: 'inv', label: opR(undo(op)), valid: false, why: 'Ce facteur n\'amène pas le pivot à 1.' },
+      { id: 'swap', label: 'L₁ ↔ L₂', valid: false, why: 'Le pivot n\'est pas nul : pas besoin d\'échanger.' },
+    ]);
+    segs.push({
+      html: `${eName(k)} : la matrice de l'opération ${k + 1}.`, start: `E_${k + 1}`, judge: { kind: 'mat', expect: mt(d.Es[k]), menu },
+      lines: [{ kind: 'eq', math: mt(d.Es[k]), note: `${opR(op)} appliquée à I`, subgoal: op.kind === 'add' && op.i > op.j ? 'elim' : 'writeE' }],
+    });
+  });
+  const order = [...Array(kk).keys()];
+  const prodInv = order.slice().reverse().map((k) => (useNames ? `E_${k + 1}` : mt(d.Es[k]))).join('·');
+  const prodA = order.map((k) => (useNames ? `E_${k + 1}^(-1)` : mt(d.Eis[k]))).join('·');
+  const invR = order.slice().reverse().map(eName).join('');
+  const aR = order.map((k) => `${eName(k)}⁻¹`).join('');
+  segs.push({
+    html: `A⁻¹ = ${invR}.`, start: 'A^(-1)',
+    judge: { kind: 'mat', expect: mt(d.Ai), about: { compose: d.Es.map(mt) }, ...(useNames ? { names } : {}),
+      menu: rng.shuffle([{ id: 'ok', label: `A⁻¹ = ${invR}`, valid: true }, { id: 'rev', label: `A⁻¹ = ${order.map(eName).join('')}`, valid: false, rule: 'l_compose_order', why: `${eName(0)} est faite en premier : elle est à droite.` }]) },
+    lines: [{ kind: 'eq', math: prodInv, note: `${invR}·A = I`, subgoal: 'writeE' }, { kind: 'eq', math: mt(d.Ai), note: '', subgoal: 'writeE' }],
+  });
+  segs.push({
+    html: `A = ${aR}.`, start: 'A',
+    judge: { kind: 'mat', expect: mt(d.A), about: { compose: d.Eis.slice().reverse().map(mt) }, ...(useNames ? { names } : {}),
+      menu: rng.shuffle([{ id: 'ok', label: `A = ${aR}`, valid: true }, { id: 'rev', label: `A = ${order.slice().reverse().map((k) => `${eName(k)}⁻¹`).join('')}`, valid: false, rule: 'l_compose_order', why: 'A = (E_k⋯E₁)⁻¹ : l\'inverse d\'un produit renverse l\'ordre.' }]) },
+    lines: [{ kind: 'eq', math: prodA, note: `(${invR})⁻¹ = ${aR}`, subgoal: 'writeE' }, { kind: 'eq', math: mt(d.A), note: '', subgoal: 'writeE' }],
+  });
+  const script = [];
+  segs.forEach((s, k) => {
+    const judge = level === 3 ? s.judge : (({ menu, ...rest }) => rest)(s.judge);
+    if (k > 0) script.push({ kind: 'segment', html: s.html, start: { math: s.start }, judge });
+    script.push(...s.lines);
+  });
+  const first = level === 3 ? segs[0].judge : (({ menu, ...rest }) => rest)(segs[0].judge);
+  return matLines({
+    skill: ELEM, level,
+    prompt: level === 3
+      ? `Réduis A = ${MLm(d.A)} à I sans échange, en ${kk} opérations : choisis chaque opération et écris sa matrice élémentaire ${order.map(eName).join(', ')}. Puis écris A⁻¹ et A comme produits de matrices élémentaires.`
+      : `On réduit A = ${MLm(d.A)} à I par ${d.ops.map((op, k) => `${eName(k)} : ${opR(op)}`).join(', ')}. Écris ${order.map(eName).join(', ')}, puis A⁻¹ et A comme produits de matrices élémentaires.`,
+    start: segs[0].start, judge: first, mode: level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null, script,
+    hints: level === 5 ? [] : [
+      { level: 1, html: `Fais chaque opération sur I pour obtenir Eₖ. Si ${invR}·A = I, alors A⁻¹ = ${invR} et A = ${aR}.` },
+      { level: 2, html: `${eName(0)}⁻¹ = ${rowHoles(d.Eis[0], d.ops[0].i)} en ligne ${d.ops[0].i + 1}` },
+      { level: 3, html: `A⁻¹ = ${MLm(d.Ai)}` },
+    ],
+    subgoals: ELEM_SUB, key: `${ELEM}:dec:${mt(d.A)}`, fallback: d.fallback,
+  });
+}
+
+const ELEM_PAIRS = [[[[1, 1], [0, 1]], [[1, 0], [1, 1]]], [[[1, 2], [0, 1]], [[1, 0], [-1, 1]]], [[[0, 1], [1, 0]], [[1, 1], [0, 1]]], [[[2, 0], [0, 1]], [[1, 0], [3, 1]]]];
+const REL_PAIRS = [[[[1, 2], [2, 4]], [[2, 4], [1, 2]]], [[[1, -1], [2, -2]], [[2, -2], [1, -1]]], [[[1, 3], [3, 9]], [[1, 3], [0, 0]]]];
+
+function elemTf(level, rng, exam) {
+  const base = { skill: ELEM, level, exam: exam ? examTag({ exam }) : false, noHints: level === 5 || !!exam };
+  const which = rng.pick(['prod', 'rows', 'inv', 'cols']);
+  if (which === 'prod') {
+    const pr = rng.pick(ELEM_PAIRS);
+    return tfL({
+      ...base, key: `prod:${mt(MX.mat(pr[0]))}`, truth: false,
+      statement: 'Le produit de deux matrices élémentaires de même taille est une matrice élémentaire.',
+      counter: pairCounter('elemProduct', pr),
+      explanation: `Faux : ${MLm(MX.mat(pr[0]))}·${MLm(MX.mat(pr[1]))} = ${MLm(MX.mul(MX.mat(pr[0]), MX.mat(pr[1])))} fait deux opérations à la fois.`,
+    });
+  }
+  if (which === 'rows') {
+    const [A, B] = rng.pick(REL_PAIRS);
+    return tfL({
+      ...base, key: `rows:${mt(MX.mat(A))}`, truth: false,
+      statement: 'Si E₁, E₂, E₃ sont des matrices élémentaires, les lignes de E₃E₂E₁A sont reliées par les mêmes relations de dépendance que les lignes de A.',
+      counter: { kind: 'matOne', params: { want: 'rowRelations' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }, { v: 'B', label: 'B = EA =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)), B: mt(MX.mat(B)) } },
+      explanation: `Faux : les opérations sur les lignes mélangent les lignes. Avec A = ${MLm(MX.mat(A))} et B = ${MLm(MX.mat(B))}, obtenue par une opération, les relations entre lignes changent. Ce sont les <b>colonnes</b> qui gardent leurs relations.`,
+    });
+  }
+  const T = {
+    inv: ['Toute matrice élémentaire est inversible, et son inverse est une matrice élémentaire.', 'Vrai : l\'inverse de E fait l\'opération contraire, qui est aussi une seule opération élémentaire.'],
+    cols: ['Si E est une matrice élémentaire, les colonnes de EA sont reliées par les mêmes relations de dépendance que les colonnes de A.', 'Vrai : Ax = 0 ⇔ EAx = 0 puisque E est inversible ; les relations entre colonnes sont les solutions de Ax = 0.'],
+  }[which];
+  return tfL({ ...base, key: which, truth: true, statement: T[0], explanation: T[1] });
+}
+
+function elemExam(rng, exam) {
+  if (exam === 'tf') return elemTf(4, rng, exam);
+  const op = randOp(3, rng, ['add']);
+  const E = elemOf(3, op);
+  const Ei = elemOf(3, undo(op));
+  return mcqDistinct({
+    skill: ELEM, level: 4, key: `mcq:${mt(E)}`, exam: examTag({ exam }),
+    prompt: `E = ${MLm(E)} est la matrice élémentaire de ${opR(op)}. Que vaut E⁻¹ ?`,
+    right: MLm(Ei),
+    wrongs: [{ html: MLm(E), rule: 'l_elementary_inverse' }, { html: MLm(MX.transpose(E)), rule: null }, { html: MLm(MX.transpose(Ei)), rule: null }],
+    solution: [{ html: `E⁻¹ fait ${opR(undo(op))} : E⁻¹ = ${MLm(Ei)}`, note: 'Contrôle : E·E⁻¹ = I' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [ELEM]: (level, rng, profile, opts = {}) => (opts.exam ? elemExam(rng, opts.exam) : elemItem(level, rng)),
   [IMT]: (level, rng, profile, opts = {}) => (opts.exam ? imtExam(rng, opts.exam) : imtItem(level, rng)),
   [GEOM]: (level, rng, profile, opts = {}) => (opts.exam ? geomExam(rng, opts.exam) : geomItem(level, rng)),
   [PROD]: (level, rng, profile, opts = {}) => (opts.exam ? prodExam(rng, opts.exam) : prodItem(level, rng)),
