@@ -1736,6 +1736,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_power_ratio`, `m_inverse_power_value`). `readtable`. `tf` : « La méthode de la puissance converge vers la plus petite valeur propre » (faux) ; « La puissance inverse sans décalage converge vers la valeur propre de plus petit module » (vrai).
 - **Pièges** : `m_power_ratio`, `m_inverse_power_value`, `m_rayleigh_no_denominator`.
 - **Sous-buts → crédit** : produit → `l-mat-product` ; itération → `m-power-method` ; Rayleigh → `m-rayleigh`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Matrices symétriques 2 × 2 à valeurs propres entières, y₀ un vecteur de la base canonique (pas de 3 × 3 : les fractions grandissent trop vite). L1 : tableau (juge `iter`, phi `power` : chaque case recalculée à partir des cases de l'élève), lignes 0 et 1 données, ligne 2 à remplir, puis le QCM « vers quoi tendent les μₖ ? » ; L2 : les mêmes pas en lignes guidées, avec la décision de la normalisation (par la norme : juste, `quality: 'poor'`) ; L3 : une itération, R(y₁), la vitesse (menus) ; L4 : tableau de la puissance inverse avec décalage (z jugé comme solution de (A − σI)z = y), puis λ = σ + 1/μ ; L5 : un tableau de μₖ dans l'énoncé (λ₁, |λ₂/λ₁| à 0,02 près, λ₂), ou le problème de l'exemple d'examen 3. Les types `readtable` et `code` (« y = z / ??? ») viendront avec l'étape U9. QCM : la vitesse, ou la valeur trouvée par la puissance inverse ; `open` : l'exemple d'examen 3 (7 points) avec d'autres nombres. Vrai/faux faux : contre-exemples `mx` `powerDominant` et `powerFails` (valeurs propres λ et −λ).
 
 ### `m-svd-lowrank` — SVD en somme de rangs 1, approximation de rang k, image de la sphère
 - **Année** 16 · **Prérequis** `l-svd-compute`, `m-rank1-proj` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1757,6 +1758,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` erreur (distracteurs : `m_rankk_wrong_sigma`, σ₂², `l_svd_sigma_is_eig`). `tf` : « ‖A‖₂ = σ₁ » (vrai) ; « A_k s'obtient en mettant à 0 les plus petits coefficients de A » (faux).
 - **Pièges** : `m_rankk_wrong_sigma`, `l_svd_sigma_is_eig`, `l_svd_sphere_boundary`.
 - **Sous-buts → crédit** : SVD → `l-svd-compute` ; rang 1 → `m-rank1-proj` ; erreurs → `m-svd-lowrank`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). A = Σ sᵢpᵢqᵢᵀ avec des familles orthogonales entières (2 × 2, 2 × 3, 3 × 2, 3 × 3). L1 : A₁ (cases de la grille) et ‖A − A₁‖₂, la SVD donnée ; L2 : les termes écrits dans le désordre, décision « quel terme garder ? » ; L3 : A₁, les deux erreurs, le stockage (menus) ; L4 : σ₁ et v₁ par AᵀA, puis A₁ = Av₁v₁ᵀ et l'erreur (U n'est pas redemandée) ; L5 : k minimal pour une erreur relative de Frobenius ≤ 10, 20 ou 30 % d'une 4 × 4 donnée par ses valeurs singulières, puis ‖A − A_k‖₂. L'image de la sphère est un QCM (ellipse pleine ou courbe seule, piège `l_svd_sphere_boundary`), sans esquisse. Vrai/faux faux : `mx` `lowRankNotZeroing` (2 × 2) et `frobNotSigma` (3 × 3).
 
 ### `m-norms` — Normes matricielles
 - **Année** 16 · **Prérequis** `l-svd-compute` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1778,6 +1780,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_norm_1_inf_swap`, `m_norm2_eig`, la plus grande case). `tf` : « ‖A‖₂ = max |λᵢ(A)| pour toute A » (faux : `[[0, 1], [0, 0]]`) ; « ρ(A) ≤ ‖A‖∞ » (vrai).
 - **Pièges** : `m_norm_1_inf_swap`, `m_norm2_eig`.
 - **Sous-buts → crédit** : AᵀA → `l-mat-product` ; valeurs propres → `l-eig-charpoly` ; norme → `m-norms`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Matrices 2 × 2 non symétriques dont AᵀA a des valeurs propres entières. Les nombres demandés sont nommés N₁, N∞, N₂, N_F dans les lignes (‖·‖ n'est pas lu par le CAS). L1 : sommes par colonne et par ligne à trous, max(|a| + |c| ; …), puis Frobenius ; L2 : décision « que somme-t-on ? » avant ‖A‖₁ ; L3 : les quatre normes (menus) ; L4 : ‖A‖₂ par AᵀA, puis ‖A‖_F (le gabarit « inégalités » n'est pas construit) ; L5 : problème, ‖A‖₂ puis deux vrai/faux sur les normes et ρ(A). Vrai/faux faux : `matOne` `svNotAbsEig` ([[0, 1], [0, 0]]), `mx` `norm1NeInf` et `frobNeTwo`.
 
 ### `m-cond` — Conditionnement
 - **Année** 16 · **Prérequis** `m-norms` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
@@ -1798,6 +1801,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_cond_eig_nonsym`, `m_cond_det`, 1/κ). `tf` : « Si det A est proche de 0, A est mal conditionnée » (faux : 10⁻³I) ; « κ(A) ≥ 1 » (vrai) ; « κ₂(Q) = 1 pour Q orthogonale » (vrai).
 - **Pièges** : `m_cond_eig_nonsym`, `m_cond_det`.
 - **Sous-buts → crédit** : normes → `m-norms` ; borne → `m-cond`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). L1 et L2 : κ₂ d'une symétrique définie positive (valeurs propres données) ou d'une triangulaire (valeurs propres de AᵀA données), L2 avec la décision de la formule (pièges `m_cond_det`, `m_cond_eig_nonsym`) ; L3 : κ₂, ‖δb‖/‖b‖, la borne, puis ‖δx‖/‖x‖ (b sur le vecteur propre dominant, δb sur l'autre : la borne est atteinte) ; L4 : κ∞ ou κ₁ par A⁻¹ ; L5 : un tableau de trois perturbations dans l'énoncé (pas de `readtable`), κ₂ et le numéro de la perturbation qui atteint la borne. Vrai/faux faux : `mx` `smallDetGoodCond` ((1/20)·I) et `condNotEigRatio` ([[1, 2], [0, 1]]).
 
 ### `m-gershgorin` — Disques de Gershgorin
 - **Année** 16 · **Prérequis** `l-eig-charpoly` · **Étiquettes** `opt`, `GM` · **Optionnelle** non · **Poids d'examen** 0
@@ -1819,6 +1823,7 @@ Les générateurs réutilisent les aides de L (`unimodular`, `pdp`, `orthRationa
 - **Variantes d'examen** : `mcq` (distracteurs : `m_gersh_radius_diag`). `tf` : « Chaque disque contient une valeur propre » (faux si les disques se chevauchent : `matOne`).
 - **Pièges** : `m_gersh_radius_diag`.
 - **Sous-buts → crédit** : disques → `m-gershgorin`.
+- **Statut** : fait le 10 novembre 2026 (étape U8). Pas de dessin (la tâche `plot` `region` n'existe pas) : les disques s'écrivent D(centre ; rayon), les rayons sont des lignes `value` et les conclusions des décisions. Matrices 3 × 3 à diagonale espacée ; chaque disque isolé est vérifié numériquement (`linalg-float.js`). L1 : rayons à trous ; L2 : disques par lignes qui se chevauchent, décision « par colonnes », rayons des colonnes ; L3 : rayons (menus), puis « A est-elle inversible ? » ; L4 : encadrement λ_min ≥ …, λ_max ≤ … (A symétrique) ; L5 : diagonale strictement dominante, la marge minᵢ(|aᵢᵢ| − Rᵢ), inversibilité (renvoi à Jacobi, module N). Vrai/faux faux : `mx` `gershEmptyDisc` ([[0, 1], [4, 0]]).
 
 ### `m-ode-modes` — Systèmes x′ = Ax : modes propres et stabilité
 - **Année** 16 · **Prérequis** `l-eig-diag`, `a2-ode-const2`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
