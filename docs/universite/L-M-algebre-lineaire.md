@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.1 matrices à paramètres (`cases`), complexes partout (`eigvec` avec `complex: true`), nœuds `det`, `tr`, `norm` ; §16.2 `rowops` avec `params` et `track: 'det' | 'lu'`, `span` avec `nested` et `affine`, `factor` avec `askCoef.convention`, `poly` avec paramètre λ, `ode` à inconnue vectorielle (M) ; §16.3 QCM à plusieurs réponses, QCM « réponse courte », contre-exemples (`matPair`, `matOne`…), `matrix` à cases symboliques, `plot`, au moins 2 exemples d'examen par module ; §16.4 familles nouvelles (`linear`, `logic`), tag C, réparation dans un autre module, pièges partagés (réutilise `g4_proj_no_square`, `g9_proof_by_example` ; `l_compose_order` et `l_lsq_normal_aat` servent aussi en A2 et M).
 
-Unité `alglin` · préfixe `l-` · pièges `l_` · Statut : à faire
+Unité `alglin` · préfixe `l-` · pièges `l_` · Statut : L fait le 10 novembre 2026 (étape U3) ; M à faire (étape U8). Les cases à remplir des lignes guidées sont des cases de la grille (`cells`) ; le niveau 5 et les variantes `open` sont des items sans aide, en attendant le type `problem` (U4).
 
 > Ce fichier contient deux catalogues : **L** (algèbre linéaire de BA1, ci-dessous) et **M** (analyse matricielle, niveau BA4, plus bas). Chacun suit le gabarit du §15 du [README](README.md). Les briques communes (générateurs à l'envers, contre-exemples, QCM « coefficient ») sont décrites une seule fois, au début de L, et M les réutilise.
 
@@ -76,6 +76,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-sys-augmented` — Matrice augmentée et opérations élémentaires
 - **Année** 13 · **Prérequis** `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `@alg:E-systemes-2x2` : un système linéaire et son ensemble de solutions.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de variante d'examen (absorbée par les compétences suivantes).
 - **Intro** : un système s'écrit comme une matrice augmentée [A | b]. Trois opérations ne changent pas l'ensemble des solutions : échanger deux lignes, multiplier une ligne par k ≠ 0, ajouter à une ligne un multiple d'une autre. L'opération porte sur **toute** la ligne, second membre compris. Exemple : `x + 2y − z = 3 ; 2x + 5y + z = 7` → `[[1, 2, −1 | 3], [2, 5, 1 | 7]]` (note : une ligne par équation) → `L2 ← L2 − 2L1` → `[0, 1, 3 | 1]` (note : le 7 devient 7 − 2·3).
 - **Juge** : `rowops` `{A: [A|b], multi: false}` · **Forme finale** : sous le premier pivot, la colonne est nulle.
 - **Niveaux** :
@@ -96,6 +97,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-sys-echelon` — Forme échelonnée, pivots
 - **Année** 13 · **Prérequis** `l-sys-augmented` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U3). Au niveau 5, les colonnes pivots s'écrivent comme un vecteur de numéros, (1 ; 3). Le vrai/faux « la forme échelonnée est unique » demande A et deux formes échelonnées (`matOne` `echelonNotUnique`).
 - **Intro** : on descend colonne par colonne : un pivot, puis des zéros dessous. Si le pivot est nul, on échange avec une ligne plus bas. La forme échelonnée donne les pivots, donc le rang et les variables libres. Exemple : `[0, 3, 3 | 3]` sous `[0, 1, 3 | 1]` → `L3 ← L3 − 3L2` → `[0, 0, −6 | 0]` (note : trois pivots, solution unique).
 - **Juge** : `rowops` `{A, multi: true}` (plusieurs opérations par ligne acceptées dès L4) · **Forme finale** : forme échelonnée (chaque pivot à droite du précédent, lignes nulles en bas) ; puis une ligne de décision « nombre de pivots = □ ».
 - **Niveaux** :
@@ -116,6 +118,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-sys-rref` — Forme échelonnée réduite
 - **Année** 13 · **Prérequis** `l-sys-echelon` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le niveau 5 et la variante `coef` ne demandent que rᵢⱼ. Un vrai/faux faux s'ajoute (« même forme réduite ⇒ égales », `matPair` `sameRref`).
 - **Intro** : après la descente, on remonte : chaque pivot vaut 1, et la colonne d'un pivot a des zéros au-dessus comme au-dessous. La forme réduite est **unique**, ce qui permet de poser « que vaut r₁₃ ? ». Exemple : `[1, 2, −1, 0]` au-dessus de `[0, 1, 1, −1]` → `L1 ← L1 − 2L2` → `[1, 0, −3, 2]` (note : r₁₃ = −3).
 - **Juge** : `rowops` `{A, reduced: true, multi: true}` · **Forme finale** : forme réduite ; `askCoef` au format examen.
 - **Niveaux** :
@@ -138,6 +141,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-sys-solution` — Variables libres, solution paramétrique
 - **Année** 13 · **Prérequis** `l-sys-rref` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U3). Les niveaux 1 et 2 partent de la forme réduite ; le gabarit (c) (solution particulière, puis générale) n'est pas construit.
 - **Intro** : sur la forme réduite, chaque colonne sans pivot donne une variable libre. On exprime les variables pivots en fonction des libres, puis on écrit x = p + t·v (+ s·w). Une ligne `[0 … 0 | c]` avec c ≠ 0 veut dire : aucune solution. Exemple : `x₁ − 3x₃ = 2 ; x₂ + x₃ = −1` → `x = (2 ; −1 ; 0) + t·(3 ; −1 ; 1)` (note : x₃ = t est libre).
 - **Juge** : `rowops` jusqu'à la forme réduite, puis `span` `{basis: [v…], affine: p, require: 'basis'}` sur la ligne « x = p + t·v » · **Forme finale** : forme vectorielle paramétrique ; toute paramétrisation du même ensemble est acceptée (autre point particulier, autre vecteur directeur).
 - **Niveaux** :
@@ -159,6 +163,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-sys-param` — Système à paramètre : aucune, une ou une infinité de solutions
 - **Année** 13 · **Prérequis** `l-sys-echelon`, `l-sys-solution`, `@alg:I-equation-parametre`, `@alg:D-trinome` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `@alg:I-equation-parametre` : dernière ligne a·x = b, avec a et b fonctions du paramètre.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le cas « solution unique » est une note, pas une ligne ; le niveau 5 prend le gabarit en a² (exemple d'examen 1), pas le système 4 × 3 ; le gabarit « paramètre seulement dans b » n'est pas construit. Un vrai/faux concret s'ajoute à l'énoncé vrai du catalogue.
 - **Intro** : on échelonne en gardant le paramètre. **On ne divise jamais par une expression qui peut s'annuler** sans traiter à part le cas où elle s'annule. À la fin, on lit la dernière ligne `[0 0 f(a) | g(a)]` : f(a) ≠ 0 → solution unique ; f(a) = 0 et g(a) ≠ 0 → aucune ; f(a) = g(a) = 0 → une infinité. Exemple : `[0, 0, (1 − a)(2 + a) | 1 − a]` → unique si a ∉ {1 ; −2}, infinité si a = 1, aucune si a = −2.
 - **Juge** : `rowops` sur ℚ(a) `{A, param: 'a', multi: true}` (voir les lacunes à la fin du fichier), puis `solset` `{v: 'a', domain: 'R'}` pour chaque cas · **Forme finale** : trois ensembles de valeurs de a (unique, aucune, infinité) qui partagent ℝ.
 - **Niveaux** :
@@ -185,6 +190,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vec-span` — Combinaisons linéaires, Span, Ax comme combinaison des colonnes
 - **Année** 13 · **Prérequis** `l-sys-echelon`, `g4-vectors` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-vectors` : combinaisons linéaires de vecteurs.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Les poids s'écrivent comme un vecteur (c₁ ; c₂) ; « b n'est pas dans le Span » se répond par « nombre de solutions = 0 ». Dans le QCM, le distracteur `l_matrix_rows_cols` est remplacé par une erreur de signe et par c₁ + c₂.
 - **Intro** : b ∈ Span{v₁, …, v_k} si et seulement si le système de matrice augmentée [v₁ … v_k | b] est compatible. Ax est la combinaison des colonnes de A avec les poids x₁, …, xₙ. La même idée vaut dans Pₙ : on travaille sur les coefficients. Exemple : `q = 3 + bt + 4t²` est dans Span{1 + t + t², 1 − t + 2t²} si et seulement si `[[1, 1 | 3], [1, −1 | b], [1, 2 | 4]]` est compatible → b = 1.
 - **Juge** : `rowops` `{A: [V | b], param?}` puis `value` sur les poids (ligne « b = 2v₁ + 1v₂ ») · **Forme finale** : poids, ou condition sur le paramètre, ou « pas dans le Span ».
 - **Niveaux** :
@@ -207,6 +213,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vec-indep` — Indépendance linéaire
 - **Année** 13 · **Prérequis** `l-sys-solution`, `l-sys-param` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-sys-solution` : la relation de dépendance se lit sur la solution paramétrique.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le paramètre n'apparaît qu'au niveau 5 et dans le QCM ; le niveau 5 s'arrête à l'ensemble des valeurs de a (pas de relation de dépendance) ; pas de distracteur `l_cofactor_sign`.
 - **Intro** : v₁, …, v_k sont linéairement indépendants si et seulement si [v₁ … v_k]x = 0 n'a que la solution nulle, c'est-à-dire s'il y a un pivot dans chaque colonne. Plus de vecteurs que la dimension : toujours liés. Une famille qui contient 0 est liée. Exemple : `(1 ; 0 ; a), (2 ; a ; 0), (1 ; 3 ; 1)` → pivots 1, a, 7 − a → liés si et seulement si a ∈ {0 ; 7}.
 - **Juge** : `rowops` `{A, param?}`, puis une ligne de décision « libre / liée », puis, pour « liée », une relation `value` (c₁v₁ + c₂v₂ + c₃v₃ = 0, coefficients non tous nuls) · **Forme finale** : décision justifiée par les pivots, avec la relation si la famille est liée.
 - **Niveaux** :
@@ -233,6 +240,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-sys-pivots-theory` — Existence et unicité lues sur les pivots
 - **Année** 13 · **Prérequis** `l-sys-solution`, `l-vec-span`, `g9-implication` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-sys-solution` : variable libre ⇔ colonne sans pivot ; `l-vec-span` : solution pour tout b ⇔ les colonnes engendrent ℝᵐ ; `g9-implication` : énoncés « si et seulement si » et réciproques.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveaux 1 à 3 en QCM plutôt qu'en cases à cocher ; niveau 5 : un vrai/faux à la fois, pas une série de 6. « Une application ℝ³ → ℝ⁴ peut être surjective » (énoncé existentiel : aucun contre-exemple possible) est remplacé par des énoncés universels.
 - **Intro** : A est m × n. Ax = b a une solution **pour tout b** si et seulement s'il y a un pivot dans chaque **ligne**. La solution est **unique** (quand elle existe) si et seulement s'il y a un pivot dans chaque **colonne**. Donc m < n ⇒ jamais d'unicité ; m > n ⇒ jamais « pour tout b ». Exemple : A 3 × 5 → au plus 3 pivots, au moins 2 variables libres → Ax = 0 a une infinité de solutions.
 - **Juge** : pas de lignes de calcul. Items `tf`, `mcq` et `example` (`dims`, `matOne`) · **Forme finale** : réponse et, pour un faux, contre-exemple accepté.
 - **Niveaux** :
@@ -257,6 +265,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-map-std-matrix` — Matrice canonique à partir d'images données
 - **Année** 13 · **Prérequis** `l-vec-span` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-vec-span` : Ax est la combinaison des colonnes T(eᵢ).
+- **Statut** : fait le 10 novembre 2026 (étape U3). ℝ³ → ℝ³ seulement ; « T est-elle linéaire ? » n'apparaît qu'en vrai/faux (contre-exemple `vecFamily` `notLinear`).
 - **Intro** : T est linéaire si T(u + v) = T(u) + T(v) et T(cu) = cT(u) ; alors T(0) = 0. La matrice canonique a pour colonnes T(e₁), …, T(eₙ). Si on donne T(2e₂) ou T(e₂ + e₃), on retrouve d'abord T(e₂) et T(e₃) par linéarité. Exemple : `T(2e₂) = (4 ; 2 ; −6)` → `T(e₂) = (2 ; 1 ; −3)` (note : on divise par 2 avant d'écrire la colonne).
 - **Juge** : `value` sur des vecteurs (lignes « T(e₂) = … »), puis `value` sur la matrice (`matrix`, 3 × 3) · **Forme finale** : matrice canonique ; `askCoef` au format examen.
 - **Niveaux** :
@@ -278,6 +287,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-map-inj-surj` — Injective ou surjective, lu sur les pivots
 - **Année** 13 · **Prérequis** `l-map-std-matrix`, `l-sys-pivots-theory` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-map-std-matrix` : matrice A de T ; `l-sys-pivots-theory` : pivots par ligne et par colonne.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Au niveau 5, T est donnée par une formule sur ℝⁿ, pas entre espaces de polynômes ou de matrices.
 - **Intro** : T(x) = Ax avec A de taille m × n. T est injective ⇔ Ker A = {0} ⇔ un pivot dans chaque **colonne**. T est surjective ⇔ Im A = ℝᵐ ⇔ un pivot dans chaque **ligne**. Si n > m, T n'est jamais injective ; si n < m, jamais surjective. Exemple : A de taille 3 × 4 → pas injective ; surjective si et seulement si le rang vaut 3.
 - **Juge** : `rowops` jusqu'à la forme échelonnée, puis une décision à 4 options · **Forme finale** : l'une des quatre réponses, justifiée par le rang.
 - **Niveaux** :
@@ -300,6 +310,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-mat-product` — Produit, transposée, règles de calcul
 - **Année** 13 · **Prérequis** — · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le gabarit (c) « AB = BA ? » n'apparaît qu'en vrai/faux ; le niveau 3 choisit la ligne et la colonne d'un coefficient.
 - **Intro** : (AB)ᵢⱼ = ligne i de A · colonne j de B ; AB existe si le nombre de colonnes de A égale le nombre de lignes de B. En général AB ≠ BA, et AB = 0 n'entraîne pas A = 0 ou B = 0. (AB)ᵀ = BᵀAᵀ. Exemple : A 3 × 2, B 2 × 3 → AB est 3 × 3 et BA est 2 × 2 (note : les deux existent mais n'ont pas la même taille).
 - **Juge** : `value` sur des matrices (grille) ; les lignes intermédiaires « (AB)₃₂ = 3·0 + 1·(−1) » sont jugées par `value` · **Forme finale** : matrice produit ; `askCoef` au format examen.
 - **Niveaux** :
@@ -321,6 +332,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-mat-inverse` — Inverse par [A | I]
 - **Année** 13 · **Prérequis** `l-mat-product`, `l-sys-rref` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-mat-product` : vérifier AA⁻¹ = I.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le gabarit (d) « A est-elle inversible ? » n'est pas construit ; le niveau 3 se termine sur un bᵢⱼ.
 - **Intro** : on réduit [A | I]. Si la partie gauche devient I, la partie droite est A⁻¹ ; sinon, A n'est pas inversible. Pour une 2 × 2 : `[[a, b], [c, d]]⁻¹ = (1/(ad − bc))·[[d, −b], [−c, a]]`. Exemple : `[[1, 2], [3, 4]]⁻¹ = (1/−2)·[[4, −2], [−3, 1]]`.
 - **Juge** : `rowops` `{A: [A | I], reduced: true, multi: true}` · **Forme finale** : A⁻¹ lue à droite ; `askCoef` bᵢⱼ au format examen. Contrôle possible : AB = I.
 - **Niveaux** :
@@ -345,6 +357,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-map-geom` — Géométrie dans ℝ² : rotation, projection, symétrie, affinité
 - **Année** 13 · **Prérequis** `l-map-std-matrix`, `l-mat-inverse`, `g3-exact`, `g4-line2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-map-std-matrix` : les colonnes sont les images de e₁ et e₂ ; `g3-exact` : cos θ et sin θ des angles usuels ; `g4-line2` : axe et direction donnés par une équation de droite.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de dessin (le type `plot` vient à l'étape U5) : au niveau 2, la transformation se choisit en mots. Les rotations passent par cos θ et sin θ ; les vecteurs de l'axe et de la direction sont jugés par `span`.
 - **Intro** : rotation d'angle θ : `[[cos θ, −sin θ], [sin θ, cos θ]]`. Projection orthogonale sur la droite de direction u : uuᵀ/(uᵀu). Symétrie : 2·projection − I. Affinité d'axe d, de direction δ, de rapport k : elle fixe les vecteurs de d et multiplie par k ceux de δ ; on écrit M = P·diag(1, k)·P⁻¹ avec P = [a | u], a sur l'axe, u dans la direction. Exemple : projection sur y = 2x : u = (1 ; 2) → (1/5)·`[[1, 2], [2, 4]]`.
 - **Juge** : `value` sur la matrice (`matrix` 2 × 2) ; lignes intermédiaires `value` (P, P⁻¹, produit) · **Forme finale** : matrice 2 × 2 exacte (racines permises pour les rotations).
 - **Niveaux** :
@@ -367,6 +380,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-mat-imt` — Théorème de la matrice inversible
 - **Année** 13 · **Prérequis** `l-mat-inverse`, `l-map-inj-surj` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-mat-inverse` : inversibilité par [A | I] ; `l-map-inj-surj` : injective et surjective lues sur les pivots.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le niveau 1 est un QCM (« lequel est équivalent ? ») au lieu de `match` ; le niveau 2 est un vrai/faux sans le nom de la propriété ; les contre-exemples non carrés sont de sorte `dims`.
 - **Intro** : pour A carrée n × n, ces énoncés sont équivalents : A inversible ; n pivots ; Ax = 0 n'a que 0 ; colonnes libres ; colonnes qui engendrent ℝⁿ ; x ↦ Ax injective ; surjective ; Aᵀ inversible ; det A ≠ 0 ; 0 n'est pas valeur propre. **Pour une matrice non carrée, rien de cela ne tient.** Exemple : A 4 × 4 dont les colonnes sont libres → A est inversible, donc Ax = b a une solution unique pour tout b.
 - **Juge** : items `tf`, `mcq`, `match` (relier les énoncés équivalents) et `example` · **Forme finale** : réponse ; contre-exemple pour un faux.
 - **Niveaux** :
@@ -387,6 +401,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-mat-elementary` — Matrices élémentaires
 - **Année** 13 · **Prérequis** `l-mat-inverse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-mat-inverse` : l'inverse de E fait l'opération contraire.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Au niveau 4, les opérations sont données dans l'énoncé ; le niveau 5 alterne un vrai/faux et la décomposition complète.
 - **Intro** : une matrice élémentaire E est Iₙ après une seule opération ; EA fait cette opération sur les lignes de A. L'inverse de E fait l'opération contraire (`L3 ← L3 + 2L1` est défaite par `L3 ← L3 − 2L1`). Si E_k⋯E₁A = I, alors A⁻¹ = E_k⋯E₁ et A = E₁⁻¹⋯E_k⁻¹. Exemple : E = `[[1, 0, 0], [0, 1, 0], [2, 0, 1]]` → E⁻¹ = `[[1, 0, 0], [0, 1, 0], [−2, 0, 1]]`.
 - **Juge** : `value` sur des matrices (E, E⁻¹, produits) ; la dernière ligne « A = E₁⁻¹E₂⁻¹E₃⁻¹ » est jugée par le produit · **Forme finale** : la liste des Eᵢ et le produit demandé.
 - **Niveaux** :
@@ -409,6 +424,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-mat-lu` — Factorisation LU
 - **Année** 13 · **Prérequis** `l-mat-elementary`, `l-sys-echelon` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-mat-elementary` : L est le produit des inverses des matrices élémentaires.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de tableau des ℓᵢⱼ à part (`track: 'lu'`) : les ℓᵢⱼ sont dans les notes et dans L ; la décision du niveau 2 demande un ℓ.
 - **Intro** : on échelonne A **sans échange**, avec seulement `Lᵢ ← Lᵢ − ℓᵢⱼLⱼ` et j < i. U est la forme échelonnée obtenue ; L est unitriangulaire inférieure et ℓᵢⱼ est **le multiplicateur lui-même** (celui qu'on retranche). Exemple : `L2 ← L2 − 2L1` → ℓ₂₁ = 2 (et non −2).
 - **Juge** : `rowops` pendant l'élimination (chaque opération annoncée inscrit ℓᵢⱼ dans un tableau à part), puis `factor` `{A, kind: 'LU'}` · **Forme finale** : L et U, avec LU = A ; `askCoef` ℓᵢⱼ au format examen.
 - **Niveaux** :
@@ -430,6 +446,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-mat-blocks` — Produit par blocs, inverse d'une matrice triangulaire par blocs
 - **Année** 13 · **Prérequis** `l-mat-inverse` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le niveau 2 choisit la formule de X₁₂ plutôt que le découpage ; le produit par blocs n'apparaît qu'au niveau 5, en alternance avec la puissance [[I, X], [0, I]]ᵏ.
 - **Intro** : si les découpages sont compatibles, on multiplie les blocs comme des nombres, **sans changer l'ordre des facteurs** (A₂₁A₁₂ ≠ A₁₂A₂₁). Triangulaire par blocs : `[[A, B], [0, D]]⁻¹ = [[A⁻¹, −A⁻¹BD⁻¹], [0, D⁻¹]]`, et son déterminant vaut det A · det D. Exemple : `[[I, X], [0, I]]⁻¹ = [[I, −X], [0, I]]`. Le complément de Schur est approfondi en M (`m-blocks-schur`).
 - **Juge** : `value` sur des blocs (chaque bloc est une petite matrice saisie dans sa propre grille), puis sur la matrice entière · **Forme finale** : produit ou inverse par blocs, égal au calcul direct.
 - **Niveaux** :
@@ -452,6 +469,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-det-cofactor` — Déterminant par cofacteurs
 - **Année** 13 · **Prérequis** — · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le menu du niveau 3 propose le signe et le mineur ensemble ; un vrai/faux faux s'ajoute, avec contre-exemple.
 - **Intro** : on développe selon la ligne ou la colonne qui a le plus de zéros : det A = Σⱼ (−1)^(i+j)·aᵢⱼ·det Aᵢⱼ. Le signe suit un damier `+ − + / − + − / + − +`. Une matrice triangulaire a pour déterminant le produit de sa diagonale. Exemple : ligne 2 = `[0, 0, 4, 0]` → det A = (−1)^(2+3)·4·det A₂₃.
 - **Juge** : `value` avec la fonction `det(…)` appliquée à des sous-matrices dans la ligne (voir les lacunes) ; chaque ligne garde la même valeur · **Forme finale** : un nombre.
 - **Niveaux** :
@@ -473,6 +491,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-det-rowops` — Déterminant par opérations sur les lignes
 - **Année** 13 · **Prérequis** `l-det-cofactor`, `l-sys-echelon` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-det-cofactor` : déterminant d'une triangulaire et des petits blocs.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Avec un paramètre, seulement des Lᵢ ← Lᵢ + kLⱼ à k constant ; le Vandermonde sort (b − a) par linéarité. Les distracteurs du QCM « inversible si et seulement si a ∉ … » ne nomment pas de piège.
 - **Intro** : `Lᵢ ← Lᵢ + kLⱼ` ne change pas det ; un échange change le signe ; `Lᵢ ← kLᵢ` multiplie det par k. On échelonne, puis on multiplie la diagonale. On peut aussi sortir un facteur d'une ligne (linéarité). Les mêmes règles valent pour les colonnes. Exemple : Vandermonde `[[1, a, a²], [1, b, b²], [1, c, c²]]` = (b − a)(c − a)(c − b).
 - **Juge** : `rowops` `{A, track: 'det'}` : chaque ligne est « det A = facteur · det(matrice) » ; l'app contrôle que le facteur suit les opérations · **Forme finale** : un nombre, ou une expression factorisée en λ ou en a.
 - **Niveaux** :
@@ -493,6 +512,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-det-props` — Propriétés : det(AB), det(kA), det(Aᵀ), det(A⁻¹)
 - **Année** 13 · **Prérequis** `l-det-rowops`, `l-mat-imt` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-det-rowops` : det(kA) = kⁿ·det A vient de Lᵢ ← kLᵢ sur chaque ligne ; `l-mat-imt` : det A ≠ 0 ⇔ A inversible.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Les items en lignes prennent toujours un n numérique (le juge `value` n'accepte pas de lettre) ; n en lettre seulement dans le QCM ; menu fixe au niveau 3.
 - **Intro** : det(AB) = det A · det B ; det(Aᵀ) = det A ; det(A⁻¹) = 1/det A ; pour A de taille n × n, det(kA) = kⁿ·det A. **Mais det(A + B) ≠ det A + det B en général.** Exemple : A 4 × 4, det A = 3 → det(2A) = 2⁴·3 = 48.
 - **Juge** : `value` `{form: 'exact'}` sur des expressions en det A, det B et n · **Forme finale** : nombre ou expression simplifiée.
 - **Niveaux** :
@@ -512,6 +532,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-det-area` — Aire et volume
 - **Année** 13 · **Prérequis** `l-det-cofactor` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pour les volumes, la matrice des arêtes est donnée au départ ; menu fixe au niveau 3.
 - **Intro** : l'aire du parallélogramme construit sur u et v vaut |det[u v]| ; celle du triangle, la moitié. Le volume d'un parallélépipède vaut |det[u v w]|. L'application x ↦ Ax multiplie les aires (ou les volumes) par |det A|. Exemple : triangle (1 ; 1), (4 ; 2), (2 ; 5) → ½·|det `[[3, 1], [1, 4]]`| = 11/2.
 - **Juge** : `value` · **Forme finale** : nombre exact positif.
 - **Niveaux** :
@@ -532,6 +553,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-det-cramer` — Règle de Cramer
 - **Année** 13 · **Prérequis** `l-det-cofactor` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U3). Menu fixe au niveau 3 (« Gauss » y est refusé avec une explication) ; la ligne intermédiaire (28 − 18)/10 n'est pas dans le corrigé.
 - **Intro** : si det A ≠ 0, xᵢ = det Aᵢ(b) / det A, où Aᵢ(b) est A dont la **colonne** i est remplacée par b. Utile pour une seule inconnue d'un système 2 × 2 ou 3 × 3, ou avec un paramètre. Exemple : `3x + 2y = 7 ; x + 4y = 9` → x = det `[[7, 2], [9, 4]]` / 10 = 1.
 - **Juge** : `value` · **Forme finale** : xᵢ exact.
 - **Niveaux** :
@@ -555,6 +577,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vs-subspace` — Est-ce un sous-espace ? Dans ℝⁿ, Pₙ et M_{m×n}
 - **Année** 13 · **Prérequis** `l-vec-span` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-vec-span` : un Span est toujours un sous-espace.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 1 : paramétrer, puis écrire le Span (ni cases à cocher, ni `blocks`) ; un ensemble qui n'est pas un sous-espace se montre par un calcul en lignes (x + y ou (−1)·x), pas par un item `example` ; Span explicite et {a·t⁴} seulement en vrai/faux.
 - **Intro** : H est un sous-espace si 0 ∈ H, et si H est stable par somme et par multiplication par un scalaire. Raccourcis : un Span, un noyau, une image sont toujours des sous-espaces ; une condition non linéaire (uv = w², a₀² = a₁²) ou non homogène (a₁ = a₂ + 3, p(0) = 1) donne presque toujours « non », et il faut alors un contre-exemple. Exemple : {a + bt + ct² : a = b + c} = Span{1 + t, 1 + t²} → sous-espace de P₂, de dimension 2.
 - **Juge** : décision « oui / non » puis, pour « oui », `blocks` (mode `frame` : 0 ∈ H, somme, multiple) ou une ligne « H = Span{…} » jugée par `span` ; pour « non », `example` `setWitness` · **Forme finale** : décision justifiée.
 - **Niveaux** :
@@ -575,6 +598,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-vs-kernel` — Noyau : base de Ker A
 - **Année** 13 · **Prérequis** `l-sys-solution` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 5 : une application ℝⁿ → ℝ³ donnée par une formule, pas P₃ → ℝ⁴.
 - **Intro** : Ker A est l'ensemble des solutions de Ax = 0. On réduit A, on écrit la solution générale avec les variables libres, et chaque variable libre donne un vecteur de base. dim Ker A = nombre de variables libres. Exemple : `x₁ + 2x₂ − x₄ = 0 ; x₃ + 3x₄ = 0` → Ker A = Span{(−2 ; 1 ; 0 ; 0), (1 ; 0 ; −3 ; 1)}.
 - **Juge** : `rowops` jusqu'à la forme réduite, puis `span` `{basis: kernel(A), require: 'basis'}` · **Forme finale** : liste de vecteurs ; toute base du noyau est acceptée.
 - **Niveaux** :
@@ -597,6 +621,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vs-col-row` — Image (Col A) et espace des lignes (Lgn A)
 - **Année** 13 · **Prérequis** `l-vec-indep` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-vec-indep` : les colonnes pivots de A sont libres.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 5 : Col A, Lgn A et Ker A, pas (Col A)⊥.
 - **Intro** : une base de Col A est formée des colonnes **de A** (pas de sa forme échelonnée) qui ont un pivot. Une base de Lgn A est formée des lignes non nulles **de la forme échelonnée**. dim Col A = dim Lgn A = rang A. Exemple : pivots en colonnes 1 et 3 → Col A = Span{a₁, a₃}, avec les colonnes de A.
 - **Juge** : `rowops`, puis `span` `{basis: col(A) ou row(A), require: 'basis'}` · **Forme finale** : liste de vecteurs ; toute base juste est acceptée.
 - **Niveaux** :
@@ -619,6 +644,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vs-basis` — Base et dimension : extraire, compléter, reconnaître
 - **Année** 13 · **Prérequis** `l-vs-col-row` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-vs-col-row` : extraire une base = garder les colonnes pivots.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de gabarit « compléter en une base » ni de ligne de relation de dépendance ; le QCM ne demande qu'une dimension.
 - **Intro** : dans un espace de dimension n, une famille de n vecteurs est une base si et seulement si elle est libre (ou si et seulement si elle engendre). Pour extraire une base d'une famille, on met les vecteurs (ou leurs coordonnées) en colonnes et on garde les colonnes pivots. Pour Pₙ ou M_{m×n}, on travaille sur les coordonnées dans la base canonique. Exemple : {1 + t, t + t², t² + t³, 1 + t³} dans P₃ : (1 + t) − (t + t²) + (t² + t³) − (1 + t³) = 0, donc pas une base.
 - **Juge** : `rowops` sur la matrice des coordonnées, puis `span` `{require: 'basis'}` pour la base extraite, ou décision « base / pas base » · **Forme finale** : base extraite, ou décision avec relation de dépendance.
 - **Niveaux** :
@@ -641,6 +667,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vs-rank` — Rang et théorème du rang
 - **Année** 13 · **Prérequis** `l-vs-basis` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-vs-basis` : dimension = nombre de vecteurs d'une base.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 5 : une chaîne de lignes sans aide plutôt qu'une série de vrai/faux et de QCM. « A 3 × 5 peut avoir un noyau de dimension 1 » (faux, mais sans contre-exemple possible) devient « dim Ker A ≥ n − m » (vrai), et le faux « dim Ker A = m − r » (contre-exemple `dims`).
 - **Intro** : pour A de taille m × n : rang A + dim Ker A = n ; dim Ker Aᵀ = m − rang A ; rang A = rang Aᵀ ≤ min(m, n). Pour T : V → W, dim Im T + dim Ker T = dim V. Exemple : A 5 × 7 de rang 3 → dim Ker A = 4, dim Ker Aᵀ = 2.
 - **Juge** : `value` sur des entiers, et items `tf` · **Forme finale** : dimensions.
 - **Niveaux** :
@@ -662,6 +689,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vs-coords` — Coordonnées dans une base
 - **Année** 13 · **Prérequis** `l-vs-basis` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-vs-basis` : les coordonnées se prennent dans une base.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de gabarit M₂ₓ₂ à base orthogonale ; niveau 4 dans ℝ³ ou P₂ ; niveau 1 : la réduction de [B | x], avec des cases.
 - **Intro** : [x]_B = (c₁ ; … ; cₙ) si x = c₁b₁ + … + cₙbₙ. On résout le système de matrice [b₁ … bₙ | x]. Dans Pₙ, on identifie les coefficients de chaque puissance de t. Exemple : B = (1, 1 − t, t + t²), p = 2 + 3t − t² → [p]_B = (6 ; −4 ; −1).
 - **Juge** : `rowops` (ou identification des coefficients, jugée par `value`), puis `value` sur le vecteur de coordonnées · **Forme finale** : vecteur de coordonnées exact.
 - **Niveaux** :
@@ -682,6 +710,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-vs-map-matrix` — Matrice d'une application entre Pₙ, M_{m×n} et ℝⁿ
 - **Année** 13 · **Prérequis** `l-vs-coords`, `l-map-std-matrix` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U3). Base d'arrivée toujours canonique (`l_coords_canonical` n'y sert pas) ; T : P₂ → ℝ³ ou P₂ → P₂, sans M₂ₓ₂ ni (t + 1)p ; niveau 5 sur P₂ au lieu de P₃.
 - **Intro** : [T]_{C B} a pour colonne j les **coordonnées dans C** de T(bⱼ). On calcule T(b₁), …, T(bₙ), puis on les exprime dans C. Si C est canonique, la seconde étape est immédiate. Exemple : T(a + bt + ct²) = (a − b ; b + 2c ; a + c), B = (1 + t, t − t², 1) → T(1 + t) = (0 ; 1 ; 1) est la 1re colonne.
 - **Juge** : `value` sur chaque T(bⱼ) (vecteur, polynôme ou matrice), puis `value` sur les coordonnées, puis sur la matrice · **Forme finale** : la matrice ; `askCoef` aᵢⱼ au format examen.
 - **Niveaux** :
@@ -704,6 +733,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vs-change-basis` — Matrice de passage P_{C←B}
 - **Année** 13 · **Prérequis** `l-vs-coords`, `l-mat-inverse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-vs-coords` : les colonnes sont des coordonnées dans C ; `l-mat-inverse` : P_{B←C} = (P_{C←B})⁻¹.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de gabarit « de B vers la base canonique » ; niveau 5 : un pᵢⱼ d'une 3 × 3, pas d'une 4 × 4.
 - **Intro** : P_{C←B} a pour colonnes les coordonnées **dans C** des vecteurs **de B** ; elle vérifie [x]_C = P_{C←B}·[x]_B. Dans ℝⁿ : on réduit [C | B] et on lit [I | P_{C←B}]. P_{B←C} = (P_{C←B})⁻¹. Exemple : C = {(1 ; 1), (1 ; 2)}, B = {(2 ; 3), (1 ; 0)} → [C | B] réduite = `[[1, 0 | 1, 2], [0, 1 | 1, −1]]`.
 - **Juge** : `rowops` `{A: [C | B], reduced: true}` puis `value` sur P · **Forme finale** : P_{C←B} ; `askCoef` pᵢⱼ au format examen.
 - **Niveaux** :
@@ -726,6 +756,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-vs-similar` — Matrice de T dans une base B ; matrices semblables
 - **Année** 13 · **Prérequis** `l-vs-change-basis`, `l-vs-map-matrix` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-vs-change-basis` : P est une matrice de passage ; `l-vs-map-matrix` : matrice [T]_B d'une application.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 3 : seulement la formule ; niveau 4 : se termine sur A (T(x) en note) ; pas de gabarit à base partiellement inconnue.
 - **Intro** : si A est la matrice canonique de T et P = [b₁ … bₙ], alors [T]_B = P⁻¹AP, et A = P·[T]_B·P⁻¹. Deux matrices semblables ont le même polynôme caractéristique, le même déterminant, la même trace et le même rang. Exemple : B = {(1 ; 1), (1 ; 2)}, [T]_B = `[[2, 0], [1, 3]]` → A = P·[T]_B·P⁻¹ = `[[3, 0], [2, 2]]`.
 - **Juge** : `value` sur P, P⁻¹ et les produits ; contrôle final T(b₁) = 2b₁ + b₂ · **Forme finale** : A ou [T]_B, ou la formule T(x).
 - **Niveaux** :
@@ -750,6 +781,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-eig-check` — Vérifier un vecteur propre ou une valeur propre
 - **Année** 13 · **Prérequis** `l-mat-product`, `l-vs-kernel` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-vs-kernel` : (A − λI)x = 0 a une solution non nulle.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le niveau 5 teste deux vecteurs et une valeur dans un même item en lignes (pas encore de QCM à plusieurs réponses à l'écran) ; « le vecteur nul est propre » (sans contre-exemple vérifiable) est remplacé par « u + w est propre » (faux).
 - **Intro** : v est un vecteur propre de A si v ≠ 0 et Av = λv pour un nombre λ. λ est une valeur propre si A − λI n'est pas inversible, c'est-à-dire si (A − λI)x = 0 a une solution non nulle. Exemple : A = `[[3, 1, 0], [1, 3, 0], [0, 0, 2]]`, v = (1 ; −1 ; 2) → Av = (2 ; −2 ; 4) = 2v.
 - **Juge** : `value` sur Av, puis décision ; pour une valeur propre, `rowops` sur A − λI jusqu'à voir une variable libre · **Forme finale** : « oui, λ = … » ou « non ».
 - **Niveaux** :
@@ -771,6 +803,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-eig-charpoly` — Polynôme caractéristique et valeurs propres
 - **Année** 13 · **Prérequis** `l-det-cofactor`, `g0-factor-thm`, `@alg:H-discriminant` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g0-factor-thm` : racine évidente d'un polynôme caractéristique de degré 3.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Lignes jugées par `det` (et non `equiv`), racines par `solset`.
 - **Intro** : p(λ) = det(A − λI) ; λ est **soustrait à chaque case de la diagonale**. Les racines sont les valeurs propres, avec leur multiplicité. 2 × 2 : p(λ) = λ² − (tr A)λ + det A. Triangulaire : les valeurs propres sont sur la diagonale. **Les opérations sur les lignes changent les valeurs propres** : on ne les lit pas sur une forme échelonnée. Exemple : `[[4, 1], [2, 3]]` → λ² − 7λ + 10 = (λ − 2)(λ − 5).
 - **Juge** : `equiv` `{vars: ['λ'], target: 'factored'}` (lignes avec `det(…)` de matrices en λ) ; puis `solset` sur les racines · **Forme finale** : polynôme factorisé et liste des valeurs propres avec multiplicités.
 - **Niveaux** :
@@ -793,6 +826,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-eig-space` — Espaces propres : base de E_λ
 - **Année** 13 · **Prérequis** `l-eig-charpoly`, `l-vs-kernel` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-eig-charpoly` : valeurs propres λ ; `l-vs-kernel` : E_λ = Ker(A − λI).
+- **Statut** : fait le 10 novembre 2026 (étape U3). Le vrai/faux « (λ − 3)²λ⁴ » devient une 3 × 3 de polynôme (λ − a)²(λ − b).
 - **Intro** : E_λ = Ker(A − λI). On réduit A − λI ; chaque variable libre donne un vecteur de base. 1 ≤ dim E_λ ≤ multiplicité de λ. Exemple : A − 2I = `[[0, 0, 0], [1, 1, 1], [1, 1, 1]]` → x₁ + x₂ + x₃ = 0 → E₂ = Span{(−1 ; 1 ; 0), (−1 ; 0 ; 1)}.
 - **Juge** : `rowops` sur A − λI, puis `eigvec` `{A, λ}` pour chaque vecteur, et `span` `{basis: kernel(A − λI), require: 'basis'}` pour la liste · **Forme finale** : base de chaque espace propre ; tout multiple et toute base juste sont acceptés.
 - **Niveaux** :
@@ -814,6 +848,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-eig-related` — Valeurs propres de cA, Aᵏ, A⁻¹, Aᵀ, A + cI, BAB⁻¹
 - **Année** 13 · **Prérequis** `l-det-props` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 5 : un item en lignes sans aide, pas une série de vrai/faux et de QCM.
 - **Intro** : si Av = λv, alors (cA)v = cλv, Aᵏv = λᵏv, A⁻¹v = (1/λ)v (si A est inversible), (A + cI)v = (λ + c)v. Aᵀ a les mêmes valeurs propres que A (mais pas les mêmes vecteurs propres). BAB⁻¹ a les mêmes valeurs propres, de vecteurs propres Bv. det A = produit des valeurs propres ; tr A = leur somme. Exemple : spectre {1 ; 2 ; −3} → A⁻¹ : {1 ; 1/2 ; −1/3}, A + 3I : {4 ; 5 ; 0}, donc A + 3I n'est pas inversible.
 - **Juge** : `value` sur des listes de nombres (ordre libre), et items `tf`, `mcq` · **Forme finale** : spectre ou propriété demandée.
 - **Niveaux** :
@@ -834,6 +869,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-eig-diag` — Diagonaliser : A = PDP⁻¹
 - **Année** 13 · **Prérequis** `l-eig-space`, `l-mat-inverse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U3). La conclusion « diagonalisable ? » est une décision en tête de la partie suivante, ou un compte (Σ dim E_λ).
 - **Intro** : A (n × n) est diagonalisable si et seulement si elle a n vecteurs propres libres, c'est-à-dire si Σ dim E_λ = n. Alors P = [v₁ … vₙ] et D = diag(λ₁, …, λₙ), **dans le même ordre**, et A = PDP⁻¹. Exemple : A = `[[5, −2], [4, −1]]` → P = `[[1, 1], [2, 1]]`, D = diag(1, 3).
 - **Juge** : `poly` puis `eigvec` pour chaque vecteur, puis `factor` `{A, kind: 'PDP'}` (AP = PD et P inversible) · **Forme finale** : P et D (et P⁻¹ si demandée) ; `askCoef` pᵢⱼ avec une convention fixée par l'énoncé (colonnes normées, λ₁ < λ₂).
 - **Niveaux** :
@@ -857,6 +893,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-eig-diag-param` — Diagonalisable selon un paramètre ; multiplicités
 - **Année** 13 · **Prérequis** `l-eig-diag`, `l-vs-rank` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-eig-diag` : diagonalisable ⇔ dim E_λ = multiplicité.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 5 en lignes libres, pas le QCM à quatre affirmations ; le vrai/faux 10 × 10 devient une 3 × 3 à valeur propre double.
 - **Intro** : A est diagonalisable si et seulement si, pour chaque valeur propre, dim E_λ = multiplicité. dim E_λ = n − rang(A − λI). Avec un paramètre : on cherche les valeurs où deux valeurs propres se confondent, puis on teste le rang seulement là. Exemple : A = `[[1, 1, 0], [0, a, 0], [0, 0, 2]]` → diagonalisable si et seulement si a ≠ 1.
 - **Juge** : `solset` `{v: 'a'}` pour les cas, `rowops` sur A − λI pour chaque cas critique, puis décision · **Forme finale** : ensemble des a pour lesquels A est diagonalisable.
 - **Niveaux** :
@@ -880,6 +917,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-eig-powers` — Puissances Aᵏ et récurrences linéaires
 - **Année** 13 · **Prérequis** `l-eig-diag`, `g5-geom` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g5-geom` : λᵏ : chaque mode est une suite géométrique.
+- **Statut** : fait le 10 novembre 2026 (étape U3). La variante A¹⁰⁰·x₀ n'est pas construite ; la variante `open` est un item en lignes sans aide (le problème de récurrence de 8 points).
 - **Intro** : si A = PDP⁻¹, alors Aᵏ = PDᵏP⁻¹, avec Dᵏ = diag(λ₁ᵏ, …). Une récurrence u_{k+2} = a·u_{k+1} + b·u_k s'écrit x_{k+1} = Mx_k avec x_k = (u_{k+1} ; u_k) et M = `[[a, b], [1, 0]]`. On décompose x₀ sur les vecteurs propres : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂. Exemple : u_{k+2} = u_{k+1} + 6u_k → λ = 3 et −2.
 - **Juge** : `factor` `{kind: 'PDP'}`, puis `equiv` `{vars: ['k'], domain: {k: 'N'}}` sur l'expression de Aᵏ ou de u_k (contrôle sur k = 0 à 6) · **Forme finale** : Aᵏ en fonction de k, ou u_k explicite.
 - **Niveaux** :
@@ -902,6 +940,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-eig-markov` — Chaînes de Markov à 2 états, état stationnaire
 - **Année** 13 · **Prérequis** `l-eig-powers`, `@alg:J-hausse-baisse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `@alg:J-hausse-baisse` : traduire les pourcentages qui restent ou changent d'état.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Vrai/faux : « toute matrice stochastique 2 × 2 a une limite indépendante de x₀ » (faux, contre-exemple).
 - **Intro** : x_{k+1} = Mx_k, où M est stochastique : **chaque colonne** somme à 1 (colonne j = où vont ceux de l'état j). 1 est valeur propre ; le vecteur stationnaire q vérifie Mq = q et a des composantes de somme 1. Si l'autre valeur propre μ vérifie |μ| < 1, x_k → q quel que soit x₀. Exemple : 70 % des buveurs de café en reprennent, 40 % des autres s'y mettent → M = `[[7/10, 4/10], [3/10, 6/10]]`, q = (4/7 ; 3/7).
 - **Juge** : `value` sur M, `eigvec` pour q puis `value` sur q normalisé ; `equiv` en k pour x_k · **Forme finale** : q (somme 1) et, si demandé, x_k.
 - **Niveaux** :
@@ -925,6 +964,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-eig-complex` — Valeurs propres complexes, rotation et dilatation
 - **Année** 13 · **Prérequis** `l-eig-charpoly`, `g8-algebraic`, `g8-polar` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `l-eig-charpoly` : polynôme caractéristique à Δ < 0 ; `g8-polar` : rapport √(a² + b²) et angle de la rotation.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Racines complexes par `poly` (factorisé sur ℂ) ; l'angle n'est demandé que s'il est usuel (π/2, π/4, 3π/4) ; les lignes « rapport et angle » créditent `l-eig-complex` tant que `g8-polar` n'existe pas.
 - **Intro** : une matrice réelle 2 × 2 avec Δ < 0 a deux valeurs propres conjuguées a ± bi, et des vecteurs propres conjugués. Elle agit comme une rotation composée d'une dilatation de rapport √(a² + b²). Les valeurs propres **réelles** d'une matrice de permutation se trouvent parmi les racines de λⁿ = 1. Exemple : `[[1, −2], [1, 3]]` → λ² − 4λ + 5 → λ = 2 ± i, rapport √5.
 - **Juge** : `complex` sur les valeurs propres ; `eigvec` `{A, λ, complex: true}` pour les vecteurs · **Forme finale** : valeurs propres, un vecteur propre, rapport et angle.
 - **Niveaux** :
@@ -949,6 +989,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-orth-dot` — Produit scalaire, norme, distance, angle
 - **Année** 13 · **Prérequis** `l-mat-product` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-mat-product` : u · v = uᵀv.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 3 : ‖v‖ est donnée ; niveau 4 : un paramètre, trouvé par `solset`, puis la distance.
 - **Intro** : u · v = uᵀv ; ‖u‖ = √(u · u) ; dist(u, v) = ‖u − v‖ ; cos θ = u · v / (‖u‖‖v‖). u ⊥ v ⇔ u · v = 0 ⇔ ‖u + v‖ = ‖u − v‖ ⇔ ‖u + v‖² = ‖u‖² + ‖v‖² (Pythagore). Exemple : u = (1 ; 2 ; 2), v = (3 ; 0 ; −4) → u · v = −5, ‖u‖ = 3, ‖v‖ = 5, cos θ = −1/3.
 - **Juge** : `value` (racines permises) · **Forme finale** : nombre exact simplifié, ou vecteur unitaire.
 - **Niveaux** :
@@ -957,7 +998,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
   - L3 (choisir l'action) : enchaîner (vecteur unitaire, puis angle).
   - L4 (libre) : ℝ⁴, avec un paramètre (« pour quel a u ⊥ v ? »).
   - L5 (seul) : vrai/faux sur les identités (2021 Q27) et un calcul de distance, sans aide.
-- **Générateur** : vecteurs entiers à normes entières (triplets et quadruplets pythagoriciens : (1, 2, 2), (2, 3, 6), (1, 4, 8), (2, 4, 4, 5), (1, 1, 1, 1)…), produits scalaires non nuls. Gabarits : (a) calculs ; (b) orthogonalité avec paramètre ; (c) vrai/faux.
+- **Générateur** : vecteurs entiers à normes entières (triplets et quadruplets pythagoriciens : (1, 2, 2), (2, 3, 6), (1, 4, 8), (1, 2, 2, 4), (1, 1, 1, 1)…), produits scalaires non nuls. Gabarits : (a) calculs ; (b) orthogonalité avec paramètre ; (c) vrai/faux.
 - **Corrigé type** : u = (1 ; 2 ; 2), v = (3 ; 0 ; −4).
   1. u · v = 3 + 0 − 8 = −5 — *produit scalaire*
   2. ‖u‖ = √9 = 3, ‖v‖ = √25 = 5 — *normes*
@@ -970,6 +1011,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-orth-complement` — Complément orthogonal W⊥
 - **Année** 13 · **Prérequis** `l-orth-dot`, `l-vs-kernel` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-orth-dot` : w · x = 0 pour chaque wᵢ.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de ligne « contrôler par des produits scalaires » ; le vrai/faux « (Col A)⊥ = Ker A » a un contre-exemple 2 × 2.
 - **Intro** : si W = Span{w₁, …, w_k}, alors W⊥ = Ker M, où M a pour **lignes** w₁ᵀ, …, w_kᵀ. dim W + dim W⊥ = n. (Col A)⊥ = Ker Aᵀ et (Lgn A)⊥ = Ker A. Exemple : W = Span{(1 ; 1 ; 0 ; 2), (0 ; 1 ; 1 ; −1)} ⊂ ℝ⁴ → W⊥ = Span{(1 ; −1 ; 1 ; 0), (−3 ; 1 ; 0 ; 1)}.
 - **Juge** : `rowops` sur M, puis `span` `{basis: kernel(M), require: 'basis'}` · **Forme finale** : base de W⊥ ; toute base est acceptée.
 - **Niveaux** :
@@ -992,6 +1034,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-orth-proj` — Projection orthogonale sur un sous-espace, distance
 - **Année** 13 · **Prérequis** `l-orth-complement` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `l-orth-complement` : z = y − ŷ est dans W⊥.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Aux niveaux 4 et 5, la base non orthogonale a deux vecteurs ; le vrai/faux « proj_W est injective » utilise `mapWitness`.
 - **Intro** : si {u₁, …, u_k} est une base **orthogonale** de W, proj_W y = Σ (y · uᵢ / uᵢ · uᵢ)·uᵢ. Alors y = ŷ + z avec z = y − ŷ ∈ W⊥, et dist(y, W) = ‖z‖. **Si la base n'est pas orthogonale, cette formule est fausse** : on orthogonalise d'abord (Gram-Schmidt). Exemple : W = Span{(1 ; 1 ; 1 ; 0), (1 ; −1 ; 0 ; 1)}, y = (3 ; 1 ; 2 ; 4) → ŷ = (4 ; 0 ; 2 ; 2).
 - **Juge** : `value` sur les coefficients, puis sur ŷ et z ; contrôle z · uᵢ = 0 · **Forme finale** : ŷ, z et la distance.
 - **Niveaux** :
@@ -1014,6 +1057,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-orth-matrices` — Familles orthonormées et matrices orthogonales
 - **Année** 13 · **Prérequis** `l-orth-dot`, `l-mat-inverse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-mat-inverse` : U⁻¹ = Uᵀ.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 2 : U est toujours orthogonale (pas de colonne modifiée) ; niveau 4 : compléter une famille de ℝ³ ou de ℝ⁴.
 - **Intro** : U (n × n) est orthogonale si ses colonnes sont orthonormées, c'est-à-dire UᵀU = I. Alors U⁻¹ = Uᵀ, ses lignes sont aussi orthonormées, ‖Ux‖ = ‖x‖, (Ux) · (Uy) = x · y, det U = ±1, et ses valeurs propres réelles valent ±1. **Des colonnes orthogonales mais non normées ne suffisent pas.** Exemple : U = (1/3)·`[[1, 2, 2], [2, 1, −2], [2, −2, 1]]` → UᵀU = I, det U = −1.
 - **Juge** : `value` sur UᵀU, U⁻¹ ; items `tf` · **Forme finale** : décision et matrice demandée.
 - **Niveaux** :
@@ -1034,6 +1078,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-orth-gs` — Gram-Schmidt
 - **Année** 13 · **Prérequis** `l-orth-proj` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U3). Chaque vecteur dans une partie `mat` (pour nommer les pièges), la liste finale par `span` ; le gabarit orthonormé seulement aux niveaux 4 et 5 ; le gabarit « colonnes d'une matrice » est laissé à QR.
 - **Intro** : v₁ = x₁ ; v₂ = x₂ − (x₂ · v₁ / v₁ · v₁)v₁ ; v₃ = x₃ − (x₃ · v₁ / v₁ · v₁)v₁ − (x₃ · v₂ / v₂ · v₂)v₂. On projette sur les **vᵢ déjà obtenus**, pas sur les xᵢ. On peut multiplier un vᵢ par un nombre pour enlever les fractions. Span{v₁, …, v_k} = Span{x₁, …, x_k} à chaque étape. Exemple : x₂ = (4 ; 1 ; 1 ; 1), v₁ = (1 ; 1 ; 0 ; 1) → x₂ · v₁ / v₁ · v₁ = 6/3 = 2 → v₂ = (2 ; −1 ; 1 ; −1).
 - **Juge** : `span` `{basis: [x₁ … x_k], require: 'orthogonal', nested: true}` (chaque vⱼ est orthogonal aux précédents et Span{v₁ … vⱼ} = Span{x₁ … xⱼ} ; voir les lacunes) ; les lignes de coefficients sont jugées par `value` · **Forme finale** : base orthogonale dans l'ordre ; orthonormée si demandé.
 - **Niveaux** :
@@ -1055,6 +1100,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-orth-qr` — Factorisation QR
 - **Année** 13 · **Prérequis** `l-orth-gs`, `l-orth-matrices` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de gabarit « résoudre Rx = Qᵀb » ; niveau 5 : un coefficient (souvent r₃₃).
 - **Intro** : si les colonnes de A sont libres, A = QR, où Q a des colonnes orthonormées (Gram-Schmidt normalisé) et R est triangulaire supérieure à diagonale positive. R = QᵀA : rᵢⱼ = qᵢ · xⱼ, et rᵢᵢ = ‖vᵢ‖. Exemple : si v₃ = (1 ; 1 ; −1 ; −1), alors r₃₃ = ‖v₃‖ = 2.
 - **Juge** : `factor` `{A, kind: 'QR'}` (Q à colonnes orthonormées, R triangulaire à diagonale > 0, QR = A) · **Forme finale** : Q et R ; `askCoef` rᵢⱼ au format examen.
 - **Niveaux** :
@@ -1077,6 +1123,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-orth-lsq` — Moindres carrés
 - **Année** 13 · **Prérequis** `l-orth-proj`, `l-mat-inverse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `l-orth-proj` : Ax̂ est la projection de b sur Col A ; `l-mat-inverse` : x̂ = (AᵀA)⁻¹Aᵀb pour les petits cas.
+- **Statut** : fait le 10 novembre 2026 (étape U3). `l_lsq_line_swap` se lit sur x̂ = (β₀ ; β₁), sans ligne « y = … » ; pas de distracteur AAᵀ quand les tailles ne le permettent pas.
 - **Intro** : si Ax = b n'a pas de solution, on cherche x̂ qui minimise ‖b − Ax‖. x̂ est solution des **équations normales** AᵀAx = Aᵀb. Si les colonnes de A sont libres, x̂ est unique. Droite y = β₀ + β₁x : A a une colonne de 1 et une colonne des x. Exemple : points (0 ; 2), (1 ; 1), (2 ; 2), (3 ; 5) → AᵀA = `[[4, 6], [6, 14]]`, Aᵀb = (10 ; 20) → y = 1 + x.
 - **Juge** : `value` sur AᵀA et Aᵀb, puis `rowops` sur [AᵀA | Aᵀb] ; contrôle Aᵀ(b − Ax̂) = 0 · **Forme finale** : x̂ ; `askCoef` x̂₁ au format examen.
 - **Niveaux** :
@@ -1099,6 +1146,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-orth-inner` — Produits scalaires non standards
 - **Année** 13 · **Prérequis** `l-orth-proj`, `l-vs-coords` · **Étiquettes** `MT` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `l-vs-coords` : produit scalaire sur Pₙ calculé sur les coefficients.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas de gabarit M₂ₓ₂ ; niveau 1 : la ligne des produits plutôt qu'un tableau de valeurs ; projection et Gram-Schmidt sur (1, t, t²) partent de la formule, produits scalaires déjà calculés.
 - **Intro** : un produit scalaire est symétrique, linéaire en chaque argument, et défini positif (⟨u, u⟩ > 0 si u ≠ 0). Exemples : ⟨u, v⟩ = uᵀAᵀAv (produit scalaire si et seulement si A est inversible) ; ⟨p, q⟩ = p(−1)q(−1) + p(0)q(0) + p(1)q(1) sur P₂ ; ⟨A, B⟩ = Σ aᵢⱼbᵢⱼ = tr(AᵀB) sur M₂ₓ₂. Les formules de projection et de Gram-Schmidt restent les mêmes, avec ce produit. Exemple : ⟨1 + t, t²⟩ = 0·1 + 1·0 + 2·1 = 2.
 - **Juge** : `value` ; décision et `example` pour les axiomes · **Forme finale** : nombre, projection, ou décision.
 - **Niveaux** :
@@ -1122,6 +1170,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-sym-orthodiag` — Diagonalisation orthogonale A = QDQᵀ
 - **Année** 13 · **Prérequis** `l-eig-diag`, `l-orth-gs`, `l-orth-matrices` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `l-eig-diag` : même calcul de P et D, puis normalisation.
+- **Statut** : fait le 10 novembre 2026 (étape U3). La variante `open` (exemple d'examen 4) donne directement le polynôme factorisé et réunit (d) et (e) ; elle vaut 14 points (cette entrée disait 12, l'exemple 14). Le vrai/faux 2021 Q21 devient un énoncé général (contre-exemple `matOne` `diagNotSym`).
 - **Intro** : A est diagonalisable en base orthonormée si et seulement si A est symétrique (théorème spectral). Les espaces propres sont orthogonaux entre eux ; dans un espace propre de dimension ≥ 2, on applique Gram-Schmidt ; puis on normalise. Q = [u₁ … uₙ], D dans le même ordre, A = QDQᵀ = Σ λᵢuᵢuᵢᵀ. Exemple : A = `[[11, −12], [−12, 4]]` → λ = −5 avec (3 ; 4)/5, λ = 20 avec (4 ; −3)/5.
 - **Juge** : `poly`, `eigvec`, `span` `{require: 'orthonormal'}` par espace propre, puis `factor` `{A, kind: 'orthodiag'}` · **Forme finale** : Q orthogonale et D ; `askCoef` qᵢⱼ avec convention (ordre des λ, signe de la première composante) au format examen.
 - **Niveaux** :
@@ -1143,6 +1192,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 
 ### `l-sym-quadform` — Formes quadratiques et axes principaux
 - **Année** 13 · **Prérequis** `l-sym-orthodiag` · **Étiquettes** `MT` · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U3). Variables x, y (z) → X, Y (Z) au lieu de x₁, x₂ → y₁, y₂ (les indices ne se distinguent pas dans l'évaluation numérique) ; niveau 5 : pour une hyperbole, seulement la distance au sommet.
 - **Intro** : Q(x) = xᵀAx avec A symétrique : le coefficient de xᵢ² va en aᵢᵢ, et **la moitié** du coefficient de xᵢxⱼ va en aᵢⱼ et en aⱼᵢ. Avec x = Py (P orthogonale, colonnes = vecteurs propres), Q = λ₁y₁² + … + λₙyₙ² : les colonnes de P sont les axes principaux. Q est définie positive si toutes les λᵢ > 0, indéfinie si deux signes apparaissent. Exemple : Q = 5x₁² − 4x₁x₂ + 8x₂² → A = `[[5, −2], [−2, 8]]`, λ = 4 et 9 → Q = 4y₁² + 9y₂².
 - **Juge** : `value` sur A, puis comme `l-sym-orthodiag`, puis `equiv` `{vars: ['y₁', 'y₂']}` sur la forme réduite · **Forme finale** : P, forme sans termes croisés, nature.
 - **Niveaux** :
@@ -1166,6 +1216,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-svd-compute` — Décomposition en valeurs singulières à la main
 - **Année** 13 · **Prérequis** `l-sym-orthodiag`, `l-vs-rank` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `l-vs-rank` : nombre de σᵢ non nuls = rang.
+- **Statut** : fait le 10 novembre 2026 (étape U3). La variante `open` (exemple d'examen 3) porte sur une 2 × 4 tirée au hasard, avec (e) réuni à U, Σ, V ; « U et V sont uniques » est remplacé par deux énoncés faux à contre-exemple vérifiable.
 - **Intro** : A (m × n) = UΣVᵀ. Les vᵢ sont des vecteurs propres orthonormés de AᵀA ; σᵢ = √λᵢ (dans l'ordre décroissant) ; pour σᵢ ≠ 0, **uᵢ = Avᵢ/σᵢ** ; on complète U et V en bases orthonormées (par Ker A et Ker Aᵀ). Le rang de A est le nombre de σᵢ non nuls. Si m < n, on peut chercher les valeurs propres non nulles sur AAᵀ, plus petite. Exemple : A = `[[4, 5, 2], [0, 3, 6]]` → σ₁ = 6√2, σ₂ = 3√2.
 - **Juge** : `poly`, `eigvec`, `span` `{require: 'orthonormal'}`, `value` (σᵢ), puis `factor` `{A, kind: 'SVD'}` · **Forme finale** : U, Σ, V ; `askCoef` (σ₂, ou un coefficient de U ou de V avec convention de signe) au format examen.
 - **Niveaux** :
@@ -1189,6 +1240,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-svd-sphere` — Image de la sphère unité
 - **Année** 13 · **Prérequis** `l-svd-compute`, `l-sym-quadform` · **Étiquettes** `MT` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `l-sym-quadform` : l'image est l'ellipse xᵀ(AAᵀ)⁻¹x = 1 et ses axes principaux.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Pas d'esquisse (type `plot` à l'étape U5) : le niveau 4 est en lignes libres ; seulement des images de rang plein (pas de segment).
 - **Intro** : l'image de la sphère unité par A est un ellipsoïde (une ellipse dans ℝ²) d'axes les uᵢ et de demi-axes les σᵢ. Si le rang est plus petit que la dimension de départ, l'image est **pleine** (ellipse pleine, ou segment) : des points de la sphère s'écrasent à l'intérieur. Exemple : A 2 × 3 de rang 2, σ = 6√2 et 3√2 → l'image de la sphère de ℝ³ est l'ellipse pleine de demi-axes 6√2 selon (1 ; 1) et 3√2 selon (1 ; −1).
 - **Juge** : `mcq` et `plot` (`task: 'conic'`) pour l'esquisse ; `value` sur les demi-axes · **Forme finale** : description (axes, demi-axes, pleine ou non).
 - **Niveaux** :
@@ -1212,6 +1264,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-proof-matrices` — Preuves courtes : inverses, noyaux, matrice canonique
 - **Année** 13 · **Prérequis** `l-mat-imt`, `l-det-props`, `g9-proof-contra` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `l-mat-imt` : énoncés équivalents de l'inversibilité ; `l-det-props` : det(AB) = det A·det B dans les preuves ; `g9-proof-contra` : preuve directe ou par contraposée.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Niveau 3 : une justification par preuve (une décision avant les blocs), pas une par bloc ; niveau 4 : charpente avec l'hypothèse placée, sans saisie.
 - **Intro** : une preuve courte enchaîne des égalités justifiées par une définition ou une règle déjà vue. On écrit d'abord ce qu'on suppose et ce qu'on veut montrer. Exemple : « (AB)(B⁻¹A⁻¹) = A(BB⁻¹)A⁻¹ = AA⁻¹ = I, donc (AB)⁻¹ = B⁻¹A⁻¹ » (note : associativité, puis définition de l'inverse).
 - **Juge** : `blocks` `{mode: 'order'}` avec des leurres ; mode `frame` aux niveaux 4 et 5 (début et fin à écrire, milieu en blocs) · **Forme finale** : chaîne de blocs qui respecte `needs`.
 - **Niveaux** :
@@ -1234,6 +1287,7 @@ Chaque générateur abandonne après 200 tirages et prend son exemple de secours
 ### `l-proof-spectral` — Preuves courtes : symétriques, orthogonales, projecteurs
 - **Année** 13 · **Prérequis** `l-sym-orthodiag`, `l-proof-matrices` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `l-sym-orthodiag` : théorème spectral cité dans la preuve ; `l-proof-matrices` : même rédaction en blocs.
+- **Statut** : fait le 10 novembre 2026 (étape U3). Comme `l-proof-matrices` ; l'énoncé du théorème spectral se construit en mode `define`.
 - **Intro** : on part du produit scalaire et on fait passer A d'un côté à l'autre : Av · w = (Av)ᵀw = vᵀAᵀw. Si A est symétrique, = vᵀAw = v · Aw. Exemple : λ(v · w) = Av · w = v · Aw = μ(v · w), donc (λ − μ)(v · w) = 0.
 - **Juge** : `blocks` `{mode: 'order' | 'frame'}` avec des leurres · **Forme finale** : chaîne de blocs complète.
 - **Niveaux** : comme `l-proof-matrices`.
@@ -1918,3 +1972,10 @@ Pièges suivis : `m_power_ratio`, `m_inverse_power_value`, `m_rayleigh_no_denomi
 10. **G10 et L.** La ligne G10 « Réduire une conique avec un terme en xy » demande les valeurs propres de L, mais G10 est en année 12.5 et L en 13. Aucun prérequis n'a été ajouté ici ; il faut décider qui dépend de qui.
 11. **Lignes du plan M laissées de côté.** « Mettre une EDO sous forme d'état » n'est gardée que pour l'EDO homogène (matrice compagne, sans B). « Linéariser par la jacobienne » n'est ni dans la liste BA4 ni dans la liste BA5+ : à placer (A2 ou plan BA5+). Le fichier `plan-ba5-et-plus.md`, cité au §1, n'existe pas encore.
 12. **`examWeight` = 0.** Le §10 dit « 1 par défaut ». Ici, 0 veut dire « jamais tiré à l'examen » (compétences absentes des examens 2015 à 2021). À confirmer dans `engine/exam.js`.
+
+**Tranché à l'étape U3** (voir [README](README.md) §17) :
+- 1 : `rowops` avec `vars: ['a']` calcule dans ℚ(a) ; une ligne qui multiplie une ligne par une expression de a est refusée et nomme `l_param_divide_zero` ; la discussion des cas passe par `solset` (ou `poly` pour factoriser le pivot).
+- 2 : le juge `det` lit les lignes avec `det[[…]]` et `det(A − λI)` (matrices nommées par l'item), calculées exactement ; ce n'est pas un nœud de `parse.js`, c'est la langue des lignes de `js/cas/matexpr.js`.
+- 3 : `span` avec `nested` et `affine`, `eigvec` avec `complex`, `rowops` avec `track: 'det'` existent. Pas de `track: 'lu'` : les ℓᵢⱼ sont dans les notes et dans L, jugée par `factor`. `askCoef = {label, path, convention?}` : le générateur fixe la convention dans l'énoncé et calcule le coefficient.
+- 5 : pas de plan `ba1-alglin-mt` : les problèmes `open` existent comme items en lignes sans aide ; le plan viendra avec le type `problem` (U4).
+- 12 : `examWeight: 0` veut dire « jamais tiré » (`sectionPool` de `js/engine/exam.js`).

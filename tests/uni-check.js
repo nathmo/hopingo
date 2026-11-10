@@ -30,13 +30,49 @@ import { pretty } from '../js/cas/normal.js';
 import { solutionSet, contains01, isSetNode } from '../js/cas/sets.js';
 import { toText } from '../js/cas/print.js';
 import { parse as parseSchool, evaluate } from '../js/math/expr.js';
+import { judgeMatrixItem } from '../js/judges/matrix-item.js';
+import { reference as spanRef, familyOf, sameSpan } from '../js/judges/span.js';
+import { valueText, vecOf, Mx, isZeroScalar } from '../js/cas/matexpr.js';
 
 
 export const UNI = UNI_SKILLS.map((s) => s.id);
 export const skillsOf = (unit) => UNI_SKILLS.filter((s) => s.unit === unit).map((s) => s.id);
 
+// Step U3: the first number of a matrix or a vector, plus one.
+const MATRIX_JUDGES = ['rowops', 'mat', 'eigvec', 'span', 'factor'];
+function perturb(text) {
+  const colon = text.lastIndexOf(':');
+  const head = colon >= 0 ? text.slice(0, colon + 1) : '';
+  const body = colon >= 0 ? text.slice(colon + 1) : text;
+  const out = body.replace(/(\[\[\s*|\(\s*|=\s*)(-?\d+)/, (m, a, n) => `${a}${Number(n) + 1}`);
+  return out === body ? `${text}+1` : head + out;
+}
+
+// A family that spans another space (judge span): a vector outside W
+// replaces the first one; with W = ℝⁿ, one vector is dropped.
+function wrongSpanLine(cfg, final) {
+  const ref = spanRef(cfg);
+  const fam = familyOf(readWith(cfg, final).value, cfg);
+  const n = ref.n;
+  const e = (k) => vecOf(Array.from({ length: n }, (_, i) => lit(i === k ? 1 : 0)));
+  const out = [...Array(n).keys()].map(e).find((v) => !sameSpan([...ref.basis, v], ref.basis));
+  const vecs = fam.vecs;
+  if (cfg.affine) {
+    const shift = out ?? e(0);
+    const p = vecOf(fam.p.rows.map((r, i) => ({ t: 'bin', op: '+', l: r[0], r: shift.rows[i][0] })));
+    if (!out) return valueText(p);
+    return `${valueText(p)}${vecs.map((v, i) => `+${['t', 's', 'r', 'u'][i]}${valueText(v)}`).join('')}`;
+  }
+  if (!out) return vecs.length > 1 ? vecs.slice(1).map(valueText).join(', ') : valueText(e(0));
+  return [out, ...vecs.slice(1)].map(valueText).join(', ');
+}
+
 // A line every judge must refuse, built from the last line of the first part.
 function wrongLine(cfg, final) {
+  if (cfg.kind === 'eigvec') return `(${final.replace(/^.*=\s*/, '').replace(/[()]/g, '').split(';').map(() => '0').join(' ; ')})`;
+  if (cfg.kind === 'span') return wrongSpanLine(cfg, final);
+  if (cfg.kind === 'rowops' && cfg.track === 'det' && !/det|\[/.test(final)) return `${final}+1`;
+  if (MATRIX_JUDGES.includes(cfg.kind)) return perturb(final);
   if (cfg.kind === 'logic') return `¬(${final})`;
   // A bound (equiv with rel): a constant far below or above.
   if (cfg.rel) return cfg.rel === '≥' ? `${final}+1000` : `${final}-1000`;
@@ -164,6 +200,19 @@ function checkItem(it, where) {
     case 'answer':
       assert.ok(evaluate(parseSchool(it.expected)), where);
       break;
+    // Step U3: a single grid answer, and an example to give.
+    case 'matrix': {
+      const r = judgeMatrixItem(it, it.answer);
+      assert.ok(r.correct, `${where}: reference answer ${r.verdict?.kind} ${r.verdict?.message ?? ''}`);
+      const bad = it.judge.kind === 'eigvec' ? wrongLine(it.judge, it.answer) : perturb(it.answer);
+      assert.equal(judgeMatrixItem(it, bad).correct, false, `${where}: ${bad} accepted`);
+      break;
+    }
+    case 'example': {
+      const r = checkCounter(it.property, it.answer);
+      assert.ok(r.ok, `${where}: reference example refused: ${r.message}`);
+      break;
+    }
     default: assert.fail(`${where}: type ${it.type}`);
   }
 }
@@ -189,6 +238,7 @@ export function checkSkills(ids, seed = 17, counts = {}) {
         total++;
         if (it.fallback) fallbacks++;
         assert.equal(it.skill, id, where);
+        assert.ok(!it.stub, `${id}: not built yet`);
         assert.ok(it.prompt && it.key && it.expectedSec > 0, where);
         if (exam) assert.equal(it.exam?.format, exam, where);
         if (it.type === 'lines') modes.add(it.mode);

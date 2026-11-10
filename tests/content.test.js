@@ -28,6 +28,8 @@ test('skim starts later for older students', () => {
 test('every generator produces valid, self-consistent items', () => {
   const rng = makeRng(7);
   for (const s of SKILLS) {
+    // Module L is checked item by item by tests/uni-alglin-*.test.js.
+    if (s.unit === 'alglin') continue;
     for (let level = 1; level <= 5; level++) {
       for (let i = 0; i < 40; i++) {
         const it = generate(s.id, level, rng);

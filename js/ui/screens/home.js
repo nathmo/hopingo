@@ -11,6 +11,8 @@ import {
 } from '../../engine/learner.js';
 import { currentStreak } from '../../engine/rewards.js';
 import { topBar, bottomNav, starRow } from './common.js';
+import { examsForUnit } from '../../engine/exam.js';
+import { EXAM_BY_ID } from '../../content/uni/exams.js';
 
 const LEVEL_NAMES = ['', 'Découverte', 'Facile', 'Moyen', 'Difficile', 'Expert'];
 
@@ -41,6 +43,10 @@ export function homeScreen(root, _args, app) {
     main.append(bubble(`Ta série de ${streak.lost} jours s'est arrêtée. On en recommence une ?`, 'sad'));
   }
   main.append(cta);
+  // A mock exam under way (step U3): resume it.
+  if (p.examRun && EXAM_BY_ID[p.examRun.exam.id]) {
+    main.append(h('button.btn.secondary.wide.exam-resume', { onclick: () => app.go('exam', { id: p.examRun.exam.id }) }, `📝 Reprendre l'examen blanc : ${EXAM_BY_ID[p.examRun.exam.id].title}`));
+  }
 
   for (const unit of UNITS) {
     const skills = unitSkills(unit.id);
@@ -53,7 +59,9 @@ export function homeScreen(root, _args, app) {
         unit.ready ? h('span.unit-count', `${done}/${skills.length} 👑`) : h('span.soon', 'Bientôt')),
       unit.ready && done < skills.length ? h('div.unit-tools',
         h('button.btn.small.ghost', { type: 'button', onclick: () => { pinBranch(p, unit.id); app.save(); app.go('home'); } }, pinned === unit.id ? 'Désépingler' : '📌 Épingler cette branche'),
-        h('button.btn.small.ghost', { type: 'button', onclick: () => app.go('skim', { unit: unit.id }) }, 'Je connais déjà ce module')) : null);
+        h('button.btn.small.ghost', { type: 'button', onclick: () => app.go('skim', { unit: unit.id }) }, 'Je connais déjà ce module')) : null,
+      // Step U3: the mock exams of this unit.
+      unit.ready && examsForUnit(unit.id).length ? h('div.unit-tools', examsForUnit(unit.id).map((e) => h('button.btn.small.secondary', { type: 'button', onclick: () => app.go('exam', { id: e.id }) }, `📝 Examen blanc : ${e.title}`))) : null);
     if (!unit.ready) {
       section.classList.add('locked');
       section.append(h('div.path', [0, 1, 2].map((i) => h('div.node-wrap', { style: { '--x': `${[0, 1, -1][i] * 70}px` } }, h('div.node.locked', '🔒')))));

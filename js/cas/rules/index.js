@@ -8,6 +8,7 @@ import { RULES as G2 } from './g2.js';
 import { RULES as G3 } from './g3.js';
 import { RULES as G5 } from './g5.js';
 import { RULES as G1, EARLY as G1_EARLY } from './g1.js';
+import { RULES as L } from './l.js';
 
 // The G1 traps of inequalities come before G9: a closed bracket at a
 // forbidden value is named g1_pole_closed, not g9_bracket.
@@ -27,3 +28,5 @@ import { RULES as A1E } from './a1e.js';
 // judge, a line « 0 » after (x − sin x)/x³ is a sine replaced in a sum,
 // although (f/g)′ has the same limit.
 CAS_RULES.push(...G6A, ...G6B, ...G6C, ...A1A, ...A1C, ...A1B, ...A1D, ...A1E);
+// Step U3: module L.
+CAS_RULES.push(...L);

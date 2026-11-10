@@ -1,0 +1,50 @@
+/* Step U3: grids of matrices and vectors (js/ui/matrix-input.js) and the
+   exam screen (js/ui/screens/exam.js). Uses the variables of style.css. */
+
+.mx-input { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+.mx-input.shake { animation: shake .4s; }
+.mx-text { width: 100%; max-width: 32em; font-size: 1.05rem; padding: 8px 10px; border: 2px solid var(--line); border-radius: 10px; font-family: inherit; }
+.mx-text:focus { outline: none; border-color: var(--violet); }
+.mx-fixed { font-weight: 800; font-size: 1.05rem; }
+.mx-grids { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; }
+.mx-grid-box { display: inline-flex; align-items: center; gap: 4px; }
+.mx-label { font-weight: 800; margin-right: 4px; }
+.mx-bracket { font-size: 2.4rem; font-weight: 300; color: var(--muted); line-height: 1; }
+.mx-grid { display: grid; grid-template-columns: repeat(var(--cols), auto); gap: 4px; align-items: center; }
+.mx-cell { width: 3.4em; font-size: 1rem; text-align: center; border: 2px solid #cbbcff; border-radius: 8px; padding: 4px 2px; font-family: inherit; }
+.mx-cell:focus { outline: none; border-color: var(--violet); background: var(--violet-soft); }
+.mx-cell.fixed { border-color: transparent; background: transparent; color: var(--ink); }
+.mx-bar { font-size: 1.4rem; color: var(--muted); padding: 0 2px; }
+.mx-hint { display: block; width: 100%; text-align: center; }
+.mx-pad { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.mx-opbar, .mx-size { flex-wrap: wrap; gap: 6px; align-items: center; justify-content: center; }
+.mx-opbar select, .mx-k { font-size: .95rem; padding: 4px; border: 2px solid var(--line); border-radius: 8px; font-family: inherit; }
+
+.exam { padding: 12px 16px 120px; max-width: 760px; margin: 0 auto; }
+.exam-info ul { margin: 6px 0 10px 1.2em; }
+.exam-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; position: sticky; top: 0; background: var(--bg); padding: 8px 0; z-index: 2; }
+.exam-timer { font-weight: 800; font-variant-numeric: tabular-nums; padding: 4px 10px; border-radius: 10px; background: var(--violet-soft); }
+.exam-timer.low { background: var(--red-soft); color: var(--red-dark); }
+.exam-nav { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 12px; }
+.exam-dot { width: 2.2em; height: 2.2em; border-radius: 8px; border: 2px solid var(--line); background: #fff; font-weight: 800; font-size: .85rem; }
+.exam-dot.answered { background: var(--violet-soft); border-color: #cbbcff; }
+.exam-dot.flagged { border-color: var(--orange); }
+.exam-dot.current { border-color: var(--violet); box-shadow: 0 0 0 2px var(--violet); }
+.exam-card { background: var(--card); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); }
+.exam-qhead { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.exam-tools { margin-top: 10px; gap: 8px; }
+.exam-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; margin-top: 14px; }
+.exam-grade { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 10px 0; }
+.exam-grade-num { font-size: 3rem; font-weight: 900; }
+.exam-verdict { font-weight: 800; padding: 4px 12px; border-radius: 999px; }
+.exam-verdict.ready { background: var(--green-soft); color: var(--green-dark); }
+.exam-verdict.almost { background: #fff4d6; color: #a86e00; }
+.exam-verdict.notyet { background: var(--red-soft); color: var(--red-dark); }
+.exam-table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; }
+.exam-table th, .exam-table td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+.exam-work { display: flex; flex-wrap: wrap; gap: 6px; }
+.exam-corr { background: var(--card); border-radius: 12px; padding: 8px 12px; margin: 6px 0; border-left: 4px solid var(--line); }
+.exam-corr.right { border-left-color: var(--green); }
+.exam-corr.wrong, .exam-corr.partial { border-left-color: var(--red); }
+.exam-corr summary { cursor: pointer; font-weight: 700; }
+.exam-resume { margin-top: 8px; }

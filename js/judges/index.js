@@ -13,6 +13,13 @@ import * as equiv from './equiv.js';
 import * as solset from './solset.js';
 import * as logic from './logic.js';
 import * as poly from './poly.js';
+// Step U3: linear algebra.
+import * as rowops from './rowops.js';
+import * as mat from './mat.js';
+import * as det from './det.js';
+import * as eigvec from './eigvec.js';
+import * as span from './span.js';
+import * as factor from './factor.js';
 import { parse } from '../cas/parse.js';
 import { toMathML } from '../cas/mathml.js';
 import { toText } from '../cas/print.js';
@@ -20,6 +27,7 @@ import { unparen } from '../cas/ast.js';
 import { parseOpts } from './common.js';
 
 export const JUDGES = { value, equiv, solset, logic, poly };
+Object.assign(JUDGES, { rowops, mat, det, eigvec, span, factor });
 
 export function judgeFor(cfg) {
   const j = JUDGES[cfg.kind];
@@ -29,8 +37,10 @@ export function judgeFor(cfg) {
 
 // Reading, showing and writing a line with the judge of cfg.
 export const readWith = (cfg, text) => (judgeFor(cfg).parseLine ? judgeFor(cfg).parseLine(cfg, text) : parse(text, parseOpts(cfg)));
-export const showWith = (cfg, node, opts = {}) => (judgeFor(cfg).show ? judgeFor(cfg).show(cfg, node, opts) : toMathML(unparen(node), { dvar: cfg.dvar, ...opts }));
-export const textWith = (cfg, node) => (judgeFor(cfg).text ? judgeFor(cfg).text(cfg, node) : toText(node, { dvar: cfg.dvar }));
+export const showWith = (cfg, node, opts = {}) => (node?.t === 'mline' ? mat.show(cfg, node, opts) : judgeFor(cfg).show ? judgeFor(cfg).show(cfg, node, opts) : toMathML(unparen(node), { dvar: cfg.dvar, ...opts }));
+export const textWith = (cfg, node) => (node?.t === 'mline' ? mat.text(cfg, node) : judgeFor(cfg).text ? judgeFor(cfg).text(cfg, node) : toText(node, { dvar: cfg.dvar }));
+// (A line of a matrix judge is shown by its own printer, whatever the
+// judge of the part where it is shown: step U3.)
 
 // Step U2: the calculus judges (developments, primitives, definite
 // integrals, limits). Each exports `sign`, the sign shown before a line.

@@ -8,6 +8,7 @@ import { MathInput } from './keypad.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { judgeTf, checkCounter } from '../judges/examples.js';
+import { counterFields, usesGrid } from './matrix-items.js';
 
 export function mountTf(item, ctx, body) {
   const stage = h('div.tf-stage');
@@ -64,6 +65,12 @@ export function mountTf(item, ctx, body) {
         }, t));
         rows.push(h('div.tf-counter-row', h('span.tf-label', `${l} :`), h('div.row', btns)));
       }
+    } else if (usesGrid(c)) {
+      // Step U3: matrices and vectors are entered in grids.
+      const fields = counterFields(c, () => onEnter());
+      rows.push(...fields.rows);
+      onEnter = () => { Object.assign(answers, fields.read()); check(); };
+      footer.replaceChildren();
     } else {
       const asks = c.ask?.length ? c.ask : [{ v: 'x', label: 'x =' }];
       const inputs = asks.map((a) => {

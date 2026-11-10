@@ -28,6 +28,7 @@ import { mountTokens } from './tokens.js';
 import { mountTf } from './tf.js';
 import { mountBlocks } from './blocks.js';
 import { mountTable } from './table-input.js';
+import { mountMatrix, mountExample } from './matrix-items.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -84,6 +85,9 @@ MOUNTS.tf = (item, ctx, body) => mountTf(item, ctx, body);
 MOUNTS.tokens = (item, ctx, body) => mountTokens(item, ctx, body);
 MOUNTS.blocks = (item, ctx, body) => mountBlocks(item, ctx, body);
 MOUNTS.table = (item, ctx, body) => mountTable(item, ctx, body);
+// Step U3: one answer in a grid, an example to give.
+MOUNTS.matrix = (item, ctx, body) => mountMatrix(item, ctx, body);
+MOUNTS.example = (item, ctx, body) => mountExample(item, ctx, body);
 
 // ---------- multiple choice ----------
 

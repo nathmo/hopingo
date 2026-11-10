@@ -31,6 +31,7 @@ import { closedHolds, setValue, isFiniteSet } from '../cas/sets.js';
 import { lexicon, parseFormula, truthOf } from '../cas/logic.js';
 import { polyOf, coeffs, qCoeffs, degree, divide, I } from '../cas/polyx.js';
 import { Poly, gcdPoly } from '../cas/poly.js';
+import { checkLinalg } from './linalg-examples.js';
 
 const SAMPLES = {
   R: ['-3', '-2', '-1', '-1/2', '0', '1/3', '1/2', '1', '2', '5/2', '3', '7'],
@@ -244,7 +245,7 @@ export function checkCounter(counter, answers) {
     case 'truth': return checkTruth(counter, answers);
     case 'poly': return checkPoly(counter, answers);
     case 'composite': return checkComposite(counter, answers);
-    default: return { ok: false, message: 'Contre-exemple non vérifiable.' };
+    default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }
 

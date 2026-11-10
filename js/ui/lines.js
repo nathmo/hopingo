@@ -20,6 +20,9 @@ import { parse, tryParse } from '../cas/parse.js';
 import { toMathML } from '../cas/mathml.js';
 import { unparen } from '../cas/ast.js';
 import { lexFor } from '../cas/logic.js';
+// Step U3: the grid of the matrix judges.
+import { MatrixInput, matrixShape } from './matrix-input.js';
+import { judgeFor } from '../judges/index.js';
 
 const MM = (node, opts) => toMathML(unparen(node), opts);
 // The MathML of a typed text, without the <math> wrapper (to put in a blank).
@@ -108,6 +111,7 @@ export function mountLines(item, ctx, body) {
     if (k < seg.lines.length && seg.lines[k].kind === 'decision') return decisionTask(seg.lines[k], k);
     if (item.mode === 'guided') {
       const next = run.nextScript();
+      if (next && next.line.cells?.length && isGrid()) return gridBlanksTask(next);
       if (next && next.line.blanks?.length) return blanksTask(next);
     }
     if (item.mode === 'tap' && item.tapActions && !tapChoice && actionsFor(item.tapActions, run.prev, run.cfg).length) return actionTask();
@@ -123,7 +127,20 @@ export function mountLines(item, ctx, body) {
     const ask = run.segment.ask;
     const prev = h('div.lines-preview');
     let preview;
-    if (run.cfg.kind === 'logic') {
+    if (isGrid()) {
+      // Matrix judges (step U3): a text field and a grid.
+      const ref = run.nextScript()?.line.math;
+      input = new MatrixInput({
+        shape: matrixShape(run.cfg, ref, run.prev), prev: run.prev, cfg: run.cfg,
+        ops: run.cfg.kind === 'rowops', apply: item.mode === 'tap',
+        onEnter: () => submit(), onChange: (v) => preview(v),
+      });
+      preview = (v) => {
+        let m = null;
+        if (v) { try { m = showWith(run.cfg, readWith(run.cfg, v)); } catch { m = null; } }
+        prev.innerHTML = m ?? '';
+      };
+    } else if (run.cfg.kind === 'logic') {
       // Formulas are built from the item's pieces and the logic symbols.
       const lex = lexFor(run.cfg);
       const pieces = [...new Set([...lex.texts.values()].map((t) => t.text))];
@@ -143,6 +160,35 @@ export function mountLines(item, ctx, body) {
       handle(run.submit(input.value, { guided: item.mode === 'guided' }));
     };
     setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider la ligne'));
+  }
+
+  // Step U3: a judge whose lines are matrices is written in a grid.
+  function isGrid() { return judgeFor(run.cfg).input === 'matrix'; }
+
+  // A guided matrix line: the reference line, its blank cells to fill.
+  function gridBlanksTask({ line }) {
+    tries = 0;
+    input = new MatrixInput({ cfg: run.cfg, prev: run.prev, onEnter: () => submit() });
+    if (!input.guided(line.math, line.cells)) return freeTask();
+    if (line.note) stage.append(h('div.step-label', line.note));
+    stage.append(h('div.step-line.current', h('span.eq', eqSign()), input.display));
+    const grid = input;
+    setTimeout(() => grid.focus?.(), 0);
+    submit = () => {
+      if (locked()) return;
+      const v = run.submit(input.value, { guided: true });
+      if (v.kind === 'wrong') {
+        tries += 1;
+        wrong(v, { follow: false });
+        if (tries >= 2) {
+          const r = run.reveal();
+          if (r) { addLine(r.node, 'shown', line.note); say('<p>Voilà cette ligne. À toi pour la suite !</p>'); afterAccept(r); }
+        }
+        return;
+      }
+      handle(v, line.note);
+    };
+    setFooter(h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider l’étape'));
   }
 
   // A reference line with blanks: the keypad fills the active blank.

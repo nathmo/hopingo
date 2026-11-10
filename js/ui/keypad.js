@@ -53,9 +53,11 @@ const KEYSETS = {
   // b, limits, one-sided bounds 0⁺ 1⁻, the constant C, the remainder ε(x).
   anal: ['int(', 'bracket(', 'lim(', ',', 'C', 'ε(x)', 'o(', '⁺', '⁻', '∞', 't', '(', ')', 'left', 'right', 'back'],
 };
+// Step U3: lines of matrices typed as text (« (1 ; 2) », det, Aᵀ, A⁻¹).
+KEYSETS.mat = ['7', '8', '9', '(', ')', ';', 'back', '4', '5', '6', '+', '-', '×', 'frac', '1', '2', '3', '^', '√', 'λ', '0', ',', '[', ']', '|', 'left', 'right'];
 
 // Tab names of the keypads.
-const TAB_LABEL = { anal: '∫ lim', calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
+const TAB_LABEL = { anal: '∫ lim', mat: '[ ]', calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
 
 const LABEL = {
   'int(': '∫( , x)', 'bracket(': '[F]ₐᵇ', 'lim(': 'lim( , x, a)', 'o(': 'o( )',
