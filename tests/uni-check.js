@@ -170,7 +170,9 @@ function checkItem(it, where) {
 // all judged by the numeric scan of sets.js.
 const COUNT = { 'g2-exp-eq': 25, 'g2-ineq': 25, 'g1-abs-ineq': 20, 'g1-irr-ineq': 25 };
 
-export function checkSkills(ids, seed = 17) {
+// counts (step U2): items per level for some skills of one test file,
+// never under 20 (heavy skills whose lines need quadrature or series).
+export function checkSkills(ids, seed = 17, counts = {}) {
   const rng = makeRng(seed);
   for (const id of ids) {
     const s = SKILL_BY_ID[id];
@@ -179,7 +181,7 @@ export function checkSkills(ids, seed = 17) {
     const runs = [...[1, 2, 3, 4, 5].map((level) => ({ level })), ...(s.exam || []).map((exam) => ({ level: 4, exam }))];
     for (const { level, exam } of runs) {
       const modes = new Set();
-      for (let i = 0; i < (COUNT[id] ?? 40); i++) {
+      for (let i = 0; i < (counts[id] ?? COUNT[id] ?? 40); i++) {
         const it = generate(id, level, rng, null, exam ? { exam } : undefined);
         const where = `${id} L${level}${exam ? ` ${exam}` : ''}: ${it.key}`;
         total++;
