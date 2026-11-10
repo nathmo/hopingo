@@ -306,6 +306,25 @@ export function compileFloat(node) {
         return x ** y;
       };
     }
+    // Step U4: a finite Σ (bounds in n), its term compiled once.
+    case 'sum': {
+      if (isInf(node.hi)) break;
+      const lo = C(node.lo);
+      const hi = C(node.hi);
+      const t = C(node.e);
+      const k = node.k;
+      return (env) => {
+        const x = lo(env);
+        const y = hi(env);
+        const a = Math.round(x);
+        const b = Math.round(y);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || Math.abs(a - x) > 1e-9 || Math.abs(b - y) > 1e-9 || b - a > 100000) return NaN;
+        const e = { ...env };
+        let s = 0;
+        for (let j = a; j <= b; j++) { e[k] = j; s += t(e); }
+        return s;
+      };
+    }
     default: break;
   }
   return (env) => evalFloat(node, env);

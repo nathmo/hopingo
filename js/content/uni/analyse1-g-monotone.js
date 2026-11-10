@@ -86,7 +86,7 @@ function sumItem(level, rng, opts) {
   const parts = [
     { html: 'Sens de variation :', start: diff, judge: EQN({ domain: { n: { int: [1, 30] } }, target: 'goal', goal: step }), lines: mLines, choices: CHOICES },
     {
-      html: 'Un majorant :', start: u, judge: { kind: 'equiv', vars: ['n'], from: 1, maxN: 1000, rel: '≤' },
+      html: 'Un majorant :', start: u, judge: { kind: 'equiv', vars: ['n'], from: 1, span: 60, maxN: 1000, rel: '≤' },
       lines: bLines, pre: level === 2 ? [pick] : [], choices: CHOICES,
     },
     {
@@ -129,7 +129,15 @@ function recItem(level, rng, opts) {
       html: `Majorée par ${l} (récurrence) : on suppose 0 ≤ u ≤ ${l}, avec u = uₙ.`, start: `√(${c}+u)`, judge: rel('≤'), lines: hLines,
       pre: [{ kind: 'note', html: `u₀ = 0 ≤ ${l}. Hérédité : si 0 ≤ uₙ ≤ ${l}, alors uₙ₊₁ = √(${c} + uₙ) ≤ ?` }, ...(level === 2 ? [how] : [])], choices: CHOICES,
     },
-    { html: `Croissante : uₙ₊₁ − uₙ = √(${c} + u) − u pour 0 ≤ u ≤ ${l}.`, start: `√(${c}+u)-u`, judge: rel('≥'), lines: mLines, choices: CHOICES },
+    {
+      html: `Croissante : uₙ₊₁ − uₙ = √(${c} + u) − u pour 0 ≤ u ≤ ${l}.`, start: `√(${c}+u)-u`, judge: rel('≥'), lines: mLines, choices: CHOICES,
+      pre: level === 2 || level === 3 ? [{
+        kind: 'decision', prompt: 'Comment montrer que (uₙ) est croissante ?', options: [
+          { id: 'sign', label: 'Montrer que uₙ₊₁ − uₙ = √(' + c + ' + uₙ) − uₙ ≥ 0', valid: true, ref: true },
+          { id: 'f', label: `f(x) = √(${c} + x) est croissante, donc (uₙ) est croissante`, valid: false, rule: 'a1_monotone_by_f_increasing', why: `f croissante dit seulement que (uₙ) est monotone ; le sens vient du signe de u₁ − u₀ = √${c} − 0, ou de uₙ₊₁ − uₙ.` },
+        ],
+      }] : [],
+    },
     {
       html: `Conclusion : la limite ℓ vérifie ℓ = √(${c} + ℓ) et ℓ ≥ 0.`, start: 'lim(u_n,n,∞)', judge: VAL(l), lines: [E(String(l), `ℓ² − ℓ − ${c} = 0, ℓ ≥ 0`, 'concl', 'concl')],
       pre: level <= 3 ? [concludeDecision(true, l)] : [], choices: CHOICES,

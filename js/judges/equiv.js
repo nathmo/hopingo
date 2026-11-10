@@ -356,7 +356,8 @@ function boundPoints(cfg) {
   if (cfg.from !== undefined || d?.int) {
     const from = cfg.from ?? d.int[0];
     const xs = [];
-    for (let n = from; n <= from + 200; n++) xs.push(n);
+    // cfg.span (step U4): whole n from `from` to from + span (200 by default).
+    for (let n = from; n <= from + (cfg.span ?? 200); n++) xs.push(n);
     // cfg.maxN (step U4): no sample past it (a Σ up to n costs n terms).
     for (let k = 3; k <= 8; k++) if (10 ** k > from + 200 && !(10 ** k > cfg.maxN)) xs.push(10 ** k);
     return { v, xs };
