@@ -1663,6 +1663,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-algebraic` — Forme algébrique : opérations, conjugué, module, division
 - **Année** 12 · **Prérequis** `@alg:C-identites` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits z₁·z₂ (+ z₃), (a + bi)² (identité), quotient q·d/d, iⁿ (n de 10 à 2030) et module d'un triplet pythagoricien. Niveau 5 : un produit ou un quotient, plus iⁿ. Les V/F faux se réfutent par des nombres complexes (contre-exemple de sorte `complex`, `js/judges/counters-complex.js`). Variante `coef` : partie réelle ou imaginaire.
 - **Intro** : on calcule comme avec des polynômes en i, puis i² = −1. Puissances de i : cycle de 4 (i, −1, −i, 1). Conjugué de a + bi : a − bi. |a + bi| = √(a² + b²), et z·z̄ = |z|². Pour diviser, on multiplie en haut et en bas par le conjugué du dénominateur.
 - **Juge** : `complex` `{form:'algebraic'}` · **Forme finale** : a + bi avec a, b rationnels simplifiés (b = 0 ou a = 0 acceptés sous forme courte).
 - **Niveaux** :
@@ -1688,6 +1689,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-polar` — Forme polaire et exponentielle
 - **Année** 12 · **Prérequis** `g8-algebraic`, `g3-exact` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : module (`complex`, forme réelle), cos θ et sin θ (`value`, niveaux 1 et 3), argument (`complex`, forme réelle, θ dans ]−π ; π]), forme exponentielle (`complex` `exp`) ; les deux sens et le produit ou quotient de formes exponentielles. Niveau 5 : le gabarit en α (série 15) est remplacé par un produit ou un quotient de deux nombres donnés sous forme algébrique, à écrire sous forme exponentielle (θ multiple de π/12). Variante `coef` : θ seul.
 - **Pourquoi ces prérequis** : `g8-algebraic` : module r = |z| et parties a, b.
 - **Intro** : z = r·e^(iθ) = r(cos θ + i sin θ), avec r = |z|. On trouve θ avec cos θ = a/r **et** sin θ = b/r (les deux, pour le bon quadrant). arctan(b/a) ne suffit pas quand a < 0. e^(iθ)·e^(iφ) = e^(i(θ + φ)).
 - **Juge** : `complex` `{form:'exponential'}` ; segments `value` pour r et θ · **Forme finale** : r·e^(iθ) avec r > 0 et θ exact.
@@ -1713,6 +1715,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-moivre` — Puissances par la formule de Moivre
 - **Année** 12 · **Prérequis** `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits zⁿ, quotient de deux puissances de même module, et plus petit n ≥ 1 tel que zⁿ soit un réel positif (partie `value`). Niveau 2 : décision « quel multiple de 2π retirer ». Variante `coef` : la partie de zⁿ qui est rationnelle (réelle ou imaginaire).
 - **Intro** : (r·e^(iθ))ⁿ = rⁿ·e^(inθ). On met z sous forme exponentielle, on élève **le module et l'argument**, puis on ramène l'argument dans ]−π ; π] et on revient à la forme algébrique.
 - **Juge** : `complex` `{form:'algebraic'}` (la forme exponentielle est une étape) · **Forme finale** : a + bi.
 - **Niveaux** :
@@ -1737,6 +1740,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-nth-roots` — Racines n-ièmes
 - **Année** 12.5 · **Prérequis** `g8-moivre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : forme exponentielle de w, module des racines (`value`), arguments nθ = φ + 2kπ (`solset` en θ avec k, où vit le piège `g8_roots_spacing`), une partie par racine aux niveaux 1 à 3 (n ≤ 4), contrôle (zₖ)ⁿ = w quand une racine a des parties rationnelles, puis l'ensemble des solutions (`complex` `set`). Cet ensemble part de l'équation quand w est dans ℚ(i), sinon des racines écrites r·e^(iθ) : le juge ne lit pas une équation à coefficients irrationnels (z⁴ = −8 + 8i√3). Pas d'esquisse du polygone (`plot`, étape U5). Variante `open` : le niveau 5 (zⁿ = w ou (z − a)ⁿ = w), 4 points.
 - **Pourquoi ces prérequis** : `g8-moivre` : zⁿ en forme exponentielle par Moivre.
 - **Intro** : zⁿ = w avec w = ρ·e^(iφ) : |z| = ρ^(1/n) et arg z = φ/n + 2kπ/n, pour k = 0, …, n − 1. Il y a **n** racines, aux sommets d'un polygone régulier centré en 0.
 - **Juge** : `complex` `{form:'set', count:n}` ; segments `value` pour le module et les arguments · **Forme finale** : les n racines (forme algébrique si les valeurs sont remarquables, sinon exponentielle).
@@ -1764,6 +1768,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-sqrt-alg` — Racine carrée sous forme algébrique
 - **Année** 12.5 · **Prérequis** `g8-algebraic`, `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Le système n'est pas jugé par `equiv` : la ligne (x + iy)² = x² − y² + 2xyi (`complex` avec x et y réels), l'identification en note, puis |w| (`complex`), x² et y² (`value`), la décision des signes et l'ensemble {δ ; −δ} (`complex` `set`). Niveau 5 : enchaîné avec une équation du 2e degré (Δ, δ par x + iy, puis les solutions).
 - **Pourquoi ces prérequis** : `g8-algebraic` : développer (x + iy)² et calculer un module.
 - **Intro** : on cherche z = x + iy avec z² = a + bi. Trois équations : x² − y² = a, 2xy = b, et x² + y² = |a + bi|. Les deux premières et la troisième donnent x² et y². Le signe de xy est celui de b : il reste **deux** racines opposées. On n'écrit pas √(a + bi) : le symbole √ est réservé aux réels positifs.
 - **Juge** : `equiv` pour le système ; `complex` `{form:'set', count:2}` pour les racines · **Forme finale** : ±(x + iy).
@@ -1789,6 +1794,7 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-quadratic` — Équation du 2e degré à coefficients complexes
 - **Année** 12.5 · **Prérequis** `g8-sqrt-alg`, `@alg:H-discriminant` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : Δ, δ (l'ensemble {δ ; −δ}), z₁ et z₂ par la formule et le contrôle z₁ + z₂ = −b/a (niveaux 1 à 3 ; omis quand les deux racines n'ont qu'un terme), puis l'ensemble des solutions depuis l'équation (niveau 4). Niveau 5 et variante `open` : le problème E6 avec d'autres nombres (a ∈ {1 + i, i, 1 − i, 2}), en 4 parties notées [[1, 1], [1, 1], [1], [1, 1]] : b² puis Δ, |Δ| puis δ, la formule (un QCM), z₁ et z₂ ; le contrôle par Viète à la place d'une simplification n'est pas proposé. Variante `mcq` : les racines (leurre `g8_sqrt_symbol_complex`) ou Δ (leurre `g8_i_squared`).
 - **Intro** : même formule que dans ℝ : Δ = b² − 4ac, puis z = (−b ± δ)/(2a), où δ est **une** racine carrée de Δ (par `g8-sqrt-alg`). Contrôle : z₁ + z₂ = −b/a et z₁z₂ = c/a.
 - **Juge** : par segments : `complex` pour Δ, `complex` `{form:'set', count:2}` pour δ (±), `complex` `{form:'set', count:2}` pour les racines · **Forme finale** : les deux racines sous forme algébrique.
 - **Niveaux** :
