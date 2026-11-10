@@ -968,14 +968,14 @@ function svdOpen(rng) {
       { kind: 'segment', html: `(d) Un vecteur propre de B pour λ = ${d.sig2[i]}.`, start: { math: `v_${i + 1}` }, judge: { kind: 'eigvec', A: mt(B), lambda: String(d.sig2[i]) } },
       { kind: 'eq', math: vt(d.qs[i]), note: '', subgoal: 'V' },
     ]),
-    { kind: 'segment', html: '(f) U, Σ et V avec A = UΣVᵀ (les deux dernières colonnes de V : la base de (a)).', start: { math: 'A = UΣVᵀ' }, judge: { kind: 'factor', A: mt(d.A), of: 'SVD' } },
+    { kind: 'segment', html: '(e) U, Σ et V avec A = UΣVᵀ (les deux dernières colonnes de V : la base de (a)).', start: { math: 'A = UΣVᵀ' }, judge: { kind: 'factor', A: mt(d.A), of: 'SVD' } },
     { kind: 'eq', math: sigmaText(dd), note: '', subgoal: 'sigma' },
     { kind: 'eq', math: VText(dd), note: '', subgoal: 'V' },
     { kind: 'eq', math: UText(dd), note: '', subgoal: 'U' },
   ];
   return matLines({
     skill: SVD, level: 5, exam: { format: 'open', points: 14 },
-    prompt: `Soit A = ${MLm(d.A)} et W = Ker A ⊂ ℝ⁴. (a) Trouve une base de W, puis une base orthonormée de W. (b) Calcule B = AᵀA. (c) Son polynôme caractéristique. (d) Des vecteurs propres de B pour ses valeurs propres non nulles. (f) Écris A = UΣVᵀ.`,
+    prompt: `Soit A = ${MLm(d.A)} et W = Ker A ⊂ ℝ⁴. (a) Trouve une base de W, puis une base orthonormée de W. (b) Calcule B = AᵀA. (c) Son polynôme caractéristique. (d) Des vecteurs propres de B pour ses valeurs propres non nulles. (e) Écris A = UΣVᵀ.`,
     start: 'Ker A', judge: { kind: 'span', basis: K.map(vt), require: 'basis' }, mode: 'free', script,
     hints: [], noHints: true, subgoals: SVD_SUB, key: `${SVD}:open:${mt(d.A)}`, fallback: d.fallback,
   });
@@ -1354,7 +1354,7 @@ function proofItem(skill, level, rng, opts = {}) {
   return blocksItem({
     skill, level: lv, mode: define ? 'define' : lv === 4 ? 'frame' : 'order',
     prompt: define
-      ? `Construis l'énoncé du ${escH(pr.statement)} : touche les morceaux dans l'ordre.`
+      ? `Construis l'énoncé de ${escH(pr.statement)} : touche les morceaux dans l'ordre.`
       : `Montre que ${escH(pr.statement)}.${lv === 4 ? ` La première ligne est posée ; la dernière doit conclure : « ${escH(pr.steps.at(-1))} »` : ''} Touche les blocs dans l'ordre de la preuve.`,
     blocks: rng.shuffle(blocks), goal: ids.at(-1), order, placed,
     decision,

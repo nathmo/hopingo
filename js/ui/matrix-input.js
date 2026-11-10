@@ -46,6 +46,22 @@ export function splitLiteral(text) {
   return { prefix: t.slice(0, start), rows, bar, suffix: t.slice(end + 1) };
 }
 
+// A line of vectors « label = (a ; b), (c ; d) »: {prefix, rows (component
+// i of vector j in rows[i][j]), vectors: true}, or null.
+export function splitVectors(text) {
+  const t = String(text);
+  const eq = splitTop(t, '=');
+  const prefix = eq.length > 1 ? `${eq.slice(0, -1).join('=')}= ` : '';
+  let body = eq[eq.length - 1].trim();
+  const span = /^(Span|Vect)\s*\{(.*)\}$/.exec(body);
+  if (span) body = span[2];
+  const parts = splitTop(body, ',').map((x) => x.trim());
+  if (!parts.length || parts.some((x) => !/^\(.*\)$/.test(x))) return null;
+  const vecs = parts.map((x) => splitTop(x.slice(1, -1), ';').map((c) => c.trim()));
+  if (vecs.some((v) => v.length !== vecs[0].length) || vecs[0].length < 2) return null;
+  return { prefix, rows: vecs[0].map((_, i) => vecs.map((v) => v[i])), vectors: true };
+}
+
 // The shape of the next line: from the reference line when there is one
 // (only its size is used), else from the previous line.
 export function matrixShape(cfg, refText, prevNode) {
@@ -129,7 +145,7 @@ export class MatrixInput {
     if (s?.factors) {
       for (const f of s.factors) this.grids.push(this.grid(f.rows, f.cols, { label: f.name.replace(/_(\d+)/, (_, d) => sub(d)) }));
     } else if (s?.vectors) {
-      this.grids.push(this.grid(s.vectors, s.count, {}));
+      this.grids.push(this.grid(s.vectors, s.count, { fixed, blanks }));
     } else if (s?.rows) {
       this.grids.push(this.grid(s.rows, s.cols, { bar: s.bar, fixed, blanks }));
     }
@@ -165,7 +181,7 @@ export class MatrixInput {
   }
 
   get value() {
-    const text = (this.fixedText ? this.fixedValue : this.textField?.value ?? '').trim().replace(/−/g, '-');
+    const text = (this.fixedText ? this.fixedValue ?? '' : this.textField?.value ?? '').trim().replace(/−/g, '-');
     if (this.shape?.factors) {
       const parts = this.grids.map((g, k) => ({ name: g.label, v: this.gridValue(k) })).filter((p) => p.v);
       const named = parts.map((p) => `${this.shape.factors.find((f) => f.name.replace(/_(\d+)/, (_, d) => sub(d)) === p.name)?.name ?? p.name} = ${p.v}`).join(' ; ');
@@ -198,8 +214,17 @@ export class MatrixInput {
   // Guided line: the reference line with its blank cells; everything else
   // is shown and fixed.
   guided(refText, blanks) {
-    const t = splitLiteral(refText);
+    const t = splitLiteral(refText) ?? splitVectors(refText);
     if (!t) return false;
+    if (t.vectors) {
+      // Vectors in columns: cell (i, j) is component i of vector j.
+      this.template = { prefix: t.prefix, suffix: '' };
+      this.shape = { vectors: t.rows.length, count: t.rows[0].length };
+      this.fixedText = t.prefix.trim() ? h('div.mx-fixed', t.prefix.trim().replace(/=\s*$/, '=').replace(/_(\d+)/g, (_, d) => sub(d))) : null;
+      this.textField = null;
+      this.build({ fixed: t.rows.map((r) => r.map((c) => c.replace(/-/g, '−'))), blanks });
+      return true;
+    }
     this.template = { prefix: t.prefix, suffix: t.suffix };
     this.shape = { rows: t.rows.length, cols: t.rows[0].length, bar: t.bar };
     this.fixedValue = t.prefix.replace(/\s*:\s*$/, '');

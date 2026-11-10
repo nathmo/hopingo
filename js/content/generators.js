@@ -51,7 +51,9 @@ function describeLines(item) {
     if (k > 0) out.push(`  — ${strip(mathText(seg.html))}  [juge ${seg.judge.kind}]  départ : ${show(seg.start.math)}`);
     for (const l of seg.lines) {
       if (l.kind === 'eq') {
-        const shown = l.blanks?.length ? `${show(templateOf(l, opts))}   (trous : ${show(l.math)})` : show(l.math);
+        let shown = l.blanks?.length ? `${show(templateOf(l, opts))}   (trous : ${show(l.math)})` : show(l.math);
+        // Step U3: blank cells of a grid line, (row, column) from 1.
+        if (l.cells?.length) shown += `   (cases à remplir : ${l.cells.map(([i, j]) => `(${i + 1},${j + 1})`).join(' ')})`;
         out.push(`    = ${shown}${l.note ? `   ← ${l.note}` : ''}`);
       }
       if (l.kind === 'decision') out.push(`    ? ${l.prompt} ${l.options.map((o) => `${o.valid ? '✔' : '·'} ${o.label}`).join(' / ')}`);
@@ -130,6 +132,9 @@ export function describe(item) {
   if (item.type === 'tokens') lines.push(...describeTokens(item));
   if (item.type === 'blocks') lines.push(...describeBlocks(item));
   if (item.type === 'table') lines.push(...describeTable(item));
+  // Step U3: one answer in a grid, an example to give.
+  if (item.type === 'matrix') lines.push(`  [grille ${item.rows}×${item.cols}, juge ${item.judge.kind}${item.noHints ? ', sans aide' : ''}] → ${item.answer}`);
+  if (item.type === 'example') lines.push(`  [exemple ${item.property.kind}${item.property.params?.want || item.property.params?.test ? ` ${item.property.params.want ?? item.property.params.test}` : ''}] → ${Object.entries(item.answer || {}).map(([k, v]) => `${k} = ${v}`).join(', ')}`);
   if (item.exam && item.type !== 'lines') lines.push(`  [examen ${item.exam.format}]`);
   if (item.type === 'shade') lines.push(`  (figure ${item.figure.shape} en ${item.figure.n} parts, colorier ${item.target.count})`);
   if (item.type === 'numberline') lines.push(`  (droite ${item.line.min ?? 0} → ${item.line.max}, graduée en ${item.line.den}es) → ${item.target}`);
