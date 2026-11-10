@@ -7,5 +7,6 @@ import { GEN as RES } from './cplx-b-res.js';
 import { GEN as LAU } from './cplx-b-laurent.js';
 import { GEN as THM } from './cplx-b-thm.js';
 import { GEN as ARC } from './cplx-b-arc.js';
+import { GEN as REAL } from './cplx-b-real.js';
 
-export const GEN = { ...RES, ...LAU, ...THM, ...ARC };
+export const GEN = { ...RES, ...LAU, ...THM, ...ARC, ...REAL };
