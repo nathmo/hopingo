@@ -90,3 +90,5 @@ import * as param from './param.js';
 import * as boundary from './boundary.js';
 
 Object.assign(JUDGES, { param, boundary });
+import { cval, arcb, laur } from './cplx-cb.js'; // step U10, part cb: labelled complex values, bounds on an arc, Laurent series in 1/z
+Object.assign(JUDGES, { cval, arcb, laur });
