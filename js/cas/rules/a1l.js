@@ -152,7 +152,7 @@ export const RULES = [
       });
       return out;
     },
-    explain: () => 'Le conjugué change le signe de l\'argument : si z = r·e^(iφ), alors z̄ = r·e^(−iφ). Avec ton signe, tu résous zⁿ = z au lieu de zⁿ = z̄.',
+    explain: () => 'Le conjugué change le signe de l\'argument : si z = r·e^(iφ), alors z̄ = r·e^(−iφ) (et a + bi devient a − bi). Avec le mauvais signe, zⁿ = z̄ devient zⁿ = z : ce n\'est plus la même équation.',
   },
   {
     id: 'a1_cauchy_consecutive', family: 'logic', tag: 'E', skill: 'a1-defs', repair: 'a1-defs', // U4 merge: repair a1-seq-monotone
