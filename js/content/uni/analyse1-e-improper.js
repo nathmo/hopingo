@@ -15,7 +15,7 @@ import { MT, linesItem, mcq, tfItem, examTag } from './kit.js';
 import { parse } from '../../cas/parse.js';
 import { toReadable } from '../../cas/print.js';
 import {
-  V, q, N, nz, modeOf, H, E, KEYS, blanked, partsScript, cterm, piText, joinSum, fr,
+  V, q, N, nz, modeOf, H, E, KEYS, blanked, partsScript, cterm, piText, joinSum, fr, sup,
   verdictLines,
 } from './analyse1-e-kit.js';
 
@@ -65,7 +65,7 @@ function icSqrt(b, L, p, qq) {
   const value = q(2 * Nn * r).sub(c2.mul(L * r));
   if (value.n <= 0) return null;
   const num = `${p === 1 ? '' : p}x${qq > 0 ? `+${qq}` : qq < 0 ? qq : ''}`;
-  const f = `(${num})/√(${b}-x)`;
+  const f = `${qq ? `(${num})` : num}/√(${b}-x)`;
   const tnum = `${Nn}-${p === 1 ? '' : p}t`;
   const prim = joinSum([`${2 * Nn}√t`, cterm(c2.neg(), 't^(3/2)')]);
   const top = String(2 * Nn * r);
@@ -74,7 +74,7 @@ function icSqrt(b, L, p, qq) {
     kind: 'sqrt', f, a: String(a), b: String(b), start: `int(${f},x,${a},${b}⁻)`, value, prim,
     point: `${b}⁻`, why: `f n'est pas bornée quand x → ${b}⁻`,
     lines: [
-      E(`int((${tnum})/√t,t,0⁺,${L})`, `t = ${b} − x, dx = −dt ; x = ${a} → t = ${L}, x → ${b}⁻ → t → 0⁺`, 'prim', 'subst'),
+      E(`int((${tnum})/√t,t,0⁺,${L})`, `t = ${b} − x, dx = −dt ; x = ${fr(a)} → t = ${L}, x → ${b}⁻ → t → 0⁺`, 'prim', 'subst'),
       E(`lim(bracket(${prim},t,ε,${L}),ε,0⁺)`, 'Primitive, puis limite en 0⁺', 'lim', 'prim'),
       E(at, 'Évaluer', 'lim', 'eval'),
       E(N(value), 'Calculer', 'lim', 'eval')],
@@ -112,7 +112,7 @@ function icConv(rng, kind) {
       lines: [
         E(`lim(bracket(${prim},x,ε,1),ε,0⁺)`, `Parties : u = ln x, v′ = ${m === 1 ? '1' : `x^${n}`.replace('x^1', 'x')}`, 'prim', 'prim'),
         E(`${N(value)}-lim(${atE},ε,0⁺)`, 'Évaluer en 1', 'lim', 'eval'),
-        E(N(value), `${m === 1 ? 'ε·ln ε' : `ε^${m}·ln ε`} → 0 (croissances comparées)`, 'lim', 'lim')],
+        E(N(value), `${m === 1 ? 'ε·ln ε' : `${sup(`ε^${m}`)}·ln ε`} → 0 (croissances comparées)`, 'lim', 'lim')],
       decision: [
         { id: 'parts', label: 'Parties avec u = ln x', valid: true, ref: true },
         { id: 'parts-bad', label: `Parties avec u = ${n === 0 ? '1' : `x^${n}`.replace('x^1', 'x')}, v′ = ln x`, valid: false, why: 'Il faudrait connaître une primitive de ln x : c\'est justement ce qu\'on cherche.' },
@@ -388,7 +388,7 @@ function cpData(rng, kind) {
     const p2 = kind === 'b'
       ? { at: '+∞', to: '+∞', g: '1/x^(3/2)', gt: 'x^(3/2)', alpha: '3/2', start: `x^(3/2)×${f}`, lines: [E(`1/(√(1-${a}/x)(1+${c}/x))`, 'Diviser par x^(3/2)', 'compare', 'simplify'), E('1', 'Limite', 'compare', 'lim')], conv: true }
       : { at: '+∞', to: '+∞', g: '1/x', gt: 'x', alpha: '1', start: `x×${f}`, lines: [E(`1/√((1-${a}/x)(1+${c}/x))`, 'Diviser par x', 'compare', 'simplify'), E('1', 'Limite', 'compare', 'lim')], conv: false };
-    const out = { kind, f, lo: `${a}⁺`, hi: '∞', I: `int(${f},x,${a}⁺,∞)`, points: [p1, p2], wrongG: [[`1/x^(1/2)`, `1/(x − ${a})`], ['1/x', '1/x²']] };
+    const out = { kind, f, lo: `${a}⁺`, hi: '∞', I: `int(${f},x,${a}⁺,∞)`, points: [p1, p2], wrongG: [[`1/x^(1/2)`, `1/(x − ${a})`], kind === 'b' ? ['1/x', '1/x²'] : ['1/x^(1/2)', '1/x²']] };
     if (kind === 'b') {
       out.value = { lines: [
         E(`int(2/(t^2+${m}),t,0,∞)`, `t = √(x − ${a}) : x = t² + ${a}, dx = 2t dt`, 'value', 'subst'),
@@ -443,8 +443,8 @@ function cpData(rng, kind) {
     const simp = degP === 0 ? `${k}/(1+${qq}/x^${degQ})` : `(${k}+${p}/x)/(1+${qq}/x^${degQ})`;
     return {
       kind: 'rat', f, lo: '1', hi: '∞', I: `int(${f},x,1,∞)`,
-      points: [{ at: '+∞', to: '+∞', g: `1/x${al === 1 ? '' : `^${al}`}`, gt, alpha: String(al), start: `${gt}×${f}`, lines: [E(simp, `Diviser par x^${degQ}`, 'compare', 'simplify'), E(String(k), 'Limite', 'compare', 'lim')], conv: al > 1 }],
-      wrongG: [[al === 1 ? '1/x²' : '1/x', `1/x^${al + 1}`]],
+      points: [{ at: '+∞', to: '+∞', g: sup(`1/x${al === 1 ? '' : `^${al}`}`), gt, alpha: String(al), start: `${gt}×${f}`, lines: [E(simp, sup(`Diviser par x^${degQ}`), 'compare', 'simplify'), E(String(k), 'Limite', 'compare', 'lim')], conv: al > 1 }],
+      wrongG: [[al === 1 ? '1/x²' : '1/x', sup(`1/x^${al + 1}`)]],
     };
   }
   return null;
@@ -462,7 +462,7 @@ function pointVerdict(pt) {
   const atInf = pt.to === '+∞';
   const sign = a.eq(1) ? '=' : a.valueOf() < 1 ? '<' : '>';
   const swapped = !a.eq(1);
-  return { kind: 'decision', prompt: `En ${pt.at}, α = ${fr(pt.alpha)} ${sign} 1. Près de ${pt.at}, ∫ f :`, options: [
+  return { kind: 'decision', prompt: `En ${pt.at}, α = ${fr(pt.alpha)}${a.eq(1) ? '' : ` ${sign} 1`}. Près de ${pt.at}, ∫ f :`, options: [
     { id: 'conv', label: 'converge', valid: pt.conv, ...(!pt.conv && swapped ? { rule: 'a1_alpha_criteria_swapped' } : {}), why: atInf ? 'En +∞, dx/xᵅ converge seulement si α > 1.' : `En ${pt.at}, dx/(x − a)ᵅ converge seulement si α < 1.` },
     { id: 'div', label: 'diverge', valid: !pt.conv, ...(pt.conv && swapped ? { rule: 'a1_alpha_criteria_swapped' } : {}), why: atInf ? 'En +∞, dx/xᵅ converge si α > 1.' : `En ${pt.at}, dx/(x − a)ᵅ converge si α < 1.` },
   ] };
@@ -694,17 +694,17 @@ function irItem(level, rng, opts = {}, onlyConv = false) {
   ] };
   const parts = [{ start: `x^2×${z.f}`, judge: { kind: 'limit', v: V, to: '+∞' }, pre: [qDecision, ...verdict], lines: convLines }];
   if (onlyConv) return { d, z, parts };
-  const des = [E(z.factored, `Q(−${r}) = 0 : Q = (${fr(z.lin)})(${fr(z.Q2)})`, 'factor', 'factor'), E(z.des, 'Décomposition en éléments simples', 'pfd', 'pfd')];
+  const des = [E(z.factored, `Q(−${r}) = 0 : Q = ${RD(`(${z.lin})(${z.Q2})`)}`, 'factor', 'factor'), E(z.des, 'Décomposition en éléments simples', 'pfd', 'pfd')];
   if (level === 1) des[1] = blanked(des[1], [String(d.A), String(d.C)].filter((t) => t !== '0'));
   if (level === 2) des[0] = blanked(des[0], [z.lin]);
   parts.push({ html: '(b) Factorise Q, puis décompose f en éléments simples :', ask: 'f(x) =', start: z.f, judge: { kind: 'equiv', vars: [V], domain: { x: [a + 0.1, a + 4] }, target: 'partial-fractions' }, lines: level === 1 ? [des[1]] : des });
-  const primLines = [E(z.split, `${fr(cterm(-d.A, 'x'))}${d.C ? ` + ${d.C}` : ''} = ${fr(cterm(q(-d.A, 2), `(2x + ${2 * r})`))} + ${K}, et ${fr(z.Q2)} = (${fr(z.lin)})² + ${d.dd}`.replace('+ -', '− '), 'prim', 'split'), E(`${z.prim}+C`, 'Primitives : Log et Arctg', 'prim', 'prim')];
+  const primLines = [E(z.split, `${RD(joinSum([cterm(-d.A, 'x'), d.C ? String(d.C) : '']))} = ${RD(`${cterm(q(-d.A, 2), `(2x+${2 * r})`)}+${K}`)}, et ${RD(z.Q2)} = ${RD(`(${z.lin})^2+${d.dd}`)}`, 'prim', 'split'), E(`${z.prim}+C`, 'Primitives : Log et Arctg', 'prim', 'prim')];
   if (level <= 2) primLines[1] = blanked(primLines[1], [`arctan(${d.dd === 1 ? z.lin : `(${z.lin})/2`})`]);
   parts.push({ html: 'Primitive de f :', ask: '∫ f(x) dx =', start: `int(${z.des},x)`, judge: { kind: 'antideriv', v: V, domain: { x: [a, a + 5] } }, lines: level >= 4 ? [primLines[1]] : primLines });
   const limLines = [E(z.grouped, 'Regrouper les Log', 'group', 'group'), E(z.limText, `Log 1 = 0 et Arctg → π/2`, 'lim', 'lim')];
   if (level === 1) limLines[0] = blanked(limLines[0], [`(${z.lin})^2/(${z.Q2})`]);
   parts.push({ html: 'Limite de la primitive en +∞ (regroupe les Log avant) :', ask: 'lim =', start: z.prim, judge: { kind: 'limit', v: V, to: '+∞' }, lines: limLines });
-  parts.push({ html: 'Valeur de I :', ask: 'I =', start: z.I, judge: { kind: 'definite' }, lines: [E(`lim(bracket(${z.prim},x,${a},b),b,+∞)`, 'I = lim F(b) − F(a)', 'value', 'eval'), E(z.value, `F(${a}) = ${fr(z.prim)} en x = ${a}`.replace(/x\+/g, 'x + '), 'value', 'eval')] });
+  parts.push({ html: 'Valeur de I :', ask: 'I =', start: z.I, judge: { kind: 'definite' }, lines: [E(`lim(bracket(${z.prim},x,${a},b),b,+∞)`, 'I = lim F(b) − F(a)', 'value', 'eval'), E(z.value, `Retrancher F(${a})`, 'value', 'eval')] });
   const { start, judge, script } = partsScript(parts, level, IR_CHOICES);
   const factorNote = level === 1 ? ` On donne Q(x) = (${MT(z.lin)})(${MT(z.Q2)}).` : '';
   return linesItem({

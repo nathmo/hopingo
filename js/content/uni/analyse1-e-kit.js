@@ -87,6 +87,9 @@ export const joinSum = (terms) => terms.filter((t) => t && t !== '0').reduce((s,
 // A number as a factor: 3, (−1/2).
 export const fac = (x) => { const s = N(x); return /^\d+$/.test(s) ? s : `(${s})`; };
 export const fr = (s) => String(s).replace(/-/g, '−');
+// Exponents written as superscripts in plain text: x^3 → x³, (x+1)^2 → (x+1)².
+const SUPS = { 0: '⁰', 1: '¹', 2: '²', 3: '³', 4: '⁴', 5: '⁵', 6: '⁶', 7: '⁷', 8: '⁸', 9: '⁹', '-': '⁻' };
+export const sup = (s) => fr(String(s).replace(/\^(-?\d+)/g, (m, d) => [...d].map((c) => SUPS[c]).join('')).replace(/\^\(([-\d/]+)\)/g, '^($1)'));
 
 // The verdict of convention 5 (catalogue A1): a decision « Nature ? »
 // followed by a self-explanation « Quel critère ? ».

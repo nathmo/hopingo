@@ -20,7 +20,7 @@ import { toText, toReadable } from '../../cas/print.js';
 const RD = (t, o) => toReadable(parse(t, o));
 import { MT, linesItem, mcq, tfItem, examTag } from './kit.js';
 import {
-  V, q, N, nz, modeOf, H, E, KEYS, tpl, blanked, partsScript, piText, joinSum, fac, fr,
+  V, q, N, nz, modeOf, H, E, KEYS, tpl, blanked, partsScript, piText, joinSum, fac, fr, sup,
 } from './analyse1-e-kit.js';
 import { GEN as IMPROPER } from './analyse1-e-improper.js';
 
@@ -83,7 +83,7 @@ function ieData(rng) {
     const top = Math.round(Math.sqrt(1 + c * b ** p));
     const k = q(c * p, 2);
     return {
-      kind, f: `√(1+${c === 1 ? '' : c}x^${p})`, df: `${k.eq(1) ? '' : fac(k)}x${p - 1 === 1 ? '' : `^${p - 1}`}/√(1+${c === 1 ? '' : c}x^${p})`, a: 0, b, inc: true,
+      kind, f: `√(1+${c === 1 ? '' : c}x^${p})`, df: `${k.d === 1 ? (k.eq(1) ? '' : k.n) : c * p}x${p - 1 === 1 ? '' : `^${p - 1}`}/(${k.d === 1 ? '' : 2}√(1+${c === 1 ? '' : c}x^${p}))`.replace('/(√', '/√').replace(/\)\)$/, k.d === 1 ? ')' : '))'), a: 0, b, inc: true,
       at: (x) => `√(1+${c === 1 ? '' : `${c}×`}${x}^${p})`, m: '1', M: String(top),
     };
   }
@@ -230,7 +230,7 @@ function ieMcq(rng) {
     { html: `${MT(big)} ≤ I ≤ ${MT(String(b))}`, correct: true },
     { html: `I ≥ ${MT(String(b))}`, correct: false },
     { html: `I = ${MT(`1-e^(${N(q(-(b ** 3), 3))})`)}`, correct: false, rule: 'a1_int_exp_square_primitive' },
-    { html: 'I = 0', correct: false, rule: 'a1_parity_misused' },
+    { html: `I ≤ ${MT(big)}`, correct: false },
   ];
   const f = s > 0 ? 'e^(x^2)' : 'e^(-x^2)';
   return mcq({
@@ -295,11 +295,13 @@ const FT_CHOICES = [
   { id: 'prim', label: 'Chercher une primitive de f', rule: 'a1_ftc_integrate_first', why: 'Inutile : seule F′ = f sert.' },
 ];
 // f(t), its value at u (text), and its value written simply.
+// u in brackets unless it is x.
+const W = (u) => (u === 'x' ? 'x' : `(${u})`);
 const FT_F = [
-  { f: 'e^(-t^2)', at: (u) => `e^(-(${u})^2)`, simple: (g) => `e^(-${sq(g, 2)})`, noPrim: true },
-  { f: 'ln(1+t^2)', at: (u) => `ln(1+(${u})^2)`, simple: (g) => `ln(1+${sq(g, 2)})`, noPrim: false },
-  { f: '√(1+t^4)', at: (u) => `√(1+(${u})^4)`, simple: (g) => `√(1+${sq(g, 4)})`, noPrim: true },
-  { f: 'sin(t)/t', at: (u) => `sin(${u})/(${u})`, simple: (g) => `sin(${g.t})/${g.t === 'x' ? 'x' : `${g.t.includes('^') || g.t.includes('(') ? `(${g.t})` : g.t}`}`, noPrim: true, sinc: true },
+  { f: 'e^(-t^2)', at: (u) => `e^(-${W(u)}^2)`, simple: (g) => `e^(-${sq(g, 2)})`, noPrim: true },
+  { f: 'ln(1+t^2)', at: (u) => `ln(1+${W(u)}^2)`, simple: (g) => `ln(1+${sq(g, 2)})`, noPrim: false },
+  { f: '√(1+t^4)', at: (u) => `√(1+${W(u)}^4)`, simple: (g) => `√(1+${sq(g, 4)})`, noPrim: true },
+  { f: 'sin(t)/t', at: (u) => `sin(${u})/${u}`, simple: (g) => `sin(${g.t})/${g.t === 'x' ? 'x' : `${g.t.includes('^') || g.t.includes('(') ? `(${g.t})` : g.t}`}`, noPrim: true, sinc: true },
 ];
 // g(x)^k written simply.
 function sq(g, k) {
@@ -357,7 +359,7 @@ function ftItem(level, rng, opts = {}) {
     ? [E(`${F.at(g.t)}×d(${g.t})-${F.at('x')}×d(x)`, 'Théorème fondamental aux deux bornes', 'ftc', 'ftc'),
       E(`${fin}-${fx}`, 'Règle de chaîne : dériver les bornes', 'chain', 'chain')]
     : [E(`${F.at(g.t)}×d(${g.t})`, 'Théorème fondamental : F′(g(x))·g′(x)', 'ftc', 'ftc'),
-      E(fin, `Règle de chaîne : (${g.t})′ = ${g.d}`, 'chain', 'chain')];
+      E(fin, `Règle de chaîne : (${sup(g.t)})′ = ${sup(g.d)}`, 'chain', 'chain')];
   const judge = { kind: 'equiv', vars: [V], domain: { x: [0.3, 1.4] }, target: 'no-prime' };
   const parts = [{ start, judge, lines: [...lines] }];
   if (level === 1) parts[0].lines = [blanked(lines[0], [g.t === 'x^2' || g.t === 'x^3' ? g.t : g.t]), blanked(lines[1], [g.d])];
@@ -367,9 +369,9 @@ function ftItem(level, rng, opts = {}) {
       ? { id: 'prim', label: `Chercher d'abord une primitive de ${RD(F.f, { vars: ['t'] })}`, valid: false, rule: 'a1_ftc_integrate_first', why: `${MT(F.f, { vars: ['t'] })} n'a pas de primitive élémentaire, et c'est inutile : seule F′ = f sert.` }
       : { id: 'prim', label: `Chercher d'abord une primitive de ${RD(F.f, { vars: ['t'] })}`, valid: true, quality: 'poor', why: 'Juste (t·ln(1 + t²) − 2t + 2Arctg t), mais inutile : seule F′ = f sert.' };
     const options = [
-      { id: 'ftc', label: `Appeler F une primitive : G(x) = F(${fr(g.t)}) − F(${d.lo}), puis dériver`, valid: true, ref: true },
+      { id: 'ftc', label: `Appeler F une primitive : G(x) = F(${sup(g.t)}) − F(${d.lo}), puis dériver`, valid: true, ref: true },
       prim,
-      ...(level === 3 ? [{ id: 'nochain', label: `G′(x) = f(${fr(g.t)}), sans autre facteur`, valid: false, rule: 'a1_ftc_no_chain', why: `La borne est ${fr(g.t)} : règle de chaîne, il faut multiplier par ${fr(g.d)}.` }] : []),
+      ...(level === 3 ? [{ id: 'nochain', label: `G′(x) = f(${sup(g.t)}), sans autre facteur`, valid: false, rule: 'a1_ftc_no_chain', why: `La borne est ${sup(g.t)} : règle de chaîne, il faut multiplier par ${sup(g.d)}.` }] : []),
     ];
     parts[0].pre = [{ kind: 'decision', prompt: 'Comment dérives-tu G ?', options }];
   }
@@ -384,7 +386,7 @@ function ftItem(level, rng, opts = {}) {
   return linesItem({
     skill: FT, level, mode: modeOf(level), start: s0, judge: j0, script,
     prompt: `G(x) = ${MT(Gtext)}. Calcule G′(x)${level === 5 ? ', puis G′(1)' : ''}.`,
-    hints: H(`Appelle F une primitive de ${MT(F.f, { vars: ['t'] })} (sans la calculer) : G(x) = F(${fr(g.t)}) − F(${fr(d.lo)}), et F′ = f.`,
+    hints: H(`Appelle F une primitive de ${MT(F.f, { vars: ['t'] })} (sans la calculer) : G(x) = F(${sup(g.t)}) − F(${fr(d.lo)}), et F′ = f.`,
       `G′(x) = ${MT(F.at(g.t))}·▢`, MT(lines.at(-1).math)),
     subgoals: FT_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${FT}:${level}:${Gtext}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -422,7 +424,7 @@ function ftMcq(rng) {
     skill: FT, level: 4, prompt: `G(x) = ${MT(Gtext)}. G′(x) =`,
     options: options.map(({ html, correct, rule }) => ({ html, correct, rule })),
     key: `${FT}:mcq:${Gtext}`, expectedSec: 240, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `Avec F′ = f : G(x) = F(${fr(g.t)}) − F(${fr(d.lo)}), donc G′(x) = ${MT(right)}.`, note: '' }],
+    solution: [{ html: `Avec F′ = f : G(x) = F(${sup(g.t)}) − F(${fr(d.lo)}), donc G′(x) = ${MT(right)}.`, note: '' }],
   }, rng);
 }
 
@@ -441,7 +443,7 @@ function ftTf(rng) {
   }
   if (kind === 'abs') {
     return vfMcq(FT, 'g(x) = ∫₀^|x| 1 dt est dérivable en 0.', false, rng, {
-      key: 'abs', ruleIfTrue: 'a1_ftc_no_chain', why: 'Faux : g(x) = |x|, qui n\'est pas dérivable en 0. La borne |x| n\'est pas dérivable en 0, la règle de chaîne ne s\'applique pas.',
+      key: 'abs', why: 'Faux : g(x) = |x|, qui n\'est pas dérivable en 0. La borne |x| n\'est pas dérivable en 0, la règle de chaîne ne s\'applique pas.',
     });
   }
   if (kind === 'thm') {
@@ -582,7 +584,7 @@ function apSolve(d) {
     const b = Number(d.b);
     const f = n === 1 ? 'x' : `x^${n}`;
     return { f, a: '0', b: d.b, integral: { start: `π×int((${f})^2,x,0,${b})`, lines: [
-      ...(n === 1 ? [] : [E(`π×int(x^${2 * n},x,0,${b})`, `(${f})² = x^${2 * n}`, 'formula', 'formula')]),
+      ...(n === 1 ? [] : [E(`π×int(x^${2 * n},x,0,${b})`, sup(`(${f})² = x^${2 * n}`), 'formula', 'formula')]),
       E(`π×bracket(x^${2 * n + 1}/${2 * n + 1},x,0,${b})`, 'Primitive', 'integrate', 'prim'),
       E(piText(q(b ** (2 * n + 1), 2 * n + 1)), 'Calculer', 'integrate', 'eval')] } };
   }
