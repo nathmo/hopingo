@@ -137,8 +137,10 @@ export const ML = (t, vars = PVARS) => MT(t, { vars, funcs: FUNCS });
 export const RD = (t, vars = PVARS) => toReadable(parse(t, { vars, funcs: FUNCS }));
 // (a ; b ; c) as one MathML, each component read by the CAS.
 export function tupML(texts, vars = PVARS) {
-  const parts = texts.map((t) => inner(toMathML(parse(String(t), { vars, funcs: FUNCS }))));
-  return `<math><mrow><mo>(</mo>${parts.join('<mo>;</mo>')}<mo>)</mo></mrow></math>`;
+  const nodes = texts.map((t) => parse(String(t), { vars, funcs: FUNCS }));
+  const parts = nodes.map((n) => inner(toMathML(n)));
+  const alt = `(${nodes.map((n) => toReadable(n)).join(' ; ')})`.replace(/"/g, '&quot;');
+  return `<math alttext="${alt}"><mrow><mo>(</mo>${parts.join('<mo>;</mo>')}<mo>)</mo></mrow></math>`;
 }
 // The field F(x, y(, z)) = (…) as MathML.
 export function fieldML(comps, name = 'F') {

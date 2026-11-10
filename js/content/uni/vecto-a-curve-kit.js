@@ -210,7 +210,8 @@ export function axisSeg(axis, a, b) {
 
 // Arc of the circle of centre c, radius R, from angle s·π/2 over span
 // quarter turns, positive (sign 1) or negative (−1) orientation.
-export function arc(c, R, s, span, sign = 1) {
+export function arc(c, R, s0, span, sign = 1) {
+  const s = span === 4 ? 0 : s0; // a whole circle starts at angle 0
   const pts = (k) => [q(c[0]).add(q(R).mul(Math.round(Math.cos((k * Math.PI) / 2)))), q(c[1]).add(q(R).mul(Math.round(Math.sin((k * Math.PI) / 2))))];
   const lo = sign > 0 ? s : -s;
   const hi = lo + span;
@@ -261,12 +262,13 @@ export function graph(k, a, b) {
 // The ellipse x²/a² + y²/b² = 1 (a ≠ b), positive orientation, span quarter turns from angle 0.
 export function ellipse(a, b, span = 4) {
   const full = span === 4;
+  const eqE = `${a === 1 ? 'x²' : `x²/${a * a}`} + ${b === 1 ? 'y²' : `y²/${b * b}`}`;
   const A = [q(a), q(0)];
   const B = [q(a * Math.round(Math.cos((span * Math.PI) / 2))), q(b * Math.round(Math.sin((span * Math.PI) / 2)))];
   return finish({
     kind: 'ellipse', a, b, span, dim: 2, closed: full, lo: 0, hi: (span * Math.PI) / 2, loT: '0', hiT: quarterT(span), A, B,
     P: [pC(a), pS(b)], speed: null,
-    desc: full ? `l'ellipse x²/${a * a} + y²/${b * b} = 1, parcourue une fois dans le sens positif` : `l'arc de l'ellipse x²/${a * a} + y²/${b * b} = 1 de A${ptR(A)} à B${ptR(B)} dans le sens positif`,
+    desc: full ? `l'ellipse ${eqE} = 1, parcourue une fois dans le sens positif` : `l'arc de l'ellipse ${eqE} = 1 de A${ptR(A)} à B${ptR(B)} dans le sens positif`,
     rev: lineOf([ptext(pC(a)), ptext(pS(-b))], quarterT(-span), '0'),
     bounds: lineOf([ptext(pC(a)), ptext(pS(b))], '0', quarterT(full ? 8 : span * 2)),
   });
@@ -278,7 +280,7 @@ export function helix(k) {
   return finish({
     kind: 'helix', k, dim: 3, lo: 0, hi: 2 * Math.PI, loT: '0', hiT: '2π',
     P: [pC(1), pS(1), pt(k)], speed: `sqrt(${s2})`, speedQ: null,
-    desc: `l'hélice tracée sur le cylindre x² + y² = 1, qui monte de ${k === 1 ? '' : k}2π par tour : un tour de A(1 ; 0 ; 0) à B(1 ; 0 ; ${k === 1 ? '' : k}2π), dans le sens positif autour de l'axe z, à vitesse de montée constante`,
+    desc: `l'hélice tracée sur le cylindre x² + y² = 1, qui monte de ${2 * k}π par tour : un tour de A(1 ; 0 ; 0) à B(1 ; 0 ; ${2 * k}π), dans le sens positif autour de l'axe z, à vitesse de montée constante`,
     rev: lineOf(['cos(t)', '-sin(t)', `${k === 1 ? '' : k}(2π-t)`], '0', '2π'),
     bounds: lineOf(['cos(t)', 'sin(t)', `${k === 1 ? '' : k}t`], '0', '4π'),
   });

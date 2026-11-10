@@ -34,20 +34,20 @@ function domainBank(rng) {
   const m = (r1 + r2) / 2;
   return [
     { id: `rect${x1}${x2}${y1}${y2}`, html: `Ω = ]${fr(x1)} ; ${fr(x2)}[ × ]${fr(y1)} ; ${fr(y2)}[`, name: 'un rectangle', dim: 2, p: [1, 1, 1, 1], dom: { dim: 2, parts: [[[`x-${pn(x1)}`, '>'], [`x-${pn(x2)}`, '<'], [`y-${pn(y1)}`, '>'], [`y-${pn(y2)}`, '<']]] } },
-    { id: `disc${R}`, html: `Ω = {(x, y) : x² + y² < ${R * R}}`, name: 'un disque', dim: 2, p: [1, 1, 1, 1], dom: { dim: 2, parts: [[[`x^2+y^2-${R * R}`, '<']]] } },
+    { id: `disc${R}`, html: `Ω = {(x, y) : x² + y² &lt; ${R * R}}`, name: 'un disque', dim: 2, p: [1, 1, 1, 1], dom: { dim: 2, parts: [[[`x^2+y^2-${R * R}`, '<']]] } },
     { id: `half${a}`, html: `Ω = {(x, y) : x > ${a}}`, name: 'un demi-plan', dim: 2, p: [1, 1, 1, 1], dom: { dim: 2, parts: [[[`x-${a}`, '>']]] } },
     { id: 'parab', html: 'Ω = {(x, y) : y > x²}', name: 'l\'intérieur d\'une parabole', dim: 2, p: [1, 1, 1, 1], dom: { dim: 2, parts: [[['y-x^2', '>']]] } },
-    { id: `punct${R}`, html: `Ω = {(x, y) : 0 < x² + y² < ${R * R}}`, name: 'un disque privé de son centre', dim: 2, p: [0, 0, 0, 1], dom: { dim: 2, parts: [[['x^2+y^2', '>'], [`x^2+y^2-${R * R}`, '<']]] }, seg: [[-1, 0], [1, 0]], hole: [0, 0], loop: `(cos(t) ; sin(t)), t ∈ [0 ; 2π]` },
-    { id: `ann${r2}`, html: `Ω = {(x, y) : ${r1 * r1} < x² + y² < ${r2 * r2}}`, name: 'une couronne', dim: 2, p: [0, 0, 0, 1], dom: { dim: 2, parts: [[[`x^2+y^2-${r1 * r1}`, '>'], [`x^2+y^2-${r2 * r2}`, '<']]] }, seg: [[-m, 0], [m, 0]], hole: [0, 0], loop: `(${m}cos(t) ; ${m}sin(t)), t ∈ [0 ; 2π]`.replace(/1\.5/g, '3/2').replace(/2\.5/g, '5/2') },
+    { id: `punct${R}`, html: `Ω = {(x, y) : 0 &lt; x² + y² &lt; ${R * R}}`, name: 'un disque privé de son centre', dim: 2, p: [0, 0, 0, 1], dom: { dim: 2, parts: [[['x^2+y^2', '>'], [`x^2+y^2-${R * R}`, '<']]] }, seg: [[-1, 0], [1, 0]], hole: [0, 0], loop: `(cos(t) ; sin(t)), t ∈ [0 ; 2π]` },
+    { id: `ann${r2}`, html: `Ω = {(x, y) : ${r1 * r1} &lt; x² + y² &lt; ${r2 * r2}}`, name: 'une couronne', dim: 2, p: [0, 0, 0, 1], dom: { dim: 2, parts: [[[`x^2+y^2-${r1 * r1}`, '>'], [`x^2+y^2-${r2 * r2}`, '<']]] }, seg: [[-m, 0], [m, 0]], hole: [0, 0], loop: `(${m}cos(t) ; ${m}sin(t)), t ∈ [0 ; 2π]`.replace(/1\.5/g, '3/2').replace(/2\.5/g, '5/2') },
     { id: 'r2o', html: 'Ω = ℝ² \\ {(0, 0)}', name: 'le plan privé de l\'origine', dim: 2, p: [0, 0, 0, 1], dom: { dim: 2, parts: [[['x^2+y^2', '>']]] }, seg: [[-1, 0], [1, 0]], hole: [0, 0], loop: '(cos(t) ; sin(t)), t ∈ [0 ; 2π]' },
     { id: `ext${r1}`, html: `Ω = {(x, y) : x² + y² > ${r1}}`, name: 'l\'extérieur d\'un disque', dim: 2, p: [0, 0, 0, 1], dom: { dim: 2, parts: [[['x^2+y^2-1', '>']]] }, seg: [[-2, 0], [2, 0]], hole: [0, 0], loop: '(2cos(t) ; 2sin(t)), t ∈ [0 ; 2π]' },
     { id: 'slit', html: 'Ω = ℝ² \\ {(x, 0) : x ≤ 0} (le plan privé d\'une demi-droite)', name: 'le plan privé d\'une demi-droite', dim: 2, p: [0, 1, 1, 1], dom: { dim: 2, parts: [[['y', '>']], [['y', '<']], [['x', '>']]] }, seg: [[-1, 1], [-1, -1]] },
-    { id: `pac${R}`, html: `Ω = {(x, y) : x² + y² < ${R * R}} privé du quart {x ≥ 0, y ≤ 0}`, name: 'un disque privé d\'un quart', dim: 2, p: [0, 1, 1, 1], dom: { dim: 2, parts: [[[`x^2+y^2-${R * R}`, '<'], ['x', '<']], [[`x^2+y^2-${R * R}`, '<'], ['y', '>']]] }, seg: [[1, 1 / 2], [-1 / 2, -1]] },
+    { id: `pac${R}`, html: `Ω = {(x, y) : x² + y² &lt; ${R * R}} privé du quart {x ≥ 0, y ≤ 0}`, name: 'un disque privé d\'un quart', dim: 2, p: [0, 1, 1, 1], dom: { dim: 2, parts: [[[`x^2+y^2-${R * R}`, '<'], ['x', '<']], [[`x^2+y^2-${R * R}`, '<'], ['y', '>']]] }, seg: [[1, 1 / 2], [-1 / 2, -1]] },
     { id: 'L', html: 'Ω = (]0 ; 3[ × ]0 ; 1[) ∪ (]0 ; 1[ × ]0 ; 3[) (en forme de L)', name: 'un domaine en L', dim: 2, p: [0, 1, 1, 1], dom: { dim: 2, parts: [[['x', '>'], ['x-3', '<'], ['y', '>'], ['y-1', '<']], [['x', '>'], ['x-1', '<'], ['y', '>'], ['y-3', '<']]] }, seg: [[5 / 2, 1 / 2], [1 / 2, 5 / 2]] },
-    { id: 'two', html: 'Ω = {(x + 3)² + y² < 1} ∪ {(x − 3)² + y² < 1} (deux disques)', name: 'deux disques disjoints', dim: 2, p: [0, 0, 0, 0], dom: { dim: 2, parts: [[['(x+3)^2+y^2-1', '<']], [['(x-3)^2+y^2-1', '<']]] }, seg: [[-3, 0], [3, 0]] },
+    { id: 'two', html: 'Ω = {(x + 3)² + y² &lt; 1} ∪ {(x − 3)² + y² &lt; 1} (deux disques)', name: 'deux disques disjoints', dim: 2, p: [0, 0, 0, 0], dom: { dim: 2, parts: [[['(x+3)^2+y^2-1', '<']], [['(x-3)^2+y^2-1', '<']]] }, seg: [[-3, 0], [3, 0]] },
     { id: 'r3o', html: 'Ω = ℝ³ \\ {(0, 0, 0)}', name: 'l\'espace privé de l\'origine', dim: 3, p: [0, 0, 1, 1], dom: { dim: 3, parts: [[['x^2+y^2+z^2', '>']]] }, seg: [[-1, 0, 0], [1, 0, 0]] },
     { id: 'r3axis', html: 'Ω = ℝ³ \\ {(0, 0, z) : z ∈ ℝ} (l\'espace privé de l\'axe z)', name: 'l\'espace privé d\'un axe', dim: 3, p: [0, 0, 0, 1], dom: { dim: 3, parts: [[['x^2+y^2', '>']]] }, seg: [[-1, 0, 0], [1, 0, 0]], hole: 'z', loop: '(cos(t) ; sin(t) ; 0), t ∈ [0 ; 2π]' },
-    { id: `ball${R}`, html: `Ω = {(x, y, z) : 0 < x² + y² + z² < ${R * R}}`, name: 'une boule privée de son centre', dim: 3, p: [0, 0, 1, 1], dom: { dim: 3, parts: [[['x^2+y^2+z^2', '>'], [`x^2+y^2+z^2-${R * R}`, '<']]] }, seg: [[-1, 0, 0], [1, 0, 0]] },
+    { id: `ball${R}`, html: `Ω = {(x, y, z) : 0 &lt; x² + y² + z² &lt; ${R * R}}`, name: 'une boule privée de son centre', dim: 3, p: [0, 0, 1, 1], dom: { dim: 3, parts: [[['x^2+y^2+z^2', '>'], [`x^2+y^2+z^2-${R * R}`, '<']]] }, seg: [[-1, 0, 0], [1, 0, 0]] },
   ];
 }
 const fr = (x) => String(x).replace('-', '−');
@@ -184,7 +184,7 @@ function potDomainMcq(skill, level, rng, opts = {}) {
     skill, level, exam: examTag(opts), noHints: level === 5, key: `${skill}:mcq:dom:${x1}${x2}${y1}${y2}${r2}${R}${sgn}`,
     prompt: `Soit F(x, y) = ${field}. On a rot F = 0 là où F est défini. F dérive d'un potentiel sur :`,
     right: `le rectangle ]${fr(x1)} ; ${fr(x2)}[ × ]${fr(y1)} ; ${fr(y2)}[`,
-    wrongs: [opt(`la couronne {1 < x² + y² < ${r2 * r2}}`, 'v_simply_connected_wrong'), opt('ℝ² \\ {(0, 0)}, puisque rot F = 0', 'v_pot_no_domain'), opt(`le disque {x² + y² < ${R * R}}`)],
+    wrongs: [opt(`la couronne {1 &lt; x² + y² &lt; ${r2 * r2}}`, 'v_simply_connected_wrong'), opt('ℝ² \\ {(0, 0)}, puisque rot F = 0', 'v_pot_no_domain'), opt(`le disque {x² + y² &lt; ${R * R}}`)],
     solution: [{ html: `Le rectangle ne contient pas l'origine et il est convexe : rot F = 0 suffit. La couronne et ℝ² \\ {0} ont un trou : sur le cercle unité, ∮ F · dl = ${sgn > 0 ? '2π' : '−2π'} ≠ 0, donc pas de potentiel. Le disque contient l'origine, où F n'est pas défini.`, note: '' }],
     hints: [{ level: 1, html: 'F n\'est pas défini en (0, 0). Sur quel domaine le critère rot F = 0 suffit-il ?' }, { level: 2, html: 'Il faut un domaine simplement connexe (par exemple convexe) qui ne contient pas l\'origine.' }, { level: 3, html: 'Le rectangle est convexe et ne contient pas l\'origine.' }],
   }, rng);
@@ -209,7 +209,7 @@ function rotPart3(F, i, { first }) {
   const dA = text(d(F[b], a));
   const dB = text(d(F[e], c));
   const goal = text(rotOf(F)[i]);
-  const judge = { kind: 'equiv', vars: XYZ, domain: DOM3, target: 'goal', goal, rot: true, traps: { v_rot_sign: [{ line: text(sub([], rotOf(F)[i])), ctx: { i: i + 1, want: goal } }] } };
+  const judge = { kind: 'equiv', vars: XYZ, domain: DOM3, target: 'no-int', goal, rot: true, traps: { v_rot_sign: [{ line: text(sub([], rotOf(F)[i])), ctx: { i: i + 1, want: goal } }] } };
   return {
     html: first ? null : `Composante ${i + 1} de rot F :`, ask: `(rot F)${SUBS[i]} =`, start: `pd(${text(F[b])},${XYZ[a]})-pd(${text(F[e])},${XYZ[c]})`, judge,
     lines: [{ math: `${dA}-${par(dB)}`, note: `∂F${SUBS[b]}/∂${XYZ[a]} − ∂F${SUBS[e]}/∂${XYZ[c]}`, subgoal: 'partials', blank: [dA, dB] }, { math: goal, note: 'On simplifie', subgoal: 'rot-zero' }],
@@ -233,7 +233,7 @@ function ptData(rng, { kind = null } = {}) {
       }
       const rot = rotOf(F);
       if ((k === 'no') === rot.every(isZero)) continue;
-      const D = rng.pick([{ html: 'ℝ³', convex: true }, { html: 'ℝ³', convex: true }, { html: 'le demi-espace {z > 0}', convex: true }, { html: `la boule {x² + y² + z² < ${rng.pick([4, 9])}}`, convex: true }]);
+      const D = rng.pick([{ html: 'ℝ³', convex: true }, { html: 'ℝ³', convex: true }, { html: 'le demi-espace {z > 0}', convex: true }, { html: `la boule {x² + y² + z² &lt; ${rng.pick([4, 9])}}`, convex: true }]);
       return { kind: k, dim: 3, F: F.map((c) => text(c)), Fs: F, rot: rot.map((r) => text(r)), D, phi };
     }
     const F = [[T(2, [1, 1, 0]), T(1, [0, 0, 1])], [T(1, [2, 0, 0])], [T(1, [1, 0, 0]), T(2, [0, 0, 1])]];
@@ -242,18 +242,19 @@ function ptData(rng, { kind = null } = {}) {
   // A field singular at the origin: a(x, y)/r² + b(−y, x)/r².
   const a = rng.pick([0, 1, 2]);
   const b = rng.pick([1, 2, 3]);
-  const P = `(${a ? `${a === 1 ? '' : a}x-` : '-'}${b === 1 ? '' : b}y)/(x^2+y^2)`;
-  const Q = `(${b === 1 ? '' : b}x${a ? `+${a === 1 ? '' : a}y` : ''})/(x^2+y^2)`;
+  const num = (t) => (/[+-]/.test(t.slice(1)) ? `(${t})` : t);
+  const P = `${num(`${a ? `${a === 1 ? '' : a}x-` : '-'}${b === 1 ? '' : b}y`)}/(x^2+y^2)`;
+  const Q = `${num(`${b === 1 ? '' : b}x${a ? `+${a === 1 ? '' : a}y` : ''}`)}/(x^2+y^2)`;
   const open = k === 'open';
   const D = open
-    ? rng.pick([{ html: 'Ω = ℝ² \\ {(0, 0)}', convex: false, hole: true }, { html: 'la couronne Ω = {1 < x² + y² < 4}', convex: false, hole: true }, { html: 'Ω = {x² + y² > 1}', convex: false, hole: true }])
-    : rng.pick([{ html: 'le demi-plan Ω = {x > 0}', convex: true }, { html: 'le demi-plan Ω = {y < 0}', convex: true }, { html: 'le rectangle Ω = ]1 ; 3[ × ]−2 ; 2[', convex: true }]);
+    ? rng.pick([{ html: 'Ω = ℝ² \\ {(0, 0)}', convex: false, hole: true }, { html: 'la couronne Ω = {1 &lt; x² + y² &lt; 4}', convex: false, hole: true }, { html: 'Ω = {x² + y² > 1}', convex: false, hole: true }])
+    : rng.pick([{ html: 'le demi-plan Ω = {x > 0}', convex: true }, { html: 'le demi-plan Ω = {y &lt; 0}', convex: true }, { html: 'le rectangle Ω = ]1 ; 3[ × ]−2 ; 2[', convex: true }]);
   return { kind: open ? 'open' : 'yes', dim: 2, F: [P, Q], rot: ['0'], D, a, b };
 }
 
 const DOMAIN_OPTS = (D) => [
   { id: 'convex', label: `${D.html.replace(/^Ω = /, '')} est convexe, donc simplement connexe`, valid: !!D.convex, ...(D.convex ? { ref: true } : { rule: 'v_simply_connected_wrong', why: 'Ce domaine a un trou : il n\'est ni convexe ni simplement connexe.' }) },
-  { id: 'hole', label: `${D.html.replace(/^Ω = /, '')} n'est pas simplement connexe (il a un trou)`, valid: !D.convex, ...(!D.convex ? { ref: true } : { rule: 'v_simply_connected_wrong', why: 'Ce domaine est convexe : il n\'a pas de trou.' }) },
+  { id: 'hole', label: `${D.html.replace(/^Ω = /, '')} n'est pas simplement connexe : il y a un trou`, valid: !D.convex, ...(!D.convex ? { ref: true } : { rule: 'v_simply_connected_wrong', why: 'Ce domaine est convexe : il n\'a pas de trou.' }) },
 ];
 function conclusionOpts(kind) {
   return [

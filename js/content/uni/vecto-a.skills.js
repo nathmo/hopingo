@@ -103,7 +103,7 @@ export const SKILLS = [
       rule: "Convexe (tout segment reste dans Ω) ⇒ étoilé (un point voit tout Ω) ⇒ simplement connexe (toute courbe fermée se réduit à un point dans Ω) ⇒ connexe, et <b>aucune réciproque</b>. Dans ℝ², simplement connexe = connexe et « sans trou ». ℝ² \\ {0} et une couronne ne le sont pas ; ℝ³ \\ {0} l'est, ℝ³ privé d'un axe ne l'est pas.",
       lines: [
         L('Ω = ]1 ; 3[ × ]2 ; 10[', 'Rectangle : convexe'),
-        L('Ω = {2 < x² + y² < 4}', 'Couronne : connexe, pas simplement connexe'),
+        L('Ω = {2 &lt; x² + y² &lt; 4}', 'Couronne : connexe, pas simplement connexe'),
         L('(√3 ; 0) et (−√3 ; 0) sont dans Ω, (0 ; 0) non', 'Le segment sort : pas convexe'),
       ],
     },

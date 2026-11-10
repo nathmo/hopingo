@@ -27,8 +27,9 @@ function fieldA(rng, { centred = true } = {}) {
   const c = centred ? 0 : rng.pick([1, 2]);
   const X = c ? `(x-${c})` : 'x';
   const den = c ? `((x-${c})^2+y^2)` : `(${R2})`;
-  const P = `(${a ? `${ONE(a)}${X}-` : '-'}${ONE(b)}y)/${den}`;
-  const Q = `(${ONE(b)}${X}${a ? `+${ONE(a)}y` : ''})/${den}`;
+  const num = (t) => (/[+-]/.test(t.slice(1)) && !/^-?\d*\(x-\d\)$/.test(t) ? `(${t})` : t);
+  const P = `${num(`${a ? `${ONE(a)}${X}-` : '-'}${ONE(b)}y`)}/${den}`;
+  const Q = `${num(`${ONE(b)}${X}${a ? `+${ONE(a)}y` : ''}`)}/${den}`;
   return { a, b, c, P, Q, F: [P, Q], val: { r: q(0), p: q(2 * b) }, hole: c ? `(${c} ; 0)` : '(0 ; 0)', omega: c ? `ℝ² \\ {(${c}, 0)}` : 'ℝ² \\ {(0, 0)}' };
 }
 const piT = (k) => (k === 1 ? 'π' : `${k}π`);
@@ -134,13 +135,13 @@ function pnBlocks(level, rng) {
 
 function pnMcq(level, rng, opts) {
   const b = rng.pick([1, 2, 3]);
-  const half = rng.pick([['{y > 0}', 'le demi-plan'], ['{x < 0}', 'le demi-plan'], ['{x > 1}', 'le demi-plan']]);
+  const half = rng.pick([['{y > 0}', 'le demi-plan'], ['{x &lt; 0}', 'le demi-plan'], ['{x > 1}', 'le demi-plan']]);
   const r2 = rng.pick([4, 9]);
   return mcqD({
     skill: PN, level, exam: examTag(opts), key: `${PN}:mcq:${b}:${half[0]}:${r2}`,
     prompt: `Soit F(x, y) = ${tupML([`-${ONE(b)}y/(${R2})`, `${ONE(b)}x/(${R2})`])}. F dérive d'un potentiel sur :`,
     right: `${half[1]} ${half[0]}`,
-    wrongs: [opt('ℝ² \\ {(0, 0)}, puisque rot F = 0', 'v_pot_no_domain'), opt(`la couronne {1 < x² + y² < ${r2}}`, 'v_simply_connected_wrong'), opt(`{x² + y² > 1}, car ∮ F · dl = 0 sur le cercle de centre (3 ; 0) et de rayon 1`, 'v_rot_closed_zero')],
+    wrongs: [opt('ℝ² \\ {(0, 0)}, puisque rot F = 0', 'v_pot_no_domain'), opt(`la couronne {1 &lt; x² + y² &lt; ${r2}}`, 'v_simply_connected_wrong'), opt(`{x² + y² > 1}, car ∮ F · dl = 0 sur le cercle de centre (3 ; 0) et de rayon 1`, 'v_rot_closed_zero')],
     solution: [{ html: `Sur le cercle unité, ∮ F · dl = ${piT(2 * b)} ≠ 0 : pas de potentiel sur un domaine qui contient ce cercle (ℝ² \\ {0}, la couronne, {x² + y² > 1}). ${half[1].replace(/^l/, 'L')} ${half[0]} est convexe et rot F = 0 : F y dérive d'un potentiel.`, note: '' }],
   }, rng);
 }

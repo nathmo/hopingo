@@ -18,7 +18,7 @@ import {
 
 const XYZ = ['x', 'y', 'z'];
 const DOM3 = { x: [-3, 3], y: [-3, 3], z: [-3, 3] };
-const eqJ = (goal, extra = {}) => ({ kind: 'equiv', vars: XYZ, domain: DOM3, target: 'goal', goal, ...extra });
+const eqJ = (goal, extra = {}) => ({ kind: 'equiv', vars: XYZ, domain: DOM3, target: 'no-int', goal, ...extra });
 // Lines with ∂ are never final: the expanded result with no more terms than the goal.
 const eqN = (goal, extra = {}) => ({ kind: 'equiv', vars: XYZ, domain: DOM3, target: 'no-int', goal, ...extra });
 const finalFor = (cfg, line) => JUDGES.equiv.isFinal(cfg, parse(line, { vars: cfg.vars })) === true;
