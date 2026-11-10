@@ -262,6 +262,7 @@ function bisItem(level, rng, opts = {}) {
   });
   return stepsItem({
     skill: BIS, level, parts, subgoals: BIS_SUB, key: `${BIS}:${linT(r1)}|${linT(r2)}`, fallback: d.fallback,
+    keys: ['calc', 'geo', 'pts', 'calcfn'], // | | of the distances
     prompt: `Donne les équations des deux bissectrices des droites d₁ : ${gR(linT(r1))} et d₂ : ${gR(linT(r2))}, à coefficients entiers.`,
     hints: [
       { level: 1, html: 'Un point de la bissectrice est à la même distance des deux droites : |a₁x + b₁y + c₁|/‖n⃗₁‖ = |a₂x + b₂y + c₂|/‖n⃗₂‖.' },

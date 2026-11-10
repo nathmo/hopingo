@@ -527,7 +527,9 @@ function asItem(level, rng, opts = {}) {
   const { start, judge, script } = partsScript(parts, lv, AS_CHOICES, before);
   const item = linesItem({
     skill: AS, level: lv, prompt, start, judge, mode: modeOf(lv), script, hints: lv >= 5 || opts.exam ? [] : hints,
-    subgoals: usedSubgoals(AS_SUB, script), keys: KEYS, tapActions: lv === 3 ? 'steps' : null,
+    // The domain part is a set: ] [ ; ∪ are on the set keypad.
+    subgoals: usedSubgoals(AS_SUB, script), keys: [judge, ...script.map((l) => l.judge)].some((j) => j?.kind === 'solset') ? [...KEYS, 'set'] : KEYS,
+    tapActions: lv === 3 ? 'steps' : null,
     key: `${AS}:${lv}:${d.f}`, exam: examTag(opts, 4), fallback: d.fallback,
   });
   return withBaits(item, ['g6_oblique_h_forgot']);

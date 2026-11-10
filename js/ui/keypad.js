@@ -84,6 +84,10 @@ const LABEL = {
 Object.assign(LABEL, { 'vec(': 'AB⃗', ' ou ': 'ou' });
 Object.assign(LABEL, { 'C(': 'C(n, k)', 'A(': 'A(n, k)', 'Φ(': 'Φ( )', 'Φ⁻¹(': 'Φ⁻¹( )' }); // step U7
 
+// What may come before a fraction bar or an exponent: a digit, a bracket,
+// a letter (Greek too: λ², 1/λ… is not refused), a factorial (6!/2!).
+const CAN_HOLD = /[0-9)!a-zA-Zπα-ωΑ-Ω]/;
+
 export class MathInput {
   constructor({ keys = 'frac', keysets = null, placeholder = '', onChange, onEnter } = {}) {
     this.chars = [];
@@ -126,11 +130,11 @@ export class MathInput {
       // start another fraction.
       let j = this.caret - 1;
       while (j >= 0 && /[0-9,]/.test(this.chars[j])) j--;
-      if (!/[0-9)a-zA-Zπ]/.test(prev ?? '') || this.chars[j] === '/') { this.flash(); return; }
+      if (!CAN_HOLD.test(prev ?? '') || this.chars[j] === '/') { this.flash(); return; }
       this.insert('/');
     } else if (k === '^') {
       // An exponent needs something to raise, and only one at a time.
-      if (!/[0-9)a-zA-Zπ]/.test(prev ?? '') || this.chars.slice(0, this.caret).join('').match(/\^-?\d*$/)) { this.flash(); return; }
+      if (!CAN_HOLD.test(prev ?? '') || this.chars.slice(0, this.caret).join('').match(/\^-?\d*$/)) { this.flash(); return; }
       this.insert('^');
     } else if (k) this.insert(k);
     play('tap');
@@ -157,8 +161,9 @@ export class MathInput {
     // Without letters on the keypad, x means × and r or v mean √.
     if (!letters) Object.assign(map, { x: '×', r: '√', v: '√' });
     let k = map[e.key] ?? e.key;
-    // With letters, any letter of the alphabet can be typed.
-    if (letters && /^[a-zA-Z]$/.test(k)) { e.preventDefault(); this.press(k); return; }
+    // With letters, any letter of the alphabet can be typed, and spaces:
+    // « x = 1 ou x = 2 » needs them around « ou ».
+    if (letters && /^[a-zA-Z ]$/.test(k)) { e.preventDefault(); this.press(k); return; }
     allowed.add('enter'); allowed.add('back'); allowed.add('left'); allowed.add('right');
     if (k === '÷' && !allowed.has('÷')) k = null;
     if (k === '²' && allowed.has('^')) {
@@ -301,7 +306,7 @@ export function renderChars(chars, caret) {
 
 // Step U6 (A2): several variables (∂ writes pd(f, x)), polar and spherical
 // letters, the constants of differential equations, systems with « ou ».
-KEYSETS.a2 = ['x', 'y', 'z', 'pd(', ',', 'r', 'φ', 'θ', 'λ', 'C', '_', ';', '≤', '|', ' ou ', 'back'];
+KEYSETS.a2 = ['x', 'y', 'z', 'pd(', ',', 'r', 'φ', 'θ', 'λ', 'C', '_', ';', '=', '≤', '|', ' ou ', 'back'];
 TAB_LABEL.a2 = 'xy ∂';
 Object.assign(LABEL, { 'pd(': '∂( , x)' });
 
