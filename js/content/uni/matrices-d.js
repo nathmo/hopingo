@@ -258,7 +258,7 @@ function modesReal(level, rng) {
     if (level === 3 && d.companion) parts.push(yPart(d));
   }
   parts.push(stabPart(eigs, { level }));
-  const given = level === 1 ? ` Avec x = (y ; ẏ), ẋ = Ax${d.companion ? ` où A = ${MLm(d.A)}` : ''}. Les valeurs propres de A sont ${listFr(d.eigs.map(fq))}.` : '';
+  const given = level === 1 ? `${d.companion ? ` Avec x = (y ; ẏ), ẋ = Ax où A = ${MLm(d.A)}.` : ''} Les valeurs propres de A sont ${listFr(d.eigs.map(fq))}.` : '';
   return partsItem({
     skill: MODES, level, parts, hints: modesHints(d), subgoals: MODES_SUB, key: `${MODES}:${mt(d.A)}:${vt(d.x0)}:${level}`, fallback: d.fallback,
     prompt: modesPrompt(d, `${d.companion && level > 1 ? 'Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve' : 'Trouve'} les modes propres, la solution x(t), et dis si le système est stable.${given}${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`),

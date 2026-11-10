@@ -226,7 +226,7 @@ function level5(rng) {
     const script = [
       { kind: 'eq', math: String(total), note: 'Σσᵢ²', subgoal: 'err' },
       { kind: 'segment', html: `k minimal pour ‖A − A<sub>k</sub>‖_F ≤ ${tPct} de ‖A‖_F.`, ask: 'k =', start: { math: 'k' }, judge: { kind: 'value', expect: String(k), form: 'irreducible' } },
-      { kind: 'eq', math: String(k), note: `Σ_{i>k} σᵢ² ≤ ${String(tt * tt).replace('.', ',')}·${total} = ${String(Math.round(tt * tt * total * 100) / 100).replace('.', ',')}`, subgoal: 'err' },
+      { kind: 'eq', math: String(k), note: `Σ_{i>k} σᵢ² ≤ ${String(Math.round(tt * tt * 1e6) / 1e6).replace('.', ',')}·${total} = ${String(Math.round(tt * tt * total * 100) / 100).replace('.', ',')}`, subgoal: 'err' },
       { kind: 'segment', html: `L'erreur ‖A − A<sub>${k}</sub>‖₂ pour ce k.`, ask: `‖A − A${sub(k)}‖₂ =`, start: { math: `E_${k}` }, judge: { kind: 'value', expect: err2, form: 'exact', lowrank: lrCfg(d, k) } },
       { kind: 'eq', math: err2, note: `σ${sub(k + 1)}`, subgoal: 'err' },
     ];

@@ -10,6 +10,8 @@
 
 import * as MX from '../../cas/matrix.js';
 import { unitText } from '../../cas/rules/l-sym.js';
+import { radicalNode } from '../../cas/matexpr.js';
+import { toText } from '../../cas/print.js';
 import { q, mt, vt, MLm, fq, qt, mcqDistinct, tfL, examTag, withCells } from './alglin-kit.js';
 import { mcq } from './kit.js';
 import { problemItem } from './kit-problem.js';
@@ -216,7 +218,8 @@ function rayExam(rng, exam) {
     skill: RA, level: 4, key: `mcq:${mt(d.A)}:${vt(d.x)}`, exam: tag,
     prompt: `A = ${MLm(d.A)} et x = ${vR(d.x)}. Que vaut le quotient de Rayleigh R(x) ?`,
     right: fq(d.R),
-    wrongs: [{ html: fq(d.num), rule: 'm_rayleigh_no_denominator' }, { html: `${fq(d.num)}/${rootDen}`, rule: 'm_rayleigh_no_denominator' }],
+    // xᵀAx/‖x‖ in closed form (28/(2√2) = 7√2).
+    wrongs: [{ html: fq(d.num), rule: 'm_rayleigh_no_denominator' }, { html: (() => { const r = radicalNode(d.num.valueOf() / Math.sqrt(d.den.valueOf())); return r ? toText(r).replace(/-/g, '−') : `${fq(d.num)}/(${rootDen})`; })(), rule: 'm_rayleigh_no_denominator' }],
     fillers: [{ html: fq(q(1).div(d.R)) }, { html: fq(d.Ax[0].div(d.x[0].n ? d.x[0] : q(1))) }, { html: fq(d.R.add(1)) }, { html: fq(d.R.neg()) }],
     solution: [{ html: `Ax = ${vR(d.Ax)}, xᵀAx = ${fq(d.num)}, xᵀx = ${fq(d.den)}`, note: '' }, { html: `R(x) = ${fq(d.R)}`, note: '' }],
     fallback: d.fallback,
