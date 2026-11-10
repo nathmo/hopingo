@@ -1,5 +1,8 @@
-// Traps of module F, part d (unit `fourier`, step U10; catalogue
-// docs/universite/VCF-analyse-3-4.md, « Pièges du module »). Each rule
-// follows spec §7 and carries a `check` replayed by tests/judges.test.js.
+// Traps of module F, part d (step U10): what makes the catalogue's traps
+// of this part work (the table itself is META in rules/vcf.js). DEFS: {id:
+// {name, judges, transform, wrongValues, explain?, check}}; explain()
+// falls back on the catalogue's text. Each trap carries a `check`
+// replayed by tests/judges.test.js: {judge, prev, line} (a wrong line
+// diagnosed as the trap), {counter, answers}, or {bait: {skill, level?, exam?}}.
 
-export const RULES = [];
+export const DEFS = {};

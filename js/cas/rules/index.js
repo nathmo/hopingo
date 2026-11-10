@@ -67,14 +67,8 @@ import { RULES as PE } from './pe.js';
 
 CAS_RULES.push(...G7, ...PA, ...PB, ...PC, ...PD, ...PE);
 
-// Step U10: modules V (parts a, b), C (parts a, b) and F (parts a to d).
-import { RULES as VA } from './va.js';
-import { RULES as VB } from './vb.js';
-import { RULES as CA } from './ca.js';
-import { RULES as CB } from './cb.js';
-import { RULES as FA } from './fa.js';
-import { RULES as FB } from './fb.js';
-import { RULES as FC } from './fc.js';
-import { RULES as FD } from './fd.js';
+// Step U10: modules V, C and F (the table is META in rules/vcf.js, each part
+// adds its DEFS in rules/va.js … rules/fd.js).
+import { RULES as VCF } from './vcf.js';
 
-CAS_RULES.push(...VA, ...VB, ...CA, ...CB, ...FA, ...FB, ...FC, ...FD);
+CAS_RULES.push(...VCF);
