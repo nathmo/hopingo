@@ -32,6 +32,10 @@ import { diagnoseLine } from './diagnose.js';
 
 export const sign = '⇔';
 
+// The tokenizer of guided lines spells « : » as « ÷ » (fillBlanks, templateOf):
+// « axe ÷ x = 3 » is « axe : x = 3 ».
+const colon = (t) => t.replace(/(^|;)\s*(asymptotes?|directrices?|axe)\s*÷/g, '$1$2 :');
+
 const AN = new WeakMap();
 export function analysis(cfg) {
   if (!AN.has(cfg)) {
@@ -73,6 +77,8 @@ function readElement(name, body) {
     const o = readObject(body, { dim: 2 });
     const parts = o.shape === 'union' ? o.parts : [o];
     const lines = parts.map((p) => {
+      // A line with irrational coefficients (x = 2 + 9√5/5) is read numerically.
+      if (p.kind === 'poly' && p.coefs.slice(0, 3).every((c) => Math.abs(c) < 1e-12) && Math.hypot(p.coefs[3], p.coefs[4]) > 1e-12) return normLine(p.coefs.slice(3));
       if (p.kind !== 'affine' || p.rows.length !== 1) throw new Error('Écris une droite : ax + by + c = 0.');
       const r = p.rows[0].map((q) => q.valueOf());
       return normLine(r);
@@ -86,7 +92,7 @@ function readElement(name, body) {
 }
 
 function readStrict(cfg, text) {
-  const t = normGeomText(text).replace(/^=\s*/, '');
+  const t = colon(normGeomText(text)).replace(/^=\s*/, '');
   const items = splitTop(t, ';').map((s) => s.trim()).filter(Boolean);
   const els = items.map((it) => ELEMENT.exec(it));
   if (els.every(Boolean)) {
@@ -124,7 +130,7 @@ const toML = (n) => toMathML(n).replace(/^<math[^>]*>/, '').replace(/<\/math>$/,
 // A line (or a guided template with blanks □) as MathML, as written.
 function lineML(t, bl = {}) {
   const counter = { n: 0 };
-  const items = splitTop(normGeomText(t), ';').map((s) => s.trim()).filter(Boolean);
+  const items = splitTop(colon(normGeomText(t)), ';').map((s) => s.trim()).filter(Boolean);
   const els = items.map((it) => ELEMENT.exec(it));
   if (els.every(Boolean)) {
     return els.map((m) => {
@@ -224,7 +230,7 @@ function standardShape(cfg, eq) {
     return Math.abs(d) < 1e-9 && Math.abs(e) < 1e-9;
   }
   // In x, y: squares of (x − h) and (y − k), as written.
-  return writtenStandard(eq.sides);
+  return writtenStandard(eq.sides || []);
 }
 
 const isNum = (n) => { n = stripParen(n); if (n.t === 'neg') n = stripParen(n.e); return n.t === 'num' || (n.t === 'frac' && stripParen(n.n).t === 'num' && stripParen(n.d).t === 'num'); };

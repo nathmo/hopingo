@@ -135,6 +135,7 @@ export function describe(item) {
   // Step U3: one answer in a grid, an example to give.
   if (item.type === 'matrix') lines.push(`  [grille ${item.rows}×${item.cols}, juge ${item.judge.kind}${item.noHints ? ', sans aide' : ''}] → ${item.answer}`);
   if (item.type === 'example') lines.push(`  [exemple ${item.property.kind}${item.property.params?.want || item.property.params?.test ? ` ${item.property.params.want ?? item.property.params.test}` : ''}] → ${Object.entries(item.answer || {}).map(([k, v]) => `${k} = ${v}`).join(', ')}`);
+  if (item.type === 'plot') lines.push(`  [repère ${item.task}, à placer : ${item.place.map((p) => `${p.label} ×${p.count}`).join(', ')}${item.noHints ? ', sans aide' : ''}]`); // step U5
   if (item.exam && item.type !== 'lines') lines.push(`  [examen ${item.exam.format}]`);
   if (item.type === 'shade') lines.push(`  (figure ${item.figure.shape} en ${item.figure.n} parts, colorier ${item.target.count})`);
   if (item.type === 'numberline') lines.push(`  (droite ${item.line.min ?? 0} → ${item.line.max}, graduée en ${item.line.den}es) → ${item.target}`);

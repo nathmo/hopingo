@@ -500,6 +500,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 
 ### `g10-circle-eq` — Cercle : centre, rayon, cercle par trois points
 - **Année** 12.5 · **Prérequis** `g4-bisectors`, `@alg:H-completer-carre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarit 1 (équation générale, multipliée par 1, 2, 3 ou 5 ; 1 item sur 8 a r² ≤ 0 aux niveaux 3 et 4, jugé par `conic` quand r² < 0) aux niveaux 1 à 3, gabarits 2 (trois points sur un cercle de rayon 5, 10 ou 13) et 3 (diamètre) au niveau 4. Ω est une partie `vector` (avec `circleEq` pour `g4_not_normalized`), r une partie `value`, la nature (cercle, point, vide) une décision. Le niveau 5 et la variante `open` sont le cercle par trois points, sans aide (pas d'enchaînement avec le cercle tangent du contrôle 3). Le V/F faux demande r² en contre-exemple.
 - **Intro** : on divise par le coefficient de x² (qui doit être celui de y², sans terme en xy), puis on complète les carrés : (x − h)² + (y − k)² = r². Si le second membre est nul, c'est un point ; négatif, l'ensemble est vide. Par trois points : intersection de deux médiatrices.
 - **Juge** : `geom` `{object:'circle'}` ; éléments `Ω`, `r` · **Forme finale** : Ω et r (ou « point », « vide »).
 - **Niveaux** :
@@ -525,6 +526,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-circle-tangent` — Tangentes à un cercle
 - **Année** 12.5 · **Prérequis** `g10-circle-eq`, `@alg:H-discriminant` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g10-circle-eq` : centre et rayon du cercle.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarits 1 (en T, dédoublement), 2 (depuis Q, toujours avec |ΩQ| > r et r = 5, une tangente verticale une fois sur trois) et 3 (tangentes parallèles à une droite, normale de norme entière). Depuis Q : ΩQ² (`value`), la décision « la verticale est-elle tangente ? », l'équation en m (`solset`), puis les deux tangentes (`geom` `count: 2`). La méthode du discriminant n'est qu'une option de la décision du niveau 3. Le niveau 5 : gabarit 3 ou 2, sans aide.
 - **Intro** : en T du cercle : (x_T − h)(x − h) + (y_T − k)(y − k) = r². Depuis un point Q extérieur : une droite est tangente si sa distance au centre vaut r. **On teste d'abord la droite verticale** x = x_Q, puis y − y_Q = m(x − x_Q). Méthode équivalente : discriminant nul de l'intersection.
 - **Juge** : `geom` `{object:'line2', count:2}` (ou une seule droite en T) ; segment `equiv` `{vars:['m']}` pour l'équation en m · **Forme finale** : toutes les tangentes.
 - **Niveaux** :
@@ -551,6 +553,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 
 ### `g10-power-radical` — Puissance d'un point, axe radical, cercles orthogonaux
 - **Année** 12.5 · **Prérequis** `g10-circle-eq` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarits 1 (axe radical ; une équation multipliée par 2 ou 3 à partir du niveau 2), 2 (puissance d'un point) et 3 (orthogonaux : γ₁ sous forme réduite, Ω₂ et r₂² lus sur γ₂, puis Ω₁Ω₂² − (r₁² + r₂²) ; la conclusion est dans la note, et `g10_orthogonal_sum` est une option de la décision « orthogonaux si… »). Niveau 5 et `open` : le cercle orthogonal à deux cercles, de centre sur une droite (axe radical ∩ d, r² = γ₁(Ω)).
 - **Intro** : avec l'équation **normalisée** γ(x, y) = x² + y² + Dx + Ey + F, la puissance de P est γ(P) = ΩP² − r². Elle est négative à l'intérieur. Axe radical de γ₁ et γ₂ : γ₁(x, y) − γ₂(x, y) = 0, droite perpendiculaire à Ω₁Ω₂. γ₁ et γ₂ sont orthogonaux si Ω₁Ω₂² = r₁² + r₂².
 - **Juge** : `value` pour les puissances ; `geom` `{object:'line2'}` pour l'axe ; décision pour l'orthogonalité · **Forme finale** : axe radical, et réponse oui/non justifiée.
 - **Niveaux** :
@@ -576,6 +579,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 
 ### `g10-pole-polar` — Pôle et polaire par rapport à un cercle
 - **Année** 12.5 · **Prérequis** `g10-circle-tangent` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Triplets (ΩP⃗, w⃗, w⃗′) énumérés une fois (r² ≤ 26, points de contact entiers). Gabarits 1 (polaire), 2 (pôle : P = Ω + λ·(a ; b), une ligne `vector`) et 3 (polaire, équation du 2e degré en x, ou en y si la polaire est verticale, T₁ et T₂, tangentes `count: 2`) ; niveau 5 et `open` : gabarit 3 sans aide.
 - **Intro** : polaire de P(x₀ ; y₀) par rapport à (x − h)² + (y − k)² = r² : (x₀ − h)(x − h) + (y₀ − k)(y − k) = r² (dédoublement). Si P est extérieur, c'est la droite des points de contact des tangentes issues de P. Le pôle d'une droite se trouve en identifiant les coefficients.
 - **Juge** : `geom` `{object:'line2'}` pour la polaire ; `value` `{form:'point'}` pour le pôle et les points de contact · **Forme finale** : polaire, ou pôle.
 - **Niveaux** :
@@ -602,6 +606,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-ellipse` — Ellipse : axes, foyers, excentricité, directrices
 - **Année** 12.5 · **Prérequis** `@alg:H-completer-carre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `@alg:H-completer-carre` : compléter les carrés jusqu'à la forme réduite.
+- **Statut** : fait le 10 novembre 2026 (étape U5). (a, b) dans (5, 4), (5, 3) deux fois sur trois, sinon (3, 2), (4, 2), (3, 1), (2, 1), (4, 3), (4, 1) ; (13, 12) et (10, 8) ne sont pas tirés (coefficients trop grands). Parties `conic` : forme réduite, puis Ω, a, b (décision « grand axe » au niveau 2), c et foyers, e et directrices. Gabarit 2 : foyers et excentricité. Gabarit 3 (esquisse) : un item `plot` sur quatre au niveau 4 (Ω, sommets du grand axe, foyers). Le niveau 5 n'enchaîne pas avec `g10-conic-from-data` : c'est l'étude complète sans aide. Le V/F « e > 1 possible » devient « 0 < e < 1 » (vrai) ou « foyers à √(a² + b²) » (faux, contre-exemple a, b).
 - **Intro** : on complète les carrés jusqu'à (x − h)²/A + (y − k)²/B = 1. Le grand axe est du côté du **plus grand** dénominateur. c² = a² − b², e = c/a < 1, directrices à distance a²/c du centre, perpendiculaires au grand axe.
 - **Juge** : `conic` `{equation}` avec lignes d'éléments · **Forme finale** : Ω, a, b, foyers, e, directrices (ceux que l'item demande).
 - **Niveaux** :
@@ -628,6 +633,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-hyperbola` — Hyperbole : foyers, asymptotes, directrices
 - **Année** 12.5 · **Prérequis** `@alg:H-completer-carre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `@alg:H-completer-carre` : compléter les carrés jusqu'à la forme réduite.
+- **Statut** : fait le 10 novembre 2026 (étape U5). (a, b) dans (4, 3), (3, 4), (8, 6), (6, 8) trois fois sur quatre, sinon des c irrationnels ; (12, 5) n'est pas tiré. L'axe réel vertical donne toujours un second membre négatif avant division. Parties `conic` : forme réduite, Ω a b c (décision « axe réel » au niveau 2), foyers et e, asymptotes, directrices (niveaux 4 et 5). Gabarit 3 : a = b. Niveau 5 : une fois sur deux l'esquisse (`plot` : Ω, sommets, asymptotes, sans aide), sinon l'étude complète ; la question sur un point de l'hyperbole n'est pas posée. Le V/F est l'énoncé vrai du catalogue.
 - **Intro** : forme réduite (x − h)²/a² − (y − k)²/b² = 1 (axe réel horizontal) ou (y − k)²/a² − (x − h)²/b² = 1 (axe réel vertical). On regarde **le terme positif quand le second membre vaut +1**. c² = a² + b², e = c/a > 1, asymptotes y − k = ±(b/a)(x − h) pour l'axe horizontal.
 - **Juge** : `conic` `{equation}` avec lignes d'éléments · **Forme finale** : Ω, sommets, foyers, asymptotes (cartésiennes entières), e.
 - **Niveaux** :
@@ -655,6 +661,7 @@ Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
 ### `g10-parabola` — Parabole : sommet, foyer, directrice
 - **Année** 12.5 · **Prérequis** `@alg:H-completer-carre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `@alg:H-completer-carre` : compléter le carré jusqu'à la forme réduite.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarits 1 (équation développée), 2 (foyer et directrice : MF² = d(M, D)², puis forme réduite, sommet et axe) et 3 (axe et deux points : 2p, puis k (ou h), puis l'équation ; p = ±1 ou ±2 pour des points entiers). p est une partie `value` (signé, comme dans (x − h)² = 2p(y − k)). Le niveau 5 et `open` sont les gabarits 2 ou 3 sans aide ; la parabole qui coupe une hyperbole orthogonalement (contrôle 4, Q3 b) n'est pas faite.
 - **Intro** : on met sous la forme (x − h)² = 2p(y − k) (axe vertical) ou (y − k)² = 2p(x − h) (axe horizontal). Le foyer est à **p/2** du sommet, la directrice à p/2 de l'autre côté. Tout point est à égale distance du foyer et de la directrice.
 - **Juge** : `conic` `{equation}` avec lignes d'éléments · **Forme finale** : S, F, directrice, axe.
 - **Niveaux** :
