@@ -9,7 +9,7 @@
 //                      one power of t too many or too few (f(tv) not
 //                      divided by t, or divided twice); judges equiv, limit;
 //   a2_diff_no_norm    cfg.ratio: 'polar' (R/‖h‖ in r, φ: R written instead,
-//                      r times the line) or 'hk' (R/√(h² + k²): R instead).
+//                      r times the line) or 'xy' (R/√(x² + y²): R instead).
 // The others are wrong final answers (wrongValues): options of the multiple
 // choices, wrong decisions, the « true » answer to a false statement. Their
 // wrongValues(d) take the generator's data and give the wrong value with
@@ -128,7 +128,7 @@ export const DEFS = {
     transform: (prev, ctx) => {
       const ratio = ctx?.cfg?.ratio;
       if (ratio === 'polar') return [{ node: mul(prev, sym('r')), ctx: {} }];
-      if (ratio === 'hk') return [{ node: mul(prev, parse('√(h^2+k^2)', { vars: ['h', 'k'] })), ctx: {} }];
+      if (ratio === 'xy') return [{ node: mul(prev, parse('√(x^2+y^2)', { vars: ['x', 'y'] })), ctx: {} }];
       return [];
     },
     explain: () => 'R tend toujours vers 0 si f est continue. La différentiabilité demande plus : R divisé par ‖(h, k)‖ doit tendre vers 0.',

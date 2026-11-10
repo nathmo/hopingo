@@ -7,9 +7,9 @@
 // D_v f(0, 0): the quotient (f(tv) − 0)/t simplified by `equiv` in t
 // (cfg.dirDeriv names a2_dirderiv_power), then its limit by `limit`.
 // Differentiability: the partial derivatives by `limit` in h and k, the
-// remainder R by `equiv` in (h, k), R/‖h‖ in polar coordinates by `equiv`
-// in (r, φ) (cfg.ratio names a2_diff_no_norm), then `bound` (R/‖h‖ → 0) or
-// a decision and the value of R/‖h‖ at an angle (`value`).
+// remainder R by `equiv` in (x, y), R/‖(x, y)‖ in polar coordinates by `equiv`
+// in (r, φ) (cfg.ratio names a2_diff_no_norm), then `bound` (R/‖(x, y)‖ → 0) or
+// a decision and the value of R/‖(x, y)‖ at an angle (`value`).
 
 import {
   q, QS, qsAdd, M, RD, linesItem, mcq, tfItem, examTag, H, E, modeOf, blanked, assemble, problemItem, blocksItem,
@@ -257,7 +257,7 @@ const DF_SUB = [
 ];
 const DF_CHOICES = [
   { id: 'limit', label: 'Faire tendre h vers 0' },
-  { id: 'remainder', label: 'Retrancher f(0, 0) et ∇f(0, 0)·(h, k)' },
+  { id: 'remainder', label: 'Retrancher f(0, 0) et ∇f(0, 0)·(x, y)' },
   { id: 'polar', label: 'Passer en polaires et diviser par r' },
   { id: 'bound', label: 'Majorer en r' },
   { id: 'angle', label: 'Fixer un angle φ' },
@@ -284,16 +284,16 @@ export function dfData(rng, kind) {
       const both = al !== 0 && be !== 0;
       const neg = both && al < 0 && be < 0;
       const sg = neg ? -1 : 1;
-      const lin = polyXY([[sg * al, 1, 0], [sg * be, 0, 1]], 'h', 'k');
-      const Rs = both ? `${neg ? '-' : ''}hk(${lin})/(h^2+k^2)` : `${polyXY([[al, 2, 1], [be, 1, 2]].filter((t) => t[0]), 'h', 'k')}/(h^2+k^2)`;
+      const lin = polyXY([[sg * al, 1, 0], [sg * be, 0, 1]]);
+      const Rs = both ? `${neg ? '-' : ''}xy(${lin})/(x^2+y^2)` : `${polyXY([[al, 2, 1], [be, 1, 2]].filter((t) => t[0]))}/(x^2+y^2)`;
       const linT = polyXY([[sg * al, 1, 0], [sg * be, 0, 1]], 'cos(φ)', 'sin(φ)');
       const ratio = both ? `${neg ? '-' : ''}cos(φ)sin(φ)(${linT})` : polyTrig([[al, 2, 1], [be, 1, 2]].filter((t) => t[0]));
       const at = new QS(q(al + be, 4), 2);
       return {
-        kind, f, P: terms, px: q(p30), py: q(p03), fx0: p30 ? `${coefText(p30, 'h^3')}/h^2` : '0', fy0: p03 ? `${coefText(p03, 'k^3')}/k^2` : '0',
-        grad: polyXY([[p30, 1, 0], [p03, 0, 1]].filter((t) => t[0]), 'h', 'k'),
-        Rraw: `${wrap(polyXY(terms, 'h', 'k'))}/(h^2+k^2)-(${polyXY([[p30, 1, 0], [p03, 0, 1]].filter((t) => t[0]), 'h', 'k')})`,
-        Rmid: `(${polyXY(terms, 'h', 'k')}-(${polyXY([[p30, 1, 0], [p03, 0, 1]].filter((t) => t[0]), 'h', 'k')})(h^2+k^2))/(h^2+k^2)`,
+        kind, f, P: terms, px: q(p30), py: q(p03), fx0: p30 ? `${coefText(p30, 't^3')}/t^2` : '0', fy0: p03 ? `${coefText(p03, 't^3')}/t^2` : '0',
+        grad: polyXY([[p30, 1, 0], [p03, 0, 1]].filter((t) => t[0])),
+        Rraw: `${wrap(polyXY(terms))}/(x^2+y^2)-(${polyXY([[p30, 1, 0], [p03, 0, 1]].filter((t) => t[0]))})`,
+        Rmid: `(${polyXY(terms)}-(${polyXY([[p30, 1, 0], [p03, 0, 1]].filter((t) => t[0]))})(x^2+y^2))/(x^2+y^2)`,
         R: Rs, ratio, at, atText: `${ratio.replace(/φ/g, '(π/4)').replace(/\(\(π\/4\)\)/g, '(π/4)')}`, diff: false, c1: false,
       };
     }
@@ -302,19 +302,18 @@ export function dfData(rng, kind) {
     const b = rng.int(-3, 3);
     if (a === 0 && b === 0) continue;
     const linXY = polyXY([[a, 1, 0], [b, 0, 1]].filter((t) => t[0]));
-    const linHK = polyXY([[a, 1, 0], [b, 0, 1]].filter((t) => t[0]), 'h', 'k');
     if (kind === 'dpoly') {
       const j = rng.int(0, 4);
       const c = C();
       const P4 = [[c, 4 - j, j]];
       const g = `${coefText(c, `${pw('x', 4 - j)}${pw('y', j)}`)}/(x^2+y^2)`;
       const f = `${linXY}+${g}`.replace('+-', '-');
-      const Rq = `${coefText(c, `${pw('h', 4 - j)}${pw('k', j)}`)}/(h^2+k^2)`;
-      const fx0 = joinSum([a ? coefText(a, 'h') : '', j === 0 ? `${coefText(c, 'h^4')}/h^2` : '']);
-      const fy0 = joinSum([b ? coefText(b, 'k') : '', j === 4 ? `${coefText(c, 'k^4')}/k^2` : '']);
+      const Rq = g;
+      const fx0 = joinSum([a ? coefText(a, 't') : '', j === 0 ? `${coefText(c, 't^4')}/t^2` : '']);
+      const fy0 = joinSum([b ? coefText(b, 't') : '', j === 4 ? `${coefText(c, 't^4')}/t^2` : '']);
       return {
-        kind, f, px: q(a), py: q(b), fx0, fy0, grad: linHK,
-        Rraw: `${f.replace(/x/g, 'h').replace(/y/g, 'k')}-(${linHK})`, Rmid: null, R: Rq,
+        kind, f, px: q(a), py: q(b), fx0, fy0, grad: linXY,
+        Rraw: `${f}-(${linXY})`, Rmid: null, R: Rq,
         ratio: coefText(c, `r${pw('cos(φ)', 4 - j)}${pw('sin(φ)', j)}`), M: Math.abs(c), diff: true, c1: true,
       };
     }
@@ -323,59 +322,59 @@ export function dfData(rng, kind) {
     const f = `${linXY}+${g}`.replace('+-', '-');
     const sq = (v) => `${coefText(c, `${v}^2`)}sin(1/√(${v}^2))`;
     return {
-      kind, f, px: q(a), py: q(b), fx0: `${a ? `${coefText(a, 'h')}+` : ''}${sq('h')}`.replace('+-', '-'), fy0: `${b ? `${coefText(b, 'k')}+` : ''}${sq('k')}`.replace('+-', '-'), grad: linHK,
-      Rraw: `${f.replace(/x/g, 'h').replace(/y/g, 'k')}-(${linHK})`, Rmid: null, R: `${coefText(c, '(h^2+k^2)')}sin(1/√(h^2+k^2))`,
+      kind, f, px: q(a), py: q(b), fx0: `${a ? `${coefText(a, 't')}+` : ''}${sq('t')}`.replace('+-', '-'), fy0: `${b ? `${coefText(b, 't')}+` : ''}${sq('t')}`.replace('+-', '-'), grad: linXY,
+      Rraw: `${f}-(${linXY})`, Rmid: null, R: g,
       ratio: `${coefText(c, 'r')}sin(1/r)`, M: Math.abs(c), diff: true, c1: false,
     };
   }
   return {
     kind: 'nd', f: 'xy^2/(x^2+y^2)', P: [[1, 1, 2]], px: q(0), py: q(0), fx0: '0', fy0: '0', grad: '0', fallback: true,
-    Rraw: 'hk^2/(h^2+k^2)-0', Rmid: null, R: 'hk^2/(h^2+k^2)', ratio: 'cos(φ)sin(φ)^2', at: new QS(q(1, 4), 2), atText: 'cos(π/4)sin(π/4)^2', diff: false, c1: false,
+    Rraw: 'xy^2/(x^2+y^2)-0', Rmid: null, R: 'xy^2/(x^2+y^2)', ratio: 'cos(φ)sin(φ)^2', at: new QS(q(1, 4), 2), atText: 'cos(π/4)sin(π/4)^2', diff: false, c1: false,
   };
 }
 
 const LH = (v) => ({ kind: 'limit', v, to: '0' });
-const hkCfg = (goal) => ({ kind: 'equiv', vars: ['h', 'k'], domain: { h: [-2, 2], k: [-2, 2] }, target: 'short', goal, slack: 2 });
+const hkCfg = (goal) => ({ kind: 'equiv', vars: ['x', 'y'], domain: { x: [-2, 2], y: [-2, 2] }, target: 'short', goal, slack: 2 });
 const ratioCfg = (goal) => ({ kind: 'equiv', vars: PV, domain: { r: [0.2, 1.5], φ: [0, 6.28] }, target: 'short', goal, slack: 2, ratio: 'polar' });
 
 function dfParts(d, level, rng) {
   const g = level <= 2;
   const parts = [];
   const partials = [
-    { html: '∂f/∂x(0, 0) = lim<sub>h→0</sub> (f(h, 0) − f(0, 0))/h :', ask: '∂f/∂x(0, 0) =', start: `(${d.fx0}-0)/h`, judge: LH('h'), lines: [E(d.px.toString(), 'Simplifier, puis h → 0', 'partials', 'limit')], choices: DF_CHOICES },
-    { html: `∂f/∂y(0, 0) = lim<sub>k→0</sub> (f(0, k) − f(0, 0))/k :`, ask: '∂f/∂y(0, 0) =', start: `(${d.fy0}-0)/k`, judge: LH('k'), lines: [E(d.py.toString(), 'Simplifier, puis k → 0', 'partials', 'limit')], choices: DF_CHOICES },
+    { html: '∂f/∂x(0, 0) = lim<sub>t→0</sub> (f(t, 0) − f(0, 0))/t :', ask: '∂f/∂x(0, 0) =', start: `(${d.fx0}-0)/t`, judge: LH('t'), lines: [E(d.px.toString(), 'Simplifier, puis t → 0', 'partials', 'limit')], choices: DF_CHOICES },
+    { html: '∂f/∂y(0, 0) = lim<sub>t→0</sub> (f(0, t) − f(0, 0))/t :', ask: '∂f/∂y(0, 0) =', start: `(${d.fy0}-0)/t`, judge: LH('t'), lines: [E(d.py.toString(), 'Simplifier, puis t → 0', 'partials', 'limit')], choices: DF_CHOICES },
   ];
   const gradNote = `∂f/∂x(0, 0) = ${fq(d.px)} et ∂f/∂y(0, 0) = ${fq(d.py)}.`;
   const Rlines = [...(d.Rmid ? [E(d.Rmid, 'Même dénominateur', 'remainder', 'remainder')] : []), E(d.R, 'Simplifier', 'remainder', 'remainder')];
-  if (g) Rlines[Rlines.length - 1] = blanked(Rlines[Rlines.length - 1], [d.kind === 'dpoly' ? d.R.split('/')[0] : 'h^2+k^2'], { vars: ['h', 'k'] });
-  const Rpart = { html: `Reste : R(h, k) = f(h, k) − f(0, 0) − (${RD(d.grad)}) :`, ask: 'R(h, k) =', start: d.Rraw, judge: hkCfg(d.R), lines: Rlines, choices: DF_CHOICES };
-  const ratioRaw = `(${toPolar(d.R.replace(/h/g, 'x').replace(/k/g, 'y'))})/r`;
-  const ratioPart = { html: 'En polaires (h = r cos φ, k = r sin φ, ‖(h, k)‖ = r) : R/‖(h, k)‖ =', ask: 'R/‖h‖ =', start: ratioRaw, judge: ratioCfg(d.ratio), lines: [E(d.ratio, 'Simplifier par r', 'polar', 'polar')], choices: DF_CHOICES };
+  if (g) Rlines[Rlines.length - 1] = blanked(Rlines[Rlines.length - 1], [d.kind === 'dpoly' ? d.R.split('/')[0] : 'x^2+y^2'], { vars: ['x', 'y'] });
+  const Rpart = { html: `Reste : R(x, y) = f(x, y) − f(0, 0) − ∇f(0, 0)·(x, y) = f(x, y) − (${RD(d.grad)}) :`, ask: 'R(x, y) =', start: d.Rraw, judge: hkCfg(d.R), lines: Rlines, choices: DF_CHOICES };
+  const ratioRaw = `(${toPolar(d.R)})/r`;
+  const ratioPart = { html: 'En polaires (x = r cos φ, y = r sin φ, ‖(x, y)‖ = r) : R/‖(x, y)‖ =', ask: 'R/r =', start: ratioRaw, judge: ratioCfg(d.ratio), lines: [E(d.ratio, 'Simplifier par r', 'polar', 'polar')], choices: DF_CHOICES };
   if (g) ratioPart.lines[0] = blanked(ratioPart.lines[0], [d.kind === 'nd' ? 'cos(φ)sin(φ)' : 'r'], { vars: PV });
   // The conclusion.
   const C1 = d.c1
-    ? { id: 'c1', label: 'Critère C¹ : les dérivées partielles sont continues en (0, 0)', valid: true, quality: 'poor', why: 'Juste ici, mais il faudrait le montrer ; la majoration de R/‖h‖ est plus directe.' }
+    ? { id: 'c1', label: 'Critère C¹ : les dérivées partielles sont continues en (0, 0)', valid: true, quality: 'poor', why: 'Juste ici, mais il faudrait le montrer ; la majoration de R/‖(x, y)‖ est plus directe.' }
     : { id: 'c1', label: 'Critère C¹ : les dérivées partielles sont continues en (0, 0)', valid: false, why: d.diff ? '∂f/∂x oscille près de (0, 0) : f n\'est pas C¹. Il faut la définition.' : 'Les dérivées partielles ne sont pas continues en (0, 0) : ce critère ne s\'applique pas.' };
   const concl = level === 3 ? [DEC('Pour conclure ?', [
-    d.diff ? { id: 'bound', label: 'Majorer |R/‖h‖| par une fonction de r qui tend vers 0', valid: true, ref: true } : { id: 'bound', label: 'Majorer |R/‖h‖| par une fonction de r qui tend vers 0', valid: false, why: 'R/‖h‖ ne contient pas r : aucune borne en r ne tend vers 0.' },
-    d.diff ? { id: 'angle', label: 'Fixer un angle φ', valid: false, why: 'Un angle fixé ne prouve pas qu\'une limite vaut 0.' } : { id: 'angle', label: 'Fixer un angle φ : R/‖h‖ y vaut une constante non nulle', valid: true, ref: true },
+    d.diff ? { id: 'bound', label: 'Majorer |R/‖(x, y)‖| par une fonction de r qui tend vers 0', valid: true, ref: true } : { id: 'bound', label: 'Majorer |R/‖(x, y)‖| par une fonction de r qui tend vers 0', valid: false, why: 'R/‖(x, y)‖ ne contient pas r : aucune borne en r ne tend vers 0.' },
+    d.diff ? { id: 'angle', label: 'Fixer un angle φ', valid: false, why: 'Un angle fixé ne prouve pas qu\'une limite vaut 0.' } : { id: 'angle', label: 'Fixer un angle φ : R/‖(x, y)‖ y vaut une constante non nulle', valid: true, ref: true },
     C1,
   ], rng)] : [];
   let last;
   if (d.diff) {
-    last = { html: 'Majoration de |R/‖h‖| sans φ (si elle tend vers 0, f est différentiable en (0, 0)) :', ask: '≤', start: d.ratio, judge: { kind: 'bound', vars: PV }, lines: [E(coefText(d.M, 'r'), '|cos φ|, |sin φ| ≤ 1', 'conclude', 'bound')], choices: DF_CHOICES, pre: concl };
+    last = { html: 'Majoration de |R/‖(x, y)‖| sans φ (si elle tend vers 0, f est différentiable en (0, 0)) :', ask: '≤', start: d.ratio, judge: { kind: 'bound', vars: PV }, lines: [E(coefText(d.M, 'r'), '|cos φ|, |sin φ| ≤ 1', 'conclude', 'bound')], choices: DF_CHOICES, pre: concl };
   } else {
-    const dec = level === 1 ? [NOTE('R/‖h‖ ne dépend que de φ : sa limite n\'est pas 0. f n\'est pas différentiable en (0, 0).')] : level === 3 ? concl : [DEC('R/‖h‖ ne dépend que de φ. Conclusion ?', [
+    const dec = level === 1 ? [NOTE('R/‖(x, y)‖ ne dépend que de φ : sa limite n\'est pas 0. f n\'est pas différentiable en (0, 0).')] : level === 3 ? concl : [DEC('R/‖(x, y)‖ ne dépend que de φ. Conclusion ?', [
       { id: 'no', label: 'Sa limite n\'est pas 0 : f n\'est pas différentiable en (0, 0)', valid: true, ref: true },
-      { id: 'yes', label: 'Les dérivées partielles existent : f est différentiable en (0, 0)', valid: false, rule: 'a2_partials_imply_diff', why: 'Les dérivées partielles ne regardent que deux directions ; ici R/‖h‖ ne tend pas vers 0.' },
-      { id: 'bounded', label: 'R/‖h‖ est bornée : f est différentiable', valid: false, why: 'Bornée ne suffit pas : il faut R/‖h‖ → 0.' },
+      { id: 'yes', label: 'Les dérivées partielles existent : f est différentiable en (0, 0)', valid: false, rule: 'a2_partials_imply_diff', why: 'Les dérivées partielles ne regardent que deux directions ; ici R/‖(x, y)‖ ne tend pas vers 0.' },
+      { id: 'bounded', label: 'R/‖(x, y)‖ est bornée : f est différentiable', valid: false, why: 'Bornée ne suffit pas : il faut R/‖(x, y)‖ → 0.' },
     ], rng)];
-    last = { html: 'Valeur de R/‖h‖ pour φ = π/4 :', ask: '=', start: d.atText, judge: { kind: 'value', expect: d.at.text(), form: 'exact' }, lines: [E(d.at.text(), 'cos(π/4) = sin(π/4) = √2/2', 'conclude', 'angle')], choices: DF_CHOICES, pre: dec };
+    last = { html: 'Valeur de R/‖(x, y)‖ pour φ = π/4 :', ask: '=', start: d.atText, judge: { kind: 'value', expect: d.at.text(), form: 'exact' }, lines: [E(d.at.text(), 'cos(π/4) = sin(π/4) = √2/2', 'conclude', 'angle')], choices: DF_CHOICES, pre: dec };
   }
   if (level === 1) {
     parts.push({ ...Rpart, pre: [NOTE(gradNote), NOTE(Rpart.html)] }, ratioPart, last);
   } else if (level === 2) {
-    parts.push({ ...partials[0], pre: [NOTE(partials[0].html)] }, partials[1], Rpart, { ...last, pre: [NOTE(`En polaires, R/‖(h, k)‖ = ${M(d.ratio)}.`), ...(last.pre || [])] });
+    parts.push({ ...partials[0], pre: [NOTE(partials[0].html)] }, partials[1], Rpart, { ...last, pre: [NOTE(`En polaires, R/‖(x, y)‖ = ${M(d.ratio)}.`), ...(last.pre || [])] });
   } else {
     parts.push({ ...partials[0], pre: [NOTE(partials[0].html)] }, partials[1], Rpart, ratioPart, last);
   }
@@ -390,8 +389,8 @@ function dfLines(level, rng, opts) {
     skill: DF, level,
     prompt: `Soit f(x, y) = ${M(d.f)} si (x, y) ≠ (0, 0), et f(0, 0) = 0. f est-elle différentiable en (0, 0) ?`,
     ...as, mode: modeOf(level),
-    hints: H('Calcule les dérivées partielles par la définition, puis le reste R, puis R/‖h‖ en polaires.', `R(h, k) = ${M(d.R)}`, d.diff ? `|R/‖h‖| ≤ ${M(coefText(d.M, 'r'))} → 0 : f est différentiable.` : `R/‖h‖ = ${M(d.ratio)} vaut ${M(d.at.text())} pour φ = π/4 : f n'est pas différentiable.`),
-    subgoals: DF_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, declares: { vars: ['x', 'y', 'h', 'k', 'r', 'φ'] },
+    hints: H('Calcule les dérivées partielles par la définition, puis le reste R, puis R/‖(x, y)‖ en polaires.', `R(x, y) = ${M(d.R)}`, d.diff ? `|R/‖(x, y)‖| ≤ ${M(coefText(d.M, 'r'))} → 0 : f est différentiable.` : `R/‖(x, y)‖ = ${M(d.ratio)} vaut ${M(d.at.text())} pour φ = π/4 : f n'est pas différentiable.`),
+    subgoals: DF_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, declares: { vars: ['x', 'y', 't', 'r', 'φ'] },
     key: `${DF}:${level}:${d.f}`, exam: false, fallback: !!d.fallback, expectedSec: [0, 200, 300, 360, 420][level],
   });
 }
@@ -419,7 +418,7 @@ export function classMcq(skill, level, rng, opts = {}) {
   } else {
     const d = dfData(rng, kind);
     f = d.f;
-    if (kind === 'nd') { right = 'partials'; rules = { noCont: 'a2_lim_polar_r_forgot', diffNotC1: 'a2_partials_imply_diff', c1: 'a2_dirderiv_gradient' }; why = `|f| ≤ ${absSum(d.P)}r → 0 : continue ; mais R/‖h‖ = ${M(d.ratio)} dépend de φ : pas différentiable.`; } else if (kind === 'dpoly') { right = 'c1'; rules = { noCont: null, partials: 'a2_diff_no_norm', diffNotC1: null }; why = 'f est une fraction rationnelle homogène de degré 2 plus une partie linéaire : ses dérivées partielles sont continues, même en (0, 0) (|∂f/∂x − ∂f/∂x(0, 0)| ≤ C·r).'; } else { right = 'diffNotC1'; rules = { noCont: null, partials: null, c1: 'a2_diff_imply_c1' }; why = `|R/‖h‖| ≤ ${d.M}r → 0 : différentiable ; mais ∂f/∂x contient cos(1/r), qui oscille : pas C¹.`; }
+    if (kind === 'nd') { right = 'partials'; rules = { noCont: 'a2_lim_polar_r_forgot', diffNotC1: 'a2_partials_imply_diff', c1: 'a2_dirderiv_gradient' }; why = `|f| ≤ ${absSum(d.P)}r → 0 : continue ; mais R/‖(x, y)‖ = ${M(d.ratio)} dépend de φ : pas différentiable.`; } else if (kind === 'dpoly') { right = 'c1'; rules = { noCont: null, partials: 'a2_diff_no_norm', diffNotC1: null }; why = 'f est une fraction rationnelle homogène de degré 2 plus une partie linéaire : ses dérivées partielles sont continues, même en (0, 0) (|∂f/∂x − ∂f/∂x(0, 0)| ≤ C·r).'; } else { right = 'diffNotC1'; rules = { noCont: null, partials: null, c1: 'a2_diff_imply_c1' }; why = `|R/‖(x, y)‖| ≤ ${d.M}r → 0 : différentiable ; mais ∂f/∂x contient cos(1/r), qui oscille : pas C¹.`; }
   }
   const options = Object.entries(PH).map(([k, html]) => ({ html, correct: k === right, rule: k === right ? null : rules[k] ?? null }));
   return mcq({
@@ -463,9 +462,9 @@ function e6Problem(level, rng) {
   const pb = linesItem({
     ...common, skill: DF, prompt: '(b) Calcule ∂f/∂x(0, 0) et ∂f/∂y(0, 0) par la définition.',
     ...assemble([
-      { start: `(${d.fx0}-0)/h`, judge: LH('h'), lines: [E(d.px.toString(), 'f(h, 0) − f(0, 0), divisé par h', 'partials', 'limit')], pre: [NOTE('∂f/∂x(0, 0) = lim<sub>h→0</sub> (f(h, 0) − f(0, 0))/h :')] },
-      { html: '∂f/∂y(0, 0) = lim<sub>k→0</sub> (f(0, k) − f(0, 0))/k :', ask: '∂f/∂y(0, 0) =', start: `(${d.fy0}-0)/k`, judge: LH('k'), lines: [E(d.py.toString(), 'f(0, k) − f(0, 0), divisé par k', 'partials', 'limit')] },
-    ], 4), key: `${DF}:e6b:${d.f}`, declares: { vars: ['h', 'k'] },
+      { start: `(${d.fx0}-0)/t`, judge: LH('t'), lines: [E(d.px.toString(), 'f(t, 0) − f(0, 0), divisé par t', 'partials', 'limit')], pre: [NOTE('∂f/∂x(0, 0) = lim<sub>t→0</sub> (f(t, 0) − f(0, 0))/t :')] },
+      { html: '∂f/∂y(0, 0) = lim<sub>t→0</sub> (f(0, t) − f(0, 0))/t :', ask: '∂f/∂y(0, 0) =', start: `(${d.fy0}-0)/t`, judge: LH('t'), lines: [E(d.py.toString(), 'f(0, t) − f(0, 0), divisé par t', 'partials', 'limit')] },
+    ], 4), key: `${DF}:e6b:${d.f}`, declares: { vars: ['t'] },
   });
   const [v1, v2] = d.u.v;
   const ftv = subst(d.f, { x: vt(v1, 't'), y: vt(v2, 't') });
@@ -478,7 +477,7 @@ function e6Problem(level, rng) {
     { html: `Non : si f était différentiable, D<sub>v</sub>f(0, 0) vaudrait ∇f(0, 0)·v = ${fq(d.gradV)} ≠ ${fq(d.val)}. Les dérivées partielles existent, mais f n'est pas différentiable`, correct: true },
     { html: 'Oui : f est continue et ses dérivées partielles existent, donc elle est différentiable', correct: false, rule: 'a2_partials_imply_diff' },
     { html: `Oui : D<sub>v</sub>f(0, 0) = ∇f(0, 0)·v = ${fq(d.gradV)}, rien ne cloche`, correct: false, rule: 'a2_dirderiv_gradient' },
-    { html: 'On ne peut pas savoir sans calculer la limite de R/‖h‖', correct: false },
+    { html: 'On ne peut pas savoir sans calculer la limite de R/‖(x, y)‖', correct: false },
   ];
   const pd = mcq({ skill: DF, level, prompt: '(d) f est-elle différentiable en (0, 0) ?', options, key: `${DF}:e6d:${d.f}`, expectedSec: 120, solution: [{ html: options[0].html, note: '' }] }, rng);
   return problemItem({
@@ -527,7 +526,7 @@ const BANK = [
 const WHY_K = {
   K1: 'K1 = xy/(x² + y²) : f(h, 0) = f(0, k) = 0, donc les dérivées partielles valent 0 ; mais f(t, t) = 1/2 : pas continue.',
   K2: 'K2 = x²y/(x⁴ + y²) : toutes les D<sub>v</sub>f(0, 0) existent (v₁²/v₂, ou 0), mais f(x, x²) = 1/2 : pas continue, donc pas différentiable.',
-  K3: 'K3 = (x² + y²) sin(1/√(x² + y²)) : |R/‖h‖| ≤ r → 0, différentiable ; mais ∂f/∂x contient cos(1/r)·x/r, qui oscille : pas C¹.',
+  K3: 'K3 = (x² + y²) sin(1/√(x² + y²)) : |R/‖(x, y)‖| ≤ r → 0, différentiable ; mais ∂f/∂x contient cos(1/r)·x/r, qui oscille : pas C¹.',
   K4: 'K4 = xy²/(x² + y²) : continue, D<sub>v</sub>f(0, 0) = v₁v₂², qui n\'est pas linéaire en v : pas différentiable.',
   K5: 'K5 = √|xy| : continue, dérivées partielles nulles, mais pas de dérivée suivant (1, 1)/√2 : pas différentiable.',
 };

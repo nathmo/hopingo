@@ -195,7 +195,7 @@ function pathsLines(level, rng, opts) {
   const as = assemble(parts, level);
   const prompt = `Soit f(x, y) = ${M(d.f)} pour (x, y) ≠ (0, 0). Montre que ${LIMXY} f(x, y) n'existe pas${level === 1 ? (d.same ? ', avec les droites y = mx.' : `, avec les droites y = mx puis la courbe ${d.p2.label}.`) : '.'}`;
   return linesItem({
-    skill: LP, level, prompt, ...as, mode: modeOf(level), hints: pathsHints(d), subgoals: LP_SUB, keys: KEYS,
+    skill: LP, level, prompt, ...as, mode: modeOf(level), hints: pathsHints(d), subgoals: LP_SUB, keys: [...KEYS, 'ineq'],
     tapActions: level === 3 ? 'steps' : null, declares: { vars: ['x', 'y', 'm'] },
     key: `${LP}:${level}:${d.f}`, exam: false, expectedSec: [0, 120, 180, 200, 240][level],
   });
