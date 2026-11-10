@@ -62,14 +62,20 @@ export const pMul = (a, b) => {
 // (−1)². atBlank: the same line with the inserted numbers left blank.
 function substituted(text, v, value, opts) {
   const holes = [];
+  // Nodes that contain an inserted number: 3t² at 2 must print 3×2².
+  const tainted = new Set();
   const node = mapNode(parse(text, opts), (n) => {
     if (n.t === 'sym' && n.name === v && !n.sub) {
       const x = lit(Q.of(value));
       holes.push(x);
+      tainted.add(x);
       return x;
     }
-    if (n.t === 'bin' && n.op === '×' && n.implicit && (holes.includes(n.l) || holes.includes(n.r))) return { ...n, implicit: false };
-    return n;
+    let out = n;
+    if (n.t === 'bin' && n.op === '×' && n.implicit && tainted.has(n.r)) out = { ...n, implicit: false };
+    const kids = Object.values(n).flatMap((c) => (Array.isArray(c) ? c : [c]));
+    if (kids.some((c) => c && typeof c === 'object' && tainted.has(c))) tainted.add(out);
+    return out;
   });
   return { node, holes };
 }
