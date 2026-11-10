@@ -11,6 +11,7 @@
 // A candidate line of the judge `conic` is cl(text, coefs, reduced).
 
 import { parse } from '../parse.js';
+import { vl, valueIn } from './g4a.js';
 
 // A line of the judge conic holding an equation (coefficients of x², xy,
 // y², x, y, 1, in X, Y when reduced).
@@ -30,6 +31,12 @@ export const RULES = [
       const cfg = ctx?.cfg || {};
       if (!cfg.abc) return [];
       const [a, b, c] = cfg.abc.map(num);
+      // Δ = det M with b, d, e instead of their halves (the nature).
+      if (cfg.kind === 'det' && cfg.co6) {
+        const [, , , d, e, f] = cfg.co6.map(num);
+        const full = a * (c * f - e * e) - b * (b * f - e * d) + d * (b * e - c * d);
+        return [{ node: parse(String(full)), ctx: { b, h: b / 2 } }];
+      }
       if (cfg.kind === 'det') return [{ node: parse(`(${a}-λ)(${c}-λ)-(${b})^2`, { vars: ['λ'] }), ctx: { b, h: b / 2 } }];
       // δ with b instead of b/2 (value lines of the nature).
       if (cfg.kind === 'value' && cfg.delta) return [{ node: parse(String(a * c - b * b)), ctx: { b, h: b / 2 } }];
@@ -65,4 +72,45 @@ export const RULES = [
     explain: (ctx = {}) => `Après la translation au centre, la constante est f(Ω)${ctx.fO !== undefined ? ` = ${String(ctx.fO).replace('-', '−')}` : ''}, pas le terme constant de départ${ctx.f !== undefined ? ` (${String(ctx.f).replace('-', '−')})` : ''}.`,
     check: { judge: { kind: 'conic', equation: '2x^2+4xy-y^2-6y-9=0', target: 'reduced', frame: { O: '(1;-1)', u1: '(2;1)/√5', u2: '(-1;2)/√5' }, reduce: { l1: 3, l2: -2, n: 5, f: '-9', fO: '-6' } }, prev: '2x^2+4xy-y^2-6y-9=0', line: '3X^2-2Y^2-9=0' },
   },
+  {
+    id: 'g10_det_sign_nature', family: 'geometry', tag: 'E', skill: 'g10-conic-nature', repair: 'g10-conic-nature',
+    example: ['δ > 0 ⇒ hyperbole', 'ellipse'], name: 'Genre lu à l\'envers sur le signe de δ',
+    judges: [],
+    explain: () => 'δ = λ₁λ₂. δ > 0 : les deux valeurs propres ont le même signe, comme dans X²/a² + Y²/b² = 1 : genre ellipse. δ < 0 : signes contraires, genre hyperbole.',
+    check: { bait: { skill: 'g10-conic-nature', level: 2 } },
+  },
+  {
+    id: 'g10_degenerate_ignored', family: 'method', tag: 'E', skill: 'g10-conic-nature', repair: 'g10-conic-nature',
+    example: ['« hyperbole » pour (x − y)(x + 2y) = 0', 'deux droites'], name: 'Δ = 0 oublié : conique dégénérée',
+    judges: [],
+    explain: () => 'Ton Δ vaut 0 : la conique est dégénérée (un point, deux droites, ou rien). Calcule toujours Δ = det M avant de nommer la conique.',
+    check: { bait: { skill: 'g10-conic-nature', exam: 'tf' } },
+  },
 ];
+
+// Wrong points written by the generator in cfg.trapPts[id] (texts), as
+// lines of the judge vector (frame back).
+function listed(id) {
+  return (prev, ctx) => {
+    const cfg = ctx?.cfg || {};
+    if (cfg.kind !== 'vector') return [];
+    return (cfg.trapPts?.[id] || []).map((t) => valueIn(cfg, t)).filter(Boolean).map((v) => ({ node: vl(v), ctx: {} }));
+  };
+}
+
+RULES.push(
+  {
+    id: 'g10_foci_reduced_frame', family: 'geometry', tag: 'E', skill: 'g10-conic-frame-back', repair: 'g10-conic-frame-back',
+    example: ['F = (√5 ; 0)', '(3 ; 0)'], name: 'Coordonnées de Ru données pour Re',
+    judges: ['vector'], transform: listed('g10_foci_reduced_frame'),
+    explain: () => 'Ces coordonnées sont celles du repère réduit Ru. La question demande Re : F = Ω + X·u₁ + Y·u₂.',
+    check: { judge: { kind: 'vector', symbols: { Ω: '(1 ; -1)', u_1: '(2 ; 1)/√5', u_2: '(-1 ; 2)/√5' }, expect: '(3 ; 0)', trapPts: { g10_foci_reduced_frame: ['(√5 ; 0)'] } }, prev: 'F', line: '(√5 ; 0)' },
+  },
+  {
+    id: 'g10_frame_back_transpose', family: 'linear', tag: 'E', skill: 'g10-conic-frame-back', repair: 'g10-conic-frame-back',
+    example: ['x = Ω + Pᵀ(X ; Y)', 'Ω + P(X ; Y)'], name: 'Retour avec Pᵀ au lieu de P',
+    judges: ['vector'], transform: listed('g10_frame_back_transpose'),
+    explain: () => 'Les colonnes de P sont u₁ et u₂ : x = Ω + X·u₁ + Y·u₂ = Ω + P·(X ; Y). Avec Pᵀ, tu tournes dans le mauvais sens : ton point n\'est pas sur le bon axe.',
+    check: { judge: { kind: 'vector', symbols: { Ω: '(1 ; -1)', u_1: '(2 ; 1)/√5', u_2: '(-1 ; 2)/√5' }, expect: '(3 ; 0)', trapPts: { g10_frame_back_transpose: ['(3 ; -2)'] } }, prev: 'F', line: '(3 ; -2)' },
+  },
+);
