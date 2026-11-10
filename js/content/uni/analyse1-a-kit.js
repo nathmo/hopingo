@@ -23,9 +23,16 @@ export function tpl(math, texts, opts = {}) {
   for (const t of texts) {
     const want = toText(parse(t, opts));
     let found = null;
+    // First inside brackets of its own (the derivatives of a rule line),
+    // then anywhere.
     walk(node, (n) => {
       if (found || holes.includes(n)) return false;
-      if (n.t !== 'paren' && !holes.includes(n) && toText(n) === want) { found = n; return false; }
+      if (n.t === 'paren' && n.e.t !== 'paren' && !holes.includes(n.e) && toText(n.e) === want) { found = n.e; return false; }
+      return true;
+    });
+    walk(node, (n) => {
+      if (found || holes.includes(n)) return false;
+      if (n.t !== 'paren' && toText(n) === want) { found = n; return false; }
       return true;
     });
     if (found) holes.push(found);
@@ -55,16 +62,6 @@ export const withMenus = (judge, level, start, lines, choices) => (level === 3 ?
 // A segment of a lines item: {kind:'segment', …} followed by its lines.
 export const segment = (html, ask, start, judge) => ({ kind: 'segment', html, ask, start: { math: start }, judge });
 
-// Signed text: a + b with b a number (x+3, x−2, x).
-export const plus = (a, b) => (b === 0 ? a : b > 0 ? `${a}+${N(b)}` : `${a}-${N(-b)}`);
-// k·t as text: t, −t, 3t, (1/2)t.
-export function times(k, t) {
-  const K = Q.of(k);
-  if (K.eq(1)) return t;
-  if (K.eq(-1)) return `-${t}`;
-  if (K.d === 1) return `${K.n}${/^[a-z(√|]/i.test(t) ? '' : '×'}${t}`;
-  return `${K.n < 0 ? '-' : ''}(${Math.abs(K.n)}/${K.d})${t}`;
-}
 // French number in text (−3/4).
 export const frN = (x) => N(x).replace(/-/g, '−');
 

@@ -15,7 +15,7 @@ import { toText } from '../../cas/print.js';
 import { deriv } from '../../cas/ast.js';
 import { seedOf } from '../../cas/equiv.js';
 import { MT, linesItem, mcq, tfItem } from './kit.js';
-import { N, modeOf, H, E, examOf, uniqOptions, blanked, boxed, withMenus, segment, frN, vfMcq, mulT, fracT } from './analyse1-a-kit.js';
+import { N, modeOf, H, E, examOf, uniqOptions, blanked, withMenus, segment, frN, vfMcq, mulT, fracT } from './analyse1-a-kit.js';
 
 const q = (n, d = 1) => new Q(n, d);
 
@@ -230,8 +230,8 @@ function logData(rng) {
     const value = Ux === 1 ? N(c2) : closedText(c1, base, c2);
     if (value === '0') continue;
     const f = `${par(u.t)}^${v.t === 'x' ? 'x' : `(${v.t})`}`;
-    const vdl = v.d === '1' ? `ln(${u.t})` : `${v.d}×ln(${u.t})`;
-    const vdu = u.t === 'x' && v.t === 'x' ? '1' : fracT({ n: mulT(v.t, u.d), d: u.t });
+    const vdl = mulT(v.d, `ln(${u.t})`);
+    const vdu = u.t === v.t ? u.d : fracT({ n: mulT(v.t, u.d), d: u.t });
     const bracket = `${vdl}+${vdu}`;
     return { f, u, v, x0, value, bracket, vdl, vdu, expo: `${par(v.t)}×ln(${u.t})`, fp: `${f}×(${bracket})`, Ux, fx, c1, c2, base };
   }
@@ -248,7 +248,7 @@ function logLines(level, rng, opts = {}) {
   const dLine = E(d.fp, 'Dériver l\'exposant, puis revenir à f', 'deriv', 'deriv');
   const valStart = at(d.fp);
   const vLines = [E(d.value, 'Évaluer et simplifier', 'eval', 'eval')];
-  const lines1 = level === 1 ? [blanked(dLine, [d.vdu])] : level === 2 ? [blanked(expLine, [d.expo]), blanked(dLine, [d.bracket])] : [expLine, dLine];
+  const lines1 = level === 1 ? [blanked(dLine, [d.vdl.includes(d.vdu) ? d.vdl : d.vdu])] : level === 2 ? [blanked(expLine, [d.expo]), blanked(dLine, [d.bracket])] : [expLine, dLine];
   const label = `f′(${d.x0})`;
   const script = [
     ...(level === 1 ? [{ kind: 'note', html: `L'exposant dépend de x : f(x) = ${MT(`e^(${d.expo})`)}.` }] : []),
@@ -260,8 +260,8 @@ function logLines(level, rng, opts = {}) {
   const s0 = withMenus({ ...judge, seed: seedOf(key) }, level, start, [expLine, dLine], LOG_CHOICES);
   return linesItem({
     skill: LOG, level, prompt: rng.pick([
-      `Soit f(x) = ${MT(d.f)} (x > 0). Dérive f, puis calcule ${label}.`,
-      `Calcule la dérivée de f(x) = ${MT(d.f)} sur ]0 ; +∞[, puis sa valeur en ${d.x0}.`,
+      `Soit f(x) = ${MT(d.f)}${d.u.t === 'x' ? ' (x > 0)' : ''}. Dérive f, puis calcule ${label}.`,
+      `Calcule la dérivée de f(x) = ${MT(d.f)}${d.u.t === 'x' ? ' sur ]0 ; +∞[' : ''}, puis sa valeur en ${d.x0}.`,
     ]),
     start: level === 1 ? `d(e^(${d.expo}))` : start, judge: level === 1 ? { ...judge, seed: seedOf(key) } : s0, mode: modeOf(level), script,
     keys: ['calcx', 'calcfn', 'explog'], declares: { vars: ['x'], dvar: 'x' }, subgoals: LOG_SUB, tapActions: level === 3 ? 'steps' : null,

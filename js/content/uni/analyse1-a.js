@@ -14,8 +14,8 @@
 import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
-import { deriv, stripParen, lit } from '../../cas/ast.js';
-import { stepDeriv, substVar } from '../../cas/diff.js';
+import { deriv } from '../../cas/ast.js';
+import { stepDeriv } from '../../cas/diff.js';
 import { pretty, exactValue } from '../../cas/normal.js';
 import { equivalent, seedOf } from '../../cas/equiv.js';
 import { expandDerivs } from '../../cas/diff.js';
@@ -47,7 +47,6 @@ const LIMIT = (dir) => ({ kind: 'limit', v: 'h', to: '0', ...(dir ? { dir } : {}
 const KEYS = ['calcx', 'calcfn', 'anal'];
 const sub = (t, from, to) => t.replace(new RegExp(from, 'g'), to);
 const hx = (t) => sub(t, 'x', 'h');
-const Tname = (T) => T;
 
 // An oscillating function c·x + xᵖ·T(1/x), f(0) = 0.
 function oscData(rng) {
@@ -84,7 +83,7 @@ function absData(rng) {
   return {
     kind: 'abs', c, f: D.f, x0: '0', start: D.start,
     lines: [E(D.S, 'Simplifier par h', 'deriv', 'simplify'), E(String(c), '|h| → 0', 'deriv', 'conclude')],
-    holes: [[k === 3 ? '|h|' : D.S.includes('×') ? 'h' : '|h|'], [D.S]],
+    holes: [['|h|'], [D.S]],
     fShow: MT(D.f),
     hint1: 'Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0.',
   };
@@ -101,7 +100,7 @@ function piece(rng, a) {
   }
   const k = a === 1 ? '' : a === -1 ? '-' : String(a);
   const g = kind === 1 ? (a === 1 ? 'e^x-1' : `e^(${k}x)-1`) : `sin(${k}x)`;
-  return { g, start: `(${hx(g)})/h`, lines: [E(String(a), kind === 1 ? `eᵘ − 1 ~ u avec u = ${MT(`${k}h`)}` : `sin u ~ u avec u = ${MT(`${k}h`)}`, 'sides', 'equiv')], hole: null };
+  return { g, start: `(${hx(g)})/h`, lines: [E(String(a), kind === 1 ? `eᵘ − 1 ~ u avec u = ${k.replace('-', '−')}h` : `sin u ~ u avec u = ${k.replace('-', '−')}h`, 'sides', 'equiv')], hole: null };
 }
 
 function sidesData(rng) {
@@ -493,7 +492,7 @@ function rulMcq(rng) {
     if (options.length < 4 && !used.has(c.rule) && isNew(c.node)) { options.push({ node: c.node, html: MM(c.node), correct: false, rule: c.rule }); used.add(c.rule); }
   }
   // Not enough traps: the sign of the second term, the derivative times 2.
-  const extra = [d.fp.replace(/\+(?![^(]*\))/, '-'), `2×(${d.fp})`].map((t) => parse(t));
+  const extra = [d.fp.replace(/\+(?![^(]*\))/, '-'), `2×(${d.fp})`, `-(${d.fp})`, `(${d.fp})/2`].map((t) => parse(t));
   for (const n of extra) if (options.length < 4 && isNew(n)) options.push({ node: n, html: MM(pretty(n)), correct: false });
   return mcq({
     skill: RUL, level: 4, prompt: `Quelle est la dérivée de f(x) = ${MT(d.f)} sur ]0 ; 1[ ?`,

@@ -12,6 +12,13 @@ export const SKILLS = [
     prereqWhy: { 'a1-fn-onesided': 'dérivées à gauche et à droite : limites d\'un côté', 'a1-seq-squeeze': 'gendarmes : |h·sin(1/h)| ≤ |h|' },
     intro: {
       rule: 'f′(x₀) = lim_{h→0} (f(x₀ + h) − f(x₀))/h, si cette limite existe et est finie. Aux points de raccord, on calcule les dérivées à gauche et à droite séparément.<br>Dérivable ⇒ continue, pas l\'inverse (|x| en 0).',
+      lines: [
+        { html: 'f(x) = x²·sin(1/x) si x ≠ 0, f(0) = 0 :', note: 'Exemple', noEq: true },
+        { cas: '(h^2×sin(1/h))/h', note: 'Taux d\'accroissement (f(h) − f(0))/h', noEq: true },
+        { cas: 'h×sin(1/h)', note: 'Simplifier' },
+        { html: '|h·sin(1/h)| ≤ |h| → 0', note: 'Gendarmes', noEq: true },
+        { html: 'f′(0) = 0', note: 'Conclure', noEq: true },
+      ],
     },
   }),
   S('a1-deriv-rules', {
@@ -21,6 +28,11 @@ export const SKILLS = [
     prereqWhy: { 'g6-deriv-rules': 'produit, quotient et chaîne', 'g2-hyp-def': 'sinh′ = cosh, cosh′ = sinh', 'g3-arc-def': 'les fonctions arc et leurs domaines' },
     intro: {
       rule: '(uv)′ = u′v + uv′, (u/v)′ = (u′v − uv′)/v², (f∘g)′ = f′(g)·g′.<br>À connaître : Arctg′ = 1/(1 + x²), Arcsin′ = 1/√(1 − x²), sinh′ = cosh, cosh′ = sinh, Argsh′ = 1/√(1 + x²).',
+      lines: [
+        { cas: 'd(Arctg(√x)×e^(2x))', note: 'Départ', noEq: true },
+        { cas: 'd(Arctg(√x))×e^(2x)+Arctg(√x)×d(e^(2x))', note: 'Règle du produit' },
+        { cas: 'e^(2x)/(2√x×(1+x))+2e^(2x)×Arctg(√x)', note: 'Chaîne : (Arctg √x)′ = 1/(1 + x)·1/(2√x)' },
+      ],
     },
   }),
   S('a1-deriv-inverse', {
@@ -30,6 +42,12 @@ export const SKILLS = [
     prereqWhy: { 'a1-deriv-rules': 'dériver f', 'g1-inverse': 'trouver x₀ tel que f(x₀) = y₀' },
     intro: {
       rule: 'Si f est bijective, dérivable en x₀ avec f′(x₀) ≠ 0, et y₀ = f(x₀), alors (f⁻¹)′(y₀) = 1/f′(x₀).<br>On cherche d\'abord <b>x₀</b> tel que f(x₀) = y₀ ; on n\'a pas besoin de la formule de f⁻¹.',
+      lines: [
+        { html: 'f(x) = x³ + 3x + 1 ; (f⁻¹)′(5) ?', note: 'Exemple', noEq: true },
+        { html: 'f(x₀) = 5 ⇒ x₀ = 1', note: 'Trouver x₀', noEq: true },
+        { html: 'f′(x) = 3x² + 3, f′(1) = 6', note: 'Dériver et évaluer', noEq: true },
+        { html: '(f⁻¹)′(5) = 1/f′(1) = 1/6', note: 'Inverser', noEq: true },
+      ],
     },
   }),
   S('a1-deriv-log', {
@@ -39,6 +57,12 @@ export const SKILLS = [
     prereqWhy: { 'a1-deriv-rules': 'dériver l\'exposant v·Log u', 'g2-real-powers': 'u^v = e^(v·Log u)' },
     intro: {
       rule: 'u^v = e^(v·Log u) (u > 0), donc (u^v)′ = u^v·(v′·Log u + v·u′/u).<br>La règle (xⁿ)′ = n·xⁿ⁻¹ ne vaut que pour un exposant constant. Exemple : (xˣ)′ = xˣ(Log x + 1).',
+      lines: [
+        { cas: 'd((x+3)^x)', note: 'Départ', noEq: true },
+        { cas: 'd(e^(x×ln(x+3)))', note: 'Forme exponentielle' },
+        { cas: '(x+3)^x×(ln(x+3)+x/(x+3))', note: 'Dériver l\'exposant' },
+        { html: 'f′(1) = 4·(Log 4 + 1/4) = 8·Log 2 + 1', note: 'Évaluer', noEq: true },
+      ],
     },
   }),
   S('a1-c1-def', {
@@ -48,6 +72,12 @@ export const SKILLS = [
     prereqWhy: { 'a1-deriv-def': 'dérivabilité en chaque point de I', 'a1-fn-extension': 'continuité de f′' },
     intro: {
       rule: 'Soit I un intervalle ouvert. f ∈ C¹(I) si f est dérivable en tout point de I <b>et</b> si sa dérivée f′ : I → ℝ est continue sur I.<br>Dérivable ne suffit pas : x²·sin(1/x) est dérivable sur ℝ, mais f′ n\'est pas continue en 0.',
+      lines: [
+        { html: 'Soit I ⊂ ℝ un intervalle ouvert et f : I → ℝ.', note: 'Cadre', noEq: true },
+        { html: 'f est dérivable en tout point de I,', note: 'Dérivabilité', noEq: true },
+        { html: 'et la fonction f′ : I → ℝ est continue sur I.', note: 'Continuité de f′', noEq: true },
+        { html: 'On note C¹(I) l\'ensemble de ces fonctions.', note: 'Nom', noEq: true },
+      ],
     },
   }),
   S('a1-piecewise-ab', {
@@ -57,6 +87,13 @@ export const SKILLS = [
     prereqWhy: { 'a1-deriv-def': 'dérivées à gauche et à droite', 'a1-fn-extension': 'continuité au raccord', 'eq-systems': 'résoudre les deux équations en a et b' },
     intro: {
       rule: 'Dans l\'ordre : (1) continuité au raccord (une équation), (2) égalité des dérivées à gauche et à droite (une deuxième équation).<br>On peut dériver chaque morceau et évaluer au raccord <b>seulement si</b> f est continue au raccord.',
+      lines: [
+        { html: 'f(x) = (x − 1)(x + 3) si x < 0, αx + β si x ≥ 0 :', note: 'Exemple', noEq: true },
+        { html: 'lim_{x→0⁻} f(x) = −3 = f(0) = β', note: 'Continuité', noEq: true },
+        { html: 'f′(0⁻) = lim ((h − 1)(h + 3) + 3)/h = lim (h + 2) = 2', note: 'Dérivée à gauche', noEq: true },
+        { html: 'f′(0⁺) = α, donc α = 2 et β = −3', note: 'Résoudre', noEq: true },
+        { html: 'f(2) = 2·2 − 3 = 1', note: 'Réponse demandée', noEq: true },
+      ],
     },
   }),
   S('a1-c1-proof', {
@@ -69,6 +106,13 @@ export const SKILLS = [
     },
     intro: {
       rule: 'Quatre temps : (1) hors de x₀, f est C¹ comme somme, produit, composée de fonctions C¹ : on donne f′ ; (2) en x₀, f′(x₀) <b>par la définition</b> ; (3) lim_{x→x₀} f′(x) = f′(x₀) ; (4) conclusion.<br>Le point (3) ne remplace pas le point (2).',
+      lines: [
+        { html: 'f(x) = 3x + x³·cos(1/x) si x ≠ 0, f(0) = 0, sur ]−1 ; 1[ :', note: 'Exemple', noEq: true },
+        { html: 'x ≠ 0 : f′(x) = 3 + 3x²·cos(1/x) + x·sin(1/x), continue', note: 'Hors de 0', noEq: true },
+        { html: '(f(h) − f(0))/h = 3 + h²·cos(1/h) → 3 : f′(0) = 3', note: 'En 0, par la définition', noEq: true },
+        { html: '|f′(x) − 3| ≤ 3x² + |x| → 0 : f′(x) → 3 = f′(0)', note: 'Continuité de f′ en 0', noEq: true },
+        { html: 'f ∈ C¹(]−1 ; 1[)', note: 'Conclure', noEq: true },
+      ],
     },
   }),
 ];

@@ -11,7 +11,7 @@
 // two limits).
 
 import { MT, linesItem, mcq, tfItem, blocksItem } from './kit.js';
-import { modeOf, H, E, examOf, uniqOptions, blanked, boxed, withMenus, segment, frN, vfMcq } from './analyse1-a-kit.js';
+import { modeOf, H, E, examOf, uniqOptions, blanked, withMenus, segment, frN, vfMcq } from './analyse1-a-kit.js';
 import { toText } from '../../cas/print.js';
 import { parse } from '../../cas/parse.js';
 import { deriv } from '../../cas/ast.js';
@@ -314,13 +314,14 @@ function cprBlocks(level, rng, opts = {}) {
     { id: 'b3', html: `f est dérivable sur ${I}, mais f′ n'est pas continue en 0 : f ∉ C¹(${I}).`, needs: ['b1', 'b2'] },
   ] : [
     { id: 'b0', html: `Pour x ≠ 0, f est C¹ sur ]−1 ; 0[ et ]0 ; 1[ (somme, produit et composée de fonctions C¹), et f′(x) = ${inputs.includes('b0') ? '…' : fpShow}.`, needs: [] },
-    { id: 'b1', html: `En 0, par la définition : (f(h) − f(0))/h = ${MT(d.simp)}, et ${MT(`|${d.simp.split('+')[1]}|`)} ≤ ${d.hpShow} → 0. Donc f′(0) = ${inputs.includes('b1') ? '…' : d.a}.`, needs: [] },
+    { id: 'b1', html: `En 0, par la définition : (f(h) − f(0))/h = ${MT(d.simp)}, et ${MT(`|${d.simp.split('+')[1]}|`)} ≤ ${d.hpShow.replace('|h|²', 'h²')} → 0. Donc f′(0) = ${inputs.includes('b1') ? '…' : d.a}.`, needs: [] },
     { id: 'b2', html: `Pour x ≠ 0 : |f′(x) − ${d.a}| ≤ ${d.high} + ${d.low} → 0, donc lim_{x→0} f′(x) = ${inputs.includes('b2') ? '…' : d.a} = f′(0).`, needs: ['b0', 'b1'] },
     { id: 'b3', html: `f est dérivable en tout point de ${I} et f′ y est continue : f ∈ C¹(${I}).`, needs: ['b0', 'b1', 'b2'] },
   ];
   if (inputs.includes('b0')) blocks[0].input = { kind: 'expr', vars: ['x'], expect: d.fp, domain: DOM, ask: 'f′(x) =', answer: d.fp };
   if (inputs.includes('b1')) blocks[1].input = { kind: 'expr', vars: [], expect: String(d.a), ask: 'f′(0) =', answer: String(d.a) };
   if (inputs.includes('b2') && !counter) blocks[2].input = { kind: 'expr', vars: [], expect: String(d.a), ask: 'lim_{x→0} f′(x) =', answer: String(d.a) };
+  for (const b of blocks) b.html = b.html.replace('….', '…');
   if (level === 5) {
     blocks.unshift({ id: 'def', html: `Définition : f ∈ C¹(${I}) si f est dérivable en tout point de ${I} et si f′ est continue sur ${I}.`, needs: [] });
     blocks[blocks.length - 1].needs = [...blocks[blocks.length - 1].needs, 'def'];
