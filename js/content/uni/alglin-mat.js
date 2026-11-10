@@ -1254,8 +1254,154 @@ function elemExam(rng, exam) {
 }
 
 // ======================================================================
+// l-mat-lu
+// ======================================================================
+
+const LU = 'l-mat-lu';
+const LU_SUB = [
+  { id: 'elim', label: 'éliminer', skill: ECH },
+  { id: 'noteL', label: 'noter ℓ', skill: LU },
+  { id: 'assemble', label: 'assembler', skill: LU },
+  { id: 'solve', label: 'résoudre Ly = b', skill: LU },
+];
+
+// A = LU (luPair), the elimination Lᵢ ← Lᵢ − ℓᵢⱼLⱼ column by column.
+function luData(rng, { n = 3, fracL = false, far: needFar = false } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const { L, U, A, fallback } = luPair(n, rng, { fracL });
+    if (fallback) continue;
+    const ls = [];
+    for (let c = 0; c < n - 1; c++) for (let i = c + 1; i < n; i++) if (L[i][c].n !== 0) ls.push([i, c]);
+    if (ls.length < n - 1) continue;
+    const ops = ls.map(([i, c]) => ({ kind: 'add', i, j: c, k: L[i][c].neg() }));
+    const steps = [];
+    let X = A;
+    for (const op of ops) { X = MX.applyOp(X, op); steps.push(X); }
+    if (!MX.equal(X, U) || steps.some((S) => maxAbs(S) > 15)) continue;
+    const lu = MX.lu(A);
+    if (!lu || !MX.equal(lu.L, L)) continue;
+    // The asked ℓ: not next to the diagonal when possible (l_lu_inverse differs).
+    const far = ls.filter(([i, c]) => i > c + 1);
+    const frac = ls.filter(([i, c]) => L[i][c].d > 1 && (!needFar || i > c + 1));
+    if (needFar && !far.length) continue;
+    if (needFar && fracL && !frac.length) continue;
+    const [i, j] = rng.pick(frac.length ? frac : far.length && (needFar || rng.chance(0.6)) ? far : ls);
+    if (needFar && MX.inverse(L)[i][j].eq(L[i][j].neg())) continue;
+    return { L, U, A, ops, n, i, j };
+  }
+  const L = MX.mat([[1, 0, 0], [2, 1, 0], [-1, 3, 1]]);
+  const U = MX.mat([[2, 1, -1], [0, -1, 2], [0, 0, 3]]);
+  const A = MX.mul(L, U);
+  return { L, U, A, ops: [[1, 0], [2, 0], [2, 1]].map(([i, c]) => ({ kind: 'add', i, j: c, k: L[i][c].neg() })), n: 3, i: 2, j: 1, fallback: true };
+}
+
+const lName = (i, j) => `ℓ${ij(i, j)}`;
+const luCfg = (d) => ({ kind: 'factor', A: mt(d.A), of: 'LU' });
+
+function luItem(level, rng) {
+  if (level === 5) return luCoef(rng, { level: 5 });
+  const d = luData(rng);
+  const lines = opLines(d.A, d.ops, { note: (op) => `${opR(op)} : ${lName(op.i, op.j)} = ${fq(op.k.neg())}`, subgoal: 'elim' });
+  const judge = { kind: 'rowops', goal: 'echelon', lowerOnly: true, multi: level >= 4 };
+  const below = [];
+  for (let i = 1; i < d.n; i++) for (let j = 0; j < i; j++) below.push([i, j]);
+  const factorSeg = { kind: 'segment', html: 'Écris L et U.', start: { math: 'LU' }, judge: luCfg(d) };
+  const Lline = { kind: 'eq', math: `L = ${mt(d.L)}`, note: 'Sous la diagonale, les multiplicateurs ℓᵢⱼ', subgoal: 'noteL' };
+  const Uline = { kind: 'eq', math: `U = ${mt(d.U)}`, note: 'La forme échelonnée obtenue', subgoal: 'assemble' };
+  const both = { kind: 'eq', math: `L = ${mt(d.L)} ; U = ${mt(d.U)}`, note: 'L : les multiplicateurs ; U : la forme échelonnée', subgoal: 'assemble' };
+  const first = d.ops[0];
+  const hints = [
+    { level: 1, html: 'ℓᵢⱼ est le nombre k de Lᵢ ← Lᵢ − kLⱼ, avec son signe : on le range en ligne i, colonne j de L.' },
+    { level: 2, html: `L${sub(first.i + 1)} ← L${sub(first.i + 1)} − □L${sub(first.j + 1)}, ${lName(first.i, first.j)} = □` },
+    { level: 3, html: `${ML(lines[0].math)} ; ${lName(first.i, first.j)} = ${fq(first.k.neg())}` },
+  ];
+  const key = `${LU}:${mt(d.A)}`;
+  const base = { skill: LU, level, start: mt(d.A), judge, hints, subgoals: LU_SUB, key, fallback: d.fallback };
+  if (level <= 2) {
+    const script = lines.map((l) => withCells(l, pickCells(l.result, [l.op.i], 2, rng)));
+    script.push(factorSeg);
+    if (level === 2) {
+      const op = rng.pick(d.ops);
+      const k = op.k.neg();
+      const cands = [
+        { id: 'ok', label: fq(k), valid: true },
+        { id: 'neg', label: fq(k.neg()), valid: false, rule: 'l_lu_sign', why: `On retranche ${parR(k)} fois la ligne ${op.j + 1} : ℓ = ${fq(k)}, avec ce signe.` },
+        { id: 'inv', label: fq(q(1).div(k)), valid: false, why: 'ℓᵢⱼ est le multiplicateur lui-même, pas son inverse.' },
+        { id: 'neginv', label: fq(q(1).div(k).neg()), valid: false, why: 'ℓᵢⱼ est le multiplicateur lui-même, avec son signe.' },
+      ];
+      const options = cands.filter((o, idx) => cands.findIndex((x) => x.label === o.label) === idx).slice(0, 3);
+      script.push({ kind: 'decision', prompt: `On a fait ${opR({ ...op })}. Que vaut ${lName(op.i, op.j)} ?`, options: rng.shuffle(options) });
+    }
+    script.push(withCells(Lline, below.slice(0, level === 1 ? below.length : below.length)), withCells(Uline, pickCells(d.U, [0, 1, 2], level === 1 ? 2 : 3, rng).filter(([r, c]) => c >= r)));
+    return matLines({ ...base, prompt: `Factorise A = ${MLm(d.A)} en A = LU : échelonne sans échange, en notant chaque multiplicateur ℓᵢⱼ.`, mode: 'guided', script });
+  }
+  const script = [...lines, factorSeg, both];
+  let prompt = `Factorise A = ${MLm(d.A)} en A = LU${level === 3 ? ' : choisis chaque opération Lᵢ ← Lᵢ − kLⱼ (j < i), puis écris la matrice' : ''}. Écris ensuite L et U.`;
+  if (level === 4 && rng.chance(0.5)) {
+    const x = [rng.int(-3, 3), rng.int(-3, 3), rng.int(-3, 3)].map((v) => q(v));
+    const y = MX.matVec(d.U, x);
+    const b = MX.matVec(d.A, x);
+    script.push(
+      { kind: 'segment', html: `Résous Ax = b avec b = ${vt(b).replace(/-/g, '−')} : d'abord Ly = b.`, start: { math: 'y' }, judge: { kind: 'mat', expect: vt(y) } },
+      { kind: 'eq', math: vt(y), note: 'Ly = b, de haut en bas', subgoal: 'solve' },
+      { kind: 'segment', html: 'Puis Ux = y.', start: { math: 'x' }, judge: { kind: 'mat', expect: vt(x) } },
+      { kind: 'eq', math: vt(x), note: 'Ux = y, de bas en haut', subgoal: 'solve' },
+    );
+    prompt = `Factorise A = ${MLm(d.A)} en A = LU, puis résous Ax = b avec b = ${vt(b).replace(/-/g, '−')} par Ly = b et Ux = y.`;
+  }
+  return matLines({ ...base, prompt, mode: level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null, script });
+}
+
+// « ℓᵢⱼ = ? » (level 5 and exam variants): 4 × 4 with a fractional ℓ, or 3 × 3.
+function luCoef(rng, { level = 4, exam = null, n = 4 } = {}) {
+  const d = luData(rng, { n, fracL: n === 4, far: exam === 'mcq' });
+  const right = d.L[d.i][d.j];
+  const prompt = `On factorise A = ${MLm(d.A)} en A = LU sans échange (L unitriangulaire inférieure). Que vaut ${lName(d.i, d.j)} ?`;
+  const solution = [{ html: `L = ${MLm(d.L)}`, note: 'Les multiplicateurs de l\'élimination' }, { html: `U = ${MLm(d.U)}`, note: '' }];
+  const traps = [{ rule: 'l_lu_sign' }, { rule: 'l_lu_inverse' }, { rule: 'l_coef_index_swap' }];
+  if (exam !== 'mcq') {
+    return coefItem({
+      skill: LU, level, prompt, label: `l_${d.i + 1}${d.j + 1}`, value: qt(right), key: `${mt(d.A)}:${d.i}${d.j}`, exam: exam ? examTag({ exam }) : false,
+      askCoef: { label: lName(d.i, d.j), path: [d.i, d.j], factor: 'L' }, traps, subgoals: LU_SUB, solution, fallback: d.fallback,
+    });
+  }
+  const Li = MX.inverse(d.L);
+  return mcqDistinct({
+    skill: LU, level: 4, key: `mcq:${mt(d.A)}:${d.i}${d.j}`, exam: examTag({ exam }), prompt, right: fq(right),
+    wrongs: [{ html: fq(right.neg()), rule: 'l_lu_sign' }, { html: fq(Li[d.i][d.j]), rule: 'l_lu_inverse' }, { html: fq(Li[d.i][d.j].neg()), rule: 'l_lu_inverse' }, { html: fq(d.U[d.j][d.i]), rule: 'l_coef_index_swap' }],
+    fillers: [{ html: fq(right.add(1)) }, { html: fq(q(1).div(right)) }, { html: fq(right.mul(2)) }],
+    solution, fallback: d.fallback,
+  }, rng);
+}
+
+const NOT_LU = ['[[0,1],[1,0]]', '[[0,2],[1,1]]', '[[0,1],[1,1]]', '[[0,1,0],[1,0,0],[0,0,1]]'];
+
+function luExam(rng, exam) {
+  if (exam === 'coef') return luCoef(rng, { exam, n: rng.pick([3, 4]) });
+  if (exam === 'mcq') return luCoef(rng, { exam });
+  const which = rng.pick(['notLU', 'notLU', 'det', 'mult']);
+  const tag = examTag({ exam });
+  if (which === 'notLU') {
+    const A = rng.pick(NOT_LU);
+    const n = A.startsWith('[[0,1,0]') ? 3 : 2;
+    return tfL({
+      skill: LU, key: `notLU:${A}`, truth: false, exam: tag,
+      statement: 'Toute matrice inversible admet une factorisation A = LU sans échange de lignes.',
+      counter: { kind: 'matOne', params: { want: 'notLUable' }, ask: [{ v: 'A', label: 'A =', shape: [n, n] }], answer: { A } },
+      explanation: `Faux : ${ML(A)} est inversible, mais son premier pivot a₁₁ est nul : il faut échanger deux lignes (PA = LU).`,
+    });
+  }
+  const T = {
+    det: ['Si A = LU avec L unitriangulaire inférieure et U triangulaire supérieure, alors det A est le produit des coefficients diagonaux de U.', 'Vrai : det A = det L · det U = 1 · (produit de la diagonale de U).'],
+    mult: ['Dans A = LU sans échange, si l\'élimination fait Lᵢ ← Lᵢ − kLⱼ, alors ℓᵢⱼ = k.', 'Vrai : L range les multiplicateurs eux-mêmes, avec leur signe.'],
+  }[which];
+  return tfL({ skill: LU, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1], ruleIfFalse: which === 'mult' ? 'l_lu_sign' : null });
+}
+
+// ======================================================================
 
 export const GEN = {
+  [LU]: (level, rng, profile, opts = {}) => (opts.exam ? luExam(rng, opts.exam) : luItem(level, rng)),
   [ELEM]: (level, rng, profile, opts = {}) => (opts.exam ? elemExam(rng, opts.exam) : elemItem(level, rng)),
   [IMT]: (level, rng, profile, opts = {}) => (opts.exam ? imtExam(rng, opts.exam) : imtItem(level, rng)),
   [GEOM]: (level, rng, profile, opts = {}) => (opts.exam ? geomExam(rng, opts.exam) : geomItem(level, rng)),
