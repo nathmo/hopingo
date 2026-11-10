@@ -152,7 +152,9 @@ function legal(op, rows, cfg, opts) {
 }
 
 const diagnose = (cfg, prev, node, ops) => diagnoseLine('rowops', prev, node, { ...cfg, _ops: ops }, (cand, n) => sameValue(cand.value, n.value, mopts(cfg)) && sameDetFactor(cand, n, cfg));
-const sameDetFactor = (a, b, cfg) => (cfg.track !== 'det' ? true : !!a.det === !!b.det && (!a.det || sameScalar(a.factor, b.factor, mopts(cfg))));
+// section det: a candidate without a factor (the row-operation traps of
+// section sys) is compared on its matrix only.
+const sameDetFactor = (a, b, cfg) => (cfg.track !== 'det' || !a.det ? true : !!b.det && sameScalar(a.factor, b.factor, mopts(cfg)));
 
 // ---------- determinant lines (track: 'det') ----------
 
