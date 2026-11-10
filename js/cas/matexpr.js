@@ -136,8 +136,11 @@ export function toQ(v) {
   return out;
 }
 
+// A 1 × 1 matrix (a row times a column) counts as a number (step U8: Schur complement S = a₂₂ − rowᵀ·A⁻¹·col).
+const one1 = (v) => (v?.k === 'm' && v.rows.length === 1 && v.rows[0].length === 1 ? S(v.rows[0][0]) : v);
 export function sameValue(a, b, opts = {}) {
   if (!a || !b) return false;
+  if ((a.k === 's') !== (b.k === 's')) { a = one1(a); b = one1(b); }
   if (a.k === 's' && b.k === 's') return sameScalar(a.n, b.n, opts);
   if (a.k === 'list' && b.k === 'list') return a.items.length === b.items.length && a.items.every((x, i) => sameValue(x, b.items[i], opts));
   if (a.k !== 'm' || b.k !== 'm') return false;
@@ -171,6 +174,7 @@ export function mmul(a, b) {
 export function madd(a, b, sign = 1) {
   const op = sign > 0 ? add : sub;
   if (a.k === 's' && b.k === 's') return S(simp(op(a.n, b.n)));
+  if ((a.k === 's') !== (b.k === 's') && one1(a).k === 's' && one1(b).k === 's') return madd(one1(a), one1(b), sign);
   if (a.k === 's' || b.k === 's') fail('On ne peut pas additionner un nombre et une matrice.');
   const [m, n] = dimsOf(a);
   const [m2, n2] = dimsOf(b);
