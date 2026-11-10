@@ -1330,6 +1330,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-ft-direct` — Transformée de Fourier : définition et calcul direct
 - **Année** 16 · **Prérequis** `a1-improper-calc`, `a1-int-parts`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-improper-calc` : ∫ sur ℝ calculée comme une limite ; `g8-polar` : e^(−iαy) = cos αy − i sin αy.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Gabarits c(b² − x²) et c(b − |x|) sur [−b ; b] (pairs, deux intégrations par parties), c·x (impair, FP3), c·e^(−w|x|) ; les fonctions sans parité (e^(−x) sin x · 1_{x>0}, sin x · 1_[0 ; π]) ne sont pas faites. Parties : la forme par parité (`transform`), l'intégrale (`equiv` en α, cible `no-int`), f̂(α) (`transform`), f̂(0) (`definite`, avec une décision pour `f_ft_alpha_zero`). L1 et L2 : la définition en blocs (`define`, échelle du §16.3) ou le calcul à trous. L5 et `open` : définition (2 pts) puis calcul (3 ou 4 pts). `f_ipp_sign` (partie a) n'est qu'une option du QCM.
 - **Intro** : définition à savoir écrire (examens 2021) : f : ℝ → ℝ continue par morceaux et ∫_ℝ |f| < ∞ ; f̂(α) = (1/√(2π)) ∫_ℝ f(y) e^(−iαy) dy. Si f est paire, f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) dx. α = 0 se traite à part. Exemple : `math: f = e^(−|x|) : f̂(α) = (1/√(2π)) (1/(1 − iα) + 1/(1 + iα))` ; `math: = √(2/π) · 1/(1 + α²)`.
 - **Juge** : `blocks` `{mode:'define'}` pour la définition ; `transform` `{kind:'fourier', of, v:'y', s:'α', dir:'forward'}` pour les lignes de calcul (contrôle numérique en 6 valeurs de α, α = 0 compris si l'item le demande) · **Forme finale** : expression en α sans ∫ ni 𝓕 ; f̂(0) donné à part si la formule a un α au dénominateur.
 - **Niveaux** :
@@ -1352,6 +1353,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-ft-table` — Transformée de Fourier par la table et les propriétés
 - **Année** 16 · **Prérequis** `f-ft-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `f-ft-direct` : définition de f̂ et convention 1/√(2π).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Gabarits : carré complété + translation + F8, e^(−w|x − a|) (F7), (x − a)e^(−k(x − a)²) (F9), g′ (FP4), H(x − a)e^(−w(x − a)) (F3) ; inverses au niveau 4 : c/(α² + w²) (F7), e^(−w|α|) (F6), c/(w + iα) (F3). Pas de changement d'échelle, ni de 𝓕(x f), ni de 𝓕((x g)″) (2019). Les lignes avec 𝓕(…) n'ont pas de trous (le noyau ne lit pas 𝓕). La ligne de la table est une décision (L2 à L5) ou une note (L1), pas une citation « F8, w = √3 » vérifiée. L5 et `open` : deux fonctions (7 pts) ou une (3 ou 4 pts). QCM d'examen : 𝓕(g ∗ h)(0) et ĝ.
 - **Intro** : on ramène f à une ligne de la table avec les propriétés : linéarité, translation F(f(x − a)) = e^(−iaα) f̂, modulation, dérivée F(f′) = iα f̂, F(x f) = i f̂′, changement d'échelle. Chaque ligne de la table a un **domaine** (« si y > 0 », |w|). Exemple (série de révision) : `math: e^(−3x² + 6x + 6) = e⁹ e^(−3(x − 1)²)` ; `math: F(e^(−3x²)) = e^(−α²/12)/√6`, `note: ligne F8, w² = 3` ; `math: F(f) = e⁹ e^(−iα) e^(−α²/12)/√6`, `note: translation de 1`.
 - **Juge** : `transform` `{kind:'fourier', of, v:'x', s:'α', dir:'forward'|'inverse', table:'mt2122'}` ; chaque ligne qui cite une ligne de table (« F8, w = √3 ») est vérifiée · **Forme finale** : expression sans 𝓕 ; pour une inverse, une fonction de x définie **sur tout ℝ** (cas x < 0 compris).
 - **Niveaux** :
@@ -1373,6 +1375,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-ft-eq` — Équations résolues par la transformée de Fourier
 - **Année** 16 · **Prérequis** `f-ft-table`, `@alg:F-variable-deux-fois`, `@alg:G-additionner` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Seulement a·u + b·(f ∗ u) = f avec f = e^(−w|x|) (10 triplets (a, b, w) qui donnent W entier) ; le gabarit avec u″ dans la convolution (2021) n'est pas fait. Parties : f̂ (F7), l'équation transformée puis û isolé (`transform` avec l'inconnue û et le symbole f̂), la fraction simplifiée (`equiv` en α, cible `short` avec le but), le retour en x (`transform`, inverse). Le juge `transform` ne nomme pas une équation transformée fausse : `f_sqrt2pi_conv` et `f_conv_coef_dropped` sont nommés sur la ligne suivante, û = …. `f_no_inverse` et `f_table_half_line` sont des options d'une décision. L5 et `open` : l'exemple F2 (8 pts, définition comprise).
 - **Intro** : on transforme les deux membres (linéarité, F(f ∗ u) = √(2π) f̂ û, F(u″) = −α² û), on isole û, on simplifie la fraction, on reconnaît une ligne de la table, on revient en x. On suppose u et ses dérivées intégrables. Exemple (2022) : `math: 2u + 3 f ∗ u = f, f = e^(−|x|)` ; `math: û = f̂/(2 + 3√(2π) f̂) = (1/2) √(2/π)/(α² + 4)`, `note: f̂ = √(2/π)/(1 + α²)` ; `math: u = e^(−2|x|)/4`, `note: ligne F7, w = 2`.
 - **Juge** : `transform` `{kind:'fourier', of:'u', v:'x', s:'α'}` pour la ligne transformée de l'équation (l'équation en α doit être équivalente à F(équation)) ; `equiv` `{vars:['α']}` pour isoler et simplifier û ; `transform` `dir:'inverse'` pour le retour · **Forme finale** : u(x) explicite sur tout ℝ, sans 𝓕.
 - **Niveaux** :
@@ -1395,6 +1398,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-plancherel` — Plancherel
 - **Année** 16 · **Prérequis** `f-ft-table` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Gabarits F1 (∫ sin²(bα)/α²), F7 (∫ dα/(α² + w²)²), F9 (∫ α² e^(−α²/2), avec ∫ x² e^(−2x²) dx donnée), F6 (dans l'autre sens : ∫ dx/(x² + w²)²). Les intégrales sur ℝ d'une fonction de |x| s'écrivent 2∫₀^∞ (la quadrature du juge `definite` ne converge pas sur ℝ avec un point anguleux) ; la valeur du départ est donnée au juge (`known`). L3 : décision Plancherel ou résidus (les deux justes). L5 : la preuve par f ∗ f̃ en 0 (blocs) ou le calcul sans aide. `open` : 3 pts.
 - **Intro** : ∫_ℝ |f(x)|² dx = ∫_ℝ |f̂(α)|² dα (pas de facteur 2π avec cette convention). Sert à calculer une intégrale en α difficile à partir d'une intégrale en x facile. Exemple : `math: f = e^(−|x|) : ∫ e^(−2|x|) dx = 1` ; `math: ∫ (2/π)/(1 + α²)² dα = 1`, `note: donc ∫ dα/(1 + α²)² = π/2`.
 - **Juge** : `definite` · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -1687,6 +1691,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-distrib-def` — Distributions : ⟨T_f, φ⟩, δ_a et f·δ_a (MT/SV)
 - **Année** 16 · **Prérequis** `a1-improper-calc` · **Étiquettes** `MT/SV` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-improper-calc` : ⟨T_f, φ⟩ = ∫ fφ sur ℝ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Nouveau juge `distrib` (`js/judges/distrib.js`) : chaque membre d'une ligne est comparé sur 6 fonctions test (des gaussiennes fois des polynômes, pas des bosses à support compact). Gabarits : ⟨T_f + g δ_a, φ⟩ pour f en morceaux (kx puis m/x ; k puis e^(−wx)), et la preuve g δ_a = g(a) δ_a. Les lignes avec ⟨ ⟩ n'ont pas de trous (le noyau ne lit pas les crochets). L5 : enchaîné avec la dérivée (`f-distrib-deriv`). `open` : 3 pts (le catalogue dit 2 : le plan `ba4-analyse4` demande au moins 3).
 - **Intro** : ⟨T_f, φ⟩ = ∫ f φ ; ⟨δ_a, φ⟩ = φ(a) ; ⟨g T, φ⟩ = ⟨T, g φ⟩, donc g δ_a = g(a) δ_a. Exemple (2019) : f = 0 (x < 0), 2x (0 ≤ x ≤ 1), 1/x (x > 1) ; `math: ⟨T_f + δ₁, φ⟩ = ∫₀¹ 2x φ(x) dx + ∫₁^∞ φ(x)/x dx + φ(1)`.
 - **Juge** : `equiv` avec une fonction test : l'expression est évaluée sur 8 fonctions φ tirées (gaussiennes fois polynômes, bosses C^∞) · **Forme finale** : expression en φ sans crochet.
 - **Niveaux** :
@@ -1707,6 +1712,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-distrib-deriv` — Dérivée au sens des distributions (MT/SV)
 - **Année** 16 · **Prérequis** `f-distrib-def`, `a1-int-parts` · **Étiquettes** `MT/SV` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-distrib-def` : ⟨T, φ⟩ et δ_a.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `distrib`. Gabarits : H(t)e^(−wt) (2021), kx puis m/x (2019), k puis e^(−wx), l'indicatrice c·1_[a ; b] ; pas |x| (D|x| = sgn). L3 : décision « par la définition » ou « par la formule des sauts » (les deux justes). L5 et `open` : un problème de 3 pts (L5 : la fonction de 2019).
 - **Intro** : ⟨DT, φ⟩ = −⟨T, φ′⟩. Pour f C¹ par morceaux : D T_f = T_(f′) + Σ (f(a + 0) − f(a − 0)) δ_a. Exemple (2021) : `math: f = e^(−t) pour t > 0, 0 sinon` ; `math: ⟨Df, φ⟩ = −∫₀^∞ e^(−t) φ′ dt = φ(0) − ∫₀^∞ e^(−t) φ dt` ; `math: Df = −f + δ`.
 - **Juge** : `equiv` avec fonctions test (comme `f-distrib-def`) · **Forme finale** : T_(g) + Σ cδ_a.
 - **Niveaux** :
@@ -1728,6 +1734,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-distrib-eq` — Équations avec δ ; transformée de Fourier de cos (MT/SV)
 - **Année** 16 · **Prérequis** `f-distrib-deriv`, `f-ft-table` · **Étiquettes** `MT/SV` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-distrib-deriv` : dérivées avec les δ des sauts ; `f-ft-table` : tables de Fourier D1 à D4.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Juge `distrib` en mode équation (⟨Ly, φ⟩ = ⟨y, L*φ⟩ sur les fonctions test, constantes tirées 3 fois) pour l'essai et la solution générale, en mode distribution pour la dérivée ; `transform` avec l'inconnue ŷ pour la voie de Fourier. Gabarits : y′ + ay = δ_b, y″ + ω²y = δ (solution fondamentale), y″ − ω²y = δ (Fourier) ; L5 et `open` : y″ − ω²y = δ + 1 (2016) ou un gabarit sans aide. La transformée de cos et de g₁ ∗ g₂ (2019) n'est pas faite.
 - **Intro** : y′ + y = δ a pour solution y = H(t) e^(−t) (+ C e^(−t)) ; y″ + y = δ : y = H(x) sin x. Avec les tables D1 à D4 : F(cos x) = √(π/2)(δ₋₁ + δ₁). Exemple (2019) : `math: g₁ = e^(−|x|), g₂ = cos x` ; `math: F(g₁ ∗ g₂) = √(2π) · √(2/π)/(1 + α²) · √(π/2)(δ₋₁ + δ₁)` ; `math: = √(π/2)(δ₋₁ + δ₁) = F(g₂)`, `note: (1/(1 + α²)) δ_(±1) = ½ δ_(±1)`.
 - **Juge** : `equiv` avec fonctions test ; `ode` au sens des distributions pour les solutions (vérifie DT + T = δ sur les fonctions test) · **Forme finale** : solution explicite.
 - **Niveaux** :
