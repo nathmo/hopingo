@@ -3,7 +3,9 @@
 // same limit as the previous line when v → to. Replacing by an equivalent is
 // fine as long as the limit is kept. cfg: {v, to: text ('0', '+∞', '2'),
 // dir?: '+' | '-'}. Limits come from js/cas/limit.js: series first, then a
-// simple numeric check (U4 extends it).
+// numeric check. Step U4: cfg.discrete (sequences: v is a whole number,
+// n → +∞), and a limit that does not exist is the value 'none' (a final
+// line « ∄ », written `none`… is not read: such items end on a decision).
 // Final form: a number in closed form, +∞ or −∞ (a line without v).
 // Lines that still depend on v are shown inside « lim ».
 
@@ -41,7 +43,7 @@ export function limitOf(cfg, node) {
   const inf = isInf(node);
   if (inf) return { value: inf, method: 'series' };
   const { to, dir } = target(cfg);
-  try { return limit(node, vOf(cfg), to, dir); } catch { return { value: null, method: 'none' }; }
+  try { return limit(node, vOf(cfg), to, dir, { discrete: !!cfg.discrete }); } catch { return { value: null, method: 'none' }; }
 }
 
 export const sameAsLimit = (cfg, a, b) => sameLimit(limitOf(cfg, a), limitOf(cfg, b));

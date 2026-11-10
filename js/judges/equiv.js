@@ -348,6 +348,16 @@ export function implicitDerivs(node, cfg) {
 const BOUND_POINTS = 400;
 function boundPoints(cfg) {
   const v = cfg.vars?.[0] || 'x';
+  // Step U4 (sequences): whole n from cfg.from (or the domain's int range)
+  // to from + 200, then n = 10ᵏ up to 10⁸.
+  const d = cfg.domain?.[v];
+  if (cfg.from !== undefined || d?.int) {
+    const from = cfg.from ?? d.int[0];
+    const xs = [];
+    for (let n = from; n <= from + 200; n++) xs.push(n);
+    for (let k = 3; k <= 8; k++) if (10 ** k > from + 200) xs.push(10 ** k);
+    return { v, xs };
+  }
   const [lo, hi] = cfg.domain?.[v] || [-3, 3];
   const xs = [];
   for (let i = 0; i <= BOUND_POINTS; i++) xs.push(lo + ((hi - lo) * i) / BOUND_POINTS);

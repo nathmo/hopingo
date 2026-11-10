@@ -49,6 +49,11 @@ const CALLS = ['bracket', 'int', 'lim'];
 // Read as functions only when "(" follows: they also look like products of letters.
 const SHORT_FUNCS = ['sh', 'ch', 'th', 'tg', 'd', 'o'];
 const MULTI_ARG = new Set(['d', 'root', 'sum', 'Σ', 'int', 'bracket', 'lim', '∫']);
+// Step U4: min(a ; b) and max(a ; b) (δ = min(1 ; ε/5)), arguments split by
+// « ; » or « , ».
+const MINMAX = ['min', 'max'];
+FUNCS.push(...MINMAX);
+for (const f of MINMAX) MULTI_ARG.add(f);
 const GREEK = 'αβγδεζηθικλμνξρστυφχψωΓΔΘΛΞΠΣΦΨΩ';
 const RELOPS = new Set(['=', '<', '>', '≤', '≥', '≠']);
 // Set and logic symbols (step U1).
@@ -282,7 +287,7 @@ export function parse(text, opts = {}) {
   function args(name) {
     expect('(', `Il faut une parenthèse après ${name}.`);
     const out = [sum()];
-    while (isOp(peek(), ',')) { p++; out.push(sum()); }
+    while (isOp(peek(), ',') || (MINMAX.includes(name) && isOp(peek(), ';'))) { p++; out.push(sum()); }
     expect(')', 'Une parenthèse n\'est pas fermée.');
     return out;
   }
@@ -374,6 +379,7 @@ export function parse(text, opts = {}) {
     const a = args(name);
     if (name === 'sqrt') { if (a.length !== 1) fail('sqrt prend un seul argument.'); return { t: 'sqrt', e: { t: 'paren', e: a[0] } }; }
     if (name === 'abs') { if (a.length !== 1) fail('abs prend un seul argument.'); return { t: 'abs', e: a[0] }; }
+    if (MINMAX.includes(name)) { if (a.length < 2) fail(`${name} prend au moins deux nombres : ${name}(a ; b).`); return { t: 'fn', name, args: a }; }
     if (a.length !== 1 && !userFuncs.has(name)) fail(`${name} prend un seul argument.`);
     return { t: 'fn', name, args: a };
   }

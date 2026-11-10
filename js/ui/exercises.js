@@ -28,6 +28,7 @@ import { mountTokens } from './tokens.js';
 import { mountTf } from './tf.js';
 import { mountBlocks } from './blocks.js';
 import { mountTable } from './table-input.js';
+import { mountProblem } from './problem.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -84,6 +85,8 @@ MOUNTS.tf = (item, ctx, body) => mountTf(item, ctx, body);
 MOUNTS.tokens = (item, ctx, body) => mountTokens(item, ctx, body);
 MOUNTS.blocks = (item, ctx, body) => mountBlocks(item, ctx, body);
 MOUNTS.table = (item, ctx, body) => mountTable(item, ctx, body);
+// Step U4: long problems in parts, each part drawn by its own mount.
+MOUNTS.problem = (item, ctx, body) => mountProblem(item, ctx, body, (p, c, b) => MOUNTS[p.type](p, c, b));
 
 // ---------- multiple choice ----------
 

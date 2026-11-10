@@ -41,3 +41,10 @@ import * as limit from './limit.js';
 
 Object.assign(JUDGES, { series, antideriv, definite, limit });
 export const signOf = (cfg) => (cfg.rel || judgeFor(cfg).sign) ?? (cfg.kind === 'equiv' || cfg.kind === 'value' ? '=' : '→');
+
+// Step U4: complex numbers (ℚ(i) exact, else floats) and the δ(ε), N(ε)
+// and x(ε) of the definitions.
+import * as complex from './complex.js';
+import * as delta from './delta.js';
+
+Object.assign(JUDGES, { complex, delta });

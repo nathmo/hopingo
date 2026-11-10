@@ -11,6 +11,7 @@
 // more: « I = »), before the justification of the last problem point for
 // a1-improper-compare.
 
+import { asProblem } from './kit-problem.js';
 import { MT, linesItem, mcq, tfItem, examTag } from './kit.js';
 import { parse } from '../../cas/parse.js';
 import { toReadable } from '../../cas/print.js';
@@ -732,5 +733,11 @@ function RATIONAL_OPEN(rng, opts) {
 export const GEN = {
   [IC]: (level, rng, profile, opts = {}) => icItem(level, rng, opts),
   [CP]: (level, rng, profile, opts = {}) => cpItem(level, rng, opts),
-  [IR]: (level, rng, profile, opts = {}) => irItem(opts.exam ? 5 : level, rng, opts),
+  // Step U4: level 5 and the open variant are `problem` items, with the
+  // catalogue's barème (E2): convergence 2, factorisation and DES 4,
+  // primitive 2, regrouping and limit 3, value 1.
+  [IR]: (level, rng, profile, opts = {}) => {
+    const it = irItem(opts.exam ? 5 : level, rng, opts);
+    return level === 5 || opts.exam ? asProblem(it, 12, { points: [2, 4, 2, 3, 1] }) : it;
+  },
 };

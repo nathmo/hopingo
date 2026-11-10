@@ -17,6 +17,7 @@
 //              {at, eq} P(at) = eq, {at, ne} P(at) ≠ ne, {degree}, {noRealRoot},
 //              {mult: {at, k}} multiplicity of at equal to k, {minMult: {at, k}}
 //   composite  {expr, v}: n ∈ ℕ with expr(n) not prime
+//   sequence, function (step U4): see js/judges/counters.js
 //   heredity   {v, from}: a property P(n) (a condition in n) whose heredity
 //              P(n) ⇒ P(n + 1) holds for n = from … from + 40, but which is
 //              false for some n: heredity alone proves nothing (answer: {P})
@@ -31,6 +32,7 @@ import { closedHolds, setValue, isFiniteSet } from '../cas/sets.js';
 import { lexicon, parseFormula, truthOf } from '../cas/logic.js';
 import { polyOf, coeffs, qCoeffs, degree, divide, I } from '../cas/polyx.js';
 import { Poly, gcdPoly } from '../cas/poly.js';
+import { checkSeqFn } from './counters.js';
 
 const SAMPLES = {
   R: ['-3', '-2', '-1', '-1/2', '0', '1/3', '1/2', '1', '2', '5/2', '3', '7'],
@@ -244,6 +246,8 @@ export function checkCounter(counter, answers) {
     case 'truth': return checkTruth(counter, answers);
     case 'poly': return checkPoly(counter, answers);
     case 'composite': return checkComposite(counter, answers);
+    // Step U4: sequences, series and functions (js/judges/counters.js).
+    case 'sequence': case 'function': return checkSeqFn(counter, answers);
     default: return { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }

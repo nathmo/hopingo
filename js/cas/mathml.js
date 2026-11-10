@@ -100,7 +100,7 @@ export function toMathML(node, opts = {}) {
       case 'fn': {
         if (n.name === 'logb') return row(`<msub><mi>log</mi>${M(stripP(n.args[0]))}</msub>`, mo('&#x2061;'), paren(M(n.args[1])));
         const name = `<mi>${esc(FN_NAMES[n.name] ?? n.name)}</mi>`;
-        return row(name, mo('&#x2061;'), paren(n.args.map(M).join(mo(','))));
+        return row(name, mo('&#x2061;'), paren(n.args.map(M).join(mo(n.name === 'min' || n.name === 'max' ? ';' : ','))));
       }
       case 'deriv': {
         const marks = '′'.repeat(Math.min(n.n, 3));

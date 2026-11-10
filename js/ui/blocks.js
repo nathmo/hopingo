@@ -76,7 +76,7 @@ export function mountBlocks(item, ctx, body) {
 
   // A block of the frame: the calculation is typed, then the block is placed.
   function askInput(b, btn) {
-    input = new MathInput({ keysets: ['calc', 'relation'], placeholder: 'ton calcul', onEnter: () => send() });
+    input = new MathInput({ keysets: b.input.keys || ['calc', 'relation'], placeholder: 'ton calcul', onEnter: () => send() });
     const send = () => { if (input.value) tap(b, btn, input.value); };
     stage.replaceChildren(h('div.step-label', b.input.ask), h('div.step-line.current', input.display));
     footer.replaceChildren(input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: send }, 'Valider le calcul'));

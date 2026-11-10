@@ -22,6 +22,7 @@ import { checkCounter, judgeTf } from '../js/judges/examples.js';
 import { judgeTokens } from '../js/judges/logic.js';
 import { checkBlocks, placeBlock } from '../js/judges/blocks.js';
 import { checkTable } from '../js/judges/iter.js';
+import { checkProblem, ProblemRun, pendingOf, resumeRun } from '../js/judges/problem.js';
 import { parse } from '../js/cas/parse.js';
 import { mapNode, lit } from '../js/cas/ast.js';
 import { paramSamples } from '../js/judges/solset.js';
@@ -164,8 +165,31 @@ function checkItem(it, where) {
     case 'answer':
       assert.ok(evaluate(parseSchool(it.expected)), where);
       break;
+    case 'problem': checkProblemItem(it, where); break;
     default: assert.fail(`${where}: type ${it.type}`);
   }
+}
+
+// A problem (step U4): each part is a sound item, the points fit the steps,
+// the reference earns every point, and a run saved halfway (JSON, as in
+// profile.pending) and resumed ends the same way.
+function checkProblemItem(it, where) {
+  assert.ok(it.parts.length >= 1 && it.points.length === it.parts.length, `${where}: parts and points`);
+  assert.ok(it.noHints && it.hints.length === 0 && it.resumable, `${where}: a problem has no hints`);
+  it.parts.forEach((p, i) => {
+    const steps = p.type === 'lines' ? segmentsOf(p).length : 1;
+    assert.equal(it.points[i].length, steps, `${where}: points of part ${i + 1}`);
+    checkItem(p, `${where} (partie ${i + 1})`);
+  });
+  const r = checkProblem(it);
+  assert.ok(r.ok, `${where}: reference play ${JSON.stringify(r.score ?? r.why)}`);
+  const half = Math.floor(r.log.length / 2);
+  const run = new ProblemRun(it);
+  for (const e of r.log.slice(0, half)) run.apply(e);
+  const saved = JSON.parse(JSON.stringify(pendingOf(run)));
+  const back = resumeRun(saved);
+  for (const e of r.log.slice(half)) back.apply(e);
+  assert.ok(back.done && back.score().got === back.score().max, `${where}: resumed run`);
 }
 
 // Items per level: 40, fewer (never under 15) for skills whose lines are

@@ -11,6 +11,8 @@
 //         must also read mod·(…) + rem (n² = 2(2k² + 2k) + 1 is odd)
 //   rel:  the typed relation must be the same equation as `expect`
 //         (sides moved or multiplied by a number)
+//   delta (step U4): {kind:'delta', cfg, answer, ask, keys?, rule?}: x(ε) or
+//         δ(ε), judged by judges/delta.js (deltaCheck) with cfg
 // placeBlock(item, placed, id, input?) → {kind:'ok'|'done'|'wrong'|'early'|'input'|'same', rule?, message?}
 
 import { parse, tryParse } from '../cas/parse.js';
@@ -18,8 +20,16 @@ import { stripParen, sub } from '../cas/ast.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
 import { polyOf, productFactors, sumTerms } from '../cas/polyx.js';
 import { exactValue } from '../cas/normal.js';
+import { deltaCheck } from './delta.js';
 
 function checkInput(spec, text) {
+  // Step U4: x(ε) or δ(ε) of a proof by the definition (judge delta).
+  if (spec.kind === 'delta') {
+    const r = deltaCheck(spec.cfg, String(text ?? ''));
+    if (r.ok) return { kind: 'ok' };
+    if (r.parse) return { kind: 'input', message: "Je n'arrive pas à lire ta saisie." };
+    return { kind: 'wrong', rule: r.rule ?? spec.rule ?? null, message: r.message };
+  }
   const node = tryParse(String(text ?? ''), { vars: spec.vars });
   if (!node) return { kind: 'input', message: 'Je n\'arrive pas à lire ta saisie.' };
   if (spec.kind === 'rel') {

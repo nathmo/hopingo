@@ -76,6 +76,8 @@ export function evalFloat(node, env = {}, opts = {}) {
         if (!(b > 0) || b === 1 || !(x > 0) || (guard && x < 1e-6)) return NaN;
         return Math.log(x) / Math.log(b);
       }
+      // Step U4: min and max of several numbers.
+      if ((name === 'min' || name === 'max') && node.args.length >= 2) return (name === 'min' ? Math.min : Math.max)(...node.args.map(E));
       const f = REAL_FN[name];
       if (!f || node.args.length !== 1) return NaN;
       const x = E(node.args[0]);
@@ -88,6 +90,8 @@ export function evalFloat(node, env = {}, opts = {}) {
     }
     case 'sum': {
       // Σ_{k=lo}^{hi} e, the bounds rounded to whole numbers (empty if hi < lo).
+      // Step U4: hi = +∞, a series, by partial sums and extrapolation.
+      if (isInf(node.hi)) return seriesSum(node, env);
       const lo = E(node.lo);
       const hi = E(node.hi);
       if (!Number.isFinite(lo) || !Number.isFinite(hi)) return NaN;
@@ -133,6 +137,61 @@ export function evalFloat(node, env = {}, opts = {}) {
     }
     default: return NaN;
   }
+}
+
+const isInf = (n) => { n = stripParen(n); return n.t === 'const' && n.name === 'inf'; };
+
+// Σ_{k=lo}^{∞} e (step U4, catalogue A1 convention 3): partial sums S_N for
+// N = 2ʲ up to 2¹⁷, then Richardson's extrapolation in 1/N and Aitken's Δ²;
+// the estimate whose last two values agree best, if they agree to 1e−7.
+// NaN for a divergent series, or one that converges too slowly to tell.
+export function seriesSum(node, env = {}) {
+  const lo = Math.round(evalFloat(node.lo, env));
+  if (!Number.isFinite(lo)) return NaN;
+  const c = compileFloat(node.e);
+  const k = node.k;
+  const e = { ...env };
+  const S = [];
+  let s = 0;
+  let n = lo;
+  for (let j = 1; j <= 17; j++) {
+    const N = lo + 2 ** j;
+    for (; n < N; n++) {
+      e[k] = n;
+      const t = c(e);
+      if (!Number.isFinite(t)) return NaN;
+      s += t;
+    }
+    S.push(s);
+  }
+  if (!S.every(Number.isFinite)) return NaN;
+  const cands = [];
+  // Richardson: error in powers of 1/N, N doubling.
+  let row = S.slice(-8);
+  for (let m = 1; m <= 4; m++) {
+    row = row.slice(1).map((x, i) => (2 ** m * x - row[i]) / (2 ** m - 1));
+    cands.push(row);
+  }
+  // Aitken (error q^N or N^(−p)).
+  const A = [];
+  for (let i = 2; i < S.length; i++) {
+    const d1 = S[i] - S[i - 1];
+    const d0 = S[i - 1] - S[i - 2];
+    A.push(d1 === d0 ? S[i] : S[i] - (d1 * d1) / (d1 - d0));
+  }
+  cands.push(A.slice(-6), S.slice(-4));
+  let best = null;
+  for (const r of cands) {
+    if (r.length < 2) continue;
+    const a = r[r.length - 1];
+    const b = r[r.length - 2];
+    const err = Math.abs(a - b);
+    if (Number.isFinite(err) && (!best || err < best.err)) best = { err, v: a };
+  }
+  if (!best || best.err > 1e-7 * (1 + Math.abs(best.v))) return NaN;
+  // A growth that only looks stable (Σ 1/k: S grows like ln N).
+  if (Math.abs(S[S.length - 1] - S[S.length - 2]) > 1e-3 * (1 + Math.abs(best.v)) && Math.abs(best.v - S[S.length - 1]) > 0.5 * (1 + Math.abs(best.v))) return NaN;
+  return best.v;
 }
 
 // k points of the domain. Integer variables take whole values.

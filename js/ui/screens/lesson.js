@@ -86,6 +86,9 @@ export function lessonScreen(root, args, app) {
       ready: (ok) => { if (checkBtn) checkBtn.disabled = !ok; },
       submit: () => check(),
       complete: (outcome) => outcomeShown(outcome),
+      // Step U4: a problem (or a long lines item) saves itself after each
+      // action, to be resumed from the home screen (profile.pending).
+      save: (pending) => { p.pending = { ...pending, lessonKind: args.kind || 'smart' }; app.save(); },
     };
     ctrl = mountExercise(item, ctx);
     body.append(ctrl.el);
