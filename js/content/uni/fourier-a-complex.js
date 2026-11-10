@@ -36,7 +36,9 @@ export function cT(re, im) {
   if (R.n === 0) return `${I.n < 0 ? '-' : ''}${imT}`;
   return `${R}${I.n < 0 ? '-' : '+'}${imT}`;
 }
-const par = (t) => (/^[0-9]+$/.test(t) ? t : `(${t})`);
+const par = (t) => (/^[0-9]+(\/[0-9]+)?$/.test(t) ? t : `(${t})`);
+// A coefficient before e^(…): '' for 1, '-' for −1, '3', '-2', '(1/2)', '(1-2i)'.
+const coefE = (t) => (t === '1' ? '' : t === '-1' ? '-' : /^-?[0-9]+$/.test(t) ? t : `(${t})`);
 
 const VALS = [1, 2, 3, -1, -2, q(3, 2), q(1, 2)];
 function data(rng) {
@@ -83,7 +85,7 @@ function expText(d) {
     const m = cT(re, im.neg());
     if (p === '0') continue;
     const ik = `${t.k === 1 ? '' : t.k}i x`;
-    parts.push(`${par(p)}e^(${ik})+${par(m)}e^(-${ik})`);
+    parts.push(`${coefE(p)}e^(${ik})+${coefE(m)}e^(-${ik})`);
   }
   return parts.join('+').replace(/\+-/g, '-').replace(/\+\(-/g, '+(-');
 }

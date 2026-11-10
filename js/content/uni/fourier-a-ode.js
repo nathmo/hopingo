@@ -60,7 +60,7 @@ function odeData(rng, level) {
     const Pwrong = (n) => Z(a, n); // delay without (−1)ⁿ
     const lhs = kind === 'first' ? `u'+${a === 1 ? '' : a}u` : kind === 'second' ? `u''+${k}u` : `u'+${a === 1 ? '' : a}u(t-π)`;
     const lhsShow = kind === 'first' ? `u′ + ${a === 1 ? '' : a}u` : kind === 'second' ? `u″ + ${k}u` : `u′(t) + ${a === 1 ? '' : a}u(t − π)`;
-    const Pshow = kind === 'first' ? `in + ${a}` : kind === 'second' ? `${k} − n²` : `in + ${a}(−1)ⁿ`;
+    const Pshow = kind === 'first' ? `in + ${a}` : kind === 'second' ? `${k} − n²` : `in + ${a === 1 ? '' : a}(−1)ⁿ`;
     return { kind, a, k, m, A, B, c0, P, Pwrong, lhs, lhsShow, Pshow };
   }
   return { kind: 'first', a: 1, k: 2, m: 1, A: 0, B: 1, c0: 0, P: (n) => Z(1, n), Pwrong: (n) => Z(1, n), lhs: "u'+u", lhsShow: 'u′ + u', Pshow: 'in + 1', fallback: true };

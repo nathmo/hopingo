@@ -9,7 +9,7 @@
 // integrations by parts of fourier-a-kit.js), the odd terms n = 2k + 1
 // (`equiv` in k), the special index (`value`).
 
-import { MT, H, q, fr, V, P, vAdd, vMul, vScale, vText, vAtN, vOddText, pAt, ipp, ipvWrong, freq, build, COEF, COEFK, atN, KEYS, mcqMulti } from './fourier-a-kit.js';
+import { MT, H, q, fr, mono, Kpre, V, P, vAdd, vMul, vScale, vText, vAtN, vOddText, pAt, ipp, ipvWrong, freq, build, COEF, COEFK, atN, KEYS, mcqMulti } from './fourier-a-kit.js';
 import { examTag } from './kit.js';
 
 const SK = 'f-coef';
@@ -65,10 +65,10 @@ function a0Part(f, level) {
   const { K, Kv } = Kof(f.L);
   const { Lv, Lt } = freq(f.L);
   const pT = f.p.length === 3 ? `${f.c === 1 ? '' : f.c}x^2` : `${f.c === 1 ? '' : f.c}x`;
-  const primT = f.p.length === 3 ? `${f.c === 1 ? '' : f.c}x^3/3` : `${f.c === 1 ? '' : f.c}x^2/2`;
+  const primT = f.p.length === 3 ? mono(q(f.c, 3), 3) : mono(q(f.c, 2), 2);
   const prim = f.p.length === 3 ? P(0, 0, 0, q(f.c, 3)) : P(0, 0, q(f.c, 2));
   const value = vText(vMul(Kv, pAt(prim, Lv)));
-  const Kp = K === '1' ? '' : `(${K}) `;
+  const Kp = Kpre(K);
   const start = `${Kp}int(${pT}, x, 0, ${Lt})`;
   const wrong02 = `(1/${Lt === '1' ? '1' : Lt}) int(${pT}, x, 0, ${f.L === 'π' ? '2π' : 2 * f.L})`;
   return {
@@ -101,7 +101,7 @@ function coefPart(f, level) {
   };
   if (f.L !== 'π') {
     const { Lt } = freq(f.L);
-    const Kp = K === '1' ? '' : `(${K}) `;
+    const Kp = Kpre(K);
     const pT = ch.start.replace(/^.*int\((.*) (sin|cos)\(.*$/, '$1');
     traps.f_period_omega = [{ line: `${Kp}int(${pT} ${trig}(n x), x, 0, ${Lt})`, ctx: { T: String(2 * f.L), omega: f.L === 1 ? 'π' : 'π/2' } }];
   }
@@ -172,7 +172,7 @@ function linesVariant(level, rng, opts, f0) {
   return build({
     skill: SK, level, parts, subgoals: SUB, keys: KEYS, choices: CHOICES,
     prompt: `f est ${T}-périodique et ${f.def}. Calcule ses coefficients de Fourier (convention a₀/2${f.parity === 'odd' ? ', il reste les bₙ' : ''}).`,
-    hints: H(`Parité d'abord : f est ${f.parity === 'even' ? 'paire, donc bₙ = 0 ; a₀ se calcule à part' : 'impaire, donc a₀ = aₙ = 0'}. Puis ${cp.name} = (${Kof(f.L).K === '1' ? '1' : Kof(f.L).K})∫₀^${Lt === 'π' ? 'π' : Lt} … par parties, u = le polynôme.`,
+    hints: H(`Parité d'abord : f est ${f.parity === 'even' ? 'paire, donc bₙ = 0 ; a₀ se calcule à part' : 'impaire, donc a₀ = aₙ = 0'}. Puis ${cp.name} = ${Kpre(Kof(f.L).K).trim()}∫₀^${Lt} … par parties, u = le polynôme.`,
       `${cp.name} = ${MT(cp.start)}`,
       `${MT(cp.lines[0].math)}`),
     key: `${SK}:${level}:${f.id}`, exam: examTag(opts, 5),
@@ -195,7 +195,7 @@ function level5(level, rng, opts) {
   const g0 = vMul(V([[2, -1]]), pAt(g === 'abs' ? P(0, 0, q(c, 2)) : P(0, 0, 0, q(c, 3)), V([[1, 1]])));
   const a0v = vAdd(V([[2 * p]]), g0);
   const a0start = `(2/π) int(${p}+${cosT}+${gT}, x, 0, π)`.replace('+-', '-');
-  const primT = `${p === 1 ? '' : p}x+${qq === 1 ? '' : qq === -1 ? '-' : qq}sin(${m === 1 ? '' : m}x)${m === 1 ? '' : `/${m}`}+${g === 'abs' ? (c === 1 ? 'x^2/2' : `${c}x^2/2`) : (c === 1 ? 'x^3/3' : `${c}x^3/3`)}`.replace('+-', '-');
+  const primT = `${p === 1 ? '' : p}x+${qq === 1 ? '' : qq === -1 ? '-' : qq}sin(${m === 1 ? '' : m}x)${m === 1 ? '' : `/${m}`}+${g === 'abs' ? mono(q(c, 2), 2) : mono(q(c, 3), 3)}`.replace('+-', '-');
   const a0 = {
     html: 'a₀ à part (f est paire : (2/π)∫₀^π) :', ask: 'a₀ =', start: a0start,
     judge: { kind: 'definite', traps: { f_interval_02pi: [{ line: `(1/π) int(${p}+${cosT}+${gT}, x, 0, 2π)`.replace('+-', '-'), ctx: { f: fr(fDisp) } }] } },

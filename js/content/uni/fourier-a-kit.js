@@ -31,6 +31,16 @@ import { judgeFor, readWith } from '../../judges/index.js';
 export { MT, H, modeOf };
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
 export const fr = (s) => String(s).replace(/-/g, '−');
+// c·x^j as text (c rational): 'x^3/3', '3x^2/2', 'x', '2x'.
+export function mono(c, j, v = 'x') {
+  const C = q(c);
+  const xj = j === 0 ? '' : j === 1 ? v : `${v}^${j}`;
+  if (!xj) return String(C);
+  const num = Math.abs(C.n) === 1 ? xj : `${Math.abs(C.n)}${xj}`;
+  return `${C.n < 0 ? '-' : ''}${num}${C.d === 1 ? '' : `/${C.d}`}`;
+}
+// A factor before ∫ or a bracket: '(2/π) ', '2 ', '' for 1.
+export const Kpre = (K) => (!K || K === '1' ? '' : /^\d+$/.test(K) ? `${K} ` : `(${K}) `);
 
 // ---------- values ----------
 
@@ -234,7 +244,8 @@ export function ipp({ K = '', Kv = V([[1]]), p, trig, L }) {
     ? `bracket(${times(pText(vNegP(ps[i])), `cos(${arg})`)}/${A}, x, 0, ${Lt})`
     : `bracket(${times(pText(ps[i]), `sin(${arg})`)}/${A}, x, 0, ${Lt})`);
   const sg = (i) => (trigs[i] === 'sin' ? '+' : '-');
-  const kWrap = (body) => (K && K !== '1' ? `(${K})(${body})` : body);
+  const Kt = /^\d+$/.test(K) ? K : `(${K})`;
+  const kWrap = (body) => (K && K !== '1' ? `${Kt}(${body})` : body);
   // The line once d IPP are done, the last bracket evaluated or not.
   const lineAt = (d, evaluated) => {
     const build = (i) => {
@@ -251,7 +262,7 @@ export function ipp({ K = '', Kv = V([[1]]), p, trig, L }) {
     };
     return build(0);
   };
-  const start = K && K !== '1' ? `(${K}) ${intT(0)}` : intT(0);
+  const start = K && K !== '1' ? `${Kt} ${intT(0)}` : intT(0);
   const lines = [];
   for (let d = 1; d <= depthMax; d++) {
     const i = d - 1;
@@ -308,8 +319,8 @@ function cleanEquiv(judge) {
 }
 
 // The reference lines a judge takes as steps: a line before the last that
-// the judge finds « right, to tidy » is dropped, and one it already finds
-// final ends the part (the judges value and equiv accept (π + 0)/2, or a
+// the judge finds « right, to tidy » or already final is dropped (one
+// marked `keep` ends the part instead) (the judges value and equiv accept (π + 0)/2, or a
 // line without ∫, as an answer).
 function prune(p) {
   const lines = p.lines;
@@ -325,8 +336,9 @@ function prune(p) {
     let v;
     try { v = judgeFor(j).judgeLine(j, prev, l.math, {}); } catch { v = { kind: 'parse' }; }
     if (v.kind === 'ok') { out.push(l); prev = v.node ?? prev; }
-    // Already an answer: it ends the part (its blanks are kept).
-    if (v.kind === 'done') { out.push({ ...l, subgoal: lines[lines.length - 1].subgoal ?? l.subgoal }); stop = true; }
+    // Already an answer: dropped, or it ends the part when it asks so
+    // (keep: its blanks are the point of the line, the Dirichlet mean).
+    if (v.kind === 'done' && l.keep) { out.push({ ...l, subgoal: lines[lines.length - 1].subgoal ?? l.subgoal }); stop = true; }
   });
   return out;
 }
@@ -350,7 +362,6 @@ export function build(o) {
   o.parts.forEach((p0, k) => {
     const p = { ...p0, lines: prune({ ...p0, lines: p0.lines.filter((l) => !(l.from && level < l.from)) }) };
     if (k > 0) script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge: judgeAt(p) });
-    else if (p.html) script.push({ kind: 'note', html: p.html });
     for (const x of p.pre || []) {
       if (x.kind === 'decision') {
         if (x.levels && !x.levels.includes(level)) continue;
@@ -364,6 +375,8 @@ export function build(o) {
         }
       } else if (!x.levels || x.levels.includes(level)) script.push({ kind: 'note', html: x.html });
     }
+    // The first part's heading comes after its decisions (the parity, the formula…).
+    if (k === 0 && p.html) script.push({ kind: 'note', html: p.html });
     const opts = parseOpts(p.judge);
     for (const l of p.lines) {
       if (l.from && level < l.from) continue;

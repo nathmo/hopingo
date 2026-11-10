@@ -126,7 +126,7 @@ function parsevalItem(level, rng, opts) {
   const parts = [lhsPart(d, level)];
   if (d.a0) {
     parts.push({
-      html: `Le terme constant : a₀²/2, avec a₀ = ${sc(d.a0.a0)}.`, ask: 'a₀²/2 =', start: 'T',
+      html: `Le terme constant : a₀²/2, avec a₀ = ${sc(d.a0.a0)}.`, ask: 'a₀²/2 =', start: 'a_0^2/2',
       judge: { kind: 'value', expect: d.a0.value, form: 'closed', traps: { f_parseval_a0: [d.a0.wrong] } },
       lines: [{ math: d.a0.start, note: 'a₀²/2', subgoal: 'rhs', act: 'square', from: 2 }, { math: d.a0.value, note: '', subgoal: 'rhs', act: 'calc', blank: [d.a0.value] }],
     });
@@ -261,11 +261,12 @@ const fixT = (t) => t.replace(/\b1\(-1\)/g, '(-1)').replace(/^1\//, '1/').replac
 function relItem(level, rng, opts) {
   const d = relData(rng);
   const nw = d.w ? 'nπ' : 'n';
+  const nwP = d.w ? '(nπ)' : 'n';
   const pre = [];
-  pre.push(level === 1 ? { kind: 'note', html: `Relation : si h est continue et ${d.T}-périodique, C¹ par morceaux, alors aₙ(h) = −bₙ(h′)/(${nw}).` } : {
+  pre.push(level === 1 ? { kind: 'note', html: `Relation : si h est continue et ${d.T}-périodique, C¹ par morceaux, alors aₙ(h) = −bₙ(h′)/${nwP}.` } : {
     kind: 'decision', prompt: `h = ${d.h} sur ${d.ivl}, h′ = ${d.fShow}. Que vaut aₙ(h) ?`, options: [
-      { id: 'ok', label: `aₙ(h) = −bₙ(h′)/(${nw}) : h est continue (${d.cont.replace(/g/g, 'h')}) et C¹ par morceaux`, valid: true },
-      { id: 'sign', label: `aₙ(h) = bₙ(h′)/(${nw})`, valid: false, why: `Par parties, bₙ(h′) = −${nw}·aₙ(h) : le signe est −.` },
+      { id: 'ok', label: `aₙ(h) = −bₙ(h′)/${nwP} : h est continue (${d.cont.replace(/g/g, 'h')}) et C¹ par morceaux`, valid: true },
+      { id: 'sign', label: `aₙ(h) = bₙ(h′)/${nwP}`, valid: false, why: `Par parties, bₙ(h′) = −${nw}·aₙ(h) : le signe est −.` },
       { id: 'times', label: `aₙ(h) = −${nw}·bₙ(h′)`, valid: false, why: `C'est l'inverse : dériver multiplie par ${nw}, intégrer divise.` },
       { id: 'all', label: 'Recalculer aₙ(h) par parties', valid: true, quality: 'poor', why: 'Juste, mais la relation donne le résultat en une ligne.' },
     ],
@@ -278,12 +279,12 @@ function relItem(level, rng, opts) {
       ],
     });
   }
-  const mT = d.K.eq(1) ? '' : String(d.K);
+  const mT = d.K.eq(1) ? '' : d.K.d === 1 ? String(d.K) : `(${d.K})`;
   const parts = [
     {
       html: `Avec h = ${d.h} (h′ = ${d.fShow}, bₙ(h′) = ${d.bfShow}) :`, ask: 'aₙ(h) =', start: 'a_n',
       judge: { kind: 'prob', vars: ['n'], domain: { n: { int: [1, 40] } }, expect: d.ah, label: 'a_n' }, pre,
-      lines: [{ math: fixT(d.ah), note: `−bₙ(h′)/(${nw})`, subgoal: 'relation', act: 'rel' }],
+      lines: [{ math: fixT(d.ah), note: `−bₙ(h′)/${nwP}`, subgoal: 'relation', act: 'rel' }],
     },
   ];
   if (!d.K.eq(1)) {
@@ -300,7 +301,7 @@ function relItem(level, rng, opts) {
   return build({
     skill: SKR, level, parts, subgoals: SUBR, keys: KEYS, choices: CHR,
     prompt: `f(x) = ${d.fShow} sur ${d.ivl}, ${d.T}-périodique, a pour coefficients aₙ = 0, bₙ = ${d.bfShow}. Sans recalculer d'intégrale par parties, donne les coefficients de g(x) = ${d.g} sur ${d.ivl} (prolongée par périodicité).`,
-    hints: H(`Par parties, aₙ(h) = −bₙ(h′)/(${nw}) pour h continue et périodique ; puis la constante entre h et g ; a₀ à part.`, `aₙ(h) = −(${MT(d.bf)})/(${nw})`, `aₙ(h) = ${MT(d.ah)}`),
+    hints: H(`Par parties, aₙ(h) = −bₙ(h′)/${nwP} pour h continue et périodique ; puis la constante entre h et g ; a₀ à part.`, `aₙ(h) = −(${MT(d.bf)})/${nwP}`, `aₙ(h) = ${MT(d.ah)}`),
     key: `${SKR}:${level}:${d.kind}:${d.m}`, exam: examTag(opts, 4),
   });
 }

@@ -8,7 +8,7 @@
 // problem as one item with hints; level 5 and the exam: a `problem` of
 // 9 points (a: 3 + 1, b: 2, c: 2 + 1).
 
-import { MT, H, fr, build, COEFK, KEYS } from './fourier-a-kit.js';
+import { MT, H, fr, q, V, vText, build, COEFK, KEYS } from './fourier-a-kit.js';
 import { problemItem } from './kit-problem.js';
 import { examTag } from './kit.js';
 import { famOf, sineParts, formulaDecision, SINE_CHOICES } from './fourier-a-sine.js';
@@ -29,19 +29,26 @@ const CHOICES = [
 const Cπ = (c, t = 'π') => (c === 1 ? t : `${c}${t}`);
 
 // The data of part (c): f(π/2), the term at π/2 for n = 2k + 1, the sum.
+// c·π^e/d reduced, for the CAS (PQ) and the screen (sh).
+const PQ = (num, den, e = 0) => vText(V([[q(num, den), e]]));
+const sh = (t) => fr(t).replace(/\^2/g, '²');
+
 function partC(f, oddGoal) {
   const c = f.c;
   if (f.kind === 'xpx') {
-    return { fpi2: `${Cπ(c, 'π^2')}/4`, term: `${8 * c}(-1)^k/(π (2k+1)^3)`, eq: `${fr(Cπ(c, 'π²'))}/4 = (${8 * c}/π)S`, S: 'π^3/32', Sshow: 'Σ<sub>k≥0</sub> (−1)ᵏ/(2k + 1)³', solve: `(${Cπ(c, 'π^2')}/4)(π/${8 * c})`, oddGoal };
+    const v = PQ(c, 4, 2);
+    return { fpi2: v, term: `${8 * c}(-1)^k/(π (2k+1)^3)`, eq: `${sh(v)} = (${8 * c}/π)S`, S: 'π^3/32', Sshow: 'Σ<sub>k≥0</sub> (−1)ᵏ/(2k + 1)³', solve: `(${v})(π/${8 * c})`, oddGoal };
   }
   if (f.kind === 'quad2') {
+    const v = PQ(3 * c, 4, 2);
+    const w = PQ(2 * c, 4, 2);
     return {
-      fpi2: `${Cπ(3 * c, 'π^2')}/4`, term: `${c === 1 ? '' : c}(-1)^k(2π/(2k+1)+8/(π (2k+1)^3))`,
-      eq: `${fr(Cπ(3 * c, 'π²'))}/4 = ${fr(Cπ(2 * c))}·(π/4) + (${8 * c}/π)S`, given: 'On donne Σ<sub>k≥0</sub> (−1)ᵏ/(2k + 1) = π/4.',
-      S: 'π^3/32', Sshow: 'Σ<sub>k≥0</sub> (−1)ᵏ/(2k + 1)³', solve: `(${Cπ(3 * c, 'π^2')}/4-${Cπ(2 * c, 'π^2')}/4)(π/${8 * c})`, oddGoal,
+      fpi2: v, term: `${c === 1 ? '' : c}(-1)^k(2π/(2k+1)+8/(π (2k+1)^3))`,
+      eq: `${sh(v)} = ${sh(PQ(2 * c, 1, 1))}·(π/4) + (${8 * c}/π)S`, given: 'On donne Σ<sub>k≥0</sub> (−1)ᵏ/(2k + 1) = π/4.',
+      S: 'π^3/32', Sshow: 'Σ<sub>k≥0</sub> (−1)ᵏ/(2k + 1)³', solve: `(${v}-${w})(π/${8 * c})`, oddGoal,
     };
   }
-  return { fpi2: Cπ(c), term: `${8 * c}/(π (2k+1)^2)`, eq: `${fr(Cπ(c))} = (${8 * c}/π)S`, S: 'π^2/8', Sshow: 'Σ<sub>k≥0</sub> 1/(2k + 1)²', solve: `${Cπ(c)}π/${8 * c}`, oddGoal };
+  return { fpi2: Cπ(c), term: `${8 * c}/(π (2k+1)^2)`, eq: `${sh(Cπ(c))} = (${8 * c}/π)S`, S: 'π^2/8', Sshow: 'Σ<sub>k≥0</sub> 1/(2k + 1)²', solve: `(${Cπ(c)})(π/${8 * c})`, oddGoal };
 }
 
 function pickF(rng) {

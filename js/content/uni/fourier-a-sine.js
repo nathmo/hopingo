@@ -10,7 +10,7 @@
 // odd terms n = 2k + 1 when the even ones vanish. The families and their
 // parts are shared with f-series-problem (fourier-a-problem.js).
 
-import { MT, H, q, fr, V, P, vMul, vScale, vText, vZero, vEven, pAt, ipp, ipvWrong, freq, build, COEF, COEFK, atN, kText, vOddText, KEYS, mcqMulti } from './fourier-a-kit.js';
+import { MT, H, q, fr, mono, V, P, vMul, vScale, vText, vZero, vEven, pAt, ipp, ipvWrong, freq, build, COEF, COEFK, atN, kText, vOddText, KEYS, mcqMulti } from './fourier-a-kit.js';
 import { examTag } from './kit.js';
 
 const SK = 'f-sine-cosine';
@@ -58,7 +58,7 @@ export function famOf(kind, c, L) {
 }
 
 const Kof = (L) => (L === 'π' ? { K: '2/π', Kv: V([[2, -1]]) } : L === 1 ? { K: '2', Kv: V([[2]]) } : { K: '1', Kv: V([[1]]) });
-const Kp = (K) => (K === '1' ? '' : `(${K}) `);
+const Kp = (K) => (K === '1' ? '' : /^\d+$/.test(K) ? `${K} ` : `(${K}) `);
 
 // bₙ of the sine series: {start, lines: [{math, act, piece?}], goal, value?, odd: {start, goal} | null, traps}.
 export function sineCoef(f) {
@@ -128,20 +128,20 @@ export function sineParts(f, { level, sub = { formula: 'formula', ipp: 'ipp', as
 export function formulaDecision(f, kind = 'sin') {
   const Lt = f.Lt;
   const arg = f.L === 'π' ? 'nx' : f.L === 1 ? 'nπx' : 'nπx/2';
-  const K = f.L === 'π' ? '2/π' : f.L === 1 ? '2' : '1';
-  const half = f.L === 'π' ? '1/π' : f.L === 1 ? '1' : '1/2';
+  const K = f.L === 'π' ? '(2/π)' : f.L === 1 ? '2' : '';
+  const half = f.L === 'π' ? '(1/π)' : f.L === 1 ? '' : '(1/2)';
   if (kind === 'sin') {
     return { kind: 'decision', prompt: 'Série en sinus : quelle formule ?', options: [
-      { id: 'ok', label: `Prolongement impair : bₙ = (${K})∫₀^${Lt} f(x) sin(${arg}) dx`, valid: true },
-      { id: 'half', label: `bₙ = (${half})∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: `Le prolongement impair a la période ${f.L === 'π' ? '2π' : 2 * f.L} : sur [−${Lt} ; ${Lt}], f(x) sin(${arg}) est paire, l'intégrale vaut deux fois celle sur [0 ; ${Lt}]. Le facteur est 2/L.` },
-      { id: 'cos', label: `aₙ = (${K})∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, why: 'C\'est la série en cosinus (prolongement pair). La série en sinus n\'a que des bₙ.' },
+      { id: 'ok', label: `Prolongement impair : bₙ = ${K}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: true },
+      { id: 'half', label: `bₙ = ${half}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: `Le prolongement impair a la période ${f.L === 'π' ? '2π' : 2 * f.L} : sur [−${Lt} ; ${Lt}], f(x) sin(${arg}) est paire, l'intégrale vaut deux fois celle sur [0 ; ${Lt}]. Le facteur est 2/L.` },
+      { id: 'cos', label: `aₙ = ${K}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, why: 'C\'est la série en cosinus (prolongement pair). La série en sinus n\'a que des bₙ.' },
       ...(f.L === 'π' ? [{ id: 'twopi', label: 'bₙ = (1/π)∫₀^2π f(x) sin(nx) dx', valid: false, rule: 'f_interval_02pi', why: 'f n\'est donnée que sur [0 ; π] : sur ]π ; 2π[, le prolongement impair vaut −f(2π − x), pas la formule de f.' }] : []),
     ] };
   }
   return { kind: 'decision', prompt: 'Série en cosinus : quelle formule ?', options: [
-    { id: 'ok', label: `Prolongement pair : a₀ et aₙ = (${K})∫₀^${Lt} f(x) cos(${arg}) dx`, valid: true },
-    { id: 'half', label: `aₙ = (${half})∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: 'Le prolongement pair double l\'intégrale sur [0 ; L] : le facteur est 2/L.' },
-    { id: 'sin', label: `bₙ = (${K})∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, why: 'C\'est la série en sinus (prolongement impair). La série en cosinus n\'a que a₀ et des aₙ.' },
+    { id: 'ok', label: `Prolongement pair : a₀ et aₙ = ${K}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: true },
+    { id: 'half', label: `aₙ = ${half}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: 'Le prolongement pair double l\'intégrale sur [0 ; L] : le facteur est 2/L.' },
+    { id: 'sin', label: `bₙ = ${K}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, why: 'C\'est la série en sinus (prolongement impair). La série en cosinus n\'a que a₀ et des aₙ.' },
   ] };
 }
 
@@ -154,7 +154,7 @@ function cosineParts(f, level) {
   const prim = [V(), ...f.p.map((c, j) => vScale(c, q(1, j + 1)))];
   const a0 = vText(vMul(Kv, pAt(prim, Lv)));
   const pT = { x: cx(f.c, 'x'), x2: `${f.c === 1 ? '' : f.c}x^2`, xpx: `${f.c === 1 ? '' : f.c}x(${f.Lt}-x)` }[f.kind];
-  const primT = { x: `${f.c === 1 ? '' : f.c}x^2/2`, x2: `${f.c === 1 ? '' : f.c}x^3/3`, xpx: `${f.c === 1 ? '' : f.c}(${f.Lt}x^2/2-x^3/3)` }[f.kind];
+  const primT = { x: mono(q(f.c, 2), 2), x2: mono(q(f.c, 3), 3), xpx: `${f.c === 1 ? '' : f.c}(${f.Lt}x^2/2-x^3/3)` }[f.kind];
   const ch = ipp({ K, Kv, p: f.p, trig: 'cos', L: f.L });
   const goal = vText(ch.value);
   const lines = ch.lines.map((l, i) => {
