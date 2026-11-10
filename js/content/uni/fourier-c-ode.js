@@ -132,7 +132,7 @@ function odeData(rng, level) {
       if (fam === 'double') roots = [{ p: cq(rng.int(-3, -1)), m: 2 }];
       if (fam === 'cplx') { const a = rng.pick([0, -1, -2]); const b = rng.pick([1, 2]); roots = [{ p: cq(a, b), m: 1 }, { p: cq(a, -b), m: 1 }]; }
       const kind = rng.pick(['const', 'exp', 'exp', 'cos', 'const']);
-      rhs = kind === 'const' ? { kind, k: rng.pick([1, 2, 3, 4, 6]) } : kind === 'exp' ? { kind, k: rng.pick([1, 2, 3, -2, 4]), c: rng.int(-3, 2) } : { kind, k: rng.pick([1, 2, 3]), w: rng.pick([1, 2]) };
+      rhs = kind === 'const' ? { kind, k: rng.pick([1, 2, 3, 4, 6]) } : kind === 'exp' ? { kind, k: rng.pick([1, 2, 3, -2, 4]), c: rng.pick([-3, -2, -1, 1, 2]) } : { kind, k: rng.pick([1, 2, 3]), w: rng.pick([1, 2]) };
       ics = [rng.int(-2, 2), rng.int(-2, 2)];
       // No resonance in the lessons: the poles of the right side are not roots.
       const rp = rhs.kind === 'const' ? [cq(0)] : rhs.kind === 'exp' ? [cq(rhs.c)] : [cq(0, rhs.w)];
@@ -256,8 +256,8 @@ function integroItem(level, rng, opts) {
   const U = `(${sumT([term(d.A, 'z'), String(d.B * d.w)])})/(z^2+${d.w * d.w})`;
   const u = sumT([term(d.A, `cos(${term(d.w, 't')})`), term(d.B, `sin(${term(d.w, 't')})`)]);
   const eq = `${sumT(['zU', String(-d.A), term(d.a, 'U'), `${d.c}U/${zMinus(d.a)}`])}=${d.K}/${zMinus(d.a)}`;
-  const aT = d.a === 1 ? '' : d.a === -1 ? '−' : rd(d.a);
-  const html = `u′(t) ${d.a > 0 ? '+' : '−'} ${Math.abs(d.a) === 1 ? '' : Math.abs(d.a)}u(t) + ${d.c} ∫₀ᵗ u(s) e^(${aT}(t − s)) ds = ${rd(d.K)}e^(${aT}t), u(0) = ${rd(d.A)}`;
+  const kHtml = d.a === 1 ? 'e^(t − s)' : d.a === -1 ? 'e^(−(t − s))' : `e^(${rd(d.a)}(t − s))`;
+  const html = `u′(t) ${d.a > 0 ? '+' : '−'} ${Math.abs(d.a) === 1 ? '' : Math.abs(d.a)}u(t) + ${d.c} ∫₀ᵗ u(s) ${kHtml} ds = ${rd(term(d.K, expA(d.a)))}, u(0) = ${rd(d.A)}`;
   const parts = [
     {
       html: null, start: `ℒ(${expA(d.a)})`, judge: lap({ f: expA(d.a), F: kern, traps: { f_lap_integro_kernel: [`1/${zMinus(-d.a)}`] } }),
@@ -338,14 +338,14 @@ function residueParts(o, level) {
   const zb = String(-o.B);
   return [
     {
-      html: `Résidu de Y(z)e^(zt) en z = ${rd(za)} (pôle simple) :`, ask: 'Res =', start: `Res(${za})`, judge: lapres({ value: ra, z0: za }),
+      html: `Résidu de Y(z)e^(zt) en z = ${rd(za)} (pôle simple) :`, ask: 'Res =', start: `Res(${rd(za)})`, judge: lapres({ value: ra, z0: za }),
       lines: [
         { math: `${numT(o.N)}e^(z t)/${zpow(cq(-o.B), 2)}`, note: `(z ${'+'} ${o.A})Y(z)e^(zt) en z = ${rd(za)}`, subgoal: 'residues' },
         { math: ra, note: 'Calculer', subgoal: 'residues', blank: [ra] },
       ],
     },
     {
-      html: `Résidu en z = ${rd(zb)} (pôle double) :`, ask: 'Res =', start: `Res(${zb})`, judge: lapres({ value: rb, z0: zb }),
+      html: `Résidu en z = ${rd(zb)} (pôle double) :`, ask: 'Res =', start: `Res(${rd(zb)})`, judge: lapres({ value: rb, z0: zb }),
       decisions: [{ kind: 'decision', prompt: 'Quelle formule ?', levels: [2, 3, 4], options: [
         { id: 'double', label: 'd/dz[(z − z₀)²Y(z)e^(zt)] en z₀', valid: true },
         { id: 'simple', label: 'lim (z − z₀)Y(z)e^(zt) quand z → z₀', valid: false, rule: 'c_simple_formula_double', why: `${rd(zb)} est un pôle double : la formule du pôle simple donne une limite infinie.` },
@@ -402,20 +402,25 @@ const SUBP = [
 ];
 
 // The arc of Bromwich in blocks (2 points), with a decoy of c_arc_triangle.
-function arcBlocks(o, level, opts) {
+function arcBlocks(o, level, opts, rng) {
   const den = factorsText(o.poles);
+  const CR = 'C<sub>R</sub>';
+  const E = (x) => `e<sup>${x}</sup>`;
+  const INT = '∫<sub>π/2</sub><sup>3π/2</sup>';
   const blocks = [
-    { id: 'param', html: 'Sur l\'arc gauche C_R : z = γ + Re^(iθ), θ ∈ [π/2 ; 3π/2], avec γ &gt; γ₀.', needs: [] },
-    { id: 'exp', html: '|e^(zt)| = e^(γt) e^(tR cos θ), et cos θ ≤ 0 sur l\'arc.', needs: ['param'] },
-    { id: 'Y', html: `Sur l'arc, chaque facteur de ${rd(den)} vérifie |z + a| ≥ |z| − |a| (inégalité triangulaire inverse) : le dénominateur a un degré de plus que le numérateur, donc |Y(z)| ≤ C/R pour R grand.`, needs: ['param'] },
-    { id: 'bound', html: '|∫_(C_R) Y(z)e^(zt) dz| ≤ (C/R) · e^(γt) · R ∫_(π/2)^(3π/2) e^(tR cos θ) dθ.', needs: ['exp', 'Y'] },
-    { id: 'jordan', html: 'Jordan : ∫_(π/2)^(3π/2) e^(tR cos θ) dθ ≤ π/(tR), donc la borne vaut πC e^(γt)/(tR) → 0 quand R → ∞ (t &gt; 0).', needs: ['bound'] },
-    { id: 'decoy', html: 'Sur l\'arc, |z + a| ≤ |z| + |a|, donc 1/|z + a| ≤ 1/(|z| + |a|) et |Y(z)| ≤ C/R.', needs: [], distractor: 'c_arc_triangle', why: 'Pour majorer |Y|, on minore son dénominateur (|z + a| ≥ R − |a|) : une majoration du dénominateur ne borne pas |Y|.' },
+    { id: 'param', html: `Sur l'arc gauche ${CR} : z = γ + R${E('iθ')}, θ ∈ [π/2 ; 3π/2], avec γ &gt; γ₀.`, needs: [] },
+    { id: 'exp', html: `|${E('zt')}| = ${E('γt')}${E('tR cos θ')}, et cos θ ≤ 0 sur l'arc.`, needs: ['param'] },
+    { id: 'Y', html: `Chaque facteur de ${rd(den)} vérifie |z + a| ≥ |z| − |a| (inégalité triangulaire inverse) ; le dénominateur a un degré de plus que le numérateur : |Y(z)| ≤ C/R pour R grand.`, needs: ['param'] },
+    { id: 'bound', html: `|∫<sub>${CR}</sub> Y(z)${E('zt')} dz| ≤ (C/R) · ${E('γt')} · R ${INT} ${E('tR cos θ')} dθ.`, needs: ['exp', 'Y'] },
+    { id: 'jordan', html: `Jordan : ${INT} ${E('tR cos θ')} dθ ≤ π/(tR), donc la borne vaut πC${E('γt')}/(tR) → 0 quand R → ∞ (t &gt; 0).`, needs: ['bound'] },
+    { id: 'decoy', html: 'Sur l’arc, |z + a| ≤ |z| + |a|, donc 1/|z + a| ≤ 1/(|z| + |a|) et |Y(z)| ≤ C/R.', needs: [], distractor: 'c_arc_triangle', why: 'Pour majorer |Y|, on minore son dénominateur (|z + a| ≥ R − |a|) : une majoration du dénominateur ne borne pas |Y|.' },
   ];
+  const order = ['param', 'exp', 'Y', 'bound', 'jordan'];
   return blocksItem({
     skill: SKP, level, mode: 'order',
     prompt: 'Montre que l\'intégrale de Y(z)e^(zt) sur l\'arc gauche C_R du contour de Bromwich tend vers 0 quand R → ∞ (t > 0). Touche les blocs dans l\'ordre.',
-    blocks, goal: 'jordan', order: ['param', 'exp', 'Y', 'bound', 'jordan'],
+    blocks: rng.shuffle(blocks), goal: 'jordan', order,
+    solution: order.map((id) => ({ html: blocks.find((x) => x.id === id).html, note: '' })),
     hints: [], noHints: true,
     subgoals: [{ id: 'arc', label: 'arc de Bromwich', skill: 'c-arc-estimate' }],
     key: `${o.id}:arc`, exam: opts.exam ? examTag(opts, 2) : false,
@@ -439,7 +444,7 @@ function problemFull(level, rng, opts) {
     skill: SKP, level, prompt: item.prompt,
     parts: [
       { item: relines(fix(first)), points: [4, 1, 2], title: 'Transformée, Y et résidus' },
-      { item: arcBlocks(o, level, opts), points: 2, title: 'Arc de Bromwich' },
+      { item: arcBlocks(o, level, opts, rng), points: 2, title: 'Arc de Bromwich' },
       { item: relines(fix(last)), points: 1, title: 'Solution et vérification' },
     ],
     key: o.id, exam: opts.exam ? examTag(opts, 10) : false, expectedSec: 1500, fallback: o.fallback,

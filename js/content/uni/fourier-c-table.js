@@ -126,7 +126,7 @@ function tDelay(rng) {
   const b = rng.pick([-2, -1, 1, 2, 3]);
   const w = rng.int(1, 4);
   const s = `t-${a}`;
-  const f = `H(${s})e^(${b === 1 ? '' : b === -1 ? '-' : b}(${s}))sin(${w === 1 ? '' : w}(${s}))`;
+  const f = `H(${s})e^(${b === 1 ? s : b === -1 ? `-(${s})` : `${b}(${s})`})sin(${w === 1 ? s : `${w}(${s})`})`;
   const F = `${w}e^(-${a === 1 ? '' : a}z)/(${zs(b)}^2+${w * w})`;
   return {
     id: `delay:${a}:${b}:${w}`, kind: 'delay', f, F, g0: b, a, b, w,
@@ -147,6 +147,7 @@ function data(rng, kinds) {
 const fHtml = (d) => MT(d.f.replace(/H\(/g, 'H('), { funcs: ['H'] });
 const promptOf = (d) => `Calcule la transformée de Laplace F(z) de ${d.kind === 'delay' ? `${MT(`${ex(d.b)}sin(${wt(d.w)})`)} retardée de ${d.a}, f(t) = ${fHtml(d)} (H : Heaviside),` : `f(t) = ${fHtml(d)}`} et donne le demi-plan où elle existe.${TABLE()}`;
 const halfLine = (g) => `Re z > ${g}`;
+const lignes = (ls) => { const u = [...new Set(ls)]; return `${u.length > 1 ? 'Lignes' : 'Ligne'} ${u.join(' et ')}`; };
 
 // ---------- lines ----------
 
@@ -183,14 +184,14 @@ function propItem(level, d, opts) {
   const parts = [
     {
       start: `ℒ(${d.inner})`, judge: lap({ f: d.inner, F: d.G }),
-      notes: level === 1 ? [`Lignes ${d.lines.join(' et ')} de la table.`] : [],
+      notes: level === 1 ? [`${lignes(d.lines)} de la table.`] : [],
       decisions: [{
         kind: 'decision', prompt: 'Que fait-on d\'abord ?', levels: [2, 3], options: [
           { id: 'inner', label: `Transformer ${rd(d.inner)} avec la table`, valid: true },
           { id: 'direct', label: 'Calculer l\'intégrale ∫₀^∞ f(t)e^(−tz) dt directement', valid: true, quality: 'poor', why: 'Juste, mais la table et les propriétés vont beaucoup plus vite.' },
         ],
       }],
-      lines: [{ math: d.G, note: `Table : ${d.lines.join(', ')}`, subgoal: 'table', blank: (d.G.match(/\d+/g) || []).filter((x) => x.length > 1 || Number(x) > 2).slice(0, 2), blank2: [d.G] }],
+      lines: [{ math: d.G, note: `Table : ${[...new Set(d.lines)].join(', ')}`, subgoal: 'table', blank: (d.G.match(/\d+/g) || []).filter((x) => x.length > 1 || Number(x) > 2).slice(0, 2), blank2: [d.G] }],
     },
     {
       html: d.kind === 'shift' ? 'Puis le décalage :' : d.kind === 'delay' ? 'Puis le retard :' : 'Puis la propriété :', ask: 'F(z) =', start: 'F(z)',
@@ -198,7 +199,7 @@ function propItem(level, d, opts) {
       notes: level === 1 ? [d.prop] : [],
       decisions: level >= 2 ? [{ ...propertyDecision(d), levels: [2, 3] }] : [],
       lines: [
-        { math: halfLine(d.g0), note: d.kind === 'shift' ? `e^(${d.b}t) déplace l'abscisse de ${d.b}` : 'Même abscisse que g', subgoal: 'abscissa' },
+        { math: halfLine(d.g0), note: d.kind === 'shift' ? `${rd(ex(d.b))} déplace l'abscisse de ${rd(d.b)}` : 'Même abscisse que g', subgoal: 'abscissa' },
         { math: `F(z) = ${d.F}`, note: d.kind === 'shift' ? 'LP4' : d.kind === 'delay' ? 'LP7' : 'LP5 : −G′(z)', subgoal: 'property', blank: d.kind === 'shift' ? [d.shiftBlank, d.shiftBlank] : [d.F], blank2: [d.F] },
       ],
     },
@@ -215,7 +216,7 @@ function directItem(level, d, opts) {
   const lines = [];
   if (d.kind === 'square') lines.push({ math: `f(t) = ${d.expanded}`, note: 'Développer le carré', subgoal: 'expand' });
   lines.push({ math: halfLine(d.g0), note: d.kind === 'sum' ? 'Le maximum des abscisses des termes' : 'Abscisse', subgoal: 'abscissa' });
-  lines.push({ math: `F(z) = ${d.F}`, note: d.kind === 'delay' ? 'Retard (LP7) : e^(−az)G(z)' : `Lignes ${d.lines.join(', ')}`, subgoal: d.kind === 'delay' ? 'property' : 'table' });
+  lines.push({ math: `F(z) = ${d.F}`, note: d.kind === 'delay' ? 'Retard (LP7) : e^(−az)G(z)' : `${lignes(d.lines)}`, subgoal: d.kind === 'delay' ? 'property' : 'table' });
   const traps = d.wrong ? Object.fromEntries(Object.entries(d.wrong).filter(([k]) => k.startsWith('f_')).map(([k, v]) => [k, [v]])) : {};
   const judge = lap({ f: d.f, F: d.F, gamma0: d.g0, halfPlane: true, traps });
   return partsItem({

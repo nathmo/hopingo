@@ -209,7 +209,8 @@ const polesText = (poles) => poles.map((x) => `z = ${zText(x.p)}`).join(' ou ');
 function stripped(d, x) {
   const others = d.poles.filter((y) => !y.p.eq(x.p));
   const num = deg(d.N) > 0 ? `(${zpoly(d.N)})` : zpoly(d.N) === '1' ? '' : zpoly(d.N);
-  return `${num}e^(z t)/(${factorsText(others)})`.replace(/^e/, 'e');
+  const den = factorsText(others);
+  return `${num}e^(z t)/${/^\([^()]*\)(\^\d)?$/.test(den) || /^z(\^\d)?$/.test(den) ? den : `(${den})`}`;
 }
 
 function resItem(level, rng, opts) {
@@ -228,7 +229,7 @@ function resItem(level, rng, opts) {
     const formula = x.m === 1 ? stripped(d, x) : `d(${stripped(d, x)}, z)`;
     const z0 = zText(x.p);
     parts.push({
-      html: `Résidu de F(z)e^(zt) en z = ${rd(z0)} (pôle ${x.m === 1 ? 'simple' : 'double'}) :`, ask: 'Res =', start: `Res(${z0})`,
+      html: `Résidu de F(z)e^(zt) en z = ${rd(z0)} (pôle ${x.m === 1 ? 'simple' : 'double'}) :`, ask: 'Res =', start: `Res(${rd(z0)})`,
       judge: lapres({ value, z0 }),
       notes: level === 1 ? [x.m === 1 ? 'Pôle simple : (z − z₀)F(z)e^(zt), pris en z₀.' : 'Pôle double : d/dz[(z − z₀)²F(z)e^(zt)], pris en z₀.'] : [],
       decisions: x.m === 2 ? [{ kind: 'decision', prompt: 'Quelle formule ?', levels: [2, 3], options: [

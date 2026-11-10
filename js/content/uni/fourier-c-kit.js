@@ -16,7 +16,7 @@ export const H = (a, b, c) => [{ level: 1, html: a }, { level: 2, html: b }, { l
 export const modeOf = (level) => (level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free');
 export const KEYS = ['calc', 'transf', 'calcfn', 'calcx', 'cplx'];
 // Readable text: − for -, spaces around + and =.
-export const rd = (t) => String(t).replace(/\s*([+=])\s*/g, ' $1 ').replace(/([^(\s^,;])\s*-\s*/g, '$1 − ').replace(/-/g, '−').replace(/\^2(?![0-9])/g, '²').replace(/\^3(?![0-9])/g, '³').replace(/\^4(?![0-9])/g, '⁴');
+export const rd = (t) => String(t).replace(/\s*([+=])\s*/g, ' $1 ').replace(/([^(\s^,;=])\s*-\s*/g, '$1 − ').replace(/-/g, '−').replace(/\^2(?![0-9])/g, '²').replace(/\^3(?![0-9])/g, '³').replace(/\^4(?![0-9])/g, '⁴');
 export const TABLE = () => laplaceTableHtml();
 
 // ---------- polynomials over ℚ(i) (lowest degree first) ----------
@@ -117,7 +117,7 @@ export function fracT(c, den) {
   return x.d === 1 ? `${x.n}/${den}` : `${x.n}/(${x.d}${den})`;
 }
 // c·(body) with an explicit product: 'body', '-body', '3×body', '(1/2)×body'.
-export const timesT = (c, body) => { const x = q(c); if (x.eq(1)) return body; if (x.eq(-1)) return `-${body}`; return x.d === 1 ? `${x.n}×${body}` : `(${qt(x)})×${body}`; };
+export const timesT = (c, body) => { const x = q(c); if (x.eq(1)) return body; if (x.eq(-1)) return `-${body}`; if (x.d === 1) return /^\(\d/.test(body) ? `${x.n}×${body}` : `${x.n}${body}`; return `(${qt(x)})×${body}`; };
 
 // The inverse transform of the partial fractions (one function of t),
 // real: conjugate pairs give e^(at)(A cos bt + B sin bt).
@@ -170,13 +170,13 @@ export function pfdText(parts, { table = false } = {}) {
       const A = cj.re.mul(2);
       const B = cj.im.mul(-2);
       if (table) {
-        if (A.n) terms.push(timesT(A, `(${a.n === 0 ? 'z' : zp(a)})/(${den})`));
-        if (B.n) terms.push(timesT(B, `(${qt(b)}/(${den}))`));
+        if (A.n) terms.push(timesT(A, `${a.n === 0 ? 'z' : `(${zp(a)})`}/(${den})`));
+        if (B.n) terms.push(B.eq(1) || B.eq(-1) ? `${B.n < 0 ? '-' : ''}${qt(b)}/(${den})` : timesT(B, `(${qt(b)}/(${den}))`));
         return;
       }
       // numerator A(z − a) + B·b = A z + (B b − A a).
       const num = zpoly([C(B.mul(b).sub(A.mul(a))), C(A)]);
-      terms.push(A.n === 0 ? `${num}/(${den})` : `(${num})/(${den})`);
+      terms.push(!/[+-]/.test(num.slice(1)) ? `${num}/(${den})` : `(${num})/(${den})`);
     });
   }
   return sumT(terms);
