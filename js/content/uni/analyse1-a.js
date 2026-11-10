@@ -25,8 +25,6 @@ import { MT, MM, linesItem, mcq, tfItem } from './kit.js';
 import { N, modeOf, H, E, examOf, uniqOptions, blanked, boxed, withMenus, segment, frN, vfMcq, hasSum, mulT, fracT } from './analyse1-a-kit.js';
 import { GEN as INV } from './analyse1-a-inv.js';
 import { GEN as C1 } from './analyse1-a-c1.js';
-import { stubGen } from './stub.js';
-import { SKILLS } from './analyse1-a.skills.js';
 
 // ======================================================================
 // a1-deriv-def
@@ -525,7 +523,6 @@ function derivRules(level, rng, profile, opts = {}) {
 }
 
 export const GEN = {
-  ...stubGen(SKILLS.map((s) => s.id)),
   [DEF]: derivDef,
   [RUL]: derivRules,
   ...INV,
