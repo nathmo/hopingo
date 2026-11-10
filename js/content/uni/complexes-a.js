@@ -12,16 +12,14 @@
 // n-th roots). opts.exam = 'mcq' | 'tf' | 'coef' | 'open' gives the exam
 // variants.
 
-import { Q } from '../../math/rational.js';
 import { CQ } from '../../cas/complex.js';
 import { linesItem, mcq, tfItem, answerItem, examTag } from './kit.js';
 import {
-  q, nz, modeOf, H, E, partsScript, M, fr, frs, ALG, EXP, ARG, ASK, KEYS, Sd, cz, czText, czExact, cqText,
+  q, nz, modeOf, H, E, partsScript, M, fr, frs, ALG, EXP, ARG, ASK, KEYS, Sd, cz, czText, cqText,
   cosT, sinT, polarToCz, principalT, piT, iPiT, expText, trigText, unitText, options, clean, bl, cq, iT, joinT, par,
 } from './complexes-a-kit.js';
 import { GEN as ROOTS } from './complexes-a-roots.js';
 
-const sq = (x) => x * x;
 const n2 = (z) => z.abs2().valueOf();
 const zt = cqText;
 
@@ -770,4 +768,3 @@ export const GEN = {
   ...ROOTS,
 };
 
-void Q; void czExact; void sq;

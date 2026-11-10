@@ -10,12 +10,11 @@
 // roots written r·e^(iθ) and asks for their algebraic form. The arguments
 // nθ = φ + 2kπ are a `solset` part in θ with k.
 
-import { CQ } from '../../cas/complex.js';
 import { linesItem, mcq, tfItem, answerItem, examTag } from './kit.js';
 import { problemItem } from './kit-problem.js';
 import {
-  q, nz, modeOf, H, E, partsScript, M, fr, frs, ALG, EXP, ASK, SET, KEYS, KEYS_SET, Sd, cz, czText, czAdd, czExact, cqText,
-  polarToCz, principalT, piT, expText, trigText, unitText, isNiceAngle, options, clean, bl, cq, iT, joinT, termsOf, par,
+  q, nz, modeOf, H, E, partsScript, M, fr, frs, ALG, EXP, ASK, SET, Sd, cz, czText, czAdd, czExact, cqText,
+  polarToCz, principalT, piT, expText, trigText, unitText, isNiceAngle, options, clean, bl, cq, joinT, termsOf, par,
 } from './complexes-a-kit.js';
 
 const zt = cqText;
@@ -596,4 +595,3 @@ export const GEN = {
   },
 };
 
-void CQ; void bl; void iT; void cz; void trigText;

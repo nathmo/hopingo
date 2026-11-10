@@ -13,14 +13,11 @@
 
 import { parse } from '../parse.js';
 import { walk, replaceAt, stripParen, contains, mapNode, num, sym, lit, mul, cst, neg as negN } from '../ast.js';
-import { toMathML } from '../mathml.js';
 import { toText } from '../print.js';
-import { exactComplex, evalComplex, complexValue, CQ, cText, cabs, carg, cpow, C, cadd, cmul } from '../complex.js';
+import { exactComplex, evalComplex, CQ, cText, cabs, carg, cpow, C, cadd, cmul } from '../complex.js';
 import { polyOf, qCoeffs } from '../polyx.js';
 import { Q } from '../../math/rational.js';
 
-const CPX = { complex: true };
-const M = (n) => toMathML(stripParen(typeof n === 'string' ? parse(n, CPX) : n));
 const par = (e) => ({ t: 'paren', e });
 const isI = (n) => n.t === 'const' && n.name === 'i';
 
@@ -336,4 +333,3 @@ export const RULES = [
   },
 ];
 
-void complexValue; void M;
