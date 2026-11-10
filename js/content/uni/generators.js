@@ -51,3 +51,9 @@ Object.assign(UNI_GEN, ANALYSE1_F, ANALYSE1_G, ANALYSE1_H, ANALYSE1_I, ANALYSE1_
 import { GEN as ANALYSE2 } from './analyse2.js';
 
 Object.assign(UNI_GEN, ANALYSE2);
+
+// Step U7: modules G7 (combi) and P (proba).
+import { GEN as COMBI } from './combi.js';
+import { GEN as PROBA } from './proba.js';
+
+Object.assign(UNI_GEN, COMBI, PROBA);

@@ -240,7 +240,7 @@ function mcqVariant(level, rng, opts) {
   } else if (kind === 'sq') {
     y0 = rng.pick([1, 2, -1, -2]);
     const c1 = rng.pick([1, 2]);
-    const xs = [q(1, 2), q(1, 4), q(-1, 2), q(-1), q(1, 3)].filter((t) => { const D = q(1).div(q(y0)).sub(t.mul(c1)); return D.n !== 0 && Math.sign(D.n) === Math.sign(y0); });
+    const xs = [q(1, 2), q(1, 4), q(-1, 2), q(-1), q(1, 3)].filter((t) => { const D = q(1).div(q(y0)).sub(t.mul(c1)); return D.n !== 0 && Math.sign(D.n) === Math.sign(y0) && q(1).div(q(y0)).add(t.mul(c1)).n !== 0; });
     const t = rng.pick(xs);
     eq = `y'=${c1 === 1 ? '' : c1}y^2`;
     x1 = qt(t);

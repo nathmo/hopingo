@@ -73,3 +73,10 @@ import * as bound from './bound.js';
 import * as domain from './domain.js';
 
 Object.assign(JUDGES, { ode, system, bound, domain });
+
+// Step U7: probabilities (exact) and statistics (approximate), lines of
+// named values (x̄ = …, t_obs = …), errors carried forward.
+import * as prob from './prob.js';
+import * as stat from './stat.js';
+
+Object.assign(JUDGES, { prob, stat });

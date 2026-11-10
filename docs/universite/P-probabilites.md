@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.2 `steps` (lignes étiquetées `cfg.steps`, report d'erreur), `stat` (lecture de table, IC arrondi, `sig`) ; §16.3 interpréter (`final.interpret`, compétence `p-interpret`), simulation (`simulate`), `plot` en lecture seule (`boxplot`), QCM « réponse courte », `code` (Python), variantes taguées dans une compétence (gabarits EE-209 ou MATH-234), `matrix` ; §16.4 familles nouvelles (`proba`, `stats`, `method`, `notation`, `numeric`), tag C, réparation dans un autre module, pièges partagés (réutilise `g7_order_confusion`, `g2_log_power` ; `p_reg_sigma_n` sert aussi en M).
 
-Unité `proba` · préfixe `p-` · pièges `p_` · Statut : à faire
+Unité `proba` · préfixe `p-` · pièges `p_` · Statut : fait le 10 novembre 2026 (étape U7). Chaque compétence a son statut. Cinq parties (`proba-a` … `proba-e`) ; pièges dans `js/cas/rules/pa.js` … `pe.js` ; juges `prob` et `stat` (lignes nommées, report d'erreur) ; « Interpréter » est un QCM posé après la dernière ligne (`final.interpret`) ; plans `ba3-proba` et `ba4-stat`.
 
 **Sources** : deux cours, tous deux dans le parcours.
 - MATH-234 *Probabilités et statistique* (GM), M. Wilhelm, automne 2022 : transparents des semaines 1 à 14, séries 1 à 14, formulaire 2022 avec ses tables, exercices d'examen 2020–2022 (questions « notebook » courtes, puis questions à développer), corrigé d'examen 2018 (G. Dehaene), examen 2013 (EL/MT).
@@ -225,6 +225,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-desc-summary` — Moyenne, médiane, variance empirique
 - **Année** 15 · **Prérequis** `@alg:A-arrondir` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Une partie par grandeur nommée (x̄, méd, Σ(xᵢ − x̄)², s², s), avec report d'erreur ($xbar). La somme des données est dans la note de la première ligne (`42/7`). Niveau 5 : la série complète sans aide, ou le changement d'unité y = a·x + b (aussi 1 fois sur 4 au niveau 4). Non faits : l'item `code` (le type `code` vient avec U9), le gabarit (b) valeur/effectif, la comparaison de deux séries.
 - **Intro** : on trie les données, puis : moyenne x̄ = Σxᵢ/n ; médiane x₍⌈n/2⌉₎ ; variance empirique s² = Σ(xᵢ − x̄)²/(**n − 1**) ; écart-type s = √s². Si yᵢ = a·xᵢ + b : ȳ = a·x̄ + b, méd(y) = a·méd(x) + b, s_y = |a|·s_x. Exemple : `2, 4, 4, 5, 7, 9, 11` (note : n = 7, x̄ = 42/7 = 6) ; `méd = x₍₄₎ = 5` ; `s² = 60/6 = 10` (note : 60 = somme des écarts au carré).
 - **Juge** : lignes étiquetées. `x̄`, `méd`, `Σ(xᵢ − x̄)²`, `s²` : `prob` (valeurs exactes) ; `s` : `stat {decimals: 2}` · **Forme finale** : x̄, médiane et s² exactes (entier, fraction ou décimal fini), s à 0,01 près.
 - **Niveaux** :
@@ -248,6 +249,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-desc-boxplot` — Quartiles, résumé en 5 valeurs, boîte à moustaches
 - **Année** 15 · **Prérequis** `p-desc-summary` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties q̂(0,25), méd, q̂(0,75), EIQ, seuils (intervalle) et moustaches (intervalle [a ; b], juge `prob`) ; les valeurs aberrantes sont une décision. Le résumé en 5 valeurs n'est pas une ligne à part. Non faits : le dessin de la boîte (L4), la comparaison de deux boîtes (L5 : tout le calcul sans aide, données non triées) et le gabarit (c) boîte dessinée.
 - **Intro** : q̂(α) = x₍⌈nα⌉₎. Résumé en 5 valeurs : min, q̂(0,25), médiane, q̂(0,75), max. EIQ = q̂(0,75) − q̂(0,25), C = 1,5·EIQ. Les moustaches vont jusqu'aux **données** les plus extrêmes à l'intérieur de [q̂(0,25) − C ; q̂(0,75) + C] ; les données hors de cet intervalle sont des points (valeurs aberrantes). Exemple : n = 11, `⌈11 · 0,25⌉ = 3` (note : q̂(0,25) = x₍₃₎) ; `C = 1,5 · 7 = 10,5`.
 - **Juge** : lignes étiquetées, `value` (positions entières, valeurs exactes) ; dernière ligne `moustaches = [a ; b] ; aberrantes = {…}` comparée comme ensemble · **Forme finale** : résumé en 5 valeurs, extrémités des moustaches, liste des valeurs aberrantes (∅ accepté).
 - **Niveaux** :
@@ -273,6 +275,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-events` — Axiomes, complément, inclusion-exclusion
 - **Année** 15 · **Prérequis** `g9-sets` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g9-sets` : réunion, intersection et complément d'événements.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Aux niveaux 1 et 2 la formule est une note, la ligne avec les nombres est à trous ; la ligne de formule (avec les symboles Pr(…)) apparaît dès le niveau 3. `p_conjunction` est une option de décision (« A seulement », Pr(A ∩ B)). Niveau 5 : les quatre questions enchaînées, sans le tableau 2 × 2. Gabarit (c) (catégories d'un tableau) non fait.
 - **Intro** : 0 ≤ Pr(A) ≤ 1, Pr(Ω) = 1, et Pr de réunions disjointes = somme. On en tire Pr(Aᶜ) = 1 − Pr(A), Pr(A ∪ B) = Pr(A) + Pr(B) − Pr(A ∩ B), Pr(A ∩ Bᶜ) = Pr(A) − Pr(A ∩ B), et A ⊂ B ⇒ Pr(A) ≤ Pr(B). Exemple : `Pr(A ∪ B) = 0,5 + 0,7 − 0,3 = 0,9` ; `Pr(aucun) = 1 − 0,9 = 0,1`.
 - **Juge** : `prob` `{symbols: {'Pr(A)': '1/2', 'Pr(B)': '7/10', 'Pr(A∩B)': '3/10'}}` · **Forme finale** : décimal fini ou fraction irréductible.
 - **Niveaux** :
@@ -295,6 +298,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-count` — Équiprobabilité et dénombrement
 - **Année** 15 · **Prérequis** `p-events`, `g7-combinations`, `g7-which-count` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-events` : Pr(A) = |A|/|Ω| et passage au complément.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits cartes (32, 36, 52), comité, lot ; Pr(A) en fraction irréductible avec « ≈ » pour la valeur approchée. Niveau 5 (et 3 fois sur 10 au niveau 4) : « au moins 2 » par le complément. Non faits : le gabarit (d) anniversaires (fractions trop grandes pour le calcul exact) et « 4 cartes de la même couleur ». Simulation : l'urne tirée 10 000 fois.
 - **Intro** : si tous les résultats sont équiprobables, Pr(A) = |A|/|Ω|. Tirage simultané (sans ordre, sans remise) de n objets parmi N : |Ω| = C(N, n). « Exactement k marqués » : C(K, k)·C(N − K, n − k). On compte Ω et A **de la même façon** (les deux ordonnés ou les deux non ordonnés). Exemple : `|Ω| = C(32, 4) = 35 960` ; `|A| = C(4, 2) · C(28, 2) = 2 268`.
 - **Juge** : `prob` ; `C(n, k)` est lu comme un nombre exact · **Forme finale** : fraction irréductible (le décimal à 4 chiffres est accepté en plus, pas à la place).
 - **Niveaux** :
@@ -317,6 +321,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-cond-total` — Conditionnement et probabilités totales
 - **Année** 15 · **Prérequis** `p-events` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-events` : Pr(A ∩ B) et partitions de Ω.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits test médical, urnes à pile ou face, trois machines (Pr(A) totale) ; Pr(A | B) à partir des valeurs données (niveau 4) ; niveau 5 : univers réduit avec deux dés, ou probabilité totale puis Pr(M | +). L'arbre des niveaux 1 et 2 est remplacé par la ligne à trous. Non faits : la double faute au tennis, le coiffeur, la clé de Julie.
 - **Intro** : Pr(A | B) = Pr(A ∩ B)/Pr(B) ; donc Pr(A ∩ B) = Pr(A | B)·Pr(B). Si B₁, …, B_k partitionnent Ω : Pr(A) = Σ Pr(A | Bᵢ)·Pr(Bᵢ) (une branche de l'arbre par Bᵢ). Exemple : `Pr(+) = 0,9 · 0,1 + 0,2 · 0,9` (note : une branche « malade », une branche « sain ») ; `= 0,27`.
 - **Juge** : `prob` `{symbols}` ; l'arbre (L1–L2) est un `table` de branches · **Forme finale** : décimal fini ou fraction irréductible.
 - **Niveaux** :
@@ -338,6 +343,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-bayes-freq` — Bayes par les fréquences naturelles
 - **Année** 15 · **Prérequis** `p-cond-total`, `@alg:J-pourcentage` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Cinq parties (malades, malades positifs, sains positifs, positifs, Pr(M | +)), le pourcentage dans la note et après « ≈ ». Gabarits test médical, filtre anti-spam, contrôle de qualité. « Interpréter » et la simulation (10 000 personnes) sont branchés. Non faits : la population choisie par l'élève (L4), le curseur « prédire puis calculer » (L5 : tout le calcul sans aide), le gabarit (d) Pr(sain | négatif).
 - **Intro** : on imagine 1 000 personnes et on remplit le tableau malades/sains × positif/négatif. Pr(malade | positif) = (malades positifs)/(tous les positifs). Exemple (1 %, 90 %, 10 %) : `10 malades, 990 sains` ; `9 malades positifs, 99 sains positifs` ; `Pr(M | +) = 9/108 = 1/12` (note : 8,3 %, pas 90 %).
 - **Juge** : lignes étiquetées. Effectifs : `value` (entiers) ; dernière ligne : `prob` · **Forme finale** : fraction irréductible et pourcentage à 0,1 % près.
 - **Niveaux** :
@@ -362,6 +368,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-bayes-formula` — Formule de Bayes, deux tests
 - **Année** 15 · **Prérequis** `p-bayes-freq` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `p-bayes-freq` : même tableau des fréquences naturelles.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties Pr(+), Pr(M | +), Pr(M | +, +) et, au niveau 5 et en variante `open` (10 points : 9 pour les lignes, 1 pour « Interpréter »), la vérification par mise à jour successive. Non faits : les gabarits (c) test négatif, (d) trois machines, (e) pièce biaisée.
 - **Intro** : Pr(M | +) = Pr(+ | M)·Pr(M) / [Pr(+ | M)·Pr(M) + Pr(+ | Mᶜ)·Pr(Mᶜ)]. Le dénominateur est Pr(+), par les probabilités totales ; c'est la colonne « positifs » du tableau. Deux tests indépendants **sachant l'état** : Pr(+, + | M) = Pr(+ | M)². Exemple : `Pr(M | +) = 0,9 · 0,01/(0,9 · 0,01 + 0,1 · 0,99) = 1/12` (note : même nombre que 9/108) ; `Pr(M | +, +) = 0,9² · 0,01/(0,9² · 0,01 + 0,1² · 0,99) = 9/20`.
 - **Juge** : `prob` `{symbols: {'Pr(M)': '1/100', 'Pr(+|M)': '9/10', 'Pr(+|Mᶜ)': '1/10'}}` · **Forme finale** : fraction irréductible et pourcentage.
 - **Niveaux** :
@@ -387,6 +394,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-indep` — Indépendance, incompatibilité, systèmes redondants
 - **Année** 15 · **Prérequis** `p-cond-total` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cond-total` : Pr(A | B) = Pr(A).
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits dés (indépendants deux à deux, pas mutuellement), tableau 2 × 2 (décision appuyée sur Pr(A)·Pr(B)), systèmes série, parallèle et mixte, « au moins un 6 ». Niveau 5 : les dés, puis le nombre minimal de composants en parallèle. Gabarit (e) (pile puis face) non fait. Le V/F « deux à deux ⇒ mutuellement » n'est pas posé (pas de contre-exemple vérifiable en nombres) : `p_pairwise_mutual` est une option de décision. Les fiabilités sont tirées pour que le résultat ait au plus 6 décimales (0,99 en parallèle seulement avec deux composants).
 - **Intro** : A et B indépendants ⇔ Pr(A ∩ B) = Pr(A)·Pr(B) ⇔ Pr(A | B) = Pr(A). Incompatibles : Pr(A ∩ B) = 0 ; deux événements incompatibles de probabilités non nulles sont **dépendants**. Trois événements sont mutuellement indépendants si les quatre égalités tiennent. Système en série : Π pᵢ ; en parallèle : 1 − Π(1 − pᵢ). Exemple : `parallèle, 3 × 0,9 : 1 − 0,1³ = 0,999` ; `série : 0,9³ = 0,729`.
 - **Juge** : décisions (« indépendants ? ») appuyées sur des lignes `prob` · **Forme finale** : décision justifiée par une égalité ou une inégalité calculée ; ou probabilité de fonctionnement exacte.
 - **Niveaux** :
@@ -410,6 +418,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-disc-pmf` — Variable discrète : fonction de masse, de répartition, quantile
 - **Année** 15 · **Prérequis** `p-events`, `a1-ser-geo-tele` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-events` : la somme des probabilités vaut 1.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits tableau (c, F(m − 1), Pr(a ≤ X < b) avec F, médiane), c·k, géométrique (convention MATH-234 : c, Pr(X ≥ k), E[X]) et maximum de deux dés (niveau 5). F n'est pas saisie en entier dans un tableau : une valeur F(k). Non fait : c·k².
 - **Intro** : fonction de masse f(xᵢ) = Pr(X = xᵢ) ≥ 0, de somme 1. Fonction de répartition F(x) = Pr(X ≤ x), en escalier, continue à droite. Quantile : F⁻¹(α) = min{x : F(x) ≥ α}. Pr(a < X ≤ b) = F(b) − F(a) ; attention à < et ≤. Géométrique (MATH-234) : Pr(X = x) = (1 − p)ˣ·p, x = 0, 1, … ; sans mémoire. Exemple : `c = 1 − 0,8 = 0,2` ; `méd = min{x : F(x) ≥ 0,5} = 2`.
 - **Juge** : `prob` (constante, probabilités, valeurs de F) ; `value` (quantile) ; F se saisit par morceaux dans un `table` · **Forme finale** : nombre exact ; F avec ses sauts.
 - **Niveaux** :
@@ -432,6 +441,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-binom` — Bernoulli et binomiale
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `g7-binomial` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-disc-pmf` : fonction de masse et de répartition.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Une partie p (avec la décision « binomiale ? »), puis Pr(X = k) ; aux niveaux 4 et 5, E[X], var(X) et Pr(X ≤ 1) ou Pr(X ≥ 2). Non fait : la comparaison des systèmes à 5 et à 3 composants (« pour quels p ? »). Simulation : B(n, p) tirée 10 000 fois. L'urne a toujours 10 boules (p en dixièmes) et, pour p ≤ 0,25, k vaut 1 ou 2, pour éviter des probabilités minuscules.
 - **Intro** : n essais indépendants, même probabilité p de succès : X ~ B(n, p), Pr(X = k) = C(n, k)·pᵏ(1 − p)^(n−k), E[X] = np, var(X) = np(1 − p). B(1, p) = B(p). « Au moins un » : 1 − (1 − p)ⁿ. Exemple : `X ~ B(5 ; 0,6)` ; `Pr(X = 3) = C(5, 3) · 0,6³ · 0,4² = 0,3456`.
 - **Juge** : `prob` si p est rationnel (exact), sinon `stat {decimals: 4}` · **Forme finale** : valeur exacte ou décimal à 4 chiffres.
 - **Niveaux** :
@@ -453,6 +463,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-poisson` — Loi de Poisson, lien avec la binomiale
 - **Année** 15 · **Prérequis** `p-binom` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits taux × durée, approximation de la binomiale (λ = np, avec la décision Poisson ou normale), deux sources indépendantes ; Pr(X = k) ou Pr(X ≤ k) par `stat` à 0,001. Non faits : les anniversaires (λ = 247/365) et la comparaison avec la valeur binomiale exacte (L5).
 - **Intro** : X ~ Poiss(λ) : Pr(X = k) = λᵏe^(−λ)/k!, E = var = λ. Si X₁ ~ Poiss(λ₁) et X₂ ~ Poiss(λ₂) sont indépendantes, X₁ + X₂ ~ Poiss(λ₁ + λ₂). Le taux suit la durée (λ par heure → 3λ en 3 h). Loi des petits nombres : n grand et p petit ⇒ B(n, p) ≈ Poiss(np). Exemple : `B(200 ; 0,01) ≈ Poiss(2)` ; `Pr(X ≤ 1) = 3e^(−2) ≈ 0,406`.
 - **Juge** : `stat {decimals: 3}` ; une expression exacte (`3e^(-2)`) est acceptée par `equiv` numérique · **Forme finale** : décimal à 3 chiffres.
 - **Niveaux** :
@@ -474,6 +485,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-hypergeom` — Loi hypergéométrique
 - **Année** 15 · **Prérequis** `p-count`, `p-binom`, `p-cond-total` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-binom` : approximation B(n, K/N) quand N est grand.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits urne et lot ; Pr(X = k), puis Pr(X ≥ 1) (niveau 4) et Pr(X = k | X ≥ 1) (niveau 5). La comparaison avec la binomiale (gabarit c) n'est qu'un distracteur (`p_binom_without_replacement`).
 - **Intro** : N objets dont K marqués ; on en tire n **sans** remise : Pr(X = k) = C(K, k)·C(N − K, n − k)/C(N, n), E[X] = nK/N. Si N est grand devant n, X ≈ B(n, K/N). Exemple : `6 rouges, 4 bleues, 3 tirées` ; `Pr(X = 2) = C(6, 2) · C(4, 1)/C(10, 3) = 60/120 = 1/2`.
 - **Juge** : `prob` · **Forme finale** : fraction irréductible.
 - **Niveaux** : L1 formule à trous ; L2 décision « avec ou sans remise ? » ; L3 actions (compter les marqués, le reste, Ω, conditionner) ; L4 libre ; L5 (examen 2013) « 2 rouges sachant au moins une rouge ».
@@ -489,6 +501,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-cont-density` — Densité : normaliser, F ↔ f, probabilités
 - **Année** 15 · **Prérequis** `a1-int-direct`, `a1-improper-calc` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties I (intégrale du noyau sur le support), c, puis une probabilité (`prob`, exacte ; `stat` pour l'exponentielle) ; aux niveaux 4 et 5, F sur le support (partie `prob` à variable x) suivie de la décision « hors du support » (`p_cdf_piecewise` est une option de décision : pas de saisie de F par morceaux). Gabarit (b) (F donnée, f par dérivation) au niveau 4, une fois sur trois, avec F puissance ou Pareto (pas la logistique) ; Cauchy seulement nommée dans les QCM d'autres compétences. Niveau 5 : Pareto, F, puis Pr(X > 2 | X < 3). Les lignes de primitive sont écrites en nombres (0 − (−1/3)), pas en crochets.
 - **Intro** : une densité vérifie f ≥ 0 et ∫ f = 1 **sur le support**. Pr(a < X ≤ b) = ∫ₐᵇ f = F(b) − F(a), F′ = f, et Pr(X = a) = 0. Une densité peut dépasser 1. Exemple : f(x) = c·x⁻⁴ pour x ≥ 1 : `c·[−x⁻³/3]₁^∞ = c/3 = 1` (note : donc c = 3) ; `F(x) = 1 − x⁻³ pour x ≥ 1`.
 - **Juge** : `prob` pour c et les probabilités (exactes) ; `equiv` `{vars: ['x'], domain: {x: support}}` pour F et f, avec un contrôle des morceaux (F = 0 avant le support, 1 après) ; `stat {decimals: 3}` si c contient π ou e · **Forme finale** : c exact ; F définie sur tout ℝ (par morceaux) ; probabilité exacte.
 - **Niveaux** :
@@ -512,6 +525,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-cont-quantile` — Quantile d'une loi continue
 - **Année** 15 · **Prérequis** `p-cont-density` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). F (partie à variable x à partir du niveau 2), puis q (`stat`, forme exacte acceptée). Lois : puissance, x²/a², Pareto, exponentielle, uniforme, Rayleigh (θ numérique, niveau 5). Niveau 5 : Rayleigh, exponentielle, Pareto, ou c·x sur [0 ; a] à normaliser puis la médiane a/√2. `p_quantile_from_pdf` et `p_quantile_inverse` sont des valeurs fausses quand elles existent, et des options de décision.
 - **Intro** : le quantile d'ordre α est la solution q de F(q) = α (F inversible). Médiane : α = 1/2 ; quartile supérieur : α = 3/4. On résout sur **F**, pas sur f. Exemple : f(x) = 3x² sur [0 ; 1] : `F(x) = x³` ; `q₀,₇₅ = (3/4)^(1/3) ≈ 0,909`.
 - **Juge** : `equiv` pour F ; `stat {decimals: 3}` pour q, une forme exacte (`(3/4)^(1/3)`) étant acceptée · **Forme finale** : q exact ou à 0,001 près.
 - **Niveaux** :
@@ -533,6 +547,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-unif-exp` — Uniforme et exponentielle, absence de mémoire
 - **Année** 15 · **Prérequis** `p-cont-density`, `p-cond-total` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cont-density` : F ↔ f et probabilités par intégrales.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : attente uniforme (densité, Pr(X > t), variance aux niveaux 4–5), queue exponentielle, absence de mémoire (λ, deux queues, puis le quotient, comparé à e^(−λt) à 0,0015 près pour accepter les queues arrondies), médiane ln 2/λ, premier appel. Durées en années. Le QCM « étonnant ? » du niveau 5 n'est pas posé (le niveau 5 est l'absence de mémoire en quatre parties).
 - **Intro** : U(a, b) : f = 1/(b − a), F(x) = (x − a)/(b − a), E = (a + b)/2, var = (b − a)²/12. exp(λ) : f = λe^(−λx), F = 1 − e^(−λx), **E = 1/λ**, var = 1/λ² (λ est un taux, à l'inverse de Poisson). Sans mémoire : Pr(X > s + t | X > s) = Pr(X > t). Exemple : moyenne 10 ans, `λ = 1/10` ; `Pr(X > 12 | X > 2) = Pr(X > 10) = e^(−1) ≈ 0,368`.
 - **Juge** : `stat {decimals: 3}` ; forme exacte acceptée par `equiv` · **Forme finale** : valeur à 0,001 près.
 - **Niveaux** :
@@ -555,6 +570,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-moments` — Espérance et variance d'une loi
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `p-cont-density` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-disc-pmf` : E[X] = Σ x·f(x) ; `p-cont-density` : E[X] = ∫ x·f(x) dx.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Lois : tableau discret à 3 ou 4 valeurs, (k + 1)yᵏ sur ]0 ; 1[, Pareto α ∈ 3..5 ; parties E[X], E[X²], var (`prob`). L'existence est une décision (option fausse `p_mean_not_exist`), Cauchy dans le QCM. Niveau 5 : E[e^X], E[e^(2X)] et var(e^X) pour X ~ exp(λ), λ ∈ 3..5 (pas E[X(X − 1)] pour Poisson). Le V/F « toute densité a une espérance » est remplacé par König-Huygens (vrai), faute de contre-exemple numérique.
 - **Intro** : E[X] = Σ x·f(x) ou ∫ x·f(x) dx ; E[g(X)] = ∫ g(x)·f(x) dx, qui n'est pas g(E[X]) ; var(X) = E[X²] − E[X]² ≥ 0. L'espérance existe seulement si l'intégrale converge (Cauchy : non ; Pareto α ≤ 1 : non). Exemple : f(y) = 5y⁴ sur ]0 ; 1[ : `E[Y] = 5/6` ; `E[Y²] = 5/7` ; `var(Y) = 5/7 − 25/36 = 5/252`.
 - **Juge** : `prob` (exact) ; `equiv` si la réponse dépend d'un paramètre (`vars: ['λ']`, domaine du paramètre) · **Forme finale** : fraction irréductible ou expression simplifiée du paramètre.
 - **Niveaux** :
@@ -576,6 +592,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-family` — Reconnaître Gamma, Beta, Weibull, Pareto, χ²
 - **Année** 15 · **Prérequis** `p-unif-exp`, `p-moments` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-unif-exp` : l'exponentielle est la loi Γ(1, θ).
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : Gamma à θ symbolique (E et var par le juge `prob` à variable θ) ou numérique, Beta (α, β, constante, E), somme d'exponentielles, χ²(r) = Γ(r/2, 2) ; la famille est une décision. Weibull et Pareto ne sont pas proposés à reconnaître sur F (gabarit d) ; la comparaison avec trois intégrations par parties (niveau 5) n'est pas montrée. Variante `open` (10 points) : Gamma symbolique avec la constante Γ(k)θᵏ vérifiée.
 - **Intro** : on lit le **noyau** (la partie qui dépend de x) pour reconnaître la loi et éviter un calcul. x^(k−1)e^(−x/θ) → Γ(k, θ), constante 1/(Γ(k)θᵏ), E = kθ, var = kθ², Γ(n) = (n − 1)!. x^(α−1)(1 − x)^(β−1) sur [0 ; 1] → Beta(α, β), constante Γ(α + β)/(Γ(α)Γ(β)), E = α/(α + β). k·t^(k−1)e^(−tᵏ) → Weibull, F = 1 − e^(−tᵏ). α·x^(−α−1) sur ]1 ; ∞[ → Pareto, F = 1 − x^(−α). χ²(r) = Γ(r/2, 2). Somme de n exp(λ) indépendantes : Γ(n, 1/λ). Exemple : `f ∝ y²e^(−y/θ)` (note : k − 1 = 2) ; `Y ~ Γ(3, θ), E[Y] = 3θ, var(Y) = 3θ²`.
 - **Juge** : décision (famille, puis paramètres dans un menu ou tapés) ; `equiv` `{vars: ['θ'], domain: {θ: [0.5, 5]}}` pour E, var et constante · **Forme finale** : loi nommée avec ses paramètres, puis E et var.
 - **Niveaux** :
@@ -598,6 +615,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-normal-std` — Loi normale : standardiser, table de Φ
 - **Année** 15 · **Prérequis** `p-cont-density` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cont-density` : Pr(X ≤ x) = F(x).
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties z, Φ(|z|) (lecture de table, voisins de la grille acceptés), probabilité. Gabarits : Pr(X > x), Pr(X < x) avec z < 0, Pr(a < X < b), énoncé avec la variance (σ = √variance, carré parfait au lieu de 63,84), et au niveau 5 la conditionnelle ou Pr(X > Y) pour deux normales indépendantes (triplets pythagoriciens).
 - **Intro** : X ~ N(μ, σ²) ⇒ Z = (X − μ)/σ ~ N(0, 1), donc Pr(X ≤ x) = Φ((x − μ)/σ). Le 2ᵉ paramètre est la **variance**. Φ(−z) = 1 − Φ(z) ; Pr(X > x) = 1 − Φ(·). aX + b est normale ; une somme de normales indépendantes est normale. Exemple : N(100, 15²) : `z = (130 − 100)/15 = 2` ; `Pr(X > 130) = 1 − Φ(2) = 1 − 0,977 = 0,023`.
 - **Juge** : lignes étiquetées `z = …` (`stat {decimals: 3}`), `Φ(…) = …` (lecture de table, convention 3), probabilité (`stat {decimals: 3}`) · **Forme finale** : probabilité à 0,001 près.
 - **Niveaux** :
@@ -619,6 +637,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-normal-inverse` — Quantiles normaux, retrouver μ ou σ
 - **Année** 15 · **Prérequis** `p-normal-std` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties « Φ(…) = 1 − part », z = Φ⁻¹ (table 2, avec ses décimales : 0,990 → 2,326), puis σ, μ ou le seuil (`stat`). Niveau 5 et variante `open` (8 points, la partie de l'examen 2020–22, ex. 12) : σ puis Pr(X > c₂) avec ce σ, comparé à 0,002 près. L'intervalle central (gabarit d) n'est pas fait.
 - **Intro** : on lit la table à l'envers : Pr(X > c) = 0,1 ⇒ (c − μ)/σ = Φ⁻¹(0,9) = 1,28 (Table 2). Quantile d'ordre α de N(μ, σ²) : μ + σ·Φ⁻¹(α). Intervalle symétrique de probabilité 0,5 : ±Φ⁻¹(0,75) = ±0,67. Exemple : `Φ(5/σ) = 0,9` ; `5/σ = 1,28, σ ≈ 3,9`.
 - **Juge** : lignes étiquetées ; `Φ⁻¹(…) = …` lecture de table (valeur imprimée, ou exacte ± 0,005) ; résultat `stat {decimals: 1 ou 2}` · **Forme finale** : paramètre ou seuil à la précision demandée.
 - **Niveaux** :
@@ -641,6 +660,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-transform` — Loi de Y = g(X) ; échantillonnage par F⁻¹
 - **Année** 15 · **Prérequis** `p-cont-density`, `a1-deriv-inverse`, `a2-change-var`, `p-family` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cont-density` : densité f_X et son support.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : X = −ln(U)/λ (g⁻¹, sa dérivée, f_X, puis reconnaître exp(λ)), Y = X² pour X ~ U(0 ; 1), Y = aX + b pour X exponentielle, et F⁻¹(u) (exponentielle, Pareto, Weibull) ; le support est une décision. Rayleigh → χ²(2), la log-normale et le gabarit à deux dimensions (g) ne sont pas faits ; `a2-change-var` n'est donc pas crédité (raison dans `prereqWhy`). Variante `open` (10 points) : le gabarit (a) ; `coef` : la densité en x = 1.
 - **Intro** : si g est strictement monotone sur le support, f_Y(y) = f_X(g⁻¹(y))·|dg⁻¹/dy| sur g(support), 0 ailleurs. Autre voie : F_Y(y) = Pr(g(X) ≤ y), puis dériver. Cas particuliers : Y = aX ⇒ f_Y(y) = f_X(y/a)/|a| ; Z ~ N(0, 1) ⇒ Z² ~ χ²(1) ; U ~ U(0, 1) ⇒ F⁻¹(U) ~ F (échantillonnage). Exemple : X = −ln(U)/λ : `g⁻¹(x) = e^(−λx)` ; `f_X(x) = 1·|−λe^(−λx)| = λe^(−λx)` (note : exp(λ)).
 - **Juge** : décision (support de Y, méthode) ; `equiv` `{vars: ['y'], domain: {y: support de Y}}` pour g⁻¹, sa dérivée et f_Y ; une ligne « f_Y(y) = … » est contrôlée aussi en dehors du support (doit valoir 0) · **Forme finale** : f_Y simplifiée avec son support ; loi nommée si c'en est une.
 - **Niveaux** :
@@ -657,13 +677,14 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
   4. `f_X(x) = f_U(e^(−λx))·|−λe^(−λx)| = λe^(−λx) pour x > 0` — formule
   5. `X ~ exp(λ)` — reconnaître
 - **Aides** : 1 « Inverse g, dérive l'inverse, prends la valeur absolue. » · 2 `f_X(x) = 1 · |…|` · 3 `f_X(x) = λe^(−λx)`.
-- **Variantes d'examen** : `open` (MATH-234 : ex. 8, 10 points ; ex. 13.3) ; `coef` (densité en un point) ; `mcq` (distracteurs : `p_transform_jacobian` → f = 1, `p_transform_abs` → −λe^(−λx), `p_transform_support` → support ]0 ; 1[) ; `tf` (EE-209) : « Si Z ~ N(0, 1), Z² ~ χ²(1) » (vrai) ; « Si Y = 2X, alors f_Y(y) = 2f_X(y) » (faux ; contre-exemple X ~ U(0, 1) : 2f_X intègre à 4 sur [0 ; 2]).
+- **Variantes d'examen** : `open` (MATH-234 : ex. 8, 10 points ; ex. 13.3) ; `coef` (densité en un point) ; `mcq` (distracteurs : `p_transform_jacobian` → f = 1, `p_transform_abs` → −λe^(−λx), `p_transform_support` → support ]0 ; 1[) ; `tf` (EE-209) : « Si Z ~ N(0, 1), Z² ~ χ²(1) » (vrai) ; « Si Y = 2X, alors f_Y(y) = 2f_X(y) » (faux ; contre-exemple X ~ U(0, 1) : 2f_X vaut 2 sur [0 ; 1] et intègre à 2, pas à 1).
 - **Pièges** : `p_transform_jacobian`, `p_transform_abs`, `p_transform_support`, `p_scale_density`.
 - **Sous-buts → crédit** : dériver g⁻¹ → `a1-deriv-inverse` ; jacobien (gabarit g) → `a2-change-var` ; reconnaître → `p-family` ; formule → `p-transform`.
 
 ### `p-joint-disc` — Loi conjointe discrète
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `p-indep` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-disc-pmf` : les marginales sont des fonctions de masse ; `p-indep` : indépendance vérifiée case par case.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Tableaux 2 × 2 ou 2 × 3 (X ∈ {0 ; 1}) : indépendant, dépendant (perturbation ±0,05) ou « dépendant mais non corrélé » (lignes symétriques, cov = 0) ; parties p_X(1), p_Y(0), Pr(X = 1 | Y = 1) avec la décision d'indépendance qui cite une case, et cov aux niveaux 4–5. Le niveau 5 est le tableau non corrélé, pas le max de deux dés.
 - **Intro** : un tableau p(x, y). Marginales : sommes des lignes et des colonnes. Conditionnelle : p(x | y) = p(x, y)/p_Y(y). Indépendance : p(x, y) = p_X(x)·p_Y(y) **pour toutes** les cases (une case fausse suffit pour dire non). cov(X, Y) = E[XY] − E[X]E[Y]. Exemple : `p(0, 0) = 0,1 ≠ 0,4 · 0,3` (note : dépendants) ; `cov = 0,6 − 0,6 · 1 = 0` (note : non corrélés quand même).
 - **Juge** : `prob` ; tableau des marginales en `table` ; décision « indépendants ? » appuyée sur une case · **Forme finale** : marginales, décision justifiée, conditionnelle ou covariance demandée.
 - **Niveaux** :
@@ -687,6 +708,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-joint-cont` — Densité conjointe : constante, marginales, indépendance
 - **Année** 15 · **Prérequis** `p-cont-density`, `a2-fubini-rect`, `a2-domain-describe`, `a2-improper-multi` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cont-density` : chaque marginale est une densité.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Noyaux w(w + z), w + z, w^p·z^q sur [0 ; A] × [0 ; B] : intégrale intérieure (partie à variable w), I, c, marginale de W et décision d'indépendance ; noyau exponentiel c·y·e^(−ax−by) au niveau 4 (une fois sur trois) ; niveau 5 : le triangle 24xy (marginale, indépendance). Pr(X < Y) n'est pas demandé. A2 n'est pas construit sur cette branche : `a2-*` sont crédités par leurs remplaçants (`UNBUILT`).
 - **Intro** : ∬ f = 1 sur le support ; marginale f_X(x) = ∫ f(x, y) dy, avec des bornes qui peuvent dépendre de x ; indépendance ⇔ f(x, y) = f_X(x)·f_Y(y), ce qui demande que f se factorise **et** que le support soit un rectangle. Exemple : f(w, z) = c·w(w + z) sur [0 ; 3]² : `∫₀³ (w² + wz) dz = 3w² + 9w/2` ; `c · 189/4 = 1, c = 4/189`.
 - **Juge** : `prob` pour c et les probabilités ; `equiv` `{vars: ['w'], domain: {w: [0, 3]}}` pour les marginales, avec le contrôle du support ; décision pour l'indépendance · **Forme finale** : c exact ; marginales simplifiées avec support ; décision justifiée.
 - **Niveaux** :
@@ -711,6 +733,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-lin-combo` — Combinaisons linéaires : espérance, variance, covariance
 - **Année** 15 · **Prérequis** `p-moments` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-moments` : E et var de chaque variable.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits : portefeuille X_A + aX_B + bX_C (E, cov par E[XY], var, σ) et var(XY) pour X, Y indépendantes (à partir du niveau 3). Le niveau 5 n'est pas le problème à trois variables Z₁, Z₂, Z₃ avec toutes les corrélations : c'est l'un des deux gabarits, sans aide. var(X̄) n'est pas un gabarit.
 - **Intro** : E[aX + bY + c] = aE[X] + bE[Y] + c, toujours. var(aX + bY) = a²var(X) + b²var(Y) + 2ab·cov(X, Y). cov(X, Y) = E[XY] − E[X]E[Y] ; indépendants ⇒ cov = 0. Pour X, Y indépendants : var(XY) = E[X²]E[Y²] − (E[X]E[Y])². Moyenne de n variables iid : var(X̄) = σ²/n. Exemple : `E[X] = 2 + 2 · 3 − 1 = 7` ; `var(X) = 3 + 4 · 2 + 6 + 2(0 + 2 · (−2) + 2 · 1) = 13`.
 - **Juge** : `prob` · **Forme finale** : nombres exacts ; écart-type √ simplifiée ou à 0,01.
 - **Niveaux** :
@@ -733,6 +756,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-cov-corr` — Covariance, corrélation ; corrélation et causalité
 - **Année** 15 · **Prérequis** `p-lin-combo`, `p-joint-disc` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-joint-disc` : E[XY] sur un tableau conjoint.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties `prob` : cov(X, Y) par E[XY] − E[X]E[Y] (une fois sur deux à partir du niveau 2), corr(X, Y), cov(aX + b, cY + d), corr(aX + b, cY + d), puis cov(X + Y, X − Y) aux niveaux 3 et 4 ; « Interpréter » en fin d'item (`p_corr_causal`, `p_corr_slope`, `p_r2_r`). Le niveau 4 n'utilise pas de tableau conjoint et le niveau 5 est la même chaîne sans aide : les nuages de points (gabarit d) et les scénarios de causalité (gabarit e) ne sont que dans « Interpréter ». V/F faux : « corr(aX + b, cY + d) = a·c·corr(X, Y) » (contre-exemple en nombres : a = 2, c = 1) ; « corr = 0 ⇒ indépendants » n'est pas proposé (son contre-exemple n'est pas un nombre).
 - **Intro** : corr(X, Y) = cov(X, Y)/(σ_X σ_Y) ∈ [−1 ; 1]. cov(aX + b, cY + d) = ac·cov(X, Y) ; corr(aX + b, cY + d) = signe(ac)·corr(X, Y). La corrélation mesure une association **linéaire** ; elle ne dit rien de la cause (variable cachée, hasard, sens inverse). cov(X + Y, X − Y) = var X − var Y. Exemple : `corr = 3/(2 · 3) = 0,5` ; `cov(2X + 1, −Y) = −6`.
 - **Juge** : `prob` (ou `stat {decimals: 3}` avec des racines) ; QCM « Interpréter » en fin d'item · **Forme finale** : nombre, puis la phrase d'interprétation.
 - **Niveaux** :
@@ -756,6 +780,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-total-expect` — Espérance et variance totales
 - **Année** 15 · **Prérequis** `p-moments`, `p-cond-total`, `p-binom` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-moments` : E[X | Y = y] et var(X | Y = y) de chaque loi conditionnelle.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarit des examinateurs en six parties `prob` (E[N | ·] deux fois, E[N], E[var(N | ·)], var(E[N | ·]), var(N)), avec la décision « loi conditionnelle » aux niveaux 1 à 3 ; l'uniforme emboîtée (gabarit b, R ~ U(0, a)) aux niveaux 4 et 5 et dans la variante `open` (3 fois sur 10). La somme aléatoire (gabarit c) n'est pas faite. Variante `open` : 10 points.
 - **Intro** : E[X] = E[E[X | Y]] = Σ_y E[X | Y = y]·Pr(Y = y). var(X) = E[var(X | Y)] + var(E[X | Y]) : la moyenne des variances, plus la variance des moyennes. Exemple : `E[N] = 0,6 · 2,5 + 0,4 · 3,5 = 2,9` ; `var(N) = 1,17 + 0,24 = 1,41`.
 - **Juge** : `prob` · **Forme finale** : nombres exacts.
 - **Niveaux** :
@@ -780,6 +805,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-sum-mixture` — Densité d'une somme ; mélange de gaussiennes
 - **Année** 16 · **Prérequis** `p-joint-cont`, `p-total-expect` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-joint-cont` : f_X(z − y)f_Y(y) est une densité conjointe intégrée en y.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Dés (convolution discrète, niveaux 1 et 2), U(0, 1) + U(0, 1) en un point z avec la décision des bornes (`p_conv_bounds`, `p_sum_density_add`, niveaux 2 à 4), exp(λ) + exp(λ) (densité en z, une expression, niveau 4), mélange (E, E[X²], var ; la somme pondérée aux niveaux 4 et 5 ; la décision « deux bosses » au niveau 5). La densité du triangle est demandée en un point, pas par morceaux ; Poisson + Poisson (gabarit d) et le QCM d'histogrammes ne sont pas faits.
 - **Intro** : X, Y indépendantes, Z = X + Y : p_Z(z) = Σ_y p_X(z − y)p_Y(y) (discret), f_Z(z) = ∫ f_X(z − y)f_Y(y) dy (continu), bornes tirées des deux supports. Mélange : on tire la composante k avec la probabilité πₖ, puis X selon fₖ ; la densité est Σ πₖ fₖ, ce n'est **pas** la loi de Σ πₖ Xₖ. E = Σ πₖ μₖ ; var = Σ πₖ(σₖ² + μₖ²) − E². a₁X₁ + a₂X₂ ~ N(a₁μ₁ + a₂μ₂, a₁²σ₁² + a₂²σ₂²) si les Xᵢ sont normales indépendantes. Exemple : `0,3·N(0, 1) + 0,7·N(4, 1) : E = 2,8 ; var = 4,36` ; `0,3X + 0,7Y : var = 0,09 + 0,49 = 0,58` (note : ce n'est pas la même chose).
 - **Juge** : `equiv` `{vars: ['z'], domain: {z: support}}` pour une densité par morceaux (chaque morceau jugé sur son intervalle) ; `prob` pour E et var · **Forme finale** : densité par morceaux avec support, ou E et var exactes.
 - **Niveaux** :
@@ -802,6 +828,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-markov-cheb` — Markov, Tchebychev, loi des grands nombres
 - **Année** 15 · **Prérequis** `p-moments`, `p-normal-std` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-moments` : E[X] et σ dans les bornes.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Markov, Tchebychev (avec la décision Markov ou Tchebychev, et la comparaison à la normale pour k ≤ 3 dès le niveau 3), taille d'échantillon n ≥ σ²/(δε²) (niveaux 3 à 5). La loi des grands nombres est un « Interpréter » en fin d'item (`p_gambler`, `p_lln_count`, `p_markov_negative`). L'intervalle X̄ ± σ/√(nδ) du niveau 5 n'est pas fait. V/F faux : Markov pour une variable négative (contre-exemple : X constante −1, a = 1).
 - **Intro** : Markov : si X ≥ 0, Pr(X ≥ a) ≤ E[X]/a. Tchebychev : Pr(|X − μ| ≥ kσ) ≤ 1/k². Loi des grands nombres : X̄ₙ → μ, car var(X̄ₙ) = σ²/n → 0. Elle ne « compense » pas les écarts passés : après 5 piles, face n'est pas plus probable (erreur du joueur). Exemple : `Pr(X ≥ 20) ≤ 5/20 = 1/4` ; `Pr(|X − 50| ≥ 10) ≤ 1/2² = 1/4` (note : pour une normale, la vraie valeur est 0,046).
 - **Juge** : `prob` pour les bornes ; `value` pour une taille d'échantillon ; décisions et QCM pour la loi des grands nombres · **Forme finale** : borne exacte, ou n minimal.
 - **Niveaux** :
@@ -823,6 +850,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-clt-sum` — Théorème central limite pour une somme ou une moyenne
 - **Année** 15 · **Prérequis** `p-normal-std`, `p-lin-combo` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Somme (ascenseur, camion, serveur), moyenne X̄ (niveaux 3 et 4) et problème inverse (capacité, quantile de la Table 2, niveaux 4 et 5) ; la décision « peut-on appliquer le TCL ? » ouvre chaque item (`p_clt_population`, `p_clt_needs_normal`). « Vérifier en simulant » : somme de n variables uniformes de mêmes μ et σ. Le gabarit c (densité 3(1 − x²)/4) et le « nombre de jours d'ouverture » ne sont pas faits.
 - **Intro** : X₁, …, Xₙ iid d'espérance μ et de variance σ² : pour **n** grand, Sₙ = ΣXᵢ ≈ N(nμ, nσ²) et X̄ ≈ N(μ, σ²/n). La condition porte sur la taille de l'**échantillon**, pas sur la population, et la population n'a pas besoin d'être normale. L'écart-type de la somme est σ√n, pas nσ. Exemple : `E[S] = 16 · 70 = 1 120 ; sd(S) = √16 · 20 = 80` ; `Pr(S > 1 280) ≈ 1 − Φ(2) = 0,023`.
 - **Juge** : lignes étiquetées `E[S]`, `sd(S)` (`prob`), `z` (`stat {decimals: 3}`), `Φ(…)` (table), probabilité (`stat {decimals: 3}`) · **Forme finale** : probabilité à 0,001 près, ou seuil, ou n.
 - **Niveaux** :
@@ -846,6 +874,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-clt-binom` — Approximation normale de la binomiale et de Poisson
 - **Année** 15 · **Prérequis** `p-clt-sum`, `p-binom`, `p-poisson` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-clt-sum` : le TCL appliqué à une somme de Bernoulli ; `p-poisson` : Poiss(λ) ≈ N(λ, λ).
+- **Statut** : fait le 10 novembre 2026 (étape U7). Binomiale (p = 1/2, 1/5, 1/10) et, à partir du niveau 3, Poisson ; queue de droite ou de gauche ; décision « normale ou Poisson ? » (`p_poisson_approx_bad`). « Vérifier en simulant » montre aussi l'écart dû à l'absence de correction de continuité. Une ligne avec la correction de continuité (59,5) est refusée (pas encore acceptée avec une note). Le problème inverse du niveau 5 n'est pas fait : le niveau 5 est le même calcul sans aide.
 - **Intro** : X ~ B(n, p) est une somme de n Bernoulli ; pour n grand, X ≈ N(np, np(1 − p)) et p̂ = X/n ≈ N(p, p(1 − p)/n). Poiss(λ) ≈ N(λ, λ) pour λ grand. Le cours n'applique **pas** de correction de continuité. Exemple : B(100 ; 1/2) : `μ = 50, σ = √25 = 5` ; `Pr(X ≥ 60) ≈ 1 − Φ(2) = 0,023`.
 - **Juge** : comme `p-clt-sum`. Une ligne avec correction de continuité (59,5) est acceptée (`ok`) avec la note « juste, mais le cours ne fait pas cette correction » · **Forme finale** : probabilité à 0,001 près.
 - **Niveaux** :
@@ -867,6 +896,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-mom` — Méthode des moments
 - **Année** 15 · **Prérequis** `p-moments` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Un paramètre (exp, Poisson, U[0 ; θ], Pareto, θx^(θ−1)), données résumées par n et Σxᵢ : x̄, E[X] en fonction du paramètre (une expression, à partir du niveau 2), θ̂ ; Γ(k, θ) à deux paramètres sur des données brutes (convention 10), avec la décision de la seconde équation (`p_mom_wrong_moment`, `p_mom_s2`). La comparaison avec le MLE (niveau 5) n'est pas faite. V/F faux : λ̂ = x̄ pour l'exponentielle (contre-exemple : x̄ = 2).
 - **Intro** : on égale les moments théoriques aux moments empiriques et on résout en θ : E[X] = x̄ ; avec deux paramètres, var(X) = σ̂² = (1/n)Σ(xᵢ − x̄)² (diviseur **n**). Exemples : exp(λ) → λ̂ = 1/x̄ ; U[0, θ] → θ̂ = 2x̄ ; Γ(k, θ) → θ̂ = σ̂²/x̄, k̂ = x̄²/σ̂². X̄ estime E[X] par les moments, quel que soit le modèle. Exemple : `kθ = 6, kθ² = 12` ; `θ̂ = 2, k̂ = 3`.
 - **Juge** : lignes étiquetées : `E[X] =` (`equiv` en θ), `équation`, `θ̂ =` (`equiv` en x̄ symbolique, ou `stat {decimals: 3}`) · **Forme finale** : θ̂ en fonction des moments empiriques, puis sa valeur.
 - **Niveaux** :
@@ -889,6 +919,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-mle` — Maximum de vraisemblance, étape par étape
 - **Année** 15 · **Prérequis** `p-disc-pmf`, `p-cont-density`, `g2-log-rules`, `g6-deriv-rules` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `p-disc-pmf` : L(θ) = Π f(xᵢ ; θ) avec une fonction de masse ; `p-cont-density` : L(θ) = Π f(xᵢ ; θ) avec une densité.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties : x̄, ℓ(θ) (à une constante près, comparée par dérivation), ℓ′, θ̂, ℓ″, la décision « maximum ? » (`p_mle_no_check`), J(θ̂), l'erreur standard (niveau 3 et plus), l'IC de Wald (niveau 4 et plus), puis « Interpréter ». Modèles : exponentielle, Poisson, Bernoulli, la densité de pluie de l'exemple E1, géométrique (MATH-234) ; au niveau 4, une fois sur deux, la version littérale en n et S (exp, Poisson ; ℓ sans constante). L(θ) est donnée en note : comparer numériquement des vraisemblances (de l'ordre de 10⁻³⁰) n'est pas fiable. Rayleigh, log-normale, Pareto et θx^(θ−1) ne sont pas faits ; le QCM demande θ̂ ou ℓ (`g2_log_power`, `p_mle_constant_kept`), pas l'intervalle de la Q6 EE-209. Variante `open` : 10 points (E1).
 - **Intro** : L(θ) = Π f(xᵢ ; θ) ; ℓ(θ) = ln L(θ) = Σ ln f(xᵢ ; θ) ; on résout ℓ′(θ̂) = 0 ; on **vérifie** que c'est un maximum (ℓ″ < 0 partout, ou point stationnaire unique avec ℓ″(θ̂) < 0) ; enfin θ̂ ≈ N(θ, 1/J(θ̂)) avec J(θ̂) = −ℓ″(θ̂), d'où l'IC de Wald θ̂ ± z/√J(θ̂). Exemple : exp(λ), n = 16, Σxᵢ = 8 : `ℓ(λ) = 16 ln λ − 8λ` ; `ℓ′(λ̂) = 16/λ̂ − 8 = 0, λ̂ = 2` ; `ℓ″(λ) = −16/λ² < 0`.
 - **Juge** : lignes étiquetées, dans cet ordre :
   - `L(θ) =` : `equiv` `{vars: ['θ'], domain: {θ: support du paramètre}}` ;
@@ -923,6 +954,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-mle-special` — MLE au bord du support ; invariance
 - **Année** 15 · **Prérequis** `p-mle` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). U[0 ; θ] (avec la décision « ℓ′ ne s'annule pas », `p_mle_support`, et l'invariance Pr(X ≤ c) = c/θ̂), U[−θ ; θ], exponentielle décalée (θ̂ = min xᵢ), invariance pour l'exponentielle (1 − e^(−c/x̄), `p_mle_invariance_ignored`, `p_exp_rate_mean`). Le graphe de L(θ) du niveau 1 est remplacé par une note et la décision ; Poisson (e^(−x̄)) et le quantile normal ne sont pas faits.
 - **Intro** : si le support dépend de θ, ℓ′ = 0 ne marche pas. U[0, θ] : L(θ) = θ⁻ⁿ·1{θ ≥ max xᵢ}, décroissante sur [max xᵢ ; ∞[, donc θ̂ = max xᵢ. Invariance : le MLE de g(θ) est g(θ̂). Exemple : exp de moyenne θ : `θ̂ = x̄` ; MLE de Pr(X ≤ 2) : `1 − e^(−2/x̄)`.
 - **Juge** : décision (« ℓ′ ne s'annule pas ; L décroît à partir de max xᵢ ») ; `equiv` et `value` · **Forme finale** : θ̂ (statistique d'ordre) ou g(θ̂).
 - **Niveaux** :
@@ -945,6 +977,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-bias-mse` — Biais, variance, erreur quadratique moyenne, consistance
 - **Année** 15 · **Prérequis** `p-mom`, `p-mle`, `p-lin-combo` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `p-mom` : biais de l'estimateur des moments ; `p-mle` : biais de l'estimateur du maximum de vraisemblance.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Densités (k + 1)y^k/θ^(k+1) pour k = 1 à 4 : E[Y], biais, facteur c, E[Y²], var(Y), var(θ̂) (expressions en θ et n) ; EQM de Ȳ (niveau 4) ; au niveau 5, aussi U[0 ; θ] (2X̄ contre max Xᵢ). « Interpréter » en fin d'item (`p_unbiased_better`, `p_mse_bias_not_squared`). σ̂²_ML, p̂(1 − p̂) et Poisson ne sont pas faits ; la consistance n'est que dans « Interpréter ».
 - **Intro** : biais(θ̂) = E[θ̂] − θ ; EQM = E[(θ̂ − θ)²] = var(θ̂) + biais² ; θ̂ est consistant s'il tend vers θ en probabilité (il suffit que l'EQM tende vers 0). X̄ est sans biais pour μ ; σ̂²_ML a pour espérance (n − 1)σ²/n ; s² est sans biais. Exemple : `E[Y] = 3θ/4` (note : Ȳ est biaisé) ; `θ̂ = 4Ȳ/3 : var(θ̂) = θ²/(15n)`.
 - **Juge** : `equiv` `{vars: ['θ', 'n'], domain: {θ: [0.5, 5], n: [2, 50]}}` · **Forme finale** : expression simplifiée en θ et n ; décision « biaisé ? », « consistant ? ».
 - **Niveaux** :
@@ -969,6 +1002,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-fisher-cr` — Information de Fisher, Cramér-Rao
 - **Année** 16 · **Prérequis** `p-mle`, `p-bias-mse` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-bias-mse` : Cramér-Rao borne la variance d'un estimateur sans biais.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Poisson, Bernoulli, exponentielle, N(μ, 4), N(0, v) : le score ∂ln f/∂θ (ln f est donnée en note : le score évite la constante en x), la dérivée seconde, I₁(θ), la borne 1/(n·I₁) avec la décision « sans biais » (`p_cr_biased`), puis « Interpréter » (niveau 3 et plus). La géométrique et l'IC de Wald par I(θ̂) du niveau 5 ne sont pas faits.
 - **Intro** : score s(θ) = ℓ′(θ) ; information par observation I₁(θ) = Var(score d'une observation) = −E[∂²ln f(X ; θ)/∂θ²] ; pour n observations iid, I(θ) = n·I₁(θ). Cramér-Rao : tout estimateur **sans biais** vérifie Var(θ̂) ≥ 1/(n·I₁(θ)). Le MLE vérifie √n(θ̂ − θ) → N(0, I₁(θ)⁻¹). Exemple Poisson : `∂²ln f/∂λ² = −x/λ²` ; `I₁(λ) = 1/λ` ; `borne = λ/n = var(X̄)` (note : X̄ est efficace).
 - **Juge** : `equiv` `{vars: ['θ', 'n']}` · **Forme finale** : I₁(θ), borne, comparaison avec la variance de l'estimateur.
 - **Niveaux** : L1 ln f écrit, dérivées à trous ; L2 espérance de −∂² à calculer ; L3 actions (ln f, ∂, ∂², espérance, ×n, inverser) ; L4 borne et efficacité ; L5 IC de Wald par I(θ̂) et comparaison avec J(θ̂) (`p-ci-wald`).
@@ -987,6 +1021,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-ci-mean` — IC pour une moyenne : z ou Student
 - **Année** 15 · **Prérequis** `p-normal-inverse`, `p-clt-sum`, `p-desc-summary` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `p-clt-sum` : données non normales : X̄ approximativement normale.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits σ connu (1,96 ou 2,576), Student sur un résumé (n, x̄, s²) ou sur des données brutes, asymptotique (n > 200, ligne ∞). Parties x̄, s², quantile (décision « quel quantile ? »), s/√n, demi-largeur, IC (à 0,001 près), puis « Interpréter ». Niveau 5 : données brutes, ou IC puis taille d'échantillon n ≥ (zσ/E)². Variante `coef` : la borne supérieure. QCM au format EE-209 Q12 (quantiles fournis). Pas d'item `code` ; l'arrondi d'EE-209 est exercé dans `p-ci-round`.
 - **Intro** : σ connu : x̄ ± z₁₋α/₂·σ/√n. σ inconnu et données normales : pivot T = (X̄ − μ)/(S/√n) ~ t_{n−1}, d'où x̄ ± t·s/√n avec ν = n − 1 (ν ≥ 200 : quantile normal). Données non normales, n grand : x̄ ± z·s/√n (asymptotique). Exemple : n = 9, x̄ = 20, s = 3 : `t = s₅(ν = 8) = 2,306` ; `IC₉₅ = 20 ± 2,306 · 3/3 = [17,694 ; 22,306]`.
 - **Juge** : protocole d'un IC (convention 8) ; lignes `ν`, `quantile` (table), `s/√n`, `demi-largeur`, `IC` (`stat {decimals: 3}`, `ciRule: 'outward'` pour les items EE-209) · **Forme finale** : IC avec ses deux bornes, puis « Interpréter ».
 - **Niveaux** :
@@ -1011,6 +1046,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-ci-wald` — IC de Wald (avec −ℓ″) et de Wilson
 - **Année** 15 · **Prérequis** `p-ci-mean`, `p-mle` · **Étiquettes** `MATH-234`, `EE-209` (le gabarit Wilson est EE-209) · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-ci-mean` : même forme θ̂ ± z·se.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits Bernoulli (n, p̂ de la liste), Poisson et exponentielle avec √J rationnel ; parties θ̂, J = −ℓ″(θ̂) (fraction exacte), se, IC à 0,001 près, puis « Interpréter » ; « Vérifier en simulant » tire la binomiale de paramètre p̂. Wilson (z = 2) seulement au niveau 5, suivi du QCM « lequel préférer ? ». La densité de l'exemple 11 n'est pas un gabarit. Variante `open` : 8 points (θ̂, J, se, IC, puis les hypothèses de validité). Le V/F faux demande p̂ = 0, qui réduit l'IC à un point (au lieu de la couverture simulée).
 - **Intro** : θ̂_ML ≈ N(θ, 1/J(θ̂)) avec J(θ̂) = −ℓ″(θ̂) (MATH-234) ou I(θ̂) = n·I₁(θ̂) (EE-209) : IC de Wald θ̂ ± z₁₋α/₂/√J(θ̂). Bernoulli : p̂ ± z·√(p̂(1 − p̂)/n). Wilson (EE-209) inverse n(p̂ − p)²/(p(1 − p)) ≤ z² : centre p̃ = (np̂ + z²/2)/(n + z²), demi-largeur z√n/(n + z²)·√(p̂(1 − p̂) + z²/(4n)). Wald est peu fiable si p̂ est près de 0 ou 1, ou si n est petit. Exemple : n = 100, 36 succès : `se = √(0,36 · 0,64/100) = 0,048` ; `IC = 0,36 ± 0,094 = [0,266 ; 0,454]`.
 - **Juge** : lignes `θ̂`, `ℓ″(θ̂)`, `J`, `se`, `IC` (`stat {decimals: 3}` ; EE-209 : `ciRule: 'outward'`) ; décision « Wald ou Wilson ? » · **Forme finale** : IC, puis « Interpréter ».
 - **Niveaux** :
@@ -1035,6 +1071,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-ci-round` — Arrondir un IC (chiffres significatifs)
 - **Année** 16 · **Prérequis** `p-ci-mean`, `@alg:A-arrondir` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-ci-mean` : l'IC à arrondir.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties u (2 chiffres significatifs, 1 accepté si le premier chiffre est 4 à 9 ; u brut est accepté comme étape, `stay`), θ̂, θ̂ ± u brut (à partir du niveau 2), IC vers l'extérieur (`ciRule: 'outward'`, précision lue sur la ligne u de l'élève). Une fois sur deux, l'arrondi au plus proche d'une borne diffère ; le QCM tire toujours un tel cas. Niveau 5 : u = t·s/√n d'un IC de Student (quantile donné), puis l'arrondi. Le V/F faux demande les deux arrondis de la borne.
 - **Intro** : règle EE-209 (partie 3b, rappelée dans les « Tables ») : u avec 2 chiffres significatifs (1 accepté si son premier chiffre est 4 à 9) ; θ̂ et les bornes avec la même dernière décimale que u ; borne inférieure arrondie **vers le bas**, borne supérieure **vers le haut**. On arrondit les bornes calculées avec les valeurs **non arrondies**. Exemple : `u = 0,002415 → 0,0024` ; `[1,067456 ; 1,072286] → [1,0674 ; 1,0723]`.
 - **Juge** : `stat {ciRule: 'outward'}` ; la précision est déduite de la ligne `u = …` de l'élève (si l'élève garde k = 1, la précision suit) · **Forme finale** : u, θ̂ et IC arrondis selon la règle.
 - **Niveaux** :
@@ -1058,6 +1095,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-max-sample` — Maximum d'un échantillon ; IC exact
 - **Année** 15 · **Prérequis** `p-cont-quantile`, `p-indep`, `p-mle-special` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-mle-special` : le MLE de U[0, θ] est le maximum.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Densités (k + 1)xᵏ/θ^(k+1) sur [0 ; θ] (k = 0 : uniforme) : F, F_M et f_M sont trois parties en x et θ (une ligne chacune, juge `prob` en expressions). IC exact [M ; M·α^(−1/n)] à 0,01 près pour l'uniforme. Niveau 5 et `open` (8 points) : plaques vaudoises, F_M puis l'IC exact. Le minimum d'exponentielles n'est pas un gabarit. `coef` : la borne supérieure de l'IC.
 - **Intro** : M = max Xᵢ pour X₁, …, Xₙ iid : F_M(x) = Pr(tous ≤ x) = F(x)ⁿ, f_M = n·F^(n−1)·f. Minimum : 1 − (1 − F)ⁿ. Pour U[0, θ], M/θ a pour fonction de répartition uⁿ sur [0 ; 1] : c'est un pivot, et Pr(α^(1/n) ≤ M/θ ≤ 1) = 1 − α donne l'IC **exact** θ ∈ [M ; M·α^(−1/n)]. Exemple : n = 10, M = 9 : `IC₉₅ = [9 ; 9 · 0,05^(−1/10)] = [9 ; 12,14]`.
 - **Juge** : `equiv` `{vars: ['x'], domain: {x: [0, θ]}}` pour F_M et f_M (θ symbole déclaré) ; `stat {decimals: 2}` pour l'IC · **Forme finale** : F_M ou f_M par morceaux ; IC exact.
 - **Niveaux** :
@@ -1079,6 +1117,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-setup` — Formuler un test : H₀, H₁, région critique, p-valeur
 - **Année** 15 · **Prérequis** `p-normal-std` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Banque de 13 scénarios (dont filtre anti-spam et détection de tumeur). Décisions « hypothèses » (3 paires au niveau 1, 5 ensuite) et « côté », puis la valeur critique et la p-valeur (table de Φ ; Φ exacte acceptée à 0,0005). Niveau 5 : la question finale porte sur le lien IC–test. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Intro** : H₀ est l'hypothèse gardée par défaut (souvent une égalité, le statu quo) ; H₁ est ce que l'on cherche à établir. Unilatéral si seul un sens intéresse (« dépasse le seuil »). Au niveau α, la région critique R vérifie Pr₀(T ∈ R) = α. p-valeur : probabilité, sous H₀, d'une statistique au moins aussi extrême que t_obs ; bilatéral : p_obs = 2(1 − Φ(|t_obs|)). On rejette H₀ ⇔ t_obs ∈ R ⇔ p_obs < α. Bilatéral : rejet au niveau α ⇔ θ₀ hors de l'IC à 1 − α. Exemple : `t_obs = 2,1, bilatéral` ; `p_obs = 2(1 − Φ(2,1)) = 2(1 − 0,982) = 0,036` (note : rejet à 5 %, pas à 1 %).
 - **Juge** : décisions (H₀/H₁ dans un menu de 5 paires, côté, décision) ; `stat {decimals: 3}` pour p_obs ; lecture de table pour t_c · **Forme finale** : paire d'hypothèses, région critique ou p-valeur, décision.
 - **Niveaux** :
@@ -1102,6 +1141,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-test-power` — Erreurs de type 1 et 2, puissance
 - **Année** 15 · **Prérequis** `p-test-setup`, `p-normal-inverse` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `p-normal-inverse` : seuil critique donné par un quantile normal.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Décisions sur les types d'erreur (dans la première partie, à la place du tableau 2 × 2 du niveau 1), puis se, t_c, δ, β et la puissance (à 0,01 près). Niveau 5 : n minimal pour une puissance de 0,9 (z₀,₉ = 1,28, 1,282 accepté). Les courbes de puissance (EE-209 Q18) ne sont pas faites. QCM : scénario « μ = 47 » (aucune erreur) ou valeur de la puissance.
 - **Intro** : erreur de type 1 : rejeter H₀ alors qu'elle est vraie (probabilité α). Type 2 : ne pas rejeter H₀ alors qu'elle est fausse (probabilité β). Puissance = 1 − β = Pr₁(rejeter). Test z unilatéral, H₁ : μ = μ₁ > μ₀ : β = Φ(z₁₋α − (μ₁ − μ₀)/(σ/√n)). La puissance augmente avec n, avec l'écart μ₁ − μ₀ et avec α. Rejeter H₀ quand H₁ est vraie n'est **pas** une erreur. Exemple : `δ = (103 − 100)/(10/√100) = 3` ; `β = Φ(1,645 − 3) = 1 − Φ(1,355) ≈ 0,09` (note : puissance ≈ 0,91).
 - **Juge** : décisions (quel type d'erreur ?) ; `stat {decimals: 2}` pour β et la puissance (z hors grille, convention 3) ; `value` pour n minimal · **Forme finale** : β, puissance, ou n.
 - **Niveaux** :
@@ -1125,6 +1165,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-test-z` — Test z : σ connu, asymptotique, une proportion, Wald
 - **Année** 15 · **Prérequis** `p-test-setup`, `p-clt-binom` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-clt-binom` : p̂ ≈ N(p, p(1 − p)/n).
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits σ connu (compteurs), proportion bilatérale ou unilatérale, asymptotique (n ≥ 225), Wald sur Poisson (niveau 5). Parties se₀, t_obs, puis p_obs (proportions, Wald) ou t_c (moyennes) ; t_obs est un multiple de 0,05, à au moins 0,1 du seuil sauf au niveau 5. L'erreur standard calculée avec p̂ (version de Wald) n'est pas acceptée avec une note : seule celle de H₀ l'est. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Intro** : σ connu, données normales : T = (X̄ − μ₀)/(σ/√n) ~ N(0, 1) sous H₀. Asymptotique (n grand) : σ remplacé par s. Une proportion : T = (p̂ − p₀)/√(p₀(1 − p₀)/n) ; l'erreur standard calculée avec p̂ (test de Wald) est acceptée aussi, avec la note « c'est la version de Wald ». Wald pour un MLE (EE-209) : T = √(I(θ̂))·(θ̂ − θ₀). Exemple : `T = (0,6 − 0,5)/√(0,25/100) = 2` ; `p_obs = 2(1 − Φ(2)) = 0,046`.
 - **Juge** : protocole d'un test (convention 7) ; `stat {decimals: 2}` pour T ; table ; décision ; « Interpréter » · **Forme finale** : décision au niveau α et phrase choisie.
 - **Niveaux** :
@@ -1149,6 +1190,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-test-t1` — Test t à un échantillon ; données appariées
 - **Année** 15 · **Prérequis** `p-test-z`, `p-ci-mean`, `p-interpret` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-test-z` : même démarche que le test z ; `p-ci-mean` : quantile de Student et erreur standard S/√n.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties x̄, s² (données brutes dès le niveau 2), s/√n, t_obs, ν, t_c (décision « quel quantile ? »). Gabarit apparié (niveaux 2, 4, 5) : décision « différences », puis le test sur les différences. Niveau 5 : un cas limite sur trois. Variante `open` (10 points) : l'exemple 5 du catalogue (6 données), avec l'IC à 95 % à la fin. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Intro** : données normales, σ inconnu : T = (X̄ − μ₀)/(S/√n) ~ t_{n−1} sous H₀ ; bilatéral à 5 % : rejet si |t_obs| > s₅(n − 1). Données appariées (mêmes individus mesurés deux fois) : on calcule les différences dᵢ = yᵢ − xᵢ et on fait un test t à un échantillon sur d, avec H₀ : μ_d = 0. Exemple : `t_obs = (88 − 84)/(√10/√5) = 2,83` ; `s₅(4) = 2,776` (note : rejet).
 - **Juge** : protocole d'un test (convention 7) ; lignes `x̄`, `s²`, `s/√n`, `t_obs` (`stat {decimals: 2}`), `ν` (`value`), `t_c` (table) · **Forme finale** : décision et interprétation.
 - **Niveaux** :
@@ -1175,6 +1217,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-test-t2` — Test t à deux échantillons, variance poolée (et test F)
 - **Année** 15 · **Prérequis** `p-test-t1` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-test-t1` : même statistique t, avec deux échantillons.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Résumés aux niveaux 1 à 3, données brutes (n₁ ≠ n₂) aux niveaux 4 et 5. Parties F (quantiles de F calculés et donnés dans l'énoncé), s_p², se, t_obs, ν, t_c ; décisions « indépendants ? » (leurre `p_paired_as_two`) et « variances compatibles ? ». Le rapport F est toujours dans l'intervalle d'acceptation : le cas « l'item s'arrête (Welch) » n'est pas tiré. Variante `open` : 10 points. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Intro** : deux échantillons normaux **indépendants** de même variance : s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2) ; T = (x̄₁ − x̄₂)/(s_p·√(1/n₁ + 1/n₂)) ~ t_{n₁+n₂−2} sous H₀ : μ₁ = μ₂. Avant, le cours vérifie l'égalité des variances par F = s₁²/s₂² ~ F_{n₁−1, n₂−1} (quantiles donnés par l'énoncé). Si ce test rejette, il faudrait le test de Welch, qui n'est pas au programme : l'item s'arrête et le dit. Exemple : `s_p² = (4 · 2,5 + 4 · 5)/8 = 3,75` ; `t_obs = −3/√(3,75 · 0,4) = −2,45`.
 - **Juge** : protocole d'un test ; lignes `F`, `s_p²`, `se`, `t_obs`, `ν`, `t_c` · **Forme finale** : décision et interprétation.
 - **Niveaux** :
@@ -1200,6 +1243,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-two-prop` — Comparer deux proportions
 - **Année** 15 · **Prérequis** `p-test-z` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties p̂₁, p̂₂, p̂ poolée (décision « poolée ? »), se, t_obs et p_obs (à 0,005 près, lecture de table). Niveau 5 : unilatéral (H₁ : p₁ > p₂) ; l'encadrement de la p-valeur par la table n'est pas demandé. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Intro** : H₀ : p₁ = p₂. Sous H₀, on estime la proportion commune p̂ = (k₁ + k₂)/(n₁ + n₂) et T = (p̂₁ − p̂₂)/√(p̂(1 − p̂)(1/n₁ + 1/n₂)) ≈ N(0, 1). Exemple : `p̂ = 100/400 = 0,25` ; `T = 0,1/√(0,25 · 0,75 · 0,01) ≈ 2,31`.
 - **Juge** : protocole d'un test ; `stat {decimals: 2}` · **Forme finale** : décision et interprétation.
 - **Niveaux** : L1 p̂ et se à trous ; L2 proportion poolée à calculer ; L3 protocole en touchant les étapes ; L4 libre ; L5 version unilatérale et p-valeur encadrée par la table.
@@ -1219,6 +1263,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-test-chi2-gof` — Test χ² d'adéquation
 - **Année** 15 · **Prérequis** `p-test-setup`, `p-family`, `p-binom` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-test-setup` : hypothèses et p-valeur ; `p-family` : loi χ²(r).
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties `prob`/`stat` : e₁ (ou e), T, r, s₅(r) lu pour le r de l'élève, décision à 5 %, puis s₁(r) pour encadrer la p-valeur, et « Interpréter ». Gabarits : dé, catégories à probabilités fixées (couleurs, groupes sanguins, Mendel 9 : 3 : 3 : 1, jours) ; Poisson ajustée (c = 1) au niveau 5 seulement, effectifs attendus donnés à 0,1 près. Les eᵢ se calculent par une partie (la première classe), les autres sont donnés en note ; pas d'item `table`. T tombe à au moins 0,4 de chaque seuil. Le QQ de la loi fixée « QI en 6 classes » n'est pas repris.
 - **Intro** : k classes, effectifs observés oᵢ, effectifs attendus eᵢ = n·pᵢ (des **effectifs**, pas des proportions). T = Σ(oᵢ − eᵢ)²/eᵢ ~ χ²(r) sous H₀, avec r = k − 1 si les pᵢ sont fixées, r = k − 1 − c si c paramètres sont estimés sur les données. On rejette pour T grand (test unilatéral à droite). Exemple : dé lancé 60 fois : `T = (25 + 4 + 1 + 4 + 0 + 100)/10 = 13,4` ; `r = 5, s₅ = 11,070` (note : rejet à 5 %).
 - **Juge** : protocole d'un test ; `table` pour les eᵢ et les termes (colonne dérivée recalculée à partir des valeurs de l'élève) ; `stat {decimals: 2}` pour T ; `value` pour r · **Forme finale** : décision, encadrement de la p-valeur par la table (0,01 < p < 0,05), interprétation.
 - **Niveaux** :
@@ -1243,6 +1288,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-test-chi2-indep` — Test χ² d'indépendance
 - **Année** 15 · **Prérequis** `p-test-chi2-gof`, `p-joint-disc` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-test-chi2-gof` : même statistique Σ(o − e)²/e.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties e₁₁, T, r, s₅(r), décision, s₁(r), puis « Interpréter ». Tableaux 2 × 2, 2 × 3, 3 × 2, 3 × 3 construits à l'envers (marges à poids entiers, eᵢⱼ entiers ≥ 5, écarts ±d sur un ou deux blocs 2 × 2) ; l'énoncé « H₀ et H₁ en mots » du niveau 5 est l'interprétation. Le V/F « rejeter montre une cause » est un QCM Vrai/Faux (pas de contre-exemple numérique).
 - **Intro** : tableau de contingence h × k ; sous H₀ (indépendance), e_ij = n_i·· n_·j/n ; T = Σ(n_ij − e_ij)²/e_ij ~ χ²((h − 1)(k − 1)). Exemple : tableau `[[30, 20], [20, 30]]` : `e_ij = 50 · 50/100 = 25` ; `T = 4 · 25/25 = 4 > 3,841`.
 - **Juge** : protocole ; `table` (effectifs attendus, termes) ; `stat`, `value` · **Forme finale** : décision et interprétation.
 - **Niveaux** : L1 marges et e_ij à trous ; L2 e_ij à calculer ; L3 protocole en touchant ; L4 tableau 2 × 3 libre ; L5 tableau 3 × 2 de l'examen 2018 (assurance, salariés ou contractuels), avec H₀ et H₁ formulées en mots.
@@ -1262,6 +1308,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-test-chi2-var` — χ² sur une variance : test et IC
 - **Année** 16 · **Prérequis** `p-test-setup`, `p-family` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-test-setup` : H₀, H₁ et région critique.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Test unilatéral H₁ : σ² > σ₀² seulement ; parties T, r, s₅(r), décision, bornes de l'IC à 95 % pour σ² (quantiles 0,025 et 0,975 fournis), « Interpréter ». Les bornes sont jugées à 0,01 près, sans l'arrondi vers l'extérieur d'EE-209 (c'est `p-ci-round`).
 - **Intro** : données normales, μ inconnue : T = (n − 1)S²/σ₀² ~ χ²(n − 1) sous H₀ : σ = σ₀. Pour H₁ : σ > σ₀, on rejette si T > χ²_{n−1 ; 1−α}. IC pour σ² : [(n − 1)s²/χ²_{1−α/2} ; (n − 1)s²/χ²_{α/2}] (les deux quantiles sont donnés par l'énoncé ; la Table 4 ne donne que la queue supérieure). Exemple : `T = 10 · 15/10 = 15 < 18,307` (note : pas de rejet).
 - **Juge** : protocole ; `stat {decimals: 2}` ; EE-209 : `ciRule: 'outward'` pour l'IC · **Forme finale** : décision, ou IC pour σ² (ou σ).
 - **Niveaux** : L1 T à trous ; L2 côté et quantile ; L3 protocole en touchant ; L4 libre ; L5 test puis IC pour σ, avec l'arrondi EE-209.
@@ -1280,6 +1327,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-interpret` — Interpréter une p-valeur ou un IC
 - **Année** 15 · **Prérequis** `p-ci-mean`, `p-test-setup` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `p-ci-mean` : l'IC à interpréter ; `p-test-setup` : la p-valeur à interpréter.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Items `mcq` et `tf` seulement : L1 une phrase « juste ou contresens » (QCM à 2 options), L2 « quelle phrase est juste », L3 et L5 « laquelle est fausse », L4 un IC et une p-valeur avec la dualité test–IC (le classement de 5 hypothèses du catalogue est un QCM). Les phrases fausses viennent des 9 pièges du module. Les V/F faux sur des niveaux ont un contre-exemple numérique (p_obs = 0,07 ; α = 0,01) ; l'intersection d'IC et les tests multiples sont des QCM Vrai/Faux.
 - **Intro** : la p-valeur est Pr(données au moins aussi extrêmes | H₀), pas Pr(H₀ | données). Ne pas rejeter H₀ ne prouve pas H₀. Un IC à 95 % vient d'une **méthode** qui capture θ dans 95 % des répétitions ; une fois calculé, il contient θ ou non. Rejeté à 5 % ⇒ rejeté à 10 %, pas l'inverse. Significatif ne veut pas dire important. Bilatéral : rejet au niveau α ⇔ θ₀ hors de l'IC à 1 − α. Vingt tests à 5 % sur des H₀ vraies donnent environ un rejet par hasard (p-hacking). Exemple : `IC₉₅(p) = [0,2 ; 0,6]` ; `p = 0,7 est rejeté à 5 %` (note : 0,7 est hors de l'IC).
 - **Juge** : items `mcq` (4 options, une juste) et `tf` ; pas de lignes · **Forme finale** : l'option choisie.
 - **Niveaux** (types propres à cette compétence) :
@@ -1302,6 +1350,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-reg-ls` — Droite des moindres carrés, r et R²
 - **Année** 15 · **Prérequis** `p-cov-corr`, `l-orth-lsq`, `p-desc-summary` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-cov-corr` : r = S_xy/√(S_xx·S_yy).
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties x̄, ȳ, S_xx, S_xy, β̂, α̂, S_yy, R² (`prob`, exactes) ; niveau 4 : une fois sur deux à partir des sommes brutes (sans R²) ; niveau 5 : à partir de r, s_x, s_y et des moyennes, puis la droite de x sur y. Pas d'item `table` ni de `code`. Aux niveaux 1 à 3, β̂ est un décimal à deux chiffres au plus. Les jeux de données ont R² ≥ 0,15 (pas de nuage sans tendance).
 - **Intro** : modèle Yᵢ = α + βxᵢ + εᵢ. β̂ = S_xy/S_xx = Σ(xᵢ − x̄)(yᵢ − ȳ)/Σ(xᵢ − x̄)² = r·s_y/s_x ; α̂ = ȳ − β̂x̄ ; la droite passe par (x̄, ȳ) ; les résidus somment à 0. r = S_xy/√(S_xx·S_yy) ; R² = r² = ESS/TSS. La régression de x sur y n'est **pas** la droite inverse (pente r·s_x/s_y). Exemple : `β̂ = 6/10 = 0,6 ; α̂ = 4 − 0,6 · 3 = 2,2` ; `R² = 36/60 = 0,6`.
 - **Juge** : lignes `x̄`, `ȳ`, `S_xx`, `S_xy`, `S_yy`, `β̂`, `α̂`, `r`, `R²` (`prob` si exact, sinon `stat {decimals: 3}`) · **Forme finale** : droite ŷ = α̂ + β̂x, puis r ou R² demandé.
 - **Niveaux** :
@@ -1325,6 +1374,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-reg-test` — Tests t et IC sur les coefficients
 - **Année** 15 · **Prérequis** `p-reg-ls`, `p-test-t1` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-test-t1` : statistique t et quantile de Student.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Niveaux 1 à 3 : test sur β (RSS, σ̂², se, t_obs, ν, t_c, décision, IC pour β) ; niveaux 4 et 5 et variante `open` (10 points, exemple 3) : test sur α, avec β̂ et α̂ à calculer au niveau 5. Les lignes du corrigé suivent les valeurs arrondies (3 décimales), comme l'élève ; la variante `coef` juge avec ces mêmes valeurs.
 - **Intro** : σ̂² = RSS/(n − 2) avec RSS = Σ(yᵢ − ŷᵢ)² = S_yy − β̂S_xy. se(β̂) = σ̂/√S_xx ; se(α̂) = σ̂·√(1/n + x̄²/S_xx). T = (β̂ − β₀)/se(β̂) ~ t_{n−2} sous H₀ (de même pour α) ; IC β̂ ± t·se(β̂). Exemple : `σ̂² = 2,4/3 = 0,8` ; `t_obs = 0,6/√(0,8/10) ≈ 2,12 < s₅(3) = 3,182`.
 - **Juge** : protocole d'un test ; lignes `RSS`, `σ̂²`, `se`, `t_obs`, `ν`, `t_c` · **Forme finale** : décision et interprétation (et IC si demandé).
 - **Niveaux** : L1 σ̂² donné, se et T à trous ; L2 RSS et σ̂² à calculer ; L3 protocole en touchant ; L4 test sur α (loi des ressorts : l'élongation est-elle proportionnelle au poids ?) ; L5 problème MATH-234 complet (examen 2020–22, ex. 10) : α̂, β̂, test sur α au seuil de 5 %.
@@ -1345,6 +1395,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-reg-multi` — Régression multiple, matrice de design, test F emboîté
 - **Année** 15 · **Prérequis** `p-reg-test`, `l-orth-lsq` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-reg-test` : test t sur chaque coefficient.
+- **Statut** : fait le 10 novembre 2026 (étape U7). L1, L2 et la variante `mcq` : choix de la matrice de design (QCM, pas de juge `matrix`) ; L3 : équations normales d'une régression simple (det, b̂, â) ; L4 et L5 : test F emboîté (ν₁, ν₂, F ; décision dans « Interpréter », quantile F donné). Le test t sur un coefficient de la régression multiple n'est pas repris (il est dans `p-reg-test`).
 - **Intro** : y = Xβ + ε ; équations normales XᵀXβ̂ = Xᵀy, β̂ = (XᵀX)⁻¹Xᵀy si les colonnes de X sont indépendantes ; S² = ‖y − Xβ̂‖²/(n − p). Test βᵢ = 0 : T = β̂ᵢ/(S√vᵢᵢ) ~ t_{n−p}, vᵢᵢ = ((XᵀX)⁻¹)ᵢᵢ. Modèles emboîtés (q < p colonnes) : F = ((SC_q − SC_p)/(p − q))/(SC_p/(n − p)) ~ F_{p−q, n−p} (quantile donné). Exemple : `F = (20/2)/(30/16) ≈ 5,33 > F₂,₁₆ ; ₀,₉₅ = 3,63`.
 - **Juge** : `matrix` (matrice de design, jugée colonne par colonne à une permutation près, et refusée si ses colonnes sont dépendantes) ; protocole d'un test pour F et T · **Forme finale** : X, β̂, ou décision.
 - **Niveaux** : L1 colonnes de X à cocher ; L2 X à construire pour un modèle décrit ; L3 actions (XᵀX, inverse 2 × 2, Xᵀy, β̂, F) ; L4 test F libre ; L5 EE-209 Q19 (deux races, pente commune) puis un test F sur la même question.
@@ -1363,6 +1414,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-reg-diag` — Diagnostics d'une régression
 - **Année** 15 · **Prérequis** `p-reg-ls` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-reg-ls` : résidus de la droite ajustée.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Graphiques tracés par l'app (SVG en lecture seule, tirés avec la graine de l'item) : résidus contre ŷ, dans l'ordre, QQ-plot. L1 3 défauts, L2 5, L3 deux graphiques, L4 le remède (les 3 pièges en options), L5 diagnostic et remède. Pas de `match` : QCM successifs. Les V/F faux sont des QCM Vrai/Faux.
 - **Intro** : les hypothèses se vérifient sur les **résidus** : linéarité (pas de courbure dans résidus contre ŷ), variance constante (pas d'entonnoir), normalité (QQ-plot des résidus aligné), indépendance (pas de structure dans l'ordre, autocovariance), points influents (levier élevé, distance de Cook grande). Un R² élevé ne valide pas le modèle. Exemple : `résidus en entonnoir` → `hétéroscédasticité`.
 - **Juge** : items `mcq` sur des graphiques produits par l'app (`plot`, lecture seule) · **Forme finale** : l'hypothèse violée, puis le remède proposé (QCM).
 - **Niveaux** (types propres) : L1 un graphique, « quel défaut ? » parmi 3 ; L2 parmi 5 ; L3 deux graphiques (résidus et QQ-plot) ; L4 associer 4 graphiques à 4 défauts (`match`) ; L5 diagnostic complet d'une régression (4 graphiques) et choix du remède (transformation log, retirer un point mal mesuré, modèle quadratique).
@@ -1379,6 +1431,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-bayes-beta` — Modèle Beta-Bernoulli : a posteriori, PM, MAP
 - **Année** 16 · **Prérequis** `p-bayes-formula`, `p-family`, `p-mle` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-bayes-formula` : a posteriori ∝ vraisemblance × a priori.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties α′, β′, PM, MAP (et variance aux niveaux 4 et 5, MLE au niveau 5). La mise à jour en deux temps du niveau 5 n'est pas reprise (comparaison avec le MLE à la place). Dénominateurs ≤ 30.
 - **Intro** : a priori θ ~ Beta(α, β) (uniforme = Beta(1, 1)) ; N succès en n essais de Bernoulli ; a posteriori θ | données ~ Beta(α + N, β + n − N). Moyenne a posteriori PM = (α + N)/(α + β + n) ; MAP = (α + N − 1)/(α + β + n − 2) ; variance a posteriori PM(1 − PM)/(1 + α + β + n). L'a posteriori sert d'a priori pour les données suivantes. Exemple : `uniforme, 2 réussites sur 2 → Beta(3, 1)` ; `Beta(2, 2), 7 sur 10 → Beta(9, 5), PM = 9/14, MAP = 2/3`.
 - **Juge** : décision (famille et paramètres) puis `prob` · **Forme finale** : loi a posteriori nommée ; PM, MAP, variance exactes.
 - **Niveaux** :
@@ -1402,6 +1455,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-bayes-gauss` — Modèle gaussien-gaussien
 - **Année** 16 · **Prérequis** `p-normal-std` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `p-normal-std` : lois normales a priori et a posteriori.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties 1/τ², n/σ², σ²_post, μ_post ; niveau 5 et variante `mcq` : nombre minimal de mesures (distracteurs : a priori oublié, inégalité mal tournée, variances additionnées).
 - **Intro** : a priori θ ~ N(μ₀, τ²) ; données Xᵢ | θ ~ N(θ, σ²), σ² connu. A posteriori N(μ_post, σ²_post) avec μ_post = (nτ²x̄ + σ²μ₀)/(nτ² + σ²) et σ²_post = σ²τ²/(nτ² + σ²) ; autrement dit, les **précisions** s'additionnent : 1/σ²_post = 1/τ² + n/σ², et μ_post est la moyenne de μ₀ et x̄ pondérée par les précisions. MAP = PM = μ_post. Exemple (rhinocéros) : `μ_post = (2,2 + 0,5 · 2,5)/1,5 = 2,3` ; `σ²_post = 0,5/1,5 = 1/3`.
 - **Juge** : `prob` (fractions) ; `value` pour n · **Forme finale** : loi a posteriori N(μ_post, σ²_post), ou n minimal.
 - **Niveaux** :
@@ -1425,6 +1479,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 ### `p-bayes-conjugate` — Lois conjuguées ; Dirichlet-multinomiale
 - **Année** 16 · **Prérequis** `p-bayes-beta`, `p-count` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `p-bayes-beta` : Beta-Bernoulli est le modèle de référence.
+- **Statut** : fait le 10 novembre 2026 (étape U7). Niveau 1 et une variante `mcq` sur deux : probabilité multinomiale (coefficient, puis produit) ; sinon a posteriori de Dirichlet (α′₁, α₀ + n, PM₁, MAP₁). Le QCM « quelle a priori est conjuguée » est un V/F.
 - **Intro** : une loi a priori est conjuguée si l'a posteriori reste dans la même famille : Beta–Bernoulli, Dirichlet–multinomiale, normale–normale (moyenne), Gamma sur la précision d'une normale. Multinomiale : Pr(N₁, …, N_K) = n!/(N₁!···N_K!)·Π θₖ^(Nₖ). A priori Dir(α₁, …, α_K), comptes Nₖ : a posteriori Dir(α₁ + N₁, …, α_K + N_K), PMₖ = (αₖ + Nₖ)/(α₀ + n) avec α₀ = Σαₖ, MAPₖ = (αₖ + Nₖ − 1)/(α₀ + n − K). Exemple : `Dir(1, 1, 1) et comptes (3, 5, 2) → Dir(4, 6, 3)` ; `PM = (4/13 ; 6/13 ; 3/13)`.
 - **Juge** : décision (famille conjuguée) ; `prob` · **Forme finale** : loi a posteriori, PM, MAP.
 - **Niveaux** : L1 probabilité multinomiale à trous ; L2 mise à jour de Dirichlet ; L3 actions (ajouter les comptes, α₀, PM, MAP) ; L4 libre ; L5 QCM « quelle a priori est conjuguée à ce modèle ? » puis calcul.

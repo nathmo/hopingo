@@ -40,3 +40,10 @@ import * as analyse2 from './analyse2.skills.js';
 
 UNI_UNITS.push(analyse2.UNIT);
 UNI_SKILLS.push(...analyse2.SKILLS);
+
+// Step U7: modules G7 (unit combi) and P (unit proba).
+import * as combi from './combi.skills.js';
+import * as proba from './proba.skills.js';
+
+UNI_UNITS.push(combi.UNIT, proba.UNIT);
+UNI_SKILLS.push(...combi.SKILLS, ...proba.SKILLS);

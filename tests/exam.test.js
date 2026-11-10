@@ -253,3 +253,36 @@ test('ba2-analyse2: a complete Analyse II exam, marked', () => {
   }
   assert.equal(BA2.durationMin, 144);
 });
+
+// Step U7: the two exams of module P. ba3-proba (MATH-234): 6 short
+// calculations, 4 multiple choice, 2 problems of 8 to 15 points; ba4-stat
+// (EE-209): 20 multiple choice +3/0/−1 and 10 true/false +1/0/−1. Every
+// question answered with its reference earns all its points.
+test('ba3-proba and ba4-stat produce complete exams, marked right with the references', () => {
+  const answer = (q) => {
+    if (q.kind === 'mcq') return q.item.options.findIndex((o) => o.correct);
+    if (q.kind === 'tf') return q.item.truth;
+    if (q.kind === 'coef') return q.item.type === 'lines' ? q.item.script.filter((l) => l.kind === 'eq').at(-1).math : q.item.expected;
+    return referenceLog(q.item);
+  };
+  for (const id of ['ba3-proba', 'ba4-stat']) {
+    const bp = EXAM_BY_ID[id];
+    for (const seed of [1, 2]) {
+      const exam = buildExam(bp, { rng: makeRng(seed), now: 0 });
+      assert.equal(exam.questions.length, bp.sections.reduce((s, x) => s + x.count, 0), id);
+      for (const q of exam.questions) {
+        assert.ok(!q.item.stub, `${q.skill} is built`);
+        assert.ok(['proba', 'combi'].includes(SKILL_BY_ID[q.skill].unit), q.skill);
+        if (q.kind === 'open') assert.ok(q.item.type === 'problem' && q.item.total >= 8 && q.item.total <= 15, `${q.item.key}: ${q.item.total} points`);
+        const r = scoreQuestion(q, bp.sections[q.section].scoring, answer(q));
+        assert.equal(r.state, 'right', `${id} ${q.kind} ${q.item.key}`);
+      }
+    }
+  }
+  const stat = EXAM_BY_ID['ba4-stat'];
+  assert.deepEqual(stat.sections.map((s) => [s.kind, s.count, s.scoring.right, s.scoring.wrong]), [['mcq', 20, 3, -1], ['tf', 10, 1, -1]]);
+  // EE-209 draws only its own skills; MATH-234 its own, and G7.
+  assert.ok(stat.sections.every((s) => s.pool.skills.every((sk) => SKILL_BY_ID[sk].tags.includes('EE-209'))));
+  assert.ok(EXAM_BY_ID['ba3-proba'].sections.every((s) => s.pool.skills.every((sk) => SKILL_BY_ID[sk].unit === 'combi' || SKILL_BY_ID[sk].tags.includes('MATH-234'))));
+  assert.deepEqual(examsForUnit('proba').map((e) => e.id), ['ba3-proba', 'ba4-stat']);
+});
