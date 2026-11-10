@@ -954,7 +954,7 @@ F_m : (1 − m)x² + 2(m + 1)xy − y² + 2x − 2my + m = 0, m ∈ ℝ. (a) Gen
 
 # G6. Analyse de base
 
-Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf la pilote `g6-deriv-rules` (fait le 9 novembre 2026, étape U0)
+Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : fait le 10 novembre 2026 (étape U2 ; la pilote `g6-deriv-rules` à l'étape U0). Chaque compétence a son statut ; `g4-line2` (G4, étape U5) passe par `UNBUILT`.
 
 **Sources** : MAN, Math 1B (examens 2017 et examen blanc 2018 corrigé : dérivée implicite et tangente à paramètre, point anguleux à paramètre, branches infinies et points stationnaires d'arcs paramétrés, tangente et approximation linéaire) ; CMS, Analyse I, séries 8 à 23 (limites, tangente commune, optimisation, extrema et points remarquables, courbes paramétrées, primitives, aires) ; formulaires M1A et M1B (table des dérivées).
 **Notation** : dérivée `f′(x)` ou `d(f, x)`. Dérivées à gauche et à droite `f′(a⁻)`, `f′(a⁺)` (touches dédiées). Limites `lim(f, x, a, +)`. Logarithme `ln` ou `Log`. Arc tangente `arctan` ou `Arctg`. La MAN dit « point stationnaire » pour un arc paramétré où ẋ = ẏ = 0.
@@ -994,7 +994,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 ### `g6-deriv-rules` — Règles de dérivation : produit, quotient, chaîne (pilote U0)
 - **Année** 12 · **Prérequis** `g6-deriv-usual`, `g1-compose` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-compose` : repérer les couches f∘g pour la règle de chaîne.
-- **Statut** : fait le 9 novembre 2026 (étape U0). Tant que `g6-deriv-usual` et `g1-compose` ne sont pas construits, le parcours les remplace par `pow-rules`, `root-rules` et `rat-domain` (`js/content/uni/index.js`, `UNBUILT`).
+- **Statut** : fait le 9 novembre 2026 (étape U0). Ses prérequis `g6-deriv-usual` (étape U2) et `g1-compose` (étape U1) sont construits.
 - **Intro** : (uv)′ = u′v + uv′. (u/v)′ = (u′v − uv′)/v². (f∘g)′ = f′(g)·g′. On dérive de l'extérieur vers l'intérieur, et chaque couche multiplie par la dérivée de ce qu'elle contient.
 - **Juge** : `equiv` `{vars:['x'], domain:{x:[-2.5, 2.5]} (privé des zéros du dénominateur), target:'no-prime'}`. Les nœuds `deriv` d'une ligne sont d'abord remplacés par `diff()`, puis la ligne est comparée à la précédente. · **Forme finale** : plus de `′` ; produit simplifié (pas de « ·1 », pas de « 0· ») ; on n'exige pas de factoriser.
 - **Niveaux** :
