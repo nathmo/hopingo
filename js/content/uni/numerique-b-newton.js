@@ -64,7 +64,7 @@ function level1(rng) {
     judge: { kind: 'equiv', vars: ['x'], domain: { x: [0.5, 4] }, target: 'goal', goal: d.phi },
     script: [
       { kind: 'note', html: `f′(x) = 2x, donc φ(x) = x − (x² − ${d.c})/(2x).` },
-      { kind: 'eq', math: d.phi, ...blankBy(d.phi, [String(d.c)]), note: 'Même dénominateur 2x : 2x² − (x² − c) = x² + c', subgoal: 'formula' },
+      { kind: 'eq', math: d.phi, ...blankBy(d.phi, [String(d.c)]), note: `Même dénominateur 2x : 2x² − (x² − ${d.c}) = x² + ${d.c}`, subgoal: 'formula' },
       { kind: 'segment', html: `x⁽¹⁾ = φ(${d.x0}).`, ask: 'x⁽¹⁾ =', start: { math: `(${d.x0}^2+${d.c})/(2×${d.x0})` }, judge: { kind: 'value', form: 'irreducible' } },
       { kind: 'eq', math: String(x1), ...blankBy(String(x1), [String(x1)]), note: 'Fraction irréductible', subgoal: 'iterate' },
     ],
@@ -124,12 +124,12 @@ function level3(rng) {
           { id: 'sign', label: 'x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ + f(x⁽ᵏ⁾)/f′(x⁽ᵏ⁾)', valid: false, rule: 'n_newton_sign', why: 'On va vers le zéro de la tangente : on retire f/f′.' },
         ],
       },
-      { kind: 'eq', math: `${d.x0}-(${f0})/(${df0})`, note: `f(${d.x0}) = ${fmt(f0)}, f′(${d.x0}) = ${fmt(df0)}`, subgoal: 'formula' },
+      { kind: 'eq', math: `${d.x0}-${f0.n < 0 ? `(${f0})` : f0}/${df0}`, note: `f(${d.x0}) = ${fmt(f0)}, f′(${d.x0}) = ${fmt(df0)}`, subgoal: 'formula' },
       { kind: 'eq', math: String(x1), note: 'x⁽¹⁾', subgoal: 'iterate' },
     ],
     hints: H('La tangente en x⁽ᵏ⁾ coupe l\'axe en x⁽ᵏ⁾ − f(x⁽ᵏ⁾)/f′(x⁽ᵏ⁾).',
-      `x⁽¹⁾ = ${d.x0} − (${fmt(f0)})/(□)`,
-      `x⁽¹⁾ = ${d.x0} − (${fmt(f0)})/${fmt(df0)} = ${fmt(x1)}.`),
+      `x⁽¹⁾ = ${d.x0} − ${f0.n < 0 ? `(${fmt(f0)})` : fmt(f0)}/□`,
+      `x⁽¹⁾ = ${d.x0} − ${f0.n < 0 ? `(${fmt(f0)})` : fmt(f0)}/${fmt(df0)} = ${fmt(x1)}.`),
     subgoals: SUB, key: `${NW}:3:${d.c}:${d.x0}`, baits: ['n_newton_inverted', 'n_newton_sign'], fallback: d.fallback,
   });
 }
