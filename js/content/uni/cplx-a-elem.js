@@ -91,7 +91,7 @@ function polarText(m, t) {
   };
   const re = mul(c);
   let im = mul(s);
-  if (im) im = im === '1' ? 'i' : im === '-1' ? '-i' : im === m ? `i${m}` : im === `-${m}` ? `-i${m}` : `${im}i`;
+  if (im) im = im === '1' ? 'i' : im === '-1' ? '-i' : im === m && m.startsWith('e') ? `i${m}` : im === `-${m}` && m.startsWith('e') ? `-i${m}` : `${im}i`;
   return joinT([re, im]);
 }
 
