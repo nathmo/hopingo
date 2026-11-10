@@ -1763,7 +1763,9 @@ function cplxData(rng) {
     const [[a11, a12], [a21, a22]] = A.map((r) => r.map((x) => x.n));
     const useRow1 = Math.abs(a12) < Math.abs(a21);
     // Row 2: a21·x + (a22 − λ)y = 0 → v = (λ − a22 ; a21); row 1: v = (a12 ; λ − a11).
-    const v = useRow1 ? [[a12, 0], [a - a11, b]] : [[a - a22, b], [a21, 0]];
+    let v = useRow1 ? [[a12, 0], [a - a11, b]] : [[a - a22, b], [a21, 0]];
+    // The real entry positive: (1 − i ; 1) rather than (−1 + i ; −1).
+    if (v.find(([, y]) => y === 0)[0] < 0) v = v.map(([x, y]) => [-x, -y]);
     return { A, a, b, v, row: useRow1 ? 1 : 2 };
   }
   return { A: MX.mat([[1, -2], [1, 3]]), a: 2, b: 1, v: [[-1, 1], [1, 0]], row: 2, fallback: true };
