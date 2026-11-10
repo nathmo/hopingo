@@ -39,7 +39,8 @@ function heunTable(rng, level) {
     const h = d.h;
     const g0 = gAt(d.g, 0);
     const g1 = gAt(d.g, h);
-    const line = `(${d.u0}+${h}/2×((${d.lam})×${d.u0}+${g0})+${h}/2×${g1})/(1-${h}/2×(${d.lam}))`;
+    // h/2 in brackets: 1/10/2 cannot be typed (a denominator starts no fraction).
+    const line = `(${d.u0}+(${h})/2×((${d.lam})×${d.u0}+${g0})+(${h})/2×${g1})/(1-(${h})/2×(${d.lam}))`;
     then = linesItem({
       skill: RK, level: 4, mode: 'free', keys: KEYS,
       prompt: `Même problème, un pas de Crank-Nicolson : u₁ = u₀ + (h/2)(f(t₀, u₀) + f(t₁, u₁)). Combien vaut u₁ ?`,

@@ -5,6 +5,7 @@
 
 import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
+import { keysFor } from './keys-needed.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { judgeTf, checkCounter } from '../judges/examples.js';
@@ -74,7 +75,7 @@ export function mountTf(item, ctx, body) {
     } else {
       const asks = c.ask?.length ? c.ask : [{ v: 'x', label: 'x =' }];
       const inputs = asks.map((a) => {
-        const input = new MathInput({ keysets: a.keys || ['calc', 'set'], placeholder: a.v, onEnter: () => onEnter() });
+        const input = new MathInput({ keysets: keysFor(a.keys || ['calc', 'set'], [c.answer?.[a.v] ?? '']), placeholder: a.v, onEnter: () => onEnter() });
         input.display.addEventListener('focus', () => { keyTarget = input; });
         return { a, input };
       });

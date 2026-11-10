@@ -126,7 +126,9 @@ export function examScreen(root, args, app) {
         qctrl = mountExercise({ ...it, resumeLog: st.responses[n] || [] }, {
           ready: () => {},
           submit: () => {},
-          save: (pending) => { st.responses[n] = pending.log.length ? pending.log : null; answerRun(p, n, st.responses[n]); save(); paintNav(); },
+          // Notes passed while the problem is shown are not an answer: a
+          // problem only looked at stays blank (its dot, « sans réponse »).
+          save: (pending) => { st.responses[n] = pending.log.some((e) => e.op !== 'pass') ? pending.log : null; answerRun(p, n, st.responses[n]); save(); paintNav(); },
           complete: () => { over = true; if (qctrl && !done.isConnected) qctrl.el.append(done); },
         });
         if (over) qctrl.el.append(done);

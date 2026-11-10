@@ -4,6 +4,7 @@
 
 import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
+import { keysFor } from './keys-needed.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { judgeDomainItem } from '../judges/domain-item.js';
@@ -18,9 +19,10 @@ export function mountDomain(item, ctx, body) {
   const say = (msg, kind = 'info') => { feedback.className = `step-feedback ${kind}`; feedback.innerHTML = msg; };
   const inputs = {};
   const focus = (input) => { active = input; keyArea.replaceChildren(input.keypad()); };
+  const keysets = keysFor(item.keys || ['calc', 'calcfn'], Object.values(item.answer || {}).flat());
   const rows = item.fields.map(({ v, label }) => {
-    const lo = new MathInput({ keysets: item.keys || ['calc', 'calcfn'], placeholder: '…', onEnter: () => submit() });
-    const hi = new MathInput({ keysets: item.keys || ['calc', 'calcfn'], placeholder: '…', onEnter: () => submit() });
+    const lo = new MathInput({ keysets, placeholder: '…', onEnter: () => submit() });
+    const hi = new MathInput({ keysets, placeholder: '…', onEnter: () => submit() });
     inputs[v] = [lo, hi];
     for (const inp of [lo, hi]) inp.display.addEventListener('click', () => focus(inp));
     return h('div.tf-counter-row', lo.display, h('span.tf-label', ` ≤ ${label || v} ≤ `), hi.display);
@@ -42,8 +44,8 @@ export function mountDomain(item, ctx, body) {
       });
     }
   }
-  void active;
   void html;
   const footer = h('div', h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, 'Valider'));
-  return { ownFlow: true, footer, onKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } } };
+  // The keyboard types in the bound last touched.
+  return { ownFlow: true, footer, onKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } else active?.handleKey(e); } };
 }

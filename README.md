@@ -10,6 +10,7 @@ ES modules don't load from `file://`, so serve the folder:
 npm run serve        # python -m http.server 8080, then open http://localhost:8080
 npm test             # math core, symbolic core, judges, content generators, learner engine
 npm run samples      # writes docs/samples-<unit>.md for content review
+npm run smoke        # drives the app in headless Edge (dev tool, not in npm test): see tools/browser-smoke.js
 ```
 
 There are no dependencies and no build step.
