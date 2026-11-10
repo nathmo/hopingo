@@ -67,3 +67,8 @@ Object.assign(UNI_GEN, MATRICES);
 import { GEN as NUMERIQUE } from './numerique.js';
 
 Object.assign(UNI_GEN, NUMERIQUE);
+
+// Step U9: code and readtable variants of earlier skills (P, M).
+import { GEN as U9_VARIANTS } from './u9-variants.js';
+
+Object.assign(UNI_GEN, U9_VARIANTS);

@@ -238,3 +238,17 @@ test('code traps of module N are named when typed in their hole', () => {
     assert.ok(found, `${r.id}: no item of ${r.code.skill} has the hole « ${r.code.text} »`);
   }
 });
+
+// The criterion of step U9 (spec §14): every skill of module N has at
+// least one item `code` or `readtable` (at some level, possibly after a
+// table, a program or inside a problem).
+test('U9 criterion: every skill of N has a code or a readtable item', async () => {
+  const { UNI_SKILLS } = await import('../js/content/uni/index.js');
+  const kinds = (it) => (!it ? [] : [it.type, ...kinds(it.then), ...kinds(it.question), ...(it.parts || []).flatMap(kinds)]);
+  for (const s of UNI_SKILLS.filter((x) => x.unit === 'numerique')) {
+    const rng = makeRng(11);
+    const seen = new Set();
+    for (let level = 1; level <= 5; level++) for (let i = 0; i < 8; i++) kinds(generate(s.id, level, rng)).forEach((k) => seen.add(k));
+    assert.ok(seen.has('code') || seen.has('readtable'), `${s.id}: no code or readtable item (${[...seen]})`);
+  }
+});
