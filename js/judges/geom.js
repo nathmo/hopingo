@@ -152,8 +152,9 @@ const isNumber = (n) => { n = stripParen(n); return n.t === 'num' || (n.t === 'f
 function partFinal(cfg, part, form) {
   const dim = dimOf(cfg);
   const coords = ['x', 'y', 'z'].slice(0, dim);
-  if (part.shape === 'param') return form === 'param' || form === 'any' || cfg.object === 'line3' ? true : 'Juste. Donne maintenant une équation cartésienne.';
-  if (form === 'param') return 'Juste. Donne maintenant une paramétrisation.';
+  // Another form than the one asked is a step on the way (ok), not a line to redo.
+  if (part.shape === 'param') return form === 'param' || form === 'any';
+  if (form === 'param') return false;
   const eqs = part.eqs || [];
   if (cfg.object === 'circle' || cfg.object === 'sphere') {
     if (form === 'any') return true;
@@ -167,7 +168,7 @@ function partFinal(cfg, part, form) {
     const l = stripParen(eqs[0].l);
     return l.t === 'sym' && l.name === 'y' && flatLinear(eqs[0].r) ? true : false;
   }
-  if (part.shape === 'chain') return cfg.object === 'line3' ? 'Juste. Écris-la comme deux équations séparées par « ; ».' : false;
+  if (part.shape === 'chain') return false;
   const want = cfg.object === 'line3' ? 2 : 1;
   if (eqs.length !== want) return false;
   for (const { l, r } of eqs) {
