@@ -174,9 +174,9 @@ export const RULES = [
     id: 'g2_log_domain', family: 'method', tag: 'E', skill: 'g2-log-eq', repair: 'g1-domain', judges: ['solset'],
     name: 'Solutions gardées hors du domaine',
     example: ['S = {−3 ; 3}', 'S = {3}'],
-    check: { judge: { kind: 'solset', v: 'x', onDomain: true }, prev: 'log_2(x-1)+log_2(x+1)=3', line: '{-3;3}' },
+    check: { judge: { kind: 'solset', v: 'x', onDomain: true, logs: true }, prev: 'log_2(x-1)+log_2(x+1)=3', line: '{-3;3}' },
     transform: (prev, ctx) => {
-      if (!ctx?.cfg?.onDomain || ctx.cfg.periodic) return [];
+      if (!ctx?.cfg?.onDomain || !ctx.cfg.logs) return [];
       const merged = mergeLogs(prev);
       return [{ node: prev, ctx: {} }, { node: merged, ctx: {} }];
     },

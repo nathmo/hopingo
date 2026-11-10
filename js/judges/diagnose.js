@@ -9,7 +9,7 @@ import { CAS_RULES } from '../cas/rules/index.js';
 // same(candidate, line) → boolean, the judge's equivalence.
 // Returns {rules: [id], ambiguous, ctx, all} or null.
 export function diagnoseLine(kind, prev, node, cfg, same) {
-  const ctx = { v: cfg.dvar || cfg.vars?.[0] || 'x', cfg };
+  const ctx = { v: cfg.dvar || cfg.vars?.[0] || cfg.v || 'x', cfg };
   const matches = [];
   for (const r of CAS_RULES) {
     if (!r.judges?.includes(kind) || !r.transform) continue;
@@ -29,7 +29,7 @@ export function diagnoseLine(kind, prev, node, cfg, same) {
 // Wrong final answers a trap produces from the question's first line, for
 // the distractors of a multiple choice (§7). Returns [{node, rule}].
 export function trapAnswers(kind, start, cfg, finish = (n) => n) {
-  const ctx = { v: cfg.dvar || cfg.vars?.[0] || 'x', cfg };
+  const ctx = { v: cfg.dvar || cfg.vars?.[0] || cfg.v || 'x', cfg };
   const out = [];
   for (const r of CAS_RULES) {
     if (!r.judges?.includes(kind) || !r.transform) continue;

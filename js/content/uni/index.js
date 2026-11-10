@@ -26,6 +26,4 @@ export const UNBUILT = {
   'g6-deriv-usual': ['g2-real-powers', 'g3-radians'],
   // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
   'g8-algebraic': ['lit-identities'],
-  // G1, second half, built in parallel (step U1b).
-  'g1-irr-ineq': ['quad-formula', 'g9-intervals'], // TEMP u1b-merge
 };

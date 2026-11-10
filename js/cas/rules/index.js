@@ -7,6 +7,8 @@ import { RULES as G0 } from './g0.js';
 import { RULES as G2 } from './g2.js';
 import { RULES as G3 } from './g3.js';
 import { RULES as G5 } from './g5.js';
-import { RULES as G1 } from './g1.js';
+import { RULES as G1, EARLY as G1_EARLY } from './g1.js';
 
-export const CAS_RULES = [...G6, ...G9, ...G0, ...G2, ...G3, ...G5, ...G1];
+// The G1 traps of inequalities come before G9: a closed bracket at a
+// forbidden value is named g1_pole_closed, not g9_bracket.
+export const CAS_RULES = [...G6, ...G1_EARLY, ...G9, ...G0, ...G2, ...G3, ...G5, ...G1];

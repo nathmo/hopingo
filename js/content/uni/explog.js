@@ -697,7 +697,7 @@ function leMain(level, rng, opts) {
   let script = lines;
   if (level === 1) script = [{ kind: 'note', html: `Domaine : D = ]${fr(String(qq))} ; +∞[.` }, ...lines.slice(1).map((l, i) => (i === 1 ? blanked(l, [String(A)]) : l))];
   if (level === 2) script = [blanked(lines[0], [String(qq)]), ...lines.slice(1)];
-  const judge = { kind: 'solset', v: V, onDomain: true };
+  const judge = { kind: 'solset', v: V, onDomain: true, logs: true };
   const sLines = level === 1 ? lines.slice(1) : lines;
   return linesItem({
     skill: LE, level, prompt: `Résous ${MT(start)}.`,
@@ -722,7 +722,7 @@ function leSquare(level, rng, opts) {
   ];
   return linesItem({
     skill: LE, level, prompt: `Résous ${MT(start)}.`,
-    start, judge: { kind: 'solset', v: V, onDomain: true }, mode: modeOf(level), script: lines,
+    start, judge: { kind: 'solset', v: V, onDomain: true, logs: true }, mode: modeOf(level), script: lines,
     hints: H('Attention : ln(x²) existe aussi pour x < 0. Ne remplace pas ln(x²) par 2 ln x.', `2 ln(x + ${c}) = ln((x + ${c})²)`, MT(lines[2].math)),
     subgoals: LE_SUB, keys: KEYS, key: `${LE}:${start}`, exam: examOf(opts),
   });
@@ -744,7 +744,7 @@ function leBases(rng, opts) {
   ];
   return linesItem({
     skill: LE, level: 5, prompt: `Résous ${MT(start)}.`,
-    start, judge: { kind: 'solset', v: V, onDomain: true }, mode: 'free', script: lines,
+    start, judge: { kind: 'solset', v: V, onDomain: true, logs: true }, mode: 'free', script: lines,
     hints: [], subgoals: LE_SUB, keys: KEYS, key: `${LE}:${start}`, exam: examOf(opts),
   });
 }
@@ -860,7 +860,7 @@ function iqSimple(level, rng, opts) {
   }
   script.push(level <= 2 ? blanked(lines[1], [linP]) : lines[1], lines[2], lines[3]);
   const sLines = level === 1 ? lines.slice(1) : lines;
-  const judge = { kind: 'solset', v: V, onDomain: true };
+  const judge = { kind: 'solset', v: V, onDomain: true, logs: true };
   return linesItem({
     skill: IQ, level, prompt: `Résous ${MT(start)}.`,
     start, judge: withMenus(judge, level, start, sLines, IQ_CHOICES), mode: modeOf(level), script,
@@ -907,7 +907,7 @@ function iqMan(level, rng, opts) {
     E(le ? `${r2}≤x≤${r1}` : `x≤${r2} ou x≥${r1}`, 'Signe du trinôme', 'trinome', 'solve'),
     E(le ? `]${p};${r1}]` : `[${r1};+∞[`, 'Intersecter avec D', 'inter', 'inter'),
   ];
-  const judge = { kind: 'solset', v: V, onDomain: true };
+  const judge = { kind: 'solset', v: V, onDomain: true, logs: true };
   return linesItem({
     skill: IQ, level, prompt: `Résous ${MT(start)}.`,
     start, judge: withMenus(judge, level, start, lines, IQ_CHOICES), mode: modeOf(level), script: lines,
