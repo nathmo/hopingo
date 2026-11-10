@@ -1794,7 +1794,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 | `f_neumann_sine` | method | E | `f-heat-sep` | `f-heat-sep` | Neumann avec sin(nπx/L) → cos(nπx/L) | Choisir les sinus pour u_x = 0 aux bords. | « u_x = 0 aux bords : ce sont les cosinus qui vérifient cette condition. » |
 | `f_heat_source_steady` | method | E | `f-heat-source` | `f-heat-source` | b₂ = 1/4 → (1 − e^(−4t))/4 | Prendre seulement la solution stationnaire, sans la condition initiale du mode. | « b₂(0) = 0 : la partie stationnaire 1/4 doit être corrigée par −e^(−4t)/4. » |
 | `f_wave_factor` | calculus | C | `f-wave` | `f-wave` | û_tt + α² û = 0 → + (α²/4) û ; u = (…)/4 → (…)/2 | Oublier c² ou mettre un facteur 1/4 dans la formule de d'Alembert. | « Le coefficient ¼ devant u_xx donne c = ½. » (Corrigé MT/SV 2021.) |
-| `f_half_plane_abs` | method | E | `f-laplace-eq` | `f-laplace-eq` | û = A e^(|α|x) + B e^(−|α|x) gardé → B e^(−|α|x) | Garder la solution non bornée. | « e^(|α|x) explose quand x → ∞ : il faut A = 0. » |
+| `f_half_plane_abs` | method | E | `f-laplace-eq` | `f-laplace-eq` | û = A e^(\|α\|x) + B e^(−\|α\|x) gardé → B e^(−\|α\|x) | Garder la solution non bornée. | « e^(\|α\|x) explose quand x → ∞ : il faut A = 0. » |
 | `f_distrib_jump` | rule | C | `f-distrib-deriv` | `f-distrib-deriv` | Df = −f → −f + δ | Oublier les δ des sauts. | « f saute de {h} en {a} : la dérivée contient {h}δ_{a}. » (Options du QCM MT/SV 2021.) |
 | `f_distrib_sign` | sign | E | `f-distrib-deriv` | `f-distrib-deriv` | ⟨DT, φ⟩ = ⟨T, φ′⟩ → −⟨T, φ′⟩ | Oublier le signe moins. | « ⟨DT, φ⟩ = −⟨T, φ′⟩. » |
 | `f_fdelta` | rule | E | `f-distrib-def` | `f-distrib-def` | f δ_a = f(0) δ_a ou f(x) δ_a → f(a) δ_a | Évaluer en 0 au lieu de a, ou ne pas évaluer. | « ⟨f δ_a, φ⟩ = f(a)φ(a). » |
