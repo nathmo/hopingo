@@ -31,7 +31,7 @@ function sinc(rng) {
     target: `int(sin(${bα})^2/α^2, α, -∞, ∞)`, value: want,
     fHtml: `f(x) = 1 si |x| &lt; ${b}, 0 sinon`, f: `H(${b}-abs(x))`, fhat: `√(2/π) sin(${bα})/α`,
     easyStart: `int(1, x, -${b}, ${b})`, easy: [String(2 * b)], easyHtml: '∫ f² = ∫ |f̂|² : à gauche, ∫ f(x)² dx',
-    solve: [`(π/2) int(1, x, -${b}, ${b})`, want],
+    solve: [`(π/2) int(1, x, -${b}, ${b})`, want], solveBlank: ['π/2'], fhatBlank: [`sin(${bα})`],
     hint2: FML(`int(1, x, -${b}, ${b}) = int((2/π) sin(${bα})^2/α^2, α, -∞, ∞)`),
     factor: [`${b === 1 ? '' : 2 * b}${b === 1 ? '2' : ''}π^2`, b === 2 ? '1' : `${b}/2`],
   };
@@ -46,7 +46,7 @@ function lorentz(rng) {
     fHtml: `f(x) = ${FML(`e^(-${w === 1 ? '' : w}|x|)`)}`, f: `e^(-${w === 1 ? '' : w}abs(x))`, fhat: `${w === 1 ? '' : w}√(2/π)/(α^2+${w * w})`,
     easyStart: `int(e^(-${2 * w}|x|), x, -∞, ∞)`, easyValue: `1/${w}`, easy: [`2int(e^(-${2 * w}x), x, 0, ∞)`, `1/${w}`.replace('1/1', '1')],
     easyHtml: '∫ f² = ∫ |f̂|² : à gauche, ∫ f(x)² dx',
-    solve: [`(π/${w * w})int(e^(-${2 * w}x), x, 0, ∞)`.replace('/1)', ')'), `π/${w3}`],
+    solve: [`${w === 1 ? 'π ' : `(π/${w * w})`}int(e^(-${2 * w}x), x, 0, ∞)`, `π/${w3}`], solveBlank: [w === 1 ? 'π' : `π/${w * w}`], fhatBlank: [String(w * w)],
     hint2: FML(`int(e^(-${2 * w}|x|), x, -∞, ∞) = (${2 * w * w}/π) int(1/(α^2+${w * w})^2, α, -∞, ∞)`),
     factor: [`π^2/${w3 / 2}`.replace('/1', ''), `1/${2 * w3}`],
   };
@@ -58,7 +58,7 @@ function gaussMoment() {
     target: 'int(α^2 e^(-α^2/2), α, -∞, ∞)', value: '√2√π',
     fHtml: `f(x) = ${FML('x e^(-x^2)')} (on donne ∫<sub>ℝ</sub> x² e<sup>−2x²</sup> dx = √(2π)/8)`, f: 'x e^(-x^2)', fhat: '-iα e^(-α^2/4)/(2√2)',
     easyStart: 'int(x^2 e^(-2x^2), x, -∞, ∞)', easy: ['√2√π/8'], easyHtml: '∫ f² = ∫ |f̂|² : à gauche, ∫ f(x)² dx (valeur donnée)',
-    solve: ['8 int(x^2 e^(-2x^2), x, -∞, ∞)', '√2√π'],
+    solve: ['8 int(x^2 e^(-2x^2), x, -∞, ∞)', '√2√π'], solveBlank: ['8'], fhatBlank: ['2√2'],
     hint2: FML('int(x^2 e^(-2x^2), x, -∞, ∞) = (1/8)int(α^2 e^(-α^2/2), α, -∞, ∞)'),
     factor: ['2π√2√π', '√2/(2√π)'],
   };
@@ -71,8 +71,8 @@ function reverse(rng) {
     id: `F6:${w}`, table: 'F6',
     target: `int(1/(x^2+${w * w})^2, x, -∞, ∞)`, value: `π/${w3}`,
     fHtml: `f(x) = ${FML(`1/(x^2+${w * w})`)}`, f: `1/(x^2+${w * w})`, fhat: `√(π/2) e^(-${w === 1 ? '' : w}abs(α))/${w}`.replace('/1', ''),
-    easyStart: `int((π/2)e^(-${2 * w}|α|)/${w * w}, α, -∞, ∞)`.replace('/1,', ','), easyValue: `π/${w3}`, easy: [`(π/${w * w})int(e^(-${2 * w}α), α, 0, ∞)`.replace('/1)', ')'), `π/${w3}`], easyHtml: 'Cette fois, c\'est ∫ |f̂(α)|² dα qui est facile',
-    solve: [`(π/${w * w})int(e^(-${2 * w}α), α, 0, ∞)`.replace('/1)', ')'), `π/${w3}`],
+    easyStart: `int((π/2)e^(-${2 * w}|α|)/${w * w}, α, -∞, ∞)`.replace('/1,', ','), easyValue: `π/${w3}`, easy: [`${w === 1 ? 'π ' : `(π/${w * w})`}int(e^(-${2 * w}α), α, 0, ∞)`, `π/${w3}`], easyHtml: 'Cette fois, c\'est ∫ |f̂(α)|² dα qui est facile',
+    solve: [`${w === 1 ? 'π ' : `(π/${w * w})`}int(e^(-${2 * w}α), α, 0, ∞)`, `π/${w3}`], solveBlank: [w === 1 ? 'π' : `π/${w * w}`], fhatBlank: ['√(π/2)'],
     hint2: FML(`int(1/(x^2+${w * w})^2, x, -∞, ∞) = int((π/2)e^(-${2 * w}abs(α))/${w * w}, α, -∞, ∞)`.replace('/1,', ',')),
     factor: [`π^2/${w3 / 2}`.replace('/1', ''), `1/${2 * w3}`],
   };
@@ -84,11 +84,11 @@ function parts(d) {
   return [{
     html: '', start: `f(x) = ${d.f}`, judge: ft({ f: d.f, F: d.fhat }),
     menu: [{ id: 'table', label: `Ligne ${d.table} de la table`, valid: true }, { id: 'direct', label: 'Calculer f̂ par la définition', valid: false, why: 'La table la donne directement.' }],
-    lines: [{ math: `f̂(α) = ${d.fhat}`, note: `Ligne ${d.table}`, subgoal: 'table' }],
+    lines: [{ math: `f̂(α) = ${d.fhat}`, note: `Ligne ${d.table}`, subgoal: 'table', blank: d.fhatBlank }],
   }, {
     html: `${d.easyHtml} :`, ask: 'Calcule l\'intégrale facile.', start: d.easyStart, judge: { kind: 'definite', ...(d.easyValue ? { known: { [key(d.easyStart)]: d.easyValue } } : {}) },
     menu: [{ id: 'calc', label: 'Calculer cette intégrale', valid: true }, { id: 'res', label: 'Utiliser les résidus', valid: false, why: 'Inutile : elle se calcule directement.' }],
-    lines: d.easy.map((math, i) => ({ math, note: i === d.easy.length - 1 ? 'Valeur' : 'Parité', subgoal: 'lhs', blank: i === d.easy.length - 1 ? [] : ['2'] })),
+    lines: d.easy.map((math, i) => ({ math, note: i === d.easy.length - 1 ? 'Valeur' : 'Parité', subgoal: 'lhs', blank: i === d.easy.length - 1 ? [] : [d.table === 'F7' ? '2' : String(2 * Number(d.id.split(':')[1]))] })),
   }, {
     html: 'L\'intégrale demandée :', ask: 'Calcule-la avec Plancherel.', start: d.target,
     judge: { kind: 'definite', known: { [key(d.target)]: d.value }, traps: { f_plancherel_factor: d.factor } },
@@ -103,7 +103,7 @@ function parts(d) {
       { id: 'planch', label: 'Appliquer Plancherel', valid: true },
       { id: 'prim', label: 'Chercher une primitive', valid: false, why: 'Pas de primitive simple : on passe par Plancherel.' },
     ],
-    lines: d.solve.map((math, i) => ({ math, note: i === 0 ? 'Plancherel, puis isoler' : 'Valeur', subgoal: 'solve', blank: i === 0 ? [] : [] })),
+    lines: d.solve.map((math, i) => ({ math, note: i === 0 ? 'Plancherel, puis isoler' : 'Valeur', subgoal: 'solve', blank: i === 0 ? d.solveBlank : [] })),
   }];
 }
 

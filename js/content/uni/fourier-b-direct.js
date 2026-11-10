@@ -53,7 +53,7 @@ function tent(rng) {
   const ba = b === 1 ? 'α' : `${b}α`;
   return {
     id: `tent:${b}:${c}`, parity: 'even', b, c,
-    fHtml: `${c === 1 ? '' : c}(${b} − |x|) si |x| ≤ ${b}, 0 sinon`,
+    fHtml: `${c === 1 ? `${b} − |x|` : `${c}(${b} − |x|)`} si |x| ≤ ${b}, 0 sinon`,
     f: `H(${b}-abs(x))${term(c, `(${b}-abs(x))`).replace(/^(\d+)\(/, '($1)(')}`,
     F: `${c}sqrt(2/π)(1-cos(${ba}))/α^2`,
     int: `int(${P}cos(α x), x, 0, ${b})`,

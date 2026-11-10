@@ -76,7 +76,7 @@ function absShift(rng) {
     f: `e^(-${wa})`,
     F: sval(s),
     lines: [
-      { math: `f̂(α) = ${s} ℱ(${g})`, note: `f(x) = g(x − ${a}) : translation`, subgoal: 'property' },
+      { math: `f̂(α) = ${s} ℱ(${g})`, note: `f(x) = g${xa(a).replace('-', ' − ').replace('+', ' + ')} : translation`, subgoal: 'property' },
       { math: `f̂(α) = ${sval(s)}`, note: `Ligne F7 : e^(−${w === 1 ? '' : w}|y|) = ${w === 1 ? '' : w}·e^(−|${w === 1 ? '' : w}y|)/${w}`, subgoal: 'table', blank: [String(w * w)], blank2: [s] },
     ],
     traps: {
@@ -140,7 +140,7 @@ function halfShift(rng) {
     F: `${s}/(√(2π)(${w}+iα))`,
     lines: [
       { math: `f̂(α) = ${s} ℱ(H(x)e^(-${w === 1 ? '' : w}x))`, note: 'Translation', subgoal: 'property' },
-      { math: `f̂(α) = ${s}/(√(2π)(${w}+iα))`, note: `Ligne F3 avec w = ${w}`, subgoal: 'table', blank: [String(w)], blank2: [String(w)] },
+      { math: `f̂(α) = ${s}/(√(2π)(${w}+iα))`, note: `Ligne F3 avec w = ${w}`, subgoal: 'table', blank: [`${w}+iα`], blank2: [`${w}+iα`] },
     ],
     traps: {
       f_ft_shift_sign: [`f̂(α) = ${shiftT(-a)}/(√(2π)(${w}+iα))`],

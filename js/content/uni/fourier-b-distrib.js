@@ -34,7 +34,7 @@ function famA(rng) {
     pair: `int(${kx} φ(x), x, 0, 1) + int(${m === 1 ? '' : m}φ(x)/x, x, 1, ∞)`,
     pairBlank: ['0', '1'],
     def: `-int(${kx} φ'(x), x, 0, 1) - int(${m === 1 ? '' : m}φ'(x)/x, x, 1, ∞)`,
-    ipp: `-${k === 1 ? '' : k}φ(1) + int(${k}φ(x), x, 0, 1) + ${m === 1 ? '' : m}φ(1) - int(${m}φ(x)/x^2, x, 1, ∞)`,
+    ipp: `-${k === 1 ? '' : k}φ(1) + int(${k === 1 ? '' : k}φ(x), x, 0, 1) + ${m === 1 ? '' : m}φ(1) - int(${m === 1 ? '' : m}φ(x)/x^2, x, 1, ∞)`,
     ippBlank: ['x^2'],
     jumps: [{ a: 1, h: m - k }],
     conclude: `DT_f = T_(f') ${m - k > 0 ? '+' : '-'} ${Math.abs(m - k) === 1 ? '' : Math.abs(m - k)}δ_1`,
@@ -139,7 +139,7 @@ function defPair(level, rng, opts = {}, F = rng.pick([famA, famB])(rng)) {
       ],
       lines: [
         { math: `⟨T_f, φ⟩ + ⟨(${D.g})${dA(D.a)}, φ⟩`, note: 'Linéarité', subgoal: 'definition' },
-        { math: final, note: `∫ fφ par morceaux ; ⟨g δ_a, φ⟩ = g(${D.a})φ(${D.a})`, subgoal: 'evaluate', blank: F.pairBlank, blank2: [`${Math.abs(D.ga) === 1 ? '' : Math.abs(D.ga)}φ(${D.a})`.replace(/^φ/, 'φ')] },
+        { math: final, note: `∫ fφ par morceaux ; ⟨g δ_a, φ⟩ = g(${D.a})φ(${D.a})`.replace(/-/g, '−'), subgoal: 'evaluate', blank: F.pairBlank, blank2: [`${Math.abs(D.ga) === 1 ? '' : Math.abs(D.ga)}φ(${D.a})`.replace(/^φ/, 'φ')] },
       ],
     }],
     hints: H('⟨T_f, φ⟩ = ∫ f φ, coupée selon les morceaux de f ; ⟨g δ_a, φ⟩ = ⟨δ_a, gφ⟩ = g(a)φ(a).', `g(${D.a}) = ${D.ga}`.replace(/-/g, '−'), DML(final, 'x', F.fns)),
@@ -171,7 +171,7 @@ function defProof(level, rng, opts = {}) {
       ],
       lines: [
         { math: `⟨${dA(D.a)}, (${D.g})φ⟩`, note: '⟨gT, φ⟩ = ⟨T, gφ⟩', subgoal: 'definition' },
-        { math: `(${sub})φ(${D.a})`, note: `⟨δ_a, ψ⟩ = ψ(${D.a})`, subgoal: 'evaluate', blank: [String(D.a)], blank2: [sub] },
+        { math: `(${sub})φ(${D.a})`, note: `⟨δ_a, ψ⟩ = ψ(${D.a})`.replace(/-/g, '−'), subgoal: 'evaluate', blank: [String(D.a)], blank2: [sub] },
         { math: `${gd} = ${gaD}`, note: 'Pour toute φ : égalité des distributions', subgoal: 'evaluate' },
       ],
     }],
@@ -244,7 +244,7 @@ export function derLines(level, rng, opts = {}, F = derFamily(rng)) {
   const jumpsT = F.jumps.map((j) => `${String(j.h).replace('-', '−')} en ${String(j.a).replace('-', '−')}`).join(', ');
   return partsItem({
     skill: DER, level,
-    prompt: `Soit ${F.html}. Calcule la dérivée de ${F.v === 't' ? 'f' : 'T_f'} au sens des distributions : ${DML(F.start, v, F.fns)}, puis ${F.v === 't' ? 'Df' : 'DT_f'} avec T_(f′) et des δ.`,
+    prompt: `Soit ${F.html}. Calcule la dérivée de ${F.v === 't' ? 'f' : 'T_f'} au sens des distributions : ${DML(F.start, v, F.fns)}, puis ${F.v === 't' ? 'Df, écrite avec f et δ' : 'DT_f, écrite avec T_(f′) et des δ'}.`,
     parts: [{
       html: '', start: F.start, judge,
       decisions: [{
