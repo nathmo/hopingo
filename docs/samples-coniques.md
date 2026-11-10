@@ -248,19 +248,21 @@ Vrai ou faux ?
   pièges : g4_square_constant
 
 Trouve l'équation du cercle qui passe par A(−6 ; −4), B(3 ; −1) et C(2 ; −4).
-  [free, sans aide, examen open]  m
-    (Le centre est à égale distance de A et de B : il est sur la médiatrice de [AB].)
-    = 9(x + 3/2) + 3(y + 5/2) = 0   ← AB⃗ = (9 ; 3), milieu I = (−3/2 ; −5/2)
-    = 3x + y + 7 = 0   ← Forme cartésienne
-  — Et sur la médiatrice de [AC].  [juge geom]  départ : m
-    = x + 2 = 0   ← AC⃗ = (8 ; 0), milieu I = (−2 ; −4)
-  — Le centre est l'intersection des deux médiatrices.  [juge vector]  départ : Ω
-    = Ω = (-2 ; -1)   ← Résoudre le système des deux médiatrices
-  — Le rayon : r² = ΩA².  [juge value]  départ : r²
-    = (−6 − (−2))² + (−4 − (−1))²   ← r² = (x_A − h)² + (y_A − k)²
-    = 25
-  — L'équation du cercle.  [juge geom]  départ : γ
-    = (x + 2)² + (y + 1)² = 25   ← (x − h)² + (y − k)² = r²
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1 ; Et sur la médiatrice de [AC]. : 1 ; Le centre est l'intersection des deux médiatrices. : 1 ; Le rayon : r² = ΩA². : 1 ; L'équation du cercle. : 1)
+    [free, sans aide, suivre l'erreur, examen open]  m
+      (Le centre est à égale distance de A et de B : il est sur la médiatrice de [AB].)
+      = 9(x + 3/2) + 3(y + 5/2) = 0   ← AB⃗ = (9 ; 3), milieu I = (−3/2 ; −5/2)
+      = 3x + y + 7 = 0   ← Forme cartésienne
+    — Et sur la médiatrice de [AC].  [juge geom]  départ : m
+      = x + 2 = 0   ← AC⃗ = (8 ; 0), milieu I = (−2 ; −4)
+    — Le centre est l'intersection des deux médiatrices.  [juge vector]  départ : Ω
+      = Ω = (-2 ; -1)   ← Résoudre le système des deux médiatrices
+    — Le rayon : r² = ΩA².  [juge value]  départ : r²
+      = (−6 − (−2))² + (−4 − (−1))²   ← r² = (x_A − h)² + (y_A − k)²
+      = 25
+    — L'équation du cercle.  [juge geom]  départ : γ
+      = (x + 2)² + (y + 1)² = 25   ← (x − h)² + (y − k)² = r²
   pièges : g4_line_constant
 
 ```
@@ -469,15 +471,17 @@ Vrai ou faux ?
   pièges : g10_vertical_tangent_lost
 
 Trouve les tangentes au cercle γ : (x − 1)² + (y − 3)² = 25 issues du point Q(8 ; 2).
-  [free, sans aide, examen open]  ΩQ²
-    = (8 − 1)² + (2 − 3)²   ← Position de Q : ΩQ²
-    = 50   ← 50 > 25 = r² : Q est extérieur
-  — Les droites non verticales par Q : y − 2 = m(x − 8). Elles sont tangentes si leur distance au centre vaut r = 5.  [juge solset]  départ : |−7m − 1|/√(m² + 1) = 5
-    = (−7m − 1)² = 25(m² + 1)   ← Élever au carré
-    = 24m² + 14m − 24 = 0   ← Développer
-    = m = −4/3 ou m = 3/4   ← Deux pentes
-  — Les tangentes issues de Q.  [juge geom]  départ : T
-    = 3x − 4y − 16 = 0 ou 4x + 3y − 38 = 0   ← y − y_Q = m(x − x_Q), mis sous forme cartésienne
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1,5 ; Les droites non verticales par Q : y − 2 = m(x − 8). Elles sont tangentes si leur distance au centre vaut r = 5. : 2,5 ; Les tangentes issues de Q. : 1)
+    [free, sans aide, suivre l'erreur, examen open]  ΩQ²
+      = (8 − 1)² + (2 − 3)²   ← Position de Q : ΩQ²
+      = 50   ← 50 > 25 = r² : Q est extérieur
+    — Les droites non verticales par Q : y − 2 = m(x − 8). Elles sont tangentes si leur distance au centre vaut r = 5.  [juge solset]  départ : |−7m − 1|/√(m² + 1) = 5
+      = (−7m − 1)² = 25(m² + 1)   ← Élever au carré
+      = 24m² + 14m − 24 = 0   ← Développer
+      = m = −4/3 ou m = 3/4   ← Deux pentes
+    — Les tangentes issues de Q.  [juge geom]  départ : T
+      = 3x − 4y − 16 = 0 ou 4x + 3y − 38 = 0   ← y − y_Q = m(x − x_Q), mis sous forme cartésienne
 
 ```
 
@@ -676,18 +680,20 @@ Vrai ou faux ?
   [examen tf]
 
 Trouve le cercle γ orthogonal aux cercles γ₁ : x² + y² − 8x − 4y + 16 = 0 et γ₂ : x² + y² − 14x − 4y + 28 = 0, dont le centre est sur la droite d : x − y − 1 = 0.
-  [free, sans aide, examen open]  Δ
-    (Le centre Ω a la même puissance par rapport aux deux cercles (r²) : il est sur leur axe radical.)
-    = (x² + y² − 8x − 4y + 16) − (x² + y² − 14x − 4y + 28) = 0   ← γ₁ − γ₂ = 0 : les carrés disparaissent
-    = 6(x − 2) = 0   ← Réduire : 6x − 12 = 0
-    = x − 2 = 0   ← Réduire, puis diviser par 6
-  — Ω est aussi sur d : x − y − 1 = 0.  [juge vector]  départ : Ω
-    = Ω = (2 ; 1)   ← Intersection de l'axe radical et de d
-  — r² est la puissance de Ω par rapport à γ₁.  [juge value]  départ : r²
-    = 2² + 1² + (−8)·2 + (−4)·1 + (16)   ← γ₁(Ω)
-    = 1
-  — Le cercle cherché.  [juge geom]  départ : γ
-    = (x − 2)² + (y − 1)² = 1
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1,5 ; Ω est aussi sur d : x − y − 1 = 0. : 1 ; r² est la puissance de Ω par rapport à γ₁. : 1,5 ; Le cercle cherché. : 1)
+    [free, sans aide, suivre l'erreur, examen open]  Δ
+      (Le centre Ω a la même puissance par rapport aux deux cercles (r²) : il est sur leur axe radical.)
+      = (x² + y² − 8x − 4y + 16) − (x² + y² − 14x − 4y + 28) = 0   ← γ₁ − γ₂ = 0 : les carrés disparaissent
+      = 6(x − 2) = 0   ← Réduire : 6x − 12 = 0
+      = x − 2 = 0   ← Réduire, puis diviser par 6
+    — Ω est aussi sur d : x − y − 1 = 0.  [juge vector]  départ : Ω
+      = Ω = (2 ; 1)   ← Intersection de l'axe radical et de d
+    — r² est la puissance de Ω par rapport à γ₁.  [juge value]  départ : r²
+      = 2² + 1² + (−8)·2 + (−4)·1 + (16)   ← γ₁(Ω)
+      = 1
+    — Le cercle cherché.  [juge geom]  départ : γ
+      = (x − 2)² + (y − 1)² = 1
   pièges : g4_line_constant
 
 ```
@@ -886,19 +892,21 @@ Vrai ou faux ?
   [examen tf]
 
 Par la polaire, trouve les points de contact et les tangentes au cercle γ : (x + 1)² + (y + 2)² = 17 issues du point P(2 ; −7).
-  [free, sans aide, examen open]  p
-    (La polaire de P passe par les deux points de contact.)
-    = 3(x + 1) + (−5)(y + 2) = 17   ← Dédoubler : x₀ − h = 3, y₀ − k = −5
-    = 3x − 5y − 24 = 0   ← Développer
-  — On remplace y de la polaire dans l'équation du cercle.  [juge solset]  départ : (x + 1)² + ((3x − 14)/5)² = 17
-    = x² − x − 6 = 0   ← Développer
-    = x = −2 ou x = 3   ← Résoudre
-  — Le premier point de contact (x = −2).  [juge vector]  départ : T_1
-    = T_1 = (-2 ; -6)   ← y se lit sur la polaire
-  — Le second.  [juge vector]  départ : T_2
-    = T_2 = (3 ; -3)
-  — Les tangentes issues de P sont les droites (PT₁) et (PT₂).  [juge geom]  départ : t
-    = x + 4y + 26 = 0 ou 4x − y − 15 = 0   ← En Tᵢ : (x_T − h)(x − h) + (y_T − k)(y − k) = r²
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1 ; On remplace y de la polaire dans l'équation du cercle. : 1 ; Le premier point de contact (x = −2). : 1 ; Le second. : 1 ; Les tangentes issues de P sont les droites (PT₁) et (PT₂). : 1)
+    [free, sans aide, suivre l'erreur, examen open]  p
+      (La polaire de P passe par les deux points de contact.)
+      = 3(x + 1) + (−5)(y + 2) = 17   ← Dédoubler : x₀ − h = 3, y₀ − k = −5
+      = 3x − 5y − 24 = 0   ← Développer
+    — On remplace y de la polaire dans l'équation du cercle.  [juge solset]  départ : (x + 1)² + ((3x − 14)/5)² = 17
+      = x² − x − 6 = 0   ← Développer
+      = x = −2 ou x = 3   ← Résoudre
+    — Le premier point de contact (x = −2).  [juge vector]  départ : T_1
+      = T_1 = (-2 ; -6)   ← y se lit sur la polaire
+    — Le second.  [juge vector]  départ : T_2
+      = T_2 = (3 ; -3)
+    — Les tangentes issues de P sont les droites (PT₁) et (PT₂).  [juge geom]  départ : t
+      = x + 4y + 26 = 0 ou 4x − y − 15 = 0   ← En Tᵢ : (x_T − h)(x − h) + (y_T − k)(y − k) = r²
   pièges : g4_line_constant, g10_polar_origin_formula
 
 ```
@@ -1153,17 +1161,19 @@ L'ellipse 16x² + 25y² + 96x − 250y + 369 = 0 a un foyer F à droite de l'aut
   pièges : g10_c_wrong_formula, g10_axis_swap
 
 Pour l'ellipse E : 25x² + 16y² + 50x + 160y + 25 = 0, trouve la forme réduite, le centre, a et b, les foyers, l'excentricité et les directrices.
-  [free, sans aide, examen open]  25x² + 16y² + 50x + 160y + 25 = 0
-    = 25(x + 1)² − 25 + 16(y + 5)² − 400 + 25 = 0   ← Compléter les carrés
-    = (x + 1)²/16 + (y + 5)²/25 = 1   ← Diviser par le second membre
-  — Le centre et les demi-axes.  [juge conic]  départ : E
-    = Ω = (-1 ; -5) ; a = 5 ; b = 4   ← Grand axe vertical : a² = 25 sous y
-  — Les foyers.  [juge conic]  départ : E
-    = c = 3   ← c² = a² − b² = 9
-    = F = (-1 ; -2) ; F' = (-1 ; -8)   ← Sur le grand axe, à c du centre
-  — L'excentricité et les directrices.  [juge conic]  départ : E
-    = e = 3/5   ← e = c/a
-    = directrices÷y = 10/3 ou y = −40/3   ← À a²/c = 25/3 du centre, perpendiculaires au grand axe
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1,5 ; Le centre et les demi-axes. : 1 ; Les foyers. : 1,5 ; L'excentricité et les directrices. : 1)
+    [free, sans aide, suivre l'erreur, examen open]  25x² + 16y² + 50x + 160y + 25 = 0
+      = 25(x + 1)² − 25 + 16(y + 5)² − 400 + 25 = 0   ← Compléter les carrés
+      = (x + 1)²/16 + (y + 5)²/25 = 1   ← Diviser par le second membre
+    — Le centre et les demi-axes.  [juge conic]  départ : E
+      = Ω = (-1 ; -5) ; a = 5 ; b = 4   ← Grand axe vertical : a² = 25 sous y
+    — Les foyers.  [juge conic]  départ : E
+      = c = 3   ← c² = a² − b² = 9
+      = F = (-1 ; -2) ; F' = (-1 ; -8)   ← Sur le grand axe, à c du centre
+    — L'excentricité et les directrices.  [juge conic]  départ : E
+      = e = 3/5   ← e = c/a
+      = directrices÷y = 10/3 ou y = −40/3   ← À a²/c = 25/3 du centre, perpendiculaires au grand axe
   pièges : g4_square_constant, g10_c_wrong_formula, g10_axis_swap
 
 ```
@@ -1372,18 +1382,20 @@ Vrai ou faux ?
   [examen tf]
 
 Pour l'hyperbole H : 9x² − 16y² − 90x − 32y + 65 = 0, trouve la forme réduite, le centre, a, b, c, les foyers, l'excentricité, les asymptotes et les directrices.
-  [free, sans aide, examen open]  9x² − 16y² − 90x − 32y + 65 = 0
-    = 9(x − 5)² − 225 − 16(y + 1)² + 16 + 65 = 0   ← Compléter les carrés
-    = (x − 5)²/16 − (y + 1)²/9 = 1   ← 9(x − 5)² − 16(y + 1)² = 144, puis diviser par le second membre (qui devient +1)
-  — Le centre, a, b et c.  [juge conic]  départ : H
-    = Ω = (5 ; -1) ; a = 4 ; b = 3 ; c = 5   ← Axe réel horizontal ; c² = a² + b² = 25
-  — Les foyers et l'excentricité.  [juge conic]  départ : H
-    = F = (10 ; -1) ; F' = (0 ; -1)   ← Sur l'axe réel, à c du centre
-    = e = 5/4   ← e = c/a > 1
-  — Les asymptotes.  [juge conic]  départ : H
-    = asymptotes÷3x − 4y − 19 = 0 ou 3x + 4y − 11 = 0   ← y − k = ±(b/a)(x − h)
-  — Les directrices.  [juge conic]  départ : H
-    = directrices÷x = 41/5 ou x = 9/5   ← À a²/c = 16/5 du centre
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1 ; Le centre, a, b et c. : 1 ; Les foyers et l'excentricité. : 1 ; Les asymptotes. : 1 ; Les directrices. : 1)
+    [free, sans aide, suivre l'erreur, examen open]  9x² − 16y² − 90x − 32y + 65 = 0
+      = 9(x − 5)² − 225 − 16(y + 1)² + 16 + 65 = 0   ← Compléter les carrés
+      = (x − 5)²/16 − (y + 1)²/9 = 1   ← 9(x − 5)² − 16(y + 1)² = 144, puis diviser par le second membre (qui devient +1)
+    — Le centre, a, b et c.  [juge conic]  départ : H
+      = Ω = (5 ; -1) ; a = 4 ; b = 3 ; c = 5   ← Axe réel horizontal ; c² = a² + b² = 25
+    — Les foyers et l'excentricité.  [juge conic]  départ : H
+      = F = (10 ; -1) ; F' = (0 ; -1)   ← Sur l'axe réel, à c du centre
+      = e = 5/4   ← e = c/a > 1
+    — Les asymptotes.  [juge conic]  départ : H
+      = asymptotes÷3x − 4y − 19 = 0 ou 3x + 4y − 11 = 0   ← y − k = ±(b/a)(x − h)
+    — Les directrices.  [juge conic]  départ : H
+      = directrices÷x = 41/5 ou x = 9/5   ← À a²/c = 16/5 du centre
   pièges : g4_square_constant, g10_c_wrong_formula, g10_axis_swap, g10_asymptote_ratio
 
 ```
@@ -1607,11 +1619,13 @@ Vrai ou faux ?
   pièges : g10_parabola_p_half
 
 Trouve l'équation de la parabole P de foyer F(7/2 ; 3) et de directrice D : x = 5/2, sous la forme réduite, puis son sommet et son axe.
-  [free, sans aide, examen open]  P
-    = (x − 7/2)² + (y − 3)² = (x − 5/2)²   ← MF² = d(M, D)²
-    = (y − 3)² = 2(x − 3)   ← Développer et réduire
-  — Le sommet et l'axe.  [juge conic]  départ : P
-    = S = (3 ; 3) ; axe : y = 3   ← Axe horizontal : le carré porte sur y
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 2,5 ; Le sommet et l'axe. : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  P
+      = (x − 7/2)² + (y − 3)² = (x − 5/2)²   ← MF² = d(M, D)²
+      = (y − 3)² = 2(x − 3)   ← Développer et réduire
+    — Le sommet et l'axe.  [juge conic]  départ : P
+      = S = (3 ; 3) ; axe : y = 3   ← Axe horizontal : le carré porte sur y
   pièges : g4_square_constant, g10_parabola_p_half
 
 ```
@@ -1822,11 +1836,13 @@ Quelle est l'équation de la conique de foyer F(−4 ; −1), de directrice D : 
   pièges : g10_e_inverted
 
 Une ellipse a pour centre Ω(3 ; −3), son grand axe parallèle à Oy, un sommet en S(3 ; 1), et elle passe par P(−3 ; −1). Trouve son équation réduite.
-  [free, sans aide, examen open]  b²
-    (a est la distance du centre au sommet. Que vaut b² ?)
-    = 48   ← 2²/16 + 6²/b² = 1
-  — L'équation réduite ?  [juge conic]  départ : E
-    = (x − 3)²/48 + (y + 3)²/16 = 1
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 2,5 ; L'équation réduite ? : 2,5)
+    [free, sans aide, suivre l'erreur, examen open]  b²
+      (a est la distance du centre au sommet. Que vaut b² ?)
+      = 48   ← 2²/16 + 6²/b² = 1
+    — L'équation réduite ?  [juge conic]  départ : E
+      = (x − 3)²/48 + (y + 3)²/16 = 1
 
 ```
 
@@ -2006,16 +2022,18 @@ Quelle est la tangente à la conique 3x² + y² − 12x + 2y − 8 = 0 au point 
   pièges : g10_doubling_wrong
 
 Trouve les tangentes à la conique 3x² − 5y² − 22 = 0 issues du point Q(−11/2 ; 11/2).
-  [free, sans aide, examen open]  3x² − 5y² − 22 = 0
-    (La polaire de Q (dédoubler avec Q) passe par les points de contact.)
-    = 3·(−11/2)·x + (−5)·11/2·y − 22 = 0   ← Dédoubler avec Q
-    = 3x + 5y + 4 = 0
-  — Intersecte-la avec la conique : le point de contact T₁ (le plus à gauche, ou le plus bas) ?  [juge vector]  départ : T_1
-    = T_1 = (-3 ; 1)
-  — Et T₂ ?  [juge vector]  départ : T_2
-    = T_2 = (7 ; -5)
-  — Les deux tangentes, (QT₁) et (QT₂) ?  [juge geom]  départ : τ
-    = 9x + 5y + 22 = 0 ou 21x + 25y − 22 = 0   ← Dédoubler en T₁ et en T₂
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 2 ; Intersecte-la avec la conique : le point de contact T₁ (le plus à gauche, ou le plus bas) ? : 1 ; Et T₂ ? : 1 ; Les deux tangentes, (QT₁) et (QT₂) ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  3x² − 5y² − 22 = 0
+      (La polaire de Q (dédoubler avec Q) passe par les points de contact.)
+      = 3·(−11/2)·x + (−5)·11/2·y − 22 = 0   ← Dédoubler avec Q
+      = 3x + 5y + 4 = 0
+    — Intersecte-la avec la conique : le point de contact T₁ (le plus à gauche, ou le plus bas) ?  [juge vector]  départ : T_1
+      = T_1 = (-3 ; 1)
+    — Et T₂ ?  [juge vector]  départ : T_2
+      = T_2 = (7 ; -5)
+    — Les deux tangentes, (QT₁) et (QT₂) ?  [juge geom]  départ : τ
+      = 9x + 5y + 22 = 0 ou 21x + 25y − 22 = 0   ← Dédoubler en T₁ et en T₂
   pièges : g4_line_constant
 
 ```
@@ -2306,18 +2324,20 @@ Vrai ou faux ?
   [examen tf]
 
 Quelle est la nature de la conique 4x² + 2xy + 4y² − 14x − 26y + 41 = 0 ? Si elle a un centre, donne aussi son équation réduite.
-  [free, sans aide, examen open]  det(M)
-    (Calcule Δ = det M.)
-    = det[[4,1,-7],[1,4,-13],[-7,-13,41]]   ← M = [[a, b/2, d/2], [b/2, c, e/2], [d/2, e/2, f]]
-    = 4·det[[4,-13],[-13,41]]-det[[1,-13],[-7,41]]-7·det[[1,4],[-7,-13]]   ← Développer selon la 1re ligne
-    = −75   ← Δ ≠ 0 : non dégénérée
-  — A = [[4,1],[1,4]]. Et δ = det A ?  [juge value]  départ : δ
-    = 4·4 − 1²   ← δ = ac − (b/2)²
-    = 15
-  — Contrôle par les valeurs propres de A.  [juge solset]  départ : λ² − 8λ + 15 = 0
-    = λ = 5 ou λ = 3   ← Même signe
-  — Écris l'équation réduite dans un repère orthonormé de ses axes, centré en Ω : λ₁X² + λ₂Y² + f(Ω) = 0, avec f(Ω) = Δ/δ.  [juge conic]  départ : 4x² + 2xy + 4y² − 14x − 26y + 41 = 0
-    = 5X² + 3Y² − 5 = 0   ← f(Ω) = Δ/δ = −5
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1,5 ; A = [[4,1],[1,4]]. Et δ = det A ? : 1 ; Contrôle par les valeurs propres de A. : 1 ; Écris l'équation réduite dans un repère orthonormé de ses axes, centré en Ω : λ₁X² + λ₂Y² + f(Ω) = 0, avec f(Ω) = Δ/δ. : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  det(M)
+      (Calcule Δ = det M.)
+      = det[[4,1,-7],[1,4,-13],[-7,-13,41]]   ← M = [[a, b/2, d/2], [b/2, c, e/2], [d/2, e/2, f]]
+      = 4·det[[4,-13],[-13,41]]-det[[1,-13],[-7,41]]-7·det[[1,4],[-7,-13]]   ← Développer selon la 1re ligne
+      = −75   ← Δ ≠ 0 : non dégénérée
+    — A = [[4,1],[1,4]]. Et δ = det A ?  [juge value]  départ : δ
+      = 4·4 − 1²   ← δ = ac − (b/2)²
+      = 15
+    — Contrôle par les valeurs propres de A.  [juge solset]  départ : λ² − 8λ + 15 = 0
+      = λ = 5 ou λ = 3   ← Même signe
+    — Écris l'équation réduite dans un repère orthonormé de ses axes, centré en Ω : λ₁X² + λ₂Y² + f(Ω) = 0, avec f(Ω) = Δ/δ.  [juge conic]  départ : 4x² + 2xy + 4y² − 14x − 26y + 41 = 0
+      = 5X² + 3Y² − 5 = 0   ← f(Ω) = Δ/δ = −5
   pièges : l_cofactor_sign, l_minor_wrong, g10_bhalf_matrix
 
 ```
@@ -2680,26 +2700,28 @@ On réduit la conique 3x² + 4xy + 3y² − 6x − 4y − 17 = 0 dans un repère
   pièges : g10_bhalf_matrix
 
 Dans un repère orthonormé Re, on donne la conique −4x² + 8xy + 2y² − 24x + 36y − 18 = 0. Réduis-la : valeurs propres et vecteurs propres normés de A, centre Ω, constante f(Ω), puis l'équation dans le repère Ru, et enfin les foyers dans Re.
-  [free, sans aide, examen open]  det(A − λI)
-    (A = [[-4,4],[4,2]] (b/2 = 4 hors de la diagonale).)
-    = det[[-4-λ,4],[4,2-λ]]   ← A = [[a, b/2], [b/2, c]] : b/2 = 4 hors de la diagonale
-    = (−4 − λ)(2 − λ) − 4²   ← Déterminant 2 × 2
-    = λ² + 2λ − 24   ← Développer
-    = (λ − 4)(λ + 6)   ← λ₁ = 4, λ₂ = −6
-  — λ₁ = 4. Un vecteur propre ?  [juge eigvec]  départ : v_1
-    = (-1 ; -2)   ← (A − 4I)v = 0
-  — Norme-le.  [juge vector]  départ : u_1
-    = u_1 = (-1 ; -2)/√5   ← ‖(−1 ; −2)‖ = √5
-  — u₂ est orthogonal à u₁ (A est symétrique), et le repère est direct : u₂ = u₁ tourné de +90°.  [juge vector]  départ : u_2
-    = u_2 = (2 ; -1)/√5   ← λ₂ = −6
-  — Le centre Ω : ∂f/∂x = −8x + 8y − 24 = 0 et ∂f/∂y = 8x + 4y + 36 = 0.  [juge vector]  départ : Ω
-    = Ω = (-4 ; -1)   ← Résoudre le système
-  — La constante f(Ω) ?  [juge value]  départ : (−4)·(−4)² + 8·(−4)·(−1) + 2·(−1)² + (−24)·(−4) + 36·(−1) + (−18)
-    = 12   ← Remplacer x et y par les coordonnées de Ω
-  — L'équation dans le repère Ru = (Ω ; u₁, u₂).  [juge conic]  départ : −4x² + 8xy + 2y² − 24x + 36y − 18 = 0
-    = 4X² − 6Y² + 12 = 0   ← λ₁X² + λ₂Y² + f(Ω) = 0
-  — Les foyers dans le repère initial Re.  [juge conic]  départ : −(1/3)X² + (1/2)Y² = 1
-    = F = (-6 ; 0) ; F' = (-2 ; -2)   ← c² = a² + b² ; F = Ω ± c·u, u sur l'axe réel
+  [problème, examen open, 7,5 points]
+  partie 1 (Début du problème : 1,5 ; λ₁ = 4. Un vecteur propre ? : 1 ; Norme-le. : 1 ; u₂ est orthogonal à u₁ (A est symétrique), et le repère est direct : u₂ = u₁ tourné de +90°. : 1 ; Le centre Ω : ∂f/∂x = −8x + 8y − 24 = 0 et ∂f/∂y = 8x + 4y + 36 = 0. : 1 ; La constante f(Ω) ? : 1 ; L'équation dans le repère Ru = (Ω ; u₁, u₂). : 0,5 ; Les foyers dans le repère initial Re. : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  det(A − λI)
+      (A = [[-4,4],[4,2]] (b/2 = 4 hors de la diagonale).)
+      = det[[-4-λ,4],[4,2-λ]]   ← A = [[a, b/2], [b/2, c]] : b/2 = 4 hors de la diagonale
+      = (−4 − λ)(2 − λ) − 4²   ← Déterminant 2 × 2
+      = λ² + 2λ − 24   ← Développer
+      = (λ − 4)(λ + 6)   ← λ₁ = 4, λ₂ = −6
+    — λ₁ = 4. Un vecteur propre ?  [juge eigvec]  départ : v_1
+      = (-1 ; -2)   ← (A − 4I)v = 0
+    — Norme-le.  [juge vector]  départ : u_1
+      = u_1 = (-1 ; -2)/√5   ← ‖(−1 ; −2)‖ = √5
+    — u₂ est orthogonal à u₁ (A est symétrique), et le repère est direct : u₂ = u₁ tourné de +90°.  [juge vector]  départ : u_2
+      = u_2 = (2 ; -1)/√5   ← λ₂ = −6
+    — Le centre Ω : ∂f/∂x = −8x + 8y − 24 = 0 et ∂f/∂y = 8x + 4y + 36 = 0.  [juge vector]  départ : Ω
+      = Ω = (-4 ; -1)   ← Résoudre le système
+    — La constante f(Ω) ?  [juge value]  départ : (−4)·(−4)² + 8·(−4)·(−1) + 2·(−1)² + (−24)·(−4) + 36·(−1) + (−18)
+      = 12   ← Remplacer x et y par les coordonnées de Ω
+    — L'équation dans le repère Ru = (Ω ; u₁, u₂).  [juge conic]  départ : −4x² + 8xy + 2y² − 24x + 36y − 18 = 0
+      = 4X² − 6Y² + 12 = 0   ← λ₁X² + λ₂Y² + f(Ω) = 0
+    — Les foyers dans le repère initial Re.  [juge conic]  départ : −(1/3)X² + (1/2)Y² = 1
+      = F = (-6 ; 0) ; F' = (-2 ; -2)   ← c² = a² + b² ; F = Ω ± c·u, u sur l'axe réel
   pièges : l_charpoly_sign, l_lambda_one_entry, g10_bhalf_matrix
 
 ```
@@ -2968,20 +2990,22 @@ La conique 4x² − 2xy + 4y² − 10x − 20y + 25 = 0 a pour équation réduit
   pièges : g10_foci_reduced_frame
 
 La conique 5x² − 4xy + 2y² + 4x − 4y − 22 = 0 a pour équation réduite X²/24 + Y²/4 = 1 dans le repère Ru = (Ω ; u₁, u₂), avec Ω = (0 ; 1), u₁ = (−1 ; −2)/√5 et u₂ = (2 ; −1)/√5. Donne ses foyers, son axe focal dans Re.
-  [free, sans aide, examen open]  c
-    (Dans Ru, c² = a² − b², avec a² = 24 et b² = 4.)
-    = √(24 − 4)   ← Ellipse : c² = a² − b²
-    = 2√5   ← Les foyers sont sur l'axe focal, à c du centre
-  — F est en (2√5 ; 0) dans Ru. Ses coordonnées dans Re ?  [juge vector]  départ : F
-    = F = Ω + 2√5·u_1   ← Ω + X·u₁ + Y·u₂ avec (2√5 ; 0)
-    = F = (0 ; 1) + (-2 ; -4)   ← 2√5·u₁ = (−2 ; −4)
-    = (-2 ; -3)
-  — F' est en (−2√5 ; 0) dans Ru. Ses coordonnées dans Re ?  [juge vector]  départ : F′
-    = F′ = Ω − 2√5·u_1   ← Ω + X·u₁ + Y·u₂ avec (−2√5 ; 0)
-    = F' = (0 ; 1) + (2 ; 4)   ← 2√5·u₁ = (2 ; 4)
-    = (2 ; 5)
-  — L'axe focal dans Re : la droite par Ω de direction u₁ ?  [juge geom]  départ : axe
-    = 2x − y − 1 = 0   ← Direction (−1 ; −2), par Ω
+  [problème, examen open, 3,5 points]
+  partie 1 (Début du problème : 1 ; F est en (2√5 ; 0) dans Ru. Ses coordonnées dans Re ? : 1 ; F' est en (−2√5 ; 0) dans Ru. Ses coordonnées dans Re ? : 1 ; L'axe focal dans Re : la droite par Ω de direction u₁ ? : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  c
+      (Dans Ru, c² = a² − b², avec a² = 24 et b² = 4.)
+      = √(24 − 4)   ← Ellipse : c² = a² − b²
+      = 2√5   ← Les foyers sont sur l'axe focal, à c du centre
+    — F est en (2√5 ; 0) dans Ru. Ses coordonnées dans Re ?  [juge vector]  départ : F
+      = F = Ω + 2√5·u_1   ← Ω + X·u₁ + Y·u₂ avec (2√5 ; 0)
+      = F = (0 ; 1) + (-2 ; -4)   ← 2√5·u₁ = (−2 ; −4)
+      = (-2 ; -3)
+    — F' est en (−2√5 ; 0) dans Ru. Ses coordonnées dans Re ?  [juge vector]  départ : F′
+      = F′ = Ω − 2√5·u_1   ← Ω + X·u₁ + Y·u₂ avec (−2√5 ; 0)
+      = F' = (0 ; 1) + (2 ; 4)   ← 2√5·u₁ = (2 ; 4)
+      = (2 ; 5)
+    — L'axe focal dans Re : la droite par Ω de direction u₁ ?  [juge geom]  départ : axe
+      = 2x − y − 1 = 0   ← Direction (−1 ; −2), par Ω
 
 ```
 
@@ -3248,22 +3272,24 @@ Pour m = 0, que décrit la conique 3x² + (4m + 2)xy + (4m − 2)x − 3 = 0 ?
   pièges : g10_det_sign_nature
 
 On donne la famille de coniques (3m − 3)x² + (2m + 6)xy − 2my² + (−4m − 4)x + (−6m + 6)y + m + 1 = 0, m ∈ ℝ. Donne son genre selon m, puis le lieu des centres et sa nature.
-  [free, sans aide, examen open]  (3m − 3)·(−2)m − (m + 3)²
-    (δ(m) = a(m)·c(m) − (b(m)/2)² ?)
-    = −7m² − 9   ← Développer
-  — δ(m) < 0 : genre hyperbole pour quels m ?  [juge solset]  départ : −7m² − 9 < 0
-    = ℝ   ← Signe du trinôme : celui de a à l'extérieur des racines
-  — Le centre vérifie ½∂f/∂x = 0 et ½∂f/∂y = 0 : −3x + 3y − 2 + m(3x + y − 2) = 0 et 3x + 3 + m(x − 2y − 3) = 0. Isole m dans la 1re (si 3x + y − 2 ≠ 0) : m = −(−3x + 3y − 2)/(3x + y − 2), et remplace dans la 2e.  [juge conic]  départ : lieu
-    = (3x + 3)(3x + y − 2) − (−3x + 3y − 2)(x − 2y − 3) = 0   ← Multiplier par le dénominateur
-  — Développe.  [juge equiv]  départ : (3x + 3)(3x + y − 2) − (−3x + 3y − 2)(x − 2y − 3)
-    = 12x² − 6xy + 6y² − 4x + 8y − 12   ← Le lieu des centres : … = 0
-  — Sa nature : Δ = det M ?  [juge det]  départ : det(M)
-    = det[[12,-3,-2],[-3,6,4],[-2,4,-12]]   ← M = [[a, b/2, d/2], [b/2, c, e/2], [d/2, e/2, f]]
-    = −924
-  — Et δ = det A ?  [juge value]  départ : δ
-    = 63
-  — Un point du lieu peut-il ne pas être un centre ?  [juge vector]  départ : P
-    = (1 ; -1)   ← Q₁ = Q₂ = 0 : le système en m devient P₁ = P₂ = 0, impossible ici
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1 ; δ(m) < 0 : genre hyperbole pour quels m ? : 1 ; Le centre vérifie ½∂f/∂x = 0 et ½∂f/∂y = 0 : −3x + 3y − 2 + m(3x + y − 2) = 0 et 3x + 3 + m(x − 2y − 3) = 0. Isole m dans la 1re (si 3x + y − 2 ≠ 0) : m = −(−3x + 3y − 2)/(3x + y − 2), et remplace dans la 2e. : 0,5 ; Développe. : 0,5 ; Sa nature : Δ = det M ? : 1 ; Et δ = det A ? : 0,5 ; Un point du lieu peut-il ne pas être un centre ? : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  (3m − 3)·(−2)m − (m + 3)²
+      (δ(m) = a(m)·c(m) − (b(m)/2)² ?)
+      = −7m² − 9   ← Développer
+    — δ(m) < 0 : genre hyperbole pour quels m ?  [juge solset]  départ : −7m² − 9 < 0
+      = ℝ   ← Signe du trinôme : celui de a à l'extérieur des racines
+    — Le centre vérifie ½∂f/∂x = 0 et ½∂f/∂y = 0 : −3x + 3y − 2 + m(3x + y − 2) = 0 et 3x + 3 + m(x − 2y − 3) = 0. Isole m dans la 1re (si 3x + y − 2 ≠ 0) : m = −(−3x + 3y − 2)/(3x + y − 2), et remplace dans la 2e.  [juge conic]  départ : lieu
+      = (3x + 3)(3x + y − 2) − (−3x + 3y − 2)(x − 2y − 3) = 0   ← Multiplier par le dénominateur
+    — Développe.  [juge equiv]  départ : (3x + 3)(3x + y − 2) − (−3x + 3y − 2)(x − 2y − 3)
+      = 12x² − 6xy + 6y² − 4x + 8y − 12   ← Le lieu des centres : … = 0
+    — Sa nature : Δ = det M ?  [juge det]  départ : det(M)
+      = det[[12,-3,-2],[-3,6,4],[-2,4,-12]]   ← M = [[a, b/2, d/2], [b/2, c, e/2], [d/2, e/2, f]]
+      = −924
+    — Et δ = det A ?  [juge value]  départ : δ
+      = 63
+    — Un point du lieu peut-il ne pas être un centre ?  [juge vector]  départ : P
+      = (1 ; -1)   ← Q₁ = Q₂ = 0 : le système en m devient P₁ = P₂ = 0, impossible ici
 
 ```
 
@@ -3496,14 +3522,16 @@ Les cercles γ₁ de centre O₁ et de rayon 5, et γ₂ de centre O₂ et de ra
   pièges : g10_locus_square_condition
 
 On donne le cercle γ : x² + y² = 100 et le point A(0 ; 6). Trouve le lieu des centres M des cercles qui passent par A et sont tangents intérieurement à γ.
-  [free, sans aide, examen open]  lieu
-    (M(x ; y) est le centre d'un cercle de rayon r qui passe par A : MA = r ; il est tangent intérieurement à γ : OM = 10 − r. Donc OM = 10 − MA, soit √(x² + y²) = 10 − √((y − 6)² + x²).)
-    (Au carré : x² + y² = 100 − 20√(…) + (y − 6)² + x², donc 20√((y − 6)² + x²) = 136 − 12y, avec la condition 136 − 12y ≥ 0.)
-    = 400((y − 6)² + x²) = (136 − 12y)²   ← Élever au carré (les deux membres sont positifs)
-    = 25x² + 16y² − 96y − 256 = 0   ← Développer et réduire
-    = x²/16 + (y − 3)²/25 = 1   ← Compléter le carré : une ellipse de foyers O et A
-  — La condition 136 − 12y ≥ 0 s'écrit y ≤ 34/3. Sur l'ellipse, quelle est la plus grande valeur de y ?  [juge value]  départ : y
-    = 8   ← Centre ± a, avec a = 5
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 3,5 ; La condition 136 − 12y ≥ 0 s'écrit y ≤ 34/3. Sur l'ellipse, quelle est la plus grande valeur de y ? : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  lieu
+      (M(x ; y) est le centre d'un cercle de rayon r qui passe par A : MA = r ; il est tangent intérieurement à γ : OM = 10 − r. Donc OM = 10 − MA, soit √(x² + y²) = 10 − √((y − 6)² + x²).)
+      (Au carré : x² + y² = 100 − 20√(…) + (y − 6)² + x², donc 20√((y − 6)² + x²) = 136 − 12y, avec la condition 136 − 12y ≥ 0.)
+      = 400((y − 6)² + x²) = (136 − 12y)²   ← Élever au carré (les deux membres sont positifs)
+      = 25x² + 16y² − 96y − 256 = 0   ← Développer et réduire
+      = x²/16 + (y − 3)²/25 = 1   ← Compléter le carré : une ellipse de foyers O et A
+    — La condition 136 − 12y ≥ 0 s'écrit y ≤ 34/3. Sur l'ellipse, quelle est la plus grande valeur de y ?  [juge value]  départ : y
+      = 8   ← Centre ± a, avec a = 5
   pièges : g4_square_constant, g10_c_wrong_formula, g10_axis_swap
 
 ```

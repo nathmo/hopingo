@@ -144,7 +144,7 @@ function mcqVariant(level, rng, opts) {
     prompt: `La solution de ${MT(form.eq)}, y(1) = ${MT(f.v0)}, pour x > 0, est :`,
     right: MT(`y = ${f.y}`),
     wrongs: [
-      opt(`y = ${f.v0 === '0' ? '0' : `${f.v0}x`}`, 'a2_ode_homog_derivative'),
+      opt(`y = ${f.v0 === '0' ? '0' : f.v0 === '1' ? 'x' : f.v0 === '-1' ? '-x' : `${f.v0}x`}`, 'a2_ode_homog_derivative'),
       f.late && opt(`y = ${f.late}`, 'a2_ode_sep_constant_late'),
       opt(`y = ${f.wrongV}`),
     ],

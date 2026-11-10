@@ -226,20 +226,22 @@ Vrai ou faux ?
   [examen tf]
 
 Le parallélogramme ABCD a pour sommets A(−4 ; −6) et B(−5 ; −2), et pour centre M(−1 ; −1). Calcule les coordonnées de C, puis de D. Vérifie ensuite que AB⃗ = DC⃗, puis décompose un vecteur dans la base (AB⃗, AD⃗).
-  [free, sans aide, examen open]  C
-    = C = 2M − A   ← M est le milieu de [AC]
-    = C = (2·(-1) - (-4) ; 2·(-1) - (-6))   ← Coordonnée par coordonnée
-    = (2 ; 4)
-  — C = (2 ; 4). Et D ?  [juge vector]  départ : D
-    = D = 2M − B   ← M est aussi le milieu de [BD]
-    = D = (2·(-1) - (-5) ; 2·(-1) - (-2))
-    = (3 ; 0)
-  — Vérifie que AB⃗ = DC⃗.  [juge vector]  départ : vec(D,C)
-    = vec(A,B) = (-1 ; 4)   ← Les deux vecteurs sont égaux
-  — Écris w⃗ = (29 ; 20) comme combinaison αu⃗ + βv⃗ de u⃗ = AB⃗ = (−1 ; 4) et v⃗ = AD⃗ = (7 ; 6). Le système : −α + 7β = 29 et 4α + 6β = 20. Que vaut α ?  [juge value]  départ : α
-    = −1   ← Par combinaison des deux équations
-  — Et β ?  [juge value]  départ : β
-    = 4
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; C = (2 ; 4). Et D ? : 1 ; Vérifie que AB⃗ = DC⃗. : 1 ; Écris w⃗ = (29 ; 20) comme combinaison αu⃗ + βv⃗ de u⃗ = AB⃗ = (−1 ; 4) et v⃗ = AD⃗ = (7 ; 6). Le système : −α + 7β = 29 et 4α + 6β = 20. Que vaut α ? : 0,5 ; Et β ? : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  C
+      = C = 2M − A   ← M est le milieu de [AC]
+      = C = (2·(-1) - (-4) ; 2·(-1) - (-6))   ← Coordonnée par coordonnée
+      = (2 ; 4)
+    — C = (2 ; 4). Et D ?  [juge vector]  départ : D
+      = D = 2M − B   ← M est aussi le milieu de [BD]
+      = D = (2·(-1) - (-5) ; 2·(-1) - (-2))
+      = (3 ; 0)
+    — Vérifie que AB⃗ = DC⃗.  [juge vector]  départ : vec(D,C)
+      = vec(A,B) = (-1 ; 4)   ← Les deux vecteurs sont égaux
+    — Écris w⃗ = (29 ; 20) comme combinaison αu⃗ + βv⃗ de u⃗ = AB⃗ = (−1 ; 4) et v⃗ = AD⃗ = (7 ; 6). Le système : −α + 7β = 29 et 4α + 6β = 20. Que vaut α ?  [juge value]  départ : α
+      = −1   ← Par combinaison des deux équations
+    — Et β ?  [juge value]  départ : β
+      = 4
   pièges : g4_midpoint_half
 
 ```
@@ -499,16 +501,18 @@ Vrai ou faux ?
   [examen tf]
 
 Dans le plan, la droite d passe par A(−5 ; 0) et a pour direction v⃗ = (−4 ; 3). Donne une équation cartésienne de d (coefficients entiers), puis le point d'intersection I de d et de la droite g : x-3 = 0.
-  [free, sans aide, examen open]  d
-    = (x ; y) = (-5 ; 0) + t(-4 ; 3)   ← Paramétrique
-    = 3x + 4y = 3·(−5) + 4·0   ← 3·x et 4·y : t disparaît
-    = 3x + 4y + 15 = 0   ← Cartésienne
-  — d : 3x+4y+15 = 0. Remplace la paramétrique de d dans g.  [juge solset]  départ : (−5 − 4t) + (−3) = 0
-    ? Les normales (3 ; 4) et (1 ; 0) sont-elles colinéaires ? ✔ Non : les droites sont sécantes / · Oui : parallèles (sans point commun) / · Oui : confondues
-    = −4t − 8 = 0   ← Développer
-    = t = −2
-  — t = −2. Le point d'intersection ?  [juge vector]  départ : I
-    = I = (3 ; -6)
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1,5 ; d : 3x+4y+15 = 0. Remplace la paramétrique de d dans g. : 1,5 ; t = −2. Le point d'intersection ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  d
+      = (x ; y) = (-5 ; 0) + t(-4 ; 3)   ← Paramétrique
+      = 3x + 4y = 3·(−5) + 4·0   ← 3·x et 4·y : t disparaît
+      = 3x + 4y + 15 = 0   ← Cartésienne
+    — d : 3x+4y+15 = 0. Remplace la paramétrique de d dans g.  [juge solset]  départ : (−5 − 4t) + (−3) = 0
+      ? Les normales (3 ; 4) et (1 ; 0) sont-elles colinéaires ? ✔ Non : les droites sont sécantes / · Oui : parallèles (sans point commun) / · Oui : confondues
+      = −4t − 8 = 0   ← Développer
+      = t = −2
+    — t = −2. Le point d'intersection ?  [juge vector]  départ : I
+      = I = (3 ; -6)
   pièges : g4_normal_as_direction, g4_line_constant
 
 ```
@@ -1007,17 +1011,19 @@ Vrai ou faux ?
   [examen tf]
 
 Le triangle ABC a pour sommets A(−3 ; 0), B(−3 ; −1) et C(−9 ; −8). Donne une équation de la bissectrice intérieure de l'angle en A.
-  [free, sans aide, examen open]  (AB)
-    = x + 3 = 0   ← Normale (1 ; 0), par A
-  — La droite (AC) ?  [juge geom]  départ : (AC)
-    = 4x − 3y + 12 = 0   ← Normale (4 ; −3), par A
-  — Les deux bissectrices de (AB) et (AC) ?  [juge geom]  départ : b
-    = |x + 3|/1 = |4x − 3y + 12|/5   ← Égalité des distances
-    = 5(x + 3) − (4x − 3y + 12) = 0 ou 5(x + 3) + (4x − 3y + 12) = 0   ← |A| = |B| ⇔ A = B ou A = −B
-    = x + 3y + 3 = 0 ou 3x − y + 9 = 0   ← Les deux bissectrices
-  — Laquelle est intérieure ?  [juge geom]  départ : b_A
-    ? La bissectrice intérieure sépare B et C. Laquelle est-ce ? ✔ 3x − y + 9 = 0 / · x + 3y + 3 = 0
-    = 3x − y + 9 = 0   ← Signes opposés en B et en C
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; La droite (AC) ? : 0,5 ; Les deux bissectrices de (AB) et (AC) ? : 1,5 ; Laquelle est intérieure ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  (AB)
+      = x + 3 = 0   ← Normale (1 ; 0), par A
+    — La droite (AC) ?  [juge geom]  départ : (AC)
+      = 4x − 3y + 12 = 0   ← Normale (4 ; −3), par A
+    — Les deux bissectrices de (AB) et (AC) ?  [juge geom]  départ : b
+      = |x + 3|/1 = |4x − 3y + 12|/5   ← Égalité des distances
+      = 5(x + 3) − (4x − 3y + 12) = 0 ou 5(x + 3) + (4x − 3y + 12) = 0   ← |A| = |B| ⇔ A = B ou A = −B
+      = x + 3y + 3 = 0 ou 3x − y + 9 = 0   ← Les deux bissectrices
+    — Laquelle est intérieure ?  [juge geom]  départ : b_A
+      ? La bissectrice intérieure sépare B et C. Laquelle est-ce ? ✔ 3x − y + 9 = 0 / · x + 3y + 3 = 0
+      = 3x − y + 9 = 0   ← Signes opposés en B et en C
   pièges : g4_line_constant
 
 ```
@@ -1179,10 +1185,12 @@ Vrai ou faux ?
   pièges : g4_line3_one_equation
 
 La droite g est l'intersection des plans x+3y-z+6 = 0 et 2y-z+6 = 0. Donne une représentation paramétrique de la droite d parallèle à g passant par M(−5 ; 4 ; −3).
-  [free, sans aide, examen open]  v
-    = (1 ; -1 ; -2)   ← v⃗ orthogonal aux normales (1 ; 3 ; −1) et (0 ; 2 ; −1) : un système à deux équations
-  — La droite d ?  [juge geom]  départ : d
-    = (x ; y ; z) = (-5 ; 4 ; -3) + t(1 ; -1 ; -2)   ← Par M, de direction v⃗
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 2 ; La droite d ? : 2)
+    [free, sans aide, suivre l'erreur, examen open]  v
+      = (1 ; -1 ; -2)   ← v⃗ orthogonal aux normales (1 ; 3 ; −1) et (0 ; 2 ; −1) : un système à deux équations
+    — La droite d ?  [juge geom]  départ : d
+      = (x ; y ; z) = (-5 ; 4 ; -3) + t(1 ; -1 ; -2)   ← Par M, de direction v⃗
 
 ```
 
@@ -1396,13 +1404,15 @@ Vrai ou faux ?
   [examen tf]
 
 Donne une équation cartésienne du plan qui contient le point A(0 ; −4 ; −1) et la droite (x ; y ; z) = (-2 ; -7 ; -1) + t(0 ; -2 ; -1).
-  [free, sans aide, examen open]  n
-    (La droite passe par B(−2 ; −7 ; −1) avec la direction v⃗ = (0 ; −2 ; −1) ; u⃗ = AB⃗ = (−2 ; −3 ; 0). La normale n⃗ = (a ; b ; c) vérifie −2a − 3b = 0 et −2b − c = 0.)
-    = n = (3 ; -2 ; 4)   ← Une solution non nulle du système
-  — n⃗ = (3 ; −2 ; 4). La constante d ?  [juge solset]  départ : 3·0 + (−2)·(−4) + 4·(−1) + d = 0
-    = d = −4   ← A est dans le plan
-  — d = −4. L'équation du plan ?  [juge geom]  départ : π
-    = 3x − 2y + 4z − 4 = 0   ← Cartésienne
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1,5 ; n⃗ = (3 ; −2 ; 4). La constante d ? : 1,5 ; d = −4. L'équation du plan ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  n
+      (La droite passe par B(−2 ; −7 ; −1) avec la direction v⃗ = (0 ; −2 ; −1) ; u⃗ = AB⃗ = (−2 ; −3 ; 0). La normale n⃗ = (a ; b ; c) vérifie −2a − 3b = 0 et −2b − c = 0.)
+      = n = (3 ; -2 ; 4)   ← Une solution non nulle du système
+    — n⃗ = (3 ; −2 ; 4). La constante d ?  [juge solset]  départ : 3·0 + (−2)·(−4) + 4·(−1) + d = 0
+      = d = −4   ← A est dans le plan
+    — d = −4. L'équation du plan ?  [juge geom]  départ : π
+      = 3x − 2y + 4z − 4 = 0   ← Cartésienne
   pièges : g4_normal_sum
 
 ```
@@ -1595,15 +1605,17 @@ Vrai ou faux ?
   pièges : g4_skew_as_secant
 
 On donne la droite d : (x ; y ; z) = (4 ; 4 ; 3) + λ(-3 ; 0 ; 1), le point P(1 ; 4 ; 4) et le plan α : -x-y-3z+21 = 0. La droite d passe-t-elle par P ? Est-elle contenue dans α ? Sinon, la coupe-t-elle ?
-  [free, sans aide, examen open]  λ_P
-    = 1   ← Coordonnée n° 1 : 4 − 3λ = 1
-  — λ = 1. Différence pour la coordonnée n° 2 entre A + λ·u⃗ et P ?  [juge value]  départ : 4 + 0·1 − 4
-    ? La droite d passe-t-elle par P ? ✔ Oui / · Non
-    = 0   ← Nulle (et les autres aussi)
-  — Est-elle contenue dans α ? Substitue d dans α.  [juge solset]  départ : −(4 − 3λ) − 4 + (−3)·(3 + λ) + 21 = 0
-    = 0λ + 4 = 0   ← Développer et réduire
-    ? Conclure : la droite et le plan sont… · Vrai pour tout λ : d ⊂ α / ✔ Aucun λ : d ∥ α (sans point commun) / · Une seule valeur de λ : d coupe α
-    = ∅   ← Aucun λ
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; λ = 1. Différence pour la coordonnée n° 2 entre A + λ·u⃗ et P ? : 1,5 ; Est-elle contenue dans α ? Substitue d dans α. : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  λ_P
+      = 1   ← Coordonnée n° 1 : 4 − 3λ = 1
+    — λ = 1. Différence pour la coordonnée n° 2 entre A + λ·u⃗ et P ?  [juge value]  départ : 4 + 0·1 − 4
+      ? La droite d passe-t-elle par P ? ✔ Oui / · Non
+      = 0   ← Nulle (et les autres aussi)
+    — Est-elle contenue dans α ? Substitue d dans α.  [juge solset]  départ : −(4 − 3λ) − 4 + (−3)·(3 + λ) + 21 = 0
+      = 0λ + 4 = 0   ← Développer et réduire
+      ? Conclure : la droite et le plan sont… · Vrai pour tout λ : d ⊂ α / ✔ Aucun λ : d ∥ α (sans point commun) / · Une seule valeur de λ : d coupe α
+      = ∅   ← Aucun λ
 
 ```
 
@@ -2068,17 +2080,19 @@ Vrai ou faux ?
   [examen tf]
 
 On donne A(1 ; 2 ; 1), B(4 ; 1 ; 2), C(−1 ; 0 ; 4) et D(2 ; −1 ; m). Pour quelle valeur de m les quatre points sont-ils coplanaires ? Calcule ensuite le volume du tétraèdre ABCD pour m = 7.
-  [free, sans aide, examen open]  AB et AC
-    (AB⃗ = (3 ; −1 ; 1), AC⃗ = (−2 ; −2 ; 3).)
-    = AB ∧ AC = (3 ; -1 ; 1) ∧ (-2 ; -2 ; 3)
-    = (-1 ; -11 ; -8)
-  — AD⃗ = (1 ; −3 ; m − 1). Le produit mixte, en fonction de m ?  [juge vector]  départ : [AB, AC, AD]
-    = −8m + 40   ← (AB⃗ ∧ AC⃗)·AD⃗
-  — Les quatre points sont coplanaires si et seulement si le produit mixte est nul.  [juge solset]  départ : −8m + 40 = 0
-    = m = 5
-  — Pour m = 7, le volume V du tétraèdre ABCD ?  [juge value]  départ : V
-    = |−16|/6   ← [AB⃗, AC⃗, AD⃗] = −8·7 + 40 = −16
-    = 8/3
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; AD⃗ = (1 ; −3 ; m − 1). Le produit mixte, en fonction de m ? : 1 ; Les quatre points sont coplanaires si et seulement si le produit mixte est nul. : 1 ; Pour m = 7, le volume V du tétraèdre ABCD ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  AB et AC
+      (AB⃗ = (3 ; −1 ; 1), AC⃗ = (−2 ; −2 ; 3).)
+      = AB ∧ AC = (3 ; -1 ; 1) ∧ (-2 ; -2 ; 3)
+      = (-1 ; -11 ; -8)
+    — AD⃗ = (1 ; −3 ; m − 1). Le produit mixte, en fonction de m ?  [juge vector]  départ : [AB, AC, AD]
+      = −8m + 40   ← (AB⃗ ∧ AC⃗)·AD⃗
+    — Les quatre points sont coplanaires si et seulement si le produit mixte est nul.  [juge solset]  départ : −8m + 40 = 0
+      = m = 5
+    — Pour m = 7, le volume V du tétraèdre ABCD ?  [juge value]  départ : V
+      = |−16|/6   ← [AB⃗, AC⃗, AD⃗] = −8·7 + 40 = −16
+      = 8/3
   pièges : g4_cross_middle_sign, g4_cross_commute
 
 ```
@@ -2339,16 +2353,18 @@ H est le pied de la perpendiculaire issue de P(8 ; 1 ; −3) sur le plan -4x+3z-
   pièges : g4_proj_no_square
 
 On donne le point P(4 ; 0 ; −3) et la droite d : (x ; y ; z) = (0 ; -1 ; -4) + t(2 ; -1 ; 2). La projection orthogonale de P sur d est-elle le point K(4 ; −3 ; 0) ? Justifie en calculant le pied H, puis donne la distance de P à d.
-  [free, sans aide, examen open]  t
-    (Le pied H = A + t·v⃗ de la perpendiculaire issue de P, avec A(0 ; −1 ; −4) et v⃗ = (2 ; −1 ; 2) : t ?)
-    = t = AP·v/(v·v)   ← AP⃗ = (4 ; 1 ; 1) : H = A + t·v⃗ avec t = AP⃗·v⃗/‖v⃗‖²
-    = 1   ← t = 9/9
-  — t = 1. Le pied H ?  [juge vector]  départ : H
-    = H = A + 1·v
-    = (2 ; -2 ; -2)
-  — La distance d = PH ?  [juge value]  départ : d
-    = √(4 + 4 + 1)   ← PH⃗ = (−2 ; −2 ; 1)
-    = 3
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 2 ; t = 1. Le pied H ? : 1,5 ; La distance d = PH ? : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  t
+      (Le pied H = A + t·v⃗ de la perpendiculaire issue de P, avec A(0 ; −1 ; −4) et v⃗ = (2 ; −1 ; 2) : t ?)
+      = t = AP·v/(v·v)   ← AP⃗ = (4 ; 1 ; 1) : H = A + t·v⃗ avec t = AP⃗·v⃗/‖v⃗‖²
+      = 1   ← t = 9/9
+    — t = 1. Le pied H ?  [juge vector]  départ : H
+      = H = A + 1·v
+      = (2 ; -2 ; -2)
+    — La distance d = PH ?  [juge value]  départ : d
+      = √(4 + 4 + 1)   ← PH⃗ = (−2 ; −2 ; 1)
+      = 3
 
 ```
 
@@ -2647,32 +2663,34 @@ Vrai ou faux ?
   pièges : g4_skew_any_points
 
 On donne les droites d₁ : (x ; y ; z) = (3 ; 0 ; -3) + s(2 ; -1 ; 0) et d₂ : (x ; y ; z) = (2 ; 1 ; -8) + t(-2 ; -2 ; 3). Montre qu'elles sont gauches et calcule leur distance, puis trouve les points P ∈ d₁ et Q ∈ d₂ de leur perpendiculaire commune, et une équation de celle-ci.
-  [free, sans aide, examen open]  n
-    = n = u ∧ v = (2 ; -1 ; 0) ∧ (-2 ; -2 ; 3)   ← Orthogonal aux deux droites
-    = (-3 ; -6 ; -6)
-  — Le vecteur AB⃗ entre les points de base ?  [juge vector]  départ : AB
-    = (-1 ; 1 ; -5)   ← B − A
-  — Le produit mixte AB⃗·n⃗ ?  [juge vector]  départ : AB·n
-    = (−1)·(−3) + 1·(−6) + (−5)·(−6) = 27   ← 27 ≠ 0 : les droites sont gauches
-  — La distance d entre les deux droites ?  [juge value]  départ : d
-    = |27|/√(9 + 36 + 36)   ← d = |AB⃗·n⃗|/‖n⃗‖
-    = 3
-  — P = A + s·u⃗ sur d₁, Q = B + t·v⃗ sur d₂ (deux paramètres différents). PQ⃗(s, t) ?  [juge vector]  départ : PQ
-    = PQ = (-1-2t-2s ; 1-2t+s ; -5+3t)   ← AB⃗ + t·v⃗ − s·u⃗
-  — 1re condition : PQ⃗·u⃗ = 0.  [juge equiv]  départ : 2·(−1 − 2t − 2s) + (−1)·(1 − 2t + s) + 0·(−5 + 3t)
-    = −3 − 2t − 5s   ← = 0
-  — 2e condition : PQ⃗·v⃗ = 0.  [juge equiv]  départ : (−2)·(−1 − 2t − 2s) + (−2)·(1 − 2t + s) + 3·(−5 + 3t)
-    = −15 + 17t + 2s   ← = 0
-  — Le système −3 − 2t − 5s = 0 et −15 + 17t + 2s = 0. s ?  [juge value]  départ : s
-    = −1   ← Par combinaison des deux équations
-  — Et t ?  [juge value]  départ : t
-    = 1
-  — s = −1. Le point P ?  [juge vector]  départ : P
-    = (1 ; 1 ; -3)   ← P = A − 1·u⃗
-  — t = 1. Le point Q ?  [juge vector]  départ : Q
-    = (0 ; -1 ; -5)   ← Q = B + 1·v⃗ ; ‖PQ⃗‖ = 3, la distance des droites
-  — Une équation de la perpendiculaire commune (PQ) ?  [juge geom]  départ : p
-    = (x ; y ; z) = (1 ; 1 ; -3) + k(1 ; 2 ; 2)   ← Par P, de direction PQ⃗ (ou n⃗ = u⃗ ∧ v⃗)
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 0,5 ; Le vecteur AB⃗ entre les points de base ? : 0,5 ; Le produit mixte AB⃗·n⃗ ? : 0,5 ; La distance d entre les deux droites ? : 0,5 ; P = A + s·u⃗ sur d₁, Q = B + t·v⃗ sur d₂ (deux paramètres différents). PQ⃗(s, t) ? : 0,5 ; 1re condition : PQ⃗·u⃗ = 0. : 0,5 ; 2e condition : PQ⃗·v⃗ = 0. : 0,5 ; Le système −3 − 2t − 5s = 0 et −15 + 17t + 2s = 0. s ? : 0,5 ; Et t ? : 0,5 ; s = −1. Le point P ? : 0,5 ; t = 1. Le point Q ? : 0,5 ; Une équation de la perpendiculaire commune (PQ) ? : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  n
+      = n = u ∧ v = (2 ; -1 ; 0) ∧ (-2 ; -2 ; 3)   ← Orthogonal aux deux droites
+      = (-3 ; -6 ; -6)
+    — Le vecteur AB⃗ entre les points de base ?  [juge vector]  départ : AB
+      = (-1 ; 1 ; -5)   ← B − A
+    — Le produit mixte AB⃗·n⃗ ?  [juge vector]  départ : AB·n
+      = (−1)·(−3) + 1·(−6) + (−5)·(−6) = 27   ← 27 ≠ 0 : les droites sont gauches
+    — La distance d entre les deux droites ?  [juge value]  départ : d
+      = |27|/√(9 + 36 + 36)   ← d = |AB⃗·n⃗|/‖n⃗‖
+      = 3
+    — P = A + s·u⃗ sur d₁, Q = B + t·v⃗ sur d₂ (deux paramètres différents). PQ⃗(s, t) ?  [juge vector]  départ : PQ
+      = PQ = (-1-2t-2s ; 1-2t+s ; -5+3t)   ← AB⃗ + t·v⃗ − s·u⃗
+    — 1re condition : PQ⃗·u⃗ = 0.  [juge equiv]  départ : 2·(−1 − 2t − 2s) + (−1)·(1 − 2t + s) + 0·(−5 + 3t)
+      = −3 − 2t − 5s   ← = 0
+    — 2e condition : PQ⃗·v⃗ = 0.  [juge equiv]  départ : (−2)·(−1 − 2t − 2s) + (−2)·(1 − 2t + s) + 3·(−5 + 3t)
+      = −15 + 17t + 2s   ← = 0
+    — Le système −3 − 2t − 5s = 0 et −15 + 17t + 2s = 0. s ?  [juge value]  départ : s
+      = −1   ← Par combinaison des deux équations
+    — Et t ?  [juge value]  départ : t
+      = 1
+    — s = −1. Le point P ?  [juge vector]  départ : P
+      = (1 ; 1 ; -3)   ← P = A − 1·u⃗
+    — t = 1. Le point Q ?  [juge vector]  départ : Q
+      = (0 ; -1 ; -5)   ← Q = B + 1·v⃗ ; ‖PQ⃗‖ = 3, la distance des droites
+    — Une équation de la perpendiculaire commune (PQ) ?  [juge geom]  départ : p
+      = (x ; y ; z) = (1 ; 1 ; -3) + k(1 ; 2 ; 2)   ← Par P, de direction PQ⃗ (ou n⃗ = u⃗ ∧ v⃗)
   pièges : g4_cross_middle_sign, g4_cross_commute
 
 ```
@@ -3032,32 +3050,34 @@ La perpendiculaire commune aux droites d₁ : (x ; y ; z) = (-1 ; 1 ; -1) + s(0 
   pièges : g4_common_perp_one_condition
 
 On donne les droites d₁ : (x ; y ; z) = (-2 ; -3 ; 2) + s(-2 ; 2 ; -1) et d₂ : (x ; y ; z) = (2 ; -6 ; 0) + t(-1 ; 0 ; -1). Calcule leur distance, puis trouve leur perpendiculaire commune (P ∈ d₁, Q ∈ d₂, et la droite (PQ)).
-  [free, sans aide, examen open]  n
-    = n = u ∧ v = (-2 ; 2 ; -1) ∧ (-1 ; 0 ; -1)   ← Orthogonal aux deux droites
-    = (-2 ; -1 ; 2)
-  — Le vecteur AB⃗ entre les points de base ?  [juge vector]  départ : AB
-    = (4 ; -3 ; -2)   ← B − A
-  — Le produit mixte AB⃗·n⃗ ?  [juge vector]  départ : AB·n
-    = 4·(−2) + (−3)·(−1) + (−2)·2 = −9   ← −9 ≠ 0 : les droites sont gauches
-  — La distance d entre les deux droites ?  [juge value]  départ : d
-    = |−9|/√(4 + 1 + 4)   ← d = |AB⃗·n⃗|/‖n⃗‖
-    = 3
-  — P = A + s·u⃗ sur d₁, Q = B + t·v⃗ sur d₂ (deux paramètres différents). PQ⃗(s, t) ?  [juge vector]  départ : PQ
-    = PQ = (4-t+2s ; -3-2s ; -2-t+s)   ← AB⃗ + t·v⃗ − s·u⃗
-  — 1re condition : PQ⃗·u⃗ = 0.  [juge equiv]  départ : (−2)·(4 − t + 2s) + 2·(−3 − 2s) + (−1)·(−2 − t + s)
-    = −12 + 3t − 9s   ← = 0
-  — 2e condition : PQ⃗·v⃗ = 0.  [juge equiv]  départ : (−1)·(4 − t + 2s) + 0·(−3 − 2s) + (−1)·(−2 − t + s)
-    = −2 + 2t − 3s   ← = 0
-  — Le système −12 + 3t − 9s = 0 et −2 + 2t − 3s = 0. s ?  [juge value]  départ : s
-    = −2   ← Par combinaison des deux équations
-  — Et t ?  [juge value]  départ : t
-    = −2
-  — s = −2. Le point P ?  [juge vector]  départ : P
-    = (2 ; -7 ; 4)   ← P = A − 2·u⃗
-  — t = −2. Le point Q ?  [juge vector]  départ : Q
-    = (4 ; -6 ; 2)   ← Q = B − 2·v⃗ ; ‖PQ⃗‖ = 3, la distance des droites
-  — Une équation de la perpendiculaire commune (PQ) ?  [juge geom]  départ : p
-    = (x ; y ; z) = (2 ; -7 ; 4) + k(2 ; 1 ; -2)   ← Par P, de direction PQ⃗ (ou n⃗ = u⃗ ∧ v⃗)
+  [problème, examen open, 7 points]
+  partie 1 (Début du problème : 1 ; Le vecteur AB⃗ entre les points de base ? : 0,5 ; Le produit mixte AB⃗·n⃗ ? : 0,5 ; La distance d entre les deux droites ? : 1 ; P = A + s·u⃗ sur d₁, Q = B + t·v⃗ sur d₂ (deux paramètres différents). PQ⃗(s, t) ? : 0,5 ; 1re condition : PQ⃗·u⃗ = 0. : 0,5 ; 2e condition : PQ⃗·v⃗ = 0. : 0,5 ; Le système −12 + 3t − 9s = 0 et −2 + 2t − 3s = 0. s ? : 0,5 ; Et t ? : 0,5 ; s = −2. Le point P ? : 0,5 ; t = −2. Le point Q ? : 0,5 ; Une équation de la perpendiculaire commune (PQ) ? : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  n
+      = n = u ∧ v = (-2 ; 2 ; -1) ∧ (-1 ; 0 ; -1)   ← Orthogonal aux deux droites
+      = (-2 ; -1 ; 2)
+    — Le vecteur AB⃗ entre les points de base ?  [juge vector]  départ : AB
+      = (4 ; -3 ; -2)   ← B − A
+    — Le produit mixte AB⃗·n⃗ ?  [juge vector]  départ : AB·n
+      = 4·(−2) + (−3)·(−1) + (−2)·2 = −9   ← −9 ≠ 0 : les droites sont gauches
+    — La distance d entre les deux droites ?  [juge value]  départ : d
+      = |−9|/√(4 + 1 + 4)   ← d = |AB⃗·n⃗|/‖n⃗‖
+      = 3
+    — P = A + s·u⃗ sur d₁, Q = B + t·v⃗ sur d₂ (deux paramètres différents). PQ⃗(s, t) ?  [juge vector]  départ : PQ
+      = PQ = (4-t+2s ; -3-2s ; -2-t+s)   ← AB⃗ + t·v⃗ − s·u⃗
+    — 1re condition : PQ⃗·u⃗ = 0.  [juge equiv]  départ : (−2)·(4 − t + 2s) + 2·(−3 − 2s) + (−1)·(−2 − t + s)
+      = −12 + 3t − 9s   ← = 0
+    — 2e condition : PQ⃗·v⃗ = 0.  [juge equiv]  départ : (−1)·(4 − t + 2s) + 0·(−3 − 2s) + (−1)·(−2 − t + s)
+      = −2 + 2t − 3s   ← = 0
+    — Le système −12 + 3t − 9s = 0 et −2 + 2t − 3s = 0. s ?  [juge value]  départ : s
+      = −2   ← Par combinaison des deux équations
+    — Et t ?  [juge value]  départ : t
+      = −2
+    — s = −2. Le point P ?  [juge vector]  départ : P
+      = (2 ; -7 ; 4)   ← P = A − 2·u⃗
+    — t = −2. Le point Q ?  [juge vector]  départ : Q
+      = (4 ; -6 ; 2)   ← Q = B − 2·v⃗ ; ‖PQ⃗‖ = 3, la distance des droites
+    — Une équation de la perpendiculaire commune (PQ) ?  [juge geom]  départ : p
+      = (x ; y ; z) = (2 ; -7 ; 4) + k(2 ; 1 ; -2)   ← Par P, de direction PQ⃗ (ou n⃗ = u⃗ ∧ v⃗)
   pièges : g4_cross_middle_sign, g4_cross_commute
 
 ```
@@ -3309,17 +3329,19 @@ On donne a : (x ; y ; z) = (1 ; 1 ; 1) + s(1 ; 2 ; 2), b : (x ; y ; z) = (6 ; 1 
   [examen mcq]
 
 On donne les droites gauches a : (x ; y ; z) = (3 ; -4 ; 2) + s(0 ; 2 ; -2) et b : (x ; y ; z) = (-2 ; -5 ; -6) + t(-1 ; -1 ; 0). Trouve la droite n, normale au plan α : -x-y-z-1 = 0, qui coupe a et b. Commence par dire combien il y a de solutions.
-  [free, sans aide, examen open]  n_π
-    = n = u ∧ w = (0 ; 2 ; -2) ∧ (-2 ; -2 ; -2)   ← Orthogonal à a et à w⃗
-    = (-8 ; 4 ; 4)
-  — Une équation du plan π qui contient a, de direction w⃗ ?  [juge geom]  départ : π
-    = 2x − y − z − 8 = 0   ← Par le point (3 ; −4 ; 2) de a
-  — π ∩ b : on remplace B + t·v⃗ dans l'équation de π. t ?  [juge value]  départ : t
-    = −1   ← 7 − t − 8 = 0
-  — t = −1. Le point Q = π ∩ b ?  [juge vector]  départ : Q
-    = (-1 ; -4 ; -6)
-  — La droite n, par Q, de direction w⃗ ?  [juge geom]  départ : n
-    = (x ; y ; z) = (-1 ; -4 ; -6) + k(-2 ; -2 ; -2)   ← Contrôle : pour k = −2, on retrouve un point de a
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 2 ; Une équation du plan π qui contient a, de direction w⃗ ? : 1 ; π ∩ b : on remplace B + t·v⃗ dans l'équation de π. t ? : 1 ; t = −1. Le point Q = π ∩ b ? : 1 ; La droite n, par Q, de direction w⃗ ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  n_π
+      = n = u ∧ w = (0 ; 2 ; -2) ∧ (-2 ; -2 ; -2)   ← Orthogonal à a et à w⃗
+      = (-8 ; 4 ; 4)
+    — Une équation du plan π qui contient a, de direction w⃗ ?  [juge geom]  départ : π
+      = 2x − y − z − 8 = 0   ← Par le point (3 ; −4 ; 2) de a
+    — π ∩ b : on remplace B + t·v⃗ dans l'équation de π. t ?  [juge value]  départ : t
+      = −1   ← 7 − t − 8 = 0
+    — t = −1. Le point Q = π ∩ b ?  [juge vector]  départ : Q
+      = (-1 ; -4 ; -6)
+    — La droite n, par Q, de direction w⃗ ?  [juge geom]  départ : n
+      = (x ; y ; z) = (-1 ; -4 ; -6) + k(-2 ; -2 ; -2)   ← Contrôle : pour k = −2, on retrouve un point de a
 
 ```
 
@@ -3565,22 +3587,24 @@ Vrai ou faux ?
   [examen tf]
 
 On donne x^2+y^2+z^2+6x+6y+6z-22 = 0. Donne son centre et son rayon, le plan tangent en T(−6 ; −1 ; −9), puis la section par le plan 2x-3y+6z+8 = 0.
-  [free, sans aide, examen open]  x² + y² + z² + 6x + 6y + 6z − 22 = 0
-    = (x + 3)² − 9 + (y + 3)² − 9 + (z + 3)² − 9 − 22 = 0   ← Compléter un carré par variable
-    = (x + 3)² + (y + 3)² + (z + 3)² = 49   ← Forme réduite
-  — Le centre C ?  [juge vector]  départ : C
-    = (-3 ; -3 ; -3)
-  — Le rayon r ?  [juge value]  départ : r
-    = 7   ← r² = 49
-  — Le plan tangent en T(−6 ; −1 ; −9) : sa normale est CT⃗.  [juge vector]  départ : n
-    = n = CT = (-3 ; 2 ; -6)   ← Le rayon CT est perpendiculaire au plan tangent
-  — Une équation du plan tangent ?  [juge geom]  départ : π
-    = 3x − 2y + 6z + 70 = 0   ← Par T, de normale (3 ; −2 ; 6)
-  — La section par le plan 2x-3y+6z+8 = 0. La distance δ du centre au plan ?  [juge value]  départ : δ
-    = 1   ← δ = |n⃗·C + d|/‖n⃗‖
-  — δ = 1 < r = 7 : la section est un cercle. Son rayon ρ ?  [juge value]  départ : ρ
-    = √(7² − 1²)   ← ρ² = r² − δ²
-    = 4√3
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 1 ; Le centre C ? : 1 ; Le rayon r ? : 0,5 ; Le plan tangent en T(−6 ; −1 ; −9) : sa normale est CT⃗. : 0,5 ; Une équation du plan tangent ? : 0,5 ; La section par le plan 2x-3y+6z+8 = 0. La distance δ du centre au plan ? : 0,5 ; δ = 1 < r = 7 : la section est un cercle. Son rayon ρ ? : 1)
+    [free, sans aide, suivre l'erreur, examen open]  x² + y² + z² + 6x + 6y + 6z − 22 = 0
+      = (x + 3)² − 9 + (y + 3)² − 9 + (z + 3)² − 9 − 22 = 0   ← Compléter un carré par variable
+      = (x + 3)² + (y + 3)² + (z + 3)² = 49   ← Forme réduite
+    — Le centre C ?  [juge vector]  départ : C
+      = (-3 ; -3 ; -3)
+    — Le rayon r ?  [juge value]  départ : r
+      = 7   ← r² = 49
+    — Le plan tangent en T(−6 ; −1 ; −9) : sa normale est CT⃗.  [juge vector]  départ : n
+      = n = CT = (-3 ; 2 ; -6)   ← Le rayon CT est perpendiculaire au plan tangent
+    — Une équation du plan tangent ?  [juge geom]  départ : π
+      = 3x − 2y + 6z + 70 = 0   ← Par T, de normale (3 ; −2 ; 6)
+    — La section par le plan 2x-3y+6z+8 = 0. La distance δ du centre au plan ?  [juge value]  départ : δ
+      = 1   ← δ = |n⃗·C + d|/‖n⃗‖
+    — δ = 1 < r = 7 : la section est un cercle. Son rayon ρ ?  [juge value]  départ : ρ
+      = √(7² − 1²)   ← ρ² = r² − δ²
+      = 4√3
   pièges : g4_square_constant
 
 ```

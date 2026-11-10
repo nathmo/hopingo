@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.1 intégrales dans `evalFloat`, complexes partout ; §16.2 `limit` à deux variables (lignes `path` et `bound`), `system` (∇f = 0, Lagrange), `ode` (lignes implicites, forme séparée, substitution), `series` à deux variables (Taylor d'ordre 2), `solset` ; §16.3 contre-exemples (bibliothèque K1 à K7), `domain` avec `typeI3`, `cyl`, `sph`, `matrix` à cases symboliques (hessienne, jacobienne), `plot` ; §16.4 familles nouvelles (`calculus`, `linear`, `logic`, `geometry`), tag C (distracteurs des QCM officiels), réparation dans un autre module, pièges partagés (réutilise `a1_arc_length_no_sqrt`, `a1_ftc_no_chain`, `l_compose_order` ; `a2_jacobian_transposed` sert aussi en N).
 
-Unité `analyse2` · préfixe `a2-` · pièges `a2_` · Statut : à faire
+Unité `analyse2` · préfixe `a2-` · pièges `a2_` · Statut : fait le 10 novembre 2026 (étape U6, voir README §17)
 
 **Sources** :
 - Analyse II (MATH-106), cours de T. Mountford (2022), qui suit les notes de J. Stubbe ; cours de P. Wittwer (2017 à 2019) ;
