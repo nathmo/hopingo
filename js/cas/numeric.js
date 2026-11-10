@@ -14,18 +14,14 @@ import { limit, targetOf, limitNumber } from './limit.js';
 
 const NEAR_POLE = 0.05;
 
+const FACTS = [1];
+for (let k = 1; k <= 170; k++) FACTS.push(FACTS[k - 1] * k);
 const REAL_FN = {
   sin: Math.sin, cos: Math.cos, tan: Math.tan, cot: (x) => 1 / Math.tan(x), exp: Math.exp, ln: Math.log,
   sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh, arcsin: Math.asin, arccos: Math.acos, arctan: Math.atan,
   argsh: Math.asinh, argch: Math.acosh, argth: Math.atanh, sqrt: Math.sqrt, abs: Math.abs,
-};
-// Step U4 (A1, sequences): n! for whole n ≥ 0 (+∞ past 170!).
-REAL_FN.fact = (x) => {
-  if (!Number.isInteger(x) || x < 0) return NaN;
-  if (x > 170) return Infinity;
-  let f = 1;
-  for (let k = 2; k <= x; k++) f *= k;
-  return f;
+  // Step U4: n! for a whole n ≥ 0 (Infinity past 170!), else undefined.
+  fact: (x) => { const n = Math.round(x); if (n < 0 || Math.abs(x - n) > 1e-9) return NaN; return n > 170 ? Infinity : FACTS[n]; },
 };
 
 export function evalFloat(node, env = {}, opts = {}) {
@@ -184,20 +180,25 @@ function sumOnce(node, env) {
   const e = { ...env };
   const S = [];
   let s = 0;
+  let t = 0;
   let n = lo;
   let last = Infinity;
   let tiny = 0;
   for (let j = 1; j <= 17; j++) {
     const N = lo + 2 ** j;
+    // Step U4: a whole block that changes nothing, ending on a vanishing
+    // term (xᵏ/k!): the sum has converged.
+    if (j > 6 && S[S.length - 1] === S[S.length - 2] && Math.abs(t) < 1e-200) return s;
     for (; n < N; n++) {
       e[k] = n;
-      const t = c(e);
-      // Step U4 (part h): a term like (1 + 2ᵏ)/3ᵏ overflows (∞/∞) long
-      // after the terms have become negligible: the sum is reached. So it
-      // is after 50 terms in a row below 1e−18 of the sum (a geometric
-      // series, in a few hundred terms instead of 2¹⁷).
+      t = c(e);
+      // Step U4: a term like (1 + 2ᵏ)/3ᵏ or xᵏ/k! overflows (∞/∞) long
+      // after the terms have become negligible: the sum is reached (after
+      // tiny terms, or a whole block that changed nothing). Also after 50
+      // terms in a row below 1e−18 of the sum (a geometric series, in a few
+      // hundred terms instead of 2¹⁷).
       if (!Number.isFinite(t)) {
-        if (Math.abs(last) < 1e-20 * (1 + Math.abs(s))) { n = Infinity; break; }
+        if (Math.abs(last) < 1e-20 * (1 + Math.abs(s)) || (n > lo + 100 && S.length && S[S.length - 1] === s)) { n = Infinity; break; }
         return NaN;
       }
       last = t;

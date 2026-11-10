@@ -44,7 +44,7 @@ const KEYSETS = {
   trig: ['k', '°', 'π', 'cot(', 'X', 't', '∨', 'back'],
   letters: ['a', 'b', 'c', 'd', 'A', 'B', 'N', 'D', 'λ', '=', ';', 'back'],
   // Step U1b: sums and sequences. Σ writes sum(terme, k, début, fin).
-  seq: ['n', 'k', 'j', 'sum(', ',', '(', ')', 'u', '_', 'q', 'r', 'back'],
+  seq: ['n', 'k', 'j', 'sum(', ',', '(', ')', 'u', '_', 'q', 'r', '!', 'back'],
   // Step U1b (G2): exponentials, logarithms in a base, hyperbolic functions.
   // Step U1b (G1): absolute values, a parameter m, named sets S₁, the domain D.
   ineq: ['|', '√(', 'm', 'S', '_', 'D', '(', ')', 'left', 'right', 'back'],

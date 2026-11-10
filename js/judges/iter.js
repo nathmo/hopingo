@@ -24,6 +24,15 @@
 //                                   does, else the product of the signs. An
 //                                   input row 'bounds' (odd columns) asks the
 //                                   zeros and poles in increasing order.
+//   {kind:'bisection', f, v?, a0, b0, tol?}  (step U4, A1 bisection) one row
+//                                   per step, columns a, b, m, f(m): row 1
+//                                   starts at [a0 ; b0]; each next a, b is
+//                                   the half of the student's row before
+//                                   where f changes sign (sign of f at the
+//                                   student's m); m = (a + b)/2 of the
+//                                   student's row; f(m) within tol
+//                                   (absolute, default 5·10⁻⁴) of f at the
+//                                   student's m, with its sign.
 // checkTable(item, values) → {ok, cells: {rowId: [true|false|null]}, rule?, message?}
 
 import { Q } from '../math/rational.js';
@@ -229,8 +238,52 @@ function checkSigns(item, values) {
   return { ok, cells, rule, message };
 }
 
+// Bisection (step U4): rows of a, b, m, f(m), each judged from the
+// student's cells (error carried forward).
+function checkBisection(item, values) {
+  const phi = item.judge.phi;
+  const v = phi.v || 'x';
+  const fNode = parse(phi.f, { vars: [v] });
+  const fAt = (x) => (x ? exactValue(mapNode(fNode, (n) => (n.t === 'sym' && n.name === v && !n.sub ? { t: 'paren', e: lit(x) } : n))) : null);
+  const sgn = (y) => (y ? Math.sign(y.n) : null);
+  const tol = phi.tol ?? 5e-4;
+  const g = grid(item, values);
+  const cells = {};
+  let prev = null;
+  let rule = null;
+  let message = null;
+  for (const r of item.table.rows) {
+    const [a, b, m, fm] = g[r.id].map(num);
+    // The interval this row should hold.
+    let want = null;
+    if (!prev) want = [num(phi.a0), num(phi.b0)];
+    else if (prev.a && prev.b && prev.m) {
+      const sm = sgn(fAt(prev.m));
+      const sa = sgn(fAt(prev.a));
+      if (sm !== null && sa !== null) want = sm === sa ? [prev.m, prev.b] : [prev.a, prev.m];
+    }
+    const mid = a && b ? a.add(b).div(new Q(2)) : null;
+    const fmTrue = fAt(m);
+    const okFm = !!fm && !!fmTrue && Math.abs(fm.valueOf() - fmTrue.valueOf()) <= tol + 1e-12 && sgn(fm) === sgn(fmTrue);
+    cells[r.id] = r.cells.map((c, j) => {
+      if (!c?.input) return null;
+      if (j === 0) return eqQ(a, want?.[0]);
+      if (j === 1) return eqQ(b, want?.[1]);
+      if (j === 2) return eqQ(m, mid);
+      return okFm;
+    });
+    if (prev && want && a && b && !(eqQ(a, want[0]) && eqQ(b, want[1])) && ((eqQ(a, prev.m) && eqQ(b, prev.b)) || (eqQ(a, prev.a) && eqQ(b, prev.m)))) {
+      message ||= 'Garde la moitié où f change de signe : compare le signe de f(m) à celui de f(a).';
+    }
+    prev = { a, b, m };
+  }
+  const ok = Object.values(cells).every((row) => row.every((x) => x !== false)) && allFilled(item, values);
+  return { ok, cells, rule, message };
+}
+
 export function checkTable(item, values) {
   switch (item.judge.phi.kind) {
+    case 'bisection': return checkBisection(item, values);
     case 'signs': return checkSigns(item, values);
     case 'horner': case 'horner-repeat': return checkHorner(item, values);
     case 'truth': return checkTruth(item, values);

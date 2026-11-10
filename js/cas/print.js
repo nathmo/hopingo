@@ -37,7 +37,8 @@ export const LOGIC_WORD = { and: 'et', or: 'ou', imp: '⇒', iff: '⇔' };
 function startsWithLetter(n) {
   if (n.t === 'fn' && n.name === 'fact') return startsWithLetter(n.args[0]) || prec(n.args[0]) < PREC.atom; // step U4: 2n!, 2(n+1)!
   switch (n.t) {
-    case 'sym': case 'const': case 'fn': case 'sqrt': case 'paren': case 'deriv': case 'root': case 'sum':
+    case 'fn': return n.name !== 'fact' || startsWithLetter(n.args[0]); // 2·3! is not 23!
+    case 'sym': case 'const': case 'sqrt': case 'paren': case 'deriv': case 'root': case 'sum':
     case 'int': case 'bracket': case 'lim': case 'eps': return true;
     case 'pow': return startsWithLetter(n.b) && n.b.t !== 'num';
     case 'bin':
