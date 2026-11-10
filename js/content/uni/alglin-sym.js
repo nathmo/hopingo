@@ -1095,8 +1095,289 @@ function sphExam(rng, exam) {
 }
 
 // ======================================================================
+// l-proof-matrices and l-proof-spectral: proofs in blocks
+// ======================================================================
+
+// Each proof: its steps in order (each needs the one before), two decoys
+// (a block that assumes the conclusion, an example, or a confusion), the
+// justification asked at level 3, and its points in the open variant.
+const ASSOC = { id: 'assoc', label: 'Associativité du produit' };
+const PROOFS_M = [
+  {
+    id: 'inv-product', statement: 'si A et B (n × n) sont inversibles, alors AB est inversible et (AB)⁻¹ = B⁻¹A⁻¹',
+    steps: [
+      'A et B sont inversibles : A⁻¹ et B⁻¹ existent, avec AA⁻¹ = A⁻¹A = I et BB⁻¹ = B⁻¹B = I.',
+      '(AB)(B⁻¹A⁻¹) = A(BB⁻¹)A⁻¹ (associativité).',
+      '= AIA⁻¹ = AA⁻¹ = I.',
+      'De même, (B⁻¹A⁻¹)(AB) = B⁻¹(A⁻¹A)B = B⁻¹B = I.',
+      'Donc AB est inversible, d\'inverse B⁻¹A⁻¹.',
+    ],
+    decoys: [
+      { html: 'Comme (AB)⁻¹ = B⁻¹A⁻¹, le produit (AB)(B⁻¹A⁻¹) vaut I.', rule: 'l_proof_circular', why: 'Ce bloc utilise (AB)⁻¹ = B⁻¹A⁻¹, ce qu\'on veut montrer.' },
+      { html: 'Avec A = B = I, (AB)⁻¹ = I = B⁻¹A⁻¹ : c\'est vrai.', rule: 'g9_proof_by_example', why: 'Un exemple ne prouve pas un énoncé « pour toutes A, B ».' },
+    ],
+    just: { at: 1, prompt: 'Quelle règle donne (AB)(B⁻¹A⁻¹) = A(BB⁻¹)A⁻¹ ?', options: [
+      { ...ASSOC, valid: true },
+      { id: 'comm', label: 'Commutativité du produit', valid: false, why: 'Le produit de matrices ne commute pas : on ne déplace pas les facteurs, on regroupe seulement.' },
+      { id: 'def', label: 'Définition de l\'inverse', valid: false, why: 'L\'inverse sert à l\'étape suivante (BB⁻¹ = I) ; ici on ne fait que regrouper.' },
+    ] },
+  },
+  {
+    id: 'inj-ker', statement: 'une application linéaire T est injective si et seulement si Ker T = {0}',
+    steps: [
+      '(⇒) Supposons T injective, et soit x ∈ Ker T.',
+      'Alors T(x) = 0 = T(0), donc x = 0 par injectivité : Ker T = {0}.',
+      '(⇐) Supposons Ker T = {0}, et soient x, y avec T(x) = T(y).',
+      'Par linéarité, T(x − y) = T(x) − T(y) = 0, donc x − y ∈ Ker T.',
+      'Donc x − y = 0, c\'est-à-dire x = y : T est injective.',
+    ],
+    decoys: [
+      { html: 'Comme T est injective, T(x) = T(y) donne x = y.', rule: 'l_proof_circular', why: 'Dans le sens (⇐), l\'injectivité est ce qu\'on veut montrer : on ne peut pas s\'en servir.' },
+      { html: 'T(0) = 0, donc T est injective.', rule: 'g9_proof_by_example', why: 'Un seul point ne dit rien : il faut T(x) = T(y) ⇒ x = y pour tous x, y.' },
+    ],
+    just: { at: 3, prompt: 'Pourquoi T(x − y) = T(x) − T(y) ?', options: [
+      { id: 'lin', label: 'T est linéaire', valid: true },
+      { id: 'inj', label: 'T est injective', valid: false, rule: 'l_proof_circular', why: 'L\'injectivité est la conclusion de ce sens : on ne peut pas l\'utiliser.' },
+      { id: 'ker', label: 'Définition du noyau', valid: false, why: 'Le noyau sert après : c\'est la linéarité qui sépare T(x − y).' },
+    ] },
+  },
+  {
+    id: 'std-unique', statement: 'si Ax = Bx pour tout x ∈ ℝⁿ, alors A = B (la matrice canonique d\'une application linéaire est unique)',
+    steps: [
+      'Supposons Ax = Bx pour tout x ∈ ℝⁿ.',
+      'Prenons x = eⱼ, le j-ième vecteur de la base canonique : Aeⱼ = Beⱼ.',
+      'Aeⱼ est la j-ième colonne de A, et Beⱼ la j-ième colonne de B.',
+      'A et B ont donc les mêmes colonnes, pour j = 1, …, n : A = B.',
+    ],
+    decoys: [
+      { html: 'Comme A = B, on a bien Aeⱼ = Beⱼ pour tout j.', rule: 'l_proof_circular', why: 'Ce bloc part de A = B, la conclusion.' },
+      { html: 'Pour x = 0, A·0 = B·0 = 0, donc A = B.', rule: 'g9_proof_by_example', why: 'Une seule valeur de x ne suffit pas : toute matrice vérifie A·0 = 0.' },
+    ],
+    just: { at: 2, prompt: 'Pourquoi Aeⱼ est-elle la j-ième colonne de A ?', options: [
+      { id: 'prod', label: 'Définition du produit matrice-vecteur (combinaison des colonnes)', valid: true },
+      { id: 'inv', label: 'A est inversible', valid: false, why: 'Rien ne dit que A est inversible, et ce n\'est pas utile ici.' },
+      { id: 'lin', label: 'T est linéaire', valid: false, why: 'C\'est vrai de toute matrice : Aeⱼ = 0·a₁ + … + 1·aⱼ + … + 0·aₙ.' },
+    ] },
+  },
+  {
+    id: 'eig-inverse', statement: 'si λ est valeur propre de A inversible, alors λ ≠ 0 et 1/λ est valeur propre de A⁻¹',
+    steps: [
+      'Soit v ≠ 0 avec Av = λv.',
+      'Si λ = 0, alors Av = 0 avec v ≠ 0, et A ne serait pas inversible. Donc λ ≠ 0.',
+      'On multiplie Av = λv à gauche par A⁻¹ : v = λA⁻¹v.',
+      'On divise par λ ≠ 0 : A⁻¹v = (1/λ)v, avec v ≠ 0.',
+      'Donc 1/λ est valeur propre de A⁻¹, de vecteur propre v.',
+    ],
+    decoys: [
+      { html: 'Comme 1/λ est valeur propre de A⁻¹, A⁻¹v = (1/λ)v.', rule: 'l_proof_circular', why: 'Ce bloc suppose la conclusion.' },
+      { html: 'Avec A = 2I : λ = 2, et A⁻¹ = ½I a la valeur propre ½. C\'est vrai.', rule: 'g9_proof_by_example', why: 'Un exemple ne prouve pas l\'énoncé pour toute matrice inversible.' },
+    ],
+    just: { at: 2, prompt: 'Comment passe-t-on de Av = λv à v = λA⁻¹v ?', options: [
+      { id: 'left', label: 'On multiplie à gauche par A⁻¹', valid: true },
+      { id: 'right', label: 'On multiplie à droite par A⁻¹', valid: false, why: 'v est un vecteur colonne : vA⁻¹ n\'a pas de sens. On multiplie à gauche.' },
+      { id: 'div', label: 'On divise par A', valid: false, why: 'On ne divise pas par une matrice : on multiplie par son inverse.' },
+    ] },
+  },
+  {
+    id: 'sym-inverse', statement: 'si A est symétrique et inversible, alors A⁻¹ est symétrique',
+    steps: [
+      'Hypothèses : Aᵀ = A et AA⁻¹ = I.',
+      'On transpose AA⁻¹ = I : (A⁻¹)ᵀAᵀ = Iᵀ = I.',
+      'Comme Aᵀ = A : (A⁻¹)ᵀA = I.',
+      'Donc (A⁻¹)ᵀ est l\'inverse de A : (A⁻¹)ᵀ = A⁻¹, et A⁻¹ est symétrique.',
+    ],
+    decoys: [
+      { html: 'A⁻¹ est symétrique, donc (A⁻¹)ᵀ = A⁻¹.', rule: 'l_proof_circular', why: 'C\'est la conclusion : elle ne peut pas servir d\'étape.' },
+      { html: 'Avec A = [[2, 1], [1, 1]], A⁻¹ = [[1, −1], [−1, 2]] est symétrique.', rule: 'g9_proof_by_example', why: 'Un exemple ne prouve pas l\'énoncé pour toutes les matrices.' },
+    ],
+    just: { at: 1, prompt: 'Pourquoi (AA⁻¹)ᵀ = (A⁻¹)ᵀAᵀ ?', options: [
+      { id: 'tp', label: 'La transposée d\'un produit renverse l\'ordre', valid: true },
+      { id: 'tp-bad', label: '(AB)ᵀ = AᵀBᵀ', valid: false, rule: 'l_transpose_product', why: 'La transposée d\'un produit renverse l\'ordre : (AB)ᵀ = BᵀAᵀ.' },
+      { id: 'sym', label: 'A est symétrique', valid: false, why: 'La symétrie sert à l\'étape suivante ; ici c\'est la règle de la transposée.' },
+    ] },
+  },
+  {
+    id: 'surj-inj', statement: 'si T : ℝⁿ → ℝⁿ linéaire est surjective, alors elle est injective',
+    steps: [
+      'Soit A la matrice canonique de T : elle est n × n.',
+      'T est surjective : les colonnes de A engendrent ℝⁿ, donc A a un pivot dans chaque ligne.',
+      'A est carrée : n pivots dans n colonnes, il y a aussi un pivot dans chaque colonne.',
+      'Pas de variable libre : Ax = 0 n\'a que la solution x = 0, donc Ker T = {0}.',
+      'Donc T est injective.',
+    ],
+    decoys: [
+      { html: 'T est injective, donc Ax = 0 n\'a que la solution nulle.', rule: 'l_proof_circular', why: 'Ce bloc part de l\'injectivité, la conclusion.' },
+      { html: 'Pour n = 1, T(x) = 2x est surjective et injective.', rule: 'g9_proof_by_example', why: 'Un exemple ne prouve rien pour tout n.' },
+    ],
+    just: { at: 2, prompt: 'Pourquoi un pivot dans chaque ligne donne-t-il un pivot dans chaque colonne ?', options: [
+      { id: 'square', label: 'A est carrée (autant de lignes que de colonnes)', valid: true },
+      { id: 'always', label: 'C\'est toujours vrai', valid: false, rule: 'l_imt_nonsquare', why: 'Faux pour une matrice 2 × 3 : 2 pivots, mais une colonne sans pivot.' },
+      { id: 'lin', label: 'T est linéaire', valid: false, why: 'Toutes les matrices sont linéaires ; c\'est le nombre de lignes et de colonnes qui compte.' },
+    ] },
+  },
+  {
+    id: 'schur', statement: 'si A = [[A₁₁, A₁₂], [A₂₁, A₂₂]] (par blocs) et A₁₁ sont inversibles, le complément de Schur S = A₂₂ − A₂₁A₁₁⁻¹A₁₂ est inversible',
+    steps: [
+      'A₁₁ est inversible : on peut former S = A₂₂ − A₂₁A₁₁⁻¹A₁₂.',
+      'Par blocs : A = [[I, 0], [A₂₁A₁₁⁻¹, I]]·[[A₁₁, 0], [0, S]]·[[I, A₁₁⁻¹A₁₂], [0, I]].',
+      'Les deux facteurs triangulaires par blocs ont un déterminant égal à 1 : det A = det A₁₁·det S.',
+      'det A ≠ 0 et det A₁₁ ≠ 0, donc det S ≠ 0 : S est inversible.',
+    ],
+    decoys: [
+      { html: 'S est inversible, donc det S ≠ 0 et det A = det A₁₁·det S ≠ 0.', rule: 'l_proof_circular', why: 'Ce bloc part de la conclusion (S inversible).' },
+      { html: 'det S = det A₂₂ − det A₂₁·det A₁₁⁻¹·det A₁₂ ≠ 0.', rule: 'l_det_sum', why: 'Le déterminant n\'est pas additif : det(M − N) ≠ det M − det N.' },
+    ],
+    just: { at: 2, prompt: 'Quelle propriété donne det A = det A₁₁·det S ?', options: [
+      { id: 'mult', label: 'det(MN) = det M·det N', valid: true },
+      { id: 'add', label: 'det(M + N) = det M + det N', valid: false, rule: 'l_det_sum', why: 'Le déterminant n\'est pas additif ; il est multiplicatif.' },
+      { id: 'tr', label: 'det(Mᵀ) = det M', valid: false, why: 'Vrai, mais ce n\'est pas ce qui sert ici : on a un produit de trois matrices.' },
+    ] },
+  },
+];
+
+const PROOFS_S = [
+  {
+    id: 'eigspaces-orth', points: 3, statement: 'si A est symétrique, deux vecteurs propres v et w de valeurs propres λ ≠ μ sont orthogonaux',
+    steps: [
+      'Soient Aᵀ = A, Av = λv et Aw = μw, avec λ ≠ μ.',
+      'λ(v · w) = (λv) · w = (Av) · w.',
+      '(Av) · w = (Av)ᵀw = vᵀAᵀw.',
+      'vᵀAᵀw = vᵀAw = v · (μw) = μ(v · w), car Aᵀ = A.',
+      '(λ − μ)(v · w) = 0 et λ ≠ μ, donc v · w = 0.',
+    ],
+    decoys: [
+      { html: 'AᵀA = I, donc Av · Aw = v · w.', rule: 'l_sym_orth_confusion', why: 'AᵀA = I, c\'est une matrice orthogonale. Symétrique veut dire Aᵀ = A.' },
+      { html: 'v et w sont orthogonaux, donc λ(v · w) = μ(v · w) = 0.', rule: 'l_proof_circular', why: 'Ce bloc suppose v · w = 0, la conclusion.' },
+    ],
+    just: { at: 3, prompt: 'Pourquoi vᵀAᵀw = vᵀAw ?', options: [
+      { id: 'sym', label: 'A est symétrique : Aᵀ = A', valid: true },
+      { id: 'orth', label: 'A est orthogonale : AᵀA = I', valid: false, rule: 'l_sym_orth_confusion', why: 'A est symétrique, pas orthogonale : c\'est Aᵀ = A qui sert.' },
+      { id: 'eig', label: 'w est un vecteur propre', valid: false, why: 'Cela sert juste après (Aw = μw) ; d\'abord, Aᵀ devient A.' },
+    ] },
+  },
+  {
+    id: 'rank1-proj', points: 4, statement: 'si ‖u‖ = 1, la matrice A = uuᵀ est la projection orthogonale sur Span{u}',
+    steps: [
+      'Au = u(uᵀu) = u‖u‖² = u : u est vecteur propre pour la valeur propre 1.',
+      'Chaque colonne de uuᵀ est un multiple de u : rang A = 1 et Col A = Span{u}.',
+      'Si x ⊥ u, Ax = u(uᵀx) = (u · x)u = 0 : u⊥ ⊂ Ker A, et dim Ker A = n − 1, donc Ker A = u⊥.',
+      'Pour tout x, Ax = (u · x)u : c\'est la projection orthogonale de x sur Span{u}, car ‖u‖ = 1.',
+    ],
+    decoys: [
+      { html: 'A est symétrique, donc AᵀA = I : A conserve les longueurs.', rule: 'l_sym_orth_confusion', why: 'Symétrique ne veut pas dire orthogonale ; d\'ailleurs une projection raccourcit les vecteurs.' },
+      { html: 'A est la projection sur Span{u}, donc Au = u.', rule: 'l_proof_circular', why: 'Ce bloc part de la conclusion.' },
+    ],
+    just: { at: 0, prompt: 'Pourquoi u(uᵀu) = u ?', options: [
+      { id: 'norm', label: 'uᵀu = ‖u‖² = 1', valid: true },
+      { id: 'id', label: 'uuᵀ = I', valid: false, rule: 'l_sym_orth_confusion', why: 'uuᵀ est de rang 1 (n × n), pas l\'identité ; c\'est uᵀu (un nombre) qui vaut 1.' },
+      { id: 'orth', label: 'u est orthogonal à lui-même', valid: false, why: 'u · u = ‖u‖² = 1 ≠ 0.' },
+    ] },
+  },
+  {
+    id: 'orth-eig', points: 4, statement: 'si U est orthogonale et Ux = λx avec x ≠ 0 et λ réel, alors λ = ±1',
+    steps: [
+      'Soient UᵀU = I et Ux = λx, avec x ≠ 0.',
+      '‖Ux‖² = (Ux)ᵀ(Ux) = xᵀUᵀUx = xᵀx = ‖x‖².',
+      'Mais ‖Ux‖² = ‖λx‖² = λ²‖x‖².',
+      'Donc λ²‖x‖² = ‖x‖², et ‖x‖ ≠ 0 : λ² = 1, λ = ±1.',
+    ],
+    decoys: [
+      { html: 'U est orthogonale, donc Uᵀ = U et ses valeurs propres sont réelles.', rule: 'l_sym_orth_confusion', why: 'Orthogonale veut dire UᵀU = I, pas Uᵀ = U (ça, c\'est symétrique).' },
+      { html: 'λ = ±1, donc ‖Ux‖ = |λ|·‖x‖ = ‖x‖.', rule: 'l_proof_circular', why: 'Ce bloc part de λ = ±1, la conclusion.' },
+    ],
+    just: { at: 1, prompt: 'Pourquoi xᵀUᵀUx = xᵀx ?', options: [
+      { id: 'orth', label: 'U est orthogonale : UᵀU = I', valid: true },
+      { id: 'sym', label: 'U est symétrique : Uᵀ = U', valid: false, rule: 'l_sym_orth_confusion', why: 'Rien ne dit que U est symétrique : c\'est UᵀU = I qui sert.' },
+      { id: 'eig', label: 'x est un vecteur propre', valid: false, why: 'Cela sert à l\'étape suivante (‖λx‖²).' },
+    ] },
+  },
+  {
+    id: 'orth-norm', points: 3, statement: 'si U est orthogonale, ‖Ux‖ = ‖x‖ pour tout x',
+    steps: [
+      'Soit U orthogonale : UᵀU = I.',
+      '‖Ux‖² = (Ux) · (Ux) = (Ux)ᵀ(Ux).',
+      '(Ux)ᵀ(Ux) = xᵀUᵀUx (transposée d\'un produit).',
+      '= xᵀIx = xᵀx = ‖x‖², donc ‖Ux‖ = ‖x‖ (deux normes positives).',
+    ],
+    decoys: [
+      { html: 'U est symétrique : Uᵀ = U, donc ‖Ux‖² = xᵀU²x.', rule: 'l_sym_orth_confusion', why: 'Orthogonale ne veut pas dire symétrique.' },
+      { html: '‖Ux‖ = ‖x‖ pour tout x, donc (Ux)ᵀ(Ux) = xᵀx.', rule: 'l_proof_circular', why: 'Ce bloc part de la conclusion.' },
+    ],
+    just: { at: 2, prompt: 'Pourquoi (Ux)ᵀ = xᵀUᵀ ?', options: [
+      { id: 'tp', label: 'La transposée d\'un produit renverse l\'ordre', valid: true },
+      { id: 'tp-bad', label: '(Ux)ᵀ = Uᵀxᵀ', valid: false, rule: 'l_transpose_product', why: 'La transposée d\'un produit renverse l\'ordre : (Ux)ᵀ = xᵀUᵀ. Uᵀxᵀ n\'a même pas la bonne taille.' },
+      { id: 'sym', label: 'U est symétrique', valid: false, rule: 'l_sym_orth_confusion', why: 'U est orthogonale, pas symétrique.' },
+    ] },
+  },
+  {
+    id: 'spectral', points: 3, mode: 'define', statement: 'le théorème spectral',
+    steps: [
+      'Une matrice réelle A (n × n)',
+      'est diagonalisable en base orthonormée,',
+      'c\'est-à-dire A = QDQᵀ avec Q orthogonale et D diagonale,',
+      'si et seulement si',
+      'A est symétrique (Aᵀ = A).',
+    ],
+    decoys: [
+      { html: 'A est orthogonale (AᵀA = I).', rule: 'l_sym_orth_confusion', why: 'Une matrice orthogonale (une rotation, par exemple) n\'a pas toujours de valeur propre réelle. Le théorème parle des matrices symétriques.' },
+      { html: 'A est diagonalisable (A = PDP⁻¹).', rule: 'l_sym_needed', why: 'Diagonalisable ne suffit pas : [[1, 1], [0, 2]] est diagonalisable mais pas en base orthonormée.' },
+    ],
+    just: { at: 4, prompt: 'Le sens « A = QDQᵀ ⇒ A symétrique » vient de…', options: [
+      { id: 'tp', label: 'Aᵀ = (QDQᵀ)ᵀ = QDᵀQᵀ = QDQᵀ = A', valid: true },
+      { id: 'orth', label: 'QᵀQ = I, donc AᵀA = I', valid: false, rule: 'l_sym_orth_confusion', why: 'AᵀA = QD²Qᵀ, pas I : on confond symétrique et orthogonale.' },
+      { id: 'inv', label: 'D est inversible', valid: false, why: 'D peut avoir un 0 sur la diagonale ; ce qui compte, c\'est Dᵀ = D.' },
+    ] },
+  },
+];
+
+const escH = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function proofItem(skill, level, rng, opts = {}) {
+  const bank = skill === PM ? PROOFS_M : PROOFS_S;
+  const pr = rng.pick(bank);
+  const exam = opts.exam ? { format: 'open', points: pr.points ?? 4 } : false;
+  const lv = exam ? 5 : level;
+  const ids = pr.steps.map((_, i) => `b${i}`);
+  const blocks = pr.steps.map((h, i) => ({ id: ids[i], html: escH(h), needs: i ? [ids[i - 1]] : [], earlyWhy: i ? 'Pas encore : ce bloc s\'appuie sur le bloc précédent de la preuve.' : undefined }));
+  const nDecoys = lv === 1 ? 0 : lv <= 3 ? 1 : 2;
+  const decoys = rng.shuffle([...pr.decoys]);
+  // Level 2: the decoy of the section's own trap first (circular, or the
+  // symmetric/orthogonal confusion).
+  const own = skill === PM ? 'l_proof_circular' : 'l_sym_orth_confusion';
+  if (lv <= 3) decoys.sort((a, b) => (b.rule === own) - (a.rule === own));
+  decoys.slice(0, nDecoys).forEach((dc, i) => blocks.push({ id: `d${i}`, html: escH(dc.html), needs: [], distractor: dc.rule, why: dc.why }));
+  // The hypothesis is placed at level 1 (long proofs) and in the frame (4).
+  const placed = (lv === 1 && pr.steps.length > 4) || lv === 4 ? [ids[0]] : [];
+  const order = ids.filter((id) => !placed.includes(id));
+  const define = pr.mode === 'define';
+  const decision = lv === 3 ? { prompt: pr.just.prompt, options: pr.just.options } : null;
+  return blocksItem({
+    skill, level: lv, mode: define ? 'define' : lv === 4 ? 'frame' : 'order',
+    prompt: define
+      ? `Construis l'énoncé du ${escH(pr.statement)} : touche les morceaux dans l'ordre.`
+      : `Montre que ${escH(pr.statement)}.${lv === 4 ? ` La première ligne est posée ; la dernière doit conclure : « ${escH(pr.steps.at(-1))} »` : ''} Touche les blocs dans l'ordre de la preuve.`,
+    blocks: rng.shuffle(blocks), goal: ids.at(-1), order, placed,
+    decision,
+    hints: [
+      { level: 1, html: skill === PM ? 'Commence par ce que tu supposes ; la dernière ligne est ce que tu veux montrer. Chaque bloc s\'appuie sur le précédent.' : 'Écris les hypothèses en formules (Aᵀ = A pour symétrique, UᵀU = I pour orthogonale, Av = λv), puis fais passer la matrice d\'un côté à l\'autre du produit scalaire : Av · w = vᵀAᵀw.'
+ },
+      { level: 2, html: escH(pr.steps[placed.length ? 1 : 0]) },
+      { level: 3, html: pr.steps.map((s, i) => `${i + 1}. ${escH(s)}`).join('<br>') },
+    ],
+    noHints: lv === 5,
+    solution: pr.steps.map((s) => ({ html: escH(s), note: '' })),
+    subgoals: [{ id: 'blocks', label: 'enchaîner les blocs', skill }],
+    key: `${pr.id}:${lv}${exam ? ':open' : ''}`, exam,
+    expectedSec: 40 + 20 * pr.steps.length,
+  });
+}
+
+// ======================================================================
 
 export const GEN = {
+  [PM]: (level, rng, profile, opts = {}) => proofItem(PM, level, rng, opts),
+  [PS]: (level, rng, profile, opts = {}) => proofItem(PS, level, rng, opts),
+
   [SVD]: (level, rng, profile, opts = {}) => (opts.exam ? svdExam(rng, opts.exam) : svdItem(level, rng)),
   [SPH]: (level, rng, profile, opts = {}) => (opts.exam ? sphExam(rng, opts.exam) : sphItem(level, rng)),
 

@@ -586,8 +586,8 @@ export const SKILLS = [
     desc: 'La moitié du terme croisé hors diagonale.',
     prereqWhy: { 'l-sym-orthodiag': 'x = Py avec P orthogonale' },
     intro: {
-      rule: 'Q(x) = xᵀAx, A symétrique : le coefficient de xᵢ² va en aᵢᵢ, et <b>la moitié</b> du coefficient de xᵢxⱼ va en aᵢⱼ et en aⱼᵢ. Avec x = Py, Q = λ₁y₁² + … + λₙyₙ².',
-      lines: L([['Q = 5x₁² − 4x₁x₂ + 8x₂²', ''], [M('[[5,-2],[-2,8]]'), 'λ = 4 et 9 : Q = 4y₁² + 9y₂²']]),
+      rule: 'Q(x) = xᵀAx, A symétrique : le coefficient de x² va en a₁₁, et <b>la moitié</b> du coefficient de xy va en a₁₂ et en a₂₁. Avec (x ; y) = P·(X ; Y), P orthogonale formée de vecteurs propres, Q = λ₁X² + λ₂Y² : les colonnes de P sont les axes principaux.',
+      lines: L([['Q = 5x² − 4xy + 8y²', ''], [M('[[5,-2],[-2,8]]'), 'λ = 4 et 9 : Q = 4X² + 9Y², définie positive']]),
     },
   }),
   S('l-svd-compute', {
