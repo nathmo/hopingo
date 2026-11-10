@@ -42,6 +42,8 @@ const Pnum = (P, x) => P.reduce((s, [c, m]) => s + Number(q(c)) * MONO[m](x), 0)
 const Pshift = (P) => sumT([polyT(P), P0(P).n ? qt(P0(P).neg()) : '']);
 
 // g·h as text: 2y, 2x y, 3x^2 (1+y^2), e^x×y, cos(x)×(9-y^2).
+// h(y) readable: 9 − y², 1 + y², e^(−y).
+const hR = (h) => sup(h).replace(/([\w²)])([+−])/g, '$1 $2 ');
 const mulT = (g, h) => (!g ? h : /^[\d(]/.test(g) || /^\d*x(\^\d)?$/.test(g) ? `${g} ${h}` : `${g}×${h}`);
 
 // ---------- h(y): the families ----------
@@ -159,7 +161,7 @@ function linesVariant(level, rng, opts) {
   };
   const parts = [];
   const divide = {
-    kind: 'decision', prompt: `Avant de diviser par h(y) = ${sup(F.h)}, que faut-il faire ?`, options: [
+    kind: 'decision', prompt: `Avant de diviser par h(y) = ${hR(F.h)}, que faut-il faire ?`, options: [
       { id: 'zeros', label: 'Chercher les zéros de h : ce sont des solutions constantes', valid: true },
       { id: 'none', label: 'Rien : on divise directement', valid: false, rule: 'a2_ode_sep_lost_constant', why: 'Diviser par h(y) perd les solutions où h(y) = 0 : ce sont des solutions constantes, parfois la seule qui vérifie la condition initiale.' },
     ],
@@ -207,7 +209,7 @@ function linesVariant(level, rng, opts) {
     parts.push({ html: level >= 2 || F.pf ? 'Sépare, intègre, puis applique la condition initiale.' : null, ask: 'y =', start: F.eq, judge: ode, pre: level >= 2 ? pre : [], lines });
   }
   const { start, judge, script } = partsScript(parts, level, CHOICES);
-  const given = level === 1 && !constant ? (F.zeros === '∅' ? ` h(y) = ${sup(F.h)} ne s'annule jamais : pas de solution constante.` : ` Les solutions constantes sont ${MT(F.zeros)} ; y(0) = ${MT(y0T)} n'en est pas une.`) : '';
+  const given = level === 1 && !constant ? (F.zeros === '∅' ? ` h(y) = ${hR(F.h)} ne s'annule jamais : pas de solution constante.` : ` Les solutions constantes sont ${MT(F.zeros)} ; y(0) = ${MT(y0T)} n'en est pas une.`) : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
     prompt: `Résous ${MT(F.eq)}, y(0) = ${MT(y0T)}.${given}`,

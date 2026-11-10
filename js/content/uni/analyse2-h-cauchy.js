@@ -69,7 +69,7 @@ function linesVariant(level, rng, opts) {
   const parts = [
     { start: `pd(${fam.f},y)`, judge: { kind: 'equiv', ...TY, target: 'no-prime', domain: { t: [-a, a], y: [y0 - b, y0 + b] } }, lines: [E(fam.fy, 'Dériver en y (t est une constante)', 'partial', 'pd')] },
     { html: `Majore |∂f/∂y| sur R (${fam.why(a, B)}) : f est M-Lipschitz en y.`, ask: 'M =', start: 'M', judge: value(M), pre: level === 3 ? [uniqueness] : [], lines: two(mLine, M, 'Majorer chaque facteur', 'lipschitz', 'lip') },
-    { html: `Majore |f| sur R : K =`, ask: 'K =', start: 'K', judge: value(K), lines: two(kLine, K, 'Majorer chaque terme', 'bound', 'K') },
+    { html: 'Majore |f| sur R : borne K.', ask: 'K =', start: 'K', judge: value(K), lines: two(kLine, K, 'Majorer chaque terme', 'bound', 'K') },
     { html: 'Solution unique sur |t| ≤ h, avec h = min(a, b/K) :', ask: 'h =', start: 'h', judge: value(qt(h)), lines: [E(hLine, 'min(a, b/K)', 'interval', 'h'), E(qt(h), 'Calculer', 'interval', 'calc')] },
   ];
   if (level === 1) {
