@@ -9,5 +9,8 @@ import { GEN as CAUCHY } from './analyse2-h-cauchy.js';
 import { GEN as SEP } from './analyse2-h-sep.js';
 import { GEN as LINEAR } from './analyse2-h-linear.js';
 import { GEN as HOMOG } from './analyse2-h-homog.js';
+import { GEN as CONST2 } from './analyse2-h-const2.js';
+import { GEN as STRUCT } from './analyse2-h-struct.js';
+import { GEN as WRONSK } from './analyse2-h-wronsk.js';
 
-export const GEN = { ...CAUCHY, ...SEP, ...LINEAR, ...HOMOG };
+export const GEN = { ...CAUCHY, ...SEP, ...LINEAR, ...HOMOG, ...CONST2, ...STRUCT, ...WRONSK };

@@ -5,7 +5,7 @@ import { checkSkills } from './uni-check.js';
 import { SKILLS } from '../js/content/uni/analyse2-h.skills.js';
 
 // Skills whose generators are not written yet (emptied when the part is done).
-const STUBBED = new Set(["a2-ode-structure", "a2-ode-const2", "a2-ode-wronskian"]);
+const STUBBED = new Set([]);
 // Items per level: 20 for every skill (the ode judge samples a lot).
 const COUNTS = Object.fromEntries(SKILLS.map((s) => [s.id, 20]));
 
