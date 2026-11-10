@@ -1019,6 +1019,350 @@ function coordsExam(rng, exam) {
   });
 }
 
+// ======================================================================
+// l-vs-map-matrix
+// ======================================================================
+
+const MAPM = 'l-vs-map-matrix';
+const MAPM_SUB = [
+  { id: 'images', label: 'images', skill: 'l-map-std-matrix' },
+  { id: 'coords', label: 'coordonnées', skill: 'l-vs-coords' },
+  { id: 'place', label: 'placer en colonnes', skill: MAPM },
+];
+const ABC = ['a', 'b', 'c'];
+
+// T : P₂ → ℝ³ or P₂ → P₂, T(a + bt + ct²) given by a matrix AT on the
+// coefficients; B = polyBasis(2) at the start, the canonical basis at the
+// end: [T]_{C B} = AT·B.
+function mapData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const AT = Array.from({ length: 3 }, () => Array.from({ length: 3 }, () => q(rng.int(-2, 2))));
+    if (AT.some((r) => r.filter((x) => x.n !== 0).length === 0) || AT.flat().filter((x) => x.n !== 0).length < 4) continue;
+    const { M: B, polys } = polyBasis(2, rng);
+    const M = MX.mul(AT, B);
+    if (maxAbs(M) > 9 || MX.equal(M, AT) || MX.equal(M, MX.transpose(M))) continue;
+    // A column asked in the exam variants: one where the trap differs.
+    const cells = [];
+    M.forEach((r, i) => r.forEach((x, j) => { if (!x.eq(AT[i][j]) && !x.eq(M[j][i])) cells.push([i, j]); }));
+    if (!cells.length) continue;
+    return { AT, B, M, bs: colsOf(B), polys, target: rng.pick(['R3', 'P2']), cells };
+  }
+  const AT = MX.mat([[1, -1, 0], [0, 1, 2], [1, 0, 1]]);
+  const B = MX.mat([[1, 0, 1], [1, 1, 0], [0, -1, 0]]);
+  return { AT, B, M: MX.mul(AT, B), bs: colsOf(B), target: 'R3', cells: [[1, 2]], fallback: true };
+}
+// T(a + bt + ct²) = (a − b ; b + 2c ; a + c), or (a − b) + (b + 2c)t + (a + c)t².
+function mapFormula(d) {
+  const rows = d.AT.map((r) => linText(r, ABC));
+  if (d.target === 'R3') return `T(a + bt + ct²) = (${rows.join(' ; ')})`;
+  const terms = rows.map((e, k) => (e === '0' ? null : k === 0 ? e : `(${e})${k === 1 ? 't' : 't²'}`)).filter(Boolean);
+  return `T(a + bt + ct²) = ${terms.join(' + ').replace(/\+ \(−/g, '+ (−') || '0'}`;
+}
+const mapSpace = (d) => (d.target === 'R3' ? 'P₂ → ℝ³' : 'P₂ → P₂');
+const coefName = (i, j) => `a${sub(i + 1)}${sub(j + 1)}`;
+
+function mapItem(level, rng) {
+  const d = mapData(rng);
+  if (level === 5) return mapCoef(rng, null, d);
+  const M3 = level === 3;
+  const arrive = d.target === 'R3' ? '' : ' (coordonnées dans 1, t, t²)';
+  const parts = d.bs.map((b, j) => {
+    const col = MX.col(d.M, j);
+    const line = { kind: 'eq', math: vt(col), note: `T(${polyR(b)})${d.target === 'R3' ? '' : ` = ${polyR(col)}`}`, subgoal: 'images' };
+    return {
+      judge: { kind: 'mat', expect: vt(col), ...(M3 ? { menu: menu(`Appliquer la formule à b${sub(j + 1)} = ${polyR(b)}`, { label: `Appliquer la formule à t${j ? sup(j) : ''}`, rule: 'l_map_basis_ignored', why: 'La colonne j est l\'image du j-ième vecteur de B, pas de la base canonique.' }) } : {}) },
+      start: `T(b_${j + 1}) = ?`, html: `T(b${sub(j + 1)}) = T(${polyR(b)})${arrive}`, ask: `T(b${sub(j + 1)}) =`,
+      lines: [level <= 2 ? withCells(line, level === 1 ? [[0, 0], [2, 0]] : [[0, 0], [1, 0], [2, 0]]) : line],
+    };
+  });
+  const fin = { kind: 'eq', math: mt(d.M), note: 'Colonne j : coordonnées de T(bⱼ)', subgoal: 'place' };
+  parts.push({
+    judge: { kind: 'mat', expect: mt(d.M), wrong: { l_map_basis_ignored: [mt(d.AT)] }, ...(M3 ? { menu: menu('Placer T(bⱼ) dans la colonne j', { label: 'Placer T(bⱼ) dans la ligne j', rule: 'l_matrix_rows_cols', why: 'La colonne j contient les coordonnées de T(bⱼ) : c\'est ce qui donne [T(x)] = [T]·[x]_B.' }) } : {}) },
+    start: '[T] = ?', html: 'La matrice de T dans les bases B et canonique', ask: '[T] =',
+    lines: [level === 1 ? withCells(fin, [[0, 1], [1, 1], [2, 1]]) : fin],
+  });
+  if (level === 2) {
+    parts[3].lines.unshift({
+      kind: 'decision', prompt: 'Où placer les coordonnées de T(bⱼ) ?', options: [
+        { id: 'col', label: 'Dans la colonne j', valid: true },
+        { id: 'row', label: 'Dans la ligne j', valid: false, rule: 'l_matrix_rows_cols', why: 'La colonne j de la matrice est l\'image du j-ième vecteur de base : [T]·eⱼ redonne [T(bⱼ)].' },
+      ],
+    });
+  }
+  const hints = [
+    { level: 1, html: 'Colonne j = coordonnées de T(bⱼ) dans la base d\'arrivée (ici canonique) : applique la formule aux coefficients de bⱼ.' },
+    { level: 2, html: `T(b₂) = T(${polyR(d.bs[1])}) = (□ ; □ ; □)` },
+    { level: 3, html: `[T] = ${MLm(d.M)}` },
+  ];
+  return partsItem({
+    skill: MAPM, level,
+    prompt: `T : ${mapSpace(d)} est linéaire, ${mapFormula(d)}. Soit B = (${d.bs.map((b) => polyR(b)).join(', ')}) au départ, et la base canonique à l'arrivée${arrive}. Calcule T(b₁), T(b₂), T(b₃), puis la matrice de T par rapport à ces bases.`,
+    mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: M3 ? 'menu' : null,
+    hints, subgoals: MAPM_SUB, key: `${MAPM}:${mt(d.AT)}:${mt(d.B)}:${d.target}`, fallback: d.fallback,
+  }, parts);
+}
+
+// Only a coefficient (2021 Q8).
+function mapCoef(rng, exam, d0) {
+  const d = d0 || mapData(rng);
+  const [i, j] = rng.pick(d.cells);
+  return coefItem({
+    skill: MAPM, level: exam ? 4 : 5,
+    prompt: `T : ${mapSpace(d)} est linéaire, ${mapFormula(d)}. Soit [T] sa matrice par rapport à B = (${d.bs.map((b) => polyR(b)).join(', ')}) au départ et à la base canonique à l'arrivée. Que vaut ${coefName(i, j)} ?`,
+    label: `a_${i + 1}${j + 1}`, value: qt(d.M[i][j]), key: `${mt(d.AT)}:${mt(d.B)}:${i}${j}`, exam: examTag({ exam }), askCoef: { label: coefName(i, j), path: [i, j] },
+    traps: [{ rule: 'l_map_basis_ignored' }, { rule: 'l_coef_index_swap' }],
+    subgoals: MAPM_SUB, solution: [{ html: `T(b${sub(j + 1)}) = T(${polyR(d.bs[j])}) = ${MLv(MX.col(d.M, j))}`, note: `Colonne ${j + 1}` }, { html: `${coefName(i, j)} = ${fq(d.M[i][j])}`, note: '' }],
+    fallback: d.fallback,
+  });
+}
+
+function mapExam(rng, exam) {
+  if (exam === 'coef') return mapCoef(rng, exam);
+  const d = mapData(rng);
+  const perm = MX.fromCols([MX.col(d.M, 1), MX.col(d.M, 0), MX.col(d.M, 2)]);
+  return mcqDistinct({
+    skill: MAPM, level: 4, key: `mcq:${mt(d.AT)}:${mt(d.B)}`, exam: examTag({ exam }),
+    prompt: `T : ${mapSpace(d)} est linéaire, ${mapFormula(d)}. Quelle est sa matrice par rapport à B = (${d.bs.map((b) => polyR(b)).join(', ')}) au départ et à la base canonique à l'arrivée ?`,
+    right: MLm(d.M),
+    wrongs: [{ html: MLm(d.AT), rule: 'l_map_basis_ignored' }, { html: MLm(MX.transpose(d.M)), rule: 'l_matrix_rows_cols' }],
+    fillers: [{ html: MLm(perm) }, { html: MLm(MX.transpose(d.AT)) }, { html: MLm(MX.mul(d.B, d.AT)) }],
+    solution: d.bs.map((b, j) => ({ html: `T(${polyR(b)}) = ${MLv(MX.col(d.M, j))}`, note: `Colonne ${j + 1}` })),
+  }, rng);
+}
+
+// ======================================================================
+// l-vs-change-basis
+// ======================================================================
+
+const CHB = 'l-vs-change-basis';
+const CHB_SUB = [
+  { id: 'reduce', label: 'réduire', skill: 'l-sys-rref' },
+  { id: 'read', label: 'lire', skill: CHB },
+];
+
+// C = unimodular(n) in columns, P = unimodular(n), B = C·P.
+function cbData(rng, { n = 2, sp = 'R', maxOps = 6 } = {}) {
+  for (let t = 0; t < 200; t++) {
+    const C = unimodular(n, rng, { max: 2 });
+    const P = unimodular(n, rng, { max: 2 });
+    const B = MX.mul(C, P);
+    if (maxAbs(B) > 6 || MX.equal(P, MX.transpose(P))) continue;
+    const Pi = MX.inverse(P);
+    const Ci = MX.inverse(C);
+    if (MX.equal(P, Pi) || MX.equal(Ci, P)) continue;
+    const CB = MX.hcat(C, B);
+    const red = MX.rref(CB, { cols: n });
+    if (red.ops.length < 2 || !niceOps(CB, red.ops, maxOps, { whole: true })) continue;
+    return { n, sp, C, B, P, Pi, Ci, BCi: MX.mul(B, Ci), CB, ops: red.ops };
+  }
+  const C = MX.mat([[1, 1], [1, 2]]);
+  const B = MX.mat([[2, 1], [3, 0]]);
+  const P = MX.mul(MX.inverse(C), B);
+  const CB = MX.hcat(C, B);
+  return { n: 2, sp: 'R', C, B, P, Pi: MX.inverse(P), Ci: MX.inverse(C), BCi: MX.mul(B, MX.inverse(C)), CB, ops: MX.rref(CB, { cols: 2 }).ops, fallback: true };
+}
+const baseShow = (d, M, name) => `${name} = {${colsOf(M).map((v) => (d.sp === 'P2' ? polyR(v) : MLv(v))).join(', ')}}`;
+const pName = (i, j) => `p${sub(i + 1)}${sub(j + 1)}`;
+const cbWrong = (d) => ({ l_change_basis_direction: [mt(d.Pi)], l_change_basis_product: [mt(d.Ci), mt(d.BCi)] });
+
+function cbItem(level, rng) {
+  if (level === 5) return cbCoef(rng, null);
+  const n = level === 4 ? rng.pick([2, 3]) : 2;
+  const d = cbData(rng, { n, sp: n === 3 && rng.chance(0.5) ? 'P2' : 'R', maxOps: n === 3 ? 9 : 6 });
+  const parts = [rrefPart(d.CB, d.ops, level, rng, { bar: n, subgoal: 'reduce' })];
+  const pLine = { kind: 'eq', math: mt(d.P), note: 'Lue à droite de la barre', subgoal: 'read' };
+  parts.push({
+    judge: { kind: 'mat', expect: mt(d.P), wrong: cbWrong(d) }, start: 'P_{C←B} = ?', html: 'P_{C←B}, lue à droite', ask: 'P_{C←B} =',
+    lines: [level === 1 ? withCells(pLine, pickCells(d.P, [0, 1], 2, rng)) : pLine],
+  });
+  if (level === 3) {
+    const b1 = MX.col(d.B, 0);
+    const comb = colsOf(d.C).map((c, i) => `${qt(d.P[i][0])}·${vt(c)}`).join('+').replace(/\+-/g, '-');
+    parts.push({
+      judge: { kind: 'mat', expect: vt(b1), menu: menu('Contrôler : p₁₁c₁ + p₂₁c₂ doit redonner b₁', { label: 'Contrôler : p₁₁b₁ + p₂₁b₂ doit redonner c₁', rule: 'l_change_basis_direction', why: 'La 1re colonne de P_{C←B} donne b₁ dans la base C.' }) },
+      start: 'p₁₁c₁ + p₂₁c₂ = ?', html: 'Contrôle : la 1re colonne de P donne b₁ dans la base C', ask: 'p₁₁c₁ + p₂₁c₂ =',
+      lines: [{ kind: 'eq', math: comb, note: '' }, { kind: 'eq', math: vt(b1), note: '= b₁ : juste', subgoal: 'read' }],
+    });
+  }
+  if (level === 2) {
+    parts[0].lines.unshift({
+      kind: 'decision', prompt: 'Quelle matrice réduire ?', options: [
+        { id: 'CB', label: '[C | B] : on lit P_{C←B} à droite', valid: true },
+        { id: 'BC', label: '[B | C]', valid: false, rule: 'l_change_basis_direction', why: 'Réduire [B | C] donne P_{B←C}, la matrice du passage inverse.' },
+      ],
+    });
+  }
+  const what = d.sp === 'P2' ? ' (coordonnées dans 1, t, t²)' : '';
+  const hints = [
+    { level: 1, html: `Les colonnes de P_{C←B} sont les coordonnées des vecteurs de B dans la base C : réduis [C | B]${what}.` },
+    { level: 2, html: `[I | P] : la 1re ligne finale est [1, 0${n === 3 ? ', 0' : ''} | □, □${n === 3 ? ', □' : ''}].` },
+    { level: 3, html: `P_{C←B} = ${MLm(d.P)}` },
+  ];
+  return partsItem({
+    skill: CHB, level,
+    prompt: `Dans ${d.sp === 'P2' ? 'P₂' : `ℝ${sup(n)}`}, ${baseShow(d, d.B, 'B')} et ${baseShow(d, d.C, 'C')}. Trouve la matrice de passage P_{C←B} en réduisant [C | B]${what}${level === 3 ? ', puis contrôle sa 1re colonne' : ''}.`,
+    mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
+    hints, subgoals: CHB_SUB, key: `${CHB}:${mt(d.CB, n)}`, fallback: d.fallback,
+  }, parts);
+}
+
+function cbCoef(rng, exam) {
+  const n = exam ? 2 : 3;
+  const d = cbData(rng, { n, maxOps: 9 });
+  const cells = [];
+  d.P.forEach((r, i) => r.forEach((x, j) => { if (!x.eq(d.Pi[i][j])) cells.push([i, j]); }));
+  const [i, j] = cells.length ? rng.pick(cells) : [0, 0];
+  return coefItem({
+    skill: CHB, level: exam ? 4 : 5,
+    prompt: `Dans ℝ${sup(n)}, ${baseShow(d, d.B, 'B')} et ${baseShow(d, d.C, 'C')}. Que vaut le coefficient ${pName(i, j)} de P_{C←B} ?`,
+    label: `p_${i + 1}${j + 1}`, value: qt(d.P[i][j]), key: `${mt(d.CB, n)}:${i}${j}`, exam: examTag({ exam }), askCoef: { label: pName(i, j), path: [i, j] },
+    traps: [{ rule: 'l_change_basis_direction' }, { rule: 'l_coef_index_swap' }],
+    subgoals: CHB_SUB, solution: [{ html: `[C | B] réduite : ${MLm(MX.hcat(MX.identity(n), d.P), n)}`, note: '' }, { html: `${pName(i, j)} = ${fq(d.P[i][j])}`, note: '' }],
+    fallback: d.fallback,
+  });
+}
+
+function cbExam(rng, exam) {
+  if (exam === 'coef') return cbCoef(rng, exam);
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    if (rng.chance(0.5)) {
+      return tfL({
+        skill: CHB, key: 'inverse', truth: true, exam: tag,
+        statement: 'Pour deux bases B et C, P_{B←C}·P_{C←B} = I.',
+        explanation: 'Vrai : passer de B à C puis de C à B redonne les coordonnées de départ : P_{B←C} = (P_{C←B})⁻¹.',
+      });
+    }
+    return tfL({
+      skill: CHB, key: 'BinvC', truth: false, exam: tag, ruleIfTrue: 'l_change_basis_direction',
+      statement: 'Si B et C sont deux bases de ℝ² (vecteurs en colonnes), P_{C←B} = B⁻¹C.',
+      counter: { kind: 'matPair', params: { n: 2, test: 'P_CB=B^-1C' }, ask: [{ v: 'A', label: 'B (vecteurs en colonnes) =', shape: [2, 2] }, { v: 'B', label: 'C (vecteurs en colonnes) =', shape: [2, 2] }], answer: { A: '[[1,1],[0,1]]', B: '[[1,0],[0,1]]' } },
+      explanation: 'Faux : P_{C←B} = C⁻¹B ; B⁻¹C est P_{B←C}. Avec B = {(1 ; 0), (1 ; 1)} et C canonique : C⁻¹B = [[1, 1], [0, 1]] mais B⁻¹C = [[1, −1], [0, 1]].',
+    });
+  }
+  const d = cbData(rng, { n: 2 });
+  return mcqDistinct({
+    skill: CHB, level: 4, key: `mcq:${mt(d.CB, 2)}`, exam: tag,
+    prompt: `Dans ℝ², ${baseShow(d, d.B, 'B')} et ${baseShow(d, d.C, 'C')}. Quelle est la matrice de passage P_{C←B} ?`,
+    right: MLm(d.P),
+    wrongs: [{ html: MLm(d.Pi), rule: 'l_change_basis_direction' }, { html: MLm(MX.transpose(d.P)), rule: 'l_matrix_rows_cols' }, { html: MLm(d.Ci), rule: 'l_change_basis_product' }, { html: MLm(d.BCi), rule: 'l_change_basis_product' }],
+    fillers: [{ html: MLm(d.B) }, { html: MLm(d.C) }],
+    solution: [{ html: `[C | B] réduite : ${MLm(MX.hcat(MX.identity(2), d.P), 2)}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-vs-similar
+// ======================================================================
+
+const SIM = 'l-vs-similar';
+const SIM_SUB = [
+  { id: 'inverse', label: 'inverser P', skill: 'l-mat-inverse' },
+  { id: 'product', label: 'produits', skill: 'l-mat-product' },
+  { id: 'formula', label: 'formule', skill: SIM },
+];
+
+// P = unimodular(n) (the vectors of B), T = [T]_B whole in [−3 ; 3],
+// A = P·T·P⁻¹ whole.
+function simData(rng, n = 2) {
+  for (let t = 0; t < 200; t++) {
+    const P = unimodular(n, rng, { max: 2, swaps: false });
+    const T = Array.from({ length: n }, () => Array.from({ length: n }, () => q(rng.int(-3, 3))));
+    if (T.flat().filter((x) => x.n !== 0).length < n + 1) continue;
+    const Pi = MX.inverse(P);
+    const A = MX.mul(MX.mul(P, T), Pi);
+    const W = MX.mul(MX.mul(Pi, T), P);
+    if (maxAbs(A) > 12 || MX.equal(A, T) || MX.equal(A, W) || MX.equal(A, MX.transpose(A))) continue;
+    if ([...A, ...T].some((r) => r.every((x) => x.n === 0))) continue;
+    if (maxAbs(MX.mul(P, T)) > 15 || maxAbs(MX.mul(A, P)) > 15) continue;
+    return { n, P, Pi, T, A, W, V: MX.mul(MX.mul(P, A), Pi) };
+  }
+  const P = MX.mat([[1, 1], [1, 2]]);
+  const T = MX.mat([[2, 0], [1, 3]]);
+  const Pi = MX.inverse(P);
+  const A = MX.mul(MX.mul(P, T), Pi);
+  return { n: 2, P, Pi, T, A, W: MX.mul(MX.mul(Pi, T), P), V: MX.mul(MX.mul(P, A), Pi), fallback: true };
+}
+const bVecs = (d) => `B = {${colsOf(d.P).map(MLv).join(', ')}}`;
+
+function simItem(level, rng) {
+  const d = simData(rng, level >= 4 ? rng.pick([2, 3]) : 2);
+  const toT = level === 5 || (level >= 3 && rng.chance(0.5));
+  const M3 = level === 3;
+  const names = { P: mt(d.P), T_B: mt(d.T), A: mt(d.A) };
+  const cells = (M) => (level === 1 ? pickCells(M, [...Array(d.n).keys()], 2, rng) : level === 2 ? pickCells(M, [...Array(d.n).keys()], 3, rng) : null);
+  const eq = (M, note, subgoal) => { const l = { kind: 'eq', math: mt(M), note, subgoal }; const c = cells(M); return c ? withCells(l, c) : l; };
+  const mid = toT ? MX.mul(d.A, d.P) : MX.mul(d.P, d.T);
+  const parts = [
+    {
+      judge: { kind: 'mat', names, expect: mt(d.Pi), ...(M3 ? { menu: menu('Inverser P', { label: 'Transposer P', why: 'P n\'est pas orthogonale : Pᵀ n\'est pas son inverse.' }) } : {}) },
+      start: 'P⁻¹ = ?', lines: [eq(d.Pi, d.n === 2 ? 'Échanger la diagonale, opposer le reste, diviser par det P' : 'Réduire [P | I]', 'inverse')],
+    },
+    {
+      judge: { kind: 'mat', names, expect: mt(mid), ...(M3 ? { menu: menu(toT ? 'Calculer A·P' : 'Calculer P·[T]_B', { label: toT ? 'Calculer P·A' : 'Calculer [T]_B·P', rule: 'l_similar_order', why: toT ? '[T]_B = P⁻¹AP : P est à droite de A.' : 'A = P·[T]_B·P⁻¹ : P est à gauche.' }) } : {}) },
+      start: toT ? 'A·P = ?' : 'P·[T]_B = ?', html: toT ? 'Le produit A·P' : 'Le produit P·[T]_B', ask: toT ? 'A·P =' : 'P·[T]_B =',
+      lines: [eq(mid, '', 'product')],
+    },
+    {
+      judge: { kind: 'mat', names, expect: mt(toT ? d.T : d.A), wrong: { l_similar_order: [mt(toT ? d.V : d.W)] }, ...(M3 ? { menu: menu(toT ? 'Multiplier à gauche par P⁻¹' : 'Multiplier à droite par P⁻¹', { label: toT ? 'Multiplier à droite par P⁻¹' : 'Multiplier à gauche par P⁻¹', rule: 'l_similar_order', why: 'L\'ordre compte : [T]_B = P⁻¹AP, A = P·[T]_B·P⁻¹.' }) } : {}) },
+      start: toT ? '[T]_B = P⁻¹·(AP) = ?' : 'A = (P·[T]_B)·P⁻¹ = ?', html: toT ? '[T]_B = P⁻¹AP' : 'A = P·[T]_B·P⁻¹', ask: toT ? '[T]_B =' : 'A =',
+      lines: [eq(toT ? d.T : d.A, toT ? `Contrôle : T(b₁) = A·b₁ = ${linText(MX.col(d.T, 0), ['b₁', 'b₂', 'b₃'])}` : `T(x) = (${d.A.map((r) => linText(r, xs(d.n))).join(' ; ')})`, 'formula')],
+    },
+  ];
+  if (level === 2) {
+    parts[2].lines.unshift({
+      kind: 'decision', prompt: toT ? 'Quelle formule donne [T]_B ?' : 'Quelle formule donne A ?', options: [
+        { id: 'ok', label: toT ? '[T]_B = P⁻¹AP' : 'A = P·[T]_B·P⁻¹', valid: true },
+        { id: 'swap', label: toT ? '[T]_B = PAP⁻¹' : 'A = P⁻¹·[T]_B·P', valid: false, rule: 'l_similar_order', why: 'P fait passer des coordonnées dans B aux coordonnées canoniques : [T]_B = P⁻¹AP, donc A = P·[T]_B·P⁻¹.' },
+      ],
+    });
+  }
+  const hints = [
+    { level: 1, html: '[T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹.' },
+    { level: 2, html: toT ? '[T]_B = P⁻¹·(A·P) = P⁻¹·□' : 'A = (P·[T]_B)·□' },
+    { level: 3, html: `${toT ? '[T]_B' : 'A'} = ${MLm(toT ? d.T : d.A)}` },
+  ];
+  return partsItem({
+    skill: SIM, level,
+    prompt: toT
+      ? `T : ℝ${sup(d.n)} → ℝ${sup(d.n)} a pour matrice canonique A = ${MLm(d.A)}. Soit ${bVecs(d)}, et P = ${MLm(d.P)} (les vecteurs de B en colonnes). Calcule P⁻¹, A·P, puis [T]_B.`
+      : `${bVecs(d)} est une base de ℝ${sup(d.n)}, P = ${MLm(d.P)}, et la matrice de T dans B est [T]_B = ${MLm(d.T)}. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.`,
+    mode: level <= 2 ? 'guided' : M3 ? 'tap' : 'free', tapActions: M3 ? 'menu' : null,
+    hints, subgoals: SIM_SUB, key: `${SIM}:${mt(d.P)}:${mt(d.T)}:${toT}`, fallback: d.fallback,
+  }, parts);
+}
+
+function simExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which < 2) {
+      return tfL({
+        skill: SIM, key: `inv:${which}`, truth: true, exam: tag,
+        statement: which === 0 ? 'Deux matrices semblables ont les mêmes valeurs propres.' : 'Deux matrices semblables ont le même déterminant et la même trace.',
+        explanation: 'Vrai : si B = P⁻¹AP, alors det(B − λI) = det(P⁻¹(A − λI)P) = det(A − λI) : même polynôme caractéristique, donc mêmes valeurs propres, même déterminant et même trace.',
+      });
+    }
+    const k = rng.pick([1, 2, -1, 3]);
+    return tfL({
+      skill: SIM, key: `notsim:${k}`, truth: false, exam: tag,
+      statement: 'Deux matrices qui ont les mêmes valeurs propres (avec multiplicités) sont semblables.',
+      counter: { kind: 'matOne', params: { want: 'sameEigNotSimilar', B: mt(MX.scale(MX.identity(2), k)), n: 2 }, ask: [{ v: 'A', label: `A (mêmes valeurs propres que ${fq(k)}I₂) =`, shape: [2, 2] }], answer: { A: mt([[k, 1], [0, k]]) } },
+      explanation: `Faux : ${MLm(MX.mat([[k, 1], [0, k]]))} a la valeur propre double ${fq(k)}, comme ${fq(k)}I₂, mais la seule matrice semblable à ${fq(k)}I₂ est ${fq(k)}I₂ elle-même (P⁻¹(kI)P = kI).`,
+    });
+  }
+  const d = simData(rng, 2);
+  const f = (M) => `T(x) = (${M.map((r) => linText(r, xs(2))).join(' ; ')})`;
+  return mcqDistinct({
+    skill: SIM, level: 4, key: `mcq:${mt(d.P)}:${mt(d.T)}`, exam: tag,
+    prompt: `${bVecs(d)} est une base de ℝ², et la matrice de T dans B est [T]_B = ${MLm(d.T)}. Que vaut T(x) ?`,
+    right: f(d.A),
+    wrongs: [{ html: f(d.W), rule: 'l_similar_order' }, { html: f(MX.transpose(d.A)), rule: 'l_matrix_rows_cols' }],
+    fillers: [{ html: f(d.T) }, { html: f(MX.mul(d.P, d.T)) }, { html: f(MX.mul(d.T, d.Pi)) }],
+    solution: [{ html: `A = P·[T]_B·P⁻¹ = ${MLm(MX.mul(d.P, d.T))}·${MLm(d.Pi)} = ${MLm(d.A)}`, note: '' }],
+  }, rng);
+}
+
 export const GEN = {
   [SUBSP]: (level, rng, profile, opts = {}) => (opts.exam ? subspaceExam(rng, opts.exam) : subspaceItem(level, rng)),
   [KER]: (level, rng, profile, opts = {}) => (opts.exam ? kernelExam(rng, opts.exam) : kernelItem(level, rng)),
@@ -1026,4 +1370,7 @@ export const GEN = {
   [BASIS]: (level, rng, profile, opts = {}) => (opts.exam ? basisExam(rng, opts.exam) : basisItem(level, rng)),
   [RANK]: (level, rng, profile, opts = {}) => (opts.exam ? rankExam(rng, opts.exam) : rankItem(level, rng)),
   [COORD]: (level, rng, profile, opts = {}) => (opts.exam ? coordsExam(rng, opts.exam) : coordsItem(level, rng)),
+  [MAPM]: (level, rng, profile, opts = {}) => (opts.exam ? mapExam(rng, opts.exam) : mapItem(level, rng)),
+  [CHB]: (level, rng, profile, opts = {}) => (opts.exam ? cbExam(rng, opts.exam) : cbItem(level, rng)),
+  [SIM]: (level, rng, profile, opts = {}) => (opts.exam ? simExam(rng, opts.exam) : simItem(level, rng)),
 };
