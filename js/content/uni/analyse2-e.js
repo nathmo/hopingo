@@ -9,10 +9,13 @@
 import { critPoints, hessian2 } from './analyse2-e-crit.js';
 import { hessian3 } from './analyse2-e-hess3.js';
 import { extremaCompact } from './analyse2-e-compact.js';
+import { lagrange, lagrange3d } from './analyse2-e-lagrange.js';
 
 export const GEN = {
   'a2-crit-points': critPoints,
   'a2-hessian-2x2': hessian2,
   'a2-hessian-3x3': hessian3,
   'a2-extrema-compact': extremaCompact,
+  'a2-lagrange': lagrange,
+  'a2-lagrange-3d': lagrange3d,
 };
