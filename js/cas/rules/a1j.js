@@ -126,6 +126,9 @@ export const RULES = [
       const t = targetOf(parse(String(cfg.to ?? '0')));
       if (t.dir || typeof t.to === 'string' || t.to === null) return [];
       const v = vOf(ctx);
+      // Most lines have a limit: one computation, then nothing to name.
+      const both = limit(prev, v, t.to);
+      if (both.value !== 'none') return [];
       const right = limit(prev, v, t.to, '+');
       const left = limit(prev, v, t.to, '-');
       if (right.value === null || left.value === null || right.value === 'none' || left.value === 'none') return [];

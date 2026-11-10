@@ -7,7 +7,7 @@
 
 import { MT, linesItem, mcq, tfItem } from './kit.js';
 import {
-  q, V, KEYS, LIM, qt, pq, fq, kx, xc, sc, poly2, rd, modeOf, H, E, examOf, uniqOptions, blanked, vfMcq, assemble, fitLines,
+  q, V, KEYS, LIM, qt, pq, fq, kx, xc, sc, poly2, rd, tx, modeOf, H, E, examOf, uniqOptions, blanked, vfMcq, assemble, fitLines,
 } from './analyse1-j-kit.js';
 
 // ======================================================================
@@ -335,7 +335,7 @@ function exData(rng) {
     const quad = rng.chance(0.5);
     const d = quad ? 1 : rng.pick([-3, -2, -1, 1, 2, 3]);
     const B = quad ? L.sub(1).div(c * c) : L.sub(d).div(c);
-    if (B.n === 0 || B.d > 30 || Math.abs(B.n) > 40) continue;
+    if (B.n === 0 || B.d > 12 || Math.abs(B.n) > 20) continue;
     const num = poly2(r - c, -r * c);
     const den = poly2(s - c, -s * c);
     const Rt = p === 1 ? `(${num})/(${den})` : p === -1 ? `-(${num})/(${den})` : `${p}(${num})/(${den})`;
@@ -345,9 +345,9 @@ function exData(rng) {
     const pre = p === 1 ? '' : p === -1 ? '-' : `${p}`;
     return {
       c, p, r, s, L, B, d, quad, R: Rt, left, leftShow, Rkey: R,
-      fac: `${pre}(${xc(-c)})(${xc(r)})/((${xc(-c)})(${xc(s)}))`,
-      simp: `${pre}(${xc(r)})/(${xc(s)})`,
-      eq: quad ? `${c * c}b+1=${qt(L)}` : `${c === 1 ? '' : c}b${sc(d)}=${qt(L)}`,
+      fac: `${pre}(${xc(-c)})(${xc(r)})/((${xc(-c)})${s === 0 ? 'x' : `(${xc(s)})`})`,
+      simp: `${pre}(${xc(r)})/${s === 0 ? 'x' : `(${xc(s)})`}`,
+      eq: quad ? `${c === 1 ? '' : c * c}b+1=${qt(L)}` : `${c === 1 ? '' : c}b${sc(d)}=${qt(L)}`,
     };
   }
   return { ...exFallback(), fallback: true };
@@ -372,15 +372,15 @@ function exParam(level, rng, opts = {}) {
     E(qt(d.L), 'Passer à la limite', 'lims', 'limit'),
   ];
   let bLines = [
-    { ...E(d.eq, `Limite à gauche de ${MT(d.leftShow)}, égale à f(${d.c})`, 'lims', 'left'), holes: [d.quad ? String(d.c * d.c) : qt(d.L)] },
+    { ...E(d.eq, `Limite à gauche de ${tx(d.leftShow)}, égale à f(${d.c})`, 'lims', 'left'), holes: [d.quad ? String(d.c * d.c) : qt(d.L)] },
     E(`b=${qt(d.B)}`, 'Résoudre', 'params', 'solve'),
   ];
   if (level === 1) { rLines = [rLines[0], rLines[1], blanked(rLines[2], [qt(d.L)])]; bLines = bLines.map((l) => (l.holes ? blanked(l, l.holes) : l)); }
   if (level === 2) { rLines = rLines.map((l) => (l.holes ? blanked(l, l.holes) : l)); }
   const bPre = level === 2 ? [{
     kind: 'decision', prompt: `Quelle formule pour la limite à gauche de ${d.c} ?`, options: rng.shuffle([
-      { id: 'left', label: `${MT(d.leftShow)}, le morceau de x < ${d.c}`, valid: true, ref: true },
-      { id: 'right', label: `${MT(d.R)}, la formule qu'on vient de simplifier`, valid: false, rule: 'a1_extension_wrong_branch', why: `À gauche de ${d.c}, c'est ${MT(d.leftShow)} qui définit f.` },
+      { id: 'left', label: `${tx(d.leftShow)}, le morceau de x < ${d.c}`, valid: true, ref: true },
+      { id: 'right', label: `${tx(d.simp)}, la formule qu'on vient de simplifier`, valid: false, rule: 'a1_extension_wrong_branch', why: `À gauche de ${d.c}, c'est ${MT(d.leftShow)} qui définit f.` },
     ]),
   }] : [];
   const parts = [

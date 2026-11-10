@@ -4,6 +4,9 @@
 // the common fields of the items.
 
 import { Q } from '../../math/rational.js';
+import { parse } from '../../cas/parse.js';
+import { toReadable } from '../../cas/print.js';
+import { stripParen } from '../../cas/ast.js';
 import { MT } from './kit.js';
 
 export { modeOf, H, E, examOf, uniqOptions, blanked, segment, frN, vfMcq } from './analyse1-a-kit.js';
@@ -35,6 +38,9 @@ export const sc = (c) => (c === 0 ? '' : c > 0 ? `+${c}` : `-${-c}`);
 
 // A short text read aloud: x-2 → x − 2, 1/(x+1) → 1/(x + 1).
 export const rd = (t) => String(t).replace(/-/g, ' − ').replace(/\+/g, ' + ').replace(/^ − /, '−').replace(/\( − /g, '(−');
+
+// A formula as plain text (decision labels and line notes are not HTML).
+export const tx = (t) => toReadable(stripParen(parse(t)));
 
 // x² + bx + c as text.
 export const poly2 = (b, c, v = V) => `${v}^2${b === 0 ? '' : b === 1 ? `+${v}` : b === -1 ? `-${v}` : `${sc(b)}${v}`}${sc(c)}`;

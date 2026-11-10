@@ -130,7 +130,7 @@ function tSqrtInf(rng) {
 function tPow(rng) {
   if (rng.chance(0.5)) {
     const k = rng.int(1, 5);
-    const start = rng.chance(0.5) || k === 1 ? `x^(${kx(k)})` : `(x^${k})^x`;
+    const start = k === 1 ? 'x^x' : rng.chance(0.5) ? `x^(${kx(k)})` : `(x^${k})^x`;
     return {
       start, to: '0', dir: '+', L: '1', key: start, tool: 'exp',
       lines: [
@@ -173,7 +173,7 @@ function tBounded(rng) {
     start, to: '0', L: '0', key: start, tool: 'bounded', T,
     lines: [E('0', `|${T}(${m}/x)| ≤ 1 et ${p === 1 ? 'x' : 'x²'} → 0 : 0 × (borné) → 0`, 'remark', 'bounded')],
     h1: `${T}(${m}/x) n'a pas de limite en 0, mais il est borné ; et ${p === 1 ? 'x' : 'x²'} → 0.`,
-    h2: `|${start.replace(/×/g, '·')}| ≤ ${Math.abs(c) === 1 ? '' : Math.abs(c)}${p === 1 ? '|x|' : 'x²'} → □`,
+    h2: `${MT(`abs(${start})`)} ≤ ${Math.abs(c) === 1 ? '' : Math.abs(c)}${p === 1 ? '|x|' : 'x²'} → □`,
   };
 }
 
