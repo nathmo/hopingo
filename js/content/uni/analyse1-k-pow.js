@@ -430,7 +430,7 @@ function sumsMcq(rng, opts) {
   const val = t.pow(m).div(q(1).sub(t)); // f(t) instead of f′(t)
   const options = uniqOptions([
     { html: MT(N(right)), correct: true },
-    { html: MT(N(geo)), correct: false },
+    { html: MT(N(geo)), correct: false, rule: 'a1_geo_sum_start' },
     { html: MT(N(val)), correct: false },
     { html: MT(N(noDen)), correct: false },
     { html: MT(N(right.add(q(1)))), correct: false },
