@@ -1150,6 +1150,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 
 ### `g6-antideriv-usual` — Primitives usuelles
 - **Année** 12 · **Prérequis** `g6-deriv-usual` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Chaque item commence par réécrire f comme une somme de termes de la table (juge `equiv`, cible `goal` : séparer une fraction sur x, développer, ou écrire en puissances), puis intègre (juge `antideriv`) ; la variante `tf` est un QCM Vrai/Faux (pas de contre-exemple vérifiable pour « ln x n'est pas une primitive sur ]−∞ ; 0[ »).
 - **Intro** : une primitive se vérifie **en la dérivant**. ∫xⁿ dx = xⁿ⁺¹/(n + 1) (n ≠ −1), ∫dx/x = ln|x|, ∫eᵃˣ dx = eᵃˣ/a, ∫cos(ax) dx = sin(ax)/a, ∫dx/(1 + x²) = arctan x. On n'oublie pas + C. Substitution et parties sont en A1.
 - **Juge** : `antideriv` `{v:'x', f}` · **Forme finale** : plus de ∫, `+ C` présent (sinon `stay` : « N'oublie pas la constante. »).
 - **Niveaux** :
@@ -1172,6 +1173,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 
 ### `g6-area` — Aire entre des courbes
 - **Année** 12 · **Prérequis** `g6-antideriv-usual`, `@alg:H-discriminant` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). L'aire part de ∫ₐᵇ |f − g| dx (une intégrale par morceau, pour que la quadrature reste exacte) ; l'élève enlève la valeur absolue avec (haut − bas). Pas de gabarit « aire sous y = f(x) ≥ 0 » séparé (courbe et axe Ox à la place) ; la variante `tf` est un QCM Vrai/Faux ; `open` est un item `lines` sans aide (le type `problem` arrive en U4).
 - **Intro** : aire entre f et g sur [a ; b] = ∫ₐᵇ |f − g| dx. On cherche les points d'intersection, on regarde quelle courbe est au-dessus sur chaque morceau, puis on intègre (haut − bas). Une intégrale négative n'est pas une aire.
 - **Juge** : `solset` pour les intersections ; `definite` `{value}` pour l'intégrale · **Forme finale** : aire exacte positive.
 - **Niveaux** :
@@ -1196,6 +1198,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 
 ### `g6-deriv-implicit` — Dérivée implicite, tangente à une courbe implicite
 - **Année** 12.5 · **Prérequis** `g6-tangent`, `g0-factor-thm` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). La ligne dérivée est jugée comme identité en x, y, y′ (`equiv` avec `implicit: {y: 'p'}`, ajout au juge) ; y′ est isolé par `solset` en p (x, y échantillonnés là où le coefficient de p ne s'annule pas), donc la comparaison « sur la courbe » n'est pas construite ; la tangente est « y = … » (`equiv`, pas de `geom`). Le gabarit 3 (points à tangente horizontale) n'est pas fait.
 - **Intro** : y dépend de x. On dérive chaque membre par rapport à x : (y²)′ = 2y·y′, (xy)′ = y + x·y′. On isole y′. En un point (x₀ ; y₀) de la courbe, y′(x₀) est la pente de la tangente.
 - **Juge** : `equiv` `{vars:['x','y','y′']}` pour la ligne dérivée (identité en x, y, y′ libres) ; `equiv` `{vars:['x','y'], domain:{curve:'F(x, y) = 0'}}` pour y′ isolé (comparé **sur la courbe**, voir la note) ; `value` pour la pente ; `geom` pour la tangente · **Forme finale** : y′ en fonction de x et y ; tangente.
 - **Niveaux** :
@@ -1222,6 +1225,7 @@ Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : à faire, sauf 
 
 ### `g6-common-tangent` — Tangente imposée à une courbe ; tangente commune à deux courbes
 - **Année** 12.5 · **Prérequis** `g6-deriv-implicit`, `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Seul le gabarit 1 (paramètre, T à coordonnées entières) est construit, avec deux énoncés ; la tangente commune à deux paraboles (gabarit 2, CMS série 12) n'est pas faite. y′ = m et y = mx + h sont remplacés dans la ligne dérivée (`solset` en x avec `subst`), puis T ∈ Γ donne p. `open` est un item `lines` sans aide.
 - **Intro** : une droite t est tangente à Γ en T si T ∈ Γ, T ∈ t, et la pente de Γ en T est celle de t. On écrit ces conditions, on trouve T, puis le paramètre. Tangente commune à deux graphes : la tangente en a à f et la tangente en b à g ont la même pente et la même ordonnée à l'origine.
 - **Juge** : segments `equiv` pour la dérivée ; `value` pour T et le paramètre ; `geom` pour la tangente commune · **Forme finale** : valeur du paramètre (ou équation de la tangente commune).
 - **Niveaux** :
