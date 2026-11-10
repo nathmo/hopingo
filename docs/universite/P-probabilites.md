@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.2 `steps` (lignes étiquetées `cfg.steps`, report d'erreur), `stat` (lecture de table, IC arrondi, `sig`) ; §16.3 interpréter (`final.interpret`, compétence `p-interpret`), simulation (`simulate`), `plot` en lecture seule (`boxplot`), QCM « réponse courte », `code` (Python), variantes taguées dans une compétence (gabarits EE-209 ou MATH-234), `matrix` ; §16.4 familles nouvelles (`proba`, `stats`, `method`, `notation`, `numeric`), tag C, réparation dans un autre module, pièges partagés (réutilise `g7_order_confusion`, `g2_log_power` ; `p_reg_sigma_n` sert aussi en M).
 
-Unité `proba` · préfixe `p-` · pièges `p_` · Statut : à faire
+Unité `proba` · préfixe `p-` · pièges `p_` · Statut : fait le 10 novembre 2026 (étape U7). Chaque compétence a son statut. Cinq parties (`proba-a` … `proba-e`) ; pièges dans `js/cas/rules/pa.js` … `pe.js` ; juges `prob` et `stat` (lignes nommées, report d'erreur) ; « Interpréter » est un QCM posé après la dernière ligne (`final.interpret`) ; plans `ba3-proba` et `ba4-stat`.
 
 **Sources** : deux cours, tous deux dans le parcours.
 - MATH-234 *Probabilités et statistique* (GM), M. Wilhelm, automne 2022 : transparents des semaines 1 à 14, séries 1 à 14, formulaire 2022 avec ses tables, exercices d'examen 2020–2022 (questions « notebook » courtes, puis questions à développer), corrigé d'examen 2018 (G. Dehaene), examen 2013 (EL/MT).
