@@ -7,5 +7,6 @@
 import { GEN as CONT } from './proba-b-cont.js';
 import { GEN as LAW } from './proba-b-law.js';
 import { GEN as NORM } from './proba-b-norm.js';
+import { GEN as JOINT } from './proba-b-joint.js';
 
-export const GEN = { ...CONT, ...LAW, ...NORM };
+export const GEN = { ...CONT, ...LAW, ...NORM, ...JOINT };

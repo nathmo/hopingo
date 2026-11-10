@@ -322,7 +322,7 @@ function trExp(level, rng) {
           { id: 'unif', label: 'X ~ U(0 ; 1)', valid: false, rule: 'p_transform_jacobian', why: 'f_U vaut 1, mais il faut multiplier par |(g⁻¹)′(x)|.' }] }],
         lines: [{ math: `1×${lam.eq(1) ? expT(lam) : `${lamT(lam)}${expT(lam)}`}`, subgoal: 'form', blank: [lam.eq(1) ? expT(lam) : `${lamT(lam)}${expT(lam)}`] }] },
     ],
-    hints: H('Inverse g, dérive l\'inverse, prends la valeur absolue.', `f_X(x) = 1·|□|`, `f_X(x) = ${fx} : X ~ exp(${qs(lam)})`),
+    hints: H('Inverse g, dérive l\'inverse, prends la valeur absolue.', `f_X(x) = 1·|□|`, `f_X(x) = ${SM(fx, { vars: ['x'] })} : X ~ exp(${qs(lam)})`),
     fx, lam,
   };
 }
@@ -350,7 +350,8 @@ function trAffine(rng) {
   const b = pickOf(rng, [0, 1, 2]);
   const r = lam.div(a);
   const inner = b ? `(y-${b})` : 'y';
-  const f = `${qt(r)}e^(-${qt(r)}×${inner})`;
+  const rp = qt(r).includes('/') ? `(${qt(r)})` : qt(r);
+  const f = r.eq(1) ? `e^(-${inner})` : `${rp}e^(-${rp}×${inner})`;
   return {
     key: `aff:${qt(lam)}:${a}:${b}`, prompt: `X ~ exp(λ) avec λ = ${qs(lam)}, et Y = ${a}X${b ? ` + ${b}` : ''}. Trouve la densité de Y sur ]${b} ; +∞[.`,
     parts: [
@@ -363,7 +364,7 @@ function trAffine(rng) {
         },
         lines: [{ math: `${qt(lam)}e^(-${qt(lam)}×${inner}/${a})×1/${a}`, subgoal: 'form', blank: [`1/${a}`] }] },
     ],
-    hints: H('Inverse g : x = (y − b)/a ; la densité est divisée par a.', `f_Y(y) = f_X(□)·1/${a}`, `f_Y(y) = ${f}`) };
+    hints: H('Inverse g : x = (y − b)/a ; la densité est divisée par a.', `f_Y(y) = f_X(□)·1/${a}`, `f_Y(y) = ${SM(f, { vars: ['y'] })}`) };
 }
 
 function trSample(rng) {
