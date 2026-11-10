@@ -90,3 +90,5 @@ import * as param from './param.js';
 import * as boundary from './boundary.js';
 
 Object.assign(JUDGES, { param, boundary });
+import { FA_JUDGES } from './fourier-a-judges.js'; // step U10, part fa: fcomplex, eigen
+Object.assign(JUDGES, FA_JUDGES);
