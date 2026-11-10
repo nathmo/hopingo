@@ -16,80 +16,17 @@ import {
 } from './geo-kit.js';
 import { coefItem, mt, MLm } from './alglin-kit.js';
 import { analyzeConic } from '../../cas/conic.js';
+import { reduceData } from './coniques-b-kit.js';
+import { GEN as NATURE } from './coniques-b-nature.js';
+import { GEN as FRAME } from './coniques-b-frame.js';
+import { GEN as DATA } from './coniques-b-data.js';
+import { GEN as FAMILY } from './coniques-b-family.js';
 
 // ======================================================================
 // Reductions built backwards
 // ======================================================================
 
-const UNIT_VECS = [[1, 1, 2], [2, 1, 5], [1, 2, 5]];
-
-// kind: 'hyp' | 'ell' | 'par'. opts.fociQ: foci with rational coordinates.
-export function reduceData(rng, kind, opts = {}) {
-  for (let t = 0; t < 400; t++) {
-    const [p, r, n] = pickW(rng, UNIT_VECS);
-    const s = rng.pick([1, -1]);
-    const w1 = [q(s * p), q(s * r)]; // u₁·√n
-    const w2 = [w1[1].neg(), w1[0]]; // u₂·√n (direct frame)
-    let l1;
-    let l2;
-    if (kind === 'par') { l1 = nz(rng, -6, 8); l2 = 0; } else {
-      l1 = nz(rng, -6, 8);
-      l2 = nz(rng, -6, 8);
-      if (l1 === l2) continue;
-      if (kind === 'hyp' && l1 * l2 > 0) continue;
-      if (kind === 'ell' && l1 * l2 < 0) continue;
-    }
-    // A = (λ₁w₁w₁ᵀ + λ₂w₂w₂ᵀ)/n, whole.
-    const A = [[0, 0], [0, 1]].map(() => [q(0), q(0)]);
-    for (let i = 0; i < 2; i++) for (let j = 0; j < 2; j++) A[i][j] = w1[i].mul(w1[j]).mul(l1).add(w2[i].mul(w2[j]).mul(l2)).div(n);
-    if (A.flat().some((x) => x.d !== 1) || A.flat().every((x) => x.n === 0)) continue;
-    if (A[0][1].n === 0) continue; // a term in xy
-    if (kind === 'par') {
-      // Vertex S whole; λ₁X² + μY = 0 in (S, w1/√n, w2/√n), μ = m·√n so that
-      // the linear terms are whole: m·(X − S)·w2.
-      const S = [q(rng.int(-4, 4)), q(rng.int(-4, 4))];
-      const m = nz(rng, -5, 5);
-      // f(x) = (x − S)ᵀA(x − S) + m·(x − S)·w2.
-      const a = A[0][0]; const b = A[0][1].mul(2); const c = A[1][1];
-      const AS = [A[0][0].mul(S[0]).add(A[0][1].mul(S[1])), A[1][0].mul(S[0]).add(A[1][1].mul(S[1]))];
-      const d = AS[0].mul(-2).add(w2[0].mul(m));
-      const e = AS[1].mul(-2).add(w2[1].mul(m));
-      const f = dot(S, AS).sub(dot(S, w2).mul(m));
-      const coefs = [a, b, c, d, e, f];
-      if (coefs.some((x) => Math.abs(x.valueOf()) > 60)) continue;
-      return { kind, p, r, n, w1, w2, l1, l2, A, S, m, coefs, k: null };
-    }
-    const O = [q(rng.int(-4, 4)), q(rng.int(-4, 4))];
-    // f(Ω) = −k: denominators k/λ of the reduced form ≤ 4, and the right sign.
-    let k = null;
-    for (let u = 0; u < 30 && k === null; u++) {
-      const kk = nz(rng, -24, 24);
-      const d1 = new Q(kk, l1);
-      const d2 = new Q(kk, l2);
-      if (d1.d > 4 || d2.d > 4) continue;
-      if (kind === 'ell' && (d1.n < 0 || d2.n < 0)) continue;
-      k = kk;
-    }
-    if (k === null) continue;
-    const AO = [A[0][0].mul(O[0]).add(A[0][1].mul(O[1])), A[1][0].mul(O[0]).add(A[1][1].mul(O[1]))];
-    const coefs = [A[0][0], A[0][1].mul(2), A[1][1], AO[0].mul(-2), AO[1].mul(-2), dot(O, AO).sub(k)];
-    if (coefs.some((x) => Math.abs(x.valueOf()) > 60) || coefs.slice(3, 5).every((x) => x.n === 0)) continue;
-    const an = analyzeConic(coefs.map((x) => x.valueOf()));
-    // Rational foci: c·u₁ rational ⇔ c²/n is the square of a rational.
-    if (opts.fociQ) {
-      const a2 = new Q(k, l1);
-      const b2 = new Q(k, l2);
-      const c2 = kind === 'hyp' ? (a2.n > 0 ? a2.sub(b2) : b2.sub(a2)) : (a2.sub(b2).n > 0 ? a2.sub(b2) : b2.sub(a2));
-      const r2 = c2.div(n);
-      const sq = (x) => Number.isInteger(Math.sqrt(x)) ? Math.sqrt(x) : null;
-      if (sq(r2.n) === null || sq(r2.d) === null) continue;
-    }
-    return { kind, p, r, n, w1, w2, l1, l2, A, O, k, coefs, an };
-  }
-  // Fallback: the corrigé type 2x² + 4xy − y² − 6y − 9 = 0.
-  const w1 = [q(2), q(1)];
-  return { kind: 'hyp', p: 2, r: 1, n: 5, w1, w2: [q(-1), q(2)], l1: 3, l2: -2, A: [[q(2), q(2)], [q(2), q(-1)]], O: [q(1), q(-1)], k: 6, coefs: [2, 4, -1, 0, -6, -9].map((x) => q(x)), fallback: true };
-}
+// reduceData is in coniques-b-kit.js (shared with the nature and the frame back).
 
 // u = w/√n as text: (2 ; 1)/√5, or (1 ; 1)/√2.
 const unitT = (w, n) => `${vt(w)}/√${n}`;
@@ -295,6 +232,10 @@ function reduceExam(rng, exam) {
 // ======================================================================
 
 export const GEN = {
+  ...DATA,
+  ...FAMILY,
+  ...NATURE,
+  ...FRAME,
   [RED]: (level, rng, profile, opts = {}) => (opts.exam ? reduceExam(rng, opts.exam) : reduceItem(level, rng)),
 };
 
