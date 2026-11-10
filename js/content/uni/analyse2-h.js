@@ -7,5 +7,7 @@
 
 import { GEN as CAUCHY } from './analyse2-h-cauchy.js';
 import { GEN as SEP } from './analyse2-h-sep.js';
+import { GEN as LINEAR } from './analyse2-h-linear.js';
+import { GEN as HOMOG } from './analyse2-h-homog.js';
 
-export const GEN = { ...CAUCHY, ...SEP };
+export const GEN = { ...CAUCHY, ...SEP, ...LINEAR, ...HOMOG };
