@@ -5,5 +5,6 @@
 
 import { GEN as RES } from './cplx-b-res.js';
 import { GEN as LAU } from './cplx-b-laurent.js';
+import { GEN as THM } from './cplx-b-thm.js';
 
-export const GEN = { ...RES, ...LAU };
+export const GEN = { ...RES, ...LAU, ...THM };
