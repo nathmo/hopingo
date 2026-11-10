@@ -347,6 +347,24 @@ const WANT_ONE = {
     if (MX.transpose(A).some((c) => !c[0].add(c[1]).eq(q(1)))) return 'Chaque colonne doit sommer à 1.';
     const mu = MX.trace(A).sub(q(1));
     return Math.abs(mu.valueOf()) === 1 || `Ici l'autre valeur propre vaut ${mu} : |μ| < 1, et x_k tend vers le même état stationnaire pour tout x₀.`;
+  // section sym
+  // Diagonalisable over ℝ (rational eigenvalues) but not symmetric: not
+  // diagonalisable in an orthonormal basis.
+  diagNotSym: ({ A }) => {
+    if (!sq(A)) return 'A doit être carrée.';
+    if (MX.isSymmetric(A)) return 'Cette matrice est symétrique : elle est diagonalisable en base orthonormée.';
+    const d = diagonalisable(A);
+    if (d === null) return 'Choisis une matrice à valeurs propres entières (triangulaire, par exemple).';
+    return d || 'Cette matrice n\'est pas diagonalisable.';
+  },
+  // Real eigenvalues, singular values ≠ their absolute values: the
+  // eigenvalues of AᵀA (σᵢ²) are not those of A² (λᵢ²).
+  svNotAbsEig: ({ A }) => {
+    if (!sq(A)) return 'A doit être carrée.';
+    if (!splitEig(A)) return 'Choisis une matrice à valeurs propres entières (triangulaire, par exemple).';
+    const a = MX.charpoly(MX.mul(MX.transpose(A), A));
+    const b = MX.charpoly(MX.mul(A, A));
+    return !a.every((c, i) => c.eq(b[i])) || 'Pour cette matrice, les valeurs singulières sont bien les |λᵢ| (elle est symétrique, par exemple).';
   },
 };
 
