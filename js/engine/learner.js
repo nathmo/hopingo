@@ -99,7 +99,7 @@ function weakestPrereq(profile, id) {
 // {type: levelUp|levelDown|mastered|repair|repairDone|trapNew|trapCleared, ...}
 //
 // a = {skill, level, correct, rtSec, expectedSec, guess, rules, ambiguous,
-//      baits, weight, review, hintsUsed, solo}
+//      baits, weight, review, hintsUsed, solo, kind}
 export function recordAnswer(profile, a) {
   const events = [];
   const st = skillState(profile, a.skill);
@@ -117,7 +117,8 @@ export function recordAnswer(profile, a) {
   st.lastSeen = t;
   if (a.solo && a.correct && a.level >= 5) st.solo = true;
 
-  if (weight >= 1) {
+  // An exam answer (kind 'exam', spec §10.2) updates the mastery, not the level.
+  if (weight >= 1 && a.kind !== 'exam') {
     const slow = isSlow(st, a.rtSec, a.expectedSec);
     if (a.correct && !slow && !hints) st.rts = [...st.rts, a.rtSec].slice(-10);
 

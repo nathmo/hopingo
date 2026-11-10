@@ -1,0 +1,25 @@
+// Exam blueprints (spec §10.1). Each blueprint draws its questions from the
+// exam variants of the skills of its pool (skill.exam lists the variants a
+// generator can make; skill.examWeight weighs the draw, 0 = never drawn).
+//
+// {id, title, year, durationMin, documents: 'none' | 'formulaire' | 'tables',
+//  sections: [{kind: 'mcq' | 'tf' | 'coef' | 'open', count, multi?,
+//              scoring: {right, wrong, blank} | {perRight: '1/N', perWrong: '-1/M', floor},
+//              pool: {units: [unitId], extraSkills: [skillId]}}],
+//  passMark (share of the points for the grade 4, estimate), source}
+// Later steps (U4–U10) add their blueprints to this list.
+
+export const EXAMS = [
+  {
+    id: 'ba1-alglin', title: 'Algèbre linéaire (BA1)', year: 13, durationMin: 144,
+    documents: 'none',
+    sections: [
+      { kind: 'mcq', count: 16, scoring: { right: 3, wrong: -1, blank: 0 }, pool: { units: ['alglin'], extraSkills: [] } },
+      { kind: 'tf', count: 16, scoring: { right: 1, wrong: -1, blank: 0 }, pool: { units: ['alglin'] } },
+    ],
+    passMark: 0.5,
+    source: 'Format des examens 2018–2021 (partie commune GM et MT) : 144 minutes, 16 QCM (+3 / 0 / −1) et 16 vrai/faux (+1 / 0 / −1), sans document.',
+  },
+];
+
+export const EXAM_BY_ID = Object.fromEntries(EXAMS.map((e) => [e.id, e]));
