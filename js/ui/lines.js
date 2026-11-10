@@ -12,7 +12,7 @@ import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
 import { TokenInput } from './tokens.js';
 import { explainRule, solutionHtml } from './exercises.js';
-import { LinesRun, templateOf, fillBlanks, segmentsOf } from '../judges/lines.js';
+import { LinesRun, templateOf, fillBlanks, segmentsOf, blankRanges } from '../judges/lines.js';
 import { keysFor } from './keys-needed.js';
 import { LoggedLinesRun, isLongLines, pendingOf, resumeRun } from '../judges/problem.js';
 import { actionsFor } from '../judges/actions.js';
@@ -241,7 +241,7 @@ export function mountLines(item, ctx, body, opts = {}) {
     // A judge with its own line language draws its template (step U5).
     const own = judgeFor(run.cfg).templateML;
     const template = own ? null : parse(templateOf(line, opts), opts);
-    const n = line.blanks.length;
+    const n = blankRanges(line).length;
     const values = Array(n).fill('');
     let active = 0;
     tries = 0;

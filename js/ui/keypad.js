@@ -85,8 +85,9 @@ Object.assign(LABEL, { 'vec(': 'AB⃗', ' ou ': 'ou' });
 Object.assign(LABEL, { 'C(': 'C(n, k)', 'A(': 'A(n, k)', 'Φ(': 'Φ( )', 'Φ⁻¹(': 'Φ⁻¹( )' }); // step U7
 
 // What may come before a fraction bar or an exponent: a digit, a bracket,
-// a letter (Greek too: λ², 1/λ… is not refused), a factorial (6!/2!).
-const CAN_HOLD = /[0-9)!a-zA-Zπα-ωΑ-Ω]/;
+// a letter (Greek too: λ², 1/λ… is not refused), a factorial (6!/2!), an
+// absolute value (|x − 1|/5).
+const CAN_HOLD = /[0-9)!|a-zA-Zπα-ωΑ-Ω]/;
 
 export class MathInput {
   constructor({ keys = 'frac', keysets = null, placeholder = '', onChange, onEnter } = {}) {

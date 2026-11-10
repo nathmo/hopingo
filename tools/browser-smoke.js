@@ -220,13 +220,13 @@ function pageLib() {
 
   S.ready = async () => {
     if (M.app) return true;
-    const [main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam, mxitems, kn] = await Promise.all([
+    const [main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam, mxitems, kn, expr, solver] = await Promise.all([
       '/js/main.js', '/js/content/generators.js', '/js/content/random.js', '/js/content/skills.js', '/js/content/uni/index.js',
       '/js/ui/keypad.js', '/js/ui/tokens.js', '/js/ui/matrix-input.js', '/js/judges/lines.js', '/js/judges/problem.js',
       '/js/judges/actions.js', '/js/judges/common.js', '/js/judges/index.js', '/js/judges/interpret.js',
-      '/js/content/uni/exams.js', '/js/engine/exam.js', '/js/ui/matrix-items.js', '/js/ui/keys-needed.js',
+      '/js/content/uni/exams.js', '/js/engine/exam.js', '/js/ui/matrix-items.js', '/js/ui/keys-needed.js', '/js/math/expr.js', '/js/math/solver.js',
     ].map((u) => import(u)));
-    Object.assign(M, { main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam, mxitems, kn });
+    Object.assign(M, { main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam, mxitems, kn, expr, solver });
     M.app = main.app;
     // Inputs and runs are found from the page: each input keeps itself on
     // its element, each run is listed (prototype hooks, nothing in the app).
@@ -436,7 +436,7 @@ function pageLib() {
       i++;
     }
     const strip = (s) => s.replace(/\s+/g, '').replace(/\./g, ',').replace(/[·*÷]/g, (x) => ({ '·': '×', '*': '×', '÷': '/' })[x]);
-    if (strip(mi.value) === strip(want)) return true;
+    if (strip(mi.value) === strip(want)) return mi.value.replace(/\s+/g, '') === want.replace(/\s+/g, '').replace(/·/g, '×') ? true : 'alt';
     S.trace.untypable.push({ text: want, typed: mi.value, missed: [...new Set(missed)].join('') });
     mi.set(want);
     mi.onChange?.(mi.value);
@@ -498,6 +498,8 @@ function pageLib() {
     let lastSig = '';
     let same = 0;
     let lines = 0;
+    let skip = 0; // reference lines skipped (typed with a substitute, then finished by the next one)
+    let skipSeg = -1;
     for (let guard = 0; guard < 400; guard++) {
       await wait(10);
       const run = runOf(item);
@@ -551,9 +553,11 @@ function pageLib() {
       const opts = M.common.parseOpts(run.cfg);
       const done = run.history.filter((e) => e.seg === run.seg && e.how !== 'start').length;
       const eqs = seg.lines.filter((l) => l.kind === 'eq');
-      const next = item.mode === 'guided' ? run.nextScript()?.line : eqs[done];
+      if (skipSeg !== run.seg) { skip = 0; skipSeg = run.seg; }
+      const next = item.mode === 'guided' ? run.nextScript()?.line : eqs[done + skip];
       if (!next) { issue(`no reference line left in part ${run.seg + 1}`); return false; }
       let pressed = false;
+      let alt = false;
       const h0 = run.history.length;
       const s0 = run.seg;
       const tpl = stage?.querySelector('.lines-template');
@@ -575,7 +579,7 @@ function pageLib() {
         await S.typeTokens(ti, next.math);
         pressed = press('Valider la ligne');
       } else if (mi) {
-        await S.typeMath(mi, next.math);
+        alt = (await S.typeMath(mi, next.math)) === 'alt';
         pressed = press(['Valider la ligne', "Valider l'étape"]);
       } else { issue(`nothing to do on « ${norm(stage?.textContent ?? '').slice(0, 120)} »`); return false; }
       lines++;
@@ -586,6 +590,8 @@ function pageLib() {
         // Not accepted (a message, a form to finish).
         const msg = norm(el.querySelector('.step-feedback')?.textContent ?? '');
         const typed = (mx ?? ti ?? stage?.querySelector('.mi-display')?.__mi)?.value;
+        // 6/3 for 6÷3 is « simplify »: a student writes the next line.
+        if (alt && item.mode !== 'guided' && eqs[done + skip + 1]) { skip++; continue; }
         issue(`line « ${next.math} » not accepted (typed « ${typed} »${pressed ? '' : ', no button to press'}): ${msg.slice(0, 200)}`);
         return false;
       }
@@ -687,7 +693,7 @@ function pageLib() {
       const sub = await sleepUntil(() => el.querySelector('.table-then .exercise'), 1000);
       if (!sub) { issue(`table refused: ${norm(el.querySelector('.step-feedback')?.textContent ?? '')}`); return false; }
       const ok = await S.play(item.then, sub);
-      if (ok && item.then.type === 'mcq') press('Valider');
+      if (ok && needsCheck(item.then)) press('Valider');
       return ok;
     }
     return true;
@@ -727,7 +733,7 @@ function pageLib() {
       const sub = await sleepUntil(() => el.querySelector('.table-then .exercise'), 1000);
       if (!sub) { issue(`program refused: ${norm(el.querySelector('.step-feedback')?.textContent ?? '')}`); return false; }
       const ok = await S.play(item.then, sub);
-      if (ok && (item.then.type === 'mcq' || (item.then.type === 'readtable' && item.then.question.type === 'mcq'))) press('Valider');
+      if (ok && needsCheck(item.then)) press('Valider');
       return ok;
     }
     return true;
@@ -767,7 +773,7 @@ function pageLib() {
       if (!sub) { issue(`part ${i + 1} not shown`); return false; }
       const ok = await S.play(part, sub);
       if (!ok) return false;
-      if (['mcq', 'plot', 'answer'].includes(part.type) || (part.type === 'readtable' && part.question.type === 'mcq')) press('Vérifier');
+      if (needsCheck(part)) press('Vérifier');
       const moved = await sleepUntil(() => runOfP().done || runOfP().part !== i, 4000);
       if (!moved) { issue(`part ${i + 1} (${part.type}) did not end: ${norm(sub.textContent).slice(-160)}`); return false; }
       played++;
@@ -801,7 +807,7 @@ function pageLib() {
       default: issue(`no player for type ${item.type}`); return false;
     }
   };
-  const needsCheck = (item) => ['mcq', 'plot', 'answer'].includes(item.type) || (item.type === 'readtable' && item.question.type === 'mcq');
+  const needsCheck = (item) => ['mcq', 'plot', 'answer'].includes(item.type) || (item.type === 'readtable' && needsCheck(item.question));
 
   // Mounts an item in the lesson screen, plays its reference answer and
   // reads the feedback panel.
@@ -817,6 +823,7 @@ function pageLib() {
     scan.push(...S.scan());
     if (ok && needsCheck(it)) press('Vérifier');
     const panel = await sleepUntil(() => document.querySelector('.feedback.show'), ok ? 4000 : 300);
+    if (!panel && ok) issue(`still on: ${norm(document.querySelector('.lesson-body')?.textContent ?? '').slice(-300)}`);
     scan.push(...S.scan());
     return {
       played: ok === true, ended: !!panel, correct: !!panel && panel.classList.contains('good'),
@@ -1001,6 +1008,160 @@ function pageLib() {
     const keys = isNames(x.keys) ? M.kn.keysFor(x.keys, [x.text]) : x.keys;
     return { ...x, keys, missing: S.untypable(x.text, keys) };
   }).filter((x) => x.missing);
+
+  // ---------- wrong answers ----------
+  // A lines item: the first trap answer of its judge typed as the first line;
+  // the mistake must be shown, and named when the judge names it.
+  S.wrongLine = async (skill, level, seed) => {
+    const [diag, print, normal, diff, mal] = await Promise.all(['/js/judges/diagnose.js', '/js/cas/print.js', '/js/cas/normal.js', '/js/cas/diff.js', '/js/math/malrules.js'].map((u) => import(u)));
+    const item = S.gen(skill, level, null, seed);
+    if (item.type !== 'lines' || item.mode === 'guided') return null;
+    const cfg = item.judge;
+    if (M.idx.judgeFor(cfg).input === 'matrix' || cfg.kind === 'logic') return null;
+    const start = M.idx.readWith(cfg, item.start.math);
+    const finish = cfg.kind === 'equiv' ? (n) => normal.pretty(diff.expandDerivs(n)) : (n) => n;
+    let traps = [];
+    try { traps = diag.trapAnswers(cfg.kind, start, cfg, finish).slice(0, 4); } catch { return null; }
+    // The first trap the judge itself names.
+    const t = traps.find((x) => { const v = new M.lines.LinesRun(item).submit(x.node); return v.kind === 'wrong' && v.rule; });
+    if (!t) return null;
+    S.trace = { issues: [], untypable: [], steps: 0 };
+    S.takeErrors();
+    const el = S.mount(item);
+    const text = M.idx.textWith(cfg, t.node);
+    const stage = el.querySelector('.lines-stage');
+    if (stage.querySelector('.lines-choices')) {
+      // Tap mode: the right action first.
+      const run = runOf(window.__hopingoItem);
+      const o = M.actions.actionsFor(item.tapActions, run.prev, run.cfg).find((x) => x.valid);
+      choiceByLabel(stage, o.label)?.click();
+      await wait(0);
+    }
+    const mi = stage.querySelector('.mi-display')?.__mi;
+    if (!mi) return { skill, err: 'no input' };
+    await S.typeMath(mi, text);
+    press('Valider la ligne');
+    await wait(20);
+    const fb = el.querySelector('.step-feedback');
+    const tag = fb?.querySelector('.trap-tag')?.textContent ?? '';
+    const name = mal.RULE_BY_ID[t.rule]?.name ?? t.rule;
+    return {
+      skill, key: item.key, line: text, rule: t.rule, name, bad: !!fb?.classList.contains('bad'), tag: norm(tag),
+      named: tag.includes(name), scan: S.scan(), errors: S.takeErrors(), untypable: S.trace.untypable,
+    };
+  };
+
+  // A multiple choice: a wrong option that carries a trap; the lesson panel
+  // must say it is wrong and name the trap.
+  S.wrongChoice = async (skill, seed) => {
+    const def = M.skills.SKILL_BY_ID[skill];
+    if (!(def.exam || []).includes('mcq')) return null;
+    const item = S.gen(skill, 4, 'mcq', seed);
+    if (item.type !== 'mcq' || item.multi) return null;
+    const k = item.options.findIndex((o) => !o.correct && o.rule);
+    if (k < 0) return null;
+    S.takeErrors();
+    const el = S.mount(item);
+    el.querySelectorAll('.choices button.choice')[k].click();
+    press('Vérifier');
+    const panel = await sleepUntil(() => document.querySelector('.feedback.show'), 1000);
+    const mal = await import('/js/math/malrules.js');
+    const name = mal.RULE_BY_ID[item.options[k].rule]?.name ?? item.options[k].rule;
+    return {
+      skill, key: item.key, rule: item.options[k].rule, bad: !!panel?.classList.contains('bad'),
+      named: norm(panel?.querySelector('.trap-tag')?.textContent ?? '').includes(name), name,
+      cont: !!panel && [...panel.querySelectorAll('button')].some((b) => /Continuer|Lis la correction/.test(b.textContent)),
+      scan: S.scan(), errors: S.takeErrors(),
+    };
+  };
+
+  // ---------- a long problem, saved halfway ----------
+  S.problemHalf = async (skill, level, exam, seed) => {
+    S.trace = { issues: [], untypable: [], steps: 0 };
+    S.takeErrors();
+    const item = S.gen(skill, level, exam, seed);
+    if (item.type !== 'problem' || item.parts.length < 2) return { err: `not a problem of 2 parts or more: ${item.type}` };
+    const el = S.mount(item);
+    const it = window.__hopingoItem;
+    const half = Math.floor(it.parts.length / 2);
+    const r = await S.playProblem(it, el, { stopAfterParts: half });
+    await wait(300);
+    const p = M.app.profile;
+    return { key: it.key, parts: it.parts.length, half, r, pending: !!p.pending, log: p.pending?.log?.length ?? 0, issues: S.trace.issues, errors: S.takeErrors(), scan: S.scan() };
+  };
+  S.problemResume = async () => {
+    S.trace = { issues: [], untypable: [], steps: 0 };
+    S.takeErrors();
+    M.app.go('home');
+    await wait(20);
+    if (!press('Reprendre le problème…')) return { err: `no « Reprendre le problème » on the home screen` };
+    await wait(50);
+    const it = window.__hopingoItem;
+    const el = document.querySelector('.lesson-body .exercise');
+    const board = norm(el?.querySelector('.problem-board')?.textContent ?? '');
+    const ok = await S.playProblem(it, el);
+    const panel = await sleepUntil(() => document.querySelector('.feedback.show'), 4000);
+    return {
+      board, played: ok === true, correct: !!panel?.classList.contains('good'), panel: norm(panel?.textContent ?? '').slice(0, 200),
+      cont: !!panel && [...panel.querySelectorAll('button')].some((b) => b.textContent.trim() === 'Continuer'),
+      pendingAfter: !!M.app.profile.pending, issues: S.trace.issues, errors: S.takeErrors(), scan: S.scan(),
+    };
+  };
+
+  // ---------- a school lesson, played to its end ----------
+  S.schoolLesson = async (skill) => {
+    S.trace = { issues: [], untypable: [], steps: 0 };
+    S.takeErrors();
+    const p = M.app.profile;
+    M.app.go('lesson', { kind: 'skill', skill });
+    const seen = [];
+    for (let n = 0; n < 30; n++) {
+      await wait(30);
+      if (document.querySelector('.done')) break;
+      const it = window.__hopingoItem;
+      if (it.type === 'intro') { press('À toi !'); seen.push('intro'); continue; }
+      const el = document.querySelector('.lesson-body .exercise');
+      const mi = el?.querySelector('.mi-display')?.__mi;
+      seen.push(`${it.type}${it.mode ? `:${it.mode}` : ''}`);
+      if (it.type === 'steps' && it.mode === 'guided') {
+        // The blanks of each canonical step, from the solver (as the screen does).
+        for (let guard = 0; guard < 12 && !document.querySelector('.feedback.show'); guard++) {
+          const blanks = [...el.querySelectorAll('.step-line.current .m-blank')];
+          if (!blanks.length) break;
+          const want = S.schoolBlanks(it, el);
+          blanks.forEach((b, i) => { b.click(); for (const ch of want[i] ?? '') key(ch); });
+          press("Valider l'étape");
+          await wait(80);
+        }
+      } else if (['steps', 'eqlines', 'answer', 'fact'].includes(it.type) && mi) {
+        await S.typeMath(mi, it.answer ?? it.expected);
+        if (!press(['Valider la ligne', 'Valider', 'Vérifier'])) key('Enter');
+      } else if (it.type === 'mcq') { pickOptions(it, el); press('Vérifier'); } else { issue(`school item type ${it.type} not played`); }
+      const panel = await sleepUntil(() => document.querySelector('.feedback.show') || document.querySelector('.done') || (window.__hopingoItem !== it && window.__hopingoItem), 3000);
+      if (panel?.classList?.contains('feedback')) {
+        if (!panel.classList.contains('good')) issue(`${it.key}: ended wrong: ${norm(panel.textContent).slice(0, 160)}`);
+        for (let w = 0; w < 120 && !S.click('Continuer'); w++) await wait(100);
+      } else if (!panel) issue(`${it.key}: did not end: ${norm(el?.textContent ?? '').slice(-160)}`);
+    }
+    const done = document.querySelector('.done');
+    const out = { seen, done: !!done, title: norm(done?.querySelector('h1')?.textContent ?? ''), issues: S.trace.issues, untypable: S.trace.untypable, errors: S.takeErrors(), scan: S.scan() };
+    if (done) S.click('Continuer');
+    return out;
+  };
+  // The numbers of the current guided step: the solver's line, its fresh numbers in order.
+  S.schoolBlanks = (it, el) => {
+    const ex = M.expr;
+    const lines = M.solver.solve(ex.tidy(ex.parse(it.expr)), it.solveOpts || undefined);
+    const done = el.querySelectorAll('.steps-history .step-line:not(.first)').length;
+    const line = lines[done];
+    const out = [];
+    const signedIn = [];
+    ex.walk(line.node, (n, path) => {
+      if (out.length >= 4 || signedIn.some((q) => path.length > q.length && q.every((k, i) => path[i] === k))) return;
+      if (it.signed && n.t === 'neg' && n.e.t === 'num' && n.e.fresh) { out.push(`-${n.e.s}`); signedIn.push(path); } else if (n.t === 'num' && n.fresh) out.push(n.s);
+    });
+    return out;
+  };
 
   S.uniSkills = () => M.uni.UNI_SKILLS.map((s) => ({ id: s.id, unit: s.unit, exam: s.exam || [] }));
   return S;
