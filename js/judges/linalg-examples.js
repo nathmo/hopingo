@@ -152,6 +152,13 @@ const TESTS_PAIR = {
   'A,B inv⇒A+B inv': ({ A, B }) => {
     if (MX.det(A).n === 0 || MX.det(B).n === 0) return 'A et B doivent être inversibles.';
     return MX.det(MX.add(A, B)).n === 0 || 'Ici A + B est inversible.';
+  // section vs
+  // A, B: the matrices of two bases B and C (vectors in columns), with
+  // P_{C←B} = C⁻¹B different from B⁻¹C.
+  'P_CB=B^-1C': ({ A, B }) => {
+    const Ai = MX.inverse(A); const Bi = MX.inverse(B);
+    if (!Ai || !Bi) return 'Les colonnes de chaque matrice doivent former une base : les deux matrices doivent être inversibles.';
+    return !eqM(MX.mul(Bi, A), MX.mul(Ai, B)) || 'Pour ces deux bases, C⁻¹B = B⁻¹C : choisis-en d’autres.';
   },
 };
 
@@ -395,6 +402,26 @@ const WANT_FAMILY = {
     const v = readQ(vText)?.vec;
     if (!v || v.length !== p.n) return `Écris v avec ${p.n} composantes.`;
     return !same(T(u.map((x, i) => x.add(v[i]))), T(u).map((y, i) => y.add(T(v)[i]))) || 'Ici T(u + v) = T(u) + T(v).';
+  // section vs
+  // One vector v of the family p.F (texts) outside Ker p.A (answer v).
+  notInKer: (ans, p) => {
+    const A = readQ(p.A).mat;
+    const v = readQ(ans.v)?.vec;
+    if (!v || v.length !== A[0].length) return `Écris un vecteur à ${A[0].length} composantes.`;
+    if (!p.F.some((t) => readQ(t).vec.every((x, i) => x.eq(v[i])))) return 'Choisis un des vecteurs de la famille.';
+    return MX.matVec(A, v).some((x) => x.n !== 0) || 'Ce vecteur est bien dans Ker A : A·v = 0.';
+  },
+  // The coordinates c of p.x in the basis p.B (texts of vectors or
+  // coordinate vectors): Σ cⱼbⱼ = x, and the component p.i of c is not
+  // p.claim (answer c).
+  coordsWitness: (ans, p) => {
+    const B = p.B.map((t) => readQ(t).vec);
+    const x = readQ(p.x).vec;
+    const c = readQ(ans.c)?.vec;
+    if (!c || c.length !== B.length) return `Écris les ${B.length} coordonnées : (c₁ ; c₂ ; …).`;
+    const s = x.map((_, k) => B.reduce((acc, b, j) => acc.add(b[k].mul(c[j])), q(0)));
+    if (!s.every((y, k) => y.eq(x[k]))) return 'Avec ces coordonnées, c₁b₁ + c₂b₂ + … ne redonne pas le vecteur.';
+    return !c[p.i].eq(q(p.claim)) || 'Avec ces coordonnées, la composante est bien celle de l’énoncé.';
   },
 };
 
