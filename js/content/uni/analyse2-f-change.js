@@ -215,7 +215,7 @@ function changeItem(level, rng, opts) {
   const pose = level === 3 ? 'Choisis un changement de variables (u, v) qui rend D rectangulaire' : `Pose ${d.label}`;
   return linesItem({
     skill: SK, level, mode: modeOf(level), start: first.start, judge: menuOf(first), script,
-    prompt: `Calcule I<sub>D</sub> = ∬<sub>D</sub> ${MT(d.f)} dx dy, où ${D}. ${pose} : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.`,
+    prompt: `Calcule I<sub>D</sub> = ∬<sub>D</sub> ${d.f === '1' ? '' : MT(d.f)} dx dy, où ${D}. ${pose} : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.`,
     hints: H(`${d.why.charAt(0).toUpperCase()}${d.why.slice(1)} : avec ${d.label}, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|.`,
       `det ∂(u, v)/∂(x, y) = ${MT(d.jacUV, { vars: ['x', 'y', 'u', 'v'] })}, donc dx dy = du dv/|${R(d.jacUV)}|`,
       `${MT(d.newLine, UV)} ; I = ${MT(d.uvInt)}`),

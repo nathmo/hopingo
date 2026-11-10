@@ -69,13 +69,15 @@ function tripleData(rng) {
     const K = q(c ** (k + 1) * b ** (j + 1) * fact(j) * fact(k), fact(j + k + 2));
     const n = j + k + 2;
     const value = q(a ** (i + 1)).mul(K).mul(q(fact(i) * fact(n), fact(i + n + 1)));
-    const plane = [[a, 'x'], [b, 'y'], [c, 'z']].map(([d, v]) => (d === 1 ? v : `${v}/${d}`)).join('+');
+    const same = a === b && b === c;
+    const plane = same ? 'x+y+z' : [[a, 'x'], [b, 'y'], [c, 'z']].map(([d, v]) => (d === 1 ? v : `${v}/${d}`)).join('+');
+    const rhs = same ? a : 1;
     return {
-      kind, region: ['x ≥ 0', 'y ≥ 0', 'z ≥ 0', `${plane} ≤ 1`], ranges: [[0, a], [0, b], [0, c]],
+      kind, region: ['x ≥ 0', 'y ≥ 0', 'z ≥ 0', `${plane} ≤ ${rhs}`], ranges: [[0, a], [0, b], [0, c]],
       bounds: `0 ≤ x ≤ ${a} ; 0 ≤ y ≤ ${Yt} ; 0 ≤ z ≤ ${Zt}`, f: mono(i, j, k) || '1', Yt, Zt, a,
       inner: `int(int(${cBody(q(1, k + 1), [mono(i, j, 0), pw(Zt, k + 1)].filter(Boolean).join(' '))},y,0,${Yt}),x,0,${a})`,
       middle: `int(${cBody(K, [mono(i, 0, 0), pw(oneMinus(a), n)].filter(Boolean).join(' '))},x,0,${a})`,
-      value, words: `le tétraèdre x, y, z ≥ 0, ${R(plane)} ≤ 1`, zWhy: `z va du sol au plan ${R(plane)} = 1`,
+      value, words: `le tétraèdre x, y, z ≥ 0, ${R(plane)} ≤ ${rhs}`, zWhy: `z va du sol au plan ${R(plane)} = ${rhs}`,
     };
   }
   if (kind === 'prism') {
@@ -175,7 +177,7 @@ function tripleItem(level, rng, opts) {
   const given = level === 1 ? ` Les bornes sont ${MT(d.bounds, XYZ)}.` : ' Écris d\'abord les bornes : x à l\'extérieur, puis y, puis z.';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start: first.start, judge: menuOf(first), script,
-    prompt: `Calcule I<sub>D</sub> = ∭<sub>D</sub> ${MT(d.f)} dV, où D est ${d.words} : ${D}.${given}`,
+    prompt: `Calcule I<sub>D</sub> = ∭<sub>D</sub> ${d.f === '1' ? '' : MT(d.f)} dV, où D est ${d.words} : ${D}.${given}`,
     hints: H(`En z : ${d.zWhy} ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D.`,
       `${MT(d.bounds, XYZ)}, puis ${MT(d.inner)}`, `= ${MT(d.middle)} = ${MT(value)}`),
     subgoals: SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -206,7 +208,7 @@ function tripleMcq(rng, opts, level) {
     { html: MT(cBody(C, `(a-x)^${p}`)), x: null, rule: 'a2_fubini_outer_var' },
   ];
   return mcqV({
-    skill: SK, level, prompt: `Soit a > 0 et T<sub>a</sub> = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭<sub>T<sub>a</sub></sub> ${MT(f)} dV ?`,
+    skill: SK, level, prompt: `Soit a > 0 et T<sub>a</sub> = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭<sub>T<sub>a</sub></sub> ${f === '1' ? '' : MT(f)} dV ?`,
     right: { html: MT(aText(C, p)), x: at(C, p) }, wrongs: [wrongs[5], ...rng.shuffle(wrongs.slice(0, 5))],
     key: `${SK}:mcq:${f}`, expectedSec: 240, exam: examTag(opts) || false,
     solution: [{ html: `Bornes : ${MT('0 ≤ x ≤ a ; 0 ≤ y ≤ a-x ; 0 ≤ z ≤ a-x-y', { vars: ['x', 'y', 'z', 'a'] })}. Chaque intégration ajoute 1 au degré en a : le résultat est ${MT(aText(C, p))} (degré ${n} + 3).`, note: '' }],

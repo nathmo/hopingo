@@ -49,7 +49,7 @@ export function vText(V) {
 
 // ---------- texts ----------
 // The letters x and y swapped (texts without other x or y).
-export const swapXY = (t) => String(t).replace(/[xy]/g, (c) => (c === 'x' ? 'y' : 'x'));
+export const swapXY = (t) => String(t).replace(/[xy]/g, (c) => (c === 'x' ? 'y' : 'x')).replace(/(^|[^\w^])y x(?![\w^])/g, '$1x y').replace(/y\^2\+x\^2/g, 'x^2+y^2');
 // a·x + b·y + c as text: 2x-y+1, x, -y.
 export function linT(terms) {
   let out = '';
