@@ -7,7 +7,7 @@
 // bottom is the trap a2_volume_surfaces_swapped), the height times the
 // jacobian (`equiv` with cfg.jac), the value (`definite`).
 
-import { MT, linesItem, mcq, examTag, A2_KEYS, H, E, modeOf, partsScript, tpl } from './a2-kit.js';
+import { MT, linesItem, mcq, examTag, A2_KEYS, H, E, modeOf, partsScript, tpl, sup } from './a2-kit.js';
 import {
   q, cn, cadd, cmul, cscale, ctext, cfloat, czero, closedOk, fr, jacJudge, domJudge, defKnown, blankChain, jacBlank,
   polyText, polyMul, polyPrim, polyInt0,
@@ -95,7 +95,7 @@ function roundParts(sh, level) {
   const region = { html: 'Les surfaces se coupent au-dessus d\'un disque R. Décris R en polaires :', ask: 'R :', start, judge: domJudge('polar', [disk], box2, proj, { volume: true }), lines: [rl] };
   const D = `${proj} ; ${sh.botR} ≤ z ≤ ${sh.topR}`;
   const cylRegion = [`z ≥ ${sh.bot}`, `z ≤ ${sh.top}`];
-  let sl = E(D, `Sur R, ${fr(sh.topR)} ≥ ${fr(sh.botR)} : z va du dessous au dessus`, 'setup', 'setup');
+  let sl = E(D, `Sur R, ${fr(sup(sh.topR))} ≥ ${fr(sup(sh.botR))} : z va du dessous au dessus`, 'setup', 'setup');
   if (level === 2) sl = { ...sl, ...blankChain(D, [[2, 'lo'], [2, 'hi']], ['r', 'φ', 'z']) };
   const box3 = [...box2, [Math.floor(sh.zmin - 0.3), Math.ceil(sh.zmax + 0.3)]];
   const setup = { html: 'Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.', ask: 'D :', start, judge: domJudge('cyl', cylRegion, box3, D, { volume: true }), lines: [sl] };
@@ -160,8 +160,8 @@ const CHOICES = [
 ];
 const topDecision = (sh) => ({
   kind: 'decision', prompt: 'Au-dessus de R, quelle surface est en haut ?', options: [
-    { id: 'top', label: `z = ${fr(sh.top)}`, valid: true },
-    { id: 'bot', label: `z = ${fr(sh.bot)}`, valid: false, rule: 'a2_volume_surfaces_swapped', why: `Au centre de R (x = y = 0), ${fr(sh.top)} vaut plus que ${fr(sh.bot)}.` },
+    { id: 'top', label: `z = ${fr(sup(sh.top))}`, valid: true },
+    { id: 'bot', label: `z = ${fr(sup(sh.bot))}`, valid: false, rule: 'a2_volume_surfaces_swapped', why: `Au centre de R (x = y = 0), ${fr(sup(sh.top))} vaut plus que ${fr(sup(sh.bot))}.` },
   ],
 });
 const coordDecision = (round) => ({

@@ -12,7 +12,7 @@
 import { MT, linesItem, mcq, examTag, A2_KEYS, H, E, modeOf, partsScript, tpl } from './a2-kit.js';
 import {
   q, cn, cmul, cscale, cfloat, ctext, czero, closedOk, angInt, piText, powInt, fr, prod, rk, trig,
-  jacJudge, domJudge, defKnown, blankChain, jacBlank, vfItem, polyText, polyMul, polyPrim, polyInt0,
+  jacJudge, domJudge, defKnown, blankChain, jacBlank, vfItem, integrandML, polyText, polyMul, polyPrim, polyInt0,
 } from './analyse2-g-kit.js';
 import { angPrim } from './analyse2-g-polar.js';
 
@@ -226,7 +226,7 @@ export function cylSph(level, rng, opts = {}) {
   const given = level <= 2 ? ` En coordonnées ${isSph ? 'sphériques (θ depuis l\'axe z)' : 'cylindriques'}.` : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Calcule ∭<sub>D</sub> ${MT(d.f.cart, XYZ)} dV, avec D = {${MT(region.join(' ; '), XYZ)}}.${given}`,
+    prompt: `Calcule ∭<sub>D</sub> ${integrandML(d.f.cart, XYZ.vars)} dV, avec D = {${MT(region.join(' ; '), XYZ)}}.${given}`,
     hints: isSph
       ? H('Une boule, une coquille ou un cône depuis l\'origine : sphériques, avec dV = r² sin θ dr dθ dφ.',
         `θ part de l'axe z : ${MT(`${piText(d.dom.t[0])} ≤ θ ≤ ${piText(d.dom.t[1])}`, SV)} ; l'intégrande devient ${MT(sphF(d.f), SV)}.`,
@@ -277,7 +277,7 @@ function csMcq(level, rng, opts) {
     options.push(c);
   }
   return mcq({
-    skill: SK, level, prompt: `Soit D = {${MT(sphRegion(d).join(' ; '), XYZ)}}. En sphériques (θ mesuré depuis l'axe z), ∭<sub>D</sub> ${MT(f.cart, XYZ)} dV est égale à :`,
+    skill: SK, level, prompt: `Soit D = {${MT(sphRegion(d).join(' ; '), XYZ)}}. En sphériques (θ mesuré depuis l'axe z), ∭<sub>D</sub> ${integrandML(f.cart, XYZ.vars)} dV est égale à :`,
     options: options.map(({ x, ...o }) => o),
     solution: [{ html: MT(sphLine(d), SV), note: 'Bornes' }, { html: MT(sphF(f), SV), note: 'f·r² sin θ' }, { html: `= ${MT(ctext(d.value))}`, note: 'Valeur' }],
     key: `mcq:${f.id}:${d.dom.id}:${d.R1}:${d.R2}`, exam: examTag(opts, 3), fallback: !!d.fallback,

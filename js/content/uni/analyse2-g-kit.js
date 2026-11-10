@@ -6,6 +6,7 @@ import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { closedNumber } from '../../cas/closedform.js';
+import { MT as MTk } from './kit.js';
 import { toText } from '../../cas/print.js';
 import { blankLine } from '../../judges/lines.js';
 
@@ -238,9 +239,9 @@ export function vfItem(mcqFn, { skill, statement, truth, rule = null, why, key }
 }
 
 // ---------- polynomials in r (inner integrals of the cylinder) ----------
-// {k: Q} → text in decreasing degree: 4r−r³.
+// {k: Q} → text in increasing degree: 4 − r², r²/2 − r⁴/4.
 export function polyText(p, v = 'r') {
-  const ks = Object.keys(p).map(Number).filter((k) => p[k].n !== 0).sort((a, b) => b - a);
+  const ks = Object.keys(p).map(Number).filter((k) => p[k].n !== 0).sort((a, b) => a - b);
   if (!ks.length) return '0';
   return ks.map((k, i) => {
     const c = p[k];
@@ -250,7 +251,7 @@ export function polyText(p, v = 'r') {
     if (k === 0) t = a.toString();
     else if (a.eq(1)) t = mono;
     else if (a.d === 1) t = `${a.n}${mono}`;
-    else t = `${a.n}${mono}/${a.d}`;
+    else t = `${a.n === 1 ? '' : a.n}${mono}/${a.d}`;
     return `${c.n < 0 ? '-' : i ? '+' : ''}${t}`;
   }).join('');
 }
@@ -265,4 +266,26 @@ export const polyInt0 = (p, R) => Object.entries(p).reduce((s, [k, c]) => s.add(
 // A whole line left blank.
 export const blankAll = (math, vars) => { const node = parse(math, { vars }); return { math: toText(node), ...blankLine(node, [node], { vars }) }; };
 // The line « f(new variables)·jacobian » with the jacobian left blank.
-export const jacBlank = (sub, jac, vars) => (sub === '1' ? blankAll(jac, vars) : blankLast(`(${sub})×${jac.includes('×') ? `(${jac})` : jac}`, vars));
+export const jacBlank = (sub, jac, vars) => {
+  // Outer brackets that wrap the whole text are dropped: « (√(18 − r²) − r) ».
+  let s0 = sub;
+  if (s0.startsWith('(') && s0.endsWith(')')) {
+    let depth = 0;
+    let whole = true;
+    for (let i = 0; i < s0.length - 1; i++) {
+      depth += s0[i] === '(' ? 1 : s0[i] === ')' ? -1 : 0;
+      if (depth === 0) { whole = false; break; }
+    }
+    if (whole) s0 = s0.slice(1, -1);
+  }
+  if (s0 === '1') return blankAll(jac, vars);
+  const n = parse(s0, { vars });
+  const sum = (n.t === 'bin' && (n.op === '+' || n.op === '-')) || n.t === 'add' || n.t === 'neg';
+  return blankLast(`${sum ? `(${s0})` : s0}×${jac.includes('×') ? `(${jac})` : jac}`, vars);
+};
+// The integrand of an integral as MathML, in brackets when it is a sum.
+export function integrandML(cart, vars) {
+  const n = parse(cart, { vars });
+  const sum = (n.t === 'bin' && (n.op === '+' || n.op === '-')) || n.t === 'add';
+  return MTk(sum ? `(${cart})` : cart, { vars });
+}

@@ -29,7 +29,7 @@ const qpiText = ({ q: c, e }) => {
   return c.d === 1 ? `${n}/π` : `${n}/(${c.d}π)`;
 };
 const ratio = (a, b) => ({ q: a.q.div(b.q), e: a.e - b.e });
-const asFac = (t) => (/^[0-9]+$/.test(t) ? t : `(${t})`);
+const asFac = (t) => (/^[0-9π]+$/.test(t) ? t : `(${t})`);
 
 // ---------- polar shapes ----------
 // A density: its text in x, y and its polar factor (r^a·sin^b φ).
@@ -80,9 +80,9 @@ function polarItem(level, rng) {
   const jac = jacJudge('polar', cartMom, { rMax: R });
   let jl = E(mom.F, `${coord} = r ${coord === 'y' ? 'sin' : 'cos'} φ, et le jacobien r`, 'moment', 'jac');
   if (level <= 2) {
-    const subs = { x: 'r×cos(φ)', y: 'r×sin(φ)' };
-    const cartSub = cartMom.replace(/√\(x\^2\+y\^2\)/, 'r').replace(/x/g, subs.x).replace(/y/g, subs.y).replace('^2', '^2');
-    jl = { ...jl, ...jacBlank(cartMom === 'y^2' ? '(r×sin(φ))^2' : cartSub, 'r', jac.vars) };
+    const cs = coord === 'y' ? 'r×sin(φ)' : 'r×cos(φ)';
+    const sub = rhoId === '1' ? cs : rhoId === 'y' ? (coord === 'y' ? '(r×sin(φ))^2' : 'r×cos(φ)×r×sin(φ)') : `${cs}×r`;
+    jl = { ...jl, ...jacBlank(sub, 'r', jac.vars) };
   }
   parts.push({ html: `Le moment ∬ ${coord}·ρ dx dy : écris l'intégrande en polaires, jacobien compris.`, ask: `${coord}·ρ·r =`, start: cartMom, judge: jac, lines: [jl] });
   parts.push({ html: `Calcule le moment ∬ ${coord}·ρ dx dy :`, ask: `M_${coord} =`, start: mom.start, judge: defKnown(mom.start, mom.value, { jacFactor: 'r' }), lines: momLines });

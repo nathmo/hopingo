@@ -8,11 +8,11 @@
 // the primitives as brackets, the number). E5 adds a primitive by parts
 // (`antideriv`) and the separation « π·∫₁² 2r ln r dr » (`equiv` on numbers).
 
-import { MT, linesItem, mcq, examTag, A2_KEYS, H, E, modeOf, tpl, blanked, partsScript } from './a2-kit.js';
-import { asProblem } from './kit-problem.js';
+import { MT, linesItem, mcq, examTag, A2_KEYS, H, E, modeOf, tpl, blanked, partsScript, sup } from './a2-kit.js';
+import { problemItem } from './kit-problem.js';
 import {
   q, cn, cadd, csub, cmul, cscale, cfloat, ctext, cfac, closedOk, czero, angInt, piText, rPow, powInt, rLn, cln,
-  fr, prod, rk, trig, jacJudge, domJudge, DEF, defKnown, SAME, blankChain, jacBlank,
+  fr, prod, rk, trig, jacJudge, domJudge, DEF, defKnown, SAME, blankChain, jacBlank, integrandML,
 } from './analyse2-g-kit.js';
 
 
@@ -130,6 +130,9 @@ const FALLBACK = () => {
 // D as shown: {(x, y) : 1 ≤ x² + y² ≤ 4, y ≥ 0}.
 export const regionML = (d) => MT(regionOf(d.R1, d.R2, d.sector).join(' ; '), { vars: ['x', 'y'] });
 
+// A factor in a note: (1/2 − e⁻¹/2), π/4.
+const noteFac = (v) => { const t = fr(sup(ctext(v).replace(/([0-9a-zπ)])([+-])/g, '$1 $2 '))); return v.length > 1 ? `(${t})` : t; };
+
 // The parts of the item.
 export function polarParts(d, level) {
   const { f, sector, R1, R2 } = d;
@@ -155,7 +158,7 @@ export function polarParts(d, level) {
   const vals = [
     E(sep, 'Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales', 'separate', 'sep'),
     E(brk, 'Primitives', 'compute', 'prim'),
-    E(fin, `${fr(ctext(d.rad))} · ${fr(ctext(d.ang))}`, 'compute', 'eval'),
+    E(fin, `${noteFac(d.rad)} · ${noteFac(d.ang)}`, 'compute', 'eval'),
   ];
   if (level === 1) {
     vals[0] = blanked(vals[0], [rad.G]);
@@ -198,7 +201,7 @@ export function polarInt(level, rng, opts = {}) {
   const F = polarIntegrand(d.f);
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Calcule I = ∬<sub>D</sub> ${MT(d.f.cart, { vars: ['x', 'y'] })} dx dy, avec D = {${regionML(d)}}.${given}`,
+    prompt: `Calcule I = ∬<sub>D</sub> ${integrandML(d.f.cart, ['x', 'y'])} dx dy, avec D = {${regionML(d)}}.${given}`,
     hints: H('D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ).',
       `${MT(`int(int(${F},r,${d.R1},${d.R2}),φ,${piText(d.sector.a)},${piText(d.sector.b)})`, PV)}, puis sépare en produit.`,
       `${MT(polarLine(d.R1, d.R2, d.sector), PV)} et l'intégrande ${MT(F, PV)}.`),
@@ -243,7 +246,11 @@ export function e5Item(d, level, opts = {}) {
 
 function e5Problem(rng, opts) {
   const d = e5Data(rng);
-  return asProblem(e5Item(d, 5, opts), 8, { points: [1.5, 1.5, 1, 2, 2] });
+  const it = e5Item(d, 5, opts);
+  return problemItem({
+    skill: SK, level: 5, prompt: it.prompt, key: `E5:${d.sector.id}:${d.R2}`, exam: it.exam, expectedSec: 600,
+    parts: [{ item: { ...it, prompt: '' }, points: [1.5, 1.5, 1, 2, 2], title: 'Bornes en (r, φ)' }],
+  });
 }
 
 // ---------- multiple choice (E5's QCM, and any integrand) ----------
@@ -289,7 +296,7 @@ export function polarMcq(rng, opts = {}) {
   }
   const F = polarIntegrand(d.f);
   return mcq({
-    skill: SK, level: 4, prompt: `∬<sub>D</sub> ${MT(d.f.cart, { vars: ['x', 'y'] })} dx dy, avec D = {${regionML(d)}}, vaut :`,
+    skill: SK, level: 4, prompt: `∬<sub>D</sub> ${integrandML(d.f.cart, ['x', 'y'])} dx dy, avec D = {${regionML(d)}}, vaut :`,
     options: options.map(({ x, ...o }) => o),
     solution: [
       { html: `D̃ : ${MT(polarLine(d.R1, d.R2, d.sector), PV)}`, note: 'Bornes en polaires' },
