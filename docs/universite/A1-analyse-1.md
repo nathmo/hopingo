@@ -705,6 +705,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-deriv-def` — Dérivée par la définition ; dérivées à gauche et à droite
 - **Année** 13 · **Prérequis** `a1-fn-onesided`, `a1-seq-squeeze` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). En lignes (juge `limit` en h) : gabarits (a) c·x + xᵖ·sin(1/x) ou cos(1/x) avec p = 2 ou 3 (h·cos(1/h) seul n'étant pas décidé par le repli numérique des limites, p = 2 sans terme c·x prend sin), (b) x|x|, |x|·x², |x|³, c·x + x|x|, et un raccord de deux formules (dérivées à droite et à gauche, puis f′(0) ou f′(0⁺) − f′(0⁻) avec une décision « dérivable ? ») ; (c) |x|ᵖ·Log|x|, (d) x·sin(e^(1/x) − 1) et x·sin(1/x) seulement en QCM (niveau 5 et variante `mcq`) ; (e) x|cos x| en π/2 laissé de côté. La ligne des gendarmes est la note de la dernière ligne. Le V/F faux est un QCM Vrai/Faux (pas de vérificateur de contre-exemple pour la dérivabilité).
 - **Intro** : `f′(x₀) = lim_{h→0} (f(x₀ + h) − f(x₀))/h`, si cette limite existe et est finie. Aux points de raccord, on calcule les dérivées à gauche et à droite séparément. Dérivable ⇒ continue, pas l'inverse (|x| en 0). Exemple : `f(x) = x|x|` : `(h|h|)/h = |h| → 0`, donc f′(0) = 0.
 - **Juge** : `limit` `{v:'h', to:0, dir}` sur le taux d'accroissement ; une ligne « f′(x₀) = … » par `value` · **Forme finale** : valeur de f′(x₀), ou « pas dérivable » avec les deux dérivées latérales.
 - **Niveaux** :
@@ -726,6 +727,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-deriv-rules` — Dériver au niveau BA1 : produits, quotients, compositions, fonctions arc et hyperboliques
 - **Année** 13 · **Prérequis** `g6-deriv-rules`, `g2-hyp-def`, `g3-arc-def` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Domaine ]0 ; 1[ ; produits, quotients (sinh, cosh, eᵏˣ, sin sur un polynôme) et composées (Arctg, Arcsin, argsh, sinh, cosh de x, x², √x, x/2, 2x ; Arctg et argsh de eᵏˣ). Argsh s'écrit `argsh` (la saisie lit « Argsh » comme un produit de lettres). Niveau 5 : f′, puis f′(0) ou f′(1) exact, au lieu de f″. Le V/F faux est un QCM Vrai/Faux.
 - **Intro** : `(uv)′ = u′v + uv′`, `(u/v)′ = (u′v − uv′)/v²`, `(f∘g)′ = f′(g)·g′`. À connaître : `Arctg′ = 1/(1 + x²)`, `Arcsin′ = 1/√(1 − x²)`, `sinh′ = cosh`, `cosh′ = sinh`, `Argsh′ = 1/√(1 + x²)`. On ne simplifie qu'à la fin.
 - **Juge** : `equiv` `{vars:['x'], domain, target:'no-prime'}` · **Forme finale** : expression sans ′ ni d/dx (simplification non exigée sauf si l'item le demande).
 - **Niveaux** :
@@ -746,6 +748,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-deriv-inverse` — Dérivée d'une fonction réciproque en un point
 - **Année** 13 · **Prérequis** `a1-deriv-rules`, `g1-inverse` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Quatre parties : x₀ (`value`), f′ (`equiv`), f′(x₀), (f⁻¹)′(y₀) (`value`, avec `cfg.inv` pour le piège). Familles x³ + ax + b, ax + sin x, ax + cos x (x₀ multiple de π/2), eˣ + ax ; le gabarit 2018 2 + Log((2e + x)/x²) est laissé de côté. Niveau 2 : x₀ parmi 2 ou 3 candidats ; niveau 5 : QCM. Les V/F faux sont des QCM Vrai/Faux.
 - **Intro** : si f est bijective, dérivable en x₀ avec f′(x₀) ≠ 0, et y₀ = f(x₀), alors `(f⁻¹)′(y₀) = 1/f′(x₀)`. On cherche d'abord **x₀** tel que f(x₀) = y₀ ; on n'a pas besoin de la formule de f⁻¹.
 - **Juge** : `value` pour x₀ (vérifie f(x₀) = y₀), `value` pour f′(x₀), `value` pour le résultat · **Forme finale** : nombre exact.
 - **Niveaux** :
@@ -766,6 +769,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-deriv-log` — Dérivée logarithmique : u(x)^(v(x))
 - **Année** 13 · **Prérequis** `a1-deriv-rules`, `g2-real-powers` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). u parmi x + a, 1 + x², x ; v parmi x, x², 1 + x², 2x, 3x ; x₀ ∈ {0, 1, 2}. La valeur f′(x₀) est jugée par `definite` (forme close : 8 Log 2 + 1 ; la réponse de référence écrit Log 4 = 2 Log 2). Niveau 5 et variante `open` : u^v puis f′(x₀) sans aide (pas de x^(xˣ)).
 - **Intro** : `u^v = e^(v·Log u)` (u > 0), donc `(u^v)′ = u^v·(v′·Log u + v·u′/u)`. La règle `(xⁿ)′ = n·xⁿ⁻¹` ne vaut que pour un exposant constant. Exemple : `(xˣ)′ = xˣ(Log x + 1)`.
 - **Juge** : `equiv` `{target:'no-prime'}` ; si une valeur est demandée, `value` · **Forme finale** : expression ou valeur exacte (Log simplifiés : Log 4 = 2 Log 2 accepté sous les deux formes).
 - **Niveaux** :
@@ -788,6 +792,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-c1-def` — Définir C¹(I)
 - **Année** 13 · **Prérequis** `a1-deriv-def`, `a1-fn-extension` · **Étiquettes** GM · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-deriv-def` : dérivabilité en chaque point de I ; `a1-fn-extension` : continuité de f′.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Variantes C¹, C², Cᵏ et « continûment dérivable » (pas C⁰) ; les quatre leurres portent `a1_c1_def_missing_cont`. Niveau 5 : la définition seule, sans aide (l'enchaînement avec `a1-c1-proof` est le niveau 5 de celle-ci, qui commence par le bloc de la définition). La variante `open` est l'item de blocs sans aide.
 - **Intro** : soit I un intervalle ouvert. `f ∈ C¹(I)` si f est dérivable en tout point de I **et** si sa dérivée f′ : I → ℝ est continue sur I. Dérivable ne suffit pas : x²·sin(1/x) est dérivable sur ℝ, mais f′ n'est pas continue en 0.
 - **Juge** : type `blocks` (`mode:'define'`) ; blocs : « Soit I ⊂ ℝ un intervalle ouvert », « f : I → ℝ », « f est dérivable en tout x ∈ I », « f′ : I → ℝ est continue sur I » ; leurres : « f est continue sur I » (insuffisant seul), « f′ existe en un point », « f′ est bornée », « lim f′ existe » · **Forme finale** : les 4 blocs, sans leurre.
 - **Niveaux** :
@@ -809,6 +814,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-piecewise-ab` — Fonction par morceaux : choisir a et b pour qu'elle soit dérivable
 - **Année** 13 · **Prérequis** `a1-deriv-def`, `a1-fn-extension`, `@alg:E-systemes` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). Raccord en 0 : un morceau donné ((x − r₁)(x − r₂), e^(kx) + c ou sin(kx) + c) et l'autre ax + b, à gauche ou à droite. Une partie par équation (continuité par `limit`, b, dérivée latérale par `limit`, a, f en un point par `value`) au lieu d'un `solset` en a et b. Pas de (√(1 + x) − 1)/x ni de solutions avec √5 ; niveau 5 : QCM. Le V/F faux est un QCM Vrai/Faux.
 - **Intro** : dans l'ordre : (1) continuité au raccord (une équation), (2) égalité des dérivées à gauche et à droite (une deuxième équation). On peut dériver chaque morceau et évaluer au raccord **seulement si** le morceau est dérivable jusqu'au point et que f est continue au raccord. Sinon, on revient au taux d'accroissement.
 - **Juge** : `limit` (continuité, dérivées latérales) ; `solset` `{vars:['a','b']}` pour le système · **Forme finale** : couples (a ; b) solutions, puis la réponse demandée (f(2), f(−3)…).
 - **Niveaux** :
@@ -831,6 +837,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-c1-proof` — Montrer qu'une fonction définie par morceaux est C¹
 - **Année** 13 · **Prérequis** `a1-c1-def`, `a1-deriv-def`, `a1-deriv-rules`, `a1-seq-squeeze` · **Étiquettes** GM · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). Blocs (`frame`) avec saisies : f′(x) hors de 0 par équivalence, f′(0) et lim f′ comme nombres (pas par le juge `limit`). Contre-gabarit p = 2 (« pas C¹ ») au niveau 4. La variante `open` (6 points) est un item `lines` sans aide en parties (`equiv`, puis `limit` sur le taux et sur f′), avec aussi le gabarit 2020 (E4) ; le type `problem` et son barème par étape arrivent en U4. Le V/F faux est un QCM Vrai/Faux.
 - **Intro** : charpente en quatre temps : (1) hors du point x₀, f est C¹ comme somme, produit, composée de fonctions C¹ : on donne f′ ; (2) en x₀, f′(x₀) **par la définition** ; (3) `lim_{x→x₀} f′(x) = f′(x₀)` ; (4) conclusion. Le point (3) ne remplace pas le point (2).
 - **Juge** : type `blocks` (`mode:'frame'`) avec saisies : f′(x) hors de x₀ par `equiv`, f′(x₀) par `limit` sur le taux, lim f′ par `limit` · **Forme finale** : les quatre parties, chacune juste.
 - **Niveaux** :
