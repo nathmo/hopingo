@@ -88,6 +88,18 @@ export const DEFS = {
     },
     check: { judge: { kind: 'mat', expect: '[[2,1],[1,2]]', spectral: { A: '[[5,4],[4,5]]', f: 'sqrt' } }, prev: '√A', line: '[[√5,2],[2,√5]]' },
   },
+  m_sylvester_semidef: {
+    name: 'Mineurs dominants ≥ 0 pris pour « semi-définie positive »',
+    judges: [],
+    explain: () => 'Pour « semi-définie », il faut tous les mineurs principaux ≥ 0, pas seulement les mineurs dominants. [[0, 0], [0, −1]] a Δ₁ = Δ₂ = 0, mais Q(0, 1) = −1 < 0.',
+    check: { bait: { skill: 'm-posdef', exam: 'mcq' } },
+  },
+  m_sylvester_negdef: {
+    name: '« Définie négative » lue comme « tous les mineurs < 0 »',
+    judges: [],
+    explain: () => 'A est définie négative si −A est définie positive : les mineurs alternent, Δ₁ < 0, Δ₂ > 0, Δ₃ < 0. Ils ne sont pas tous négatifs.',
+    check: { bait: { skill: 'm-posdef', level: 3 } },
+  },
 };
 
 export { matQ, mline, R, Q, Mx, S, valueText, radicalNode, lit, sqrtNode, num };

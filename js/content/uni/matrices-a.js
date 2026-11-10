@@ -788,8 +788,246 @@ function specExam(rng, exam) {
 }
 
 // ======================================================================
+// m-posdef
+// ======================================================================
+
+const POSDEF_SUB = [
+  { id: 'minors', label: 'mineurs dominants', skill: 'l-det-cofactor' },
+  { id: 'nature', label: 'nature', skill: POSDEF },
+  { id: 'squares', label: 'somme de carrés', skill: 'l-sym-quadform' },
+];
+
+const NATURES = [
+  ['pos', 'définie positive'], ['semipos', 'semi-définie positive'], ['neg', 'définie négative'],
+  ['semineg', 'semi-définie négative'], ['indef', 'indéfinie'],
+];
+const NAT = Object.fromEntries(NATURES);
+
+// A = LDLᵀ: L unit lower (whole), D the pivots (signs by nature), so the
+// leading minors are Δₖ = d₁…dₖ ≠ 0. tri: L bidiagonal (A tridiagonal).
+function posdefData(rng, { n = rng.chance(0.4) ? 2 : 3, nature = rng.pick(['pos', 'pos', 'neg', 'indef', 'indef']), tri = rng.chance(0.4) } = {}) {
+  for (let t = 0; t < 400; t++) {
+    const L = MX.identity(n);
+    for (let i = 1; i < n; i++) for (let j = 0; j < i; j++) L[i][j] = q(tri && i - j > 1 ? 0 : rng.int(-2, 2));
+    let ds;
+    if (nature === 'pos') ds = Array.from({ length: n }, () => rng.int(1, 4));
+    else if (nature === 'neg') ds = Array.from({ length: n }, () => -rng.int(1, 4));
+    else {
+      ds = Array.from({ length: n }, () => nz(rng, -3, 4));
+      if (ds.every((x) => x > 0) || ds.every((x) => x < 0)) continue;
+    }
+    const A = MX.mul(MX.mul(L, MX.diag(ds.map((x) => q(x)))), MX.transpose(L));
+    if (MX.isDiagonal(A) || maxAbs(A) > 12) continue;
+    if (tri && n === 3 && A[0][2].n !== 0) continue;
+    const minors = ds.map((_, k) => ds.slice(0, k + 1).reduce((p, x) => p * x, 1));
+    // The leurre « diagonale positive » for half of the indefinite ones.
+    const diagPos = A.every((r, i) => r[i].n > 0);
+    if (nature === 'indef' && !diagPos && rng.chance(0.5)) continue;
+    return { n, nature, A, ds, minors, diagPos, tri: n === 3 && tri, L };
+  }
+  const A = MX.mat([[2, -1, 0], [-1, 2, -1], [0, -1, 2]]);
+  return { n: 3, nature: 'pos', A, ds: [2, 3 / 2, 4 / 3].map((x) => x), minors: [2, 3, 4], diagPos: true, tri: true, fallback: true };
+}
+
+const pivotsOf = (d) => d.minors.map((m, k) => (k ? q(m).div(q(d.minors[k - 1])) : q(m)));
+const prM = (x) => (q(x).n < 0 ? `(${qt(x)})` : qt(x));
+const d2Text = (A) => `${prM(A[0][0])}×${prM(A[1][1])}-${prM(A[0][1])}×${prM(A[1][0])}`;
+function d3Dev(A) {
+  const minor = (j) => A.slice(1).map((r) => r.filter((_, k) => k !== j));
+  const terms = [];
+  [0, 1, 2].forEach((j) => {
+    const c = A[0][j].mul(j % 2 ? -1 : 1);
+    if (c.n === 0) return;
+    const sgn = c.n < 0 ? '-' : terms.length ? '+' : '';
+    const a = c.n < 0 ? c.neg() : c;
+    terms.push(`${sgn}${a.eq(1) ? '' : `${qt(a)}·`}det${mt(minor(j))}`);
+  });
+  return terms.join('') || '0';
+}
+const minorsR = (d) => d.minors.map((m, k) => `Δ${sub(k + 1)} = ${R(m)}`).join(', ');
+
+// The decision « nature ? », with the traps on the wrong options.
+function natureDecision(d, rng) {
+  const allNeg = d.minors.every((m) => m < 0);
+  const opts = NATURES.map(([id, label]) => {
+    const o = { id, label, valid: id === d.nature };
+    if (o.valid) return o;
+    if (id === 'pos' && d.nature === 'indef' && d.diagPos) Object.assign(o, { rule: 'l_posdef_diag', why: 'La diagonale est positive, mais ce n\'est pas un critère : un mineur est négatif.' });
+    else if (id === 'indef' && d.nature === 'neg') Object.assign(o, { rule: 'm_sylvester_negdef', why: 'Définie négative : les mineurs alternent, Δ₁ < 0, Δ₂ > 0, Δ₃ < 0. Ils ne sont pas tous négatifs.' });
+    else if (id === 'neg' && d.nature === 'indef' && allNeg) Object.assign(o, { rule: 'm_sylvester_negdef', why: 'Pour « définie négative », il faut des signes alternés (−, +, −), pas tous négatifs.' });
+    else if (id === 'semipos' && d.nature === 'pos') o.why = 'Elle est même définie positive : tous les mineurs sont > 0.';
+    else if (id === 'semineg' && d.nature === 'neg') o.why = 'Elle est même définie négative : les mineurs alternent strictement.';
+    else o.why = `Relis les signes : ${minorsR(d)}.`;
+    return o;
+  });
+  return { kind: 'decision', prompt: `${minorsR(d)}. Quelle est la nature de A ?`, options: rng.shuffle(opts) };
+}
+
+function posdefSegs(d, rng) {
+  const A = mt(d.A);
+  const segs = [];
+  const sub2 = [[d.A[0][0], d.A[0][1]], [d.A[1][0], d.A[1][1]]];
+  segs.push({
+    html: `Δ₁ = ${R(d.minors[0])}. Le mineur Δ₂ :`, ask: 'Δ₂ =', start: `det${mt(sub2)}`, judge: { kind: 'det', target: 'number' },
+    decision: {
+      kind: 'decision', prompt: 'Quel critère est le plus court ici ?', options: rng.shuffle([
+        { id: 'minors', label: d.n === 2 ? 'Le signe de a₁₁ et de det A' : d.tri ? 'Les mineurs dominants (ou les pivots : A est tridiagonale)' : 'Les mineurs dominants Δ₁, Δ₂, Δ₃', valid: true },
+        { id: 'eig', label: 'Les valeurs propres', valid: true, quality: 'poor', why: 'Juste, mais il faut résoudre un polynôme de degré ' + d.n + ' : les mineurs sont plus rapides.' },
+        { id: 'diag', label: 'Le signe des cases diagonales', valid: false, rule: 'l_posdef_diag', why: 'Une diagonale positive ne suffit pas : [[1, 2], [2, 1]] a la valeur propre −1.' },
+      ]),
+    },
+    menu: menuOf(rng, 'Mineur 2 × 2 en haut à gauche', [{ id: 'diag', label: 'Regarder seulement la diagonale', valid: false, rule: 'l_posdef_diag', why: 'La diagonale ne suffit pas : il faut les mineurs.' }]),
+    lines: [{ math: d2Text(d.A), note: 'a₁₁a₂₂ − a₁₂a₂₁', subgoal: 'minors' }, { math: qt(d.minors[1]), note: '', subgoal: 'minors', blank: true }],
+  });
+  if (d.n === 3) {
+    segs.push({
+      html: 'Le mineur Δ₃ = det A :', ask: 'Δ₃ =', start: `det${A}`, judge: { kind: 'det', target: 'number' },
+      menu: menuOf(rng, 'Développer selon la 1re ligne', [{ id: 'trace', label: 'Prendre la trace', valid: false, why: 'Δ₃ est un déterminant, pas une trace.' }]),
+      lines: [{ math: d3Dev(d.A), note: 'Développement selon la première ligne', subgoal: 'minors' }, { math: qt(d.minors[2]), note: '', subgoal: 'minors', blank: true }],
+    });
+  }
+  const piv = pivotsOf(d);
+  segs.push({
+    html: 'Contrôle par un second critère : les pivots de Gauss sans échange, dₖ = Δₖ/Δₖ₋₁.', ask: '(d₁ ; …) =', start: 'pivots', judge: { kind: 'mat', expect: vt(piv) },
+    pre: [natureDecision(d, rng)],
+    menu: menuOf(rng, 'Pivots dₖ = Δₖ/Δₖ₋₁', [{ id: 'minors', label: 'Pivots = mineurs', valid: false, why: 'Le pivot dₖ est le quotient Δₖ/Δₖ₋₁ (Δₖ = d₁…dₖ).' }]),
+    lines: [{ math: vt(piv), note: `Mêmes signes que les valeurs propres : ${NAT[d.nature]}`, subgoal: 'nature', grid: piv.map((x) => [x]) }],
+  });
+  return segs;
+}
+
+const posdefHints = (d) => hints(
+  'Calcule les déterminants des coins en haut à gauche, de taille 1, 2' + (d.n === 3 ? ', 3' : '') + '. Tous > 0 : définie positive ; signes −, +, − : définie négative ; un mauvais signe (et aucun nul) : indéfinie.',
+  `Δ₂ = ${parR(d.A[0][0])}·${parR(d.A[1][1])} − □`,
+  `${minorsR(d)} : ${NAT[d.nature]}`,
+);
+
+function posdefItem(level, rng) {
+  if (level === 5) return posdefParam(rng, 3);
+  if (level === 4 && rng.chance(0.5)) return posdefParam(rng, 2);
+  const d = posdefData(rng, level === 1 ? { nature: rng.pick(['pos', 'neg', 'indef']) } : {});
+  return partsItem(level, rng, posdefSegs(d, rng), {
+    skill: POSDEF, key: `${POSDEF}:${level}:${mt(d.A)}`, fallback: d.fallback, subgoals: POSDEF_SUB,
+    prompt: `A = ${MLm(d.A)} est symétrique. Est-elle définie positive, définie négative, ou indéfinie ? Utilise les mineurs principaux dominants (critère de Sylvester), puis contrôle avec les pivots.${level <= 2 ? '<br>Règle : tous les Δₖ &gt; 0 ⇔ définie positive ; Δ₁ &lt; 0, Δ₂ &gt; 0, Δ₃ &lt; 0 ⇔ définie négative.' : ''}${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
+    hints: posdefHints(d), baits: ['l_posdef_diag'],
+  });
+}
+
+// A parameter a: 2 × 2 [[p, a], [a, r]] with pr = c², or 3 × 3 tridiagonal
+// [[p, a, 0], [a, r, b], [0, b, s]] with Δ₃ = κ(c² − a²). Definite positive
+// ⇔ |a| < c.
+function paramData(rng, n) {
+  const c = rng.pick(n === 2 ? [2, 3, 4, 6] : [1, 2, 3]);
+  if (n === 2) {
+    const ps = [];
+    for (let p = 1; p <= c * c; p++) if ((c * c) % p === 0 && c * c / p <= 12 && p <= 12) ps.push(p);
+    const p = rng.pick(ps);
+    const r = (c * c) / p;
+    return { n, c, M: [[String(p), 'a'], [String(r), 'a']], text: `[[${p},a],[a,${r}]]`, d2: `${p * r}-a^2`, d3: null, cond: `${p * r}-a^2>0`, p, r };
+  }
+  const opt = rng.pick([{ p: 1, s: 1 }, { p: 2, s: 2 }]);
+  const b = opt.p === 1 ? rng.pick([1, 2]) : 1;
+  // p = s = 1: r = c² + b², Δ₃ = c² − a². p = s = 2, b = 1: 2r − 1 = c², Δ₃ = 2(c² − a²).
+  let r;
+  let cc = c;
+  if (opt.p === 1) r = c * c + b * b;
+  else { cc = rng.pick([1, 3]); r = (cc * cc + 1) / 2; }
+  const k = opt.p === 1 ? 1 : 2;
+  const d3 = `${k * cc * cc}-${k === 1 ? '' : k}a^2`;
+  return { n, c: cc, text: `[[${opt.p},a,0],[a,${r},${b}],[0,${b},${opt.s}]]`, d2: `${opt.p * r}-a^2`, d3, cond: `${d3}>0`, p: opt.p, r, b, s: opt.s, k };
+}
+
+function posdefParam(rng, n) {
+  const d = paramData(rng, n);
+  const level = n === 3 ? 5 : 4;
+  const c = d.c;
+  const sol = `]-${c} ; ${c}[`;
+  const segs = [{
+    start: `det[[${d.p},a],[a,${d.r}]]`, judge: { kind: 'det', vars: ['a'], target: 'expanded' },
+    lines: [{ math: d.d2, note: `Δ₂ = ${d.p}·${d.r} − a²`, subgoal: 'minors' }],
+  }];
+  if (n === 3) {
+    segs.push({
+      html: 'Le mineur Δ₃ = det A :', ask: 'Δ₃ =', start: `det${d.text}`, judge: { kind: 'det', vars: ['a'], target: 'expanded' },
+      lines: [{ math: d.d3, note: 'Développer, puis réduire', subgoal: 'minors' }],
+    });
+  }
+  segs.push({
+    html: `Δ₁ = ${d.p} > 0. A est définie positive si et seulement si ${n === 3 ? 'Δ₂ > 0 et Δ₃ > 0 (ici Δ₃ > 0 entraîne Δ₂ > 0)' : 'Δ₂ > 0'} : résous en a.`, ask: 'a ∈', start: d.cond, judge: { kind: 'solset', v: 'a' },
+    lines: [
+      { math: `a^2<${c * c}`, note: 'Isoler a²', subgoal: 'nature' },
+      { math: `-${c}<a<${c}`, note: 'Racine carrée : |a| < ' + c, subgoal: 'nature' },
+      { math: sol, note: '', subgoal: 'nature' },
+    ],
+  });
+  const item = partsItem(level, rng, segs, {
+    skill: POSDEF, key: `${POSDEF}:param:${d.text}`, subgoals: POSDEF_SUB, noHints: level === 5,
+    prompt: `A = ${ML(d.text, { vars: ['a'] })}, avec un paramètre réel a. Pour quelles valeurs de a la matrice A est-elle définie positive ? Calcule les mineurs dominants, puis résous.`,
+    hints: level === 5 ? [] : hints('Tous les mineurs dominants doivent être > 0 : Δ₁, puis Δ₂ (et Δ₃), qui dépendent de a.', `Δ₂ = ${d.p}·${d.r} − □ > 0`, `a ∈ ]−${c} ; ${c}[`),
+    baits: ['m_sylvester_semidef'],
+  });
+  item.declares = { vars: ['a'] };
+  return item;
+}
+
+// A semi-definite leurre: [[B, 0], [0, −k]] with B = vvᵀ (rank 1): the
+// leading minors are ≥ 0 (Δ₂ = Δ₃ = 0), but A is indefinite.
+function semiLeurre(rng) {
+  const v = [nz(rng, -2, 2), nz(rng, -2, 2)];
+  const k = rng.int(1, 3);
+  const A = MX.mat([[v[0] * v[0], v[0] * v[1], 0], [v[0] * v[1], v[1] * v[1], 0], [0, 0, -k]]);
+  return { n: 3, nature: 'indef', A, minors: [v[0] * v[0], 0, 0], diagPos: false, semi: true };
+}
+
+function posdefExam(rng, exam) {
+  const tag = examTag({ exam });
+  if (exam === 'tf') {
+    const k = rng.int(0, 3);
+    if (k === 0) return tfL({ skill: POSDEF, key: 'inv', truth: true, exam: tag, statement: 'Une matrice symétrique définie positive est inversible.', explanation: 'Vrai : ses valeurs propres sont > 0, donc det A = Π λᵢ > 0.' });
+    if (k === 1) return tfL({ skill: POSDEF, key: 'ata', truth: true, exam: tag, statement: 'Pour toute matrice A (m × n), AᵀA est semi-définie positive.', explanation: 'Vrai : xᵀAᵀAx = ‖Ax‖² ≥ 0.' });
+    const kk = rng.int(1, 4);
+    const answer = mt(MX.mat([[0, 0], [0, -kk]]));
+    return tfL({
+      skill: POSDEF, key: `semi:${kk}`, truth: false, exam: tag, ruleIfTrue: 'm_sylvester_semidef',
+      statement: 'Si A est symétrique et que tous ses mineurs principaux dominants sont ≥ 0, alors A est semi-définie positive.',
+      counter: { kind: 'mx', prop: 'minorsNotSemidef', params: { n: 2 }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: answer } },
+      explanation: `Faux : ${ML(answer)} a Δ₁ = Δ₂ = 0, mais Q(0, 1) = −${kk} < 0. Pour « semi-définie », il faut tous les mineurs principaux, pas seulement les dominants.`,
+    });
+  }
+  if (rng.chance(0.3)) {
+    const d = paramData(rng, 2);
+    const c = d.c;
+    return mcqDistinct({
+      skill: POSDEF, level: 4, key: `mcqParam:${d.text}`, exam: tag,
+      prompt: `A = ${ML(d.text, { vars: ['a'] })}. A est définie positive si et seulement si :`,
+      right: `a ∈ ]−${c} ; ${c}[`,
+      wrongs: [
+        { html: `a ∈ [−${c} ; ${c}]`, rule: 'm_sylvester_semidef' },
+        { html: `a ∈ ]−${c * c} ; ${c * c}[`, rule: null },
+        { html: `a ∈ ]0 ; ${c}[`, rule: null },
+      ],
+      fillers: [{ html: 'pour tout a ∈ ℝ' }],
+      solution: [{ html: `Δ₁ = ${d.p} > 0, Δ₂ = ${R(d.d2.replace('^2', '²'))} > 0 ⇔ |a| < ${c}`, note: '' }],
+    }, rng);
+  }
+  const d = rng.chance(0.25) ? semiLeurre(rng) : posdefData(rng);
+  const dec = natureDecision(d, rng);
+  if (d.semi) dec.options.find((o) => o.id === 'semipos').rule = 'm_sylvester_semidef';
+  const right = dec.options.find((o) => o.valid);
+  const wrongs = dec.options.filter((o) => !o.valid).sort((a, b) => (b.rule ? 1 : 0) - (a.rule ? 1 : 0));
+  return mcqDistinct({
+    skill: POSDEF, level: 4, key: `mcq:${mt(d.A)}`, exam: tag, fallback: d.fallback,
+    prompt: `Quelle est la nature de la matrice symétrique A = ${MLm(d.A)} ?`,
+    right: right.label,
+    wrongs: wrongs.map((o) => ({ html: o.label, rule: o.rule ?? null })),
+    solution: [{ html: d.semi ? `Δ₁ = ${d.minors[0]}, Δ₂ = Δ₃ = 0 ; mais e₃ᵀAe₃ = ${R(qt(d.A[2][2]))} < 0 et e₁ᵀAe₁ > 0 : indéfinie.` : `${minorsR(d)} : ${NAT[d.nature]}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [POSDEF]: (level, rng, profile, opts = {}) => (opts.exam ? posdefExam(rng, opts.exam) : posdefItem(level, rng)),
   [SPEC]: (level, rng, profile, opts = {}) => (opts.exam ? specExam(rng, opts.exam) : specItem(level, rng)),
   [RANK1]: (level, rng, profile, opts = {}) => (opts.exam ? rank1Exam(rng, opts.exam) : rank1Item(level, rng)),
   [SCHUR]: (level, rng, profile, opts = {}) => (opts.exam ? schurExam(rng, opts.exam) : schurItem(level, rng)),
