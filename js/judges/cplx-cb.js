@@ -371,8 +371,8 @@ export const arcb = {
 // ======================================================================
 
 const lv = (cfg) => cfg.v || 'z';
-const lcfg = (cfg) => ({ kind: 'series', v: lv(cfg), at: '+inf', order: cfg.order ?? 3 });
-const lParse = (cfg, text) => (text && typeof text === 'object' ? text : parse(String(text).replace(/^\s*=/, ''), { vars: [lv(cfg)] }));
+const lcfg = (cfg) => ({ kind: 'series', v: lv(cfg), vars: [lv(cfg)], dvar: lv(cfg), at: '+inf', order: cfg.order ?? 3 });
+const lParse = (cfg, text) => (text && typeof text === 'object' ? text : parse(String(text).replace(/^\s*=/, ''), { vars: [lv(cfg)], dvar: lv(cfg) }));
 
 function sumTermsOf(n, out = []) {
   n = stripParen(n);

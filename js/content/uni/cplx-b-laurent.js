@@ -7,11 +7,16 @@
 
 import { Q } from '../../math/rational.js';
 import {
-  q, cq, cT, cP, rd, CM, inner, resLabel, mathLabel, CV, SG, L, choice, opt, partsItem, problemItem, H, examTag, KEYS, pick, checkRes,
+  q, cq, cT, cP, zMinus, rd, CM, inner, resLabel, mathLabel, CV, SG, L, choice, opt, partsItem, problemItem, H, examTag, KEYS, pick, checkRes,
 } from './cplx-b-kit.js';
 import { mcq } from './kit.js';
+import { parse } from '../../cas/parse.js';
+import { exactComplex } from '../../cas/complex.js';
 
 const SK = 'c-res-laurent';
+// z₀ from its text (a + bi), and « w + z₀ » written with its sign.
+const cqOf = (t) => { const v = parse(t, { complex: true }); return exactComplex(v); };
+const wPlus = (t) => (t.startsWith('-') ? `w${t}` : `w+${t}`);
 const COEF = {
   sin: [0, 1, 0, q(-1, 6), 0, q(1, 120)],
   cos: [1, 0, q(-1, 2), 0, q(1, 24), 0],
@@ -58,7 +63,7 @@ function laurentData(rng) {
       const arg = b === 1 ? `${cT(a)}-z` : `${cT(a)}-${b}z`;
       const h = g === 'exp' ? `e^(1/(${arg}))` : `${g}(1/(${arg}))`;
       const u = b === 1 ? '-1/w' : `-1/(${b}w)`;
-      const uDL = serT(c.slice(0, N + 1).map((x, n) => [x, n]), 'u', N).replace(/\+o\(.*$/, '');
+      const uDL = { sin: 'u − u³/6', sinh: 'u + u³/6', exp: '1 + u + u²/2', cos: '1 − u²/2' }[g];
       return {
         kind: 'ab', id: `ab:${g}:${cT(a)}:${b}`, g, h, z0T: cT(z0), arg, b, u, res: String(res), resQ: res,
         start2: g === 'exp' ? `e^(${u})` : `${g}(${u})`, exp2: serT(terms, 'w', N), order2: N, uDL,
@@ -103,18 +108,18 @@ function laurentParts(d, level, { only = false } = {}) {
   if (d.kind === 'ab') {
     if (level >= 2) {
       const J = CV(mathLabel(`1/(${d.arg})`), d.u, { vars: ['w'], domain: { w: [0.5, 3] }, form: 'ratz' });
-      parts.push({ start: J.label, judge: J, menu: MENU, notes: [`On pose w = z − ${CM(d.z0T)}, donc z = w + ${CM(d.z0T)}.`], lines: [L(d.u, `z = w + ${rd(d.z0T)}`, 'expand', { blank: [d.u] })] });
+      parts.push({ start: J.label, judge: J, menu: MENU, notes: [`On pose w = ${CM(zMinus(cqOf(d.z0T)))}, donc z = ${CM(wPlus(d.z0T))}.`], lines: [L(d.u, `z = ${rd(wPlus(d.z0T))}`, 'expand', { blank: [d.u] })] });
     }
-    const J2 = { kind: 'laur', v: 'w', order: d.order2 };
+    const J2 = { kind: 'laur', v: 'w', vars: ['w'], dvar: 'w', order: d.order2 };
     parts.push({
       html: level >= 2 ? `1/(${CM(d.arg)}) = ${CM(d.u)}. Développe en puissances de 1/w :` : '', ask: 'h =', start: d.start2, judge: J2, menu: MENU,
-      lines: [L(d.exp2, `${d.g === 'exp' ? 'eᵘ' : `${d.g} u`} = ${rd(d.uDL)} + …, u = ${rd(d.u)}`, 'multiply', { blank: [d.exp2.replace(/\+o\(.*$/, '')] })],
+      lines: [L(d.exp2, `${d.g === 'exp' ? 'eᵘ' : `${d.g} u`} = ${d.uDL} + …, u = ${rd(d.u)}`, 'multiply', { blank: [d.exp2.replace(/\+o\(.*$/, '')] })],
     });
   } else {
-    const J1 = { kind: 'laur', v: 'z', order: d.order1 };
+    const J1 = { kind: 'laur', v: 'z', vars: ['z'], dvar: 'z', order: d.order1 };
     parts.push({ start: d.start1, judge: J1, menu: MENU, lines: [L(d.exp1, 'DL usuel en u = 1/z', 'expand', { blank: [d.exp1.replace(/\+o\(.*$/, '')] })] });
     if (d.start2) {
-      const J2 = { kind: 'laur', v: 'z', order: 1 };
+      const J2 = { kind: 'laur', v: 'z', vars: ['z'], dvar: 'z', order: 1 };
       parts.push({ html: `On multiplie par ${CM(d.k === 1 ? 'z' : `z^${d.k}`)} :`, ask: 'h =', start: d.start2, judge: J2, menu: MENU, lines: [L(d.exp2, 'Multiplier terme à terme', 'multiply', { blank: [d.exp2.replace(/\+o\(.*$/, '')] })] });
     }
   }
@@ -138,7 +143,7 @@ function laurentLines(level, rng, opts = {}) {
   const d = laurentData(rng) || FALLBACK;
   checkRes(d.h, d.z0T, d.res);
   const parts = laurentParts(d, level, { only: coef });
-  if (level === 1 && d.kind === 'ab') parts[0].notes = [`On pose w = z − ${CM(d.z0T)} : 1/(${CM(d.arg)}) = ${CM(d.u)}.`];
+  if (level === 1 && d.kind === 'ab') parts[0].notes = [`On pose w = ${CM(zMinus(cqOf(d.z0T)))} : 1/(${CM(d.arg)}) = ${CM(d.u)}.`];
   const last = d.kind === 'ab' ? d.exp2 : d.exp2 || d.exp1;
   return partsItem({
     skill: SK, level,

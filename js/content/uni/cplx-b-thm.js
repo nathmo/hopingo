@@ -115,7 +115,7 @@ const SUBS = [SG('locate', 'singularités à l\'intérieur de Γ', 'c-cauchy-thm
 function thmParts(d, level, { title = '' } = {}) {
   const parts = [];
   const value = twoPiI(d.S);
-  const sumT = d.ins.map((i) => cP(d.res[i])).join('+').replace(/\+\(-/g, '+(-');
+  const sumT = d.ins.length === 1 ? cT(d.res[d.ins[0]]) : d.ins.map((i) => cP(d.res[i])).join('+');
   const outsideAll = twoPiI(d.Sall);
   const traps = {
     c_pole_outside_counted: [{ line: `2πi(${d.poles.map((p, i) => cP(d.res[i])).join('+')})`, ctx: d.Gamma.ctx(d.poles[d.outs[0]]) }],

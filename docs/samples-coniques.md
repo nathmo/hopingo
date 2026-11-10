@@ -1649,7 +1649,7 @@ Trouve l'équation de la conique de foyer F(0 ; 3), de directrice D : x = 6 et d
   pièges : g4_square_constant, g10_parabola_p_half
 
 Trouve l'équation de la conique de foyer F(−7 ; 0), de directrice D : x = −4 et d'excentricité e = 2, puis nomme-la.
-  [guided]  √((x + 7)^2 + y^2) = 2|x + 4|
+  [guided]  √((x + 7)² + y²) = 2|x + 4|
     (MF = e·d(M, D) avec M(x ; y), F = (−7 ; 0), D : x = −4.)
     (e = 2 : quelle conique ? e > 1 : une hyperbole.)
     = (x + 7)² + y² = 4□   (trous : (x + 7)² + y² = 4(x + 4)²)   ← Les deux membres sont positifs : élever au carré
@@ -1700,7 +1700,7 @@ Trouve l'équation de la conique de foyer F(3 ; −1), de directrice D : y = 5 e
   pièges : g4_square_constant, g10_parabola_p_half
 
 Trouve l'équation de la conique de foyer F(0 ; 3), de directrice D : y = 0 et d'excentricité e = 2, puis nomme-la.
-  [guided]  √(x^2 + (y - 3)^2) = 2|y|
+  [guided]  √(x² + (y − 3)²) = 2|y|
     (MF = e·d(M, D) avec M(x ; y), F = (0 ; 3), D : y = 0.)
     ? Quelle méthode ? ✔ Foyer-directrice : MF = e·d(M, D) / ✔ Forme réduite à paramètres (centre, a, b)
     ? e = 2 : quelle conique ? · e < 1 : une ellipse / · e = 1 : une parabole / ✔ e > 1 : une hyperbole
@@ -1717,7 +1717,7 @@ Trouve l'équation de la conique de foyer F(0 ; 3), de directrice D : y = 0 et d
 
 ```
 Trouve l'équation de la conique de foyer F(−2 ; −2), de directrice D : x = 1 et d'excentricité e = 2, puis nomme-la.
-  [tap, suivre l'erreur, menu menu]  √((x + 2)^2 + (y + 2)^2) = 2|x - 1|
+  [tap, suivre l'erreur, menu menu]  √((x + 2)² + (y + 2)²) = 2|x − 1|
     (MF = e·d(M, D) avec M(x ; y), F = (−2 ; −2), D : x = 1.)
     ? Quelle méthode ? ✔ Foyer-directrice : MF = e·d(M, D) / ✔ Forme réduite à paramètres (centre, a, b)
     ? e = 2 : quelle conique ? · e < 1 : une ellipse / · e = 1 : une parabole / ✔ e > 1 : une hyperbole

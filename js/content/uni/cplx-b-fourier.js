@@ -24,6 +24,8 @@ const SUB = [SG('poles', 'pôles du bon demi-plan', 'c-res-theorem'), SG('residu
 
 // e^(k) as text ('e^(-2)').
 const ek = (k) => `e^(${k})`;
+// k as a factor before a letter: '' for 1, '-' for −1.
+const kT = (k) => (k === 1 ? '' : k === -1 ? '-' : String(k));
 const sinT = (al) => (al < 0 ? `-sin(${-al})` : `sin(${al})`);
 
 export function fourierData(rng, { kind = null, al = null } = {}) {
@@ -62,7 +64,7 @@ export function fourierData(rng, { kind = null, al = null } = {}) {
     const c = resRat(N, D, z);
     const ex = z.mul(cq(0, al));
     const exT = cT(ex);
-    return { z, c, sub: `${cP(c)}e^(${al}i(${cT(z)}))`, val: c.eq(1) ? ek(exT) : `${cP(c)}e^(${exT})`, cos: `${cP(c)}cos(${al}(${cT(z)}))` };
+    return { z, c, sub: `${cP(c)}e^(${kT(al)}i(${cT(z)}))`, val: c.eq(1) ? ek(exT) : `${cP(c)}e^(${exT})`, cos: `${cP(c)}cos(${al}(${cT(z)}))` };
   });
   const others = poles.map((z) => z.conj()).map((z) => {
     const c = resRat(N, D, z);
@@ -72,7 +74,8 @@ export function fourierData(rng, { kind = null, al = null } = {}) {
   const sumRes = res.map((r) => r.val).join('+');
   // Σ Res = e^(−|α|) sin|α|/4 on either side (the lower residues for α < 0).
   const sumText = kind === 'x4' ? `e^(${-A})sin(${A})/4` : null;
-  const intText = `int(${R.startsWith('1/') ? `${trig}(${al}x)/${R.slice(2)}` : `x${trig}(${al}x)/${R.slice(2)}`}, x, -∞, +∞)`.replace('(1x)', '(x)').replace('(-1x)', '(-x)');
+  // cos is even: the integral is written with |α| (α < 0 only for the even R).
+  const intText = `int(${R.startsWith('1/') ? `${trig}(${kT(A)}x)/${R.slice(2)}` : `x${trig}(${kT(al)}x)/${R.slice(2)}`}, x, -∞, +∞)`;
   return { kind, al, s, A, a, N, D, poles, R, Rz, fz, E, J, real, trig, arc, res, others, sgn, sumRes, sumText, intText, id: `${kind}:${a}:${al}` };
 }
 
@@ -150,7 +153,7 @@ function fourierLines(level, rng, opts = {}) {
   const parts = fourierParts(d, level, { arc: level >= 4 });
   if (level === 1) parts[0].notes = [`On intègre f(z) = ${CM(d.fz)} sur [−R ; R] fermé par le demi-cercle ${halfName(d.s)}, puis on prend la partie ${d.trig === 'cos' ? 'réelle' : 'imaginaire'}.`];
   return partsItem({
-    skill: SK, level, prompt: `Calcule ∫_ℝ ${intML(d)} dx avec le théorème des résidus.`,
+    skill: SK, level, prompt: `Calcule ∫_ℝ ${intML(d)} dx avec le théorème des résidus${d.al < 0 ? `, en passant par J = ∫_ℝ ${CM(`${d.fz.replace(/z/g, 'x')}`)} dx (α = ${rd(String(d.al))})` : ''}.`,
     parts, keys: [...KEYS, 'anal'], subgoals: SUB,
     hints: H(`Intègre R(z)e^(iαz) : avec α = ${d.al}, |e^(iαz)| ≤ 1 quand Im z ${d.s > 0 ? '≥' : '≤'} 0, on ferme ${d.s > 0 ? 'en haut' : 'en bas'}.`, `Res = e^(iαz₀) p(z₀)/q′(z₀) : ${d.res.map((r) => CM(r.sub)).join(' ; ')}`, `J = ${CM(d.J)}`),
     key: `${SK}:${level}:${d.id}`, exam: examTag(opts),
@@ -169,7 +172,7 @@ function fourierC1(level, rng, opts = {}) {
     options: [
       { html: `f(z) = ${CM(d.fz)} ; segment [−R ; R] et demi-cercle supérieur`, correct: true },
       { html: `f(z) = ${CM(d.fz)} ; segment [−R ; R] et demi-cercle inférieur`, correct: false, rule: 'c_jordan_alpha_sign' },
-      { html: `f(z) = ${CM(`z sin(${al}z)/(z^4+4)`)} ; segment [−R ; R] et demi-cercle supérieur`, correct: false, rule: 'c_eiax_cos' },
+      { html: `f(z) = ${CM(`z sin(${kT(al)}z)/(z^4+4)`)} ; segment [−R ; R] et demi-cercle supérieur`, correct: false, rule: 'c_eiax_cos' },
       { html: `f(z) = ${CM(d.fz)} ; le cercle |z| = 1`, correct: false },
     ],
   }, rng);
@@ -187,7 +190,7 @@ function fourierC1(level, rng, opts = {}) {
   const item = partsItem({ skill: SK, level, prompt: 'Les résidus, la somme, J, l\'arc et la conclusion.', parts, keys: [...KEYS, 'anal'], subgoals: SUB, hints: [], key: `${SK}:c1l:${al}` });
   return problemItem({
     skill: SK, level, key: `C1:${al}`, exam: opts.exam ? examTag(opts, 11) : false,
-    prompt: `Calculer, avec le théorème des résidus et en simplifiant, ∫_ℝ ${CM(`xe^(${al}ix)/(x^4+4)`)} dx (format 2022, 11 points). En déduire ∫_ℝ ${CM(`x sin(${al}x)/(x^4+4)`)} dx.`,
+    prompt: `Calculer, avec le théorème des résidus et en simplifiant, ∫_ℝ ${CM(`xe^(${kT(al)}ix)/(x^4+4)`)} dx (format 2022, 11 points). En déduire ∫_ℝ ${CM(`x sin(${kT(al)}x)/(x^4+4)`)} dx.`,
     parts: [
       { item: p1, points: 1, title: 'Fonction et contour' },
       { item: p2, points: 1.5, title: 'Pôles du demi-plan supérieur' },
@@ -204,7 +207,7 @@ function fourierMcq(rng, opts) {
   const k = A * a;
   const div = a === 1 ? '' : `/${a}`;
   const val = `πe^(${-k})${div}`;
-  const R = `cos(${al === 1 ? '' : al === -1 ? '-' : al}x)/(x^2+${a * a})`;
+  const R = `cos(${kT(A)}x)/(x^2+${a * a})`;
   if (opts.multi) {
     return choice({
       skill: SK, level: 4, key: `${SK}:mcq:m:${a}:${al}`, exam: examTag(opts, 2), multi: true, count: 5,

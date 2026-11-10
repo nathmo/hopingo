@@ -48,7 +48,10 @@ function closeC(z) {
   if (a === null || b === null) return null;
   if (b === '0') return a;
   const bAbs = b.startsWith('-') ? b.slice(1) : b;
-  const bi = bAbs === '1' ? 'i' : /\//.test(bAbs) ? `${bAbs.split('/')[0] === '1' ? '' : bAbs.split('/')[0]}i/${bAbs.split('/')[1]}` : `${bAbs}i`;
+  // i written before a radical: 'i√2/2', '3i√2/4'; else after the number: '3i/2'.
+  const [nb, db] = bAbs.split('/');
+  const m = /^(\d*)(√\d+)?$/.exec(nb);
+  const bi = `${m[1] === '1' && !m[2] ? '' : m[1]}i${m[2] || ''}${db ? `/${db}` : ''}`;
   if (a === '0') return `${b.startsWith('-') ? '-' : ''}${bi}`;
   return `${a}${b.startsWith('-') ? '-' : '+'}${bi}`;
 }
@@ -114,7 +117,7 @@ function branchParts(d, level) {
       lines: chain(J, [p.sub, p.val]).map((t, j, a) => L(t, j === a.length - 1 ? 'Calculer' : `${rd(p.z)} = ${p.z === '-2' ? '2' : ''}e^(i${p.arg})`, 'residue', { blank: [t] })),
     });
   });
-  const sumT = d.poles.map((p) => `(${p.val})`).join('+');
+  const sumT = d.poles.length === 1 ? d.poles[0].val : d.poles.map((p) => `(${p.val})`).join('+');
   const JV = CV(mathLabel('I'), d.value, { form: 'real', traps: { c_branch_factor: [`2πi(${sumT})/(1+${d.exp2})`].filter(() => Math.abs(1 + Math.cos(2 * Math.PI * d.af)) > 1e-9) } });
   parts.push({ html: '(1 − e^(2πia)) I = 2πi Σ Res :', ask: 'I =', start: JV.label, judge: JV, menu: MENU, lines: chain(JV, [`2πi(${sumT})/(${d.factorF})`, d.value]).map((t, j, a) => L(t, j === a.length - 1 ? 'Calculer' : 'Diviser par le facteur', 'value', { blank: [t] })) });
   const intText = `int(${d.f}, x, 0, +∞)`;
@@ -264,6 +267,7 @@ const homT = ([a, b, c, d]) => {
     if (y.isZero()) return xz || '0';
     if (!xz) return cT(y);
     const yt = cT(y);
+    if (xz.startsWith('-') && !yt.startsWith('-')) return `${yt}${xz}`;
     return yt.startsWith('-') ? `${xz}${yt}` : `${xz}+${yt}`;
   };
   return { num: lin(a, b), den: lin(c, d) };
@@ -287,16 +291,25 @@ function termwise(h, p) {
   return cq(N.re.div(D.re), N.im.div(D.im));
 }
 
+// (num)/(den) with brackets only around sums.
+const br = (t) => (/[+-]/.test(t.slice(1)) ? `(${t})` : t);
+const wT = (num, den) => `${br(num)}/${br(den)}`;
+// z replaced by t: bare after an operator or a bracket, between brackets after a factor.
+function subZ(text, t) {
+  const simple = /^[0-9]+$|^i$/.test(t);
+  return text.replace(/(^|[(+\-*/])z/g, (m, pre) => `${pre}${simple ? t : `(${t})`}`).replace(/z/g, `(${t})`);
+}
+
 function confPoints(level, rng, opts = {}) {
   const h = pick(rng, HOMOS);
   const { num, den } = homT(h);
-  const w = `(${num})/(${den})`;
+  const w = wT(num, den);
   const pts = rng.shuffle(POINTS).filter((p) => imageOf(h, p)).slice(0, 3);
   const parts = pts.map((p, k) => {
     const img = imageOf(h, p);
     const wrong = termwise(h, p);
     const J = CV(mathLabel(`w(${p.t})`, `<mi>w</mi><mo>(</mo>${p.t === '∞' ? '<mi>∞</mi>' : inner(p.t)}<mo>)</mo>`), cT(img), wrong && !wrong.eq(img) ? { traps: { c_mobius_point: [cT(wrong)] } } : {});
-    const sub = p.z === null ? null : `(${num.replace(/z/g, `(${p.t})`)})/(${den.replace(/z/g, `(${p.t})`)})`;
+    const sub = p.z === null ? null : `(${subZ(num, p.t)})/(${subZ(den, p.t)})`;
     return {
       html: k ? (p.t === '∞' ? 'La limite quand z → ∞ :' : `Image de ${CM(p.t)} :`) : '', ask: `w(${rd(p.t)}) =`, start: J.label, judge: J,
       menu: [{ id: 'sub', label: 'Remplacer z', valid: true }, { id: 'conj', label: 'Multiplier par le conjugué du dénominateur', valid: true }, { id: 'tw', label: 'Diviser parties réelles et imaginaires séparément', valid: false, rule: 'c_mobius_point', why: '(a + bi)/(c + di) ≠ a/c + (b/d)i : multiplie par le conjugué.' }],
@@ -315,7 +328,7 @@ function confPoints(level, rng, opts = {}) {
   return partsItem({
     skill: SC, level, prompt: `Soit w = ${CM(w)}. Calcule les images de ${pts.map((p) => CM(p.t === '∞' ? '∞' : p.t)).join(', ')}.`,
     parts, keys: KEYS, subgoals: SUB_C,
-    hints: H('Remplace z, puis multiplie par le conjugué du dénominateur. w(∞) = a/c.', `w(${rd(pts[0].t)}) = ${pts[0].z === null ? 'a/c' : CM(`(${num.replace(/z/g, `(${pts[0].t})`)})/(${den.replace(/z/g, `(${pts[0].t})`)})`)}`, `w(${rd(pts[0].t)}) = ${CM(cT(imageOf(h, pts[0])))}`),
+    hints: H('Remplace z, puis multiplie par le conjugué du dénominateur. w(∞) = a/c.', `w(${rd(pts[0].t)}) = ${pts[0].z === null ? 'a/c' : CM(`(${subZ(num, pts[0].t)})/(${subZ(den, pts[0].t)})`)}`, `w(${rd(pts[0].t)}) = ${CM(cT(imageOf(h, pts[0])))}`),
     key: `${SC}:${level}:${w}:${pts.map((p) => p.t).join()}`, exam: examTag(opts), baits: ['c_mobius_point'],
   });
 }
@@ -324,7 +337,7 @@ function confPoints(level, rng, opts = {}) {
 function confFind(level, rng) {
   const h = pick(rng, HOMOS);
   const { num, den } = homT(h);
-  const w = `(${num})/(${den})`;
+  const w = wT(num, den);
   const pts = POINTS.filter((p) => imageOf(h, p)).slice(0, 3);
   const J = CV(mathLabel('w(z)'), w, { vars: ['z'], domain: { z: [-3, 3] }, form: 'ratz' });
   const desc = pts.map((p) => `${CM(p.t === '∞' ? '∞' : p.t)} ↦ ${CM(cT(imageOf(h, p)))}`).join(', ');
@@ -340,19 +353,19 @@ function confFind(level, rng) {
 // Images of lines and regions (multiple choice), levels 2, 5 and the exam.
 const IMAGES = [
   { w: '(z-i)/(z+i)', what: 'l\'axe réel', right: 'le cercle |w| = 1', wrongs: ['la droite Re w = 0', 'le cercle |w − 1| = 1', 'l\'axe réel'] },
-  { w: '(z-i)/(z+i)', what: 'le demi-plan Im z > 0', right: 'le disque |w| < 1', wrongs: ['le demi-plan Im w > 0', 'l\'extérieur |w| > 1', 'le demi-plan Re w > 0'] },
-  { w: 'e^z', what: 'la bande 0 < Im z < π', right: 'le demi-plan Im w > 0', wrongs: ['le disque |w| < 1', 'la bande 0 < Im w < π', 'le demi-plan Re w > 0'] },
-  { w: 'e^z', what: 'la bande −π/2 < Im z < π/2', right: 'le demi-plan Re w > 0', wrongs: ['le demi-plan Im w > 0', 'le disque |w| < 1', 'tout ℂ privé de 0'] },
-  { w: '1/z', what: 'la droite Re z = 1', right: 'le cercle |w − 1/2| = 1/2', wrongs: ['la droite Re w = 1', 'le cercle |w| = 1', 'la droite Im w = 1'] },
-  { w: '(1+z)/(1-z)', what: 'le disque |z| < 1', right: 'le demi-plan Re w > 0', wrongs: ['le disque |w| < 1', 'le demi-plan Im w > 0', 'l\'extérieur |w| > 1'] },
-  { w: 'z^2', what: 'le premier quadrant (Re z > 0, Im z > 0)', right: 'le demi-plan Im w > 0', wrongs: ['le premier quadrant', 'le demi-plan Re w > 0', 'le disque |w| < 1'] },
-  { w: '1/z', what: 'le cercle |z − 1| = 1 (privé de 0)', right: 'la droite Re w = 1/2', wrongs: ['le cercle |w − 1| = 1', 'la droite Re w = 1', 'le cercle |w| = 1/2'] },
+  { w: '(z-i)/(z+i)', what: 'du demi-plan Im z > 0', right: 'le disque |w| < 1', wrongs: ['le demi-plan Im w > 0', 'l\'extérieur |w| > 1', 'le demi-plan Re w > 0'] },
+  { w: 'e^z', what: 'de la bande 0 < Im z < π', right: 'le demi-plan Im w > 0', wrongs: ['le disque |w| < 1', 'la bande 0 < Im w < π', 'le demi-plan Re w > 0'] },
+  { w: 'e^z', what: 'de la bande −π/2 < Im z < π/2', right: 'le demi-plan Re w > 0', wrongs: ['le demi-plan Im w > 0', 'le disque |w| < 1', 'tout ℂ privé de 0'] },
+  { w: '1/z', what: 'de la droite Re z = 1', right: 'le cercle |w − 1/2| = 1/2', wrongs: ['la droite Re w = 1', 'le cercle |w| = 1', 'la droite Im w = 1'] },
+  { w: '(1+z)/(1-z)', what: 'du disque |z| < 1', right: 'le demi-plan Re w > 0', wrongs: ['le disque |w| < 1', 'le demi-plan Im w > 0', 'l\'extérieur |w| > 1'] },
+  { w: 'z^2', what: 'du premier quadrant (Re z > 0, Im z > 0)', right: 'le demi-plan Im w > 0', wrongs: ['le premier quadrant', 'le demi-plan Re w > 0', 'le disque |w| < 1'] },
+  { w: '1/z', what: 'du cercle |z − 1| = 1 (privé de 0)', right: 'la droite Re w = 1/2', wrongs: ['le cercle |w − 1| = 1', 'la droite Re w = 1', 'le cercle |w| = 1/2'] },
 ];
 function confImage(level, rng, opts = {}) {
   const c = pick(rng, IMAGES);
   return choice({
     skill: SC, level, key: `${SC}:img:${c.w}:${c.what}`, exam: examTag(opts, 2),
-    prompt: `L'image de ${c.what} par w = ${CM(c.w)} est :`,
+    prompt: `L'image ${c.what} par w = ${CM(c.w)} est :`,
     right: c.right, wrongs: c.wrongs.map((x) => ({ html: x, rule: null })),
     solution: [{ html: `Images de trois points du bord (et d'un point intérieur) : ${c.right}.`, note: '' }],
     expectedSec: 90,

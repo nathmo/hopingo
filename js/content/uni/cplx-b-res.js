@@ -8,12 +8,14 @@
 
 import { CQ } from '../../cas/complex.js';
 import {
-  q, cq, cT, cP, zMinus, rd, CM, inner, resLabel, mathLabel, CV, P, pT, checkRes, SG, L, chain, choice, opt,
+  q, cq, cT, cP, zMinus, rd, CM, inner, resLabel, mathLabel, CV, P, pT, checkRes, SG, L, chain, choice, opt, niceC, scaledOpt,
   partsItem, H, examTag, KEYS, pick,
 } from './cplx-b-kit.js';
 
 const RS = 'c-res-simple';
 const RM = 'c-res-multiple';
+// (z − a) as a factor: 'z' alone for a = 0.
+const zf = (a) => (a === 0 || (a instanceof CQ && a.isZero()) ? 'z' : `(${zMinus(a)})`);
 const sub = (a, b) => (a instanceof CQ ? a : cq(a)).sub(b instanceof CQ ? b : cq(b));
 
 const qpML = (arg) => `<msup><mi>q</mi><mo>′</mo></msup><mo>(</mo>${arg}<mo>)</mo>`;
@@ -187,13 +189,13 @@ function simpleMcq(rng, opts) {
   const d = simpleData(rng, { trig: true });
   checkRes(fOf(d), d.z0T, d.res);
   const multi = !!opts.multi;
-  const inv = d.pv === '0' ? null : `(${d.dq0})/(${d.pv})`;
+  const inv = d.pv === '0' || d.noExp ? null : niceC(`(${d.dq0})/(${d.pv})`);
   return choice({
     skill: RS, level: 4, key: `${RS}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
     prompt: `Soit f(z) = ${fML(d)}. Res(f ; ${CM(d.z0T)}) =${multi ? ' (plusieurs réponses possibles)' : ''}`,
-    right: CM(d.res), rights: multi ? [CM(d.sub)] : [],
-    wrongs: [d.noExp && opt(d.noExp, 'c_essential_factor'), opt(`-(${d.res})`), inv && opt(inv), opt(`2(${d.res})`)],
-    fillers: [opt(`i(${d.res})`), opt(`(${d.res})/2`)],
+    right: CM(niceC(d.res) || d.res), rights: multi ? [CM(d.sub)] : [],
+    wrongs: [d.noExp && opt(niceC(d.noExp) || d.noExp, 'c_essential_factor'), scaledOpt('-1', d.res), inv && opt(inv), scaledOpt('2', d.res)],
+    fillers: [scaledOpt('i', d.res), scaledOpt('1/2', d.res), scaledOpt('-i', d.res)],
     solution: [{ html: `Pôle simple : Res = p(z₀)/q′(z₀) = ${CM(d.sub)} = ${CM(d.res)}.`, note: '' }],
     expectedSec: 120,
   }, rng);
@@ -218,29 +220,30 @@ function phiDeriv(g, b, k) {
     if (g === 'e^(zt)') return k === 0 ? 'e^(zt)' : `${powT('t', k)}e^(zt)`;
   }
   const w = zMinus(b);
-  if (g === '1') return k === 0 ? `1/(${w})` : `${k % 2 ? '-' : ''}${fact(k)}/(${w})^${k + 1}`;
+  const W = zf(b);
+  if (g === '1') return k === 0 ? `1/${W}` : `${k % 2 ? '-' : ''}${fact(k)}/${W}^${k + 1}`;
   if (g === 'z') {
     // z/(z − b) = 1 + b/(z − b)
-    if (k === 0) return `z/(${w})`;
+    if (k === 0) return `z/${W}`;
     const c = (k % 2 ? -1 : 1) * fact(k) * b;
-    return `${c}/(${w})^${k + 1}`;
+    return `${c}/${W}^${k + 1}`;
   }
   // e^(cz)/(z − b): e^(cz) Σ_j C(k,j) c^(k−j) (−1)^j j!/(z − b)^(j+1), c = 1 or t.
   const c = g === 'e^z' ? '' : 't';
   const E = g;
-  if (k === 0) return `${E}/(${w})`;
+  if (k === 0) return `${E}/${W}`;
   const terms = [];
   for (let j = 0; j <= k; j++) {
     const coef = binom(k, j) * fact(j) * (j % 2 ? -1 : 1);
     const cp = k - j === 0 ? '' : c ? powT('t', k - j) : '';
-    const wp = k - j === 0 ? '' : powT(`(${w})`, k - j);
+    const wp = k - j === 0 ? '' : powT(W, k - j);
     let t = `${cp}${wp}`;
     const abs = Math.abs(coef);
     t = abs === 1 ? (t || '1') : `${abs}${t}`;
     terms.push({ s: coef < 0 ? '-' : '+', t });
   }
   const num = terms.map((x, i) => (i === 0 && x.s === '+' ? x.t : `${x.s}${x.t}`)).join('');
-  return `${E}(${num})/(${w})^${k + 1}`;
+  return `${E}(${num})/${W}^${k + 1}`;
 }
 
 function multipleData(rng, { t = false } = {}) {
@@ -254,7 +257,7 @@ function multipleData(rng, { t = false } = {}) {
     if (g === '1' && !hasB) continue;
     if (g === 'z' && a === 0) continue;
     const env = t ? { t: 1.3 } : {};
-    const fT = `${g === '1' ? '1' : `(${g})`}/(${powT(`(${zMinus(a)})`, m)}${hasB ? `(${zMinus(b)})` : ''})`;
+    const fT = `${g === '1' || g === 'z' || g === 'e^z' ? g : `(${g})`}/(${powT(zf(a), m)}${hasB ? zf(b) : ''})`;
     const phi = phiDeriv(g, b, 0);
     const der = phiDeriv(g, b, m - 1);
     // Value at a: substitute z = a in der, then exact text.
@@ -304,13 +307,13 @@ function resValue(g, a, b, m) {
 }
 
 const SUB_M = [SG('order', 'ordre m du pôle', 'c-singularities'), SG('derivative', 'dériver (z − z₀)^m f', RM), SG('value', 'diviser par (m − 1)!', RM)];
-const phiML = (m, a) => `<msup><mrow><mo>(</mo>${inner(zMinus(a))}<mo>)</mo></mrow><mn>${m}</mn></msup><mi>f</mi><mo>(</mo><mi>z</mi><mo>)</mo>`;
+const phiML = (m, a) => `<msup>${a === 0 ? '<mi>z</mi>' : `<mrow><mo>(</mo>${inner(zMinus(a))}<mo>)</mo></mrow>`}<mn>${m}</mn></msup><mi>f</mi><mo>(</mo><mi>z</mi><mo>)</mo>`;
 const derML = (m) => (m === 2 ? '<msup><mi>φ</mi><mo>′</mo></msup><mo>(</mo><mi>z</mi><mo>)</mo>' : '<msup><mi>φ</mi><mo>″</mo></msup><mo>(</mo><mi>z</mi><mo>)</mo>');
 
 function multipleParts(d, level, { only = false, label = null } = {}) {
   const vars = d.t ? ['t'] : [];
   const tDom = { t: [0.3, 2] };
-  const phiJ = CV(mathLabel(`(${rd(zMinus(d.a))})^${d.m}f(z)`, phiML(d.m, d.a)), d.phi, { vars: ['z', ...vars], form: 'any', domain: tDom });
+  const phiJ = CV(mathLabel(`${rd(zf(d.a))}^${d.m}f(z)`, phiML(d.m, d.a)), d.phi, { vars: ['z', ...vars], form: 'any', domain: tDom });
   const derJ = CV(mathLabel(d.m === 2 ? 'φ′(z)' : 'φ″(z)', derML(d.m)), d.der, { vars: ['z', ...vars], form: 'any', domain: tDom });
   const F = fact(d.m - 1);
   const wrongs = {};
@@ -329,13 +332,13 @@ function multipleParts(d, level, { only = false, label = null } = {}) {
   ];
   const parts = [];
   if (!only) {
-    parts.push({ start: phiJ.label, judge: phiJ, menu: MENU, lines: [L(d.phi, `z₀ = ${d.a} est un pôle d'ordre ${d.m} : on simplifie`, 'order', { blank: [d.phi] })] });
+    parts.push({ start: phiJ.label, judge: phiJ, menu: MENU, lines: [L(d.phi, `z₀ = ${rd(String(d.a))} est un pôle d'ordre ${d.m} : on simplifie`, 'order', { blank: [d.phi] })] });
     parts.push({ html: `φ(z) = (z − z₀)^${d.m} f(z) = ${CM(d.phi)}. On dérive ${d.m === 2 ? 'une fois' : 'deux fois'} :`, ask: d.m === 2 ? 'φ′(z) =' : 'φ″(z) =', start: derJ.label, judge: derJ, menu: MENU, lines: [L(d.der, 'Dériver', 'derivative', { blank: [d.der] })] });
   }
-  parts.push({ html: only ? '' : `En z₀ = ${d.a} :`, ask: 'Res =', start: resJ.label, judge: resJ, menu: MENU, lines: chain(resJ, [subst, d.res]).map((t, i, a) => L(t, i === a.length - 1 ? 'Simplifier' : `1/(m − 1)! · φ${d.m === 2 ? '′' : '″'}(z₀)`, 'value', { blank: [t] })) });
+  parts.push({ html: only ? '' : `En z₀ = ${rd(String(d.a))} :`, ask: 'Res =', start: resJ.label, judge: resJ, menu: MENU, lines: chain(resJ, [subst, d.res]).map((t, i, a) => L(t, i === a.length - 1 ? 'Simplifier' : `1/(m − 1)! · φ${d.m === 2 ? '′' : '″'}(z₀)`, 'value', { blank: [t] })) });
   if (level >= 2 && level <= 3 && !only) {
     parts[0].decisions = [{
-      kind: 'decision', prompt: `z₀ = ${d.a} : quelle formule ?`,
+      kind: 'decision', prompt: `z₀ = ${rd(String(d.a))} : quelle formule ?`,
       options: [
         { id: 'multi', label: `Pôle d'ordre ${d.m} : Res = 1/(m − 1)! · lim d^(m−1)/dz^(m−1) [(z − z₀)^m f(z)]`, valid: true, ref: true },
         { id: 'simple', label: 'Pôle simple : Res = lim (z − z₀)f(z)', valid: false, rule: 'c_simple_formula_double', why: `z₀ est un pôle d'ordre ${d.m} : la limite de (z − z₀)f(z) est infinie.` },
@@ -351,10 +354,10 @@ function multipleLines(level, rng, opts = {}) {
   checkRes(d.f, String(d.a), d.res);
   const { parts } = multipleParts(d, level, { only: coef });
   if (level === 1) {
-    parts[0].notes = [`z₀ = ${d.a} est un pôle d'ordre m = ${d.m}. On pose φ(z) = (z − z₀)^${d.m} f(z) ; alors Res(f ; z₀) = φ${d.m === 2 ? '′' : '″'}(z₀)/${fact(d.m - 1)}!.`];
+    parts[0].notes = [`z₀ = ${rd(String(d.a))} est un pôle d'ordre m = ${d.m}. On pose φ(z) = (z − z₀)^${d.m} f(z) ; alors Res(f ; z₀) = φ${d.m === 2 ? '′' : '″'}(z₀)/${fact(d.m - 1)}!.`];
   }
   return partsItem({
-    skill: RM, level, prompt: `Calcule Res(f ; ${d.a}) pour f(z) = ${CM(d.f)}.`,
+    skill: RM, level, prompt: `Calcule Res(f ; ${CM(String(d.a))}) pour f(z) = ${CM(d.f)}.`,
     parts, keys: KEYS, subgoals: SUB_M,
     hints: H(`Ordre m = ${d.m} : on dérive ${d.m - 1} fois (z − z₀)^${d.m} f et on divise par ${fact(d.m - 1)}!.`, `φ(z) = ${CM(d.phi)}, φ${d.m === 2 ? '′' : '″'}(z) = ${CM(d.der)}.`, `Res = ${CM(d.res)}`),
     key: `${RM}:${level}:${d.id}`, exam: examTag(opts, coef ? 2 : 1), fallback: !!d.fallback,
@@ -368,7 +371,7 @@ function multipleLaplace(level, rng) {
   const a = pick(rng, [-1, -2, 0, 1]);
   let b = pick(rng, [-3, -2, -1, 0, 1, 2]);
   if (b === a) b = a - 1;
-  const d = { m: 2, a, b, g: 'e^(zt)', f: `e^(zt)/((${zMinus(a)})^2(${zMinus(b)}))`, phi: phiDeriv('e^(zt)', b, 0), der: phiDeriv('e^(zt)', b, 1), t: true, id: `L:${a}:${b}` };
+  const d = { m: 2, a, b, g: 'e^(zt)', f: `e^(zt)/(${zf(a)}^2${zf(b)})`, phi: phiDeriv('e^(zt)', b, 0), der: phiDeriv('e^(zt)', b, 1), t: true, id: `L:${a}:${b}` };
   d.dAt = d.der.replace(/z/g, `(${a})`);
   Object.assign(d, resValue('e^(zt)', a, b, 2));
   d.wrong0 = d.phi.replace(/z/g, `(${a})`);
@@ -383,7 +386,7 @@ function multipleLaplace(level, rng) {
   const JS = CV(mathLabel('y(t)', '<mi>y</mi><mo>(</mo><mi>t</mi><mo>)</mo>'), sum, { vars: ['t'], domain: { t: [0.3, 2] }, form: 'value' });
   parts.push({ html: 'La fonction est la somme des résidus :', ask: 'y(t) =', start: JS.label, judge: JS, lines: [L(sum, 'Somme des résidus', 'sum')] });
   return partsItem({
-    skill: RM, level, prompt: `Laplace inverse par les résidus : y(t) = Σ Res(e^(zt)F(z)) pour F(z) = ${CM(`1/((${zMinus(a)})^2(${zMinus(b)}))`)}, t > 0. Calcule les résidus de ${CM(d.f)}, puis y(t).`,
+    skill: RM, level, prompt: `Laplace inverse par les résidus : y(t) = Σ Res(e^(zt)F(z)) pour F(z) = ${CM(`1/(${zf(a)}^2${zf(b)})`)}, t > 0. Calcule les résidus de ${CM(d.f)}, puis y(t).`,
     parts, keys: [...KEYS, 'calcx'], subgoals: [...SUB_M, SG('sum', 'somme des résidus', RM)], hints: [],
     key: `${RM}:5:${d.id}`, baits: ['c_simple_formula_double', 'c_multiple_factorial'],
   });
@@ -394,17 +397,18 @@ function multipleMcq(rng, opts) {
   checkRes(d.f, String(d.a), d.res);
   const multi = !!opts.multi;
   const F = fact(d.m - 1);
+  const nice = (t, rule) => { const x = niceC(t); return x ? opt(x, rule) : null; };
   const wrongs = [
-    opt(d.wrong0, 'c_simple_formula_double'),
-    d.m === 3 ? opt(d.dAt, 'c_multiple_factorial') : opt(`(${d.res})/2`, 'c_multiple_factorial'),
-    d.m === 3 ? opt(`(${d.dAt})/6`, 'c_multiple_factorial') : null,
-    opt(`-(${d.res})`),
+    nice(d.wrong0, 'c_simple_formula_double'),
+    d.m === 3 ? nice(d.dAt, 'c_multiple_factorial') : nice(`(${d.res})/2`, 'c_multiple_factorial'),
+    d.m === 3 ? nice(`(${d.dAt})/6`, 'c_multiple_factorial') : null,
+    scaledOpt('-1', d.res),
   ];
   return choice({
     skill: RM, level: 4, key: `${RM}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
-    prompt: `Soit f(z) = ${CM(d.f)}. Res(f ; ${d.a}) =${multi ? ' (plusieurs réponses possibles)' : ''}`,
-    right: CM(d.res), rights: multi && F > 1 ? [CM(`(1/${F})(${d.dAt})`)] : [],
-    wrongs, fillers: [opt(`2(${d.res})`), opt(`(${d.res})+1`)],
+    prompt: `Soit f(z) = ${CM(d.f)}. Res(f ; ${CM(String(d.a))}) =${multi ? ' (plusieurs réponses possibles)' : ''}`,
+    right: CM(niceC(d.res) || d.res), rights: multi && F > 1 ? [CM(`(1/${F})(${d.dAt})`)] : [],
+    wrongs, fillers: [scaledOpt('2', d.res), nice(`(${d.res})+1`), scaledOpt('1/2', d.res), scaledOpt('-2', d.res)],
     solution: [{ html: `Pôle d'ordre ${d.m} : φ(z) = ${CM(d.phi)}, φ${d.m === 2 ? '′' : '″'}(z) = ${CM(d.der)}, Res = ${CM(d.res)}.`, note: '' }],
     expectedSec: 150,
   }, rng);

@@ -176,6 +176,50 @@ export function checkValue(text, expected, env = {}) {
   if (!v || !near(v, w)) throw new Error(`${text} = ${v?.re} + ${v?.im}i, pas ${w.re} + ${w.im}i`);
 }
 
+// ---------- nice texts of computed values ----------
+
+// A float as a fraction with a small denominator, or null.
+export function ratQ(x) {
+  if (!Number.isFinite(x)) return null;
+  for (let m = 1; m <= 60; m++) {
+    const k = x * m;
+    if (Math.abs(k - Math.round(k)) < 1e-9 * Math.max(1, Math.abs(k)) && Math.abs(k) < 1e6) return q(Math.round(k), m);
+  }
+  return null;
+}
+// c·E as text (c in ℚ(i), E '' or a factor such as 'π', 'e^(-2)').
+export function mulT(c, E = '') {
+  if (!E) return cT(c);
+  if (c.isZero()) return '0';
+  if (c.isReal() || c.re.n === 0) {
+    const r = c.isReal() ? c.re : c.im;
+    const iS = c.isReal() ? '' : 'i';
+    const a = r.n < 0 ? r.neg() : r;
+    const n = a.n === 1 && !iS ? '' : a.n === 1 ? '' : String(a.n);
+    return `${r.n < 0 ? '-' : ''}${n}${iS}${E}${a.d === 1 ? '' : `/${a.d}`}`;
+  }
+  return `(${cT(c)})${E}`;
+}
+// The value of a CAS text written c·E with E an exponential or π of the text
+// itself (or 1), c in ℚ(i) with small denominators; null if none fits.
+export function niceC(text) {
+  let v;
+  try { v = evalComplex(parse(text, { complex: true }), {}); } catch { v = null; }
+  if (!v) return null;
+  const Es = ['', ...new Set(String(text).match(/e\^\([^()]*\)/g) || []), ...(String(text).includes('π') ? ['π'] : [])];
+  for (const E of Es) {
+    const ev = E ? evalComplex(parse(E, { complex: true }), {}) : { re: 1, im: 0 };
+    const m = ev.re * ev.re + ev.im * ev.im;
+    const c = { re: (v.re * ev.re + v.im * ev.im) / m, im: (v.im * ev.re - v.re * ev.im) / m };
+    const re = ratQ(c.re);
+    const im = ratQ(c.im);
+    if (re && im) return mulT(new CQ(re, im), E);
+  }
+  return null;
+}
+// An option for k·value (k a text: '-1', '2', 'i', '1/2'), when it has a nice text.
+export const scaledOpt = (k, text, rule = null) => { const t = niceC(`(${k})(${text})`); return t ? { html: CM(t), rule } : null; };
+
 // ---------- items ----------
 
 // The lines of a part, without an intermediate line that would already end

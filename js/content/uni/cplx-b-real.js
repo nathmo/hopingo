@@ -8,7 +8,7 @@
 
 import { Q } from '../../math/rational.js';
 import {
-  q, cq, cT, cP, rd, CM, resLabel, mathLabel, CV, P, resRat, checkRes, checkValue, SG, L, chain, choice, opt,
+  q, cq, cT, cP, rd, CM, resLabel, mathLabel, CV, P, resRat, checkRes, checkValue, SG, L, chain, choice, opt, scaledOpt, niceC,
   partsItem, H, examTag, KEYS, pick, asProblem,
 } from './cplx-b-kit.js';
 import { evalFloat } from '../../cas/numeric.js';
@@ -105,7 +105,7 @@ function ratParts(d, level, { arc = false, even = false } = {}) {
   }
   const value = `${cP(cq(0, 2))}`;
   void value;
-  const sumT = d.res.map((r) => cP(r)).join('+');
+  const sumT = d.res.length === 1 ? cT(d.res[0]) : d.res.map((r) => cP(r)).join('+');
   const traps = {
     c_upper_half_lower_pole: [`2πi(${d.resLow.map((r) => cP(r)).join('+')})`],
     c_pole_outside_counted: [`2πi(${[...d.res, ...d.resLow].map((r) => cP(r)).join('+')})`],
@@ -156,8 +156,8 @@ function ratMcq(rng, opts) {
     rights: multi ? [`I = 2πi (${d.ups.map((z) => `Res(f ; ${CM(cT(z))})`).join(' + ')})`] : [],
     wrongs: multi
       ? [{ html: `I = 2πi (${d.lows.map((z) => `Res(f ; ${CM(cT(z))})`).join(' + ')})`, rule: 'c_upper_half_lower_pole' }, { html: 'I = 0, car la somme de tous les résidus est nulle', rule: 'c_pole_outside_counted' }, { html: `I = ${CM(cT(d.S))}`, rule: 'c_residue_2pii' }]
-      : [opt(`-(${d.value})`, 'c_upper_half_lower_pole'), opt('0', 'c_pole_outside_counted'), opt(`2(${d.value})`), opt(cT(d.S), 'c_residue_2pii')],
-    fillers: [opt(`(${d.value})/2`), opt(`π(${d.value})`)],
+      : [scaledOpt('-1', d.value, 'c_upper_half_lower_pole'), opt('0', 'c_pole_outside_counted'), scaledOpt('2', d.value), opt(cT(d.S), 'c_residue_2pii')],
+    fillers: [scaledOpt('1/2', d.value), scaledOpt('3/2', d.value)],
     solution: [{ html: `Pôles du haut : ${d.ups.map((z) => CM(cT(z))).join(', ')} ; ∫ = 2πi Σ Res = ${CM(d.value)}.`, note: '' }],
     expectedSec: 180,
   }, rng);
@@ -191,12 +191,12 @@ function trigData(rng) {
   let zin;
   if (kind === 'cos') {
     g = b > 0 ? `-2i/(${lead(b)}z^2+${2 * a}z+${b})` : `2i/(${lead(-b)}z^2-${2 * a}z+${-b})`;
-    zin = b === 1 ? `${R.s}-${a}` : b === -1 ? `${a}-${R.s}` : `(${R.s}-${a})/(${b})`;
+    zin = b === 1 ? `${R.s}-${a}` : b === -1 ? `${a}-${R.s}` : b > 0 ? `(${R.s}-${a})/${b}` : `(${a}-${R.s})/${-b}`;
   } else {
     g = `2/(${lead(b)}z^2+${2 * a}iz${b > 0 ? '-' : '+'}${Math.abs(b)})`;
-    zin = b === 1 ? `i(${R.s}-${a})` : b === -1 ? `i(${a}-${R.s})` : `i(${R.s}-${a})/(${b})`;
+    zin = b === 1 ? `i(${R.s}-${a})` : b === -1 ? `i(${a}-${R.s})` : b > 0 ? `i(${R.s}-${a})/${b}` : `i(${a}-${R.s})/${-b}`;
   }
-  let zout = kind === 'cos' ? `(-${R.s}-${a})/(${b})` : `i(-${R.s}-${a})/(${b})`;
+  let zout = kind === 'cos' ? (b > 0 ? `-(${R.s}+${a})/${b}` : `(${R.s}+${a})/${-b}`) : (b > 0 ? `-i(${R.s}+${a})/${b}` : `i(${R.s}+${a})/${-b}`);
   // √D whole: the roots are exact numbers of ℚ(i).
   const r = Math.round(Math.sqrt(D));
   if (r * r === D) {
@@ -293,7 +293,7 @@ function trigMcq(rng, opts) {
       skill: ST, level: 4, key: `${ST}:mcq:multi:${d.id}`, exam: examTag(opts, 2), multi: true, count: 5,
       prompt: `I = ∫₀^{2π} ${CM(d.f)} dθ. Quelles affirmations sont vraies ? (plusieurs réponses possibles)`,
       right: `I = ∮_{|z| = 1} ${CM(d.g)} dz`, rights: [`I = ${CM(d.R.val)}`, `Le seul pôle de l'intégrande dans |z| < 1 est ${CM(d.zin)}`],
-      wrongs: [{ html: `I = ∮_{|z| = 1} ${CM(d.gWrong)} dz`, rule: 'c_trig_sub' }, { html: `I = ${CM(`2(${d.R.val})`)}`, rule: null }, { html: `I = 2πi (Res(g ; ${CM(d.zin)}) + Res(g ; ${CM(d.zout)}))`, rule: 'c_pole_outside_counted' }],
+      wrongs: [{ html: `I = ∮_{|z| = 1} ${CM(d.gWrong)} dz`, rule: 'c_trig_sub' }, { html: `I = ${CM(niceC(`2(${d.R.val})`) || `2(${d.R.val})`)}`, rule: null }, { html: `I = 2πi (Res(g ; ${CM(d.zin)}) + Res(g ; ${CM(d.zout)}))`, rule: 'c_pole_outside_counted' }],
       solution: [{ html: `z = e^(iθ) : I = ∮ ${CM(d.g)} dz, pôle intérieur ${CM(d.zin)}, résidu ${CM(d.R.res)}, I = ${CM(d.R.val)}.`, note: '' }],
       expectedSec: 240,
     }, rng);
@@ -302,7 +302,7 @@ function trigMcq(rng, opts) {
     skill: ST, level: 4, key: `${ST}:mcq:${d.id}`, exam: examTag(opts, 2),
     prompt: `∫₀^{2π} ${CM(d.f)} dθ =`,
     right: CM(d.R.val),
-    wrongs: [opt(`(${d.R.val})/2`, 'c_trig_sub'), opt(`2(${d.R.val})`), opt(`-(${d.R.val})`), opt(`i(${d.R.val})`, 'c_residue_2pii')],
+    wrongs: [scaledOpt('1/2', d.R.val, 'c_trig_sub'), scaledOpt('2', d.R.val), scaledOpt('-1', d.R.val), scaledOpt('i', d.R.val, 'c_residue_2pii')],
     fillers: [opt('0', 'c_pole_outside_counted'), opt('π')],
     solution: [{ html: `I = ∮ ${CM(d.g)} dz, résidu ${CM(d.R.res)} en ${CM(d.zin)}, I = ${CM(d.R.val)}.`, note: '' }],
     expectedSec: 240,

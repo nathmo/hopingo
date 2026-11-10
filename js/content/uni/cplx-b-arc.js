@@ -9,7 +9,7 @@
 // The bound is the ML bound: it needs deg q ≥ deg p + 2 (with
 // deg q = deg p + 1 and α > 0, Jordan's lemma would be needed).
 
-import { CM, SG, L, partsItem, H, examTag, KEYS, pick, asProblem } from './cplx-b-kit.js';
+import { CM, rd, SG, L, partsItem, H, examTag, KEYS, pick, asProblem } from './cplx-b-kit.js';
 import { blocksItem } from './kit.js';
 
 export const SK = 'c-arc-estimate';
@@ -49,10 +49,10 @@ export function arcData(rng, { laplace = false } = {}) {
   return null;
 }
 
-const arcName = (d) => (d.laplace ? 'le demi-cercle gauche C_r : |z| = r, Re z ≤ 0' : d.side === 'up' ? 'le demi-cercle supérieur C_R : |z| = R, Im z ≥ 0' : 'le demi-cercle inférieur C_R : |z| = R, Im z ≤ 0');
+const arcName = (d) => (d.laplace ? 'le demi-cercle gauche C_r (|z| = r, Re z ≤ 0)' : d.side === 'up' ? 'le demi-cercle supérieur C_R (|z| = R, Im z ≥ 0)' : 'le demi-cercle inférieur C_R (|z| = R, Im z ≤ 0)');
 const numHtml = (d) => d.numHtml || (d.al === 0 || d.al === undefined
   ? (d.numBound === 'R' ? '|z| = R' : 'le numérateur vaut 1')
-  : `|${d.num.replace(/^z/, '')}| = e^(${d.al > 0 ? '−' : ''}${Math.abs(d.al) === 1 ? '' : Math.abs(d.al)} Im z) ≤ 1 (Im z ${d.al > 0 ? '≥' : '≤'} 0)${d.numBound === 'R' ? ', |z| = R' : ''}`);
+  : `|${rd(d.num.replace(/^z/, ''))}| = e^(${d.al > 0 ? '−' : ''}${Math.abs(d.al) === 1 ? '' : Math.abs(d.al)}Im z) ≤ 1 (Im z ${d.al > 0 ? '≥' : '≤'} 0)${d.numBound === 'R' ? ', |z| = R' : ''}`);
 
 // The four parts of the lines version (levels 4, 5 and open).
 export function arcParts(d) {
@@ -108,7 +108,7 @@ function arcBlocks(level, rng) {
   const order = ['n', 'd', 'm', 'l', 'b', 'z'];
   return blocksItem({
     skill: SK, level, mode: 'order',
-    prompt: `Montre que ∫_{C_R} f(z) dz → 0 quand R → +∞, pour f(z) = ${CM(d.f)} et C_R ${arcName(d).replace(/^le /, 'le ')}. Touche les blocs dans l'ordre de la preuve${level >= 2 ? ' (certains blocs sont faux)' : ''}.`,
+    prompt: `Montre que ∫_{C_R} f(z) dz → 0 quand R → +∞, pour f(z) = ${CM(d.f)} et ${arcName(d)}. Touche les blocs dans l'ordre de la preuve${level >= 2 ? ' (certains blocs sont faux)' : ''}.`,
     blocks: rng.shuffle(blocks), goal: 'z', order,
     hints: H('Majore |f| sur l\'arc, puis multiplie par la longueur πR.', `|${CM(d.q)}| ≥ ${CM(d.low)}`, `|∫| ≤ ${CM(d.ml)}`),
     subgoals: SUB_ARC,
