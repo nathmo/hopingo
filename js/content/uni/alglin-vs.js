@@ -55,10 +55,11 @@ function linText(co, names, c0 = 0) {
 }
 
 // A lines item from parts [{judge, start, html?, ask?, lines}]: the first
-// part is the item's own judge and start, the others are segments.
+// part is the item's own judge and start (its html becomes a note shown
+// before its lines), the others are segments.
 function partsItem(o, parts) {
   const [first, ...rest] = parts;
-  const script = [...first.lines];
+  const script = [...(first.html ? [{ kind: 'note', html: first.html }] : []), ...first.lines];
   for (const p of rest) script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge: p.judge }, ...p.lines);
   return matLines({ ...o, start: first.start, judge: first.judge, script });
 }
@@ -530,7 +531,7 @@ function colRowParts(d, level, rng, { rows = true, ker = false } = {}) {
   const pc = d.pivots.map((j) => j + 1);
   if (level <= 2) {
     const line = { kind: 'eq', math: vt(pc), note: 'Lues sur R', subgoal: 'pivots' };
-    parts.push({ judge: { kind: 'mat', expect: vt(pc) }, start: 'colonnes', lines: [level === 1 ? withCells(line, pc.map((_, i) => [i, 0])) : line] });
+    parts.push({ judge: { kind: 'mat', expect: vt(pc) }, start: 'colonnes', html: 'Les numéros des colonnes pivots, lus sur R, sous la forme (1 ; 3)', lines: [level === 1 ? withCells(line, pc.map((_, i) => [i, 0])) : line] });
   } else parts.push(rrefPart(d.A, d.ops, level, rng));
   const colPart = {
     judge: { kind: 'span', basis: colBasisOf(d).map(vt), require: 'basis' }, start: mt(d.A), html: 'Une base de Col A', ask: 'Col A =',
@@ -577,7 +578,7 @@ function colRowItem(level, rng) {
     { level: 3, html: `Col A = ${Spn(colBasisOf(d))}` },
   ];
   const what = level === 1 ? 'Col A' : level === 3 || level === 5 ? 'Col A, Lgn A et Ker A' : 'Col A et Lgn A';
-  const Aname = images ? `T : ℝ${'⁰¹²³⁴⁵'[d.n]} → ℝ³ telle que ${colsOf(d.A).map((c, j) => `T(e${sub(j + 1)}) = ${MLv(c)}`).join(', ')}` : `A = ${MLm(d.A)}`;
+  const Aname = images ? `T : ℝ${sup(d.n)} → ℝ${sup(d.m)} telle que ${colsOf(d.A).map((c, j) => `T(e${sub(j + 1)}) = ${MLv(c)}`).join(', ')}` : `A = ${MLm(d.A)}`;
   const prompt = level <= 2
     ? `A = ${MLm(d.A)} a pour forme réduite R = ${MLm(d.R)}. Donne les colonnes pivots, puis une base de ${what}.`
     : `Soit ${Aname}${images ? ', et A sa matrice canonique (Col A = Im T)' : ''}. Réduis A, puis donne une base de ${what}${level === 3 ? ' : choisis chaque opération' : ''}.`;
@@ -664,7 +665,7 @@ function basisItem(level, rng) {
   const S = SPACES[d.sp];
   const coordsLine = { kind: 'eq', math: mt(d.M), note: `Coordonnées en colonnes (${S.what})`, subgoal: 'coords' };
   const parts = [{
-    judge: { kind: 'mat', expect: mt(d.M) }, start: 'Coordonnées',
+    judge: { kind: 'mat', expect: mt(d.M) }, start: 'Coordonnées', html: 'La matrice des coordonnées, un vecteur par colonne',
     lines: [level === 1 ? withCells(coordsLine, pickCells(d.M, [0, 1, 2, 3], 4, rng)) : coordsLine],
   }];
   const ech = opLines(d.M, d.ops, { note: (op) => (op.kind === 'swap' ? 'Échanger' : `Annuler sous le pivot : ${opR(op)}`), subgoal: 'echelon' });
@@ -831,7 +832,7 @@ function rankMapItem(rng) {
   do { V = rng.pick(VSPACES.filter((x) => !x.rn)); W = rng.pick(VSPACES); } while (W.dim === V.dim);
   const r = rng.int(1, Math.min(V.dim, W.dim));
   const parts = [
-    { judge: { kind: 'value', expect: String(V.dim) }, start: 'k', lines: [{ kind: 'eq', math: String(V.dim), note: V.poly ? `Base 1, t, …, t${sup(V.poly)} : ${V.dim} vecteurs` : 'Une coordonnée par case', subgoal: 'formula' }] },
+    { judge: { kind: 'value', expect: String(V.dim) }, start: 'k', html: `La dimension de ${V.label}`, ask: `dim ${V.label} =`, lines: [{ kind: 'eq', math: String(V.dim), note: V.poly ? `Base 1, t, …, t${sup(V.poly)} : ${V.dim} vecteurs` : 'Une coordonnée par case', subgoal: 'formula' }] },
     valPart({ ask: 'dim Ker T =', html: 'dim Ker T', value: V.dim - r, note: `dim V − dim Im T = ${V.dim} − ${r}`, wrong: W.dim - r, ctx: { n: V.dim, r } }),
   ];
   return partsItem({
@@ -1055,8 +1056,8 @@ function mapData(rng) {
 function mapFormula(d) {
   const rows = d.AT.map((r) => linText(r, ABC));
   if (d.target === 'R3') return `T(a + bt + ct²) = (${rows.join(' ; ')})`;
-  const terms = rows.map((e, k) => (e === '0' ? null : k === 0 ? e : `(${e})${k === 1 ? 't' : 't²'}`)).filter(Boolean);
-  return `T(a + bt + ct²) = ${terms.join(' + ').replace(/\+ \(−/g, '+ (−') || '0'}`;
+  const terms = rows.map((e, k) => (e === '0' ? null : `${k === 0 && !/ /.test(e) ? e : `(${e})`}${['', 't', 't²'][k]}`)).filter(Boolean);
+  return `T(a + bt + ct²) = ${terms.join(' + ') || '0'}`;
 }
 const mapSpace = (d) => (d.target === 'R3' ? 'P₂ → ℝ³' : 'P₂ → P₂');
 const coefName = (i, j) => `a${sub(i + 1)}${sub(j + 1)}`;
@@ -1296,7 +1297,7 @@ function simItem(level, rng) {
   const parts = [
     {
       judge: { kind: 'mat', names, expect: mt(d.Pi), ...(M3 ? { menu: menu('Inverser P', { label: 'Transposer P', why: 'P n\'est pas orthogonale : Pᵀ n\'est pas son inverse.' }) } : {}) },
-      start: 'P⁻¹ = ?', lines: [eq(d.Pi, d.n === 2 ? 'Échanger la diagonale, opposer le reste, diviser par det P' : 'Réduire [P | I]', 'inverse')],
+      start: 'P⁻¹ = ?', html: 'L’inverse de P', ask: 'P⁻¹ =', lines: [eq(d.Pi, d.n === 2 ? 'Échanger la diagonale, opposer le reste, diviser par det P' : 'Réduire [P | I]', 'inverse')],
     },
     {
       judge: { kind: 'mat', names, expect: mt(mid), ...(M3 ? { menu: menu(toT ? 'Calculer A·P' : 'Calculer P·[T]_B', { label: toT ? 'Calculer P·A' : 'Calculer [T]_B·P', rule: 'l_similar_order', why: toT ? '[T]_B = P⁻¹AP : P est à droite de A.' : 'A = P·[T]_B·P⁻¹ : P est à gauche.' }) } : {}) },
