@@ -32,8 +32,8 @@ export const RULES = [
     id: 'p_df_wrong', family: 'method', tag: 'C', skill: 'p-ci-mean', repair: 'p-ci-mean',
     name: "Mauvais nombre de degrés de liberté",
     example: ["ν = n", "n − 1 (n₁ + n₂ − 2 ; n − 2 en régression)"],
-    check: { bait: { skill: 'p-ci-mean' } },
-    // W : quantile lu avec ν ± 1
+    wrong: ['4', '5'],
+    // W : quantile lu avec ν ± 1 (dans les items : la ligne ν = n, et s₅(n) au lieu de s₅(n − 1))
     explain: (c) => fill("On perd un degré de liberté par paramètre estimé : ν = {ν}.", c),
   }),
   trap({
