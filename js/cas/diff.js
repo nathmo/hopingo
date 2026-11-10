@@ -157,6 +157,8 @@ export function diff(node, v = 'x', hooks = {}) {
         const inner = mul(e, pow(b, { t: 'paren', e: sub(e, num(1)) }));
         return stripParen(b).t === 'sym' && stripParen(b).name === v ? inner : mul(inner, D(b));
       }
+      // Step U6 (A2, ∂/∂t of x^t): a base without v, a letter in it: aᵘ·ln a·u′.
+      if (!dependsOn(b, v) && !numValue(b) && stripParen(b).t !== 'const') return mul(mul(node, fn('ln', paren(b))), D(e));
       return chain(node, D, hooks, v);
     }
     case 'sqrt': case 'root': case 'abs': case 'fn': return chain(node, D, hooks, v);
@@ -174,9 +176,12 @@ export function diff(node, v = 'x', hooks = {}) {
         if (node.v === v) return node.e;
         throw new Error('Intégrale par rapport à une autre variable');
       }
-      if (node.v !== v && dependsOn(node.e, v)) throw new Error('Intégrale à paramètre');
       const at = (b) => substVar(node.e, node.v, b);
-      return sub(mul(at(node.hi), D(node.hi)), mul(at(node.lo), D(node.lo)));
+      const ends = sub(mul(at(node.hi), D(node.hi)), mul(at(node.lo), D(node.lo)));
+      // Step U6 (A2, Leibniz's rule): an integrand that depends on v adds
+      // ∫ from h to g of ∂f/∂v.
+      if (node.v !== v && dependsOn(node.e, v)) return add(ends, { t: 'int', e: D(node.e), v: node.v, lo: node.lo, hi: node.hi });
+      return ends;
     }
     case 'bracket': return D(sub(substVar(node.e, node.v, node.hi), substVar(node.e, node.v, node.lo)));
     case 'side': return D(node.e);

@@ -274,7 +274,26 @@ const TARGETS = {
     if (hasDeriv(node)) return false;
     return presentationIssue(node) ?? true;
   },
+  // Step U6 (A2, integrals with a parameter): no ∫, [F], lim or d(…) left,
+  // and, with cfg.goal, no more terms written than in the goal (the terms
+  // of F′(t) are collected).
+  'no-int': (node, cfg) => {
+    if (contains(node, (x) => x.t === 'int' || x.t === 'bracket' || x.t === 'lim')) return false;
+    if (cfg.goal && writtenTerms(node) > writtenTerms(parseGoal(cfg))) return false;
+    return TARGETS['no-prime'](node, cfg);
+  },
 };
+
+// Terms as written, sums inside products and numerators counted:
+// 3(1 − cos t⁴)/t has 2, (2 + 2cos t² − 4cos t⁴)/t has 3.
+function writtenTerms(n) {
+  n = stripParen(n);
+  if (n.t === 'bin' && (n.op === '+' || n.op === '-')) return writtenTerms(n.l) + writtenTerms(n.r);
+  if (n.t === 'neg') return writtenTerms(n.e);
+  if (n.t === 'frac') return writtenTerms(n.n);
+  if (n.t === 'bin' && (n.op === '×' || n.op === '÷')) return writtenTerms(n.l) * writtenTerms(n.r);
+  return 1;
+}
 
 // true (final), false (not yet), or a message (right but to tidy).
 export function isFinal(cfg, node) {
