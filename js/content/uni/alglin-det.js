@@ -14,14 +14,17 @@ import * as MX from '../../cas/matrix.js';
 import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
 import { walk } from '../../cas/ast.js';
-import { evalAst, envOf, isZeroScalar } from '../../cas/matexpr.js';
+import { lit, div } from '../../cas/ast.js';
+import {
+  evalAst, envOf, isZeroScalar, parseExpr, applyRowOp, valueText, opText, Mx, simp, ONE, qn,
+} from '../../cas/matexpr.js';
 import { blankLine } from '../../judges/lines.js';
 import { detsOf } from '../../judges/det.js';
 import { mopts } from '../../judges/matcommon.js';
 import { ACTIONS } from '../../judges/actions.js';
 import { readWith, showWith } from '../../judges/index.js';
 import {
-  q, mt, ML, MLm, fq, qt, sub, pickCells, withCells, matLines, mcqDistinct, tfL, examTag,
+  q, mt, ML, MLm, fq, qt, sub, opT, opR, pickCells, withCells, matLines, mcqDistinct, tfL, examTag,
 } from './alglin-kit.js';
 
 const nz = (rng, lo, hi) => { for (;;) { const k = rng.int(lo, hi); if (k) return k; } };
@@ -320,7 +323,338 @@ ACTIONS.cofactor = (prev, cfg) => {
 };
 
 // ======================================================================
+// l-det-rowops
+// ======================================================================
+
+const RO = 'l-det-rowops';
+const RO_SUB = [
+  { id: 'echelon', label: 'échelonner', skill: 'l-sys-echelon' },
+  { id: 'factor', label: 'suivre le facteur devant det', skill: RO },
+];
+const RO_TRACK = { kind: 'rowops', track: 'det' };
+// MathML of a line of the track-det judge.
+const MLr = (text, cfg = RO_TRACK) => { try { return showWith(cfg, readWith(cfg, text)); } catch { return text; } };
+const maxAbs = (A) => Math.max(...A.flat().map((x) => Math.abs(x.valueOf())));
+
+// A = P·L·U, L unit lower (ℓ in [−2 ; 2]), U upper (diagonal in {±1, ±2, 3}):
+// the elimination has whole multipliers. swap: ℓ(c+1, c) = 0 and rows c, c+1
+// exchanged, so that a pivot is 0 on the way. half: row 1 doubled after the
+// pivot ±1, to « sortir le facteur 2 » first (a₂₁ odd).
+function roData(n, rng, { swap = false, half = false } = {}) {
+  for (let t = 0; t < 300; t++) {
+    const U = MX.zeros(n, n);
+    const L = MX.identity(n);
+    for (let i = 0; i < n; i++) {
+      U[i][i] = q(rng.pick([1, -1, 2, -2, 3]));
+      for (let j = i + 1; j < n; j++) U[i][j] = q(rng.int(-3, 3));
+      for (let j = 0; j < i; j++) L[i][j] = q(rng.int(-2, 2));
+    }
+    if (half) U[0][0] = q(rng.pick([1, -1]));
+    const c = swap ? rng.int(0, n - 2) : null;
+    if (swap) L[c + 1][c] = q(0);
+    let A = MX.mul(L, U);
+    if (swap) A = MX.applyOp(A, { kind: 'swap', i: c, j: c + 1 });
+    const pre = [];
+    if (half) {
+      A = A.map((r, i) => (i === 0 ? r.map((x) => x.mul(2)) : r));
+      pre.push({ kind: 'scale', i: 0, k: q(1, 2) });
+      if (A[1][0].d !== 1 || A[1][0].n % 2 === 0) continue;
+    }
+    const e = MX.echelon(pre.length ? MX.applyOps(A, pre) : A);
+    const swaps = e.ops.filter((op) => op.kind === 'swap').length;
+    if (swaps !== (swap ? 1 : 0)) continue;
+    if (e.ops.some((op) => op.kind === 'add' && op.k.d !== 1)) continue;
+    const adds = e.ops.filter((op) => op.kind === 'add').length;
+    if (adds < n - 1 || adds > n + 2) continue;
+    if (maxAbs(A) > 12 || A.every((r) => r.every((x) => x.n !== 0)) === false && maxAbs(A) < 2) continue;
+    const ops = [...pre, ...e.ops];
+    const mats = [];
+    let M = A;
+    for (const op of ops) { M = MX.applyOp(M, op); mats.push(M); }
+    if (mats.some((X) => maxAbs(X) > 20)) continue;
+    if (MX.isUpper(A)) continue;
+    return { A, ops, det: MX.det(A), E: M };
+  }
+  const A = MX.mat([[1, 2, -1, 0], [2, 5, -1, 1], [-1, -2, 3, 2], [3, 6, -3, 1]]);
+  const e = MX.echelon(A);
+  return { A, ops: e.ops, det: MX.det(A), E: e.E, fallback: true };
+}
+
+const factorText = (f) => (f.eq(1) ? '' : f.eq(-1) ? '−' : `${fq(f)}·`);
+// The reference lines « op : f·det[[…]] », then det A.
+function roLines(d) {
+  let M = d.A;
+  let f = q(1);
+  const lines = d.ops.map((op) => {
+    M = MX.applyOp(M, op);
+    f = f.div(MX.detFactor(op));
+    const note = op.kind === 'swap' ? 'Un échange : det change de signe'
+      : op.kind === 'scale' ? `Sortir le facteur ${fq(q(1).div(op.k))} de la ligne ${op.i + 1}`
+        : 'Lᵢ ← Lᵢ + kLⱼ : det inchangé';
+    return { kind: 'eq', math: `${opT(op)} : ${pre(f)}det${mt(M)}`, op, result: M, factor: f, subgoal: op.kind === 'add' ? 'echelon' : 'factor', note };
+  });
+  const diagT = M.map((r, i) => par(r[i])).join('·');
+  lines.push({ kind: 'eq', math: qt(d.det), subgoal: 'factor', note: `Produit de la diagonale : ${factorText(f)}${diagT.replace(/-/g, '−')} = ${fq(d.det)}` });
+  return lines;
+}
+
+// ---------- with a parameter (a, λ): A = L·U, U's diagonal in ℚ[a] ----------
+
+// c0 + c1·v as text: 2a-3, -a, 5.
+function lin(c0, c1, v) {
+  if (c1 === 0) return String(c0);
+  const head = c1 === 1 ? v : c1 === -1 ? `-${v}` : `${c1}${v}`;
+  return c0 === 0 ? head : `${head}${c0 > 0 ? '+' : '-'}${Math.abs(c0)}`;
+}
+// (v − r) as text, in a product: (a-1), (a+2), a.
+const vfac = (v, r) => (r === 0 ? v : `(${v}${r > 0 ? '-' : '+'}${Math.abs(r)})`);
+// C·Π(v − r)^m.
+function factoredText(C, roots, v) {
+  const m = new Map();
+  for (const r of roots) m.set(r, (m.get(r) || 0) + 1);
+  const fs = [...m.entries()].sort((x, y) => x[0] - y[0]).map(([r, k]) => {
+    const f = vfac(v, r);
+    if (k === 1) return f;
+    return `${f.startsWith('(') ? f : `(${f})`}^${k}`;
+  });
+  const lead = C === 1 ? '' : C === -1 ? '-' : `${C}`;
+  return `${lead}${fs.join('')}` || String(C);
+}
+
+function roParamData(n, rng, v, { two = false } = {}) {
+  for (let t = 0; t < 300; t++) {
+    const k = n === 3 && !two ? rng.pick([1, 2, 2]) : 2;
+    const pos = rng.shuffle([...Array(n).keys()]).slice(0, k);
+    const U = Array.from({ length: n }, () => Array.from({ length: n }, () => [0, 0]));
+    const L = MX.identity(n).map((r) => r.map((x) => x.valueOf()));
+    let C = 1;
+    const roots = [];
+    for (let i = 0; i < n; i++) {
+      if (pos.includes(i)) {
+        const r = rng.int(-3, 4);
+        const s = rng.pick([1, -1]);
+        U[i][i] = [-s * r, s];
+        roots.push(r);
+        C *= s;
+      } else {
+        const dgn = rng.pick([1, -1, 2, 1]);
+        U[i][i] = [dgn, 0];
+        C *= dgn;
+      }
+      for (let j = i + 1; j < n; j++) U[i][j] = [rng.int(-2, 2), 0];
+      for (let j = 0; j < i; j++) L[i][j] = rng.int(-2, 2);
+    }
+    if (two && new Set(roots).size < 2) continue;
+    if (L.flat().filter((x, idx) => x !== 0 && Math.floor(idx / n) !== idx % n).length < n - 1) continue;
+    // A = L·U, entries c0 + c1·v.
+    const A = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => {
+      let c0 = 0; let c1 = 0;
+      for (let p = 0; p < n; p++) { c0 += L[i][p] * U[p][j][0]; c1 += L[i][p] * U[p][j][1]; }
+      return [c0, c1];
+    }));
+    if (A.flat().some(([c0, c1]) => Math.abs(c0) > 9 || Math.abs(c1) > 3)) continue;
+    if (A[0][0][1] !== 0 && pos[0] !== 0) continue;
+    const ops = [];
+    for (let c = 0; c < n - 1; c++) for (let i = c + 1; i < n; i++) if (L[i][c]) ops.push({ kind: 'add', i, j: c, k: q(-L[i][c]) });
+    if (ops.length < n - 1) continue;
+    const text = `[${A.map((r) => `[${r.map(([c0, c1]) => lin(c0, c1, v)).join(',')}]`).join(',')}]`;
+    return { text, ops, C, roots, v, n, final: factoredText(C, roots, v) };
+  }
+  const text = `[[1,1,1],[1,${v},1],[1,1,${v}]]`;
+  return { text, ops: [{ kind: 'add', i: 1, j: 0, k: q(-1) }, { kind: 'add', i: 2, j: 0, k: q(-1) }], C: 1, roots: [1, 1], v, n: 3, final: `(${v}-1)^2`, fallback: true };
+}
+
+// The lines of a reduction on node matrices (parameters): « op : f·det[[…]] ».
+function nodeLines(text, ops, v, factors = []) {
+  const opts = { vars: [v] };
+  let rows = evalAst(parseExpr(text, opts), {}, opts).rows;
+  return ops.map((op, k) => {
+    rows = applyRowOp(rows, op);
+    const f = factors[k] ?? '';
+    return { kind: 'eq', math: `${opText(op)} : ${f}det${valueText(Mx(rows))}`, op, subgoal: op.kind === 'add' ? 'echelon' : 'factor', note: op.kind === 'add' ? 'Lᵢ ← Lᵢ + kLⱼ : det inchangé' : 'Sortir le facteur de la ligne' };
+  });
+}
+
+// Vandermonde [[1, a, a²], [1, b, b²], [1, c, c²]] = (b − a)(c − a)(c − b).
+function vandermonde(rng, v) {
+  const [b, c] = rng.shuffle([-2, -1, 1, 2, 3, 4]).slice(0, 2).sort((x, y) => x - y);
+  const text = `[[1,${v},${v}^2],[1,${b},${b * b}],[1,${c},${c * c}]]`;
+  const opts = { vars: [v] };
+  const P = (t) => parse(t, opts);
+  const bv = `(${b}-${v})`.replace('(0-', '(-');
+  const cv = `(${c}-${v})`.replace('(0-', '(-');
+  const two = [{ kind: 'add', i: 1, j: 0, k: qn(-1) }, { kind: 'add', i: 2, j: 0, k: qn(-1) }];
+  let rows = evalAst(parseExpr(text, opts), {}, opts).rows;
+  rows = two.reduce((r, op) => applyRowOp(r, op), rows);
+  const l1 = { kind: 'eq', math: `${two.map(opText).join(' ; ')} : det${valueText(Mx(rows))}`, subgoal: 'echelon', note: 'Lᵢ ← Lᵢ − L₁ : det inchangé' };
+  const s2 = { kind: 'scale', i: 1, k: simp(div(ONE, P(bv))) };
+  rows = applyRowOp(rows, s2);
+  const l2 = { kind: 'eq', math: `L2 ← (1/${bv})L2 : ${bv}·det${valueText(Mx(rows))}`, subgoal: 'factor', note: `Sortir le facteur ${bv.slice(1, -1).replace(/-/g, ' − ')} de la ligne 2` };
+  const s3 = { kind: 'scale', i: 2, k: simp(div(ONE, P(cv))) };
+  rows = applyRowOp(rows, s3);
+  const l3 = { kind: 'eq', math: `L3 ← (1/${cv})L3 : (${bv}${cv})·det${valueText(Mx(rows))}`, subgoal: 'factor', note: `Sortir le facteur ${cv.slice(1, -1).replace(/-/g, ' − ')} de la ligne 3` };
+  const s4 = { kind: 'add', i: 2, j: 1, k: qn(-1) };
+  rows = applyRowOp(rows, s4);
+  const l4 = { kind: 'eq', math: `${opText(s4)} : (${bv}${cv})·det${valueText(Mx(rows))}`, subgoal: 'echelon', note: 'Échelonnée' };
+  const final = `${c - b === 1 ? '' : c - b}${bv}${cv}`;
+  const l5 = { kind: 'eq', math: final, subgoal: 'factor', note: 'Produit de la diagonale, déjà factorisé' };
+  return { text, lines: [l1, l2, l3, l4, l5], final, roots: [b, c], v, vander: true };
+}
+
+const roHints = (lines, cfg = RO_TRACK) => {
+  const tri = lines.at(-2);
+  return H(
+    'Seuls les échanges (det change de signe) et les multiplications de ligne (det multiplié par k) changent det ; Lᵢ ← Lᵢ + kLⱼ le garde. Échelonne, puis multiplie la diagonale.',
+    `À la fin : det A = □·det(triangulaire), avec ${MLr(tri.math.slice(tri.math.indexOf('det[')), cfg)} ; □ tient compte des échanges et des facteurs sortis.`,
+    MLr(lines[0].math, cfg),
+  );
+};
+const roSolution = (start, lines, cfg) => [
+  { html: MLr(start, cfg), note: 'Départ' },
+  ...lines.map((l) => ({ html: `<span class="eq">→</span> ${MLr(l.math, cfg)}`, note: l.note || '' })),
+];
+
+function roItem(level, rng) {
+  // Levels 4 and 5 with a parameter.
+  const kind = level === 5 ? 'lambda' : level === 4 ? rng.pick(['num', 'num', 'param', 'vander']) : 'num';
+  if (kind !== 'num') return roParamItem(level, rng, kind);
+  const n = level === 4 ? 4 : 3;
+  const d = roData(n, rng, { swap: level === 1 ? rng.chance(0.5) : level === 2 ? false : rng.chance(0.5), half: level === 2 });
+  const start = `det${mt(d.A)}`;
+  const lines = roLines(d);
+  const key = `${RO}:${mt(d.A)}`;
+  const script = [];
+  if (level <= 2) {
+    lines.forEach((l, k) => {
+      if (level === 2 && k === 0) {
+        const p = d.A[0][0];
+        const a21 = d.A[1][0];
+        const combo = { kind: 'combo', i: 1, c: q(2), j: 0, k: a21.mul(-2).div(p) };
+        const one = d.A.findIndex((r, i) => i > 0 && Math.abs(r[0].valueOf()) === 1);
+        const opts = [
+          { id: 'factor', label: `Sortir le facteur 2 de la ligne 1 : ${opR(l.op)}, et det A = 2·det(…)`, valid: true, quality: 'good', ref: true },
+          { id: 'combo', label: `${opR(combo)} pour garder des entiers`, valid: true, quality: 'poor', why: `Juste à condition de corriger : ${opR(combo)} multiplie det par 2, donc det A = (1/2)·det(nouvelle matrice).` },
+        ];
+        if (one > 0) opts.push({ id: 'swap', label: `L₁ ↔ L${sub(one + 1)} pour avoir un pivot ±1, det inchangé`, valid: false, rule: 'l_det_swap_sign', why: 'Un échange de lignes change le signe de det : det A = −det(nouvelle matrice).' });
+        script.push({ kind: 'decision', prompt: `Le pivot vaut ${fq(p)} et toute la ligne 1 est paire. Comment continuer ?`, options: rng.shuffle(opts) });
+      }
+      if (level === 1 && l.op?.kind === 'swap') {
+        script.push({
+          kind: 'decision', prompt: `Le pivot de la colonne ${l.op.i + 1} est nul : on fait ${opR(l.op)}. Que devient le facteur devant det ?`, options: rng.shuffle([
+            { id: 'neg', label: 'Il change de signe', valid: true },
+            { id: 'same', label: 'Il ne change pas', valid: false, rule: 'l_det_swap_sign', why: 'Échanger deux lignes change le signe du déterminant.' },
+          ]),
+        });
+      }
+      if (level === 1 && k === 0 && l.op?.kind === 'add') {
+        script.push({
+          kind: 'decision', prompt: `On fait ${opR(l.op)}. Que devient det ?`, options: rng.shuffle([
+            { id: 'same', label: 'Il ne change pas', valid: true },
+            { id: 'mul', label: `Il est multiplié par ${fq(l.op.k)}`, valid: false, why: 'Ajouter à une ligne un multiple d\'une autre ne change pas det : seule la ligne qui change est multipliée par 1.' },
+          ]),
+        });
+      }
+      script.push(l.op ? withCells(l, pickCells(l.result, [l.op.i, ...(l.op.kind === 'swap' ? [l.op.j] : [])], level === 1 ? 2 : 3, rng)) : l);
+    });
+  } else script.push(...lines);
+  return matLines({
+    skill: RO, level,
+    prompt: `Calcule det A par opérations sur les lignes, pour A = ${MLm(d.A)}${level === 3 ? ' : choisis chaque opération, puis écris le facteur et la matrice' : ''}. Chaque ligne s'écrit « opération : facteur·det[[…]] ».`,
+    start, judge: { ...RO_TRACK }, mode: modeOf(level), script, hints: roHints(lines), subgoals: RO_SUB, key, keys: ['mat', 'calc'],
+    tapActions: level === 3 ? 'rowops' : null, fallback: d.fallback, solution: roSolution(start, lines, RO_TRACK),
+  });
+}
+
+function roParamItem(level, rng, kind) {
+  const v = kind === 'lambda' ? 'λ' : 'a';
+  const cfg = { kind: 'rowops', track: 'det', vars: [v], factored: true };
+  let text;
+  let lines;
+  let roots;
+  let fallback = false;
+  if (kind === 'vander') ({ text, lines, roots } = vandermonde(rng, v));
+  else {
+    const d = roParamData(kind === 'lambda' ? 4 : 3, rng, v);
+    ({ text, roots, fallback } = d);
+    lines = [...nodeLines(text, d.ops.map((op) => ({ ...op, k: lit(op.k) })), v), { kind: 'eq', math: d.final, subgoal: 'factor', note: 'Produit de la diagonale, factorisé' }];
+  }
+  const start = `det${text}`;
+  const final = lines.at(-1).math;
+  const uniq = [...new Set(roots)].sort((x, y) => x - y);
+  const script = [...lines];
+  if (kind === 'lambda') {
+    const sol = uniq.map((r) => `${v}=${r}`).join(' ou ');
+    script.push(
+      { kind: 'segment', html: `A n'est pas inversible exactement quand det A = 0. Pour quelles valeurs de ${v} ?`, start: { math: `${final}=0` }, judge: { kind: 'solset', v } },
+      { kind: 'eq', math: sol, subgoal: 'factor', note: `A est inversible si et seulement si ${v} ∉ {${uniq.join(' ; ')}}` },
+    );
+  }
+  return matLines({
+    skill: RO, level,
+    prompt: kind === 'lambda'
+      ? `Soit A = ${ML(text, { vars: [v] })}. Calcule det A par opérations sur les lignes (factorisé), puis trouve les valeurs de ${v} pour lesquelles A n'est pas inversible.`
+      : `Calcule det A par opérations sur les lignes, pour A = ${ML(text, { vars: [v] })}, et donne-le factorisé. Chaque ligne s'écrit « opération : facteur·det[[…]] ».`,
+    start, judge: cfg, mode: 'free', script, hints: roHints(lines, cfg), subgoals: RO_SUB, key: `${RO}:${text}`, keys: ['mat', 'calc'],
+    fallback, solution: kind === 'lambda' ? undefined : roSolution(start, lines, cfg),
+  });
+}
+
+function roExam(rng, exam) {
+  if (exam === 'tf') {
+    const which = rng.int(0, 4);
+    if (which < 3) {
+      const st = [
+        ['Ajouter à une ligne de A un multiple d\'une autre ligne ne change pas det A.', 'Vrai : c\'est la seule opération sur les lignes qui garde det.'],
+        ['Si deux colonnes de A sont égales, alors det A = 0.', 'Vrai : det A = det Aᵀ, et Aᵀ a deux lignes égales.'],
+        ['Multiplier une ligne de A par 3 multiplie det A par 3.', 'Vrai : det est linéaire par rapport à chaque ligne.'],
+      ][which];
+      return tfL({ skill: RO, key: `true:${which}`, truth: true, exam: examTag({ exam }), statement: st[0], explanation: st[1] });
+    }
+    const A = rng.pick([[[1, 0], [0, 1]], [[2, 1], [1, 1]], [[1, 2], [0, 3]], [[3, 1], [2, 1]]]);
+    const swapT = which === 3;
+    return tfL({
+      skill: RO, key: `${swapT ? 'swap' : 'combo'}:${mt(MX.mat(A))}`, truth: false, exam: examTag({ exam }),
+      statement: swapT ? 'Échanger deux lignes de A ne change pas det A.' : 'L\'opération L₂ ← 2L₂ − L₁ ne change pas det A.',
+      ruleIfTrue: swapT ? 'l_det_swap_sign' : 'l_det_rowop_combo',
+      counter: { kind: 'matOne', params: { want: 'detNonZero', n: 2 }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)) } },
+      explanation: swapT
+        ? `Faux : un échange change le signe de det. Pour A = ${MLm(MX.mat(A))}, det A = ${fq(MX.det(MX.mat(A)))} ≠ 0, et après l'échange det vaut ${fq(MX.det(MX.mat(A)).neg())}.`
+        : `Faux : L₂ ← 2L₂ − L₁ multiplie det par 2. Pour A = ${MLm(MX.mat(A))}, det A = ${fq(MX.det(MX.mat(A)))} ≠ 0 devient ${fq(MX.det(MX.mat(A)).mul(2))}.`,
+    });
+  }
+  if (rng.chance(0.35)) {
+    const d = roParamData(3, rng, 'a', { two: true });
+    const uniq = [...new Set(d.roots)].sort((x, y) => x - y);
+    const set = (rs) => `a ∉ {${rs.map((r) => fq(q(r))).join(' ; ')}}`;
+    return mcqDistinct({
+      skill: RO, level: 4, key: `mcq:${d.text}`, exam: examTag({ exam }),
+      prompt: `Soit A = ${ML(d.text, { vars: ['a'] })}. Pour quelles valeurs de a la matrice A est-elle inversible ?`,
+      right: set(uniq),
+      wrongs: [{ html: set(uniq.map((r) => -r).sort((x, y) => x - y)), rule: null }, { html: `a ∈ {${uniq.map((r) => fq(q(r))).join(' ; ')}}`, rule: null }, { html: set([uniq[0]]), rule: null }],
+      fillers: [{ html: set(uniq.map((r) => r + 1)) }, { html: 'pour tout a ∈ ℝ' }],
+      solution: [{ html: `det A = ${ML(d.final, { vars: ['a'] })}`, note: 'Échelonner : le facteur reste 1' }],
+    }, rng);
+  }
+  const d = roData(rng.pick([3, 4]), rng, { swap: rng.chance(0.6), half: rng.chance(0.5) });
+  const swaps = d.ops.some((op) => op.kind === 'swap');
+  const half = d.ops.some((op) => op.kind === 'scale');
+  return mcqDistinct({
+    skill: RO, level: 4, key: `mcq:${mt(d.A)}`, exam: examTag({ exam }),
+    prompt: `Que vaut le déterminant de A = ${MLm(d.A)} ?`,
+    right: fq(d.det),
+    wrongs: [
+      swaps ? { html: fq(d.det.neg()), rule: 'l_det_swap_sign' } : null,
+      half ? { html: fq(d.det.div(2)), rule: 'l_det_scale_row' } : null,
+      { html: fq(d.det.mul(2)), rule: 'l_det_rowop_combo' },
+    ].filter(Boolean),
+    fillers: [{ html: fq(d.det.neg()) }, { html: fq(d.det.add(1)) }, { html: fq(d.det.sub(2)) }, { html: '0' }],
+    solution: roLines(d).map((l) => ({ html: MLr(l.math), note: l.note || '' })),
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
   [COF]: (level, rng, profile, opts = {}) => (opts.exam ? cofExam(rng, opts.exam) : cofItem(level, rng)),
+  [RO]: (level, rng, profile, opts = {}) => (opts.exam ? roExam(rng, opts.exam) : roItem(level, rng)),
 };
