@@ -1286,7 +1286,7 @@ function luData(rng, { n = 3, fracL = false, far: needFar = false } = {}) {
     if (needFar && !far.length) continue;
     if (needFar && fracL && !frac.length) continue;
     const [i, j] = rng.pick(frac.length ? frac : far.length && (needFar || rng.chance(0.6)) ? far : ls);
-    if (needFar && MX.inverse(L)[i][j].eq(L[i][j].neg())) continue;
+    if (needFar && [L[i][j].neg(), L[i][j]].some((x) => MX.inverse(L)[i][j].eq(x))) continue;
     return { L, U, A, ops, n, i, j };
   }
   const L = MX.mat([[1, 0, 0], [2, 1, 0], [-1, 3, 1]]);
