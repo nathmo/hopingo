@@ -60,6 +60,15 @@ export function isUnlocked(profile, id) {
   return SKILL_BY_ID[id].prereqs.every((p) => isSatisfied(profile.skills[p]));
 }
 
+// Test mode: the profile named « nathmo » with the bee avatar can open every
+// skill. Nothing else changes: isUnlocked still says what the path would
+// have opened (colours, « Continuer », unlock messages), and answers,
+// mastery, traps and rewards work as for any student.
+export const isTester = (profile) => profile?.name?.trim().toLowerCase() === 'nathmo' && profile?.avatar === '🐝';
+
+// May the student start this skill? Always in test mode.
+export const canOpen = (profile, id) => isTester(profile) || isUnlocked(profile, id);
+
 // The prerequisites still missing, for the map.
 export const missingPrereqs = (profile, id) => SKILL_BY_ID[id].prereqs.filter((p) => !isSatisfied(profile.skills[p]));
 

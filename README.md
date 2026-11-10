@@ -14,6 +14,8 @@ npm run samples      # writes docs/samples-<unit>.md for content review
 
 There are no dependencies and no build step.
 
+**Test mode.** A profile named `nathmo` with the bee avatar (🐝) can open every skill on the map, to try any part of the tree. Everything else works as usual: answers are judged, mastery and traps are recorded, and the map still shows in grey (🔓) the skills the normal path would not have unlocked yet. See `isTester` and `canOpen` in `js/engine/learner.js`.
+
 ## Deploy on GitHub Pages
 
 Push the folder to a repository, then go to **Settings → Pages → Deploy from a branch** and pick `main` / root. `.nojekyll` makes Pages serve the files as they are.

@@ -4,7 +4,7 @@ import { h, html } from '../dom.js';
 import { SKILLS, UNITS, unitSkills } from '../../content/skills.js';
 import { skillFacts } from '../../content/calcul.js';
 import { isAutomatic } from '../../engine/facts.js';
-import { stars, isUnlocked } from '../../engine/learner.js';
+import { stars, isUnlocked, isTester } from '../../engine/learner.js';
 import { BADGES, xpHistory, xpToday, currentStreak } from '../../engine/rewards.js';
 import { topBar, bottomNav, starRow } from './common.js';
 
@@ -52,7 +52,7 @@ export function progressScreen(root, _args, app) {
           const st = p.skills[s.id];
           const unlocked = isUnlocked(p, s.id);
           return h(`div.skill-row${unlocked ? '' : '.locked'}`,
-            h('span.skill-icon', unlocked ? s.icon : '🔒'),
+            h('span.skill-icon', unlocked ? s.icon : isTester(p) ? '🔓' : '🔒'),
             h('div.skill-main', h('b', s.title),
               s.facts ? factCount(p, s.id) : null,
               h('div.meter', h('div.meter-fill', { style: { width: `${Math.round((st?.p ?? 0) * 100)}%` } }))),

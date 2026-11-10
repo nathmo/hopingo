@@ -7,7 +7,7 @@ import { generate } from '../content/generators.js';
 import { RULE_BY_ID } from '../math/malrules.js';
 import {
   skillState, recordAnswer, recordTraps, nextFocus, noteLessonBranch, practiceSkill, dueSkills, activeTraps,
-  finishReview, isUnlocked, isSlow,
+  finishReview, isUnlocked, canOpen, isSlow,
 } from './learner.js';
 import { now } from './time.js';
 import { recordFact } from './facts.js';
@@ -98,7 +98,7 @@ export class Lesson {
   // The skill a trap can be practised on, if the student has reached it.
   trapSkill(rule) {
     const s = RULE_BY_ID[rule]?.skill;
-    return s && SKILL_BY_ID[s] && isUnlocked(this.profile, s) ? s : null;
+    return s && SKILL_BY_ID[s] && canOpen(this.profile, s) ? s : null;
   }
 
   // A new question: not asked yet in this lesson. Fact sets can be small

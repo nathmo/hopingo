@@ -173,3 +173,21 @@ test('a profile from the linear path keeps only its 3 most recent branches', () 
   // u-length waits for tab-2510: the unites branch has nothing open.
   assert.deepEqual(active, ['calcul', 'relatifs', 'algebre']);
 });
+
+// Test mode: the profile « nathmo » with the bee avatar opens every skill,
+// while isUnlocked and « Continuer » still follow the real path.
+test('test mode: nathmo with the bee opens every skill, the path stays the same', async () => {
+  const { isTester, canOpen } = await import('../js/engine/learner.js');
+  const p = profile(13, { name: ' Nathmo ', avatar: '🐝' });
+  assert.ok(isTester(p));
+  assert.ok(!isTester(profile(13, { name: 'nathmo', avatar: '🦊' })));
+  assert.ok(!isTester(profile(13, { name: 'nath', avatar: '🐝' })));
+  const deep = SKILL_BY_ID['f-laplace-ode'] ? 'f-laplace-ode' : SKILLS.at(-1).id;
+  assert.ok(!isUnlocked(p, deep), 'the path still says it is locked');
+  assert.ok(SKILLS.every((s) => canOpen(p, s.id)), 'every skill can be opened');
+  assert.equal(nextFocus(p), nextFocus(profile(13)), '« Continuer » is unchanged');
+  // A lesson on a skill far down the tree runs and records answers.
+  const lesson = new Lesson(p, { kind: 'skill', skill: deep }, makeRng(2));
+  const item = lesson.next();
+  assert.ok(item, 'the lesson gives an item');
+});

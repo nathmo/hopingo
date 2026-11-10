@@ -4,7 +4,7 @@ import { h, html, bubble } from '../dom.js';
 import { RULE_BY_ID, FAMILIES } from '../../math/malrules.js';
 import { renderText } from '../../math/expr.js';
 import { SKILL_BY_ID } from '../../content/skills.js';
-import { isUnlocked } from '../../engine/learner.js';
+import { canOpen } from '../../engine/learner.js';
 import { topBar, bottomNav } from './common.js';
 
 const mathify = (s) => s.replace(/(\d+\/\d+|\d+)/g, (m) => `<span class="m">${renderText(m)}</span>`);
@@ -13,7 +13,7 @@ function trapCard(app, id, tr) {
   const r = RULE_BY_ID[id];
   const fam = FAMILIES[r.family];
   const days = tr.clearDays?.length || 0;
-  const canTrain = isUnlocked(app.profile, r.skill);
+  const canTrain = canOpen(app.profile, r.skill);
   let explain = '';
   try { explain = r.op ? '' : r.explain(); } catch { explain = ''; }
   return h(`div.trap-card${tr.active ? '.active' : '.cleared'}`,
