@@ -48,13 +48,22 @@ function expand(cfg, node, n) {
 }
 
 // The value of a line: {q} exact, or {x} a float (NaN if unknown).
+// Step U6 (A2, part g): the values of lines with integrals are kept (a
+// triple integral costs about 0,3 s, and the start of a part is compared
+// with each line).
+const VALUES = new Map();
 function valueOf(cfg, node, n) {
   const e = expand(cfg, node, n);
   if (!contains(e, (x) => x.t === 'int' || x.t === 'lim')) {
     const q = exactValue(e);
     if (q) return { q, x: q.valueOf() };
   }
-  return { x: evalFloat(e, {}) };
+  const key = toText(e);
+  if (VALUES.has(key)) return { x: VALUES.get(key) };
+  const x = evalFloat(e, {});
+  if (VALUES.size >= 2000) VALUES.clear();
+  VALUES.set(key, x);
+  return { x };
 }
 
 const nsOf = (cfg) => {
@@ -78,7 +87,12 @@ function compare(cfg, a, b) {
 }
 
 export function sameValue(cfg, a, b) {
-  try { return compare(cfg, a, b).equal; } catch { return false; }
+  try {
+    // Step U6: a trap's candidate whose value is unknown (a primitive taken
+    // at ±∞ that diverges) matches no line.
+    if (nsOf(cfg).every((n) => !Number.isFinite(valueOf(cfg, a, n).x))) return false;
+    return compare(cfg, a, b).equal;
+  } catch { return false; }
 }
 
 // cfg.recurrence (with seq and param): the part asks for the recurrence

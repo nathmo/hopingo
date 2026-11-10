@@ -30,6 +30,10 @@
 // y′ = d(y) being the letter p (listed in cfg.vars). So (x·y + y³)′ =
 // y + x·y′ + 3y²·y′, and a line may write y′ or p. Target 'no-prime'
 // accepts y′ in a final line.
+// Step U6 (A2, part g): cfg.jac = {from, factor}: the start line `from` (an
+// integrand in x, y(, z), given in cfg.subst in the new variables) stands
+// for from·factor, the jacobian of the change of variables (r, r²·sin(θ)):
+// the line after it is the integrand in r, φ(, θ) with its jacobian.
 
 import { expandDerivs, hasDeriv, diff } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
@@ -289,6 +293,12 @@ function parseGoal(cfg) {
   return GOALS.get(cfg.goal);
 }
 const SUBSTS = new Map();
+// Step U6 (A2, part g): the start line of cfg.jac times its jacobian.
+export function withJac(cfg, prev) {
+  if (!cfg.jac) return prev;
+  const from = parse(cfg.jac.from, { vars: cfg.vars });
+  return sameLine(prev, from) ? { t: 'bin', op: '×', l: { t: 'paren', e: prev }, r: { t: 'paren', e: parse(cfg.jac.factor, { vars: cfg.vars }) } } : prev;
+}
 function substOf(cfg) {
   if (!cfg.subst) return null;
   const key = JSON.stringify(cfg.subst);
@@ -319,7 +329,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const map = substOf(cfg);
   const D = (n) => (cfg.defs ? expandFns(n, cfg.defs, cfg.vars?.[0] || 'x') : cfg.implicit ? implicitDerivs(n, cfg) : n);
   const S = (n) => (map ? substSyms(expandDerivs(D(n)), map) : expandDerivs(D(n)));
-  const r = equivalent(S(prev), S(node), opts);
+  const r = equivalent(S(withJac(cfg, prev)), S(node), opts);
   if (!r.equal) {
     const same = (cand, line) => equivalent(S(cand), S(line), opts).equal;
     const diag = diagnoseLine('equiv', prev, node, cfg, same);

@@ -32,6 +32,8 @@ const NICE = {
 function atomKey(x) {
   x = stripParen(x);
   if (x.t === 'const' && (x.name === 'pi' || x.name === 'e')) return x.name;
+  // Step U6 (A2, part g): √π, the Gauss integral.
+  if (x.t === 'sqrt' && stripParen(x.e).t === 'const' && stripParen(x.e).name === 'pi') return '√π';
   if (x.t === 'sqrt' || x.t === 'root') {
     const q = qOf(x.e);
     if (!q || q.d !== 1 || q.n < 2) return q && q.d !== 1 ? 'Écris la racine sans fraction dedans.' : null;
