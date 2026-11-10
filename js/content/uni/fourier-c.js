@@ -5,8 +5,11 @@
 // fourier-c-table.js, fourier-c-inv.js, fourier-c-ode.js.
 
 import { genTable, genAbscissa } from './fourier-c-table.js';
+import { genInvDes, genInvRes } from './fourier-c-inv.js';
 
 export const GEN = {
   'f-lap-table': genTable,
   'f-lap-abscissa': genAbscissa,
+  'f-lap-inv-des': genInvDes,
+  'f-lap-inv-res': genInvRes,
 };

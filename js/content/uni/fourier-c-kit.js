@@ -182,6 +182,21 @@ export function pfdText(parts, { table = false } = {}) {
   return sumT(terms);
 }
 
+// The terms of a sum written as text, split at the top-level + and −.
+export function topTerms(text) {
+  const out = [];
+  let depth = 0;
+  let cur = '';
+  for (const c of text) {
+    if (c === '(') depth++;
+    if (c === ')') depth--;
+    if (depth === 0 && (c === '+' || c === '-') && cur && !/[\^(]$/.test(cur)) { out.push(cur); cur = c === '-' ? '-' : ''; continue; }
+    cur += c;
+  }
+  if (cur) out.push(cur);
+  return out;
+}
+
 // ---------- judges ----------
 
 export const lap = (o) => ({ kind: 'transform', transform: 'laplace', v: 't', s: 'z', dir: 'forward', ...o });
