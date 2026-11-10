@@ -11,6 +11,7 @@ import { parse } from '../parse.js';
 import { walk, getAt, replaceAt, mapNode, stripParen, dependsOn, add, sub, mul, div, neg, pow, num, fn } from '../ast.js';
 import { diff } from '../diff.js';
 import { toMathML } from '../mathml.js';
+import { toText } from '../print.js';
 import { limit, targetOf } from '../limit.js';
 
 const M = (n) => toMathML(stripParen(typeof n === 'string' ? parse(n) : n));
@@ -40,22 +41,33 @@ function linDiff(node, v, special, info) {
   }
 }
 
-// One candidate: every d(…) of prev computed, with the wrong table entry.
+// Candidates: every d(…) of prev computed, with the wrong table entry for
+// one kind of term (each one in turn), then for all of them at once.
 function tableCandidates(prev, v, special) {
   const paths = [];
   walk(prev, (n, path) => {
     if (n.t === 'deriv' && n.v === v && n.n === 1) { paths.push(path); return false; }
     return true;
   });
-  const info = {};
-  let out = prev;
-  for (const path of paths) {
-    const d = getAt(prev, path);
-    let repl;
-    try { repl = linDiff(d.e, v, special, info); } catch { return []; }
-    out = replaceAt(out, path, par(repl));
-  }
-  return info.fired ? [{ node: out, ctx: { g: info.fired } }] : [];
+  const run = (only) => {
+    const info = {};
+    let out = prev;
+    const sp = (n, w) => (only === null || toText(stripParen(n)) === only ? special(n, w) : null);
+    for (const path of paths) {
+      const d = getAt(prev, path);
+      out = replaceAt(out, path, par(linDiff(d.e, v, sp, info)));
+    }
+    return info.fired ? { node: out, ctx: { g: info.fired } } : null;
+  };
+  // The terms the wrong entry applies to.
+  const keys = new Set();
+  for (const path of paths) walk(getAt(prev, path).e, (n) => { if (special(n, v)) keys.add(toText(stripParen(n))); return true; });
+  const out = [];
+  try {
+    for (const k of keys) { const c = run(k); if (c) out.push(c); }
+    if (keys.size > 1) { const c = run(null); if (c) out.push(c); }
+  } catch { return out; }
+  return out;
 }
 
 // aˣ (a constant, the exponent depends on x), eˣ and exp(u).
