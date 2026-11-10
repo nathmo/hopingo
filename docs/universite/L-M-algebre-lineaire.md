@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.1 matrices à paramètres (`cases`), complexes partout (`eigvec` avec `complex: true`), nœuds `det`, `tr`, `norm` ; §16.2 `rowops` avec `params` et `track: 'det' | 'lu'`, `span` avec `nested` et `affine`, `factor` avec `askCoef.convention`, `poly` avec paramètre λ, `ode` à inconnue vectorielle (M) ; §16.3 QCM à plusieurs réponses, QCM « réponse courte », contre-exemples (`matPair`, `matOne`…), `matrix` à cases symboliques, `plot`, au moins 2 exemples d'examen par module ; §16.4 familles nouvelles (`linear`, `logic`), tag C, réparation dans un autre module, pièges partagés (réutilise `g4_proj_no_square`, `g9_proof_by_example` ; `l_compose_order` et `l_lsq_normal_aat` servent aussi en A2 et M).
 
-Unité `alglin` · préfixe `l-` · pièges `l_` · Statut : L fait le 10 novembre 2026 (étape U3) ; M à faire (étape U8). Les cases à remplir des lignes guidées sont des cases de la grille (`cells`) ; le niveau 5 et les variantes `open` sont des items sans aide, en attendant le type `problem` (U4).
+Unité `alglin` · préfixe `l-` · pièges `l_` · Statut : L fait le 10 novembre 2026 (étape U3) ; M fait le 10 novembre 2026 (étape U8). Les cases à remplir des lignes guidées sont des cases de la grille (`cells`) ; le niveau 5 et les variantes `open` sont des items sans aide, en attendant le type `problem` (U4).
 
 > Ce fichier contient deux catalogues : **L** (algèbre linéaire de BA1, ci-dessous) et **M** (analyse matricielle, niveau BA4, plus bas). Chacun suit le gabarit du §15 du [README](README.md). Les briques communes (générateurs à l'envers, contre-exemples, QCM « coefficient ») sont décrites une seule fois, au début de L, et M les réutilise.
 
@@ -1502,7 +1502,7 @@ Barème : +1 juste, 0 vide, −1 faux. Hors examen, une réponse « faux » just
 
 # M. Analyse matricielle
 
-Unité `matrices` · préfixe `m-` · pièges `m_` · Statut : à faire
+Unité `matrices` · préfixe `m-` · pièges `m_` · Statut : fait le 10 novembre 2026 (étape U8, voir README §17)
 
 > **Portée : niveau BA4 seulement.** Ce module rassemble ce que les cours de BA4 utilisent sans le réenseigner. **Ne sont pas ici** et vont dans le plan séparé `plan-ba5-et-plus.md` : la forme d'état avec entrée et sortie (B, C, D), les fonctions de transfert, la commandabilité et l'observabilité, le placement de pôles (Ackermann) et les observateurs, l'équation de Lyapunov, l'ACP, le filtre de Kalman et la non-normalité. On garde seulement la matrice compagne d'une EDO **homogène** (x = (y ; ẏ), sans entrée), parce qu'elle relie les EDO de A2 aux systèmes x′ = Ax.
 >
@@ -1995,3 +1995,9 @@ Pièges suivis : `m_power_ratio`, `m_inverse_power_value`, `m_rayleigh_no_denomi
 - 3 : `span` avec `nested` et `affine`, `eigvec` avec `complex`, `rowops` avec `track: 'det'` existent. Pas de `track: 'lu'` : les ℓᵢⱼ sont dans les notes et dans L, jugée par `factor`. `askCoef = {label, path, convention?}` : le générateur fixe la convention dans l'énoncé et calcule le coefficient.
 - 5 : pas de plan `ba1-alglin-mt` : les problèmes `open` existent comme items en lignes sans aide ; le plan viendra avec le type `problem` (U4).
 - 12 : `examWeight: 0` veut dire « jamais tiré » (`sectionPool` de `js/engine/exam.js`).
+
+**Tranché à l'étape U8** (voir [README](README.md) §17) :
+- 4 : un nouveau juge, `odevec` (`js/judges/odevec.js`), lit des lignes vectorielles et matricielles dans la langue de `matexpr.js` : x(t) = c₁e^{λ₁t}v₁ + …, e^{At} = e^{λt}(I + tN), x_k = Σ cᵢλᵢᵏvᵢ. Une ligne vectorielle vérifie x′ = Ax (ou x_{k+1} = Ax_k) ; une ligne matricielle vérifie M(0) = I et M′ = AM. Les lignes « x = … ; y = … » restent au juge `ode` avec `system` (U6).
+- 6 : pas de plan d'examen propre à M. Chaque compétence a ses variantes (`mcq`, `tf`, et `coef` ou `open` quand le catalogue les donne). Le plan `ba4-numerique` de U9 reprendra `m-cholesky`, `m-power-method`, `m-rayleigh`, `m-norms`, `m-cond` et `m-svd-lowrank` par `extraSkills`.
+- 7 : M est construit avant N. Cholesky (exact dans `matrix.js`, flottant dans `linalg-float.js`), la puissance, Rayleigh, les normes et le conditionnement sont dans M ; N n'a qu'à s'y référer.
+

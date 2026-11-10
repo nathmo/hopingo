@@ -613,7 +613,7 @@ Chaque étape suit le même protocole :
 | **U5** (fait le 10 novembre 2026, voir §17) | `G-gymnase-2.md`, parties G4 et G10 | Juges `geom` et `conic`. Items `plot` (repère du plan d'algèbre). Arbre de décision des coniques. Plan `cms-controle`. | Réduction d'une conique jouable de bout en bout |
 | **U6** (fait le 10 novembre 2026, voir §17) | `A2-analyse-2.md` | `equiv` à plusieurs variables, juge `ode`, type `domain`. Plan `ba2-analyse2`. | Les 52 compétences avec leurs 90 pièges ; un examen blanc d'Analyse II complet et noté ; `a2-judges.test.js` vert |
 | **U7** | `G-gymnase-2.md`, partie G7 ; `P-probabilites.md` | `stats.js`, juges `prob` et `stat`, simulation (lancer 10 000 fois). Plans `ba3-proba` et `ba4-stat`. | |
-| **U8** | `L-M-algebre-lineaire.md`, partie M | `linalg-float.js` : SVD, exponentielle de matrice, normes, conditionnement ; Cholesky flottant (l'exact est dans `matrix.js` depuis U3). Juge `ode` vectoriel pour x′ = Ax. | M possède Cholesky, la puissance, Rayleigh, les normes et le conditionnement ; N s'en sert à U9 |
+| **U8** (fait le 10 novembre 2026, voir §17) | `L-M-algebre-lineaire.md`, partie M | `linalg-float.js` : SVD, exponentielle de matrice, normes, conditionnement ; Cholesky flottant (l'exact est dans `matrix.js` depuis U3). Juge `ode` vectoriel pour x′ = Ax. | M possède Cholesky, la puissance, Rayleigh, les normes et le conditionnement ; N s'en sert à U9 |
 | **U9** | `N-analyse-numerique.md` | `js/py/`, types `code`, `table` et `readtable`, juge `iter` avec ses `phi` (§16), `fp.js`. Plan `ba4-numerique`, qui reprend des compétences de M grâce à `extraSkills`. | Chaque compétence N a au moins un item `code` ou `readtable` |
 | **U10** | `VCF-analyse-3-4.md` | Juges `param`, `boundary`, `transform` ; résidus par séries de Laurent. Plans `ba3-analyse3` et `ba4-analyse4`. | |
 
@@ -1067,3 +1067,70 @@ Une unité, `analyse2` (A2, `#1098ad`) : les 52 compétences du catalogue et ses
 **Erreurs corrigées dans le catalogue.** `a2-diff-def` : x + y + xy sin(1/r) (2016 Q6) est différentiable mais pas C¹ ; le générateur prend une partie linéaire et une fraction homogène de degré 2. `a2-chain` : J_f = (2x + y, xe^y) n'est la jacobienne d'aucune fonction ; elle est remplacée par (2x + ye^y, x(1 + y)e^y), avec le même J_f(1, 0) = (2, 1) et la même réponse (4, 1).
 
 **Pas encore fait** : les dessins `plot` de régions (`a2-rn-topology`, `a2-rn-boundary`, `a2-domain-describe` : ensembles écrits, tableaux V/F et QCM) ; le type `match` (`a2-diff-implications` : QCM) ; un QCM à plusieurs réponses dans les leçons (`a2-rn-topology` : un QCM sur la classification entière) ; `series` à deux variables (Taylor par `jet`) ; quelques V/F dont le contre-exemple est une formule ou une fonction de deux variables hors de K1–K7 sont des QCM « Vrai / Faux ».
+
+### Ce que U8 (analyse matricielle, module M) a construit
+
+Une unité, `matrices` (M, `#3b5bdb`) : les 16 compétences du catalogue et ses 29 pièges, en quatre parties :
+- `matrices-a` : blocs et complément de Schur, rang 1 et projecteurs, décomposition spectrale, matrices définies positives ;
+- `-b` : Cholesky, gradient d'une forme quadratique, équations normales, Rayleigh ;
+- `-c` : puissance et puissance inverse, approximation de rang k, normes, conditionnement, Gershgorin ;
+- `-d` : x′ = Ax (modes, stabilité), e^{At}, x_{k+1} = Ax_k.
+
+Chaque partie a `matrices-<p>.skills.js`, `matrices-<p>.js` et ses fichiers d'aide (`matrices-a-kit.js`, `matrices-b-kit.js`, `-b-chol.js`, `-b-quad.js`, `-b-ray.js`, `matrices-c-power.js`, `-c-svd.js`, `-c-norms.js`, `-c-gersh.js`, `matrices-d-kit.js`). Elle a aussi ses pièges `rules/m<p>.js` (les `DEFS` ; la table du catalogue est `META` dans `rules/m.js`), ses contre-exemples `judges/m-examples-<p>.js` et son test `tests/uni-matrices-<p>.test.js`. `matrices.skills.js` range les compétences dans l'ordre du catalogue ; `matrices.js` donne un item `stub` à une compétence pas encore écrite. Les simplifications de chaque compétence sont dans son statut, dans le catalogue.
+
+**`js/cas/linalg-float.js`** (pour U9). Une matrice est un tableau de lignes de nombres ; chaque fonction accepte aussi des lignes de `Q` ou de textes (`toF`). Rien ne lance d'erreur sur une matrice singulière ou non définie positive : `solve`, `inv` et `cholesky` rendent `null`, `cond` rend `Infinity`.
+- Bases : `toF(A)`, `toFv(v)`, `identity(n)`, `zeros(m, n)`, `transpose`, `matmul`, `matvec`, `madd(A, B, s = 1)` (A + s·B), `mscale`, `dot`, `vnorm(x, p)`, `close(a, b, tol)`.
+- `norm(A, p = 2)` : `p` vaut 1 (colonnes), 2 (σ₁), `Infinity` ou `'inf'` (lignes), `'fro'`. `cond(A, p = 2)` : ‖A‖·‖A⁻¹‖, et σmax/σmin pour p = 2.
+- `lu(A)` → `{L, U, perm, sign}` (pivot partiel, PA = LU) ; `solve(A, b)` (b vecteur ou matrice) ; `inv(A)` ; `det(A)`.
+- `cholesky(A)` → L (A = LLᵀ, diagonale > 0) ou `null` ; `choleskySolve(L, b)` (Ly = b, puis Lᵀx = y).
+- `eigSym(A)` → `{values, vectors}` (Jacobi ; valeurs croissantes, vecteurs propres orthonormés en colonnes) ; `eig(A)` → `[{re, im}]` par module décroissant (racines du polynôme caractéristique, n ≤ 8) ; `charpolyF(A)` (det(λI − A), Faddeev-LeVerrier) ; `spectralRadius(A)`.
+- `svd(A)` → `{U, S, V}` (Jacobi à un côté ; p = min(m, n) : U est m × p, S décroissant, V est n × p, et A = U·diag(S)·Vᵀ) ; `singularValues`, `rank(A, tol?)`, `lowRank(A, k)` → `{Ak, err2, errF, S}` (Eckart-Young).
+- `expm(A, t = 1)` : e^{At} par mise à l'échelle et élévation au carré, avec une série de Taylor.
+- `rayleigh(A, x)` ; `powerMethod(A, y0, {steps, tol, normalize: 'max' | '2', shift, inverse})` → `{value, vector, iterations: [{k, y, z, mu}], converged}`. La normalisation du cours est `'max'` : μ est la composante de z de plus grand module et y_{k+1} = z/μ. `inversePower(A, y0, shift)` résout (A − σI)z = y et rend σ + 1/μ.
+- `gershgorin(A, 'rows' | 'cols')` → `[{center, radius}]`.
+
+`tests/linalg-float.test.js` les compare à des résultats connus : la SVD redonne A, la puissance converge vers la valeur propre dominante, κ₂ = σmax/σmin, et e^{At} est juste dans les cas diagonalisable, nilpotent et valeur propre double.
+
+**Juges.**
+- `odevec` (`JUDGES` gagne `odevec`, fin de `judges/index.js`). Config : `{A, v?, discrete?, x0?, want: 'expm' | 'solution' | 'general', names?, domain?}`. C'est la forme vectorielle du juge `ode` pour x′ = Ax et x_{k+1} = Ax_k. Une ligne est un vecteur ou une matrice entière, dans la langue de `matexpr.js`, saisie dans la grille (`input = 'matrix'`).
+  - Chaque ligne est jugée contre l'équation, pas contre la ligne précédente. Un vecteur doit vérifier x′ = Ax en 10 instants (en k = 0 à 6 pour un système discret). Avec les constantes c_1 … c_n, il en faut n indépendantes, et la ligne est rangée comme solution générale ; sans constante, il doit vérifier x(0) = x0.
+  - Une matrice doit vérifier M(0) = I et M′ = AM.
+  - Une ligne « c_1 = 3 ; c_2 = −2 » donne les constantes : avec elles, la solution générale doit vérifier x(0).
+  - Forme finale : la matrice ou le vecteur écrit (un littéral, ou une somme de scalaires fois des littéraux), sans I ni matrice nommée.
+  - Les pièges reçoivent des lignes rebâties par `lineOf(cfg, texte)`, comparées par leurs valeurs (`sameLine`).
+  - `ode` avec `system` (U6) garde les lignes en composantes.
+- Tableaux : `phi {kind: 'power', A, y0, shift?, inverse?, tol?}` (`judges/iter-power.js`, une ligne dans `checkTable`).
+  - Chaque ligne k a les cases y_k, z_k = Ay_k (ou la solution de (A − σI)z = y_k) et μ_k. Chaque case est jugée à partir des cases de l'élève : y_{k+1} = z_k/μ_k, et μ_k est la composante de z_k de plus grand module.
+  - Les fractions sont exactes ; un décimal est accepté à `tol` près (relatif, 1e−6). Les fractions passent en flottants quand elles deviennent trop grandes.
+  - Messages pour une division par la norme et pour un μ pris sur la mauvaise composante. Un z calculé avec A dans la puissance inverse nomme `m_inverse_power_value`.
+  - `powerRows(phi, steps)` donne le tableau de référence.
+- `matexpr.js` lit `e` (la constante, sauf si l'item déclare une lettre e), `e^t` (un scalaire à la puissance t ; une matrice à la puissance t reste Aᵀ) et `exp(…)` d'un scalaire. Une matrice 1 × 1 (une ligne fois une colonne) vaut un nombre dans `sameValue` et `madd`, pour qu'un complément de Schur 1 × 1 s'écrive « 3 ».
+- Contre-exemples : sorte `mx` (`judges/m-examples.js`, une ligne dans `checkCounter`), `{kind: 'mx', prop, params, ask: [{v, label, shape?}], answer}`. Une demande avec `shape` se saisit dans la grille. Chaque partie a ses propriétés :
+  - a : `schurDetA22`, `projNotInvertible`, `symNegEig`, `minorsNotSemidef` ;
+  - b : `symInvNoChol`, `gradNot2Mx`, `rayleighOutside`, `varNotXtX` ;
+  - c : `powerDominant`, `powerFails`, `norm1NeInf`, `frobNeTwo`, `smallDetGoodCond`, `condNotEigRatio`, `lowRankNotZeroing`, `frobNotSigma`, `gershEmptyDisc` ;
+  - d : `absLessOneUnstable`, `traceNegUnstable`, `reNegDiscreteUnstable`, `expSumFails`, `expEntrywise`.
+  Les sortes de L (`matOne`, `matPair`) servent aussi.
+
+**Pièges.** Ils lisent des champs que les générateurs mettent dans la config du juge. L'en-tête de chaque `rules/m<p>.js` les décrit :
+- a : `schur`, `householder`, `spectral` (lignes `mat`) ;
+- b : `chol`, `nvar`, `rayleigh` (lignes `value`) et `qgrad` (lignes `mat`) ;
+- c : `speed`, `invpow`, `lowrank`, `mnorm`, `mcond`, `gersh` (lignes `value`) ;
+- d : `companion` (`mat`) et `modes` (`odevec`).
+
+Les pièges de stabilité (`m_stab_*`), de Sylvester et `m_cond_det` sont des options fausses de décisions, de QCM ou de vrai/faux. Les textes `explainText` de `META` sont en HTML.
+
+**Parcours.** `p-lin-combo` (module P, étape U7, construite en parallèle) est un prérequis de `m-normal-eq`. Jusqu'à la fusion de P, elle passe par `UNBUILT` (fin de `content/uni/index.js`), avec `a1-int-direct`, `a1-improper-calc` et `a1-ser-geo-tele`. Cette ligne ne s'applique que si P n'est pas construit, et la fusion peut la retirer. Le piège `p_reg_sigma_n` (P) n'est proposé comme option de `m-normal-eq` que si `RULE_BY_ID` le connaît : il s'active seul après la fusion.
+
+**Mode examen.** Aucun plan (lacune 6). Variantes `mcq` et `tf` partout. `coef` pour `m-blocks-schur`, `m-rank1-proj`, `m-cholesky` et `m-expm`. `open` (problèmes) pour :
+- `m-cholesky` : exemple d'examen 2, 7 points ;
+- `m-power-method` : exemple d'examen 3, 7 points ;
+- `m-expm` : exemple d'examen 1, 10 points.
+
+**Tests.** `tests/linalg-float.test.js`, `tests/m-judges.test.js` (`odevec`, tableaux de la puissance), un fichier par partie (`uni-matrices-a` … `-d`, 20 ou 40 items par niveau, quelques secondes chacun).
+
+**Pas encore fait :**
+- `readtable` et `code` (U9) : le niveau 5 de `m-power-method` et celui de `m-cond` montrent un tableau dans l'énoncé, puis des lignes ;
+- `plot` de régions : les disques de Gershgorin sont écrits D(centre ; rayon) ;
+- quelques gabarits du catalogue, nommés dans les statuts : Cholesky tridiagonale, somme de carrés de `m-posdef`, inégalités de normes, preuve en blocs de `m-blocks-schur`, U au niveau 4 de `m-svd-lowrank`.
+
