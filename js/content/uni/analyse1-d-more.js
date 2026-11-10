@@ -333,7 +333,7 @@ function raTexts(d) {
     return out;
   }
   if (d.kind === 'D') {
-    const Qf = `(${lin(d.a)})^2${pf(lin(d.b))}`;
+    const Qf = d.b === 0 ? `x(${lin(d.a)})^2` : `(${lin(d.a)})^2${pf(lin(d.b))}`;
     out.f = `${wrap(ptext(d.P))}/(${Qf})`;
     out.Qexp = ptext(pmul(pmul([q(-d.a), q(1)], [q(-d.a), q(1)]), [q(-d.b), q(1)]));
     out.fexp = `${wrap(ptext(d.P))}/(${out.Qexp})`;
@@ -479,7 +479,15 @@ function raMcq(rng) {
       solution: [{ html: `${MT(T.des)} ; ${MT(T.split)}`, note: '' }],
     }, rng);
   }
-  return null;
+  return mcq({
+    skill: RA, level: 4, prompt: `${MT('int((x+5)/((x-1)(x^2+2x+5)),x)')} =`, key: 'mcq:fallback', exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: true,
+    options: [
+      { html: MT('(3/4)ln(|x-1|)-(3/8)ln(x^2+2x+5)-(1/4)arctan((x+1)/2)+C'), correct: true },
+      { html: MT('(3/4)ln(|x-1|)-(3/8)ln(x^2+2x+5)-(1/2)arctan(x+1)+C'), correct: false, rule: 'a1_arctg_scale' },
+      { html: MT('(3/4)ln(|x-1|)-(7/8)ln(x^2+2x+5)+C'), correct: false, rule: 'a1_int_arctg_as_log' },
+      { html: MT('ln(|(x-1)(x^2+2x+5)|)+C'), correct: false, rule: 'a1_int_log_of_denominator' },
+    ],
+  }, rng);
 }
 
 GEN_[RA] = (level, rng, profile, opts = {}) => (opts.exam === 'mcq' ? raMcq(rng) : raItem(level, rng, opts));

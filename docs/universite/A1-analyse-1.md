@@ -1168,6 +1168,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-int-direct` — Primitives immédiates : u′/u, u′·uʳ, u′/(1 + u²), u′·eᵘ
 - **Année** 13 · **Prérequis** `g6-antideriv-usual`, `a1-deriv-rules` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). Une primitive commence par une courte partie « u′ = … » jugée par `equiv` (le test des items refuse « dernière ligne + 1 » sur la première partie, ce qu'une primitive F + C + 1 ne permet pas) ; niveaux 4 et 5 : intégrales définies, et le niveau 5 est une seule intégrale (pas 4 intégrales mélangées). Le QCM porte sur une primitive (les distracteurs : facteur de u′, Arctg pris pour un Log, + C oublié) ; `g6_antideriv_power_minus_one` (partie g6b) n'y est pas.
 - **Intro** : avant toute méthode, on cherche une dérivée cachée : `∫ u′/u = Log|u|`, `∫ u′·uʳ = uʳ⁺¹/(r + 1)` (r ≠ −1), `∫ u′/(1 + u²) = Arctg u`, `∫ u′·eᵘ = eᵘ`, `∫ u′/√(1 − u²) = Arcsin u`. Il manque souvent une constante : on l'ajuste.
 - **Juge** : décision (convention 4) puis `antideriv` `{v:'x', f}` ; pour une intégrale définie, `definite` `{value}` · **Forme finale** : primitive sans ∫ avec `+ C`, ou valeur exacte.
 - **Niveaux** :
@@ -1189,6 +1190,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-int-subst` — Changement de variable : choisir φ, changer dx et les bornes
 - **Année** 13 · **Prérequis** `a1-int-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). La ligne « dx = … » est une première partie `equiv` (dx/dt) pour une primitive ; pour une intégrale définie, dx et les bornes sont des trous de la ligne en t au niveau 1. Gabarits k/(√x(a + √x)), k/(√x(a² + x)), Log x/(x√(Log²x + m)), x/√(x + a) ; le QCM reprend l'examen 2019 (pas celui de 2018).
 - **Intro** : on pose t = φ⁻¹(x) (ou x = φ(t), φ bijective) ; on remplace **dx** (dx = φ′(t) dt) et, pour une intégrale définie, **les bornes**. La difficulté est de **choisir** φ : racine → t = √(…) ; Log x et 1/x → t = Log x ; √(1 − x²) → x = sin t ; √(1 + x²) → x = sinh t.
 - **Juge** : décision avec saisie `then:{ask:'t =', judge:'equiv'}` (rangée dans `state`) ; ligne « dx = … » par `equiv` ; lignes en t par `definite` (même valeur) ou `antideriv` (dérivée par rapport à x après retour) ; bornes par `value` · **Forme finale** : valeur exacte, ou primitive en x avec `+ C`.
 - **Niveaux** :
@@ -1212,6 +1214,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-int-parts` — Intégration par parties
 - **Année** 13 · **Prérequis** `a1-int-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). P(x)·e^(ax) (degré 1 ou 2), (αx + β)·sin ou cos(ax), xⁿ·Log x, Arctg x et x·Arctg x, eˣ·sin(bx) (niveau 3) ; les niveaux 4 et 5 sont des intégrales définies sans limite. Le V/F du terme de bord est un QCM Vrai/Faux (aucun vérificateur ne prend une paire de fonctions) ; les autres énoncés faux ont un contre-exemple b.
 - **Intro** : `∫ u·v′ = u·v − ∫ u′·v`. On dérive ce qui se simplifie (polynôme, Log, Arctg) et on intègre ce qui reste stable (eᵃˣ, sin, cos). Avec eˣ·sin x, deux parties font revenir l'intégrale de départ : on la résout comme une équation.
 - **Juge** : décision `{then:{ask:'u =', judge:'equiv'}}` ; `antideriv` `{v:'x', f}` (une ligne peut contenir des ∫ restantes) ; `definite` pour les bornes · **Forme finale** : primitive sans ∫ avec `+ C`, ou valeur.
 - **Niveaux** :
@@ -1235,6 +1238,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-int-reduction` — Formules de récurrence Iₙ
 - **Année** 13 · **Prérequis** `a1-int-parts`, `g5-induction-frame` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Familles ∫₀¹ xⁿe^(ax) (a = 1, 2, −1) et ∫₁ᵉ (Log x)ⁿ, Wallis au niveau 5 ; pas de ∫ xⁿ sin(bx). La récurrence est jugée par `definite` avec `seq`, `param` et l'option `recurrence` ajoutée en U2 (une ligne Jₙ = A − c·Jₙ₋₁ est finale) ; Jₖ se remonte en une chaîne de lignes jusqu'à J₀.
 - **Intro** : une IPP (parfois deux) exprime Iₙ en fonction de Iₙ₋₁ ou Iₙ₋₂. On calcule I₀ (et I₁), puis on remonte. Exemple : `Jₙ = ∫₀¹ xⁿeˣ dx = e − n·Jₙ₋₁`, J₀ = e − 1.
 - **Juge** : décision « IPP avec u = xⁿ » ; la ligne de récurrence (« Iₙ = … Iₙ₋₁ ») est jugée par `definite` avec `{value, param:'n', nRange:[1, 6]}` : l'identité est testée pour n = 1 à 6 par quadrature (extension E4) ; I₀ et les valeurs par `definite` · **Forme finale** : formule de récurrence, I₀, et la valeur Iₖ demandée.
 - **Niveaux** :
@@ -1258,6 +1262,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-int-rational` — Fractions rationnelles : DES, y compris avec un facteur irréductible
 - **Année** 13 · **Prérequis** `g0-pfd-general`, `a1-int-direct`, `g0-long-div` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-int-direct` : primitives Log et Arctg des éléments simples.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Coefficients entiers (le corrigé type, avec des quarts, est l'exemple de secours du QCM) ; la DES est une première partie `equiv` (cible `partial-fractions`), sans ligne séparée « A = … » ; le niveau 5 est une intégrale définie sur [a + 1 ; a + 2], pas l'intégrale généralisée de `a1-improper-rational`.
 - **Intro** : (1) si deg P ≥ deg Q, division euclidienne ; (2) factoriser Q sur ℝ ; (3) DES : `A/(x − a)`, `B/(x − a)²`, `(Cx + D)/(x² + px + q)` avec Δ < 0 ; (4) intégrer : Log pour les premiers, et pour le facteur irréductible on sépare `Cx + D = (C/2)(2x + p) + E`, ce qui donne un Log et un Arctg après avoir complété le carré.
 - **Juge** : décision ; `equiv` pour la factorisation et la DES (identité de fractions) ; `antideriv` `{v:'x', f}` ou `definite` · **Forme finale** : primitive avec `+ C` (Log et Arctg), ou valeur exacte.
 - **Niveaux** :
@@ -1283,6 +1288,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-int-trig` — Fractions rationnelles en sin et cos : Bioche et t = tan(x/2)
 - **Année** 13 · **Prérequis** `a1-int-rational`, `a1-int-subst`, `g3-bioche` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-int-subst` : changer dx et les bornes avec t.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Bioche par x → −x et x → π − x (sinᵐx·R(cos x), m = 1 ou 3, et l'inverse), t = tan(x/2) pour 1/(a + b cos x) et k/sin x ; ni x → π + x ni linéarisation. Le niveau 5 et la variante `open` sont une intégrale définie de ces gabarits (pas l'intégrale du CMS) ; les intégrales définies par tan(x/2) prennent a = 5, b = ±3 ou ±4, pour des coefficients rationnels.
 - **Intro** : règles de Bioche : si l'intégrande·dx est invariant par x → −x, poser t = cos x ; par x → π − x, t = sin x ; par x → π + x, t = tan x. Sinon, t = tan(x/2) marche toujours : `sin x = 2t/(1 + t²)`, `cos x = (1 − t²)/(1 + t²)`, `dx = 2 dt/(1 + t²)`, mais le calcul est plus long. Pour sin², cos² seuls : linéariser.
 - **Juge** : décision ; `antideriv` `{v:'x', f}` (le retour en x est vérifié par dérivation) ; `definite` si bornes · **Forme finale** : primitive en x avec `+ C`, ou valeur.
 - **Niveaux** :
@@ -1306,6 +1312,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-int-hyper` — sinh et cosh dans les intégrales
 - **Année** 13 · **Prérequis** `a1-int-subst`, `g2-hyp-formulas` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). 1/√(x² + a²) et 1/√(x² − a²) (primitive, ou bornes où Argsh et Argch valent Log 2, 3 ou 5), cosh²x et sinh²x linéarisés, et au niveau 5 l'intégrale généralisée de 2018 ∫ eˣ/(e²ˣ − 1) dx (bornes Log 2, Log 3 ou 1) ; ni √(x² + a²) ni 1/(2 + cosh x), qui n'est que dans le V/F.
 - **Intro** : `cosh² − sinh² = 1`. √(x² + a²) → x = a·sinh t ; √(x² − a²) → x = a·cosh t (t ≥ 0). `Argsh x = Log(x + √(x² + 1))`. Avec eˣ partout, poser t = eˣ ramène à une fraction rationnelle.
 - **Juge** : décision ; `antideriv` `{v:'x', f}` ; `definite` · **Forme finale** : primitive en x (Argsh ou Log acceptés, comparés par dérivation), ou valeur.
 - **Niveaux** :
