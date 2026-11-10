@@ -148,6 +148,11 @@ const TESTS_PAIR = {
     });
     return !fits || 'Ici, les valeurs propres de A + B sont bien des sommes : choisis A et B sans vecteurs propres communs.';
   },
+  // section mat
+  'A,B inv⇒A+B inv': ({ A, B }) => {
+    if (MX.det(A).n === 0 || MX.det(B).n === 0) return 'A et B doivent être inversibles.';
+    return MX.det(MX.add(A, B)).n === 0 || 'Ici A + B est inversible.';
+  },
 };
 
 const WANT_ONE = {
@@ -276,6 +281,8 @@ const WANT_ONE = {
     const same = ka.length === kb.length && (ka.length === 0 || MX.rank(MX.fromCols([...ka, ...kb])) === ka.length);
     return !same || 'Les lignes de A et de B ont ici les mêmes relations.';
   },
+  // section mat
+  singular: ({ A }) => (!sq(A) ? 'A doit être carrée.' : MX.det(A).n === 0 || 'Cette matrice est inversible.'),
 };
 
 // (λ − r)·P, P as coefficients from λ⁰.

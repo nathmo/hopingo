@@ -914,8 +914,162 @@ function geomExam(rng, exam) {
 }
 
 // ======================================================================
+// l-mat-imt
+// ======================================================================
+
+const IMT = 'l-mat-imt';
+const IMT_SUB = [
+  { id: 'pivots', label: 'pivots', skill: 'l-sys-pivots-theory' },
+  { id: 'equiv', label: 'équivalence', skill: IMT },
+];
+
+// Statements « always true? »: [statement, explanation, pivot hint].
+const SQ_TRUE = [
+  ['Si A est n × n et que ses colonnes sont libres, alors Ax = b a une solution pour tout b ∈ ℝⁿ.', 'Vrai : colonnes libres, c\'est n pivots. A est carrée, donc il y a aussi un pivot dans chaque ligne : Ax = b a une solution (unique) pour tout b.', 'nombre de pivots = □ sur n colonnes et n lignes'],
+  ['Si A est 3 × 3 et que Ax = 0 a une infinité de solutions, alors les colonnes de A n\'engendrent pas ℝ³.', 'Vrai : une infinité de solutions, c\'est une variable libre, donc moins de 3 pivots. Une ligne n\'a pas de pivot : les colonnes n\'engendrent pas ℝ³.', 'nombre de pivots = □ sur 3'],
+  ['Si A est n × n et que x ↦ Ax est injective, alors x ↦ Ax est surjective.', 'Vrai : injective, c\'est un pivot dans chaque colonne, donc n pivots ; A est carrée, donc un pivot dans chaque ligne : surjective.', 'nombre de pivots = □ sur n'],
+  ['Si A est n × n et que Aᵀ est inversible, alors les lignes de A sont libres.', 'Vrai : les lignes de A sont les colonnes de Aᵀ, qui sont libres puisque Aᵀ est inversible.', 'Aᵀ inversible : ses □ sont libres'],
+  ['Si A et B sont n × n et que AB = I, alors BA = I.', 'Vrai pour des matrices carrées : Bx = 0 donne x = ABx = 0, donc B est inversible (théorème), A = B⁻¹ et BA = I.', 'Bx = 0 ⇒ x = □'],
+  ['Si A et B sont n × n et que AB est inversible, alors A est inversible.', 'Vrai : avec C = (AB)⁻¹, A(BC) = I et A est carrée, donc A est inversible.', 'A(BC) = □'],
+  ['Si A est n × n et a deux colonnes égales, alors A n\'est pas inversible.', 'Vrai : deux colonnes égales sont liées, donc A n\'a pas n pivots.', 'nombre de pivots < □'],
+  ['Si 0 est valeur propre de la matrice carrée A, alors A n\'est pas inversible.', 'Vrai : Av = 0 avec v ≠ 0, donc Ax = 0 a une solution non nulle.', 'Av = □ avec v ≠ 0'],
+  ['Si A est n × n et que Ax = b a une solution unique pour un certain b, alors A est inversible.', 'Vrai : solution unique, donc aucune variable libre, donc n pivots ; A est carrée, donc inversible.', 'nombre de pivots = □ sur n'],
+];
+const SINGULAR = [[[1, 2], [2, 4]], [[1, 1], [1, 1]], [[0, 0], [0, 0]], [[1, 0], [0, 0]], [[2, 1], [4, 2]]];
+const SQ_FALSE = [
+  (rng) => {
+    const A = rng.pick(SINGULAR);
+    return {
+      statement: 'Si A est n × n et que Ax = b a une solution pour un certain b, alors A est inversible.',
+      counter: { kind: 'matOne', params: { want: 'singular' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)) } },
+      explanation: `Faux : avec b = 0, Ax = b a toujours la solution x = 0. Une matrice non inversible comme ${MLm(MX.mat(A))} convient.`,
+      hint: 'avec b = □, il y a toujours une solution',
+    };
+  },
+  (rng) => {
+    const A = rng.pick([[[1, 0], [0, 1]], [[1, 1], [0, 1]], [[2, 1], [1, 1]]]);
+    const B = MX.scale(MX.mat(A), -1);
+    return {
+      statement: 'Si A et B sont des matrices n × n inversibles, alors A + B est inversible.',
+      counter: pairCounter('A,B inv⇒A+B inv', [A, B.map((r) => r.map((x) => x.valueOf()))]),
+      explanation: `Faux : A = ${MLm(MX.mat(A))} et B = −A sont inversibles, mais A + B = 0 ne l'est pas.`,
+      hint: 'essaie B = □A',
+    };
+  },
+  (rng) => {
+    const pr = rng.pick(INV_PAIRS);
+    return {
+      statement: 'Si S et T sont des applications linéaires inversibles de ℝⁿ dans ℝⁿ, de matrices canoniques A et B, alors B⁻¹A⁻¹ est la matrice canonique de (T ∘ S)⁻¹.',
+      counter: pairCounter('(AB)^-1=A^-1B^-1', pr), ruleIfTrue: 'l_inv_product_order',
+      explanation: `Faux : T ∘ S a pour matrice BA (S d'abord, donc A à droite), et (BA)⁻¹ = A⁻¹B⁻¹, qui diffère de B⁻¹A⁻¹ si A et B ne commutent pas : A = ${MLm(MX.mat(pr[0]))}, B = ${MLm(MX.mat(pr[1]))}.`,
+      hint: 'la matrice de T ∘ S est □',
+    };
+  },
+  (rng) => {
+    const A = rng.pick(SINGULAR.slice(0, 2).concat([[[1, 2], [1, 2]]]));
+    return {
+      statement: 'Si A est n × n et qu\'aucune colonne de A n\'est nulle, alors A est inversible.',
+      counter: { kind: 'matOne', params: { want: 'singular' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)) } },
+      explanation: `Faux : ${MLm(MX.mat(A))} a des colonnes non nulles mais liées : un seul pivot.`,
+      hint: 'des colonnes non nulles peuvent être □',
+    };
+  },
+];
+// Statements on m × n matrices (m ≠ n allowed): false, with sizes for a counter-example.
+const NS_FALSE = [
+  ['Si A est m × n et que ses colonnes sont libres, alors A est inversible.', ['r=n', 'm>n'], 'Seule une matrice carrée peut être inversible'],
+  ['Si A est m × n et que ses colonnes sont libres, alors Ax = b a une solution pour tout b ∈ ℝᵐ.', ['r=n', 'm>n'], 'Colonnes libres : n pivots, mais il en faudrait m pour avoir une solution pour tout b'],
+  ['Si A est m × n et que Ax = b a une solution pour tout b ∈ ℝᵐ, alors Ax = 0 n\'a que la solution nulle.', ['r=m', 'n>m'], 'Un pivot par ligne, c\'est m pivots ; avec n > m colonnes, il reste des variables libres'],
+  ['Si A est m × n et que x ↦ Ax est injective, alors x ↦ Ax est surjective.', ['r=n', 'm>n'], 'Injective : n pivots ; surjective demande m pivots'],
+  ['Si les colonnes d\'une matrice A de taille m × n engendrent ℝᵐ, alors elles sont libres.', ['r=m', 'n>m'], 'Engendrer ℝᵐ : m pivots ; libres demande n pivots'],
+  ['Si A est m × n avec un pivot dans chaque ligne, alors x ↦ Ax est injective.', ['r=m', 'n>m'], 'Un pivot par ligne donne la surjectivité ; l\'injectivité demande un pivot par colonne', 'l_inj_rows'],
+];
+const exampleOf = (m, n) => MX.mat(Array.from({ length: m }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))));
+// Sizes m ≠ n: true statements read on the pivots.
+const NS_TRUE = [
+  (m, n) => (m < n ? [`Si A est ${m} × ${n}, alors Ax = 0 a une infinité de solutions.`, `Vrai : au plus ${m} pivots pour ${n} colonnes, donc au moins ${n - m} variable${n - m > 1 ? 's' : ''} libre${n - m > 1 ? 's' : ''}.`] : null),
+  (m, n) => (m < n ? [`Si A est ${m} × ${n}, alors x ↦ Ax n'est pas injective.`, `Vrai : au plus ${m} pivots pour ${n} colonnes : une colonne n'a pas de pivot.`] : null),
+  (m, n) => (m > n ? [`Si A est ${m} × ${n}, alors x ↦ Ax n'est pas surjective.`, `Vrai : au plus ${n} pivots pour ${m} lignes : une ligne n'a pas de pivot.`] : null),
+  (m, n) => (m > n ? [`Si A est ${m} × ${n}, alors ses colonnes n'engendrent pas ℝ${'⁰¹²³⁴⁵⁶'[m]}.`, `Vrai : ${n} vecteurs ne peuvent pas engendrer ℝ${'⁰¹²³⁴⁵⁶'[m]}, il faut au moins ${m} pivots.`] : null),
+  (m, n) => (m !== n ? [`Une matrice ${m} × ${n} n'est jamais inversible.`, 'Vrai : seule une matrice carrée peut avoir un inverse des deux côtés.'] : null),
+];
+const IMT_HINT1 = 'La matrice est-elle carrée ? Sinon, le théorème de la matrice inversible ne s\'applique pas : compte les pivots par ligne et par colonne.';
+
+function imtTf(level, rng, kind, exam) {
+  const base = { skill: IMT, level, exam: exam ? examTag({ exam }) : false, noHints: level === 5 || !!exam };
+  const hints = (h2, expl) => [{ level: 1, html: IMT_HINT1 }, { level: 2, html: h2 }, { level: 3, html: expl }];
+  const sg = { subgoals: IMT_SUB };
+  if (kind === 'sqTrue') {
+    const k = rng.int(0, SQ_TRUE.length - 1);
+    const [st, ex, h] = SQ_TRUE[k];
+    return { ...tfL({ ...base, key: `sq:${k}`, truth: true, statement: st, explanation: ex, hints: hints(h, ex) }), ...sg };
+  }
+  if (kind === 'sqFalse') {
+    const k = rng.int(0, SQ_FALSE.length - 1);
+    const f = SQ_FALSE[k](rng);
+    return { ...tfL({ ...base, key: `sqf:${k}:${f.counter.answer.A}`, truth: false, statement: f.statement, counter: f.counter, explanation: f.explanation, ruleIfTrue: f.ruleIfTrue || null, hints: hints(f.hint, f.explanation) }), ...sg };
+  }
+  if (kind === 'nsFalse') {
+    const k = rng.int(0, NS_FALSE.length - 1);
+    const [st, conds, why, rule] = NS_FALSE[k];
+    const [m, n] = conds[1] === 'm>n' ? rng.pick([[3, 2], [4, 3], [4, 2]]) : rng.pick([[2, 3], [3, 4], [2, 4]]);
+    const r = Math.min(m, n);
+    const ex = `Faux si A n'est pas carrée. ${why}. Par exemple A = ${MLm(exampleOf(m, n))}, de taille ${m} × ${n} et de rang ${r}.`;
+    return {
+      ...tfL({
+        ...base, key: `ns:${k}:${m}${n}`, truth: false, statement: st, explanation: ex, ruleIfTrue: rule || 'l_imt_nonsquare',
+        counter: { kind: 'dims', params: { conds }, ask: [{ v: 'm', label: 'm =' }, { v: 'n', label: 'n =' }, { v: 'r', label: 'rang r =' }], answer: { m: String(m), n: String(n), r: String(r) } },
+        hints: hints(`nombre de pivots ≤ min(m, n) ; ici, il faudrait ${conds.join(' et ').replace(/r=/g, 'r = ').replace(/>/g, ' > ')}`, ex),
+      }),
+      ...sg,
+    };
+  }
+  // nsTrue
+  for (;;) {
+    const [m, n] = rng.pick([[2, 3], [3, 5], [3, 4], [4, 3], [5, 3], [4, 2], [2, 4]]);
+    const f = rng.pick(NS_TRUE)(m, n);
+    if (!f) continue;
+    return { ...tfL({ ...base, key: `nst:${f[0]}`, truth: true, statement: f[0], explanation: f[1], ruleIfFalse: null, hints: hints(`nombre de pivots ≤ min(${m}, ${n}) = ${Math.min(m, n)}`, f[1]) }), ...sg };
+  }
+}
+
+const EQUIV = ['A a n pivots', 'Ax = 0 n\'a que la solution x = 0', 'Les colonnes de A sont libres', 'Les colonnes de A engendrent ℝⁿ', 'x ↦ Ax est injective', 'x ↦ Ax est surjective', 'Aᵀ est inversible', 'det A ≠ 0', '0 n\'est pas valeur propre de A', 'Ax = b a une solution unique pour tout b', 'Les lignes de A sont libres'];
+const NOT_EQUIV = ['A n\'a aucun coefficient nul', 'A est symétrique', 'det A = 1', 'A est diagonale', 'Ax = b a une solution pour un certain b', 'Aucune colonne de A n\'est nulle', 'A ≠ 0', 'La diagonale de A n\'a pas de 0', 'A² = A'];
+
+function imtMcq(level, rng, exam) {
+  const not = exam === 'mcq';
+  const right = rng.pick(not ? NOT_EQUIV : EQUIV);
+  const wrongs = rng.shuffle([...(not ? EQUIV : NOT_EQUIV)]).slice(0, 3).map((html) => ({ html, rule: null }));
+  return {
+    ...mcqDistinct({
+      skill: IMT, level, key: `mcq:${not ? 'not' : 'eq'}:${right}`, exam: exam ? examTag({ exam }) : false,
+      prompt: not
+        ? 'A est une matrice carrée n × n. Lequel de ces énoncés <b>n\'est pas</b> équivalent à « A est inversible » ?'
+        : 'A est une matrice carrée n × n. Lequel de ces énoncés est équivalent à « A est inversible » ?',
+      right, wrongs,
+      solution: [{ html: not ? `« ${right} » ne suffit pas : une matrice peut le vérifier sans être inversible (ou être inversible sans le vérifier).` : `« ${right} » fait partie du théorème de la matrice inversible.`, note: '' }],
+    }, rng),
+    subgoals: IMT_SUB,
+  };
+}
+
+function imtItem(level, rng) {
+  if (level === 1) return imtMcq(1, rng);
+  if (level === 2) return imtTf(2, rng, rng.pick(['sqTrue', 'sqTrue', 'sqFalse']));
+  if (level === 3) return imtTf(3, rng, rng.pick(['nsFalse', 'nsFalse', 'nsTrue']));
+  if (level === 4) return imtTf(4, rng, rng.pick(['sqFalse', 'nsFalse']));
+  return imtTf(5, rng, rng.pick(['sqTrue', 'sqFalse', 'nsFalse', 'nsTrue']));
+}
+
+function imtExam(rng, exam) {
+  if (exam === 'mcq') return imtMcq(4, rng, exam);
+  return imtTf(4, rng, rng.pick(['sqTrue', 'sqFalse', 'sqFalse', 'nsFalse', 'nsTrue']), exam);
+}
+
+// ======================================================================
 
 export const GEN = {
+  [IMT]: (level, rng, profile, opts = {}) => (opts.exam ? imtExam(rng, opts.exam) : imtItem(level, rng)),
   [GEOM]: (level, rng, profile, opts = {}) => (opts.exam ? geomExam(rng, opts.exam) : geomItem(level, rng)),
   [PROD]: (level, rng, profile, opts = {}) => (opts.exam ? prodExam(rng, opts.exam) : prodItem(level, rng)),
   [INV]: (level, rng, profile, opts = {}) => (opts.exam ? invExam(rng, opts.exam) : invItem(level, rng)),
