@@ -8946,7 +8946,7 @@ Soit W = Span{u₁, u₂}, u₁ = (−2 ; 0 ; 0 ; 1), u₂ = (−1 ; 0 ; −1 ; 
   — Coefficient de u₂ : y · u₂ / u₂ · u₂  [juge value]  départ : y·u_2/(u_2·u_2)
     = (1 + □ − 1 − 6)/(1 + 0 + □ + 4)   (trous : (1 + 0 − 1 − 6)/(1 + 0 + 1 + 4))   ← Produits scalaires
     = −1
-  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
     = (-2 ; 0 ; 0 ; 1) - (-1 ; 0 ; -1 ; -2)   ← Combinaison des vecteurs de la base
     = (-1 ; 0 ; 1 ; 3)   (cases à remplir : (3,1) (4,1))
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -8967,7 +8967,7 @@ Soit W = Span{u₁, u₂}, u₁ = (1 ; −1 ; 0 ; 0), u₂ = (−1 ; −1 ; −2
   — Coefficient de u₂ : y · u₂ / u₂ · u₂  [juge value]  départ : y·u_2/(u_2·u_2)
     = (4 + □ + 6 + 0)/(1 + 1 + □ + 0)   (trous : (4 + 2 + 6 + 0)/(1 + 1 + 4 + 0))   ← Produits scalaires
     = 2
-  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
     = -(1 ; -1 ; 0 ; 0) + 2·(-1 ; -1 ; -2 ; 0)   ← Combinaison des vecteurs de la base
     = (-3 ; -1 ; -4 ; 0)   (cases à remplir : (1,1) (4,1))
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -8988,7 +8988,7 @@ Soit W = Span{u₁, u₂}, u₁ = (1 ; 0 ; 0 ; −1), u₂ = (−1 ; −1 ; −1
   — Coefficient de u₂ : y · u₂ / u₂ · u₂  [juge value]  départ : y·u_2/(u_2·u_2)
     = (0 + □ + 2 + 2)/(1 + 1 + □ + 1)   (trous : (0 + 0 + 2 + 2)/(1 + 1 + 1 + 1))   ← Produits scalaires
     = 1
-  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
     = (1 ; 0 ; 0 ; -1) + (-1 ; -1 ; -1 ; -1)   ← Combinaison des vecteurs de la base
     = (0 ; -1 ; -1 ; -2)   (cases à remplir : (3,1) (4,1))
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9015,7 +9015,7 @@ Soit W = Span{x₁, x₂}, x₁ = (0 ; −1 ; 1 ; 2), x₂ = (1 ; −1 ; −1 ; 
   — Coefficient de v₂ : y · v₂ / v₂ · v₂  [juge value]  départ : y·v_2/(v_2·v_2)
     = (□ + 0 + 2 + 4)/(1 + 0 + 4 + □)   (trous : (0 + 0 + 2 + 4)/(1 + 0 + 4 + 1))   ← Produits scalaires
     = 1
-  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
     = (0 ; -1 ; 1 ; 2) + (1 ; 0 ; -2 ; 1)   ← Combinaison des vecteurs de la base
     = (1 ; -1 ; -1 ; 3)   (cases à remplir : (1,1) (4,1))
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9038,7 +9038,7 @@ Soit W = Span{x₁, x₂}, x₁ = (0 ; 0 ; 1 ; −1), x₂ = (1 ; −1 ; −3 ; 
   — Coefficient de v₂ : y · v₂ / v₂ · v₂  [juge value]  départ : y·v_2/(v_2·v_2)
     = (□ + 1 + 1 + 5)/(1 + 1 + 1 + □)   (trous : (1 + 1 + 1 + 5)/(1 + 1 + 1 + 1))   ← Produits scalaires
     = 2
-  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
     = 2·(0 ; 0 ; 1 ; -1) + 2·(1 ; -1 ; -1 ; -1)   ← Combinaison des vecteurs de la base
     = (2 ; -2 ; 0 ; -4)   (cases à remplir : (2,1) (4,1))
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9061,7 +9061,7 @@ Soit W = Span{x₁, x₂}, x₁ = (2 ; 0 ; 1 ; 0), x₂ = (3 ; 0 ; 4 ; 0) et y =
   — Coefficient de v₂ : y · v₂ / v₂ · v₂  [juge value]  départ : y·v_2/(v_2·v_2)
     = (−□ + 0 + 0 + 0)/(1 + 0 + 4 + □)   (trous : (−5 + 0 + 0 + 0)/(1 + 0 + 4 + 0))   ← Produits scalaires
     = −1
-  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
     = 2·(2 ; 0 ; 1 ; 0) - (-1 ; 0 ; 2 ; 0)   ← Combinaison des vecteurs de la base
     = (5 ; 0 ; 0 ; 0)   (cases à remplir : (1,1) (4,1))
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9085,7 +9085,7 @@ Soit W = Span{u₁, u₂}, u₁ = (−1 ; −1 ; 0 ; −2), u₂ = (0 ; 2 ; −1
   — Coefficient de u₂ : y · u₂ / u₂ · u₂  [juge value]  départ : y·u_2/(u_2·u_2)
     = (0 − 8 + 0 − 4)/(0 + 4 + 1 + 1)   ← Produits scalaires
     = −2
-  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
     = -(-1 ; -1 ; 0 ; -2) - 2·(0 ; 2 ; -1 ; -1)   ← Combinaison des vecteurs de la base
     = (1 ; -3 ; 2 ; 4)
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9104,7 +9104,7 @@ Soit W = Span{u₁, u₂}, u₁ = (−1 ; 0 ; −1 ; 1), u₂ = (−1 ; −2 ; 1
   — Coefficient de u₂ : y · u₂ / u₂ · u₂  [juge value]  départ : y·u_2/(u_2·u_2)
     = (−1 − 2 − 3 + 0)/(1 + 4 + 1 + 0)   ← Produits scalaires
     = −1
-  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
     = (-1 ; 0 ; -1 ; 1) - (-1 ; -2 ; 1 ; 0)   ← Combinaison des vecteurs de la base
     = (0 ; 2 ; -2 ; 1)
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9123,7 +9123,7 @@ Soit W = Span{u₁, u₂}, u₁ = (−1 ; −1 ; −1 ; −1), u₂ = (−1 ; 1 
   — Coefficient de u₂ : y · u₂ / u₂ · u₂  [juge value]  départ : y·u_2/(u_2·u_2)
     = (−4 + 0 + 2 − 2)/(1 + 1 + 1 + 1)   ← Produits scalaires
     = −1
-  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁u₁ + c₂u₂  [juge mat]  départ : ŷ
     = -2·(-1 ; -1 ; -1 ; -1) - (-1 ; 1 ; 1 ; -1)   ← Combinaison des vecteurs de la base
     = (3 ; 1 ; 1 ; 3)
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9144,7 +9144,7 @@ Soit W = Span{x₁, x₂}, x₁ = (0 ; 0 ; −1 ; 2), x₂ = (1 ; −1 ; −2 ; 
   [free, suivre l'erreur]  v_2
     = (1 ; -1 ; -2 ; 4) - 2·(0 ; 0 ; -1 ; 2)   ← x₂ · v₁ / v₁ · v₁ = 10/5
     = (1 ; -1 ; 0 ; 0)
-  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
     = -(0 ; 0 ; -1 ; 2) + (1 ; -1 ; 0 ; 0)   ← Combinaison des vecteurs de la base
     = (1 ; -1 ; 1 ; -2)
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9160,7 +9160,7 @@ Soit W = Span{x₁, x₂}, x₁ = (−1 ; 0 ; 2 ; −1), x₂ = (3 ; 0 ; −3 ; 
   [free, suivre l'erreur]  v_2
     = (3 ; 0 ; -3 ; 3) + 2·(-1 ; 0 ; 2 ; -1)   ← x₂ · v₁ / v₁ · v₁ = −12/6
     = (1 ; 0 ; 1 ; 1)
-  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
+  — Projection ŷ = c₁v₁ + c₂v₂  [juge mat]  départ : ŷ
     = (-1 ; 0 ; 2 ; -1) + (1 ; 0 ; 1 ; 1)   ← Combinaison des vecteurs de la base
     = (0 ; 0 ; 3 ; 0)
   — Composante orthogonale z = y − ŷ (dans W⊥)  [juge mat]  départ : z
@@ -9176,7 +9176,7 @@ Soit W = {x ∈ ℝ⁴ : x₁ + x₂ + x₃ + 2x₄ = 0} et y = (3 ; 1 ; 1 ; 1).
   [free, suivre l'erreur]  p
     = (7/7)·(1 ; 1 ; 1 ; 2)   ← (y · a / a · a) a
     = (1 ; 1 ; 1 ; 2)
-  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
+  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
     = (3 ; 1 ; 1 ; 1) - (1 ; 1 ; 1 ; 2)   ← On retire la composante normale
     = (2 ; 0 ; 0 ; -1)
   — Distance de y à W : ‖y − ŷ‖ = ‖proj_a y‖  [juge value]  départ : √(z·z)
@@ -9194,7 +9194,7 @@ Soit W = {x ∈ ℝ⁴ : x₁ − 2x₂ + 2x₃ = 0} et y = (3 ; −1 ; 2 ; −1
   [free, sans aide]  p
     = (9/9)·(1 ; -2 ; 2 ; 0)   ← (y · a / a · a) a
     = (1 ; -2 ; 2 ; 0)
-  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
+  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
     = (3 ; -1 ; 2 ; -1) - (1 ; -2 ; 2 ; 0)   ← On retire la composante normale
     = (2 ; 1 ; 0 ; -1)
   — Distance de y à W : ‖y − ŷ‖ = ‖proj_a y‖  [juge value]  départ : √(z·z)
@@ -9206,7 +9206,7 @@ Soit W = {x ∈ ℝ⁴ : −x₁ + x₃ − x₄ = 0} et y = (0 ; 1 ; −1 ; 2).
   [free, sans aide]  p
     = (-3/3)·(-1 ; 0 ; 1 ; -1)   ← (y · a / a · a) a
     = (1 ; 0 ; -1 ; 1)
-  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
+  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
     = (0 ; 1 ; -1 ; 2) - (1 ; 0 ; -1 ; 1)   ← On retire la composante normale
     = (-1 ; 1 ; 0 ; 1)
   — Distance de y à W : ‖y − ŷ‖ = ‖proj_a y‖  [juge value]  départ : √(z·z)
@@ -9218,7 +9218,7 @@ Soit W = {x ∈ ℝ⁴ : 2x₁ + x₂ + x₃ − x₄ = 0} et y = (2 ; 3 ; 1 ; 1
   [free, sans aide]  p
     = (7/7)·(2 ; 1 ; 1 ; -1)   ← (y · a / a · a) a
     = (2 ; 1 ; 1 ; -1)
-  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
+  — Projection sur W : ŷ = y − proj_a y  [juge mat]  départ : ŷ
     = (2 ; 3 ; 1 ; 1) - (2 ; 1 ; 1 ; -1)   ← On retire la composante normale
     = (0 ; 2 ; 0 ; 2)
   — Distance de y à W : ‖y − ŷ‖ = ‖proj_a y‖  [juge value]  départ : √(z·z)
@@ -10131,7 +10131,7 @@ Soit A = [[0,1,0],[1,0,2],[1,-1,0],[-1,2,2]] et b = (1 ; 6 ; 0 ; 0). Le système
     = L1 ← (1/3)L1 : [[1,0,0|3],[0,1,0|1],[0,0,1|1]]   ← Pivot à 1
   — La solution aux moindres carrés x̂  [juge mat]  départ : x̂
     = (3 ; 1 ; 1)   ← Lue sur la forme réduite
-  — Le résidu b − Ax̂ (orthogonal aux colonnes de A)  [juge mat]  départ : b − Ax̂
+  — Le résidu b − Ax̂ (orthogonal aux colonnes de A)  [juge mat]  départ : b - Ax̂
     = (1 ; 6 ; 0 ; 0) - A·(3 ; 1 ; 1)
     = (0 ; 1 ; -2 ; -1)   ← Aᵀ(b − Ax̂) = 0
   — L'erreur ‖b − Ax̂‖  [juge value]  départ : √(r·r)
