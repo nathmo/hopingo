@@ -54,7 +54,7 @@ L'élève place les éléments (points, droites) sur le repère, puis trace la c
 
 # G4. Géométrie analytique du plan et de l'espace
 
-Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
+Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : fait le 10 novembre 2026 (étape U5). Chaque compétence a son statut. Les niveaux 5 et les variantes `open` sont des items `lines` sans aide, en parties (le type `problem` vient avec l'étape U4).
 
 **Sources** : MAN, Math 2A (examen blanc 2018 : droites et plans, tétraèdre, droite qui s'appuie sur deux droites gauches) ; CMS, Géométrie analytique, semestre 1 (séries 1 à 12, automne 2018 : vecteurs, droites et plans, produit scalaire, produit vectoriel, distances).
 **Notation** : repère orthonormé direct sauf mention contraire. Une droite du plan : `ax + by + c = 0` ou `(x ; y) = (x₀ ; y₀) + t(v₁ ; v₂)`. Une droite de l'espace : paramétrique, ou deux équations cartésiennes, ou la forme `(x − x₀)/v₁ = (y − y₀)/v₂ = (z − z₀)/v₃`. Plan : `ax + by + cz + d = 0`. Le produit vectoriel s'écrit `∧`.
@@ -485,11 +485,25 @@ On donne A(3 ; 1 ; 2), B(1 ; 2 ; 0), C(2 ; 4 ; 0), D(2 ; 2 ; −1).
 
 Item `problem` : 4 parties `lines`, `points: [[0.5, 0.5], [0.5, 1], [0.5, 0.5, 0.5], [0.5, 0.5]]`. La partie 4 accepte les deux méthodes (base × hauteur, ou produit mixte).
 
+### E7. Droites gauches : distance et perpendiculaire commune (d'après MAN Math 2A, 2018, nombres changés, 6 points)
+
+Ajouté à l'étape U5 (§16.3 : au moins 2 exemples par module). On donne d₁ : (x ; y ; z) = (−1 ; 1 ; 0) + s(2 ; −1 ; 0) et d₂ : (x ; y ; z) = (4 ; 2 ; 1) + t(2 ; 0 ; −1).
+
+| Étape | Attendu | Points | Compétence |
+|---|---|---|---|
+| 1. Montrer que d₁ et d₂ sont gauches | n⃗ = (2 ; −1 ; 0) ∧ (2 ; 0 ; −1) = (1 ; 2 ; 2) ≠ 0⃗ ; AB⃗ = (5 ; 1 ; 1), AB⃗·n⃗ = 9 ≠ 0 | 1 | `g4-relative-pos`, `g4-triple` |
+| 2. Distance de d₁ à d₂ | d = \|9\|/‖n⃗‖ = 9/3 = 3 | 1,5 | `g4-dist-skew` |
+| 3. Pieds P et Q de la perpendiculaire commune | PQ⃗ = (5 + 2t − 2s ; 1 + s ; 1 − t) ; PQ⃗·u⃗ = 9 + 4t − 5s = 0 et PQ⃗·v⃗ = 9 + 5t − 4s = 0 ; s = 1, t = −1 ; P = (1 ; 0 ; 0), Q = (2 ; 2 ; 2) | 2 | `g4-common-perp` |
+| 4. Équation de la perpendiculaire commune | (x ; y ; z) = (1 ; 0 ; 0) + k(1 ; 2 ; 2) | 1 | `g4-common-perp` |
+| 5. Contrôle | ‖PQ⃗‖ = ‖(1 ; 2 ; 2)‖ = 3 = d | 0,5 | `g4-dist-skew` |
+
+Item `problem` : 5 parties `lines`, `points: [[0.5, 0.5], [0.5, 1], [0.5, 0.5, 1], [1], [0.5]]`. En attendant le type `problem`, c'est le niveau 5 et la variante `open` de `g4-dist-skew` (distance puis perpendiculaire commune).
+
 ---
 
 # G10. Cercles et coniques
 
-Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : à faire
+Unité `coniques` · préfixe `g10-` · pièges `g10_` · Statut : fait le 10 novembre 2026 (étape U5). Chaque compétence a son statut. Les niveaux 5 et les variantes `open` sont des items `lines` sans aide, en parties (le type `problem` vient avec l'étape U4) ; les esquisses sont des items `plot`.
 
 **Sources** : CMS, Géométrie analytique, semestre 2 (séries 13 à 23 : cercles, polaires, axe radical, cercles orthogonaux, ellipse, hyperbole, parabole, familles, coordonnées homogènes, réduction) ; contrôles 3 et 4 (2018 : cercle tangent, ellipse et polaire, lieu, réduction d'une conique avec terme en xy, famille de coniques et lieu des centres, parabole et hyperbole orthogonales) ; organigramme personnel « nature d'une conique » (plan, §2).
 **Notation** : équation générale ax² + bxy + cy² + dx + ey + f = 0. Matrice de la forme quadratique A = [[a, b/2], [b/2, c]], δ = det A = ac − b²/4. Matrice complète M = [[a, b/2, d/2], [b/2, c, e/2], [d/2, e/2, f]], Δ = det M. Ellipse x²/a² + y²/b² = 1, hyperbole x²/a² − y²/b² = 1, c > 0 la demi-distance focale, e = c/a. Parabole (x − h)² = 2p(y − k) : sommet (h ; k), foyer (h ; k + p/2), directrice y = k − p/2 (convention du corrigé CMS 2018). Repère réduit Ru = (Ω, u₁, u₂), direct.
@@ -983,7 +997,7 @@ F_m : (1 − m)x² + 2(m + 1)xy − y² + 2x − 2my + m = 0, m ∈ ℝ. (a) Gen
 
 # G6. Analyse de base
 
-Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : fait le 10 novembre 2026 (étape U2 ; la pilote `g6-deriv-rules` à l'étape U0). Chaque compétence a son statut ; `g4-line2` (G4, étape U5) passe par `UNBUILT`.
+Unité `analyse0` · préfixe `g6-` · pièges `g6_` · Statut : fait le 10 novembre 2026 (étape U2 ; la pilote `g6-deriv-rules` à l'étape U0). Chaque compétence a son statut ; `g4-line2` (G4) est construit depuis l'étape U5.
 
 **Sources** : MAN, Math 1B (examens 2017 et examen blanc 2018 corrigé : dérivée implicite et tangente à paramètre, point anguleux à paramètre, branches infinies et points stationnaires d'arcs paramétrés, tangente et approximation linéaire) ; CMS, Analyse I, séries 8 à 23 (limites, tangente commune, optimisation, extrema et points remarquables, courbes paramétrées, primitives, aires) ; formulaires M1A et M1B (table des dérivées).
 **Notation** : dérivée `f′(x)` ou `d(f, x)`. Dérivées à gauche et à droite `f′(a⁻)`, `f′(a⁺)` (touches dédiées). Limites `lim(f, x, a, +)`. Logarithme `ln` ou `Log`. Arc tangente `arctan` ou `Arctg`. La MAN dit « point stationnaire » pour un arc paramétré où ẋ = ẏ = 0.

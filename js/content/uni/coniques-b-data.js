@@ -11,9 +11,10 @@
 // point T of the conic (judge geom); from a point Q: the polar of Q, the
 // points of contact (vector), then both tangents (geom, count 2).
 
+import { templateOf } from '../../judges/lines.js';
 import { Q } from '../../math/rational.js';
 import {
-  q, qt, fq, nz, H, vt, vr, sumT, eqT, rootT, partsItem, mcqD, examTag, MT, prim, linT, readable,
+  q, qt, fq, nz, H, vt, vr, sumT, eqT, rootT, partsItem, mcqD, examTag, MT, prim, linT, readable, blanks,
 } from './geo-kit.js';
 import { DeltaOf } from './coniques-b-kit.js';
 
@@ -341,7 +342,7 @@ function atTItem(level, rng, opts = {}) {
     prompt: giveAbscissa
       ? `Trouve la tangente à la conique ${MTxy(eq)} au point d'abscisse ${fq(T[0])} et d'ordonnée ${T[1].n > 0 ? 'positive' : 'négative'}.`
       : `Trouve la tangente à la conique ${MTxy(eq)} au point T${vr(T)}.`,
-    hints: H('Dédouble : remplace un x par x₀ et un y par y₀ (x → (x + x₀)/2 dans les termes du 1er degré).', dd.text.split(par(T[0])).join('□').replace(/-/g, '−'), readable(tan)),
+    hints: H('Dédouble : remplace un x par x₀ et un y par y₀ (x → (x + x₀)/2 dans les termes du 1er degré).', readable(templateOf(blanks(dd.text, [par(T[0]), par(T[1])])).replace(/×/g, '·')), readable(tan)),
     key: `${TG}:T:${eq}:${vt(T)}`, fallback: cn.fallback, exam: opts.exam ? examTag(opts) : false,
   });
 }
@@ -362,6 +363,10 @@ function fromQItem(level, rng, opts = {}) {
     const [P1, P2] = [T1, T2].sort((A, B) => A[0].sub(B[0]).valueOf() || A[1].sub(B[1]).valueOf());
     const eq = eqT(co);
     const tans = `${rowLine(dedouble(co, P1).row)} ou ${rowLine(dedouble(co, P2).row)}`;
+    // A vertical tangent (no y): the trap g10_vertical_tangent_lost (rules/g10a.js).
+    const rows = [P1, P2].map((P) => dedouble(co, P).row);
+    const vert = rows.findIndex((r) => r[1].n === 0);
+    const tangents = vert >= 0 ? { vertical: rowLine(rows[vert]), others: [rowLine(rows[1 - vert])] } : undefined;
     return partsItem({
       skill: TG, level, subgoals: TG_SUB,
       parts: [
@@ -371,7 +376,7 @@ function fromQItem(level, rng, opts = {}) {
           lines: [{ math: `T_1 = ${vt(P1)}`, note: '', subgoal: 'polar' }] },
         { html: 'Et T₂ ?', ask: 'T₂ =', start: 'T_2', judge: { kind: 'vector', expect: vt(P2) },
           lines: [{ math: `T_2 = ${vt(P2)}`, note: '', subgoal: 'polar' }] },
-        { html: 'Les deux tangentes, (QT₁) et (QT₂) ?', ask: 'tangentes :', start: 'τ', judge: { kind: 'geom', object: 'line2', ref: tans, count: 2 },
+        { html: 'Les deux tangentes, (QT₁) et (QT₂) ?', ask: 'tangentes :', start: 'τ', judge: { kind: 'geom', object: 'line2', ref: tans, count: 2, ...(tangents ? { tangents } : {}) },
           lines: [{ math: tans, note: 'Dédoubler en T₁ et en T₂', subgoal: 'tan' }] },
       ],
       prompt: `Trouve les tangentes à la conique ${MTxy(eq)} issues du point Q${vr(Qp)}.`,

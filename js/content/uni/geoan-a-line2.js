@@ -128,7 +128,7 @@ function line2Item(level, rng, opts = {}) {
   return stepsItem({
     skill: L2, level, prompt, parts, subgoals: L2_SUB, key: `${L2}:${kind}:${vt(A)}${vt(v)}${gText}`, fallback: d.fallback,
     hints: [
-      { level: 1, html: `Écris d sous forme paramétrique A + t·v⃗, puis élimine t : la normale (v₂ ; −v₁) = ${vr(n)} donne ${fq(n[0])}x + ${fq(n[1])}y = ${fq(n[0])}·x_A + ${fq(n[1])}·y_A.`.replace('+ −', '− ') },
+      { level: 1, html: `Écris d sous forme paramétrique A + t·v⃗, puis élimine t : la normale (v₂ ; −v₁) = ${vr(n)} donne ${readable(sumT([[n[0], 'x'], [n[1], 'y']]))} = ${readable(sumT([[n[0], 'x_A'], [n[1], 'y_A']]))}.` },
       { level: 2, html: `${readable(sumT([[n[0], 'x'], [n[1], 'y']]))} = ${par(n[0]).replace(/-/g, '−')}·(□) + ${par(n[1]).replace(/-/g, '−')}·(□)` },
       { level: 3, html: gR(linT(row)) },
     ],
@@ -298,7 +298,7 @@ function mediatorItem(level, rng) {
     ],
     hints: [
       { level: 1, html: 'Un point M de la médiatrice vérifie MA = MB, ou AB⃗·(M − I) = 0 avec I le milieu de [AB].' },
-      { level: 2, html: `${fq(u[0])}(x − □) + ${fq(u[1])}(y − □) = 0` },
+      { level: 2, html: `${fq(u[0])}(x − □) ${q(u[1]).n < 0 ? '−' : '+'} ${fq(q(u[1]).n < 0 ? q(u[1]).neg() : u[1])}(y − □) = 0` },
       { level: 3, html: gR(linT(row)) },
     ],
   });

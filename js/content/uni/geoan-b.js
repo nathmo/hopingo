@@ -745,6 +745,7 @@ const CP_MENU = [
   { id: 'two', label: 'Deux conditions : PQ⃗·u⃗ = 0 et PQ⃗·v⃗ = 0', valid: true },
   { id: 'solve', label: 'Résoudre en s et t', valid: true },
   { id: 'one', label: 'Une condition PQ⃗·u⃗ = 0 suffit', valid: false, rule: 'g4_common_perp_one_condition', why: 'PQ⃗ doit être perpendiculaire aux deux droites : deux conditions.' },
+  { id: 'same', label: 'Le même paramètre t sur les deux droites', valid: false, rule: 'g4_param_same_letter', why: 'P et Q sont deux points différents, chacun sur sa droite : il faut deux paramètres, s et t.' },
 ];
 
 function perpParts(d, level, { line = true } = {}) {
@@ -846,7 +847,7 @@ const LS_MENU = [
   { id: 'eq', label: 'Équation de π (contient a, de direction w⃗)', valid: true },
   { id: 'inter', label: 'π ∩ b : remplacer la paramétrique de b', valid: true },
   { id: 'line', label: 'La droite n : par Q, de direction w⃗', valid: true },
-  { id: 'wn', label: 'Normale de π : w⃗', valid: false, why: 'π contient la direction w⃗ : w⃗ est dans le plan, pas normal à lui.' },
+  { id: 'wn', label: 'Normale de π : w⃗', valid: false, rule: 'g4_normal_as_direction', why: 'π contient la direction w⃗ : w⃗ est dans le plan, pas normal à lui.' },
 ];
 
 // P, w; Q = P + k·w; a = (P, u), b = (Q, v) with [u, v, w] ≠ 0; base points shifted.

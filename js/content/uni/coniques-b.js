@@ -135,7 +135,10 @@ function reduceParts(d, level, { foci = false } = {}) {
       lines: [{ math: `Ω = ${vt(d.O)}`, note: 'Résoudre le système', subgoal: 'centre', blank: [qt(d.O[0]), qt(d.O[1])] }],
     });
     const [x0, y0] = d.O.map(parT);
-    const sub0 = `${parT(a)}·${x0}^2 + ${parT(b)}·${x0}·${y0} + ${parT(c)}·${y0}^2 + ${parT(dd)}·${x0} + ${parT(e)}·${y0} + ${parT(d.coefs[5])}`;
+    // a·x₀² + b·x₀y₀ + … with the zero terms left out, a coefficient 1 not written.
+    const term = (k, body) => (k.n === 0 ? null : k.eq(1) ? body : k.eq(-1) ? `-${body}` : `${parT(k)}·${body}`);
+    const sub0 = [term(a, `${x0}^2`), term(b, `${x0}·${y0}`), term(c, `${y0}^2`), term(dd, x0), term(e, y0), d.coefs[5].n === 0 ? null : parT(d.coefs[5])]
+      .filter(Boolean).join(' + ').replace(/\+ -/g, '- ');
     parts.push({
       html: 'La constante f(Ω) ?', ask: 'f(Ω) =', start: sub0.replace(/\+ \(-/g, '+ (-'),
       judge: { kind: 'value', expect: String(-d.k), ...trapCfg }, menu: RED_MENU.const,
