@@ -85,6 +85,7 @@ export function buildExam(blueprint, { rng, profile = null, now = clock() } = {}
         } catch { item = null; }
       }
       if (!item) throw new Error(`Examen ${bp.id} : impossible de produire une question ${section.kind}.`);
+      if (section.kind === 'tf' && item.type === 'mcq') item = vfAsTf(item); // step U6
       questions.push({ n: questions.length + 1, section: si, kind: section.kind, skill: item.skill, item, max: maxOf(section) });
       last = item.skill;
     }
@@ -94,6 +95,22 @@ export function buildExam(blueprint, { rng, profile = null, now = clock() } = {}
     startedAt: now, endsAt: now + bp.durationMin * 60 * 1000,
     sections: bp.sections.map((s) => ({ kind: s.kind, count: s.count, scoring: s.scoring, multi: !!s.multi })),
     questions,
+  };
+}
+
+// Step U6: a true/false written as a two-option « Vrai / Faux » multiple
+// choice (no checker fits its counter-example, as in A2) becomes a `tf`
+// question of the exam: only the choice is marked there.
+export function vfAsTf(item) {
+  const t = item.options?.find((o) => /^\s*Vrai\s*$/.test(o.html));
+  const f = item.options?.find((o) => /^\s*Faux\s*$/.test(o.html));
+  if (!t || !f || item.options.length !== 2) return item;
+  return {
+    ...item, type: 'tf', prompt: 'Vrai ou faux ?',
+    statement: String(item.prompt).replace(/^\s*Vrai ou faux\s*\?\s*(<br\s*\/?>)?\s*/, ''),
+    truth: !!t.correct, decided: false, counter: null,
+    ruleIfTrue: t.correct ? null : t.rule ?? null, ruleIfFalse: f.correct ? null : f.rule ?? null,
+    explanation: item.solution?.map((x) => x.html).join(' ') || '',
   };
 }
 

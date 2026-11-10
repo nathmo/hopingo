@@ -165,3 +165,23 @@ test('cms-controle: four open problems drawn from several G units', () => {
   assert.ok(examsForUnit('coniques').some((e) => e.id === 'cms-controle'));
   assert.ok(examsForUnit('geoan').some((e) => e.id === 'cms-controle'));
 });
+
+// Step U6: Analyse II, 18 multiple choice (+3/0/−1) and 10 true/false
+// (+1/0/−1) in 144 minutes; a « Vrai / Faux » multiple choice becomes a tf.
+test('ba2-analyse2: a complete Analyse II exam, marked', () => {
+  const BA2 = EXAM_BY_ID['ba2-analyse2'];
+  for (const seed of [4, 5, 6]) {
+    const exam = buildExam(BA2, { rng: makeRng(seed), now: 0 });
+    assert.equal(exam.questions.filter((q) => q.kind === 'mcq').length, 18);
+    assert.equal(exam.questions.filter((q) => q.kind === 'tf').length, 10);
+    assert.ok(exam.questions.every((q) => q.skill.startsWith('a2-')));
+    assert.equal(maxScore(exam), 64);
+    const all = scoreExam(exam, exam.questions.map(right), profile());
+    assert.equal(all.score, 64);
+    assert.equal(all.grade, 6);
+    const none = scoreExam(exam, exam.questions.map(wrong), profile());
+    assert.equal(none.score, -28);
+    assert.equal(none.grade, 1);
+  }
+  assert.equal(BA2.durationMin, 144);
+});

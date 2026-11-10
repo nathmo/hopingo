@@ -18,8 +18,12 @@ import { solves } from './ode.js';
 import { PROPS as PA } from './a2-examples-a.js';
 import { PROPS as PB } from './a2-examples-b.js';
 import { PROPS as PC } from './a2-examples-c.js';
+import { PROPS as PD } from './a2-examples-d.js';
 import { PROPS as PE } from './a2-examples-e.js';
+import { PROPS as PF } from './a2-examples-f.js';
+import { PROPS as PG } from './a2-examples-g.js';
 import { PROPS as PH } from './a2-examples-h.js';
+import { PROPS as PI } from './a2-examples-i.js';
 
 // The catalogue's library of counter-examples (A2, a2-diff-implications);
 // each is 0 at (0, 0) (K6: 2).
@@ -93,7 +97,7 @@ const SHARED = {
   },
 };
 
-export const PROPS = { ...SHARED, ...PA, ...PB, ...PC, ...PE, ...PH };
+export const PROPS = { ...SHARED, ...PA, ...PB, ...PC, ...PD, ...PE, ...PF, ...PG, ...PH, ...PI };
 
 export function checkA2(counter, answers) {
   const f = PROPS[counter.prop];
