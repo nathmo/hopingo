@@ -11,7 +11,8 @@ import { checkCounter } from '../js/judges/examples.js';
 import { checkProblem } from '../js/judges/problem.js';
 import { JUDGES, readWith } from '../js/judges/index.js';
 
-test('unit analyse1, part i: every skill, 5 levels and exam variants', () => checkSkills(SKILLS.map((s) => s.id)));
+// The problem E6 (a1-ser-param, level 5 and `open`) replays seven parts.
+test('unit analyse1, part i: every skill, 5 levels and exam variants', () => checkSkills(SKILLS.map((s) => s.id), 17, { 'a1-ser-param': 25 }));
 
 // The false statements of the true/false variants: a sequence that does
 // not refute them is refused.
