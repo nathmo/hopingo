@@ -77,7 +77,7 @@ function nonHoloData(rng) {
     const c = joinT([String(a), term(b, 'i')]);
     const u = `${sh('x', a)}^2+${sh('y', b)}^2`;
     return {
-      key: `abs:${a}:${b}`, name: c === '0' ? '|z|^2' : `|z-(${c})|^2`, start: c === '0' ? '|x+iy|^2' : `|x+iy-(${c})|^2`,
+      key: `abs:${a}:${b}`, name: `|${joinT(['z', String(-a), term(-b, 'i')])}|^2`, start: `|${joinT(['x', String(-a), 'iy', term(-b, 'i')])}|^2`,
       lines: [u], u, v: '0', ux: a ? `2${sh('x', a)}` : '2x', vy: '0', uy: b ? `2${sh('y', b)}` : '2y', vx: '0', holo: false,
       sys: `${a ? `2${sh('x', a)}` : '2x'} = 0 ; ${b ? `2${sh('y', b)}` : '2y'} = 0`, sol: [a, b],
     };
@@ -133,9 +133,9 @@ function crParts(d, level) {
     });
     parts.push({ html: 'Les dérivées partielles :', ask: 'u_x =', start: pd(d.u, 'x'), judge: EQXY(), lines: [eq(d.ux, 'y constante', 'partials', [d.ux])], menu: CR_MENU('dx') });
   }
-  parts.push({ ask: 'v_y =', start: pd(d.v, 'y'), judge: EQXY(), lines: [eq(d.vy, 'x constante', 'partials', [d.vy])], menu: CR_MENU('dy') });
-  parts.push({ ask: 'u_y =', start: pd(d.u, 'y'), judge: EQXY(), lines: [eq(d.uy, 'x constante', 'partials', [d.uy])], menu: CR_MENU('dy') });
-  parts.push({ ask: 'v_x =', start: pd(d.v, 'x'), judge: EQXY(), lines: [eq(d.vx, 'y constante', 'partials', [d.vx])], menu: CR_MENU('dx') });
+  parts.push({ html: 'Puis v_y :', ask: 'v_y =', start: pd(d.v, 'y'), judge: EQXY(), lines: [eq(d.vy, 'x constante', 'partials', [d.vy])], menu: CR_MENU('dy') });
+  parts.push({ html: 'u_y :', ask: 'u_y =', start: pd(d.u, 'y'), judge: EQXY(), lines: [eq(d.uy, 'x constante', 'partials', [d.uy])], menu: CR_MENU('dy') });
+  parts.push({ html: 'v_x :', ask: 'v_x =', start: pd(d.v, 'x'), judge: EQXY(), lines: [eq(d.vx, 'y constante', 'partials', [d.vx])], menu: CR_MENU('dx') });
   const compare = {
     kind: 'decision', prompt: 'Les équations de Cauchy-Riemann sont :', options: [
       { id: 'cr', label: 'u_x = v_y et u_y = −v_x', valid: true },
@@ -176,9 +176,9 @@ function crProblem(level, rng, opts) {
   const first = rng.chance(0.5);
   const [p1, p2] = first ? [a, b] : [b, a];
   return problemItem({
-    skill: CR, level, key: `${level}:${p1.key}:${p2.key}`, exam: examTag(opts, 5),
+    skill: CR, level, key: `${level}:${p1.key}:${p2.key}`, exam: examTag(opts, 6),
     prompt: 'Étudie l\'holomorphie des deux fonctions (Cauchy-Riemann).',
-    parts: [{ item: p1, points: 2.5, title: 'Première fonction' }, { item: p2, points: 2.5, title: 'Seconde fonction' }],
+    parts: [{ item: p1, points: 3, title: 'Première fonction' }, { item: p2, points: 3, title: 'Seconde fonction' }],
   });
 }
 
@@ -222,7 +222,7 @@ function hcData(rng, big = false) {
     const b = rng.pick([0, 0, 1]);
     const c = rng.pick([0, 1, 2, 3, -2, -3]);
     const e = big ? 0 : rng.pick([0, 0, 0, 1]);
-    const d = rng.pick([0, 0, 0, 1]);
+    const d = a ? 0 : rng.pick([0, 0, 1]);
     const g = big ? 1 : 0;
     const bb = big ? 1 : b;
     const n = [a, bb, c, e, d, g].filter(Boolean).length;
@@ -239,9 +239,9 @@ function hcData(rng, big = false) {
     // u = ∫ v_y dx + α(y), α = −a y².
     const uint = joinT([T(a, 'x^2'), T(bb, 'x^3'), T(-3 * bb, 'xy^2'), T(c, 'x'), T(e, 'e^x·cos(y)'), T(-2 * d, 'xy'), g ? 'e^(x^2-y^2)·cos(2xy)' : '']);
     const u = joinT([uint, T(-a, 'y^2')]);
-    const fz = joinT([term(a, 'z^2'), term(bb, 'z^3'), term(c, 'z'), term(e, 'e^z'), term(d, 'i·z^2'), g ? 'e^(z^2)' : '']);
+    const fz = joinT([term(bb, 'z^3'), term(a, 'z^2'), term(d, 'i·z^2'), term(c, 'z'), term(e, 'e^z'), g ? 'e^(z^2)' : '']);
     const wrongCR = a ? joinT([uint, T(a, 'y^2')]) : null;
-    const conjF = joinT([term(a, 'conj(z)^2'), term(bb, 'z^3'), term(c, 'z'), term(e, 'e^z'), term(d, 'i·z^2'), g ? 'e^(z^2)' : '']);
+    const conjF = joinT([term(bb, 'z^3'), term(a, 'conj(z)^2'), term(d, 'i·z^2'), term(c, 'z'), term(e, 'e^z'), g ? 'e^(z^2)' : '']);
     return { a, b: bb, c, e, d, g, v, vx, vy, vxx, vyy, lapSum, uint, u, fz, wrongCR, conjF, key: `${a}:${bb}:${c}:${e}:${d}:${g}` };
   }
   return null;

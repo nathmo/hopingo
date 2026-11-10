@@ -74,7 +74,7 @@ export const KEYS_SUM = ['calc', 'cplx', 'calcfn', 'seq', 'anal'];
 // ---------- items ----------
 
 // A lines item made of parts (geo-kit's partsItem), with the module's keys.
-export const linesOf = (o) => partsItem({ keys: KEYS, ...o });
+export const linesOf = (o) => partsItem({ keys: KEYS, ...o, parts: o.parts.map((p) => ({ html: '', ...p })) });
 
 // A multiple choice: right (html), wrongs [{html, rule}], fillers; four
 // distinct options. With multi: options [{html, correct, rule?}], at

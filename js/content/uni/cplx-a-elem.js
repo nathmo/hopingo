@@ -111,7 +111,7 @@ function powData(rng) {
       const lines = [`e^(${al === 'i' ? 'i' : `(${al})`}·Log(${z}))`, exp1];
       if (a !== 0 && mod.n !== 0) lines.push(`e^(${joinT([piT(mod), piIT(ang)])})`);
       lines.push(fin);
-      return { kind: 'pow', z, al, start: `${z.length > 1 ? `(${z})` : z}^(${al})`, lines, fin, key: `pow:${z}:${al}` };
+      return { kind: 'pow', z, al, start: `${z.length > 1 ? `(${z})` : z}^${al.length > 1 ? `(${al})` : al}`, lines, fin, key: `pow:${z}:${al}` };
     }
     const [z, r, ln, t] = rng.pick(POW_Z2);
     const ang = t.div(2);
@@ -128,15 +128,17 @@ function powData(rng) {
 function trigData(rng) {
   const b = rng.pick([1, 2, 3]);
   const kind = rng.pick(['cos', 'sin', 'abs']);
+  const bi = b === 1 ? 'i' : `${b}i`;
+  const eb = b === 1 ? 'e' : `e^${b}`;
   if (kind === 'cos') {
-    return { kind, start: `cos(${b}i)`, lines: [`(e^(i·${b}i)+e^(-i·${b}i))/2`, `(e^(-${b})+e^${b})/2`], fin: `(e^(-${b})+e^${b})/2`, key: `cos:${b}`, b };
+    return { kind, start: `cos(${bi})`, lines: [`(e^(i·${bi})+e^(-i·${bi}))/2`, `(e^(-${b})+${eb})/2`], fin: `(e^(-${b})+${eb})/2`, key: `cos:${b}`, b };
   }
   if (kind === 'sin') {
-    return { kind, start: `sin(${b}i)`, lines: [`(e^(i·${b}i)-e^(-i·${b}i))/(2i)`, `(e^(-${b})-e^${b})/(2i)`, `i(e^${b}-e^(-${b}))/2`], fin: `i(e^${b}-e^(-${b}))/2`, key: `sin:${b}`, b };
+    return { kind, start: `sin(${bi})`, lines: [`(e^(i·${bi})-e^(-i·${bi}))/(2i)`, `(e^(-${b})-${eb})/(2i)`, `i(${eb}-e^(-${b}))/2`], fin: `i(${eb}-e^(-${b}))/2`, key: `sin:${b}`, b };
   }
   const a = rng.pick([1, 2, 3, -1, -2]);
   const ea = a === 1 ? 'e' : `e^${a < 0 ? `(${a})` : a}`;
-  return { kind, start: `|e^(${a}+${b}i)|`, lines: [`|${ea}|·|e^(${b}i)|`, ea], fin: ea, key: `abs:${a}:${b}`, a, b };
+  return { kind, start: `|e^(${a}+${bi})|`, lines: [`|${ea}|·|e^(${bi})|`, ea], fin: ea, key: `abs:${a}:${b}`, a, b };
 }
 
 const EF_MENU = (right) => [
@@ -333,9 +335,10 @@ function hyperData(rng) {
     if (L1 === null || L2 === null) continue;
     const eqT = `${joinT([term(a, 'cosh(z)'), term(b, 'sinh(z)')])} = ${zt(c)}`;
     const subT = `${joinT([term(a.div(2), '(w+1/w)'), term(b.div(2), '(w-1/w)')])} = ${zt(c)}`;
-    const poly = `${joinT([term(A, 'w^2'), cqTerm(c.mul(cq(-2)), 'w'), String(a.sub(b))])} = 0`;
+    const g = [A, 2 * c.re.n, 2 * c.im.n, a.sub(b).n].reduce((x, y) => { x = Math.abs(x); y = Math.abs(y); while (y) [x, y] = [y, x % y]; return x; }, 0) || 1;
+    const poly = `${joinT([term(q(A, g), 'w^2'), cqTerm(c.mul(cq(q(-2, g))), 'w'), String(a.sub(b).div(g))])} = 0`;
     // Δ = 4c² − 4A(a − b).
-    const D = c.mul(c).mul(cq(4)).sub(cq(q(4 * A).mul(a.sub(b))));
+    const D = c.mul(c).mul(cq(4)).sub(cq(q(4 * A).mul(a.sub(b)))).mul(cq(q(1, g * g)));
     return {
       kind: 'hyp', eqT, subT, poly, D, roots: [t1, t2], sols: [L1 || '0', L2 || '0'], period: '2πi', periodText: '2kπi',
       sub: 'w = e^z', logLine: `z = Log(${t1})+2kπi ou z = Log(${t2})+2kπi ; k ∈ ℤ`,
@@ -357,11 +360,12 @@ function trigEqData(rng) {
   const [P, Qd] = [val.n, val.d];
   const eqT = `${Qd}${fn}(z) = ${P}`;
   const subT = fn === 'cos' ? `${term(q(Qd, 2), '(w+1/w)')} = ${P}` : `${Qd}(w-1/w)/(2i) = ${P}`;
-  const poly = fn === 'cos' ? `${joinT([term(Qd, 'w^2'), term(-2 * P, 'w'), String(Qd)])} = 0` : `${joinT([term(Qd, 'w^2'), term(-2 * P, 'iw'), String(-Qd)])} = 0`;
+  const g = Qd % 2 === 0 ? 2 : 1;
+  const poly = fn === 'cos' ? `${joinT([term(Qd / g, 'w^2'), term(-2 * P / g, 'w'), String(Qd / g)])} = 0` : `${joinT([term(Qd / g, 'w^2'), term(-2 * P / g, 'iw'), String(-Qd / g)])} = 0`;
   const L1 = logIText(w1);
   const L2 = logIText(w2);
   const needLog = !(w1.im.n === 0 && w1.re.valueOf() > 0 && w2.im.n === 0 && w2.re.valueOf() > 0);
-  const D = fn === 'cos' ? cq(4 * P * P - 4 * Qd * Qd) : cq(-4 * P * P + 4 * Qd * Qd);
+  const D = (fn === 'cos' ? cq(4 * P * P - 4 * Qd * Qd) : cq(-4 * P * P + 4 * Qd * Qd)).mul(cq(q(1, g * g)));
   return {
     kind: fn, eqT, subT, poly, D, roots: [t1, t2], sols: [L1, L2], period: '2π', periodText: '2kπ',
     sub: 'w = e^(iz)', logLine: `z = -i·Log(${t1})+2kπ ou z = -i·Log(${t2})+2kπ ; k ∈ ℤ`,
@@ -396,7 +400,7 @@ function eqParts(d, level) {
       start: d.eqT, judge: cfg1, decisions: [decision],
       lines: [
         eq(d.subT, `${d.sub}`, 'substitute', ['w+1/w']),
-        eq(d.poly, 'multiplier par 2w (w ≠ 0)', 'polynomial', [d.poly.split(' = ')[0]]),
+        eq(d.poly, 'multiplier par 2w (w ≠ 0), simplifier', 'polynomial', [d.poly.split(' = ')[0]]),
       ],
       menu: [
         { id: 'sub', label: `Poser ${d.sub}`, valid: true },

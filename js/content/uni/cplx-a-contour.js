@@ -40,10 +40,10 @@ const iM = (t) => `<math><mrow>${t}</mrow></math>`;
 const oint = (contour) => iM(`<msub><mo>∮</mo><mrow>${contour}</mrow></msub><mi>f</mi><mo>(</mo><mi>z</mi><mo>)</mo><mspace width="0.2em"/><mi>d</mi><mi>z</mi>`);
 // MathML of |z − c| = R.
 function circleML(c, R) {
-  const inner = c === '0' ? '<mi>z</mi>' : `<mi>z</mi><mo>−</mo>${c.length > 1 ? `<mo>(</mo>${M(c).replace(/^<math[^>]*>|<\/math>$/g, '')}<mo>)</mo>` : M(c).replace(/^<math[^>]*>|<\/math>$/g, '')}`;
+  const inner = M(joinT(['z', zt(X(c).neg())])).replace(/^<math[^>]*>|<\/math>$/g, '');
   return `<mo>|</mo>${inner}<mo>|</mo><mo>=</mo>${M(String(R)).replace(/^<math[^>]*>|<\/math>$/g, '')}`;
 }
-const circleT = (c, R) => `|z${c === '0' ? '' : ` − ${c.length > 1 ? `(${rd(c)})` : rd(c)}`}| = ${R}`;
+const circleT = (c, R) => `|${rdc(joinT(['z', zt(X(c).neg())]))}| = ${String(R).replace('.', ',')}`;
 
 // ======================================================================
 // c-contour-param
@@ -193,7 +193,7 @@ function cpParts(d, level) {
   const parts = [];
   if (level >= 2) {
     parts.push({
-      html: `γ est ${d.desc} :`, ask: 'γ(t) =', start: `γ : ${d.kind === 'seg' ? `segment de ${rdc(d.ps)} à ${rdc(d.qs)}` : `cercle ${circleT(d.z0s, d.R)}`}`,
+      html: `γ est ${d.desc} :`, ask: 'γ(t) =', start: `γ : ${d.kind === 'seg' ? `segment de ${rdc(d.ps)} à ${rdc(d.qs)}` : `cercle de centre ${rdc(d.z0s)} et de rayon ${d.R}`}`,
       judge: { kind: 'param', complex: true, curve: { ref: d.ref, t: d.t, ...(d.kind === 'circ' ? { closed: true } : {}) } },
       lines: [eq(d.line, d.kind === 'seg' ? 'p + (q − p)t' : 'z₀ + Re^(it)', 'param', d.kind === 'seg' ? [d.gamma] : [d.gamma])], menu: CP_MENU('param'),
     });
@@ -366,7 +366,7 @@ function ctParts(d, level) {
     ],
   };
   if (level === 1) {
-    valuePart.html = `Les singularités de f sont ${d.kind === 'cos' ? 'les π/2 + kπ, la plus proche de 0 étant ±π/2' : d.sings.map(rd).join(' et ')}. ${valuePart.html}`;
+    valuePart.html = `${d.kind === 'cos' ? 'Les singularités de f sont les π/2 + kπ, les plus proches de 0 étant ±π/2' : d.sings.length > 1 ? `Les singularités de f sont ${d.sings.map(rdc).join(' et ')}` : `La singularité de f est ${rdc(d.sings[0])}`}. ${valuePart.html}`;
     parts.push(valuePart);
     return parts;
   }
@@ -379,7 +379,7 @@ function ctParts(d, level) {
     });
   } else {
     parts.push({
-      html: 'Les singularités sont les zéros du dénominateur :', ask: 'z :', start: `${d.den} = 0`, judge: SETZ,
+      html: 'Les singularités sont les zéros du dénominateur :', ask: 'z :', start: `${/^\([^()]*\)$/.test(d.den) ? d.den.slice(1, -1) : d.den} = 0`, judge: SETZ,
       lines: [eq(d.sings.map((s) => `z = ${s}`).join(' ou '), 'zéros du dénominateur', 'singularities', d.sings)],
       menu: [{ id: 'zeros', label: 'Chercher les zéros du dénominateur', valid: true }, { id: 'num', label: 'Chercher les zéros du numérateur', valid: false, why: 'Les singularités sont là où le dénominateur s\'annule.' }],
     });
@@ -460,8 +460,9 @@ const CFm_SUB = [
 function kText(k, unit, atom) {
   // c·body with a fraction written after: πi/8, 3πie²/2.
   const ft = (c, body) => (c.d === 1 || !body ? term(c, body) : `${c.n < 0 ? '-' : ''}${Math.abs(c.n) === 1 ? '' : Math.abs(c.n)}${body}/${c.d}`);
-  const re = k.re.n === 0 ? '' : ft(k.re, `${unit}${atom}`);
-  const im = k.im.n === 0 ? '' : ft(k.im, `${unit}i${atom}`);
+  const at = /^[a-z]/.test(atom) && !atom.startsWith('e') ? `·${atom}` : atom;
+  const re = k.re.n === 0 ? '' : ft(k.re, `${unit}${unit ? at : atom}`);
+  const im = k.im.n === 0 ? '' : ft(k.im, `${unit}i${at}`);
   return joinT([re, im]);
 }
 
@@ -539,9 +540,9 @@ function cfParts(d, level) {
   };
   if (d.n > 0) {
     parts.push({
-      html: level === 1 ? `g(z) = ${M(d.g)}, z₀ = ${rd(d.z0)} et n = ${d.n} : on dérive g ${d.n} fois.` : `On écrit l'intégrande g(z)/(z − z₀)^(n+1), puis on dérive g :`,
+      html: level === 1 ? `g(z) = ${M(d.g)}, z₀ = ${rd(d.z0)} et n = ${d.n} : on dérive g ${d.n === 1 ? 'une fois' : `${d.n} fois`}.` : `On écrit l'intégrande g(z)/(z − z₀)^(n+1), puis on dérive g :`,
       ask: `g⁽${d.n}⁾(z) =`, start: Array.from({ length: d.n }).reduce((s) => `d(${s}, z)`, d.g), judge: CV({ vars: ['z'], cz: ['z'], box: [-1, 1] }),
-      decisions: level === 1 ? [] : [ndec], lines: [eq(d.gn, `dériver ${d.n} fois`, 'identify', [d.gn])],
+      decisions: level === 1 ? [] : [ndec], lines: [eq(d.gn, d.n === 1 ? 'dériver une fois' : `dériver ${d.n} fois`, 'identify', [d.gn])],
       menu: CF_MENU('deriv'),
     });
   }
