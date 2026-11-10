@@ -96,3 +96,5 @@ import { cval, arcb, laur } from './cplx-cb.js'; // step U10, part cb: labelled 
 Object.assign(JUDGES, { cval, arcb, laur });
 import { FA_JUDGES } from './fourier-a-judges.js'; // step U10, part fa: fcomplex, eigen
 Object.assign(JUDGES, FA_JUDGES);
+import * as distrib from './distrib.js'; // step U10, part fb: distributions (module F, MT/SV)
+Object.assign(JUDGES, { distrib });
