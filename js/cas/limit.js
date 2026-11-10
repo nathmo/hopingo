@@ -35,7 +35,9 @@ export function targetOf(node) {
 }
 
 function bySeries(node, v, to, dir, env) {
-  const d = dir === '+' ? 1 : dir === '-' ? -1 : 0;
+  // At ±∞ the series is in h = 1/v, which has the sign of the bound: an odd
+  // pole there has a sign, not two.
+  const d = to === '+inf' ? 1 : to === '-inf' ? -1 : dir === '+' ? 1 : dir === '-' ? -1 : 0;
   for (const W of [4, 8, 14]) {
     let s;
     try { s = series(node, v, to, W, { dir: d, env }); } catch (e) {
