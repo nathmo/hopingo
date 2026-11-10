@@ -316,13 +316,15 @@ Avec j = k − 1, Σ_{k=2}^{n + 1} (k − 1) =
   pièges : g5_reindex_half
 
 Calcule S(n) = Σ_{k=1}^{n} 3/(k(k + 1)) en fonction de n, puis S(7).
-  [free, sans aide, examen open]  Σ_{k=1}^{n} 3/(k(k + 1))
-    = Σ_{k=1}^{n} (3/k − 3/(k + 1))   ← Décomposer
-    (Les termes : (3 − 3/2) + (3/2 − 3/3) + … + (3/n − 3/(n + 1)))
-    = 3 − 3/(n + 1)   ← Télescoper : il reste le début et la fin
-    = 3n/(n + 1)   ← Réduire
-  — Valeur pour n = 7 :  [juge value]  départ : S_7
-    = 21/8   ← n = 7
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 3 ; Valeur pour n = 7 : 1)
+    [free, sans aide, suivre l'erreur, examen open]  Σ_{k=1}^{n} 3/(k(k + 1))
+      = Σ_{k=1}^{n} (3/k − 3/(k + 1))   ← Décomposer
+      (Les termes : (3 − 3/2) + (3/2 − 3/3) + … + (3/n − 3/(n + 1)))
+      = 3 − 3/(n + 1)   ← Télescoper : il reste le début et la fin
+      = 3n/(n + 1)   ← Réduire
+    — Valeur pour n = 7 :  [juge value]  départ : S_7
+      = 21/8   ← n = 7
   pièges : g5_reindex_half
 
 ```
@@ -664,13 +666,15 @@ Suite géométrique, u₀ = 2, q = 3. S = 2 + 6 + … + 2·3⁵ vaut :
   pièges : g5_geom_offset
 
 Une balle tombe d'une hauteur de 3 m. Après chaque rebond, elle remonte aux 3/4 de la hauteur précédente. (a) Écris la distance Dₙ parcourue jusqu'au n-ième contact avec le sol, sans Σ. (b) Quelle est la distance totale ?
-  [free, sans aide, examen open]  3 + 2·Σ_{k=1}^{n − 1} 3·(3/4)^k
-    (Descente de 3 m, puis pour chaque rebond k = 1, …, n − 1 : montée et descente de 3·(3/4)ᵏ.)
-    = 3 + 2·3·(3/4)·(1 − (3/4)^(n − 1))/(1 − 3/4)   ← Somme géométrique de n − 1 termes
-    = 3 + 18(1 − (3/4)^(n − 1))   ← Simplifier
-  — (b) Distance totale (n → ∞) :  [juge value]  départ : D
-    = 3 + 18   ← |3/4| < 1 : (3/4)ⁿ⁻¹ → 0
-    = 21   ← Calculer
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 3 ; (b) Distance totale (n → ∞) : 3)
+    [free, sans aide, suivre l'erreur, examen open]  3 + 2·Σ_{k=1}^{n − 1} 3·(3/4)^k
+      (Descente de 3 m, puis pour chaque rebond k = 1, …, n − 1 : montée et descente de 3·(3/4)ᵏ.)
+      = 3 + 2·3·(3/4)·(1 − (3/4)^(n − 1))/(1 − 3/4)   ← Somme géométrique de n − 1 termes
+      = 3 + 18(1 − (3/4)^(n − 1))   ← Simplifier
+    — (b) Distance totale (n → ∞) :  [juge value]  départ : D
+      = 3 + 18   ← |3/4| < 1 : (3/4)ⁿ⁻¹ → 0
+      = 21   ← Calculer
   pièges : g5_reindex_half
 
 ```
@@ -855,16 +859,18 @@ Montre par récurrence : Σk=1^(n) k = n(n + 1)/2 pour tout n ≥ 1. Touche les 
 
 ```
 Montre par récurrence : Σk=1^(n) (2k − 1) = n² pour tout n ≥ 1. Touche les blocs dans l'ordre de la preuve et complète le calcul.
-  [blocs frame, sans aide]
-    1. Initialisation : pour n = 1, Σk=1^1 (2k − 1) = 1 = 1². ✓
-    2. Hérédité : supposons Σk=1^(n) (2k − 1) = n² pour un n ≥ 1.
-    3. Alors Σk=1^(n+1) (2k − 1) = n² + (2(n + 1) − 1) = n² + 2n + 1.   [à écrire : n² + (2(n + 1) − 1) = n^2+2n+1]
-    4. n² + 2n + 1 = (n + 1)² : P(n + 1) est vraie.
-    5. Conclusion : par récurrence, P(n) est vraie pour tout n ≥ 1.
-    ✗ C'est vrai pour n = 1, 2 et 3, donc pour tout n. [g9_proof_by_example]
-    ✗ L'hérédité suffit : P(n) est donc vraie pour tout n, sans initialisation. [g5_induction_no_base]
-    ✗ Hérédité : supposons Σk=1^(n+1) (2k − 1) = (n + 1)². [g5_induction_circular]
-  [examen open]
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 5)
+    [blocs frame, sans aide]
+      1. Initialisation : pour n = 1, Σk=1^1 (2k − 1) = 1 = 1². ✓
+      2. Hérédité : supposons Σk=1^(n) (2k − 1) = n² pour un n ≥ 1.
+      3. Alors Σk=1^(n+1) (2k − 1) = n² + (2(n + 1) − 1) = n² + 2n + 1.   [à écrire : n² + (2(n + 1) − 1) = n^2+2n+1]
+      4. n² + 2n + 1 = (n + 1)² : P(n + 1) est vraie.
+      5. Conclusion : par récurrence, P(n) est vraie pour tout n ≥ 1.
+      ✗ C'est vrai pour n = 1, 2 et 3, donc pour tout n. [g9_proof_by_example]
+      ✗ L'hérédité suffit : P(n) est donc vraie pour tout n, sans initialisation. [g5_induction_no_base]
+      ✗ Hérédité : supposons Σk=1^(n+1) (2k − 1) = (n + 1)². [g5_induction_circular]
+    [examen open]
   pièges : g9_proof_by_example, g5_induction_no_base, g5_induction_circular
 
 On montre par récurrence : 2ⁿ ≥ n + 1 pour tout n ≥ 0. Quelle phrase commence l'hérédité ?
@@ -1062,15 +1068,17 @@ Montre par récurrence que Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour tout n ≥
 
 ```
 Montre par récurrence que Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour tout n ≥ 1.
-  [free, sans aide, examen open]  Σ_{k=1}^{1} 1/(k(k + 1))
-    (Initialisation : calcule Σ_{k=1}^{1} 1/(k(k + 1)), puis compare avec la formule pour n = 1.)
-    = 1/2   ← Initialisation : la formule donne aussi 1/2 pour n = 1
-  — Hérédité : on suppose Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour un n ≥ 1. Écris la somme jusqu'à n + 1 jusqu'à (n + 1)/(n + 2).  [juge equiv]  départ : Σ_{k=1}^{n + 1} 1/(k(k + 1))
-    = Σ_{k=1}^{n} 1/(k(k + 1)) + 1/((n + 1)(n + 2))   ← Séparer le dernier terme (k = n + 1)
-    = n/(n + 1) + 1/((n + 1)(n + 2))   ← Hypothèse de récurrence
-    = (n² + 2n + 1)/((n + 1)(n + 2))   ← Mettre en facteur
-    = (n + 1)/(n + 2)   ← C'est la formule au rang n + 1
-    (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; Hérédité : on suppose Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour un n ≥ 1. Écris la somme jusqu'à n + 1 jusqu'à (n + 1)/(n + 2). : 3)
+    [free, sans aide, suivre l'erreur, examen open]  Σ_{k=1}^{1} 1/(k(k + 1))
+      (Initialisation : calcule Σ_{k=1}^{1} 1/(k(k + 1)), puis compare avec la formule pour n = 1.)
+      = 1/2   ← Initialisation : la formule donne aussi 1/2 pour n = 1
+    — Hérédité : on suppose Σ_{k=1}^{n} 1/(k(k + 1)) = n/(n + 1) pour un n ≥ 1. Écris la somme jusqu'à n + 1 jusqu'à (n + 1)/(n + 2).  [juge equiv]  départ : Σ_{k=1}^{n + 1} 1/(k(k + 1))
+      = Σ_{k=1}^{n} 1/(k(k + 1)) + 1/((n + 1)(n + 2))   ← Séparer le dernier terme (k = n + 1)
+      = n/(n + 1) + 1/((n + 1)(n + 2))   ← Hypothèse de récurrence
+      = (n² + 2n + 1)/((n + 1)(n + 2))   ← Mettre en facteur
+      = (n + 1)/(n + 2)   ← C'est la formule au rang n + 1
+      (Conclusion : par récurrence, la formule est vraie pour tout n ≥ 1.)
 
 ```
 
@@ -1236,17 +1244,19 @@ Montre par récurrence : f(x) = 3x + 2, f₁ = f et fₙ₊₁ = f ∘ fₙ : f�
 
 ```
 Montre par récurrence : f(x) = x², f₁ = f et fₙ₊₁ = f ∘ fₙ : fₙ(x) = x^(2ⁿ) pour tout n ≥ 1 et tout x > 0. Touche les blocs dans l'ordre de la preuve et complète le calcul.
-  [blocs frame, sans aide]
-    1. Initialisation : f₁(x) = x² = x^(2¹). ✓
-    2. Hérédité : supposons fₙ(x) = x^(2ⁿ) pour un n ≥ 1.
-    3. Alors fₙ₊₁(x) = f(fₙ(x)) = (x^(2ⁿ))².
-    4. (x^(2ⁿ))² = x^(2·2ⁿ) = x^(2ⁿ⁺¹) : P(n + 1) est vraie.   [à écrire : (x^(2ⁿ))² = x^(2^(n+1))]
-    5. Conclusion : par récurrence, P(n) est vraie pour tout n ≥ 1.
-    ✗ Alors fₙ₊₁(x) = f(fₙ(x)) = x^(2ⁿ + 2). [g2_power_power]
-    ✗ C'est vrai pour n = 1, 2 et 3, donc pour tout n. [g9_proof_by_example]
-    ✗ Hérédité : supposons fₙ₊₁(x) = x^(2ⁿ⁺¹). [g5_induction_circular]
-    ✗ L'hérédité suffit : P(n) est donc vraie pour tout n, sans initialisation. [g5_induction_no_base]
-  [examen open]
+  [problème, examen open, 5 points]
+  partie 1 (Début du problème : 5)
+    [blocs frame, sans aide]
+      1. Initialisation : f₁(x) = x² = x^(2¹). ✓
+      2. Hérédité : supposons fₙ(x) = x^(2ⁿ) pour un n ≥ 1.
+      3. Alors fₙ₊₁(x) = f(fₙ(x)) = (x^(2ⁿ))².
+      4. (x^(2ⁿ))² = x^(2·2ⁿ) = x^(2ⁿ⁺¹) : P(n + 1) est vraie.   [à écrire : (x^(2ⁿ))² = x^(2^(n+1))]
+      5. Conclusion : par récurrence, P(n) est vraie pour tout n ≥ 1.
+      ✗ Alors fₙ₊₁(x) = f(fₙ(x)) = x^(2ⁿ + 2). [g2_power_power]
+      ✗ C'est vrai pour n = 1, 2 et 3, donc pour tout n. [g9_proof_by_example]
+      ✗ Hérédité : supposons fₙ₊₁(x) = x^(2ⁿ⁺¹). [g5_induction_circular]
+      ✗ L'hérédité suffit : P(n) est donc vraie pour tout n, sans initialisation. [g5_induction_no_base]
+    [examen open]
   pièges : g2_power_power, g9_proof_by_example, g5_induction_circular, g5_induction_no_base
 
 Vrai ou faux ?

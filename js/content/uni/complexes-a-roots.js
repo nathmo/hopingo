@@ -14,7 +14,7 @@ import { CQ } from '../../cas/complex.js';
 import { linesItem, mcq, tfItem, answerItem, examTag } from './kit.js';
 import { problemItem } from './kit-problem.js';
 import {
-  q, nz, modeOf, H, E, partsScript, M, fr, ALG, EXP, ASK, SET, KEYS, KEYS_SET, Sd, cz, czText, czAdd, czExact, cqText,
+  q, nz, modeOf, H, E, partsScript, M, fr, frs, ALG, EXP, ASK, SET, KEYS, KEYS_SET, Sd, cz, czText, czAdd, czExact, cqText,
   polarToCz, principalT, piT, expText, trigText, unitText, isNiceAngle, options, clean, bl, cq, iT, joinT, termsOf, par,
 } from './complexes-a-kit.js';
 
@@ -29,6 +29,7 @@ function prep(judge, lines, level, blanks = [], start = null) {
   return out;
 }
 const setText = (xs) => `{${xs.join(' ; ')}}`;
+const SUP = { 2: '²', 3: '³', 4: '⁴', 6: '⁶' };
 // A numerator: in brackets when it has two parts.
 const numer = (z) => (z.re.n && z.im.n ? `(${zt(z)})` : zt(z));
 
@@ -80,7 +81,8 @@ function rootData(rng, kind, ns, exactW = false) {
       if (zs.some((z) => !z)) continue;
     }
     // A root with rational parts, for the check (zₖ)ⁿ = w.
-    const ctl = us.find((u) => u.re.isRational() && u.im.isRational() && !(u.re.isZero() && u.im.isZero()));
+    const rat = us.filter((u) => u.re.isRational() && u.im.isRational());
+    const ctl = rat.find((u) => !u.im.isZero()) ?? rat.find((u) => u.re.sign() < 0) ?? null;
     return { kind, n, rr, phi, rho, w, angles, us, a, zs, ctl };
   }
   return null;
@@ -112,14 +114,15 @@ function nrParts(d, level) {
   if (d.phi.n !== 0 && level >= 2) {
     parts.push({ html: `Écris w = ${M(wS)} sous forme exponentielle :`, ask: 'w =', start: wS, judge: EXP, lines: prep(EXP, [E(expText(d.rho, d.phi), 'w = ρ·e^(iφ)', 'wexp', 'wexp')], level, [[d.rho.text()]]) });
   }
-  const modLines = [E(String(d.rr), d.n === 2 ? `|${u}|² = ${d.rho.text()}` : `|${u}|^${d.n} = ${d.rho.text()}`, 'mod', 'mod')];
-  parts.push({ html: `Module des racines : |${u}|^${d.n} = |w| = ${fr(d.rho.text())}, donc |${u}| =`, ask: `|${u}| =`, start: `|${u}|`, judge: ASK(d.rr), lines: prep(ASK(d.rr), modLines, level) });
+  const modLines = [E(String(d.rr), `|${u}|${SUP[d.n]} = ${fr(d.rho.text())}`, 'mod', 'mod')];
+  parts.push({ html: `Module des racines : |${u}|${SUP[d.n]} = |w| = ${fr(d.rho.text())}, donc |${u}| =`, ask: `|${u}| =`, start: `|${u}|`, judge: ASK(d.rr), lines: prep(ASK(d.rr), modLines, level) });
   const stepT = { 2: 'kπ', 3: '2kπ/3', 4: 'kπ/2', 6: 'kπ/3' }[d.n];
   parts.push({ html: `Arguments : ${u === 'u' ? 'u' : 'z'} = |${u}|·e^(iθ), et ${d.n}θ = φ + 2kπ. Résous en θ :`, ask: '', start: argStart(d), judge: ARGS, lines: prep(ARGS, [E(argText(d), `Diviser par ${d.n}, la période aussi`, 'args', 'args')], level, [[stepT]]) });
   // One part per root (levels 1 to 3).
   if (level <= 3) {
     d.angles.forEach((t, k) => {
       const uk = d.us[k];
+      if (t.n === 0) return; // u₀ = rr is already written a + bi
       const lines = prep(ALG, [
         E(trigText(d.rr, t), 'r(cos θ + i sin θ)', 'alg', 'alg'),
         E(d.rr === 1 ? unitText(t) : `${d.rr}(${unitText(t)})`, 'Valeurs exactes', 'alg', 'alg'),
@@ -128,7 +131,7 @@ function nrParts(d, level) {
       parts.push({ html: `k = ${k} : ${u}${'₀₁₂₃₄₅'[k]} =`, ask: `${u}${'₀₁₂₃₄₅'[k]} =`, start: expText(d.rr, t), judge: ALG, lines });
     });
     if (d.ctl && exactW) {
-      parts.push({ html: `Contrôle : (${fr(czText(d.ctl))})^${d.n} =`, ask: '', start: `(${czText(d.ctl)})^${d.n}`, judge: ALG, lines: prep(ALG, [E(wS, 'On retrouve w', 'ctl', 'ctl')], level) });
+      parts.push({ html: `Contrôle : ${M(`(${czText(d.ctl)})^${d.n}`)} =`, ask: '', start: `(${czText(d.ctl)})^${d.n}`, judge: ALG, lines: prep(ALG, [E(wS, 'On retrouve w', 'ctl', 'ctl')], level) });
     }
   }
   // The set of solutions: from the equation when w is in ℚ(i), else from
@@ -137,7 +140,7 @@ function nrParts(d, level) {
   const fromEq = exactW;
   const startSet = fromEq ? eqText(d) : setText(d.angles.map((t) => (d.a ? `${zt(d.a)}+${expText(d.rr, t)}` : expText(d.rr, t))));
   parts.push({
-    html: fromEq ? `Les solutions de ${M(eqText(d))}, sous forme algébrique :` : `Les solutions${d.a ? ` z = ${fr(zt(d.a))} + u` : ''}, sous forme algébrique :`,
+    html: fromEq ? `Les solutions de ${M(eqText(d))}, sous forme algébrique :` : `Les solutions${d.a ? ` z = ${frs(zt(d.a))} + u` : ''}, sous forme algébrique :`,
     ask: 'S =', start: startSet, judge: SET(), lines: prep(SET(), [E(set, `Les ${d.n} racines`, 'roots', 'roots')], level, [level === 1 ? [czText(d.zs[d.n - 1])] : []]),
   });
   return parts;
@@ -155,7 +158,7 @@ function nrItem(level, rng, opts = {}) {
   const given = level === 1 && d.phi.n !== 0 ? ` On donne w = ${M(czText(d.w))} = ${M(expText(d.rho, d.phi))}.` : '';
   return linesItem({
     skill: NR, level, mode: modeOf(level), start, judge, script,
-    prompt: `Résous dans ℂ : ${M(eq)}.${d.a ? ` Pose u = ${M(`z-(${zt(d.a)})`)}.` : ''} Donne les ${d.n} solutions sous forme algébrique${level === 5 ? ', sans aide' : ''}.${given}`,
+    prompt: `Résous dans ℂ : ${M(eq)}.${d.a ? ` Pose u = ${M(joinT(['z', ...termsOf(d.a.neg())]))}.` : ''} Donne les ${d.n} solutions sous forme algébrique${level === 5 ? ', sans aide' : ''}.${given}`,
     hints: H(`Il y a ${d.n} racines, de module ${d.rr} et d'arguments espacés de 2π/${d.n}.`, `θ = ${M(piT(d.phi.div(d.n)))} + 2kπ/□`, M(setText(roots))),
     subgoals: NR_SUB, keys: KEYS_ALL, tapActions: level === 3 ? 'steps' : null,
     key: `${NR}:${level}:${eq}`, exam: examTag(opts, 4), fallback: !!d.fallback,
@@ -240,21 +243,21 @@ function sqrtParts(d, level, { v = 'z', withPose = level >= 2, decide = level ==
   }
   const sys = `x² − y² = ${fr(d.a)} et 2xy = ${fr(d.b)}`;
   parts.push({
-    html: `${withPose ? `On identifie avec ${fr(ws)} : ${sys}. ` : ''}Module : x² + y² = |${fr(ws)}| =`, ask: 'x² + y² =',
+    html: `${withPose ? `On identifie avec ${M(ws)} : ${sys}. ` : ''}Module : x² + y² = ${M(`|${ws}|`)} =`, ask: 'x² + y² =',
     start: `|${ws}|`, judge: ALG,
-    lines: prep(ALG, [E(`√(${d.a * d.a}+${d.b * d.b})`, '|a + bi| = √(a² + b²)', 'mod', 'mod'), E(String(d.m), 'Calculer', 'mod', 'mod')], level, [[String(d.b * d.b)], []]),
+    lines: prep(ALG, [...(d.a ? [E(`√(${d.a * d.a}+${d.b * d.b})`, '|a + bi| = √(a² + b²)', 'mod', 'mod')] : []), E(String(d.m), d.a ? 'Calculer' : '|bi| = |b|', 'mod', 'mod')], level, d.a ? [[String(d.b * d.b)], []] : [[]]),
   });
   parts.push({ html: `x² = (|w| + a)/2 = (${d.m} ${d.a < 0 ? '−' : '+'} ${Math.abs(d.a)})/2 :`.replace(level >= 4 ? /x² = .*$/ : /$^/, 'x² ='), ask: 'x² =', start: 'x^2', judge: ASK(d.x * d.x), lines: prep(ASK(d.x * d.x), [E(String(d.x * d.x), 'Additionner les équations', 'solve', 'solve')], level) });
   parts.push({ html: 'y² =', ask: 'y² =', start: 'y^2', judge: ASK(d.y * d.y), lines: prep(ASK(d.y * d.y), [E(String(d.y * d.y), 'Soustraire les équations', 'solve', 'solve')], level) });
   const same = d.b > 0;
   const pre = decide ? [{ kind: 'decision', prompt: `2xy = ${fr(d.b)} ${same ? '>' : '<'} 0. Les racines sont :`, options: [
-    { id: 'two', label: `${same ? 'x et y de même signe' : 'x et y de signes contraires'} : ±(${fr(zt(d.z))})`, valid: true },
-    { id: 'four', label: `les quatre : ±${d.x} ± ${Math.abs(d.y)}i`, valid: false, rule: 'g8_sqrt_signs', why: `(${fr(zt(d.z.conj()))})² = ${fr(zt(d.z.conj().mul(d.z.conj())))} : seules deux combinaisons de signes conviennent.` },
-    { id: 'wrong', label: `±(${fr(zt(d.z.conj()))})`, valid: false, rule: 'g8_sqrt_signs', why: `2xy = ${fr(d.b)} : x et y ont ${same ? 'le même signe' : 'des signes contraires'}.` },
+    { id: 'two', label: `${same ? 'x et y de même signe' : 'x et y de signes contraires'} : ±(${frs(zt(d.z))})`, valid: true },
+    { id: 'four', label: `les quatre : ±${d.x} ± ${Math.abs(d.y)}i`, valid: false, rule: 'g8_sqrt_signs', why: `(${frs(zt(d.z.conj()))})² = ${frs(zt(d.z.conj().mul(d.z.conj())))} : seules deux combinaisons de signes conviennent.` },
+    { id: 'wrong', label: `±(${frs(zt(d.z.conj()))})`, valid: false, rule: 'g8_sqrt_signs', why: `2xy = ${fr(d.b)} : x et y ont ${same ? 'le même signe' : 'des signes contraires'}.` },
   ] }] : [];
   const roots = setText([zt(d.z), zt(d.z.neg())]);
   const sj = setJudge || SET(v);
-  parts.push({ html: `Les racines carrées de ${fr(ws)} :`, ask: 'S =', start: setStart || `${v}^2=${ws}`, judge: sj, pre, lines: prep(sj, [E(roots, 'Deux racines opposées', 'signs', 'signs')], level, [[zt(d.z.neg())]]) });
+  parts.push({ html: `Les racines carrées de ${M(ws)} :`, ask: 'S =', start: setStart || `${v}^2=${ws}`, judge: sj, pre, lines: prep(sj, [E(roots, 'Deux racines opposées', 'signs', 'signs')], level, [[zt(d.z.neg())]]) });
   return parts;
 }
 
@@ -367,6 +370,13 @@ function quadData(rng, kind) {
   }
   return null;
 }
+// i√m simplified: 2i√17, 3i, i√10.
+function surdI(m) {
+  let k = 1;
+  let s = m;
+  for (let f = 2; f * f <= s; f++) while (s % (f * f) === 0) { s /= f * f; k *= f; }
+  return `${k === 1 ? '' : k}i${s === 1 ? '' : `√${s}`}`;
+}
 const QFALL = () => {
   const a = cq(1); const b = cq(-3, -1); const c = cq(4, 3);
   return { kind: 'one', a, b, c, D: cq(-8, -6), delta: cq(1, -3), two: cq(2), r1: cq(2, -1), r2: cq(1, 2), b2: b.mul(b), ac4: c.mul(4), fallback: true };
@@ -384,7 +394,8 @@ function coefText(k, v) {
   return `${zt(k)}${v}`;
 }
 export const quadText = (d, v = 'z') => `${joinT([coefText(d.a, `${v}^2`), coefText(d.b, v), ...termsOf(d.c)])}=0`;
-const discStart = (d) => `(${zt(d.b)})^2-4${d.a.eq(1) ? '' : `(${zt(d.a)})`}(${zt(d.c)})`;
+const plainPos = (z) => z.isReal() && z.re.n > 0;
+const discStart = (d) => `${plainPos(d.b) ? zt(d.b) : `(${zt(d.b)})`}^2-4${d.a.eq(1) ? '' : plainPos(d.a) ? `×${zt(d.a)}` : `(${zt(d.a)})`}${plainPos(d.c) ? `×${zt(d.c)}` : `(${zt(d.c)})`}`;
 const formula = (d, sgn) => `(${par(d.b.neg())}${sgn}(${zt(d.delta)}))/${d.two.isReal() ? zt(d.two) : `(${zt(d.two)})`}`;
 
 // Δ, δ (by x + iy at level 5 of g8-sqrt-alg), then z₁ and z₂ or the set.
@@ -392,22 +403,22 @@ function quadParts(d, level, { chain = false } = {}) {
   const parts = [];
   const Ds = zt(d.D);
   const expand = joinT([...termsOf(d.b2), ...termsOf(d.ac4.neg())]);
-  parts.push({ start: discStart(d), judge: ALG, lines: prep(ALG, [E(expand, 'b² et 4ac', 'disc', 'disc'), E(Ds, 'Regrouper', 'disc', 'disc')], level, [[zt(d.b2).replace(/^-/, '')], []]) });
+  parts.push({ start: discStart(d), judge: ALG, lines: prep(ALG, [E(expand, 'b² et 4ac', 'disc', 'disc'), E(Ds, 'Regrouper', 'disc', 'disc')], level, [[(termsOf(d.ac4.neg()).filter(Boolean).at(-1) || '').replace(/^-/, '')], []]) });
   const real = d.D.isReal();
   const decide = level === 2 || level === 3;
   const pre = [];
   if (level <= 2 && !chain) {
     const m = d.delta.abs2().n;
-    pre.push({ kind: 'note', html: real ? `Δ = ${fr(Ds)} est un réel négatif : δ = i√${-d.D.re.n}.` : `δ = x + iy avec δ² = Δ : x² − y² = ${fr(d.D.re.n)}, 2xy = ${fr(d.D.im.n)}, x² + y² = |Δ| = ${m}.` });
+    pre.push({ kind: 'note', html: real ? `Δ = ${frs(Ds)} est un réel négatif : δ = i√${-d.D.re.n}.` : `δ = x + iy avec δ² = Δ : x² − y² = ${fr(d.D.re.n)}, 2xy = ${fr(d.D.im.n)}, x² + y² = |Δ| = ${m}.` });
   }
   if (decide && !chain) {
-    pre.push({ kind: 'decision', prompt: `Comment trouver δ, une racine carrée de Δ = ${fr(Ds)} ?`, options: real ? [
+    pre.push({ kind: 'decision', prompt: `Comment trouver δ, une racine carrée de Δ = ${frs(Ds)} ?`, options: real ? [
       { id: 'ineg', label: `Δ est un réel négatif : δ = i√${-d.D.re.n}`, valid: true },
       { id: 'xy', label: 'Poser δ = x + iy avec δ² = Δ', valid: true },
       { id: 'none', label: 'Pas de solution : Δ < 0', valid: false, why: 'Dans ℂ, un réel négatif a deux racines carrées : ±i√(−Δ).' },
     ] : [
       { id: 'xy', label: 'Poser δ = x + iy avec δ² = Δ', valid: true },
-      { id: 'sym', label: `δ = i√(${fr(zt(d.D.neg()))}), comme pour un réel négatif`, valid: false, rule: 'g8_sqrt_symbol_complex', why: 'La règle √(−a) = i√a ne vaut que pour a réel positif. Ici Δ n\'est pas réel.' },
+      { id: 'sym', label: `δ = i√(${frs(zt(d.D.neg()))}), comme pour un réel négatif`, valid: false, rule: 'g8_sqrt_symbol_complex', why: 'La règle √(−a) = i√a ne vaut que pour a réel positif. Ici Δ n\'est pas réel.' },
       { id: 'parts', label: 'Prendre la racine de chaque partie de Δ', valid: false, why: '√ ne se calcule pas partie par partie : (x + iy)² = x² − y² + 2xyi.' },
     ] });
   }
@@ -430,7 +441,7 @@ function quadParts(d, level, { chain = false } = {}) {
       // z₁ + z₂ = −b/a (left out when both roots are a single term).
       const sum = `${numer(d.r1)}+${numer(d.r2)}`;
       const useSum = (d.r1.re.n && d.r1.im.n) || (d.r2.re.n && d.r2.im.n);
-      if (useSum) parts.push({ html: 'Contrôle par Viète : z₁ + z₂ (doit valoir −b/a) =', ask: 'z₁ + z₂ =', start: sum, judge: ALG, lines: prep(ALG, [E(zt(d.r1.add(d.r2)), `−b/a = ${fr(zt(d.r1.add(d.r2)))}`, 'viete', 'viete')], level) });
+      if (useSum) parts.push({ html: 'Contrôle par Viète : z₁ + z₂ (doit valoir −b/a) =', ask: 'z₁ + z₂ =', start: sum, judge: ALG, lines: prep(ALG, [E(zt(d.r1.add(d.r2)), `−b/a = ${frs(zt(d.r1.add(d.r2)))}`, 'viete', 'viete')], level) });
     }
   } else {
     parts.push({ html: 'Les solutions, sous forme algébrique :', ask: 'S =', start: quadText(d), judge: SET(), lines: [E(setText([zt(d.r1), zt(d.r2)]), 'z = (−b ± δ)/(2a), simplifié', 'formula', 'set')] });
@@ -443,7 +454,7 @@ function quadItem(level, rng, opts = {}, { skill = QU, chain = false } = {}) {
   const d = quadData(rng, chain ? rng.pick(['one', 'cplx']) : kind) || QFALL();
   const parts = quadParts(d, level, { chain });
   if (level === 2 && !d.a.eq(1) && !chain) {
-    parts[0].pre = [{ kind: 'decision', prompt: `a = ${fr(zt(d.a))} : comment commencer ?`, options: [
+    parts[0].pre = [{ kind: 'decision', prompt: `a = ${frs(zt(d.a))} : comment commencer ?`, options: [
       { id: 'direct', label: 'Formule directe avec a, b, c', valid: true, quality: 'good' },
       { id: 'divide', label: 'Diviser d\'abord l\'équation par a', valid: true, quality: 'good', why: 'Possible aussi : les coefficients changent, les solutions non.' },
     ] }];
@@ -517,7 +528,7 @@ function quMcq(rng) {
     const wrongs = [];
     if (!d.D.isReal()) {
       // δ taken as i√|Δ|, as if Δ were a negative real.
-      const ia = `i√${d.delta.abs2().n}`;
+      const ia = surdI(d.delta.abs2().n);
       const den = d.two.isReal() ? zt(d.two) : `(${zt(d.two)})`;
       wrongs.push({ html: M(setText([`(${par(d.b.neg())}+${ia})/${den}`, `(${par(d.b.neg())}-${ia})/${den}`])), rule: 'g8_sqrt_symbol_complex' });
     }

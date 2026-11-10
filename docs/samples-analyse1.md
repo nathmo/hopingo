@@ -689,11 +689,13 @@ Soit f(x) = (x + 2)^(1 + x²). Que vaut f′(1) ?
   pièges : a1_exp_rule_var_base, g6_power_rule_exp
 
 Calcule la dérivée de f(x) = (1 + x²)^x, puis sa valeur en 2.
-  [free, sans aide, examen open]  ((1 + x²)^x)′
-    = (e^(x·ln(1 + x²)))′   ← Forme exponentielle
-    = (1 + x²)^x·(ln(1 + x²) + 2x²/(1 + x²))   ← Dériver l'exposant, puis revenir à f
-  — Calcule maintenant f′(2).  [juge definite]  départ : (1 + (2)²)^(2)·(ln(1 + (2)²) + 2(2)²/(1 + (2)²))
-    = 25ln(5) + 40   ← Évaluer et simplifier
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 1 ; Calcule maintenant f′(2). : 1)
+    [free, sans aide, suivre l'erreur, examen open]  ((1 + x²)^x)′
+      = (e^(x·ln(1 + x²)))′   ← Forme exponentielle
+      = (1 + x²)^x·(ln(1 + x²) + 2x²/(1 + x²))   ← Dériver l'exposant, puis revenir à f
+    — Calcule maintenant f′(2).  [juge definite]  départ : (1 + (2)²)^(2)·(ln(1 + (2)²) + 2(2)²/(1 + (2)²))
+      = 25ln(5) + 40   ← Évaluer et simplifier
   pièges : a1_exp_rule_var_base
 
 ```
@@ -883,16 +885,18 @@ Soit f(x) = x·|x| sur ℝ. Quelle affirmation est juste ?
   pièges : a1_corner_missed
 
 Construis la définition de C¹(I). Touche les blocs dans l'ordre.
-  [blocs define, sans aide]
-    1. Soit I ⊂ ℝ un intervalle ouvert et f : I → ℝ.
-    2. f est dérivable en tout point de I.
-    3. La fonction f′ : I → ℝ est continue sur I.
-    4. On note C¹(I) l'ensemble de ces fonctions.
-    ✗ f′ est bornée sur I. [a1_c1_def_missing_cont]
-    ✗ lim_{x→x₀} f′(x) existe pour un x₀ de I. [a1_c1_def_missing_cont]
-    ✗ f′ existe en un point de I. [a1_c1_def_missing_cont]
-    ✗ f est continue sur I. [a1_c1_def_missing_cont]
-  [examen open]
+  [problème, examen open, 1 points]
+  partie 1 (Début du problème : 1)
+    [blocs define, sans aide]
+      1. Soit I ⊂ ℝ un intervalle ouvert et f : I → ℝ.
+      2. f est dérivable en tout point de I.
+      3. La fonction f′ : I → ℝ est continue sur I.
+      4. On note C¹(I) l'ensemble de ces fonctions.
+      ✗ f′ est bornée sur I. [a1_c1_def_missing_cont]
+      ✗ lim_{x→x₀} f′(x) existe pour un x₀ de I. [a1_c1_def_missing_cont]
+      ✗ f′ existe en un point de I. [a1_c1_def_missing_cont]
+      ✗ f est continue sur I. [a1_c1_def_missing_cont]
+    [examen open]
   pièges : a1_c1_def_missing_cont
 
 ```
@@ -1322,14 +1326,16 @@ Vrai ou faux ? « f(x) = x³·sin(1/x), f(0) = 0, est deux fois dérivable sur �
   pièges : a1_derivable_from_formula
 
 Soit f : ]−1 ; 1[ → ℝ, f(x) = x + x³·sin(1/x) si x ≠ 0, et f(0) = 0. Montre que f ∈ C¹(]−1 ; 1[) : dérive f hors de 0, calcule f′(0) par la définition, puis la limite de f′ en 0.
-  [free, sans aide, examen open]  (x + x³·sin(1/x))′
-    = 1 + 3x²·sin(1/x) − x·cos(1/x)   ← Pour x ≠ 0 : produit et composée
-  — En 0, par la définition : (f(h) − f(0))/h.  [juge limit]  départ : (h + h³·sin(1/h))/h
-    = 1 + h²·sin(1/h)   ← Simplifier par h
-    = 1   ← Gendarmes : |h²·sin(1/h)| ≤ |h|² → 0
-  — Continuité de f′ en 0 : la limite de f′(x).  [juge limit]  départ : 1 + 3x²·sin(1/x) − x·cos(1/x)
-    = 1   ← |f′(x) − 1| ≤ 3|x|² + |x| → 0
-    (f est dérivable sur ]−1 ; 1[ et f′ y est continue : f ∈ C¹(]−1 ; 1[).)
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 1,5 ; En 0, par la définition : (f(h) − f(0))/h. : 3 ; Continuité de f′ en 0 : la limite de f′(x). : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  (x + x³·sin(1/x))′
+      = 1 + 3x²·sin(1/x) − x·cos(1/x)   ← Pour x ≠ 0 : produit et composée
+    — En 0, par la définition : (f(h) − f(0))/h.  [juge limit]  départ : (h + h³·sin(1/h))/h
+      = 1 + h²·sin(1/h)   ← Simplifier par h
+      = 1   ← Gendarmes : |h²·sin(1/h)| ≤ |h|² → 0
+    — Continuité de f′ en 0 : la limite de f′(x).  [juge limit]  départ : 1 + 3x²·sin(1/x) − x·cos(1/x)
+      = 1   ← |f′(x) − 1| ≤ 3|x|² + |x| → 0
+      (f est dérivable sur ]−1 ; 1[ et f′ y est continue : f ∈ C¹(]−1 ; 1[).)
   pièges : g6_product_naive, g6_chain_forgot, g6_quotient_sign, g6_quotient_no_square
 
 ```
@@ -2056,24 +2062,26 @@ f est deux fois dérivable sur ℝ et admet un minimum local en 0. Que peut-on a
   [examen mcq]
 
 Soit f(x) = (x² − 2x − 3)/(x² + 2x + 3) sur [−1 ; 2]. Trouve ses extrema globaux.
-  [free, sans aide, examen open]  2² − 4·3
-    (f est-elle définie sur [−1 ; 2] ? Discriminant du dénominateur x² + 2x + 3 :)
-    = −8   ← Δ < 0 : le dénominateur ne s'annule pas
-  — Dérive f :  [juge equiv]  départ : ((x² − 2x − 3)/(x² + 2x + 3))′
-    = (4x(x + 3))/(x² + 2x + 3)²   ← Règle du quotient, factoriser
-  — Résous f′(x) = 0 :  [juge solset]  départ : 4x² + 12x = 0
-    = x = −3 ou x = 0   ← Racines
-  — Évalue f aux candidats :  [juge value]  départ : ((−1)² − 2·(−1) − 3)/((−1)² + 2·(−1) + 3)
-    ? Quels sont les candidats sur [−1 ; 2] ? ✔ x = −1, 0, 2 / · x = 0 seulement / · x = −3, −1, 0, 2 / · x = −1, 2 seulement
-    = 0   ← Calculer
-  — Candidat suivant :  [juge value]  départ : (0² − 2·0 − 3)/(0² + 2·0 + 3)
-    = −1   ← Calculer
-  — Candidat suivant :  [juge value]  départ : (2² − 2·2 − 3)/(2² + 2·2 + 3)
-    = −3/11   ← Calculer
-  — Maximum global de f sur [−1 ; 2] :  [juge value]  départ : M
-    = 0   ← Comparer
-  — Minimum global de f sur [−1 ; 2] :  [juge value]  départ : m
-    = −1   ← Comparer
+  [problème, examen open, 7 points]
+  partie 1 (Début du problème : 1 ; Dérive f : 1 ; Résous f′(x) = 0 : 1 ; Évalue f aux candidats : 1 ; Candidat suivant : 1 ; Candidat suivant : 1 ; Maximum global de f sur [−1 ; 2] : 0,5 ; Minimum global de f sur [−1 ; 2] : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  2² − 4·3
+      (f est-elle définie sur [−1 ; 2] ? Discriminant du dénominateur x² + 2x + 3 :)
+      = −8   ← Δ < 0 : le dénominateur ne s'annule pas
+    — Dérive f :  [juge equiv]  départ : ((x² − 2x − 3)/(x² + 2x + 3))′
+      = (4x(x + 3))/(x² + 2x + 3)²   ← Règle du quotient, factoriser
+    — Résous f′(x) = 0 :  [juge solset]  départ : 4x² + 12x = 0
+      = x = −3 ou x = 0   ← Racines
+    — Évalue f aux candidats :  [juge value]  départ : ((−1)² − 2·(−1) − 3)/((−1)² + 2·(−1) + 3)
+      ? Quels sont les candidats sur [−1 ; 2] ? ✔ x = −1, 0, 2 / · x = 0 seulement / · x = −3, −1, 0, 2 / · x = −1, 2 seulement
+      = 0   ← Calculer
+    — Candidat suivant :  [juge value]  départ : (0² − 2·0 − 3)/(0² + 2·0 + 3)
+      = −1   ← Calculer
+    — Candidat suivant :  [juge value]  départ : (2² − 2·2 − 3)/(2² + 2·2 + 3)
+      = −3/11   ← Calculer
+    — Maximum global de f sur [−1 ; 2] :  [juge value]  départ : M
+      = 0   ← Comparer
+    — Minimum global de f sur [−1 ; 2] :  [juge value]  départ : m
+      = −1   ← Comparer
   pièges : a1_extrema_bounds_forgotten
 
 ```
@@ -2618,20 +2626,22 @@ En quels points la courbe x(t) = t³ − 12t, y(t) = t² − 3 a-t-elle une tang
   [examen mcq]
 
 Soit la courbe γ(t) = (t³ − 3t − 1 ; t² + 2), t ∈ ℝ. Trouve ses tangentes horizontales et verticales et son point double.
-  [free, sans aide, examen open]  (t³ − 3t − 1)′
-    (Dérive x(t) :)
-    = 3t² − 3   ← Dériver
-  — Dérive y(t) :  [juge equiv]  départ : (t² + 2)′
-    = 2t   ← Dériver
-  — Tangente horizontale : ẏ = 0 (ẋ ≠ 0 en ces t)  [juge solset]  départ : 2t = 0
-    = t = 0   ← Racine
-  — Point de tangente horizontale pour t = 0 :  [juge value]  départ : 0² + 2
-    = 2   ← Calculer
-  — Tangente verticale : ẋ = 0 (ẏ ≠ 0 en ces t)  [juge solset]  départ : 3t² − 3 = 0
-    = t = −1 ou t = 1   ← Racines
-  — Point double : y(t) = y(s) avec s ≠ t donne s = −t ; alors x(t) = x(−t) donne, pour t ≠ 0 :  [juge solset]  départ : 2t³ − 6t = 0
-    = t² = 3   ← Diviser par 2t
-    = t = −√3 ou t = √3   ← Racines
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; Dérive y(t) : 0,5 ; Tangente horizontale : ẏ = 0 (ẋ ≠ 0 en ces t) : 0,5 ; Point de tangente horizontale pour t = 0 : 0,5 ; Tangente verticale : ẋ = 0 (ẏ ≠ 0 en ces t) : 0,5 ; Point double : y(t) = y(s) avec s ≠ t donne s = −t ; alors x(t) = x(−t) donne, pour t ≠ 0 : 1)
+    [free, sans aide, suivre l'erreur, examen open]  (t³ − 3t − 1)′
+      (Dérive x(t) :)
+      = 3t² − 3   ← Dériver
+    — Dérive y(t) :  [juge equiv]  départ : (t² + 2)′
+      = 2t   ← Dériver
+    — Tangente horizontale : ẏ = 0 (ẋ ≠ 0 en ces t)  [juge solset]  départ : 2t = 0
+      = t = 0   ← Racine
+    — Point de tangente horizontale pour t = 0 :  [juge value]  départ : 0² + 2
+      = 2   ← Calculer
+    — Tangente verticale : ẋ = 0 (ẏ ≠ 0 en ces t)  [juge solset]  départ : 3t² − 3 = 0
+      = t = −1 ou t = 1   ← Racines
+    — Point double : y(t) = y(s) avec s ≠ t donne s = −t ; alors x(t) = x(−t) donne, pour t ≠ 0 :  [juge solset]  départ : 2t³ − 6t = 0
+      = t² = 3   ← Diviser par 2t
+      = t = −√3 ou t = √3   ← Racines
 
 ```
 
@@ -2894,87 +2904,93 @@ Courbe polaire ρ(φ) = 2/(1 + cos(φ)) pour φ ∈ ]−π ; π[ : limites quand
 
 ```
 Courbe polaire ρ(φ) = 4tan(φ/2) pour φ ∈ [0 ; π[ : limites quand φ → π⁻, ρ̇, pente, point sur Oy, tangentes horizontales.
-  [free, sans aide]  (4tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = 2(1 + tan(φ/2)²)   ← Dériver
-    = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
-    = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 8   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
-    = 4sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
-    = 4   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur]  (4tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = 2(1 + tan(φ/2)²)   ← Dériver
+      = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
+      = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 8   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
+      = 4sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
+      = 4   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 Courbe polaire ρ(φ) = 5tan(φ/2) pour φ ∈ [0 ; π[ : limites quand φ → π⁻, ρ̇, pente, point sur Oy, tangentes horizontales.
-  [free, sans aide]  (5tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = (5/2)(1 + tan(φ/2)²)   ← Dériver
-    = 5/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·sin(φ)
-    = 5sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 5(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 10   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 5tan(φ/2) et ρ̇ = 5/(1 + cos(φ)) :  [juge equiv]  départ : (5/(1 + cos(φ))·sin(φ) + 5tan(φ/2)·cos(φ))/(5/(1 + cos(φ))·cos(φ) − 5tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 10 / · Asymptote horizontale y = 5 / · Asymptote verticale x = −10 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/5
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (5(1 − cos(φ)))′
-    = 5sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 5(1 − cos(π/2))
-    = 5   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 5sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → +∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 5 / · Courbe fermée qui passe par l'origine et par (0 ; 5)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 5tan(φ/2) et ρ̇ = 5/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur]  (5tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = (5/2)(1 + tan(φ/2)²)   ← Dériver
+      = 5/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·sin(φ)
+      = 5sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 5(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 10   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 5tan(φ/2) et ρ̇ = 5/(1 + cos(φ)) :  [juge equiv]  départ : (5/(1 + cos(φ))·sin(φ) + 5tan(φ/2)·cos(φ))/(5/(1 + cos(φ))·cos(φ) − 5tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 10 / · Asymptote horizontale y = 5 / · Asymptote verticale x = −10 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/5
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (5(1 − cos(φ)))′
+      = 5sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 5(1 − cos(π/2))
+      = 5   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 5sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → +∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 5 / · Courbe fermée qui passe par l'origine et par (0 ; 5)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 On étudie la courbe polaire ρ = 2tan(φ/2), φ ∈ [0 ; π[.
-  [free, sans aide]  (2tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = 1 + tan(φ/2)²   ← Dériver
-    = 2/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·sin(φ)
-    = 2sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 2(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 4   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 2tan(φ/2) et ρ̇ = 2/(1 + cos(φ)) :  [juge equiv]  départ : (2/(1 + cos(φ))·sin(φ) + 2tan(φ/2)·cos(φ))/(2/(1 + cos(φ))·cos(φ) − 2tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 4 / · Asymptote horizontale y = 2 / · Asymptote verticale x = −4 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/2
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (2(1 − cos(φ)))′
-    = 2sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 2(1 − cos(π/2))
-    = 2   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 2sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → +∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 2 / · Courbe fermée qui passe par l'origine et par (0 ; 2)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 2tan(φ/2) et ρ̇ = 2/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur]  (2tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = 1 + tan(φ/2)²   ← Dériver
+      = 2/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·sin(φ)
+      = 2sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 2(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 4   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 2tan(φ/2) et ρ̇ = 2/(1 + cos(φ)) :  [juge equiv]  départ : (2/(1 + cos(φ))·sin(φ) + 2tan(φ/2)·cos(φ))/(2/(1 + cos(φ))·cos(φ) − 2tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 4 / · Asymptote horizontale y = 2 / · Asymptote verticale x = −4 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/2
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (2(1 − cos(φ)))′
+      = 2sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 2(1 − cos(π/2))
+      = 2   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 2sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → +∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 2 / · Courbe fermée qui passe par l'origine et par (0 ; 2)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 ```
@@ -2983,31 +2999,33 @@ On étudie la courbe polaire ρ = 2tan(φ/2), φ ∈ [0 ; π[.
 
 ```
 On étudie la courbe polaire ρ = 4tan(φ/2), φ ∈ [0 ; π[.
-  [free, sans aide, examen open]  (4tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = 2(1 + tan(φ/2)²)   ← Dériver
-    = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
-    = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 8   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
-    = 4sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
-    = 4   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, examen open, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur, examen open]  (4tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = 2(1 + tan(φ/2)²)   ← Dériver
+      = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
+      = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 8   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
+      = 4sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
+      = 4   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 ```
@@ -3933,17 +3951,19 @@ Vrai ou faux ?
   [examen tf]
 
 Écris le DL d'ordre 5 de f(x) = ln(1 − x²)/sin(x) en 0, puis déduis-en f⁽⁴⁾(0) et f⁽⁵⁾(0).
-  [free, sans aide, examen open]  ln(1 − x²)/sin(x)
-    = (−x² − x⁴/2 − x⁶/3 + x⁶ε(x))/(x − x³/6 + x⁵/120 + x⁶ε(x))   ← DL du numérateur et du dénominateur
-    = (−x − x³/2 − x⁵/3 + x⁵ε(x))/(1 − x²/6 + x⁴/120 + x⁵ε(x))   ← Simplifier par x
-    = (−x − x³/2 − x⁵/3)·(1 − (−x²/6 + x⁴/120) + (−x²/6 + x⁴/120)²) + x⁵ε(x)   ← 1/(1 + u) = 1 − u + u² − …
-    = −x − (2/3)x³ − (157/360)x⁵ + x⁵ε(x)   ← Développer, garder les termes de degré ≤ 5
-  — Déduis-en f⁽⁴⁾(0) :  [juge value]  départ : f′′′′(0)
-    = 24·0   ← f⁽⁴⁾(0) = 4!·a₄
-    = 0   ← Calculer
-  — Déduis-en f⁽⁵⁾(0) :  [juge value]  départ : f′′′′′(0)
-    = 120·(−157/360)   ← f⁽⁵⁾(0) = 5!·a₅
-    = −157/3   ← Calculer
+  [problème, examen open, 7 points]
+  partie 1 (Début du problème : 3 ; Déduis-en f⁽⁴⁾(0) : 2 ; Déduis-en f⁽⁵⁾(0) : 2)
+    [free, sans aide, suivre l'erreur, examen open]  ln(1 − x²)/sin(x)
+      = (−x² − x⁴/2 − x⁶/3 + x⁶ε(x))/(x − x³/6 + x⁵/120 + x⁶ε(x))   ← DL du numérateur et du dénominateur
+      = (−x − x³/2 − x⁵/3 + x⁵ε(x))/(1 − x²/6 + x⁴/120 + x⁵ε(x))   ← Simplifier par x
+      = (−x − x³/2 − x⁵/3)·(1 − (−x²/6 + x⁴/120) + (−x²/6 + x⁴/120)²) + x⁵ε(x)   ← 1/(1 + u) = 1 − u + u² − …
+      = −x − (2/3)x³ − (157/360)x⁵ + x⁵ε(x)   ← Développer, garder les termes de degré ≤ 5
+    — Déduis-en f⁽⁴⁾(0) :  [juge value]  départ : f′′′′(0)
+      = 24·0   ← f⁽⁴⁾(0) = 4!·a₄
+      = 0   ← Calculer
+    — Déduis-en f⁽⁵⁾(0) :  [juge value]  départ : f′′′′′(0)
+      = 120·(−157/360)   ← f⁽⁵⁾(0) = 5!·a₅
+      = −157/3   ← Calculer
   pièges : a1_dl_factorial_missing, a1_dl_remainder_wrong_order, a1_dl_truncate_early
 
 ```
@@ -4750,11 +4770,13 @@ Vrai ou faux ?
   [examen tf]
 
 Calcule ∫_{0}^{1} x·arctan(x) dx.
-  [free, sans aide, examen open]  ∫_{0}^{1} x·arctan(x) dx
-    = [(x²/2)·arctan(x)]_{0}^{1} − ∫_{0}^{1} (x²/2)·(1/(1 + x²)) dx   ← u = Arctg x, v′ = x : u′ = 1/(1 + x²), v = x²/2
-    = [(x²/2)·arctan(x)]_{0}^{1} − (1/2)(∫_{0}^{1} (1 − 1/(1 + x²)) dx)   ← x²/(1 + x²) = 1 − 1/(1 + x²)
-    = [(x²/2)arctan(x) − x/2 + arctan(x)/2]_{0}^{1}   ← Intégrer ce qui reste
-    = π/4 − 1/2   ← Évaluer
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 2)
+    [free, sans aide, suivre l'erreur, examen open]  ∫_{0}^{1} x·arctan(x) dx
+      = [(x²/2)·arctan(x)]_{0}^{1} − ∫_{0}^{1} (x²/2)·(1/(1 + x²)) dx   ← u = Arctg x, v′ = x : u′ = 1/(1 + x²), v = x²/2
+      = [(x²/2)·arctan(x)]_{0}^{1} − (1/2)(∫_{0}^{1} (1 − 1/(1 + x²)) dx)   ← x²/(1 + x²) = 1 − 1/(1 + x²)
+      = [(x²/2)arctan(x) − x/2 + arctan(x)/2]_{0}^{1}   ← Intégrer ce qui reste
+      = π/4 − 1/2   ← Évaluer
   pièges : a1_int_missing_inner_factor, a1_ibp_plus, a1_ibp_boundary_term, a1_int_product
 
 ```
@@ -5016,17 +5038,19 @@ Soit Jₙ = ∫₀¹ xⁿeˣ dx. Alors J₄ =
   pièges : a1_reduction_index, a1_ibp_boundary_term, a1_ibp_sign
 
 Soit Iₙ = ∫₁ᵉ (Log x)ⁿ dx (n ≥ 0). Trouve une formule de récurrence, puis calcule I₂.
-  [free, sans aide, examen open]  I_n
-    = [x·ln(x)^n]_{1}^{e} − n·(∫_{1}^{e} ln(x)^(n − 1) dx)   ← u = (Log x)ⁿ, v′ = 1
-    = e − n·I_(n − 1)   ← Reconnaître Iₙ₋₁
-  — Calcule I₀  [juge definite]  départ : I_0
-    = [x]_{1}^{e}   ← Primitive
-    = e − 1   ← Valeur
-  — Remonte la récurrence jusqu'à I₂  [juge definite]  départ : I_2
-    = e − 2·I_1   ← Récurrence
-    = e − 2·(e − I_0)   ← Récurrence
-    = e − 2·(e − (e − 1))   ← I₀ = e − 1
-    = e − 2   ← Calculer
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; Calcule I₀ : 1 ; Remonte la récurrence jusqu'à I₂ : 1)
+    [free, sans aide, suivre l'erreur, examen open]  I_n
+      = [x·ln(x)^n]_{1}^{e} − n·(∫_{1}^{e} ln(x)^(n − 1) dx)   ← u = (Log x)ⁿ, v′ = 1
+      = e − n·I_(n − 1)   ← Reconnaître Iₙ₋₁
+    — Calcule I₀  [juge definite]  départ : I_0
+      = [x]_{1}^{e}   ← Primitive
+      = e − 1   ← Valeur
+    — Remonte la récurrence jusqu'à I₂  [juge definite]  départ : I_2
+      = e − 2·I_1   ← Récurrence
+      = e − 2·(e − I_0)   ← Récurrence
+      = e − 2·(e − (e − 1))   ← I₀ = e − 1
+      = e − 2   ← Calculer
   pièges : a1_reduction_index, a1_ibp_boundary_term
 
 ```
@@ -5229,14 +5253,16 @@ Calcule ∫_{3}^{4} (−6x² − 6x − 18)/((x − 2)(x² + 2x + 10)) dx.
   pièges : a1_arctg_scale, a1_int_arctg_as_log, a1_int_log_of_denominator
 
 Calcule ∫ (4x² + x + 21)/(x³ + 3x² + 9x + 27) dx.
-  [free, sans aide, examen open]  (4x² + x + 21)/(x³ + 3x² + 9x + 27)
-    (Décompose la fraction.)
-    = (4x² + x + 21)/((x + 3)(x² + 9))   ← Factoriser Q
-    = 3/(x + 3) + (x − 2)/(x² + 9)   ← Éléments simples
-  — L’intégrale  [juge antideriv]  départ : ∫ (4x² + x + 21)/(x³ + 3x² + 9x + 27) dx
-    = ∫ (3/(x + 3) + (x − 2)/(x² + 9)) dx   ← Intégrer les éléments simples
-    = 3(∫ 1/(x + 3) dx) + (1/2)(∫ 2x/(x² + 9) dx) − 2(∫ 1/(x² + 9) dx)   ← Dérivée du dénominateur + constante, carré complété
-    = 3ln(|x + 3|) + (1/2)ln(x² + 9) − (2/3)arctan(x/3) + C   ← Log et Arctg
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1,5 ; L’intégrale : 2,5)
+    [free, sans aide, suivre l'erreur, examen open]  (4x² + x + 21)/(x³ + 3x² + 9x + 27)
+      (Décompose la fraction.)
+      = (4x² + x + 21)/((x + 3)(x² + 9))   ← Factoriser Q
+      = 3/(x + 3) + (x − 2)/(x² + 9)   ← Éléments simples
+    — L’intégrale  [juge antideriv]  départ : ∫ (4x² + x + 21)/(x³ + 3x² + 9x + 27) dx
+      = ∫ (3/(x + 3) + (x − 2)/(x² + 9)) dx   ← Intégrer les éléments simples
+      = 3(∫ 1/(x + 3) dx) + (1/2)(∫ 2x/(x² + 9) dx) − 2(∫ 1/(x² + 9) dx)   ← Dérivée du dénominateur + constante, carré complété
+      = 3ln(|x + 3|) + (1/2)ln(x² + 9) − (2/3)arctan(x/3) + C   ← Log et Arctg
   pièges : a1_des_wrong_form, a1_int_no_constant
 
 ```
@@ -5444,11 +5470,13 @@ Sur ]0 ; π[, ∫ 1/sin(x) dx =
   pièges : a1_trig_subst_dx, a1_int_log_of_denominator
 
 Calcule ∫_{π/3}^{π/2} 2/sin(x) dx.
-  [free, sans aide, examen open]  ∫_{π/3}^{π/2} 2/sin(x) dx
-    = ∫_{√3/3}^{1} 2/((2t)/(1 + t²))·2/(1 + t²) dt   ← Exprimer en t, avec dt et les bornes
-    = ∫_{√3/3}^{1} 2/t dt   ← Simplifier
-    = [2ln(|t|)]_{√3/3}^{1}   ← Intégrer en t
-    = ln(3)   ← Évaluer
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 4)
+    [free, sans aide, suivre l'erreur, examen open]  ∫_{π/3}^{π/2} 2/sin(x) dx
+      = ∫_{√3/3}^{1} 2/((2t)/(1 + t²))·2/(1 + t²) dt   ← Exprimer en t, avec dt et les bornes
+      = ∫_{√3/3}^{1} 2/t dt   ← Simplifier
+      = [2ln(|t|)]_{√3/3}^{1}   ← Intégrer en t
+      = ln(3)   ← Évaluer
   pièges : a1_subst_dx_kept, a1_subst_bounds_kept, a1_int_log_of_denominator
 
 ```
@@ -6493,11 +6521,13 @@ Vrai ou faux ?
   [examen tf]
 
 I = ∫_{1}^{∞} (5x + 1)/(x³ + 3x² + 4x + 2) dx. Montre que I converge, sans la calculer.
-  [free, sans aide, examen open]  x²·(5x + 1)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 5   ← f(x) ~ 5/x²
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 2)
+    [free, sans aide, suivre l'erreur, examen open]  x²·(5x + 1)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 5   ← f(x) ~ 5/x²
   pièges : a1_improper_undefined_means_diverge
 
 ```
@@ -6785,60 +6815,66 @@ I = ∫_{1}^{∞} (3x + 3)/(x³ + 6x² + 13x + 10) dx. (a) Montre que I converge
 
 ```
 I = ∫_{0}^{∞} (5x + 4)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide]  x²·(5x + 4)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 5   ← f(x) ~ 5/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (5x + 4)/(x³ + 3x² + 4x + 2)
-    = (5x + 4)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = −1/(x + 1) + (x + 6)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 6)/(x² + 2x + 2)) dx
-    = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)
-    = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 5arctan(x + 1)   ← Regrouper les Log
-    = 5π/2   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (5x + 4)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
-    = 5π/4 − (1/2)ln(2)   ← Retrancher F(0)
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur]  x²·(5x + 4)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 5   ← f(x) ~ 5/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (5x + 4)/(x³ + 3x² + 4x + 2)
+      = (5x + 4)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = −1/(x + 1) + (x + 6)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 6)/(x² + 2x + 2)) dx
+      = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)
+      = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 5arctan(x + 1)   ← Regrouper les Log
+      = 5π/2   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (5x + 4)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
+      = 5π/4 − (1/2)ln(2)   ← Retrancher F(0)
   pièges : a1_improper_undefined_means_diverge
 
 I = ∫_{1}^{∞} (6x + 7)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide]  x²·(6x + 7)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 6   ← f(x) ~ 6/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (6x + 7)/(x³ + 3x² + 4x + 2)
-    = (6x + 7)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = 1/(x + 1) + (−x + 5)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x + 5)/(x² + 2x + 2)) dx
-    = ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)
-    = (1/2)ln((x + 1)²/(x² + 2x + 2)) + 6arctan(x + 1)   ← Regrouper les Log
-    = 3π   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (6x + 7)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
-    = 3π + (1/2)ln(5/4) − 6arctan(2)   ← Retrancher F(1)
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur]  x²·(6x + 7)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 6   ← f(x) ~ 6/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (6x + 7)/(x³ + 3x² + 4x + 2)
+      = (6x + 7)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = 1/(x + 1) + (−x + 5)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x + 5)/(x² + 2x + 2)) dx
+      = ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)
+      = (1/2)ln((x + 1)²/(x² + 2x + 2)) + 6arctan(x + 1)   ← Regrouper les Log
+      = 3π   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (6x + 7)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
+      = 3π + (1/2)ln(5/4) − 6arctan(2)   ← Retrancher F(1)
   pièges : a1_improper_undefined_means_diverge
 
 I = ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide]  x²·(3x + 2)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 3   ← f(x) ~ 3/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (3x + 2)/(x³ + 3x² + 4x + 2)
-    = (3x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = −1/(x + 1) + (x + 4)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 4)/(x² + 2x + 2)) dx
-    = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)
-    = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 3arctan(x + 1)   ← Regrouper les Log
-    = 3π/2   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
-    = 3π/2 − (1/2)ln(5/4) − 3arctan(2)   ← Retrancher F(1)
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur]  x²·(3x + 2)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 3   ← f(x) ~ 3/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (3x + 2)/(x³ + 3x² + 4x + 2)
+      = (3x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = −1/(x + 1) + (x + 4)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 4)/(x² + 2x + 2)) dx
+      = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)
+      = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 3arctan(x + 1)   ← Regrouper les Log
+      = 3π/2   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
+      = 3π/2 − (1/2)ln(5/4) − 3arctan(2)   ← Retrancher F(1)
   pièges : a1_improper_undefined_means_diverge
 
 ```
@@ -6847,22 +6883,24 @@ I = ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. 
 
 ```
 I = ∫_{0}^{∞} (x + 2)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide, examen open]  x²·(x + 2)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 1   ← f(x) ~ 1/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (x + 2)/(x³ + 3x² + 4x + 2)
-    = (x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = 1/(x + 1) + (−x)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x)/(x² + 2x + 2)) dx
-    = ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)
-    = (1/2)ln((x + 1)²/(x² + 2x + 2)) + arctan(x + 1)   ← Regrouper les Log
-    = π/2   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (x + 2)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
-    = π/4 + (1/2)ln(2)   ← Retrancher F(0)
+  [problème, examen open, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur, examen open]  x²·(x + 2)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 1   ← f(x) ~ 1/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (x + 2)/(x³ + 3x² + 4x + 2)
+      = (x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = 1/(x + 1) + (−x)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x)/(x² + 2x + 2)) dx
+      = ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)
+      = (1/2)ln((x + 1)²/(x² + 2x + 2)) + arctan(x + 1)   ← Regrouper les Log
+      = π/2   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (x + 2)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
+      = π/4 + (1/2)ln(2)   ← Retrancher F(0)
   pièges : a1_improper_undefined_means_diverge
 
 ```
@@ -7060,16 +7098,18 @@ Volume du solide obtenu en faisant tourner y = √x, x ∈ [0 ; 1], autour de l'
   pièges : a1_volume_no_square
 
 Calcule l'aire A de la surface obtenue en faisant tourner y = cosh(x) sur [0 ; ln(3)] autour de l'axe Ox.
-  [free, sans aide, examen open]  (cosh(x))′
-    = sinh(x)   ← Dériver
-  — Simplifie |f(x)|·√(1 + f′(x)²) :  [juge equiv]  départ : cosh(x)·√(1 + sinh(x)²)
-    = cosh(x)²   ← 1 + sinh² = cosh²
-  — A = 2π∫ |f(x)|·√(1 + f′(x)²) dx :  [juge definite]  départ : 2π·(∫_{0}^{ln(3)} cosh(x)·√(1 + sinh(x)²) dx)
-    = 2π·(∫_{0}^{ln(3)} cosh(x)² dx)   ← A = 2π∫ cosh²x dx
-    = π·(∫_{0}^{ln(3)} (1 + cosh(2x)) dx)   ← 2cosh²x = 1 + cosh 2x
-    = π·([x + sinh(2x)/2]_{0}^{ln(3)})   ← Primitive
-    = π·(ln(3) + (9 − 1/9)/4)   ← sinh(2ln 3) = (9 − 1/9)/2
-    = π·ln(3) + 20π/9   ← Calculer
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; Simplifie |f(x)|·√(1 + f′(x)²) : 1 ; A = 2π∫ |f(x)|·√(1 + f′(x)²) dx : 2)
+    [free, sans aide, suivre l'erreur, examen open]  (cosh(x))′
+      = sinh(x)   ← Dériver
+    — Simplifie |f(x)|·√(1 + f′(x)²) :  [juge equiv]  départ : cosh(x)·√(1 + sinh(x)²)
+      = cosh(x)²   ← 1 + sinh² = cosh²
+    — A = 2π∫ |f(x)|·√(1 + f′(x)²) dx :  [juge definite]  départ : 2π·(∫_{0}^{ln(3)} cosh(x)·√(1 + sinh(x)²) dx)
+      = 2π·(∫_{0}^{ln(3)} cosh(x)² dx)   ← A = 2π∫ cosh²x dx
+      = π·(∫_{0}^{ln(3)} (1 + cosh(2x)) dx)   ← 2cosh²x = 1 + cosh 2x
+      = π·([x + sinh(2x)/2]_{0}^{ln(3)})   ← Primitive
+      = π·(ln(3) + (9 − 1/9)/4)   ← sinh(2ln 3) = (9 − 1/9)/2
+      = π·ln(3) + 20π/9   ← Calculer
 
 ```
 

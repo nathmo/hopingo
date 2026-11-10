@@ -22,6 +22,8 @@ export const M = (text, display = false) => MT(text, C, display);
 // A text read back and printed (canonical writing).
 export const canon = (text, opts = C) => toText(parse(text, opts));
 export const fr = (s) => String(s).replace(/-/g, '−');
+// A complex number as plain text with spaces: 3 − 2i, −1 + i√3.
+export const frs = (s) => fr(s).replace(/([\diπ)])([+−])/g, '$1 $2 ');
 
 // ---------- judge configurations ----------
 
