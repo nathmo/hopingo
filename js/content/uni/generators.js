@@ -46,3 +46,9 @@ import { GEN as COMPLEXES_A } from './complexes-a.js';
 import { GEN as COMPLEXES_B } from './complexes-b.js';
 
 Object.assign(UNI_GEN, ANALYSE1_F, ANALYSE1_G, ANALYSE1_H, ANALYSE1_I, ANALYSE1_J, ANALYSE1_K, ANALYSE1_L, COMPLEXES_A, COMPLEXES_B);
+
+// Step U7: modules G7 (combi) and P (proba).
+import { GEN as COMBI } from './combi.js';
+import { GEN as PROBA } from './proba.js';
+
+Object.assign(UNI_GEN, COMBI, PROBA);

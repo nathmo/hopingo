@@ -54,11 +54,16 @@ export class LinesRun {
   }
 
   enter(i) {
+    // Step U7: the last line of each part named by its judge (cfg.name) is
+    // kept, for judges that compute what they expect from the student's
+    // own earlier values (prob, stat: errors carried forward).
+    this.vals = this.vals || {};
+    if (this.cfg?.name) this.vals[this.cfg.name] = this.prev;
     this.seg = i;
     const s = this.segments[i];
     this.cfg = s.judge;
     this.prev = readWith(this.cfg, s.start.math);
-    this.state = {};
+    this.state = { vals: this.vals };
     this.cursor = 0; // index in s.lines of the next line to play
     this.history.push({ seg: i, node: this.prev, how: 'start' });
   }

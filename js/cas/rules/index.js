@@ -51,3 +51,13 @@ import { RULES as G8A } from './g8a.js';
 import { RULES as G8B } from './g8b.js';
 
 CAS_RULES.push(...A1F, ...A1G, ...A1H, ...A1I, ...A1J, ...A1K, ...A1L, ...G8A, ...G8B);
+
+// Step U7: modules G7 and P (most traps are wrong values, rules/stattrap.js).
+import { RULES as G7 } from './g7.js';
+import { RULES as PA } from './pa.js';
+import { RULES as PB } from './pb.js';
+import { RULES as PC } from './pc.js';
+import { RULES as PD } from './pd.js';
+import { RULES as PE } from './pe.js';
+
+CAS_RULES.push(...G7, ...PA, ...PB, ...PC, ...PD, ...PE);

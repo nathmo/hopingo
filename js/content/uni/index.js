@@ -34,3 +34,23 @@ export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
 // Empty since steps U3, U4 and U5: every prerequisite of the built modules
 // (L, A1, G4, G8, G10) is now built.
 export const UNBUILT = {};
+
+// Step U7: modules G7 (unit combi) and P (unit proba). A2 (step U6) is not
+// built on this branch: its skills that P needs stand for their own
+// prerequisites in the catalogue A2-analyse-2.md, resolved to built skills
+// (a2-partials, a2-polar-int, a2-triple-int and a2-cyl-sph only as steps).
+import * as combi from './combi.skills.js';
+import * as proba from './proba.skills.js';
+
+UNI_UNITS.push(combi.UNIT, proba.UNIT);
+UNI_SKILLS.push(...combi.SKILLS, ...proba.SKILLS);
+Object.assign(UNBUILT, {
+  'a2-fubini-rect': ['a1-int-direct'],
+  'a2-domain-describe': ['a2-fubini-rect', 'g10-circle-eq'],
+  'a2-partials': ['g6-deriv-rules'],
+  'a2-change-var': ['a2-domain-describe', 'a2-partials', 'l-det-cofactor'],
+  'a2-polar-int': ['a2-change-var', 'g3-identities'],
+  'a2-triple-int': ['a2-domain-describe'],
+  'a2-cyl-sph': ['a2-polar-int', 'a2-triple-int'],
+  'a2-improper-multi': ['a2-polar-int', 'a2-cyl-sph', 'a1-improper-calc'],
+});

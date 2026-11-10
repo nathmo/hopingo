@@ -64,3 +64,9 @@ import * as complex from './complex.js';
 import * as delta from './delta.js';
 
 Object.assign(JUDGES, { complex, delta });
+// Step U7: probabilities (exact) and statistics (approximate), lines of
+// named values (x̄ = …, t_obs = …), errors carried forward.
+import * as prob from './prob.js';
+import * as stat from './stat.js';
+
+Object.assign(JUDGES, { prob, stat });

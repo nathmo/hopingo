@@ -24,6 +24,9 @@ import { lexFor } from '../cas/logic.js';
 // Step U3: the grid of the matrix judges.
 import { MatrixInput, matrixShape } from './matrix-input.js';
 import { judgeFor } from '../judges/index.js';
+// Step U7: interpretation and simulation of module P.
+import { interpretTask, simulateBox } from './interpret.js';
+import { interpretOf, withInterpretation } from '../judges/interpret.js';
 
 const MM = (node, opts) => toMathML(unparen(node), opts);
 // The MathML of a typed text, without the <math> wrapper (to put in a blank).
@@ -402,10 +405,15 @@ export function mountLines(item, ctx, body, opts = {}) {
     afterAccept(r);
   }
 
+  // Step U7: « Interpréter » after the last line, then the simulation
+  // button (js/ui/interpret.js). Not in a problem: its parts ask their own.
+  let interpreted = null;
   function finish() {
+    if (interpretOf(item) && !opts.run && !interpreted) return interpretTask(item, stage, setFooter, (r) => { interpreted = r; finish(); });
     stage.replaceChildren();
     setFooter();
-    const o = run.outcome();
+    if (item.simulate && !opts.run) stage.append(simulateBox(item));
+    const o = withInterpretation(run.outcome(), interpreted);
     const common = { hintsUsed: o.hintsUsed, subgoals: o.subgoals, solo: o.solo };
     if (o.correct) { ctx.complete({ correct: true, ...common }); return; }
     const parts = [];

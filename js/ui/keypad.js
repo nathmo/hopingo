@@ -61,6 +61,9 @@ const KEYSETS = {
 KEYSETS.geo = ['x', 'y', 'z', '=', ';', 't', 's', 'vec(', ',', '·', '∧', '‖', 'X', 'Y', 'Ω', 'F', ':', ' ou ', 'λ', 'back'];
 KEYSETS.pts = ['A', 'B', 'C', 'D', 'M', 'P', 'Q', 'H', 'I', 'T', 'u', 'v', 'w', 'n', "'", '_', 'back'];
 KEYSETS.mat = ['7', '8', '9', '(', ')', ';', 'back', '4', '5', '6', '+', '-', '×', 'frac', '1', '2', '3', '^', '√', 'λ', '0', ',', '[', ']', '|', 'left', 'right'];
+// Step U7: probabilities and statistics (C(n, k), A(n, k), n!, Φ, Φ⁻¹,
+// intervals [a ; b], ≈, %).
+KEYSETS.stat = ['C(', 'A(', '!', ';', 'Φ(', 'Φ⁻¹(', '≈', '%', '[', ']', '√(', 'e^(', 'ln(', '(', ')', 'left', 'right', 'back'];
 
 // Tab names of the keypads.
 const TAB_LABEL = { anal: '∫ lim', mat: '[ ]', calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
@@ -69,6 +72,7 @@ const TAB_LABEL = { anal: '∫ lim', mat: '[ ]', calc: '123', calcx: '123', calc
 TAB_LABEL.geo = 'xyz ‖‖';
 TAB_LABEL.pts = 'A B u';
 TAB_LABEL.fact = 'n!'; // step U4
+TAB_LABEL.stat = 'C Φ'; // step U7
 
 const LABEL = {
   'int(': '∫( , x)', 'bracket(': '[F]ₐᵇ', 'lim(': 'lim( , x, a)', 'o(': 'o( )',
@@ -78,6 +82,7 @@ const LABEL = {
 };
 // Step U5.
 Object.assign(LABEL, { 'vec(': 'AB⃗', ' ou ': 'ou' });
+Object.assign(LABEL, { 'C(': 'C(n, k)', 'A(': 'A(n, k)', 'Φ(': 'Φ( )', 'Φ⁻¹(': 'Φ⁻¹( )' }); // step U7
 
 export class MathInput {
   constructor({ keys = 'frac', keysets = null, placeholder = '', onChange, onEnter } = {}) {
