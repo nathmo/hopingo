@@ -90,3 +90,5 @@ import * as param from './param.js';
 import * as boundary from './boundary.js';
 
 Object.assign(JUDGES, { param, boundary });
+import * as lapres from './lapres.js'; // step U10, part fc: residues of F(z)e^(zt) in t
+Object.assign(JUDGES, { lapres });
