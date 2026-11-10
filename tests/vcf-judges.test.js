@@ -124,6 +124,14 @@ test('judge transform: Fourier and Laplace, forward, inverse, equations, half-pl
   const ode = { kind: 'transform', transform: 'laplace', v: 't', s: 'z', unknown: 'Y', f: '1+t e^(-t)', F: '1/z+1/(z+1)^2', dir: 'inverse' };
   assert.deepEqual(play(ode, null, ['z^2Y - z - 1 + 2(zY - 1) + Y = 1/z', 'Y = 1/z + 1/(z+1)^2', 'y(t) = 1 + t e^(-t)']).map((v) => v.kind), ['ok', 'ok', 'done']);
   assert.equal(play(ode, null, ['z^2Y - z + 2zY + Y = 1/z'])[0].kind, 'wrong');
+  // A wrong equation is named by a trap whose candidate is the value it gives.
+  const withTrap = { ...eq, traps: { f_sqrt2pi_conv: ['û = f̂/(2+3f̂)'] } };
+  const w = play(withTrap, null, ['2û + 3f̂û = f̂'])[0];
+  assert.equal(w.kind, 'wrong');
+  assert.equal(w.rule, 'f_sqrt2pi_conv');
+  // A line in α that still holds an integral is not final.
+  const direct = { kind: 'transform', transform: 'fourier', v: 'x', s: 'α', f: 'e^(-abs(x))', F: 'sqrt(2/π)/(1+α^2)', dir: 'forward' };
+  assert.equal(play(direct, null, ['sqrt(2/π)int(e^(-x)cos(α x), x, 0, ∞)'])[0].kind, 'ok');
 });
 
 test('judge antideriv with grad: potentials and harmonic conjugates', () => {

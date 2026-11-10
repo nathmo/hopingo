@@ -136,7 +136,7 @@ function parts(d) {
     ],
   };
   const out = [{
-    html: '', start: `f(x) = ${d.f}`, judge: ft({ f: d.f, F: d.F }),
+    html: '', start: `f(x) = ${d.f}`, judge: ft({ f: d.f, F: d.F, final: 'any' }), // the formula by parity, an integral left: final here
     decisions: [choose],
     menu: [
       { id: 'parity', label: ev ? 'Utiliser la parité (FP2)' : 'Utiliser l\'imparité (FP3)', valid: true },

@@ -21,7 +21,7 @@ Ce fichier regroupe trois catalogues, un par module, chacun au gabarit du §15 d
 
 # V. Analyse vectorielle
 
-Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : à faire
+Unité `vecto` · préfixe `v-` · pièges `v_` · Statut : fait le 10 novembre 2026 (étape U10, voir README §17)
 
 **Sources** : Analyse III MT/SV 2021-22 (cours, séries, série de révision, examen blanc de décembre 2021, examen du 18.01.2022 et son corrigé avec les « Common mistakes ») ; Analyse III MT/SV janvier 2021 (cours du Dr Strütt, énoncé reconstitué et corrigé d'étudiants) ; Analyse III GM (résumés, examens 2013–2015) ; Dacorogna et Tanteri, *Analyse avancée pour ingénieurs*, chapitres 1 à 7 et appendice (courbes, surfaces).
 
@@ -573,15 +573,15 @@ Familles : `calculus`, `geometry`, `method`, `notation`, `sign` (existante). Les
 | `v_green_singular` | method | C | `v-green` | `v-domain-topo` | Green pour (−y, x)/(x² + y²) sur le disque unité : 0 → 2π | `wrongValues` : ∬_A rot F = 0 pris comme valeur de ∮. | « F n'est pas défini en (0, 0), qui est dans le disque : Green ne s'applique pas. Le calcul direct donne {direct}. » (Plan §5 et §8.) |
 | `v_green_no_rot` | method | C | `v-green` | `v-ops` | « par Green, ∮ = aire » → ∮ = ∬ rot F = 2 · aire | Remplacer rot F par 1 dans ∬_A rot F (on obtient l'aire) ; ou ligne « par Green » sans ligne rot : `stay`. | « Green dit ∮ F · dl = ∬ rot F. Il faut écrire rot F = {rot} : c'est parce qu'il vaut une constante que ∮ = {rot} × aire. » (Corrigé 2022 : citer Green sans calculer rot F = 2 ne donne pas les points.) |
 | `v_pot_on_restricted` | method | C | `v-pot-domain` | `v-domain-topo` | « φ = Arctg(y/x) + ½ ln(x² + y²) est un potentiel sur ℝ² \ {0} » → seulement là où x ≠ 0 | Leurre du `blocks` ; `wrongValues` « oui » pour ℝ² \ {0}. | « Ton φ n'est pas défini sur l'axe x = 0, qui fait partie de Ω. C'est un potentiel sur {x > 0}, pas sur Ω. » (Corrigé 2021.) |
-| `v_nu_formula` | sign | E | `v-green-flux` | `v-curve-param` | ν = (−γ₂′, γ₁′)/|γ′| → (γ₂′, −γ₁′)/|γ′| | Rotation dans l'autre sens : flux opposé ; ou ν non normé (facteur |γ′|). | « Pour un bord parcouru avec le domaine à gauche, la normale extérieure est (γ₂′, −γ₁′)/|γ′|. Ta normale pointe vers l'intérieur. » |
+| `v_nu_formula` | sign | E | `v-green-flux` | `v-curve-param` | ν = (−γ₂′, γ₁′)/\|γ′\| → (γ₂′, −γ₁′)/\|γ′\| | Rotation dans l'autre sens : flux opposé ; ou ν non normé (facteur \|γ′\|). | « Pour un bord parcouru avec le domaine à gauche, la normale extérieure est (γ₂′, −γ₁′)/\|γ′\|. Ta normale pointe vers l'intérieur. » |
 | `v_fubini_bounds` | calculus | E | `v-green-flux` | `a2-domain-describe` | ∫₀ˣ ∫₀ᵃ … dx dy → ∫₀ᵃ ∫₀ˣ … dy dx | Échanger l'ordre des intégrales sans changer les bornes. | « La borne {inner} dépend de x : l'intégrale en y doit être à l'intérieur. » (Plan §8, A2.) |
 | `v_cross_order` | sign | E | `v-surf-param` | `g4-cross` | σ_φ ∧ σ_r au lieu de σ_r ∧ σ_φ ; 2e composante sans le signe − | Candidats −N et N avec la 2e composante opposée. | « Le produit vectoriel change de signe si on échange les facteurs. La 2e composante est a₃b₁ − a₁b₃ : vérifie {second}. » |
 | `v_sphere_theta` | notation | E | `v-surf-param` | `a2-cyl-sph` | z = R sin θ → z = R cos θ (θ depuis l'axe z) | Échanger sin θ et cos θ dans σ (latitude au lieu de colatitude), en gardant R² sin θ. | « Dans ce cours, θ se mesure depuis l'axe z : z = R cos θ et le facteur est R² sin θ. » |
 | `v_surf_domain` | geometry | E | `v-surf-param` | `v-surf-param` | φ ∈ [0 ; 2π] avec y ≥ 0 → [0 ; π] | Doubler l'intervalle de φ ; prendre r jusqu'à l'autre racine de z = 0 (r = −1). | « y ≥ 0 veut dire sin φ ≥ 0, donc φ ∈ [0 ; π]. z ≥ 0 donne {r-range}, avec r ≥ 0. » |
-| `v_jacobian_surface` | calculus | E | `v-surf-area` | `v-surf-area` | aire = ∬_A du dv → ∬_A |σ_u ∧ σ_v| du dv | Supprimer |σ_u ∧ σ_v| (on obtient l'aire du domaine A). | « Le domaine A n'a pas la même aire que Σ : chaque petit rectangle du dv devient un parallélogramme d'aire |σ_u ∧ σ_v| du dv = {norm} du dv. » |
-| `v_normal_not_norm` | calculus | E | `v-surf-area` | `v-surf-area` | ∬ f · (σ_u ∧ σ_v)₃ → ∬ f |σ_u ∧ σ_v| | Garder seulement la 3e composante de N (ou N sans norme). | « Pour ∬ f ds, il faut la **norme** de σ_u ∧ σ_v, pas une de ses composantes. » |
+| `v_jacobian_surface` | calculus | E | `v-surf-area` | `v-surf-area` | aire = ∬_A du dv → ∬_A \|σ_u ∧ σ_v\| du dv | Supprimer \|σ_u ∧ σ_v\| (on obtient l'aire du domaine A). | « Le domaine A n'a pas la même aire que Σ : chaque petit rectangle du dv devient un parallélogramme d'aire \|σ_u ∧ σ_v\| du dv = {norm} du dv. » |
+| `v_normal_not_norm` | calculus | E | `v-surf-area` | `v-surf-area` | ∬ f · (σ_u ∧ σ_v)₃ → ∬ f \|σ_u ∧ σ_v\| | Garder seulement la 3e composante de N (ou N sans norme). | « Pour ∬ f ds, il faut la **norme** de σ_u ∧ σ_v, pas une de ses composantes. » |
 | `v_normal_flip` | sign | C | `v-flux` | `v-boundary` | ∬ rot F · ds = −18π → 18π (la normale « corrigée » alors que le bord n'a pas été changé) | Opposé du flux. | « Le cours n'exige pas une normale extérieure pour Stokes : il faut que le bord soit σ(∂A) parcouru avec **la même** paramétrisation. Tu as changé {which} sans changer l'autre. » (Corrigé 2022.) |
-| `v_normal_unit_twice` | calculus | E | `v-flux` | `v-flux` | ∬ F · N/|N| du dv → ∬ F · N du dv | Diviser l'intégrande par |N|. | « Dans ∬ F · ds = ∬ F · (σ_u ∧ σ_v) du dv, la norme se simplifie : ν ds = (σ_u ∧ σ_v) du dv. » |
+| `v_normal_unit_twice` | calculus | E | `v-flux` | `v-flux` | ∬ F · N/\|N\| du dv → ∬ F · N du dv | Diviser l'intégrande par \|N\|. | « Dans ∬ F · ds = ∬ F · (σ_u ∧ σ_v) du dv, la norme se simplifie : ν ds = (σ_u ∧ σ_v) du dv. » |
 | `v_curl_eval` | calculus | C | `v-stokes` | `v-ops` | rot F(σ(θ, φ)) = (0, 0, −6 cos θ) → (0, 0, −2) | Pour rot F constant c, multiplier une composante de c par une composante de σ (candidats c·σ₁, c·σ₂, c·σ₃). | « rot F = {c} ne dépend pas du point : en σ(θ, φ), il vaut encore {c}. » (Corrigé 2022.) |
 | `v_boundary_orient` | sign | C | `v-boundary` | `v-boundary` | (3 cos t, 3 sin t, 0) → (3 cos t, −3 sin t, 0) | Bord parcouru dans l'autre sens : opposé de ∮. | « Avec ta paramétrisation σ(φ, θ), le bord σ(∂A) tourne dans le sens {sense}. Ton cercle tourne dans l'autre sens. » (Corrigé 2022.) |
 | `v_boundary_pieces` | geometry | C | `v-boundary` | `v-boundary` | ∂Σ = méridien + équateur → équateur | Ajouter l'intégrale sur un seul des deux côtés qui s'annulent, ou donner une contribution non nulle au côté réduit à un point. | « Les côtés φ = 0 et φ = 2π ont la même image, parcourue dans les deux sens : ils s'annulent. Le côté θ = 0 devient un point. » (Plan §8.) |
@@ -613,7 +613,7 @@ Format `ba3-analyse3` : 120 min, sans document ni calculatrice ; QCM à une rép
 
 # C. Analyse complexe
 
-Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
+Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : fait le 10 novembre 2026 (étape U10, voir README §17)
 
 **Sources** : Analyse III MT (programme normal : analyse complexe au semestre d'automne) ; Analyse IV MT/SV 2021 (Prof. Picasso : QCM à plusieurs réponses sur Cauchy, Laurent, résidus, intégrale trigonométrique, Laplace inverse par résidus ; corrigé d'étudiants) ; Analyse IV GC/IN/SC/SIE 2022 (Cauchy-Riemann, conjuguée harmonique, Laurent, résidus, intégrales réelles) ; Analyse IV GM (astuces du cours, examens 2015–2016 de P. Metzener : Taylor, couronnes de Laurent) ; Dacorogna et Tanteri, chapitres 9 à 13.
 
@@ -1151,7 +1151,7 @@ Unité `cplx` · préfixe `c-` · pièges `c_` · Statut : à faire
 
 # F. Fourier, Laplace, EDP, distributions
 
-Unité `fourier` · préfixe `f-` · pièges `f_` · Statut : à faire
+Unité `fourier` · préfixe `f-` · pièges `f_` · Statut : fait le 10 novembre 2026 (étape U10, voir README §17)
 
 **Sources** : Analyse IV MT/SV (examens 2016, 2017, test blanc 2017, juin 2019, juin 2021 et son corrigé d'étudiants, souvenirs d'examen) ; Analyse III MT/SV 2021-22, qui contenait exceptionnellement les séries et la transformée de Fourier (examen blanc, examen du 18.01.2022 et son corrigé avec les « Common mistakes », série de révision, série 13) ; Analyse III MT/SV janvier 2021 et son corrigé ; Analyse IV GC/IN/SC/SIE 2022 (Laplace, intégro-différentielle, chaleur avec Neumann, Laplace dans un demi-plan) ; Analyse IV GM (examens 2015–2016 de P. Metzener ; Sturm-Liouville) ; fiches « Propriétés de la transformée de Fourier » et « … de Laplace » ; formulaires des transformées (Dacorogna et Tanteri p. 118 et 126, et formulaire MT 2021-22) ; Dacorogna et Tanteri, chapitres 14 à 18.
 

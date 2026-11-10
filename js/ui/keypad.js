@@ -313,5 +313,8 @@ TAB_LABEL.vecto = 'σ ∈ Γ';
 KEYSETS.transf = ['ℱ(', 'ℒ(', 'α', 'z', 'û', 'Y', 'U', 'H(', 'δ', '|', 'e^(', '√(2π)', ', Re z > ', 'back'];
 TAB_LABEL.transf = 'ℱ ℒ';
 Object.assign(LABEL, { ', Re z > ': 'Re z >', 'H(': 'H( )', 'ℱ(': 'ℱ( )', 'ℒ(': 'ℒ( )' });
-KEYSETS.cres = ['z', 'R', 'w', 'θ', 'α', 'i', '|', 'e^(', 'o(', 'Im(', '(', ')', 'left', 'right', 'back']; TAB_LABEL.cres = 'z R'; // step U10, part cb
-KEYSETS.distrib = ['⟨', ',', '⟩', 'φ', "'", 'δ', '_', 'T_', 'D', 'H(', 'int(', '∞', 'C', 'back']; // step U10, part fb: distributions
+// Residues and arcs (C, part b), distributions (F, part b).
+KEYSETS.cres = ['z', 'R', 'w', 'θ', 'α', 'i', '|', 'e^(', 'o(', 'Im(', '(', ')', 'left', 'right', 'back'];
+TAB_LABEL.cres = 'z R';
+KEYSETS.distrib = ['⟨', ',', '⟩', 'φ', "'", 'δ', '_', 'T_', 'D', 'H(', 'int(', '∞', 'C', 'back'];
+TAB_LABEL.distrib = '⟨T, φ⟩';

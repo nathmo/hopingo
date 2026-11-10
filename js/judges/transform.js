@@ -271,6 +271,30 @@ function matches(cfg, m) {
   return n >= Math.min(4, vals.length) ? 'yes' : 'no';
 }
 
+// The value of the unknown that an equation (linear in it) gives at each
+// s point: U* = −d₀/(d₁ − d₀), dᵤ the difference of its sides at U = u.
+function solvedU(cfg, eq) {
+  const ref = refOf(cfg);
+  const u = NFD(cfg.unknown);
+  return ref.sPts.map((_, k) => {
+    const base = sEnv(cfg, ref, k, [...eq.l.holes, ...eq.r.holes]);
+    const at = (U) => {
+      const env = { ...base, [u]: U };
+      const l = cval(eq.l.node, env);
+      const r = cval(eq.r.node, env);
+      return l && r ? C(l.re - r.re, l.im - r.im) : null;
+    };
+    const d0 = at(C(0));
+    const d1 = at(C(1));
+    if (!d0 || !d1) return null;
+    const den = C(d1.re - d0.re, d1.im - d0.im);
+    const m = den.re * den.re + den.im * den.im;
+    if (m < 1e-24) return null;
+    // −d₀/den
+    return C(-(d0.re * den.re + d0.im * den.im) / m, -(d0.im * den.re - d0.re * den.im) / m);
+  });
+}
+
 // An equation in the unknown: F satisfies it, F + 1 does not.
 function equationHolds(cfg, eq) {
   const ref = refOf(cfg);
@@ -307,6 +331,8 @@ export function isFinal(cfg, node, state = {}) {
   const kind = last.kind === 'c' ? ((cfg.dir ?? 'forward') === 'forward' ? 's' : 'v') : last.kind;
   const w = wantFinal(cfg);
   if (w === 'any') return true;
+  // An integral, a limit or a sum left is not a final answer.
+  if (contains(last.node, (n) => n.t === 'int' || n.t === 'lim' || n.t === 'sum' || n.t === 'bracket')) return false;
   if (w === 'transform' && kind !== 's') return false;
   if (w === 'function' && kind !== 'v') return false;
   if (w === 'transform' && symbolNames(cfg).some((n) => symbolsIn(last.node).has(n))) return false;
@@ -320,6 +346,21 @@ function sameAsCandidate(cfg, cand, node) {
   let c = cand;
   if (typeof c === 'string') c = parseLine(cfg, c);
   else if (c && c.t !== 'tline') c = { t: 'tline', members: [{ node: c, raw: '', holes: [], kind: kindOf(cfg, { node: c, holes: [] }) }], eq: null, half: null };
+  // Two equations in the unknown: the same solution at every point.
+  if (c?.eq && node.eq) {
+    const a = solvedU(cfg, c.eq);
+    const b = solvedU(cfg, node.eq);
+    return a.length > 0 && a.every((x, k) => (x && b[k] ? close(x, b[k]) : !x && !b[k]));
+  }
+  // An equation and a value line « û = … »: the value the equation gives.
+  if ((c?.eq && node.members?.length) || (node.eq && c?.members?.length)) {
+    const eq = c.eq || node.eq;
+    const line = c.eq ? node : c;
+    const vals = valuesOf(cfg, line.members[line.members.length - 1]);
+    if (vals.kind !== 's') return false;
+    const a = solvedU(cfg, eq);
+    return a.every((x, k) => (x && vals.vals[k] ? close(x, vals.vals[k]) : !x && !vals.vals[k]));
+  }
   if (!c?.members?.length || !node.members.length) return false;
   const a = valuesOf(cfg, c.members[c.members.length - 1]);
   const b = valuesOf(cfg, node.members[node.members.length - 1]);
@@ -345,7 +386,8 @@ export function judgeLine(cfg, prev, input, state = {}) {
   }
   if (node.eq) {
     if (equationHolds(cfg, node.eq)) return { kind: 'ok', node };
-    return { kind: 'wrong', node, message: `Cette équation n'est pas vérifiée par la transformée de l'inconnue.`, rule: null };
+    const diag = diagnoseLine('transform', prev, node, cfg, (cand, n) => sameAsCandidate(cfg, cand, n));
+    return { kind: 'wrong', node, message: `Cette équation n'est pas vérifiée par la transformée de l'inconnue.`, rule: diag?.rules[0] ?? null, diag };
   }
   // Every member describes the reference pair.
   for (const m of node.members) {

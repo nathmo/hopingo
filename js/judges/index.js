@@ -82,21 +82,19 @@ import * as stat from './stat.js';
 Object.assign(JUDGES, { prob, stat });
 
 // Step U10: parametrised curves and surfaces, oriented boundaries,
-// Fourier and Laplace transforms (modules V, C and F).
+// Fourier and Laplace transforms (modules V, C and F), and the judges of
+// the parts: complex values with ∫ and Σ, families z₀ + 2kπi (C, part a:
+// cvalue, cfamily), labelled complex values, bounds on an arc, Laurent
+// series in 1/z (C, part b: cval, arcb, laur), complex coefficients and
+// eigenfunctions (F, part a: fcomplex, eigen), distributions (F, part b),
+// residues of F(z)e^(zt) in t (F, part c: lapres).
 import * as transform from './transform.js';
-
-Object.assign(JUDGES, { transform });
 import * as param from './param.js';
 import * as boundary from './boundary.js';
+import { cvalue, cfamily } from './cplx-ca.js';
+import { cval, arcb, laur } from './cplx-cb.js';
+import { FA_JUDGES } from './fourier-a-judges.js';
+import * as distrib from './distrib.js';
+import * as lapres from './lapres.js';
 
-Object.assign(JUDGES, { param, boundary });
-import { cvalue, cfamily } from './cplx-ca.js'; // step U10, module C part a: complex values with ∫ and Σ, families z₀ + 2kπi
-Object.assign(JUDGES, { cvalue, cfamily });
-import { cval, arcb, laur } from './cplx-cb.js'; // step U10, part cb: labelled complex values, bounds on an arc, Laurent series in 1/z
-Object.assign(JUDGES, { cval, arcb, laur });
-import { FA_JUDGES } from './fourier-a-judges.js'; // step U10, part fa: fcomplex, eigen
-Object.assign(JUDGES, FA_JUDGES);
-import * as distrib from './distrib.js'; // step U10, part fb: distributions (module F, MT/SV)
-Object.assign(JUDGES, { distrib });
-import * as lapres from './lapres.js'; // step U10, part fc: residues of F(z)e^(zt) in t
-Object.assign(JUDGES, { lapres });
+Object.assign(JUDGES, { transform, param, boundary, cvalue, cfamily, cval, arcb, laur, distrib, lapres }, FA_JUDGES);

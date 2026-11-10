@@ -4,8 +4,13 @@
 
 export const VCF_JUDGES = ['param', 'boundary', 'transform'];
 
-// The first component of a tuple moved by 7: off the curve or the surface.
-const moveTuple = (text) => text.replace(/\(\s*/, '(7+');
+// The first component of a tuple moved by 7: off the curve or the surface
+// (the tuple after « = » when the line has a label γ(t) = (…)).
+function moveTuple(text) {
+  const eq = text.search(/=\s*\(/);
+  if (eq < 0) return text.replace(/\(\s*/, '(7+');
+  return text.slice(0, eq) + text.slice(eq).replace(/\(\s*/, '(7+');
+}
 
 export function wrongVcf(cfg, final) {
   if (cfg.kind === 'param') {
