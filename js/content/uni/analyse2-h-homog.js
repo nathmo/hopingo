@@ -78,7 +78,7 @@ function family(rng) {
   return {
     kind, R: String(c), v0: String(v0), C: String(v0), domain: [0.5, 3], vRange: [-5, 8],
     forms: [{ eq: `x y'-y=${c === 1 ? '' : c}x`, sub: `x(v+x v')-x v=${c === 1 ? '' : c}x` }, { eq: `x y'=y+${c === 1 ? '' : c}x`, sub: `x(v+x v')=x v+${c === 1 ? '' : c}x` }],
-    sep: c === 1 ? 'dv = dx/x' : `dv = (${c}/x) dx`, rel: `v = ${term(c, 'ln(x)')} + C`, mid: null, v: vT, y: sumT([term(c, 'x ln(x)'), v0 ? term(v0, 'x') : '']), prim: 'v',
+    sep: c === 1 ? 'dv = dx/x' : `dv = (${c}/x) dx`, rel: `v = ${term(c, 'ln(x)')} + C`, mid: null, v: vT, y: sumT([term(c, 'x ln(x)'), v0 ? term(v0, 'x') : '']), prim: c === 1 ? 'v' : `v/${c}`,
     late: v0 ? sumT([term(c, 'x ln(x)'), String(v0)]) : null, wrongV: vT,
   };
 }

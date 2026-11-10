@@ -6,6 +6,8 @@
 // order 2). Built from the pair (y₁, y₂) of the catalogue.
 
 import { MT, linesItem, examTag, mcq } from './kit.js';
+import { parse } from '../../cas/parse.js';
+import { toMathML } from '../../cas/mathml.js';
 import { partsScript, tpl, sup } from './a2-kit.js';
 import { H, E, modeOf } from './analyse2-h-kit.js';
 
@@ -33,6 +35,8 @@ const PAIRS = [
 ];
 const TT = { vars: ['t'], dvar: 't' };
 const M = (t) => MT(t, TT);
+// An equation in y(t), shown with y′ and y″ (not d/dt).
+const ME = (t) => toMathML(parse(t, { dvar: 't' }), { dvar: 't' });
 
 const CHOICES = [
   { id: 'check', label: 'Vérifier que y₁ est solution' },
@@ -73,7 +77,7 @@ function linesVariant(level, rng, opts) {
   const { start, judge, script } = partsScript(parts, level, CHOICES);
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `${M(d.eq)}${d.dom[0] > 0 ? `, t > ${d.dom[0] >= 1 ? '1' : '0'}` : ''}. Vérifie que y₁ = ${M(d.y1)} est une solution, puis trouve une deuxième solution y₂ et la solution générale.${level === 1 ? ` Le wronskien (formule d'Abel) vaut W = ${M(d.W)}.` : ''}`,
+    prompt: `On considère ${ME(d.eq)}${d.dom[0] > 0 ? ` (t > ${d.dom[0] >= 1 ? '1' : '0'})` : ''}. Vérifie que y₁ = ${M(d.y1)} est une solution, puis trouve une deuxième solution y₂ et la solution générale.${level === 1 ? ` Le wronskien (formule d'Abel) vaut W = ${M(d.W)}.` : ''}`,
     hints: H(`Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁².`,
       `p = ${sup(d.p)}, W = ${M(d.W)} ; (y₂/y₁)′ = W/y₁² = ${M(`(${d.W})/(${d.y1})^2`)}.`,
       `(y₂/y₁)′ = ${M(d.red)}, donc y₂ = ${M(d.y2)}.`),
@@ -93,7 +97,7 @@ function mcqVariant(level, rng, opts) {
   const opt = (a, b) => ({ html: `A ${a ? 'vraie' : 'fausse'}, B ${b ? 'vraie' : 'fausse'}`, correct: a === A && b === B });
   return mcq({
     skill: SK, level, key: `${SK}:mcq:${d.eq}:${A}:${B}`, exam: examTag(opts), keepOrder: true,
-    prompt: `On considère ${M(d.eq)}${d.dom[0] > 0 ? ` (t > ${d.dom[0] >= 1 ? '1' : '0'})` : ''}.<br>A : ${M(y1)} est une solution.<br>B : la solution générale est y = ${M(gen)}.`,
+    prompt: `On considère ${ME(d.eq)}${d.dom[0] > 0 ? ` (t > ${d.dom[0] >= 1 ? '1' : '0'})` : ''}.<br>A : ${M(y1)} est une solution.<br>B : la solution générale est y = ${M(gen)}.`,
     options: [opt(true, true), opt(true, false), opt(false, true), opt(false, false)],
     solution: [{ html: `${M(d.y1)} est une solution ; p = ${sup(d.p)}, W = ${M(d.W)}, (y₂/y₁)′ = ${M(d.red)}, y₂ = ${M(d.y2)} : y = ${M(d.gen)}.`, note: '' }],
     expectedSec: 180,

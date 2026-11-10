@@ -6,7 +6,7 @@
 // the traps a2_ode_double_root, a2_ode_complex_swap, a2_ode_char_sign).
 
 import { MT, linesItem, examTag } from './kit.js';
-import { partsScript, tpl } from './a2-kit.js';
+import { partsScript, tpl, sup } from './a2-kit.js';
 import { q, qt, term, sumT, polyT, fac, expT, rd, H, E, modeOf, mcq4, opt, tfOf } from './analyse2-h-kit.js';
 
 const SK = 'a2-ode-const2';
@@ -96,7 +96,7 @@ const formOptions = (d) => {
 const deltaDecision = (d) => {
   const D = d.b * d.b - 4 * d.a * d.c;
   const o = (id, label, ok) => ({ id, label, valid: ok, ...(ok ? {} : { why: `Δ = ${rd(d.b)}² − 4·${d.a}·${rd(d.c)} = ${rd(D)}.` }) });
-  return { kind: 'decision', prompt: `Le discriminant de ${MT(d.P, { vars: ['r'] })} est :`, options: [o('pos', 'Δ > 0 : deux racines réelles', D > 0), o('zero', 'Δ = 0 : une racine double', D === 0), o('neg', 'Δ < 0 : deux racines complexes conjuguées', D < 0)] };
+  return { kind: 'decision', prompt: `Le discriminant de ${sup(d.P)} est :`, options: [o('pos', 'Δ > 0 : deux racines réelles', D > 0), o('zero', 'Δ = 0 : une racine double', D === 0), o('neg', 'Δ < 0 : deux racines complexes conjuguées', D < 0)] };
 };
 
 const CHOICES = [

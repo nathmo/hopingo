@@ -34,7 +34,7 @@ function operator(rng) {
 // A piece of the right side and its y_p, built from the y_p: {b, yp, form}.
 function piece(rng, L, kind) {
   const A = rng.pick([1, 2, 3, -1, -2, 3]);
-  if (kind === 'const') return { kind, yp: String(A), b: String(A * L.qq), desc: 'une constante A' };
+  if (kind === 'const') return { kind, yp: String(A), b: String(A * L.qq), desc: 'A (une constante)' };
   if (kind === 'exp') {
     for (let i = 0; ; i++) {
       const m = rng.pick([1, 2, -1, 3, -2]);
@@ -86,7 +86,7 @@ function linesVariant(level, rng, opts) {
   parts.push({ html: `Une solution particulière pour le second membre ${MT(b1.b)} :`, ask: 'y_p =', start: d.eq1, judge: ode(d.eq1, 'particular'), lines: [pl(b1, 1)] });
   parts.push({ html: `Une solution particulière pour ${MT(b2.b)} :`, ask: 'y_p =', start: d.eq2, judge: ode(d.eq2, 'particular'), lines: [pl(b2, 2)] });
   const combo = {
-    kind: 'decision', prompt: `y = y_h + 2·y_p1 + y_p2 est-elle une solution de ${MT(d.eq)} ?`, options: [
+    kind: 'decision', prompt: 'y = y_h + 2·y_p1 + y_p2 est-elle aussi une solution de l’équation ?', options: [
       { id: 'no', label: 'Non : L(2y_p1) = 2b₁', valid: true },
       { id: 'yes', label: 'Oui : on peut multiplier une solution par une constante', valid: false, rule: 'a2_ode_superposition_nonhom', why: 'Seules les solutions de l\'équation homogène se multiplient par une constante : L(2y_p1) = 2b₁ ≠ b₁.' },
     ],

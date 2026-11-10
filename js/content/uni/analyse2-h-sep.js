@@ -6,7 +6,7 @@
 // constant solution (trap a2_ode_sep_lost_constant).
 
 import { MT, linesItem, examTag } from './kit.js';
-import { partsScript, tpl } from './a2-kit.js';
+import { partsScript, tpl, sup } from './a2-kit.js';
 import { q, qt, sumT, polyT, scaleP, fac, rd, H, E, modeOf, mcq4, opt, tfOf } from './analyse2-h-kit.js';
 import { parse } from '../../cas/parse.js';
 import { evalFloat } from '../../cas/numeric.js';
@@ -159,7 +159,7 @@ function linesVariant(level, rng, opts) {
   };
   const parts = [];
   const divide = {
-    kind: 'decision', prompt: `Avant de diviser par h(y) = ${MT(F.h)}, que faut-il faire ?`, options: [
+    kind: 'decision', prompt: `Avant de diviser par h(y) = ${sup(F.h)}, que faut-il faire ?`, options: [
       { id: 'zeros', label: 'Chercher les zéros de h : ce sont des solutions constantes', valid: true },
       { id: 'none', label: 'Rien : on divise directement', valid: false, rule: 'a2_ode_sep_lost_constant', why: 'Diviser par h(y) perd les solutions où h(y) = 0 : ce sont des solutions constantes, parfois la seule qui vérifie la condition initiale.' },
     ],
@@ -207,12 +207,12 @@ function linesVariant(level, rng, opts) {
     parts.push({ html: level >= 2 || F.pf ? 'Sépare, intègre, puis applique la condition initiale.' : null, ask: 'y =', start: F.eq, judge: ode, pre: level >= 2 ? pre : [], lines });
   }
   const { start, judge, script } = partsScript(parts, level, CHOICES);
-  const given = level === 1 && !constant ? ` Les solutions constantes (zéros de h) sont ${F.zeros === '∅' ? 'inexistantes' : MT(F.zeros)} ; y(0) = ${rd(y0T)} n'en est pas une.` : '';
+  const given = level === 1 && !constant ? (F.zeros === '∅' ? ` h(y) = ${sup(F.h)} ne s'annule jamais : pas de solution constante.` : ` Les solutions constantes sont ${MT(F.zeros)} ; y(0) = ${MT(y0T)} n'en est pas une.`) : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
     prompt: `Résous ${MT(F.eq)}, y(0) = ${MT(y0T)}.${given}`,
     hints: H('Repère les solutions constantes (zéros de h), puis mets les y d\'un côté et les x de l\'autre.',
-      `∫ dy/h(y) = ${F.prim} et ∫ g(x) dx = ${rd(polyT(g.P))}, plus une seule constante.`,
+      `∫ dy/h(y) = ${F.prim} et ∫ g(x) dx = ${sup(polyT(g.P))}, plus une seule constante.`,
       constant ? `y(0) = ${rd(y0)} annule h : y ≡ ${rd(y0)}.` : `${MT(F.rel)}, puis C = ${MT(F.C)}.`),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${F.eq}:${y0T}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -249,7 +249,7 @@ function mcqVariant(level, rng, opts) {
   } else if (kind === 'atan') {
     y0 = 0;
     const [frac, val, alt] = rng.pick([[4, '1', 'π/4'], [3, '√3', 'π/3'], [6, '√3/3', 'π/6']]);
-    eq = `y'=${cT}(1+y^2)`;
+    eq = `y'=${cT ? `${cT}(1+y^2)` : '1+y^2'}`;
     x1 = c === 1 ? `π/${frac}` : `π/${frac * c}`;
     right = val;
     wrongs = [opt(`arctan(${alt})`), opt(`-${val}`), opt(alt), opt('0')];
@@ -258,7 +258,7 @@ function mcqVariant(level, rng, opts) {
     y0 = 0;
     const a = rng.pick([1, 2, 3]);
     const k = rng.pick([2, 3]);
-    eq = `y'=${cT}(${a * a}-y^2)`;
+    eq = `y'=${cT ? `${cT}(${a * a}-y^2)` : `${a * a}-y^2`}`;
     x1 = `ln(${k})/${2 * a * c}`;
     const val = q(a * (k - 1), k + 1);
     right = qt(val);
@@ -267,7 +267,7 @@ function mcqVariant(level, rng, opts) {
   } else if (kind === 'exp') {
     y0 = 0;
     const t = rng.pick([1, 2]);
-    eq = `y'=${cT ? `${cT}×` : ''}e^(-y)`;
+    eq = `y'=${cT}e^(-y)`;
     x1 = String(t);
     right = `ln(${1 + c * t})`;
     wrongs = [opt(`ln(${c * t})`), opt(`-ln(${1 + c * t})`), opt(String(1 + c * t)), opt(`e^(${c * t})`)];
@@ -276,7 +276,7 @@ function mcqVariant(level, rng, opts) {
     const a = rng.pick([1, 2, 3]);
     const k = rng.pick([2, 3]);
     y0 = rng.pick([a, -a]);
-    eq = `y'=${cT}(${a * a}-y^2)`;
+    eq = `y'=${cT ? `${cT}(${a * a}-y^2)` : `${a * a}-y^2`}`;
     x1 = `ln(${k})/${2 * a * c}`;
     right = String(y0);
     wrongs = [NO, opt(qt(q(a * (k - 1), k + 1)), 'a2_ode_sep_lost_constant'), opt(String(-y0)), opt('0')];

@@ -48,7 +48,7 @@ function tExp(rng) {
     exact: `d(${mu} y) = ${ce(beta, p + k)}`, integ: `${mu} y = ${ce(c, p + k)} + C`, C: String(C),
     y: sumT([ce(c, p), term(C, expT(-k))]),
     raw2: lead ? `μ = ${expT(m * k)}` : null, inv: `μ = ${expT(-k)}`, rhs: `d(${mu} y) = ${ce(beta, p)}`, mub: ce(beta, p + k),
-    shift: p === 0, sep: p === 0, intHint: `∫ ${rd(ce(beta, p + k))} dx`,
+    shift: p === 0, sep: p === 0, intHint: `∫ ${sup(ce(beta, p + k))} dx`,
     wrongs: {
       ic: p === 0 && c === 0 ? null : sumT([ce(c, p), term(y0, expT(-k))]),
       sign: p === k ? null : (() => { const c2 = q(beta, p - k); return sumT([q(p).n === 0 ? qt(c2) : term(c2, expT(p)), term(q(y0).sub(c2), expT(k))]); })(),
@@ -76,7 +76,7 @@ function tPow(rng) {
     exact: `d(${mu} y) = ${term(beta, xp(n + k))}`, integ: `${mu} y = ${term(c, xp(N))} + C`, C: String(C),
     y: sumT([term(c, xp(n + 1)), over(C, k)]),
     raw2: lead ? `μ = ${expT(k)}` : null, inv: `μ = 1/${mu}`, rhs: `d(${mu} y) = ${term(beta, xp(n))}`, mub: term(beta, xp(n + k)),
-    shift: false, sep: false, intHint: `∫ ${rd(term(beta, xp(n + k)))} dx`,
+    shift: false, sep: false, intHint: `∫ ${sup(term(beta, xp(n + k)))} dx`,
     wrongs: {
       ic: sumT([term(c, xp(n + 1)), over(y0, k)]),
       sign: s === 0 ? null : sumT([term(q(beta, s), xp(n + 1)), term(q(y0).sub(q(beta, s)), xp(k))]),
@@ -136,7 +136,7 @@ function tGauss(rng) {
       exact: `d(e^(x^2/2) y) = ${term(beta, 'x')} e^(x^2/2)`, integ: `e^(x^2/2) y = ${term(beta, 'e^(x^2/2)')} + C`, C: String(C),
       y: sumT([String(beta), term(C, 'e^(-x^2/2)')]),
       raw2: m === 1 ? null : 'μ = e^(x^2)', inv: 'μ = e^(-x^2/2)', rhs: `d(e^(x^2/2) y) = ${term(beta, 'x')}`, mub: `${term(beta, 'x')}e^(x²/2)`,
-      shift: false, sep: true, intHint: `∫ ${rd(term(beta, 'x'))}e^(x²/2) dx`,
+      shift: false, sep: true, intHint: `∫ ${sup(term(beta, 'x'))}e^(x²/2) dx`,
       wrongs: {
         ic: sumT([String(beta), term(y0, 'e^(-x^2/2)')]),
         sign: sumT([String(-beta), term(y0 + beta, 'e^(x^2/2)')]),
@@ -254,18 +254,19 @@ function statements(rng) {
   const k = rng.pick([1, 2, 3]);
   const b = k * rng.pick([1, 2, 3]);
   const e = b / k;
+  const E = expT(-k);
   return [
     { key: 'diff', truth: true, text: 'Si y₁ et y₂ sont deux solutions de y′ + a(x)y = b(x), alors y₁ − y₂ est une solution de y′ + a(x)y = 0.', why: 'Vrai : (y₁ − y₂)′ + a(y₁ − y₂) = b − b = 0.' },
     {
       key: `sum${k}${b}`, truth: false, text: `Si y₁ et y₂ sont deux solutions de y′ + ${fac(k)}y = ${b}, alors y₁ + y₂ en est une aussi.`, ruleIfTrue: 'a2_ode_superposition_nonhom',
       why: `Faux : (y₁ + y₂)′ + ${fac(k)}(y₁ + y₂) = ${b} + ${b} = ${2 * b}. Par exemple y₁ = y₂ = ${e}.`,
-      counter: { kind: 'a2', prop: 'odeSumFails', params: { eq: `y'+${fac(k)}y=${b}` }, ask: [{ v: 'y1', label: 'y₁(x) =', keys: KEYS }, { v: 'y2', label: 'y₂(x) =', keys: KEYS }], answer: { y1: String(e), y2: `${e}+e^(${-k}x)` } },
+      counter: { kind: 'a2', prop: 'odeSumFails', params: { eq: `y'+${fac(k)}y=${b}` }, ask: [{ v: 'y1', label: 'y₁(x) =', keys: KEYS }, { v: 'y2', label: 'y₂(x) =', keys: KEYS }], answer: { y1: String(e), y2: `${e}+${E}` } },
     },
-    { key: `gen${k}${b}`, truth: true, text: `La solution générale de y′ + ${fac(k)}y = ${b} est y = ${e} + Ce^(${-k}x).`, why: `Vrai : a et b sont constants, on décale vers l'équilibre y* = ${b}/${k} = ${e}.` },
+    { key: `gen${k}${b}`, truth: true, text: `La solution générale de y′ + ${fac(k)}y = ${b} est y = ${e} + C${E}.`, why: `Vrai : a et b sont constants, on décale vers l'équilibre y* = ${b}/${k} = ${e}.` },
     {
-      key: `late${k}${b}`, truth: false, text: `Toutes les solutions de y′ + ${fac(k)}y = ${b} sont de la forme y = ${e} + e^(${-k}x) + C.`, ruleIfTrue: 'a2_ode_sep_constant_late',
-      why: `Faux : la constante multiplie la solution homogène, y = ${e} + Ce^(${-k}x). Par exemple y = ${e} + 2e^(${-k}x).`,
-      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y'+${fac(k)}y=${b}`, family: `${e}+e^(${-k}x)+C`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: 'Une solution qui n\'est pas de cette forme : y(x) =', keys: KEYS }], answer: { y: `${e}+2e^(${-k}x)` } },
+      key: `late${k}${b}`, truth: false, text: `Toutes les solutions de y′ + ${fac(k)}y = ${b} sont de la forme y = ${e} + ${E} + C.`, ruleIfTrue: 'a2_ode_sep_constant_late',
+      why: `Faux : la constante multiplie la solution homogène, y = ${e} + C${E}. Par exemple y = ${e} + 2${E}.`,
+      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y'+${fac(k)}y=${b}`, family: `${e}+${E}+C`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: 'Une solution qui n\'est pas de cette forme : y(x) =', keys: KEYS }], answer: { y: `${e}+2${E}` } },
     },
   ];
 }
