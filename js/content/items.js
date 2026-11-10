@@ -78,6 +78,8 @@ export function answerItem(skill, level, prompt, expected, opts = {}) {
     form: opts.form || 'any',
     exact: opts.exact || null,
     tree: opts.tree || null,
+    // The question's expression: the steps before the answer keep its value.
+    ...(opts.tree ? { start: { math: String(opts.tree) } } : {}),
     traps: traps.map((t) => ({ value: valStr(...t.value), rule: t.rule })),
     keys: opts.keys || 'frac',
     suffix: opts.suffix || '',

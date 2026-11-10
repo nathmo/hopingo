@@ -1061,6 +1061,12 @@ const SCHOOL_RULES = [
     explain: () => 'Une équation est une balance : ce qu\'on fait à gauche, on le fait aussi à droite, sinon l\'égalité n\'est plus vraie.',
   },
   {
+    id: 'eq_mult_one_term', family: 'distribute', tag: 'R', skill: 'eq-fractions', repair: 'lit-expand1',
+    name: 'Multiplier seulement certains termes',
+    example: ['x + 12/x = 7 → x² + 12 = 7', 'x² + 12 = 7x'],
+    explain: () => 'Pour enlever un dénominateur, on multiplie les deux membres par lui : <b>chaque terme</b>, des deux côtés, est multiplié. (x + 12/x) · x = x² + 12, et 7 · x = 7x.',
+  },
+  {
     id: 'zero_product_misuse', family: 'rule', tag: 'R', skill: 'eq-product', repair: 'eq-product',
     name: 'Produit nul utilisé quand le produit n\'est pas nul',
     example: ['(x − 2)(x + 3) = 6 → x = 8 ou x = 3', 'on développe d\'abord'],

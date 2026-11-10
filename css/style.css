@@ -198,6 +198,15 @@ textarea.code { width: 100%; font-family: ui-monospace, monospace; font-size: .7
 .m-tap.m-tap-rad { margin: 0 .1em 0 0; padding: 0 .2em; min-width: 1.2em; }
 .m-sqrt { display: inline-flex; align-items: stretch; }
 .m-under { border-top: 2px solid currentColor; padding: 0 .1em; }
+/* The radical: √ grows down to the line, the bar covers its whole argument. */
+.m-sqrt > .m-rad { display: inline-flex; align-items: flex-end; font-size: 1.12em; line-height: 1; margin-right: -.06em; padding-right: 0; }
+.m-sqrt > .m-under { display: inline-flex; align-items: center; gap: .08em; padding: .12em .14em 0; margin-top: .08em; }
+/* |…|: bars as tall as their content. */
+.m-abs { display: inline-flex; align-items: stretch; }
+.m-bar { display: inline-block; width: 0; border-left: 2px solid currentColor; color: transparent; margin: 0 .16em; overflow: hidden; cursor: text; }
+/* The 2D input: boxes keep their content on one line. */
+.mi-display .m-sup, .mi-display .m-under, .mi-display .m-frac > .m-n, .mi-display .m-frac > .m-d { gap: .06em; flex-wrap: nowrap; }
+.mi-display .m-frac { cursor: text; }
 .m-q { color: var(--violet); font-weight: 900; }
 .m-fresh { color: var(--violet-dark); font-weight: 900; }
 .prompt .m { font-size: 1.15em; }
@@ -281,6 +290,14 @@ textarea.code { width: 100%; font-family: ui-monospace, monospace; font-size: .7
 .step-note { flex-basis: 100%; font-size: .8rem; font-weight: 600; color: var(--muted); padding-left: 22px; }
 .step-line.current { border: 2px dashed #cbbcff; border-radius: 14px; background: #fff; padding: 6px 10px; }
 .step-line.current .mi-display { border: none; min-height: 52px; padding: 2px 4px; justify-content: flex-start; flex: 1; }
+/* Free steps above a typed answer (js/ui/draft.js). */
+.draft-lines:empty { display: none; }
+.draft-lines { margin-bottom: 8px; }
+.step-line.draft .eq { color: var(--orange); }
+.step-tag { margin-left: auto; font-size: .72rem; font-weight: 700; color: var(--muted); }
+.step-tag.checked { color: var(--green); }
+.draft-tools { justify-content: center; align-items: center; }
+.draft-hint { font-size: .8rem; color: var(--muted); }
 .m-blank { display: inline-block; min-width: 1.6em; min-height: 1.25em; border: 2px solid #cbbcff; border-radius: 8px; background: var(--violet-soft); text-align: center; padding: 0 4px; cursor: pointer; line-height: 1.2; }
 .m-blank.active { border-color: var(--violet); box-shadow: 0 0 0 3px #e2d9ff; }
 .m-blank.bad { border-color: var(--red); background: var(--red-soft); }

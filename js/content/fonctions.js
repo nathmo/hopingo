@@ -166,7 +166,7 @@ GEN['fn-intersection'] = (level, rng) => {
       expected: `x=${x};y=${y}`, form: 'any', exact: null, tree: null, traps: [], keys: 'sys', suffix: '', figure: null,
       baits: ['system_one_equation', 'graph_xy_swap'],
       solution: [{ html: algHtml(`${lin(a1, b1)}=${lin(a2, b2)}`), note: `Au point commun, les deux y sont égaux : on résout, x = ${show(x)}, puis y = ${show(y)}.` }],
-      expectedSec: 60, key: `i:${a1}:${b1}:${a2}:${b2}`,
+      expectedSec: 60, key: `i:${a1}:${b1}:${a2}:${b2}`, start: { math: `y=${lin(a1, b1)};y=${lin(a2, b2)}` },
       checker: 'system', pair: [x, y], eqs: [[-a1, 1, b1], [-a2, 1, b2]],
       expectedHtml: `${algHtml(`x=${x}`)} ; ${algHtml(`y=${y}`)}`,
     };

@@ -169,7 +169,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       input = new TokenInput({ pieces, onEnter: () => submit(), onChange: (v) => preview(v) });
       preview = () => {};
     } else {
-      input = new MathInput({ keysets, placeholder: 'écris la ligne suivante', onEnter: () => submit(), onChange: (v) => preview(v) });
+      input = new MathInput({ keysets, item, placeholder: 'écris la ligne suivante', onEnter: () => submit(), onChange: (v) => preview(v) });
       preview = (v) => {
         let m = null;
         if (v) { try { m = showWith(run.cfg, readWith(run.cfg, v)); } catch { m = innerMath(v, popts()); m = m ? `<math>${m}</math>` : null; } }
@@ -231,7 +231,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       box.querySelectorAll('[data-blank]').forEach((el) => el.addEventListener('click', () => select(Number(el.dataset.blank))));
     };
     const select = (i) => { active = i; input.set(values[i]); paint(); };
-    input = new MathInput({ keysets, placeholder: 'case active', onEnter: () => submit(), onChange: (v) => { values[active] = v; paint(); } });
+    input = new MathInput({ keysets, item, placeholder: 'case active', onEnter: () => submit(), onChange: (v) => { values[active] = v; paint(); } });
     stage.append(box, h('div.lines-blank-input', h('small.muted', n > 1 ? 'Touche une case pour la remplir.' : 'Remplis la case.'), input.display));
     if (line.note) stage.prepend(h('div.step-label', line.note));
     paint();
@@ -300,7 +300,7 @@ export function mountLines(item, ctx, body, opts = {}) {
   // The typed follow-up of a decision (§5.3 `then`): « t = … ».
   function thenTask(opt, index) {
     stage.replaceChildren();
-    input = new MathInput({ keysets, placeholder: opt.then.ask, onEnter: () => submit() });
+    input = new MathInput({ keysets, item, placeholder: opt.then.ask, onEnter: () => submit() });
     stage.append(h('div.step-line.current', h('span.eq', opt.then.ask), input.display));
     submit = () => {
       if (!input.value || locked()) return;

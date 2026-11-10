@@ -24,6 +24,7 @@ import { graphSvg } from '../math/graph.js';
 import { parseAlg, algHtml, printAlg } from '../math/algebra.js';
 import { judgeEquationLine, nextMove, solveLines, isolatedValue } from '../math/equations.js';
 import { mountLines } from './lines.js';
+import { mountSteps } from './draft.js';
 import { mountTokens } from './tokens.js';
 import { mountTf } from './tf.js';
 import { mountBlocks } from './blocks.js';
@@ -144,35 +145,51 @@ MOUNTS.mcq = (item, ctx, body) => {
 
 // ---------- typed answer ----------
 
+// The student may write steps above the answer (« + Ajouter une étape »):
+// checked against the previous line when the item has a `start`, else kept
+// as brouillon (js/ui/draft.js). The answer is still judged here.
 MOUNTS.answer = (item, ctx, body) => {
+  let steps = null;
   const input = new MathInput({
     keys: item.keys,
+    item,
     placeholder: 'Ta réponse',
-    onChange: (v) => ctx.ready(v.length > 0),
+    onChange: (v) => ctx.ready(v.length > 0 || !!steps?.chain.lines.length),
     onEnter: () => ctx.submit(),
   });
-  body.appendChild(h('div.answer-row', input.display, item.suffix ? h('span.suffix', item.suffix) : null));
+  steps = mountSteps(item, input, { explain: explainRule, onLines: (n) => ctx.ready(n > 0 || input.value.length > 0) });
+  body.append(steps.history, h('div.answer-row', input.display, item.suffix ? h('span.suffix', item.suffix) : null), steps.tools, steps.feedback);
   // Checker answers (2^3×3, 6√2) are not a single number.
   const expected = item.checker ? null : evaluate(parse(item.expected));
+  // A wrong answer also reports the traps named in the steps.
+  const wrong = (opts) => {
+    const own = opts.rules || [];
+    return wrongOutcome(item, { ...opts, rules: [...steps.chain.rules.filter((r) => !own.includes(r)), ...own] });
+  };
   return {
     footer: input.keypad(),
-    onKey: (e) => input.handleKey(e),
+    onKey: (e) => {
+      // Shift + Enter adds the line as a step.
+      if (e.key === 'Enter' && e.shiftKey) { e.preventDefault(); steps.add(); return; }
+      input.handleKey(e);
+    },
     check() {
-      if (!input.value) return null;
+      const value = input.value || steps.lastText();
+      if (!value) return null;
       // Answers that are not one number (2^3×3, 6√2) have their own checker.
       if (item.checker) {
-        const r = CHECKERS[item.checker](item, input.value);
+        const r = CHECKERS[item.checker](item, value);
         if (r.kind === 'done') return { correct: true };
         if (r.kind === 'stay') { input.flash(); return { stayOpen: true, message: r.message }; }
-        return wrongOutcome(item, { rules: r.rule ? [r.rule] : [], answerHtml: item.expectedHtml });
+        return wrong({ rules: r.rule ? [r.rule] : [], answerHtml: item.expectedHtml });
       }
       if (item.exact) {
-        const node = parse(input.value.includes('/') ? input.value : `${input.value}/1`);
+        const node = parse(value.includes('/') ? value : `${value}/1`);
         const ok = node.t === 'frac' && node.n.v.n === item.exact[0] && node.d.v.n === item.exact[1];
-        if (ok || (item.exact[1] === 1 && input.value === String(item.exact[0]))) return { correct: true };
+        if (ok || (item.exact[1] === 1 && value === String(item.exact[0]))) return { correct: true };
       }
       const tree = item.tree ? parse(item.tree) : null;
-      const r = judgeAnswer(expected, input.value, { form: item.form, tree });
+      const r = judgeAnswer(expected, value, { form: item.form, tree });
       if (r.kind === 'parse' || r.kind === 'unfinished' || r.kind === 'form') {
         input.flash();
         return { stayOpen: true, message: r.message };
@@ -180,11 +197,11 @@ MOUNTS.answer = (item, ctx, body) => {
       if (r.kind === 'simplify') return { stayOpen: true, message: 'C\'est juste ! Mais tu peux encore simplifier.' };
       if (r.kind === 'done' && !item.exact) return { correct: true };
       // Wrong: a known trap for this question, or a diagnosed mistake.
-      const v = r.value ?? tryEvaluate(parse(input.value));
+      const v = r.value ?? tryEvaluate(parse(value));
       const trap = v && item.traps.find((t) => evaluate(parse(t.value)).eq(v));
-      if (trap) return wrongOutcome(item, { rules: [trap.rule], answerHtml: M(item.expected) });
-      if (r.diag) return wrongOutcome(item, { ...rulesFromDiag(r.diag), diag: r.diag, answerHtml: M(item.expected) });
-      return wrongOutcome(item, { answerHtml: M(item.exact ? `${item.exact[0]}/${item.exact[1]}` : item.expected) });
+      if (trap) return wrong({ rules: [trap.rule], answerHtml: M(item.expected) });
+      if (r.diag) return wrong({ ...rulesFromDiag(r.diag), diag: r.diag, answerHtml: M(item.expected) });
+      return wrong({ answerHtml: M(item.exact ? `${item.exact[0]}/${item.exact[1]}` : item.expected) });
     },
   };
 };
@@ -200,7 +217,7 @@ MOUNTS.eqlines = (item, ctx, body) => {
   let last = item.equation;
   const history = h('div.steps-history', h('div.step-line.first', html(algHtml(item.equation))));
   const move = h('div.step-label');
-  const input = new MathInput({ keys: 'algeq', placeholder: 'écris l\'équation suivante', onEnter: () => submit() });
+  const input = new MathInput({ keys: 'algeq', item, placeholder: 'écris l\'équation suivante', onEnter: () => submit() });
   const row = h('div.step-line.current', h('span.eq', '⇔'), input.display);
   const feedback = h('div.step-feedback');
   let hintLevel = 0;
@@ -702,7 +719,7 @@ MOUNTS.steps = (item, ctx, body) => {
     let last = start;
     let wrongHere = 0;
     let hintLevel = 0;
-    const input = new MathInput({ keys: item.keys || 'ops', placeholder: 'écris la ligne suivante', onEnter: () => submit() });
+    const input = new MathInput({ keys: item.keys || 'ops', item, placeholder: 'écris la ligne suivante', onEnter: () => submit() });
     const row = h('div.step-line.current', h('span.eq', '='), input.display);
     const tools = h('div.step-tools',
       h('button.btn.small.ghost', { type: 'button', onclick: () => { input.set(print(last)); } }, '⧉ Recopier la ligne'),

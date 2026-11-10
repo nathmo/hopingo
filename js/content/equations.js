@@ -205,7 +205,7 @@ function solsetItem(skill, level, equation, values, traps, note) {
     expected: txt, form: 'any', exact: null, tree: null, traps: [], keys: 'eqset', suffix: '', figure: null,
     baits: [...new Set(traps.map(([, r]) => r))],
     solution: [{ html: algHtml(equation), note }, { html: sorted.map((v) => algHtml(`x=${fracText(v)}`)).join(' ou '), note: '' }],
-    expectedSec: 45, key: `${skill}:${equation}`,
+    expectedSec: 45, key: `${skill}:${equation}`, start: { math: equation },
     checker: 'solset', values: sorted, setTraps: traps.map(([vs, rule]) => ({ values: vs.map(fix), rule })),
     expectedHtml: sorted.map((v) => algHtml(`x=${fracText(v)}`)).join(' ou '),
   };
@@ -235,7 +235,7 @@ GEN['eq-systems'] = (level, rng) => {
       expected: `x=${x};y=${y}`, form: 'any', exact: null, tree: null, traps: [], keys: 'sys', suffix: '', figure: null,
       baits: ['system_one_equation'],
       solution: [{ html: algHtml(`x=${x}`), note: level === 3 ? 'Substitution : on remplace y dans la deuxième équation.' : 'Combinaison : on additionne ou soustrait les équations pour éliminer une lettre.' }, { html: algHtml(`y=${y}`), note: 'Vérifie dans les deux équations.' }],
-      expectedSec: 120, key: `sys:${e1}|${e2}`,
+      expectedSec: 120, key: `sys:${e1}|${e2}`, start: { math: `${e1};${e2}` },
       checker: 'system', pair: [x, y], eqs: [[a, b, a * x + b * y], [c, d, c * x + d * y]],
       expectedHtml: `${algHtml(`x=${x}`)} ; ${algHtml(`y=${y}`)}`,
     };
@@ -286,7 +286,7 @@ GEN['iso-formula'] = (level, rng) => {
     keys: ['7', '8', '9', '(', ')', '4', '5', '6', '+', '-', '1', '2', '3', '×', 'frac', '0', '^', '√', '=', 'back', ...letters, 'left', 'right'],
     baits: [...new Set(traps.map(([, r]) => r))],
     solution: [{ html: algHtml(`${v}=${ans}`), note: 'On défait les opérations autour de la lettre, dans l\'ordre inverse, en faisant la même chose des deux côtés.' }],
-    expectedSec: 60, key: `iso:${formula}:${v}`,
+    expectedSec: 60, key: `iso:${formula}:${v}`, start: { math: formula },
     checker: 'isolate', variable: v, target: ans, isoTraps: traps.map(([expr, rule]) => ({ expr, rule })),
     expectedHtml: algHtml(`${v}=${ans}`),
   };

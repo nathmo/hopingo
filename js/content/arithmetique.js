@@ -181,6 +181,7 @@ GEN['ar-factor'] = (level, rng) => {
     ...answerItem('ar-factor', level, `Décompose ${m(num(big(n)))} en produit de facteurs premiers.`, factorString(n), {
       keys: 'prod', solution: factorLines(n), key: `f:${n}`, expectedSec: 30,
     }),
+    start: { math: String(n) },
     checker: 'primes', target: n, expectedHtml: mathHtml(factorString(n)),
   };
 };
@@ -289,6 +290,7 @@ GEN['ar-surd'] = (level, rng) => {
     ],
     expectedSec: 30,
     key: `ar-surd:${n}`,
+    start: { math: `√${n}` },
     checker: 'surd', target: n, surd: [k, r], expectedHtml: m(`${k}√${r}`),
   };
 };

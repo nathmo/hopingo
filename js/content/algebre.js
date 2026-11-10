@@ -21,7 +21,8 @@ const show = (x) => String(x).replace('-', '−');
 const canon = (expr) => polyText(toPoly(parseAlg(expr)), ['x', 'y', 'a', 'b']);
 
 // An answer item judged by the algebra checker.
-function algItem(skill, level, prompt, target, { form = 'reduced', traps = [], solution = [], shown, key, sec = 40 } = {}) {
+// start: the expression to transform (keypad text), for the steps.
+function algItem(skill, level, prompt, target, { form = 'reduced', traps = [], solution = [], shown, key, sec = 40, start = null } = {}) {
   const t = parseAlg(target);
   const display = shown ?? target;
   const algTraps = traps.filter(([expr]) => {
@@ -33,6 +34,7 @@ function algItem(skill, level, prompt, target, { form = 'reduced', traps = [], s
     traps: [], keys: 'alg', suffix: '', figure: null,
     baits: [...new Set(algTraps.map((x) => x.rule).filter(Boolean))],
     solution, expectedSec: sec, key: `${skill}:${key ?? target}`,
+    ...(start ? { start: { math: start } } : {}),
     checker: 'alg', target, form, algTraps, expectedHtml: algHtml(display),
   };
 }
@@ -161,7 +163,7 @@ GEN['lit-reduce'] = (level, rng) => {
   if (level === 5) expr += `${sgn(nz(rng, -4, 4))}x×x`.replace(/^\+/, '+');
   const target = canon(expr);
   const total = terms.reduce((s, [c]) => s + c, 0);
-  return algItem('lit-reduce', level, `Réduis : ${algHtml(expr)}`, target, {
+  return algItem('lit-reduce', level, `Réduis : ${algHtml(expr)}`, target, { start: expr,
     traps: [[`${total}x`, 'conjoin_terms'], [`${total}`, 'conjoin_terms']],
     solution: [{ math: '0', html: algHtml(target), note: 'On regroupe les termes de même sorte : les x ensemble, les x² ensemble, les nombres ensemble.' }],
     key: expr,
@@ -191,7 +193,7 @@ GEN['lit-monomial'] = (level, rng) => {
     traps = [[`${a * b}x^${p * q}`, 'pow_product_multiply_exp'], [`${a + b}x^${p + q}`, 'alg_coeff_add']];
   }
   const target = canon(expr);
-  return algItem('lit-monomial', level, `Calcule et écris le plus simplement possible : ${algHtml(expr)}`, target, {
+  return algItem('lit-monomial', level, `Calcule et écris le plus simplement possible : ${algHtml(expr)}`, target, { start: expr,
     traps, key: expr, sec: 25,
     solution: [{ html: algHtml(target), note: 'On multiplie les nombres entre eux, et on additionne les exposants de x : x² × x³ = x⁵.' }],
   });
@@ -222,7 +224,7 @@ GEN['lit-expand1'] = (level, rng) => {
     traps = [[`${term(k * a, 'x', true)}${term(b, '')}`, 'distribute_partial']];
   }
   const target = canon(expr);
-  return algItem('lit-expand1', level, `Développe et réduis : ${algHtml(expr)}`, target, {
+  return algItem('lit-expand1', level, `Développe et réduis : ${algHtml(expr)}`, target, { start: expr,
     traps, key: expr, sec: 30,
     solution: [{ html: algHtml(target), note: 'Le facteur devant la parenthèse multiplie <b>chaque</b> terme, avec son signe.' }],
   });
@@ -241,7 +243,7 @@ GEN['lit-expand2'] = (level, rng) => {
     expr += `${k < 0 ? '-' : '+'}${Math.abs(k)}x(x${sgn(nz(rng, -5, 5))})`;
   }
   const target = canon(expr);
-  return algItem('lit-expand2', level, `Développe et réduis : ${algHtml(expr)}`, target, {
+  return algItem('lit-expand2', level, `Développe et réduis : ${algHtml(expr)}`, target, { start: expr,
     traps: [[`${term(a * c, 'x^2', true)}${term(b * d, '')}`, 'double_distribution_partial']], key: expr, sec: 45,
     solution: [{ html: algHtml(target), note: 'Chaque terme de la première parenthèse multiplie chaque terme de la deuxième : 4 produits, puis on réduit.' }],
   });
@@ -269,7 +271,7 @@ GEN['lit-identities'] = (level, rng) => {
     ];
   }
   const target = canon(expr);
-  return algItem('lit-identities', level, `Développe avec une identité remarquable : ${algHtml(expr)}`, target, {
+  return algItem('lit-identities', level, `Développe avec une identité remarquable : ${algHtml(expr)}`, target, { start: expr,
     traps, key: expr, sec: 30,
     solution: [{ html: algHtml(target), note: kind === '±' ? '(a + b)(a − b) = a² − b²' : `(a ${kind === '+' ? '+' : '−'} b)² = a² ${kind === '+' ? '+' : '−'} 2ab + b² : n'oublie pas le double produit.` }],
   });
@@ -290,7 +292,7 @@ GEN['lit-polynomial'] = (level, rng) => {
   ];
   const expr = patterns[Math.min(patterns.length - 1, level - 1 + rng.int(0, 1))];
   const target = canon(expr);
-  return algItem('lit-polynomial', level, `Développe, réduis et ordonne : ${algHtml(expr)}`, target, {
+  return algItem('lit-polynomial', level, `Développe, réduis et ordonne : ${algHtml(expr)}`, target, { start: expr,
     key: expr, sec: 90,
     solution: [{ html: algHtml(target), note: 'On développe chaque morceau, puis on regroupe les termes de même degré, du plus grand au plus petit.' }],
   });
@@ -326,7 +328,7 @@ GEN['fac-common'] = (level, rng) => {
   }
   const target = `${factor}(${inner})`;
   const shown = canon(target);
-  return algItem('fac-common', level, `Factorise en mettant le plus grand facteur commun en évidence : ${algHtml(shown)}`, target, {
+  return algItem('fac-common', level, `Factorise en mettant le plus grand facteur commun en évidence : ${algHtml(shown)}`, target, { start: shown,
     form: 'common', traps, key: shown, sec: 30,
     solution: [{ html: algHtml(target), note: `Le facteur commun ${factor} sort devant ; dans la parenthèse, on divise chaque terme par ${factor}. Vérifie en redéveloppant.` }],
   });
@@ -347,7 +349,7 @@ GEN['fac-bracket'] = (level, rng) => {
     const g = p.terms().reduce((acc, t) => gcd(acc, Math.abs(t.c.n)), 0);
     if (g > 1 || p.isConst) return GEN['fac-bracket'](level, rng);
   } catch { /* fine */ }
-  return algItem('fac-bracket', level, `Factorise : ${algHtml(expr)}`, target, {
+  return algItem('fac-bracket', level, `Factorise : ${algHtml(expr)}`, target, { start: expr,
     form: 'common', key: expr, sec: 45,
     solution: [{ html: algHtml(target), note: `La parenthèse ${common.replace(/[()]/g, '')} est un facteur commun : on la sort, et on écrit ce qui reste dans une seule parenthèse.` }],
   });
@@ -366,7 +368,7 @@ GEN['fac-identities'] = (level, rng) => {
   const traps = kind === '±'
     ? [[`(${ax}-${b})^2`, 'fac_diff_squares_as_square']]
     : [[`(${ax}${kind === '+' ? '-' : '+'}${b})^2`, 'identity_sign_square'], [`(${ax}+${b})(${ax}-${b})`, 'fac_diff_squares_as_square']];
-  return algItem('fac-identities', level, `Factorise avec une identité remarquable : ${algHtml(shown)}`, target, {
+  return algItem('fac-identities', level, `Factorise avec une identité remarquable : ${algHtml(shown)}`, target, { start: shown,
     form: 'factored', traps, key: shown, sec: 35,
     solution: [{ html: algHtml(target), note: kind === '±' ? 'a² − b² = (a − b)(a + b)' : 'a² ± 2ab + b² = (a ± b)² : repère les deux carrés et vérifie le double produit.' }],
   });
@@ -386,7 +388,7 @@ GEN['fac-trinomial'] = (level, rng) => {
   const [r, s] = roots(rng, level);
   const target = `(x${sgn(-r)})(x${sgn(-s)})`;
   const shown = canon(target);
-  return algItem('fac-trinomial', level, `Factorise : ${algHtml(shown)}`, target, {
+  return algItem('fac-trinomial', level, `Factorise : ${algHtml(shown)}`, target, { start: shown,
     form: 'factored', traps: [[`(x${sgn(r)})(x${sgn(s)})`, 'fac_trinomial_signs']], key: shown, sec: 45,
     solution: [{ html: algHtml(target), note: `Deux nombres de somme ${-(r + s) < 0 ? '−' : ''}${Math.abs(r + s)} et de produit ${r * s < 0 ? '−' : ''}${Math.abs(r * s)} : ${-r < 0 ? '−' : ''}${Math.abs(r)} et ${-s < 0 ? '−' : ''}${Math.abs(s)}. Vérifie en redéveloppant.` }],
   });
@@ -401,7 +403,7 @@ GEN['fac-trinomial-a'] = (level, rng) => {
     if (gcd(a, Math.abs(b)) !== 1 || gcd(c, Math.abs(d)) !== 1) continue;
     const target = `(${a}x${sgn(b)})(${c === 1 ? '' : c}x${sgn(d)})`;
     const shown = canon(target);
-    return algItem('fac-trinomial-a', level, `Factorise : ${algHtml(shown)}`, target, {
+    return algItem('fac-trinomial-a', level, `Factorise : ${algHtml(shown)}`, target, { start: shown,
       form: 'factored', traps: [[`(${a}x${sgn(-b)})(${c === 1 ? '' : c}x${sgn(-d)})`, 'fac_trinomial_signs']], key: shown, sec: 90,
       solution: [{ html: algHtml(target), note: 'Méthode ac : cherche deux nombres de produit a·c et de somme b, coupe le terme du milieu en deux, puis regroupe.' }],
     });
@@ -423,7 +425,7 @@ GEN['fac-complete'] = (level, rng) => {
   ];
   const target = targets[Math.min(4, level - 1)];
   const shown = canon(target);
-  return algItem('fac-complete', level, `Factorise complètement : ${algHtml(shown)}`, target, {
+  return algItem('fac-complete', level, `Factorise complètement : ${algHtml(shown)}`, target, { start: shown,
     form: 'factored', key: shown, sec: 90,
     solution: [{ html: algHtml(target), note: 'D\'abord le facteur commun, puis une identité ou un trinôme sur ce qui reste. On s\'arrête quand plus rien ne se factorise.' }],
   });
