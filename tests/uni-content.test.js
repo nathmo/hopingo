@@ -167,7 +167,7 @@ function checkItem(it, where) {
 
 // Items per level: 40, fewer (never under 15) for skills whose lines are
 // all judged by the numeric scan of sets.js.
-const COUNT = { 'g2-exp-eq': 25, 'g2-ineq': 25 };
+const COUNT = { 'g2-exp-eq': 25, 'g2-ineq': 25, 'g1-abs-ineq': 20, 'g1-irr-ineq': 25 };
 
 test('every university skill: 5 levels and exam variants, 40 items each', () => {
   const rng = makeRng(17);

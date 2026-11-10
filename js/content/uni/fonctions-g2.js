@@ -15,7 +15,7 @@
 
 import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
-import { toText } from '../../cas/print.js';
+import { toText, toReadable } from '../../cas/print.js';
 import { walk, lit, mapNode, neg, stripParen, contains, unparen } from '../../cas/ast.js';
 import { solutionSet, setToNode, setEqual, minus, union, intersect, complement, domainOf, isFiniteSet, points } from '../../cas/sets.js';
 import { polyOf, polyNode, qCoeffs } from '../../cas/polyx.js';
@@ -46,7 +46,9 @@ const br = (t) => (/[+-]/.test(t.slice(1)) ? `(${t})` : t);
 const setOf = (text, cfg = {}) => solutionSet(typeof text === 'string' ? parse(text) : text, { v: V, ...cfg });
 const ST = (S) => toText(setToNode(S));
 const setText = (text, cfg) => ST(setOf(text, cfg));
-const RD = (t) => fr(String(t).replace(/×/g, '·'));
+// B² written without useless brackets: x², (x + 3)².
+const squared = (b) => (/^[a-z]$/.test(b) ? `${b}^2` : `(${b})^2`);
+const RD = (t) => { try { return toReadable(parse(String(t))); } catch { return fr(String(t).replace(/×/g, '·')); } };
 
 // A line with the sub-expressions written in `texts` left blank.
 function tpl(math, texts, opts = {}) {
@@ -58,7 +60,7 @@ function tpl(math, texts, opts = {}) {
     walk(node, (n) => {
       if (found) return false;
       if (n.t !== 'paren' && !holes.includes(n) && toText(n) === want) { found = n; return false; }
-      return true;
+      return !(n.t === 'neg' && !want.startsWith('-'));
     });
     if (found) holes.push(found);
   }
@@ -84,8 +86,9 @@ const withMenus = (judge, level, start, lines, choices) => (level === 3 ? { ...j
 // others are segments. part = {start, judge, html?, lines}.
 function partsScript(parts, before = []) {
   const [first, ...rest] = parts;
-  const script = [...before, ...(first.pre || []), ...first.lines];
-  for (const p of rest) script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge: p.judge }, ...(p.pre || []), ...p.lines);
+  const lt = (h) => h && h.replace(/<(?![a-z/])/g, '&lt;');
+  const script = [...before, ...(first.html ? [{ kind: 'note', html: `<b>${lt(first.html)}</b>` }] : []), ...(first.pre || []), ...first.lines];
+  for (const p of rest) script.push({ kind: 'segment', html: lt(p.html), ask: p.ask, start: { math: p.start }, judge: p.judge }, ...(p.pre || []), ...p.lines);
   return { start: first.start, judge: first.judge, script };
 }
 
@@ -116,7 +119,7 @@ function dropAbs(node, at) {
   });
 }
 // a − (−b) → a + b, a + (−b) → a − b.
-const signs = (node) => mapNode(node, (n) => (n.t === 'bin' && (n.op === '+' || n.op === '-') && n.r.t === 'neg' ? { ...n, op: n.op === '+' ? '-' : '+', r: n.r.e } : n));
+const signs = (node) => mapNode(node, (n) => (n.t === 'bin' && (n.op === '+' || n.op === '-') && n.r.t === 'neg' ? { ...n, op: n.op === '+' ? '-' : '+', r: ['sym', 'num'].includes(n.r.e.t) ? n.r.e : { t: 'paren', e: n.r.e } } : n));
 // Brackets that are not needed: (2x − 3) = x + 1, x² + (x − 5) ≤ 7.
 const tidy = (text) => toText(parse(text.replace(/^\(([^()]*)\)(?=[=<>≤≥])/, '$1')));
 
@@ -153,8 +156,11 @@ function absCases(startText, { order = 'up' } = {}) {
       const op = c1.n > 0 ? rel.op : FLIP[rel.op];
       lines.push({ math: `x${REL_TEXT[op]}${N(v)}`, act: 'solve', note: c1.n < 0 && rel.op !== '=' ? 'Isoler x (on divise par un négatif : on retourne)' : 'Isoler x', subgoal: 'solve' });
     } else {
-      lines.push({ math: `${N(cs ? cs[0] : q(0))}${REL_TEXT[rel.op]}0`, act: 'solve', note: 'Réduire', subgoal: 'solve' });
-      rawSet = setOf(`${N(cs ? cs[0] : q(0))}${REL_TEXT[rel.op]}0`);
+      // No x left: both sides are numbers (2 = 3, 0 ≤ 1).
+      const side = (e) => toText(polyNode(polyOf(e)));
+      const c = `${side(r.l)}${REL_TEXT[rel.op]}${side(r.r)}`;
+      lines.push({ math: c, act: 'solve', note: 'Réduire : il ne reste pas de x', subgoal: 'solve' });
+      rawSet = setOf(c);
     }
     const inCase = intersect(rawSet, setOf(dom));
     const last = lines[lines.length - 1];
@@ -331,7 +337,9 @@ function riItem(level, rng, opts = {}) {
   return linesItem({
     skill: RI, level, prompt: `Résous ${MT(start)}.`,
     start, judge: withMenus(judge, level, start, sLines, RI_CHOICES), mode: modeOf(level), script,
-    hints: H('Ne multiplie pas par le dénominateur : son signe change. Écris d\'abord le domaine, puis passe tout à gauche.', MT(d.lines[2].math), MT(d.lines[3].math)),
+    hints: level === 1
+      ? H('Le quotient change de signe en ses zéros et en ses valeurs interdites. Une valeur interdite est toujours exclue.', `Valeur interdite : ${d.poles.map((x) => fr(String(x))).join(', ')} ; zéro : ${fr(String(d.p))}`, MT(d.lines[4].math))
+      : H('Ne multiplie pas par le dénominateur : son signe change. Écris d\'abord le domaine, puis passe tout à gauche.', MT(d.lines[2].math), MT(d.lines[3].math)),
     subgoals: RI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${RI}:${level}:${start}`, exam: examOf(opts, 3),
   });
@@ -520,8 +528,10 @@ function viData(rng, two) {
     const bT = pt(`${b1}m+(${b0})`, 'm');
     const cT = pt(`${g1}m+(${g0})`, 'm');
     if (cT === '0') continue;
-    const eqText = `${pt(`(${aT})x^2+(${bT})x+(${cT})`)}=0`;
-    const fRaw = (kv) => `${br(aT)}×${kk(kv)}^2${bT === '0' ? '' : `+${br(bT)}×${kk(kv)}`}+${br(cT)}`;
+    const bx = bT === '0' ? '' : /^-?\d*m$|^-?\d+$/.test(bT) ? `${bT.startsWith('-') ? '' : '+'}${bT}x` : `+(${bT})x`;
+    const eqText = `${p === 0 ? 'm' : `(${aT})`}x^2${bx}${cT.startsWith('-') ? '' : '+'}${cT}=0`;
+    const pr = (t) => (/[+-]/.test(t) ? `(${t})` : t);
+    const fRaw = (kv) => `${pr(aT)}×${kk(kv)}^2${bT === '0' ? '' : `+${pr(bT)}×${kk(kv)}`}+${pr(cT)}`;
     const d = { k, p, q: qq, aT, bT, cT, eqText, fRaw, fk: lin(qq, 'm') };
     if (!two) return d;
     // A second number outside the roots: a·f(k2) > 0.
@@ -569,7 +579,7 @@ function viItem(level, rng, opts = {}) {
   }
   if (level === 1) cPart.lines = cLines.map((l, i) => (i === 1 ? blanked(l, [String(d.p), String(d.q)]) : l));
   parts.push(cPart);
-  const { start, judge, script } = partsScript(parts, level === 1 ? [{ kind: 'note', html: 'Rappel : k est entre les racines si et seulement si a·f(k) < 0 ; k est à l\'extérieur si a·f(k) > 0.' }] : []);
+  const { start, judge, script } = partsScript(parts, level === 1 ? [{ kind: 'note', html: 'Rappel : k est entre les racines si et seulement si a·f(k) &lt; 0 ; k est à l\'extérieur si a·f(k) &gt; 0.' }] : []);
   return linesItem({
     skill: VI, level, prompt: `Pour quels m l'équation ${MT(d.eqText)} a-t-elle deux racines avec ${posText(d)} ?`,
     start, judge, mode: modeOf(level), script, declares: { vars: ['m'] },
@@ -786,6 +796,9 @@ function aiData(rng, sign) {
     const start = `x^2${sg}|${absArg(p, qq)}|${op}${rhs}`;
     const d = absCases(start, { order: 'down' });
     if (!d.cases.every((c) => rational(c.raw))) continue;
+    // Two distinct roots in each case: no trinomial of constant sign.
+    const ends = (S) => new Set(S.parts.flatMap((p) => [p.lo.x, p.hi.x]).filter(Number.isFinite)).size;
+    if (!d.cases.every((c) => ends(c.raw) === 2)) continue;
     if (!d.answer.parts.length || setEqual(d.answer, setOf('ℝ'))) continue;
     if (!d.cases.every((c) => c.raw.parts.every((x) => [x.lo, x.hi].every((b) => !Number.isFinite(b.x) || (b.q.d <= 2 && Math.abs(b.x) <= 12))))) continue;
     const rawU = d.cases.reduce((S, c) => union(S, c.raw), { parts: [] });
@@ -860,7 +873,7 @@ function ieData(rng) {
     const tri = pt(`(x-(${x0}))(x-(${x1}))`);
     const start = `sqrt(${A})=${B}`;
     const lines = [
-      E(`${B}≥0 et ${A}=(${B})^2`, 'Condition B ≥ 0 et carré', 'cond', 'cond'),
+      E(`${B}≥0 et ${A}=${squared(B)}`, 'Condition B ≥ 0 et carré', 'cond', 'cond'),
       E(`${cond} et ${tri}=0`, 'Développer, tout d\'un côté', 'expand', 'expand'),
       E(`${cond} et (x=${x0} ou x=${x1})`, 'Résoudre', 'solve', 'solve'),
       E(`{${x0}}`, `Trier : ${fr(String(x1))} ne vérifie pas ${RD(cond)}`, 'sort', 'sort'),
@@ -878,12 +891,12 @@ function ieTwo(rng) {
     const a = q(b * b).sub(t.mul(2 * b));
     if (a.n <= 0 || t.valueOf() >= b || a.d !== 1) continue;
     const A = N(a);
-    const start = `sqrt(x+${A})+sqrt(x)=${b}`;
+    const start = `sqrt(x+${A})+√x=${b}`;
     const lines = [
-      E(`sqrt(x+${A})=${b}-sqrt(x)`, 'Isoler une racine', 'cond', 'iso'),
-      E(`${b}-sqrt(x)≥0 et x+${A}=${b * b}-${2 * b}sqrt(x)+x`, 'Condition et carré', 'cond', 'cond'),
-      E(`sqrt(x)≤${b} et ${2 * b}sqrt(x)=${N(q(b * b).sub(a))}`, 'Réduire', 'expand', 'expand'),
-      E(`sqrt(x)=${N(t)}`, 'Diviser', 'solve', 'solve'),
+      E(`sqrt(x+${A})=${b}-√x`, 'Isoler une racine', 'cond', 'iso'),
+      E(`${b}-√x≥0 et x+${A}=${b * b}-${2 * b}√x+x`, 'Condition et carré', 'cond', 'cond'),
+      E(`√x≤${b} et ${2 * b}√x=${N(q(b * b).sub(a))}`, 'Réduire', 'expand', 'expand'),
+      E(`√x=${N(t)}`, 'Diviser', 'solve', 'solve'),
       E(`x=${N(t.mul(t))}`, 'Élever au carré', 'sort', 'solve'),
     ];
     return { start, lines };
@@ -943,7 +956,7 @@ function ieQuadratic(rng, opts) {
     const parts = [
       { start: `sqrt(${A})`, judge: { kind: 'solset', v: V, exprDomain: true }, html: 'Domaine de la racine :', lines: [E(`${A}≥0`, 'Radicande ≥ 0', 'domain'), E(`${fac(u)}${fac(w)}≥0`, 'Factoriser', 'domain'), E(dom, 'Signe du trinôme', 'domain')] },
       { start, judge: { kind: 'solset', v: V }, html: 'Équation :', lines: [
-        E(`${B}≥0 et ${A}=(${B})^2`, 'Condition et carré', 'cond'),
+        E(`${B}≥0 et ${A}=${squared(B)}`, 'Condition et carré', 'cond'),
         E(`x≥${-s} et ${pt(`${pp - 2 * s}x`)}=${s * s - qq}`, 'Les x² s\'en vont', 'expand'),
         E(`x≥${-s} et x=${N(v)}`, 'Résoudre', 'solve'),
         E(`{${N(v)}}`, 'La condition est vérifiée', 'sort'),
@@ -1021,7 +1034,7 @@ function iiSimple(rng, ops) {
     const B = pt(`x+(${s})`);
     const start = `sqrt(${A})${op}${B}`;
     const answer = setOf(start);
-    const noCond = setOf(`${A}≥0 et ${A}${op}(${B})^2`);
+    const noCond = setOf(`${A}≥0 et ${A}${op}${squared(B)}`);
     if (!answer.parts.length || setEqual(answer, noCond)) continue;
     return { op, s, r1, r2, q: qq, A, B, start, answer, noCond, tri: pt(`x^2+(${2 * s - 1})x+(${s * s - qq})`) };
   }
@@ -1036,7 +1049,7 @@ function iiLeLines(d) {
   const tri = strict ? `${d.tri}>0` : `${d.tri}≥0`;
   const out = strict ? `(x<${d.r1} ou x>${d.r2})` : `(x≤${d.r1} ou x≥${d.r2})`;
   return [
-    E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}(${d.B})^2`, 'A ≥ 0, B ≥ 0 et A ≤ B²', 'cond', 'cond'),
+    E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}${squared(d.B)}`, 'A ≥ 0, B ≥ 0 et A ≤ B²', 'cond', 'cond'),
     E(`x≥${-d.q} et ${xC} et ${tri}`, 'Simplifier', 'cond', 'reduce'),
     E(`x≥${-d.q} et ${xC} et ${out}`, 'Signe du trinôme', 'tri', 'solve'),
     E(ST(d.answer), 'Intersecter', 'keep', 'keep'),
@@ -1051,7 +1064,7 @@ function iiGeParts(d, level) {
   const casePosRaw = setOf(`${d.tri}${sq}0`);
   const casePos = intersect(casePosRaw, setOf(`x≥${-s}`));
   const neg = [E(`${d.A}≥0`, 'B < 0 : vrai dès que la racine existe', 'case', 'abs'), E(ST(caseNeg), 'Garder les x du cas', 'keep', 'keep')];
-  const pos = [E(`${d.A}${d.op}(${d.B})^2`, 'B ≥ 0 : élever au carré', 'square', 'square'), E(`${d.tri}${sq}0`, 'Réduire', 'tri', 'reduce'), E(ST(casePosRaw), 'Signe du trinôme', 'tri', 'solve')];
+  const pos = [E(`${d.A}${d.op}${squared(d.B)}`, 'B ≥ 0 : élever au carré', 'square', 'square'), E(`${d.tri}${sq}0`, 'Réduire', 'tri', 'reduce'), E(ST(casePosRaw), 'Signe du trinôme', 'tri', 'solve')];
   if (!setEqual(casePosRaw, casePos)) pos.push(E(ST(casePos), 'Garder les x du cas', 'keep', 'keep'));
   const parts = [
     { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `]-∞;${-s}[`, inCase: true }, level, d.start, neg, II_CHOICES), html: `Cas ${RD(d.B)} < 0 :`, lines: neg },
@@ -1078,7 +1091,7 @@ function iiQuad(rng, ops) {
     const B = pt(`x+(${s})`);
     const start = `sqrt(${A})${op}${B}`;
     const answer = setOf(start);
-    const noCond = setOf(`${A}≥0 et ${A}${op}(${B})^2`);
+    const noCond = setOf(`${A}≥0 et ${A}${op}${squared(B)}`);
     if (!answer.parts.length || setEqual(answer, noCond) || setEqual(answer, setOf('ℝ')) || !rational(answer)) continue;
     if (answer.parts.some((p) => [p.lo, p.hi].some((b) => Number.isFinite(b.x) && b.q.d > 4))) continue;
     return { op, u, w, s, pp, q: qq, A, B, start, answer, noCond, lin: pt(`${pp - 2 * s}x`), c: s * s - qq };
@@ -1092,7 +1105,7 @@ function iiQuadParts(d, level) {
     const bC = d.op === '<' ? `${d.B}>0` : `${d.B}≥0`;
     const xC = d.op === '<' ? `x>${-d.s}` : `x≥${-d.s}`;
     const lines = [
-      E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}(${d.B})^2`, 'A ≥ 0, B ≥ 0 et A ≤ B²', 'cond', 'cond'),
+      E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}${squared(d.B)}`, 'A ≥ 0, B ≥ 0 et A ≤ B²', 'cond', 'cond'),
       E(`${out} et ${xC} et ${d.lin}${d.op}${d.c}`, 'Signe du trinôme ; les x² s\'en vont', 'tri', 'reduce'),
       E(ST(d.answer), 'Intersecter', 'keep', 'keep'),
     ];
@@ -1103,7 +1116,7 @@ function iiQuadParts(d, level) {
   const casePos = intersect(intersect(posRaw, setOf(`x≥${-d.s}`)), setOf(`${d.A}≥0`));
   const neg = [E(`${d.A}≥0`, 'B < 0 : vrai dès que la racine existe', 'case', 'abs'), E(ST(setOf(`${d.A}≥0`)), 'Signe du trinôme', 'tri', 'solve')];
   if (!setEqual(setOf(`${d.A}≥0`), caseNeg)) neg.push(E(ST(caseNeg), 'Garder les x du cas', 'keep', 'keep'));
-  const pos = [E(`${d.A}${d.op}(${d.B})^2`, 'B ≥ 0 : élever au carré', 'square', 'square'), E(`${d.lin}${d.op}${d.c}`, 'Les x² s\'en vont', 'tri', 'reduce'), E(ST(posRaw), 'Isoler x', 'tri', 'solve')];
+  const pos = [E(`${d.A}${d.op}${squared(d.B)}`, 'B ≥ 0 : élever au carré', 'square', 'square'), E(`${d.lin}${d.op}${d.c}`, 'Les x² s\'en vont', 'tri', 'reduce'), E(ST(posRaw), 'Isoler x', 'tri', 'solve')];
   if (!setEqual(posRaw, casePos)) pos.push(E(ST(casePos), 'Garder les x du cas', 'keep', 'keep'));
   const sets = { S_1: ST(caseNeg), S_2: ST(casePos) };
   const raw = { S_1: ST(setOf(`${d.A}≥0`)), S_2: ST(posRaw) };
@@ -1213,7 +1226,7 @@ function boQuot(rng) {
     const c = rng.int(0, 3);
     const lo = q(a).sub(r);
     const hi = q(a).add(r);
-    if (lo.n < 0 || lo.add(q(c)).n <= 0) continue;
+    if (lo.n < 0 || lo.add(q(c)).n <= 0 || k === c * c) continue;
     const M = [lo.mul(lo).sub(q(k)), hi.mul(hi).sub(q(k))].map((x) => (x.n < 0 ? x.neg() : x)).reduce((x, y) => (x.cmp(y) >= 0 ? x : y));
     if (M.n === 0) continue;
     const C = M.div(lo.add(q(c)));
@@ -1240,7 +1253,7 @@ function boItem(level, rng, opts = {}) {
     script = [d.lines[0],
       { kind: 'decision', prompt: `Comment majorer |${RD(lin(d.a))}| ?`, options: [
         { id: 'r', label: `Par ${fr(N(d.r))}, l'hypothèse`, valid: true },
-        { id: 'a', label: `Par ${fr(N(q(Math.abs(d.a)).add(d.r)))}`, valid: false, why: `L'hypothèse dit directement |${RD(lin(d.a))}| ≤ ${fr(N(d.r))}.` },
+        { id: 'a', label: `Par ${fr(N(d.a === 0 ? d.r.add(q(1)) : q(Math.abs(d.a)).add(d.r)))}`, valid: false, why: `L'hypothèse dit directement |${RD(lin(d.a))}| ≤ ${fr(N(d.r))}.` },
       ] },
       d.lines[1],
       { kind: 'decision', prompt: `Comment majorer |${RD(lin(d.b))}| sur [${fr(N(d.lo))} ; ${fr(N(d.hi))}] ?`, options: [
