@@ -152,6 +152,7 @@ const TESTS_PAIR = {
   'A,B inv⇒A+B inv': ({ A, B }) => {
     if (MX.det(A).n === 0 || MX.det(B).n === 0) return 'A et B doivent être inversibles.';
     return MX.det(MX.add(A, B)).n === 0 || 'Ici A + B est inversible.';
+  },
   // section vs
   // A, B: the matrices of two bases B and C (vectors in columns), with
   // P_{C←B} = C⁻¹B different from B⁻¹C.
@@ -325,6 +326,7 @@ const WANT_ONE = {
     if (!sq(A)) return 'A doit être carrée.';
     if (A.some((r) => r.every((x) => x.n === 0)) || MX.transpose(A).some((c) => c.every((x) => x.n === 0))) return 'A ne doit avoir ni ligne nulle ni colonne nulle.';
     return MX.det(A).n === 0 || 'Ici det A ≠ 0.';
+  },
   // section eig
   // u and w eigenvectors of A, u + w not (answers A, u, w).
   sumNotEigvec: ({ A }, p, ans) => {
@@ -347,6 +349,7 @@ const WANT_ONE = {
     if (MX.transpose(A).some((c) => !c[0].add(c[1]).eq(q(1)))) return 'Chaque colonne doit sommer à 1.';
     const mu = MX.trace(A).sub(q(1));
     return Math.abs(mu.valueOf()) === 1 || `Ici l'autre valeur propre vaut ${mu} : |μ| < 1, et x_k tend vers le même état stationnaire pour tout x₀.`;
+  },
   // section sym
   // Diagonalisable over ℝ (rational eigenvalues) but not symmetric: not
   // diagonalisable in an orthonormal basis.
@@ -442,6 +445,7 @@ const WANT_FAMILY = {
     const v = readQ(vText)?.vec;
     if (!v || v.length !== p.n) return `Écris v avec ${p.n} composantes.`;
     return !same(T(u.map((x, i) => x.add(v[i]))), T(u).map((y, i) => y.add(T(v)[i]))) || 'Ici T(u + v) = T(u) + T(v).';
+  },
   // section vs
   // One vector v of the family p.F (texts) outside Ker p.A (answer v).
   notInKer: (ans, p) => {
@@ -462,6 +466,7 @@ const WANT_FAMILY = {
     const s = x.map((_, k) => B.reduce((acc, b, j) => acc.add(b[k].mul(c[j])), q(0)));
     if (!s.every((y, k) => y.eq(x[k]))) return 'Avec ces coordonnées, c₁b₁ + c₂b₂ + … ne redonne pas le vecteur.';
     return !c[p.i].eq(q(p.claim)) || 'Avec ces coordonnées, la composante est bien celle de l’énoncé.';
+  },
   // section orth
   // x ∈ W = Span{params.basis} closer to params.y than params.w (answer x).
   closerInW: (ans, p) => {
