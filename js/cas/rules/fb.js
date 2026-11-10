@@ -94,8 +94,8 @@ export const DEFS = {
   },
   f_rat_simplify: {
     name: 'Fraction rationnelle mal réduite',
-    judges: ['transform'],
-    transform: (prev, ctx) => fromCfg('f_rat_simplify', ctx),
+    judges: ['transform', 'equiv'],
+    transform: (prev, ctx) => fromCfg('f_rat_simplify', ctx, ctx?.cfg?.kind === 'equiv' ? (t) => parse(t, { vars: ctx.cfg.vars }) : (t) => t),
     check: { judge: { ...EQ, traps: { f_rat_simplify: ['û = √(2/π)/(2α^2+7)'] } }, prev: 'û = √(2/π)/(1+α^2)/(2+6/(1+α^2))', line: 'û = √(2/π)/(2α^2+7)' },
   },
   f_ft_shift_sign: {

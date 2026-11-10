@@ -8,5 +8,7 @@
 
 import { GEN as DIRECT } from './fourier-b-direct.js';
 import { GEN as TABLE } from './fourier-b-table.js';
+import { GEN as EQ } from './fourier-b-eq.js';
+import { GEN as PLANCH } from './fourier-b-planch.js';
 
-export const GEN = { ...DIRECT, ...TABLE };
+export const GEN = { ...DIRECT, ...TABLE, ...EQ, ...PLANCH };
