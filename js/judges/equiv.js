@@ -343,7 +343,8 @@ export function implicitDerivs(node, cfg) {
 // ---------- chains of inequalities (step U1b, G1 catalogue « ajout 4 ») ----------
 // cfg.rel '≤' (or '≥'): a line is right if prev ≤ line (or ≥) at every point
 // of the domain {v: [lo, hi]}: 400 points and the ends. Final form: a number
-// written out, within cfg.bound when the question gives one.
+// written out, within cfg.bound when the question gives one; with
+// cfg.simple (step U4), also a bound c·vᵖ with p < 0 (5/n before N(ε)).
 
 const BOUND_POINTS = 400;
 function boundPoints(cfg) {
@@ -380,6 +381,16 @@ export function boundWitness(cfg, prev, node) {
 // Small values (errors of a Taylor bound) keep three significant digits.
 const small = (x) => (x !== 0 && Math.abs(x) < 0.01 ? x.toPrecision(3).replace('.', ',').replace('-', '−') : frNum(x));
 
+// Step U4 (A1, ε-N): with cfg.simple, a bound c·vᵖ (c > 0, p < 0: 5/n,
+// 3/n², 2/√n) ends the part; it is recognised by g(2v)/g(v) = 2ᵖ < 1.
+function simpleBound(node, v) {
+  if ([...symbolsIn(node)].some((s) => s !== v)) return false;
+  const g = [1, 2, 4, 8, 16, 32].map((x) => evalFloat(node, { [v]: x }));
+  if (!g.every((y) => Number.isFinite(y) && y > 0)) return false;
+  const r = g.slice(1).map((y, i) => y / g[i]);
+  return r[0] < 1 - 1e-9 && r.every((x) => Math.abs(x - r[0]) <= 1e-9);
+}
+
 function judgeBound(cfg, prev, node) {
   const w = boundWitness(cfg, prev, node);
   const v = cfg.vars?.[0] || 'x';
@@ -390,7 +401,7 @@ function judgeBound(cfg, prev, node) {
     const word = cfg.rel === '≥' ? 'plus grande' : 'plus petite';
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: `En ${v} = ${frNum(w[v])}, ta ligne vaut ${small(w.b)}, ${word} que la précédente (${small(w.a)}) : ce n'est pas une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}.` };
   }
-  if (contains(node, (x) => x.t === 'sym' && x.name === v)) return { kind: 'ok', node };
+  if (contains(node, (x) => x.t === 'sym' && x.name === v)) return cfg.simple && simpleBound(node, v) ? { kind: 'done', node } : { kind: 'ok', node };
   const q = exactValue(node);
   const val = q ? q.valueOf() : evalFloat(node, {});
   if (cfg.bound !== undefined) {

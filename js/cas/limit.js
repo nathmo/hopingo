@@ -199,6 +199,8 @@ function windowVerdict(ws) {
     if (last.negs === 0 && last.minAbs > first.minAbs && last.minAbs > 1e3) return '+inf';
     if (last.pos === 0 && last.minAbs > first.minAbs && last.minAbs > 1e3) return '-inf';
     if (last.pos > 0 && last.negs > 0) return 'none';
+    // Step U4: unbounded, but some values stay small (n(1 + (−1)ⁿ)): no limit.
+    if (last.minAbs <= first.maxAbs) return 'none';
     return null;
   }
   const scale = 1 + Math.abs(c);
