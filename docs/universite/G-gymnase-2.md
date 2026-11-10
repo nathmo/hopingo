@@ -65,6 +65,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 
 ### `g4-vectors` — Vecteurs : Chasles, combinaisons, colinéarité
 - **Année** 12 · **Prérequis** `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarits 1 (centre donné) et 2 (trois sommets, à partir du niveau 3) ; le gabarit 3 (w⃗ = αu⃗ + βv⃗) n'est qu'au niveau 5 et dans la variante `open`, où α et β sont deux parties `value` (le système est écrit dans l'énoncé). Le niveau 5 est un item `lines` sans aide, en parties (le type `problem` arrive en U4). Juge `vector` (« `value` avec `form: 'point'` » du §16.2 est construit comme un juge à part). Le V/F faux demande quatre points alignés (sorte `geo`, `flatParallelogram`).
 - **Intro** : AB⃗ = B − A. Chasles : AB⃗ + BC⃗ = AC⃗. Le milieu de [AB] est (A + B)/2. Deux vecteurs du plan sont colinéaires si et seulement si u₁v₂ − u₂v₁ = 0. Exemple : parallélogramme ABCD de centre M, alors C = 2M − A.
 - **Juge** : `value` `{form:'point', symbols:{A, B, M}}` · **Forme finale** : coordonnées numériques de chaque point demandé.
 - **Niveaux** :
@@ -90,6 +91,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-line2` — Droite du plan : paramétrique, cartésienne, intersection
 - **Année** 12 · **Prérequis** `g4-vectors`, `@alg:L-affine`, `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-vectors` : A + t·v⃗ est une combinaison de vecteurs ; `@alg:L-affine` : pente et ordonnée à l'origine de y = mx + p.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Le point d'intersection est jugé par `vector`, t par `solset`. Le niveau 5 demande la position des deux droites par une décision, puis l'intersection : les droites y sont toujours sécantes (parallèles ou confondues seulement dans le V/F, avec un point commun comme contre-exemple). Gabarits 2 et 3 à partir du niveau 3.
 - **Intro** : par A et de direction v⃗ : (x ; y) = A + t·v⃗. On élimine t pour la cartésienne. Dans ax + by + c = 0, le vecteur (a ; b) est **normal** et (−b ; a) est directeur. Intersection : on remplace la paramétrique dans la cartésienne.
 - **Juge** : `geom` `{object:'line2'}` pour les équations ; `value` `{form:'point'}` pour l'intersection (juge par segment) · **Forme finale** : cartésienne à coefficients entiers premiers entre eux, puis un point.
 - **Niveaux** :
@@ -116,6 +118,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-dot` — Produit scalaire, angles, projection d'un vecteur
 - **Année** 12 · **Prérequis** `g4-vectors`, `@alg:M-pythagore`, `g3-arc-def` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-vectors` : composantes des vecteurs.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Toutes les parties sont jugées par `vector` (produit scalaire, produit des normes, cos θ, θ, projection). La ligne « cos θ = 1/(√2·√2) » est remplacée par « cos θ = AB⃗·AC⃗/(‖AB⃗‖·‖AC⃗‖) » (une valeur avec une racine au dénominateur n'est pas une ligne finale). Les paires de vecteurs sont tirées au hasard et gardées selon cos θ (pas de table de 40 paires) ; 1 item sur 4 a un angle non remarquable (θ = arccos(…), cos θ exact). Niveau 5 : angle en A, puis pied de la hauteur issue de C par projection.
 - **Intro** : u⃗·v⃗ = u₁v₁ + u₂v₂ + u₃v₃ = ‖u⃗‖‖v⃗‖cos θ. Projection de u⃗ sur v⃗ : (u⃗·v⃗ / ‖v⃗‖²)·v⃗. Angle de deux droites : on prend |cos θ|.
 - **Juge** : `value` `{form:'vector'}` pour les vecteurs ; `value` `{form:'exact'}` pour cos θ et θ (θ en radians, valeur exacte ou `arccos(…)`) · **Forme finale** : θ exact ; projection en composantes.
 - **Niveaux** :
@@ -143,6 +146,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-bisectors` — Médiatrice et bissectrices
 - **Année** 12 · **Prérequis** `g4-line2`, `g4-dot`, `g1-abs-eq` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-line2` : équations cartésiennes ax + by + c = 0 ; `g4-dot` : norme du vecteur normal ‖n⃗‖.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Les normes sont deux parties `vector` à partir du niveau 2 (données au niveau 1). La ligne des cas s'écrit « A − (B) = 0 ou A + (B) = 0 ». Médiatrice (gabarit 2) 3 fois sur 10 aux niveaux 3 et 4. Niveau 5 et `open` : (AB), (AC), les deux bissectrices, puis une décision pour la bissectrice intérieure (signes opposés en B et C). Le V/F ne propose que des énoncés vrais.
 - **Intro** : distance d'un point à une droite du plan : |ax₀ + by₀ + c| / √(a² + b²). Les bissectrices de d₁ et d₂ sont les points à égale distance : |a₁x + b₁y + c₁|/‖n₁‖ = |a₂x + b₂y + c₂|/‖n₂‖, d'où deux droites (signe + et signe −). Médiatrice de [AB] : MA = MB, ou AB⃗·(X − I) = 0 avec I milieu.
 - **Juge** : `geom` `{object:'line2', count:2}` (bissectrices) ; `geom` `{object:'line2'}` (médiatrice) · **Forme finale** : deux cartésiennes entières, ou une.
 - **Niveaux** :
@@ -169,6 +173,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-line3` — Droite de l'espace : paramétrique et cartésienne
 - **Année** 12 · **Prérequis** `g4-line2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-line2` : même passage paramétrique ↔ cartésienne, avec une coordonnée de plus.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Gabarit 3 (deux plans → paramétrique, forme `param`) à partir du niveau 3 ; la forme symétrique est omise quand une composante de v⃗ est nulle. Niveau 5 : la direction est une partie `vector` (tout multiple non nul), puis la droite. Le V/F faux demande un point du plan hors de la droite (sorte `geo`, `pointOnPlaneOffLine`).
 - **Intro** : (x ; y ; z) = A + t·v⃗. Cartésienne : (x − x₀)/v₁ = (y − y₀)/v₂ = (z − z₀)/v₃, c'est-à-dire **deux** équations. Si une composante de v⃗ est nulle, la coordonnée correspondante est constante. Dans l'autre sens, on résout le système de deux plans avec une inconnue libre.
 - **Juge** : `geom` `{object:'line3'}` · **Forme finale** : la forme demandée (paramétrique, ou deux équations).
 - **Niveaux** :
@@ -194,6 +199,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-plane` — Plan : par trois points, paramétrique ↔ cartésienne
 - **Année** 12 · **Prérequis** `g4-vectors` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g4-vectors` : deux vecteurs directeurs AB⃗ et AC⃗.
+- **Statut** : fait le 10 novembre 2026 (étape U5). La normale est une partie `vector` (`multiple`), d une partie `solset`, le plan une partie `geom`. L'option « produit vectoriel » du niveau 2 est toujours `valid:false` (« Pas encore vu »). Niveau 5 : gabarit 3 (un point et une droite). Le V/F faux demande trois points alignés (`threeAligned`).
 - **Intro** : un plan est donné par un point et deux directions non colinéaires, ou par une normale n⃗ = (a ; b ; c) : ax + by + cz + d = 0. Sans produit vectoriel (comme à la MAN), on trouve n⃗ en résolvant n⃗·u⃗ = 0 et n⃗·v⃗ = 0. Après `g4-cross`, n⃗ = u⃗ ∧ v⃗ est accepté aussi.
 - **Juge** : `geom` `{object:'plane'}` ; segment `value` `{form:'vector'}` pour n⃗ (tout multiple non nul accepté) · **Forme finale** : cartésienne entière.
 - **Niveaux** :
@@ -220,6 +226,7 @@ Unité `geoan` · préfixe `g4-` · pièges `g4_` · Statut : à faire
 ### `g4-relative-pos` — Positions relatives dans l'espace
 - **Année** 12 · **Prérequis** `g4-plane`, `g4-line3` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g4-plane` : équation cartésienne du plan ; `g4-line3` : paramétrique de la droite substituée dans le plan.
+- **Statut** : fait le 10 novembre 2026 (étape U5). Le système en s et t est joué par deux parties `value` (s, puis t, sur deux équations de déterminant non nul), puis la 3e équation comme une différence ; les décisions (colinéarité, conclusion) sont placées entre les lignes. Niveau 1 : droite et plan ; niveau 2 : deux droites sécantes ou gauches ; niveau 4 : les cinq cas et deux plans. Niveau 5 (MAN 2A Q1) : P est-il sur d (λ par une coordonnée, puis une différence), puis d et α. `g4_skew_as_secant` et `g4_param_same_letter` sont des leurres de décisions et du QCM (pas de transformation de ligne). Le V/F faux demande deux droites gauches (`skewLines`).
 - **Intro** : droite et plan : on remplace la paramétrique dans le plan. On obtient 0·t = 0 (droite contenue), 0·t = k ≠ 0 (parallèle), ou une seule valeur de t (sécante). Deux droites : directions colinéaires (parallèles ou confondues) ; sinon on résout A + s·u⃗ = B + t·v⃗ avec **deux paramètres différents** : une solution (sécantes) ou aucune (gauches). Deux plans : normales colinéaires ou non.
 - **Juge** : décisions (menu des positions) ; segments `value` pour le système et le point d'intersection ; `geom` `{object:'line3'}` pour l'intersection de deux plans · **Forme finale** : la position nommée, et l'intersection si elle existe.
 - **Niveaux** : la décision « Choisir la méthode » suit l'arbre :

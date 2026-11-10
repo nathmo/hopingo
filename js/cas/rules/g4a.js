@@ -4,6 +4,12 @@
 //
 // The line traps read what the generators put in the judge's cfg:
 //   cfg.proj2 = {u, v}   (texts of components: the projection of u on v, judge vector)
+//   cfg.via = text       (the relation that gives the point: 2M - A, A + vec(B,C))
+//   cfg.lineData = {A, n}          (line2 through A with normal n: texts)
+//   cfg.l3 = {rows, A}             (line3: two plane rows [a, b, c, d], a point)
+//   cfg.obtuse = {wrong}           (the angle of two vectors, when the lines' angle is asked)
+//   cfg.bis = {r1, r2, N1, N2}     (bisectors of r1 = 0, r2 = 0; norms of the normals)
+//   cfg.planeData = {A, u, v}      (plane through A with directions u, v)
 // and those of module L (cfg.pc, cfg.proj, cfg.gs: js/cas/rules/l-orth.js).
 // A candidate line of the judge `vector` is vl(value), of `geom` gl(cfg, text).
 
@@ -12,6 +18,7 @@ import { lit, sqrt as sqrtN, mul, div } from '../ast.js';
 import { simp } from '../matexpr.js';
 import { V, vText, envFrom, namesOf, parseVec, evalVec } from '../vecexpr.js';
 import { PROJ_NO_SQUARE_L } from './l-orth.js';
+import { readObject } from '../geomobj.js';
 
 const q = (x) => (x instanceof Q ? x : new Q(Number(x)));
 const dotQ = (u, v) => u.reduce((s, x, i) => s.add(q(x).mul(q(v[i]))), new Q(0));
@@ -91,5 +98,132 @@ export const RULES = [
     explain: PROJ_NO_SQUARE_L.explain,
     check: PROJ_NO_SQUARE_L.check,
   },
+  {
+    id: 'g4_normal_as_direction', family: 'geometry', tag: 'E', skill: 'g4-line2', repair: 'g4-line2',
+    example: ['2x − 3y − 8 = 0 a la direction (2 ; −3)', '(3 ; 2)'], name: 'Vecteur normal pris pour directeur',
+    judges: ['geom'],
+    transform(prev, ctx) {
+      const cfg = ctx?.cfg || {};
+      if (cfg.lineData) {
+        // The line through A whose direction is the normal (a ; b).
+        const [a, b] = cfg.lineData.n.map(q);
+        const [x, y] = cfg.lineData.A.map(q);
+        return gl(2, `(x ; y) = (${x} ; ${y}) + t(${a} ; ${b})`, { n: `(${a} ; ${b})`.replace(/-/g, '−') });
+      }
+      if (cfg.l3) {
+        const n = cfg.l3.rows[0].slice(0, 3);
+        return gl(3, `(x ; y ; z) = (${cfg.l3.A.join(' ; ')}) + t(${n.join(' ; ')})`, { n: `(${n.join(' ; ')})`.replace(/-/g, '−') });
+      }
+      return [];
+    },
+    explain: (ctx = {}) => `Dans ax + by + c = 0, (a ; b)${ctx.n ? ` = ${ctx.n}` : ''} est perpendiculaire à la droite : c'est un vecteur normal. Une direction est (−b ; a).`,
+    check: { judge: { kind: 'geom', object: 'line2', ref: '2x - 3y - 8 = 0', lineData: { A: ['1', '-2'], n: ['2', '-3'] } }, prev: 'd', line: '3x + 2y + 1 = 0' },
+  },
+  {
+    id: 'g4_line_constant', family: 'sign', tag: 'E', skill: 'g4-line2', repair: 'g4-line2',
+    example: ['2x − 3y = 8 écrit 2x − 3y + 8 = 0', '2x − 3y − 8 = 0'], name: 'Constante de la droite (ou du plan) fausse',
+    judges: ['geom'],
+    transform(prev, ctx) {
+      const cfg = ctx?.cfg || {};
+      if (!cfg.ref || !['line2', 'plane'].includes(cfg.object) || cfg.count) return [];
+      let o;
+      try { o = readObject(cfg.ref, { dim: cfg.object === 'plane' ? 3 : 2 }); } catch { return []; }
+      if (o.kind !== 'affine' || o.rows.length !== 1) return [];
+      const row = o.rows[0];
+      const c = row[row.length - 1];
+      if (c.n === 0) return [];
+      return [c.neg(), new Q(0)].map((k) => ({ node: { t: 'gline', text: '', obj: { kind: 'affine', dim: o.dim, rows: [[...row.slice(0, -1), k]] } }, ctx: {} }));
+    },
+    explain: () => 'Ta droite (ou ton plan) a la bonne direction, mais ne passe pas par le point donné. Calcule la constante en remplaçant les coordonnées de ce point.',
+    check: { judge: { kind: 'geom', object: 'line2', ref: '2x - 3y - 8 = 0' }, prev: 'd', line: '2x - 3y + 8 = 0' },
+  },
+  {
+    id: 'g4_angle_obtuse', family: 'geometry', tag: 'E', skill: 'g4-dot', repair: 'g4-dot',
+    example: ['angle de deux droites 2π/3', 'π/3'], name: 'Angle obtus donné pour deux droites',
+    judges: ['vector'],
+    transform(prev, ctx) {
+      const cfg = ctx?.cfg || {};
+      if (!cfg.obtuse) return [];
+      return fromTexts(cfg, [cfg.obtuse.wrong]);
+    },
+    explain: () => 'Deux droites font deux angles, θ et π − θ. On donne le plus petit, avec |cos θ|.',
+    check: { judge: { kind: 'vector', expect: 'π/3', angle: true, obtuse: { wrong: '2π/3' } }, prev: 'θ', line: '2π/3' },
+  },
+  {
+    id: 'g4_bisector_unnormalized', family: 'geometry', tag: 'E', skill: 'g4-bisectors', repair: 'g4-bisectors',
+    example: ['|a₁x + b₁y + c₁| = |a₂x + b₂y + c₂| sans les normes', 'divisé par ‖n₁‖ et ‖n₂‖'], name: 'Bissectrices sans diviser par les normes',
+    judges: ['geom'],
+    transform(prev, ctx) {
+      const b = ctx?.cfg?.bis;
+      if (!b || b.N1 === b.N2) return [];
+      const L = (r) => `(${r[0]}x + (${r[1]})y + (${r[2]}))`;
+      return gl(2, `${L(b.r1)} = ${L(b.r2)} ou ${L(b.r1)} = -${L(b.r2)}`, { N1: b.N1, N2: b.N2 });
+    },
+    explain: (ctx = {}) => `Les normales n'ont pas la même longueur${ctx.N1 ? ` (‖n₁‖ = ${ctx.N1}, ‖n₂‖ = ${ctx.N2})` : ''}. Une expression ax + by + c n'est une distance qu'après division par √(a² + b²).`,
+    check: { judge: { kind: 'geom', object: 'line2', count: 2, ref: '2x + y - 3 = 0 ou x - 2y + 1 = 0', bis: { r1: ['1', '0', '-1'], r2: ['3', '4', '-7'], N1: 1, N2: 5 } }, prev: 'b', line: 'x + 2y - 3 = 0 ou x + y - 2 = 0' },
+  },
+  {
+    id: 'g4_bisector_one_sign', family: 'method', tag: 'E', skill: 'g4-bisectors', repair: 'g1-abs-eq',
+    example: ['une seule bissectrice', 'les deux'], name: 'Une seule des deux bissectrices',
+    judges: ['geom'],
+    transform(prev, ctx) {
+      const b = ctx?.cfg?.bis;
+      if (!b) return [];
+      const L = (r) => `(${r[0]}x + (${r[1]})y + (${r[2]}))`;
+      return [...gl(2, `${L(b.r1)}/${b.N1} = ${L(b.r2)}/${b.N2}`), ...gl(2, `${L(b.r1)}/${b.N1} = -${L(b.r2)}/${b.N2}`)];
+    },
+    explain: () => '|A| = |B| donne A = B ou A = −B : il y a deux bissectrices, perpendiculaires.',
+    check: { judge: { kind: 'geom', object: 'line2', count: 2, ref: '2x + y - 3 = 0 ou x - 2y + 1 = 0', bis: { r1: ['1', '0', '-1'], r2: ['3', '4', '-7'], N1: 1, N2: 5 } }, prev: 'b', line: '2x + y - 3 = 0' },
+  },
+  {
+    id: 'g4_line3_one_equation', family: 'geometry', tag: 'E', skill: 'g4-line3', repair: 'g4-line3',
+    example: ['(x − 1)/2 = (y + 2)/1 seul', 'deux équations'], name: "Une seule équation pour une droite de l'espace",
+    judges: ['geom'],
+    transform(prev, ctx) {
+      const l3 = ctx?.cfg?.l3;
+      if (!l3) return [];
+      return l3.rows.flatMap((r) => gl(3, `${r[0]}x + (${r[1]})y + (${r[2]})z + (${r[3]}) = 0`));
+    },
+    explain: () => 'Une seule équation en x, y, z décrit un plan. Il en faut deux pour une droite.',
+    check: { judge: { kind: 'geom', object: 'line3', ref: '(x ; y ; z) = (1 ; -2 ; 3) + t(2 ; 1 ; -1)', l3: { rows: [['1', '-2', '0', '-5'], ['0', '1', '1', '-1']], A: ['1', '-2', '3'] } }, prev: 'd', line: 'x - 2y - 5 = 0' },
+  },
+  {
+    id: 'g4_normal_sum', family: 'geometry', tag: 'E', skill: 'g4-plane', repair: 'g4-dot',
+    example: ['n⃗ = AB⃗ + AC⃗', 'solution de n⃗·AB⃗ = n⃗·AC⃗ = 0'], name: 'Normale prise dans le plan',
+    judges: ['vector', 'geom'],
+    transform(prev, ctx) {
+      const cfg = ctx?.cfg || {};
+      const p = cfg.planeData;
+      if (!p) return [];
+      const u = p.u.map(q);
+      const v = p.v.map(q);
+      const A = p.A.map(q);
+      const ns = [u.map((x, i) => x.add(v[i])), u.map((x, i) => x.sub(v[i]))].filter((n) => n.some((x) => x.n !== 0));
+      const show = (n) => `(${n.join(' ; ')})`.replace(/-/g, '−');
+      if (cfg.kind === 'vector') return ns.map((n) => ({ node: vl(V(n.map((x) => lit(x)))), ctx: { n: show(n) } }));
+      return ns.flatMap((n) => gl(3, `${n[0]}(x - (${A[0]})) + (${n[1]})(y - (${A[1]})) + (${n[2]})(z - (${A[2]})) = 0`, { n: show(n) }));
+    },
+    explain: (ctx = {}) => `${ctx.n ? `${ctx.n} est` : 'u⃗ + v⃗ est'} dans le plan, pas perpendiculaire à lui. La normale doit être orthogonale aux deux directions : n⃗·u⃗ = 0 et n⃗·v⃗ = 0.`,
+    check: { judge: { kind: 'vector', expect: '(4 ; -3 ; 5)', multiple: true, planeData: { A: ['1', '0', '2'], u: ['2', '1', '-1'], v: ['-1', '2', '2'] } }, prev: 'n', line: '(1 ; 3 ; 1)' },
+  },
+  {
+    id: 'g4_skew_as_secant', family: 'geometry', tag: 'E', skill: 'g4-relative-pos', repair: 'g4-relative-pos',
+    example: ['non parallèles ⇒ sécantes', 'gauches'], name: 'Droites gauches prises pour sécantes',
+    judges: [],
+    explain: () => "Dans l'espace, deux droites non parallèles peuvent ne jamais se couper : si le système en s et t n'a pas de solution (la 3e équation est fausse), elles sont gauches.",
+    check: { bait: { skill: 'g4-relative-pos', exam: 'mcq' } },
+  },
+  {
+    id: 'g4_param_same_letter', family: 'method', tag: 'E', skill: 'g4-relative-pos', repair: 'g4-relative-pos',
+    example: ['A + t·u⃗ = B + t·v⃗', 'A + s·u⃗ = B + t·v⃗'], name: 'Même paramètre pour deux droites',
+    judges: [],
+    explain: () => 'Avec le même paramètre t, tu cherches deux mobiles au même instant. Le point commun peut être atteint à des instants différents : prends s et t.',
+    check: { bait: { skill: 'g4-relative-pos', exam: 'mcq' } },
+  },
 ];
+
+// Candidate lines of the judge geom from texts (those that read).
+function gl(dim, text, ctx = {}) {
+  try { return [{ node: { t: 'gline', text, obj: readObject(text, { dim }) }, ctx }]; } catch { return []; }
+}
 

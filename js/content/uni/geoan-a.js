@@ -12,6 +12,9 @@ import {
   q, qt, fq, nz, H, modeOf, sumT, readable, add, sub, scale, det2, mid, isInt, vt, vr, ptR, blanks,
   linesItem, mcqD, tfG, examTag, geoCounter, VML,
 } from './geo-kit.js';
+import { GEN as LINE2 } from './geoan-a-line2.js';
+import { GEN as DOTS } from './geoan-a-dot.js';
+import { GEN as SPACE } from './geoan-a-space.js';
 
 const KEYS = ['calc', 'geo', 'pts'];
 
@@ -182,6 +185,7 @@ function vecExam(rng, exam) {
 
 export const GEN = {
   [VEC]: (level, rng, profile, opts = {}) => (opts.exam ? vecExam(rng, opts.exam) : vecItem(level, rng)),
+  ...LINE2, ...DOTS, ...SPACE,
 };
 
 export { VML };
