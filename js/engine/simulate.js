@@ -4,7 +4,8 @@
 // frequency of the event is shown next to the answer. Pure, no DOM; the
 // button and the histogram are in js/ui/interpret.js.
 //
-// item.simulate = {model, …params, event, given?, n?, label?}
+// item.simulate = {model, …params, event, given?, draws?, label?} (draws: number of
+// experiments, 10 000 by default; n is a parameter of binom and sum)
 //   model 'urn'     {balls: {R: 5, B: 3}, draw: 3, replace: false}   X = number of balls of colour `count`
 //   model 'dice'    {dice: 2, faces: 6, stat: 'sum' | 'max' | 'min' | 'six'}   X = that statistic
 //   model 'binom'   {n, p}            model 'poisson' {lambda}       model 'geom' {p, from: 0 | 1}
@@ -101,7 +102,7 @@ export function holds(ev, d) {
 
 const DISCRETE = new Set(['urn', 'dice', 'binom', 'poisson', 'geom', 'bayes', 'system']);
 
-export function simulate(spec, seed = 1, n = spec.n ?? 10000) {
+export function simulate(spec, seed = 1, n = spec.draws ?? 10000) {
   const rng = makeRng(seed);
   let hits = 0;
   let kept = 0;
