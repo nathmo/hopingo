@@ -58,3 +58,9 @@ import * as geom from './geom.js';
 import * as conic from './conic.js';
 
 Object.assign(JUDGES, { vector, geom, conic });
+// Step U4: complex numbers (ℚ(i) exact, else floats) and the δ(ε), N(ε)
+// and x(ε) of the definitions.
+import * as complex from './complex.js';
+import * as delta from './delta.js';
+
+Object.assign(JUDGES, { complex, delta });

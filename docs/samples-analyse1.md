@@ -17,14 +17,14 @@ Soit f(x) = |x|·x². Montre avec le taux d'accroissement que f est dérivable e
     = □·h   (trous : |h|·h)   ← Simplifier par h
     = 0   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = □·h | |h|·h, puis 0 : f′(0) = 0
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_abs_removed
 
 Soit f(x) = x·|x|. Montre avec le taux d'accroissement que f est dérivable en 0, et donne f′(0).
   [guided]  (h·|h|)/h
     = □   (trous : |h|)   ← Simplifier par h
     = 0   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = □ | |h|, puis 0 : f′(0) = 0
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_abs_removed
 
 Soit f(x) = 3x + x³·sin(1/x) si x ≠ 0, et f(0) = 0. Montre avec le taux d'accroissement que f est dérivable en 0, et donne f′(0).
   [guided]  (3h + h³·sin(1/h))/h
@@ -44,7 +44,7 @@ Soit f(x) = |x|·x². Calcule f′(0) par la définition.
     = □   (trous : |h|·h)   ← Simplifier par h
     = 0   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = □·h | |h|·h, puis 0 : f′(0) = 0
-  pièges : a1_bh_quotient_rule, a1_bounded_times_zero, a1_derivable_from_formula
+  pièges : a1_bh_quotient_rule, a1_abs_removed, a1_bounded_times_zero, a1_derivable_from_formula
 
 Soit f(x) = |x|³. Montre avec le taux d'accroissement que f est dérivable en 0, et donne f′(0).
   [guided]  |h|³/h
@@ -52,7 +52,7 @@ Soit f(x) = |x|³. Montre avec le taux d'accroissement que f est dérivable en 0
     = □   (trous : h·|h|)   ← Simplifier par h
     = 0   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = h·□ | h·|h|, puis 0 : f′(0) = 0
-  pièges : a1_bh_quotient_rule, a1_bounded_times_zero, a1_derivable_from_formula
+  pièges : a1_bh_quotient_rule, a1_abs_removed, a1_bounded_times_zero, a1_derivable_from_formula
 
 Soit f(x) = x + x²·cos(1/x) si x ≠ 0, et f(0) = 0. Calcule f′(0) par la définition.
   [guided]  (h + h²·cos(1/h))/h
@@ -79,7 +79,7 @@ Soit f(x) = x·|x|. Calcule f′(0) par la définition.
     = |h|   ← Simplifier par h
     = 0   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = □ | |h|, puis 0 : f′(0) = 0
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_abs_removed
 
 Soit f(x) = e^x − 1 si x ≥ 0, et −x − 3x² si x < 0. Calcule les dérivées à droite et à gauche de f en 0 par la définition, puis conclus.
   [tap, suivre l'erreur, menu steps]  (e^h − 1)/h
@@ -103,21 +103,21 @@ Soit f(x) = |x|³. Calcule f′(0) par la définition.
     = h·|h|   ← Simplifier par h
     = 0   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = h·□ | h·|h|, puis 0 : f′(0) = 0
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_abs_removed
 
 Soit f(x) = x·|x|. Calcule f′(0) par la définition.
   [free, suivre l'erreur]  (h·|h|)/h
     = |h|   ← Simplifier par h
     = 0   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = □ | |h|, puis 0 : f′(0) = 0
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_abs_removed
 
 Soit f(x) = 3x + x·|x|. Calcule f′(0) par la définition.
   [free, suivre l'erreur]  (3h + h·|h|)/h
     = 3 + |h|   ← Simplifier par h
     = 3   ← |h| → 0
   aides : Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0. | = 3 + □ | 3 + |h|, puis 3 : f′(0) = 3
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_abs_removed
 
 ```
 
@@ -689,11 +689,13 @@ Soit f(x) = (x + 2)^(1 + x²). Que vaut f′(1) ?
   pièges : a1_exp_rule_var_base, g6_power_rule_exp
 
 Calcule la dérivée de f(x) = (1 + x²)^x, puis sa valeur en 2.
-  [free, sans aide, examen open]  ((1 + x²)^x)′
-    = (e^(x·ln(1 + x²)))′   ← Forme exponentielle
-    = (1 + x²)^x·(ln(1 + x²) + 2x²/(1 + x²))   ← Dériver l'exposant, puis revenir à f
-  — Calcule maintenant f′(2).  [juge definite]  départ : (1 + (2)²)^(2)·(ln(1 + (2)²) + 2(2)²/(1 + (2)²))
-    = 25ln(5) + 40   ← Évaluer et simplifier
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 1 ; Calcule maintenant f′(2). : 1)
+    [free, sans aide, suivre l'erreur, examen open]  ((1 + x²)^x)′
+      = (e^(x·ln(1 + x²)))′   ← Forme exponentielle
+      = (1 + x²)^x·(ln(1 + x²) + 2x²/(1 + x²))   ← Dériver l'exposant, puis revenir à f
+    — Calcule maintenant f′(2).  [juge definite]  départ : (1 + (2)²)^(2)·(ln(1 + (2)²) + 2(2)²/(1 + (2)²))
+      = 25ln(5) + 40   ← Évaluer et simplifier
   pièges : a1_exp_rule_var_base
 
 ```
@@ -883,16 +885,18 @@ Soit f(x) = x·|x| sur ℝ. Quelle affirmation est juste ?
   pièges : a1_corner_missed
 
 Construis la définition de C¹(I). Touche les blocs dans l'ordre.
-  [blocs define, sans aide]
-    1. Soit I ⊂ ℝ un intervalle ouvert et f : I → ℝ.
-    2. f est dérivable en tout point de I.
-    3. La fonction f′ : I → ℝ est continue sur I.
-    4. On note C¹(I) l'ensemble de ces fonctions.
-    ✗ f′ est bornée sur I. [a1_c1_def_missing_cont]
-    ✗ lim_{x→x₀} f′(x) existe pour un x₀ de I. [a1_c1_def_missing_cont]
-    ✗ f′ existe en un point de I. [a1_c1_def_missing_cont]
-    ✗ f est continue sur I. [a1_c1_def_missing_cont]
-  [examen open]
+  [problème, examen open, 1 points]
+  partie 1 (Début du problème : 1)
+    [blocs define, sans aide]
+      1. Soit I ⊂ ℝ un intervalle ouvert et f : I → ℝ.
+      2. f est dérivable en tout point de I.
+      3. La fonction f′ : I → ℝ est continue sur I.
+      4. On note C¹(I) l'ensemble de ces fonctions.
+      ✗ f′ est bornée sur I. [a1_c1_def_missing_cont]
+      ✗ lim_{x→x₀} f′(x) existe pour un x₀ de I. [a1_c1_def_missing_cont]
+      ✗ f′ existe en un point de I. [a1_c1_def_missing_cont]
+      ✗ f est continue sur I. [a1_c1_def_missing_cont]
+    [examen open]
   pièges : a1_c1_def_missing_cont
 
 ```
@@ -918,7 +922,7 @@ Soit f(x) = ax + b si x < 0, et e^(−2x) + 1 si x ≥ 0. Trouve a et b pour que
     = −2·(−2) + 2   ← Remplacer
     = 6   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁺) = lim (e^(−2h) − 1)/h = □ | b = 2, a = −2
-  pièges : a1_dl_factorial_missing
+  pièges : a1_dl_factorial_missing, a1_remarkable_limit_scale
 
 Soit f(x) = ax + b si x < 0, et (x − 1)(x + 3) si x ≥ 0. Trouve a et b pour que f soit dérivable en 0, puis calcule f(−1).
   [guided]  (x − 1)(x + 3)
@@ -950,7 +954,7 @@ Soit f(x) = ax + b si x < 0, et e^(2x) + 3 si x ≥ 0. Trouve a et b pour que f 
     = 2·(−3) + 4   ← Remplacer
     = −2   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁺) = lim (e^(2h) − 1)/h = □ | b = 4, a = 2
-  pièges : a1_dl_factorial_missing
+  pièges : a1_dl_factorial_missing, a1_remarkable_limit_scale
 
 ```
 
@@ -971,7 +975,7 @@ Soit f(x) = e^(3x) + 1 si x < 0, et ax + b si x ≥ 0. Trouve a et b pour que f 
     = 3·3 + 2   ← Remplacer
     = 11   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁻) = lim (e^(3h) − 1)/h = □ | b = 2, a = 3
-  pièges : a1_dl_factorial_missing, a1_piecewise_derivative_formula
+  pièges : a1_dl_factorial_missing, a1_remarkable_limit_scale, a1_piecewise_derivative_formula
 
 Soit f(x) = ax + b si x < 0, et e^(3x) + 3 si x ≥ 0. Trouve a et b pour que f soit dérivable en 0, puis calcule f(−2).
   [guided]  e^(3x) + 3
@@ -987,7 +991,7 @@ Soit f(x) = ax + b si x < 0, et e^(3x) + 3 si x ≥ 0. Trouve a et b pour que f 
     = 3·(−2) + 4   ← Remplacer
     = −2   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁺) = lim (e^(3h) − 1)/h = □ | b = 4, a = 3
-  pièges : a1_dl_factorial_missing, a1_piecewise_derivative_formula
+  pièges : a1_dl_factorial_missing, a1_remarkable_limit_scale, a1_piecewise_derivative_formula
 
 Soit f(x) = ax + b si x < 0, et (x + 3)(x + 2) si x ≥ 0. Trouve a et b pour que f soit dérivable en 0, puis calcule f(−3).
   [guided]  (x + 3)(x + 2)
@@ -1024,7 +1028,7 @@ Soit f(x) = ax + b si x < 0, et sin(2x) + 1 si x ≥ 0. Trouve a et b pour que f
     = 2·(−2) + 1   ← Remplacer
     = −3   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁺) = lim (sin(2h))/h = □ | b = 1, a = 2
-  pièges : a1_dl_factorial_missing, a1_ipe_in_sum
+  pièges : a1_dl_factorial_missing, a1_ipe_in_sum, a1_remarkable_limit_scale
 
 Soit f(x) = ax + b si x < 0, et (x − 4)(x + 3) si x ≥ 0. Trouve a et b pour que f soit dérivable en 0, puis calcule f(−3).
   [tap, suivre l'erreur, menu steps]  (x − 4)(x + 3)
@@ -1054,7 +1058,7 @@ Soit f(x) = e^(3x) − 2 si x < 0, et ax + b si x ≥ 0. Trouve a et b pour que 
     = 3·1 − 1   ← Remplacer
     = 2   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁻) = lim (e^(3h) − 1)/h = □ | b = −1, a = 3
-  pièges : a1_dl_factorial_missing
+  pièges : a1_dl_factorial_missing, a1_remarkable_limit_scale
 
 ```
 
@@ -1074,7 +1078,7 @@ Soit f(x) = ax + b si x < 0, et e^(2x) + 1 si x ≥ 0. Trouve a et b pour que f 
     = 2·(−2) + 2   ← Remplacer
     = −2   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁺) = lim (e^(2h) − 1)/h = □ | b = 2, a = 2
-  pièges : a1_dl_factorial_missing
+  pièges : a1_dl_factorial_missing, a1_remarkable_limit_scale
 
 Soit f(x) = (x − 1)(x − 4) si x < 0, et ax + b si x ≥ 0. Trouve a et b pour que f soit dérivable en 0, puis calcule f(2).
   [free, suivre l'erreur]  (x − 1)(x − 4)
@@ -1104,7 +1108,7 @@ Soit f(x) = ax + b si x < 0, et sin(3x) + 3 si x ≥ 0. Trouve a et b pour que f
     = 3·(−2) + 3   ← Remplacer
     = −3   ← Calculer
   aides : D'abord continue en 0, ensuite mêmes pentes des deux côtés. | b = □ ; a = f′(0⁺) = lim (sin(3h))/h = □ | b = 3, a = 3
-  pièges : a1_dl_factorial_missing, a1_ipe_in_sum
+  pièges : a1_dl_factorial_missing, a1_ipe_in_sum, a1_remarkable_limit_scale
 
 ```
 
@@ -1322,14 +1326,16 @@ Vrai ou faux ? « f(x) = x³·sin(1/x), f(0) = 0, est deux fois dérivable sur �
   pièges : a1_derivable_from_formula
 
 Soit f : ]−1 ; 1[ → ℝ, f(x) = x + x³·sin(1/x) si x ≠ 0, et f(0) = 0. Montre que f ∈ C¹(]−1 ; 1[) : dérive f hors de 0, calcule f′(0) par la définition, puis la limite de f′ en 0.
-  [free, sans aide, examen open]  (x + x³·sin(1/x))′
-    = 1 + 3x²·sin(1/x) − x·cos(1/x)   ← Pour x ≠ 0 : produit et composée
-  — En 0, par la définition : (f(h) − f(0))/h.  [juge limit]  départ : (h + h³·sin(1/h))/h
-    = 1 + h²·sin(1/h)   ← Simplifier par h
-    = 1   ← Gendarmes : |h²·sin(1/h)| ≤ |h|² → 0
-  — Continuité de f′ en 0 : la limite de f′(x).  [juge limit]  départ : 1 + 3x²·sin(1/x) − x·cos(1/x)
-    = 1   ← |f′(x) − 1| ≤ 3|x|² + |x| → 0
-    (f est dérivable sur ]−1 ; 1[ et f′ y est continue : f ∈ C¹(]−1 ; 1[).)
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 1,5 ; En 0, par la définition : (f(h) − f(0))/h. : 3 ; Continuité de f′ en 0 : la limite de f′(x). : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  (x + x³·sin(1/x))′
+      = 1 + 3x²·sin(1/x) − x·cos(1/x)   ← Pour x ≠ 0 : produit et composée
+    — En 0, par la définition : (f(h) − f(0))/h.  [juge limit]  départ : (h + h³·sin(1/h))/h
+      = 1 + h²·sin(1/h)   ← Simplifier par h
+      = 1   ← Gendarmes : |h²·sin(1/h)| ≤ |h|² → 0
+    — Continuité de f′ en 0 : la limite de f′(x).  [juge limit]  départ : 1 + 3x²·sin(1/x) − x·cos(1/x)
+      = 1   ← |f′(x) − 1| ≤ 3|x|² + |x| → 0
+      (f est dérivable sur ]−1 ; 1[ et f′ y est continue : f ∈ C¹(]−1 ; 1[).)
   pièges : g6_product_naive, g6_chain_forgot, g6_quotient_sign, g6_quotient_no_square
 
 ```
@@ -1570,7 +1576,7 @@ Calcule lim_{x→0} (e^(−2x) − e^(3x))/x.
     = □ − 3e^(3x)   (trous : −2e^(−2x) − 3e^(3x))   ← BH : dériver le haut et le bas
     = −5   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : □−3e^(3x) | Une fois BH, puis la limite vaut −5.
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 Trouve lim_{x→0} ln(1 − 5x)/(3x), avec la règle de Bernoulli-l'Hôpital si elle s'applique.
   [guided]  ln(1 − 5x)/(3x)
@@ -1586,7 +1592,7 @@ Trouve lim_{x→0} (e^(−2x) − e^x)/x, avec la règle de Bernoulli-l'Hôpital
     = □ − e^x   (trous : −2e^(−2x) − e^x)   ← BH : dériver le haut et le bas
     = −3   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : □−e^x | Une fois BH, puis la limite vaut −3.
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 ```
 
@@ -1599,7 +1605,7 @@ Trouve lim_{x→0} ln(1 + 4x)/(3x), avec la règle de Bernoulli-l'Hôpital si el
     = 4/(3(1 + 4x))   ← BH : dériver le haut et le bas
     = 4/3   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : 4/(3(□)) | Une fois BH, puis la limite vaut 4/3.
-  pièges : a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 Trouve lim_{x→0} (e^(4x) − e^(−x))/x, avec la règle de Bernoulli-l'Hôpital si elle s'applique.
   [guided]  (e^(4x) − e^(−x))/x
@@ -1607,14 +1613,14 @@ Trouve lim_{x→0} (e^(4x) − e^(−x))/x, avec la règle de Bernoulli-l'Hôpit
     = 4e^(4x) + e^(−x)   ← BH : dériver le haut et le bas
     = 5   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : □+e^(−x) | Une fois BH, puis la limite vaut 5.
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 Trouve lim_{x→0} (x − 5)/(x² + 2x + 5), avec la règle de Bernoulli-l'Hôpital si elle s'applique.
   [guided]  (x − 5)/(x² + 2x + 5)
     ? Quelle forme ? · 0/0 : on peut appliquer BH / · ∞/∞ : on peut appliquer BH / ✔ Pas indéterminé : on substitue / · 1^∞ : on passe par e^(…·ln …)
     = −1   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | En 0, le haut vaut −5 et le bas vaut 5 : substitue x = 0. | La limite vaut −1.
-  pièges : a1_bh_not_indeterminate
+  pièges : a1_bh_not_indeterminate, a1_dominant_term_wrong
 
 ```
 
@@ -1638,7 +1644,7 @@ Trouve lim_{x→0} (1 − cos(3x))/x², avec la règle de Bernoulli-l'Hôpital s
     = 9cos(3x)/2   ← BH : dériver le haut et le bas
     = 9/2   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : 3sin(3x)/(□) | 2 fois BH, puis la limite vaut 9/2.
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 Trouve lim_{x→0} (1 − cos(2x))/x², avec la règle de Bernoulli-l'Hôpital si elle s'applique.
   [tap, suivre l'erreur, menu steps]  (1 − cos(2x))/x²
@@ -1647,7 +1653,7 @@ Trouve lim_{x→0} (1 − cos(2x))/x², avec la règle de Bernoulli-l'Hôpital s
     = 4cos(2x)/2   ← BH : dériver le haut et le bas
     = 2   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : 2sin(□)/(2x) | 2 fois BH, puis la limite vaut 2.
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 ```
 
@@ -1669,7 +1675,7 @@ Calcule lim_{x→0} (e^x − e^(−3x))/x.
     = e^x + 3e^(−3x)   ← BH : dériver le haut et le bas
     = 4   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : □+3e^(−3x) | Une fois BH, puis la limite vaut 4.
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 Calcule lim_{x→0} (e^x − e^(−2x))/x.
   [free, suivre l'erreur]  (e^x − e^(−2x))/x
@@ -1677,7 +1683,7 @@ Calcule lim_{x→0} (e^x − e^(−2x))/x.
     = e^x + 2e^(−2x)   ← BH : dériver le haut et le bas
     = 3   ← Substituer
   aides : Vérifie la forme ; si c'est 0/0 ou ∞/∞, dérive le haut et le bas séparément. | Après BH : □+2e^(−2x) | Une fois BH, puis la limite vaut 3.
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 ```
 
@@ -1704,7 +1710,7 @@ Calcule lim_{x→0} (2x − sin(2x))/x³.
     = 4sin(2x)/(6x)   ← BH : dériver le haut et le bas
     = 8cos(2x)/6   ← BH : dériver le haut et le bas
     = 4/3   ← Substituer
-  pièges : a1_dl_factorial_missing, a1_ipe_in_sum, a1_dl_order_too_low, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_ipe_in_sum, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
 
 ```
 
@@ -1712,9 +1718,9 @@ Calcule lim_{x→0} (2x − sin(2x))/x³.
 
 ```
 lim_{x→0} (1 − cos(2x))/x² = ?
-  ✔ 2   · 0 [a1_dl_order_too_low]   · −2   · 4 [a1_dl_factorial_missing]
+  ✔ 2   · 0 [a1_dl_order_too_low]   · 1/2 [a1_remarkable_limit_scale]   · 4 [a1_dl_factorial_missing]
   [examen mcq]
-  pièges : a1_dl_factorial_missing, a1_dl_order_too_low
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_remarkable_limit_scale
 
 Vrai ou faux ? « Si f/g est de la forme 0/0 en a, alors limx→a f/g = limx→a (f/g)′. »
   · Vrai [a1_bh_quotient_rule]   ✔ Faux
@@ -2056,24 +2062,26 @@ f est deux fois dérivable sur ℝ et admet un minimum local en 0. Que peut-on a
   [examen mcq]
 
 Soit f(x) = (x² − 2x − 3)/(x² + 2x + 3) sur [−1 ; 2]. Trouve ses extrema globaux.
-  [free, sans aide, examen open]  2² − 4·3
-    (f est-elle définie sur [−1 ; 2] ? Discriminant du dénominateur x² + 2x + 3 :)
-    = −8   ← Δ < 0 : le dénominateur ne s'annule pas
-  — Dérive f :  [juge equiv]  départ : ((x² − 2x − 3)/(x² + 2x + 3))′
-    = (4x(x + 3))/(x² + 2x + 3)²   ← Règle du quotient, factoriser
-  — Résous f′(x) = 0 :  [juge solset]  départ : 4x² + 12x = 0
-    = x = −3 ou x = 0   ← Racines
-  — Évalue f aux candidats :  [juge value]  départ : ((−1)² − 2·(−1) − 3)/((−1)² + 2·(−1) + 3)
-    ? Quels sont les candidats sur [−1 ; 2] ? ✔ x = −1, 0, 2 / · x = 0 seulement / · x = −3, −1, 0, 2 / · x = −1, 2 seulement
-    = 0   ← Calculer
-  — Candidat suivant :  [juge value]  départ : (0² − 2·0 − 3)/(0² + 2·0 + 3)
-    = −1   ← Calculer
-  — Candidat suivant :  [juge value]  départ : (2² − 2·2 − 3)/(2² + 2·2 + 3)
-    = −3/11   ← Calculer
-  — Maximum global de f sur [−1 ; 2] :  [juge value]  départ : M
-    = 0   ← Comparer
-  — Minimum global de f sur [−1 ; 2] :  [juge value]  départ : m
-    = −1   ← Comparer
+  [problème, examen open, 7 points]
+  partie 1 (Début du problème : 1 ; Dérive f : 1 ; Résous f′(x) = 0 : 1 ; Évalue f aux candidats : 1 ; Candidat suivant : 1 ; Candidat suivant : 1 ; Maximum global de f sur [−1 ; 2] : 0,5 ; Minimum global de f sur [−1 ; 2] : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  2² − 4·3
+      (f est-elle définie sur [−1 ; 2] ? Discriminant du dénominateur x² + 2x + 3 :)
+      = −8   ← Δ < 0 : le dénominateur ne s'annule pas
+    — Dérive f :  [juge equiv]  départ : ((x² − 2x − 3)/(x² + 2x + 3))′
+      = (4x(x + 3))/(x² + 2x + 3)²   ← Règle du quotient, factoriser
+    — Résous f′(x) = 0 :  [juge solset]  départ : 4x² + 12x = 0
+      = x = −3 ou x = 0   ← Racines
+    — Évalue f aux candidats :  [juge value]  départ : ((−1)² − 2·(−1) − 3)/((−1)² + 2·(−1) + 3)
+      ? Quels sont les candidats sur [−1 ; 2] ? ✔ x = −1, 0, 2 / · x = 0 seulement / · x = −3, −1, 0, 2 / · x = −1, 2 seulement
+      = 0   ← Calculer
+    — Candidat suivant :  [juge value]  départ : (0² − 2·0 − 3)/(0² + 2·0 + 3)
+      = −1   ← Calculer
+    — Candidat suivant :  [juge value]  départ : (2² − 2·2 − 3)/(2² + 2·2 + 3)
+      = −3/11   ← Calculer
+    — Maximum global de f sur [−1 ; 2] :  [juge value]  départ : M
+      = 0   ← Comparer
+    — Minimum global de f sur [−1 ; 2] :  [juge value]  départ : m
+      = −1   ← Comparer
   pièges : a1_extrema_bounds_forgotten
 
 ```
@@ -2618,20 +2626,22 @@ En quels points la courbe x(t) = t³ − 12t, y(t) = t² − 3 a-t-elle une tang
   [examen mcq]
 
 Soit la courbe γ(t) = (t³ − 3t − 1 ; t² + 2), t ∈ ℝ. Trouve ses tangentes horizontales et verticales et son point double.
-  [free, sans aide, examen open]  (t³ − 3t − 1)′
-    (Dérive x(t) :)
-    = 3t² − 3   ← Dériver
-  — Dérive y(t) :  [juge equiv]  départ : (t² + 2)′
-    = 2t   ← Dériver
-  — Tangente horizontale : ẏ = 0 (ẋ ≠ 0 en ces t)  [juge solset]  départ : 2t = 0
-    = t = 0   ← Racine
-  — Point de tangente horizontale pour t = 0 :  [juge value]  départ : 0² + 2
-    = 2   ← Calculer
-  — Tangente verticale : ẋ = 0 (ẏ ≠ 0 en ces t)  [juge solset]  départ : 3t² − 3 = 0
-    = t = −1 ou t = 1   ← Racines
-  — Point double : y(t) = y(s) avec s ≠ t donne s = −t ; alors x(t) = x(−t) donne, pour t ≠ 0 :  [juge solset]  départ : 2t³ − 6t = 0
-    = t² = 3   ← Diviser par 2t
-    = t = −√3 ou t = √3   ← Racines
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; Dérive y(t) : 0,5 ; Tangente horizontale : ẏ = 0 (ẋ ≠ 0 en ces t) : 0,5 ; Point de tangente horizontale pour t = 0 : 0,5 ; Tangente verticale : ẋ = 0 (ẏ ≠ 0 en ces t) : 0,5 ; Point double : y(t) = y(s) avec s ≠ t donne s = −t ; alors x(t) = x(−t) donne, pour t ≠ 0 : 1)
+    [free, sans aide, suivre l'erreur, examen open]  (t³ − 3t − 1)′
+      (Dérive x(t) :)
+      = 3t² − 3   ← Dériver
+    — Dérive y(t) :  [juge equiv]  départ : (t² + 2)′
+      = 2t   ← Dériver
+    — Tangente horizontale : ẏ = 0 (ẋ ≠ 0 en ces t)  [juge solset]  départ : 2t = 0
+      = t = 0   ← Racine
+    — Point de tangente horizontale pour t = 0 :  [juge value]  départ : 0² + 2
+      = 2   ← Calculer
+    — Tangente verticale : ẋ = 0 (ẏ ≠ 0 en ces t)  [juge solset]  départ : 3t² − 3 = 0
+      = t = −1 ou t = 1   ← Racines
+    — Point double : y(t) = y(s) avec s ≠ t donne s = −t ; alors x(t) = x(−t) donne, pour t ≠ 0 :  [juge solset]  départ : 2t³ − 6t = 0
+      = t² = 3   ← Diviser par 2t
+      = t = −√3 ou t = √3   ← Racines
 
 ```
 
@@ -2894,87 +2904,93 @@ Courbe polaire ρ(φ) = 2/(1 + cos(φ)) pour φ ∈ ]−π ; π[ : limites quand
 
 ```
 Courbe polaire ρ(φ) = 4tan(φ/2) pour φ ∈ [0 ; π[ : limites quand φ → π⁻, ρ̇, pente, point sur Oy, tangentes horizontales.
-  [free, sans aide]  (4tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = 2(1 + tan(φ/2)²)   ← Dériver
-    = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
-    = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 8   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
-    = 4sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
-    = 4   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur]  (4tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = 2(1 + tan(φ/2)²)   ← Dériver
+      = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
+      = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 8   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
+      = 4sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
+      = 4   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 Courbe polaire ρ(φ) = 5tan(φ/2) pour φ ∈ [0 ; π[ : limites quand φ → π⁻, ρ̇, pente, point sur Oy, tangentes horizontales.
-  [free, sans aide]  (5tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = (5/2)(1 + tan(φ/2)²)   ← Dériver
-    = 5/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·sin(φ)
-    = 5sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 5(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 10   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 5tan(φ/2) et ρ̇ = 5/(1 + cos(φ)) :  [juge equiv]  départ : (5/(1 + cos(φ))·sin(φ) + 5tan(φ/2)·cos(φ))/(5/(1 + cos(φ))·cos(φ) − 5tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 10 / · Asymptote horizontale y = 5 / · Asymptote verticale x = −10 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/5
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (5(1 − cos(φ)))′
-    = 5sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 5(1 − cos(π/2))
-    = 5   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 5sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → +∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 5 / · Courbe fermée qui passe par l'origine et par (0 ; 5)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 5tan(φ/2) et ρ̇ = 5/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur]  (5tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = (5/2)(1 + tan(φ/2)²)   ← Dériver
+      = 5/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 5tan(φ/2)·sin(φ)
+      = 5sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 5(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 10   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 5tan(φ/2) et ρ̇ = 5/(1 + cos(φ)) :  [juge equiv]  départ : (5/(1 + cos(φ))·sin(φ) + 5tan(φ/2)·cos(φ))/(5/(1 + cos(φ))·cos(φ) − 5tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 10 / · Asymptote horizontale y = 5 / · Asymptote verticale x = −10 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/5
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (5(1 − cos(φ)))′
+      = 5sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 5(1 − cos(π/2))
+      = 5   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 5sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → +∞ en s'approchant de la droite y = 10 / · Part de l'origine, passe par (0 ; 5), puis file vers x → −∞ en s'approchant de la droite y = 5 / · Courbe fermée qui passe par l'origine et par (0 ; 5)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 On étudie la courbe polaire ρ = 2tan(φ/2), φ ∈ [0 ; π[.
-  [free, sans aide]  (2tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = 1 + tan(φ/2)²   ← Dériver
-    = 2/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·sin(φ)
-    = 2sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 2(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 4   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 2tan(φ/2) et ρ̇ = 2/(1 + cos(φ)) :  [juge equiv]  départ : (2/(1 + cos(φ))·sin(φ) + 2tan(φ/2)·cos(φ))/(2/(1 + cos(φ))·cos(φ) − 2tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 4 / · Asymptote horizontale y = 2 / · Asymptote verticale x = −4 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/2
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (2(1 − cos(φ)))′
-    = 2sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 2(1 − cos(π/2))
-    = 2   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 2sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → +∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 2 / · Courbe fermée qui passe par l'origine et par (0 ; 2)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 2tan(φ/2) et ρ̇ = 2/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur]  (2tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = 1 + tan(φ/2)²   ← Dériver
+      = 2/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 2tan(φ/2)·sin(φ)
+      = 2sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 2(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 4   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 2tan(φ/2) et ρ̇ = 2/(1 + cos(φ)) :  [juge equiv]  départ : (2/(1 + cos(φ))·sin(φ) + 2tan(φ/2)·cos(φ))/(2/(1 + cos(φ))·cos(φ) − 2tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 4 / · Asymptote horizontale y = 2 / · Asymptote verticale x = −4 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/2
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (2(1 − cos(φ)))′
+      = 2sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 2(1 − cos(π/2))
+      = 2   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 2sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → +∞ en s'approchant de la droite y = 4 / · Part de l'origine, passe par (0 ; 2), puis file vers x → −∞ en s'approchant de la droite y = 2 / · Courbe fermée qui passe par l'origine et par (0 ; 2)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 ```
@@ -2983,31 +2999,33 @@ On étudie la courbe polaire ρ = 2tan(φ/2), φ ∈ [0 ; π[.
 
 ```
 On étudie la courbe polaire ρ = 4tan(φ/2), φ ∈ [0 ; π[.
-  [free, sans aide, examen open]  (4tan(φ/2))′
-    (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
-    ((a) Dérive ρ et simplifie :)
-    = 2(1 + tan(φ/2)²)   ← Dériver
-    = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
-  — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
-    = −∞   ← tan(φ/2) → +∞, cos φ → −1
-  — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
-    = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
-    = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
-    = 8   ← Passer à la limite
-  — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
-    ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
-    ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
-    = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
-    = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
-  — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
-    = 4sin(φ)   ← Dériver
-  — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
-    = 4   ← Calculer
-  — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
-    = −1   ← Calculer
-  — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
-    ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
-    = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
+  [problème, examen open, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Limite de x = ρ cos φ quand φ → π⁻ : 1,5 ; (b) Limite de y = ρ sin φ quand φ → π⁻ : 1,5 ; (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) : 3 ; (c) Au passage, ẏ (dérive y simplifié) : 1 ; (d) Point P sur l'axe Oy : φ = π/2. : 1 ; (d) Pente en P : 1 ; (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[ : 1)
+    [free, sans aide, suivre l'erreur, examen open]  (4tan(φ/2))′
+      (x = ρ cos φ, y = ρ sin φ. Formule : tan(φ/2) = sin φ/(1 + cos φ).)
+      ((a) Dérive ρ et simplifie :)
+      = 2(1 + tan(φ/2)²)   ← Dériver
+      = 4/(1 + cos(φ))   ← 1 + tan²(φ/2) = 2/(1 + cos φ)
+    — (b) Limite de x = ρ cos φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·cos(φ)
+      = −∞   ← tan(φ/2) → +∞, cos φ → −1
+    — (b) Limite de y = ρ sin φ quand φ → π⁻ :  [juge limit]  départ : 4tan(φ/2)·sin(φ)
+      = 4sin(φ)²/(1 + cos(φ))   ← tan(φ/2) = sin φ/(1 + cos φ)
+      = 4(1 − cos(φ))   ← sin²φ = (1 − cos φ)(1 + cos φ)
+      = 8   ← Passer à la limite
+    — (c) Pente : y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ), avec ρ = 4tan(φ/2) et ρ̇ = 4/(1 + cos(φ)) :  [juge equiv]  départ : (4/(1 + cos(φ))·sin(φ) + 4tan(φ/2)·cos(φ))/(4/(1 + cos(φ))·cos(φ) − 4tan(φ/2)·sin(φ))
+      ? Quand φ → π⁻, que dit-on de la courbe ? ✔ Asymptote horizontale y = 8 / · Asymptote horizontale y = 4 / · Asymptote verticale x = −8 / · Pas d'asymptote
+      ? La pente de la tangente, avec x = ρ cos φ et y = ρ sin φ : ✔ y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ) / · y′ = ρ̇ / · y′ = ρ̇/ρ / · y′ = ẋ/ẏ
+      = (sin(φ) + sin(φ)cos(φ))/(cos(φ) − sin(φ)²)   ← Multiplier haut et bas par (1 + cos φ)/4
+      = sin(φ)(1 + cos(φ))/(cos(φ)² + cos(φ) − 1)   ← Simplifier
+    — (c) Au passage, ẏ (dérive y simplifié) :  [juge equiv]  départ : (4(1 − cos(φ)))′
+      = 4sin(φ)   ← Dériver
+    — (d) Point P sur l'axe Oy : φ = π/2.  [juge value]  départ : 4(1 − cos(π/2))
+      = 4   ← Calculer
+    — (d) Pente en P :  [juge value]  départ : sin(π/2)(1 + cos(π/2))/(cos(π/2)² + cos(π/2) − 1)
+      = −1   ← Calculer
+    — (e) Tangentes horizontales : ẏ = 0 sur [0 ; π[  [juge solset]  départ : 4sin(φ) = 0
+      ? Esquisse : quelle description convient ? ✔ Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → +∞ en s'approchant de la droite y = 8 / · Part de l'origine, passe par (0 ; 4), puis file vers x → −∞ en s'approchant de la droite y = 4 / · Courbe fermée qui passe par l'origine et par (0 ; 4)
+      = φ = 0   ← sin φ = 0 ; ẋ(0) ≠ 0 : l'origine
   pièges : g6_chain_forgot, a1_polar_slope_naive, g6_param_slope_inverted
 
 ```
@@ -3365,7 +3383,7 @@ Vérifie d'abord la limite en 0 de u = x/(1 − x), puis écris le DL d'ordre 3 
     = 1 + (x + x² + x³) + □ + □ + x³ε(x)   (trous : 1 + (x + x² + x³) + (x² + 2x³)/2 + x³/6 + x³ε(x))   ← Puissances de u, termes de degré ≤ 3
     = 1 + □ + □x² + □x³ + x³ε(x)   (trous : 1 + x + (3/2)x² + (13/6)x³ + x³ε(x))   ← Réduire
   aides : u = x/(1 − x) tend vers 0 : remplace u par son DL dans celui de eᵘ, et garde dans uᵏ tous les termes de degré ≤ 3. | 1 + □ + □x² + □x³ + x³ε(x) | 1 + x + (3/2)x² + (13/6)x³ + x³ε(x)
-  pièges : a1_bh_not_indeterminate
+  pièges : a1_bh_not_indeterminate, a1_dominant_term_wrong
 
 ```
 
@@ -3381,7 +3399,7 @@ Vérifie d'abord la limite en 0 de u = x/(1 − x), puis écris le DL d'ordre 2 
     = 1 + (x + x²) + x²/2 + x²ε(x)   ← Puissances de u, termes de degré ≤ 2
     = 1 + □ + □ + x²ε(x)   (trous : 1 + x + (3/2)x² + x²ε(x))   ← Réduire
   aides : u = x/(1 − x) tend vers 0 : remplace u par son DL dans celui de eᵘ, et garde dans uᵏ tous les termes de degré ≤ 2. | 1 + □ + □x² + x²ε(x) | 1 + x + (3/2)x² + x²ε(x)
-  pièges : a1_bh_not_indeterminate
+  pièges : a1_bh_not_indeterminate, a1_dominant_term_wrong
 
 Vérifie d'abord la limite en 0 de u = tan(x), puis écris le DL d'ordre 4 de e^(tan(x)) en 0.
   [guided]  tan(x)
@@ -3933,17 +3951,19 @@ Vrai ou faux ?
   [examen tf]
 
 Écris le DL d'ordre 5 de f(x) = ln(1 − x²)/sin(x) en 0, puis déduis-en f⁽⁴⁾(0) et f⁽⁵⁾(0).
-  [free, sans aide, examen open]  ln(1 − x²)/sin(x)
-    = (−x² − x⁴/2 − x⁶/3 + x⁶ε(x))/(x − x³/6 + x⁵/120 + x⁶ε(x))   ← DL du numérateur et du dénominateur
-    = (−x − x³/2 − x⁵/3 + x⁵ε(x))/(1 − x²/6 + x⁴/120 + x⁵ε(x))   ← Simplifier par x
-    = (−x − x³/2 − x⁵/3)·(1 − (−x²/6 + x⁴/120) + (−x²/6 + x⁴/120)²) + x⁵ε(x)   ← 1/(1 + u) = 1 − u + u² − …
-    = −x − (2/3)x³ − (157/360)x⁵ + x⁵ε(x)   ← Développer, garder les termes de degré ≤ 5
-  — Déduis-en f⁽⁴⁾(0) :  [juge value]  départ : f′′′′(0)
-    = 24·0   ← f⁽⁴⁾(0) = 4!·a₄
-    = 0   ← Calculer
-  — Déduis-en f⁽⁵⁾(0) :  [juge value]  départ : f′′′′′(0)
-    = 120·(−157/360)   ← f⁽⁵⁾(0) = 5!·a₅
-    = −157/3   ← Calculer
+  [problème, examen open, 7 points]
+  partie 1 (Début du problème : 3 ; Déduis-en f⁽⁴⁾(0) : 2 ; Déduis-en f⁽⁵⁾(0) : 2)
+    [free, sans aide, suivre l'erreur, examen open]  ln(1 − x²)/sin(x)
+      = (−x² − x⁴/2 − x⁶/3 + x⁶ε(x))/(x − x³/6 + x⁵/120 + x⁶ε(x))   ← DL du numérateur et du dénominateur
+      = (−x − x³/2 − x⁵/3 + x⁵ε(x))/(1 − x²/6 + x⁴/120 + x⁵ε(x))   ← Simplifier par x
+      = (−x − x³/2 − x⁵/3)·(1 − (−x²/6 + x⁴/120) + (−x²/6 + x⁴/120)²) + x⁵ε(x)   ← 1/(1 + u) = 1 − u + u² − …
+      = −x − (2/3)x³ − (157/360)x⁵ + x⁵ε(x)   ← Développer, garder les termes de degré ≤ 5
+    — Déduis-en f⁽⁴⁾(0) :  [juge value]  départ : f′′′′(0)
+      = 24·0   ← f⁽⁴⁾(0) = 4!·a₄
+      = 0   ← Calculer
+    — Déduis-en f⁽⁵⁾(0) :  [juge value]  départ : f′′′′′(0)
+      = 120·(−157/360)   ← f⁽⁵⁾(0) = 5!·a₅
+      = −157/3   ← Calculer
   pièges : a1_dl_factorial_missing, a1_dl_remainder_wrong_order, a1_dl_truncate_early
 
 ```
@@ -4750,11 +4770,13 @@ Vrai ou faux ?
   [examen tf]
 
 Calcule ∫_{0}^{1} x·arctan(x) dx.
-  [free, sans aide, examen open]  ∫_{0}^{1} x·arctan(x) dx
-    = [(x²/2)·arctan(x)]_{0}^{1} − ∫_{0}^{1} (x²/2)·(1/(1 + x²)) dx   ← u = Arctg x, v′ = x : u′ = 1/(1 + x²), v = x²/2
-    = [(x²/2)·arctan(x)]_{0}^{1} − (1/2)(∫_{0}^{1} (1 − 1/(1 + x²)) dx)   ← x²/(1 + x²) = 1 − 1/(1 + x²)
-    = [(x²/2)arctan(x) − x/2 + arctan(x)/2]_{0}^{1}   ← Intégrer ce qui reste
-    = π/4 − 1/2   ← Évaluer
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 2)
+    [free, sans aide, suivre l'erreur, examen open]  ∫_{0}^{1} x·arctan(x) dx
+      = [(x²/2)·arctan(x)]_{0}^{1} − ∫_{0}^{1} (x²/2)·(1/(1 + x²)) dx   ← u = Arctg x, v′ = x : u′ = 1/(1 + x²), v = x²/2
+      = [(x²/2)·arctan(x)]_{0}^{1} − (1/2)(∫_{0}^{1} (1 − 1/(1 + x²)) dx)   ← x²/(1 + x²) = 1 − 1/(1 + x²)
+      = [(x²/2)arctan(x) − x/2 + arctan(x)/2]_{0}^{1}   ← Intégrer ce qui reste
+      = π/4 − 1/2   ← Évaluer
   pièges : a1_int_missing_inner_factor, a1_ibp_plus, a1_ibp_boundary_term, a1_int_product
 
 ```
@@ -5016,17 +5038,19 @@ Soit Jₙ = ∫₀¹ xⁿeˣ dx. Alors J₄ =
   pièges : a1_reduction_index, a1_ibp_boundary_term, a1_ibp_sign
 
 Soit Iₙ = ∫₁ᵉ (Log x)ⁿ dx (n ≥ 0). Trouve une formule de récurrence, puis calcule I₂.
-  [free, sans aide, examen open]  I_n
-    = [x·ln(x)^n]_{1}^{e} − n·(∫_{1}^{e} ln(x)^(n − 1) dx)   ← u = (Log x)ⁿ, v′ = 1
-    = e − n·I_(n − 1)   ← Reconnaître Iₙ₋₁
-  — Calcule I₀  [juge definite]  départ : I_0
-    = [x]_{1}^{e}   ← Primitive
-    = e − 1   ← Valeur
-  — Remonte la récurrence jusqu'à I₂  [juge definite]  départ : I_2
-    = e − 2·I_1   ← Récurrence
-    = e − 2·(e − I_0)   ← Récurrence
-    = e − 2·(e − (e − 1))   ← I₀ = e − 1
-    = e − 2   ← Calculer
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; Calcule I₀ : 1 ; Remonte la récurrence jusqu'à I₂ : 1)
+    [free, sans aide, suivre l'erreur, examen open]  I_n
+      = [x·ln(x)^n]_{1}^{e} − n·(∫_{1}^{e} ln(x)^(n − 1) dx)   ← u = (Log x)ⁿ, v′ = 1
+      = e − n·I_(n − 1)   ← Reconnaître Iₙ₋₁
+    — Calcule I₀  [juge definite]  départ : I_0
+      = [x]_{1}^{e}   ← Primitive
+      = e − 1   ← Valeur
+    — Remonte la récurrence jusqu'à I₂  [juge definite]  départ : I_2
+      = e − 2·I_1   ← Récurrence
+      = e − 2·(e − I_0)   ← Récurrence
+      = e − 2·(e − (e − 1))   ← I₀ = e − 1
+      = e − 2   ← Calculer
   pièges : a1_reduction_index, a1_ibp_boundary_term
 
 ```
@@ -5229,14 +5253,16 @@ Calcule ∫_{3}^{4} (−6x² − 6x − 18)/((x − 2)(x² + 2x + 10)) dx.
   pièges : a1_arctg_scale, a1_int_arctg_as_log, a1_int_log_of_denominator
 
 Calcule ∫ (4x² + x + 21)/(x³ + 3x² + 9x + 27) dx.
-  [free, sans aide, examen open]  (4x² + x + 21)/(x³ + 3x² + 9x + 27)
-    (Décompose la fraction.)
-    = (4x² + x + 21)/((x + 3)(x² + 9))   ← Factoriser Q
-    = 3/(x + 3) + (x − 2)/(x² + 9)   ← Éléments simples
-  — L’intégrale  [juge antideriv]  départ : ∫ (4x² + x + 21)/(x³ + 3x² + 9x + 27) dx
-    = ∫ (3/(x + 3) + (x − 2)/(x² + 9)) dx   ← Intégrer les éléments simples
-    = 3(∫ 1/(x + 3) dx) + (1/2)(∫ 2x/(x² + 9) dx) − 2(∫ 1/(x² + 9) dx)   ← Dérivée du dénominateur + constante, carré complété
-    = 3ln(|x + 3|) + (1/2)ln(x² + 9) − (2/3)arctan(x/3) + C   ← Log et Arctg
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1,5 ; L’intégrale : 2,5)
+    [free, sans aide, suivre l'erreur, examen open]  (4x² + x + 21)/(x³ + 3x² + 9x + 27)
+      (Décompose la fraction.)
+      = (4x² + x + 21)/((x + 3)(x² + 9))   ← Factoriser Q
+      = 3/(x + 3) + (x − 2)/(x² + 9)   ← Éléments simples
+    — L’intégrale  [juge antideriv]  départ : ∫ (4x² + x + 21)/(x³ + 3x² + 9x + 27) dx
+      = ∫ (3/(x + 3) + (x − 2)/(x² + 9)) dx   ← Intégrer les éléments simples
+      = 3(∫ 1/(x + 3) dx) + (1/2)(∫ 2x/(x² + 9) dx) − 2(∫ 1/(x² + 9) dx)   ← Dérivée du dénominateur + constante, carré complété
+      = 3ln(|x + 3|) + (1/2)ln(x² + 9) − (2/3)arctan(x/3) + C   ← Log et Arctg
   pièges : a1_des_wrong_form, a1_int_no_constant
 
 ```
@@ -5444,11 +5470,13 @@ Sur ]0 ; π[, ∫ 1/sin(x) dx =
   pièges : a1_trig_subst_dx, a1_int_log_of_denominator
 
 Calcule ∫_{π/3}^{π/2} 2/sin(x) dx.
-  [free, sans aide, examen open]  ∫_{π/3}^{π/2} 2/sin(x) dx
-    = ∫_{√3/3}^{1} 2/((2t)/(1 + t²))·2/(1 + t²) dt   ← Exprimer en t, avec dt et les bornes
-    = ∫_{√3/3}^{1} 2/t dt   ← Simplifier
-    = [2ln(|t|)]_{√3/3}^{1}   ← Intégrer en t
-    = ln(3)   ← Évaluer
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 4)
+    [free, sans aide, suivre l'erreur, examen open]  ∫_{π/3}^{π/2} 2/sin(x) dx
+      = ∫_{√3/3}^{1} 2/((2t)/(1 + t²))·2/(1 + t²) dt   ← Exprimer en t, avec dt et les bornes
+      = ∫_{√3/3}^{1} 2/t dt   ← Simplifier
+      = [2ln(|t|)]_{√3/3}^{1}   ← Intégrer en t
+      = ln(3)   ← Évaluer
   pièges : a1_subst_dx_kept, a1_subst_bounds_kept, a1_int_log_of_denominator
 
 ```
@@ -6258,7 +6286,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/(√(1 − 1/x)(1 + 2/x))   ← Diviser par x^(3/2)
     = □   (trous : 1)   ← Limite
   aides : Deux problèmes : en 1⁺ et en +∞. Compare à 1/(x − 1)^(1/2) puis à 1/x^(3/2). | en 1⁺, α = ▢ ; en +∞, α = ▢ | en 1⁺, α = 1/2 ; en +∞, α = 3/2 : converge.
-  pièges : a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_alpha_criteria_swapped
 
 ∫_{3⁺}^{6⁻} 1/√((x − 3)(6 − x)) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale. Points problèmes : 3⁺ (compare à 1/(x − 3)^(1/2)) ; 6⁻ (compare à 1/(6 − x)^(1/2)).
   [guided]  √(x − 3)·1/√((x − 3)(6 − x))
@@ -6274,7 +6302,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/√(x − 3)   ← Simplifier
     = □   (trous : √3/3)   ← Limite
   aides : Deux problèmes : en 3⁺ et en 6⁻. Compare à 1/(x − 3)^(1/2) puis à 1/(6 − x)^(1/2). | en 3⁺, α = ▢ ; en 6⁻, α = ▢ | en 3⁺, α = 1/2 ; en 6⁻, α = 1/2 : converge.
-  pièges : a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_alpha_criteria_swapped
 
 ∫_{0⁺}^{1} 1/(x^(1/3)(3 + x)) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale. Points problèmes : 0⁺ (compare à 1/x^(1/3)).
   [guided]  x^(1/3)·1/(x^(1/3)(3 + x))
@@ -6306,7 +6334,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/√((1 − 2/x)(1 + 4/x))   ← Diviser par x
     = 1   ← Limite
   aides : Deux problèmes : en 2⁺ et en +∞. Compare à 1/(x − 2)^(1/2) puis à 1/x. | en 2⁺, α = ▢ ; en +∞, α = ▢ | en 2⁺, α = 1/2 ; en +∞, α = 1 : diverge.
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ∫_{1⁺}^{∞} 1/√((x − 1)(x + 1)) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale.
   [guided]  √(x − 1)·1/√((x − 1)(x + 1))
@@ -6323,7 +6351,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/√((1 − 1/x)(1 + 1/x))   ← Diviser par x
     = 1   ← Limite
   aides : Deux problèmes : en 1⁺ et en +∞. Compare à 1/(x − 1)^(1/2) puis à 1/x. | en 1⁺, α = ▢ ; en +∞, α = ▢ | en 1⁺, α = 1/2 ; en +∞, α = 1 : diverge.
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ∫_{1}^{∞} (2x + 4)/(x³ + 3) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale.
   [guided]  x²·(2x + 4)/(x³ + 3)
@@ -6356,7 +6384,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/(√(1 − 3/x)(1 + 3/x))   ← Diviser par x^(3/2)
     = 1   ← Limite
   aides : Deux problèmes : en 3⁺ et en +∞. Compare à 1/(x − 3)^(1/2) puis à 1/x^(3/2). | en 3⁺, α = ▢ ; en +∞, α = ▢ | en 3⁺, α = 1/2 ; en +∞, α = 3/2 : converge.
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ∫_{2⁺}^{∞} 1/(√(x − 2)(x + 2)) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale.
   [tap, suivre l'erreur, menu steps]  √(x − 2)·1/(√(x − 2)(x + 2))
@@ -6373,7 +6401,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/(√(1 − 2/x)(1 + 2/x))   ← Diviser par x^(3/2)
     = 1   ← Limite
   aides : Deux problèmes : en 2⁺ et en +∞. Compare à 1/(x − 2)^(1/2) puis à 1/x^(3/2). | en 2⁺, α = ▢ ; en +∞, α = ▢ | en 2⁺, α = 1/2 ; en +∞, α = 3/2 : converge.
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ∫_{1⁺}^{3⁻} 1/√((x − 1)(3 − x)) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale.
   [tap, suivre l'erreur, menu steps]  √(x − 1)·1/√((x − 1)(3 − x))
@@ -6390,7 +6418,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/√(x − 1)   ← Simplifier
     = √2/2   ← Limite
   aides : Deux problèmes : en 1⁺ et en 3⁻. Compare à 1/(x − 1)^(1/2) puis à 1/(3 − x)^(1/2). | en 1⁺, α = ▢ ; en 3⁻, α = ▢ | en 1⁺, α = 1/2 ; en 3⁻, α = 1/2 : converge.
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ```
 
@@ -6419,7 +6447,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     = 1/(√(1 − 2/x)(1 + 1/x))   ← Diviser par x^(3/2)
     = 1   ← Limite
   aides : Deux problèmes : en 2⁺ et en +∞. Compare à 1/(x − 2)^(1/2) puis à 1/x^(3/2). | en 2⁺, α = ▢ ; en +∞, α = ▢ | en 2⁺, α = 1/2 ; en +∞, α = 3/2 : converge.
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ∫_{1}^{∞} (4x + 6)/(x³ + 3) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale.
   [free, suivre l'erreur]  x²·(4x + 6)/(x³ + 3)
@@ -6448,7 +6476,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
     = 1/√((1 − 3/x)(1 + 1/x))   ← Diviser par x
     = 1   ← Limite
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ∫_{3⁺}^{∞} 1/√((x − 3)(x + 1)) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale.
   [free, sans aide]  √(x − 3)·1/√((x − 3)(x + 1))
@@ -6462,7 +6490,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
     = 1/√((1 − 3/x)(1 + 1/x))   ← Diviser par x
     = 1   ← Limite
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ∫_{2⁺}^{∞} 1/√((x − 2)(x + 3)) dx converge-t-elle ? Étudie chaque point problème sans calculer l'intégrale.
   [free, sans aide]  √(x − 2)·1/√((x − 2)(x + 3))
@@ -6476,7 +6504,7 @@ _Comparer à 1/xᵅ en 0⁺ (α < 1) et en +∞ (α > 1)._
     ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
     = 1/√((1 − 2/x)(1 + 3/x))   ← Diviser par x
     = 1   ← Limite
-  pièges : a1_improper_one_end_only, a1_alpha_criteria_swapped
+  pièges : a1_sqrt_sum_split, a1_improper_one_end_only, a1_alpha_criteria_swapped
 
 ```
 
@@ -6493,11 +6521,13 @@ Vrai ou faux ?
   [examen tf]
 
 I = ∫_{1}^{∞} (5x + 1)/(x³ + 3x² + 4x + 2) dx. Montre que I converge, sans la calculer.
-  [free, sans aide, examen open]  x²·(5x + 1)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 5   ← f(x) ~ 5/x²
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 2)
+    [free, sans aide, suivre l'erreur, examen open]  x²·(5x + 1)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 5   ← f(x) ~ 5/x²
   pièges : a1_improper_undefined_means_diverge
 
 ```
@@ -6785,60 +6815,66 @@ I = ∫_{1}^{∞} (3x + 3)/(x³ + 6x² + 13x + 10) dx. (a) Montre que I converge
 
 ```
 I = ∫_{0}^{∞} (5x + 4)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide]  x²·(5x + 4)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 5   ← f(x) ~ 5/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (5x + 4)/(x³ + 3x² + 4x + 2)
-    = (5x + 4)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = −1/(x + 1) + (x + 6)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 6)/(x² + 2x + 2)) dx
-    = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)
-    = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 5arctan(x + 1)   ← Regrouper les Log
-    = 5π/2   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (5x + 4)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
-    = 5π/4 − (1/2)ln(2)   ← Retrancher F(0)
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur]  x²·(5x + 4)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 5   ← f(x) ~ 5/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (5x + 4)/(x³ + 3x² + 4x + 2)
+      = (5x + 4)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = −1/(x + 1) + (x + 6)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 6)/(x² + 2x + 2)) dx
+      = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)
+      = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 5arctan(x + 1)   ← Regrouper les Log
+      = 5π/2   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (5x + 4)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 5arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
+      = 5π/4 − (1/2)ln(2)   ← Retrancher F(0)
   pièges : a1_improper_undefined_means_diverge
 
 I = ∫_{1}^{∞} (6x + 7)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide]  x²·(6x + 7)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 6   ← f(x) ~ 6/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (6x + 7)/(x³ + 3x² + 4x + 2)
-    = (6x + 7)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = 1/(x + 1) + (−x + 5)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x + 5)/(x² + 2x + 2)) dx
-    = ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)
-    = (1/2)ln((x + 1)²/(x² + 2x + 2)) + 6arctan(x + 1)   ← Regrouper les Log
-    = 3π   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (6x + 7)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
-    = 3π + (1/2)ln(5/4) − 6arctan(2)   ← Retrancher F(1)
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur]  x²·(6x + 7)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 6   ← f(x) ~ 6/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (6x + 7)/(x³ + 3x² + 4x + 2)
+      = (6x + 7)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = 1/(x + 1) + (−x + 5)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x + 5)/(x² + 2x + 2)) dx
+      = ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)
+      = (1/2)ln((x + 1)²/(x² + 2x + 2)) + 6arctan(x + 1)   ← Regrouper les Log
+      = 3π   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (6x + 7)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + 6arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
+      = 3π + (1/2)ln(5/4) − 6arctan(2)   ← Retrancher F(1)
   pièges : a1_improper_undefined_means_diverge
 
 I = ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide]  x²·(3x + 2)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 3   ← f(x) ~ 3/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (3x + 2)/(x³ + 3x² + 4x + 2)
-    = (3x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = −1/(x + 1) + (x + 4)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 4)/(x² + 2x + 2)) dx
-    = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)
-    = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 3arctan(x + 1)   ← Regrouper les Log
-    = 3π/2   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
-    = 3π/2 − (1/2)ln(5/4) − 3arctan(2)   ← Retrancher F(1)
+  [problème, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur]  x²·(3x + 2)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [1 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 3   ← f(x) ~ 3/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (3x + 2)/(x³ + 3x² + 4x + 2)
+      = (3x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = −1/(x + 1) + (x + 4)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (−1/(x + 1) + (x + 4)/(x² + 2x + 2)) dx
+      = −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : −ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)
+      = −(1/2)ln((x + 1)²/(x² + 2x + 2)) + 3arctan(x + 1)   ← Regrouper les Log
+      = 3π/2   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [−ln(x + 1) + (1/2)ln(x² + 2x + 2) + 3arctan(x + 1)]_{1}^{b}   ← I = lim F(b) − F(a)
+      = 3π/2 − (1/2)ln(5/4) − 3arctan(2)   ← Retrancher F(1)
   pièges : a1_improper_undefined_means_diverge
 
 ```
@@ -6847,22 +6883,24 @@ I = ∫_{1}^{∞} (3x + 2)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. 
 
 ```
 I = ∫_{0}^{∞} (x + 2)/(x³ + 3x² + 4x + 2) dx. (a) Montre que I converge. (b) Calcule I.
-  [free, sans aide, examen open]  x²·(x + 2)/(x³ + 3x² + 4x + 2)
-    ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
-    ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
-    ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
-    = 1   ← f(x) ~ 1/x²
-  — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (x + 2)/(x³ + 3x² + 4x + 2)
-    = (x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
-    = 1/(x + 1) + (−x)/(x² + 2x + 2)   ← Décomposition en éléments simples
-  — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x)/(x² + 2x + 2)) dx
-    = ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1) + C   ← Primitives : Log et Arctg
-  — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)
-    = (1/2)ln((x + 1)²/(x² + 2x + 2)) + arctan(x + 1)   ← Regrouper les Log
-    = π/2   ← Log 1 = 0 et Arctg → π/2
-  — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (x + 2)/(x³ + 3x² + 4x + 2) dx
-    = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
-    = π/4 + (1/2)ln(2)   ← Retrancher F(0)
+  [problème, examen open, 12 points]
+  partie 1 (Début du problème : 2 ; (b) Factorise Q, puis décompose f en éléments simples : 4 ; Primitive de f : 2 ; Limite de la primitive en +∞ (regroupe les Log avant) : 3 ; Valeur de I : 1)
+    [free, sans aide, suivre l'erreur, examen open]  x²·(x + 2)/(x³ + 3x² + 4x + 2)
+      ? Q s'annule-t-il sur [0 ; +∞[ ? ✔ Non : sa seule racine réelle est −1 / · Oui
+      ? Nature de l'intégrale ? ✔ converge absolument / · converge, pas absolument / · diverge
+      ? Quel critère ? → Comparaison à 1/xᵅ par la limite du quotient (α < 1 en un point fini, α > 1 en +∞)
+      = 1   ← f(x) ~ 1/x²
+    — (b) Factorise Q, puis décompose f en éléments simples :  [juge equiv]  départ : (x + 2)/(x³ + 3x² + 4x + 2)
+      = (x + 2)/((x + 1)(x² + 2x + 2))   ← Q(−1) = 0 : Q = (x + 1)(x² + 2x + 2)
+      = 1/(x + 1) + (−x)/(x² + 2x + 2)   ← Décomposition en éléments simples
+    — Primitive de f :  [juge antideriv]  départ : ∫ (1/(x + 1) + (−x)/(x² + 2x + 2)) dx
+      = ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1) + C   ← Primitives : Log et Arctg
+    — Limite de la primitive en +∞ (regroupe les Log avant) :  [juge limit]  départ : ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)
+      = (1/2)ln((x + 1)²/(x² + 2x + 2)) + arctan(x + 1)   ← Regrouper les Log
+      = π/2   ← Log 1 = 0 et Arctg → π/2
+    — Valeur de I :  [juge definite]  départ : ∫_{0}^{∞} (x + 2)/(x³ + 3x² + 4x + 2) dx
+      = lim_{b→∞} [ln(x + 1) − (1/2)ln(x² + 2x + 2) + arctan(x + 1)]_{0}^{b}   ← I = lim F(b) − F(a)
+      = π/4 + (1/2)ln(2)   ← Retrancher F(0)
   pièges : a1_improper_undefined_means_diverge
 
 ```
@@ -7060,16 +7098,7608 @@ Volume du solide obtenu en faisant tourner y = √x, x ∈ [0 ; 1], autour de l'
   pièges : a1_volume_no_square
 
 Calcule l'aire A de la surface obtenue en faisant tourner y = cosh(x) sur [0 ; ln(3)] autour de l'axe Ox.
-  [free, sans aide, examen open]  (cosh(x))′
-    = sinh(x)   ← Dériver
-  — Simplifie |f(x)|·√(1 + f′(x)²) :  [juge equiv]  départ : cosh(x)·√(1 + sinh(x)²)
-    = cosh(x)²   ← 1 + sinh² = cosh²
-  — A = 2π∫ |f(x)|·√(1 + f′(x)²) dx :  [juge definite]  départ : 2π·(∫_{0}^{ln(3)} cosh(x)·√(1 + sinh(x)²) dx)
-    = 2π·(∫_{0}^{ln(3)} cosh(x)² dx)   ← A = 2π∫ cosh²x dx
-    = π·(∫_{0}^{ln(3)} (1 + cosh(2x)) dx)   ← 2cosh²x = 1 + cosh 2x
-    = π·([x + sinh(2x)/2]_{0}^{ln(3)})   ← Primitive
-    = π·(ln(3) + (9 − 1/9)/4)   ← sinh(2ln 3) = (9 − 1/9)/2
-    = π·ln(3) + 20π/9   ← Calculer
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; Simplifie |f(x)|·√(1 + f′(x)²) : 1 ; A = 2π∫ |f(x)|·√(1 + f′(x)²) dx : 2)
+    [free, sans aide, suivre l'erreur, examen open]  (cosh(x))′
+      = sinh(x)   ← Dériver
+    — Simplifie |f(x)|·√(1 + f′(x)²) :  [juge equiv]  départ : cosh(x)·√(1 + sinh(x)²)
+      = cosh(x)²   ← 1 + sinh² = cosh²
+    — A = 2π∫ |f(x)|·√(1 + f′(x)²) dx :  [juge definite]  départ : 2π·(∫_{0}^{ln(3)} cosh(x)·√(1 + sinh(x)²) dx)
+      = 2π·(∫_{0}^{ln(3)} cosh(x)² dx)   ← A = 2π∫ cosh²x dx
+      = π·(∫_{0}^{ln(3)} (1 + cosh(2x)) dx)   ← 2cosh²x = 1 + cosh 2x
+      = π·([x + sinh(2x)/2]_{0}^{ln(3)})   ← Primitive
+      = π·(ln(3) + (9 − 1/9)/4)   ← sinh(2ln 3) = (9 − 1/9)/2
+      = π·ln(3) + 20π/9   ← Calculer
+
+```
+
+## Inf, Sup, Min, Max d'un ensemble défini par une fonction (`a1-sup-inf`, BA1)
+
+_Réécrire A en intervalles en x, puis lire ses bornes._
+
+### Niveau 1
+
+```
+A = {x > 0 : 1/ln(x) > 4}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max. 1/ln x > 0 demande ln x > 0 : on peut multiplier par ln x sans changer le sens.
+  [guided]  1/ln(x) > 4
+    = 0 < ln(x) < □   (trous : 0 < ln(x) < 1/4)   ← 1/ln x > 0 force ln x > 0 ; multiplier par ln x > 0 garde le sens : 1 > 4ln x
+    = 1 < x < e^(1/4)   ← Appliquer exp, croissante
+    = ]1 ; e^(1/4)[   ← Écrire en intervalles
+  — A = ]1 ; e^(1/4)[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    (1 ∉ A : pas de Min.)
+    = 1   ← 1 ∉ A
+  — Sup A :  [juge value]  départ : S
+    (e^(1/4) ∉ A : pas de Max.)
+    = e^(1/4)   ← e^(1/4) ∉ A
+  aides : 1/ln x > 0 demande ln x > 0 : on peut multiplier par ln x sans changer le sens. | Première ligne : 0 < ln(x) < 1/4 | A = ]1 ; e^(1/4)[ : Inf A = 1 ; Sup A = e^(1/4)
+  pièges : g1_mult_denominator, g9_bracket
+
+A = {x ∈ ℝ* : 0 < arctan(1/x) ≤ π/4}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max. Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[.
+  [guided]  0 < arctan(1/x) ≤ π/4
+    = tan(0) < 1/x ≤ tan(π/4)   ← Appliquer tan, strictement croissante sur ]−π/2 ; π/2[
+    = 0 < □/x ≤ □   (trous : 0 < 1/x ≤ 1)   ← Valeurs de tan
+    = x > 0 et x ≥ 1   ← Le signe de x, puis inverser
+    = [1 ; +∞[   ← Écrire en intervalles
+  — A = [1 ; +∞[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    (A n'est pas majoré : Sup A = +∞, pas de Max.)
+    (1 ∈ A : Min A = Inf A.)
+    = 1   ← 1 ∈ A
+  aides : Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[. | Première ligne : tan(0) < 1/x ≤ tan(π/4) | A = [1 ; +∞[ : Inf A = 1 ; Sup A = +∞
+  pièges : g9_bracket
+
+A = {x ∈ ℝ* : 0 < arctan(2/x) < π/3}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max. Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[.
+  [guided]  0 < arctan(2/x) < π/3
+    = tan(0) < 2/x < tan(π/3)   ← Appliquer tan, strictement croissante sur ]−π/2 ; π/2[
+    = 0 < 2/x < □   (trous : 0 < 2/x < √3)   ← Valeurs de tan
+    = x > 0 et x > 2√3/3   ← Le signe de x, puis inverser
+    = ]2√3/3 ; +∞[   ← Écrire en intervalles
+  — A = ]2√3/3 ; +∞[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    (A n'est pas majoré : Sup A = +∞, pas de Max.)
+    (2√3/3 ∉ A : pas de Min.)
+    = 2√3/3   ← 2√3/3 ∉ A
+  aides : Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[. | Première ligne : tan(0) < 2/x < tan(π/3) | A = ]2√3/3 ; +∞[ : Inf A = 2√3/3 ; Sup A = +∞
+  pièges : g9_bracket
+
+```
+
+### Niveau 2
+
+```
+A = {x > 0 : 1/ln(x) > 4}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [guided]  1/ln(x) > 4
+    ? Comment commencer ? ✔ Multiplier par ln x, qui est positif : le sens ne change pas / · Multiplier par ln x en changeant le sens
+    = 0 < ln(x) < 1/4   ← 1/ln x > 0 force ln x > 0 ; multiplier par ln x > 0 garde le sens : 1 > 4ln x
+    = 1 < x < e^(1/4)   ← Appliquer exp, croissante
+    = ]1 ; e^(1/4)[   ← Écrire en intervalles
+  — A = ]1 ; e^(1/4)[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? Inf A = 1 : est-il dans A ? ✔ Non : 1 ∉ A, A n'a pas de minimum / · Oui : Min A = Inf A
+    = 1   ← 1 ∉ A
+  — Sup A :  [juge value]  départ : S
+    ? Sup A = e^(1/4) : est-il dans A ? ✔ Non : e^(1/4) ∉ A, A n'a pas de maximum / · Oui : Max A = Sup A
+    = e^(1/4)   ← e^(1/4) ∉ A
+  aides : 1/ln x > 0 demande ln x > 0 : on peut multiplier par ln x sans changer le sens. | Première ligne : 0 < ln(x) < 1/4 | A = ]1 ; e^(1/4)[ : Inf A = 1 ; Sup A = e^(1/4)
+  pièges : g1_mult_denominator, g9_bracket, a1_sup_in_set
+
+A = {x ∈ ℝ* : −π/3 < arctan(3/x) < −π/6}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [guided]  −π/3 < arctan(3/x) < −π/6
+    ? Comment commencer ? ✔ Appliquer tan aux trois membres : tan est croissante sur ]−π/2 ; π/2[ / · Appliquer Arctg aux trois membres
+    = tan(−π/3) < 3/x < tan(−π/6)   ← Appliquer tan, strictement croissante sur ]−π/2 ; π/2[
+    = −√3 < 3/x < −1/√3   ← Valeurs de tan
+    = −3√3 < x < −√3   ← Inverser : 1/u est décroissante sur chaque demi-droite
+    = ]−3√3 ; −√3[   ← Écrire en intervalles
+  — A = ]−3√3 ; −√3[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? Inf A = −3√3 : est-il dans A ? ✔ Non : −3√3 ∉ A, A n'a pas de minimum / · Oui : Min A = Inf A
+    = −3√3   ← −3√3 ∉ A
+  — Sup A :  [juge value]  départ : S
+    ? Sup A = −√3 : est-il dans A ? ✔ Non : −√3 ∉ A, A n'a pas de maximum / · Oui : Max A = Sup A
+    = −√3   ← −√3 ∉ A
+  aides : Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[. | Première ligne : tan(−π/3) < 3/x < tan(−π/6) | A = ]−3√3 ; −√3[ : Inf A = −3√3 ; Sup A = −√3
+  pièges : g9_bracket, a1_sup_in_set
+
+A = {x > 0 : 1 < ln(x) < 2}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [guided]  1 < ln(x) < 2
+    ? Comment commencer ? ✔ Appliquer exp aux trois membres (croissante) / · Appliquer ln aux trois membres
+    = e < x < e²   ← Appliquer exp, strictement croissante
+    = ]e ; e²[   ← Écrire en intervalles
+  — A = ]e ; e²[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? Inf A = e : est-il dans A ? ✔ Non : e ∉ A, A n'a pas de minimum / · Oui : Min A = Inf A
+    = e   ← e ∉ A
+  — Sup A :  [juge value]  départ : S
+    ? Sup A = e² : est-il dans A ? ✔ Non : e² ∉ A, A n'a pas de maximum / · Oui : Max A = Sup A
+    = e²   ← e² ∉ A
+  aides : exp est strictement croissante : applique-la aux trois membres. | Première ligne : e < x < e² | A = ]e ; e²[ : Inf A = e ; Sup A = e^2
+  pièges : g9_bracket, a1_sup_in_set
+
+```
+
+### Niveau 3
+
+```
+A = {x ∈ ℝ* : 0 < arctan(4/x) ≤ π/6}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [tap, suivre l'erreur, menu steps]  0 < arctan(4/x) ≤ π/6
+    = tan(0) < 4/x ≤ tan(π/6)   ← Appliquer tan, strictement croissante sur ]−π/2 ; π/2[
+    = 0 < 4/x ≤ 1/√3   ← Valeurs de tan
+    = x > 0 et x ≥ 4√3   ← Le signe de x, puis inverser
+    = [4√3 ; +∞[   ← Écrire en intervalles
+  — A = [4√3 ; +∞[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? A est-il majoré ? ✔ Non : Sup A = +∞, et A n'a pas de maximum / · Oui, par la borne de droite des valeurs
+    ? Inf A = 4√3 : est-il dans A ? ✔ Oui : le crochet est fermé, Min A = Inf A / · Non : A n'a pas de minimum
+    = 4√3   ← 4√3 ∈ A
+  aides : Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[. | Première ligne : tan(0) < 4/x ≤ tan(π/6) | A = [4√3 ; +∞[ : Inf A = 4√3 ; Sup A = +∞
+  pièges : g9_bracket, a1_supinf_on_values
+
+A = {x ∈ ℝ* : 0 < arctan(4/x) < π/3}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [tap, suivre l'erreur, menu steps]  0 < arctan(4/x) < π/3
+    = tan(0) < 4/x < tan(π/3)   ← Appliquer tan, strictement croissante sur ]−π/2 ; π/2[
+    = 0 < 4/x < √3   ← Valeurs de tan
+    = x > 0 et x > 4√3/3   ← Le signe de x, puis inverser
+    = ]4√3/3 ; +∞[   ← Écrire en intervalles
+  — A = ]4√3/3 ; +∞[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? A est-il majoré ? ✔ Non : Sup A = +∞, et A n'a pas de maximum / · Oui, par la borne de droite des valeurs
+    ? Inf A = 4√3/3 : est-il dans A ? ✔ Non : 4√3/3 ∉ A, A n'a pas de minimum / · Oui : Min A = Inf A
+    = 4√3/3   ← 4√3/3 ∉ A
+  aides : Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[. | Première ligne : tan(0) < 4/x < tan(π/3) | A = ]4√3/3 ; +∞[ : Inf A = 4√3/3 ; Sup A = +∞
+  pièges : g9_bracket, a1_supinf_on_values, a1_sup_in_set
+
+A = {x ∈ ℝ* : π/3 < arctan(3/x) < 3π/4}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [tap, suivre l'erreur, menu steps]  π/3 < arctan(3/x) < 3π/4
+    = π/3 < arctan(3/x)   ← Arctg prend ses valeurs dans ]−π/2 ; π/2[, et π/2 < 3π/4 : la seconde inégalité est toujours vraie
+    = √3 < 3/x   ← Appliquer tan, croissante sur ]−π/2 ; π/2[
+    = 0 < x < √3   ← k/x > 0 donne x > 0, puis inverser
+    = ]0 ; √3[   ← Écrire en intervalles
+  — A = ]0 ; √3[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? Inf A = 0 : est-il dans A ? ✔ Non : 0 ∉ A, A n'a pas de minimum / · Oui : Min A = Inf A
+    = 0   ← 0 ∉ A
+  — Sup A :  [juge value]  départ : S
+    ? Sup A = √3 : est-il dans A ? ✔ Non : √3 ∉ A, A n'a pas de maximum / · Oui : Max A = Sup A
+    = √3   ← √3 ∉ A
+  aides : tan n'est croissante que sur ]−π/2 ; π/2[ : 3π/4 n'y est pas. Arctg(…) < π/2 < 3π/4 est toujours vrai. | Première ligne : π/3 < arctan(3/x) | A = ]0 ; √3[ : Inf A = 0 ; Sup A = √3
+  pièges : g1_pole_closed, g9_bracket, a1_tan_monotone_range, a1_sup_in_set
+
+```
+
+### Niveau 4
+
+```
+A = {x > 0 : 1/ln(x) > 2}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [free, suivre l'erreur]  1/ln(x) > 2
+    = 0 < ln(x) < 1/2   ← 1/ln x > 0 force ln x > 0 ; multiplier par ln x > 0 garde le sens : 1 > 2ln x
+    = 1 < x < e^(1/2)   ← Appliquer exp, croissante
+    = ]1 ; e^(1/2)[   ← Écrire en intervalles
+  — A = ]1 ; e^(1/2)[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? Inf A = 1 : est-il dans A ? ✔ Non : 1 ∉ A, A n'a pas de minimum / · Oui : Min A = Inf A
+    = 1   ← 1 ∉ A
+  — Sup A :  [juge value]  départ : S
+    ? Sup A = e^(1/2) : est-il dans A ? ✔ Non : e^(1/2) ∉ A, A n'a pas de maximum / · Oui : Max A = Sup A
+    = e^(1/2)   ← e^(1/2) ∉ A
+  aides : 1/ln x > 0 demande ln x > 0 : on peut multiplier par ln x sans changer le sens. | Première ligne : 0 < ln(x) < 1/2 | A = ]1 ; e^(1/2)[ : Inf A = 1 ; Sup A = e^(1/2)
+  pièges : g1_mult_denominator, g9_bracket, a1_sup_in_set
+
+A = {x > 0 : −2 ≤ ln(x) < 0}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [free, suivre l'erreur]  −2 ≤ ln(x) < 0
+    = e^(−2) ≤ x < 1   ← Appliquer exp, strictement croissante
+    = [e^(−2) ; 1[   ← Écrire en intervalles
+  — A = [e^−2 ; 1[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? Inf A = e^(−2) : est-il dans A ? ✔ Oui : le crochet est fermé, Min A = Inf A / · Non : A n'a pas de minimum
+    = e^(−2)   ← e^(−2) ∈ A
+  — Sup A :  [juge value]  départ : S
+    ? Sup A = 1 : est-il dans A ? ✔ Non : 1 ∉ A, A n'a pas de maximum / · Oui : Max A = Sup A
+    = 1   ← 1 ∉ A
+  aides : exp est strictement croissante : applique-la aux trois membres. | Première ligne : e^−2 ≤ x < 1 | A = [e^−2 ; 1[ : Inf A = e^−2 ; Sup A = 1
+  pièges : g9_bracket, a1_sup_in_set
+
+A = {x ∈ ℝ* : 0 < arctan(4/x) < π/4}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [free, suivre l'erreur]  0 < arctan(4/x) < π/4
+    = tan(0) < 4/x < tan(π/4)   ← Appliquer tan, strictement croissante sur ]−π/2 ; π/2[
+    = 0 < 4/x < 1   ← Valeurs de tan
+    = x > 0 et x > 4   ← Le signe de x, puis inverser
+    = ]4 ; +∞[   ← Écrire en intervalles
+  — A = ]4 ; +∞[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? A est-il majoré ? ✔ Non : Sup A = +∞, et A n'a pas de maximum / · Oui, par la borne de droite des valeurs
+    ? Inf A = 4 : est-il dans A ? ✔ Non : 4 ∉ A, A n'a pas de minimum / · Oui : Min A = Inf A
+    = 4   ← 4 ∉ A
+  aides : Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[. | Première ligne : tan(0) < 4/x < tan(π/4) | A = ]4 ; +∞[ : Inf A = 4 ; Sup A = +∞
+  pièges : g9_bracket, a1_supinf_on_values, a1_sup_in_set
+
+```
+
+### Niveau 5
+
+```
+A = {x ∈ ℝ* : π/6 < arctan(2/x) ≤ π/4}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.
+  [free, sans aide]  π/6 < arctan(2/x) ≤ π/4
+    = tan(π/6) < 2/x ≤ tan(π/4)   ← Appliquer tan, strictement croissante sur ]−π/2 ; π/2[
+    = 1/√3 < 2/x ≤ 1   ← Valeurs de tan
+    = 2 ≤ x < 2√3   ← Inverser : 1/u est décroissante sur chaque demi-droite
+    = [2 ; 2√3[   ← Écrire en intervalles
+  — A = [2 ; 2√3[. Lis ses bornes. Inf A :  [juge value]  départ : I
+    ? Inf A = 2 : est-il dans A ? ✔ Oui : le crochet est fermé, Min A = Inf A / · Non : A n'a pas de minimum
+    = 2   ← 2 ∈ A
+  — Sup A :  [juge value]  départ : S
+    ? Sup A = 2√3 : est-il dans A ? ✔ Non : 2√3 ∉ A, A n'a pas de maximum / · Oui : Max A = Sup A
+    = 2√3   ← 2√3 ∉ A
+  pièges : g9_bracket, a1_sup_in_set
+
+Soit A = {x ∈ ℝ* : π/6 ≤ arctan(4/x) < π/3}. Quelle affirmation est vraie ?
+  · Inf A = 1/√3 [a1_supinf_on_values]   · Min A = 4√3/3 [a1_sup_in_set]   ✔ Inf A = 4√3/3, et A n'a pas de minimum   · Sup A = √3 [a1_supinf_on_values]
+  pièges : a1_supinf_on_values, a1_sup_in_set
+
+Soit A = {x > 0 : 1/ln(x) > 3}. Quelle affirmation est vraie ?
+  · Sup A = 1/3 [a1_supinf_on_values]   · Min A = 1 [a1_sup_in_set]   · Max A = e^(1/3) [a1_sup_in_set]   ✔ Sup A = e^(1/3), et A n'a pas de maximum
+  pièges : a1_supinf_on_values, a1_sup_in_set
+
+```
+
+### Variantes d'examen
+
+```
+Soit A = {1/(1 + 3x²) : x ≥ 0}, l'ensemble des valeurs. Quelle affirmation est vraie ?
+  ✔ Inf A = 0, et A n'a pas de minimum   · A n'est pas majoré [a1_supinf_on_values]   · Sup A = 1, et A n'a pas de maximum   · Min A = 0 [a1_sup_in_set]
+  [examen mcq]
+  pièges : a1_supinf_on_values, a1_sup_in_set
+
+Vrai ou faux ? « Pour A = {x > 0 : Log(x) < 2}, Sup A = 2. »
+  · Vrai [a1_supinf_on_values]   ✔ Faux
+  [examen tf]
+  pièges : a1_supinf_on_values
+
+```
+
+## Prouver que s = Sup A (`a1-sup-proof`, BA1)
+
+_s majore A, et pour tout ε > 0, un x ∈ A dépasse s − ε._
+
+### Niveau 1
+
+```
+A = ]−2 ; 2[. Montre que Sup A = 2. Touche les blocs dans l'ordre. Le début est placé.
+  [blocs frame]
+    ? Soit ε > 0. Quel x convient (x ∈ A et x > 2 − ε) ? · x = 2 − ε / · x = 2 − ε/2 / ✔ x = max(2 − ε/2 ; 0)
+    1. Posons x = max(2 − ε/2 ; 0).
+    2. Alors x ∈ A et x > 2 − ε.
+    3. Aucun nombre plus petit que 2 n'est un majorant : 2 = Sup A.
+
+A = [−5 ; −2[. Montre que Sup A = −2. Touche les blocs dans l'ordre. Le début est placé.
+  [blocs frame]
+    ? Soit ε > 0. Quel x convient (x ∈ A et x > −2 − ε) ? ✔ x = max(−2 − ε/2 ; −7/2) / · x = −2 − ε / · x = −2 − ε/2
+    1. Posons x = max(−2 − ε/2 ; −7/2).
+    2. Alors x ∈ A et x > −2 − ε.
+    3. Aucun nombre plus petit que −2 n'est un majorant : −2 = Sup A.
+
+A = [2 ; 5[. Montre que Sup A = 5. Touche les blocs dans l'ordre. Le début est placé.
+  [blocs frame]
+    ? Soit ε > 0. Quel x convient (x ∈ A et x > 5 − ε) ? ✔ x = max(5 − ε/2 ; 7/2) / · x = 5 − ε / · x = 5 − ε/2
+    1. Posons x = max(5 − ε/2 ; 7/2).
+    2. Alors x ∈ A et x > 5 − ε.
+    3. Aucun nombre plus petit que 5 n'est un majorant : 5 = Sup A.
+
+```
+
+### Niveau 2
+
+```
+A = ]2 ; 4[. Montre que Inf A = 2. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame]
+    1. Pour tout x ∈ A, x > … : … est un minorant de A.   [à écrire : Minorant : 2]
+    2. Soit ε > 0.
+    3. Posons x = …   [à écrire : x = min(2+ε/2 ; 3)]
+    4. Alors x ∈ A et x < 2 + ε.
+    5. Aucun nombre plus grand que 2 n'est un minorant : 2 = Inf A.
+
+A = ]0 ; 4[. Montre que Sup A = 4. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame]
+    1. Pour tout x ∈ A, x < … : … est un majorant de A.   [à écrire : Majorant : 4]
+    2. Soit ε > 0.
+    3. Posons x = …   [à écrire : x = max(4-ε/2 ; 2)]
+    4. Alors x ∈ A et x > 4 − ε.
+    5. Aucun nombre plus petit que 4 n'est un majorant : 4 = Sup A.
+
+A = ]−4 ; 4[. Montre que Inf A = −4. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame]
+    1. Pour tout x ∈ A, x > … : … est un minorant de A.   [à écrire : Minorant : -4]
+    2. Soit ε > 0.
+    3. Posons x = …   [à écrire : x = min(-4+ε/2 ; 0)]
+    4. Alors x ∈ A et x < −4 + ε.
+    5. Aucun nombre plus grand que −4 n'est un minorant : −4 = Inf A.
+
+```
+
+### Niveau 3
+
+```
+A = [−4 ; 3[. Montre que Sup A = 3. Touche les blocs dans l'ordre.
+  [blocs order]
+    1. Pour tout x ∈ A, x < 3 : 3 est un majorant de A.
+    2. Soit ε > 0.
+    3. Posons x = max(3 − ε/2 ; −1/2).
+    4. Alors x ∈ A et x > 3 − ε.
+    5. Aucun nombre plus petit que 3 n'est un majorant : 3 = Sup A.
+    ✗ Prenons ε = 0,1 : x = 3 − 0,05 convient. [g9_proof_by_example]
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x > 3 − ε. [g9_quant_order]
+  pièges : g9_proof_by_example, g9_quant_order
+
+A = ]−2 ; 3[. Montre que Sup A = 3. Touche les blocs dans l'ordre.
+  [blocs order]
+    1. Pour tout x ∈ A, x < 3 : 3 est un majorant de A.
+    2. Soit ε > 0.
+    3. Posons x = max(3 − ε/2 ; 1/2).
+    4. Alors x ∈ A et x > 3 − ε.
+    5. Aucun nombre plus petit que 3 n'est un majorant : 3 = Sup A.
+    ✗ 3 ∈ A, donc 3 = Sup A. [a1_sup_in_set]
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x > 3 − ε. [g9_quant_order]
+  pièges : a1_sup_in_set, g9_quant_order
+
+A = ]3 ; 5]. Montre que Inf A = 3. Touche les blocs dans l'ordre.
+  [blocs order]
+    1. Pour tout x ∈ A, x > 3 : 3 est un minorant de A.
+    2. Soit ε > 0.
+    3. Posons x = min(3 + ε/2 ; 4).
+    4. Alors x ∈ A et x < 3 + ε.
+    5. Aucun nombre plus grand que 3 n'est un minorant : 3 = Inf A.
+    ✗ Prenons ε = 0,1 : x = 3 + 0,05 convient. [g9_proof_by_example]
+    ✗ 3 ∈ A, donc 3 = Inf A. [a1_sup_in_set]
+  pièges : g9_proof_by_example, a1_sup_in_set
+
+```
+
+### Niveau 4
+
+```
+A = [3 ; 5[. Montre que Sup A = 5. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame]
+    1. Pour tout x ∈ A, x < 5 : 5 est un majorant de A.
+    2. Soit ε > 0.
+    3. Posons x = …   [à écrire : x = max(5-ε/2 ; 4)]
+    4. Alors x ∈ A et x > 5 − ε.
+    5. Aucun nombre plus petit que 5 n'est un majorant : 5 = Sup A.
+    ✗ 5 ∈ A, donc 5 = Sup A. [a1_sup_in_set]
+    ✗ Prenons ε = 0,1 : x = 5 − 0,05 convient. [g9_proof_by_example]
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x > 5 − ε. [g9_quant_order]
+  pièges : a1_sup_in_set, g9_proof_by_example, g9_quant_order
+
+A = ]−1 ; 4]. Montre que Inf A = −1. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame]
+    1. Pour tout x ∈ A, x > −1 : −1 est un minorant de A.
+    2. Soit ε > 0.
+    3. Posons x = …   [à écrire : x = min(-1+ε/2 ; 3/2)]
+    4. Alors x ∈ A et x < −1 + ε.
+    5. Aucun nombre plus grand que −1 n'est un minorant : −1 = Inf A.
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x < −1 + ε. [g9_quant_order]
+    ✗ Prenons ε = 0,1 : x = −1 + 0,05 convient. [g9_proof_by_example]
+    ✗ −1 ∈ A, donc −1 = Inf A. [a1_sup_in_set]
+  pièges : g9_quant_order, g9_proof_by_example, a1_sup_in_set
+
+A = ]1 ; 3]. Montre que Inf A = 1. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame]
+    1. Pour tout x ∈ A, x > 1 : 1 est un minorant de A.
+    2. Soit ε > 0.
+    3. Posons x = …   [à écrire : x = min(1+ε/2 ; 2)]
+    4. Alors x ∈ A et x < 1 + ε.
+    5. Aucun nombre plus grand que 1 n'est un minorant : 1 = Inf A.
+    ✗ Prenons ε = 0,1 : x = 1 + 0,05 convient. [g9_proof_by_example]
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x < 1 + ε. [g9_quant_order]
+    ✗ 1 ∈ A, donc 1 = Inf A. [a1_sup_in_set]
+  pièges : g9_proof_by_example, g9_quant_order, a1_sup_in_set
+
+```
+
+### Niveau 5
+
+```
+A = {2 + 2/n : n ∈ ℕ*}. Montre que Inf A = 2. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame, sans aide]
+    1. Pour tout n ≥ 1, 2/n > 0, donc 2 + 2/n > 2 : 2 est un minorant de A.
+    2. Soit ε > 0.
+    3. Prenons un entier n ≥ …   [à écrire : Seuil : n ≥ 2/ε+1]
+    4. Alors 2/n < ε, donc x = 2 + 2/n ∈ A et x < 2 + ε.
+    5. Aucun nombre plus grand que 2 n'est un minorant : 2 = Inf A.
+    ✗ Prenons ε = 0,1 : x = 2 + 0,05 convient. [g9_proof_by_example]
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x < 2 + ε. [g9_quant_order]
+    ✗ 2 ∈ A, donc 2 = Inf A. [a1_sup_in_set]
+  pièges : g9_proof_by_example, g9_quant_order, a1_sup_in_set
+
+A = {3 − 2/n : n ∈ ℕ*}. Montre que Sup A = 3. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame, sans aide]
+    1. Pour tout n ≥ 1, 2/n > 0, donc 3 − 2/n < 3 : 3 est un majorant de A.
+    2. Soit ε > 0.
+    3. Prenons un entier n ≥ …   [à écrire : Seuil : n ≥ 2/ε+1]
+    4. Alors 2/n < ε, donc x = 3 − 2/n ∈ A et x > 3 − ε.
+    5. Aucun nombre plus petit que 3 n'est un majorant : 3 = Sup A.
+    ✗ 3 ∈ A, donc 3 = Sup A. [a1_sup_in_set]
+    ✗ Prenons ε = 0,1 : x = 3 − 0,05 convient. [g9_proof_by_example]
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x > 3 − ε. [g9_quant_order]
+  pièges : a1_sup_in_set, g9_proof_by_example, g9_quant_order
+
+A = {−2 − 2/n : n ∈ ℕ*}. Montre que Sup A = −2. Touche les blocs dans l'ordre et complète les calculs.
+  [blocs frame, sans aide]
+    1. Pour tout n ≥ 1, 2/n > 0, donc −2 − 2/n < −2 : −2 est un majorant de A.
+    2. Soit ε > 0.
+    3. Prenons un entier n ≥ …   [à écrire : Seuil : n ≥ 2/ε+1]
+    4. Alors 2/n < ε, donc x = −2 − 2/n ∈ A et x > −2 − ε.
+    5. Aucun nombre plus petit que −2 n'est un majorant : −2 = Sup A.
+    ✗ Il existe x ∈ A tel que, pour tout ε > 0, x > −2 − ε. [g9_quant_order]
+    ✗ −2 ∈ A, donc −2 = Sup A. [a1_sup_in_set]
+    ✗ Prenons ε = 0,1 : x = −2 − 0,05 convient. [g9_proof_by_example]
+  pièges : g9_quant_order, a1_sup_in_set, g9_proof_by_example
+
+```
+
+### Variantes d'examen
+
+```
+A = {1 − 3/n : n ∈ ℕ*}. Montre que Sup A = 1.
+  [problème, examen open, 2 points]
+  partie 1 (1 est un majorant : 0,5)
+  Première étape : pourquoi 1 est-il un majorant de A ?
+    · Pour n = 1, le terme vaut −2, plus petit que 1 [g9_proof_by_example]   · Parce que 1 est le plus grand élément de A [a1_sup_in_set]   ✔ Pour tout n ≥ 1, 3/n > 0, donc 1 − 3/n < 1   · Parce que 1 ∈ A [a1_sup_in_set]
+  partie 2 (Construire x(ε) : 1)
+  Deuxième étape : pour tout ε > 0, trouve un élément de A plus grand que 1 − ε. Touche les blocs dans l'ordre et complète.
+    [blocs frame, sans aide]
+      1. Soit ε > 0.
+      2. Prenons un entier n ≥ …   [à écrire : Seuil : n ≥ 3/ε+1]
+      3. Alors 3/n < ε, donc x = 1 − 3/n ∈ A et x > 1 − ε.
+      ✗ Prenons ε = 0,1 : x = 1 − 0,05 convient. [g9_proof_by_example]
+  partie 3 (Conclure : 0,5)
+  Conclusion :
+    · On ne peut rien conclure sans fixer ε [g9_quant_order]   · 1 = Max A [a1_sup_in_set]   · Sup A = 1 − ε   ✔ 1 = Sup A, et A n'a pas de maximum
+  pièges : a1_sup_in_set, g9_proof_by_example, g9_quant_order
+
+Vrai ou faux ?
+  « Soit A ⊂ ℝ non vide et majoré, et c = Sup A. Pour tout ε > 0, il existe x ∈ A tel que x + ε ≥ c. » → VRAI
+  [examen tf]
+
+```
+
+## Écrire la définition ε-N de la limite d'une suite (`a1-seq-eps-n-def`, BA1)
+
+_∀ε > 0 ∃N ∈ ℕ ∀n ≥ N : |aₙ − L| ≤ ε._
+
+### Niveau 1
+
+```
+Construis la définition : « lim aₙ = −∞ ». Le début est placé. Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∀n ≥ N
+    2. , a_n ≤ −M
+    ✗ ∀N ∈ ℕ [g9_quant_order]
+  pièges : g9_quant_order
+
+Construis la définition : « lim aₙ = −2 ». Le début est placé. Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. , |a_n + 2| ≤ ε
+    ✗ ∃N ∈ ℕ qui dépend de n [a1_n_depends_on_n]
+  pièges : a1_n_depends_on_n, g9_quant_order
+
+Construis la définition : « lim aₙ = 3 ». Le début est placé. Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. , |a_n − 3| ≤ ε
+    ✗ ∃ε > 0 [g9_quant_order]
+  pièges : g9_quant_order
+
+```
+
+### Niveau 2
+
+```
+Construis la définition : « lim aₙ = +∞ ». Le début est placé. Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∃N ∈ ℕ
+    2. ∀n ≥ N
+    3. , a_n ≥ M
+    ✗ ∀N ∈ ℕ [g9_quant_order]
+  pièges : g9_quant_order
+
+Construis la définition : « lim aₙ = +∞ ». Le début est placé. Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∃N ∈ ℕ
+    2. ∀n ≥ N
+    3. , a_n ≥ M
+    ✗ ∀N ∈ ℕ [g9_quant_order]
+  pièges : g9_quant_order
+
+Construis la définition : « lim aₙ = L ». Le début est placé. Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∃N ∈ ℕ
+    2. ∀n ≥ N
+    3. , |a_n − L| ≤ ε
+    ✗ ∃ε > 0 [g9_quant_order]
+  pièges : g9_quant_order
+
+```
+
+### Niveau 3
+
+```
+Construis la définition : « lim aₙ = 2 ». Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃N ∈ ℕ
+    3. ∀n ≥ N
+    4. , |a_n − 2| ≤ ε
+    ✗ ∃N ∈ ℕ qui dépend de n [a1_n_depends_on_n]
+    ✗ ∀N ∈ ℕ [g9_quant_order]
+  pièges : a1_n_depends_on_n, g9_quant_order
+
+Construis la définition : « lim aₙ = 0 ». Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃N ∈ ℕ
+    3. ∀n ≥ N
+    4. , |a_n| ≤ ε
+    ✗ ∀N ∈ ℕ [g9_quant_order]
+    ✗ ∃ε > 0 [g9_quant_order]
+  pièges : g9_quant_order
+
+Construis la définition : « lim aₙ = L ». Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃N ∈ ℕ
+    3. ∀n ≥ N
+    4. , |a_n − L| ≤ ε
+    ✗ ∃ε > 0 [g9_quant_order]
+    ✗ ∀N ∈ ℕ [g9_quant_order]
+  pièges : g9_quant_order
+
+```
+
+### Niveau 4
+
+```
+Donne la définition précise : « lim aₙ = −∞ ».
+  [jetons] palette : M > 0 · N ∈ ℕ · n ≥ N · a_n ≤ −M · ε > 0 · a_n ≥ M · a_n ≤ M
+    → ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≤ −M
+  aides : On te donne ε (ou M) d'abord ; tu dois trouver un rang N qui marche pour tous les n après. N dépend de ε, pas de n. | ∀M > 0 … | ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≤ −M
+  pièges : g9_quant_order
+
+Donne la définition précise : « lim aₙ = −∞ ».
+  [jetons] palette : M > 0 · N ∈ ℕ · n ≥ N · a_n ≤ −M · ε > 0 · a_n ≥ M · a_n ≤ M
+    → ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≤ −M
+  aides : On te donne ε (ou M) d'abord ; tu dois trouver un rang N qui marche pour tous les n après. N dépend de ε, pas de n. | ∀M > 0 … | ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≤ −M
+  pièges : g9_quant_order
+
+Donne la définition précise : « (aₙ) est une suite de Cauchy ».
+  [jetons] palette : ε > 0 · N ∈ ℕ · m, n ≥ N · |a_m − a_n| ≤ ε · ε ≥ 0 · |a_(n+1) − a_n| ≤ ε · n ≥ N
+    → ∀ε > 0 ∃N ∈ ℕ ∀m, n ≥ N, |a_m − a_n| ≤ ε
+  aides : On te donne ε (ou M) d'abord ; tu dois trouver un rang N qui marche pour tous les n après. N dépend de ε, pas de n. | ∀ε > 0 … | ∀ε > 0 ∃N ∈ ℕ ∀m, n ≥ N, |a_m − a_n| ≤ ε
+  pièges : g9_quant_order, a1_cauchy_consecutive
+
+```
+
+### Niveau 5
+
+```
+Donne la définition précise : « (aₙ) est une suite de Cauchy ».
+  [jetons, sans aide] palette : ε > 0 · N ∈ ℕ · m, n ≥ N · |a_m − a_n| ≤ ε · ε ≥ 0 · |a_(n+1) − a_n| ≤ ε · n ≥ N
+    → ∀ε > 0 ∃N ∈ ℕ ∀m, n ≥ N, |a_m − a_n| ≤ ε
+  pièges : g9_quant_order, a1_cauchy_consecutive
+
+Donne la définition précise : « lim aₙ = −∞ ».
+  [jetons, sans aide] palette : M > 0 · N ∈ ℕ · n ≥ N · a_n ≤ −M · ε > 0 · a_n ≥ M · a_n ≤ M
+    → ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≤ −M
+  pièges : g9_quant_order
+
+Donne la définition précise : « lim aₙ = +∞ ».
+  [jetons, sans aide] palette : M > 0 · N ∈ ℕ · n ≥ N · a_n ≥ M · ε > 0 · a_n ≤ M · |a_n − L| ≤ ε
+    → ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≥ M
+  pièges : g9_quant_order
+
+```
+
+### Variantes d'examen
+
+```
+Donne la définition précise : « lim aₙ = L ».
+  [problème, examen open, 1 points]
+  partie 1 (Début du problème : 1)
+    [jetons, sans aide] palette : ε > 0 · N ∈ ℕ · n ≥ N · |a_n − L| ≤ ε · ε ≥ 0 · M > 0 · a_n ≥ M · |a_n| ≤ ε
+      → ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |a_n − L| ≤ ε
+    [examen open]
+  pièges : g9_quant_order
+
+Vrai ou faux ?
+  « Toute suite (aₙ) qui converge vers L vérifie : ∃N ∈ ℕ ∀ε > 0 ∀n ≥ N, |aₙ − L| ≤ ε. » → FAUX
+    contre-exemple (sequence) : a = 1/n
+  [examen tf]
+  pièges : g9_quant_order
+
+```
+
+## Trouver N(ε) pour une limite de suite (`a1-seq-eps-n`, BA1)
+
+_Simplifier |aₙ − L|, le majorer simplement, résoudre en n._
+
+### Niveau 1
+
+```
+Montre par la définition que lim aₙ = 4 pour aₙ = 4 + 3/(n² + 1) : simplifie |aₙ − 4|, majore-le par c/n², puis donne N(ε) tel que |aₙ − 4| ≤ ε pour tout n ≥ N(ε).
+  [guided]  |4 + 3/(n² + 1) − 4|
+    = □/(n² + 1)   (trous : 3/(n² + 1))   ← Simplifier : 3/(n² + 1) > 0
+  — Majore 3/(n² + 1) par une expression simple c/n² :  [juge equiv]  départ : 3/(n² + 1)
+    = □/n²   (trous : 3/n²)   ← Majorer : n² + 1 ≥ n²
+  — Résous 3/n² ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = √(□/ε)   (trous : √(3/ε))   ← 3/n² ≤ ε dès que n ≥ √(3/ε)
+    (Pour tout n ≥ N(ε) = √(3/ε), |aₙ − 4| ≤ 3/n² ≤ ε : lim aₙ = 4.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ − 4| = 3/(n² + 1) ≤ 3/n² ≤ ε dès que n ≥ ▢ | 3/(n² + 1) ≤ 3/n² ≤ ε dès que n ≥ √(3/ε) : N(ε) = √(3/ε)
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = −3 pour aₙ = (−3n² − 5)/(n² + 3) : simplifie |aₙ + 3|, majore-le par c/n², puis donne N(ε) tel que |aₙ + 3| ≤ ε pour tout n ≥ N(ε).
+  [guided]  |(−3n² − 5)/(n² + 3) + 3|
+    = □/(n² + 3)   (trous : 4/(n² + 3))   ← Simplifier
+  — Majore 4/(n² + 3) par une expression simple c/n² :  [juge equiv]  départ : 4/(n² + 3)
+    = □/n²   (trous : 4/n²)   ← Majorer : n² + 3 ≥ n²
+  — Résous 4/n² ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = √(□/ε)   (trous : √(4/ε))   ← 4/n² ≤ ε dès que n ≥ √(4/ε)
+    (Pour tout n ≥ N(ε) = √(4/ε), |aₙ + 3| ≤ 4/n² ≤ ε : lim aₙ = −3.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 3| = 4/(n² + 3) ≤ 4/n² ≤ ε dès que n ≥ ▢ | 4/(n² + 3) ≤ 4/n² ≤ ε dès que n ≥ √(4/ε) : N(ε) = √(4/ε)
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = −1 pour aₙ = −1 + 5/(n² + 2) : simplifie |aₙ + 1|, majore-le par c/n², puis donne N(ε) tel que |aₙ + 1| ≤ ε pour tout n ≥ N(ε).
+  [guided]  |−1 + 5/(n² + 2) + 1|
+    = □/(n² + 2)   (trous : 5/(n² + 2))   ← Simplifier : 5/(n² + 2) > 0
+  — Majore 5/(n² + 2) par une expression simple c/n² :  [juge equiv]  départ : 5/(n² + 2)
+    = □/n²   (trous : 5/n²)   ← Majorer : n² + 2 ≥ n²
+  — Résous 5/n² ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = √(□/ε)   (trous : √(5/ε))   ← 5/n² ≤ ε dès que n ≥ √(5/ε)
+    (Pour tout n ≥ N(ε) = √(5/ε), |aₙ + 1| ≤ 5/n² ≤ ε : lim aₙ = −1.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 1| = 5/(n² + 2) ≤ 5/n² ≤ ε dès que n ≥ ▢ | 5/(n² + 2) ≤ 5/n² ≤ ε dès que n ≥ √(5/ε) : N(ε) = √(5/ε)
+  pièges : g1_triangle_reverse
+
+```
+
+### Niveau 2
+
+```
+Montre par la définition que lim aₙ = −1 pour aₙ = (−n − 11)/(n + 2) : simplifie |aₙ + 1|, majore-le par c/n, puis donne N(ε) tel que |aₙ + 1| ≤ ε pour tout n ≥ N(ε).
+  [guided]  |(−n − 11)/(n + 2) + 1|
+    = |□|/(n + 2)   (trous : |−n − 11 + (n + 2)|/(n + 2))   ← Réduire au même dénominateur
+    = □/(n + 2)   (trous : 9/(n + 2))   ← Simplifier : il reste une constante en haut
+  — Majore 9/(n + 2) par une expression simple c/n :  [juge equiv]  départ : 9/(n + 2)
+    = □/n   (trous : 9/n)   ← Majorer : n + 2 ≥ n
+  — Résous 9/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 9/ε   ← 9/n ≤ ε dès que n ≥ 9/ε
+    (Pour tout n ≥ N(ε) = 9/ε, |aₙ + 1| ≤ 9/n ≤ ε : lim aₙ = −1.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 1| = 9/(n + 2) ≤ 9/n ≤ ε dès que n ≥ ▢ | 9/(n + 2) ≤ 9/n ≤ ε dès que n ≥ 9/ε : N(ε) = 9/ε
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = 2 pour aₙ = (2n² + 9)/(n² + 3) : simplifie |aₙ − 2|, majore-le par c/n², puis donne N(ε) tel que |aₙ − 2| ≤ ε pour tout n ≥ N(ε).
+  [guided]  |(2n² + 9)/(n² + 3) − 2|
+    = |□|/(n² + 3)   (trous : |2n² + 9 − 2(n² + 3)|/(n² + 3))   ← Réduire au même dénominateur
+    = □/(n² + 3)   (trous : 3/(n² + 3))   ← Simplifier
+  — Majore 3/(n² + 3) par une expression simple c/n² :  [juge equiv]  départ : 3/(n² + 3)
+    = □/n²   (trous : 3/n²)   ← Majorer : n² + 3 ≥ n²
+  — Résous 3/n² ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = √(3/ε)   ← 3/n² ≤ ε dès que n ≥ √(3/ε)
+    (Pour tout n ≥ N(ε) = √(3/ε), |aₙ − 2| ≤ 3/n² ≤ ε : lim aₙ = 2.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ − 2| = 3/(n² + 3) ≤ 3/n² ≤ ε dès que n ≥ ▢ | 3/(n² + 3) ≤ 3/n² ≤ ε dès que n ≥ √(3/ε) : N(ε) = √(3/ε)
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = −2 pour aₙ = (−2n − 13)/(n + 3) : simplifie |aₙ + 2|, majore-le par c/n, puis donne N(ε) tel que |aₙ + 2| ≤ ε pour tout n ≥ N(ε).
+  [guided]  |(−2n − 13)/(n + 3) + 2|
+    = |□|/(n + 3)   (trous : |−2n − 13 + 2(n + 3)|/(n + 3))   ← Réduire au même dénominateur
+    = □/(n + 3)   (trous : 7/(n + 3))   ← Simplifier : il reste une constante en haut
+  — Majore 7/(n + 3) par une expression simple c/n :  [juge equiv]  départ : 7/(n + 3)
+    = □/n   (trous : 7/n)   ← Majorer : n + 3 ≥ n
+  — Résous 7/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 7/ε   ← 7/n ≤ ε dès que n ≥ 7/ε
+    (Pour tout n ≥ N(ε) = 7/ε, |aₙ + 2| ≤ 7/n ≤ ε : lim aₙ = −2.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 2| = 7/(n + 3) ≤ 7/n ≤ ε dès que n ≥ ▢ | 7/(n + 3) ≤ 7/n ≤ ε dès que n ≥ 7/ε : N(ε) = 7/ε
+  pièges : g1_triangle_reverse
+
+```
+
+### Niveau 3
+
+```
+Montre par la définition que lim aₙ = −5 pour aₙ = (−5n − 2)/(n + 2) : simplifie |aₙ + 5|, majore-le par c/n, puis donne N(ε) tel que |aₙ + 5| ≤ ε pour tout n ≥ N(ε).
+  [tap, suivre l'erreur, menu steps]  |(−5n − 2)/(n + 2) + 5|
+    = |−5n − 2 + 5(n + 2)|/(n + 2)   ← Réduire au même dénominateur
+    = 8/(n + 2)   ← Simplifier : il reste une constante en haut
+  — Majore 8/(n + 2) par une expression simple c/n :  [juge equiv]  départ : 8/(n + 2)
+    = 8/n   ← Majorer : n + 2 ≥ n
+  — Résous 8/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 8/ε   ← 8/n ≤ ε dès que n ≥ 8/ε
+    (Pour tout n ≥ N(ε) = 8/ε, |aₙ + 5| ≤ 8/n ≤ ε : lim aₙ = −5.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 5| = 8/(n + 2) ≤ 8/n ≤ ε dès que n ≥ ▢ | 8/(n + 2) ≤ 8/n ≤ ε dès que n ≥ 8/ε : N(ε) = 8/ε
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = −5 pour aₙ = (−5n − 7)/(n + 1) : simplifie |aₙ + 5|, majore-le par c/n, puis donne N(ε) tel que |aₙ + 5| ≤ ε pour tout n ≥ N(ε).
+  [tap, suivre l'erreur, menu steps]  |(−5n − 7)/(n + 1) + 5|
+    = |−5n − 7 + 5(n + 1)|/(n + 1)   ← Réduire au même dénominateur
+    = 2/(n + 1)   ← Simplifier : il reste une constante en haut
+  — Majore 2/(n + 1) par une expression simple c/n :  [juge equiv]  départ : 2/(n + 1)
+    = 2/n   ← Majorer : n + 1 ≥ n
+  — Résous 2/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 2/ε   ← 2/n ≤ ε dès que n ≥ 2/ε
+    (Pour tout n ≥ N(ε) = 2/ε, |aₙ + 5| ≤ 2/n ≤ ε : lim aₙ = −5.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 5| = 2/(n + 1) ≤ 2/n ≤ ε dès que n ≥ ▢ | 2/(n + 1) ≤ 2/n ≤ ε dès que n ≥ 2/ε : N(ε) = 2/ε
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = 4 pour aₙ = (4n + 4)/(n + 2) : simplifie |aₙ − 4|, majore-le par c/n, puis donne N(ε) tel que |aₙ − 4| ≤ ε pour tout n ≥ N(ε).
+  [tap, suivre l'erreur, menu steps]  |(4n + 4)/(n + 2) − 4|
+    = |4n + 4 − 4(n + 2)|/(n + 2)   ← Réduire au même dénominateur
+    = 4/(n + 2)   ← Simplifier : il reste une constante en haut
+  — Majore 4/(n + 2) par une expression simple c/n :  [juge equiv]  départ : 4/(n + 2)
+    = 4/n   ← Majorer : n + 2 ≥ n
+  — Résous 4/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 4/ε   ← 4/n ≤ ε dès que n ≥ 4/ε
+    (Pour tout n ≥ N(ε) = 4/ε, |aₙ − 4| ≤ 4/n ≤ ε : lim aₙ = 4.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ − 4| = 4/(n + 2) ≤ 4/n ≤ ε dès que n ≥ ▢ | 4/(n + 2) ≤ 4/n ≤ ε dès que n ≥ 4/ε : N(ε) = 4/ε
+  pièges : g1_triangle_reverse
+
+```
+
+### Niveau 4
+
+```
+Montre par la définition que lim aₙ = −2 pour aₙ = (−2n − 2)/(n + 4) : simplifie |aₙ + 2|, majore-le par c/n, puis donne N(ε) tel que |aₙ + 2| ≤ ε pour tout n ≥ N(ε).
+  [free, suivre l'erreur]  |(−2n − 2)/(n + 4) + 2|
+    = |−2n − 2 + 2(n + 4)|/(n + 4)   ← Réduire au même dénominateur
+    = 6/(n + 4)   ← Simplifier : il reste une constante en haut
+  — Majore 6/(n + 4) par une expression simple c/n :  [juge equiv]  départ : 6/(n + 4)
+    = 6/n   ← Majorer : n + 4 ≥ n
+  — Résous 6/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 6/ε   ← 6/n ≤ ε dès que n ≥ 6/ε
+    (Pour tout n ≥ N(ε) = 6/ε, |aₙ + 2| ≤ 6/n ≤ ε : lim aₙ = −2.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 2| = 6/(n + 4) ≤ 6/n ≤ ε dès que n ≥ ▢ | 6/(n + 4) ≤ 6/n ≤ ε dès que n ≥ 6/ε : N(ε) = 6/ε
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = −2 pour aₙ = (−2n + 1)/(n + 4) : simplifie |aₙ + 2|, majore-le par c/n, puis donne N(ε) tel que |aₙ + 2| ≤ ε pour tout n ≥ N(ε).
+  [free, suivre l'erreur]  |(−2n + 1)/(n + 4) + 2|
+    = |−2n + 1 + 2(n + 4)|/(n + 4)   ← Réduire au même dénominateur
+    = 9/(n + 4)   ← Simplifier : il reste une constante en haut
+  — Majore 9/(n + 4) par une expression simple c/n :  [juge equiv]  départ : 9/(n + 4)
+    = 9/n   ← Majorer : n + 4 ≥ n
+  — Résous 9/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 9/ε   ← 9/n ≤ ε dès que n ≥ 9/ε
+    (Pour tout n ≥ N(ε) = 9/ε, |aₙ + 2| ≤ 9/n ≤ ε : lim aₙ = −2.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 2| = 9/(n + 4) ≤ 9/n ≤ ε dès que n ≥ ▢ | 9/(n + 4) ≤ 9/n ≤ ε dès que n ≥ 9/ε : N(ε) = 9/ε
+  pièges : g1_triangle_reverse
+
+Montre par la définition que lim aₙ = −2 pour aₙ = (−2n − 6)/(n + 4) : simplifie |aₙ + 2|, majore-le par c/n, puis donne N(ε) tel que |aₙ + 2| ≤ ε pour tout n ≥ N(ε).
+  [free, suivre l'erreur]  |(−2n − 6)/(n + 4) + 2|
+    = |−2n − 6 + 2(n + 4)|/(n + 4)   ← Réduire au même dénominateur
+    = 2/(n + 4)   ← Simplifier : il reste une constante en haut
+  — Majore 2/(n + 4) par une expression simple c/n :  [juge equiv]  départ : 2/(n + 4)
+    = 2/n   ← Majorer : n + 4 ≥ n
+  — Résous 2/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+    = 2/ε   ← 2/n ≤ ε dès que n ≥ 2/ε
+    (Pour tout n ≥ N(ε) = 2/ε, |aₙ + 2| ≤ 2/n ≤ ε : lim aₙ = −2.)
+  aides : Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ». | |aₙ + 2| = 2/(n + 4) ≤ 2/n ≤ ε dès que n ≥ ▢ | 2/(n + 4) ≤ 2/n ≤ ε dès que n ≥ 2/ε : N(ε) = 2/ε
+  pièges : g1_triangle_reverse
+
+```
+
+### Niveau 5
+
+```
+Définition, puis preuve par la définition.
+  [problème, 4 points]
+  partie 1 (Définition : 1)
+  Première partie : donne la définition de lim aₙ = L.
+    [jetons, sans aide] palette : ε > 0 · N ∈ ℕ · n ≥ N · |a_n − L| ≤ ε · ε ≥ 0 · M > 0 · a_n ≥ M · |a_n| ≤ ε
+      → ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |a_n − L| ≤ ε
+  partie 2 (Preuve : 1 ; Majore 5/(n + 3) par une expression simple c/n : 1 ; Résous 5/n ≤ ε en n : choisis N(ε). : 1)
+  Deuxième partie : prouve par la définition que lim aₙ = 2 pour aₙ = (2n + 11)/(n + 3) : simplifie |aₙ − 2|, majore-le par c/n, puis donne N(ε) tel que |aₙ − 2| ≤ ε pour tout n ≥ N(ε).
+    [free, sans aide, suivre l'erreur]  |(2n + 11)/(n + 3) − 2|
+      = |2n + 11 − 2(n + 3)|/(n + 3)   ← Réduire au même dénominateur
+      = 5/(n + 3)   ← Simplifier : il reste une constante en haut
+    — Majore 5/(n + 3) par une expression simple c/n :  [juge equiv]  départ : 5/(n + 3)
+      = 5/n   ← Majorer : n + 3 ≥ n
+    — Résous 5/n ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+      = 5/ε   ← 5/n ≤ ε dès que n ≥ 5/ε
+      (Pour tout n ≥ N(ε) = 5/ε, |aₙ − 2| ≤ 5/n ≤ ε : lim aₙ = 2.)
+  pièges : g9_quant_order, g1_triangle_reverse
+
+Définition, puis preuve par la définition.
+  [problème, 4 points]
+  partie 1 (Définition : 1)
+  Première partie : donne la définition de lim aₙ = L.
+    [jetons, sans aide] palette : M > 0 · N ∈ ℕ · n ≥ N · a_n ≤ −M · ε > 0 · a_n ≥ M · a_n ≤ M
+      → ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≤ −M
+  partie 2 (Preuve : 1 ; Majore 14/(n² + 2) par une expression simple c/n² : 1 ; Résous 14/n² ≤ ε en n : choisis N(ε). : 1)
+  Deuxième partie : prouve par la définition que lim aₙ = 3 pour aₙ = (3n² − 8)/(n² + 2) : simplifie |aₙ − 3|, majore-le par c/n², puis donne N(ε) tel que |aₙ − 3| ≤ ε pour tout n ≥ N(ε).
+    [free, sans aide, suivre l'erreur]  |(3n² − 8)/(n² + 2) − 3|
+      = |3n² − 8 − 3(n² + 2)|/(n² + 2)   ← Réduire au même dénominateur
+      = 14/(n² + 2)   ← Simplifier
+    — Majore 14/(n² + 2) par une expression simple c/n² :  [juge equiv]  départ : 14/(n² + 2)
+      = 14/n²   ← Majorer : n² + 2 ≥ n²
+    — Résous 14/n² ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+      = √(14/ε)   ← 14/n² ≤ ε dès que n ≥ √(14/ε)
+      (Pour tout n ≥ N(ε) = √(14/ε), |aₙ − 3| ≤ 14/n² ≤ ε : lim aₙ = 3.)
+  pièges : g9_quant_order, g1_triangle_reverse
+
+Définition, puis preuve par la définition.
+  [problème, 4 points]
+  partie 1 (Définition : 1)
+  Première partie : donne la définition de lim aₙ = L.
+    [jetons, sans aide] palette : M > 0 · N ∈ ℕ · n ≥ N · a_n ≥ M · ε > 0 · a_n ≤ M · |a_n − L| ≤ ε
+      → ∀M > 0 ∃N ∈ ℕ ∀n ≥ N, a_n ≥ M
+  partie 2 (Preuve : 1 ; Majore 3/(n² + 3) par une expression simple c/n² : 1 ; Résous 3/n² ≤ ε en n : choisis N(ε). : 1)
+  Deuxième partie : prouve par la définition que lim aₙ = −1 pour aₙ = (−n² − 6)/(n² + 3) : simplifie |aₙ + 1|, majore-le par c/n², puis donne N(ε) tel que |aₙ + 1| ≤ ε pour tout n ≥ N(ε).
+    [free, sans aide, suivre l'erreur]  |(−n² − 6)/(n² + 3) + 1|
+      = |−n² − 6 + (n² + 3)|/(n² + 3)   ← Réduire au même dénominateur
+      = 3/(n² + 3)   ← Simplifier
+    — Majore 3/(n² + 3) par une expression simple c/n² :  [juge equiv]  départ : 3/(n² + 3)
+      = 3/n²   ← Majorer : n² + 3 ≥ n²
+    — Résous 3/n² ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+      = √(3/ε)   ← 3/n² ≤ ε dès que n ≥ √(3/ε)
+      (Pour tout n ≥ N(ε) = √(3/ε), |aₙ + 1| ≤ 3/n² ≤ ε : lim aₙ = −1.)
+  pièges : g9_quant_order, g1_triangle_reverse
+
+```
+
+### Variantes d'examen
+
+```
+Montre par la définition que lim aₙ = 2 pour aₙ = (2n² + 6)/(n² + 5) : simplifie |aₙ − 2|, majore-le par c/n², puis donne N(ε) tel que |aₙ − 2| ≤ ε pour tout n ≥ N(ε).
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; Majore 4/(n² + 5) par une expression simple c/n² : 1 ; Résous 4/n² ≤ ε en n : choisis N(ε). : 1)
+    [free, sans aide, suivre l'erreur]  |(2n² + 6)/(n² + 5) − 2|
+      = |2n² + 6 − 2(n² + 5)|/(n² + 5)   ← Réduire au même dénominateur
+      = 4/(n² + 5)   ← Simplifier
+    — Majore 4/(n² + 5) par une expression simple c/n² :  [juge equiv]  départ : 4/(n² + 5)
+      = 4/n²   ← Majorer : n² + 5 ≥ n²
+    — Résous 4/n² ≤ ε en n : choisis N(ε).  [juge delta]  départ : N
+      = √(4/ε)   ← 4/n² ≤ ε dès que n ≥ √(4/ε)
+      (Pour tout n ≥ N(ε) = √(4/ε), |aₙ − 2| ≤ 4/n² ≤ ε : lim aₙ = 2.)
+  pièges : g1_triangle_reverse
+
+Vrai ou faux ? « Une suite convergente n'atteint jamais sa limite. »
+  · Vrai [a1_limit_never_reached]   ✔ Faux
+  [examen tf]
+  pièges : a1_limit_never_reached
+
+```
+
+## Limites de suites : opérations et formes indéterminées (`a1-seq-limits`, BA1)
+
+_Terme dominant, quantité conjuguée, croissances comparées._
+
+### Niveau 1
+
+```
+Calcule la limite de la suite aₙ = √(n² − 2n + 3) − n.
+  [guided]  √(n² − 2n + 3) − n
+    (∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée √(…) + n.)
+    = (n² − 2n + 3 − n²)/(√(n² − 2n + 3) + n)   ← Multiplier et diviser par la quantité conjuguée √(…) + n
+    = (□)/(√(n² − 2n + 3) + n)   (trous : (−2n + 3)/(√(n² − 2n + 3) + n))   ← Simplifier : (√A)² − n² = A − n²
+    = (−2 + 3/n)/(√(1 − 2/n + 3/n²) + 1)   ← Diviser en haut et en bas par n
+    = −1   ← √(…) → 1 : la limite vaut −2/2
+  aides : ∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée √(…) + n. | = (n² − 2n + 3 − n²)/(√(n² − 2n + 3) + n) | (−2 + 3/n)/(√(1 − 2/n + 3/n²) + 1) → −1
+  pièges : g6_infinity_minus_infinity, a1_sqrt_sum_split
+
+Calcule la limite de la suite aₙ = (8n + 6)/(2n + 4).
+  [guided]  (8n + 6)/(2n + 4)
+    (∞/∞ : divise en haut et en bas par n, la plus grande puissance du dénominateur.)
+    = (8 + 6/n)/(□ + 4/n)   (trous : (8 + 6/n)/(2 + 4/n))   ← Diviser en haut et en bas par n
+    = 4   ← Les termes en 1/n tendent vers 0
+  aides : ∞/∞ : divise en haut et en bas par n, la plus grande puissance du dénominateur. | = (8 + 6/n)/(2 + 4/n) | (8 + 6/n)/(2 + 4/n) → 4
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+Calcule la limite de la suite aₙ = (−2n − 3)/(7n + 5).
+  [guided]  (−2n − 3)/(7n + 5)
+    (∞/∞ : divise en haut et en bas par n, la plus grande puissance du dénominateur.)
+    = (−2 − 3/n)/(□ + 5/n)   (trous : (−2 − 3/n)/(7 + 5/n))   ← Diviser en haut et en bas par n
+    = −2/7   ← Les termes en 1/n tendent vers 0
+  aides : ∞/∞ : divise en haut et en bas par n, la plus grande puissance du dénominateur. | = (−2 − 3/n)/(7 + 5/n) | (−2 − 3/n)/(7 + 5/n) → −2/7
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+```
+
+### Niveau 2
+
+```
+Calcule la limite de la suite aₙ = √(n² + 4n) − n.
+  [guided]  √(n² + 4n) − n
+    ? Quelle transformation ? ✔ Multiplier et diviser par la quantité conjuguée √(…) + n / · Mettre n en facteur : n·(√(1 + …) − 1)
+    = (n² + 4n − n²)/(√(n² + 4n) + n)   ← Multiplier et diviser par la quantité conjuguée √(…) + n
+    = 4n/(√(n² + 4n) + n)   ← Simplifier : (√A)² − n² = A − n²
+    = 4/(√(1 + 4/n) + 1)   ← Diviser en haut et en bas par n
+    = 2   ← √(…) → 1 : la limite vaut 4/2
+  aides : ∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée √(…) + n. | = (n² + 4n − n²)/(√(n² + 4n) + n) | 4/(√(1 + 4/n) + 1) → 2
+  pièges : g6_infinity_minus_infinity, a1_sqrt_sum_split
+
+Calcule la limite de la suite aₙ = (√(n + 6) − √n)·√(n + 3).
+  [guided]  (√(n + 6) − √n)·√(n + 3)
+    ? Quelle transformation ? ✔ Multiplier et diviser par √(n + a) + √n / · √(n + a) − √n → 0, donc le produit tend vers 0
+    = 6√(n + 3)/(√(n + 6) + √n)   ← Quantité conjuguée : (n + 6) − n = 6
+    = 6√(1 + 3/n)/(√(1 + 6/n) + 1)   ← Diviser en haut et en bas par √n
+    = 3   ← Les racines tendent vers 1
+  aides : ∞ − ∞ avec des racines : multiplie et divise √(n + a) − √n par √(n + a) + √n. | = 6√(n + 3)/(√(n + 6) + √n) | 6√(1 + 3/n)/(√(1 + 6/n) + 1) → 3
+  pièges : a1_sqrt_sum_split, a1_indet_inf_minus_inf
+
+Calcule la limite de la suite aₙ = (2n² − 1)/(7n³ − 5).
+  [guided]  (2n² − 1)/(7n³ − 5)
+    ? Quelle transformation ? ✔ Diviser en haut et en bas par n³ / · Multiplier par la quantité conjuguée
+    = (2/n − 1/n³)/(7 − 5/n³)   ← Diviser en haut et en bas par n³
+    = 0   ← Le numérateur tend vers 0, le dénominateur vers 7
+  aides : ∞/∞ : divise en haut et en bas par n³, la plus grande puissance du dénominateur. | = (2/n − 1/n³)/(7 − 5/n³) | (2/n − 1/n³)/(7 − 5/n³) → 0
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+```
+
+### Niveau 3
+
+```
+Calcule la limite de la suite aₙ = n^(1/n).
+  [tap, suivre l'erreur, menu steps]  n^(1/n)
+    = e^(ln(n)/n)   ← uᵛ = e^(v·ln u)
+    = 1   ← Croissances comparées : ln(n)/n → 0, et e⁰ = 1
+  aides : Une puissance variable : écris uᵛ = e^(v·ln u), puis cherche la limite de l'exposant. | = e^(ln(n)/n) | e^(ln(n)/n) → 1
+
+Calcule la limite de la suite aₙ = 6n²/(3n³ + 7n).
+  [tap, suivre l'erreur, menu steps]  6n²/(3n³ + 7n)
+    = (6/n)/(3 + 7/n²)   ← Diviser en haut et en bas par n³
+    = 0   ← Le numérateur tend vers 0, le dénominateur vers 3
+  aides : ∞/∞ : divise en haut et en bas par n³, la plus grande puissance du dénominateur. | = (6/n)/(3 + 7/n²) | (6/n)/(3 + 7/n²) → 0
+
+Calcule la limite de la suite aₙ = (√(n + 2) − √n)·√(n + 2).
+  [tap, suivre l'erreur, menu steps]  (√(n + 2) − √n)·√(n + 2)
+    = 2√(n + 2)/(√(n + 2) + √n)   ← Quantité conjuguée : (n + 2) − n = 2
+    = 2√(1 + 2/n)/(√(1 + 2/n) + 1)   ← Diviser en haut et en bas par √n
+    = 1   ← Les racines tendent vers 1
+  aides : ∞ − ∞ avec des racines : multiplie et divise √(n + a) − √n par √(n + a) + √n. | = 2√(n + 2)/(√(n + 2) + √n) | 2√(1 + 2/n)/(√(1 + 2/n) + 1) → 1
+  pièges : a1_sqrt_sum_split
+
+```
+
+### Niveau 4
+
+```
+Calcule la limite de la suite aₙ = (−2n + ln(n))/(5n + 6).
+  [free, suivre l'erreur]  (−2n + ln(n))/(5n + 6)
+    = (−2 + ln(n)/n)/(5 + 6/n)   ← Diviser en haut et en bas par n
+    = −2/5   ← Croissances comparées : ln(n)/n → 0
+  aides : ln n est négligeable devant n : divise en haut et en bas par n. | = (−2 + ln(n)/n)/(5 + 6/n) | (−2 + ln(n)/n)/(5 + 6/n) → −2/5
+  pièges : a1_bh_quotient_rule
+
+Calcule la limite de la suite aₙ = √(n² + 6n + 7) − n.
+  [free, suivre l'erreur]  √(n² + 6n + 7) − n
+    = (n² + 6n + 7 − n²)/(√(n² + 6n + 7) + n)   ← Multiplier et diviser par la quantité conjuguée √(…) + n
+    = (6n + 7)/(√(n² + 6n + 7) + n)   ← Simplifier : (√A)² − n² = A − n²
+    = (6 + 7/n)/(√(1 + 6/n + 7/n²) + 1)   ← Diviser en haut et en bas par n
+    = 3   ← √(…) → 1 : la limite vaut 6/2
+  aides : ∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée √(…) + n. | = (n² + 6n + 7 − n²)/(√(n² + 6n + 7) + n) | (6 + 7/n)/(√(1 + 6/n + 7/n²) + 1) → 3
+  pièges : g6_infinity_minus_infinity, a1_sqrt_sum_split
+
+Calcule la limite de la suite aₙ = (√(n + 6) − √n)·√(n + 4).
+  [free, suivre l'erreur]  (√(n + 6) − √n)·√(n + 4)
+    = 6√(n + 4)/(√(n + 6) + √n)   ← Quantité conjuguée : (n + 6) − n = 6
+    = 6√(1 + 4/n)/(√(1 + 6/n) + 1)   ← Diviser en haut et en bas par √n
+    = 3   ← Les racines tendent vers 1
+  aides : ∞ − ∞ avec des racines : multiplie et divise √(n + a) − √n par √(n + a) + √n. | = 6√(n + 4)/(√(n + 6) + √n) | 6√(1 + 4/n)/(√(1 + 6/n) + 1) → 3
+  pièges : a1_sqrt_sum_split
+
+```
+
+### Niveau 5
+
+```
+limn→+∞ (9n² − 5n)/(8n − 5) =
+  · 0   · 8/9   · 1   ✔ +∞
+
+Calcule la limite de la suite aₙ = (−6n + 6)/(4n³ − 1).
+  [free, sans aide]  (−6n + 6)/(4n³ − 1)
+    = (−6/n² + 6/n³)/(4 − 1/n³)   ← Diviser en haut et en bas par n³
+    = 0   ← Le numérateur tend vers 0, le dénominateur vers 4
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+limn→+∞ n^(1/n) =
+  · e   · +∞   · 0   ✔ 1
+
+```
+
+### Variantes d'examen
+
+```
+limn→+∞ root(3,n³+3n²+8) − n =
+  · 3   · 3/2   ✔ 1   · 0 [a1_indet_inf_minus_inf]
+  [examen mcq]
+  pièges : a1_indet_inf_minus_inf
+
+Vrai ou faux ?
+  « Si (aₙ) converge et (bₙ) est bornée, alors (aₙbₙ) converge. » → FAUX
+    contre-exemple (sequence) : a = 1, b = (-1)^n
+  [examen tf]
+
+```
+
+## Gendarmes : trouver les deux bornes (`a1-seq-squeeze`, BA1)
+
+_Minorer et majorer par deux suites de même limite._
+
+### Niveau 1
+
+```
+Calcule la limite de aₙ = ln(e^(3n) + n²)/(n + 5) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [guided]  ln(e^(3n) + n²)/(n + 5)
+    (Minorant donné : (3n)/(n + 5) ≤ aₙ pour tout n ≥ 1.)
+    = ln(2e^(3n))/(n + 5)   ← n² ≤ e^(3n) pour n ≥ 1
+    = (3n + □)/(n + 5)   (trous : (3n + ln(2))/(n + 5))   ← Log(2e^(3n)) = 3n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (3n)/(n + 5)
+    = 3/(1 + □)   (trous : 3/(1 + 5/n))   ← Diviser par n
+    = 3   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (3n + ln(2))/(n + 5)
+    = (3 + ln(2)/n)/(1 + □)   (trous : (3 + ln(2)/n)/(1 + 5/n))   ← Diviser par n
+    = 3   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    ? Que conclure pour aₙ ? ✔ aₙ est coincée entre deux suites qui tendent toutes deux vers 3 / · aₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · aₙ est bornée, donc elle converge
+    = 3   ← Gendarmes
+  aides : Coince ce qui est dans le Log : e^(3n) ≤ e^(3n) + n² ≤ 2e^(3n), puis Log est croissant. | ln(e^(3n))/(n + 5) ≤ aₙ ≤ ln(□·e^(3n))/(n + 5) | (3n)/(n + 5) ≤ aₙ ≤ (3n + ln(2))/(n + 5) : les deux bornes tendent vers 3.
+  pièges : g2_log_sum, a1_squeeze_wrong_direction, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+Calcule la limite de aₙ = (2n + 5cos(n))/(4n − 1) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [guided]  (2n + 5cos(n))/(4n − 1)
+    (Minorant donné : (2n − 5)/(4n − 1) ≤ aₙ pour tout n ≥ 1.)
+    = (□)/(4n − 1)   (trous : (2n + 5)/(4n − 1))   ← cos n ≤ 1
+  — Limite du minorant :  [juge limit]  départ : (2n − 5)/(4n − 1)
+    = (2 − □)/(4 − 1/n)   (trous : (2 − 5/n)/(4 − 1/n))   ← Diviser par n
+    = 1/2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (2n + 5)/(4n − 1)
+    = (2 + □)/(4 − 1/n)   (trous : (2 + 5/n)/(4 − 1/n))   ← Diviser par n
+    = 1/2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    ? Que conclure pour aₙ ? ✔ aₙ est coincée entre deux suites qui tendent toutes deux vers 1/2 / · aₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · aₙ est bornée, donc elle converge
+    = 1/2   ← Gendarmes
+  aides : −1 ≤ cos n ≤ 1, et le dénominateur est positif : remplace cos n par −1, puis par 1. | (2n − □)/(4n − 1) ≤ aₙ ≤ (2n + □)/(4n − 1) | (2n − 5)/(4n − 1) ≤ aₙ ≤ (2n + 5)/(4n − 1) : les deux bornes tendent vers 1/2.
+  pièges : a1_squeeze_wrong_direction, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+Calcule la limite de Sₙ = Σ_{k=1}^{n} (5n)/(2n² + k) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [guided]  Σ_{k=1}^{n} (5n)/(2n² + k)
+    (Minorant donné : (5n²)/(2n² + n) ≤ Sₙ pour tout n ≥ 1.)
+    = Σ_{k=1}^{n} (5n)/(2n² + 1)   ← Chaque terme est au plus le plus grand (k = 1)
+    = (5n²)/(□)   (trous : (5n²)/(2n² + 1))   ← Il y a n termes égaux
+  — Limite du minorant :  [juge limit]  départ : (5n²)/(2n² + n)
+    = 5/(2 + □)   (trous : 5/(2 + 1/n))   ← Diviser par n²
+    = 5/2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (5n²)/(2n² + 1)
+    = 5/(2 + □)   (trous : 5/(2 + 1/n²))   ← Diviser par n²
+    = 5/2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} S_n
+    ? Que conclure pour Sₙ ? ✔ Sₙ est coincée entre deux suites qui tendent toutes deux vers 5/2 / · Sₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · Sₙ est bornée, donc elle converge
+    = 5/2   ← Gendarmes
+  aides : Chaque terme est entre le plus petit (k = n) et le plus grand (k = 1). Il y a n termes. | n·(5n)/(2n² + □) ≤ Sₙ ≤ n·(5n)/(2n² + □) | (5n²)/(2n² + n) ≤ Sₙ ≤ (5n²)/(2n² + 1), et les deux bornes tendent vers 5/2.
+  pièges : g5_reindex_half, a1_squeeze_wrong_direction, a1_sum_n_terms_as_one, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+```
+
+### Niveau 2
+
+```
+Calcule la limite de aₙ = ln(e^(4n) + n³)/(4n + 3) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [guided]  ln(e^(4n) + n³)/(4n + 3)
+    ? Pour minorer <math alttext="ln(e^(4n) + n³)"><mrow><mi>ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup><mo>+</mo><msup><mrow><mi>n</mi></mrow><mn>3</mn></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math> : ✔ <math alttext="ln(e^(4n))"><mrow><mi>ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup><mo stretchy="false">)</mo></mrow></mrow></math>, en retirant <math alttext="n³"><msup><mrow><mi>n</mi></mrow><mn>3</mn></msup></math> ≥ 0 / · <math alttext="ln(2e^(4n))"><mrow><mi>ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, car <math alttext="n³"><msup><mrow><mi>n</mi></mrow><mn>3</mn></msup></math> ≤ <math alttext="e^(4n)"><msup><mrow><mi>e</mi></mrow><mrow><mn>4</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup></math>
+    = ln(e^(4n))/(4n + 3)   ← Log est croissant et n³ ≥ 0
+    = (□)/(4n + 3)   (trous : (4n)/(4n + 3))   ← Log(e^(4n)) = 4n
+  — Majore aₙ :  [juge equiv]  départ : ln(e^(4n) + n³)/(4n + 3)
+    = ln(2e^(4n))/(4n + 3)   ← n³ ≤ e^(4n) pour n ≥ 1
+    = (4n + □)/(4n + 3)   (trous : (4n + ln(2))/(4n + 3))   ← Log(2e^(4n)) = 4n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (4n)/(4n + 3)
+    = 4/(4 + 3/n)   ← Diviser par n
+    = 1   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (4n + ln(2))/(4n + 3)
+    = (4 + ln(2)/n)/(4 + 3/n)   ← Diviser par n
+    = 1   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    ? Que conclure pour aₙ ? ✔ aₙ est coincée entre deux suites qui tendent toutes deux vers 1 / · aₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · aₙ est bornée, donc elle converge
+    = 1   ← Gendarmes
+  aides : Coince ce qui est dans le Log : e^(4n) ≤ e^(4n) + n³ ≤ 2e^(4n), puis Log est croissant. | ln(e^(4n))/(4n + 3) ≤ aₙ ≤ ln(□·e^(4n))/(4n + 3) | (4n)/(4n + 3) ≤ aₙ ≤ (4n + ln(2))/(4n + 3) : les deux bornes tendent vers 1.
+  pièges : g2_log_sum, a1_squeeze_wrong_direction, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+Calcule la limite de Sₙ = Σ_{k=1}^{n} (5n)/(3n² + k) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [guided]  Σ_{k=1}^{n} (5n)/(3n² + k)
+    ? Pour minorer Sₙ, on remplace chaque terme par : ✔ le plus petit, <math alttext="(5n)/(3n² + n)"><mfrac><mrow><mn>5</mn><mo>&#x2062;</mo><mi>n</mi></mrow><mrow><mrow><mn>3</mn><mo>&#x2062;</mo><msup><mrow><mi>n</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mi>n</mi></mrow></mfrac></math> (k = n) / · le plus grand, <math alttext="(5n)/(3n² + 1)"><mfrac><mrow><mn>5</mn><mo>&#x2062;</mo><mi>n</mi></mrow><mrow><mrow><mn>3</mn><mo>&#x2062;</mo><msup><mrow><mi>n</mi></mrow><mn>2</mn></msup></mrow><mo>+</mo><mn>1</mn></mrow></mfrac></math> (k = 1)
+    = Σ_{k=1}^{n} (5n)/(3n² + n)   ← Chaque terme est au moins le plus petit (k = n)
+    = (5n²)/(□)   (trous : (5n²)/(3n² + n))   ← Il y a n termes égaux
+  — Majore Sₙ :  [juge equiv]  départ : Σ_{k=1}^{n} (5n)/(3n² + k)
+    = Σ_{k=1}^{n} (5n)/(3n² + 1)   ← Chaque terme est au plus le plus grand (k = 1)
+    = (5n²)/(□)   (trous : (5n²)/(3n² + 1))   ← Il y a n termes égaux
+  — Limite du minorant :  [juge limit]  départ : (5n²)/(3n² + n)
+    = 5/(3 + 1/n)   ← Diviser par n²
+    = 5/3   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (5n²)/(3n² + 1)
+    = 5/(3 + 1/n²)   ← Diviser par n²
+    = 5/3   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} S_n
+    ? Que conclure pour Sₙ ? ✔ Sₙ est coincée entre deux suites qui tendent toutes deux vers 5/3 / · Sₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · Sₙ est bornée, donc elle converge
+    = 5/3   ← Gendarmes
+  aides : Chaque terme est entre le plus petit (k = n) et le plus grand (k = 1). Il y a n termes. | n·(5n)/(3n² + □) ≤ Sₙ ≤ n·(5n)/(3n² + □) | (5n²)/(3n² + n) ≤ Sₙ ≤ (5n²)/(3n² + 1), et les deux bornes tendent vers 5/3.
+  pièges : g5_reindex_half, a1_squeeze_wrong_direction, a1_sum_n_terms_as_one, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+Calcule la limite de aₙ = ln(e^(3n) + n²)/(n + 5) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [guided]  ln(e^(3n) + n²)/(n + 5)
+    ? Pour minorer <math alttext="ln(e^(3n) + n²)"><mrow><mi>ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><msup><mrow><mi>e</mi></mrow><mrow><mn>3</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup><mo>+</mo><msup><mrow><mi>n</mi></mrow><mn>2</mn></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math> : ✔ <math alttext="ln(e^(3n))"><mrow><mi>ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>3</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup><mo stretchy="false">)</mo></mrow></mrow></math>, en retirant <math alttext="n²"><msup><mrow><mi>n</mi></mrow><mn>2</mn></msup></math> ≥ 0 / · <math alttext="ln(2e^(3n))"><mrow><mi>ln</mi><mo>&#x2061;</mo><mrow><mo stretchy="false">(</mo><mrow><mn>2</mn><mo>&#x2062;</mo><msup><mrow><mi>e</mi></mrow><mrow><mn>3</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup></mrow><mo stretchy="false">)</mo></mrow></mrow></math>, car <math alttext="n²"><msup><mrow><mi>n</mi></mrow><mn>2</mn></msup></math> ≤ <math alttext="e^(3n)"><msup><mrow><mi>e</mi></mrow><mrow><mn>3</mn><mo>&#x2062;</mo><mi>n</mi></mrow></msup></math>
+    = ln(e^(3n))/(n + 5)   ← Log est croissant et n² ≥ 0
+    = (□)/(n + 5)   (trous : (3n)/(n + 5))   ← Log(e^(3n)) = 3n
+  — Majore aₙ :  [juge equiv]  départ : ln(e^(3n) + n²)/(n + 5)
+    = ln(2e^(3n))/(n + 5)   ← n² ≤ e^(3n) pour n ≥ 1
+    = (3n + □)/(n + 5)   (trous : (3n + ln(2))/(n + 5))   ← Log(2e^(3n)) = 3n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (3n)/(n + 5)
+    = 3/(1 + 5/n)   ← Diviser par n
+    = 3   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (3n + ln(2))/(n + 5)
+    = (3 + ln(2)/n)/(1 + 5/n)   ← Diviser par n
+    = 3   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    ? Que conclure pour aₙ ? ✔ aₙ est coincée entre deux suites qui tendent toutes deux vers 3 / · aₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · aₙ est bornée, donc elle converge
+    = 3   ← Gendarmes
+  aides : Coince ce qui est dans le Log : e^(3n) ≤ e^(3n) + n² ≤ 2e^(3n), puis Log est croissant. | ln(e^(3n))/(n + 5) ≤ aₙ ≤ ln(□·e^(3n))/(n + 5) | (3n)/(n + 5) ≤ aₙ ≤ (3n + ln(2))/(n + 5) : les deux bornes tendent vers 3.
+  pièges : g2_log_sum, a1_squeeze_wrong_direction, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+```
+
+### Niveau 3
+
+```
+Calcule la limite de Sₙ = Σ_{k=1}^{n} (4n)/(2n² + k) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=1}^{n} (4n)/(2n² + k)
+    = Σ_{k=1}^{n} (4n)/(2n² + n)   ← Chaque terme est au moins le plus petit (k = n)
+    = (4n²)/(2n² + n)   ← Il y a n termes égaux
+  — Majore Sₙ :  [juge equiv]  départ : Σ_{k=1}^{n} (4n)/(2n² + k)
+    = Σ_{k=1}^{n} (4n)/(2n² + 1)   ← Chaque terme est au plus le plus grand (k = 1)
+    = (4n²)/(2n² + 1)   ← Il y a n termes égaux
+  — Limite du minorant :  [juge limit]  départ : (4n²)/(2n² + n)
+    = 4/(2 + 1/n)   ← Diviser par n²
+    = 2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (4n²)/(2n² + 1)
+    = 4/(2 + 1/n²)   ← Diviser par n²
+    = 2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} S_n
+    ? Que conclure pour Sₙ ? ✔ Sₙ est coincée entre deux suites qui tendent toutes deux vers 2 / · Sₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · Sₙ est bornée, donc elle converge
+    = 2   ← Gendarmes
+  aides : Chaque terme est entre le plus petit (k = n) et le plus grand (k = 1). Il y a n termes. | n·(4n)/(2n² + □) ≤ Sₙ ≤ n·(4n)/(2n² + □) | (4n²)/(2n² + n) ≤ Sₙ ≤ (4n²)/(2n² + 1), et les deux bornes tendent vers 2.
+  pièges : g5_reindex_half, a1_squeeze_wrong_direction, a1_sum_n_terms_as_one, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+Calcule la limite de Sₙ = Σ_{k=1}^{n} (2n)/(n² + k) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=1}^{n} (2n)/(n² + k)
+    = Σ_{k=1}^{n} (2n)/(n² + n)   ← Chaque terme est au moins le plus petit (k = n)
+    = (2n²)/(n² + n)   ← Il y a n termes égaux
+  — Majore Sₙ :  [juge equiv]  départ : Σ_{k=1}^{n} (2n)/(n² + k)
+    = Σ_{k=1}^{n} (2n)/(n² + 1)   ← Chaque terme est au plus le plus grand (k = 1)
+    = (2n²)/(n² + 1)   ← Il y a n termes égaux
+  — Limite du minorant :  [juge limit]  départ : (2n²)/(n² + n)
+    = 2/(1 + 1/n)   ← Diviser par n²
+    = 2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (2n²)/(n² + 1)
+    = 2/(1 + 1/n²)   ← Diviser par n²
+    = 2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} S_n
+    ? Que conclure pour Sₙ ? ✔ Sₙ est coincée entre deux suites qui tendent toutes deux vers 2 / · Sₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · Sₙ est bornée, donc elle converge
+    = 2   ← Gendarmes
+  aides : Chaque terme est entre le plus petit (k = n) et le plus grand (k = 1). Il y a n termes. | n·(2n)/(n² + □) ≤ Sₙ ≤ n·(2n)/(n² + □) | (2n²)/(n² + n) ≤ Sₙ ≤ (2n²)/(n² + 1), et les deux bornes tendent vers 2.
+  pièges : g5_reindex_half, a1_squeeze_wrong_direction, a1_sum_n_terms_as_one, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+Calcule la limite de aₙ = (3n + 5sin(n))/(2n − 1) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [tap, suivre l'erreur, menu steps]  (3n + 5sin(n))/(2n − 1)
+    = (3n − 5)/(2n − 1)   ← sin n ≥ −1 (et 2n − 1 > 0)
+  — Majore aₙ :  [juge equiv]  départ : (3n + 5sin(n))/(2n − 1)
+    = (3n + 5)/(2n − 1)   ← sin n ≤ 1
+  — Limite du minorant :  [juge limit]  départ : (3n − 5)/(2n − 1)
+    = (3 − 5/n)/(2 − 1/n)   ← Diviser par n
+    = 3/2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (3n + 5)/(2n − 1)
+    = (3 + 5/n)/(2 − 1/n)   ← Diviser par n
+    = 3/2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    ? Que conclure pour aₙ ? ✔ aₙ est coincée entre deux suites qui tendent toutes deux vers 3/2 / · aₙ est entre deux suites convergentes : elle converge, même si leurs limites diffèrent / · aₙ est bornée, donc elle converge
+    = 3/2   ← Gendarmes
+  aides : −1 ≤ sin n ≤ 1, et le dénominateur est positif : remplace sin n par −1, puis par 1. | (3n − □)/(2n − 1) ≤ aₙ ≤ (3n + □)/(2n − 1) | (3n − 5)/(2n − 1) ≤ aₙ ≤ (3n + 5)/(2n − 1) : les deux bornes tendent vers 3/2.
+  pièges : a1_squeeze_wrong_direction, a1_squeeze_different_limits, a1_bounded_implies_convergent
+
+```
+
+### Niveau 4
+
+```
+Calcule la limite de aₙ = ln(e^(3n) + n²)/(2n + 4) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [free, suivre l'erreur]  ln(e^(3n) + n²)/(2n + 4)
+    = ln(e^(3n))/(2n + 4)   ← Log est croissant et n² ≥ 0
+    = (3n)/(2n + 4)   ← Log(e^(3n)) = 3n
+  — Majore aₙ :  [juge equiv]  départ : ln(e^(3n) + n²)/(2n + 4)
+    = ln(2e^(3n))/(2n + 4)   ← n² ≤ e^(3n) pour n ≥ 1
+    = (3n + ln(2))/(2n + 4)   ← Log(2e^(3n)) = 3n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (3n)/(2n + 4)
+    = 3/(2 + 4/n)   ← Diviser par n
+    = 3/2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (3n + ln(2))/(2n + 4)
+    = (3 + ln(2)/n)/(2 + 4/n)   ← Diviser par n
+    = 3/2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    = 3/2   ← Gendarmes
+  aides : Coince ce qui est dans le Log : e^(3n) ≤ e^(3n) + n² ≤ 2e^(3n), puis Log est croissant. | ln(e^(3n))/(2n + 4) ≤ aₙ ≤ ln(□·e^(3n))/(2n + 4) | (3n)/(2n + 4) ≤ aₙ ≤ (3n + ln(2))/(2n + 4) : les deux bornes tendent vers 3/2.
+  pièges : g2_log_sum, a1_squeeze_wrong_direction
+
+Calcule la limite de aₙ = ln(e^(3n) + n)/(n + 2) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [free, suivre l'erreur]  ln(e^(3n) + n)/(n + 2)
+    = ln(e^(3n))/(n + 2)   ← Log est croissant et n ≥ 0
+    = (3n)/(n + 2)   ← Log(e^(3n)) = 3n
+  — Majore aₙ :  [juge equiv]  départ : ln(e^(3n) + n)/(n + 2)
+    = ln(2e^(3n))/(n + 2)   ← n ≤ e^(3n) pour n ≥ 1
+    = (3n + ln(2))/(n + 2)   ← Log(2e^(3n)) = 3n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (3n)/(n + 2)
+    = 3/(1 + 2/n)   ← Diviser par n
+    = 3   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (3n + ln(2))/(n + 2)
+    = (3 + ln(2)/n)/(1 + 2/n)   ← Diviser par n
+    = 3   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    = 3   ← Gendarmes
+  aides : Coince ce qui est dans le Log : e^(3n) ≤ e^(3n) + n ≤ 2e^(3n), puis Log est croissant. | ln(e^(3n))/(n + 2) ≤ aₙ ≤ ln(□·e^(3n))/(n + 2) | (3n)/(n + 2) ≤ aₙ ≤ (3n + ln(2))/(n + 2) : les deux bornes tendent vers 3.
+  pièges : g2_log_sum, a1_squeeze_wrong_direction
+
+Calcule la limite de aₙ = (2n + 2cos(n))/(4n + 3) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [free, suivre l'erreur]  (2n + 2cos(n))/(4n + 3)
+    = (2n − 2)/(4n + 3)   ← cos n ≥ −1 (et 4n + 3 > 0)
+  — Majore aₙ :  [juge equiv]  départ : (2n + 2cos(n))/(4n + 3)
+    = (2n + 2)/(4n + 3)   ← cos n ≤ 1
+  — Limite du minorant :  [juge limit]  départ : (2n − 2)/(4n + 3)
+    = (2 − 2/n)/(4 + 3/n)   ← Diviser par n
+    = 1/2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (2n + 2)/(4n + 3)
+    = (2 + 2/n)/(4 + 3/n)   ← Diviser par n
+    = 1/2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    = 1/2   ← Gendarmes
+  aides : −1 ≤ cos n ≤ 1, et le dénominateur est positif : remplace cos n par −1, puis par 1. | (2n − □)/(4n + 3) ≤ aₙ ≤ (2n + □)/(4n + 3) | (2n − 2)/(4n + 3) ≤ aₙ ≤ (2n + 2)/(4n + 3) : les deux bornes tendent vers 1/2.
+  pièges : a1_squeeze_wrong_direction
+
+```
+
+### Niveau 5
+
+```
+Calcule la limite de aₙ = ln(e^(2n) + n²)/(3n + 4) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [free, sans aide]  ln(e^(2n) + n²)/(3n + 4)
+    = ln(e^(2n))/(3n + 4)   ← Log est croissant et n² ≥ 0
+    = (2n)/(3n + 4)   ← Log(e^(2n)) = 2n
+  — Majore aₙ :  [juge equiv]  départ : ln(e^(2n) + n²)/(3n + 4)
+    = ln(2e^(2n))/(3n + 4)   ← n² ≤ e^(2n) pour n ≥ 1
+    = (2n + ln(2))/(3n + 4)   ← Log(2e^(2n)) = 2n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (2n)/(3n + 4)
+    = 2/(3 + 4/n)   ← Diviser par n
+    = 2/3   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (2n + ln(2))/(3n + 4)
+    = (2 + ln(2)/n)/(3 + 4/n)   ← Diviser par n
+    = 2/3   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    = 2/3   ← Gendarmes
+  pièges : g2_log_sum, a1_squeeze_wrong_direction
+
+Calcule la limite de aₙ = ln(e^(2n) + n)/(n + 3) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [free, sans aide]  ln(e^(2n) + n)/(n + 3)
+    = ln(e^(2n))/(n + 3)   ← Log est croissant et n ≥ 0
+    = (2n)/(n + 3)   ← Log(e^(2n)) = 2n
+  — Majore aₙ :  [juge equiv]  départ : ln(e^(2n) + n)/(n + 3)
+    = ln(2e^(2n))/(n + 3)   ← n ≤ e^(2n) pour n ≥ 1
+    = (2n + ln(2))/(n + 3)   ← Log(2e^(2n)) = 2n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (2n)/(n + 3)
+    = 2/(1 + 3/n)   ← Diviser par n
+    = 2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (2n + ln(2))/(n + 3)
+    = (2 + ln(2)/n)/(1 + 3/n)   ← Diviser par n
+    = 2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    = 2   ← Gendarmes
+  pièges : g2_log_sum, a1_squeeze_wrong_direction
+
+Calcule la limite de aₙ = ln(e^(2n) + n)/(4n + 5) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [free, sans aide]  ln(e^(2n) + n)/(4n + 5)
+    = ln(e^(2n))/(4n + 5)   ← Log est croissant et n ≥ 0
+    = (2n)/(4n + 5)   ← Log(e^(2n)) = 2n
+  — Majore aₙ :  [juge equiv]  départ : ln(e^(2n) + n)/(4n + 5)
+    = ln(2e^(2n))/(4n + 5)   ← n ≤ e^(2n) pour n ≥ 1
+    = (2n + ln(2))/(4n + 5)   ← Log(2e^(2n)) = 2n + Log 2
+  — Limite du minorant :  [juge limit]  départ : (2n)/(4n + 5)
+    = 2/(4 + 5/n)   ← Diviser par n
+    = 1/2   ← Passer à la limite
+  — Limite du majorant :  [juge limit]  départ : (2n + ln(2))/(4n + 5)
+    = (2 + ln(2)/n)/(4 + 5/n)   ← Diviser par n
+    = 1/2   ← Passer à la limite
+  — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+    = 1/2   ← Gendarmes
+  pièges : g2_log_sum, a1_squeeze_wrong_direction
+
+```
+
+### Variantes d'examen
+
+```
+Pour calculer la limite de aₙ = ln(e^(4n) + n)/(4n + 1), quel encadrement (pour tout n ≥ 1) permet de conclure par les gendarmes ?
+  · 0 ≤ aₙ ≤ (4n + ln(2))/(4n + 1) [a1_squeeze_different_limits]   · aₙ ≤ (4n + ln(2))/(4n + 1) suffit : le majorant tend vers 1   · (4n + ln(2))/(4n + 1) ≤ aₙ ≤ (4n)/(4n + 1) [a1_squeeze_wrong_direction]   ✔ (4n)/(4n + 1) ≤ aₙ ≤ (4n + ln(2))/(4n + 1)
+  [examen mcq]
+  pièges : a1_squeeze_wrong_direction, a1_squeeze_different_limits
+
+Vrai ou faux ?
+  « Si 0 < bₙ < cₙ pour tout n et si (cₙ) converge, alors (bₙ) converge. » → FAUX
+    contre-exemple (sequence) : b = (2+(-1)^n)/4, c = 1
+  [examen tf]
+  pièges : a1_bounded_implies_convergent
+
+Calcule la limite de aₙ = (2n + 5cos(n))/(3n + 2) par les gendarmes : minore, majore, puis passe à la limite des deux bornes.
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 0,5 ; Majore aₙ : 0,5 ; Limite du minorant : 0,5 ; Limite du majorant : 0,5 ; Conclusion : 0)
+    [free, sans aide, suivre l'erreur, examen open]  (2n + 5cos(n))/(3n + 2)
+      = (2n − 5)/(3n + 2)   ← cos n ≥ −1 (et 3n + 2 > 0)
+    — Majore aₙ :  [juge equiv]  départ : (2n + 5cos(n))/(3n + 2)
+      = (2n + 5)/(3n + 2)   ← cos n ≤ 1
+    — Limite du minorant :  [juge limit]  départ : (2n − 5)/(3n + 2)
+      = (2 − 5/n)/(3 + 2/n)   ← Diviser par n
+      = 2/3   ← Passer à la limite
+    — Limite du majorant :  [juge limit]  départ : (2n + 5)/(3n + 2)
+      = (2 + 5/n)/(3 + 2/n)   ← Diviser par n
+      = 2/3   ← Passer à la limite
+    — Conclusion :  [juge value]  départ : lim_{n→∞} a_n
+      = 2/3   ← Gendarmes
+  pièges : a1_squeeze_wrong_direction
+
+```
+
+## Formes 1^∞ : écrire e^(n·Log(…)) (`a1-seq-1inf`, BA1)
+
+_uₙ^(vₙ) = e^(vₙ·Log uₙ), puis Log(1 + h) ≈ h._
+
+### Niveau 1
+
+```
+Calcule lim_{n→∞} ((n − 1)/(n − 2))^(3n).
+  [guided]  3n·ln((n − 1)/(n − 2))
+    (Forme exponentielle : ((n − 1)/(n − 2))^(3n) = e^(3n·ln((n − 1)/(n − 2))).)
+    = 3n·ln(1 + □)   (trous : 3n·ln(1 + 1/(n − 2)))   ← Faire apparaître 1 + h, avec h → 0
+    = 3n·(1)/(n − 2)   ← Log(1 + h) = h + h·ε(h)
+    = □   (trous : 3)   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : ((n − 1)/(n − 2))^(3n)
+    ? L'exposant tend vers 3. Donc la suite tend vers : ✔ <math alttext="e³"><msup><mrow><mi>e</mi></mrow><mn>3</mn></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 3, la limite de l'exposant
+    = e³   ← Continuité de exp
+  aides : Base → 1, exposant → ∞ : passe en e^(3n·Log(…)) et écris la base 1 + h. | (n − 1)/(n − 2) = 1 + □/(n − 2) | 3n·ln(1 + 1/(n − 2)) ~ 3n·(1)/(n − 2) → 3
+  pièges : a1_indet_one_inf
+
+Calcule lim_{n→∞} ((n + 1)/(n − 2))^(2n).
+  [guided]  2n·ln((n + 1)/(n − 2))
+    (Forme exponentielle : ((n + 1)/(n − 2))^(2n) = e^(2n·ln((n + 1)/(n − 2))).)
+    = 2n·ln(1 + □)   (trous : 2n·ln(1 + 3/(n − 2)))   ← Faire apparaître 1 + h, avec h → 0
+    = 2n·(3)/(n − 2)   ← Log(1 + h) = h + h·ε(h)
+    = □   (trous : 6)   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : ((n + 1)/(n − 2))^(2n)
+    ? L'exposant tend vers 6. Donc la suite tend vers : ✔ <math alttext="e⁶"><msup><mrow><mi>e</mi></mrow><mn>6</mn></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 6, la limite de l'exposant
+    = e⁶   ← Continuité de exp
+  aides : Base → 1, exposant → ∞ : passe en e^(2n·Log(…)) et écris la base 1 + h. | (n + 1)/(n − 2) = 1 + □/(n − 2) | 2n·ln(1 + 3/(n − 2)) ~ 2n·(3)/(n − 2) → 6
+  pièges : a1_indet_one_inf
+
+Calcule lim_{n→∞} ((5n + 1)/(5n))^n.
+  [guided]  n·ln((5n + 1)/(5n))
+    (Forme exponentielle : ((5n + 1)/(5n))^n = e^(n·ln((5n + 1)/(5n))).)
+    = n·ln(1 + □)   (trous : n·ln(1 + 1/(5n)))   ← Faire apparaître 1 + h, h = 1/(5n)
+    = n·1/(5n)   ← Log(1 + h) = h + h·ε(h)
+    = □   (trous : 1/5)   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : ((5n + 1)/(5n))^n
+    ? L'exposant tend vers 1/5. Donc la suite tend vers : ✔ <math alttext="e^(1/5)"><msup><mrow><mi>e</mi></mrow><mfrac><mn>1</mn><mn>5</mn></mfrac></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 1/5, la limite de l'exposant
+    = e^(1/5)   ← Continuité de exp
+  aides : Base → 1, exposant → ∞ : passe en e^(n·Log(…)). | (5n + 1)/(5n) = 1 + □ | n·ln(1 + 1/(5n)) ~ n·1/(5n) = 1/5
+  pièges : a1_indet_one_inf
+
+```
+
+### Niveau 2
+
+```
+Calcule lim_{n→∞} ((n)/(n − 1))^n.
+  [guided]  ((n)/(n − 1))^n
+    = e^(n·ln((n)/(n − 1)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : n·ln((n)/(n − 1))
+    = n·ln(1 + 1/(n − 1))   ← Faire apparaître 1 + h, avec h → 0
+    = n·(1)/(n − 1)   ← Log(1 + h) = h + h·ε(h)
+    = □   (trous : 1)   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : ((n)/(n − 1))^n
+    ? L'exposant tend vers 1. Donc la suite tend vers : ✔ <math alttext="e"><mi>e</mi></math>, par continuité de exp / · 1, car la base tend vers 1 / · 1, la limite de l'exposant
+    = e   ← Continuité de exp
+  aides : Base → 1, exposant → ∞ : passe en e^(n·Log(…)) et écris la base 1 + h. | (n)/(n − 1) = 1 + □/(n − 1) | n·ln(1 + 1/(n − 1)) ~ n·(1)/(n − 1) → 1
+  pièges : a1_indet_one_inf
+
+Calcule lim_{n→∞} (1 + (1 + 1/n)/(5n))^(3n).
+  [guided]  (1 + (1 + 1/n)/(5n))^(3n)
+    = e^(3n·ln(1 + (1 + 1/n)/(5n)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : 3n·ln(1 + (1 + 1/n)/(5n))
+    = 3n·(1 + 1/n)/(5n)   ← Log(1 + h) = h + h·ε(h), h → 0
+    = 3(1 + 1/n)/5   ← Simplifier par n
+    = □   (trous : 3/5)   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : (1 + (1 + 1/n)/(5n))^(3n)
+    ? L'exposant tend vers 3/5. Donc la suite tend vers : ✔ <math alttext="e^(3/5)"><msup><mrow><mi>e</mi></mrow><mfrac><mn>3</mn><mn>5</mn></mfrac></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 3/5, la limite de l'exposant
+    = e^(3/5)   ← Continuité de exp
+  aides : h = (1 + 1/n)/(5n) → 0 : passe en exponentielle, puis Log(1 + h) ≈ h. | 3n·ln(1 + (1 + 1/n)/(5n)) ~ 3n·□ | 3n·(1 + 1/n)/(5n) → 3/5
+  pièges : a1_indet_one_inf
+
+Calcule lim_{n→∞} (1 + (1 + 1/n)/(6n))^n.
+  [guided]  (1 + (1 + 1/n)/(6n))^n
+    = e^(n·ln(1 + (1 + 1/n)/(6n)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : n·ln(1 + (1 + 1/n)/(6n))
+    = n·(1 + 1/n)/(6n)   ← Log(1 + h) = h + h·ε(h), h → 0
+    = (1 + 1/n)/6   ← Simplifier par n
+    = □   (trous : 1/6)   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : (1 + (1 + 1/n)/(6n))^n
+    ? L'exposant tend vers 1/6. Donc la suite tend vers : ✔ <math alttext="e^(1/6)"><msup><mrow><mi>e</mi></mrow><mfrac><mn>1</mn><mn>6</mn></mfrac></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 1/6, la limite de l'exposant
+    = e^(1/6)   ← Continuité de exp
+  aides : h = (1 + 1/n)/(6n) → 0 : passe en exponentielle, puis Log(1 + h) ≈ h. | n·ln(1 + (1 + 1/n)/(6n)) ~ n·□ | n·(1 + 1/n)/(6n) → 1/6
+  pièges : a1_indet_one_inf
+
+```
+
+### Niveau 3
+
+```
+Calcule lim_{n→∞} ((5n + 1)/(5n))^n.
+  [tap, suivre l'erreur, menu steps]  ((5n + 1)/(5n))^n
+    = e^(n·ln((5n + 1)/(5n)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : n·ln((5n + 1)/(5n))
+    = n·ln(1 + 1/(5n))   ← Faire apparaître 1 + h, h = 1/(5n)
+    = n·1/(5n)   ← Log(1 + h) = h + h·ε(h)
+    = 1/5   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : ((5n + 1)/(5n))^n
+    ? L'exposant tend vers 1/5. Donc la suite tend vers : ✔ <math alttext="e^(1/5)"><msup><mrow><mi>e</mi></mrow><mfrac><mn>1</mn><mn>5</mn></mfrac></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 1/5, la limite de l'exposant
+    = e^(1/5)   ← Continuité de exp
+  aides : Base → 1, exposant → ∞ : passe en e^(n·Log(…)). | (5n + 1)/(5n) = 1 + □ | n·ln(1 + 1/(5n)) ~ n·1/(5n) = 1/5
+  pièges : a1_indet_one_inf
+
+Calcule lim_{n→∞} (1 + 1/n − 3/n²)^(3n).
+  [tap, suivre l'erreur, menu steps]  (1 + 1/n − 3/n²)^(3n)
+    = e^(3n·ln(1 + 1/n − 3/n²))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : 3n·ln(1 + 1/n − 3/n²)
+    = 3n·(1/n − 3/n²)   ← Log(1 + h) = h + h·ε(h), h → 0
+    = 3 − 9/n   ← Développer
+    = 3   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : (1 + 1/n − 3/n²)^(3n)
+    ? L'exposant tend vers 3. Donc la suite tend vers : ✔ <math alttext="e³"><msup><mrow><mi>e</mi></mrow><mn>3</mn></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 3, la limite de l'exposant
+    = e³   ← Continuité de exp
+  aides : La base est déjà 1 + h avec h = 1/n − 3/n² → 0 : passe en exponentielle et remplace Log(1 + h) par h. | 3n·ln(1 + 1/n − 3/n²) ~ 3n·(□) | 3n·(1/n − 3/n²) = 3 − 9/n → 3
+  pièges : a1_indet_one_inf
+
+Calcule lim_{n→∞} ((9n + 1)/(9n))^n.
+  [tap, suivre l'erreur, menu steps]  ((9n + 1)/(9n))^n
+    = e^(n·ln((9n + 1)/(9n)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : n·ln((9n + 1)/(9n))
+    = n·ln(1 + 1/(9n))   ← Faire apparaître 1 + h, h = 1/(9n)
+    = n·1/(9n)   ← Log(1 + h) = h + h·ε(h)
+    = 1/9   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : ((9n + 1)/(9n))^n
+    ? L'exposant tend vers 1/9. Donc la suite tend vers : ✔ <math alttext="e^(1/9)"><msup><mrow><mi>e</mi></mrow><mfrac><mn>1</mn><mn>9</mn></mfrac></msup></math>, par continuité de exp / · 1, car la base tend vers 1 / · 1/9, la limite de l'exposant
+    = e^(1/9)   ← Continuité de exp
+  aides : Base → 1, exposant → ∞ : passe en e^(n·Log(…)). | (9n + 1)/(9n) = 1 + □ | n·ln(1 + 1/(9n)) ~ n·1/(9n) = 1/9
+  pièges : a1_indet_one_inf
+
+```
+
+### Niveau 4
+
+```
+Calcule lim_{n→∞} e^(n²·ln(1 + 1/n) − n). Tout est déjà en exponentielle : étudie l'exposant.
+  [free, suivre l'erreur]  n²·ln(1 + 1/n) − n
+    = n²·(1/n − 1/(2n²)) − n   ← Log(1 + h) = h − h²/2 + h²·ε(h) : l'ordre 2 est nécessaire
+    = −1/2   ← Simplifier
+  — Conclusion :  [juge limit]  départ : e^(n²·ln(1 + 1/n) − n)
+    = e^(−1/2)   ← Continuité de exp
+  aides : À l'ordre 1, n²·(1/n) − n = 0 ne dit rien : il faut Log(1 + h) = h − h²/2 + h²·ε(h). | n²·(1/n − □) − n | n²·(1/n − 1/(2n²)) − n = −1/2
+  pièges : g6_infinity_minus_infinity
+
+Calcule lim_{n→∞} e^(n²·ln(1 + 1/n) − n). Tout est déjà en exponentielle : étudie l'exposant.
+  [free, suivre l'erreur]  n²·ln(1 + 1/n) − n
+    = n²·(1/n − 1/(2n²)) − n   ← Log(1 + h) = h − h²/2 + h²·ε(h) : l'ordre 2 est nécessaire
+    = −1/2   ← Simplifier
+  — Conclusion :  [juge limit]  départ : e^(n²·ln(1 + 1/n) − n)
+    = e^(−1/2)   ← Continuité de exp
+  aides : À l'ordre 1, n²·(1/n) − n = 0 ne dit rien : il faut Log(1 + h) = h − h²/2 + h²·ε(h). | n²·(1/n − □) − n | n²·(1/n − 1/(2n²)) − n = −1/2
+  pièges : g6_infinity_minus_infinity
+
+Calcule lim_{n→∞} ((n)/(n − 3))^n.
+  [free, suivre l'erreur]  ((n)/(n − 3))^n
+    = e^(n·ln((n)/(n − 3)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : n·ln((n)/(n − 3))
+    = n·ln(1 + 3/(n − 3))   ← Faire apparaître 1 + h, avec h → 0
+    = n·(3)/(n − 3)   ← Log(1 + h) = h + h·ε(h)
+    = 3   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : ((n)/(n − 3))^n
+    = e³   ← Continuité de exp
+  aides : Base → 1, exposant → ∞ : passe en e^(n·Log(…)) et écris la base 1 + h. | (n)/(n − 3) = 1 + □/(n − 3) | n·ln(1 + 3/(n − 3)) ~ n·(3)/(n − 3) → 3
+
+```
+
+### Niveau 5
+
+```
+Calcule lim_{n→∞} (1 + (1 + 1/n)/(3n))^(4n).
+  [free, sans aide]  (1 + (1 + 1/n)/(3n))^(4n)
+    = e^(4n·ln(1 + (1 + 1/n)/(3n)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : 4n·ln(1 + (1 + 1/n)/(3n))
+    = 4n·(1 + 1/n)/(3n)   ← Log(1 + h) = h + h·ε(h), h → 0
+    = 4(1 + 1/n)/3   ← Simplifier par n
+    = 4/3   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : (1 + (1 + 1/n)/(3n))^(4n)
+    = e^(4/3)   ← Continuité de exp
+
+Calcule lim_{n→∞} (1 + 1/n − 1/n²)^(2n).
+  [free, sans aide]  (1 + 1/n − 1/n²)^(2n)
+    = e^(2n·ln(1 + 1/n − 1/n²))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : 2n·ln(1 + 1/n − 1/n²)
+    = 2n·(1/n − 1/n²)   ← Log(1 + h) = h + h·ε(h), h → 0
+    = 2 − 2/n   ← Développer
+    = 2   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : (1 + 1/n − 1/n²)^(2n)
+    = e²   ← Continuité de exp
+
+Calcule lim_{n→∞} (1 + (5 + 1/n)/(4n))^n.
+  [free, sans aide]  (1 + (5 + 1/n)/(4n))^n
+    = e^(n·ln(1 + (5 + 1/n)/(4n)))   ← uᵛ = e^(v·Log u)
+  — Limite de l'exposant :  [juge limit]  départ : n·ln(1 + (5 + 1/n)/(4n))
+    = n·(5 + 1/n)/(4n)   ← Log(1 + h) = h + h·ε(h), h → 0
+    = (5 + 1/n)/4   ← Simplifier par n
+    = 5/4   ← Limite de l'exposant
+  — Conclusion :  [juge limit]  départ : (1 + (5 + 1/n)/(4n))^n
+    = e^(5/4)   ← Continuité de exp
+
+```
+
+### Variantes d'examen
+
+```
+lim_{n→∞} (1 + (5 + 1/n)/(6n))^(3n) =
+  · +∞   · e^(−5/2)   · 1 [a1_indet_one_inf]   ✔ e^(5/2)
+  [examen mcq]
+  pièges : a1_indet_one_inf
+
+Vrai ou faux ?
+  « Si uₙ → 1 et n(uₙ − 1) → c, alors uₙⁿ → eᶜ. » → VRAI
+  [examen tf]
+
+```
+
+## Critère de d'Alembert pour les suites (`a1-seq-ratio`, BA1)
+
+_|aₙ₊₁/aₙ| → q < 1 : aₙ → 0 ; q > 1 : |aₙ| → +∞._
+
+### Niveau 1
+
+```
+Soit aₙ = (6^n(n!)²)/(2n)!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [guided]  ((6^(n + 1)((n + 1)!)²)/(2n + 2)!)/((6^n(n!)²)/(2n)!)
+    = (6^(n + 1)((n + 1)!)²(2n)!)/((2n + 2)!·6^n(n!)²)   ← Former le rapport
+    = (6(n + 1)²)/(□)   (trous : (6(n + 1)²)/((2n + 2)(2n + 1)))   ← Simplifier les factorielles et les puissances
+  — Limite du rapport :  [juge limit]  départ : (6(n + 1))/(4n + 2)
+    = (6(1 + 1/n))/(4 + 2/n)   ← Diviser par n
+    = □   (trous : 3/2)   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : (6^n(n!)²)/(2n)!
+    ? Le rapport tend vers q = 3/2. Que conclure ? · q < 1 : aₙ → 0 / ✔ q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = ∞   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (2n + 2)!/(2n)! = □ | aₙ₊₁/aₙ = (6(n + 1))/(4n + 2) → 3/2
+  pièges : g2_exp_sum, a1_factorial_ratio
+
+Soit aₙ = (2n)!/3^(n²). Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [guided]  ((2n + 2)!/3^((n + 1)²))/((2n)!/3^(n²))
+    = ((2n + 2)!·3^(n²))/(3^((n + 1)²)(2n)!)   ← Former le rapport
+    = (□)/3^(2n + 1)   (trous : ((2n + 2)(2n + 1))/3^(2n + 1))   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : ((2n + 2)(2n + 1))/3^(2n + 1)
+    = □   (trous : 0)   ← Croissances comparées : l'exponentielle l'emporte
+  — Conclusion :  [juge limit]  départ : (2n)!/3^(n²)
+    ? Le rapport tend vers q = 0. Que conclure ? ✔ q < 1 : aₙ → 0 / · q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (2n + 2)!/(2n)! = □ | aₙ₊₁/aₙ = ((2n + 2)(2n + 1))/3^(2n + 1) → 0
+  pièges : a1_factorial_ratio
+
+Soit aₙ = (n²·7^n)/n!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [guided]  (((n + 1)²·7^(n + 1))/(n + 1)!)/((n²·7^n)/n!)
+    = (7^(n + 1)(n + 1)²·n!)/((n + 1)!·7^n·n²)   ← Former le rapport
+    = (7(n + 1)²)/(□)   (trous : (7(n + 1)²)/((n + 1)n²))   ← Simplifier les factorielles et les puissances
+  — Limite du rapport :  [juge limit]  départ : (7(n + 1))/n²
+    = (7(1 + 1/n))/n   ← Diviser par la plus grande puissance
+    = □   (trous : 0)   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : (n²·7^n)/n!
+    ? Le rapport tend vers q = 0. Que conclure ? ✔ q < 1 : aₙ → 0 / · q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (n + 1)!/n! = □ | aₙ₊₁/aₙ = (7(n + 1))/n² → 0
+  pièges : g2_exp_sum
+
+```
+
+### Niveau 2
+
+```
+Soit aₙ = 6^n/n!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [guided]  (6^(n + 1)/(n + 1)!)/(6^n/n!)
+    ? (n + 1)!/n! = ✔ n + 1 / · n! / · 1
+    = (6^(n + 1)·n!)/((n + 1)!·6^n)   ← Former le rapport
+    = 6/(n + 1)   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : 6/(n + 1)
+    = □   (trous : 0)   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : 6^n/n!
+    ? Le rapport tend vers q = 0. Que conclure ? ✔ q < 1 : aₙ → 0 / · q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (n + 1)!/n! = □ | aₙ₊₁/aₙ = 6/(n + 1) → 0
+  pièges : g2_exp_sum
+
+Soit aₙ = 3^n/n!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [guided]  (3^(n + 1)/(n + 1)!)/(3^n/n!)
+    ? (n + 1)!/n! = ✔ n + 1 / · n! / · 1
+    = (3^(n + 1)·n!)/((n + 1)!·3^n)   ← Former le rapport
+    = 3/(n + 1)   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : 3/(n + 1)
+    = □   (trous : 0)   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : 3^n/n!
+    ? Le rapport tend vers q = 0. Que conclure ? ✔ q < 1 : aₙ → 0 / · q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (n + 1)!/n! = □ | aₙ₊₁/aₙ = 3/(n + 1) → 0
+  pièges : g2_exp_sum
+
+Soit aₙ = 6^n/n!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [guided]  (6^(n + 1)/(n + 1)!)/(6^n/n!)
+    ? (n + 1)!/n! = ✔ n + 1 / · n! / · 1
+    = (6^(n + 1)·n!)/((n + 1)!·6^n)   ← Former le rapport
+    = 6/(n + 1)   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : 6/(n + 1)
+    = □   (trous : 0)   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : 6^n/n!
+    ? Le rapport tend vers q = 0. Que conclure ? ✔ q < 1 : aₙ → 0 / · q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (n + 1)!/n! = □ | aₙ₊₁/aₙ = 6/(n + 1) → 0
+  pièges : g2_exp_sum
+
+```
+
+### Niveau 3
+
+```
+Soit aₙ = (2n)!/4^(n²). Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [tap, suivre l'erreur, menu steps]  ((2n + 2)!/4^((n + 1)²))/((2n)!/4^(n²))
+    = ((2n + 2)!·4^(n²))/(4^((n + 1)²)(2n)!)   ← Former le rapport
+    = ((2n + 2)(2n + 1))/4^(2n + 1)   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : ((2n + 2)(2n + 1))/4^(2n + 1)
+    = 0   ← Croissances comparées : l'exponentielle l'emporte
+  — Conclusion :  [juge limit]  départ : (2n)!/4^(n²)
+    ? Le rapport tend vers q = 0. Que conclure ? ✔ q < 1 : aₙ → 0 / · q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (2n + 2)!/(2n)! = □ | aₙ₊₁/aₙ = ((2n + 2)(2n + 1))/4^(2n + 1) → 0
+  pièges : a1_factorial_ratio
+
+Soit aₙ = 2^(n²)/(n!)². Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [tap, suivre l'erreur, menu steps]  (2^((n + 1)²)/((n + 1)!)²)/(2^(n²)/(n!)²)
+    = (2^((n + 1)²)(n!)²)/(((n + 1)!)²·2^(n²))   ← Former le rapport
+    = 2^(2n + 1)/(n + 1)²   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : 2^(2n + 1)/(n + 1)²
+    = ∞   ← Croissances comparées
+  — Conclusion :  [juge limit]  départ : 2^(n²)/(n!)²
+    ? Le rapport tend vers q = +∞. Que conclure ? · q < 1 : aₙ → 0 / ✔ q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = ∞   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (n + 1)!/n! = □ | aₙ₊₁/aₙ = 2^(2n + 1)/(n + 1)² → +∞
+
+Soit aₙ = 3^(n²)/(n!)². Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [tap, suivre l'erreur, menu steps]  (3^((n + 1)²)/((n + 1)!)²)/(3^(n²)/(n!)²)
+    = (3^((n + 1)²)(n!)²)/(((n + 1)!)²·3^(n²))   ← Former le rapport
+    = 3^(2n + 1)/(n + 1)²   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : 3^(2n + 1)/(n + 1)²
+    = ∞   ← Croissances comparées
+  — Conclusion :  [juge limit]  départ : 3^(n²)/(n!)²
+    ? Le rapport tend vers q = +∞. Que conclure ? · q < 1 : aₙ → 0 / ✔ q > 1 : aₙ → +∞ / · Le critère ne permet pas de conclure
+    = ∞   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (n + 1)!/n! = □ | aₙ₊₁/aₙ = 3^(2n + 1)/(n + 1)² → +∞
+
+```
+
+### Niveau 4
+
+```
+Soit aₙ = (2n)!/4^(n²). Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [free, suivre l'erreur]  ((2n + 2)!/4^((n + 1)²))/((2n)!/4^(n²))
+    = ((2n + 2)!·4^(n²))/(4^((n + 1)²)(2n)!)   ← Former le rapport
+    = ((2n + 2)(2n + 1))/4^(2n + 1)   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : ((2n + 2)(2n + 1))/4^(2n + 1)
+    = 0   ← Croissances comparées : l'exponentielle l'emporte
+  — Conclusion :  [juge limit]  départ : (2n)!/4^(n²)
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (2n + 2)!/(2n)! = □ | aₙ₊₁/aₙ = ((2n + 2)(2n + 1))/4^(2n + 1) → 0
+  pièges : a1_factorial_ratio
+
+Soit aₙ = (n³·3^n)/n!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [free, suivre l'erreur]  (((n + 1)³·3^(n + 1))/(n + 1)!)/((n³·3^n)/n!)
+    = (3^(n + 1)(n + 1)³·n!)/((n + 1)!·3^n·n³)   ← Former le rapport
+    = (3(n + 1)³)/((n + 1)n³)   ← Simplifier les factorielles et les puissances
+  — Limite du rapport :  [juge limit]  départ : (3(n + 1)²)/n³
+    = (3(1 + 1/n)²)/n   ← Diviser par la plus grande puissance
+    = 0   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : (n³·3^n)/n!
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (n + 1)!/n! = □ | aₙ₊₁/aₙ = (3(n + 1)²)/n³ → 0
+  pièges : g2_exp_sum
+
+Soit aₙ = (2^n(n!)²)/(2n)!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [free, suivre l'erreur]  ((2^(n + 1)((n + 1)!)²)/(2n + 2)!)/((2^n(n!)²)/(2n)!)
+    = (2^(n + 1)((n + 1)!)²(2n)!)/((2n + 2)!·2^n(n!)²)   ← Former le rapport
+    = (2(n + 1)²)/((2n + 2)(2n + 1))   ← Simplifier les factorielles et les puissances
+  — Limite du rapport :  [juge limit]  départ : (2(n + 1))/(4n + 2)
+    = (2(1 + 1/n))/(4 + 2/n)   ← Diviser par n
+    = 1/2   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : (2^n(n!)²)/(2n)!
+    = 0   ← D'Alembert
+  aides : Il y a une factorielle : forme aₙ₊₁/aₙ, beaucoup de choses se simplifient. | (2n + 2)!/(2n)! = □ | aₙ₊₁/aₙ = (2(n + 1))/(4n + 2) → 1/2
+  pièges : g2_exp_sum, a1_factorial_ratio
+
+```
+
+### Niveau 5
+
+```
+Soit aₙ = n!/n^n. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [free, sans aide]  ((n + 1)!/(n + 1)^(n + 1))/(n!/n^n)
+    = ((n + 1)!·n^n)/((n + 1)^(n + 1)·n!)   ← Former le rapport
+    = ((n + 1)n^n)/(n + 1)^(n + 1)   ← Simplifier les factorielles et les puissances
+    = (n/(n + 1))^n   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : (n/(n + 1))^n
+    = 1/(1 + 1/n)^n   ← (n/(n + 1))ⁿ = 1/(1 + 1/n)ⁿ
+    = e^(−1)   ← (1 + 1/n)ⁿ → e
+  — Conclusion :  [juge limit]  départ : n!/n^n
+    = 0   ← D'Alembert
+  pièges : g2_exp_sum
+
+Soit aₙ = (7^n(n!)²)/(2n)!. Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [free, sans aide]  ((7^(n + 1)((n + 1)!)²)/(2n + 2)!)/((7^n(n!)²)/(2n)!)
+    = (7^(n + 1)((n + 1)!)²(2n)!)/((2n + 2)!·7^n(n!)²)   ← Former le rapport
+    = (7(n + 1)²)/((2n + 2)(2n + 1))   ← Simplifier les factorielles et les puissances
+  — Limite du rapport :  [juge limit]  départ : (7(n + 1))/(4n + 2)
+    = (7(1 + 1/n))/(4 + 2/n)   ← Diviser par n
+    = 7/4   ← Limite du rapport
+  — Conclusion :  [juge limit]  départ : (7^n(n!)²)/(2n)!
+    = ∞   ← D'Alembert
+  pièges : g2_exp_sum, a1_factorial_ratio
+
+Soit aₙ = 3^(n²)/(n!)². Forme aₙ₊₁/aₙ, simplifie-le, calcule sa limite q, puis conclus sur lim_{n→∞} a_n.
+  [free, sans aide]  (3^((n + 1)²)/((n + 1)!)²)/(3^(n²)/(n!)²)
+    = (3^((n + 1)²)(n!)²)/(((n + 1)!)²·3^(n²))   ← Former le rapport
+    = 3^(2n + 1)/(n + 1)²   ← Simplifier
+  — Limite du rapport :  [juge limit]  départ : 3^(2n + 1)/(n + 1)²
+    = ∞   ← Croissances comparées
+  — Conclusion :  [juge limit]  départ : 3^(n²)/(n!)²
+    = ∞   ← D'Alembert
+
+```
+
+### Variantes d'examen
+
+```
+Vrai ou faux ?
+  « Si aₙ ≠ 0 et |aₙ₊₁/aₙ| → 3, alors |aₙ| → +∞. » → VRAI
+  [examen tf]
+
+lim_{n→∞} 2^n/n! =
+  · +∞   ✔ 0   · La limite n'existe pas   · 1
+  [examen mcq]
+
+```
+
+## Suites monotones et bornées ; suites de Cauchy (`a1-seq-monotone`, BA1)
+
+_Croissante et majorée ⇒ convergente ; bornée ne suffit pas._
+
+### Niveau 1
+
+```
+Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 3, et conclus.
+  [guided]  Σ_{k=0}^{n + 1} 1/k! − Σ_{k=0}^{n} 1/k!
+    = 1/(□)!   (trous : 1/(n + 1)!)   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=0}^{n} 1/k!
+    = 1 + Σ_{k=1}^{n} 1/2^(k − 1)   ← 1/k! ≤ 1/2^(k−1) pour k ≥ 1
+    = 1 + 2(1 − 1/2^n)   ← Somme géométrique de raison 1/2
+    = 3 − □   (trous : 3 − 1/2^(n − 1))   ← Simplifier
+    = 3   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 3 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 3   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k! ≤ 1/2^(k−1), donc uₙ ≤ 1 + Σ 1/2^(k−1) | uₙ ≤ 1 + 2(1 − 1/2ⁿ) ≤ 3
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
+
+Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par 2, et conclus.
+  [guided]  Σ_{k=1}^{n + 1} 1/k³ − Σ_{k=1}^{n} 1/k³
+    = 1/□   (trous : 1/(n + 1)³)   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k³
+    = Σ_{k=1}^{n} 1/k²   ← 1/k³ ≤ 1/k²
+    = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
+    = 2 − □   (trous : 2 − 1/n)   ← Télescoper
+    = 2   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 2 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 2   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
+
+Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 3, et conclus.
+  [guided]  Σ_{k=0}^{n + 1} 1/k! − Σ_{k=0}^{n} 1/k!
+    = 1/(□)!   (trous : 1/(n + 1)!)   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=0}^{n} 1/k!
+    = 1 + Σ_{k=1}^{n} 1/2^(k − 1)   ← 1/k! ≤ 1/2^(k−1) pour k ≥ 1
+    = 1 + 2(1 − 1/2^n)   ← Somme géométrique de raison 1/2
+    = 3 − □   (trous : 3 − 1/2^(n − 1))   ← Simplifier
+    = 3   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 3 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 3   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k! ≤ 1/2^(k−1), donc uₙ ≤ 1 + Σ 1/2^(k−1) | uₙ ≤ 1 + 2(1 − 1/2ⁿ) ≤ 3
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
+
+```
+
+### Niveau 2
+
+```
+Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par 2, et conclus.
+  [guided]  Σ_{k=1}^{n + 1} 1/k³ − Σ_{k=1}^{n} 1/k³
+    = 1/(n + 1)³   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k³
+    ? Quel majorant de 1/k³ (k ≥ 2) donne une somme bornée ? ✔ 1/(k − 1) − 1/k / · 1/k / · 1/(k(k + 1))
+    = Σ_{k=1}^{n} 1/k²   ← 1/k³ ≤ 1/k²
+    = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
+    = 2 − 1/n   ← Télescoper
+    = 2   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 2 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 2   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
+
+Soit u₀ = 0 et uₙ₊₁ = √(20 + uₙ). Montre que (uₙ) est majorée par 5 et croissante, puis calcule sa limite.
+  [guided]  √(20 + u)
+    (u₀ = 0 ≤ 5. Hérédité : si 0 ≤ uₙ ≤ 5, alors uₙ₊₁ = √(20 + uₙ) ≤ ?)
+    ? Comment montrer que uₙ ≤ 5 pour tout n ? ✔ Par récurrence : u₀ = 0 ≤ 5, et uₙ ≤ 5 ⇒ uₙ₊₁ ≤ 5 / · La limite est 5, donc uₙ ≤ 5
+    = √(20 + 5)   ← u ≤ 5 et √ est croissante
+    = 5   ← Calculer
+  — Croissante : uₙ₊₁ − uₙ = √(20 + u) − u pour 0 ≤ u ≤ 5.  [juge equiv]  départ : √(20 + u) − u
+    ? Comment montrer que (uₙ) est croissante ? ✔ Montrer que uₙ₊₁ − uₙ = √(20 + uₙ) − uₙ ≥ 0 / · f(x) = √(20 + x) est croissante, donc (uₙ) est croissante
+    = (20 + u − u²)/(√(20 + u) + u)   ← Quantité conjuguée
+    = 0   ← 20 + u − u² = (5 − u)(u + 4) ≥ 0 sur [0 ; 5]
+  — Conclusion : la limite ℓ vérifie ℓ = √(20 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 5 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 5   ← ℓ² − ℓ − 20 = 0, ℓ ≥ 0
+  aides : Récurrence : si uₙ ≤ 5, alors √(20 + uₙ) ≤ √(20 + 5). Puis le signe de uₙ₊₁ − uₙ. | √(20 + u) − u = (20 + u − u²)/(□) | √(20 + u) ≤ √25 = 5 ; 20 + u − u² = (5 − u)(u + 4) ≥ 0
+  pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent
+
+Soit uₙ = Σ_{k=1}^{n} 1/k². Montre que (uₙ) est croissante et majorée par 2, et conclus.
+  [guided]  Σ_{k=1}^{n + 1} 1/k² − Σ_{k=1}^{n} 1/k²
+    = 1/(n + 1)²   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k²
+    ? Quel majorant de 1/k² (k ≥ 2) donne une somme bornée ? ✔ 1/(k − 1) − 1/k / · 1/k / · 1/(k(k + 1))
+    = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
+    = 2 − 1/n   ← Télescoper
+    = 2   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 2 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 2   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
+
+```
+
+### Niveau 3
+
+```
+Soit u₀ = 0 et uₙ₊₁ = √(2 + uₙ). Montre que (uₙ) est majorée par 2 et croissante, puis calcule sa limite.
+  [tap, suivre l'erreur, menu steps]  √(2 + u)
+    (u₀ = 0 ≤ 2. Hérédité : si 0 ≤ uₙ ≤ 2, alors uₙ₊₁ = √(2 + uₙ) ≤ ?)
+    = 2   ← Calculer
+  — Croissante : uₙ₊₁ − uₙ = √(2 + u) − u pour 0 ≤ u ≤ 2.  [juge equiv]  départ : √(2 + u) − u
+    ? Comment montrer que (uₙ) est croissante ? ✔ Montrer que uₙ₊₁ − uₙ = √(2 + uₙ) − uₙ ≥ 0 / · f(x) = √(2 + x) est croissante, donc (uₙ) est croissante
+    = (2 + u − u²)/(√(2 + u) + u)   ← Quantité conjuguée
+    = 0   ← 2 + u − u² = (2 − u)(u + 1) ≥ 0 sur [0 ; 2]
+  — Conclusion : la limite ℓ vérifie ℓ = √(2 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 2 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 2   ← ℓ² − ℓ − 2 = 0, ℓ ≥ 0
+  aides : Récurrence : si uₙ ≤ 2, alors √(2 + uₙ) ≤ √(2 + 2). Puis le signe de uₙ₊₁ − uₙ. | √(2 + u) − u = (2 + u − u²)/(□) | √(2 + u) ≤ √4 = 2 ; 2 + u − u² = (2 − u)(u + 1) ≥ 0
+  pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent
+
+Soit uₙ = Σ_{k=0}^{n} 1/k!. Montre que (uₙ) est croissante et majorée par 3, et conclus.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=0}^{n + 1} 1/k! − Σ_{k=0}^{n} 1/k!
+    = 1/(n + 1)!   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=0}^{n} 1/k!
+    = 1 + Σ_{k=1}^{n} 1/2^(k − 1)   ← 1/k! ≤ 1/2^(k−1) pour k ≥ 1
+    = 1 + 2(1 − 1/2^n)   ← Somme géométrique de raison 1/2
+    = 3 − 1/2^(n − 1)   ← Simplifier
+    = 3   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 3 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 3   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k! ≤ 1/2^(k−1), donc uₙ ≤ 1 + Σ 1/2^(k−1) | uₙ ≤ 1 + 2(1 − 1/2ⁿ) ≤ 3
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
+
+Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par 2, et conclus.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=1}^{n + 1} 1/k³ − Σ_{k=1}^{n} 1/k³
+    = 1/(n + 1)³   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k³
+    = Σ_{k=1}^{n} 1/k²   ← 1/k³ ≤ 1/k²
+    = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
+    = 2 − 1/n   ← Télescoper
+    = 2   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    ? Que conclure ? ✔ (uₙ) est croissante et majorée par 2 : elle converge / · (uₙ) est bornée, donc elle converge / · (uₙ) est croissante, donc elle tend vers +∞
+    = 2   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
+  pièges : g5_hered_wrong_term, g5_reindex_half, a1_bounded_implies_convergent
+
+```
+
+### Niveau 4
+
+```
+Soit u₀ = 0 et uₙ₊₁ = √(20 + uₙ). Montre que (uₙ) est majorée par 5 et croissante, puis calcule sa limite.
+  [free, suivre l'erreur]  √(20 + u)
+    (u₀ = 0 ≤ 5. Hérédité : si 0 ≤ uₙ ≤ 5, alors uₙ₊₁ = √(20 + uₙ) ≤ ?)
+    = 5   ← Calculer
+  — Croissante : uₙ₊₁ − uₙ = √(20 + u) − u pour 0 ≤ u ≤ 5.  [juge equiv]  départ : √(20 + u) − u
+    = (20 + u − u²)/(√(20 + u) + u)   ← Quantité conjuguée
+    = 0   ← 20 + u − u² = (5 − u)(u + 4) ≥ 0 sur [0 ; 5]
+  — Conclusion : la limite ℓ vérifie ℓ = √(20 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
+    = 5   ← ℓ² − ℓ − 20 = 0, ℓ ≥ 0
+  aides : Récurrence : si uₙ ≤ 5, alors √(20 + uₙ) ≤ √(20 + 5). Puis le signe de uₙ₊₁ − uₙ. | √(20 + u) − u = (20 + u − u²)/(□) | √(20 + u) ≤ √25 = 5 ; 20 + u − u² = (5 − u)(u + 4) ≥ 0
+
+Soit uₙ = Σ_{k=1}^{n} 1/k³. Montre que (uₙ) est croissante et majorée par 2, et conclus.
+  [free, suivre l'erreur]  Σ_{k=1}^{n + 1} 1/k³ − Σ_{k=1}^{n} 1/k³
+    = 1/(n + 1)³   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k³
+    = Σ_{k=1}^{n} 1/k²   ← 1/k³ ≤ 1/k²
+    = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
+    = 2 − 1/n   ← Télescoper
+    = 2   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    = 2   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
+  pièges : g5_hered_wrong_term, g5_reindex_half
+
+Soit uₙ = Σ_{k=1}^{n} 1/k². Montre que (uₙ) est croissante et majorée par 2, et conclus.
+  [free, suivre l'erreur]  Σ_{k=1}^{n + 1} 1/k² − Σ_{k=1}^{n} 1/k²
+    = 1/(n + 1)²   ← Tous les termes s'en vont sauf le dernier
+  — Un majorant :  [juge equiv]  départ : Σ_{k=1}^{n} 1/k²
+    = 1 + Σ_{k=2}^{n} (1/(k − 1) − 1/k)   ← 1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2
+    = 2 − 1/n   ← Télescoper
+    = 2   ← Majorer par une constante
+  — Conclusion :  [juge value]  départ : lim_{n→∞} u_n
+    = 2   ← Croissante et majorée
+  aides : Montre qu'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n. | 1/k² ≤ 1/(k − 1) − □ pour k ≥ 2 | uₙ ≤ 1 + (1 − 1/n) ≤ 2
+  pièges : g5_hered_wrong_term, g5_reindex_half
+
+```
+
+### Niveau 5
+
+```
+Vrai ou faux ?
+  « Toute suite définie par une récurrence aₙ₊₁ = f(aₙ) et bornée est convergente. » → FAUX
+    contre-exemple (sequence) : a = (-1)^n
+  pièges : a1_bounded_implies_convergent
+
+Vrai ou faux ?
+  « Une suite de réels converge si et seulement si elle est de Cauchy. » → VRAI
+
+Vrai ou faux ?
+  « Toute suite bornée est convergente. » → FAUX
+    contre-exemple (sequence) : a = (-1)^n
+  pièges : a1_bounded_implies_convergent
+
+```
+
+### Variantes d'examen
+
+```
+Vrai ou faux ?
+  « Toute suite bornée est convergente. » → FAUX
+    contre-exemple (sequence) : a = (-1)^n
+  [examen tf]
+  pièges : a1_bounded_implies_convergent
+
+Soit u₀ = 0 et uₙ₊₁ = √(2 + uₙ). Montre que (uₙ) est majorée par 2 et croissante, puis calcule sa limite.
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 0,5 ; Croissante : uₙ₊₁ − uₙ = √(2 + u) − u pour 0 ≤ u ≤ 2. : 1 ; Conclusion : la limite ℓ vérifie ℓ = √(2 + ℓ) et ℓ ≥ 0. : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  √(2 + u)
+      (u₀ = 0 ≤ 2. Hérédité : si 0 ≤ uₙ ≤ 2, alors uₙ₊₁ = √(2 + uₙ) ≤ ?)
+      = 2   ← Calculer
+    — Croissante : uₙ₊₁ − uₙ = √(2 + u) − u pour 0 ≤ u ≤ 2.  [juge equiv]  départ : √(2 + u) − u
+      = (2 + u − u²)/(√(2 + u) + u)   ← Quantité conjuguée
+      = 0   ← 2 + u − u² = (2 − u)(u + 1) ≥ 0 sur [0 ; 2]
+    — Conclusion : la limite ℓ vérifie ℓ = √(2 + ℓ) et ℓ ≥ 0.  [juge value]  départ : lim_{n→∞} u_n
+      = 2   ← ℓ² − ℓ − 2 = 0, ℓ ≥ 0
+
+```
+
+## lim sup, lim inf et sous-suites (`a1-seq-limsup`, BA1)
+
+_Séparer selon la parité, prendre la plus grande et la plus petite limite._
+
+### Niveau 1
+
+```
+Soit aₙ = (−1)^n·(2n)/(n + 3) + 1/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  (4m)/(2m + 3) + 1/(2m)
+    = 4/(2 + □) + 1/(2m)   (trous : 4/(2 + 3/m) + 1/(2m))   ← Diviser par m
+    = □   (trous : 2)   ← Limite
+  — a₂ₘ₊₁ = −(2(2m + 1))/(2m + 4) + 1/(2m + 1) :  [juge limit]  départ : −(2(2m + 1))/(2m + 4) + 1/(2m + 1)
+    = −(2(2 + 1/m))/(2 + □) + 1/(2m + 1)   (trous : −(2(2 + 1/m))/(2 + 4/m) + 1/(2m + 1))   ← Diviser par m
+    = □   (trous : −2)   ← Limite
+  — lim sup :  [juge value]  départ : max(2,−2)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 2 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 2   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(2,−2)
+    = −2   ← La plus petite limite
+  aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 2, lim inf aₙ = −2
+
+Soit aₙ = 3^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  3^(1/(2m))
+    = e^(□/(2m))   (trous : e^(ln(3)/(2m)))   ← Écrire en exponentielle
+    = □   (trous : 1)   ← Limite
+  — a₂ₘ₊₁ = 1/(2m + 1)³ :  [juge limit]  départ : 1/(2m + 1)³
+    = □   (trous : 0)   ← Limite
+  — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √3 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 1   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(1,0)
+    = 0   ← La plus petite limite
+  aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 3^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √3, atteint en n = 2).
+  pièges : a1_limsup_as_sup
+
+Soit aₙ = √(n + (−1)^n) − √n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  √(2m + 1) − √(2m)
+    = 1/(□)   (trous : 1/(√(2m + 1) + √(2m)))   ← Quantité conjuguée
+    = □   (trous : 0)   ← Limite
+  — a₂ₘ₊₁ = √(2m) − √(2m + 1) :  [juge limit]  départ : √(2m) − √(2m + 1)
+    = −1/(□)   (trous : −1/(√(2m) + √(2m + 1)))   ← Quantité conjuguée
+    = □   (trous : 0)   ← Limite
+  — lim sup :  [juge value]  départ : max(0,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 0 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 0   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(0,0)
+    = 0   ← La plus petite limite
+  aides : (−1)ⁿ vaut 1 ou −1 selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | √(2m + 1) − √(2m) = 1/(□) | Les deux sous-suites tendent vers 0 : lim sup = lim inf = 0, la suite converge vers 0.
+  pièges : g6_infinity_minus_infinity, a1_dl_factorial_missing, a1_sqrt_sum_split
+
+```
+
+### Niveau 2
+
+```
+Soit aₙ = 7^(1/n) si n est pair, aₙ = 1/n² si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  7^(1/(2m))
+    ? Comment découper la suite ? ✔ Selon la parité : n = 2m et n = 2m + 1 / ✔ Modulo 4 : n = 4m, 4m + 1, 4m + 2, 4m + 3 / · Pas besoin : on calcule directement la limite de aₙ
+    = e^(ln(7)/(2m))   ← Écrire en exponentielle
+    = 1   ← Limite
+  — a₂ₘ₊₁ = 1/(2m + 1)² :  [juge limit]  départ : 1/(2m + 1)²
+    = 0   ← Limite
+  — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √7 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 1   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(1,0)
+    = 0   ← La plus petite limite
+  aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 7^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √7, atteint en n = 2).
+  pièges : a1_limsup_as_sup
+
+Soit aₙ = 7^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  7^(1/(2m))
+    ? Comment découper la suite ? ✔ Selon la parité : n = 2m et n = 2m + 1 / ✔ Modulo 4 : n = 4m, 4m + 1, 4m + 2, 4m + 3 / · Pas besoin : on calcule directement la limite de aₙ
+    = e^(ln(7)/(2m))   ← Écrire en exponentielle
+    = 1   ← Limite
+  — a₂ₘ₊₁ = 1/(2m + 1)³ :  [juge limit]  départ : 1/(2m + 1)³
+    = 0   ← Limite
+  — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √7 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 1   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(1,0)
+    = 0   ← La plus petite limite
+  aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 7^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √7, atteint en n = 2).
+  pièges : a1_limsup_as_sup
+
+Soit aₙ = (−1)^n·(3n)/(n + 3) + 4/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [guided]  (−1)^(2m)·(3(2m))/(2m + 3) + 4/(2m)
+    ? Comment découper la suite ? ✔ Selon la parité : n = 2m et n = 2m + 1 / ✔ Modulo 4 : n = 4m, 4m + 1, 4m + 2, 4m + 3 / · Pas besoin : on calcule directement la limite de aₙ
+    = (6m)/(2m + 3) + 4/(2m)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ :  [juge limit]  départ : (6m)/(2m + 3) + 4/(2m)
+    = 6/(2 + 3/m) + 4/(2m)   ← Diviser par m
+    = 3   ← Limite
+  — a₂ₘ₊₁ :  [juge equiv]  départ : (−1)^(2m + 1)·(3(2m + 1))/(2m + 1 + 3) + 4/(2m + 1)
+    = −(3(2m + 1))/(2m + 4) + 4/(2m + 1)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ₊₁ :  [juge limit]  départ : −(3(2m + 1))/(2m + 4) + 4/(2m + 1)
+    = −(3(2 + 1/m))/(2 + 4/m) + 4/(2m + 1)   ← Diviser par m
+    = −3   ← Limite
+  — lim sup :  [juge value]  départ : max(3,−3)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 3 / · le plus grand terme de la suite, 13/4 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 3   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(3,−3)
+    = −3   ← La plus petite limite
+  aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 3, lim inf aₙ = −3
+  pièges : a1_limsup_as_sup
+
+```
+
+### Niveau 3
+
+```
+Soit aₙ = 3^(1/n) si n est pair, aₙ = 1/n si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [tap, suivre l'erreur, menu steps]  3^(1/(2m))
+    = e^(ln(3)/(2m))   ← Écrire en exponentielle
+    = 1   ← Limite
+  — a₂ₘ₊₁ = 1/(2m + 1) :  [juge limit]  départ : 1/(2m + 1)
+    = 0   ← Limite
+  — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √3 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 1   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(1,0)
+    = 0   ← La plus petite limite
+  aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 3^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √3, atteint en n = 2).
+  pièges : a1_limsup_as_sup
+
+Soit aₙ = 7^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [tap, suivre l'erreur, menu steps]  7^(1/(2m))
+    = e^(ln(7)/(2m))   ← Écrire en exponentielle
+    = 1   ← Limite
+  — a₂ₘ₊₁ = 1/(2m + 1)³ :  [juge limit]  départ : 1/(2m + 1)³
+    = 0   ← Limite
+  — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √7 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 1   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(1,0)
+    = 0   ← La plus petite limite
+  aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 7^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √7, atteint en n = 2).
+  pièges : a1_limsup_as_sup
+
+Soit aₙ = 6^(1/n) si n est pair, aₙ = 1/n² si n est impair. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [tap, suivre l'erreur, menu steps]  6^(1/(2m))
+    = e^(ln(6)/(2m))   ← Écrire en exponentielle
+    = 1   ← Limite
+  — a₂ₘ₊₁ = 1/(2m + 1)² :  [juge limit]  départ : 1/(2m + 1)²
+    = 0   ← Limite
+  — lim sup :  [juge value]  départ : max(1,0)
+    ? La lim sup de (aₙ), c'est : ✔ la plus grande limite des sous-suites, 1 / · le plus grand terme de la suite, √6 / · la limite de a₂ₘ, quelle qu'elle soit
+    = 1   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(1,0)
+    = 0   ← La plus petite limite
+  aides : La suite est définie selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | 6^(1/(2m)) = e^(□/(2m)) → □ | lim sup aₙ = 1, lim inf aₙ = 0 (et sup des termes = √6, atteint en n = 2).
+  pièges : a1_limsup_as_sup
+
+```
+
+### Niveau 4
+
+```
+Soit aₙ = (−1)^n·(3n)/(n + 2) + 4/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [free, suivre l'erreur]  (−1)^(2m)·(3(2m))/(2m + 2) + 4/(2m)
+    = (6m)/(2m + 2) + 4/(2m)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ :  [juge limit]  départ : (6m)/(2m + 2) + 4/(2m)
+    = 6/(2 + 2/m) + 4/(2m)   ← Diviser par m
+    = 3   ← Limite
+  — a₂ₘ₊₁ :  [juge equiv]  départ : (−1)^(2m + 1)·(3(2m + 1))/(2m + 1 + 2) + 4/(2m + 1)
+    = −(3(2m + 1))/(2m + 3) + 4/(2m + 1)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ₊₁ :  [juge limit]  départ : −(3(2m + 1))/(2m + 3) + 4/(2m + 1)
+    = −(3(2 + 1/m))/(2 + 3/m) + 4/(2m + 1)   ← Diviser par m
+    = −3   ← Limite
+  — lim sup :  [juge value]  départ : max(3,−3)
+    = 3   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(3,−3)
+    = −3   ← La plus petite limite
+  aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 3, lim inf aₙ = −3
+
+Soit aₙ = (−1)^n·(2n)/(n + 1) + 4/n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [free, suivre l'erreur]  (−1)^(2m)·(2(2m))/(2m + 1) + 4/(2m)
+    = (4m)/(2m + 1) + 4/(2m)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ :  [juge limit]  départ : (4m)/(2m + 1) + 4/(2m)
+    = 4/(2 + 1/m) + 4/(2m)   ← Diviser par m
+    = 2   ← Limite
+  — a₂ₘ₊₁ :  [juge equiv]  départ : (−1)^(2m + 1)·(2(2m + 1))/(2m + 1 + 1) + 4/(2m + 1)
+    = −(2(2m + 1))/(2m + 2) + 4/(2m + 1)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ₊₁ :  [juge limit]  départ : −(2(2m + 1))/(2m + 2) + 4/(2m + 1)
+    = −(2(2 + 1/m))/(2 + 2/m) + 4/(2m + 1)   ← Diviser par m
+    = −2   ← Limite
+  — lim sup :  [juge value]  départ : max(2,−2)
+    = 2   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(2,−2)
+    = −2   ← La plus petite limite
+  aides : (−1)ⁿ change selon la parité : regarde n = 2m et n = 2m + 1 séparément. | a₂ₘ → □, a₂ₘ₊₁ → □ | lim sup aₙ = 2, lim inf aₙ = −2
+
+Soit aₙ = √(n + (−1)^n) − √n. Calcule la limite de chaque sous-suite, puis lim sup aₙ et lim inf aₙ.
+  [free, suivre l'erreur]  √(2m + (−1)^(2m)) − √(2m)
+    = √(2m + 1) − √(2m)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ :  [juge limit]  départ : √(2m + 1) − √(2m)
+    = 1/(√(2m + 1) + √(2m))   ← Quantité conjuguée
+    = 0   ← Limite
+  — a₂ₘ₊₁ :  [juge equiv]  départ : √(2m + 1 + (−1)^(2m + 1)) − √(2m + 1)
+    = √(2m) − √(2m + 1)   ← Remplacer n, puis simplifier
+  — Limite de a₂ₘ₊₁ :  [juge limit]  départ : √(2m) − √(2m + 1)
+    = −1/(√(2m) + √(2m + 1))   ← Quantité conjuguée
+    = 0   ← Limite
+  — lim sup :  [juge value]  départ : max(0,0)
+    = 0   ← La plus grande limite
+  — lim inf :  [juge value]  départ : min(0,0)
+    = 0   ← La plus petite limite
+  aides : (−1)ⁿ vaut 1 ou −1 selon la parité : étudie a₂ₘ et a₂ₘ₊₁. | √(2m + 1) − √(2m) = 1/(□) | Les deux sous-suites tendent vers 0 : lim sup = lim inf = 0, la suite converge vers 0.
+
+```
+
+### Niveau 5
+
+```
+Soit aₙ = 3(sin(π/4 + n·π/2) + cos(π/4 + n·π/2)). Que valent lim sup aₙ et lim inf aₙ ?
+  · lim sup aₙ = 3√2, lim inf aₙ = 3√2   ✔ lim sup aₙ = 3√2, lim inf aₙ = −3√2   · lim sup aₙ = 6, lim inf aₙ = −6   · lim sup aₙ = −3√2, lim inf aₙ = 3√2
+
+Soit aₙ = (−1)^n·(3n)/(n + 2) + 2/n. Que valent lim sup aₙ et lim inf aₙ ?
+  · lim sup aₙ = 3, lim inf aₙ = 3   · lim sup aₙ = −3, lim inf aₙ = 3   ✔ lim sup aₙ = 3, lim inf aₙ = −3   · lim sup aₙ = 1, lim inf aₙ = −1
+
+Soit aₙ = 5^(1/n) si n est pair, aₙ = 1/n³ si n est impair. Que valent lim sup aₙ et lim inf aₙ ?
+  ✔ lim sup aₙ = 1, lim inf aₙ = 0   · lim sup aₙ = √5, lim inf aₙ = 0 [a1_limsup_as_sup]   · lim sup aₙ = 0, lim inf aₙ = 1   · lim sup aₙ = 1, lim inf aₙ = 1
+  pièges : a1_limsup_as_sup
+
+```
+
+### Variantes d'examen
+
+```
+Soit aₙ = (−1)^n·n/(n + 2) + 1/n. Que valent lim sup aₙ et lim inf aₙ ?
+  · lim sup aₙ = 1, lim inf aₙ = 1   · lim sup et lim inf n'existent pas : la suite oscille   ✔ lim sup aₙ = 1, lim inf aₙ = −1   · lim sup aₙ = −1, lim inf aₙ = 1
+  [examen mcq]
+
+Vrai ou faux ?
+  « Si (|aₙ|) converge, alors (aₙ) converge. » → FAUX
+    contre-exemple (sequence) : a = (-1)^n
+  [examen tf]
+
+```
+
+## Suites aₙ₊₁ = q·aₙ + c : formule explicite (`a1-seq-affine`, BA1)
+
+_Le point fixe L, l'écart aₙ − L géométrique, puis la limite._
+
+### Niveau 1
+
+```
+a₀ = 9 et a_(n + 1) = a_n/2 + 4. Trouve la formule explicite de aₙ, puis la limite. Le point fixe est L = 8.
+  [guided]  b_0
+    (bₙ = aₙ − 8 est géométrique de raison q = 1/2. Son premier terme :)
+    = 9 − □   (trous : 9 − 8)   ← b₀ = a₀ − L
+    = 1   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 8 + □·(1/2)^n   (trous : 8 + 1·(1/2)^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 8 + 1/2^n
+    = 8   ← qⁿ → 0
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 8 = (1/2)ⁿ·(▢) | aₙ = 8 + 1/2^n
+
+a₀ = 3 et a_(n + 1) = 2a_n + 6. Trouve la formule explicite de aₙ, puis la limite. Le point fixe est L = −6.
+  [guided]  b_0
+    (bₙ = aₙ + 6 est géométrique de raison q = 2. Son premier terme :)
+    = 3 − (□)   (trous : 3 − (−6))   ← b₀ = a₀ − L
+    = 9   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −6 + □·2^n   (trous : −6 + 9·2^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 9·2^n − 6
+    = ∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 6 = 2ⁿ·(▢) | aₙ = 9·2^n − 6
+
+a₀ = 6 et a_(n + 1) = −a_n/2 + 12. Trouve la formule explicite de aₙ, puis la limite. Le point fixe est L = 8.
+  [guided]  b_0
+    (bₙ = aₙ − 8 est géométrique de raison q = −1/2. Son premier terme :)
+    = 6 − □   (trous : 6 − 8)   ← b₀ = a₀ − L
+    = −2   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 8 + (□)·(−1/2)^n   (trous : 8 + (−2)·(−1/2)^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 8 − 2(−1/2)^n
+    = 8   ← qⁿ → 0
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 8 = (−1/2)ⁿ·(▢) | aₙ = 8 − 2(−1/2)^n
+
+```
+
+### Niveau 2
+
+```
+a₀ = 9 et a_(n + 1) = (3/4)a_n + 2. Trouve la formule explicite de aₙ, puis la limite.
+  [guided]  L = (3/4)L + 2
+    (Point fixe : résous L = qL + c.)
+    = (1/4)L = □   (trous : (1/4)L = 2)   ← Regrouper les L
+    = L = 8   ← Diviser
+  — bₙ = aₙ − 8 est géométrique de raison q = 3/4. Son premier terme :  [juge value]  départ : b_0
+    = 9 − 8   ← b₀ = a₀ − L
+    = 1   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 8 + □·(3/4)^n   (trous : 8 + 1·(3/4)^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 8 + (3/4)^n
+    ? Pourquoi aₙ → 8 ? ✔ |q| = 3/4 < 1, donc qⁿ → 0 / · 8 est le point fixe, donc la suite y tend
+    = 8   ← qⁿ → 0
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 8 = (3/4)ⁿ·(▢) | aₙ = 8 + (3/4)^n
+  pièges : a1_rec_limit_without_convergence
+
+a₀ = −2 et a_(n + 1) = 3a_n + 8. Trouve la formule explicite de aₙ, puis la limite.
+  [guided]  L = 3L + 8
+    (Point fixe : résous L = qL + c.)
+    = −2L = □   (trous : −2L = 8)   ← Regrouper les L
+    = L = −4   ← Diviser
+  — bₙ = aₙ + 4 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = −2 − (−4)   ← b₀ = a₀ − L
+    = 2   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −4 + □·3^n   (trous : −4 + 2·3^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 2·3^n − 4
+    ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart 2·3ⁿ grandit / · Oui : L = −4 vérifie L = qL + c
+    = ∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 4 = 3ⁿ·(▢) | aₙ = 2·3^n − 4
+  pièges : a1_rec_limit_without_convergence
+
+a₀ = 1 et a_(n + 1) = (2/3)a_n − 2. Trouve la formule explicite de aₙ, puis la limite.
+  [guided]  L = (2/3)L − 2
+    (Point fixe : résous L = qL + c.)
+    = (1/3)L = □   (trous : (1/3)L = −2)   ← Regrouper les L
+    = L = −6   ← Diviser
+  — bₙ = aₙ + 6 est géométrique de raison q = 2/3. Son premier terme :  [juge value]  départ : b_0
+    = 1 − (−6)   ← b₀ = a₀ − L
+    = 7   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −6 + □·(2/3)^n   (trous : −6 + 7·(2/3)^n)   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : −6 + 7(2/3)^n
+    ? Pourquoi aₙ → −6 ? ✔ |q| = 2/3 < 1, donc qⁿ → 0 / · −6 est le point fixe, donc la suite y tend
+    = −6   ← qⁿ → 0
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 6 = (2/3)ⁿ·(▢) | aₙ = −6 + 7(2/3)^n
+  pièges : a1_rec_limit_without_convergence
+
+```
+
+### Niveau 3
+
+```
+a₀ = 2 et a_(n + 1) = 3a_n − 2. Trouve la formule explicite de aₙ, puis la limite.
+  [tap, suivre l'erreur, menu steps]  L = 3L − 2
+    (Point fixe : résous L = qL + c.)
+    = −2L = −2   ← Regrouper les L
+    = L = 1   ← Diviser
+  — bₙ = aₙ − 1 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = 2 − 1   ← b₀ = a₀ − L
+    = 1   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 1 + 1·3^n   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 3^n + 1
+    = ∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 1 = 3ⁿ·(▢) | aₙ = 3^n + 1
+
+a₀ = −3 et a_(n + 1) = 2a_n + 6. Trouve la formule explicite de aₙ, puis la limite.
+  [tap, suivre l'erreur, menu steps]  L = 2L + 6
+    (Point fixe : résous L = qL + c.)
+    = −L = 6   ← Regrouper les L
+    = L = −6   ← Diviser
+  — bₙ = aₙ + 6 est géométrique de raison q = 2. Son premier terme :  [juge value]  départ : b_0
+    = −3 − (−6)   ← b₀ = a₀ − L
+    = 3   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −6 + 3·2^n   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 3·2^n − 6
+    = ∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 6 = 2ⁿ·(▢) | aₙ = 3·2^n − 6
+
+a₀ = 7 et a_(n + 1) = 3a_n + 10. Trouve la formule explicite de aₙ, puis la limite.
+  [tap, suivre l'erreur, menu steps]  L = 3L + 10
+    (Point fixe : résous L = qL + c.)
+    = −2L = 10   ← Regrouper les L
+    = L = −5   ← Diviser
+  — bₙ = aₙ + 5 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = 7 − (−5)   ← b₀ = a₀ − L
+    = 12   ← Calculer
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −5 + 12·3^n   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 12·3^n − 5
+    = ∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 5 = 3ⁿ·(▢) | aₙ = 12·3^n − 5
+
+```
+
+### Niveau 4
+
+```
+a₀ = −4 et a_(n + 1) = 3a_n + 4. Trouve la formule explicite de aₙ, puis la limite.
+  [free, suivre l'erreur]  L = 3L + 4
+    (Point fixe : résous L = qL + c.)
+    = L = −2   ← Point fixe
+  — bₙ = aₙ + 2 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = −2   ← b₀ = a₀ − L
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −2·3^n − 2   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : −2·3^n − 2
+    ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart −2·3ⁿ grandit / · Oui : L = −2 vérifie L = qL + c
+    = −∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 2 = 3ⁿ·(▢) | aₙ = −2·3^n − 2
+  pièges : a1_rec_limit_without_convergence
+
+a₀ = −7 et a_(n + 1) = 3a_n + 8. Trouve la formule explicite de aₙ, puis la limite.
+  [free, suivre l'erreur]  L = 3L + 8
+    (Point fixe : résous L = qL + c.)
+    = L = −4   ← Point fixe
+  — bₙ = aₙ + 4 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = −3   ← b₀ = a₀ − L
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −3·3^n − 4   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : −3·3^n − 4
+    ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart −3·3ⁿ grandit / · Oui : L = −4 vérifie L = qL + c
+    = −∞   ← qⁿ → +∞
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ + 4 = 3ⁿ·(▢) | aₙ = −3·3^n − 4
+  pièges : a1_rec_limit_without_convergence
+
+a₀ = −5 et a_(n + 1) = (2/3)a_n + 2. Trouve la formule explicite de aₙ, puis la limite.
+  [free, suivre l'erreur]  L = (2/3)L + 2
+    (Point fixe : résous L = qL + c.)
+    = L = 6   ← Point fixe
+  — bₙ = aₙ − 6 est géométrique de raison q = 2/3. Son premier terme :  [juge value]  départ : b_0
+    = −11   ← b₀ = a₀ − L
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 6 − 11(2/3)^n   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 6 − 11(2/3)^n
+    ? Pourquoi aₙ → 6 ? ✔ |q| = 2/3 < 1, donc qⁿ → 0 / · 6 est le point fixe, donc la suite y tend
+    = 6   ← qⁿ → 0
+  aides : Cherche le nombre L qui ne bouge pas (L = qL + c), puis regarde l'écart bₙ = aₙ − L : il est géométrique. | aₙ − 6 = (2/3)ⁿ·(▢) | aₙ = 6 − 11(2/3)^n
+  pièges : a1_rec_limit_without_convergence
+
+```
+
+### Niveau 5
+
+```
+a₀ = 1 et a_(n + 1) = 3a_n + 8. Trouve la formule explicite de aₙ, puis la limite.
+  [free, sans aide]  L = 3L + 8
+    (Point fixe : résous L = qL + c.)
+    = L = −4   ← Point fixe
+  — bₙ = aₙ + 4 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = 5   ← b₀ = a₀ − L
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = 5·3^n − 4   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : 5·3^n − 4
+    ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart 5·3ⁿ grandit / · Oui : L = −4 vérifie L = qL + c
+    = ∞   ← qⁿ → +∞
+  pièges : a1_rec_limit_without_convergence
+
+a₀ = 7 et a_(n + 1) = 3a_n − 4. Quelle est la formule explicite de aₙ ?
+  · 9·3^n − 2   · 7·3^n − 4 [a1_affine_rec_no_fixed_point]   · 7·3^n − 4n [a1_affine_rec_no_fixed_point]   ✔ 5·3^n + 2
+  pièges : a1_affine_rec_no_fixed_point
+
+a₀ = −1 et a_(n + 1) = 3a_n − 6. Trouve la formule explicite de aₙ, puis la limite.
+  [free, sans aide]  L = 3L − 6
+    (Point fixe : résous L = qL + c.)
+    = L = 3   ← Point fixe
+  — bₙ = aₙ − 3 est géométrique de raison q = 3. Son premier terme :  [juge value]  départ : b_0
+    = −4   ← b₀ = a₀ − L
+  — Formule explicite :  [juge equiv]  départ : a(n)
+    = −4·3^n + 3   ← aₙ = L + qⁿ·b₀
+  — Limite de la suite :  [juge limit]  départ : −4·3^n + 3
+    ? La suite converge-t-elle vers le point fixe ? ✔ Non : q = 3 > 1, l'écart −4·3ⁿ grandit / · Oui : L = 3 vérifie L = qL + c
+    = −∞   ← qⁿ → +∞
+  pièges : a1_rec_limit_without_convergence
+
+```
+
+### Variantes d'examen
+
+```
+a₀ = −6 et a_(n + 1) = (2/3)a_n + 2. Quelle est la formule explicite de aₙ ?
+  · 6 − 6(2/3)^n   ✔ 6 − 12(2/3)^n   · −6(2/3)^n + 2n [a1_affine_rec_no_fixed_point]   · −6(2/3)^n + 2 [a1_affine_rec_no_fixed_point]
+  [examen mcq]
+  pièges : a1_affine_rec_no_fixed_point
+
+Vrai ou faux ?
+  « Pour tout a₀ ∈ ℝ, la suite a_(n + 1) = (3/4)a_n − 2 converge vers −8. » → VRAI
+  [examen tf]
+
+```
+
+## Suite aₙ₊₁ = f(aₙ) : points fixes, signe de f(x) − x, intervalle stable (`a1-seq-rec-fixed`, BA1)
+
+_Les candidats L = f(L), le sens donné par f(x) − x, la borne donnée par un intervalle stable._
+
+### Niveau 1
+
+```
+On pose a₀ = 0 et a_(n + 1) = (a_n² + 21)/10. Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 3 et 7.
+  [guided]  (x² + 21)/10 − x > 0
+    (Signe de f(x) − x :)
+    = (x² − 10x + 21)/10 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 3[ ∪ ]7 ; +∞[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 0 :  [juge value]  départ : lim_{n→∞} a_n
+    (f est croissante et f(I) ⊂ I pour I = [0 ; 3[ : la suite reste dans I, elle croît et elle est bornée.)
+    = 3   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]7 ; +∞[ | aₙ ∈ [0 ; 3[, croissante : aₙ → 3
+  pièges : g9_bracket, g1_trinome_sign_swap
+
+On pose a₀ = 7 et a_(n + 1) = √(7a_n − 12). Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 3 et 4.
+  [guided]  √(7x − 12) − x > 0
+    (Signe de f(x) − x :)
+    = x² − 7x + 12 < 0   ← Les deux membres sont positifs : élever au carré
+    = ]□ ; □[   (trous : ]3 ; 4[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 7 :  [juge value]  départ : lim_{n→∞} a_n
+    (f est croissante et f(I) ⊂ I pour I = ]4 ; +∞[ : la suite reste dans I, elle décroît et elle est bornée.)
+    = 4   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 4[ | aₙ ∈ ]4 ; +∞[, décroissante : aₙ → 4
+  pièges : g9_bracket
+
+On pose a₀ = 6 et a_(n + 1) = (a_n² + 16)/10. Étudie la suite : points fixes, sens de variation, limite. Les points fixes de f sont 2 et 8.
+  [guided]  (x² + 16)/10 − x > 0
+    (Signe de f(x) − x :)
+    = (x² − 10x + 16)/10 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 2[ ∪ ]8 ; +∞[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 6 :  [juge value]  départ : lim_{n→∞} a_n
+    (f est croissante et f(I) ⊂ I pour I = ]2 ; 8[ : la suite reste dans I, elle décroît et elle est bornée.)
+    = 2   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]8 ; +∞[ | aₙ ∈ ]2 ; 8[, décroissante : aₙ → 2
+  pièges : g9_bracket, g1_trinome_sign_swap
+
+```
+
+### Niveau 2
+
+```
+On pose a₀ = 9 et a_(n + 1) = (a_n² + 12)/8. Étudie la suite : points fixes, sens de variation, limite.
+  [guided]  L = (L² + 12)/8
+    (Candidats : résous L = f(L).)
+    = L² − 8L + 12 = 0   ← Multiplier par 8
+    = L = 2 ou L = □   (trous : L = 2 ou L = 6)   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 12)/8 − x > 0
+    = (x² − 8x + 12)/8 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]6 ; +∞[   (trous : ]−∞ ; 2[ ∪ ]6 ; +∞[)   ← Signe du trinôme
+  — Pour x > 6, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 21/8, donc aₙ ≥ 9 + (21/8)n. Limite de ce minorant :  [juge limit]  départ : 9 + (21/8)n
+    ? a₀ = 9 > 6. La suite (aₙ) : ✔ croît (f(x) > x pour x > 6) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 6, un point fixe / · croît et elle est minorée par 6 : elle converge
+    = ∞   ← aₙ → +∞
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]6 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
+  pièges : a1_rec_limit_without_convergence
+
+On pose a₀ = 3 et a_(n + 1) = √(3a_n − 2). Étudie la suite : points fixes, sens de variation, limite.
+  [guided]  L = √(3L − 2)
+    (Candidats : résous L = f(L).)
+    = L² − 3L + 2 = 0   ← Élever au carré (L ≥ 0)
+    = L = 1 ou L = □   (trous : L = 1 ou L = 2)   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : √(3x − 2) − x > 0
+    = x² − 3x + 2 < 0   ← Les deux membres sont positifs : élever au carré
+    = ]□ ; 2[   (trous : ]1 ; 2[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 3 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 3 ∈ ]2 ; +∞[. Pourquoi aₙ ∈ ]2 ; +∞[ pour tout n ? ✔ f est croissante, f(2) = 2 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]2 ; +∞[ / · Parce que a₀ ∈ ]2 ; +∞[
+    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 2 : elle converge, vers 2 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est minorée par 2 : elle converge / · converge vers 1, l'autre point fixe
+    = 2   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 2[ | aₙ ∈ ]2 ; +∞[, décroissante : aₙ → 2
+  pièges : g1_irr_extraneous, a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+
+On pose a₀ = 5 et a_(n + 1) = (a_n² + 28)/11. Étudie la suite : points fixes, sens de variation, limite.
+  [guided]  L = (L² + 28)/11
+    (Candidats : résous L = f(L).)
+    = L² − 11L + 28 = 0   ← Multiplier par 11
+    = L = 4 ou L = □   (trous : L = 4 ou L = 7)   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 28)/11 − x > 0
+    = (x² − 11x + 28)/11 > 0   ← Même dénominateur
+    = ]−∞ ; □[ ∪ ]7 ; +∞[   (trous : ]−∞ ; 4[ ∪ ]7 ; +∞[)   ← Signe du trinôme
+  — Conclusion pour a₀ = 5 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 5 ∈ ]4 ; 7[. Pourquoi aₙ ∈ ]4 ; 7[ pour tout n ? ✔ f est croissante, f(4) = 4 et f(7) = 7 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]4 ; 7[ / · Parce que a₀ ∈ ]4 ; 7[
+    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 4 : elle converge, vers 4 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est bornée (elle reste dans ]4 ; 7[) : elle converge / · converge vers 7, l'autre point fixe
+    = 4   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]7 ; +∞[ | aₙ ∈ ]4 ; 7[, décroissante : aₙ → 4
+  pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+
+```
+
+### Niveau 3
+
+```
+On pose a₀ = 4 et a_(n + 1) = √(2a_n). Étudie la suite : points fixes, sens de variation, limite.
+  [tap, suivre l'erreur, menu steps]  L = √(2L)
+    (Candidats : résous L = f(L).)
+    = L² − 2L = 0   ← Élever au carré (L ≥ 0)
+    = L = 0 ou L = 2   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : √(2x) − x > 0
+    = x² − 2x < 0   ← Les deux membres sont positifs : élever au carré
+    = ]0 ; 2[   ← Signe du trinôme
+  — Conclusion pour a₀ = 4 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 4 ∈ ]2 ; +∞[. Pourquoi aₙ ∈ ]2 ; +∞[ pour tout n ? ✔ f est croissante, f(2) = 2 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]2 ; +∞[ / · Parce que a₀ ∈ ]2 ; +∞[
+    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 2 : elle converge, vers 2 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est minorée par 2 : elle converge / · converge vers 0, l'autre point fixe
+    = 2   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 2[ | aₙ ∈ ]2 ; +∞[, décroissante : aₙ → 2
+  pièges : g1_irr_extraneous, a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+
+On pose a₀ = 5 et a_(n + 1) = (a_n² + 12)/7. Étudie la suite : points fixes, sens de variation, limite.
+  [tap, suivre l'erreur, menu steps]  L = (L² + 12)/7
+    (Candidats : résous L = f(L).)
+    = L² − 7L + 12 = 0   ← Multiplier par 7
+    = L = 3 ou L = 4   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 12)/7 − x > 0
+    = (x² − 7x + 12)/7 > 0   ← Même dénominateur
+    = ]−∞ ; 3[ ∪ ]4 ; +∞[   ← Signe du trinôme
+  — Pour x > 4, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 2/7, donc aₙ ≥ 5 + (2/7)n. Limite de ce minorant :  [juge limit]  départ : 5 + (2/7)n
+    ? a₀ = 5 > 4. La suite (aₙ) : ✔ croît (f(x) > x pour x > 4) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 4, un point fixe / · croît et elle est minorée par 4 : elle converge
+    = ∞   ← aₙ → +∞
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]4 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
+  pièges : a1_rec_limit_without_convergence
+
+On pose a₀ = 6 et a_(n + 1) = √(11a_n − 28). Étudie la suite : points fixes, sens de variation, limite.
+  [tap, suivre l'erreur, menu steps]  L = √(11L − 28)
+    (Candidats : résous L = f(L).)
+    = L² − 11L + 28 = 0   ← Élever au carré (L ≥ 0)
+    = L = 4 ou L = 7   ← Racines du trinôme
+  — Signe de f(x) − x :  [juge solset]  départ : √(11x − 28) − x > 0
+    = x² − 11x + 28 < 0   ← Les deux membres sont positifs : élever au carré
+    = ]4 ; 7[   ← Signe du trinôme
+  — Conclusion pour a₀ = 6 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 6 ∈ ]4 ; 7[. Pourquoi aₙ ∈ ]4 ; 7[ pour tout n ? ✔ f est croissante, f(4) = 4 et f(7) = 7 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]4 ; 7[ / · Parce que a₀ ∈ ]4 ; 7[
+    ? Donc la suite (aₙ) : ✔ croît (f(x) > x sur I) et est majorée par 7 : elle converge, vers 7 / · croît et tend vers +∞ / · est bornée (elle reste dans ]4 ; 7[) : elle converge / · converge vers 4, l'autre point fixe
+    = 7   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]▢ ; 7[ | aₙ ∈ ]4 ; 7[, croissante : aₙ → 7
+  pièges : g1_irr_extraneous, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+
+```
+
+### Niveau 4
+
+```
+On pose a₀ = 4 et a_(n + 1) = (a_n² + 1)/2. Étudie la suite : points fixes, sens de variation, limite.
+  [free, suivre l'erreur]  L = (L² + 1)/2
+    (Candidats : résous L = f(L).)
+    = L = 1   ← Points fixes
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 1)/2 − x > 0
+    = ]−∞ ; 1[ ∪ ]1 ; +∞[   ← Signe de f(x) − x
+  — Pour x > 1, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 9/2, donc aₙ ≥ 4 + (9/2)n. Limite de ce minorant :  [juge limit]  départ : 4 + (9/2)n
+    ? a₀ = 4 > 1. La suite (aₙ) : ✔ croît (f(x) > x pour x > 1) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 1, le point fixe / · croît et elle est minorée par 1 : elle converge
+    = ∞   ← aₙ → +∞
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]1 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
+  pièges : a1_rec_limit_without_convergence
+
+On pose a₀ = 3 et a_(n + 1) = (a_n² + 24)/10. Étudie la suite : points fixes, sens de variation, limite.
+  [free, suivre l'erreur]  L = (L² + 24)/10
+    (Candidats : résous L = f(L).)
+    = L = 4 ou L = 6   ← Points fixes
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 24)/10 − x > 0
+    = ]−∞ ; 4[ ∪ ]6 ; +∞[   ← Signe de f(x) − x
+  — Conclusion pour a₀ = 3 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 3 ∈ [0 ; 4[. Pourquoi aₙ ∈ [0 ; 4[ pour tout n ? ✔ f est croissante, f(0) = 12/5 ≥ 0 et f(4) = 4 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur [0 ; 4[ / · Parce que a₀ ∈ [0 ; 4[
+    ? Donc la suite (aₙ) : ✔ croît (f(x) > x sur I) et est majorée par 4 : elle converge, vers 4 / · croît et tend vers +∞ / · est bornée (elle reste dans [0 ; 4[) : elle converge / · converge vers 6, l'autre point fixe
+    = 4   ← Monotone et bornée : la limite est un point fixe
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]6 ; +∞[ | aₙ ∈ [0 ; 4[, croissante : aₙ → 4
+  pièges : a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+
+On pose a₀ = 6 et a_(n + 1) = (a_n² + 20)/9. Étudie la suite : points fixes, sens de variation, limite.
+  [free, suivre l'erreur]  L = (L² + 20)/9
+    (Candidats : résous L = f(L).)
+    = L = 4 ou L = 5   ← Points fixes
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 20)/9 − x > 0
+    = ]−∞ ; 4[ ∪ ]5 ; +∞[   ← Signe de f(x) − x
+  — Pour x > 5, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 2/9, donc aₙ ≥ 6 + (2/9)n. Limite de ce minorant :  [juge limit]  départ : 6 + (2/9)n
+    ? a₀ = 6 > 5. La suite (aₙ) : ✔ croît (f(x) > x pour x > 5) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 5, un point fixe / · croît et elle est minorée par 5 : elle converge
+    = ∞   ← aₙ → +∞
+  aides : Trouve d'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c'est le signe de f(x) − x. | f(x) − x > 0 ⇔ x ∈ ]−∞ ; ▢[ ∪ ]5 ; +∞[ | aₙ ≥ a₀ + n·δ, donc aₙ → +∞
+  pièges : a1_rec_limit_without_convergence
+
+```
+
+### Niveau 5
+
+```
+On pose a_(n + 1) = (a_n² + 9)/6. Étudie la suite pour a₀ = 0, puis pour a₀ = 4.
+  [free, sans aide]  L = (L² + 9)/6
+    (Candidats : résous L = f(L).)
+    = L = 3   ← Points fixes
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 9)/6 − x > 0
+    = ]−∞ ; 3[ ∪ ]3 ; +∞[   ← Signe de f(x) − x
+  — (1) Conclusion pour a₀ = 0 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 0 ∈ [0 ; 3[. Pourquoi aₙ ∈ [0 ; 3[ pour tout n ? ✔ f est croissante, f(0) = 3/2 ≥ 0 et f(3) = 3 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur [0 ; 3[ / · Parce que a₀ ∈ [0 ; 3[
+    ? Donc la suite (aₙ) : ✔ croît (f(x) > x sur I) et est majorée par 3 : elle converge, vers 3 / · croît et tend vers +∞ / · est bornée (elle reste dans [0 ; 3[) : elle converge
+    = 3   ← Monotone et bornée : la limite est un point fixe
+  — (2) Pour x > 3, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 1/6, donc aₙ ≥ 4 + (1/6)n. Limite de ce minorant :  [juge limit]  départ : 4 + (1/6)n
+    ? a₀ = 4 > 3. La suite (aₙ) : ✔ croît (f(x) > x pour x > 3) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 3, le point fixe / · croît et elle est minorée par 3 : elle converge
+    = ∞   ← aₙ → +∞
+  pièges : a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+
+On pose a_(n + 1) = (a_n² + 16)/8. Étudie la suite pour a₀ = 6, puis pour a₀ = 0.
+  [free, sans aide]  L = (L² + 16)/8
+    (Candidats : résous L = f(L).)
+    = L = 4   ← Points fixes
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 16)/8 − x > 0
+    = ]−∞ ; 4[ ∪ ]4 ; +∞[   ← Signe de f(x) − x
+  — (1) Pour x > 4, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 1/2, donc aₙ ≥ 6 + (1/2)n. Limite de ce minorant :  [juge limit]  départ : 6 + (1/2)n
+    ? a₀ = 6 > 4. La suite (aₙ) : ✔ croît (f(x) > x pour x > 4) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 4, le point fixe / · croît et elle est minorée par 4 : elle converge
+    = ∞   ← aₙ → +∞
+  — (2) Conclusion pour a₀ = 0 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 0 ∈ [0 ; 4[. Pourquoi aₙ ∈ [0 ; 4[ pour tout n ? ✔ f est croissante, f(0) = 2 ≥ 0 et f(4) = 4 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur [0 ; 4[ / · Parce que a₀ ∈ [0 ; 4[
+    ? Donc la suite (aₙ) : ✔ croît (f(x) > x sur I) et est majorée par 4 : elle converge, vers 4 / · croît et tend vers +∞ / · est bornée (elle reste dans [0 ; 4[) : elle converge
+    = 4   ← Monotone et bornée : la limite est un point fixe
+  pièges : a1_rec_limit_without_convergence, a1_bounded_implies_convergent
+
+On pose a_(n + 1) = (a_n² + 10)/7. Étudie la suite pour a₀ = 4, puis pour a₀ = 6.
+  [free, sans aide]  L = (L² + 10)/7
+    (Candidats : résous L = f(L).)
+    = L = 2 ou L = 5   ← Points fixes
+  — Signe de f(x) − x :  [juge solset]  départ : (x² + 10)/7 − x > 0
+    = ]−∞ ; 2[ ∪ ]5 ; +∞[   ← Signe de f(x) − x
+  — (1) Conclusion pour a₀ = 4 :  [juge value]  départ : lim_{n→∞} a_n
+    ? a₀ = 4 ∈ ]2 ; 5[. Pourquoi aₙ ∈ ]2 ; 5[ pour tout n ? ✔ f est croissante, f(2) = 2 et f(5) = 5 : f(I) ⊂ I, puis récurrence / · Parce que f(x) − x garde un signe sur ]2 ; 5[ / · Parce que a₀ ∈ ]2 ; 5[
+    ? Donc la suite (aₙ) : ✔ décroît (f(x) < x sur I) et est minorée par 2 : elle converge, vers 2 / · croît, parce que f est croissante / · décroît et tend vers −∞ / · est bornée (elle reste dans ]2 ; 5[) : elle converge / · converge vers 5, l'autre point fixe
+    = 2   ← Monotone et bornée : la limite est un point fixe
+  — (2) Pour x > 5, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = 4/7, donc aₙ ≥ 6 + (4/7)n. Limite de ce minorant :  [juge limit]  départ : 6 + (4/7)n
+    ? a₀ = 6 > 5. La suite (aₙ) : ✔ croît (f(x) > x pour x > 5) ; une limite serait un point fixe ≥ a₀, il n'y en a pas / · converge vers 5, un point fixe / · croît et elle est minorée par 5 : elle converge
+    = ∞   ← aₙ → +∞
+  pièges : a1_monotone_by_f_increasing, a1_bounded_implies_convergent, a1_rec_limit_without_convergence
+
+```
+
+### Variantes d'examen
+
+```
+On pose a₀ = 1/2 et a_(n + 1) = (a_n² + 7)/8. Que vaut la limite de (aₙ) ?
+  · lim aₙ = +∞   · lim aₙ = 7 [a1_rec_limit_without_convergence]   · lim aₙ = 1/2   ✔ lim aₙ = 1
+  [examen mcq]
+  pièges : a1_rec_limit_without_convergence
+
+Vrai ou faux ?
+  « Pour tout a₀ ≥ 0, la suite a_(n + 1) = a_n²/2 converge vers 0 ou vers 2. » → FAUX
+    contre-exemple (refute) : a = 3
+  [examen tf]
+  pièges : a1_rec_limit_without_convergence
+
+```
+
+## Suite récurrente par l'étude complète de f (problème long) (`a1-seq-rec-study`, BA1)
+
+_Étudier f, comparer son graphe à y = x, puis discuter la suite selon a₁._
+
+### Niveau 1
+
+```
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n + (a_n + 2)/(a_n + 1), avec f(x) = x + (x + 2)/(x + 1) (a₁ ≠ −1). On sait que : la seule limite possible est −2 ; f′(x) = (x + 2)x/(x + 1)² ; f croît sur ]−∞ ; −2[ ∪ ]0 ; +∞[ et décroît ailleurs (hors de −1) ; max local f(−2) = −2, min local f(0) = 2 ; asymptotes x = −1 et y = x + 1. (c) Compare le graphe de f à la droite y = x.
+  [guided]  x + (x + 2)/(x + 1) > x
+    ((c) Où le graphe de f est-il au-dessus de la droite y = x ?)
+    = (x + 2)/(x + 1) > 0   ← Retrancher x
+    = ]−∞ ; −2[ ∪ ]□ ; +∞[   (trous : ]−∞ ; −2[ ∪ ]−1 ; +∞[)   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x + (x + 2)/(x + 1) < x
+    = (x + 2)/(x + 1) < 0   ← Retrancher x
+    = ]□ ; −1[   (trous : ]−2 ; −1[)   ← Signe du quotient
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−∞ ; −1[, le maximum de f vaut ▢ : c'est un point fixe. | f(x) ≤ −2 pour x < −1, donc dès a₂ la suite reste sous −2, et elle converge vers −2.
+  pièges : g1_pole_closed, g9_bracket
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n + a_n/(2a_n − 1), avec f(x) = x + x/(2x − 1) (a₁ ≠ 1/2). On sait que : la seule limite possible est 0 ; f′(x) = 4x(x − 1)/(2x − 1)² ; f croît sur ]−∞ ; 0[ ∪ ]1 ; +∞[ et décroît ailleurs (hors de 1/2) ; max local f(0) = 0, min local f(1) = 2 ; asymptotes x = 1/2 et y = x + 1/2. (c) Compare le graphe de f à la droite y = x.
+  [guided]  x + x/(2x − 1) > x
+    ((c) Où le graphe de f est-il au-dessus de la droite y = x ?)
+    = x/(2x − 1) > 0   ← Retrancher x
+    = ]−∞ ; 0[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 0[ ∪ ]1/2 ; +∞[)   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x + x/(2x − 1) < x
+    = x/(2x − 1) < 0   ← Retrancher x
+    = ]□ ; 1/2[   (trous : ]0 ; 1/2[)   ← Signe du quotient
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−∞ ; 1/2[, le maximum de f vaut ▢ : c'est un point fixe. | f(x) ≤ 0 pour x < 1/2, donc dès a₂ la suite reste sous 0, et elle converge vers 0.
+  pièges : g1_pole_closed, g9_bracket
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − a_n/(a_n + 1), avec f(x) = x − x/(x + 1) (a₁ ≠ −1). On sait que : la seule limite possible est 0 ; f′(x) = x(x + 2)/(x + 1)² ; f croît sur ]−∞ ; −2[ ∪ ]0 ; +∞[ et décroît ailleurs (hors de −1) ; min local f(0) = 0, max local f(−2) = −4 ; asymptotes x = −1 et y = x − 1. (c) Compare le graphe de f à la droite y = x.
+  [guided]  x − x/(x + 1) > x
+    ((c) Où le graphe de f est-il au-dessus de la droite y = x ?)
+    = −x/(x + 1) > 0   ← Retrancher x
+    = ]□ ; 0[   (trous : ]−1 ; 0[)   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x − x/(x + 1) < x
+    = −x/(x + 1) < 0   ← Retrancher x
+    = ]−∞ ; −1[ ∪ ]□ ; +∞[   (trous : ]−∞ ; −1[ ∪ ]0 ; +∞[)   ← Signe du quotient
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−1 ; +∞[, le minimum de f vaut ▢ : c'est un point fixe. | f(x) ≥ 0 pour x > −1, donc dès a₂ la suite reste au-dessus de 0, et elle converge vers 0.
+  pièges : g1_pole_closed, g9_bracket
+
+```
+
+### Niveau 2
+
+```
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n + (a_n + 3)/(2a_n + 5), avec f(x) = x + (x + 3)/(2x + 5) (a₁ ≠ −5/2). (a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.
+  [guided]  L = L + (L + 3)/(2L + 5)
+    ((a) Seule limite possible : résous L = f(L).)
+    = (L + 3)/(2L + 5) = 0   ← Retrancher L
+    = L = □   (trous : L = −3)   ← Une fraction est nulle si son numérateur l'est
+  — (b) Dérive f :  [juge equiv]  départ : (x + (x + 3)/(2x + 5))′
+    = 1 − 1/□   (trous : 1 − 1/(2x + 5)²)   ← Dériver
+  — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(2x + 5)² > 0
+    = 4(x + 3)(x + 2)/(2x + 5)² > 0   ← Même dénominateur, factoriser
+    = ]−∞ ; −3[ ∪ ]□ ; +∞[   (trous : ]−∞ ; −3[ ∪ ]−2 ; +∞[)   ← Signe des facteurs
+  — Dérive encore :  [juge equiv]  départ : (1 − 1/(2x + 5)²)′
+    = □/(2x + 5)³   (trous : 4/(2x + 5)³)   ← Dériver
+  — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 4/(2x + 5)³ > 0
+    = ]−5/2 ; +∞[   ← Signe de (2x + 5)³
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x + (x + 3)/(2x + 5) > x
+    = (x + 3)/(2x + 5) > 0   ← Retrancher x
+    = ]−∞ ; −3[ ∪ ]□ ; +∞[   (trous : ]−∞ ; −3[ ∪ ]−5/2 ; +∞[)   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x + (x + 3)/(2x + 5) < x
+    = (x + 3)/(2x + 5) < 0   ← Retrancher x
+    = ]□ ; −5/2[   (trous : ]−3 ; −5/2[)   ← Signe du quotient
+  — (d) Pour a₁ < −5/2 : le maximum de f sur ]−∞ ; −5/2[ vaut  [juge value]  départ : M
+    ? Si a₁ > −5/2 : ✔ f(x) > x et f(x) ≥ −1 > −5/2 sur ]−5/2 ; +∞[ : (aₙ) croît ; une limite serait un point fixe > −5/2, il n'y en a pas : aₙ → +∞ / · aₙ → −3, le seul point fixe / · (aₙ) croît et elle est minorée par −1 : elle converge
+    = −3   ← f(−3) = −3, extremum local et point fixe
+  — Si a₁ < −3, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ < −3 : ✔ aₙ < −3 pour tout n (−3 est le maximum de f sur ]−∞ ; −5/2[) et f(x) > x : (aₙ) croît, majorée par −3, donc aₙ → −3 / · f est croissante sur ]−∞ ; −3] : (aₙ) croît sans borne, aₙ → +∞ / · (aₙ) décroît et tend vers −∞ / · (aₙ) croît et converge vers −5/2
+    ? Si a₁ est entre −3 et −5/2 : ✔ a₂ = f(a₁) < −3 : on est ramené au cas a₁ < −3, donc aₙ → −3 / · f(x) < x sur cet intervalle : (aₙ) décroît et tend vers −∞ / · (aₙ) décroît et elle est minorée par −3 : aₙ → −3
+    = −3   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = −3 donne une suite constante).  [juge solset]  départ : x < −3 ou x = −3 ou (−3 < x et x < −5/2)
+    = ]−∞ ; −5/2[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−∞ ; −5/2[, le maximum de f vaut ▢ : c'est un point fixe. | f(x) ≤ −3 pour x < −5/2, donc dès a₂ la suite reste sous −3, et elle converge vers −3.
+  pièges : a1_rec_limit_without_convergence
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n + 3)/(a_n + 4), avec f(x) = x − (x + 3)/(x + 4) (a₁ ≠ −4). (a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.
+  [guided]  L = L − (L + 3)/(L + 4)
+    ((a) Seule limite possible : résous L = f(L).)
+    = (L + 3)/(L + 4) = 0   ← Retrancher L
+    = L = □   (trous : L = −3)   ← Une fraction est nulle si son numérateur l'est
+  — (b) Dérive f :  [juge equiv]  départ : (x − (x + 3)/(x + 4))′
+    = 1 − 1/□   (trous : 1 − 1/(x + 4)²)   ← Dériver
+  — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(x + 4)² > 0
+    = (x + 3)(x + 5)/(x + 4)² > 0   ← Même dénominateur, factoriser
+    = ]−∞ ; −5[ ∪ ]□ ; +∞[   (trous : ]−∞ ; −5[ ∪ ]−3 ; +∞[)   ← Signe des facteurs
+  — Dérive encore :  [juge equiv]  départ : (1 − 1/(x + 4)²)′
+    = □/(x + 4)³   (trous : 2/(x + 4)³)   ← Dériver
+  — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 2/(x + 4)³ > 0
+    = ]−4 ; +∞[   ← Signe de (x + 4)³
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x − (x + 3)/(x + 4) > x
+    = −(x + 3)/(x + 4) > 0   ← Retrancher x
+    = ]□ ; −3[   (trous : ]−4 ; −3[)   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x − (x + 3)/(x + 4) < x
+    = −(x + 3)/(x + 4) < 0   ← Retrancher x
+    = ]−∞ ; −4[ ∪ ]□ ; +∞[   (trous : ]−∞ ; −4[ ∪ ]−3 ; +∞[)   ← Signe du quotient
+  — (d) Pour a₁ > −4 : le minimum de f sur ]−4 ; +∞[ vaut  [juge value]  départ : m
+    ? Si a₁ < −4 : ✔ f(x) < x et f(x) ≤ −7 < −4 sur ]−∞ ; −4[ : (aₙ) décroît ; une limite serait un point fixe < −4, il n'y en a pas : aₙ → −∞ / · aₙ → −3, le seul point fixe / · (aₙ) décroît et elle est majorée par −7 : elle converge
+    = −3   ← f(−3) = −3, extremum local et point fixe
+  — Si a₁ > −3, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ > −3 : ✔ aₙ > −3 pour tout n (−3 est le minimum de f sur ]−4 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par −3, donc aₙ → −3 / · f est croissante sur [−3 ; +∞[, donc (aₙ) croît / · (aₙ) croît et tend vers +∞ / · (aₙ) décroît et converge vers −4
+    ? Si a₁ est entre −4 et −3 : ✔ a₂ = f(a₁) > −3 : on est ramené au cas a₁ > −3, donc aₙ → −3 / · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞ / · (aₙ) croît et elle est majorée par −3 : aₙ → −3
+    = −3   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = −3 donne une suite constante).  [juge solset]  départ : x > −3 ou x = −3 ou (−4 < x et x < −3)
+    = ]−4 ; +∞[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−4 ; +∞[, le minimum de f vaut ▢ : c'est un point fixe. | f(x) ≥ −3 pour x > −4, donc dès a₂ la suite reste au-dessus de −3, et elle converge vers −3.
+  pièges : a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n + (a_n − 2)/(2a_n − 5), avec f(x) = x + (x − 2)/(2x − 5) (a₁ ≠ 5/2). (a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.
+  [guided]  L = L + (L − 2)/(2L − 5)
+    ((a) Seule limite possible : résous L = f(L).)
+    = (L − 2)/(2L − 5) = 0   ← Retrancher L
+    = L = □   (trous : L = 2)   ← Une fraction est nulle si son numérateur l'est
+  — (b) Dérive f :  [juge equiv]  départ : (x + (x − 2)/(2x − 5))′
+    = 1 − 1/□   (trous : 1 − 1/(2x − 5)²)   ← Dériver
+  — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(2x − 5)² > 0
+    = 4(x − 2)(x − 3)/(2x − 5)² > 0   ← Même dénominateur, factoriser
+    = ]−∞ ; 2[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 2[ ∪ ]3 ; +∞[)   ← Signe des facteurs
+  — Dérive encore :  [juge equiv]  départ : (1 − 1/(2x − 5)²)′
+    = □/(2x − 5)³   (trous : 4/(2x − 5)³)   ← Dériver
+  — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 4/(2x − 5)³ > 0
+    = ]5/2 ; +∞[   ← Signe de (2x − 5)³
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x + (x − 2)/(2x − 5) > x
+    = (x − 2)/(2x − 5) > 0   ← Retrancher x
+    = ]−∞ ; 2[ ∪ ]□ ; +∞[   (trous : ]−∞ ; 2[ ∪ ]5/2 ; +∞[)   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x + (x − 2)/(2x − 5) < x
+    = (x − 2)/(2x − 5) < 0   ← Retrancher x
+    = ]□ ; 5/2[   (trous : ]2 ; 5/2[)   ← Signe du quotient
+  — (d) Pour a₁ < 5/2 : le maximum de f sur ]−∞ ; 5/2[ vaut  [juge value]  départ : M
+    ? Si a₁ > 5/2 : ✔ f(x) > x et f(x) ≥ 4 > 5/2 sur ]5/2 ; +∞[ : (aₙ) croît ; une limite serait un point fixe > 5/2, il n'y en a pas : aₙ → +∞ / · aₙ → 2, le seul point fixe / · (aₙ) croît et elle est minorée par 4 : elle converge
+    = 2   ← f(2) = 2, extremum local et point fixe
+  — Si a₁ < 2, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ < 2 : ✔ aₙ < 2 pour tout n (2 est le maximum de f sur ]−∞ ; 5/2[) et f(x) > x : (aₙ) croît, majorée par 2, donc aₙ → 2 / · f est croissante sur ]−∞ ; 2] : (aₙ) croît sans borne, aₙ → +∞ / · (aₙ) décroît et tend vers −∞ / · (aₙ) croît et converge vers 5/2
+    ? Si a₁ est entre 2 et 5/2 : ✔ a₂ = f(a₁) < 2 : on est ramené au cas a₁ < 2, donc aₙ → 2 / · f(x) < x sur cet intervalle : (aₙ) décroît et tend vers −∞ / · (aₙ) décroît et elle est minorée par 2 : aₙ → 2
+    = 2   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = 2 donne une suite constante).  [juge solset]  départ : x < 2 ou x = 2 ou (2 < x et x < 5/2)
+    = ]−∞ ; 5/2[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−∞ ; 5/2[, le maximum de f vaut ▢ : c'est un point fixe. | f(x) ≤ 2 pour x < 5/2, donc dès a₂ la suite reste sous 2, et elle converge vers 2.
+  pièges : a1_rec_limit_without_convergence
+
+```
+
+### Niveau 3
+
+```
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n + a_n/(2a_n − 1), avec f(x) = x + x/(2x − 1) (a₁ ≠ 1/2). On sait que f a un maximum local en 0, f(0) = 0, et que x = 1/2 est asymptote verticale. Trouve la limite possible, compare f à y = x, puis discute selon a₁.
+  [tap, suivre l'erreur, menu steps]  L = L + L/(2L − 1)
+    ((a) Seule limite possible : résous L = f(L).)
+    = L/(2L − 1) = 0   ← Retrancher L
+    = L = 0   ← Une fraction est nulle si son numérateur l'est
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x + x/(2x − 1) > x
+    = x/(2x − 1) > 0   ← Retrancher x
+    = ]−∞ ; 0[ ∪ ]1/2 ; +∞[   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x + x/(2x − 1) < x
+    = x/(2x − 1) < 0   ← Retrancher x
+    = ]0 ; 1/2[   ← Signe du quotient
+  — (d) Pour a₁ < 1/2 : le maximum de f sur ]−∞ ; 1/2[ vaut  [juge value]  départ : M
+    ? Si a₁ > 1/2 : ✔ f(x) > x et f(x) ≥ 2 > 1/2 sur ]1/2 ; +∞[ : (aₙ) croît ; une limite serait un point fixe > 1/2, il n'y en a pas : aₙ → +∞ / · aₙ → 0, le seul point fixe / · (aₙ) croît et elle est minorée par 2 : elle converge
+    = 0   ← f(0) = 0, extremum local et point fixe
+  — Si a₁ < 0, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ < 0 : ✔ aₙ < 0 pour tout n (0 est le maximum de f sur ]−∞ ; 1/2[) et f(x) > x : (aₙ) croît, majorée par 0, donc aₙ → 0 / · f est croissante sur ]−∞ ; 0] : (aₙ) croît sans borne, aₙ → +∞ / · (aₙ) décroît et tend vers −∞ / · (aₙ) croît et converge vers 1/2
+    ? Si a₁ est entre 0 et 1/2 : ✔ a₂ = f(a₁) < 0 : on est ramené au cas a₁ < 0, donc aₙ → 0 / · f(x) < x sur cet intervalle : (aₙ) décroît et tend vers −∞ / · (aₙ) décroît et elle est minorée par 0 : aₙ → 0
+    = 0   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = 0 donne une suite constante).  [juge solset]  départ : x < 0 ou x = 0 ou (0 < x et x < 1/2)
+    = ]−∞ ; 1/2[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−∞ ; 1/2[, le maximum de f vaut ▢ : c'est un point fixe. | f(x) ≤ 0 pour x < 1/2, donc dès a₂ la suite reste sous 0, et elle converge vers 0.
+  pièges : a1_rec_limit_without_convergence
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n − 2)/(2a_n − 3), avec f(x) = x − (x − 2)/(2x − 3) (a₁ ≠ 3/2). On sait que f a un minimum local en 2, f(2) = 2, et que x = 3/2 est asymptote verticale. Trouve la limite possible, compare f à y = x, puis discute selon a₁.
+  [tap, suivre l'erreur, menu steps]  L = L − (L − 2)/(2L − 3)
+    ((a) Seule limite possible : résous L = f(L).)
+    = (L − 2)/(2L − 3) = 0   ← Retrancher L
+    = L = 2   ← Une fraction est nulle si son numérateur l'est
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x − (x − 2)/(2x − 3) > x
+    = −(x − 2)/(2x − 3) > 0   ← Retrancher x
+    = ]3/2 ; 2[   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x − (x − 2)/(2x − 3) < x
+    = −(x − 2)/(2x − 3) < 0   ← Retrancher x
+    = ]−∞ ; 3/2[ ∪ ]2 ; +∞[   ← Signe du quotient
+  — (d) Pour a₁ > 3/2 : le minimum de f sur ]3/2 ; +∞[ vaut  [juge value]  départ : m
+    ? Si a₁ < 3/2 : ✔ f(x) < x et f(x) ≤ 0 < 3/2 sur ]−∞ ; 3/2[ : (aₙ) décroît ; une limite serait un point fixe < 3/2, il n'y en a pas : aₙ → −∞ / · aₙ → 2, le seul point fixe / · (aₙ) décroît et elle est majorée par 0 : elle converge
+    = 2   ← f(2) = 2, extremum local et point fixe
+  — Si a₁ > 2, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ > 2 : ✔ aₙ > 2 pour tout n (2 est le minimum de f sur ]3/2 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par 2, donc aₙ → 2 / · f est croissante sur [2 ; +∞[, donc (aₙ) croît / · (aₙ) croît et tend vers +∞ / · (aₙ) décroît et converge vers 3/2
+    ? Si a₁ est entre 3/2 et 2 : ✔ a₂ = f(a₁) > 2 : on est ramené au cas a₁ > 2, donc aₙ → 2 / · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞ / · (aₙ) croît et elle est majorée par 2 : aₙ → 2
+    = 2   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = 2 donne une suite constante).  [juge solset]  départ : x > 2 ou x = 2 ou (3/2 < x et x < 2)
+    = ]3/2 ; +∞[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]3/2 ; +∞[, le minimum de f vaut ▢ : c'est un point fixe. | f(x) ≥ 2 pour x > 3/2, donc dès a₂ la suite reste au-dessus de 2, et elle converge vers 2.
+  pièges : a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n + 1)/(a_n + 2), avec f(x) = x − (x + 1)/(x + 2) (a₁ ≠ −2). On sait que f a un minimum local en −1, f(−1) = −1, et que x = −2 est asymptote verticale. Trouve la limite possible, compare f à y = x, puis discute selon a₁.
+  [tap, suivre l'erreur, menu steps]  L = L − (L + 1)/(L + 2)
+    ((a) Seule limite possible : résous L = f(L).)
+    = (L + 1)/(L + 2) = 0   ← Retrancher L
+    = L = −1   ← Une fraction est nulle si son numérateur l'est
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x − (x + 1)/(x + 2) > x
+    = −(x + 1)/(x + 2) > 0   ← Retrancher x
+    = ]−2 ; −1[   ← Signe du quotient
+  — Et en dessous ?  [juge solset]  départ : x − (x + 1)/(x + 2) < x
+    = −(x + 1)/(x + 2) < 0   ← Retrancher x
+    = ]−∞ ; −2[ ∪ ]−1 ; +∞[   ← Signe du quotient
+  — (d) Pour a₁ > −2 : le minimum de f sur ]−2 ; +∞[ vaut  [juge value]  départ : m
+    ? Si a₁ < −2 : ✔ f(x) < x et f(x) ≤ −5 < −2 sur ]−∞ ; −2[ : (aₙ) décroît ; une limite serait un point fixe < −2, il n'y en a pas : aₙ → −∞ / · aₙ → −1, le seul point fixe / · (aₙ) décroît et elle est majorée par −5 : elle converge
+    = −1   ← f(−1) = −1, extremum local et point fixe
+  — Si a₁ > −1, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ > −1 : ✔ aₙ > −1 pour tout n (−1 est le minimum de f sur ]−2 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par −1, donc aₙ → −1 / · f est croissante sur [−1 ; +∞[, donc (aₙ) croît / · (aₙ) croît et tend vers +∞ / · (aₙ) décroît et converge vers −2
+    ? Si a₁ est entre −2 et −1 : ✔ a₂ = f(a₁) > −1 : on est ramené au cas a₁ > −1, donc aₙ → −1 / · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞ / · (aₙ) croît et elle est majorée par −1 : aₙ → −1
+    = −1   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = −1 donne une suite constante).  [juge solset]  départ : x > −1 ou x = −1 ou (−2 < x et x < −1)
+    = ]−2 ; +∞[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−2 ; +∞[, le minimum de f vaut ▢ : c'est un point fixe. | f(x) ≥ −1 pour x > −2, donc dès a₂ la suite reste au-dessus de −1, et elle converge vers −1.
+  pièges : a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+```
+
+### Niveau 4
+
+```
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n + 2)/(a_n + 3), avec f(x) = x − (x + 2)/(x + 3) (a₁ ≠ −3). (a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.
+  [free, suivre l'erreur]  L = L − (L + 2)/(L + 3)
+    ((a) Seule limite possible : résous L = f(L).)
+    = L = −2   ← Le seul point fixe
+  — (b) Dérive f :  [juge equiv]  départ : (x − (x + 2)/(x + 3))′
+    = 1 − 1/(x + 3)²   ← Dériver
+  — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(x + 3)² > 0
+    = ]−∞ ; −4[ ∪ ]−2 ; +∞[   ← Signe de f′
+  — Valeur de l'autre extremum local, en x = −4 :  [juge value]  départ : (−4) − ((−4) + 2)/((−4) + 3)
+    ? f′ s'annule en x = −2 et change de signe. En x = −2, f a : ✔ un minimum local, f(−2) = −2 / · un maximum local / · pas d'extremum
+    = −6   ← Calculer
+  — Dérive encore :  [juge equiv]  départ : (1 − 1/(x + 3)²)′
+    = 2/(x + 3)³   ← Dériver
+  — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 2/(x + 3)³ > 0
+    = ]−3 ; +∞[   ← Signe de (x + 3)³
+  — Asymptote verticale : limite quand x → −3⁺  [juge limit]  départ : x − (x + 2)/(x + 3)
+    ? Asymptote verticale : ✔ x = −3 : f n'y est pas définie et |f(x)| → +∞ / · x = −2 / · il n'y en a pas
+    = ∞   ← Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0
+  — Puis quand x → −3⁻  [juge limit]  départ : x − (x + 2)/(x + 3)
+    = −∞   ← Le dénominateur tend vers 0 de l'autre côté
+  — Asymptote oblique en ±∞ : limite de f(x) − x  [juge limit]  départ : x − (x + 2)/(x + 3) − x
+    ? f(x)/x → 1 en ±∞ : la pente de l'asymptote oblique est 1. Pour son équation y = x + p : ✔ il faut encore p = lim (f(x) − x) / · y = x suffit : la pente est connue
+    = −1   ← Asymptote y = x − 1
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x − (x + 2)/(x + 3) > x
+    = ]−3 ; −2[   ← Signe de f(x) − x
+  — Et en dessous ?  [juge solset]  départ : x − (x + 2)/(x + 3) < x
+    = ]−∞ ; −3[ ∪ ]−2 ; +∞[   ← Signe de f(x) − x
+  — (d) Pour a₁ > −3 : le minimum de f sur ]−3 ; +∞[ vaut  [juge value]  départ : m
+    ? Si a₁ < −3 : ✔ f(x) < x et f(x) ≤ −6 < −3 sur ]−∞ ; −3[ : (aₙ) décroît ; une limite serait un point fixe < −3, il n'y en a pas : aₙ → −∞ / · aₙ → −2, le seul point fixe / · (aₙ) décroît et elle est majorée par −6 : elle converge
+    = −2   ← f(−2) = −2, extremum local et point fixe
+  — Si a₁ > −2, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ > −2 : ✔ aₙ > −2 pour tout n (−2 est le minimum de f sur ]−3 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par −2, donc aₙ → −2 / · f est croissante sur [−2 ; +∞[, donc (aₙ) croît / · (aₙ) croît et tend vers +∞ / · (aₙ) décroît et converge vers −3
+    ? Si a₁ est entre −3 et −2 : ✔ a₂ = f(a₁) > −2 : on est ramené au cas a₁ > −2, donc aₙ → −2 / · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞ / · (aₙ) croît et elle est majorée par −2 : aₙ → −2
+    = −2   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = −2 donne une suite constante).  [juge solset]  départ : x > −2 ou x = −2 ou (−3 < x et x < −2)
+    = ]−3 ; +∞[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]−3 ; +∞[, le minimum de f vaut ▢ : c'est un point fixe. | f(x) ≥ −2 pour x > −3, donc dès a₂ la suite reste au-dessus de −2, et elle converge vers −2.
+  pièges : a1_oblique_asymptote_slope_only, a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n − 1)/(2a_n − 1), avec f(x) = x − (x − 1)/(2x − 1) (a₁ ≠ 1/2). (a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.
+  [free, suivre l'erreur]  L = L − (L − 1)/(2L − 1)
+    ((a) Seule limite possible : résous L = f(L).)
+    = L = 1   ← Le seul point fixe
+  — (b) Dérive f :  [juge equiv]  départ : (x − (x − 1)/(2x − 1))′
+    = 1 − 1/(2x − 1)²   ← Dériver
+  — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(2x − 1)² > 0
+    = ]−∞ ; 0[ ∪ ]1 ; +∞[   ← Signe de f′
+  — Valeur de l'autre extremum local, en x = 0 :  [juge value]  départ : 0 − (0 − 1)/(2·0 − 1)
+    ? f′ s'annule en x = 1 et change de signe. En x = 1, f a : ✔ un minimum local, f(1) = 1 / · un maximum local / · pas d'extremum
+    = −1   ← Calculer
+  — Dérive encore :  [juge equiv]  départ : (1 − 1/(2x − 1)²)′
+    = 4/(2x − 1)³   ← Dériver
+  — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 4/(2x − 1)³ > 0
+    = ]1/2 ; +∞[   ← Signe de (2x − 1)³
+  — Asymptote verticale : limite quand x → 1/2⁺  [juge limit]  départ : x − (x − 1)/(2x − 1)
+    ? Asymptote verticale : ✔ x = 1/2 : f n'y est pas définie et |f(x)| → +∞ / · x = 1 / · il n'y en a pas
+    = ∞   ← Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0
+  — Puis quand x → 1/2⁻  [juge limit]  départ : x − (x − 1)/(2x − 1)
+    = −∞   ← Le dénominateur tend vers 0 de l'autre côté
+  — Asymptote oblique en ±∞ : limite de f(x) − x  [juge limit]  départ : x − (x − 1)/(2x − 1) − x
+    ? f(x)/x → 1 en ±∞ : la pente de l'asymptote oblique est 1. Pour son équation y = x + p : ✔ il faut encore p = lim (f(x) − x) / · y = x suffit : la pente est connue
+    = −1/2   ← Asymptote y = x − 1/2
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x − (x − 1)/(2x − 1) > x
+    = ]1/2 ; 1[   ← Signe de f(x) − x
+  — Et en dessous ?  [juge solset]  départ : x − (x − 1)/(2x − 1) < x
+    = ]−∞ ; 1/2[ ∪ ]1 ; +∞[   ← Signe de f(x) − x
+  — (d) Pour a₁ > 1/2 : le minimum de f sur ]1/2 ; +∞[ vaut  [juge value]  départ : m
+    ? Si a₁ < 1/2 : ✔ f(x) < x et f(x) ≤ −1 < 1/2 sur ]−∞ ; 1/2[ : (aₙ) décroît ; une limite serait un point fixe < 1/2, il n'y en a pas : aₙ → −∞ / · aₙ → 1, le seul point fixe / · (aₙ) décroît et elle est majorée par −1 : elle converge
+    = 1   ← f(1) = 1, extremum local et point fixe
+  — Si a₁ > 1, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ > 1 : ✔ aₙ > 1 pour tout n (1 est le minimum de f sur ]1/2 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par 1, donc aₙ → 1 / · f est croissante sur [1 ; +∞[, donc (aₙ) croît / · (aₙ) croît et tend vers +∞ / · (aₙ) décroît et converge vers 1/2
+    ? Si a₁ est entre 1/2 et 1 : ✔ a₂ = f(a₁) > 1 : on est ramené au cas a₁ > 1, donc aₙ → 1 / · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞ / · (aₙ) croît et elle est majorée par 1 : aₙ → 1
+    = 1   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = 1 donne une suite constante).  [juge solset]  départ : x > 1 ou x = 1 ou (1/2 < x et x < 1)
+    = ]1/2 ; +∞[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]1/2 ; +∞[, le minimum de f vaut ▢ : c'est un point fixe. | f(x) ≥ 1 pour x > 1/2, donc dès a₂ la suite reste au-dessus de 1, et elle converge vers 1.
+  pièges : a1_oblique_asymptote_slope_only, a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n − 2)/(a_n − 1), avec f(x) = x − (x − 2)/(x − 1) (a₁ ≠ 1). (a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.
+  [free, suivre l'erreur]  L = L − (L − 2)/(L − 1)
+    ((a) Seule limite possible : résous L = f(L).)
+    = L = 2   ← Le seul point fixe
+  — (b) Dérive f :  [juge equiv]  départ : (x − (x − 2)/(x − 1))′
+    = 1 − 1/(x − 1)²   ← Dériver
+  — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(x − 1)² > 0
+    = ]−∞ ; 0[ ∪ ]2 ; +∞[   ← Signe de f′
+  — Valeur de l'autre extremum local, en x = 0 :  [juge value]  départ : 0 − (0 − 2)/(0 − 1)
+    ? f′ s'annule en x = 2 et change de signe. En x = 2, f a : ✔ un minimum local, f(2) = 2 / · un maximum local / · pas d'extremum
+    = −2   ← Calculer
+  — Dérive encore :  [juge equiv]  départ : (1 − 1/(x − 1)²)′
+    = 2/(x − 1)³   ← Dériver
+  — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 2/(x − 1)³ > 0
+    = ]1 ; +∞[   ← Signe de (x − 1)³
+  — Asymptote verticale : limite quand x → 1⁺  [juge limit]  départ : x − (x − 2)/(x − 1)
+    ? Asymptote verticale : ✔ x = 1 : f n'y est pas définie et |f(x)| → +∞ / · x = 2 / · il n'y en a pas
+    = ∞   ← Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0
+  — Puis quand x → 1⁻  [juge limit]  départ : x − (x − 2)/(x − 1)
+    = −∞   ← Le dénominateur tend vers 0 de l'autre côté
+  — Asymptote oblique en ±∞ : limite de f(x) − x  [juge limit]  départ : x − (x − 2)/(x − 1) − x
+    ? f(x)/x → 1 en ±∞ : la pente de l'asymptote oblique est 1. Pour son équation y = x + p : ✔ il faut encore p = lim (f(x) − x) / · y = x suffit : la pente est connue
+    = −1   ← Asymptote y = x − 1
+  — (c) Où le graphe de f est-il au-dessus de la droite y = x ?  [juge solset]  départ : x − (x − 2)/(x − 1) > x
+    = ]1 ; 2[   ← Signe de f(x) − x
+  — Et en dessous ?  [juge solset]  départ : x − (x − 2)/(x − 1) < x
+    = ]−∞ ; 1[ ∪ ]2 ; +∞[   ← Signe de f(x) − x
+  — (d) Pour a₁ > 1 : le minimum de f sur ]1 ; +∞[ vaut  [juge value]  départ : m
+    ? Si a₁ < 1 : ✔ f(x) < x et f(x) ≤ −2 < 1 sur ]−∞ ; 1[ : (aₙ) décroît ; une limite serait un point fixe < 1, il n'y en a pas : aₙ → −∞ / · aₙ → 2, le seul point fixe / · (aₙ) décroît et elle est majorée par −2 : elle converge
+    = 2   ← f(2) = 2, extremum local et point fixe
+  — Si a₁ > 2, la limite de la suite :  [juge value]  départ : lim_{n→∞} a_n
+    ? Si a₁ > 2 : ✔ aₙ > 2 pour tout n (2 est le minimum de f sur ]1 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par 2, donc aₙ → 2 / · f est croissante sur [2 ; +∞[, donc (aₙ) croît / · (aₙ) croît et tend vers +∞ / · (aₙ) décroît et converge vers 1
+    ? Si a₁ est entre 1 et 2 : ✔ a₂ = f(a₁) > 2 : on est ramené au cas a₁ > 2, donc aₙ → 2 / · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞ / · (aₙ) croît et elle est majorée par 2 : aₙ → 2
+    = 2   ← Monotone et bornée : la limite est le point fixe
+  — Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = 2 donne une suite constante).  [juge solset]  départ : x > 2 ou x = 2 ou (1 < x et x < 2)
+    = ]1 ; +∞[   ← Réunir les cas
+  aides : Compare le graphe de f à la droite y = x : c'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend. | Sur ]1 ; +∞[, le minimum de f vaut ▢ : c'est un point fixe. | f(x) ≥ 2 pour x > 1, donc dès a₂ la suite reste au-dessus de 2, et elle converge vers 2.
+  pièges : a1_oblique_asymptote_slope_only, a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+```
+
+### Niveau 5
+
+```
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − a_n/(a_n + 1), avec f(x) = x − x/(x + 1) (a₁ ≠ −1). Problème en 13 points : (a) seule limite possible, (b) étude de f, (c) position par rapport à y = x, (d) discussion selon a₁.
+  [problème, 13 points]
+  partie 1 ((a) Seule limite possible : 1)
+  (a) Quelle est la seule limite possible de la suite ?
+    [free, sans aide, suivre l'erreur]  L = L − L/(L + 1)
+      ((a) Seule limite possible : résous L = f(L).)
+      = L = 0   ← Le seul point fixe
+  partie 2 ((b) Étude de f : 2 ; f est croissante là où f′(x) > 0 : 0,5 ; Valeur de l'autre extremum local, en x = −2 : 0,5 ; Dérive encore : 1 ; f est convexe là où f″(x) > 0 : 1 ; Asymptote verticale : limite quand x → −1⁺ : 0,5 ; Puis quand x → −1⁻ : 0,5 ; Asymptote oblique en ±∞ : limite de f(x) − x : 1)
+  (b) Étudie f : f′ et f″, monotonie et extrema, convexité, asymptotes.
+    [free, sans aide, suivre l'erreur]  (x − x/(x + 1))′
+      ((b) Dérive f :)
+      = 1 − 1/(x + 1)²   ← Dériver
+    — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(x + 1)² > 0
+      = ]−∞ ; −2[ ∪ ]0 ; +∞[   ← Signe de f′
+    — Valeur de l'autre extremum local, en x = −2 :  [juge value]  départ : (−2) − (−2)/((−2) + 1)
+      ? f′ s'annule en x = 0 et change de signe. En x = 0, f a : ✔ un minimum local, f(0) = 0 / · un maximum local / · pas d'extremum
+      = −4   ← Calculer
+    — Dérive encore :  [juge equiv]  départ : (1 − 1/(x + 1)²)′
+      = 2/(x + 1)³   ← Dériver
+    — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 2/(x + 1)³ > 0
+      = ]−1 ; +∞[   ← Signe de (x + 1)³
+    — Asymptote verticale : limite quand x → −1⁺  [juge limit]  départ : x − x/(x + 1)
+      ? Asymptote verticale : ✔ x = −1 : f n'y est pas définie et |f(x)| → +∞ / · x = 0 / · il n'y en a pas
+      = ∞   ← Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0
+    — Puis quand x → −1⁻  [juge limit]  départ : x − x/(x + 1)
+      = −∞   ← Le dénominateur tend vers 0 de l'autre côté
+    — Asymptote oblique en ±∞ : limite de f(x) − x  [juge limit]  départ : x − x/(x + 1) − x
+      ? f(x)/x → 1 en ±∞ : la pente de l'asymptote oblique est 1. Pour son équation y = x + p : ✔ il faut encore p = lim (f(x) − x) / · y = x suffit : la pente est connue
+      = −1   ← Asymptote y = x − 1
+  partie 3 ((c) Position par rapport à y = x : 1 ; Et en dessous ? : 1)
+  (c) Compare le graphe de f à la droite y = x.
+    [free, sans aide, suivre l'erreur]  x − x/(x + 1) > x
+      ((c) Où le graphe de f est-il au-dessus de la droite y = x ?)
+      = ]−1 ; 0[   ← Signe de f(x) − x
+    — Et en dessous ?  [juge solset]  départ : x − x/(x + 1) < x
+      = ]−∞ ; −1[ ∪ ]0 ; +∞[   ← Signe de f(x) − x
+  partie 4 ((d) Premier cas : 1)
+  (d) Si a₁ < −1, que fait la suite ?
+    ✔ f(x) < x et f(x) ≤ −4 < −1 sur ]−∞ ; −1[ : (aₙ) décroît ; une limite serait un point fixe < −1, il n'y en a pas : aₙ → −∞   · (aₙ) décroît et elle est majorée par −4 : elle converge   · aₙ → 0, le seul point fixe [a1_rec_limit_without_convergence]
+  partie 5 ((d) Deuxième cas : 1)
+  (d) Si a₁ > 0, que fait la suite ?
+    · (aₙ) décroît et converge vers −1   ✔ aₙ > 0 pour tout n (0 est le minimum de f sur ]−1 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par 0, donc aₙ → 0   · (aₙ) croît et tend vers +∞   · f est croissante sur [0 ; +∞[, donc (aₙ) croît [a1_monotone_by_f_increasing]
+  partie 6 ((d) Dernier cas et conclusion : 1)
+  (d) Si a₁ est entre −1 et 0, que fait la suite ? Conclus : pour quels a₁ converge-t-elle ?
+    · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞. La suite converge si et seulement si a₁ ≥ 0   · La suite converge seulement si a₁ = 0 (suite constante)   ✔ a₂ = f(a₁) > 0 : on est ramené au cas a₁ > 0, donc aₙ → 0. Avec a₁ = 0 (suite constante), la suite converge, vers 0, si et seulement si a₁ > −1   · (aₙ) croît et elle est majorée par 0 : aₙ → 0. La suite converge pour tout a₁ ≠ −1 [a1_rec_limit_without_convergence]
+  pièges : g6_quotient_sign, g6_quotient_no_square, a1_oblique_asymptote_slope_only, g1_pole_closed, g9_bracket, a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n − 1)/(2a_n − 1), avec f(x) = x − (x − 1)/(2x − 1) (a₁ ≠ 1/2). Problème en 13 points : (a) seule limite possible, (b) étude de f, (c) position par rapport à y = x, (d) discussion selon a₁.
+  [problème, 13 points]
+  partie 1 ((a) Seule limite possible : 1)
+  (a) Quelle est la seule limite possible de la suite ?
+    [free, sans aide, suivre l'erreur]  L = L − (L − 1)/(2L − 1)
+      ((a) Seule limite possible : résous L = f(L).)
+      = L = 1   ← Le seul point fixe
+  partie 2 ((b) Étude de f : 2 ; f est croissante là où f′(x) > 0 : 0,5 ; Valeur de l'autre extremum local, en x = 0 : 0,5 ; Dérive encore : 1 ; f est convexe là où f″(x) > 0 : 1 ; Asymptote verticale : limite quand x → 1/2⁺ : 0,5 ; Puis quand x → 1/2⁻ : 0,5 ; Asymptote oblique en ±∞ : limite de f(x) − x : 1)
+  (b) Étudie f : f′ et f″, monotonie et extrema, convexité, asymptotes.
+    [free, sans aide, suivre l'erreur]  (x − (x − 1)/(2x − 1))′
+      ((b) Dérive f :)
+      = 1 − 1/(2x − 1)²   ← Dériver
+    — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(2x − 1)² > 0
+      = ]−∞ ; 0[ ∪ ]1 ; +∞[   ← Signe de f′
+    — Valeur de l'autre extremum local, en x = 0 :  [juge value]  départ : 0 − (0 − 1)/(2·0 − 1)
+      ? f′ s'annule en x = 1 et change de signe. En x = 1, f a : ✔ un minimum local, f(1) = 1 / · un maximum local / · pas d'extremum
+      = −1   ← Calculer
+    — Dérive encore :  [juge equiv]  départ : (1 − 1/(2x − 1)²)′
+      = 4/(2x − 1)³   ← Dériver
+    — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 4/(2x − 1)³ > 0
+      = ]1/2 ; +∞[   ← Signe de (2x − 1)³
+    — Asymptote verticale : limite quand x → 1/2⁺  [juge limit]  départ : x − (x − 1)/(2x − 1)
+      ? Asymptote verticale : ✔ x = 1/2 : f n'y est pas définie et |f(x)| → +∞ / · x = 1 / · il n'y en a pas
+      = ∞   ← Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0
+    — Puis quand x → 1/2⁻  [juge limit]  départ : x − (x − 1)/(2x − 1)
+      = −∞   ← Le dénominateur tend vers 0 de l'autre côté
+    — Asymptote oblique en ±∞ : limite de f(x) − x  [juge limit]  départ : x − (x − 1)/(2x − 1) − x
+      ? f(x)/x → 1 en ±∞ : la pente de l'asymptote oblique est 1. Pour son équation y = x + p : ✔ il faut encore p = lim (f(x) − x) / · y = x suffit : la pente est connue
+      = −1/2   ← Asymptote y = x − 1/2
+  partie 3 ((c) Position par rapport à y = x : 1 ; Et en dessous ? : 1)
+  (c) Compare le graphe de f à la droite y = x.
+    [free, sans aide, suivre l'erreur]  x − (x − 1)/(2x − 1) > x
+      ((c) Où le graphe de f est-il au-dessus de la droite y = x ?)
+      = ]1/2 ; 1[   ← Signe de f(x) − x
+    — Et en dessous ?  [juge solset]  départ : x − (x − 1)/(2x − 1) < x
+      = ]−∞ ; 1/2[ ∪ ]1 ; +∞[   ← Signe de f(x) − x
+  partie 4 ((d) Premier cas : 1)
+  (d) Si a₁ < 1/2, que fait la suite ?
+    ✔ f(x) < x et f(x) ≤ −1 < 1/2 sur ]−∞ ; 1/2[ : (aₙ) décroît ; une limite serait un point fixe < 1/2, il n'y en a pas : aₙ → −∞   · (aₙ) décroît et elle est majorée par −1 : elle converge   · aₙ → 1, le seul point fixe [a1_rec_limit_without_convergence]
+  partie 5 ((d) Deuxième cas : 1)
+  (d) Si a₁ > 1, que fait la suite ?
+    ✔ aₙ > 1 pour tout n (1 est le minimum de f sur ]1/2 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par 1, donc aₙ → 1   · f est croissante sur [1 ; +∞[, donc (aₙ) croît [a1_monotone_by_f_increasing]   · (aₙ) décroît et converge vers 1/2   · (aₙ) croît et tend vers +∞
+  partie 6 ((d) Dernier cas et conclusion : 1)
+  (d) Si a₁ est entre 1/2 et 1, que fait la suite ? Conclus : pour quels a₁ converge-t-elle ?
+    · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞. La suite converge si et seulement si a₁ ≥ 1   · La suite converge seulement si a₁ = 1 (suite constante)   ✔ a₂ = f(a₁) > 1 : on est ramené au cas a₁ > 1, donc aₙ → 1. Avec a₁ = 1 (suite constante), la suite converge, vers 1, si et seulement si a₁ > 1/2   · (aₙ) croît et elle est majorée par 1 : aₙ → 1. La suite converge pour tout a₁ ≠ 1/2 [a1_rec_limit_without_convergence]
+  pièges : g6_quotient_sign, g6_quotient_no_square, a1_oblique_asymptote_slope_only, g1_pole_closed, g9_bracket, a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n + 1)/(2a_n + 3), avec f(x) = x − (x + 1)/(2x + 3) (a₁ ≠ −3/2). Problème en 13 points : (a) seule limite possible, (b) étude de f, (c) position par rapport à y = x, (d) discussion selon a₁.
+  [problème, 13 points]
+  partie 1 ((a) Seule limite possible : 1)
+  (a) Quelle est la seule limite possible de la suite ?
+    [free, sans aide, suivre l'erreur]  L = L − (L + 1)/(2L + 3)
+      ((a) Seule limite possible : résous L = f(L).)
+      = L = −1   ← Le seul point fixe
+  partie 2 ((b) Étude de f : 2 ; f est croissante là où f′(x) > 0 : 0,5 ; Valeur de l'autre extremum local, en x = −2 : 0,5 ; Dérive encore : 1 ; f est convexe là où f″(x) > 0 : 1 ; Asymptote verticale : limite quand x → −3/2⁺ : 0,5 ; Puis quand x → −3/2⁻ : 0,5 ; Asymptote oblique en ±∞ : limite de f(x) − x : 1)
+  (b) Étudie f : f′ et f″, monotonie et extrema, convexité, asymptotes.
+    [free, sans aide, suivre l'erreur]  (x − (x + 1)/(2x + 3))′
+      ((b) Dérive f :)
+      = 1 − 1/(2x + 3)²   ← Dériver
+    — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(2x + 3)² > 0
+      = ]−∞ ; −2[ ∪ ]−1 ; +∞[   ← Signe de f′
+    — Valeur de l'autre extremum local, en x = −2 :  [juge value]  départ : (−2) − ((−2) + 1)/(2·(−2) + 3)
+      ? f′ s'annule en x = −1 et change de signe. En x = −1, f a : ✔ un minimum local, f(−1) = −1 / · un maximum local / · pas d'extremum
+      = −3   ← Calculer
+    — Dérive encore :  [juge equiv]  départ : (1 − 1/(2x + 3)²)′
+      = 4/(2x + 3)³   ← Dériver
+    — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 4/(2x + 3)³ > 0
+      = ]−3/2 ; +∞[   ← Signe de (2x + 3)³
+    — Asymptote verticale : limite quand x → −3/2⁺  [juge limit]  départ : x − (x + 1)/(2x + 3)
+      ? Asymptote verticale : ✔ x = −3/2 : f n'y est pas définie et |f(x)| → +∞ / · x = −1 / · il n'y en a pas
+      = ∞   ← Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0
+    — Puis quand x → −3/2⁻  [juge limit]  départ : x − (x + 1)/(2x + 3)
+      = −∞   ← Le dénominateur tend vers 0 de l'autre côté
+    — Asymptote oblique en ±∞ : limite de f(x) − x  [juge limit]  départ : x − (x + 1)/(2x + 3) − x
+      ? f(x)/x → 1 en ±∞ : la pente de l'asymptote oblique est 1. Pour son équation y = x + p : ✔ il faut encore p = lim (f(x) − x) / · y = x suffit : la pente est connue
+      = −1/2   ← Asymptote y = x − 1/2
+  partie 3 ((c) Position par rapport à y = x : 1 ; Et en dessous ? : 1)
+  (c) Compare le graphe de f à la droite y = x.
+    [free, sans aide, suivre l'erreur]  x − (x + 1)/(2x + 3) > x
+      ((c) Où le graphe de f est-il au-dessus de la droite y = x ?)
+      = ]−3/2 ; −1[   ← Signe de f(x) − x
+    — Et en dessous ?  [juge solset]  départ : x − (x + 1)/(2x + 3) < x
+      = ]−∞ ; −3/2[ ∪ ]−1 ; +∞[   ← Signe de f(x) − x
+  partie 4 ((d) Premier cas : 1)
+  (d) Si a₁ < −3/2, que fait la suite ?
+    ✔ f(x) < x et f(x) ≤ −3 < −3/2 sur ]−∞ ; −3/2[ : (aₙ) décroît ; une limite serait un point fixe < −3/2, il n'y en a pas : aₙ → −∞   · aₙ → −1, le seul point fixe [a1_rec_limit_without_convergence]   · (aₙ) décroît et elle est majorée par −3 : elle converge
+  partie 5 ((d) Deuxième cas : 1)
+  (d) Si a₁ > −1, que fait la suite ?
+    ✔ aₙ > −1 pour tout n (−1 est le minimum de f sur ]−3/2 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par −1, donc aₙ → −1   · (aₙ) croît et tend vers +∞   · f est croissante sur [−1 ; +∞[, donc (aₙ) croît [a1_monotone_by_f_increasing]   · (aₙ) décroît et converge vers −3/2
+  partie 6 ((d) Dernier cas et conclusion : 1)
+  (d) Si a₁ est entre −3/2 et −1, que fait la suite ? Conclus : pour quels a₁ converge-t-elle ?
+    · La suite converge seulement si a₁ = −1 (suite constante)   · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞. La suite converge si et seulement si a₁ ≥ −1   ✔ a₂ = f(a₁) > −1 : on est ramené au cas a₁ > −1, donc aₙ → −1. Avec a₁ = −1 (suite constante), la suite converge, vers −1, si et seulement si a₁ > −3/2   · (aₙ) croît et elle est majorée par −1 : aₙ → −1. La suite converge pour tout a₁ ≠ −3/2 [a1_rec_limit_without_convergence]
+  pièges : g6_quotient_sign, g6_quotient_no_square, a1_oblique_asymptote_slope_only, g1_pole_closed, g9_bracket, a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+```
+
+### Variantes d'examen
+
+```
+On étudie la suite définie par a₁ ∈ ℝ et a_(n + 1) = a_n − (a_n − 2)/(2a_n − 3), avec f(x) = x − (x − 2)/(2x − 3) (a₁ ≠ 3/2). Problème en 13 points : (a) seule limite possible, (b) étude de f, (c) position par rapport à y = x, (d) discussion selon a₁.
+  [problème, examen open, 13 points]
+  partie 1 ((a) Seule limite possible : 1)
+  (a) Quelle est la seule limite possible de la suite ?
+    [free, sans aide, suivre l'erreur]  L = L − (L − 2)/(2L − 3)
+      ((a) Seule limite possible : résous L = f(L).)
+      = L = 2   ← Le seul point fixe
+  partie 2 ((b) Étude de f : 2 ; f est croissante là où f′(x) > 0 : 0,5 ; Valeur de l'autre extremum local, en x = 1 : 0,5 ; Dérive encore : 1 ; f est convexe là où f″(x) > 0 : 1 ; Asymptote verticale : limite quand x → 3/2⁺ : 0,5 ; Puis quand x → 3/2⁻ : 0,5 ; Asymptote oblique en ±∞ : limite de f(x) − x : 1)
+  (b) Étudie f : f′ et f″, monotonie et extrema, convexité, asymptotes.
+    [free, sans aide, suivre l'erreur]  (x − (x − 2)/(2x − 3))′
+      ((b) Dérive f :)
+      = 1 − 1/(2x − 3)²   ← Dériver
+    — f est croissante là où f′(x) > 0 :  [juge solset]  départ : 1 − 1/(2x − 3)² > 0
+      = ]−∞ ; 1[ ∪ ]2 ; +∞[   ← Signe de f′
+    — Valeur de l'autre extremum local, en x = 1 :  [juge value]  départ : 1 − (1 − 2)/(2·1 − 3)
+      ? f′ s'annule en x = 2 et change de signe. En x = 2, f a : ✔ un minimum local, f(2) = 2 / · un maximum local / · pas d'extremum
+      = 0   ← Calculer
+    — Dérive encore :  [juge equiv]  départ : (1 − 1/(2x − 3)²)′
+      = 4/(2x − 3)³   ← Dériver
+    — f est convexe là où f″(x) > 0 :  [juge solset]  départ : 4/(2x − 3)³ > 0
+      = ]3/2 ; +∞[   ← Signe de (2x − 3)³
+    — Asymptote verticale : limite quand x → 3/2⁺  [juge limit]  départ : x − (x − 2)/(2x − 3)
+      ? Asymptote verticale : ✔ x = 3/2 : f n'y est pas définie et |f(x)| → +∞ / · x = 2 / · il n'y en a pas
+      = ∞   ← Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0
+    — Puis quand x → 3/2⁻  [juge limit]  départ : x − (x − 2)/(2x − 3)
+      = −∞   ← Le dénominateur tend vers 0 de l'autre côté
+    — Asymptote oblique en ±∞ : limite de f(x) − x  [juge limit]  départ : x − (x − 2)/(2x − 3) − x
+      ? f(x)/x → 1 en ±∞ : la pente de l'asymptote oblique est 1. Pour son équation y = x + p : ✔ il faut encore p = lim (f(x) − x) / · y = x suffit : la pente est connue
+      = −1/2   ← Asymptote y = x − 1/2
+  partie 3 ((c) Position par rapport à y = x : 1 ; Et en dessous ? : 1)
+  (c) Compare le graphe de f à la droite y = x.
+    [free, sans aide, suivre l'erreur]  x − (x − 2)/(2x − 3) > x
+      ((c) Où le graphe de f est-il au-dessus de la droite y = x ?)
+      = ]3/2 ; 2[   ← Signe de f(x) − x
+    — Et en dessous ?  [juge solset]  départ : x − (x − 2)/(2x − 3) < x
+      = ]−∞ ; 3/2[ ∪ ]2 ; +∞[   ← Signe de f(x) − x
+  partie 4 ((d) Premier cas : 1)
+  (d) Si a₁ < 3/2, que fait la suite ?
+    ✔ f(x) < x et f(x) ≤ 0 < 3/2 sur ]−∞ ; 3/2[ : (aₙ) décroît ; une limite serait un point fixe < 3/2, il n'y en a pas : aₙ → −∞   · (aₙ) décroît et elle est majorée par 0 : elle converge   · aₙ → 2, le seul point fixe [a1_rec_limit_without_convergence]
+  partie 5 ((d) Deuxième cas : 1)
+  (d) Si a₁ > 2, que fait la suite ?
+    · (aₙ) décroît et converge vers 3/2   · (aₙ) croît et tend vers +∞   · f est croissante sur [2 ; +∞[, donc (aₙ) croît [a1_monotone_by_f_increasing]   ✔ aₙ > 2 pour tout n (2 est le minimum de f sur ]3/2 ; +∞[) et f(x) < x : (aₙ) décroît, minorée par 2, donc aₙ → 2
+  partie 6 ((d) Dernier cas et conclusion : 1)
+  (d) Si a₁ est entre 3/2 et 2, que fait la suite ? Conclus : pour quels a₁ converge-t-elle ?
+    · La suite converge seulement si a₁ = 2 (suite constante)   · f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞. La suite converge si et seulement si a₁ ≥ 2   ✔ a₂ = f(a₁) > 2 : on est ramené au cas a₁ > 2, donc aₙ → 2. Avec a₁ = 2 (suite constante), la suite converge, vers 2, si et seulement si a₁ > 3/2   · (aₙ) croît et elle est majorée par 2 : aₙ → 2. La suite converge pour tout a₁ ≠ 3/2 [a1_rec_limit_without_convergence]
+  pièges : g6_quotient_sign, g6_quotient_no_square, a1_oblique_asymptote_slope_only, g1_pole_closed, g9_bracket, a1_rec_limit_without_convergence, a1_monotone_by_f_increasing
+
+```
+
+## Séries géométriques et télescopiques : calculer la somme (`a1-ser-geo-tele`, BA1)
+
+_Premier terme sur 1 − raison ; une télescopique par ses sommes partielles S_N._
+
+### Niveau 1
+
+```
+Calcule Σ_{k=0}^{∞} (3^k + 5^k)/6^k.
+  [guided]  Σ_{k=0}^{∞} (3^k + 5^k)/6^k
+    = Σ_{k=0}^{∞} (3/6)^k + Σ_{k=0}^{∞} (5/6)^k   ← Séparer : deux séries géométriques
+    = 1/(1 − 1/2) + 1/(□)   (trous : 1/(1 − 1/2) + 1/(1 − 5/6))   ← Premier terme sur 1 − raison
+    = 8   ← Calculer
+  aides : Sépare la fraction : (3ᵏ+5ᵏ)/6ᵏ est une somme de deux puissances k-ièmes. | Σ_{k=0}^{∞} (3^k + 5^k)/6^k = Σ_{k=0}^{∞} (3/6)^k + ▢ | 1/(1 − 1/2) + 1/(1 − 5/6) = 8
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=1}^{∞} 1/((k + 2)(k + 3)) à l'aide des sommes partielles S_N. On donne 1/((k + 2)(k + 3)) = 1/(k + 2) − 1/(k + 3).
+  [guided]  Σ_{k=1}^{N} (1/(k + 2) − 1/(k + 3))
+    (Somme partielle :)
+    (S_N = (1/3 − 1/4) + (1/4 − 1/5) + … + (1/(N + 2) − 1/(N + 3)))
+    = 1/3 − □   (trous : 1/3 − 1/(N + 3))   ← Télescoper : il reste le premier et le dernier terme
+  — Passe à la limite :  [juge limit]  départ : 1/3 − 1/(N + 3)
+    = 1/3   ← Les termes en N tendent vers 0
+  aides : Décompose en deux fractions, puis écris les premiers termes de S_N : beaucoup s'annulent. | S_N = 1/3 + … − 1/(N + 3) − … | 1/3 − 1/(N + 3) → 1/3
+  pièges : g5_reindex_half, g5_telescope_ends
+
+Calcule Σ_{k=1}^{∞} 1/((k + 1)(k + 2)) à l'aide des sommes partielles S_N. On donne 1/((k + 1)(k + 2)) = 1/(k + 1) − 1/(k + 2).
+  [guided]  Σ_{k=1}^{N} (1/(k + 1) − 1/(k + 2))
+    (Somme partielle :)
+    (S_N = (1/2 − 1/3) + (1/3 − 1/4) + … + (1/(N + 1) − 1/(N + 2)))
+    = 1/2 − □   (trous : 1/2 − 1/(N + 2))   ← Télescoper : il reste le premier et le dernier terme
+  — Passe à la limite :  [juge limit]  départ : 1/2 − 1/(N + 2)
+    = 1/2   ← Les termes en N tendent vers 0
+  aides : Décompose en deux fractions, puis écris les premiers termes de S_N : beaucoup s'annulent. | S_N = 1/2 + … − 1/(N + 2) − … | 1/2 − 1/(N + 2) → 1/2
+  pièges : g5_reindex_half, g5_telescope_ends
+
+```
+
+### Niveau 2
+
+```
+Calcule Σ_{k=1}^{∞} 1/((k + 2)(k + 3)) à l'aide des sommes partielles S_N.
+  [guided]  1/((k + 2)(k + 3))
+    (Décompose le terme général :)
+    = 1/(k + 2) − □   (trous : 1/(k + 2) − 1/(k + 3))   ← Décomposition en éléments simples
+  — Somme partielle :  [juge equiv]  départ : Σ_{k=1}^{N} (1/(k + 2) − 1/(k + 3))
+    (S_N = (1/3 − 1/4) + (1/4 − 1/5) + … + (1/(N + 2) − 1/(N + 3)))
+    = 1/3 − □   (trous : 1/3 − 1/(N + 3))   ← Télescoper : il reste le premier et le dernier terme
+  — Passe à la limite :  [juge limit]  départ : 1/3 − 1/(N + 3)
+    = 1/3   ← Les termes en N tendent vers 0
+  aides : Décompose en deux fractions, puis écris les premiers termes de S_N : beaucoup s'annulent. | S_N = 1/3 + … − 1/(N + 3) − … | 1/3 − 1/(N + 3) → 1/3
+
+Calcule Σ_{k=0}^{∞} (3^k + 5^k)/6^k.
+  [guided]  Σ_{k=0}^{∞} (3^k + 5^k)/6^k
+    = Σ_{k=0}^{∞} (3/6)^k + Σ_{k=0}^{∞} □   (trous : Σ_{k=0}^{∞} (3/6)^k + Σ_{k=0}^{∞} (5/6)^k)   ← Séparer : deux séries géométriques
+    = 1/(1 − 1/2) + 1/(1 − 5/6)   ← Premier terme sur 1 − raison
+    = 8   ← Calculer
+  aides : Sépare la fraction : (3ᵏ+5ᵏ)/6ᵏ est une somme de deux puissances k-ièmes. | Σ_{k=0}^{∞} (3^k + 5^k)/6^k = Σ_{k=0}^{∞} (3/6)^k + ▢ | 1/(1 − 1/2) + 1/(1 − 5/6) = 8
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=3}^{∞} (−2/3)^k.
+  [guided]  Σ_{k=3}^{∞} (−2/3)^k
+    = (□)/(1 − (−2/3))   (trous : (−8/27)/(1 − (−2/3)))   ← Premier terme sur 1 − raison
+    = −8/45   ← Calculer
+  aides : Une série géométrique de raison q, |q| < 1, vaut premier terme sur (1 − q). | Σ_{k=3}^{∞} (−2/3)^k = ▢/(1 − (−2/3)) | (−8/27)/(1 − (−2/3)) = −8/45
+  pièges : a1_geo_sum_start, a1_pow_sum_index_shift
+
+```
+
+### Niveau 3
+
+```
+Calcule Σ_{k=2}^{∞} 5/4^k.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=2}^{∞} 5/4^k
+    = (5/16)/(1 − 1/4)   ← Premier terme sur 1 − raison
+    = 5/12   ← Calculer
+  aides : Une série géométrique de raison q, |q| < 1, vaut premier terme sur (1 − q). | Σ_{k=2}^{∞} 5/4^k = ▢/(1 − 1/4) | (5/16)/(1 − 1/4) = 5/12
+  pièges : a1_geo_sum_start, a1_pow_sum_index_shift
+
+Calcule Σ_{k=3}^{∞} −2(−1/2)^k.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=3}^{∞} −2(−1/2)^k
+    = (1/4)/(1 − (−1/2))   ← Premier terme sur 1 − raison
+    = 1/6   ← Calculer
+  aides : Une série géométrique de raison q, |q| < 1, vaut premier terme sur (1 − q). | Σ_{k=3}^{∞} −2(−1/2)^k = ▢/(1 − (−1/2)) | (1/4)/(1 − (−1/2)) = 1/6
+  pièges : a1_geo_sum_start, a1_pow_sum_index_shift
+
+Calcule Σ_{k=3}^{∞} −2(−1/2)^k.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=3}^{∞} −2(−1/2)^k
+    = (1/4)/(1 − (−1/2))   ← Premier terme sur 1 − raison
+    = 1/6   ← Calculer
+  aides : Une série géométrique de raison q, |q| < 1, vaut premier terme sur (1 − q). | Σ_{k=3}^{∞} −2(−1/2)^k = ▢/(1 − (−1/2)) | (1/4)/(1 − (−1/2)) = 1/6
+  pièges : a1_geo_sum_start, a1_pow_sum_index_shift
+
+```
+
+### Niveau 4
+
+```
+Calcule Σ_{k=1}^{∞} 2/((k + 3)(k + 5)) à l'aide des sommes partielles S_N.
+  [free, suivre l'erreur]  2/((k + 3)(k + 5))
+    (Décompose le terme général :)
+    = 1/(k + 3) − 1/(k + 5)   ← Décomposition en éléments simples
+  — Somme partielle :  [juge equiv]  départ : Σ_{k=1}^{N} (1/(k + 3) − 1/(k + 5))
+    = 1/4 + 1/5 − 1/(N + 4) − 1/(N + 5)   ← Télescoper : décalage de 2, il reste 2 termes au début et 2 à la fin
+  — Passe à la limite :  [juge limit]  départ : 1/4 + 1/5 − 1/(N + 4) − 1/(N + 5)
+    = 9/20   ← Les termes en N tendent vers 0
+  aides : Décompose en deux fractions, puis écris les premiers termes de S_N : beaucoup s'annulent. | S_N = 1/4 + … − 1/(N + 4) − … | 1/4 + 1/5 − 1/(N + 4) − 1/(N + 5) → 9/20
+
+Calcule Σ_{k=1}^{∞} (2^k + 3^k)/5^k.
+  [free, suivre l'erreur]  Σ_{k=1}^{∞} (2^k + 3^k)/5^k
+    = Σ_{k=1}^{∞} (2/5)^k + Σ_{k=1}^{∞} (3/5)^k   ← Deux séries géométriques
+    = 13/6   ← Premier terme sur 1 − raison
+  aides : Sépare la fraction : (2ᵏ+3ᵏ)/5ᵏ est une somme de deux puissances k-ièmes. | Σ_{k=1}^{∞} (2^k + 3^k)/5^k = Σ_{k=1}^{∞} (2/5)^k + ▢ | (2/5)/(1 − 2/5) + (3/5)/(1 − 3/5) = 13/6
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=1}^{∞} 1/((k + 3)(k + 4)) à l'aide des sommes partielles S_N.
+  [free, suivre l'erreur]  1/((k + 3)(k + 4))
+    (Décompose le terme général :)
+    = 1/(k + 3) − 1/(k + 4)   ← Décomposition en éléments simples
+  — Somme partielle :  [juge equiv]  départ : Σ_{k=1}^{N} (1/(k + 3) − 1/(k + 4))
+    = 1/4 − 1/(N + 4)   ← Télescoper : il reste le premier et le dernier terme
+  — Passe à la limite :  [juge limit]  départ : 1/4 − 1/(N + 4)
+    = 1/4   ← Les termes en N tendent vers 0
+  aides : Décompose en deux fractions, puis écris les premiers termes de S_N : beaucoup s'annulent. | S_N = 1/4 + … − 1/(N + 4) − … | 1/4 − 1/(N + 4) → 1/4
+
+```
+
+### Niveau 5
+
+```
+Calcule Σ_{k=1}^{∞} (1/((k + 3)(k + 4)) + (−2/3)^k).
+  [free, sans aide]  Σ_{k=1}^{∞} (1/((k + 3)(k + 4)) + (−2/3)^k)
+    = Σ_{k=1}^{∞} (1/(k + 3) − 1/(k + 4)) + Σ_{k=1}^{∞} (−2/3)^k   ← Séparer ; décomposer le premier terme
+    = 1/4 + (−2/3)/(1 − (−2/3))   ← Télescoper ; premier terme sur 1 − raison
+    = −3/20   ← Calculer
+  pièges : a1_pow_sum_index_shift
+
+Σ_{k=1}^{∞} (2/3)^k =
+  · 2/5   ✔ 2   · 3 [a1_geo_sum_start]   · 4/3
+  pièges : a1_geo_sum_start
+
+Calcule Σ_{k=1}^{∞} (2/(k(k + 2)) + 1/3^k).
+  [free, sans aide]  Σ_{k=1}^{∞} (2/(k(k + 2)) + 1/3^k)
+    = Σ_{k=1}^{∞} (1/k − 1/(k + 2)) + Σ_{k=1}^{∞} 1/3^k   ← Séparer ; décomposer le premier terme
+    = 1 + 1/2 + (1/3)/(1 − 1/3)   ← Télescoper ; premier terme sur 1 − raison
+    = 2   ← Calculer
+  pièges : a1_pow_sum_index_shift
+
+```
+
+### Variantes d'examen
+
+```
+Σ_{k=0}^{∞} 6(−1/2)^k =
+  ✔ 4   · 12   · −2   · 6
+  [examen mcq]
+
+Vrai ou faux ?
+  « Si uₙ → 0, alors la série Σ uₙ converge. » → FAUX
+    contre-exemple (sequence) : a = ln((n+1)/n)
+  [examen tf]
+
+```
+
+## Condition nécessaire : uₙ → 0 (`a1-ser-necessary`, BA1)
+
+_Si uₙ ne tend pas vers 0, la série diverge ; sinon, il faut un autre critère._
+
+### Niveau 1
+
+```
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} n/(n² + 6) ? Calcule d'abord la limite du terme général uₙ = n/(n² + 6).
+  [guided]  n/(n² + 6)
+    = (1/n)/(1 + 6/n²)   ← Diviser par n²
+    = □   (trous : 0)   ← Passer à la limite
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : (1/n)/(1 + 6/n²)
+    ? Que dit la condition nécessaire ? · La série diverge : son terme général ne tend pas vers 0 / ✔ On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = □   (trous : 0)   ← uₙ → 0 : il faudra un autre critère
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 0 : la condition nécessaire ne dit rien, il faut un autre critère.
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, a1_series_term_to_zero
+
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} (1 + 1/n)^n ? Calcule d'abord la limite du terme général uₙ = (1 + 1/n)^n.
+  [guided]  (1 + 1/n)^n
+    = e^(n·ln(1 + 1/n))   ← Forme 1^∞ : e^(n·Log(1 + 1/n))
+    = □   (trous : e)   ← n·Log(1 + 1/n) → 1
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : e^(n·ln(1 + 1/n))
+    ? Que dit la condition nécessaire ? ✔ La série diverge : son terme général ne tend pas vers 0 / · On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = □   (trous : e)   ← Limite e ≠ 0
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → e ≠ 0 : la série diverge.
+  pièges : a1_indet_one_inf
+
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} 2n/(5n + 1) ? Calcule d'abord la limite du terme général uₙ = 2n/(5n + 1).
+  [guided]  2n/(5n + 1)
+    = 2/(5 + 1/n)   ← Diviser en haut et en bas par n
+    = □   (trous : 2/5)   ← Passer à la limite
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : 2/(5 + 1/n)
+    ? Que dit la condition nécessaire ? ✔ La série diverge : son terme général ne tend pas vers 0 / · On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = □   (trous : 2/5)   ← Limite 2/5 ≠ 0
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 2/5 ≠ 0 : la série diverge.
+
+```
+
+### Niveau 2
+
+```
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} 5n/(2n + 5) ? Calcule d'abord la limite du terme général uₙ = 5n/(2n + 5).
+  [guided]  5n/(2n + 5)
+    = 5/(□)   (trous : 5/(2 + 5/n))   ← Diviser en haut et en bas par n
+    = □   (trous : 5/2)   ← Passer à la limite
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : 5/(2 + 5/n)
+    ? Que dit la condition nécessaire ? ✔ La série diverge : son terme général ne tend pas vers 0 / · On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = 5/2   ← Limite 5/2 ≠ 0
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 5/2 ≠ 0 : la série diverge.
+
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} (2n² + 4)/(5n² + 4n) ? Calcule d'abord la limite du terme général uₙ = (2n² + 4)/(5n² + 4n).
+  [guided]  (2n² + 4)/(5n² + 4n)
+    = (2 + 4/n²)/(□)   (trous : (2 + 4/n²)/(5 + 4/n))   ← Diviser en haut et en bas par n²
+    = □   (trous : 2/5)   ← Passer à la limite
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : (2 + 4/n²)/(5 + 4/n)
+    ? Que dit la condition nécessaire ? ✔ La série diverge : son terme général ne tend pas vers 0 / · On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = 2/5   ← Limite 2/5 ≠ 0
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 2/5 ≠ 0 : la série diverge.
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} 1/√n ? Calcule d'abord la limite du terme général uₙ = 1/√n.
+  [guided]  1/√n
+    = □   (trous : 0)   ← Passer à la limite
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : 1/√n
+    ? Que dit la condition nécessaire ? · La série diverge : son terme général ne tend pas vers 0 / ✔ On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = 0   ← uₙ → 0 : il faudra un autre critère
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 0 : la condition nécessaire ne dit rien, il faut un autre critère.
+  pièges : a1_bh_not_indeterminate, a1_series_term_to_zero
+
+```
+
+### Niveau 3
+
+```
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} (1 + 2/n)^n ? Calcule d'abord la limite du terme général uₙ = (1 + 2/n)^n.
+  [tap, suivre l'erreur, menu steps]  (1 + 2/n)^n
+    = e^(n·ln(1 + 2/n))   ← Forme 1^∞ : e^(n·Log(1 + 2/n))
+    = e²   ← n·Log(1 + 2/n) → 2
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : e^(n·ln(1 + 2/n))
+    ? Que dit la condition nécessaire ? ✔ La série diverge : son terme général ne tend pas vers 0 / · On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = e²   ← Limite e² ≠ 0
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → e² ≠ 0 : la série diverge.
+  pièges : a1_indet_one_inf
+
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} n·sin(2/n) ? Calcule d'abord la limite du terme général uₙ = n·sin(2/n).
+  [tap, suivre l'erreur, menu steps]  n·sin(2/n)
+    = 2·sin(2/n)/(2/n)   ← Faire apparaître sin u/u, u → 0
+    = 2   ← sin u/u → 1
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : 2·sin(2/n)/(2/n)
+    ? Que dit la condition nécessaire ? ✔ La série diverge : son terme général ne tend pas vers 0 / · On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = 2   ← Limite 2 ≠ 0
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 2 ≠ 0 : la série diverge.
+  pièges : a1_dl_factorial_missing
+
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} cos(1/n) ? Calcule d'abord la limite du terme général uₙ = cos(1/n).
+  [tap, suivre l'erreur, menu steps]  cos(1/n)
+    = 1   ← 1/n → 0 et cos 0 = 1
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : cos(1/n)
+    ? Que dit la condition nécessaire ? ✔ La série diverge : son terme général ne tend pas vers 0 / · On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = 1   ← Limite 1 ≠ 0
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 1 ≠ 0 : la série diverge.
+  pièges : a1_dl_factorial_missing
+
+```
+
+### Niveau 4
+
+```
+Pour une seule de ces séries, la condition nécessaire ne permet pas de conclure. Laquelle ?
+  · Σ_{n=1}^{∞} (1 + 3/n)^n   ✔ Σ_{n=1}^{∞} ln(1 + 2/n)   · Σ_{n=1}^{∞} cos(1/n)   · Σ_{n=1}^{∞} cos(2/n)
+
+Une seule de ces séries diverge par la condition nécessaire (son terme général ne tend pas vers 0). Laquelle ?
+  ✔ Σ_{n=1}^{∞} (3n² + 5)/(2n² + 3n)   · Σ_{n=1}^{∞} ln(1 + 2/n)   · Σ_{n=1}^{∞} 2/(n + 6)   · Σ_{n=1}^{∞} 3/(n + 6)
+
+Que dit la condition nécessaire sur Σ_{n=1}^{∞} n/(n² + 3) ? Calcule d'abord la limite du terme général uₙ = n/(n² + 3).
+  [free, suivre l'erreur]  n/(n² + 3)
+    = (1/n)/(1 + 3/n²)   ← Diviser par n²
+    = 0   ← Passer à la limite
+  — Conclusion : rappelle la limite du terme général.  [juge limit]  départ : (1/n)/(1 + 3/n²)
+    ? Que dit la condition nécessaire ? · La série diverge : son terme général ne tend pas vers 0 / ✔ On ne sait pas encore : uₙ → 0 ne suffit pas, il faut un autre critère / · La série converge, car uₙ → 0
+    = 0   ← uₙ → 0 : il faudra un autre critère
+  aides : Regarde d'abord si le terme général tend vers 0. | uₙ → ▢ | uₙ → 0 : la condition nécessaire ne dit rien, il faut un autre critère.
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, a1_series_term_to_zero
+
+```
+
+### Niveau 5
+
+```
+Vrai ou faux ?
+  « Si aₙ ne tend pas vers 0, alors Σ aₙ diverge. » → VRAI
+
+Vrai ou faux ?
+  « Si f(n) > n pour tout n ≥ 1, alors Σ 1/f(n) converge. » → FAUX
+    contre-exemple (sequence) : a = n+1
+  pièges : a1_series_term_to_zero
+
+Vrai ou faux ?
+  « Si f(n) > n pour tout n ≥ 1, alors Σ 1/f(n) converge. » → FAUX
+    contre-exemple (sequence) : a = n+1
+  pièges : a1_series_term_to_zero
+
+```
+
+### Variantes d'examen
+
+```
+Vrai ou faux ?
+  « Si aₙ ne tend pas vers 0, alors Σ aₙ diverge. » → VRAI
+  [examen tf]
+
+```
+
+## Critère de comparaison et de la limite du quotient (`a1-ser-compare`, BA1)
+
+_Comparer à Σ 1/nᵖ, qui converge si et seulement si p > 1._
+
+### Niveau 1
+
+```
+Nature de Σ_{n=1}^{∞} (√(n + 2) − √n) (termes positifs) ? Compare à bₙ = 1/√n : calcule la limite de aₙ/bₙ.
+  [guided]  √n·(√(n + 2) − √n)
+    = 2√n/(√(n + 2) + √n)   ← Multiplier par la quantité conjuguée
+    = 2/(√(1 + 2/n) + 1)   ← Diviser par √n
+    = □   (trous : 1)   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 1/2)   ← bₙ = 1/√n : p = 1/2 ≤ 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = √n·(√(n + 2) − √n) → ▢ | bₙ = 1/√n, aₙ/bₙ → 1, p = 1/2 ≤ 1 : diverge.
+  pièges : a1_sqrt_sum_split
+
+Nature de Σ_{n=1}^{∞} 5/(n² + 5n) (termes positifs) ? Compare à bₙ = 1/n² : calcule la limite de aₙ/bₙ.
+  [guided]  n²·5/(n² + 5n)
+    = 5/(1 + 5/n)   ← Diviser en haut et en bas par n²
+    = □   (trous : 5)   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 2)   ← bₙ = 1/n² : p = 2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n²·5/(n² + 5n) → ▢ | bₙ = 1/n², aₙ/bₙ → 5, p = 2 > 1 : converge.
+
+Nature de Σ_{n=1}^{∞} (√(n + 2) − √n)/n (termes positifs) ? Compare à bₙ = 1/n^(3/2) : calcule la limite de aₙ/bₙ.
+  [guided]  n^(3/2)·(√(n + 2) − √n)/n
+    = 2√n/(√(n + 2) + √n)   ← Multiplier par la quantité conjuguée
+    = 2/(√(1 + 2/n) + 1)   ← Diviser par √n
+    = □   (trous : 1)   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 3/2)   ← bₙ = 1/n^(3/2) : p = 3/2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n^(3/2)·(√(n + 2) − √n)/n → ▢ | bₙ = 1/n^(3/2), aₙ/bₙ → 1, p = 3/2 > 1 : converge.
+  pièges : a1_sqrt_sum_split, a1_riemann_p_boundary
+
+```
+
+### Niveau 2
+
+```
+Nature de Σ_{n=1}^{∞} ln(1 + 4/n) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [guided]  n·ln(1 + 4/n)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n / · bₙ = 1/√n / · bₙ = 1/n^(3/2)
+    = 4·□   (trous : 4·ln(1 + 4/n)/(4/n))   ← Log(1 + u)/u avec u = 4/n → 0
+    = □   (trous : 4)   ← Log(1 + u)/u → 1
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 1   ← bₙ = 1/n : p = 1 ≤ 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n·ln(1 + 4/n) → ▢ | bₙ = 1/n, aₙ/bₙ → 4, p = 1 ≤ 1 : diverge.
+  pièges : a1_riemann_p_boundary
+
+Nature de Σ_{n=1}^{∞} (n + 2)/(n² + 4n) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [guided]  n·(n + 2)/(n² + 4n)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n / · bₙ = 1/√n / · bₙ = 1/n^(3/2)
+    = (1 + 2/n)/(□)   (trous : (1 + 2/n)/(1 + 4/n))   ← Diviser en haut et en bas par n²
+    = □   (trous : 1)   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 1   ← bₙ = 1/n : p = 1 ≤ 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n·(n + 2)/(n² + 4n) → ▢ | bₙ = 1/n, aₙ/bₙ → 1, p = 1 ≤ 1 : diverge.
+  pièges : a1_riemann_p_boundary
+
+Nature de Σ_{n=1}^{∞} sin(1/n²) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [guided]  n²·sin(1/n²)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n² / · bₙ = 1/n^(3/2) / · bₙ = 1/n³
+    = sin(□)/(1/n²)   (trous : sin(1/n²)/(1/n²))   ← sin u/u avec u = 1/n² → 0
+    = □   (trous : 1)   ← sin u/u → 1
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 2   ← bₙ = 1/n² : p = 2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n²·sin(1/n²) → ▢ | bₙ = 1/n², aₙ/bₙ → 1, p = 2 > 1 : converge.
+  pièges : a1_dl_factorial_missing
+
+```
+
+### Niveau 3
+
+```
+Nature de Σ_{n=1}^{∞} 4/(n² + 6n) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [tap, suivre l'erreur, menu steps]  n²·4/(n² + 6n)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n² / · bₙ = 1/n^(3/2) / · bₙ = 1/n³
+    = 4/(1 + 6/n)   ← Diviser en haut et en bas par n²
+    = 4   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 2   ← bₙ = 1/n² : p = 2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n²·4/(n² + 6n) → ▢ | bₙ = 1/n², aₙ/bₙ → 4, p = 2 > 1 : converge.
+
+Nature de Σ_{n=1}^{∞} ln(1 + 3/n²) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [tap, suivre l'erreur, menu steps]  n²·ln(1 + 3/n²)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n² / · bₙ = 1/n^(3/2) / · bₙ = 1/n³
+    = 3·ln(1 + 3/n²)/(3/n²)   ← Log(1 + u)/u avec u = 3/n² → 0
+    = 3   ← Log(1 + u)/u → 1
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 2   ← bₙ = 1/n² : p = 2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n²·ln(1 + 3/n²) → ▢ | bₙ = 1/n², aₙ/bₙ → 3, p = 2 > 1 : converge.
+
+Nature de Σ_{n=1}^{∞} ln(1 + 3/n²) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [tap, suivre l'erreur, menu steps]  n²·ln(1 + 3/n²)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n² / · bₙ = 1/n^(3/2) / · bₙ = 1/n³
+    = 3·ln(1 + 3/n²)/(3/n²)   ← Log(1 + u)/u avec u = 3/n² → 0
+    = 3   ← Log(1 + u)/u → 1
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 2   ← bₙ = 1/n² : p = 2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n²·ln(1 + 3/n²) → ▢ | bₙ = 1/n², aₙ/bₙ → 3, p = 2 > 1 : converge.
+
+```
+
+### Niveau 4
+
+```
+Nature de Σ_{n=1}^{∞} ln(1 + 3/n) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [free, suivre l'erreur]  n·ln(1 + 3/n)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n / · bₙ = 1/√n / · bₙ = 1/n^(3/2)
+    = 3·ln(1 + 3/n)/(3/n)   ← Log(1 + u)/u avec u = 3/n → 0
+    = 3   ← Log(1 + u)/u → 1
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 1   ← bₙ = 1/n : p = 1 ≤ 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n·ln(1 + 3/n) → ▢ | bₙ = 1/n, aₙ/bₙ → 3, p = 1 ≤ 1 : diverge.
+  pièges : a1_riemann_p_boundary
+
+Nature de Σ_{n=1}^{∞} (√(n + 1) − √n)/n (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [free, suivre l'erreur]  n^(3/2)·(√(n + 1) − √n)/n
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n^(3/2) / · bₙ = 1/n / · bₙ = 1/n²
+    = √n/(√(n + 1) + √n)   ← Multiplier par la quantité conjuguée
+    = 1/(√(1 + 1/n) + 1)   ← Diviser par √n
+    = 1/2   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 3/2   ← bₙ = 1/n^(3/2) : p = 3/2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n^(3/2)·(√(n + 1) − √n)/n → ▢ | bₙ = 1/n^(3/2), aₙ/bₙ → 1/2, p = 3/2 > 1 : converge.
+  pièges : a1_dl_factorial_missing, a1_sqrt_sum_split, a1_riemann_p_boundary
+
+Nature de Σ_{n=1}^{∞} 3/(n² + 6) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [free, suivre l'erreur]  n²·3/(n² + 6)
+    ? À quelle série de Riemann Σ bₙ compares-tu Σ aₙ ? ✔ bₙ = 1/n² / · bₙ = 1/n^(3/2) / · bₙ = 1/n³
+    = 3/(1 + 6/n²)   ← Diviser en haut et en bas par n²
+    = 3   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 2   ← bₙ = 1/n² : p = 2 > 1
+  aides : Garde les termes qui dominent (ou remplace sin u, Log(1 + u) par u) : à quelle série de Riemann cela ressemble-t-il ? | aₙ/bₙ = n²·3/(n² + 6) → ▢ | bₙ = 1/n², aₙ/bₙ → 3, p = 2 > 1 : converge.
+
+```
+
+### Niveau 5
+
+```
+Nature de Σ_{n=1}^{∞} ln(1 + 2/n) (termes positifs) ?
+  · Converge : aₙ ~ c/n avec c > 0, et Σ 1/n converge. [a1_riemann_p_boundary]   ✔ Diverge : aₙ/(1/n) → 2 ∈ ]0 ; +∞[, et p = 1 ≤ 1.   · Converge : aₙ ≥ 1/n³ pour n assez grand, et Σ 1/n³ converge. [a1_compare_wrong_direction]   · Converge, car aₙ → 0. [a1_series_term_to_zero]
+  pièges : a1_compare_wrong_direction, a1_riemann_p_boundary, a1_series_term_to_zero
+
+Nature de Σ_{n=1}^{∞} (√(n + 5) − √(n + 3))·sin(3/n) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [free, sans aide]  n^(3/2)·(√(n + 5) − √(n + 3))·sin(3/n)
+    = 2√n/(√(n + 5) + √(n + 3))·sin(3/n)/(1/n)   ← Conjuguée, et n^(3/2) = √n·n
+    = 3   ← √n/(√(n + …) + √(n + …)) → 1/2 et sin(3/n)/(1/n) → 3
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 3/2   ← bₙ = 1/n^(3/2) : p = 3/2 > 1
+  pièges : a1_dl_factorial_missing, a1_sqrt_sum_split, a1_riemann_p_boundary
+
+Nature de Σ_{n=1}^{∞} (√(n + 4) − √(n + 3))·sin(3/n) (termes positifs) ? Calcule la limite de aₙ/bₙ pour la série de Riemann Σ bₙ qui convient.
+  [free, sans aide]  n^(3/2)·(√(n + 4) − √(n + 3))·sin(3/n)
+    = √n/(√(n + 4) + √(n + 3))·sin(3/n)/(1/n)   ← Conjuguée, et n^(3/2) = √n·n
+    = 3/2   ← √n/(√(n + …) + √(n + …)) → 1/2 et sin(3/n)/(1/n) → 3
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 3/2   ← bₙ = 1/n^(3/2) : p = 3/2 > 1
+  pièges : a1_dl_factorial_missing, a1_sqrt_sum_split, a1_riemann_p_boundary
+
+```
+
+### Variantes d'examen
+
+```
+Nature de Σ_{n=1}^{∞} (1/n − ln(1 + 1/n)) (termes positifs) ?
+  · Converge, car aₙ → 0. [a1_series_term_to_zero]   · Diverge : 0 ≤ aₙ ≤ 1/n, et Σ 1/n diverge. [a1_compare_wrong_direction]   · On ne peut pas conclure : Log(1 + ·)(1/n) ~ 1/n, donc aₙ ~ 1/n − 1/n = 0. [a1_ipe_in_sum]   ✔ Converge : aₙ ~ 1/2·1/n² (développement limité), p = 2 > 1.
+  [examen mcq]
+  pièges : a1_ipe_in_sum, a1_compare_wrong_direction, a1_series_term_to_zero
+
+Vrai ou faux ?
+  « Si aₙ ≥ 0 et Σ aₙ converge, alors Σ aₙ² converge. » → VRAI
+  [examen tf]
+
+```
+
+## Critères de d'Alembert et de Cauchy pour les séries (`a1-ser-ratio-root`, BA1)
+
+_|aₙ₊₁/aₙ| → ρ ou ⁿ√|aₙ| → ρ : ρ < 1 converge, ρ > 1 diverge, ρ = 1 ne dit rien._
+
+### Niveau 1
+
+```
+Nature de Σn≥1 (5n/(6n + 1))ⁿ ? Par Cauchy : ⁿ√|aₙ| = 5n/(6n + 1).
+  [guided]  5n/(6n + 1)
+    = 5/(6 + 1/n)   ← Diviser par n
+    = □   (trous : 5/6)   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 5/(6 + 1/n)
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = □   (trous : 5/6)   ← ρ < 1
+  aides : Une puissance n-ième : Cauchy, la racine n-ième la fait disparaître. | ⁿ√|aₙ| = 5n/(6n + 1) → ▢ | ρ = 5/6 < 1 : converge absolument.
+
+Nature de Σn≥1 n·5ⁿ/n! ? Par d'Alembert : aₙ₊₁/aₙ = 5(n + 1)/(n(n + 1)).
+  [guided]  5(n + 1)/(n(n + 1))
+    = 5/n   ← Simplifier par n + 1
+    = □   (trous : 0)   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 5/n
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = □   (trous : 0)   ← ρ < 1
+  aides : Des factorielles : d'Alembert. (n + 1)! = (n + 1)·n! et (2n + 2)! = (2n + 2)(2n + 1)·(2n)!. | aₙ₊₁/aₙ = 5(n + 1)/(n(n + 1)) → ▢ | ρ = 0 < 1 : converge absolument.
+
+Nature de Σn≥1 (1 + 1/n)^(n²)/2ⁿ ? Par Cauchy : ⁿ√|aₙ| = (1 + 1/n)^n/2.
+  [guided]  (1 + 1/n)^n/2
+    = e^(n·ln(1 + 1/n))/2   ← Forme 1^∞ : e^(n·Log(1 + 1/n))
+    = □   (trous : e/2)   ← n·Log(1 + 1/n) → 1
+  — Conclusion : rappelle ρ.  [juge limit]  départ : e^(n·ln(1 + 1/n))/2
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = □   (trous : e/2)   ← ρ > 1
+  aides : Une puissance n-ième : Cauchy, la racine n-ième la fait disparaître. | ⁿ√|aₙ| = (1 + 1/n)^n/2 → ▢ | ρ = e/2 > 1 : diverge.
+
+```
+
+### Niveau 2
+
+```
+Nature de Σn≥1 (n!)²/(2n)! ? Choisis le critère : la ligne de départ est alors aₙ₊₁/aₙ, déjà formé.
+  [guided]  (n + 1)²/((2n + 2)(2n + 1))
+    ? Quel critère choisis-tu ? ✔ d'Alembert : |aₙ₊₁/aₙ| / · Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    ? Pour former aₙ₊₁/aₙ : (2n + 2)!/(2n)! = ? ✔ (2n + 2)(2n + 1) / · 2n + 2 / · (n + 1)(n + 2)
+    = (n + 1)/(□)   (trous : (n + 1)/(2(2n + 1)))   ← Simplifier par 2n + 2 = 2(n + 1)
+    = □   (trous : 1/4)   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : (n + 1)/(2(2n + 1))
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 1/4   ← ρ < 1
+  aides : Des factorielles : d'Alembert. (n + 1)! = (n + 1)·n! et (2n + 2)! = (2n + 2)(2n + 1)·(2n)!. | aₙ₊₁/aₙ = (n + 1)²/((2n + 2)(2n + 1)) → ▢ | ρ = 1/4 < 1 : converge absolument.
+  pièges : a1_dl_factorial_missing, a1_bh_quotient_rule, a1_dominant_term_wrong, a1_factorial_ratio
+
+Nature de Σn≥1 3ⁿ(n!)²/(2n)! ? Choisis le critère : la ligne de départ est alors aₙ₊₁/aₙ, déjà formé.
+  [guided]  3(n + 1)²/((2n + 2)(2n + 1))
+    ? Quel critère choisis-tu ? ✔ d'Alembert : |aₙ₊₁/aₙ| / · Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    ? Pour former aₙ₊₁/aₙ : (2n + 2)!/(2n)! = ? ✔ (2n + 2)(2n + 1) / · 2n + 2 / · (n + 1)(n + 2)
+    = 3□   (trous : 3(n + 1)/(2(2n + 1)))   ← Simplifier par 2n + 2 = 2(n + 1)
+    = □   (trous : 3/4)   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 3(n + 1)/(2(2n + 1))
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 3/4   ← ρ < 1
+  aides : Des factorielles : d'Alembert. (n + 1)! = (n + 1)·n! et (2n + 2)! = (2n + 2)(2n + 1)·(2n)!. | aₙ₊₁/aₙ = 3(n + 1)²/((2n + 2)(2n + 1)) → ▢ | ρ = 3/4 < 1 : converge absolument.
+  pièges : a1_dl_factorial_missing, a1_factorial_ratio
+
+Nature de Σn≥1 (n/(5n + 1))ⁿ ? Choisis le critère : la ligne de départ est alors ⁿ√|aₙ|, déjà formé.
+  [guided]  n/(5n + 1)
+    ? Quel critère choisis-tu ? · d'Alembert : |aₙ₊₁/aₙ| / ✔ Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    = 1/(□)   (trous : 1/(5 + 1/n))   ← Diviser par n
+    = □   (trous : 1/5)   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 1/(5 + 1/n)
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 1/5   ← ρ < 1
+  aides : Une puissance n-ième : Cauchy, la racine n-ième la fait disparaître. | ⁿ√|aₙ| = n/(5n + 1) → ▢ | ρ = 1/5 < 1 : converge absolument.
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+```
+
+### Niveau 3
+
+```
+Nature de Σn≥1 (n/(2n + 1))ⁿ ?
+  [tap, suivre l'erreur, menu steps]  n/(2n + 1)
+    ? Quel critère choisis-tu ? · d'Alembert : |aₙ₊₁/aₙ| / ✔ Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    = 1/(2 + 1/n)   ← Diviser par n
+    = 1/2   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 1/(2 + 1/n)
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 1/2   ← ρ < 1
+  aides : Une puissance n-ième : Cauchy, la racine n-ième la fait disparaître. | ⁿ√|aₙ| = n/(2n + 1) → ▢ | ρ = 1/2 < 1 : converge absolument.
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+Nature de Σn≥1 5ⁿ(n!)²/(2n)! ?
+  [tap, suivre l'erreur, menu steps]  5(n + 1)²/((2n + 2)(2n + 1))
+    ? Quel critère choisis-tu ? ✔ d'Alembert : |aₙ₊₁/aₙ| / · Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    ? Pour former aₙ₊₁/aₙ : (2n + 2)!/(2n)! = ? ✔ (2n + 2)(2n + 1) / · 2n + 2 / · (n + 1)(n + 2)
+    = 5(n + 1)/(2(2n + 1))   ← Simplifier par 2n + 2 = 2(n + 1)
+    = 5/4   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 5(n + 1)/(2(2n + 1))
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 5/4   ← ρ > 1
+  aides : Des factorielles : d'Alembert. (n + 1)! = (n + 1)·n! et (2n + 2)! = (2n + 2)(2n + 1)·(2n)!. | aₙ₊₁/aₙ = 5(n + 1)²/((2n + 2)(2n + 1)) → ▢ | ρ = 5/4 > 1 : diverge.
+  pièges : a1_dl_factorial_missing, a1_factorial_ratio
+
+Nature de Σn≥1 n!/(2n)ⁿ ?
+  [tap, suivre l'erreur, menu steps]  (n/(n + 1))^n/2
+    ? Quel critère choisis-tu ? ✔ d'Alembert : |aₙ₊₁/aₙ| / · Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    = 1/(2(1 + 1/n)^n)   ← (n/(n + 1))ⁿ = 1/(1 + 1/n)ⁿ
+    = e^(−1)/2   ← (1 + 1/n)ⁿ → e
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 1/(2(1 + 1/n)^n)
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = e^(−1)/2   ← ρ < 1
+  aides : Des factorielles : d'Alembert. (n + 1)! = (n + 1)·n! et (2n + 2)! = (2n + 2)(2n + 1)·(2n)!. | aₙ₊₁/aₙ = (n/(n + 1))^n/2 → ▢ | ρ = 1/(2e) < 1 : converge absolument.
+
+```
+
+### Niveau 4
+
+```
+Nature de Σn≥1 (1 + 1/n)^(n²)/2ⁿ ?
+  [free, suivre l'erreur]  (1 + 1/n)^n/2
+    ? Quel critère choisis-tu ? · d'Alembert : |aₙ₊₁/aₙ| / ✔ Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    = e^(n·ln(1 + 1/n))/2   ← Forme 1^∞ : e^(n·Log(1 + 1/n))
+    = e/2   ← n·Log(1 + 1/n) → 1
+  — Conclusion : rappelle ρ.  [juge limit]  départ : e^(n·ln(1 + 1/n))/2
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = e/2   ← ρ > 1
+  aides : Une puissance n-ième : Cauchy, la racine n-ième la fait disparaître. | ⁿ√|aₙ| = (1 + 1/n)^n/2 → ▢ | ρ = e/2 > 1 : diverge.
+
+Nature de Σn≥1 (2n/(5n + 1))ⁿ ?
+  [free, suivre l'erreur]  2n/(5n + 1)
+    ? Quel critère choisis-tu ? · d'Alembert : |aₙ₊₁/aₙ| / ✔ Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    = 2/(5 + 1/n)   ← Diviser par n
+    = 2/5   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 2/(5 + 1/n)
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 2/5   ← ρ < 1
+  aides : Une puissance n-ième : Cauchy, la racine n-ième la fait disparaître. | ⁿ√|aₙ| = 2n/(5n + 1) → ▢ | ρ = 2/5 < 1 : converge absolument.
+
+Nature de Σn≥1 n²·5ⁿ/n! ?
+  [free, suivre l'erreur]  5(n + 1)²/(n²(n + 1))
+    ? Quel critère choisis-tu ? ✔ d'Alembert : |aₙ₊₁/aₙ| / · Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    = 5(n + 1)/n²   ← Simplifier par n + 1
+    = 0   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 5(n + 1)/n²
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 0   ← ρ < 1
+  aides : Des factorielles : d'Alembert. (n + 1)! = (n + 1)·n! et (2n + 2)! = (2n + 2)(2n + 1)·(2n)!. | aₙ₊₁/aₙ = 5(n + 1)²/(n²(n + 1)) → ▢ | ρ = 0 < 1 : converge absolument.
+  pièges : a1_dl_factorial_missing
+
+```
+
+### Niveau 5
+
+```
+Nature de Σn≥1 7ⁿ(n!)²/(2n)! ?
+  [free, sans aide]  7(n + 1)²/((2n + 2)(2n + 1))
+    ? Quel critère choisis-tu ? ✔ d'Alembert : |aₙ₊₁/aₙ| / · Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    ? Pour former aₙ₊₁/aₙ : (2n + 2)!/(2n)! = ? ✔ (2n + 2)(2n + 1) / · 2n + 2 / · (n + 1)(n + 2)
+    = 7(n + 1)/(2(2n + 1))   ← Simplifier par 2n + 2 = 2(n + 1)
+    = 7/4   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 7(n + 1)/(2(2n + 1))
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 7/4   ← ρ > 1
+  pièges : a1_dl_factorial_missing, a1_factorial_ratio
+
+Nature de Σn≥1 6ⁿ(n!)²/(2n)! ?
+  [free, sans aide]  6(n + 1)²/((2n + 2)(2n + 1))
+    ? Quel critère choisis-tu ? ✔ d'Alembert : |aₙ₊₁/aₙ| / · Cauchy : ⁿ√|aₙ| / · Comparer à une série de Riemann
+    ? Pour former aₙ₊₁/aₙ : (2n + 2)!/(2n)! = ? ✔ (2n + 2)(2n + 1) / · 2n + 2 / · (n + 1)(n + 2)
+    = 6(n + 1)/(2(2n + 1))   ← Simplifier par 2n + 2 = 2(n + 1)
+    = 3/2   ← Passer à la limite
+  — Conclusion : rappelle ρ.  [juge limit]  départ : 6(n + 1)/(2(2n + 1))
+    ? Nature de la série ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / ✔ Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Critère de Cauchy : ⁿ√|aₙ| → ρ
+    = 3/2   ← ρ > 1
+  pièges : a1_dl_factorial_missing, a1_factorial_ratio
+
+Nature de Σn≥1 3ⁿ(n!)²/(2n)! ?
+  ✔ Absolument convergente   · Convergente, mais pas absolument   · Divergente, car |aₙ| → +∞ [a1_factorial_ratio]   · Divergente, car |aₙ| → 1
+  pièges : a1_factorial_ratio
+
+```
+
+### Variantes d'examen
+
+```
+Nature de Σn≥1 2ⁿ(n!)²/(2n)! ?
+  ✔ Absolument convergente   · Convergente, mais pas absolument   · Divergente, car |aₙ| → +∞ [a1_factorial_ratio]   · Divergente, car |aₙ| → 1
+  [examen mcq]
+  pièges : a1_factorial_ratio
+
+Vrai ou faux ?
+  « Si aₙ > 0 et aₙ₊₁/aₙ < 1 pour tout n, alors Σ aₙ converge. » → FAUX
+    contre-exemple (sequence) : a = 1/n
+  [examen tf]
+  pièges : a1_ratio_lt1_termwise
+
+```
+
+## Leibniz, convergence absolue et semi-convergence (`a1-ser-leibniz-abs`, BA1)
+
+_D'abord Σ |aₙ| ; si elle diverge, Leibniz : xₙ décroissante et → 0._
+
+### Niveau 1
+
+```
+Nature de Σn≥1 (−1)ⁿ⁺¹·sin(1/n²) : converge-t-elle absolument, seulement, ou diverge-t-elle ? Compare |aₙ| à 1/n².
+  [guided]  n²·sin(1/n²)
+    = sin(1/n²)/(1/n²)   ← sin u/u avec u = 1/n²
+    = □   (trous : 1)   ← sin u/u → 1
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 2)   ← p = 2 > 1 : Σ |aₙ| converge
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | |aₙ| ~ 1/n² : converge absolument.
+  pièges : a1_dl_factorial_missing, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ·sin(1/n²) : converge-t-elle absolument, seulement, ou diverge-t-elle ? Compare |aₙ| à 1/n².
+  [guided]  n²·sin(1/n²)
+    = sin(1/n²)/(1/n²)   ← sin u/u avec u = 1/n²
+    = □   (trous : 1)   ← sin u/u → 1
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 2)   ← p = 2 > 1 : Σ |aₙ| converge
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | |aₙ| ~ 1/n² : converge absolument.
+  pièges : a1_dl_factorial_missing, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ/(n + 2) : converge-t-elle absolument, seulement, ou diverge-t-elle ? Étape 1 : compare |aₙ| à 1/n. Étape 2 : Leibniz avec xₙ = |aₙ|.
+  [guided]  n/(n + 2)
+    = 1/(1 + 2/n)   ← Diviser par n
+    = □   (trous : 1)   ← Passer à la limite
+  — Leibniz : montre que xₙ = 1/(n + 2) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : 1/(n + 2) − 1/(n + 3)
+    ? |aₙ| ~ 1/n : Σ |aₙ| … ✔ diverge (p = 1 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    = 1/((n + 2)(n + 3))   ← Même dénominateur
+    = □   (trous : 0)   ← C'est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : 1/(n + 2)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 0)   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, a1_riemann_p_boundary, a1_abs_conv_confused
+
+```
+
+### Niveau 2
+
+```
+Nature de Σn≥1 (−1)ⁿ/(√n + 1) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [guided]  √n/(√n + 1)
+    ? Par quoi commences-tu ? ✔ Étudier Σ |aₙ| (convergence absolue) / ✔ Appliquer Leibniz tout de suite / · aₙ → 0, donc la série converge
+    = 1/(□)   (trous : 1/(1 + 1/√n))   ← Diviser par √n
+    = □   (trous : 1)   ← Passer à la limite
+  — Leibniz : montre que xₙ = 1/(√n + 1) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : 1/(√n + 1) − 1/(√(n + 1) + 1)
+    ? |aₙ| ~ 1/√n : Σ |aₙ| … ✔ diverge (p = 1/2 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    ? Que demande le critère de Leibniz pour aₙ = (−1)ⁿxₙ ? ✔ xₙ ≥ 0, xₙ décroissante et xₙ → 0 / · Des signes alternés et aₙ → 0 / · xₙ décroissante
+    = (√(n + 1) − √n)/(□)   (trous : (√(n + 1) − √n)/((√n + 1)(√(n + 1) + 1)))   ← Même dénominateur
+    = □   (trous : 0)   ← √(n + 1) > √n : c'est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : 1/(√n + 1)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 0)   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1/2), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_bh_quotient_rule, a1_series_term_to_zero, a1_leibniz_no_decrease, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ⁺¹·Log(1 + 1/n) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [guided]  n·ln(1 + 1/n)
+    ? Par quoi commences-tu ? ✔ Étudier Σ |aₙ| (convergence absolue) / ✔ Appliquer Leibniz tout de suite / · aₙ → 0, donc la série converge
+    = □   (trous : 1)   ← Log(1 + u)/u → 1 avec u = 1/n
+  — Leibniz : montre que xₙ = ln(1 + 1/n) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : ln(1 + 1/n) − ln(1 + 1/(n + 1))
+    ? |aₙ| ~ 1/n : Σ |aₙ| … ✔ diverge (p = 1 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    ? Que demande le critère de Leibniz pour aₙ = (−1)ⁿxₙ ? ✔ xₙ ≥ 0, xₙ décroissante et xₙ → 0 / · Des signes alternés et aₙ → 0 / · xₙ décroissante
+    = □   (trous : ln((n + 1)²/(n(n + 2))))   ← Regrouper les Log
+    = □   (trous : 0)   ← (n + 1)² > n(n + 2) : le Log est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : ln(1 + 1/n)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 0)   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_series_term_to_zero, a1_riemann_p_boundary, a1_leibniz_no_decrease, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ⁺¹·Log(1 + 1/n) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [guided]  n·ln(1 + 1/n)
+    ? Par quoi commences-tu ? ✔ Étudier Σ |aₙ| (convergence absolue) / ✔ Appliquer Leibniz tout de suite / · aₙ → 0, donc la série converge
+    = □   (trous : 1)   ← Log(1 + u)/u → 1 avec u = 1/n
+  — Leibniz : montre que xₙ = ln(1 + 1/n) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : ln(1 + 1/n) − ln(1 + 1/(n + 1))
+    ? |aₙ| ~ 1/n : Σ |aₙ| … ✔ diverge (p = 1 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    ? Que demande le critère de Leibniz pour aₙ = (−1)ⁿxₙ ? ✔ xₙ ≥ 0, xₙ décroissante et xₙ → 0 / · Des signes alternés et aₙ → 0 / · xₙ décroissante
+    = □   (trous : ln((n + 1)²/(n(n + 2))))   ← Regrouper les Log
+    = □   (trous : 0)   ← (n + 1)² > n(n + 2) : le Log est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : ln(1 + 1/n)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = □   (trous : 0)   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_series_term_to_zero, a1_riemann_p_boundary, a1_leibniz_no_decrease, a1_abs_conv_confused
+
+```
+
+### Niveau 3
+
+```
+Nature de Σn≥1 (−1)ⁿ·sin(1/n) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [tap, suivre l'erreur, menu steps]  n·sin(1/n)
+    ? Par quoi commences-tu ? ✔ Étudier Σ |aₙ| (convergence absolue) / ✔ Appliquer Leibniz tout de suite / · aₙ → 0, donc la série converge
+    = sin(1/n)/(1/n)   ← sin u/u avec u = 1/n
+    = 1   ← sin u/u → 1
+  — Leibniz : montre que xₙ = sin(1/n) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : sin(1/n) − sin(1/(n + 1))
+    ? |aₙ| ~ 1/n : Σ |aₙ| … ✔ diverge (p = 1 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    ? Que demande le critère de Leibniz pour aₙ = (−1)ⁿxₙ ? ✔ xₙ ≥ 0, xₙ décroissante et xₙ → 0 / · Des signes alternés et aₙ → 0 / · xₙ décroissante
+    = 0   ← sin croît sur [0 ; 1] et 1/(n + 1) < 1/n : c'est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : sin(1/n)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 0   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_dl_factorial_missing, a1_series_term_to_zero, a1_riemann_p_boundary, a1_leibniz_no_decrease, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ·Log(1 + 1/n) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [tap, suivre l'erreur, menu steps]  n·ln(1 + 1/n)
+    ? Par quoi commences-tu ? ✔ Étudier Σ |aₙ| (convergence absolue) / ✔ Appliquer Leibniz tout de suite / · aₙ → 0, donc la série converge
+    = 1   ← Log(1 + u)/u → 1 avec u = 1/n
+  — Leibniz : montre que xₙ = ln(1 + 1/n) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : ln(1 + 1/n) − ln(1 + 1/(n + 1))
+    ? |aₙ| ~ 1/n : Σ |aₙ| … ✔ diverge (p = 1 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    ? Que demande le critère de Leibniz pour aₙ = (−1)ⁿxₙ ? ✔ xₙ ≥ 0, xₙ décroissante et xₙ → 0 / · Des signes alternés et aₙ → 0 / · xₙ décroissante
+    = ln((n + 1)²/(n(n + 2)))   ← Regrouper les Log
+    = 0   ← (n + 1)² > n(n + 2) : le Log est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : ln(1 + 1/n)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 0   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_series_term_to_zero, a1_riemann_p_boundary, a1_leibniz_no_decrease, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ⁺¹·Log(1 + 1/n) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [tap, suivre l'erreur, menu steps]  n·ln(1 + 1/n)
+    ? Par quoi commences-tu ? ✔ Étudier Σ |aₙ| (convergence absolue) / ✔ Appliquer Leibniz tout de suite / · aₙ → 0, donc la série converge
+    = 1   ← Log(1 + u)/u → 1 avec u = 1/n
+  — Leibniz : montre que xₙ = ln(1 + 1/n) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : ln(1 + 1/n) − ln(1 + 1/(n + 1))
+    ? |aₙ| ~ 1/n : Σ |aₙ| … ✔ diverge (p = 1 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    ? Que demande le critère de Leibniz pour aₙ = (−1)ⁿxₙ ? ✔ xₙ ≥ 0, xₙ décroissante et xₙ → 0 / · Des signes alternés et aₙ → 0 / · xₙ décroissante
+    = ln((n + 1)²/(n(n + 2)))   ← Regrouper les Log
+    = 0   ← (n + 1)² > n(n + 2) : le Log est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : ln(1 + 1/n)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 0   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_series_term_to_zero, a1_riemann_p_boundary, a1_leibniz_no_decrease, a1_abs_conv_confused
+
+```
+
+### Niveau 4
+
+```
+Nature de Σn≥1 (−1)ⁿ/(n² + 4) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [free, suivre l'erreur]  n²/(n² + 4)
+    = 1/(1 + 4/n²)   ← Diviser par n²
+    = 1   ← Passer à la limite
+  — Conclusion : quel est l'exposant p de la série de Riemann ?  [juge value]  départ : p
+    ? Nature de la série ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / ✔ Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / · Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 2   ← p = 2 > 1 : Σ |aₙ| converge
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | |aₙ| ~ 1/n² : converge absolument.
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ·Log(1 + 1/n) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [free, suivre l'erreur]  n·ln(1 + 1/n)
+    = 1   ← Log(1 + u)/u → 1 avec u = 1/n
+  — Leibniz : montre que xₙ = ln(1 + 1/n) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : ln(1 + 1/n) − ln(1 + 1/(n + 1))
+    ? |aₙ| ~ 1/n : Σ |aₙ| … ✔ diverge (p = 1 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    = ln((n + 1)²/(n(n + 2)))   ← Regrouper les Log
+    = 0   ← (n + 1)² > n(n + 2) : le Log est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : ln(1 + 1/n)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 0   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_riemann_p_boundary, a1_abs_conv_confused
+
+Nature de Σn≥1 (−1)ⁿ/(√n + 2) : converge-t-elle absolument, seulement, ou diverge-t-elle ?
+  [free, suivre l'erreur]  √n/(√n + 2)
+    = 1/(1 + 2/√n)   ← Diviser par √n
+    = 1   ← Passer à la limite
+  — Leibniz : montre que xₙ = 1/(√n + 2) décroît, avec xₙ − xₙ₊₁ ≥ 0.  [juge equiv]  départ : 1/(√n + 2) − 1/(√(n + 1) + 2)
+    ? |aₙ| ~ 1/√n : Σ |aₙ| … ✔ diverge (p = 1/2 ≤ 1) : pas de convergence absolue / · converge : la série converge absolument
+    = (√(n + 1) − √n)/((√n + 2)(√(n + 1) + 2))   ← Même dénominateur
+    = 0   ← √(n + 1) > √n : c'est positif
+  — Conclus, puis vérifie la dernière hypothèse de Leibniz : xₙ → 0.  [juge limit]  départ : 1/(√n + 2)
+    ? Nature de la série ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère conclut ? · Condition nécessaire : le terme général ne tend pas vers 0 / · Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ / · Critère de d'Alembert : |aₙ₊₁/aₙ| → ρ / ✔ Comparaison pour Σ |aₙ|, puis le critère de Leibniz
+    = 0   ← xₙ → 0
+  aides : Commence par les valeurs absolues ; si Σ |aₙ| diverge, essaie Leibniz et vérifie ses trois hypothèses. | |aₙ| ~ 1/n^▢ | Pas absolument (p = 1/2), mais Leibniz : xₙ décroît vers 0.
+  pièges : a1_bh_quotient_rule, a1_abs_conv_confused
+
+```
+
+### Niveau 5
+
+```
+Nature de Σ_{n=2}^{∞} (−1)^n/(√n + (−1)^n) ?
+  · Converge par Leibniz : les signes alternent et aₙ → 0. [a1_leibniz_no_decrease]   · Converge absolument : |aₙ| → 0. [a1_abs_conv_confused]   ✔ Diverge : aₙ = (−1)ⁿ√n/(n − 1) − 1/(n − 1), une série convergente moins une divergente.   · Converge, car aₙ → 0. [a1_series_term_to_zero]
+  pièges : a1_leibniz_no_decrease, a1_abs_conv_confused, a1_series_term_to_zero
+
+Nature de Σn≥1 (−1)ⁿ/(√n + 5) ?
+  · Converge absolument : |aₙ| → 0. [a1_series_term_to_zero]   ✔ Converge, mais pas absolument (semi-convergente) : Σ |aₙ| diverge (comme Σ 1/√n), et Leibniz s'applique.   · Diverge : Σ |aₙ| diverge (comme Σ 1/√n). [a1_abs_conv_confused]   · Converge absolument : Leibniz s'applique. [a1_abs_conv_confused]
+  pièges : a1_abs_conv_confused, a1_series_term_to_zero
+
+Nature de Σn≥1 (−1)ⁿ/(n + 3) ?
+  · Converge absolument : |aₙ| → 0. [a1_series_term_to_zero]   ✔ Converge, mais pas absolument (semi-convergente) : Σ |aₙ| diverge (comme Σ 1/n), et Leibniz s'applique.   · Converge absolument : Leibniz s'applique. [a1_abs_conv_confused]   · Diverge : Σ |aₙ| diverge (comme Σ 1/n). [a1_abs_conv_confused]
+  pièges : a1_abs_conv_confused, a1_series_term_to_zero
+
+```
+
+### Variantes d'examen
+
+```
+Nature de Σn≥1 (−1)ⁿ⁺¹/(√n + 2) ?
+  ✔ Converge, mais pas absolument (semi-convergente) : Σ |aₙ| diverge (comme Σ 1/√n), et Leibniz s'applique.   · Converge absolument : Leibniz s'applique. [a1_abs_conv_confused]   · Diverge : Σ |aₙ| diverge (comme Σ 1/√n). [a1_abs_conv_confused]   · Converge absolument : |aₙ| → 0. [a1_series_term_to_zero]
+  [examen mcq]
+  pièges : a1_abs_conv_confused, a1_series_term_to_zero
+
+Vrai ou faux ?
+  « Si aₙ ≥ 0 et Σ aₙ converge, alors Σ (−1)ⁿaₙ converge. » → VRAI
+  [examen tf]
+
+```
+
+## Séries à paramètre : ensemble de convergence (`a1-ser-param`, BA1)
+
+_Le critère en gardant le paramètre, une inéquation, puis les bornes à part._
+
+### Niveau 1
+
+```
+Pour quels λ ≠ −10 la série Σ_{n=0}^{∞} (3λ/(λ + 10))^n converge-t-elle ? C'est une géométrique : elle converge si et seulement si |q| < 1.
+  [guided]  |3λ/(λ + 10)| < 1
+    = |3λ| < |λ + 10|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 9λ² < (λ + 10)²   ← Élever au carré (deux membres positifs)
+    = 8λ² − 20λ − 100 < 0   ← Développer et ordonner
+    = (λ − 5)(□) < 0   (trous : (λ − 5)(λ + 5/2) < 0)   ← Racines −5/2 et 5
+    = □   (trous : ]−5/2 ; 5[)   ← Négatif entre les racines
+  — Borne λ = −5/2 : que vaut la raison q ?  [juge value]  départ : 3·(−5/2)/((−5/2) + 10)
+    = □   (trous : −1)   ← q = −1
+  — Borne λ = 5 : que vaut q ?  [juge value]  départ : 3·(5)/((5) + 10)
+    ? En λ = −5/2, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = □   (trous : 1)   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |3λ/(λ + 10)| < 1
+    ? En λ = 5, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = □   (trous : ]−5/2 ; 5[)   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−5)(λ ▢) < 0 | ]−5/2 ; 5[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_param_bounds_untreated
+
+Pour quels λ ≠ −9 la série Σ_{n=0}^{∞} (2λ/(λ + 9))^n converge-t-elle ? C'est une géométrique : elle converge si et seulement si |q| < 1.
+  [guided]  |2λ/(λ + 9)| < 1
+    = |2λ| < |λ + 9|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 4λ² < (λ + 9)²   ← Élever au carré (deux membres positifs)
+    = 3λ² − 18λ − 81 < 0   ← Développer et ordonner
+    = (λ − 9)(□) < 0   (trous : (λ − 9)(λ + 3) < 0)   ← Racines −3 et 9
+    = □   (trous : ]−3 ; 9[)   ← Négatif entre les racines
+  — Borne λ = −3 : que vaut la raison q ?  [juge value]  départ : 2·(−3)/((−3) + 9)
+    = □   (trous : −1)   ← q = −1
+  — Borne λ = 9 : que vaut q ?  [juge value]  départ : 2·(9)/((9) + 9)
+    ? En λ = −3, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = □   (trous : 1)   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |2λ/(λ + 9)| < 1
+    ? En λ = 9, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = □   (trous : ]−3 ; 9[)   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−9)(λ ▢) < 0 | ]−3 ; 9[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_param_bounds_untreated
+
+Pour quels λ ≠ −6 la série Σ_{n=0}^{∞} (2λ/(λ + 6))^n converge-t-elle ? C'est une géométrique : elle converge si et seulement si |q| < 1.
+  [guided]  |2λ/(λ + 6)| < 1
+    = |2λ| < |λ + 6|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 4λ² < (λ + 6)²   ← Élever au carré (deux membres positifs)
+    = 3λ² − 12λ − 36 < 0   ← Développer et ordonner
+    = (λ − 6)(□) < 0   (trous : (λ − 6)(λ + 2) < 0)   ← Racines −2 et 6
+    = □   (trous : ]−2 ; 6[)   ← Négatif entre les racines
+  — Borne λ = −2 : que vaut la raison q ?  [juge value]  départ : 2·(−2)/((−2) + 6)
+    = □   (trous : −1)   ← q = −1
+  — Borne λ = 6 : que vaut q ?  [juge value]  départ : 2·(6)/((6) + 6)
+    ? En λ = −2, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = □   (trous : 1)   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |2λ/(λ + 6)| < 1
+    ? En λ = 6, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = □   (trous : ]−2 ; 6[)   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−6)(λ ▢) < 0 | ]−2 ; 6[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_param_bounds_untreated
+
+```
+
+### Niveau 2
+
+```
+Pour quels λ ≠ −3 la série Σ_{n=0}^{∞} (λ/(λ + 3))^n converge-t-elle ?
+  [guided]  |λ/(λ + 3)| < 1
+    ? Quel critère pour Σ qⁿ ? ✔ Série géométrique de raison q = λ/(λ+3) : converge si et seulement si |q| < 1 / ✔ Cauchy : ⁿ√|qⁿ| = |q|, puis ρ < 1 / · Le terme général qⁿ tend vers 0 : la série converge pour tout λ
+    = |λ| < |λ + 3|   ← |A/B| < 1 ⇔ |A| < |B|
+    = λ² < □   (trous : λ² < (λ + 3)²)   ← Élever au carré
+    = 6λ + 9 > 0   ← Développer : λ² se simplifie
+    = □   (trous : ]−3/2 ; +∞[)   ← λ > −3/2
+  — Borne λ = −3/2 : que vaut la raison q ?  [juge value]  départ : (−3/2)/((−3/2) + 3)
+    = −1   ← q = −1
+  — Ensemble de convergence :  [juge solset]  départ : |λ/(λ + 3)| < 1
+    ? En λ = −3/2, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = ]−3/2 ; +∞[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | Développe (λ + 3)² : λ² se simplifie, et il reste 6λ + ▢ > 0. | ]−3/2 ; +∞[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_series_term_to_zero, a1_param_bounds_untreated
+
+Pour quels λ ≠ −9 la série Σ_{n=0}^{∞} (2λ/(λ + 9))^n converge-t-elle ?
+  [guided]  |2λ/(λ + 9)| < 1
+    ? Quel critère pour Σ qⁿ ? ✔ Série géométrique de raison q = 2λ/(λ+9) : converge si et seulement si |q| < 1 / ✔ Cauchy : ⁿ√|qⁿ| = |q|, puis ρ < 1 / · Le terme général qⁿ tend vers 0 : la série converge pour tout λ
+    = |2λ| < |λ + 9|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 4λ² < □   (trous : 4λ² < (λ + 9)²)   ← Élever au carré (deux membres positifs)
+    = 3λ² − 18λ − 81 < 0   ← Développer et ordonner
+    = (λ − 9)(λ + 3) < 0   ← Racines −3 et 9
+    = □   (trous : ]−3 ; 9[)   ← Négatif entre les racines
+  — Borne λ = −3 : que vaut la raison q ?  [juge value]  départ : 2·(−3)/((−3) + 9)
+    = −1   ← q = −1
+  — Borne λ = 9 : que vaut q ?  [juge value]  départ : 2·(9)/((9) + 9)
+    ? En λ = −3, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |2λ/(λ + 9)| < 1
+    ? En λ = 9, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−3 ; 9[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−9)(λ ▢) < 0 | ]−3 ; 9[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_series_term_to_zero, a1_param_bounds_untreated
+
+Pour quels λ ≠ −6 la série Σ_{n=0}^{∞} (2λ/(λ + 6))^n converge-t-elle ?
+  [guided]  |2λ/(λ + 6)| < 1
+    ? Quel critère pour Σ qⁿ ? ✔ Série géométrique de raison q = 2λ/(λ+6) : converge si et seulement si |q| < 1 / ✔ Cauchy : ⁿ√|qⁿ| = |q|, puis ρ < 1 / · Le terme général qⁿ tend vers 0 : la série converge pour tout λ
+    = |2λ| < |λ + 6|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 4λ² < □   (trous : 4λ² < (λ + 6)²)   ← Élever au carré (deux membres positifs)
+    = 3λ² − 12λ − 36 < 0   ← Développer et ordonner
+    = (λ − 6)(λ + 2) < 0   ← Racines −2 et 6
+    = □   (trous : ]−2 ; 6[)   ← Négatif entre les racines
+  — Borne λ = −2 : que vaut la raison q ?  [juge value]  départ : 2·(−2)/((−2) + 6)
+    = −1   ← q = −1
+  — Borne λ = 6 : que vaut q ?  [juge value]  départ : 2·(6)/((6) + 6)
+    ? En λ = −2, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |2λ/(λ + 6)| < 1
+    ? En λ = 6, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−2 ; 6[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−6)(λ ▢) < 0 | ]−2 ; 6[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_series_term_to_zero, a1_param_bounds_untreated
+
+```
+
+### Niveau 3
+
+```
+Pour quels λ ≠ −6 la série Σ_{n=0}^{∞} (2λ/(λ + 6))^n converge-t-elle ?
+  [tap, suivre l'erreur, menu steps]  |2λ/(λ + 6)| < 1
+    ? Quel critère pour Σ qⁿ ? ✔ Série géométrique de raison q = 2λ/(λ+6) : converge si et seulement si |q| < 1 / ✔ Cauchy : ⁿ√|qⁿ| = |q|, puis ρ < 1 / · Le terme général qⁿ tend vers 0 : la série converge pour tout λ
+    = |2λ| < |λ + 6|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 4λ² < (λ + 6)²   ← Élever au carré (deux membres positifs)
+    = 3λ² − 12λ − 36 < 0   ← Développer et ordonner
+    = (λ − 6)(λ + 2) < 0   ← Racines −2 et 6
+    = ]−2 ; 6[   ← Négatif entre les racines
+  — Borne λ = −2 : que vaut la raison q ?  [juge value]  départ : 2·(−2)/((−2) + 6)
+    = −1   ← q = −1
+  — Borne λ = 6 : que vaut q ?  [juge value]  départ : 2·(6)/((6) + 6)
+    ? En λ = −2, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |2λ/(λ + 6)| < 1
+    ? En λ = 6, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−2 ; 6[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−6)(λ ▢) < 0 | ]−2 ; 6[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_series_term_to_zero, a1_param_bounds_untreated
+
+Pour quels λ ≠ −4 la série Σ_{n=0}^{∞} (3λ/(λ + 4))^n converge-t-elle ?
+  [tap, suivre l'erreur, menu steps]  |3λ/(λ + 4)| < 1
+    ? Quel critère pour Σ qⁿ ? ✔ Série géométrique de raison q = 3λ/(λ+4) : converge si et seulement si |q| < 1 / ✔ Cauchy : ⁿ√|qⁿ| = |q|, puis ρ < 1 / · Le terme général qⁿ tend vers 0 : la série converge pour tout λ
+    = |3λ| < |λ + 4|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 9λ² < (λ + 4)²   ← Élever au carré (deux membres positifs)
+    = 8λ² − 8λ − 16 < 0   ← Développer et ordonner
+    = (λ − 2)(λ + 1) < 0   ← Racines −1 et 2
+    = ]−1 ; 2[   ← Négatif entre les racines
+  — Borne λ = −1 : que vaut la raison q ?  [juge value]  départ : 3·(−1)/((−1) + 4)
+    = −1   ← q = −1
+  — Borne λ = 2 : que vaut q ?  [juge value]  départ : 3·(2)/((2) + 4)
+    ? En λ = −1, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |3λ/(λ + 4)| < 1
+    ? En λ = 2, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−1 ; 2[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−2)(λ ▢) < 0 | ]−1 ; 2[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_series_term_to_zero, a1_param_bounds_untreated
+
+Pour quels λ ≠ −3 la série Σ_{n=0}^{∞} (2λ/(λ + 3))^n converge-t-elle ?
+  [tap, suivre l'erreur, menu steps]  |2λ/(λ + 3)| < 1
+    ? Quel critère pour Σ qⁿ ? ✔ Série géométrique de raison q = 2λ/(λ+3) : converge si et seulement si |q| < 1 / ✔ Cauchy : ⁿ√|qⁿ| = |q|, puis ρ < 1 / · Le terme général qⁿ tend vers 0 : la série converge pour tout λ
+    = |2λ| < |λ + 3|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 4λ² < (λ + 3)²   ← Élever au carré (deux membres positifs)
+    = 3λ² − 6λ − 9 < 0   ← Développer et ordonner
+    = (λ − 3)(λ + 1) < 0   ← Racines −1 et 3
+    = ]−1 ; 3[   ← Négatif entre les racines
+  — Borne λ = −1 : que vaut la raison q ?  [juge value]  départ : 2·(−1)/((−1) + 3)
+    = −1   ← q = −1
+  — Borne λ = 3 : que vaut q ?  [juge value]  départ : 2·(3)/((3) + 3)
+    ? En λ = −1, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |2λ/(λ + 3)| < 1
+    ? En λ = 3, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−1 ; 3[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−3)(λ ▢) < 0 | ]−1 ; 3[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_series_term_to_zero, a1_param_bounds_untreated
+
+```
+
+### Niveau 4
+
+```
+Pour quels λ ≠ −6 la série Σ_{n=0}^{∞} (5λ/(λ + 6))^n converge-t-elle ?
+  [free, suivre l'erreur]  |5λ/(λ + 6)| < 1
+    = |5λ| < |λ + 6|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 25λ² < (λ + 6)²   ← Élever au carré (deux membres positifs)
+    = 24λ² − 12λ − 36 < 0   ← Développer et ordonner
+    = (λ − 3/2)(λ + 1) < 0   ← Racines −1 et 3/2
+    = ]−1 ; 3/2[   ← Négatif entre les racines
+  — Borne λ = −1 : que vaut la raison q ?  [juge value]  départ : 5·(−1)/((−1) + 6)
+    = −1   ← q = −1
+  — Borne λ = 3/2 : que vaut q ?  [juge value]  départ : 5·(3/2)/((3/2) + 6)
+    ? En λ = −1, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |5λ/(λ + 6)| < 1
+    ? En λ = 3/2, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−1 ; 3/2[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−3/2)(λ ▢) < 0 | ]−1 ; 3/2[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_param_bounds_untreated
+
+Pour quels λ ≠ −4 la série Σ_{n=0}^{∞} (3λ/(λ + 4))^n converge-t-elle ?
+  [free, suivre l'erreur]  |3λ/(λ + 4)| < 1
+    = |3λ| < |λ + 4|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 9λ² < (λ + 4)²   ← Élever au carré (deux membres positifs)
+    = 8λ² − 8λ − 16 < 0   ← Développer et ordonner
+    = (λ − 2)(λ + 1) < 0   ← Racines −1 et 2
+    = ]−1 ; 2[   ← Négatif entre les racines
+  — Borne λ = −1 : que vaut la raison q ?  [juge value]  départ : 3·(−1)/((−1) + 4)
+    = −1   ← q = −1
+  — Borne λ = 2 : que vaut q ?  [juge value]  départ : 3·(2)/((2) + 4)
+    ? En λ = −1, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |3λ/(λ + 4)| < 1
+    ? En λ = 2, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−1 ; 2[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−2)(λ ▢) < 0 | ]−1 ; 2[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_param_bounds_untreated
+
+Pour quels λ ≠ −12 la série Σ_{n=0}^{∞} (3λ/(λ + 12))^n converge-t-elle ?
+  [free, suivre l'erreur]  |3λ/(λ + 12)| < 1
+    = |3λ| < |λ + 12|   ← |A/B| < 1 ⇔ |A| < |B|
+    = 9λ² < (λ + 12)²   ← Élever au carré (deux membres positifs)
+    = 8λ² − 24λ − 144 < 0   ← Développer et ordonner
+    = (λ − 6)(λ + 3) < 0   ← Racines −3 et 6
+    = ]−3 ; 6[   ← Négatif entre les racines
+  — Borne λ = −3 : que vaut la raison q ?  [juge value]  départ : 3·(−3)/((−3) + 12)
+    = −1   ← q = −1
+  — Borne λ = 6 : que vaut q ?  [juge value]  départ : 3·(6)/((6) + 12)
+    ? En λ = −3, q = −1 : la série Σ (−1)ⁿ… ✔ diverge : son terme général ne tend pas vers 0 / · converge par Leibniz : la borne est dans l'ensemble
+    = 1   ← q = 1
+  — Ensemble de convergence :  [juge solset]  départ : |3λ/(λ + 12)| < 1
+    ? En λ = 6, q = 1 : la série Σ 1… ✔ diverge : son terme général ne tend pas vers 0 / · converge : la borne est dans l'ensemble
+    = ]−3 ; 6[   ← Bornes exclues
+  aides : C'est une géométrique : elle converge si et seulement si |q| < 1. Puis regarde les bornes à part. | (λ−6)(λ ▢) < 0 | ]−3 ; 6[, bornes exclues (|q| = 1).
+  pièges : g1_abs_dropped, g1_abs_and_or, g9_bracket, a1_param_bounds_untreated
+
+```
+
+### Niveau 5
+
+```
+Pour α > 0, étudie la nature de Σ_{k=1}^{∞} (−1)^(k + 1)·k^(3α)/(α^k + k⁴) : absolument convergente, semi-convergente ou divergente ? On note uₖ son terme général.
+  [problème, 9 points]
+  partie 1 (α > 1 : d'Alembert sur |uₖ| : 2)
+  Cas α > 1. Simplifie le rapport |uₖ₊₁|/|uₖ| de d'Alembert jusqu'à ((k + 1)/k)^(3α)·(1 + k⁴/α^k)/(α + (k + 1)⁴/α^k).
+    [free, sans aide, suivre l'erreur]  (k + 1)^(3α)/(α^(k + 1) + (k + 1)⁴)·(α^k + k⁴)/k^(3α)
+      = ((k + 1)/k)^(3α)·(α^k + k⁴)/(α^(k + 1) + (k + 1)⁴)   ← Regrouper les puissances de k
+      = ((k + 1)/k)^(3α)·(1 + k⁴/α^k)/(α + (k + 1)⁴/α^k)   ← Diviser en haut et en bas par αᵏ
+  partie 2 (α > 1 : limite du rapport : 1)
+  Cas α > 1 : quand k → +∞, ce rapport tend vers :
+    · α   ✔ 1/α   · 1   · 0
+  partie 3 (α > 1 : conclusion : 1)
+  Cas α > 1 : la série est
+    ✔ absolument convergente   · semi-convergente   · divergente   · on ne peut pas conclure [a1_ratio_one]
+  partie 4 (0 < α < 1 : comparaison : 1 ; Pour quels α ∈ ]0 ; 1[ l'exposant 4 − 3α est-il > 1 ? : 1)
+  Cas 0 < α < 1. Compare |uₖ| à 1/k^(4 − 3α) : simplifie k^(4 − 3α)·|uₖ| jusqu'à 1/(1 + α^k/k⁴), puis étudie l'exposant.
+    [free, sans aide, suivre l'erreur]  k^(4 − 3α)·k^(3α)/(α^k + k⁴)
+      (0 < α < 1 : αᵏ → 0, donc |uₖ| ~ k^(3α)/k⁴ = 1/k^(4 − 3α).)
+      = 1/(1 + α^k/k⁴)   ← k^(4 − 3α)·k^(3α) = k⁴, puis diviser par k⁴ : → 1
+    — Pour quels α ∈ ]0 ; 1[ l'exposant 4 − 3α est-il > 1 ?  [juge solset]  départ : 4 − 3α > 1
+      = α < 1   ← Résoudre
+      = ]0 ; 1[   ← Toujours, sur ]0 ; 1[
+  partie 5 (0 < α < 1 : conclusion : 1)
+  Cas 0 < α < 1 : la série est
+    ✔ absolument convergente   · semi-convergente [a1_abs_conv_confused]   · divergente   · on ne peut pas conclure
+  partie 6 (α = 1 : |uₖ| et Leibniz : 0,5 ; Leibniz : xₖ = k³/(1 + k⁴) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0. : 0,5)
+  Cas α = 1 : |uₖ| = k³/(1 + k⁴). Calcule la limite de k·|uₖ|, puis vérifie la décroissance de Leibniz.
+    [free, sans aide, suivre l'erreur]  k·k³/(1 + k⁴)
+      = 1/(1/k⁴ + 1)   ← Diviser par k⁴
+      = 1   ← |uₖ| ~ 1/k : Σ |uₖ| diverge
+    — Leibniz : xₖ = k³/(1 + k⁴) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0.  [juge equiv]  départ : k³/(1 + k⁴) − (k + 1)³/(1 + (k + 1)⁴)
+      = 0   ← C'est positif
+  partie 7 (α = 1 : conclusion : 1)
+  Cas α = 1 : la série est
+    · absolument convergente [a1_abs_conv_confused]   ✔ semi-convergente   · divergente [a1_abs_conv_confused]   · on ne peut pas conclure
+  pièges : g2_exp_sum, a1_ratio_one, a1_abs_conv_confused
+
+Pour α > 0, étudie la nature de Σ_{k=1}^{∞} (−1)^(k + 1)·k^(2α)/(α^k + k³) : absolument convergente, semi-convergente ou divergente ? On note uₖ son terme général.
+  [problème, 9 points]
+  partie 1 (α > 1 : d'Alembert sur |uₖ| : 2)
+  Cas α > 1. Simplifie le rapport |uₖ₊₁|/|uₖ| de d'Alembert jusqu'à ((k + 1)/k)^(2α)·(1 + k³/α^k)/(α + (k + 1)³/α^k).
+    [free, sans aide, suivre l'erreur]  (k + 1)^(2α)/(α^(k + 1) + (k + 1)³)·(α^k + k³)/k^(2α)
+      = ((k + 1)/k)^(2α)·(α^k + k³)/(α^(k + 1) + (k + 1)³)   ← Regrouper les puissances de k
+      = ((k + 1)/k)^(2α)·(1 + k³/α^k)/(α + (k + 1)³/α^k)   ← Diviser en haut et en bas par αᵏ
+  partie 2 (α > 1 : limite du rapport : 1)
+  Cas α > 1 : quand k → +∞, ce rapport tend vers :
+    ✔ 1/α   · 1   · α   · 0
+  partie 3 (α > 1 : conclusion : 1)
+  Cas α > 1 : la série est
+    ✔ absolument convergente   · semi-convergente   · divergente   · on ne peut pas conclure [a1_ratio_one]
+  partie 4 (0 < α < 1 : comparaison : 1 ; Pour quels α ∈ ]0 ; 1[ l'exposant 3 − 2α est-il > 1 ? : 1)
+  Cas 0 < α < 1. Compare |uₖ| à 1/k^(3 − 2α) : simplifie k^(3 − 2α)·|uₖ| jusqu'à 1/(1 + α^k/k³), puis étudie l'exposant.
+    [free, sans aide, suivre l'erreur]  k^(3 − 2α)·k^(2α)/(α^k + k³)
+      (0 < α < 1 : αᵏ → 0, donc |uₖ| ~ k^(2α)/k³ = 1/k^(3 − 2α).)
+      = 1/(1 + α^k/k³)   ← k^(3 − 2α)·k^(2α) = k³, puis diviser par k³ : → 1
+    — Pour quels α ∈ ]0 ; 1[ l'exposant 3 − 2α est-il > 1 ?  [juge solset]  départ : 3 − 2α > 1
+      = α < 1   ← Résoudre
+      = ]0 ; 1[   ← Toujours, sur ]0 ; 1[
+  partie 5 (0 < α < 1 : conclusion : 1)
+  Cas 0 < α < 1 : la série est
+    ✔ absolument convergente   · semi-convergente [a1_abs_conv_confused]   · divergente   · on ne peut pas conclure
+  partie 6 (α = 1 : |uₖ| et Leibniz : 0,5 ; Leibniz : xₖ = k²/(1 + k³) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0. : 0,5)
+  Cas α = 1 : |uₖ| = k²/(1 + k³). Calcule la limite de k·|uₖ|, puis vérifie la décroissance de Leibniz.
+    [free, sans aide, suivre l'erreur]  k·k²/(1 + k³)
+      = 1/(1/k³ + 1)   ← Diviser par k³
+      = 1   ← |uₖ| ~ 1/k : Σ |uₖ| diverge
+    — Leibniz : xₖ = k²/(1 + k³) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0.  [juge equiv]  départ : k²/(1 + k³) − (k + 1)²/(1 + (k + 1)³)
+      = 0   ← C'est positif
+  partie 7 (α = 1 : conclusion : 1)
+  Cas α = 1 : la série est
+    · absolument convergente [a1_abs_conv_confused]   ✔ semi-convergente   · divergente [a1_abs_conv_confused]   · on ne peut pas conclure
+  pièges : g2_exp_sum, a1_ratio_one, a1_abs_conv_confused
+
+Pour α > 0, étudie la nature de Σ_{k=1}^{∞} (−1)^k·k^(2α)/(α^k + k³) : absolument convergente, semi-convergente ou divergente ? On note uₖ son terme général.
+  [problème, 9 points]
+  partie 1 (α > 1 : d'Alembert sur |uₖ| : 2)
+  Cas α > 1. Simplifie le rapport |uₖ₊₁|/|uₖ| de d'Alembert jusqu'à ((k + 1)/k)^(2α)·(1 + k³/α^k)/(α + (k + 1)³/α^k).
+    [free, sans aide, suivre l'erreur]  (k + 1)^(2α)/(α^(k + 1) + (k + 1)³)·(α^k + k³)/k^(2α)
+      = ((k + 1)/k)^(2α)·(α^k + k³)/(α^(k + 1) + (k + 1)³)   ← Regrouper les puissances de k
+      = ((k + 1)/k)^(2α)·(1 + k³/α^k)/(α + (k + 1)³/α^k)   ← Diviser en haut et en bas par αᵏ
+  partie 2 (α > 1 : limite du rapport : 1)
+  Cas α > 1 : quand k → +∞, ce rapport tend vers :
+    · 1   · α   · 0   ✔ 1/α
+  partie 3 (α > 1 : conclusion : 1)
+  Cas α > 1 : la série est
+    ✔ absolument convergente   · semi-convergente   · divergente   · on ne peut pas conclure [a1_ratio_one]
+  partie 4 (0 < α < 1 : comparaison : 1 ; Pour quels α ∈ ]0 ; 1[ l'exposant 3 − 2α est-il > 1 ? : 1)
+  Cas 0 < α < 1. Compare |uₖ| à 1/k^(3 − 2α) : simplifie k^(3 − 2α)·|uₖ| jusqu'à 1/(1 + α^k/k³), puis étudie l'exposant.
+    [free, sans aide, suivre l'erreur]  k^(3 − 2α)·k^(2α)/(α^k + k³)
+      (0 < α < 1 : αᵏ → 0, donc |uₖ| ~ k^(2α)/k³ = 1/k^(3 − 2α).)
+      = 1/(1 + α^k/k³)   ← k^(3 − 2α)·k^(2α) = k³, puis diviser par k³ : → 1
+    — Pour quels α ∈ ]0 ; 1[ l'exposant 3 − 2α est-il > 1 ?  [juge solset]  départ : 3 − 2α > 1
+      = α < 1   ← Résoudre
+      = ]0 ; 1[   ← Toujours, sur ]0 ; 1[
+  partie 5 (0 < α < 1 : conclusion : 1)
+  Cas 0 < α < 1 : la série est
+    ✔ absolument convergente   · semi-convergente [a1_abs_conv_confused]   · divergente   · on ne peut pas conclure
+  partie 6 (α = 1 : |uₖ| et Leibniz : 0,5 ; Leibniz : xₖ = k²/(1 + k³) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0. : 0,5)
+  Cas α = 1 : |uₖ| = k²/(1 + k³). Calcule la limite de k·|uₖ|, puis vérifie la décroissance de Leibniz.
+    [free, sans aide, suivre l'erreur]  k·k²/(1 + k³)
+      = 1/(1/k³ + 1)   ← Diviser par k³
+      = 1   ← |uₖ| ~ 1/k : Σ |uₖ| diverge
+    — Leibniz : xₖ = k²/(1 + k³) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0.  [juge equiv]  départ : k²/(1 + k³) − (k + 1)²/(1 + (k + 1)³)
+      = 0   ← C'est positif
+  partie 7 (α = 1 : conclusion : 1)
+  Cas α = 1 : la série est
+    · absolument convergente [a1_abs_conv_confused]   ✔ semi-convergente   · divergente [a1_abs_conv_confused]   · on ne peut pas conclure
+  pièges : g2_exp_sum, a1_ratio_one, a1_abs_conv_confused
+
+```
+
+### Variantes d'examen
+
+```
+Ensemble des λ ≠ −9 pour lesquels Σ_{n=0}^{∞} (2λ/(λ + 9))^n converge :
+  · ]−3 ; 9] [a1_ratio_one]   ✔ ]−3 ; 9[   · ]−∞ ; 9[ [a1_abs_square_ineq]   · [−3 ; 9] [a1_param_bounds_untreated]
+  [examen mcq]
+  pièges : a1_param_bounds_untreated, a1_abs_square_ineq, a1_ratio_one
+
+Vrai ou faux ?
+  « Pour tout b ∈ [−1 ; 1], la série Σ (b + 1/k)ᵏ converge. » → FAUX
+    contre-exemple (refute) : b = 1
+  [examen tf]
+  pièges : a1_param_bounds_untreated
+
+Pour α > 0, étudie la nature de Σ_{k=1}^{∞} (−1)^(k + 1)·k^(2α)/(α^k + k³) : absolument convergente, semi-convergente ou divergente ? On note uₖ son terme général.
+  [problème, examen open, 9 points]
+  partie 1 (α > 1 : d'Alembert sur |uₖ| : 2)
+  Cas α > 1. Simplifie le rapport |uₖ₊₁|/|uₖ| de d'Alembert jusqu'à ((k + 1)/k)^(2α)·(1 + k³/α^k)/(α + (k + 1)³/α^k).
+    [free, sans aide, suivre l'erreur]  (k + 1)^(2α)/(α^(k + 1) + (k + 1)³)·(α^k + k³)/k^(2α)
+      = ((k + 1)/k)^(2α)·(α^k + k³)/(α^(k + 1) + (k + 1)³)   ← Regrouper les puissances de k
+      = ((k + 1)/k)^(2α)·(1 + k³/α^k)/(α + (k + 1)³/α^k)   ← Diviser en haut et en bas par αᵏ
+  partie 2 (α > 1 : limite du rapport : 1)
+  Cas α > 1 : quand k → +∞, ce rapport tend vers :
+    ✔ 1/α   · 0   · 1   · α
+  partie 3 (α > 1 : conclusion : 1)
+  Cas α > 1 : la série est
+    ✔ absolument convergente   · semi-convergente   · divergente   · on ne peut pas conclure [a1_ratio_one]
+  partie 4 (0 < α < 1 : comparaison : 1 ; Pour quels α ∈ ]0 ; 1[ l'exposant 3 − 2α est-il > 1 ? : 1)
+  Cas 0 < α < 1. Compare |uₖ| à 1/k^(3 − 2α) : simplifie k^(3 − 2α)·|uₖ| jusqu'à 1/(1 + α^k/k³), puis étudie l'exposant.
+    [free, sans aide, suivre l'erreur]  k^(3 − 2α)·k^(2α)/(α^k + k³)
+      (0 < α < 1 : αᵏ → 0, donc |uₖ| ~ k^(2α)/k³ = 1/k^(3 − 2α).)
+      = 1/(1 + α^k/k³)   ← k^(3 − 2α)·k^(2α) = k³, puis diviser par k³ : → 1
+    — Pour quels α ∈ ]0 ; 1[ l'exposant 3 − 2α est-il > 1 ?  [juge solset]  départ : 3 − 2α > 1
+      = α < 1   ← Résoudre
+      = ]0 ; 1[   ← Toujours, sur ]0 ; 1[
+  partie 5 (0 < α < 1 : conclusion : 1)
+  Cas 0 < α < 1 : la série est
+    ✔ absolument convergente   · semi-convergente [a1_abs_conv_confused]   · divergente   · on ne peut pas conclure
+  partie 6 (α = 1 : |uₖ| et Leibniz : 0,5 ; Leibniz : xₖ = k²/(1 + k³) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0. : 0,5)
+  Cas α = 1 : |uₖ| = k²/(1 + k³). Calcule la limite de k·|uₖ|, puis vérifie la décroissance de Leibniz.
+    [free, sans aide, suivre l'erreur]  k·k²/(1 + k³)
+      = 1/(1/k³ + 1)   ← Diviser par k³
+      = 1   ← |uₖ| ~ 1/k : Σ |uₖ| diverge
+    — Leibniz : xₖ = k²/(1 + k³) décroît pour k ≥ 2. Montre xₖ − xₖ₊₁ ≥ 0.  [juge equiv]  départ : k²/(1 + k³) − (k + 1)²/(1 + (k + 1)³)
+      = 0   ← C'est positif
+  partie 7 (α = 1 : conclusion : 1)
+  Cas α = 1 : la série est
+    · absolument convergente [a1_abs_conv_confused]   ✔ semi-convergente   · divergente [a1_abs_conv_confused]   · on ne peut pas conclure
+  pièges : g2_exp_sum, a1_ratio_one, a1_abs_conv_confused
+
+```
+
+## Limites de fonctions : formes indéterminées, croissances comparées, équivalents (`a1-fn-limits`, BA1)
+
+_Limites remarquables, conjugué, e^(v·Log u), 0 × (borné)._
+
+### Niveau 1
+
+```
+Calcule lim_{x→0} (1 − cos(6x))/(x·sin(5x)).
+  [guided]  (1 − cos(6x))/(x·sin(5x))
+    (Forme 0/0 avec cos et sin : fais apparaître (1 − cos u)/u² et sin u/u, en produit.)
+    = ((1 − cos(6x))/□)·((5x)/sin(5x))·(□)   (trous : ((1 − cos(6x))/(6x)²)·((5x)/sin(5x))·(36/5))   ← Faire apparaître (1 − cos u)/u² et u/sin u, en produit
+    = (1/2)·1·(36/5)   ← Limites remarquables
+    = 18/5   ← Conclure
+  aides : Forme 0/0 avec cos et sin : fais apparaître (1 − cos u)/u² et sin u/u, en produit. | (1 − cos(6x))/(6x)² → □ | (1 − cos(6x))/(x·sin(5x)) → 18/5
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
+
+Calcule lim_{x→0⁺} x^(5x).
+  [guided]  x^(5x)
+    (Forme 0⁰ : écris u^v = e^(v·Log u), puis utilise x·Log x → 0 en 0⁺.)
+    = e^(5x·□)   (trous : e^(5x·ln(x)))   ← Écrire u^v = e^(v·Log u)
+    = e⁰   ← Croissances comparées : x·Log x → 0
+    = 1   ← Conclure
+  aides : Forme 0⁰ : écris u^v = e^(v·Log u), puis utilise x·Log x → 0 en 0⁺. | e^(5x·Log x) → e^□ | x^(5x) → 1
+
+Calcule lim_{x→0} (√(1 + 3x) − 1)/x.
+  [guided]  (√(1 + 3x) − 1)/x
+    (Forme 0/0 avec une racine : multiplie en haut et en bas par le conjugué √(…) + 1.)
+    = (1 + 3x − 1)/(x(□))   (trous : (1 + 3x − 1)/(x(√(1 + 3x) + 1)))   ← Multiplier en haut et en bas par le conjugué
+    = 3/(√(1 + 3x) + 1)   ← Simplifier par x
+    = 3/2   ← Passer à la limite
+  aides : Forme 0/0 avec une racine : multiplie en haut et en bas par le conjugué √(…) + 1. | 3/(√(1 + 3x) + 1) → □ | (√(1 + 3x) − 1)/x → 3/2
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_sqrt_sum_split
+
+```
+
+### Niveau 2
+
+```
+Calcule lim_{x→0} (1 − cos(3x))/(x·sin(2x)).
+  [guided]  (1 − cos(3x))/(x·sin(2x))
+    ? Que vaut la limite de (1 − cos(3x))/x² en 0 ? · 1/2 : c'est une limite remarquable / ✔ 9/2 : on fait apparaître u = 3x en bas / · 0, car le haut tend vers 0
+    = ((1 − cos(3x))/□)·((2x)/sin(2x))·(□)   (trous : ((1 − cos(3x))/(3x)²)·((2x)/sin(2x))·(9/2))   ← Faire apparaître (1 − cos u)/u² et u/sin u, en produit
+    = (□)·1·(9/2)   (trous : (1/2)·1·(9/2))   ← Limites remarquables
+    = 9/4   ← Conclure
+  aides : Forme 0/0 avec cos et sin : fais apparaître (1 − cos u)/u² et sin u/u, en produit. | (1 − cos(3x))/(3x)² → □ | (1 − cos(3x))/(x·sin(2x)) → 9/4
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
+
+Calcule lim_{x→0} ln(1 + 3x)/sin(2x).
+  [guided]  ln(1 + 3x)/sin(2x)
+    ? Que vaut la limite de Log(1 + 3x)/x en 0 ? · 0, car le haut tend vers 0 / ✔ 3 : on fait apparaître u = 3x en bas / · 1 : c'est une limite remarquable
+    = (ln(1 + 3x)/(3x))·((2x)/sin(2x))·(□)   (trous : (ln(1 + 3x)/(3x))·((2x)/sin(2x))·(3/2))   ← Faire apparaître Log(1 + u)/u avec u = 3x et u/sin(u) avec u = 2x
+    = □·(3/2)   (trous : 1·1·(3/2))   ← Limites remarquables
+    = 3/2   ← Conclure
+  aides : Forme 0/0 : multiplie et divise pour faire apparaître une limite remarquable en haut et une en bas, avec le même argument que la fonction. | ln(1 + 3x)/(3x) → □ | ln(1 + 3x)/sin(2x) → 3/2
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
+
+Calcule lim_{x→0} (√(9 − 3x) − 3)/x.
+  [guided]  (√(9 − 3x) − 3)/x
+    ? Comment lever la forme 0/0 ? ✔ Multiplier par le conjugué / · Remplacer la racine par sa limite dans la différence : (√… − …)/x → 0
+    = (9 − 3x − 9)/(x(□))   (trous : (9 − 3x − 9)/(x(√(9 − 3x) + 3)))   ← Multiplier en haut et en bas par le conjugué
+    = −3/(√(9 − 3x) + 3)   ← Simplifier par x
+    = −1/2   ← Passer à la limite
+  aides : Forme 0/0 avec une racine : multiplie en haut et en bas par le conjugué √(…) + 3. | −3/(√(9 − 3x) + 3) → □ | (√(9 − 3x) − 3)/x → −1/2
+  pièges : a1_dl_order_too_low, a1_bh_quotient_rule, a1_sqrt_sum_split, a1_ipe_in_sum
+
+```
+
+### Niveau 3
+
+```
+Calcule lim_{x→0} (1 − cos(4x))/(x·sin(x)).
+  [tap, suivre l'erreur, menu steps]  (1 − cos(4x))/(x·sin(x))
+    = ((1 − cos(4x))/(4x)²)·(x/sin(x))·16   ← Faire apparaître (1 − cos u)/u² et u/sin u, en produit
+    = (1/2)·1·16   ← Limites remarquables
+    = 8   ← Conclure
+  aides : Forme 0/0 avec cos et sin : fais apparaître (1 − cos u)/u² et sin u/u, en produit. | (1 − cos(4x))/(4x)² → □ | (1 − cos(4x))/(x·sin(x)) → 8
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
+
+Calcule lim_{x→0} 2x·sin(3/x).
+  [tap, suivre l'erreur, menu steps]  2x·sin(3/x)
+    = 0   ← |sin(3/x)| ≤ 1 et x → 0 : 0 × (borné) → 0
+  aides : sin(3/x) n'a pas de limite en 0, mais il est borné ; et x → 0. | |2x·sin(3/x)| ≤ 2|x| → □ | 2x·sin(3/x) → 0
+  pièges : a1_dl_factorial_missing
+
+Calcule lim_{x→0} x·cos(3/x).
+  [tap, suivre l'erreur, menu steps]  x·cos(3/x)
+    = 0   ← |cos(3/x)| ≤ 1 et x → 0 : 0 × (borné) → 0
+  aides : cos(3/x) n'a pas de limite en 0, mais il est borné ; et x → 0. | |x·cos(3/x)| ≤ |x| → □ | x·cos(3/x) → 0
+  pièges : a1_dl_factorial_missing
+
+```
+
+### Niveau 4
+
+```
+Calcule lim_{x→0} (√(4 + 4x) − 2)/x.
+  [free, suivre l'erreur]  (√(4 + 4x) − 2)/x
+    = (4 + 4x − 4)/(x(√(4 + 4x) + 2))   ← Multiplier en haut et en bas par le conjugué
+    = 4/(√(4 + 4x) + 2)   ← Simplifier par x
+    = 1   ← Passer à la limite
+  aides : Forme 0/0 avec une racine : multiplie en haut et en bas par le conjugué √(…) + 2. | 4/(√(4 + 4x) + 2) → □ | (√(4 + 4x) − 2)/x → 1
+  pièges : a1_dl_order_too_low, a1_bh_quotient_rule, a1_sqrt_sum_split
+
+Calcule lim_{x→0} (1 − cos(x))/(x·sin(6x)).
+  [free, suivre l'erreur]  (1 − cos(x))/(x·sin(6x))
+    = ((1 − cos(x))/x²)·((6x)/sin(6x))·(1/6)   ← Faire apparaître (1 − cos u)/u² et u/sin u, en produit
+    = (1/2)·1·(1/6)   ← Limites remarquables
+    = 1/12   ← Conclure
+  aides : Forme 0/0 avec cos et sin : fais apparaître (1 − cos u)/u² et sin u/u, en produit. | (1 − cos(x))/x² → □ | (1 − cos(x))/(x·sin(6x)) → 1/12
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
+
+Calcule lim_{x→0} −2x²·sin(2/x).
+  [free, suivre l'erreur]  −2x²·sin(2/x)
+    = 0   ← |sin(2/x)| ≤ 1 et x² → 0 : 0 × (borné) → 0
+  aides : sin(2/x) n'a pas de limite en 0, mais il est borné ; et x² → 0. | |−2x²·sin(2/x)| ≤ 2x² → □ | −2x²·sin(2/x) → 0
+  pièges : a1_dl_factorial_missing
+
+```
+
+### Niveau 5
+
+```
+Calcule lim_{x→0} arctan(5x²)/(x·sin(3x)).
+  [free, sans aide]  arctan(5x²)/(x·sin(3x))
+    = (arctan(5x²)/(5x²))·((3x)/sin(3x))·(5/3)   ← x·sin(bx) ressemble à b·x² : faire apparaître Arctg(u)/u et u/sin u
+    = 1·1·(5/3)   ← Limites remarquables
+    = 5/3   ← Conclure
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_bh_quotient_rule, a1_remarkable_limit_scale
+
+Calcule lim_{x→0} (1 + 3x)^(2/x).
+  [free, sans aide]  (1 + 3x)^(2/x)
+    = e^((2/x)·ln(1 + 3x))   ← Écrire u^v = e^(v·Log u)
+    = e^(6·ln(1 + 3x)/(3x))   ← Faire apparaître Log(1 + u)/u avec u = 3x
+    = e⁶   ← Conclure
+
+Calcule lim_{x→∞} √(x + 7)/√(7x + 9).
+  [free, sans aide]  √(x + 7)/√(7x + 9)
+    = √((x + 7)/(7x + 9))   ← Une seule racine
+    = √((1 + 7/x)/(7 + 9/x))   ← Mettre x en facteur en haut et en bas, simplifier
+    = √7/7   ← Sortir la racine du dénominateur
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split
+
+```
+
+### Variantes d'examen
+
+```
+lim_{x→0} (1 − cos(x))/(x·sin(4x)) =
+  ✔ 1/8   · 1/4 [a1_dl_factorial_missing]   · 0 [a1_dl_order_too_low]   · 1/2 [a1_remarkable_limit_scale]
+  [examen mcq]
+  pièges : a1_dl_factorial_missing, a1_dl_order_too_low, a1_remarkable_limit_scale
+
+Vrai ou faux ?
+  « Si f est bornée sur [−1 ; 1] ∖ {0}, alors limx→0 f(x) existe. » → FAUX
+    contre-exemple (function) : f = sin(1/x)
+  [examen tf]
+
+Calcule lim_{x→∞} √(9x + 9)/√(3x + 8).
+  [problème, examen open, 2 points]
+  partie 1 (Début du problème : 2)
+    [free, sans aide, suivre l'erreur, examen open]  √(9x + 9)/√(3x + 8)
+      = √((9x + 9)/(3x + 8))   ← Une seule racine
+      = √((9 + 9/x)/(3 + 8/x))   ← Mettre x en facteur en haut et en bas, simplifier
+      = √(3)   ← Passer à la limite
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split
+
+```
+
+## Limites à gauche et à droite ; limite qui n'existe pas (`a1-fn-onesided`, BA1)
+
+_|x − a|, e^(1/x), Arctg(1/x) ; deux côtés différents : pas de limite._
+
+### Niveau 1
+
+```
+Soit f(x) = (x² − 3x)/|x − 3|. Calcule les limites de f à droite et à gauche de 3, puis conclus. Commence par la limite à droite en 3.
+  [guided]  (x² − 3x)/|x − 3|
+    (Enlève la valeur absolue séparément pour x > 3 et x < 3.)
+    = (x − 3)(x)/(x − 3)   ← x > 3 : |x − 3| = x − 3
+    = x   ← Simplifier
+    = 3   ← Passer à la limite
+  — À gauche de 3 :  [juge limit]  départ : (x² − 3x)/|x − 3|
+    = (x − 3)(x)/(□)   (trous : (x − 3)(x)/(−(x − 3)))   ← x < 3 : |x − 3| = −(x − 3)
+    = □   (trous : −(x))   ← Simplifier
+    = −3   ← Passer à la limite
+  — Conclusion, et le saut de f en 3 :  [juge value]  départ : lim_{x→3⁺} (x² − 3x)/|x − 3| − lim_{x→3⁻} (x² − 3x)/|x − 3|
+    (Les deux limites sont différentes : f n'a pas de limite en 3.)
+    = 3 − (−3)   ← Différence des deux limites
+    = 6   ← Calculer
+  aides : Enlève la valeur absolue séparément pour x > 3 et x < 3. | x < 3 : |x − 3| = □ | À droite 3, à gauche −3 : pas de limite en 3.
+  pièges : a1_bh_quotient_rule, a1_abs_removed
+
+Soit f(x) = sin(6x)/|x|. Calcule les limites de f à droite et à gauche de 0, puis conclus. Commence par la limite à droite en 0.
+  [guided]  sin(6x)/|x|
+    (Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche.)
+    = sin(6x)/x   ← x > 0 : |x| = x
+    = 6   ← sin(u)/u → 1 avec u = 6x
+  — À gauche de 0 :  [juge limit]  départ : sin(6x)/|x|
+    = sin(6x)/(□)   (trous : sin(6x)/(−x))   ← x < 0 : |x| = −x
+    = −6   ← sin(u)/u → 1 avec u = 6x
+  — Conclusion, et le saut de f en 0 :  [juge value]  départ : lim_{x→0⁺} sin(6x)/|x| − lim_{x→0⁻} sin(6x)/|x|
+    (Les deux limites sont différentes : f n'a pas de limite en 0.)
+    = 6 − (−6)   ← Différence des deux limites
+    = 12   ← Calculer
+  aides : Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche. | x < 0 : |x| = □ | À droite 6, à gauche −6 : pas de limite en 0.
+  pièges : a1_dl_factorial_missing, a1_bh_quotient_rule, a1_remarkable_limit_scale, a1_abs_removed
+
+Soit f(x) = sin(2x)/|x|. Calcule les limites de f à droite et à gauche de 0, puis conclus. Commence par la limite à droite en 0.
+  [guided]  sin(2x)/|x|
+    (Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche.)
+    = sin(2x)/x   ← x > 0 : |x| = x
+    = 2   ← sin(u)/u → 1 avec u = 2x
+  — À gauche de 0 :  [juge limit]  départ : sin(2x)/|x|
+    = sin(2x)/(□)   (trous : sin(2x)/(−x))   ← x < 0 : |x| = −x
+    = −2   ← sin(u)/u → 1 avec u = 2x
+  — Conclusion, et le saut de f en 0 :  [juge value]  départ : lim_{x→0⁺} sin(2x)/|x| − lim_{x→0⁻} sin(2x)/|x|
+    (Les deux limites sont différentes : f n'a pas de limite en 0.)
+    = 2 − (−2)   ← Différence des deux limites
+    = 4   ← Calculer
+  aides : Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche. | x < 0 : |x| = □ | À droite 2, à gauche −2 : pas de limite en 0.
+  pièges : a1_dl_factorial_missing, a1_bh_quotient_rule, a1_remarkable_limit_scale, a1_abs_removed
+
+```
+
+### Niveau 2
+
+```
+Soit f(x) = sin(1/x). Montre avec deux suites que f n'a pas de limite en 0. Avec xₙ = 1/(2nπ) → 0⁺, calcule la limite de f(xₙ).
+  [guided]  sin(2nπ)
+    = 0   ← sin(2nπ) = 0 pour tout n
+  — Avec yₙ = 1/(2nπ + π/2) → 0 :  [juge limit]  départ : sin(2nπ + π/2)
+    = 1   ← sin(2nπ + π/2) = 1 pour tout n
+  — Conclusion, et l'écart entre les deux limites :  [juge value]  départ : lim_{n→∞} sin(2nπ + π/2) − lim_{n→∞} sin(2nπ)
+    ? Conclusion ? · f tend vers la moyenne des deux valeurs en 0 / ✔ f(xₙ) et f(yₙ) ont des limites différentes : f n'a pas de limite en 0 / · f tend vers 0 en 0 (la première suite suffit)
+    = 1 − 0   ← Différence des deux limites
+    = 1   ← Calculer
+  aides : Prends deux suites qui tendent vers 0, sur lesquelles sin(1/x) vaut toujours la même chose : 1/xₙ = 2nπ, puis 2nπ + π/2. | xₙ = 1/(2nπ) : f(xₙ) = sin(2nπ) = □ | f(xₙ) → 0 et f(yₙ) → 1 : pas de limite.
+  pièges : a1_dl_factorial_missing, a1_onesided_ignored
+
+Soit f(x) = (x² − x − 6)/|x − 3|. Calcule les limites de f à droite et à gauche de 3, puis conclus. Commence par la limite à droite en 3.
+  [guided]  (x² − x − 6)/|x − 3|
+    = (□)(x + 2)/(x − 3)   (trous : (x − 3)(x + 2)/(x − 3))   ← x > 3 : |x − 3| = x − 3
+    = x + 2   ← Simplifier
+    = 5   ← Passer à la limite
+  — À gauche de 3 :  [juge limit]  départ : (x² − x − 6)/|x − 3|
+    ? Pour x < 3, |x − 3| = ? · x − 3 / ✔ −(x − 3)
+    = (x − 3)(x + 2)/(□)   (trous : (x − 3)(x + 2)/(−(x − 3)))   ← x < 3 : |x − 3| = −(x − 3)
+    = □   (trous : −(x + 2))   ← Simplifier
+    = −5   ← Passer à la limite
+  — Conclusion, et le saut de f en 3 :  [juge value]  départ : lim_{x→3⁺} (x² − x − 6)/|x − 3| − lim_{x→3⁻} (x² − x − 6)/|x − 3|
+    ? Conclusion ? ✔ Les deux limites sont différentes : f n'a pas de limite en 3 / · f tend vers 5 en 3 (la limite à droite suffit) / · f tend vers la moyenne des deux valeurs en 3
+    = 5 − (−5)   ← Différence des deux limites
+    = 10   ← Calculer
+  aides : Enlève la valeur absolue séparément pour x > 3 et x < 3. | x < 3 : |x − 3| = □ | À droite 5, à gauche −5 : pas de limite en 3.
+  pièges : a1_bh_quotient_rule, a1_abs_removed, a1_onesided_ignored
+
+Soit f(x) = sin(4x)/|x|. Calcule les limites de f à droite et à gauche de 0, puis conclus. Commence par la limite à droite en 0.
+  [guided]  sin(4x)/|x|
+    = sin(4□)/x   (trous : sin(4x)/x)   ← x > 0 : |x| = x
+    = 4   ← sin(u)/u → 1 avec u = 4x
+  — À gauche de 0 :  [juge limit]  départ : sin(4x)/|x|
+    ? Pour x < 0, |x| = ? · x / ✔ −(x)
+    = sin(4x)/(□)   (trous : sin(4x)/(−x))   ← x < 0 : |x| = −x
+    = −4   ← sin(u)/u → 1 avec u = 4x
+  — Conclusion, et le saut de f en 0 :  [juge value]  départ : lim_{x→0⁺} sin(4x)/|x| − lim_{x→0⁻} sin(4x)/|x|
+    ? Conclusion ? · f tend vers 4 en 0 (la limite à droite suffit) / ✔ Les deux limites sont différentes : f n'a pas de limite en 0 / · f tend vers la moyenne des deux valeurs en 0
+    = 4 − (−4)   ← Différence des deux limites
+    = 8   ← Calculer
+  aides : Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche. | x < 0 : |x| = □ | À droite 4, à gauche −4 : pas de limite en 0.
+  pièges : a1_dl_factorial_missing, a1_bh_quotient_rule, a1_remarkable_limit_scale, a1_abs_removed, a1_onesided_ignored
+
+```
+
+### Niveau 3
+
+```
+Soit f(x) = sin(4x)/|x|. Calcule les limites de f à droite et à gauche de 0, puis conclus. Commence par la limite à droite en 0.
+  [tap, suivre l'erreur, menu steps]  sin(4x)/|x|
+    = sin(4x)/x   ← x > 0 : |x| = x
+    = 4   ← sin(u)/u → 1 avec u = 4x
+  — À gauche de 0 :  [juge limit]  départ : sin(4x)/|x|
+    = sin(4x)/(−x)   ← x < 0 : |x| = −x
+    = −4   ← sin(u)/u → 1 avec u = 4x
+  — Conclusion, et le saut de f en 0 :  [juge value]  départ : lim_{x→0⁺} sin(4x)/|x| − lim_{x→0⁻} sin(4x)/|x|
+    ? Conclusion ? · f tend vers 4 en 0 (la limite à droite suffit) / · f tend vers la moyenne des deux valeurs en 0 / ✔ Les deux limites sont différentes : f n'a pas de limite en 0
+    = 8   ← Calculer
+  aides : Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche. | x < 0 : |x| = □ | À droite 4, à gauche −4 : pas de limite en 0.
+  pièges : a1_dl_factorial_missing, a1_bh_quotient_rule, a1_remarkable_limit_scale, a1_abs_removed, a1_onesided_ignored
+
+Soit f(x) = cos(1/x). Montre avec deux suites que f n'a pas de limite en 0. Avec xₙ = 1/(2nπ) → 0⁺, calcule la limite de f(xₙ).
+  [tap, suivre l'erreur, menu steps]  cos(2nπ)
+    = 1   ← cos(2nπ) = 1 pour tout n
+  — Avec yₙ = 1/((2n + 1)π) → 0 :  [juge limit]  départ : cos((2n + 1)π)
+    = −1   ← cos((2n + 1)π) = −1 pour tout n
+  — Conclusion, et l'écart entre les deux limites :  [juge value]  départ : lim_{n→∞} cos((2n + 1)π) − lim_{n→∞} cos(2nπ)
+    ? Conclusion ? · f tend vers la moyenne des deux valeurs en 0 / ✔ f(xₙ) et f(yₙ) ont des limites différentes : f n'a pas de limite en 0 / · f tend vers 1 en 0 (la première suite suffit)
+    = −2   ← Calculer
+  aides : Prends deux suites qui tendent vers 0, sur lesquelles cos(1/x) vaut toujours la même chose : 1/xₙ = 2nπ, puis (2n + 1)π. | xₙ = 1/(2nπ) : f(xₙ) = cos(2nπ) = □ | f(xₙ) → 1 et f(yₙ) → −1 : pas de limite.
+  pièges : a1_dl_factorial_missing, a1_onesided_ignored
+
+Soit f(x) = arctan(1/(x − 1)). Calcule les limites de f à droite et à gauche de 1, puis conclus. Commence par la limite à droite en 1.
+  [tap, suivre l'erreur, menu steps]  arctan(1/(x − 1))
+    = π/2   ← 1/(x − 1) → +∞ et Arctg(u) → π/2
+  — À gauche de 1 :  [juge limit]  départ : arctan(1/(x − 1))
+    = −π/2   ← 1/(x − 1) → −∞ et Arctg(u) → −π/2
+  — Conclusion, et le saut de f en 1 :  [juge value]  départ : lim_{x→1⁺} arctan(1/(x − 1)) − lim_{x→1⁻} arctan(1/(x − 1))
+    ? Conclusion ? ✔ Les deux limites sont différentes : f n'a pas de limite en 1 / · f tend vers π/2 en 1 (la limite à droite suffit) / · f tend vers la moyenne des deux valeurs en 1
+    = π/2 − (−π/2)   ← Différence des deux limites
+    = π   ← Calculer
+  aides : Regarde le signe de 1/(x − 1) de chaque côté de 1 : Arctg(u) → ±π/2 quand u → ±∞. | x → 1⁻ : 1/(x − 1) → □ | À droite π/2, à gauche −π/2 : pas de limite en 1.
+  pièges : a1_onesided_ignored
+
+```
+
+### Niveau 4
+
+```
+Soit f(x) = (x² + x − 2)/|x − 1|. Calcule les limites de f à droite et à gauche de 1, puis conclus. Commence par la limite à droite en 1.
+  [free, suivre l'erreur]  (x² + x − 2)/|x − 1|
+    = (x − 1)(x + 2)/(x − 1)   ← x > 1 : |x − 1| = x − 1
+    = x + 2   ← Simplifier
+    = 3   ← Passer à la limite
+  — À gauche de 1 :  [juge limit]  départ : (x² + x − 2)/|x − 1|
+    = (x − 1)(x + 2)/(−(x − 1))   ← x < 1 : |x − 1| = −(x − 1)
+    = −(x + 2)   ← Simplifier
+    = −3   ← Passer à la limite
+  — Conclusion, et le saut de f en 1 :  [juge value]  départ : lim_{x→1⁺} (x² + x − 2)/|x − 1| − lim_{x→1⁻} (x² + x − 2)/|x − 1|
+    ? Conclusion ? · f tend vers la moyenne des deux valeurs en 1 / · f tend vers 3 en 1 (la limite à droite suffit) / ✔ Les deux limites sont différentes : f n'a pas de limite en 1
+    = 6   ← Calculer
+  aides : Enlève la valeur absolue séparément pour x > 1 et x < 1. | x < 1 : |x − 1| = □ | À droite 3, à gauche −3 : pas de limite en 1.
+  pièges : a1_bh_quotient_rule, a1_abs_removed, a1_onesided_ignored
+
+Soit f(x) = cos(1/x). Montre avec deux suites que f n'a pas de limite en 0. Avec xₙ = 1/(2nπ) → 0⁺, calcule la limite de f(xₙ).
+  [free, suivre l'erreur]  cos(2nπ)
+    = 1   ← cos(2nπ) = 1 pour tout n
+  — Avec yₙ = 1/((2n + 1)π) → 0 :  [juge limit]  départ : cos((2n + 1)π)
+    = −1   ← cos((2n + 1)π) = −1 pour tout n
+  — Conclusion, et l'écart entre les deux limites :  [juge value]  départ : lim_{n→∞} cos((2n + 1)π) − lim_{n→∞} cos(2nπ)
+    ? Conclusion ? · f tend vers la moyenne des deux valeurs en 0 / ✔ f(xₙ) et f(yₙ) ont des limites différentes : f n'a pas de limite en 0 / · f tend vers 1 en 0 (la première suite suffit)
+    = −2   ← Calculer
+  aides : Prends deux suites qui tendent vers 0, sur lesquelles cos(1/x) vaut toujours la même chose : 1/xₙ = 2nπ, puis (2n + 1)π. | xₙ = 1/(2nπ) : f(xₙ) = cos(2nπ) = □ | f(xₙ) → 1 et f(yₙ) → −1 : pas de limite.
+  pièges : a1_dl_factorial_missing, a1_onesided_ignored
+
+Soit f(x) = (x² + 2x − 15)/|x − 3|. Calcule les limites de f à droite et à gauche de 3, puis conclus. Commence par la limite à droite en 3.
+  [free, suivre l'erreur]  (x² + 2x − 15)/|x − 3|
+    = (x − 3)(x + 5)/(x − 3)   ← x > 3 : |x − 3| = x − 3
+    = x + 5   ← Simplifier
+    = 8   ← Passer à la limite
+  — À gauche de 3 :  [juge limit]  départ : (x² + 2x − 15)/|x − 3|
+    = (x − 3)(x + 5)/(−(x − 3))   ← x < 3 : |x − 3| = −(x − 3)
+    = −(x + 5)   ← Simplifier
+    = −8   ← Passer à la limite
+  — Conclusion, et le saut de f en 3 :  [juge value]  départ : lim_{x→3⁺} (x² + 2x − 15)/|x − 3| − lim_{x→3⁻} (x² + 2x − 15)/|x − 3|
+    ? Conclusion ? · f tend vers 8 en 3 (la limite à droite suffit) / · f tend vers la moyenne des deux valeurs en 3 / ✔ Les deux limites sont différentes : f n'a pas de limite en 3
+    = 16   ← Calculer
+  aides : Enlève la valeur absolue séparément pour x > 3 et x < 3. | x < 3 : |x − 3| = □ | À droite 8, à gauche −8 : pas de limite en 3.
+  pièges : a1_bh_quotient_rule, a1_abs_removed, a1_onesided_ignored
+
+```
+
+### Niveau 5
+
+```
+lim_{x→0} sin(e^(1/x))/e^(1/x) =
+  · +∞   ✔ n'existe pas   · 0 [a1_onesided_ignored]   · 1 [a1_onesided_ignored]
+  pièges : a1_onesided_ignored
+
+lim_{x→0} sin(e^(1/x))/e^(1/x) =
+  ✔ n'existe pas   · 0 [a1_onesided_ignored]   · 1 [a1_onesided_ignored]   · +∞
+  pièges : a1_onesided_ignored
+
+lim_{x→0} 4e^(1/x) =
+  · 4   · +∞ [a1_onesided_ignored]   · 0 [a1_onesided_ignored]   ✔ n'existe pas
+  pièges : a1_onesided_ignored
+
+```
+
+### Variantes d'examen
+
+```
+lim_{x→0} 2e^(1/x) =
+  · +∞ [a1_onesided_ignored]   ✔ n'existe pas   · 2   · 0 [a1_onesided_ignored]
+  [examen mcq]
+  pièges : a1_onesided_ignored
+
+Vrai ou faux ?
+  « limx→0 e^(1/x) n'existe pas. » → VRAI
+  [examen tf]
+  pièges : a1_onesided_ignored
+
+```
+
+## Prolongement par continuité, continuité d'une fonction par morceaux (`a1-fn-extension`, BA1)
+
+_Limite de chaque morceau = valeur au point._
+
+### Niveau 1
+
+```
+Soit f(x) = 2(x² + 2x − 8)/(x² − 4) si x > 2, f(2) = a, et bx + 2 si x < 2. Trouve a et b pour que f soit continue en 2. Commence par la limite à droite.
+  [guided]  2(x² + 2x − 8)/(x² − 4)
+    (Limite à droite : le morceau de x > 2 se simplifie par (x − 2).)
+    = 2(x − 2)(x + 4)/((x − 2)(x + 2))   ← Factoriser le haut et le bas
+    = 2(x + 4)/(x + 2)   ← Simplifier par (x − 2)
+    = □   (trous : 3)   ← Passer à la limite
+  — Continuité à droite : f(2) = a doit valoir cette limite.  [juge value]  départ : a
+    = 3   ← Égaler à f(2)
+  — Continuité à gauche : la limite de bx + 2 en 2⁻ doit valoir 3.  [juge solset]  départ : lim_{x→2⁻} (b·x + 2) = 3
+    = 2b + 2 = □   (trous : 2b + 2 = 3)   ← Limite à gauche de bx + 2, égale à f(2)
+    = b = 1/2   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 2 ; elles doivent valoir f(2) = a. | 2(x + 4)/(x + 2) → □ | a = 3 et b = 1/2
+
+Soit f(x) = (x² − 5x + 4)/(x² − x) si x > 1, f(1) = a, et bx² + 1 si x < 1. Trouve a et b pour que f soit continue en 1. Commence par la limite à droite.
+  [guided]  (x² − 5x + 4)/(x² − x)
+    (Limite à droite : le morceau de x > 1 se simplifie par (x − 1).)
+    = (x − 1)(x − 4)/((x − 1)x)   ← Factoriser le haut et le bas
+    = (x − 4)/x   ← Simplifier par (x − 1)
+    = □   (trous : −3)   ← Passer à la limite
+  — Continuité à droite : f(1) = a doit valoir cette limite.  [juge value]  départ : a
+    = −3   ← Égaler à f(1)
+  — Continuité à gauche : la limite de bx² + 1 en 1⁻ doit valoir −3.  [juge solset]  départ : lim_{x→1⁻} (b·x² + 1) = −3
+    = b + □ = −3   (trous : b + 1 = −3)   ← Limite à gauche de bx² + 1, égale à f(1)
+    = b = −4   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 1 ; elles doivent valoir f(1) = a. | (x − 4)/x → □ | a = −3 et b = −4
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+Soit f(x) = (x² − 4x + 3)/(x² + x − 2) si x > 1, f(1) = a, et bx − 3 si x < 1. Trouve a et b pour que f soit continue en 1. Commence par la limite à droite.
+  [guided]  (x² − 4x + 3)/(x² + x − 2)
+    (Limite à droite : le morceau de x > 1 se simplifie par (x − 1).)
+    = (x − 1)(x − 3)/((x − 1)(x + 2))   ← Factoriser le haut et le bas
+    = (x − 3)/(x + 2)   ← Simplifier par (x − 1)
+    = □   (trous : −2/3)   ← Passer à la limite
+  — Continuité à droite : f(1) = a doit valoir cette limite.  [juge value]  départ : a
+    = −2/3   ← Égaler à f(1)
+  — Continuité à gauche : la limite de bx − 3 en 1⁻ doit valoir −2/3.  [juge solset]  départ : lim_{x→1⁻} (b·x − 3) = −2/3
+    = b − 3 = □   (trous : b − 3 = −2/3)   ← Limite à gauche de bx − 3, égale à f(1)
+    = b = 7/3   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 1 ; elles doivent valoir f(1) = a. | (x − 3)/(x + 2) → □ | a = −2/3 et b = 7/3
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+```
+
+### Niveau 2
+
+```
+Soit f(x) = (x² + 3x − 4)/(x² − x) si x > 1, f(1) = a, et bx − 1 si x < 1. Trouve a et b pour que f soit continue en 1. Commence par la limite à droite.
+  [guided]  (x² + 3x − 4)/(x² − x)
+    = (□)(x + 4)/((x − 1)x)   (trous : (x − 1)(x + 4)/((x − 1)x))   ← Factoriser le haut et le bas
+    = (□)/x   (trous : (x + 4)/x)   ← Simplifier par (x − 1)
+    = 5   ← Passer à la limite
+  — Continuité à droite : f(1) = a doit valoir cette limite.  [juge value]  départ : a
+    = 5   ← Égaler à f(1)
+  — Continuité à gauche : la limite de bx − 1 en 1⁻ doit valoir 5.  [juge solset]  départ : lim_{x→1⁻} (b·x − 1) = 5
+    ? Quelle formule pour la limite à gauche de 1 ? ✔ bx − 1, le morceau de x < 1 / · (x + 4)/x, la formule qu'on vient de simplifier
+    = b − 1 = 5   ← Limite à gauche de bx − 1, égale à f(1)
+    = b = 6   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 1 ; elles doivent valoir f(1) = a. | (x + 4)/x → □ | a = 5 et b = 6
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, a1_extension_wrong_branch
+
+Soit f(x) = (x² − 2x − 8)/(x² − 7x + 12) si x > 4, f(4) = a, et bx − 3 si x < 4. Trouve a et b pour que f soit continue en 4. Commence par la limite à droite.
+  [guided]  (x² − 2x − 8)/(x² − 7x + 12)
+    = (□)(x + 2)/((x − 4)(x − 3))   (trous : (x − 4)(x + 2)/((x − 4)(x − 3)))   ← Factoriser le haut et le bas
+    = (□)/(x − 3)   (trous : (x + 2)/(x − 3))   ← Simplifier par (x − 4)
+    = 6   ← Passer à la limite
+  — Continuité à droite : f(4) = a doit valoir cette limite.  [juge value]  départ : a
+    = 6   ← Égaler à f(4)
+  — Continuité à gauche : la limite de bx − 3 en 4⁻ doit valoir 6.  [juge solset]  départ : lim_{x→4⁻} (b·x − 3) = 6
+    ? Quelle formule pour la limite à gauche de 4 ? · (x + 2)/(x − 3), la formule qu'on vient de simplifier / ✔ bx − 3, le morceau de x < 4
+    = 4b − 3 = 6   ← Limite à gauche de bx − 3, égale à f(4)
+    = b = 9/4   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 4 ; elles doivent valoir f(4) = a. | (x + 2)/(x − 3) → □ | a = 6 et b = 9/4
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, a1_extension_wrong_branch
+
+Soit f(x) = (x² − 3x + 2)/(x² − x − 2) si x > 2, f(2) = a, et bx² + 1 si x < 2. Trouve a et b pour que f soit continue en 2. Commence par la limite à droite.
+  [guided]  (x² − 3x + 2)/(x² − x − 2)
+    = (□)(x − 1)/((x − 2)(x + 1))   (trous : (x − 2)(x − 1)/((x − 2)(x + 1)))   ← Factoriser le haut et le bas
+    = (□)/(x + 1)   (trous : (x − 1)/(x + 1))   ← Simplifier par (x − 2)
+    = 1/3   ← Passer à la limite
+  — Continuité à droite : f(2) = a doit valoir cette limite.  [juge value]  départ : a
+    = 1/3   ← Égaler à f(2)
+  — Continuité à gauche : la limite de bx² + 1 en 2⁻ doit valoir 1/3.  [juge solset]  départ : lim_{x→2⁻} (b·x² + 1) = 1/3
+    ? Quelle formule pour la limite à gauche de 2 ? · (x − 1)/(x + 1), la formule qu'on vient de simplifier / ✔ bx² + 1, le morceau de x < 2
+    = 4b + 1 = 1/3   ← Limite à gauche de bx² + 1, égale à f(2)
+    = b = −1/6   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 2 ; elles doivent valoir f(2) = a. | (x − 1)/(x + 1) → □ | a = 1/3 et b = −1/6
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, a1_extension_wrong_branch
+
+```
+
+### Niveau 3
+
+```
+Soit f(x) = 2(x² − 3x − 4)/(x² − 5x + 4) si x > 4, f(4) = a, et bx + 1 si x < 4. Trouve a et b pour que f soit continue en 4. Commence par la limite à droite.
+  [tap, suivre l'erreur, menu steps]  2(x² − 3x − 4)/(x² − 5x + 4)
+    = 2(x − 4)(x + 1)/((x − 4)(x − 1))   ← Factoriser le haut et le bas
+    = 2(x + 1)/(x − 1)   ← Simplifier par (x − 4)
+    = 10/3   ← Passer à la limite
+  — Continuité à droite : f(4) = a doit valoir cette limite.  [juge value]  départ : a
+    = 10/3   ← Égaler à f(4)
+  — Continuité à gauche : la limite de bx + 1 en 4⁻ doit valoir 10/3.  [juge solset]  départ : lim_{x→4⁻} (b·x + 1) = 10/3
+    = 4b + 1 = 10/3   ← Limite à gauche de bx + 1, égale à f(4)
+    = b = 7/12   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 4 ; elles doivent valoir f(4) = a. | 2(x + 1)/(x − 1) → □ | a = 10/3 et b = 7/12
+
+Soit f(x) = (x² − 4x + 3)/(x² + 3x − 4) si x > 1, f(1) = a, et bx² + 1 si x < 1. Trouve a et b pour que f soit continue en 1. Commence par la limite à droite.
+  [tap, suivre l'erreur, menu steps]  (x² − 4x + 3)/(x² + 3x − 4)
+    = (x − 1)(x − 3)/((x − 1)(x + 4))   ← Factoriser le haut et le bas
+    = (x − 3)/(x + 4)   ← Simplifier par (x − 1)
+    = −2/5   ← Passer à la limite
+  — Continuité à droite : f(1) = a doit valoir cette limite.  [juge value]  départ : a
+    = −2/5   ← Égaler à f(1)
+  — Continuité à gauche : la limite de bx² + 1 en 1⁻ doit valoir −2/5.  [juge solset]  départ : lim_{x→1⁻} (b·x² + 1) = −2/5
+    = b + 1 = −2/5   ← Limite à gauche de bx² + 1, égale à f(1)
+    = b = −7/5   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 1 ; elles doivent valoir f(1) = a. | (x − 3)/(x + 4) → □ | a = −2/5 et b = −7/5
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+Soit f(x) = 3(x² + 2x − 15)/(x² − x − 6) si x > 3, f(3) = a, et bx − 3 si x < 3. Trouve a et b pour que f soit continue en 3. Commence par la limite à droite.
+  [tap, suivre l'erreur, menu steps]  3(x² + 2x − 15)/(x² − x − 6)
+    = 3(x − 3)(x + 5)/((x − 3)(x + 2))   ← Factoriser le haut et le bas
+    = 3(x + 5)/(x + 2)   ← Simplifier par (x − 3)
+    = 24/5   ← Passer à la limite
+  — Continuité à droite : f(3) = a doit valoir cette limite.  [juge value]  départ : a
+    = 24/5   ← Égaler à f(3)
+  — Continuité à gauche : la limite de bx − 3 en 3⁻ doit valoir 24/5.  [juge solset]  départ : lim_{x→3⁻} (b·x − 3) = 24/5
+    = 3b − 3 = 24/5   ← Limite à gauche de bx − 3, égale à f(3)
+    = b = 13/5   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 3 ; elles doivent valoir f(3) = a. | 3(x + 5)/(x + 2) → □ | a = 24/5 et b = 13/5
+
+```
+
+### Niveau 4
+
+```
+Soit f(x) = (x² − 6x + 8)/(x² − 4x) si x > 4, f(4) = a, et bx − 3 si x < 4. Trouve a et b pour que f soit continue en 4. Commence par la limite à droite.
+  [free, suivre l'erreur]  (x² − 6x + 8)/(x² − 4x)
+    = (x − 4)(x − 2)/((x − 4)x)   ← Factoriser le haut et le bas
+    = (x − 2)/x   ← Simplifier par (x − 4)
+    = 1/2   ← Passer à la limite
+  — Continuité à droite : f(4) = a doit valoir cette limite.  [juge value]  départ : a
+    = 1/2   ← Égaler à f(4)
+  — Continuité à gauche : la limite de bx − 3 en 4⁻ doit valoir 1/2.  [juge solset]  départ : lim_{x→4⁻} (b·x − 3) = 1/2
+    = 4b − 3 = 1/2   ← Limite à gauche de bx − 3, égale à f(4)
+    = b = 7/8   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 4 ; elles doivent valoir f(4) = a. | (x − 2)/x → □ | a = 1/2 et b = 7/8
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
+
+Soit f(x) = 3(x² + 2x − 15)/(x² − 2x − 3) si x > 3, f(3) = a, et bx² + 1 si x < 3. Trouve a et b pour que f soit continue en 3. Commence par la limite à droite.
+  [free, suivre l'erreur]  3(x² + 2x − 15)/(x² − 2x − 3)
+    = 3(x − 3)(x + 5)/((x − 3)(x + 1))   ← Factoriser le haut et le bas
+    = 3(x + 5)/(x + 1)   ← Simplifier par (x − 3)
+    = 6   ← Passer à la limite
+  — Continuité à droite : f(3) = a doit valoir cette limite.  [juge value]  départ : a
+    = 6   ← Égaler à f(3)
+  — Continuité à gauche : la limite de bx² + 1 en 3⁻ doit valoir 6.  [juge solset]  départ : lim_{x→3⁻} (b·x² + 1) = 6
+    = 9b + 1 = 6   ← Limite à gauche de bx² + 1, égale à f(3)
+    = b = 5/9   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 3 ; elles doivent valoir f(3) = a. | 3(x + 5)/(x + 1) → □ | a = 6 et b = 5/9
+
+Soit f(x) = 3(x² + x − 20)/(x² − 7x + 12) si x > 4, f(4) = a, et bx + 3 si x < 4. Trouve a et b pour que f soit continue en 4. Commence par la limite à droite.
+  [free, suivre l'erreur]  3(x² + x − 20)/(x² − 7x + 12)
+    = 3(x − 4)(x + 5)/((x − 4)(x − 3))   ← Factoriser le haut et le bas
+    = 3(x + 5)/(x − 3)   ← Simplifier par (x − 4)
+    = 27   ← Passer à la limite
+  — Continuité à droite : f(4) = a doit valoir cette limite.  [juge value]  départ : a
+    = 27   ← Égaler à f(4)
+  — Continuité à gauche : la limite de bx + 3 en 4⁻ doit valoir 27.  [juge solset]  départ : lim_{x→4⁻} (b·x + 3) = 27
+    = 4b + 3 = 27   ← Limite à gauche de bx + 3, égale à f(4)
+    = b = 6   ← Résoudre
+  aides : Calcule la limite de chaque morceau en 4 ; elles doivent valoir f(4) = a. | 3(x + 5)/(x − 3) → □ | a = 27 et b = 6
+
+```
+
+### Niveau 5
+
+```
+Laquelle de ces fonctions est continue en 0 ?
+  · sin(1/x) pour x ≠ 0, f(0) = 0   ✔ sin(3x)/x pour x ≠ 0, f(0) = 3   · Aucune des trois   · sin(x)/|x| pour x ≠ 0, f(0) = 1 [a1_onesided_ignored]
+  pièges : a1_onesided_ignored
+
+Laquelle de ces fonctions est continue en 0 ?
+  · Aucune des trois   · x·sin(1/x) pour x ≠ 0, f(0) = 1   · e^(1/x) pour x ≠ 0, f(0) = 0 [a1_onesided_ignored]   ✔ (e^x − 1)/x pour x ≠ 0, f(0) = 1
+  pièges : a1_onesided_ignored
+
+Laquelle de ces fonctions est continue en 0 ?
+  ✔ x·ln(|x|) pour x ≠ 0, f(0) = 0   · Aucune des trois   · sin(2x)/x pour x ≠ 0, f(0) = 1 [a1_remarkable_limit_scale]   · sin(1/x) pour x ≠ 0, f(0) = 0
+  pièges : a1_remarkable_limit_scale
+
+```
+
+### Variantes d'examen
+
+```
+Soit f(x) = (x² + x − 20)/(x² − 6x + 8) si x > 4, f(4) = a, et bx − 1 si x < 4. Pour quelles valeurs f est-elle continue en 4 ?
+  · a = −1/2 et b = 1/8   · b = 11/8, et a quelconque [a1_onesided_ignored]   ✔ a = 9/2 et b = 11/8   · a = 9/2, et b quelconque [a1_extension_wrong_branch]
+  [examen mcq]
+  pièges : a1_extension_wrong_branch, a1_onesided_ignored
+
+Vrai ou faux ?
+  « Si f est continue et bornée sur ℝ ∖ {0}, alors f se prolonge par continuité en 0. » → FAUX
+    contre-exemple (function) : f = sin(1/x)
+  [examen tf]
+
+```
+
+## Écrire la définition ε-δ d'une limite et de la continuité (`a1-fn-epsdelta-def`, BA1)
+
+_∀ε > 0 ∃δ > 0 ∀x : 0 < |x − x₀| ≤ δ ⇒ |f(x) − L| ≤ ε._
+
+### Niveau 1
+
+```
+Complète la définition de « limx→x₀ f(x) = L » : ∀ε > 0 ▢ ∀x ∈ D, 0 < |x − x₀| ≤ δ ⇒ |f(x) − L| ≤ ε
+  · ∃δ = ε   · ∀δ > 0 [g9_quant_order]   ✔ ∃δ > 0   · ∃x ∈ D
+  pièges : g9_quant_order
+
+Complète la définition de « limx→x₀⁺ f(x) = L » : ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < x − x₀ ≤ δ ⇒ ▢
+  · |f(x) − L| ≤ δ [a1_epsdelta_swapped]   · 0 < x − x₀ ≤ ε [a1_epsdelta_swapped]   ✔ |f(x) − L| ≤ ε   · |f(x) − L| ≥ ε
+  pièges : a1_epsdelta_swapped
+
+Complète la définition de « limx→x₀ f(x) = L » : ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < |x − x₀| ≤ δ ⇒ ▢
+  ✔ |f(x) − L| ≤ ε   · |f(x) − L| ≥ ε   · 0 < |x − x₀| ≤ ε [a1_epsdelta_swapped]   · |f(x) − L| ≤ δ [a1_epsdelta_swapped]
+  pièges : a1_epsdelta_swapped
+
+```
+
+### Niveau 2
+
+```
+Construis la définition de « limx→x₀ f(x) = L ». Touche les blocs dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃δ > 0
+    3. ∀x ∈ D :
+    4. 0 < |x − x₀| ≤ δ
+    5. ⇒ |f(x) − L| ≤ ε
+  pièges : g9_quant_order
+
+Construis la définition de « limx→x₀ f(x) = L ». Touche les blocs dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃δ > 0
+    3. ∀x ∈ D :
+    4. 0 < |x − x₀| ≤ δ
+    5. ⇒ |f(x) − L| ≤ ε
+  pièges : g9_quant_order
+
+Construis la définition de « limx→x₀ f(x) = L ». Touche les blocs dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃δ > 0
+    3. ∀x ∈ D :
+    4. 0 < |x − x₀| ≤ δ
+    5. ⇒ |f(x) − L| ≤ ε
+  pièges : g9_quant_order
+
+```
+
+### Niveau 3
+
+```
+Construis la définition de « limx→x₀ f(x) = L ». Touche les blocs dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃δ > 0
+    3. ∀x ∈ D :
+    4. 0 < |x − x₀| ≤ δ
+    5. ⇒ |f(x) − L| ≤ ε
+    ✗ 0 < |x − x₀| ≤ ε [a1_epsdelta_swapped]
+    ✗ ⇒ |f(x) − L| ≤ δ [a1_epsdelta_swapped]
+  pièges : a1_epsdelta_swapped, g9_quant_order
+
+Construis la définition de « limx→x₀⁺ f(x) = L ». Touche les blocs dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃δ > 0
+    3. ∀x ∈ D :
+    4. 0 < x − x₀ ≤ δ
+    5. ⇒ |f(x) − L| ≤ ε
+    ✗ 0 < x − x₀ ≤ ε [a1_epsdelta_swapped]
+    ✗ ⇒ |f(x) − L| ≤ δ [a1_epsdelta_swapped]
+  pièges : a1_epsdelta_swapped, g9_quant_order
+
+Construis la définition de « limx→x₀⁺ f(x) = L ». Touche les blocs dans l'ordre.
+  [blocs define]
+    1. ∀ε > 0
+    2. ∃δ > 0
+    3. ∀x ∈ D :
+    4. 0 < x − x₀ ≤ δ
+    5. ⇒ |f(x) − L| ≤ ε
+    ✗ ⇒ |f(x) − L| ≤ δ [a1_epsdelta_swapped]
+    ✗ 0 < x − x₀ ≤ ε [a1_epsdelta_swapped]
+  pièges : a1_epsdelta_swapped, g9_quant_order
+
+```
+
+### Niveau 4
+
+```
+Écris la définition de « f est continue en x₀ » avec des quantificateurs.
+  [jetons] palette : ε > 0 · δ > 0 · x ∈ D · |x − x₀| ≤ δ · |f(x) − f(x₀)| ≤ ε · |x − x₀| ≤ ε · |f(x) − f(x₀)| ≤ δ
+    → ∀ε > 0 ∃δ > 0 ∀x ∈ D, |x − x₀| ≤ δ ⇒ |f(x) − f(x₀)| ≤ ε
+  aides : Même structure que pour les suites : ε d'abord, puis δ, puis tous les x assez proches de x₀. | ∀ε > 0 ∃δ > 0 ∀x ∈ D, |x − x₀| ≤ ▢ ⇒ |f(x) − f(x₀)| ≤ ▢ | ∀ε > 0 ∃δ > 0 ∀x ∈ D, |x − x₀| ≤ δ ⇒ |f(x) − f(x₀)| ≤ ε
+  pièges : g9_quant_order, a1_epsdelta_swapped
+
+Écris la définition de « limx→x₀ f(x) = L » avec des quantificateurs.
+  [jetons] palette : ε > 0 · δ > 0 · x ∈ D · 0 < |x − x₀| ≤ δ · |f(x) − L| ≤ ε · 0 < |x − x₀| ≤ ε · |f(x) − L| ≤ δ
+    → ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < |x − x₀| ≤ δ ⇒ |f(x) − L| ≤ ε
+  aides : Même structure que pour les suites : ε d'abord, puis δ, puis tous les x assez proches de x₀. | ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < |x − x₀| ≤ ▢ ⇒ |f(x) − L| ≤ ▢ | ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < |x − x₀| ≤ δ ⇒ |f(x) − L| ≤ ε
+  pièges : g9_quant_order, a1_epsdelta_swapped
+
+Écris la définition de « limx→x₀⁺ f(x) = L » avec des quantificateurs.
+  [jetons] palette : ε > 0 · δ > 0 · x ∈ D · 0 < x − x₀ ≤ δ · |f(x) − L| ≤ ε · 0 < x − x₀ ≤ ε · |f(x) − L| ≤ δ
+    → ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < x − x₀ ≤ δ ⇒ |f(x) − L| ≤ ε
+  aides : Même structure que pour les suites : ε d'abord, puis δ, puis tous les x assez proches de x₀. | ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < x − x₀ ≤ ▢ ⇒ |f(x) − L| ≤ ▢ | ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < x − x₀ ≤ δ ⇒ |f(x) − L| ≤ ε
+  pièges : g9_quant_order, a1_epsdelta_swapped
+
+```
+
+### Niveau 5
+
+```
+Écris avec des quantificateurs : « f ne tend pas vers L quand x → x₀ ».
+  [jetons, sans aide] palette : ε > 0 · δ > 0 · x ∈ D · 0 < |x − x₀| ≤ δ · |f(x) − L| ≤ ε · |f(x) − L| > ε · 0 < |x − x₀| ≤ ε · |f(x) − L| ≤ δ
+    → ∃ε > 0 ∀δ > 0 ∃x ∈ D, 0 < |x − x₀| ≤ δ ∧ |f(x) − L| > ε
+  pièges : g9_quant_order, a1_epsdelta_swapped
+
+Écris avec des quantificateurs : « f n'est pas continue en x₀ ».
+  [jetons, sans aide] palette : ε > 0 · δ > 0 · x ∈ D · |x − x₀| ≤ δ · |f(x) − f(x₀)| ≤ ε · |f(x) − f(x₀)| > ε · |x − x₀| ≤ ε · |f(x) − f(x₀)| ≤ δ
+    → ∃ε > 0 ∀δ > 0 ∃x ∈ D, |x − x₀| ≤ δ ∧ |f(x) − f(x₀)| > ε
+  pièges : g9_quant_order, a1_epsdelta_swapped
+
+Écris la définition de « limx→x₀ f(x) = +∞ » avec des quantificateurs.
+  [jetons, sans aide] palette : M > 0 · δ > 0 · x ∈ D · 0 < |x − x₀| ≤ δ · f(x) ≥ M · 0 < |x − x₀| ≤ M
+    → ∀M > 0 ∃δ > 0 ∀x ∈ D, 0 < |x − x₀| ≤ δ ⇒ f(x) ≥ M
+  pièges : g9_quant_order
+
+```
+
+### Variantes d'examen
+
+```
+Vrai ou faux ? « f est continue en x₀ ⇔ ∃δ > 0 ∀ε > 0 : |x − x₀| ≤ δ ⇒ |f(x) − f(x₀)| ≤ ε. »
+  · Vrai [g9_quant_order]   ✔ Faux
+  [examen tf]
+  pièges : g9_quant_order
+
+Écris la définition de « limx→x₀ f(x) = L » avec des quantificateurs.
+  [problème, examen open, 1 points]
+  partie 1 (Début du problème : 1)
+    [jetons, sans aide] palette : ε > 0 · δ > 0 · x ∈ D · 0 < |x − x₀| ≤ δ · |f(x) − L| ≤ ε · 0 < |x − x₀| ≤ ε · |f(x) − L| ≤ δ
+      → ∀ε > 0 ∃δ > 0 ∀x ∈ D, 0 < |x − x₀| ≤ δ ⇒ |f(x) − L| ≤ ε
+    [examen open]
+  pièges : g9_quant_order, a1_epsdelta_swapped
+
+```
+
+## Trouver δ(ε) : prouver une limite par la définition (`a1-fn-epsdelta`, BA1)
+
+_|f(x) − L| ≤ M·|x − x₀|, puis δ = ε/M (ou min(1 ; ε/M))._
+
+### Niveau 1
+
+```
+Montre avec la définition que limx→3 −6x + 5 = −13. Écris d'abord l'écart |(−6x + 5) + 13| en fonction de |x − x₀|.
+  [guided]  |(−6x + 5) + 13|
+    = |−6x + □|   (trous : |−6x + 18|)   ← Réduire l'écart
+    = □(|x − 3|)   (trous : 6(|x − 3|))   ← Faire apparaître |x − x₀| = |x − 3|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = ε/□   (trous : ε/6)   ← 6|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/6
+  aides : Écris |f(x) + 13| et fais apparaître |x − x₀| = |x − 3|. | |(−6x + 5) + 13| = □·|x − 3| | δ = ε/6 : 6·|x − 3| ≤ ε dès que |x − 3| ≤ ε/6.
+  pièges : g1_triangle_reverse
+
+Montre avec la définition que limx→−4 −5 − 5x = 15. Écris d'abord l'écart |(−5 − 5x) − 15| en fonction de |x − x₀|.
+  [guided]  |(−5 − 5x) − 15|
+    = |−5x − □|   (trous : |−5x − 20|)   ← Réduire l'écart
+    = □(|x + 4|)   (trous : 5(|x + 4|))   ← Faire apparaître |x − x₀| = |x + 4|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = ε/□   (trous : ε/5)   ← 5|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/5
+  aides : Écris |f(x) − 15| et fais apparaître |x − x₀| = |x + 4|. | |(−5 − 5x) − 15| = □·|x + 4| | δ = ε/5 : 5·|x + 4| ≤ ε dès que |x + 4| ≤ ε/5.
+  pièges : g1_triangle_reverse
+
+Montre avec la définition que limx→−4 2x + 7 = −1. Écris d'abord l'écart |(2x + 7) + 1| en fonction de |x − x₀|.
+  [guided]  |(2x + 7) + 1|
+    = |2x + □|   (trous : |2x + 8|)   ← Réduire l'écart
+    = □(|x + 4|)   (trous : 2(|x + 4|))   ← Faire apparaître |x − x₀| = |x + 4|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = ε/□   (trous : ε/2)   ← 2|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/2
+  aides : Écris |f(x) + 1| et fais apparaître |x − x₀| = |x + 4|. | |(2x + 7) + 1| = □·|x + 4| | δ = ε/2 : 2·|x + 4| ≤ ε dès que |x + 4| ≤ ε/2.
+  pièges : g1_triangle_reverse
+
+```
+
+### Niveau 2
+
+```
+Montre avec la définition que limx→−4 6 + 6x = −18. Écris d'abord l'écart |(6 + 6x) + 18| en fonction de |x − x₀|.
+  [guided]  |(6 + 6x) + 18|
+    = |6x + □|   (trous : |6x + 24|)   ← Réduire l'écart
+    = □(|x + 4|)   (trous : 6(|x + 4|))   ← Faire apparaître |x − x₀| = |x + 4|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    ? Quel δ choisir ? ✔ δ = ε/6 / · δ = 6ε
+    = ε/6   ← 6|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/6
+  aides : Écris |f(x) + 18| et fais apparaître |x − x₀| = |x + 4|. | |(6 + 6x) + 18| = □·|x + 4| | δ = ε/6 : 6·|x + 4| ≤ ε dès que |x + 4| ≤ ε/6.
+  pièges : g1_triangle_reverse, a1_delta_inverted
+
+Montre avec la définition que limx→1 x² + x = 2. Écris d'abord l'écart |(x² + x) − 2| en fonction de |x − x₀|.
+  [guided]  |(x² + x) − 2|
+    = |(x − 1)(□)|   (trous : |(x − 1)(x + 2)|)   ← Factoriser : x₀ est une racine de f(x) − L
+    = |x − 1|·|x + 2|   ← Séparer les deux valeurs absolues
+  — Impose |x − 1| ≤ 1 et majore l'autre facteur |x + 2|.  [juge equiv]  départ : |x + 2|
+    (Si |x − 1| ≤ 1, alors x ∈ [0 ; 2].)
+    = |x − 1| + □   (trous : |x − 1| + 3)   ← x + 2 = (x − 1) + 3 : inégalité triangulaire
+    = 4   ← |x − 1| ≤ 1
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    ? Quel δ choisir ? · δ = ε/|x + 2| / · δ = 4ε / ✔ δ = min(1 ; ε/4)
+    = min(1,ε/4)   ← |x − 1| ≤ 1 et 4|x − 1| ≤ ε
+  aides : Écris |f(x) − 2| et fais apparaître |x − x₀| = |x − 1|. Pour l'autre facteur, impose |x − x₀| ≤ 1. | |(x² + x) − 2| = □·|x − 1| | δ = min(1 ; ε/4) : si |x − 1| ≤ 1, |f(x) − 2| ≤ 4·|x − 1| ≤ ε dès que |x − 1| ≤ ε/4.
+  pièges : g1_triangle_reverse, a1_delta_depends_on_x, a1_delta_inverted
+
+Montre avec la définition que limx→2 −3 − 8x = −19. Écris d'abord l'écart |(−3 − 8x) + 19| en fonction de |x − x₀|.
+  [guided]  |(−3 − 8x) + 19|
+    = |−8x + □|   (trous : |−8x + 16|)   ← Réduire l'écart
+    = □(|x − 2|)   (trous : 8(|x − 2|))   ← Faire apparaître |x − x₀| = |x − 2|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    ? Quel δ choisir ? · δ = 8ε / ✔ δ = ε/8
+    = ε/8   ← 8|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/8
+  aides : Écris |f(x) + 19| et fais apparaître |x − x₀| = |x − 2|. | |(−3 − 8x) + 19| = □·|x − 2| | δ = ε/8 : 8·|x − 2| ≤ ε dès que |x − 2| ≤ ε/8.
+  pièges : g1_triangle_reverse, a1_delta_inverted
+
+```
+
+### Niveau 3
+
+```
+Montre avec la définition que limx→1 x² − 4x = −3. Écris d'abord l'écart |(x² − 4x) + 3| en fonction de |x − x₀|.
+  [tap, suivre l'erreur, menu steps]  |(x² − 4x) + 3|
+    = |(x − 1)(x − 3)|   ← Factoriser : x₀ est une racine de f(x) − L
+    = |x − 1|·|x − 3|   ← Séparer les deux valeurs absolues
+  — Impose |x − 1| ≤ 1 et majore l'autre facteur |x − 3|.  [juge equiv]  départ : |x − 3|
+    = |x − 1| + 2   ← x − 3 = (x − 1) + (-2) : inégalité triangulaire
+    = 3   ← |x − 1| ≤ 1
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = min(1,ε/3)   ← |x − 1| ≤ 1 et 3|x − 1| ≤ ε
+  aides : Écris |f(x) + 3| et fais apparaître |x − x₀| = |x − 1|. Pour l'autre facteur, impose |x − x₀| ≤ 1. | |(x² − 4x) + 3| = □·|x − 1| | δ = min(1 ; ε/3) : si |x − 1| ≤ 1, |f(x) + 3| ≤ 3·|x − 1| ≤ ε dès que |x − 1| ≤ ε/3.
+  pièges : g1_triangle_reverse
+
+Montre avec la définition que limx→2 x² + 2x = 8. Écris d'abord l'écart |(x² + 2x) − 8| en fonction de |x − x₀|.
+  [tap, suivre l'erreur, menu steps]  |(x² + 2x) − 8|
+    = |(x − 2)(x + 4)|   ← Factoriser : x₀ est une racine de f(x) − L
+    = |x − 2|·|x + 4|   ← Séparer les deux valeurs absolues
+  — Impose |x − 2| ≤ 1 et majore l'autre facteur |x + 4|.  [juge equiv]  départ : |x + 4|
+    = |x − 2| + 6   ← x + 4 = (x − 2) + 6 : inégalité triangulaire
+    = 7   ← |x − 2| ≤ 1
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = min(1,ε/7)   ← |x − 2| ≤ 1 et 7|x − 2| ≤ ε
+  aides : Écris |f(x) − 8| et fais apparaître |x − x₀| = |x − 2|. Pour l'autre facteur, impose |x − x₀| ≤ 1. | |(x² + 2x) − 8| = □·|x − 2| | δ = min(1 ; ε/7) : si |x − 2| ≤ 1, |f(x) − 8| ≤ 7·|x − 2| ≤ ε dès que |x − 2| ≤ ε/7.
+  pièges : g1_triangle_reverse
+
+Montre avec la définition que limx→0 −9 + 7x = −9. Écris d'abord l'écart |(−9 + 7x) + 9| en fonction de |x − x₀|.
+  [tap, suivre l'erreur, menu steps]  |(−9 + 7x) + 9|
+    = |7x|   ← Réduire l'écart
+    = 7|x|   ← Faire apparaître |x − x₀| = |x|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = ε/7   ← 7|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/7
+  aides : Écris |f(x) + 9| et fais apparaître |x − x₀| = |x|. | |(−9 + 7x) + 9| = □·|x| | δ = ε/7 : 7·|x| ≤ ε dès que |x| ≤ ε/7.
+  pièges : g1_triangle_reverse
+
+```
+
+### Niveau 4
+
+```
+Montre avec la définition que limx→−1 −7 + 5x = −12. Écris d'abord l'écart |(−7 + 5x) + 12| en fonction de |x − x₀|.
+  [free, suivre l'erreur]  |(−7 + 5x) + 12|
+    = |5x + 5|   ← Réduire l'écart
+    = 5|x + 1|   ← Faire apparaître |x − x₀| = |x + 1|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = ε/5   ← 5|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/5
+  aides : Écris |f(x) + 12| et fais apparaître |x − x₀| = |x + 1|. | |(−7 + 5x) + 12| = □·|x + 1| | δ = ε/5 : 5·|x + 1| ≤ ε dès que |x + 1| ≤ ε/5.
+  pièges : g1_triangle_reverse
+
+Montre avec la définition que limx→4 7 − 4x = −9. Écris d'abord l'écart |(7 − 4x) + 9| en fonction de |x − x₀|.
+  [free, suivre l'erreur]  |(7 − 4x) + 9|
+    = |−4x + 16|   ← Réduire l'écart
+    = 4|x − 4|   ← Faire apparaître |x − x₀| = |x − 4|
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = ε/4   ← 4|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/4
+  aides : Écris |f(x) + 9| et fais apparaître |x − x₀| = |x − 4|. | |(7 − 4x) + 9| = □·|x − 4| | δ = ε/4 : 4·|x − 4| ≤ ε dès que |x − 4| ≤ ε/4.
+  pièges : g1_triangle_reverse
+
+Montre avec la définition que limx→1 √x = 1. Écris d'abord l'écart |√x − 1| en fonction de |x − x₀|.
+  [free, suivre l'erreur]  |√x − 1|
+    = |x − 1|/(√x + 1)   ← Multiplier par le conjugué √x + 1
+  — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+    = ε   ← √x + 1 ≥ 1, donc |√x − 1| ≤ |x − 1|/1 ≤ ε dès que |x − 1| ≤ ε
+  aides : Écris |f(x) − 1| et fais apparaître |x − x₀| = |x − 1|. | |√x − 1| = |x − 1|/□ | δ = ε : √x + 1 ≥ 1, donc |√x − 1| ≤ |x − 1|/1.
+  pièges : g1_triangle_reverse
+
+```
+
+### Niveau 5
+
+```
+Montre avec la définition que limx→4 √x = 2.
+  [problème, 4 points]
+  partie 1 (Définition : 1)
+  Écris avec des quantificateurs ce que veut dire limx→4 √x = 2.
+    [jetons, sans aide] palette : ε > 0 · δ > 0 · x ∈ ℝ · 0 < |x − 4| ≤ δ · |f(x) − 2| ≤ ε · 0 < |x − 4| ≤ ε · |f(x) − 2| ≤ δ
+      → ∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, 0 < |x − 4| ≤ δ ⇒ |f(x) − 2| ≤ ε
+  partie 2 (Écart et δ : 1 ; Choisis δ en fonction de ε seulement. : 1)
+  Écris l'écart |√x − 2| en fonction de |x − x₀|, puis choisis δ.
+    [free, sans aide, suivre l'erreur]  |√x − 2|
+      = |x − 4|/(√x + 2)   ← Multiplier par le conjugué √x + 2
+    — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+      = 2ε   ← √x + 2 ≥ 2, donc |√x − 2| ≤ |x − 4|/2 ≤ ε dès que |x − 4| ≤ 2ε
+  partie 3 (Conclusion : 1)
+  Quelle conclusion ?
+    ✔ Pour tout ε > 0, avec δ = 2ε : si 0 < |x − 4| ≤ δ, alors |f(x) − 2| ≤ ε. Donc la limite vaut 2.   · Pour ε = 0,01, δ = 20,01 convient : donc la limite vaut 2. [g9_proof_by_example]   · Il existe δ > 0 tel que pour tout ε > 0 : si 0 < |x − 4| ≤ δ, alors |f(x) − 2| ≤ ε. [g9_quant_order]   · Pour tout x, il existe ε > 0 tel que |f(x) − 2| ≤ ε.
+  pièges : g9_quant_order, a1_epsdelta_swapped, g1_triangle_reverse, g9_proof_by_example
+
+Montre avec la définition que limx→2 −1 − 3x = −7.
+  [problème, 4 points]
+  partie 1 (Définition : 1)
+  Écris avec des quantificateurs ce que veut dire limx→2 −1 − 3x = −7.
+    [jetons, sans aide] palette : ε > 0 · δ > 0 · x ∈ ℝ · 0 < |x − 2| ≤ δ · |f(x) + 7| ≤ ε · 0 < |x − 2| ≤ ε · |f(x) + 7| ≤ δ
+      → ∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, 0 < |x − 2| ≤ δ ⇒ |f(x) + 7| ≤ ε
+  partie 2 (Écart et δ : 1 ; Choisis δ en fonction de ε seulement. : 1)
+  Écris l'écart |(−1 − 3x) + 7| en fonction de |x − x₀|, puis choisis δ.
+    [free, sans aide, suivre l'erreur]  |(−1 − 3x) + 7|
+      = |−3x + 6|   ← Réduire l'écart
+      = 3|x − 2|   ← Faire apparaître |x − x₀| = |x − 2|
+    — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+      = ε/3   ← 3|x − x₀| ≤ ε dès que |x − x₀| ≤ ε/3
+  partie 3 (Conclusion : 1)
+  Quelle conclusion ?
+    · Pour ε = 0,01, δ = 0,01/3 convient : donc la limite vaut −7. [g9_proof_by_example]   ✔ Pour tout ε > 0, avec δ = ε/3 : si 0 < |x − 2| ≤ δ, alors |f(x) + 7| ≤ ε. Donc la limite vaut −7.   · Pour tout x, il existe ε > 0 tel que |f(x) + 7| ≤ ε.   · Il existe δ > 0 tel que pour tout ε > 0 : si 0 < |x − 2| ≤ δ, alors |f(x) + 7| ≤ ε. [g9_quant_order]
+  pièges : g9_quant_order, a1_epsdelta_swapped, g1_triangle_reverse, g9_proof_by_example
+
+Montre avec la définition que limx→1 √x = 1.
+  [problème, 4 points]
+  partie 1 (Définition : 1)
+  Écris avec des quantificateurs ce que veut dire limx→1 √x = 1.
+    [jetons, sans aide] palette : ε > 0 · δ > 0 · x ∈ ℝ · 0 < |x − 1| ≤ δ · |f(x) − 1| ≤ ε · 0 < |x − 1| ≤ ε · |f(x) − 1| ≤ δ
+      → ∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, 0 < |x − 1| ≤ δ ⇒ |f(x) − 1| ≤ ε
+  partie 2 (Écart et δ : 1 ; Choisis δ en fonction de ε seulement. : 1)
+  Écris l'écart |√x − 1| en fonction de |x − x₀|, puis choisis δ.
+    [free, sans aide, suivre l'erreur]  |√x − 1|
+      = |x − 1|/(√x + 1)   ← Multiplier par le conjugué √x + 1
+    — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+      = ε   ← √x + 1 ≥ 1, donc |√x − 1| ≤ |x − 1|/1 ≤ ε dès que |x − 1| ≤ ε
+  partie 3 (Conclusion : 1)
+  Quelle conclusion ?
+    · Pour tout x, il existe ε > 0 tel que |f(x) − 1| ≤ ε.   · Pour ε = 0,01, δ = 0,01 convient : donc la limite vaut 1. [g9_proof_by_example]   · Il existe δ > 0 tel que pour tout ε > 0 : si 0 < |x − 1| ≤ δ, alors |f(x) − 1| ≤ ε. [g9_quant_order]   ✔ Pour tout ε > 0, avec δ = ε : si 0 < |x − 1| ≤ δ, alors |f(x) − 1| ≤ ε. Donc la limite vaut 1.
+  pièges : g9_quant_order, a1_epsdelta_swapped, g1_triangle_reverse, g9_proof_by_example
+
+```
+
+### Variantes d'examen
+
+```
+Vrai ou faux ? « Pour prouver limx→3 x² = 9, δ = ε/|x + 3| convient. »
+  · Vrai [a1_delta_depends_on_x]   ✔ Faux
+  [examen tf]
+  pièges : a1_delta_depends_on_x
+
+Montre avec la définition que limx→1 √x = 1.
+  [problème, examen open, 4 points]
+  partie 1 (Définition : 1)
+  Écris avec des quantificateurs ce que veut dire limx→1 √x = 1.
+    [jetons, sans aide] palette : ε > 0 · δ > 0 · x ∈ ℝ · 0 < |x − 1| ≤ δ · |f(x) − 1| ≤ ε · 0 < |x − 1| ≤ ε · |f(x) − 1| ≤ δ
+      → ∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, 0 < |x − 1| ≤ δ ⇒ |f(x) − 1| ≤ ε
+  partie 2 (Écart et δ : 1 ; Choisis δ en fonction de ε seulement. : 1)
+  Écris l'écart |√x − 1| en fonction de |x − x₀|, puis choisis δ.
+    [free, sans aide, suivre l'erreur]  |√x − 1|
+      = |x − 1|/(√x + 1)   ← Multiplier par le conjugué √x + 1
+    — Choisis δ en fonction de ε seulement.  [juge delta]  départ : δ
+      = ε   ← √x + 1 ≥ 1, donc |√x − 1| ≤ |x − 1|/1 ≤ ε dès que |x − 1| ≤ ε
+  partie 3 (Conclusion : 1)
+  Quelle conclusion ?
+    · Pour ε = 0,01, δ = 0,01 convient : donc la limite vaut 1. [g9_proof_by_example]   ✔ Pour tout ε > 0, avec δ = ε : si 0 < |x − 1| ≤ δ, alors |f(x) − 1| ≤ ε. Donc la limite vaut 1.   · Pour tout x, il existe ε > 0 tel que |f(x) − 1| ≤ ε.   · Il existe δ > 0 tel que pour tout ε > 0 : si 0 < |x − 1| ≤ δ, alors |f(x) − 1| ≤ ε. [g9_quant_order]
+  pièges : g9_quant_order, a1_epsdelta_swapped, g1_triangle_reverse, g9_proof_by_example
+
+```
+
+## Théorème de la valeur intermédiaire : existence d'une solution (`a1-fn-ivt`, BA1)
+
+_f continue sur [a ; b], f(a) et f(b) de signes contraires : f s'annule._
+
+### Niveau 1
+
+```
+Montre que l'équation cos(x) = 3x a une solution dans ]0 ; π/2[. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame]
+    1. h(0) = … > 0   [à écrire : h(0) = 1]
+    2. h(π/2) = … < 0   [à écrire : h(π/2) = -3π/2]
+    3. h est continue sur [0 ; π/2] et change de signe : par le TVI, il existe c ∈ ]0 ; π/2[ tel que h(c) = 0. L'équation a une solution dans ]0 ; π/2[.
+
+Montre que l'équation x⁵ + 8x − 3 = 0 a une solution dans ]0 ; 1[. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame]
+    1. f(0) = … < 0   [à écrire : f(0) = -3]
+    2. f(1) = … > 0   [à écrire : f(1) = 6]
+    3. f est continue sur [0 ; 1] et change de signe : par le TVI, il existe c ∈ ]0 ; 1[ tel que f(c) = 0. L'équation a une solution dans ]0 ; 1[.
+
+Montre que l'équation x⁷ + 4x − 4 = 0 a une solution dans ]0 ; 1[. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame]
+    1. f(0) = … < 0   [à écrire : f(0) = -4]
+    2. f(1) = … > 0   [à écrire : f(1) = 1]
+    3. f est continue sur [0 ; 1] et change de signe : par le TVI, il existe c ∈ ]0 ; 1[ tel que f(c) = 0. L'équation a une solution dans ]0 ; 1[.
+
+```
+
+### Niveau 2
+
+```
+Montre que l'équation ln(x) = 3 − x a une solution dans ]1 ; 3[. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame]
+    ? Sur quel segment, et avec quelle fonction, appliques-tu le TVI ? · h(x) = ln(x) + x − 3 sur [3 ; 4] / · h(x) = ln(x) + x − 3 sur [0 ; 3] / ✔ h(x) = ln(x) + x − 3 sur [1 ; 3]
+    1. Soit h(x) = ln(x) + x − 3.
+    2. h est continue sur [1 ; 3] (ln est continue sur ]0 ; +∞[).
+    3. h(1) = … < 0   [à écrire : h(1) = -2]
+    4. h(3) = … > 0   [à écrire : h(3) = ln(3)]
+    5. h est continue sur [1 ; 3] et change de signe : par le TVI, il existe c ∈ ]1 ; 3[ tel que h(c) = 0. L'équation a une solution dans ]1 ; 3[.
+
+Montre que l'équation ln(x) = 4 − x a une solution dans ]1 ; 4[. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame]
+    ? Sur quel segment, et avec quelle fonction, appliques-tu le TVI ? · h(x) = ln(x) + x − 4 sur [4 ; 5] / · h(x) = ln(x) + x − 4 sur [0 ; 4] / ✔ h(x) = ln(x) + x − 4 sur [1 ; 4]
+    1. Soit h(x) = ln(x) + x − 4.
+    2. h est continue sur [1 ; 4] (ln est continue sur ]0 ; +∞[).
+    3. h(1) = … < 0   [à écrire : h(1) = -3]
+    4. h(4) = … > 0   [à écrire : h(4) = ln(4)]
+    5. h est continue sur [1 ; 4] et change de signe : par le TVI, il existe c ∈ ]1 ; 4[ tel que h(c) = 0. L'équation a une solution dans ]1 ; 4[.
+
+Montre que l'équation cos(x) = x a une solution dans ]0 ; π/2[. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame]
+    ? Sur quel segment, et avec quelle fonction, appliques-tu le TVI ? · h(x) = cos(x) − x sur [π/2 ; π] / ✔ h(x) = cos(x) − x sur [0 ; π/2] / · h(x) = cos(x) + x sur [0 ; π/2]
+    1. Soit h(x) = cos(x) − x : cos c = c ⇔ h(c) = 0.
+    2. h est continue sur [0 ; π/2] (somme de fonctions continues).
+    3. h(0) = … > 0   [à écrire : h(0) = 1]
+    4. h(π/2) = … < 0   [à écrire : h(π/2) = -π/2]
+    5. h est continue sur [0 ; π/2] et change de signe : par le TVI, il existe c ∈ ]0 ; π/2[ tel que h(c) = 0. L'équation a une solution dans ]0 ; π/2[.
+
+```
+
+### Niveau 3
+
+```
+Montre que l'équation ln(x) = 3 − x a une solution dans ]1 ; 3[. Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    1. Soit h(x) = ln(x) + x − 3.
+    2. h est continue sur [1 ; 3] (ln est continue sur ]0 ; +∞[).
+    3. h(1) = −2 < 0
+    4. h(3) = ln(3) > 0
+    5. h est continue sur [1 ; 3] et change de signe : par le TVI, il existe c ∈ ]1 ; 3[ tel que h(c) = 0. L'équation a une solution dans ]1 ; 3[.
+    ✗ On calcule h en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+    ✗ Par le théorème de Rolle, il existe c avec h′(c) = 0. [a1_rolle_without_hyp]
+  pièges : g9_proof_by_example, a1_rolle_without_hyp
+
+Soit f : [−1 ; 3] → [0 ; 1] continue. Montre qu'il existe x ∈ [0 ; 1] tel que f(x) = x. Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    1. Soit g(x) = f(x) − x, définie sur [−1 ; 3], qui contient [0 ; 1] : f(x) = x ⇔ g(x) = 0.
+    2. g est continue sur [0 ; 1] (différence de deux fonctions continues).
+    3. g(0) = f(0) ≥ 0, car f(0) ∈ [0 ; 1]
+    4. g(1) = f(1) − 1 ≤ 0, car f(1) ≤ 1
+    5. Par le TVI (si g(0) = 0 ou g(1) = 0, c'est déjà fini), g s'annule sur [0 ; 1] : il existe x ∈ [0 ; 1] tel que f(x) = x.
+    ✗ On calcule g en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+    ✗ g(0) et g(1) sont de signes contraires, donc g s'annule : pas besoin de continuité. [a1_ivt_no_continuity]
+  pièges : g9_proof_by_example, a1_ivt_no_continuity
+
+Montre que l'équation ln(x) = 4 − x a une solution dans ]1 ; 4[. Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    1. Soit h(x) = ln(x) + x − 4.
+    2. h est continue sur [1 ; 4] (ln est continue sur ]0 ; +∞[).
+    3. h(1) = −3 < 0
+    4. h(4) = ln(4) > 0
+    5. h est continue sur [1 ; 4] et change de signe : par le TVI, il existe c ∈ ]1 ; 4[ tel que h(c) = 0. L'équation a une solution dans ]1 ; 4[.
+    ✗ On calcule h en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+    ✗ Par le théorème de Rolle, il existe c avec h′(c) = 0. [a1_rolle_without_hyp]
+  pièges : g9_proof_by_example, a1_rolle_without_hyp
+
+```
+
+### Niveau 4
+
+```
+Soit f : [−3 ; 1] → [0 ; 1] continue. Montre qu'il existe x ∈ [0 ; 1] tel que f(x) = x. Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    1. Soit g(x) = f(x) − x, définie sur [−3 ; 1], qui contient [0 ; 1] : f(x) = x ⇔ g(x) = 0.
+    2. g est continue sur [0 ; 1] (différence de deux fonctions continues).
+    3. g(0) = f(0) ≥ 0, car f(0) ∈ [0 ; 1]
+    4. g(1) = f(1) − 1 ≤ 0, car f(1) ≤ 1
+    5. Par le TVI (si g(0) = 0 ou g(1) = 0, c'est déjà fini), g s'annule sur [0 ; 1] : il existe x ∈ [0 ; 1] tel que f(x) = x.
+    ✗ On calcule g en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+    ✗ Par le théorème de Rolle, il existe c avec g′(c) = 0. [a1_rolle_without_hyp]
+    ✗ g(0) et g(1) sont de signes contraires, donc g s'annule : pas besoin de continuité. [a1_ivt_no_continuity]
+  pièges : g9_proof_by_example, a1_rolle_without_hyp, a1_ivt_no_continuity
+
+Montre que l'équation x³ − x² − 7 = 0 a au moins une solution réelle. Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    1. Soit P(x) = x³ − x² − 7, polynôme de degré 3 (impair).
+    2. P est continue sur ℝ (polynôme).
+    3. lim_{x→−∞} P(x) = −∞ : il existe a avec P(a) < 0
+    4. lim_{x→+∞} P(x) = +∞ : il existe b > a avec P(b) > 0
+    5. Par le TVI sur [a ; b], P s'annule : l'équation a une solution réelle.
+    ✗ Par le théorème de Rolle, il existe c avec P′(c) = 0. [a1_rolle_without_hyp]
+    ✗ On calcule P en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+    ✗ P(a) et P(b) sont de signes contraires, donc P s'annule : pas besoin de continuité. [a1_ivt_no_continuity]
+  pièges : a1_rolle_without_hyp, g9_proof_by_example, a1_ivt_no_continuity
+
+Montre que l'équation e^(−x) = x a une solution dans ]0 ; 1[, et qu'elle est unique. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame]
+    1. Soit h(x) = e^(−x) − x.
+    2. h est continue sur [0 ; 1] (somme de fonctions continues).
+    3. h(0) = … > 0   [à écrire : h(0) = 1]
+    4. h(1) = … < 0   [à écrire : h(1) = e^(-1)-1]
+    5. h est continue sur [0 ; 1] et change de signe : par le TVI, il existe c ∈ ]0 ; 1[ tel que h(c) = 0. L'équation a une solution dans ]0 ; 1[.
+    6. h′(x) = …, de signe constant sur [0 ; 1] : h est strictement décroissante, la solution est unique.   [à écrire : h′(x) = -e^(-x)-1]
+    ✗ Par le théorème de Rolle, il existe c avec h′(c) = 0. [a1_rolle_without_hyp]
+    ✗ h(0) et h(1) sont de signes contraires, donc h s'annule : pas besoin de continuité. [a1_ivt_no_continuity]
+    ✗ On calcule h en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+  pièges : a1_rolle_without_hyp, a1_ivt_no_continuity, g9_proof_by_example
+
+```
+
+### Niveau 5
+
+```
+Montre que l'équation x⁷ + 8x − 5 = 0 a une solution dans ]0 ; 1[, et qu'elle est unique. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame, sans aide]
+    1. Soit f(x) = x⁷ + 8x − 5.
+    2. f est continue sur [0 ; 1] (polynôme).
+    3. f(0) = … < 0   [à écrire : f(0) = -5]
+    4. f(1) = … > 0   [à écrire : f(1) = 4]
+    5. f est continue sur [0 ; 1] et change de signe : par le TVI, il existe c ∈ ]0 ; 1[ tel que f(c) = 0. L'équation a une solution dans ]0 ; 1[.
+    6. f′(x) = 7x⁶ + 8, de signe constant sur [0 ; 1] : f est strictement croissante, la solution est unique.
+    ✗ On calcule f en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+    ✗ f(0) et f(1) sont de signes contraires, donc f s'annule : pas besoin de continuité. [a1_ivt_no_continuity]
+    ✗ Par le théorème de Rolle, il existe c avec f′(c) = 0. [a1_rolle_without_hyp]
+  pièges : g9_proof_by_example, a1_ivt_no_continuity, a1_rolle_without_hyp
+
+Montre que l'équation x³ − 3x − 2 = 0 a au moins une solution réelle. Touche les blocs dans l'ordre de la preuve.
+  [blocs order, sans aide]
+    1. Soit P(x) = x³ − 3x − 2, polynôme de degré 3 (impair).
+    2. P est continue sur ℝ (polynôme).
+    3. lim_{x→−∞} P(x) = −∞ : il existe a avec P(a) < 0
+    4. lim_{x→+∞} P(x) = +∞ : il existe b > a avec P(b) > 0
+    5. Par le TVI sur [a ; b], P s'annule : l'équation a une solution réelle.
+    ✗ P(a) et P(b) sont de signes contraires, donc P s'annule : pas besoin de continuité. [a1_ivt_no_continuity]
+    ✗ Par le théorème de Rolle, il existe c avec P′(c) = 0. [a1_rolle_without_hyp]
+    ✗ On calcule P en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+  pièges : a1_ivt_no_continuity, a1_rolle_without_hyp, g9_proof_by_example
+
+Montre que l'équation e^(−x) = 2x a une solution dans ]0 ; 1[, et qu'elle est unique. Touche les blocs dans l'ordre de la preuve et complète les calculs.
+  [blocs frame, sans aide]
+    1. Soit h(x) = e^(−x) − 2x.
+    2. h est continue sur [0 ; 1] (somme de fonctions continues).
+    3. h(0) = … > 0   [à écrire : h(0) = 1]
+    4. h(1) = … < 0   [à écrire : h(1) = e^(-1)-2]
+    5. h est continue sur [0 ; 1] et change de signe : par le TVI, il existe c ∈ ]0 ; 1[ tel que h(c) = 0. L'équation a une solution dans ]0 ; 1[.
+    6. h′(x) = −e^(−x) − 2, de signe constant sur [0 ; 1] : h est strictement décroissante, la solution est unique.
+    ✗ Par le théorème de Rolle, il existe c avec h′(c) = 0. [a1_rolle_without_hyp]
+    ✗ On calcule h en quelques points : la valeur au milieu est proche de 0, donc c'est la solution. [g9_proof_by_example]
+    ✗ h(0) et h(1) sont de signes contraires, donc h s'annule : pas besoin de continuité. [a1_ivt_no_continuity]
+  pièges : a1_rolle_without_hyp, g9_proof_by_example, a1_ivt_no_continuity
+
+```
+
+### Variantes d'examen
+
+```
+Vrai ou faux ?
+  « Il existe une fonction f continue et bijective de ]−1 ; 1[ sur ℝ. » → VRAI
+  [examen tf]
+
+```
+
+## Image d'un intervalle par une fonction continue (`a1-fn-image`, BA1)
+
+_Sur un segment : [min ; max], cherchés aux bornes et là où f′ = 0._
+
+### Niveau 1
+
+```
+Soit f(x) = e^x·cos(x) sur [0 ; π/2]. Détermine l'image f([0 ; π/2]). On donne f′(x) = e^x(cos(x) − sin(x)).
+  [guided]  e^x(cos(x) − sin(x)) = 0
+    = cos(x) − sin(x) = 0   ← eˣ > 0 : on simplifie
+    = x = □   (trous : x = π/4)   ← Zéros dans [0 ; π/2]
+  — Image : f est continue sur [0 ; π/2], son image est [min ; max] des valeurs aux bornes et aux points critiques (0, π/4, π/2).  [juge solset]  départ : min(f(0),f(π/4),f(π/2)) ≤ y ≤ max(f(0),f(π/4),f(π/2))
+    = min(1,□,0) ≤ y ≤ max(1,(√2/2)e^(π/4),0)   (trous : min(1,(√2/2)e^(π/4),0) ≤ y ≤ max(1,(√2/2)e^(π/4),0))   ← Valeurs aux candidats
+    = 0 ≤ y ≤ (√2/2)e^(π/4)   ← Min et max
+    = [□ ; (√2/2)e^(π/4)]   (trous : [0 ; (√2/2)e^(π/4)])   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = e^x(cos(x) − sin(x)) = 0 ⇔ x = π/4 ; puis f(0), f(π/4), f(π/2). | max = (√2/2)e^(π/4) (en π/4), min = 0 (en π/2).
+
+Soit f(x) = −2x³ + 9x² − 12x + 1 sur [1 ; 3]. Détermine l'image f([1 ; 3]). On donne f′(x) = −6x² + 18x − 12.
+  [guided]  −6x² + 18x − 12 = 0
+    = x² − 3x + 2 = 0   ← Diviser par 6
+    = x = 1 ou x = □   (trous : x = 1 ou x = 2)   ← Zéros dans [1 ; 3]
+  — Image : f est continue sur [1 ; 3], son image est [min ; max] des valeurs aux bornes et aux points critiques (1, 2, 3).  [juge solset]  départ : min(f(1),f(2),f(3)) ≤ y ≤ max(f(1),f(2),f(3))
+    = min(−4,□,−8) ≤ y ≤ max(−4,−3,−8)   (trous : min(−4,−3,−8) ≤ y ≤ max(−4,−3,−8))   ← Valeurs aux candidats
+    = −8 ≤ y ≤ −3   ← Min et max
+    = [□ ; −3]   (trous : [−8 ; −3])   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = −6x² + 18x − 12 = 0 ⇔ x = 1 ou x = 2 ; puis f(1), f(2), f(3). | max = −3 (en 2), min = −8 (en 3).
+
+Soit f(x) = e^x·sin(x) sur [0 ; π]. Détermine l'image f([0 ; π]). On donne f′(x) = e^x(sin(x) + cos(x)).
+  [guided]  e^x(sin(x) + cos(x)) = 0
+    = sin(x) + cos(x) = 0   ← eˣ > 0 : on simplifie
+    = x = □   (trous : x = 3π/4)   ← Zéros dans [0 ; π]
+  — Image : f est continue sur [0 ; π], son image est [min ; max] des valeurs aux bornes et aux points critiques (0, 3π/4, π).  [juge solset]  départ : min(f(0),f(3π/4),f(π)) ≤ y ≤ max(f(0),f(3π/4),f(π))
+    = min(0,□,0) ≤ y ≤ max(0,(√2/2)e^(3π/4),0)   (trous : min(0,(√2/2)e^(3π/4),0) ≤ y ≤ max(0,(√2/2)e^(3π/4),0))   ← Valeurs aux candidats
+    = 0 ≤ y ≤ (√2/2)e^(3π/4)   ← Min et max
+    = [□ ; (√2/2)e^(3π/4)]   (trous : [0 ; (√2/2)e^(3π/4)])   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = e^x(sin(x) + cos(x)) = 0 ⇔ x = 3π/4 ; puis f(0), f(3π/4), f(π). | max = (√2/2)e^(3π/4) (en 3π/4), min = 0 (en 0).
+
+```
+
+### Niveau 2
+
+```
+Soit f(x) = −2x³ − 9x² − 12x − 1 sur [−4 ; −1]. Détermine l'image f([−4 ; −1]). Les candidats sont −4, −2, −1.
+  [guided]  (−2x³ − 9x² − 12x − 1)′
+    = −6x² − 18x − 12   ← Dériver
+  — Image : f est continue sur [−4 ; −1], son image est [min ; max] des valeurs aux bornes et aux points critiques (−4, −2, −1).  [juge solset]  départ : min(f(−4),f(−2),f(−1)) ≤ y ≤ max(f(−4),f(−2),f(−1))
+    = min(31,3,4) ≤ y ≤ max(31,3,4)   ← Valeurs aux candidats
+    = 3 ≤ y ≤ 31   ← Min et max
+    = [□ ; 31]   (trous : [3 ; 31])   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = −6x² − 18x − 12 = 0 ⇔ x = −2 ou x = −1 ; puis f(−4), f(−2), f(−1). | max = 31 (en −4), min = 3 (en −2).
+
+Soit f(x) = −2x³ + 9x² − 6 sur [0 ; 4]. Détermine l'image f([0 ; 4]). Les candidats sont 0, 3, 4.
+  [guided]  (−2x³ + 9x² − 6)′
+    = −6x² + 18x   ← Dériver
+  — Image : f est continue sur [0 ; 4], son image est [min ; max] des valeurs aux bornes et aux points critiques (0, 3, 4).  [juge solset]  départ : min(f(0),f(3),f(4)) ≤ y ≤ max(f(0),f(3),f(4))
+    = min(−6,21,10) ≤ y ≤ max(−6,21,10)   ← Valeurs aux candidats
+    = −6 ≤ y ≤ 21   ← Min et max
+    = [□ ; 21]   (trous : [−6 ; 21])   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = −6x² + 18x = 0 ⇔ x = 0 ou x = 3 ; puis f(0), f(3), f(4). | max = 21 (en 3), min = −6 (en 0).
+
+Soit f(x) = −2x³ + 9x² − 12x sur [−1 ; 2]. Détermine l'image f([−1 ; 2]). Les candidats sont −1, 1, 2.
+  [guided]  (−2x³ + 9x² − 12x)′
+    = −6x² + 18x − 12   ← Dériver
+  — Image : f est continue sur [−1 ; 2], son image est [min ; max] des valeurs aux bornes et aux points critiques (−1, 1, 2).  [juge solset]  départ : min(f(−1),f(1),f(2)) ≤ y ≤ max(f(−1),f(1),f(2))
+    = min(23,−5,−4) ≤ y ≤ max(23,−5,−4)   ← Valeurs aux candidats
+    = −5 ≤ y ≤ 23   ← Min et max
+    = [□ ; 23]   (trous : [−5 ; 23])   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = −6x² + 18x − 12 = 0 ⇔ x = 1 ou x = 2 ; puis f(−1), f(1), f(2). | max = 23 (en −1), min = −5 (en 1).
+
+```
+
+### Niveau 3
+
+```
+Soit f(x) = 2x³ + 3x² − 12x − 8 sur [−2 ; 2]. Détermine l'image f([−2 ; 2]).
+  [tap, suivre l'erreur, menu steps]  (2x³ + 3x² − 12x − 8)′
+    = 6x² + 6x − 12   ← Dériver
+  — Points critiques : f′(x) = 0 sur [−2 ; 2].  [juge solset]  départ : 6x² + 6x − 12 = 0
+    = x² + x − 2 = 0   ← Diviser par 6
+    = x = −2 ou x = 1   ← Zéros dans [−2 ; 2]
+  — Image : f est continue sur [−2 ; 2], son image est [min ; max] des valeurs aux bornes et aux points critiques (−2, 1, 2).  [juge solset]  départ : min(f(−2),f(1),f(2)) ≤ y ≤ max(f(−2),f(1),f(2))
+    = min(12,−15,−4) ≤ y ≤ max(12,−15,−4)   ← Valeurs aux candidats
+    = −15 ≤ y ≤ 12   ← Min et max
+    = [−15 ; 12]   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = 6x² + 6x − 12 = 0 ⇔ x = −2 ou x = 1 ; puis f(−2), f(1), f(2). | max = 12 (en −2), min = −15 (en 1).
+
+Soit f(x) = e^x·cos(x) sur [0 ; π/2]. Détermine l'image f([0 ; π/2]).
+  [tap, suivre l'erreur, menu steps]  (e^x·cos(x))′
+    = e^x(cos(x) − sin(x))   ← Dériver
+  — Points critiques : f′(x) = 0 sur [0 ; π/2].  [juge solset]  départ : e^x(cos(x) − sin(x)) = 0
+    = cos(x) − sin(x) = 0   ← eˣ > 0 : on simplifie
+    = x = π/4   ← Zéros dans [0 ; π/2]
+  — Image : f est continue sur [0 ; π/2], son image est [min ; max] des valeurs aux bornes et aux points critiques (0, π/4, π/2).  [juge solset]  départ : min(f(0),f(π/4),f(π/2)) ≤ y ≤ max(f(0),f(π/4),f(π/2))
+    = min(1,(√2/2)e^(π/4),0) ≤ y ≤ max(1,(√2/2)e^(π/4),0)   ← Valeurs aux candidats
+    = 0 ≤ y ≤ (√2/2)e^(π/4)   ← Min et max
+    = [0 ; (√2/2)e^(π/4)]   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = e^x(cos(x) − sin(x)) = 0 ⇔ x = π/4 ; puis f(0), f(π/4), f(π/2). | max = (√2/2)e^(π/4) (en π/4), min = 0 (en π/2).
+  pièges : g6_product_naive
+
+Soit f(x) = 2x³ − 6x + 7 sur [−1 ; 2]. Détermine l'image f([−1 ; 2]).
+  [tap, suivre l'erreur, menu steps]  (2x³ − 6x + 7)′
+    = 6x² − 6   ← Dériver
+  — Points critiques : f′(x) = 0 sur [−1 ; 2].  [juge solset]  départ : 6x² − 6 = 0
+    = x² − 1 = 0   ← Diviser par 6
+    = x = −1 ou x = 1   ← Zéros dans [−1 ; 2]
+  — Image : f est continue sur [−1 ; 2], son image est [min ; max] des valeurs aux bornes et aux points critiques (−1, 1, 2).  [juge solset]  départ : min(f(−1),f(1),f(2)) ≤ y ≤ max(f(−1),f(1),f(2))
+    = min(11,3,11) ≤ y ≤ max(11,3,11)   ← Valeurs aux candidats
+    = 3 ≤ y ≤ 11   ← Min et max
+    = [3 ; 11]   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = 6x² − 6 = 0 ⇔ x = −1 ou x = 1 ; puis f(−1), f(1), f(2). | max = 11 (en −1), min = 3 (en 1).
+
+```
+
+### Niveau 4
+
+```
+Soit f(x) = e^(−x)·cos(x) sur [0 ; π]. Détermine l'image f([0 ; π]).
+  [free, suivre l'erreur]  (e^(−x)·cos(x))′
+    = −e^(−x)(sin(x) + cos(x))   ← Dériver
+  — Points critiques : f′(x) = 0 sur [0 ; π].  [juge solset]  départ : −e^(−x)(sin(x) + cos(x)) = 0
+    = sin(x) + cos(x) = 0   ← e^(−x) > 0 : on simplifie
+    = x = 3π/4   ← Zéros dans [0 ; π]
+  — Image : f est continue sur [0 ; π], son image est [min ; max] des valeurs aux bornes et aux points critiques (0, 3π/4, π).  [juge solset]  départ : min(f(0),f(3π/4),f(π)) ≤ y ≤ max(f(0),f(3π/4),f(π))
+    = min(1,−(√2/2)e^(−3π/4),−e^(−π)) ≤ y ≤ max(1,−(√2/2)e^(−3π/4),−e^(−π))   ← Valeurs aux candidats
+    = −(√2/2)e^(−3π/4) ≤ y ≤ 1   ← Min et max
+    = [−(√2/2)e^(−3π/4) ; 1]   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = −e^(−x)(sin(x) + cos(x)) = 0 ⇔ x = 3π/4 ; puis f(0), f(3π/4), f(π). | max = 1 (en 0), min = −(√2/2)e^(−3π/4) (en 3π/4).
+  pièges : g6_product_naive, g6_chain_forgot
+
+Soit f(x) = e^x·cos(x) sur [0 ; π]. Détermine l'image f([0 ; π]).
+  [free, suivre l'erreur]  (e^x·cos(x))′
+    = e^x(cos(x) − sin(x))   ← Dériver
+  — Points critiques : f′(x) = 0 sur [0 ; π].  [juge solset]  départ : e^x(cos(x) − sin(x)) = 0
+    = cos(x) − sin(x) = 0   ← eˣ > 0 : on simplifie
+    = x = π/4   ← Zéros dans [0 ; π]
+  — Image : f est continue sur [0 ; π], son image est [min ; max] des valeurs aux bornes et aux points critiques (0, π/4, π).  [juge solset]  départ : min(f(0),f(π/4),f(π)) ≤ y ≤ max(f(0),f(π/4),f(π))
+    = min(1,(√2/2)e^(π/4),−e^π) ≤ y ≤ max(1,(√2/2)e^(π/4),−e^π)   ← Valeurs aux candidats
+    = −e^π ≤ y ≤ (√2/2)e^(π/4)   ← Min et max
+    = [−e^π ; (√2/2)e^(π/4)]   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = e^x(cos(x) − sin(x)) = 0 ⇔ x = π/4 ; puis f(0), f(π/4), f(π). | max = (√2/2)e^(π/4) (en π/4), min = −e^π (en π).
+  pièges : g6_product_naive
+
+Soit f(x) = e^x·sin(x) sur [0 ; π]. Détermine l'image f([0 ; π]).
+  [free, suivre l'erreur]  (e^x·sin(x))′
+    = e^x(sin(x) + cos(x))   ← Dériver
+  — Points critiques : f′(x) = 0 sur [0 ; π].  [juge solset]  départ : e^x(sin(x) + cos(x)) = 0
+    = sin(x) + cos(x) = 0   ← eˣ > 0 : on simplifie
+    = x = 3π/4   ← Zéros dans [0 ; π]
+  — Image : f est continue sur [0 ; π], son image est [min ; max] des valeurs aux bornes et aux points critiques (0, 3π/4, π).  [juge solset]  départ : min(f(0),f(3π/4),f(π)) ≤ y ≤ max(f(0),f(3π/4),f(π))
+    = min(0,(√2/2)e^(3π/4),0) ≤ y ≤ max(0,(√2/2)e^(3π/4),0)   ← Valeurs aux candidats
+    = 0 ≤ y ≤ (√2/2)e^(3π/4)   ← Min et max
+    = [0 ; (√2/2)e^(3π/4)]   ← L'image est un segment
+  aides : Continue sur un segment : l'image est [min ; max]. Cherche-les aux bornes et là où f′ = 0. | f′(x) = e^x(sin(x) + cos(x)) = 0 ⇔ x = 3π/4 ; puis f(0), f(3π/4), f(π). | max = (√2/2)e^(3π/4) (en 3π/4), min = 0 (en 0).
+  pièges : g6_product_naive
+
+```
+
+### Niveau 5
+
+```
+Soit f(x) = −2x³ + 9x² + 1. L'image f([−1 ; 4]) est :
+  · [12 ; 17] [a1_image_endpoints_only]   · [1 ; 28[   ✔ [1 ; 28]   · ]1 ; 28[
+  pièges : a1_image_endpoints_only
+
+Soit f(x) = 2x³ − 18x² + 48x − 9. L'image f([2 ; 5]) est :
+  ✔ [23 ; 31]   · [23 ; 31[   · ]23 ; 31[   · [31 ; 31] [a1_image_endpoints_only]
+  pièges : a1_image_endpoints_only
+
+Soit f(x) = −2x³ + 9x² − 2. L'image f([−1 ; 3]) est :
+  · [9 ; 25] [a1_image_endpoints_only]   ✔ [−2 ; 25]   · ]−2 ; 25[   · [−2 ; 25[
+  pièges : a1_image_endpoints_only
+
+```
+
+### Variantes d'examen
+
+```
+Soit f(x) = sin(Arctg(√x)) sur [3 ; +∞[. L'image f([3 ; +∞[) est :
+  · [0 ; 1]   ✔ [√3/2 ; 1[   · ]√3/2 ; 1[   · [√3/2 ; 1]
+  [examen mcq]
+
+Vrai ou faux ?
+  « Soit f(x) = −2x³ + 9x² − 12x + 8. Alors f([0 ; 2]) = [4 ; 8]. » → FAUX
+    contre-exemple (refute) : x = 1
+  [examen tf]
+  pièges : a1_image_endpoints_only
+
+```
+
+## Bissection et méthode du point fixe (cours MT) (`a1-bisection-fixpoint`, BA1)
+
+_Garder la moitié où f change de signe ; g contractante._
+
+### Niveau 1
+
+```
+Bissection pour f(x) = x³ + 3x − 9 sur [1 ; 2] : f(1) = −5 < 0 et f(2) = 5 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe (f(m) est donné). Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        1  2  1,5  −1,125
+    2        (1,5)  (2)  1,75  1,6094
+    3        (1,5)  (1,75)  1,625  0,166
+
+Bissection pour f(x) = x³ + x − 7 sur [1 ; 2] : f(1) = −5 < 0 et f(2) = 3 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe (f(m) est donné). Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        1  2  1,5  −2,125
+    2        (1,5)  (2)  1,75  0,1094
+    3        (1,5)  (1,75)  1,625  −1,084
+
+Bissection pour f(x) = x³ + 5x − 5 sur [0 ; 1] : f(0) = −5 < 0 et f(1) = 1 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe (f(m) est donné). Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        0  1  0,5  −2,375
+    2        (0,5)  (1)  0,75  −0,8281
+    3        (0,75)  (1)  0,875  0,0449
+
+```
+
+### Niveau 2
+
+```
+Bissection pour f(x) = x³ + 3x − 6 sur [1 ; 2] : f(1) = −2 < 0 et f(2) = 8 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe (f(m) est donné). Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        1  2  1,5  1,875
+    2        (1)  (1,5)  (1,25)  −0,2969
+    3        (1,25)  (1,5)  (1,375)  0,7246
+    4        (1,25)  (1,375)  (1,3125)  0,1985
+
+Bissection pour f(x) = x³ + x² + 4x − 1 sur [0 ; 1] : f(0) = −1 < 0 et f(1) = 5 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe (f(m) est donné). Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        0  1  0,5  1,375
+    2        (0)  (0,5)  (0,25)  0,0781
+    3        (0)  (0,25)  (0,125)  −0,4824
+    4        (0,125)  (0,25)  (0,1875)  −0,2083
+
+Bissection pour f(x) = x³ + 4x − 4 sur [0 ; 1] : f(0) = −4 < 0 et f(1) = 1 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe (f(m) est donné). Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        0  1  0,5  −1,875
+    2        (0,5)  (1)  (0,75)  −0,5781
+    3        (0,75)  (1)  (0,875)  0,1699
+    4        (0,75)  (0,875)  (0,8125)  −0,2136
+
+```
+
+### Niveau 3
+
+```
+Bissection pour f(x) = x³ + 2x − 6 sur [1 ; 2] : f(1) = −3 < 0, f(2) = 6 > 0. Précision voulue : un intervalle de longueur ≤ 0,125. À chaque étape, choisis la moitié, puis écris son milieu.
+  [tap, suivre l'erreur]  m_1
+    = 1,5   ← m₁ = (1 + 2)/2
+  — Étape 2  [juge value]  départ : m_2
+    ? f(1,5) = 0,375 : quelle moitié gardes-tu ? ✔ Garder [1 ; 1,5] / · Garder [1,5 ; 2] / · Arrêter
+    = 1,25   ← Milieu de la moitié gardée
+  — Étape 3  [juge value]  départ : m_3
+    ? f(1,25) ≈ −1,5469 : quelle moitié gardes-tu ? · Garder [1 ; 1,25] / ✔ Garder [1,25 ; 1,5] / · Arrêter
+    = 1,375   ← Milieu de la moitié gardée
+  — Fin  [juge value]  départ : c
+    ? f(1,375) ≈ −0,6504 : quelle moitié gardes-tu ? · Garder [1,25 ; 1,375] / ✔ Garder [1,375 ; 1,5] / · Arrêter
+    ? La moitié gardée mesure 0,125. Continuer ou arrêter ? ✔ Arrêter : son milieu approche la racine à 0,0625 près / · Continuer
+    = 1,4375   ← Milieu de [1,375 ; 1,5]
+  aides : Garde la moitié où f change de signe : compare le signe de f(m) à ceux de f(a) et f(b). | m₂ est le milieu de la moitié gardée : (a + b)/2 = ▢. | m₁ = 1,5, m₂ = 1,25, m₃ = 1,375, puis c ≈ 1,4375.
+
+Bissection pour f(x) = x³ + 4x − 9 sur [1 ; 2] : f(1) = −4 < 0, f(2) = 7 > 0. Précision voulue : un intervalle de longueur ≤ 0,125. À chaque étape, choisis la moitié, puis écris son milieu.
+  [tap, suivre l'erreur]  m_1
+    = 1,5   ← m₁ = (1 + 2)/2
+  — Étape 2  [juge value]  départ : m_2
+    ? f(1,5) = 0,375 : quelle moitié gardes-tu ? ✔ Garder [1 ; 1,5] / · Garder [1,5 ; 2] / · Arrêter
+    = 1,25   ← Milieu de la moitié gardée
+  — Étape 3  [juge value]  départ : m_3
+    ? f(1,25) ≈ −2,0469 : quelle moitié gardes-tu ? · Garder [1 ; 1,25] / ✔ Garder [1,25 ; 1,5] / · Arrêter
+    = 1,375   ← Milieu de la moitié gardée
+  — Fin  [juge value]  départ : c
+    ? f(1,375) ≈ −0,9004 : quelle moitié gardes-tu ? · Garder [1,25 ; 1,375] / ✔ Garder [1,375 ; 1,5] / · Arrêter
+    ? La moitié gardée mesure 0,125. Continuer ou arrêter ? ✔ Arrêter : son milieu approche la racine à 0,0625 près / · Continuer
+    = 1,4375   ← Milieu de [1,375 ; 1,5]
+  aides : Garde la moitié où f change de signe : compare le signe de f(m) à ceux de f(a) et f(b). | m₂ est le milieu de la moitié gardée : (a + b)/2 = ▢. | m₁ = 1,5, m₂ = 1,25, m₃ = 1,375, puis c ≈ 1,4375.
+
+Bissection pour f(x) = x³ + 6x − 2 sur [0 ; 1] : f(0) = −2 < 0, f(1) = 5 > 0. Précision voulue : un intervalle de longueur ≤ 0,125. À chaque étape, choisis la moitié, puis écris son milieu.
+  [tap, suivre l'erreur]  m_1
+    = 0,5   ← m₁ = (0 + 1)/2
+  — Étape 2  [juge value]  départ : m_2
+    ? f(0,5) = 1,125 : quelle moitié gardes-tu ? ✔ Garder [0 ; 0,5] / · Garder [0,5 ; 1] / · Arrêter
+    = 0,25   ← Milieu de la moitié gardée
+  — Étape 3  [juge value]  départ : m_3
+    ? f(0,25) ≈ −0,4844 : quelle moitié gardes-tu ? · Garder [0 ; 0,25] / ✔ Garder [0,25 ; 0,5] / · Arrêter
+    = 0,375   ← Milieu de la moitié gardée
+  — Fin  [juge value]  départ : c
+    ? f(0,375) ≈ 0,3027 : quelle moitié gardes-tu ? ✔ Garder [0,25 ; 0,375] / · Garder [0,375 ; 0,5] / · Arrêter
+    ? La moitié gardée mesure 0,125. Continuer ou arrêter ? ✔ Arrêter : son milieu approche la racine à 0,0625 près / · Continuer
+    = 0,3125   ← Milieu de [0,25 ; 0,375]
+  aides : Garde la moitié où f change de signe : compare le signe de f(m) à ceux de f(a) et f(b). | m₂ est le milieu de la moitié gardée : (a + b)/2 = ▢. | m₁ = 0,5, m₂ = 0,25, m₃ = 0,375, puis c ≈ 0,3125.
+
+```
+
+### Niveau 4
+
+```
+Bissection pour f(x) = x³ + x² + 6x − 2 sur [0 ; 1] : f(0) = −2 < 0 et f(1) = 6 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe. Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        0  1  (0,5)  (1,375)
+    2        (0)  (0,5)  (0,25)  (-0,4219)
+    3        (0,25)  (0,5)  (0,375)  (0,4434)
+    4        (0,25)  (0,375)  (0,3125)  (0,0032)
+  puis : Après n étapes, l'erreur est au plus (b − a)/2ⁿ = 1/2ⁿ. Combien d'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻³ ? n =
+      → 10   pièges attendus : 3 [a1_bisection_count]
+      pièges : a1_bisection_count
+  pièges : a1_bisection_count
+
+Bissection pour f(x) = x³ + 4x − 7 sur [1 ; 2] : f(1) = −2 < 0 et f(2) = 9 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe. Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        1  2  (1,5)  (2,375)
+    2        (1)  (1,5)  (1,25)  (-0,0469)
+    3        (1,25)  (1,5)  (1,375)  (1,0996)
+    4        (1,25)  (1,375)  (1,3125)  (0,511)
+  puis : Après n étapes, l'erreur est au plus (b − a)/2ⁿ = 1/2ⁿ. Combien d'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻⁴ ? n =
+      → 14   pièges attendus : 4 [a1_bisection_count]
+      pièges : a1_bisection_count
+  pièges : a1_bisection_count
+
+Bissection pour f(x) = x³ + 2x − 2 sur [0 ; 1] : f(0) = −2 < 0 et f(1) = 1 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe. Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        0  1  (0,5)  (-0,875)
+    2        (0,5)  (1)  (0,75)  (-0,0781)
+    3        (0,75)  (1)  (0,875)  (0,4199)
+    4        (0,75)  (0,875)  (0,8125)  (0,1614)
+  puis : Après n étapes, l'erreur est au plus (b − a)/2ⁿ = 1/2ⁿ. Combien d'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻² ? n =
+      → 7   pièges attendus : 2 [a1_bisection_count]
+      pièges : a1_bisection_count
+  pièges : a1_bisection_count
+
+```
+
+### Niveau 5
+
+```
+Bissection pour f(x) = x³ + x − 3 sur [1 ; 2] : f(1) = −1 < 0 et f(2) = 7 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe. Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        1  2  (1,5)  (1,875)
+    2        (1)  (1,5)  (1,25)  (0,2031)
+    3        (1)  (1,25)  (1,125)  (-0,4512)
+  puis : Pour approcher la racine par xₙ₊₁ = g(xₙ), quelle fonction g est contractante sur [1 ; 2] (g([1 ; 2]) ⊂ [1 ; 2] et |g′| < 1) ?
+      ✔ g(x) = root(3,3−x)   · g(x) = 3/(x² + 1)   · g(x) = 3 − x³
+
+Bissection pour f(x) = x³ + x − 4 sur [1 ; 2] : f(1) = −2 < 0 et f(2) = 6 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe. Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        1  2  (1,5)  (0,875)
+    2        (1)  (1,5)  (1,25)  (-0,7969)
+    3        (1,25)  (1,5)  (1,375)  (-0,0254)
+  puis : Pour approcher la racine par xₙ₊₁ = g(xₙ), quelle fonction g est contractante sur [1 ; 2] (g([1 ; 2]) ⊂ [1 ; 2] et |g′| < 1) ?
+      ✔ g(x) = root(3,4−x)   · g(x) = 4 − x³   · g(x) = 4/(x² + 1)
+
+Bissection pour f(x) = x³ + 4x − 9 sur [1 ; 2] : f(1) = −4 < 0 et f(2) = 7 > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe. Arrondis f(m) à 10⁻⁴.
+  [tableau bisection]  colonnes : a | b | m = (a + b)/2 | f(m)
+    1        1  2  (1,5)  (0,375)
+    2        (1)  (1,5)  (1,25)  (-2,0469)
+    3        (1,25)  (1,5)  (1,375)  (-0,9004)
+  puis : Pour approcher la racine par xₙ₊₁ = g(xₙ), quelle fonction g est contractante sur [1 ; 2] (g([1 ; 2]) ⊂ [1 ; 2] et |g′| < 1) ?
+      · g(x) = (9 − x³)/4   · g(x) = root(3,9−4x)   ✔ g(x) = 9/(x² + 4)
+
+```
+
+### Variantes d'examen
+
+```
+On applique la bissection sur [1 ; 5]. Après n étapes, l'erreur est au plus (b − a)/2ⁿ. Combien d'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻⁴ ?
+  · n = 4 [a1_bisection_count]   ✔ n = 16   · n = 15   · n = 17
+  [examen mcq]
+  pièges : a1_bisection_count
+
+Vrai ou faux ?
+  « Après n étapes de bissection sur [0 ; 4], le zéro est à moins de 4/2ⁿ du milieu du dernier intervalle. » → VRAI
+  [examen tf]
+
+```
+
+## Rayon de convergence et domaine, bornes comprises (`a1-pow-domain`, BA1)
+
+_ρ par d'Alembert, R = 1/ρ, puis chaque borne à part._
+
+### Niveau 1
+
+```
+Domaine de convergence de Σ_{n=1}^{∞} 2^n/n·(x − 2)^n. On donne ρ = lim |aₙ₊₁/aₙ| = 2.
+  [guided]  R
+    = □   (trous : 1/2)   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x − 2| < 1/2
+    = □ < x < □   (trous : 3/2 < x < 5/2)   ← x₀ − R < x < x₀ + R
+    = ]3/2 ; 5/2[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = 3/2 et x = 5/2, puis le domaine D :  [juge solset]  départ : D
+    (En x = 5/2 : Σ 1/n diverge. En x = 3/2 : Σ (−1)^n/n converge (Leibniz), pas absolument.)
+    = [□ ; 5/2[   (trous : [3/2 ; 5/2[)   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes 2 ± R | ρ = 2, R = 1/2 ; domaine [3/2 ; 5/2[.
+
+Domaine de convergence de Σ_{n=1}^{∞} (−3)^n/2^n·(x − 1)^n. On donne ρ = lim |aₙ₊₁/aₙ| = 3/2.
+  [guided]  R
+    = □   (trous : 2/3)   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x − 1| < 2/3
+    = □ < x < □   (trous : 1/3 < x < 5/3)   ← x₀ − R < x < x₀ + R
+    = ]1/3 ; 5/3[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = 1/3 et x = 5/3, puis le domaine D :  [juge solset]  départ : D
+    (En x = 5/3 : Σ (−1)^n diverge. En x = 1/3 : Σ 1 diverge.)
+    = ]□ ; 5/3[   (trous : ]1/3 ; 5/3[)   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes 1 ± R | ρ = 3/2, R = 2/3 ; domaine ]1/3 ; 5/3[.
+
+Domaine de convergence de Σ_{n=1}^{∞} 2^n/n·(x + 2)^n. On donne ρ = lim |aₙ₊₁/aₙ| = 2.
+  [guided]  R
+    = □   (trous : 1/2)   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x + 2| < 1/2
+    = □ < x < □   (trous : −5/2 < x < −3/2)   ← x₀ − R < x < x₀ + R
+    = ]−5/2 ; −3/2[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −5/2 et x = −3/2, puis le domaine D :  [juge solset]  départ : D
+    (En x = −3/2 : Σ 1/n diverge. En x = −5/2 : Σ (−1)^n/n converge (Leibniz), pas absolument.)
+    = [□ ; −3/2[   (trous : [−5/2 ; −3/2[)   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes −2 ± R | ρ = 2, R = 1/2 ; domaine [−5/2 ; −3/2[.
+
+```
+
+### Niveau 2
+
+```
+Domaine de convergence de Σ_{n=1}^{∞} 2^n/√n·(x + 3)^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [guided]  |2^(n + 1)/√(n + 1)·√n/2^n|
+    = 2√(n/(n + 1))   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : 2√(n/(n + 1))
+    = 2   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 1/2   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x + 3| < 1/2
+    = −7/2 < x < −5/2   ← x₀ − R < x < x₀ + R
+    = ]−7/2 ; −5/2[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −7/2 et x = −5/2, puis le domaine D :  [juge solset]  départ : D
+    ? En x = −5/2, la série devient Σ 1/√n. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? En x = −7/2, la série devient Σ (−1)^n/√n. Nature ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère pour la borne x = −7/2 ? → Leibniz : série alternée, |uₙ| décroît vers 0
+    = [−7/2 ; −5/2[   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes −3 ± R | ρ = 2, R = 1/2 ; domaine [−7/2 ; −5/2[.
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+Domaine de convergence de Σ_{n=1}^{∞} 2^n/(√n·3^n)·x^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [guided]  |2^(n + 1)/(√(n + 1)·3^(n + 1))·(√n·3^n)/2^n|
+    = (2/3)√(n/(n + 1))   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : (2/3)√(n/(n + 1))
+    = 2/3   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 3/2   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x| < 3/2
+    = −3/2 < x < 3/2   ← x₀ − R < x < x₀ + R
+    = ]−3/2 ; 3/2[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −3/2 et x = 3/2, puis le domaine D :  [juge solset]  départ : D
+    ? En x = 3/2, la série devient Σ 1/√n. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? En x = −3/2, la série devient Σ (−1)^n/√n. Nature ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère pour la borne x = −3/2 ? → Leibniz : série alternée, |uₙ| décroît vers 0
+    = [−3/2 ; 3/2[   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes 0 ± R | ρ = 2/3, R = 3/2 ; domaine [−3/2 ; 3/2[.
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+Domaine de convergence de Σ_{n=1}^{∞} (−2)^n/(√n·3^n)·(x − 1)^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [guided]  |(−2)^(n + 1)/(√(n + 1)·3^(n + 1))·(√n·3^n)/(−2)^n|
+    = (2/3)√(n/(n + 1))   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : (2/3)√(n/(n + 1))
+    = 2/3   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 3/2   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x − 1| < 3/2
+    = −1/2 < x < 5/2   ← x₀ − R < x < x₀ + R
+    = ]−1/2 ; 5/2[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −1/2 et x = 5/2, puis le domaine D :  [juge solset]  départ : D
+    ? En x = 5/2, la série devient Σ (−1)^n/√n. Nature ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? En x = −1/2, la série devient Σ 1/√n. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère pour la borne x = −1/2 ? → Riemann : Σ 1/nᵅ converge ⇔ α > 1
+    = ]−1/2 ; 5/2]   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes 1 ± R | ρ = 2/3, R = 3/2 ; domaine ]−1/2 ; 5/2].
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+```
+
+### Niveau 3
+
+```
+Domaine de convergence de Σ_{n=1}^{∞} 3^n/(√n·2^(n + 1))·(x + 2)^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [tap, suivre l'erreur, menu steps]  |3^(n + 1)/(√(n + 1)·2^(n + 2))·(√n·2^(n + 1))/3^n|
+    = (3/2)√(n/(n + 1))   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : (3/2)√(n/(n + 1))
+    = 3/2   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 2/3   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x + 2| < 2/3
+    = −8/3 < x < −4/3   ← x₀ − R < x < x₀ + R
+    = ]−8/3 ; −4/3[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −8/3 et x = −4/3, puis le domaine D :  [juge solset]  départ : D
+    ? En x = −4/3, la série devient Σ 1/(2√n). Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? En x = −8/3, la série devient Σ (−1)^n/(2√n). Nature ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère pour la borne x = −8/3 ? → Leibniz : série alternée, |uₙ| décroît vers 0
+    = [−8/3 ; −4/3[   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes −2 ± R | ρ = 3/2, R = 2/3 ; domaine [−8/3 ; −4/3[.
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+Domaine de convergence de Σ_{n=1}^{∞} 3^n·(x + 3)^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [tap, suivre l'erreur, menu steps]  |3^(n + 1)·1/3^n|
+    = 3   ← Simplifier le quotient
+  — Rayon de convergence :  [juge value]  départ : R
+    = 1/3   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x + 3| < 1/3
+    = −10/3 < x < −8/3   ← x₀ − R < x < x₀ + R
+    = ]−10/3 ; −8/3[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −10/3 et x = −8/3, puis le domaine D :  [juge solset]  départ : D
+    ? En x = −8/3, la série devient Σ 1. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? En x = −10/3, la série devient Σ (−1)^n. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère pour la borne x = −10/3 ? → Condition nécessaire : uₙ ne tend pas vers 0
+    = ]−10/3 ; −8/3[   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes −3 ± R | ρ = 3, R = 1/3 ; domaine ]−10/3 ; −8/3[.
+  pièges : g2_exp_sum
+
+Domaine de convergence de Σ_{n=1}^{∞} 3^n/(n²·2^n)·x^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [tap, suivre l'erreur, menu steps]  |3^(n + 1)/((n + 1)²·2^(n + 1))·(n²·2^n)/3^n|
+    = 3n²/(2(n + 1)²)   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : 3n²/(2(n + 1)²)
+    = 3/2   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 2/3   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x| < 2/3
+    = −2/3 < x < 2/3   ← x₀ − R < x < x₀ + R
+    = ]−2/3 ; 2/3[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −2/3 et x = 2/3, puis le domaine D :  [juge solset]  départ : D
+    ? En x = 2/3, la série devient Σ 1/n². Nature ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? En x = −2/3, la série devient Σ (−1)^n/n². Nature ? ✔ converge absolument / · converge, pas absolument / · diverge
+    ? Quel critère pour la borne x = −2/3 ? → Riemann : Σ 1/nᵅ converge ⇔ α > 1
+    = [−2/3 ; 2/3]   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes 0 ± R | ρ = 3/2, R = 2/3 ; domaine [−2/3 ; 2/3].
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+```
+
+### Niveau 4
+
+```
+Domaine de convergence de Σ_{n=1}^{∞} 3^n/2^n·x^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [free, suivre l'erreur]  |3^(n + 1)/2^(n + 1)·2^n/3^n|
+    = 3/2   ← Simplifier le quotient
+  — Rayon de convergence :  [juge value]  départ : R
+    = 2/3   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x| < 2/3
+    = −2/3 < x < 2/3   ← x₀ − R < x < x₀ + R
+    = ]−2/3 ; 2/3[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −2/3 et x = 2/3, puis le domaine D :  [juge solset]  départ : D
+    ? En x = 2/3, la série devient Σ 1. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? En x = −2/3, la série devient Σ (−1)^n. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? Quel critère pour la borne x = −2/3 ? → Condition nécessaire : uₙ ne tend pas vers 0
+    = ]−2/3 ; 2/3[   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes 0 ± R | ρ = 3/2, R = 2/3 ; domaine ]−2/3 ; 2/3[.
+  pièges : g2_exp_sum
+
+Domaine de convergence de Σ_{n=1}^{∞} 1/(n·2^n)·(x + 1)^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [free, suivre l'erreur]  |1/((n + 1)·2^(n + 1))·(n·2^n)|
+    = n/(2(n + 1))   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : n/(2(n + 1))
+    = 1/2   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 2   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x + 1| < 2
+    = −3 < x < 1   ← x₀ − R < x < x₀ + R
+    = ]−3 ; 1[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −3 et x = 1, puis le domaine D :  [juge solset]  départ : D
+    ? En x = 1, la série devient Σ 1/n. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? En x = −3, la série devient Σ (−1)^n/n. Nature ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère pour la borne x = −3 ? → Leibniz : série alternée, |uₙ| décroît vers 0
+    = [−3 ; 1[   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes −1 ± R | ρ = 1/2, R = 2 ; domaine [−3 ; 1[.
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+Domaine de convergence de Σ_{n=1}^{∞} 1/(n·2^(n + 1))·(x + 1)^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [free, suivre l'erreur]  |1/((n + 1)·2^(n + 2))·(n·2^(n + 1))|
+    = n/(2(n + 1))   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : n/(2(n + 1))
+    = 1/2   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 2   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x + 1| < 2
+    = −3 < x < 1   ← x₀ − R < x < x₀ + R
+    = ]−3 ; 1[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −3 et x = 1, puis le domaine D :  [juge solset]  départ : D
+    ? En x = 1, la série devient Σ 1/(2n). Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    ? En x = −3, la série devient Σ (−1)^n/(2n). Nature ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? Quel critère pour la borne x = −3 ? → Leibniz : série alternée, |uₙ| décroît vers 0
+    = [−3 ; 1[   ← Domaine de convergence
+  aides : R = 1/lim |aₙ₊₁/aₙ| ; puis remplace x par chaque borne x₀ ± R. | R = ▢ ; bornes −1 ± R | ρ = 1/2, R = 2 ; domaine [−3 ; 1[.
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+```
+
+### Niveau 5
+
+```
+Le domaine de convergence de Σ_{n=1}^{∞} (−3)^n·(x − 2)^n est :
+  ✔ ]5/3 ; 7/3[   · ]−7/3 ; −5/3[ [a1_power_center_sign]   · [5/3 ; 7/3] [a1_power_bounds_forgotten]   · ]−1 ; 5[ [a1_power_radius_inverse]
+  pièges : a1_power_bounds_forgotten, a1_power_radius_inverse, a1_power_center_sign
+
+Domaine de convergence de Σ_{n=1}^{∞} (−2)^n/(n·3^n)·(x + 2)^n. Calcule ρ = lim |aₙ₊₁/aₙ| (d'Alembert), R, puis étudie les deux bornes.
+  [free, sans aide]  |(−2)^(n + 1)/((n + 1)·3^(n + 1))·(n·3^n)/(−2)^n|
+    = 2n/(3(n + 1))   ← Simplifier le quotient
+  — Limite du quotient :  [juge limit]  départ : 2n/(3(n + 1))
+    = 2/3   ← ρ = lim |aₙ₊₁/aₙ|
+  — Rayon de convergence :  [juge value]  départ : R
+    = 3/2   ← R = 1/ρ
+  — Convergence absolue :  [juge solset]  départ : |x + 2| < 3/2
+    = −7/2 < x < −1/2   ← x₀ − R < x < x₀ + R
+    = ]−7/2 ; −1/2[   ← Intervalle ouvert de convergence absolue
+  — Bornes x = −7/2 et x = −1/2, puis le domaine D :  [juge solset]  départ : D
+    ? En x = −1/2, la série devient Σ (−1)^n/n. Nature ? · converge absolument / ✔ converge, pas absolument / · diverge
+    ? En x = −7/2, la série devient Σ 1/n. Nature ? · converge absolument / · converge, pas absolument / ✔ diverge
+    = ]−7/2 ; −1/2]   ← Domaine de convergence
+  pièges : g2_exp_sum, a1_power_bounds_forgotten
+
+Le domaine de convergence de Σ_{n=1}^{∞} (−2)^n/3^(n + 1)·(x − 1)^n est :
+  · [−1/2 ; 5/2] [a1_power_bounds_forgotten]   · ]−5/2 ; 1/2[ [a1_power_center_sign]   · ]1/3 ; 5/3[ [a1_power_radius_inverse]   ✔ ]−1/2 ; 5/2[
+  pièges : a1_power_bounds_forgotten, a1_power_radius_inverse, a1_power_center_sign
+
+```
+
+### Variantes d'examen
+
+```
+Le domaine de convergence de Σ_{n=1}^{∞} 3^n·(x − 1)^n est :
+  · ]−4/3 ; −2/3[ [a1_power_center_sign]   · ]−2 ; 4[ [a1_power_radius_inverse]   ✔ ]2/3 ; 4/3[   · [2/3 ; 4/3] [a1_power_bounds_forgotten]
+  [examen mcq]
+  pièges : a1_power_bounds_forgotten, a1_power_radius_inverse, a1_power_center_sign
+
+Vrai ou faux ?
+  « Si Σ aₙ(x + 2)ⁿ converge en x = −1,5, alors elle converge en x = −2,3. » → VRAI
+  [examen tf]
+
+```
+
+## Dériver une série entière ; sommes par MacLaurin (`a1-pow-sums`, BA1)
+
+_Reconnaître eˣ, 1/(1 − x) en un point ; changer d'indice._
+
+### Niveau 1
+
+```
+Calcule Σ_{k=2}^{∞} (2^k + 2k)/k!. Référence : Σ_{k≥0} xᵏ/k! = eˣ.
+  [guided]  Σ_{k=2}^{∞} (2^k + 2k)/k!
+    = Σ_{k=2}^{∞} 2^k/k! + 2Σ_{k=2}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e² − □ + 2Σ_{k=2}^{∞} k/k!   (trous : e² − 3 + 2Σ_{k=2}^{∞} k/k!)   ← Σ 2ᵏ/k! = e² sans les termes k = 0 et k = 1
+    = e² − 3 + 2Σ_{k=2}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e² − 3 + 2Σ_{j=1}^{∞} 1/□   (trous : e² − 3 + 2Σ_{j=1}^{∞} 1/j!)   ← Changer d'indice : j = k − 1
+    = e² + 2e − 5   ← Σ_{j≥1} 1/j! = e − 1
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 2ᵏ/k! = e² − ▢ | e² + 2e − 5
+  pièges : a1_pow_sum_index_shift
+
+Pour |x| < 1, écris f(x) = Σ_{n=1}^{∞} n·x^n sans Σ (dérive terme à terme Σ xⁿ), puis calcule Σ_{n≥1} n·(2/3)ⁿ. Référence : Σ_{n≥0} xⁿ = 1/(1 − x), dérivable terme à terme pour |x| < 1.
+  [guided]  f(x)
+    = x·Σ_{n=1}^{∞} n·x^(□)   (trous : x·Σ_{n=1}^{∞} n·x^(n − 1))   ← Mettre x en facteur
+    = x·(1/(1 − x))′   ← Σ n·xⁿ⁻¹ est la dérivée terme à terme de Σ xⁿ
+    = x/(1 − x)²   ← Dériver
+  — Évaluer en x = 2/3 :  [juge definite]  départ : (2/3)/(1 − (2/3))²
+    = 6   ← Calculer
+  aides : Reconnais la série de référence : Σ_{n≥0} xⁿ = 1/(1 − x), dérivable terme à terme pour |x| < 1. | Σ n·xⁿ = x·Σ n·xⁿ⁻¹ = x·(1/(1 − x))′ = ▢ | 6
+
+Calcule Σ_{k=1}^{∞} (3^k + k)/k!. Référence : Σ_{k≥0} xᵏ/k! = eˣ.
+  [guided]  Σ_{k=1}^{∞} (3^k + k)/k!
+    = Σ_{k=1}^{∞} 3^k/k! + Σ_{k=1}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e³ − □ + Σ_{k=1}^{∞} k/k!   (trous : e³ − 1 + Σ_{k=1}^{∞} k/k!)   ← Σ 3ᵏ/k! = e³ sans le terme k = 0
+    = e³ − 1 + Σ_{k=1}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e³ − 1 + Σ_{j=0}^{∞} 1/□   (trous : e³ − 1 + Σ_{j=0}^{∞} 1/j!)   ← Changer d'indice : j = k − 1
+    = e³ + e − 1   ← Σ_{j≥0} 1/j! = e
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 3ᵏ/k! = e³ − ▢ | e³ + e − 1
+  pièges : a1_pow_sum_index_shift
+
+```
+
+### Niveau 2
+
+```
+Calcule Σ_{k=2}^{∞} (3^k + k)/k!. Référence : Σ_{k≥0} xᵏ/k! = eˣ.
+  [guided]  Σ_{k=2}^{∞} (3^k + k)/k!
+    = Σ_{k=2}^{∞} 3^k/k! + Σ_{k=2}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e³ − 4 + Σ_{k=2}^{∞} k/k!   ← Σ 3ᵏ/k! = e³ sans les termes k = 0 et k = 1
+    = e³ − 4 + Σ_{k=2}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e³ − 4 + Σ_{j=1}^{∞} 1/□   (trous : e³ − 4 + Σ_{j=1}^{∞} 1/j!)   ← Changer d'indice : j = k − 1
+    = e³ + e − 5   ← Σ_{j≥1} 1/j! = e − 1
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 3ᵏ/k! = e³ − ▢ | e³ + e − 5
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=2}^{∞} (3^k + 3k)/k!. Référence : Σ_{k≥0} xᵏ/k! = eˣ.
+  [guided]  Σ_{k=2}^{∞} (3^k + 3k)/k!
+    = Σ_{k=2}^{∞} 3^k/k! + 3Σ_{k=2}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e³ − 4 + 3Σ_{k=2}^{∞} k/k!   ← Σ 3ᵏ/k! = e³ sans les termes k = 0 et k = 1
+    = e³ − 4 + 3Σ_{k=2}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e³ − 4 + 3Σ_{j=1}^{∞} 1/□   (trous : e³ − 4 + 3Σ_{j=1}^{∞} 1/j!)   ← Changer d'indice : j = k − 1
+    = e³ + 3e − 7   ← Σ_{j≥1} 1/j! = e − 1
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 3ᵏ/k! = e³ − ▢ | e³ + 3e − 7
+  pièges : a1_pow_sum_index_shift
+
+Pour |x| < 1, écris f(x) = Σ_{n=1}^{∞} n·x^n sans Σ (dérive terme à terme Σ xⁿ), puis calcule Σ_{n≥1} n·(1/2)ⁿ. Référence : Σ_{n≥0} xⁿ = 1/(1 − x), dérivable terme à terme pour |x| < 1.
+  [guided]  f(x)
+    = x·Σ_{n=1}^{∞} n·x^(n − 1)   ← Mettre x en facteur
+    = x·(1/(1 − x))′   ← Σ n·xⁿ⁻¹ est la dérivée terme à terme de Σ xⁿ
+    = x/(1 − x)²   ← Dériver
+  — Évaluer en x = 1/2 :  [juge definite]  départ : (1/2)/(1 − (1/2))²
+    = 2   ← Calculer
+  aides : Reconnais la série de référence : Σ_{n≥0} xⁿ = 1/(1 − x), dérivable terme à terme pour |x| < 1. | Σ n·xⁿ = x·Σ n·xⁿ⁻¹ = x·(1/(1 − x))′ = ▢ | 2
+
+```
+
+### Niveau 3
+
+```
+Calcule Σ_{k=2}^{∞} (2^k + 3k)/k!.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=2}^{∞} (2^k + 3k)/k!
+    = Σ_{k=2}^{∞} 2^k/k! + 3Σ_{k=2}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e² − 3 + 3Σ_{k=2}^{∞} k/k!   ← Σ 2ᵏ/k! = e² sans les termes k = 0 et k = 1
+    = e² − 3 + 3Σ_{k=2}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e² − 3 + 3Σ_{j=1}^{∞} 1/j!   ← Changer d'indice : j = k − 1
+    = e² + 3e − 6   ← Σ_{j≥1} 1/j! = e − 1
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 2ᵏ/k! = e² − ▢ | e² + 3e − 6
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=3}^{∞} (−1)^k·2^k/k!.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=3}^{∞} (−1)^k·2^k/k!
+    = e^(−2) − Σ_{k=0}^{2} (−1)^k·2^k/k!   ← Σ_{k≥0} (−2)ᵏ/k! = e^(−2), moins les premiers termes
+    = e^(−2) − 1   ← Les termes retirés : 1 − 2 + 2
+  aides : Reconnais la série de référence : Σ_{k≥0} xᵏ/k! = eˣ, en x = −2. | Σ_{k=3}^{∞} (−1)^k·2^k/k! = e^−2 − Σ_{k=0}^{2} ▢ | e^−2 − 1
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=3}^{∞} (−1)^k/k!.
+  [tap, suivre l'erreur, menu steps]  Σ_{k=3}^{∞} (−1)^k/k!
+    = e^(−1) − Σ_{k=0}^{2} (−1)^k/k!   ← Σ_{k≥0} (−1)ᵏ/k! = e^(−1), moins les premiers termes
+    = e^(−1) − 1/2   ← Les termes retirés : 1 − 1 + 1/2
+  aides : Reconnais la série de référence : Σ_{k≥0} xᵏ/k! = eˣ, en x = −1. | Σ_{k=3}^{∞} (−1)^k/k! = e^−1 − Σ_{k=0}^{2} ▢ | e^−1 − 1/2
+  pièges : a1_pow_sum_index_shift
+
+```
+
+### Niveau 4
+
+```
+Calcule Σ_{k=1}^{∞} (2^k + k)/k!.
+  [free, suivre l'erreur]  Σ_{k=1}^{∞} (2^k + k)/k!
+    = Σ_{k=1}^{∞} 2^k/k! + Σ_{k=1}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e² − 1 + Σ_{k=1}^{∞} k/k!   ← Σ 2ᵏ/k! = e² sans le terme k = 0
+    = e² − 1 + Σ_{k=1}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e² − 1 + Σ_{j=0}^{∞} 1/j!   ← Changer d'indice : j = k − 1
+    = e² + e − 1   ← Σ_{j≥0} 1/j! = e
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 2ᵏ/k! = e² − ▢ | e² + e − 1
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=1}^{∞} (3^k + k)/k!.
+  [free, suivre l'erreur]  Σ_{k=1}^{∞} (3^k + k)/k!
+    = Σ_{k=1}^{∞} 3^k/k! + Σ_{k=1}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e³ − 1 + Σ_{k=1}^{∞} k/k!   ← Σ 3ᵏ/k! = e³ sans le terme k = 0
+    = e³ − 1 + Σ_{k=1}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e³ − 1 + Σ_{j=0}^{∞} 1/j!   ← Changer d'indice : j = k − 1
+    = e³ + e − 1   ← Σ_{j≥0} 1/j! = e
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 3ᵏ/k! = e³ − ▢ | e³ + e − 1
+  pièges : a1_pow_sum_index_shift
+
+Calcule Σ_{k=2}^{∞} (2^k − k)/k!.
+  [free, suivre l'erreur]  Σ_{k=2}^{∞} (2^k − k)/k!
+    = Σ_{k=2}^{∞} 2^k/k! − Σ_{k=2}^{∞} k/k!   ← Séparer : deux séries convergentes
+    = e² − 3 − Σ_{k=2}^{∞} k/k!   ← Σ 2ᵏ/k! = e² sans les termes k = 0 et k = 1
+    = e² − 3 − Σ_{k=2}^{∞} 1/(k − 1)!   ← k/k! = 1/(k − 1)!
+    = e² − 3 − Σ_{j=1}^{∞} 1/j!   ← Changer d'indice : j = k − 1
+    = e² − e − 2   ← Σ_{j≥1} 1/j! = e − 1
+  aides : Sépare en deux sommes et compare chacune à Σ xᵏ/k! = eˣ. | k/k! = 1/(k − 1)! ; puis Σ 2ᵏ/k! = e² − ▢ | e² − e − 2
+  pièges : a1_pow_sum_index_shift
+
+```
+
+### Niveau 5
+
+```
+Σ_{k=1}^{∞} (2^k + 2k)/(k − 1)! =
+  · 2e² + 2e   · 2e² + 2e − 2   ✔ 2e² + 4e   · e² + 4e
+
+Σ_{k=1}^{∞} (2^k − 2k)/(k − 1)! =
+  · 2e² − 2e + 2   · e² − 4e   ✔ 2e² − 4e   · 2e² − 2e
+
+Σ_{k=2}^{∞} (3^k + 2k)/(k − 1)! =
+  ✔ 3e³ + 4e − 5   · 3e³ + 4e − 2 [a1_pow_sum_index_shift]   · 3e³ + 4e − 3 [a1_pow_sum_index_shift]   · e³ + 4e − 3
+  pièges : a1_pow_sum_index_shift
+
+```
+
+### Variantes d'examen
+
+```
+Σ_{k=2}^{∞} (3^k + 2k)/(k − 1)! =
+  ✔ 3e³ + 4e − 5   · 3e³ + 4e − 2 [a1_pow_sum_index_shift]   · 3e³ + 4e − 3 [a1_pow_sum_index_shift]   · e³ + 4e − 3
+  [examen mcq]
+  pièges : a1_pow_sum_index_shift
+
+Vrai ou faux ?
+  « La série de Taylor de f(x) = 4/(4 + 3x) en x₀ = 2 converge sur ]−14/3 ; 26/3[. » → FAUX
+    contre-exemple (refute) : x = -4/3
+  [examen tf]
+  pièges : a1_power_bounds_forgotten
+
+```
+
+## Simplifier un nombre complexe et l'élever à une puissance (`a1-cplx-exam`, BA1)
+
+_Réduire iᵏ modulo 4, conjugué, forme polaire avec r > 0, Moivre._
+
+### Niveau 1
+
+```
+Soit z = (−2i⁸ − 2i⁴¹)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z⁹.
+  [guided]  (−2i⁸ − 2i⁴¹)/(1 − i)
+    = (−□ − □)/(1 − i)   (trous : (−2 − 2i)/(1 − i))   ← Réduire iᵏ modulo 4
+    = (−2 − 2i)(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = −2i   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : −2i
+    = □e^□   (trous : 2e^(−iπ/2))   ← r = 2, φ = −π/2
+  — Calcule z⁹ et écris-le sous la forme a + bi :  [juge complex]  départ : (−2i)⁹
+    = (2e^(−iπ/2))⁹   ← Forme polaire
+    = □e^(−9iπ/2)   (trous : 512e^(−9iπ/2))   ← Moivre : rᵐ et m·φ
+    = 512e^(−iπ/2)   ← Argument dans ]−π ; π]
+    = −512i   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = −2i = 2·e^(i·▢), puis z⁹ = 512·e^(i·▢). | z = −2i = 2e^(−iπ/2), donc z⁹ = 512e^(−9iπ/2) = −512i.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise
+
+Soit z = (−i⁶⁹ − i⁷²)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z⁷.
+  [guided]  (−i⁶⁹ − i⁷²)/(1 − i)
+    = (−□ − □)/(1 − i)   (trous : (−i − 1)/(1 − i))   ← Réduire iᵏ modulo 4
+    = (−1 − i)(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = −i   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : −i
+    = e^□   (trous : e^(−iπ/2))   ← r = 1, φ = −π/2
+  — Calcule z⁷ et écris-le sous la forme a + bi :  [juge complex]  départ : (−i)⁷
+    = (e^(−iπ/2))⁷   ← Forme polaire
+    = e^□   (trous : e^(−7iπ/2))   ← Moivre : rᵐ et m·φ
+    = e^(iπ/2)   ← Argument dans ]−π ; π]
+    = i   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = −i = e^(i·▢), puis z⁷ = e^(i·▢). | z = −i = e^(−iπ/2), donc z⁷ = e^(−7iπ/2) = i.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise
+
+Soit z = (−i⁵³ − i⁸⁴)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z⁹.
+  [guided]  (−i⁵³ − i⁸⁴)/(1 − i)
+    = (−□ − □)/(1 − i)   (trous : (−i − 1)/(1 − i))   ← Réduire iᵏ modulo 4
+    = (−1 − i)(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = −i   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : −i
+    = e^□   (trous : e^(−iπ/2))   ← r = 1, φ = −π/2
+  — Calcule z⁹ et écris-le sous la forme a + bi :  [juge complex]  départ : (−i)⁹
+    = (e^(−iπ/2))⁹   ← Forme polaire
+    = e^□   (trous : e^(−9iπ/2))   ← Moivre : rᵐ et m·φ
+    = e^(−iπ/2)   ← Argument dans ]−π ; π]
+    = −i   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = −i = e^(i·▢), puis z⁹ = e^(i·▢). | z = −i = e^(−iπ/2), donc z⁹ = e^(−9iπ/2) = −i.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise
+
+```
+
+### Niveau 2
+
+```
+Soit z = (−2i⁷⁰ − 2i¹⁹)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z¹².
+  [guided]  (−2i⁷⁰ − 2i¹⁹)/(1 − i)
+    = □/(1 − i)   (trous : (2 + 2i)/(1 − i))   ← Réduire iᵏ modulo 4
+    = (2 + 2i)(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = □   (trous : 2i)   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : 2i
+    ? Module et argument de z = <math alttext="2i"><mrow><mn>2</mn><mo>&#x2062;</mo><mi>i</mi></mrow></math> : ✔ r = 2, φ = π/2 / · r = −2, φ = −π/2
+    = □e^□   (trous : 2e^(iπ/2))   ← r = 2, φ = π/2
+  — Calcule z¹² et écris-le sous la forme a + bi :  [juge complex]  départ : (2i)¹²
+    ? Pour calculer z^12 : ✔ Forme polaire, puis Moivre / ✔ Développer (2i)¹² avec le binôme / · Élever 0 et 2i à la puissance 12 séparément
+    = (2e^(iπ/2))¹²   ← Forme polaire
+    = □e^□   (trous : 4096e^(6iπ))   ← Moivre : rᵐ et m·φ
+    = 4096   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = 2i = 2·e^(i·▢), puis z¹² = 4096·e^(i·▢). | z = 2i = 2e^(iπ/2), donc z¹² = 4096e^(6iπ) = 4096.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise, a1_polar_r_negative
+
+Soit z = (−i⁵¹ + 5i⁹⁷)/(1 + i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z⁴.
+  [guided]  (−i⁵¹ + 5i⁹⁷)/(1 + i)
+    = □/(1 + i)   (trous : (i + 5i)/(1 + i))   ← Réduire iᵏ modulo 4
+    = 6i(1 − i)/2   ← Multiplier haut et bas par 1 − i
+    = □ + □   (trous : 3 + 3i)   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : 3 + 3i
+    ? Module et argument de z = <math alttext="3 + 3i"><mrow><mn>3</mn><mo>+</mo><mrow><mn>3</mn><mo>&#x2062;</mo><mi>i</mi></mrow></mrow></math> : · r = −3√2, φ = −3π/4 / ✔ r = 3√2, φ = π/4
+    = □e^□   (trous : 3√2e^(iπ/4))   ← r = 3√2, φ = π/4
+  — Calcule z⁴ et écris-le sous la forme a + bi :  [juge complex]  départ : (3 + 3i)⁴
+    ? Pour calculer z^4 : ✔ Forme polaire, puis Moivre / ✔ Développer (3+3i)⁴ avec le binôme / · Élever 3 et 3i à la puissance 4 séparément
+    = (3√2e^(iπ/4))⁴   ← Forme polaire
+    = □e^□   (trous : 324e^(iπ))   ← Moivre : rᵐ et m·φ
+    = −324   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = 3 + 3i = 3√2·e^(i·▢), puis z⁴ = 324·e^(i·▢). | z = 3 + 3i = 3√2e^(iπ/4), donc z⁴ = 324e^(iπ) = −324.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise, a1_polar_r_negative
+
+Soit z = (i³⁷ − i²⁸)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z⁴.
+  [guided]  (i³⁷ − i²⁸)/(1 − i)
+    = □/(1 − i)   (trous : (i − 1)/(1 − i))   ← Réduire iᵏ modulo 4
+    = (−1 + i)(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = □   (trous : −1)   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : −1
+    ? Module et argument de z = <math alttext="−1"><mrow><mo>−</mo><mn>1</mn></mrow></math> : · r = −1, φ = 0 / ✔ r = 1, φ = π
+    = e^□   (trous : e^(iπ))   ← r = 1, φ = π
+  — Calcule z⁴ et écris-le sous la forme a + bi :  [juge complex]  départ : (−1)⁴
+    ? Pour calculer z^4 : ✔ Forme polaire, puis Moivre / ✔ Développer (−1)⁴ avec le binôme / · Élever −1 et 0 à la puissance 4 séparément
+    = (e^(iπ))⁴   ← Forme polaire
+    = e^□   (trous : e^(4iπ))   ← Moivre : rᵐ et m·φ
+    = 1   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = −1 = e^(i·▢), puis z⁴ = e^(i·▢). | z = −1 = e^(iπ), donc z⁴ = e^(4iπ) = 1.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise, a1_polar_r_negative
+
+```
+
+### Niveau 3
+
+```
+Soit w = √3 − i. Écris w sous forme polaire, puis calcule la partie réelle de w⁴.
+  [tap, suivre l'erreur, menu steps]  √3 − i
+    = 2e^(−iπ/6)   ← r = 2, φ = −π/6
+  — Calcule Re(w⁴) :  [juge complex]  départ : Re((√3 − i)⁴)
+    = Re((2e^(−iπ/6))⁴)   ← Forme polaire
+    = Re(16e^(−2iπ/3))   ← Moivre
+    = 16cos(−2π/3)   ← Re(r·e^(iθ)) = r·cos θ
+    = −8   ← Valeur exacte
+  aides : Passe en forme polaire : |w| = 2. Puis Moivre, et Re(r·e^(iθ)) = r·cos θ. | w = 2·e^(i·▢), donc w⁴ = 16·e^(i·▢). | Re(16e^(−2iπ/3)) = 16cos(−2π/3) = −8.
+
+Soit z = (−2i¹⁶ − 2i⁹⁹)/(1 + i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z¹².
+  [tap, suivre l'erreur, menu steps]  (−2i¹⁶ − 2i⁹⁹)/(1 + i)
+    = (−2 + 2i)/(1 + i)   ← Réduire iᵏ modulo 4
+    = (−2 + 2i)(1 − i)/2   ← Multiplier haut et bas par 1 − i
+    = 2i   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : 2i
+    = 2e^(iπ/2)   ← r = 2, φ = π/2
+  — Calcule z¹² et écris-le sous la forme a + bi :  [juge complex]  départ : (2i)¹²
+    = (2e^(iπ/2))¹²   ← Forme polaire
+    = 4096e^(6iπ)   ← Moivre : rᵐ et m·φ
+    = 4096   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = 2i = 2·e^(i·▢), puis z¹² = 4096·e^(i·▢). | z = 2i = 2e^(iπ/2), donc z¹² = 4096e^(6iπ) = 4096.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise
+
+Soit z = (2i⁹⁸ + 2i³¹)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z¹¹.
+  [tap, suivre l'erreur, menu steps]  (2i⁹⁸ + 2i³¹)/(1 − i)
+    = (−2 − 2i)/(1 − i)   ← Réduire iᵏ modulo 4
+    = (−2 − 2i)(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = −2i   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : −2i
+    = 2e^(−iπ/2)   ← r = 2, φ = −π/2
+  — Calcule z¹¹ et écris-le sous la forme a + bi :  [juge complex]  départ : (−2i)¹¹
+    = (2e^(−iπ/2))¹¹   ← Forme polaire
+    = 2048e^(−11iπ/2)   ← Moivre : rᵐ et m·φ
+    = 2048e^(iπ/2)   ← Argument dans ]−π ; π]
+    = 2048i   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = −2i = 2·e^(i·▢), puis z¹¹ = 2048·e^(i·▢). | z = −2i = 2e^(−iπ/2), donc z¹¹ = 2048e^(−11iπ/2) = 2048i.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise
+
+```
+
+### Niveau 4
+
+```
+Soit w = √3 − i. Écris w sous forme polaire, puis calcule la partie réelle de w⁸.
+  [free, suivre l'erreur]  √3 − i
+    = 2e^(−iπ/6)   ← r = 2, φ = −π/6
+  — Calcule Re(w⁸) :  [juge complex]  départ : Re((√3 − i)⁸)
+    = Re((2e^(−iπ/6))⁸)   ← Forme polaire
+    = Re(256e^(−4iπ/3))   ← Moivre
+    = 256cos(−4π/3)   ← Re(r·e^(iθ)) = r·cos θ
+    = −128   ← Valeur exacte
+  aides : Passe en forme polaire : |w| = 2. Puis Moivre, et Re(r·e^(iθ)) = r·cos θ. | w = 2·e^(i·▢), donc w⁸ = 256·e^(i·▢). | Re(256e^(−4iπ/3)) = 256cos(−4π/3) = −128.
+
+Soit z = (2i⁴² + 4i²⁸)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z¹⁰.
+  [free, suivre l'erreur]  (2i⁴² + 4i²⁸)/(1 − i)
+    = (−2 + 4)/(1 − i)   ← Réduire iᵏ modulo 4
+    = 2(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = 1 + i   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : 1 + i
+    = √2e^(iπ/4)   ← r = √2, φ = π/4
+  — Calcule z¹⁰ et écris-le sous la forme a + bi :  [juge complex]  départ : (1 + i)¹⁰
+    = (√2e^(iπ/4))¹⁰   ← Forme polaire
+    = 32e^(5iπ/2)   ← Moivre : rᵐ et m·φ
+    = 32e^(iπ/2)   ← Argument dans ]−π ; π]
+    = 32i   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = 1 + i = √2·e^(i·▢), puis z¹⁰ = 32·e^(i·▢). | z = 1 + i = √2e^(iπ/4), donc z¹⁰ = 32e^(5iπ/2) = 32i.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise
+
+Soit z = (3i³⁹ + 5i⁴¹)/(1 − i). Écris z sous la forme a + bi, puis sous forme polaire, et calcule z¹².
+  [free, suivre l'erreur]  (3i³⁹ + 5i⁴¹)/(1 − i)
+    = (−3i + 5i)/(1 − i)   ← Réduire iᵏ modulo 4
+    = 2i(1 + i)/2   ← Multiplier haut et bas par 1 + i
+    = −1 + i   ← Forme algébrique
+  — Forme polaire de z (r > 0, φ dans ]−π ; π]) :  [juge complex]  départ : −1 + i
+    = √2e^(3iπ/4)   ← r = √2, φ = 3π/4
+  — Calcule z¹² et écris-le sous la forme a + bi :  [juge complex]  départ : (−1 + i)¹²
+    = (√2e^(3iπ/4))¹²   ← Forme polaire
+    = 64e^(9iπ)   ← Moivre : rᵐ et m·φ
+    = 64e^(iπ)   ← Argument dans ]−π ; π]
+    = −64   ← Forme algébrique
+  aides : Réduis les exposants de i modulo 4, puis débarrasse-toi du dénominateur avec son conjugué. Pour la puissance, passe en forme polaire avec r > 0. | z = −1 + i = √2·e^(i·▢), puis z¹² = 64·e^(i·▢). | z = −1 + i = √2e^(3iπ/4), donc z¹² = 64e^(9iπ) = −64.
+  pièges : a1_cplx_ik_mod, g8_i_squared, g8_div_componentwise
+
+```
+
+### Niveau 5
+
+```
+Soit w = √3 + i. Quelle affirmation est vraie ?
+  · w⁸ est imaginaire pur   ✔ w⁶ ∈ ℝ   · Im(w⁶) < 0   · |w⁷| > 9³
+
+Soit z = (4i⁷ + 6i²⁹)/(1 + i). Alors z⁷ =
+  · −8 + 8i [a1_polar_r_negative]   · 625000 − 625000i [a1_cplx_ik_mod]   ✔ 8 − 8i   · 8 + 8i
+  pièges : a1_cplx_ik_mod, a1_polar_r_negative
+
+Soit w = √3 − i. Écris w sous forme polaire, puis calcule la partie réelle de w³.
+  [free, sans aide]  √3 − i
+    = 2e^(−iπ/6)   ← r = 2, φ = −π/6
+  — Calcule Re(w³) :  [juge complex]  départ : Re((√3 − i)³)
+    = Re((2e^(−iπ/6))³)   ← Forme polaire
+    = Re(8e^(−iπ/2))   ← Moivre
+    = 8cos(−π/2)   ← Re(r·e^(iθ)) = r·cos θ
+    = 0   ← Valeur exacte
+
+```
+
+### Variantes d'examen
+
+```
+Soit z = (5i¹⁸ + i⁷⁰)/(1 − i). Alors z⁵ =
+  ✔ 972 + 972i   · −972 + 972i   · −972 − 972i [a1_cplx_ik_mod]   · 972 − 972i
+  [examen mcq]
+  pièges : a1_cplx_ik_mod
+
+Vrai ou faux ?
+  « Pour tout réel y ≠ 0, l'équation z⁴ = iy a exactement 4 solutions distinctes. » → VRAI
+  [examen tf]
+
+```
+
+## Équations zⁿ = z̄, zⁿ = 1/z̄, zⁿ = |z|, sans oublier r = 0 (`a1-cplx-zn-conj`, BA1)
+
+_Poser z = r·e^(iφ), traiter r = 0 avant de diviser, compter les solutions._
+
+### Niveau 1
+
+```
+Résous dans ℂ l'équation z² = z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [guided]  conj(re^(iφ))
+    = re^□   (trous : re^(−iφ))   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r² = r
+    (Cas r = 0 : z = 0 est solution. Cas r > 0 : on peut diviser par r.)
+    = r = 0 ou r = □   (trous : r = 0 ou r = 1)   ← Cas r = 0, puis r > 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 2φ = −φ + 2kπ
+    = □φ = 2kπ   (trous : 3φ = 2kπ)   ← Regrouper
+    = φ = 2kπ/3   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z³ = 1
+    = {0 ; 1 ; −1/2 + i√3/2 ; −1/2 − i√3/2}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 4   ← 1 + 3 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = 2kπ/3 ; avec z = 0, cela fait 4 solutions.
+  pièges : a1_conj_arg_sign
+
+Résous dans ℂ l'équation z⁷ = z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [guided]  conj(re^(iφ))
+    = re^□   (trous : re^(−iφ))   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r⁷ = r
+    (Cas r = 0 : z = 0 est solution. Cas r > 0 : on peut diviser par r.)
+    = r = 0 ou r⁶ = 1   ← Cas r = 0, puis r > 0
+    = r = 0 ou r = □   (trous : r = 0 ou r = 1)   ← r ≥ 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 7φ = −φ + 2kπ
+    = □φ = 2kπ   (trous : 8φ = 2kπ)   ← Regrouper
+    = φ = kπ/4   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z⁸ = 1
+    = {0 ; 1 ; √2/2 + i√2/2 ; i ; −√2/2 + i√2/2 ; −1 ; −√2/2 − i√2/2 ; −i ; √2/2 − i√2/2}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 9   ← 1 + 8 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r⁶ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = kπ/4 ; avec z = 0, cela fait 9 solutions.
+  pièges : a1_conj_arg_sign
+
+Résous dans ℂ l'équation z⁷ = z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [guided]  conj(re^(iφ))
+    = re^□   (trous : re^(−iφ))   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r⁷ = r
+    (Cas r = 0 : z = 0 est solution. Cas r > 0 : on peut diviser par r.)
+    = r = 0 ou r⁶ = 1   ← Cas r = 0, puis r > 0
+    = r = 0 ou r = □   (trous : r = 0 ou r = 1)   ← r ≥ 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 7φ = −φ + 2kπ
+    = □φ = 2kπ   (trous : 8φ = 2kπ)   ← Regrouper
+    = φ = kπ/4   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z⁸ = 1
+    = {0 ; 1 ; √2/2 + i√2/2 ; i ; −√2/2 + i√2/2 ; −1 ; −√2/2 − i√2/2 ; −i ; √2/2 − i√2/2}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 9   ← 1 + 8 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r⁶ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = kπ/4 ; avec z = 0, cela fait 9 solutions.
+  pièges : a1_conj_arg_sign
+
+```
+
+### Niveau 2
+
+```
+Résous dans ℂ l'équation z⁷ = 1/z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris 1/z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [guided]  1/conj(re^(iφ))
+    = (1/r)e^(iφ)   ← 1/z̄ = 1/(r·e^(−iφ))
+  — Modules : r > 0.  [juge solset]  départ : r⁷ = 1/r
+    ? Et r = 0 ? · z = 0 est solution / ✔ z = 0 est exclu : 1/z̄ n'existe pas
+    = r⁸ = 1   ← Multiplier par r > 0
+    = r = 1   ← r > 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 7φ = φ + 2kπ
+    = 6φ = 2kπ   ← Regrouper
+    = φ = □   (trous : φ = kπ/3)   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z⁶ = 1
+    = {1 ; 1/2 + i√3/2 ; −1/2 + i√3/2 ; −1 ; −1/2 − i√3/2 ; 1/2 − i√3/2}   ← Les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 6   ← 6 solutions
+  aides : Pose z = r·e^(iφ). Ici z = 0 est exclu, donc r > 0. | r > 0 : r⁸ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = kπ/3 : 6 solutions.
+  pièges : a1_conj_arg_sign
+
+Résous dans ℂ l'équation z³ = 4z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris 4z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [guided]  4conj(re^(iφ))
+    = 4re^(−iφ)   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r³ = 4r
+    ? <math alttext="r³ = 4r"><mrow><msup><mrow><mi>r</mi></mrow><mn>3</mn></msup><mo>=</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>r</mi></mrow></mrow></math> : avant de diviser par r, ✔ je regarde d'abord r = 0 : z = 0 est solution / · je divise par r : r³ ÷ r
+    = r = 0 ou r² = 4   ← Cas r = 0, puis r > 0
+    = r = 0 ou r = 2   ← r ≥ 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 3φ = −φ + 2kπ
+    = 4φ = 2kπ   ← Regrouper
+    = φ = □   (trous : φ = kπ/2)   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z⁴ = 16
+    = {0 ; 2 ; 2i ; −2 ; −2i}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 5   ← 1 + 4 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r² = 4 et e^(i·▢·φ) = 1. | r = 2 et φ = kπ/2 ; avec z = 0, cela fait 5 solutions.
+  pièges : a1_conj_arg_sign, a1_zn_conj_r0
+
+Résous dans ℂ l'équation z⁴ = 27z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris 27z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [guided]  27conj(re^(iφ))
+    = 27re^(−iφ)   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r⁴ = 27r
+    ? <math alttext="r⁴ = 27r"><mrow><msup><mrow><mi>r</mi></mrow><mn>4</mn></msup><mo>=</mo><mrow><mn>27</mn><mo>&#x2062;</mo><mi>r</mi></mrow></mrow></math> : avant de diviser par r, ✔ je regarde d'abord r = 0 : z = 0 est solution / · je divise par r : r⁴ ÷ r
+    = r = 0 ou r³ = 27   ← Cas r = 0, puis r > 0
+    = r = 0 ou r = 3   ← r ≥ 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 4φ = −φ + 2kπ
+    = 5φ = 2kπ   ← Regrouper
+    = φ = □   (trous : φ = 2kπ/5)   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z⁵ = 243
+    = {0 ; 3 ; 3e^(2iπ/5) ; 3e^(4iπ/5) ; 3e^(−4iπ/5) ; 3e^(−2iπ/5)}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 6   ← 1 + 5 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r³ = 27 et e^(i·▢·φ) = 1. | r = 3 et φ = 2kπ/5 ; avec z = 0, cela fait 6 solutions.
+  pièges : a1_conj_arg_sign, a1_zn_conj_r0
+
+```
+
+### Niveau 3
+
+```
+Résous dans ℂ l'équation z⁷ = z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [tap, suivre l'erreur, menu steps]  conj(re^(iφ))
+    = re^(−iφ)   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r⁷ = r
+    ? <math alttext="r⁷ = r"><mrow><msup><mrow><mi>r</mi></mrow><mn>7</mn></msup><mo>=</mo><mi>r</mi></mrow></math> : avant de diviser par r, · je divise par r : r⁷ ÷ r / ✔ je regarde d'abord r = 0 : z = 0 est solution
+    = r = 0 ou r⁶ = 1   ← Cas r = 0, puis r > 0
+    = r = 0 ou r = 1   ← r ≥ 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 7φ = −φ + 2kπ
+    = 8φ = 2kπ   ← Regrouper
+    = φ = kπ/4   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z⁸ = 1
+    = {0 ; 1 ; √2/2 + i√2/2 ; i ; −√2/2 + i√2/2 ; −1 ; −√2/2 − i√2/2 ; −i ; √2/2 − i√2/2}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 9   ← 1 + 8 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r⁶ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = kπ/4 ; avec z = 0, cela fait 9 solutions.
+  pièges : a1_conj_arg_sign, a1_zn_conj_r0
+
+Résous dans ℂ l'équation z⁶ = 1/z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris 1/z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [tap, suivre l'erreur, menu steps]  1/conj(re^(iφ))
+    = (1/r)e^(iφ)   ← 1/z̄ = 1/(r·e^(−iφ))
+  — Modules : r > 0.  [juge solset]  départ : r⁶ = 1/r
+    ? Et r = 0 ? ✔ z = 0 est exclu : 1/z̄ n'existe pas / · z = 0 est solution
+    = r⁷ = 1   ← Multiplier par r > 0
+    = r = 1   ← r > 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 6φ = φ + 2kπ
+    = 5φ = 2kπ   ← Regrouper
+    = φ = 2kπ/5   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z⁵ = 1
+    = {1 ; e^(2iπ/5) ; e^(4iπ/5) ; e^(−4iπ/5) ; e^(−2iπ/5)}   ← Les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 5   ← 5 solutions
+  aides : Pose z = r·e^(iφ). Ici z = 0 est exclu, donc r > 0. | r > 0 : r⁷ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = 2kπ/5 : 5 solutions.
+  pièges : a1_conj_arg_sign
+
+Résous dans ℂ l'équation z⁵ = |z|. Pose z = r·e^(iφ) (r ≥ 0) : écris |z| en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [tap, suivre l'erreur, menu steps]  |re^(iφ)|
+    = r   ← |z| = r
+  — Modules : r ≥ 0.  [juge solset]  départ : r⁵ = r
+    ? <math alttext="r⁵ = r"><mrow><msup><mrow><mi>r</mi></mrow><mn>5</mn></msup><mo>=</mo><mi>r</mi></mrow></math> : avant de diviser par r, ✔ je regarde d'abord r = 0 : z = 0 est solution / · je divise par r : r⁵ ÷ r
+    = r = 0 ou r⁴ = 1   ← Cas r = 0, puis r > 0
+    = r = 0 ou r = 1   ← r ≥ 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 5φ = 2kπ
+    = φ = 2kπ/5   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z⁵ = 1
+    = {0 ; 1 ; e^(2iπ/5) ; e^(4iπ/5) ; e^(−4iπ/5) ; e^(−2iπ/5)}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 6   ← 1 + 5 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r⁴ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = 2kπ/5 ; avec z = 0, cela fait 6 solutions.
+  pièges : a1_zn_conj_r0
+
+```
+
+### Niveau 4
+
+```
+Résous dans ℂ l'équation z⁵ = 1/z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris 1/z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [free, suivre l'erreur]  1/conj(re^(iφ))
+    = (1/r)e^(iφ)   ← 1/z̄ = 1/(r·e^(−iφ))
+  — Modules : r > 0.  [juge solset]  départ : r⁵ = 1/r
+    ? Et r = 0 ? ✔ z = 0 est exclu : 1/z̄ n'existe pas / · z = 0 est solution
+    = r⁶ = 1   ← Multiplier par r > 0
+    = r = 1   ← r > 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 5φ = φ + 2kπ
+    = 4φ = 2kπ   ← Regrouper
+    = φ = kπ/2   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z⁴ = 1
+    = {1 ; i ; −1 ; −i}   ← Les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 4   ← 4 solutions
+  aides : Pose z = r·e^(iφ). Ici z = 0 est exclu, donc r > 0. | r > 0 : r⁶ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = kπ/2 : 4 solutions.
+  pièges : a1_conj_arg_sign
+
+Résous dans ℂ l'équation z² = z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [free, suivre l'erreur]  conj(re^(iφ))
+    = re^(−iφ)   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r² = r
+    ? <math alttext="r² = r"><mrow><msup><mrow><mi>r</mi></mrow><mn>2</mn></msup><mo>=</mo><mi>r</mi></mrow></math> : avant de diviser par r, · je divise par r : r² ÷ r / ✔ je regarde d'abord r = 0 : z = 0 est solution
+    = r = 0 ou r = 1   ← Cas r = 0, puis r > 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 2φ = −φ + 2kπ
+    = 3φ = 2kπ   ← Regrouper
+    = φ = 2kπ/3   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z³ = 1
+    = {0 ; 1 ; −1/2 + i√3/2 ; −1/2 − i√3/2}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 4   ← 1 + 3 solutions
+  aides : Pose z = r·e^(iφ). Avant de diviser par r, regarde si r = 0 marche. | r > 0 : r = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = 2kπ/3 ; avec z = 0, cela fait 4 solutions.
+  pièges : a1_conj_arg_sign, a1_zn_conj_r0
+
+Résous dans ℂ l'équation z⁶ = 1/z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris 1/z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [free, suivre l'erreur]  1/conj(re^(iφ))
+    = (1/r)e^(iφ)   ← 1/z̄ = 1/(r·e^(−iφ))
+  — Modules : r > 0.  [juge solset]  départ : r⁶ = 1/r
+    ? Et r = 0 ? · z = 0 est solution / ✔ z = 0 est exclu : 1/z̄ n'existe pas
+    = r⁷ = 1   ← Multiplier par r > 0
+    = r = 1   ← r > 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 6φ = φ + 2kπ
+    = 5φ = 2kπ   ← Regrouper
+    = φ = 2kπ/5   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z⁵ = 1
+    = {1 ; e^(2iπ/5) ; e^(4iπ/5) ; e^(−4iπ/5) ; e^(−2iπ/5)}   ← Les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 5   ← 5 solutions
+  aides : Pose z = r·e^(iφ). Ici z = 0 est exclu, donc r > 0. | r > 0 : r⁷ = 1 et e^(i·▢·φ) = 1. | r = 1 et φ = 2kπ/5 : 5 solutions.
+  pièges : a1_conj_arg_sign
+
+```
+
+### Niveau 5
+
+```
+Résous dans ℂ l'équation z⁷ = z̄. Pose z = r·e^(iφ) (r ≥ 0) : écris z̄ en r et φ, résous en r, puis en φ, liste les solutions et compte-les.
+  [free, sans aide]  conj(re^(iφ))
+    = re^(−iφ)   ← Le conjugué change le signe de φ
+  — Modules : r ≥ 0.  [juge solset]  départ : r⁷ = r
+    ? <math alttext="r⁷ = r"><mrow><msup><mrow><mi>r</mi></mrow><mn>7</mn></msup><mo>=</mo><mi>r</mi></mrow></math> : avant de diviser par r, ✔ je regarde d'abord r = 0 : z = 0 est solution / · je divise par r : r⁷ ÷ r
+    = r = 0 ou r⁶ = 1   ← Cas r = 0, puis r > 0
+    = r = 0 ou r = 1   ← r ≥ 0
+  — Arguments (cas r > 0), à 2kπ près :  [juge solset]  départ : 7φ = −φ + 2kπ
+    = 8φ = 2kπ   ← Regrouper
+    = φ = kπ/4   ← Isoler φ
+  — L'ensemble des solutions :  [juge complex]  départ : z = 0 ou z⁸ = 1
+    = {0 ; 1 ; √2/2 + i√2/2 ; i ; −√2/2 + i√2/2 ; −1 ; −√2/2 − i√2/2 ; −i ; √2/2 − i√2/2}   ← z = 0, et les racines
+  — Nombre de solutions distinctes :  [juge value]  départ : N
+    = 9   ← 1 + 8 solutions
+  pièges : a1_conj_arg_sign, a1_zn_conj_r0
+
+Dans ℂ, l'équation z⁷ = |z| a :
+  · 7 solutions distinctes [a1_zn_conj_polynomial_count]   · 9 solutions distinctes   · 14 solutions distinctes   ✔ 8 solutions distinctes
+  pièges : a1_zn_conj_polynomial_count
+
+Soit A = {z ∈ ℂ : z²(|z| − 4) = 0} et B = {z ∈ ℂ : Re z = 2}. Alors A ∩ B =
+  · {2 + 2i√3}   · ∅   · {0 ; 2 + 2i√3 ; 2 − 2i√3}   ✔ {2 + 2i√3 ; 2 − 2i√3}
+
+```
+
+### Variantes d'examen
+
+```
+Dans ℂ, l'équation z⁴ = 1/z̄ a :
+  · 4 solutions distinctes [a1_zn_conj_polynomial_count]   ✔ 3 solutions distinctes   · 5 solutions distinctes   · 8 solutions distinctes
+  [examen mcq]
+  pièges : a1_zn_conj_polynomial_count
+
+Vrai ou faux ?
+  « Pour tout n ≥ 1, les solutions de zⁿ = |z| sont exactement les racines n-ièmes de 1. » → FAUX
+    contre-exemple (refute) : n = 2
+  [examen tf]
+  pièges : a1_zn_conj_r0
+
+```
+
+## Définitions à écrire : Sup, continuité, dérivabilité, série convergente, suite de Cauchy (`a1-defs`, BA1)
+
+_Les conditions du cours, dans le bon ordre, sans condition en trop._
+
+### Niveau 1
+
+```
+Construis la définition de « f ∈ C¹(I) » : le début est placé, touche le bloc qui manque. Soit I un intervalle ouvert et f : I → ℝ. On dit que f ∈ C¹(I) si :
+  [blocs define]
+    1. et la fonction f′ : I → ℝ est continue sur I.
+    ✗ et f est continue sur I. [a1_c1_def_missing_cont]
+    ✗ et f′ est bornée sur I. [a1_c1_def_missing_cont]
+  pièges : a1_c1_def_missing_cont
+
+Construis la définition de « la série Σ aₙ converge absolument » : le début est placé, touche le bloc qui manque. Soit (aₙ) une suite réelle. On dit que la série Σ aₙ converge absolument si :
+  [blocs define]
+    1. converge.
+    ✗ la série Σ aₙ [a1_abs_conv_confused]
+    ✗ la suite (|aₙ|) [a1_series_term_to_zero]
+  pièges : a1_abs_conv_confused, a1_series_term_to_zero
+
+Construis la définition de « ∫ₐ^(+∞) f(x) dx converge » : le début est placé, touche le bloc qui manque. Soit f : [a ; +∞[ → ℝ continue. On dit que l'intégrale ∫ₐ^(+∞) f(x) dx converge si :
+  [blocs define]
+    1. existe et est finie.
+    ✗ f(x) → 0 quand x → +∞. [a1_improper_lim_zero_converges]
+    ✗ f est bornée sur [a ; +∞[. [a1_improper_lim_zero_converges]
+  pièges : a1_improper_lim_zero_converges
+
+```
+
+### Niveau 2
+
+```
+Construis la définition de « s = Sup A » : touche les blocs dans l'ordre. Soit A ⊂ ℝ non vide et s ∈ ℝ. On dit que s = Sup A si :
+  [blocs define]
+    1. s est un majorant de A : x ≤ s pour tout x ∈ A ;
+    2. pour tout ε > 0, il existe x ∈ A tel que x > s − ε.
+    ✗ s ∈ A. [a1_sup_in_set]
+    ✗ il existe x ∈ A tel que x > s − 1/10. [g9_proof_by_example]
+  pièges : a1_sup_in_set, g9_proof_by_example
+
+Construis la définition de « la série Σ aₙ converge absolument » : touche les blocs dans l'ordre. Soit (aₙ) une suite réelle. On dit que la série Σ aₙ converge absolument si :
+  [blocs define]
+    1. la série Σ |aₙ|
+    2. converge.
+    ✗ la suite (|aₙ|) [a1_series_term_to_zero]
+    ✗ la série Σ aₙ [a1_abs_conv_confused]
+  pièges : a1_series_term_to_zero, a1_abs_conv_confused
+
+Construis la définition de « (aₙ) est une suite de Cauchy » : le début est placé, touche les blocs qui manquent. Soit (aₙ) une suite réelle. On dit que (aₙ) est une suite de Cauchy si :
+  [blocs define]
+    1. pour tous m, n ≥ N,
+    2. on a |aₘ − aₙ| ≤ ε.
+    ✗ on a |aₙ₊₁ − aₙ| ≤ ε. [a1_cauchy_consecutive]
+    ✗ la suite aₙ₊₁ − aₙ tend vers 0. [a1_cauchy_consecutive]
+  pièges : a1_cauchy_consecutive
+
+```
+
+### Niveau 3
+
+```
+Construis la définition de « la série Σ aₙ converge absolument » : touche les blocs dans l'ordre. Soit (aₙ) une suite réelle. On dit que la série Σ aₙ converge absolument si :
+  [blocs define]
+    1. la série Σ |aₙ|
+    2. converge.
+    ✗ la suite (|aₙ|) [a1_series_term_to_zero]
+    ✗ la série Σ aₙ [a1_abs_conv_confused]
+  pièges : a1_series_term_to_zero, a1_abs_conv_confused
+
+Construis la définition de « (aₙ) est une suite de Cauchy » : touche les blocs dans l'ordre. Soit (aₙ) une suite réelle. On dit que (aₙ) est une suite de Cauchy si :
+  [blocs define]
+    1. pour tout ε > 0,
+    2. il existe N ∈ ℕ tel que,
+    3. pour tous m, n ≥ N,
+    4. on a |aₘ − aₙ| ≤ ε.
+    ✗ on a |aₙ₊₁ − aₙ| ≤ ε. [a1_cauchy_consecutive]
+    ✗ la suite aₙ₊₁ − aₙ tend vers 0. [a1_cauchy_consecutive]
+  pièges : a1_cauchy_consecutive
+
+Construis la définition de « f ∈ C¹(I) » : touche les blocs dans l'ordre. Soit I un intervalle ouvert et f : I → ℝ. On dit que f ∈ C¹(I) si :
+  [blocs define]
+    1. f est dérivable en tout point de I,
+    2. et la fonction f′ : I → ℝ est continue sur I.
+    ✗ et f est continue sur I. [a1_c1_def_missing_cont]
+    ✗ et f′ est bornée sur I. [a1_c1_def_missing_cont]
+  pièges : a1_c1_def_missing_cont
+
+```
+
+### Niveau 4
+
+```
+Construis la définition de « f ∈ C¹(I) » : touche les blocs dans l'ordre. Soit I un intervalle ouvert et f : I → ℝ. On dit que f ∈ C¹(I) si :
+  [blocs define]
+    1. f est dérivable en tout point de I,
+    2. et la fonction f′ : I → ℝ est continue sur I.
+    ✗ et f′ est bornée sur I. [a1_c1_def_missing_cont]
+    ✗ et f est continue sur I. [a1_c1_def_missing_cont]
+  pièges : a1_c1_def_missing_cont
+
+Construis la définition de « f est dérivable en x₀ » : touche les blocs dans l'ordre. Soit I un intervalle ouvert, f : I → ℝ et x₀ ∈ I. On dit que f est dérivable en x₀ si :
+  [blocs define]
+    1. la limite lim_{h→0} (f(x₀ + h) − f(x₀))/h
+    2. existe et est finie ; on la note f′(x₀).
+    ✗ f est continue en x₀. [a1_corner_missed]
+    ✗ la limite lim_{x→x₀} f′(x) existe. [a1_derivable_from_formula]
+  pièges : a1_corner_missed, a1_derivable_from_formula
+
+Construis la définition de « la série Σ aₙ converge » : touche les blocs dans l'ordre. Soit (aₙ) une suite réelle et sₙ = a₀ + a₁ + … + aₙ. On dit que la série Σ aₙ converge si :
+  [blocs define]
+    1. la suite des sommes partielles (sₙ)
+    2. converge vers un réel S ; on note S = Σ aₙ.
+    ✗ la suite (aₙ) tend vers 0. [a1_series_term_to_zero]
+    ✗ la suite (aₙ) converge. [a1_series_term_to_zero]
+    ✗ la suite (sₙ) est bornée. [a1_bounded_implies_convergent]
+  pièges : a1_series_term_to_zero, a1_bounded_implies_convergent
+
+```
+
+### Niveau 5
+
+```
+Donne la définition précise de chacune de ces trois notions.
+  [problème, 4 points]
+  partie 1 (Définition : (aₙ) est une suite de Cauchy : 2)
+  Écris avec des quantificateurs la définition de « (aₙ) est une suite de Cauchy ». Soit (aₙ) une suite réelle. On dit que (aₙ) est une suite de Cauchy si :
+    [jetons, sans aide] palette : N ∈ ℕ · ε > 0 · n ≥ N · |a_m − a_n| ≤ ε · |a_(n+1) − a_n| ≤ ε · m, n ≥ N
+      → ∀ε > 0 ∃N ∈ ℕ ∀m, n ≥ N, |a_m − a_n| ≤ ε
+  partie 2 (Définition : f admet un DL(n) en x₀ : 1)
+  Construis la définition de « f admet un DL(n) en x₀ » : touche les blocs dans l'ordre. Soit f définie autour de x₀ et n ∈ ℕ. On dit que f admet un développement limité d'ordre n en x₀ si :
+    [blocs define, sans aide]
+      1. il existe des réels a₀, a₁, …, aₙ et une fonction ε(x) → 0 quand x → x₀
+      2. tels que f(x) = a₀ + a₁(x − x₀) + … + aₙ(x − x₀)ⁿ + (x − x₀)ⁿ·ε(x).
+      ✗ tels que f(x) = a₀ + a₁(x − x₀) + … + aₙ(x − x₀)ⁿ + (x − x₀)ⁿ⁻¹·ε(x). [a1_dl_remainder_wrong_order]
+      ✗ tels que f(x) = a₀ + a₁(x − x₀) + … + aₙ(x − x₀)ⁿ. [a1_dl_remainder_wrong_order]
+  partie 3 (Définition : f ∈ C¹(I) : 1)
+  Construis la définition de « f ∈ C¹(I) » : touche les blocs dans l'ordre. Soit I un intervalle ouvert et f : I → ℝ. On dit que f ∈ C¹(I) si :
+    [blocs define, sans aide]
+      1. f est dérivable en tout point de I,
+      2. et la fonction f′ : I → ℝ est continue sur I.
+      ✗ et f′ est bornée sur I. [a1_c1_def_missing_cont]
+      ✗ et f est continue sur I. [a1_c1_def_missing_cont]
+  pièges : g9_quant_order, a1_cauchy_consecutive, a1_dl_remainder_wrong_order, a1_c1_def_missing_cont
+
+Donne la définition précise de chacune de ces trois notions.
+  [problème, 4 points]
+  partie 1 (Définition : ∫ₐ^(+∞) f(x) dx converge : 1)
+  Construis la définition de « ∫ₐ^(+∞) f(x) dx converge » : touche les blocs dans l'ordre. Soit f : [a ; +∞[ → ℝ continue. On dit que l'intégrale ∫ₐ^(+∞) f(x) dx converge si :
+    [blocs define, sans aide]
+      1. la limite lim_{b→+∞} ∫ₐᵇ f(x) dx
+      2. existe et est finie.
+      ✗ f est bornée sur [a ; +∞[. [a1_improper_lim_zero_converges]
+      ✗ f(x) → 0 quand x → +∞. [a1_improper_lim_zero_converges]
+  partie 2 (Définition : (aₙ) est une suite de Cauchy : 2)
+  Écris avec des quantificateurs la définition de « (aₙ) est une suite de Cauchy ». Soit (aₙ) une suite réelle. On dit que (aₙ) est une suite de Cauchy si :
+    [jetons, sans aide] palette : |a_(n+1) − a_n| ≤ ε · n ≥ N · N ∈ ℕ · |a_m − a_n| ≤ ε · ε > 0 · m, n ≥ N
+      → ∀ε > 0 ∃N ∈ ℕ ∀m, n ≥ N, |a_m − a_n| ≤ ε
+  partie 3 (Définition : la série Σ aₙ converge absolument : 1)
+  Construis la définition de « la série Σ aₙ converge absolument » : touche les blocs dans l'ordre. Soit (aₙ) une suite réelle. On dit que la série Σ aₙ converge absolument si :
+    [blocs define, sans aide]
+      1. la série Σ |aₙ|
+      2. converge.
+      ✗ la série Σ aₙ [a1_abs_conv_confused]
+      ✗ la suite (|aₙ|) [a1_series_term_to_zero]
+  pièges : a1_improper_lim_zero_converges, g9_quant_order, a1_cauchy_consecutive, a1_abs_conv_confused, a1_series_term_to_zero
+
+Donne la définition précise de chacune de ces trois notions.
+  [problème, 4 points]
+  partie 1 (Définition : la série Σ aₙ converge : 1)
+  Construis la définition de « la série Σ aₙ converge » : touche les blocs dans l'ordre. Soit (aₙ) une suite réelle et sₙ = a₀ + a₁ + … + aₙ. On dit que la série Σ aₙ converge si :
+    [blocs define, sans aide]
+      1. la suite des sommes partielles (sₙ)
+      2. converge vers un réel S ; on note S = Σ aₙ.
+      ✗ la suite (aₙ) converge. [a1_series_term_to_zero]
+      ✗ la suite (aₙ) tend vers 0. [a1_series_term_to_zero]
+      ✗ la suite (sₙ) est bornée. [a1_bounded_implies_convergent]
+  partie 2 (Définition : f est continue en x₀ : 2)
+  Construis la définition de « f est continue en x₀ » : touche les blocs dans l'ordre. Soit f : D → ℝ et x₀ ∈ D. On dit que f est continue en x₀ si :
+    [blocs define, sans aide]
+      1. pour tout ε > 0,
+      2. il existe δ > 0 tel que,
+      3. pour tout x ∈ D avec |x − x₀| ≤ δ,
+      4. on a |f(x) − f(x₀)| ≤ ε.
+      ✗ pour tout x ∈ D avec |x − x₀| ≤ ε, [a1_epsdelta_swapped]
+      ✗ on a |f(x) − f(x₀)| ≤ δ. [a1_epsdelta_swapped]
+      ✗ il existe δ > 0 tel que, pour tout ε > 0, [g9_quant_order]
+  partie 3 (Définition : f ∈ C¹(I) : 1)
+  Construis la définition de « f ∈ C¹(I) » : touche les blocs dans l'ordre. Soit I un intervalle ouvert et f : I → ℝ. On dit que f ∈ C¹(I) si :
+    [blocs define, sans aide]
+      1. f est dérivable en tout point de I,
+      2. et la fonction f′ : I → ℝ est continue sur I.
+      ✗ et f′ est bornée sur I. [a1_c1_def_missing_cont]
+      ✗ et f est continue sur I. [a1_c1_def_missing_cont]
+  pièges : a1_series_term_to_zero, a1_bounded_implies_convergent, a1_epsdelta_swapped, g9_quant_order, a1_c1_def_missing_cont
+
+```
+
+### Variantes d'examen
+
+```
+Donne la définition précise de : « la série Σ aₙ converge absolument ».
+  [problème, examen open, 1 points]
+  partie 1 (Définition : la série Σ aₙ converge absolument : 1)
+  Construis la définition de « la série Σ aₙ converge absolument » : touche les blocs dans l'ordre. Soit (aₙ) une suite réelle. On dit que la série Σ aₙ converge absolument si :
+    [blocs define, sans aide]
+      1. la série Σ |aₙ|
+      2. converge.
+      ✗ la suite (|aₙ|) [a1_series_term_to_zero]
+      ✗ la série Σ aₙ [a1_abs_conv_confused]
+  pièges : a1_series_term_to_zero, a1_abs_conv_confused
+
+Vrai ou faux ?
+  « Si f est dérivable en x₀, alors f est continue en x₀. » → VRAI
+  [examen tf]
+
+```
+
+## Preuves courtes d'examen : énoncer le théorème, vérifier ses hypothèses (`a1-proofs`, BA1)
+
+_Traduire l'hypothèse, citer le théorème, vérifier chaque hypothèse, conclure._
+
+### Niveau 1
+
+```
+Soit Σ aₙ une série absolument convergente. Montrer que Σ (−1)ⁿaₙe^(aₙ) converge absolument. Le début de la preuve est placé : touche les blocs qui suivent.
+  [blocs order]
+    1. Σ e·|aₙ| converge ; par le critère de comparaison (termes positifs, à partir du rang N), Σ |(−1)ⁿaₙe^(aₙ)| converge.
+    2. Donc Σ (−1)ⁿaₙe^(aₙ) converge absolument.
+    ✗ Pour tout n, il existe Nₙ tel que |aₙ| ≤ 1. [g9_quant_order]
+    ✗ Avec aₙ = 1/n², la série converge : c'est vrai. [g9_proof_by_example]
+  pièges : g9_quant_order, g9_proof_by_example
+
+Soit Σ aₙ une série absolument convergente. Montrer que Σ (−1)ⁿaₙe^(aₙ) converge absolument. Le début de la preuve est placé : touche les blocs qui suivent.
+  [blocs order]
+    1. Σ e·|aₙ| converge ; par le critère de comparaison (termes positifs, à partir du rang N), Σ |(−1)ⁿaₙe^(aₙ)| converge.
+    2. Donc Σ (−1)ⁿaₙe^(aₙ) converge absolument.
+    ✗ aₙe^(aₙ) ≤ e·aₙ, donc la série converge. [a1_compare_wrong_direction]
+    ✗ Pour tout n, il existe Nₙ tel que |aₙ| ≤ 1. [g9_quant_order]
+  pièges : a1_compare_wrong_direction, g9_quant_order
+
+Soit Σ aₙ une série absolument convergente. Montrer que a₂ₙ + a₂ₙ₊₁ + … + a₃ₙ → 0 quand n → ∞. Le début de la preuve est placé : touche les blocs qui suivent.
+  [blocs order]
+    1. 0 ≤ |a₂ₙ + … + a₃ₙ| ≤ R₂ₙ₋₁ et R₂ₙ₋₁ → 0.
+    2. Par les gendarmes, a₂ₙ + … + a₃ₙ → 0.
+    ✗ Avec aₖ = 1/k², a₂ₙ + … + a₃ₙ ≤ (n + 1)/(4n²) → 0 : c'est vrai. [g9_proof_by_example]
+    ✗ Chaque aₖ → 0, donc la somme a₂ₙ + … + a₃ₙ → 0. [a1_sum_n_terms_as_one]
+  pièges : g9_proof_by_example, a1_sum_n_terms_as_one
+
+```
+
+### Niveau 2
+
+```
+Soit f : [0 ; 1] → ℝ continue, dérivable sur ]0 ; 1[, avec f(0) = 2 et f′(x) ≤ −3 pour tout x ∈ ]0 ; 1[. Montrer que f s'annule sur ]0 ; 1[. Touche les blocs de la preuve dans l'ordre.
+  [blocs order]
+    1. f est continue sur [0 ; 1] et dérivable sur ]0 ; 1[ : les hypothèses du théorème des accroissements finis sont vérifiées.
+    2. TAF : il existe ξ ∈ ]0 ; 1[ tel que f(1) − f(0) = f′(ξ)·(1 − 0).
+    3. Comme f′(ξ) ≤ −3 : f(1) = 2 + 1·f′(ξ) ≤ 2 − 3 = −1 < 0.
+    4. TVI : si g est continue sur [α ; β] et si g(α) et g(β) sont de signes opposés, alors g s'annule sur ]α ; β[.
+    5. Ici f est continue sur [0 ; 1], f(0) = 2 > 0 et f(1) < 0 : les hypothèses du TVI sont vérifiées.
+    6. Donc il existe x₀ ∈ ]0 ; 1[ tel que f(x₀) = 0.
+
+Soit (bₙ) une suite convergente. Montrer que la série Σ bₙ/n³ converge. Touche les blocs de la preuve dans l'ordre.
+  [blocs order]
+    1. (bₙ) converge, donc elle est bornée : il existe M > 0 tel que |bₙ| ≤ M pour tout n.
+    2. Donc |bₙ/n³| ≤ M/n³ pour tout n ≥ 1.
+    3. La série Σ M/n³ converge : série de Riemann avec p = 3 > 1.
+    4. Critère de comparaison (termes positifs) : 0 ≤ |bₙ/n³| ≤ M/n³ et Σ M/n³ converge, donc Σ |bₙ/n³| converge.
+    5. Une série absolument convergente converge : Σ bₙ/n³ converge.
+
+Soit (bₙ) une suite convergente. Montrer que la série Σ bₙ/n³ converge. Touche les blocs de la preuve dans l'ordre.
+  [blocs order]
+    1. (bₙ) converge, donc elle est bornée : il existe M > 0 tel que |bₙ| ≤ M pour tout n.
+    2. Donc |bₙ/n³| ≤ M/n³ pour tout n ≥ 1.
+    3. La série Σ M/n³ converge : série de Riemann avec p = 3 > 1.
+    4. Critère de comparaison (termes positifs) : 0 ≤ |bₙ/n³| ≤ M/n³ et Σ M/n³ converge, donc Σ |bₙ/n³| converge.
+    5. Une série absolument convergente converge : Σ bₙ/n³ converge.
+
+```
+
+### Niveau 3
+
+```
+Soit f : [2 ; 4] → ℝ continue, dérivable sur ]2 ; 4[, avec f(2) = 2 et f′(x) ≤ −4 pour tout x ∈ ]2 ; 4[. Montrer que f s'annule sur ]2 ; 4[. Touche les blocs de la preuve dans l'ordre.
+  [blocs order]
+    1. f est continue sur [2 ; 4] et dérivable sur ]2 ; 4[ : les hypothèses du théorème des accroissements finis sont vérifiées.
+    2. TAF : il existe ξ ∈ ]2 ; 4[ tel que f(4) − f(2) = f′(ξ)·(4 − 2).
+    3. Comme f′(ξ) ≤ −4 : f(4) = 2 + 2·f′(ξ) ≤ 2 − 8 = −6 < 0.
+    4. TVI : si g est continue sur [α ; β] et si g(α) et g(β) sont de signes opposés, alors g s'annule sur ]α ; β[.
+    5. Ici f est continue sur [2 ; 4], f(2) = 2 > 0 et f(4) < 0 : les hypothèses du TVI sont vérifiées.
+    6. Donc il existe x₀ ∈ ]2 ; 4[ tel que f(x₀) = 0.
+    ✗ Avec f(x) = 2 − 4(x − 2), f s'annule en x = 5/2 : c'est vrai. [g9_proof_by_example]
+    ✗ f(2) > 0 et f′ < 0, donc f décroît et finit par s'annuler. [a1_ivt_no_continuity]
+  pièges : g9_proof_by_example, a1_ivt_no_continuity
+
+Soit Σ aₙ une série absolument convergente. Montrer que Σ (−1)ⁿaₙe^(aₙ) converge absolument. Touche les blocs de la preuve dans l'ordre.
+  [blocs order]
+    1. Σ |aₙ| converge, donc aₙ → 0 (condition nécessaire).
+    2. Il existe N tel que |aₙ| ≤ 1 pour n ≥ N ; alors e^(aₙ) ≤ e.
+    3. Pour n ≥ N : |(−1)ⁿaₙe^(aₙ)| = |aₙ|·e^(aₙ) ≤ e·|aₙ|.
+    4. Σ e·|aₙ| converge ; par le critère de comparaison (termes positifs, à partir du rang N), Σ |(−1)ⁿaₙe^(aₙ)| converge.
+    5. Donc Σ (−1)ⁿaₙe^(aₙ) converge absolument.
+    ✗ Pour tout n, il existe Nₙ tel que |aₙ| ≤ 1. [g9_quant_order]
+    ✗ Avec aₙ = 1/n², la série converge : c'est vrai. [g9_proof_by_example]
+  pièges : g9_quant_order, g9_proof_by_example
+
+Soit Σ aₙ une série absolument convergente. Montrer que a₂ₙ + a₂ₙ₊₁ + … + a₃ₙ → 0 quand n → ∞. Touche les blocs de la preuve dans l'ordre.
+  [blocs order]
+    1. Σ |aₖ| converge : ses restes Rₘ = Σ_{k>m} |aₖ| tendent vers 0 quand m → ∞.
+    2. |a₂ₙ + … + a₃ₙ| ≤ |a₂ₙ| + … + |a₃ₙ| (inégalité triangulaire).
+    3. |a₂ₙ| + … + |a₃ₙ| ≤ Σ_{k≥2n} |aₖ| = R₂ₙ₋₁ (termes positifs).
+    4. 0 ≤ |a₂ₙ + … + a₃ₙ| ≤ R₂ₙ₋₁ et R₂ₙ₋₁ → 0.
+    5. Par les gendarmes, a₂ₙ + … + a₃ₙ → 0.
+    ✗ Chaque aₖ → 0, donc la somme a₂ₙ + … + a₃ₙ → 0. [a1_sum_n_terms_as_one]
+    ✗ Il existe N tel que, pour tout ε > 0, Rₘ ≤ ε pour m ≥ N. [g9_quant_order]
+  pièges : a1_sum_n_terms_as_one, g9_quant_order
+
+```
+
+### Niveau 4
+
+```
+Soit Σ aₙ une série absolument convergente. Montrer que a₂ₙ + a₂ₙ₊₁ + … + a₃ₙ → 0 quand n → ∞. Touche les blocs de la preuve dans l'ordre. Un bloc demande un calcul.
+  [blocs order]
+    1. Σ |aₖ| converge : ses restes Rₘ = Σ_{k>m} |aₖ| tendent vers 0 quand m → ∞.
+    2. |a₂ₙ + … + a₃ₙ| ≤ |a₂ₙ| + … + |a₃ₙ| (inégalité triangulaire).
+    3. |a₂ₙ| + … + |a₃ₙ| ≤ Σ_{k≥2n} |aₖ| = R₂ₙ₋₁ (termes positifs).   [à écrire : Le reste commence à k = 2n]
+    4. 0 ≤ |a₂ₙ + … + a₃ₙ| ≤ R₂ₙ₋₁ et R₂ₙ₋₁ → 0.
+    5. Par les gendarmes, a₂ₙ + … + a₃ₙ → 0.
+    ✗ Chaque aₖ → 0, donc la somme a₂ₙ + … + a₃ₙ → 0. [a1_sum_n_terms_as_one]
+    ✗ a₂ₙ + … + a₃ₙ ≤ Σ aₖ, qui converge, donc a₂ₙ + … + a₃ₙ → 0. [a1_compare_wrong_direction]
+    ✗ Il existe N tel que, pour tout ε > 0, Rₘ ≤ ε pour m ≥ N. [g9_quant_order]
+    ✗ Avec aₖ = 1/k², a₂ₙ + … + a₃ₙ ≤ (n + 1)/(4n²) → 0 : c'est vrai. [g9_proof_by_example]
+  pièges : a1_sum_n_terms_as_one, a1_compare_wrong_direction, g9_quant_order, g9_proof_by_example
+
+Soit Σ aₙ une série absolument convergente. Montrer que Σ (−1)ⁿaₙe^(aₙ) converge absolument. Touche les blocs de la preuve dans l'ordre. Un bloc demande un calcul.
+  [blocs order]
+    1. Σ |aₙ| converge, donc aₙ → 0 (condition nécessaire).
+    2. Il existe N tel que |aₙ| ≤ 1 pour n ≥ N ; alors e^(aₙ) ≤ e.   [à écrire : Pour n ≥ N, e^(aₙ) ≤ e]
+    3. Pour n ≥ N : |(−1)ⁿaₙe^(aₙ)| = |aₙ|·e^(aₙ) ≤ e·|aₙ|.
+    4. Σ e·|aₙ| converge ; par le critère de comparaison (termes positifs, à partir du rang N), Σ |(−1)ⁿaₙe^(aₙ)| converge.
+    5. Donc Σ (−1)ⁿaₙe^(aₙ) converge absolument.
+    ✗ aₙe^(aₙ) ≤ e·aₙ, donc la série converge. [a1_compare_wrong_direction]
+    ✗ Avec aₙ = 1/n², la série converge : c'est vrai. [g9_proof_by_example]
+    ✗ La série est alternée, donc elle converge absolument par Leibniz. [a1_abs_conv_confused]
+    ✗ Pour tout n, il existe Nₙ tel que |aₙ| ≤ 1. [g9_quant_order]
+  pièges : a1_compare_wrong_direction, g9_proof_by_example, a1_abs_conv_confused, g9_quant_order
+
+Soit Σ aₙ une série absolument convergente. Montrer que a₂ₙ + a₂ₙ₊₁ + … + a₃ₙ → 0 quand n → ∞. Touche les blocs de la preuve dans l'ordre. Un bloc demande un calcul.
+  [blocs order]
+    1. Σ |aₖ| converge : ses restes Rₘ = Σ_{k>m} |aₖ| tendent vers 0 quand m → ∞.
+    2. |a₂ₙ + … + a₃ₙ| ≤ |a₂ₙ| + … + |a₃ₙ| (inégalité triangulaire).
+    3. |a₂ₙ| + … + |a₃ₙ| ≤ Σ_{k≥2n} |aₖ| = R₂ₙ₋₁ (termes positifs).   [à écrire : Le reste commence à k = 2n]
+    4. 0 ≤ |a₂ₙ + … + a₃ₙ| ≤ R₂ₙ₋₁ et R₂ₙ₋₁ → 0.
+    5. Par les gendarmes, a₂ₙ + … + a₃ₙ → 0.
+    ✗ Chaque aₖ → 0, donc la somme a₂ₙ + … + a₃ₙ → 0. [a1_sum_n_terms_as_one]
+    ✗ Il existe N tel que, pour tout ε > 0, Rₘ ≤ ε pour m ≥ N. [g9_quant_order]
+    ✗ a₂ₙ + … + a₃ₙ ≤ Σ aₖ, qui converge, donc a₂ₙ + … + a₃ₙ → 0. [a1_compare_wrong_direction]
+    ✗ Avec aₖ = 1/k², a₂ₙ + … + a₃ₙ ≤ (n + 1)/(4n²) → 0 : c'est vrai. [g9_proof_by_example]
+  pièges : a1_sum_n_terms_as_one, g9_quant_order, a1_compare_wrong_direction, g9_proof_by_example
+
+```
+
+### Niveau 5
+
+```
+Soit (bₙ) une suite convergente. Montrer que la série Σ bₙ/n³ converge. Si tu utilises un résultat du cours, énonce-le et vérifie ses hypothèses.
+  [problème, 4 points]
+  partie 1 (Traduire l'hypothèse : (bₙ) est bornée : 1)
+  Traduire l'hypothèse : (bₙ) est bornée :
+    [blocs order, sans aide]
+      1. (bₙ) converge, donc elle est bornée : il existe M > 0 tel que |bₙ| ≤ M pour tout n.
+      ✗ bₙ → ℓ, donc bₙ/n³ ~ ℓ/n³, et Σ ℓ/n³ converge. [a1_equiv_zero_limit]
+      ✗ Pour tout n, il existe Mₙ > 0 tel que |bₙ| ≤ Mₙ. [g9_quant_order]
+  partie 2 (Majorer |bₙ/nᵖ| : 1)
+  Majorer |bₙ/nᵖ| :
+    [blocs order, sans aide]
+      1. Donc |bₙ/n³| ≤ M/n³ pour tout n ≥ 1.   [à écrire : |bₙ/n³| ≤ M/n^3]
+      ✗ bₙ ≤ M, donc bₙ/n³ ≤ M/n³, donc Σ bₙ/n³ converge. [a1_compare_wrong_direction]
+  partie 3 (Énoncer et appliquer le critère de comparaison : 1,5)
+  Énoncer et appliquer le critère de comparaison :
+    [blocs order, sans aide]
+      1. La série Σ M/n³ converge : série de Riemann avec p = 3 > 1.
+      2. Critère de comparaison (termes positifs) : 0 ≤ |bₙ/n³| ≤ M/n³ et Σ M/n³ converge, donc Σ |bₙ/n³| converge.
+      ✗ bₙ → ℓ, donc bₙ/n³ ~ ℓ/n³, et Σ ℓ/n³ converge. [a1_equiv_zero_limit]
+      ✗ Avec bₙ = 1 : Σ 1/n³ converge, donc c'est vrai pour toute suite convergente. [g9_proof_by_example]
+  partie 4 (Conclure : 0,5)
+  Conclure :
+    [blocs order, sans aide]
+      1. Une série absolument convergente converge : Σ bₙ/n³ converge.
+      ✗ bₙ/n³ → 0, donc la série Σ bₙ/n³ converge. [a1_series_term_to_zero]
+  pièges : a1_equiv_zero_limit, g9_quant_order, a1_compare_wrong_direction, g9_proof_by_example, a1_series_term_to_zero
+
+Soit Σ aₙ une série absolument convergente. (a) Montrer que a₂ₙ + … + a₃ₙ → 0. (b) Montrer que Σ (−1)ⁿaₙe^(aₙ) converge absolument. Si tu utilises un résultat du cours, énonce-le et vérifie ses hypothèses.
+  [problème, 6 points]
+  partie 1 ((a) Traduire l'hypothèse : les restes tendent vers 0 : 1)
+  Traduire l'hypothèse : les restes tendent vers 0 :
+    [blocs order, sans aide]
+      1. Σ |aₖ| converge : ses restes Rₘ = Σ_{k>m} |aₖ| tendent vers 0 quand m → ∞.
+      ✗ Il existe N tel que, pour tout ε > 0, Rₘ ≤ ε pour m ≥ N. [g9_quant_order]
+  partie 2 ((a) Majorer par un reste : 1)
+  Majorer par un reste :
+    [blocs order, sans aide]
+      1. |a₂ₙ + … + a₃ₙ| ≤ |a₂ₙ| + … + |a₃ₙ| (inégalité triangulaire).
+      2. |a₂ₙ| + … + |a₃ₙ| ≤ Σ_{k≥2n} |aₖ| = R₂ₙ₋₁ (termes positifs).   [à écrire : Le reste commence à k = 2n]
+      ✗ a₂ₙ + … + a₃ₙ ≤ Σ aₖ, qui converge, donc a₂ₙ + … + a₃ₙ → 0. [a1_compare_wrong_direction]
+  partie 3 ((a) Conclure par les gendarmes : 1)
+  Conclure par les gendarmes :
+    [blocs order, sans aide]
+      1. 0 ≤ |a₂ₙ + … + a₃ₙ| ≤ R₂ₙ₋₁ et R₂ₙ₋₁ → 0.
+      2. Par les gendarmes, a₂ₙ + … + a₃ₙ → 0.
+      ✗ Chaque aₖ → 0, donc la somme a₂ₙ + … + a₃ₙ → 0. [a1_sum_n_terms_as_one]
+      ✗ Avec aₖ = 1/k², a₂ₙ + … + a₃ₙ ≤ (n + 1)/(4n²) → 0 : c'est vrai. [g9_proof_by_example]
+  partie 4 ((b) Traduire l'hypothèse : aₙ → 0, donc e^(aₙ) ≤ e : 1)
+  Traduire l'hypothèse : aₙ → 0, donc e^(aₙ) ≤ e :
+    [blocs order, sans aide]
+      1. Σ |aₙ| converge, donc aₙ → 0 (condition nécessaire).
+      2. Il existe N tel que |aₙ| ≤ 1 pour n ≥ N ; alors e^(aₙ) ≤ e.   [à écrire : Pour n ≥ N, e^(aₙ) ≤ e]
+      ✗ Pour tout n, il existe Nₙ tel que |aₙ| ≤ 1. [g9_quant_order]
+  partie 5 ((b) Majorer : 1)
+  Majorer :
+    [blocs order, sans aide]
+      1. Pour n ≥ N : |(−1)ⁿaₙe^(aₙ)| = |aₙ|·e^(aₙ) ≤ e·|aₙ|.
+      ✗ aₙe^(aₙ) ≤ e·aₙ, donc la série converge. [a1_compare_wrong_direction]
+  partie 6 ((b) Critère de comparaison et conclusion : 1)
+  Critère de comparaison et conclusion :
+    [blocs order, sans aide]
+      1. Σ e·|aₙ| converge ; par le critère de comparaison (termes positifs, à partir du rang N), Σ |(−1)ⁿaₙe^(aₙ)| converge.
+      2. Donc Σ (−1)ⁿaₙe^(aₙ) converge absolument.
+      ✗ La série est alternée, donc elle converge absolument par Leibniz. [a1_abs_conv_confused]
+      ✗ Avec aₙ = 1/n², la série converge : c'est vrai. [g9_proof_by_example]
+  pièges : g9_quant_order, a1_compare_wrong_direction, a1_sum_n_terms_as_one, g9_proof_by_example, a1_abs_conv_confused
+
+Soit (bₙ) une suite convergente. Montrer que la série Σ bₙ/n² converge. Si tu utilises un résultat du cours, énonce-le et vérifie ses hypothèses.
+  [problème, 4 points]
+  partie 1 (Traduire l'hypothèse : (bₙ) est bornée : 1)
+  Traduire l'hypothèse : (bₙ) est bornée :
+    [blocs order, sans aide]
+      1. (bₙ) converge, donc elle est bornée : il existe M > 0 tel que |bₙ| ≤ M pour tout n.
+      ✗ Pour tout n, il existe Mₙ > 0 tel que |bₙ| ≤ Mₙ. [g9_quant_order]
+      ✗ bₙ → ℓ, donc bₙ/n² ~ ℓ/n², et Σ ℓ/n² converge. [a1_equiv_zero_limit]
+  partie 2 (Majorer |bₙ/nᵖ| : 1)
+  Majorer |bₙ/nᵖ| :
+    [blocs order, sans aide]
+      1. Donc |bₙ/n²| ≤ M/n² pour tout n ≥ 1.   [à écrire : |bₙ/n²| ≤ M/n^2]
+      ✗ bₙ ≤ M, donc bₙ/n² ≤ M/n², donc Σ bₙ/n² converge. [a1_compare_wrong_direction]
+  partie 3 (Énoncer et appliquer le critère de comparaison : 1,5)
+  Énoncer et appliquer le critère de comparaison :
+    [blocs order, sans aide]
+      1. La série Σ M/n² converge : série de Riemann avec p = 2 > 1.
+      2. Critère de comparaison (termes positifs) : 0 ≤ |bₙ/n²| ≤ M/n² et Σ M/n² converge, donc Σ |bₙ/n²| converge.
+      ✗ bₙ → ℓ, donc bₙ/n² ~ ℓ/n², et Σ ℓ/n² converge. [a1_equiv_zero_limit]
+      ✗ Avec bₙ = 1 : Σ 1/n² converge, donc c'est vrai pour toute suite convergente. [g9_proof_by_example]
+  partie 4 (Conclure : 0,5)
+  Conclure :
+    [blocs order, sans aide]
+      1. Une série absolument convergente converge : Σ bₙ/n² converge.
+      ✗ bₙ/n² → 0, donc la série Σ bₙ/n² converge. [a1_series_term_to_zero]
+  pièges : g9_quant_order, a1_equiv_zero_limit, a1_compare_wrong_direction, g9_proof_by_example, a1_series_term_to_zero
+
+```
+
+### Variantes d'examen
+
+```
+Soit f : [1 ; 3] → ℝ continue, dérivable sur ]1 ; 3[, avec f(1) = 3 et f′(x) ≤ −2 pour tout x ∈ ]1 ; 3[. Montrer que f s'annule sur ]1 ; 3[. Si tu utilises un résultat du cours, énonce-le et vérifie ses hypothèses.
+  [problème, examen open, 5 points]
+  partie 1 (Énoncer le TAF et vérifier ses hypothèses : 1)
+  Énoncer le TAF et vérifier ses hypothèses :
+    [blocs order, sans aide]
+      1. f est continue sur [1 ; 3] et dérivable sur ]1 ; 3[ : les hypothèses du théorème des accroissements finis sont vérifiées.
+      2. TAF : il existe ξ ∈ ]1 ; 3[ tel que f(3) − f(1) = f′(ξ)·(3 − 1).
+      ✗ Par Rolle, il existe ξ ∈ ]1 ; 3[ tel que f′(ξ) = 0. [a1_rolle_without_hyp]
+  partie 2 (Appliquer le TAF : signe de f(3) : 1,5)
+  Appliquer le TAF : signe de f(3) :
+    [blocs order, sans aide]
+      1. Comme f′(ξ) ≤ −2 : f(3) = 3 + 2·f′(ξ) ≤ 3 − 4 = −1 < 0.   [à écrire : f(3) ≤ -1]
+      ✗ f′ ≤ −2, donc f(3) ≤ −2. [a1_mvt_endpoints_values]
+  partie 3 (Énoncer le TVI : 1)
+  Énoncer le TVI :
+    [blocs order, sans aide]
+      1. TVI : si g est continue sur [α ; β] et si g(α) et g(β) sont de signes opposés, alors g s'annule sur ]α ; β[.
+      ✗ TVI : il existe x₀ ∈ ]α ; β[ tel que toute g continue sur [α ; β], avec g(α) et g(β) de signes opposés, vérifie g(x₀) = 0. [g9_quant_order]
+  partie 4 (Vérifier les hypothèses du TVI : 1)
+  Vérifier les hypothèses du TVI :
+    [blocs order, sans aide]
+      1. Ici f est continue sur [1 ; 3], f(1) = 3 > 0 et f(3) < 0 : les hypothèses du TVI sont vérifiées.
+      ✗ f(1) > 0 et f′ < 0, donc f décroît et finit par s'annuler. [a1_ivt_no_continuity]
+  partie 5 (Conclure : 0,5)
+  Conclure :
+    [blocs order, sans aide]
+      1. Donc il existe x₀ ∈ ]1 ; 3[ tel que f(x₀) = 0.
+      ✗ Avec f(x) = 3 − 2(x − 1), f s'annule en x = 5/2 : c'est vrai. [g9_proof_by_example]
+  pièges : a1_rolle_without_hyp, a1_mvt_endpoints_values, g9_quant_order, a1_ivt_no_continuity, g9_proof_by_example
 
 ```
 
@@ -7132,3 +14762,54 @@ Calcule l'aire A de la surface obtenue en faisant tourner y = cosh(x) sur [0 ; l
 - **Volume de révolution sans le carré** (`a1_volume_no_square`, E) : V = π∫ f(x) dx au lieu de V = π∫ f(x)² dx
 - **Longueur d'arc sans la racine** (`a1_arc_length_no_sqrt`, E) : L = ∫ (1 + f′²) dx au lieu de L = ∫ √(1 + f′²) dx
 - **Comparaison dans le mauvais sens** (`a1_compare_wrong_direction`, E) : f ≥ 1/x², ∫ 1/x² converge, donc ∫ f converge au lieu de il faut f ≤ g
+- **Inf ou Sup des valeurs de la fonction, au lieu des x** (`a1_supinf_on_values`, C) : A = {x > 0 : cos(1/x) > 0} : « Sup A = π/2 » au lieu de Sup A = +∞, Inf A = 0
+- **tan appliquée hors de ]−π/2 ; π/2[** (`a1_tan_monotone_range`, C) : Arctg(1/x) < 2π/3 ⇒ 1/x < tan(2π/3) = −√3 au lieu de la condition est toujours vraie
+- **Le Sup pris pour un élément de A (un Max)** (`a1_sup_in_set`, E) : Sup [0 ; 3[ = 3 = Max au lieu de pas de Max
+- **N(ε) qui dépend de n** (`a1_n_depends_on_n`, E) : N(ε) = 5/(εn) au lieu de N(ε) = 5/ε
+- **Majorer une fraction en agrandissant son dénominateur** (`a1_bound_wrong_direction`, E) : 5/(n + 2) ≤ 5/(n + 3) au lieu de 5/(n + 2) ≤ 5/n
+- **Une limite ne serait jamais atteinte** (`a1_limit_never_reached`, R) : « 0,999… < 1 » ; « la suite constante 3 ne tend pas vers 3 » au lieu de 0,999… = 1, et la suite constante 3 tend vers 3
+- **∞ − ∞ pris pour 0 (suites)** (`a1_indet_inf_minus_inf`, E) : √(n² + 4n) − n → 0 au lieu de √(n² + 4n) − n → 2
+- **Racine distribuée sur une somme** (`a1_sqrt_sum_split`, E) : √(n² + 4n) = n + 2√n au lieu de quantité conjuguée
+- **Termes de plus bas degré gardés en +∞** (`a1_dominant_term_wrong`, E) : (2n³ − n)/(5n³ + 7) → −1/7 au lieu de (2n³ − n)/(5n³ + 7) → 2/5
+- **Règle du quotient appliquée avec lim bₙ = 0** (`a1_lim_quotient_bn_nonzero`, C) : aₙ → 1, bₙ → 0 (bₙ ≠ 0) : « aₙ/bₙ converge » au lieu de aₙ/bₙ peut ne pas avoir de limite
+- **Minorant et majorant échangés** (`a1_squeeze_wrong_direction`, C) : Sₙ ≤ n²/(n² + n) au lieu de Sₙ ≥ n²/(n² + n)
+- **Gendarmes avec deux bornes de limites différentes** (`a1_squeeze_different_limits`, C) : 0 ≤ bₙ ≤ 2 ⇒ « bₙ converge » au lieu de des bornes qui ont la même limite
+- **Une somme de n termes majorée par un seul terme** (`a1_sum_n_terms_as_one`, E) : Σ_{k=1}^{n} n/(n² + k) ≤ n/(n² + 1) au lieu de Σ_{k=1}^{n} n/(n² + k) ≤ n·n/(n² + 1)
+- **1^∞ pris pour 1** (`a1_indet_one_inf`, E) : (1 + 2/n)ⁿ → 1 au lieu de (1 + 2/n)ⁿ = e^(n·Log(1 + 2/n)) → e²
+- **(m + k)!/m! simplifié en un seul facteur** (`a1_factorial_ratio`, E) : (2n + 2)!/(2n)! = 2n + 2 au lieu de (2n + 2)!/(2n)! = (2n + 2)(2n + 1)
+- **Bornée, donc convergente** (`a1_bounded_implies_convergent`, C) : « (aₙ) est bornée, donc elle converge » au lieu de (aₙ) monotone et bornée, donc elle converge
+- **lim sup confondue avec le sup des termes** (`a1_limsup_as_sup`, E) : lim sup aₙ = sup des termes = 5/2 au lieu de lim sup aₙ = limite de la plus haute sous-suite = 1
+- **Formule de aₙ₊₁ = q·aₙ + c sans passer par le point fixe** (`a1_affine_rec_no_fixed_point`, E) : aₙ = qⁿ·a₀ + c au lieu de aₙ = qⁿ·(a₀ − L) + L
+- **Point fixe pris pour la limite sans prouver la convergence** (`a1_rec_limit_without_convergence`, C) : « L = f(L) ⇒ L = 2, donc aₙ → 2 » au lieu de la convergence d'abord : monotone et bornée
+- **Suite croissante parce que f est croissante** (`a1_monotone_by_f_increasing`, E) : f croissante, donc (aₙ) croissante au lieu de le sens dépend du signe de a₁ − a₀
+- **Somme géométrique : 1/(1 − q) sans regarder le premier terme** (`a1_geo_sum_start`, E) : Σ_{k≥2} (1/3)ᵏ = 3/2 au lieu de Σ_{k≥2} (1/3)ᵏ = (1/9)/(1 − 1/3) = 1/6
+- **Série télescopique : un seul terme gardé quand le décalage vaut 2** (`a1_tele_wrong_terms`, E) : Σ (1/(k + 1) − 1/(k + 3)) = 1/2 au lieu de 1/2 + 1/3
+- **« uₙ → 0, donc la série converge »** (`a1_series_term_to_zero`, R) : 1/n → 0, donc Σ 1/n converge au lieu de Σ 1/n diverge
+- **Seuil de la série de Riemann mal placé** (`a1_riemann_p_boundary`, E) : Σ 1/n converge (p = 1) au lieu de diverge
+- **ρ = 1, donc « converge » (ou « diverge »)** (`a1_ratio_one`, E) : ρ = 1, donc la série converge au lieu de aucune conclusion
+- **aₙ₊₁/aₙ < 1 pour tout n pris pour ρ < 1** (`a1_ratio_lt1_termwise`, E) : aₙ₊₁/aₙ < 1 pour tout n, donc Σ aₙ converge au lieu de il faut ≤ q < 1 fixe, ou une limite < 1
+- **Leibniz sans la décroissance** (`a1_leibniz_no_decrease`, C) : Σ (−1)ⁿ/(√n + (−1)ⁿ) « converge par Leibniz » au lieu de |aₙ| n'est pas décroissante : la série diverge
+- **Convergence et convergence absolue confondues** (`a1_abs_conv_confused`, E) : Σ (−1)ⁿ/n « converge absolument » au lieu de semi-convergente
+- **Bornes de l'ensemble de convergence non étudiées** (`a1_param_bounds_untreated`, E) : [−1 ; 3] au lieu de ]−1 ; 3[
+- **|a| < |b| remplacé par a < b** (`a1_abs_square_ineq`, E) : |2λ| < |λ + 3| ⇒ 2λ < λ + 3 au lieu de 4λ² < (λ + 3)²
+- **Limite remarquable sans le facteur de l'argument** (`a1_remarkable_limit_scale`, E) : sin(3x)/x → 1 au lieu de sin(3x)/x = 3·sin(3x)/(3x) → 3
+- **Une seule limite latérale donnée comme limite** (`a1_onesided_ignored`, E) : lim e^(1/x) en 0 = 0 (vu à gauche) au lieu de à gauche 0, à droite +∞ : pas de limite en 0
+- **Valeur absolue enlevée sans regarder le signe** (`a1_abs_removed`, E) : |x − 2| = x − 2 pour x < 2 au lieu de |x − 2| = −(x − 2) pour x < 2
+- **Limite latérale prise avec le mauvais morceau** (`a1_extension_wrong_branch`, E) : limite à gauche de 3 avec le morceau de x > 3 au lieu de à gauche de 3, le morceau de x < 3
+- **ε et δ échangés dans la définition** (`a1_epsdelta_swapped`, E) : |x − x₀| ≤ ε ⇒ |f(x) − L| ≤ δ au lieu de |x − x₀| ≤ δ ⇒ |f(x) − L| ≤ ε
+- **δ qui dépend de x** (`a1_delta_depends_on_x`, E) : δ = ε/|x + 3| au lieu de δ = min(1 ; ε/7)
+- **δ = k·ε au lieu de ε/k** (`a1_delta_inverted`, E) : |f(x) − 7| = 4|x + 1| : δ = 4ε au lieu de δ = ε/4
+- **TVI sans la continuité** (`a1_ivt_no_continuity`, E) : « f(0) < 0 < f(1), donc f s'annule » pour 1/(x − 1/2) au lieu de il faut f continue sur [0 ; 1]
+- **Image lue sur les seules bornes** (`a1_image_endpoints_only`, E) : f(x) = e^(−x)·sin x : image [f(0) ; f(π)] = {0} au lieu de [0 ; (√2/2)·e^(−π/4)]
+- **Bissection : l'erreur divisée par 10 à chaque étape** (`a1_bisection_count`, E) : erreur ≤ 10⁻³ dès n = 3 au lieu de n = 10, car 2¹⁰ = 1024 ≥ 10³
+- **Bornes du domaine oubliées** (`a1_power_bounds_forgotten`, E) : domaine ]1/3 ; 5/3[ au lieu de [1/3 ; 5/3[ : en x = 1/3, Σ (−1)ⁿ/(2n) converge
+- **Rayon R = ρ au lieu de 1/ρ** (`a1_power_radius_inverse`, E) : ρ = 3/2, donc R = 3/2 au lieu de R = 1/ρ = 2/3
+- **Centre de la série lu avec le mauvais signe** (`a1_power_center_sign`, E) : Σ aₙ(x + 1)ⁿ centrée en 1 au lieu de centrée en −1
+- **Série de référence sans ses premiers termes** (`a1_pow_sum_index_shift`, E) : Σ_{k≥1} 2ᵏ/k! = e² au lieu de e² − 1 : le terme k = 0 manque
+- **iᵏ réduit avec un mauvais modulo** (`a1_cplx_ik_mod`, C) : i¹⁵ = i au lieu de i¹⁵ = i³ = −i
+- **Module négatif dans une forme polaire** (`a1_polar_r_negative`, C) : −1 + i√3 = −2e^(−iπ/3), lu « r = 2, φ = −π/3 » au lieu de −1 + i√3 = 2e^(2iπ/3)
+- **Division par r sans le cas r = 0** (`a1_zn_conj_r0`, C) : z³ = z̄ : S = {1 ; i ; −1 ; −i} au lieu de S = {0 ; 1 ; i ; −1 ; −i}
+- **Nombre de solutions lu sur le degré apparent** (`a1_zn_conj_polynomial_count`, C) : z⁵ = |z| a 5 solutions au lieu de z⁵ = |z| a 6 solutions : 0 et les 5 racines cinquièmes de 1
+- **Conjugué écrit sans changer le signe de l'argument** (`a1_conj_arg_sign`, E) : z̄ = r·e^(iφ) au lieu de z̄ = r·e^(−iφ)
+- **Cauchy réduit à deux termes consécutifs** (`a1_cauchy_consecutive`, E) : (aₙ) de Cauchy ⇔ aₙ₊₁ − aₙ → 0 au lieu de ∀ε > 0 ∃N ∀m, n ≥ N, |aₘ − aₙ| ≤ ε
+- **Équivalent ℓ/n³ avec ℓ = 0** (`a1_equiv_zero_limit`, E) : bₙ → ℓ, donc bₙ/n³ ~ ℓ/n³ au lieu de si ℓ = 0, passer par la borne |bₙ| ≤ M

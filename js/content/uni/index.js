@@ -20,28 +20,17 @@ import * as alglin from './alglin.skills.js';
 import * as geoan from './geoan.skills.js';
 import * as coniques from './coniques.skills.js';
 
+// Step U4: module G8 (unit complexes).
+import * as complexes from './complexes.skills.js';
+
 const MODULES = [logique, polynomes, analyse0, explog, trigo, recurrence, fonctionsg, analyse1];
+MODULES.push(complexes); // step U4
 MODULES.push(alglin); // step U3
 MODULES.push(geoan, coniques); // step U5
 
 export const UNI_UNITS = MODULES.map((m) => m.UNIT);
 export const UNI_SKILLS = MODULES.flatMap((m) => m.SKILLS);
 
-export const UNBUILT = {
-  // g8-algebraic ← @alg:C-identites = lit-identities (step U4 builds G8).
-  'g8-algebraic': ['lit-identities'],
-  // Step U2: the A1 skills of step U4 that the derivatives, DL and
-  // integrals need. @alg:G-simplifier = rat-simplify.
-  'a1-seq-limits': ['rat-simplify', 'g2-log-rules'],
-  'a1-seq-squeeze': ['a1-seq-limits', 'g1-bound'],
-  'a1-fn-limits': ['a1-seq-limits', 'g3-identities'],
-  'a1-fn-onesided': ['a1-fn-limits'],
-  'a1-fn-extension': ['a1-fn-onesided', 'rat-simplify'],
-  'a1-fn-ivt': ['a1-fn-extension', 'a1-deriv-rules'],
-  'a1-fn-image': ['a1-fn-ivt', 'g6-deriv-rules'],
-  'a1-ser-compare': ['a1-seq-limits'],
-};
-// Step U3 (module L): G8 is built at step U4.
-Object.assign(UNBUILT, {
-  'g8-polar': ['lit-identities', 'g3-exact'],
-});
+// Empty since steps U3, U4 and U5: every prerequisite of the built modules
+// (L, A1, G4, G8, G10) is now built.
+export const UNBUILT = {};

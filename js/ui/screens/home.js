@@ -37,6 +37,13 @@ export function homeScreen(root, _args, app) {
       ? h('button.btn.secondary', { onclick: () => app.go('lesson', { kind: 'review' }) }, `⏰ Réviser${due.length ? ` (${due.length})` : ''}`)
       : null);
 
+  // Step U4: a problem left halfway (profile.pending) can be resumed.
+  if (p.pending?.item) {
+    const s = SKILL_BY_ID[p.pending.item.skill];
+    main.append(h('div.cta.resume',
+      h('button.btn.secondary.big', { onclick: () => app.go('lesson', { kind: 'resume' }) },
+        'Reprendre le problème', h('small', s ? s.title : ''))));
+  }
   if (streak.atRisk && streak.count > 0) {
     main.append(bubble(`Ta série de <b>${streak.count} jour${streak.count > 1 ? 's' : ''}</b> t'attend : une leçon aujourd'hui pour la garder !`, 'wow'));
   } else if (streak.lost) {

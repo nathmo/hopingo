@@ -8,6 +8,9 @@ import { judgeAnswer } from '../js/math/judge.js';
 import { RULE_BY_ID } from '../js/math/malrules.js';
 import { Q } from '../js/math/rational.js';
 import { CHECKERS } from '../js/math/checkers.js';
+import { UNI_SKILLS } from '../js/content/uni/index.js';
+
+const UNI_IDS = new Set(UNI_SKILLS.map((s) => s.id));
 
 test('skill graph: prerequisites exist and come earlier', () => {
   SKILLS.forEach((s, i) => {
@@ -30,8 +33,11 @@ test('every generator produces valid, self-consistent items', () => {
   for (const s of SKILLS) {
     // Module L is checked item by item by tests/uni-alglin-*.test.js.
     if (s.unit === 'alglin') continue;
+    // University skills: a few items here, 40 per level in tests/uni-*.test.js
+    // (step U4: 92 skills, whose items are long to build).
+    const n = UNI_IDS.has(s.id) ? 6 : 40;
     for (let level = 1; level <= 5; level++) {
-      for (let i = 0; i < 40; i++) {
+      for (let i = 0; i < n; i++) {
         const it = generate(s.id, level, rng);
         const where = `${s.id} L${level}: ${it.key}`;
         assert.equal(it.skill, s.id, where);

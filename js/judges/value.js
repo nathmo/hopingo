@@ -4,6 +4,7 @@
 // others (π, sin 0, √2) are compared exactly when possible, else in
 // floating point. cfg: {form: 'irreducible' (default) | 'any' | 'log', expect?}.
 // form 'log': a number or the logarithm of a whole number (ln 2, −ln 3) is final.
+// Step U4: form 'closed', a number in closed form (js/cas/closedform.js).
 // Step U1b (G3): forms 'exact' and 'deg', tol, tolDeg: 'exact' ends on a number
 // written out with radicals and π (−(√2 + √6)/4, 4π/3, js/cas/exactform.js);
 // 'deg' on an angle in degrees (38,21°); tol (absolute) or tolDeg (in
@@ -25,6 +26,7 @@ import { evalFloat } from '../cas/numeric.js';
 import { close } from '../cas/equiv.js';
 import { readLine, sameLine } from './common.js';
 import { exactForm } from '../cas/exactform.js';
+import { closedNumber } from '../cas/closedform.js';
 import { diagnoseLine } from './diagnose.js';
 
 const KIND = { parse: 'parse', same: 'same', ok: 'ok', done: 'done', wrong: 'wrong', simplify: 'stay' };
@@ -57,6 +59,8 @@ export function isFinal(cfg, node) {
   if (cfg.terms) return !!sumTerms(node);
   if (cfg.form === 'log' && !isLiteral(node)) return isLogLiteral(node);
   if (cfg.form === 'exact') return exactForm(node);
+  // Step U4 (A1, bounds of a set): a number in closed form (e^(−1/2), 2√3).
+  if (cfg.form === 'closed') return closedNumber(node);
   if (cfg.form === 'deg') return isDegLiteral(node) || (isLiteral(node) && stripParen(node).t !== 'frac' ? "Écris l'unité : ° pour des degrés." : false);
   if (!isLiteral(node)) return false;
   if ((cfg.form ?? 'irreducible') === 'any') return true;

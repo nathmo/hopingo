@@ -8,6 +8,8 @@
 // The `problem` type arrives in step U4: level 5 and the `open` variant
 // are hint-free lines items with parts.
 
+import { segmentsOf } from '../../judges/lines.js';
+import { asProblem } from './kit-problem.js';
 import { parse } from '../../cas/parse.js';
 import { exactValue } from '../../cas/normal.js';
 import { q, N, H, E, examOf, kx, joinSum, blanked, partsItem, mcqOf, ML, RD } from './analyse1-b-common.js';
@@ -285,6 +287,13 @@ function poItem(level, rng, opts) {
   });
 }
 
+// Step U4: level 5 and the open variant are `problem` items; the steps are
+// the segments (ρ̇, the two limits, the slope, ẏ, P, the slope at P, the
+// horizontal tangents), with the catalogue's barème (E3, 12 points).
+const PO_POINTS = [2, 1.5, 1.5, 3, 1, 1, 1, 1];
 export function polarCurveItem(level, rng, profile, opts = {}) {
-  return poItem(level, rng, opts);
+  const it = poItem(level, rng, opts);
+  if (level < 5 && opts.exam !== 'open') return it;
+  const steps = segmentsOf(it).length;
+  return asProblem(it, 12, { points: steps === PO_POINTS.length ? PO_POINTS : undefined });
 }

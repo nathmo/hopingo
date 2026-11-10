@@ -14,10 +14,14 @@ import { limit, targetOf, limitNumber } from './limit.js';
 
 const NEAR_POLE = 0.05;
 
+const FACTS = [1];
+for (let k = 1; k <= 170; k++) FACTS.push(FACTS[k - 1] * k);
 const REAL_FN = {
   sin: Math.sin, cos: Math.cos, tan: Math.tan, cot: (x) => 1 / Math.tan(x), exp: Math.exp, ln: Math.log,
   sinh: Math.sinh, cosh: Math.cosh, tanh: Math.tanh, arcsin: Math.asin, arccos: Math.acos, arctan: Math.atan,
   argsh: Math.asinh, argch: Math.acosh, argth: Math.atanh, sqrt: Math.sqrt, abs: Math.abs,
+  // Step U4: n! for a whole n ≥ 0 (Infinity past 170!), else undefined.
+  fact: (x) => { const n = Math.round(x); if (n < 0 || Math.abs(x - n) > 1e-9) return NaN; return n > 170 ? Infinity : FACTS[n]; },
 };
 
 export function evalFloat(node, env = {}, opts = {}) {
@@ -76,6 +80,8 @@ export function evalFloat(node, env = {}, opts = {}) {
         if (!(b > 0) || b === 1 || !(x > 0) || (guard && x < 1e-6)) return NaN;
         return Math.log(x) / Math.log(b);
       }
+      // Step U4: min and max of several numbers.
+      if ((name === 'min' || name === 'max') && node.args.length >= 2) return (name === 'min' ? Math.min : Math.max)(...node.args.map(E));
       const f = REAL_FN[name];
       if (!f || node.args.length !== 1) return NaN;
       const x = E(node.args[0]);
@@ -88,6 +94,8 @@ export function evalFloat(node, env = {}, opts = {}) {
     }
     case 'sum': {
       // Σ_{k=lo}^{hi} e, the bounds rounded to whole numbers (empty if hi < lo).
+      // Step U4: hi = +∞, a series, by partial sums and extrapolation.
+      if (isInf(node.hi)) return seriesSum(node, env);
       const lo = E(node.lo);
       const hi = E(node.hi);
       if (!Number.isFinite(lo) || !Number.isFinite(hi)) return NaN;
@@ -95,6 +103,14 @@ export function evalFloat(node, env = {}, opts = {}) {
       const b = Math.round(hi);
       if (Math.abs(a - lo) > 1e-9 || Math.abs(b - hi) > 1e-9 || b - a > 100000) return NaN;
       let s = 0;
+      // Step U4: long sums (Σ up to n = 10⁵ in the bounds of a squeeze) are
+      // compiled once.
+      if (b - a > 8 && !guard) {
+        const c = compileFloat(node.e);
+        const e = { ...env };
+        for (let j = a; j <= b; j++) { e[node.k] = j; s += c(e); }
+        return s;
+      }
       for (let j = a; j <= b; j++) s += evalFloat(node.e, { ...env, [node.k]: j }, opts);
       return s;
     }
@@ -133,6 +149,93 @@ export function evalFloat(node, env = {}, opts = {}) {
     }
     default: return NaN;
   }
+}
+
+const isInf = (n) => { n = stripParen(n); return n.t === 'const' && n.name === 'inf'; };
+
+// Σ_{k=lo}^{∞} e (step U4, catalogue A1 convention 3): partial sums S_N for
+// N = 2ʲ up to 2¹⁷, then Richardson's extrapolation in 1/N and Aitken's Δ²;
+// the estimate whose last two values agree best, if they agree to 1e−7.
+// NaN for a divergent series, or one that converges too slowly to tell.
+// Step U4 (part h): the values are kept (500 at most): a judge evaluates
+// the same Σ for the line, the previous line and each trap's candidate.
+const SUMS = new Map();
+export function seriesSum(node, env = {}) {
+  let key = null;
+  try { key = JSON.stringify([node.e, node.k, node.lo, env]); } catch { key = null; }
+  if (key !== null && SUMS.has(key)) return SUMS.get(key);
+  const v = sumOnce(node, env);
+  if (key !== null) {
+    if (SUMS.size >= 500) SUMS.clear();
+    SUMS.set(key, v);
+  }
+  return v;
+}
+
+function sumOnce(node, env) {
+  const lo = Math.round(evalFloat(node.lo, env));
+  if (!Number.isFinite(lo)) return NaN;
+  const c = compileFloat(node.e);
+  const k = node.k;
+  const e = { ...env };
+  const S = [];
+  let s = 0;
+  let t = 0;
+  let n = lo;
+  let last = Infinity;
+  let tiny = 0;
+  for (let j = 1; j <= 17; j++) {
+    const N = lo + 2 ** j;
+    // Step U4: a whole block that changes nothing, ending on a vanishing
+    // term (xᵏ/k!): the sum has converged.
+    if (j > 6 && S[S.length - 1] === S[S.length - 2] && Math.abs(t) < 1e-200) return s;
+    for (; n < N; n++) {
+      e[k] = n;
+      t = c(e);
+      // Step U4: a term like (1 + 2ᵏ)/3ᵏ or xᵏ/k! overflows (∞/∞) long
+      // after the terms have become negligible: the sum is reached (after
+      // tiny terms, or a whole block that changed nothing). Also after 50
+      // terms in a row below 1e−18 of the sum (a geometric series, in a few
+      // hundred terms instead of 2¹⁷).
+      if (!Number.isFinite(t)) {
+        if (Math.abs(last) < 1e-20 * (1 + Math.abs(s)) || (n > lo + 100 && S.length && S[S.length - 1] === s)) { n = Infinity; break; }
+        return NaN;
+      }
+      last = t;
+      s += t;
+      tiny = Math.abs(t) < 1e-18 * (1 + Math.abs(s)) ? tiny + 1 : 0;
+      if (tiny >= 50) { n = Infinity; break; }
+    }
+    S.push(s);
+  }
+  if (!S.every(Number.isFinite)) return NaN;
+  const cands = [];
+  // Richardson: error in powers of 1/N, N doubling.
+  let row = S.slice(-8);
+  for (let m = 1; m <= 4; m++) {
+    row = row.slice(1).map((x, i) => (2 ** m * x - row[i]) / (2 ** m - 1));
+    cands.push(row);
+  }
+  // Aitken (error q^N or N^(−p)).
+  const A = [];
+  for (let i = 2; i < S.length; i++) {
+    const d1 = S[i] - S[i - 1];
+    const d0 = S[i - 1] - S[i - 2];
+    A.push(d1 === d0 ? S[i] : S[i] - (d1 * d1) / (d1 - d0));
+  }
+  cands.push(A.slice(-6), S.slice(-4));
+  let best = null;
+  for (const r of cands) {
+    if (r.length < 2) continue;
+    const a = r[r.length - 1];
+    const b = r[r.length - 2];
+    const err = Math.abs(a - b);
+    if (Number.isFinite(err) && (!best || err < best.err)) best = { err, v: a };
+  }
+  if (!best || best.err > 1e-7 * (1 + Math.abs(best.v))) return NaN;
+  // A growth that only looks stable (Σ 1/k: S grows like ln N).
+  if (Math.abs(S[S.length - 1] - S[S.length - 2]) > 1e-3 * (1 + Math.abs(best.v)) && Math.abs(best.v - S[S.length - 1]) > 0.5 * (1 + Math.abs(best.v))) return NaN;
+  return best.v;
 }
 
 // k points of the domain. Integer variables take whole values.
@@ -201,6 +304,25 @@ export function compileFloat(node) {
         }
         if (x === 0 && y < 0) return NaN;
         return x ** y;
+      };
+    }
+    // Step U4: a finite Σ (bounds in n), its term compiled once.
+    case 'sum': {
+      if (isInf(node.hi)) break;
+      const lo = C(node.lo);
+      const hi = C(node.hi);
+      const t = C(node.e);
+      const k = node.k;
+      return (env) => {
+        const x = lo(env);
+        const y = hi(env);
+        const a = Math.round(x);
+        const b = Math.round(y);
+        if (!Number.isFinite(a) || !Number.isFinite(b) || Math.abs(a - x) > 1e-9 || Math.abs(b - y) > 1e-9 || b - a > 100000) return NaN;
+        const e = { ...env };
+        let s = 0;
+        for (let j = a; j <= b; j++) { e[k] = j; s += t(e); }
+        return s;
       };
     }
     default: break;

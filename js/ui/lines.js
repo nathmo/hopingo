@@ -13,6 +13,7 @@ import { MathInput } from './keypad.js';
 import { TokenInput } from './tokens.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { LinesRun, templateOf, fillBlanks } from '../judges/lines.js';
+import { LoggedLinesRun, isLongLines, pendingOf, resumeRun } from '../judges/problem.js';
 import { actionsFor } from '../judges/actions.js';
 import { parseOpts } from '../judges/common.js';
 import { readWith, showWith, textWith, signOf } from '../judges/index.js';
@@ -31,8 +32,15 @@ const innerMath = (text, opts) => {
   return n ? MM(n).replace(/^<math[^>]*>/, '').replace(/<\/math>$/, '') : null;
 };
 
-export function mountLines(item, ctx, body) {
-  const run = new LinesRun(item);
+// opts.run: a run already made (a part of a problem, or a resumed item: its
+// lines so far are drawn again). A long item (§9.6) saves itself after each
+// action through ctx.save(pending) when the screen gives ctx.save.
+export function mountLines(item, ctx, body, opts = {}) {
+  let run = opts.run || null;
+  if (!run && item.resumeLog) run = resumeRun({ item, log: item.resumeLog });
+  if (!run && isLongLines(item) && ctx.save) run = new LoggedLinesRun(item);
+  if (!run) run = new LinesRun(item);
+  if (!opts.run && run instanceof LoggedLinesRun && ctx.save) run.onChange = () => ctx.save(pendingOf(run));
   const popts = () => parseOpts(run.cfg);
   const keysets = item.keys?.length ? item.keys : ['calcx', 'calcfn'];
   const canHint = !item.noHints && item.hints?.length > 0;
@@ -69,13 +77,21 @@ export function mountLines(item, ctx, body) {
 
   // Each judge shows its own lines (the logic judge writes formulas).
   const eqSign = () => signOf(run.cfg);
-  const addLine = (node, cls, note = '', eq = true) => {
-    history.appendChild(h(`div.step-line.${cls}`, eq ? h('span.eq', eqSign()) : null,
-      html(showWith(run.cfg, node)), note ? h('span.step-note', note) : null));
+  const addLine = (node, cls, note = '', eq = true, cfg = run.cfg) => {
+    history.appendChild(h(`div.step-line.${cls}`, eq ? h('span.eq', signOf(cfg)) : null,
+      html(showWith(cfg, node)), note ? h('span.step-note', note) : null));
     history.scrollTop = history.scrollHeight;
   };
   const addNote = (text, cls = '') => history.appendChild(h(`div.lines-note${cls ? `.${cls}` : ''}`, html(text)));
-  addLine(run.prev, 'first', '', false);
+  // The lines so far (a resumed run), else the first line.
+  if (run.history.length > 1 || run.seg > 0) {
+    run.history.forEach((e, i) => {
+      if (e.how === 'start') {
+        if (i > 0) addNote(run.segments[e.seg].html || '', 'segment');
+        else addLine(e.node, 'first', '', false, run.segments[0].judge);
+      } else addLine(e.node, e.how === 'ok' ? 'ok' : e.how, e.how === 'followed' ? 'ta ligne' : '', true, run.segments[e.seg].judge);
+    });
+  } else addLine(run.prev, 'first', '', false);
 
   // ---------- tools ----------
   const hintBtn = canHint ? h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }) : null;
@@ -402,9 +418,10 @@ export function mountLines(item, ctx, body) {
     });
   }
 
-  nextTask();
+  if (run.done) finish(); else nextTask();
   return {
     ownFlow: true,
+    run,
     footer,
     onKey: (e) => {
       if (locked()) { e.preventDefault(); return; }

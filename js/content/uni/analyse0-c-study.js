@@ -10,6 +10,7 @@
 // oblique asymptotes, a vertical one.
 
 import { MT, fr, linesItem, examTag } from './kit.js';
+import { asProblem } from './kit-problem.js';
 import {
   q, N, RT, nz, modeOf, H, E, D, NOTE, polyText, affText, minusText, atText, blanked, part, partsScript, usedSubgoals,
   KEYS,
@@ -272,6 +273,11 @@ function sfItem(level, rng, opts = {}) {
   return { ...it, baits: [...new Set([...it.baits, 'g6_sketch_crosses_asymptote'])] };
 }
 
+// Step U4: level 5 and the open variant are `problem` items (one part,
+// its segments the steps; 6 points as in the catalogue's barème).
 export const GEN = {
-  [SF]: (level, rng, profile, opts = {}) => sfItem(level, rng, opts),
+  [SF]: (level, rng, profile, opts = {}) => {
+    const it = sfItem(level, rng, opts);
+    return level === 5 || opts.exam === 'open' ? asProblem(it, 6) : it;
+  },
 };

@@ -38,13 +38,13 @@ const KEYSETS = {
   // of an identity or a division.
   set: [']', '[', ';', '{', '}', '∪', '∩', '∖', '∞', '∈', 'ℝ', 'ℕ', 'ℤ', '∅', '∧', '∨', '¬', 'back'],
   logic: ['∀', '∃', '¬', '⇒', '⇔', '∧', '∨', '∈', '(', ')', ',', 'back'],
-  cplx: ['i', '(', ')', 'left', 'right', 'back'],
+  cplx: ['i', 'conj(', 'Re(', 'Im(', 'arg(', '|', '(', ')', 'left', 'right', 'back'],
   // Trigonometry (G3): the integer k of families, degrees, cot, the letters
   // of substitutions (X = cos x, t = tan(x/2)) and « ou ».
   trig: ['k', '°', 'π', 'cot(', 'X', 't', '∨', 'back'],
   letters: ['a', 'b', 'c', 'd', 'A', 'B', 'N', 'D', 'λ', '=', ';', 'back'],
   // Step U1b: sums and sequences. Σ writes sum(terme, k, début, fin).
-  seq: ['n', 'k', 'j', 'sum(', ',', '(', ')', 'u', '_', 'q', 'r', 'back'],
+  seq: ['n', 'k', 'j', 'sum(', ',', '(', ')', 'u', '_', 'q', 'r', '!', 'back'],
   // Step U1b (G2): exponentials, logarithms in a base, hyperbolic functions.
   // Step U1b (G1): absolute values, a parameter m, named sets S₁, the domain D.
   ineq: ['|', '√(', 'm', 'S', '_', 'D', '(', ')', 'left', 'right', 'back'],
@@ -52,6 +52,8 @@ const KEYSETS = {
   // Step U2: integrals int(f, x) and int(f, x, a, b), brackets [F] from a to
   // b, limits, one-sided bounds 0⁺ 1⁻, the constant C, the remainder ε(x).
   anal: ['int(', 'bracket(', 'lim(', ',', 'C', 'ε(x)', 'o(', '⁺', '⁻', '∞', 't', '(', ')', 'left', 'right', 'back'],
+  // Step U4 (A1, sequences): factorials n!, (n + 1)!, the index m of a subsequence.
+  fact: ['!', 'n', 'm', 'k', '(', ')', '^', 'left', 'right', 'back'],
 };
 // Step U3: lines of matrices typed as text (« (1 ; 2) », det, Aᵀ, A⁻¹).
 // Step U5: analytic geometry: coordinates, parameters, points and vectors
@@ -66,6 +68,7 @@ const TAB_LABEL = { anal: '∫ lim', mat: '[ ]', calc: '123', calcx: '123', calc
 // Step U5.
 TAB_LABEL.geo = 'xyz ‖‖';
 TAB_LABEL.pts = 'A B u';
+TAB_LABEL.fact = 'n!'; // step U4
 
 const LABEL = {
   'int(': '∫( , x)', 'bracket(': '[F]ₐᵇ', 'lim(': 'lim( , x, a)', 'o(': 'o( )',

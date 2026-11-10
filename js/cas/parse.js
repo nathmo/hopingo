@@ -28,6 +28,8 @@
 // (the key ∫ writes int( ; « ∫ » is read too), bracket(F, x, a, b) = [F]
 // from a to b, lim(f, x, a); a bound 0⁺ or 1⁻ (the keys ⁺ ⁻); ε(x), the
 // remainder of a DL, and o(x^n), read as xⁿ·ε(x).
+// Step U4 (A1, sequences): a factorial n!, (n + 1)!, read as the call
+// {t:'fn', name:'fact', args:[e]} and printed back with « ! ».
 
 import { Q } from '../math/rational.js';
 
@@ -49,6 +51,11 @@ const CALLS = ['bracket', 'int', 'lim'];
 // Read as functions only when "(" follows: they also look like products of letters.
 const SHORT_FUNCS = ['sh', 'ch', 'th', 'tg', 'd', 'o'];
 const MULTI_ARG = new Set(['d', 'root', 'sum', 'Σ', 'int', 'bracket', 'lim', '∫']);
+// Step U4: min(a ; b) and max(a ; b) (δ = min(1 ; ε/5)), arguments split by
+// « ; » or « , ».
+const MINMAX = ['min', 'max'];
+FUNCS.push(...MINMAX);
+for (const f of MINMAX) MULTI_ARG.add(f);
 const GREEK = 'αβγδεζηθικλμνξρστυφχψωΓΔΘΛΞΠΣΦΨΩ';
 const RELOPS = new Set(['=', '<', '>', '≤', '≥', '≠']);
 // Set and logic symbols (step U1).
@@ -114,7 +121,7 @@ export function tokenize(text, opts = {}) {
       continue;
     }
     if (GREEK.includes(c) || c === 'π' || c === '∞' || c === '∫') { out.push({ k: 'name', s: c, pos: i }); i++; continue; }
-    if ('+-×÷/^()|\'√_,;□°'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
+    if ('+-×÷/^()|\'√_,;□°!'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
       if (c === '(') {
         const prev = out[out.length - 1];
         stack.push(prev?.k === 'name' && MULTI_ARG.has(prev.s) ? 'args' : 'group');
@@ -259,6 +266,8 @@ export function parse(text, opts = {}) {
   }
   // 30° is 30·π/180: a product marked `deg`, printed back with its sign.
   const degrees = (b) => {
+    // Step U4 (A1, sequences): n!, (n + 1)!, (2n)!: the call fact(…).
+    while (isOp(peek(), '!')) { p++; b = { t: 'fn', name: 'fact', args: [b] }; }
     // 0⁺, 1⁻: a bound approached from one side (step U2).
     if (isOp(peek(), '⁺') || isOp(peek(), '⁻')) return { t: 'side', e: b, dir: toks[p++].s === '⁺' ? '+' : '-' };
     if (!isOp(peek(), '°')) return b;
@@ -282,7 +291,7 @@ export function parse(text, opts = {}) {
   function args(name) {
     expect('(', `Il faut une parenthèse après ${name}.`);
     const out = [sum()];
-    while (isOp(peek(), ',')) { p++; out.push(sum()); }
+    while (isOp(peek(), ',') || (MINMAX.includes(name) && isOp(peek(), ';'))) { p++; out.push(sum()); }
     expect(')', 'Une parenthèse n\'est pas fermée.');
     return out;
   }
@@ -374,6 +383,7 @@ export function parse(text, opts = {}) {
     const a = args(name);
     if (name === 'sqrt') { if (a.length !== 1) fail('sqrt prend un seul argument.'); return { t: 'sqrt', e: { t: 'paren', e: a[0] } }; }
     if (name === 'abs') { if (a.length !== 1) fail('abs prend un seul argument.'); return { t: 'abs', e: a[0] }; }
+    if (MINMAX.includes(name)) { if (a.length < 2) fail(`${name} prend au moins deux nombres : ${name}(a ; b).`); return { t: 'fn', name, args: a }; }
     if (a.length !== 1 && !userFuncs.has(name)) fail(`${name} prend un seul argument.`);
     return { t: 'fn', name, args: a };
   }
