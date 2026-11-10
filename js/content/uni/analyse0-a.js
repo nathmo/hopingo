@@ -421,7 +421,7 @@ function tgParallel(level, rng, opts) {
   return partsItem({
     skill: TG, level, parts, choices: TG_CHOICES,
     prompt: `Soit f(x) = ${MT(d.f)}. En quel point la tangente au graphe de f est-elle parallèle à la droite y = ${MT(lineText)} ? Donne l'équation de cette tangente.`,
-    hints: H(`Deux droites parallèles ont la même pente : résous f′(x) = ${fr(d.m)}.`, `x = ${fr(d.a)}, puis y = f(${fr(d.a)}) + ${fr(d.m)}(${MT(lin(d.a))}) avec f(${fr(d.a)}) = □`, `y = ${MT(tangentFinal(d.fa, d.dfa, d.a), YV)}`),
+    hints: H(`Deux droites parallèles ont la même pente : résous f′(x) = ${fr(d.m)}.`, `x = ${fr(d.a)}, puis y = f(${fr(d.a)}) ${d.m < 0 ? '−' : '+'} ${fr(Math.abs(d.m)) === '1' ? '' : fr(Math.abs(d.m))}(${MT(lin(d.a))}) avec f(${fr(d.a)}) = □`, `y = ${MT(tangentFinal(d.fa, d.dfa, d.a), YV)}`),
     subgoals: TG_SUB, keys: [...KEYS, 'relation'], key: `${TG}:par:${level}:${d.f}:${d.m}`, exam: examOf(opts, 3), fallback: d.fallback, expectedSec: 150,
   });
 }

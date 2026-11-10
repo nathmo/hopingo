@@ -326,7 +326,8 @@ function pbParts(d, level) {
     E(N(d.h), `t = ${fr(d.t0)}`, 'intercept', 'intercept'),
   ];
   if (level <= 2) hLines[1] = blanked(hLines[1], [[String(Math.abs(d.L[0].n)), -1]].filter(() => d.L[0].n !== 0));
-  const mx = `${d.m.d === 1 && d.m.n > 0 ? d.m.n : `(${N(d.m)})`}×${xt}`;
+  // m·x(t), without « 1· » when m = 1.
+  const mx = d.m.eq(1) ? xt : `${d.m.d === 1 && d.m.n > 0 ? d.m.n : `(${N(d.m)})`}×${xt}`;
   const inter = part(`Quand t → ${fr(d.t0)} : h = lim (y − mx).`, 'h =', `${yt}-${mx}`, lim(d.t0), hLines);
   const asym = part(`Asymptote quand t → ${fr(d.t0)} :`, 'y =', 'mx+h', asymJudge(d.m, d.h), [E(affText(d.m, d.h), 'y = mx + h', 'asym', 'asym')], [obliqueDecision(d.m, d.h)]);
   return { xt, yt, domain, xInf, yInf, xT0, yT0, slope, inter, asym };

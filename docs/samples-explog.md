@@ -1196,7 +1196,7 @@ Montre que cosh(x)² + sinh(x)² = cosh(2x) avec les exponentielles.
     = (e^(2x) + e^(−2x))/2   ← Développer, réduire
     = cosh(2x)   ← Définition de cosh 2x
   aides : Remplace chaque sinh et cosh par sa formule en exponentielles, puis développe. | ((e^x + e^(−x))/2)² + ((e^x − e^(−x))/2)² | (e^(2x) + e^(−2x))/2
-  pièges : g2_hyp_trig_sign
+  pièges : g2_hyp_trig_sign, a1_hyper_identity_sign
 
 Montre que cosh(x)² + sinh(x)² = cosh(2x) avec les exponentielles.
   [guided]  cosh(x)² + sinh(x)²
@@ -1204,7 +1204,7 @@ Montre que cosh(x)² + sinh(x)² = cosh(2x) avec les exponentielles.
     = (e^(2x) + e^(−2x))/2   ← Développer, réduire
     = cosh(2x)   ← Définition de cosh 2x
   aides : Remplace chaque sinh et cosh par sa formule en exponentielles, puis développe. | ((e^x + e^(−x))/2)² + ((e^x − e^(−x))/2)² | (e^(2x) + e^(−2x))/2
-  pièges : g2_hyp_trig_sign
+  pièges : g2_hyp_trig_sign, a1_hyper_identity_sign
 
 ```
 
@@ -1257,7 +1257,7 @@ Exprime sinh(x)² en fonction de t = tanh x.
     ? Quelle identité permet de remplacer cosh²x ? ✔ 1 − tanh²x = 1/cosh²x / · 1 + tanh²x = 1/cosh²x / · cosh²x − sinh²x = cosh 2x
     = t²/(1 − t²)   ← Remplacer tanh x par t
   aides : Angle double, puis mets cosh²x en facteur pour faire apparaître tanh x = sinh x / cosh x. | 1 − tanh²x = 1/cosh²x, donc cosh²x = … | tanh(x)²/(1 − tanh(x)²)
-  pièges : g2_hyp_trig_sign
+  pièges : a1_hyper_identity_sign, g2_hyp_trig_sign
 
 Exprime sinh(2x) en fonction de t = tanh x.
   [tap, suivre l'erreur, menu steps]  sinh(2x)
@@ -1280,6 +1280,7 @@ Exprime sinh(x)² en fonction de t = tanh x.
     = tanh(x)²/(1 − tanh(x)²)   ← cosh²x = 1/(1 − tanh²x)
     = t²/(1 − t²)   ← Remplacer tanh x par t
   aides : Angle double, puis mets cosh²x en facteur pour faire apparaître tanh x = sinh x / cosh x. | 1 − tanh²x = 1/cosh²x, donc cosh²x = … | tanh(x)²/(1 − tanh(x)²)
+  pièges : a1_hyper_identity_sign
 
 Exprime e^(2x) en fonction de t = tanh x.
   [free, suivre l'erreur]  e^(2x)
@@ -1296,6 +1297,7 @@ Exprime sinh(x)² en fonction de t = tanh x.
     = tanh(x)²/(1 − tanh(x)²)   ← cosh²x = 1/(1 − tanh²x)
     = t²/(1 − t²)   ← Remplacer tanh x par t
   aides : Angle double, puis mets cosh²x en facteur pour faire apparaître tanh x = sinh x / cosh x. | 1 − tanh²x = 1/cosh²x, donc cosh²x = … | tanh(x)²/(1 − tanh(x)²)
+  pièges : a1_hyper_identity_sign
 
 ```
 
@@ -1307,12 +1309,14 @@ Exprime sinh(x)² en fonction de t = tanh x.
     = tanh(x)²cosh(x)²   ← sinh x = tanh x · cosh x
     = tanh(x)²/(1 − tanh(x)²)   ← cosh²x = 1/(1 − tanh²x)
     = t²/(1 − t²)   ← Remplacer tanh x par t
+  pièges : a1_hyper_identity_sign
 
 Exprime sinh(x)² en fonction de t = tanh x.
   [free, sans aide]  sinh(x)²
     = tanh(x)²cosh(x)²   ← sinh x = tanh x · cosh x
     = tanh(x)²/(1 − tanh(x)²)   ← cosh²x = 1/(1 − tanh²x)
     = t²/(1 − t²)   ← Remplacer tanh x par t
+  pièges : a1_hyper_identity_sign
 
 Exprime e^(2x) en fonction de t = tanh x.
   [free, sans aide]  e^(2x)

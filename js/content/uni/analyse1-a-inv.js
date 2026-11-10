@@ -60,7 +60,7 @@ function invData(rng) {
     }
     if (fam === 'exp') {
       const a = rng.int(1, 4);
-      return { fam, f: `e^x+${a === 1 ? '' : a}x`, fp: `e^x+${a}`, fpAt: (t) => `e^(${t})+${a}`, x0: '0', y0: '1', fpx0: q(1 + a), fpy0: Math.E + a, domain: [-2, 2] };
+      return { fam, f: `e^x+${a === 1 ? '' : a}x`, fp: `e^x+${a}`, fpAt: (t) => (String(t) === '1' ? `e+${a}` : `e^(${t})+${a}`), x0: '0', y0: '1', fpx0: q(1 + a), fpy0: Math.E + a, domain: [-2, 2] };
     }
     const a = rng.pick([2, 3, 4]);
     if (fam === 'sin') {
