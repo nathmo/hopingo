@@ -155,7 +155,10 @@ export const EARLY = [
     check: { judge: { kind: 'solset', v: 'x' }, prev: '-2x≥6', line: 'x≥-3' },
     transform: (prev, ctx = {}) => {
       const n = stripParen(prev);
-      if (n.t !== 'rel' || !INEQ.has(n.op) || !linear(n.l, n.r, ctx.v || 'x')) return [];
+      const cs = n.t === 'rel' && INEQ.has(n.op) ? linear(n.l, n.r, ctx.v || 'x') : null;
+      // Only when isolating x means dividing by a negative number.
+      const a = cs?.[1];
+      if (!a || !a.isConst || a.constValue().n >= 0) return [];
       // Multiplying by c < 0 without turning: the same as turning prev.
       return [{ node: rel(FLIP[n.op], n.l, n.r), ctx: {} }];
     },
@@ -169,7 +172,8 @@ export const EARLY = [
     transform: (prev, ctx = {}) => {
       const n = stripParen(prev);
       const v = ctx.v || 'x';
-      if (n.t !== 'rel' || !INEQ.has(n.op)) return [];
+      // a·f(k) is a condition on the parameter m (g1-viete).
+      if (v !== 'm' || n.t !== 'rel' || !INEQ.has(n.op)) return [];
       const zero = (x) => stripParen(x).t === 'num' && stripParen(x).v.n === 0;
       const side = zero(n.r) ? stripParen(n.l) : zero(n.l) ? stripParen(n.r) : null;
       if (!side || side.t !== 'bin' || side.op !== '×' || !hasV(side.l, v) || !hasV(side.r, v)) return [];
@@ -183,9 +187,11 @@ export const EARLY = [
     name: 'Une condition de la position des racines oubliée',
     example: ['a·f(2) < 0 et a·f(6) > 0 → seulement a·f(2) < 0', 'les deux conditions'],
     check: { judge: { kind: 'solset', v: 'm' }, prev: '(m-2)(m-5)<0 et (m-2)(25m-69)>0', line: ']2;5[' },
-    transform: (prev) => {
+    // Conditions on the parameter m only (g1-viete): elsewhere, keeping one
+    // condition of a conjunction is another mistake (g9_union_inter).
+    transform: (prev, ctx = {}) => {
       const n = stripParen(prev);
-      if (n.t !== 'logic' || n.op !== 'and') return [];
+      if (ctx.v !== 'm' || n.t !== 'logic' || n.op !== 'and') return [];
       if (!isIneq(stripParen(n.l)) || !isIneq(stripParen(n.r))) return [];
       return [{ node: n.l, ctx: { kept: n.l } }, { node: n.r, ctx: { kept: n.r } }];
     },

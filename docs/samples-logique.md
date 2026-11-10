@@ -203,7 +203,7 @@ Quel ensemble décrit les réels x tels que x ≥ −4 ?
     = ]−3 ; −1[ ∩ [−2 ; +∞[   ← Traduire en intervalles
     = [−2 ; −1[   ← Intersecter
   aides : Écris chaque condition comme un intervalle : « et » donne ∩, « ou » donne ∪. Un crochet tourné vers le nombre l'inclut. | −1 < x + 2 < 1 et □ | [−2 ; −1[
-  pièges : g9_union_inter, g9_bracket
+  pièges : g1_abs_dropped, g9_union_inter, g9_bracket
 
 Écris l'ensemble des réels x tels que |x + 1| < 2 et x ≥ −1 à l'aide d'intervalles.
   [tap, suivre l'erreur, menu solset]  |x + 1| < 2 et x ≥ −1
@@ -212,7 +212,7 @@ Quel ensemble décrit les réels x tels que x ≥ −4 ?
     = ]−3 ; 1[ ∩ [−1 ; +∞[   ← Traduire en intervalles
     = [−1 ; 1[   ← Intersecter
   aides : Écris chaque condition comme un intervalle : « et » donne ∩, « ou » donne ∪. Un crochet tourné vers le nombre l'inclut. | −2 < x + 1 < 2 et □ | [−1 ; 1[
-  pièges : g9_union_inter, g9_bracket
+  pièges : g1_abs_dropped, g9_union_inter, g9_bracket
 
 Écris l'ensemble des réels x tels que ¬(−4 ≤ x < 2) à l'aide d'intervalles.
   [tap, suivre l'erreur, menu solset]  ¬(−4 ≤ x < 2)
@@ -233,7 +233,7 @@ Quel ensemble décrit les réels x tels que x ≥ −4 ?
     = ]−2 ; 0[ ∩ [−1 ; +∞[   ← Traduire en intervalles
     = [−1 ; 0[   ← Intersecter
   aides : Écris chaque condition comme un intervalle : « et » donne ∩, « ou » donne ∪. Un crochet tourné vers le nombre l'inclut. | −1 < x + 1 < 1 et □ | [−1 ; 0[
-  pièges : g9_union_inter, g9_bracket
+  pièges : g1_abs_dropped, g9_union_inter, g9_bracket
 
 Écris l'ensemble des réels x tels que x < −4 ou x ≥ 1/2 à l'aide d'intervalles.
   [free, suivre l'erreur]  x < −4 ou x ≥ 1/2
@@ -258,14 +258,14 @@ Quel ensemble décrit les réels x tels que x ≥ −4 ?
     = −4 < x < 0 et x ≥ −2   ← Isoler x : soustraire 2
     = ]−4 ; 0[ ∩ [−2 ; +∞[   ← Traduire en intervalles
     = [−2 ; 0[   ← Intersecter
-  pièges : g9_union_inter, g9_bracket
+  pièges : g1_abs_dropped, g9_union_inter, g9_bracket
 
 Écris l'ensemble des réels x tels que |x| < 4 et x ≥ 2 à l'aide d'intervalles.
   [free, sans aide]  |x| < 4 et x ≥ 2
     = −4 < x < 4 et x ≥ 2   ← Ôter la valeur absolue
     = ]−4 ; 4[ ∩ [2 ; +∞[   ← Traduire en intervalles
     = [2 ; 4[   ← Intersecter
-  pièges : g9_union_inter, g9_bracket
+  pièges : g1_abs_dropped, g9_union_inter, g9_bracket
 
 Écris l'ensemble des réels x tels que |x + 3| < 1 et x ≥ −3 à l'aide d'intervalles.
   [free, sans aide]  |x + 3| < 1 et x ≥ −3
@@ -273,7 +273,7 @@ Quel ensemble décrit les réels x tels que x ≥ −4 ?
     = −4 < x < −2 et x ≥ −3   ← Isoler x : soustraire 3
     = ]−4 ; −2[ ∩ [−3 ; +∞[   ← Traduire en intervalles
     = [−3 ; −2[   ← Intersecter
-  pièges : g9_union_inter, g9_bracket
+  pièges : g1_abs_dropped, g9_union_inter, g9_bracket
 
 ```
 
@@ -281,13 +281,15 @@ Quel ensemble décrit les réels x tels que x ≥ −4 ?
 
 ```
 Quel ensemble décrit les réels x tels que |x − 1| < 4 et x ≥ 4 ?
-  ✔ [4 ; 5[   · ]−3 ; +∞[ [g9_union_inter]   · ]4 ; 5[ [g9_bracket]   · [4 ; 5] [g9_bracket]
+  · ]−3 ; +∞[ [g9_union_inter]   ✔ [4 ; 5[   · ]4 ; 5[ [g9_bracket]   · [4 ; 5] [g9_bracket]
   [examen mcq]
-  pièges : g9_union_inter, g9_bracket
+  pièges : g9_bracket, g9_union_inter
 
 Vrai ou faux ?
-  « ℝ ∖ ]−1 ; 5/2] = ]−∞ ; −1] ∪ ]5/2 ; +∞[ » → VRAI
+  « ℝ ∖ ]−2 ; 5] = ]−∞ ; −2[ ∪ [5 ; +∞[ » → FAUX
+    contre-exemple (refute) : x = -2
   [examen tf]
+  pièges : g9_bracket
 
 ```
 
@@ -298,13 +300,6 @@ _P ⇒ Q ≡ ¬P ∨ Q ; lois de De Morgan._
 ### Niveau 1
 
 ```
-Complète la table de vérité de ¬P ∨ Q (V = vrai, F = faux).
-  [tableau truth]  colonnes : P | Q | ¬P ∨ Q
-             V  V  (V)
-             V  F  (F)
-             F  V  (V)
-             F  F  (V)
-
 Complète la table de vérité de P ∨ Q (V = vrai, F = faux).
   [tableau truth]  colonnes : P | Q | P ∨ Q
              V  V  (V)
@@ -319,6 +314,13 @@ Complète la table de vérité de P ∧ Q (V = vrai, F = faux).
              F  V  (F)
              F  F  (F)
 
+Complète la table de vérité de ¬P ∨ Q (V = vrai, F = faux).
+  [tableau truth]  colonnes : P | Q | ¬P ∨ Q
+             V  V  (V)
+             V  F  (F)
+             F  V  (V)
+             F  F  (V)
+
 ```
 
 ### Niveau 2
@@ -331,7 +333,7 @@ Complète la table de vérité (V = vrai, F = faux).
              F  V  (V)  (F)  (F)
              F  F  (V)  (V)  (V)
   puis : La dernière colonne est la table de…
-      · P ∧ Q   · P ∨ Q   ✔ P ⇔ Q   · P ⇒ Q
+      · P ∨ Q   · P ⇒ Q   · P ∧ Q   ✔ P ⇔ Q
 
 Complète la table de vérité (V = vrai, F = faux).
   [tableau truth]  colonnes : P | Q | P ⇒ Q | Q ⇒ P | (P ⇒ Q) ∧ (Q ⇒ P)
@@ -340,7 +342,7 @@ Complète la table de vérité (V = vrai, F = faux).
              F  V  (V)  (F)  (F)
              F  F  (V)  (V)  (V)
   puis : La dernière colonne est la table de…
-      · P ∨ Q   · P ∧ Q   · P ⇒ Q   ✔ P ⇔ Q
+      · P ⇒ Q   · P ∨ Q   · P ∧ Q   ✔ P ⇔ Q
 
 Complète la table de vérité (V = vrai, F = faux).
   [tableau truth]  colonnes : P | Q | P ⇒ Q | Q ⇒ P | (P ⇒ Q) ∧ (Q ⇒ P)
@@ -349,18 +351,18 @@ Complète la table de vérité (V = vrai, F = faux).
              F  V  (V)  (F)  (F)
              F  F  (V)  (V)  (V)
   puis : La dernière colonne est la table de…
-      ✔ P ⇔ Q   · P ∧ Q   · P ⇒ Q   · P ∨ Q
+      · P ∧ Q   ✔ P ⇔ Q   · P ∨ Q   · P ⇒ Q
 
 ```
 
 ### Niveau 3
 
 ```
-Montre que ¬(P ∧ Q) ≡ P ⇒ ¬Q, une règle par ligne.
-  [tap, suivre l'erreur, menu logic]  ¬(P ∧ Q)
-    = ¬P ∨ ¬Q   ← De Morgan
-    = P ⇒ ¬Q   ← Reconnaître l'implication : ¬A ∨ B ≡ A ⇒ B
-  aides : Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A. | Première ligne : ¬P ∨ ¬Q | P ⇒ ¬Q
+Simplifie ¬(¬P ∧ Q) : fais entrer la négation, une règle par ligne.
+  [tap, suivre l'erreur, menu logic]  ¬(¬P ∧ Q)
+    = ¬¬P ∨ ¬Q   ← De Morgan
+    = P ∨ ¬Q   ← Double négation
+  aides : Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A. | Première ligne : ¬¬P ∨ ¬Q | P ∨ ¬Q
   pièges : g9_demorgan, g9_neg_strict
 
 Montre que ¬(P ∧ ¬Q) ≡ P ⇒ Q, une règle par ligne.
@@ -384,12 +386,13 @@ Montre que ¬(P ∧ ¬Q) ≡ P ⇒ Q, une règle par ligne.
 ### Niveau 4
 
 ```
-Montre que ¬(Q ∧ ¬P) ≡ Q ⇒ P, une règle par ligne.
-  [free, suivre l'erreur]  ¬(Q ∧ ¬P)
-    = ¬Q ∨ ¬¬P   ← De Morgan
-    = ¬Q ∨ P   ← Double négation
-    = Q ⇒ P   ← Reconnaître l'implication : ¬A ∨ B ≡ A ⇒ B
-  aides : Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A. | Première ligne : ¬Q ∨ ¬¬P | Q ⇒ P
+Simplifie ¬((P ∨ ¬Q) ∧ ¬R) : fais entrer la négation, une règle par ligne.
+  [free, suivre l'erreur]  ¬((P ∨ ¬Q) ∧ ¬R)
+    = ¬(P ∨ ¬Q) ∨ ¬¬R   ← De Morgan
+    = (¬P ∧ ¬¬Q) ∨ ¬¬R   ← De Morgan
+    = (¬P ∧ Q) ∨ ¬¬R   ← Double négation
+    = (¬P ∧ Q) ∨ R   ← Double négation
+  aides : Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A. | Première ligne : ¬(P ∨ ¬Q) ∨ ¬¬R | (¬P ∧ Q) ∨ R
   pièges : g9_demorgan, g9_neg_strict
 
 Simplifie ¬(¬P ∧ (¬Q ∨ ¬R)) : fais entrer la négation, une règle par ligne.
@@ -402,14 +405,12 @@ Simplifie ¬(¬P ∧ (¬Q ∨ ¬R)) : fais entrer la négation, une règle par l
   aides : Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A. | Première ligne : ¬¬P ∨ ¬(¬Q ∨ ¬R) | P ∨ (Q ∧ R)
   pièges : g9_demorgan, g9_neg_strict
 
-Simplifie ¬(¬P ∧ (¬Q ∨ ¬R)) : fais entrer la négation, une règle par ligne.
-  [free, suivre l'erreur]  ¬(¬P ∧ (¬Q ∨ ¬R))
-    = ¬¬P ∨ ¬(¬Q ∨ ¬R)   ← De Morgan
-    = P ∨ ¬(¬Q ∨ ¬R)   ← Double négation
-    = P ∨ (¬¬Q ∧ ¬¬R)   ← De Morgan
-    = P ∨ (Q ∧ ¬¬R)   ← Double négation
-    = P ∨ (Q ∧ R)   ← Double négation
-  aides : Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A. | Première ligne : ¬¬P ∨ ¬(¬Q ∨ ¬R) | P ∨ (Q ∧ R)
+Simplifie ¬(P ∧ (¬Q ∨ R)) : fais entrer la négation, une règle par ligne.
+  [free, suivre l'erreur]  ¬(P ∧ (¬Q ∨ R))
+    = ¬P ∨ ¬(¬Q ∨ R)   ← De Morgan
+    = ¬P ∨ (¬¬Q ∧ ¬R)   ← De Morgan
+    = ¬P ∨ (Q ∧ ¬R)   ← Double négation
+  aides : Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A. | Première ligne : ¬P ∨ ¬(¬Q ∨ R) | ¬P ∨ (Q ∧ ¬R)
   pièges : g9_demorgan, g9_neg_strict
 
 ```
@@ -417,13 +418,6 @@ Simplifie ¬(¬P ∧ (¬Q ∨ ¬R)) : fais entrer la négation, une règle par l
 ### Niveau 5
 
 ```
-Simplifie ¬(P ∧ (¬Q ∨ R)) : fais entrer la négation, une règle par ligne.
-  [free, sans aide]  ¬(P ∧ (¬Q ∨ R))
-    = ¬P ∨ ¬(¬Q ∨ R)   ← De Morgan
-    = ¬P ∨ (¬¬Q ∧ ¬R)   ← De Morgan
-    = ¬P ∨ (Q ∧ ¬R)   ← Double négation
-  pièges : g9_demorgan, g9_neg_strict
-
 Simplifie ¬((P ∨ ¬Q) ∧ ¬R) : fais entrer la négation, une règle par ligne.
   [free, sans aide]  ¬((P ∨ ¬Q) ∧ ¬R)
     = ¬(P ∨ ¬Q) ∨ ¬¬R   ← De Morgan
@@ -438,6 +432,14 @@ Simplifie ¬((P ∨ ¬Q) ∧ ¬R) : fais entrer la négation, une règle par lig
     = (¬P ∧ ¬¬Q) ∨ ¬¬R   ← De Morgan
     = (¬P ∧ Q) ∨ ¬¬R   ← Double négation
     = (¬P ∧ Q) ∨ R   ← Double négation
+  pièges : g9_demorgan, g9_neg_strict
+
+Simplifie ¬((¬P ∧ ¬Q) ∨ R) : fais entrer la négation, une règle par ligne.
+  [free, sans aide]  ¬((¬P ∧ ¬Q) ∨ R)
+    = ¬(¬P ∧ ¬Q) ∧ ¬R   ← De Morgan
+    = (¬¬P ∨ ¬¬Q) ∧ ¬R   ← De Morgan
+    = (P ∨ ¬¬Q) ∧ ¬R   ← Double négation
+    = (P ∨ Q) ∧ ¬R   ← Double négation
   pièges : g9_demorgan, g9_neg_strict
 
 ```
@@ -452,7 +454,7 @@ Vrai ou faux ?
   pièges : g9_converse_contra
 
 Quelle formule est équivalente à ¬(P ⇒ Q) ?
-  · P ⇒ ¬Q [g9_neg_implication]   ✔ P ∧ ¬Q   · P ∧ Q   · ¬P ⇒ ¬Q [g9_neg_implication]
+  · P ∧ Q   · P ⇒ ¬Q [g9_neg_implication]   ✔ P ∧ ¬Q   · ¬P ⇒ ¬Q [g9_neg_implication]
   [examen mcq]
   pièges : g9_neg_implication
 
@@ -465,16 +467,16 @@ _Contraposée ¬Q ⇒ ¬P ; négation P ∧ ¬Q._
 ### Niveau 1
 
 ```
-Laquelle est la contraposée de x² > 1 ⇒ x > 1 ?
-  ✔ x ≤ 1 ⇒ x² ≤ 1   · x² ≤ 1 ⇒ x ≤ 1 [g9_converse_contra]   · x² > 1 ⇒ x ≤ 1   · x > 1 ⇒ x² > 1 [g9_converse_contra]
+Laquelle est la contraposée de n² est pair ⇒ n est pair ?
+  ✔ n est impair ⇒ n² est impair   · n² est pair ⇒ n est impair   · n est pair ⇒ n² est pair [g9_converse_contra]   · n² est impair ⇒ n est impair [g9_converse_contra]
   pièges : g9_converse_contra
 
 Laquelle est la contraposée de n² est multiple de 3 ⇒ n est multiple de 3 ?
-  · n² n'est pas multiple de 3 ⇒ n n'est pas multiple de 3 [g9_converse_contra]   · n est multiple de 3 ⇒ n² est multiple de 3 [g9_converse_contra]   · n² est multiple de 3 ⇒ n n'est pas multiple de 3   ✔ n n'est pas multiple de 3 ⇒ n² n'est pas multiple de 3
+  · n est multiple de 3 ⇒ n² est multiple de 3 [g9_converse_contra]   · n² est multiple de 3 ⇒ n n'est pas multiple de 3   · n² n'est pas multiple de 3 ⇒ n n'est pas multiple de 3 [g9_converse_contra]   ✔ n n'est pas multiple de 3 ⇒ n² n'est pas multiple de 3
   pièges : g9_converse_contra
 
-Laquelle est la contraposée de x² > 25 ⇒ x > 5 ?
-  · x² > 25 ⇒ x ≤ 5   · x > 5 ⇒ x² > 25 [g9_converse_contra]   ✔ x ≤ 5 ⇒ x² ≤ 25   · x² ≤ 25 ⇒ x ≤ 5 [g9_converse_contra]
+Laquelle est la contraposée de x² > 9 ⇒ x > 3 ?
+  · x > 3 ⇒ x² > 9 [g9_converse_contra]   · x² > 9 ⇒ x ≤ 3   · x² ≤ 9 ⇒ x ≤ 3 [g9_converse_contra]   ✔ x ≤ 3 ⇒ x² ≤ 9
   pièges : g9_converse_contra
 
 ```
@@ -482,45 +484,45 @@ Laquelle est la contraposée de x² > 25 ⇒ x > 5 ?
 ### Niveau 2
 
 ```
-Écris la négation de l'énoncé n² est multiple de 2 ⇒ n est multiple de 2 (« si n² est multiple de 2, alors n est multiple de 2 »).
-  [jetons] palette : n² est multiple de 2 · n² n'est pas multiple de 2 · n est multiple de 2 · n n'est pas multiple de 2
-    → n² est multiple de 2 ∧ n n'est pas multiple de 2
-  aides : Une implication est fausse quand A est vrai et B faux : sa négation est A ∧ ¬B. Le ∀ devient ∃. | n² est multiple de 2 ∧ … | n² est multiple de 2 ∧ n n'est pas multiple de 2
-  pièges : g9_neg_implication
+Écris la réciproque de l'énoncé x² > 4 ⇒ x > 2 (« si x² > 4, alors x > 2 »).
+  [jetons] palette : x² > 4 · x² ≤ 4 · x > 2 · x ≤ 2
+    → x > 2 ⇒ x² > 4
+  aides : On échange les deux côtés : B ⇒ A. | … ⇒ x² > 4 | x > 2 ⇒ x² > 4
+  pièges : g9_converse_contra
 
-Écris la négation de l'énoncé x > 1 ⇒ x² > 1 (« si x > 1, alors x² > 1 »).
-  [jetons] palette : x > 1 · x ≤ 1 · x² > 1 · x² ≤ 1
-    → x > 1 ∧ x² ≤ 1
-  aides : Une implication est fausse quand A est vrai et B faux : sa négation est A ∧ ¬B. Le ∀ devient ∃. | x > 1 ∧ … | x > 1 ∧ x² ≤ 1
-  pièges : g9_neg_implication
+Écris la réciproque de l'énoncé x > 5 ⇒ x² > 25 (« si x > 5, alors x² > 25 »).
+  [jetons] palette : x > 5 · x ≤ 5 · x² > 25 · x² ≤ 25
+    → x² > 25 ⇒ x > 5
+  aides : On échange les deux côtés : B ⇒ A. | … ⇒ x > 5 | x² > 25 ⇒ x > 5
+  pièges : g9_converse_contra
 
-Écris la négation de l'énoncé x² > 16 ⇒ x > 4 (« si x² > 16, alors x > 4 »).
-  [jetons] palette : x² > 16 · x² ≤ 16 · x > 4 · x ≤ 4
-    → x² > 16 ∧ x ≤ 4
-  aides : Une implication est fausse quand A est vrai et B faux : sa négation est A ∧ ¬B. Le ∀ devient ∃. | x² > 16 ∧ … | x² > 16 ∧ x ≤ 4
-  pièges : g9_neg_implication
+Écris la réciproque de l'énoncé x > 3 ⇒ x² > 9 (« si x > 3, alors x² > 9 »).
+  [jetons] palette : x > 3 · x ≤ 3 · x² > 9 · x² ≤ 9
+    → x² > 9 ⇒ x > 3
+  aides : On échange les deux côtés : B ⇒ A. | … ⇒ x > 3 | x² > 9 ⇒ x > 3
+  pièges : g9_converse_contra
 
 ```
 
 ### Niveau 3
 
 ```
-Écris la contraposée de l'énoncé ∀n ∈ ℤ, n² est multiple de 3 ⇒ n est multiple de 3.
-  [jetons] palette : n ∈ ℤ · n² est multiple de 3 · n² n'est pas multiple de 3 · n est multiple de 3 · n n'est pas multiple de 3
-    → ∀n ∈ ℤ, n n'est pas multiple de 3 ⇒ n² n'est pas multiple de 3
-  aides : On nie les deux côtés et on les échange : ¬B ⇒ ¬A. | … ⇒ n² n'est pas multiple de 3 | ∀n ∈ ℤ, n n'est pas multiple de 3 ⇒ n² n'est pas multiple de 3
+Écris la contraposée de l'énoncé ∀n ∈ ℤ, n² est multiple de 2 ⇒ n est multiple de 2.
+  [jetons] palette : n ∈ ℤ · n² est multiple de 2 · n² n'est pas multiple de 2 · n est multiple de 2 · n n'est pas multiple de 2
+    → ∀n ∈ ℤ, n n'est pas multiple de 2 ⇒ n² n'est pas multiple de 2
+  aides : On nie les deux côtés et on les échange : ¬B ⇒ ¬A. | … ⇒ n² n'est pas multiple de 2 | ∀n ∈ ℤ, n n'est pas multiple de 2 ⇒ n² n'est pas multiple de 2
   pièges : g9_converse_contra
 
-Écris la négation de l'énoncé ∀x ∈ ℝ, x² > 4 ⇒ x > 2.
-  [jetons] palette : x ∈ ℝ · x² > 4 · x² ≤ 4 · x > 2 · x ≤ 2
-    → ∃x ∈ ℝ, x² > 4 ∧ x ≤ 2
-  aides : Une implication est fausse quand A est vrai et B faux : sa négation est A ∧ ¬B. Le ∀ devient ∃. | ∃x ∈ ℝ, x² > 4 ∧ … | ∃x ∈ ℝ, x² > 4 ∧ x ≤ 2
-  pièges : g9_neg_implication
+Écris la réciproque de l'énoncé ∀x ∈ ℝ, x² > 16 ⇒ x > 4.
+  [jetons] palette : x ∈ ℝ · x² > 16 · x² ≤ 16 · x > 4 · x ≤ 4
+    → ∀x ∈ ℝ, x > 4 ⇒ x² > 16
+  aides : On échange les deux côtés : B ⇒ A. | … ⇒ x² > 16 | ∀x ∈ ℝ, x > 4 ⇒ x² > 16
+  pièges : g9_converse_contra
 
-Écris la réciproque de l'énoncé ∀n ∈ ℤ, n² est multiple de 3 ⇒ n est multiple de 3.
-  [jetons] palette : n ∈ ℤ · n² est multiple de 3 · n² n'est pas multiple de 3 · n est multiple de 3 · n n'est pas multiple de 3
-    → ∀n ∈ ℤ, n est multiple de 3 ⇒ n² est multiple de 3
-  aides : On échange les deux côtés : B ⇒ A. | … ⇒ n² est multiple de 3 | ∀n ∈ ℤ, n est multiple de 3 ⇒ n² est multiple de 3
+Écris la réciproque de l'énoncé ∀n ∈ ℤ, n² est pair ⇒ n est pair.
+  [jetons] palette : n ∈ ℤ · n² est pair · n² est impair · n est pair · n est impair
+    → ∀n ∈ ℤ, n est pair ⇒ n² est pair
+  aides : On échange les deux côtés : B ⇒ A. | … ⇒ n² est pair | ∀n ∈ ℤ, n est pair ⇒ n² est pair
   pièges : g9_converse_contra
 
 ```
@@ -528,42 +530,42 @@ Laquelle est la contraposée de x² > 25 ⇒ x > 5 ?
 ### Niveau 4
 
 ```
-Écris la réciproque de l'énoncé ∀A, B, C ⊂ ℕ, A ∩ C = B ∩ C ⇒ A = B.
-  [jetons] palette : A, B, C ⊂ ℕ · A ∩ C = B ∩ C · A ∩ C ≠ B ∩ C · A = B · A ≠ B
-    → ∀A, B, C ⊂ ℕ, A = B ⇒ A ∩ C = B ∩ C
-  aides : On échange les deux côtés : B ⇒ A. | … ⇒ A ∩ C = B ∩ C | ∀A, B, C ⊂ ℕ, A = B ⇒ A ∩ C = B ∩ C
+Écris la contraposée de l'énoncé ∀x ∈ ℝ, x² > 25 ⇒ x > 5.
+  [jetons] palette : x ∈ ℝ · x² > 25 · x² ≤ 25 · x² < 25 · x > 5 · x ≤ 5 · x < 5
+    → ∀x ∈ ℝ, x ≤ 5 ⇒ x² ≤ 25
+  aides : On nie les deux côtés et on les échange : ¬B ⇒ ¬A. | … ⇒ x² ≤ 25 | ∀x ∈ ℝ, x ≤ 5 ⇒ x² ≤ 25
   pièges : g9_converse_contra
 
-Écris la contraposée de l'énoncé ∀A, B, C ⊂ ℕ, A ∩ C = B ∩ C ⇒ A = B.
-  [jetons] palette : A, B, C ⊂ ℕ · A ∩ C = B ∩ C · A ∩ C ≠ B ∩ C · A = B · A ≠ B
-    → ∀A, B, C ⊂ ℕ, A ≠ B ⇒ A ∩ C ≠ B ∩ C
-  aides : On nie les deux côtés et on les échange : ¬B ⇒ ¬A. | … ⇒ A ∩ C ≠ B ∩ C | ∀A, B, C ⊂ ℕ, A ≠ B ⇒ A ∩ C ≠ B ∩ C
+Écris la réciproque de l'énoncé ∀n ∈ ℤ, n² est pair ⇒ n est pair.
+  [jetons] palette : n ∈ ℤ · n² est pair · n² est impair · n est pair · n est impair
+    → ∀n ∈ ℤ, n est pair ⇒ n² est pair
+  aides : On échange les deux côtés : B ⇒ A. | … ⇒ n² est pair | ∀n ∈ ℤ, n est pair ⇒ n² est pair
   pièges : g9_converse_contra
 
-Écris la négation de l'énoncé ∀A, B, C ⊂ ℕ, A ∩ C = B ∩ C ⇒ A = B.
-  [jetons] palette : A, B, C ⊂ ℕ · A ∩ C = B ∩ C · A ∩ C ≠ B ∩ C · A = B · A ≠ B
-    → ∃A, B, C ⊂ ℕ, A ∩ C = B ∩ C ∧ A ≠ B
-  aides : Une implication est fausse quand A est vrai et B faux : sa négation est A ∧ ¬B. Le ∀ devient ∃. | ∃A, B, C ⊂ ℕ, A ∩ C = B ∩ C ∧ … | ∃A, B, C ⊂ ℕ, A ∩ C = B ∩ C ∧ A ≠ B
-  pièges : g9_neg_implication
+Écris la réciproque de l'énoncé ∀x ∈ ℝ, x > 5 ⇒ x² > 25.
+  [jetons] palette : x ∈ ℝ · x > 5 · x ≤ 5 · x < 5 · x² > 25 · x² ≤ 25 · x² < 25
+    → ∀x ∈ ℝ, x² > 25 ⇒ x > 5
+  aides : On échange les deux côtés : B ⇒ A. | … ⇒ x > 5 | ∀x ∈ ℝ, x² > 25 ⇒ x > 5
+  pièges : g9_converse_contra
 
 ```
 
 ### Niveau 5
 
 ```
-Écris la négation de l'énoncé ∀n ∈ ℤ, n² est pair ⇒ n est pair.
-  [jetons, sans aide] palette : n ∈ ℤ · n² est pair · n² est impair · n est pair · n est impair
-    → ∃n ∈ ℤ, n² est pair ∧ n est impair
+Écris la négation de l'énoncé ∀x ∈ ℝ, x² > 4 ⇒ x > 2.
+  [jetons, sans aide] palette : x ∈ ℝ · x² > 4 · x² ≤ 4 · x² < 4 · x > 2 · x ≤ 2 · x < 2
+    → ∃x ∈ ℝ, x² > 4 ∧ x ≤ 2
   pièges : g9_neg_implication
 
-Écris la négation de l'énoncé ∀x ∈ ℝ, x² > 16 ⇒ x > 4.
-  [jetons, sans aide] palette : x ∈ ℝ · x² > 16 · x² ≤ 16 · x² < 16 · x > 4 · x ≤ 4 · x < 4
-    → ∃x ∈ ℝ, x² > 16 ∧ x ≤ 4
+Écris la négation de l'énoncé ∀x ∈ ℝ, x > 3 ⇒ x² > 9.
+  [jetons, sans aide] palette : x ∈ ℝ · x > 3 · x ≤ 3 · x < 3 · x² > 9 · x² ≤ 9 · x² < 9
+    → ∃x ∈ ℝ, x > 3 ∧ x² ≤ 9
   pièges : g9_neg_implication
 
-Écris la négation de l'énoncé ∀x ∈ ℝ, x² > 9 ⇒ x > 3.
-  [jetons, sans aide] palette : x ∈ ℝ · x² > 9 · x² ≤ 9 · x² < 9 · x > 3 · x ≤ 3 · x < 3
-    → ∃x ∈ ℝ, x² > 9 ∧ x ≤ 3
+Écris la négation de l'énoncé ∀A, B, C ⊂ ℕ, A ∩ C = B ∩ C ⇒ A = B.
+  [jetons, sans aide] palette : A, B, C ⊂ ℕ · A ∩ C = B ∩ C · A ∩ C ≠ B ∩ C · A = B · A ≠ B
+    → ∃A, B, C ⊂ ℕ, A ∩ C = B ∩ C ∧ A ≠ B
   pièges : g9_neg_implication
 
 ```
@@ -571,22 +573,20 @@ Laquelle est la contraposée de x² > 25 ⇒ x > 5 ?
 ### Variantes d'examen
 
 ```
-Écris la négation de l'énoncé ∀x ∈ ℝ, x > 5 ⇒ x² > 25.
-  [jetons, sans aide] palette : x ∈ ℝ · x > 5 · x ≤ 5 · x < 5 · x² > 25 · x² ≤ 25 · x² < 25
-    → ∃x ∈ ℝ, x > 5 ∧ x² ≤ 25
+Écris la négation de l'énoncé ∀n ∈ ℤ, n² est pair ⇒ n est pair.
+  [jetons, sans aide] palette : n ∈ ℤ · n² est pair · n² est impair · n est pair · n est impair
+    → ∃n ∈ ℤ, n² est pair ∧ n est impair
   [examen open]
   pièges : g9_neg_implication
 
-Laquelle est la négation de ∀x ∈ ℝ, x > 4 ⇒ x² > 16 ?
-  · ∃x ∈ ℝ, x > 4 ⇒ x² ≤ 16 [g9_neg_implication]   ✔ ∃x ∈ ℝ, x > 4 ∧ x² ≤ 16   · ∀x ∈ ℝ, x > 4 ∧ x² ≤ 16 [g9_neg_one_quant]   · ∃x ∈ ℝ, x ≤ 4 ⇒ x² ≤ 16 [g9_neg_implication]
+Laquelle est la contraposée de ∀A, B, C ⊂ ℕ, A ∩ C = B ∩ C ⇒ A = B ?
+  · ∀A, B, C ⊂ ℕ, A ∩ C ≠ B ∩ C ⇒ A ≠ B [g9_converse_contra]   · ∀A, B, C ⊂ ℕ, A = B ⇒ A ∩ C = B ∩ C [g9_converse_contra]   ✔ ∀A, B, C ⊂ ℕ, A ≠ B ⇒ A ∩ C ≠ B ∩ C   · ∀A, B, C ⊂ ℕ, A ∩ C = B ∩ C ⇒ A ≠ B
   [examen mcq]
-  pièges : g9_neg_implication, g9_neg_one_quant
+  pièges : g9_converse_contra
 
 Vrai ou faux ?
-  « « ∀x ∈ ℝ, x > 5 ⇒ x² > 25 » est vraie. Sa réciproque « ∀x ∈ ℝ, x² > 25 ⇒ x > 5 » est donc vraie aussi. » → FAUX
-    contre-exemple (refute) : x = -6
+  « « ∀x ∈ ℝ, x > 3 ⇒ x² > 9 » est vraie. Sa contraposée est donc vraie aussi. » → VRAI
   [examen tf]
-  pièges : g9_converse_contra
 
 ```
 
@@ -597,33 +597,34 @@ _∀x ∃y ou ∃y ∀x : l'ordre compte._
 ### Niveau 1
 
 ```
-A = {1 ; 3 ; 5}. Coche les cases où x + 2y < 13 est vraie.
-  [tableau grid]  colonnes : y = 1 | y = 3 | y = 5
-    x = 1    (V)  (V)  (V)
-    x = 3    (V)  (V)  (F)
-    x = 5    (V)  (V)  (F)
+A = {1 ; 3 ; 4}. Coche les cases où x·y ≥ 15 est vraie.
+  [tableau grid]  colonnes : y = 1 | y = 3 | y = 4
+    x = 1    (F)  (F)  (F)
+    x = 3    (F)  (F)  (F)
+    x = 4    (F)  (F)  (V)
   puis : Vrai ou faux ?
-      « A = {1 ; 3 ; 5}. ∃y ∈ A ∀x ∈ A, x + 2y < 13 » → VRAI
-      aides : Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois. | Teste x = 5 avec le plus petit y. | L'énoncé est vrai.
+      « A = {1 ; 3 ; 4}. ∀x ∈ A ∃y ∈ A, x·y ≥ 15 » → FAUX
+        contre-exemple (refute) : x = 1
+      aides : Pour ∀x ∃y : prends chaque x et cherche un y qui marche. | Teste x = 4 avec le plus petit y. | L'énoncé est faux : x = 1.
 
-A = {1 ; 2 ; 5}. Coche les cases où x + 2y < 11 est vraie.
-  [tableau grid]  colonnes : y = 1 | y = 2 | y = 5
-    x = 1    (V)  (V)  (F)
-    x = 2    (V)  (V)  (F)
-    x = 5    (V)  (V)  (F)
-  puis : Vrai ou faux ?
-      « A = {1 ; 2 ; 5}. ∃y ∈ A ∀x ∈ A, x + 2y < 11 » → VRAI
-      aides : Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois. | Teste x = 5 avec le plus petit y. | L'énoncé est vrai.
-
-A = {2 ; 3 ; 5}. Coche les cases où x² + y < 23 est vraie.
-  [tableau grid]  colonnes : y = 2 | y = 3 | y = 5
+A = {2 ; 4 ; 5}. Coche les cases où x² + y < 14 est vraie.
+  [tableau grid]  colonnes : y = 2 | y = 4 | y = 5
     x = 2    (V)  (V)  (V)
-    x = 3    (V)  (V)  (V)
+    x = 4    (F)  (F)  (F)
     x = 5    (F)  (F)  (F)
   puis : Vrai ou faux ?
-      « A = {2 ; 3 ; 5}. ∀x ∈ A ∃y ∈ A, x² + y < 23 » → FAUX
-        contre-exemple (refute) : x = 5
-      aides : Pour ∀x ∃y : prends chaque x et cherche un y qui marche. | Teste x = 5 avec le plus petit y. | L'énoncé est faux : x = 5.
+      « A = {2 ; 4 ; 5}. ∃y ∈ A ∀x ∈ A, x² + y < 14 » → FAUX
+        contre-exemple (refute) : x = 4
+      aides : Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois. | Teste x = 5 avec le plus petit y. | L'énoncé est faux : x = 4.
+
+A = {2 ; 3 ; 5}. Coche les cases où x·y ≥ 6 est vraie.
+  [tableau grid]  colonnes : y = 2 | y = 3 | y = 5
+    x = 2    (F)  (V)  (V)
+    x = 3    (V)  (V)  (V)
+    x = 5    (V)  (V)  (V)
+  puis : Vrai ou faux ?
+      « A = {2 ; 3 ; 5}. ∃y ∈ A ∀x ∈ A, x·y ≥ 6 » → VRAI
+      aides : Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois. | Teste x = 5 avec le plus petit y. | L'énoncé est vrai.
 
 ```
 
@@ -631,17 +632,16 @@ A = {2 ; 3 ; 5}. Coche les cases où x² + y < 23 est vraie.
 
 ```
 Vrai ou faux ?
-  « A = {1 ; 2 ; 5}. ∀x ∈ A ∃y ∈ A, x² + y < 23 » → FAUX
-    contre-exemple (refute) : x = 5
-  aides : Pour ∀x ∃y : prends chaque x et cherche un y qui marche. | Teste x = 5 avec le plus petit y. | L'énoncé est faux : x = 5.
+  « A = {1 ; 2 ; 5}. ∃y ∈ A ∀x ∈ A, x·y ≥ 9 » → FAUX
+    contre-exemple (refute) : x = 1
+  aides : Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois. | Teste x = 5 avec le plus petit y. | L'énoncé est faux : x = 1.
 
 Vrai ou faux ?
-  « A = {1 ; 2 ; 3}. ∃y ∈ A ∀x ∈ A, x² + y < 7 » → FAUX
-    contre-exemple (refute) : x = 3
-  aides : Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois. | Teste x = 3 avec le plus petit y. | L'énoncé est faux : x = 3.
+  « A = {1 ; 2 ; 4}. ∀x ∈ A ∃y ∈ A, x + 2y < 9 » → VRAI
+  aides : Pour ∀x ∃y : prends chaque x et cherche un y qui marche. | Teste x = 4 avec le plus petit y. | L'énoncé est vrai.
 
 Vrai ou faux ?
-  « A = {1 ; 3 ; 5}. ∀x ∈ A ∃y ∈ A, x + 2y < 11 » → VRAI
+  « A = {2 ; 3 ; 5}. ∀x ∈ A ∃y ∈ A, x + 2y < 13 » → VRAI
   aides : Pour ∀x ∃y : prends chaque x et cherche un y qui marche. | Teste x = 5 avec le plus petit y. | L'énoncé est vrai.
 
 ```
@@ -650,20 +650,18 @@ Vrai ou faux ?
 
 ```
 Vrai ou faux ?
-  « ∃x ∈ ℝ ∀y ∈ ℝ, x ≤ y² » → VRAI
+  « ∃y ∈ ℝ ∀x ∈ ℝ, x·y = 0 » → VRAI
   aides : ∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x. | Essaie de trouver le y (ou le x) qui marche. | Vrai.
   pièges : g9_quant_order
 
 Vrai ou faux ?
-  « ∃m ∈ ℕ ∀n ∈ ℕ, m > n » → FAUX
-    contre-exemple (refute) : n = m
-  aides : ∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x. | Essaie de faire échouer chaque choix possible. | Faux : n = m.
+  « ∀x ∈ ℝ ∃y ∈ ℝ, y < x² » → VRAI
+  aides : ∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x. | Essaie de trouver le y (ou le x) qui marche. | Vrai.
   pièges : g9_quant_order
 
 Vrai ou faux ?
-  « ∀x ∈ ℝ ∃y ∈ ℝ, x·y = 1 » → FAUX
-    contre-exemple (refute) : x = 0
-  aides : ∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x. | Essaie de faire échouer chaque choix possible. | Faux : x = 0.
+  « ∀n ∈ ℕ ∃m ∈ ℕ, m > n » → VRAI
+  aides : ∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x. | Essaie de trouver le y (ou le x) qui marche. | Vrai.
   pièges : g9_quant_order
 
 ```
@@ -677,16 +675,16 @@ Vrai ou faux ?
   aides : « Pour tout » donne ∀, « il existe » donne ∃. Garde l'ordre de la phrase. | ∀… | ∀x ∈ ℝ ∃y ∈ ℝ, x + y = 0
   pièges : g9_quant_order
 
-Écris avec des quantificateurs : « Il existe un entier m plus grand que tous les entiers naturels n. »
-  [jetons] palette : n ∈ ℕ · m ∈ ℕ · m > n · m ≤ n
-    → ∃m ∈ ℕ ∀n ∈ ℕ, m > n
-  aides : « Pour tout » donne ∀, « il existe » donne ∃. Garde l'ordre de la phrase. | ∃… | ∃m ∈ ℕ ∀n ∈ ℕ, m > n
-  pièges : g9_quant_order
-
 Écris avec des quantificateurs : « Tout entier naturel n a un entier m plus grand que lui. »
   [jetons] palette : n ∈ ℕ · m ∈ ℕ · m > n · m ≤ n
     → ∀n ∈ ℕ ∃m ∈ ℕ, m > n
   aides : « Pour tout » donne ∀, « il existe » donne ∃. Garde l'ordre de la phrase. | ∀… | ∀n ∈ ℕ ∃m ∈ ℕ, m > n
+  pièges : g9_quant_order
+
+Écris avec des quantificateurs : « Il existe un réel y tel que, pour tout réel x, y > x. »
+  [jetons] palette : x ∈ ℝ · y ∈ ℝ · y > x · y ≤ x
+    → ∃y ∈ ℝ ∀x ∈ ℝ, y > x
+  aides : « Pour tout » donne ∀, « il existe » donne ∃. Garde l'ordre de la phrase. | ∃… | ∃y ∈ ℝ ∀x ∈ ℝ, y > x
   pièges : g9_quant_order
 
 ```
@@ -695,17 +693,16 @@ Vrai ou faux ?
 
 ```
 Vrai ou faux ?
-  « ∀x ∈ ℝ ∃y ∈ ℝ, x + y = 0 » → VRAI
+  « ∀n ∈ ℕ ∃m ∈ ℕ, m > n » → VRAI
   pièges : g9_quant_order
 
 Vrai ou faux ?
-  « ∀x ∈ ℝ ∃y ∈ ℝ, x·y = 1 » → FAUX
-    contre-exemple (refute) : x = 0
-  pièges : g9_quant_order
+  « A = {2 ; 3 ; 4}. ∃y ∈ A ∀x ∈ A, x·y ≥ 12 » → FAUX
+    contre-exemple (refute) : x = 2
 
 Vrai ou faux ?
-  « A = {2 ; 3 ; 4}. ∃y ∈ A ∀x ∈ A, x² + y < 16 » → FAUX
-    contre-exemple (refute) : x = 4
+  « A = {1 ; 4 ; 5}. ∃y ∈ A ∀x ∈ A, x·y ≥ 9 » → FAUX
+    contre-exemple (refute) : x = 1
 
 ```
 
@@ -718,8 +715,8 @@ Vrai ou faux ?
   [examen tf]
   pièges : g9_quant_order
 
-Quelle phrase dit la même chose que ∀x ∈ ℝ ∃y ∈ ℝ, x + y = 0 ?
-  · Il existe un réel y, pour tout réel x, x + y = 0. [g9_quant_order]   ✔ Pour tout réel x, il existe un réel y tel que x + y = 0.   · Il existe un réel x, il existe un réel y tel que x + y = 0.   · Pour tout réel x, pour tout réel y, x + y = 0.
+Quelle phrase dit la même chose que ∃m ∈ ℕ ∀n ∈ ℕ, m > n ?
+  ✔ Il existe un entier naturel m, pour tout entier naturel n, m > n.   · Pour tout entier naturel m, pour tout entier naturel n, m > n.   · Il existe un entier naturel m, il existe un entier naturel n tel que m > n.   · Pour tout entier naturel n, il existe un entier naturel m tel que m > n. [g9_quant_order]
   [examen mcq]
   pièges : g9_quant_order
 
@@ -732,16 +729,16 @@ _Majorée, bornée, croissante, convergente…_
 ### Niveau 1
 
 ```
-Quelle formule dit « f est minorée sur ℝ » ?
-  · ∀x ∈ ℝ ∃m ∈ ℝ, f(x) ≥ m [g9_quant_order]   ✔ ∃m ∈ ℝ ∀x ∈ ℝ, f(x) ≥ m   · ∀m ∈ ℝ ∀x ∈ ℝ, f(x) ≥ m   · ∃m ∈ ℝ ∀x ∈ ℝ, f(x) ≤ m
-  pièges : g9_quant_order
-
 Quelle formule dit « f est bornée sur ℝ » ?
-  · ∃M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≥ M   ✔ ∃M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≤ M   · ∀M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≤ M   · ∀x ∈ ℝ ∃M ∈ ℝ, |f(x)| ≤ M [g9_quant_order]
+  ✔ ∃M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≤ M   · ∀M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≤ M   · ∃M ∈ ℝ ∀x ∈ ℝ, |f(x)| ≥ M   · ∀x ∈ ℝ ∃M ∈ ℝ, |f(x)| ≤ M [g9_quant_order]
   pièges : g9_quant_order
 
-Quelle formule dit « (uₙ) converge vers L » ?
-  · ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − L| > ε   ✔ ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − L| < ε   · ∃ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − L| < ε   · ∃N ∈ ℕ ∀ε > 0 ∀n ≥ N, |u_n − L| < ε [g9_quant_order]
+Quelle formule dit « f est minorée sur ℝ » ?
+  ✔ ∃m ∈ ℝ ∀x ∈ ℝ, f(x) ≥ m   · ∃m ∈ ℝ ∀x ∈ ℝ, f(x) ≤ m   · ∀m ∈ ℝ ∀x ∈ ℝ, f(x) ≥ m   · ∀x ∈ ℝ ∃m ∈ ℝ, f(x) ≥ m [g9_quant_order]
+  pièges : g9_quant_order
+
+Quelle formule dit « f est majorée sur ℝ » ?
+  · ∀M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M   · ∀x ∈ ℝ ∃M ∈ ℝ, f(x) ≤ M [g9_quant_order]   ✔ ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M   · ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≥ M
   pièges : g9_quant_order
 
 ```
@@ -749,28 +746,27 @@ Quelle formule dit « (uₙ) converge vers L » ?
 ### Niveau 2
 
 ```
-Construis la définition : « f est bornée sur ℝ ». Touche les morceaux dans l'ordre.
+Construis la définition : « f est périodique ». Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∃T > 0
+    2. ∀x ∈ ℝ
+    3. , f(x + T) = f(x)
+    ✗ ∀T > 0 [g9_quant_order]
+  pièges : g9_quant_order
+
+Construis la définition : « f est minorée sur ℝ ». Touche les morceaux dans l'ordre.
+  [blocs define]
+    1. ∃m ∈ ℝ
+    2. ∀x ∈ ℝ
+    3. , f(x) ≥ m
+    ✗ ∀m ∈ ℝ [g9_quant_order]
+  pièges : g9_quant_order
+
+Construis la définition : « f est majorée sur ℝ ». Touche les morceaux dans l'ordre.
   [blocs define]
     1. ∃M ∈ ℝ
     2. ∀x ∈ ℝ
-    3. , |f(x)| ≤ M
-    ✗ ∀M ∈ ℝ [g9_quant_order]
-  pièges : g9_quant_order
-
-Construis la définition : « (uₙ) converge vers L ». Touche les morceaux dans l'ordre.
-  [blocs define]
-    1. ∀ε > 0
-    2. ∃N ∈ ℕ
-    3. ∀n ≥ N
-    4. , |u_n − L| 
-    ✗ ∀N ∈ ℕ [g9_quant_order]
-  pièges : g9_quant_order
-
-Construis la définition : « f est bornée sur ℝ ». Touche les morceaux dans l'ordre.
-  [blocs define]
-    1. ∃M ∈ ℝ
-    2. ∀x ∈ ℝ
-    3. , |f(x)| ≤ M
+    3. , f(x) ≤ M
     ✗ ∀M ∈ ℝ [g9_quant_order]
   pièges : g9_quant_order
 
@@ -779,16 +775,10 @@ Construis la définition : « f est bornée sur ℝ ». Touche les morceaux dans
 ### Niveau 3
 
 ```
-Écris avec des quantificateurs : « f est injective sur I ».
-  [jetons] palette : x, y ∈ I · f(x) = f(y) · x = y
-    → ∀x, y ∈ I, f(x) = f(y) ⇒ x = y
-  aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∀x, … | ∀x, y ∈ I, f(x) = f(y) ⇒ x = y
-  pièges : g9_quant_order
-
-Écris avec des quantificateurs : « f est décroissante sur I ».
-  [jetons] palette : x, y ∈ I · x < y · f(x) ≥ f(y)
-    → ∀x, y ∈ I, x < y ⇒ f(x) ≥ f(y)
-  aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∀x, … | ∀x, y ∈ I, x < y ⇒ f(x) ≥ f(y)
+Écris avec des quantificateurs : « f est paire ».
+  [jetons] palette : x ∈ ℝ · f(-x) = f(x)
+    → ∀x ∈ ℝ, f(-x) = f(x)
+  aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∀x ∈ ℝ, … | ∀x ∈ ℝ, f(-x) = f(x)
   pièges : g9_quant_order
 
 Écris avec des quantificateurs : « f est paire ».
@@ -797,21 +787,27 @@ Construis la définition : « f est bornée sur ℝ ». Touche les morceaux dans
   aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∀x ∈ ℝ, … | ∀x ∈ ℝ, f(-x) = f(x)
   pièges : g9_quant_order
 
+Écris avec des quantificateurs : « A = B (dans E) ».
+  [jetons] palette : x ∈ E · x ∈ A · x ∈ B
+    → ∀x ∈ E, x ∈ A ⇔ x ∈ B
+  aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∀x ∈ E, … | ∀x ∈ E, x ∈ A ⇔ x ∈ B
+  pièges : g9_quant_order
+
 ```
 
 ### Niveau 4
 
 ```
+Écris avec des quantificateurs : « A ⊂ B ».
+  [jetons] palette : x ∈ A · x ∈ B · x ∉ B
+    → ∀x ∈ A, x ∈ B
+  aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∀x ∈ A, … | ∀x ∈ A, x ∈ B
+  pièges : g9_quant_order
+
 Écris avec des quantificateurs : « f est majorée sur ℝ ».
   [jetons] palette : M ∈ ℝ · x ∈ ℝ · f(x) ≤ M · f(x) ≥ M
     → ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M
   aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∃M ∈ ℝ ∀x ∈ ℝ, … | ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M
-  pièges : g9_quant_order
-
-Écris avec des quantificateurs : « f est périodique ».
-  [jetons] palette : T > 0 · x ∈ ℝ · f(x + T) = f(x) · T ≥ 0
-    → ∃T > 0 ∀x ∈ ℝ, f(x + T) = f(x)
-  aides : Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu'elle contrôle. | ∃T > 0 ∀x ∈ ℝ, … | ∃T > 0 ∀x ∈ ℝ, f(x + T) = f(x)
   pièges : g9_quant_order
 
 Écris avec des quantificateurs : « f est majorée sur ℝ ».
@@ -845,8 +841,8 @@ Construis la définition : « f est bornée sur ℝ ». Touche les morceaux dans
 ### Variantes d'examen
 
 ```
-Quelle formule dit « f est périodique » ?
-  · ∀x ∈ ℝ ∃T > 0, f(x + T) = f(x) [g9_quant_order]   · ∀T > 0 ∀x ∈ ℝ, f(x + T) = f(x)   ✔ ∃T > 0 ∀x ∈ ℝ, f(x + T) = f(x)
+Quelle formule dit « f est majorée sur ℝ » ?
+  · ∀x ∈ ℝ ∃M ∈ ℝ, f(x) ≤ M [g9_quant_order]   · ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≥ M   ✔ ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M   · ∀M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M
   [examen mcq]
   pièges : g9_quant_order
 
@@ -865,16 +861,16 @@ _∀ devient ∃, ∃ devient ∀, la propriété est niée._
 ### Niveau 1
 
 ```
-On nie ∀x ∈ A ∃y ∈ A, x² + y < 8. Première ligne : ∃x ∈ A, ¬(∃y ∈ A, x² + y < 8). Quelle est la ligne suivante ?
-  · ∃x ∈ A ∀y ∈ A, x² + y > 8 [g9_neg_strict]   ✔ ∃x ∈ A ∀y ∈ A, x² + y ≥ 8   · ∃x ∈ A ∀y ∈ A, x² + y < 8 [g9_neg_pred_kept]
-  pièges : g9_neg_pred_kept, g9_neg_strict
+On nie ∀x ∈ A ∃y ∈ A, x² + y < 12. Première ligne : ∃x ∈ A, ¬(∃y ∈ A, x² + y < 12). Quelle est la ligne suivante ?
+  ✔ ∃x ∈ A ∀y ∈ A, x² + y ≥ 12   · ∃x ∈ A ∀y ∈ A, x² + y < 12 [g9_neg_pred_kept]   · ∃x ∈ A ∀y ∈ A, x² + y > 12 [g9_neg_strict]
+  pièges : g9_neg_strict, g9_neg_pred_kept
 
-On nie ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M. Première ligne : ∀M ∈ ℝ, ¬(∀x ∈ ℝ, f(x) ≤ M). Quelle est la ligne suivante ?
-  · ∀M ∈ ℝ ∃x ∈ ℝ, f(x) ≥ M [g9_neg_strict]   · ∀M ∈ ℝ ∃x ∈ ℝ, f(x) ≤ M [g9_neg_pred_kept]   ✔ ∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M
-  pièges : g9_neg_pred_kept, g9_neg_strict
+On nie ∀x ∈ A ∃y ∈ A, x² + y < 12. Première ligne : ∃x ∈ A, ¬(∃y ∈ A, x² + y < 12). Quelle est la ligne suivante ?
+  ✔ ∃x ∈ A ∀y ∈ A, x² + y ≥ 12   · ∃x ∈ A ∀y ∈ A, x² + y < 12 [g9_neg_pred_kept]   · ∃x ∈ A ∀y ∈ A, x² + y > 12 [g9_neg_strict]
+  pièges : g9_neg_strict, g9_neg_pred_kept
 
-On nie ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M. Première ligne : ∀M ∈ ℝ, ¬(∀x ∈ ℝ, f(x) ≤ M). Quelle est la ligne suivante ?
-  · ∀M ∈ ℝ ∃x ∈ ℝ, f(x) ≥ M [g9_neg_strict]   ✔ ∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M   · ∀M ∈ ℝ ∃x ∈ ℝ, f(x) ≤ M [g9_neg_pred_kept]
+On nie ∀x ∈ A ∃y ∈ A, x² + y < 9. Première ligne : ∃x ∈ A, ¬(∃y ∈ A, x² + y < 9). Quelle est la ligne suivante ?
+  · ∃x ∈ A ∀y ∈ A, x² + y < 9 [g9_neg_pred_kept]   ✔ ∃x ∈ A ∀y ∈ A, x² + y ≥ 9   · ∃x ∈ A ∀y ∈ A, x² + y > 9 [g9_neg_strict]
   pièges : g9_neg_strict, g9_neg_pred_kept
 
 ```
@@ -882,16 +878,16 @@ On nie ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M. Première ligne : ∀M ∈ ℝ, ¬
 ### Niveau 2
 
 ```
-Écris la négation de ∀x ∈ ℝ, x² ≥ 3.
-  [jetons] palette : x ∈ ℝ · x² ≥ 3 · x² < 3 · x² ≤ 3
-    → ∃x ∈ ℝ, x² < 3
-  aides : Chaque ∀ devient ∃, chaque ∃ devient ∀, et la propriété à la fin est niée. | ∃x ∈ ℝ, … | ∃x ∈ ℝ, x² < 3
+Écris la négation de ∀x ∈ A ∃y ∈ A, x² + y < 12.
+  [jetons] palette : x ∈ A · y ∈ A · x² + y < 12 · x² + y ≥ 12 · x² + y > 12
+    → ∃x ∈ A ∀y ∈ A, x² + y ≥ 12
+  aides : Chaque ∀ devient ∃, chaque ∃ devient ∀, et la propriété à la fin est niée. | ∃x ∈ A ∀y ∈ A, … | ∃x ∈ A ∀y ∈ A, x² + y ≥ 12
   pièges : g9_neg_one_quant, g9_neg_pred_kept, g9_neg_strict
 
-Écris la négation de ∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M.
-  [jetons] palette : M ∈ ℝ · x ∈ ℝ · f(x) > M · f(x) ≤ M · f(x) < M
-    → ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M
-  aides : Chaque ∀ devient ∃, chaque ∃ devient ∀, et la propriété à la fin est niée. | ∃M ∈ ℝ ∀x ∈ ℝ, … | ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M
+Écris la négation de ∀x ∈ ℝ, x² ≥ 5.
+  [jetons] palette : x ∈ ℝ · x² ≥ 5 · x² < 5 · x² ≤ 5
+    → ∃x ∈ ℝ, x² < 5
+  aides : Chaque ∀ devient ∃, chaque ∃ devient ∀, et la propriété à la fin est niée. | ∃x ∈ ℝ, … | ∃x ∈ ℝ, x² < 5
   pièges : g9_neg_one_quant, g9_neg_pred_kept, g9_neg_strict
 
 Écris la négation de ∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M.
@@ -905,34 +901,23 @@ On nie ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M. Première ligne : ∀M ∈ ℝ, ¬
 ### Niveau 3
 
 ```
-Écris la négation de ∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M (« f n'est pas majorée ») : fais entrer ¬, un symbole par ligne.
-  [tap, suivre l'erreur, menu logic]  ¬(∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M)
-    = ∃M ∈ ℝ, ¬(∃x ∈ ℝ, f(x) > M)   ← Franchir ∀M ∈ ℝ
-    = ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M   ← Franchir ∃x ∈ ℝ
-  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃M ∈ ℝ, ¬(∃x ∈ ℝ, f(x) > M) | ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M
+Écris la négation de ∀x ∈ A ∃y ∈ A, x² + y < 14 (« A = {1 ; 2 ; 3} ») : fais entrer ¬, un symbole par ligne.
+  [tap, suivre l'erreur, menu logic]  ¬(∀x ∈ A ∃y ∈ A, x² + y < 14)
+    = ∃x ∈ A, ¬(∃y ∈ A, x² + y < 14)   ← Franchir ∀x ∈ A
+    = ∃x ∈ A ∀y ∈ A, x² + y ≥ 14   ← Franchir ∃y ∈ A
+  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃x ∈ A, ¬(∃y ∈ A, x² + y < 14) | ∃x ∈ A ∀y ∈ A, x² + y ≥ 14
   pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_strict
 
-Écris la négation de ∃y ∈ A ∀x ∈ A, x + 2y < 9 (« A = {1 ; 2 ; 3} ») : fais entrer ¬, un symbole par ligne.
-  [tap, suivre l'erreur, menu logic]  ¬(∃y ∈ A ∀x ∈ A, x + 2y < 9)
-    = ∀y ∈ A, ¬(∀x ∈ A, x + 2y < 9)   ← Franchir ∃y ∈ A
-    = ∀y ∈ A ∃x ∈ A, x + 2y ≥ 9   ← Franchir ∀x ∈ A
-  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∀y ∈ A, ¬(∀x ∈ A, x + 2y < 9) | ∀y ∈ A ∃x ∈ A, x + 2y ≥ 9
-  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_strict
+Écris la négation de ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε (« (uₙ) tend vers 2 ») : fais entrer ¬, un symbole par ligne.
+  [tap, suivre l'erreur, menu logic]  ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε)
+    = ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε)   ← Franchir ∀ε > 0
+    = ∃ε > 0 ∀N ∈ ℕ, ¬(∀n ≥ N, |u_n − 2| < ε)   ← Franchir ∃N ∈ ℕ
+    = ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n − 2| ≥ ε   ← Franchir ∀n ≥ N
+  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε) | ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n − 2| ≥ ε
+  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
 
-Écris la négation de ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M (« f est majorée ») : fais entrer ¬, un symbole par ligne.
-  [tap, suivre l'erreur, menu logic]  ¬(∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M)
-    = ∀M ∈ ℝ, ¬(∀x ∈ ℝ, f(x) ≤ M)   ← Franchir ∃M ∈ ℝ
-    = ∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M   ← Franchir ∀x ∈ ℝ
-  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∀M ∈ ℝ, ¬(∀x ∈ ℝ, f(x) ≤ M) | ∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M
-  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_strict
-
-```
-
-### Niveau 4
-
-```
 Écris la négation de ∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − 5| < δ ⇒ |f(x) − f(5)| < ε (« f est continue en 5 ») : fais entrer ¬, un symbole par ligne.
-  [free, suivre l'erreur]  ¬(∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − 5| < δ ⇒ |f(x) − f(5)| < ε)
+  [tap, suivre l'erreur, menu logic]  ¬(∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − 5| < δ ⇒ |f(x) − f(5)| < ε)
     = ∃ε > 0, ¬(∃δ > 0 ∀x ∈ ℝ, |x − 5| < δ ⇒ |f(x) − f(5)| < ε)   ← Franchir ∀ε > 0
     = ∃ε > 0 ∀δ > 0, ¬(∀x ∈ ℝ, |x − 5| < δ ⇒ |f(x) − f(5)| < ε)   ← Franchir ∃δ > 0
     = ∃ε > 0 ∀δ > 0 ∃x ∈ ℝ, ¬(|x − 5| < δ ⇒ |f(x) − f(5)| < ε)   ← Franchir ∀x ∈ ℝ
@@ -940,21 +925,34 @@ On nie ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M. Première ligne : ∀M ∈ ℝ, ¬
   aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃ε > 0, ¬(∃δ > 0 ∀x ∈ ℝ, |x − 5| < δ ⇒ |f(x) − f(5)| < ε) | ∃ε > 0 ∀δ > 0 ∃x ∈ ℝ, |x − 5| < δ ∧ |f(x) − f(5)| ≥ ε
   pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
 
-Écris la négation de ∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − 2| < δ ⇒ |f(x) − f(2)| < ε (« f est continue en 2 ») : fais entrer ¬, un symbole par ligne.
-  [free, suivre l'erreur]  ¬(∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − 2| < δ ⇒ |f(x) − f(2)| < ε)
-    = ∃ε > 0, ¬(∃δ > 0 ∀x ∈ ℝ, |x − 2| < δ ⇒ |f(x) − f(2)| < ε)   ← Franchir ∀ε > 0
-    = ∃ε > 0 ∀δ > 0, ¬(∀x ∈ ℝ, |x − 2| < δ ⇒ |f(x) − f(2)| < ε)   ← Franchir ∃δ > 0
-    = ∃ε > 0 ∀δ > 0 ∃x ∈ ℝ, ¬(|x − 2| < δ ⇒ |f(x) − f(2)| < ε)   ← Franchir ∀x ∈ ℝ
-    = ∃ε > 0 ∀δ > 0 ∃x ∈ ℝ, |x − 2| < δ ∧ |f(x) − f(2)| ≥ ε   ← Nier l'implication : A ∧ ¬B
-  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃ε > 0, ¬(∃δ > 0 ∀x ∈ ℝ, |x − 2| < δ ⇒ |f(x) − f(2)| < ε) | ∃ε > 0 ∀δ > 0 ∃x ∈ ℝ, |x − 2| < δ ∧ |f(x) − f(2)| ≥ ε
+```
+
+### Niveau 4
+
+```
+Écris la négation de ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε (« (uₙ) tend vers −1 ») : fais entrer ¬, un symbole par ligne.
+  [free, suivre l'erreur]  ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε)
+    = ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε)   ← Franchir ∀ε > 0
+    = ∃ε > 0 ∀N ∈ ℕ, ¬(∀n ≥ N, |u_n + 1| < ε)   ← Franchir ∃N ∈ ℕ
+    = ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n + 1| ≥ ε   ← Franchir ∀n ≥ N
+  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε) | ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n + 1| ≥ ε
   pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
 
-Écris la négation de ∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y) (« f est croissante sur I ») : fais entrer ¬, un symbole par ligne.
-  [free, suivre l'erreur]  ¬(∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y))
-    = ∃x, y ∈ I, ¬(x < y ⇒ f(x) ≤ f(y))   ← Franchir ∀x, y ∈ I
-    = ∃x, y ∈ I, x < y ∧ f(x) > f(y)   ← Nier l'implication : A ∧ ¬B
-  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃x, y ∈ I, ¬(x < y ⇒ f(x) ≤ f(y)) | ∃x, y ∈ I, x < y ∧ f(x) > f(y)
-  pièges : g9_neg_pred_kept, g9_neg_strict
+Écris la négation de ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε (« (uₙ) tend vers 2 ») : fais entrer ¬, un symbole par ligne.
+  [free, suivre l'erreur]  ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε)
+    = ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε)   ← Franchir ∀ε > 0
+    = ∃ε > 0 ∀N ∈ ℕ, ¬(∀n ≥ N, |u_n − 2| < ε)   ← Franchir ∃N ∈ ℕ
+    = ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n − 2| ≥ ε   ← Franchir ∀n ≥ N
+  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε) | ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n − 2| ≥ ε
+  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
+
+Écris la négation de ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε (« (uₙ) tend vers 2 ») : fais entrer ¬, un symbole par ligne.
+  [free, suivre l'erreur]  ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε)
+    = ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε)   ← Franchir ∀ε > 0
+    = ∃ε > 0 ∀N ∈ ℕ, ¬(∀n ≥ N, |u_n − 2| < ε)   ← Franchir ∃N ∈ ℕ
+    = ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n − 2| ≥ ε   ← Franchir ∀n ≥ N
+  aides : Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée. | Première ligne : ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n − 2| < ε) | ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n − 2| ≥ ε
+  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
 
 ```
 
@@ -967,36 +965,33 @@ On nie ∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M. Première ligne : ∀M ∈ ℝ, ¬
     = ∃x, y ∈ I, x < y ∧ f(x) > f(y)   ← Nier l'implication : A ∧ ¬B
   pièges : g9_neg_pred_kept, g9_neg_strict
 
-Écris la négation de ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε (« (uₙ) tend vers −1 ») : fais entrer ¬, un symbole par ligne.
-  [free, sans aide]  ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε)
-    = ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε)   ← Franchir ∀ε > 0
-    = ∃ε > 0 ∀N ∈ ℕ, ¬(∀n ≥ N, |u_n + 1| < ε)   ← Franchir ∃N ∈ ℕ
-    = ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n + 1| ≥ ε   ← Franchir ∀n ≥ N
-  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
+Écris la négation de ∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y) (« f est croissante sur I ») : fais entrer ¬, un symbole par ligne.
+  [free, sans aide]  ¬(∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y))
+    = ∃x, y ∈ I, ¬(x < y ⇒ f(x) ≤ f(y))   ← Franchir ∀x, y ∈ I
+    = ∃x, y ∈ I, x < y ∧ f(x) > f(y)   ← Nier l'implication : A ∧ ¬B
+  pièges : g9_neg_pred_kept, g9_neg_strict
 
-Écris la négation de ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 2| < ε (« (uₙ) tend vers −2 ») : fais entrer ¬, un symbole par ligne.
-  [free, sans aide]  ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 2| < ε)
-    = ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n + 2| < ε)   ← Franchir ∀ε > 0
-    = ∃ε > 0 ∀N ∈ ℕ, ¬(∀n ≥ N, |u_n + 2| < ε)   ← Franchir ∃N ∈ ℕ
-    = ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n + 2| ≥ ε   ← Franchir ∀n ≥ N
-  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
+Écris la négation de ∀x, y ∈ I, f(x) = f(y) ⇒ x = y (« f est injective sur I ») : fais entrer ¬, un symbole par ligne.
+  [free, sans aide]  ¬(∀x, y ∈ I, f(x) = f(y) ⇒ x = y)
+    = ∃x, y ∈ I, ¬(f(x) = f(y) ⇒ x = y)   ← Franchir ∀x, y ∈ I
+    = ∃x, y ∈ I, f(x) = f(y) ∧ x ≠ y   ← Nier l'implication : A ∧ ¬B
+  pièges : g9_neg_pred_kept, g9_neg_strict
 
 ```
 
 ### Variantes d'examen
 
 ```
-Écris la négation de ∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε (« (uₙ) tend vers −1 ») : fais entrer ¬, un symbole par ligne.
-  [free, sans aide, examen open]  ¬(∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε)
-    = ∃ε > 0, ¬(∃N ∈ ℕ ∀n ≥ N, |u_n + 1| < ε)   ← Franchir ∀ε > 0
-    = ∃ε > 0 ∀N ∈ ℕ, ¬(∀n ≥ N, |u_n + 1| < ε)   ← Franchir ∃N ∈ ℕ
-    = ∃ε > 0 ∀N ∈ ℕ ∃n ≥ N, |u_n + 1| ≥ ε   ← Franchir ∀n ≥ N
-  pièges : g9_quant_order, g9_neg_one_quant, g9_neg_pred_kept, g9_neg_restriction, g9_neg_strict
+Écris la négation de ∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y) (« f est croissante sur I ») : fais entrer ¬, un symbole par ligne.
+  [free, sans aide, examen open]  ¬(∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y))
+    = ∃x, y ∈ I, ¬(x < y ⇒ f(x) ≤ f(y))   ← Franchir ∀x, y ∈ I
+    = ∃x, y ∈ I, x < y ∧ f(x) > f(y)   ← Nier l'implication : A ∧ ¬B
+  pièges : g9_neg_pred_kept, g9_neg_strict
 
-Quelle est la négation de ∀x ∈ A ∃y ∈ A, x² + y < 7 ?
-  · ∃x ∈ A ∃y ∈ A, x² + y ≥ 7 [g9_neg_one_quant]   ✔ ∃x ∈ A ∀y ∈ A, x² + y ≥ 7   · ∃x ∈ A ∀y ∈ A, x² + y < 7 [g9_neg_pred_kept]   · ∃x ∈ A ∀y ∈ A, x² + y > 7 [g9_neg_strict]
+Quelle est la négation de ∃y ∈ A ∀x ∈ A, x + 2y < 9 ?
+  · ∀y ∈ A ∃x ∈ A, x + 2y < 9 [g9_neg_pred_kept]   · ∀y ∈ A ∀x ∈ A, x + 2y ≥ 9 [g9_neg_one_quant]   ✔ ∀y ∈ A ∃x ∈ A, x + 2y ≥ 9   · ∀y ∈ A ∃x ∈ A, x + 2y > 9 [g9_neg_strict]
   [examen mcq]
-  pièges : g9_neg_one_quant, g9_neg_strict, g9_neg_pred_kept
+  pièges : g9_neg_strict, g9_neg_one_quant, g9_neg_pred_kept
 
 ```
 
@@ -1007,16 +1002,16 @@ _Un seul x suffit pour montrer qu'un « pour tout » est faux._
 ### Niveau 1
 
 ```
-Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 16 ⇒ x > 4 » ?
-  · x = −4 [g9_counter_not_hyp]   · x = 3 [g9_counter_not_hyp]   · x = 5   ✔ x = −5
-  pièges : g9_counter_not_hyp
-
-Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 16 ⇒ x > 4 » ?
-  · x = 1 [g9_counter_not_hyp]   ✔ x = −6   · x = 5   · x = −4 [g9_counter_not_hyp]
+Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 4 ⇒ x > 2 » ?
+  · x = −2 [g9_counter_not_hyp]   · x = 3   · x = 0 [g9_counter_not_hyp]   ✔ x = −4
   pièges : g9_counter_not_hyp
 
 Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 4 ⇒ x > 2 » ?
-  · x = 3   · x = 1 [g9_counter_not_hyp]   · x = −2 [g9_counter_not_hyp]   ✔ x = −3
+  · x = 3   ✔ x = −4   · x = −2 [g9_counter_not_hyp]   · x = 0 [g9_counter_not_hyp]
+  pièges : g9_counter_not_hyp
+
+Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 9 ⇒ x > 3 » ?
+  · x = 1 [g9_counter_not_hyp]   · x = 4   ✔ x = −5   · x = −3 [g9_counter_not_hyp]
   pièges : g9_counter_not_hyp
 
 ```
@@ -1025,15 +1020,15 @@ Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 4 ⇒ x > 2 » ?
 
 ```
 Cet énoncé est faux. Donne un contre-exemple.
-  « ∀x > 0, 1/x < 1 » (faux, contre-exemple demandé) → FAUX
-    contre-exemple (refute) : x = 1/2
-  aides : Un seul exemple qui ne marche pas suffit à montrer qu'un « pour tout » est faux. | Essaie une valeur négative, ou entre 0 et 1. | x = 1/2
+  « ∀n ∈ ℕ, n² + n + 41 est premier » (faux, contre-exemple demandé) → FAUX
+    contre-exemple (composite) : n = 40
+  aides : Un seul exemple qui ne marche pas suffit à montrer qu'un « pour tout » est faux. | Cherche un n qui rend n² + n + 41 divisible par 41 : par exemple n = 41. | n = 40
   pièges : g9_proof_by_example
 
 Cet énoncé est faux. Donne un contre-exemple.
-  « ∀n ∈ ℕ, n² + n + 17 est premier » (faux, contre-exemple demandé) → FAUX
-    contre-exemple (composite) : n = 16
-  aides : Un seul exemple qui ne marche pas suffit à montrer qu'un « pour tout » est faux. | Cherche un n qui rend n² + n + 17 divisible par 17 : par exemple n = 17. | n = 16
+  « ∀x ∈ ℝ, x² ≥ x » (faux, contre-exemple demandé) → FAUX
+    contre-exemple (refute) : x = 1/2
+  aides : Un seul exemple qui ne marche pas suffit à montrer qu'un « pour tout » est faux. | Essaie une valeur négative, ou entre 0 et 1. | x = 1/2
   pièges : g9_proof_by_example
 
 Cet énoncé est faux. Donne un contre-exemple.
@@ -1048,22 +1043,20 @@ Cet énoncé est faux. Donne un contre-exemple.
 
 ```
 Vrai ou faux ?
-  « ∀x ∈ ℝ, x < 4 ⇒ x² < 16 » → FAUX
-    contre-exemple (refute) : x = -5
-  aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie une valeur négative, ou entre 0 et 1. | x = −5
-  pièges : g9_proof_by_example
-
-Vrai ou faux ?
-  « ∀x ∈ ℝ, x < 3 ⇒ x² < 9 » → FAUX
-    contre-exemple (refute) : x = -4
-  aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie une valeur négative, ou entre 0 et 1. | x = −4
-  pièges : g9_proof_by_example
-
-Vrai ou faux ?
   « ∀x ∈ ℝ, x² ≥ x ⇒ x ≥ 1 » → FAUX
     contre-exemple (refute) : x = -1
   aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie une valeur négative, ou entre 0 et 1. | x = −1
   pièges : g9_proof_by_example
+
+Vrai ou faux ?
+  « ∀x ∈ ℝ, x < 1 ⇒ x² < 1 » → FAUX
+    contre-exemple (refute) : x = -2
+  aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie une valeur négative, ou entre 0 et 1. | x = −2
+  pièges : g9_proof_by_example
+
+Vrai ou faux ?
+  « ∀x ∈ ℝ, x > 1 ⇒ x² > 1 » → VRAI
+  aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie quelques valeurs : trouves-tu un exemple qui ne marche pas ? | Vrai : si x > 1 > 0, alors x² > 1.
 
 ```
 
@@ -1071,21 +1064,21 @@ Vrai ou faux ?
 
 ```
 Vrai ou faux ?
+  « Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅ » → FAUX
+    contre-exemple (refute) : A = {1}, B = {1}
+  aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}. | A = {1}, B = {1}
+  pièges : g9_proof_by_example
+
+Vrai ou faux ?
   « Pour tous ensembles A, B : (A ∪ B) ∖ B = A » → FAUX
     contre-exemple (refute) : A = {1}, B = {1}
   aides : Un seul exemple qui ne marche pas suffit à montrer qu'un « pour tout » est faux. | Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}. | A = {1}, B = {1}
   pièges : g9_proof_by_example
 
 Vrai ou faux ?
-  « Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅ » → FAUX
+  « Pour tous ensembles A, B : (A ∪ B) ∖ B = A » → FAUX
     contre-exemple (refute) : A = {1}, B = {1}
-  aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}. | A = {1}, B = {1}
-  pièges : g9_proof_by_example
-
-Vrai ou faux ?
-  « Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅ » → FAUX
-    contre-exemple (refute) : A = {1}, B = {1}
-  aides : Cherche un x qui vérifie l'hypothèse mais pas la conclusion. | Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}. | A = {1}, B = {1}
+  aides : Un seul exemple qui ne marche pas suffit à montrer qu'un « pour tout » est faux. | Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}. | A = {1}, B = {1}
   pièges : g9_proof_by_example
 
 ```
@@ -1094,17 +1087,17 @@ Vrai ou faux ?
 
 ```
 Vrai ou faux ?
-  « ∀x > 0, 1/x < 1 » → FAUX
-    contre-exemple (refute) : x = 1/2
+  « ∀x ∈ ℝ, x² ≥ x ⇒ x ≥ 1 » → FAUX
+    contre-exemple (refute) : x = -1
   pièges : g9_proof_by_example
 
 Vrai ou faux ?
-  « ∀x ∈ ℝ, x² > 25 ⇒ x > 5 » → FAUX
-    contre-exemple (refute) : x = -6
-  pièges : g9_proof_by_example
+  « ∀x ∈ ℝ, x > 4 ⇒ x² > 16 » → VRAI
 
 Vrai ou faux ?
-  « ∀x ∈ ℝ, x² ≥ 0 » → VRAI
+  « ∀a, b ∈ ℝ, (a + b)² = a² + b² » → FAUX
+    contre-exemple (refute) : a = 1, b = 1
+  pièges : g9_proof_by_example
 
 ```
 
@@ -1115,8 +1108,8 @@ Vrai ou faux ?
   « ∀x ∈ ℝ, |x| ≥ x » → VRAI
   [examen tf]
 
-Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 9 ⇒ x > 3 » ?
-  · x = 1 [g9_counter_not_hyp]   · x = 4   ✔ x = −5   · x = −3 [g9_counter_not_hyp]
+Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > 16 ⇒ x > 4 » ?
+  ✔ x = −5   · x = 5   · x = −4 [g9_counter_not_hyp]   · x = 0 [g9_counter_not_hyp]
   [examen mcq]
   pièges : g9_counter_not_hyp
 
@@ -1129,41 +1122,41 @@ _Supposer ¬Q pour arriver à ¬P._
 ### Niveau 1
 
 ```
-Preuve : si x² < 1, alors |x| < 1 (x ∈ ℝ).Montrons la contraposée : si |x| ≥ 1, alors x² ≥ 1.Soit x avec |x| ≥ 1.…Donc x² ≥ 1.La contraposée est vraie, donc l'énoncé l'est aussi.Quel bloc manque ?
-  · Soit |x| < 1 : alors x² < 1. [g9_converse_contra]   ✔ x² = |x|² ≥ 1² = 1, car t ↦ t² est croissante sur [0 ; +∞[.
-  pièges : g9_converse_contra
-
-Preuve : si n + m est impair, alors n ou m est pair (n, m ∈ ℤ).Montrons la contraposée : si n et m sont impairs, alors n + m est pair.Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.n + m = 2k + 2l + 2 = 2(k + l + 1).…La contraposée est vraie, donc l'énoncé l'est aussi.Quel bloc manque ?
-  ✔ Donc n + m est pair.   · 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
-  pièges : g9_proof_by_example
-
 Preuve : si x² < 1, alors |x| < 1 (x ∈ ℝ).Montrons la contraposée : si |x| ≥ 1, alors x² ≥ 1.…x² = |x|² ≥ 1² = 1, car t ↦ t² est croissante sur [0 ; +∞[.Donc x² ≥ 1.La contraposée est vraie, donc l'énoncé l'est aussi.Quel bloc manque ?
   · Soit |x| < 1 : alors x² < 1. [g9_converse_contra]   ✔ Soit x avec |x| ≥ 1.
   pièges : g9_converse_contra
+
+Preuve : si x² < 1, alors |x| < 1 (x ∈ ℝ).Montrons la contraposée : si |x| ≥ 1, alors x² ≥ 1.Soit x avec |x| ≥ 1.…Donc x² ≥ 1.La contraposée est vraie, donc l'énoncé l'est aussi.Quel bloc manque ?
+  ✔ x² = |x|² ≥ 1² = 1, car t ↦ t² est croissante sur [0 ; +∞[.   · x = 1/2 donne x² = 1/4 < 1 et |x| < 1, donc c'est vrai. [g9_proof_by_example]
+  pièges : g9_proof_by_example
+
+Preuve : si n + m est impair, alors n ou m est pair (n, m ∈ ℤ).Montrons la contraposée : si n et m sont impairs, alors n + m est pair.…n + m = 2k + 2l + 2 = 2(k + l + 1).Donc n + m est pair.La contraposée est vraie, donc l'énoncé l'est aussi.Quel bloc manque ?
+  · 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]   ✔ Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
+  pièges : g9_proof_by_example
 
 ```
 
 ### Niveau 2
 
 ```
-Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
+Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs order]
-    1. Montrons la contraposée : si n est impair, alors n² est impair.
-    2. Soit n impair : n = 2k + 1, avec k ∈ ℤ.
-    3. n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1.
-    4. Donc n² est impair.
+    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
+    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
+    3. n + m = 2k + 2l + 2 = 2(k + l + 1).
+    4. Donc n + m est pair.
     5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ 2² = 4 et 4² = 16 sont pairs, donc c'est vrai. [g9_proof_by_example]
+    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
   pièges : g9_proof_by_example
 
-Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
+Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs order]
-    1. Montrons la contraposée : si n est impair, alors n² est impair.
-    2. Soit n impair : n = 2k + 1, avec k ∈ ℤ.
-    3. n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1.
-    4. Donc n² est impair.
+    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
+    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
+    3. n + m = 2k + 2l + 2 = 2(k + l + 1).
+    4. Donc n + m est pair.
     5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ 2² = 4 et 4² = 16 sont pairs, donc c'est vrai. [g9_proof_by_example]
+    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
   pièges : g9_proof_by_example
 
 Montre que si x² < 1, alors |x| < 1 (x ∈ ℝ). Touche les blocs dans l'ordre de la preuve.
@@ -1181,28 +1174,17 @@ Montre que si x² < 1, alors |x| < 1 (x ∈ ℝ). Touche les blocs dans l'ordre 
 ### Niveau 3
 
 ```
-Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
+Montre que si n² est multiple de 3, alors n est multiple de 3 (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs order]
     ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
-    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
-    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
-    3. n + m = 2k + 2l + 2 = 2(k + l + 1).
-    4. Donc n + m est pair.
-    5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
-    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
-  pièges : g9_proof_by_example, g9_converse_contra
-
-Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
-  [blocs order]
-    ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
-    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
-    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
-    3. n + m = 2k + 2l + 2 = 2(k + l + 1).
-    4. Donc n + m est pair.
-    5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
-    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
+    1. Montrons la contraposée : si n n'est pas multiple de 3, alors n² n'est pas multiple de 3.
+    2. n n'est pas multiple de 3 : n = 3k + 1 ou n = 3k + 2, avec k ∈ ℤ.
+    3. Si n = 3k + 1 : n² = 9k² + 6k + 1 = 3(3k² + 2k) + 1.
+    4. Si n = 3k + 2 : n² = 9k² + 12k + 4 = 3(3k² + 4k + 1) + 1.
+    5. Dans les deux cas, n² = 3m + 1 : n² n'est pas multiple de 3.
+    6. La contraposée est vraie, donc l'énoncé l'est aussi.
+    ✗ Soit n = 3k : n² = 9k² est multiple de 3. [g9_converse_contra]
+    ✗ 3² = 9 et 6² = 36 sont multiples de 3, donc c'est vrai. [g9_proof_by_example]
   pièges : g9_converse_contra, g9_proof_by_example
 
 Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
@@ -1217,23 +1199,23 @@ Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans 
     ✗ 2² = 4 et 4² = 16 sont pairs, donc c'est vrai. [g9_proof_by_example]
   pièges : g9_converse_contra, g9_proof_by_example
 
+Montre que si x² < 1, alors |x| < 1 (x ∈ ℝ). Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
+    1. Montrons la contraposée : si |x| ≥ 1, alors x² ≥ 1.
+    2. Soit x avec |x| ≥ 1.
+    3. x² = |x|² ≥ 1² = 1, car t ↦ t² est croissante sur [0 ; +∞[.
+    4. Donc x² ≥ 1.
+    5. La contraposée est vraie, donc l'énoncé l'est aussi.
+    ✗ Soit |x| < 1 : alors x² < 1. [g9_converse_contra]
+    ✗ x = 1/2 donne x² = 1/4 < 1 et |x| < 1, donc c'est vrai. [g9_proof_by_example]
+  pièges : g9_converse_contra, g9_proof_by_example
+
 ```
 
 ### Niveau 4
 
 ```
-Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
-  [blocs frame]
-    ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
-    1. Montrons la contraposée : si n est impair, alors n² est impair.
-    2. Soit n impair : n = 2k + 1, avec k ∈ ℤ.
-    3. n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1.   [à écrire : n² = (2k + 1)² = 2(2k^2+2k)+1]
-    4. Donc n² est impair.
-    5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ Soit n pair : n = 2k, donc n² = 4k² est pair. [g9_converse_contra]
-    ✗ 2² = 4 et 4² = 16 sont pairs, donc c'est vrai. [g9_proof_by_example]
-  pièges : g9_converse_contra, g9_proof_by_example
-
 Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs frame]
     ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
@@ -1245,6 +1227,18 @@ Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les
     ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
     ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
   pièges : g9_converse_contra, g9_proof_by_example
+
+Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
+  [blocs frame]
+    ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
+    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
+    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
+    3. n + m = 2k + 2l + 2 = 2(k + l + 1).   [à écrire : n + m = (2k + 1) + (2l + 1) = 2(k+l+1)]
+    4. Donc n + m est pair.
+    5. La contraposée est vraie, donc l'énoncé l'est aussi.
+    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
+    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
+  pièges : g9_proof_by_example, g9_converse_contra
 
 Montre que si n² est multiple de 3, alors n est multiple de 3 (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs frame]
@@ -1264,40 +1258,41 @@ Montre que si n² est multiple de 3, alors n est multiple de 3 (n ∈ ℤ). Touc
 ### Niveau 5
 
 ```
-Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
+Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs frame, sans aide]
     ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
-    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
-    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
-    3. n + m = 2k + 2l + 2 = 2(k + l + 1).   [à écrire : n + m = (2k + 1) + (2l + 1) = 2(k+l+1)]
-    4. Donc n + m est pair.
+    1. Montrons la contraposée : si n est impair, alors n² est impair.
+    2. Soit n impair : n = 2k + 1, avec k ∈ ℤ.
+    3. n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1.   [à écrire : n² = (2k + 1)² = 2(2k^2+2k)+1]
+    4. Donc n² est impair.
     5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
-    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
+    ✗ Soit n pair : n = 2k, donc n² = 4k² est pair. [g9_converse_contra]
+    ✗ 2² = 4 et 4² = 16 sont pairs, donc c'est vrai. [g9_proof_by_example]
   pièges : g9_converse_contra, g9_proof_by_example
 
-Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
+Montre que si n² est multiple de 3, alors n est multiple de 3 (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs frame, sans aide]
     ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
-    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
-    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
-    3. n + m = 2k + 2l + 2 = 2(k + l + 1).   [à écrire : n + m = (2k + 1) + (2l + 1) = 2(k+l+1)]
-    4. Donc n + m est pair.
-    5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
-    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
+    1. Montrons la contraposée : si n n'est pas multiple de 3, alors n² n'est pas multiple de 3.
+    2. n n'est pas multiple de 3 : n = 3k + 1 ou n = 3k + 2, avec k ∈ ℤ.
+    3. Si n = 3k + 1 : n² = 9k² + 6k + 1 = 3(3k² + 2k) + 1.   [à écrire : n² = (3k + 1)² = 3(3k^2+2k)+1]
+    4. Si n = 3k + 2 : n² = 9k² + 12k + 4 = 3(3k² + 4k + 1) + 1.
+    5. Dans les deux cas, n² = 3m + 1 : n² n'est pas multiple de 3.
+    6. La contraposée est vraie, donc l'énoncé l'est aussi.
+    ✗ 3² = 9 et 6² = 36 sont multiples de 3, donc c'est vrai. [g9_proof_by_example]
+    ✗ Soit n = 3k : n² = 9k² est multiple de 3. [g9_converse_contra]
   pièges : g9_proof_by_example, g9_converse_contra
 
-Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
+Montre que si n² est pair, alors n est pair (n ∈ ℤ). Touche les blocs dans l'ordre de la preuve.
   [blocs frame, sans aide]
     ? Preuve directe ou par contraposée ? ✔ Par contraposée / ~ Preuve directe
-    1. Montrons la contraposée : si n et m sont impairs, alors n + m est pair.
-    2. Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.
-    3. n + m = 2k + 2l + 2 = 2(k + l + 1).   [à écrire : n + m = (2k + 1) + (2l + 1) = 2(k+l+1)]
-    4. Donc n + m est pair.
+    1. Montrons la contraposée : si n est impair, alors n² est impair.
+    2. Soit n impair : n = 2k + 1, avec k ∈ ℤ.
+    3. n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1.   [à écrire : n² = (2k + 1)² = 2(2k^2+2k)+1]
+    4. Donc n² est impair.
     5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
-    ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
+    ✗ Soit n pair : n = 2k, donc n² = 4k² est pair. [g9_converse_contra]
+    ✗ 2² = 4 et 4² = 16 sont pairs, donc c'est vrai. [g9_proof_by_example]
   pièges : g9_converse_contra, g9_proof_by_example
 
 ```
@@ -1313,10 +1308,10 @@ Montre que si n + m est impair, alors n ou m est pair (n, m ∈ ℤ). Touche les
     3. n + m = 2k + 2l + 2 = 2(k + l + 1).   [à écrire : n + m = (2k + 1) + (2l + 1) = 2(k+l+1)]
     4. Donc n + m est pair.
     5. La contraposée est vraie, donc l'énoncé l'est aussi.
-    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
     ✗ 3 + 4 = 7 est impair et 4 est pair, donc c'est vrai. [g9_proof_by_example]
+    ✗ Soit n pair : alors n + m a la parité de m. [g9_converse_contra]
   [examen open]
-  pièges : g9_converse_contra, g9_proof_by_example
+  pièges : g9_proof_by_example, g9_converse_contra
 
 ```
 
@@ -1327,54 +1322,48 @@ _Supposer la négation, arriver à une contradiction._
 ### Niveau 1
 
 ```
-Preuve : log₂ 3 est irrationnel.Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.Alors 2^(a/b) = 3, donc 2^a = 3^b.…Donc log₂ 3 est irrationnel.Quel bloc manque ?
-  · Supposons log₂ 3 irrationnel. [g9_absurd_wrong_assumption]   ✔ 2^a est pair et 3^b est impair : contradiction.
-  pièges : g9_absurd_wrong_assumption
-
-Preuve : log₂ 3 est irrationnel.Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.…2^a est pair et 3^b est impair : contradiction.Donc log₂ 3 est irrationnel.Quel bloc manque ?
-  ✔ Alors 2^(a/b) = 3, donc 2^a = 3^b.   · Supposons log₂ 3 irrationnel. [g9_absurd_wrong_assumption]
-  pièges : g9_absurd_wrong_assumption
+Preuve : √7 est irrationnel.Supposons √7 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.…7 divise a², et 7 est premier, donc 7 divise a : a = 7c.49c² = 7b², donc b² = 7c², donc 7 divise b.7 divise a et b : contradiction avec pgcd(a, b) = 1.Donc √7 est irrationnel.Quel bloc manque ?
+  ✔ Alors a² = 7b².   · √7 ≈ 2,6458… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
+  pièges : g9_proof_by_example
 
 Preuve : il n'existe pas de plus grand entier.Supposons qu'il existe un plus grand entier N.…N + 1 > N : N n'est pas le plus grand, contradiction.Donc il n'existe pas de plus grand entier.Quel bloc manque ?
-  ✔ Alors N + 1 est aussi un entier.   · Supposons qu'il n'existe pas de plus grand entier. [g9_absurd_wrong_assumption]
+  · Supposons qu'il n'existe pas de plus grand entier. [g9_absurd_wrong_assumption]   ✔ Alors N + 1 est aussi un entier.
   pièges : g9_absurd_wrong_assumption
+
+Preuve : √5 est irrationnel.Supposons √5 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.Alors a² = 5b².5 divise a², et 5 est premier, donc 5 divise a : a = 5c.…5 divise a et b : contradiction avec pgcd(a, b) = 1.Donc √5 est irrationnel.Quel bloc manque ?
+  ✔ 25c² = 5b², donc b² = 5c², donc 5 divise b.   · √5 ≈ 2,2361… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
+  pièges : g9_proof_by_example
 
 ```
 
 ### Niveau 2
 
 ```
-Montre que √3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+Montre que log₂ 3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
   [blocs order]
-    1. Supposons √3 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 3b².
-    3. 3 divise a², et 3 est premier, donc 3 divise a : a = 3c.
-    4. 9c² = 3b², donc b² = 3c², donc 3 divise b.
-    5. 3 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √3 est irrationnel.
-    ✗ Supposons √3 irrationnel. [g9_absurd_wrong_assumption]
+    1. Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.
+    2. Alors 2^(a/b) = 3, donc 2^a = 3^b.
+    3. 2^a est pair et 3^b est impair : contradiction.
+    4. Donc log₂ 3 est irrationnel.
+    ✗ Supposons log₂ 3 irrationnel. [g9_absurd_wrong_assumption]
   pièges : g9_absurd_wrong_assumption
 
-Montre que √7 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+Montre que il n'existe pas de plus grand entier. Touche les blocs dans l'ordre de la preuve.
   [blocs order]
-    1. Supposons √7 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 7b².
-    3. 7 divise a², et 7 est premier, donc 7 divise a : a = 7c.
-    4. 49c² = 7b², donc b² = 7c², donc 7 divise b.
-    5. 7 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √7 est irrationnel.
-    ✗ Supposons √7 irrationnel. [g9_absurd_wrong_assumption]
+    1. Supposons qu'il existe un plus grand entier N.
+    2. Alors N + 1 est aussi un entier.
+    3. N + 1 > N : N n'est pas le plus grand, contradiction.
+    4. Donc il n'existe pas de plus grand entier.
+    ✗ Supposons qu'il n'existe pas de plus grand entier. [g9_absurd_wrong_assumption]
   pièges : g9_absurd_wrong_assumption
 
-Montre que √3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+Montre que log₂ 3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
   [blocs order]
-    1. Supposons √3 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 3b².
-    3. 3 divise a², et 3 est premier, donc 3 divise a : a = 3c.
-    4. 9c² = 3b², donc b² = 3c², donc 3 divise b.
-    5. 3 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √3 est irrationnel.
-    ✗ Supposons √3 irrationnel. [g9_absurd_wrong_assumption]
+    1. Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.
+    2. Alors 2^(a/b) = 3, donc 2^a = 3^b.
+    3. 2^a est pair et 3^b est impair : contradiction.
+    4. Donc log₂ 3 est irrationnel.
+    ✗ Supposons log₂ 3 irrationnel. [g9_absurd_wrong_assumption]
   pièges : g9_absurd_wrong_assumption
 
 ```
@@ -1382,6 +1371,28 @@ Montre que √3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
 ### Niveau 3
 
 ```
+Montre que log₂ 3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
+    1. Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.
+    2. Alors 2^(a/b) = 3, donc 2^a = 3^b.
+    3. 2^a est pair et 3^b est impair : contradiction.
+    4. Donc log₂ 3 est irrationnel.
+    ✗ Supposons log₂ 3 irrationnel. [g9_absurd_wrong_assumption]
+    ✗ log₂ 3 ≈ 1,585 n'est pas une fraction simple, donc il est irrationnel. [g9_proof_by_example]
+  pièges : g9_absurd_wrong_assumption, g9_proof_by_example
+
+Montre que log₂ 3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+  [blocs order]
+    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
+    1. Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.
+    2. Alors 2^(a/b) = 3, donc 2^a = 3^b.
+    3. 2^a est pair et 3^b est impair : contradiction.
+    4. Donc log₂ 3 est irrationnel.
+    ✗ log₂ 3 ≈ 1,585 n'est pas une fraction simple, donc il est irrationnel. [g9_proof_by_example]
+    ✗ Supposons log₂ 3 irrationnel. [g9_absurd_wrong_assumption]
+  pièges : g9_proof_by_example, g9_absurd_wrong_assumption
+
 Montre que √2 est irrationnel. Touche les blocs dans l'ordre de la preuve.
   [blocs order]
     ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
@@ -1393,30 +1404,6 @@ Montre que √2 est irrationnel. Touche les blocs dans l'ordre de la preuve.
     6. Donc √2 est irrationnel.
     ✗ √2 ≈ 1,4142… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
     ✗ Supposons √2 irrationnel. [g9_absurd_wrong_assumption]
-  pièges : g9_proof_by_example, g9_absurd_wrong_assumption
-
-Montre que il n'existe pas de plus grand entier. Touche les blocs dans l'ordre de la preuve.
-  [blocs order]
-    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
-    1. Supposons qu'il existe un plus grand entier N.
-    2. Alors N + 1 est aussi un entier.
-    3. N + 1 > N : N n'est pas le plus grand, contradiction.
-    4. Donc il n'existe pas de plus grand entier.
-    ✗ 10, 100 et 1000 ont tous un entier plus grand, donc c'est vrai. [g9_proof_by_example]
-    ✗ Supposons qu'il n'existe pas de plus grand entier. [g9_absurd_wrong_assumption]
-  pièges : g9_proof_by_example, g9_absurd_wrong_assumption
-
-Montre que √7 est irrationnel. Touche les blocs dans l'ordre de la preuve.
-  [blocs order]
-    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
-    1. Supposons √7 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 7b².
-    3. 7 divise a², et 7 est premier, donc 7 divise a : a = 7c.
-    4. 49c² = 7b², donc b² = 7c², donc 7 divise b.
-    5. 7 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √7 est irrationnel.
-    ✗ √7 ≈ 2,6458… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
-    ✗ Supposons √7 irrationnel. [g9_absurd_wrong_assumption]
   pièges : g9_proof_by_example, g9_absurd_wrong_assumption
 
 ```
@@ -1433,34 +1420,34 @@ Montre que √5 est irrationnel. Touche les blocs dans l'ordre de la preuve.
     4. 25c² = 5b², donc b² = 5c², donc 5 divise b.
     5. 5 divise a et b : contradiction avec pgcd(a, b) = 1.
     6. Donc √5 est irrationnel.
+    ✗ Supposons √5 irrationnel. [g9_absurd_wrong_assumption]
+    ✗ √5 ≈ 2,2361… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
+  pièges : g9_absurd_wrong_assumption, g9_proof_by_example
+
+Montre que √5 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+  [blocs frame]
+    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
+    1. Supposons √5 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
+    2. Alors a² = 5b².   [à écrire : En élevant √5 = a/b au carré : a^2=5b^2]
+    3. 5 divise a², et 5 est premier, donc 5 divise a : a = 5c.
+    4. 25c² = 5b², donc b² = 5c², donc 5 divise b.
+    5. 5 divise a et b : contradiction avec pgcd(a, b) = 1.
+    6. Donc √5 est irrationnel.
     ✗ √5 ≈ 2,2361… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
     ✗ Supposons √5 irrationnel. [g9_absurd_wrong_assumption]
   pièges : g9_proof_by_example, g9_absurd_wrong_assumption
 
-Montre que √7 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+Montre que √5 est irrationnel. Touche les blocs dans l'ordre de la preuve.
   [blocs frame]
     ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
-    1. Supposons √7 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 7b².   [à écrire : En élevant √7 = a/b au carré : a^2=7b^2]
-    3. 7 divise a², et 7 est premier, donc 7 divise a : a = 7c.
-    4. 49c² = 7b², donc b² = 7c², donc 7 divise b.
-    5. 7 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √7 est irrationnel.
-    ✗ Supposons √7 irrationnel. [g9_absurd_wrong_assumption]
-    ✗ √7 ≈ 2,6458… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
-  pièges : g9_absurd_wrong_assumption, g9_proof_by_example
-
-Montre que √7 est irrationnel. Touche les blocs dans l'ordre de la preuve.
-  [blocs frame]
-    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
-    1. Supposons √7 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 7b².   [à écrire : En élevant √7 = a/b au carré : a^2=7b^2]
-    3. 7 divise a², et 7 est premier, donc 7 divise a : a = 7c.
-    4. 49c² = 7b², donc b² = 7c², donc 7 divise b.
-    5. 7 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √7 est irrationnel.
-    ✗ √7 ≈ 2,6458… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
-    ✗ Supposons √7 irrationnel. [g9_absurd_wrong_assumption]
+    1. Supposons √5 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
+    2. Alors a² = 5b².   [à écrire : En élevant √5 = a/b au carré : a^2=5b^2]
+    3. 5 divise a², et 5 est premier, donc 5 divise a : a = 5c.
+    4. 25c² = 5b², donc b² = 5c², donc 5 divise b.
+    5. 5 divise a et b : contradiction avec pgcd(a, b) = 1.
+    6. Donc √5 est irrationnel.
+    ✗ √5 ≈ 2,2361… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
+    ✗ Supposons √5 irrationnel. [g9_absurd_wrong_assumption]
   pièges : g9_proof_by_example, g9_absurd_wrong_assumption
 
 ```
@@ -1481,37 +1468,19 @@ Montre que √5 est irrationnel. Touche les blocs dans l'ordre de la preuve.
     ✗ √5 ≈ 2,2361… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
   pièges : g9_absurd_wrong_assumption, g9_proof_by_example
 
-Montre que √2 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+Montre que √5 est irrationnel. Touche les blocs dans l'ordre de la preuve.
   [blocs frame, sans aide]
     ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
-    1. Supposons √2 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 2b².   [à écrire : En élevant √2 = a/b au carré : a^2=2b^2]
-    3. 2 divise a², et 2 est premier, donc 2 divise a : a = 2c.
-    4. 4c² = 2b², donc b² = 2c², donc 2 divise b.
-    5. 2 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √2 est irrationnel.
-    ✗ √2 ≈ 1,4142… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
-    ✗ Supposons √2 irrationnel. [g9_absurd_wrong_assumption]
-  pièges : g9_proof_by_example, g9_absurd_wrong_assumption
-
-Montre que √3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
-  [blocs frame, sans aide]
-    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
-    1. Supposons √3 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
-    2. Alors a² = 3b².   [à écrire : En élevant √3 = a/b au carré : a^2=3b^2]
-    3. 3 divise a², et 3 est premier, donc 3 divise a : a = 3c.
-    4. 9c² = 3b², donc b² = 3c², donc 3 divise b.
-    5. 3 divise a et b : contradiction avec pgcd(a, b) = 1.
-    6. Donc √3 est irrationnel.
-    ✗ Supposons √3 irrationnel. [g9_absurd_wrong_assumption]
-    ✗ √3 ≈ 1,7321… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
+    1. Supposons √5 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
+    2. Alors a² = 5b².   [à écrire : En élevant √5 = a/b au carré : a^2=5b^2]
+    3. 5 divise a², et 5 est premier, donc 5 divise a : a = 5c.
+    4. 25c² = 5b², donc b² = 5c², donc 5 divise b.
+    5. 5 divise a et b : contradiction avec pgcd(a, b) = 1.
+    6. Donc √5 est irrationnel.
+    ✗ Supposons √5 irrationnel. [g9_absurd_wrong_assumption]
+    ✗ √5 ≈ 2,2361… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
   pièges : g9_absurd_wrong_assumption, g9_proof_by_example
 
-```
-
-### Variantes d'examen
-
-```
 Montre que √7 est irrationnel. Touche les blocs dans l'ordre de la preuve.
   [blocs frame, sans aide]
     ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
@@ -1523,8 +1492,26 @@ Montre que √7 est irrationnel. Touche les blocs dans l'ordre de la preuve.
     6. Donc √7 est irrationnel.
     ✗ √7 ≈ 2,6458… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
     ✗ Supposons √7 irrationnel. [g9_absurd_wrong_assumption]
-  [examen open]
   pièges : g9_proof_by_example, g9_absurd_wrong_assumption
+
+```
+
+### Variantes d'examen
+
+```
+Montre que √3 est irrationnel. Touche les blocs dans l'ordre de la preuve.
+  [blocs frame, sans aide]
+    ? Que suppose-t-on ? ✔ La négation de l'énoncé / · L'énoncé lui-même / · La réciproque / · Un exemple
+    1. Supposons √3 = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.
+    2. Alors a² = 3b².   [à écrire : En élevant √3 = a/b au carré : a^2=3b^2]
+    3. 3 divise a², et 3 est premier, donc 3 divise a : a = 3c.
+    4. 9c² = 3b², donc b² = 3c², donc 3 divise b.
+    5. 3 divise a et b : contradiction avec pgcd(a, b) = 1.
+    6. Donc √3 est irrationnel.
+    ✗ Supposons √3 irrationnel. [g9_absurd_wrong_assumption]
+    ✗ √3 ≈ 1,7321… n'a pas de période visible, donc il est irrationnel. [g9_proof_by_example]
+  [examen open]
+  pièges : g9_absurd_wrong_assumption, g9_proof_by_example
 
 ```
 
