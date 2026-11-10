@@ -10,7 +10,7 @@ import { CQ } from '../../cas/complex.js';
 import { Q } from '../../math/rational.js';
 import {
   MT, examTag, H, KEYS, topTerms, TABLE, rd, lap, lapres, opt, mcqMulti, q,
-  P, padd, pmul, pscale, ppow, lin, deg, zpoly, zpow, denText, denPoly, pfd, pfdText, inverseText, residueText, cText,
+  P, padd, pmul, pscale, ppow, lin, deg, zpoly, zpow, denText, denPoly, pfd, pfdText, inverseText, residueText, cText, factorsText,
 } from './fourier-c-kit.js';
 
 const SKD = 'f-lap-inv-des';
@@ -37,18 +37,6 @@ const pairParts = (a, b, A, B) => {
   const c = new CQ(q(A).div(2), q(B).neg().div(2));
   return [{ p: cq(a, b), m: 1, c: [c] }, { p: cq(a, -b), m: 1, c: [c.conj()] }];
 };
-
-// The factors of D as text; a conjugate pair is a trinomial when both are there.
-function factorsText(poles) {
-  const out = [];
-  for (const x of poles) {
-    const conj = poles.find((y) => y.p.eq(x.p.conj()) && x.p.im.n !== 0);
-    if (conj && x.p.im.n < 0) continue;
-    if (conj) out.push(denText([x, conj]));
-    else out.push(zpow(x.p, x.m));
-  }
-  return out.join('');
-}
 
 function build(parts) {
   const poles = parts.map(({ p, m }) => ({ p, m }));

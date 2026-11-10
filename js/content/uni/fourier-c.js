@@ -6,10 +6,14 @@
 
 import { genTable, genAbscissa } from './fourier-c-table.js';
 import { genInvDes, genInvRes } from './fourier-c-inv.js';
+import { genOde, genIntegro, genProblem } from './fourier-c-ode.js';
 
 export const GEN = {
   'f-lap-table': genTable,
   'f-lap-abscissa': genAbscissa,
   'f-lap-inv-des': genInvDes,
   'f-lap-inv-res': genInvRes,
+  'f-lap-ode': genOde,
+  'f-lap-integro': genIntegro,
+  'f-lap-problem': genProblem,
 };

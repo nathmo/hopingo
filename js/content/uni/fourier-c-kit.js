@@ -197,6 +197,18 @@ export function topTerms(text) {
   return out;
 }
 
+// The factors of D as text; a conjugate pair is a trinomial when both are there.
+export function factorsText(poles) {
+  const out = [];
+  for (const x of poles) {
+    const conj = poles.find((y) => y.p.eq(x.p.conj()) && x.p.im.n !== 0);
+    if (conj && x.p.im.n < 0) continue;
+    if (conj) out.push(denText([x, conj]));
+    else out.push(zpow(x.p, x.m));
+  }
+  return out.join('');
+}
+
 // ---------- judges ----------
 
 export const lap = (o) => ({ kind: 'transform', transform: 'laplace', v: 't', s: 'z', dir: 'forward', ...o });
