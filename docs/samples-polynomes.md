@@ -1377,16 +1377,14 @@ Détermine le polynôme réel unitaire P de degré 3 qui admet i comme racine et
 
 ```
 Détermine le polynôme réel unitaire P de degré 3 qui admet 1 + 2i comme racine et dont le reste par x − 2 vaut 25.
-  [problème, examen open, 6 points]
-  partie 1 (Début du problème : 1,5 ; Reste par x − 2 : P(2) = 25, avec P = (x² − 2x + 5)(x − c). Trouve c. : 3 ; P développé : 1,5)
-    [free, sans aide, suivre l'erreur, examen open]  (x − 1 − 2i)(x − 1 + 2i)
-      = x² − 2x + 5   ← Développer
-    — Reste par x − 2 : P(2) = 25, avec P = (x² − 2x + 5)(x − c). Trouve c.  [juge solset]  départ : (2² − 2·2 + 5)(2 − c) = 25
-      = 5(2 − c) = 25   ← Calculer le trinôme en 2
-      = 2 − c = 5   ← Diviser par 5
-      = c = −3   ← Isoler c
-    — P développé :  [juge poly]  départ : (x² − 2x + 5)(x + 3)
-      = x³ + x² − x + 15   ← Développer
+  [free, sans aide, examen open]  (x − 1 − 2i)(x − 1 + 2i)
+    = x² − 2x + 5   ← Développer
+  — Reste par x − 2 : P(2) = 25, avec P = (x² − 2x + 5)(x − c). Trouve c.  [juge solset]  départ : (2² − 2·2 + 5)(2 − c) = 25
+    = 5(2 − c) = 25   ← Calculer le trinôme en 2
+    = 2 − c = 5   ← Diviser par 5
+    = c = −3   ← Isoler c
+  — P développé :  [juge poly]  départ : (x² − 2x + 5)(x + 3)
+    = x³ + x² − x + 15   ← Développer
   pièges : g0_irred_split
 
 P est réel, unitaire, de degré 3, admet 3 + 2i comme racine, et son reste par x − 2 vaut 20. Alors P =
@@ -1621,18 +1619,16 @@ P(x) = x⁴ − 3x³ + 2x² + (2λ − 4)x + λ² − 3λ + 2. Détermine λ pou
 
 ```
 P(x) = x⁴ − 7x² + (−λ − 9)x + λ² + λ − 6. Détermine λ pour que x² + x divise P, puis factorise P.
-  [problème, examen open, 4 points]
-  partie 1 (Début du problème : 1 ; Condition P(−1) = 0 : 1 ; Les deux conditions à la fois : 1 ; Avec λ = −3, factorise P : 1)
-    [free, sans aide, suivre l'erreur, examen open]  (0)⁴ − 7(0)² + (−λ − 9)(0) + λ² + λ − 6 = 0
-      = λ² + λ − 6 = 0   ← Calculer P(0)
-      = λ ∈ {−3 ; 2}   ← Résoudre
-    — Condition P(−1) = 0 :  [juge solset]  départ : (−1)⁴ − 7(−1)² + (−λ − 9)(−1) + λ² + λ − 6 = 0
-      = λ² + 2λ − 3 = 0   ← Calculer P(−1)
-      = λ ∈ {−3 ; 1}   ← Résoudre
-    — Les deux conditions à la fois :  [juge solset]  départ : {−3 ; 2} ∩ {−3 ; 1}
-      = λ = −3   ← Intersecter
-    — Avec λ = −3, factorise P :  [juge poly]  départ : x⁴ − 7x² − 6x
-      = (x + 2)(x + 1)x(x − 3)   ← Factoriser
+  [free, sans aide, examen open]  (0)⁴ − 7(0)² + (−λ − 9)(0) + λ² + λ − 6 = 0
+    = λ² + λ − 6 = 0   ← Calculer P(0)
+    = λ ∈ {−3 ; 2}   ← Résoudre
+  — Condition P(−1) = 0 :  [juge solset]  départ : (−1)⁴ − 7(−1)² + (−λ − 9)(−1) + λ² + λ − 6 = 0
+    = λ² + 2λ − 3 = 0   ← Calculer P(−1)
+    = λ ∈ {−3 ; 1}   ← Résoudre
+  — Les deux conditions à la fois :  [juge solset]  départ : {−3 ; 2} ∩ {−3 ; 1}
+    = λ = −3   ← Intersecter
+  — Avec λ = −3, factorise P :  [juge poly]  départ : x⁴ − 7x² − 6x
+    = (x + 2)(x + 1)x(x − 3)   ← Factoriser
 
 P(x) = x⁴ + x³ − 3x² + (λ − 1)x + λ² + 3λ + 2. Pour quelles valeurs de λ le polynôme x² + x − 2 divise-t-il P ?
   ✔ {0}   · {−4 ; −1 ; 0} [g9_union_inter]   · {−4 ; 0} [g0_param_one_cond]   · {−1 ; 0} [g0_param_one_cond]
@@ -1823,14 +1819,12 @@ Quel est le PGCD (unitaire) de x³ − x² − 6x et x³ − 7x − 6 ?
   pièges : g0_gcd_last
 
 Trouve le PGCD de A = x² − 9 et B = x² − 2x − 3, puis leurs racines communes.
-  [problème, examen open, 5 points]
-  partie 1 (Début du problème : 2 ; Divise B par le reste R₁ = 2x − 6 : 1,5 ; Le PGCD est le dernier reste non nul, rendu unitaire : 1,5)
-    [free, sans aide, suivre l'erreur, examen open]  A = x² − 9
-      = A = B·1 + (2x − 6)   ← Première division
-    — Divise B par le reste R₁ = 2x − 6 :  [juge poly]  départ : B = x² − 2x − 3
-      = B = (2x − 6)(1/2·x + 1/2) + 0   ← Deuxième division : reste nul
-    — Le PGCD est le dernier reste non nul, rendu unitaire :  [juge poly]  départ : 2x − 6
-      = x − 3   ← Rendre unitaire
+  [free, sans aide, examen open]  A = x² − 9
+    = A = B·1 + (2x − 6)   ← Première division
+  — Divise B par le reste R₁ = 2x − 6 :  [juge poly]  départ : B = x² − 2x − 3
+    = B = (2x − 6)(1/2·x + 1/2) + 0   ← Deuxième division : reste nul
+  — Le PGCD est le dernier reste non nul, rendu unitaire :  [juge poly]  départ : 2x − 6
+    = x − 3   ← Rendre unitaire
   pièges : g0_div_subtract
 
 ```
@@ -2355,19 +2349,17 @@ Décompose en éléments simples (x² + 10x − 23)/(x³ − 5x² + 3x + 9).
   [examen coef]
 
 Décompose en éléments simples (7x² − 6x + 14)/(x³ − x² + 4x − 4).
-  [problème, examen open, 4 points]
-  partie 1 (Début du problème : 1 ; B = ? : 1 ; C = ? : 1 ; Écris la décomposition : 1)
-    [free, sans aide, suivre l'erreur, examen open]  A
-      = (7·1² − 6·1 + 14)/(1² + 4)   ← Cache x − 1, pose x = 1
-      = 3   ← Calculer
-    — B = ?  [juge value]  départ : B
-      = 7 − 3   ← Coefficient de x² : A + B
-      = 4   ← Calculer
-    — C = ?  [juge value]  départ : C
-      = 12 − 14   ← Terme constant : N(0) = 4A − C
-      = −2   ← Calculer
-    — Écris la décomposition :  [juge equiv]  départ : (7x² − 6x + 14)/(x³ − x² + 4x − 4)
-      = 3/(x − 1) + (4x − 2)/(x² + 4)   ← Écrire
+  [free, sans aide, examen open]  A
+    = (7·1² − 6·1 + 14)/(1² + 4)   ← Cache x − 1, pose x = 1
+    = 3   ← Calculer
+  — B = ?  [juge value]  départ : B
+    = 7 − 3   ← Coefficient de x² : A + B
+    = 4   ← Calculer
+  — C = ?  [juge value]  départ : C
+    = 12 − 14   ← Terme constant : N(0) = 4A − C
+    = −2   ← Calculer
+  — Écris la décomposition :  [juge equiv]  départ : (7x² − 6x + 14)/(x³ − x² + 4x − 4)
+    = 3/(x − 1) + (4x − 2)/(x² + 4)   ← Écrire
   pièges : g0_coverup_sign
 
 ```

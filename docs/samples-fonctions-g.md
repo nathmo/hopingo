@@ -568,14 +568,12 @@ f : ℝ ∖ {2} → ℝ ∖ {−1}, f(x) = (−x − 4)/(x − 2). Alors f⁻¹(
   pièges : g1_inverse_reciprocal
 
 f : [2 ; +∞[ → [0 ; +∞[, f(x) = x² − 4x + 4 est bijective. Résous y = f(x) en x, puis explicite f⁻¹.
-  [problème, examen open, 3 points]
-  partie 1 (Début du problème : 2 ; Renomme la variable : 1)
-    [free, sans aide, suivre l'erreur, examen open]  x² − 4x + 4 = y
-      = (x − 2)² = y   ← Faire apparaître un carré
-      = x = 2 + √(y) ou x = 2 − √(y)   ← Deux racines
-      = x = 2 + √(y)   ← x ≥ 2 : on garde la racine +
-    — Renomme la variable :  [juge equiv]  départ : 2 + √(y)
-      = 2 + √(x)   ← Renommer y en x
+  [free, sans aide, examen open]  x² − 4x + 4 = y
+    = (x − 2)² = y   ← Faire apparaître un carré
+    = x = 2 + √(y) ou x = 2 − √(y)   ← Deux racines
+    = x = 2 + √(y)   ← x ≥ 2 : on garde la racine +
+  — Renomme la variable :  [juge equiv]  départ : 2 + √(y)
+    = 2 + √(x)   ← Renommer y en x
 
 ```
 
@@ -761,17 +759,15 @@ Vrai ou faux ?
   [examen tf]
 
 Montre que f(x) = (x + 1)/(x − 1) est injective sur ℝ ∖ {1}. Touche les blocs dans l'ordre de la preuve et complète les calculs.
-  [problème, examen open, 3 points]
-  partie 1 (Début du problème : 3)
-    [blocs frame, sans aide]
-      1. Soient a, b ∈ ℝ ∖ {1} tels que (a + 1)/(a − 1) = (b + 1)/(b − 1).
-      2. (a + 1)(b − 1) = (b + 1)(a − 1) (produit en croix)   [à écrire : Produit en croix : (a+1)(b-1)=(b+1)(a-1)]
-      3. −1a + 1b = −1b + 1a (les termes en ab et les constantes s'éliminent)
-      4. 2(b − a) = 0, et 2 ≠ 0, donc a = b.   [à écrire : Factorise : 2(b-a)=0]
-      5. Donc f est injective sur ℝ ∖ {1}.
-      ✗ Si a = b, alors f(a) = f(b) : f est injective. [g9_converse_contra]
-      ✗ f(0) ≠ f(1), donc f est injective. [g9_proof_by_example]
-    [examen open]
+  [blocs frame, sans aide]
+    1. Soient a, b ∈ ℝ ∖ {1} tels que (a + 1)/(a − 1) = (b + 1)/(b − 1).
+    2. (a + 1)(b − 1) = (b + 1)(a − 1) (produit en croix)   [à écrire : Produit en croix : (a+1)(b-1)=(b+1)(a-1)]
+    3. −1a + 1b = −1b + 1a (les termes en ab et les constantes s'éliminent)
+    4. 2(b − a) = 0, et 2 ≠ 0, donc a = b.   [à écrire : Factorise : 2(b-a)=0]
+    5. Donc f est injective sur ℝ ∖ {1}.
+    ✗ Si a = b, alors f(a) = f(b) : f est injective. [g9_converse_contra]
+    ✗ f(0) ≠ f(1), donc f est injective. [g9_proof_by_example]
+  [examen open]
   pièges : g9_converse_contra, g9_proof_by_example
 
 ```
@@ -979,19 +975,17 @@ Montre que f : ]−∞ ; −2] → ]−∞ ; −4], f(x) = x + 4/x est surjectiv
 
 ```
 Montre que f : ℝ ∖ {2} → ℝ ∖ {−2}, f(x) = (−2x − 5)/(x − 2) est surjective, et explicite f⁻¹. Touche les blocs dans l'ordre de la preuve et complète les calculs.
-  [problème, examen open, 7 points]
-  partie 1 (Début du problème : 7)
-    [blocs frame, sans aide]
-      1. Soit y ≠ −2. On cherche x ≠ 2 avec (−2x − 5)/(x − 2) = y.
-      2. y(x − 2) = −2x − 5   [à écrire : Multiplie par le dénominateur : y(x-2)=-2x-5]
-      3. x(y + 2) = 2y − 5   [à écrire : Regroupe les termes en x : x(y+2)=2y-5]
-      4. y ≠ −2, donc x = (2y − 5)/(y + 2).
-      5. x ≠ 2 : sinon 2y − 5 = 2(y + 2), soit −9 = 0, impossible. La solution est dans ℝ ∖ {2}.
-      6. Donc f est surjective ; elle est aussi injective, donc bijective.
-      7. f⁻¹(x) = (2x − 5)/(x + 2), x ≠ −2.
-      ✗ On trouve une solution x, donc f est surjective. [g1_surj_domain]
-      ✗ f⁻¹(x) = (x − 2)/(−2x − 5). [g1_inverse_reciprocal]
-    [examen open]
+  [blocs frame, sans aide]
+    1. Soit y ≠ −2. On cherche x ≠ 2 avec (−2x − 5)/(x − 2) = y.
+    2. y(x − 2) = −2x − 5   [à écrire : Multiplie par le dénominateur : y(x-2)=-2x-5]
+    3. x(y + 2) = 2y − 5   [à écrire : Regroupe les termes en x : x(y+2)=2y-5]
+    4. y ≠ −2, donc x = (2y − 5)/(y + 2).
+    5. x ≠ 2 : sinon 2y − 5 = 2(y + 2), soit −9 = 0, impossible. La solution est dans ℝ ∖ {2}.
+    6. Donc f est surjective ; elle est aussi injective, donc bijective.
+    7. f⁻¹(x) = (2x − 5)/(x + 2), x ≠ −2.
+    ✗ On trouve une solution x, donc f est surjective. [g1_surj_domain]
+    ✗ f⁻¹(x) = (x − 2)/(−2x − 5). [g1_inverse_reciprocal]
+  [examen open]
   pièges : g1_surj_domain, g1_inverse_reciprocal
 
 ```
@@ -1706,14 +1700,12 @@ Ensemble des solutions de (−2x − 12)/(x + 2) ≤ −3 :
   pièges : g1_mult_denominator, g1_pole_closed
 
 Résous (x + 4)/(x − 4) ≥ (x − 1)/(x − 5).
-  [problème, examen open, 3 points]
-  partie 1 (Début du problème : 3)
-    [free, sans aide, suivre l'erreur, examen open]  (x + 4)/(x − 4) ≥ (x − 1)/(x − 5)
-      = D = ℝ ∖ {4 ; 5}   ← Valeurs interdites
-      = (x + 4)/(x − 4) − (x − 1)/(x − 5) ≥ 0   ← Tout d'un côté
-      = ((x + 4)(x − 5) − (x − 1)(x − 4))/((x − 4)(x − 5)) ≥ 0   ← Même dénominateur
-      = (4x − 24)/((x − 4)(x − 5)) ≥ 0   ← Développer le numérateur
-      = ]4 ; 5[ ∪ [6 ; +∞[   ← Signes : valeurs interdites 4 et 5, zéro 6
+  [free, sans aide, examen open]  (x + 4)/(x − 4) ≥ (x − 1)/(x − 5)
+    = D = ℝ ∖ {4 ; 5}   ← Valeurs interdites
+    = (x + 4)/(x − 4) − (x − 1)/(x − 5) ≥ 0   ← Tout d'un côté
+    = ((x + 4)(x − 5) − (x − 1)(x − 4))/((x − 4)(x − 5)) ≥ 0   ← Même dénominateur
+    = (4x − 24)/((x − 4)(x − 5)) ≥ 0   ← Développer le numérateur
+    = ]4 ; 5[ ∪ [6 ; +∞[   ← Signes : valeurs interdites 4 et 5, zéro 6
   pièges : g1_mult_denominator, g1_pole_closed, g9_bracket
 
 ```
@@ -1970,17 +1962,15 @@ Selon m, combien de solutions a l'équation x² − 2mx + 1 = 0 ? Écris pour qu
 
 ```
 Résous (m + 3)x = m² − 9 selon les valeurs du paramètre m.
-  [problème, examen open, 4 points]
-  partie 1 (Début du problème : 1 ; Cas m ≠ −3 : 1,5 ; Cas m = −3 : 1,5)
-    [free, sans aide, suivre l'erreur, examen open]  m + 3 = 0
-      (Valeur critique de m :)
-      = {−3}   ← Le coefficient de x s'annule
-    — Cas m ≠ −3 :  [juge solset]  départ : (m + 3)x = m² − 9
-      = (m + 3)x = (m + 3)(m − 3)   ← Factoriser
-      = x = m − 3   ← Diviser par (m + 3) ≠ 0
-    — Cas m = −3 :  [juge solset]  départ : (m + 3)x = (m + 3)(m − 3)
-      = 0 = 0   ← 0·x = 0
-      = ℝ   ← Toujours vrai
+  [free, sans aide, examen open]  m + 3 = 0
+    (Valeur critique de m :)
+    = {−3}   ← Le coefficient de x s'annule
+  — Cas m ≠ −3 :  [juge solset]  départ : (m + 3)x = m² − 9
+    = (m + 3)x = (m + 3)(m − 3)   ← Factoriser
+    = x = m − 3   ← Diviser par (m + 3) ≠ 0
+  — Cas m = −3 :  [juge solset]  départ : (m + 3)x = (m + 3)(m − 3)
+    = 0 = 0   ← 0·x = 0
+    = ℝ   ← Toujours vrai
 
 On résout (m + 2)x < m² + 2m. Pour m = −5, l'ensemble des solutions est :
   · ℝ   · ∅   ✔ ]−5 ; +∞[   · ]−∞ ; −5[ [g1_param_case]
@@ -2175,16 +2165,14 @@ Pour quels m l'équation (m + 1)x² + 2mx − 2m − 1 = 0 a-t-elle deux racines
 
 ```
 Pour quels m l'équation mx² + (−2m + 2)x − 2m − 11 = 0 a-t-elle deux racines avec −4 < x₁ < 3 < x₂ ?
-  [problème, examen open, 6 points]
-  partie 1 (Début du problème : 1,5 ; f(−4) = : 1,5 ; Conditions a·f(k₁) et a·f(k₂) : 3)
-    [free, sans aide, suivre l'erreur, examen open]  m·3² + (−2m + 2)·3 + (−2m − 11)
-      (f(3) =)
-      = m − 5   ← Développer et réduire
-    — f(−4) =  [juge equiv]  départ : m·(−4)² + (−2m + 2)·(−4) + (−2m − 11)
-      = 22m − 19   ← Développer et réduire
-    — Conditions a·f(k₁) et a·f(k₂) :  [juge solset]  départ : m(m − 5) < 0 et m(22m − 19) > 0
-      = 0 < m < 5 et m ∈ ]−∞ ; 0[ ∪ ]19/22 ; +∞[   ← Résoudre chaque condition
-      = ]19/22 ; 5[   ← Intersecter
+  [free, sans aide, examen open]  m·3² + (−2m + 2)·3 + (−2m − 11)
+    (f(3) =)
+    = m − 5   ← Développer et réduire
+  — f(−4) =  [juge equiv]  départ : m·(−4)² + (−2m + 2)·(−4) + (−2m − 11)
+    = 22m − 19   ← Développer et réduire
+  — Conditions a·f(k₁) et a·f(k₂) :  [juge solset]  départ : m(m − 5) < 0 et m(22m − 19) > 0
+    = 0 < m < 5 et m ∈ ]−∞ ; 0[ ∪ ]19/22 ; +∞[   ← Résoudre chaque condition
+    = ]19/22 ; 5[   ← Intersecter
 
 Pour quels m l'équation (m − 2)x² − 2mx + 2m − 3 = 0 a-t-elle deux racines avec x₁ < 1 < x₂ ?
   · ]−∞ ; 2[ ∪ ]5 ; +∞[   · [2 ; 5]   ✔ ]2 ; 5[   · ]−∞ ; 5[ [g1_viete_a]
@@ -2712,21 +2700,19 @@ Résous x² − |x − 4| > −2x + 6.
 
 ```
 Résous x² − |3x + 3| > 3x + 4.
-  [problème, examen open, 5 points]
-  partie 1 (Début du problème : 2 ; Cas x < −1 : 2 ; Réunion : 1)
-    [free, sans aide, suivre l'erreur, examen open]  x² − |3x + 3| > 3x + 4
-      (Cas x ≥ −1 :)
-      = x² − (3x + 3) > 3x + 4   ← Ôter la valeur absolue dans ce cas
-      = x² − 6x − 7 > 0   ← Réduire
-      = ]−∞ ; −1[ ∪ ]7 ; +∞[   ← Résoudre
-      = ]7 ; +∞[   ← Garder les solutions du cas
-    — Cas x < −1 :  [juge solset]  départ : x² − |3x + 3| > 3x + 4
-      = x² + (3x + 3) > 3x + 4   ← Ôter la valeur absolue dans ce cas
-      = x² − 1 > 0   ← Réduire
-      = ]−∞ ; −1[ ∪ ]1 ; +∞[   ← Résoudre
-      = ]−∞ ; −1[   ← Garder les solutions du cas
-    — Réunion :  [juge solset]  départ : S_1 ∪ S_2
-      = ]−∞ ; −1[ ∪ ]7 ; +∞[   ← Réunir les cas
+  [free, sans aide, examen open]  x² − |3x + 3| > 3x + 4
+    (Cas x ≥ −1 :)
+    = x² − (3x + 3) > 3x + 4   ← Ôter la valeur absolue dans ce cas
+    = x² − 6x − 7 > 0   ← Réduire
+    = ]−∞ ; −1[ ∪ ]7 ; +∞[   ← Résoudre
+    = ]7 ; +∞[   ← Garder les solutions du cas
+  — Cas x < −1 :  [juge solset]  départ : x² − |3x + 3| > 3x + 4
+    = x² + (3x + 3) > 3x + 4   ← Ôter la valeur absolue dans ce cas
+    = x² − 1 > 0   ← Réduire
+    = ]−∞ ; −1[ ∪ ]1 ; +∞[   ← Résoudre
+    = ]−∞ ; −1[   ← Garder les solutions du cas
+  — Réunion :  [juge solset]  départ : S_1 ∪ S_2
+    = ]−∞ ; −1[ ∪ ]7 ; +∞[   ← Réunir les cas
   pièges : g1_abs_dropped, g9_bracket, g1_trinome_sign_swap
 
 Ensemble des solutions de x² + |x + 2| > 2x + 2 :
@@ -3146,20 +3132,18 @@ Résous √(x² − x − 2) ≥ x − 1.
 
 ```
 Résous √(x² + x − 6) ≥ x + 2.
-  [problème, examen open, 6 points]
-  partie 1 (Début du problème : 2 ; Cas x + 2 ≥ 0 : 3 ; Réunion : 1)
-    [free, sans aide, suivre l'erreur, examen open]  √(x² + x − 6) ≥ x + 2
-      (Cas x + 2 < 0 :)
-      = x² + x − 6 ≥ 0   ← B < 0 : vrai dès que la racine existe
-      = ]−∞ ; −3] ∪ [2 ; +∞[   ← Signe du trinôme
-      = ]−∞ ; −3]   ← Garder les x du cas
-    — Cas x + 2 ≥ 0 :  [juge solset]  départ : √(x² + x − 6) ≥ x + 2
-      = x² + x − 6 ≥ (x + 2)²   ← B ≥ 0 : élever au carré
-      = −3x ≥ 10   ← Les x² s'en vont
-      = ]−∞ ; −10/3]   ← Isoler x
-      = ∅   ← Garder les x du cas
-    — Réunion :  [juge solset]  départ : S_1 ∪ S_2
-      = ]−∞ ; −3]   ← Réunir
+  [free, sans aide, examen open]  √(x² + x − 6) ≥ x + 2
+    (Cas x + 2 < 0 :)
+    = x² + x − 6 ≥ 0   ← B < 0 : vrai dès que la racine existe
+    = ]−∞ ; −3] ∪ [2 ; +∞[   ← Signe du trinôme
+    = ]−∞ ; −3]   ← Garder les x du cas
+  — Cas x + 2 ≥ 0 :  [juge solset]  départ : √(x² + x − 6) ≥ x + 2
+    = x² + x − 6 ≥ (x + 2)²   ← B ≥ 0 : élever au carré
+    = −3x ≥ 10   ← Les x² s'en vont
+    = ]−∞ ; −10/3]   ← Isoler x
+    = ∅   ← Garder les x du cas
+  — Réunion :  [juge solset]  départ : S_1 ∪ S_2
+    = ]−∞ ; −3]   ← Réunir
   pièges : g1_square_no_cond, g9_bracket, g1_trinome_sign_swap
 
 Ensemble des solutions de √(x + 11) ≥ x − 1 :
@@ -3329,12 +3313,10 @@ Vrai ou faux ?
   [examen tf]
 
 Montre que si |x + 1| ≤ 1, alors |x² − 1| ≤ 3. Écris une chaîne de majorations.
-  [problème, examen open, 4 points]
-  partie 1 (Début du problème : 4)
-    [free, sans aide, suivre l'erreur, examen open]  |x² − 1|
-      = |x + 1|·|x − 1|   ← Factoriser
-      = 1·|x − 1|   ← |x + 1| ≤ 1
-      = 3   ← x ∈ [−2 ; 0], donc |x − 1| ≤ 3
+  [free, sans aide, examen open]  |x² − 1|
+    = |x + 1|·|x − 1|   ← Factoriser
+    = 1·|x − 1|   ← |x + 1| ≤ 1
+    = 3   ← x ∈ [−2 ; 0], donc |x − 1| ≤ 3
   pièges : g1_triangle_reverse
 
 ```

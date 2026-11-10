@@ -459,13 +459,11 @@ Ensemble des solutions de e^(2x) − 3e^x − 4 = 0 :
   pièges : g2_exp_neg_t
 
 Résous 4^x − 3·2^(x + 1) + 8 = 0.
-  [problème, examen open, 3 points]
-  partie 1 (Début du problème : 3)
-    [free, sans aide, suivre l'erreur, examen open]  4^x − 3·2^(x + 1) + 8 = 0
-      = t² − 6t + 8 = 0   ← Posons t = 2ˣ, 4ˣ = t², 2^(x+1) = 2t
-      = t = 4 ou t = 2   ← Résoudre
-      = 2^x = 4 ou 2^x = 2   ← Revenir à x
-      = x = 1 ou x = 2   ← Puissances de 2
+  [free, sans aide, examen open]  4^x − 3·2^(x + 1) + 8 = 0
+    = t² − 6t + 8 = 0   ← Posons t = 2ˣ, 4ˣ = t², 2^(x+1) = 2t
+    = t = 4 ou t = 2   ← Résoudre
+    = 2^x = 4 ou 2^x = 2   ← Revenir à x
+    = x = 1 ou x = 2   ← Puissances de 2
 
 ```
 
@@ -846,16 +844,14 @@ Résous log_(1/2)(x − 3) ≥ −4 + log₂(x + 3).
 
 ```
 Résous log_(1/2)(x − 2) ≥ −2 + log₂(x + 1).
-  [problème, examen open, 8 points]
-  partie 1 (Début du problème : 8)
-    [free, sans aide, suivre l'erreur, examen open]  log_(1/2)(x − 2) ≥ −2 + log₂(x + 1)
-      = D = ]2 ; +∞[   ← Domaine : x−2 > 0 et x+1 > 0
-      = −log₂(x − 2) ≥ −2 + log₂(x + 1)   ← log_{1/2} u = −log_2 u
-      = 2 ≥ log₂((x − 2)(x + 1))   ← Regrouper
-      = (x − 2)(x + 1) ≤ 4   ← Base 2 > 1 : exponentielle, même sens
-      = x² − x − 6 ≤ 0   ← Développer
-      = −2 ≤ x ≤ 3   ← Signe du trinôme
-      = ]2 ; 3]   ← Intersecter avec D
+  [free, sans aide, examen open]  log_(1/2)(x − 2) ≥ −2 + log₂(x + 1)
+    = D = ]2 ; +∞[   ← Domaine : x−2 > 0 et x+1 > 0
+    = −log₂(x − 2) ≥ −2 + log₂(x + 1)   ← log_{1/2} u = −log_2 u
+    = 2 ≥ log₂((x − 2)(x + 1))   ← Regrouper
+    = (x − 2)(x + 1) ≤ 4   ← Base 2 > 1 : exponentielle, même sens
+    = x² − x − 6 ≤ 0   ← Développer
+    = −2 ≤ x ≤ 3   ← Signe du trinôme
+    = ]2 ; 3]   ← Intersecter avec D
   pièges : g9_bracket, g2_log_domain
 
 Ensemble des solutions de log_(1/3)(2x + 3) < log_(1/3)(3x − 5) :
@@ -1033,13 +1029,11 @@ Résous x^(x^(1/3)) = (x^(1/3))^x pour x > 0.
 
 ```
 Résous x^(√(x)) = (√(x))^x pour x > 0.
-  [problème, examen open, 5 points]
-  partie 1 (Début du problème : 5)
-    [free, sans aide, suivre l'erreur, examen open]  x^(√(x)) = (√(x))^x
-      = e^(√(x)ln(x)) = e^((x/2)ln(x))   ← Écrire avec e
-      = √(x)ln(x) = (x/2)ln(x)   ← Comparer les exposants
-      = ln(x)(√(x) − x/2) = 0   ← Factoriser
-      = {1 ; 4}   ← ln x = 0, ou √x = x/2 : x = 4
+  [free, sans aide, examen open]  x^(√(x)) = (√(x))^x
+    = e^(√(x)ln(x)) = e^((x/2)ln(x))   ← Écrire avec e
+    = √(x)ln(x) = (x/2)ln(x)   ← Comparer les exposants
+    = ln(x)(√(x) − x/2) = 0   ← Factoriser
+    = {1 ; 4}   ← ln x = 0, ou √x = x/2 : x = 4
   pièges : g2_xx_lost_one
 
 Pour x > 0, ensemble des solutions de (x⁴)^x = x^(x²) :
@@ -1343,13 +1337,11 @@ Avec t = tanh x, cosh(2x) =
   pièges : g2_hyp_trig_sign
 
 Exprime sinh(2x) en fonction de t = tanh x.
-  [problème, examen open, 4 points]
-  partie 1 (Début du problème : 4)
-    [free, sans aide, suivre l'erreur, examen open]  sinh(2x)
-      = 2sinh(x)cosh(x)   ← Angle double
-      = 2tanh(x)cosh(x)²   ← sinh x = tanh x · cosh x
-      = 2tanh(x)/(1 − tanh(x)²)   ← cosh²x = 1/(1 − tanh²x)
-      = 2t/(1 − t²)   ← Remplacer tanh x par t
+  [free, sans aide, examen open]  sinh(2x)
+    = 2sinh(x)cosh(x)   ← Angle double
+    = 2tanh(x)cosh(x)²   ← sinh x = tanh x · cosh x
+    = 2tanh(x)/(1 − tanh(x)²)   ← cosh²x = 1/(1 − tanh²x)
+    = 2t/(1 − t²)   ← Remplacer tanh x par t
 
 ```
 
@@ -1503,15 +1495,13 @@ Combien de solutions a l'équation cosh(x) = 3 ? (Pense aux graphes, sans calcul
 
 ```
 Résous −3cosh(x) + 5sinh(x) = 0.
-  [problème, examen open, 5 points]
-  partie 1 (Début du problème : 5)
-    [free, sans aide, suivre l'erreur, examen open]  −3cosh(x) + 5sinh(x) = 0
-      = −3(e^x + e^(−x))/2 + 5(e^x − e^(−x))/2 = 0   ← Exponentielles
-      = 2e^(2x) − 8 = 0   ← Multiplier par 2eˣ
-      = 2t² − 8 = 0   ← Posons t = eˣ > 0
-      = t = 2 ou t = −2   ← Résoudre le trinôme
-      = e^x = 2   ← t > 0 : une seule racine
-      = x = ln(2)   ← Revenir à x
+  [free, sans aide, examen open]  −3cosh(x) + 5sinh(x) = 0
+    = −3(e^x + e^(−x))/2 + 5(e^x − e^(−x))/2 = 0   ← Exponentielles
+    = 2e^(2x) − 8 = 0   ← Multiplier par 2eˣ
+    = 2t² − 8 = 0   ← Posons t = eˣ > 0
+    = t = 2 ou t = −2   ← Résoudre le trinôme
+    = e^x = 2   ← t > 0 : une seule racine
+    = x = ln(2)   ← Revenir à x
 
 Combien de solutions a l'équation cosh(x) = x + 2 ? (Pense aux graphes, sans calcul.)
   · 0   · 1   ✔ 2   · 3

@@ -635,15 +635,13 @@ cos((17π)/12) = ?
   pièges : g3_add_sign, g3_half_sign
 
 On sait que sin x = −5/13 et x ∈ [π ; 3π/2]. Calcule cos x, sin 2x et cos 2x.
-  [problème, examen open, 2 points]
-  partie 1 (Début du problème : 1 ; sin 2x = 2 sin x cos x : 0,5 ; cos 2x = 1 − 2sin²x : 0,5)
-    [free, sans aide, suivre l'erreur, examen open]  cos(x)
-      = −√(1 − 25/169)   ← cos x < 0 sur [π ; 3π/2]
-      = −12/13   ← cos x
-    — sin 2x = 2 sin x cos x :  [juge value]  départ : 2·(−5/13)·(−12/13)
-      = 120/169   ← Angle double
-    — cos 2x = 1 − 2sin²x :  [juge value]  départ : 1 − 2·(−5/13)²
-      = 119/169   ← Angle double
+  [free, sans aide, examen open]  cos(x)
+    = −√(1 − 25/169)   ← cos x < 0 sur [π ; 3π/2]
+    = −12/13   ← cos x
+  — sin 2x = 2 sin x cos x :  [juge value]  départ : 2·(−5/13)·(−12/13)
+    = 120/169   ← Angle double
+  — cos 2x = 1 − 2sin²x :  [juge value]  départ : 1 − 2·(−5/13)²
+    = 119/169   ← Angle double
 
 ```
 
@@ -985,17 +983,15 @@ Résous sin(x)² − 3sin(x)cos(x) + 2cos(x)² = 0 dans ℝ.
 
 ```
 Résous −sin(x)² + 3cos(x) + 3 = 0 dans [−π ; π].
-  [problème, examen open, 4 points]
-  partie 1 (Début du problème : 3 ; Solutions dans [−π ; π] : 1)
-    [free, sans aide, suivre l'erreur, examen open]  −sin(x)² + 3cos(x) + 3 = 0
-      = −(1 − cos(x)²) + 3cos(x) + 3 = 0   ← sin²x = 1 − cos²x
-      = cos(x)² + 3cos(x) + 2 = 0   ← Réduire
-      = X² + 3X + 2 = 0   ← Posons X = cos x
-      = (X + 2)(X + 1) = 0   ← Factoriser
-      = cos(x) = −2 ou cos(x) = −1   ← Revenir à x
-      = x = π + 2kπ   ← Équations de base
-    — Solutions dans [−π ; π] :  [juge solset]  départ : x = π + 2kπ
-      = {−π ; π}   ← Garder les k qui tombent dans l'intervalle
+  [free, sans aide, examen open]  −sin(x)² + 3cos(x) + 3 = 0
+    = −(1 − cos(x)²) + 3cos(x) + 3 = 0   ← sin²x = 1 − cos²x
+    = cos(x)² + 3cos(x) + 2 = 0   ← Réduire
+    = X² + 3X + 2 = 0   ← Posons X = cos x
+    = (X + 2)(X + 1) = 0   ← Factoriser
+    = cos(x) = −2 ou cos(x) = −1   ← Revenir à x
+    = x = π + 2kπ   ← Équations de base
+  — Solutions dans [−π ; π] :  [juge solset]  départ : x = π + 2kπ
+    = {−π ; π}   ← Garder les k qui tombent dans l'intervalle
   pièges : g3_divide_zero, g3_rphi
 
 Les solutions de sin(2x) = −cos(x) sont…
@@ -1197,16 +1193,14 @@ Les solutions de sin(x) + √3cos(x) = 1 sont…
   pièges : g3_rphi, g3_sin_family
 
 Résous sin(3x) − √3cos(3x) = −√2 dans [0 ; 2π].
-  [problème, examen open, 4 points]
-  partie 1 (Début du problème : 3 ; Solutions dans [0 ; 2π] : 1)
-    [free, sans aide, suivre l'erreur, examen open]  sin(3x) − √3cos(3x) = −√2
-      = (1/2)sin(3x) + (−√3/2)cos(3x) = −√2/2   ← Diviser par R = 2
-      = sin(3x − π/3) = −√2/2   ← Formule d'addition, φ = −π/3
-      = 3x − π/3 = −π/4 + 2kπ ou 3x − π/3 = (5π)/4 + 2kπ   ← Équation de base
-      = 3x = π/12 + 2kπ ou 3x = (19π)/12 + 2kπ   ← Isoler 3x
-      = x = π/36 + 2kπ/3 ou x = (19π)/36 + 2kπ/3   ← Diviser aussi la période
-    — Solutions dans [0 ; 2π] :  [juge solset]  départ : x = π/36 + 2kπ/3 ou x = (19π)/36 + 2kπ/3
-      = {π/36 ; (19π)/36 ; (25π)/36 ; (43π)/36 ; (49π)/36 ; (67π)/36}   ← Garder les k qui tombent dans l'intervalle
+  [free, sans aide, examen open]  sin(3x) − √3cos(3x) = −√2
+    = (1/2)sin(3x) + (−√3/2)cos(3x) = −√2/2   ← Diviser par R = 2
+    = sin(3x − π/3) = −√2/2   ← Formule d'addition, φ = −π/3
+    = 3x − π/3 = −π/4 + 2kπ ou 3x − π/3 = (5π)/4 + 2kπ   ← Équation de base
+    = 3x = π/12 + 2kπ ou 3x = (19π)/12 + 2kπ   ← Isoler 3x
+    = x = π/36 + 2kπ/3 ou x = (19π)/36 + 2kπ/3   ← Diviser aussi la période
+  — Solutions dans [0 ; 2π] :  [juge solset]  départ : x = π/36 + 2kπ/3 ou x = (19π)/36 + 2kπ/3
+    = {π/36 ; (19π)/36 ; (25π)/36 ; (43π)/36 ; (49π)/36 ; (67π)/36}   ← Garder les k qui tombent dans l'intervalle
   pièges : g3_divide_zero, g3_rphi
 
 ```
@@ -1390,13 +1384,11 @@ Résous −2sin(x) + cos(x) = −1 dans ℝ avec t = tan(x/2).
 
 ```
 Résous −3sin(x) + cos(x) = −1 dans ℝ avec t = tan(x/2).
-  [problème, examen open, 6 points]
-  partie 1 (Début du problème : 6)
-    [free, sans aide, suivre l'erreur, examen open]  −3sin(x) + cos(x) = −1
-      = −6t/(1 + t²) + (1 − t²)/(1 + t²) = −1   ← sin x = 2t/(1 + t²), cos x = (1 − t²)/(1 + t²)
-      = 6t − 2 = 0   ← Multiplier par 1 + t²
-      = t = 1/3   ← Résoudre en t
-      = x = 2arctan(1/3) + 2kπ ou x = π + 2kπ   ← tan(x/2) = t : x = 2 arctan t + 2kπ
+  [free, sans aide, examen open]  −3sin(x) + cos(x) = −1
+    = −6t/(1 + t²) + (1 − t²)/(1 + t²) = −1   ← sin x = 2t/(1 + t²), cos x = (1 − t²)/(1 + t²)
+    = 6t − 2 = 0   ← Multiplier par 1 + t²
+    = t = 1/3   ← Résoudre en t
+    = x = 2arctan(1/3) + 2kπ ou x = π + 2kπ   ← tan(x/2) = t : x = 2 arctan t + 2kπ
   pièges : g3_bioche_pi, g3_divide_zero, g3_rphi
 
 Les solutions de sin(x) + cos(x) = −1 sont…
@@ -1577,15 +1569,13 @@ Résous sin(4x) − √3cos(4x) ≤ −√2 dans [π/2 ; 3π/2].
 
 ```
 Résous −sin(4x) + √3cos(4x) > −1 dans [0 ; 2π].
-  [problème, examen open, 11 points]
-  partie 1 (Début du problème : 11)
-    [free, sans aide, suivre l'erreur, examen open]  −sin(4x) + √3cos(4x) > −1
-      = 2sin(4x + (2π)/3) > −1   ← Forme R sin(x + φ), R = 2
-      = sin(4x + (2π)/3) > −1/2   ← Diviser par R
-      = −π/6 + 2kπ < 4x + (2π)/3 < (7π)/6 + 2kπ   ← Arc solution, + 2kπ
-      = −(5π)/6 + 2kπ < 4x < π/2 + 2kπ   ← Retirer (2π)/3
-      = −(5π)/24 + kπ/2 < x < π/8 + kπ/2   ← Diviser aussi la période
-      = [0 ; π/8[ ∪ ](7π)/24 ; (5π)/8[ ∪ ](19π)/24 ; (9π)/8[ ∪ ](31π)/24 ; (13π)/8[ ∪ ](43π)/24 ; 2π]   ← Garder ce qui tombe dans [0 ; 2π], k par k
+  [free, sans aide, examen open]  −sin(4x) + √3cos(4x) > −1
+    = 2sin(4x + (2π)/3) > −1   ← Forme R sin(x + φ), R = 2
+    = sin(4x + (2π)/3) > −1/2   ← Diviser par R
+    = −π/6 + 2kπ < 4x + (2π)/3 < (7π)/6 + 2kπ   ← Arc solution, + 2kπ
+    = −(5π)/6 + 2kπ < 4x < π/2 + 2kπ   ← Retirer (2π)/3
+    = −(5π)/24 + kπ/2 < x < π/8 + kπ/2   ← Diviser aussi la période
+    = [0 ; π/8[ ∪ ](7π)/24 ; (5π)/8[ ∪ ](19π)/24 ; (9π)/8[ ∪ ](31π)/24 ; (13π)/8[ ∪ ](43π)/24 ; 2π]   ← Garder ce qui tombe dans [0 ; 2π], k par k
   pièges : g9_bracket, g3_divide_zero, g3_rphi, g3_ineq_arc
 
 Les solutions de cos(x − π/3) ≤ √2/2 dans [0 ; π] sont…
@@ -1849,17 +1839,15 @@ Triangle ABC avec a = 7, b = 5, c = 8. (a) Calcule α. (b) D est sur le segment 
 
 ```
 Triangle ABC avec a = 19, b = 5, c = 21. (a) Calcule α. (b) D est sur le segment AB et CD = 5√6/2. Calcule δ = ∠ADC.
-  [problème, examen open, 8 points]
-  partie 1 (Début du problème : 2 ; L'angle α : 1,5 ; Dans le triangle ADC (CD = 5√6/2), théorème du sinus : 1,5 ; L'angle δ : 3)
-    [free, sans aide, suivre l'erreur, examen open]  (5² + 21² − 19²)/(2·5·21)
-      = 1/2   ← Théorème du cosinus, puis simplifier
-    — L'angle α :  [juge value]  départ : arccos(1/2)
-      = 60°   ← Valeur exacte
-    — Dans le triangle ADC (CD = 5√6/2), théorème du sinus :  [juge value]  départ : 5·sin(60°)/((5√6)/2)
-      = √2/2   ← sin δ = AC·sin α / CD
-    — L'angle δ :  [juge value]  départ : arcsin(√2/2)
-      ? sin δ = √2/2 : δ = 45° ou δ = 135° ? ✔ δ = 45° : 135° + 60° dépasse 180° / · δ = 135°
-      = 45°   ← 135° + 60° > 180° : δ = 45°
+  [free, sans aide, examen open]  (5² + 21² − 19²)/(2·5·21)
+    = 1/2   ← Théorème du cosinus, puis simplifier
+  — L'angle α :  [juge value]  départ : arccos(1/2)
+    = 60°   ← Valeur exacte
+  — Dans le triangle ADC (CD = 5√6/2), théorème du sinus :  [juge value]  départ : 5·sin(60°)/((5√6)/2)
+    = √2/2   ← sin δ = AC·sin α / CD
+  — L'angle δ :  [juge value]  départ : arcsin(√2/2)
+    ? sin δ = √2/2 : δ = 45° ou δ = 135° ? ✔ δ = 45° : 135° + 60° dépasse 180° / · δ = 135°
+    = 45°   ← 135° + 60° > 180° : δ = 45°
 
 Triangle avec a = 5, b = 8 et γ = 60°. Alors c =
   ✔ 7   · 13   · √129 [g3_cos_law_sign]   · √89
@@ -2181,15 +2169,13 @@ tan(arcsin(−8/17)) = ?
   pièges : g3_arc_root_sign
 
 Calcule sin(2arcsin(8/17)).
-  [problème, examen open, 2 points]
-  partie 1 (Début du problème : 1 ; Puis : 1)
-    [free, sans aide, suivre l'erreur, examen open]  cos(arcsin(8/17))
-      (θ = arcsin(8/17) : sin θ = 8/17, θ ∈ [−π/2 ; π/2].)
-      = √(1 − (8/17)²)   ← cos θ ≥ 0 sur [−π/2 ; π/2]
-      = 15/17   ← Calculer
-    — Puis :  [juge value]  départ : sin(2arcsin(8/17))
-      = 2·(8/17)·(15/17)   ← sin 2θ = 2 sin θ cos θ
-      = 240/289   ← Calculer
+  [free, sans aide, examen open]  cos(arcsin(8/17))
+    (θ = arcsin(8/17) : sin θ = 8/17, θ ∈ [−π/2 ; π/2].)
+    = √(1 − (8/17)²)   ← cos θ ≥ 0 sur [−π/2 ; π/2]
+    = 15/17   ← Calculer
+  — Puis :  [juge value]  départ : sin(2arcsin(8/17))
+    = 2·(8/17)·(15/17)   ← sin 2θ = 2 sin θ cos θ
+    = 240/289   ← Calculer
 
 ```
 
