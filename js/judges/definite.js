@@ -4,7 +4,7 @@
 // exactly when both are exact, else by quadrature (relative 1e−7; a
 // singular end costs about 1e−8 in double precision). cfg:
 //   {vars?: letters allowed, seq?: {J: 'int(x^n×e^x, x, 0, 1)'}, param?: 'n',
-//    nRange?: [1, 6], recurrence?: true}
+//    nRange?: [1, 6], recurrence?: true, known?: {text: value}}
 // seq and param (recurrence formulas Iₙ = … Iₙ₋₁, catalogue A1 E4): J_n,
 // J_(n−1), J_0 stand for the integral with n replaced; a line with n is
 // compared for every n of nRange.
@@ -59,6 +59,13 @@ function valueOf(cfg, node, n) {
     if (q) return { q, x: q.valueOf() };
   }
   const key = toText(e);
+  // cfg.known = {line text: exact value text}: a value the generator
+  // computed (the start of a part, a triple integral).
+  if (cfg.known?.[key]) {
+    const k = parse(cfg.known[key]);
+    const q = exactValue(k);
+    return q ? { q, x: q.valueOf() } : { x: evalFloat(k, {}) };
+  }
   if (VALUES.has(key)) return { x: VALUES.get(key) };
   const x = evalFloat(e, {});
   if (VALUES.size >= 2000) VALUES.clear();
