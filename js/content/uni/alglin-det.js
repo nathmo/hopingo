@@ -43,6 +43,7 @@ const pre = (k) => (k.eq(1) ? '' : k.eq(-1) ? '-' : `${qt(k)}·`);
 const par = (e) => (e === 'x' ? 'x' : e.n < 0 || e.d !== 1 ? `(${qt(e)})` : qt(e));
 // MathML of a line of the det judge, shown as written.
 const MLd = (text, vars = []) => { const cfg = { kind: 'det', vars }; try { return showWith(cfg, readWith(cfg, text)); } catch { return text; } };
+const parR = (x) => par(x).replace(/-/g, '−');
 const minorOf = (A, i, j) => A.filter((_, r) => r !== i).map((r) => r.filter((_, c) => c !== j));
 
 // A line of numbers with the sub-expressions written in `texts` left blank
@@ -381,7 +382,6 @@ function roData(n, rng, { swap = false, half = false } = {}) {
   return { A, ops: e.ops, det: MX.det(A), E: e.E, fallback: true };
 }
 
-const factorText = (f) => (f.eq(1) ? '' : f.eq(-1) ? '−' : `${fq(f)}·`);
 // The reference lines « op : f·det[[…]] », then det A.
 function roLines(d) {
   let M = d.A;
@@ -395,7 +395,7 @@ function roLines(d) {
     return { kind: 'eq', math: `${opT(op)} : ${pre(f)}det${mt(M)}`, op, result: M, factor: f, subgoal: op.kind === 'add' ? 'echelon' : 'factor', note };
   });
   const diagT = M.map((r, i) => par(r[i])).join('·');
-  lines.push({ kind: 'eq', math: qt(d.det), subgoal: 'factor', note: `Produit de la diagonale : ${factorText(f)}${diagT.replace(/-/g, '−')} = ${fq(d.det)}` });
+  lines.push({ kind: 'eq', math: qt(d.det), subgoal: 'factor', note: f.eq(1) ? `Produit de la diagonale : ${diagT.replace(/-/g, '−')} = ${fq(d.det)}` : `Facteur fois produit de la diagonale : ${parR(f)}·${diagT.replace(/-/g, '−')} = ${fq(d.det)}` });
   return lines;
 }
 
@@ -551,7 +551,7 @@ function roItem(level, rng) {
         script.push({
           kind: 'decision', prompt: `On fait ${opR(l.op)}. Que devient det ?`, options: rng.shuffle([
             { id: 'same', label: 'Il ne change pas', valid: true },
-            { id: 'mul', label: `Il est multiplié par ${fq(l.op.k)}`, valid: false, why: 'Ajouter à une ligne un multiple d\'une autre ne change pas det : seule la ligne qui change est multipliée par 1.' },
+            { id: 'mul', label: Math.abs(l.op.k.valueOf()) === 1 ? 'Il change de signe' : `Il est multiplié par ${fq(l.op.k)}`, valid: false, why: 'Ajouter à une ligne un multiple d\'une autre ne change pas det : seule la ligne qui change est multipliée par 1.' },
           ]),
         });
       }
@@ -875,8 +875,7 @@ const AREA_SUB = [
   { id: 'det', label: 'calculer le déterminant', skill: COF },
   { id: 'area', label: 'aire ou volume', skill: AREA },
 ];
-const parR = (x) => par(x).replace(/-/g, '−');
-const ptT = (P) => `(${P.map(fq).join(' ; ')})`;
+const ptT =(P) => `(${P.map(fq).join(' ; ')})`;
 const vsub = (P, Q) => P.map((x, i) => x.sub(Q[i]));
 // det[u v] (u, v in columns) as CAS text, and its value.
 const det2T = (u, v) => `${par(u[0])}·${par(v[1])}-${par(v[0])}·${par(u[1])}`;
@@ -940,7 +939,7 @@ function areaParts(kind, rng) {
         { kind: 'eq', math: qt(area), subgoal: 'area', note: tri ? `det[u v] = ${fq(d.d)} : la moitié, en valeur absolue` : `det[u v] = ${fq(d.d)} : en valeur absolue` },
       ],
       traps: areaTraps(area, tri
-        ? [{ value: d.d, ctx: { half: true, d: fq(d.d), area: fq(area) } }, { value: d.d.div(2), ctx: { half: true, d: fq(d.d), area: fq(area) } }, { value: qAbs(d.d), ctx: { half: true, d: fq(d.d), area: fq(area) } }]
+        ? [{ value: d.d, ctx: { half: true, d: fq(d.d), area: fq(area) } }, { value: d.d.div(2), ctx: { half: true, d: fq(d.d), area: fq(area) } }, { value: d.d.div(2).neg(), ctx: { half: true, d: fq(d.d), area: fq(area) } }, { value: qAbs(d.d), ctx: { half: true, d: fq(d.d), area: fq(area) } }]
         : [{ value: d.d, ctx: { d: fq(d.d), area: fq(area) } }]),
       hint2: tri ? `S = ½·|det${MLm(M)}| avec u = Q − P et v = R − P en colonnes : S = ½·|${parR(d.u[0])}·□ − □·${parR(d.u[1])}|.` : `S = |det${MLm(M)}| = |${parR(d.u[0])}·□ − □·${parR(d.u[1])}|.`,
       blanks: [qt(d.v[1]), qt(d.v[0])],
