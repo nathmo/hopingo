@@ -18,7 +18,8 @@ import { lit, div } from '../../cas/ast.js';
 import {
   evalAst, envOf, isZeroScalar, parseExpr, applyRowOp, valueText, opText, Mx, simp, ONE, qn,
 } from '../../cas/matexpr.js';
-import { blankLine } from '../../judges/lines.js';
+import { blankLine, templateOf } from '../../judges/lines.js';
+import { linesItem, MT } from './kit.js';
 import { detsOf } from '../../judges/det.js';
 import { mopts } from '../../judges/matcommon.js';
 import { ACTIONS } from '../../judges/actions.js';
@@ -653,8 +654,222 @@ function roExam(rng, exam) {
 }
 
 // ======================================================================
+// l-det-props
+// ======================================================================
+
+const PROPS = 'l-det-props';
+const PROPS_SUB = [{ id: 'rule', label: 'appliquer les règles du déterminant', skill: PROPS }];
+const sup = (n) => String(n).split('').map((d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] ?? (d === '-' ? '⁻' : d)).join('');
+const kT = (k) => (k.d !== 1 || k.n < 0 ? `(${qt(k)})` : qt(k));
+// The scalar in an expression shown: 2A, −2A, (1/2)A.
+const kH = (k) => (k.d !== 1 ? `(${fq(k)})` : fq(k));
+// The rules, as the decisions and the menu name them.
+const R = {
+  scalar: { label: 'det(kM) = kⁿ·det M', valid: true },
+  scalarBad: { label: 'det(kM) = k·det M', valid: false, rule: 'l_det_scalar', why: 'kM multiplie chacune des n lignes par k : det(kM) = kⁿ·det M.' },
+  product: { label: 'det(MN) = det M·det N', valid: true },
+  sum: { label: 'det(M + N) = det M + det N', valid: false, rule: 'l_det_sum', why: 'Le déterminant n\'est pas additif : det(I₂ + I₂) = 4, pas 2.' },
+  transpose: { label: 'det(Mᵀ) = det M', valid: true },
+  transposeBad: { label: 'det(Mᵀ) = −det M', valid: false, rule: 'l_det_transpose_sign', why: 'Transposer ne change pas le déterminant : det(Iᵀ) = 1.' },
+  inverse: { label: 'det(M⁻¹) = 1/det M', valid: true },
+  inverseBad: { label: 'det(M⁻¹) = −det M', valid: false, why: 'M·M⁻¹ = I donne det M·det(M⁻¹) = 1 : det(M⁻¹) = 1/det M.' },
+  power: { label: 'det(Mᵐ) = (det M)ᵐ', valid: true },
+};
+
+// The table of forms: expression (HTML), the line that applies the rules
+// (CAS text), its value, the wrong values of the traps, the rules used.
+// n: size; a = det A, b = det B; k a scalar.
+const FORMS = [
+  {
+    id: 'scalar', needB: false,
+    html: ({ k }) => `det(${kH(k)}A)`,
+    line: ({ n, a, k }) => `${kT(k)}^${n}·${par(a)}`,
+    value: ({ n, a, k }) => k.pow(n).mul(a),
+    wrongs: ({ n, a, k }) => [{ rule: 'l_det_scalar', value: k.mul(a), ctx: { k: fq(k), n, p: fq(k.pow(n)) } }],
+    rules: ['scalar'], bad: ['scalarBad', 'sum', 'transposeBad'],
+  },
+  {
+    id: 'kAtBinv', needB: true,
+    html: ({ k }) => `det(${kH(k)}AᵀB⁻¹)`,
+    line: ({ n, a, b, k }) => `${kT(k)}^${n}·${par(a)}·(1/${par(b)})`,
+    value: ({ n, a, b, k }) => k.pow(n).mul(a).div(b),
+    wrongs: ({ n, a, b, k }) => [
+      { rule: 'l_det_scalar', value: k.mul(a).div(b), ctx: { k: fq(k), n, p: fq(k.pow(n)) } },
+      { rule: 'l_det_transpose_sign', value: k.pow(n).mul(a).div(b).neg() },
+    ],
+    rules: ['scalar', 'product', 'transpose', 'inverse'], bad: ['scalarBad', 'transposeBad', 'inverseBad'],
+  },
+  {
+    id: 'invScalar', needB: false,
+    html: ({ k }) => `det((${kH(k)}A)⁻¹)`,
+    line: ({ n, a, k }) => `1/(${kT(k)}^${n}·${par(a)})`,
+    value: ({ n, a, k }) => q(1).div(k.pow(n).mul(a)),
+    wrongs: ({ a, k, n }) => [{ rule: 'l_det_scalar', value: q(1).div(k.mul(a)), ctx: { k: fq(k), n, p: fq(k.pow(n)) } }],
+    rules: ['inverse', 'scalar'], bad: ['scalarBad', 'inverseBad'],
+  },
+  {
+    id: 'power', needB: true,
+    html: ({ m }) => `det(A${sup(m)}Bᵀ)`,
+    line: ({ a, b, m }) => `${par(a)}^${m}·${par(b)}`,
+    value: ({ a, b, m }) => a.pow(m).mul(b),
+    wrongs: ({ a, b, m }) => [{ rule: 'l_det_transpose_sign', value: a.pow(m).mul(b).neg() }],
+    rules: ['power', 'product', 'transpose'], bad: ['transposeBad', 'sum'],
+  },
+  {
+    id: 'twice', needB: false,
+    html: () => 'det(A + A)',
+    line: ({ n, a }) => `2^${n}·${par(a)}`,
+    value: ({ n, a }) => q(2).pow(n).mul(a),
+    wrongs: ({ a, n }) => [{ rule: 'l_det_sum', value: a.mul(2), ctx: { why: `Ici A + A = 2A, et det(2A) = 2${sup(n)}·det A.` } }, { rule: 'l_det_scalar', value: a.mul(2), ctx: { k: 2, n, p: 2 ** n } }],
+    rules: ['scalar'], bad: ['sum', 'scalarBad'],
+  },
+  {
+    id: 'q19', needB: false,
+    html: () => 'det((A + I)² − (A − I)²)',
+    note: '(A + I)² − (A − I)² = A² + 2A + I − (A² − 2A + I) = 4A',
+    line: ({ n, a }) => `4^${n}·${par(a)}`,
+    value: ({ n, a }) => q(4).pow(n).mul(a),
+    wrongs: ({ a, n }) => [{ rule: 'l_det_scalar', value: a.mul(4), ctx: { k: 4, n, p: 4 ** n } }],
+    rules: ['scalar'], bad: ['scalarBad', 'sum'],
+  },
+  {
+    id: 'quotient', needB: false,
+    html: ({ k }) => `det(${kH(k)}A) / det(Aᵀ)`,
+    line: ({ n, a, k }) => `${kT(k)}^${n}·${par(a)}/${par(a)}`,
+    value: ({ n, k }) => k.pow(n),
+    wrongs: ({ n, k }) => [{ rule: 'l_det_scalar', value: k, ctx: { k: fq(k), n, p: fq(k.pow(n)) } }, { rule: 'l_det_transpose_sign', value: k.pow(n).neg() }],
+    rules: ['scalar', 'transpose'], bad: ['scalarBad', 'transposeBad'],
+  },
+];
+
+const DETS = [1, -1, 2, -2, 3, -3, q(1, 2)];
+function propsData(rng, ids) {
+  for (let t = 0; t < 200; t++) {
+    const id = rng.pick(ids);
+    const f = FORMS.find((x) => x.id === id);
+    const p = {
+      n: rng.int(2, 5), a: q(rng.pick(DETS)), b: q(rng.pick(DETS)), k: q(rng.pick([2, 2, 3, -2, q(1, 2)])), m: rng.pick([2, 3]),
+    };
+    if (f.id === 'q19' || f.id === 'twice') p.n = rng.int(2, 4);
+    if (f.id === 'invScalar' && p.k.n < 0) continue;
+    const value = f.value(p);
+    if (value.d > 64 || Math.abs(value.valueOf()) > 300 || value.n === 0) continue;
+    const wrongs = f.wrongs(p).filter((w) => !w.value.eq(value));
+    if (!wrongs.length) continue;
+    if (f.needB && p.a.eq(p.b)) continue;
+    return { f, p, value, wrongs };
+  }
+  const f = FORMS[1];
+  const p = { n: 3, a: q(2), b: q(-1), k: q(2), m: 2 };
+  return { f, p, value: q(-16), wrongs: f.wrongs(p), fallback: true };
+}
+
+const givenText = ({ n, a, b }, needB) => `A${needB ? ' et B sont' : ' est'} de taille ${n} × ${n}, det A = ${fq(a)}${needB ? ` et det B = ${fq(b)}` : ''}`;
+const trapValuesOf = (wrongs) => wrongs.reduce((o, w) => ({ ...o, [w.rule]: [...(o[w.rule] || []), { value: qt(w.value), ctx: w.ctx || {} }] }), {});
+
+function propsItem(level, rng) {
+  const ids = level === 1 ? ['scalar', 'twice', 'q19'] : level === 2 ? ['scalar', 'twice', 'invScalar'] : level === 3 ? ['kAtBinv', 'power', 'invScalar'] : level === 4 ? ['kAtBinv', 'invScalar', 'quotient', 'power'] : ['q19', 'quotient', 'kAtBinv'];
+  const d = propsData(rng, ids);
+  const { f, p, value } = d;
+  const line = f.line(p);
+  const judge = { kind: 'value', expect: qt(value), trapValues: trapValuesOf(d.wrongs) };
+  const rulesTxt = f.rules.map((r) => R[r].label).join(' ; ');
+  const menu = [...f.rules.map((r) => ({ id: r, ...R[r] })), ...f.bad.map((r) => ({ id: r, ...R[r] }))];
+  if (level === 3) judge.menu = menu.sort((x, y) => x.label.localeCompare(y.label));
+  const lines = [
+    { kind: 'eq', math: line, subgoal: 'rule', note: rulesTxt },
+    { kind: 'eq', math: qt(value), subgoal: 'rule', note: 'Calculer' },
+  ];
+  const opts = {};
+  const blanked = tpl(line, level === 1 ? [String(p.n)] : [String(p.n), qt(p.a)], opts);
+  const script = [];
+  if (f.note) script.push({ kind: 'note', html: f.note });
+  if (level === 2) {
+    script.push({
+      kind: 'decision', prompt: `Quelle règle sert à calculer ${f.html(p)} ?`,
+      options: rng.shuffle([{ id: f.rules[0], ...R[f.rules[0]] }, ...[...new Set([...f.bad, 'transposeBad', 'inverseBad', 'sum', 'scalarBad'])].slice(0, 3).map((r) => ({ id: r, ...R[r] }))]),
+    });
+  }
+  script.push(level <= 2 ? { ...lines[0], ...blanked } : lines[0], lines[1]);
+  const hints = H(
+    level === 1 ? `La règle : ${rulesTxt}. Un scalaire sort avec la puissance n.` : 'Un scalaire sort avec la puissance n : det(kA) = kⁿ·det A. Puis det(AB) = det A·det B, det(Aᵀ) = det A, det(A⁻¹) = 1/det A.',
+    `D = ${templateOf(blanked, opts).replace(/-/g, '−').replace(/×/g, '·')}`,
+    MT(line),
+  );
+  return linesItem({
+    skill: PROPS, level,
+    prompt: `${givenText(p, f.needB)}. Calcule D = ${f.html(p)}.${level === 1 ? ` Règle : ${rulesTxt}.` : ''}`,
+    start: 'D', judge, mode: modeOf(level), script, hints, subgoals: PROPS_SUB, keys: ['calc'],
+    key: `${PROPS}:${f.id}:${p.n}:${qt(p.a)}:${qt(p.b)}:${qt(p.k)}`, tapActions: level === 3 ? 'menu' : null, fallback: d.fallback,
+  });
+}
+
+function propsExam(rng, exam) {
+  if (exam === 'tf') {
+    const which = rng.int(0, 5);
+    const I2 = '[[1,0],[0,1]]';
+    const T = [
+      { truth: true, s: 'Si A est 3 × 3 de valeurs propres 1, 2 et 4, alors det A = 8.', e: 'Vrai : det A est le produit des valeurs propres (avec multiplicités) : 1·2·4 = 8.' },
+      { truth: true, s: 'Pour A et B carrées de même taille, det(AB) = det(BA).', e: 'Vrai : det(AB) = det A·det B = det B·det A = det(BA), même si AB ≠ BA.' },
+      { truth: true, s: 'Si A est inversible, det(A⁻¹) = 1/det A.', e: 'Vrai : A·A⁻¹ = I donne det A·det(A⁻¹) = det I = 1.' },
+      {
+        truth: false, s: 'Pour toute matrice carrée A, det(Aᵀ) = −det A.', rule: 'l_det_transpose_sign',
+        counter: { kind: 'matOne', params: { want: 'detNonZero', n: 2 }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: I2 } },
+        e: 'Faux : det(Aᵀ) = det A. Avec A = I₂ : det(Iᵀ) = 1 ≠ −1.',
+      },
+      {
+        truth: false, s: 'Pour A et B carrées de même taille, det(A + B) = det A + det B.', rule: 'l_det_sum',
+        counter: { kind: 'matPair', params: { n: 2, test: 'det(A+B)=detA+detB' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }, { v: 'B', label: 'B =', shape: [2, 2] }], answer: { A: I2, B: I2 } },
+        e: 'Faux : avec A = B = I₂, det(A + B) = det(2I₂) = 4, mais det A + det B = 2.',
+      },
+      {
+        truth: false, s: 'Pour A de taille 3 × 3, det(2A) = 2·det A.', rule: 'l_det_scalar',
+        counter: { kind: 'matOne', params: { want: 'detNonZero', n: 3 }, ask: [{ v: 'A', label: 'A =', shape: [3, 3] }], answer: { A: '[[1,0,0],[0,1,0],[0,0,1]]' } },
+        e: 'Faux : det(2A) = 2³·det A = 8·det A. Avec A = I₃ : det(2I₃) = 8 ≠ 2.',
+      },
+    ][which];
+    return tfL({
+      skill: PROPS, key: `k${which}`, truth: T.truth, exam: examTag({ exam }), statement: T.s, explanation: T.e,
+      counter: T.counter, ruleIfTrue: T.truth ? null : T.rule,
+    });
+  }
+  if (rng.chance(0.3)) {
+    // n as a letter.
+    const k = rng.pick([2, 3, 5]);
+    const which = rng.int(0, 1);
+    if (which === 0) {
+      return mcqDistinct({
+        skill: PROPS, level: 4, key: `mcq:n:scalar:${k}`, exam: examTag({ exam }),
+        prompt: `A est une matrice n × n. Que vaut det(${k}A) ?`,
+        right: `${k}ⁿ·det A`,
+        wrongs: [{ html: `${k}·det A`, rule: 'l_det_scalar' }, { html: `${k}n·det A`, rule: null }, { html: `det A + ${k}`, rule: null }],
+        solution: [{ html: `Chacune des n lignes est multipliée par ${k} : det(${k}A) = ${k}ⁿ·det A.`, note: '' }],
+      }, rng);
+    }
+    return mcqDistinct({
+      skill: PROPS, level: 4, key: 'mcq:n:transpose', exam: examTag({ exam }),
+      prompt: 'A est une matrice n × n inversible. Que vaut det(Aᵀ)·det(A⁻¹) ?',
+      right: '1',
+      wrongs: [{ html: '−1', rule: 'l_det_transpose_sign' }, { html: '(det A)²', rule: null }, { html: '(−1)ⁿ', rule: null }],
+      solution: [{ html: 'det(Aᵀ) = det A et det(A⁻¹) = 1/det A : le produit vaut 1.', note: '' }],
+    }, rng);
+  }
+  const d = propsData(rng, ['kAtBinv', 'invScalar', 'quotient', 'q19', 'power']);
+  const { f, p, value } = d;
+  return mcqDistinct({
+    skill: PROPS, level: 4, key: `mcq:${f.id}:${p.n}:${qt(p.a)}:${qt(p.b)}:${qt(p.k)}`, exam: examTag({ exam }),
+    prompt: `${givenText(p, f.needB)}. Que vaut ${f.html(p)} ?`,
+    right: fq(value),
+    wrongs: d.wrongs.map((w) => ({ html: fq(w.value), rule: w.rule })),
+    fillers: [{ html: fq(value.neg()) }, { html: fq(value.mul(2)) }, { html: fq(q(1).div(value)) }, { html: fq(value.add(1)) }],
+    solution: [{ html: `${f.html(p)} = ${MT(f.line(p))} = ${fq(value)}`, note: f.rules.map((r) => R[r].label).join(' ; ') }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
   [COF]: (level, rng, profile, opts = {}) => (opts.exam ? cofExam(rng, opts.exam) : cofItem(level, rng)),
   [RO]: (level, rng, profile, opts = {}) => (opts.exam ? roExam(rng, opts.exam) : roItem(level, rng)),
+  [PROPS]: (level, rng, profile, opts = {}) => (opts.exam ? propsExam(rng, opts.exam) : propsItem(level, rng)),
 };
