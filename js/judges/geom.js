@@ -146,7 +146,7 @@ function sumOfSquares(n, coords) {
   if (n.t === 'bin' && n.op === '+') return sumOfSquares(n.l, coords) && squareOf(n.r, coords);
   return squareOf(n, coords);
 }
-const isNumber = (n) => { n = stripParen(n); return n.t === 'num' || (n.t === 'frac' && stripParen(n.n).t === 'num' && stripParen(n.d).t === 'num') || (n.t === 'pow' && stripParen(n.b).t === 'num'); };
+const isNumber = (n) => { n = stripParen(n); if (n.t === 'neg') n = stripParen(n.e); return n.t === 'num' || (n.t === 'frac' && stripParen(n.n).t === 'num' && stripParen(n.d).t === 'num') || (n.t === 'pow' && stripParen(n.b).t === 'num'); };
 
 // The equations of a part, as written (from geomobj's eqs).
 function partFinal(cfg, part, form) {
