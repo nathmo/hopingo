@@ -34,6 +34,7 @@ import { lexicon, parseFormula, truthOf } from '../cas/logic.js';
 import { polyOf, coeffs, qCoeffs, degree, divide, I } from '../cas/polyx.js';
 import { Poly, gcdPoly } from '../cas/poly.js';
 import { checkLinalg } from './linalg-examples.js';
+import { checkMx } from './m-examples.js'; // step U8
 import { checkGeo } from './geo-examples.js';
 import { checkSeqFn } from './counters.js';
 import { checkComplexCounter } from './counters-complex.js';
@@ -259,6 +260,7 @@ export function checkCounter(counter, answers) {
     case 'complex': return checkComplexCounter(counter, answers);
 
     case 'a2': return checkA2(counter, answers); // step U6
+    case 'mx': return checkMx(counter, answers); // step U8 (js/judges/m-examples.js)
     default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }

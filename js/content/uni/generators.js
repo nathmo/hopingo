@@ -51,3 +51,8 @@ Object.assign(UNI_GEN, ANALYSE1_F, ANALYSE1_G, ANALYSE1_H, ANALYSE1_I, ANALYSE1_
 import { GEN as ANALYSE2 } from './analyse2.js';
 
 Object.assign(UNI_GEN, ANALYSE2);
+
+// Step U8: module M.
+import { GEN as MATRICES } from './matrices.js';
+
+Object.assign(UNI_GEN, MATRICES);

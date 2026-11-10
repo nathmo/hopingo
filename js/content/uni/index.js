@@ -40,3 +40,12 @@ import * as analyse2 from './analyse2.skills.js';
 
 UNI_UNITS.push(analyse2.UNIT);
 UNI_SKILLS.push(...analyse2.SKILLS);
+
+// Step U8: module M (analyse matricielle). Until module P (step U7) is
+// merged, p-lin-combo (m-normal-eq) stands for its prerequisites resolved
+// down to built skills (p-moments ← p-disc-pmf, p-cont-density).
+import * as matrices from './matrices.skills.js';
+
+UNI_UNITS.push(matrices.UNIT);
+UNI_SKILLS.push(...matrices.SKILLS);
+if (!UNI_SKILLS.some((s) => s.id === 'p-lin-combo')) UNBUILT['p-lin-combo'] = ['a1-int-direct', 'a1-improper-calc', 'a1-ser-geo-tele'];

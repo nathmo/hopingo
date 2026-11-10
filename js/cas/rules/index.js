@@ -56,3 +56,8 @@ CAS_RULES.push(...A1F, ...A1G, ...A1H, ...A1I, ...A1J, ...A1K, ...A1L, ...G8A, .
 import { RULES as A2 } from './a2.js';
 
 CAS_RULES.push(...A2);
+
+// Step U8: module M.
+import { RULES as M } from './m.js';
+
+CAS_RULES.push(...M);
