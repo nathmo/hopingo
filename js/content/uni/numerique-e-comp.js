@@ -22,8 +22,7 @@
 // formula (n_richardson_swap, n_richardson_wrong_p).
 
 import { linesItem, mcq, examTag } from './kit.js';
-import { refCode, codeItem, holesFor, readtableItem, multiMcq, codeInline, PRELUDE_VEC, SIG_VEC } from './numerique-kit.js';
-import { blankBy } from './numerique-kit.js';
+import { refCode, codeItem, holesFor, readtableItem, multiMcq, blankBy, PRELUDE_VEC, SIG_VEC } from './numerique-kit.js';
 import { q, qd, qR, qi, pEval, pInt, pText, quadQ, H, etraps } from './numerique-e-kit.js';
 
 const QC = 'n-quad-composite';
@@ -474,12 +473,10 @@ function richMcq(rng, opts) {
   const meth = rng.pick([['point milieu', 2], ['trapèze', 2], ['Simpson', 4], ['rectangle à gauche', 1]]);
   const [name, p] = meth;
   const P = 2 ** p;
-  const F = (a, b, k) => (k === 1 ? `${a === 2 ? '2' : a}Q_h − Q₂ₕ` : `(${a}${a === 1 ? '' : ''}Q_h − Q₂ₕ)/${k}`);
   const show = (k) => (k === 1 ? '2Q_h − Q₂ₕ' : `(${2 ** Math.log2(k + 1)}Q_h − Q₂ₕ)/${k}`);
   const right = show(P - 1);
   const others = [1, 3, 15].filter((k) => k !== P - 1).map((k) => ({ html: show(k), correct: false, rule: 'n_richardson_wrong_p' }));
   const swap = { html: P - 1 === 1 ? '2Q₂ₕ − Q_h' : `(${P}Q₂ₕ − Q_h)/${P - 1}`, correct: false, rule: 'n_richardson_swap' };
-  void F;
   return mcq({
     skill: RI, level: 4, key: `${RI}:mcq:${p}:${name}`, exam: examTag(opts),
     prompt: `Q_h est la formule ${name === 'Simpson' ? 'de Simpson' : `du ${name}`} composite avec un pas h (d'ordre ${p}), Q₂ₕ la même avec le pas 2h. Quelle combinaison est d'un ordre plus élevé (extrapolation de Richardson) ?`,
@@ -502,4 +499,3 @@ export const GEN = {
   },
 };
 
-export { codeInline };

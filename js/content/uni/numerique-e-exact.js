@@ -25,16 +25,13 @@
 // est plus précis que le point milieu » (false; counter-example kind num,
 // trapNotBetter).
 
-import { Q } from '../../math/rational.js';
 import { linesItem, mcq, tfItem, examTag } from './kit.js';
-import { refCode, codeItem, holesFor, readtableItem, multiMcq, vfMcq, tableHtml, blankBy, PRELUDE_VEC } from './numerique-kit.js';
-import { linesItem as LI } from './kit.js';
+import { refCode, codeItem, holesFor, readtableItem, multiMcq, vfMcq, tableHtml, blankBy } from './numerique-kit.js';
 import { q, qd, qR, H, etraps, METHODS, FUNS, NS, errOf, E3, r2 } from './numerique-e-kit.js';
 
 const EX = 'n-quad-exactness';
 const OR = 'n-quad-order';
 const KEYS = ['calc'];
-void LI;
 
 // ---------- formulas on [−1 ; 1] ----------
 
@@ -438,4 +435,3 @@ export const GEN = {
   },
 };
 
-export { Q, PRELUDE_VEC };

@@ -35,7 +35,6 @@ import { FUNS, NS, errOf, E3, H, quadF } from './numerique-e-kit.js';
 
 const QP = 'n-quad-proof';
 const ES = 'n-error-statements';
-const KEYS = ['calc'];
 
 // ======================================================================
 // n-quad-proof
@@ -449,4 +448,3 @@ export const GEN = {
   },
 };
 
-export { KEYS };
