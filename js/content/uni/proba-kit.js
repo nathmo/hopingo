@@ -91,6 +91,11 @@ const trapIds = (p) => Object.keys(p.traps || {});
 export function statItem(o) {
   const { level } = o;
   const exam = o.exam || false;
+  // The values of the earlier parts (their expect), for a part whose expect
+  // names them ($xbar) when the student's own value is not there (exam coef).
+  const ref = {};
+  for (const p of o.parts) if (p.name && typeof p.expect === 'string') ref[p.name] = p.expect;
+  o = { ...o, parts: o.parts.map((p) => (Object.keys(ref).length && !p.ref ? { ...p, ref } : p)) };
   const parts = o.parts.map((p, k) => ({
     html: p.html ?? (k > 0 ? `<b>${p.title ?? `${LM(p.label)}`}</b>` : null),
     start: p.start ?? p.label,

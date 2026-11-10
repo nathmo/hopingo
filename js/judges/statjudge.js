@@ -130,7 +130,8 @@ export function makeJudge(kind) {
         if (ms.some((m) => m.op === '≈') && exact.length) return 'Donne aussi la valeur exacte (une fraction irréductible).';
         return false;
       }
-      if (k === 'fraction' && !isIrreducible(lastExact.ast)) return 'C\'est juste, mais simplifie la fraction.';
+      // 60/6: right, and a step (the next line simplifies it).
+      if (k === 'fraction' && !isIrreducible(lastExact.ast)) return false;
       return true;
     }
     const k = literalKind(last.ast);
