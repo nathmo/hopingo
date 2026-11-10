@@ -109,9 +109,6 @@ export const META = [
   { id: "l_svd_sphere_boundary", family: "geometry", tag: "E", skill: "l-svd-sphere", repair: "l-svd-sphere", example: ["image de la sphère de ℝ³ par A 2 × 3 = ellipse (le bord seul)", ""], transformText: "wrongValues : « ellipse » au lieu d'« ellipse pleine » ; demi-axes σᵢ²", explainText: "A écrase une direction (son noyau) : les points de la sphère vont aussi à l'intérieur de l'ellipse. L'image est l'ellipse pleine." },
   { id: "l_proof_circular", family: "logic", tag: "E", skill: "l-proof-matrices", repair: "g9-proof-contra", example: ["bloc qui utilise la conclusion", ""], transformText: "Placer en tête le bloc leurre qui suppose le résultat", explainText: "Ce bloc suppose déjà ce qu'on veut montrer. Une preuve part des hypothèses." },
   { id: "l_sym_orth_confusion", family: "logic", tag: "E", skill: "l-proof-spectral", repair: "l-orth-matrices", example: ["« A symétrique, donc AᵀA = I »", ""], transformText: "Bloc leurre qui utilise la propriété d'une matrice orthogonale", explainText: "Symétrique veut dire Aᵀ = A, pas AᵀA = I (ça, c'est orthogonale)." },
-  // Shared with module G4 (not built yet): defined here, the first built
-  // module that uses it (spec §16.4). Step U5 moves it to G4 (skill g4-dot).
-  { id: "g4_proj_no_square", family: "geometry", tag: "E", skill: "l-orth-proj", repair: "l-orth-proj", example: ["(u·v/‖v‖)·v", "(u·v/‖v‖²)·v"], transformText: "Dans la ligne de projection, remplace ‖v‖² par ‖v‖ (et produit aussi la version sans division).", explainText: "u·v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = {n2}." },
 ];
 
 const DEFS = { ...SYS, ...MAT, ...DET, ...VS, ...EIG, ...ORTH, ...SYM };

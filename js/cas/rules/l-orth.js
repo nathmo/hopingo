@@ -89,44 +89,6 @@ export const DEFS = {
       : 'La formule Σ (y · wᵢ / wᵢ · wᵢ) wᵢ n\'est juste que si les wᵢ sont orthogonaux deux à deux. Orthogonalise d\'abord la base (Gram-Schmidt).'),
     check: { judge: { kind: 'mat', expect: '(1;3;1;3)', proj: { y: ['3', '1', '-1', '5'], basis: [['1', '1', '1', '1'], ['2', '0', '2', '0']] } }, prev: 'ŷ', line: '(3;2;3;2)' },
   },
-  g4_proj_no_square: {
-    name: 'Division par ‖v‖ au lieu de ‖v‖²',
-    judges: ['mat', 'value'],
-    transform(prev, ctx) {
-      const cfg = ctx?.cfg || {};
-      const out = [];
-      // A projection coefficient (value line): y · u / ‖u‖, and y · u.
-      if (cfg.pc && cfg.kind === 'value') {
-        const d = dot(cfg.pc.y, cfg.pc.u);
-        const nn = dot(cfg.pc.u, cfg.pc.u);
-        out.push({ node: simp(parse(`(${d})/${rootOf(nn)}`)), ctx: { n2: String(nn) } }, { node: parse(String(d)), ctx: { n2: String(nn) } });
-      }
-      if (cfg.kind !== 'mat') return out;
-      // ŷ = Σ (y · uᵢ / ‖uᵢ‖) uᵢ (and without division).
-      if (cfg.proj) {
-        const us = cfg.proj.orth || cfg.proj.basis;
-        const zero = us[0].map(() => '0');
-        const dv = us.map((u) => [`(${dot(cfg.proj.y, u)})/${rootOf(dot(u, u))}`, u]);
-        out.push({ node: node(combText(zero, dv)), ctx: { n2: String(dot(us[0], us[0])) } });
-        out.push({ node: node(qVec(comb(us.map((u) => [dot(cfg.proj.y, u), u])))), ctx: { n2: String(dot(us[0], us[0])) } });
-      }
-      // vⱼ = xⱼ − Σ (xⱼ · vᵢ / ‖vᵢ‖) vᵢ.
-      if (cfg.gs) {
-        const { xs, vs, j } = cfg.gs;
-        const x = xs[j];
-        const prevs = vs.slice(0, j);
-        if (prevs.length) {
-          out.push({ node: node(combText(x.map(String), prevs.map((v) => [`-(${dot(x, v)})/${rootOf(dot(v, v))}`, v]))), ctx: { n2: String(dot(prevs[0], prevs[0])) } });
-          out.push({ node: node(qVec(comb([[1, x], ...prevs.map((v) => [dot(x, v).neg(), v])]))), ctx: { n2: String(dot(prevs[0], prevs[0])) } });
-        }
-      }
-      return out;
-    },
-    explain: (ctx = {}) => (ctx.n2
-      ? `u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v = ${ctx.n2}.`
-      : 'u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v.'),
-    check: { judge: { kind: 'mat', expect: '(1;3;1;3)', proj: { y: ['3', '1', '-1', '5'], basis: [['1', '1', '1', '1'], ['1', '-1', '1', '-1']] } }, prev: 'ŷ', line: '(2;6;2;6)' },
-  },
   l_orth_cols_only: {
     name: 'Colonnes orthogonales mais pas normées',
     judges: [],
@@ -264,3 +226,44 @@ function parseMatrix(text) {
     return rows.map((r) => r.map((x) => q(String(x))));
   } catch { return null; }
 }
+
+// g4_proj_no_square is a trap of module G4 (skill g4-dot, step U5: js/cas/rules/g4a.js).
+// What makes it work on the lines of module L stays here.
+export const PROJ_NO_SQUARE_L = {
+  name: 'Division par ‖v‖ au lieu de ‖v‖²',
+  judges: ['mat', 'value'],
+  transform(prev, ctx) {
+    const cfg = ctx?.cfg || {};
+    const out = [];
+    // A projection coefficient (value line): y · u / ‖u‖, and y · u.
+    if (cfg.pc && cfg.kind === 'value') {
+      const d = dot(cfg.pc.y, cfg.pc.u);
+      const nn = dot(cfg.pc.u, cfg.pc.u);
+      out.push({ node: simp(parse(`(${d})/${rootOf(nn)}`)), ctx: { n2: String(nn) } }, { node: parse(String(d)), ctx: { n2: String(nn) } });
+    }
+    if (cfg.kind !== 'mat') return out;
+    // ŷ = Σ (y · uᵢ / ‖uᵢ‖) uᵢ (and without division).
+    if (cfg.proj) {
+      const us = cfg.proj.orth || cfg.proj.basis;
+      const zero = us[0].map(() => '0');
+      const dv = us.map((u) => [`(${dot(cfg.proj.y, u)})/${rootOf(dot(u, u))}`, u]);
+      out.push({ node: node(combText(zero, dv)), ctx: { n2: String(dot(us[0], us[0])) } });
+      out.push({ node: node(qVec(comb(us.map((u) => [dot(cfg.proj.y, u), u])))), ctx: { n2: String(dot(us[0], us[0])) } });
+    }
+    // vⱼ = xⱼ − Σ (xⱼ · vᵢ / ‖vᵢ‖) vᵢ.
+    if (cfg.gs) {
+      const { xs, vs, j } = cfg.gs;
+      const x = xs[j];
+      const prevs = vs.slice(0, j);
+      if (prevs.length) {
+        out.push({ node: node(combText(x.map(String), prevs.map((v) => [`-(${dot(x, v)})/${rootOf(dot(v, v))}`, v]))), ctx: { n2: String(dot(prevs[0], prevs[0])) } });
+        out.push({ node: node(qVec(comb([[1, x], ...prevs.map((v) => [dot(x, v).neg(), v])]))), ctx: { n2: String(dot(prevs[0], prevs[0])) } });
+      }
+    }
+    return out;
+  },
+  explain: (ctx = {}) => (ctx.n2
+    ? `u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v = ${ctx.n2}.`
+    : 'u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v.'),
+  check: { judge: { kind: 'mat', expect: '(1;3;1;3)', proj: { y: ['3', '1', '-1', '5'], basis: [['1', '1', '1', '1'], ['1', '-1', '1', '-1']] } }, prev: 'ŷ', line: '(2;6;2;6)' },
+};
