@@ -126,7 +126,10 @@ export function statItem(o) {
 
 // The exam variant `coef`: one value to give (judged as the part's last line).
 export function coefItem(o) {
-  return statItem({ ...o, level: 4, parts: [o.part ?? o.parts[o.parts.length - 1]], exam: o.exam || { format: 'coef', points: 1 }, noHints: true, interpret: null, simulate: null });
+  const ref = {};
+  for (const p of o.parts || []) if (p.name && typeof p.expect === 'string') ref[p.name] = p.expect;
+  const part = o.part ?? o.parts[o.parts.length - 1];
+  return statItem({ ...o, level: 4, parts: [{ ...part, ref: part.ref ?? ref }], exam: o.exam || { format: 'coef', points: 1 }, noHints: true, interpret: null, simulate: null });
 }
 
 // The exam variant `open`: a problem of `points` points; the lines item
