@@ -130,7 +130,7 @@ export function eig2(rng, eigs, { max = 9 } = {}) {
     const Pinv = MX.inverse(P);
     const D = MX.diag([l1, l2]);
     const A = MX.mul(MX.mul(P, D), Pinv);
-    if (maxAbs(A) > max || A[0][1].n === 0 || A[1][0].n === 0) continue;
+    if (maxAbs(A) > max || A[0][1].n === 0 || A[1][0].n === 0 || (A[0][0].n === 0 && A[1][1].n === 0)) continue;
     return { A, eigs: [l1, l2], vecs: MX.transpose(P), P, D, Pinv };
   }
   const A = MX.mat([[5, -2], [4, -1]]);
@@ -1384,6 +1384,506 @@ function dparExam(rng, exam) {
 }
 
 // ======================================================================
+// l-eig-powers
+// ======================================================================
+
+const POW = 'l-eig-powers';
+const POW_SUB = [
+  { id: 'diag', label: 'diagonaliser', skill: DIAG },
+  { id: 'power', label: 'élever à la puissance k', skill: POW },
+];
+
+// c·λᵏ as text (λ a whole number ≠ 0): 3^k, -(−2)^k, 2·3^k; λ = 1: c.
+const powT = (l) => (q(l).eq(1) ? '1' : q(l).n < 0 ? `(${qt(l)})^k` : `${qt(l)}^k`);
+function combo(terms) {
+  // terms: [{c: Q, l: Q}] → text of Σ c·λᵏ (λ = 1 terms are constants).
+  let cst = q(0);
+  const parts = [];
+  for (const { c, l } of terms) {
+    if (c.n === 0) continue;
+    if (l.eq(1)) { cst = cst.add(c); continue; }
+    const abs = c.n < 0 ? c.neg() : c;
+    const body = abs.eq(1) ? powT(l) : `${qt(abs)}·${powT(l)}`;
+    parts.push({ neg: c.n < 0, s: body });
+  }
+  if (cst.n !== 0) {
+    const c = { neg: cst.n < 0, s: qt(cst.n < 0 ? cst.neg() : cst) };
+    // 2 − 3ᵏ rather than −3ᵏ + 2.
+    if (parts.length && parts[0].neg && !c.neg) parts.unshift(c); else parts.push(c);
+  }
+  if (!parts.length) return '0';
+  return parts.map((p, i) => (i === 0 ? (p.neg ? `-${p.s}` : p.s) : `${p.neg ? '-' : '+'}${p.s}`)).join('');
+}
+// Aᵏ = P·Dᵏ·P⁻¹ entry by entry.
+const powMatT = (P, Pinv, eigs) => `[${P.map((r, i) => `[${Pinv[0].map((_, j) => combo(eigs.map((l, m) => ({ c: r[m].mul(Pinv[m][j]), l })))).join(',')}]`).join(',')}]`;
+const pdT = (P, eigs) => `[${P.map((r) => `[${r.map((x, m) => combo([{ c: x, l: eigs[m] }])).join(',')}]`).join(',')}]`;
+
+function powData(rng) {
+  for (let t = 0; t < 100; t++) {
+    const e = pickEigs(rng, [-3, -2, -1, 1, 2, 3, 4], 2, 4);
+    if (Math.abs(e[0]) === Math.abs(e[1])) continue;
+    const d = eig2(rng, e);
+    if (d.fallback) continue;
+    return d;
+  }
+  return eig2(rng, [1, 3]);
+}
+
+// Recurrence u_{k+2} = a·u_{k+1} + b·u_k with roots r₁ > |r₂|, u_k = c₁r₁ᵏ + c₂r₂ᵏ.
+function recData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const r1 = rng.int(2, 4);
+    const r2 = nzPick(rng, -3, 3);
+    if (Math.abs(r2) >= r1) continue;
+    const c1 = nzPick(rng, -2, 3);
+    const c2 = nzPick(rng, -2, 2);
+    const u0 = c1 + c2;
+    const u1 = c1 * r1 + c2 * r2;
+    if (Math.abs(u1) > 15 || (u0 === 0 && u1 === 0)) continue;
+    return { r1, r2, c1, c2, u0, u1, a: r1 + r2, b: -r1 * r2 };
+  }
+  return { r1: 3, r2: -2, c1: 1, c2: -1, u0: 0, u1: 5, a: 1, b: 6, fallback: true };
+}
+const recR = (d) => `u${sub(0)} = ${fq(d.u0)}, u${sub(1)} = ${fq(d.u1)} et u_{k+2} = ${d.a === 0 ? '' : `${d.a === 1 ? '' : d.a === -1 ? '−' : fq(d.a)}u_{k+1}`}${d.a === 0 ? `${fq(d.b)}u_k` : ` ${d.b < 0 ? '−' : '+'} ${Math.abs(d.b) === 1 ? '' : Math.abs(d.b)}u_k`}`.replace(/u_\{k\+1\}/g, 'u<sub>k+1</sub>').replace(/u_\{k\+2\}/g, 'u<sub>k+2</sub>').replace(/u_k/g, 'u<sub>k</sub>');
+
+function recParts(d, level, rng, { limit = false } = {}) {
+  const M = MX.mat([[d.a, d.b], [1, 0]]);
+  const ch = charLines2(M, [d.r2, d.r1].map((x) => q(x)));
+  const parts = [
+    {
+      html: 'x<sub>k</sub> = (u<sub>k+1</sub> ; u<sub>k</sub>) vérifie x<sub>k+1</sub> = Mx<sub>k</sub>. Écris M.', ask: 'M =', start: 'M', judge: { kind: 'mat', expect: mt(M) },
+      lines: [{ math: mt(M), note: 'Ligne 1 : la récurrence ; ligne 2 : u<sub>k+1</sub> = u<sub>k+1</sub>', subgoal: 'diag', cells: level <= 2 ? [[0, 0], [0, 1]] : null }],
+      menu: [
+        { id: 'comp', label: 'Matrice compagne [[a, b], [1, 0]]', valid: true },
+        { id: 'T', label: 'Matrice [[a, 1], [b, 0]]', valid: false, why: 'La première ligne donne u_{k+2} = a·u_{k+1} + b·u_k : (a, b) est une ligne.' },
+      ],
+    },
+    { html: 'Valeurs propres de M.', start: 'det(M-λI)', judge: { kind: 'det', vars: ['λ'], target: 'factored', names: { M: mt(M) } }, lines: ch.map((l) => ({ ...l, subgoal: 'diag' })), menu: MENU.develop },
+    ...[d.r1, d.r2].map((r, k) => ({
+      html: `Un vecteur propre v${sub(k + 1)} de M pour λ = ${fq(r)}.`, ask: `v${sub(k + 1)} =`, start: `v_${k + 1}`, judge: { kind: 'eigvec', A: mt(M), lambda: String(r) },
+      lines: [{ math: vt([q(r), q(1)]), note: 'De la ligne 2 : x₁ = λx₂', subgoal: 'diag', cells: level <= 2 ? [[0, 0]] : null }], menu: MENU.kernel,
+    })),
+    {
+      html: `Décompose x${sub(0)} = (u${sub(1)} ; u${sub(0)}) = ${vecR([q(d.u1), q(d.u0)])} = c${sub(1)}v${sub(1)} + c${sub(2)}v${sub(2)}.`, ask: '(c₁ ; c₂) =', start: 'c', judge: { kind: 'mat', expect: vt([q(d.c1), q(d.c2)]) },
+      lines: [{ math: vt([q(d.c1), q(d.c2)]), note: 'Résoudre le système 2 × 2', subgoal: 'power', cells: level <= 2 ? [[0, 0]] : null }],
+      menu: [
+        { id: 'solve', label: 'Résoudre c₁v₁ + c₂v₂ = x₀', valid: true },
+        { id: 'pow', label: 'Élever M à la puissance k case par case', valid: false, rule: 'l_powers_entrywise', why: 'Mᵏ n\'est pas la matrice des puissances des cases.' },
+      ],
+    },
+    {
+      html: 'x<sub>k</sub> = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂ : donne u<sub>k</sub> (la 2e composante).', ask: 'u_k =', start: 'u_k', judge: { kind: 'mat', vars: ['k'], ints: ['k'], expect: combo([{ c: q(d.c1), l: q(d.r1) }, { c: q(d.c2), l: q(d.r2) }]) },
+      lines: [{ math: combo([{ c: q(d.c1), l: q(d.r1) }, { c: q(d.c2), l: q(d.r2) }]), note: `Contrôle : u${sub(2)} = ${fq(d.c1 * d.r1 ** 2 + d.c2 * d.r2 ** 2)}`, subgoal: 'power' }],
+      menu: [
+        { id: 'modes', label: 'Combiner les modes λᵏ', valid: true },
+        { id: 'inv', label: 'Calculer P⁻¹DᵏP', valid: false, rule: 'l_pdp_inverse_side', why: 'Aᵏ = PDᵏP⁻¹ : P à gauche, P⁻¹ à droite.' },
+      ],
+    },
+  ];
+  if (limit) {
+    parts.push({
+      html: `Que vaut la limite de u<sub>k</sub>/${d.r1}ᵏ quand k → ∞ ?`, ask: 'limite =', start: 'L', judge: { kind: 'value', expect: String(d.c1) },
+      lines: [{ math: String(d.c1), note: `u<sub>k</sub>/${d.r1}ᵏ = ${fq(d.c1)} ${d.c2 < 0 ? '−' : '+'} ${Math.abs(d.c2) === 1 ? '' : `${Math.abs(d.c2)}·`}(${fq(q(d.r2, d.r1))})ᵏ → ${fq(d.c1)}, car |${fq(q(d.r2, d.r1))}| &lt; 1`, subgoal: 'power' }],
+    });
+  }
+  return parts;
+}
+
+function powAkParts(d, level, rng, { diagFirst = false } = {}) {
+  const parts = [];
+  if (diagFirst) {
+    parts.push({ html: 'Valeurs propres.', start: 'det(A-λI)', judge: detJudge(d.A), lines: charLines2(d.A, d.eigs).map((l) => ({ ...l, subgoal: 'diag' })), menu: MENU.develop });
+    parts.push({
+      html: 'Diagonalise A.', ask: 'P, D :', start: 'A = P·D·P^(-1)', judge: { kind: 'factor', A: mt(d.A), of: 'PDP' },
+      lines: [{ math: `P = ${mt(d.P)} ; D = ${diagT(d.eigs)}`, note: 'Vecteurs propres en colonnes', subgoal: 'diag' }], menu: MENU.assemble,
+    });
+  }
+  const Ak = powMatT(d.P, d.Pinv, d.eigs);
+  const lines = [
+    { math: `${pdT(d.P, d.eigs)}·${mt(d.Pinv)}`, note: 'P·Dᵏ d\'abord', subgoal: 'power' },
+    { math: Ak, note: 'Puis (PDᵏ)·P⁻¹', subgoal: 'power', cells: level <= 2 ? cellsOf(d.A, level === 1 ? 2 : 3, rng) : null },
+  ];
+  if (level <= 2) lines.unshift({ math: `${mt(d.P)}·diag(${d.eigs.map(powT).join(',')})·${mt(d.Pinv)}`, note: 'Aᵏ = PDᵏP⁻¹', subgoal: 'power' });
+  parts.push({
+    html: 'Calcule Aᵏ.', ask: 'Aᵏ =', start: 'A^k', judge: { kind: 'mat', vars: ['k'], ints: ['k'], names: { A: mt(d.A), P: mt(d.P), D: diagT(d.eigs) }, expect: 'P·D^k·P^(-1)' },
+    lines,
+    decision: level === 2 ? {
+      kind: 'decision', prompt: 'Comment calculer Aᵏ ?', options: rng.shuffle([
+        { id: 'ok', label: 'Aᵏ = PDᵏP⁻¹', valid: true },
+        { id: 'inv', label: 'Aᵏ = P⁻¹DᵏP', valid: false, rule: 'l_pdp_inverse_side', why: 'A = PDP⁻¹, donc Aᵏ = PDP⁻¹·PDP⁻¹·… = PDᵏP⁻¹ : P reste à gauche.' },
+        { id: 'entry', label: 'Élever chaque case de A à la puissance k', valid: false, rule: 'l_powers_entrywise', why: 'Seule une matrice diagonale s\'élève case par case.' },
+      ]),
+    } : null,
+    menu: [
+      { id: 'pdp', label: 'Aᵏ = PDᵏP⁻¹, puis les produits', valid: true },
+      { id: 'entry', label: 'Élever chaque case à la puissance k', valid: false, rule: 'l_powers_entrywise', why: 'Aᵏ = A·A·…·A, pas la matrice des aᵢⱼᵏ.' },
+    ],
+  });
+  return parts;
+}
+
+function powItem(level, rng, exam = false) {
+  const rec = level === 3 || level === 5 || exam || (level === 4 && rng.chance(0.5));
+  if (rec) {
+    const d = recData(rng);
+    const parts = recParts(d, level, rng, { limit: level === 5 || exam });
+    const hints = [
+      { level: 1, html: 'Avec x_k = (u_{k+1} ; u_k), M = [[a, b], [1, 0]]. Ses valeurs propres sont les racines de λ² − aλ − b ; un vecteur propre est (λ ; 1). Décompose x₀, puis u_k = c₁λ₁ᵏ + c₂λ₂ᵏ.' },
+      { level: 2, html: `λ² ${d.a < 0 ? '+' : '−'} ${Math.abs(d.a)}λ ${d.b < 0 ? '+' : '−'} ${Math.abs(d.b)} = (λ − □)(λ − □)`.replace('− 1λ', '− λ').replace('+ 1λ', '+ λ') },
+      { level: 3, html: `u<sub>k</sub> = ${R(combo([{ c: q(d.c1), l: q(d.r1) }, { c: q(d.c2), l: q(d.r2) }]))}` },
+    ];
+    return partsItem({
+      skill: POW, level, parts, hints, subgoals: POW_SUB, key: `${POW}:rec:${d.a},${d.b},${d.u0},${d.u1}`, fallback: d.fallback, noHints: level === 5 || !!exam,
+      exam: exam ? { format: 'open', points: 8 } : false,
+      prompt: `Soit la suite définie par ${recR(d)}. Trouve u<sub>k</sub> en fonction de k${level === 5 || exam ? `, puis la limite de u<sub>k</sub>/${d.r1}ᵏ` : ''}${level === 3 ? ' (choisis d\'abord l\'action)' : ''}.`,
+    });
+  }
+  const d = powData(rng);
+  const parts = powAkParts(d, level, rng, { diagFirst: level === 4 });
+  const hints = [
+    { level: 1, html: 'Aᵏ = PDᵏP⁻¹ ; seule D est élevée à la puissance k : Dᵏ = diag(λ₁ᵏ, λ₂ᵏ).' },
+    { level: 2, html: `${pdT(d.P, d.eigs).replace(/-/g, '−')}·${ML(mt(d.Pinv))} = [[□, □], [□, □]]` },
+    { level: 3, html: `Aᵏ = ${ML(powMatT(d.P, d.Pinv, d.eigs), { vars: ['k'] })}` },
+  ];
+  return partsItem({
+    skill: POW, level, parts, hints, subgoals: POW_SUB, key: `${POW}:${mt(d.A)}`, fallback: d.fallback, noHints: level === 5,
+    prompt: level === 4
+      ? `Diagonalise A = ${MLm(d.A)}, puis calcule Aᵏ pour tout entier k ≥ 0.`
+      : `A = ${MLm(d.A)} s'écrit A = PDP⁻¹ avec P = ${MLm(d.P)}, D = ${diagR(d.eigs)} et P⁻¹ = ${MLm(d.Pinv)}. Calcule Aᵏ.`,
+  });
+}
+
+function powExam(rng, exam) {
+  if (exam === 'open') return powItem(5, rng, true);
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which === 0) {
+      return tfL({
+        skill: POW, key: 'diag-pow', truth: true, exam: examTag({ exam }),
+        statement: 'Si A est diagonalisable, alors Aᵏ est diagonalisable pour tout entier k ≥ 1.',
+        explanation: 'Vrai : A = PDP⁻¹ donne Aᵏ = PDᵏP⁻¹, et Dᵏ est diagonale.',
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: POW, key: 'pdkp', truth: true, exam: examTag({ exam }),
+        statement: 'Si A = PDP⁻¹, alors Aᵏ = PDᵏP⁻¹ pour tout entier k ≥ 1.',
+        explanation: 'Vrai : dans A·A·…·A = PDP⁻¹PDP⁻¹…PDP⁻¹, chaque P⁻¹P vaut I.',
+      });
+    }
+    const a = rng.pick([1, 2]);
+    return tfL({
+      skill: POW, key: `entry:${a}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'l_powers_entrywise',
+      statement: 'Pour toute matrice carrée A, A² est la matrice des carrés des coefficients de A.',
+      counter: { kind: 'matOne', params: { want: 'entrywiseSquare' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat([[a, 1], [0, a]])) } },
+      explanation: `Faux : avec A = [[${a}, 1], [0, ${a}]], A² = [[${a * a}, ${2 * a}], [0, ${a * a}]], mais la matrice des carrés est [[${a * a}, 1], [0, ${a * a}]].`,
+    });
+  }
+  const d = powData(rng);
+  const i = rng.int(0, 1);
+  const j = rng.int(0, 1);
+  const entry = (P, Pinv) => combo(d.eigs.map((l, m) => ({ c: P[i][m].mul(Pinv[m][j]), l })));
+  const right = entry(d.P, d.Pinv);
+  const at2 = (t) => [2, 3].map((k) => { try { return exactValue(parse(t.replace(/k/g, `(${k})`))).toString(); } catch { return t; } }).join(',');
+  const opt = (t, rule) => (at2(t) === at2(right) ? null : { html: CM(t, ['k']), rule });
+  return mcqDistinct({
+    skill: POW, level: 4, key: `mcq:${mt(d.A)}:${i}${j}`, exam: examTag({ exam }),
+    prompt: `Soit A = ${MLm(d.A)} = PDP⁻¹ avec P = ${MLm(d.P)} et D = ${diagR(d.eigs)}. Quel est le coefficient (${i + 1}, ${j + 1}) de Aᵏ ?`,
+    right: CM(right, ['k']),
+    wrongs: [
+      opt(combo([{ c: q(1), l: d.A[i][j] }]).replace(/^0$/, '0'), 'l_powers_entrywise'),
+      opt(entry(d.Pinv, d.P), 'l_pdp_inverse_side'),
+      opt(combo(d.eigs.map((l, m) => ({ c: d.P[i][m].mul(d.Pinv[m][j]), l: d.eigs[1 - m] }))), 'l_pd_order'),
+    ].filter(Boolean),
+    fillers: [opt(combo(d.eigs.map((l, m) => ({ c: d.P[i][m].mul(d.Pinv[m][j]).neg(), l }))), null), opt(combo(d.eigs.map((l) => ({ c: q(1), l }))), null)].filter(Boolean),
+    solution: [{ html: `Aᵏ = PDᵏP⁻¹ = ${ML(powMatT(d.P, d.Pinv, d.eigs), { vars: ['k'] })}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-eig-markov
+// ======================================================================
+
+const MARK = 'l-eig-markov';
+const MARK_SUB = [
+  { id: 'translate', label: 'traduire les pourcentages', skill: MARK },
+  { id: 'stationary', label: 'état stationnaire', skill: SPACE },
+  { id: 'xk', label: 'x_k explicite', skill: POW },
+];
+const STORIES = [
+  { s: ['café', 'pas de café'], who: 'part de la population', text: (p, r) => `Chaque matin, ${p} % des buveurs de café en reprennent le lendemain, et ${r} % de ceux qui n'en ont pas bu s'y mettent.` },
+  { s: ['vélo', 'métro'], who: 'part des trajets', text: (p, r) => `Chaque jour, ${p} % des cyclistes reprennent le vélo le lendemain, et ${r} % des usagers du métro passent au vélo.` },
+  { s: ['soleil', 'pluie'], who: 'proportion des jours', text: (p, r) => `Après un jour de soleil, il fait beau le lendemain avec une probabilité de ${p} % ; après un jour de pluie, avec une probabilité de ${r} %.` },
+];
+
+function markData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const p = rng.int(5, 9);
+    const qq = rng.int(2, 9);
+    const mu = p + qq - 10;
+    if (![1, -1, 2, -2, 3, -3, 5].includes(mu) || p === qq) continue;
+    const st = rng.pick(STORIES);
+    const M = [[q(p, 10), q(10 - qq, 10)], [q(10 - p, 10), q(qq, 10)]];
+    const w = primitive([q(10 - qq), q(10 - p)]);
+    const s = w[0].add(w[1]);
+    const qs = w.map((x) => x.div(s));
+    const x0 = rng.pick([[q(1), q(0)], [q(0), q(1)], [q(1, 2), q(1, 2)]]);
+    if (x0[0].eq(qs[0])) continue;
+    const c = x0[0].sub(qs[0]);
+    return { p, qq, mu: q(mu, 10), st, M, w, s, qs, x0, c };
+  }
+  return null;
+}
+// x_k = q + c·μᵏ·(1 ; −1).
+const xkT = (d) => {
+  const mu = d.mu.n < 0 ? `(${qt(d.mu)})` : `(${qt(d.mu)})`;
+  const term = (sgn) => { const c = sgn > 0 ? d.c : d.c.neg(); return `${c.n < 0 ? '-' : '+'}${qt(c.n < 0 ? c.neg() : c)}·${mu}^k`; };
+  return `(${qt(d.qs[0])}${term(1)} ; ${qt(d.qs[1])}${term(-1)})`;
+};
+
+function markItem(level, rng) {
+  const d = markData(rng);
+  const [A, B] = d.st.s;
+  const story = d.st.text(d.p * 10, (10 - d.qq) * 10);
+  const parts = [{
+    html: `État 1 : ${A} ; état 2 : ${B}. La colonne j dit ce que deviennent ceux de l'état j.`, ask: 'M =', start: 'M', judge: { kind: 'mat', markov: true, expect: mt(d.M) },
+    lines: [{ math: mt(d.M), note: 'Chaque colonne somme à 1', subgoal: 'translate', cells: level <= 2 ? [[1, 0], [0, 1]] : null }],
+    decision: level === 2 ? {
+      kind: 'decision', prompt: 'Où ranger les probabilités « de l\'état j vers l\'état i » ?', options: rng.shuffle([
+        { id: 'col', label: 'Dans la colonne j (chaque colonne somme à 1)', valid: true },
+        { id: 'row', label: 'Dans la ligne j (chaque ligne somme à 1)', valid: false, rule: 'l_markov_rows', why: 'Avec x_{k+1} = Mx_k, la colonne j multiplie la part de l\'état j : c\'est elle qui doit sommer à 1.' },
+      ]),
+    } : null,
+    menu: [
+      { id: 'col', label: 'Ranger « de j vers i » en case (i, j)', valid: true },
+      { id: 'row', label: 'Ranger « de i vers j » en case (i, j)', valid: false, rule: 'l_markov_rows', why: 'Avec x_{k+1} = Mx_k, chaque colonne somme à 1.' },
+    ],
+  }, {
+    html: '(M − I)q = 0 : un vecteur propre de M pour la valeur propre 1.', ask: 'v =', start: 'v', judge: { kind: 'eigvec', A: mt(d.M), lambda: '1' },
+    lines: [{ math: vt(d.w), note: 'Ker(M − I)', subgoal: 'stationary', cells: level <= 2 ? [[1, 0]] : null }], menu: MENU.kernel,
+  }, {
+    html: 'L\'état stationnaire q : un vecteur propre de 1 dont les composantes somment à 1.', ask: 'q =', start: 'q', judge: { kind: 'mat', markov: true, expect: vt(d.qs) },
+    lines: [{ math: vt(d.qs), note: `Diviser par ${fq(d.s)}`, subgoal: 'stationary', cells: level <= 2 ? [[0, 0], [1, 0]] : null }],
+    menu: [
+      { id: 'norm', label: 'Diviser par la somme des composantes', valid: true },
+      { id: 'raw', label: 'Garder le vecteur propre tel quel', valid: false, rule: 'l_markov_normalize', why: 'q est une répartition : ses composantes somment à 1.' },
+    ],
+  }];
+  if (level >= 4) {
+    parts.push({
+      html: `Au départ, x${sub(0)} = ${vecR(d.x0)}. L'autre valeur propre est μ = tr M − 1 = ${fq(d.mu)}, de vecteur propre (1 ; −1). Donne x<sub>k</sub>.`,
+      ask: 'x_k =', start: 'x_k', judge: { kind: 'mat', vars: ['k'], ints: ['k'], expect: xkT(d) },
+      lines: [{ math: xkT(d), note: `x₀ = q + (${fq(d.c)})·(1 ; −1)`, subgoal: 'xk' }],
+    });
+  }
+  if (level === 5) {
+    parts.push({
+      html: `À la longue, quelle ${d.st.who} est dans l'état « ${A} » ?`, ask: 'part limite =', start: 'L', judge: { kind: 'value', expect: qt(d.qs[0]) },
+      decision: {
+        kind: 'decision', prompt: 'Cette limite dépend-elle de x₀ ?', options: [
+          { id: 'no', label: 'Non', valid: true },
+          { id: 'yes', label: 'Oui', valid: false, why: `|μ| = ${fq(d.mu.n < 0 ? d.mu.neg() : d.mu)} &lt; 1 : le terme en μᵏ s'éteint, x_k → q quel que soit x₀.` },
+        ],
+      },
+      lines: [{ math: qt(d.qs[0]), note: `≈ ${Math.round(100 * d.qs[0].valueOf())} %`, subgoal: 'xk' }],
+    });
+  }
+  const hints = [
+    { level: 1, html: 'Colonne j : ce que deviennent ceux qui sont dans l\'état j (elle somme à 1). Puis (M − I)q = 0 et q₁ + q₂ = 1.' },
+    { level: 2, html: `q = (□ ; □)/${fq(d.s)}` },
+    { level: 3, html: `M = ${MLm(d.M)}, q = ${vecR(d.qs)}` },
+  ];
+  return partsItem({
+    skill: MARK, level, parts, hints, subgoals: MARK_SUB, key: `${MARK}:${d.p}${d.qq}:${d.st.s[0]}`, noHints: level === 5,
+    prompt: `${story} On note x<sub>k</sub> = (part « ${A} » ; part « ${B} ») le jour k, et x<sub>k+1</sub> = Mx<sub>k</sub>. Écris M, puis l'état stationnaire${level >= 4 ? ' et x<sub>k</sub>' : ''}${level === 5 ? ', et la part limite' : ''}.`,
+  });
+}
+
+function markExam(rng, exam) {
+  if (exam === 'tf') {
+    if (rng.chance(0.5)) {
+      return tfL({
+        skill: MARK, key: 'eig1', truth: true, exam: examTag({ exam }),
+        statement: 'Si chaque colonne d\'une matrice carrée M somme à 1, alors 1 est valeur propre de M.',
+        explanation: 'Vrai : chaque colonne de M − I somme à 0, donc la somme des lignes de M − I est nulle : M − I n\'est pas inversible.',
+      });
+    }
+    return tfL({
+      skill: MARK, key: 'limit', truth: false, exam: examTag({ exam }),
+      statement: 'Pour toute matrice stochastique M de taille 2 × 2 (colonnes de somme 1, coefficients ≥ 0), x_k = Mᵏx₀ tend vers une limite qui ne dépend pas de x₀.',
+      counter: { kind: 'matOne', params: { want: 'stochNoUniqueLimit' }, ask: [{ v: 'A', label: 'M =', shape: [2, 2] }], answer: { A: rng.pick(['[[0,1],[1,0]]', '[[1,0],[0,1]]']) } },
+      explanation: 'Faux : avec M = I, x_k = x₀ pour tout k ; avec M = [[0, 1], [1, 0]], x_k oscille. Il faut que l\'autre valeur propre vérifie |μ| &lt; 1.',
+    });
+  }
+  const d = markData(rng);
+  const story = d.st.text(d.p * 10, (10 - d.qq) * 10);
+  const raw = d.w[0].div(d.w[1]);
+  return mcqDistinct({
+    skill: MARK, level: 4, key: `mcq:${d.p}${d.qq}`, exam: examTag({ exam }),
+    prompt: `${story} À la longue, quelle ${d.st.who} est dans l'état « ${d.st.s[0]} » ?`,
+    right: fq(d.qs[0]),
+    wrongs: [{ html: '1/2', rule: 'l_markov_rows' }, { html: fq(raw), rule: 'l_markov_normalize' }, { html: fq(d.qs[1]), rule: null }],
+    fillers: [{ html: fq(q(d.p, 10)) }, { html: fq(q(10 - d.qq, 10)) }],
+    solution: [{ html: `M = ${MLm(d.M)} ; (M − I)q = 0 donne q ∝ ${vecR(d.w)}`, note: '' }, { html: `q = ${vecR(d.qs)}`, note: 'Composantes de somme 1' }],
+  }, rng);
+}
+
+// ======================================================================
+// l-eig-complex
+// ======================================================================
+
+const CPLX = 'l-eig-complex';
+const CPLX_SUB = [
+  { id: 'roots', label: 'racines complexes', skill: 'g8-algebraic' },
+  { id: 'vector', label: 'vecteur propre complexe', skill: CPLX },
+];
+// a + bi as text: 2+i, -1-2i, 3i, 2.
+const cT = (a, b) => {
+  const bs = b === 0 ? '' : `${b < 0 ? '-' : a === 0 ? '' : '+'}${Math.abs(b) === 1 ? '' : Math.abs(b)}i`;
+  return a === 0 ? (b === 0 ? '0' : bs) : `${a}${bs}`;
+};
+const cR = (a, b) => cT(a, b).replace(/-/g, '−').replace(/([0-9])([+−])/, '$1 $2 ');
+// √n simplified: 2√2, √5, 3.
+function sqrtText(n) {
+  let s = 1;
+  let m = n;
+  for (let f = 2; f * f <= m; f++) while (m % (f * f) === 0) { m /= f * f; s *= f; }
+  return m === 1 ? String(s) : `${s === 1 ? '' : s}√${m}`;
+}
+
+function cplxData(rng) {
+  for (let t = 0; t < 200; t++) {
+    const a = rng.int(-3, 3);
+    const b = rng.int(1, 3);
+    const S = MX.mat(rng.pick(P2));
+    const C = MX.mat([[a, -b], [b, a]]);
+    const A = MX.mul(MX.mul(S, C), MX.inverse(S));
+    if (maxAbs(A) > 9 || A[0][1].n === 0 || A[1][0].n === 0 || (A[0][0].n === 0 && A[1][1].n === 0)) continue;
+    // v for λ = a + bi from the row whose off-diagonal entry is ±1 (or row 2).
+    const [[a11, a12], [a21, a22]] = A.map((r) => r.map((x) => x.n));
+    const useRow1 = Math.abs(a12) < Math.abs(a21);
+    // Row 2: a21·x + (a22 − λ)y = 0 → v = (λ − a22 ; a21); row 1: v = (a12 ; λ − a11).
+    const v = useRow1 ? [[a12, 0], [a - a11, b]] : [[a - a22, b], [a21, 0]];
+    return { A, a, b, v, row: useRow1 ? 1 : 2 };
+  }
+  return { A: MX.mat([[1, -2], [1, 3]]), a: 2, b: 1, v: [[-1, 1], [1, 0]], row: 2, fallback: true };
+}
+const vecC = (v, conj = false) => `(${v.map(([x, y]) => cT(x, conj ? -y : y)).join(' ; ')})`;
+const vecCR = (v, conj = false) => `(${v.map(([x, y]) => cR(x, conj ? -y : y)).join(' ; ')})`;
+
+function cplxItem(level, rng) {
+  const d = cplxData(rng);
+  const lam = cT(d.a, d.b);
+  const lamB = cT(d.a, -d.b);
+  const n2 = d.a * d.a + d.b * d.b;
+  const cs = [q(n2), q(-2 * d.a), q(1)];
+  const poly = polyDesc(cs);
+  const fact = `(λ-(${lam}))(λ-(${lamB}))`;
+  const parts = [];
+  if (level === 1) {
+    parts.push({ html: `Le polynôme caractéristique est ${CM(poly)}. Calcule son discriminant.`, ask: 'Δ =', start: 'Δ', judge: { kind: 'value', expect: String(4 * d.a * d.a - 4 * n2) }, lines: [{ math: String(4 * d.a * d.a - 4 * n2), note: 'Δ < 0 : deux racines complexes conjuguées'.replace(' < ', ' &lt; '), subgoal: 'roots' }] });
+  } else {
+    parts.push({ html: 'Polynôme caractéristique.', start: 'det(A-λI)', judge: { kind: 'det', vars: ['λ'], target: 'factored', names: { A: mt(d.A) } }, lines: charLines2(d.A, []).slice(0, 3), menu: MENU.develop });
+  }
+  parts.push({
+    html: 'Factorise-le dans ℂ : λ = (−b ± i√(−Δ))/2a.', ask: 'p(λ) =', start: poly, judge: { kind: 'poly', v: 'λ', complex: true, target: 'factored-C' },
+    lines: [{ math: fact, note: `Valeurs propres ${cR(d.a, d.b)} et ${cR(d.a, -d.b)}`, subgoal: 'roots' }],
+    menu: [
+      { id: 'delta', label: 'Discriminant, puis racines complexes conjuguées', valid: true },
+      { id: 'none', label: 'Conclure « pas de valeur propre »', valid: false, why: 'Δ &lt; 0 : pas de valeur propre réelle, mais deux valeurs propres complexes conjuguées.' },
+    ],
+  });
+  const vPart = {
+    html: `Un vecteur propre v pour λ = ${cR(d.a, d.b)}.`, ask: 'v =', start: 'v', judge: { kind: 'eigvec', A: mt(d.A), lambda: lam, complex: true },
+    lines: [{ math: vecC(d.v), note: `Ligne ${d.row} de A − λI`, subgoal: 'vector' }], menu: MENU.kernel,
+  };
+  if (level === 2) {
+    vPart.decision = {
+      kind: 'decision', prompt: 'Quelle ligne de A − λI utiliser pour trouver v ?', options: [
+        { id: 'r1', label: 'La ligne 1', valid: true, ref: d.row === 1 },
+        { id: 'r2', label: 'La ligne 2', valid: true, ref: d.row === 2 },
+      ],
+    };
+  }
+  parts.push(vPart);
+  parts.push({
+    html: `Un vecteur propre pour λ̄ = ${cR(d.a, -d.b)}.`, ask: 'w =', start: 'w', judge: { kind: 'eigvec', A: mt(d.A), lambda: lamB, complex: true, pair: lam },
+    lines: [{ math: vecC(d.v, true), note: 'Le conjugué de v', subgoal: 'vector' }],
+    menu: [
+      { id: 'conj', label: 'Conjuguer v', valid: true },
+      { id: 'same', label: 'Reprendre v', valid: false, rule: 'l_complex_conj_vec', why: 'Av = λv donne Av̄ = λ̄v̄ : c\'est v̄ qui convient pour λ̄.' },
+    ],
+  });
+  if (level >= 4) {
+    parts.push({
+      html: 'A agit comme une rotation composée d\'une dilatation : quel est le rapport |λ| ?', ask: '|λ| =', start: 'r', judge: { kind: 'value', expect: sqrtText(n2), form: 'exact' },
+      lines: [{ math: sqrtText(n2), note: `√(${d.a}² + ${d.b}²)`.replace('-', '−'), subgoal: 'vector' }],
+    });
+    const ang = d.a === 0 ? 'π/2' : Math.abs(d.a) === d.b ? (d.a > 0 ? 'π/4' : '3π/4') : null;
+    if (ang) {
+      parts.push({
+        html: `Et l'angle de la rotation, arg(${cR(d.a, d.b)}) ?`, ask: 'θ =', start: 'θ', judge: { kind: 'value', expect: ang, form: 'exact' },
+        lines: [{ math: ang, note: 'Argument de λ', subgoal: 'vector' }],
+      });
+    }
+  }
+  const hints = [
+    { level: 1, html: 'Δ &lt; 0 : λ = a ± bi. Pour v, prends une ligne de A − λI, par exemple (p, q) : v = (−q ; p) (ou (q ; −p)). Pour λ̄, conjugue v.' },
+    { level: 2, html: `v = ${vecCR(d.v).replace(/\(([^;]+);/, '(□ ;')}` },
+    { level: 3, html: `λ = ${cR(d.a, d.b)}, v = ${vecCR(d.v)} ; λ̄ = ${cR(d.a, -d.b)}, v̄ = ${vecCR(d.v, true)}` },
+  ];
+  return partsItem({
+    skill: CPLX, level, parts, hints, subgoals: CPLX_SUB, key: `${CPLX}:${mt(d.A)}`, fallback: d.fallback, noHints: level === 5,
+    prompt: `Trouve les valeurs propres complexes de A = ${MLm(d.A)} et un vecteur propre pour chacune${level >= 4 ? ', puis le rapport de la rotation-dilatation' : ''}${level === 3 ? ' (choisis d\'abord l\'action)' : ''}.`,
+  });
+}
+
+// Permutation matrices: the real eigenvalues are among the roots of λⁿ = 1.
+const CYCLES = [[4, [[0, 1, 2, 3]]], [3, [[0, 1, 2]]], [4, [[0, 1, 2]]], [4, [[0, 1], [2, 3]]], [3, [[0, 1]]]];
+function cplxExam(rng, exam) {
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which === 0) {
+      const b = rng.pick([1, 2]);
+      return tfL({
+        skill: CPLX, key: `real:${b}`, truth: false, exam: examTag({ exam }),
+        statement: 'Toute matrice réelle 2 × 2 a au moins une valeur propre réelle.',
+        counter: { kind: 'matOne', params: { want: 'noRealEig' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat([[0, -b], [b, 0]])) } },
+        explanation: `Faux : la rotation [[0, ${-b}], [${b}, 0]] a pour polynôme λ² + ${b * b}, sans racine réelle (valeurs propres ±${b === 1 ? '' : b}i).`.replace('-', '−'),
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: CPLX, key: 'conj-val', truth: true, exam: examTag({ exam }),
+        statement: 'Si λ = a + bi est une valeur propre d\'une matrice réelle A, alors λ̄ = a − bi en est aussi une.',
+        explanation: 'Vrai : le polynôme caractéristique est à coefficients réels, donc ses racines non réelles vont par paires conjuguées.',
+      });
+    }
+    return tfL({
+      skill: CPLX, key: 'conj-vec', truth: true, exam: examTag({ exam }), ruleIfFalse: 'l_complex_conj_vec',
+      statement: 'Si A est réelle et Av = λv, alors Av̄ = λ̄v̄.',
+      explanation: 'Vrai : en conjuguant Av = λv, et comme Ā = A, on obtient Av̄ = λ̄v̄. Le vecteur propre de λ̄ est v̄ (pas v).',
+    });
+  }
+  const [n, cycles] = rng.pick(CYCLES);
+  const perm = [...Array(n).keys()];
+  const lab = rng.shuffle([...Array(n).keys()]);
+  for (const c of cycles) c.forEach((x, k) => { perm[lab[x]] = lab[c[(k + 1) % c.length]]; });
+  const P = MX.zeros(n, n).map((r) => [...r]);
+  perm.forEach((j, i) => { P[j][i] = q(1); });
+  const real = MX.rationalEigen(P).roots.map((x) => x.value).sort((a, b) => a.valueOf() - b.valueOf());
+  const set = (xs) => setR(xs.map((x) => q(x)));
+  return mcqDistinct({
+    skill: CPLX, level: 4, key: `mcq:${mt(P)}`, exam: examTag({ exam }),
+    prompt: `Soit A = ${MLm(P)}. L'ensemble des valeurs propres <b>réelles</b> de A est…`,
+    right: set(real),
+    wrongs: [{ html: set([0, 1]), rule: 'l_eigen_rref' }, { html: set([0]), rule: null }, { html: set([-1, 0]), rule: null }],
+    fillers: [{ html: set([1]) }, { html: set([-1, 1]) }, { html: '{−1 ; 1 ; i ; −i}' }],
+    solution: [{ html: `A permute les vecteurs de base : Aⁿ = I pour n = ${cycles.reduce((l, c) => lcm(l, c.length), 1)}, donc toute valeur propre vérifie λⁿ = 1.`, note: '' }, { html: `Valeurs propres réelles : ${set(real)}`, note: '' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
   [CHECK]: (level, rng, profile, opts = {}) => (opts.exam ? checkExam(rng, opts.exam) : checkItem(level, rng)),
@@ -1392,4 +1892,7 @@ export const GEN = {
   [REL]: (level, rng, profile, opts = {}) => (opts.exam ? relExam(rng, opts.exam) : relItem(level, rng)),
   [DIAG]: (level, rng, profile, opts = {}) => (opts.exam ? diagExam(rng, opts.exam) : diagItem(level, rng)),
   [DPAR]: (level, rng, profile, opts = {}) => (opts.exam ? dparExam(rng, opts.exam) : dparItem(level, rng)),
+  [POW]: (level, rng, profile, opts = {}) => (opts.exam ? powExam(rng, opts.exam) : powItem(level, rng)),
+  [MARK]: (level, rng, profile, opts = {}) => (opts.exam ? markExam(rng, opts.exam) : markItem(level, rng)),
+  [CPLX]: (level, rng, profile, opts = {}) => (opts.exam ? cplxExam(rng, opts.exam) : cplxItem(level, rng)),
 };
