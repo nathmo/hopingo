@@ -5,7 +5,7 @@ import { checkSkills } from './uni-check.js';
 import { SKILLS } from '../js/content/uni/fourier-a.skills.js';
 
 // Skills whose generators are not written yet (emptied when the part is done).
-const STUBBED = new Set(["f-coef", "f-coef-complex", "f-sine-cosine", "f-dirichlet", "f-parseval", "f-coef-relations", "f-series-problem", "f-periodic-ode", "f-sturm-liouville"]);
+const STUBBED = new Set([]);
 // Items per level: 20 (never under 15).
 const COUNTS = Object.fromEntries(SKILLS.map((s) => [s.id, 20]));
 

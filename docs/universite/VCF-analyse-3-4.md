@@ -1223,6 +1223,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-coef` — Coefficients de Fourier, parité, a₀ et petits indices
 - **Année** 16 · **Prérequis** `a1-int-parts`, `g1-parity-period` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Familles c·x, c·x², c·|x| et la marche ±c sur ]−π ; π[ (c ∈ {1, 2, 3}) ; au niveau 4, c·x, c·x², c·|x| sur ]−L ; L[ (L ∈ {1, 2}, T = 2L) avec une décision « ω = 2π/T » (`f_period_omega`). Parité et « a₀ à part » sont des décisions (des notes au niveau 1) ; a₀ par `definite` ; aₙ ou bₙ par `equiv` en n (domaine entier, ∫ par quadrature), lignes d'intégration par parties calculées exactement (`fourier-a-kit.js`, valeurs q·π^e·(−1)ⁿˢ/nᵏ) ; puis n = 2k + 1 (`equiv` en k) quand les termes pairs s'annulent. Niveau 5 : p + q cos(mx) + c|x| ou c·x² (indice spécial m par `value`, `f_a0_separate`). Variantes : `mcq` à plusieurs réponses (affirmations sur a₀, aₘ, bₙ), `coef` (aₙ ou bₙ pour un n donné, `value`), `open` (5 points). Pas de famille « ni paire ni impaire » ici (elle est dans `f-dirichlet`) ; |x| est intégré sur [0 ; π] (la quadrature ne passe pas le coin en 0).
 - **Intro** : d'abord la période T et la parité : f paire ⟹ bₙ = 0 et aₙ = (4/T)∫₀^{T/2} f cos ; f impaire ⟹ aₙ = 0. a₀ se calcule **à part** (la formule générale contient souvent un 1/n²). Si f contient un polynôme trigonométrique (1 + cos 2x), ses coefficients se lisent, et les indices concernés (a₂) se traitent à part. Exemple : f(x) = x² sur [−π ; π] ; `math: f paire : bₙ = 0` ; `math: a₀ = (2/π)∫₀^π x² dx = 2π²/3` ; `math: aₙ = (2/π)∫₀^π x² cos(nx) dx = 4(−1)ⁿ/n²`.
 - **Juge** : `equiv` `{vars:['n'], domain:{n:{int:[1,40]}}}` pour les lignes en n (les ∫ définies sont évaluées par quadrature à chaque n tiré) ; `value` pour a₀ ; une ligne de décision pour la parité · **Forme finale** : a₀, aₙ, bₙ explicites (cas n pair et impair séparés si besoin), sans ∫.
 - **Niveaux** :
@@ -1246,6 +1247,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-coef-complex` — Coefficients complexes cₙ d'une somme d'exponentielles
 - **Année** 16 · **Prérequis** `f-coef`, `g8-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-coef` : passage aₙ, bₙ ↔ cₙ ; `g8-polar` : e^(ikx) = cos kx + i sin kx.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Polynômes trigonométriques réels : c₀ et deux fréquences k ≤ 7, (aₖ, bₖ) entiers ou demis ; donnés en cos/sin (sens « vers les cₖ ») ou en exponentielles (sens « vers les aₖ, bₖ »). Chaque valeur demandée est une partie du juge `fcomplex` (nouveau, `js/judges/fourier-a-judges.js` : `complex` avec une valeur attendue et une forme finale réduite). Niveau 1 : formules en note ; niveaux 2 à 4 : décision « dans quel sens » (avec `f_coef_complex_convert`) ; niveau 5 : les deux sens dans le même item. Variante `mcq` à plusieurs réponses. La liste « coefficients non nuls » est faite par le QCM, pas par une ligne.
 - **Intro** : cos(kx) = (e^(ikx) + e^(−ikx))/2, sin(kx) = (e^(ikx) − e^(−ikx))/(2i). On lit les cₖ sans intégrer. Passage aux réels : aₙ = cₙ + c₋ₙ, bₙ = i(cₙ − c₋ₙ). Exemple (2022) : `math: g = cos x + 3 sin 3x` ; `math: c₁ = c₋₁ = 1/2, c₃ = 3/(2i) = −3i/2, c₋₃ = 3i/2`, `note: les autres sont nuls`.
 - **Juge** : `complex` par coefficient ; item `mcq` multi pour « lesquels sont non nuls » · **Forme finale** : liste des cₖ non nuls avec leur valeur.
 - **Niveaux** :
@@ -1267,6 +1269,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-sine-cosine` — Séries en sinus et en cosinus sur [0 ; L]
 - **Année** 16 · **Prérequis** `f-coef` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `f-coef` : même calcul de coefficients, sur le prolongement.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Séries en sinus de c·x, c, c·x², c·x(L − x) sur [0 ; L] (L ∈ {π, 1, 2}), c(2πx − x²) et le triangle 2x / 2π − 2x (2019) sur [0 ; π] ; séries en cosinus (≈ 30 % aux niveaux 1 à 4) de c·x, c·x², c·x(L − x) avec a₀ par `definite`. Décisions « quel prolongement » (niveau 3) et « quelle formule » (avec `f_sine_wrong_factor`, `f_interval_02pi`) ; bₙ par `equiv` en n, puis n = 2k + 1. Variantes `mcq` à plusieurs réponses (deux écritures justes, les valeurs des pièges) et `open` (5 points). x cos(x/2) (2016, produit en somme) n'est pas fait.
 - **Intro** : F_s f est la série de Fourier du prolongement **impair** de f, 2L-périodique : bₙ = (2/L)∫₀^L f(x) sin(nπx/L) dx. F_c f, celle du prolongement **pair**. On intègre sur [0 ; L] seulement. Exemple : `math: f(x) = x(π − x) sur [0 ; π]` ; `math: bₙ = (2/π)∫₀^π x(π − x) sin(nx) dx = 4(1 − (−1)ⁿ)/(πn³)`, `note: 8/(πn³) si n impair, 0 si n pair`.
 - **Juge** : `equiv` `{vars:['n'], domain:{n:{int:[1,40]}}}` · **Forme finale** : bₙ (ou aₙ) explicite, cas pair et impair séparés.
 - **Niveaux** :
@@ -1289,6 +1292,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-dirichlet` — Dirichlet : valeur aux sauts, puis une somme numérique
 - **Année** 16 · **Prérequis** `f-coef`, `a1-fn-onesided`, `g5-reindex` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `a1-fn-onesided` : f(x + 0) et f(x − 0).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Scénarios : x² en π et en 0, |x| en 0, −x/π (exemple du catalogue) en 0 (Σ 1/(2k − 1)², ou Σ 1/(k − ½)² au niveau 5), la rampe en π, x et la marche en π/2 (Σ (−1)ᵏ/(2k + 1)), et des sauts sans somme (marche en 0, x en π, série en sinus de c en π). F(x₀) par `value` (`f_dirichlet_skip`, `f_sine_endpoint`), le terme en x₀ pour n = 2k ± 1 par `equiv` en k (décision « k ≥ ? » avec `f_sum_reindex`), S par `value`. La continuité est une décision. L'équation de Dirichlet en S est donnée dans l'énoncé de la dernière partie (la ligne « F(x₀) = a₀/2 + Σ … » n'est pas écrite par l'élève). Niveau 5 : série en sinus de c, F_s f(π), puis π/2. Variantes `mcq` à plusieurs réponses (le catalogue dit « une réponse » : le format F est multiple) et `open` (4 points).
 - **Intro** : si f est C¹ par morceaux, F f(x) = (f(x + 0) + f(x − 0))/2 partout. On compare donc F f et f point par point (sauts, bords de [0 ; L] pour F_s : le prolongement impair vaut 0 en 0 et en L). Pour une somme numérique, on choisit un x où les cos ou sin deviennent ±1 ou 0, on écrit Dirichlet, on isole la somme. Exemple (2021) : `math: F f(0) = (π + 0)/2 = π/2`, `note: f saute en 0 : on ne prend pas f(0)` ; `math: π/2 = 3π/4 − (2/π) Σ_{n impair} 1/n²`, `note: donc Σ 1/(2k − 1)² = π²/8`.
 - **Juge** : `value` pour F f(x₀) (exact) ; `equiv` pour la ligne qui isole la somme ; `value` pour la somme · **Forme finale** : comparaison écrite (F f = f sur … ; en … F f vaut …), puis la somme exacte.
 - **Niveaux** :
@@ -1311,6 +1315,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-parseval` — Parseval et sommes
 - **Année** 16 · **Prérequis** `f-coef` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `f-coef` : les aₙ et bₙ à substituer.
+- **Statut** : fait le 10 novembre 2026 (étape U10). x → Σ 1/n², x² → Σ 1/n⁴, |x| → Σ 1/(2k + 1)⁴, la marche → Σ 1/(2k + 1)² (f multipliée par c ∈ {1, 2, 3}) ; niveau 5 : x³ → Σ 1/n⁶ (2022). Le membre de gauche G est écrit par l'élève (juge `definite`, valeur de G connue ; `f_parseval_factor`, `_bounds`, `_square`), a₀²/2 (`value`, `f_parseval_a0`), le carré du coefficient (`equiv` en n ou k ; `f_parseval_expand` pour x³), les sommes données substituées (`equiv` en S), puis S (`value`). Niveau 3 : décision « Parseval ou Dirichlet ». Variantes `mcq` à plusieurs réponses et `open` (5 points). Les séries Σ cos(2πnx)/qⁿ (série de révision) ne sont pas faites.
 - **Intro** : (2/T) ∫₀^T f² dx = a₀²/2 + Σ (aₙ² + bₙ²), avec les **bornes de la période où f est définie** (]−π ; π[, pas [0 ; 2π] si f est donnée sur ]−π ; π[), le **carré** de f, et le facteur 2/T. Exemple : f(x) = x sur ]−π ; π[, bₙ = 2(−1)ⁿ⁺¹/n ; `math: (1/π)∫_{−π}^{π} x² dx = 2π²/3 = Σ 4/n²`, `note: donc Σ 1/n² = π²/6`.
 - **Juge** : `definite` pour le membre intégral ; `equiv` pour le membre série (développement de bₙ²) ; `value` pour la somme · **Forme finale** : somme exacte.
 - **Niveaux** :
@@ -1332,6 +1337,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-coef-relations` — Relations entre coefficients ; dérivation terme à terme
 - **Année** 16 · **Prérequis** `f-coef` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U10). Paires f = x → g = m·x², x³ → m·x⁴ (2022), 2x sur [−1 ; 1[ → m·x² (test blanc 2017), m ∈ {1/4, 1/2, 1, 2, 4}. La relation et ses hypothèses sont une décision (« tout recalculer » est juste mais `poor`) ; aₙ(h) puis aₙ(g) par le juge `prob` (valeur attendue en n, domaine entier ; `f_coef_relation_factor`), a₀ par `definite`. La question réciproque (niveaux 3 et 5) est une décision « dériver terme à terme ? » (`f_termwise_deriv`). Variantes `mcq` à plusieurs réponses et `open` (4 points).
 - **Intro** : si h est continue, 2π-périodique, C¹ par morceaux, et h′ = f, alors (IPP) aₙ(f) = n bₙ(h) et bₙ(f) = −n aₙ(h), donc aₙ(h) = −bₙ(f)/n et bₙ(h) = aₙ(f)/n ; a₀(h) se calcule à part. On ne dérive terme à terme que la série d'une fonction **continue** périodique. Exemple : `math: x a bₙ = 2(−1)ⁿ⁺¹/n ; h = x²/2 a h′ = x` ; `math: aₙ(x²/2) = −bₙ(x)/n = 2(−1)ⁿ/n²`, `note: donc aₙ(x²) = 4(−1)ⁿ/n²`.
 - **Juge** : `equiv` en n (domaine entier) ; décision « dérivation terme à terme permise ? » · **Forme finale** : coefficients de la nouvelle fonction, a₀ compris.
 - **Niveaux** :
@@ -1353,6 +1359,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 
 ### `f-series-problem` — Problème : série en sinus, Dirichlet, somme numérique
 - **Année** 16 · **Prérequis** `f-sine-cosine`, `f-dirichlet` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U10). Exemple F1 du catalogue : f ∈ {c·x(π − x), c(2πx − x²), triangle}, c ∈ {1, 2, 3}. Niveaux 1 à 3 : une des trois parties ; niveau 4 : le problème entier en un item avec aides ; niveau 5 et `open` : `problem` de 9 points (a : 3 + 1, ou 4 sans séparation pair / impair ; b : 2 ; c : 2 + 1). La comparaison (b) est une décision suivie de F_s f(π) par `value` ; en (c), l'équation de Dirichlet en π/2 est donnée et la somme Σ (−1)ᵏ/(2k + 1) = π/4 est fournie pour 2πx − x². x cos(x/2) (2016) n'est pas fait.
 - **Intro** : le problème d'examen le plus fréquent en MT : (a) F_s f ; (b) comparer F_s f et f sur [0 ; π] (Dirichlet, bords compris) ; (c) en déduire une somme numérique.
 - **Juge** : `problem` ; parties jugées comme dans `f-sine-cosine` et `f-dirichlet` · **Forme finale** : les trois réponses.
 - **Niveaux** :
@@ -1459,6 +1466,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-periodic-ode` — EDO périodique par séries de Fourier
 - **Année** 16 · **Prérequis** `f-coef-complex` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-coef-complex` : u = Σ cₙe^(int).
+- **Statut** : fait le 10 novembre 2026 (étape U10). Opérateurs u′ + au, u″ + ku (k ≠ m²) et u′(t) + b·u(t − π) (fréquence impaire, pour que `f_ode_shift_phase` change la valeur), second membre c₀ + A cos(mt) + B sin(mt). Parties `fcomplex` : cₘ(f), cₘ(u) = cₘ(f)/P(m), c₀(u), puis u assemblée (forme finale réelle, sans i) ; le facteur de u′, u″ ou du retard est une décision, la forme réelle ou complexe une décision du niveau 3. La solution est jugée contre c₀ + cₘe^(imt) + c₋ₘe^(−imt), pas par le juge `ode` (qui ne lit pas le retard). Niveau 5 : comme le niveau 4, sans aide ; « f quelconque » (forme générale) n'est pas demandé. Variante `open` (4 points).
 - **Intro** : on cherche u périodique sous la forme Σ cₙ e^(int) ; u′ a pour coefficients in cₙ, u(t − τ) a pour coefficients e^(−inτ) cₙ ; on égale coefficient par coefficient avec ceux du second membre. Exemple : `math: u′ + u = sin t` ; `math: (i + 1) c₁ = 1/(2i)`, `note: n = ±1 seulement` ; `math: u = (sin t − cos t)/2`.
 - **Juge** : `complex` pour chaque cₙ ; `ode` `{eq, unknown:'u', v:'t'}` pour la solution (vérifie l'équation) · **Forme finale** : u(t) réelle explicite.
 - **Niveaux** :
@@ -1480,6 +1488,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 ### `f-sturm-liouville` — Problème de Sturm-Liouville (GM)
 - **Année** 16 · **Prérequis** `f-sine-cosine`, `a2-ode-const2` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `f-sine-cosine` : les solutions sin(nπx/L) donnent une série en sinus ; `a2-ode-const2` : −u″ = λu : équation caractéristique selon le signe de λ.
+- **Statut** : fait le 10 novembre 2026 (étape U10). Conditions (D, D), (D, N), (N, D), (N, N) sur [0 ; π] (et [0 ; L], L ∈ {1, 2}, au niveau 4). Les cas λ < 0, λ = 0 (`f_sl_eigen_zero`), λ = k² > 0, la condition au bord et « n ≥ ? » sont des décisions (des notes au niveau 1) ; λₙ par `prob` (valeur attendue en n) ; uₙ par le juge `eigen` (nouveau : −u″ = λₙu et les deux conditions pour six valeurs de n, tout multiple non nul). La solution générale A cos kx + B sin kx est choisie, pas écrite. Niveau 5 (Dirichlet en 0) : −u″ = f sur les fonctions propres, par `ode` avec u(0) et u′(0). Variante `open` (5 ou 6 points).
 - **Intro** : −u″ = λu sur ]0 ; L[ avec des conditions aux bords : on cherche les λ pour lesquels il existe u ≠ 0. On traite λ < 0, λ = 0, λ > 0 ; seul λ > 0 donne des solutions pour Dirichlet. Exemple : `math: −u″ = λu, u(0) = 0, u′(π) = 0` ; `math: λₙ = (n + ½)², uₙ = sin((n + ½)x), n ≥ 0`.
 - **Juge** : `ode` pour chaque uₙ (vérifie l'équation et les conditions) ; `equiv` en n (domaine entier) pour λₙ · **Forme finale** : λₙ et uₙ, avec les cas λ ≤ 0 écartés.
 - **Niveaux** :
@@ -1795,7 +1804,7 @@ FP1 linéarité ; FP2 f paire ⟹ f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) d
 |---|---|---|---|---|---|---|---|
 | `f_even_an_zero` | rule | C | `f-coef` | `g1-parity-period` | f paire ⟹ aₙ = 0 → bₙ = 0 | Annuler les aₙ au lieu des bₙ (ou l'inverse pour f impaire). | « f paire : f(x) sin(nx) est impaire, son intégrale est nulle : ce sont les **bₙ** qui valent 0. » (Corrigé 2022.) |
 | `f_a0_separate` | calculus | C | `f-coef` | `f-coef` | a₀ = formule aₙ en n = 0 ; a₂ de cos 2x oublié → a₀ et a₂ à part | Remplacer n par 0 dans la formule générale (division par 0 ou valeur fausse) ; oublier l'apport du polynôme trigonométrique à a₂. | « La formule de aₙ a été obtenue pour n ≥ 1 : a₀ se calcule à part. Le terme cos 2x ajoute {c} à a₂. » (Corrigé 2022.) |
-| `f_interval_02pi` | notation | C | `f-coef` | `f-coef` | |x| sur [0 ; 2π] → |x| sur [−π ; π] | Intégrer la formule de f sur [0 ; 2π] au lieu de la période donnée. | « f = |x| est donnée sur [−π ; π] puis prolongée : sur [π ; 2π], f(x) = 2π − x, pas x. » (Corrigé 2022.) |
+| `f_interval_02pi` | notation | C | `f-coef` | `f-coef` | \|x\| sur [0 ; 2π] → \|x\| sur [−π ; π] | Intégrer la formule de f sur [0 ; 2π] au lieu de la période donnée. | « f = \|x\| est donnée sur [−π ; π] puis prolongée : sur [π ; 2π], f(x) = 2π − x, pas x. » (Corrigé 2022.) |
 | `f_period_omega` | notation | E | `f-coef` | `f-coef` | période 2 : cos(nx) → cos(nπx) | Garder cos(nx) quand T ≠ 2π. | « Avec T = {T}, ω = 2π/T = {omega} : les modes sont cos(nωx). » |
 | `f_coef_complex_convert` | rule | E | `f-coef-complex` | `f-coef-complex` | bₙ = cₙ − c₋ₙ → bₙ = i(cₙ − c₋ₙ) | Oublier le facteur i ou l'échanger avec aₙ. | « cₙ = (aₙ − ibₙ)/2 donne bₙ = i(cₙ − c₋ₙ). » |
 | `f_sine_wrong_factor` | calculus | E | `f-sine-cosine` | `f-sine-cosine` | bₙ = (1/π)∫₀^π → (2/π)∫₀^π | Facteur 1/L au lieu de 2/L. | « Sur [0 ; L], le prolongement impair double l'intégrale : bₙ = (2/L)∫₀^L. » |

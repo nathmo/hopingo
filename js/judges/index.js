@@ -94,3 +94,5 @@ import { cvalue, cfamily } from './cplx-ca.js'; // step U10, module C part a: co
 Object.assign(JUDGES, { cvalue, cfamily });
 import { cval, arcb, laur } from './cplx-cb.js'; // step U10, part cb: labelled complex values, bounds on an arc, Laurent series in 1/z
 Object.assign(JUDGES, { cval, arcb, laur });
+import { FA_JUDGES } from './fourier-a-judges.js'; // step U10, part fa: fcomplex, eigen
+Object.assign(JUDGES, FA_JUDGES);
