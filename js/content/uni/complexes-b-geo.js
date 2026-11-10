@@ -13,7 +13,7 @@ import { parse } from '../../cas/parse.js';
 import { sameLine } from '../../judges/common.js';
 import { linesItem, mcq, examTag } from './kit.js';
 import {
-  q, N, modeOf, H, E, fr, ct, cp, cd, cm, mt, cq, CQ, gauss, blanked, partsScript, decision, uniq, vfMcq, piText, surd, argPi,
+  q, N, modeOf, H, E, fr, ct, cp, cd, cm, coefText, cw, rd, mt, cq, CQ, gauss, blanked, partsScript, decision, uniq, vfMcq, piText, surd, argPi,
 } from './complexes-b-kit.js';
 
 const KEYS = ['calc', 'cplx', 'greek'];
@@ -160,7 +160,8 @@ function equilateralItem(level, rng, opts) {
   // is one term (a + bi with a, b in ℚ(√3)).
   const k = 2 * rng.pick([-2, -1, 1, 2]);
   const vert = rng.chance(0.3);
-  const a = vert ? cq(0, rng.int(-3, 3)) : gauss(rng, -3, 3);
+  let a = vert ? cq(0, rng.int(-3, 3)) : gauss(rng, -3, 3);
+  if (a.isZero()) a = vert ? cq(0, 1) : cq(1, 1);
   const u = vert ? cq(0, k) : cq(k);
   const d = { a, u, b: a.add(u) };
   const [u1, u2] = [d.u.re.n, d.u.im.n];
@@ -171,7 +172,7 @@ function equilateralItem(level, rng, opts) {
   const lines = [
     E(`${cp(d.a)}+e^(iπ/3)×${cp(d.u)}`, 'b − a', 'diff', 'diff'),
     E(`${cp(d.a)}+(1/2+i√3/2)×${cp(d.u)}`, 'e^(iπ/3) = 1/2 + i√3/2', 'arg', 'polar'),
-    E(`${cp(d.a)}+${cp(ue)}+${cp(ue)}i√3`, 'Développer', 'quot', 'calc'),
+    E(`${cp(d.a)}+${cp(ue)}${ue.isReal() ? (ue.re.n > 0 ? '+' : '') + coefText(ue, 'i√3') : `${ue.im.n > 0 ? '-' : '+'}${coefText(cq(Math.abs(ue.im.n)), '√3')}`}`, 'Développer', 'quot', 'calc'),
     E(final, 'Regrouper : c = x + iy', 'quot', 'calc'),
   ];
   if (level >= 4) lines.splice(0, 1);
@@ -227,6 +228,7 @@ const RA_TF = [
 
 export function genRatio(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return ratioMcq(rng, opts);
+  if (opts.exam === 'open') return { ...(rng.chance(0.6) ? ratioItem(4, rng, {}) : equilateralItem(4, rng, {})), exam: { format: 'open', points: 4 } };
   if (opts.exam === 'tf') {
     const k = rng.int(0, RA_TF.length - 1);
     return vfMcq(RA, RA_TF[k].s, RA_TF[k].t, rng, { key: String(k), why: RA_TF[k].why, ruleIfTrue: RA_TF[k].rule || null });
@@ -286,14 +288,14 @@ function natureDecision(d) {
     { id: 'homothétie', label: 'une homothétie (a réel)' },
     { id: 'similitude', label: 'une similitude (|a| ≠ 1, a non réel)' },
     { id: 'translation', label: 'une translation' },
-  ].map((o) => ({ ...o, valid: o.id === nat, why: o.id === 'translation' ? 'a ≠ 1 : ce n\'est pas une translation.' : `a = ${fr(ct(d.a))} : |a| = ${fr(modT(d.a))}${d.a.isReal() ? ', a réel' : ''}.` }));
-  opts.push({ id: 'origin', label: `une transformation de centre 0`, valid: false, rule: 'g8_rotation_about_origin', why: `b = ${fr(ct(d.b))} ≠ 0 : 0 n'est pas fixe. Le centre est la solution de ω = aω + b.` });
-  return decision(`z ↦ ${mt(mapText(d.a, d.b))} : a = ${cm(d.a)}. C'est…`, opts);
+  ].map((o) => ({ ...o, valid: o.id === nat, why: o.id === 'translation' ? 'a ≠ 1 : ce n\'est pas une translation.' : `a = ${cw(d.a)} : |a| = ${fr(modT(d.a))}${d.a.isReal() ? ', a réel' : ''}.` }));
+  opts.push({ id: 'origin', label: `une transformation de centre 0`, valid: false, rule: 'g8_rotation_about_origin', why: `b = ${cw(d.b)} ≠ 0 : 0 n'est pas fixe. Le centre est la solution de ω = aω + b.` });
+  return decision(`z ↦ ${rd(mapText(d.a, d.b))} : a = ${cw(d.a)}. C'est…`, opts);
 }
 
 function fixedPart(d, level) {
   const one = cq(1).sub(d.a);
-  const lines = [E(`${cp(one)}ω=${ct(d.b)}`, 'Regrouper les ω : (1 − a)ω = b', 'fixed', 'fixed')];
+  const lines = [E(`${coefText(one, 'ω')}=${ct(d.b)}`, 'Regrouper les ω : (1 − a)ω = b', 'fixed', 'fixed')];
   if (level <= 2) lines.push(E(`ω=(${ct(d.b)})/${cd(one)}`, 'Diviser', 'fixed', 'solve'));
   lines.push(E(`ω=${ct(d.w)}`, 'Calculer', 'fixed', 'solve'));
   if (level === 1) lines[0] = blanked(lines[0], [ct(one)]);
@@ -312,7 +314,7 @@ function elementsItem(level, rng, opts) {
     skill: TR, level, mode: modeOf(level), start, judge, script,
     prompt: `Trouve le centre ω, le rapport et l'angle de la transformation z ↦ ${mt(mapText(d.a, d.b))}.`,
     hints: H('Le centre est le point fixe : résous ω = aω + b. Le rapport est |a|, l\'angle arg a.',
-      `${mt(`${cp(cq(1).sub(d.a))}ω=${ct(d.b)}`)}, donc ω = □.`,
+      `${mt(`${coefText(cq(1).sub(d.a), 'ω')}=${ct(d.b)}`)}, donc ω = □.`,
       `ω = ${cm(d.w)}, rapport ${fr(modT(d.a))}, angle ${fr(argT(d.a))} : ${natureOf(d.a)}.`),
     subgoals: TR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['ω'], complex: true }, baits: level >= 2 && level <= 4 ? ['g8_rotation_about_origin'] : [],
@@ -385,7 +387,7 @@ function composeItem(level, rng, opts) {
     skill: TR, level, mode: modeOf(level), start, judge, script,
     prompt: `f₁(z) = ${mt(mapText(d.a1, d.b1))} et f₂(z) = ${mt(mapText(d.a2, d.b2))}. Écris f₂ ∘ f₁ sous la forme z ↦ az + b, puis trouve son centre ω.`,
     hints: H('f₂(f₁(z)) = a₂(a₁z + b₁) + b₂ : a = a₂a₁ et b = a₂b₁ + b₂. Le centre résout ω = aω + b.',
-      `a = ${cm(d.a)}, b = ${cm(d.b)} ; ${mt(`${cp(cq(1).sub(d.a))}ω=${ct(d.b)}`)}.`,
+      `a = ${cm(d.a)}, b = ${cm(d.b)} ; ${mt(`${coefText(cq(1).sub(d.a), 'ω')}=${ct(d.b)}`)}.`,
       `f₂ ∘ f₁ : z ↦ ${mt(mapText(d.a, d.b))}, centre ω = ${cm(d.w)}.`),
     subgoals: TR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['ω'], complex: true }, baits: level <= 4 ? ['g8_rotation_about_origin'] : [],
@@ -433,6 +435,7 @@ const TR_TF = [
 
 export function genTransform(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return trMcq(rng, opts);
+  if (opts.exam === 'open') return { ...(rng.chance(0.5) ? elementsItem(4, rng, {}) : composeItem(4, rng, {})), exam: { format: 'open', points: 4 } };
   if (opts.exam === 'tf') {
     const k = rng.int(0, TR_TF.length - 1);
     return vfMcq(TR, TR_TF[k].s, TR_TF[k].t, rng, { key: String(k), why: TR_TF[k].why, ruleIfTrue: TR_TF[k].rule || null });

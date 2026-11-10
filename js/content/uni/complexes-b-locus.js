@@ -18,7 +18,7 @@ import { Q } from '../../math/rational.js';
 import { isFinal as locusFinal, parseLine as locusRead } from '../../judges/locus.js';
 import { MT, linesItem, mcq, examTag } from './kit.js';
 import {
-  q, N, nz, modeOf, H, E, CX, fr, ct, cp, cm, mt, cq, xMinus, ptText, blanked, partsScript, decision, uniq, vfMcq,
+  q, N, nz, modeOf, H, E, fr, ct, cp, cm, mt, cq, xMinus, ptText, blanked, partsScript, decision, uniq, vfMcq, rd, coefText, surd,
 } from './complexes-b-kit.js';
 
 const KEYS = ['calc', 'cplx', 'ineq', 'relation'];
@@ -52,7 +52,7 @@ function lineText(a, b, c, op = '=') {
   return `${lin([a / g, b / g, c / g])}${op}0`;
 }
 const signed = (s) => (s === '0' ? '' : s.startsWith('-') ? s : `+${s}`);
-const absT = (n) => (Number.isInteger(Math.sqrt(n)) ? String(Math.sqrt(n)) : `√${n}`);
+const absT = (n) => surd(n);
 const dist = (v, a) => `|${xMinus(v, a)}|`;
 const flipOp = (op) => ({ '<': '>', '≤': '≥', '>': '<', '≥': '≤', '=': '=' }[op]);
 const locusCfg = (locus, target, extra = {}) => ({ kind: 'poly', mode: 'locus', cv: 'z', xy: ['x', 'y'], vars: ['z', 'x', 'y'], complex: true, locus, target, ...extra });
@@ -124,9 +124,9 @@ function bisectorItem(level, rng, opts, region) {
   const pre = [];
   if (level <= 3) {
     const bb = d.b.neg();
-    pre.push(decision(`Que décrit ${mt(`${dist('z', d.a)}=${dist('z', d.b)}`)} ?`, [
+    pre.push(decision(`Que décrit ${rd(`${dist('z', d.a)}=${dist('z', d.b)}`)} ?`, [
       { id: 'med', label: `La médiatrice de [AB], avec ${A} et ${B}`, valid: true },
-      ...(d.b.isZero() ? [] : [{ id: 'flip', label: `La médiatrice de [AB′], avec ${A} et B′${ptText(bb)}`, valid: false, rule: 'g8_locus_sign', why: `${fr(dist('z', d.b))} est la distance au point ${ptText(d.b)}.` }]),
+      ...(d.b.isZero() ? [] : [{ id: 'flip', label: `La médiatrice de [AB′], avec ${A} et B′${ptText(bb)}`, valid: false, rule: 'g8_locus_sign', why: `${rd(dist('z', d.b))} est la distance au point ${ptText(d.b)}.` }]),
       { id: 'circle', label: 'Le cercle de centre A passant par B', valid: false, why: 'Les deux côtés sont des distances à deux points différents : on cherche les points à égale distance de A et de B.' },
       { id: 'ab', label: 'La droite (AB)', valid: false, why: 'Seul le milieu de [AB] est sur (AB) à égale distance de A et B.' },
     ]));
@@ -136,7 +136,7 @@ function bisectorItem(level, rng, opts, region) {
   return linesItem({
     skill: LO, level, mode: modeOf(level), start: s0, judge, script,
     prompt: `Pose z = x + iy et trouve ${region ? 'l\'inéquation' : 'l\'équation'} en x et y du lieu des points z tels que ${mt(start)}.`,
-    hints: H(`${fr(dist('z', d.a))} est la distance de z au point ${A}. Élève au carré : |z − a|² = (x − a₁)² + (y − a₂)².`,
+    hints: H(`${mt(dist('z', d.a))} est la distance de z au point ${A}. Élève au carré : |z − a|² = (x − a₁)² + (y − a₂)².`,
       `${mxy(`${sqA}${op0}${sqB}`)}, puis développe : x² et y² disparaissent.`,
       `${mxy(final)}.${side}`),
     subgoals: LO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -177,14 +177,14 @@ function apolloItem(level, rng, opts) {
   const lines = [
     E(`${sqA}=${K}(${sqB})`, 'Module au carré', 'square', 'square'),
     E(`x^2+y^2${signed(lin([-2 * a1, -2 * a2, a1 * a1 + a2 * a2]))}=${K}x^2+${K}y^2${signed(lin([-2 * K * b1, -2 * K * b2, K * (b1 * b1 + b2 * b2)]))}`, 'Développer', 'expand', 'expand'),
-    E(gathered, 'Tout passer à droite', 'expand', 'gather'),
+    E(gathered, 'Tout regrouper d\'un côté', 'expand', 'gather'),
     E(divided, `Diviser par ${d.m}`, 'circle', 'divide'),
     E(final, 'Compléter les carrés', 'circle', 'circle'),
   ];
-  if (level >= 4) lines.splice(1, 2);
+  if (level >= 4) { lines.splice(1, 2); lines[1] = { ...lines[1], note: `Développer, tout regrouper d'un côté, diviser par ${d.m}` }; }
   if (level === 1) lines[4] = blanked(lines[4], [N(d.r2)], XYV);
   if (level === 2) lines[3] = blanked(lines[3], [String(d.m)], XYV);
-  const pre = level <= 3 ? [decision(`Que décrit ${mt(start)} (k = ${d.k}) ?`, [
+  const pre = level <= 3 ? [decision(`Que décrit ${rd(start)} (k = ${d.k}) ?`, [
     { id: 'circle', label: 'Un cercle : k ≠ 1 (cercle d\'Apollonius)', valid: true },
     { id: 'med', label: 'La médiatrice de [AB]', valid: false, why: `Avec le facteur ${d.k}, les distances ne sont pas égales : ce n'est une médiatrice que pour k = 1.` },
     { id: 'line', label: 'Une droite', valid: false, why: `Les termes en x² ne se simplifient pas (1 ≠ ${K}) : c'est un cercle.` },
@@ -220,15 +220,16 @@ function diskData(rng) {
 function diskItem(level, rng, opts) {
   const d = diskData(rng);
   const mTerm = (fn) => (d.m === 0 ? '' : `${d.m === 1 ? '' : d.m === -1 ? '-' : d.m}${fn}(z)`);
+  const P = d.p === 1 ? '' : d.p;
   const start = d.im
-    ? `z(conj(z)+${d.p}i)${d.op}${mTerm('Im')}${d.m === 0 ? '' : '+'}${d.p}i×conj(z)+${d.c}`.replace('+-', '-')
-    : `z(conj(z)-${d.p})${d.op}${mTerm('Re')}${d.m === 0 ? '' : '+'}${d.p}conj(z)+${d.c}`.replace('+-', '-');
+    ? `z(conj(z)+${P}i)${d.op}${mTerm('Im')}${d.m === 0 ? '' : '+'}${P}i×conj(z)+${d.c}`.replace('+-', '-')
+    : `z(conj(z)-${d.p})${d.op}${mTerm('Re')}${d.m === 0 ? '' : '+'}${P}conj(z)+${d.c}`.replace('+-', '-');
   const k = 2 * d.p + d.m;
   const center = d.im ? [0, d.h] : [d.h, 0];
   const mv = d.m === 0 ? '' : `${lin(d.im ? [0, d.m, 0] : [d.m, 0, 0])}+`;
   const line1 = d.im
-    ? `x^2+y^2+${d.p}i(x+iy)${d.op}${mv}${d.p}i(x-iy)+${d.c}`
-    : `x^2+y^2-${d.p}(x+iy)${d.op}${mv}${d.p}(x-iy)+${d.c}`;
+    ? `x^2+y^2+${P}i(x+iy)${d.op}${mv}${P}i(x-iy)+${d.c}`
+    : `x^2+y^2-${P}(x+iy)${d.op}${mv}${P}(x-iy)+${d.c}`;
   const line2 = `x^2+y^2${signed(lin(d.im ? [0, -k, -d.c] : [-k, 0, -d.c]))}${d.op}0`;
   const final = circleText(center, d.R, d.op);
   const lines = [
@@ -239,7 +240,7 @@ function diskItem(level, rng, opts) {
   if (level >= 4) lines.shift();
   if (level === 1) lines[2] = blanked(lines[2], [String(d.R)], XYV);
   if (level === 2) lines[1] = blanked(lines[1], [String(Math.abs(k))], XYV);
-  const where = { '<': 'l\'intérieur du disque, bord exclu', '≤': 'le disque fermé (bord compris)', '>': 'l\'extérieur du disque' }[d.op];
+  const where = { '<': 'l\'intérieur (bord exclu) du disque', '≤': 'le disque fermé (bord compris)', '>': 'l\'extérieur du disque' }[d.op];
   const pre = level <= 3 ? [decision('Avec z = x + iy, que vaut z·z̄ ?', [
     { id: 'mod', label: 'x² + y² = |z|²', valid: true },
     { id: 'diff', label: 'x² − y²', valid: false, why: '(x + iy)(x − iy) = x² − (iy)² = x² + y².' },
@@ -308,6 +309,7 @@ function locusTf(rng) {
 export function genLocus(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return locusMcq(rng, opts);
   if (opts.exam === 'tf') return locusTf(rng);
+  if (opts.exam === 'open') return { ...genLocus(4, rng, profile), exam: { format: 'open', points: 3 } };
   if (level === 1) return rng.chance(0.7) ? bisectorItem(level, rng, opts, false) : apolloItem(level, rng, opts);
   if (level === 5) return rng.chance(0.5) ? diskItem(level, rng, opts) : apolloItem(level, rng, opts);
   return rng.pick([() => bisectorItem(level, rng, opts, false), () => apolloItem(level, rng, opts), () => diskItem(level, rng, opts), () => bisectorItem(level, rng, opts, true)])();
@@ -350,7 +352,6 @@ function lineData(rng, { asym = false } = {}) {
   }
   return null;
 }
-const cText = (c) => (c.d === 1 ? N(c) : `(${N(c)})`);
 
 function lineItem(level, rng, opts) {
   const d = lineData(rng, { asym: level <= 3 });
@@ -360,7 +361,7 @@ function lineItem(level, rng, opts) {
   const start = d.kind === 'Re' ? `Re(${Z})=${N(d.c)}` : d.kind === 'Im' ? `Im(${Z})=${N(d.c)}` : `${term(d.a, 'Re')}${d.b.n > 0 ? '+' : ''}${term(d.b, 'Im')}=${N(d.c)}`;
   const num = lin([d.a, d.b, 0]);
   const line1 = `${d.kind === 'gen' ? `(${num})` : num}/(x^2+y^2)=${N(d.c)}`;
-  const line2 = `${num}=${cText(d.c)}(x^2+y^2)`;
+  const line2 = `${num}=${coefText(d.c, '(x^2+y^2)').replace(/^\((x\^2\+y\^2)\)$/, '$1')}`;
   const final = circleText(d.center, d.r2);
   const lines = [
     E(line1, d.kind === 'Re' ? 'Re z = Re(w)/|w|²' : d.kind === 'Im' ? 'Im z = Im(w)/|w|²' : 'Re z = x/|w|², Im z = y/|w|²', 'replace', 'replace'),
@@ -401,14 +402,14 @@ function circleItem(level, rng, opts) {
   const Z = '1/conj(w)';
   const startZ = `${dist('z', c)}=${absT(n)}`;
   const start = `|${Z}-${cp(c)}|=${absT(n)}`;
-  const line1 = `|1-${cp(c)}conj(w)|=${absT(n)}×|w|`;
+  const line1 = `|1-${coefText(c, 'conj(w)', '×')}|=${n === 1 ? '' : `${absT(n)}×`}|w|`;
   const re = lin([-c1, -c2, 1]);
   const im = lin([c2, -c1, 0]);
   const line2 = `(${re})^2+(${im})^2=${n === 1 ? '' : n}(x^2+y^2)`;
   const final = `${lin([2 * c1, 2 * c2, 0])}=1`;
   const lines = [
     E(line1, 'Multiplier par |w̄| = |w|', 'clear', 'clear'),
-    E(line2, `1 − c·w̄ = (${fr(re)}) − i(${fr(lin([c2, -c1, 0]))}) ; module au carré`, 'replace', 'square'),
+    E(line2, `1 − c·w̄ = (${rd(re)}) − i(${rd(lin([c2, -c1, 0]))}) ; module au carré`, 'replace', 'square'),
     E(final, 'Développer : x² et y² disparaissent', 'clear', 'line'),
   ];
   if (level >= 4) lines.splice(1, 1);
@@ -474,12 +475,13 @@ function inversionMcq(rng, opts) {
   return mcq({
     skill: IN, level: 4, prompt: `Quelle est l'image de la droite ${mt(startZ)} par w = 1/z̄ (w = x + iy, privée de 0) ?`, options,
     key: `${IN}:mcq:${startZ}`, exam: examTag(opts),
-    solution: [{ html: `z = 1/w̄ = w/|w|², donc ${mxy(`${lin([d.a, d.b, 0])}=${cText(d.c)}(x^2+y^2)`)} : ${mxy(circleText(d.center, d.r2))}.`, note: '' }],
+    solution: [{ html: `z = 1/w̄ = w/|w|², donc ${mxy(`${lin([d.a, d.b, 0])}=${coefText(d.c, '(x^2+y^2)')}`)} : ${mxy(circleText(d.center, d.r2))}.`, note: '' }],
   }, rng);
 }
 
 export function genInversion(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return inversionMcq(rng, opts);
+  if (opts.exam === 'open') return { ...(rng.chance(0.5) ? lineItem(4, rng, {}) : circleItem(4, rng, {})), exam: { format: 'open', points: 4 } };
   if (level === 5) return circleItem(level, rng, opts);
   if (level <= 3 && rng.chance(0.2)) return pointItem(level, rng, opts);
   return rng.chance(0.65) ? lineItem(level, rng, opts) : circleItem(level, rng, opts);

@@ -12,7 +12,7 @@
 import { MT, linesItem, mcq, examTag } from './kit.js';
 import { problemItem } from './kit-problem.js';
 import {
-  CQ, cq, N, nz, modeOf, H, E, CX, fr, ct, cm, mt, xMinus, cpolyText, qpolyText, blanked, partsScript, decision, uniq, vfMcq,
+  CQ, cq, N, nz, modeOf, H, E, CX, fr, ct, cm, mt, cw, xMinus, cpolyText, qpolyText, blanked, partsScript, decision, uniq, vfMcq,
 } from './complexes-b-kit.js';
 
 const ID = 'g8-poly';
@@ -90,9 +90,9 @@ function distributed(d) {
 const condWords = (d) => (d.rem ? `le reste de sa division par ${MT(xMinus('x', d.x0))} vaut ${fr(d.val)}` : `${MT(`P(${d.x0})`)} = ${fr(d.val)}`);
 
 function conjDecision(d) {
-  return decision(`P est à coefficients réels et ${cm(d.w)} est racine. Que peut-on dire de ${cm(d.wb)} ?`, [
-    { id: 'yes', label: `${fr(ct(d.wb))} est aussi racine : P est réel`, valid: true },
-    { id: 'no', label: 'Rien : il faut le calculer', valid: false, rule: 'g0_conj_missing', why: `P est réel : P(w̄) est le conjugué de P(w) = 0, donc ${fr(ct(d.wb))} est racine.` },
+  return decision(`P est à coefficients réels et ${cw(d.w)} est racine. Que peut-on dire de ${cw(d.wb)} ?`, [
+    { id: 'yes', label: `${cw(d.wb)} est aussi racine : P est réel`, valid: true },
+    { id: 'no', label: 'Rien : il faut le calculer', valid: false, rule: 'g0_conj_missing', why: `P est réel : P(w̄) est le conjugué de P(w) = 0, donc ${cw(d.wb)} est racine.` },
     { id: 'monic', label: 'Seulement si P est unitaire', valid: false, why: 'Le coefficient dominant ne joue aucun rôle : il suffit que les coefficients soient réels.' },
   ]);
 }
@@ -100,7 +100,7 @@ function conjDecision(d) {
 // Part « facteur réel ».
 function factorPart(d, level) {
   const two = level <= 3 && d.p !== 0;
-  const lines = two ? [E(shifted(d), '(x − p)² − (qi)² = (x − p)² + q²', 'factor', 'factor'), E(Ftext(d), 'Développer', 'factor', 'expand')] : [E(Ftext(d), 'Facteur réel : x² − (qi)² = x² + q²', 'factor', 'factor')];
+  const lines = two ? [E(shifted(d), '(x − p)² − (qi)² = (x − p)² + q²', 'factor', 'factor'), E(Ftext(d), 'Développer', 'factor', 'expand')] : [E(Ftext(d), 'Facteur réel : (x − Re w)² + (Im w)²', 'factor', 'factor')];
   if (level === 1 && two) lines[0] = blanked(lines[0], [String(d.qq * d.qq)]);
   if (level === 2) lines[lines.length - 1] = blanked(lines[lines.length - 1], [String(d.F[0]), String(Math.abs(2 * d.p))].filter((t) => t !== '0'));
   return {
@@ -113,9 +113,9 @@ function factorPart(d, level) {
 function condPart(d, level) {
   const lines = [E(`${d.Fx0 === 1 ? '' : d.Fx0}(${d.x0}-r)=${d.val}`.replace(/^\((.*)\)=/, '$1='), 'Calculer le facteur en x₀', 'cond', 'cond'), E(`r=${d.r}`, 'Résoudre', 'cond', 'cond')];
   if (level >= 4) lines.shift();
-  if (level <= 2) lines[0] = blanked(lines[0], [String(d.Fx0)].filter((t) => t !== '1'), {});
+  if (level <= 2) lines[0] = blanked(lines[0], [String(d.Fx0)].filter((t) => t !== '1'), {}, true);
   return {
-    html: `Troisième facteur : P(x) = (${fr(Ftext(d))})(x − r). Condition${d.rem ? ' (le reste de la division par x − x₀ est P(x₀))' : ''} :`, ask: 'r =',
+    html: `Troisième facteur : P(x) = (${MT(Ftext(d))})(x − r). Condition${d.rem ? ' (le reste de la division par x − x₀ est P(x₀))' : ''} :`, ask: 'r =',
     start: `(${factorAt(d)})(${d.x0}-r)=${d.val}`,
     judge: { kind: 'poly', mode: 'identity', v: 'x', params: ['r'], solution: { r: String(d.r) } }, lines,
   };
@@ -161,7 +161,7 @@ function realItem(level, rng, opts, gab) {
     : `P(x) = ${MT(Ptext(d))} est à coefficients réels, et ${cm(d.w)} est une de ses racines. Trouve toutes ses racines dans ℂ.`;
   const hints = gab === 1
     ? H('Pour un polynôme réel, la conjuguée d\'une racine est racine : (x − w)(x − w̄) est un facteur réel de P.',
-      `(${fr(shifted(d))} = ${MT(Ftext(d))}, puis P(${d.x0}) = ${fr(d.Fx0)}·(${d.x0} − r) = ${fr(d.val)}.`,
+      `${MT(shifted(d))} = ${MT(Ftext(d))}, puis P(${fr(d.x0)}) = ${fr(d.Fx0)}·(${fr(d.x0)} − r) = ${fr(d.val)}.`,
       `P(x) = (${MT(Ftext(d))})(${MT(xMinus('x', d.r))}) = ${MT(Ptext(d))}`)
     : H(`P est réel : ${cm(d.wb)} est aussi racine, et (x − w)(x − w̄) divise P.`,
       `(x − w)(x − w̄) = ${MT(Ftext(d))} ; P(x) = (${MT(Ftext(d))})(x − □).`,
@@ -217,9 +217,9 @@ function imagItem(level, rng, opts) {
   ];
   const at = atQ(d.cs, ti.neg());
   if (level <= 4) {
-    parts[0].pre = [decision(`Les coefficients de P ne sont pas tous réels. Si ${cm(ti)} est racine, ${cm(ti.neg())} l'est-elle ?`, [
+    parts[0].pre = [decision(`Les coefficients de P ne sont pas tous réels. Si ${cw(ti)} est racine, ${cw(ti.neg())} l'est-elle ?`, [
       { id: 'no', label: 'Pas forcément : la règle de la conjuguée demande des coefficients réels', valid: true },
-      { id: 'yes', label: 'Oui : la conjuguée d\'une racine est toujours racine', valid: false, rule: 'g8_conj_root_nonreal', why: `Les coefficients ne sont pas réels : P(${fr(ct(ti.neg()))}) = ${fr(ct(at))} ≠ 0.` },
+      { id: 'yes', label: 'Oui : la conjuguée d\'une racine est toujours racine', valid: false, rule: 'g8_conj_root_nonreal', why: `Les coefficients ne sont pas réels : P(${cw(ti.neg())}) = ${cw(at)} ≠ 0.` },
     ])];
   }
   const { start, judge, script } = partsScript(parts, level, CHOICES);
@@ -249,7 +249,7 @@ function mcqItem(rng, opts) {
       opt(`P(x) = ${MT(`(${Ftext(d)})(${xMinus('x', -d.r)})`)}`, false),
     ]);
     return mcq({
-      skill: ID, level: 4, prompt: `P est réel, unitaire, de degré 3, et ses racines sont ${cm(d.w)} et ${fr(d.r)} (et pas d'autre racine réelle). Que vaut P(x) ?`, options,
+      skill: ID, level: 4, prompt: `P est réel, unitaire, de degré 3, et ${cm(d.w)} et ${fr(d.r)} sont des racines de P. Que vaut P(x) ?`, options,
       key: `${ID}:mcq:${Ptext(d)}`, exam: examTag(opts), fallback: !!d.fallback,
       solution: [{ html: `P réel : ${cm(d.wb)} est aussi racine ; (x − w)(x − w̄) = ${MT(Ftext(d))}, donc P(x) = (${MT(Ftext(d))})(${MT(xMinus('x', d.r))}) = ${MT(Ptext(d))}.`, note: '' }],
     }, rng);
@@ -257,7 +257,7 @@ function mcqItem(rng, opts) {
   const d = imagData(rng);
   const ti = cq(0, d.t);
   const P = cpolyText(hi(d.cs), 'z');
-  const set = (xs) => `{${xs.map((x) => fr(ct(x))).join(' ; ')}}`;
+  const set = (xs) => `{${xs.map((x) => cw(x)).join(' ; ')}}`;
   const options = uniq([
     { html: set([ti, cq(d.r1), cq(d.r2)]), correct: true },
     { html: set([ti, ti.neg(), cq(d.r1), cq(d.r2)]), correct: false, rule: 'g8_conj_root_nonreal' },

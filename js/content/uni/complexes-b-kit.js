@@ -5,9 +5,9 @@
 
 import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
-import { toText } from '../../cas/print.js';
+import { toText, toReadable } from '../../cas/print.js';
 import { walk, lit, contains } from '../../cas/ast.js';
-import { CQ } from '../../cas/complex.js';
+import { CQ, cText } from '../../cas/complex.js';
 import { qNode } from '../../cas/polyx.js';
 import { blankLine } from '../../judges/lines.js';
 import { judgeFor, readWith } from '../../judges/index.js';
@@ -41,6 +41,18 @@ export function xMinus(v, w) {
   if (w.isReal()) return w.re.n > 0 ? `${v}-${N(w.re)}` : `${v}+${N(w.re.neg())}`;
   if (w.re.n === 0) return w.im.n > 0 ? `${v}-${ct(w)}` : `${v}+${ct(w.neg())}`;
   return `${v}-(${ct(w)})`;
+}
+// Plain text (decision prompts and options are text, not HTML): 3 − 2i,
+// |z − (2 + i)| = 2·|z + 1|.
+export const cw = (z) => cText(CQ.of(z));
+export const rd = (text) => toReadable(parse(text, { complex: true, vars: ['z', 'w', 'x', 'y', 'ω'] }));
+// c·v as text: v, -v, 3v, 2iv, (1+i)v (sep '×' before a function: 2i×conj(w)).
+export function coefText(c, v, sep = '') {
+  c = CQ.of(c);
+  if (c.eq(1)) return v;
+  if (c.eq(-1)) return `-${v}`;
+  const atom = (c.isReal() && c.re.d === 1) || (c.re.n === 0 && c.im.d === 1);
+  return atom ? `${ct(c)}${sep}${v}` : `(${ct(c)})${v}`;
 }
 // MathML of a complex number or of a text.
 export const cm = (z) => MT(ct(z), CX);
@@ -79,21 +91,21 @@ export const qpolyText = (cs, v) => toText(qNode(cs.map((c) => Q.of(c)), v));
 
 // A line with the sub-expressions written in `texts` left blank (the last
 // occurrence of each: constants come last, exponents first).
-export function tpl(math, texts, opts = CX) {
+export function tpl(math, texts, opts = CX, first = false) {
   const node = parse(math, opts);
   const holes = [];
   for (const t of texts) {
     const want = toText(parse(t, opts));
     let found = null;
     walk(node, (n) => {
-      if (n.t !== 'paren' && !holes.includes(n) && toText(n) === want) found = n;
+      if (n.t !== 'paren' && !holes.includes(n) && toText(n) === want && !(first && found)) found = n;
       return true;
     });
     if (found && !holes.some((h) => contains(h, (x) => x === found) || contains(found, (x) => x === h))) holes.push(found);
   }
   return holes.length ? blankLine(node, holes, opts) : { math };
 }
-export const blanked = (line, texts, opts = CX) => ({ ...line, ...tpl(line.math, texts, opts) });
+export const blanked = (line, texts, opts = CX, first = false) => ({ ...line, ...tpl(line.math, texts, opts, first) });
 
 // A segment: a new part with its own judge.
 export const SEG = (html, ask, start, judge) => ({ kind: 'segment', html, ask, start: { math: start }, judge });
@@ -120,6 +132,7 @@ export function partsScript(parts, level, choices) {
   // numbers) would end its part: it is left out. Above the guided levels, a
   // right but untidy line (stay) is refused, so it is left out too.
   for (const p of parts) {
+    if (p.judge.kind === 'poly' && (p.judge.mode === 'identity' || p.judge.mode === 'div')) continue;
     const eqs = p.lines.filter((l) => l.kind === 'eq');
     const drop = new Set(eqs.slice(0, -1).filter((l) => {
       const f = judgeFor(p.judge).isFinal(p.judge, readWith(p.judge, l.math));
