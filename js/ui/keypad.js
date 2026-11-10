@@ -50,9 +50,11 @@ const KEYSETS = {
   ineq: ['|', '√(', 'm', 'S', '_', 'D', '(', ')', 'left', 'right', 'back'],
   explog: ['e^(', 'ln(', 'log_', 'sinh(', 'cosh(', 'tanh(', 'argsh(', 'argch(', 'argth(', '√(', '(', ')', 'left', 'right', 'back'],
 };
+// Step U3: lines of matrices typed as text (« (1 ; 2) », det, Aᵀ, A⁻¹).
+KEYSETS.mat = ['7', '8', '9', '(', ')', ';', 'back', '4', '5', '6', '+', '-', '×', 'frac', '1', '2', '3', '^', '√', 'λ', '0', ',', '[', ']', '|', 'left', 'right'];
 
 // Tab names of the keypads.
-const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
+const TAB_LABEL = { mat: '[ ]', calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
 
 const LABEL = {
   back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )', 'sum(': 'Σ( , k, , )',

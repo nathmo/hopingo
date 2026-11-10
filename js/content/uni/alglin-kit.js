@@ -290,7 +290,7 @@ export function rowHoles(M, i, bar = null, k = 2) {
 // A lines item of a matrix judge: linesItem with its defaults (baits from
 // the traps on the first line, keys of the grid).
 export function matLines(o) {
-  return linesItem({ keys: ['mat'], ...o });
+  return linesItem({ keys: ['calc', 'greek'], ...o });
 }
 
 // « b₁₃ = ? »: a coefficient (exam variant `coef`, level 5). A lines item

@@ -37,5 +37,7 @@ export function judgeFor(cfg) {
 
 // Reading, showing and writing a line with the judge of cfg.
 export const readWith = (cfg, text) => (judgeFor(cfg).parseLine ? judgeFor(cfg).parseLine(cfg, text) : parse(text, parseOpts(cfg)));
-export const showWith = (cfg, node, opts = {}) => (judgeFor(cfg).show ? judgeFor(cfg).show(cfg, node, opts) : toMathML(unparen(node), { dvar: cfg.dvar, ...opts }));
-export const textWith = (cfg, node) => (judgeFor(cfg).text ? judgeFor(cfg).text(cfg, node) : toText(node, { dvar: cfg.dvar }));
+export const showWith = (cfg, node, opts = {}) => (node?.t === 'mline' ? mat.show(cfg, node, opts) : judgeFor(cfg).show ? judgeFor(cfg).show(cfg, node, opts) : toMathML(unparen(node), { dvar: cfg.dvar, ...opts }));
+export const textWith = (cfg, node) => (node?.t === 'mline' ? mat.text(cfg, node) : judgeFor(cfg).text ? judgeFor(cfg).text(cfg, node) : toText(node, { dvar: cfg.dvar }));
+// (A line of a matrix judge is shown by its own printer, whatever the
+// judge of the part where it is shown: step U3.)

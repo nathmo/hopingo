@@ -10,6 +10,7 @@ import { skimIntroScreen, skimScreen } from './ui/screens/skim.js';
 import { trapsScreen } from './ui/screens/traps.js';
 import { progressScreen } from './ui/screens/progress.js';
 import { settingsScreen } from './ui/screens/settings.js';
+import { examScreen } from './ui/screens/exam.js';
 
 const SCREENS = {
   profiles: profilesScreen,
@@ -21,6 +22,8 @@ const SCREENS = {
   traps: trapsScreen,
   progress: progressScreen,
   settings: settingsScreen,
+  // Step U3: the mock exams.
+  exam: examScreen,
 };
 
 const root = document.getElementById('app');
