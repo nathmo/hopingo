@@ -287,6 +287,7 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
 
 ### `a2-partials` — Dérivées partielles, gradient, jacobienne, dérivées d'ordre 2
 - **Année** 14 · **Prérequis** `g6-deriv-rules` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U6). Jacobiennes dans la grille : juge `mat` avec `vars` pour J_u, puis J_u(a) en nombres (la case symbolique est comparée comme une expression). Niveau 1 : f à deux variables, ∂f/∂x et ∂f/∂y (juge `equiv`, départ `pd(f, x)`), puis ∇f(a) ; niveau 4 : jacobienne avec (1 + x²)^y, ou ∂f/∂x, ∂²f/∂y∂x et ∂²f/∂x∂y (Schwarz) ; niveau 5 : le QCM. V/F avec contre-exemple vérifié : f = x² (propriété `fxxNeqFyy`), K7 pour les dérivées croisées sans C² (piège `a2_schwarz_no_c2`). Le noyau dérive maintenant a^u quand la base ne dépend pas de la variable sans être un nombre ((1 + x²)^y en y).
 - **Intro** : ∂f/∂x : on dérive en x, les autres variables étant des constantes. ∇f est le vecteur des dérivées partielles. Pour u : ℝⁿ → ℝᵐ, J_u a m lignes (une par composante) et n colonnes (une par variable). Schwarz : si f ∈ C², ∂²f/∂x∂y = ∂²f/∂y∂x.
   Exemple : `u(x, y, z) = (x² + yz², y/x)` ; `J_u = [[2x, z², 2yz], [−y/x², 1/x, 0]]` ; en (1, 2, 1) : `[[2, 1, 4], [−2, 1, 0]]` — note « 2 lignes, 3 colonnes ».
 - **Juge** : `equiv` `{vars:['x','y','z'], domain:{x:[0.2,3], y:[-3,3], z:[-3,3]}}` pour chaque dérivée partielle ; `matrix` `{rows:m, cols:n, judge:{kind:'value'}}` pour la jacobienne évaluée. · **Forme finale** : expressions sans ∂, ou matrice de nombres.
@@ -397,6 +398,7 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
 
 ### `a2-tangent-graph` — Plan tangent au graphe
 - **Année** 14 · **Prérequis** `a2-partials`, `g4-plane` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U6). En parties : f(a, b), f_x(a, b), f_y(a, b) (juge `value` ; aux niveaux 1 et 2, les dérivées sont données et seule leur valeur est demandée), puis le plan (juge `geom`, `cfg.tangent` pour `a2_tangent_point_sign`). Niveau 4 : aussi « en quel point le plan tangent est-il horizontal ? » (juge `system`, puis la cote et le plan z = c) ; niveau 5 : moitié QCM, moitié calcul seul. V/F en QCM Vrai/Faux (pas de vérificateur pour ces énoncés), avec un énoncé faux ajouté (la normale (f_x, f_y, 1)).
 - **Intro** : Pour f différentiable en (a, b), le plan tangent au graphe en (a, b, f(a, b)) est `z = f(a, b) + f_x(a, b)(x − a) + f_y(a, b)(y − b)`.
   Exemple : `f = x²y − 3y² + x`, point (1, −1) ; `f(1, −1) = −3`, `f_x = 2xy + 1 = −1`, `f_y = x² − 6y = 7` ; `z = −3 − (x − 1) + 7(y + 1) = −x + 7y + 5`.
 - **Juge** : `value` pour f(a, b) et les dérivées ; `geom` `{object:'plane'}` pour le plan (toute équation proportionnelle est acceptée). · **Forme finale** : équation du plan.
@@ -422,6 +424,7 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
 
 ### `a2-tangent-level` — Plan tangent à une surface de niveau
 - **Année** 14 · **Prérequis** `g4-dot`, `a2-partials`, `g4-plane` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U6). ∇F dans la grille (juge `mat` avec `vars`, donné en note au niveau 1), ∇F(p), puis le plan (juge `geom`, `cfg.level` pour `a2_tangent_level_rhs`, `cfg.tangent` pour `a2_tangent_point_sign`). Termes de F : monômes, e^(xy), cos(πx), x⁴ (pas de z⁸). Niveau 3 : la décision « graphe ou surface de niveau » (résoudre en z est `poor`) ; niveau 5 : le QCM. V/F en QCM Vrai/Faux.
 - **Pourquoi ces prérequis** : `g4-dot` : ∇F(p)·(x − p) = 0 : ∇F(p) est un vecteur normal.
 - **Intro** : Si S = {F = c} et ∇F(p) ≠ 0, ∇F(p) est normal à S en p, et le plan tangent est `∇F(p)·(x − p) = 0`. Une courbe tracée sur S a sa vitesse orthogonale à ∇F. En 2D, ∇F est perpendiculaire à la ligne de niveau.
   Exemple : `F = x²y + yz³ + 2e^{xz} = 10`, p = (0, 1, 2) ; `∇F = (2xy + 2ze^{xz}, x² + z³, 3yz² + 2xe^{xz})` ; `∇F(p) = (4, 8, 12)` ; `4x + 8(y − 1) + 12(z − 2) = 0`, soit `x + 2y + 3z = 8`.
@@ -448,8 +451,9 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
 
 ### `a2-chain` — Règle de chaîne et jacobienne d'une composée
 - **Année** 14 · **Prérequis** `a2-partials`, `l-mat-product` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U6). f : ℝ² → ℝ donnée par sa jacobienne (polynômes, et xe^y ou sin x quand ils tombent juste au point) ; parties g(a), J_f(g(a)), J_g(u, v), J_g(a) et le produit (juge `mat`, `cfg.chain` pour les pièges). La variante f ∘ f (2020 Q6) n'est pas faite. `l_compose_order` est le leurre de la décision « dans quel ordre ? » et du QCM (valeur de J_g(a)·J_f(g(a))ᵀ). V/F en QCM Vrai/Faux. Exemple corrigé : J_f = (2x + y, xe^y) n'était pas une jacobienne (∂/∂y(2x + y) = 1 ≠ ∂/∂x(xe^y) = e^y), remplacée par (2x + ye^y, x(1 + y)e^y), qui garde J_f(1, 0) = (2, 1).
 - **Intro** : `J_{f∘g}(a) = J_f(g(a))·J_g(a)`. On évalue J_f **au point g(a)**, pas en a. Pour une courbe : `(f∘γ)′(t) = ∇f(γ(t))·γ′(t)`.
-  Exemple : `g(u, v) = (uv, u² − v)`, `J_f(x, y) = (2x + y, xe^y)`, h = f∘g, en (1, 1) ; `g(1, 1) = (1, 0)` ; `J_f(1, 0) = (2, 1)` ; `J_g(1, 1) = [[1, 1], [2, −1]]` ; `J_h(1, 1) = (4, 1)`.
+  Exemple : `g(u, v) = (uv, u² − v)`, `J_f(x, y) = (2x + ye^y, x(1 + y)e^y)`, h = f∘g, en (1, 1) ; `g(1, 1) = (1, 0)` ; `J_f(1, 0) = (2, 1)` ; `J_g(1, 1) = [[1, 1], [2, −1]]` ; `J_h(1, 1) = (4, 1)`.
 - **Juge** : `value` pour g(a) ; `matrix` pour J_f(g(a)), J_g(a) et le produit. · **Forme finale** : la matrice J_h(a), ou le coefficient demandé (`askCoef`, par exemple ∂h/∂v).
 - **Niveaux** :
   - L1 (guidé) : les trois étapes sont nommées (« point image », « J_f là-bas », « J_g ici ») ; les cases sont à trous.
@@ -463,7 +467,7 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
   | # | Ligne | Sous-but |
   |---|---|---|
   | 1 | g(1, 1) = (1·1, 1 − 1) = (1, 0) | `image` |
-  | 2 | J_f(1, 0) = (2·1 + 0, 1·e⁰) = (2, 1) | `outer` |
+  | 2 | J_f(1, 0) = (2·1 + 0·e⁰, 1·(1 + 0)·e⁰) = (2, 1) | `outer` |
   | 3 | J_g(u, v) = [[v, u], [2u, −1]], J_g(1, 1) = [[1, 1], [2, −1]] | `inner` |
   | 4 | J_h(1, 1) = (2, 1)·[[1, 1], [2, −1]] = (4, 1) | `product` |
 - **Aides** : 1 « J_h(a) = J_f(g(a))·J_g(a) : commence par calculer g(a). » · 2 « J_f(1, 0) = (…, …) » · 3 Ligne 4.
@@ -473,6 +477,7 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
 
 ### `a2-chain-polar` — Gradient et coordonnées polaires
 - **Année** 14 · **Prérequis** `a2-chain`, `g3-identities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U6). r et φ par `value` (φ exact), puis l'inversion par le juge `system` (inconnues a = ∂f/∂x et b = ∂f/∂y au point, départ « a = f_x ; b = f_y ») ; la règle de chaîne symbolique est une note (niveaux 1 et 2) ou un menu (niveau 3), pas une ligne `equiv` en (r, φ). Niveau 3 : la décision « quelle identité ? » (2019 Q5) ; niveau 5 : le QCM. φ ∈ {0, π/6, π/4, π/3, π/2, π}, calculs exacts dans ℚ(√2) ou ℚ(√3). V/F avec contre-exemple vérifié (f = x, propriété `polarGradIdentity`).
 - **Intro** : Avec `f̃(r, φ) = f(r cos φ, r sin φ)`, la règle de chaîne donne `f̃_r = cos φ·f_x + sin φ·f_y` et `f̃_φ = −r sin φ·f_x + r cos φ·f_y`. On inverse ce système 2 × 2 pour trouver f_x et f_y. On en tire `f_x² + f_y² = f̃_r² + f̃_φ²/r²`.
   Exemple : `J_{f̃}(r, φ) = (3r² cos φ + 2r, −r³ sin φ)` ; en (x, y) = (0, 2) : r = 2, φ = π/2 ; `f̃_r = 4 = f_y`, `f̃_φ = −8 = −2f_x` ; `∇f(0, 2) = (4, 4)`.
 - **Juge** : `value` pour (r, φ) ; `equiv` `{vars:['r','φ']}` pour le système de la règle de chaîne ; ligne `system` pour l'inversion ; `value` pour le résultat. · **Forme finale** : f_x(a) et f_y(a), ou l'identité demandée.
@@ -498,6 +503,7 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
 
 ### `a2-laplacian-radial` — Laplacien en coordonnées polaires et radiales
 - **Année** 14 · **Prérequis** `a2-chain-polar` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U6). Formule radiale : décision « quelle formule ? » (niveaux 2 et 3, note au niveau 1), puis g′, g″ et Δf (juge `equiv` en r ; cible `short` pour exiger la forme simplifiée). Niveau 4 : aussi « r^α harmonique » (`equiv` en r et α, puis `solset` en α) et Δ en polaires de r^m cos(kφ) ; niveau 5 : r^α harmonique dans ℝ² ou ℝ³ (sans la vérification en cartésiennes), ou le calcul radial seul. V/F avec contre-exemple vérifié (un point où Δf ≠ 0, propriété `notHarmonic`).
 - **Pourquoi ces prérequis** : `a2-chain-polar` : dérivées en coordonnées polaires.
 - **Intro** : Pour f(x) = g(r) avec r = ‖x‖ dans ℝⁿ : `Δf = g″(r) + (n − 1)/r·g′(r)`. En polaires dans ℝ² : `Δf = f̃_rr + f̃_r/r + f̃_φφ/r²`. r^α est harmonique hors de 0 si et seulement si α(α + n − 2) = 0.
   Exemple : `f = (x² + y² + z²)² = r⁴` dans ℝ³ ; `g′ = 4r³`, `g″ = 12r²` ; `Δf = 12r² + (2/r)·4r³ = 20r²`.
@@ -523,6 +529,7 @@ Le poids d'examen (`examWeight`) vient du décompte des examens 2019, 2020 et 20
 
 ### `a2-taylor2` — Polynôme de Taylor d'ordre 2 à deux variables
 - **Année** 14 · **Prérequis** `a2-partials`, `a1-dl-ops`, `a1-dl-compose` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U6). Juge : `equiv` avec `cfg.jet` (deux lignes sont égales si leurs polynômes de Taylor d'ordre 2 au point le sont, `js/cas/jet.js`) et la cible `taylor2` (somme de c·XⁱYʲ de degré ≤ 2, termes semblables regroupés ; un terme de degré > 2 donne `stay`, « Tronque »), au lieu d'un juge `series` à deux variables ; le DL de φ en u par `series`. Niveaux 1 et 3 : méthode du DL ; niveau 2 : les six dérivées en (0, 0) (`value`), puis la formule à trous (½ et 2) ; niveau 4 : DL en (0, 0), ou dérivées en un point comme (1, 1) ; niveau 5 : DL seul, puis ∂²f/∂x∂y(0, 0) lu sur p₂. Pas de variante produit cos(x + y)·cos(x − y). V/F avec contre-exemple vérifié (f = 1 + x² − y², propriété `p2NotMin`).
 - **Pourquoi ces prérequis** : `a2-partials` : dérivées partielles d'ordre 1 et 2 en (a, b).
 - **Intro** : `p₂ = f + f_x·X + f_y·Y + ½(f_xx·X² + 2f_xy·XY + f_yy·Y²)`, avec X = x − a, Y = y − b, toutes les dérivées étant prises en (a, b). Le terme croisé a pour coefficient **f_xy** (le ½ et le 2 se simplifient). Autre méthode, souvent plus rapide : un DL à une variable de la fonction extérieure, en gardant les termes de degré ≤ 2.
   Exemple : `f = ln(1 + 2x − y + xy)` en (0, 0) ; `u = 2x − y + xy`, `ln(1 + u) = u − u²/2 + …` ; `p₂ = 2x − y + xy − (2x − y)²/2` ; `= 2x − y − 2x² + 3xy − y²/2`.
