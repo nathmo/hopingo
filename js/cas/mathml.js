@@ -99,6 +99,8 @@ export function toMathML(node, opts = {}) {
       }
       case 'fn': {
         if (n.name === 'logb') return row(`<msub><mi>log</mi>${M(stripP(n.args[0]))}</msub>`, mo('&#x2061;'), paren(M(n.args[1])));
+        // Step U4: the factorial k!, (k + 1)!.
+        if (n.name === 'fact') return row(wrap(n.args[0], 6), mo('!', ' lspace="0"'));
         const name = `<mi>${esc(FN_NAMES[n.name] ?? n.name)}</mi>`;
         return row(name, mo('&#x2061;'), paren(n.args.map(M).join(mo(n.name === 'min' || n.name === 'max' ? ';' : ','))));
       }

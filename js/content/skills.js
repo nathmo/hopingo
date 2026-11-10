@@ -1293,7 +1293,8 @@ function resolvePrereq(id, seen = new Set()) {
   if (BUILT.has(id)) return [id];
   if (!UNBUILT[id] || seen.has(id)) throw new Error(`Prérequis inconnu : ${id}`);
   seen.add(id);
-  return UNBUILT[id].flatMap((p) => resolvePrereq(p, seen));
+  // A copy per branch: two stand-ins may share a prerequisite (step U4).
+  return UNBUILT[id].flatMap((p) => resolvePrereq(p, new Set(seen)));
 }
 const ALL = DECLARED.map((s) => {
   if (s.prereqs.every((p) => BUILT.has(p))) return s;

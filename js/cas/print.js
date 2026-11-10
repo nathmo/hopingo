@@ -22,6 +22,7 @@ export function prec(n) {
     case 'pow': return PREC.pow;
     case 'float': return n.x < 0 ? PREC.neg : PREC.atom;
     case 'sum': case 'int': case 'bracket': case 'lim': return PREC.prod; // Σ reads like a prefix: (Σ k)² keeps its brackets
+    case 'fn': return n.name === 'fact' ? PREC.pow : PREC.atom; // step U4: k! as an exponent is written (k!)
     default: return PREC.atom;
   }
 }
@@ -35,7 +36,8 @@ export const LOGIC_WORD = { and: 'et', or: 'ou', imp: '⇒', iff: '⇔' };
 // Can this right factor follow a number without a × sign? (3x, 2sin(x), 5(x+1))
 function startsWithLetter(n) {
   switch (n.t) {
-    case 'sym': case 'const': case 'fn': case 'sqrt': case 'paren': case 'deriv': case 'root': case 'sum':
+    case 'fn': return n.name !== 'fact' || startsWithLetter(n.args[0]); // 2·3! is not 23!
+    case 'sym': case 'const': case 'sqrt': case 'paren': case 'deriv': case 'root': case 'sum':
     case 'int': case 'bracket': case 'lim': case 'eps': return true;
     case 'pow': return startsWithLetter(n.b) && n.b.t !== 'num';
     case 'bin':
@@ -149,6 +151,8 @@ function printer(style, opts) {
           if (readable && b.t === 'num' && /^\d+$/.test(b.s)) return `log${[...b.s].map((c) => SUB[c]).join('')}(${P(n.args[1])})`;
           return `log_${simple ? P(b) : `(${P(b)})`}(${P(n.args[1])})`;
         }
+        // Step U4: the factorial k!, (k + 1)!.
+        if (n.name === 'fact') return `${wrap(n.args[0], PREC.atom)}!`;
         return `${n.name}(${n.args.map(P).join(',')})`;
       }
       case 'deriv': {

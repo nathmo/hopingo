@@ -119,7 +119,7 @@ export function tokenize(text, opts = {}) {
       continue;
     }
     if (GREEK.includes(c) || c === 'π' || c === '∞' || c === '∫') { out.push({ k: 'name', s: c, pos: i }); i++; continue; }
-    if ('+-×÷/^()|\'√_,;□°'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
+    if ('+-×÷/^()|\'√_,;□°!'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
       if (c === '(') {
         const prev = out[out.length - 1];
         stack.push(prev?.k === 'name' && MULTI_ARG.has(prev.s) ? 'args' : 'group');
@@ -266,6 +266,8 @@ export function parse(text, opts = {}) {
   const degrees = (b) => {
     // 0⁺, 1⁻: a bound approached from one side (step U2).
     if (isOp(peek(), '⁺') || isOp(peek(), '⁻')) return { t: 'side', e: b, dir: toks[p++].s === '⁺' ? '+' : '-' };
+    // Step U4: n! and (k + 1)!, the function `fact`.
+    if (isOp(peek(), '!')) { p++; return degrees({ t: 'fn', name: 'fact', args: [b] }); }
     if (!isOp(peek(), '°')) return b;
     p++;
     return { t: 'bin', op: '×', l: b, r: { t: 'frac', n: { t: 'const', name: 'pi' }, d: { t: 'num', s: '180', v: new Q(180) } }, deg: true };
