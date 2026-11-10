@@ -107,6 +107,14 @@ export function evalFloat(node, env = {}, opts = {}) {
       const b = Math.round(hi);
       if (Math.abs(a - lo) > 1e-9 || Math.abs(b - hi) > 1e-9 || b - a > 100000) return NaN;
       let s = 0;
+      // Step U4: long sums (Σ up to n = 10⁵ in the bounds of a squeeze) are
+      // compiled once.
+      if (b - a > 8 && !guard) {
+        const c = compileFloat(node.e);
+        const e = { ...env };
+        for (let j = a; j <= b; j++) { e[node.k] = j; s += c(e); }
+        return s;
+      }
       for (let j = a; j <= b; j++) s += evalFloat(node.e, { ...env, [node.k]: j }, opts);
       return s;
     }

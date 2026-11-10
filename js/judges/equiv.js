@@ -37,7 +37,7 @@ import { numValue, stripParen, symbolsIn, contains, equalsStructural, unparen, w
 import { parse } from '../cas/parse.js';
 import { substSyms, expandFns } from '../cas/sets.js';
 import { equalExact, exactValue } from '../cas/normal.js';
-import { evalFloat } from '../cas/numeric.js';
+import { evalFloat, compileFloat } from '../cas/numeric.js';
 import { exactForm, trigForm } from '../cas/exactform.js';
 import { toText } from '../cas/print.js';
 import { limit, sameLimit } from '../cas/limit.js';
@@ -356,7 +356,8 @@ function boundPoints(cfg) {
     const from = cfg.from ?? d.int[0];
     const xs = [];
     for (let n = from; n <= from + 200; n++) xs.push(n);
-    for (let k = 3; k <= 8; k++) if (10 ** k > from + 200) xs.push(10 ** k);
+    // cfg.maxN (step U4): no sample past it (a Σ up to n costs n terms).
+    for (let k = 3; k <= 8; k++) if (10 ** k > from + 200 && !(10 ** k > cfg.maxN)) xs.push(10 ** k);
     return { v, xs };
   }
   const [lo, hi] = cfg.domain?.[v] || [-3, 3];
@@ -369,10 +370,12 @@ function boundPoints(cfg) {
 export function boundWitness(cfg, prev, node) {
   const { v, xs } = boundPoints(cfg);
   const sign = cfg.rel === '≥' ? -1 : 1;
+  const A = compileFloat(expandDerivs(prev));
+  const B = compileFloat(expandDerivs(node));
   for (const x of xs) {
-    const a = evalFloat(expandDerivs(prev), { [v]: x });
+    const a = A({ [v]: x });
     if (!Number.isFinite(a)) continue;
-    const b = evalFloat(expandDerivs(node), { [v]: x });
+    const b = B({ [v]: x });
     if (!Number.isFinite(b) || sign * (a - b) > 1e-9 * (1 + Math.abs(a) + Math.abs(b))) return { [v]: x, a, b };
   }
   return null;
