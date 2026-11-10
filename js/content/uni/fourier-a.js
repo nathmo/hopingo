@@ -12,5 +12,6 @@ import { GEN_COMPLEX } from './fourier-a-complex.js';
 import { GEN_SINE } from './fourier-a-sine.js';
 import { GEN_DIRICHLET } from './fourier-a-dirichlet.js';
 import { GEN_PROBLEM } from './fourier-a-problem.js';
+import { GEN_PARSEVAL } from './fourier-a-parseval.js';
 
-export const GEN = { ...GEN_COEF, ...GEN_COMPLEX, ...GEN_SINE, ...GEN_DIRICHLET, ...GEN_PROBLEM };
+export const GEN = { ...GEN_COEF, ...GEN_COMPLEX, ...GEN_SINE, ...GEN_DIRICHLET, ...GEN_PROBLEM, ...GEN_PARSEVAL };
