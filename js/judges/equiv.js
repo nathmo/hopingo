@@ -25,10 +25,15 @@
 // Step U1b (G1): cfg.defs = {f: 'sqrt(x)', g: '1-x^2'} with cfg.funcs: the
 // item's functions, expanded before comparing (g(f(x)) = 1 − (√x)²);
 // target 'short': no f or g left and a writing about as short as cfg.goal.
+// Step U2 (G6 catalogue, implicit derivatives): cfg.implicit = {y: 'p'}: y
+// is a function of x (cfg.vars[0]); every d(…) is the total derivative,
+// y′ = d(y) being the letter p (listed in cfg.vars). So (x·y + y³)′ =
+// y + x·y′ + 3y²·y′, and a line may write y′ or p. Target 'no-prime'
+// accepts y′ in a final line.
 
-import { expandDerivs, hasDeriv } from '../cas/diff.js';
+import { expandDerivs, hasDeriv, diff } from '../cas/diff.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
-import { numValue, stripParen, symbolsIn, contains, equalsStructural, unparen, walk } from '../cas/ast.js';
+import { numValue, stripParen, symbolsIn, contains, equalsStructural, unparen, walk, mapNode, add, mul, sym as symNode } from '../cas/ast.js';
 import { parse } from '../cas/parse.js';
 import { substSyms, expandFns } from '../cas/sets.js';
 import { equalExact, exactValue } from '../cas/normal.js';
@@ -263,7 +268,8 @@ const TARGETS = {
   'one-trig': (node, cfg) => trigForm(node, cfg.vars?.[0] || 'x') || (exactForm(node) === true),
   'factored-den': (node) => factoredDen(node),
   'partial-fractions': (node) => partialFractions(node),
-  'no-prime': (node) => {
+  'no-prime': (node, cfg) => {
+    if (cfg?.implicit) node = mapNode(node, (n) => (n.t === 'deriv' && n.n === 1 && stripParen(n.e).t === 'sym' && cfg.implicit[stripParen(n.e).name] ? symNode(cfg.implicit[stripParen(n.e).name]) : n));
     if (hasDeriv(node)) return false;
     return presentationIssue(node) ?? true;
   },
@@ -307,7 +313,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (cfg.rel) return judgeBound(cfg, prev, node);
   const opts = { vars: cfg.vars, domain: cfg.domain, seed: cfg.seed ?? seedOf(toText(prev)) };
   const map = substOf(cfg);
-  const D = (n) => (cfg.defs ? expandFns(n, cfg.defs, cfg.vars?.[0] || 'x') : n);
+  const D = (n) => (cfg.defs ? expandFns(n, cfg.defs, cfg.vars?.[0] || 'x') : cfg.implicit ? implicitDerivs(n, cfg) : n);
   const S = (n) => (map ? substSyms(expandDerivs(D(n)), map) : expandDerivs(D(n)));
   const r = equivalent(S(prev), S(node), opts);
   if (!r.equal) {
@@ -320,6 +326,18 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
+}
+
+// cfg.implicit = {y: 'p'}: every first derivative d(e) in x replaced by
+// ∂e/∂x + p·∂e/∂y (y′ = d(y) becomes p).
+export function implicitDerivs(node, cfg) {
+  const v = cfg.vars?.[0] || 'x';
+  return mapNode(node, (n) => {
+    if (n.t !== 'deriv' || n.n !== 1 || n.v !== v) return n;
+    let out = diff(n.e, v);
+    for (const [y, p] of Object.entries(cfg.implicit)) out = add(out, mul(symNode(p), diff(n.e, y)));
+    return { t: 'paren', e: out };
+  });
 }
 
 // ---------- chains of inequalities (step U1b, G1 catalogue « ajout 4 ») ----------
