@@ -9,9 +9,10 @@
 //   lagrangeNotExtremum {}  answers {f, g}: g(0, 0) = 0, ∇g(0, 0) ≠ 0,
 //       ∇f(0, 0) parallel to ∇g(0, 0), and f is not extremal at (0, 0) on
 //       the curve g = 0
-//   hess3 {fxx, det, claim: 'max' | 'min'}  answers {H}: a symmetric 3 × 3
-//       matrix with H₁₁ = fxx and det H = det that is not definite of the
-//       claimed sign (not negative definite for 'max', not positive for 'min')
+//   hess3 {fxx?, det?, detPos?, claim: 'max' | 'min'}  answers {H}: a
+//       symmetric 3 × 3 matrix with H₁₁ = fxx and det H = det (or det H > 0)
+//       that is not definite of the claimed sign (not negative definite for
+//       'max', not positive definite for 'min')
 // Numbers by finite differences and sampling: every function the students
 // type here is a polynomial or close to one.
 
@@ -127,8 +128,9 @@ export const PROPS = {
     const d1 = H[0][0];
     const d2 = H[0][0] * H[1][1] - H[0][1] * H[1][0];
     const d3 = H[0][0] * (H[1][1] * H[2][2] - H[1][2] * H[2][1]) - H[0][1] * (H[1][0] * H[2][2] - H[1][2] * H[2][0]) + H[0][2] * (H[1][0] * H[2][1] - H[1][1] * H[2][0]);
-    if (Math.abs(d1 - Number(p.fxx)) > 1e-9) return { ok: false, message: `Il faut f_xx = H₁₁ = ${p.fxx}.` };
-    if (Math.abs(d3 - Number(p.det)) > 1e-9) return { ok: false, message: `Il faut det H = ${p.det} ; ta matrice a det H = ${Math.round(d3 * 1000) / 1000}.` };
+    if (p.fxx !== undefined && Math.abs(d1 - Number(p.fxx)) > 1e-9) return { ok: false, message: `Il faut f_xx = H₁₁ = ${p.fxx}.` };
+    if (p.det !== undefined && Math.abs(d3 - Number(p.det)) > 1e-9) return { ok: false, message: `Il faut det H = ${p.det} ; ta matrice a det H = ${Math.round(d3 * 1000) / 1000}.` };
+    if (p.detPos && !(d3 > 0)) return { ok: false, message: 'Il faut det H > 0.' };
     const negDef = d1 < 0 && d2 > 0 && d3 < 0;
     const posDef = d1 > 0 && d2 > 0 && d3 > 0;
     if (p.claim === 'max' && negDef) return { ok: false, rule: 'a2_hess_partial_minors', message: 'Ta matrice est définie négative (Δ₁ < 0, Δ₂ > 0, Δ₃ < 0) : le point est bien un maximum. Prends Δ₂ < 0.' };
