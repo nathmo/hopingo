@@ -859,6 +859,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-mvt` — Rolle et accroissements finis : encadrer un taux d'accroissement
 - **Année** 13 · **Prérequis** `a1-deriv-rules`, `a1-fn-image` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U2). Les bornes de f′ sont deux parties « minore f′(c) » et « majore f′(c) » (juge `equiv` avec `rel`, inégalités larges, borne la plus fine exigée) ; l'énoncé du TAF est une décision prise avant le calcul, l'encadrement strict final n'est pas saisi. Gabarits en lignes : polynômes de degré 2 et 3 (pas de c·e^((x + d)/c), d'Arctg ni de sin). V/F : « |f(x) − f(y)| ≤ K|x − y| » est un vrai `tf` avec contre-exemple (x, y) ; les énoncés sur des fonctions (Rolle avec |x|, f′ ≤ g′) sont des QCM Vrai/Faux, faute de vérificateur de contre-exemple « fonction ».
 - **Intro** : TAF : f continue sur [a ; b], dérivable sur ]a ; b[ ⇒ il existe c ∈ ]a ; b[ tel que `(f(b) − f(a))/(b − a) = f′(c)`. Donc si `m ≤ f′ ≤ M` sur l'intervalle, `m ≤ (f(y) − f(x))/(y − x) ≤ M`. Rolle (f(a) = f(b) ⇒ f′(c) = 0) exige la dérivabilité : |x| sur [−1 ; 1] n'a pas de c.
 - **Juge** : `equiv` pour f′ ; `solset` pour l'ensemble des valeurs de f′ sur l'intervalle (image) ; mcq ou saisie de l'encadrement (`value` sur m et M) · **Forme finale** : encadrement `m ≤ … ≤ M` (ou strict) juste et le plus fin possible.
 - **Niveaux** :
@@ -880,6 +881,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-bh` — Règle de Bernoulli-l'Hôpital, avec ses conditions
 - **Année** 13 · **Prérequis** `a1-fn-limits`, `a1-deriv-rules` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). « Quelle forme ? » : note au niveau 1, décision (avec `a1_bh_not_indeterminate` sur l'option « 0/0 » d'une forme qui n'est pas indéterminée) avant chaque BH au niveau 2, ligne d'auto-explication aux niveaux 3 et 4 ; la solution par DL n'est pas montrée au niveau 4. V/F en QCM Vrai/Faux (pas de vérificateur de contre-exemple « fonction »).
 - **Intro** : si f/g est de la forme **0/0 ou ∞/∞**, g′ ≠ 0 près du point et `lim f′/g′ = L`, alors `lim f/g = L`. On vérifie la forme **avant chaque application**. On dérive numérateur et dénominateur **séparément**, pas (f/g)′. Si lim f′/g′ n'existe pas, on ne peut rien conclure.
 - **Juge** : `limit` `{v:'x', to, dir}` ; avant chaque ligne BH, une ligne `{kind:'rule', ask:'Quelle forme ?', options:['0/0','∞/∞','pas indéterminé','1^∞']}` (aux niveaux 2 à 4) · **Forme finale** : valeur exacte.
 - **Niveaux** :
@@ -903,6 +905,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-extrema-global` — Extrema globaux sur [a ; b] : bornes, f′ = 0, f′ qui n'existe pas
 - **Année** 13 · **Prérequis** `a1-fn-image`, `a1-deriv-rules`, `g6-sign-variation` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-fn-image` : min et max atteints sur un segment ; `g6-sign-variation` : confirmer les candidats par le signe de f′.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Gabarits (x² + s)/(x + r) (examen GM 2019), polynôme de degré 3 et (x² + px + q)/(x² + rx + s) (avec Δ du dénominateur) ; pas de gabarit avec valeur absolue (point anguleux) ni sin x·e^(−x). Le max et le min sont deux nombres (pas « atteint en … »). Variante `open` : item `lines` sans aide (7 points), en attendant le type `problem`.
 - **Intro** : f continue sur [a ; b] atteint son min et son max (théorème du cours). Candidats : **les bornes**, les points où **f′ = 0**, les points où **f′ n'existe pas**. On compare les valeurs. f′(x₀) = 0 ne suffit pas pour un extremum (x³ en 0).
 - **Juge** : `equiv` pour f′ ; `solset` pour les candidats intérieurs ; `value` pour chaque valeur ; deux champs finaux (min, max avec les points) · **Forme finale** : « max = … atteint en … ; min = … atteint en … ».
 - **Niveaux** :
@@ -926,6 +929,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-fn-study` — Étude de fonction : convexité, asymptotes, graphe
 - **Année** 13 · **Prérequis** `a1-extrema-global`, `a1-fn-limits`, `g6-study-full` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-fn-limits` : limites aux bornes pour les asymptotes ; `g6-study-full` : même plan d'étude qu'au gymnase.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Un gabarit (x² + bx + c)/(x − d) = x + m + K/(x − d), avec extrema (K > 0) ou sans (K < 0) ; pas de x·e^(1/x) ni de (1/x²)ˣ. L'asymptote oblique est une décision après la division ; f′ et f″ sont dérivées sous la forme divisée. L'esquisse est un QCM en mots (variante `mcq`), pas d'item `plot` avant U5.
 - **Intro** : f″ > 0 : convexe ; f″ < 0 : concave ; changement de signe : inflexion. Asymptote verticale : limite infinie en un point. Oblique y = mx + p : `m = lim f(x)/x`, puis `p = lim (f(x) − mx)` ; pour une fraction rationnelle, la division euclidienne donne les deux d'un coup.
 - **Juge** : `equiv` pour f′, f″ et la division ; `solset` pour les intervalles ; `limit` pour m, p et les asymptotes verticales ; item `plot` ou `mcq` pour l'esquisse · **Forme finale** : tableau (monotonie, convexité), asymptotes, et esquisse choisie.
 - **Niveaux** :
@@ -949,6 +953,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 ### `a1-param-curve` — Courbes paramétrées : tangentes, points doubles, asymptotes
 - **Année** 13 · **Prérequis** `a1-deriv-rules`, `a1-fn-limits` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-fn-limits` : asymptotes : limites quand t → t₀.
+- **Statut** : fait le 10 novembre 2026 (étape U2). Gabarit x = t² + a, y = t³ − 3b²t + e, et le même avec x et y échangés ; pas de folium ni de Lissajous, pas d'asymptote. Les points sont demandés coordonnée par coordonnée (`value`) ; pas d'esquisse. Variante `open` : item `lines` sans aide (4 points).
 - **Intro** : `γ(t) = (x(t) ; y(t))`. Pente de la tangente : `y′ = ẏ/ẋ` (si ẋ ≠ 0). Tangente horizontale : ẏ = 0, ẋ ≠ 0 ; verticale : ẋ = 0, ẏ ≠ 0. Point double : deux valeurs t ≠ s avec γ(t) = γ(s). (Douchet, section 5.7.)
 - **Juge** : `equiv` `{vars:['t']}` pour ẋ, ẏ et la pente ; `solset` `{v:'t'}` pour les valeurs de t ; `value` pour les points · **Forme finale** : liste des points demandés (coordonnées exactes).
 - **Niveaux** :
@@ -971,6 +976,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : à faire
 
 ### `a1-polar-curve` — Courbe polaire ρ = f(φ) : limites, pente, tangentes (problème long)
 - **Année** 13 · **Prérequis** `a1-param-curve`, `g3-identities` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U2). Problème long : au niveau 5 et en variante `open` (12 points), un item `lines` sans aide avec des parties, en attendant le type `problem`. Parties dans l'ordre (a) ρ̇, (b) limites de x et y en φ → π⁻ (juge `limit` en φ), (c) pente puis ẏ, (d) point sur Oy et pente, (e) tangentes horizontales ; l'asymptote, la formule de la pente et l'esquisse sont des décisions en mots. Gabarits a·tan(φ/2) et a/(1 + cos φ) (pas de cardioïde).
 - **Intro** : `x = ρ(φ)·cos φ`, `y = ρ(φ)·sin φ`. Pente : `y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ)`. Une asymptote se lit sur les limites de x(φ) et y(φ) quand ρ → ∞. On simplifie beaucoup avec les formules de l'angle moitié.
 - **Juge** : type `problem` ; parties : (a) `limit` `{v:'φ', to:'π', dir:'-'}` pour x et y ; (b) `equiv` `{vars:['φ'], domain:{φ:[0, 3]}}` pour ρ̇ ; (c) `equiv` pour y′ et ẏ ; (d) `value` pour le point et la pente ; (e) `solset` `{v:'φ', domain:[0, π[}` ; (f) `mcq` d'esquisses · **Forme finale** : réponses des six parties.
 - **Niveaux** :
