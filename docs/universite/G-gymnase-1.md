@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.1 complexes partout (`solset` sur ℂ, G0) ; §16.2 `solset` avec cas, substitution et paramètres (G1, G2, G3), `equiv` avec `rel` (lignes d'inégalités, `g1-bound`), `signs` (tableaux de signes), `value` avec `tol` (triangles), `poly` avec paramètre (G0), `logic` avec table de négation (G9) ; §16.3 échelle des niveaux `blocks` et `tokens`, compétences de l'école (`pow-rules`, `root-rules`), générateur qui suit les progrès, plan `cms-controle`, au moins 2 exemples d'examen par module ; §16.4 familles nouvelles (`logic`, `method`, `notation`), tag C, pièges partagés (`g9_proof_by_example`, `g9_quant_order`, `g1_ineq_not_flipped`, `g1_inverse_reciprocal`, `g2_log_power`, `g0_conj_missing` servent aussi plus loin).
 
-Statut : G9 et G0 faits le 9 novembre 2026 (étape U1, partie a) ; G1, G2, G3 et G5 à faire (partie b). Ce catalogue est construit à l'étape **U1** ([README](README.md) §14).
+Statut : G9 et G0 faits le 9 novembre 2026 (étape U1, partie a) ; G1, G2, G3 et G5 faits le 10 novembre 2026 (partie b). Ce catalogue est construit à l'étape **U1** ([README](README.md) §14).
 
 Ce fichier contient six modules, dans l'ordre où le moteur les débloque : G9 (logique), G0 (polynômes), G1 (fonctions et inéquations), G2 (exponentielles, logarithmes, hyperboliques), G3 (trigonométrie), G5 (suites et récurrence). Chaque module suit le gabarit du README §15. Les conventions communes sont ici, une seule fois.
 
@@ -805,7 +805,7 @@ Unité `polynomes` · préfixe `g0-` · pièges `g0_` · Statut : fait le 9 nove
 ---
 # G1. Fonctions et inéquations
 
-Unité `fonctions` · préfixe `g1-` · pièges `g1_` · Statut : à faire. L'id `fonctions` est déjà celui d'une unité de l'école : prendre `fonctions-g` (README §8.1).
+Unité `fonctions-g` (l'id `fonctions` est celui d'une unité de l'école, README §8.1) · préfixe `g1-` · pièges `g1_` · Statut : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 et les variantes `open` sont des items sans aide, en attendant le type `problem` (U4). Les cas sont des parties dont le domaine est le cas, réunies par une dernière partie S₁ ∪ S₂ (README §17).
 
 **Sources** : MAN, examen Math 1A 2017 (Q2, inéquation irrationnelle, 11 pts), examen Math 1B 2017 (Q3, bijection, 11 pts), examen blanc 1A 2018 (Q1, valeur absolue) et examen blanc 1B 2018 avec son corrigé (Q2, bijection, 7 pts) ; CMS, Analyse I, séries 1 à 4 (inéquations, paramètres, Viète, irrationnelles) et 7 (parité) ; Analyse I GM, série 0 de 2019 (ex. 11, 14, 19) et corrigé de la série 3 de 2017 (valeur absolue par cas).
 **Notation** : D_f pour le domaine. Ensembles de solutions en intervalles `]a ; b]`, union `∪`, ensemble fini `{2/3 ; 4}`. Une ligne de cas s'écrit « Cas x ≥ 3/2 : ». Tableau de signes : `+`, `−`, `0`, `‖`.
@@ -819,6 +819,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-domain` — Domaine de définition
 - **Année** 12 · **Prérequis** `g9-intervals`, `@alg:G-valeurs-interdites` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `@alg:G-valeurs-interdites` : valeurs interdites d'un dénominateur.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 enchaîne le domaine et l'équation (x − r)√(x + q)/(x − a) = 0, pas l'équation à racine imbriquée. Une ligne qui est une expression vaut son domaine (`solset` avec `exprDomain`).
 - **Intro** : on écrit **toutes** les conditions : dénominateur ≠ 0, expression sous une racine carrée ≥ 0 (> 0 si elle est aussi au dénominateur). Puis on les combine avec « et ». Exemple : f(x) = √(x + 3)/(x² − 4) : x ≥ −3 et x ≠ ±2.
 - **Juge** : `solset` (la ligne finale est comparée à D_f calculé par `numeric.js`) · **Forme finale** : union d'intervalles.
 - **Niveaux** :
@@ -842,6 +843,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 
 ### `g1-compose` — Composition de fonctions
 - **Année** 12 · **Prérequis** `g1-domain` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 demande les deux ordres et leurs domaines sans aide ; la décomposition de h et la recherche de g ne sont pas construites.
 - **Intro** : (f ∘ g)(x) = f(g(x)) : on applique g **d'abord**. x est dans le domaine de f ∘ g si x ∈ D_g et g(x) ∈ D_f. Exemple : f(x) = √x, g(x) = 1 − x² : (f ∘ g)(x) = √(1 − x²) sur [−1 ; 1] ; (g ∘ f)(x) = 1 − x sur [0 ; +∞[ seulement.
 - **Juge** : `equiv` `{vars:['x'], domain: D_{f∘g}}` pour l'expression ; `solset` pour le domaine · **Forme finale** : expression simplifiée **et** domaine.
 - **Niveaux** :
@@ -866,6 +868,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-inverse` — Fonction réciproque : l'expliciter
 - **Année** 12 · **Prérequis** `g1-compose`, `@alg:F-isoler` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-compose` : on vérifie f(f⁻¹(x)) = x ; `@alg:F-isoler` : isoler x dans y = f(x).
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Pas encore de gabarit exponentiel ; le niveau 5 ne s'enchaîne pas avec `g1-surjective`.
 - **Intro** : pour f : A → B bijective, on résout y = f(x) en x, avec x ∈ A. S'il y a deux solutions, on garde celle qui est dans A. Puis on renomme : f⁻¹(x) = … Ce n'est pas 1/f.
 - **Juge** : `solset` `{v:'x', domain:A, params:{y:B}}` pour les lignes « x = … » (6 valeurs de y tirées dans B) ; `equiv` `{vars:['x'], domain:B}` pour la ligne finale contre la vraie réciproque · **Forme finale** : « f⁻¹(x) = … » avec son ensemble de départ B.
 - **Niveaux** :
@@ -892,6 +895,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-injective` — Injectivité : prouver ou réfuter
 - **Année** 12 · **Prérequis** `g9-counterexample`, `g9-proof-contra` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-counterexample` : réfuter : deux valeurs a ≠ b avec f(a) = f(b) ; `g9-proof-contra` : preuve directe f(a) = f(b) ⇒ a = b.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). La banque de preuves ne contient que des fonctions injectives : la décision du niveau 3 est toujours « oui ». Les réfutations sont dans la variante `tf`.
 - **Intro** : f est injective sur A si f(a) = f(b) ⇒ a = b pour tous a, b ∈ A. Pour le prouver : on part de f(a) = f(b) et on arrive à a = b. Pour le réfuter : deux valeurs a ≠ b avec f(a) = f(b).
 - **Juge** : `blocks` (charpente « Soient a, b ∈ A tels que f(a) = f(b) » … « donc a = b ») ; les lignes de calcul sont des relations en a et b jugées par `solset` `{vars:['a','b'], domain:A²}` (grille 40 × 40 plus la diagonale) ; réfutation par `example` · **Forme finale** : « a = b » (sur A²) puis conclusion, ou contre-exemple.
 - **Niveaux** : échelle des conventions (blocs, puis lignes). L3 : décision « injective ou pas ? » avant de commencer. L4 : la factorisation (a − b)(…) = 0 est à trouver.
@@ -913,6 +917,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-surjective` — Surjectivité, bijection, ensemble d'arrivée
 - **Année** 12.5 · **Prérequis** `g1-injective`, `g1-inverse`, `g1-irr-ineq` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `g1-injective` : bijective = injective et surjective.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Pas encore de gabarit (eˣ + p)/(eˣ − 1).
 - **Intro** : f : A → B est surjective si tout y ∈ B a un antécédent **dans A**. On résout y = f(x) en x, on vérifie qu'une solution existe pour tout y ∈ B, **et** qu'elle est dans A. Injective et surjective : bijective, et la solution trouvée donne f⁻¹.
 - **Juge** : `blocks` `mode:'frame'` ; calculs par `solset` avec paramètre y ; la condition « x ∈ A » par `solset` `{v:'y'}` (pour quels y la racine choisie est dans A) · **Forme finale** : conclusion « bijective » et f⁻¹ avec ses ensembles.
 - **Niveaux** :
@@ -941,6 +946,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-parity-period` — Parité et périodicité
 - **Année** 12 · **Prérequis** `g1-domain`, `g9-counterexample`, `g3-reduce` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g9-counterexample` : « ni paire ni impaire » se montre avec une valeur de x ; `g3-reduce` : période de sin(ax) et cos(ax), angles associés.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). La conclusion est une décision suivie de « f(−x) ± f(x) = 0 », ou de f(x₀) et f(−x₀) pour « ni l'une ni l'autre ». Un domaine non symétrique n'apparaît qu'au niveau 1 (QCM).
 - **Intro** : f est paire si D_f est symétrique et f(−x) = f(x) pour tout x ; impaire si f(−x) = −f(x). Pour dire « ni paire ni impaire », une valeur x suffit. La période de sin(ax) est 2π/|a| ; une somme a pour période le plus petit multiple commun.
 - **Juge** : `equiv` pour le calcul de f(−x) ; `mcq` pour la conclusion ; `example` pour le contre-exemple ; `value` pour la période · **Forme finale** : « paire », « impaire » ou « ni l'une ni l'autre » avec preuve ou contre-exemple ; période.
 - **Niveaux** :
@@ -966,6 +972,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-trinome-sign` — Signe du trinôme, inéquation du 2e degré
 - **Année** 12 · **Prérequis** `g9-intervals`, `@alg:H-discriminant` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-intervals` : écrire l'ensemble solution en intervalles.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : si Δ > 0, ax² + bx + c a le signe de a **à l'extérieur** des racines et le signe contraire entre elles. Si Δ < 0, il a partout le signe de a. Exemple : −2x² + x + 3 ≥ 0 : racines −1 et 3/2, a < 0, donc [−1 ; 3/2].
 - **Juge** : `solset` · **Forme finale** : intervalles.
 - **Niveaux** :
@@ -991,6 +998,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-sign-table` — Tableau de signes
 - **Année** 12 · **Prérequis** `g1-trinome-sign`, `@alg:D-factoriser-completement` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-trinome-sign` : signe de chaque facteur du 2e degré ; `@alg:D-factoriser-completement` : factoriser avant de faire le tableau.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le tableau se remplit case par case (+, −, 0, ‖), la ligne de f jugée à partir des lignes de l'élève. Le niveau 5 est une suite de lignes (factoriser, puis l'ensemble), pas un tableau.
 - **Intro** : on factorise, on place tous les zéros et les valeurs interdites dans l'ordre, une ligne par facteur, puis la règle des signes. Un facteur au carré ne change pas de signe.
 - **Juge** : `table` `{judge:{kind:'signs', f}}` (ajout 5 du début du fichier), puis `solset` pour lire l'inéquation · **Forme finale** : tableau complet et ensemble demandé.
 - **Niveaux** :
@@ -1015,6 +1023,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 
 ### `g1-rational-ineq` — Inéquations rationnelles
 - **Année** 12 · **Prérequis** `g1-sign-table`, `@alg:G-additionner` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 1 donne la forme réduite et les bornes en note, puis demande D et S, sans tableau.
 - **Intro** : on ne multiplie **pas** par un dénominateur dont le signe dépend de x. On passe tout d'un côté, on réduit au même dénominateur, puis on fait le tableau de signes. Les valeurs interdites restent exclues.
 - **Juge** : `solset` (avec la ligne de domaine) · **Forme finale** : intervalles, valeurs interdites exclues.
 - **Niveaux** :
@@ -1041,6 +1050,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-param` — Équations et inéquations à paramètre
 - **Année** 12.5 · **Prérequis** `g1-rational-ineq`, `@alg:I-param-1er-degre` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-rational-ineq` : les cas selon m donnent des inéquations rationnelles ; `@alg:I-param-1er-degre` : équation du 1er degré à paramètre.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Les cas sont des parties jugées pour des valeurs de m tirées dans le cas. Le niveau 2 demande la valeur critique comme un ensemble ({a}).
 - **Intro** : avant de diviser par une expression en m, on traite à part les m qui l'annulent, et on regarde son signe (pour une inéquation). La réponse est un tableau « selon m ».
 - **Juge** : `solset` `{v:'x', params:['m'], cases:true}` (les cas portent sur m ; chaque cas est jugé pour 4 valeurs de m tirées dedans, plus ses bornes) · **Forme finale** : un ensemble par cas, les cas recouvrant ℝ.
 - **Niveaux** :
@@ -1066,6 +1076,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-viete` — Trinôme à paramètre : position des racines
 - **Année** 12.5 · **Prérequis** `g1-trinome-sign`, `g1-param`, `@alg:I-param-2e-degre` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-param` : discussion selon les valeurs de m ; `@alg:I-param-2e-degre` : trinôme à paramètre, Δ en fonction de m.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Les niveaux 3 et 5 utilisent le gabarit à deux nombres (comme E5) ; le gabarit somme et produit (« même signe ») n'est pas construit.
 - **Intro** : pour f(x) = ax² + bx + c et un nombre k : x₁ < k < x₂ si et seulement si a·f(k) < 0 (alors Δ > 0 automatiquement). Pour k à l'extérieur des racines : a·f(k) > 0 et Δ > 0, puis −b/(2a) compare k au milieu. Somme et produit : x₁ + x₂ = −b/a, x₁x₂ = c/a.
 - **Juge** : `solset` `{v:'m'}` · **Forme finale** : ensemble des m.
 - **Niveaux** :
@@ -1091,6 +1102,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-abs-eq` — Valeur absolue : équations
 - **Année** 12 · **Prérequis** `g9-intervals`, `@alg:H-discriminant` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `@alg:H-discriminant` : chaque cas donne souvent une équation du 2e degré.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Chaque cas est une partie dont le domaine est le cas ; la dernière partie réunit S₁ et S₂.
 - **Intro** : |A| = A si A ≥ 0, et −A si A < 0. On découpe ℝ selon le signe de A, on résout dans chaque cas, et on garde les solutions **qui sont dans le cas**. Pour |A| = B avec B ≥ 0 : A = B ou A = −B.
 - **Juge** : `solset` `{cases:true}` · **Forme finale** : ensemble fini ou intervalles.
 - **Niveaux** :
@@ -1117,6 +1129,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-abs-ineq` — Valeur absolue : inéquations, y compris avec un 2e degré
 - **Année** 12 · **Prérequis** `g1-abs-eq`, `g1-trinome-sign` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `g1-abs-eq` : même découpage en cas selon le signe de A.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 est x² − |px + q| ⋚ rx + s (forme de E1), pas deux valeurs absolues.
 - **Intro** : |A| < B ⇔ −B < A < B. |A| > B ⇔ A < −B **ou** A > B. Avec un 2e degré, on découpe en cas, on résout chaque inéquation du 2e degré, puis on **intersecte avec le cas** avant de réunir.
 - **Juge** : `solset` `{cases:true}` · **Forme finale** : intervalles.
 - **Niveaux** :
@@ -1143,6 +1156,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-irr-eq` — Équations irrationnelles
 - **Année** 12 · **Prérequis** `g1-domain`, `@alg:H-discriminant` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-domain` : condition A ≥ 0 sous la racine ; `@alg:H-discriminant` : A = B² est souvent du 2e degré.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). « Élever au carré directement » (niveau 3) est un choix valide mais pauvre : les lignes peuvent alors garder des solutions en trop jusqu'à la vérification.
 - **Intro** : √A = B ⇔ B ≥ 0 et A = B². La condition B ≥ 0 remplace la vérification (et A ≥ 0 devient automatique). Sans elle, élever au carré ajoute des solutions.
 - **Juge** : `solset` · **Forme finale** : ensemble fini.
 - **Niveaux** :
@@ -1168,6 +1182,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-irr-ineq` — Inéquations irrationnelles
 - **Année** 12.5 · **Prérequis** `g1-irr-eq`, `g1-abs-ineq` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `g1-irr-eq` : même condition B ≥ 0 avant d'élever au carré.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 et la variante `open` sont √(trinôme) ≥ x + s (ou >) avec deux cas ; E2 (√ > |·| − d) n'est pas généré.
 - **Intro** : √A ≤ B ⇔ A ≥ 0 et B ≥ 0 et A ≤ B². √A ≥ B : deux cas. Si B < 0, c'est vrai dès que A ≥ 0. Si B ≥ 0, on élève au carré : A ≥ B². On réunit les deux cas.
 - **Juge** : `solset` `{cases:true}` · **Forme finale** : intervalles.
 - **Niveaux** :
@@ -1193,6 +1208,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ### `g1-bound` — Majorer ou minorer une expression
 - **Année** 12.5 · **Prérequis** `g1-abs-ineq` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g1-abs-ineq` : |x| ≤ 1 se traduit par −1 ≤ x ≤ 1.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : pour majorer |A·B|, on majore |A| et |B| séparément. Inégalité triangulaire : |a + b| ≤ |a| + |b|. Pour majorer une fraction positive, on majore le numérateur et on **minore** le dénominateur. Ces outils servent ensuite aux gendarmes et à ε-δ (A1).
 - **Juge** : `equiv` `{vars:['x'], domain, rel:'≤'}` (ajout 4 du début du fichier) · **Forme finale** : une constante, et ≤ la borne demandée si l'énoncé en donne une.
 - **Niveaux** :
@@ -1309,7 +1325,7 @@ Toutes les équations et inéquations de ce module sont jugées par `solset` `{v
 ---
 # G2. Exponentielles, logarithmes, fonctions hyperboliques
 
-Unité `explog` · préfixe `g2-` · pièges `g2_` · Statut : fait le 9 novembre 2026 (étape U1, partie b). Le niveau 5 est l'item le plus difficile sans aide, en attendant le type `problem` (U4) : `g2-exp-eq` sans l'inéquation associée, `g2-arg` sans l'enchaînement avec `g1-surjective`. Les graphes de `g2-hyp-def` (L3) sont des QCM en mots. Le V/F « (−8)^(1/3) » (convention, sans contre-exemple vérifiable) est remplacé par d'autres énoncés sur les puissances.
+Unité `explog` · préfixe `g2-` · pièges `g2_` · Statut : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 est l'item le plus difficile sans aide, en attendant le type `problem` (U4) : `g2-exp-eq` sans l'inéquation associée, `g2-arg` sans l'enchaînement avec `g1-surjective`. Les graphes de `g2-hyp-def` (L3) sont des QCM en mots. Le V/F « (−8)^(1/3) » (convention, sans contre-exemple vérifiable) est remplacé par d'autres énoncés sur les puissances.
 
 **Sources** : MAN, examen Math 1A 2017 (Q10, inéquation logarithmique avec base 1/10, 8 pts ; Q11d, nombre de solutions de cosh x = −x + 1) et formulaire M1A (trigonométrie hyperbolique) ; CMS, Analyse II, séries 11 (logarithmes), 12 (inéquations exp/log, équations du type xˣ) et 13 (formules et équations hyperboliques).
 **Notation** : ln et Log acceptés (logarithme naturel) ; log_a pour une autre base ; log₁₀ écrit `log_10`. Puissance réelle aˣ seulement pour a > 0. Fonctions réciproques : argsh, argch, argth (arg sinh, arg cosh, arg tanh acceptés à la saisie).
@@ -1323,6 +1339,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-real-powers` — Puissances à exposant réel
 - **Année** 12 · **Prérequis** `pow-rules`, `root-rules` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `root-rules` : a^(1/n) = ⁿ√a.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le V/F « (−8)^(1/3) » (convention, sans contre-exemple vérifiable) est remplacé par d'autres énoncés sur les puissances.
 - **Intro** : pour a > 0 : aˣ·aʸ = aˣ⁺ʸ, (aˣ)ʸ = aˣʸ, a^(1/n) = ⁿ√a, a^(−x) = 1/aˣ, et aˣ = e^(x ln a). Exemple : 8^(2/3) = (∛8)² = 4.
 - **Juge** : `equiv` `{vars:['a','b','x'], domain:{a:[0.2, 4], b:[0.2, 4]}}` ; `value` pour les nombres · **Forme finale** : une seule puissance par base, exposants réduits, pas d'exposant négatif si l'énoncé le demande.
 - **Niveaux** :
@@ -1346,6 +1363,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 
 ### `g2-log-rules` — Logarithmes : définition et règles
 - **Année** 12 · **Prérequis** `g2-real-powers` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : log_a y = x ⇔ aˣ = y (a > 0, a ≠ 1, y > 0). ln(uv) = ln u + ln v, ln(u/v) = ln u − ln v, ln(uᵖ) = p·ln u, log_a y = ln y / ln a. Il n'y a **pas** de règle pour ln(u + v).
 - **Juge** : `equiv` `{vars:['x'], domain:{x:[0.2, 5]}}` ; `value` pour les nombres · **Forme finale** : combinaison de ln de facteurs premiers ou de ln x, ou un seul logarithme (selon la consigne).
 - **Niveaux** :
@@ -1370,6 +1388,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-exp-eq` — Équations exponentielles
 - **Année** 12 · **Prérequis** `g2-log-rules`, `@alg:H-discriminant` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g2-log-rules` : prendre ln des deux membres.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 n'enchaîne pas l'inéquation associée.
 - **Intro** : si les deux membres sont des puissances de la même base, on compare les exposants. Sinon on prend ln des deux côtés. Si e²ˣ et eˣ apparaissent, on pose t = eˣ > 0 : le t négatif est rejeté.
 - **Juge** : `solset` `{subst:true}` · **Forme finale** : ensemble fini, valeurs exactes (ln 3, pas 1,0986).
 - **Niveaux** :
@@ -1396,6 +1415,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-log-eq` — Équations logarithmiques
 - **Année** 12 · **Prérequis** `g2-log-rules`, `g1-domain` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g2-log-rules` : regrouper en un seul logarithme.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : on écrit **d'abord** le domaine (chaque argument > 0). Puis on regroupe en un seul logarithme de chaque côté, et log_a u = log_a v ⇔ u = v (sur le domaine). On garde seulement les solutions du domaine.
 - **Juge** : `solset` avec ligne de domaine · **Forme finale** : ensemble fini.
 - **Niveaux** :
@@ -1422,6 +1442,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-ineq` — Inéquations exponentielles et logarithmiques, base < 1
 - **Année** 12.5 · **Prérequis** `g2-log-eq`, `g2-exp-eq`, `g1-trinome-sign` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `g2-log-eq` : domaine et regroupement des logarithmes, comme pour l'équation ; `g2-exp-eq` : substitution t = aˣ, comme pour l'équation.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 utilise la forme MAN log_{1/b}(x − p) ⋚ −k + log_b(x + q), pas les formes de la série 12 du CMS.
 - **Intro** : x ↦ aˣ et x ↦ log_a x sont croissantes si a > 1, **décroissantes** si 0 < a < 1. Avec une base < 1, on retourne l'inégalité. log_{1/a} u = −log_a u. Le domaine d'abord, comme pour les équations.
 - **Juge** : `solset` avec ligne de domaine · **Forme finale** : intervalles.
 - **Niveaux** :
@@ -1447,6 +1468,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-xx` — Équations du type xˣ
 - **Année** 12.5 · **Prérequis** `g2-log-eq` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g2-log-eq` : prendre ln des deux membres, avec le domaine x > 0.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : pour x > 0, xᵃ = e^(a ln x). Donc x^f = x^g ⇔ (f − g)·ln x = 0 ⇔ f = g **ou** x = 1. Ne pas oublier x = 1.
 - **Juge** : `solset` `{domain:']0 ; +∞['}` · **Forme finale** : ensemble fini.
 - **Niveaux** :
@@ -1473,6 +1495,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-hyp-def` — sinh, cosh, tanh : définitions et graphes
 - **Année** 12.5 · **Prérequis** `g2-log-rules`, `g1-parity-period` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g2-log-rules` : évaluer en ln a : e^(ln a) = a.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Les graphes du niveau 3 sont des QCM en mots ; le niveau 5 est un item de valeurs ou d'identité, pas une série.
 - **Intro** : sinh x = (eˣ − e⁻ˣ)/2 (impaire), cosh x = (eˣ + e⁻ˣ)/2 (paire, ≥ 1), tanh x = sinh x / cosh x ∈ ]−1 ; 1[. cosh²x − sinh²x = 1. Exemple : cosh(ln 2) = (2 + 1/2)/2 = 5/4.
 - **Juge** : `value` ; `equiv` pour les identités ; `mcq` pour les graphes · **Forme finale** : fraction exacte.
 - **Niveaux** :
@@ -1497,6 +1520,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 
 ### `g2-hyp-formulas` — Formules hyperboliques
 - **Année** 12.5 · **Prérequis** `g2-hyp-def` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). 7 identités et 6 formes en t = tanh x (au lieu de 10) ; tanh 2x n'est pas proposé.
 - **Intro** : on les retrouve depuis les exponentielles. sinh(x + y) = sinh x cosh y + cosh x sinh y ; cosh(x + y) = cosh x cosh y + sinh x sinh y (signe +, pas −) ; cosh 2x = cosh²x + sinh²x ; 1 − tanh²x = 1/cosh²x.
 - **Juge** : `equiv` `{vars:['x','y'], domain:{x:[-2,2], y:[-2,2]}}` ; si l'énoncé impose une variable t = tanh x, la forme finale ne doit contenir que t · **Forme finale** : selon la consigne.
 - **Niveaux** :
@@ -1522,6 +1546,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-hyp-eq` — Équations hyperboliques
 - **Année** 12.5 · **Prérequis** `g2-hyp-def`, `g2-exp-eq` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g2-hyp-def` : remplacer sinh et cosh par leurs exponentielles.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : on remplace sinh et cosh par leurs exponentielles, on multiplie par eˣ (ou 2eˣ), et on pose t = eˣ > 0. On obtient un trinôme en t.
 - **Juge** : `solset` `{subst:true}` · **Forme finale** : ensemble fini exact.
 - **Niveaux** :
@@ -1547,6 +1572,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ### `g2-arg` — argsh, argch, argth
 - **Année** 12.5 · **Prérequis** `g2-hyp-eq`, `g1-inverse` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g2-hyp-eq` : argsh y s'obtient en résolvant sinh x = y en t = eˣ.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). argch est aussi établi aux niveaux 2 et 3 ; le niveau 5 ne s'enchaîne pas avec `g1-surjective`.
 - **Intro** : argsh y = ln(y + √(y² + 1)) sur ℝ ; argch y = ln(y + √(y² − 1)) pour y ≥ 1, à valeurs ≥ 0 ; argth y = ½ ln((1 + y)/(1 − y)) pour |y| < 1. cosh x = a (a > 1) a **deux** solutions : ±argch a.
 - **Juge** : `solset` `{subst:true}` pour l'établissement de la formule (comme `g1-inverse`) ; `value` pour les valeurs · **Forme finale** : formule ou valeur exacte.
 - **Niveaux** :
@@ -1644,7 +1670,7 @@ Les équations et inéquations passent par `solset` `{v:'x', domain:'R', subst:t
 ---
 # G3. Trigonométrie
 
-Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre 2026 (étape U1, partie b). Le niveau 5 est l'item le plus difficile sans aide, en attendant le type `problem` (U4) ; le bouton « Formulaire » viendra avec lui. Simplifications : banque de 12 identités (au lieu de 25) ; le cas ambigu des triangles avec α = 30° seulement ; pas de conversion en degrés et minutes ; les inéquations a sin x + b cos x passent par la forme R sin(x + φ) dans le corrigé (toute forme juste est acceptée, car chaque ligne est jugée par son ensemble de solutions).
+Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 est l'item le plus difficile sans aide, en attendant le type `problem` (U4) ; le bouton « Formulaire » viendra avec lui. Simplifications : banque de 12 identités (au lieu de 25) ; le cas ambigu des triangles avec α = 30° seulement ; pas de conversion en degrés et minutes ; les inéquations a sin x + b cos x passent par la forme R sin(x + φ) dans le corrigé (toute forme juste est acceptée, car chaque ligne est jugée par son ensemble de solutions).
 
 **Sources** : MAN, examen Math 1A 2017 (Q7 triangle, Q8 équation, Q9 inéquation a·sin + b·cos, 11 pts, Q11 valeurs exactes et fonctions arc) et examen blanc 1A 2018 (Q3 équation, Q4 inéquation, Q6 vrai/faux sur tan et arccot), formulaire M1A ; CMS, Analyse II, séries 1 (radians) à 9 (fonctions arc et bijections) ; Analyse I GM, série 0 de 2019 (ex. 15 à 17).
 **Notation** : angles en radians, sauf pour les triangles (degrés, « ° » obligatoire). Familles « π/6 + 2kπ, k ∈ ℤ » ; `k` est réservé. Arctg et arctan acceptés. Le formulaire M1A (addition, bissection, t = tan(x/2), somme-produit, sinus et cosinus) est disponible dans les items `problem` (bouton « Formulaire »), comme à l'examen.
@@ -1657,6 +1683,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 
 ### `g3-radians` — Radians et degrés
 - **Année** 12 · **Prérequis** `prop-rule3` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : π rad = 180°. Pour passer en radians, on multiplie par π/180. Longueur d'arc : L = rθ, avec θ en radians. Exemple : 240° = 240·π/180 = 4π/3.
 - **Juge** : `value` (exact, multiples rationnels de π) ; `value` avec `tol` pour les approximations en degrés et minutes · **Forme finale** : fraction de π irréductible, ou degrés.
 - **Niveaux** :
@@ -1681,6 +1708,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 ### `g3-reduce` — Cercle trigonométrique, réduction d'angles
 - **Année** 12 · **Prérequis** `g3-radians` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g3-radians` : angles en radians, tours de 2π.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : on retire des tours entiers (2π pour sin et cos, π pour tan), puis on lit le quadrant. Angles associés : cos(π − x) = −cos x, sin(π − x) = sin x, cos(π/2 − x) = sin x, sin(π/2 + x) = cos x. Exemple : cos(53π/6) = cos(5π/6) = −√3/2.
 - **Juge** : `equiv` (nombres avec radicaux, et expressions en x) · **Forme finale** : valeur exacte ; ou une seule fonction de x.
 - **Niveaux** :
@@ -1705,6 +1733,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 
 ### `g3-identities` — Formules d'addition, d'angle double, de bissection, somme-produit
 - **Année** 12 · **Prérequis** `@alg:C-developper` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Banque de 12 identités (au lieu de 25) ; les menus du niveau 3 sont fixés par partie.
 - **Intro** : cos(a + b) = cos a cos b − sin a sin b ; sin(a + b) = sin a cos b + cos a sin b. D'où sin 2x = 2 sin x cos x et cos 2x = 2cos²x − 1 = 1 − 2sin²x. Bissection : cos²x = (1 + cos 2x)/2. Somme-produit : sin p + sin q = 2 sin((p + q)/2) cos((p − q)/2). Ce sont les formules du formulaire M1A.
 - **Juge** : `equiv` `{vars:['x'], domain:{x:[-3,3]}}` (points où une expression n'est pas définie retirés) · **Forme finale** : selon la consigne (« une seule fonction trigonométrique de x », « produit »…).
 - **Niveaux** :
@@ -1729,6 +1758,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 
 ### `g3-exact` — Valeurs exactes sans calculatrice
 - **Année** 12 · **Prérequis** `g3-identities`, `root-rules` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : on écrit l'angle comme somme, différence ou moitié d'angles connus. 7π/12 = π/3 + π/4 ; π/8 = (π/4)/2. Pour une moitié, le signe se lit sur le quadrant. tan(x/2) = (1 − cos x)/sin x évite le signe.
 - **Juge** : `equiv` (valeurs exactes avec radicaux) · **Forme finale** : radicaux simplifiés, dénominateur sans racine.
 - **Niveaux** :
@@ -1754,6 +1784,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 ### `g3-basic-eq` — Équations de base : cos x = a, sin x = a, tan x = a
 - **Année** 12 · **Prérequis** `g3-reduce`, `g9-intervals` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g3-reduce` : lire l'angle α sur le cercle trigonométrique.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : cos u = cos α ⇔ u = α + 2kπ ou u = −α + 2kπ. sin u = sin α ⇔ u = α + 2kπ ou u = π − α + 2kπ. tan u = tan α ⇔ u = α + kπ. Si u = 2x, on divise **aussi** la période par 2.
 - **Juge** : `solset` `{periodic:true}` · **Forme finale** : familles (domaine ℝ) ou liste (intervalle donné).
 - **Niveaux** :
@@ -1778,6 +1809,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 ### `g3-eq` — Équations trigonométriques
 - **Année** 12.5 · **Prérequis** `g3-basic-eq`, `g3-identities`, `@alg:E-produit-nul` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `g3-identities` : cos²x = 1 − sin²x, angle double ; `@alg:E-produit-nul` : factoriser puis appliquer le produit nul.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : on ramène à des équations de base. Outils : une seule fonction (cos²x = 1 − sin²x) puis substitution ; factorisation et produit nul ; équation homogène en sin et cos : on divise par cos²x **après avoir vérifié** que cos x = 0 ne donne pas de solution.
 - **Juge** : `solset` `{periodic:true, subst:true}` · **Forme finale** : familles, ou liste sur l'intervalle.
 - **Niveaux** :
@@ -1802,6 +1834,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 
 ### `g3-asinbcos` — a sin x + b cos x : équations
 - **Année** 12.5 · **Prérequis** `g3-basic-eq`, `g3-identities` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : a sin x + b cos x = R sin(x + φ) avec R = √(a² + b²), cos φ = a/R, sin φ = b/R. On divise par R, on reconnaît une formule d'addition, puis on résout l'équation de base. Si |c| > R, pas de solution.
 - **Juge** : `equiv` pour la mise sous forme R sin(x + φ) (ou R cos(x − φ)) ; `solset` `{periodic:true}` ensuite · **Forme finale** : familles.
 - **Niveaux** :
@@ -1827,6 +1860,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 ### `g3-bioche` — Substitution t = tan(x/2)
 - **Année** 12.5 · **Prérequis** `g3-basic-eq` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g3-basic-eq` : revenir de tan(x/2) = t à x.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : avec t = tan(x/2) : sin x = 2t/(1 + t²), cos x = (1 − t²)/(1 + t²), tan x = 2t/(1 − t²). L'équation devient rationnelle en t. Cette substitution n'existe pas pour x = π + 2kπ : on teste ces valeurs à part.
 - **Juge** : `solset` `{periodic:true, subst:true}` (substitution t = tan(x/2), `range` ℝ, valeurs x = π + 2kπ hors substitution) · **Forme finale** : familles, y compris π + 2kπ si c'est une solution.
 - **Niveaux** :
@@ -1851,6 +1885,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 
 ### `g3-ineq` — Inéquations trigonométriques
 - **Année** 12.5 · **Prérequis** `g3-asinbcos` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le corrigé passe par la forme R sin(x + φ) ; toute forme juste est acceptée, car chaque ligne est jugée par son ensemble de solutions.
 - **Intro** : on se ramène à cos u ≥ c (ou sin, tan). Sur le cercle, on lit l'arc solution, on l'écrit comme intervalle + 2kπ, on revient à x, puis on garde les morceaux qui tombent dans l'intervalle donné, k par k.
 - **Juge** : `solset` `{domain:'[a ; b]', periodic:true}` · **Forme finale** : union d'intervalles (et points isolés) dans [a ; b].
 - **Niveaux** :
@@ -1877,6 +1912,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 
 ### `g3-triangle` — Résoudre un triangle
 - **Année** 12 · **Prérequis** `g3-exact` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le cas ambigu avec α = 30° seulement ; pas de conversion en degrés et minutes ; les menus du niveau 3 sont fixés par partie.
 - **Intro** : théorème du cosinus a² = b² + c² − 2bc cos α : deux côtés et l'angle compris, ou trois côtés. Théorème du sinus a/sin α = b/sin β : un côté et deux angles, ou deux côtés et un angle opposé. Dans ce dernier cas, sin β = s a deux solutions β et 180° − β : on teste les deux.
 - **Juge** : `value` (exact) ; `value` avec `tol: 0.01` pour les angles en degrés (ajout 6 du début du fichier) · **Forme finale** : tous les côtés et angles demandés.
 - **Niveaux** :
@@ -1903,6 +1939,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 ### `g3-arc-def` — Fonctions arc : définition et arccos(cos θ)
 - **Année** 12 · **Prérequis** `g3-reduce`, `g1-inverse` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g1-inverse` : un arc est la réciproque d'une restriction bijective.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 est une banque de V/F.
 - **Intro** : arcsin : [−1 ; 1] → [−π/2 ; π/2] ; arccos : [−1 ; 1] → [0 ; π] ; arctan : ℝ → ]−π/2 ; π/2[. arccos(cos θ) = θ **seulement si** θ ∈ [0 ; π]. Sinon on cherche l'angle de [0 ; π] qui a le même cosinus.
 - **Juge** : `value` (multiples rationnels de π) · **Forme finale** : angle dans l'image de la fonction arc.
 - **Niveaux** :
@@ -1928,6 +1965,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 ### `g3-arc-comp` — Compositions : cos(2 arccos a), tan(arcsin a)
 - **Année** 12.5 · **Prérequis** `g3-arc-def`, `g3-identities` · **Étiquettes** MAN, CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g3-arc-def` : poser θ = arcsin a avec θ dans le bon intervalle.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : on pose θ = arcsin a (ou arccos a, arctan a), on écrit ce qu'on sait (sin θ = a, θ ∈ [−π/2 ; π/2]), on en déduit les autres valeurs avec le **signe** donné par l'intervalle, puis on applique une formule. Exemple : cos(arcsin a) = √(1 − a²) ≥ 0.
 - **Juge** : `equiv` (valeurs exactes) · **Forme finale** : valeur exacte simplifiée.
 - **Niveaux** :
@@ -2030,7 +2068,7 @@ Unité `trigo` · préfixe `g3-` · pièges `g3_` · Statut : fait le 9 novembre
 ---
 # G5. Suites, sommes, récurrence
 
-Unité `recurrence` · préfixe `g5-` · pièges `g5_` · Statut : fait le 9 novembre 2026 (étape U1, partie b). Une somme se tape `sum(terme, k, début, fin)` (touche Σ). Simplifications : l'écriture avec Σ (`g5-sigma` L2) est une ligne jugée par ses termes, pas des jetons ; le niveau 5 de `g5-reindex` demande S(N) au lieu de la limite ; `g5-induction-sum` n'a pas Σ k·2ᵏ (sa formule au rang n + 1 n'est pas un produit) ; les inégalités de `g5-induction-more` sont des blocs avec un calcul tapé, pas des lignes `equiv` avec `rel` ; pas d'étape « conjecturer » au niveau 5 ; les variantes `open` sont des items sans aide, en attendant le type `problem` (U4) ; `g2_power_power` sera proposé quand G2 sera fusionné.
+Unité `recurrence` · préfixe `g5-` · pièges `g5_` · Statut : fait le 10 novembre 2026 (étape U1, partie b). Une somme se tape `sum(terme, k, début, fin)` (touche Σ). Simplifications : l'écriture avec Σ (`g5-sigma` L2) est une ligne jugée par ses termes, pas des jetons ; le niveau 5 de `g5-reindex` demande S(N) au lieu de la limite ; `g5-induction-sum` n'a pas Σ k·2ᵏ (sa formule au rang n + 1 n'est pas un produit) ; les inégalités de `g5-induction-more` sont des blocs avec un calcul tapé, pas des lignes `equiv` avec `rel` ; pas d'étape « conjecturer » au niveau 5 ; les variantes `open` sont des items sans aide, en attendant le type `problem` (U4) ; `g2_power_power` est un leurre des preuves d'itérées.
 
 **Sources** : MAN, examen blanc Math 1B 2018 avec son corrigé (Q1, chemin de projections et somme géométrique, 6 pts) ; Analyse I 2021 (récurrence fₙ = f ∘ fₙ₋₁) ; cours d'Analyse I (principe de récurrence, exemple n ≤ n²) ; CMS, Analyse I, séries sur les suites.
 **Notation** : Σ_{k=p}^{n} uₖ ; suites indexées à partir de 0 ou de 1, comme l'énoncé le dit. Récurrence : « Initialisation », « Hérédité », « Conclusion » ; P(n) désigne la propriété au rang n.
@@ -2043,6 +2081,7 @@ Les lignes de calcul sont jugées par `equiv` `{vars:['n'], domain:{n:'N*'}}` (f
 
 ### `g5-sigma` — Notation Σ
 - **Année** 12 · **Prérequis** `@alg:C-reduire` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). L'écriture avec Σ (niveau 2) est une ligne jugée par ses termes, pas des jetons.
 - **Intro** : Σ_{k=p}^{n} uₖ = u_p + … + u_n : il y a n − p + 1 termes. Linéarité : Σ(a·uₖ + vₖ) = a·Σuₖ + Σvₖ. Formules du cours : Σ_{k=1}^{n} k = n(n + 1)/2 ; Σ_{k=1}^{n} k² = n(n + 1)(2n + 1)/6.
 - **Juge** : `value` (n numérique) ; `equiv` (n symbolique) ; `tokens` pour écrire une somme avec Σ · **Forme finale** : nombre, ou polynôme en n réduit.
 - **Niveaux** :
@@ -2067,6 +2106,7 @@ Les lignes de calcul sont jugées par `equiv` `{vars:['n'], domain:{n:'N*'}}` (f
 ### `g5-reindex` — Changement d'indice, sommes télescopiques
 - **Année** 12 · **Prérequis** `g5-sigma`, `g0-pfd-simple` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g5-sigma` : lire les bornes et le terme d'une somme Σ.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Le niveau 5 demande S(N) au lieu de la limite.
 - **Intro** : poser j = k − 1 change le terme **et** les bornes : Σ_{k=2}^{n+1}(k − 1)² = Σ_{j=1}^{n} j². Somme télescopique : Σ_{k=1}^{n}(aₖ − aₖ₊₁) = a₁ − aₙ₊₁ ; il reste le premier et le dernier.
 - **Juge** : `equiv` `{vars:['n']}` · **Forme finale** : expression en n sans Σ.
 - **Niveaux** :
@@ -2092,6 +2132,7 @@ Les lignes de calcul sont jugées par `equiv` `{vars:['n'], domain:{n:'N*'}}` (f
 ### `g5-arith` — Suites arithmétiques
 - **Année** 12 · **Prérequis** `g5-sigma` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g5-sigma` : somme de termes consécutifs écrite avec Σ.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : uₙ₊₁ = uₙ + r. Terme général : uₙ = u₁ + (n − 1)r (ou u₀ + nr). Somme de termes consécutifs : (nombre de termes) × (premier + dernier)/2.
 - **Juge** : `value` ; `equiv` en n · **Forme finale** : nombre ou expression en n.
 - **Niveaux** :
@@ -2115,6 +2156,7 @@ Les lignes de calcul sont jugées par `equiv` `{vars:['n'], domain:{n:'N*'}}` (f
 
 ### `g5-geom` — Suites géométriques
 - **Année** 12 · **Prérequis** `pow-rules` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : uₙ₊₁ = q·uₙ. Terme général : uₙ = u₀qⁿ. Somme de n termes à partir de u₀ : u₀(1 − qⁿ)/(1 − q) si q ≠ 1. Si |q| < 1, la somme infinie vaut u₀/(1 − q).
 - **Juge** : `value` ; `equiv` en n · **Forme finale** : nombre ou expression en n.
 - **Niveaux** :
@@ -2139,6 +2181,7 @@ Les lignes de calcul sont jugées par `equiv` `{vars:['n'], domain:{n:'N*'}}` (f
 ### `g5-induction-frame` — Charpente d'une récurrence
 - **Année** 12 · **Prérequis** `g9-proof-contra` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g9-proof-contra` : l'hérédité est une preuve directe P(n) ⇒ P(n + 1).
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b).
 - **Intro** : pour montrer P(n) pour tout n ≥ n₀ : (1) initialisation : P(n₀) est vraie ; (2) hérédité : **on suppose** P(n) pour un n ≥ n₀ et on montre P(n + 1) ; (3) conclusion. On ne suppose jamais P(n + 1).
 - **Juge** : `blocks` `mode:'frame'` ; les calculs dans les blocs par `equiv` · **Forme finale** : tous les blocs, dans un ordre qui respecte `needs`.
 - **Niveaux** : échelle des conventions (blocs). L4 : charpente vide à remplir avec les phrases-types et le calcul de l'hérédité.
@@ -2162,6 +2205,7 @@ Les lignes de calcul sont jugées par `equiv` `{vars:['n'], domain:{n:'N*'}}` (f
 ### `g5-induction-sum` — Récurrence : formules de sommes
 - **Année** 12 · **Prérequis** `g5-induction-frame`, `g5-sigma` · **Étiquettes** CMS · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g5-induction-frame` : même charpente initialisation, hérédité, conclusion.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Pas de Σ k·2ᵏ : sa formule au rang n + 1 n'est pas un produit.
 - **Intro** : dans l'hérédité, on sépare le dernier terme : Σ_{k=1}^{n+1} uₖ = Σ_{k=1}^{n} uₖ + uₙ₊₁. On remplace la somme jusqu'à n par la formule supposée, puis on factorise pour faire apparaître la formule au rang n + 1.
 - **Juge** : `blocks` pour la charpente ; lignes de l'hérédité par `equiv` `{vars:['n']}` ; cible : la formule au rang n + 1 · **Forme finale** : expression égale à f(n + 1), écrite factorisée comme f(n + 1).
 - **Niveaux** :
@@ -2187,6 +2231,7 @@ Les lignes de calcul sont jugées par `equiv` `{vars:['n'], domain:{n:'N*'}}` (f
 ### `g5-induction-more` — Récurrence : inégalités, divisibilité, suites et itérées
 - **Année** 12.5 · **Prérequis** `g1-compose`, `g5-induction-frame`, `g2-real-powers` · **Étiquettes** MAN · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `g5-induction-frame` : même charpente initialisation, hérédité, conclusion.
+- **Statut** : fait le 10 novembre 2026 (étape U1, partie b). Les inégalités sont des blocs avec un calcul tapé, pas des lignes `equiv` avec `rel`.
 - **Intro** : même charpente, autres hérédités. Inégalité : partir de P(n) et majorer ou minorer (2ⁿ⁺¹ = 2·2ⁿ ≥ 2(n + 1) ≥ n + 2). Divisibilité : écrire le terme n + 1 avec le terme n (8ⁿ⁺¹ − 1 = 8(8ⁿ − 1) + 7). Itérées : fₙ₊₁ = f ∘ fₙ.
 - **Juge** : `blocks` ; lignes `equiv` (`rel:'≥'` pour les inégalités, ajout 4 du début du fichier) · **Forme finale** : P(n + 1) atteint.
 - **Niveaux** :

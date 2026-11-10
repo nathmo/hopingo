@@ -388,7 +388,7 @@ Les pièges de calcul de l'école (signes, fractions, priorités) restent actifs
 |---|---|---|---|---|---|
 | G9 | `logique` | Logique et langage | `g9-` | `g9_` | 12 |
 | G0 | `polynomes` | Polynômes | `g0-` | `g0_` | 12 |
-| G1 | `fonctions` ⚠ | Fonctions et inéquations | `g1-` | `g1_` | 12, 12.5 |
+| G1 | `fonctions-g` ⚠ | Fonctions et inéquations | `g1-` | `g1_` | 12, 12.5 |
 | G2 | `explog` | Exponentielles, logarithmes, hyperboliques | `g2-` | `g2_` | 12, 12.5 |
 | G3 | `trigo` | Trigonométrie | `g3-` | `g3_` | 12, 12.5 |
 | G5 | `recurrence` | Suites, sommes, récurrence | `g5-` | `g5_` | 12 |
@@ -407,7 +407,7 @@ Les pièges de calcul de l'école (signes, fractions, priorités) restent actifs
 | N | `numerique` | Analyse numérique | `n-` | `n_` | 16 |
 | M | `matrices` | Analyse matricielle | `m-` | `m_` | 16 |
 
-- ⚠ L'id `fonctions` est déjà celui d'une unité de l'école (`js/content/skills.js`). L'étape U1 doit donner un autre id à G1, par exemple `fonctions-g`.
+- ⚠ L'id `fonctions` est déjà celui d'une unité de l'école (`js/content/skills.js`) : G1 a pris `fonctions-g` (étape U1, partie b).
 - `year` est un nombre : 12 = maturité, 12.5 = niveau CMS, 13 = BA1, 14 = BA2, 15 = BA3, 16 = BA4. C'est une indication pour le placement et pour départager deux compétences ouvertes, jamais un verrou (§8.4).
 - On ajoute à `YEARS` : `{id:13, label:'BA1', age:'1re année uni / EPF'}`, `{id:14, label:'BA2', …}`, `{id:15, label:'BA3', …}`, `{id:16, label:'BA4', …}`.
 - `hasTrack` reste faux pour ces années.
@@ -606,7 +606,7 @@ Chaque étape suit le même protocole :
 | Étape | Contenu | Moteur à construire | Critères de fin |
 |---|---|---|---|
 | **U0** (fait le 9 novembre 2026, voir §17) | Socle, plus une compétence pilote : `g6-deriv-rules` | `cas/` : ast, parse, print, mathml, poly, ratfun, normal, numeric, equiv, diff. `judges/` : index, value, equiv, diagnose. Type `lines` avec décisions, aides, sous-buts, `followError`. Claviers `calc`, `rel`, `greek`. MathML. Années 13–16. **Parcours en branches (§8.4)** : tri topologique, `nextFocus`, épinglage, carte, placement par unité, relecture des prérequis des unités de l'école. `optional`. `needsSolo`. Aides dans `learner`. | Tests existants verts (sauf ceux qui supposaient le parcours en ligne, qu'on adapte) ; `cas.test.js` et `judges.test.js` verts ; la compétence pilote jouable de bout en bout aux 5 niveaux ; un nouvel élève de 7H voit au moins 2 branches ouvertes après le calcul mental |
-| **U1** (partie a, G9 et G0, faite le 9 novembre 2026, voir §17) | Catalogue `G-gymnase-1.md` : G9, G0, G1, G2, G3, G5 | `sets.js` et juge `solset` (inéquations, familles trigonométriques). `logic.js` avec le juge `logic` et les types `tokens` et `blocks`. Juge `poly` (Horner, division). Type `table` pour le schéma de Horner. | Toutes les compétences du catalogue, avec leurs pièges ; samples relus |
+| **U1** (partie a, G9 et G0, faite le 9 novembre 2026 ; partie b, G1, G2, G3 et G5, faite le 10 novembre 2026 ; voir §17) | Catalogue `G-gymnase-1.md` : G9, G0, G1, G2, G3, G5 | `sets.js` et juge `solset` (inéquations, familles trigonométriques). `logic.js` avec le juge `logic` et les types `tokens` et `blocks`. Juge `poly` (Horner, division). Type `table` pour le schéma de Horner. | Toutes les compétences du catalogue, avec leurs pièges ; samples relus |
 | **U2** | Catalogue `G-gymnase-2.md`, partie G6 ; `A1-analyse-1.md`, parties dérivées, DL et intégrales | `series.js`, juges `series`, `antideriv`, `definite`, `limit` (partie séries). Décisions `quality:'poor'`. | Idem, plus la vérification des primitives par dérivation sur tout le catalogue |
 | **U3** | `L-M-algebre-lineaire.md`, partie L ; **mode examen** | `matrix.js`, `matrix-input.js`. Juges `rowops`, `eigvec`, `span`, `factor` (LU, QR, PDP, orthodiagonalisation, SVD sur des cas construits). Types `tf`, `example`, `matrix`, `askCoef`. `engine/exam.js`, écran examen, plan `ba1-alglin`. | Un examen blanc d'algèbre linéaire complet et noté ; `exam.test.js` vert |
 | **U4** | `A1-analyse-1.md`, le reste (réels, suites, séries, limites, ε-δ, séries entières, définitions) ; `G-gymnase-2.md`, partie G8 | `limit.js` numérique, juge `delta`, `complex.js` et juge `complex`. Type `problem`, avec sauvegarde et reprise. Plan `ba1-analyse1`. | Problèmes longs (suite récurrente de 13 points) jouables et repris après fermeture de l'app |
@@ -818,4 +818,56 @@ Les parenthèses contiennent une formule entière : `¬(−1 ≤ x < 3)`.
 
 **Unités.** `logique` (G9, `#4c6ef5`) et `polynomes` (G0, `#d9480f`). G1 prendra `fonctions-g`. Prérequis du plan d'algèbre : `@alg:N-ensembles` = `nb-sets`, `C-developper` = `lit-polynomial`, `E-systemes` = `eq-systems`, `H-discriminant` = `quad-formula`, `D-factoriser-completement` = `fac-complete`, `G-additionner` = `rat-operations` ; crédits `E-inconnue-deux-cotes` = `eq-both-sides`, `C-identites` = `lit-identities`, `D-trinome` = `fac-trinomial`. `UNBUILT` : `g8-algebraic` ← `lit-identities`.
 
-**Pas encore fait** (pour les étapes suivantes) : `then` des décisions (une saisie après le choix) ; les pièges de l'école sur les sous-expressions numériques d'une ligne avec des lettres ; la sauvegarde en cours d'item (`profile.pending`) ; le type `problem` (le niveau 5 et les variantes `open` sont des items sans aide) ; les familles périodiques de `solset`, les cas, la substitution et les paramètres (§16.2, pour G1, G2, G3) ; le chronométrage de l'examen.
+**Pas encore fait après la partie a** (la partie b, ci-dessous, a fait `then`, les familles, les cas, la substitution et les paramètres) : `then` des décisions (une saisie après le choix) ; les pièges de l'école sur les sous-expressions numériques d'une ligne avec des lettres ; la sauvegarde en cours d'item (`profile.pending`) ; le type `problem` (le niveau 5 et les variantes `open` sont des items sans aide) ; les familles périodiques de `solset`, les cas, la substitution et les paramètres (§16.2, pour G1, G2, G3) ; le chronométrage de l'examen.
+
+### Ce que U1, partie b (G1, G2, G3 et G5), a construit
+
+Quatre unités : `fonctions-g` (G1, `#e64980`), `explog` (G2, `#9c36b5`), `trigo` (G3, `#0ca678`) et `recurrence` (G5, `#5f3dc4`). Générateurs : `fonctions-g.js` (du domaine au tableau de signes) et `fonctions-g-ineq.js` (inéquations, bornes) ; `explog.js` ; `trigo.js`, `trigo-eq.js` (équations et inéquations) et `trigo-tri.js` (triangles, fonctions arc) ; `recurrence.js`. Pièges : `rules/g1.js` (deux listes : `EARLY`, les inéquations, placée avant G9 dans `CAS_RULES` pour que `g1_pole_closed` passe avant `g9_bracket` ; `RULES`, le reste), `g2.js`, `g3.js`, `g5.js`.
+
+**Saisie (`parse.js`, `print.js`, `mathml.js`).**
+- `log_2(x)`, `log_10(x)`, `log_(1/3)(x)`, `log_a(x)` : nœud `{t:'fn', name:'logb', args:[base, x]}`, affiché log₂. `log` seul reste ln. `normal.js` donne la valeur exacte quand elle est rationnelle (log₄ 8 = 3/2), sinon un atome opaque.
+- Chiffres en indice : S₁ est lu `S_1`.
+- Σ : `{t:'sum', e, k, lo, hi}`, tapé `sum(terme, k, début, fin)` (la touche Σ écrit `sum(` ; `Σ(` est aussi lu). L'indice est lié (`symbolsIn` ne le compte pas). Affiché avec `munderover`. `normal.js` additionne exactement une somme à bornes entières (400 termes au plus) ; `atIndex(somme, j)`. `numeric.js` l'évalue terme à terme (somme vide : 0).
+- Degrés : `30°` est un produit marqué `deg: true` (valeur 30·π/180), réaffiché avec °.
+- La lettre k (entier) dans une expression de x écrit une famille : `x = π/6 + 2kπ`, `{π/6 + 2kπ ; 5π/6 + 2kπ}`, `]π/6 + 2kπ ; 5π/6 + 2kπ[`, avec `k ∈ ℤ` facultatif. Il n'y a pas de nœud `family` : une famille est une expression qui contient k.
+- Claviers : `explog` (eˣ, ln, log_, sinh… argth), `trig` (k, °, π, cot, X, t, ∨), `seq` (n, k, j, Σ, u, q, r), `ineq` (|, √, m, S, _, D).
+
+**Noyau.**
+- `numeric.js` : `compileFloat(node)` → `(env) => nombre`, l'arbre compilé une fois en fermetures (sans `eval`). Les balayages de `sets.js` l'utilisent : 4 à 6 fois plus rapides.
+- `sets.js` :
+  - `domainConds(node, v)`, `domainNode`, `domainOf(node, cfg)` : là où une expression est définie (dénominateurs ≠ 0, radicandes ≥ 0, logarithmes > 0, tan et cot hors de leurs pôles, arcsin et arccos dans [−1 ; 1], argch, argth, puissances réelles d'une base > 0) ;
+  - `substSyms(node, {t: node})`, `expandFns(node, defs, v)` (f(a) remplacé par sa définition), `piNode(k)` (k·π écrit π/2, −3π/4), `hasK` ;
+  - racines numériques : pas de 0,04 sur [−120 ; 120] (0,02 sur un domaine borné), puis bissection ; racines doubles (sin x = 1) par le changement de signe de f′ ; bornes arrondies à une fraction ou à un multiple rationnel de π ; trinômes à coefficients en π ou √ résolus par échantillonnage ;
+  - `signAt` : un facteur exactement nul ne cache plus un point où la ligne n'est pas définie ;
+  - un cache des ensembles (600 lignes) ; `setName` (S₁).
+- `exactform.js` : `exactForm(node)` (nombre écrit avec radicaux et π) et `trigForm(node, v)` (une seule fonction trigonométrique de x).
+
+**Juges.**
+- `solset`, champs ajoutés (en-tête de `judges/solset.js`) :
+  - `subst: {t: 'e^x'}` : les lettres valent une expression de v ; une ligne en t est lue t remplacé (« t = 3 ou t = −2 » est la même ligne que « eˣ = 3 »). Sert aussi à X = cos x et t = tan(x/2).
+  - `onDomain: true` : les lignes intermédiaires sont comparées sur D₀, le domaine de la première ligne de la partie (regrouper deux logarithmes élargit le domaine) ; une ligne finale doit donner le vrai ensemble ; « x = 3 ou x = −3 », juste sur D₀, est `ok` avec la note « garde les solutions du domaine ». Une ligne « D = … » est comparée à D₀ et ne remplace pas l'équation. `onDomainOf: 'tan(x/2)'` : comparaison là où cette expression existe (Bioche). `logs: true` réserve le piège `g2_log_domain` aux items de logarithmes.
+  - `exprDomain: true` : une ligne qui est une expression vaut son domaine (`g1-domain`, domaine de g ∘ f avant simplification).
+  - `params: {m: ensemble}` : un paramètre ; chaque ligne est comparée pour 5 valeurs de m tirées dans l'ensemble (entiers répartis, puis demis) ; les bornes d'un ensemble final peuvent contenir m. `paramSamples(cfg)` est exporté.
+  - `defs: {f: texte}` avec `funcs` : les fonctions de l'item sont développées avant le calcul.
+  - `periodic: true` (k entier) : une ligne avec k est la réunion sur k ; comparaison sur la fenêtre [−13 ; 13] (`window`) ou sur `domain` ; forme finale en familles sur ℝ, en intervalles sur un domaine borné (une famille y est `stay`).
+  - `inCase: true` avec `domain` = le cas : une ligne finale ne termine la partie que si elle est dans le cas.
+  - État d'une partie : `start`, `ref` (vrai ensemble), `lastEq`, et ce qu'une décision y met : `superset` (élever au carré sans condition : une ligne peut garder des solutions en trop ; la ligne finale doit être exacte).
+  - Un nombre qui n'existe pas (ln(−2), √(−4)) rend la ligne fausse et le message le nomme ; un piège ne la nomme que si son candidat en contient un aussi.
+  - **Cas** : une partie (`segment`) par cas, avec `domain` (ou `params`) ; puis une partie qui réunit les cas avec `sets: {S_1: …, S_2: …}`. C'est la forme retenue pour l'« ajout 1 » du catalogue G.
+- `equiv` : cibles `goal` (atteindre `cfg.goal` : exactement égal, même opération en tête, même nombre de termes, mêmes fonctions), `only` (seules les lettres `finalVars`), `powers`, `log-expanded`, `log-single`, `constant`, `exact`, `one-trig`, `no-sum` (avec `factored` ou `expanded`), `expanded`, `short` (plus d'appel f, g, et pas plus long que `goal` + `slack`) ; `subst` ; `defs` ; **lignes d'inégalités** `rel: '≤' | '≥'` (chaque ligne majore ou minore la précédente en 401 points du domaine ; forme finale : un nombre, `stay` s'il dépasse `cfg.bound` ; `boundWitness`).
+- `value` : formes `log` (ln d'un entier), `exact`, `deg` ; `tol` et `tolDeg` ; `terms` (la ligne est une Σ qui a exactement ces termes ; `sumTerms`) ; `arith` et `geom` pour les pièges des suites. Quand l'évaluateur de l'école ne sait pas calculer (8^(1/3)), le noyau décide.
+- Tableaux (`judges/iter.js`) : `phi {kind:'signs', v, bounds, factors:[{id, f, den?, even?}]}` ; colonnes alternées intervalle, borne ; une ligne de bornes peut être à remplir ; la ligne de f est jugée à partir des lignes de l'élève ; ‖ là où un dénominateur s'annule ; `sign()` exporté. Une case `kind: 'sign'` tourne entre + − 0 ‖ (`ui/table-input.js`).
+- Blocs : une saisie `rel` en plusieurs lettres est acceptée à un facteur près ; une saisie `expr` peut porter son `domain` (`{n: {int: [1, 6]}}`).
+- Contre-exemples : sorte `heredity` (`{v, from}`, réponse `{P}` : P héréditaire de `from` à `from + 40` et fausse quelque part).
+- Menus du mode « choisir l'action » : `steps` (`cfg.menus: [{at, options}]` : le menu de la ligne précédente de l'élève), `sigma`, `telescope`, `induction`, `trig`, `exact`.
+- `diagnose.js` : la variable du contexte retombe sur `cfg.v` (pièges en m).
+
+**Lignes (`judges/lines.js`, `ui/lines.js`).**
+- Une option de décision valide peut porter `state` (fusionné dans l'état du juge) et `then: {ask, expect, vars, store?, why?}` : l'élève tape ensuite ce que le choix demande, jugé par équivalence (`LinesRun.answerThen`) et rangé dans `state[store]`. `ref: true` marque l'option du corrigé. `checkScript` rejoue maintenant les décisions et leurs `then`.
+- En mode guidé, une ligne du corrigé sans trou, tapée en entier, est jugée comme guidée : le curseur avance et la ligne à trous suivante s'affiche.
+
+**Tests.** `tests/uni-check.js` contient les contrôles des items ; un fichier par unité (`tests/uni-<unit>.test.js`, G1 en deux moitiés) les lance, pour que `node --test` les fasse tourner en parallèle. `COUNT` baisse le nombre d'items de quelques compétences lourdes (25 ou 20 par niveau, jamais moins de 15).
+
+**Parcours.** `UNBUILT` ne garde que `g6-deriv-usual` ← `g2-real-powers`, `g3-radians` et `g8-algebraic` ← `lit-identities`. `g6-deriv-rules` dépend à nouveau de `g1-compose`. Le sous-but « ôter la valeur absolue » de `g9-intervals` crédite `g1-abs-eq`. Prérequis du plan d'algèbre : `@alg:G-valeurs-interdites` = `rat-domain`, `F-isoler` = `iso-formula`, `I-param-1er-degre` = `param-linear`, `I-param-2e-degre` = `param-quadratic`, `C-reduire` = `lit-reduce` ; crédits `E-produit-en-croix` = `eq-proportion`, `E-produit-nul` = `eq-product`.
+
+**Pas encore fait** (pour les étapes suivantes) : le type `problem` (les niveaux 5 et les variantes `open` sont des items sans aide) et le bouton « Formulaire » ; les items `plot` (les graphes de G1, G2 et G3 sont des QCM en mots) ; la sauvegarde en cours d'item ; les pièges de l'école sur les sous-expressions numériques d'une ligne avec des lettres ; aucun générateur n'utilise encore `then` (testé au niveau du juge). Les simplifications propres à chaque compétence sont dans son statut, dans le catalogue.
