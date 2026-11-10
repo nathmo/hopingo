@@ -326,7 +326,7 @@ function vfItem(rng, level, exam) {
     if (!truth) { counter = refute([['k', 'R+']], 'k = 1/k', { k: '2' }); ruleIfTrue = 'a2_changevar_domain_direction'; }
   }
   return tfItem({
-    skill: SK, level, statement, truth, counter, ruleIfTrue, explanation: why, key: `${kind}:${truth}`, exam,
+    skill: SK, level, statement, truth, counter, ruleIfTrue, explanation: why, key: `${kind}:${truth}`, exam, noHints: level >= 5,
     hints: H('|det J_G| = 1/|det ∂(u, v)/∂(x, y)| : le jacobien de G, pas celui de G⁻¹.', 'D̃ = G⁻¹(D) : les (u, v) que G envoie dans D.', why),
   });
 }
