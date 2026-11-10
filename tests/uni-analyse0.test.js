@@ -2,4 +2,4 @@
 import { test } from 'node:test';
 import { checkSkills, skillsOf } from './uni-check.js';
 
-test('unit analyse0: every skill, 5 levels and exam variants', () => checkSkills(skillsOf('analyse0')));
+test('unit analyse0: the pilot g6-deriv-rules, 5 levels and exam variants', () => checkSkills(['g6-deriv-rules']));

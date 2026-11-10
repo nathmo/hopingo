@@ -161,6 +161,20 @@ export function diff(node, v = 'x', hooks = {}) {
       return D(inner);
     }
     case 'rel': return { t: 'rel', op: node.op, l: D(node.l), r: D(node.r) };
+    // Step U2: d/dv ∫ f dv = f; d/dv ∫ from h(v) to g(v) of f(t) dt =
+    // f(g)·g′ − f(h)·h′ (theorem of the fundamental); [F] from a to b is
+    // F(b) − F(a).
+    case 'int': {
+      if (!node.lo) {
+        if (node.v === v) return node.e;
+        throw new Error('Intégrale par rapport à une autre variable');
+      }
+      if (node.v !== v && dependsOn(node.e, v)) throw new Error('Intégrale à paramètre');
+      const at = (b) => substVar(node.e, node.v, b);
+      return sub(mul(at(node.hi), D(node.hi)), mul(at(node.lo), D(node.lo)));
+    }
+    case 'bracket': return D(sub(substVar(node.e, node.v, node.hi), substVar(node.e, node.v, node.lo)));
+    case 'side': return D(node.e);
     default: throw new Error(`Je ne sais pas dériver ${node.t}`);
   }
 }
@@ -179,6 +193,12 @@ function chain(node, D, hooks, v) {
   if (isVar(inner, v)) return outer;
   if (hooks.chain) return hooks.chain(outer, inner, D(inner), node);
   return mul(outer, D(inner));
+}
+
+// e with the variable u replaced by the node b (in brackets).
+export function substVar(e, u, b) {
+  const bb = b.t === 'sym' || b.t === 'num' || b.t === 'const' ? b : { t: 'paren', e: b };
+  return mapNode(e, (n) => (n.t === 'sym' && n.name === u && !n.sub ? bb : n));
 }
 
 // Partial derivatives in turn: pdiff(f, ['x', 'y']) = ∂²f/∂y∂x.

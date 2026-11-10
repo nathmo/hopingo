@@ -31,3 +31,13 @@ export function judgeFor(cfg) {
 export const readWith = (cfg, text) => (judgeFor(cfg).parseLine ? judgeFor(cfg).parseLine(cfg, text) : parse(text, parseOpts(cfg)));
 export const showWith = (cfg, node, opts = {}) => (judgeFor(cfg).show ? judgeFor(cfg).show(cfg, node, opts) : toMathML(unparen(node), { dvar: cfg.dvar, ...opts }));
 export const textWith = (cfg, node) => (judgeFor(cfg).text ? judgeFor(cfg).text(cfg, node) : toText(node, { dvar: cfg.dvar }));
+
+// Step U2: the calculus judges (developments, primitives, definite
+// integrals, limits). Each exports `sign`, the sign shown before a line.
+import * as series from './series.js';
+import * as antideriv from './antideriv.js';
+import * as definite from './definite.js';
+import * as limit from './limit.js';
+
+Object.assign(JUDGES, { series, antideriv, definite, limit });
+export const signOf = (cfg) => judgeFor(cfg).sign ?? (cfg.kind === 'equiv' || cfg.kind === 'value' ? '=' : '→');

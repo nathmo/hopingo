@@ -24,6 +24,10 @@
 // number or letter (sin x); sin^2(x) = (sin x)². d(f) and d(f, x) are
 // derivatives, f′ and (…)′ too; π, e, ∞ are constants, i only if
 // opts.complex. x_k and x_(k+1) are indices.
+// Calculus (step U2): int(f, x) = ∫ f dx, int(f, x, a, b) = ∫ from a to b
+// (the key ∫ writes int( ; « ∫ » is read too), bracket(F, x, a, b) = [F]
+// from a to b, lim(f, x, a); a bound 0⁺ or 1⁻ (the keys ⁺ ⁻); ε(x), the
+// remainder of a DL, and o(x^n), read as xⁿ·ε(x).
 
 import { Q } from '../math/rational.js';
 
@@ -40,14 +44,16 @@ export const FUNCS = [
   'cotan', 'sinh', 'cosh', 'tanh', 'sqrt', 'root', 'conj', 'sin', 'cos', 'tan', 'cot', 'exp', 'Log', 'log', 'abs',
   'ln', 'Re', 'Im', 'arg', 'sum',
 ];
+// Calls of step U2, read as such only right before « ( » (point, limite).
+const CALLS = ['bracket', 'int', 'lim'];
 // Read as functions only when "(" follows: they also look like products of letters.
-const SHORT_FUNCS = ['sh', 'ch', 'th', 'tg', 'd'];
-const MULTI_ARG = new Set(['d', 'root', 'sum', 'Σ']);
+const SHORT_FUNCS = ['sh', 'ch', 'th', 'tg', 'd', 'o'];
+const MULTI_ARG = new Set(['d', 'root', 'sum', 'Σ', 'int', 'bracket', 'lim', '∫']);
 const GREEK = 'αβγδεζηθικλμνξρστυφχψωΓΔΘΛΞΠΣΦΨΩ';
 const RELOPS = new Set(['=', '<', '>', '≤', '≥', '≠']);
 // Set and logic symbols (step U1).
 const SET_NAMES = new Set(['ℝ', 'ℕ', 'ℤ', 'ℚ', 'ℂ', '∅']);
-const SYMBOL_OPS = '[]{}∪∩∖∈∉⊂∧∨¬⇒⇔ℝℕℤℚℂ∅';
+const SYMBOL_OPS = '[]{}∪∩∖∈∉⊂∧∨¬⇒⇔ℝℕℤℚℂ∅⁺⁻';
 
 export function normalizeText(text) {
   return String(text)
@@ -97,7 +103,7 @@ export function tokenize(text, opts = {}) {
         const atEnd = (name) => p + name.length === run.length && s[j] === '(';
         let name = FUNCS.find((f) => rest.startsWith(f))
           || [...userFuncs].find((f) => rest === f && s[j] === '(')
-          || SHORT_FUNCS.find((f) => rest === f && atEnd(f))
+          || [...SHORT_FUNCS, ...CALLS].find((f) => rest === f && atEnd(f))
           || (rest.startsWith('pi') ? 'pi' : null)
           || rest[0];
         if (rest.startsWith('pi') && name.length < 2) name = 'pi';
@@ -107,7 +113,7 @@ export function tokenize(text, opts = {}) {
       i = j;
       continue;
     }
-    if (GREEK.includes(c) || c === 'π' || c === '∞') { out.push({ k: 'name', s: c, pos: i }); i++; continue; }
+    if (GREEK.includes(c) || c === 'π' || c === '∞' || c === '∫') { out.push({ k: 'name', s: c, pos: i }); i++; continue; }
     if ('+-×÷/^()|\'√_,;□°'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
       if (c === '(') {
         const prev = out[out.length - 1];
@@ -253,6 +259,8 @@ export function parse(text, opts = {}) {
   }
   // 30° is 30·π/180: a product marked `deg`, printed back with its sign.
   const degrees = (b) => {
+    // 0⁺, 1⁻: a bound approached from one side (step U2).
+    if (isOp(peek(), '⁺') || isOp(peek(), '⁻')) return { t: 'side', e: b, dir: toks[p++].s === '⁺' ? '+' : '-' };
     if (!isOp(peek(), '°')) return b;
     p++;
     return { t: 'bin', op: '×', l: b, r: { t: 'frac', n: { t: 'const', name: 'pi' }, d: { t: 'num', s: '180', v: new Q(180) } }, deg: true };
@@ -322,6 +330,32 @@ export function parse(text, opts = {}) {
       if (k.t !== 'sym' || k.sub) fail("Dans sum(terme, k, début, fin), le 2e argument est l'indice.", at);
       return { t: 'sum', e: a[0], k: k.name, lo: a[2], hi: a[3] };
     }
+    if (name === 'int' || name === '∫') {
+      // int(f, x) = ∫ f dx; int(f, x, a, b) from a to b.
+      const a = args('int');
+      if (a.length !== 2 && a.length !== 4) fail('Écris int(f, x) pour une primitive, int(f, x, a, b) pour une intégrale de a à b.', at);
+      if (a[1].t !== 'sym' || a[1].sub) fail("Dans int(f, x, …), le 2e argument est la variable d'intégration.", at);
+      return a.length === 2 ? { t: 'int', e: a[0], v: a[1].name } : { t: 'int', e: a[0], v: a[1].name, lo: a[2], hi: a[3] };
+    }
+    if (name === 'bracket') {
+      const a = args('bracket');
+      if (a.length !== 4) fail('Écris bracket(F, x, a, b) pour [F] de a à b.', at);
+      if (a[1].t !== 'sym' || a[1].sub) fail('Dans bracket(F, x, a, b), le 2e argument est la variable.', at);
+      return { t: 'bracket', e: a[0], v: a[1].name, lo: a[2], hi: a[3] };
+    }
+    if (name === 'lim') {
+      const a = args('lim');
+      if (a.length !== 3) fail("Écris lim(f, x, a), avec a⁺ ou a⁻ pour une limite d'un côté.", at);
+      if (a[1].t !== 'sym' || a[1].sub) fail('Dans lim(f, x, a), le 2e argument est la variable.', at);
+      return { t: 'lim', e: a[0], v: a[1].name, to: a[2] };
+    }
+    if (name === 'o') {
+      // o(x^n) = xⁿ·ε(x), the remainder of a DL.
+      const a = args('o');
+      if (a.length !== 1) fail('Écris o(x^n) avec un seul argument.', at);
+      const v = firstSym(a[0]) || dvar;
+      return { t: 'bin', op: '×', l: a[0], r: { t: 'eps', v } };
+    }
     if (name === 'root') {
       const a = args('root');
       if (a.length !== 2) fail('Écris root(3, x) pour la racine cubique de x.', at);
@@ -385,10 +419,19 @@ export function parse(text, opts = {}) {
     }
     const name = t.s;
     if (name === 'pi' || name === 'π') return { t: 'const', name: 'pi' };
+    if (name === 'ε' && isOp(peek(), '(')) {
+      // ε(x): the remainder factor of a DL (step U2).
+      const at = p - 1;
+      const a = args('ε');
+      if (a.length !== 1 || stripP(a[0]).t !== 'sym' || stripP(a[0]).sub) fail('Écris ε(x), avec la variable entre les parenthèses.', at);
+      return { t: 'eps', v: stripP(a[0]).name };
+    }
+    if (name === '∫' && isOp(peek(), '(')) return call('int');
     if (name === 'Σ' && isOp(peek(), '(')) return call('sum');
     if (name === '∞') return { t: 'const', name: 'inf' };
     if (name === 'e') return { t: 'const', name: 'e' };
     if (name === 'i' && opts.complex) return { t: 'const', name: 'i' };
+    if (CALLS.includes(name)) return call(name);
     if (FUNCS.includes(name) || SHORT_FUNCS.includes(name)) {
       if (SHORT_FUNCS.includes(name) && !isOp(peek(), '(')) return symbol(name);
       return call(name);
@@ -416,6 +459,13 @@ export function parse(text, opts = {}) {
       node = { ...node };
     }
     return primes(node);
+  }
+
+  const stripP = (n) => (n.t === 'paren' ? stripP(n.e) : n);
+  function firstSym(n) {
+    if (n.t === 'sym' && !n.sub) return n.name;
+    for (const k of ['e', 'b', 'l', 'r', 'n']) if (n[k] && typeof n[k] === 'object') { const s = firstSym(n[k]); if (s) return s; }
+    return null;
   }
 
   if (!toks.length) throw new ParseError('Rien à lire.', 0);

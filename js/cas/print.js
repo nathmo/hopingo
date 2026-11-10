@@ -21,7 +21,7 @@ export function prec(n) {
     case 'frac': return PREC.frac;
     case 'pow': return PREC.pow;
     case 'float': return n.x < 0 ? PREC.neg : PREC.atom;
-    case 'sum': return PREC.prod; // Σ reads like a prefix: (Σ k)² keeps its brackets
+    case 'sum': case 'int': case 'bracket': case 'lim': return PREC.prod; // Σ reads like a prefix: (Σ k)² keeps its brackets
     default: return PREC.atom;
   }
 }
@@ -35,7 +35,8 @@ export const LOGIC_WORD = { and: 'et', or: 'ou', imp: '⇒', iff: '⇔' };
 // Can this right factor follow a number without a × sign? (3x, 2sin(x), 5(x+1))
 function startsWithLetter(n) {
   switch (n.t) {
-    case 'sym': case 'const': case 'fn': case 'sqrt': case 'paren': case 'deriv': case 'root': case 'sum': return true;
+    case 'sym': case 'const': case 'fn': case 'sqrt': case 'paren': case 'deriv': case 'root': case 'sum':
+    case 'int': case 'bracket': case 'lim': case 'eps': return true;
     case 'pow': return startsWithLetter(n.b) && n.b.t !== 'num';
     case 'bin':
       if (n.op === '+' || n.op === '-') return true; // printed in brackets
@@ -114,6 +115,33 @@ function printer(style, opts) {
         return s;
       }
       case 'abs': return `|${P(n.e)}|`;
+      // Step U2: integrals, brackets, limits, one-sided bounds, ε(x).
+      case 'eps': return `ε(${n.v})`;
+      case 'side': return `${wrap(n.e, PREC.atom)}${n.dir === '+' ? '⁺' : '⁻'}`;
+      case 'int': {
+        if (readable) {
+          const body = prec(n.e) < PREC.prod ? `(${P(n.e)})` : P(n.e);
+          return n.lo ? `∫_{${P(n.lo)}}^{${P(n.hi)}} ${body} d${n.v}` : `∫ ${body} d${n.v}`;
+        }
+        inArgs++;
+        const s = n.lo ? `int(${P(n.e)},${n.v},${P(n.lo)},${P(n.hi)})` : `int(${P(n.e)},${n.v})`;
+        inArgs--;
+        return s;
+      }
+      case 'bracket': {
+        if (readable) return `[${P(n.e)}]_{${P(n.lo)}}^{${P(n.hi)}}`;
+        inArgs++;
+        const s = `bracket(${P(n.e)},${n.v},${P(n.lo)},${P(n.hi)})`;
+        inArgs--;
+        return s;
+      }
+      case 'lim': {
+        if (readable) return `lim_{${n.v}→${P(n.to)}} ${prec(n.e) < PREC.prod ? `(${P(n.e)})` : P(n.e)}`;
+        inArgs++;
+        const s = `lim(${P(n.e)},${n.v},${P(n.to)})`;
+        inArgs--;
+        return s;
+      }
       case 'fn': {
         if (n.name === 'logb') {
           const b = n.args[0].t === 'paren' ? n.args[0].e : n.args[0];

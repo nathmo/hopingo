@@ -7,8 +7,10 @@
 // sample(vars, domain, rng, k) → k points; domain {x: [lo, hi]} or
 // {n: {int: [lo, hi]}}, default [−3, 3].
 
-import { canonFn } from './ast.js';
+import { canonFn, stripParen } from './ast.js';
 import { diff } from './diff.js';
+import { quad } from './integrate.js';
+import { limit, targetOf, limitNumber } from './limit.js';
 
 const NEAR_POLE = 0.05;
 
@@ -100,6 +102,34 @@ export function evalFloat(node, env = {}, opts = {}) {
       let e = node.e;
       for (let i = 0; i < node.n; i++) e = diff(e, node.v);
       return E(e);
+    }
+    // Step U2: a bound 0⁺ is worth 0; definite integrals by quadrature;
+    // [F] from a to b and lim by limits when a bound is one-sided or infinite.
+    case 'side': return E(node.e);
+    case 'int': {
+      if (!node.lo) return NaN;
+      const a = E(node.lo);
+      const b = E(node.hi);
+      const c = compileFloat(node.e);
+      const v = node.v;
+      return quad((x) => c({ ...env, [v]: x }), a, b);
+    }
+    case 'bracket': {
+      const at = (bound) => {
+        const s = stripParen(bound);
+        const x = E(s);
+        if (s.t !== 'side' && Number.isFinite(x)) {
+          const y = evalFloat(node.e, { ...env, [node.v]: x }, opts);
+          if (Number.isFinite(y)) return y;
+        }
+        const { to, dir } = targetOf(s);
+        return limitNumber(limit(node.e, node.v, to, dir, { env }));
+      };
+      return at(node.hi) - at(node.lo);
+    }
+    case 'lim': {
+      const { to, dir } = targetOf(node.to);
+      return limitNumber(limit(node.e, node.v, to, dir, { env }));
     }
     default: return NaN;
   }

@@ -22,6 +22,13 @@
 //   {t:'chain', items, ops}      −2 < x ≤ 4 (inequalities in one direction)
 //   {t:'not', e}  {t:'logic', op:'and'|'or'|'imp'|'iff', l, r}   ¬ ∧ ∨ ⇒ ⇔
 //   {t:'list', items}            a = 2 ; b = 1 (a system, or several answers)
+// Calculus (step U2, js/cas/series.js, judges antideriv, definite, limit, series):
+//   {t:'int', e, v, lo?, hi?}    ∫ e dv, definite when lo and hi are given; v is
+//                                bound in e for a definite integral
+//   {t:'bracket', e, v, lo, hi}  [e] from lo to hi = e(hi) − e(lo)
+//   {t:'lim', e, v, to}          lim of e when v → to (to may be a side node)
+//   {t:'side', e, dir:'+'|'-'}   0⁺, 1⁻: a bound approached from one side
+//   {t:'eps', v}                 ε(x), the remainder factor of a DL; o(xⁿ) is xⁿ·ε(x)
 // Parsed trees keep `paren` nodes; trees built by the constructors below
 // have none, and printers add brackets where precedence needs them.
 
@@ -31,6 +38,7 @@ const CHILD_KEYS = {
   neg: ['e'], paren: ['e'], bin: ['l', 'r'], frac: ['n', 'd'], pow: ['b', 'e'], sqrt: ['e'],
   root: ['n', 'e'], abs: ['e'], deriv: ['e'], rel: ['l', 'r'], sum: ['e', 'lo', 'hi'],
   not: ['e'], logic: ['l', 'r'], setop: ['l', 'r'], in: ['l', 'r'],
+  bracket: ['e', 'lo', 'hi'], lim: ['e', 'to'], side: ['e'],
 };
 // Nodes whose children are a list: key → field.
 const LIST_KEY = { chain: 'items', list: 'items' };
@@ -45,6 +53,7 @@ export function children(node) {
     if (node.kind === 'builder') return [['head', node.head], ['cond', node.cond]];
     return [];
   }
+  if (node.t === 'int') return node.lo ? [['e', node.e], ['lo', node.lo], ['hi', node.hi]] : [['e', node.e]];
   const out = [];
   for (const k of CHILD_KEYS[node.t] || []) out.push([k, node[k]]);
   if (node.t === 'sym' && node.sub && typeof node.sub === 'object') out.push(['sub', node.sub]);
@@ -109,7 +118,21 @@ export function contains(node, pred) {
 }
 
 // Does the node depend on the variable v?
-export const dependsOn = (node, v) => contains(node, (n) => n.t === 'sym' && n.name === v && !n.sub);
+// A variable bound by a definite integral, a bracket, a limit or a Σ does
+// not count; ε(x) depends on x.
+export function dependsOn(node, v) {
+  let found = false;
+  walk(node, (n) => {
+    if (found) return false;
+    if ((n.t === 'sym' && n.name === v && !n.sub) || (n.t === 'eps' && n.v === v)) { found = true; return false; }
+    if ((((n.t === 'int' && n.lo) || n.t === 'bracket' || n.t === 'lim') && n.v === v) || (n.t === 'sum' && n.k === v)) {
+      found = ['lo', 'hi', 'to'].some((k) => n[k] && dependsOn(n[k], v));
+      return false;
+    }
+    return true;
+  });
+  return found;
+}
 
 export function symbolsIn(node, out = new Set()) {
   walk(node, (n) => {
@@ -120,6 +143,15 @@ export function symbolsIn(node, out = new Set()) {
       symbolsIn(n.hi, out);
       const inner = symbolsIn(n.e);
       inner.delete(n.k);
+      for (const x of inner) out.add(x);
+      return false;
+    }
+    // The variable of a definite integral, of a bracket [F] from a to b and
+    // of a limit is bound too (step U2); a primitive ∫ f dx keeps x free.
+    if ((n.t === 'int' && n.lo) || n.t === 'bracket' || n.t === 'lim') {
+      for (const k of ['lo', 'hi', 'to']) if (n[k]) symbolsIn(n[k], out);
+      const inner = symbolsIn(n.e);
+      inner.delete(n.v);
       for (const x of inner) out.add(x);
       return false;
     }
@@ -151,6 +183,10 @@ export function equalsStructural(a, b, { parens = true } = {}) {
     case 'deriv': if (a.v !== b.v || a.n !== b.n) return false; break;
     case 'sum': if (a.k !== b.k) return false; break;
     case 'blank': return a.id === b.id;
+    case 'int': if (a.v !== b.v || !a.lo !== !b.lo) return false; break;
+    case 'bracket': case 'lim': if (a.v !== b.v) return false; break;
+    case 'side': if (a.dir !== b.dir) return false; break;
+    case 'eps': return a.v === b.v;
     default: break;
   }
   const ca = children(a);
@@ -306,6 +342,10 @@ export function rebuild(node, keep = new Set()) {
     case 'sqrt': case 'abs': case 'deriv': return { ...node, e: R(node.e) };
     case 'root': return { ...node, n: R(node.n), e: R(node.e) };
     case 'sum': return { ...node, e: R(node.e), lo: R(node.lo), hi: R(node.hi) };
+    case 'int': return node.lo ? { ...node, e: R(node.e), lo: R(node.lo), hi: R(node.hi) } : { ...node, e: R(node.e) };
+    case 'bracket': return { ...node, e: R(node.e), lo: R(node.lo), hi: R(node.hi) };
+    case 'lim': return { ...node, e: R(node.e), to: R(node.to) };
+    case 'side': return { ...node, e: R(node.e) };
     default: return node;
   }
 }

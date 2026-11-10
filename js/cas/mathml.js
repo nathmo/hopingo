@@ -82,6 +82,21 @@ export function toMathML(node, opts = {}) {
         return row(sigma, prec(e) < PREC.prod || e.t === 'neg' ? paren(M(e)) : M(e));
       }
       case 'abs': return row(mo('|', ' stretchy="false"'), M(n.e), mo('|', ' stretchy="false"'));
+      // Step U2: ∫, [F] from a to b, lim, 0⁺, ε(x).
+      case 'eps': return row('<mi>ε</mi>', mo('&#x2061;'), paren(`<mi>${esc(n.v)}</mi>`));
+      case 'side': return `<msup>${row(wrap(n.e, PREC.atom))}${mo(n.dir === '+' ? '+' : '−')}</msup>`;
+      case 'int': {
+        const sign = n.lo ? `<msubsup>${mo('∫')}${M(stripP(n.lo))}${M(stripP(n.hi))}</msubsup>` : mo('∫');
+        const e = stripP(n.e);
+        return row(sign, prec(e) < PREC.prod ? paren(M(e)) : M(e), '<mspace width="0.17em"/>', `<mi mathvariant="normal">d</mi><mi>${esc(n.v)}</mi>`);
+      }
+      case 'bracket': return `<msubsup>${row(mo('[', ' stretchy="true"'), M(stripP(n.e)), mo(']', ' stretchy="true"'))}${M(stripP(n.lo))}${M(stripP(n.hi))}</msubsup>`;
+      case 'lim': {
+        const e = stripP(n.e);
+        const to = stripP(n.to);
+        const under = row(`<mi>${esc(n.v)}</mi>`, mo('→'), to.t === 'const' && to.name === 'inf' ? row(mo('+'), M(to)) : M(to));
+        return row(`<munder>${mo('lim')}${under}</munder>`, prec(e) < PREC.prod ? paren(M(e)) : M(e));
+      }
       case 'fn': {
         if (n.name === 'logb') return row(`<msub><mi>log</mi>${M(stripP(n.args[0]))}</msub>`, mo('&#x2061;'), paren(M(n.args[1])));
         const name = `<mi>${esc(FN_NAMES[n.name] ?? n.name)}</mi>`;

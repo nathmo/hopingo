@@ -137,9 +137,10 @@ test('sub-goals credit their skills, even in a failed item (§9.3, §9.4)', () =
   const lesson = new Lesson(p, { kind: 'skill', skill: 'g6-deriv-rules' }, makeRng(1));
   const before = skillState(p, 'lit-monomial').p;
   const item = { skill: 'g6-deriv-rules', level: 4, type: 'lines', expectedSec: 120, baits: [] };
-  lesson.answer(item, { correct: false, rtSec: 60, rules: ['g6_chain_forgot'], subgoals: ['lit-monomial', 'g6-deriv-rules', 'g6-deriv-usual'] });
+  lesson.answer(item, { correct: false, rtSec: 60, rules: ['g6_chain_forgot'], subgoals: ['lit-monomial', 'g6-deriv-rules', 'g8-algebraic'] });
   assert.ok(skillState(p, 'lit-monomial').p > before);
-  assert.equal(p.skills['g6-deriv-usual'], undefined, 'a skill not built yet is ignored');
+  // g6-deriv-usual was built at step U2: g8-algebraic (step U4) is not yet.
+  assert.equal(p.skills['g8-algebraic'], undefined, 'a skill not built yet is ignored');
 });
 
 test('a lesson of long items stops after about 15 minutes (§9.7)', () => {

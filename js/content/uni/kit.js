@@ -7,7 +7,7 @@ import { parse } from '../../cas/parse.js';
 import { toMathML } from '../../cas/mathml.js';
 import { lexFor, parseFormula, formulaML } from '../../cas/logic.js';
 import { trapAnswers } from '../../judges/diagnose.js';
-import { readWith, showWith } from '../../judges/index.js';
+import { readWith, showWith, signOf } from '../../judges/index.js';
 import { segmentsOf } from '../../judges/lines.js';
 import { mcqItem } from '../items.js';
 
@@ -25,7 +25,7 @@ function linesSolution(item) {
     if (k > 0 && seg.html) out.push({ html: `<b>${seg.html}</b>`, note: '' });
     out.push({ html: showWith(seg.judge, readWith(seg.judge, seg.start.math)), note: k === 0 ? 'Départ' : '' });
     for (const l of seg.lines) {
-      if (l.kind === 'eq') out.push({ html: `<span class="eq">${seg.judge.kind === 'equiv' || seg.judge.kind === 'value' ? '=' : '→'}</span> ${showWith(seg.judge, readWith(seg.judge, l.math))}`, note: l.note || '' });
+      if (l.kind === 'eq') out.push({ html: `<span class="eq">${signOf(seg.judge)}</span> ${showWith(seg.judge, readWith(seg.judge, l.math))}`, note: l.note || '' });
       if (l.kind === 'note') out.push({ html: l.html, note: '' });
     }
   });

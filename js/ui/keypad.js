@@ -49,12 +49,16 @@ const KEYSETS = {
   // Step U1b (G1): absolute values, a parameter m, named sets S₁, the domain D.
   ineq: ['|', '√(', 'm', 'S', '_', 'D', '(', ')', 'left', 'right', 'back'],
   explog: ['e^(', 'ln(', 'log_', 'sinh(', 'cosh(', 'tanh(', 'argsh(', 'argch(', 'argth(', '√(', '(', ')', 'left', 'right', 'back'],
+  // Step U2: integrals int(f, x) and int(f, x, a, b), brackets [F] from a to
+  // b, limits, one-sided bounds 0⁺ 1⁻, the constant C, the remainder ε(x).
+  anal: ['int(', 'bracket(', 'lim(', ',', 'C', 'ε(x)', 'o(', '⁺', '⁻', '∞', 't', '(', ')', 'left', 'right', 'back'],
 };
 
 // Tab names of the keypads.
-const TAB_LABEL = { calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
+const TAB_LABEL = { anal: '∫ lim', calc: '123', calcx: '123', calcfn: 'f(x)', relation: '= <', greek: 'αβ', set: '{ ; }', logic: '∀∃', cplx: 'i', letters: 'abc', seq: 'Σ n', explog: 'eˣ ln', ineq: '|x| m', trig: 'kπ' };
 
 const LABEL = {
+  'int(': '∫( , x)', 'bracket(': '[F]ₐᵇ', 'lim(': 'lim( , x, a)', 'o(': 'o( )',
   back: '⌫', left: '◀', right: '▶', ok: '✓', '-': '−', '√': '√', "'": '′', 'd(': 'd/dx', '√(': '√( )', 'sum(': 'Σ( , k, , )',
   '^': '<span class="key-pow">▢<sup>n</sup></span>',
   frac: '<span class="key-frac"><span>▢</span><span>▢</span></span>',
@@ -193,6 +197,8 @@ export class MathInput {
 }
 
 const CARET = '<span class="caret"></span>';
+// How some chunks are drawn while typing (step U2).
+const CHUNK_SHOW = { 'int(': '∫(', 'bracket(': '[F](', 'lim(': 'lim(' };
 const isNumChar = (c) => /[0-9,]/.test(c);
 
 // Renders typed characters with live stacked fractions and the caret.
@@ -249,7 +255,7 @@ export function renderChars(chars, caret) {
     }
     if (c.length > 1) {
       // A chunk typed with one key: sin(, d(…
-      out += `${gap(i)}<span class="m-fn" data-i="${i}">${esc(c === 'd(' ? 'd(' : c)}</span>`;
+      out += `${gap(i)}<span class="m-fn" data-i="${i}">${esc(CHUNK_SHOW[c] ?? c)}</span>`;
       i++;
       continue;
     }

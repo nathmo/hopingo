@@ -15,7 +15,7 @@ import { RatFun } from './ratfun.js';
 import {
   num, lit, sym, fn, neg, add, sub, mul, div, pow, numValue, stripParen, canonFn, mapNode,
 } from './ast.js';
-import { expandDerivs } from './diff.js';
+import { expandDerivs, substVar } from './diff.js';
 import { toText } from './print.js';
 
 export class NotExact extends Error {}
@@ -136,6 +136,10 @@ function toRF(node, ctx) {
       return atom(ctx, `${name}(${u.canon()})`, node);
     }
     case 'deriv': return toRF(expandDerivs(node), ctx);
+    // Step U2: an integral is an opaque atom; a bracket is F(b) − F(a).
+    case 'int': return atom(ctx, `int(${toText(node)})`, node);
+    case 'bracket': return toRF(substVar(node.e, node.v, node.hi), ctx).sub(toRF(substVar(node.e, node.v, node.lo), ctx));
+    case 'side': return toRF(node.e, ctx);
     case 'sum': {
       // Σ with whole-number bounds: added term by term; with a bound in n,
       // an opaque atom (compared at sampled whole n by equiv.js).

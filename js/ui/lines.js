@@ -15,7 +15,7 @@ import { explainRule, solutionHtml } from './exercises.js';
 import { LinesRun, templateOf, fillBlanks } from '../judges/lines.js';
 import { actionsFor } from '../judges/actions.js';
 import { parseOpts } from '../judges/common.js';
-import { readWith, showWith, textWith } from '../judges/index.js';
+import { readWith, showWith, textWith, signOf } from '../judges/index.js';
 import { parse, tryParse } from '../cas/parse.js';
 import { toMathML } from '../cas/mathml.js';
 import { unparen } from '../cas/ast.js';
@@ -65,7 +65,7 @@ export function mountLines(item, ctx, body) {
   };
 
   // Each judge shows its own lines (the logic judge writes formulas).
-  const eqSign = () => (run.cfg.kind === 'equiv' || run.cfg.kind === 'value' ? '=' : '→');
+  const eqSign = () => signOf(run.cfg);
   const addLine = (node, cls, note = '', eq = true) => {
     history.appendChild(h(`div.step-line.${cls}`, eq ? h('span.eq', eqSign()) : null,
       html(showWith(run.cfg, node)), note ? h('span.step-note', note) : null));
