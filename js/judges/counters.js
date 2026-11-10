@@ -14,7 +14,8 @@
 //   sequence: converges, diverges, bounded, unbounded, toZero, toInf
 //             (+∞), increasing, decreasing, monotone, positive, limit
 //             (value: text), seriesConverges, seriesDiverges, absConverges
-//             (Σ|aₙ| converges), alternating (sign changes every term)
+//             (Σ|aₙ| converges), alternating (sign changes every term),
+//             eventuallyConstant (step U4: constant from some rank on)
 //   function: definedAt, continuousAt, limitAt (exists, finite), limitIs
 //             (value), differentiableAt, boundedOn (on: [lo, hi]),
 //             continuousOn (on: [lo, hi], closed), positive (on), zeroIn
@@ -103,6 +104,8 @@ function seqProp(prop, node, counter) {
     case 'monotone': { const d = diffs(); return d.every((x) => x >= -tol(x)) || d.every((x) => x <= tol(x)); }
     case 'positive': return ts.every((t) => t.y > 0);
     case 'alternating': return ts.slice(0, 2000).every((t, i, a) => i === 0 || t.y * a[i - 1].y < 0);
+    // Step U4 (A1, ε-N): constant from some rank on (seen from n = from + 1000).
+    case 'eventuallyConstant': { const far = ts.filter((t) => t.n >= from + 1000); return far.every((t) => Math.abs(t.y - far[0].y) <= tol(far[0].y)); }
     case 'seriesConverges': case 'seriesDiverges': case 'absConverges': {
       const body = prop.p === 'absConverges' ? { t: 'abs', e: node } : node;
       const r = seriesNature(body, v, from);
@@ -198,6 +201,7 @@ const SAY = {
   toInf: 'tend vers +∞', increasing: 'est croissante', decreasing: 'est décroissante', monotone: 'est monotone',
   positive: 'est positive', alternating: 'alterne de signe', seriesConverges: 'donne une série convergente',
   seriesDiverges: 'donne une série divergente', absConverges: 'donne une série absolument convergente', limit: 'a la bonne limite',
+  eventuallyConstant: 'est constante à partir d\'un rang',
   definedAt: 'est définie au point', continuousAt: 'est continue au point', limitAt: 'a une limite au point',
   limitIs: 'a la bonne limite', differentiableAt: 'est dérivable au point', boundedOn: 'est bornée sur l\'intervalle',
   continuousOn: 'est continue sur l\'intervalle', zeroIn: 's\'annule sur l\'intervalle', noZeroIn: 'ne s\'annule pas sur l\'intervalle',
