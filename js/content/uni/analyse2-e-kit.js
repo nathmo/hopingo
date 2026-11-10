@@ -142,6 +142,8 @@ export function rootT(x, sign = 1) {
 }
 // The text of a coordinate, read: −√2 for « -√2 ».
 export const rd = (t) => String(t).replace(/-/g, '−');
+// A line of the judge `system` as plain text (decision prompts): x² + y² = 5 ; xy = 2.
+export const sysR = (t) => rd(String(t).replace(/\^2/g, '²').replace(/\^3/g, '³').replace(/\^4/g, '⁴').replace(/([^ ])([+=])/g, '$1 $2').replace(/([+=])([^ ])/g, '$1 $2').replace(/([\wλ)²³⁴])-/g, '$1 - '));
 export const ptT = (p) => `(${p.map(String).join(' ; ')})`;
 export const ptR = (p) => rd(ptT(p));
 export const listT = (pts) => pts.map(ptT).join(', ');

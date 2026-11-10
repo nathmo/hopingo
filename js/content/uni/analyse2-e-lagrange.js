@@ -11,7 +11,7 @@
 
 import { Q } from '../../math/rational.js';
 import {
-  q, XY, XYZ, N, rd, rootT, sysCfg, SML, partsLines, mcq4, tfItem, problemItem, mcq, H, E, MT, blanked, examTag,
+  q, XY, XYZ, N, rd, rootT, substT, sysCfg, SML, partsLines, mcq4, tfItem, problemItem, mcq, H, E, MT, blanked, examTag,
 } from './analyse2-e-kit.js';
 
 export const LG = 'a2-lagrange';
@@ -97,8 +97,10 @@ function dataLIN(rng) {
     const sols = [[...pts[0], String(lam)], [...pts[1], String(lam.neg())]];
     const fT = `${cf(al, 'x')}${be > 0 ? '+' : '-'}${cf(Math.abs(be), 'y')}`;
     const fv = q(c, g);
-    const xl = `${al}/(${2 * a}λ)`;
-    const yl = `${be}/(${2 * b}λ)`;
+    // k/λ as text: 1/(2λ), -3/λ.
+    const overL = (k) => (k.d === 1 ? `${k.n}/λ` : `${k.n}/(${k.d}λ)`);
+    const xl = overL(q(al, 2 * a));
+    const yl = overL(q(be, 2 * b));
     const lines = [
       { math: `${al} = ${cf(2 * a, 'λx')} ; ${be} = ${cf(2 * b, 'λy')} ; ${gT(a, b, c)}`, note: `∇f = (${rd(al)} ; ${rd(be)}), ∇g = (${2 * a}x ; ${2 * b}y)`, act: 'system', sub: 'system' },
       { math: `x = ${xl} ; y = ${yl} ; ${gT(a, b, c)}`, note: 'λ ≠ 0 (sinon la 1re équation donne 0 = …) : diviser par λ est permis', act: 'express', sub: 'case' },
@@ -301,9 +303,9 @@ function lagProblem(level, rng, opts) {
     parts: [
       { item: exist, points: 1, title: 'Existence et hypothèse' },
       { item: systemMcq(d, level, rng), points: 1, title: 'Système' },
-      { item: sub([{ start: `y = 0 ; y^2 = 2λx ; ${d.gText}`, judge: caseY0, lines: [E(`λ = 0 ; y = 0 ; x^2 = ${c}`, 'y = 0 : λx = 0 et x² = …', 'case', 'cases'), E(listT(d.pts.slice(0, 2)), `x = ±${rd(xc)}`, 'points', 'list')] }], 'Cas y = 0 : résous.', 'y0'), points: 2, title: 'Cas y = 0' },
-      { item: sub([{ start: `x = ${bl} ; y^2 = 2λx ; ${d.gText}`, judge: caseY1, lines: [E(`x = ${bl} ; y^2 = ${y2} ; 3x^2 = ${c}`, 'y² = 2λx = 2x²/b, puis la contrainte', 'case', 'subst'), E(listT(d.pts.slice(2)), `x = ±${rd(d.pts[2][0])}`, 'points', 'list')] }], `Cas y ≠ 0 : la 2e équation donne x = ${rd(bl)}. Résous.`, 'y1'), points: 3, title: 'Cas y ≠ 0' },
-      { item: sub(valueParts(d, 5), `Valeurs de f : en (${rd(xc)} ; 0) :`, 'val'), points: 1, title: 'Valeurs' },
+      { item: sub([{ start: `y = 0 ; y^2 = 2λx ; ${d.gText}`, judge: caseY0, lines: [E(`λ = 0 ; y = 0 ; x^2 = ${c}`, 'y = 0 : λx = 0 et x² = …', 'case', 'cases'), E(listT(d.pts.slice(0, 2)), `x = ±${rd(xc)}`, 'points', 'list')] }, valueOf(d, d.vals[0], 5)], 'Cas y = 0 : résous, puis calcule f en ces points.', 'y0'), points: 2, title: 'Cas y = 0' },
+      { item: sub([{ start: `x = ${bl} ; y^2 = 2λx ; ${d.gText}`, judge: caseY1, lines: [E(`x = ${bl} ; y^2 = ${y2} ; 3x^2 = ${c}`, `y² = 2λx = ${y2.replace('^2', '²')}, puis la contrainte`, 'case', 'subst'), E(listT(d.pts.slice(2)), `x = ±${rd(d.pts[2][0])}`, 'points', 'list')] }], `Cas y ≠ 0 : la 2e équation donne x = ${rd(bl)}. Résous.`, 'y1'), points: 3, title: 'Cas y ≠ 0' },
+      { item: sub(valueParts(d, 5).slice(1), `Valeurs de f aux candidats du cas y ≠ 0 : en ${ptR(d.vals[2].p)} :`, 'val'), points: 1, title: 'Valeurs' },
       { item: sub(compareParts(d, 5), 'Conclus. Le maximum de f sur la courbe :', 'cmp'), points: 2, title: 'Conclusion' },
     ],
     key: `${level}:${d.gText}:${m}`, exam: examTag(opts, 10), expectedSec: 900, fallback: !!d.fallback,
@@ -450,7 +452,7 @@ function lin3Lines(level, rng, opts) {
   const valPart = (P, sign) => {
     const l = E(String(sign * d.R * d.n), `f${rd(p3(P))}`, 'compare', 'value');
     return {
-      html: `Valeur de f en ${rd(p3(P))} :`, ask: 'f =', start: `${a}×(${P[0]})+${b}×(${P[1]})+${c}×(${P[2]})`.replace(/\+-/g, '-'), judge: { kind: 'value' },
+      html: `Valeur de f en ${rd(p3(P))} :`, ask: 'f =', start: substT(d.fT, { x: String(P[0]), y: String(P[1]), z: String(P[2]) }, XYZ), judge: { kind: 'value' },
       lines: [level === 1 ? blanked(l, [String(d.R * d.n)], { vars: [] }) : l],
     };
   };

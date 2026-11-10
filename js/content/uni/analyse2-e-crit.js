@@ -10,7 +10,7 @@
 //   C  f = x³ + εy³ + 3kxy: x(x³ + εk³) = 0, points (0, 0) and (−εk, −k)
 
 import {
-  q, XY, KEYS, poly, padd, pscale, pmul, psub, pd, pat, ptxt, N, ptT, ptR, listT, rd, RD, substT,
+  q, XY, KEYS, sysR, poly, padd, pscale, pmul, psub, pd, pat, ptxt, N, ptT, ptR, listT, rd, RD, substT,
   sysCfg, SML, partsLines, linesItem, mcq4, vfMcq, tfItem, problemItem, natureDecision, H, E, MT, blanked, examTag,
 } from './analyse2-e-kit.js';
 
@@ -142,7 +142,7 @@ function famC(rng) {
   const lines = [
     { math: eqs(`y = ${yT}`, `${e === 1 ? '' : '-'}y^2${k > 0 ? '+' : '-'}${Math.abs(k) === 1 ? '' : Math.abs(k)}x = 0`), note: `1re équation : y = ${RD(yT, XY)} ; la 2e divisée par 3`, act: 'express', sub: 'transform' },
     { math: eqs(`y = ${yT}`, `x(x^3${c3 > 0 ? '+' : '-'}${Math.abs(c3)}) = 0`), note: 'Substituer y dans la 2e équation, puis mettre x en facteur (sans diviser par x)', act: 'subst', sub: 'transform' },
-    { math: eqs(`y = ${yT}`, `(x = 0 ou x = ${-e * k})`), note: `x = 0, ou x³ = ${-c3}`, act: 'cases', sub: 'cases' },
+    { math: eqs(`y = ${yT}`, `(x = 0 ou x = ${-e * k})`), note: `x = 0, ou x³ = ${rd(-c3)}`, act: 'cases', sub: 'cases' },
     { math: listT(pts), note: `y = ${RD(yT, XY)} dans chaque cas`, act: 'list', sub: 'list' },
   ];
   return { fam: 'C', f, fx, fy, pts, lines, zero: true };
@@ -176,7 +176,8 @@ export function critData(rng, fams = ['A', 'B', 'B0', 'C']) {
   d.fyy = pd(d.fy, 1);
   d.det = psub(pmul(d.fxx, d.fyy), pmul(d.fxy, d.fxy));
   d.HT = `[[${ptxt(d.fxx, XY)}, ${ptxt(d.fxy, XY)}], [${ptxt(d.fxy, XY)}, ${ptxt(d.fyy, XY)}]]`;
-  d.detT = ptxt(d.det, XY);
+  // A diagonal H (family A): det H = f_xx·f_yy, kept as a product.
+  d.detT = d.fxy.size ? ptxt(d.det, XY) : `(${ptxt(d.fxx, XY)})(${ptxt(d.fyy, XY)})`;
   d.info = d.pts.map((p) => {
     const det = pat(d.det, p);
     const fxx = pat(d.fxx, p);
@@ -330,7 +331,7 @@ function casesDecision(d, k) {
     };
   }
   return {
-    kind: 'decision', prompt: `Comment exploiter le système ${SML(d.cfg, before)} ?`, options: [
+    kind: 'decision', prompt: `Comment exploiter le système ${sysR(before)} ?`, options: [
       { id: 'cases', label: 'Un produit est nul si l\'un des facteurs l\'est : on sépare les cas', valid: true },
       { id: 'div', label: 'Diviser par la variable en facteur', valid: false, rule: 'a2_crit_divide', why: 'Cette variable peut valoir 0 : on perdrait les points où elle est nulle.' },
       { id: 'one', label: 'Garder seulement le facteur qui n\'est pas une variable seule', valid: false, rule: 'a2_crit_divide', why: 'Chaque facteur nul donne des solutions : il faut tous les cas.' },
