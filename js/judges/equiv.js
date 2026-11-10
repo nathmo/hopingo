@@ -37,9 +37,10 @@ import { numValue, stripParen, symbolsIn, contains, equalsStructural, unparen, w
 import { parse } from '../cas/parse.js';
 import { substSyms, expandFns } from '../cas/sets.js';
 import { equalExact, exactValue } from '../cas/normal.js';
-import { evalFloat } from '../cas/numeric.js';
+import { evalFloat, compileFloat } from '../cas/numeric.js';
 import { exactForm, trigForm } from '../cas/exactform.js';
 import { toText } from '../cas/print.js';
+import { limit, sameLimit } from '../cas/limit.js';
 import { polyOf, qCoeffs, discriminant, sumTerms, productFactors, isExpanded } from '../cas/polyx.js';
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine, frNum } from './common.js';
@@ -356,7 +357,8 @@ function boundPoints(cfg) {
     const from = cfg.from ?? d.int[0];
     const xs = [];
     for (let n = from; n <= from + 200; n++) xs.push(n);
-    for (let k = 3; k <= 8; k++) if (10 ** k > from + 200) xs.push(10 ** k);
+    // cfg.maxN (step U4): no sample past it (a Σ up to n costs n terms).
+    for (let k = 3; k <= 8; k++) if (10 ** k > from + 200 && !(10 ** k > cfg.maxN)) xs.push(10 ** k);
     return { v, xs };
   }
   const [lo, hi] = cfg.domain?.[v] || [-3, 3];
@@ -369,10 +371,12 @@ function boundPoints(cfg) {
 export function boundWitness(cfg, prev, node) {
   const { v, xs } = boundPoints(cfg);
   const sign = cfg.rel === '≥' ? -1 : 1;
+  const A = compileFloat(expandDerivs(prev));
+  const B = compileFloat(expandDerivs(node));
   for (const x of xs) {
-    const a = evalFloat(expandDerivs(prev), { [v]: x });
+    const a = A({ [v]: x });
     if (!Number.isFinite(a)) continue;
-    const b = evalFloat(expandDerivs(node), { [v]: x });
+    const b = B({ [v]: x });
     if (!Number.isFinite(b) || sign * (a - b) > 1e-9 * (1 + Math.abs(a) + Math.abs(b))) return { [v]: x, a, b };
   }
   return null;
@@ -401,6 +405,7 @@ function judgeBound(cfg, prev, node) {
     const word = cfg.rel === '≥' ? 'plus grande' : 'plus petite';
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: `En ${v} = ${frNum(w[v])}, ta ligne vaut ${small(w.b)}, ${word} que la précédente (${small(w.a)}) : ce n'est pas une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}.` };
   }
+  if (cfg.squeeze) return squeezeEnd(cfg, node, v);
   if (contains(node, (x) => x.t === 'sym' && x.name === v)) return cfg.simple && simpleBound(node, v) ? { kind: 'done', node } : { kind: 'ok', node };
   const q = exactValue(node);
   const val = q ? q.valueOf() : evalFloat(node, {});
@@ -410,4 +415,23 @@ function judgeBound(cfg, prev, node) {
   }
   if (!TARGETS.constant(node)) return { kind: 'stay', node, message: "C'est juste, mais calcule ce nombre." };
   return { kind: 'done', node };
+}
+
+// Step U4 (A1 catalogue, squeeze): cfg.squeeze = {L, gone?}: a bound of a
+// sequence (whole v, from cfg.from) ends the part when its limit as v → +∞
+// is L and none of the pieces `gone` (node types or function names, default
+// ['sum']) that depends on v is left in it (ln 2 may stay); a bound with
+// another limit is `stay` (it does not squeeze the sequence), and one whose
+// limit cannot be told is `ok`.
+function squeezeEnd(cfg, node, v) {
+  const gone = cfg.squeeze.gone || ['sum'];
+  if (contains(node, (x) => (gone.includes(x.t) || (x.t === 'fn' && gone.includes(x.name))) && symbolsIn(x).has(v))) return { kind: 'ok', node };
+  let r;
+  try { r = limit(node, v, '+inf', undefined, { discrete: true }); } catch { r = { value: null }; }
+  if (r.value === null) return { kind: 'ok', node };
+  const want = limit(parse(String(cfg.squeeze.L)), v, '+inf', undefined, { discrete: true });
+  if (sameLimit(r, want)) return { kind: 'done', node };
+  const word = cfg.rel === '≥' ? 'minoration' : 'majoration';
+  const at = r.value === '+inf' ? '+∞' : r.value === '-inf' ? '−∞' : r.value === 'none' ? 'aucune limite' : frNum(typeof r.value === 'number' ? r.value : r.value.valueOf());
+  return { kind: 'stay', node, message: `C'est une ${word} juste, mais elle tend vers ${at}, et l'autre borne n'a pas cette limite : elle ne coince pas la suite. Cherche une borne plus serrée.` };
 }

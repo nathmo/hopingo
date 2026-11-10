@@ -28,6 +28,8 @@
 // (the key ∫ writes int( ; « ∫ » is read too), bracket(F, x, a, b) = [F]
 // from a to b, lim(f, x, a); a bound 0⁺ or 1⁻ (the keys ⁺ ⁻); ε(x), the
 // remainder of a DL, and o(x^n), read as xⁿ·ε(x).
+// Step U4 (A1, sequences): a factorial n!, (n + 1)!, read as the call
+// {t:'fn', name:'fact', args:[e]} and printed back with « ! ».
 
 import { Q } from '../math/rational.js';
 
@@ -119,7 +121,7 @@ export function tokenize(text, opts = {}) {
       continue;
     }
     if (GREEK.includes(c) || c === 'π' || c === '∞' || c === '∫') { out.push({ k: 'name', s: c, pos: i }); i++; continue; }
-    if ('+-×÷/^()|\'√_,;□°'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
+    if ('+-×÷/^()|\'√_,;□°!'.includes(c) || RELOPS.has(c) || SYMBOL_OPS.includes(c)) {
       if (c === '(') {
         const prev = out[out.length - 1];
         stack.push(prev?.k === 'name' && MULTI_ARG.has(prev.s) ? 'args' : 'group');
@@ -264,6 +266,8 @@ export function parse(text, opts = {}) {
   }
   // 30° is 30·π/180: a product marked `deg`, printed back with its sign.
   const degrees = (b) => {
+    // Step U4 (A1, sequences): n!, (n + 1)!, (2n)!: the call fact(…).
+    while (isOp(peek(), '!')) { p++; b = { t: 'fn', name: 'fact', args: [b] }; }
     // 0⁺, 1⁻: a bound approached from one side (step U2).
     if (isOp(peek(), '⁺') || isOp(peek(), '⁻')) return { t: 'side', e: b, dir: toks[p++].s === '⁺' ? '+' : '-' };
     if (!isOp(peek(), '°')) return b;

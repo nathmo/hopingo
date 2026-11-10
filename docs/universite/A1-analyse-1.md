@@ -220,6 +220,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-seq-squeeze` — Gendarmes : trouver les deux bornes
 - **Année** 13 · **Prérequis** `a1-seq-limits`, `g1-bound` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits (a), (b) et (c), ce dernier élargi à (an + c·sin n)/(dn + e) ; le gabarit (d) ⌊nx⌋/n est laissé de côté (pas de partie entière dans le noyau). Dans (b), q ≤ 2p pour que nᵠ ≤ e^(pn) dès n = 1. Une partie par borne (`equiv` avec `rel` et `from: 1`) : elle se termine sur une borne dont la limite est la limite commune et où il ne reste ni Σ, ni sin, ni Log en n (option `squeeze` ajoutée au juge `equiv`) ; une borne juste mais d'une autre limite reste à corriger. Puis la limite de chaque borne (`limit`, n entier) et « lim aₙ = ℓ » (`value`). Au niveau 1, le minorant est donné. `a1_squeeze_different_limits` et `a1_bounded_implies_convergent` sont des options de la décision finale ; `a1_bounded_times_zero` (défini en U2, ramené par la partie j) est un leurre du QCM et du menu du niveau 3, sans être défini ici. V/F : énoncés aux bornes explicites, contre-exemple bₙ = 1 + (−1)ⁿ. Variante open : un problème de 2 points réparti sur les parties.
 - **Intro** : on minore et on majore aₙ par deux suites **qui ont la même limite**. Pour majorer une fraction positive : augmenter le numérateur, diminuer le dénominateur. Avec un Log : `2n = Log(e²ⁿ) ≤ Log(e²ⁿ + n²) ≤ Log(2e²ⁿ) = 2n + Log 2`. Si le majorant tend vers 0 et aₙ ≥ 0, un seul côté suffit.
 - **Juge** : lignes d'encadrement `equiv` `{rel:'≤'|'≥', from:n₀}` (convention 2), chacune comparée à aₙ ; puis `limit` sur chaque borne · **Forme finale** : deux bornes de même limite, et la valeur de la limite.
 - **Niveaux** :
@@ -241,6 +242,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-seq-1inf` — Formes 1^∞ : écrire e^(n·Log(…))
 - **Année** 13 · **Prérequis** `a1-seq-limits`, `g2-real-powers` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits (a) à (e) ; dans (e), 1/n remplace 1/√n (la limite numérique d'un terme en 1/√n converge trop lentement) ; (c) est écrit e^(n²·Log(1 + p/n) − pn), une seule exponentielle. Trois parties : la forme exponentielle (`equiv`, jusqu'à e^(v·Log u)), la limite de l'exposant (`limit`, n entier ; la ligne « Log(1 + h) ≈ h » est écrite sans reste), puis la limite de la suite. Le niveau 1 donne la forme exponentielle. Le niveau 5 est un `lines` sans aide (gabarits b, c, e). Le QCM du gabarit (c) nomme `a1_dl_order_too_low`. V/F : énoncés généraux avec contre-exemple uₙ = 1 + 1/n.
 - **Intro** : `uₙ^(vₙ) = e^(vₙ·Log uₙ)`. Si uₙ → 1 et vₙ → ∞, c'est une forme indéterminée : on utilise `Log(1 + h) = h + h·ε(h)` avec h → 0. Exemple : `(1 + 2/n)ⁿ = e^(n·Log(1 + 2/n)) → e²`.
 - **Juge** : `limit` `{v:'n', to:'+inf', discrete:true}` ; la ligne « exposant → c » est jugée comme une limite séparée (sous-item) · **Forme finale** : `e^c` simplifié (c rationnel), ou 0, ou +∞.
 - **Niveaux** :
@@ -263,6 +265,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-seq-ratio` — Critère de d'Alembert pour les suites
 - **Année** 13 · **Prérequis** `a1-seq-limits` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). La factorielle est ajoutée au noyau (`n!`, `(2n)!`, clavier « n! »). Gabarits nᵖ·cⁿ/n!, cⁿ(n!)²/(2n)! (c ≠ 4), c^(n²)/(n!)², cⁿ·n!/nⁿ (c = 1, 2, 3 : q = c/e) et (2n)!/c^(n²) ; pas de q = 1 dans les lignes. Le verdict est une partie `limit` dont la limite est donnée par l'item (option `value` ajoutée au juge `limit`, qui ne calcule pas de limite avec n!). Les V/F du catalogue sur une suite précise (lim 2^(n²)/(n!)² = 0) sont devenus des QCM « lim aₙ = ? » ; les V/F sont des énoncés généraux avec contre-exemple (aₙ = 1 + 1/n). Le niveau 5 est un `lines` sans aide. Le leurre `a1_ratio_one` (compétence `a1-ser-ratio-root`) manque encore : ajouté à la fusion.
 - **Pourquoi ces prérequis** : `a1-seq-limits` : calculer la limite du rapport.
 - **Intro** : si `|aₙ₊₁/aₙ| → q < 1`, alors aₙ → 0 ; si q > 1, alors |aₙ| → +∞ ; si q = 1, on ne peut rien dire. Bon réflexe devant n!, qⁿ, q^(n²). Exemple : `n!/nⁿ` : rapport `(n/(n + 1))ⁿ → 1/e < 1`, donc → 0.
 - **Juge** : `equiv` `{vars:['n'], domain:{n:'ℕ*'}}` pour la simplification du rapport ; `limit` pour sa limite ; décision « q < 1 / q > 1 / q = 1 » · **Forme finale** : verdict (« → 0 », « → +∞ », « critère non concluant ») et la limite.
@@ -285,6 +288,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-seq-monotone` — Suites monotones et bornées ; suites de Cauchy
 - **Année** 13 · **Prérequis** `a1-seq-limits`, `g5-induction-more`, `a1-ser-geo-tele` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits (a) avec p = 2 et 3, (b) Σ 1/k! majorée par 3 par une somme géométrique, (c) uₙ₊₁ = √(c + uₙ), u₀ = 0, c = ℓ(ℓ − 1) : l'hérédité de la récurrence est une ligne d'inégalité en u ∈ [0 ; ℓ], la croissance le signe de √(c + u) − u par la quantité conjuguée. Conclusion jugée par `value` : « lim uₙ ≤ 2 » (ou 3), ou ℓ pour (c). Le niveau 5 et la variante tf sont des V/F d'examen avec contre-exemples de suites ; « x₀ = 2, xₙ = xₙ₋₁ − 1/n converge » devient « toute suite décroissante converge » (le contre-exemple 2 − Hₙ est dans l'explication). Le leurre `a1_monotone_by_f_increasing` (compétence `a1-seq-rec-fixed`) manque encore : ajouté à la fusion. Variante open : un problème de 2 points.
 - **Pourquoi ces prérequis** : `a1-seq-limits` : calculer la limite une fois la convergence établie.
 - **Intro** : toute suite croissante et majorée converge (vers son Sup). Dans ℝ, une suite converge si et seulement si elle est de Cauchy. Une suite bornée n'est pas forcément convergente : (−1)ⁿ. Exemple : `uₙ = Σ_{k=1}^{n} 1/k²` est croissante et majorée par 2, donc converge.
 - **Juge** : lignes `equiv` (calcul de uₙ₊₁ − uₙ), lignes d'encadrement (convention 2), décision finale « converge / diverge » avec la règle (« monotone et bornée ») · **Forme finale** : verdict justifié par les deux propriétés.
@@ -307,6 +311,7 @@ Unité `analyse1` · préfixe `a1-` · pièges `a1_` · Statut : dérivées, dé
 
 ### `a1-seq-limsup` — lim sup, lim inf et sous-suites
 - **Année** 13 · **Prérequis** `a1-seq-limits` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U4). Gabarits (a), (b), (c) (avec un facteur A) et (d) ; (e) est laissé de côté. Pour chaque sous-suite : a₂ₘ écrit à partir de aₙ (`equiv` en m entier), puis sa limite (`limit`, m entier) ; lim sup et lim inf sont deux parties `value` (une lim sup égale au sup des termes est nommée `a1_limsup_as_sup`). Dans (c), seules a₄ₘ et a₄ₘ₊₂ sont calculées, a₄ₘ₊₁ = a₄ₘ₊₃ = 0 est donné. Le niveau 5 est le QCM d'examen. V/F : les deux vrais du catalogue, plus des faux avec contre-exemple (−1)ⁿ.
 - **Intro** : on sépare la suite en sous-suites (n pair, n impair, n modulo 4…) qui convergent chacune. lim sup = la plus grande de leurs limites, lim inf = la plus petite. La suite converge si et seulement si lim sup = lim inf (finie). Exemple : `(−1)ⁿ + 1/n` : lim sup = 1, lim inf = −1.
 - **Juge** : `limit` `{v:'m', to:'+inf', discrete:true}` pour chaque sous-suite (`a₂ₘ`, `a₂ₘ₊₁`) ; deux champs `value` pour lim sup et lim inf · **Forme finale** : les deux valeurs.
 - **Niveaux** :

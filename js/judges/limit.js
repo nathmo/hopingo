@@ -79,7 +79,10 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const { node } = read;
   if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression (ou la valeur de la limite), sans « = ».' };
   if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
-  const a = limitOf(cfg, prev);
+  let a = limitOf(cfg, prev);
+  // Step U4 (A1, ratio test): cfg.value, the limit of a line that cannot be
+  // computed (a sequence with n!), known from the item.
+  if (a.value === null && cfg.value !== undefined) a = limitOf(cfg, parse(String(cfg.value)));
   const b = limitOf(cfg, node);
   if (b.value === null) return { kind: 'stay', node, message: 'Je n\'arrive pas à calculer la limite de cette ligne : écris-la autrement.' };
   if (a.value !== null && !sameLimit(a, b)) {
