@@ -57,7 +57,7 @@ export function linT(terms) {
     const c = q(c0);
     if (c.n === 0) continue;
     const abs = c.n < 0 ? c.neg() : c;
-    const body = v ? (abs.eq(1) ? v : abs.d === 1 ? `${abs.n}${v}` : `(${abs})${v}`) : String(abs);
+    const body = v ? (abs.eq(1) ? v : abs.d === 1 ? `${abs.n}${v}` : `${abs.n === 1 ? '' : abs.n}${v}/${abs.d}`) : String(abs);
     out += c.n < 0 ? `-${body}` : out ? `+${body}` : body;
   }
   return out || '0';
