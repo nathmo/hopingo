@@ -23,7 +23,7 @@ import { walk } from '../../cas/ast.js';
 import { exprML, parseExpr } from '../../cas/matexpr.js';
 import { blankLine } from '../../judges/lines.js';
 import {
-  q, mt, vt, ML, MLm, opR, fq, qt, sub, rrefWith, orthRational, gsReverse, lsqReverse, opLines, pickCells,
+  q, mt, vt, ML, MLm, opR, fq, qt, polyT, polyR, rrefWith, orthRational, gsReverse, opLines, pickCells,
   withCells, matLines, coefItem, mcqDistinct, tfL, examTag, rowHoles,
 } from './alglin-kit.js';
 import { MT } from './kit.js';
@@ -60,8 +60,6 @@ function rootT(n0) {
   if (m === 1) return String(out);
   return out === 1 ? `√${m}` : `${out}√${m}`;
 }
-const isSquare = (n0) => { const n = q(n0).valueOf(); const r = Math.round(Math.sqrt(n)); return r * r === n; };
-const rootR = (n) => rootT(n);
 
 // A sum of numbers as text: 3+0-8.
 const sumT = (xs) => xs.map((x, i) => { const s = qt(x); return i === 0 ? s : s.startsWith('-') ? s : `+${s}`; }).join('');
@@ -245,7 +243,8 @@ function partsItem(o, parts) {
   const [first, ...rest] = parts;
   const script = [...(o.before || []), ...first.lines];
   for (const p of rest) script.push(seg(p.html, p.ask, p.start, p.judge), ...(p.pre || []), ...p.lines);
-  return matLines({ ...o, start: first.start, judge: first.judge, script, keys: o.keys || ['mat'] });
+  const grid = parts.some((p) => ['mat', 'rowops', 'span', 'factor'].includes(p.judge.kind));
+  return matLines({ ...o, start: first.start, judge: first.judge, script, keys: o.keys || (grid ? ['mat'] : ['calc']) });
 }
 const withMenu = (p, m) => ({ ...p, judge: { ...p.judge, menu: m } });
 
@@ -1216,7 +1215,7 @@ function lsqData(rng, kind) {
     const At = MX.transpose(A);
     const AtA = MX.mul(At, A);
     const Atb = MX.matVec(At, b);
-    if (maxAbs([AtA.flat(), Atb]) > 60) continue;
+    if (maxAbs([AtA.flat(), Atb]) > 60 || AtA[0][1].n === 0) continue;
     const M = AtA.map((row, i) => [...row, Atb[i]]);
     const red = MX.rref(M);
     if (red.ops.length > (n === 2 ? 5 : 8)) continue;
@@ -1298,7 +1297,7 @@ function lsqItem(level, rng) {
         ['Résoudre AAᵀx = Ab', 'On multiplie Ax = b à gauche par Aᵀ : AᵀA a la taille de x, AAᵀ celle de b.', 'l_lsq_normal_aat'],
       ])),
     };
-    return partsItem({ ...base, prompt: lsqPrompt(d, `. ${AandB ? `Ici ${AandB}.` : ''}`), before: [decision] }, [lsqAtAPart(d, rng), lsqAtbPart(d, rng), lsqRedPart(d, rng), lsqXPart(d, rng)]);
+    return partsItem({ ...base, prompt: lsqPrompt(d, `.${AandB ? ` Ici ${AandB}.` : ''}`), before: [decision] }, [lsqAtAPart(d, rng), lsqAtbPart(d, rng), lsqRedPart(d, rng), lsqXPart(d, rng)]);
   }
   if (level === 3) {
     const parts = [lsqAtAPart(d, null, false), lsqAtbPart(d, null, false), lsqRedPart(d), lsqXPart(d)];
@@ -1381,6 +1380,209 @@ function lsqExam(rng, exam) {
 }
 
 // ======================================================================
+// l-orth-inner
+// ======================================================================
+
+const INNER = 'l-orth-inner';
+const INNER_SUB = [
+  { id: 'eval', label: 'évaluer', skill: INNER },
+  { id: 'proj', label: 'projection', skill: PROJ },
+];
+// p(t) for p given by its coefficients (constant first).
+const evalP = (cs, t) => cs.reduceRight((s, c) => s.mul(q(t)).add(q(c)), q(0));
+const ipP = (p, r, pts) => pts.reduce((s, t) => s.add(evalP(p, t).mul(evalP(r, t))), q(0));
+const par = (x) => (q(x).n < 0 || q(x).d !== 1 ? `(${qt(x)})` : qt(x));
+// p(t₁)·r(t₁) + … as text.
+const ipText = (p, r, pts) => pts.map((t) => `${par(evalP(p, t))}·${par(evalP(r, t))}`).join('+');
+const ptsDef = (pts) => pts.map((t) => `p(${fq(t)})q(${fq(t)})`).join(' + ');
+const polyD = (cs) => polyR(cs.map((c) => q(c)));
+
+const ipPart = (p, r, pts, names, guided = null) => {
+  const s = ipText(p, r, pts);
+  const v = ipP(p, r, pts);
+  return {
+    judge: { kind: 'value', expect: qt(v) }, start: `${names[0]}·${names[1]}`, html: `⟨${names[0]}, ${names[1]}⟩`, ask: `⟨${names[0]}, ${names[1]}⟩ =`,
+    lines: [guided ? eqG(s, guided, 'Valeurs aux points, multipliées', 'eval') : eq(s, 'Valeurs aux points, multipliées', 'eval'), eq(qt(v), '', 'eval')],
+  };
+};
+const randPoly = (rng) => { for (;;) { const cs = [rng.int(-2, 2), rng.int(-2, 2), rng.int(-2, 2)]; if (cs[1] || cs[2]) return cs; } };
+
+function innerItem(level, rng) {
+  if (level === 2) return innerAxiom(rng);
+  if (level === 3 || (level === 5 && rng.chance(0.5))) return innerProj(level, rng);
+  if (level === 4) return innerGS(rng);
+  if (level === 5) return innerSingular(rng);
+  // Level 1: one inner product, then a norm.
+  const pts = rng.pick([[-1, 0, 1], [-1, 0, 1], [0, 1, 2], [-2, 0, 2], [-1, 1, 2]]);
+  let p;
+  let r;
+  for (let t = 0; t < 100; t++) {
+    p = randPoly(rng);
+    r = randPoly(rng);
+    if (ipP(p, r, pts).n !== 0 && p.join() !== r.join() && ipP(p, p, pts).valueOf() <= 40) break;
+  }
+  const np = ipP(p, p, pts);
+  const normPart = {
+    judge: { kind: 'value', expect: rootT(np), form: 'exact' }, start: '√(p·p)', html: '‖p‖ = √⟨p, p⟩', ask: '‖p‖ =',
+    lines: [eqG(`√(${pts.map((t) => `${par(evalP(p, t))}^2`).join('+')})`, [0, 2], 'Somme des carrés des valeurs', 'eval'), eq(rootT(np), '', 'eval')],
+  };
+  return partsItem({
+    skill: INNER, level, subgoals: INNER_SUB, key: `${INNER}:${p}:${r}:${pts}`, mode: 'guided', keys: ['calc'],
+    prompt: `Sur P₂, on pose ⟨p, q⟩ = ${ptsDef(pts)}. Soit p = ${polyD(p)} et q = ${polyD(r)}. Calcule ⟨p, q⟩, puis ‖p‖.`,
+    hints: hints3('Calcule les valeurs de p et de q aux points, multiplie-les deux à deux, puis additionne.', `p : ${pts.map((t) => `p(${fq(t)}) = ${fq(evalP(p, t))}`).join(', ')}`, `⟨p, q⟩ = ${fq(ipP(p, r, pts))}`),
+  }, [ipPart(p, r, pts, ['p', 'q'], [0, 3]), normPart]);
+}
+
+// Level 2: two points on P₂: which axiom fails?
+function innerAxiom(rng) {
+  const [a, b] = rng.pick([[0, 1], [-1, 1], [0, 2], [1, 2], [-1, 0], [-1, 2]]);
+  const r = [a * b, -(a + b), 1];
+  const decision = {
+    kind: 'decision', prompt: 'Quel axiome tombe ?', options: rng.shuffle(menu('Défini positif : un polynôme non nul peut avoir ⟨p, p⟩ = 0', [
+      ['La symétrie', `p(${fq(a)})q(${fq(a)}) + p(${fq(b)})q(${fq(b)}) ne change pas si on échange p et q.`],
+      ['La linéarité', 'Chaque terme est linéaire en p (et en q) : la somme aussi.'],
+    ])),
+  };
+  return partsItem({
+    skill: INNER, level: 2, subgoals: INNER_SUB, key: `${INNER}:axiom:${a},${b}`, mode: 'guided', keys: ['calc'],
+    prompt: `Sur P₂, on pose ⟨p, q⟩ = p(${fq(a)})q(${fq(a)}) + p(${fq(b)})q(${fq(b)}). Est-ce un produit scalaire ? Teste p = ${polyD(r)}.`,
+    before: [decision],
+    hints: hints3('Un produit scalaire vérifie ⟨p, p⟩ > 0 pour tout p ≠ 0. Cherche un polynôme non nul qui s\'annule aux deux points.', `p(${fq(a)}) = □, p(${fq(b)}) = □`, '⟨p, p⟩ = 0 alors que p ≠ 0'),
+  }, [ipPart(r, r, [a, b], ['p', 'p'], [0, -1])]);
+}
+
+// Projection of q on Span{1, t} (symmetric points: 1 ⊥ t).
+function innerProj(level, rng) {
+  const pts = rng.pick([[-1, 0, 1], [-2, 0, 2]]);
+  let r;
+  for (let t = 0; t < 50; t++) { r = randPoly(rng); if (r[2]) break; }
+  const one = [1, 0, 0];
+  const tt = [0, 1, 0];
+  const a = ipP(r, one, pts);
+  const n0 = ipP(one, one, pts);
+  const b = ipP(r, tt, pts);
+  const n1 = ipP(tt, tt, pts);
+  const c0 = a.div(n0);
+  const c1 = b.div(n1);
+  const coefP = (num, den, c, nm) => ({
+    judge: { kind: 'value', expect: qt(c), ...(level === 3 ? { menu: menu(`⟨q, ${nm}⟩ / ⟨${nm}, ${nm}⟩`, [[`⟨q, ${nm}⟩`, `Il faut diviser par ⟨${nm}, ${nm}⟩ = ${fq(num === a ? n0 : n1)}.`, 'g4_proj_no_square'], [`⟨q, ${nm}⟩ / ‖${nm}‖`, `Il faut diviser par ‖${nm}‖² = ⟨${nm}, ${nm}⟩.`, 'g4_proj_no_square']]) } : {}) },
+    start: `q·${nm}/(${nm}·${nm})`, html: `Coefficient de ${nm} : ⟨q, ${nm}⟩ / ⟨${nm}, ${nm}⟩`, ask: `c${nm === '1' ? '₀' : '₁'} =`,
+    lines: [eq(`(${ipText(r, nm === '1' ? one : tt, pts)})/(${ipText(nm === '1' ? one : tt, nm === '1' ? one : tt, pts)})`, 'Valeurs aux points', 'proj'), eq(qt(c), '', 'proj')],
+  });
+  const proj = polyT([c0, c1].map((x) => q(x)));
+  const parts = [
+    { judge: { kind: 'value', expect: '0', ...(level === 3 ? { menu: menu('Vérifier que ⟨1, t⟩ = 0', [['Projeter directement sur 1 et t', 'La formule de projection demande une base orthogonale : vérifie d\'abord ⟨1, t⟩ = 0.', 'l_proj_nonorth']]) } : {}) }, start: '1·t', html: '⟨1, t⟩ : la base (1, t) est-elle orthogonale ?', ask: '⟨1, t⟩ =', lines: [eq(ipText(one, tt, pts), '', 'eval'), eq('0', 'Base orthogonale', 'eval')] },
+    coefP(a, n0, c0, '1'),
+    coefP(b, n1, c1, 't'),
+    { judge: { kind: 'poly', v: 't', target: 'expanded', ...(level === 3 ? { menu: menu('proj = c₀·1 + c₁·t', [['proj = c₀ + c₁', 'La projection est un polynôme : c₀·1 + c₁·t.']]) } : {}) }, start: `(${qt(a)}/${qt(n0)})+(${qt(b)}/${qt(n1)})·t`, html: 'La projection c₀·1 + c₁·t', ask: 'proj =', lines: [eq(proj, '', 'proj')] },
+  ];
+  return partsItem({
+    skill: INNER, level, subgoals: INNER_SUB, key: `${INNER}:proj:${r}:${pts}:${level}`, mode: level === 3 ? 'tap' : 'free', keys: ['calc'], tapActions: level === 3 ? 'menu' : null,
+    prompt: `Sur P₂, on pose ⟨p, q⟩ = ${ptsDef(pts)}. Projette q = ${polyD(r)} sur Span{1, t}.`,
+    hints: hints3('Vérifie que 1 et t sont orthogonaux pour ce produit, puis applique la formule de projection avec ⟨ , ⟩.', `proj = (□/${fq(n0)})·1 + (□/${fq(n1)})·t`, `proj = ${polyR([c0, c1].map((x) => q(x)))}`),
+  }, parts);
+}
+
+// Level 4: Gram-Schmidt on (1, t, t²) with ⟨p, q⟩ = Σ p(tᵢ)q(tᵢ).
+function innerGS(rng) {
+  for (let t = 0; t < 100; t++) {
+    const pts = rng.shuffle([-2, -1, 0, 1, 2]).slice(0, 3).sort((x, y) => x - y);
+    const one = [1, 0, 0];
+    const tt = [0, 1, 0];
+    const t2 = [0, 0, 1];
+    const s1 = ipP(tt, one, pts);
+    const m = s1.div(q(3));
+    const v1 = [m.neg(), q(1), q(0)];
+    const a = ipP(t2, one, pts);
+    const b = ipP(t2, v1, pts);
+    const c = ipP(v1, v1, pts);
+    const k = b.div(c);
+    const v2 = [a.div(q(3)).neg().sub(k.mul(v1[0])), k.neg(), q(1)];
+    if (v2.some((x) => x.d > 9) || m.d > 3) continue;
+    const parts = [
+      { judge: { kind: 'value', expect: qt(s1) }, start: 't·1', html: '⟨t, 1⟩ (et ⟨1, 1⟩ = 3)', ask: '⟨t, 1⟩ =', lines: [eq(ipText(tt, one, pts), '', 'eval'), eq(qt(s1), '', 'eval')] },
+      { judge: { kind: 'poly', v: 't', target: 'expanded' }, start: `t-(${qt(s1)}/3)`, html: 'v₁ = t − (⟨t, 1⟩/⟨1, 1⟩)·1', ask: 'v₁ =', lines: [eq(polyT(v1), '', 'proj')] },
+      { judge: { kind: 'value', expect: qt(b) }, start: 'q·v_1', html: `⟨t², v₁⟩ (et ⟨t², 1⟩ = ${fq(a)})`, ask: '⟨t², v₁⟩ =', lines: [eq(ipText(t2, v1, pts), '', 'eval'), eq(qt(b), '', 'eval')] },
+      { judge: { kind: 'value', expect: qt(c) }, start: 'v_1·v_1', html: '⟨v₁, v₁⟩', ask: '⟨v₁, v₁⟩ =', lines: [eq(ipText(v1, v1, pts), '', 'eval'), eq(qt(c), '', 'eval')] },
+      { judge: { kind: 'poly', v: 't', target: 'expanded' }, start: `t^2-(${qt(a)}/3)-((${qt(b)})/(${qt(c)}))·(${polyT(v1)})`, html: 'v₂ = t² − (⟨t², 1⟩/⟨1, 1⟩)·1 − (⟨t², v₁⟩/⟨v₁, v₁⟩)·v₁', ask: 'v₂ =', lines: [eq(polyT(v2), '', 'proj')] },
+    ];
+    return partsItem({
+      skill: INNER, level: 4, subgoals: INNER_SUB, key: `${INNER}:gs:${pts}`, mode: 'free', keys: ['calc'],
+      prompt: `Sur P₂, on pose ⟨p, q⟩ = ${ptsDef(pts)}. Applique Gram-Schmidt à (1, t, t²) : v₀ = 1, puis v₁, puis v₂.`,
+      hints: hints3('Mêmes formules que dans ℝⁿ, avec ce produit scalaire : vⱼ = xⱼ − Σ (⟨xⱼ, vᵢ⟩/⟨vᵢ, vᵢ⟩)·vᵢ.', `v₁ = t − (□/3)·1`, `v₁ = ${polyR(v1)}, v₂ = ${polyR(v2)}`),
+    }, parts);
+  }
+  return innerProj(4, rng);
+}
+
+// Level 5: ⟨u, v⟩ = uᵀAᵀAv with A singular.
+const SINGULAR = [[[1, 2], [2, 4]], [[1, -1], [-2, 2]], [[2, 1], [4, 2]], [[1, 3], [2, 6]], [[3, 1], [-3, -1]], [[1, -2], [1, -2]]];
+function innerSingular(rng) {
+  const A = MX.mat(rng.pick(SINGULAR));
+  const u = MX.kernel(A)[0];
+  const ui = scaleV(u, denOf(u));
+  const decision = {
+    kind: 'decision', prompt: '⟨u, v⟩ = uᵀAᵀAv est-il un produit scalaire sur ℝ² ?', options: rng.shuffle(menu('Non : A n\'est pas inversible', [
+      ['Oui : uᵀAᵀAu = ‖Au‖² ≥ 0', '‖Au‖² ≥ 0, mais il faut ⟨u, u⟩ > 0 pour tout u ≠ 0 : si A est singulière, un u ≠ 0 donne Au = 0.', 'l_inner_positivity'],
+    ])),
+  };
+  return partsItem({
+    skill: INNER, level: 5, subgoals: INNER_SUB, key: `${INNER}:sing:${mt(A)}`, mode: 'free', keys: ['mat'],
+    prompt: `Soit A = ${MLm(A)} et ⟨u, v⟩ = uᵀAᵀAv sur ℝ². Est-ce un produit scalaire ? Si non, donne u ≠ 0 avec ⟨u, u⟩ = 0.`,
+    before: [decision], hints: [],
+  }, [
+    { judge: { kind: 'span', basis: [vt(u)], require: 'basis' }, start: 'u', html: '', ask: 'u =', lines: [eq(vt(ui), 'Au = 0 : un vecteur du noyau', 'eval')] },
+    { judge: { kind: 'mat', expect: '0', names: { A: mt(A) } }, start: '⟨u,u⟩', html: '⟨u, u⟩ = (Au) · (Au) = ‖Au‖²', ask: '⟨u, u⟩ =', lines: [eq('0', 'Au = 0', 'eval')] },
+  ]);
+}
+
+function innerExam(rng, exam) {
+  if (exam === 'tf') {
+    const which = rng.int(0, 2);
+    if (which === 0) {
+      const A = MX.mat(rng.pick(SINGULAR));
+      const u = MX.kernel(A)[0];
+      return tfL({
+        skill: INNER, key: `sing:${mt(A)}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'l_inner_positivity',
+        statement: 'Pour toute matrice A de taille 2 × 2, ⟨u, v⟩ = uᵀAᵀAv est un produit scalaire sur ℝ².',
+        counter: { kind: 'matOne', params: { want: 'innerNotPD', n: 2 }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }, { v: 'u', label: 'u =', shape: [2, 1] }], answer: { A: mt(A), u: vt(scaleV(u, denOf(u))) } },
+        explanation: `Faux : avec A = ${MLm(A)} et u = ${vR(scaleV(u, denOf(u)))}, Au = 0, donc ⟨u, u⟩ = ‖Au‖² = 0 alors que u ≠ 0.`,
+      });
+    }
+    if (which === 1) {
+      return tfL({
+        skill: INNER, key: 'three', truth: true, exam: examTag({ exam }),
+        statement: '⟨p, q⟩ = p(−1)q(−1) + p(0)q(0) + p(1)q(1) est un produit scalaire sur P₂.',
+        explanation: 'Vrai : symétrique et bilinéaire, et ⟨p, p⟩ = p(−1)² + p(0)² + p(1)² = 0 force trois racines, donc p = 0 (degré ≤ 2).',
+      });
+    }
+    const [a, b] = rng.pick([[0, 1], [-1, 1], [0, 2], [1, 2]]);
+    const r = [a * b, -(a + b), 1];
+    return tfL({
+      skill: INNER, key: `two:${a},${b}`, truth: false, exam: examTag({ exam }),
+      statement: `⟨p, q⟩ = p(${fq(a)})q(${fq(a)}) + p(${fq(b)})q(${fq(b)}) est un produit scalaire sur P₂.`,
+      counter: { kind: 'vecFamily', params: { want: 'polyNullAtPoints', points: [a, b], deg: 2 }, ask: [{ v: 'p', label: 'p(t) =', keys: ['calc'] }], answer: { p: polyT(r.map((x) => q(x))) } },
+      explanation: `Faux : p = ${polyD(r)} est non nul mais ⟨p, p⟩ = p(${fq(a)})² + p(${fq(b)})² = 0.`,
+    });
+  }
+  const pts = rng.pick([[-1, 0, 1], [0, 1, 2], [-2, 0, 2], [-1, 1, 2]]);
+  let p;
+  let r;
+  for (let t = 0; t < 100; t++) { p = randPoly(rng); r = randPoly(rng); if (ipP(p, r, pts).n !== 0 && p.join() !== r.join()) break; }
+  const v = ipP(p, r, pts);
+  const coefDot = p.reduce((s, c, k) => s.add(q(c).mul(q(r[k]))), q(0));
+  const two = ipP(p, r, pts.slice(0, 2));
+  return mcqDistinct({
+    skill: INNER, level: 4, key: `mcq:${p}:${r}:${pts}`, exam: examTag({ exam }),
+    prompt: `Sur P₂, on pose ⟨p, q⟩ = ${ptsDef(pts)}. Avec p = ${polyD(p)} et q = ${polyD(r)}, ⟨p, q⟩ vaut :`,
+    right: fq(v),
+    wrongs: [{ html: fq(coefDot), rule: null }, { html: fq(two), rule: null }],
+    fillers: [{ html: fq(v.neg()) }, { html: fq(v.add(1)) }, { html: fq(v.sub(2)) }],
+    solution: [{ html: `⟨p, q⟩ = ${C(ipText(p, r, pts))} = ${fq(v)}`, note: 'Valeurs aux points, pas les coefficients' }],
+  }, rng);
+}
+
+// ======================================================================
 
 export const GEN = {
   [DOT]: (level, rng, profile, opts = {}) => (opts.exam ? dotExam(rng, opts.exam) : dotItem(level, rng)),
@@ -1390,6 +1592,7 @@ export const GEN = {
   [GS]: (level, rng, profile, opts = {}) => (opts.exam ? gsExam(rng, opts.exam) : gsItem(level, rng)),
   [QR]: (level, rng, profile, opts = {}) => (opts.exam ? qrExam(rng, opts.exam) : qrItem(level, rng)),
   [LSQ]: (level, rng, profile, opts = {}) => (opts.exam ? lsqExam(rng, opts.exam) : lsqItem(level, rng)),
+  [INNER]: (level, rng, profile, opts = {}) => (opts.exam ? innerExam(rng, opts.exam) : innerItem(level, rng)),
 };
 
 export { dotQ, n2, rootT, Qv };
