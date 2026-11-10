@@ -300,7 +300,10 @@ function witnessMessage(r, cfg) {
   if (!r.witness) return 'Cette ligne n\'est pas égale à la précédente.';
   const [v] = Object.keys(r.witness.env);
   const [a, b] = r.witness.values;
-  const at = v ? `En ${v} = ${frNum(r.witness.env[v])}, ` : '';
+  let at = v ? `En ${v} = ${frNum(r.witness.env[v])}, ` : '';
+  // Step U6: several variables, the point of the plane or of space.
+  const names = Object.keys(r.witness.env);
+  if (names.length > 1) at = `En (${names.join(' ; ')}) = (${names.map((k) => frNum(r.witness.env[k])).join(' ; ')}), `;
   return `${at}la ligne précédente vaut ${frNum(a)}, mais ta ligne vaut ${frNum(b)}.`;
 }
 

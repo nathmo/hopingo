@@ -38,3 +38,8 @@ import { RULES as G10A } from './g10a.js';
 import { RULES as G10B } from './g10b.js';
 
 CAS_RULES.push(...G4A, ...G4B, ...G10A, ...G10B);
+
+// Step U6: module A2.
+import { RULES as A2 } from './a2.js';
+
+CAS_RULES.push(...A2);

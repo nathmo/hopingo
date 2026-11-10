@@ -30,6 +30,7 @@ import { mountBlocks } from './blocks.js';
 import { mountTable } from './table-input.js';
 import { mountMatrix, mountExample } from './matrix-items.js';
 import { mountPlot } from './plot.js';
+import { mountDomain } from './domain.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -91,6 +92,8 @@ MOUNTS.matrix = (item, ctx, body) => mountMatrix(item, ctx, body);
 MOUNTS.example = (item, ctx, body) => mountExample(item, ctx, body);
 // Step U5: elements placed on the plane (conics).
 MOUNTS.plot = (item, ctx, body) => mountPlot(item, ctx, body);
+// Step U6: the bounds of an integral.
+MOUNTS.domain = (item, ctx, body) => mountDomain(item, ctx, body);
 
 // ---------- multiple choice ----------
 

@@ -58,3 +58,12 @@ import * as geom from './geom.js';
 import * as conic from './conic.js';
 
 Object.assign(JUDGES, { vector, geom, conic });
+
+// Step U6: differential equations, non-linear systems, polar bounds of a
+// limit in two variables, bounds of a multiple integral (A2).
+import * as ode from './ode.js';
+import * as system from './system.js';
+import * as bound from './bound.js';
+import * as domain from './domain.js';
+
+Object.assign(JUDGES, { ode, system, bound, domain });

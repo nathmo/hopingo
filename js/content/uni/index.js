@@ -45,3 +45,13 @@ export const UNBUILT = {
 Object.assign(UNBUILT, {
   'g8-polar': ['lit-identities', 'g3-exact'],
 });
+
+// Step U6: module A2 (analyse II). a1-seq-limsup (U4) stands for its
+// prerequisite a1-seq-limits until U4 builds it.
+import * as analyse2 from './analyse2.skills.js';
+
+UNI_UNITS.push(analyse2.UNIT);
+UNI_SKILLS.push(...analyse2.SKILLS);
+Object.assign(UNBUILT, {
+  'a1-seq-limsup': ['a1-seq-limits'],
+});

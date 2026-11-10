@@ -51,6 +51,9 @@ const SHORT_FUNCS = ['sh', 'ch', 'th', 'tg', 'd', 'o'];
 const MULTI_ARG = new Set(['d', 'root', 'sum', 'Σ', 'int', 'bracket', 'lim', '∫']);
 const GREEK = 'αβγδεζηθικλμνξρστυφχψωΓΔΘΛΞΠΣΦΨΩ';
 const RELOPS = new Set(['=', '<', '>', '≤', '≥', '≠']);
+// Step U6 (A2): pd(f, x) = ∂f/∂x, pd(f, x, y) = ∂²f/∂y∂x (the ∂ key).
+SHORT_FUNCS.push('pd');
+MULTI_ARG.add('pd');
 // Set and logic symbols (step U1).
 const SET_NAMES = new Set(['ℝ', 'ℕ', 'ℤ', 'ℚ', 'ℂ', '∅']);
 const SYMBOL_OPS = '[]{}∪∩∖∈∉⊂∧∨¬⇒⇔ℝℕℤℚℂ∅⁺⁻';
@@ -312,6 +315,13 @@ export function parse(text, opts = {}) {
         expect(')', 'Une parenthèse n\'est pas fermée.');
       } else arg = bareArg('log').args[0];
       return primes({ t: 'fn', name: 'logb', args: [base, arg] });
+    }
+    if (name === 'pd') {
+      // Step U6: a partial derivative, one variable after another.
+      const a = args('pd');
+      if (a.length < 2) fail('Écris pd(f, x) : la fonction, puis la variable.', at);
+      if (a.slice(1).some((v) => v.t !== 'sym' || v.sub)) fail('Dans pd(f, x, y), après la fonction viennent les variables.', at);
+      return primes(a.slice(1).reduce((e, v) => ({ t: 'deriv', e, v: v.name, n: 1, partial: true }), a[0]));
     }
     if (name === 'd') {
       const a = args('d');

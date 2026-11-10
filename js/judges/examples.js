@@ -33,6 +33,7 @@ import { polyOf, coeffs, qCoeffs, degree, divide, I } from '../cas/polyx.js';
 import { Poly, gcdPoly } from '../cas/poly.js';
 import { checkLinalg } from './linalg-examples.js';
 import { checkGeo } from './geo-examples.js';
+import { checkA2 } from './a2-examples.js'; // step U6
 
 const SAMPLES = {
   R: ['-3', '-2', '-1', '-1/2', '0', '1/3', '1/2', '1', '2', '5/2', '3', '7'],
@@ -247,6 +248,7 @@ export function checkCounter(counter, answers) {
     case 'poly': return checkPoly(counter, answers);
     case 'composite': return checkComposite(counter, answers);
     case 'geo': return checkGeo(counter, answers); // step U5
+    case 'a2': return checkA2(counter, answers); // step U6
     default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
   }
 }

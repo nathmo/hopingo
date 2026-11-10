@@ -33,3 +33,8 @@ import { GEN as GEOAN } from './geoan.js';
 import { GEN as CONIQUES } from './coniques.js';
 
 Object.assign(UNI_GEN, GEOAN, CONIQUES);
+
+// Step U6: module A2.
+import { GEN as ANALYSE2 } from './analyse2.js';
+
+Object.assign(UNI_GEN, ANALYSE2);
