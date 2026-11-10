@@ -27,7 +27,7 @@
 // Traps (judges: ['odevec']) replay on the previous line or on cfg; the
 // candidates are compared by their values at a few times.
 
-import { parseMatLine, evalAst, envOf, lineML, lineText, normalizeMatText, isLiteralAst } from '../cas/matexpr.js';
+import { parseMatLine, evalAst, envOf, lineML, lineText, normalizeMatText, isLiteralAst, exprML } from '../cas/matexpr.js';
 import { ParseError, parse } from '../cas/parse.js';
 import { toMathML } from '../cas/mathml.js';
 import { diff } from '../cas/diff.js';
@@ -95,6 +95,8 @@ function readLine(cfg, text0) {
   if (line.ops.length || line.assigns.length > 1) throw new ParseError('Écris une seule matrice ou un seul vecteur, fonction de ' + vOf(cfg) + '.', 0);
   const env = { ...envOf(opts) };
   line.value = line.body ? evalAst(line.body, env, opts, aOf(cfg).A.length) : null;
+  // Shown as written (a sum of modes, e^(2t)(I + tN)), not as its value.
+  if (line.body && !isLiteralAst(line.body)) line.ml = exprML(line.body);
   // « e^(At) = … » is read as a label, not as a product.
   if (line.label && /e\^?\(?A/.test(line.label)) line.assigns = [];
   return { t: 'mline', ...line, text };
