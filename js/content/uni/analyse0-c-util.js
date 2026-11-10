@@ -6,7 +6,6 @@ import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { toText, toReadable } from '../../cas/print.js';
 import { walk, lit, mapNode } from '../../cas/ast.js';
-import { evalFloat } from '../../cas/numeric.js';
 import { blankLine } from '../../judges/lines.js';
 
 export const q = (n, d = 1) => new Q(n, d);
@@ -84,7 +83,6 @@ export function atBlank(text, v, value, opts = {}) {
   const { node, holes } = substituted(text, v, value, opts);
   return blankLine(node, holes, opts);
 }
-export const valueAt = (text, v, value) => evalFloat(parse(text), { [v]: Q.of(value).valueOf() });
 
 // A line with sub-expressions left blank. texts: 'text' (first match) or
 // ['text', k] (the k-th match, from 0; -1 for the last one).
@@ -146,4 +144,3 @@ export function distinctOptions(list, n = 4) {
 }
 
 export const KEYS = ['calcx', 'calcfn', 'anal'];
-export const KEYS_SET = ['calcx', 'set', 'relation', 'anal'];

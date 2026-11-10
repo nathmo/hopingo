@@ -13,7 +13,7 @@ import { toText } from '../../cas/print.js';
 import { MT, fr, linesItem, mcq, examTag } from './kit.js';
 import {
   q, N, RT, nz, modeOf, H, E, D, NOTE, polyText, affText, minusText, pEval, pDeriv, pAdd, pScale, atText, blanked, part,
-  partsScript, usedSubgoals, distinctOptions, KEYS, coefText,
+  partsScript, usedSubgoals, distinctOptions, KEYS,
 } from './analyse0-c-util.js';
 
 const T = 't';

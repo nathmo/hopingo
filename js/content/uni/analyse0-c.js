@@ -14,7 +14,7 @@
 import { MT, fr, linesItem, mcq, tfItem, examTag } from './kit.js';
 import {
   q, N, RT, nz, modeOf, H, E, D, NOTE, coefText, polyText, affText, minusText, pEval, pDeriv, pAdd, pScale,
-  atText, atBlank, blanked, part, partsScript, usedSubgoals, distinctOptions, KEYS, KEYS_SET,
+  atText, atBlank, blanked, part, partsScript, usedSubgoals, distinctOptions, KEYS,
 } from './analyse0-c-util.js';
 import { GEN as STUDY } from './analyse0-c-study.js';
 import { GEN as PARAM } from './analyse0-c-param.js';
