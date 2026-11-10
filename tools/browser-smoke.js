@@ -22,7 +22,10 @@
 //            in, a grade between 1 and 6;
 //   problem  a long problem played halfway, reloaded, resumed from the
 //            home screen (« Reprendre le problème ») and finished;
-//   school   a lesson of fractions and one of equations, played to the end.
+//   school   a lesson of fractions and one of equations, played to the end;
+//   steps    rat-equation (x + 12/x = 7) solved on screen in four lines
+//            written above the answer, each checked; a wrong line flagged;
+//            screenshots of the 2D input (fraction, power, root).
 //
 // The lesson screen plays given items through Lesson kind 'items'
 // (js/engine/session.js), a debug entry point the app never uses.
@@ -32,7 +35,7 @@
 //   node tools/browser-smoke.js --only mount --unit alglin --per 1
 //   node tools/browser-smoke.js --only play --skill l-sys-rref
 // Options:
-//   --only a,b        phases to run (start, mount, play, wrong, exams, problem, school)
+//   --only a,b        phases to run (start, mount, play, wrong, exams, problem, school, steps)
 //   --unit u1,u2      university units to check (default: all)
 //   --skill s1,s2     skills to check (default: all of the units)
 //   --per N           items per skill, level and exam variant (default 2)
@@ -60,7 +63,7 @@ const opt = (name, def) => {
 };
 const flag = (name) => argv.includes(`--${name}`);
 const list = (s) => (s ? String(s).split(',').map((x) => x.trim()).filter(Boolean) : null);
-const PHASES = ['start', 'mount', 'play', 'wrong', 'exams', 'problem', 'school'];
+const PHASES = ['start', 'mount', 'play', 'wrong', 'exams', 'problem', 'school', 'steps'];
 const ONLY = list(opt('only')) ?? PHASES;
 const UNITS = list(opt('unit'));
 const SKILLS = list(opt('skill'));
@@ -972,7 +975,7 @@ function pageLib() {
     const add = (text, keys, w) => { if (text !== undefined && text !== null && String(text) !== '') out.push({ text: String(text), keys, where: where + w }); };
     switch (item.type) {
       case 'lines': {
-        const keys = item.keys?.length ? item.keys : ['calcx', 'calcfn'];
+        const keys = { item };
         M.lines.segmentsOf(item).forEach((seg, s) => {
           const cfg = seg.judge;
           const grid = M.idx.judgeFor(cfg).input === 'matrix';
@@ -994,7 +997,7 @@ function pageLib() {
       }
       case 'blocks': for (const b of item.blocks) if (b.input) add(b.input.answer, b.input.keys || ['calc', 'relation'], ' block'); break;
       case 'domain': for (const f of item.fields) for (const x of item.answer[f.v]) add(x, item.keys || ['calc', 'calcfn'], ` bound ${f.v}`); break;
-      case 'answer': add(item.expected, item.keys ?? 'frac', ' answer'); break;
+      case 'answer': add(item.expected === 'aucune' ? '∅' : item.expected, { item }, ' answer'); break;
       case 'problem': item.parts.forEach((p, i) => S.typedTexts(p, out, `${where} part ${i + 1}`)); break;
       case 'table': case 'code': if (item.then) S.typedTexts(item.then, out, `${where} then`); break;
       case 'readtable': S.typedTexts(item.question, out, `${where} question`); break;
@@ -1005,7 +1008,7 @@ function pageLib() {
   // With the keypads the screens add for the symbols (js/ui/keys-needed.js).
   const isNames = (k) => Array.isArray(k) && k.length && k.every((x) => x.length > 1);
   S.coverage = (item) => S.typedTexts(item).map((x) => {
-    const keys = isNames(x.keys) ? M.kn.keysFor(x.keys, [x.text]) : x.keys;
+    const keys = x.keys?.item ? M.kn.keysForItem(x.keys.item).flatMap((t) => t.keys) : isNames(x.keys) ? M.kn.keysFor(x.keys, [x.text]) : x.keys;
     return { ...x, keys, missing: S.untypable(x.text, keys) };
   }).filter((x) => x.missing);
 
@@ -1164,6 +1167,46 @@ function pageLib() {
       if (it.signed && n.t === 'neg' && n.e.t === 'num' && n.e.fresh) { out.push(`-${n.e.s}`); signedIn.push(path); } else if (n.t === 'num' && n.fresh) out.push(n.s);
     });
     return out;
+  };
+
+  // ---------- free steps above an answer (spec §17) ----------
+  // A lesson of `skill` whose item starts with a line matching `re`.
+  S.stepsFind = async (skill, re, level = 3) => {
+    S.trace = { issues: [], untypable: [], steps: 0 };
+    S.takeErrors();
+    const { skillState } = await import('/js/engine/learner.js');
+    Object.assign(skillState(M.app.profile, skill), { level, introduced: true });
+    for (let n = 0; n < 60; n++) {
+      M.app.go('lesson', { kind: 'skill', skill });
+      await wait(20);
+      if (window.__hopingoItem?.type === 'intro') { press('À toi !'); await wait(20); }
+      const it = window.__hopingoItem;
+      if (it?.skill === skill && it.start && new RegExp(re).test(it.start.math)) return { start: it.start.math, key: it.key };
+    }
+    return null;
+  };
+  // Types a line on the keypad (S.typeMath), returns the field's markup.
+  S.stepsType = async (text) => {
+    const mi = document.querySelector('.answer-row .mi-display').__mi;
+    await S.typeMath(mi, text);
+    return { value: mi.value, html: mi.display.innerHTML, untypable: S.trace.untypable.splice(0) };
+  };
+  S.stepsCopy = () => { press('⧉ Recopier la ligne'); return document.querySelector('.answer-row .mi-display').innerHTML; };
+  S.stepsAdd = async () => {
+    press('＋ Ajouter une étape');
+    await wait(30);
+    return S.stepsState();
+  };
+  S.stepsState = () => ({
+    lines: [...document.querySelectorAll('.draft-lines .step-line')].map((l) => ({ cls: l.className, text: norm(l.textContent), html: l.innerHTML })),
+    feedback: norm(document.querySelector('.exercise .step-feedback')?.textContent ?? ''),
+    feedbackBad: !!document.querySelector('.exercise .step-feedback.bad'),
+    value: document.querySelector('.answer-row .mi-display')?.__mi?.value ?? null,
+  });
+  S.stepsCheck = async () => {
+    press('Vérifier');
+    const panel = await sleepUntil(() => document.querySelector('.feedback.show'), 3000);
+    return { good: !!panel?.classList.contains('good'), text: norm(panel?.textContent ?? '').slice(0, 200), errors: S.takeErrors(), scan: S.scan() };
   };
 
   S.uniSkills = () => M.uni.UNI_SKILLS.map((s) => ({ id: s.id, unit: s.unit, exam: s.exam || [] }));
@@ -1420,6 +1463,72 @@ async function phaseSchool() {
   }
 }
 
+// Free steps (spec §17): rat-equation x + c/x = s solved on screen in four
+// lines, each typed on the keypad, drawn in 2D and checked; a wrong line
+// (s not multiplied by x) is flagged and its trap named. Screenshots of the
+// field show a fraction, a power and a root.
+async function shotOf(name, selector) {
+  const box = await cdp.eval(`(() => { const el = document.querySelector(${JSON.stringify(selector)}); el.scrollIntoView({ block: 'center' }); const r = el.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; })()`);
+  const clip = { x: Math.max(0, box.x - 10), y: Math.max(0, box.y - 10), width: box.w + 20, height: box.h + 20, scale: 2 };
+  const { data } = await cdp.send('Page.captureScreenshot', { format: 'png', clip });
+  const file = join(OUT, `${name}.png`);
+  writeFileSync(file, Buffer.from(data, 'base64'));
+  report.screenshots.push(file);
+  return file;
+}
+
+async function phaseSteps() {
+  log('\n== steps: rat-equation solved in four checked lines');
+  await load();
+  await cdp.eval(`(async () => { const a = window.__smoke.M.app; a.store.createProfile({name: 'Étapes', avatar: '🦉', year: 12, track: 'unknown'}); const { applyPlacement } = await import('/js/engine/learner.js'); applyPlacement(a.profile, 0); a.save(); })()`);
+  const found = await cdp.call('stepsFind', 'rat-equation', '^x\\+12/x=7$') ?? await cdp.call('stepsFind', 'rat-equation', '^x\\+\\d+/x=\\d+$');
+  if (!found) { fail('steps', 'rat-equation', 'no item x + c/x = s'); return; }
+  const [, c, s] = /^x\+(\d+)\/x=(\d+)$/.exec(found.start).map(Number);
+  const roots = [];
+  for (let r = 1; r < s; r++) if (r * (s - r) === c && !roots.includes(s - r)) roots.push(r);
+  const [r1, r2] = roots.length === 1 ? [roots[0], s - roots[0]] : roots;
+  log(`  item ${found.start}, solutions ${r1} and ${r2}`);
+  await shot('steps-question');
+  const ok = (cond, what) => { if (!cond) fail('steps', found.start, what); };
+  // The start line copied into the field: a fraction in 2D.
+  const copied = await cdp.call('stepsCopy');
+  ok(/m-frac/.test(copied), 'the copied line has no 2D fraction');
+  log(`  ${await shotOf('steps-input-fraction', '.answer-row')}`);
+  // A wrong first line: s not multiplied by x.
+  let t = await cdp.call('stepsType', `x^2+${c}=${s}`);
+  ok(/m-sup/.test(t.html), 'no raised exponent in the field');
+  let st = await cdp.call('stepsAdd');
+  ok(st.feedbackBad && st.lines.length === 0, `the wrong line is not flagged: ${st.feedback}`);
+  ok(/Multiplier seulement certains termes/.test(st.feedback), `the trap is not named: ${st.feedback}`);
+  log(`  wrong line: ${st.feedback.slice(0, 140)}`);
+  await shot('steps-wrong-line');
+  // The four lines.
+  const chain = [`x^2+${c}=${s}x`, `x^2-${s}x+${c}=0`, `(x-${r1})(x-${r2})=0`];
+  for (const [i, line] of chain.entries()) {
+    t = await cdp.call('stepsType', line);
+    ok(t.value === line, `typed « ${t.value} » for « ${line} »`);
+    for (const u of t.untypable) fail('steps', line, `cannot type « ${u.missed} »`);
+    if (i === 0) log(`  ${await shotOf('steps-input-power', '.answer-row')}`);
+    st = await cdp.call('stepsAdd');
+    ok(!st.feedbackBad, `« ${line} » refused: ${st.feedback}`);
+  }
+  ok(st.lines.length === 4, `${st.lines.length} lines on screen (start + 3 steps expected)`);
+  ok(st.lines.slice(1).every((l) => /\bok\b/.test(l.cls) && /vérifiée/.test(l.text)), 'a line is not marked as checked');
+  ok(/m-sup/.test(st.lines[1]?.html ?? ''), 'the kept line is not drawn in 2D');
+  // A root in the field (the formula), then cleared.
+  t = await cdp.call('stepsType', `x=(${s}+√(${s * s}-${4 * c}))/2`);
+  ok(/m-sqrt/.test(t.html) && /m-frac/.test(t.html), 'no radical or fraction in the field');
+  log(`  ${await shotOf('steps-input-root', '.answer-row')}`);
+  // The answer.
+  t = await cdp.call('stepsType', `x=${r1};x=${r2}`);
+  log(`  ${await shot('steps-before-check')}`);
+  const v = await cdp.call('stepsCheck');
+  ok(v.good, `the answer is not accepted: ${v.text}`);
+  for (const x of [...v.errors, ...v.scan]) fail('steps', found.start, x);
+  log(`  verdict: ${v.good ? 'juste' : v.text}`);
+  log(`  ${await shot('steps-checked')}`);
+}
+
 // A debug aid: mounts one item (--skill, --level, --exam, --seed) and prints
 // the elements whose text looks wrong, with a screenshot.
 async function phaseDump() {
@@ -1453,7 +1562,7 @@ async function main() {
     if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error') report.console.push(`log: ${m.params.entry.text} ${m.params.entry.url ?? ''}`);
   });
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: `(${pageLib.toString()})();` });
-  const PH = { start: phaseStart, mount: phaseMount, play: phasePlay, wrong: phaseWrong, exams: phaseExams, problem: phaseProblem, school: phaseSchool, dump: phaseDump };
+  const PH = { start: phaseStart, mount: phaseMount, play: phasePlay, wrong: phaseWrong, exams: phaseExams, problem: phaseProblem, school: phaseSchool, steps: phaseSteps, dump: phaseDump };
   for (const name of [...PHASES, 'dump'].filter((p) => ONLY.includes(p))) {
     if (!PH[name]) continue;
     const n0 = report.failures.length;
