@@ -359,10 +359,12 @@ Soit f(x) = x²·(x² + 3)³. Dérive f, puis calcule f′(0).
   pièges : g6_product_naive, g6_chain_forgot
 
 Calcule f′(x) pour f(x) = x·sin(2x² + 3).
-  [free, sans aide, examen open]  (x·sin(2x² + 3))′
-    = sin(2x² + 3) + x·(sin(2x² + 3))′   ← Règle du produit
-    = sin(2x² + 3) + x·cos(2x² + 3)·(2x² + 3)′   ← Règle de chaîne
-    = sin(2x² + 3) + 4x²·cos(2x² + 3)   ← Simplifier
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 3)
+    [free, sans aide, suivre l'erreur, examen open]  (x·sin(2x² + 3))′
+      = sin(2x² + 3) + x·(sin(2x² + 3))′   ← Règle du produit
+      = sin(2x² + 3) + x·cos(2x² + 3)·(2x² + 3)′   ← Règle de chaîne
+      = sin(2x² + 3) + 4x²·cos(2x² + 3)   ← Simplifier
   pièges : g6_product_naive, g6_chain_forgot
 
 ```
@@ -601,16 +603,18 @@ La tangente au graphe de f(x) = x³ − 4x² + 3x − 1 en a = 1 s'écrit y = mx
   [examen coef]
 
 Soit f(x) = e^(2x − 2). Donne la tangente à son graphe au point d'abscisse 1, sous la forme y = mx + p.
-  [free, sans aide, examen open]  (e^(2x − 2))′
-    (Dérive f.)
-    = 2e^(2x − 2)   ← Dériver
-  — Valeur en a = 1 :  [juge value]  départ : e^(2·1 − 2)
-    = 1   ← Remplacer x par a
-  — Pente de la tangente :  [juge value]  départ : 2e^(2·1 − 2)
-    = 2   ← Pente en a
-  — Tangente :  [juge equiv]  départ : y
-    = 1 + 2(x − 1)   ← y = f(a) + f′(a)(x − a)
-    = 2x − 1   ← Développer
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; Valeur en a = 1 : 0,5 ; Pente de la tangente : 0,5 ; Tangente : 1)
+    [free, sans aide, suivre l'erreur, examen open]  (e^(2x − 2))′
+      (Dérive f.)
+      = 2e^(2x − 2)   ← Dériver
+    — Valeur en a = 1 :  [juge value]  départ : e^(2·1 − 2)
+      = 1   ← Remplacer x par a
+    — Pente de la tangente :  [juge value]  départ : 2e^(2·1 − 2)
+      = 2   ← Pente en a
+    — Tangente :  [juge equiv]  départ : y
+      = 1 + 2(x − 1)   ← y = f(a) + f′(a)(x − a)
+      = 2x − 1   ← Développer
   pièges : g6_chain_forgot, g2_exp_sum, g6_power_rule_exp
 
 ```
@@ -628,7 +632,7 @@ Calcule lim_{x→−∞} (3x² − 3x)/(x³ + 2x² − 5x − 6).
     = (□ − 3/x)/(x(1 + 2/x − 5/x² − 6/x³))   (trous : (3 − 3/x)/(x(1 + 2/x − 5/x² − 6/x³)))   ← Simplifier par x²
     = □   (trous : 0)   ← Le dénominateur tend vers l'infini
   aides : En ±∞ : mets en évidence la plus grande puissance de x en haut et en bas. | = □(3 − 3/x)/(x³(1 + 2/x − 5/x² − 6/x³)) | = x²(3 − 3/x)/(x³(1 + 2/x − 5/x² − 6/x³)), et la limite vaut 0.
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
 
 Calcule la limite de f(x) = √(x² − 6x) − x quand x → +∞.
   [guided]  √(x² − 6x) − x
@@ -636,7 +640,7 @@ Calcule la limite de f(x) = √(x² − 6x) − x quand x → +∞.
     = −□/(√(1 − 6/x) + 1)   (trous : −6/(√(1 − 6/x) + 1))   ← Diviser par x (x > 0)
     = □   (trous : −3)   ← Passer à la limite
   aides : ∞ − ∞ avec une racine : multiplie et divise par l'expression conjuguée. | = (□)/(√(x² − 6x) + x) | = (−6x)/(√(x² − 6x) + x), et la limite vaut −3.
-  pièges : g6_infinity_minus_infinity
+  pièges : g6_infinity_minus_infinity, a1_sqrt_sum_split
 
 Calcule lim_{x→−∞} (√(x² + 8x) + x).
   [guided]  √(x² + 8x) + x
@@ -644,7 +648,7 @@ Calcule lim_{x→−∞} (√(x² + 8x) + x).
     = □/(−√(1 + 8/x) − 1)   (trous : 8/(−√(1 + 8/x) − 1))   ← Diviser par x : x < 0, donc √(x²) = −x
     = □   (trous : −4)   ← Passer à la limite
   aides : ∞ − ∞ avec une racine : multiplie et divise par l'expression conjuguée. | = (□)/(√(x² + 8x) − x) | = (8x)/(√(x² + 8x) − x), et la limite vaut −4.
-  pièges : g6_infinity_minus_infinity, g6_sqrt_x2_abs
+  pièges : g6_infinity_minus_infinity, g6_sqrt_x2_abs, a1_sqrt_sum_split
 
 ```
 
@@ -658,7 +662,7 @@ Calcule lim_{x→∞} √(4x² + 4)/(−2x − 5).
     = √(4 + 4/x²)/(□)   (trous : √(4 + 4/x²)/(−2 − 5/x))   ← √(x²) = x pour x > 0
     = −1   ← Passer à la limite
   aides : Mets x² en évidence sous la racine : √(x²) = |x|, et |x| = −x quand x → −∞. | = √(x²(□))/(x(−2 − 5/x)) | = √(x²(4 + 4/x²))/(x(−2 − 5/x)), et la limite vaut −1.
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split
 
 Calcule la limite de f(x) = √(4x² + 1)/(−x + 1) quand x → +∞.
   [guided]  √(4x² + 1)/(−x + 1)
@@ -667,7 +671,7 @@ Calcule la limite de f(x) = √(4x² + 1)/(−x + 1) quand x → +∞.
     = √(4 + 1/x²)/(□)   (trous : √(4 + 1/x²)/(−1 + 1/x))   ← √(x²) = x pour x > 0
     = −2   ← Passer à la limite
   aides : Mets x² en évidence sous la racine : √(x²) = |x|, et |x| = −x quand x → −∞. | = √(x²(□))/(x(−1 + 1/x)) | = √(x²(4 + 1/x²))/(x(−1 + 1/x)), et la limite vaut −2.
-  pièges : a1_dl_factorial_missing, a1_bh_quotient_rule
+  pièges : a1_dl_factorial_missing, a1_bh_quotient_rule, a1_sqrt_sum_split
 
 Soit f(x) = (3x − 9)/((x − 2)²). Calcule les limites de f à gauche et à droite de 2.
   [guided]  3·2 − 9
@@ -692,7 +696,7 @@ Calcule la limite de f(x) = √(9x² + 4)/(2x − 1) quand x → +∞.
     = √(9 + 4/x²)/(2 − 1/x)   ← √(x²) = x pour x > 0
     = 3/2   ← Passer à la limite
   aides : Mets x² en évidence sous la racine : √(x²) = |x|, et |x| = −x quand x → −∞. | = √(x²(□))/(x(2 − 1/x)) | = √(x²(9 + 4/x²))/(x(2 − 1/x)), et la limite vaut 3/2.
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split
 
 Calcule lim_{x→−∞} (√(x² + 4x) + x).
   [tap, suivre l'erreur, menu steps]  √(x² + 4x) + x
@@ -700,7 +704,7 @@ Calcule lim_{x→−∞} (√(x² + 4x) + x).
     = 4/(−√(1 + 4/x) − 1)   ← Diviser par x : x < 0, donc √(x²) = −x
     = −2   ← Passer à la limite
   aides : ∞ − ∞ avec une racine : multiplie et divise par l'expression conjuguée. | = (□)/(√(x² + 4x) − x) | = (4x)/(√(x² + 4x) − x), et la limite vaut −2.
-  pièges : g6_infinity_minus_infinity, g6_sqrt_x2_abs
+  pièges : g6_infinity_minus_infinity, g6_sqrt_x2_abs, a1_sqrt_sum_split
 
 Calcule la limite de f(x) = (−x + 1)/(3x + 3) quand x → −∞.
   [tap, suivre l'erreur, menu steps]  (−x + 1)/(3x + 3)
@@ -708,7 +712,7 @@ Calcule la limite de f(x) = (−x + 1)/(3x + 3) quand x → −∞.
     = (−1 + 1/x)/(3 + 3/x)   ← Simplifier par x
     = −1/3   ← Les termes en 1/x tendent vers 0
   aides : En ±∞ : mets en évidence la plus grande puissance de x en haut et en bas. | = □(−1 + 1/x)/(x(3 + 3/x)) | = x(−1 + 1/x)/(x(3 + 3/x)), et la limite vaut −1/3.
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
 
 ```
 
@@ -721,7 +725,7 @@ Calcule lim_{x→∞} (x − 4)/(x³ − 3x² − x + 3).
     = (1 − 4/x)/(x²(1 − 3/x − 1/x² + 3/x³))   ← Simplifier par x
     = 0   ← Le dénominateur tend vers l'infini
   aides : En ±∞ : mets en évidence la plus grande puissance de x en haut et en bas. | = □(1 − 4/x)/(x³(1 − 3/x − 1/x² + 3/x³)) | = x(1 − 4/x)/(x³(1 − 3/x − 1/x² + 3/x³)), et la limite vaut 0.
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
 
 Calcule la limite de f(x) = √(9x² + 1)/(x − 5) quand x → −∞.
   [free, suivre l'erreur]  √(9x² + 1)/(x − 5)
@@ -729,7 +733,7 @@ Calcule la limite de f(x) = √(9x² + 1)/(x − 5) quand x → −∞.
     = −√(9 + 1/x²)/(1 − 5/x)   ← √(x²) = |x| = −x pour x < 0
     = −3   ← Passer à la limite
   aides : Mets x² en évidence sous la racine : √(x²) = |x|, et |x| = −x quand x → −∞. | = √(x²(□))/(x(1 − 5/x)) | = √(x²(9 + 1/x²))/(x(1 − 5/x)), et la limite vaut −3.
-  pièges : g6_sqrt_x2_abs, a1_dl_factorial_missing, a1_bh_quotient_rule
+  pièges : g6_sqrt_x2_abs, a1_dl_factorial_missing, a1_bh_quotient_rule, a1_sqrt_sum_split
 
 Calcule lim_{x→∞} (√(x² − 2x − 1) − x).
   [free, suivre l'erreur]  √(x² − 2x − 1) − x
@@ -737,7 +741,7 @@ Calcule lim_{x→∞} (√(x² − 2x − 1) − x).
     = (−2 − 1/x)/(√(1 − 2/x − 1/x²) + 1)   ← Diviser par x (x > 0)
     = −1   ← Passer à la limite
   aides : ∞ − ∞ avec une racine : multiplie et divise par l'expression conjuguée. | = (□)/(√(x² − 2x − 1) + x) | = (−2x − 1)/(√(x² − 2x − 1) + x), et la limite vaut −1.
-  pièges : g6_infinity_minus_infinity
+  pièges : g6_infinity_minus_infinity, a1_sqrt_sum_split
 
 ```
 
@@ -756,7 +760,7 @@ Soit f(x) = (x² − 3x + 2)/((x − 3)²). Calcule ses limites en +∞, en −�
     = ∞   ← 2/0⁺
   — Quand x → 3⁺ :  [juge limit]  départ : (x² − 3x + 2)/((x − 3)²)
     = ∞   ← 2/0⁺
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
 
 Soit f(x) = (2x + 8)/(x − 1). Calcule ses limites en +∞, en −∞, et à gauche et à droite de 1.
   [free, sans aide]  (2x + 8)/(x − 1)
@@ -770,7 +774,7 @@ Soit f(x) = (2x + 8)/(x − 1). Calcule ses limites en +∞, en −∞, et à ga
     = −∞   ← 10/0⁻
   — Quand x → 1⁺ :  [juge limit]  départ : (2x + 8)/(x − 1)
     = ∞   ← 10/0⁺
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
 
 Soit f(x) = (3x² − 9x + 6)/((x + 3)²). Calcule ses limites en +∞, en −∞, et à gauche et à droite de −3.
   [free, sans aide]  (3x² − 9x + 6)/((x + 3)²)
@@ -784,7 +788,7 @@ Soit f(x) = (3x² − 9x + 6)/((x + 3)²). Calcule ses limites en +∞, en −�
     = ∞   ← 60/0⁺
   — Quand x → −3⁺ :  [juge limit]  départ : (3x² − 9x + 6)/((x + 3)²)
     = ∞   ← 60/0⁺
-  pièges : a1_bh_quotient_rule
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong
 
 ```
 
@@ -1073,18 +1077,20 @@ Vrai ou faux ? « f(x) = x³ − 27x − 2 n’a ni maximum ni minimum local en 
   [examen tf]
 
 Étudie la variation de f(x) = x⁴ + 4x³ − 16x + 3 : signe de f′, puis nature et valeur de chaque point critique.
-  [free, sans aide, examen open]  (x⁴ + 4x³ − 16x + 3)′
-    (Dérive et factorise f′.)
-    = 4x³ + 12x² − 16   ← Dériver
-    = 4(x + 2)²(x − 1)   ← Factoriser
-  — Où f′ est-elle positive ?  [juge solset]  départ : 4(x + 2)²(x − 1) > 0
-    = ]1 ; +∞[   ← Tableau de signes de f′
-  — Point critique x = −2 :  [juge value]  départ : (−2)⁴ + 4(−2)³ − 16(−2) + 3
-    ? En x = −2, f a… · un maximum local / · un minimum local / ✔ ni maximum ni minimum
-    = 19   ← ni maximum ni minimum
-  — Point critique x = 1 :  [juge value]  départ : 1⁴ + 4·1³ − 16·1 + 3
-    ? En x = 1, f a… · un maximum local / ✔ un minimum local / · ni maximum ni minimum
-    = −8   ← minimum local
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; Où f′ est-elle positive ? : 0,5 ; Point critique x = −2 : 1 ; Point critique x = 1 : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  (x⁴ + 4x³ − 16x + 3)′
+      (Dérive et factorise f′.)
+      = 4x³ + 12x² − 16   ← Dériver
+      = 4(x + 2)²(x − 1)   ← Factoriser
+    — Où f′ est-elle positive ?  [juge solset]  départ : 4(x + 2)²(x − 1) > 0
+      = ]1 ; +∞[   ← Tableau de signes de f′
+    — Point critique x = −2 :  [juge value]  départ : (−2)⁴ + 4(−2)³ − 16(−2) + 3
+      ? En x = −2, f a… · un maximum local / · un minimum local / ✔ ni maximum ni minimum
+      = 19   ← ni maximum ni minimum
+    — Point critique x = 1 :  [juge value]  départ : 1⁴ + 4·1³ − 16·1 + 3
+      ? En x = 1, f a… · un maximum local / ✔ un minimum local / · ni maximum ni minimum
+      = −8   ← minimum local
   pièges : g6_critical_is_extremum
 
 ```
@@ -1363,21 +1369,23 @@ Vrai ou faux ? « Si f″ change de signe en a, le graphe de f a un point d'infl
   [examen tf]
 
 Soit f(x) = x³ + 3x² − x. Où f est-elle convexe ? Donne ses points d'inflexion et la tangente au premier.
-  [free, sans aide, examen open]  ((x³ + 3x² − x)′)′
-    (Dérive deux fois.)
-    = (3x² + 6x − 1)′   ← Dériver une fois
-    = 6x + 6   ← Dériver une deuxième fois
-    = 6(x + 1)   ← Factoriser
-  — Où f″ est-elle positive (f convexe) ?  [juge solset]  départ : 6(x + 1) > 0
-    = ]−1 ; +∞[   ← Signe de f″
-  — x = −1 :  [juge value]  départ : (−1)³ + 3(−1)² − (−1)
-    ? f″(−1) = 0. Le graphe a-t-il un point d'inflexion en x = −1 ? ✔ Oui / · Non
-    = 3   ← Point d'inflexion
-  — Tangente d'inflexion : pente  [juge value]  départ : 3(−1)² + 6(−1) − 1
-    = −4   ← Pente au point d'inflexion
-  — Tangente d'inflexion :  [juge equiv]  départ : y
-    = 3 − 4(x + 1)   ← y = f(a) + f′(a)(x − a)
-    = −4x − 1   ← Développer
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; Où f″ est-elle positive (f convexe) ? : 0,5 ; x = −1 : 0,5 ; Tangente d'inflexion : pente : 0,5 ; Tangente d'inflexion : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  ((x³ + 3x² − x)′)′
+      (Dérive deux fois.)
+      = (3x² + 6x − 1)′   ← Dériver une fois
+      = 6x + 6   ← Dériver une deuxième fois
+      = 6(x + 1)   ← Factoriser
+    — Où f″ est-elle positive (f convexe) ?  [juge solset]  départ : 6(x + 1) > 0
+      = ]−1 ; +∞[   ← Signe de f″
+    — x = −1 :  [juge value]  départ : (−1)³ + 3(−1)² − (−1)
+      ? f″(−1) = 0. Le graphe a-t-il un point d'inflexion en x = −1 ? ✔ Oui / · Non
+      = 3   ← Point d'inflexion
+    — Tangente d'inflexion : pente  [juge value]  départ : 3(−1)² + 6(−1) − 1
+      = −4   ← Pente au point d'inflexion
+    — Tangente d'inflexion :  [juge equiv]  départ : y
+      = 3 − 4(x + 1)   ← y = f(a) + f′(a)(x − a)
+      = −4x − 1   ← Développer
 
 ```
 
@@ -1683,21 +1691,23 @@ Un rectangle a deux sommets sur l'axe des x et deux sur la parabole y = 27 − x
   pièges : g6_optim_outside_domain
 
 Dans une feuille de 21 cm × 16 cm, on découpe un carré de côté x aux quatre coins, puis on plie pour faire une boîte sans couvercle. Pour quel x le volume est-il maximal, et que vaut-il ?
-  [free, sans aide, examen open]  x > 0 et 21 − 2x > 0 et 16 − 2x > 0
-    (Domaine de x :)
-    = ]0 ; 8[   ← Contraintes : longueurs positives
-  — V(x) en fonction de x :  [juge equiv]  départ : V
-    = x(21 − 2x)(16 − 2x)   ← La grandeur avec la seule variable x
-    = 4x³ − 74x² + 336x   ← Développer
-  — Dérive V et factorise.  [juge equiv]  départ : (4x³ − 74x² + 336x)′
-    = 12x² − 148x + 336   ← Dériver
-    = 4(x − 3)(3x − 28)   ← Factoriser
-  — Zéros de V′ dans le domaine ]0 ; 8[ :  [juge solset]  départ : 4(x − 3)(3x − 28) = 0
-    ? La racine x = 28/3 de la dérivée : on la… · garde / ✔ rejette (hors du domaine)
-    = x = 3   ← La racine du domaine
-  — Maximum :  [juge value]  départ : 3(21 − 2·3)·(16 − 2·3)
-    ? V′ > 0 sur ]0 ; 3[ et V′ < 0 après. En x = 3, V a… ✔ un maximum / · un minimum / · on ne peut rien dire
-    = 450   ← Valeur maximale
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 0,5 ; V(x) en fonction de x : 1 ; Dérive V et factorise. : 1 ; Zéros de V′ dans le domaine ]0 ; 8[ : 1 ; Maximum : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  x > 0 et 21 − 2x > 0 et 16 − 2x > 0
+      (Domaine de x :)
+      = ]0 ; 8[   ← Contraintes : longueurs positives
+    — V(x) en fonction de x :  [juge equiv]  départ : V
+      = x(21 − 2x)(16 − 2x)   ← La grandeur avec la seule variable x
+      = 4x³ − 74x² + 336x   ← Développer
+    — Dérive V et factorise.  [juge equiv]  départ : (4x³ − 74x² + 336x)′
+      = 12x² − 148x + 336   ← Dériver
+      = 4(x − 3)(3x − 28)   ← Factoriser
+    — Zéros de V′ dans le domaine ]0 ; 8[ :  [juge solset]  départ : 4(x − 3)(3x − 28) = 0
+      ? La racine x = 28/3 de la dérivée : on la… · garde / ✔ rejette (hors du domaine)
+      = x = 3   ← La racine du domaine
+    — Maximum :  [juge value]  départ : 3(21 − 2·3)·(16 − 2·3)
+      ? V′ > 0 sur ]0 ; 3[ et V′ < 0 après. En x = 3, V a… ✔ un maximum / · un minimum / · on ne peut rien dire
+      = 450   ← Valeur maximale
   pièges : g9_union_inter, g9_bracket, g6_optim_outside_domain
 
 ```
@@ -2116,14 +2126,16 @@ Vrai ou faux ? « L'aire entre y = x² et y = x sur [0 ; 1] vaut ∫_{0}^{1} (x�
   pièges : g6_area_signed
 
 Calcule l'aire du domaine limité par la courbe y = −x² − 4x − 3 et l'axe Ox.
-  [free, sans aide, examen open]  −x² − 4x − 3 = 0
-    = −(x + 3)(x + 1) = 0   ← Factoriser
-    = x = −3 ou x = −1   ← Produit nul
-  — L'aire vaut :  [juge definite]  départ : ∫_{−3}^{−1} |−x² − 4x − 3| dx
-    ? Sur ]−3 ; −1[, quelle courbe est au-dessus ? ✔ y = <math alttext="−x² − 4x − 3"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow></math> / · l'axe Ox
-    = ∫_{−3}^{−1} (−x² − 4x − 3) dx   ← Courbe du haut : intégrer (haut − bas)
-    = [−x³/3 − 2x² − 3x]_{−3}^{−1}   ← Primitive
-    = 4/3   ← Calculer
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; L'aire vaut : 2)
+    [free, sans aide, suivre l'erreur, examen open]  −x² − 4x − 3 = 0
+      = −(x + 3)(x + 1) = 0   ← Factoriser
+      = x = −3 ou x = −1   ← Produit nul
+    — L'aire vaut :  [juge definite]  départ : ∫_{−3}^{−1} |−x² − 4x − 3| dx
+      ? Sur ]−3 ; −1[, quelle courbe est au-dessus ? ✔ y = <math alttext="−x² − 4x − 3"><mrow><mrow><mrow><mo>−</mo><msup><mrow><mi>x</mi></mrow><mn>2</mn></msup></mrow><mo>−</mo><mrow><mn>4</mn><mo>&#x2062;</mo><mi>x</mi></mrow></mrow><mo>−</mo><mn>3</mn></mrow></math> / · l'axe Ox
+      = ∫_{−3}^{−1} (−x² − 4x − 3) dx   ← Courbe du haut : intégrer (haut − bas)
+      = [−x³/3 − 2x² − 3x]_{−3}^{−1}   ← Primitive
+      = 4/3   ← Calculer
   pièges : g6_area_signed
 
 ```
@@ -2347,19 +2359,21 @@ Le point T(−2 ; 0) est sur la courbe Γ : x + y + x²·y + y³ = −2. Quelle 
   [examen coef]
 
 La courbe Γ a pour équation −3x·y − 3y² + y³ = 2. Détermine le point T de Γ d'abscisse −1, puis la tangente à Γ en T. (Écris y′ pour la dérivée de y.)
-  [free, sans aide, examen open]  −3x·y − 3y² + y³ = 2
-    = y³ − 3y² + 3y − 2 = 0   ← x = −1
-    = (y − 2)(y² − y + 1) = 0   ← Racine évidente, factoriser
-    = y = 2   ← Le trinôme n'a pas de racine réelle
-  — Dérive les deux membres par rapport à x. Le membre de droite est constant : sa dérivée est 0. y dépend de x : écris y′.  [juge equiv]  départ : (−3x·y − 3y² + y³)′
-    = −3y − 3x·y′ − 6y·y′ + 3y²·y′   ← Dériver par rapport à x
-  — On note p = y′. Isole p :  [juge solset]  départ : −3y − 3x·p − 6y·p + 3y²·p = 0
-    = p(−3x − 6y + 3y²) = 3y   ← Regrouper les termes en p
-    = p = 3y/(−3x − 6y + 3y²)   ← Diviser
-  — Pente en T(−1 ; 2) :  [juge value]  départ : (3·2)/(−3·(−1) − 6·2 + 3·2²)
-    = 2   ← Calculer
-  — Tangente en T(−1 ; 2) :  [juge equiv]  départ : 2 + (2)(x + 1)
-    = 2x + 4   ← Développer
+  [problème, examen open, 3 points]
+  partie 1 (Début du problème : 1 ; Dérive les deux membres par rapport à x. Le membre de droite est constant : sa dérivée est 0. y dépend de x : écris y′. : 0,5 ; On note p = y′. Isole p : 0,5 ; Pente en T(−1 ; 2) : 0,5 ; Tangente en T(−1 ; 2) : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  −3x·y − 3y² + y³ = 2
+      = y³ − 3y² + 3y − 2 = 0   ← x = −1
+      = (y − 2)(y² − y + 1) = 0   ← Racine évidente, factoriser
+      = y = 2   ← Le trinôme n'a pas de racine réelle
+    — Dérive les deux membres par rapport à x. Le membre de droite est constant : sa dérivée est 0. y dépend de x : écris y′.  [juge equiv]  départ : (−3x·y − 3y² + y³)′
+      = −3y − 3x·y′ − 6y·y′ + 3y²·y′   ← Dériver par rapport à x
+    — On note p = y′. Isole p :  [juge solset]  départ : −3y − 3x·p − 6y·p + 3y²·p = 0
+      = p(−3x − 6y + 3y²) = 3y   ← Regrouper les termes en p
+      = p = 3y/(−3x − 6y + 3y²)   ← Diviser
+    — Pente en T(−1 ; 2) :  [juge value]  départ : (3·2)/(−3·(−1) − 6·2 + 3·2²)
+      = 2   ← Calculer
+    — Tangente en T(−1 ; 2) :  [juge equiv]  départ : 2 + (2)(x + 1)
+      = 2x + 4   ← Développer
 
 ```
 
@@ -2600,16 +2614,18 @@ Trouve p pour que la droite y = 2x + 2 soit tangente à la courbe 2x²·y − 2x
 
 ```
 Trouve p pour que la droite y = 2x − 2 soit tangente à la courbe x²·y − x² + y² + p = 0 en un point T dont les coordonnées sont entières.
-  [free, sans aide, examen open]  (x²·y − x² + y² + p)′
-    = 2x·y + x²·y′ − 2x + 2y·y′   ← Dériver implicitement
-  — La pente de t est 2 : y′ = 2. T est sur t : y = 2x − 2.  [juge solset]  départ : 2x·y + x²·2 − 2x + 2y·2 = 0
-    = 6x² + 2x − 8 = 0   ← y′ = 2, et y = <math alttext="2x − 2"><mrow><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo>−</mo><mn>2</mn></mrow></math> (T sur t)
-    = 2(x − 1)(3x + 4) = 0   ← Factoriser
-    = x = −4/3 ou x = 1   ← Produit nul
-  — T est sur Γ :  [juge solset]  départ : x²·y − x² + y² + p = 0
-    ? Quel point T retiens-tu ? ✔ x = 1, donc T(1 ; 0) / · x = −4/3, donc T(−4/3 ; −14/3)
-    = −1 + p = 0   ← T(1 ; 0) sur Γ
-    = p = 1   ← Isoler p
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; La pente de t est 2 : y′ = 2. T est sur t : y = 2x − 2. : 1,5 ; T est sur Γ : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  (x²·y − x² + y² + p)′
+      = 2x·y + x²·y′ − 2x + 2y·y′   ← Dériver implicitement
+    — La pente de t est 2 : y′ = 2. T est sur t : y = 2x − 2.  [juge solset]  départ : 2x·y + x²·2 − 2x + 2y·2 = 0
+      = 6x² + 2x − 8 = 0   ← y′ = 2, et y = <math alttext="2x − 2"><mrow><mrow><mn>2</mn><mo>&#x2062;</mo><mi>x</mi></mrow><mo>−</mo><mn>2</mn></mrow></math> (T sur t)
+      = 2(x − 1)(3x + 4) = 0   ← Factoriser
+      = x = −4/3 ou x = 1   ← Produit nul
+    — T est sur Γ :  [juge solset]  départ : x²·y − x² + y² + p = 0
+      ? Quel point T retiens-tu ? ✔ x = 1, donc T(1 ; 0) / · x = −4/3, donc T(−4/3 ; −14/3)
+      = −1 + p = 0   ← T(1 ; 0) sur Γ
+      = p = 1   ← Isoler p
   pièges : g6_implicit_xy, g6_implicit_yprime_forgot
 
 ```
@@ -3008,24 +3024,26 @@ Vrai ou faux ?
   [examen tf]
 
 Soit f(x) = |x³ − a³| − 12x, avec a ∈ ℝ. Écris f par morceaux, calcule f′(a⁻) et f′(a⁺), puis trouve pour quels a le graphe a en x = a un point anguleux qui est un extremum (attention aux cas limites).
-  [free, sans aide, examen open]  |x³ − a³| − 12x
-    (Pour x > a :)
-    = x³ − a³ − 12x   ← x³ − a³ > 0 quand x > a
-  — Pour x < a :  [juge equiv]  départ : |x³ − a³| − 12x
-    = a³ − x³ − 12x   ← x³ − a³ < 0 quand x < a
-  — f′(a⁻) : dérive le morceau de gauche, puis fais tendre x vers a.  [juge equiv]  départ : (a³ − x³ − 12x)′
-    = −3x² − 12   ← Dériver le morceau
-    = −3a² − 12   ← x → a
-  — f′(a⁺) : dérive le morceau de droite, puis fais tendre x vers a.  [juge equiv]  départ : (x³ − a³ − 12x)′
-    = 3x² − 12   ← Dériver le morceau
-    = 3a² − 12   ← x → a
-  — Les dérivées latérales diffèrent dès que a ≠ 0. Sans les cas limites, le point anguleux est un extremum quand elles sont de signes opposés : f′(a⁻)·f′(a⁺) < 0.  [juge solset]  départ : (−3a² − 12)(3a² − 12) < 0
-    = a² > 4   ← f′(a⁻) < 0 pour tout a
-    = ]−∞ ; −2[ ∪ ]2 ; +∞[   ← S₁
-  — Réponse : réunis S₁ = ]−∞ ; −2[ ∪ ]2 ; +∞[ et S₂, les cas limites qui donnent un extremum.  [juge solset]  départ : S_1 ∪ S_2
-    ? Cas limite a = 2 : f′(2⁺) = 0. Le point anguleux est-il un extremum ? ✔ oui / · non
-    ? Cas limite a = −2 : f′(−2⁺) = 0. Le point anguleux est-il un extremum ? · oui / ✔ non
-    = ]−∞ ; −2[ ∪ [2 ; +∞[   ← Réunir
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 1 ; Pour x < a : 0,5 ; f′(a⁻) : dérive le morceau de gauche, puis fais tendre x vers a. : 1 ; f′(a⁺) : dérive le morceau de droite, puis fais tendre x vers a. : 1 ; Les dérivées latérales diffèrent dès que a ≠ 0. Sans les cas limites, le point anguleux est un extremum quand elles sont de signes opposés : f′(a⁻)·f′(a⁺) < 0. : 1 ; Réponse : réunis S₁ = ]−∞ ; −2[ ∪ ]2 ; +∞[ et S₂, les cas limites qui donnent un extremum. : 1,5)
+    [free, sans aide, suivre l'erreur, examen open]  |x³ − a³| − 12x
+      (Pour x > a :)
+      = x³ − a³ − 12x   ← x³ − a³ > 0 quand x > a
+    — Pour x < a :  [juge equiv]  départ : |x³ − a³| − 12x
+      = a³ − x³ − 12x   ← x³ − a³ < 0 quand x < a
+    — f′(a⁻) : dérive le morceau de gauche, puis fais tendre x vers a.  [juge equiv]  départ : (a³ − x³ − 12x)′
+      = −3x² − 12   ← Dériver le morceau
+      = −3a² − 12   ← x → a
+    — f′(a⁺) : dérive le morceau de droite, puis fais tendre x vers a.  [juge equiv]  départ : (x³ − a³ − 12x)′
+      = 3x² − 12   ← Dériver le morceau
+      = 3a² − 12   ← x → a
+    — Les dérivées latérales diffèrent dès que a ≠ 0. Sans les cas limites, le point anguleux est un extremum quand elles sont de signes opposés : f′(a⁻)·f′(a⁺) < 0.  [juge solset]  départ : (−3a² − 12)(3a² − 12) < 0
+      = a² > 4   ← f′(a⁻) < 0 pour tout a
+      = ]−∞ ; −2[ ∪ ]2 ; +∞[   ← S₁
+    — Réponse : réunis S₁ = ]−∞ ; −2[ ∪ ]2 ; +∞[ et S₂, les cas limites qui donnent un extremum.  [juge solset]  départ : S_1 ∪ S_2
+      ? Cas limite a = 2 : f′(2⁺) = 0. Le point anguleux est-il un extremum ? ✔ oui / · non
+      ? Cas limite a = −2 : f′(−2⁺) = 0. Le point anguleux est-il un extremum ? · oui / ✔ non
+      = ]−∞ ; −2[ ∪ [2 ; +∞[   ← Réunir
   pièges : g1_triangle_reverse, g6_angular_boundary
 
 ```
@@ -3270,7 +3288,7 @@ Soit f(x) = √(x² − 2x − 3). Trouve ses asymptotes en +∞ et en −∞.
     = 1   ← Diviser par x
   — Asymptote oblique en −∞ :  [juge equiv]  départ : mx + h
     = −x + 1   ← y = mx + h
-  pièges : a1_bh_quotient_rule, g6_oblique_h_forgot
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split, g6_oblique_h_forgot
 
 Soit f(x) = √(x² + 6x − 4). Trouve ses asymptotes en +∞ et en −∞.
   [free, sans aide]  (√(x² + 6x − 4))/x
@@ -3290,7 +3308,7 @@ Soit f(x) = √(x² + 6x − 4). Trouve ses asymptotes en +∞ et en −∞.
     = −3   ← Diviser par x
   — Asymptote oblique en −∞ :  [juge equiv]  départ : mx + h
     = −x − 3   ← y = mx + h
-  pièges : a1_bh_quotient_rule, g6_oblique_h_forgot
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split, g6_oblique_h_forgot
 
 Soit f(x) = √(x² + 2x + 8). Trouve ses asymptotes en +∞ et en −∞.
   [free, sans aide]  (√(x² + 2x + 8))/x
@@ -3310,7 +3328,7 @@ Soit f(x) = √(x² + 2x + 8). Trouve ses asymptotes en +∞ et en −∞.
     = −1   ← Diviser par x
   — Asymptote oblique en −∞ :  [juge equiv]  départ : mx + h
     = −x − 1   ← y = mx + h
-  pièges : a1_bh_quotient_rule, g6_oblique_h_forgot
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split, g6_oblique_h_forgot
 
 ```
 
@@ -3327,24 +3345,26 @@ Vrai ou faux ?
   [examen tf]
 
 Soit f(x) = √(x² + 6x + 4). Trouve ses asymptotes en +∞ et en −∞.
-  [free, sans aide, examen open]  (√(x² + 6x + 4))/x
-    (En +∞ : m = lim f(x)/x.)
-    = √(1 + 6/x + 4/x²)   ← x > 0 : √(x²) = x
-    = 1   ← Calculer
-  — En +∞ : h = lim (f(x) − mx).  [juge limit]  départ : √(x² + 6x + 4) − x
-    = (6x + 4)/(√(x² + 6x + 4) + x)   ← Multiplier par la quantité conjuguée
-    = 3   ← Diviser par x
-  — Asymptote oblique en +∞ :  [juge equiv]  départ : mx + h
-    = x + 3   ← y = mx + h
-  — En −∞ : m = lim f(x)/x.  [juge limit]  départ : (√(x² + 6x + 4))/x
-    = −√(1 + 6/x + 4/x²)   ← x < 0 : √(x²) = |x| = −x
-    = −1   ← Calculer
-  — En −∞ : h = lim (f(x) − mx).  [juge limit]  départ : √(x² + 6x + 4) + x
-    = (6x + 4)/(√(x² + 6x + 4) − x)   ← Multiplier par la quantité conjuguée
-    = −3   ← Diviser par x
-  — Asymptote oblique en −∞ :  [juge equiv]  départ : mx + h
-    = −x − 3   ← y = mx + h
-  pièges : a1_bh_quotient_rule, g6_oblique_h_forgot
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 1 ; En +∞ : h = lim (f(x) − mx). : 1 ; Asymptote oblique en +∞ : 0,5 ; En −∞ : m = lim f(x)/x. : 0,5 ; En −∞ : h = lim (f(x) − mx). : 0,5 ; Asymptote oblique en −∞ : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  (√(x² + 6x + 4))/x
+      (En +∞ : m = lim f(x)/x.)
+      = √(1 + 6/x + 4/x²)   ← x > 0 : √(x²) = x
+      = 1   ← Calculer
+    — En +∞ : h = lim (f(x) − mx).  [juge limit]  départ : √(x² + 6x + 4) − x
+      = (6x + 4)/(√(x² + 6x + 4) + x)   ← Multiplier par la quantité conjuguée
+      = 3   ← Diviser par x
+    — Asymptote oblique en +∞ :  [juge equiv]  départ : mx + h
+      = x + 3   ← y = mx + h
+    — En −∞ : m = lim f(x)/x.  [juge limit]  départ : (√(x² + 6x + 4))/x
+      = −√(1 + 6/x + 4/x²)   ← x < 0 : √(x²) = |x| = −x
+      = −1   ← Calculer
+    — En −∞ : h = lim (f(x) − mx).  [juge limit]  départ : √(x² + 6x + 4) + x
+      = (6x + 4)/(√(x² + 6x + 4) − x)   ← Multiplier par la quantité conjuguée
+      = −3   ← Diviser par x
+    — Asymptote oblique en −∞ :  [juge equiv]  départ : mx + h
+      = −x − 3   ← y = mx + h
+  pièges : a1_bh_quotient_rule, a1_sqrt_sum_split, g6_oblique_h_forgot
 
 ```
 
@@ -3661,117 +3681,123 @@ _Domaine, symétries, asymptotes, variation, concavité, tableau, esquisse._
 
 ```
 Étudie f(x) = |x + 1| + 4/x : domaine, asymptotes (de chaque côté), point anguleux, extrema, position de la courbe.
-  [free, sans aide]  |x + 1| + 4/x
-    (Domaine de f :)
-    = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
-  — Pour x > −1 :  [juge equiv]  départ : |x + 1| + 4/x
-    = x + 1 + 4/x   ← |x + 1| = x + 1
-  — Pour x < −1 :  [juge equiv]  départ : |x + 1| + 4/x
-    = −x − 1 + 4/x   ← |x + 1| = −x − 1
-  — Limite en 0⁺ :  [juge limit]  départ : |x + 1| + 4/x
-    = 4/x   ← |x + 1| tend vers 1
-    = ∞   ← Asymptote verticale x = 0
-  — Asymptote en +∞ :  [juge equiv]  départ : mx + h
-    = x + 1   ← f(x) = x + 1 + 4/x et 4/x → 0
-  — Asymptote en −∞ :  [juge equiv]  départ : mx + h
-    ? En +∞, la courbe est : ✔ au-dessus de son asymptote / · en dessous de son asymptote
-    = −x − 1   ← f(x) = −x − 1 + 4/x
-  — Pour x > −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
-    = 1 − 4/x²   ← Dériver le morceau de droite
-  — Pour x < −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
-    = −1 − 4/x²   ← Dériver le morceau de gauche
-  — Dérivée à gauche en −1 :  [juge limit]  départ : −1 − 4/x²
-    = −1 − 4/(−1)²   ← x = a dans la dérivée de gauche
-    = −5   ← Calculer
-  — Dérivée à droite en −1 :  [juge limit]  départ : 1 − 4/x²
-    = 1 − 4/(−1)²   ← x = a dans la dérivée de droite
-    = −3   ← Calculer
-  — Le point anguleux A(−1 ; f(−1)) :  [juge value]  départ : |−1 + 1| + 4/(−1)
-    ? f′(−1⁻) = −5 et f′(−1⁺) = −3. En x = −1, f a : ✔ un point anguleux / · une tangente : f y est dérivable
-    ? Ce point anguleux est-il un extremum local ? · oui, un minimum local / · oui, un maximum local / ✔ non
-    = −4   ← Calculer
-  — Zéros de f′ pour x > −1 :  [juge solset]  départ : 1 − 4/x² = 0
-    = x² = 4   ← Isoler x²
-    = x = 2   ← Garder les solutions plus grandes que −1
-  — Valeur en x = 2 :  [juge value]  départ : |2 + 1| + 4/2
-    ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
-    = 5   ← Calculer
+  [problème, 6 points]
+  partie 1 (Début du problème : 0,5 ; Pour x > −1 : 0,5 ; Pour x < −1 : 0,5 ; Limite en 0⁺ : 0,5 ; Asymptote en +∞ : 0,5 ; Asymptote en −∞ : 0,5 ; Pour x > −1 : 0 ; Pour x < −1 : 0 ; Dérivée à gauche en −1 : 0,5 ; Dérivée à droite en −1 : 0,5 ; Le point anguleux A(−1 ; f(−1)) : 1 ; Zéros de f′ pour x > −1 : 0,5 ; Valeur en x = 2 : 0,5)
+    [free, sans aide, suivre l'erreur]  |x + 1| + 4/x
+      (Domaine de f :)
+      = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
+    — Pour x > −1 :  [juge equiv]  départ : |x + 1| + 4/x
+      = x + 1 + 4/x   ← |x + 1| = x + 1
+    — Pour x < −1 :  [juge equiv]  départ : |x + 1| + 4/x
+      = −x − 1 + 4/x   ← |x + 1| = −x − 1
+    — Limite en 0⁺ :  [juge limit]  départ : |x + 1| + 4/x
+      = 4/x   ← |x + 1| tend vers 1
+      = ∞   ← Asymptote verticale x = 0
+    — Asymptote en +∞ :  [juge equiv]  départ : mx + h
+      = x + 1   ← f(x) = x + 1 + 4/x et 4/x → 0
+    — Asymptote en −∞ :  [juge equiv]  départ : mx + h
+      ? En +∞, la courbe est : ✔ au-dessus de son asymptote / · en dessous de son asymptote
+      = −x − 1   ← f(x) = −x − 1 + 4/x
+    — Pour x > −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
+      = 1 − 4/x²   ← Dériver le morceau de droite
+    — Pour x < −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
+      = −1 − 4/x²   ← Dériver le morceau de gauche
+    — Dérivée à gauche en −1 :  [juge limit]  départ : −1 − 4/x²
+      = −1 − 4/(−1)²   ← x = a dans la dérivée de gauche
+      = −5   ← Calculer
+    — Dérivée à droite en −1 :  [juge limit]  départ : 1 − 4/x²
+      = 1 − 4/(−1)²   ← x = a dans la dérivée de droite
+      = −3   ← Calculer
+    — Le point anguleux A(−1 ; f(−1)) :  [juge value]  départ : |−1 + 1| + 4/(−1)
+      ? f′(−1⁻) = −5 et f′(−1⁺) = −3. En x = −1, f a : ✔ un point anguleux / · une tangente : f y est dérivable
+      ? Ce point anguleux est-il un extremum local ? · oui, un minimum local / · oui, un maximum local / ✔ non
+      = −4   ← Calculer
+    — Zéros de f′ pour x > −1 :  [juge solset]  départ : 1 − 4/x² = 0
+      = x² = 4   ← Isoler x²
+      = x = 2   ← Garder les solutions plus grandes que −1
+    — Valeur en x = 2 :  [juge value]  départ : |2 + 1| + 4/2
+      ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
+      = 5   ← Calculer
   pièges : g1_abs_dropped, g6_sketch_crosses_asymptote, g6_angular_not_seen
 
 Étudie f(x) = |x − 1| + 4/x : domaine, asymptotes (de chaque côté), point anguleux, extrema, position de la courbe.
-  [free, sans aide]  |x − 1| + 4/x
-    (Domaine de f :)
-    = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
-  — Pour x > 1 :  [juge equiv]  départ : |x − 1| + 4/x
-    = x − 1 + 4/x   ← |x − 1| = x − 1
-  — Pour x < 1 :  [juge equiv]  départ : |x − 1| + 4/x
-    = −x + 1 + 4/x   ← |x − 1| = −x + 1
-  — Limite en 0⁺ :  [juge limit]  départ : |x − 1| + 4/x
-    = 4/x   ← |x − 1| tend vers 1
-    = ∞   ← Asymptote verticale x = 0
-  — Asymptote en +∞ :  [juge equiv]  départ : mx + h
-    = x − 1   ← f(x) = x − 1 + 4/x et 4/x → 0
-  — Asymptote en −∞ :  [juge equiv]  départ : mx + h
-    ? En +∞, la courbe est : ✔ au-dessus de son asymptote / · en dessous de son asymptote
-    = −x + 1   ← f(x) = −x + 1 + 4/x
-  — Pour x > 1 :  [juge equiv]  départ : (|x − 1| + 4/x)′
-    = 1 − 4/x²   ← Dériver le morceau de droite
-  — Pour x < 1 :  [juge equiv]  départ : (|x − 1| + 4/x)′
-    = −1 − 4/x²   ← Dériver le morceau de gauche
-  — Dérivée à gauche en 1 :  [juge limit]  départ : −1 − 4/x²
-    = −1 − 4/1²   ← x = a dans la dérivée de gauche
-    = −5   ← Calculer
-  — Dérivée à droite en 1 :  [juge limit]  départ : 1 − 4/x²
-    = 1 − 4/1²   ← x = a dans la dérivée de droite
-    = −3   ← Calculer
-  — Le point anguleux A(1 ; f(1)) :  [juge value]  départ : |1 − 1| + 4/1
-    ? f′(1⁻) = −5 et f′(1⁺) = −3. En x = 1, f a : ✔ un point anguleux / · une tangente : f y est dérivable
-    ? Ce point anguleux est-il un extremum local ? · oui, un minimum local / · oui, un maximum local / ✔ non
-    = 4   ← Calculer
-  — Zéros de f′ pour x > 1 :  [juge solset]  départ : 1 − 4/x² = 0
-    = x² = 4   ← Isoler x²
-    = x = 2   ← Garder les solutions plus grandes que 1
-  — Valeur en x = 2 :  [juge value]  départ : |2 − 1| + 4/2
-    ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
-    = 3   ← Calculer
+  [problème, 6 points]
+  partie 1 (Début du problème : 0,5 ; Pour x > 1 : 0,5 ; Pour x < 1 : 0,5 ; Limite en 0⁺ : 0,5 ; Asymptote en +∞ : 0,5 ; Asymptote en −∞ : 0,5 ; Pour x > 1 : 0 ; Pour x < 1 : 0 ; Dérivée à gauche en 1 : 0,5 ; Dérivée à droite en 1 : 0,5 ; Le point anguleux A(1 ; f(1)) : 1 ; Zéros de f′ pour x > 1 : 0,5 ; Valeur en x = 2 : 0,5)
+    [free, sans aide, suivre l'erreur]  |x − 1| + 4/x
+      (Domaine de f :)
+      = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
+    — Pour x > 1 :  [juge equiv]  départ : |x − 1| + 4/x
+      = x − 1 + 4/x   ← |x − 1| = x − 1
+    — Pour x < 1 :  [juge equiv]  départ : |x − 1| + 4/x
+      = −x + 1 + 4/x   ← |x − 1| = −x + 1
+    — Limite en 0⁺ :  [juge limit]  départ : |x − 1| + 4/x
+      = 4/x   ← |x − 1| tend vers 1
+      = ∞   ← Asymptote verticale x = 0
+    — Asymptote en +∞ :  [juge equiv]  départ : mx + h
+      = x − 1   ← f(x) = x − 1 + 4/x et 4/x → 0
+    — Asymptote en −∞ :  [juge equiv]  départ : mx + h
+      ? En +∞, la courbe est : ✔ au-dessus de son asymptote / · en dessous de son asymptote
+      = −x + 1   ← f(x) = −x + 1 + 4/x
+    — Pour x > 1 :  [juge equiv]  départ : (|x − 1| + 4/x)′
+      = 1 − 4/x²   ← Dériver le morceau de droite
+    — Pour x < 1 :  [juge equiv]  départ : (|x − 1| + 4/x)′
+      = −1 − 4/x²   ← Dériver le morceau de gauche
+    — Dérivée à gauche en 1 :  [juge limit]  départ : −1 − 4/x²
+      = −1 − 4/1²   ← x = a dans la dérivée de gauche
+      = −5   ← Calculer
+    — Dérivée à droite en 1 :  [juge limit]  départ : 1 − 4/x²
+      = 1 − 4/1²   ← x = a dans la dérivée de droite
+      = −3   ← Calculer
+    — Le point anguleux A(1 ; f(1)) :  [juge value]  départ : |1 − 1| + 4/1
+      ? f′(1⁻) = −5 et f′(1⁺) = −3. En x = 1, f a : ✔ un point anguleux / · une tangente : f y est dérivable
+      ? Ce point anguleux est-il un extremum local ? · oui, un minimum local / · oui, un maximum local / ✔ non
+      = 4   ← Calculer
+    — Zéros de f′ pour x > 1 :  [juge solset]  départ : 1 − 4/x² = 0
+      = x² = 4   ← Isoler x²
+      = x = 2   ← Garder les solutions plus grandes que 1
+    — Valeur en x = 2 :  [juge value]  départ : |2 − 1| + 4/2
+      ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
+      = 3   ← Calculer
   pièges : g1_abs_dropped, g6_sketch_crosses_asymptote, g6_angular_not_seen
 
 Étudie f(x) = |x + 1| + 4/x : domaine, asymptotes (de chaque côté), point anguleux, extrema, position de la courbe.
-  [free, sans aide]  |x + 1| + 4/x
-    (Domaine de f :)
-    = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
-  — Pour x > −1 :  [juge equiv]  départ : |x + 1| + 4/x
-    = x + 1 + 4/x   ← |x + 1| = x + 1
-  — Pour x < −1 :  [juge equiv]  départ : |x + 1| + 4/x
-    = −x − 1 + 4/x   ← |x + 1| = −x − 1
-  — Limite en 0⁺ :  [juge limit]  départ : |x + 1| + 4/x
-    = 4/x   ← |x + 1| tend vers 1
-    = ∞   ← Asymptote verticale x = 0
-  — Asymptote en +∞ :  [juge equiv]  départ : mx + h
-    = x + 1   ← f(x) = x + 1 + 4/x et 4/x → 0
-  — Asymptote en −∞ :  [juge equiv]  départ : mx + h
-    ? En +∞, la courbe est : ✔ au-dessus de son asymptote / · en dessous de son asymptote
-    = −x − 1   ← f(x) = −x − 1 + 4/x
-  — Pour x > −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
-    = 1 − 4/x²   ← Dériver le morceau de droite
-  — Pour x < −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
-    = −1 − 4/x²   ← Dériver le morceau de gauche
-  — Dérivée à gauche en −1 :  [juge limit]  départ : −1 − 4/x²
-    = −1 − 4/(−1)²   ← x = a dans la dérivée de gauche
-    = −5   ← Calculer
-  — Dérivée à droite en −1 :  [juge limit]  départ : 1 − 4/x²
-    = 1 − 4/(−1)²   ← x = a dans la dérivée de droite
-    = −3   ← Calculer
-  — Le point anguleux A(−1 ; f(−1)) :  [juge value]  départ : |−1 + 1| + 4/(−1)
-    ? f′(−1⁻) = −5 et f′(−1⁺) = −3. En x = −1, f a : ✔ un point anguleux / · une tangente : f y est dérivable
-    ? Ce point anguleux est-il un extremum local ? · oui, un minimum local / · oui, un maximum local / ✔ non
-    = −4   ← Calculer
-  — Zéros de f′ pour x > −1 :  [juge solset]  départ : 1 − 4/x² = 0
-    = x² = 4   ← Isoler x²
-    = x = 2   ← Garder les solutions plus grandes que −1
-  — Valeur en x = 2 :  [juge value]  départ : |2 + 1| + 4/2
-    ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
-    = 5   ← Calculer
+  [problème, 6 points]
+  partie 1 (Début du problème : 0,5 ; Pour x > −1 : 0,5 ; Pour x < −1 : 0,5 ; Limite en 0⁺ : 0,5 ; Asymptote en +∞ : 0,5 ; Asymptote en −∞ : 0,5 ; Pour x > −1 : 0 ; Pour x < −1 : 0 ; Dérivée à gauche en −1 : 0,5 ; Dérivée à droite en −1 : 0,5 ; Le point anguleux A(−1 ; f(−1)) : 1 ; Zéros de f′ pour x > −1 : 0,5 ; Valeur en x = 2 : 0,5)
+    [free, sans aide, suivre l'erreur]  |x + 1| + 4/x
+      (Domaine de f :)
+      = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
+    — Pour x > −1 :  [juge equiv]  départ : |x + 1| + 4/x
+      = x + 1 + 4/x   ← |x + 1| = x + 1
+    — Pour x < −1 :  [juge equiv]  départ : |x + 1| + 4/x
+      = −x − 1 + 4/x   ← |x + 1| = −x − 1
+    — Limite en 0⁺ :  [juge limit]  départ : |x + 1| + 4/x
+      = 4/x   ← |x + 1| tend vers 1
+      = ∞   ← Asymptote verticale x = 0
+    — Asymptote en +∞ :  [juge equiv]  départ : mx + h
+      = x + 1   ← f(x) = x + 1 + 4/x et 4/x → 0
+    — Asymptote en −∞ :  [juge equiv]  départ : mx + h
+      ? En +∞, la courbe est : ✔ au-dessus de son asymptote / · en dessous de son asymptote
+      = −x − 1   ← f(x) = −x − 1 + 4/x
+    — Pour x > −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
+      = 1 − 4/x²   ← Dériver le morceau de droite
+    — Pour x < −1 :  [juge equiv]  départ : (|x + 1| + 4/x)′
+      = −1 − 4/x²   ← Dériver le morceau de gauche
+    — Dérivée à gauche en −1 :  [juge limit]  départ : −1 − 4/x²
+      = −1 − 4/(−1)²   ← x = a dans la dérivée de gauche
+      = −5   ← Calculer
+    — Dérivée à droite en −1 :  [juge limit]  départ : 1 − 4/x²
+      = 1 − 4/(−1)²   ← x = a dans la dérivée de droite
+      = −3   ← Calculer
+    — Le point anguleux A(−1 ; f(−1)) :  [juge value]  départ : |−1 + 1| + 4/(−1)
+      ? f′(−1⁻) = −5 et f′(−1⁺) = −3. En x = −1, f a : ✔ un point anguleux / · une tangente : f y est dérivable
+      ? Ce point anguleux est-il un extremum local ? · oui, un minimum local / · oui, un maximum local / ✔ non
+      = −4   ← Calculer
+    — Zéros de f′ pour x > −1 :  [juge solset]  départ : 1 − 4/x² = 0
+      = x² = 4   ← Isoler x²
+      = x = 2   ← Garder les solutions plus grandes que −1
+    — Valeur en x = 2 :  [juge value]  départ : |2 + 1| + 4/2
+      ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
+      = 5   ← Calculer
   pièges : g1_abs_dropped, g6_sketch_crosses_asymptote, g6_angular_not_seen
 
 ```
@@ -3780,33 +3806,35 @@ _Domaine, symétries, asymptotes, variation, concavité, tableau, esquisse._
 
 ```
 Étudie la fonction f(x) = (2x² + 8)/x : domaine, symétries, asymptotes, variation, concavité, valeurs du tableau et position de la courbe.
-  [free, sans aide, examen open]  (2x² + 8)/x
-    (Domaine de f :)
-    = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
-  — Limite en 0⁺ :  [juge limit]  départ : (2x² + 8)/x
-    ? Symétries : f est · ni paire ni impaire / ✔ impaire (symétrique par rapport à l'origine) / · paire (symétrique par rapport à l'axe Oy)
-    = 8/x   ← Le numérateur tend vers 8
-    = ∞   ← Asymptote verticale x = 0
-  — Division euclidienne :  [juge equiv]  départ : (2x² + 8)/x
-    = 2x + 8/x   ← Division euclidienne
-  — Asymptote oblique (en ±∞) :  [juge equiv]  départ : mx + h
-    ? Pour x < 0, la courbe de f est : · au-dessus de l'asymptote oblique / ✔ en dessous de l'asymptote oblique
-    = 2x   ← Le quotient de la division
-  — Dérivée :  [juge equiv]  départ : (2x + 8/x)′
-    = 2 − 8/x²   ← La dérivée de k/(x − a) est −k/(x − a)²
-  — Zéros de f′ :  [juge solset]  départ : 2 − 8/x² = 0
-    = x² = 4   ← Isoler le carré
-    = x = −2 ou x = 2   ← Racine carrée
-  — Dérivée seconde :  [juge equiv]  départ : (2 − 8/x²)′
-    = 16/x³   ← Dériver −k(x − a)⁻²
-  — Valeur au point x = −2 :  [juge value]  départ : 2·(−2) + 8/(−2)
-    ? Concavité : f est ✔ concave sur ]−∞ ; 0[ et convexe sur ]0 ; +∞[ / · convexe sur ]−∞ ; 0[ et concave sur ]0 ; +∞[ / · convexe sur tout son domaine
-    ? Point d'inflexion ? ✔ aucun : f″ change de signe en 0, mais 0 n'est pas dans le domaine / · oui, en x = 0
-    ? En x = −2, f′ s'annule. Ce point est : ✔ un maximum local / · un minimum local / · pas un extremum
-    = −8   ← Calculer
-  — Valeur au point x = 2 :  [juge value]  départ : 2·2 + 8/2
-    ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
-    = 8   ← Calculer
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 0,5 ; Limite en 0⁺ : 1 ; Division euclidienne : 0,5 ; Asymptote oblique (en ±∞) : 1 ; Dérivée : 0,5 ; Zéros de f′ : 0,5 ; Dérivée seconde : 0,5 ; Valeur au point x = −2 : 1 ; Valeur au point x = 2 : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  (2x² + 8)/x
+      (Domaine de f :)
+      = ]−∞ ; 0[ ∪ ]0 ; +∞[   ← 0 annule le dénominateur
+    — Limite en 0⁺ :  [juge limit]  départ : (2x² + 8)/x
+      ? Symétries : f est · ni paire ni impaire / ✔ impaire (symétrique par rapport à l'origine) / · paire (symétrique par rapport à l'axe Oy)
+      = 8/x   ← Le numérateur tend vers 8
+      = ∞   ← Asymptote verticale x = 0
+    — Division euclidienne :  [juge equiv]  départ : (2x² + 8)/x
+      = 2x + 8/x   ← Division euclidienne
+    — Asymptote oblique (en ±∞) :  [juge equiv]  départ : mx + h
+      ? Pour x < 0, la courbe de f est : · au-dessus de l'asymptote oblique / ✔ en dessous de l'asymptote oblique
+      = 2x   ← Le quotient de la division
+    — Dérivée :  [juge equiv]  départ : (2x + 8/x)′
+      = 2 − 8/x²   ← La dérivée de k/(x − a) est −k/(x − a)²
+    — Zéros de f′ :  [juge solset]  départ : 2 − 8/x² = 0
+      = x² = 4   ← Isoler le carré
+      = x = −2 ou x = 2   ← Racine carrée
+    — Dérivée seconde :  [juge equiv]  départ : (2 − 8/x²)′
+      = 16/x³   ← Dériver −k(x − a)⁻²
+    — Valeur au point x = −2 :  [juge value]  départ : 2·(−2) + 8/(−2)
+      ? Concavité : f est ✔ concave sur ]−∞ ; 0[ et convexe sur ]0 ; +∞[ / · convexe sur ]−∞ ; 0[ et concave sur ]0 ; +∞[ / · convexe sur tout son domaine
+      ? Point d'inflexion ? ✔ aucun : f″ change de signe en 0, mais 0 n'est pas dans le domaine / · oui, en x = 0
+      ? En x = −2, f′ s'annule. Ce point est : ✔ un maximum local / · un minimum local / · pas un extremum
+      = −8   ← Calculer
+    — Valeur au point x = 2 :  [juge value]  départ : 2·2 + 8/2
+      ? En x = 2, f′ s'annule. Ce point est : · un maximum local / ✔ un minimum local / · pas un extremum
+      = 8   ← Calculer
   pièges : g6_sketch_crosses_asymptote
 
 ```
@@ -4183,28 +4211,30 @@ Arc paramétré : x(t) = t³ + 6t² + 9t − 1, y(t) = t² + 6t. Quelle est la p
   pièges : g6_param_slope_inverted
 
 Arc paramétré : x(t) = t³ − 6t² + 9t − 2, y(t) = t² − 2t − 2. Trouve les points à tangente horizontale ou verticale et le point stationnaire, puis la tangente en ce point.
-  [free, sans aide, examen open]  (t³ − 6t² + 9t − 2)′
-    (Vecteur vitesse :)
-    = 3t² − 12t + 9   ← Dériver x(t)
-  —   [juge equiv]  départ : (t² − 2t − 2)′
-    = 2t − 2   ← Dériver y(t)
-  — Zéros de ẋ :  [juge solset]  départ : 3t² − 12t + 9 = 0
-    = 3(t − 1)(t − 3) = 0   ← Factoriser
-    = t = 1 ou t = 3   ← Produit nul
-  — Zéros de ẏ :  [juge solset]  départ : 2t − 2 = 0
-    = 2(t − 1) = 0   ← Factoriser
-    = t = 1   ← Produit nul
-  — Pente au point stationnaire t = 1 : la limite de ẏ/ẋ.  [juge limit]  départ : (2t − 2)/(3t² − 12t + 9)
-    ? En t = 3 : ẋ = 0 et ẏ = 4 ≠ 0. La tangente en ce point est : ✔ verticale / · horizontale / · un point stationnaire
-    ? En t = 1 : ẋ = ẏ = 0. Ce point est : ✔ un point stationnaire : la pente est la limite de ẏ/ẋ / · un point à tangente verticale / · un point à tangente horizontale
-    = 2/(3(t − 3))   ← Simplifier par t − 1
-    = −1/3   ← t → 1
-  — Le point stationnaire M(1) :  [juge value]  départ : 1³ − 6·1² + 9·1 − 2
-    = 2   ← Calculer
-  —   [juge value]  départ : 1² − 2·1 − 2
-    = −3   ← Calculer
-  — Tangente en M(2 ; −3), de pente −1/3 :  [juge equiv]  départ : −3 + (−1/3)(x − 2)
-    = −(1/3)x − 7/3   ← Développer
+  [problème, examen open, 4 points]
+  partie 1 (Début du problème : 0,5 ; Étape 2 : 0,5 ; Zéros de ẋ : 0,5 ; Zéros de ẏ : 0,5 ; Pente au point stationnaire t = 1 : la limite de ẏ/ẋ. : 0,5 ; Le point stationnaire M(1) : 0,5 ; Étape 7 : 0,5 ; Tangente en M(2 ; −3), de pente −1/3 : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  (t³ − 6t² + 9t − 2)′
+      (Vecteur vitesse :)
+      = 3t² − 12t + 9   ← Dériver x(t)
+    —   [juge equiv]  départ : (t² − 2t − 2)′
+      = 2t − 2   ← Dériver y(t)
+    — Zéros de ẋ :  [juge solset]  départ : 3t² − 12t + 9 = 0
+      = 3(t − 1)(t − 3) = 0   ← Factoriser
+      = t = 1 ou t = 3   ← Produit nul
+    — Zéros de ẏ :  [juge solset]  départ : 2t − 2 = 0
+      = 2(t − 1) = 0   ← Factoriser
+      = t = 1   ← Produit nul
+    — Pente au point stationnaire t = 1 : la limite de ẏ/ẋ.  [juge limit]  départ : (2t − 2)/(3t² − 12t + 9)
+      ? En t = 3 : ẋ = 0 et ẏ = 4 ≠ 0. La tangente en ce point est : ✔ verticale / · horizontale / · un point stationnaire
+      ? En t = 1 : ẋ = ẏ = 0. Ce point est : ✔ un point stationnaire : la pente est la limite de ẏ/ẋ / · un point à tangente verticale / · un point à tangente horizontale
+      = 2/(3(t − 3))   ← Simplifier par t − 1
+      = −1/3   ← t → 1
+    — Le point stationnaire M(1) :  [juge value]  départ : 1³ − 6·1² + 9·1 − 2
+      = 2   ← Calculer
+    —   [juge value]  départ : 1² − 2·1 − 2
+      = −3   ← Calculer
+    — Tangente en M(2 ; −3), de pente −1/3 :  [juge equiv]  départ : −3 + (−1/3)(x − 2)
+      = −(1/3)x − 7/3   ← Développer
   pièges : g6_param_slope_inverted
 
 ```
@@ -4297,7 +4327,7 @@ _Limites de x et de y à chaque borne, asymptotes, branches paraboliques._
     ? m = 2 et h = −9 sont finis. La branche est : ✔ une asymptote oblique y = mx + h / · une branche parabolique / · l'asymptote y = mx
     = 2x − 9   ← y = mx + h
   aides : Pour chaque borne (±∞ et la valeur interdite), calcule les limites de x et de y, puis choisis le cas. | h = lim (−2t² − 5t + 7)/(t − □) | y = 2x − 9
-  pièges : a1_bh_quotient_rule, g6_param_ratio_inverted, g6_oblique_h_forgot
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, g6_param_ratio_inverted, g6_oblique_h_forgot
 
 Γ : x(t) = (t² + t − 2)/(t − 2), y(t) = (2t − 3)/(t − 2). Détermine les branches infinies de Γ.
   [guided]  (2t − 3)/(t − 2)
@@ -4324,7 +4354,7 @@ _Limites de x et de y à chaque borne, asymptotes, branches paraboliques._
     ? m = 1/4 et h = 3/4 sont finis. La branche est : ✔ une asymptote oblique y = mx + h / · une branche parabolique / · l'asymptote y = mx
     = (1/4)x + 3/4   ← y = mx + h
   aides : Pour chaque borne (±∞ et la valeur interdite), calcule les limites de x et de y, puis choisis le cas. | h = lim (−(1/4)t² + (7/4)t − 5/2)/(t − □) | y = (1/4)x + 3/4
-  pièges : a1_bh_quotient_rule, g6_param_ratio_inverted, g6_oblique_h_forgot
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, g6_param_ratio_inverted, g6_oblique_h_forgot
 
 Γ : x(t) = (t² + 3)/(t − 1), y(t) = (−t − 2)/(t − 1). Détermine les branches infinies de Γ.
   [guided]  (−t − 2)/(t − 1)
@@ -4351,7 +4381,7 @@ _Limites de x et de y à chaque borne, asymptotes, branches paraboliques._
     ? m = −3/4 et h = 1/2 sont finis. La branche est : ✔ une asymptote oblique y = mx + h / · une branche parabolique / · l'asymptote y = mx
     = −(3/4)x + 1/2   ← y = mx + h
   aides : Pour chaque borne (±∞ et la valeur interdite), calcule les limites de x et de y, puis choisis le cas. | h = lim ((3/4)t² − t + 1/4)/(t − □) | y = −(3/4)x + 1/2
-  pièges : a1_bh_quotient_rule, g6_param_ratio_inverted, g6_oblique_h_forgot
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, g6_param_ratio_inverted, g6_oblique_h_forgot
 
 ```
 
@@ -4561,7 +4591,7 @@ _Limites de x et de y à chaque borne, asymptotes, branches paraboliques._
     = −1a/(a + 1)   ← t = −1
   — Asymptote oblique (a ≠ −1) :  [juge equiv]  départ : mx + h
     = −1(x + a)/(a + 1)   ← y = mx + h
-  pièges : a1_bh_quotient_rule, g6_param_ratio_inverted, g6_oblique_h_forgot
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, g6_param_ratio_inverted, g6_oblique_h_forgot
 
 Γ : x(t) = (a·t² − t)/(t + 1), y(t) = 2t/(t + 1), avec a ∈ ℝ. Détermine, selon a, les branches infinies de Γ (en ±∞ et quand t → −1).
   [free, sans aide]  2t/(t + 1)
@@ -4620,27 +4650,29 @@ _Limites de x et de y à chaque borne, asymptotes, branches paraboliques._
   pièges : g6_param_ratio_inverted
 
 Γ : x(t) = (a·t² − t)/(t + 1), y(t) = t/(t + 1), avec a ∈ ℝ. Détermine, selon a, les branches infinies de Γ (en ±∞ et quand t → −1).
-  [free, sans aide, examen open]  t/(t + 1)
-    (Quand t → ±∞ :)
-    = 1   ← Coefficients dominants
-  — Cas a = 0 : x(t) = −t/(t + 1). Quand t → ±∞ :  [juge limit]  départ : −t/(t + 1)
-    = −1   ← Coefficients dominants
-  — Quand t → −1, y → ∞. Cas a = −1 :  [juge equiv]  départ : (−t² − t)/(t + 1)
-    ? Quand t → ±∞ : y → 1 ; x → ∞ si a ≠ 0, et x → −1 si a = 0. Donc : ✔ a ≠ 0 : asymptote horizontale y = 1 ; a = 0 : pas de branche infinie, M(t) tend vers (−1 ; 1) / · asymptote horizontale y = 1 pour tout a / · a = 0 : asymptote verticale x = −1
-    = −t   ← Factoriser −t(t + 1)
-  — Cas a ≠ −1 : quand t → −1, x et y → ∞.  [juge equiv]  départ : (t/(t + 1))/((a·t² − t)/(t + 1))
-    ? Cas a = −1 : x(t) = −t → 1 et y → ∞ quand t → −1. La branche est : ✔ une asymptote verticale x = 1 / · une asymptote horizontale y = 1 / · une asymptote oblique
-    ? Quand t → −1, x et y tendent vers l'infini. On calcule : ✔ m = lim y/x, puis h = lim (y − mx) / · m = lim x/y, puis h = lim (y − mx) / · rien : c'est une asymptote verticale
-    = 1/(a·t − 1)   ← Simplifier par t(t + 1)/(t + 1)
-  — m = lim y/x quand t → −1 :  [juge equiv]  départ : 1/(a·t − 1)
-    = −1/(a + 1)   ← t = −1
-  — y − mx =  [juge equiv]  départ : t/(t + 1) + (1/(a + 1))·(a·t² − t)/(t + 1)
-    = 1a·t/(a + 1)   ← Même dénominateur, puis simplifier par t + 1
-  — h = lim (y − mx) quand t → −1 :  [juge equiv]  départ : 1a·t/(a + 1)
-    = −1a/(a + 1)   ← t = −1
-  — Asymptote oblique (a ≠ −1) :  [juge equiv]  départ : mx + h
-    = −1(x + a)/(a + 1)   ← y = mx + h
-  pièges : a1_bh_quotient_rule, g6_param_ratio_inverted, g6_oblique_h_forgot
+  [problème, examen open, 6 points]
+  partie 1 (Début du problème : 1 ; Cas a = 0 : x(t) = −t/(t + 1). Quand t → ±∞ : 1 ; Quand t → −1, y → ∞. Cas a = −1 : 1 ; Cas a ≠ −1 : quand t → −1, x et y → ∞. : 1 ; m = lim y/x quand t → −1 : 0,5 ; y − mx = : 0,5 ; h = lim (y − mx) quand t → −1 : 0,5 ; Asymptote oblique (a ≠ −1) : 0,5)
+    [free, sans aide, suivre l'erreur, examen open]  t/(t + 1)
+      (Quand t → ±∞ :)
+      = 1   ← Coefficients dominants
+    — Cas a = 0 : x(t) = −t/(t + 1). Quand t → ±∞ :  [juge limit]  départ : −t/(t + 1)
+      = −1   ← Coefficients dominants
+    — Quand t → −1, y → ∞. Cas a = −1 :  [juge equiv]  départ : (−t² − t)/(t + 1)
+      ? Quand t → ±∞ : y → 1 ; x → ∞ si a ≠ 0, et x → −1 si a = 0. Donc : ✔ a ≠ 0 : asymptote horizontale y = 1 ; a = 0 : pas de branche infinie, M(t) tend vers (−1 ; 1) / · asymptote horizontale y = 1 pour tout a / · a = 0 : asymptote verticale x = −1
+      = −t   ← Factoriser −t(t + 1)
+    — Cas a ≠ −1 : quand t → −1, x et y → ∞.  [juge equiv]  départ : (t/(t + 1))/((a·t² − t)/(t + 1))
+      ? Cas a = −1 : x(t) = −t → 1 et y → ∞ quand t → −1. La branche est : ✔ une asymptote verticale x = 1 / · une asymptote horizontale y = 1 / · une asymptote oblique
+      ? Quand t → −1, x et y tendent vers l'infini. On calcule : ✔ m = lim y/x, puis h = lim (y − mx) / · m = lim x/y, puis h = lim (y − mx) / · rien : c'est une asymptote verticale
+      = 1/(a·t − 1)   ← Simplifier par t(t + 1)/(t + 1)
+    — m = lim y/x quand t → −1 :  [juge equiv]  départ : 1/(a·t − 1)
+      = −1/(a + 1)   ← t = −1
+    — y − mx =  [juge equiv]  départ : t/(t + 1) + (1/(a + 1))·(a·t² − t)/(t + 1)
+      = 1a·t/(a + 1)   ← Même dénominateur, puis simplifier par t + 1
+    — h = lim (y − mx) quand t → −1 :  [juge equiv]  départ : 1a·t/(a + 1)
+      = −1a/(a + 1)   ← t = −1
+    — Asymptote oblique (a ≠ −1) :  [juge equiv]  départ : mx + h
+      = −1(x + a)/(a + 1)   ← y = mx + h
+  pièges : a1_bh_quotient_rule, a1_dominant_term_wrong, g6_param_ratio_inverted, g6_oblique_h_forgot
 
 ```
 

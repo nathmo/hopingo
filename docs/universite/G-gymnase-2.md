@@ -1650,7 +1650,7 @@ Pas de problème long : au CMS, la combinatoire est évaluée en questions court
 
 # G8. Nombres complexes
 
-Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
+Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : fait le 10 novembre 2026 (étape U4), chaque compétence a son statut. `g4-bisectors`, `g4-dot` et `g10-circle-eq` (étape U5) restent des remplaçants dans `UNBUILT`.
 
 **Sources** : MAN, Math 1A (examen 2017 : polynôme réel avec une racine complexe, rapport et angle dans le plan complexe, équation du 2e degré à coefficients complexes) ; CMS, Analyse II, séries 14 à 16, 19 et 21 (forme algébrique, carré parfait, module et argument, forme trigonométrique, lieux, triangle équilatéral, polynômes complexes, sin i et cos i).
 **Notation** : i est l'unité imaginaire (l'item déclare `complex: true`). Conjugué `z̄` (touche `conj`). Module `|z|`, argument `arg z` dans ]−π ; π] (une valeur dans [0 ; 2π[ est acceptée et ramenée). Forme exponentielle `r·e^(iθ)` ; forme trigonométrique `r(cos θ + i sin θ)` acceptée. Point du plan d'affixe z = x + iy : (x ; y).
@@ -1689,8 +1689,8 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-polar` — Forme polaire et exponentielle
 - **Année** 12 · **Prérequis** `g8-algebraic`, `g3-exact` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
-- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : module (`complex`, forme réelle), cos θ et sin θ (`value`, niveaux 1 et 3), argument (`complex`, forme réelle, θ dans ]−π ; π]), forme exponentielle (`complex` `exp`) ; les deux sens et le produit ou quotient de formes exponentielles. Niveau 5 : le gabarit en α (série 15) est remplacé par un produit ou un quotient de deux nombres donnés sous forme algébrique, à écrire sous forme exponentielle (θ multiple de π/12). Variante `coef` : θ seul.
 - **Pourquoi ces prérequis** : `g8-algebraic` : module r = |z| et parties a, b.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : module (`complex`, forme réelle), cos θ et sin θ (`value`, niveaux 1 et 3), argument (`complex`, forme réelle, θ dans ]−π ; π]), forme exponentielle (`complex` `exp`) ; les deux sens et le produit ou quotient de formes exponentielles. Niveau 5 : le gabarit en α (série 15) est remplacé par un produit ou un quotient de deux nombres donnés sous forme algébrique, à écrire sous forme exponentielle (θ multiple de π/12). Variante `coef` : θ seul.
 - **Intro** : z = r·e^(iθ) = r(cos θ + i sin θ), avec r = |z|. On trouve θ avec cos θ = a/r **et** sin θ = b/r (les deux, pour le bon quadrant). arctan(b/a) ne suffit pas quand a < 0. e^(iθ)·e^(iφ) = e^(i(θ + φ)).
 - **Juge** : `complex` `{form:'exponential'}` ; segments `value` pour r et θ · **Forme finale** : r·e^(iθ) avec r > 0 et θ exact.
 - **Niveaux** :
@@ -1740,8 +1740,8 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-nth-roots` — Racines n-ièmes
 - **Année** 12.5 · **Prérequis** `g8-moivre` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
-- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : forme exponentielle de w, module des racines (`value`), arguments nθ = φ + 2kπ (`solset` en θ avec k, où vit le piège `g8_roots_spacing`), une partie par racine aux niveaux 1 à 3 (n ≤ 4), contrôle (zₖ)ⁿ = w quand une racine a des parties rationnelles, puis l'ensemble des solutions (`complex` `set`). Cet ensemble part de l'équation quand w est dans ℚ(i), sinon des racines écrites r·e^(iθ) : le juge ne lit pas une équation à coefficients irrationnels (z⁴ = −8 + 8i√3). Pas d'esquisse du polygone (`plot`, étape U5). Variante `open` : le niveau 5 (zⁿ = w ou (z − a)ⁿ = w), 4 points.
 - **Pourquoi ces prérequis** : `g8-moivre` : zⁿ en forme exponentielle par Moivre.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Parties : forme exponentielle de w, module des racines (`value`), arguments nθ = φ + 2kπ (`solset` en θ avec k, où vit le piège `g8_roots_spacing`), une partie par racine aux niveaux 1 à 3 (n ≤ 4), contrôle (zₖ)ⁿ = w quand une racine a des parties rationnelles, puis l'ensemble des solutions (`complex` `set`). Cet ensemble part de l'équation quand w est dans ℚ(i), sinon des racines écrites r·e^(iθ) : le juge ne lit pas une équation à coefficients irrationnels (z⁴ = −8 + 8i√3). Pas d'esquisse du polygone (`plot`, étape U5). Variante `open` : le niveau 5 (zⁿ = w ou (z − a)ⁿ = w), 4 points.
 - **Intro** : zⁿ = w avec w = ρ·e^(iφ) : |z| = ρ^(1/n) et arg z = φ/n + 2kπ/n, pour k = 0, …, n − 1. Il y a **n** racines, aux sommets d'un polygone régulier centré en 0.
 - **Juge** : `complex` `{form:'set', count:n}` ; segments `value` pour le module et les arguments · **Forme finale** : les n racines (forme algébrique si les valeurs sont remarquables, sinon exponentielle).
 - **Niveaux** :
@@ -1768,8 +1768,8 @@ Unité `complexes` · préfixe `g8-` · pièges `g8_` · Statut : à faire
 
 ### `g8-sqrt-alg` — Racine carrée sous forme algébrique
 - **Année** 12.5 · **Prérequis** `g8-algebraic`, `@alg:E-systemes-2x2` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
-- **Statut** : fait le 10 novembre 2026 (étape U4). Le système n'est pas jugé par `equiv` : la ligne (x + iy)² = x² − y² + 2xyi (`complex` avec x et y réels), l'identification en note, puis |w| (`complex`), x² et y² (`value`), la décision des signes et l'ensemble {δ ; −δ} (`complex` `set`). Niveau 5 : enchaîné avec une équation du 2e degré (Δ, δ par x + iy, puis les solutions).
 - **Pourquoi ces prérequis** : `g8-algebraic` : développer (x + iy)² et calculer un module.
+- **Statut** : fait le 10 novembre 2026 (étape U4). Le système n'est pas jugé par `equiv` : la ligne (x + iy)² = x² − y² + 2xyi (`complex` avec x et y réels), l'identification en note, puis |w| (`complex`), x² et y² (`value`), la décision des signes et l'ensemble {δ ; −δ} (`complex` `set`). Niveau 5 : enchaîné avec une équation du 2e degré (Δ, δ par x + iy, puis les solutions).
 - **Intro** : on cherche z = x + iy avec z² = a + bi. Trois équations : x² − y² = a, 2xy = b, et x² + y² = |a + bi|. Les deux premières et la troisième donnent x² et y². Le signe de xy est celui de b : il reste **deux** racines opposées. On n'écrit pas √(a + bi) : le symbole √ est réservé aux réels positifs.
 - **Juge** : `equiv` pour le système ; `complex` `{form:'set', count:2}` pour les racines · **Forme finale** : ±(x + iy).
 - **Niveaux** :
