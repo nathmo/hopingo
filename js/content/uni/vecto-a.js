@@ -6,5 +6,7 @@
 
 import { GEN as OPS } from './vecto-a-ops.js';
 import { GEN as CURVES } from './vecto-a-curves.js';
+import { GEN as TOPO } from './vecto-a-topo.js';
+import { GEN as POT } from './vecto-a-pot.js';
 
-export const GEN = { ...OPS, ...CURVES };
+export const GEN = { ...OPS, ...CURVES, ...TOPO, ...POT };
