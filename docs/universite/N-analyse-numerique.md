@@ -2,7 +2,7 @@
 
 Extensions du §16 utilisées : §16.1 intégrales dans `evalFloat`, alias `o(xⁿ)` ; §16.2 `iter` avec les sortes de `phi` (`bisection`, `secant`, `jacobi`, `gauss-seidel`, `euler`, `gradient`…), `stat` avec `sig`, `value` avec `arith: 'fp'`, `series` avec fonctions abstraites (preuves d'ordre) ; §16.3 `code` (Python, `atol`), QCM à plusieurs réponses, `matrix`, échelle des niveaux `blocks` et `tokens` ; §16.4 familles nouvelles (`numeric`, `method`, `logic`, `calculus`), tag C, réparation dans un autre module, pièges partagés (réutilise `g9_quant_order`, `g9_proof_by_example`, `a2_jacobian_transposed`).
 
-Unité `numerique` · préfixe `n-` · pièges `n_` · Statut : à faire
+Unité `numerique` · préfixe `n-` · pièges `n_` · Statut : fait le 10 novembre 2026 (étape U9). Les 45 compétences et les 91 pièges ; chaque compétence a au moins un item `code` ou `readtable`. Les juges à fonction abstraite (extension 5) ne sont pas construits : les preuves d'ordre utilisent des lettres pour f(x₀), f′(x₀)… et f‴(ξᵢ) (juge `equiv`), des QCM et des blocs. Les simplifications de chaque compétence sont dans son statut.
 
 **Sources** :
 - cours d'Analyse numérique de la section GM (F. Nobile), notes de cours 2017–2018 et séries d'exercices avec Matlab 2017 et 2018 (bissection, point fixe, Newton, interpolation, moindres carrés, dérivation, intégration, systèmes linéaires, méthodes itératives, valeurs propres, EDO). Les séries citent d'anciennes questions d'examen GM (2011–2013) ;
@@ -161,6 +161,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-err-abs-rel` — Erreurs absolue et relative ; arrondis
 - **Année** 16 · **Prérequis** `@alg:A-arrondir`, `@alg:J-quel-pourcentage` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `@alg:J-quel-pourcentage` : erreur relative exprimée en pourcentage.
+- **Statut** : fait le 10 novembre 2026 (étape U9). x = p/q (q ∈ {3, 6, 7, 9, 11}), x̃ son arrondi à 2, 3 ou 4 chiffres significatifs ; e_abs et e_rel en fractions exactes (juge `value`). L1 : lignes guidées (même dénominateur, puis division) ; L2 : avec la décision « diviser par x ou par x̃ » (`n_rel_by_approx`) ; L3 : menus ; L4 : deux paires (gabarit 3) classées différemment par e_abs et e_rel, puis la meilleure au sens relatif ; L5 : `readtable` des itérés de Newton pour √c, avec une question `answer` (« à partir de quel k a-t-on 5 chiffres significatifs exacts ? ») au lieu de cases e_abs et e_rel à remplir. Une fois sur trois, L1, L2 et L4 sont l'item `code` errors(x, xt) : un trou au choix, un trou tapé, puis les deux trous. QCM : e_rel (pièges division par x̃ et erreur signée) ou une mesure en % (gabarit 2, sans piège pour le facteur 100). V/F : une affirmation vraie sur l'arrondi, ou « e_abs ≤ 10⁻³ ⇒ 3 chiffres exacts », faux avec x = 10⁻⁴, x̃ = 0 (`num` `absSmallNotSig`).
 - **Intro** : e_abs = |x − x̃| et e_rel = |x − x̃| / |x| (x ≠ 0), où x est la valeur exacte et x̃ l'approximation. Arrondir x à d chiffres significatifs donne e_rel ≤ 5·10⁻ᵈ. L'erreur relative compare des grandeurs d'échelles différentes. Exemple : x = 2/3, x̃ = 0,667.
   - `e_abs = |0,667 − 2/3| = |2001/3000 − 2000/3000| = 1/3000` (note : « même dénominateur »)
   - `e_rel = (1/3000)/(2/3) = 1/2000 = 5·10⁻⁴` (note : « on divise par la valeur exacte »)
@@ -212,6 +213,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-err-float` — Virgule flottante, ε machine, annulation
 - **Année** 16 · **Prérequis** `n-err-abs-rel` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U9). Juge `value` {arith: 'fp', digits: 4} ; trois annulations : √(N + 1) − √N avec N ∈ {200, 400, 500, 1000, 2000, 5000, 10 000}, la petite racine de x² − bx + 1 (b = 10³ à 10⁵), et 1 − cos x pour x ∈ {0,01 ; 0,03 ; 0,005 ; 0,002 ; 0,001}. On garde un tirage seulement si la forme naïve se trompe d'au moins 10 % et la forme stable d'au plus 0,1 %. L1 : la forme stable guidée ; L2 : les deux formes guidées, la réécriture choisie dans une décision (piège `n_cancel_ignored`) ; L3 : menus, avec la réécriture exacte en ligne `equiv` ; L4 : les deux formes et l'erreur relative de la forme naïve (calculée à partir de l'expression exacte), ou (une fois sur deux) le `readtable` de (1 − cos x)/x² en double précision ; L5 : l'item `code` (g_stable, small_root). QCM : quelle formule est stable. V/F : l'absorption (QCM Vrai/Faux) ; « l'erreur d'arrondi vaut 10⁻¹⁶ en valeur absolue », faux avec x = 10²⁰ (`num` `roundAbsLarge`).
 - **Intro** : un ordinateur garde environ 16 chiffres significatifs : fl(x) = x(1 + δ) avec |δ| ≤ ε ≈ 10⁻¹⁶. L'erreur d'arrondi est **relative**. Soustraire deux nombres proches fait perdre des chiffres (annulation) : on réécrit alors le calcul. Exemple, en arithmétique à 4 chiffres :
   - `√1001 − √1000 = 31,64 − 31,62 = 0,02` (note : « faux dès le 1er chiffre : la vraie valeur est 0,01581 »)
   - `= 1/(√1001 + √1000) = 1/63,26 = 0,01581` (note : « conjugué : plus de soustraction »)
@@ -223,7 +225,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
   - L4 (libre) : calculer les deux formes à 4 chiffres et donner leurs erreurs relatives.
   - L5 (seul) : l'item `code` de la petite racine d'un trinôme, sans aide.
 - **Générateur** : on part de l'annulation voulue.
-  - **Gabarit 1.** √(N + 1) − √N avec N ∈ {100, 400, 1000, 2500, 10 000}.
+  - **Gabarit 1.** √(N + 1) − √N avec N ∈ {200, 400, 500, 1000, 2000, 5000, 10 000}. (Corrigé à l'étape U9 : la liste d'origine contenait 100 et 2500, qui ne vérifient pas la contrainte ci-dessous : à 4 chiffres, √101 − √100 = 0,05 et √2501 − √2500 = 0,01 ont une erreur relative de 0,25 % et 0,002 % seulement.)
   - **Gabarit 2.** La petite racine de x² − bx + 1 avec b = 10ᵏ, k ∈ {3, …, 8}, calculée par (b − √(b² − 4))/2, puis par 1/x₊ (produit des racines = 1).
   - **Gabarit 3.** 1 − cos x avec x = 10⁻ᵏ.
   - **Contrainte.** La forme naïve à 4 chiffres a une erreur relative ≥ 10 % et la forme stable ≤ 0,1 %.
@@ -269,6 +271,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-bisection` — Bissection : nombre d'itérations et intervalles
 - **Année** 16 · **Prérequis** `a1-fn-ivt`, `g2-log-rules` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-fn-ivt` : f continue et f(a)f(b) < 0 : un zéro existe (TVI).
+- **Statut** : fait le 10 novembre 2026 (étape U9). f ∈ {x² − c, x³ − x − 2, cos x − x}, b − a ∈ {1, 2, 4}, tol de 10⁻² à 10⁻¹⁰ (log₂((b − a)/tol) à au moins 0,05 d'un entier). k_min se calcule en lignes `value` : (b − a)/tol, log₂(…) − 1 à 0,01 près, puis k_min (pièges `n_bisect_no_minus1`, `n_bisect_log10`). Le tableau utilise le juge `iter` (phi `bisect` : a, b, x, signe de f(x)). L1 et L2 : les lignes de k_min ou le tableau ; L3 : trois pas où l'on choisit la moitié à garder dans un menu, puis k_min ; L4 : le tableau, puis k_min en lignes libres ; L5 : l'item `code`, puis le QCM « vers quel zéro, en au plus combien d'itérations » (polynôme de degré 3 à zéros demi-entiers sur [−2 ; 2]). Examen : ce QCM ou la ligne `kmin = int(???)` ; V/F « l'erreur diminue à chaque pas », faux avec x − 0,51 sur [0 ; 1] (`num` `bisectErrorUp`), ou (x − 1)² sur [0 ; 3] (QCM Vrai/Faux).
 - **Intro** : si f est continue et f(a)f(b) < 0, on prend le milieu x⁽ᵏ⁾ et on garde la moitié où f change de signe. On a |α − x⁽ᵏ⁾| ≤ (b − a)/2ᵏ⁺¹. Pour garantir une tolérance tol, il faut k_min > log₂((b − a)/tol) − 1. Exemple : f(x) = x² − 2 sur [1 ; 2] avec tol = 10⁻³.
   - `(b − a)/2^(k+1) ≤ 10⁻³` (note : « borne garantie »)
   - `k > log₂(1000) − 1 ≈ 9,97 − 1 = 8,97` (note : « 2¹⁰ = 1024 ≈ 10³ »)
@@ -330,6 +333,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-fp-converge` — Point fixe : convergence, choix de φ
 - **Année** 16 · **Prérequis** `a1-seq-rec-fixed`, `a1-mvt` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-seq-rec-fixed` : suite récurrente et point fixe α = φ(α) ; `a1-mvt` : |φ′| < 1 donne une contraction par les accroissements finis.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Gabarit 1 : φ = ax/(b + x), points fixes 0 et α = a − b, φ′(α) = b/a ∈ {1/2, 1/3, 2/3, 1/4, 3/4}, itérés exacts (dénominateurs ≤ 10⁴). Points fixes avec `solset`, φ′ avec `equiv`, φ′(α) et les itérés avec `value`, puis la décision de convergence (pièges `n_fp_f_vs_phi`, `n_fp_phi_at_x0`). L1 : φ′ donnée ; L2 : points fixes et φ′ guidés ; L3 : gabarit 2 (x² − x − c), choisir la reformulation la plus rapide (φ₃ en `quality: 'poor'`), puis φ₂′(α) ; L4 : tout en lignes libres, avec 3 itérations en lignes (pas de tableau `iter`) ; L5 : l'item `code` fixed_point, puis le `readtable` des incréments (ordre 1, rapport → φ′(α)). Le gabarit 3 (diode) n'est pas construit. QCM : gabarit 2 (piège `n_fp_abs_forgot`). V/F : « converge quel que soit x⁽⁰⁾ », faux avec x², α = 0, x⁽⁰⁾ = 2 (`fpNotGlobal`) ; « le résidu estime l'erreur », faux avec 0,99x + 0,01 (`residualNotError`).
 - **Intro** : x⁽ᵏ⁺¹⁾ = φ(x⁽ᵏ⁾), et α = φ(α).
   - Si φ est C¹ près de α et |φ′(α)| < 1, la méthode converge pour x⁽⁰⁾ assez proche de α, et |x⁽ᵏ⁺¹⁾ − α| ≈ |φ′(α)|·|x⁽ᵏ⁾ − α|.
   - Si |φ′(α)| > 1, elle ne converge pas vers α.
@@ -395,6 +399,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-fp-order` — Ordre d'un point fixe, ordre selon un paramètre
 - **Année** 16 · **Prérequis** `n-fp-converge`, `a1-dl-usual` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `n-fp-converge` : φ et son point fixe α ; `a1-dl-usual` : Taylor de φ autour de α.
+- **Statut** : fait le 10 novembre 2026 (étape U9). φ_ω = x − ω(x − α)(x + β), F = f′(α) = α + β, avec |F| ≤ 12 : ω* = 1/F, φ″(α) = −2/F, convergence pour |1 − ωF| < 1. Juges : `equiv` pour α point fixe et φ′, `solset` en ω pour ω* et l'intervalle, `value` pour φ″(α) et pour l'ordre p (piège `n_fp_order_count`). L1 : φ′, ω* et φ″ guidés ; L2 : dérivée libre et décision sur l'ordre ; L3 : menus ; L4 : le problème complet avec l'intervalle (gabarit 1 seulement, le gabarit 2 x − ωf/f′ n'est pas construit) ; L5 : `readtable` des incréments pour ω₁ = 4/(5F) et ω*, puis un QCM à plusieurs réponses (au lieu du problème GM en quatre parties : un `problem` ne contient pas de `readtable`). QCM : (x − a)³ + a, d'ordre 3 en a (GM 2013). V/F : « φ′(α) = 0 ⇒ ordre 2 », faux avec (x − 1)³ + 1 (`orderAboveTwo`), ou un énoncé vrai. `coef` : ω*.
 - **Intro** : si φ′(α) = … = φ⁽ᵖ⁻¹⁾(α) = 0 et φ⁽ᵖ⁾(α) ≠ 0, la méthode est d'ordre p. Par Taylor, x⁽ᵏ⁺¹⁾ − α = φ⁽ᵖ⁾(ξ)/p!·(x⁽ᵏ⁾ − α)ᵖ, donc le rapport tend vers |φ⁽ᵖ⁾(α)|/p!. Exemple : φ_ω(x) = x − ω(x² − 4), α = 2.
   - `φ_ω(2) = 2 pour tout ω` (note : « α est point fixe »)
   - `φ_ω′(2) = 1 − 4ω` (note : « nul ⇔ ω = 1/4 »)
@@ -448,6 +453,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-newton` — Méthode de Newton pour une équation
 - **Année** 16 · **Prérequis** `n-fp-converge`, `g6-deriv-rules` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `n-fp-converge` : Newton est le point fixe de φ(x) = x − f(x)/f′(x).
+- **Statut** : fait le 10 novembre 2026 (étape U9). f = x² − c, x⁽⁰⁾ entier voisin de √c. L1 : φ simplifiée à trous, puis x⁽¹⁾ ; L2 : tableau (phi `scalar`, incréments calculés par l'app) ; L3 : décision x − f/f′ (pièges `n_newton_inverted`, `n_newton_sign`), puis x⁽¹⁾ ; L4 : tableau avec δ et r₂ à calculer, puis QCM d'ordre ; L5 : programme `newton` (3 trous), puis lecture de ses incréments (QCM à plusieurs réponses). QCM d'examen : la ligne `incr = ???`, ou un tableau d'incréments ; V/F avec le contre-exemple x³ − 2x + 2, x⁽⁰⁾ = 0 (`num` `newtonNoConv`). Les gabarits x³ − c et x − cos x (calculatrice) ne sont pas construits.
 - **Intro** : x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ − f(x⁽ᵏ⁾)/f′(x⁽ᵏ⁾) est le zéro de la tangente. Si α est un zéro simple (f′(α) ≠ 0), Newton est d'ordre 2 près de α. On arrête sur l'incrément : |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| < tol. Exemple : x² = 2, x⁽⁰⁾ = 1.
   - `x⁽ᵏ⁺¹⁾ = x − (x² − 2)/(2x) = (x² + 2)/(2x)`
   - `1 → 3/2 → 17/12 → 577/408` (note : « incréments 0,5 ; 0,0833 ; 0,00245 »)
@@ -512,6 +518,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-order-read` — Lire l'ordre sur les rapports d'incréments
 - **Année** 16 · **Prérequis** `n-newton` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-newton` : les suites d'itérés à analyser viennent de Newton.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Tableaux calculés en double précision (Newton sur x² − c et x³ − c, point fixe x − ω(x² − 4), Newton sur racine double, sécante), δ à 4 chiffres. Rapports et constante jugés par `stat` avec une tolérance (2 chiffres significatifs). L1 : `readtable` avec r₁, r₂, r₃ et le choix de p (ou, une fois sur quatre, la fonction `ratios` en QCM de trou) ; L2 : deux rapports à calculer, puis p ; L3 : ligne d'arrondi à garder ou ignorer (`n_order_roundoff_rows`), p et C ; L4 : incréments bruts, p et C (ou `ratios` à 2 trous) ; L5 : deux méthodes côte à côte, QCM à plusieurs réponses. Examen : QCM sur un tableau, V/F en Vrai/Faux.
 - **Intro** : α est inconnue, donc on lit l'ordre sur les incréments δₖ = |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾|. La méthode est d'ordre p si rₚ = δₖ/δₖ₋₁ᵖ tend vers une constante **finie et non nulle**. Pour p trop petit, rₚ → 0 ; pour p trop grand, rₚ → ∞. On ignore les lignes où δ atteint ~10⁻¹⁵, qui sont dominées par l'arrondi. Exemple : Newton pour ∛2, x⁽⁰⁾ = 2.
   - `δ : 5.0e-01, 2.0e-01, 3.5e-02, 1.0e-03, 8.1e-07, 5.2e-13`
   - `r₁ : 0,41 ; 0,17 ; 0,029 ; 0,0008 → 0` (note : « p = 1 trop petit »)
@@ -563,6 +570,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-newton-multiple` — Newton sur une racine multiple ; Newton modifié
 - **Année** 16 · **Prérequis** `n-newton`, `n-order-read`, `g0-multiplicity` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `g0-multiplicity` : multiplicité m de la racine.
+- **Statut** : fait le 10 novembre 2026 (étape U9). À la main : f = (x − a)ᵐ, m ∈ {2, 3}. L1 : φ simplifiée, le rapport 1 − 1/m, l'ordre ; L2 : tableau, puis QCM d'ordre (`n_newton_always2`) ; L3 : m, puis un pas de Newton modifié (exact en un pas) ; L4 : `readtable` de Newton sur (x − a)ᵐ·g(x) en double précision, puis m (`n_mult_ratio`) ; L5 : `newton_mod` (1 trou), puis Newton contre Newton modifié. La limite de 40 itérations est portée à 70 pour m = 3, sinon m = 3 n'apparaîtrait jamais. Examen : QCM sur le tableau, ou la ligne `incr = ???` pour une racine double ; V/F avec le contre-exemple (x − 1)², x⁽⁰⁾ = 2 (`num` `newtonOrder1`).
 - **Intro** : si α est de multiplicité m ≥ 2 (f(α) = … = f⁽ᵐ⁻¹⁾(α) = 0), Newton n'est plus que d'ordre 1, avec un rapport qui tend vers 1 − 1/m. Newton modifié, x − m·f/f′, retrouve l'ordre 2. Exemple : f(x) = (x − 1)², x⁽⁰⁾ = 2.
   - `x⁽ᵏ⁺¹⁾ = x − (x − 1)²/(2(x − 1)) = (x + 1)/2`
   - `2 → 1,5 → 1,25 → 1,125` (note : « incréments 0,5 ; 0,25 ; 0,125 : r₁ = 1/2 = 1 − 1/2 »)
@@ -623,6 +631,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-newton-system` — Newton pour les systèmes ; jacobienne à la main
 - **Année** 16 · **Prérequis** `n-newton`, `a2-partials`, `l-sys-echelon` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-newton` : même itération, avec la jacobienne.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Parties jugées par `mat` : J(x, y), J(x⁽⁰⁾), F(x⁽⁰⁾), δ, puis x⁽¹⁾ (`n_newton_sys_sign`). Cases de la grille aux niveaux 1 et 2 ; F(x⁽⁰⁾) est donné au niveau 1. Les décisions « résoudre ou inverser J » (`quality: 'poor'`) et « x − δ ou x + δ » remplacent la barre d'opérations : δ s'écrit directement, sans `rowops`. Systèmes à solution simple (J(p, q) inversible) ; l'équation xy − pq passe en second. L5 : `newton_sys` (4 trous), puis lecture de ‖δ‖ du système de l'item. QCM d'examen : J(x⁽⁰⁾), avec la transposée en distracteur (`a2_jacobian_transposed`) ; `coef` : la première composante de x⁽¹⁾. Le gabarit exponentiel (calculatrice) n'est pas construit.
 - **Intro** : pour F : ℝⁿ → ℝⁿ, on résout J_F(x⁽ᵏ⁾)·δ⁽ᵏ⁾ = F(x⁽ᵏ⁾), puis on pose x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ − δ⁽ᵏ⁾. C'est la convention des examens : DF(xⁿ)(xⁿ − xⁿ⁺¹) = F(xⁿ). On ne calcule jamais J⁻¹. Exemple : F(x, y) = (x² + y² − 5 ; x − y + 1), x⁽⁰⁾ = (1 ; 1).
   - `J = [[2x, 2y], [1, −1]] → J(1, 1) = [[2, 2], [1, −1]]`
   - `F(1, 1) = (−3 ; 1)`
@@ -679,6 +688,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-secant` — Méthode de la sécante
 - **Année** 16 · **Prérequis** `n-newton`, `n-order-read` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `n-newton` : même itération, f′ remplacée par la pente de la corde ; `n-order-read` : ordre (1 + √5)/2 lu sur les incréments.
+- **Statut** : fait le 10 novembre 2026 (étape U9). f = x² − c ou x³ − c, x⁽⁰⁾ et x⁽¹⁾ entiers qui encadrent α. L1 : x⁽²⁾ et x⁽³⁾ guidés ; L2 : tableau (phi `secant`, jugé à partir des deux lignes précédentes de l'élève) ; L3 : choix des deux points (`n_secant_update`) ; L4 : tableau de 5 lignes, puis QCM d'ordre ; L5 : programme `secant` (3 trous ; le trou `x0` nomme `n_secant_update`), puis lecture des incréments. Examen : V/F en Vrai/Faux (pas de vérificateur de contre-exemple).
 - **Intro** : on remplace f′ par la pente de la corde, x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ − f(x⁽ᵏ⁾)·(x⁽ᵏ⁾ − x⁽ᵏ⁻¹⁾)/(f(x⁽ᵏ⁾) − f(x⁽ᵏ⁻¹⁾)). Il faut deux points de départ, mais aucune dérivée. L'ordre est (1 + √5)/2 ≈ 1,618. Exemple : x² − 2, x⁽⁰⁾ = 1, x⁽¹⁾ = 2.
   - `x⁽²⁾ = 2 − 2·(2 − 1)/(2 − (−1)) = 4/3`
   - `x⁽³⁾ = 4/3 − (−2/9)(4/3 − 2)/(−2/9 − 2) = 7/5`
@@ -721,6 +731,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-interp-lagrange` — Interpolation : Vandermonde et Lagrange à la main
 - **Année** 16 · **Prérequis** `l-sys-echelon` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U9). p de degré 2 à coefficients entiers, 3 nœuds de {−2, …, 3} (consécutifs aux niveaux 1 et 2), x* demi-entier. Le système de Vandermonde est résolu par des parties `value` (a₂, a₁, a₀, piège `n_vandermonde_order`), sans `rowops`. L1 : coefficients guidés à partir de leurs formules, puis p(x*). L2 : décision Vandermonde ou Lagrange, puis φ₀(x*), φ₁(x*), φ₂(x*) et p(x*), guidés (piège `n_lagrange_no_denominator`). L3 : choix de φ₁ (leurre sans dénominateur), puis menus. L4 : Vandermonde libre, forme de Lagrange développée (`equiv`, `expanded`), puis p(x*). L5 : `code` lagrange_eval (tous les trous), puis `readtable` de sa sortie. Examen : `mcq` (φ₁(x*)), `tf` (contre-exemple `num` `interpDegreeLow`), `coef` (a₂). Le gabarit à 4 points de degré 3 n'est que dans les tests du programme.
 - **Intro** : par n + 1 points d'abscisses distinctes passe un seul polynôme de degré ≤ n.
   - **Vandermonde** : on résout le système en a₀, …, aₙ.
   - **Lagrange** : φᵢ(x) = Π_{j≠i} (x − xⱼ)/(xᵢ − xⱼ), avec φᵢ(xⱼ) = δᵢⱼ, et p = Σ yᵢ φᵢ.
@@ -781,6 +792,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-interp-error` — Erreur d'interpolation ; phénomène de Runge
 - **Année** 16 · **Prérequis** `n-interp-lagrange`, `a1-extrema-global` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `n-interp-lagrange` : Πₙf, le polynôme d'interpolation.
+- **Statut** : fait le 10 novembre 2026 (étape U9). f ∈ {sin et cos sur [0 ; π] ou [0 ; π/2], 1/(1 + x), ln(1 + x), eˣ sur [0 ; b]}, n ∈ {1, 2, 3}. max|f⁽ⁿ⁺¹⁾| est exact (1, (n + 1)!, n!, eᵇ), et la borne est un nombre clos jugé par `value` `closed` (et non `equiv`). Parties : f⁽ⁿ⁺¹⁾ (`equiv`, sauf en L1 où elle est donnée), M, h, borne (piège `n_interp_error_factorial` : f⁽ⁿ⁾, 4n, hⁿ). L3 avec menus. L4 : lignes libres, ou `readtable` des bornes de eˣ pour n = 1 … 8 (n minimal). L5 : `readtable` de Runge (recalculé, identique au catalogue), puis QCM à plusieurs réponses. Examen : `mcq` (borne, ou tableau de Runge), `tf` (Runge en QCM Vrai/Faux, ou « nulle aux nœuds », vrai).
 - **Intro** : f(x) − Πₙf(x) = f⁽ⁿ⁺¹⁾(ξ)/(n + 1)!·Π(x − xᵢ). Pour des nœuds équirépartis de pas h, max|f − Πₙf| ≤ max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹. Augmenter n ne suffit pas toujours : pour 1/(1 + x²) sur [−5 ; 5] avec des nœuds équirépartis, l'erreur explose aux bords. C'est le phénomène de Runge. Exemple : f = sin sur [0 ; π], n = 2, h = π/2.
   - `max|f‴| = 1`
   - `erreur ≤ 1/(4·3)·(π/2)³ = π³/96 ≈ 0,32` (note : « l'erreur réelle est 0,056 : la borne est pessimiste »)
@@ -822,6 +834,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-divided-diff` — Différences divisées, forme de Newton
 - **Année** 16 · **Prérequis** `n-interp-lagrange`, `g0-horner` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `n-interp-lagrange` : même polynôme d'interpolation, dans une autre base ; `g0-horner` : évaluer la forme de Newton par un schéma de Horner.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Table `iter` (phi `divdiff`, chaque case calculée à partir des cases de l'élève). L1 : colonne d'ordre 1, puis QCM sur f[x₀, x₁, x₂] (leurre `n_divdiff_denominator`). L2 : table entière, puis p(x*) en forme de Newton (guidé). L3 : `readtable` de la table, choisir la forme de Newton (la diagonale). L4 : un 4ᵉ point ajouté, dernière ligne à remplir, puis p₃(x*). L5 : `code` divdiff/newton_eval (un test ajouté, divdiff([0, 1, 3], [1, 2, 10]), pour que le mauvais dénominateur échoue), puis `readtable` des coefficients. Examen : `mcq` (la case f[x₀, x₁, x₂], ou le trou de divdiff).
 - **Intro** : f[xᵢ] = yᵢ et f[xᵢ, …, xᵢ₊ₖ] = (f[xᵢ₊₁, …, xᵢ₊ₖ] − f[xᵢ, …, xᵢ₊ₖ₋₁])/(xᵢ₊ₖ − xᵢ). On a alors p = f[x₀] + f[x₀, x₁](x − x₀) + f[x₀, x₁, x₂](x − x₀)(x − x₁) + …. Ajouter un point ajoute un terme. Exemple : (0 ; 12), (1 ; 18), (2 ; 6), puis (3 ; 0).
   - `f[0, 1] = 6 ; f[1, 2] = −12 ; f[0, 1, 2] = −9`
   - `p₂ = 12 + 6x − 9x(x − 1)` (note : « = 12 + 15x − 9x² »)
@@ -876,6 +889,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-chebyshev` — Nœuds de Tchebychev
 - **Année** 16 · **Prérequis** `n-interp-error` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `n-interp-error` : le facteur Π(x − xᵢ) de l'erreur à minimiser.
+- **Statut** : fait le 10 novembre 2026 (étape U9). n ∈ {1, 2} seulement (cosinus √2/2, √3/2, 0), [a ; b] avec b − a pair ; n = 3 et 5 ne sont pas calculés à la main (n = 5 seulement dans le programme). L1 : cosinus guidés. L2 : transport guidé (piège `n_cheb_no_mapping`). L3 : décision sur le jeu de nœuds (leurre `n_runge_more_nodes`), puis menus. L4 : nœuds, puis max|Π(x − xᵢ)| = 2⁻ⁿ((b − a)/2)ⁿ⁺¹. L5 : `code` cheb, puis `readtable` de Runge. Examen : `tf` (deux énoncés vrais).
 - **Intro** : sur [−1 ; 1], tᵢ = cos((2i + 1)π/(2(n + 1))) pour i = 0 … n. Sur [a ; b], xᵢ = (a + b)/2 + (b − a)/2·tᵢ. Ces nœuds minimisent max|Π(x − xᵢ)|, qui vaut 2⁻ⁿ sur [−1 ; 1], et évitent Runge. Les notes GM utilisent aussi les nœuds de Clenshaw-Curtis et de Gauss-Legendre. Exemple : n = 2.
   - `t = cos(π/6), cos(π/2), cos(5π/6) = √3/2 ; 0 ; −√3/2`
   - `Π(x − tᵢ) = x³ − 3x/4, max = 1/4` (note : « contre 2/(3√3) ≈ 0,385 pour −1, 0, 1 »)
@@ -919,6 +933,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-interp-piecewise` — Interpolation linéaire par morceaux
 - **Année** 16 · **Prérequis** `n-interp-error` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `n-interp-error` : erreur de degré 1 sur chaque morceau.
+- **Statut** : fait le 10 novembre 2026 (étape U9). f = kx³ + αx² sur [0 ; b], h ∈ {1/2, 1/4, 1/5, 1/8, 1/10, 1/20}, tol = h²·max|f″|/8 décimal. Parties M, h = √(8·tol/M) (piège `n_p1_bound`), n. L1 et L2 ne diffèrent que par f″ donnée en L1. L3 : choix du sous-intervalle, puis Π₁ʰf(x*) avec menus. L4 : n minimal et une évaluation. L5 : `code` p1h (deux tests ajoutés : x = 1,5, et x hors des nœuds → None), puis `readtable` de sin sur [0 ; π] (ordre 2, borne respectée). Examen : `tf` (contre-exemple `num` `p1Ratio`, f = x²). La fonction eˣ n'est pas tirée.
 - **Intro** : Π₁ʰf est affine sur chaque [xᵢ ; xᵢ₊₁] et max|f − Π₁ʰf| ≤ (h²/8)·max|f″|. C'est l'ordre 2 en h, sans phénomène de Runge. Exemple : f(x) = x³ sur [0 ; 2].
   - `max|f″| = max|6x| = 12` (note : « en x = 2 »)
   - `erreur ≤ 12h²/8 = 1,5h²`
@@ -969,6 +984,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-spline` — Splines cubiques naturelles
 - **Année** 16 · **Prérequis** `n-interp-piecewise` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `n-interp-piecewise` : interpolation par morceaux, puis conditions de raccord.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Nœuds −1, 0, 1 ; données tirées à partir de (a, b, c), c ∈ (3/2)ℤ*. Parties `value` a, b, c, d₁, d₂ (conditions dans les notes, au lieu de `equiv` et `rowops`). L1 : formules données. L2 : décision sur les conditions aux bords (leurres `n_spline_natural_first`, `n_spline_count`). L3 : décision sur les 2 conditions supplémentaires, puis menus. L4 : libre. L5 : `readtable` de la spline naturelle de sin (ordre 4, recalculé). Examen : `mcq` (degrés de liberté restants, `n_spline_count`), `tf` (s′ = 0 aux bords, QCM Vrai/Faux ; ou « C² », vrai).
 - **Intro** : une spline cubique s est C² sur [a ; b], de degré 3 sur chaque sous-intervalle, et interpole les données. On compte : 4n inconnues, 3(n − 1) conditions de continuité et n + 1 conditions d'interpolation, donc il reste 2 degrés de liberté. La spline naturelle les fixe par s″(x₁) = s″(xₙ₊₁) = 0. L'erreur est en O(h⁴). Exemple des notes : (−1 ; −1), (0 ; 1), (1 ; 1).
   - `continuité en 0 : a₁ = a₂, b₁ = b₂, c₁ = c₂`
   - `s″(−1) = 0 : 2c − 6d₁ = 0 ; s″(1) = 0 : 2c + 6d₂ = 0`
@@ -1006,6 +1022,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-least-squares` — Moindres carrés : équations normales à la main
 - **Année** 16 · **Prérequis** `l-orth-lsq` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U9). 3 ou 4 points, solution de dénominateur ≤ 12, points non alignés. L1 : sommes Σx, Σx², Σy, Σxy, puis a₁, a₀ (guidé). L2 : AᵀA et Aᵀy dans la grille (`mat`, `cells`), puis a₁, a₀. L3 : décision interpoler ou équations normales (`n_ls_interp`), puis menus. L4 : droite, ou y = a + bx². L5 : `code` lsq/lsq_line de l'examen 2021, puis `readtable` de sa sortie. Examen : `mcq` (ligne `alpha` avec `n_ls_aat` et `n_ls_interp`, ou ligne `basis` avec `n_ls_index_swap`), `coef` (a₁), `tf` (contre-exemple `num` `lsNoPoint`). Le gabarit (0 ; 1), (1 ; 3), (2 ; 4) et 1/(2 + x) ne sont que dans les tests du programme. Les trous de code n'apparaissent qu'au niveau 5 et dans les QCM d'examen (pas de trou au choix au niveau 1).
 - **Intro** : on a m données et n < m fonctions de base φⱼ. On minimise Σᵢ (Σⱼ αⱼφⱼ(xᵢ) − yᵢ)². Avec A de taille m × n, Aᵢⱼ = φⱼ(xᵢ), on résout les équations normales AᵀA·α = Aᵀy. Pour une droite : [[m, Σx], [Σx, Σx²]]·(a₀ ; a₁) = (Σy ; Σxy). Exemple : (0 ; 1), (1 ; 3), (2 ; 4).
   - `Σx = 3, Σx² = 5, Σy = 8, Σxy = 11`
   - `[[3, 3], [3, 5]]·(a₀ ; a₁) = (8 ; 11)`
@@ -1072,6 +1089,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-fd-basic` — Différences finies progressives, rétrogrades, centrées
 - **Année** 16 · **Prérequis** `a1-dl-usual` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-dl-usual` : Taylor de f(x̄ ± h) pour l'ordre.
+- **Statut** : fait le 10 novembre 2026 (étape U9). f polynôme de degré 3 ou 4 à coefficients entiers dans [−3 ; 3], x̄ ∈ {−1, 0, 1, 2}, h ∈ {0,1 ; 0,2 ; 0,5}, avec f″(x̄) ≠ 0 et f‴(x̄) ≠ 0 ; valeurs décimales exactes jugées par `value`. L1 : les trois quotients, valeur à trous ; L2 : formules avec les valeurs, dénominateur à trous ; L3 : décision sur la formule centrée (piège `n_fd_centered_h`), puis l'ordre ; L4 : δ⁺, δᶜ, f′(x̄) et l'erreur δᶜ − f′(x̄), égale à h²f‴(x̄)/6 (exact en degré ≤ 4), au lieu d'une comparaison des ordres ; L5 : l'item `code` (quatre formules, tests du catalogue), puis un `readtable` d'erreurs recalculé en double (ln, exp ou sin) avec un QCM à plusieurs réponses. Examen : QCM (valeur de δᶜ, ou le tableau avec plusieurs réponses) ; V/F vrai (centrée exacte en degré 2) ou faux avec le contre-exemple f = x² en 0 (`num` `fdForwardNotOrder2`). Le QCM 2019 « quelle formule pour ∂u/∂t » n'est pas construit.
 - **Intro** : les formules de base sont :
   - progressive : δ⁺f = (f(x̄ + h) − f(x̄))/h, d'ordre 1 ; son erreur vaut (h/2)·f″(ξ) ;
   - rétrograde : δ⁻f = (f(x̄) − f(x̄ − h))/h, d'ordre 1 ;
@@ -1138,6 +1156,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-fd-roundoff` — Compromis entre arrondi et troncature
 - **Année** 16 · **Prérequis** `n-fd-basic`, `n-err-float`, `a1-extrema-global` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `n-fd-basic` : erreur de troncature de δ⁺f.
+- **Statut** : fait le 10 novembre 2026 (étape U9). ε reste une lettre dans les lignes (`equiv` sur ε ∈ [0,5 ; 2]), puisque 10⁻¹⁶ se perdrait dans la comparaison numérique. M₀ et M₂ sont des carrés, donc h* = k√ε. h* est saisi comme la lettre H, jugée par `subst`, puis h*/10⁻⁸ pour ε = 10⁻¹⁶. L1 : E′(h) à trous, puis H et la valeur ; L2 : décision sur les deux termes de E(h) (piège `n_fd_smaller_h`), puis E(h), E′(h) et h* ; L3 : `readtable` de la progressive en double (ln, exp, sin, x³), « quel h est le meilleur ? » ; L4 : formule centrée, h* = ∛(3εM₀/M₃) avec 3M₀/M₃ = 1, puis l'ordre de grandeur 10⁻⁵ ; L5 : tableau des deux formules, QCM à plusieurs réponses dont les vérités sont calculées. Examen : V/F faux avec contre-exemple vérifié en double (`num` `fdSmallerWorse`).
 - **Intro** : en machine, |f′(x̄) − δ̂⁺f| ≤ (h/2)·max|f″| + 2ε·max|f|/h, avec ε ≈ 10⁻¹⁶. Le premier terme (troncature) décroît avec h ; le second (arrondi) croît. Le minimum est vers h* = 2√(ε·max|f|/max|f″|) ≈ 10⁻⁸. Pour la formule centrée, (h²/6)·max|f‴| + ε·max|f|/h donne h* ≈ ε^(1/3) ≈ 10⁻⁵. Exemple : f = ln, x̄ = 1, avec max|f| ≈ max|f″| ≈ 1.
   - `E(h) ≈ h/2 + 2·10⁻¹⁶/h`
   - `E′(h) = 1/2 − 2·10⁻¹⁶/h² = 0 ⇔ h* = 2·10⁻⁸`
@@ -1179,6 +1198,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-fd-build` — Construire une formule de différences finies par Taylor
 - **Année** 16 · **Prérequis** `n-fd-basic` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `n-fd-basic` : formules de base et leur ordre.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Gabarits de f′ sur {0, −1, −2}, {0, 1, 2}, {−1, 0, 1} et {−1, 0, 2}, coefficients exacts. Les développements sont des lignes `equiv` où f est déclarée comme son polynôme de Taylor d'ordre 3 avec les lettres A = f(x̄), B = f′(x̄), C = f″(x̄), D = f‴(x̄) : pas de juge `series` à f abstraite, et le reste n'est pas écrit (« + … » en note). Le système en α, β, γ est jugé par `system`. L1 : coefficients à trous ; L2 : un développement à trous, puis le système ; L3 : décision sur les conditions (piège `n_fd_order_conditions`) ; L4 : développement, système et coefficient E du terme d'erreur ; L5 : l'item `code` (deux formules), puis le gabarit à paramètre « γ pour l'ordre 2 ». Les gabarits pour f″ ne sont pas construits. Examen : QCM « laquelle est d'ordre 2 » (distracteurs : formule d'ordre 1, signes inversés, non consistante), `coef` β (leurre `n_fd_taylor_sign`).
 - **Intro** : pour Dₕf(x̄) = (αf(x̄) + βf(x̄ − h) + γf(x̄ − 2h))/h, on développe chaque terme et on impose :
   - coefficient de f(x̄) égal à 0 ;
   - coefficient de f′(x̄) égal à 1 (ordre ≥ 1) ;
@@ -1236,6 +1256,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-fd-proof` — Prouver l'ordre d'une formule de différences finies, avec la constante
 - **Année** 16 · **Prérequis** `n-fd-build` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U9). Formules d'ordre 2 de n-fd-build, avec C = 1, 1/3 ou 1/6. Les restes de Lagrange sont les lettres U = f‴(ξ₁) et V = f‴(ξ₂) ; les lignes `equiv` (f définie par son polynôme de Taylor terminé par U ou V) remplacent le `series` à f abstraite. La combinaison et f′ − Dₕf sont jugées par `equiv` avec la cible `goal` (piège `n_proof_same_xi`). La constante est la lettre K, cible `constant` (piège `n_proof_constant_depends_h` si U, V ou h restent). La majoration est une preuve en blocs avec trois leurres (`n_proof_same_xi`, `n_proof_constant_depends_h`, `g9_proof_by_example`). L1 et L2 : lignes guidées ; L3 : décisions sur l'ordre où arrêter Taylor et sur ξ₁ = ξ₂ ; L4 : lignes libres, ou les blocs, ou le `readtable` eˣ (« ce tableau prouve-t-il ? ») ; L5 et `open` : le problème de l'exemple d'examen 6 sur 7 points (1,5 + 1,5 + 1,5 + 1,5 + 1). V/F : trois énoncés en QCM Vrai/Faux (changés en `tf` par l'examen).
 - **Intro** : une preuve d'ordre se fait en quatre temps :
   1. Taylor avec reste de Lagrange, jusqu'au premier ordre qui ne s'annule pas ;
   2. combinaison des développements ;
@@ -1285,6 +1306,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-quad-composite` — Formules composites : rectangle, point milieu, trapèze, Simpson
 - **Année** 16 · **Prérequis** `g5-sigma`, `a1-int-direct` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a1-int-direct` : intégrale exacte pour comparer.
+- **Statut** : fait le 10 novembre 2026 (étape U9). f = c·xᵏ (+ e·x) + d, k ∈ {2, 3, 4}, b − a ∈ {1, 2, 4}, n ∈ {1, 2}, valeurs exactes de dénominateur ≤ 48 ; lignes jugées par `value` avec la valeur de la formule (la formule écrite avec les nombres, la somme par sous-intervalle, le total). L1 : poids et f(cᵢ) du premier sous-intervalle à trous ; L2 : les poids ; L3 : décision h/6 ou h/3 (`n_simpson_h3_h6`), h/2 ou h (`n_trap_weights`) ; L4 : les quatre formules sur un même exemple ; L5 : le programme (simpson, trapeze, midpoint, 6 trous), puis un tableau de simpson(g, 0, 2, 2) pour x², x³, x⁴ (QCM à plusieurs réponses). La variante avec une table de valeurs de eˣ, sin, 1/x n'est pas construite. QCM : valeur de Simpson ou du trapèze, avec les distracteurs h/3, poids h partout et une autre formule.
 - **Intro** : avec h = (b − a)/n, xᵢ = a + ih et cᵢ le milieu de [xᵢ₋₁ ; xᵢ] :
   - rectangle (à gauche) : Σ h·f(xᵢ₋₁) ;
   - point milieu : Σ h·f(cᵢ) ;
@@ -1353,6 +1375,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-quad-exactness` — Degré d'exactitude ; ramener à [−1 ; 1]
 - **Année** 16 · **Prérequis** `n-quad-composite`, `a1-int-subst` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-quad-composite` : les formules élémentaires J à tester.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Formules symétriques sur [−1 ; 1] : g(±1/√3), g(±1/2), g(±1), 2g(0), Simpson, trapèze en deux morceaux, Simpson 3/8 (et Gauss à 3 points pour le QCM) ; une partie `value` par monôme (J(tᵏ), et ∫tᵏ au niveau 2), puis r (piège `n_exactness_stop_early`). L3 : après chaque monôme, décision « tester le suivant / conclure » ; L4 : poids de ω₀g(−1) + ω₁g(β) + ω₂g(1), β ∈ {0, ±1/2, ±1/3}, puis le degré ; L5 : le programme gauss2 (3 trous ; « h » à la place de h/2 nomme `n_map_jacobian`), puis la lecture de ses tests. Le gabarit « trouver α tel que l'ordre soit 3 » est seulement dans l'exemple résolu (pas de juge `solset` en α). QCM à plusieurs réponses (exacte sur Pₖ, ordre de la composite) ; V/F sur le changement de variable (vrai avec h/2, faux avec h).
 - **Intro** : J a le degré d'exactitude r si J(p) = ∫p pour tout p ∈ Pᵣ, mais pas pour un polynôme de degré r + 1. On teste 1, t, t², … dans l'ordre. Pour ramener [xᵢ ; xᵢ₊₁] à [−1 ; 1], on pose x = xᵢ + h(t + 1)/2, dx = (h/2)dt. Exemple : J(g) = g(−α) + g(α) avec 0 < α < 1.
   - `1 : J = 2 = ∫1 ; t : J = 0 = ∫t` (note : « exacte sur P₁ pour tout α »)
   - `t² : 2α² = 2/3 ⇔ α = 1/√3`
@@ -1403,6 +1426,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-quad-order` — Ordre d'une formule composite ; lire un tableau d'erreurs
 - **Année** 16 · **Prérequis** `n-quad-exactness`, `@alg:L-fonction-affine` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-quad-exactness` : ordre = degré d'exactitude + 1.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Tableaux calculés en JS pour e⁻ˣ sin x sur [0 ; 2] (série GM 7, identique au catalogue), eˣ et 1/(1 + x²) sur [0 ; 1], cos sur [0 ; π/2], n = 10 à 80 ; on écarte les paires où le rapport s'éloigne de plus de 25 % de 2ᵖ ou où l'erreur descend sous 10⁻¹³ (Simpson et Gauss sur 1/(1 + x²) convergent en h⁶ sur [0 ; 1]). L1 : colonne et rapports donnés, QCM sur p (`n_order_ratio_is_p`) ; L2 : le rapport (juge `stat`), puis p ; L3 : colonnes A à D à associer ; L4 : r puis p = r + 1 (`n_exactness_order`) ; L5 : méthode X inconnue, QCM à plusieurs réponses. Examen : QCM (ordre à partir du degré d'exactitude, ou la colonne X) ; V/F « le trapèze est plus précis que le point milieu », contre-exemple f (`num` `trapNotBetter`, réponse x²).
 - **Intro** : si J a le degré d'exactitude r, la formule composite est d'ordre r + 1 pour f ∈ Cʳ⁺¹ : |∫f − Q_h(f)| ≤ C·max|f⁽ʳ⁺¹⁾|·hʳ⁺¹, avec C = 2(b − a)/(r + 1)! dans les notes. Les ordres sont : rectangle 1, point milieu 2, trapèze 2, Simpson 4, Gauss à 2 points 4. Pour lire un tableau : quand h est divisé par 2, l'erreur est divisée par 2ᵖ (c'est la pente p en échelle log-log). Exemple : point milieu, erreur 1,962·10⁻³ puis 4,912·10⁻⁴ quand n double.
   - `rapport 1,962e-03/4,912e-04 ≈ 3,99 ≈ 2²`
   - `ordre 2` (note : « cohérent avec r = 1 »)
@@ -1413,7 +1437,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
   - L3 : associer chaque colonne à une méthode.
   - L4 : prédire l'ordre à partir du degré d'exactitude, puis vérifier sur le tableau.
   - L5 : une colonne de méthode inconnue, à identifier, puis un QCM à plusieurs réponses.
-- **Générateur** : f ∈ {e⁻ˣ sin x sur [0 ; 2], eˣ, 1/(1 + x²), cos}, d'intégrale exacte connue ; n ∈ {10, 20, 40, 80}. On exclut les colonnes qui descendent sous 10⁻¹³.
+- **Générateur** : f ∈ {e⁻ˣ sin x sur [0 ; 2], eˣ, 1/(1 + x²), cos}, d'intégrale exacte connue ; n ∈ {10, 20, 40, 80}. On exclut les colonnes qui descendent sous 10⁻¹³. Attention : sur [0 ; 1], Simpson et Gauss à 2 points appliqués à 1/(1 + x²) convergent en h⁶ (rapport 64) et passent sous 10⁻¹³ à n = 80 ; ces paires sont écartées (constaté à l'étape U9).
 - **Item `readtable`** (série GM 7) : f = e⁻ˣ sin x sur [0 ; 2].
 
   | n | rectangle | point milieu | trapèze | Simpson | Gauss 2 points |
@@ -1440,6 +1464,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-quad-proof` — Prouver l'ordre d'une formule composite par Taylor
 - **Année** 16 · **Prérequis** `n-quad-order`, `a1-dl-usual` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-quad-order` : l'énoncé d'ordre à prouver.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Les juges à fonction abstraite (extension 5) ne sont pas construits : le changement de variable, L_h et Taylor sont des QCM ; « J exacte sur P₁ » est une preuve en blocs (leurre « rᵢ = 0 car t est petit ») ; la majoration est jugée par `value` (∫₋₁¹ du poids du reste) puis `equiv` en h, N, L, M avec N = L/h substitué et une forme finale sans N ; la constante est (b − a)/24·max|f″|. Variantes de J : point milieu, rectangles à gauche et à droite (ordre 1), trapèze (erreur d'interpolation, (b − a)h²/12). L2 : tableau rectangle et point milieu (« que devient l'ordre avec 2g(−1) ? ») ; L3 : décisions (point du développement, degré de pᵢ) ; L4 : les blocs ; L5 et variante `open` : le problème 3 des exemples d'examen (10 points : 1,5 + 1 + 2 + 1,5 + 2,5 + 1,5). V/F : la formule de l'erreur (vrai) ou une borne laissée avec N (`n_proof_sum_count`).
 - **Intro** : la preuve type est celle des examens 2019 (8 points) et 2021 (10 points), pour le point milieu J(g) = 2g(0).
   - (a) `∫ₐᵇ f = (h/2)·Σᵢ ∫₋₁¹ f(xᵢ + h(t + 1)/2)dt`
   - (b) `L_h(f) = (h/2)·Σᵢ 2f(xᵢ + h/2) = h·Σᵢ f(xᵢ + h/2)`
@@ -1478,6 +1503,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-error-statements` — Lire une estimation d'erreur : quantificateurs, constante, régularité
 - **Année** 16 · **Prérequis** `n-quad-order`, `g9-negate` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-quad-order` : énoncés d'erreur des formules composites.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Énoncés engendrés (point milieu, trapèze, Simpson, Gauss 2 points ; ordre des quantificateurs ; f ∈ Cᵖ⁻¹, Cᵖ, Cᵖ⁺¹ ; hᵖ ou hᵖ⁺¹ ; avec ou sans max|f⁽ᵖ⁾|) ; vrai si q = p, k ≥ p et (∀f ∃C, ou le facteur max|f⁽ᵖ⁾|). Les différences finies ne sont pas dans les énoncés (seulement des formules de quadrature). Contre-exemples `num` : `errScaling` (famille λxᵖ) et `notOrder` (f = xᵖ pour la puissance hᵖ⁺¹) ; un énoncé faux seulement par manque de régularité est un QCM Vrai/Faux. L1 : deux énoncés à comparer ; L2 : V/F avec contre-exemple guidé ; L3 : la raison (`g9_quant_order`, `n_regularity_ignored`, `n_more_regularity_more_order`) ; L4 : l'énoncé en jetons (juge `logic`, leurres hᵖ⁺¹ et Cᵖ⁻¹) ; L5 : le tableau de Simpson sur √x et eˣ, ou 4 à 5 énoncés, à plusieurs réponses.
 - **Intro** : il faut savoir lire trois énoncés :
   - « ∀f ∈ C⁴, ∃C > 0, ∀h : |E| ≤ Ch⁴ » est **vrai** : C peut dépendre de f ;
   - « ∃C > 0, ∀f ∈ C⁴, ∀h : |E| ≤ Ch⁴ » est **faux** : on remplace f par λf avec λ grand ;
@@ -1537,6 +1563,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-richardson` — Extrapolation de Richardson, estimation a posteriori
 - **Année** 16 · **Prérequis** `n-quad-order` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `n-quad-order` : l'ordre p sert à extrapoler.
+- **Statut** : fait le 10 novembre 2026 (étape U9). f de degré 2 ou 3 sur [0 ; 1] ou [0 ; 2], point milieu ou trapèze (p = 2), n ∈ {1, 2} ; Q₂ₕ, Q_h, Q̃ et ε exacts (`value`, pièges `n_richardson_wrong_p` et `n_richardson_swap` sur la ligne de Q̃). L1 : Q₂ₕ et Q_h donnés ; L2 et L4 : tout à calculer ; L3 : décision sur p et sur la place de 2ᵖ ; L5 : le programme richardson (2 trous ; le prélude contient midpoint et trapeze), puis ses sorties pour eˣ (Q̃ d'ordre 4). La version adaptative n'est pas construite. QCM : la combinaison pour une méthode d'ordre 1, 2 ou 4.
 - **Intro** : si Q_h = I + Chᵖ + O(h^q), alors Q̃_h = (2ᵖQ_h − Q₂ₕ)/(2ᵖ − 1) est d'ordre q > p. L'estimateur a posteriori est ε_h = |Q̃_h − Q_h| = |Q_h − Q₂ₕ|/(2ᵖ − 1). L'algorithme adaptatif divise h par 2 tant que ε_h > tol. Exemple : ∫₀¹ x² dx par le point milieu (p = 2).
   - `Q₂ₕ (n = 1) = f(1/2) = 1/4`
   - `Q_h (n = 2) = (1/2)(1/16 + 9/16) = 5/16`
@@ -1574,6 +1601,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-lu` — Factorisation LU, pivot, coût, déterminant
 - **Année** 16 · **Prérequis** `l-mat-lu`, `l-det-props` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U9). L1–L2 : élimination guidée (cases de la grille, juge `rowops`), L et U (`factor`), det A ; L2 ajoute une décision sur le signe de ℓ (`l_lu_sign`). L3 : pivot nul au 2e pas (ℓ₃₂ = 0 et lignes 2, 3 de LU échangées), menu `rowops`, décision « échanger / A singulière » (`n_lu_zero_pivot`), puis det A = −Π uᵢᵢ (`n_lu_det_permutation`). L4 : PB = LU en 4 × 4 (la matrice B de la série GM 8 une fois sur deux, sinon une matrice tirée), P, L, U (`factor` PLU), det. L5 : le programme `lu` (2 trous), puis un tableau des coûts (10 seconds membres, QCM à plusieurs réponses avec `n_cost_inverse`). `coef` : un ℓᵢⱼ ou un uᵢⱼ non nul ; `mcq` : A\b contre inv(A)*b, ou det A après un échange ; `tf` : pivot nul ⇒ singulière (contre-exemple `matOne` `notLUable`), 10 factorisations, coût O(n²).
 - **Intro** : A = LU, avec L triangulaire inférieure à diagonale unité ; si un pivot s'annule, on permute des lignes : PA = LU. Les coûts sont les suivants :
   - la factorisation coûte environ 2n³/3 opérations ;
   - chaque descente ou remontée coûte environ n² ;
@@ -1641,6 +1669,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-thomas` — LU tridiagonale (algorithme de Thomas), en O(N)
 - **Année** 16 · **Prérequis** `n-lu` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 4
 - **Pourquoi ces prérequis** : `n-lu` : A = LU sans pivot, dans le cas tridiagonal.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Le programme `thomas` du catalogue (7 trous), en place, avec les tests du catalogue. L1 : une ligne en QCM (les lignes d'examen 2019 et 2022, avec les options d'examen et les pièges) ; L2 : un trou à taper, ou (une fois sur deux) ℓ₂ et γ₂ à la main, guidés (N = 3 ou 4, dénominateurs ≤ 12) ; L3 : les 3 trous de la factorisation ou les 2 des substitutions ; L4 : les 7 trous ; L5 : les 7 trous, puis un tableau des coûts (8N contre 2N³/3) ; le programme de la chaleur complet est dans n-heat-implicit. Pièges de code : `n_thomas_index_shift` (d[i]*c[i], a[i−1], d[i−1]*b[i−1]), `n_thomas_lu_roles` (c ↔ d), `n_thomas_forget_last` (« 0 » dans la ligne de a[N−1]). `mcq` : une ligne du programme ; `tf` : coût O(N³), forme bidiagonale de L et U, b contient x à la fin.
 - **Intro** : A est tridiagonale, avec la sous-diagonale d, la diagonale a et la sur-diagonale c. On écrit A = LU, avec L bidiagonale (diagonale ℓ, sous-diagonale d) et U bidiagonale à diagonale unité (sur-diagonale γ).
   - Factorisation : γ₁ = c₁/a₁, ℓᵢ = aᵢ − dᵢ₋₁γᵢ₋₁, γᵢ = cᵢ/ℓᵢ.
   - Descente Ly = b : y₁ = b₁/ℓ₁, yᵢ₊₁ = (bᵢ₊₁ − dᵢyᵢ)/ℓᵢ₊₁.
@@ -1703,6 +1732,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-iter-jacobi-gs` — Jacobi et Gauss-Seidel
 - **Année** 16 · **Prérequis** `l-sys-augmented` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `l-sys-augmented` : le système Ax = b est mis à jour ligne par ligne.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Tableaux `iter` (phi `jacobi` / `gs`, résidu ‖b − Ax‖∞ calculé par l'app), A 3 × 3 à diagonale dans {2, 4, 5, 8}, solution entière, dénominateurs ≤ 512 ; un quart des matrices ne sont pas strictement dominantes (Jacobi converge quand même). L1 : x₁⁽¹⁾ donné ; L2 : une itération ; L3 : x⁽²⁾ composante par composante, avec le menu « anciennes / nouvelles valeurs » ; L4 : deux itérations de chaque méthode, puis un QCM sur le critère (`n_diag_dominance` quand une ligne a l'égalité) ; L5 : `jacobi_step` et `gs_step` (3 trous), puis un tableau d'erreurs (GS ≈ deux fois plus vite). Le gabarit à paramètres (α, β, γ) n'est pas construit. `tf` : Jacobi converge mais pas GS (contre-exemple [[1, 2, −2], [1, 1, 1], [2, 2, 1]], `num` `jacobiNotGs`), diagonale dominante, valeurs nouvelles (`n_jacobi_uses_new`).
 - **Intro** : les deux méthodes mettent à jour une composante à la fois.
   - Jacobi : xᵢ⁽ᵏ⁺¹⁾ = (bᵢ − Σ_{j≠i} aᵢⱼxⱼ⁽ᵏ⁾)/aᵢᵢ, c'est-à-dire P = D.
   - Gauss-Seidel : on utilise les composantes **déjà mises à jour** de l'itération courante, c'est-à-dire P = triangle inférieur de A.
@@ -1767,6 +1797,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-iter-convergence` — Convergence des méthodes itératives, critère d'arrêt
 - **Année** 16 · **Prérequis** `n-iter-jacobi-gs`, `l-eig-charpoly`, `m-cond` · **Étiquettes** `GM` · **Optionnelle** non · **Poids d'examen** 0
 - **Pourquoi ces prérequis** : `n-iter-jacobi-gs` : matrices d'itération de Jacobi et Gauss-Seidel ; `l-eig-charpoly` : rayon spectral ρ(B) ; `m-cond` : κ(A) dans le critère d'arrêt sur le résidu.
+- **Statut** : fait le 10 novembre 2026 (étape U9). A = [[a, b], [b, d]] avec ρ(B_J) = |b|/√(ad) rationnel. L1–L2 : B_J guidée (`mat`, cases), puis ρ (`value`) ; L3 : critère (décision : ρ < 1, ‖B‖ < 1 en `poor`, det A), ρ_J, ρ_GS = ρ_J², κ₂(A) = λ_max/λ_min (valeurs propres rationnelles) ; L4 : ρ_J, ρ_GS et le nombre d'itérations k ≥ −6/log₁₀ ρ (log₁₀ ρ donné) ; L5 : `jacobi_solve` (2 trous, `jacobi_step` dans le prélude), puis le tableau des itérations de la série GM 10, recalculé (b = A·(1, …, 1), arrêt sur ‖r‖₂/‖b‖₂ ≤ 10⁻¹⁰ : identique au catalogue), QCM à plusieurs réponses. `tf` : ‖B‖ ≥ 1 ⇒ divergence (contre-exemple [[1/2, 4], [0, 1/2]], `num` `normNotRadius`), petit résidu (`n_residual_is_error`), ρ(B) < 1 ⇔ convergence.
 - **Intro** : la méthode de Richardson stationnaire s'écrit P(x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾) = r⁽ᵏ⁾, avec la matrice d'itération B = I − P⁻¹A.
   - Elle converge pour tout x⁽⁰⁾ ⇔ ρ(B) < 1, et ‖e⁽ᵏ⁾‖ ≤ ‖B‖ᵏ·‖e⁽⁰⁾‖.
   - Arrêt sur le résidu : ‖r⁽ᵏ⁾‖/‖b‖ ≤ tol ⇒ ‖e⁽ᵏ⁾‖/‖x‖ ≤ κ(A)·tol.
@@ -1784,7 +1815,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
   - L4 : ρ_J et ρ_GS en 2 × 2, puis le nombre d'itérations pour gagner un facteur 10⁻⁶.
   - L5 : `readtable`, puis l'item `code`.
 - **Générateur** : A 2 × 2 symétrique à diagonale > 0, avec ρ(B_J) rationnel (aᵢⱼ² / (a₁₁a₂₂) carré parfait). Nombre d'itérations : k ≥ log(10⁻⁶)/log ρ, avec une table de log₁₀ fournie.
-- **Item `readtable`** (série GM 10) : itérations pour ‖r‖/‖b‖ ≤ 10⁻¹⁰, avec x⁽⁰⁾ = 0.
+- **Item `readtable`** (série GM 10) : itérations pour ‖r‖₂/‖b‖₂ ≤ 10⁻¹⁰, avec x⁽⁰⁾ = 0 et b = A·(1, …, 1) (précisé à l'étape U9 : avec ce b, le tableau est reproduit exactement).
 
   | n | Jacobi, tridiag(−1, 2,5, −1) | GS, idem | Jacobi, tridiag(−1, 2, −1) | GS, idem |
   |---|---|---|---|---|
@@ -1834,6 +1865,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-gradient-spd` — Méthode du gradient, à pas fixe ou optimal, pour A SDP
 - **Année** 16 · **Prérequis** `m-posdef`, `m-quad-gradient` · **Étiquettes** `GM`, `MT` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `m-posdef` : A symétrique définie positive ; `m-quad-gradient` : ∇Φ(v) = Av − b.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Tableaux `iter` (phi `gradient` : r, α, x jugés à partir des cases de l'élève), A dans la liste du catalogue sauf QDQᵀ, b entier, r⁽⁰⁾ jamais vecteur propre, dénominateurs ≤ 64. L1 : r⁽⁰⁾ et Ar⁽⁰⁾ donnés ; L2 : une itération ; L3 : décisions « pas optimal » (`n_optimal_step_inverted`) et « sens » (`n_gradient_sign`) avec menus ; L4 : deux itérations, puis l'intervalle du pas fixe (`n_gradient_step_bound`) ; L5 : `gradient` et `gradient_fixed` (4 trous, tests du catalogue), puis un tableau d'erreurs du pas fixe (α = 0,5 ; 0,6 ; 0,65 ; 0,7). `open` : la preuve de 2021 en problème de 7 points (∇f = 0 en QCM, l'équation de l'erreur et l'argument des vecteurs propres en blocs avec leurres, α_max) ; `mcq` : intervalle du pas fixe ; `tf` : n itérations (contre-exemple A, b, `num` `gradientNotFinite`), tout α > 0, pas optimal.
 - **Intro** : si A est SDP, Ax = b ⇔ x minimise Φ(v) = ½vᵀAv − bᵀv, et ∇Φ(v) = Av − b = −r. L'itération est x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ + αₖr⁽ᵏ⁾.
   - Pas optimal : αₖ = (r·r)/(r·Ar).
   - Pas fixe α : x − x⁽ᵏ⁺¹⁾ = (I − αA)(x − x⁽ᵏ⁾). La méthode converge ⇔ 0 < α < 2/λ_max, avec le facteur max|1 − αλᵢ|.
@@ -1908,6 +1940,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-ode-euler` — Euler progressif et rétrograde
 - **Année** 16 · **Prérequis** `a2-ode-cauchy`, `a2-ode-linear1` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `a2-ode-cauchy` : problème de Cauchy u′ = f(t, u), u(0) = u₀ ; `a2-ode-linear1` : solution exacte de u′ = λu + g pour comparer.
+- **Statut** : fait le 10 novembre 2026 (étape U9). u′ = λu + g(t), λ ∈ {−1, −2, −5, −10}, g ∈ {0, 1, t}, h ∈ {1/10, 1/20, 1/5}, |hλ| < 1, valeurs exactes (dénominateurs ≤ 1000), sans l'équilibre trivial. L1 : u₁ par EP, puis l'équation de ER, guidées ; L2 : tableau `iter` `ode` EP (deux pas) ; L3 : décision « où évaluer f » (pièges `n_implicit_as_explicit`, `n_euler_time_index`), puis u₁ ; L4 : tableau ER, puis u₂ par EP ; L5 : le code (`euler`, `euler_implicit_linear` ; un test ajouté avec f = t), puis le `readtable` de la série GM 13 (QCM à plusieurs réponses). QCM : u₁ par ER, ou l'équation résolue à chaque pas (2019, Q4) ; V/F : « ER est explicite », ou « EP décroît pour tout h » (contre-exemple λ, h, `num` `epNotDecreasing`). La variante non linéaire (Newton en L5) est dans n-ode-implicit-newton.
 - **Intro** : t_n = nh.
   - Euler progressif (explicite) : u_{n+1} = u_n + h·f(t_n, u_n).
   - Euler rétrograde (implicite) : u_{n+1} = u_n + h·f(t_{n+1}, u_{n+1}). Il faut résoudre une équation en u_{n+1} à chaque pas.
@@ -1983,6 +2016,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-ode-rk` — Heun, Crank-Nicolson, Runge-Kutta
 - **Année** 16 · **Prérequis** `n-ode-euler` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 1
 - **Pourquoi ces prérequis** : `n-ode-euler` : même formalisme t_n, u_n et pas h.
+- **Statut** : fait le 10 novembre 2026 (étape U9). L1 : tableau de Heun, k₁ et k₂ à remplir ; L2 : un pas libre ; L3 : reconnaître un schéma d'après sa formule (QCM ; formules générales, ou f = −u + sin(tu) de GM 2012 ; option « aucun » avec `n_cn_explicit`) ; L4 : deux pas de Heun, puis u₁ par Crank-Nicolson (f affine) ; L5 : le code `heun` (un test ajouté avec f = t), puis le tableau avec la colonne Heun (ordre 2). QCM : le schéma de GM 2012, ou u₁ par Heun (`n_heun_k2`). Le tableau de Butcher et RK4 à la main ne sont pas construits (RK4 seulement dans le juge).
 - **Intro** : trois familles prolongent Euler.
   - Crank-Nicolson : u_{n+1} = u_n + (h/2)(f(t_n, u_n) + f(t_{n+1}, u_{n+1})). Implicite, d'ordre 2.
   - Heun : on prédit avec Euler, puis on fait la moyenne. u_{n+1} = u_n + (h/2)(f(t_n, u_n) + f(t_{n+1}, u_n + h·f(t_n, u_n))). Explicite, d'ordre 2.
@@ -2031,6 +2065,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-ode-stability` — Stabilité absolue sur u′ = λu
 - **Année** 16 · **Prérequis** `n-ode-rk`, `m-ode-modes` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-ode-rk` : fonctions R(hλ) des schémas.
+- **Statut** : fait le 10 novembre 2026 (étape U9). La condition |R(hλ)| < 1 est une ligne `solset` en h sur ]0 ; +∞[, avec λ ∈ {−2, −5, −10, −20} (λ = −50 et −100 restent dans le QCM : le balayage de `solset` manque ]0 ; 0,02[). L1 : R donné ; L2 : décision sur R(z) (piège `n_stab_lambda_sign`) ; L3 : classer les schémas (QCM à plusieurs réponses) ; L4 : la θ-méthode, ou un système 2 × 2 (valeurs propres réelles par `solset` en λ, ou −a ± bi) ; L5 : le tableau raide u′ = −50(u − cos t). QCM : l'intervalle de EP (`n_stab_factor2`), ou la θ-méthode ; V/F : Heun (contre-exemple z = −3, `num` `heunUnstable`), ou « ER stable donc précis ». La formule R(z) n'est pas écrite à la main : c'est une décision. Le circuit RLC n'est pas construit.
 - **Intro** : sur le problème modèle u′ = λu avec λ < 0, la solution tend vers 0. Le schéma est absolument stable si u_n → 0. On écrit u_{n+1} = R(hλ)·u_n et on exige |R(hλ)| < 1.
   - EP : R = 1 + hλ, stable ⇔ h < 2/|λ|.
   - ER : R = 1/(1 − hλ), toujours stable.
@@ -2083,6 +2118,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-ode-euler-global` — Erreur globale d'Euler, par une preuve
 - **Année** 16 · **Prérequis** `n-ode-euler`, `g5-geom`, `a1-extrema-global`, `a1-dl-usual` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `a1-extrema-global` : majorer une fonction sur un intervalle.
+- **Statut** : fait le 10 novembre 2026 (étape U9). λ = −1 seulement (la variante λ = −2 n'est pas construite), T ∈ {10, 20, 50, 100}. L1 et L2 : lignes guidées (le schéma, aᴺ − bᴺ factorisé par `equiv` pour N = 2, 3, 4, la constante C) ; L3 : `readtable` de l'erreur pour T = 1 (`n_global_error_order`) ; L4 : la preuve en blocs avec trois leurres ; L5 : le problème de 2020 (T = 10, 5 points). Variante `open` : l'exemple d'examen 4 (T = 20, 4 points), en quatre parties (lignes, blocs, lignes, blocs). Le lemme est en blocs, sans juge `series` à reste de Lagrange.
 - **Intro** : pour u′ = −u, u(0) = 1 sur [0 ; T], h = T/N, on a u_N = (1 − h)ᴺ et u(t_N) = e^(−Nh). La preuve demande deux faits :
   - **Lemme.** |e^(−x) − (1 − x)| ≤ x²/2 pour x > 0, par Taylor : le reste vaut e^(−ξ)x²/2 ≤ x²/2.
   - **Factorisation.** aᴺ − bᴺ = (a − b)·Σₖ a^(N−1−k)bᵏ. Si 0 < h ≤ 2, alors |a|, |b| ≤ 1, donc |aᴺ − bᴺ| ≤ N|a − b|.
@@ -2126,6 +2162,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-ode-implicit-newton` — Euler implicite sur un système, avec un pas de Newton
 - **Année** 16 · **Prérequis** `n-ode-euler`, `n-newton-system` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U9). g ∈ {u², 1 + u², u⁴}, uⁿ ∈ {(1 ; 1), (1 ; 2), (2 ; 1)}, h ∈ {1/10, 1/2, 1}, x⁽¹⁾ à dénominateurs ≤ 50 ; inconnues notées (x ; y). L1 : J et x⁽¹⁾ par cases de la grille (juge `mat`) ; L2 : f₁ et f₂ à écrire (`equiv`), puis J et x⁽¹⁾ ; L3 : décision entre les trois systèmes de 2019, puis J et x⁽¹⁾ ; L4 : J, F et x⁽¹⁾ libres ; L5 : le code `be_newton_step` (tests ajoutés en (2 ; 1) et (1 ; 2)), puis les énoncés d'énergie (QCM à plusieurs réponses). QCM : le couple (a, b) (2019, Q5 ; `a2_jacobian_transposed` quand J n'est pas symétrique), ou le système (Q4) ; V/F : énergie (vrai), ou x⁽¹⁾ = uⁿ + δ (`n_newton_sys_sign`). `n_implicit_as_explicit` n'est pas un piège de code ici (F est évaluée en x = uⁿ : le texte faux donne les mêmes nombres) ; c'est une option de décision et de QCM.
 - **Intro** : ER sur un système non linéaire demande de résoudre F(x) = 0 à chaque pas. On le fait par Newton, en partant de x⁽⁰⁾ = uⁿ. Exemple (2019) : u₁′ = −u₂²u₁, u₂′ = −u₁²u₂, u(0) = (1 ; 1).
   - `f₁(x) = x₁ − u₁ⁿ + h·x₂²·x₁ ; f₂(x) = x₂ − u₂ⁿ + h·x₁²·x₂` (note : « les inconnues sont x = uⁿ⁺¹ »)
   - `J = [[1 + h·x₂², 2h·x₁x₂], [2h·x₁x₂, 1 + h·x₁²]]`
@@ -2174,6 +2211,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-ode-stiff` — Problèmes raides
 - **Année** 16 · **Prérequis** `n-ode-stability` · **Étiquettes** `opt` · **Optionnelle** non · **Poids d'examen** 0
+- **Statut** : fait le 10 novembre 2026 (étape U9). λ_rapide ∈ {−50, −100, −500, −1000}. L1 : h_max guidé ; L2 : système diagonal, décision sur la valeur propre qui impose le pas ; L3 : décision sur le schéma (`n_stiff_accuracy`), puis h_max ; L4 : `readtable` du tableau raide avec un QCM « pourquoi » ; L5 : A = PDP⁻¹ non diagonale, valeurs propres (`solset`), puis h_max, sans aide. V/F : « réduire la tolérance » (faux).
 - **Intro** : un problème est raide quand il mêle des échelles de temps très différentes. Une composante rapide (λ très négatif) impose h < 2/|λ| aux schémas explicites, alors que la solution, une fois le transitoire passé, varie lentement. Avec un schéma implicite (ER, CN), on choisit h pour la précision seulement. Exemple : u′ = −50(u − cos t).
   - `transitoire de durée ~1/50, puis u ≈ cos t`
   - `EP : h < 0,04 imposé par la stabilité ; ER : h = 0,05 marche`
@@ -2203,6 +2241,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-bvp-fd` — Problème aux limites −u″ = f : schéma, matrice, A SDP
 - **Année** 16 · **Prérequis** `n-fd-basic`, `n-thomas`, `m-posdef` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-thomas` : résoudre le système tridiagonal.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Données : solution exacte cubique u = α(1 − x) + βx + x(1 − x)(a + bx), donc f = 2a − 2b + 6bx, N ∈ {2, 3, 4}, et le schéma est exact. L1 : valeurs guidées 2/h², f̃₁, f̃_N (pièges `n_bvp_h2_missing`, `n_bvp_bc_rhs`). L2 : la même chose avec la décision « que devient −u₀/h² », ou A et f̃ dans la grille (`mat`). L3 : menus. L4 : preuve SDP en blocs (leurres `n_spd_semidefinite`, `l_posdef_diag`) au lieu d'un `frame` avec vᵀAv tapé. L5 : programme `bvp_system` (test ajouté avec f(x) = x : sans lui, le trou `f((i + 1) * h)` n'était pas contrôlé), puis `readtable` (le schéma est exact pour f = 1). QCM : la matrice de Neumann de 2019 Q1 à plusieurs réponses, ou f̃₁. `open` : l'exemple d'examen 2 a–c sur 3,5 points (A, f̃, preuve SDP). Pas de bord de Neumann (notes GM).
 - **Intro** : on pose xᵢ = ih, h = 1/(N + 1). Le schéma centré s'écrit (−uᵢ₋₁ + 2uᵢ − uᵢ₊₁)/h² = f(xᵢ) pour i = 1 … N, avec u₀ = α et u_{N+1} = β. Sous forme matricielle, Au = f̃ :
   - A = (1/h²)·tridiag(−1, 2, −1) ;
   - f̃₁ = f(x₁) + α/h², f̃_N = f(x_N) + β/h², et f̃ᵢ = f(xᵢ) pour les autres i.
@@ -2268,6 +2307,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-bvp-convergence` — Consistance, stabilité, convergence en Ch²
 - **Année** 16 · **Prérequis** `n-bvp-fd`, `n-fd-proof` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-bvp-fd` : schéma et matrice A ; `n-fd-proof` : la consistance se prouve comme l'ordre d'une différence finie.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Les développements de Taylor ne sont pas jugés par `series` (fonctions abstraites non construites) : ce sont des parties `value` sur les coefficients (1/24, C₁ = 1/12, C = 1/96, max|u⁽⁴⁾| pour sin πx, sin 2πx ou 1 − eˣ + (e − 1)x), avec le calcul comme départ aux niveaux 1 et 2. L3 : preuve en blocs (leurres `n_stability_skipped`, `n_proof_same_xi`). L4 : libre, sur ]0 ; L[ avec la stabilité L²/8. L5 : `readtable` d'un des deux tableaux recalculés. QCM : la constante de troncature, ou le tableau. `open` : l'exemple d'examen 2 d–f sur 4 points (blocs, puis C₁, max|u⁽⁴⁾| et K = π⁴/96).
 - **Intro** : la preuve de convergence a trois étages.
   - **Consistance.** L'erreur de troncature est τᵢ = (−u(xᵢ₋₁) + 2u(xᵢ) − u(xᵢ₊₁))/h² − f(xᵢ). Par Taylor à l'ordre 4, |τᵢ| ≤ (h²/12)·max|u⁽⁴⁾|.
   - **Stabilité** (admise aux examens) : si Av = g, alors max|vᵢ| ≤ (1/8)·max|gᵢ|.
@@ -2313,6 +2353,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
 ### `n-bvp-newton` — Problème non linéaire : différences finies, Newton, Cholesky tridiagonal
 - **Année** 16 · **Prérequis** `n-bvp-fd`, `n-newton-system`, `m-cholesky` · **Étiquettes** `MT` · **Optionnelle** non · **Poids d'examen** 3
+- **Statut** : fait le 10 novembre 2026 (étape U9). Tous les niveaux sont le programme `bvp_newton` (exam1.m 2020), avec g ∈ {x³ − 1, x⁵ − 1, x³ + x − 2, eˣ − 1}. Les tests (nombre d'itérations, stop₁, stop₃, x₃ pour N = 5) sont calculés par l'interpréteur. L1 : un trou à choix aux options d'examen (`n_jacobian_vs_F`, `n_cholesky_tridiag_sq`, `n_thomas_index_shift`). L2 : un trou tapé. L3 : les trous de DF et F. L4 : Cholesky et les deux substitutions. L5 : tous les trous, puis les `stop` pour N = 9 et 19, en QCM à plusieurs réponses. QCM d'examen : une ligne de code, le tableau `stop`, ou l'unicité (2020 mc1b). Pas de matrice DF en grille ni de blocs pour l'unicité (c'est un QCM).
 - **Intro** : examen 2020. On cherche x ∈ ℝᴺ tel que F(x) = 0, avec F(x) = (N + 1)²·tridiag(−1, 2, −1)·x + (xᵢ³ − 1)ᵢ.
   - La jacobienne est DF(x) = (N + 1)²·tridiag(−1, 2, −1) + diag(3xᵢ²). Elle est SDP, donc on la factorise par Cholesky tridiagonal.
   - Newton : DF(xⁿ)(xⁿ − xⁿ⁺¹) = F(xⁿ).
@@ -2404,6 +2445,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-heat-implicit` — Équation de la chaleur : Euler implicite et différences finies
 - **Année** 16 · **Prérequis** `n-bvp-fd`, `n-ode-stability`, `n-thomas` · **Étiquettes** — · **Optionnelle** non · **Poids d'examen** 4
 - **Pourquoi ces prérequis** : `n-bvp-fd` : même matrice tridiagonale en espace.
+- **Statut** : fait le 10 novembre 2026 (étape U9). Programme `heat_implicit` avec u(x, 0) = sin(πx) ou sin(2πx). Un troisième test (9, 20, 0,005) a τ/h² = 1/2 : les tests du catalogue gardent τ/h² = 1 et ne distinguaient pas `tau / (h * h) * sin(...)` de la bonne réponse. L1 : `b[i] = ???` ou `a[i] = 1 + ???` à choix. L2 : un coefficient de A tapé. L3 : décision « point (xᵢ, tₙ₊₁) » (piège `n_implicit_as_explicit`), puis A et u₁¹ pour N = 2, τ/h² ∈ {1, 1/2} (valeurs en √3). L4 : les trous de remplissage, puis le tableau d'ordre. L5 : tout le programme, puis le tableau A (tableau 1 pour k = 1, tableau A de l'exemple 1 pour k = 2). QCM d'examen : une ligne (dont celles de Thomas), le tableau d'ordre, le tableau de stabilité, ou le contraste explicite.
 - **Intro** : on résout ∂u/∂t − ∂²u/∂x² = 0, u(0, t) = u(1, t) = 0, u(x, 0) = sin(πx) ; la solution exacte est e^(−π²t)·sin(πx). On écrit l'équation au point (xᵢ, t_{n+1}), avec une différence rétrograde en t et centrée en x :
   - (uᵢⁿ⁺¹ − uᵢⁿ)/τ − (uᵢ₋₁ⁿ⁺¹ − 2uᵢⁿ⁺¹ + uᵢ₊₁ⁿ⁺¹)/h² = 0 ;
   - donc Auⁿ⁺¹ = uⁿ, avec A = tridiag(−τ/h², 1 + 2τ/h², −τ/h²) ;
@@ -2477,7 +2519,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 
   **Item `readtable`** (2) : N ∈ {9, 19, 39}, M = 1000, τ ∈ {0,01 ; 0,1 ; 1}. L'erreur vaut entre 10⁻⁴¹ et 0, sans explosion. Vrai = « stable pour tous h > 0, τ > 0 ».
 
-  **Item `readtable`** (3, contraste, schéma explicite) : (N, M, τ) = (9, 500, 0,004) : 5.534e-10 ; (9, 500, 0,0055) : 1.028e+12 ; (19, 2000, 0,001) : 1.485e-10 ; (19, 2000, 0,0014) : 5.632e+160. Vrai = « l'explicite est stable seulement si τ/h² ≤ 1/2 » (0,4 contre 0,55 et 0,56).
+  **Item `readtable`** (3, contraste, schéma explicite) : (N, M, τ) = (9, 500, 0,004) : 5.534e-10 ; (9, 500, 0,0055) : 1.028e+12 ; (19, 2000, 0,001) : 1.485e-10 ; (19, 2000, 0,0014) : 7.825e+160 (recalculé à l'étape U9 ; l'explosion part des erreurs d'arrondi, sa valeur exacte dépend de la machine : l'examen donnait 5.632e+160). Vrai = « l'explicite est stable seulement si τ/h² ≤ 1/2 » (0,4 contre 0,55 et 0,56).
 - **Corrigé type** :
   1. `(uᵢⁿ⁺¹ − uᵢⁿ)/τ = (uᵢ₋₁ⁿ⁺¹ − 2uᵢⁿ⁺¹ + uᵢ₊₁ⁿ⁺¹)/h²` — sous-but `scheme`.
   2. `(1 + 2τ/h²)uᵢⁿ⁺¹ − (τ/h²)(uᵢ₋₁ⁿ⁺¹ + uᵢ₊₁ⁿ⁺¹) = uᵢⁿ` — sous-but `matrix`.
@@ -2495,6 +2537,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-pde-cfl` — Transport et ondes : schémas explicites, condition CFL
 - **Année** 16 · **Prérequis** `n-heat-implicit` · **Étiquettes** `MT` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-heat-implicit` : même grille (xᵢ, tₙ).
+- **Statut** : fait le 10 novembre 2026 (étape U9). L1 : `unew[i] = ???` à choix (`n_cfl_direction`). L2 : ondes, λ = τ²/h² (piège `n_wave_lambda`) et le premier pas, guidés. L3 : décision du voisin, uᵢⁿ⁺¹, puis (τ/h)max = 1. L4 : principe du maximum en blocs. L5 : programme `transport`, puis le tableau d'erreurs. QCM d'examen : la ligne de code, le tableau de transport, le tableau des ondes (ordre 2, τ ≤ h) ou la valeur de λ. Le programme des ondes n'est pas un item `code` : le catalogue n'en donne pas.
 - **Intro** : deux schémas explicites, tous deux soumis à une condition sur τ/h.
   - **Transport** ∂u/∂t − ∂u/∂x = 0 : u(x, t) = u₀(x + t), donc l'information vient de la droite. On décentre vers i + 1 : uᵢⁿ⁺¹ = (1 − τ/h)uᵢⁿ + (τ/h)uᵢ₊₁ⁿ. Si τ ≤ h, c'est une combinaison convexe : max|uⁿ⁺¹| ≤ max|uⁿ|, et la positivité est conservée. L'ordre est O(h + τ).
   - **Ondes** ∂²u/∂t² = ∂²u/∂x² : avec λ = τ²/h², uᵢⁿ⁺¹ = 2(1 − λ)uᵢⁿ + λ(uᵢ₋₁ⁿ + uᵢ₊₁ⁿ) − uᵢⁿ⁻¹. Le premier pas, pour une vitesse initiale nulle, est uᵢ¹ = (1 − λ)uᵢ⁰ + (λ/2)(uᵢ₋₁⁰ + uᵢ₊₁⁰). Le schéma est stable si τ ≤ h, et d'ordre h² + τ².
@@ -2544,7 +2587,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
   | `transport(19, 10, 0.045)` | `3.465000e-02` | 1e−6 |
 - **Item `readtable`** :
   - Transport (2019) : 6.435000e-02, 3.465000e-02, 1.794375e-02, 9.126562e-03 pour N = 9, 19, 39, 79 et τ = 0,9h. Vrai = « stable », « O(h + τ) ».
-  - Ondes (2020, recalculé) : (9, 10, 0,09) : 6.903714e-04 ; (19, 20, 0,045) : 1.711472e-04 ; (39, 40, 0,0225) : 4.269724e-05. Vrai = « O(h² + τ²) ». Puis τ = 0,1 = h : ~10⁻¹⁵, alors que τ = 0,11 > h : 1,1·10⁵⁴. Vrai = « stable si τ ≤ h ».
+  - Ondes (2020, recalculé) : (9, 10, 0,09) : 6.903714e-04 ; (19, 20, 0,045) : 1.711472e-04 ; (39, 40, 0,0225) : 4.269724e-05. Vrai = « O(h² + τ²) ». Puis, avec M = 100 pas : τ = 0,1 = h donne 1.443290e-15, alors que τ = 0,11 > h donne 1.564047e+18 (recalculé à l'étape U9 ; le catalogue donnait 1,1·10⁵⁴ sans dire M). Vrai = « stable si τ ≤ h ».
 - **Corrigé type** :
   1. `∂u/∂t ≈ (uᵢⁿ⁺¹ − uᵢⁿ)/τ ; ∂u/∂x ≈ (uᵢ₊₁ⁿ − uᵢⁿ)/h` — sous-but `scheme`.
   2. `uᵢⁿ⁺¹ = (1 − τ/h)uᵢⁿ + (τ/h)uᵢ₊₁ⁿ` — sous-but `scheme`.
@@ -2561,6 +2604,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-fem-hat` — Forme faible et fonctions chapeau
 - **Année** 16 · **Prérequis** `n-bvp-fd`, `a1-int-parts` · **Étiquettes** `MT` · **Optionnelle** non · **Poids d'examen** 2
 - **Pourquoi ces prérequis** : `n-bvp-fd` : même problème −u″ = f et même matrice tridiagonale.
+- **Statut** : fait le 10 novembre 2026 (étape U9). L1 : QCM sur l'espace V (Dirichlet, ou Neumann en 1). L2 à L4 : ∫(φ₁′)², ∫fφ₁ et α, avec une décision sur la forme faible (`n_weak_sign`), pour un chapeau de sommet c ∈ {1/2, 1/3, 1/4, 2/3, 3/4} et f ∈ {1, 2, x}. L5 : programme `fem_hat`, puis les valeurs nodales comparées à u, en QCM à plusieurs réponses. QCM d'examen : V, ou α (`n_hat_derivative`). Pas de N = 3 à la main ; la question ouverte de l'exemple 5 n'est pas construite.
 - **Intro** : on part de −u″ = f, u(0) = u(1) = 0. On multiplie par v ∈ V et on intègre par parties : ∫u′v′ = ∫fv pour tout v ∈ V, avec V = {g continue, g′ continue par morceaux, g(0) = g(1) = 0}.
   - Une condition de Dirichlet est imposée dans V. Une condition de Neumann, comme u′(1) = 0, est naturelle : elle n'est pas dans V (2020 : V = {g(0) = 0}).
   - Galerkin : V_h = span(φ₁, …, φ_N), u_h = Σ uⱼφⱼ, Kᵢⱼ = ∫φᵢ′φⱼ′ = (1/h)·tridiag(−1, 2, −1), Fᵢ = ∫fφᵢ.
@@ -2610,6 +2654,7 @@ Les colonnes dérivées (`inc` = δ, `r1`, `r2` = rapports) sont recalculées à
 ### `n-opt-kkt` — Optimisation sous contraintes : conditions KKT
 - **Année** 16 · **Prérequis** `a2-lagrange`, `m-quad-gradient` · **Étiquettes** `MT` · **Optionnelle** non · **Poids d'examen** 3
 - **Pourquoi ces prérequis** : `m-quad-gradient` : ∇f = Ax − b pour f quadratique.
+- **Statut** : fait le 10 novembre 2026 (étape U9). min ½(x − a)² sous x ≤ c ou x ≥ c, cas actif ou inactif tirés à égalité. ∂L/∂x est jugé par `equiv` (piège `n_kkt_sign`). L2 : décision de complémentarité (`n_kkt_complementarity`). L3 : décision du cas (`n_kkt_multiplier_sign`). L4 : la moitié du temps, la contrainte d'égalité b·q = c (μ, q₁, q₂). L5 : programme `kkt_eq`. QCM d'examen : ∇ₓL, la complémentarité, ou le système par blocs et ker Bᵀ. La variante des points intérieurs (2021) n'est pas construite.
 - **Intro** : pour minimiser f(x) sous gᵢ(x) ≥ 0, on pose L(x, λ) = f(x) − Σλᵢgᵢ(x). Les conditions KKT sont :
   - ∇f(x) − Σλᵢ∇gᵢ(x) = 0 ;
   - gᵢ(x) ≥ 0 ;
@@ -2791,7 +2836,7 @@ Tableau A (recalculé avec le programme de référence) :
 | 39 | 160 | 0.0003125 | 2.252158e-03 |
 | 79 | 640 | 0.000078125 | 5.636110e-04 |
 
-Tableau B : (9, 200, 0,01) : 1.027960e-24 ; (9, 200, 0,1) : 5.287283e-76 ; (19, 200, 0,01) : 1.693745e-24 ; (19, 200, 0,1) : 6.999844e-76 ; (39, 200, 1) : 5.076334e-223.
+Tableau B (recalculé à l'étape U9 avec le programme de référence) : (9, 200, 0,01) : 3.860579e-24 ; (9, 200, 0,1) : 4.468324e-76 ; (19, 200, 0,01) : 1.209868e-24 ; (19, 200, 0,1) : 4.169160e-76 ; (39, 200, 1) : 5.484563e-223. Ces erreurs sont du bruit d'arrondi amorti par le schéma (la solution exacte vaut ~10⁻³⁵) : leurs chiffres dépendent de la machine ; l'examen donnait 1.027960e-24, 5.287283e-76, 1.693745e-24, 6.999844e-76 et 5.076334e-223. Seul l'ordre de grandeur se lit.
 
 Les options fausses des questions 8 et 9 sont « O(h + τ) », « stable si τ ≤ h²/2 », et l'option juste de l'autre tableau (`n_stab_order_confused`).
 
@@ -2875,3 +2920,5 @@ Ces points sont utilisés plus haut. Ils sont à trancher ou à ajouter au READM
 5. **Juge `series` avec une fonction abstraite.** Les preuves d'ordre développent f(x₀ + kh) avec f quelconque. Proposition : `{abstract:{f:'C3'}, remainder:'lagrange'}`. Les symboles f(x₀), f′(x₀), …, f‴(ξᵢ) sont libres, et la ligne est contrôlée en substituant 3 fonctions test (polynômes aléatoires de degré order + 1, e^(ax)), avec ξᵢ remplacé par x₀ au premier ordre du reste. Le même mécanisme sert à `definite` pour le changement de variable de `n-quad-proof`.
 6. **Arithmétique simulée.** `value` `{arith:'fp', digits:4}` juge une ligne d'après `fp.js` dans `n-err-float`.
 7. **Pool de l'examen `ba4-numerique`.** Les examens MT 2020 et 2021 contiennent des QCM de SVD et de méthode de la puissance, qui sont des compétences de M. Proposition : `pool:{units:['numerique'], extraSkills:['<id M de la SVD>', '<id M de la puissance>']}`, avec `examWeight` 1 chacune. Les poids d'examen N ci-dessus sont tirés du nombre de questions de chaque compétence dans les examens 2019 à 2022.
+
+État à l'étape U9 : les points 1 (juge `iter` à état, `js/judges/iter-num.js`), 2 (`stat` avec `sig`, déjà là depuis U7), 3 (`atol`), 4 (pas négatif, fonctions en argument), 6 (`value` `{arith: 'fp'}`) et 7 (`extraSkills` du plan `ba4-numerique`) sont faits. Le point 5 (fonctions abstraites) ne l'est pas : les preuves d'ordre utilisent des lettres pour f(x₀), f′(x₀)… et f‴(ξᵢ), jugées par `equiv`.

@@ -614,7 +614,7 @@ Chaque étape suit le même protocole :
 | **U6** (fait le 10 novembre 2026, voir §17) | `A2-analyse-2.md` | `equiv` à plusieurs variables, juge `ode`, type `domain`. Plan `ba2-analyse2`. | Les 52 compétences avec leurs 90 pièges ; un examen blanc d'Analyse II complet et noté ; `a2-judges.test.js` vert |
 | **U7** (fait le 10 novembre 2026, voir §17) | `G-gymnase-2.md`, partie G7 ; `P-probabilites.md` | `stats.js`, juges `prob` et `stat`, simulation (lancer 10 000 fois). Plans `ba3-proba` et `ba4-stat`. | |
 | **U8** (fait le 10 novembre 2026, voir §17) | `L-M-algebre-lineaire.md`, partie M | `linalg-float.js` : SVD, exponentielle de matrice, normes, conditionnement ; Cholesky flottant (l'exact est dans `matrix.js` depuis U3). Juge `ode` vectoriel pour x′ = Ax. | M possède Cholesky, la puissance, Rayleigh, les normes et le conditionnement ; N s'en sert à U9 |
-| **U9** | `N-analyse-numerique.md` | `js/py/`, types `code`, `table` et `readtable`, juge `iter` avec ses `phi` (§16), `fp.js`. Plan `ba4-numerique`, qui reprend des compétences de M grâce à `extraSkills`. | Chaque compétence N a au moins un item `code` ou `readtable` |
+| **U9** (fait le 10 novembre 2026, voir §17) | `N-analyse-numerique.md` | `js/py/`, types `code`, `table` et `readtable`, juge `iter` avec ses `phi` (§16), `fp.js`. Plan `ba4-numerique`, qui reprend des compétences de M grâce à `extraSkills`. | Chaque compétence N a au moins un item `code` ou `readtable` |
 | **U10** | `VCF-analyse-3-4.md` | Juges `param`, `boundary`, `transform` ; résidus par séries de Laurent. Plans `ba3-analyse3` et `ba4-analyse4`. | |
 
 U2 et U3 sont indépendantes et peuvent avancer en parallèle, chacune sur sa branche.
@@ -1169,3 +1169,82 @@ Les pièges de stabilité (`m_stab_*`), de Sylvester et `m_cond_det` sont des op
 - `plot` de régions : les disques de Gershgorin sont écrits D(centre ; rayon) ;
 - quelques gabarits du catalogue, nommés dans les statuts : Cholesky tridiagonale, somme de carrés de `m-posdef`, inégalités de normes, preuve en blocs de `m-blocks-schur`, U au niveau 4 de `m-svd-lowrank`.
 
+
+### Ce que U9 (analyse numérique, module N) a construit
+
+Une unité, `numerique` (N, `#087f5b`) : les 45 compétences du catalogue et ses 91 pièges, en huit parties, dans l'ordre du catalogue :
+- `numerique-a` : erreurs, virgule flottante, bissection, point fixe et son ordre ;
+- `-b` : Newton, lecture de l'ordre, racines multiples, systèmes, sécante ;
+- `-c` : interpolation (Lagrange, erreur et Runge, différences divisées, Tchebychev, par morceaux, splines), moindres carrés ;
+- `-d` : différences finies (formules, arrondi, construction, preuve d'ordre) ;
+- `-e` : quadrature (composites, degré d'exactitude, ordre, preuve), énoncés d'erreur, Richardson ;
+- `-f` : LU, Thomas, Jacobi et Gauss-Seidel, convergence des méthodes itératives, gradient ;
+- `-g` : EDO (Euler, Heun et Crank-Nicolson, stabilité, erreur globale, Euler implicite avec Newton, raideur) ;
+- `-h` : problèmes aux limites (schéma, convergence, Newton et Cholesky tridiagonal), chaleur, transport et ondes, éléments finis, KKT.
+
+Chaque partie a `numerique-<p>.skills.js`, `numerique-<p>.js` et ses fichiers d'aide (`numerique-<p>-*.js`), ses pièges `rules/n<p>.js` (la table du catalogue est `META` dans `rules/n.js`), ses contre-exemples `judges/n-examples-<p>.js` et son test `tests/uni-numerique-<p>.test.js`. `numerique.skills.js` range les compétences dans l'ordre du catalogue. Les outils communs sont dans `numerique-kit.js`. Les simplifications de chaque compétence sont dans son statut, dans le catalogue. Chaque compétence a au moins un item `code` ou `readtable` (critère de U9, testé dans `tests/n-engine.test.js`).
+
+**Interpréteur Python (`js/py/`).** Il est écrit à la main, sans `eval` ni `Function` : `lexer.js` (indentation en INDENT/DEDENT, `PyError(message, line, kind)`), `parser.js` (AST, refus en français de `lambda`, des compréhensions, des classes, de `global`), `interp.js` (`Interp`, `runProgram`), `builtins.js` (valeurs et opérations) et `index.js` (l'API des items).
+- Valeurs : un entier est un `BigInt`, un flottant un `number`, une liste un `Array`, un tuple un `Array` marqué. Les opérations suivent Python : `//` et `%` arrondis vers −∞, `/` toujours flottant, `range` refuse un flottant (« utilise int(…) »), `repr` à la Python (`1e-08`, `2.0`).
+- Langage du §12 : `def` (fonctions passées en argument), `return`, `if/elif/else`, `for … in range(a, b, pas)` (pas négatif compris) ou sur une liste, `while`, `break`, `continue`, `a, b = b, a`, `+=` et ses cousins, comparaisons enchaînées, tranches, `append`, `pop`, `extend`, `[0] * n`. `import math` et `from math import *` ; tout autre `import` est refusé, `numpy` avec un message. Fonctions : `range len abs min max sum float int round print list`, plus `math` (sqrt exp log sin cos tan pi e fabs, et quelques autres).
+- Une fonction voit les globales et ses variables locales (les noms qu'elle affecte, comme en Python).
+- Limites : 200 000 opérations élémentaires (`maxSteps` de l'item ; instructions, opérateurs, appels et indices comptés), profondeur 100, listes de 10 000 éléments. Le dépassement donne « Le programme ne s'arrête pas (boucle infinie ?) ».
+- Erreurs en français avec la ligne : « ligne 2 : nom inconnu : y », « indice hors de la liste (indice 2, longueur 2) », « division par zéro », « indentation : … », « nom inconnu : sqrt (écris math.sqrt) », « opération impossible avec None : une fonction a-t-elle oublié son return ? ».
+- API (`js/py/index.js`) : `runProgram(src, {prelude, maxSteps})` → `{ok, output, error: {message, line, kind, text}}` ; `runTests({prelude, source, tests, maxSteps})` → `{ok, results, failed}`. Chaque test `{setup?, expr, expect, tol?, atol?}` tourne dans un interpréteur neuf : prélude, programme, `setup`, puis `expr`. `expect` est un littéral Python (texte) ou une valeur JS. Les nombres sont égaux à `tol` près (relatif, 1e−9 par défaut) ou à `atol` près (absolu), les listes case par case. `failed.text` vaut « Test 2 : g(3) donne 6, attendu 8 ». Il y a aussi `sameValue`, `show` (repr) et `toJs`.
+
+**Arithmétique simulée (`js/cas/fp.js`).** `fl(x, p)` arrondit à p chiffres significatifs, à la moitié supérieure, sur l'écriture décimale (31,635 → 31,64, comme à la main). `fpOp`, `fpSqrt`, `fpFn`, `fpEval(nœud, p)` (arrondi après chaque littéral et chaque opération : √1001 − √1000 donne 0,02 à 4 chiffres), `fpText`, `relErr`, `lostDigits`, `machineEps`. Le juge `value` avec `{arith: 'fp', digits}` (`judges/fpvalue.js`, deux lignes dans `value.js`) accepte une ligne si son calcul à p chiffres a la valeur de la ligne précédente (ou de `expect`) ; la forme finale est un nombre écrit avec au plus p chiffres significatifs.
+
+**Tableaux d'itérations (`judges/iter-num.js`, une ligne dans `checkTable`).** Les sortes de `phi` sont les suivantes ; chaque case est jugée à partir des cases de l'élève, exactement (fractions) si possible, sinon à `tol` près (relatif, 1e−6 par défaut) :
+- `scalar` (point fixe et Newton : `phi: 'x - (x^2-2)/(2x)'`) ;
+- `secant` (les deux lignes précédentes de l'élève, piège `n_secant_update`) ;
+- `bisect` (a, b, x, signe ; `n_bisect_wrong_half`) ;
+- `jacobi` et `gs` (`n_jacobi_uses_new`) ;
+- `ode` (schémas EP, ER, CN, Heun, RK4 ; ER et CN sont résolus exactement si f est affine en u, par Newton sinon ; colonnes t, u, k1, k2 ; pièges `n_implicit_as_explicit`, `n_euler_time_index`, `n_heun_k2`) ;
+- `gradient` (x, r, α ; `n_gradient_sign`, `n_optimal_step_inverted`) ;
+- `divdiff` (table triangulaire ; `n_divdiff_denominator`).
+
+`phi.cols` donne le sens de chaque colonne. Les colonnes dérivées `inc` (δ), `r1`, `r2`, `r3`, `err`, `fx` et `res` sont recalculées à partir des valeurs de l'élève, et jugées à `sig` chiffres significatifs (2 par défaut). Une case `{auto: true}` est calculée et affichée par l'app (`autoCells`), sans être jugée. `referenceRows(phi, n)` donne le tableau de référence, et `fmt` et `expText` (`2.032035e-02`) les écritures. `NUM_KINDS` liste ces sortes. `ui/calculator.js` est une petite calculatrice (fractions exactes, √, exp, ln, sin, cos) ; `ui/table-input.js` l'affiche pour un item qui porte `calculator: true` (niveaux 1 à 4, jamais à l'examen) et affiche les cases `auto`.
+
+**Items `code`** (`judges/code.js`, `ui/code-input.js`, constructeurs dans `numerique-kit.js`).
+- Item : `{type: 'code', lang: 'python', source (avec ???), holes: [{answer, options?, traps?: [{text, rule}], wrong?}], prelude (caché), signatures (« Fonctions disponibles »), tests, maxSteps, then?}`.
+- Un trou avec `options` est un choix (le format d'examen, niveau 1).
+- `judgeCode(item, réponses)` met les trous à la place des ???, lance les tests, et rend `{ok, holes, rule, message, failed}`. Un trou dont le texte est un piège connu le nomme ; les espaces et les parenthèses extérieures ne comptent pas (`normalize`). Sinon, chaque trou différent de la référence est essayé seul pour savoir lequel casse le programme.
+- `checkCodeItem(item)` : la référence passe, et chaque piège, chaque option fausse et le `wrong` de chaque trou échouent.
+- Constructeurs : `refCode(texte)` (les trous du catalogue entre « … »), `sourceOf`, `holesFor(niveau, R, {focus, linked, loop})` (progression du catalogue), `codeItem({…, blanks, choice, traps, fillers, wrong, preludes: ['vec', 'mat'], tests, then})`, `codeMcq` (le programme dans l'énoncé, un ??? et quatre options : la variante `mcq` d'examen), `codeHtml`. `PRELUDE_VEC` et `PRELUDE_MAT` sont ceux du catalogue (`solve` joue le rôle de A\b).
+- Écran : le programme en police à chasse fixe, un champ (ou un menu) par trou, une rangée de touches `( ) [ ] : = + - * / ** < > , .` et les noms du programme, le premier test raté avec la valeur obtenue et la valeur attendue, trois essais, puis `then` au même endroit.
+
+**Items `readtable`** (`ui/readtable.js`) : `{type: 'readtable', table: {columns, rows} | null, question: item}`. Le tableau est affiché, puis la question est posée en dessous (`mcq`, `answer`, `lines`…). `readtableItem`, `tableHtml`, `multiMcq` (QCM à plusieurs réponses : juste si exactement les bonnes cases sont cochées, `mountMulti`) et `vfMcq` (vrai/faux en QCM, changé en `tf` par l'examen) sont dans le kit. Dans les leçons, un QCM à plusieurs réponses passe toujours par un `readtable` (avec `table: null` s'il n'y a pas de tableau) ; `MOUNTS.mcq` n'est pas changé. `iterTable({phi, cols: [{id, label, auto?}], n, given, blank})` construit un item `table` à partir de `referenceRows`.
+
+**Contre-exemples.** Sorte `num` (`judges/n-examples.js`, une ligne dans `checkCounter`) : `{kind: 'num', prop, params, ask, answer}`, avec une table de propriétés par partie (`n-examples-<p>.js`) ; les lecteurs `numberOf`, `fnOf`, `matrixOf` sont dans `n-examples-util.js`. Par exemple : `newtonNoConv`, `bisectErrorUp`, `fpNotGlobal`, `interpDegreeLow`, `fdForwardNotOrder2`, `trapNotBetter`, `errScaling`, `jacobiNotGs`, `normNotRadius`, `heunUnstable`.
+
+**Pièges.** `rules/n.js` : `META`, la table du catalogue telle qu'écrite, lue en respectant les |…| des cellules. Chaque partie complète ses pièges dans `rules/n<p>.js` (`DEFS`). Un piège de code porte `code: {skill, text, levels?}` : `tests/n-engine.test.js` vérifie que ce texte, tapé dans le trou d'un item de sa compétence, est nommé par le juge. Son `check` est un leurre ou une ligne diagnostiquée. Les pièges de valeur lisent des champs de la config du juge (`cfg.ntraps`, `cfg.traps` de `stattrap.js`…), décrits en tête de chaque fichier de règles.
+
+**Mode examen** (`content/uni/exams-numerique.js`, ajouté à `EXAMS`). Plan `ba4-numerique` :
+- 180 min, sans document ;
+- 18 QCM à plusieurs réponses (+1/N par bonne case, −1/M par mauvaise, plancher 0) ;
+- 8 vrai/faux (+1/0/−1) ;
+- 2 problèmes `open` de 3,5 à 10 points, notés par étape.
+
+Le pool est `numerique`, plus `extraSkills` : `m-cholesky`, `m-power-method`, `m-rayleigh`, `m-norms`, `m-cond` et `m-svd-lowrank`. Les nombres sont à vérifier. Dans une section `multi`, `buildExam` marque `multi` un QCM à une seule bonne réponse (N = 1) : une ligne dans `engine/exam.js`. Les problèmes `open` viennent de `n-fd-proof` (7 points), `n-quad-proof` (10), `n-ode-euler-global` (4), `n-bvp-fd` (3,5), `n-bvp-convergence` (4) et `n-gradient-spd` (7).
+
+**Variantes des compétences précédentes** (`content/uni/u9-variants.js`, qui enveloppe les générateurs de P et de M) :
+- `p-desc-summary`, `p-ci-mean` et `p-reg-ls` : un item de niveau 4 sur trois est un item `code` (variance en n − 1, demi-largeur t·s/√n, pente S_xy/S_xx) ;
+- `m-power-method` : un niveau 5 sur deux est le programme de la puissance, puis le `readtable` de ses μₖ ;
+- `m-cond` : un niveau 5 sur deux est le tableau des perturbations en `readtable`.
+
+**`describe()`** (`content/generators.js`) décrit les items `code` (le programme, ⟦réponse⟧ ou les options de chaque trou, les tests) et `readtable` (le tableau, puis la question).
+
+**Tests.**
+- `tests/py.test.js` : les programmes de référence (Newton, Horner, LU tridiagonale, Simpson), le langage, les messages d'erreur et les limites.
+- `tests/n-engine.test.js` : `fp.js` et `value` `{arith: 'fp'}` ; chaque sorte de `phi` (ligne juste, ligne fausse typique, convergence) ; le juge des items `code` ; les pièges de code ; le critère de U9.
+- Un fichier par partie (`tests/uni-numerique-a` … `-h`), qui passe par `checkSkills`. `tests/uni-check-num.js` contrôle les items `code` (la référence passe ses tests ; un trou faux typique est refusé, et son piège est nommé) et `readtable`.
+- `exam.test.js` : `ba4-numerique` produit un examen complet, et ses QCM à plusieurs réponses sont notés au barème +1/N, −1/M.
+
+**Parcours.** `UNBUILT` reste vide : les prérequis de N (A1, L, A2, M, G) sont tous construits. Les prérequis `f-heat-sep` et `f-wave` du catalogue (module F, U10) ne sont les prérequis directs d'aucune compétence. Prérequis du plan d'algèbre : `@alg:A-arrondir` = `cm-round`, `@alg:J-quel-pourcentage` = `pct-which`, `@alg:L-fonction-affine` = `fn-affine`.
+
+**Pas encore fait :**
+- les juges à fonction abstraite (`series` et `definite` avec `abstract`, extension 5 du catalogue) : les preuves d'ordre utilisent des lettres pour f(x₀), f′(x₀)… et f‴(ξᵢ), jugées par `equiv`, avec des QCM et des blocs ;
+- un `problem` ne contient pas de partie `code` ou `readtable` (le problème « à la GM » de `n-fp-order` est un `readtable`) ;
+- un QCM à plusieurs réponses hors d'un `readtable` dans les leçons ;
+- l'ajout d'une ligne à la fois dans les tableaux (§11) : toutes les lignes sont affichées d'emblée ;
+- quelques gabarits du catalogue, nommés dans les statuts : la diode de `n-fp-converge`, x³ − c et x − cos x pour Newton, n = 3 ou 5 de Tchebychev à la main, les tableaux de Butcher, le circuit RLC, la version adaptative de Richardson, les points intérieurs de KKT, le bord de Neumann de `n-bvp-fd`.

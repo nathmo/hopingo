@@ -2605,6 +2605,40 @@ Puissance inverse avec décalage σ = −3 pour A = [[-2,-4],[-4,4]], à partir 
 ### Niveau 5
 
 ```
+Complète la méthode de la puissance du cours : μ est la composante de z = Ay de plus grand module (avec son signe), et y ← z/μ. La fonction renvoie la liste des μₖ.
+  [code python, 2 trous, sans aide]
+    | def power(A, y, nsteps):
+    |     mus = []
+    |     for k in range(nsteps):
+    |         z = matvec(A, y)
+    |         mu = z[0]
+    |         for i in range(len(z)):
+    |             if ⟦abs(z[i]) > abs(mu)⟧:
+    |                 mu = z[i]
+    |         mus.append(mu)
+    |         for i in range(len(z)):
+    |             y[i] = ⟦z[i] / mu⟧
+    |     return mus
+    test : power([[3, 1], [1, 3]], [1.0, 0.0], 4) → [3.0, 10/3, 3.6, 34/9]
+    test : power([[-5, 1], [1, 2]], [1.0, 1.0], 2) → [-4.0, -5.75]
+  puis : Le programme, appelé pour A = [[6, 2], [2, 3]] et y₀ = (1 ; 0), renvoie :
+      [tableau à lire, sans aide]
+        k | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7
+        μₖ | 6.000000e+00 | 6.666667e+00 | 6.900000e+00 | 6.971014e+00 | 6.991684e+00 | 6.997621e+00 | 6.999320e+00 | 6.999806e+00
+      question : Que peut-on lire sur ce tableau ? Une ou plusieurs réponses justes.
+          · μₖ → 2, la plus petite valeur propre [m_power_ratio]   · L'erreur est multipliée par environ 7/2 à chaque pas [m_power_ratio]   ✔ L'erreur μₖ − λ₁ est multipliée par environ 2/7 à chaque pas   ✔ μₖ → λ₁ = 7
+          pièges : m_power_ratio
+      pièges : m_power_ratio
+
+La méthode de la puissance (normalisation par la plus grande composante) appliquée à une matrice symétrique 2 × 2 donne :k01234567μk4,0000005,0000005,6000005,8571435,9512205,9836075,9945215,998172Lis λ₁ (entière), le rapport |λ₂/λ₁|, puis λ₂.
+  [free, sans aide]  λ_1
+    = 6   ← La limite des μ_k (λ₁ est entière)
+  — Le rapport |λ₂/λ₁|, lu sur les erreurs μk − λ₁ (à 0,02 près).  [juge value]  départ : |λ_2/λ_1|
+    = 1/3   ← (μ₇ − λ₁)/(μ₆ − λ₁) ≈ 0,334
+  — λ₂ (entière ; le signe des erreurs dit son signe).  [juge value]  départ : λ_2
+    = 2   ← Les erreurs gardent leur signe : λ₂/λ₁ > 0
+  pièges : m_power_ratio
+
 La méthode de la puissance (normalisation par la plus grande composante) appliquée à une matrice symétrique 2 × 2 donne :k01234567μk8,00000010,00000011,20000011,71428611,90243911,96721311,98904111,996344Lis λ₁ (entière), le rapport |λ₂/λ₁|, puis λ₂.
   [free, sans aide]  λ_1
     = 12   ← La limite des μ_k (λ₁ est entière)
@@ -2614,100 +2648,55 @@ La méthode de la puissance (normalisation par la plus grande composante) appliq
     = 4   ← Les erreurs gardent leur signe : λ₂/λ₁ > 0
   pièges : m_power_ratio
 
-A = [[7,3],[3,7]], y₀ = (0 ; 1).
-  [problème, examen open, 7 points]
-  partie 1 ((a) Deux itérations : 0,5 ; μ₀ : la composante de Ay₀ de plus grand module. : 0,5 ; y₁ = Ay₀/μ₀. : 0,5 ; Itération 2 : z = Ay₁. : 0,5 ; μ₁ : la composante de Ay₁ de plus grand module. : 0,5)
-  (a) Deux itérations (normalisation par la plus grande composante).
-    [free, sans aide, suivre l'erreur]  [[7,3],[3,7]]·(0 ; 1)
-      (Itération 1 : z = Ay₀.)
-      = (3 ; 7)   ← Ligne par colonne
-    — μ₀ : la composante de Ay₀ de plus grand module.  [juge value]  départ : μ_0
-      = 7   ← max(|3| ; |7|), avec son signe
-    — y₁ = Ay₀/μ₀.  [juge mat]  départ : y_1
-      = (3/7 ; 1)   ← Divisé par 7 : une composante vaut 1
-    — Itération 2 : z = Ay₁.  [juge mat]  départ : [[7,3],[3,7]]·(3/7 ; 1)
-      = (6 ; 58/7)   ← Ligne par colonne
-    — μ₁ : la composante de Ay₁ de plus grand module.  [juge value]  départ : μ_1
-      = 58/7   ← max(|6| ; |58/7|), avec son signe
-  partie 2 ((b) Rayleigh : 1)
-  (b) Le quotient de Rayleigh R(y₁).
-    [free, sans aide, suivre l'erreur]  R
-      = 266/29   ← y₁ᵀAy₁ = 76/7, y₁ᵀy₁ = 58/49
-  partie 3 ((c) Vitesse : 1)
-  (c) Vitesse de convergence.
-    [free, sans aide, suivre l'erreur]  |λ_2/λ_1|
-      (Valeurs propres : tr A et det A.)
-      = 2/5   ← |4/10|
-  partie 4 ((d) Puissance inverse : 0,5 ; La valeur propre trouvée. : 1)
-  (d) Puissance inverse avec σ = 3 : vers quoi tendent les μk, puis quelle valeur propre trouve-t-on ?
-    [free, sans aide, suivre l'erreur]  μ
-      = 1   ← 1/(λ − σ) pour la valeur propre la plus proche de 3
-    — La valeur propre trouvée.  [juge value]  départ : λ
-      = 4   ← La valeur propre la plus proche de σ = 3
-  partie 5 ((e) Conditionnement : 1)
-  (e) Le conditionnement κ₂(A).
-    [free, sans aide, suivre l'erreur]  κ_2
-      = 5/2   ← A symétrique définie positive : λ_max/λ_min
-
-La méthode de la puissance (normalisation par la plus grande composante) appliquée à une matrice symétrique 2 × 2 donne :k01234567μk5,0000006,8000007,6470597,9076927,9766547,9941467,9985367,999634Lis λ₁ (entière), le rapport |λ₂/λ₁|, puis λ₂.
-  [free, sans aide]  λ_1
-    = 8   ← La limite des μ_k (λ₁ est entière)
-  — Le rapport |λ₂/λ₁|, lu sur les erreurs μk − λ₁ (à 0,02 près).  [juge value]  départ : |λ_2/λ_1|
-    = 1/4   ← (μ₇ − λ₁)/(μ₆ − λ₁) ≈ 0,250
-  — λ₂ (entière ; le signe des erreurs dit son signe).  [juge value]  départ : λ_2
-    = 2   ← Les erreurs gardent leur signe : λ₂/λ₁ > 0
-  pièges : m_power_ratio
-
 ```
 
 ### Variantes d'examen
 
 ```
-Puissance inverse avec décalage σ = 1 : les μk (composantes de plus grand module des solutions de (A − σI)z = yk) tendent vers −1/2. Quelle valeur propre de A a-t-on trouvée ?
-  · 1/2 [m_inverse_power_value]   · −1/2 [m_inverse_power_value]   · −2 [m_inverse_power_value]   ✔ −1
+A = [[5,-3],[-3,5]] a les valeurs propres 8 et 2. Avec la méthode de la puissance, par combien l'erreur sur μk est-elle multipliée environ à chaque pas ?
+  ✔ 1/4   · 1/16   · 4 [m_power_ratio]   · 3/4
   [examen mcq]
-  pièges : m_inverse_power_value
+  pièges : m_power_ratio
 
 Vrai ou faux ?
-  « La méthode de la puissance (sans décalage, ni inverse) converge vers la valeur propre de plus petit module. » → FAUX
-    contre-exemple (mx) : A = [[3,1],[1,3]]
+  « Si |λ₁| > |λ₂| ≥ …, l'erreur de la méthode de la puissance est multipliée à peu près par |λ₂/λ₁| à chaque pas. » → VRAI
   [examen tf]
   pièges : m_power_ratio
 
-A = [[7,1],[1,7]], y₀ = (1 ; 0).
+A = [[6,-2],[-2,6]], y₀ = (1 ; 0).
   [problème, examen open, 7 points]
   partie 1 ((a) Deux itérations : 0,5 ; μ₀ : la composante de Ay₀ de plus grand module. : 0,5 ; y₁ = Ay₀/μ₀. : 0,5 ; Itération 2 : z = Ay₁. : 0,5 ; μ₁ : la composante de Ay₁ de plus grand module. : 0,5)
   (a) Deux itérations (normalisation par la plus grande composante).
-    [free, sans aide, suivre l'erreur]  [[7,1],[1,7]]·(1 ; 0)
+    [free, sans aide, suivre l'erreur]  [[6,-2],[-2,6]]·(1 ; 0)
       (Itération 1 : z = Ay₀.)
-      = (7 ; 1)   ← Ligne par colonne
+      = (6 ; -2)   ← Ligne par colonne
     — μ₀ : la composante de Ay₀ de plus grand module.  [juge value]  départ : μ_0
-      = 7   ← max(|7| ; |1|), avec son signe
+      = 6   ← max(|6| ; |−2|), avec son signe
     — y₁ = Ay₀/μ₀.  [juge mat]  départ : y_1
-      = (1 ; 1/7)   ← Divisé par 7 : une composante vaut 1
-    — Itération 2 : z = Ay₁.  [juge mat]  départ : [[7,1],[1,7]]·(1 ; 1/7)
-      = (50/7 ; 2)   ← Ligne par colonne
+      = (1 ; -1/3)   ← Divisé par 6 : une composante vaut 1
+    — Itération 2 : z = Ay₁.  [juge mat]  départ : [[6,-2],[-2,6]]·(1 ; -1/3)
+      = (20/3 ; -4)   ← Ligne par colonne
     — μ₁ : la composante de Ay₁ de plus grand module.  [juge value]  départ : μ_1
-      = 50/7   ← max(|50/7| ; |2|), avec son signe
+      = 20/3   ← max(|20/3| ; |−4|), avec son signe
   partie 2 ((b) Rayleigh : 1)
   (b) Le quotient de Rayleigh R(y₁).
     [free, sans aide, suivre l'erreur]  R
-      = 182/25   ← y₁ᵀAy₁ = 52/7, y₁ᵀy₁ = 50/49
+      = 36/5   ← y₁ᵀAy₁ = 8, y₁ᵀy₁ = 10/9
   partie 3 ((c) Vitesse : 1)
   (c) Vitesse de convergence.
     [free, sans aide, suivre l'erreur]  |λ_2/λ_1|
       (Valeurs propres : tr A et det A.)
-      = 3/4   ← |6/8|
+      = 1/2   ← |4/8|
   partie 4 ((d) Puissance inverse : 0,5 ; La valeur propre trouvée. : 1)
   (d) Puissance inverse avec σ = 5 : vers quoi tendent les μk, puis quelle valeur propre trouve-t-on ?
     [free, sans aide, suivre l'erreur]  μ
-      = 1   ← 1/(λ − σ) pour la valeur propre la plus proche de 5
+      = −1   ← 1/(λ − σ) pour la valeur propre la plus proche de 5
     — La valeur propre trouvée.  [juge value]  départ : λ
-      = 6   ← La valeur propre la plus proche de σ = 5
+      = 4   ← La valeur propre la plus proche de σ = 5
   partie 5 ((e) Conditionnement : 1)
   (e) Le conditionnement κ₂(A).
     [free, sans aide, suivre l'erreur]  κ_2
-      = 4/3   ← A symétrique définie positive : λ_max/λ_min
+      = 2   ← A symétrique définie positive : λ_max/λ_min
 
 ```
 
@@ -2718,31 +2707,31 @@ _Garder les k plus grands σᵢuᵢvᵢᵀ ; l'erreur est σₖ₊₁._
 ### Niveau 1
 
 ```
-A = [[0,0],[-2,-6],[6,2]] a pour SVD A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 8, u₁ = (0 ; −1 ; 1)/√2, v₁ = (1 ; 1)/√2 ; σ₂ = 4, u₂ = (0 ; −1 ; −1)/√2, v₂ = (−1 ; 1)/√2. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
+A = [[2,0,-2],[1,0,1]] a pour SVD A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 2√2, u₁ = (1 ; 0), v₁ = (1 ; 0 ; −1)/√2 ; σ₂ = √2, u₂ = (0 ; 1), v₂ = (1 ; 0 ; 1)/√2. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
   [guided]  A_1
     (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    = [[0,0],[-4,-4],[4,4]]   (cases à remplir : (1,1) (3,2))   ← σ₁u₁v₁ᵀ = 8·(0 ; −1 ; 1)/√2·(1 ; 1)/√2ᵀ
+    = [[2,0,-2],[0,0,0]]   (cases à remplir : (1,1) (2,3))   ← σ₁u₁v₁ᵀ = 2√2·(1 ; 0)·(1 ; 0 ; −1)/√2ᵀ
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = □   (trous : 4)   ← Le plus grand terme jeté : σ₂
-  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 8·(0 ; −1 ; 1)/√2·(1 ; 1)/√2ᵀ = [[□, …], …] | A₁ = [[0,0],[−4,−4],[4,4]], ‖A − A₁‖₂ = 4
+    = □   (trous : √2)   ← Le plus grand terme jeté : σ₂
+  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 2√2·(1 ; 0)·(1 ; 0 ; −1)/√2ᵀ = [[□, …], …] | A₁ = [[2,0,−2],[0,0,0]], ‖A − A₁‖₂ = √2
   pièges : m_rankk_wrong_sigma
 
-A = [[-2,4],[-2,4],[4,4]] a pour SVD A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 4√3, u₁ = (1 ; 1 ; 1)/√3, v₁ = (0 ; 1) ; σ₂ = 2√6, u₂ = (1 ; 1 ; −2)/√6, v₂ = (−1 ; 0). Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
+A = [[2,2,0],[-3,3,3]] a pour SVD A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 3√3, u₁ = (0 ; 1), v₁ = (−1 ; 1 ; 1)/√3 ; σ₂ = 2√2, u₂ = (−1 ; 0), v₂ = (−1 ; −1 ; 0)/√2. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
   [guided]  A_1
     (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    = [[0,4],[0,4],[0,4]]   (cases à remplir : (1,1) (3,2))   ← σ₁u₁v₁ᵀ = 4√3·(1 ; 1 ; 1)/√3·(0 ; 1)ᵀ
+    = [[0,0,0],[-3,3,3]]   (cases à remplir : (1,1) (2,3))   ← σ₁u₁v₁ᵀ = 3√3·(0 ; 1)·(−1 ; 1 ; 1)/√3ᵀ
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = □   (trous : 2√6)   ← Le plus grand terme jeté : σ₂
-  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 4√3·(1 ; 1 ; 1)/√3·(0 ; 1)ᵀ = [[□, …], …] | A₁ = [[0,4],[0,4],[0,4]], ‖A − A₁‖₂ = 2√6
+    = □   (trous : 2√2)   ← Le plus grand terme jeté : σ₂
+  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 3√3·(0 ; 1)·(−1 ; 1 ; 1)/√3ᵀ = [[□, …], …] | A₁ = [[0,0,0],[−3,3,3]], ‖A − A₁‖₂ = 2√2
   pièges : m_rankk_wrong_sigma
 
-A = [[3,6],[4,-2]] a pour SVD A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 3√5, u₁ = (1 ; 0), v₁ = (1 ; 2)/√5 ; σ₂ = 2√5, u₂ = (0 ; 1), v₂ = (2 ; −1)/√5. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
+A = [[-4,-4],[1,-1]] a pour SVD A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 4√2, u₁ = (−1 ; 0), v₁ = (1 ; 1)/√2 ; σ₂ = √2, u₂ = (0 ; −1), v₂ = (−1 ; 1)/√2. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
   [guided]  A_1
     (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    = [[3,6],[0,0]]   (cases à remplir : (1,1) (2,2))   ← σ₁u₁v₁ᵀ = 3√5·(1 ; 0)·(1 ; 2)/√5ᵀ
+    = [[-4,-4],[0,0]]   (cases à remplir : (1,1) (2,2))   ← σ₁u₁v₁ᵀ = 4√2·(−1 ; 0)·(1 ; 1)/√2ᵀ
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = □   (trous : 2√5)   ← Le plus grand terme jeté : σ₂
-  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 3√5·(1 ; 0)·(1 ; 2)/√5ᵀ = [[□, …], …] | A₁ = [[3,6],[0,0]], ‖A − A₁‖₂ = 2√5
+    = □   (trous : √2)   ← Le plus grand terme jeté : σ₂
+  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 4√2·(−1 ; 0)·(1 ; 1)/√2ᵀ = [[□, …], …] | A₁ = [[−4,−4],[0,0]], ‖A − A₁‖₂ = √2
   pièges : m_rankk_wrong_sigma
 
 ```
@@ -2750,34 +2739,34 @@ A = [[3,6],[4,-2]] a pour SVD A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ�
 ### Niveau 2
 
 ```
-A = [[-6,-5,-11],[12,-10,2]] a pour SVD A = 4√10·u₂v₂ᵀ + 3√30·u₁v₁ᵀ, avec σ₂ = 4√10, u₂ = (2 ; 1)/√5, v₂ = (0 ; −1 ; −1)/√2 ; σ₁ = 3√30, u₁ = (1 ; −2)/√5, v₁ = (−2 ; 1 ; −1)/√6. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
+A = [[-8,4],[6,2],[-2,6]] a pour SVD A = 2√10·u₂v₂ᵀ + 2√30·u₁v₁ᵀ, avec σ₂ = 2√10, u₂ = (0 ; 1 ; 1)/√2, v₂ = (1 ; 2)/√5 ; σ₁ = 2√30, u₁ = (−2 ; 1 ; −1)/√6, v₁ = (2 ; −1)/√5. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
   [guided]  A_1
     (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    ? Quel terme garde-t-on pour la meilleure approximation de rang 1 ? ✔ Celui de la plus grande valeur singulière, 3√30 / · Celui écrit en premier (σ = 4√10)
-    = [[-6,3,-3],[12,-6,6]]   (cases à remplir : (1,1) (2,3))   ← σ₁u₁v₁ᵀ = 3√30·(1 ; −2)/√5·(−2 ; 1 ; −1)/√6ᵀ
-  — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = □   (trous : 4√10)   ← Le plus grand terme jeté : σ₂
-  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 3√30·(1 ; −2)/√5·(−2 ; 1 ; −1)/√6ᵀ = [[□, …], …] | A₁ = [[−6,3,−3],[12,−6,6]], ‖A − A₁‖₂ = 4√10
-  pièges : m_rankk_wrong_sigma
-
-A = [[0,0],[2,4],[-2,4]] a pour SVD A = 2√2·u₂v₂ᵀ + 4√2·u₁v₁ᵀ, avec σ₂ = 2√2, u₂ = (0 ; 1 ; −1)/√2, v₂ = (1 ; 0) ; σ₁ = 4√2, u₁ = (0 ; 1 ; 1)/√2, v₁ = (0 ; 1). Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
-  [guided]  A_1
-    (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    ? Quel terme garde-t-on pour la meilleure approximation de rang 1 ? ✔ Celui de la plus grande valeur singulière, 4√2 / · Celui écrit en premier (σ = 2√2)
-    = [[0,0],[0,4],[0,4]]   (cases à remplir : (1,1) (3,2))   ← σ₁u₁v₁ᵀ = 4√2·(0 ; 1 ; 1)/√2·(0 ; 1)ᵀ
-  — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = □   (trous : 2√2)   ← Le plus grand terme jeté : σ₂
-  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 4√2·(0 ; 1 ; 1)/√2·(0 ; 1)ᵀ = [[□, …], …] | A₁ = [[0,0],[0,4],[0,4]], ‖A − A₁‖₂ = 2√2
-  pièges : m_rankk_wrong_sigma
-
-A = [[-4,2],[-3,-6],[4,-2]] a pour SVD A = 2√10·u₂v₂ᵀ + 3√5·u₁v₁ᵀ, avec σ₂ = 2√10, u₂ = (1 ; 0 ; −1)/√2, v₂ = (−2 ; 1)/√5 ; σ₁ = 3√5, u₁ = (0 ; −1 ; 0), v₁ = (1 ; 2)/√5. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
-  [guided]  A_1
-    (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    ? Quel terme garde-t-on pour la meilleure approximation de rang 1 ? ✔ Celui de la plus grande valeur singulière, 3√5 / · Celui écrit en premier (σ = 2√10)
-    = [[0,0],[-3,-6],[0,0]]   (cases à remplir : (1,1) (3,2))   ← σ₁u₁v₁ᵀ = 3√5·(0 ; −1 ; 0)·(1 ; 2)/√5ᵀ
+    ? Quel terme garde-t-on pour la meilleure approximation de rang 1 ? ✔ Celui de la plus grande valeur singulière, 2√30 / · Celui écrit en premier (σ = 2√10)
+    = [[-8,4],[4,-2],[-4,2]]   (cases à remplir : (1,1) (3,2))   ← σ₁u₁v₁ᵀ = 2√30·(−2 ; 1 ; −1)/√6·(2 ; −1)/√5ᵀ
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
     = □   (trous : 2√10)   ← Le plus grand terme jeté : σ₂
-  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 3√5·(0 ; −1 ; 0)·(1 ; 2)/√5ᵀ = [[□, …], …] | A₁ = [[0,0],[−3,−6],[0,0]], ‖A − A₁‖₂ = 2√10
+  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 2√30·(−2 ; 1 ; −1)/√6·(2 ; −1)/√5ᵀ = [[□, …], …] | A₁ = [[−8,4],[4,−2],[−4,2]], ‖A − A₁‖₂ = 2√10
+  pièges : m_rankk_wrong_sigma
+
+A = [[2,-2,0],[1,1,0]] a pour SVD A = √2·u₂v₂ᵀ + 2√2·u₁v₁ᵀ, avec σ₂ = √2, u₂ = (0 ; 1), v₂ = (1 ; 1 ; 0)/√2 ; σ₁ = 2√2, u₁ = (1 ; 0), v₁ = (1 ; −1 ; 0)/√2. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
+  [guided]  A_1
+    (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
+    ? Quel terme garde-t-on pour la meilleure approximation de rang 1 ? ✔ Celui de la plus grande valeur singulière, 2√2 / · Celui écrit en premier (σ = √2)
+    = [[2,-2,0],[0,0,0]]   (cases à remplir : (1,1) (2,3))   ← σ₁u₁v₁ᵀ = 2√2·(1 ; 0)·(1 ; −1 ; 0)/√2ᵀ
+  — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
+    = □   (trous : √2)   ← Le plus grand terme jeté : σ₂
+  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 2√2·(1 ; 0)·(1 ; −1 ; 0)/√2ᵀ = [[□, …], …] | A₁ = [[2,−2,0],[0,0,0]], ‖A − A₁‖₂ = √2
+  pièges : m_rankk_wrong_sigma
+
+A = [[11,-2],[5,-10]] a pour SVD A = 5√2·u₂v₂ᵀ + 10√2·u₁v₁ᵀ, avec σ₂ = 5√2, u₂ = (1 ; −1)/√2, v₂ = (3 ; 4)/5 ; σ₁ = 10√2, u₁ = (1 ; 1)/√2, v₁ = (4 ; −3)/5. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.
+  [guided]  A_1
+    (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
+    ? Quel terme garde-t-on pour la meilleure approximation de rang 1 ? ✔ Celui de la plus grande valeur singulière, 10√2 / · Celui écrit en premier (σ = 5√2)
+    = [[8,-6],[8,-6]]   (cases à remplir : (1,1) (2,2))   ← σ₁u₁v₁ᵀ = 10√2·(1 ; 1)/√2·(4 ; −3)/5ᵀ
+  — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
+    = □   (trous : 5√2)   ← Le plus grand terme jeté : σ₂
+  aides : Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l'erreur en norme 2 est la plus grande valeur singulière jetée. | A₁ = 10√2·(1 ; 1)/√2·(4 ; −3)/5ᵀ = [[□, …], …] | A₁ = [[8,−6],[8,−6]], ‖A − A₁‖₂ = 5√2
   pièges : m_rankk_wrong_sigma
 
 ```
@@ -2785,43 +2774,43 @@ A = [[-4,2],[-3,-6],[4,-2]] a pour SVD A = 2√10·u₂v₂ᵀ + 3√5·u₁v₁
 ### Niveau 3
 
 ```
-A = [[-1,-1,-5],[-3,-3,-3],[3,-3,0]] = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + σ₃u₃v₃ᵀ, avec σ₁ = 4√3, u₁ = (−1 ; −1 ; 0)/√2, v₁ = (1 ; 1 ; 2)/√6 ; σ₂ = 3√2, u₂ = (0 ; 0 ; −1), v₂ = (−1 ; 1 ; 0)/√2 ; σ₃ = √6, u₃ = (1 ; −1 ; 0)/√2, v₃ = (1 ; 1 ; −1)/√3. Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.
+A = [[-6,0,2],[0,-1,0],[-2,0,6]] = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + σ₃u₃v₃ᵀ, avec σ₁ = 8, u₁ = (−1 ; 0 ; −1)/√2, v₁ = (1 ; 0 ; −1)/√2 ; σ₂ = 4, u₂ = (−1 ; 0 ; 1)/√2, v₂ = (1 ; 0 ; 1)/√2 ; σ₃ = 1, u₃ = (0 ; −1 ; 0), v₃ = (0 ; 1 ; 0). Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  A_1
     (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    = [[-2,-2,-4],[-2,-2,-4],[0,0,0]]   ← σ₁u₁v₁ᵀ = 4√3·(−1 ; −1 ; 0)/√2·(1 ; 1 ; 2)/√6ᵀ
+    = [[-4,0,4],[0,0,0],[-4,0,4]]   ← σ₁u₁v₁ᵀ = 8·(−1 ; 0 ; −1)/√2·(1 ; 0 ; −1)/√2ᵀ
+  — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
+    = 4   ← Le plus grand terme jeté : σ₂
+  — L'erreur de Frobenius ‖A − A₁‖_F.  [juge value]  départ : F_1
+    = √17   ← √(16 + 1) : tous les termes jetés
+  — Combien de nombres faut-il stocker pour A₁ (σ₁, u₁ et v₁) ?  [juge value]  départ : N
+    = 7   ← k(m + n + 1) = 1·(3 + 3 + 1), au lieu de 9
+  aides : ‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés. | ‖A − A₁‖_F = √(□ + □) | ‖A − A₁‖₂ = 4, ‖A − A₁‖_F = √17
+  pièges : m_rankk_wrong_sigma
+
+A = [[-10,2,7],[1,-2,2],[-6,6,9]] = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + σ₃u₃v₃ᵀ, avec σ₁ = 12√2, u₁ = (1 ; 0 ; 1)/√2, v₁ = (−2 ; 1 ; 2)/3 ; σ₂ = 3√2, u₂ = (−1 ; 0 ; 1)/√2, v₂ = (2 ; 2 ; 1)/3 ; σ₃ = 3, u₃ = (0 ; 1 ; 0), v₃ = (1 ; −2 ; 2)/3. Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.
+  [tap, suivre l'erreur, menu menu]  A_1
+    (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
+    = [[-8,4,8],[0,0,0],[-8,4,8]]   ← σ₁u₁v₁ᵀ = 12√2·(1 ; 0 ; 1)/√2·(−2 ; 1 ; 2)/3ᵀ
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
     = 3√2   ← Le plus grand terme jeté : σ₂
   — L'erreur de Frobenius ‖A − A₁‖_F.  [juge value]  départ : F_1
-    = 2√6   ← √(18 + 6) : tous les termes jetés
+    = 3√3   ← √(18 + 9) : tous les termes jetés
   — Combien de nombres faut-il stocker pour A₁ (σ₁, u₁ et v₁) ?  [juge value]  départ : N
     = 7   ← k(m + n + 1) = 1·(3 + 3 + 1), au lieu de 9
-  aides : ‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés. | ‖A − A₁‖_F = √(□ + □) | ‖A − A₁‖₂ = 3√2, ‖A − A₁‖_F = 2√6
+  aides : ‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés. | ‖A − A₁‖_F = √(□ + □) | ‖A − A₁‖₂ = 3√2, ‖A − A₁‖_F = 3√3
   pièges : m_rankk_wrong_sigma
 
-A = [[1,-8],[-2,4],[-2,-8]] = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 12, u₁ = (−2 ; 1 ; −2)/3, v₁ = (0 ; 1) ; σ₂ = 3, u₂ = (1 ; −2 ; −2)/3, v₂ = (1 ; 0). Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.
+A = [[4,3,3],[-3,4,4]] = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec σ₁ = 5√2, u₁ = (3 ; 4)/5, v₁ = (0 ; 1 ; 1)/√2 ; σ₂ = 5, u₂ = (4 ; −3)/5, v₂ = (1 ; 0 ; 0). Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  A_1
     (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    = [[0,-8],[0,4],[0,-8]]   ← σ₁u₁v₁ᵀ = 12·(−2 ; 1 ; −2)/3·(0 ; 1)ᵀ
+    = [[0,3,3],[0,4,4]]   ← σ₁u₁v₁ᵀ = 5√2·(3 ; 4)/5·(0 ; 1 ; 1)/√2ᵀ
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = 3   ← Le plus grand terme jeté : σ₂
+    = 5   ← Le plus grand terme jeté : σ₂
   — L'erreur de Frobenius ‖A − A₁‖_F.  [juge value]  départ : F_1
-    = 3   ← √(9) : tous les termes jetés
+    = 5   ← √(25) : tous les termes jetés
   — Combien de nombres faut-il stocker pour A₁ (σ₁, u₁ et v₁) ?  [juge value]  départ : N
-    = 6   ← k(m + n + 1) = 1·(3 + 2 + 1), au lieu de 6
-  aides : ‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés. | ‖A − A₁‖_F = √(□) | ‖A − A₁‖₂ = 3, ‖A − A₁‖_F = 3
-  pièges : m_rankk_wrong_sigma
-
-A = [[1,-1,-1],[-5,-2,-3],[3,-2,5]] = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + σ₃u₃v₃ᵀ, avec σ₁ = 8, u₁ = (0 ; −1 ; 1)/√2, v₁ = (1 ; 0 ; 1)/√2 ; σ₂ = 2√3, u₂ = (0 ; 1 ; 1)/√2, v₂ = (−1 ; −2 ; 1)/√6 ; σ₃ = √3, u₃ = (−1 ; 0 ; 0), v₃ = (−1 ; 1 ; 1)/√3. Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.
-  [tap, suivre l'erreur, menu menu]  A_1
-    (A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.)
-    = [[0,0,0],[-4,0,-4],[4,0,4]]   ← σ₁u₁v₁ᵀ = 8·(0 ; −1 ; 1)/√2·(1 ; 0 ; 1)/√2ᵀ
-  — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = 2√3   ← Le plus grand terme jeté : σ₂
-  — L'erreur de Frobenius ‖A − A₁‖_F.  [juge value]  départ : F_1
-    = √15   ← √(12 + 3) : tous les termes jetés
-  — Combien de nombres faut-il stocker pour A₁ (σ₁, u₁ et v₁) ?  [juge value]  départ : N
-    = 7   ← k(m + n + 1) = 1·(3 + 3 + 1), au lieu de 9
-  aides : ‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés. | ‖A − A₁‖_F = √(□ + □) | ‖A − A₁‖₂ = 2√3, ‖A − A₁‖_F = √15
+    = 6   ← k(m + n + 1) = 1·(2 + 3 + 1), au lieu de 6
+  aides : ‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés. | ‖A − A₁‖_F = √(□) | ‖A − A₁‖₂ = 5, ‖A − A₁‖_F = 5
   pièges : m_rankk_wrong_sigma
 
 ```
@@ -2829,43 +2818,43 @@ A = [[1,-1,-1],[-5,-2,-3],[3,-2,5]] = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ + σ�
 ### Niveau 4
 
 ```
-A = [[-4,-4,-2],[4,-8,8]]. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.
+A = [[-3,3,0],[0,0,-3]]. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.
   [free, suivre l'erreur]  σ_1
     (σ₁, la plus grande valeur singulière : la racine de la plus grande valeur propre de AᵀA (ou de AAᵀ, plus petite).)
-    = 12   ← √144
-  — v₁ : un vecteur propre de AᵀA pour λ = 144.  [juge eigvec]  départ : v_1
-    = (1 ; -2 ; 2)   ← (AᵀA − 144I)v = 0
+    = 3√2   ← √18
+  — v₁ : un vecteur propre de AᵀA pour λ = 18.  [juge eigvec]  départ : v_1
+    = (1 ; -1 ; 0)   ← (AᵀA − 18I)v = 0
   — A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.  [juge mat]  départ : A_1
-    = [[0,0,0],[4,-8,8]]   ← A₁ = Av₁v₁ᵀ, avec v₁ = (1 ; −2 ; 2)/3
+    = [[-3,3,0],[0,0,0]]   ← A₁ = Av₁v₁ᵀ, avec v₁ = (1 ; −1 ; 0)/√2
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = 6   ← Le plus grand terme jeté : σ₂
-  aides : AᵀA = [[32,−16,40],[−16,80,−56],[40,−56,68]] : ses valeurs propres sont les σᵢ² (et des 0). | σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire | σ₁ = 12, v₁ = (1 ; −2 ; 2)/3, A₁ = [[0,0,0],[4,−8,8]], erreur 6
+    = 3   ← Le plus grand terme jeté : σ₂
+  aides : AᵀA = [[9,−9,0],[−9,9,0],[0,0,9]] : ses valeurs propres sont les σᵢ² (et des 0). | σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire | σ₁ = 3√2, v₁ = (1 ; −1 ; 0)/√2, A₁ = [[−3,3,0],[0,0,0]], erreur 3
   pièges : l_svd_sigma_is_eig, m_rankk_wrong_sigma
 
-A = [[-7,6,1],[-1,-6,7]]. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.
+A = [[5,-10],[11,-2],[0,0]]. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.
   [free, suivre l'erreur]  σ_1
     (σ₁, la plus grande valeur singulière : la racine de la plus grande valeur propre de AᵀA (ou de AAᵀ, plus petite).)
-    = 6√3   ← √108
-  — v₁ : un vecteur propre de AᵀA pour λ = 108.  [juge eigvec]  départ : v_1
-    = (1 ; -2 ; 1)   ← (AᵀA − 108I)v = 0
+    = 10√2   ← √200
+  — v₁ : un vecteur propre de AᵀA pour λ = 200.  [juge eigvec]  départ : v_1
+    = (4 ; -3)   ← (AᵀA − 200I)v = 0
   — A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.  [juge mat]  départ : A_1
-    = [[-3,6,-3],[3,-6,3]]   ← A₁ = Av₁v₁ᵀ, avec v₁ = (1 ; −2 ; 1)/√6
+    = [[8,-6],[8,-6],[0,0]]   ← A₁ = Av₁v₁ᵀ, avec v₁ = (4 ; −3)/5
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = 8   ← Le plus grand terme jeté : σ₂
-  aides : AᵀA = [[50,−36,−14],[−36,72,−36],[−14,−36,50]] : ses valeurs propres sont les σᵢ² (et des 0). | σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire | σ₁ = 6√3, v₁ = (1 ; −2 ; 1)/√6, A₁ = [[−3,6,−3],[3,−6,3]], erreur 8
+    = 5√2   ← Le plus grand terme jeté : σ₂
+  aides : AᵀA = [[146,−72],[−72,104]] : ses valeurs propres sont les σᵢ² (et des 0). | σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire | σ₁ = 10√2, v₁ = (4 ; −3)/5, A₁ = [[8,−6],[8,−6],[0,0]], erreur 5√2
   pièges : l_svd_sigma_is_eig, m_rankk_wrong_sigma
 
-A = [[-1,-8],[-7,4],[0,0]]. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.
+A = [[-4,2,4],[1,-2,2]]. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.
   [free, suivre l'erreur]  σ_1
     (σ₁, la plus grande valeur singulière : la racine de la plus grande valeur propre de AᵀA (ou de AAᵀ, plus petite).)
-    = 3√10   ← √90
-  — v₁ : un vecteur propre de AᵀA pour λ = 90.  [juge eigvec]  départ : v_1
-    = (-1 ; 2)   ← (AᵀA − 90I)v = 0
+    = 6   ← √36
+  — v₁ : un vecteur propre de AᵀA pour λ = 36.  [juge eigvec]  départ : v_1
+    = (2 ; -1 ; -2)   ← (AᵀA − 36I)v = 0
   — A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.  [juge mat]  départ : A_1
-    = [[3,-6],[-3,6],[0,0]]   ← A₁ = Av₁v₁ᵀ, avec v₁ = (−1 ; 2)/√5
+    = [[-4,2,4],[0,0,0]]   ← A₁ = Av₁v₁ᵀ, avec v₁ = (2 ; −1 ; −2)/3
   — L'erreur ‖A − A₁‖₂.  [juge value]  départ : E_1
-    = 2√10   ← Le plus grand terme jeté : σ₂
-  aides : AᵀA = [[50,−20],[−20,80]] : ses valeurs propres sont les σᵢ² (et des 0). | σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire | σ₁ = 3√10, v₁ = (−1 ; 2)/√5, A₁ = [[3,−6],[−3,6],[0,0]], erreur 2√10
+    = 3   ← Le plus grand terme jeté : σ₂
+  aides : AᵀA = [[17,−10,−14],[−10,8,4],[−14,4,20]] : ses valeurs propres sont les σᵢ² (et des 0). | σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire | σ₁ = 6, v₁ = (2 ; −1 ; −2)/3, A₁ = [[−4,2,4],[0,0,0]], erreur 3
   pièges : l_svd_sigma_is_eig, m_rankk_wrong_sigma
 
 ```
@@ -2873,6 +2862,26 @@ A = [[-1,-8],[-7,4],[0,0]]. Trouve σ₁ et v₁, puis la meilleure approximatio
 ### Niveau 5
 
 ```
+Une image 4 × 4 a les valeurs singulières 36, 28, 16, 12. On veut la compresser par Ak avec une erreur relative de Frobenius ‖A − Ak‖_F/‖A‖_F ≤ 30 %. Donne ‖A‖_F², le plus petit k, puis ‖A − Ak‖₂.
+  [free, sans aide]  N
+    (‖A‖_F² :)
+    = 2480   ← Σσᵢ²
+  — k minimal pour ‖A − Ak‖_F ≤ 30 % de ‖A‖_F.  [juge value]  départ : k
+    = 3   ← Σ_{i>k} σᵢ² ≤ 0,09·2480 = 223,2
+  — L'erreur ‖A − A3‖₂ pour ce k.  [juge value]  départ : E_3
+    = 12   ← σ₄
+  pièges : m_rankk_wrong_sigma
+
+Une image 4 × 4 a les valeurs singulières 36, 24, 20, 4. On veut la compresser par Ak avec une erreur relative de Frobenius ‖A − Ak‖_F/‖A‖_F ≤ 30 %. Donne ‖A‖_F², le plus petit k, puis ‖A − Ak‖₂.
+  [free, sans aide]  N
+    (‖A‖_F² :)
+    = 2288   ← Σσᵢ²
+  — k minimal pour ‖A − Ak‖_F ≤ 30 % de ‖A‖_F.  [juge value]  départ : k
+    = 3   ← Σ_{i>k} σᵢ² ≤ 0,09·2288 = 205,92
+  — L'erreur ‖A − A3‖₂ pour ce k.  [juge value]  départ : E_3
+    = 4   ← σ₄
+  pièges : m_rankk_wrong_sigma
+
 Une image 4 × 4 a les valeurs singulières 36, 28, 12, 8. On veut la compresser par Ak avec une erreur relative de Frobenius ‖A − Ak‖_F/‖A‖_F ≤ 20 %. Donne ‖A‖_F², le plus petit k, puis ‖A − Ak‖₂.
   [free, sans aide]  N
     (‖A‖_F² :)
@@ -2883,39 +2892,21 @@ Une image 4 × 4 a les valeurs singulières 36, 28, 12, 8. On veut la compresser
     = 8   ← σ₄
   pièges : m_rankk_wrong_sigma
 
-Une image 4 × 4 a les valeurs singulières 36, 32, 24, 16. On veut la compresser par Ak avec une erreur relative de Frobenius ‖A − Ak‖_F/‖A‖_F ≤ 30 %. Donne ‖A‖_F², le plus petit k, puis ‖A − Ak‖₂.
-  [free, sans aide]  N
-    (‖A‖_F² :)
-    = 3152   ← Σσᵢ²
-  — k minimal pour ‖A − Ak‖_F ≤ 30 % de ‖A‖_F.  [juge value]  départ : k
-    = 3   ← Σ_{i>k} σᵢ² ≤ 0,09·3152 = 283,68
-  — L'erreur ‖A − A3‖₂ pour ce k.  [juge value]  départ : E_3
-    = 16   ← σ₄
-  pièges : m_rankk_wrong_sigma
-
-Une image 4 × 4 a les valeurs singulières 32, 24, 12, 8. On veut la compresser par Ak avec une erreur relative de Frobenius ‖A − Ak‖_F/‖A‖_F ≤ 20 %. Donne ‖A‖_F², le plus petit k, puis ‖A − Ak‖₂.
-  [free, sans aide]  N
-    (‖A‖_F² :)
-    = 1808   ← Σσᵢ²
-  — k minimal pour ‖A − Ak‖_F ≤ 20 % de ‖A‖_F.  [juge value]  départ : k
-    = 3   ← Σ_{i>k} σᵢ² ≤ 0,04·1808 = 72,32
-  — L'erreur ‖A − A3‖₂ pour ce k.  [juge value]  départ : E_3
-    = 8   ← σ₄
-  pièges : m_rankk_wrong_sigma
-
 ```
 
 ### Variantes d'examen
 
 ```
-A = [[0,3],[-3,0],[3,0]] (valeurs singulières 3√2 et 3). Quelle est l'image par A de la sphère unité de ℝ² ?
-  · Un ellipsoïde de ℝ³ de demi-axes 3√2, 3 et 1   ✔ Une ellipse (la courbe seule), de demi-axes 3√2 et 3, dans un plan de ℝ³   · L'ellipse pleine de demi-axes 3√2 et 3, dans un plan de ℝ³ [l_svd_sphere_boundary]   · Un cercle de rayon 3√2
+A = [[6,2,-4],[-6,-4,2],[-1,1,-1]] a les valeurs singulières 6√3, 2, √3. Que vaut ‖A − A₁‖₂, où A₁ est la meilleure approximation de rang 1 de A ?
+  · √7   · 6√3 [m_rankk_wrong_sigma]   · 4 [l_svd_sigma_is_eig]   ✔ 2
   [examen mcq]
-  pièges : l_svd_sphere_boundary
+  pièges : m_rankk_wrong_sigma, l_svd_sigma_is_eig
 
 Vrai ou faux ?
-  « ‖A‖_F² = Σ aᵢⱼ² = Σ σᵢ². » → VRAI
+  « Pour toute matrice A, ‖A − A₁‖_F = σ₂. » → FAUX
+    contre-exemple (mx) : A = [[3,0,0],[0,2,0],[0,0,1]]
   [examen tf]
+  pièges : m_rankk_wrong_sigma
 
 ```
 
@@ -2926,43 +2917,43 @@ _‖·‖₁ par colonnes, ‖·‖∞ par lignes, ‖·‖₂ = σ₁, Frobeniu
 ### Niveau 1
 
 ```
-A = [[-5,0],[4,3]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
+A = [[-4,-4],[-5,5]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
   [guided]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
-    = max(|−5| + |□|,|0| + |□|)   (trous : max(|−5| + |4|,|0| + |3|))   ← Colonnes
-    = 9   ← le plus grand de (9 ; 3)
+    = max(|−4| + |−□|,|−4| + |□|)   (trous : max(|−4| + |−5|,|−4| + |5|))   ← Colonnes
+    = 9   ← le plus grand de (9 ; 9)
   — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|−5| + |□|,|4| + |□|)   (trous : max(|−5| + |0|,|4| + |3|))   ← Lignes
-    = 7   ← le plus grand de (5 ; 7)
+    = max(|−□| + |−4|,|−□| + |5|)   (trous : max(|−4| + |−4|,|−5| + |5|))   ← Lignes
+    = 10   ← le plus grand de (8 ; 10)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = 5√2   ← √((−5)² + 0² + 4² + 3²) = √50
-  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 3) | ‖A‖₁ = 9, ‖A‖∞ = 7, ‖A‖_F = 5√2
+    = √82   ← √((−4)² + (−4)² + (−5)² + 5²) = √82
+  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 9) | ‖A‖₁ = 9, ‖A‖∞ = 10, ‖A‖_F = √82
   pièges : m_norm_1_inf_swap
 
-A = [[-5,-2],[-5,2]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
+A = [[-5,1],[-2,2]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
   [guided]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
-    = max(|−□| + |−5|,|−□| + |2|)   (trous : max(|−5| + |−5|,|−2| + |2|))   ← Colonnes
-    = 10   ← le plus grand de (10 ; 4)
+    = max(|−5| + |−□|,|1| + |□|)   (trous : max(|−5| + |−2|,|1| + |2|))   ← Colonnes
+    = 7   ← le plus grand de (7 ; 3)
   — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|−5| + |−□|,|−5| + |□|)   (trous : max(|−5| + |−2|,|−5| + |2|))   ← Lignes
-    = 7   ← le plus grand de (7 ; 7)
+    = max(|−5| + |□|,|−□| + |2|)   (trous : max(|−5| + |1|,|−2| + |2|))   ← Lignes
+    = 6   ← le plus grand de (6 ; 4)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = √58   ← √((−5)² + (−2)² + (−5)² + 2²) = √58
-  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 4) | ‖A‖₁ = 10, ‖A‖∞ = 7, ‖A‖_F = √58
+    = √34   ← √((−5)² + 1² + (−2)² + 2²) = √34
+  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 3) | ‖A‖₁ = 7, ‖A‖∞ = 6, ‖A‖_F = √34
   pièges : m_norm_1_inf_swap
 
-A = [[4,-1],[2,2]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
+A = [[-4,-2],[-1,2]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
   [guided]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
-    = max(|4| + |□|,|−1| + |□|)   (trous : max(|4| + |2|,|−1| + |2|))   ← Colonnes
-    = 6   ← le plus grand de (6 ; 3)
-  — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|4| + |−□|,|□| + |2|)   (trous : max(|4| + |−1|,|2| + |2|))   ← Lignes
+    = max(|−4| + |−□|,|−□| + |2|)   (trous : max(|−4| + |−1|,|−2| + |2|))   ← Colonnes
     = 5   ← le plus grand de (5 ; 4)
+  — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
+    = max(|−4| + |−□|,|−1| + |□|)   (trous : max(|−4| + |−2|,|−1| + |2|))   ← Lignes
+    = 6   ← le plus grand de (6 ; 3)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = 5   ← √(4² + (−1)² + 2² + 2²) = √25
-  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 3) | ‖A‖₁ = 6, ‖A‖∞ = 5, ‖A‖_F = 5
+    = 5   ← √((−4)² + (−2)² + (−1)² + 2²) = √25
+  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 4) | ‖A‖₁ = 5, ‖A‖∞ = 6, ‖A‖_F = 5
   pièges : m_norm_1_inf_swap
 
 ```
@@ -2970,46 +2961,46 @@ A = [[4,-1],[2,2]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖
 ### Niveau 2
 
 ```
-A = [[-4,4],[1,1]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
+A = [[4,0],[3,-5]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
   [guided]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
     ? Pour ‖A‖₁, que somme-t-on ? ✔ Les |aᵢⱼ| de chaque colonne / · Les |aᵢⱼ| de chaque ligne / · Tous les |aᵢⱼ|
-    = max(|−4| + |□|,|4| + |□|)   (trous : max(|−4| + |1|,|4| + |1|))   ← Colonnes
-    = 5   ← le plus grand de (5 ; 5)
+    = max(|4| + |□|,|0| + |−□|)   (trous : max(|4| + |3|,|0| + |−5|))   ← Colonnes
+    = 7   ← le plus grand de (7 ; 5)
   — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|−□| + |4|,|□| + |1|)   (trous : max(|−4| + |4|,|1| + |1|))   ← Lignes
-    = 8   ← le plus grand de (8 ; 2)
+    = max(|4| + |□|,|3| + |−□|)   (trous : max(|4| + |0|,|3| + |−5|))   ← Lignes
+    = 8   ← le plus grand de (4 ; 8)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = √34   ← √((−4)² + 4² + 1² + 1²) = √34
-  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 5) | ‖A‖₁ = 5, ‖A‖∞ = 8, ‖A‖_F = √34
+    = 5√2   ← √(4² + 0² + 3² + (−5)²) = √50
+  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 5) | ‖A‖₁ = 7, ‖A‖∞ = 8, ‖A‖_F = 5√2
   pièges : m_norm_1_inf_swap
 
-A = [[-5,-5],[1,-1]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
+A = [[-1,-1],[-5,5]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
   [guided]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
     ? Pour ‖A‖₁, que somme-t-on ? ✔ Les |aᵢⱼ| de chaque colonne / · Les |aᵢⱼ| de chaque ligne / · Tous les |aᵢⱼ|
-    = max(|−5| + |□|,|−5| + |−□|)   (trous : max(|−5| + |1|,|−5| + |−1|))   ← Colonnes
+    = max(|−1| + |−□|,|−1| + |□|)   (trous : max(|−1| + |−5|,|−1| + |5|))   ← Colonnes
     = 6   ← le plus grand de (6 ; 6)
   — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|−□| + |−5|,|□| + |−1|)   (trous : max(|−5| + |−5|,|1| + |−1|))   ← Lignes
-    = 10   ← le plus grand de (10 ; 2)
-  — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = 2√13   ← √((−5)² + (−5)² + 1² + (−1)²) = √52
-  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 6) | ‖A‖₁ = 6, ‖A‖∞ = 10, ‖A‖_F = 2√13
-  pièges : m_norm_1_inf_swap
-
-A = [[1,1],[5,-5]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
-  [guided]  N_1
-    (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
-    ? Pour ‖A‖₁, que somme-t-on ? ✔ Les |aᵢⱼ| de chaque colonne / · Les |aᵢⱼ| de chaque ligne / · Tous les |aᵢⱼ|
-    = max(|1| + |□|,|1| + |−□|)   (trous : max(|1| + |5|,|1| + |−5|))   ← Colonnes
-    = 6   ← le plus grand de (6 ; 6)
-  — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|□| + |1|,|□| + |−5|)   (trous : max(|1| + |1|,|5| + |−5|))   ← Lignes
+    = max(|−□| + |−1|,|−□| + |5|)   (trous : max(|−1| + |−1|,|−5| + |5|))   ← Lignes
     = 10   ← le plus grand de (2 ; 10)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = 2√13   ← √(1² + 1² + 5² + (−5)²) = √52
+    = 2√13   ← √((−1)² + (−1)² + (−5)² + 5²) = √52
   aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 6) | ‖A‖₁ = 6, ‖A‖∞ = 10, ‖A‖_F = 2√13
+  pièges : m_norm_1_inf_swap
+
+A = [[2,2],[1,-4]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₁, ‖A‖∞ et ‖A‖_F.
+  [guided]  N_1
+    (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
+    ? Pour ‖A‖₁, que somme-t-on ? ✔ Les |aᵢⱼ| de chaque colonne / · Les |aᵢⱼ| de chaque ligne / · Tous les |aᵢⱼ|
+    = max(|2| + |□|,|2| + |−□|)   (trous : max(|2| + |1|,|2| + |−4|))   ← Colonnes
+    = 6   ← le plus grand de (3 ; 6)
+  — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
+    = max(|□| + |2|,|1| + |−□|)   (trous : max(|2| + |2|,|1| + |−4|))   ← Lignes
+    = 5   ← le plus grand de (4 ; 5)
+  — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
+    = 5   ← √(2² + 2² + 1² + (−4)²) = √25
+  aides : ‖·‖₁ : colonnes (le 1 est vertical) ; ‖·‖∞ : lignes (le ∞ est couché). | ‖A‖₁ = max(□ ; 6) | ‖A‖₁ = 6, ‖A‖∞ = 5, ‖A‖_F = 5
   pièges : m_norm_1_inf_swap
 
 ```
@@ -3017,55 +3008,55 @@ A = [[1,1],[5,-5]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖
 ### Niveau 3
 
 ```
-A = [[-5,2],[-1,2]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule les quatre normes. Choisis d'abord chaque action.
+A = [[-5,5],[1,1]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule les quatre normes. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
-    = max(|−5| + |−1|,|2| + |2|)   ← Colonnes
-    = 6   ← le plus grand de (6 ; 4)
+    = max(|−5| + |1|,|5| + |1|)   ← Colonnes
+    = 6   ← le plus grand de (6 ; 6)
   — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|−5| + |2|,|−1| + |2|)   ← Lignes
-    = 7   ← le plus grand de (7 ; 3)
+    = max(|−5| + |5|,|1| + |1|)   ← Lignes
+    = 10   ← le plus grand de (10 ; 2)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = √34   ← √((−5)² + 2² + (−1)² + 2²) = √34
+    = 2√13   ← √((−5)² + 5² + 1² + 1²) = √52
   — AᵀA.  [juge mat]  départ : A^T·A
-    = [[26,-12],[-12,8]]   ← Produit, symétrique
+    = [[26,-24],[-24,26]]   ← Produit, symétrique
   — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-    = 4√2   ← √32 : valeurs propres de AᵀA 32 et 2 (trace 34, déterminant 64)
-  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[26, □], [□, 8]] | ‖A‖₂ = 4√2, ‖A‖_F = √34
+    = 5√2   ← √50 : valeurs propres de AᵀA 50 et 2 (trace 52, déterminant 100)
+  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[26, □], [□, 26]] | ‖A‖₂ = 5√2, ‖A‖_F = 2√13
   pièges : m_norm_1_inf_swap, m_norm2_eig
 
-A = [[-4,-1],[0,3]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule les quatre normes. Choisis d'abord chaque action.
+A = [[-3,-3],[1,-1]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule les quatre normes. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
-    = max(|−4| + |0|,|−1| + |3|)   ← Colonnes
+    = max(|−3| + |1|,|−3| + |−1|)   ← Colonnes
     = 4   ← le plus grand de (4 ; 4)
   — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|−4| + |−1|,|0| + |3|)   ← Lignes
-    = 5   ← le plus grand de (5 ; 3)
+    = max(|−3| + |−3|,|1| + |−1|)   ← Lignes
+    = 6   ← le plus grand de (6 ; 2)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = √26   ← √((−4)² + (−1)² + 0² + 3²) = √26
+    = 2√5   ← √((−3)² + (−3)² + 1² + (−1)²) = √20
   — AᵀA.  [juge mat]  départ : A^T·A
-    = [[16,4],[4,10]]   ← Produit, symétrique
+    = [[10,8],[8,10]]   ← Produit, symétrique
   — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-    = 3√2   ← √18 : valeurs propres de AᵀA 18 et 8 (trace 26, déterminant 144)
-  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[16, □], [□, 10]] | ‖A‖₂ = 3√2, ‖A‖_F = √26
+    = 3√2   ← √18 : valeurs propres de AᵀA 18 et 2 (trace 20, déterminant 36)
+  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[10, □], [□, 10]] | ‖A‖₂ = 3√2, ‖A‖_F = 2√5
   pièges : m_norm_1_inf_swap, m_norm2_eig
 
-A = [[-2,-1],[-2,1]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule les quatre normes. Choisis d'abord chaque action.
+A = [[4,4],[-3,3]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule les quatre normes. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  N_1
     (‖A‖₁ : la plus grande somme des |aᵢⱼ| d'une colonne.)
-    = max(|−2| + |−2|,|−1| + |1|)   ← Colonnes
-    = 4   ← le plus grand de (4 ; 2)
+    = max(|4| + |−3|,|4| + |3|)   ← Colonnes
+    = 7   ← le plus grand de (7 ; 7)
   — ‖A‖∞ : la plus grande somme des |aᵢⱼ| d'une ligne.  [juge value]  départ : N_∞
-    = max(|−2| + |−1|,|−2| + |1|)   ← Lignes
-    = 3   ← le plus grand de (3 ; 3)
+    = max(|4| + |4|,|−3| + |3|)   ← Lignes
+    = 8   ← le plus grand de (8 ; 6)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = √10   ← √((−2)² + (−1)² + (−2)² + 1²) = √10
+    = 5√2   ← √(4² + 4² + (−3)² + 3²) = √50
   — AᵀA.  [juge mat]  départ : A^T·A
-    = [[8,0],[0,2]]   ← Produit, symétrique
+    = [[25,7],[7,25]]   ← Produit, symétrique
   — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-    = 2√2   ← √8 : valeurs propres de AᵀA 8 et 2 (trace 10, déterminant 16)
-  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[8, □], [□, 2]] | ‖A‖₂ = 2√2, ‖A‖_F = √10
+    = 4√2   ← √32 : valeurs propres de AᵀA 32 et 18 (trace 50, déterminant 576)
+  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[25, □], [□, 25]] | ‖A‖₂ = 4√2, ‖A‖_F = 5√2
   pièges : m_norm_1_inf_swap, m_norm2_eig
 
 ```
@@ -3073,37 +3064,37 @@ A = [[-2,-1],[-2,1]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A�
 ### Niveau 4
 
 ```
-A = [[-4,-3],[-5,0]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₂ par AᵀA (A n'est pas symétrique), puis ‖A‖_F.
+A = [[-2,-1],[2,5]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₂ par AᵀA (A n'est pas symétrique), puis ‖A‖_F.
   [free, suivre l'erreur]  A^T·A
     (AᵀA.)
-    = [[41,12],[12,9]]   ← Produit, symétrique
-  — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-    = 3√5   ← √45 : valeurs propres de AᵀA 45 et 5 (trace 50, déterminant 225)
-  — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = 5√2   ← √((−4)² + (−3)² + (−5)² + 0²) = √50
-  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[41, □], [□, 9]] | ‖A‖₂ = 3√5, ‖A‖_F = 5√2
-  pièges : m_norm_1_inf_swap, m_norm2_eig
-
-A = [[-5,2],[1,-2]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₂ par AᵀA (A n'est pas symétrique), puis ‖A‖_F.
-  [free, suivre l'erreur]  A^T·A
-    (AᵀA.)
-    = [[26,-12],[-12,8]]   ← Produit, symétrique
+    = [[8,12],[12,26]]   ← Produit, symétrique
   — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
     = 4√2   ← √32 : valeurs propres de AᵀA 32 et 2 (trace 34, déterminant 64)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = √34   ← √((−5)² + 2² + 1² + (−2)²) = √34
-  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[26, □], [□, 8]] | ‖A‖₂ = 4√2, ‖A‖_F = √34
+    = √34   ← √((−2)² + (−1)² + 2² + 5²) = √34
+  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[8, □], [□, 26]] | ‖A‖₂ = 4√2, ‖A‖_F = √34
   pièges : m_norm_1_inf_swap, m_norm2_eig
 
-A = [[5,0],[4,3]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₂ par AᵀA (A n'est pas symétrique), puis ‖A‖_F.
+A = [[5,-5],[-3,-3]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₂ par AᵀA (A n'est pas symétrique), puis ‖A‖_F.
   [free, suivre l'erreur]  A^T·A
     (AᵀA.)
-    = [[41,12],[12,9]]   ← Produit, symétrique
+    = [[34,-16],[-16,34]]   ← Produit, symétrique
   — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-    = 3√5   ← √45 : valeurs propres de AᵀA 45 et 5 (trace 50, déterminant 225)
+    = 5√2   ← √50 : valeurs propres de AᵀA 50 et 18 (trace 68, déterminant 900)
   — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
-    = 5√2   ← √(5² + 0² + 4² + 3²) = √50
-  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[41, □], [□, 9]] | ‖A‖₂ = 3√5, ‖A‖_F = 5√2
+    = 2√17   ← √(5² + (−5)² + (−3)² + (−3)²) = √68
+  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[34, □], [□, 34]] | ‖A‖₂ = 5√2, ‖A‖_F = 2√17
+  pièges : m_norm_1_inf_swap, m_norm2_eig
+
+A = [[2,4],[2,-4]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖₂ et N_F = ‖A‖_F. Calcule ‖A‖₂ par AᵀA (A n'est pas symétrique), puis ‖A‖_F.
+  [free, suivre l'erreur]  A^T·A
+    (AᵀA.)
+    = [[8,0],[0,32]]   ← Produit, symétrique
+  — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
+    = 4√2   ← √32 : valeurs propres de AᵀA 32 et 8 (trace 40, déterminant 256)
+  — ‖A‖_F : la racine de la somme des carrés des cases.  [juge value]  départ : N_F
+    = 2√10   ← √(2² + 4² + 2² + (−4)²) = √40
+  aides : ‖A‖₂ n'est pas lue sur A : c'est √(λ_max(AᵀA)), sauf si A est symétrique. | AᵀA = [[8, □], [□, 32]] | ‖A‖₂ = 4√2, ‖A‖_F = 2√10
   pièges : m_norm_1_inf_swap, m_norm2_eig
 
 ```
@@ -3111,57 +3102,58 @@ A = [[5,0],[4,3]]. On note N₁ = ‖A‖₁, N∞ = ‖A‖∞, N₂ = ‖A‖�
 ### Niveau 5
 
 ```
-Normes de matrices. A = [[2,4],[2,-1]].
+Normes de matrices. A = [[4,1],[0,-3]].
   [problème, 4 points]
   partie 1 (‖A‖₂ : 1 ; ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA). : 1)
-  ‖A‖₂ pour A = [[2,4],[2,-1]].
+  ‖A‖₂ pour A = [[4,1],[0,-3]].
     [free, sans aide, suivre l'erreur]  A^T·A
       (AᵀA.)
-      = [[8,6],[6,17]]   ← Produit, symétrique
+      = [[16,4],[4,10]]   ← Produit, symétrique
     — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-      = 2√5   ← √20 : valeurs propres de AᵀA 20 et 5 (trace 25, déterminant 100)
+      = 3√2   ← √18 : valeurs propres de AᵀA 18 et 8 (trace 26, déterminant 144)
   partie 2 (Vrai ou faux : 1)
-  Vrai ou faux ?
-    « Pour toute matrice carrée A, ρ(A) ≤ ‖A‖∞. » → VRAI
-  partie 3 (Vrai ou faux : 1)
-  Vrai ou faux ?
-    « Pour toute norme subordonnée, ‖AB‖ ≤ ‖A‖·‖B‖. » → VRAI
-  pièges : m_norm2_eig
-
-Normes de matrices. A = [[-2,-1],[2,5]].
-  [problème, 4 points]
-  partie 1 (‖A‖₂ : 1 ; ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA). : 1)
-  ‖A‖₂ pour A = [[-2,-1],[2,5]].
-    [free, sans aide, suivre l'erreur]  A^T·A
-      (AᵀA.)
-      = [[8,12],[12,26]]   ← Produit, symétrique
-    — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-      = 4√2   ← √32 : valeurs propres de AᵀA 32 et 2 (trace 34, déterminant 64)
-  partie 2 (Vrai ou faux : 1)
-  Vrai ou faux ?
-    « Pour toute matrice carrée A, ρ(A) ≤ ‖A‖∞. » → VRAI
-  partie 3 (Vrai ou faux : 1)
   Vrai ou faux ?
     « Pour toute matrice A, ‖A‖_F = ‖A‖₂. » → FAUX
       contre-exemple (mx) : A = [[1,0],[0,1]]
+  partie 3 (Vrai ou faux : 1)
+  Vrai ou faux ?
+    « Pour toute matrice carrée A, ρ(A) ≤ ‖A‖∞. » → VRAI
   pièges : m_norm2_eig
 
-Normes de matrices. A = [[-4,-5],[-4,5]].
+Normes de matrices. A = [[2,3],[2,-3]].
   [problème, 4 points]
   partie 1 (‖A‖₂ : 1 ; ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA). : 1)
-  ‖A‖₂ pour A = [[-4,-5],[-4,5]].
+  ‖A‖₂ pour A = [[2,3],[2,-3]].
     [free, sans aide, suivre l'erreur]  A^T·A
       (AᵀA.)
-      = [[32,0],[0,50]]   ← Produit, symétrique
+      = [[8,0],[0,18]]   ← Produit, symétrique
     — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
-      = 5√2   ← √50 : valeurs propres de AᵀA 50 et 32 (trace 82, déterminant 1600)
+      = 3√2   ← √18 : valeurs propres de AᵀA 18 et 8 (trace 26, déterminant 144)
   partie 2 (Vrai ou faux : 1)
   Vrai ou faux ?
     « Pour toute matrice carrée A, ρ(A) ≤ ‖A‖∞. » → VRAI
   partie 3 (Vrai ou faux : 1)
   Vrai ou faux ?
+    « Pour toute matrice A, ‖A‖₁ = ‖A‖∞. » → FAUX
+      contre-exemple (mx) : A = [[3,0],[4,5]]
+  pièges : m_norm2_eig, m_norm_1_inf_swap
+
+Normes de matrices. A = [[1,5],[1,-5]].
+  [problème, 4 points]
+  partie 1 (‖A‖₂ : 1 ; ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA). : 1)
+  ‖A‖₂ pour A = [[1,5],[1,-5]].
+    [free, sans aide, suivre l'erreur]  A^T·A
+      (AᵀA.)
+      = [[2,0],[0,50]]   ← Produit, symétrique
+    — ‖A‖₂ = σ₁ = √(plus grande valeur propre de AᵀA).  [juge value]  départ : N_2
+      = 5√2   ← √50 : valeurs propres de AᵀA 50 et 2 (trace 52, déterminant 100)
+  partie 2 (Vrai ou faux : 1)
+  Vrai ou faux ?
     « Pour toute matrice A, ‖A‖_F = ‖A‖₂. » → FAUX
       contre-exemple (mx) : A = [[1,0],[0,1]]
+  partie 3 (Vrai ou faux : 1)
+  Vrai ou faux ?
+    « Pour toute matrice carrée A, ρ(A) ≤ ‖A‖∞. » → VRAI
   pièges : m_norm2_eig
 
 ```
@@ -3169,16 +3161,16 @@ Normes de matrices. A = [[-4,-5],[-4,5]].
 ### Variantes d'examen
 
 ```
-A = [[1,3],[4,0]]. Que vaut ‖A‖₂ ?
-  · 18 [l_svd_sigma_is_eig]   ✔ 3√2   · √26   · 4 [m_norm2_eig]
+A = [[5,-4],[0,-3]]. Que vaut ‖A‖₂ ?
+  · 5√2   · 45 [l_svd_sigma_is_eig]   · 5 [m_norm2_eig]   ✔ 3√5
   [examen mcq]
   pièges : m_norm2_eig, l_svd_sigma_is_eig
 
 Vrai ou faux ?
-  « Pour toute matrice A, ‖A‖₁ = ‖A‖∞. » → FAUX
-    contre-exemple (mx) : A = [[3,0],[4,5]]
+  « Pour toute matrice carrée A, ‖A‖₂ = max |λᵢ(A)|. » → FAUX
+    contre-exemple (matOne) : A = [[0,1],[0,0]]
   [examen tf]
-  pièges : m_norm_1_inf_swap
+  pièges : m_norm2_eig
 
 ```
 
@@ -3189,103 +3181,114 @@ _κ = ‖A‖·‖A⁻¹‖ amplifie l'erreur relative ; κ₂ = σ₁/σₙ._
 ### Niveau 1
 
 ```
-A = [[-5,-4],[0,-3]] ; AᵀA a les valeurs propres 45 et 5. Calcule κ₂(A).
-  [guided]  κ_2
-    (κ₂(A) = σ₁/σ₂.)
-    = □   (trous : 3)   ← √(45/5) : σ₁² = 45, σ₂² = 5 (valeurs propres de AᵀA)
-  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = √(45/□) | 3
-  pièges : m_cond_eig_nonsym
-
-A = [[-4,3],[0,5]] ; AᵀA a les valeurs propres 40 et 10. Calcule κ₂(A).
-  [guided]  κ_2
-    (κ₂(A) = σ₁/σ₂.)
-    = □   (trous : 2)   ← √(40/10) : σ₁² = 40, σ₂² = 10 (valeurs propres de AᵀA)
-  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = √(40/□) | 2
-  pièges : m_cond_eig_nonsym
-
-A = [[6,3],[3,6]] est symétrique, de valeurs propres 9 et 3. Calcule κ₂(A).
+A = [[3,-4],[-4,9]] est symétrique, de valeurs propres 11 et 1. Calcule κ₂(A).
   [guided]  κ_2
     (κ₂(A).)
-    = 9/□   (trous : 9/3)   ← λ_max/λ_min
-    = □   (trous : 3)   ← Simplifié
-  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 9/□ | 3
+    = □   (trous : 11)   ← λ_max/λ_min = 11/1
+  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 11/□ | 11
+
+A = [[5,3],[3,5]] est symétrique, de valeurs propres 8 et 2. Calcule κ₂(A).
+  [guided]  κ_2
+    (κ₂(A).)
+    = 8/□   (trous : 8/2)   ← λ_max/λ_min
+    = □   (trous : 4)   ← Simplifié
+  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 8/□ | 4
+
+A = [[2,1],[1,2]] est symétrique, de valeurs propres 3 et 1. Calcule κ₂(A).
+  [guided]  κ_2
+    (κ₂(A).)
+    = □   (trous : 3)   ← λ_max/λ_min = 3/1
+  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 3/□ | 3
 
 ```
 
 ### Niveau 2
 
 ```
-A = [[-4,-3],[0,5]] ; AᵀA a les valeurs propres 40 et 10. Calcule κ₂(A).
+A = [[6,3],[3,6]] est symétrique, de valeurs propres 9 et 3. Calcule κ₂(A).
+  [guided]  κ_2
+    (κ₂(A).)
+    ? A est symétrique définie positive. Quelle formule pour κ₂ ? ✔ λ_max/λ_min / · 1/|det A| : plus det est petit, plus A est mal conditionnée / · λ_max − λ_min
+    = 9/□   (trous : 9/3)   ← λ_max/λ_min
+    = □   (trous : 3)   ← Simplifié
+  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 9/□ | 3
+  pièges : m_cond_det
+
+A = [[3,2],[2,3]] est symétrique, de valeurs propres 5 et 1. Calcule κ₂(A).
+  [guided]  κ_2
+    (κ₂(A).)
+    ? A est symétrique définie positive. Quelle formule pour κ₂ ? ✔ λ_max/λ_min / · 1/|det A| : plus det est petit, plus A est mal conditionnée / · λ_max − λ_min
+    = □   (trous : 5)   ← λ_max/λ_min = 5/1
+  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 5/□ | 5
+  pièges : m_cond_det
+
+A = [[-5,3],[0,4]] ; AᵀA a les valeurs propres 40 et 10. Calcule κ₂(A).
   [guided]  κ_2
     (κ₂(A) = σ₁/σ₂.)
-    ? A n'est pas symétrique. Quelle formule pour κ₂ ? ✔ σ₁/σ₂, avec les valeurs propres de AᵀA / · |λ_max/λ_min| avec les valeurs propres de A (−4 et 5)
+    ? A n'est pas symétrique. Quelle formule pour κ₂ ? ✔ σ₁/σ₂, avec les valeurs propres de AᵀA / · |λ_max/λ_min| avec les valeurs propres de A (−5 et 4)
     = □   (trous : 2)   ← √(40/10) : σ₁² = 40, σ₂² = 10 (valeurs propres de AᵀA)
   aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = √(40/□) | 2
   pièges : m_cond_eig_nonsym
-
-A = [[6,-4],[-4,6]] est symétrique, de valeurs propres 10 et 2. Calcule κ₂(A).
-  [guided]  κ_2
-    (κ₂(A).)
-    ? A est symétrique définie positive. Quelle formule pour κ₂ ? ✔ λ_max/λ_min / · 1/|det A| : plus det est petit, plus A est mal conditionnée / · λ_max − λ_min
-    = 10/□   (trous : 10/2)   ← λ_max/λ_min
-    = □   (trous : 5)   ← Simplifié
-  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 10/□ | 5
-  pièges : m_cond_det
-
-A = [[4,-3],[-3,4]] est symétrique, de valeurs propres 7 et 1. Calcule κ₂(A).
-  [guided]  κ_2
-    (κ₂(A).)
-    ? A est symétrique définie positive. Quelle formule pour κ₂ ? ✔ λ_max/λ_min / · 1/|det A| : plus det est petit, plus A est mal conditionnée / · λ_max − λ_min
-    = □   (trous : 7)   ← λ_max/λ_min = 7/1
-  aides : κ₂ = plus grande sur plus petite valeur singulière ; pour A symétrique définie positive, λ_max/λ_min. | κ₂ = 7/□ | 7
-  pièges : m_cond_det
 
 ```
 
 ### Niveau 3
 
 ```
-A = [[6,-4],[-4,6]] (valeurs propres 10 et 2), Ax = b avec b = (10 ; -10), donc x = (1 ; -1). On perturbe b de δb = (1/10 ; 1/10). Calcule κ₂(A), ‖δb‖/‖b‖, la borne sur ‖δx‖/‖x‖, puis ‖δx‖/‖x‖. Choisis d'abord chaque action.
+A = [[6,-2],[-2,9]] (valeurs propres 10 et 5), Ax = b avec b = (10 ; -20), donc x = (1 ; -2). On perturbe b de δb = (1/5 ; 1/10). Calcule κ₂(A), ‖δb‖/‖b‖, la borne sur ‖δx‖/‖x‖, puis ‖δx‖/‖x‖. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  κ_2
     (κ₂(A).)
-    = 5   ← λ_max/λ_min = 10/2
+    = 2   ← λ_max/λ_min = 10/5
   — L'erreur relative de b, ‖δb‖/‖b‖ (norme 2).  [juge value]  départ : r_b
-    = 1/100   ← δb = 1/10·(1 ; 1) et b = 10·(1 ; −1), de même norme √2
+    = 1/100   ← δb = 1/10·(2 ; 1) et b = 10·(1 ; −2), de même norme √5
   — La borne κ₂·‖δb‖/‖b‖ sur l'erreur relative de x.  [juge value]  départ : B
-    = 1/20   ← 5 × 1/100
+    = 1/50   ← 2 × 1/100
   — L'erreur relative ‖δx‖/‖x‖ vraiment obtenue.  [juge value]  départ : r_x
-    = 1/20   ← δb est vecteur propre pour 2 : δx = δb/2, la borne est atteinte
-  aides : ‖δx‖/‖x‖ ≤ κ(A)·‖δb‖/‖b‖ ; si δb est vecteur propre de la plus petite valeur propre, δx = δb/λ_min. | borne = 5 × □ | κ₂ = 5, ‖δb‖/‖b‖ = 1/100, borne = ‖δx‖/‖x‖ = 1/20
+    = 1/50   ← δb est vecteur propre pour 5 : δx = δb/5, la borne est atteinte
+  aides : ‖δx‖/‖x‖ ≤ κ(A)·‖δb‖/‖b‖ ; si δb est vecteur propre de la plus petite valeur propre, δx = δb/λ_min. | borne = 2 × □ | κ₂ = 2, ‖δb‖/‖b‖ = 1/100, borne = ‖δx‖/‖x‖ = 1/50
 
-A = [[6,-4],[-4,6]] (valeurs propres 10 et 2), Ax = b avec b = (10 ; -10), donc x = (1 ; -1). On perturbe b de δb = (1/10 ; 1/10). Calcule κ₂(A), ‖δb‖/‖b‖, la borne sur ‖δx‖/‖x‖, puis ‖δx‖/‖x‖. Choisis d'abord chaque action.
+A = [[4,-2],[-2,4]] (valeurs propres 6 et 2), Ax = b avec b = (6 ; -6), donc x = (1 ; -1). On perturbe b de δb = (3/50 ; 3/50). Calcule κ₂(A), ‖δb‖/‖b‖, la borne sur ‖δx‖/‖x‖, puis ‖δx‖/‖x‖. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  κ_2
     (κ₂(A).)
-    = 5   ← λ_max/λ_min = 10/2
+    = 3   ← λ_max/λ_min = 6/2
   — L'erreur relative de b, ‖δb‖/‖b‖ (norme 2).  [juge value]  départ : r_b
-    = 1/100   ← δb = 1/10·(1 ; 1) et b = 10·(1 ; −1), de même norme √2
-  — La borne κ₂·‖δb‖/‖b‖ sur l'erreur relative de x.  [juge value]  départ : B
-    = 1/20   ← 5 × 1/100
-  — L'erreur relative ‖δx‖/‖x‖ vraiment obtenue.  [juge value]  départ : r_x
-    = 1/20   ← δb est vecteur propre pour 2 : δx = δb/2, la borne est atteinte
-  aides : ‖δx‖/‖x‖ ≤ κ(A)·‖δb‖/‖b‖ ; si δb est vecteur propre de la plus petite valeur propre, δx = δb/λ_min. | borne = 5 × □ | κ₂ = 5, ‖δb‖/‖b‖ = 1/100, borne = ‖δx‖/‖x‖ = 1/20
-
-A = [[2,-1],[-1,2]] (valeurs propres 3 et 1), Ax = b avec b = (3 ; -3), donc x = (1 ; -1). On perturbe b de δb = (3/100 ; 3/100). Calcule κ₂(A), ‖δb‖/‖b‖, la borne sur ‖δx‖/‖x‖, puis ‖δx‖/‖x‖. Choisis d'abord chaque action.
-  [tap, suivre l'erreur, menu menu]  κ_2
-    (κ₂(A).)
-    = 3   ← λ_max/λ_min = 3/1
-  — L'erreur relative de b, ‖δb‖/‖b‖ (norme 2).  [juge value]  départ : r_b
-    = 1/100   ← δb = 3/100·(1 ; 1) et b = 3·(1 ; −1), de même norme √2
+    = 1/100   ← δb = 3/50·(1 ; 1) et b = 6·(1 ; −1), de même norme √2
   — La borne κ₂·‖δb‖/‖b‖ sur l'erreur relative de x.  [juge value]  départ : B
     = 3/100   ← 3 × 1/100
   — L'erreur relative ‖δx‖/‖x‖ vraiment obtenue.  [juge value]  départ : r_x
-    = 3/100   ← δb est vecteur propre pour 1 : δx = δb/1, la borne est atteinte
+    = 3/100   ← δb est vecteur propre pour 2 : δx = δb/2, la borne est atteinte
   aides : ‖δx‖/‖x‖ ≤ κ(A)·‖δb‖/‖b‖ ; si δb est vecteur propre de la plus petite valeur propre, δx = δb/λ_min. | borne = 3 × □ | κ₂ = 3, ‖δb‖/‖b‖ = 1/100, borne = ‖δx‖/‖x‖ = 3/100
+
+A = [[4,3],[3,4]] (valeurs propres 7 et 1), Ax = b avec b = (7 ; 7), donc x = (1 ; 1). On perturbe b de δb = (7/100 ; -7/100). Calcule κ₂(A), ‖δb‖/‖b‖, la borne sur ‖δx‖/‖x‖, puis ‖δx‖/‖x‖. Choisis d'abord chaque action.
+  [tap, suivre l'erreur, menu menu]  κ_2
+    (κ₂(A).)
+    = 7   ← λ_max/λ_min = 7/1
+  — L'erreur relative de b, ‖δb‖/‖b‖ (norme 2).  [juge value]  départ : r_b
+    = 1/100   ← δb = 7/100·(1 ; −1) et b = 7·(1 ; 1), de même norme √2
+  — La borne κ₂·‖δb‖/‖b‖ sur l'erreur relative de x.  [juge value]  départ : B
+    = 7/100   ← 7 × 1/100
+  — L'erreur relative ‖δx‖/‖x‖ vraiment obtenue.  [juge value]  départ : r_x
+    = 7/100   ← δb est vecteur propre pour 1 : δx = δb/1, la borne est atteinte
+  aides : ‖δx‖/‖x‖ ≤ κ(A)·‖δb‖/‖b‖ ; si δb est vecteur propre de la plus petite valeur propre, δx = δb/λ_min. | borne = 7 × □ | κ₂ = 7, ‖δb‖/‖b‖ = 1/100, borne = ‖δx‖/‖x‖ = 7/100
 
 ```
 
 ### Niveau 4
 
 ```
+A = [[5,2],[-4,-1]]. Calcule A⁻¹, puis κ₁(A) = ‖A‖₁·‖A⁻¹‖₁.
+  [free, suivre l'erreur]  A^(−1)
+    (A⁻¹.)
+    = [[-1/3,-2/3],[4/3,5/3]]   ← (1/det A)·[[d, −b], [−c, a]], det A = 3
+  — ‖A‖₁.  [juge value]  départ : N_1
+    = 9   ← Colonnes
+  — ‖A⁻¹‖₁.  [juge value]  départ : M
+    = 7/3   ← Colonnes de A⁻¹
+  — κ₁(A) = ‖A‖₁·‖A⁻¹‖₁.  [juge value]  départ : κ
+    = 21   ← Produit
+  aides : κ₁ = ‖A‖₁·‖A⁻¹‖₁ ; ‖·‖₁ : colonnes. | A⁻¹ = (1/3)·[[-1, □], [□, 5]] | A⁻¹ = [[−1/3,−2/3],[4/3,5/3]], κ₁ = 9 × 7/3 = 21
+  pièges : m_norm_1_inf_swap
+
 A = [[0,1],[2,2]]. Calcule A⁻¹, puis κ₁(A) = ‖A‖₁·‖A⁻¹‖₁.
   [free, suivre l'erreur]  A^(−1)
     (A⁻¹.)
@@ -3312,57 +3315,48 @@ A = [[3,4],[2,3]]. Calcule A⁻¹, puis κ₁(A) = ‖A‖₁·‖A⁻¹‖₁.
   aides : κ₁ = ‖A‖₁·‖A⁻¹‖₁ ; ‖·‖₁ : colonnes. | A⁻¹ = (1/1)·[[3, □], [□, 3]] | A⁻¹ = [[3,−4],[−2,3]], κ₁ = 7 × 7 = 49
   pièges : m_norm_1_inf_swap
 
-A = [[5,4],[-3,-2]]. Calcule A⁻¹, puis κ∞(A) = ‖A‖∞·‖A⁻¹‖∞.
-  [free, suivre l'erreur]  A^(−1)
-    (A⁻¹.)
-    = [[-1,-2],[3/2,5/2]]   ← (1/det A)·[[d, −b], [−c, a]], det A = 2
-  — ‖A‖∞.  [juge value]  départ : N_∞
-    = 9   ← Lignes
-  — ‖A⁻¹‖∞.  [juge value]  départ : M
-    = 4   ← Lignes de A⁻¹
-  — κ∞(A) = ‖A‖∞·‖A⁻¹‖∞.  [juge value]  départ : κ
-    = 36   ← Produit
-  aides : κ∞ = ‖A‖∞·‖A⁻¹‖∞ ; ‖·‖∞ : lignes. | A⁻¹ = (1/2)·[[-2, □], [□, 5]] | A⁻¹ = [[−1,−2],[3/2,5/2]], κ∞ = 9 × 4 = 36
-  pièges : m_norm_1_inf_swap
-
 ```
 
 ### Niveau 5
 
 ```
-A = [[3,-4],[-4,9]] (symétrique, valeurs propres 11 et 1), b = (11 ; -22). On résout A(x + δx) = b + δb pour trois perturbations :n°δb‖δb‖/‖b‖‖δx‖/‖x‖1(0,02 ; 0,01)0,000910,010002(0,03 ; −0,01)0,001290,010043(0,01 ; −0,02)0,000910,00091Donne κ₂(A), puis la perturbation qui atteint la borne.
-  [free, sans aide]  κ_2
-    = 11   ← λ_max/λ_min = 11/1
-  — Le numéro de la perturbation qui atteint la borne ‖δx‖/‖x‖ = κ₂·‖δb‖/‖b‖.  [juge value]  départ : n
-    = 1   ← Rapport 11 : δb sur le vecteur propre de λ_min = 1
+A = [[6, 5], [5, 6]] (symétrique, valeurs propres 11 et 1), x = (1 ; 1), b = Ax = (11 ; 11). On résout A(x + δx) = b + δb pour trois perturbations δb :
+  [tableau à lire, sans aide]
+    n° | δb | ‖δb‖/‖b‖ | ‖δx‖/‖x‖
+    1 | (0,01 ; 0,01) | 9.091e-04 | 9.091e-04
+    2 | (0,01 ; −0,01) | 9.091e-04 | 1.000e-02
+    3 | (0,01 ; 0) | 6.428e-04 | 5.021e-03
+  question : Que lit-on dans ce tableau ? Une ou plusieurs réponses justes.
+      ✔ La perturbation n° 2 atteint la borne ‖δx‖/‖x‖ = κ₂·‖δb‖/‖b‖   · La perturbation n° 1 atteint la borne   ✔ κ₂(A) = 11   · κ₂(A) = 1/det A = 1/11 [m_cond_det]
+      pièges : m_cond_det
+  pièges : m_cond_det
 
-A = [[2,-2],[-2,5]] (symétrique, valeurs propres 6 et 1), b = (6 ; -12). On résout A(x + δx) = b + δb pour trois perturbations :n°δb‖δb‖/‖b‖‖δx‖/‖x‖1(0,02 ; 0,01)0,001670,010002(0,01 ; −0,02)0,001670,001673(0,03 ; −0,01)0,002360,01014Donne κ₂(A), puis la perturbation qui atteint la borne.
+A = [[9,-2],[-2,6]] (symétrique, valeurs propres 10 et 5), b = (20 ; -10). On résout A(x + δx) = b + δb pour trois perturbations :n°δb‖δb‖/‖b‖‖δx‖/‖x‖1(0,03 ; 0,01)0,001410,002242(0,02 ; −0,01)0,001000,001003(0,01 ; 0,02)0,001000,00200Donne κ₂(A), puis la perturbation qui atteint la borne.
   [free, sans aide]  κ_2
-    = 6   ← λ_max/λ_min = 6/1
+    = 2   ← λ_max/λ_min = 10/5
   — Le numéro de la perturbation qui atteint la borne ‖δx‖/‖x‖ = κ₂·‖δb‖/‖b‖.  [juge value]  départ : n
-    = 1   ← Rapport 6 : δb sur le vecteur propre de λ_min = 1
+    = 3   ← Rapport 2 : δb sur le vecteur propre de λ_min = 5
 
-A = [[3,2],[2,3]] (symétrique, valeurs propres 5 et 1), b = (5 ; 5). On résout A(x + δx) = b + δb pour trois perturbations :n°δb‖δb‖/‖b‖‖δx‖/‖x‖1(0,02 ; 0)0,002830,010202(0,01 ; −0,01)0,002000,010003(0,01 ; 0,01)0,002000,00200Donne κ₂(A), puis la perturbation qui atteint la borne.
+A = [[2,1],[1,2]] (symétrique, valeurs propres 3 et 1), b = (3 ; 3). On résout A(x + δx) = b + δb pour trois perturbations :n°δb‖δb‖/‖b‖‖δx‖/‖x‖1(0,01 ; −0,01)0,003330,010002(0,02 ; 0)0,004710,010543(0,01 ; 0,01)0,003330,00333Donne κ₂(A), puis la perturbation qui atteint la borne.
   [free, sans aide]  κ_2
-    = 5   ← λ_max/λ_min = 5/1
+    = 3   ← λ_max/λ_min = 3/1
   — Le numéro de la perturbation qui atteint la borne ‖δx‖/‖x‖ = κ₂·‖δb‖/‖b‖.  [juge value]  départ : n
-    = 2   ← Rapport 5 : δb sur le vecteur propre de λ_min = 1
+    = 1   ← Rapport 3 : δb sur le vecteur propre de λ_min = 1
 
 ```
 
 ### Variantes d'examen
 
 ```
-A = [[-4,-1],[0,3]] ; AᵀA a les valeurs propres 18 et 8. Que vaut κ₂(A) ?
-  · 9/4 [l_svd_sigma_is_eig]   · 4/3 [m_cond_eig_nonsym]   ✔ 3/2   · 2/3
+A = [[-3,-4],[0,5]] ; AᵀA a les valeurs propres 45 et 5. Que vaut κ₂(A) ?
+  ✔ 3   · 5/3 [m_cond_eig_nonsym]   · 1/3   · 9 [l_svd_sigma_is_eig]
   [examen mcq]
   pièges : m_cond_eig_nonsym, l_svd_sigma_is_eig
 
 Vrai ou faux ?
-  « Pour toute matrice inversible A à valeurs propres réelles, κ₂(A) = |λ_max|/|λ_min|. » → FAUX
-    contre-exemple (mx) : A = [[1,2],[0,1]]
+  « Pour toute matrice inversible A et toute norme subordonnée, κ(A) ≥ 1. » → VRAI
   [examen tf]
-  pièges : m_cond_eig_nonsym
+  pièges : m_cond_det
 
 ```
 
@@ -3373,46 +3367,46 @@ _Chaque valeur propre est dans un disque centré sur la diagonale._
 ### Niveau 1
 
 ```
-A = [[9,-2,-1],[-2,-4,-1],[-1,-1,2]]. Donne les disques de Gershgorin (par lignes).
+A = [[9,1,-2],[-1,2,-1],[2,0,-3]]. Donne les disques de Gershgorin (par lignes).
   [guided]  R_1
     (Le disque 1 : centre a₁₁ = 9, rayon R₁.)
-    = |−2| + |−□|   (trous : |−2| + |−1|)   ← Ligne 1, sans la diagonale
+    = |1| + |−□|   (trous : |1| + |−2|)   ← Ligne 1, sans la diagonale
     = □   (trous : 3)   ← D(9 ; 3)
-  — Le disque 2 : centre a₂₂ = −4, rayon R₂.  [juge value]  départ : R_2
-    = |−2| + |−□|   (trous : |−2| + |−1|)   ← Ligne 2, sans la diagonale
-    = □   (trous : 3)   ← D(−4 ; 3)
-  — Le disque 3 : centre a₃₃ = 2, rayon R₃.  [juge value]  départ : R_3
-    = |−□| + |−1|   (trous : |−1| + |−1|)   ← Ligne 3, sans la diagonale
+  — Le disque 2 : centre a₂₂ = 2, rayon R₂.  [juge value]  départ : R_2
+    = |−□| + |−1|   (trous : |−1| + |−1|)   ← Ligne 2, sans la diagonale
     = □   (trous : 2)   ← D(2 ; 2)
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-2|+|□| | D(9 ; 3), D(−4 ; 3), D(2 ; 2) (valeurs propres ≈ −4,50 ; 2,10 ; 9,40)
+  — Le disque 3 : centre a₃₃ = −3, rayon R₃.  [juge value]  départ : R_3
+    = |2| + |□|   (trous : |2| + |0|)   ← Ligne 3, sans la diagonale
+    = □   (trous : 2)   ← D(−3 ; 2)
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(9 ; 3), D(2 ; 2), D(−3 ; 2) (valeurs propres ≈ −2,70 ; 2,23 ; 8,47)
   pièges : m_gersh_radius_diag
 
-A = [[3,1,0],[-1,-6,-2],[0,1,9]]. Donne les disques de Gershgorin (par lignes).
+A = [[2,1,1],[-2,-6,1],[0,-2,9]]. Donne les disques de Gershgorin (par lignes).
   [guided]  R_1
-    (Le disque 1 : centre a₁₁ = 3, rayon R₁.)
-    = |1| + |□|   (trous : |1| + |0|)   ← Ligne 1, sans la diagonale
-    = □   (trous : 1)   ← D(3 ; 1)
+    (Le disque 1 : centre a₁₁ = 2, rayon R₁.)
+    = |□| + |1|   (trous : |1| + |1|)   ← Ligne 1, sans la diagonale
+    = □   (trous : 2)   ← D(2 ; 2)
   — Le disque 2 : centre a₂₂ = −6, rayon R₂.  [juge value]  départ : R_2
-    = |−1| + |−□|   (trous : |−1| + |−2|)   ← Ligne 2, sans la diagonale
+    = |−2| + |□|   (trous : |−2| + |1|)   ← Ligne 2, sans la diagonale
     = □   (trous : 3)   ← D(−6 ; 3)
   — Le disque 3 : centre a₃₃ = 9, rayon R₃.  [juge value]  départ : R_3
-    = |0| + |□|   (trous : |0| + |1|)   ← Ligne 3, sans la diagonale
-    = □   (trous : 1)   ← D(9 ; 1)
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(3 ; 1), D(−6 ; 3), D(9 ; 1) (valeurs propres ≈ −5,75 ; 2,88 ; 8,87)
+    = |0| + |−□|   (trous : |0| + |−2|)   ← Ligne 3, sans la diagonale
+    = □   (trous : 2)   ← D(9 ; 2)
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-2|+|□| | D(2 ; 2), D(−6 ; 3), D(9 ; 2) (valeurs propres ≈ −5,56 ; 1,66 ; 8,91)
   pièges : m_gersh_radius_diag
 
-A = [[3,1,1],[1,-2,1],[1,1,9]]. Donne les disques de Gershgorin (par lignes).
+A = [[9,2,-1],[2,2,0],[-1,0,-4]]. Donne les disques de Gershgorin (par lignes).
   [guided]  R_1
-    (Le disque 1 : centre a₁₁ = 3, rayon R₁.)
-    = |□| + |1|   (trous : |1| + |1|)   ← Ligne 1, sans la diagonale
-    = □   (trous : 2)   ← D(3 ; 2)
-  — Le disque 2 : centre a₂₂ = −2, rayon R₂.  [juge value]  départ : R_2
-    = |□| + |1|   (trous : |1| + |1|)   ← Ligne 2, sans la diagonale
-    = □   (trous : 2)   ← D(−2 ; 2)
-  — Le disque 3 : centre a₃₃ = 9, rayon R₃.  [juge value]  départ : R_3
-    = |□| + |1|   (trous : |1| + |1|)   ← Ligne 3, sans la diagonale
-    = □   (trous : 2)   ← D(9 ; 2)
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |1|+|□| | D(3 ; 2), D(−2 ; 2), D(9 ; 2) (valeurs propres ≈ −2,25 ; 2,97 ; 9,28)
+    (Le disque 1 : centre a₁₁ = 9, rayon R₁.)
+    = |2| + |−□|   (trous : |2| + |−1|)   ← Ligne 1, sans la diagonale
+    = □   (trous : 3)   ← D(9 ; 3)
+  — Le disque 2 : centre a₂₂ = 2, rayon R₂.  [juge value]  départ : R_2
+    = |2| + |□|   (trous : |2| + |0|)   ← Ligne 2, sans la diagonale
+    = □   (trous : 2)   ← D(2 ; 2)
+  — Le disque 3 : centre a₃₃ = −4, rayon R₃.  [juge value]  départ : R_3
+    = |−1| + |□|   (trous : |−1| + |0|)   ← Ligne 3, sans la diagonale
+    = □   (trous : 1)   ← D(−4 ; 1)
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |2|+|□| | D(9 ; 3), D(2 ; 2), D(−4 ; 1) (valeurs propres ≈ −4,08 ; 1,48 ; 9,60)
   pièges : m_gersh_radius_diag
 
 ```
@@ -3420,49 +3414,49 @@ A = [[3,1,1],[1,-2,1],[1,1,9]]. Donne les disques de Gershgorin (par lignes).
 ### Niveau 2
 
 ```
-A = [[5,1,2],[1,9,-1],[-1,0,-6]]. Trouve des disques de Gershgorin disjoints.
+A = [[-5,1,0],[0,6,-1],[2,1,2]]. Trouve des disques de Gershgorin disjoints.
   [guided]  R_1
-    (Le disque 1 : centre a₁₁ = 5, rayon R₁.)
-    ? Par lignes, les disques sont D(5 ; 3), D(9 ; 2), D(−6 ; 1) : ils se chevauchent. Que fais-tu ? ✔ Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres) / ✔ Garder les lignes / · Agrandir les rayons avec la diagonale
-    = |□| + |−1|   (trous : |1| + |−1|)   ← Colonne 1, sans la diagonale
-    = □   (trous : 2)   ← D(5 ; 2)
-  — Le disque 2 : centre a₂₂ = 9, rayon R₂.  [juge value]  départ : R_2
-    = |1| + |□|   (trous : |1| + |0|)   ← Colonne 2, sans la diagonale
-    = □   (trous : 1)   ← D(9 ; 1)
-  — Le disque 3 : centre a₃₃ = −6, rayon R₃.  [juge value]  départ : R_3
-    = |2| + |−□|   (trous : |2| + |−1|)   ← Colonne 3, sans la diagonale
-    = □   (trous : 3)   ← D(−6 ; 3)
-  aides : Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale. | R₁ (colonne 1) = |1|+|□| | D(5 ; 2), D(9 ; 1), D(−6 ; 3)
-  pièges : m_gersh_radius_diag
-
-A = [[-3,1,0],[-2,3,-1],[1,-1,8]]. Trouve des disques de Gershgorin disjoints.
-  [guided]  R_1
-    (Le disque 1 : centre a₁₁ = −3, rayon R₁.)
-    ? Par lignes, les disques sont D(−3 ; 1), D(3 ; 3), D(8 ; 2) : ils se chevauchent. Que fais-tu ? ✔ Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres) / ✔ Garder les lignes / · Agrandir les rayons avec la diagonale
-    = |−2| + |□|   (trous : |−2| + |1|)   ← Colonne 1, sans la diagonale
-    = □   (trous : 3)   ← D(−3 ; 3)
-  — Le disque 2 : centre a₂₂ = 3, rayon R₂.  [juge value]  départ : R_2
-    = |□| + |−1|   (trous : |1| + |−1|)   ← Colonne 2, sans la diagonale
-    = □   (trous : 2)   ← D(3 ; 2)
-  — Le disque 3 : centre a₃₃ = 8, rayon R₃.  [juge value]  départ : R_3
-    = |0| + |−□|   (trous : |0| + |−1|)   ← Colonne 3, sans la diagonale
-    = □   (trous : 1)   ← D(8 ; 1)
-  aides : Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale. | R₁ (colonne 1) = |-2|+|□| | D(−3 ; 3), D(3 ; 2), D(8 ; 1)
-  pièges : m_gersh_radius_diag
-
-A = [[3,1,0],[0,-3,-2],[2,2,8]]. Trouve des disques de Gershgorin disjoints.
-  [guided]  R_1
-    (Le disque 1 : centre a₁₁ = 3, rayon R₁.)
-    ? Par lignes, les disques sont D(3 ; 1), D(−3 ; 2), D(8 ; 4) : ils se chevauchent. Que fais-tu ? ✔ Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres) / ✔ Garder les lignes / · Agrandir les rayons avec la diagonale
+    (Le disque 1 : centre a₁₁ = −5, rayon R₁.)
+    ? Par lignes, les disques sont D(−5 ; 1), D(6 ; 1), D(2 ; 3) : ils se chevauchent. Que fais-tu ? ✔ Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres) / ✔ Garder les lignes / · Agrandir les rayons avec la diagonale
     = |0| + |□|   (trous : |0| + |2|)   ← Colonne 1, sans la diagonale
-    = □   (trous : 2)   ← D(3 ; 2)
+    = □   (trous : 2)   ← D(−5 ; 2)
+  — Le disque 2 : centre a₂₂ = 6, rayon R₂.  [juge value]  départ : R_2
+    = |□| + |1|   (trous : |1| + |1|)   ← Colonne 2, sans la diagonale
+    = □   (trous : 2)   ← D(6 ; 2)
+  — Le disque 3 : centre a₃₃ = 2, rayon R₃.  [juge value]  départ : R_3
+    = |0| + |−□|   (trous : |0| + |−1|)   ← Colonne 3, sans la diagonale
+    = □   (trous : 1)   ← D(2 ; 1)
+  aides : Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale. | R₁ (colonne 1) = |0|+|□| | D(−5 ; 2), D(6 ; 2), D(2 ; 1)
+  pièges : m_gersh_radius_diag
+
+A = [[2,1,1],[1,-3,-2],[0,-2,7]]. Trouve des disques de Gershgorin disjoints.
+  [guided]  R_1
+    (Le disque 1 : centre a₁₁ = 2, rayon R₁.)
+    ? Par lignes, les disques sont D(2 ; 2), D(−3 ; 3), D(7 ; 2) : ils se chevauchent. Que fais-tu ? ✔ Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres) / ✔ Garder les lignes / · Agrandir les rayons avec la diagonale
+    = |1| + |□|   (trous : |1| + |0|)   ← Colonne 1, sans la diagonale
+    = □   (trous : 1)   ← D(2 ; 1)
   — Le disque 2 : centre a₂₂ = −3, rayon R₂.  [juge value]  départ : R_2
-    = |1| + |□|   (trous : |1| + |2|)   ← Colonne 2, sans la diagonale
+    = |1| + |−□|   (trous : |1| + |−2|)   ← Colonne 2, sans la diagonale
     = □   (trous : 3)   ← D(−3 ; 3)
-  — Le disque 3 : centre a₃₃ = 8, rayon R₃.  [juge value]  départ : R_3
-    = |0| + |−□|   (trous : |0| + |−2|)   ← Colonne 3, sans la diagonale
-    = □   (trous : 2)   ← D(8 ; 2)
-  aides : Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale. | R₁ (colonne 1) = |0|+|□| | D(3 ; 2), D(−3 ; 3), D(8 ; 2)
+  — Le disque 3 : centre a₃₃ = 7, rayon R₃.  [juge value]  départ : R_3
+    = |1| + |−□|   (trous : |1| + |−2|)   ← Colonne 3, sans la diagonale
+    = □   (trous : 3)   ← D(7 ; 3)
+  aides : Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale. | R₁ (colonne 1) = |1|+|□| | D(2 ; 1), D(−3 ; 3), D(7 ; 3)
+  pièges : m_gersh_radius_diag
+
+A = [[9,1,1],[-2,3,2],[1,0,-4]]. Trouve des disques de Gershgorin disjoints.
+  [guided]  R_1
+    (Le disque 1 : centre a₁₁ = 9, rayon R₁.)
+    ? Par lignes, les disques sont D(9 ; 2), D(3 ; 4), D(−4 ; 1) : ils se chevauchent. Que fais-tu ? ✔ Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres) / ✔ Garder les lignes / · Agrandir les rayons avec la diagonale
+    = |−2| + |□|   (trous : |−2| + |1|)   ← Colonne 1, sans la diagonale
+    = □   (trous : 3)   ← D(9 ; 3)
+  — Le disque 2 : centre a₂₂ = 3, rayon R₂.  [juge value]  départ : R_2
+    = |1| + |□|   (trous : |1| + |0|)   ← Colonne 2, sans la diagonale
+    = □   (trous : 1)   ← D(3 ; 1)
+  — Le disque 3 : centre a₃₃ = −4, rayon R₃.  [juge value]  départ : R_3
+    = |1| + |□|   (trous : |1| + |2|)   ← Colonne 3, sans la diagonale
+    = □   (trous : 3)   ← D(−4 ; 3)
+  aides : Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale. | R₁ (colonne 1) = |-2|+|□| | D(9 ; 3), D(3 ; 1), D(−4 ; 3)
   pièges : m_gersh_radius_diag
 
 ```
@@ -3470,49 +3464,49 @@ A = [[3,1,0],[0,-3,-2],[2,2,8]]. Trouve des disques de Gershgorin disjoints.
 ### Niveau 3
 
 ```
-A = [[-5,-1,1],[-1,9,-2],[1,-2,2]]. Donne les disques de Gershgorin (par lignes), puis conclus. Choisis d'abord chaque action.
+A = [[2,0,1],[0,-5,-1],[1,-1,6]]. Donne les disques de Gershgorin (par lignes), puis conclus. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  R_1
-    (Le disque 1 : centre a₁₁ = −5, rayon R₁.)
-    = |−1| + |1|   ← Ligne 1, sans la diagonale
-    = 2   ← D(−5 ; 2)
-  — Le disque 2 : centre a₂₂ = 9, rayon R₂.  [juge value]  départ : R_2
-    = |−1| + |−2|   ← Ligne 2, sans la diagonale
-    = 3   ← D(9 ; 3)
-  — Le disque 3 : centre a₃₃ = 2, rayon R₃.  [juge value]  départ : R_3
-    = |1| + |−2|   ← Ligne 3, sans la diagonale
-    ? Avec tes disques, que peut-on dire de A ? · A est inversible : 0 n'est dans aucun disque / ✔ On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
-    = 3   ← D(2 ; 3)
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(−5 ; 2), D(9 ; 3), D(2 ; 3) (valeurs propres ≈ −5,18 ; 1,54 ; 9,63)
+    (Le disque 1 : centre a₁₁ = 2, rayon R₁.)
+    = |0| + |1|   ← Ligne 1, sans la diagonale
+    = 1   ← D(2 ; 1)
+  — Le disque 2 : centre a₂₂ = −5, rayon R₂.  [juge value]  départ : R_2
+    = |0| + |−1|   ← Ligne 2, sans la diagonale
+    = 1   ← D(−5 ; 1)
+  — Le disque 3 : centre a₃₃ = 6, rayon R₃.  [juge value]  départ : R_3
+    = |1| + |−1|   ← Ligne 3, sans la diagonale
+    ? Avec tes disques, que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
+    = 2   ← D(6 ; 2)
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |0|+|□| | D(2 ; 1), D(−5 ; 1), D(6 ; 2) (valeurs propres ≈ −5,09 ; 1,77 ; 6,32)
   pièges : m_gersh_radius_diag
 
-A = [[-4,-1,-2],[-1,3,1],[0,1,7]]. Donne les disques de Gershgorin (par lignes), puis conclus. Choisis d'abord chaque action.
+A = [[-6,-1,1],[-1,3,0],[2,-1,8]]. Donne les disques de Gershgorin (par lignes), puis conclus. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  R_1
-    (Le disque 1 : centre a₁₁ = −4, rayon R₁.)
-    = |−1| + |−2|   ← Ligne 1, sans la diagonale
-    = 3   ← D(−4 ; 3)
+    (Le disque 1 : centre a₁₁ = −6, rayon R₁.)
+    = |−1| + |1|   ← Ligne 1, sans la diagonale
+    = 2   ← D(−6 ; 2)
   — Le disque 2 : centre a₂₂ = 3, rayon R₂.  [juge value]  départ : R_2
+    = |−1| + |0|   ← Ligne 2, sans la diagonale
+    = 1   ← D(3 ; 1)
+  — Le disque 3 : centre a₃₃ = 8, rayon R₃.  [juge value]  départ : R_3
+    = |2| + |−1|   ← Ligne 3, sans la diagonale
+    ? Avec tes disques, que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
+    = 3   ← D(8 ; 3)
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(−6 ; 2), D(3 ; 1), D(8 ; 3) (valeurs propres ≈ −6,24 ; 3,08 ; 8,16)
+  pièges : m_gersh_radius_diag
+
+A = [[4,-1,0],[-1,8,1],[0,1,-5]]. Donne les disques de Gershgorin (par lignes), puis conclus. Choisis d'abord chaque action.
+  [tap, suivre l'erreur, menu menu]  R_1
+    (Le disque 1 : centre a₁₁ = 4, rayon R₁.)
+    = |−1| + |0|   ← Ligne 1, sans la diagonale
+    = 1   ← D(4 ; 1)
+  — Le disque 2 : centre a₂₂ = 8, rayon R₂.  [juge value]  départ : R_2
     = |−1| + |1|   ← Ligne 2, sans la diagonale
-    = 2   ← D(3 ; 2)
-  — Le disque 3 : centre a₃₃ = 7, rayon R₃.  [juge value]  départ : R_3
+    = 2   ← D(8 ; 2)
+  — Le disque 3 : centre a₃₃ = −5, rayon R₃.  [juge value]  départ : R_3
     = |0| + |1|   ← Ligne 3, sans la diagonale
     ? Avec tes disques, que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
-    = 1   ← D(7 ; 1)
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(−4 ; 3), D(3 ; 2), D(7 ; 1) (valeurs propres ≈ −4,12 ; 2,84 ; 7,28)
-  pièges : m_gersh_radius_diag
-
-A = [[8,1,-1],[-1,-6,2],[0,2,3]]. Donne les disques de Gershgorin (par lignes), puis conclus. Choisis d'abord chaque action.
-  [tap, suivre l'erreur, menu menu]  R_1
-    (Le disque 1 : centre a₁₁ = 8, rayon R₁.)
-    = |1| + |−1|   ← Ligne 1, sans la diagonale
-    = 2   ← D(8 ; 2)
-  — Le disque 2 : centre a₂₂ = −6, rayon R₂.  [juge value]  départ : R_2
-    = |−1| + |2|   ← Ligne 2, sans la diagonale
-    = 3   ← D(−6 ; 3)
-  — Le disque 3 : centre a₃₃ = 3, rayon R₃.  [juge value]  départ : R_3
-    = |0| + |2|   ← Ligne 3, sans la diagonale
-    ? Avec tes disques, que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
-    = 2   ← D(3 ; 2)
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(8 ; 2), D(−6 ; 3), D(3 ; 2) (valeurs propres ≈ −6,34 ; 3,39 ; 7,95)
+    = 1   ← D(−5 ; 1)
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(4 ; 1), D(8 ; 2), D(−5 ; 1) (valeurs propres ≈ −5,08 ; 3,77 ; 8,31)
   pièges : m_gersh_radius_diag
 
 ```
@@ -3520,58 +3514,58 @@ A = [[8,1,-1],[-1,-6,2],[0,2,3]]. Donne les disques de Gershgorin (par lignes), 
 ### Niveau 4
 
 ```
-A = [[9,-1,-1],[-1,4,-1],[-1,-1,-6]]. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.
+A = [[2,2,0],[2,9,2],[0,2,-6]]. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.
   [free, suivre l'erreur]  R_1
-    (Le disque 1 : centre a₁₁ = 9, rayon R₁.)
-    = |−1| + |−1|   ← Ligne 1, sans la diagonale
-    = 2   ← D(9 ; 2)
-  — Le disque 2 : centre a₂₂ = 4, rayon R₂.  [juge value]  départ : R_2
-    = |−1| + |−1|   ← Ligne 2, sans la diagonale
-    = 2   ← D(4 ; 2)
+    (Le disque 1 : centre a₁₁ = 2, rayon R₁.)
+    = |2| + |0|   ← Ligne 1, sans la diagonale
+    = 2   ← D(2 ; 2)
+  — Le disque 2 : centre a₂₂ = 9, rayon R₂.  [juge value]  départ : R_2
+    = |2| + |2|   ← Ligne 2, sans la diagonale
+    = 4   ← D(9 ; 4)
   — Le disque 3 : centre a₃₃ = −6, rayon R₃.  [juge value]  départ : R_3
-    = |−1| + |−1|   ← Ligne 3, sans la diagonale
+    = |0| + |2|   ← Ligne 3, sans la diagonale
     = 2   ← D(−6 ; 2)
   — A est symétrique : ses valeurs propres sont réelles. Une borne inférieure de la plus petite.  [juge value]  départ : m
     = −8   ← Le bord gauche du disque le plus à gauche
   — Une borne supérieure de la plus grande.  [juge value]  départ : M
-    = 11   ← Le bord droit du disque le plus à droite
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(9 ; 2), D(4 ; 2), D(−6 ; 2) (valeurs propres ≈ −6,18 ; 3,94 ; 9,23)
+    = 13   ← Le bord droit du disque le plus à droite
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |2|+|□| | D(2 ; 2), D(9 ; 4), D(−6 ; 2) (valeurs propres ≈ −6,27 ; 1,50 ; 9,77)
   pièges : m_gersh_radius_diag
 
-A = [[-6,0,-1],[0,2,-1],[-1,-1,-2]]. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.
-  [free, suivre l'erreur]  R_1
-    (Le disque 1 : centre a₁₁ = −6, rayon R₁.)
-    = |0| + |−1|   ← Ligne 1, sans la diagonale
-    = 1   ← D(−6 ; 1)
-  — Le disque 2 : centre a₂₂ = 2, rayon R₂.  [juge value]  départ : R_2
-    = |0| + |−1|   ← Ligne 2, sans la diagonale
-    = 1   ← D(2 ; 1)
-  — Le disque 3 : centre a₃₃ = −2, rayon R₃.  [juge value]  départ : R_3
-    = |−1| + |−1|   ← Ligne 3, sans la diagonale
-    = 2   ← D(−2 ; 2)
-  — A est symétrique : ses valeurs propres sont réelles. Une borne inférieure de la plus petite.  [juge value]  départ : m
-    = −7   ← Le bord gauche du disque le plus à gauche
-  — Une borne supérieure de la plus grande.  [juge value]  départ : M
-    = 3   ← Le bord droit du disque le plus à droite
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |0|+|□| | D(−6 ; 1), D(2 ; 1), D(−2 ; 2) (valeurs propres ≈ −6,24 ; −2,00 ; 2,24)
-  pièges : m_gersh_radius_diag
-
-A = [[8,-1,0],[-1,-4,1],[0,1,4]]. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.
+A = [[8,-1,0],[-1,3,1],[0,1,-6]]. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.
   [free, suivre l'erreur]  R_1
     (Le disque 1 : centre a₁₁ = 8, rayon R₁.)
     = |−1| + |0|   ← Ligne 1, sans la diagonale
     = 1   ← D(8 ; 1)
-  — Le disque 2 : centre a₂₂ = −4, rayon R₂.  [juge value]  départ : R_2
+  — Le disque 2 : centre a₂₂ = 3, rayon R₂.  [juge value]  départ : R_2
     = |−1| + |1|   ← Ligne 2, sans la diagonale
-    = 2   ← D(−4 ; 2)
-  — Le disque 3 : centre a₃₃ = 4, rayon R₃.  [juge value]  départ : R_3
+    = 2   ← D(3 ; 2)
+  — Le disque 3 : centre a₃₃ = −6, rayon R₃.  [juge value]  départ : R_3
     = |0| + |1|   ← Ligne 3, sans la diagonale
-    = 1   ← D(4 ; 1)
+    = 1   ← D(−6 ; 1)
   — A est symétrique : ses valeurs propres sont réelles. Une borne inférieure de la plus petite.  [juge value]  départ : m
-    = −6   ← Le bord gauche du disque le plus à gauche
+    = −7   ← Le bord gauche du disque le plus à gauche
   — Une borne supérieure de la plus grande.  [juge value]  départ : M
     = 9   ← Le bord droit du disque le plus à droite
-  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(8 ; 1), D(−4 ; 2), D(4 ; 1) (valeurs propres ≈ −4,20 ; 4,12 ; 8,08)
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |-1|+|□| | D(8 ; 1), D(3 ; 2), D(−6 ; 1) (valeurs propres ≈ −6,11 ; 2,92 ; 8,20)
+  pièges : m_gersh_radius_diag
+
+A = [[4,0,-1],[0,7,-1],[-1,-1,-2]]. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.
+  [free, suivre l'erreur]  R_1
+    (Le disque 1 : centre a₁₁ = 4, rayon R₁.)
+    = |0| + |−1|   ← Ligne 1, sans la diagonale
+    = 1   ← D(4 ; 1)
+  — Le disque 2 : centre a₂₂ = 7, rayon R₂.  [juge value]  départ : R_2
+    = |0| + |−1|   ← Ligne 2, sans la diagonale
+    = 1   ← D(7 ; 1)
+  — Le disque 3 : centre a₃₃ = −2, rayon R₃.  [juge value]  départ : R_3
+    = |−1| + |−1|   ← Ligne 3, sans la diagonale
+    = 2   ← D(−2 ; 2)
+  — A est symétrique : ses valeurs propres sont réelles. Une borne inférieure de la plus petite.  [juge value]  départ : m
+    = −4   ← Le bord gauche du disque le plus à gauche
+  — Une borne supérieure de la plus grande.  [juge value]  départ : M
+    = 8   ← Le bord droit du disque le plus à droite
+  aides : Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale. | R₂ = |0|+|□| | D(4 ; 1), D(7 ; 1), D(−2 ; 2) (valeurs propres ≈ −2,27 ; 4,15 ; 7,11)
   pièges : m_gersh_radius_diag
 
 ```
@@ -3579,55 +3573,55 @@ A = [[8,-1,0],[-1,-4,1],[0,1,4]]. Donne les rayons des disques de Gershgorin (li
 ### Niveau 5
 
 ```
-A = [[2,0,-1],[0,5,-1],[-1,-1,6]]. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?
+A = [[-6,0,1],[-1,-4,2],[1,1,5]]. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?
   [free, sans aide]  R_1
-    (Le disque 1 : centre a₁₁ = 2, rayon R₁.)
-    = |0| + |−1|   ← Ligne 1, sans la diagonale
-    = 1   ← D(2 ; 1)
-  — Le disque 2 : centre a₂₂ = 5, rayon R₂.  [juge value]  départ : R_2
-    = |0| + |−1|   ← Ligne 2, sans la diagonale
-    = 1   ← D(5 ; 1)
-  — Le disque 3 : centre a₃₃ = 6, rayon R₃.  [juge value]  départ : R_3
-    = |−1| + |−1|   ← Ligne 3, sans la diagonale
-    = 2   ← D(6 ; 2)
+    (Le disque 1 : centre a₁₁ = −6, rayon R₁.)
+    = |0| + |1|   ← Ligne 1, sans la diagonale
+    = 1   ← D(−6 ; 1)
+  — Le disque 2 : centre a₂₂ = −4, rayon R₂.  [juge value]  départ : R_2
+    = |−1| + |2|   ← Ligne 2, sans la diagonale
+    = 3   ← D(−4 ; 3)
+  — Le disque 3 : centre a₃₃ = 5, rayon R₃.  [juge value]  départ : R_3
+    = |1| + |1|   ← Ligne 3, sans la diagonale
+    = 2   ← D(5 ; 2)
   — La plus petite marge minᵢ(|aᵢᵢ| − Rᵢ) : toute valeur propre vérifie |λ| ≥ cette marge.  [juge value]  départ : m
     ? A est-elle à diagonale strictement dominante ? ✔ Oui : |aᵢᵢ| > Rᵢ pour chaque ligne / · Non
-    ? Disques D(2 ; 1), D(5 ; 1), D(6 ; 2). Que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
+    ? Disques D(−6 ; 1), D(−4 ; 3), D(5 ; 2). Que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
     = 1   ← Donc 0 n'est pas valeur propre : A est inversible (et Jacobi converge, voir module N)
   pièges : m_gersh_radius_diag
 
-A = [[6,-1,1],[1,-6,1],[2,2,8]]. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?
+A = [[-5,-1,2],[-1,7,0],[2,0,9]]. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?
   [free, sans aide]  R_1
-    (Le disque 1 : centre a₁₁ = 6, rayon R₁.)
-    = |−1| + |1|   ← Ligne 1, sans la diagonale
-    = 2   ← D(6 ; 2)
-  — Le disque 2 : centre a₂₂ = −6, rayon R₂.  [juge value]  départ : R_2
-    = |1| + |1|   ← Ligne 2, sans la diagonale
-    = 2   ← D(−6 ; 2)
-  — Le disque 3 : centre a₃₃ = 8, rayon R₃.  [juge value]  départ : R_3
-    = |2| + |2|   ← Ligne 3, sans la diagonale
-    = 4   ← D(8 ; 4)
+    (Le disque 1 : centre a₁₁ = −5, rayon R₁.)
+    = |−1| + |2|   ← Ligne 1, sans la diagonale
+    = 3   ← D(−5 ; 3)
+  — Le disque 2 : centre a₂₂ = 7, rayon R₂.  [juge value]  départ : R_2
+    = |−1| + |0|   ← Ligne 2, sans la diagonale
+    = 1   ← D(7 ; 1)
+  — Le disque 3 : centre a₃₃ = 9, rayon R₃.  [juge value]  départ : R_3
+    = |2| + |0|   ← Ligne 3, sans la diagonale
+    = 2   ← D(9 ; 2)
   — La plus petite marge minᵢ(|aᵢᵢ| − Rᵢ) : toute valeur propre vérifie |λ| ≥ cette marge.  [juge value]  départ : m
     ? A est-elle à diagonale strictement dominante ? ✔ Oui : |aᵢᵢ| > Rᵢ pour chaque ligne / · Non
-    ? Disques D(6 ; 2), D(−6 ; 2), D(8 ; 4). Que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
-    = 4   ← Donc 0 n'est pas valeur propre : A est inversible (et Jacobi converge, voir module N)
+    ? Disques D(−5 ; 3), D(7 ; 1), D(9 ; 2). Que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
+    = 2   ← Donc 0 n'est pas valeur propre : A est inversible (et Jacobi converge, voir module N)
   pièges : m_gersh_radius_diag
 
-A = [[-6,-1,-1],[-1,5,0],[-1,0,3]]. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?
+A = [[7,-1,-1],[0,4,1],[2,-2,5]]. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?
   [free, sans aide]  R_1
-    (Le disque 1 : centre a₁₁ = −6, rayon R₁.)
+    (Le disque 1 : centre a₁₁ = 7, rayon R₁.)
     = |−1| + |−1|   ← Ligne 1, sans la diagonale
-    = 2   ← D(−6 ; 2)
-  — Le disque 2 : centre a₂₂ = 5, rayon R₂.  [juge value]  départ : R_2
-    = |−1| + |0|   ← Ligne 2, sans la diagonale
-    = 1   ← D(5 ; 1)
-  — Le disque 3 : centre a₃₃ = 3, rayon R₃.  [juge value]  départ : R_3
-    = |−1| + |0|   ← Ligne 3, sans la diagonale
-    = 1   ← D(3 ; 1)
+    = 2   ← D(7 ; 2)
+  — Le disque 2 : centre a₂₂ = 4, rayon R₂.  [juge value]  départ : R_2
+    = |0| + |1|   ← Ligne 2, sans la diagonale
+    = 1   ← D(4 ; 1)
+  — Le disque 3 : centre a₃₃ = 5, rayon R₃.  [juge value]  départ : R_3
+    = |2| + |−2|   ← Ligne 3, sans la diagonale
+    = 4   ← D(5 ; 4)
   — La plus petite marge minᵢ(|aᵢᵢ| − Rᵢ) : toute valeur propre vérifie |λ| ≥ cette marge.  [juge value]  départ : m
     ? A est-elle à diagonale strictement dominante ? ✔ Oui : |aᵢᵢ| > Rᵢ pour chaque ligne / · Non
-    ? Disques D(−6 ; 2), D(5 ; 1), D(3 ; 1). Que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
-    = 2   ← Donc 0 n'est pas valeur propre : A est inversible (et Jacobi converge, voir module N)
+    ? Disques D(7 ; 2), D(4 ; 1), D(5 ; 4). Que peut-on dire de A ? ✔ A est inversible : 0 n'est dans aucun disque / · On ne peut pas conclure : 0 est dans un disque / · A n'est pas inversible
+    = 1   ← Donc 0 n'est pas valeur propre : A est inversible (et Jacobi converge, voir module N)
   pièges : m_gersh_radius_diag
 
 ```
@@ -3635,14 +3629,13 @@ A = [[-6,-1,-1],[-1,5,0],[-1,0,3]]. Donne les rayons de Gershgorin (lignes) et l
 ### Variantes d'examen
 
 ```
-A = [[8,1,-1],[1,3,-1],[-1,-1,-2]]. Quel est le disque de Gershgorin de la ligne 1 ?
-  ✔ D(8 ; 2)   · D(8 ; 10) [m_gersh_radius_diag]   · D(0 ; 2)   · D(8 ; 0)
+A = [[2,-2,0],[-2,9,1],[0,1,-3]]. Quel est le disque de Gershgorin de la ligne 3 ?
+  · D(−3 ; 2)   ✔ D(−3 ; 1)   · D(0 ; 1)   · D(−3 ; 4) [m_gersh_radius_diag]
   [examen mcq]
   pièges : m_gersh_radius_diag
 
 Vrai ou faux ?
-  « Chaque disque de Gershgorin contient au moins une valeur propre. » → FAUX
-    contre-exemple (mx) : A = [[0,1],[4,0]]
+  « Une matrice à diagonale strictement dominante (|aᵢᵢ| > Σⱼ≠ᵢ |aᵢⱼ| pour chaque i) est inversible. » → VRAI
   [examen tf]
 
 ```
@@ -3654,52 +3647,52 @@ _Un mode e^{λt}v par valeur propre ; stable si toutes les Re λ < 0._
 ### Niveau 1
 
 ```
-ẋ = Ax avec A = [[-1,2],[-4,5]] et x(0) = (-3 ; -5). Trouve les modes propres, la solution x(t), et dis si le système est stable. Les valeurs propres de A sont 3 et 1.
+ÿ + 2ẏ − 8y = 0, avec y(0) = 0 et ẏ(0) = 6. Trouve les modes propres, la solution x(t), et dis si le système est stable. Avec x = (y ; ẏ), ẋ = Ax où A = [[0,1],[8,-2]]. Les valeurs propres de A sont 2 et −4.
   [guided]  v_1
-    (Un vecteur propre pour λ = 3.)
-    = (1 ; 2)   (cases à remplir : (1,1))   ← Noyau de A − 3I
-  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_2
-    = (1 ; 1)   (cases à remplir : (2,1))   ← Noyau de A − I
+    (Un vecteur propre pour λ = 2.)
+    = (1 ; 2)   (cases à remplir : (2,1))   ← Noyau de A − 2I
+  — Un vecteur propre pour λ = −4.  [juge eigvec]  départ : v_2
+    = (1 ; -4)   (cases à remplir : (2,1))   ← Noyau de A + 4I
   — Les coefficients c : Pc = x(0), avec P = [v₁ v₂].  [juge mat]  départ : c
-    = (-2 ; -1)   (cases à remplir : (2,1))   ← c₁v₁ + c₂v₂ = (−3 ; −5)
+    = (1 ; -1)   (cases à remplir : (2,1))   ← c₁v₁ + c₂v₂ = (0 ; 6)
   — La solution x(t).  [juge odevec]  départ : x(t)
-    = x(t) = -2e^(3t)(1 ; 2)-e^(t)(1 ; 1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = x(t) = e^(2t)(1 ; 2)-e^(-4t)(1 ; -4)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
   — La stabilité.  [juge value]  départ : α
     (Le système ẋ = Ax est-il stable ? Instable : une Re λ > 0.)
-    = 3   ← La plus grande partie réelle : instable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(3t)(1 ; □) + c₂e^(t)(1 ; □) | x(t) = (-2e^(3t)-e^t ; -4e^(3t)-e^t)
+    = 2   ← La plus grande partie réelle : instable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(2t)(1 ; □) + c₂e^(−4t)(1 ; □) | x(t) = (e^(2t)-e^(-4t) ; 2e^(2t)+4e^(-4t))
   pièges : l_eigvec_row
 
-ẋ = Ax avec A = [[1,-4],[2,-5]] et x(0) = (-4 ; -3). Trouve les modes propres, la solution x(t), et dis si le système est stable. Les valeurs propres de A sont −1 et −3.
+ẋ = Ax avec A = [[-5,4],[-2,1]] et x(0) = (-5 ; -3). Trouve les modes propres, la solution x(t), et dis si le système est stable. Les valeurs propres de A sont −1 et −3.
   [guided]  v_1
     (Un vecteur propre pour λ = −1.)
-    = (2 ; 1)   (cases à remplir : (1,1))   ← Noyau de A + I
-  — Un vecteur propre pour λ = −3.  [juge eigvec]  départ : v_2
-    = (1 ; 1)   (cases à remplir : (2,1))   ← Noyau de A + 3I
-  — Les coefficients c : Pc = x(0), avec P = [v₁ v₂].  [juge mat]  départ : c
-    = (-1 ; -2)   (cases à remplir : (2,1))   ← c₁v₁ + c₂v₂ = (−4 ; −3)
-  — La solution x(t).  [juge odevec]  départ : x(t)
-    = x(t) = -e^(-t)(2 ; 1)-2e^(-3t)(1 ; 1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
-  — La stabilité.  [juge value]  départ : α
-    (Le système ẋ = Ax est-il stable ? Stable : toutes les Re λ < 0.)
-    = −1   ← La plus grande partie réelle : stable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(−t)(2 ; □) + c₂e^(−3t)(1 ; □) | x(t) = (-2e^-t-2e^(-3t) ; -e^-t-2e^(-3t))
-  pièges : l_eigvec_row
-
-ẋ = Ax avec A = [[-4,2],[-1,-1]] et x(0) = (1 ; 2). Trouve les modes propres, la solution x(t), et dis si le système est stable. Les valeurs propres de A sont −2 et −3.
-  [guided]  v_1
-    (Un vecteur propre pour λ = −2.)
-    = (1 ; 1)   (cases à remplir : (2,1))   ← Noyau de A + 2I
+    = (1 ; 1)   (cases à remplir : (2,1))   ← Noyau de A + I
   — Un vecteur propre pour λ = −3.  [juge eigvec]  départ : v_2
     = (2 ; 1)   (cases à remplir : (1,1))   ← Noyau de A + 3I
   — Les coefficients c : Pc = x(0), avec P = [v₁ v₂].  [juge mat]  départ : c
-    = (3 ; -1)   (cases à remplir : (2,1))   ← c₁v₁ + c₂v₂ = (1 ; 2)
+    = (-1 ; -2)   (cases à remplir : (1,1))   ← c₁v₁ + c₂v₂ = (−5 ; −3)
   — La solution x(t).  [juge odevec]  départ : x(t)
-    = x(t) = 3e^(-2t)(1 ; 1)-e^(-3t)(2 ; 1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = x(t) = -e^(-t)(1 ; 1)-2e^(-3t)(2 ; 1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
   — La stabilité.  [juge value]  départ : α
     (Le système ẋ = Ax est-il stable ? Stable : toutes les Re λ < 0.)
-    = −2   ← La plus grande partie réelle : stable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(−2t)(1 ; □) + c₂e^(−3t)(2 ; □) | x(t) = (3e^(-2t)-2e^(-3t) ; 3e^(-2t)-e^(-3t))
+    = −1   ← La plus grande partie réelle : stable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(−t)(1 ; □) + c₂e^(−3t)(2 ; □) | x(t) = (-e^-t-4e^(-3t) ; -e^-t-2e^(-3t))
+  pièges : l_eigvec_row
+
+ÿ + 3ẏ + 2y = 0, avec y(0) = −1 et ẏ(0) = 3. Trouve les modes propres, la solution x(t), et dis si le système est stable. Avec x = (y ; ẏ), ẋ = Ax où A = [[0,1],[-2,-3]]. Les valeurs propres de A sont −1 et −2.
+  [guided]  v_1
+    (Un vecteur propre pour λ = −1.)
+    = (1 ; -1)   (cases à remplir : (1,1))   ← Noyau de A + I
+  — Un vecteur propre pour λ = −2.  [juge eigvec]  départ : v_2
+    = (1 ; -2)   (cases à remplir : (2,1))   ← Noyau de A + 2I
+  — Les coefficients c : Pc = x(0), avec P = [v₁ v₂].  [juge mat]  départ : c
+    = (1 ; -2)   (cases à remplir : (1,1))   ← c₁v₁ + c₂v₂ = (−1 ; 3)
+  — La solution x(t).  [juge odevec]  départ : x(t)
+    = x(t) = e^(-t)(1 ; -1)-2e^(-2t)(1 ; -2)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+  — La stabilité.  [juge value]  départ : α
+    (Le système ẋ = Ax est-il stable ? Stable : toutes les Re λ < 0.)
+    = −1   ← La plus grande partie réelle : stable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(−t)(1 ; □) + c₂e^(−2t)(1 ; □) | x(t) = (e^-t-2e^(-2t) ; -e^-t+4e^(-2t))
   pièges : l_eigvec_row
 
 ```
@@ -3707,66 +3700,144 @@ _Un mode e^{λt}v par valeur propre ; stable si toutes les Re λ < 0._
 ### Niveau 2
 
 ```
-ÿ + 5ẏ + 6y = 0, avec y(0) = 1 et ẏ(0) = −5. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable.
+ÿ − ẏ − 6y = 0, avec y(0) = −3 et ẏ(0) = −4. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable.
   [guided]  A
     (La matrice A de ẋ = Ax, avec x = (y ; ẏ).)
-    = [[0,1],[-6,-5]]   (cases à remplir : (2,1) (2,2))   ← ÿ = −6y − 5ẏ
+    = [[0,1],[6,1]]   (cases à remplir : (2,1) (2,2))   ← ÿ = 6y + ẏ
   — Le polynôme caractéristique, factorisé.  [juge det]  départ : det(A − λI)
-    = det[[-λ,1],[-6,-5-λ]]   ← λ soustrait sur la diagonale
-    = (−λ)(−5 − λ) + 6   ← Diagonale moins antidiagonale
-    = λ² + 5λ + 6   ← λ² − (tr A)λ + det A
-    = (λ + 3)(λ + □)   (trous : (λ + 3)(λ + 2))   ← Factoriser
-  — Un vecteur propre pour λ = −2.  [juge eigvec]  départ : v_1
+    = det[[-λ,1],[6,1-λ]]   ← λ soustrait sur la diagonale
+    = (−λ)(1 − λ) − 6   ← Diagonale moins antidiagonale
+    = λ² − λ − 6   ← λ² − (tr A)λ + det A
+    = (λ + 2)(λ − □)   (trous : (λ + 2)(λ − 3))   ← Factoriser
+  — Un vecteur propre pour λ = 3.  [juge eigvec]  départ : v_1
+    = (1 ; 3)   (cases à remplir : (2,1))   ← Noyau de A − 3I
+  — Un vecteur propre pour λ = −2.  [juge eigvec]  départ : v_2
     = (1 ; -2)   (cases à remplir : (2,1))   ← Noyau de A + 2I
+  — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
+    = x(t) = c_1e^(3t)(1 ; 3)+c_2e^(-2t)(1 ; -2)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = c_1 = −2 ; c_2 = −1   ← c₁v₁ + c₂v₂ = (−3 ; −4)
+    = x(t) = -2e^(3t)(1 ; 3)-e^(-2t)(1 ; -2)   ← Les constantes remplacées
+  — La stabilité.  [juge value]  départ : α
+    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
+    = 3   ← La plus grande partie réelle : instable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(3t)(1 ; □) + c₂e^(−2t)(1 ; □) | x(t) = (-2e^(3t)-e^(-2t) ; -6e^(3t)+2e^(-2t))
+  pièges : a2_jacobian_transposed, m_companion_sign, m_stab_discrete_in_cont
+
+ÿ + 7ẏ + 12y = 0, avec y(0) = −1 et ẏ(0) = 1. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable.
+  [guided]  A
+    (La matrice A de ẋ = Ax, avec x = (y ; ẏ).)
+    = [[0,1],[-12,-7]]   (cases à remplir : (2,1) (2,2))   ← ÿ = −12y − 7ẏ
+  — Le polynôme caractéristique, factorisé.  [juge det]  départ : det(A − λI)
+    = det[[-λ,1],[-12,-7-λ]]   ← λ soustrait sur la diagonale
+    = (−λ)(−7 − λ) + 12   ← Diagonale moins antidiagonale
+    = λ² + 7λ + 12   ← λ² − (tr A)λ + det A
+    = (λ + 4)(λ + □)   (trous : (λ + 4)(λ + 3))   ← Factoriser
+  — Un vecteur propre pour λ = −3.  [juge eigvec]  départ : v_1
+    = (1 ; -3)   (cases à remplir : (2,1))   ← Noyau de A + 3I
+  — Un vecteur propre pour λ = −4.  [juge eigvec]  départ : v_2
+    = (1 ; -4)   (cases à remplir : (1,1))   ← Noyau de A + 4I
+  — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
+    = x(t) = c_1e^(-3t)(1 ; -3)+c_2e^(-4t)(1 ; -4)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = c_1 = −3 ; c_2 = 2   ← c₁v₁ + c₂v₂ = (−1 ; 1)
+    = x(t) = -3e^(-3t)(1 ; -3)+2e^(-4t)(1 ; -4)   ← Les constantes remplacées
+  — La stabilité.  [juge value]  départ : α
+    ? Le système ẋ = Ax est-il stable ? ✔ Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
+    = −3   ← La plus grande partie réelle : stable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(−3t)(1 ; □) + c₂e^(−4t)(1 ; □) | x(t) = (-3e^(-3t)+2e^(-4t) ; 9e^(-3t)-8e^(-4t))
+  pièges : a2_jacobian_transposed, m_companion_sign, m_stab_discrete_in_cont
+
+ÿ + 4ẏ + 3y = 0, avec y(0) = 0 et ẏ(0) = 6. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable.
+  [guided]  A
+    (La matrice A de ẋ = Ax, avec x = (y ; ẏ).)
+    = [[0,1],[-3,-4]]   (cases à remplir : (2,1) (2,2))   ← ÿ = −3y − 4ẏ
+  — Le polynôme caractéristique, factorisé.  [juge det]  départ : det(A − λI)
+    = det[[-λ,1],[-3,-4-λ]]   ← λ soustrait sur la diagonale
+    = (−λ)(−4 − λ) + 3   ← Diagonale moins antidiagonale
+    = λ² + 4λ + 3   ← λ² − (tr A)λ + det A
+    = (λ + □)(λ + 1)   (trous : (λ + 3)(λ + 1))   ← Factoriser
+  — Un vecteur propre pour λ = −1.  [juge eigvec]  départ : v_1
+    = (1 ; -1)   (cases à remplir : (2,1))   ← Noyau de A + I
   — Un vecteur propre pour λ = −3.  [juge eigvec]  départ : v_2
     = (1 ; -3)   (cases à remplir : (1,1))   ← Noyau de A + 3I
   — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(-2t)(1 ; -2)+c_2e^(-3t)(1 ; -3)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
-    = c_1 = −2 ; c_2 = 3   ← c₁v₁ + c₂v₂ = (1 ; −5)
-    = x(t) = -2e^(-2t)(1 ; -2)+3e^(-3t)(1 ; -3)   ← Les constantes remplacées
+    = x(t) = c_1e^(-t)(1 ; -1)+c_2e^(-3t)(1 ; -3)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = c_1 = 3 ; c_2 = −3   ← c₁v₁ + c₂v₂ = (0 ; 6)
+    = x(t) = 3e^(-t)(1 ; -1)-3e^(-3t)(1 ; -3)   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : α
     ? Le système ẋ = Ax est-il stable ? ✔ Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
-    = −2   ← La plus grande partie réelle : stable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(−2t)(1 ; □) + c₂e^(−3t)(1 ; □) | x(t) = (-2e^(-2t)+3e^(-3t) ; 4e^(-2t)-9e^(-3t))
+    = −1   ← La plus grande partie réelle : stable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(−t)(1 ; □) + c₂e^(−3t)(1 ; □) | x(t) = (3e^-t-3e^(-3t) ; -3e^-t+9e^(-3t))
   pièges : a2_jacobian_transposed, m_companion_sign, m_stab_discrete_in_cont
 
-ẋ = Ax avec A = [[3,2],[-4,-3]] et x(0) = (-1 ; 4). Trouve les modes propres, la solution x(t), et dis si le système est stable.
-  [guided]  det(A − λI)
+```
+
+### Niveau 3
+
+```
+ẋ = Ax avec A = [[3,2],[-1,0]] et x(0) = (6 ; -4). Trouve les modes propres, la solution x(t), et dis si le système est stable. Choisis d'abord chaque action.
+  [tap, suivre l'erreur, menu menu]  det(A − λI)
     (Le polynôme caractéristique, factorisé.)
-    = det[[3-λ,2],[-4,-3-λ]]   ← λ soustrait sur la diagonale
-    = (3 − λ)(−3 − λ) + 8   ← Diagonale moins antidiagonale
-    = λ² − 1   ← λ² − (tr A)λ + det A
-    = (λ + 1)(λ − 1)   ← Factoriser
-  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_1
-    = (1 ; -1)   (cases à remplir : (1,1))   ← Noyau de A − I
-  — Un vecteur propre pour λ = −1.  [juge eigvec]  départ : v_2
-    = (1 ; -2)   (cases à remplir : (2,1))   ← Noyau de A + I
+    = det[[3-λ,2],[-1,-λ]]   ← λ soustrait sur la diagonale
+    = (3 − λ)(−λ) + 2   ← Diagonale moins antidiagonale
+    = λ² − 3λ + 2   ← λ² − (tr A)λ + det A
+    = (λ − 1)(λ − 2)   ← Factoriser
+  — Un vecteur propre pour λ = 2.  [juge eigvec]  départ : v_1
+    = (2 ; -1)   ← Noyau de A − 2I
+  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_2
+    = (1 ; -1)   ← Noyau de A − I
   — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(t)(1 ; -1)+c_2e^(-t)(1 ; -2)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
-    = c_1 = 2 ; c_2 = −3   ← c₁v₁ + c₂v₂ = (−1 ; 4)
-    = x(t) = 2e^(t)(1 ; -1)-3e^(-t)(1 ; -2)   ← Les constantes remplacées
+    = x(t) = c_1e^(2t)(2 ; -1)+c_2e^(t)(1 ; -1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = c_1 = 2 ; c_2 = 2   ← c₁v₁ + c₂v₂ = (6 ; −4)
+    = x(t) = 2e^(2t)(2 ; -1)+2e^(t)(1 ; -1)   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : α
     ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
-    = 1   ← La plus grande partie réelle : instable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(t)(1 ; □) + c₂e^(−t)(1 ; □) | x(t) = (2e^t-3e^-t ; -2e^t+6e^-t)
+    = 2   ← La plus grande partie réelle : instable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(2t)(2 ; □) + c₂e^(t)(1 ; □) | x(t) = (4e^(2t)+2e^t ; -2e^(2t)-2e^t)
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont
 
-ÿ − 9y = 0, avec y(0) = 0 et ẏ(0) = −6. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable.
-  [guided]  A
+ÿ − ẏ − 2y = 0, avec y(0) = −1 et ẏ(0) = 4. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable. Choisis d'abord chaque action.
+  [tap, suivre l'erreur, menu menu]  A
     (La matrice A de ẋ = Ax, avec x = (y ; ẏ).)
-    = [[0,1],[9,0]]   (cases à remplir : (2,1) (2,2))   ← ÿ = 9y
+    = [[0,1],[2,1]]   ← ÿ = 2y + ẏ
+  — Le polynôme caractéristique, factorisé.  [juge det]  départ : det(A − λI)
+    = det[[-λ,1],[2,1-λ]]   ← λ soustrait sur la diagonale
+    = (−λ)(1 − λ) − 2   ← Diagonale moins antidiagonale
+    = λ² − λ − 2   ← λ² − (tr A)λ + det A
+    = (λ + 1)(λ − 2)   ← Factoriser
+  — Un vecteur propre pour λ = 2.  [juge eigvec]  départ : v_1
+    = (1 ; 2)   ← Noyau de A − 2I
+  — Un vecteur propre pour λ = −1.  [juge eigvec]  départ : v_2
+    = (1 ; -1)   ← Noyau de A + I
+  — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
+    = x(t) = c_1e^(2t)(1 ; 2)+c_2e^(-t)(1 ; -1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = c_1 = 1 ; c_2 = −2   ← c₁v₁ + c₂v₂ = (−1 ; 4)
+    = x(t) = e^(2t)(1 ; 2)-2e^(-t)(1 ; -1)   ← Les constantes remplacées
+  — y(t), la première composante de x(t).  [juge ode]  départ : y′′ − y′ − 2y = 0
+    = y = e^(2t) − 2e^(−t)   ← La première composante
+  — La stabilité.  [juge value]  départ : α
+    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
+    = 2   ← La plus grande partie réelle : instable
+  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(2t)(1 ; □) + c₂e^(−t)(1 ; □) | x(t) = (e^(2t)-2e^-t ; 2e^(2t)+2e^-t)
+  pièges : a2_jacobian_transposed, m_companion_sign, m_stab_discrete_in_cont
+
+ÿ − 9y = 0, avec y(0) = 0 et ẏ(0) = −6. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable. Choisis d'abord chaque action.
+  [tap, suivre l'erreur, menu menu]  A
+    (La matrice A de ẋ = Ax, avec x = (y ; ẏ).)
+    = [[0,1],[9,0]]   ← ÿ = 9y
   — Le polynôme caractéristique, factorisé.  [juge det]  départ : det(A − λI)
     = det[[-λ,1],[9,-λ]]   ← λ soustrait sur la diagonale
     = λ² − 9   ← λ² − (tr A)λ + det A
-    = (λ + 3)(λ − □)   (trous : (λ + 3)(λ − 3))   ← Factoriser
+    = (λ + 3)(λ − 3)   ← Factoriser
   — Un vecteur propre pour λ = 3.  [juge eigvec]  départ : v_1
-    = (1 ; 3)   (cases à remplir : (1,1))   ← Noyau de A − 3I
+    = (1 ; 3)   ← Noyau de A − 3I
   — Un vecteur propre pour λ = −3.  [juge eigvec]  départ : v_2
-    = (1 ; -3)   (cases à remplir : (1,1))   ← Noyau de A + 3I
+    = (1 ; -3)   ← Noyau de A + 3I
   — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
     = x(t) = c_1e^(3t)(1 ; 3)+c_2e^(-3t)(1 ; -3)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
     = c_1 = −1 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (0 ; −6)
     = x(t) = -e^(3t)(1 ; 3)+e^(-3t)(1 ; -3)   ← Les constantes remplacées
+  — y(t), la première composante de x(t).  [juge ode]  départ : y′′ − 9y = 0
+    = y = −e^(3t) + e^(−3t)   ← La première composante
   — La stabilité.  [juge value]  départ : α
     ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
     = 3   ← La plus grande partie réelle : instable
@@ -3775,103 +3846,28 @@ _Un mode e^{λt}v par valeur propre ; stable si toutes les Re λ < 0._
 
 ```
 
-### Niveau 3
-
-```
-ÿ + ẏ − 6y = 0, avec y(0) = 0 et ẏ(0) = −5. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable. Choisis d'abord chaque action.
-  [tap, suivre l'erreur, menu menu]  A
-    (La matrice A de ẋ = Ax, avec x = (y ; ẏ).)
-    = [[0,1],[6,-1]]   ← ÿ = 6y − ẏ
-  — Le polynôme caractéristique, factorisé.  [juge det]  départ : det(A − λI)
-    = det[[-λ,1],[6,-1-λ]]   ← λ soustrait sur la diagonale
-    = (−λ)(−1 − λ) − 6   ← Diagonale moins antidiagonale
-    = λ² + λ − 6   ← λ² − (tr A)λ + det A
-    = (λ + 3)(λ − 2)   ← Factoriser
-  — Un vecteur propre pour λ = 2.  [juge eigvec]  départ : v_1
-    = (1 ; 2)   ← Noyau de A − 2I
-  — Un vecteur propre pour λ = −3.  [juge eigvec]  départ : v_2
-    = (1 ; -3)   ← Noyau de A + 3I
-  — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(2t)(1 ; 2)+c_2e^(-3t)(1 ; -3)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
-    = c_1 = −1 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (0 ; −5)
-    = x(t) = -e^(2t)(1 ; 2)+e^(-3t)(1 ; -3)   ← Les constantes remplacées
-  — y(t), la première composante de x(t).  [juge ode]  départ : y′′ + y′ − 6y = 0
-    = y = −e^(2t) + e^(−3t)   ← La première composante
-  — La stabilité.  [juge value]  départ : α
-    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
-    = 2   ← La plus grande partie réelle : instable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(2t)(1 ; □) + c₂e^(−3t)(1 ; □) | x(t) = (-e^(2t)+e^(-3t) ; -2e^(2t)-3e^(-3t))
-  pièges : a2_jacobian_transposed, m_companion_sign, m_stab_discrete_in_cont
-
-ẋ = Ax avec A = [[-5,-3],[6,4]] et x(0) = (-1 ; 0). Trouve les modes propres, la solution x(t), et dis si le système est stable. Choisis d'abord chaque action.
-  [tap, suivre l'erreur, menu menu]  det(A − λI)
-    (Le polynôme caractéristique, factorisé.)
-    = det[[-5-λ,-3],[6,4-λ]]   ← λ soustrait sur la diagonale
-    = (−5 − λ)(4 − λ) + 18   ← Diagonale moins antidiagonale
-    = λ² + λ − 2   ← λ² − (tr A)λ + det A
-    = (λ + 2)(λ − 1)   ← Factoriser
-  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_1
-    = (1 ; -2)   ← Noyau de A − I
-  — Un vecteur propre pour λ = −2.  [juge eigvec]  départ : v_2
-    = (1 ; -1)   ← Noyau de A + 2I
-  — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(t)(1 ; -2)+c_2e^(-2t)(1 ; -1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
-    = c_1 = 1 ; c_2 = −2   ← c₁v₁ + c₂v₂ = (−1 ; 0)
-    = x(t) = e^(t)(1 ; -2)-2e^(-2t)(1 ; -1)   ← Les constantes remplacées
-  — La stabilité.  [juge value]  départ : α
-    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
-    = 1   ← La plus grande partie réelle : instable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(t)(1 ; □) + c₂e^(−2t)(1 ; □) | x(t) = (e^t-2e^(-2t) ; -2e^t+2e^(-2t))
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont
-
-ÿ − y = 0, avec y(0) = 3 et ẏ(0) = −1. Écris-la comme ẋ = Ax avec x = (y ; ẏ), trouve les modes propres, la solution x(t), et dis si le système est stable. Choisis d'abord chaque action.
-  [tap, suivre l'erreur, menu menu]  A
-    (La matrice A de ẋ = Ax, avec x = (y ; ẏ).)
-    = [[0,1],[1,0]]   ← ÿ = y
-  — Le polynôme caractéristique, factorisé.  [juge det]  départ : det(A − λI)
-    = det[[-λ,1],[1,-λ]]   ← λ soustrait sur la diagonale
-    = λ² − 1   ← λ² − (tr A)λ + det A
-    = (λ + 1)(λ − 1)   ← Factoriser
-  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_1
-    = (1 ; 1)   ← Noyau de A − I
-  — Un vecteur propre pour λ = −1.  [juge eigvec]  départ : v_2
-    = (1 ; -1)   ← Noyau de A + I
-  — La solution x(t) : la solution générale, puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(t)(1 ; 1)+c_2e^(-t)(1 ; -1)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
-    = c_1 = 1 ; c_2 = 2   ← c₁v₁ + c₂v₂ = (3 ; −1)
-    = x(t) = e^(t)(1 ; 1)+2e^(-t)(1 ; -1)   ← Les constantes remplacées
-  — y(t), la première composante de x(t).  [juge ode]  départ : y′′ − y = 0
-    = y = e^(t) + 2e^(−t)   ← La première composante
-  — La stabilité.  [juge value]  départ : α
-    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
-    = 1   ← La plus grande partie réelle : instable
-  aides : Un mode e^{λt}v par valeur propre ; les coefficients résolvent Pc = x(0) ; stable si toutes les Re λ < 0. | x(t) = c₁e^(t)(1 ; □) + c₂e^(−t)(1 ; □) | x(t) = (e^t+2e^-t ; e^t-2e^-t)
-  pièges : a2_jacobian_transposed, m_companion_sign, m_stab_discrete_in_cont
-
-```
-
 ### Niveau 4
 
 ```
-ẋ = Ax avec A = [[3,-4],[2,-1]] et x(0) = (0 ; -2). Trouve les valeurs propres, la solution réelle x(t) et dis si le système est stable.
+ẋ = Ax avec A = [[2,-1],[2,0]] et x(0) = (1 ; 0). Trouve les valeurs propres, la solution réelle x(t) et dis si le système est stable.
   [free, suivre l'erreur]  det(A − λI)
     (Le polynôme caractéristique, développé.)
-    = det[[3-λ,-4],[2,-1-λ]]   ← λ soustrait sur la diagonale
-    = (3 − λ)(−1 − λ) + 8   ← Diagonale moins antidiagonale
-    = λ² − 2λ + 5   ← λ² − (tr A)λ + det A
-  — Les valeurs propres (complexes).  [juge complex]  départ : λ² − 2λ + 5 = 0
-    = λ = 1 + 2i ou λ = 1 − 2i   ← Δ &lt; 0 : deux racines conjuguées a ± ib
+    = det[[2-λ,-1],[2,-λ]]   ← λ soustrait sur la diagonale
+    = (2 − λ)(−λ) + 2   ← Diagonale moins antidiagonale
+    = λ² − 2λ + 2   ← λ² − (tr A)λ + det A
+  — Les valeurs propres (complexes).  [juge complex]  départ : λ² − 2λ + 2 = 0
+    = λ = 1 + i ou λ = 1 − i   ← Δ &lt; 0 : deux racines conjuguées a ± ib
   — La solution réelle : modes e^{at}(cos bt, sin bt), puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(t)(cos(2t)+sin(2t) ; sin(2t))+c_2e^(t)(-sin(2t)+cos(2t) ; cos(2t))   ← Partie réelle et partie imaginaire de e^{λt}w, w vecteur propre complexe
-    = c_1 = 2 ; c_2 = −2   ← En t = 0 : c₁·(1 ; 0) + c₂·(1 ; 1) = (0 ; −2)
-    = x(t) = 2e^(t)(cos(2t)+sin(2t) ; sin(2t))-2e^(t)(-sin(2t)+cos(2t) ; cos(2t))   ← Les constantes remplacées
+    = x(t) = c_1e^(t)(cos(t) ; cos(t)+sin(t))+c_2e^(t)(-sin(t) ; -sin(t)+cos(t))   ← Partie réelle et partie imaginaire de e^{λt}w, w vecteur propre complexe
+    = c_1 = 1 ; c_2 = −1   ← En t = 0 : c₁·(1 ; 1) + c₂·(0 ; 1) = (1 ; 0)
+    = x(t) = e^(t)(cos(t) ; cos(t)+sin(t))-e^(t)(-sin(t) ; -sin(t)+cos(t))   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : α
     ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Ni l'un ni l'autre : Re λ = 0, les solutions restent bornées / · Instable : une |λ| ≥ 1 / · Stable : Im λ ≠ 0, les oscillations s'amortissent
     = 1   ← La plus grande partie réelle : instable
-  aides : λ = a ± ib : les modes réels sont e^{at}(Re w·cos bt − Im w·sin bt) et e^{at}(Re w·sin bt + Im w·cos bt), w vecteur propre de a + ib. La stabilité se lit sur a = Re λ. | λ = 1 ± 2i ; x(t) = c₁e^(t)(… cos(2t) …) + c₂e^(t)(…) | x(t) = (2e^t×(cos(2t)+sin(2t))-2e^t×(-sin(2t)+cos(2t)) ; 2e^t×sin(2t)-2e^t×cos(2t))
+  aides : λ = a ± ib : les modes réels sont e^{at}(Re w·cos bt − Im w·sin bt) et e^{at}(Re w·sin bt + Im w·cos bt), w vecteur propre de a + ib. La stabilité se lit sur a = Re λ. | λ = 1 ± i ; x(t) = c₁e^(t)(… cos(t) …) + c₂e^(t)(…) | x(t) = (e^t×cos(t)+e^t×sin(t) ; e^t×(cos(t)+sin(t))-e^t×(-sin(t)+cos(t)))
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_imag_part
 
-ẋ = Ax avec A = [[-2,-2],[2,-2]] et x(0) = (1 ; 0). Trouve les valeurs propres, la solution réelle x(t) et dis si le système est stable.
+ẋ = Ax avec A = [[-2,-2],[2,-2]] et x(0) = (-2 ; 2). Trouve les valeurs propres, la solution réelle x(t) et dis si le système est stable.
   [free, suivre l'erreur]  det(A − λI)
     (Le polynôme caractéristique, développé.)
     = det[[-2-λ,-2],[2,-2-λ]]   ← λ soustrait sur la diagonale
@@ -3880,31 +3876,31 @@ _Un mode e^{λt}v par valeur propre ; stable si toutes les Re λ < 0._
   — Les valeurs propres (complexes).  [juge complex]  départ : λ² + 4λ + 8 = 0
     = λ = −2 + 2i ou λ = −2 − 2i   ← Δ &lt; 0 : deux racines conjuguées a ± ib
   — La solution réelle : modes e^{at}(cos bt, sin bt), puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(-2t)(cos(2t) ; sin(2t))+c_2e^(-2t)(-sin(2t) ; cos(2t))   ← Partie réelle et partie imaginaire de e^{λt}w, w vecteur propre complexe
-    = c_1 = 1 ; c_2 = 0   ← En t = 0 : c₁·(1 ; 0) + c₂·(0 ; 1) = (1 ; 0)
-    = x(t) = e^(-2t)(cos(2t) ; sin(2t))   ← Les constantes remplacées
+    = x(t) = c_1e^(-2t)(sin(2t) ; -cos(2t))+c_2e^(-2t)(cos(2t) ; sin(2t))   ← Partie réelle et partie imaginaire de e^{λt}w, w vecteur propre complexe
+    = c_1 = −2 ; c_2 = −2   ← En t = 0 : c₁·(0 ; −1) + c₂·(1 ; 0) = (−2 ; 2)
+    = x(t) = -2e^(-2t)(sin(2t) ; -cos(2t))-2e^(-2t)(cos(2t) ; sin(2t))   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : α
     ? Le système ẋ = Ax est-il stable ? ✔ Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / · Ni l'un ni l'autre : Re λ = 0, les solutions restent bornées / · Instable : une |λ| ≥ 1 / · Stable : Im λ ≠ 0, les oscillations s'amortissent
     = −2   ← La plus grande partie réelle : stable
-  aides : λ = a ± ib : les modes réels sont e^{at}(Re w·cos bt − Im w·sin bt) et e^{at}(Re w·sin bt + Im w·cos bt), w vecteur propre de a + ib. La stabilité se lit sur a = Re λ. | λ = −2 ± 2i ; x(t) = c₁e^(−2t)(… cos(2t) …) + c₂e^(−2t)(…) | x(t) = (e^(-2t)×cos(2t) ; e^(-2t)×sin(2t))
+  aides : λ = a ± ib : les modes réels sont e^{at}(Re w·cos bt − Im w·sin bt) et e^{at}(Re w·sin bt + Im w·cos bt), w vecteur propre de a + ib. La stabilité se lit sur a = Re λ. | λ = −2 ± 2i ; x(t) = c₁e^(−2t)(… cos(2t) …) + c₂e^(−2t)(…) | x(t) = (-2e^(-2t)×sin(2t)-2e^(-2t)×cos(2t) ; 2e^(-2t)×cos(2t)-2e^(-2t)×sin(2t))
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_imag_part
 
-ẋ = Ax avec A = [[1,-2],[1,-1]] et x(0) = (2 ; 0). Trouve les valeurs propres, la solution réelle x(t) et dis si le système est stable.
+ẋ = Ax avec A = [[-3,-1],[5,1]] et x(0) = (-1 ; 1). Trouve les valeurs propres, la solution réelle x(t) et dis si le système est stable.
   [free, suivre l'erreur]  det(A − λI)
     (Le polynôme caractéristique, développé.)
-    = det[[1-λ,-2],[1,-1-λ]]   ← λ soustrait sur la diagonale
-    = (1 − λ)(−1 − λ) + 2   ← Diagonale moins antidiagonale
-    = λ² + 1   ← λ² − (tr A)λ + det A
-  — Les valeurs propres (complexes).  [juge complex]  départ : λ² + 1 = 0
-    = λ = i ou λ = −i   ← Δ &lt; 0 : deux racines conjuguées a ± ib
+    = det[[-3-λ,-1],[5,1-λ]]   ← λ soustrait sur la diagonale
+    = (−3 − λ)(1 − λ) + 5   ← Diagonale moins antidiagonale
+    = λ² + 2λ + 2   ← λ² − (tr A)λ + det A
+  — Les valeurs propres (complexes).  [juge complex]  départ : λ² + 2λ + 2 = 0
+    = λ = −1 + i ou λ = −1 − i   ← Δ &lt; 0 : deux racines conjuguées a ± ib
   — La solution réelle : modes e^{at}(cos bt, sin bt), puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1(cos(t)+sin(t) ; sin(t))+c_2(-sin(t)+cos(t) ; cos(t))   ← Partie réelle et partie imaginaire de e^{λt}w, w vecteur propre complexe
-    = c_1 = 2 ; c_2 = 0   ← En t = 0 : c₁·(1 ; 0) + c₂·(1 ; 1) = (2 ; 0)
-    = x(t) = 2·(cos(t)+sin(t) ; sin(t))   ← Les constantes remplacées
+    = x(t) = c_1e^(-t)(cos(t) ; -2cos(t)+sin(t))+c_2e^(-t)(-sin(t) ; 2sin(t)+cos(t))   ← Partie réelle et partie imaginaire de e^{λt}w, w vecteur propre complexe
+    = c_1 = −1 ; c_2 = −1   ← En t = 0 : c₁·(1 ; −2) + c₂·(0 ; 1) = (−1 ; 1)
+    = x(t) = -e^(-t)(cos(t) ; -2cos(t)+sin(t))-e^(-t)(-sin(t) ; 2sin(t)+cos(t))   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : α
-    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / ✔ Ni l'un ni l'autre : Re λ = 0, les solutions restent bornées / · Instable : une |λ| ≥ 1 / · Stable : Im λ ≠ 0, les oscillations s'amortissent
-    = 0   ← La plus grande partie réelle : bornée
-  aides : λ = a ± ib : les modes réels sont e^{at}(Re w·cos bt − Im w·sin bt) et e^{at}(Re w·sin bt + Im w·cos bt), w vecteur propre de a + ib. La stabilité se lit sur a = Re λ. | λ = 0 ± i ; x(t) = c₁(… cos(t) …) + c₂(…) | x(t) = (2cos(t)+2sin(t) ; 2sin(t))
+    ? Le système ẋ = Ax est-il stable ? ✔ Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / · Ni l'un ni l'autre : Re λ = 0, les solutions restent bornées / · Instable : une |λ| ≥ 1 / · Stable : Im λ ≠ 0, les oscillations s'amortissent
+    = −1   ← La plus grande partie réelle : stable
+  aides : λ = a ± ib : les modes réels sont e^{at}(Re w·cos bt − Im w·sin bt) et e^{at}(Re w·sin bt + Im w·cos bt), w vecteur propre de a + ib. La stabilité se lit sur a = Re λ. | λ = −1 ± i ; x(t) = c₁e^(−t)(… cos(t) …) + c₂e^(−t)(…) | x(t) = (-e^-t×cos(t)+e^-t×sin(t) ; -e^-t×(-2cos(t)+sin(t))-e^-t×(2sin(t)+cos(t)))
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_imag_part
 
 ```
@@ -3912,22 +3908,20 @@ _Un mode e^{λt}v par valeur propre ; stable si toutes les Re λ < 0._
 ### Niveau 5
 
 ```
-ẋ = Ax avec A = [[0,-1],[2,2]] et x(0) = (-1 ; 3). Trouve les valeurs propres, la solution réelle x(t) et dis si le système est stable.
-  [free, sans aide]  det(A − λI)
-    (Le polynôme caractéristique, développé.)
-    = det[[-λ,-1],[2,2-λ]]   ← λ soustrait sur la diagonale
-    = (−λ)(2 − λ) + 2   ← Diagonale moins antidiagonale
-    = λ² − 2λ + 2   ← λ² − (tr A)λ + det A
-  — Les valeurs propres (complexes).  [juge complex]  départ : λ² − 2λ + 2 = 0
-    = λ = 1 + i ou λ = 1 − i   ← Δ &lt; 0 : deux racines conjuguées a ± ib
-  — La solution réelle : modes e^{at}(cos bt, sin bt), puis les constantes avec x(0).  [juge odevec]  départ : x(t)
-    = x(t) = c_1e^(t)(cos(t) ; -cos(t)+sin(t))+c_2e^(t)(-sin(t) ; sin(t)+cos(t))   ← Partie réelle et partie imaginaire de e^{λt}w, w vecteur propre complexe
-    = c_1 = −1 ; c_2 = 2   ← En t = 0 : c₁·(1 ; −1) + c₂·(0 ; 1) = (−1 ; 3)
-    = x(t) = -e^(t)(cos(t) ; -cos(t)+sin(t))+2e^(t)(-sin(t) ; sin(t)+cos(t))   ← Les constantes remplacées
-  — La stabilité.  [juge value]  départ : α
-    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Ni l'un ni l'autre : Re λ = 0, les solutions restent bornées / · Instable : une |λ| ≥ 1 / · Stable : Im λ ≠ 0, les oscillations s'amortissent
-    = 1   ← La plus grande partie réelle : instable
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_imag_part
+ÿ + cẏ + 4y = 0, c réel. Écris le système ẋ = Ax (x = (y ; ẏ)), son polynôme caractéristique, dis pour quels c il est stable et pour quels c il oscille, puis résous-le pour c = 5.
+  [free, sans aide]  A
+    (La matrice compagne (x = (y ; ẏ)).)
+    = [[0,1],[-4,-c]]   ← ÿ = −4y − cẏ
+  — Le polynôme caractéristique.  [juge det]  départ : det(A − λI)
+    = λ² + cλ + 4   ← Somme des racines −c, produit 4
+  — Stabilité, puis les valeurs de c pour lesquelles les valeurs propres ne sont pas réelles (oscillations) : Δ = c² − 16 < 0.  [juge solset]  départ : c² − 16 < 0
+    ? Pour quelles valeurs de c le système est-il stable ? ✔ c &gt; 0 / · c &gt; 4 / · c &lt; 0 / · |λ| &lt; 1 : jamais, le produit des racines vaut 4
+    = ]−4 ; 4[   ← Oscillations amorties si 0 < c < 4
+  — La solution pour c = 5, avec y(0) = 0 et ẏ(0) = 3.  [juge odevec]  départ : x(t)
+    = x(t) = c_1e^(-t)(1 ; -1)+c_2e^(-4t)(1 ; -4)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
+    = c_1 = 1 ; c_2 = −1   ← c₁v₁ + c₂v₂ = (0 ; 3)
+    = x(t) = e^(-t)(1 ; -1)-e^(-4t)(1 ; -4)   ← Les constantes remplacées
+  pièges : a2_jacobian_transposed, m_stab_discrete_in_cont
 
 ÿ + cẏ + 4y = 0, c réel. Écris le système ẋ = Ax (x = (y ; ẏ)), son polynôme caractéristique, dis pour quels c il est stable et pour quels c il oscille, puis résous-le pour c = 5.
   [free, sans aide]  A
@@ -3938,10 +3932,10 @@ _Un mode e^{λt}v par valeur propre ; stable si toutes les Re λ < 0._
   — Stabilité, puis les valeurs de c pour lesquelles les valeurs propres ne sont pas réelles (oscillations) : Δ = c² − 16 < 0.  [juge solset]  départ : c² − 16 < 0
     ? Pour quelles valeurs de c le système est-il stable ? ✔ c &gt; 0 / · c &gt; 4 / · c &lt; 0 / · |λ| &lt; 1 : jamais, le produit des racines vaut 4
     = ]−4 ; 4[   ← Oscillations amorties si 0 < c < 4
-  — La solution pour c = 5, avec y(0) = 2 et ẏ(0) = −5.  [juge odevec]  départ : x(t)
+  — La solution pour c = 5, avec y(0) = 0 et ẏ(0) = −3.  [juge odevec]  départ : x(t)
     = x(t) = c_1e^(-t)(1 ; -1)+c_2e^(-4t)(1 ; -4)   ← Un mode cᵢe^{λᵢt}vᵢ par valeur propre
-    = c_1 = 1 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (2 ; −5)
-    = x(t) = e^(-t)(1 ; -1)+e^(-4t)(1 ; -4)   ← Les constantes remplacées
+    = c_1 = −1 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (0 ; −3)
+    = x(t) = -e^(-t)(1 ; -1)+e^(-4t)(1 ; -4)   ← Les constantes remplacées
   pièges : a2_jacobian_transposed, m_stab_discrete_in_cont
 
 ÿ + cẏ + 4y = 0, c réel. Écris le système ẋ = Ax (x = (y ; ẏ)), son polynôme caractéristique, dis pour quels c il est stable et pour quels c il oscille, puis résous-le pour c = 5.
@@ -3964,10 +3958,10 @@ _Un mode e^{λt}v par valeur propre ; stable si toutes les Re λ < 0._
 ### Variantes d'examen
 
 ```
-Le système ẋ = Ax, avec A = [[-4,-5],[1,0]], est :
-  · Instable : une Re λ > 0   · Instable : une |λ| ≥ 1 [m_stab_discrete_in_cont]   ✔ Stable : toutes les Re λ < 0   · Stable : Im λ ≠ 0, les oscillations s'amortissent [m_stab_imag_part]
+Le système ẋ = Ax, avec A = [[-3,4],[-2,3]], est :
+  · Stable : toutes les Re λ < 0   · Instable : une |λ| ≥ 1 [m_stab_discrete_in_cont]   ✔ Instable : une Re λ > 0   · Ni l'un ni l'autre : les solutions restent bornées
   [examen mcq]
-  pièges : m_stab_discrete_in_cont, m_stab_imag_part
+  pièges : m_stab_discrete_in_cont
 
 Vrai ou faux ?
   « Pour A réelle 2 × 2, ẋ = Ax est stable si et seulement si tr A < 0 et det A > 0. » → VRAI
@@ -3982,40 +3976,40 @@ _P·diag(e^{λt})·P⁻¹, ou e^{λt}(I + tN) pour une valeur double._
 ### Niveau 1
 
 ```
-A = [[5,-3],[6,-4]] = PDP⁻¹ avec P = [[1,1],[1,2]] (vecteurs propres en colonnes) et P⁻¹ = [[2,-1],[-1,1]]. Trouve D, puis e^{Dt}, puis e^{At}.
+A = [[-1,-1],[2,-4]] = PDP⁻¹ avec P = [[1,1],[1,2]] (vecteurs propres en colonnes) et P⁻¹ = [[2,-1],[-1,1]]. Trouve D, puis e^{Dt}, puis e^{At}.
   [guided]  D
     (D = P⁻¹AP : les valeurs propres, dans l’ordre des colonnes de P.)
-    = [[2,0],[0,-1]]   (cases à remplir : (1,1) (2,2))   ← λ₁ = 2 et λ₂ = −1
+    = [[-2,0],[0,-3]]   (cases à remplir : (1,1) (2,2))   ← λ₁ = −2 et λ₂ = −3
   — e^{Dt} pour D diagonale : l'exponentielle de chaque valeur propre.  [juge mat]  départ : e^(Dt)
-    = [[e^(2t),0],[0,e^(-t)]]   (cases à remplir : (2,2))   ← D est diagonale : e^{Dt} = diag(e^{λ₁t}, e^{λ₂t})
+    = [[e^(-2t),0],[0,e^(-3t)]]   (cases à remplir : (1,1))   ← D est diagonale : e^{Dt} = diag(e^{λ₁t}, e^{λ₂t})
   — e^{At} = P·e^{Dt}·P⁻¹.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·[[e^(2t),0],[0,e^(-t)]]·P^(-1)   ← A = PDP⁻¹
-    = [[2e^(2t)-e^(-t),-e^(2t)+e^(-t)],[2e^(2t)-2e^(-t),-e^(2t)+2e^(-t)]]   ← Le produit
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(2t), □)·P⁻¹ | [[2e^(2t)-e^(-t),-e^(2t)+e^(-t)],[2e^(2t)-2e^(-t),-e^(2t)+2e^(-t)]]
+    = e^(At) = P·[[e^(-2t),0],[0,e^(-3t)]]·P^(-1)   ← A = PDP⁻¹
+    = [[2e^(-2t)-e^(-3t),-e^(-2t)+e^(-3t)],[2e^(-2t)-2e^(-3t),-e^(-2t)+2e^(-3t)]]   ← Le produit
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(−2t), □)·P⁻¹ | [[2e^(-2t)-e^(-3t),-e^(-2t)+e^(-3t)],[2e^(-2t)-2e^(-3t),-e^(-2t)+2e^(-3t)]]
   pièges : a2_jacobian_transposed
 
-A = [[-5,-4],[2,1]] = PDP⁻¹ avec P = [[1,2],[-1,-1]] (vecteurs propres en colonnes) et P⁻¹ = [[-1,-2],[1,1]]. Trouve D, puis e^{Dt}, puis e^{At}.
+A = [[-3,4],[-2,3]] = PDP⁻¹ avec P = [[1,2],[1,1]] (vecteurs propres en colonnes) et P⁻¹ = [[-1,2],[1,-1]]. Trouve D, puis e^{Dt}, puis e^{At}.
   [guided]  D
     (D = P⁻¹AP : les valeurs propres, dans l’ordre des colonnes de P.)
-    = [[-1,0],[0,-3]]   (cases à remplir : (1,1) (2,2))   ← λ₁ = −1 et λ₂ = −3
+    = [[1,0],[0,-1]]   (cases à remplir : (1,1) (2,2))   ← λ₁ = 1 et λ₂ = −1
   — e^{Dt} pour D diagonale : l'exponentielle de chaque valeur propre.  [juge mat]  départ : e^(Dt)
-    = [[e^(-t),0],[0,e^(-3t)]]   (cases à remplir : (2,2))   ← D est diagonale : e^{Dt} = diag(e^{λ₁t}, e^{λ₂t})
+    = [[e^(t),0],[0,e^(-t)]]   (cases à remplir : (1,1))   ← D est diagonale : e^{Dt} = diag(e^{λ₁t}, e^{λ₂t})
   — e^{At} = P·e^{Dt}·P⁻¹.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·[[e^(-t),0],[0,e^(-3t)]]·P^(-1)   ← A = PDP⁻¹
-    = [[-e^(-t)+2e^(-3t),-2e^(-t)+2e^(-3t)],[e^(-t)-e^(-3t),2e^(-t)-e^(-3t)]]   ← Le produit
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(−t), □)·P⁻¹ | [[-e^(-t)+2e^(-3t),-2e^(-t)+2e^(-3t)],[e^(-t)-e^(-3t),2e^(-t)-e^(-3t)]]
+    = e^(At) = P·[[e^(t),0],[0,e^(-t)]]·P^(-1)   ← A = PDP⁻¹
+    = [[-e^(t)+2e^(-t),2e^(t)-2e^(-t)],[-e^(t)+e^(-t),2e^(t)-e^(-t)]]   ← Le produit
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(t), □)·P⁻¹ | [[-e^(t)+2e^(-t),2e^(t)-2e^(-t)],[-e^(t)+e^(-t),2e^(t)-e^(-t)]]
   pièges : a2_jacobian_transposed
 
-A = [[5,6],[-3,-4]] = PDP⁻¹ avec P = [[2,1],[-1,-1]] (vecteurs propres en colonnes) et P⁻¹ = [[1,1],[-1,-2]]. Trouve D, puis e^{Dt}, puis e^{At}.
+A = [[-5,-3],[6,4]] = PDP⁻¹ avec P = [[1,1],[-2,-1]] (vecteurs propres en colonnes) et P⁻¹ = [[-1,-1],[2,1]]. Trouve D, puis e^{Dt}, puis e^{At}.
   [guided]  D
     (D = P⁻¹AP : les valeurs propres, dans l’ordre des colonnes de P.)
-    = [[2,0],[0,-1]]   (cases à remplir : (1,1) (2,2))   ← λ₁ = 2 et λ₂ = −1
+    = [[1,0],[0,-2]]   (cases à remplir : (1,1) (2,2))   ← λ₁ = 1 et λ₂ = −2
   — e^{Dt} pour D diagonale : l'exponentielle de chaque valeur propre.  [juge mat]  départ : e^(Dt)
-    = [[e^(2t),0],[0,e^(-t)]]   (cases à remplir : (2,2))   ← D est diagonale : e^{Dt} = diag(e^{λ₁t}, e^{λ₂t})
+    = [[e^(t),0],[0,e^(-2t)]]   (cases à remplir : (1,1))   ← D est diagonale : e^{Dt} = diag(e^{λ₁t}, e^{λ₂t})
   — e^{At} = P·e^{Dt}·P⁻¹.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·[[e^(2t),0],[0,e^(-t)]]·P^(-1)   ← A = PDP⁻¹
-    = [[2e^(2t)-e^(-t),2e^(2t)-2e^(-t)],[-e^(2t)+e^(-t),-e^(2t)+2e^(-t)]]   ← Le produit
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(2t), □)·P⁻¹ | [[2e^(2t)-e^(-t),2e^(2t)-2e^(-t)],[-e^(2t)+e^(-t),-e^(2t)+2e^(-t)]]
+    = e^(At) = P·[[e^(t),0],[0,e^(-2t)]]·P^(-1)   ← A = PDP⁻¹
+    = [[-e^(t)+2e^(-2t),-e^(t)+e^(-2t)],[2e^(t)-2e^(-2t),2e^(t)-e^(-2t)]]   ← Le produit
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(t), □)·P⁻¹ | [[-e^(t)+2e^(-2t),-e^(t)+e^(-2t)],[2e^(t)-2e^(-2t),2e^(t)-e^(-2t)]]
   pièges : a2_jacobian_transposed
 
 ```
@@ -4023,104 +4017,102 @@ A = [[5,6],[-3,-4]] = PDP⁻¹ avec P = [[2,1],[-1,-1]] (vecteurs propres en col
 ### Niveau 2
 
 ```
-Calcule e^{At} pour A = [[-5,4],[-2,1]].
+Calcule e^{At} pour A = [[-5,3],[-6,4]].
   [guided]  det(A − λI)
     (Le polynôme caractéristique.)
-    = det[[-5-λ,4],[-2,1-λ]]   ← λ soustrait sur la diagonale
-    = (−5 − λ)(1 − λ) + 8   ← Diagonale moins antidiagonale
-    = λ² + 4λ + 3   ← λ² − (tr A)λ + det A
-    = (λ + □)(λ + 1)   (trous : (λ + 3)(λ + 1))   ← Factoriser
+    = det[[-5-λ,3],[-6,4-λ]]   ← λ soustrait sur la diagonale
+    = (−5 − λ)(4 − λ) + 18   ← Diagonale moins antidiagonale
+    = λ² + λ − 2   ← λ² − (tr A)λ + det A
+    = (λ + □)(λ − 1)   (trous : (λ + 2)(λ − 1))   ← Factoriser
   — Diagonalise : P (vecteurs propres en colonnes) et D.  [juge factor]  départ : A = P·D·P^(−1)
     ? Comment calculer e^{At} ? ✔ Diagonaliser : e^{At} = P·diag(e^{λᵢt})·P⁻¹ / · A = λI + N avec N² = 0 / · L'exponentielle de chaque case de At
-    = P = [[1,2],[1,1]] ; D = diag(-1,-3)   ← Colonne k de P ↔ case k de D
+    = P = [[1,1],[2,1]] ; D = diag(1,-2)   ← Colonne k de P ↔ case k de D
   — e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·diag(e^(-t),e^(-3t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
-    = [[-e^(-t)+2e^(-3t),2e^(-t)-2e^(-3t)],[-e^(-t)+e^(-3t),2e^(-t)-e^(-3t)]]   ← Le produit, avec P⁻¹ = [[−1,2],[1,−1]]
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(−t), □)·P⁻¹ | [[-e^(-t)+2e^(-3t),2e^(-t)-2e^(-3t)],[-e^(-t)+e^(-3t),2e^(-t)-e^(-3t)]]
+    = e^(At) = P·diag(e^(t),e^(-2t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
+    = [[-e^(t)+2e^(-2t),e^(t)-e^(-2t)],[-2e^(t)+2e^(-2t),2e^(t)-e^(-2t)]]   ← Le produit, avec P⁻¹ = [[−1,1],[2,−1]]
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(t), □)·P⁻¹ | [[-e^(t)+2e^(-2t),e^(t)-e^(-2t)],[-2e^(t)+2e^(-2t),2e^(t)-e^(-2t)]]
   pièges : l_charpoly_sign, l_lambda_one_entry, m_expm_entrywise
 
-Calcule e^{At} pour A = [[3,2],[-4,-3]].
+Calcule e^{At} pour A = [[5,-6],[3,-4]].
   [guided]  det(A − λI)
     (Le polynôme caractéristique.)
-    = det[[3-λ,2],[-4,-3-λ]]   ← λ soustrait sur la diagonale
-    = (3 − λ)(−3 − λ) + 8   ← Diagonale moins antidiagonale
-    = λ² − 1   ← λ² − (tr A)λ + det A
-    = (λ + 1)(λ − 1)   ← Factoriser
+    = det[[5-λ,-6],[3,-4-λ]]   ← λ soustrait sur la diagonale
+    = (5 − λ)(−4 − λ) + 18   ← Diagonale moins antidiagonale
+    = λ² − λ − 2   ← λ² − (tr A)λ + det A
+    = (λ + 1)(λ − □)   (trous : (λ + 1)(λ − 2))   ← Factoriser
   — Diagonalise : P (vecteurs propres en colonnes) et D.  [juge factor]  départ : A = P·D·P^(−1)
     ? Comment calculer e^{At} ? ✔ Diagonaliser : e^{At} = P·diag(e^{λᵢt})·P⁻¹ / · A = λI + N avec N² = 0 / · L'exponentielle de chaque case de At
-    = P = [[1,1],[-1,-2]] ; D = diag(1,-1)   ← Colonne k de P ↔ case k de D
+    = P = [[2,1],[1,1]] ; D = diag(2,-1)   ← Colonne k de P ↔ case k de D
   — e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·diag(e^(t),e^(-t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
-    = [[2e^(t)-e^(-t),e^(t)-e^(-t)],[-2e^(t)+2e^(-t),-e^(t)+2e^(-t)]]   ← Le produit, avec P⁻¹ = [[2,1],[−1,−1]]
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(t), □)·P⁻¹ | [[2e^(t)-e^(-t),e^(t)-e^(-t)],[-2e^(t)+2e^(-t),-e^(t)+2e^(-t)]]
+    = e^(At) = P·diag(e^(2t),e^(-t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
+    = [[2e^(2t)-e^(-t),-2e^(2t)+2e^(-t)],[e^(2t)-e^(-t),-e^(2t)+2e^(-t)]]   ← Le produit, avec P⁻¹ = [[1,−1],[−1,2]]
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(2t), □)·P⁻¹ | [[2e^(2t)-e^(-t),-2e^(2t)+2e^(-t)],[e^(2t)-e^(-t),-e^(2t)+2e^(-t)]]
   pièges : l_charpoly_sign, l_lambda_one_entry, m_expm_entrywise
 
-Calcule e^{At} pour A = [[-3,-2],[1,0]].
+Calcule e^{At} pour A = [[-3,-1],[0,-3]].
   [guided]  det(A − λI)
     (Le polynôme caractéristique.)
-    = det[[-3-λ,-2],[1,-λ]]   ← λ soustrait sur la diagonale
-    = (−3 − λ)(−λ) + 2   ← Diagonale moins antidiagonale
-    = λ² + 3λ + 2   ← λ² − (tr A)λ + det A
-    = (λ + □)(λ + 1)   (trous : (λ + 2)(λ + 1))   ← Factoriser
-  — Diagonalise : P (vecteurs propres en colonnes) et D.  [juge factor]  départ : A = P·D·P^(−1)
-    ? Comment calculer e^{At} ? ✔ Diagonaliser : e^{At} = P·diag(e^{λᵢt})·P⁻¹ / · A = λI + N avec N² = 0 / · L'exponentielle de chaque case de At
-    = P = [[1,2],[-1,-1]] ; D = diag(-1,-2)   ← Colonne k de P ↔ case k de D
-  — e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·diag(e^(-t),e^(-2t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
-    = [[-e^(-t)+2e^(-2t),-2e^(-t)+2e^(-2t)],[e^(-t)-e^(-2t),2e^(-t)-e^(-2t)]]   ← Le produit, avec P⁻¹ = [[−1,−2],[1,1]]
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(−t), □)·P⁻¹ | [[-e^(-t)+2e^(-2t),-2e^(-t)+2e^(-2t)],[e^(-t)-e^(-2t),2e^(-t)-e^(-2t)]]
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_expm_entrywise
+    = det[[-3-λ,-1],[0,-3-λ]]   ← λ soustrait sur la diagonale
+    = (−3 − λ)(−3 − λ) − 0   ← Diagonale moins antidiagonale
+    = λ² + 6λ + 9   ← λ² − (tr A)λ + det A
+    = (λ + □)²   (trous : (λ + 3)²)   ← Factoriser
+  — λ = −3 est double : la partie nilpotente N = A + 3I.  [juge mat]  départ : N
+    ? Comment calculer e^{At} ? ✔ A = λI + N avec N² = 0 : e^{At} = e^{λt}(I + tN) / · Diagonaliser A / · e^{At} = e^{λt}I / · L'exponentielle de chaque case de At
+    = [[0,-1],[0,0]]   (cases à remplir : (1,1) (1,2))   ← A + 3I ≠ 0 : A n'est pas diagonalisable
+  — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
+    = e^(At) = e^(−3t)(I + tN)   ← λI et N commutent
+    = e^(-3t)·[[1,-t],[0,1]]   ← Case par case
+  aides : Valeur double : A = λI + N avec N² = 0, donc e^{At} = e^{λt}(I + tN). | e^{At} = e^(−3t)(I + t·[[□,−1],[0,0]]) | [[e^(-3t),-t×e^(-3t)],[0,e^(-3t)]]
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_expm_double_no_t, m_expm_entrywise
 
 ```
 
 ### Niveau 3
 
 ```
-Calcule e^{At} pour A = [[-5,-4],[2,1]]. Choisis d'abord chaque action.
+Calcule e^{At} pour A = [[-3,4],[-2,3]]. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  det(A − λI)
     (Le polynôme caractéristique.)
-    = det[[-5-λ,-4],[2,1-λ]]   ← λ soustrait sur la diagonale
-    = (−5 − λ)(1 − λ) + 8   ← Diagonale moins antidiagonale
-    = λ² + 4λ + 3   ← λ² − (tr A)λ + det A
-    = (λ + 3)(λ + 1)   ← Factoriser
+    = det[[-3-λ,4],[-2,3-λ]]   ← λ soustrait sur la diagonale
+    = (−3 − λ)(3 − λ) + 8   ← Diagonale moins antidiagonale
+    = λ² − 1   ← λ² − (tr A)λ + det A
+    = (λ + 1)(λ − 1)   ← Factoriser
   — Diagonalise : P (vecteurs propres en colonnes) et D.  [juge factor]  départ : A = P·D·P^(−1)
-    = P = [[1,2],[-1,-1]] ; D = diag(-1,-3)   ← Colonne k de P ↔ case k de D
+    = P = [[1,2],[1,1]] ; D = diag(1,-1)   ← Colonne k de P ↔ case k de D
   — e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·diag(e^(-t),e^(-3t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
-    = [[-e^(-t)+2e^(-3t),-2e^(-t)+2e^(-3t)],[e^(-t)-e^(-3t),2e^(-t)-e^(-3t)]]   ← Le produit, avec P⁻¹ = [[−1,−2],[1,1]]
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(−t), □)·P⁻¹ | [[-e^(-t)+2e^(-3t),-2e^(-t)+2e^(-3t)],[e^(-t)-e^(-3t),2e^(-t)-e^(-3t)]]
+    = e^(At) = P·diag(e^(t),e^(-t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
+    = [[-e^(t)+2e^(-t),2e^(t)-2e^(-t)],[-e^(t)+e^(-t),2e^(t)-e^(-t)]]   ← Le produit, avec P⁻¹ = [[−1,2],[1,−1]]
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(t), □)·P⁻¹ | [[-e^(t)+2e^(-t),2e^(t)-2e^(-t)],[-e^(t)+e^(-t),2e^(t)-e^(-t)]]
   pièges : l_charpoly_sign, l_lambda_one_entry
 
-Calcule e^{At} pour A = [[2,1],[-1,0]]. Choisis d'abord chaque action.
+Calcule e^{At} pour A = [[-5,-6],[3,4]]. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  det(A − λI)
     (Le polynôme caractéristique.)
-    = det[[2-λ,1],[-1,-λ]]   ← λ soustrait sur la diagonale
-    = (2 − λ)(−λ) + 1   ← Diagonale moins antidiagonale
-    = λ² − 2λ + 1   ← λ² − (tr A)λ + det A
-    = (λ − 1)²   ← Factoriser
-  — λ = 1 est double : la partie nilpotente N = A − I.  [juge mat]  départ : N
-    = [[1,1],[-1,-1]]   ← A − I ≠ 0 : A n'est pas diagonalisable
-  — Vérifie que N² = 0.  [juge mat]  départ : N²
-    = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
-  — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = e^(t)(I + tN)   ← λI et N commutent
-    = e^(t)·[[1+t,t],[-t,1-t]]   ← Case par case
-  aides : Valeur double : A = λI + N avec N² = 0, donc e^{At} = e^{λt}(I + tN). | e^{At} = e^(t)(I + t·[[□,1],[−1,−1]]) | [[e^t×(t+1),t×e^t],[-t×e^t,e^t×(-t+1)]]
+    = det[[-5-λ,-6],[3,4-λ]]   ← λ soustrait sur la diagonale
+    = (−5 − λ)(4 − λ) + 18   ← Diagonale moins antidiagonale
+    = λ² + λ − 2   ← λ² − (tr A)λ + det A
+    = (λ + 2)(λ − 1)   ← Factoriser
+  — Diagonalise : P (vecteurs propres en colonnes) et D.  [juge factor]  départ : A = P·D·P^(−1)
+    = P = [[1,2],[-1,-1]] ; D = diag(1,-2)   ← Colonne k de P ↔ case k de D
+  — e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹, écrite case par case.  [juge odevec]  départ : e^(At)
+    = e^(At) = P·diag(e^(t),e^(-2t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
+    = [[-e^(t)+2e^(-2t),-2e^(t)+2e^(-2t)],[e^(t)-e^(-2t),2e^(t)-e^(-2t)]]   ← Le produit, avec P⁻¹ = [[−1,−2],[1,1]]
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(t), □)·P⁻¹ | [[-e^(t)+2e^(-2t),-2e^(t)+2e^(-2t)],[e^(t)-e^(-2t),2e^(t)-e^(-2t)]]
   pièges : l_charpoly_sign, l_lambda_one_entry
 
-Calcule e^{At} pour A = [[3,-1],[2,0]]. Choisis d'abord chaque action.
+Calcule e^{At} pour A = [[-4,2],[-1,-1]]. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  det(A − λI)
     (Le polynôme caractéristique.)
-    = det[[3-λ,-1],[2,-λ]]   ← λ soustrait sur la diagonale
-    = (3 − λ)(−λ) + 2   ← Diagonale moins antidiagonale
-    = λ² − 3λ + 2   ← λ² − (tr A)λ + det A
-    = (λ − 1)(λ − 2)   ← Factoriser
+    = det[[-4-λ,2],[-1,-1-λ]]   ← λ soustrait sur la diagonale
+    = (−4 − λ)(−1 − λ) + 2   ← Diagonale moins antidiagonale
+    = λ² + 5λ + 6   ← λ² − (tr A)λ + det A
+    = (λ + 3)(λ + 2)   ← Factoriser
   — Diagonalise : P (vecteurs propres en colonnes) et D.  [juge factor]  départ : A = P·D·P^(−1)
-    = P = [[1,1],[1,2]] ; D = diag(2,1)   ← Colonne k de P ↔ case k de D
+    = P = [[1,2],[1,1]] ; D = diag(-2,-3)   ← Colonne k de P ↔ case k de D
   — e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = P·diag(e^(2t),e^(t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
-    = [[2e^(2t)-e^(t),-e^(2t)+e^(t)],[2e^(2t)-2e^(t),-e^(2t)+2e^(t)]]   ← Le produit, avec P⁻¹ = [[2,−1],[−1,1]]
-  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(2t), □)·P⁻¹ | [[2e^(2t)-e^(t),-e^(2t)+e^(t)],[2e^(2t)-2e^(t),-e^(2t)+2e^(t)]]
+    = e^(At) = P·diag(e^(-2t),e^(-3t))·P^(-1)   ← e^{Dt} = diag(e^{λᵢt})
+    = [[-e^(-2t)+2e^(-3t),2e^(-2t)-2e^(-3t)],[-e^(-2t)+e^(-3t),2e^(-2t)-e^(-3t)]]   ← Le produit, avec P⁻¹ = [[−1,2],[1,−1]]
+  aides : Diagonalisable : e^{At} = P·diag(e^{λ₁t}, e^{λ₂t})·P⁻¹. | e^{At} = P·diag(e^(−2t), □)·P⁻¹ | [[-e^(-2t)+2e^(-3t),2e^(-2t)-2e^(-3t)],[-e^(-2t)+e^(-3t),2e^(-2t)-e^(-3t)]]
   pièges : l_charpoly_sign, l_lambda_one_entry
 
 ```
@@ -4128,7 +4120,26 @@ Calcule e^{At} pour A = [[3,-1],[2,0]]. Choisis d'abord chaque action.
 ### Niveau 4
 
 ```
-Calcule e^{At} pour A = [[1,1],[-1,3]], puis la solution de ẋ = Ax avec x(0) = (-2 ; -1).
+Calcule e^{At} pour A = [[-1,2],[-2,-5]], puis la solution de ẋ = Ax avec x(0) = (0 ; -1).
+  [free, suivre l'erreur]  det(A − λI)
+    (Le polynôme caractéristique.)
+    = det[[-1-λ,2],[-2,-5-λ]]   ← λ soustrait sur la diagonale
+    = (−1 − λ)(−5 − λ) + 4   ← Diagonale moins antidiagonale
+    = λ² + 6λ + 9   ← λ² − (tr A)λ + det A
+    = (λ + 3)²   ← Factoriser
+  — λ = −3 est double : la partie nilpotente N = A + 3I.  [juge mat]  départ : N
+    = [[2,2],[-2,-2]]   ← A + 3I ≠ 0 : A n'est pas diagonalisable
+  — Vérifie que N² = 0.  [juge mat]  départ : N²
+    = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
+  — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
+    = e^(At) = e^(−3t)(I + tN)   ← λI et N commutent
+    = e^(-3t)·[[1+2t,2t],[-2t,1-2t]]   ← Case par case
+  — x(t) = e^{At}x(0), avec x(0) = (0 ; −1).  [juge odevec]  départ : x(t)
+    = x(t) = e^(-3t)·(-2t ; -1+2t)   ← e^{At} fois x(0)
+  aides : Valeur double : A = λI + N avec N² = 0, donc e^{At} = e^{λt}(I + tN). | e^{At} = e^(−3t)(I + t·[[□,2],[−2,−2]]) | [[e^(-3t)×(2t+1),2t×e^(-3t)],[-2t×e^(-3t),e^(-3t)×(-2t+1)]]
+  pièges : l_charpoly_sign, l_lambda_one_entry
+
+Calcule e^{At} pour A = [[1,1],[-1,3]], puis la solution de ẋ = Ax avec x(0) = (2 ; -2).
   [free, suivre l'erreur]  det(A − λI)
     (Le polynôme caractéristique.)
     = det[[1-λ,1],[-1,3-λ]]   ← λ soustrait sur la diagonale
@@ -4142,47 +4153,28 @@ Calcule e^{At} pour A = [[1,1],[-1,3]], puis la solution de ẋ = Ax avec x(0) =
   — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
     = e^(At) = e^(2t)(I + tN)   ← λI et N commutent
     = e^(2t)·[[1-t,t],[-t,1+t]]   ← Case par case
-  — x(t) = e^{At}x(0), avec x(0) = (−2 ; −1).  [juge odevec]  départ : x(t)
-    = x(t) = e^(2t)·(-2+t ; -1+t)   ← e^{At} fois x(0)
+  — x(t) = e^{At}x(0), avec x(0) = (2 ; −2).  [juge odevec]  départ : x(t)
+    = x(t) = e^(2t)·(2-4t ; -2-4t)   ← e^{At} fois x(0)
   aides : Valeur double : A = λI + N avec N² = 0, donc e^{At} = e^{λt}(I + tN). | e^{At} = e^(2t)(I + t·[[□,1],[−1,1]]) | [[e^(2t)×(-t+1),t×e^(2t)],[-t×e^(2t),e^(2t)×(t+1)]]
   pièges : l_charpoly_sign, l_lambda_one_entry
 
-Calcule e^{At} pour A = [[0,2],[-2,-4]], puis la solution de ẋ = Ax avec x(0) = (-1 ; 3).
+Calcule e^{At} pour A = [[-3,0],[-1,-3]], puis la solution de ẋ = Ax avec x(0) = (1 ; 2).
   [free, suivre l'erreur]  det(A − λI)
     (Le polynôme caractéristique.)
-    = det[[-λ,2],[-2,-4-λ]]   ← λ soustrait sur la diagonale
-    = (−λ)(−4 − λ) + 4   ← Diagonale moins antidiagonale
-    = λ² + 4λ + 4   ← λ² − (tr A)λ + det A
-    = (λ + 2)²   ← Factoriser
-  — λ = −2 est double : la partie nilpotente N = A + 2I.  [juge mat]  départ : N
-    = [[2,2],[-2,-2]]   ← A + 2I ≠ 0 : A n'est pas diagonalisable
+    = det[[-3-λ,0],[-1,-3-λ]]   ← λ soustrait sur la diagonale
+    = (−3 − λ)(−3 − λ) − 0   ← Diagonale moins antidiagonale
+    = λ² + 6λ + 9   ← λ² − (tr A)λ + det A
+    = (λ + 3)²   ← Factoriser
+  — λ = −3 est double : la partie nilpotente N = A + 3I.  [juge mat]  départ : N
+    = [[0,0],[-1,0]]   ← A + 3I ≠ 0 : A n'est pas diagonalisable
   — Vérifie que N² = 0.  [juge mat]  départ : N²
     = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
   — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = e^(−2t)(I + tN)   ← λI et N commutent
-    = e^(-2t)·[[1+2t,2t],[-2t,1-2t]]   ← Case par case
-  — x(t) = e^{At}x(0), avec x(0) = (−1 ; 3).  [juge odevec]  départ : x(t)
-    = x(t) = e^(-2t)·(-1+4t ; 3-4t)   ← e^{At} fois x(0)
-  aides : Valeur double : A = λI + N avec N² = 0, donc e^{At} = e^{λt}(I + tN). | e^{At} = e^(−2t)(I + t·[[□,2],[−2,−2]]) | [[e^(-2t)×(2t+1),2t×e^(-2t)],[-2t×e^(-2t),e^(-2t)×(-2t+1)]]
-  pièges : l_charpoly_sign, l_lambda_one_entry
-
-Calcule e^{At} pour A = [[-1,0],[-2,-1]], puis la solution de ẋ = Ax avec x(0) = (-2 ; -1).
-  [free, suivre l'erreur]  det(A − λI)
-    (Le polynôme caractéristique.)
-    = det[[-1-λ,0],[-2,-1-λ]]   ← λ soustrait sur la diagonale
-    = (−1 − λ)(−1 − λ) − 0   ← Diagonale moins antidiagonale
-    = λ² + 2λ + 1   ← λ² − (tr A)λ + det A
-    = (λ + 1)²   ← Factoriser
-  — λ = −1 est double : la partie nilpotente N = A + I.  [juge mat]  départ : N
-    = [[0,0],[-2,0]]   ← A + I ≠ 0 : A n'est pas diagonalisable
-  — Vérifie que N² = 0.  [juge mat]  départ : N²
-    = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
-  — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
-    = e^(At) = e^(−t)(I + tN)   ← λI et N commutent
-    = e^(-t)·[[1,0],[-2t,1]]   ← Case par case
-  — x(t) = e^{At}x(0), avec x(0) = (−2 ; −1).  [juge odevec]  départ : x(t)
-    = x(t) = e^(-t)·(-2 ; -1+4t)   ← e^{At} fois x(0)
-  aides : Valeur double : A = λI + N avec N² = 0, donc e^{At} = e^{λt}(I + tN). | e^{At} = e^(−t)(I + t·[[□,0],[−2,0]]) | [[e^-t,0],[-2t×e^-t,e^-t]]
+    = e^(At) = e^(−3t)(I + tN)   ← λI et N commutent
+    = e^(-3t)·[[1,0],[-t,1]]   ← Case par case
+  — x(t) = e^{At}x(0), avec x(0) = (1 ; 2).  [juge odevec]  départ : x(t)
+    = x(t) = e^(-3t)·(1 ; 2-t)   ← e^{At} fois x(0)
+  aides : Valeur double : A = λI + N avec N² = 0, donc e^{At} = e^{λt}(I + tN). | e^{At} = e^(−3t)(I + t·[[□,0],[−1,0]]) | [[e^(-3t),0],[-t×e^(-3t),e^(-3t)]]
   pièges : l_charpoly_sign, l_lambda_one_entry
 
 ```
@@ -4192,121 +4184,120 @@ Calcule e^{At} pour A = [[-1,0],[-2,-1]], puis la solution de ẋ = Ax avec x(0)
 ```
 Exponentielle de matrice, puis un vrai/faux.
   [problème, 9 points]
-  partie 1 (e^{At} et x(t) : 1 ; λ = 1 est double : la partie nilpotente N = A − I. : 1 ; Vérifie que N² = 0. : 1 ; e^{At} = e^{λt}·e^{Nt}, écrite case par case. : 3 ; x(t) = e^{At}x(0), avec x(0) = (2 ; 3). : 2)
-  A = [[2,-1],[1,0]]. Calcule e^{At}, puis la solution de ẋ = Ax avec x(0) = (2 ; 3).
+  partie 1 (e^{At} et x(t) : 1 ; λ = −2 est double : la partie nilpotente N = A + 2I. : 1 ; Vérifie que N² = 0. : 1 ; e^{At} = e^{λt}·e^{Nt}, écrite case par case. : 3 ; x(t) = e^{At}x(0), avec x(0) = (3 ; −2). : 2)
+  A = [[-3,1],[-1,-1]]. Calcule e^{At}, puis la solution de ẋ = Ax avec x(0) = (3 ; -2).
     [free, sans aide, suivre l'erreur]  det(A − λI)
       (Le polynôme caractéristique.)
-      = det[[2-λ,-1],[1,-λ]]   ← λ soustrait sur la diagonale
-      = (2 − λ)(−λ) + 1   ← Diagonale moins antidiagonale
-      = λ² − 2λ + 1   ← λ² − (tr A)λ + det A
-      = (λ − 1)²   ← Factoriser
-    — λ = 1 est double : la partie nilpotente N = A − I.  [juge mat]  départ : N
-      = [[1,-1],[1,-1]]   ← A − I ≠ 0 : A n'est pas diagonalisable
-    — Vérifie que N² = 0.  [juge mat]  départ : N²
-      = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
-    — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
-      = e^(At) = e^(t)(I + tN)   ← λI et N commutent
-      = e^(t)·[[1+t,-t],[t,1-t]]   ← Case par case
-    — x(t) = e^{At}x(0), avec x(0) = (2 ; 3).  [juge odevec]  départ : x(t)
-      = x(t) = e^(t)·(2-t ; 3-t)   ← e^{At} fois x(0)
-  partie 2 (Vrai ou faux : 1)
-  Vrai ou faux ?
-    « Pour toute matrice carrée A et tout t, e^{At} est inversible. » → VRAI
-  pièges : l_charpoly_sign, l_lambda_one_entry
-
-Exponentielle de matrice, puis un vrai/faux.
-  [problème, 9 points]
-  partie 1 (e^{At} et x(t) : 1 ; λ = −2 est double : la partie nilpotente N = A + 2I. : 1 ; Vérifie que N² = 0. : 1 ; e^{At} = e^{λt}·e^{Nt}, écrite case par case. : 3 ; x(t) = e^{At}x(0), avec x(0) = (2 ; 1). : 2)
-  A = [[-2,0],[-1,-2]]. Calcule e^{At}, puis la solution de ẋ = Ax avec x(0) = (2 ; 1).
-    [free, sans aide, suivre l'erreur]  det(A − λI)
-      (Le polynôme caractéristique.)
-      = det[[-2-λ,0],[-1,-2-λ]]   ← λ soustrait sur la diagonale
-      = (−2 − λ)(−2 − λ) − 0   ← Diagonale moins antidiagonale
+      = det[[-3-λ,1],[-1,-1-λ]]   ← λ soustrait sur la diagonale
+      = (−3 − λ)(−1 − λ) + 1   ← Diagonale moins antidiagonale
       = λ² + 4λ + 4   ← λ² − (tr A)λ + det A
       = (λ + 2)²   ← Factoriser
     — λ = −2 est double : la partie nilpotente N = A + 2I.  [juge mat]  départ : N
-      = [[0,0],[-1,0]]   ← A + 2I ≠ 0 : A n'est pas diagonalisable
+      = [[-1,1],[-1,1]]   ← A + 2I ≠ 0 : A n'est pas diagonalisable
     — Vérifie que N² = 0.  [juge mat]  départ : N²
       = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
     — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
       = e^(At) = e^(−2t)(I + tN)   ← λI et N commutent
-      = e^(-2t)·[[1,0],[-t,1]]   ← Case par case
-    — x(t) = e^{At}x(0), avec x(0) = (2 ; 1).  [juge odevec]  départ : x(t)
-      = x(t) = e^(-2t)·(2 ; 1-2t)   ← e^{At} fois x(0)
+      = e^(-2t)·[[1-t,t],[-t,1+t]]   ← Case par case
+    — x(t) = e^{At}x(0), avec x(0) = (3 ; −2).  [juge odevec]  départ : x(t)
+      = x(t) = e^(-2t)·(3-5t ; -2-5t)   ← e^{At} fois x(0)
+  partie 2 (Vrai ou faux : 1)
+  Vrai ou faux ?
+    « Si AB = BA, alors e^{A+B} = e^A·e^B. » → VRAI
+  pièges : l_charpoly_sign, l_lambda_one_entry
+
+Exponentielle de matrice, puis un vrai/faux.
+  [problème, 9 points]
+  partie 1 (e^{At} et x(t) : 1 ; λ = 1 est double : la partie nilpotente N = A − I. : 1 ; Vérifie que N² = 0. : 1 ; e^{At} = e^{λt}·e^{Nt}, écrite case par case. : 3 ; x(t) = e^{At}x(0), avec x(0) = (2 ; 3). : 2)
+  A = [[2,1],[-1,0]]. Calcule e^{At}, puis la solution de ẋ = Ax avec x(0) = (2 ; 3).
+    [free, sans aide, suivre l'erreur]  det(A − λI)
+      (Le polynôme caractéristique.)
+      = det[[2-λ,1],[-1,-λ]]   ← λ soustrait sur la diagonale
+      = (2 − λ)(−λ) + 1   ← Diagonale moins antidiagonale
+      = λ² − 2λ + 1   ← λ² − (tr A)λ + det A
+      = (λ − 1)²   ← Factoriser
+    — λ = 1 est double : la partie nilpotente N = A − I.  [juge mat]  départ : N
+      = [[1,1],[-1,-1]]   ← A − I ≠ 0 : A n'est pas diagonalisable
+    — Vérifie que N² = 0.  [juge mat]  départ : N²
+      = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
+    — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
+      = e^(At) = e^(t)(I + tN)   ← λI et N commutent
+      = e^(t)·[[1+t,t],[-t,1-t]]   ← Case par case
+    — x(t) = e^{At}x(0), avec x(0) = (2 ; 3).  [juge odevec]  départ : x(t)
+      = x(t) = e^(t)·(2+5t ; 3-5t)   ← e^{At} fois x(0)
+  partie 2 (Vrai ou faux : 1)
+  Vrai ou faux ?
+    « Pour toutes matrices carrées A et B de même taille, e^{A+B} = e^A·e^B. » → FAUX
+      contre-exemple (mx) : A = [[0,1],[0,0]], B = [[0,0],[1,0]]
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_expm_sum
+
+Exponentielle de matrice, puis un vrai/faux.
+  [problème, 9 points]
+  partie 1 (e^{At} et x(t) : 1 ; λ = 1 est double : la partie nilpotente N = A − I. : 1 ; Vérifie que N² = 0. : 1 ; e^{At} = e^{λt}·e^{Nt}, écrite case par case. : 3 ; x(t) = e^{At}x(0), avec x(0) = (1 ; 1). : 2)
+  A = [[1,0],[-1,1]]. Calcule e^{At}, puis la solution de ẋ = Ax avec x(0) = (1 ; 1).
+    [free, sans aide, suivre l'erreur]  det(A − λI)
+      (Le polynôme caractéristique.)
+      = det[[1-λ,0],[-1,1-λ]]   ← λ soustrait sur la diagonale
+      = (1 − λ)(1 − λ) − 0   ← Diagonale moins antidiagonale
+      = λ² − 2λ + 1   ← λ² − (tr A)λ + det A
+      = (λ − 1)²   ← Factoriser
+    — λ = 1 est double : la partie nilpotente N = A − I.  [juge mat]  départ : N
+      = [[0,0],[-1,0]]   ← A − I ≠ 0 : A n'est pas diagonalisable
+    — Vérifie que N² = 0.  [juge mat]  départ : N²
+      = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
+    — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
+      = e^(At) = e^(t)(I + tN)   ← λI et N commutent
+      = e^(t)·[[1,0],[-t,1]]   ← Case par case
+    — x(t) = e^{At}x(0), avec x(0) = (1 ; 1).  [juge odevec]  départ : x(t)
+      = x(t) = e^(t)·(1 ; 1-t)   ← e^{At} fois x(0)
   partie 2 (Vrai ou faux : 1)
   Vrai ou faux ?
     « Pour toute matrice carrée A, e^A est la matrice des e^{aᵢⱼ}. » → FAUX
       contre-exemple (mx) : A = [[0,0],[0,0]]
   pièges : l_charpoly_sign, l_lambda_one_entry, m_expm_entrywise
 
-Exponentielle de matrice, puis un vrai/faux.
-  [problème, 9 points]
-  partie 1 (e^{At} et x(t) : 1 ; λ = −3 est double : la partie nilpotente N = A + 3I. : 1 ; Vérifie que N² = 0. : 1 ; e^{At} = e^{λt}·e^{Nt}, écrite case par case. : 3 ; x(t) = e^{At}x(0), avec x(0) = (3 ; 1). : 2)
-  A = [[-3,0],[1,-3]]. Calcule e^{At}, puis la solution de ẋ = Ax avec x(0) = (3 ; 1).
-    [free, sans aide, suivre l'erreur]  det(A − λI)
-      (Le polynôme caractéristique.)
-      = det[[-3-λ,0],[1,-3-λ]]   ← λ soustrait sur la diagonale
-      = (−3 − λ)(−3 − λ) − 0   ← Diagonale moins antidiagonale
-      = λ² + 6λ + 9   ← λ² − (tr A)λ + det A
-      = (λ + 3)²   ← Factoriser
-    — λ = −3 est double : la partie nilpotente N = A + 3I.  [juge mat]  départ : N
-      = [[0,0],[1,0]]   ← A + 3I ≠ 0 : A n'est pas diagonalisable
-    — Vérifie que N² = 0.  [juge mat]  départ : N²
-      = [[0,0],[0,0]]   ← La série de e^{Nt} s'arrête : e^{Nt} = I + tN
-    — e^{At} = e^{λt}·e^{Nt}, écrite case par case.  [juge odevec]  départ : e^(At)
-      = e^(At) = e^(−3t)(I + tN)   ← λI et N commutent
-      = e^(-3t)·[[1,0],[t,1]]   ← Case par case
-    — x(t) = e^{At}x(0), avec x(0) = (3 ; 1).  [juge odevec]  départ : x(t)
-      = x(t) = e^(-3t)·(3 ; 1+3t)   ← e^{At} fois x(0)
-  partie 2 (Vrai ou faux : 1)
-  Vrai ou faux ?
-    « Si AB = BA, alors e^{A+B} = e^A·e^B. » → VRAI
-  pièges : l_charpoly_sign, l_lambda_one_entry
-
 ```
 
 ### Variantes d'examen
 
 ```
-A = [[2,1],[-1,0]]. Que vaut e^{At} ?
-  · [[e^(2t),e^(t)],[e^(-t),1]] [m_expm_entrywise]   ✔ [[e^t×(t+1),t×e^t],[-t×e^t,e^t×(-t+1)]]   · [[e^t,0],[0,e^t]] [m_expm_double_no_t]   · [[e^t×(-t+1),-t×e^t],[t×e^t,e^t×(t+1)]]
+A = [[-2,1],[-1,-4]]. Que vaut e^{At} ?
+  · [[e^(-3t)×(-t+1),-t×e^(-3t)],[t×e^(-3t),e^(-3t)×(t+1)]]   ✔ [[e^(-3t)×(t+1),t×e^(-3t)],[-t×e^(-3t),e^(-3t)×(-t+1)]]   · [[e^(-3t),0],[0,e^(-3t)]] [m_expm_double_no_t]   · [[e^(-2t),e^(t)],[e^(-t),e^(-4t)]] [m_expm_entrywise]
   [examen mcq]
   pièges : m_expm_entrywise, m_expm_double_no_t
 
-A = [[0,1],[-2,3]]. Que vaut la case (1, 2) de e^{A} (t = 1) ? Écris-la exactement, avec e.
-  [free, sans aide, examen coef]  m_12
-    = e^(2) − e
+A = [[-5,-3],[6,4]]. Que vaut la case (2, 1) de e^{A} (t = 1) ? Écris-la exactement, avec e.
+  [free, sans aide, examen coef]  m_21
+    = 2e − 2e^(−2)
   pièges : m_expm_entrywise
 
 Vrai ou faux ?
-  « Pour toute matrice carrée A, e^A est la matrice des e^{aᵢⱼ}. » → FAUX
-    contre-exemple (mx) : A = [[0,0],[0,0]]
+  « Si AB = BA, alors e^{A+B} = e^A·e^B. » → VRAI
   [examen tf]
-  pièges : m_expm_entrywise
 
-ẋ = Ax avec A = [[0,2],[-2,4]] et x(0) = (-2 ; 1). (a) Polynôme caractéristique. (b) A est-elle diagonalisable ? (c) Partie nilpotente. (d) e^{At}. (e) x(t). (f) Stabilité, en continu et pour x_{k+1} = Ax_k.
+ẋ = Ax avec A = [[-2,0],[-1,-2]] et x(0) = (3 ; 2). (a) Polynôme caractéristique. (b) A est-elle diagonalisable ? (c) Partie nilpotente. (d) e^{At}. (e) x(t). (f) Stabilité, en continu et pour x_{k+1} = Ax_k.
   [problème, examen open, 10 points]
-  partie 1 (Début du problème : 1 ; (b) A est-elle diagonalisable ? Le rang de A − 2I. : 1 ; (c) La partie nilpotente N = A − 2I (et N² = 0). : 1 ; (d) e^{At}, case par case. : 3 ; (e) x(t) avec x(0) = (−2 ; 1). : 2 ; (f) Stabilité de ẋ = Ax, puis de x_{k+1} = Ax_k. : 2)
+  partie 1 (Début du problème : 1 ; (b) A est-elle diagonalisable ? Le rang de A + 2I. : 1 ; (c) La partie nilpotente N = A + 2I (et N² = 0). : 1 ; (d) e^{At}, case par case. : 3 ; (e) x(t) avec x(0) = (3 ; 2). : 2 ; (f) Stabilité de ẋ = Ax, puis de x_{k+1} = Ax_k. : 2)
     [free, sans aide, suivre l'erreur, examen open]  det(A − λI)
       ((a) Le polynôme caractéristique.)
-      = det[[-λ,2],[-2,4-λ]]   ← λ soustrait sur la diagonale
-      = (−λ)(4 − λ) + 4   ← Diagonale moins antidiagonale
-      = λ² − 4λ + 4   ← λ² − (tr A)λ + det A
-      = (λ − 2)²   ← Factoriser
-    — (b) A est-elle diagonalisable ? Le rang de A − 2I.  [juge value]  départ : r
-      ? A est-elle diagonalisable ? ✔ Non : dim E₂ = 2 − 1 = 1 &lt; 2 / · Oui : A est 2 × 2 et a une valeur propre
+      = det[[-2-λ,0],[-1,-2-λ]]   ← λ soustrait sur la diagonale
+      = (−2 − λ)(−2 − λ) − 0   ← Diagonale moins antidiagonale
+      = λ² + 4λ + 4   ← λ² − (tr A)λ + det A
+      = (λ + 2)²   ← Factoriser
+    — (b) A est-elle diagonalisable ? Le rang de A + 2I.  [juge value]  départ : r
+      ? A est-elle diagonalisable ? ✔ Non : dim E₋₂ = 2 − 1 = 1 &lt; 2 / · Oui : A est 2 × 2 et a une valeur propre
       = 1   ← Une seule ligne indépendante
-    — (c) La partie nilpotente N = A − 2I (et N² = 0).  [juge mat]  départ : N
-      = [[-2,2],[-2,2]]   ← A − 2I ≠ 0 : A n'est pas diagonalisable
+    — (c) La partie nilpotente N = A + 2I (et N² = 0).  [juge mat]  départ : N
+      = [[0,0],[-1,0]]   ← A + 2I ≠ 0 : A n'est pas diagonalisable
     — (d) e^{At}, case par case.  [juge odevec]  départ : e^(At)
-      = e^(At) = e^(2t)(I + tN)   ← λI et N commutent
-      = e^(2t)·[[1-2t,2t],[-2t,1+2t]]   ← Case par case
-    — (e) x(t) avec x(0) = (−2 ; 1).  [juge odevec]  départ : x(t)
-      = x(t) = e^(2t)·(-2+6t ; 1+6t)   ← e^{At} fois x(0)
+      = e^(At) = e^(−2t)(I + tN)   ← λI et N commutent
+      = e^(-2t)·[[1,0],[-t,1]]   ← Case par case
+    — (e) x(t) avec x(0) = (3 ; 2).  [juge odevec]  départ : x(t)
+      = x(t) = e^(-2t)·(3 ; 2-3t)   ← e^{At} fois x(0)
     — (f) Stabilité de ẋ = Ax, puis de x_{k+1} = Ax_k.  [juge value]  départ : λ
-      ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
-      ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / ✔ Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
-      = 2   ← Continu : instable ; discret : instable (|λ| = 2)
+      ? Le système ẋ = Ax est-il stable ? ✔ Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
+      ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / ✔ Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
+      = −2   ← Continu : stable ; discret : instable (|λ| = 2)
   pièges : l_charpoly_sign, l_lambda_one_entry, m_expm_double_no_t, m_stab_discrete_in_cont, m_stab_cont_in_discrete
 
 ```
@@ -4318,105 +4309,105 @@ _x_k = Σ cᵢλᵢᵏvᵢ ; stable si toutes les |λ| < 1._
 ### Niveau 1
 
 ```
-x_{k+1} = Ax_k avec A = [[-1/2,-5/2],[5/4,13/4]] et x₀ = (-1 ; 0). Écris x_k et dis si le système est stable. Les valeurs propres sont 2 et 3/4, de vecteurs propres v₁ = (1 ; −1) et v₂ = (2 ; −1).
+x_{k+1} = Ax_k avec A = [[5/4,1],[-2,-7/4]] et x₀ = (0 ; -2). Écris x_k et dis si le système est stable. Les valeurs propres sont 1/4 et −3/4, de vecteurs propres v₁ = (1 ; −1) et v₂ = (1 ; −2).
   [guided]  c
     (Décompose x₀ sur les vecteurs propres : c₁v₁ + c₂v₂ = x₀.)
-    = (1 ; -1)   (cases à remplir : (1,1))   ← c₁(1 ; −1) + c₂(2 ; −1) = (−1 ; 0)
+    = (-2 ; 2)   (cases à remplir : (2,1))   ← c₁(1 ; −1) + c₂(1 ; −2) = (0 ; −2)
   — La solution x_k.  [juge odevec]  départ : x_k
-    = x_k = (2)^k(1 ; -1)-(3/4)^k(2 ; -1)   ← Les constantes remplacées
-  — La stabilité.  [juge value]  départ : ρ
-    (Le système x_{k+1} = Ax_k est-il stable ? Instable : une |λ| > 1.)
-    = 2   ← Le rayon spectral : instable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(2)^k(1 ; −1) + □(3/4)^k(2 ; −1) | x_k = (2^k-2×(3/4)^k ; -2^k+(3/4)^k)
-
-x_{k+1} = Ax_k avec A = [[9/4,5/2],[-5/4,-3/2]] et x₀ = (-1 ; 0). Écris x_k et dis si le système est stable. Les valeurs propres sont 1 et −1/4, de vecteurs propres v₁ = (2 ; −1) et v₂ = (1 ; −1).
-  [guided]  c
-    (Décompose x₀ sur les vecteurs propres : c₁v₁ + c₂v₂ = x₀.)
-    = (-1 ; 1)   (cases à remplir : (2,1))   ← c₁(2 ; −1) + c₂(1 ; −1) = (−1 ; 0)
-  — La solution x_k.  [juge odevec]  départ : x_k
-    = x_k = -(2 ; -1)+(-1/4)^k(1 ; -1)   ← Les constantes remplacées
-  — La stabilité.  [juge value]  départ : ρ
-    (Le système x_{k+1} = Ax_k est-il stable ? Ni l'un ni l'autre : ρ(A) = 1.)
-    = 1   ← Le rayon spectral : ni stable ni instable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(2 ; −1) + □(−1/4)^k(1 ; −1) | x_k = (-2+(-1/4)^k ; 1-(-1/4)^k)
-
-x_{k+1} = Ax_k avec A = [[1,-1/2],[1/4,1/4]] et x₀ = (-3 ; 0). Écris x_k et dis si le système est stable. Les valeurs propres sont 3/4 et 1/2, de vecteurs propres v₁ = (2 ; 1) et v₂ = (1 ; 1).
-  [guided]  c
-    (Décompose x₀ sur les vecteurs propres : c₁v₁ + c₂v₂ = x₀.)
-    = (-3 ; 3)   (cases à remplir : (1,1))   ← c₁(2 ; 1) + c₂(1 ; 1) = (−3 ; 0)
-  — La solution x_k.  [juge odevec]  départ : x_k
-    = x_k = -3(3/4)^k(2 ; 1)+3(1/2)^k(1 ; 1)   ← Les constantes remplacées
+    = x_k = -2(1/4)^k(1 ; -1)+2(-3/4)^k(1 ; -2)   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : ρ
     (Le système x_{k+1} = Ax_k est-il stable ? Stable : toutes les |λ| < 1.)
     = 3/4   ← Le rayon spectral : stable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(3/4)^k(2 ; 1) + □(1/2)^k(1 ; 1) | x_k = (-6×(3/4)^k+3×(1/2)^k ; -3×(3/4)^k+3×(1/2)^k)
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(1/4)^k(1 ; −1) + □(−3/4)^k(1 ; −2) | x_k = (-2×(1/4)^k+2×(-3/4)^k ; 2×(1/4)^k-4×(-3/4)^k)
+
+x_{k+1} = Ax_k avec A = [[7/4,5/2],[-5/4,-2]] et x₀ = (3 ; 0). Écris x_k et dis si le système est stable. Les valeurs propres sont 1/2 et −3/4, de vecteurs propres v₁ = (2 ; −1) et v₂ = (1 ; −1).
+  [guided]  c
+    (Décompose x₀ sur les vecteurs propres : c₁v₁ + c₂v₂ = x₀.)
+    = (3 ; -3)   (cases à remplir : (2,1))   ← c₁(2 ; −1) + c₂(1 ; −1) = (3 ; 0)
+  — La solution x_k.  [juge odevec]  départ : x_k
+    = x_k = 3(1/2)^k(2 ; -1)-3(-3/4)^k(1 ; -1)   ← Les constantes remplacées
+  — La stabilité.  [juge value]  départ : ρ
+    (Le système x_{k+1} = Ax_k est-il stable ? Stable : toutes les |λ| < 1.)
+    = 3/4   ← Le rayon spectral : stable
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(1/2)^k(2 ; −1) + □(−3/4)^k(1 ; −1) | x_k = (6×(1/2)^k-3×(-3/4)^k ; -3×(1/2)^k+3×(-3/4)^k)
+
+x_{k+1} = Ax_k avec A = [[11/4,-7/4],[7/2,-5/2]] et x₀ = (0 ; -1). Écris x_k et dis si le système est stable. Les valeurs propres sont 1 et −3/4, de vecteurs propres v₁ = (1 ; 1) et v₂ = (1 ; 2).
+  [guided]  c
+    (Décompose x₀ sur les vecteurs propres : c₁v₁ + c₂v₂ = x₀.)
+    = (1 ; -1)   (cases à remplir : (1,1))   ← c₁(1 ; 1) + c₂(1 ; 2) = (0 ; −1)
+  — La solution x_k.  [juge odevec]  départ : x_k
+    = x_k = (1 ; 1)-(-3/4)^k(1 ; 2)   ← Les constantes remplacées
+  — La stabilité.  [juge value]  départ : ρ
+    (Le système x_{k+1} = Ax_k est-il stable ? Ni l'un ni l'autre : ρ(A) = 1.)
+    = 1   ← Le rayon spectral : ni stable ni instable
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(1 ; 1) + □(−3/4)^k(1 ; 2) | x_k = (1-(-3/4)^k ; 1-2×(-3/4)^k)
 
 ```
 
 ### Niveau 2
 
 ```
-x_{k+1} = Ax_k avec A = [[-13/4,5/2],[-5/4,1/2]] et x₀ = (-2 ; 0). Écris x_k et dis si le système est stable.
+x_{k+1} = Ax_k avec A = [[-1,-1/2],[1/4,-1/4]] et x₀ = (0 ; -1). Écris x_k et dis si le système est stable.
   [guided]  det(A − λI)
     (Le polynôme caractéristique, factorisé.)
-    = det[[-13/4-λ,5/2],[-5/4,1/2-λ]]   ← λ soustrait sur la diagonale
-    = (−13/4 − λ)(1/2 − λ) + 25/8   ← Diagonale moins antidiagonale
-    = λ² + (11/4)λ + 3/2   ← λ² − (tr A)λ + det A
-    = (λ + □)(λ + 3/4)   (trous : (λ + 2)(λ + 3/4))   ← Factoriser
-  — Un vecteur propre pour λ = −3/4.  [juge eigvec]  départ : v_1
-    = (1 ; 1)   (cases à remplir : (2,1))   ← Noyau de A + (3/4)I
-  — Un vecteur propre pour λ = −2.  [juge eigvec]  départ : v_2
-    = (2 ; 1)   (cases à remplir : (2,1))   ← Noyau de A + 2I
-  — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-    = x_k = c_1(-3/4)^k(1 ; 1)+c_2(-2)^k(2 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-    = c_1 = 2 ; c_2 = −2   ← c₁v₁ + c₂v₂ = (−2 ; 0)
-    = x_k = 2(-3/4)^k(1 ; 1)-2(-2)^k(2 ; 1)   ← Les constantes remplacées
-  — La stabilité.  [juge value]  départ : ρ
-    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / ✔ Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
-    = 2   ← Le rayon spectral : instable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(−3/4)^k(1 ; 1) + □(−2)^k(2 ; 1) | x_k = (2×(-3/4)^k-4×(-2)^k ; 2×(-3/4)^k-2×(-2)^k)
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
-
-x_{k+1} = Ax_k avec A = [[7/4,3/4],[-3/2,-1/2]] et x₀ = (-1 ; 0). Écris x_k et dis si le système est stable.
-  [guided]  det(A − λI)
-    (Le polynôme caractéristique, factorisé.)
-    = det[[7/4-λ,3/4],[-3/2,-1/2-λ]]   ← λ soustrait sur la diagonale
-    = (7/4 − λ)(−1/2 − λ) + 9/8   ← Diagonale moins antidiagonale
-    = λ² − (5/4)λ + 1/4   ← λ² − (tr A)λ + det A
-    = (λ − 1/□)(λ − 1)   (trous : (λ − 1/4)(λ − 1))   ← Factoriser
-  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_1
-    = (1 ; -1)   (cases à remplir : (1,1))   ← Noyau de A − I
-  — Un vecteur propre pour λ = 1/4.  [juge eigvec]  départ : v_2
-    = (1 ; -2)   (cases à remplir : (1,1))   ← Noyau de A − (1/4)I
-  — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-    = x_k = c_1(1 ; -1)+c_2(1/4)^k(1 ; -2)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-    = c_1 = −2 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (−1 ; 0)
-    = x_k = -2·(1 ; -1)+(1/4)^k(1 ; -2)   ← Les constantes remplacées
-  — La stabilité.  [juge value]  départ : ρ
-    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / ✔ Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
-    = 1   ← Le rayon spectral : ni stable ni instable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(1 ; −1) + □(1/4)^k(1 ; −2) | x_k = (-2+(1/4)^k ; 2-2×(1/4)^k)
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
-
-x_{k+1} = Ax_k avec A = [[-2,5/2],[-5/4,7/4]] et x₀ = (-1 ; 0). Écris x_k et dis si le système est stable.
-  [guided]  det(A − λI)
-    (Le polynôme caractéristique, factorisé.)
-    = det[[-2-λ,5/2],[-5/4,7/4-λ]]   ← λ soustrait sur la diagonale
-    = (−2 − λ)(7/4 − λ) + 25/8   ← Diagonale moins antidiagonale
-    = λ² + (1/4)λ − 3/8   ← λ² − (tr A)λ + det A
-    = (λ + 3/4)(λ − 1/□)   (trous : (λ + 3/4)(λ − 1/2))   ← Factoriser
-  — Un vecteur propre pour λ = 1/2.  [juge eigvec]  départ : v_1
-    = (1 ; 1)   (cases à remplir : (2,1))   ← Noyau de A − (1/2)I
+    = det[[-1-λ,-1/2],[1/4,-1/4-λ]]   ← λ soustrait sur la diagonale
+    = (−1 − λ)(−1/4 − λ) + 1/8   ← Diagonale moins antidiagonale
+    = λ² + (5/4)λ + 3/8   ← λ² − (tr A)λ + det A
+    = (λ + 3/□)(λ + 1/2)   (trous : (λ + 3/4)(λ + 1/2))   ← Factoriser
+  — Un vecteur propre pour λ = −1/2.  [juge eigvec]  départ : v_1
+    = (1 ; -1)   (cases à remplir : (1,1))   ← Noyau de A + (1/2)I
   — Un vecteur propre pour λ = −3/4.  [juge eigvec]  départ : v_2
-    = (2 ; 1)   (cases à remplir : (2,1))   ← Noyau de A + (3/4)I
+    = (2 ; -1)   (cases à remplir : (2,1))   ← Noyau de A + (3/4)I
   — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-    = x_k = c_1(1/2)^k(1 ; 1)+c_2(-3/4)^k(2 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-    = c_1 = 1 ; c_2 = −1   ← c₁v₁ + c₂v₂ = (−1 ; 0)
-    = x_k = (1/2)^k(1 ; 1)-(-3/4)^k(2 ; 1)   ← Les constantes remplacées
+    = x_k = c_1(-1/2)^k(1 ; -1)+c_2(-3/4)^k(2 ; -1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+    = c_1 = 2 ; c_2 = −1   ← c₁v₁ + c₂v₂ = (0 ; −1)
+    = x_k = 2(-1/2)^k(1 ; -1)-(-3/4)^k(2 ; -1)   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : ρ
-    ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
+    ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
     = 3/4   ← Le rayon spectral : stable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(1/2)^k(1 ; 1) + □(−3/4)^k(2 ; 1) | x_k = ((1/2)^k-2×(-3/4)^k ; (1/2)^k-(-3/4)^k)
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(−1/2)^k(1 ; −1) + □(−3/4)^k(2 ; −1) | x_k = (2×(-1/2)^k-2×(-3/4)^k ; -2×(-1/2)^k+(-3/4)^k)
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
+
+x_{k+1} = Ax_k avec A = [[-1/2,5/4],[-5/2,13/4]] et x₀ = (0 ; -2). Écris x_k et dis si le système est stable.
+  [guided]  det(A − λI)
+    (Le polynôme caractéristique, factorisé.)
+    = det[[-1/2-λ,5/4],[-5/2,13/4-λ]]   ← λ soustrait sur la diagonale
+    = (−1/2 − λ)(13/4 − λ) + 25/8   ← Diagonale moins antidiagonale
+    = λ² − (11/4)λ + 3/2   ← λ² − (tr A)λ + det A
+    = (λ − 3/4)(λ − □)   (trous : (λ − 3/4)(λ − 2))   ← Factoriser
+  — Un vecteur propre pour λ = 2.  [juge eigvec]  départ : v_1
+    = (1 ; 2)   (cases à remplir : (2,1))   ← Noyau de A − 2I
+  — Un vecteur propre pour λ = 3/4.  [juge eigvec]  départ : v_2
+    = (1 ; 1)   (cases à remplir : (1,1))   ← Noyau de A − (3/4)I
+  — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
+    = x_k = c_1(2)^k(1 ; 2)+c_2(3/4)^k(1 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+    = c_1 = −2 ; c_2 = 2   ← c₁v₁ + c₂v₂ = (0 ; −2)
+    = x_k = -2(2)^k(1 ; 2)+2(3/4)^k(1 ; 1)   ← Les constantes remplacées
+  — La stabilité.  [juge value]  départ : ρ
+    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / ✔ Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
+    = 2   ← Le rayon spectral : instable
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(2)^k(1 ; 2) + □(3/4)^k(1 ; 1) | x_k = (-2×2^k+2×(3/4)^k ; -4×2^k+2×(3/4)^k)
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
+
+x_{k+1} = Ax_k avec A = [[0,1/4],[-1/2,-3/4]] et x₀ = (1 ; -3). Écris x_k et dis si le système est stable.
+  [guided]  det(A − λI)
+    (Le polynôme caractéristique, factorisé.)
+    = det[[-λ,1/4],[-1/2,-3/4-λ]]   ← λ soustrait sur la diagonale
+    = (−λ)(−3/4 − λ) + 1/8   ← Diagonale moins antidiagonale
+    = λ² + (3/4)λ + 1/8   ← λ² − (tr A)λ + det A
+    = (λ + 1/2)(λ + 1/□)   (trous : (λ + 1/2)(λ + 1/4))   ← Factoriser
+  — Un vecteur propre pour λ = −1/4.  [juge eigvec]  départ : v_1
+    = (1 ; -1)   (cases à remplir : (1,1))   ← Noyau de A + (1/4)I
+  — Un vecteur propre pour λ = −1/2.  [juge eigvec]  départ : v_2
+    = (1 ; -2)   (cases à remplir : (1,1))   ← Noyau de A + (1/2)I
+  — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
+    = x_k = c_1(-1/4)^k(1 ; -1)+c_2(-1/2)^k(1 ; -2)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+    = c_1 = −1 ; c_2 = 2   ← c₁v₁ + c₂v₂ = (1 ; −3)
+    = x_k = -(-1/4)^k(1 ; -1)+2(-1/2)^k(1 ; -2)   ← Les constantes remplacées
+  — La stabilité.  [juge value]  départ : ρ
+    ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
+    = 1/2   ← Le rayon spectral : stable
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(−1/4)^k(1 ; −1) + □(−1/2)^k(1 ; −2) | x_k = (-(-1/4)^k+2×(-1/2)^k ; (-1/4)^k-4×(-1/2)^k)
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
 
 ```
@@ -4424,67 +4415,67 @@ x_{k+1} = Ax_k avec A = [[-2,5/2],[-5/4,7/4]] et x₀ = (-1 ; 0). Écris x_k et 
 ### Niveau 3
 
 ```
-x_{k+1} = Ax_k avec A = [[-3/2,5/4],[-5/2,9/4]] et x₀ = (0 ; 3). Écris x_k et dis si le système est stable. Choisis d'abord chaque action.
+x_{k+1} = Ax_k avec A = [[-5/4,2],[-1,7/4]] et x₀ = (3 ; 0). Écris x_k et dis si le système est stable. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  det(A − λI)
     (Le polynôme caractéristique, factorisé.)
-    = det[[-3/2-λ,5/4],[-5/2,9/4-λ]]   ← λ soustrait sur la diagonale
-    = (−3/2 − λ)(9/4 − λ) + 25/8   ← Diagonale moins antidiagonale
-    = λ² − (3/4)λ − 1/4   ← λ² − (tr A)λ + det A
-    = (λ + 1/4)(λ − 1)   ← Factoriser
-  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_1
-    = (1 ; 2)   ← Noyau de A − I
-  — Un vecteur propre pour λ = −1/4.  [juge eigvec]  départ : v_2
-    = (1 ; 1)   ← Noyau de A + (1/4)I
-  — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-    = x_k = c_1(1 ; 2)+c_2(-1/4)^k(1 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-    = c_1 = 3 ; c_2 = −3   ← c₁v₁ + c₂v₂ = (0 ; 3)
-    = x_k = 3·(1 ; 2)-3(-1/4)^k(1 ; 1)   ← Les constantes remplacées
-  — La stabilité.  [juge value]  départ : ρ
-    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / ✔ Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
-    = 1   ← Le rayon spectral : ni stable ni instable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(1 ; 2) + □(−1/4)^k(1 ; 1) | x_k = (3-3×(-1/4)^k ; 6-3×(-1/4)^k)
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
-
-x_{k+1} = Ax_k avec A = [[9/4,3/2],[-3,-9/4]] et x₀ = (-2 ; 3). Écris x_k et dis si le système est stable. Choisis d'abord chaque action.
-  [tap, suivre l'erreur, menu menu]  det(A − λI)
-    (Le polynôme caractéristique, factorisé.)
-    = det[[9/4-λ,3/2],[-3,-9/4-λ]]   ← λ soustrait sur la diagonale
-    = (9/4 − λ)(−9/4 − λ) + 9/2   ← Diagonale moins antidiagonale
-    = λ² − 9/16   ← λ² − (tr A)λ + det A
-    = (λ + 3/4)(λ − 3/4)   ← Factoriser
+    = det[[-5/4-λ,2],[-1,7/4-λ]]   ← λ soustrait sur la diagonale
+    = (−5/4 − λ)(7/4 − λ) + 2   ← Diagonale moins antidiagonale
+    = λ² − (1/2)λ − 3/16   ← λ² − (tr A)λ + det A
+    = (λ + 1/4)(λ − 3/4)   ← Factoriser
   — Un vecteur propre pour λ = 3/4.  [juge eigvec]  départ : v_1
-    = (1 ; -1)   ← Noyau de A − (3/4)I
-  — Un vecteur propre pour λ = −3/4.  [juge eigvec]  départ : v_2
-    = (1 ; -2)   ← Noyau de A + (3/4)I
+    = (1 ; 1)   ← Noyau de A − (3/4)I
+  — Un vecteur propre pour λ = −1/4.  [juge eigvec]  départ : v_2
+    = (2 ; 1)   ← Noyau de A + (1/4)I
   — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-    = x_k = c_1(3/4)^k(1 ; -1)+c_2(-3/4)^k(1 ; -2)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-    = c_1 = −1 ; c_2 = −1   ← c₁v₁ + c₂v₂ = (−2 ; 3)
-    = x_k = -(3/4)^k(1 ; -1)-(-3/4)^k(1 ; -2)   ← Les constantes remplacées
+    = x_k = c_1(3/4)^k(1 ; 1)+c_2(-1/4)^k(2 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+    = c_1 = −3 ; c_2 = 3   ← c₁v₁ + c₂v₂ = (3 ; 0)
+    = x_k = -3(3/4)^k(1 ; 1)+3(-1/4)^k(2 ; 1)   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : ρ
     ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
     = 3/4   ← Le rayon spectral : stable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(3/4)^k(1 ; −1) + □(−3/4)^k(1 ; −2) | x_k = (-(3/4)^k-(-3/4)^k ; (3/4)^k+2×(-3/4)^k)
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(3/4)^k(1 ; 1) + □(−1/4)^k(2 ; 1) | x_k = (-3×(3/4)^k+6×(-1/4)^k ; -3×(3/4)^k+3×(-1/4)^k)
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
 
-x_{k+1} = Ax_k avec A = [[-5/4,-1/2],[1,1/4]] et x₀ = (1 ; 0). Écris x_k et dis si le système est stable. Choisis d'abord chaque action.
+x_{k+1} = Ax_k avec A = [[-2,3],[-3/2,5/2]] et x₀ = (-5 ; -3). Écris x_k et dis si le système est stable. Choisis d'abord chaque action.
   [tap, suivre l'erreur, menu menu]  det(A − λI)
     (Le polynôme caractéristique, factorisé.)
-    = det[[-5/4-λ,-1/2],[1,1/4-λ]]   ← λ soustrait sur la diagonale
-    = (−5/4 − λ)(1/4 − λ) + 1/2   ← Diagonale moins antidiagonale
-    = λ² + λ + 3/16   ← λ² − (tr A)λ + det A
-    = (λ + 3/4)(λ + 1/4)   ← Factoriser
-  — Un vecteur propre pour λ = −1/4.  [juge eigvec]  départ : v_1
-    = (1 ; -2)   ← Noyau de A + (1/4)I
-  — Un vecteur propre pour λ = −3/4.  [juge eigvec]  départ : v_2
-    = (1 ; -1)   ← Noyau de A + (3/4)I
+    = det[[-2-λ,3],[-3/2,5/2-λ]]   ← λ soustrait sur la diagonale
+    = (−2 − λ)(5/2 − λ) + 9/2   ← Diagonale moins antidiagonale
+    = λ² − (1/2)λ − 1/2   ← λ² − (tr A)λ + det A
+    = (λ + 1/2)(λ − 1)   ← Factoriser
+  — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_1
+    = (1 ; 1)   ← Noyau de A − I
+  — Un vecteur propre pour λ = −1/2.  [juge eigvec]  départ : v_2
+    = (2 ; 1)   ← Noyau de A + (1/2)I
   — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-    = x_k = c_1(-1/4)^k(1 ; -2)+c_2(-3/4)^k(1 ; -1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-    = c_1 = −1 ; c_2 = 2   ← c₁v₁ + c₂v₂ = (1 ; 0)
-    = x_k = -(-1/4)^k(1 ; -2)+2(-3/4)^k(1 ; -1)   ← Les constantes remplacées
+    = x_k = c_1(1 ; 1)+c_2(-1/2)^k(2 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+    = c_1 = −1 ; c_2 = −2   ← c₁v₁ + c₂v₂ = (−5 ; −3)
+    = x_k = -(1 ; 1)-2(-1/2)^k(2 ; 1)   ← Les constantes remplacées
   — La stabilité.  [juge value]  départ : ρ
-    ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
-    = 3/4   ← Le rayon spectral : stable
-  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(−1/4)^k(1 ; −2) + □(−3/4)^k(1 ; −1) | x_k = (-(-1/4)^k+2×(-3/4)^k ; 2×(-1/4)^k-2×(-3/4)^k)
+    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / ✔ Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
+    = 1   ← Le rayon spectral : ni stable ni instable
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(1 ; 1) + □(−1/2)^k(2 ; 1) | x_k = (-1-4×(-1/2)^k ; -1-2×(-1/2)^k)
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
+
+x_{k+1} = Ax_k avec A = [[-7/2,-3/2],[3,1]] et x₀ = (1 ; -3). Écris x_k et dis si le système est stable. Choisis d'abord chaque action.
+  [tap, suivre l'erreur, menu menu]  det(A − λI)
+    (Le polynôme caractéristique, factorisé.)
+    = det[[-7/2-λ,-3/2],[3,1-λ]]   ← λ soustrait sur la diagonale
+    = (−7/2 − λ)(1 − λ) + 9/2   ← Diagonale moins antidiagonale
+    = λ² + (5/2)λ + 1   ← λ² − (tr A)λ + det A
+    = (λ + 2)(λ + 1/2)   ← Factoriser
+  — Un vecteur propre pour λ = −1/2.  [juge eigvec]  départ : v_1
+    = (1 ; -2)   ← Noyau de A + (1/2)I
+  — Un vecteur propre pour λ = −2.  [juge eigvec]  départ : v_2
+    = (1 ; -1)   ← Noyau de A + 2I
+  — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
+    = x_k = c_1(-1/2)^k(1 ; -2)+c_2(-2)^k(1 ; -1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+    = c_1 = 2 ; c_2 = −1   ← c₁v₁ + c₂v₂ = (1 ; −3)
+    = x_k = 2(-1/2)^k(1 ; -2)-(-2)^k(1 ; -1)   ← Les constantes remplacées
+  — La stabilité.  [juge value]  départ : ρ
+    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / ✔ Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
+    = 2   ← Le rayon spectral : instable
+  aides : Chaque mode est multiplié par λ à chaque pas : x_k = c₁λ₁ᵏv₁ + c₂λ₂ᵏv₂, avec c₁v₁ + c₂v₂ = x₀. Stable si toutes les |λ| < 1. | x_k = □(−1/2)^k(1 ; −2) + □(−2)^k(1 ; −1) | x_k = (2×(-1/2)^k-(-2)^k ; -4×(-1/2)^k+(-2)^k)
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
 
 ```
@@ -4492,10 +4483,42 @@ x_{k+1} = Ax_k avec A = [[-5/4,-1/2],[1,1/4]] et x₀ = (1 ; 0). Écris x_k et d
 ### Niveau 4
 
 ```
-A = [[-5/2,1],[-2,1/2]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k ?
+A = [[1/2,-2],[1,-5/2]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k ?
   [free, suivre l'erreur]  det(A − λI)
     (Le polynôme caractéristique, factorisé.)
-    = det[[-5/2-λ,1],[-2,1/2-λ]]   ← λ soustrait sur la diagonale
+    = det[[1/2-λ,-2],[1,-5/2-λ]]   ← λ soustrait sur la diagonale
+    = (1/2 − λ)(−5/2 − λ) + 2   ← Diagonale moins antidiagonale
+    = λ² + 2λ + 3/4   ← λ² − (tr A)λ + det A
+    = (λ + 3/2)(λ + 1/2)   ← Factoriser
+  — En continu : ẋ = Ax.  [juge value]  départ : α
+    ? Le système ẋ = Ax est-il stable ? ✔ Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
+    = −1/2   ← La plus grande partie réelle : stable
+  — En discret : x_{k+1} = Ax_k.  [juge value]  départ : ρ
+    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / ✔ Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
+    = 3/2   ← Le rayon spectral : instable
+  aides : Continu : stable si toutes les Re λ < 0. Discret : stable si toutes les |λ| < 1. Ce ne sont pas les mêmes critères. | Valeurs propres □ et □ ; α = max Re λ, ρ = max |λ| | λ = −1/2 et −3/2 : continu stable, discret instable.
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_cont_in_discrete
+
+A = [[1/2,-1],[2,-5/2]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k ?
+  [free, suivre l'erreur]  det(A − λI)
+    (Le polynôme caractéristique, factorisé.)
+    = det[[1/2-λ,-1],[2,-5/2-λ]]   ← λ soustrait sur la diagonale
+    = (1/2 − λ)(−5/2 − λ) + 2   ← Diagonale moins antidiagonale
+    = λ² + 2λ + 3/4   ← λ² − (tr A)λ + det A
+    = (λ + 3/2)(λ + 1/2)   ← Factoriser
+  — En continu : ẋ = Ax.  [juge value]  départ : α
+    ? Le système ẋ = Ax est-il stable ? ✔ Stable : toutes les Re λ &lt; 0 / · Instable : une Re λ &gt; 0 / · Instable : une |λ| ≥ 1
+    = −1/2   ← La plus grande partie réelle : stable
+  — En discret : x_{k+1} = Ax_k.  [juge value]  départ : ρ
+    ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / ✔ Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
+    = 3/2   ← Le rayon spectral : instable
+  aides : Continu : stable si toutes les Re λ < 0. Discret : stable si toutes les |λ| < 1. Ce ne sont pas les mêmes critères. | Valeurs propres □ et □ ; α = max Re λ, ρ = max |λ| | λ = −1/2 et −3/2 : continu stable, discret instable.
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_cont_in_discrete
+
+A = [[-5/2,-1],[2,1/2]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k ?
+  [free, suivre l'erreur]  det(A − λI)
+    (Le polynôme caractéristique, factorisé.)
+    = det[[-5/2-λ,-1],[2,1/2-λ]]   ← λ soustrait sur la diagonale
     = (−5/2 − λ)(1/2 − λ) + 2   ← Diagonale moins antidiagonale
     = λ² + 2λ + 3/4   ← λ² − (tr A)λ + det A
     = (λ + 3/2)(λ + 1/2)   ← Factoriser
@@ -4508,38 +4531,6 @@ A = [[-5/2,1],[-2,1/2]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k 
   aides : Continu : stable si toutes les Re λ < 0. Discret : stable si toutes les |λ| < 1. Ce ne sont pas les mêmes critères. | Valeurs propres □ et □ ; α = max Re λ, ρ = max |λ| | λ = −1/2 et −3/2 : continu stable, discret instable.
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_cont_in_discrete
 
-A = [[3/4,1/2],[-1/4,0]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k ?
-  [free, suivre l'erreur]  det(A − λI)
-    (Le polynôme caractéristique, factorisé.)
-    = det[[3/4-λ,1/2],[-1/4,-λ]]   ← λ soustrait sur la diagonale
-    = (3/4 − λ)(−λ) + 1/8   ← Diagonale moins antidiagonale
-    = λ² − (3/4)λ + 1/8   ← λ² − (tr A)λ + det A
-    = (λ − 1/4)(λ − 1/2)   ← Factoriser
-  — En continu : ẋ = Ax.  [juge value]  départ : α
-    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Stable : toutes les |λ| &lt; 1
-    = 1/2   ← La plus grande partie réelle : instable
-  — En discret : x_{k+1} = Ax_k.  [juge value]  départ : ρ
-    ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
-    = 1/2   ← Le rayon spectral : stable
-  aides : Continu : stable si toutes les Re λ < 0. Discret : stable si toutes les |λ| < 1. Ce ne sont pas les mêmes critères. | Valeurs propres □ et □ ; α = max Re λ, ρ = max |λ| | λ = 1/2 et 1/4 : continu instable, discret stable.
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_cont_in_discrete
-
-A = [[-3/2,2],[-1,3/2]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k ?
-  [free, suivre l'erreur]  det(A − λI)
-    (Le polynôme caractéristique, factorisé.)
-    = det[[-3/2-λ,2],[-1,3/2-λ]]   ← λ soustrait sur la diagonale
-    = (−3/2 − λ)(3/2 − λ) + 2   ← Diagonale moins antidiagonale
-    = λ² − 1/4   ← λ² − (tr A)λ + det A
-    = (λ + 1/2)(λ − 1/2)   ← Factoriser
-  — En continu : ẋ = Ax.  [juge value]  départ : α
-    ? Le système ẋ = Ax est-il stable ? · Stable : toutes les Re λ &lt; 0 / ✔ Instable : une Re λ &gt; 0 / · Stable : toutes les |λ| &lt; 1
-    = 1/2   ← La plus grande partie réelle : instable
-  — En discret : x_{k+1} = Ax_k.  [juge value]  départ : ρ
-    ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
-    = 1/2   ← Le rayon spectral : stable
-  aides : Continu : stable si toutes les Re λ < 0. Discret : stable si toutes les |λ| < 1. Ce ne sont pas les mêmes critères. | Valeurs propres □ et □ ; α = max Re λ, ρ = max |λ| | λ = 1/2 et −1/2 : continu instable, discret stable.
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_discrete_in_cont, m_stab_cont_in_discrete
-
 ```
 
 ### Niveau 5
@@ -4548,73 +4539,48 @@ A = [[-3/2,2],[-1,3/2]]. Le système ẋ = Ax est-il stable ? Et x_{k+1} = Ax_k 
 Système discret, puis un vrai/faux.
   [problème, 8 points]
   partie 1 (x_k et stabilité : 1 ; Un vecteur propre pour λ = 1. : 1 ; Un vecteur propre pour λ = 1/4. : 1 ; La solution x_k : la solution générale, puis les constantes avec x₀. : 3 ; La stabilité. : 1)
-  x_{k+1} = Ax_k avec A = [[7/4,-3/2],[3/4,-1/2]] et x₀ = (-1 ; 0). Trouve x_k et dis si le système est stable.
+  x_{k+1} = Ax_k avec A = [[-1/2,3/2],[-3/4,7/4]] et x₀ = (-1 ; 1). Trouve x_k et dis si le système est stable.
     [free, sans aide, suivre l'erreur]  det(A − λI)
       (Le polynôme caractéristique, factorisé.)
-      = det[[7/4-λ,-3/2],[3/4,-1/2-λ]]   ← λ soustrait sur la diagonale
-      = (7/4 − λ)(−1/2 − λ) + 9/8   ← Diagonale moins antidiagonale
+      = det[[-1/2-λ,3/2],[-3/4,7/4-λ]]   ← λ soustrait sur la diagonale
+      = (−1/2 − λ)(7/4 − λ) + 9/8   ← Diagonale moins antidiagonale
       = λ² − (5/4)λ + 1/4   ← λ² − (tr A)λ + det A
       = (λ − 1/4)(λ − 1)   ← Factoriser
     — Un vecteur propre pour λ = 1.  [juge eigvec]  départ : v_1
-      = (2 ; 1)   ← Noyau de A − I
+      = (1 ; 1)   ← Noyau de A − I
     — Un vecteur propre pour λ = 1/4.  [juge eigvec]  départ : v_2
-      = (1 ; 1)   ← Noyau de A − (1/4)I
+      = (2 ; 1)   ← Noyau de A − (1/4)I
     — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-      = x_k = c_1(2 ; 1)+c_2(1/4)^k(1 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-      = c_1 = −1 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (−1 ; 0)
-      = x_k = -(2 ; 1)+(1/4)^k(1 ; 1)   ← Les constantes remplacées
+      = x_k = c_1(1 ; 1)+c_2(1/4)^k(2 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+      = c_1 = 3 ; c_2 = −2   ← c₁v₁ + c₂v₂ = (−1 ; 1)
+      = x_k = 3·(1 ; 1)-2(1/4)^k(2 ; 1)   ← Les constantes remplacées
     — La stabilité.  [juge value]  départ : ρ
       ? Le système x_{k+1} = Ax_k est-il stable ? · Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / ✔ Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
       = 1   ← Le rayon spectral : ni stable ni instable
   partie 2 (Vrai ou faux : 1)
   Vrai ou faux ?
-    « Si ρ(A) < 1, alors x_k = Aᵏx₀ → 0 pour tout x₀. » → VRAI
+    « Si toutes les valeurs propres de A ont Re λ < 0, le système x_{k+1} = Ax_k est stable. » → FAUX
+      contre-exemple (mx) : A = [[-2,0],[0,-1/2]]
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
 
 Système discret, puis un vrai/faux.
   [problème, 8 points]
-  partie 1 (x_k et stabilité : 1 ; Un vecteur propre pour λ = 3/4. : 1 ; Un vecteur propre pour λ = −1/2. : 1 ; La solution x_k : la solution générale, puis les constantes avec x₀. : 3 ; La stabilité. : 1)
-  x_{k+1} = Ax_k avec A = [[2,5/2],[-5/4,-7/4]] et x₀ = (1 ; 0). Trouve x_k et dis si le système est stable.
+  partie 1 (x_k et stabilité : 1 ; Un vecteur propre pour λ = 1/4. : 1 ; Un vecteur propre pour λ = −3/4. : 1 ; La solution x_k : la solution générale, puis les constantes avec x₀. : 3 ; La stabilité. : 1)
+  x_{k+1} = Ax_k avec A = [[5/4,1],[-2,-7/4]] et x₀ = (1 ; 1). Trouve x_k et dis si le système est stable.
     [free, sans aide, suivre l'erreur]  det(A − λI)
       (Le polynôme caractéristique, factorisé.)
-      = det[[2-λ,5/2],[-5/4,-7/4-λ]]   ← λ soustrait sur la diagonale
-      = (2 − λ)(−7/4 − λ) + 25/8   ← Diagonale moins antidiagonale
-      = λ² − (1/4)λ − 3/8   ← λ² − (tr A)λ + det A
-      = (λ + 1/2)(λ − 3/4)   ← Factoriser
-    — Un vecteur propre pour λ = 3/4.  [juge eigvec]  départ : v_1
-      = (2 ; -1)   ← Noyau de A − (3/4)I
-    — Un vecteur propre pour λ = −1/2.  [juge eigvec]  départ : v_2
-      = (1 ; -1)   ← Noyau de A + (1/2)I
-    — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-      = x_k = c_1(3/4)^k(2 ; -1)+c_2(-1/2)^k(1 ; -1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-      = c_1 = 1 ; c_2 = −1   ← c₁v₁ + c₂v₂ = (1 ; 0)
-      = x_k = (3/4)^k(2 ; -1)-(-1/2)^k(1 ; -1)   ← Les constantes remplacées
-    — La stabilité.  [juge value]  départ : ρ
-      ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
-      = 3/4   ← Le rayon spectral : stable
-  partie 2 (Vrai ou faux : 1)
-  Vrai ou faux ?
-    « Si A est diagonalisable, de valeurs propres 1 et 1/2, alors x_k converge pour tout x₀. » → VRAI
-  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
-
-Système discret, puis un vrai/faux.
-  [problème, 8 points]
-  partie 1 (x_k et stabilité : 1 ; Un vecteur propre pour λ = 1/2. : 1 ; Un vecteur propre pour λ = −3/4. : 1 ; La solution x_k : la solution générale, puis les constantes avec x₀. : 3 ; La stabilité. : 1)
-  x_{k+1} = Ax_k avec A = [[7/4,-5/2],[5/4,-2]] et x₀ = (-1 ; 0). Trouve x_k et dis si le système est stable.
-    [free, sans aide, suivre l'erreur]  det(A − λI)
-      (Le polynôme caractéristique, factorisé.)
-      = det[[7/4-λ,-5/2],[5/4,-2-λ]]   ← λ soustrait sur la diagonale
-      = (7/4 − λ)(−2 − λ) + 25/8   ← Diagonale moins antidiagonale
-      = λ² + (1/4)λ − 3/8   ← λ² − (tr A)λ + det A
-      = (λ + 3/4)(λ − 1/2)   ← Factoriser
-    — Un vecteur propre pour λ = 1/2.  [juge eigvec]  départ : v_1
-      = (2 ; 1)   ← Noyau de A − (1/2)I
+      = det[[5/4-λ,1],[-2,-7/4-λ]]   ← λ soustrait sur la diagonale
+      = (5/4 − λ)(−7/4 − λ) + 2   ← Diagonale moins antidiagonale
+      = λ² + (1/2)λ − 3/16   ← λ² − (tr A)λ + det A
+      = (λ + 3/4)(λ − 1/4)   ← Factoriser
+    — Un vecteur propre pour λ = 1/4.  [juge eigvec]  départ : v_1
+      = (1 ; -1)   ← Noyau de A − (1/4)I
     — Un vecteur propre pour λ = −3/4.  [juge eigvec]  départ : v_2
-      = (1 ; 1)   ← Noyau de A + (3/4)I
+      = (1 ; -2)   ← Noyau de A + (3/4)I
     — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
-      = x_k = c_1(1/2)^k(2 ; 1)+c_2(-3/4)^k(1 ; 1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
-      = c_1 = −1 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (−1 ; 0)
-      = x_k = -(1/2)^k(2 ; 1)+(-3/4)^k(1 ; 1)   ← Les constantes remplacées
+      = x_k = c_1(1/4)^k(1 ; -1)+c_2(-3/4)^k(1 ; -2)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+      = c_1 = 3 ; c_2 = −2   ← c₁v₁ + c₂v₂ = (1 ; 1)
+      = x_k = 3(1/4)^k(1 ; -1)-2(-3/4)^k(1 ; -2)   ← Les constantes remplacées
     — La stabilité.  [juge value]  départ : ρ
       ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Instable : une Re λ &gt; 0
       = 3/4   ← Le rayon spectral : stable
@@ -4624,15 +4590,41 @@ Système discret, puis un vrai/faux.
       contre-exemple (mx) : A = [[-2,0],[0,-1/2]]
   pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
 
+Système discret, puis un vrai/faux.
+  [problème, 8 points]
+  partie 1 (x_k et stabilité : 1 ; Un vecteur propre pour λ = −1/4. : 1 ; Un vecteur propre pour λ = −1/2. : 1 ; La solution x_k : la solution générale, puis les constantes avec x₀. : 3 ; La stabilité. : 1)
+  x_{k+1} = Ax_k avec A = [[-3/4,-1/2],[1/4,0]] et x₀ = (4 ; -3). Trouve x_k et dis si le système est stable.
+    [free, sans aide, suivre l'erreur]  det(A − λI)
+      (Le polynôme caractéristique, factorisé.)
+      = det[[-3/4-λ,-1/2],[1/4,-λ]]   ← λ soustrait sur la diagonale
+      = (−3/4 − λ)(−λ) + 1/8   ← Diagonale moins antidiagonale
+      = λ² + (3/4)λ + 1/8   ← λ² − (tr A)λ + det A
+      = (λ + 1/2)(λ + 1/4)   ← Factoriser
+    — Un vecteur propre pour λ = −1/4.  [juge eigvec]  départ : v_1
+      = (1 ; -1)   ← Noyau de A + (1/4)I
+    — Un vecteur propre pour λ = −1/2.  [juge eigvec]  départ : v_2
+      = (2 ; -1)   ← Noyau de A + (1/2)I
+    — La solution x_k : la solution générale, puis les constantes avec x₀.  [juge odevec]  départ : x_k
+      = x_k = c_1(-1/4)^k(1 ; -1)+c_2(-1/2)^k(2 ; -1)   ← Un mode cᵢλᵢᵏvᵢ par valeur propre
+      = c_1 = 2 ; c_2 = 1   ← c₁v₁ + c₂v₂ = (4 ; −3)
+      = x_k = 2(-1/4)^k(1 ; -1)+(-1/2)^k(2 ; -1)   ← Les constantes remplacées
+    — La stabilité.  [juge value]  départ : ρ
+      ? Le système x_{k+1} = Ax_k est-il stable ? ✔ Stable : toutes les |λ| &lt; 1 / · Instable : une |λ| &gt; 1 / · Ni l'un ni l'autre : ρ(A) = 1 / · Stable : toutes les Re λ &lt; 0
+      = 1/2   ← Le rayon spectral : stable
+  partie 2 (Vrai ou faux : 1)
+  Vrai ou faux ?
+    « Si les valeurs propres de A sont −2 et −1/2, ẋ = Ax est stable mais x_{k+1} = Ax_k ne l'est pas. » → VRAI
+  pièges : l_charpoly_sign, l_lambda_one_entry, m_stab_cont_in_discrete
+
 ```
 
 ### Variantes d'examen
 
 ```
-Le système x_{k+1} = Ax_k, avec A = [[1/4,1/4],[-1/2,1]], est :
-  · Ni l'un ni l'autre : ρ(A) = 1   ✔ Stable : toutes les |λ| < 1   · Instable : une Re λ > 0 [m_stab_cont_in_discrete]   · Instable : une |λ| > 1
+x_{k+1} = Ax_k avec A = [[7/4,1],[-2,-5/4]] (valeurs propres 3/4 et −1/4) et x₀ = (-3 ; 5). Que vaut x_k ?
+  ✔ x_k = (-(3/4)^k-2×(-1/4)^k ; (3/4)^k+4×(-1/4)^k)   · x_k = (-3×(7/4)^k+5×(1)^k ; -3×(-2)^k+5×(-5/4)^k) [l_powers_entrywise]   · x_k = (-e^(3/4×k)-2e^(-1/4×k) ; e^(3/4×k)+4e^(-1/4×k)) [m_discrete_exp]   · x_k = (-3×(3/4)^k+5×(-1/4)^k ; 3×(3/4)^k-10×(-1/4)^k) [m_modes_c_equals_x0]
   [examen mcq]
-  pièges : m_stab_cont_in_discrete
+  pièges : m_discrete_exp, l_powers_entrywise, m_modes_c_equals_x0
 
 Vrai ou faux ?
   « Si toutes les valeurs propres de A ont Re λ < 0, le système x_{k+1} = Ax_k est stable. » → FAUX

@@ -146,7 +146,7 @@ function proofBlocks(rng, level = 4, opts = {}) {
   ];
   const order = ['split', 'exact', 'lin', 'jr', 'sum'];
   return blocksItem({
-    skill: QP, level, mode: 'order', exam: opts.exam || false,
+    skill: QP, level, mode: 'order', exam: opts.exam ? { format: opts.exam, points: 1 } : false,
     prompt: `Montre que ∫ₐᵇ f − L_h(f) = (h/2)·Σᵢ ∫₋₁¹ rᵢ(t) dt pour J(g) = ${V.J} (${V.name}). Touche les blocs dans l'ordre de la preuve ; un bloc est faux.`,
     blocks: rng.shuffle(blocks), goal: 'sum', order, placed: [],
     hints: level >= 5 || opts.exam ? [] : H('On écrit f = pᵢ + rᵢ, J intègre pᵢ exactement, et J ne voit pas rᵢ.', `J(pᵢ) = ∫pᵢ car J est exacte sur ${P}`, 'Taylor, puis l\'exactitude et J(rᵢ) = 0, la linéarité, et enfin la somme.'),

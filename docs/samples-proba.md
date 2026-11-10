@@ -195,53 +195,64 @@ Voici des temps de trajet (en minutes) : 55, 51, 46, 51, 48, 60, 56, 47, 53, 57,
 ### Niveau 4
 
 ```
-Une série de scores sur 100 a pour moyenne x̄ = 20, médiane 18 et écart-type s = 7. On convertit chaque donnée en points perdus (y = 100 − x). Sans refaire le calcul, donne ȳ, la médiane et l'écart-type des nouvelles données.
-  [free, suivre l'erreur]  ȳ
-    = −1·20 + 100   ← ȳ = a·x̄ + b
-    = 80   ← Calculer
-  — méd(y)  [juge prob]  départ : méd(y)
-    = 82   ← La médiane suit la même règle
-  — sy  [juge prob]  départ : s_y
-    = 1·7   ← |a|·s_x
-    = 7   ← Calculer
-  aides : Chaque donnée devient a·x + b : la moyenne et la médiane suivent la même règle ; l'écart-type est seulement multiplié par |a|. | s_y = 1 · □ | ȳ = 80 ; méd = 82 ; s_y = 7
-  pièges : p_lin_transform_sd
+Complète la fonction qui calcule la variance empirique s² d'une liste de données (l'estimateur sans biais du cours).
+  [code python, 1 trou]
+    | def variance(x):
+    |     n = len(x)
+    |     m = sum(x) / n
+    |     s2 = 0.0
+    |     for i in range(n):
+    |         s2 = s2 + (x[i] - m) ** 2
+    |     return s2 / ⟦(n - 1)⟧
+    test : variance([2, 4, 4, 5, 7, 8]) → 4.8
+    test : variance([10, 12, 9, 11, 13]) → 2.5
+    test : variance([3, 7, 7, 19]) → 48.0
+  pièges : p_sd_n
 
-Voici des âges des joueurs d'un club : 6, 2, 17, 5, 20. Calcule la moyenne, la médiane, la variance empirique s² et l'écart-type s (à 0,01 près).
-  [free, suivre l'erreur]  x̄
-    = 50/5   ← Somme des données : 6 + 2 + 17 + 5 + 20 = 50, divisée par n = 5
-    = 10   ← Diviser
-  — méd  [juge prob]  départ : méd
-    = 6   ← Données triées : 2, 5, 6, 17, 20 ; la 3ᵉ
-  — Σ(xᵢ−x̄)2  [juge prob]  départ : Σ(xᵢ−x̄)²
-    = 64 + 25 + 16 + 49 + 100   ← Chaque écart (xᵢ − x̄), au carré
-    = 254   ← Additionner
-  — s2  [juge prob]  départ : s²
-    = 254/4   ← Diviser par n − 1
-    = 63,5   ← Simplifier
-  — s  [juge stat]  départ : s
-    = √(63,5)   ← Écart-type : racine de la variance
-    = 7,97   ← Arrondir au centième
-  aides : Trie d'abord. Pour s², somme des écarts au carré, divisée par n − 1. | s²=254/□ | x̄ = 10 ; méd = 6 ; s² = 63,5 ; s ≈ 7,97
-  pièges : p_median_unsorted, p_median_mean, p_sd_n
+Complète la fonction qui calcule la variance empirique s² d'une liste de données (l'estimateur sans biais du cours).
+  [code python, 2 trous]
+    | def variance(x):
+    |     n = len(x)
+    |     m = sum(x) / n
+    |     s2 = 0.0
+    |     for i in range(n):
+    |         s2 = s2 + ⟦(x[i] - m) ** 2⟧
+    |     return s2 / ⟦(n - 1)⟧
+    test : variance([2, 4, 4, 5, 7, 8]) → 4.8
+    test : variance([10, 12, 9, 11, 13]) → 2.5
+    test : variance([3, 7, 7, 19]) → 48.0
+  pièges : p_sd_n
 
-Une série de températures en °C a pour moyenne x̄ = 30, médiane 31 et écart-type s = 5. On convertit chaque donnée en °F (y = 1,8x + 32). Sans refaire le calcul, donne ȳ, la médiane et l'écart-type des nouvelles données.
-  [free, suivre l'erreur]  ȳ
-    = 1,8·30 + 32   ← ȳ = a·x̄ + b
-    = 86   ← Calculer
-  — méd(y)  [juge prob]  départ : méd(y)
-    = 87,8   ← La médiane suit la même règle
-  — sy  [juge prob]  départ : s_y
-    = 1,8·5   ← |a|·s_x
-    = 9   ← Calculer
-  aides : Chaque donnée devient a·x + b : la moyenne et la médiane suivent la même règle ; l'écart-type est seulement multiplié par |a|. | s_y = 1,8 · □ | ȳ = 86 ; méd = 87,8 ; s_y = 9
-  pièges : p_lin_transform_sd
+Complète la fonction qui calcule la variance empirique s² d'une liste de données (l'estimateur sans biais du cours).
+  [code python, 1 trou]
+    | def variance(x):
+    |     n = len(x)
+    |     m = sum(x) / n
+    |     s2 = 0.0
+    |     for i in range(n):
+    |         s2 = s2 + (x[i] - m) ** 2
+    |     return s2 / ⟦(n - 1)⟧
+    test : variance([2, 4, 4, 5, 7, 8]) → 4.8
+    test : variance([10, 12, 9, 11, 13]) → 2.5
+    test : variance([3, 7, 7, 19]) → 48.0
+  pièges : p_sd_n
 
 ```
 
 ### Niveau 5
 
 ```
+Une série de longueurs en pouces a pour moyenne x̄ = 38, médiane 41 et écart-type s = 5. On convertit chaque donnée en centimètres (1 pouce = 2,54 cm). Sans refaire le calcul, donne ȳ, la médiane et l'écart-type des nouvelles données.
+  [free, sans aide]  ȳ
+    = 2,54·38 + 0   ← ȳ = a·x̄ + b
+    = 96,52   ← Calculer
+  — méd(y)  [juge prob]  départ : méd(y)
+    = 104,14   ← La médiane suit la même règle
+  — sy  [juge prob]  départ : s_y
+    = 2,54·5   ← |a|·s_x
+    = 12,7   ← Calculer
+  pièges : p_lin_transform_sd
+
 Voici des nombres de pas (en centaines) par jour : 58, 62, 45, 55, 63, 51, 58. Calcule la moyenne, la médiane, la variance empirique s² et l'écart-type s (à 0,01 près).
   [free, sans aide]  x̄
     = 392/7   ← Somme des données : 58 + 62 + 45 + 55 + 63 + 51 + 58 = 392, divisée par n = 7
@@ -274,23 +285,6 @@ Voici des temps de trajet (en minutes) : 36, 23, 22, 18, 31. Calcule la moyenne,
   — s  [juge stat]  départ : s
     = √(53,5)   ← Écart-type : racine de la variance
     = 7,31   ← Arrondir au centième
-  pièges : p_median_unsorted, p_median_mean, p_sd_n
-
-Voici des températures relevées (en °C) : 20, 10, 11, 12, 16, 17, 17, 23, 18. Calcule la moyenne, la médiane, la variance empirique s² et l'écart-type s (à 0,01 près).
-  [free, sans aide]  x̄
-    = 144/9   ← Somme des données : 20 + 10 + 11 + 12 + 16 + 17 + 17 + 23 + 18 = 144, divisée par n = 9
-    = 16   ← Diviser
-  — méd  [juge prob]  départ : méd
-    = 17   ← Données triées : 10, 11, 12, 16, 17, 17, 18, 20, 23 ; la 5ᵉ
-  — Σ(xᵢ−x̄)2  [juge prob]  départ : Σ(xᵢ−x̄)²
-    = 36 + 25 + 16 + 0 + 1 + 1 + 4 + 16 + 49   ← Chaque écart (xᵢ − x̄), au carré
-    = 148   ← Additionner
-  — s2  [juge prob]  départ : s²
-    = 148/8   ← Diviser par n − 1
-    = 18,5   ← Simplifier
-  — s  [juge stat]  départ : s
-    = √(18,5)   ← Écart-type : racine de la variance
-    = 4,30   ← Arrondir au centième
   pièges : p_median_unsorted, p_median_mean, p_sd_n
 
 ```
@@ -9059,142 +9053,129 @@ Sur n = 225 observations (loi inconnue), x̄ = 407 et s = 15. Donne l’interval
 ### Niveau 4
 
 ```
-Sur n = 10 mesures supposées normales, x̄ = 194 et s² = 160. Donne l’intervalle de confiance à 95 % pour μ.
-  [free, suivre l'erreur]  t
-    = 2,262   ← Table 3, ν = 9
-  — s/√n  [juge stat]  départ : s/√n
-    = √(160/10)   ← Erreur standard
-    = 4
-  — u  [juge stat]  départ : u
-    = 2,262·4   ← Demi-largeur
-    = 9,048
-  — IC  [juge stat]  départ : IC
-    = [194 − 9,048 ; 194 + 9,048]   ← x̄ ± u
-    = [184,952 ; 203,048]
-  aides : σ inconnu et n petit : Student à n − 1 = 9 degrés de liberté. | [194-□ ; 194+□] | IC = [184,952 ; 203,048]
-  pièges : p_t_vs_z, p_df_wrong, p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+Complète le calcul de l'intervalle de confiance de Student x̄ ± t·s/√n (t est le quantile, déjà lu dans la table).
+  [code python, 1 trou]
+    | def half_width(t, s, n):
+    |     # demi-largeur de l'IC de Student : t * s / racine de n
+    |     half = t * s / ⟦math.sqrt(n)⟧
+    |     return half
+    | 
+    | def interval(xbar, t, s, n):
+    |     h = half_width(t, s, n)
+    |     return [xbar - h, xbar + h]
+    test : half_width(2.131, 4.0, 16) → 2.131
+    test : half_width(1.96, 3.0, 25) → 1.176
+    test : interval(50.0, 2.262, 5.0, 10) → [46.423463966349566, 53.576536033650434]
+  pièges : p_se_forgot_sqrt_n
 
-Mesures supposées normales : 20 ; 17 ; 23 ; 21 ; 19 ; 20. Donne l’intervalle de confiance à 95 % pour μ.
-  [free, suivre l'erreur]  x̄
-    = (20 + 17 + 23 + 21 + 19 + 20)/6   ← Moyenne
-    = 20
-  — s2  [juge prob]  départ : s²
-    = (0 + 9 + 9 + 1 + 1 + 0)/5   ← Écarts au carré, divisés par n − 1
-    = 20/5
-    = 4
-  — t  [juge stat]  départ : t
-    = 2,571   ← Table 3, ν = 5
-  — s/√n  [juge stat]  départ : s/√n
-    = √(4/6)   ← Erreur standard
-    = 0,816
-  — u  [juge stat]  départ : u
-    = 2,571·0,816   ← Demi-largeur
-    = 2,098
-  — IC  [juge stat]  départ : IC
-    = [20 − 2,098 ; 20 + 2,098]   ← x̄ ± u
-    = [17,902 ; 22,098]
-  aides : σ inconnu et n petit : Student à n − 1 = 5 degrés de liberté. | [20-□ ; 20+□] | IC = [17,902 ; 22,098]
-  pièges : p_sd_n, p_t_vs_z, p_df_wrong, p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+Complète le calcul de l'intervalle de confiance de Student x̄ ± t·s/√n (t est le quantile, déjà lu dans la table).
+  [code python, 2 trous]
+    | def half_width(t, s, n):
+    |     # demi-largeur de l'IC de Student : t * s / racine de n
+    |     half = t * s / ⟦math.sqrt(n)⟧
+    |     return half
+    | 
+    | def interval(xbar, t, s, n):
+    |     h = half_width(t, s, n)
+    |     return [⟦xbar - h⟧, xbar + h]
+    test : half_width(2.131, 4.0, 16) → 2.131
+    test : half_width(1.96, 3.0, 25) → 1.176
+    test : interval(50.0, 2.262, 5.0, 10) → [46.423463966349566, 53.576536033650434]
+  pièges : p_se_forgot_sqrt_n
 
-Mesures supposées normales : 33 ; 39 ; 41 ; 37 ; 35. Donne l’intervalle de confiance à 95 % pour μ.
-  [free, suivre l'erreur]  x̄
-    = (33 + 39 + 41 + 37 + 35)/5   ← Moyenne
-    = 37
-  — s2  [juge prob]  départ : s²
-    = (16 + 4 + 16 + 0 + 4)/4   ← Écarts au carré, divisés par n − 1
-    = 40/4
-    = 10
-  — t  [juge stat]  départ : t
-    = 2,776   ← Table 3, ν = 4
+Sur n = 400 observations (loi inconnue), x̄ = 220 et s = 30. Donne l’intervalle de confiance asymptotique à 95 % pour μ.
+  [free, suivre l'erreur]  z
+    = 1,96   ← Table 2
   — s/√n  [juge stat]  départ : s/√n
-    = √(10/5)   ← Erreur standard
-    = 1,414
+    = 30/√(400)   ← Erreur standard
+    = 1,5
   — u  [juge stat]  départ : u
-    = 2,776·1,414   ← Demi-largeur
-    = 3,925
+    = 1,96·1,5   ← Demi-largeur
+    = 2,94
   — IC  [juge stat]  départ : IC
-    = [37 − 3,925 ; 37 + 3,925]   ← x̄ ± u
-    = [33,075 ; 40,925]
-  aides : σ inconnu et n petit : Student à n − 1 = 4 degrés de liberté. | [37-□ ; 37+□] | IC = [33,075 ; 40,925]
-  pièges : p_sd_n, p_t_vs_z, p_df_wrong, p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+    = [220 − 2,94 ; 220 + 2,94]   ← x̄ ± u
+    = [217,06 ; 222,94]
+  aides : n est grand : x̄ ± 1,96·s/√n. | [220-□ ; 220+□] | IC = [217,06 ; 222,94]
+  pièges : p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
 
 ```
 
 ### Niveau 5
 
 ```
-Un appareil de mesure a un écart-type connu σ = 2. On fait 36 mesures de moyenne x̄ = 229. On suppose les mesures normales. Donne l’intervalle de confiance à 95 % pour μ. Puis : combien de mesures faut-il pour une demi-largeur au plus 1,5 ?
-  [free, sans aide]  z
-    = 1,96   ← Table 2
-  — σ/√n  [juge stat]  départ : σ/√n
-    = 2/√(36)   ← Erreur standard
-    = 0,333
-  — u  [juge stat]  départ : u
-    = 1,96·0,333   ← Demi-largeur
-    = 0,653
-  — IC  [juge stat]  départ : IC
-    = [229 − 0,653 ; 229 + 0,653]   ← x̄ ± u
-    = [228,347 ; 229,653]
-  — n  [juge stat]  départ : n
-    (n ≥ (1,96 · 2/1,5)² = 6,83 : on arrondit vers le haut.)
-    = 7   ← Le plus petit entier qui convient
-  pièges : p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
-
-Un appareil de mesure a un écart-type connu σ = 7. On fait 100 mesures de moyenne x̄ = 68. On suppose les mesures normales. Donne l’intervalle de confiance à 95 % pour μ. Puis : combien de mesures faut-il pour une demi-largeur au plus 0,5 ?
-  [free, sans aide]  z
-    = 1,96   ← Table 2
-  — σ/√n  [juge stat]  départ : σ/√n
-    = 7/√(100)   ← Erreur standard
-    = 0,7
-  — u  [juge stat]  départ : u
-    = 1,96·0,7   ← Demi-largeur
-    = 1,372
-  — IC  [juge stat]  départ : IC
-    = [68 − 1,372 ; 68 + 1,372]   ← x̄ ± u
-    = [66,628 ; 69,372]
-  — n  [juge stat]  départ : n
-    (n ≥ (1,96 · 7/0,5)² = 752,95 : on arrondit vers le haut.)
-    = 753   ← Le plus petit entier qui convient
-  pièges : p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
-
-Mesures supposées normales : 24 ; 25 ; 23 ; 21 ; 27 ; 24. Donne l’intervalle de confiance à 95 % pour μ.
+Mesures supposées normales : 15 ; 17 ; 11 ; 7 ; 15 ; 12 ; 9 ; 9 ; 13. Donne l’intervalle de confiance à 95 % pour μ.
   [free, sans aide]  x̄
-    = (24 + 25 + 23 + 21 + 27 + 24)/6   ← Moyenne
-    = 24
+    = (15 + 17 + 11 + 7 + 15 + 12 + 9 + 9 + 13)/9   ← Moyenne
+    = 12
   — s2  [juge prob]  départ : s²
-    = (0 + 1 + 1 + 9 + 9 + 0)/5   ← Écarts au carré, divisés par n − 1
-    = 20/5
-    = 4
+    = (9 + 25 + 1 + 25 + 9 + 0 + 9 + 9 + 1)/8   ← Écarts au carré, divisés par n − 1
+    = 88/8
+    = 11
   — t  [juge stat]  départ : t
-    = 2,571   ← Table 3, ν = 5
+    = 2,306   ← Table 3, ν = 8
   — s/√n  [juge stat]  départ : s/√n
-    = √(4/6)   ← Erreur standard
-    = 0,816
+    = √(11/9)   ← Erreur standard
+    = 1,106
   — u  [juge stat]  départ : u
-    = 2,571·0,816   ← Demi-largeur
-    = 2,098
+    = 2,306·1,106   ← Demi-largeur
+    = 2,55
   — IC  [juge stat]  départ : IC
-    = [24 − 2,098 ; 24 + 2,098]   ← x̄ ± u
-    = [21,902 ; 26,098]
+    = [12 − 2,55 ; 12 + 2,55]   ← x̄ ± u
+    = [9,45 ; 14,55]
   pièges : p_sd_n, p_t_vs_z, p_df_wrong, p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+
+Un appareil de mesure a un écart-type connu σ = 6. On fait 9 mesures de moyenne x̄ = 72,1. On suppose les mesures normales. Donne l’intervalle de confiance à 95 % pour μ. Puis : combien de mesures faut-il pour une demi-largeur au plus 2 ?
+  [free, sans aide]  z
+    = 1,96   ← Table 2
+  — σ/√n  [juge stat]  départ : σ/√n
+    = 6/√(9)   ← Erreur standard
+    = 2
+  — u  [juge stat]  départ : u
+    = 1,96·2   ← Demi-largeur
+    = 3,92
+  — IC  [juge stat]  départ : IC
+    = [72,1 − 3,92 ; 72,1 + 3,92]   ← x̄ ± u
+    = [68,18 ; 76,02]
+  — n  [juge stat]  départ : n
+    (n ≥ (1,96 · 6/2)² = 34,57 : on arrondit vers le haut.)
+    = 35   ← Le plus petit entier qui convient
+  pièges : p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+
+Un appareil de mesure a un écart-type connu σ = 9. On fait 100 mesures de moyenne x̄ = 147,7. On suppose les mesures normales. Donne l’intervalle de confiance à 95 % pour μ. Puis : combien de mesures faut-il pour une demi-largeur au plus 1 ?
+  [free, sans aide]  z
+    = 1,96   ← Table 2
+  — σ/√n  [juge stat]  départ : σ/√n
+    = 9/√(100)   ← Erreur standard
+    = 0,9
+  — u  [juge stat]  départ : u
+    = 1,96·0,9   ← Demi-largeur
+    = 1,764
+  — IC  [juge stat]  départ : IC
+    = [147,7 − 1,764 ; 147,7 + 1,764]   ← x̄ ± u
+    = [145,936 ; 149,464]
+  — n  [juge stat]  départ : n
+    (n ≥ (1,96 · 9/1)² = 311,17 : on arrondit vers le haut.)
+    = 312   ← Le plus petit entier qui convient
+  pièges : p_one_two_sided, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
 
 ```
 
 ### Variantes d'examen
 
 ```
-Sur n = 25 mesures supposées normales, x̄ = 64 et s² = 225. Donne l’intervalle de confiance à 95 % pour μ. On donne les quantiles : t(ν = 24 ; 0,975) = 2,064, t(ν = 24 ; 0,95) = 1,711, t(ν = 25 ; 0,975) = 2,06, z(0,975) = 1,96.
-  · [58,12 ; 69,88] [p_t_vs_z]   · [58,867 ; 69,133] [p_one_two_sided]   ✔ [57,808 ; 70,192]   · [33,04 ; 94,96] [p_se_forgot_sqrt_n]
+Sur n = 5 mesures supposées normales, x̄ = 106 et s² = 12. Donne l’intervalle de confiance à 95 % pour μ. On donne les quantiles : t(ν = 4 ; 0,975) = 2,776, t(ν = 4 ; 0,95) = 2,132, t(ν = 5 ; 0,975) = 2,571, z(0,975) = 1,96.
+  · [102,697 ; 109,303] [p_one_two_sided]   · [96,384 ; 115,616] [p_se_forgot_sqrt_n]   ✔ [101,699 ; 110,301]   · [102,964 ; 109,036] [p_t_vs_z]
   [examen mcq]
   pièges : p_t_vs_z, p_one_two_sided, p_se_forgot_sqrt_n
 
 Vrai ou faux ?
-  « σ connu : avec 4 fois plus d’observations, l’intervalle de confiance pour μ est 2 fois plus étroit. » → VRAI
+  « Un intervalle de confiance à 95 % pour μ est plus étroit que l’intervalle à 90 % calculé sur les mêmes données. » → FAUX
+    contre-exemple (refute) : a = 1,645, b = 1,96
   [examen tf]
 
-Un appareil de mesure a un écart-type connu σ = 2. On fait 36 mesures de moyenne x̄ = 133,6. On suppose les mesures normales. Donne l’intervalle de confiance à 99 % pour μ. Donne la borne supérieure.
+Sur n = 5 mesures supposées normales, x̄ = 125 et s² = 22. Donne l’intervalle de confiance à 95 % pour μ. Donne la borne supérieure.
   [free, sans aide, examen coef]  borne sup.
-    = 134,459
+    = 130,823
 
 ```
 
@@ -9221,20 +9202,20 @@ n = 100 observations indépendantes d’une loi de Poisson de paramètre λ, de 
   aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√25 | se = 0,2, IC = [3,608 ; 4,392]
   pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
 
-n = 64 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 256. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
-  [guided]  λ̂
-    = 256/□   (trous : 256/64)   ← λ̂ = x̄
-    = □   (trous : 4)
+On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
+  [guided]  p̂
+    = 40/□   (trous : 40/400)   ← p̂ = k/n
+    = □   (trous : 0,1)
   — J  [juge prob]  départ : J
-    = 256/4²   ← J = −ℓ″(θ̂)
-    = □   (trous : 16)
+    = □/(0,1·0,9)   (trous : 400/(0,1·0,9))   ← J = −ℓ″(θ̂)
+    = □   (trous : 40000/9)
   — se  [juge stat]  départ : se
-    = 1/√(□)   (trous : 1/√(16))   ← Var(θ̂) ≈ 1/J
-    = □   (trous : 0,25)
+    = 1/√(□)   (trous : 1/√(40000/9))   ← Var(θ̂) ≈ 1/J
+    = □   (trous : 0,015)
   — IC  [juge stat]  départ : IC
-    = [4 − 1,96·□ ; 4 + 1,96·0,25]   (trous : [4 − 1,96·0,25 ; 4 + 1,96·0,25])   ← θ̂ ± z·se
-    = [□ ; □]   (trous : [3,51 ; 4,49])
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√16 | se = 0,25, IC = [3,51 ; 4,49]
+    = [0,1 − 1,96·□ ; 0,1 + 1,96·0,015]   (trous : [0,1 − 1,96·0,015 ; 0,1 + 1,96·0,015])   ← θ̂ ± z·se
+    = [□ ; □]   (trous : [0,071 ; 0,129])
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√(40000/9) | se = 0,015, IC = [0,071 ; 0,129]
   pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
 
 On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
@@ -9258,52 +9239,52 @@ On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre
 ### Niveau 2
 
 ```
-n = 100 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 400. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+n = 25 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 25. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
   [guided]  λ̂
-    = 400/□   (trous : 400/100)   ← λ̂ = x̄
-    = □   (trous : 4)
+    = □/25   (trous : 25/25)   ← λ̂ = x̄
+    = □   (trous : 1)
   — J  [juge prob]  départ : J
-    = 400/4²   ← J = −ℓ″(θ̂)
+    = □/1²   (trous : 25/1²)   ← J = −ℓ″(θ̂)
     = □   (trous : 25)
   — se  [juge stat]  départ : se
     = 1/√(□)   (trous : 1/√(25))   ← Var(θ̂) ≈ 1/J
     = □   (trous : 0,2)
   — IC  [juge stat]  départ : IC
-    = [4 − 1,96·□ ; 4 + 1,96·0,2]   (trous : [4 − 1,96·0,2 ; 4 + 1,96·0,2])   ← θ̂ ± z·se
-    = [□ ; □]   (trous : [3,608 ; 4,392])
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√25 | se = 0,2, IC = [3,608 ; 4,392]
+    = [1 − 1,96·□ ; 1 + 1,96·0,2]   (trous : [1 − 1,96·0,2 ; 1 + 1,96·0,2])   ← θ̂ ± z·se
+    = [□ ; □]   (trous : [0,608 ; 1,392])
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√25 | se = 0,2, IC = [0,608 ; 1,392]
   pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
 
-n = 64 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 256. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
-  [guided]  λ̂
-    = 256/□   (trous : 256/64)   ← λ̂ = x̄
-    = □   (trous : 4)
-  — J  [juge prob]  départ : J
-    = 256/4²   ← J = −ℓ″(θ̂)
-    = □   (trous : 16)
-  — se  [juge stat]  départ : se
-    = 1/√(□)   (trous : 1/√(16))   ← Var(θ̂) ≈ 1/J
-    = □   (trous : 0,25)
-  — IC  [juge stat]  départ : IC
-    = [4 − 1,96·□ ; 4 + 1,96·0,25]   (trous : [4 − 1,96·0,25 ; 4 + 1,96·0,25])   ← θ̂ ± z·se
-    = [□ ; □]   (trous : [3,51 ; 4,49])
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√16 | se = 0,25, IC = [3,51 ; 4,49]
-  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
-
-On observe 90 succès en n = 900 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
+On observe 125 succès en n = 625 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
   [guided]  p̂
-    = 90/□   (trous : 90/900)   ← p̂ = k/n
+    = 125/□   (trous : 125/625)   ← p̂ = k/n
+    = □   (trous : 0,2)
+  — J  [juge prob]  départ : J
+    = □/(0,2·0,8)   (trous : 625/(0,2·0,8))   ← J = −ℓ″(θ̂)
+    = □   (trous : 15625/4)
+  — se  [juge stat]  départ : se
+    = 1/√(□)   (trous : 1/√(15625/4))   ← Var(θ̂) ≈ 1/J
+    = □   (trous : 0,016)
+  — IC  [juge stat]  départ : IC
+    = [0,2 − 1,96·□ ; 0,2 + 1,96·0,016]   (trous : [0,2 − 1,96·0,016 ; 0,2 + 1,96·0,016])   ← θ̂ ± z·se
+    = [□ ; □]   (trous : [0,169 ; 0,231])
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√(15625/4) | se = 0,016, IC = [0,169 ; 0,231]
+  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+
+On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
+  [guided]  p̂
+    = 40/□   (trous : 40/400)   ← p̂ = k/n
     = □   (trous : 0,1)
   — J  [juge prob]  départ : J
-    = □/(0,1·0,9)   (trous : 900/(0,1·0,9))   ← J = −ℓ″(θ̂)
-    = □   (trous : 10000)
+    = □/(0,1·0,9)   (trous : 400/(0,1·0,9))   ← J = −ℓ″(θ̂)
+    = □   (trous : 40000/9)
   — se  [juge stat]  départ : se
-    = 1/√(□)   (trous : 1/√(10000))   ← Var(θ̂) ≈ 1/J
-    = □   (trous : 0,01)
+    = 1/√(□)   (trous : 1/√(40000/9))   ← Var(θ̂) ≈ 1/J
+    = □   (trous : 0,015)
   — IC  [juge stat]  départ : IC
-    = [0,1 − 1,96·□ ; 0,1 + 1,96·0,01]   (trous : [0,1 − 1,96·0,01 ; 0,1 + 1,96·0,01])   ← θ̂ ± z·se
-    = [□ ; □]   (trous : [0,08 ; 0,12])
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√10000 | se = 0,01, IC = [0,08 ; 0,12]
+    = [0,1 − 1,96·□ ; 0,1 + 1,96·0,015]   (trous : [0,1 − 1,96·0,015 ; 0,1 + 1,96·0,015])   ← θ̂ ± z·se
+    = [□ ; □]   (trous : [0,071 ; 0,129])
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√(40000/9) | se = 0,015, IC = [0,071 ; 0,129]
   pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
 
 ```
@@ -9311,94 +9292,41 @@ On observe 90 succès en n = 900 essais de Bernoulli indépendants de paramètre
 ### Niveau 3
 
 ```
-On observe 50 succès en n = 100 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
-  [tap, suivre l'erreur, menu menu]  p̂
-    = 50/100   ← p̂ = k/n
+n = 50 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 100. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+  [tap, suivre l'erreur, menu menu]  λ̂
+    = 100/50   ← λ̂ = x̄
+    = 2
+  — J  [juge prob]  départ : J
+    = 100/2²   ← J = −ℓ″(θ̂)
+    = 25
+  — se  [juge stat]  départ : se
+    = 1/√(25)   ← Var(θ̂) ≈ 1/J
+    = 0,2
+  — IC  [juge stat]  départ : IC
+    = [2 − 1,96·0,2 ; 2 + 1,96·0,2]   ← θ̂ ± z·se
+    = [1,608 ; 2,392]
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√25 | se = 0,2, IC = [1,608 ; 2,392]
+  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+
+n = 25 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 50. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+  [tap, suivre l'erreur, menu menu]  λ̂
+    = 25/50   ← λ̂ = n/Σxᵢ
     = 0,5
   — J  [juge prob]  départ : J
-    = 100/(0,5·0,5)   ← J = −ℓ″(θ̂)
-    = 400
+    = 25/0,5²   ← J = −ℓ″(θ̂)
+    = 100
   — se  [juge stat]  départ : se
-    = 1/√(400)   ← Var(θ̂) ≈ 1/J
-    = 0,05
-  — IC  [juge stat]  départ : IC
-    = [0,5 − 1,96·0,05 ; 0,5 + 1,96·0,05]   ← θ̂ ± z·se
-    = [0,402 ; 0,598]
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√400 | se = 0,05, IC = [0,402 ; 0,598]
-  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
-
-On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
-  [tap, suivre l'erreur, menu menu]  p̂
-    = 40/400   ← p̂ = k/n
+    = 1/√(100)   ← Var(θ̂) ≈ 1/J
     = 0,1
-  — J  [juge prob]  départ : J
-    = 400/(0,1·0,9)   ← J = −ℓ″(θ̂)
-    = 40000/9
-  — se  [juge stat]  départ : se
-    = 1/√(40000/9)   ← Var(θ̂) ≈ 1/J
-    = 0,015
   — IC  [juge stat]  départ : IC
-    = [0,1 − 1,96·0,015 ; 0,1 + 1,96·0,015]   ← θ̂ ± z·se
-    = [0,071 ; 0,129]
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√(40000/9) | se = 0,015, IC = [0,071 ; 0,129]
+    = [0,5 − 1,96·0,1 ; 0,5 + 1,96·0,1]   ← θ̂ ± z·se
+    = [0,304 ; 0,696]
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√100 | se = 0,1, IC = [0,304 ; 0,696]
   pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
 
-On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
-  [tap, suivre l'erreur, menu menu]  p̂
-    = 40/400   ← p̂ = k/n
-    = 0,1
-  — J  [juge prob]  départ : J
-    = 400/(0,1·0,9)   ← J = −ℓ″(θ̂)
-    = 40000/9
-  — se  [juge stat]  départ : se
-    = 1/√(40000/9)   ← Var(θ̂) ≈ 1/J
-    = 0,015
-  — IC  [juge stat]  départ : IC
-    = [0,1 − 1,96·0,015 ; 0,1 + 1,96·0,015]   ← θ̂ ± z·se
-    = [0,071 ; 0,129]
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√(40000/9) | se = 0,015, IC = [0,071 ; 0,129]
-  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
-
-```
-
-### Niveau 4
-
-```
-On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
-  [free, suivre l'erreur]  p̂
-    = 40/400   ← p̂ = k/n
-    = 0,1
-  — J  [juge prob]  départ : J
-    = 400/(0,1·0,9)   ← J = −ℓ″(θ̂)
-    = 40000/9
-  — se  [juge stat]  départ : se
-    = 1/√(40000/9)   ← Var(θ̂) ≈ 1/J
-    = 0,015
-  — IC  [juge stat]  départ : IC
-    = [0,1 − 1,96·0,015 ; 0,1 + 1,96·0,015]   ← θ̂ ± z·se
-    = [0,071 ; 0,129]
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√(40000/9) | se = 0,015, IC = [0,071 ; 0,129]
-  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
-
-n = 49 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 98. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
-  [free, suivre l'erreur]  λ̂
-    = 49/98   ← λ̂ = n/Σxᵢ
-    = 0,5
-  — J  [juge prob]  départ : J
-    = 49/0,5²   ← J = −ℓ″(θ̂)
-    = 196
-  — se  [juge stat]  départ : se
-    = 1/√(196)   ← Var(θ̂) ≈ 1/J
-    = 0,0714
-  — IC  [juge stat]  départ : IC
-    = [0,5 − 1,96·0,0714 ; 0,5 + 1,96·0,0714]   ← θ̂ ± z·se
-    = [0,36 ; 0,64]
-  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√196 | se = 0,0714, IC = [0,36 ; 0,64]
-  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
-
-n = 100 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 50. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
-  [free, suivre l'erreur]  λ̂
-    = 100/50   ← λ̂ = n/Σxᵢ
+n = 50 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 100. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+  [tap, suivre l'erreur, menu menu]  λ̂
+    = 100/50   ← λ̂ = x̄
     = 2
   — J  [juge prob]  départ : J
     = 100/2²   ← J = −ℓ″(θ̂)
@@ -9414,9 +9342,102 @@ n = 100 durées indépendantes de loi exponentielle de paramètre λ, de somme �
 
 ```
 
+### Niveau 4
+
+```
+On observe 90 succès en n = 900 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de confiance de Wald à 95 % pour p (z = 1,96).
+  [free, suivre l'erreur]  p̂
+    = 90/900   ← p̂ = k/n
+    = 0,1
+  — J  [juge prob]  départ : J
+    = 900/(0,1·0,9)   ← J = −ℓ″(θ̂)
+    = 10000
+  — se  [juge stat]  départ : se
+    = 1/√(10000)   ← Var(θ̂) ≈ 1/J
+    = 0,01
+  — IC  [juge stat]  départ : IC
+    = [0,1 − 1,96·0,01 ; 0,1 + 1,96·0,01]   ← θ̂ ± z·se
+    = [0,08 ; 0,12]
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√10000 | se = 0,01, IC = [0,08 ; 0,12]
+  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+
+n = 100 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 400. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+  [free, suivre l'erreur]  λ̂
+    = 400/100   ← λ̂ = x̄
+    = 4
+  — J  [juge prob]  départ : J
+    = 400/4²   ← J = −ℓ″(θ̂)
+    = 25
+  — se  [juge stat]  départ : se
+    = 1/√(25)   ← Var(θ̂) ≈ 1/J
+    = 0,2
+  — IC  [juge stat]  départ : IC
+    = [4 − 1,96·0,2 ; 4 + 1,96·0,2]   ← θ̂ ± z·se
+    = [3,608 ; 4,392]
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√25 | se = 0,2, IC = [3,608 ; 4,392]
+  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+
+n = 64 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 32. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+  [free, suivre l'erreur]  λ̂
+    = 64/32   ← λ̂ = n/Σxᵢ
+    = 2
+  — J  [juge prob]  départ : J
+    = 64/2²   ← J = −ℓ″(θ̂)
+    = 16
+  — se  [juge stat]  départ : se
+    = 1/√(16)   ← Var(θ̂) ≈ 1/J
+    = 0,25
+  — IC  [juge stat]  départ : IC
+    = [2 − 1,96·0,25 ; 2 + 1,96·0,25]   ← θ̂ ± z·se
+    = [1,51 ; 2,49]
+  aides : La variance asymptotique est l’inverse de −ℓ″ évaluée en θ̂ ; se = 1/√J. | 1/√16 | se = 0,25, IC = [1,51 ; 2,49]
+  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data, p_ci_xbar
+
+```
+
 ### Niveau 5
 
 ```
+On observe 125 succès en n = 625 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de Wald à 95 % (z = 1,96), puis celui de Wilson (EE-209 : on prend z = 2).
+  [free, sans aide]  p̂
+    = 125/625   ← p̂ = k/n
+    = 0,2
+  — J  [juge prob]  départ : J
+    = 625/(0,2·0,8)   ← J = −ℓ″(θ̂)
+    = 15625/4
+  — se  [juge stat]  départ : se
+    = 1/√(15625/4)   ← Var(θ̂) ≈ 1/J
+    = 0,016
+  — IC  [juge stat]  départ : IC
+    = [0,2 − 1,96·0,016 ; 0,2 + 1,96·0,016]   ← θ̂ ± z·se
+    = [0,169 ; 0,231]
+  — p̃  [juge stat]  départ : p̃
+    = (125 + 2)/(625 + 4)   ← p̃ = (np̂ + z²/2)/(n + z²), z = 2
+    = 0,2019
+  — ICW  [juge stat]  départ : IC_W
+    = [0,17 ; 0,234]   ← demi-largeur z√n/(n + z²)·√(p̂(1 − p̂) + z²/(4n)) = 0,032
+  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_wilson_center
+
+On observe 90 succès en n = 900 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de Wald à 95 % (z = 1,96), puis celui de Wilson (EE-209 : on prend z = 2).
+  [free, sans aide]  p̂
+    = 90/900   ← p̂ = k/n
+    = 0,1
+  — J  [juge prob]  départ : J
+    = 900/(0,1·0,9)   ← J = −ℓ″(θ̂)
+    = 10000
+  — se  [juge stat]  départ : se
+    = 1/√(10000)   ← Var(θ̂) ≈ 1/J
+    = 0,01
+  — IC  [juge stat]  départ : IC
+    = [0,1 − 1,96·0,01 ; 0,1 + 1,96·0,01]   ← θ̂ ± z·se
+    = [0,08 ; 0,12]
+  — p̃  [juge stat]  départ : p̃
+    = (90 + 2)/(900 + 4)   ← p̃ = (np̂ + z²/2)/(n + z²), z = 2
+    = 0,1018
+  — ICW  [juge stat]  départ : IC_W
+    = [0,082 ; 0,122]   ← demi-largeur z√n/(n + z²)·√(p̂(1 − p̂) + z²/(4n)) = 0,02
+  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_wilson_center
+
 On observe 36 succès en n = 100 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de Wald à 95 % (z = 1,96), puis celui de Wilson (EE-209 : on prend z = 2).
   [free, sans aide]  p̂
     = 36/100   ← p̂ = k/n
@@ -9437,86 +9458,45 @@ On observe 36 succès en n = 100 essais de Bernoulli indépendants de paramètre
     = [0,271 ; 0,46]   ← demi-largeur z√n/(n + z²)·√(p̂(1 − p̂) + z²/(4n)) = 0,0943
   pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_wilson_center
 
-On observe 50 succès en n = 100 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de Wald à 95 % (z = 1,96), puis celui de Wilson (EE-209 : on prend z = 2).
-  [free, sans aide]  p̂
-    = 50/100   ← p̂ = k/n
-    = 0,5
-  — J  [juge prob]  départ : J
-    = 100/(0,5·0,5)   ← J = −ℓ″(θ̂)
-    = 400
-  — se  [juge stat]  départ : se
-    = 1/√(400)   ← Var(θ̂) ≈ 1/J
-    = 0,05
-  — IC  [juge stat]  départ : IC
-    = [0,5 − 1,96·0,05 ; 0,5 + 1,96·0,05]   ← θ̂ ± z·se
-    = [0,402 ; 0,598]
-  — p̃  [juge stat]  départ : p̃
-    = (50 + 2)/(100 + 4)   ← p̃ = (np̂ + z²/2)/(n + z²), z = 2
-    = 0,5
-  — ICW  [juge stat]  départ : IC_W
-    = [0,402 ; 0,598]   ← demi-largeur z√n/(n + z²)·√(p̂(1 − p̂) + z²/(4n)) = 0,0981
-  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_wilson_center
-
-On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Donne l’intervalle de Wald à 95 % (z = 1,96), puis celui de Wilson (EE-209 : on prend z = 2).
-  [free, sans aide]  p̂
-    = 40/400   ← p̂ = k/n
-    = 0,1
-  — J  [juge prob]  départ : J
-    = 400/(0,1·0,9)   ← J = −ℓ″(θ̂)
-    = 40000/9
-  — se  [juge stat]  départ : se
-    = 1/√(40000/9)   ← Var(θ̂) ≈ 1/J
-    = 0,015
-  — IC  [juge stat]  départ : IC
-    = [0,1 − 1,96·0,015 ; 0,1 + 1,96·0,015]   ← θ̂ ± z·se
-    = [0,071 ; 0,129]
-  — p̃  [juge stat]  départ : p̃
-    = (40 + 2)/(400 + 4)   ← p̃ = (np̂ + z²/2)/(n + z²), z = 2
-    = 0,104
-  — ICW  [juge stat]  départ : IC_W
-    = [0,074 ; 0,134]   ← demi-largeur z√n/(n + z²)·√(p̂(1 − p̂) + z²/(4n)) = 0,0301
-  pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_wilson_center
-
 ```
 
 ### Variantes d'examen
 
 ```
-On observe 36 succès en n = 100 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Quel est l’intervalle de Wald à 95 % pour p (z = 1,96) ?
-  ✔ [0,266 ; 0,454]   · [−40,5 ; 41,2] [p_wald_var_inverse]   · La variance est négative : l’intervalle n’existe pas. [p_wald_sign]   · [−0,581 ; 1,301] [p_se_forgot_sqrt_n]
+On observe 40 succès en n = 400 essais de Bernoulli indépendants de paramètre p. ℓ″(p) = −k/p² − (n − k)/(1 − p)², d’où ℓ″(p̂) = −n/(p̂(1 − p̂)). Quel est l’intervalle de Wald à 95 % pour p (z = 1,96) ?
+  · La variance est négative : l’intervalle n’existe pas. [p_wald_sign]   · [−0,488 ; 0,688] [p_se_forgot_sqrt_n]   · [−130,6 ; 130,8] [p_wald_var_inverse]   ✔ [0,071 ; 0,129]
   [examen mcq]
   pièges : p_wald_var_inverse, p_se_forgot_sqrt_n, p_wald_sign
 
 Vrai ou faux ?
-  « L’intervalle de Wald p̂ ± 1,96·√(p̂(1 − p̂)/n) a une couverture de 95 % pour tout n et tout p (ici n = 20). » → FAUX
-    contre-exemple (refute) : p = 0
+  « L’intervalle de Wald θ̂ ± z/√J(θ̂) repose sur la normalité approchée du MLE, valable quand n est grand. » → VRAI
   [examen tf]
 
-n = 25 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 25. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96). Donne l’erreur standard se = 1/√J.
+n = 36 observations indépendantes d’une loi de Poisson de paramètre λ, de somme Σxᵢ = 144. ℓ(λ) = Σxᵢ ln λ − nλ + constante, ℓ″(λ) = −Σxᵢ/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96). Donne l’erreur standard se = 1/√J.
   [free, sans aide, examen coef]  se
-    = 1/√(25)   ← Var(θ̂) ≈ 1/J
-    = 0,2
+    = 1/√(9)   ← Var(θ̂) ≈ 1/J
+    = 0,3333
   pièges : p_wald_var_inverse
 
-n = 36 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 12. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+n = 100 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 50. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
   [problème, examen open, 8 points]
   partie 1 (IC de Wald : 2 ; J : 2 ; se : 1,5 ; IC : 1,5)
-  n = 36 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 12. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
+  n = 100 durées indépendantes de loi exponentielle de paramètre λ, de somme Σxᵢ = 50. ℓ(λ) = n ln λ − λΣxᵢ, ℓ″(λ) = −n/λ². Donne l’intervalle de confiance de Wald à 95 % pour λ (z = 1,96).
     [free, sans aide, suivre l'erreur, examen open]  λ̂
-      = 36/12   ← λ̂ = n/Σxᵢ
-      = 3
+      = 100/50   ← λ̂ = n/Σxᵢ
+      = 2
     — J  [juge prob]  départ : J
-      = 36/3²   ← J = −ℓ″(θ̂)
-      = 4
+      = 100/2²   ← J = −ℓ″(θ̂)
+      = 25
     — se  [juge stat]  départ : se
-      = 1/√(4)   ← Var(θ̂) ≈ 1/J
-      = 0,5
+      = 1/√(25)   ← Var(θ̂) ≈ 1/J
+      = 0,2
     — IC  [juge stat]  départ : IC
-      = [3 − 1,96·0,5 ; 3 + 1,96·0,5]   ← θ̂ ± z·se
-      = [2,02 ; 3,98]
+      = [2 − 1,96·0,2 ; 2 + 1,96·0,2]   ← θ̂ ± z·se
+      = [1,608 ; 2,392]
   partie 2 (Interpréter : 1)
   Sous quelles hypothèses cet intervalle est-il valable ?
-    ✔ n grand, et un modèle régulier (le support ne dépend pas du paramètre).   · Il est exact pour tout n.   · Il contient λ̂ avec une probabilité de 95 %. [p_ci_prob]   · 95 % des données sont dans l’intervalle. [p_ci_data]
+    · Il contient λ̂ avec une probabilité de 95 %. [p_ci_prob]   · 95 % des données sont dans l’intervalle. [p_ci_data]   · Il est exact pour tout n.   ✔ n grand, et un modèle régulier (le support ne dépend pas du paramètre).
     [examen open]
   pièges : p_wald_sign, p_wald_var_inverse, p_se_forgot_sqrt_n, p_ci_prob, p_ci_data
 
@@ -9529,37 +9509,37 @@ _Arrondir un intervalle de confiance selon la règle d'EE-209 : u à 2 chiffres 
 ### Niveau 1
 
 ```
-Un estimateur vaut θ̂ = 24,595756 et la demi-largeur de l’IC est u = 0,01270. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 5,562612 et la demi-largeur de l’IC est u = 0,6903. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [guided]  u
-    = □   (trous : 0,013)   ← 2 chiffres significatifs : précision 10⁻³
+    = □   (trous : 0,69)   ← 2 chiffres significatifs : précision 10⁻²
   — θ̂  [juge stat]  départ : θ̂
-    = □   (trous : 24,596)   ← Même dernière décimale que u
+    = □   (trous : 5,56)   ← Même dernière décimale que u
   — IC  [juge stat]  départ : IC
     (Comment arrondir les bornes ? Vers l’extérieur : la borne inférieure vers le bas, la supérieure vers le haut.)
-    = [□ ; □]   (trous : [24,583 ; 24,609])   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [24,583 ; □] | IC = [24,583 ; 24,609]
+    = [□ ; □]   (trous : [4,87 ; 6,26])   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [4,87 ; □] | IC = [4,87 ; 6,26]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 42,350055 et la demi-largeur de l’IC est u = 6,276. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 34,059182 et la demi-largeur de l’IC est u = 7,683. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [guided]  u
-    = □   (trous : 6,3)   ← 2 chiffres significatifs : précision 10⁻¹
+    = □   (trous : 7,7)   ← 2 chiffres significatifs : précision 10⁻¹
   — θ̂  [juge stat]  départ : θ̂
-    = □   (trous : 42,4)   ← Même dernière décimale que u
+    = □   (trous : 34,1)   ← Même dernière décimale que u
   — IC  [juge stat]  départ : IC
     (Comment arrondir les bornes ? Vers l’extérieur : la borne inférieure vers le bas, la supérieure vers le haut.)
-    = [□ ; □]   (trous : [36,0 ; 48,7])   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [36,0 ; □] | IC = [36,0 ; 48,7]
+    = [□ ; □]   (trous : [26,3 ; 41,8])   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [26,3 ; □] | IC = [26,3 ; 41,8]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 50,624580 et la demi-largeur de l’IC est u = 0,01633. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 16,707649 et la demi-largeur de l’IC est u = 0,09237. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [guided]  u
-    = □   (trous : 0,016)   ← 2 chiffres significatifs : précision 10⁻³
+    = □   (trous : 0,092)   ← 2 chiffres significatifs : précision 10⁻³
   — θ̂  [juge stat]  départ : θ̂
-    = □   (trous : 50,625)   ← Même dernière décimale que u
+    = □   (trous : 16,708)   ← Même dernière décimale que u
   — IC  [juge stat]  départ : IC
     (Comment arrondir les bornes ? Vers l’extérieur : la borne inférieure vers le bas, la supérieure vers le haut.)
-    = [□ ; □]   (trous : [50,608 ; 50,641])   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [50,608 ; □] | IC = [50,608 ; 50,641]
+    = [□ ; □]   (trous : [16,615 ; 16,801])   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [16,615 ; □] | IC = [16,615 ; 16,801]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
 ```
@@ -9567,43 +9547,43 @@ Un estimateur vaut θ̂ = 50,624580 et la demi-largeur de l’IC est u = 0,01633
 ### Niveau 2
 
 ```
-Un estimateur vaut θ̂ = 49,603286 et la demi-largeur de l’IC est u = 0,01842. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 45,951869 et la demi-largeur de l’IC est u = 0,08286. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [guided]  u
-    = □   (trous : 0,018)   ← 2 chiffres significatifs : précision 10⁻³
+    = □   (trous : 0,083)   ← 2 chiffres significatifs : précision 10⁻³
   — θ̂  [juge stat]  départ : θ̂
-    = □   (trous : 49,603)   ← Même dernière décimale que u
+    = □   (trous : 45,952)   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [□ ; 49,621706]   (trous : [49,584866 ; 49,621706])   ← Avec les valeurs non arrondies
+    = [□ ; 46,034729]   (trous : [45,869009 ; 46,034729])   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
     ? Comment arrondir les bornes ? ✔ Vers l’extérieur : la borne inférieure vers le bas, la supérieure vers le haut / · Chaque borne au plus proche
-    = [□ ; □]   (trous : [49,584 ; 49,622])   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [49,584 ; □] | IC = [49,584 ; 49,622]
+    = [□ ; □]   (trous : [45,869 ; 46,035])   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [45,869 ; □] | IC = [45,869 ; 46,035]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 5,275169 et la demi-largeur de l’IC est u = 4,988. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 21,394383 et la demi-largeur de l’IC est u = 0,9605. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [guided]  u
-    = □   (trous : 5,0)   ← 2 chiffres significatifs : précision 10⁻¹
+    = □   (trous : 0,96)   ← 2 chiffres significatifs : précision 10⁻²
   — θ̂  [juge stat]  départ : θ̂
-    = □   (trous : 5,3)   ← Même dernière décimale que u
+    = □   (trous : 21,39)   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [□ ; 10,263169]   (trous : [0,287169 ; 10,263169])   ← Avec les valeurs non arrondies
+    = [□ ; 22,354883]   (trous : [20,433883 ; 22,354883])   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
     ? Comment arrondir les bornes ? ✔ Vers l’extérieur : la borne inférieure vers le bas, la supérieure vers le haut / · Chaque borne au plus proche
-    = [□ ; □]   (trous : [0,2 ; 10,3])   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [0,2 ; □] | IC = [0,2 ; 10,3]
+    = [□ ; □]   (trous : [20,43 ; 22,36])   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [20,43 ; □] | IC = [20,43 ; 22,36]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 25,188291 et la demi-largeur de l’IC est u = 0,03772. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 20,263478 et la demi-largeur de l’IC est u = 0,0003317. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [guided]  u
-    = □   (trous : 0,038)   ← 2 chiffres significatifs : précision 10⁻³
+    = □   (trous : 0,00033)   ← 2 chiffres significatifs : précision 10⁻⁵
   — θ̂  [juge stat]  départ : θ̂
-    = □   (trous : 25,188)   ← Même dernière décimale que u
+    = □   (trous : 20,26348)   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [□ ; 25,226011]   (trous : [25,150571 ; 25,226011])   ← Avec les valeurs non arrondies
+    = [□ ; 20,2638097]   (trous : [20,2631463 ; 20,2638097])   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
     ? Comment arrondir les bornes ? ✔ Vers l’extérieur : la borne inférieure vers le bas, la supérieure vers le haut / · Chaque borne au plus proche
-    = [□ ; □]   (trous : [25,150 ; 25,227])   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [25,150 ; □] | IC = [25,150 ; 25,227]
+    = [□ ; □]   (trous : [20,26314 ; 20,26381])   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [20,26314 ; □] | IC = [20,26314 ; 20,26381]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
 ```
@@ -9611,40 +9591,40 @@ Un estimateur vaut θ̂ = 25,188291 et la demi-largeur de l’IC est u = 0,03772
 ### Niveau 3
 
 ```
-Un estimateur vaut θ̂ = 39,809319 et la demi-largeur de l’IC est u = 0,006433. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 55,051488 et la demi-largeur de l’IC est u = 0,06432. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [tap, suivre l'erreur, menu menu]  u
-    = 0,0064   ← 2 chiffres significatifs : précision 10⁻⁴
+    = 0,064   ← 2 chiffres significatifs : précision 10⁻³
   — θ̂  [juge stat]  départ : θ̂
-    = 39,8093   ← Même dernière décimale que u
+    = 55,051   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [39,802886 ; 39,815752]   ← Avec les valeurs non arrondies
+    = [54,987168 ; 55,115808]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [39,8028 ; 39,8158]   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [39,8028 ; □] | IC = [39,8028 ; 39,8158]
+    = [54,987 ; 55,116]   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [54,987 ; □] | IC = [54,987 ; 55,116]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 9,473995 et la demi-largeur de l’IC est u = 0,01589. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 3,642335 et la demi-largeur de l’IC est u = 0,05783. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [tap, suivre l'erreur, menu menu]  u
-    = 0,016   ← 2 chiffres significatifs : précision 10⁻³
+    = 0,058   ← 2 chiffres significatifs : précision 10⁻³
   — θ̂  [juge stat]  départ : θ̂
-    = 9,474   ← Même dernière décimale que u
+    = 3,642   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [9,458105 ; 9,489885]   ← Avec les valeurs non arrondies
+    = [3,584505 ; 3,700165]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [9,458 ; 9,490]   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [9,458 ; □] | IC = [9,458 ; 9,490]
+    = [3,584 ; 3,701]   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [3,584 ; □] | IC = [3,584 ; 3,701]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 28,959400 et la demi-largeur de l’IC est u = 0,08489. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 16,106041 et la demi-largeur de l’IC est u = 0,003692. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [tap, suivre l'erreur, menu menu]  u
-    = 0,085   ← 2 chiffres significatifs : précision 10⁻³
+    = 0,0037   ← 2 chiffres significatifs : précision 10⁻⁴
   — θ̂  [juge stat]  départ : θ̂
-    = 28,959   ← Même dernière décimale que u
+    = 16,1060   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [28,87451 ; 29,04429]   ← Avec les valeurs non arrondies
+    = [16,102349 ; 16,109733]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [28,874 ; 29,045]   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [28,874 ; □] | IC = [28,874 ; 29,045]
+    = [16,1023 ; 16,1098]   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [16,1023 ; □] | IC = [16,1023 ; 16,1098]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
 ```
@@ -9652,40 +9632,40 @@ Un estimateur vaut θ̂ = 28,959400 et la demi-largeur de l’IC est u = 0,08489
 ### Niveau 4
 
 ```
-Un estimateur vaut θ̂ = 53,616167 et la demi-largeur de l’IC est u = 0,2470. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 8,201655 et la demi-largeur de l’IC est u = 0,0006656. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [free, suivre l'erreur]  u
-    = 0,25   ← 2 chiffres significatifs : précision 10⁻²
+    = 0,00067   ← 2 chiffres significatifs : précision 10⁻⁵
   — θ̂  [juge stat]  départ : θ̂
-    = 53,62   ← Même dernière décimale que u
+    = 8,20166   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [53,369167 ; 53,863167]   ← Avec les valeurs non arrondies
+    = [8,2009894 ; 8,2023206]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [53,36 ; 53,87]   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [53,36 ; □] | IC = [53,36 ; 53,87]
+    = [8,20098 ; 8,20233]   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [8,20098 ; □] | IC = [8,20098 ; 8,20233]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 31,575073 et la demi-largeur de l’IC est u = 0,01660. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 26,726714 et la demi-largeur de l’IC est u = 5,656. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [free, suivre l'erreur]  u
-    = 0,017   ← 2 chiffres significatifs : précision 10⁻³
+    = 5,7   ← 2 chiffres significatifs : précision 10⁻¹
   — θ̂  [juge stat]  départ : θ̂
-    = 31,575   ← Même dernière décimale que u
+    = 26,7   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [31,558473 ; 31,591673]   ← Avec les valeurs non arrondies
+    = [21,070714 ; 32,382714]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [31,558 ; 31,592]   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [31,558 ; □] | IC = [31,558 ; 31,592]
+    = [21,0 ; 32,4]   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [21,0 ; □] | IC = [21,0 ; 32,4]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
-Un estimateur vaut θ̂ = 42,988772 et la demi-largeur de l’IC est u = 0,01739. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
+Un estimateur vaut θ̂ = 46,383869 et la demi-largeur de l’IC est u = 4,753. Écris u, θ̂ et l’IC arrondis selon la règle d’EE-209.
   [free, suivre l'erreur]  u
-    = 0,017   ← 2 chiffres significatifs : précision 10⁻³
+    = 4,8   ← 2 chiffres significatifs : précision 10⁻¹
   — θ̂  [juge stat]  départ : θ̂
-    = 42,989   ← Même dernière décimale que u
+    = 46,4   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [42,971382 ; 43,006162]   ← Avec les valeurs non arrondies
+    = [41,630869 ; 51,136869]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [42,971 ; 43,007]   ← Vers le bas, vers le haut
-  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [42,971 ; □] | IC = [42,971 ; 43,007]
+    = [41,6 ; 51,2]   ← Vers le bas, vers le haut
+  aides : La précision vient de u (2 chiffres significatifs) ; on élargit l’IC en arrondissant, jamais on ne le rétrécit. | [41,6 ; □] | IC = [41,6 ; 51,2]
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits
 
 ```
@@ -9693,46 +9673,46 @@ Un estimateur vaut θ̂ = 42,988772 et la demi-largeur de l’IC est u = 0,01739
 ### Niveau 5
 
 ```
-Sur n = 100 mesures normales : x̄ = 60,699790, s = 0,001314, et t₍99₎ ; 0,975 = 1,984 (donné). Calcule la demi-largeur u, puis écris u, x̄ et l’IC à 95 % arrondis selon la règle d’EE-209.
+Sur n = 16 mesures normales : x̄ = 20,634050, s = 0,072792, et t₍15₎ ; 0,975 = 2,131 (donné). Calcule la demi-largeur u, puis écris u, x̄ et l’IC à 95 % arrondis selon la règle d’EE-209.
   [free, sans aide]  u_brut
-    = 1,984·0,001314/√(100)   ← u = t·s/√n
-    = 0,00026070
+    = 2,131·0,072792/√(16)   ← u = t·s/√n
+    = 0,038780
   — u  [juge stat]  départ : u
-    = 0,00026   ← 2 chiffres significatifs : précision 10⁻⁵
+    = 0,039   ← 2 chiffres significatifs : précision 10⁻³
   — θ̂  [juge stat]  départ : θ̂
-    = 60,69979   ← Même dernière décimale que u
+    = 20,634   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [60,6995293 ; 60,7000507]   ← Avec les valeurs non arrondies
+    = [20,59527006 ; 20,67282994]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [60,69952 ; 60,70006]   ← Vers le bas, vers le haut
+    = [20,595 ; 20,673]   ← Vers le bas, vers le haut
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits, p_ci_prob, p_ci_data, p_ci_xbar
 
-Sur n = 16 mesures normales : x̄ = 58,818976, s = 0,001742, et t₍15₎ ; 0,975 = 2,131 (donné). Calcule la demi-largeur u, puis écris u, x̄ et l’IC à 95 % arrondis selon la règle d’EE-209.
+Sur n = 64 mesures normales : x̄ = 15,716704, s = 0,002411, et t₍63₎ ; 0,975 = 2 (donné). Calcule la demi-largeur u, puis écris u, x̄ et l’IC à 95 % arrondis selon la règle d’EE-209.
   [free, sans aide]  u_brut
-    = 2,131·0,001742/√(16)   ← u = t·s/√n
-    = 0,00092805
+    = 2·0,002411/√(64)   ← u = t·s/√n
+    = 0,00060275
   — u  [juge stat]  départ : u
-    = 0,00093   ← 2 chiffres significatifs : précision 10⁻⁵
+    = 0,00060   ← 2 chiffres significatifs : précision 10⁻⁵
   — θ̂  [juge stat]  départ : θ̂
-    = 58,81898   ← Même dernière décimale que u
+    = 15,71670   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [58,81804795 ; 58,81990405]   ← Avec les valeurs non arrondies
+    = [15,71610125 ; 15,71730675]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [58,81804 ; 58,81991]   ← Vers le bas, vers le haut
+    = [15,71610 ; 15,71731]   ← Vers le bas, vers le haut
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits, p_ci_prob, p_ci_data, p_ci_xbar
 
-Sur n = 25 mesures normales : x̄ = 37,585648, s = 0,008980, et t₍24₎ ; 0,975 = 2,064 (donné). Calcule la demi-largeur u, puis écris u, x̄ et l’IC à 95 % arrondis selon la règle d’EE-209.
+Sur n = 16 mesures normales : x̄ = 19,534011, s = 0,063313, et t₍15₎ ; 0,975 = 2,131 (donné). Calcule la demi-largeur u, puis écris u, x̄ et l’IC à 95 % arrondis selon la règle d’EE-209.
   [free, sans aide]  u_brut
-    = 2,064·0,008980/√(25)   ← u = t·s/√n
-    = 0,0037069
+    = 2,131·0,063313/√(16)   ← u = t·s/√n
+    = 0,033730
   — u  [juge stat]  départ : u
-    = 0,0037   ← 2 chiffres significatifs : précision 10⁻⁴
+    = 0,034   ← 2 chiffres significatifs : précision 10⁻³
   — θ̂  [juge stat]  départ : θ̂
-    = 37,5856   ← Même dernière décimale que u
+    = 19,534   ← Même dernière décimale que u
   — θ̂ ± u  [juge stat]  départ : θ̂ ± u
-    = [37,58194106 ; 37,58935494]   ← Avec les valeurs non arrondies
+    = [19,500281 ; 19,567741]   ← Avec les valeurs non arrondies
   — IC  [juge stat]  départ : IC
-    = [37,5819 ; 37,5894]   ← Vers le bas, vers le haut
+    = [19,500 ; 19,568]   ← Vers le bas, vers le haut
   pièges : p_ci_round_nearest, p_ci_round_from_rounded, p_ci_round_digits, p_ci_prob, p_ci_data, p_ci_xbar
 
 ```
@@ -9740,14 +9720,14 @@ Sur n = 25 mesures normales : x̄ = 37,585648, s = 0,008980, et t₍24₎ ; 0,97
 ### Variantes d'examen
 
 ```
-θ̂ = 35,804822 et u = 2,927. Quel est l’IC arrondi selon la règle d’EE-209 (u à 2 chiffres significatifs, bornes vers l’extérieur) ?
-  ✔ [32,8 ; 38,8]   · [32 ; 39] [p_ci_round_digits]   · [32,877822 ; 38,731822] [p_ci_round_digits]   · [32,9 ; 38,7] [p_ci_round_nearest]
+θ̂ = 34,121710 et u = 0,003237. Quel est l’IC arrondi selon la règle d’EE-209 (u à 2 chiffres significatifs, bornes vers l’extérieur) ?
+  ✔ [34,1184 ; 34,1250]   · [34,118473 ; 34,124947] [p_ci_round_digits]   · [34,1185 ; 34,1249] [p_ci_round_nearest]   · [34,11 ; 34,13] [p_ci_round_digits]
   [examen mcq]
   pièges : p_ci_round_nearest, p_ci_round_digits
 
 Vrai ou faux ?
-  « Pour θ̂ = 21,394383 et u = 0,9605, on arrondit chaque borne de l’IC au plus proche, à la précision de u. » → FAUX
-    contre-exemple (refute) : a = 22,35, b = 22,36
+  « Pour θ̂ = 37,927938 et u = 0,06820, on arrondit chaque borne de l’IC au plus proche, à la précision de u. » → FAUX
+    contre-exemple (refute) : a = 37,860, b = 37,859
   [examen tf]
   pièges : p_ci_round_nearest
 
@@ -9760,34 +9740,34 @@ _La loi du maximum d'un échantillon, F_M = Fⁿ, et l'intervalle de confiance e
 ### Niveau 1
 
 ```
-X₁, …, X₅ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+X₁, …, X₁₀ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
   [guided]  F(x)
     = □   (trous : x/θ)   ← F(x) = x/θ sur [0 ; θ]
   — F_M(x)  [juge prob]  départ : F_M(x)
-    = (x/θ)^□   (trous : (x/θ)⁵)   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
+    = (x/θ)^□   (trous : (x/θ)¹⁰)   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
   — f_M(x)  [juge prob]  départ : f_M(x)
-    = □x^□/θ⁵   (trous : 5x⁴/θ⁵)   ← f_M = n·F^(n−1)·f
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 5x^4/θ^5
+    = □x^□/θ¹⁰   (trous : 10x⁹/θ¹⁰)   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 10x^9/θ^10
   pièges : p_max_min_swap, p_max_density_power
 
-X₁, …, X₅ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+X₁, …, X₂₀ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
   [guided]  F(x)
     = □   (trous : x/θ)   ← F(x) = x/θ sur [0 ; θ]
   — F_M(x)  [juge prob]  départ : F_M(x)
-    = (x/θ)^□   (trous : (x/θ)⁵)   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
+    = (x/θ)^□   (trous : (x/θ)²⁰)   ← M ≤ x ⇔ les 20 données ≤ x : F(x)²⁰
   — f_M(x)  [juge prob]  départ : f_M(x)
-    = □x^□/θ⁵   (trous : 5x⁴/θ⁵)   ← f_M = n·F^(n−1)·f
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 5x^4/θ^5
+    = □x^□/θ²⁰   (trous : 20x¹⁹/θ²⁰)   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 20x^19/θ^20
   pièges : p_max_min_swap, p_max_density_power
 
-X₁, …, X₅ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+X₁, …, X₁₀ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
   [guided]  F(x)
     = □   (trous : x/θ)   ← F(x) = x/θ sur [0 ; θ]
   — F_M(x)  [juge prob]  départ : F_M(x)
-    = (x/θ)^□   (trous : (x/θ)⁵)   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
+    = (x/θ)^□   (trous : (x/θ)¹⁰)   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
   — f_M(x)  [juge prob]  départ : f_M(x)
-    = □x^□/θ⁵   (trous : 5x⁴/θ⁵)   ← f_M = n·F^(n−1)·f
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 5x^4/θ^5
+    = □x^□/θ¹⁰   (trous : 10x⁹/θ¹⁰)   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 10x^9/θ^10
   pièges : p_max_min_swap, p_max_density_power
 
 ```
@@ -9795,62 +9775,69 @@ X₁, …, X₅ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Don
 ### Niveau 2
 
 ```
-X₁, …, X₂₀ iid de densité f(x) = 3x^2/θ^3 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+X₁, …, X₂₀ iid de densité f(x) = 2x/θ^2 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+  [guided]  F(x)
+    = (x/θ)^□   (trous : (x/θ)²)   ← F(x) = ∫₀ˣ 2u^1/θ^2 du
+  — F_M(x)  [juge prob]  départ : F_M(x)
+    = (x/θ)^□   (trous : (x/θ)⁴⁰)   ← M ≤ x ⇔ les 20 données ≤ x : F(x)²⁰
+  — f_M(x)  [juge prob]  départ : f_M(x)
+    = □x^□/θ⁴⁰   (trous : 40x³⁹/θ⁴⁰)   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 40x^39/θ^40
+  pièges : p_max_min_swap, p_max_density_power
+
+X₁, …, X₅ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+  [guided]  F(x)
+    = □   (trous : x/θ)   ← F(x) = x/θ sur [0 ; θ]
+  — F_M(x)  [juge prob]  départ : F_M(x)
+    = (x/θ)^□   (trous : (x/θ)⁵)   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
+  — f_M(x)  [juge prob]  départ : f_M(x)
+    = □x^□/θ⁵   (trous : 5x⁴/θ⁵)   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 5x^4/θ^5
+  pièges : p_max_min_swap, p_max_density_power
+
+X₁, …, X₁₀ iid de densité f(x) = 3x^2/θ^3 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
   [guided]  F(x)
     = (x/θ)^□   (trous : (x/θ)³)   ← F(x) = ∫₀ˣ 3u^2/θ^3 du
   — F_M(x)  [juge prob]  départ : F_M(x)
-    = (x/θ)^□   (trous : (x/θ)⁶⁰)   ← M ≤ x ⇔ les 20 données ≤ x : F(x)²⁰
+    = (x/θ)^□   (trous : (x/θ)³⁰)   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
   — f_M(x)  [juge prob]  départ : f_M(x)
-    = □x^□/θ⁶⁰   (trous : 60x⁵⁹/θ⁶⁰)   ← f_M = n·F^(n−1)·f
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 60x^59/θ^60
+    = □x^□/θ³⁰   (trous : 30x²⁹/θ³⁰)   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 30x^29/θ^30
   pièges : p_max_min_swap, p_max_density_power
-
-X₁, …, X₂₀ iid U[0, θ], et M = max Xᵢ = 29. Donne l’IC exact à 90 % pour θ (deux décimales).
-  [guided]  IC
-    ? Quel pivot ? ✔ M/θ, de fonction de répartition u^20 sur [0 ; 1] / · Le théorème central limite sur M
-    = [29 ; 29·0,1^(−1/□)]   (trous : [29 ; 29·0,1^(−1/20)])   ← Pr(0,1^(1/20) ≤ M/θ ≤ 1) = 0,9
-    = [29 ; □]   (trous : [29 ; 32,54])
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont ; M/θ a la fonction de répartition uⁿ. | [29 ; 29×0,1^(-1/□)] | IC = [29 ; 32,54]
-  pièges : p_ci_prob, p_ci_data, p_ci_xbar
-
-X₁, …, X₅ iid U[0, θ], et M = max Xᵢ = 25. Donne l’IC exact à 95 % pour θ (deux décimales).
-  [guided]  IC
-    ? Quel pivot ? ✔ M/θ, de fonction de répartition u^5 sur [0 ; 1] / · Le théorème central limite sur M
-    = [25 ; 25·0,05^(−1/5)]   ← Pr(0,05^(1/5) ≤ M/θ ≤ 1) = 0,95
-    = [25 ; □]   (trous : [25 ; 45,51])
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont ; M/θ a la fonction de répartition uⁿ. | [25 ; 25×0,05^(-1/□)] | IC = [25 ; 45,51]
-  pièges : p_ci_prob, p_ci_data, p_ci_xbar
 
 ```
 
 ### Niveau 3
 
 ```
-X₁, …, X₅ iid U[0, θ], et M = max Xᵢ = 24. Donne l’IC exact à 90 % pour θ (deux décimales).
-  [tap, suivre l'erreur, menu menu]  IC
-    = [24 ; 24·0,1^(−1/5)]   ← Pr(0,1^(1/5) ≤ M/θ ≤ 1) = 0,9
-    = [24 ; 38,04]
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont ; M/θ a la fonction de répartition uⁿ. | [24 ; 24×0,1^(-1/□)] | IC = [24 ; 38,04]
-  pièges : p_ci_prob, p_ci_data, p_ci_xbar
+X₁, …, X₁₀ iid de densité f(x) = 3x^2/θ^3 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+  [tap, suivre l'erreur, menu menu]  F(x)
+    = (x/θ)³   ← F(x) = ∫₀ˣ 3u^2/θ^3 du
+  — F_M(x)  [juge prob]  départ : F_M(x)
+    = (x/θ)³⁰   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
+  — f_M(x)  [juge prob]  départ : f_M(x)
+    = 30x²⁹/θ³⁰   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 30x^29/θ^30
+  pièges : p_max_min_swap, p_max_density_power
 
-X₁, …, X₁₀ iid de densité f(x) = 4x^3/θ^4 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+X₁, …, X₁₀ iid de densité f(x) = 3x^2/θ^3 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+  [tap, suivre l'erreur, menu menu]  F(x)
+    = (x/θ)³   ← F(x) = ∫₀ˣ 3u^2/θ^3 du
+  — F_M(x)  [juge prob]  départ : F_M(x)
+    = (x/θ)³⁰   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
+  — f_M(x)  [juge prob]  départ : f_M(x)
+    = 30x²⁹/θ³⁰   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 30x^29/θ^30
+  pièges : p_max_min_swap, p_max_density_power
+
+X₁, …, X₂₀ iid de densité f(x) = 4x^3/θ^4 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
   [tap, suivre l'erreur, menu menu]  F(x)
     = (x/θ)⁴   ← F(x) = ∫₀ˣ 4u^3/θ^4 du
   — F_M(x)  [juge prob]  départ : F_M(x)
-    = (x/θ)⁴⁰   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
+    = (x/θ)⁸⁰   ← M ≤ x ⇔ les 20 données ≤ x : F(x)²⁰
   — f_M(x)  [juge prob]  départ : f_M(x)
-    = 40x³⁹/θ⁴⁰   ← f_M = n·F^(n−1)·f
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 40x^39/θ^40
-  pièges : p_max_min_swap, p_max_density_power
-
-X₁, …, X₅ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
-  [tap, suivre l'erreur, menu menu]  F(x)
-    = x/θ   ← F(x) = x/θ sur [0 ; θ]
-  — F_M(x)  [juge prob]  départ : F_M(x)
-    = (x/θ)⁵   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
-  — f_M(x)  [juge prob]  départ : f_M(x)
-    = 5x⁴/θ⁵   ← f_M = n·F^(n−1)·f
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 5x^4/θ^5
+    = 80x⁷⁹/θ⁸⁰   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 80x^79/θ^80
   pièges : p_max_min_swap, p_max_density_power
 
 ```
@@ -9858,23 +9845,6 @@ X₁, …, X₅ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Don
 ### Niveau 4
 
 ```
-X₁, …, X₁₀ iid U[0, θ], et M = max Xᵢ = 13. Donne l’IC exact à 95 % pour θ (deux décimales).
-  [free, suivre l'erreur]  IC
-    = [13 ; 13·0,05^(−1/10)]   ← Pr(0,05^(1/10) ≤ M/θ ≤ 1) = 0,95
-    = [13 ; 17,54]
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont ; M/θ a la fonction de répartition uⁿ. | [13 ; 13×0,05^(-1/□)] | IC = [13 ; 17,54]
-  pièges : p_ci_prob, p_ci_data, p_ci_xbar
-
-X₁, …, X₁₀ iid de densité f(x) = 2x/θ^2 sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
-  [free, suivre l'erreur]  F(x)
-    = (x/θ)²   ← F(x) = ∫₀ˣ 2u^1/θ^2 du
-  — F_M(x)  [juge prob]  départ : F_M(x)
-    = (x/θ)²⁰   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
-  — f_M(x)  [juge prob]  départ : f_M(x)
-    = 20x¹⁹/θ²⁰   ← f_M = n·F^(n−1)·f
-  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 20x^19/θ^20
-  pièges : p_max_min_swap, p_max_density_power
-
 X₁, …, X₁₀ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
   [free, suivre l'erreur]  F(x)
     = x/θ   ← F(x) = x/θ sur [0 ; θ]
@@ -9885,11 +9855,44 @@ X₁, …, X₁₀ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. 
   aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 10x^9/θ^10
   pièges : p_max_min_swap, p_max_density_power
 
+X₁, …, X₅ iid U[0, θ], et M = max Xᵢ = 16. Donne l’IC exact à 95 % pour θ (deux décimales).
+  [free, suivre l'erreur]  IC
+    = [16 ; 16·0,05^(−1/5)]   ← Pr(0,05^(1/5) ≤ M/θ ≤ 1) = 0,95
+    = [16 ; 29,13]
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont ; M/θ a la fonction de répartition uⁿ. | [16 ; 16×0,05^(-1/□)] | IC = [16 ; 29,13]
+  pièges : p_ci_prob, p_ci_data, p_ci_xbar
+
+X₁, …, X₂₀ iid de densité f(x) = 1/θ sur [0 ; θ]. Soit M = max Xᵢ. Donne F, F_M et la densité f_M sur [0 ; θ].
+  [free, suivre l'erreur]  F(x)
+    = x/θ   ← F(x) = x/θ sur [0 ; θ]
+  — F_M(x)  [juge prob]  départ : F_M(x)
+    = (x/θ)²⁰   ← M ≤ x ⇔ les 20 données ≤ x : F(x)²⁰
+  — f_M(x)  [juge prob]  départ : f_M(x)
+    = 20x¹⁹/θ²⁰   ← f_M = n·F^(n−1)·f
+  aides : Le maximum est ≤ x si et seulement si toutes les données le sont : F_M = Fⁿ, puis on dérive. | (x/θ)^□ | f_M(x) = 20x^19/θ^20
+  pièges : p_max_min_swap, p_max_density_power
+
 ```
 
 ### Niveau 5
 
 ```
+Sur 20 plaques vaudoises vues au hasard, le plus grand numéro est M = 512. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 95 % pour θ (deux décimales).
+  [free, sans aide]  F_M(x)
+    = (x/θ)²⁰   ← M ≤ x ⇔ les 20 données ≤ x : F(x)²⁰
+  — IC  [juge stat]  départ : IC
+    = [512 ; 512·0,05^(−1/20)]   ← Pr(0,05^(1/20) ≤ M/θ ≤ 1) = 0,95
+    = [512 ; 594,73]
+  pièges : p_max_min_swap, p_ci_prob, p_ci_data, p_ci_xbar
+
+Sur 5 plaques vaudoises vues au hasard, le plus grand numéro est M = 925. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 90 % pour θ (deux décimales).
+  [free, sans aide]  F_M(x)
+    = (x/θ)⁵   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
+  — IC  [juge stat]  départ : IC
+    = [925 ; 925·0,1^(−1/5)]   ← Pr(0,1^(1/5) ≤ M/θ ≤ 1) = 0,9
+    = [925 ; 1466,03]
+  pièges : p_max_min_swap, p_ci_prob, p_ci_data, p_ci_xbar
+
 Sur 5 plaques vaudoises vues au hasard, le plus grand numéro est M = 512. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 90 % pour θ (deux décimales).
   [free, sans aide]  F_M(x)
     = (x/θ)⁵   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
@@ -9898,48 +9901,32 @@ Sur 5 plaques vaudoises vues au hasard, le plus grand numéro est M = 512. On mo
     = [512 ; 811,47]
   pièges : p_max_min_swap, p_ci_prob, p_ci_data, p_ci_xbar
 
-Sur 5 plaques vaudoises vues au hasard, le plus grand numéro est M = 347. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 95 % pour θ (deux décimales).
-  [free, sans aide]  F_M(x)
-    = (x/θ)⁵   ← M ≤ x ⇔ les 5 données ≤ x : F(x)⁵
-  — IC  [juge stat]  départ : IC
-    = [347 ; 347·0,05^(−1/5)]   ← Pr(0,05^(1/5) ≤ M/θ ≤ 1) = 0,95
-    = [347 ; 631,74]
-  pièges : p_max_min_swap, p_ci_prob, p_ci_data, p_ci_xbar
-
-Sur 10 plaques vaudoises vues au hasard, le plus grand numéro est M = 347. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 90 % pour θ (deux décimales).
-  [free, sans aide]  F_M(x)
-    = (x/θ)¹⁰   ← M ≤ x ⇔ les 10 données ≤ x : F(x)¹⁰
-  — IC  [juge stat]  départ : IC
-    = [347 ; 347·0,1^(−1/10)]   ← Pr(0,1^(1/10) ≤ M/θ ≤ 1) = 0,9
-    = [347 ; 436,85]
-  pièges : p_max_min_swap, p_ci_prob, p_ci_data, p_ci_xbar
-
 ```
 
 ### Variantes d'examen
 
 ```
-X₁, …, X₁₀ iid de fonction de répartition F(x) = (x/θ)^2 sur [0 ; θ]. Quelle est la densité de M = max Xᵢ sur [0 ; θ] ?
-  ✔ 20x^19/θ^20   · (x/θ)^20   · (2x^1/θ^2)^10 [p_max_density_power]   · 10×(1-(x/θ)^2)^9×2x^1/θ^2 [p_max_min_swap]
+X₁, …, X₁₀ iid de fonction de répartition F(x) = x/θ sur [0 ; θ]. Quelle est la densité de M = max Xᵢ sur [0 ; θ] ?
+  · (x/θ)^10   · 10×(1-x/θ)^9×1/θ [p_max_min_swap]   · (1/θ)^10 [p_max_density_power]   ✔ 10x^9/θ^10
   [examen mcq]
   pièges : p_max_density_power, p_max_min_swap
 
-X₁, …, X₁₀ iid U[0, θ], et M = max Xᵢ = 20. Donne la borne supérieure de l’IC exact à 90 % pour θ.
+X₁, …, X₅ iid U[0, θ], et M = max Xᵢ = 30. Donne la borne supérieure de l’IC exact à 95 % pour θ.
   [free, sans aide, examen coef]  borne sup.
-    = 25,18
+    = 54,62
 
-Sur 20 plaques vaudoises vues au hasard, le plus grand numéro est M = 512. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 90 % pour θ (deux décimales).
+Sur 20 plaques vaudoises vues au hasard, le plus grand numéro est M = 689. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 90 % pour θ (deux décimales).
   [problème, examen open, 8 points]
   partie 1 (Maximum et IC exact : 2,5 ; IC : 4,5)
-  Sur 20 plaques vaudoises vues au hasard, le plus grand numéro est M = 512. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 90 % pour θ (deux décimales).
+  Sur 20 plaques vaudoises vues au hasard, le plus grand numéro est M = 689. On modélise les numéros par des variables iid U[0, θ]. Donne F_M, puis l’IC exact à 90 % pour θ (deux décimales).
     [free, sans aide, suivre l'erreur, examen open]  F_M(x)
       = (x/θ)²⁰   ← M ≤ x ⇔ les 20 données ≤ x : F(x)²⁰
     — IC  [juge stat]  départ : IC
-      = [512 ; 512·0,1^(−1/20)]   ← Pr(0,1^(1/20) ≤ M/θ ≤ 1) = 0,9
-      = [512 ; 574,47]
+      = [689 ; 689·0,1^(−1/20)]   ← Pr(0,1^(1/20) ≤ M/θ ≤ 1) = 0,9
+      = [689 ; 773,07]
   partie 2 (Interpréter : 1)
   Interpréter : quelle phrase est juste ?
-    · La moyenne observée est dans l’intervalle avec une probabilité de 0,9. [p_ci_xbar]   · θ est dans [512 ; 574,47] avec une probabilité de 0,9. [p_ci_prob]   ✔ Si l’on refaisait l’expérience souvent, 90 % des intervalles construits ainsi contiendraient θ.   · 90 % des mesures sont dans [512 ; 574,47]. [p_ci_data]
+    · La moyenne observée est dans l’intervalle avec une probabilité de 0,9. [p_ci_xbar]   · θ est dans [689 ; 773,07] avec une probabilité de 0,9. [p_ci_prob]   · 90 % des mesures sont dans [689 ; 773,07]. [p_ci_data]   ✔ Si l’on refaisait l’expérience souvent, 90 % des intervalles construits ainsi contiendraient θ.
     [examen open]
   pièges : p_max_min_swap, p_ci_prob, p_ci_data, p_ci_xbar
 
@@ -9952,81 +9939,81 @@ _Formuler un test : H₀ et H₁, uni- ou bilatéral, région critique, p-valeur
 ### Niveau 1
 
 ```
-La proportion p d’unités défectueuses d’une ligne de production dépasse-t-elle 1/1 000 ? On fait un test z au niveau 5 % et on observe t_obs = 1,425. Pose les hypothèses, donne la région critique et la p-valeur.
+Une machine remplit-elle bien les paquets à 500 g en moyenne ? On fait un test z au niveau 5 % et on observe t_obs = 3,275. Pose les hypothèses, donne la région critique et la p-valeur.
   [guided]  t_c
-    (Quelles hypothèses ? H₀ : p = 1/1 000 contre H₁ : p > 1/1 000.)
-    (Le test est… unilatéral à droite.)
-    = □   (trous : 1,645)   ← R = [1,645 ; +∞[
+    (Quelles hypothèses ? H₀ : μ = 500 contre H₁ : μ ≠ 500.)
+    (Le test est… bilatéral.)
+    = □   (trous : 1,96)   ← R = {|T| > 1,96}
   — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(□)   (trous : 1 − Φ(1,425))   ← Une queue
-    = 1 − □   (trous : 1 − 0,923)   ← Table : Φ(1,425) = 0,923
-    = □   (trous : 0,077)
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,077
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Le « oui » l’emporte-t-il au référendum (p = part des oui) ? On fait un test z au niveau 1 % et on observe t_obs = 1,3. Pose les hypothèses, donne la région critique et la p-valeur.
-  [guided]  t_c
-    (Quelles hypothèses ? H₀ : p = 1/2 contre H₁ : p > 1/2.)
-    (Le test est… unilatéral à droite.)
-    = □   (trous : 2,326)   ← R = [2,326 ; +∞[
-  — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(□)   (trous : 1 − Φ(1,3))   ← Une queue
-    = 1 − □   (trous : 1 − 0,903)   ← Table : Φ(1,3) = 0,903
-    = □   (trous : 0,097)
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,097
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-La teneur moyenne μ en alcool d’une boisson dépasse-t-elle la limite de 0,5 % ? On fait un test z au niveau 5 % et on observe t_obs = 2,4. Pose les hypothèses, donne la région critique et la p-valeur.
-  [guided]  t_c
-    (Quelles hypothèses ? H₀ : μ = 0,5 contre H₁ : μ > 0,5.)
-    (Le test est… unilatéral à droite.)
-    = □   (trous : 1,645)   ← R = [1,645 ; +∞[
-  — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(□)   (trous : 1 − Φ(2,4))   ← Une queue
-    = 1 − □   (trous : 1 − 0,992)   ← Table : Φ(2,4) = 0,992
-    = □   (trous : 0,008)
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,008
+    = 2(1 − Φ(□))   (trous : 2(1 − Φ(3,275)))   ← Bilatéral : les deux queues
+    = 2(1 − □)   (trous : 2(1 − 0,9994717))   ← Table : Φ(3,275) = 0,9994717
+    = □   (trous : 0,0011)
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 2(1-Φ(□)) | p_obs = 0,0011
   pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+L’alcool allonge-t-il le temps de réaction moyen μ, qui est de 0,8 s à jeun ? On fait un test z au niveau 5 % et on observe t_obs = 3,175. Pose les hypothèses, donne la région critique et la p-valeur.
+  [guided]  t_c
+    (Quelles hypothèses ? H₀ : μ = 0,8 contre H₁ : μ > 0,8.)
+    (Le test est… unilatéral à droite.)
+    = □   (trous : 1,645)   ← R = [1,645 ; +∞[
+  — pobs  [juge stat]  départ : p_obs
+    = 1 − Φ(□)   (trous : 1 − Φ(3,175))   ← Une queue
+    = 1 − □   (trous : 1 − 0,9992508)   ← Table : Φ(3,175) = 0,9992508
+    = □   (trous : 0,0007)
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,0007
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+Une machine remplit-elle bien les paquets à 500 g en moyenne ? On fait un test z au niveau 5 % et on observe t_obs = 1,425. Pose les hypothèses, donne la région critique et la p-valeur.
+  [guided]  t_c
+    (Quelles hypothèses ? H₀ : μ = 500 contre H₁ : μ ≠ 500.)
+    (Le test est… bilatéral.)
+    = □   (trous : 1,96)   ← R = {|T| > 1,96}
+  — pobs  [juge stat]  départ : p_obs
+    = 2(1 − Φ(□))   (trous : 2(1 − Φ(1,425)))   ← Bilatéral : les deux queues
+    = 2(1 − □)   (trous : 2(1 − 0,923))   ← Table : Φ(1,425) = 0,923
+    = □   (trous : 0,154)
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 2(1-Φ(□)) | p_obs = 0,154
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
 ### Niveau 2
 
 ```
-Une nouvelle méthode augmente-t-elle le taux de réussite p, qui était de 0,7 ? On fait un test z au niveau 5 % et on observe t_obs = 0,525. Pose les hypothèses, donne la région critique et la p-valeur.
+La teneur moyenne μ en alcool d’une boisson dépasse-t-elle la limite de 0,5 % ? On fait un test z au niveau 5 % et on observe t_obs = 2,325. Pose les hypothèses, donne la région critique et la p-valeur.
   [guided]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : p = 0,7 contre H₁ : p > 0,7 / · H₀ : p > 0,7 contre H₁ : p = 0,7 / · H₀ : p = 0,7 contre H₁ : p ≠ 0,7 / · H₀ : p = 0,7 contre H₁ : p < 0,7 / · H₀ : p ≠ 0,7 contre H₁ : p = 0,7
+    ? Quelles hypothèses ? ✔ H₀ : μ = 0,5 contre H₁ : μ > 0,5 / · H₀ : μ > 0,5 contre H₁ : μ = 0,5 / · H₀ : μ = 0,5 contre H₁ : μ ≠ 0,5 / · H₀ : μ = 0,5 contre H₁ : μ < 0,5 / · H₀ : μ ≠ 0,5 contre H₁ : μ = 0,5
     ? Le test est… ✔ unilatéral à droite / · bilatéral
     = □   (trous : 1,645)   ← R = [1,645 ; +∞[
   — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(□)   (trous : 1 − Φ(0,525))   ← Une queue
-    = 1 − □   (trous : 1 − 0,7)   ← Table : Φ(0,525) = 0,7
-    = □   (trous : 0,3)
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,3
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+    = 1 − Φ(□)   (trous : 1 − Φ(2,325))   ← Une queue
+    = 1 − □   (trous : 1 − 0,99)   ← Table : Φ(2,325) = 0,99
+    = □   (trous : 0,01)
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,01
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
 
-La proportion p d’unités défectueuses d’une ligne de production dépasse-t-elle 1/1 000 ? On fait un test z au niveau 1 % et on observe t_obs = 1,225. Pose les hypothèses, donne la région critique et la p-valeur.
+Une pièce de monnaie est-elle truquée (p = probabilité de pile) ? On fait un test z au niveau 5 % et on observe t_obs = 3,1. Pose les hypothèses, donne la région critique et la p-valeur.
+  [guided]  t_c
+    ? Quelles hypothèses ? ✔ H₀ : p = 1/2 contre H₁ : p ≠ 1/2 / · H₀ : p = 1/2 contre H₁ : p > 1/2 / · H₀ : p ≠ 1/2 contre H₁ : p = 1/2 / · H₀ : p = 1/2 contre H₁ : p < 1/2 / · H₀ : p > 1/2 contre H₁ : p ≤ 1/2
+    ? Le test est… ✔ bilatéral / · unilatéral
+    = □   (trous : 1,96)   ← R = {|T| > 1,96}
+  — pobs  [juge stat]  départ : p_obs
+    = 2(1 − Φ(□))   (trous : 2(1 − Φ(3,1)))   ← Bilatéral : les deux queues
+    = 2(1 − □)   (trous : 2(1 − 0,9990324))   ← Table : Φ(3,1) = 0,9990324
+    = □   (trous : 0,0019)
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 2(1-Φ(□)) | p_obs = 0,0019
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+La proportion p d’unités défectueuses d’une ligne de production dépasse-t-elle 1/1 000 ? On fait un test z au niveau 1 % et on observe t_obs = 3,1. Pose les hypothèses, donne la région critique et la p-valeur.
   [guided]  t_c
     ? Quelles hypothèses ? ✔ H₀ : p = 1/1 000 contre H₁ : p > 1/1 000 / · H₀ : p > 1/1 000 contre H₁ : p = 1/1 000 / · H₀ : p = 1/1 000 contre H₁ : p ≠ 1/1 000 / · H₀ : p = 1/1 000 contre H₁ : p < 1/1 000 / · H₀ : p ≠ 1/1 000 contre H₁ : p = 1/1 000
     ? Le test est… ✔ unilatéral à droite / · bilatéral
     = □   (trous : 2,326)   ← R = [2,326 ; +∞[
   — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(□)   (trous : 1 − Φ(1,225))   ← Une queue
-    = 1 − □   (trous : 1 − 0,89)   ← Table : Φ(1,225) = 0,89
-    = □   (trous : 0,11)
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,11
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Un radar de détection des tumeurs manque-t-il moins de 10 % des tumeurs (p = part manquée) ? On fait un test z au niveau 1 % et on observe t_obs = −3,2. Pose les hypothèses, donne la région critique et la p-valeur.
-  [guided]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : p = 0,1 contre H₁ : p < 0,1 / · H₀ : p < 0,1 contre H₁ : p = 0,1 / · H₀ : p = 0,1 contre H₁ : p ≠ 0,1 / · H₀ : p = 0,1 contre H₁ : p > 0,1 / · H₀ : p ≠ 0,1 contre H₁ : p = 0,1
-    ? Le test est… ✔ unilatéral à gauche / · bilatéral
-    = □   (trous : 2,326)   ← R = ]−∞ ; −2,326]
-  — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(□)   (trous : 1 − Φ(3,2))   ← Une queue
-    = 1 − □   (trous : 1 − 0,9993129)   ← Table : Φ(3,2) = 0,9993129
-    = □   (trous : 0,0007)
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,0007
+    = 1 − Φ(□)   (trous : 1 − Φ(3,1))   ← Une queue
+    = 1 − □   (trous : 1 − 0,9990324)   ← Table : Φ(3,1) = 0,9990324
+    = □   (trous : 0,001)
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,001
   pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 ```
@@ -10034,21 +10021,62 @@ Un radar de détection des tumeurs manque-t-il moins de 10 % des tumeurs (p = pa
 ### Niveau 3
 
 ```
-Une nouvelle méthode augmente-t-elle le taux de réussite p, qui était de 0,7 ? On fait un test z au niveau 1 % et on observe t_obs = 1,375. Pose les hypothèses, donne la région critique et la p-valeur.
+Les contrôles radar font-ils baisser la vitesse moyenne μ, qui était de 50 km/h ? On fait un test z au niveau 1 % et on observe t_obs = −3,075. Pose les hypothèses, donne la région critique et la p-valeur.
   [tap, suivre l'erreur, menu menu]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : p = 0,7 contre H₁ : p > 0,7 / · H₀ : p > 0,7 contre H₁ : p = 0,7 / · H₀ : p = 0,7 contre H₁ : p ≠ 0,7 / · H₀ : p = 0,7 contre H₁ : p < 0,7 / · H₀ : p ≠ 0,7 contre H₁ : p = 0,7
-    ? Le test est… ✔ unilatéral à droite / · bilatéral
-    = 2,326   ← R = [2,326 ; +∞[
+    ? Quelles hypothèses ? ✔ H₀ : μ = 50 contre H₁ : μ < 50 / · H₀ : μ < 50 contre H₁ : μ = 50 / · H₀ : μ = 50 contre H₁ : μ ≠ 50 / · H₀ : μ = 50 contre H₁ : μ > 50 / · H₀ : μ ≠ 50 contre H₁ : μ = 50
+    ? Le test est… ✔ unilatéral à gauche / · bilatéral
+    = 2,326   ← R = ]−∞ ; −2,326]
   — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(1,375)   ← Une queue
-    = 1 − 0,915   ← Table : Φ(1,375) = 0,915
-    = 0,085
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,085
+    = 1 − Φ(3,075)   ← Une queue
+    = 1 − 0,9989475   ← Table : Φ(3,075) = 0,9989475
+    = 0,0011
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,0011
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+Un radar de détection des tumeurs manque-t-il moins de 10 % des tumeurs (p = part manquée) ? On fait un test z au niveau 5 % et on observe t_obs = −1,425. Pose les hypothèses, donne la région critique et la p-valeur.
+  [tap, suivre l'erreur, menu menu]  t_c
+    ? Quelles hypothèses ? ✔ H₀ : p = 0,1 contre H₁ : p < 0,1 / · H₀ : p < 0,1 contre H₁ : p = 0,1 / · H₀ : p = 0,1 contre H₁ : p ≠ 0,1 / · H₀ : p = 0,1 contre H₁ : p > 0,1 / · H₀ : p ≠ 0,1 contre H₁ : p = 0,1
+    ? Le test est… ✔ unilatéral à gauche / · bilatéral
+    = 1,645   ← R = ]−∞ ; −1,645]
+  — pobs  [juge stat]  départ : p_obs
+    = 1 − Φ(1,425)   ← Une queue
+    = 1 − 0,923   ← Table : Φ(1,425) = 0,923
+    = 0,077
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,077
   pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-La consommation moyenne μ d’une voiture diffère-t-elle des 6 L/100 km annoncés ? On fait un test z au niveau 5 % et on observe t_obs = 1,775. Pose les hypothèses, donne la région critique et la p-valeur.
+Le filtre anti-spam laisse-t-il passer moins de 5 % des spams (p = part des spams non filtrés) ? On fait un test z au niveau 1 % et on observe t_obs = −2,825. Pose les hypothèses, donne la région critique et la p-valeur.
   [tap, suivre l'erreur, menu menu]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : μ = 6 contre H₁ : μ ≠ 6 / · H₀ : μ = 6 contre H₁ : μ > 6 / · H₀ : μ ≠ 6 contre H₁ : μ = 6 / · H₀ : μ = 6 contre H₁ : μ < 6 / · H₀ : μ > 6 contre H₁ : μ ≤ 6
+    ? Quelles hypothèses ? ✔ H₀ : p = 0,05 contre H₁ : p < 0,05 / · H₀ : p < 0,05 contre H₁ : p = 0,05 / · H₀ : p = 0,05 contre H₁ : p ≠ 0,05 / · H₀ : p = 0,05 contre H₁ : p > 0,05 / · H₀ : p ≠ 0,05 contre H₁ : p = 0,05
+    ? Le test est… ✔ unilatéral à gauche / · bilatéral
+    = 2,326   ← R = ]−∞ ; −2,326]
+  — pobs  [juge stat]  départ : p_obs
+    = 1 − Φ(2,825)   ← Une queue
+    = 1 − 0,998   ← Table : Φ(2,825) = 0,998
+    = 0,002
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,002
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+```
+
+### Niveau 4
+
+```
+Le « oui » l’emporte-t-il au référendum (p = part des oui) ? On fait un test z au niveau 5 % et on observe t_obs = 3,275. Pose les hypothèses, donne la région critique et la p-valeur.
+  [free, suivre l'erreur]  t_c
+    ? Quelles hypothèses ? ✔ H₀ : p = 1/2 contre H₁ : p > 1/2 / · H₀ : p > 1/2 contre H₁ : p = 1/2 / · H₀ : p = 1/2 contre H₁ : p ≠ 1/2 / · H₀ : p = 1/2 contre H₁ : p < 1/2 / · H₀ : p ≠ 1/2 contre H₁ : p = 1/2
+    ? Le test est… ✔ unilatéral à droite / · bilatéral
+    = 1,645   ← R = [1,645 ; +∞[
+  — pobs  [juge stat]  départ : p_obs
+    = 1 − Φ(3,275)   ← Une queue
+    = 1 − 0,9994717   ← Table : Φ(3,275) = 0,9994717
+    = 0,0005
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,0005
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+Une machine remplit-elle bien les paquets à 500 g en moyenne ? On fait un test z au niveau 5 % et on observe t_obs = 1,775. Pose les hypothèses, donne la région critique et la p-valeur.
+  [free, suivre l'erreur]  t_c
+    ? Quelles hypothèses ? ✔ H₀ : μ = 500 contre H₁ : μ ≠ 500 / · H₀ : μ = 500 contre H₁ : μ > 500 / · H₀ : μ ≠ 500 contre H₁ : μ = 500 / · H₀ : μ = 500 contre H₁ : μ < 500 / · H₀ : μ > 500 contre H₁ : μ ≤ 500
     ? Le test est… ✔ bilatéral / · unilatéral
     = 1,96   ← R = {|T| > 1,96}
   — pobs  [juge stat]  départ : p_obs
@@ -10058,57 +10086,16 @@ La consommation moyenne μ d’une voiture diffère-t-elle des 6 L/100 km annonc
   aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 2(1-Φ(□)) | p_obs = 0,076
   pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-La teneur moyenne μ en alcool d’une boisson dépasse-t-elle la limite de 0,5 % ? On fait un test z au niveau 5 % et on observe t_obs = 1,45. Pose les hypothèses, donne la région critique et la p-valeur.
-  [tap, suivre l'erreur, menu menu]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : μ = 0,5 contre H₁ : μ > 0,5 / · H₀ : μ > 0,5 contre H₁ : μ = 0,5 / · H₀ : μ = 0,5 contre H₁ : μ ≠ 0,5 / · H₀ : μ = 0,5 contre H₁ : μ < 0,5 / · H₀ : μ ≠ 0,5 contre H₁ : μ = 0,5
-    ? Le test est… ✔ unilatéral à droite / · bilatéral
-    = 1,645   ← R = [1,645 ; +∞[
-  — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(1,45)   ← Une queue
-    = 1 − 0,926   ← Table : Φ(1,45) = 0,926
-    = 0,074
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,074
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-```
-
-### Niveau 4
-
-```
-Un nouveau médicament raccourcit-il la durée moyenne μ de guérison, qui était de 7 jours ? On fait un test z au niveau 5 % et on observe t_obs = −1,55. Pose les hypothèses, donne la région critique et la p-valeur.
+Une pièce de monnaie est-elle truquée (p = probabilité de pile) ? On fait un test z au niveau 1 % et on observe t_obs = 1,825. Pose les hypothèses, donne la région critique et la p-valeur.
   [free, suivre l'erreur]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : μ = 7 contre H₁ : μ < 7 / · H₀ : μ < 7 contre H₁ : μ = 7 / · H₀ : μ = 7 contre H₁ : μ ≠ 7 / · H₀ : μ = 7 contre H₁ : μ > 7 / · H₀ : μ ≠ 7 contre H₁ : μ = 7
-    ? Le test est… ✔ unilatéral à gauche / · bilatéral
-    = 1,645   ← R = ]−∞ ; −1,645]
-  — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(1,55)   ← Une queue
-    = 1 − 0,939   ← Table : Φ(1,55) = 0,939
-    = 0,061
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 1-Φ(□) | p_obs = 0,061
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Des compteurs électriques mesurent-ils juste en moyenne (moyenne nominale 1 000 kWh) ? On fait un test z au niveau 5 % et on observe t_obs = 2,175. Pose les hypothèses, donne la région critique et la p-valeur.
-  [free, suivre l'erreur]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : μ = 1 000 contre H₁ : μ ≠ 1 000 / · H₀ : μ = 1 000 contre H₁ : μ > 1 000 / · H₀ : μ ≠ 1 000 contre H₁ : μ = 1 000 / · H₀ : μ = 1 000 contre H₁ : μ < 1 000 / · H₀ : μ > 1 000 contre H₁ : μ ≤ 1 000
+    ? Quelles hypothèses ? ✔ H₀ : p = 1/2 contre H₁ : p ≠ 1/2 / · H₀ : p = 1/2 contre H₁ : p > 1/2 / · H₀ : p ≠ 1/2 contre H₁ : p = 1/2 / · H₀ : p = 1/2 contre H₁ : p < 1/2 / · H₀ : p > 1/2 contre H₁ : p ≤ 1/2
     ? Le test est… ✔ bilatéral / · unilatéral
-    = 1,96   ← R = {|T| > 1,96}
+    = 2,576   ← R = {|T| > 2,576}
   — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(2,175))   ← Bilatéral : les deux queues
-    = 2(1 − 0,985)   ← Table : Φ(2,175) = 0,985
-    = 0,03
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 2(1-Φ(□)) | p_obs = 0,03
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
-
-La consommation moyenne μ d’une voiture diffère-t-elle des 6 L/100 km annoncés ? On fait un test z au niveau 5 % et on observe t_obs = 1,75. Pose les hypothèses, donne la région critique et la p-valeur.
-  [free, suivre l'erreur]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : μ = 6 contre H₁ : μ ≠ 6 / · H₀ : μ = 6 contre H₁ : μ > 6 / · H₀ : μ ≠ 6 contre H₁ : μ = 6 / · H₀ : μ = 6 contre H₁ : μ < 6 / · H₀ : μ > 6 contre H₁ : μ ≤ 6
-    ? Le test est… ✔ bilatéral / · unilatéral
-    = 1,96   ← R = {|T| > 1,96}
-  — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(1,75))   ← Bilatéral : les deux queues
-    = 2(1 − 0,96)   ← Table : Φ(1,75) = 0,96
-    = 0,08
-  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 2(1-Φ(□)) | p_obs = 0,08
+    = 2(1 − Φ(1,825))   ← Bilatéral : les deux queues
+    = 2(1 − 0,966)   ← Table : Φ(1,825) = 0,966
+    = 0,068
+  aides : H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)). | 2(1-Φ(□)) | p_obs = 0,068
   pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
@@ -10116,37 +10103,37 @@ La consommation moyenne μ d’une voiture diffère-t-elle des 6 L/100 km annonc
 ### Niveau 5
 
 ```
-La teneur moyenne μ en alcool d’une boisson dépasse-t-elle la limite de 0,5 % ? On fait un test z au niveau 5 % et on observe t_obs = 2,25. Pose les hypothèses, donne la région critique et la p-valeur.
+La teneur moyenne μ en alcool d’une boisson dépasse-t-elle la limite de 0,5 % ? On fait un test z au niveau 1 % et on observe t_obs = 2,8. Pose les hypothèses, donne la région critique et la p-valeur.
   [free, sans aide]  t_c
     ? Quelles hypothèses ? ✔ H₀ : μ = 0,5 contre H₁ : μ > 0,5 / · H₀ : μ > 0,5 contre H₁ : μ = 0,5 / · H₀ : μ = 0,5 contre H₁ : μ ≠ 0,5 / · H₀ : μ = 0,5 contre H₁ : μ < 0,5 / · H₀ : μ ≠ 0,5 contre H₁ : μ = 0,5
     ? Le test est… ✔ unilatéral à droite / · bilatéral
+    = 2,326   ← R = [2,326 ; +∞[
+  — pobs  [juge stat]  départ : p_obs
+    = 1 − Φ(2,8)   ← Une queue
+    = 1 − 0,997   ← Table : Φ(2,8) = 0,997
+    = 0,003
+  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_accept_h0, p_pvalue_h0, p_significant_large
+
+Le « oui » l’emporte-t-il au référendum (p = part des oui) ? On fait un test z au niveau 5 % et on observe t_obs = 2,425. Pose les hypothèses, donne la région critique et la p-valeur.
+  [free, sans aide]  t_c
+    ? Quelles hypothèses ? ✔ H₀ : p = 1/2 contre H₁ : p > 1/2 / · H₀ : p > 1/2 contre H₁ : p = 1/2 / · H₀ : p = 1/2 contre H₁ : p ≠ 1/2 / · H₀ : p = 1/2 contre H₁ : p < 1/2 / · H₀ : p ≠ 1/2 contre H₁ : p = 1/2
+    ? Le test est… ✔ unilatéral à droite / · bilatéral
     = 1,645   ← R = [1,645 ; +∞[
   — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(2,25)   ← Une queue
-    = 1 − 0,988   ← Table : Φ(2,25) = 0,988
-    = 0,012
+    = 1 − Φ(2,425)   ← Une queue
+    = 1 − 0,992   ← Table : Φ(2,425) = 0,992
+    = 0,008
   pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_accept_h0, p_pvalue_h0, p_significant_large
 
-Le filtre anti-spam laisse-t-il passer moins de 5 % des spams (p = part des spams non filtrés) ? On fait un test z au niveau 1 % et on observe t_obs = −0,675. Pose les hypothèses, donne la région critique et la p-valeur.
+Une pièce de monnaie est-elle truquée (p = probabilité de pile) ? On fait un test z au niveau 5 % et on observe t_obs = 0,525. Pose les hypothèses, donne la région critique et la p-valeur.
   [free, sans aide]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : p = 0,05 contre H₁ : p < 0,05 / · H₀ : p < 0,05 contre H₁ : p = 0,05 / · H₀ : p = 0,05 contre H₁ : p ≠ 0,05 / · H₀ : p = 0,05 contre H₁ : p > 0,05 / · H₀ : p ≠ 0,05 contre H₁ : p = 0,05
-    ? Le test est… ✔ unilatéral à gauche / · bilatéral
-    = 2,326   ← R = ]−∞ ; −2,326]
-  — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(0,675)   ← Une queue
-    = 1 − 0,75   ← Table : Φ(0,675) = 0,75
-    = 0,25
-  pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_accept_h0, p_pvalue_h0, p_significant_large
-
-La consommation moyenne μ d’une voiture diffère-t-elle des 6 L/100 km annoncés ? On fait un test z au niveau 1 % et on observe t_obs = 2,2. Pose les hypothèses, donne la région critique et la p-valeur.
-  [free, sans aide]  t_c
-    ? Quelles hypothèses ? ✔ H₀ : μ = 6 contre H₁ : μ ≠ 6 / · H₀ : μ = 6 contre H₁ : μ > 6 / · H₀ : μ ≠ 6 contre H₁ : μ = 6 / · H₀ : μ = 6 contre H₁ : μ < 6 / · H₀ : μ > 6 contre H₁ : μ ≤ 6
+    ? Quelles hypothèses ? ✔ H₀ : p = 1/2 contre H₁ : p ≠ 1/2 / · H₀ : p = 1/2 contre H₁ : p > 1/2 / · H₀ : p ≠ 1/2 contre H₁ : p = 1/2 / · H₀ : p = 1/2 contre H₁ : p < 1/2 / · H₀ : p > 1/2 contre H₁ : p ≤ 1/2
     ? Le test est… ✔ bilatéral / · unilatéral
-    = 2,576   ← R = {|T| > 2,576}
+    = 1,96   ← R = {|T| > 1,96}
   — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(2,2))   ← Bilatéral : les deux queues
-    = 2(1 − 0,986)   ← Table : Φ(2,2) = 0,986
-    = 0,028
+    = 2(1 − Φ(0,525))   ← Bilatéral : les deux queues
+    = 2(1 − 0,7)   ← Table : Φ(0,525) = 0,7
+    = 0,6
   pièges : p_one_two_sided, p_pvalue_two_sided, p_upper_tail, p_h0_direction, p_accept_h0, p_pvalue_h0, p_significant_large
 
 ```
@@ -10154,8 +10141,8 @@ La consommation moyenne μ d’une voiture diffère-t-elle des 6 L/100 km annonc
 ### Variantes d'examen
 
 ```
-Un radar de détection des tumeurs manque-t-il moins de 10 % des tumeurs (p = part manquée) ? Quelles hypothèses tester ?
-  · H₀ : p < 0,1 contre H₁ : p = 0,1 [p_h0_direction]   · H₀ : p ≠ 0,1 contre H₁ : p = 0,1 [p_h0_direction]   ✔ H₀ : p = 0,1 contre H₁ : p < 0,1   · H₀ : p = 0,1 contre H₁ : p > 0,1 [p_one_two_sided]   · H₀ : p = 0,1 contre H₁ : p ≠ 0,1 [p_one_two_sided]
+La teneur moyenne μ en alcool d’une boisson dépasse-t-elle la limite de 0,5 % ? Quelles hypothèses tester ?
+  · H₀ : μ = 0,5 contre H₁ : μ < 0,5 [p_one_two_sided]   · H₀ : μ ≠ 0,5 contre H₁ : μ = 0,5 [p_h0_direction]   ✔ H₀ : μ = 0,5 contre H₁ : μ > 0,5   · H₀ : μ = 0,5 contre H₁ : μ ≠ 0,5 [p_one_two_sided]   · H₀ : μ > 0,5 contre H₁ : μ = 0,5 [p_h0_direction]
   [examen mcq]
   pièges : p_h0_direction, p_one_two_sided
 
@@ -10172,61 +10159,61 @@ _Erreurs de type 1 et 2, et puissance d'un test sous H₁._
 ### Niveau 1
 
 ```
-H₀ : μ = 171 contre H₁ : μ = 173,5 (unilatéral), σ = 20 connu, n = 64, niveau α = 5 %. Calcule β et la puissance du test z.
+H₀ : μ = 22 contre H₁ : μ = 22,75 (unilatéral), σ = 5 connu, n = 100, niveau α = 5 %. Calcule β et la puissance du test z.
   [guided]  se
     (On garde H₀ alors que H₁ est vraie : quelle erreur ? Une erreur de type 2 (probabilité β).)
-    = 20/√(□)   (trous : 20/√(64))   ← σ/√n
-    = □   (trous : 2,5)
+    = 5/√(□)   (trous : 5/√(100))   ← σ/√n
+    = □   (trous : 0,5)
   — tc  [juge stat]  départ : t_c
     = □   (trous : 1,645)   ← Unilatéral à 5 % : Φ⁻¹(0,95)
   — δ  [juge stat]  départ : δ
-    = (173,5 − □)/2,5   (trous : (173,5 − 171)/2,5)   ← Sous H₁, T ~ N(δ, 1)
-    = □   (trous : 1)
+    = (22,75 − 22)/0,5   ← Sous H₁, T ~ N(δ, 1)
+    = □   (trous : 1,5)
   — β  [juge stat]  départ : β
-    = Φ(1,645 − 1)   ← β = Φ(t_c − δ)
-    = □   (trous : 0,7405)
+    = Φ(1,645 − □)   (trous : Φ(1,645 − 1,5))   ← β = Φ(t_c − δ)
+    = □   (trous : 0,5576)
   — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − □   (trous : 1 − 0,7405)   ← Puissance
-    = □   (trous : 0,2595)
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,7405, puissance 0,2595
+    = 1 − □   (trous : 1 − 0,5576)   ← Puissance
+    = □   (trous : 0,4424)
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,5576, puissance 0,4424
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
-H₀ : μ = 193 contre H₁ : μ = 196,75 (unilatéral), σ = 10 connu, n = 64, niveau α = 1 %. Calcule β et la puissance du test z.
+H₀ : μ = 62 contre H₁ : μ = 64,5 (unilatéral), σ = 5 connu, n = 25, niveau α = 1 %. Calcule β et la puissance du test z.
   [guided]  se
     (On garde H₀ alors que H₁ est vraie : quelle erreur ? Une erreur de type 2 (probabilité β).)
-    = 10/√(□)   (trous : 10/√(64))   ← σ/√n
-    = □   (trous : 1,25)
+    = 5/√(□)   (trous : 5/√(25))   ← σ/√n
+    = □   (trous : 1)
   — tc  [juge stat]  départ : t_c
     = □   (trous : 2,326)   ← Unilatéral à 1 % : Φ⁻¹(0,99)
   — δ  [juge stat]  départ : δ
-    = (196,75 − □)/1,25   (trous : (196,75 − 193)/1,25)   ← Sous H₁, T ~ N(δ, 1)
-    = □   (trous : 3)
+    = (64,5 − □)/1   (trous : (64,5 − 62)/1)   ← Sous H₁, T ~ N(δ, 1)
+    = □   (trous : 2,5)
   — β  [juge stat]  départ : β
-    = Φ(2,326 − 3)   ← β = Φ(t_c − δ)
-    = □   (trous : 0,2502)
+    = Φ(2,326 − □)   (trous : Φ(2,326 − 2,5))   ← β = Φ(t_c − δ)
+    = □   (trous : 0,4309)
   — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − □   (trous : 1 − 0,2502)   ← Puissance
-    = □   (trous : 0,7498)
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,2502, puissance 0,7498
+    = 1 − □   (trous : 1 − 0,4309)   ← Puissance
+    = □   (trous : 0,5691)
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,4309, puissance 0,5691
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
-H₀ : μ = 168 contre H₁ : μ = 169,25 (unilatéral), σ = 10 connu, n = 64, niveau α = 1 %. Calcule β et la puissance du test z.
+H₀ : μ = 37 contre H₁ : μ = 49,5 (unilatéral), σ = 20 connu, n = 16, niveau α = 5 %. Calcule β et la puissance du test z.
   [guided]  se
     (On garde H₀ alors que H₁ est vraie : quelle erreur ? Une erreur de type 2 (probabilité β).)
-    = 10/√(□)   (trous : 10/√(64))   ← σ/√n
-    = □   (trous : 1,25)
+    = 20/√(□)   (trous : 20/√(16))   ← σ/√n
+    = □   (trous : 5)
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,326)   ← Unilatéral à 1 % : Φ⁻¹(0,99)
+    = □   (trous : 1,645)   ← Unilatéral à 5 % : Φ⁻¹(0,95)
   — δ  [juge stat]  départ : δ
-    = (169,25 − □)/1,25   (trous : (169,25 − 168)/1,25)   ← Sous H₁, T ~ N(δ, 1)
-    = □   (trous : 1)
+    = (49,5 − □)/5   (trous : (49,5 − 37)/5)   ← Sous H₁, T ~ N(δ, 1)
+    = □   (trous : 2,5)
   — β  [juge stat]  départ : β
-    = Φ(2,326 − □)   (trous : Φ(2,326 − 1))   ← β = Φ(t_c − δ)
-    = □   (trous : 0,9076)
+    = Φ(1,645 − □)   (trous : Φ(1,645 − 2,5))   ← β = Φ(t_c − δ)
+    = □   (trous : 0,1963)
   — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − □   (trous : 1 − 0,9076)   ← Puissance
-    = □   (trous : 0,0924)
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,9076, puissance 0,0924
+    = 1 − □   (trous : 1 − 0,1963)   ← Puissance
+    = □   (trous : 0,8037)
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,1963, puissance 0,8037
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
 ```
@@ -10234,36 +10221,16 @@ H₀ : μ = 168 contre H₁ : μ = 169,25 (unilatéral), σ = 10 connu, n = 64, 
 ### Niveau 2
 
 ```
-H₀ : μ = 165 contre H₁ : μ = 166,5 (unilatéral), σ = 5 connu, n = 100, niveau α = 1 %. Calcule β et la puissance du test z.
+H₀ : μ = 156 contre H₁ : μ = 159 (unilatéral), σ = 10 connu, n = 100, niveau α = 5 %. Calcule β et la puissance du test z.
   [guided]  se
     ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 166,5 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 5/√(□)   (trous : 5/√(100))   ← σ/√n
-    = □   (trous : 0,5)
-  — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,326)   ← Unilatéral à 1 % : Φ⁻¹(0,99)
-  — δ  [juge stat]  départ : δ
-    = (166,5 − □)/0,5   (trous : (166,5 − 165)/0,5)   ← Sous H₁, T ~ N(δ, 1)
-    = □   (trous : 3)
-  — β  [juge stat]  départ : β
-    = Φ(2,326 − 3)   ← β = Φ(t_c − δ)
-    = □   (trous : 0,2502)
-  — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − □   (trous : 1 − 0,2502)   ← Puissance
-    = □   (trous : 0,7498)
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,2502, puissance 0,7498
-  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
-
-H₀ : μ = 17 contre H₁ : μ = 20,75 (unilatéral), σ = 10 connu, n = 64, niveau α = 5 %. Calcule β et la puissance du test z.
-  [guided]  se
-    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 20,75 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 10/√(□)   (trous : 10/√(64))   ← σ/√n
-    = □   (trous : 1,25)
+    ? On rejette H₀ et en fait μ = 159 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 10/√(□)   (trous : 10/√(100))   ← σ/√n
+    = □   (trous : 1)
   — tc  [juge stat]  départ : t_c
     = □   (trous : 1,645)   ← Unilatéral à 5 % : Φ⁻¹(0,95)
   — δ  [juge stat]  départ : δ
-    = (20,75 − □)/1,25   (trous : (20,75 − 17)/1,25)   ← Sous H₁, T ~ N(δ, 1)
+    = (159 − □)/1   (trous : (159 − 156)/1)   ← Sous H₁, T ~ N(δ, 1)
     = □   (trous : 3)
   — β  [juge stat]  départ : β
     = Φ(1,645 − □)   (trous : Φ(1,645 − 3))   ← β = Φ(t_c − δ)
@@ -10274,24 +10241,44 @@ H₀ : μ = 17 contre H₁ : μ = 20,75 (unilatéral), σ = 10 connu, n = 64, ni
   aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,0877, puissance 0,9123
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
-H₀ : μ = 69 contre H₁ : μ = 74 (unilatéral), σ = 10 connu, n = 25, niveau α = 10 %. Calcule β et la puissance du test z.
+H₀ : μ = 172 contre H₁ : μ = 175 (unilatéral), σ = 5 connu, n = 25, niveau α = 5 %. Calcule β et la puissance du test z.
   [guided]  se
     ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 74 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 10/√(□)   (trous : 10/√(25))   ← σ/√n
-    = □   (trous : 2)
+    ? On rejette H₀ et en fait μ = 175 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 5/√(□)   (trous : 5/√(25))   ← σ/√n
+    = □   (trous : 1)
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 1,282)   ← Unilatéral à 10 % : Φ⁻¹(0,9)
+    = □   (trous : 1,645)   ← Unilatéral à 5 % : Φ⁻¹(0,95)
   — δ  [juge stat]  départ : δ
-    = (74 − □)/2   (trous : (74 − 69)/2)   ← Sous H₁, T ~ N(δ, 1)
-    = □   (trous : 2,5)
+    = (175 − □)/1   (trous : (175 − 172)/1)   ← Sous H₁, T ~ N(δ, 1)
+    = □   (trous : 3)
   — β  [juge stat]  départ : β
-    = Φ(1,282 − □)   (trous : Φ(1,282 − 2,5))   ← β = Φ(t_c − δ)
-    = □   (trous : 0,1116)
+    = Φ(1,645 − □)   (trous : Φ(1,645 − 3))   ← β = Φ(t_c − δ)
+    = □   (trous : 0,0877)
   — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − □   (trous : 1 − 0,1116)   ← Puissance
-    = □   (trous : 0,8884)
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,282-□) | β = 0,1116, puissance 0,8884
+    = 1 − □   (trous : 1 − 0,0877)   ← Puissance
+    = □   (trous : 0,9123)
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,0877, puissance 0,9123
+  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
+
+H₀ : μ = 45 contre H₁ : μ = 48,5 (unilatéral), σ = 5 connu, n = 25, niveau α = 1 %. Calcule β et la puissance du test z.
+  [guided]  se
+    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
+    ? On rejette H₀ et en fait μ = 48,5 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 5/√(□)   (trous : 5/√(25))   ← σ/√n
+    = □   (trous : 1)
+  — tc  [juge stat]  départ : t_c
+    = □   (trous : 2,326)   ← Unilatéral à 1 % : Φ⁻¹(0,99)
+  — δ  [juge stat]  départ : δ
+    = (48,5 − □)/1   (trous : (48,5 − 45)/1)   ← Sous H₁, T ~ N(δ, 1)
+    = □   (trous : 3,5)
+  — β  [juge stat]  départ : β
+    = Φ(2,326 − □)   (trous : Φ(2,326 − 3,5))   ← β = Φ(t_c − δ)
+    = □   (trous : 0,1202)
+  — 1 − β  [juge stat]  départ : 1 − β
+    = 1 − □   (trous : 1 − 0,1202)   ← Puissance
+    = □   (trous : 0,8798)
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,1202, puissance 0,8798
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
 ```
@@ -10299,16 +10286,56 @@ H₀ : μ = 69 contre H₁ : μ = 74 (unilatéral), σ = 10 connu, n = 25, nivea
 ### Niveau 3
 
 ```
-H₀ : μ = 185 contre H₁ : μ = 186,25 (unilatéral), σ = 10 connu, n = 64, niveau α = 5 %. Calcule β et la puissance du test z.
+H₀ : μ = 113 contre H₁ : μ = 116,5 (unilatéral), σ = 5 connu, n = 25, niveau α = 1 %. Calcule β et la puissance du test z.
   [tap, suivre l'erreur, menu menu]  se
     ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 186,25 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 10/√(64)   ← σ/√n
-    = 1,25
+    ? On rejette H₀ et en fait μ = 116,5 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 5/√(25)   ← σ/√n
+    = 1
+  — tc  [juge stat]  départ : t_c
+    = 2,326   ← Unilatéral à 1 % : Φ⁻¹(0,99)
+  — δ  [juge stat]  départ : δ
+    = (116,5 − 113)/1   ← Sous H₁, T ~ N(δ, 1)
+    = 3,5
+  — β  [juge stat]  départ : β
+    = Φ(2,326 − 3,5)   ← β = Φ(t_c − δ)
+    = 0,1202
+  — 1 − β  [juge stat]  départ : 1 − β
+    = 1 − 0,1202   ← Puissance
+    = 0,8798
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,1202, puissance 0,8798
+  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
+
+H₀ : μ = 180 contre H₁ : μ = 183 (unilatéral), σ = 10 connu, n = 25, niveau α = 1 %. Calcule β et la puissance du test z.
+  [tap, suivre l'erreur, menu menu]  se
+    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
+    ? On rejette H₀ et en fait μ = 183 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 10/√(25)   ← σ/√n
+    = 2
+  — tc  [juge stat]  départ : t_c
+    = 2,326   ← Unilatéral à 1 % : Φ⁻¹(0,99)
+  — δ  [juge stat]  départ : δ
+    = (183 − 180)/2   ← Sous H₁, T ~ N(δ, 1)
+    = 1,5
+  — β  [juge stat]  départ : β
+    = Φ(2,326 − 1,5)   ← β = Φ(t_c − δ)
+    = 0,7956
+  — 1 − β  [juge stat]  départ : 1 − β
+    = 1 − 0,7956   ← Puissance
+    = 0,2044
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,7956, puissance 0,2044
+  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
+
+H₀ : μ = 146 contre H₁ : μ = 147 (unilatéral), σ = 5 connu, n = 25, niveau α = 5 %. Calcule β et la puissance du test z.
+  [tap, suivre l'erreur, menu menu]  se
+    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
+    ? On rejette H₀ et en fait μ = 147 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 5/√(25)   ← σ/√n
+    = 1
   — tc  [juge stat]  départ : t_c
     = 1,645   ← Unilatéral à 5 % : Φ⁻¹(0,95)
   — δ  [juge stat]  départ : δ
-    = (186,25 − 185)/1,25   ← Sous H₁, T ~ N(δ, 1)
+    = (147 − 146)/1   ← Sous H₁, T ~ N(δ, 1)
     = 1
   — β  [juge stat]  départ : β
     = Φ(1,645 − 1)   ← β = Φ(t_c − δ)
@@ -10319,101 +10346,61 @@ H₀ : μ = 185 contre H₁ : μ = 186,25 (unilatéral), σ = 10 connu, n = 64, 
   aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,7405, puissance 0,2595
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
-H₀ : μ = 177 contre H₁ : μ = 180,75 (unilatéral), σ = 20 connu, n = 64, niveau α = 10 %. Calcule β et la puissance du test z.
-  [tap, suivre l'erreur, menu menu]  se
-    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 180,75 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 20/√(64)   ← σ/√n
-    = 2,5
-  — tc  [juge stat]  départ : t_c
-    = 1,282   ← Unilatéral à 10 % : Φ⁻¹(0,9)
-  — δ  [juge stat]  départ : δ
-    = (180,75 − 177)/2,5   ← Sous H₁, T ~ N(δ, 1)
-    = 1,5
-  — β  [juge stat]  départ : β
-    = Φ(1,282 − 1,5)   ← β = Φ(t_c − δ)
-    = 0,4137
-  — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − 0,4137   ← Puissance
-    = 0,5863
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,282-□) | β = 0,4137, puissance 0,5863
-  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
-
-H₀ : μ = 92 contre H₁ : μ = 99 (unilatéral), σ = 10 connu, n = 25, niveau α = 5 %. Calcule β et la puissance du test z.
-  [tap, suivre l'erreur, menu menu]  se
-    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 99 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 10/√(25)   ← σ/√n
-    = 2
-  — tc  [juge stat]  départ : t_c
-    = 1,645   ← Unilatéral à 5 % : Φ⁻¹(0,95)
-  — δ  [juge stat]  départ : δ
-    = (99 − 92)/2   ← Sous H₁, T ~ N(δ, 1)
-    = 3,5
-  — β  [juge stat]  départ : β
-    = Φ(1,645 − 3,5)   ← β = Φ(t_c − δ)
-    = 0,0318
-  — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − 0,0318   ← Puissance
-    = 0,9682
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,0318, puissance 0,9682
-  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
-
 ```
 
 ### Niveau 4
 
 ```
-H₀ : μ = 55 contre H₁ : μ = 58 (unilatéral), σ = 10 connu, n = 100, niveau α = 5 %. Calcule β et la puissance du test z.
+H₀ : μ = 33 contre H₁ : μ = 35 (unilatéral), σ = 20 connu, n = 100, niveau α = 1 %. Calcule β et la puissance du test z.
   [free, suivre l'erreur]  se
     ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 58 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 10/√(100)   ← σ/√n
-    = 1
-  — tc  [juge stat]  départ : t_c
-    = 1,645   ← Unilatéral à 5 % : Φ⁻¹(0,95)
-  — δ  [juge stat]  départ : δ
-    = (58 − 55)/1   ← Sous H₁, T ~ N(δ, 1)
-    = 3
-  — β  [juge stat]  départ : β
-    = Φ(1,645 − 3)   ← β = Φ(t_c − δ)
-    = 0,0877
-  — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − 0,0877   ← Puissance
-    = 0,9123
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,0877, puissance 0,9123
-  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
-
-H₀ : μ = 29 contre H₁ : μ = 37,75 (unilatéral), σ = 20 connu, n = 64, niveau α = 5 %. Calcule β et la puissance du test z.
-  [free, suivre l'erreur]  se
-    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 37,75 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 20/√(64)   ← σ/√n
-    = 2,5
-  — tc  [juge stat]  départ : t_c
-    = 1,645   ← Unilatéral à 5 % : Φ⁻¹(0,95)
-  — δ  [juge stat]  départ : δ
-    = (37,75 − 29)/2,5   ← Sous H₁, T ~ N(δ, 1)
-    = 3,5
-  — β  [juge stat]  départ : β
-    = Φ(1,645 − 3,5)   ← β = Φ(t_c − δ)
-    = 0,0318
-  — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − 0,0318   ← Puissance
-    = 0,9682
-  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(1,645-□) | β = 0,0318, puissance 0,9682
-  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
-
-H₀ : μ = 191 contre H₁ : μ = 194,75 (unilatéral), σ = 10 connu, n = 64, niveau α = 1 %. Calcule β et la puissance du test z.
-  [free, suivre l'erreur]  se
-    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
-    ? On rejette H₀ et en fait μ = 194,75 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 10/√(64)   ← σ/√n
-    = 1,25
+    ? On rejette H₀ et en fait μ = 35 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 20/√(100)   ← σ/√n
+    = 2
   — tc  [juge stat]  départ : t_c
     = 2,326   ← Unilatéral à 1 % : Φ⁻¹(0,99)
   — δ  [juge stat]  départ : δ
-    = (194,75 − 191)/1,25   ← Sous H₁, T ~ N(δ, 1)
+    = (35 − 33)/2   ← Sous H₁, T ~ N(δ, 1)
+    = 1
+  — β  [juge stat]  départ : β
+    = Φ(2,326 − 1)   ← β = Φ(t_c − δ)
+    = 0,9076
+  — 1 − β  [juge stat]  départ : 1 − β
+    = 1 − 0,9076   ← Puissance
+    = 0,0924
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,9076, puissance 0,0924
+  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
+
+H₀ : μ = 27 contre H₁ : μ = 30 (unilatéral), σ = 10 connu, n = 25, niveau α = 1 %. Calcule β et la puissance du test z.
+  [free, suivre l'erreur]  se
+    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
+    ? On rejette H₀ et en fait μ = 30 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 10/√(25)   ← σ/√n
+    = 2
+  — tc  [juge stat]  départ : t_c
+    = 2,326   ← Unilatéral à 1 % : Φ⁻¹(0,99)
+  — δ  [juge stat]  départ : δ
+    = (30 − 27)/2   ← Sous H₁, T ~ N(δ, 1)
+    = 1,5
+  — β  [juge stat]  départ : β
+    = Φ(2,326 − 1,5)   ← β = Φ(t_c − δ)
+    = 0,7956
+  — 1 − β  [juge stat]  départ : 1 − β
+    = 1 − 0,7956   ← Puissance
+    = 0,2044
+  aides : Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1). | Φ(2,326-□) | β = 0,7956, puissance 0,2044
+  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
+
+H₀ : μ = 176 contre H₁ : μ = 182 (unilatéral), σ = 10 connu, n = 25, niveau α = 1 %. Calcule β et la puissance du test z.
+  [free, suivre l'erreur]  se
+    ? On garde H₀ alors que H₁ est vraie : quelle erreur ? ✔ Une erreur de type 2 (probabilité β) / · Une erreur de type 1 (probabilité α) / · Aucune erreur
+    ? On rejette H₀ et en fait μ = 182 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 10/√(25)   ← σ/√n
+    = 2
+  — tc  [juge stat]  départ : t_c
+    = 2,326   ← Unilatéral à 1 % : Φ⁻¹(0,99)
+  — δ  [juge stat]  départ : δ
+    = (182 − 176)/2   ← Sous H₁, T ~ N(δ, 1)
     = 3
   — β  [juge stat]  départ : β
     = Φ(2,326 − 3)   ← β = Φ(t_c − δ)
@@ -10429,64 +10416,67 @@ H₀ : μ = 191 contre H₁ : μ = 194,75 (unilatéral), σ = 10 connu, n = 64, 
 ### Niveau 5
 
 ```
-H₀ : μ = 194 contre H₁ : μ = 200 (unilatéral), σ = 10 connu, n = 25, niveau α = 1 %. Calcule β et la puissance, puis le plus petit n qui donne une puissance d’au moins 0,9.
+H₀ : μ = 55 contre H₁ : μ = 56,875 (unilatéral), σ = 10 connu, n = 64, niveau α = 5 %. Calcule β et la puissance, puis le plus petit n qui donne une puissance d’au moins 0,9.
   [free, sans aide]  se
-    ? On rejette H₀ et en fait μ = 200 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    ? On rejette H₀ et en fait μ = 56,875 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 10/√(64)   ← σ/√n
+    = 1,25
+  — tc  [juge stat]  départ : t_c
+    = 1,645   ← Unilatéral à 5 % : Φ⁻¹(0,95)
+  — δ  [juge stat]  départ : δ
+    = (56,875 − 55)/1,25   ← Sous H₁, T ~ N(δ, 1)
+    = 1,5
+  — β  [juge stat]  départ : β
+    = Φ(1,645 − 1,5)   ← β = Φ(t_c − δ)
+    = 0,5576
+  — 1 − β  [juge stat]  départ : 1 − β
+    = 1 − 0,5576   ← Puissance
+    = 0,4424
+  — n  [juge stat]  départ : n
+    (n ≥ ((z₁₋α + z₀,₉)·σ/(μ₁ − μ₀))², avec z₀,₉ = Φ⁻¹(0,9) = 1,28 ; on arrondit vers le haut.)
+    = 244   ← ((1,645 + 1,28)·10/1,875)² = 243,36
+  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
+
+H₀ : μ = 109 contre H₁ : μ = 116 (unilatéral), σ = 10 connu, n = 25, niveau α = 10 %. Calcule β et la puissance, puis le plus petit n qui donne une puissance d’au moins 0,9.
+  [free, sans aide]  se
+    ? On rejette H₀ et en fait μ = 116 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
     = 10/√(25)   ← σ/√n
     = 2
   — tc  [juge stat]  départ : t_c
-    = 2,326   ← Unilatéral à 1 % : Φ⁻¹(0,99)
+    = 1,282   ← Unilatéral à 10 % : Φ⁻¹(0,9)
   — δ  [juge stat]  départ : δ
-    = (200 − 194)/2   ← Sous H₁, T ~ N(δ, 1)
-    = 3
+    = (116 − 109)/2   ← Sous H₁, T ~ N(δ, 1)
+    = 3,5
   — β  [juge stat]  départ : β
-    = Φ(2,326 − 3)   ← β = Φ(t_c − δ)
-    = 0,2502
+    = Φ(1,282 − 3,5)   ← β = Φ(t_c − δ)
+    = 0,0133
   — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − 0,2502   ← Puissance
-    = 0,7498
+    = 1 − 0,0133   ← Puissance
+    = 0,9867
   — n  [juge stat]  départ : n
     (n ≥ ((z₁₋α + z₀,₉)·σ/(μ₁ − μ₀))², avec z₀,₉ = Φ⁻¹(0,9) = 1,28 ; on arrondit vers le haut.)
-    = 37   ← ((2,326 + 1,28)·10/6)² = 36,12
+    = 14   ← ((1,282 + 1,28)·10/7)² = 13,4
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
-H₀ : μ = 113 contre H₁ : μ = 118 (unilatéral), σ = 20 connu, n = 16, niveau α = 10 %. Calcule β et la puissance du test z.
+H₀ : μ = 75 contre H₁ : μ = 78 (unilatéral), σ = 10 connu, n = 100, niveau α = 10 %. Calcule β et la puissance, puis le plus petit n qui donne une puissance d’au moins 0,9.
   [free, sans aide]  se
-    ? On rejette H₀ et en fait μ = 118 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 20/√(16)   ← σ/√n
-    = 5
+    ? On rejette H₀ et en fait μ = 78 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
+    = 10/√(100)   ← σ/√n
+    = 1
   — tc  [juge stat]  départ : t_c
     = 1,282   ← Unilatéral à 10 % : Φ⁻¹(0,9)
   — δ  [juge stat]  départ : δ
-    = (118 − 113)/5   ← Sous H₁, T ~ N(δ, 1)
-    = 1
-  — β  [juge stat]  départ : β
-    = Φ(1,282 − 1)   ← β = Φ(t_c − δ)
-    = 0,611
-  — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − 0,611   ← Puissance
-    = 0,389
-  pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
-
-H₀ : μ = 69 contre H₁ : μ = 72 (unilatéral), σ = 5 connu, n = 25, niveau α = 1 %. Calcule β et la puissance, puis le plus petit n qui donne une puissance d’au moins 0,9.
-  [free, sans aide]  se
-    ? On rejette H₀ et en fait μ = 72 : quelle erreur ? ✔ Aucune : la décision est juste / · Une erreur de type 1 / · Une erreur de type 2
-    = 5/√(25)   ← σ/√n
-    = 1
-  — tc  [juge stat]  départ : t_c
-    = 2,326   ← Unilatéral à 1 % : Φ⁻¹(0,99)
-  — δ  [juge stat]  départ : δ
-    = (72 − 69)/1   ← Sous H₁, T ~ N(δ, 1)
+    = (78 − 75)/1   ← Sous H₁, T ~ N(δ, 1)
     = 3
   — β  [juge stat]  départ : β
-    = Φ(2,326 − 3)   ← β = Φ(t_c − δ)
-    = 0,2502
+    = Φ(1,282 − 3)   ← β = Φ(t_c − δ)
+    = 0,0429
   — 1 − β  [juge stat]  départ : 1 − β
-    = 1 − 0,2502   ← Puissance
-    = 0,7498
+    = 1 − 0,0429   ← Puissance
+    = 0,9571
   — n  [juge stat]  départ : n
     (n ≥ ((z₁₋α + z₀,₉)·σ/(μ₁ − μ₀))², avec z₀,₉ = Φ⁻¹(0,9) = 1,28 ; on arrondit vers le haut.)
-    = 37   ← ((2,326 + 1,28)·5/3)² = 36,12
+    = 73   ← ((1,282 + 1,28)·10/3)² = 72,93
   pièges : p_one_two_sided, p_upper_tail, p_power_alpha, p_type_errors_swap, p_error_when_correct
 
 ```
@@ -10494,8 +10484,8 @@ H₀ : μ = 69 contre H₁ : μ = 72 (unilatéral), σ = 5 connu, n = 25, niveau
 ### Variantes d'examen
 
 ```
-H₀ : μ = 197 contre H₁ : μ = 198,25 (unilatéral), σ = 5 connu, n = 100, niveau α = 5 %. Quelle est la puissance du test z (deux décimales) ?
-  · 0,2 [p_upper_tail]   · 0,95 [p_power_alpha]   · 0,99   ✔ 0,8
+H₀ : μ = 62 contre H₁ : μ = 62,5 (unilatéral), σ = 5 connu, n = 100, niveau α = 1 %. Quelle est la puissance du test z (deux décimales) ?
+  · 0,91 [p_upper_tail]   · 0,84   · 0,99 [p_power_alpha]   ✔ 0,09
   [examen mcq]
   pièges : p_power_alpha, p_upper_tail
 
@@ -10505,9 +10495,9 @@ Vrai ou faux ?
   [examen tf]
   pièges : p_power_alpha
 
-H₀ : μ = 160 contre H₁ : μ = 161,5 (unilatéral), σ = 5 connu, n = 100, niveau α = 5 %. Donne la puissance du test z (deux décimales).
+H₀ : μ = 164 contre H₁ : μ = 167,75 (unilatéral), σ = 20 connu, n = 64, niveau α = 5 %. Donne la puissance du test z (deux décimales).
   [free, sans aide, examen coef]  1 − β
-    = 0,91
+    = 0,44
 
 ```
 
@@ -10518,45 +10508,45 @@ _Le test z : σ connu, version asymptotique, une proportion, ou un MLE (Wald)._
 ### Niveau 1
 
 ```
-Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = 10 connu. Sur n = 25 compteurs (normaux), x̄ = 1005,1. Test z unilatéral (H₁ : μ > 1 000). Niveau 5 %.
-  [guided]  se₀
-    (Quel test ? Test z : σ est connu.)
-    = 10/√(□)   (trous : 10/√(25))   ← Sous H₀
-    = □   (trous : 2)
-  — tobs  [juge stat]  départ : t_obs
-    = (1005,1 − □)/2   (trous : (1005,1 − 1000)/2)   ← T = (estimation − valeur de H₀)/se
-    = □   (trous : 2,55)
-  — tc  [juge stat]  départ : t_c
-    = □   (trous : 1,645)   ← Unilatéral à 5 %
-  aides : T = (estimation − valeur de H₀)/(erreur standard). | (1005,1-1000)/□ | t_obs = 2,55
-  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
-Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 100 pièces, on en trouve 15. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
+Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 100 pièces, on en trouve 10. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
   [guided]  se₀
     (Quel test ? Test z d’une proportion.)
     = √(0,2·0,8/□)   (trous : √(0,2·0,8/100))   ← Sous H₀
     = □   (trous : 0,04)
   — tobs  [juge stat]  départ : t_obs
-    = (0,15 − □)/0,04   (trous : (0,15 − 0,2)/0,04)   ← T = (estimation − valeur de H₀)/se
-    = □   (trous : −1,25)
+    = (0,1 − □)/0,04   (trous : (0,1 − 0,2)/0,04)   ← T = (estimation − valeur de H₀)/se
+    = □   (trous : −2,5)
   — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(□))   (trous : 2(1 − Φ(1,25)))   ← Bilatéral
-    = □   (trous : 0,212)
-  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,15-0,2)/□ | t_obs = -1,25
-  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+    = 2(1 − Φ(□))   (trous : 2(1 − Φ(2,5)))   ← Bilatéral
+    = □   (trous : 0,012)
+  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,1-0,2)/□ | t_obs = -2,5
+  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
 
-Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 625 pièces, on en trouve 136. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
+Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = 10 connu. Sur n = 16 compteurs (normaux), x̄ = 994,375. Test z bilatéral. Niveau 5 %.
+  [guided]  se₀
+    (Quel test ? Test z : σ est connu.)
+    = 10/√(□)   (trous : 10/√(16))   ← Sous H₀
+    = □   (trous : 2,5)
+  — tobs  [juge stat]  départ : t_obs
+    = (994,375 − □)/2,5   (trous : (994,375 − 1000)/2,5)   ← T = (estimation − valeur de H₀)/se
+    = □   (trous : −2,25)
+  — tc  [juge stat]  départ : t_c
+    = □   (trous : 1,96)   ← Bilatéral à 5 %
+  aides : T = (estimation − valeur de H₀)/(erreur standard). | (994,375-1000)/□ | t_obs = -2,25
+  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 625 pièces, on en trouve 130. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
   [guided]  se₀
     (Quel test ? Test z d’une proportion.)
     = √(0,2·0,8/□)   (trous : √(0,2·0,8/625))   ← Sous H₀
     = □   (trous : 0,016)
   — tobs  [juge stat]  départ : t_obs
-    = (0,2176 − 0,2)/0,016   ← T = (estimation − valeur de H₀)/se
-    = □   (trous : 1,1)
+    = (0,208 − 0,2)/0,016   ← T = (estimation − valeur de H₀)/se
+    = □   (trous : 0,5)
   — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(□))   (trous : 2(1 − Φ(1,1)))   ← Bilatéral
-    = □   (trous : 0,272)
-  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,2176-0,2)/□ | t_obs = 1,1
+    = 2(1 − Φ(□))   (trous : 2(1 − Φ(0,5)))   ← Bilatéral
+    = □   (trous : 0,618)
+  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,208-0,2)/□ | t_obs = 0,5
   pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
@@ -10564,91 +10554,90 @@ Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 625 piè
 ### Niveau 2
 
 ```
-Sur n = 225 observations (loi inconnue), x̄ = 268,3 et s = 30. Test z asymptotique de H₀ : μ = 274 (bilatéral). Niveau 5 %.
+Sur n = 625 unités, 133 présentent le caractère. On teste H₀ : p = 0,2 contre H₁ : p > 0,2. Niveau 5 %.
   [guided]  se₀
-    ? Quel test ? ✔ Test z asymptotique : n est grand / ✔ Test t de Student
-    = 30/√(□)   (trous : 30/√(225))   ← Sous H₀
+    ? Quel test ? ✔ Test z d’une proportion / · Test t de Student
+    = √(0,2·0,8/□)   (trous : √(0,2·0,8/625))   ← Sous H₀
+    = □   (trous : 0,016)
+  — tobs  [juge stat]  départ : t_obs
+    = (0,2128 − 0,2)/0,016   ← T = (estimation − valeur de H₀)/se
+    = □   (trous : 0,8)
+  — pobs  [juge stat]  départ : p_obs
+    = 1 − Φ(□)   (trous : 1 − Φ(0,8))   ← Unilatéral
+    = □   (trous : 0,212)
+  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,2128-0,2)/□ | t_obs = 0,8
+  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = 10 connu. Sur n = 25 compteurs (normaux), x̄ = 1001,1. Test z unilatéral (H₁ : μ > 1 000). Niveau 5 %.
+  [guided]  se₀
+    ? Quel test ? ✔ Test z : σ est connu / · Test t de Student
+    = 10/√(□)   (trous : 10/√(25))   ← Sous H₀
     = □   (trous : 2)
   — tobs  [juge stat]  départ : t_obs
-    = (268,3 − □)/2   (trous : (268,3 − 274)/2)   ← T = (estimation − valeur de H₀)/se
-    = □   (trous : −2,85)
+    = (1001,1 − □)/2   (trous : (1001,1 − 1000)/2)   ← T = (estimation − valeur de H₀)/se
+    = □   (trous : 0,55)
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 1,96)   ← Bilatéral à 5 %
-  aides : T = (estimation − valeur de H₀)/(erreur standard). | (268,3-274)/□ | t_obs = -2,85
-  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+    = □   (trous : 1,645)   ← Unilatéral à 5 %
+  aides : T = (estimation − valeur de H₀)/(erreur standard). | (1001,1-1000)/□ | t_obs = 0,55
+  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 100 pièces, on en trouve 25. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
+Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 100 pièces, on en trouve 8. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
   [guided]  se₀
     ? Quel test ? ✔ Test z d’une proportion / · Test t de Student
     = √(0,2·0,8/□)   (trous : √(0,2·0,8/100))   ← Sous H₀
     = □   (trous : 0,04)
   — tobs  [juge stat]  départ : t_obs
-    = (0,25 − 0,2)/0,04   ← T = (estimation − valeur de H₀)/se
-    = □   (trous : 1,25)
+    = (0,08 − □)/0,04   (trous : (0,08 − 0,2)/0,04)   ← T = (estimation − valeur de H₀)/se
+    = □   (trous : −3)
   — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(□))   (trous : 2(1 − Φ(1,25)))   ← Bilatéral
-    = □   (trous : 0,212)
-  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,25-0,2)/□ | t_obs = 1,25
-  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Un fournisseur annonce 10 % de pièces défectueuses. Sur un lot de n = 100 pièces, on en trouve 7. Test z bilatéral de H₀ : p = 0,1. Niveau 5 %.
-  [guided]  se₀
-    ? Quel test ? ✔ Test z d’une proportion / · Test t de Student
-    = √(0,1·0,9/□)   (trous : √(0,1·0,9/100))   ← Sous H₀
-    = □   (trous : 0,03)
-  — tobs  [juge stat]  départ : t_obs
-    = (0,07 − □)/0,03   (trous : (0,07 − 0,1)/0,03)   ← T = (estimation − valeur de H₀)/se
-    = □   (trous : −1)
-  — pobs  [juge stat]  départ : p_obs
-    = 2(□ − Φ(1))   (trous : 2(1 − Φ(1)))   ← Bilatéral
-    = □   (trous : 0,318)
-  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,07-0,1)/□ | t_obs = -1
-  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+    = 2(1 − Φ(□))   (trous : 2(1 − Φ(3)))   ← Bilatéral
+    = □   (trous : 0,0027)
+  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,08-0,2)/□ | t_obs = -3
+  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 ```
 
 ### Niveau 3
 
 ```
-Sur n = 400 unités, 191 présentent le caractère. On teste H₀ : p = 0,5 contre H₁ : p < 0,5. Niveau 5 %.
+Sur n = 225 observations (loi inconnue), x̄ = 224,1 et s = 30. Test z asymptotique de H₀ : μ = 227 (bilatéral). Niveau 5 %.
   [tap, suivre l'erreur, menu menu]  se₀
-    ? Quel test ? ✔ Test z d’une proportion / · Test t de Student
-    = √(0,5·0,5/400)   ← Sous H₀
-    = 0,025
+    ? Quel test ? ✔ Test z asymptotique : n est grand / ✔ Test t de Student
+    = 30/√(225)   ← Sous H₀
+    = 2
   — tobs  [juge stat]  départ : t_obs
-    = (0,4775 − 0,5)/0,025   ← T = (estimation − valeur de H₀)/se
-    = −0,9
-  — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(0,9)   ← Unilatéral
-    = 0,184
-  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,4775-0,5)/□ | t_obs = -0,9
-  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = 30 connu. Sur n = 100 compteurs (normaux), x̄ = 997,45. Test z bilatéral. Niveau 5 %.
-  [tap, suivre l'erreur, menu menu]  se₀
-    ? Quel test ? ✔ Test z : σ est connu / · Test t de Student
-    = 30/√(100)   ← Sous H₀
-    = 3
-  — tobs  [juge stat]  départ : t_obs
-    = (997,45 − 1000)/3   ← T = (estimation − valeur de H₀)/se
-    = −0,85
+    = (224,1 − 227)/2   ← T = (estimation − valeur de H₀)/se
+    = −1,45
   — tc  [juge stat]  départ : t_c
     = 1,96   ← Bilatéral à 5 %
-  aides : T = (estimation − valeur de H₀)/(erreur standard). | (997,45-1000)/□ | t_obs = -0,85
+  aides : T = (estimation − valeur de H₀)/(erreur standard). | (224,1-227)/□ | t_obs = -1,45
   pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 100 pièces, on en trouve 29. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
+Sur n = 900 observations (loi inconnue), x̄ = 380,2 et s = 45. Test z asymptotique de H₀ : μ = 379 contre H₁ : μ > 379. Niveau 5 %.
+  [tap, suivre l'erreur, menu menu]  se₀
+    ? Quel test ? ✔ Test z asymptotique : n est grand / ✔ Test t de Student
+    = 45/√(900)   ← Sous H₀
+    = 1,5
+  — tobs  [juge stat]  départ : t_obs
+    = (380,2 − 379)/1,5   ← T = (estimation − valeur de H₀)/se
+    = 0,8
+  — tc  [juge stat]  départ : t_c
+    = 1,645   ← Unilatéral à 5 %
+  aides : T = (estimation − valeur de H₀)/(erreur standard). | (380,2-379)/□ | t_obs = 0,8
+  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 400 pièces, on en trouve 60. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
   [tap, suivre l'erreur, menu menu]  se₀
     ? Quel test ? ✔ Test z d’une proportion / · Test t de Student
-    = √(0,2·0,8/100)   ← Sous H₀
-    = 0,04
+    = √(0,2·0,8/400)   ← Sous H₀
+    = 0,02
   — tobs  [juge stat]  départ : t_obs
-    = (0,29 − 0,2)/0,04   ← T = (estimation − valeur de H₀)/se
-    = 2,25
+    = (0,15 − 0,2)/0,02   ← T = (estimation − valeur de H₀)/se
+    = −2,5
   — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(2,25))   ← Bilatéral
-    = 0,024
-  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,29-0,2)/□ | t_obs = 2,25
+    = 2(1 − Φ(2,5))   ← Bilatéral
+    = 0,012
+  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,15-0,2)/□ | t_obs = -2,5
   pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
 
 ```
@@ -10656,91 +10645,92 @@ Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 100 piè
 ### Niveau 4
 
 ```
-Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 100 pièces, on en trouve 8. Test z bilatéral de H₀ : p = 0,2. Niveau 5 %.
+Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = 15 connu. Sur n = 36 compteurs (normaux), x̄ = 998. Test z bilatéral. Niveau 5 %.
   [free, suivre l'erreur]  se₀
-    = √(0,2·0,8/100)   ← Sous H₀
-    = 0,04
+    = 15/√(36)   ← Sous H₀
+    = 2,5
   — tobs  [juge stat]  départ : t_obs
-    = (0,08 − 0,2)/0,04   ← T = (estimation − valeur de H₀)/se
-    = −3
-  — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(3))   ← Bilatéral
-    = 0,0027
-  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,08-0,2)/□ | t_obs = -3
-  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
-Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = 20 connu. Sur n = 25 compteurs (normaux), x̄ = 1007,4. Test z unilatéral (H₁ : μ > 1 000). Niveau 5 %.
-  [free, suivre l'erreur]  se₀
-    = 20/√(25)   ← Sous H₀
-    = 4
-  — tobs  [juge stat]  départ : t_obs
-    = (1007,4 − 1000)/4   ← T = (estimation − valeur de H₀)/se
-    = 1,85
-  — tc  [juge stat]  départ : t_c
-    = 1,645   ← Unilatéral à 5 %
-  aides : T = (estimation − valeur de H₀)/(erreur standard). | (1007,4-1000)/□ | t_obs = 1,85
-  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
-Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = 20 connu. Sur n = 25 compteurs (normaux), x̄ = 1011. Test z bilatéral. Niveau 5 %.
-  [free, suivre l'erreur]  se₀
-    = 20/√(25)   ← Sous H₀
-    = 4
-  — tobs  [juge stat]  départ : t_obs
-    = (1011 − 1000)/4   ← T = (estimation − valeur de H₀)/se
-    = 2,75
+    = (998 − 1000)/2,5   ← T = (estimation − valeur de H₀)/se
+    = −0,8
   — tc  [juge stat]  départ : t_c
     = 1,96   ← Bilatéral à 5 %
-  aides : T = (estimation − valeur de H₀)/(erreur standard). | (1011-1000)/□ | t_obs = 2,75
-  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+  aides : T = (estimation − valeur de H₀)/(erreur standard). | (998-1000)/□ | t_obs = -0,8
+  pièges : p_se_forgot_sqrt_n, p_one_two_sided, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Une pièce est lancée 100 fois ; on obtient 64 piles. Est-elle équilibrée ? Test z bilatéral de H₀ : p = 0,5. Niveau 5 %.
+  [free, suivre l'erreur]  se₀
+    = √(0,5·0,5/100)   ← Sous H₀
+    = 0,05
+  — tobs  [juge stat]  départ : t_obs
+    = (0,64 − 0,5)/0,05   ← T = (estimation − valeur de H₀)/se
+    = 2,8
+  — pobs  [juge stat]  départ : p_obs
+    = 2(1 − Φ(2,8))   ← Bilatéral
+    = 0,006
+  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,64-0,5)/□ | t_obs = 2,8
+  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+Sur n = 625 unités, 139 présentent le caractère. On teste H₀ : p = 0,2 contre H₁ : p > 0,2. Niveau 5 %.
+  [free, suivre l'erreur]  se₀
+    = √(0,2·0,8/625)   ← Sous H₀
+    = 0,016
+  — tobs  [juge stat]  départ : t_obs
+    = (0,2224 − 0,2)/0,016   ← T = (estimation − valeur de H₀)/se
+    = 1,4
+  — pobs  [juge stat]  départ : p_obs
+    = 1 − Φ(1,4)   ← Unilatéral
+    = 0,081
+  aides : Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n). | (0,2224-0,2)/□ | t_obs = 1,4
+  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
 ### Niveau 5
 
 ```
-n = 100 comptages de Poisson, λ̂ = x̄ = 4. Test de Wald (EE-209) de H₀ : λ = 3,51, bilatéral : T = √(I(λ̂))·(λ̂ − λ₀) avec I(λ̂) = n/λ̂. Niveau 5 %.
+n = 100 comptages de Poisson, λ̂ = x̄ = 1. Test de Wald (EE-209) de H₀ : λ = 1,25, bilatéral : T = √(I(λ̂))·(λ̂ − λ₀) avec I(λ̂) = n/λ̂. Niveau 5 %.
+  [free, sans aide]  se₀
+    = √(1/100)   ← se = 1/√I(λ̂) = √(λ̂/n)
+    = 0,1
+  — tobs  [juge stat]  départ : t_obs
+    = (1 − 1,25)/0,1   ← T = (estimation − valeur de H₀)/se
+    = −2,5
+  — pobs  [juge stat]  départ : p_obs
+    = 2(1 − Φ(2,5))   ← Bilatéral
+    = 0,012
+  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
+
+n = 100 comptages de Poisson, λ̂ = x̄ = 4. Test de Wald (EE-209) de H₀ : λ = 3,59, bilatéral : T = √(I(λ̂))·(λ̂ − λ₀) avec I(λ̂) = n/λ̂. Niveau 5 %.
   [free, sans aide]  se₀
     = √(4/100)   ← se = 1/√I(λ̂) = √(λ̂/n)
     = 0,2
   — tobs  [juge stat]  départ : t_obs
-    = (4 − 3,51)/0,2   ← T = (estimation − valeur de H₀)/se
-    = 2,45
+    = (4 − 3,59)/0,2   ← T = (estimation − valeur de H₀)/se
+    = 2,05
   — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(2,45))   ← Bilatéral
-    = 0,014
+    = 2(1 − Φ(2,05))   ← Bilatéral
+    = 0,04
   pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
 
-Sur n = 100 unités, 61 présentent le caractère. On teste H₀ : p = 0,5 contre H₁ : p > 0,5. Niveau 5 %.
+Sur n = 100 unités, 10 présentent le caractère. On teste H₀ : p = 0,2 contre H₁ : p < 0,2. Niveau 5 %.
   [free, sans aide]  se₀
-    = √(0,5·0,5/100)   ← Sous H₀
-    = 0,05
+    = √(0,2·0,8/100)   ← Sous H₀
+    = 0,04
   — tobs  [juge stat]  départ : t_obs
-    = (0,61 − 0,5)/0,05   ← T = (estimation − valeur de H₀)/se
-    = 2,2
+    = (0,1 − 0,2)/0,04   ← T = (estimation − valeur de H₀)/se
+    = −2,5
   — pobs  [juge stat]  départ : p_obs
-    = 1 − Φ(2,2)   ← Unilatéral
-    = 0,014
-  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_reject_10_5
-
-n = 100 comptages de Poisson, λ̂ = x̄ = 4. Test de Wald (EE-209) de H₀ : λ = 3,77, bilatéral : T = √(I(λ̂))·(λ̂ − λ₀) avec I(λ̂) = n/λ̂. Niveau 5 %.
-  [free, sans aide]  se₀
-    = √(4/100)   ← se = 1/√I(λ̂) = √(λ̂/n)
-    = 0,2
-  — tobs  [juge stat]  départ : t_obs
-    = (4 − 3,77)/0,2   ← T = (estimation − valeur de H₀)/se
-    = 1,15
-  — pobs  [juge stat]  départ : p_obs
-    = 2(1 − Φ(1,15))   ← Bilatéral
-    = 0,25
-  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+    = 1 − Φ(2,5)   ← Unilatéral
+    = 0,006
+  pièges : p_se_forgot_sqrt_n, p_pvalue_two_sided, p_upper_tail, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 ```
 
 ### Variantes d'examen
 
 ```
-Une pièce est lancée 400 fois ; on obtient 223 piles. Est-elle équilibrée ? Test z bilatéral de H₀ : p = 0,5. Quelle est la p-valeur ?
-  · 0,011 [p_pvalue_two_sided]   ✔ 0,022   · 0,904 [p_se_forgot_sqrt_n]   · 0,978 [p_upper_tail]
+Un fournisseur annonce 20 % de pièces défectueuses. Sur un lot de n = 625 pièces, on en trouve 146. Test z bilatéral de H₀ : p = 0,2. Quelle est la p-valeur ?
+  · 0,936 [p_se_forgot_sqrt_n]   · 0,018 [p_pvalue_two_sided]   ✔ 0,036   · 0,964 [p_upper_tail]
   [examen mcq]
   pièges : p_pvalue_two_sided, p_upper_tail, p_se_forgot_sqrt_n
 
@@ -10748,9 +10738,9 @@ Vrai ou faux ?
   « Un test z bilatéral à 5 % rejette H₀ : θ = θ₀ si et seulement si θ₀ est hors de l’IC à 95 % construit avec la même statistique. » → VRAI
   [examen tf]
 
-Une pièce est lancée 100 fois ; on obtient 53 piles. Est-elle équilibrée ? Test z bilatéral de H₀ : p = 0,5. Donne t_obs (deux décimales).
+Une pièce est lancée 400 fois ; on obtient 222 piles. Est-elle équilibrée ? Test z bilatéral de H₀ : p = 0,5. Donne t_obs (deux décimales).
   [free, sans aide, examen coef]  t_obs
-    = 0,6
+    = 2,2
 
 ```
 
@@ -10761,21 +10751,6 @@ _Le test t à un échantillon (σ inconnu), et sur les différences de données 
 ### Niveau 1
 
 ```
-Sur n = 9 mesures normales, x̄ = 67 et s² = 7. On teste H₀ : μ = 63 contre H₁ : μ ≠ 63 au niveau 5 %.
-  [guided]  s/√n
-    = √(7/□)   (trous : √(7/9))   ← Erreur standard
-    = □   (trous : 0,882)
-  — tobs  [juge stat]  départ : t_obs
-    = (67 − □)/0,882   (trous : (67 − 63)/0,882)   ← T = (x̄ − μ₀)/(s/√n)
-    = □   (trous : 4,54)
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 8)   ← ν = n − 1
-  — tc  [juge stat]  départ : t_c
-    (Quel quantile ? Student à ν = 8 degrés de liberté, bilatéral : 2,306.)
-    = □   (trous : 2,306)   ← Table 3, ν = 8
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (67-63)/□ | t_obs = 4,54, s₅(8) = 2,306
-  pièges : p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
 Sur n = 16 mesures normales, x̄ = 31 et s² = 10. On teste H₀ : μ = 29 contre H₁ : μ ≠ 29 au niveau 5 %.
   [guided]  s/√n
     = √(10/□)   (trous : √(10/16))   ← Erreur standard
@@ -10806,75 +10781,90 @@ Sur n = 6 mesures normales, x̄ = 10 et s² = 10. On teste H₀ : μ = 12 contre
   aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (10-12)/□ | t_obs = -1,55, s₅(5) = 2,571
   pièges : p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
+Sur n = 9 mesures normales, x̄ = 42 et s² = 15. On teste H₀ : μ = 46 contre H₁ : μ ≠ 46 au niveau 5 %.
+  [guided]  s/√n
+    = √(15/□)   (trous : √(15/9))   ← Erreur standard
+    = □   (trous : 1,291)
+  — tobs  [juge stat]  départ : t_obs
+    = (42 − □)/1,291   (trous : (42 − 46)/1,291)   ← T = (x̄ − μ₀)/(s/√n)
+    = □   (trous : −3,1)
+  — ν  [juge prob]  départ : ν
+    = □   (trous : 8)   ← ν = n − 1
+  — tc  [juge stat]  départ : t_c
+    (Quel quantile ? Student à ν = 8 degrés de liberté, bilatéral : 2,306.)
+    = □   (trous : 2,306)   ← Table 3, ν = 8
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (42-46)/□ | t_obs = -3,1, s₅(8) = 2,306
+  pièges : p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
 ```
 
 ### Niveau 2
 
 ```
-Mesures supposées normales : 42 ; 39 ; 41 ; 40 ; 42 ; 40 ; 44 ; 44 ; 43 ; 45. On teste H₀ : μ = 41 contre H₁ : μ ≠ 41 au niveau 5 %.
+Mesures supposées normales : 40 ; 42 ; 48 ; 40 ; 38 ; 41 ; 44 ; 46 ; 46 ; 44 ; 39 ; 48 ; 38 ; 45 ; 47 ; 42. On teste H₀ : μ = 44 contre H₁ : μ ≠ 44 au niveau 5 %.
   [guided]  x̄
-    = (42 + 39 + 41 + 40 + 42 + 40 + 44 + 44 + 43 + 45)/□   (trous : (42 + 39 + 41 + 40 + 42 + 40 + 44 + 44 + 43 + 45)/10)   ← Moyenne
-    = □   (trous : 42)
+    = (40 + 42 + 48 + 40 + 38 + 41 + 44 + 46 + 46 + 44 + 39 + 48 + 38 + 45 + 47 + 42)/□   (trous : (40 + 42 + 48 + 40 + 38 + 41 + 44 + 46 + 46 + 44 + 39 + 48 + 38 + 45 + 47 + 42)/16)   ← Moyenne
+    = □   (trous : 43)
   — s2  [juge prob]  départ : s²
-    = (0 + □ + 1 + 4 + 0 + 4 + 4 + 4 + 1 + 9)/9   (trous : (0 + 9 + 1 + 4 + 0 + 4 + 4 + 4 + 1 + 9)/9)   ← Écarts au carré, ÷ (n − 1)
-    = 36/9
-    = 4
+    = (9 + 1 + 25 + 9 + 25 + 4 + 1 + 9 + 9 + 1 + 16 + 25 + 25 + 4 + 16 + 1)/□   (trous : (9 + 1 + 25 + 9 + 25 + 4 + 1 + 9 + 9 + 1 + 16 + 25 + 25 + 4 + 16 + 1)/15)   ← Écarts au carré, ÷ (n − 1)
+    = 180/15
+    = 12
   — s/√n  [juge stat]  départ : s/√n
-    = √(4/□)   (trous : √(4/10))   ← Erreur standard
-    = □   (trous : 0,632)
+    = √(12/□)   (trous : √(12/16))   ← Erreur standard
+    = □   (trous : 0,866)
   — tobs  [juge stat]  départ : t_obs
-    = (42 − □)/0,632   (trous : (42 − 41)/0,632)   ← T = (x̄ − μ₀)/(s/√n)
-    = □   (trous : 1,58)
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 9)   ← ν = n − 1
-  — tc  [juge stat]  départ : t_c
-    ? Quel quantile ? ✔ Student à ν = 9 degrés de liberté, bilatéral : 2,262 / · La loi normale : 1,96 / · Student à ν = 10 : 2,228
-    = □   (trous : 2,262)   ← Table 3, ν = 9
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (42-41)/□ | t_obs = 1,58, s₅(9) = 2,262
-  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Mesures supposées normales : 12 ; 8 ; 16 ; 8 ; 16 ; 14 ; 14 ; 10 ; 10. On teste H₀ : μ = 9 contre H₁ : μ ≠ 9 au niveau 5 %.
-  [guided]  x̄
-    = (12 + 8 + 16 + 8 + 16 + 14 + 14 + 10 + 10)/□   (trous : (12 + 8 + 16 + 8 + 16 + 14 + 14 + 10 + 10)/9)   ← Moyenne
-    = □   (trous : 12)
-  — s2  [juge prob]  départ : s²
-    = (0 + 16 + 16 + 16 + 16 + 4 + 4 + 4 + 4)/□   (trous : (0 + 16 + 16 + 16 + 16 + 4 + 4 + 4 + 4)/8)   ← Écarts au carré, ÷ (n − 1)
-    = 80/8
-    = 10
-  — s/√n  [juge stat]  départ : s/√n
-    = √(10/□)   (trous : √(10/9))   ← Erreur standard
-    = □   (trous : 1,054)
-  — tobs  [juge stat]  départ : t_obs
-    = (12 − □)/1,054   (trous : (12 − 9)/1,054)   ← T = (x̄ − μ₀)/(s/√n)
-    = □   (trous : 2,85)
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 8)   ← ν = n − 1
-  — tc  [juge stat]  départ : t_c
-    ? Quel quantile ? ✔ Student à ν = 8 degrés de liberté, bilatéral : 2,306 / · La loi normale : 1,96 / · Student à ν = 9 : 2,262
-    = □   (trous : 2,306)   ← Table 3, ν = 8
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (12-9)/□ | t_obs = 2,85, s₅(8) = 2,306
-  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
-Mesures supposées normales : 84 ; 83 ; 89 ; 84 ; 88 ; 82 ; 82 ; 89 ; 87 ; 81 ; 88 ; 83 ; 87 ; 86 ; 86 ; 81. On teste H₀ : μ = 89 contre H₁ : μ ≠ 89 au niveau 5 %.
-  [guided]  x̄
-    = (84 + 83 + 89 + 84 + 88 + 82 + 82 + 89 + 87 + 81 + 88 + 83 + 87 + 86 + 86 + 81)/□   (trous : (84 + 83 + 89 + 84 + 88 + 82 + 82 + 89 + 87 + 81 + 88 + 83 + 87 + 86 + 86 + 81)/16)   ← Moyenne
-    = □   (trous : 85)
-  — s2  [juge prob]  départ : s²
-    = (1 + 4 + 16 + 1 + 9 + 9 + 9 + 16 + 4 + 16 + 9 + 4 + 4 + 1 + 1 + 16)/□   (trous : (1 + 4 + 16 + 1 + 9 + 9 + 9 + 16 + 4 + 16 + 9 + 4 + 4 + 1 + 1 + 16)/15)   ← Écarts au carré, ÷ (n − 1)
-    = 120/15
-    = 8
-  — s/√n  [juge stat]  départ : s/√n
-    = √(8/□)   (trous : √(8/16))   ← Erreur standard
-    = □   (trous : 0,707)
-  — tobs  [juge stat]  départ : t_obs
-    = (85 − □)/0,707   (trous : (85 − 89)/0,707)   ← T = (x̄ − μ₀)/(s/√n)
-    = □   (trous : −5,66)
+    = (43 − □)/0,866   (trous : (43 − 44)/0,866)   ← T = (x̄ − μ₀)/(s/√n)
+    = □   (trous : −1,15)
   — ν  [juge prob]  départ : ν
     = □   (trous : 15)   ← ν = n − 1
   — tc  [juge stat]  départ : t_c
     ? Quel quantile ? ✔ Student à ν = 15 degrés de liberté, bilatéral : 2,131 / · La loi normale : 1,96 / · Student à ν = 16 : 2,12
     = □   (trous : 2,131)   ← Table 3, ν = 15
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (85-89)/□ | t_obs = -5,66, s₅(15) = 2,131
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (43-44)/□ | t_obs = -1,15, s₅(15) = 2,131
+  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Mesures supposées normales : 78 ; 82 ; 74 ; 80 ; 76. On teste H₀ : μ = 76 contre H₁ : μ ≠ 76 au niveau 5 %.
+  [guided]  x̄
+    = (78 + 82 + 74 + 80 + 76)/□   (trous : (78 + 82 + 74 + 80 + 76)/5)   ← Moyenne
+    = □   (trous : 78)
+  — s2  [juge prob]  départ : s²
+    = (0 + 16 + 16 + □ + 4)/4   (trous : (0 + 16 + 16 + 4 + 4)/4)   ← Écarts au carré, ÷ (n − 1)
+    = 40/4
+    = 10
+  — s/√n  [juge stat]  départ : s/√n
+    = √(10/□)   (trous : √(10/5))   ← Erreur standard
+    = □   (trous : 1,414)
+  — tobs  [juge stat]  départ : t_obs
+    = (78 − □)/1,414   (trous : (78 − 76)/1,414)   ← T = (x̄ − μ₀)/(s/√n)
+    = □   (trous : 1,41)
+  — ν  [juge prob]  départ : ν
+    = □   (trous : 4)   ← ν = n − 1
+  — tc  [juge stat]  départ : t_c
+    ? Quel quantile ? ✔ Student à ν = 4 degrés de liberté, bilatéral : 2,776 / · La loi normale : 1,96 / · Student à ν = 5 : 2,571
+    = □   (trous : 2,776)   ← Table 3, ν = 4
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (78-76)/□ | t_obs = 1,41, s₅(4) = 2,776
+  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Mesures supposées normales : 26 ; 26 ; 20 ; 22 ; 28 ; 20 ; 18 ; 27 ; 25 ; 24 ; 22 ; 28 ; 18 ; 24 ; 21 ; 19. On teste H₀ : μ = 19 contre H₁ : μ ≠ 19 au niveau 5 %.
+  [guided]  x̄
+    = (26 + 26 + 20 + 22 + 28 + 20 + 18 + 27 + 25 + 24 + 22 + 28 + 18 + 24 + 21 + 19)/□   (trous : (26 + 26 + 20 + 22 + 28 + 20 + 18 + 27 + 25 + 24 + 22 + 28 + 18 + 24 + 21 + 19)/16)   ← Moyenne
+    = □   (trous : 23)
+  — s2  [juge prob]  départ : s²
+    = (9 + 9 + 9 + 1 + 25 + 9 + 25 + 16 + 4 + 1 + 1 + 25 + 25 + 1 + 4 + 16)/□   (trous : (9 + 9 + 9 + 1 + 25 + 9 + 25 + 16 + 4 + 1 + 1 + 25 + 25 + 1 + 4 + 16)/15)   ← Écarts au carré, ÷ (n − 1)
+    = 180/15
+    = 12
+  — s/√n  [juge stat]  départ : s/√n
+    = √(12/□)   (trous : √(12/16))   ← Erreur standard
+    = □   (trous : 0,866)
+  — tobs  [juge stat]  départ : t_obs
+    = (23 − □)/0,866   (trous : (23 − 19)/0,866)   ← T = (x̄ − μ₀)/(s/√n)
+    = □   (trous : 4,62)
+  — ν  [juge prob]  départ : ν
+    = □   (trous : 15)   ← ν = n − 1
+  — tc  [juge stat]  départ : t_c
+    ? Quel quantile ? ✔ Student à ν = 15 degrés de liberté, bilatéral : 2,131 / · La loi normale : 1,96 / · Student à ν = 16 : 2,12
+    = □   (trous : 2,131)   ← Table 3, ν = 15
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (23-19)/□ | t_obs = 4,62, s₅(15) = 2,131
   pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 ```
@@ -10882,139 +10872,139 @@ Mesures supposées normales : 84 ; 83 ; 89 ; 84 ; 88 ; 82 ; 82 ; 89 ; 87 ; 81 ; 
 ### Niveau 3
 
 ```
-Mesures supposées normales : 14 ; 14 ; 12 ; 14 ; 16. On teste H₀ : μ = 17 contre H₁ : μ ≠ 17 au niveau 5 %.
+Mesures supposées normales : 72 ; 80 ; 77 ; 74 ; 73 ; 76 ; 70 ; 79 ; 74 ; 76 ; 78 ; 72 ; 78 ; 70 ; 71 ; 80. On teste H₀ : μ = 74 contre H₁ : μ ≠ 74 au niveau 5 %.
   [tap, suivre l'erreur, menu menu]  x̄
-    = (14 + 14 + 12 + 14 + 16)/5   ← Moyenne
-    = 14
+    = (72 + 80 + 77 + 74 + 73 + 76 + 70 + 79 + 74 + 76 + 78 + 72 + 78 + 70 + 71 + 80)/16   ← Moyenne
+    = 75
   — s2  [juge prob]  départ : s²
-    = (0 + 0 + 4 + 0 + 4)/4   ← Écarts au carré, ÷ (n − 1)
-    = 8/4
-    = 2
-  — s/√n  [juge stat]  départ : s/√n
-    = √(2/5)   ← Erreur standard
-    = 0,632
-  — tobs  [juge stat]  départ : t_obs
-    = (14 − 17)/0,632   ← T = (x̄ − μ₀)/(s/√n)
-    = −4,75
-  — ν  [juge prob]  départ : ν
-    = 4   ← ν = n − 1
-  — tc  [juge stat]  départ : t_c
-    ? Quel quantile ? ✔ Student à ν = 4 degrés de liberté, bilatéral : 2,776 / · La loi normale : 1,96 / · Student à ν = 5 : 2,571
-    = 2,776   ← Table 3, ν = 4
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (14-17)/□ | t_obs = -4,74, s₅(4) = 2,776
-  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
-Mesures supposées normales : 14 ; 22 ; 22 ; 12 ; 20 ; 19 ; 12 ; 16 ; 16 ; 18 ; 21 ; 15 ; 18 ; 20 ; 13 ; 14. On teste H₀ : μ = 15 contre H₁ : μ ≠ 15 au niveau 5 %.
-  [tap, suivre l'erreur, menu menu]  x̄
-    = (14 + 22 + 22 + 12 + 20 + 19 + 12 + 16 + 16 + 18 + 21 + 15 + 18 + 20 + 13 + 14)/16   ← Moyenne
-    = 17
-  — s2  [juge prob]  départ : s²
-    = (9 + 25 + 25 + 25 + 9 + 4 + 25 + 1 + 1 + 1 + 16 + 4 + 1 + 9 + 16 + 9)/15   ← Écarts au carré, ÷ (n − 1)
+    = (9 + 25 + 4 + 1 + 4 + 1 + 25 + 16 + 1 + 1 + 9 + 9 + 9 + 25 + 16 + 25)/15   ← Écarts au carré, ÷ (n − 1)
     = 180/15
     = 12
   — s/√n  [juge stat]  départ : s/√n
     = √(12/16)   ← Erreur standard
     = 0,866
   — tobs  [juge stat]  départ : t_obs
-    = (17 − 15)/0,866   ← T = (x̄ − μ₀)/(s/√n)
-    = 2,31
+    = (75 − 74)/0,866   ← T = (x̄ − μ₀)/(s/√n)
+    = 1,15
   — ν  [juge prob]  départ : ν
     = 15   ← ν = n − 1
   — tc  [juge stat]  départ : t_c
     ? Quel quantile ? ✔ Student à ν = 15 degrés de liberté, bilatéral : 2,131 / · La loi normale : 1,96 / · Student à ν = 16 : 2,12
     = 2,131   ← Table 3, ν = 15
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (17-15)/□ | t_obs = 2,31, s₅(15) = 2,131
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (75-74)/□ | t_obs = 1,15, s₅(15) = 2,131
+  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Mesures supposées normales : 59 ; 57 ; 51 ; 55 ; 55 ; 53 ; 51 ; 52 ; 59 ; 58. On teste H₀ : μ = 58 contre H₁ : μ ≠ 58 au niveau 5 %.
+  [tap, suivre l'erreur, menu menu]  x̄
+    = (59 + 57 + 51 + 55 + 55 + 53 + 51 + 52 + 59 + 58)/10   ← Moyenne
+    = 55
+  — s2  [juge prob]  départ : s²
+    = (16 + 4 + 16 + 0 + 0 + 4 + 16 + 9 + 16 + 9)/9   ← Écarts au carré, ÷ (n − 1)
+    = 90/9
+    = 10
+  — s/√n  [juge stat]  départ : s/√n
+    = √(10/10)   ← Erreur standard
+    = 1
+  — tobs  [juge stat]  départ : t_obs
+    = (55 − 58)/1   ← T = (x̄ − μ₀)/(s/√n)
+    = −3
+  — ν  [juge prob]  départ : ν
+    = 9   ← ν = n − 1
+  — tc  [juge stat]  départ : t_c
+    ? Quel quantile ? ✔ Student à ν = 9 degrés de liberté, bilatéral : 2,262 / · La loi normale : 1,96 / · Student à ν = 10 : 2,228
+    = 2,262   ← Table 3, ν = 9
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (55-58)/□ | t_obs = -3, s₅(9) = 2,262
   pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
-Mesures supposées normales : 23 ; 22 ; 22 ; 21 ; 24 ; 20. On teste H₀ : μ = 23 contre H₁ : μ ≠ 23 au niveau 5 %.
+Mesures supposées normales : 49 ; 43 ; 51 ; 49 ; 50 ; 47 ; 45 ; 43 ; 51 ; 45 ; 47 ; 44 ; 52 ; 51 ; 43 ; 42. On teste H₀ : μ = 44 contre H₁ : μ ≠ 44 au niveau 5 %.
   [tap, suivre l'erreur, menu menu]  x̄
-    = (23 + 22 + 22 + 21 + 24 + 20)/6   ← Moyenne
-    = 22
+    = (49 + 43 + 51 + 49 + 50 + 47 + 45 + 43 + 51 + 45 + 47 + 44 + 52 + 51 + 43 + 42)/16   ← Moyenne
+    = 47
   — s2  [juge prob]  départ : s²
-    = (1 + 0 + 0 + 1 + 4 + 4)/5   ← Écarts au carré, ÷ (n − 1)
-    = 10/5
-    = 2
+    = (4 + 16 + 16 + 4 + 9 + 0 + 4 + 16 + 16 + 4 + 0 + 9 + 25 + 16 + 16 + 25)/15   ← Écarts au carré, ÷ (n − 1)
+    = 180/15
+    = 12
   — s/√n  [juge stat]  départ : s/√n
-    = √(2/6)   ← Erreur standard
-    = 0,577
+    = √(12/16)   ← Erreur standard
+    = 0,866
   — tobs  [juge stat]  départ : t_obs
-    = (22 − 23)/0,577   ← T = (x̄ − μ₀)/(s/√n)
-    = −1,73
+    = (47 − 44)/0,866   ← T = (x̄ − μ₀)/(s/√n)
+    = 3,46
   — ν  [juge prob]  départ : ν
-    = 5   ← ν = n − 1
+    = 15   ← ν = n − 1
   — tc  [juge stat]  départ : t_c
-    ? Quel quantile ? ✔ Student à ν = 5 degrés de liberté, bilatéral : 2,571 / · La loi normale : 1,96 / · Student à ν = 6 : 2,447
-    = 2,571   ← Table 3, ν = 5
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (22-23)/□ | t_obs = -1,73, s₅(5) = 2,571
-  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+    ? Quel quantile ? ✔ Student à ν = 15 degrés de liberté, bilatéral : 2,131 / · La loi normale : 1,96 / · Student à ν = 16 : 2,12
+    = 2,131   ← Table 3, ν = 15
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (47-44)/□ | t_obs = 3,46, s₅(15) = 2,131
+  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 ```
 
 ### Niveau 4
 
 ```
-Les mêmes 10 personnes sont mesurées avant et après un traitement (avant ; après) : (5 ; 7), (9 ; 13), (5 ; 10), (9 ; 12), (5 ; 6), (12 ; 13), (5 ; 8), (12 ; 18), (9 ; 9), (10 ; 15). Données supposées normales. Le traitement change-t-il la mesure ? Test bilatéral à 5 %.
+Mesures supposées normales : 77 ; 75 ; 79 ; 81 ; 83. On teste H₀ : μ = 77 contre H₁ : μ ≠ 77 au niveau 5 %.
+  [free, suivre l'erreur]  x̄
+    = (77 + 75 + 79 + 81 + 83)/5   ← Moyenne
+    = 79
+  — s2  [juge prob]  départ : s²
+    = (4 + 16 + 0 + 4 + 16)/4   ← Écarts au carré, ÷ (n − 1)
+    = 40/4
+    = 10
+  — s/√n  [juge stat]  départ : s/√n
+    = √(10/5)   ← Erreur standard
+    = 1,414
+  — tobs  [juge stat]  départ : t_obs
+    = (79 − 77)/1,414   ← T = (x̄ − μ₀)/(s/√n)
+    = 1,41
+  — ν  [juge prob]  départ : ν
+    = 4   ← ν = n − 1
+  — tc  [juge stat]  départ : t_c
+    = 2,776   ← Table 3, ν = 4
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (79-77)/□ | t_obs = 1,41, s₅(4) = 2,776
+  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Les mêmes 5 personnes sont mesurées avant et après un traitement (avant ; après) : (11 ; 13), (5 ; 7), (11 ; 11), (7 ; 11), (8 ; 10). Données supposées normales. Le traitement change-t-il la mesure ? Test bilatéral à 5 %.
   [free, suivre l'erreur]  d̄
     ? Comment traiter ces données ? ✔ Mêmes personnes : test t sur les différences après − avant / · Deux échantillons indépendants (avant, après)
-    = (2 + 4 + 5 + 3 + 1 + 1 + 3 + 6 + 0 + 5)/10   ← Différences : 2 ; 4 ; 5 ; 3 ; 1 ; 1 ; 3 ; 6 ; 0 ; 5
-    = 3
+    = (2 + 2 + 0 + 4 + 2)/5   ← Différences : 2 ; 2 ; 0 ; 4 ; 2
+    = 2
   — s_d²  [juge prob]  départ : s_d²
-    = (1 + 1 + 4 + 0 + 4 + 4 + 0 + 9 + 9 + 4)/9   ← Écarts au carré, ÷ (n − 1)
-    = 36/9
-    = 4
-  — s/√n  [juge stat]  départ : s/√n
-    = √(4/10)   ← Erreur standard
-    = 0,632
-  — tobs  [juge stat]  départ : t_obs
-    = (3 − 0)/0,632   ← T = (x̄ − μ₀)/(s/√n)
-    = 4,75
-  — ν  [juge prob]  départ : ν
-    = 9   ← ν = n − 1
-  — tc  [juge stat]  départ : t_c
-    = 2,262   ← Table 3, ν = 9
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (3-0)/□ | t_obs = 4,74, s₅(9) = 2,262
-  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
-Mesures supposées normales : 20 ; 21 ; 19 ; 22 ; 23 ; 21. On teste H₀ : μ = 20 contre H₁ : μ ≠ 20 au niveau 5 %.
-  [free, suivre l'erreur]  x̄
-    = (20 + 21 + 19 + 22 + 23 + 21)/6   ← Moyenne
-    = 21
-  — s2  [juge prob]  départ : s²
-    = (1 + 0 + 4 + 1 + 4 + 0)/5   ← Écarts au carré, ÷ (n − 1)
-    = 10/5
+    = (0 + 0 + 4 + 4 + 0)/4   ← Écarts au carré, ÷ (n − 1)
+    = 8/4
     = 2
   — s/√n  [juge stat]  départ : s/√n
-    = √(2/6)   ← Erreur standard
-    = 0,577
+    = √(2/5)   ← Erreur standard
+    = 0,632
   — tobs  [juge stat]  départ : t_obs
-    = (21 − 20)/0,577   ← T = (x̄ − μ₀)/(s/√n)
-    = 1,73
+    = (2 − 0)/0,632   ← T = (x̄ − μ₀)/(s/√n)
+    = 3,16
+  — ν  [juge prob]  départ : ν
+    = 4   ← ν = n − 1
+  — tc  [juge stat]  départ : t_c
+    = 2,776   ← Table 3, ν = 4
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (2-0)/□ | t_obs = 3,16, s₅(4) = 2,776
+  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+Mesures supposées normales : 33 ; 37 ; 39 ; 31 ; 35 ; 35. On teste H₀ : μ = 31 contre H₁ : μ ≠ 31 au niveau 5 %.
+  [free, suivre l'erreur]  x̄
+    = (33 + 37 + 39 + 31 + 35 + 35)/6   ← Moyenne
+    = 35
+  — s2  [juge prob]  départ : s²
+    = (4 + 4 + 16 + 16 + 0 + 0)/5   ← Écarts au carré, ÷ (n − 1)
+    = 40/5
+    = 8
+  — s/√n  [juge stat]  départ : s/√n
+    = √(8/6)   ← Erreur standard
+    = 1,155
+  — tobs  [juge stat]  départ : t_obs
+    = (35 − 31)/1,155   ← T = (x̄ − μ₀)/(s/√n)
+    = 3,46
   — ν  [juge prob]  départ : ν
     = 5   ← ν = n − 1
   — tc  [juge stat]  départ : t_c
     = 2,571   ← Table 3, ν = 5
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (21-20)/□ | t_obs = 1,73, s₅(5) = 2,571
-  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Mesures supposées normales : 26 ; 26 ; 20 ; 22 ; 28 ; 20 ; 18 ; 27 ; 25 ; 24 ; 22 ; 28 ; 18 ; 24 ; 21 ; 19. On teste H₀ : μ = 19 contre H₁ : μ ≠ 19 au niveau 5 %.
-  [free, suivre l'erreur]  x̄
-    = (26 + 26 + 20 + 22 + 28 + 20 + 18 + 27 + 25 + 24 + 22 + 28 + 18 + 24 + 21 + 19)/16   ← Moyenne
-    = 23
-  — s2  [juge prob]  départ : s²
-    = (9 + 9 + 9 + 1 + 25 + 9 + 25 + 16 + 4 + 1 + 1 + 25 + 25 + 1 + 4 + 16)/15   ← Écarts au carré, ÷ (n − 1)
-    = 180/15
-    = 12
-  — s/√n  [juge stat]  départ : s/√n
-    = √(12/16)   ← Erreur standard
-    = 0,866
-  — tobs  [juge stat]  départ : t_obs
-    = (23 − 19)/0,866   ← T = (x̄ − μ₀)/(s/√n)
-    = 4,62
-  — ν  [juge prob]  départ : ν
-    = 15   ← ν = n − 1
-  — tc  [juge stat]  départ : t_c
-    = 2,131   ← Table 3, ν = 15
-  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (23-19)/□ | t_obs = 4,62, s₅(15) = 2,131
+  aides : σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n. | (35-31)/□ | t_obs = 3,46, s₅(5) = 2,571
   pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
 ```
@@ -11022,113 +11012,111 @@ Mesures supposées normales : 26 ; 26 ; 20 ; 22 ; 28 ; 20 ; 18 ; 27 ; 25 ; 24 ; 
 ### Niveau 5
 
 ```
-Mesures supposées normales : 62 ; 64 ; 61 ; 66 ; 61 ; 60 ; 62 ; 58 ; 60 ; 56. On teste H₀ : μ = 62 contre H₁ : μ ≠ 62 au niveau 5 %.
+Mesures supposées normales : 82 ; 76 ; 79 ; 79 ; 78 ; 80. On teste H₀ : μ = 77 contre H₁ : μ ≠ 77 au niveau 5 %.
   [free, sans aide]  x̄
-    = (62 + 64 + 61 + 66 + 61 + 60 + 62 + 58 + 60 + 56)/10   ← Moyenne
-    = 61
+    = (82 + 76 + 79 + 79 + 78 + 80)/6   ← Moyenne
+    = 79
   — s2  [juge prob]  départ : s²
-    = (1 + 9 + 0 + 25 + 0 + 1 + 1 + 9 + 1 + 25)/9   ← Écarts au carré, ÷ (n − 1)
-    = 72/9
-    = 8
+    = (9 + 9 + 0 + 0 + 1 + 1)/5   ← Écarts au carré, ÷ (n − 1)
+    = 20/5
+    = 4
   — s/√n  [juge stat]  départ : s/√n
-    = √(8/10)   ← Erreur standard
-    = 0,894
+    = √(4/6)   ← Erreur standard
+    = 0,816
   — tobs  [juge stat]  départ : t_obs
-    = (61 − 62)/0,894   ← T = (x̄ − μ₀)/(s/√n)
-    = −1,12
+    = (79 − 77)/0,816   ← T = (x̄ − μ₀)/(s/√n)
+    = 2,45
   — ν  [juge prob]  départ : ν
-    = 9   ← ν = n − 1
+    = 5   ← ν = n − 1
   — tc  [juge stat]  départ : t_c
-    = 2,262   ← Table 3, ν = 9
+    = 2,571   ← Table 3, ν = 5
   pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-Mesures supposées normales : 30 ; 30 ; 35 ; 36 ; 37 ; 32 ; 37 ; 38 ; 31 ; 36 ; 33 ; 35 ; 33 ; 32 ; 31 ; 38. On teste H₀ : μ = 37 contre H₁ : μ ≠ 37 au niveau 5 %.
+Mesures supposées normales : 87 ; 81 ; 85 ; 85 ; 83 ; 83 ; 87 ; 84 ; 81. On teste H₀ : μ = 86 contre H₁ : μ ≠ 86 au niveau 5 %.
   [free, sans aide]  x̄
-    = (30 + 30 + 35 + 36 + 37 + 32 + 37 + 38 + 31 + 36 + 33 + 35 + 33 + 32 + 31 + 38)/16   ← Moyenne
-    = 34
+    = (87 + 81 + 85 + 85 + 83 + 83 + 87 + 84 + 81)/9   ← Moyenne
+    = 84
   — s2  [juge prob]  départ : s²
-    = (16 + 16 + 1 + 4 + 9 + 4 + 9 + 16 + 9 + 4 + 1 + 1 + 1 + 4 + 9 + 16)/15   ← Écarts au carré, ÷ (n − 1)
-    = 120/15
-    = 8
+    = (9 + 9 + 1 + 1 + 1 + 1 + 9 + 0 + 9)/8   ← Écarts au carré, ÷ (n − 1)
+    = 40/8
+    = 5
   — s/√n  [juge stat]  départ : s/√n
-    = √(8/16)   ← Erreur standard
-    = 0,707
+    = √(5/9)   ← Erreur standard
+    = 0,745
   — tobs  [juge stat]  départ : t_obs
-    = (34 − 37)/0,707   ← T = (x̄ − μ₀)/(s/√n)
-    = −4,24
+    = (84 − 86)/0,745   ← T = (x̄ − μ₀)/(s/√n)
+    = −2,68
   — ν  [juge prob]  départ : ν
-    = 15   ← ν = n − 1
+    = 8   ← ν = n − 1
   — tc  [juge stat]  départ : t_c
-    = 2,131   ← Table 3, ν = 15
+    = 2,306   ← Table 3, ν = 8
   pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
-Mesures supposées normales : 70 ; 70 ; 70 ; 72 ; 68. On teste H₀ : μ = 73 contre H₁ : μ ≠ 73 au niveau 5 %.
+Mesures supposées normales : 81 ; 83 ; 77 ; 83 ; 81 ; 75 ; 79 ; 77 ; 75. On teste H₀ : μ = 80 contre H₁ : μ ≠ 80 au niveau 5 %.
   [free, sans aide]  x̄
-    = (70 + 70 + 70 + 72 + 68)/5   ← Moyenne
-    = 70
+    = (81 + 83 + 77 + 83 + 81 + 75 + 79 + 77 + 75)/9   ← Moyenne
+    = 79
   — s2  [juge prob]  départ : s²
-    = (0 + 0 + 0 + 4 + 4)/4   ← Écarts au carré, ÷ (n − 1)
-    = 8/4
-    = 2
+    = (4 + 16 + 4 + 16 + 4 + 16 + 0 + 4 + 16)/8   ← Écarts au carré, ÷ (n − 1)
+    = 80/8
+    = 10
   — s/√n  [juge stat]  départ : s/√n
-    = √(2/5)   ← Erreur standard
-    = 0,632
+    = √(10/9)   ← Erreur standard
+    = 1,054
   — tobs  [juge stat]  départ : t_obs
-    = (70 − 73)/0,632   ← T = (x̄ − μ₀)/(s/√n)
-    = −4,75
+    = (79 − 80)/1,054   ← T = (x̄ − μ₀)/(s/√n)
+    = −0,95
   — ν  [juge prob]  départ : ν
-    = 4   ← ν = n − 1
+    = 8   ← ν = n − 1
   — tc  [juge stat]  départ : t_c
-    = 2,776   ← Table 3, ν = 4
-  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+    = 2,306   ← Table 3, ν = 8
+  pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
 ### Variantes d'examen
 
 ```
-Mesures supposées normales : 86 ; 84 ; 86 ; 86 ; 88. On teste H₀ : μ = 89 contre H₁ : μ ≠ 89. Quelle est la valeur de t_obs ?
-  · −5,3 [p_sd_n]   · −9,49   · −2,12 [p_se_forgot_sqrt_n]   ✔ −4,74
+Mesures supposées normales : −2 ; 0 ; 1 ; 4 ; 2 ; 1. On teste H₀ : μ = 0 contre H₁ : μ ≠ 0. Quelle est la valeur de t_obs ?
+  · 0,5 [p_se_forgot_sqrt_n]   · 1,34 [p_sd_n]   ✔ 1,22   · 2,45
   [examen mcq]
   pièges : p_sd_n, p_se_forgot_sqrt_n
 
 Vrai ou faux ?
-  « Le test t à un échantillon de n données utilise la loi de Student à n degrés de liberté. » → FAUX
-    contre-exemple (refute) : n = 5, v = 4
+  « Si un test rejette H₀ au niveau 1 %, il la rejette aussi au niveau 5 %. » → VRAI
   [examen tf]
-  pièges : p_df_wrong
 
-Mesures supposées normales : 24 ; 28 ; 25 ; 31 ; 28 ; 32. On teste H₀ : μ = 31 contre H₁ : μ ≠ 31 au niveau 5 %. Donne t_obs (deux décimales).
+Les mêmes 9 personnes sont mesurées avant et après un traitement (avant ; après) : (12 ; 18), (11 ; 14), (6 ; 6), (8 ; 10), (12 ; 16), (12 ; 16), (5 ; 7), (8 ; 8), (9 ; 15). Données supposées normales. Le traitement change-t-il la mesure ? Test bilatéral à 5 %. Donne t_obs (deux décimales).
   [free, sans aide, examen coef]  t_obs
-    = −2,32
+    = 4,02
 
-Mesures supposées normales : 18 ; 15 ; 14 ; 15 ; 12 ; 16. On teste H₀ : μ = 18 contre H₁ : μ ≠ 18 au niveau 5 %. Puis donne l’IC à 95 % pour μ (deux décimales).
+Mesures supposées normales : 47 ; 48 ; 45 ; 51 ; 48 ; 49. On teste H₀ : μ = 45 contre H₁ : μ ≠ 45 au niveau 5 %. Puis donne l’IC à 95 % pour μ (deux décimales).
   [problème, examen open, 10 points]
   partie 1 (Test t et IC : 1,5 ; s2 : 1,5 ; s/√n : 1,5 ; tobs : 1,5 ; ν : 1 ; tc : 1 ; IC : 1)
-  Mesures supposées normales : 18 ; 15 ; 14 ; 15 ; 12 ; 16. On teste H₀ : μ = 18 contre H₁ : μ ≠ 18 au niveau 5 %. Puis donne l’IC à 95 % pour μ (deux décimales).
+  Mesures supposées normales : 47 ; 48 ; 45 ; 51 ; 48 ; 49. On teste H₀ : μ = 45 contre H₁ : μ ≠ 45 au niveau 5 %. Puis donne l’IC à 95 % pour μ (deux décimales).
     [free, sans aide, suivre l'erreur, examen open]  x̄
-      = (18 + 15 + 14 + 15 + 12 + 16)/6   ← Moyenne
-      = 15
+      = (47 + 48 + 45 + 51 + 48 + 49)/6   ← Moyenne
+      = 48
     — s2  [juge prob]  départ : s²
-      = (9 + 0 + 1 + 0 + 9 + 1)/5   ← Écarts au carré, ÷ (n − 1)
+      = (1 + 0 + 9 + 9 + 0 + 1)/5   ← Écarts au carré, ÷ (n − 1)
       = 20/5
       = 4
     — s/√n  [juge stat]  départ : s/√n
       = √(4/6)   ← Erreur standard
       = 0,816
     — tobs  [juge stat]  départ : t_obs
-      = (15 − 18)/0,816   ← T = (x̄ − μ₀)/(s/√n)
-      = −3,68
+      = (48 − 45)/0,816   ← T = (x̄ − μ₀)/(s/√n)
+      = 3,68
     — ν  [juge prob]  départ : ν
       = 5   ← ν = n − 1
     — tc  [juge stat]  départ : t_c
       = 2,571   ← Table 3, ν = 5
     — IC  [juge stat]  départ : IC
-      = [15 − 2,571·0,816 ; 15 + 2,571·0,816]   ← x̄ ± t_c·s/√n
-      = [12,9 ; 17,1]
+      = [48 − 2,571·0,816 ; 48 + 2,571·0,816]   ← x̄ ± t_c·s/√n
+      = [45,9 ; 50,1]
   partie 2 (Interpréter : 1)
   Conclure et interpréter : quelle phrase est juste ?
-    · On ne rejette pas H₀ au niveau 5 % : les données sont compatibles avec l’hypothèse que μ vaut 18. [p_pvalue_alpha_compare]   · L’écart est significatif, donc il est important en pratique. [p_significant_large]   ✔ On rejette H₀ au niveau 5 % : les données contredisent l’hypothèse que μ vaut 18.   · La probabilité que H₀ soit vraie est inférieure à 0,05. [p_pvalue_h0]
+    · On ne rejette pas H₀ au niveau 5 % : les données sont compatibles avec l’hypothèse que μ vaut 45. [p_pvalue_alpha_compare]   · La probabilité que H₀ soit vraie est inférieure à 0,05. [p_pvalue_h0]   ✔ On rejette H₀ au niveau 5 % : les données contredisent l’hypothèse que μ vaut 45.   · L’écart est significatif, donc il est important en pratique. [p_significant_large]
     [examen open]
   pièges : p_sd_n, p_se_forgot_sqrt_n, p_df_wrong, p_t_vs_z, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
@@ -11141,168 +11129,121 @@ _Le test t de deux échantillons indépendants avec la variance poolée, précé
 ### Niveau 1
 
 ```
-Deux groupes indépendants, supposés normaux : n₁ = 8, x̄₁ = 12, s₁² = 6 ; n₂ = 5, x̄₂ = 18, s₂² = 5. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(7 ; 4) : 0,181 et 9,074.
+Deux groupes indépendants, supposés normaux : n₁ = 4, x̄₁ = 39, s₁² = 12 ; n₂ = 5, x̄₂ = 33, s₂² = 4. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(3 ; 4) : 0,066 et 9,979.
   [guided]  F
     (Ces deux groupes sont-ils… Deux échantillons indépendants (des individus différents).)
-    = 1,2   ← F = s₁²/s₂² = 6/5
+    = 3   ← F = s₁²/s₂² = 12/4
   — s_p²  [juge prob]  départ : s_p²
-    = (7·6 + 4·5)/□   (trous : (7·6 + 4·5)/11)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = □   (trous : 62/11)
+    = (3·12 + 4·4)/□   (trous : (3·12 + 4·4)/7)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = □   (trous : 52/7)
   — se  [juge stat]  départ : se
-    = √(62/11·(1/8 + 1/5))   ← se
-    = 1,353
+    = √(52/7·(1/4 + 1/5))   ← se
+    = 1,828
   — tobs  [juge stat]  départ : t_obs
-    = (12 − 18)/1,353   ← T = (x̄₁ − x̄₂)/se
-    = −4,43
+    = (39 − 33)/1,828   ← T = (x̄₁ − x̄₂)/se
+    = 3,28
+  — ν  [juge prob]  départ : ν
+    = □   (trous : 7)   ← ν = n₁ + n₂ − 2
+  — tc  [juge stat]  départ : t_c
+    = □   (trous : 2,365)   ← Table 3, ν = 7
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (3×12+4×4)/□ | s_p² = 52 / 7
+  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+
+Deux groupes indépendants, supposés normaux : n₁ = 9, x̄₁ = 37, s₁² = 11 ; n₂ = 9, x̄₂ = 38, s₂² = 14. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(8 ; 8) : 0,226 et 4,433.
+  [guided]  F
+    (Ces deux groupes sont-ils… Deux échantillons indépendants (des individus différents).)
+    = 0,786   ← F = s₁²/s₂² = 11/14
+  — s_p²  [juge prob]  départ : s_p²
+    = (8·11 + 8·14)/□   (trous : (8·11 + 8·14)/16)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = □   (trous : 25/2)
+  — se  [juge stat]  départ : se
+    = √(25/2·(1/9 + 1/9))   ← se
+    = 1,667
+  — tobs  [juge stat]  départ : t_obs
+    = (37 − 38)/1,667   ← T = (x̄₁ − x̄₂)/se
+    = −0,6
+  — ν  [juge prob]  départ : ν
+    = □   (trous : 16)   ← ν = n₁ + n₂ − 2
+  — tc  [juge stat]  départ : t_c
+    = □   (trous : 2,12)   ← Table 3, ν = 16
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (8×11+8×14)/□ | s_p² = 25 / 2
+  pièges : p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0, p_pooled_average
+
+Deux groupes indépendants, supposés normaux : n₁ = 4, x̄₁ = 39, s₁² = 6 ; n₂ = 9, x̄₂ = 37, s₂² = 15. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(3 ; 8) : 0,069 et 5,416.
+  [guided]  F
+    (Ces deux groupes sont-ils… Deux échantillons indépendants (des individus différents).)
+    = 0,4   ← F = s₁²/s₂² = 6/15
+  — s_p²  [juge prob]  départ : s_p²
+    = (3·6 + 8·15)/□   (trous : (3·6 + 8·15)/11)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = □   (trous : 138/11)
+  — se  [juge stat]  départ : se
+    = √(138/11·(1/4 + 1/9))   ← se
+    = 2,128
+  — tobs  [juge stat]  départ : t_obs
+    = (39 − 37)/2,128   ← T = (x̄₁ − x̄₂)/se
+    = 0,94
   — ν  [juge prob]  départ : ν
     = □   (trous : 11)   ← ν = n₁ + n₂ − 2
   — tc  [juge stat]  départ : t_c
     = □   (trous : 2,201)   ← Table 3, ν = 11
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (7×6+4×5)/□ | s_p² = 62 / 11
-  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
-
-Deux groupes indépendants, supposés normaux : n₁ = 8, x̄₁ = 14, s₁² = 22 ; n₂ = 8, x̄₂ = 13, s₂² = 28. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(7 ; 7) : 0,2 et 4,995.
-  [guided]  F
-    (Ces deux groupes sont-ils… Deux échantillons indépendants (des individus différents).)
-    = 0,786   ← F = s₁²/s₂² = 22/28
-  — s_p²  [juge prob]  départ : s_p²
-    = (7·22 + 7·28)/□   (trous : (7·22 + 7·28)/14)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = □   (trous : 25)
-  — se  [juge stat]  départ : se
-    = √(25·(1/8 + 1/8))   ← se
-    = 2,5
-  — tobs  [juge stat]  départ : t_obs
-    = (14 − 13)/2,5   ← T = (x̄₁ − x̄₂)/se
-    = 0,4
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 14)   ← ν = n₁ + n₂ − 2
-  — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,145)   ← Table 3, ν = 14
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (7×22+7×28)/□ | s_p² = 25
-  pièges : p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0, p_pooled_average
-
-Deux groupes indépendants, supposés normaux : n₁ = 10, x̄₁ = 25, s₁² = 16 ; n₂ = 10, x̄₂ = 26, s₂² = 16. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(9 ; 9) : 0,248 et 4,026.
-  [guided]  F
-    (Ces deux groupes sont-ils… Deux échantillons indépendants (des individus différents).)
-    = 1   ← F = s₁²/s₂² = 16/16
-  — s_p²  [juge prob]  départ : s_p²
-    = (9·16 + 9·16)/□   (trous : (9·16 + 9·16)/18)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = □   (trous : 16)
-  — se  [juge stat]  départ : se
-    = √(16·(1/10 + 1/10))   ← se
-    = 1,789
-  — tobs  [juge stat]  départ : t_obs
-    = (25 − 26)/1,789   ← T = (x̄₁ − x̄₂)/se
-    = −0,56
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 18)   ← ν = n₁ + n₂ − 2
-  — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,101)   ← Table 3, ν = 18
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (9×16+9×16)/□ | s_p² = 16
-  pièges : p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0, p_pooled_average
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (3×6+8×15)/□ | s_p² = 138 / 11
+  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
 ### Niveau 2
 
 ```
-Deux groupes indépendants, supposés normaux : n₁ = 4, x̄₁ = 30, s₁² = 6 ; n₂ = 5, x̄₂ = 28, s₂² = 2. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(3 ; 4) : 0,066 et 9,979.
+Deux groupes indépendants, supposés normaux : n₁ = 8, x̄₁ = 26, s₁² = 10 ; n₂ = 6, x̄₂ = 25, s₂² = 8. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(7 ; 5) : 0,189 et 6,853.
   [guided]  F
     ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
-    = 3   ← F = s₁²/s₂² = 6/2
+    = 1,25   ← F = s₁²/s₂² = 10/8
   — s_p²  [juge prob]  départ : s_p²
-    ? F = 3 et l’énoncé donne F(3 ; 4) entre 0,066 et 9,979 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
-    = (3·6 + 4·2)/□   (trous : (3·6 + 4·2)/7)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = □   (trous : 26/7)
+    ? F = 1,25 et l’énoncé donne F(7 ; 5) entre 0,189 et 6,853 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
+    = (7·10 + 5·8)/□   (trous : (7·10 + 5·8)/12)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = □   (trous : 55/6)
   — se  [juge stat]  départ : se
-    = √(26/7·(1/4 + 1/5))   ← se
-    = 1,293
+    = √(55/6·(1/8 + 1/6))   ← se
+    = 1,635
   — tobs  [juge stat]  départ : t_obs
-    = (30 − 28)/1,293   ← T = (x̄₁ − x̄₂)/se
-    = 1,55
+    = (26 − 25)/1,635   ← T = (x̄₁ − x̄₂)/se
+    = 0,61
   — ν  [juge prob]  départ : ν
-    = □   (trous : 7)   ← ν = n₁ + n₂ − 2
+    = □   (trous : 12)   ← ν = n₁ + n₂ − 2
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,365)   ← Table 3, ν = 7
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (3×6+4×2)/□ | s_p² = 26 / 7
+    = □   (trous : 2,179)   ← Table 3, ν = 12
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (7×10+5×8)/□ | s_p² = 55 / 6
   pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-Deux groupes indépendants, supposés normaux : n₁ = 5, x̄₁ = 25, s₁² = 10 ; n₂ = 5, x̄₂ = 28, s₂² = 18. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(4 ; 4) : 0,104 et 9,605.
+Deux groupes indépendants, supposés normaux : n₁ = 8, x̄₁ = 18, s₁² = 22 ; n₂ = 8, x̄₂ = 17, s₂² = 16. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(7 ; 7) : 0,2 et 4,995.
   [guided]  F
     ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
-    = 0,556   ← F = s₁²/s₂² = 10/18
+    = 1,375   ← F = s₁²/s₂² = 22/16
   — s_p²  [juge prob]  départ : s_p²
-    ? F = 0,556 et l’énoncé donne F(4 ; 4) entre 0,104 et 9,605 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
-    = (4·10 + 4·18)/8   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = □   (trous : 14)
+    ? F = 1,375 et l’énoncé donne F(7 ; 7) entre 0,2 et 4,995 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
+    = (7·22 + 7·16)/□   (trous : (7·22 + 7·16)/14)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = □   (trous : 19)
   — se  [juge stat]  départ : se
-    = √(14·(1/5 + 1/5))   ← se
-    = 2,366
+    = √(19·(1/8 + 1/8))   ← se
+    = 2,179
   — tobs  [juge stat]  départ : t_obs
-    = (25 − 28)/2,366   ← T = (x̄₁ − x̄₂)/se
-    = −1,27
+    = (18 − 17)/2,179   ← T = (x̄₁ − x̄₂)/se
+    = 0,46
   — ν  [juge prob]  départ : ν
-    = □   (trous : 8)   ← ν = n₁ + n₂ − 2
+    = □   (trous : 14)   ← ν = n₁ + n₂ − 2
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,306)   ← Table 3, ν = 8
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (4×10+4×18)/□ | s_p² = 14
-  pièges : p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0, p_pooled_average
-
-Deux groupes indépendants, supposés normaux : n₁ = 6, x̄₁ = 19, s₁² = 14 ; n₂ = 5, x̄₂ = 17, s₂² = 5. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(5 ; 4) : 0,135 et 9,364.
-  [guided]  F
-    ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
-    = 2,8   ← F = s₁²/s₂² = 14/5
-  — s_p²  [juge prob]  départ : s_p²
-    ? F = 2,8 et l’énoncé donne F(5 ; 4) entre 0,135 et 9,364 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
-    = (5·14 + 4·5)/□   (trous : (5·14 + 4·5)/9)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = □   (trous : 10)
-  — se  [juge stat]  départ : se
-    = √(10·(1/6 + 1/5))   ← se
-    = 1,915
-  — tobs  [juge stat]  départ : t_obs
-    = (19 − 17)/1,915   ← T = (x̄₁ − x̄₂)/se
-    = 1,04
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 9)   ← ν = n₁ + n₂ − 2
-  — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,262)   ← Table 3, ν = 9
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (5×14+4×5)/□ | s_p² = 10
-  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-```
-
-### Niveau 3
-
-```
-Deux groupes indépendants, supposés normaux : n₁ = 7, x̄₁ = 27, s₁² = 24 ; n₂ = 7, x̄₂ = 28, s₂² = 8. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(6 ; 6) : 0,172 et 5,82.
-  [tap, suivre l'erreur, menu menu]  F
-    ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
-    = 3   ← F = s₁²/s₂² = 24/8
-  — s_p²  [juge prob]  départ : s_p²
-    ? F = 3 et l’énoncé donne F(6 ; 6) entre 0,172 et 5,82 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
-    = (6·24 + 6·8)/12   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = 16
-  — se  [juge stat]  départ : se
-    = √(16·(1/7 + 1/7))   ← se
-    = 2,138
-  — tobs  [juge stat]  départ : t_obs
-    = (27 − 28)/2,138   ← T = (x̄₁ − x̄₂)/se
-    = −0,47
-  — ν  [juge prob]  départ : ν
-    = 12   ← ν = n₁ + n₂ − 2
-  — tc  [juge stat]  départ : t_c
-    = 2,179   ← Table 3, ν = 12
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (6×24+6×8)/□ | s_p² = 16
+    = □   (trous : 2,145)   ← Table 3, ν = 14
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (7×22+7×16)/□ | s_p² = 19
   pièges : p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0, p_pooled_average
 
 Deux groupes indépendants, supposés normaux : n₁ = 7, x̄₁ = 30, s₁² = 15 ; n₂ = 10, x̄₂ = 35, s₂² = 24. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(6 ; 9) : 0,181 et 4,32.
-  [tap, suivre l'erreur, menu menu]  F
+  [guided]  F
     ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
     = 0,625   ← F = s₁²/s₂² = 15/24
   — s_p²  [juge prob]  départ : s_p²
     ? F = 0,625 et l’énoncé donne F(6 ; 9) entre 0,181 et 4,32 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
-    = (6·15 + 9·24)/15   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = 102/5
+    = (6·□ + 9·24)/15   (trous : (6·15 + 9·24)/15)   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = □   (trous : 102/5)
   — se  [juge stat]  départ : se
     = √(102/5·(1/7 + 1/10))   ← se
     = 2,226
@@ -11310,12 +11251,17 @@ Deux groupes indépendants, supposés normaux : n₁ = 7, x̄₁ = 30, s₁² = 
     = (30 − 35)/2,226   ← T = (x̄₁ − x̄₂)/se
     = −2,25
   — ν  [juge prob]  départ : ν
-    = 15   ← ν = n₁ + n₂ − 2
+    = □   (trous : 15)   ← ν = n₁ + n₂ − 2
   — tc  [juge stat]  départ : t_c
-    = 2,131   ← Table 3, ν = 15
+    = □   (trous : 2,131)   ← Table 3, ν = 15
   aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (6×15+9×24)/□ | s_p² = 102 / 5
   pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
 
+```
+
+### Niveau 3
+
+```
 Deux groupes indépendants, supposés normaux : n₁ = 8, x̄₁ = 19, s₁² = 22 ; n₂ = 8, x̄₂ = 16, s₂² = 16. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(7 ; 7) : 0,2 et 4,995.
   [tap, suivre l'erreur, menu menu]  F
     ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
@@ -11337,75 +11283,53 @@ Deux groupes indépendants, supposés normaux : n₁ = 8, x̄₁ = 19, s₁² = 
   aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (7×22+7×16)/□ | s_p² = 19
   pièges : p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0, p_pooled_average
 
+Deux groupes indépendants, supposés normaux : n₁ = 6, x̄₁ = 37, s₁² = 20 ; n₂ = 4, x̄₂ = 31, s₂² = 24. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(5 ; 3) : 0,129 et 14,885.
+  [tap, suivre l'erreur, menu menu]  F
+    ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
+    = 0,833   ← F = s₁²/s₂² = 20/24
+  — s_p²  [juge prob]  départ : s_p²
+    ? F = 0,833 et l’énoncé donne F(5 ; 3) entre 0,129 et 14,885 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
+    = (5·20 + 3·24)/8   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = 43/2
+  — se  [juge stat]  départ : se
+    = √(43/2·(1/6 + 1/4))   ← se
+    = 2,993
+  — tobs  [juge stat]  départ : t_obs
+    = (37 − 31)/2,993   ← T = (x̄₁ − x̄₂)/se
+    = 2
+  — ν  [juge prob]  départ : ν
+    = 8   ← ν = n₁ + n₂ − 2
+  — tc  [juge stat]  départ : t_c
+    = 2,306   ← Table 3, ν = 8
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (5×20+3×24)/□ | s_p² = 43 / 2
+  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Deux groupes indépendants, supposés normaux : n₁ = 4, x̄₁ = 39, s₁² = 24 ; n₂ = 6, x̄₂ = 40, s₂² = 8. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(3 ; 5) : 0,067 et 7,764.
+  [tap, suivre l'erreur, menu menu]  F
+    ? Ces deux groupes sont-ils… ✔ Deux échantillons indépendants (des individus différents) / · Des données appariées : on teste les différences groupe par groupe
+    = 3   ← F = s₁²/s₂² = 24/8
+  — s_p²  [juge prob]  départ : s_p²
+    ? F = 3 et l’énoncé donne F(3 ; 5) entre 0,067 et 7,764 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
+    = (3·24 + 5·8)/8   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = 14
+  — se  [juge stat]  départ : se
+    = √(14·(1/4 + 1/6))   ← se
+    = 2,415
+  — tobs  [juge stat]  départ : t_obs
+    = (39 − 40)/2,415   ← T = (x̄₁ − x̄₂)/se
+    = −0,41
+  — ν  [juge prob]  départ : ν
+    = 8   ← ν = n₁ + n₂ − 2
+  — tc  [juge stat]  départ : t_c
+    = 2,306   ← Table 3, ν = 8
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (3×24+5×8)/□ | s_p² = 14
+  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
 ```
 
 ### Niveau 4
 
 ```
-Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 33 ; 36 ; 32 ; 30 ; 29 ; 26. Groupe 2 : 25 ; 24 ; 28 ; 26 ; 30 ; 34 ; 30 ; 35 ; 32 ; 36. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(5 ; 9) : 0,15 (2,5 %) et 4,484 (97,5 %).
-  [free, suivre l'erreur]  x̄₁
-    = (33 + 36 + 32 + 30 + 29 + 26)/6   ← Groupe 1
-    = 31
-  — s₁2  [juge prob]  départ : s_1²
-    = 60/5   ← Σ(x − x̄)² = 60, ÷ (n − 1)
-    = 12
-  — x̄₂  [juge prob]  départ : x̄₂
-    = (25 + 24 + 28 + 26 + 30 + 34 + 30 + 35 + 32 + 36)/10   ← Groupe 2
-    = 30
-  — s₂2  [juge prob]  départ : s_2²
-    = 162/9   ← Σ(x − x̄)² = 162, ÷ (n − 1)
-    = 18
-  — F  [juge stat]  départ : F
-    = 0,667   ← F = s₁²/s₂² = 12/18
-  — s_p²  [juge prob]  départ : s_p²
-    ? F = 0,667 et l’énoncé donne F(5 ; 9) entre 0,15 et 4,484 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
-    = (5·12 + 9·18)/14   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = 111/7
-  — se  [juge stat]  départ : se
-    = √(111/7·(1/6 + 1/10))   ← se
-    = 2,056
-  — tobs  [juge stat]  départ : t_obs
-    = (31 − 30)/2,056   ← T = (x̄₁ − x̄₂)/se
-    = 0,49
-  — ν  [juge prob]  départ : ν
-    = 14   ← ν = n₁ + n₂ − 2
-  — tc  [juge stat]  départ : t_c
-    = 2,145   ← Table 3, ν = 14
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (5×12+9×18)/□ | s_p² = 111 / 7
-  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 31 ; 33 ; 31 ; 31 ; 32 ; 33 ; 27 ; 37 ; 33. Groupe 2 : 26 ; 34 ; 27 ; 35 ; 28 ; 36. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(8 ; 5) : 0,208 (2,5 %) et 6,757 (97,5 %).
-  [free, suivre l'erreur]  x̄₁
-    = (31 + 33 + 31 + 31 + 32 + 33 + 27 + 37 + 33)/9   ← Groupe 1
-    = 32
-  — s₁2  [juge prob]  départ : s_1²
-    = 56/8   ← Σ(x − x̄)² = 56, ÷ (n − 1)
-    = 7
-  — x̄₂  [juge prob]  départ : x̄₂
-    = (26 + 34 + 27 + 35 + 28 + 36)/6   ← Groupe 2
-    = 31
-  — s₂2  [juge prob]  départ : s_2²
-    = 100/5   ← Σ(x − x̄)² = 100, ÷ (n − 1)
-    = 20
-  — F  [juge stat]  départ : F
-    = 0,35   ← F = s₁²/s₂² = 7/20
-  — s_p²  [juge prob]  départ : s_p²
-    ? F = 0,35 et l’énoncé donne F(8 ; 5) entre 0,208 et 6,757 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
-    = (8·7 + 5·20)/13   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = 12
-  — se  [juge stat]  départ : se
-    = √(12·(1/9 + 1/6))   ← se
-    = 1,826
-  — tobs  [juge stat]  départ : t_obs
-    = (32 − 31)/1,826   ← T = (x̄₁ − x̄₂)/se
-    = 0,55
-  — ν  [juge prob]  départ : ν
-    = 13   ← ν = n₁ + n₂ − 2
-  — tc  [juge stat]  départ : t_c
-    = 2,16   ← Table 3, ν = 13
-  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (8×7+5×20)/□ | s_p² = 12
-  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
 Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 27 ; 21 ; 31 ; 25 ; 25 ; 23 ; 27 ; 26 ; 29. Groupe 2 : 20 ; 17 ; 20 ; 26 ; 20 ; 26 ; 29 ; 26. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(8 ; 7) : 0,221 (2,5 %) et 4,899 (97,5 %).
   [free, suivre l'erreur]  x̄₁
     = (27 + 21 + 31 + 25 + 25 + 23 + 27 + 26 + 29)/9   ← Groupe 1
@@ -11438,13 +11362,8 @@ Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 27 ;
   aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (8×9+7×18)/□ | s_p² = 66 / 5
   pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-```
-
-### Niveau 5
-
-```
 Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 36 ; 35 ; 43 ; 36 ; 42 ; 33 ; 42 ; 45. Groupe 2 : 32 ; 44 ; 32 ; 44. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(7 ; 3) : 0,17 (2,5 %) et 14,624 (97,5 %).
-  [free, sans aide]  x̄₁
+  [free, suivre l'erreur]  x̄₁
     = (36 + 35 + 43 + 36 + 42 + 33 + 42 + 45)/8   ← Groupe 1
     = 39
   — s₁2  [juge prob]  départ : s_1²
@@ -11472,10 +11391,11 @@ Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 36 ;
     = 10   ← ν = n₁ + n₂ − 2
   — tc  [juge stat]  départ : t_c
     = 2,228   ← Table 3, ν = 10
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (7×20+3×48)/□ | s_p² = 142 / 5
   pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 22 ; 16 ; 22 ; 10 ; 10. Groupe 2 : 24 ; 21 ; 14 ; 25 ; 13 ; 17. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(4 ; 5) : 0,107 (2,5 %) et 7,388 (97,5 %).
-  [free, sans aide]  x̄₁
+  [free, suivre l'erreur]  x̄₁
     = (22 + 16 + 22 + 10 + 10)/5   ← Groupe 1
     = 16
   — s₁2  [juge prob]  départ : s_1²
@@ -11503,8 +11423,14 @@ Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 22 ;
     = 9   ← ν = n₁ + n₂ − 2
   — tc  [juge stat]  départ : t_c
     = 2,262   ← Table 3, ν = 9
+  aides : Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2. | (4×36+5×26)/□ | s_p² = 274 / 9
   pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
+```
+
+### Niveau 5
+
+```
 Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 21 ; 27 ; 33 ; 21 ; 27 ; 27 ; 21 ; 33 ; 33. Groupe 2 : 27 ; 21 ; 18 ; 30. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(8 ; 3) : 0,185 (2,5 %) et 14,54 (97,5 %).
   [free, sans aide]  x̄₁
     = (21 + 27 + 33 + 21 + 27 + 27 + 21 + 33 + 33)/9   ← Groupe 1
@@ -11536,62 +11462,126 @@ Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 21 ;
     = 2,201   ← Table 3, ν = 11
   pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
+Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 23 ; 25 ; 20 ; 28 ; 28 ; 24 ; 20. Groupe 2 : 26 ; 22 ; 26 ; 24 ; 28 ; 30. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(6 ; 5) : 0,167 (2,5 %) et 6,978 (97,5 %).
+  [free, sans aide]  x̄₁
+    = (23 + 25 + 20 + 28 + 28 + 24 + 20)/7   ← Groupe 1
+    = 24
+  — s₁2  [juge prob]  départ : s_1²
+    = 66/6   ← Σ(x − x̄)² = 66, ÷ (n − 1)
+    = 11
+  — x̄₂  [juge prob]  départ : x̄₂
+    = (26 + 22 + 26 + 24 + 28 + 30)/6   ← Groupe 2
+    = 26
+  — s₂2  [juge prob]  départ : s_2²
+    = 40/5   ← Σ(x − x̄)² = 40, ÷ (n − 1)
+    = 8
+  — F  [juge stat]  départ : F
+    = 1,375   ← F = s₁²/s₂² = 11/8
+  — s_p²  [juge prob]  départ : s_p²
+    ? F = 1,375 et l’énoncé donne F(6 ; 5) entre 0,167 et 6,978 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
+    = (6·11 + 5·8)/11   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = 106/11
+  — se  [juge stat]  départ : se
+    = √(106/11·(1/7 + 1/6))   ← se
+    = 1,727
+  — tobs  [juge stat]  départ : t_obs
+    = (24 − 26)/1,727   ← T = (x̄₁ − x̄₂)/se
+    = −1,16
+  — ν  [juge prob]  départ : ν
+    = 11   ← ν = n₁ + n₂ − 2
+  — tc  [juge stat]  départ : t_c
+    = 2,201   ← Table 3, ν = 11
+  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 6 ; 13 ; 7 ; 14 ; 10 ; 10. Groupe 2 : 15 ; 12 ; 14 ; 7 ; 7 ; 10 ; 15 ; 8. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(5 ; 7) : 0,146 (2,5 %) et 5,285 (97,5 %).
+  [free, sans aide]  x̄₁
+    = (6 + 13 + 7 + 14 + 10 + 10)/6   ← Groupe 1
+    = 10
+  — s₁2  [juge prob]  départ : s_1²
+    = 50/5   ← Σ(x − x̄)² = 50, ÷ (n − 1)
+    = 10
+  — x̄₂  [juge prob]  départ : x̄₂
+    = (15 + 12 + 14 + 7 + 7 + 10 + 15 + 8)/8   ← Groupe 2
+    = 11
+  — s₂2  [juge prob]  départ : s_2²
+    = 84/7   ← Σ(x − x̄)² = 84, ÷ (n − 1)
+    = 12
+  — F  [juge stat]  départ : F
+    = 0,833   ← F = s₁²/s₂² = 10/12
+  — s_p²  [juge prob]  départ : s_p²
+    ? F = 0,833 et l’énoncé donne F(5 ; 7) entre 0,146 et 5,285 (95 %) : ✔ Variances compatibles : le test t poolé convient / · Variances différentes : il faudrait le test de Welch
+    = (5·10 + 7·12)/12   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = 67/6
+  — se  [juge stat]  départ : se
+    = √(67/6·(1/6 + 1/8))   ← se
+    = 1,805
+  — tobs  [juge stat]  départ : t_obs
+    = (10 − 11)/1,805   ← T = (x̄₁ − x̄₂)/se
+    = −0,55
+  — ν  [juge prob]  départ : ν
+    = 12   ← ν = n₁ + n₂ − 2
+  — tc  [juge stat]  départ : t_c
+    = 2,179   ← Table 3, ν = 12
+  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
 ```
 
 ### Variantes d'examen
 
 ```
-Deux groupes indépendants, normaux de même variance : n₁ = 7, x̄₁ = 24, s₁² = 11 ; n₂ = 6, x̄₂ = 26, s₂² = 8. Quelle est la statistique t_obs du test t poolé ?
-  · −2,32   ✔ −1,16   · −0,46 [p_two_sample_se]   · −1,17 [p_pooled_average]
+Deux groupes indépendants, normaux de même variance : n₁ = 7, x̄₁ = 24, s₁² = 10 ; n₂ = 9, x̄₂ = 22, s₂² = 9. Quelle est la statistique t_obs du test t poolé ?
+  · 0,46 [p_two_sample_se]   ✔ 1,29   · 0,65   · 2,58
   [examen mcq]
-  pièges : p_pooled_average, p_two_sample_se
+  pièges : p_two_sample_se
 
 Vrai ou faux ?
-  « Le test t à deux échantillons avec variance poolée suppose les deux variances égales. » → VRAI
+  « Le test t poolé à deux échantillons de tailles n₁ et n₂ a n₁ + n₂ − 1 degrés de liberté. » → FAUX
+    contre-exemple (refute) : a = 5, b = 5, v = 8
   [examen tf]
+  pièges : p_df_wrong
 
-Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 29 ; 26 ; 25 ; 28 ; 27 ; 23 ; 31. Groupe 2 : 27 ; 31 ; 35 ; 33 ; 33 ; 29 ; 29 ; 25 ; 23 ; 25. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(6 ; 9) : 0,181 (2,5 %) et 4,32 (97,5 %). Donne la variance poolée s_p².
+Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 19 ; 21 ; 13 ; 25 ; 22 ; 16 ; 19 ; 17. Groupe 2 : 25 ; 21 ; 19 ; 18 ; 15 ; 22. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(7 ; 5) : 0,189 (2,5 %) et 6,853 (97,5 %). Donne la variance poolée s_p².
   [free, sans aide, examen coef]  s_p²
-    = (6·7 + 9·16)/15   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-    = 62/5
+    = (7·14 + 5·12)/12   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+    = 79/6
   pièges : p_pooled_average
 
-Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 22 ; 19 ; 18 ; 20 ; 20 ; 26 ; 21 ; 22 ; 18 ; 14. Groupe 2 : 8 ; 14 ; 14 ; 20. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(9 ; 3) : 0,197 (2,5 %) et 14,473 (97,5 %).
+Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 24 ; 22 ; 22 ; 28 ; 20 ; 16. Groupe 2 : 23 ; 25 ; 21 ; 24 ; 25 ; 19 ; 27 ; 29 ; 23. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(5 ; 8) : 0,148 (2,5 %) et 4,817 (97,5 %).
   [problème, examen open, 10 points]
   partie 1 (Test t à deux échantillons : 1 ; s₁2 : 1 ; x̄₂ : 1 ; s₂2 : 1 ; F : 1 ; s_p² : 1 ; se : 1 ; tobs : 1 ; ν : 0,5 ; tc : 0,5)
-  Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 22 ; 19 ; 18 ; 20 ; 20 ; 26 ; 21 ; 22 ; 18 ; 14. Groupe 2 : 8 ; 14 ; 14 ; 20. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(9 ; 3) : 0,197 (2,5 %) et 14,473 (97,5 %).
+  Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : 24 ; 22 ; 22 ; 28 ; 20 ; 16. Groupe 2 : 23 ; 25 ; 21 ; 24 ; 25 ; 19 ; 27 ; 29 ; 23. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(5 ; 8) : 0,148 (2,5 %) et 4,817 (97,5 %).
     [free, sans aide, suivre l'erreur, examen open]  x̄₁
-      = (22 + 19 + 18 + 20 + 20 + 26 + 21 + 22 + 18 + 14)/10   ← Groupe 1
-      = 20
+      = (24 + 22 + 22 + 28 + 20 + 16)/6   ← Groupe 1
+      = 22
     — s₁2  [juge prob]  départ : s_1²
-      = 90/9   ← Σ(x − x̄)² = 90, ÷ (n − 1)
-      = 10
+      = 80/5   ← Σ(x − x̄)² = 80, ÷ (n − 1)
+      = 16
     — x̄₂  [juge prob]  départ : x̄₂
-      = (8 + 14 + 14 + 20)/4   ← Groupe 2
-      = 14
-    — s₂2  [juge prob]  départ : s_2²
-      = 72/3   ← Σ(x − x̄)² = 72, ÷ (n − 1)
+      = (23 + 25 + 21 + 24 + 25 + 19 + 27 + 29 + 23)/9   ← Groupe 2
       = 24
+    — s₂2  [juge prob]  départ : s_2²
+      = 72/8   ← Σ(x − x̄)² = 72, ÷ (n − 1)
+      = 9
     — F  [juge stat]  départ : F
-      = 0,417   ← F = s₁²/s₂² = 10/24
+      = 1,778   ← F = s₁²/s₂² = 16/9
     — s_p²  [juge prob]  départ : s_p²
-      = (9·10 + 3·24)/12   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
-      = 27/2
+      = (5·16 + 8·9)/13   ← s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)
+      = 152/13
     — se  [juge stat]  départ : se
-      = √(27/2·(1/10 + 1/4))   ← se
-      = 2,174
+      = √(152/13·(1/6 + 1/9))   ← se
+      = 1,802
     — tobs  [juge stat]  départ : t_obs
-      = (20 − 14)/2,174   ← T = (x̄₁ − x̄₂)/se
-      = 2,76
+      = (22 − 24)/1,802   ← T = (x̄₁ − x̄₂)/se
+      = −1,11
     — ν  [juge prob]  départ : ν
-      = 12   ← ν = n₁ + n₂ − 2
+      = 13   ← ν = n₁ + n₂ − 2
     — tc  [juge stat]  départ : t_c
-      = 2,179   ← Table 3, ν = 12
+      = 2,16   ← Table 3, ν = 13
   partie 2 (Interpréter : 1)
   Conclure et interpréter : quelle phrase est juste ?
-    · La probabilité que H₀ soit vraie est inférieure à 0,05. [p_pvalue_h0]   · On ne rejette pas H₀ au niveau 5 % : les données sont compatibles avec l’hypothèse que les deux moyennes sont égales. [p_pvalue_alpha_compare]   ✔ On rejette H₀ au niveau 5 % : les données contredisent l’hypothèse que les deux moyennes sont égales.   · L’écart est significatif, donc il est important en pratique. [p_significant_large]
+    · H₀ est vraie avec une probabilité de 0,95. [p_pvalue_h0]   ✔ On ne rejette pas H₀ au niveau 5 % : les données ne contredisent pas l’hypothèse que les deux moyennes sont égales.   · Les données prouvent que les deux moyennes sont égales. [p_accept_h0]   · On rejette H₀ au niveau 5 %. [p_pvalue_alpha_compare]
     [examen open]
-  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large
+  pièges : p_pooled_average, p_two_sample_se, p_df_wrong, p_t_vs_z, p_paired_as_two, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
@@ -13403,126 +13393,115 @@ Données (5 points) : x : 2, 3, 4, 5, 6 ; y : 3, 7, 8, 4, 8. Calcule la droite d
 ### Niveau 4
 
 ```
-Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Pour n = 5 mesures : Σx = 20, Σy = 40, Σx² = 90, Σxy = 170. Donne la droite des moindres carrés y = α̂ + β̂x.
-  [free, suivre l'erreur]  x̄
-    = 20/5   ← Σx/n
-    = 4
-  — ȳ  [juge prob]  départ : ȳ
-    = 40/5   ← Σy/n
-    = 8
-  — Sxx  [juge prob]  départ : S_xx
-    = 90 − 5·4²   ← Σx² − n·x̄²
-    = 10
-  — Sxy  [juge prob]  départ : S_xy
-    = 170 − 5·4·8   ← Σxy − n·x̄·ȳ
-    = 10
-  — β̂  [juge prob]  départ : β̂
-    = 10/10   ← S_xy/S_xx
-    = 1
-  — α̂  [juge prob]  départ : α̂
-    = 8 − 1·4   ← La droite passe par (x̄, ȳ)
-    = 4
-  aides : Centre d'abord : pente β̂ = S_xy/S_xx, puis la droite passe par (x̄, ȳ). | β̂ = 10/□ | β̂ = 1, α̂ = 4
-  pièges : p_reg_slope_swap, p_reg_sums_raw
+Complète la pente des moindres carrés β̂ = S_xy/S_xx (sommes centrées).
+  [code python, 3 trous]
+    | def slope(x, y):
+    |     n = len(x)
+    |     mx = sum(x) / n
+    |     my = sum(y) / n
+    |     sxx = 0.0
+    |     sxy = 0.0
+    |     for i in range(n):
+    |         sxx = sxx + ⟦(x[i] - mx) ** 2⟧
+    |         sxy = sxy + ⟦(x[i] - mx) * (y[i] - my)⟧
+    |     return ⟦sxy / sxx⟧
+    test : slope([1, 2, 3, 4], [2, 4, 5, 9]) → 2.2
+    test : slope([0, 1, 2], [1, 3, 4]) → 1.5
+    test : slope([2, 4, 6, 8, 10], [10, 8, 9, 5, 3]) → -0.85
+  pièges : p_reg_sums_raw
 
-Données (6 points) : x : 1, 2, 3, 4, 5, 6 ; y : 15, 13, 15, 15, 14, 18. Calcule la droite des moindres carrés y = α̂ + β̂x et R².
+Données (7 points) : x : 0, 1, 2, 3, 4, 5, 6 ; y : 8, 5, 7, 9, 11, 7, 9. Calcule la droite des moindres carrés y = α̂ + β̂x et R².
   [free, suivre l'erreur]  x̄
-    = (1 + 2 + 3 + 4 + 5 + 6)/6   ← Moyenne des x
-    = 3,5
-  — ȳ  [juge prob]  départ : ȳ
-    = (15 + 13 + 15 + 15 + 14 + 18)/6   ← Moyenne des y
-    = 15
-  — Sxx  [juge prob]  départ : S_xx
-    = (−2,5)² + (−1,5)² + (−0,5)² + 0,5² + 1,5² + 2,5²   ← Σ(xᵢ − x̄)²
-    = 17,5
-  — Sxy  [juge prob]  départ : S_xy
-    = (−2,5)·0 + (−1,5)·(−2) + (−0,5)·0 + 0,5·0 + 1,5·(−1) + 2,5·3   ← Σ(xᵢ − x̄)(yᵢ − ȳ)
-    = 9
-  — β̂  [juge prob]  départ : β̂
-    = 9/17,5   ← S_xy/S_xx
-    = 18/35
-  — α̂  [juge prob]  départ : α̂
-    = 15 − 18/35·3,5   ← La droite passe par (x̄, ȳ)
-    = 13,2
-  — Syy  [juge prob]  départ : S_yy
-    = 0² + (−2)² + 0² + 0² + (−1)² + 3²   ← Σ(yᵢ − ȳ)²
-    = 14
-  — R2  [juge prob]  départ : R²
-    = 9²/(17,5·14)   ← R² = r²
-    = 81/245
-  aides : Centre d'abord : pente β̂ = S_xy/S_xx, puis la droite passe par (x̄, ȳ). | β̂ = 9/□ | β̂ = 18/35, α̂ = 13,2
-  pièges : p_reg_slope_swap, p_reg_sums_raw, p_r2_r
-
-Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Pour n = 5 mesures : Σx = 15, Σy = 40, Σx² = 55, Σxy = 128. Donne la droite des moindres carrés y = α̂ + β̂x.
-  [free, suivre l'erreur]  x̄
-    = 15/5   ← Σx/n
+    = (0 + 1 + 2 + 3 + 4 + 5 + 6)/7   ← Moyenne des x
     = 3
   — ȳ  [juge prob]  départ : ȳ
-    = 40/5   ← Σy/n
+    = (8 + 5 + 7 + 9 + 11 + 7 + 9)/7   ← Moyenne des y
     = 8
   — Sxx  [juge prob]  départ : S_xx
-    = 55 − 5·3²   ← Σx² − n·x̄²
-    = 10
+    = (−3)² + (−2)² + (−1)² + 0² + 1² + 2² + 3²   ← Σ(xᵢ − x̄)²
+    = 28
   — Sxy  [juge prob]  départ : S_xy
-    = 128 − 5·3·8   ← Σxy − n·x̄·ȳ
-    = 8
+    = (−3)·0 + (−2)·(−3) + (−1)·(−1) + 0·1 + 1·3 + 2·(−1) + 3·1   ← Σ(xᵢ − x̄)(yᵢ − ȳ)
+    = 11
   — β̂  [juge prob]  départ : β̂
-    = 8/10   ← S_xy/S_xx
-    = 0,8
+    = 11/28   ← S_xy/S_xx
   — α̂  [juge prob]  départ : α̂
-    = 8 − 0,8·3   ← La droite passe par (x̄, ȳ)
-    = 5,6
-  aides : Centre d'abord : pente β̂ = S_xy/S_xx, puis la droite passe par (x̄, ȳ). | β̂ = 8/□ | β̂ = 0,8, α̂ = 5,6
-  pièges : p_reg_slope_swap, p_reg_sums_raw
+    = 8 − 11/28·3   ← La droite passe par (x̄, ȳ)
+    = 191/28
+  — Syy  [juge prob]  départ : S_yy
+    = 0² + (−3)² + (−1)² + 1² + 3² + (−1)² + 1²   ← Σ(yᵢ − ȳ)²
+    = 22
+  — R2  [juge prob]  départ : R²
+    = 11²/(28·22)   ← R² = r²
+    = 11/56
+  aides : Centre d'abord : pente β̂ = S_xy/S_xx, puis la droite passe par (x̄, ȳ). | β̂ = 11/□ | β̂ = 11/28, α̂ = 191/28
+  pièges : p_reg_slope_swap, p_reg_sums_raw, p_r2_r
+
+Complète la pente des moindres carrés β̂ = S_xy/S_xx (sommes centrées).
+  [code python, 3 trous]
+    | def slope(x, y):
+    |     n = len(x)
+    |     mx = sum(x) / n
+    |     my = sum(y) / n
+    |     sxx = 0.0
+    |     sxy = 0.0
+    |     for i in range(n):
+    |         sxx = sxx + ⟦(x[i] - mx) ** 2⟧
+    |         sxy = sxy + ⟦(x[i] - mx) * (y[i] - my)⟧
+    |     return ⟦sxy / sxx⟧
+    test : slope([1, 2, 3, 4], [2, 4, 5, 9]) → 2.2
+    test : slope([0, 1, 2], [1, 3, 4]) → 1.5
+    test : slope([2, 4, 6, 8, 10], [10, 8, 9, 5, 3]) → -0.85
+  pièges : p_reg_sums_raw
 
 ```
 
 ### Niveau 5
 
 ```
-On connaît x̄ = 7, ȳ = 25, s_x = 4, s_y = 10 et r = −0,5. Donne la droite de régression de y sur x (y = α̂ + β̂x), puis celle de x sur y (x = ĉ + d̂y).
+On connaît x̄ = 7, ȳ = 14, s_x = 4, s_y = 3 et r = 0,6. Donne la droite de régression de y sur x (y = α̂ + β̂x), puis celle de x sur y (x = ĉ + d̂y).
   [free, sans aide]  β̂
-    = −0,5·10/4   ← β̂ = r·s_y/s_x
-    = −1,25
+    = 0,6·3/4   ← β̂ = r·s_y/s_x
+    = 0,45
   — α̂  [juge prob]  départ : α̂
-    = 25 − (−1,25)·7   ← Par (x̄, ȳ)
-    = 33,75
+    = 14 − 0,45·7   ← Par (x̄, ȳ)
+    = 10,85
   — Droite de x sur y : pente d̂  [juge prob]  départ : d̂
-    = −0,5·4/10   ← d̂ = r·s_x/s_y, pas 1/β̂
-    = −0,2
+    = 0,6·4/3   ← d̂ = r·s_x/s_y, pas 1/β̂
+    = 0,8
   — ĉ  [juge prob]  départ : ĉ
-    = 7 − (−0,2)·25   ← Par (x̄, ȳ) aussi
-    = 12
+    = 7 − 0,8·14   ← Par (x̄, ȳ) aussi
+    = −4,2
   pièges : p_reg_x_on_y
 
-On connaît x̄ = 7, ȳ = 11, s_x = 2, s_y = 3 et r = −0,6. Donne la droite de régression de y sur x (y = α̂ + β̂x), puis celle de x sur y (x = ĉ + d̂y).
+On connaît x̄ = 4, ȳ = 38, s_x = 5, s_y = 10 et r = 0,6. Donne la droite de régression de y sur x (y = α̂ + β̂x), puis celle de x sur y (x = ĉ + d̂y).
   [free, sans aide]  β̂
-    = −0,6·3/2   ← β̂ = r·s_y/s_x
-    = −0,9
+    = 0,6·10/5   ← β̂ = r·s_y/s_x
+    = 1,2
   — α̂  [juge prob]  départ : α̂
-    = 11 − (−0,9)·7   ← Par (x̄, ȳ)
-    = 17,3
+    = 38 − 1,2·4   ← Par (x̄, ȳ)
+    = 33,2
   — Droite de x sur y : pente d̂  [juge prob]  départ : d̂
-    = −0,6·2/3   ← d̂ = r·s_x/s_y, pas 1/β̂
-    = −0,4
+    = 0,6·5/10   ← d̂ = r·s_x/s_y, pas 1/β̂
+    = 0,3
   — ĉ  [juge prob]  départ : ĉ
-    = 7 − (−0,4)·11   ← Par (x̄, ȳ) aussi
-    = 11,4
+    = 4 − 0,3·38   ← Par (x̄, ȳ) aussi
+    = −7,4
   pièges : p_reg_x_on_y
 
-On connaît x̄ = 4, ȳ = 17, s_x = 4, s_y = 3 et r = 0,5. Donne la droite de régression de y sur x (y = α̂ + β̂x), puis celle de x sur y (x = ĉ + d̂y).
+On connaît x̄ = 2, ȳ = 37, s_x = 5, s_y = 10 et r = 0,5. Donne la droite de régression de y sur x (y = α̂ + β̂x), puis celle de x sur y (x = ĉ + d̂y).
   [free, sans aide]  β̂
-    = 0,5·3/4   ← β̂ = r·s_y/s_x
-    = 0,375
+    = 0,5·10/5   ← β̂ = r·s_y/s_x
+    = 1
   — α̂  [juge prob]  départ : α̂
-    = 17 − 0,375·4   ← Par (x̄, ȳ)
-    = 15,5
+    = 37 − 1·2   ← Par (x̄, ȳ)
+    = 35
   — Droite de x sur y : pente d̂  [juge prob]  départ : d̂
-    = 0,5·4/3   ← d̂ = r·s_x/s_y, pas 1/β̂
-    = 2/3
+    = 0,5·5/10   ← d̂ = r·s_x/s_y, pas 1/β̂
+    = 0,25
   — ĉ  [juge prob]  départ : ĉ
-    = 4 − 2/3·17   ← Par (x̄, ȳ) aussi
-    = −22/3
+    = 2 − 0,25·37   ← Par (x̄, ȳ) aussi
+    = −7,25
   pièges : p_reg_x_on_y
 
 ```
@@ -13530,8 +13509,8 @@ On connaît x̄ = 4, ȳ = 17, s_x = 4, s_y = 3 et r = 0,5. Donne la droite de r�
 ### Variantes d'examen
 
 ```
-Données : x : 0, 1, 2, 3 ; y : 5, 4, 8, 7. Quelle est la pente β̂ de la droite des moindres carrés de y sur x ?
-  · 41/14 [p_reg_sums_raw]   · 1/2 [p_reg_slope_swap]   ✔ 1   · 2
+Données : x : 2, 3, 4, 5 ; y : 14, 12, 8, 10. Quelle est la pente β̂ de la droite des moindres carrés de y sur x ?
+  · −0,4 [p_reg_slope_swap]   · 2,7037 [p_reg_sums_raw]   · −3,2   ✔ −1,6
   [examen mcq]
   pièges : p_reg_slope_swap, p_reg_sums_raw
 
@@ -13539,9 +13518,9 @@ Vrai ou faux ?
   « La droite des moindres carrés de y sur x passe par le point (x̄, ȳ). » → VRAI
   [examen tf]
 
-Données : x : 3, 4, 5, 6, 7, 8, 9 ; y : 2, 0, 0, 5, 4, 5, 5. Calcule la pente β̂ de la droite des moindres carrés.
+Données : x : 2, 3, 4, 5 ; y : 13, 11, 14, 10. Calcule la pente β̂ de la droite des moindres carrés.
   [free, sans aide, examen coef]  β̂
-    = 23/28   ← S_xy/S_xx
+    = −3/5   ← S_xy/S_xx
   pièges : p_reg_slope_swap, p_reg_sums_raw
 
 ```
@@ -13553,221 +13532,220 @@ _Tests t et intervalles sur les coefficients d'une régression, avec σ̂² = RS
 ### Niveau 1
 
 ```
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 4,5, ȳ = 9, S_xx = 17,5, S_xy = −9, S_yy = 10, β̂ = −18/35. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 8, x̄ = 3,5, ȳ = 5, S_xx = 42, S_xy = 8, S_yy = 16, β̂ = 4/21. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
   [guided]  RSS
-    = 10 − □·(−9)   (trous : 10 − (−18/35)·(−9))   ← Somme des carrés des résidus
-    = □   (trous : 5,371)
+    = 16 − □·8   (trous : 16 − (4/21)·8)   ← Somme des carrés des résidus
+    = □   (trous : 14,476)
   — σ̂2  [juge stat]  départ : σ̂²
-    = 5,371/□   (trous : 5,371/4)   ← Deux paramètres estimés : n − 2
-    = 1,343
+    = 14,476/6   ← Deux paramètres estimés : n − 2
+    = 2,413
   — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(1,343/□)   (trous : √(1,343/17,5))   ← Erreur standard de β̂
-    = □   (trous : 0,277)
-  — tobs  [juge stat]  départ : t_obs
-    = (−18/35)/□   (trous : (−18/35)/0,277)   ← Sous H₀ : β = 0
-    = □   (trous : −1,86)
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 4)   ← ν = n − 2
-  — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,776)   ← Table 3, ν = 4, colonne s₅
-  — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    (Décision au niveau 5 % ? Ne pas rejeter H₀, car |t_obs| = 1,86 ≤ 2,776.)
-    = [−1,28 ; 0,25]   ← β̂ ± 2,776·0,277 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = −1,86
-  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 8, x̄ = 3,5, ȳ = 3, S_xx = 42, S_xy = −1, S_yy = 42, β̂ = −1/42. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
-  [guided]  RSS
-    = 42 − □·(−1)   (trous : 42 − (−1/42)·(−1))   ← Somme des carrés des résidus
-    = □   (trous : 41,976)
-  — σ̂2  [juge stat]  départ : σ̂²
-    = 41,976/6   ← Deux paramètres estimés : n − 2
-    = 6,996
-  — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(6,996/□)   (trous : √(6,996/42))   ← Erreur standard de β̂
-    = □   (trous : 0,408)
-  — tobs  [juge stat]  départ : t_obs
-    = (−1/42)/□   (trous : (−1/42)/0,408)   ← Sous H₀ : β = 0
-    = □   (trous : −0,06)
-  — ν  [juge prob]  départ : ν
-    = □   (trous : 6)   ← ν = n − 2
-  — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,447)   ← Table 3, ν = 6, colonne s₅
-  — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    (Décision au niveau 5 % ? Ne pas rejeter H₀, car |t_obs| = 0,06 ≤ 2,447.)
-    = [−1,02 ; 0,97]   ← β̂ ± 2,447·0,408 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/6, se = √(σ̂²/…) | t_obs = −0,06
-  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
-
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 8, x̄ = 5,5, ȳ = 10, S_xx = 42, S_xy = 3, S_yy = 22, β̂ = 1/14. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
-  [guided]  RSS
-    = 22 − □·3   (trous : 22 − (1/14)·3)   ← Somme des carrés des résidus
-    = □   (trous : 21,786)
-  — σ̂2  [juge stat]  départ : σ̂²
-    = 21,786/6   ← Deux paramètres estimés : n − 2
-    = 3,631
-  — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(3,631/□)   (trous : √(3,631/42))   ← Erreur standard de β̂
-    = □   (trous : 0,294)
-  — tobs  [juge stat]  départ : t_obs
-    = (1/14)/□   (trous : (1/14)/0,294)   ← Sous H₀ : β = 0
+    = √(2,413/□)   (trous : √(2,413/42))   ← Erreur standard de β̂
     = □   (trous : 0,24)
+  — tobs  [juge stat]  départ : t_obs
+    = (4/21)/□   (trous : (4/21)/0,24)   ← Sous H₀ : β = 0
+    = □   (trous : 0,79)
   — ν  [juge prob]  départ : ν
     = □   (trous : 6)   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
     = □   (trous : 2,447)   ← Table 3, ν = 6, colonne s₅
   — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    (Décision au niveau 5 % ? Ne pas rejeter H₀, car |t_obs| = 0,24 ≤ 2,447.)
-    = [−0,65 ; 0,79]   ← β̂ ± 2,447·0,294 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/6, se = √(σ̂²/…) | t_obs = 0,24
+    (Décision au niveau 5 % ? Ne pas rejeter H₀, car |t_obs| = 0,79 ≤ 2,447.)
+    = [−0,4 ; 0,78]   ← β̂ ± 2,447·0,24 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/6, se = √(σ̂²/…) | t_obs = 0,79
+  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 8, x̄ = 5,5, ȳ = 15, S_xx = 42, S_xy = −19, S_yy = 54, β̂ = −19/42. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+  [guided]  RSS
+    = 54 − □·(−19)   (trous : 54 − (−19/42)·(−19))   ← Somme des carrés des résidus
+    = □   (trous : 45,405)
+  — σ̂2  [juge stat]  départ : σ̂²
+    = 45,405/□   (trous : 45,405/6)   ← Deux paramètres estimés : n − 2
+    = 7,568
+  — se(β̂)  [juge stat]  départ : se(β̂)
+    = √(7,568/□)   (trous : √(7,568/42))   ← Erreur standard de β̂
+    = □   (trous : 0,424)
+  — tobs  [juge stat]  départ : t_obs
+    = (−19/42)/□   (trous : (−19/42)/0,424)   ← Sous H₀ : β = 0
+    = □   (trous : −1,07)
+  — ν  [juge prob]  départ : ν
+    = □   (trous : 6)   ← ν = n − 2
+  — tc  [juge stat]  départ : t_c
+    = □   (trous : 2,447)   ← Table 3, ν = 6, colonne s₅
+  — IC à 95 % pour β  [juge stat]  départ : IC(β)
+    (Décision au niveau 5 % ? Ne pas rejeter H₀, car |t_obs| = 1,07 ≤ 2,447.)
+    = [−1,49 ; 0,59]   ← β̂ ± 2,447·0,424 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/6, se = √(σ̂²/…) | t_obs = −1,07
   pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_accept_h0
+
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 7, x̄ = 5, ȳ = 15, S_xx = 28, S_xy = −5, S_yy = 12, β̂ = −5/28. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+  [guided]  RSS
+    = 12 − □·(−5)   (trous : 12 − (−5/28)·(−5))   ← Somme des carrés des résidus
+    = □   (trous : 11,107)
+  — σ̂2  [juge stat]  départ : σ̂²
+    = 11,107/□   (trous : 11,107/5)   ← Deux paramètres estimés : n − 2
+    = 2,221
+  — se(β̂)  [juge stat]  départ : se(β̂)
+    = √(2,221/□)   (trous : √(2,221/28))   ← Erreur standard de β̂
+    = □   (trous : 0,282)
+  — tobs  [juge stat]  départ : t_obs
+    = (−5/28)/□   (trous : (−5/28)/0,282)   ← Sous H₀ : β = 0
+    = □   (trous : −0,63)
+  — ν  [juge prob]  départ : ν
+    = □   (trous : 5)   ← ν = n − 2
+  — tc  [juge stat]  départ : t_c
+    = □   (trous : 2,571)   ← Table 3, ν = 5, colonne s₅
+  — IC à 95 % pour β  [juge stat]  départ : IC(β)
+    (Décision au niveau 5 % ? Ne pas rejeter H₀, car |t_obs| = 0,63 ≤ 2,571.)
+    = [−0,9 ; 0,55]   ← β̂ ± 2,571·0,282 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/5, se = √(σ̂²/…) | t_obs = −0,63
+  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
 ### Niveau 2
 
 ```
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 2,5, ȳ = 15, S_xx = 17,5, S_xy = 5, S_yy = 38, β̂ = 2/7. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 5, x̄ = 4, ȳ = 12, S_xx = 10, S_xy = −2, S_yy = 16, β̂ = −0,2. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
   [guided]  RSS
-    = 38 − □·5   (trous : 38 − (2/7)·5)   ← Somme des carrés des résidus
-    = □   (trous : 36,571)
+    = 16 − □·(−2)   (trous : 16 − (−0,2)·(−2))   ← Somme des carrés des résidus
+    = □   (trous : 15,6)
   — σ̂2  [juge stat]  départ : σ̂²
-    = 36,571/□   (trous : 36,571/4)   ← Deux paramètres estimés : n − 2
-    = 9,143
+    = 15,6/□   (trous : 15,6/3)   ← Deux paramètres estimés : n − 2
+    = 5,2
   — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(9,143/□)   (trous : √(9,143/17,5))   ← Erreur standard de β̂
-    = □   (trous : 0,723)
+    = √(5,2/□)   (trous : √(5,2/10))   ← Erreur standard de β̂
+    = □   (trous : 0,721)
   — tobs  [juge stat]  départ : t_obs
-    = (2/7)/□   (trous : (2/7)/0,723)   ← Sous H₀ : β = 0
-    = □   (trous : 0,4)
+    = (−0,2)/□   (trous : (−0,2)/0,721)   ← Sous H₀ : β = 0
+    = □   (trous : −0,28)
   — ν  [juge prob]  départ : ν
-    = □   (trous : 4)   ← ν = n − 2
+    = □   (trous : 3)   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,776)   ← Table 3, ν = 4, colonne s₅
+    = □   (trous : 3,182)   ← Table 3, ν = 3, colonne s₅
   — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 0,4 > 2,776 / ✔ Ne pas rejeter H₀, car |t_obs| = 0,4 ≤ 2,776
-    = [−1,72 ; 2,29]   ← β̂ ± 2,776·0,723 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = 0,4
+    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 0,28 > 3,182 / ✔ Ne pas rejeter H₀, car |t_obs| = 0,28 ≤ 3,182
+    = [−2,49 ; 2,09]   ← β̂ ± 3,182·0,721 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/3, se = √(σ̂²/…) | t_obs = −0,28
   pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 2,5, ȳ = 7, S_xx = 17,5, S_xy = −20, S_yy = 26, β̂ = −8/7. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 5, x̄ = 3, ȳ = 12, S_xx = 10, S_xy = 10, S_yy = 20, β̂ = 1. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
   [guided]  RSS
-    = 26 − □·(−20)   (trous : 26 − (−8/7)·(−20))   ← Somme des carrés des résidus
-    = □   (trous : 3,143)
+    = 20 − □·10   (trous : 20 − 1·10)   ← Somme des carrés des résidus
+    = □   (trous : 10)
   — σ̂2  [juge stat]  départ : σ̂²
-    = 3,143/4   ← Deux paramètres estimés : n − 2
-    = 0,786
+    = 10/□   (trous : 10/3)   ← Deux paramètres estimés : n − 2
   — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(0,786/□)   (trous : √(0,786/17,5))   ← Erreur standard de β̂
-    = □   (trous : 0,212)
+    = √(3,333/□)   (trous : √(3,333/10))   ← Erreur standard de β̂
+    = □   (trous : 0,577)
   — tobs  [juge stat]  départ : t_obs
-    = (−8/7)/□   (trous : (−8/7)/0,212)   ← Sous H₀ : β = 0
-    = □   (trous : −5,39)
+    = 1/□   (trous : 1/0,577)   ← Sous H₀ : β = 0
+    = □   (trous : 1,73)
   — ν  [juge prob]  départ : ν
-    = □   (trous : 4)   ← ν = n − 2
+    = □   (trous : 3)   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,776)   ← Table 3, ν = 4, colonne s₅
+    = □   (trous : 3,182)   ← Table 3, ν = 3, colonne s₅
   — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : β = 0, car |t_obs| = 5,39 > 2,776 / · Ne pas rejeter H₀, car |t_obs| = 5,39 ≤ 2,776
-    = [−1,73 ; −0,55]   ← β̂ ± 2,776·0,212 ; 0 est hors de l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = −5,39
-  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_ci_prob, p_pvalue_h0, p_significant_large
+    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 1,73 > 3,182 / ✔ Ne pas rejeter H₀, car |t_obs| = 1,73 ≤ 3,182
+    = [−0,84 ; 2,84]   ← β̂ ± 3,182·0,577 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/3, se = √(σ̂²/…) | t_obs = 1,73
+  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 2,5, ȳ = 6, S_xx = 17,5, S_xy = 5, S_yy = 28, β̂ = 2/7. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 5, x̄ = 3, ȳ = 7, S_xx = 10, S_xy = −4, S_yy = 20, β̂ = −0,4. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
   [guided]  RSS
-    = 28 − □·5   (trous : 28 − (2/7)·5)   ← Somme des carrés des résidus
-    = □   (trous : 26,571)
+    = 20 − □·(−4)   (trous : 20 − (−0,4)·(−4))   ← Somme des carrés des résidus
+    = □   (trous : 18,4)
   — σ̂2  [juge stat]  départ : σ̂²
-    = 26,571/□   (trous : 26,571/4)   ← Deux paramètres estimés : n − 2
-    = 6,643
+    = 18,4/□   (trous : 18,4/3)   ← Deux paramètres estimés : n − 2
+    = 6,133
   — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(6,643/□)   (trous : √(6,643/17,5))   ← Erreur standard de β̂
-    = □   (trous : 0,616)
+    = √(6,133/□)   (trous : √(6,133/10))   ← Erreur standard de β̂
+    = □   (trous : 0,783)
   — tobs  [juge stat]  départ : t_obs
-    = (2/7)/□   (trous : (2/7)/0,616)   ← Sous H₀ : β = 0
-    = □   (trous : 0,46)
+    = (−0,4)/□   (trous : (−0,4)/0,783)   ← Sous H₀ : β = 0
+    = □   (trous : −0,51)
   — ν  [juge prob]  départ : ν
-    = □   (trous : 4)   ← ν = n − 2
+    = □   (trous : 3)   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
-    = □   (trous : 2,776)   ← Table 3, ν = 4, colonne s₅
+    = □   (trous : 3,182)   ← Table 3, ν = 3, colonne s₅
   — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 0,46 > 2,776 / ✔ Ne pas rejeter H₀, car |t_obs| = 0,46 ≤ 2,776
-    = [−1,42 ; 2]   ← β̂ ± 2,776·0,616 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = 0,46
-  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_accept_h0
+    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 0,51 > 3,182 / ✔ Ne pas rejeter H₀, car |t_obs| = 0,51 ≤ 3,182
+    = [−2,89 ; 2,09]   ← β̂ ± 3,182·0,783 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/3, se = √(σ̂²/…) | t_obs = −0,51
+  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
 ### Niveau 3
 
 ```
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 4,5, ȳ = 13, S_xx = 17,5, S_xy = 13, S_yy = 22, β̂ = 26/35. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 5, x̄ = 2, ȳ = 9, S_xx = 10, S_xy = 9, S_yy = 18, β̂ = 0,9. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
   [tap, suivre l'erreur, menu menu]  RSS
-    = 22 − (26/35)·13   ← Somme des carrés des résidus
-    = 12,343
+    = 18 − 0,9·9   ← Somme des carrés des résidus
+    = 9,9
   — σ̂2  [juge stat]  départ : σ̂²
-    = 12,343/4   ← Deux paramètres estimés : n − 2
-    = 3,086
+    = 9,9/3   ← Deux paramètres estimés : n − 2
+    = 3,3
   — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(3,086/17,5)   ← Erreur standard de β̂
-    = 0,42
+    = √(3,3/10)   ← Erreur standard de β̂
+    = 0,574
   — tobs  [juge stat]  départ : t_obs
-    = (26/35)/0,42   ← Sous H₀ : β = 0
-    = 1,77
+    = 0,9/0,574   ← Sous H₀ : β = 0
+    = 1,57
   — ν  [juge prob]  départ : ν
-    = 4   ← ν = n − 2
+    = 3   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
-    = 2,776   ← Table 3, ν = 4, colonne s₅
+    = 3,182   ← Table 3, ν = 3, colonne s₅
   — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 1,77 > 2,776 / ✔ Ne pas rejeter H₀, car |t_obs| = 1,77 ≤ 2,776
-    = [−0,42 ; 1,91]   ← β̂ ± 2,776·0,42 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = 1,77
+    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 1,57 > 3,182 / ✔ Ne pas rejeter H₀, car |t_obs| = 1,57 ≤ 3,182
+    = [−0,93 ; 2,73]   ← β̂ ± 3,182·0,574 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/3, se = √(σ̂²/…) | t_obs = 1,57
   pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_accept_h0
 
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 7, x̄ = 5, ȳ = 13, S_xx = 28, S_xy = 2, S_yy = 34, β̂ = 1/14. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 5, x̄ = 4, ȳ = 10, S_xx = 10, S_xy = 7, S_yy = 20, β̂ = 0,7. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
   [tap, suivre l'erreur, menu menu]  RSS
-    = 34 − (1/14)·2   ← Somme des carrés des résidus
-    = 33,857
+    = 20 − 0,7·7   ← Somme des carrés des résidus
+    = 15,1
   — σ̂2  [juge stat]  départ : σ̂²
-    = 33,857/5   ← Deux paramètres estimés : n − 2
-    = 6,771
+    = 15,1/3   ← Deux paramètres estimés : n − 2
+    = 5,033
   — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(6,771/28)   ← Erreur standard de β̂
-    = 0,492
+    = √(5,033/10)   ← Erreur standard de β̂
+    = 0,709
   — tobs  [juge stat]  départ : t_obs
-    = (1/14)/0,492   ← Sous H₀ : β = 0
-    = 0,15
+    = 0,7/0,709   ← Sous H₀ : β = 0
+    = 0,99
   — ν  [juge prob]  départ : ν
-    = 5   ← ν = n − 2
+    = 3   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
-    = 2,571   ← Table 3, ν = 5, colonne s₅
+    = 3,182   ← Table 3, ν = 3, colonne s₅
   — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 0,15 > 2,571 / ✔ Ne pas rejeter H₀, car |t_obs| = 0,15 ≤ 2,571
-    = [−1,19 ; 1,34]   ← β̂ ± 2,571·0,492 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/5, se = √(σ̂²/…) | t_obs = 0,15
-  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_accept_h0
+    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 0,99 > 3,182 / ✔ Ne pas rejeter H₀, car |t_obs| = 0,99 ≤ 3,182
+    = [−1,56 ; 2,96]   ← β̂ ± 3,182·0,709 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/3, se = √(σ̂²/…) | t_obs = 0,99
+  pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 7, x̄ = 4, ȳ = 9, S_xx = 28, S_xy = −4, S_yy = 32, β̂ = −1/7. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 8, x̄ = 6,5, ȳ = 7, S_xx = 42, S_xy = 27, S_yy = 42, β̂ = 9/14. Teste H₀ : β = 0 contre H₁ : β ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour β.
   [tap, suivre l'erreur, menu menu]  RSS
-    = 32 − (−1/7)·(−4)   ← Somme des carrés des résidus
-    = 31,429
+    = 42 − (9/14)·27   ← Somme des carrés des résidus
+    = 24,643
   — σ̂2  [juge stat]  départ : σ̂²
-    = 31,429/5   ← Deux paramètres estimés : n − 2
-    = 6,286
+    = 24,643/6   ← Deux paramètres estimés : n − 2
+    = 4,107
   — se(β̂)  [juge stat]  départ : se(β̂)
-    = √(6,286/28)   ← Erreur standard de β̂
-    = 0,474
+    = √(4,107/42)   ← Erreur standard de β̂
+    = 0,313
   — tobs  [juge stat]  départ : t_obs
-    = (−1/7)/0,474   ← Sous H₀ : β = 0
-    = −0,3
+    = (9/14)/0,313   ← Sous H₀ : β = 0
+    = 2,05
   — ν  [juge prob]  départ : ν
-    = 5   ← ν = n − 2
+    = 6   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
-    = 2,571   ← Table 3, ν = 5, colonne s₅
+    = 2,447   ← Table 3, ν = 6, colonne s₅
   — IC à 95 % pour β  [juge stat]  départ : IC(β)
-    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 0,3 > 2,571 / ✔ Ne pas rejeter H₀, car |t_obs| = 0,3 ≤ 2,571
-    = [−1,36 ; 1,08]   ← β̂ ± 2,571·0,474 ; 0 est dans l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/5, se = √(σ̂²/…) | t_obs = −0,3
+    ? Décision au niveau 5 % ? · Rejeter H₀ : β = 0, car |t_obs| = 2,05 > 2,447 / ✔ Ne pas rejeter H₀, car |t_obs| = 2,05 ≤ 2,447
+    = [−0,12 ; 1,41]   ← β̂ ± 2,447·0,313 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/6, se = √(σ̂²/…) | t_obs = 2,06
   pièges : p_reg_sigma_n, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
@@ -13775,218 +13753,218 @@ Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 7, x̄
 ### Niveau 4
 
 ```
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 4,5, ȳ = 10, S_xx = 17,5, S_xy = −9, S_yy = 38, β̂ = −18/35, α̂ = 431/35. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 4,5, ȳ = 14, S_xx = 17,5, S_xy = −4, S_yy = 28, β̂ = −8/35, α̂ = 526/35. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α.
   [free, suivre l'erreur]  RSS
-    = 38 − (−18/35)·(−9)   ← Somme des carrés des résidus
-    = 33,371
+    = 28 − (−8/35)·(−4)   ← Somme des carrés des résidus
+    = 27,086
   — σ̂2  [juge stat]  départ : σ̂²
-    = 33,371/4   ← Deux paramètres estimés : n − 2
-    = 8,343
+    = 27,086/4   ← Deux paramètres estimés : n − 2
+    = 6,772
   — se(α̂)  [juge stat]  départ : se(α̂)
-    = √(8,343·(1/6 + 4,5²/17,5))   ← Erreur standard de α̂
-    = 3,323
+    = √(6,772·(1/6 + 4,5²/17,5))   ← Erreur standard de α̂
+    = 2,994
   — tobs  [juge stat]  départ : t_obs
-    = (431/35)/3,323   ← Sous H₀ : α = 0
-    = 3,71
+    = (526/35)/2,994   ← Sous H₀ : α = 0
+    = 5,02
   — ν  [juge prob]  départ : ν
     = 4   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
     = 2,776   ← Table 3, ν = 4, colonne s₅
   — IC à 95 % pour α  [juge stat]  départ : IC(α)
-    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 3,71 > 2,776 / · Ne pas rejeter H₀, car |t_obs| = 3,71 ≤ 2,776
-    = [3,09 ; 21,54]   ← α̂ ± 2,776·3,323 ; 0 est hors de l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = 3,71
-  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_significant_large, p_pvalue_h0, p_ci_prob
-
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 7, x̄ = 3, ȳ = 14, S_xx = 28, S_xy = −8, S_yy = 26, β̂ = −2/7, α̂ = 104/7. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α.
-  [free, suivre l'erreur]  RSS
-    = 26 − (−2/7)·(−8)   ← Somme des carrés des résidus
-    = 23,714
-  — σ̂2  [juge stat]  départ : σ̂²
-    = 23,714/5   ← Deux paramètres estimés : n − 2
-    = 4,743
-  — se(α̂)  [juge stat]  départ : se(α̂)
-    = √(4,743·(1/7 + 3²/28))   ← Erreur standard de α̂
-    = 1,484
-  — tobs  [juge stat]  départ : t_obs
-    = (104/7)/1,484   ← Sous H₀ : α = 0
-    = 10,01
-  — ν  [juge prob]  départ : ν
-    = 5   ← ν = n − 2
-  — tc  [juge stat]  départ : t_c
-    = 2,571   ← Table 3, ν = 5, colonne s₅
-  — IC à 95 % pour α  [juge stat]  départ : IC(α)
-    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 10,01 > 2,571 / · Ne pas rejeter H₀, car |t_obs| = 10,01 ≤ 2,571
-    = [11,04 ; 18,67]   ← α̂ ± 2,571·1,484 ; 0 est hors de l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/5, se = √(σ̂²/…) | t_obs = 10,01
+    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 5,02 > 2,776 / · Ne pas rejeter H₀, car |t_obs| = 5,02 ≤ 2,776
+    = [6,72 ; 23,34]   ← α̂ ± 2,776·2,994 ; 0 est hors de l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = 5,02
   pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_significant_large, p_ci_prob, p_pvalue_h0
 
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 2,5, ȳ = 14, S_xx = 17,5, S_xy = 4, S_yy = 22, β̂ = 8/35, α̂ = 94/7. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α.
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 5, x̄ = 5, ȳ = 8, S_xx = 10, S_xy = −4, S_yy = 16, β̂ = −0,4, α̂ = 10. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α.
   [free, suivre l'erreur]  RSS
-    = 22 − (8/35)·4   ← Somme des carrés des résidus
-    = 21,086
+    = 16 − (−0,4)·(−4)   ← Somme des carrés des résidus
+    = 14,4
   — σ̂2  [juge stat]  départ : σ̂²
-    = 21,086/4   ← Deux paramètres estimés : n − 2
-    = 5,272
+    = 14,4/3   ← Deux paramètres estimés : n − 2
+    = 4,8
   — se(α̂)  [juge stat]  départ : se(α̂)
-    = √(5,272·(1/6 + 2,5²/17,5))   ← Erreur standard de α̂
-    = 1,662
+    = √(4,8·(1/5 + 5²/10))   ← Erreur standard de α̂
+    = 3,6
   — tobs  [juge stat]  départ : t_obs
-    = (94/7)/1,662   ← Sous H₀ : α = 0
-    = 8,08
+    = 10/3,6   ← Sous H₀ : α = 0
+    = 2,78
+  — ν  [juge prob]  départ : ν
+    = 3   ← ν = n − 2
+  — tc  [juge stat]  départ : t_c
+    = 3,182   ← Table 3, ν = 3, colonne s₅
+  — IC à 95 % pour α  [juge stat]  départ : IC(α)
+    ? Décision au niveau 5 % ? · Rejeter H₀ : α = 0, car |t_obs| = 2,78 > 3,182 / ✔ Ne pas rejeter H₀, car |t_obs| = 2,78 ≤ 3,182
+    = [−1,46 ; 21,46]   ← α̂ ± 3,182·3,6 ; 0 est dans l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/3, se = √(σ̂²/…) | t_obs = 2,78
+  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
+
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 2,5, ȳ = 9, S_xx = 17,5, S_xy = 5, S_yy = 28, β̂ = 2/7, α̂ = 58/7. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α.
+  [free, suivre l'erreur]  RSS
+    = 28 − (2/7)·5   ← Somme des carrés des résidus
+    = 26,571
+  — σ̂2  [juge stat]  départ : σ̂²
+    = 26,571/4   ← Deux paramètres estimés : n − 2
+    = 6,643
+  — se(α̂)  [juge stat]  départ : se(α̂)
+    = √(6,643·(1/6 + 2,5²/17,5))   ← Erreur standard de α̂
+    = 1,865
+  — tobs  [juge stat]  départ : t_obs
+    = (58/7)/1,865   ← Sous H₀ : α = 0
+    = 4,44
   — ν  [juge prob]  départ : ν
     = 4   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
     = 2,776   ← Table 3, ν = 4, colonne s₅
   — IC à 95 % pour α  [juge stat]  départ : IC(α)
-    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 8,08 > 2,776 / · Ne pas rejeter H₀, car |t_obs| = 8,08 ≤ 2,776
-    = [8,81 ; 18,04]   ← α̂ ± 2,776·1,662 ; 0 est hors de l'IC
-  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = 8,08
-  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_significant_large, p_pvalue_h0, p_ci_prob
+    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 4,44 > 2,776 / · Ne pas rejeter H₀, car |t_obs| = 4,44 ≤ 2,776
+    = [3,11 ; 13,46]   ← α̂ ± 2,776·1,865 ; 0 est hors de l'IC
+  aides : σ̂² = RSS/(n − 2) : deux paramètres estimés. Puis t_obs = estimation/se, comparé à s₅(n − 2). | σ̂² = RSS/4, se = √(σ̂²/…) | t_obs = 4,44
+  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_ci_prob, p_pvalue_h0, p_significant_large
 
 ```
 
 ### Niveau 5
 
 ```
-Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 1, 2, 3, 4, 5, 6, 7 ; y : 17, 13, 12, 13, 18, 15, 17 ; résumés : n = 7, x̄ = 4, ȳ = 15, S_xx = 28, S_xy = 10, S_yy = 34. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
+Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 2, 3, 4, 5, 6, 7 ; y : 10, 14, 11, 15, 13, 15 ; résumés : n = 6, x̄ = 4,5, ȳ = 13, S_xx = 17,5, S_xy = 13, S_yy = 22. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
   [free, sans aide]  β̂
-    = (10)/(28)   ← S_xy/S_xx
-    = 0,357
+    = (13)/(17,5)   ← S_xy/S_xx
+    = 0,743
   — α̂  [juge stat]  départ : α̂
-    = 15 − 0,357·4
-    = 13,57
+    = 13 − 0,743·4,5
+    = 9,66
   — RSS  [juge stat]  départ : RSS
-    = 34 − 0,357·10   ← Somme des carrés des résidus
-    = 30,43
+    = 22 − 0,743·13   ← Somme des carrés des résidus
+    = 12,341
   — σ̂2  [juge stat]  départ : σ̂²
-    = 30,43/5   ← Deux paramètres estimés : n − 2
-    = 6,086
+    = 12,341/4   ← Deux paramètres estimés : n − 2
+    = 3,085
   — se(α̂)  [juge stat]  départ : se(α̂)
-    = √(6,086·(1/7 + 4²/28))   ← Erreur standard de α̂
-    = 2,085
+    = √(3,085·(1/6 + 4,5²/17,5))   ← Erreur standard de α̂
+    = 2,021
   — tobs  [juge stat]  départ : t_obs
-    = 13,57/2,085   ← Sous H₀ : α = 0
-    = 6,51
+    = 9,66/2,021   ← Sous H₀ : α = 0
+    = 4,78
+  — ν  [juge prob]  départ : ν
+    = 4   ← ν = n − 2
+  — tc  [juge stat]  départ : t_c
+    = 2,776   ← Table 3, ν = 4, colonne s₅
+  — IC à 95 % pour α  [juge stat]  départ : IC(α)
+    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 4,78 > 2,776 / · Ne pas rejeter H₀, car |t_obs| = 4,78 ≤ 2,776
+    = [4,05 ; 15,27]   ← α̂ ± 2,776·2,021 ; 0 est hors de l'IC
+  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_ci_prob, p_significant_large, p_pvalue_h0
+
+Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 2, 3, 4, 5, 6, 7 ; y : 16, 12, 10, 15, 14, 11 ; résumés : n = 6, x̄ = 4,5, ȳ = 13, S_xx = 17,5, S_xy = −7, S_yy = 28. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
+  [free, sans aide]  β̂
+    = (−7)/(17,5)   ← S_xy/S_xx
+    = −0,4
+  — α̂  [juge stat]  départ : α̂
+    = 13 − (−0,4)·4,5
+    = 14,8
+  — RSS  [juge stat]  départ : RSS
+    = 28 − (−0,4)·(−7)   ← Somme des carrés des résidus
+    = 25,2
+  — σ̂2  [juge stat]  départ : σ̂²
+    = 25,2/4   ← Deux paramètres estimés : n − 2
+    = 6,3
+  — se(α̂)  [juge stat]  départ : se(α̂)
+    = √(6,3·(1/6 + 4,5²/17,5))   ← Erreur standard de α̂
+    = 2,888
+  — tobs  [juge stat]  départ : t_obs
+    = 14,8/2,888   ← Sous H₀ : α = 0
+    = 5,12
+  — ν  [juge prob]  départ : ν
+    = 4   ← ν = n − 2
+  — tc  [juge stat]  départ : t_c
+    = 2,776   ← Table 3, ν = 4, colonne s₅
+  — IC à 95 % pour α  [juge stat]  départ : IC(α)
+    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 5,12 > 2,776 / · Ne pas rejeter H₀, car |t_obs| = 5,12 ≤ 2,776
+    = [6,78 ; 22,82]   ← α̂ ± 2,776·2,888 ; 0 est hors de l'IC
+  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_ci_prob, p_significant_large
+
+Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 1, 2, 3, 4, 5, 6, 7 ; y : 10, 12, 13, 14, 16, 10, 16 ; résumés : n = 7, x̄ = 4, ȳ = 13, S_xx = 28, S_xy = 17, S_yy = 38. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
+  [free, sans aide]  β̂
+    = (17)/(28)   ← S_xy/S_xx
+    = 0,607
+  — α̂  [juge stat]  départ : α̂
+    = 13 − 0,607·4
+    = 10,57
+  — RSS  [juge stat]  départ : RSS
+    = 38 − 0,607·17   ← Somme des carrés des résidus
+    = 27,681
+  — σ̂2  [juge stat]  départ : σ̂²
+    = 27,681/5   ← Deux paramètres estimés : n − 2
+    = 5,536
+  — se(α̂)  [juge stat]  départ : se(α̂)
+    = √(5,536·(1/7 + 4²/28))   ← Erreur standard de α̂
+    = 1,989
+  — tobs  [juge stat]  départ : t_obs
+    = 10,57/1,989   ← Sous H₀ : α = 0
+    = 5,31
   — ν  [juge prob]  départ : ν
     = 5   ← ν = n − 2
   — tc  [juge stat]  départ : t_c
     = 2,571   ← Table 3, ν = 5, colonne s₅
   — IC à 95 % pour α  [juge stat]  départ : IC(α)
-    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 6,51 > 2,571 / · Ne pas rejeter H₀, car |t_obs| = 6,51 ≤ 2,571
-    = [8,21 ; 18,93]   ← α̂ ± 2,571·2,085 ; 0 est hors de l'IC
-  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_ci_prob, p_pvalue_h0, p_significant_large
-
-Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 0, 1, 2, 3, 4 ; y : 7, 10, 7, 9, 7 ; résumés : n = 5, x̄ = 2, ȳ = 8, S_xx = 10, S_xy = −1, S_yy = 8. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
-  [free, sans aide]  β̂
-    = (−1)/(10)   ← S_xy/S_xx
-    = −0,1
-  — α̂  [juge stat]  départ : α̂
-    = 8 − (−0,1)·2
-    = 8,2
-  — RSS  [juge stat]  départ : RSS
-    = 8 − (−0,1)·(−1)   ← Somme des carrés des résidus
-    = 7,9
-  — σ̂2  [juge stat]  départ : σ̂²
-    = 7,9/3   ← Deux paramètres estimés : n − 2
-    = 2,633
-  — se(α̂)  [juge stat]  départ : se(α̂)
-    = √(2,633·(1/5 + 2²/10))   ← Erreur standard de α̂
-    = 1,257
-  — tobs  [juge stat]  départ : t_obs
-    = 8,2/1,257   ← Sous H₀ : α = 0
-    = 6,52
-  — ν  [juge prob]  départ : ν
-    = 3   ← ν = n − 2
-  — tc  [juge stat]  départ : t_c
-    = 3,182   ← Table 3, ν = 3, colonne s₅
-  — IC à 95 % pour α  [juge stat]  départ : IC(α)
-    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 6,52 > 3,182 / · Ne pas rejeter H₀, car |t_obs| = 6,52 ≤ 3,182
-    = [4,2 ; 12,2]   ← α̂ ± 3,182·1,257 ; 0 est hors de l'IC
-  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_significant_large, p_ci_prob
-
-Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 2, 3, 4, 5, 6, 7, 8 ; y : 7, 10, 11, 7, 10, 9, 9 ; résumés : n = 7, x̄ = 5, ȳ = 9, S_xx = 28, S_xy = 3, S_yy = 14. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
-  [free, sans aide]  β̂
-    = (3)/(28)   ← S_xy/S_xx
-    = 0,107
-  — α̂  [juge stat]  départ : α̂
-    = 9 − 0,107·5
-    = 8,47
-  — RSS  [juge stat]  départ : RSS
-    = 14 − 0,107·3   ← Somme des carrés des résidus
-    = 13,679
-  — σ̂2  [juge stat]  départ : σ̂²
-    = 13,679/5   ← Deux paramètres estimés : n − 2
-    = 2,736
-  — se(α̂)  [juge stat]  départ : se(α̂)
-    = √(2,736·(1/7 + 5²/28))   ← Erreur standard de α̂
-    = 1,683
-  — tobs  [juge stat]  départ : t_obs
-    = 8,47/1,683   ← Sous H₀ : α = 0
-    = 5,03
-  — ν  [juge prob]  départ : ν
-    = 5   ← ν = n − 2
-  — tc  [juge stat]  départ : t_c
-    = 2,571   ← Table 3, ν = 5, colonne s₅
-  — IC à 95 % pour α  [juge stat]  départ : IC(α)
-    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 5,03 > 2,571 / · Ne pas rejeter H₀, car |t_obs| = 5,03 ≤ 2,571
-    = [4,14 ; 12,8]   ← α̂ ± 2,571·1,683 ; 0 est hors de l'IC
-  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_significant_large, p_pvalue_h0, p_ci_prob
+    ? Décision au niveau 5 % ? ✔ Rejeter H₀ : α = 0, car |t_obs| = 5,31 > 2,571 / · Ne pas rejeter H₀, car |t_obs| = 5,31 ≤ 2,571
+    = [5,46 ; 15,68]   ← α̂ ± 2,571·1,989 ; 0 est hors de l'IC
+  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_ci_prob, p_significant_large
 
 ```
 
 ### Variantes d'examen
 
 ```
-Régression simple sur n = 6 points ; somme des carrés des résidus RSS = 642/35. Quelle est l'estimation σ̂² de la variance des erreurs ?
-  · 642/35   · 107/35 [p_reg_sigma_n]   ✔ 321/70   · 642/175 [p_reg_sigma_n]
+Régression simple sur n = 6 points ; somme des carrés des résidus RSS = 88/7. Quelle est l'estimation σ̂² de la variance des erreurs ?
+  · 44/21 [p_reg_sigma_n]   · 88/35 [p_reg_sigma_n]   ✔ 22/7   · 88/7
   [examen mcq]
   pièges : p_reg_sigma_n
 
 Vrai ou faux ?
-  « En régression simple sur n = 8 points avec RSS = 6, on estime σ² par RSS/n = 0,75. » → FAUX
-    contre-exemple (refute) : s = 1
+  « En régression simple sur n = 6 points avec RSS = 2,4, on estime σ² par RSS/n = 0,4. » → FAUX
+    contre-exemple (refute) : s = 3/5
   [examen tf]
   pièges : p_reg_sigma_n
 
-Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 6, x̄ = 2,5, ȳ = 8, S_xx = 17,5, S_xy = −12, S_yy = 16, β̂ = −24/35, α̂ = 68/7. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α. Donne t_obs (à 0,01 près).
+Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Résumés : n = 7, x̄ = 4, ȳ = 6, S_xx = 28, S_xy = −10, S_yy = 32, β̂ = −5/14, α̂ = 52/7. Teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 %, puis donne l'IC à 95 % pour α. Donne t_obs (à 0,01 près).
   [free, sans aide, examen coef]  t_obs
-    = (68/7)/1,009   ← Sous H₀ : α = 0
-    = 9,63
+    = (52/7)/2,015   ← Sous H₀ : α = 0
+    = 3,69
 
-Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 1, 2, 3, 4, 5 ; y : 6, 4, 5, 2, 3 ; résumés : n = 5, x̄ = 3, ȳ = 4, S_xx = 10, S_xy = −8, S_yy = 10. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
+Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 3, 4, 5, 6, 7, 8 ; y : 5, 0, 0, 6, 3, 4 ; résumés : n = 6, x̄ = 5,5, ȳ = 3, S_xx = 17,5, S_xy = 5, S_yy = 32. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
   [problème, examen open, 10 points]
   partie 1 (β̂ : 1 ; α̂ : 1 ; RSS : 1 ; σ̂2 : 1 ; se(α̂) : 1 ; tobs : 1 ; ν : 1 ; tc : 1 ; IC à 95 % pour α : 1)
-  Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 1, 2, 3, 4, 5 ; y : 6, 4, 5, 2, 3 ; résumés : n = 5, x̄ = 3, ȳ = 4, S_xx = 10, S_xy = −8, S_yy = 10. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
+  Un ressort s'allonge sous des masses x (en kg) ; y est l'allongement (en mm). Modèle Yᵢ = α + βxᵢ + εᵢ, εᵢ iid N(0, σ²). Données : x : 3, 4, 5, 6, 7, 8 ; y : 5, 0, 0, 6, 3, 4 ; résumés : n = 6, x̄ = 5,5, ȳ = 3, S_xx = 17,5, S_xy = 5, S_yy = 32. Calcule α̂ et β̂, puis teste H₀ : α = 0 contre H₁ : α ≠ 0 au niveau 5 % (l'élongation est-elle proportionnelle à la masse ?).
     [free, sans aide, suivre l'erreur, examen open]  β̂
-      = (−8)/(10)   ← S_xy/S_xx
-      = −0,8
+      = (5)/(17,5)   ← S_xy/S_xx
+      = 0,286
     — α̂  [juge stat]  départ : α̂
-      = 4 − (−0,8)·3
-      = 6,4
+      = 3 − 0,286·5,5
+      = 1,43
     — RSS  [juge stat]  départ : RSS
-      = 10 − (−0,8)·(−8)   ← Somme des carrés des résidus
-      = 3,6
+      = 32 − 0,286·5   ← Somme des carrés des résidus
+      = 30,57
     — σ̂2  [juge stat]  départ : σ̂²
-      = 3,6/3   ← Deux paramètres estimés : n − 2
-      = 1,2
+      = 30,57/4   ← Deux paramètres estimés : n − 2
+      = 7,643
     — se(α̂)  [juge stat]  départ : se(α̂)
-      = √(1,2·(1/5 + 3²/10))   ← Erreur standard de α̂
-      = 1,149
+      = √(7,643·(1/6 + 5,5²/17,5))   ← Erreur standard de α̂
+      = 3,806
     — tobs  [juge stat]  départ : t_obs
-      = 6,4/1,149   ← Sous H₀ : α = 0
-      = 5,57
+      = 1,43/3,806   ← Sous H₀ : α = 0
+      = 0,38
     — ν  [juge prob]  départ : ν
-      = 3   ← ν = n − 2
+      = 4   ← ν = n − 2
     — tc  [juge stat]  départ : t_c
-      = 3,182   ← Table 3, ν = 3, colonne s₅
+      = 2,776   ← Table 3, ν = 4, colonne s₅
     — IC à 95 % pour α  [juge stat]  départ : IC(α)
-      = [2,74 ; 10,06]   ← α̂ ± 3,182·1,149 ; 0 est hors de l'IC
+      = [−9,14 ; 12]   ← α̂ ± 2,776·3,806 ; 0 est dans l'IC
   partie 2 (Interpréter : 1)
   Interpréter : quelle phrase est juste ?
-    · α est dans l'IC avec probabilité 0,95. [p_ci_prob]   · Le lien est fort et important en pratique, puisque le test rejette. [p_significant_large]   · La probabilité que α = 0 est inférieure à 5 %. [p_pvalue_h0]   ✔ Au niveau 5 %, les données demandent une ordonnée à l'origine non nulle.
+    · La probabilité que α = 0 est supérieure à 95 %. [p_pvalue_h0]   · α vaut 0. [p_accept_h0]   ✔ Avec 6 points, les données ne suffisent pas à montrer une ordonnée à l'origine non nulle.   · L'élongation est exactement proportionnelle à la masse : c'est prouvé. [p_accept_h0]
     [examen open]
-  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_pvalue_h0, p_ci_prob, p_significant_large
+  pièges : p_reg_sigma_n, p_reg_se_alpha, p_df_wrong, p_pvalue_alpha_compare, p_accept_h0, p_pvalue_h0
 
 ```
 
@@ -13997,16 +13975,16 @@ _Régression multiple : matrice de design, équations normales et test F de mod�
 ### Niveau 1
 
 ```
+Le poids y d'un chien dépend de sa taille x, avec une ordonnée propre à chacune de deux races T et H, et la même pente pour les deux races. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
+  · colonnes [1T, 1H, x·1T, x·1H] [p_design_separate_slopes]   ✔ colonnes [1T, 1H, x]   · colonnes [1, x]   · colonnes [1, 1T, 1H, x] [p_design_collinear]
+  pièges : p_design_collinear, p_design_separate_slopes
+
+Le prix y d'un appartement dépend de sa surface x, avec une ordonnée propre à chacun de deux quartiers N et S, et une pente commune. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
+  ✔ colonnes [1, 1S, x]   · colonnes [1N, 1S, x·1N, x·1S] [p_design_separate_slopes]   · colonnes [1, 1N, 1S, x] [p_design_collinear]   · colonnes [1, x]
+  pièges : p_design_collinear, p_design_separate_slopes
+
 Le rendement y d'une culture dépend de la dose d'engrais x, avec un effet propre à chacun de deux sols A et B, et la même pente pour les deux sols. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, 1B, x, x·1B] [p_design_separate_slopes]   · colonnes [1, 1A, 1B, x] [p_design_collinear]   · colonnes [1A, 1B]   ✔ colonnes [1, 1B, x]
-  pièges : p_design_collinear, p_design_separate_slopes
-
-Le poids y d'un chien dépend de sa taille x, avec une ordonnée propre à chacune de deux races T et H, et la même pente pour les deux races. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, x]   · colonnes [1, 1T, 1H, x] [p_design_collinear]   · colonnes [1T, 1H, x·1T, x·1H] [p_design_separate_slopes]   ✔ colonnes [1T, 1H, x]
-  pièges : p_design_collinear, p_design_separate_slopes
-
-Le poids y d'un chien dépend de sa taille x, avec une ordonnée propre à chacune de deux races T et H, et la même pente pour les deux races. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  ✔ colonnes [1T, 1H, x]   · colonnes [1, 1T, 1H, x] [p_design_collinear]   · colonnes [1T, 1H, x·1T, x·1H] [p_design_separate_slopes]   · colonnes [1, x]
+  · colonnes [1, 1B, x, x·1B] [p_design_separate_slopes]   · colonnes [1A, 1B]   · colonnes [1, 1A, 1B, x] [p_design_collinear]   ✔ colonnes [1, 1B, x]
   pièges : p_design_collinear, p_design_separate_slopes
 
 ```
@@ -14015,15 +13993,15 @@ Le poids y d'un chien dépend de sa taille x, avec une ordonnée propre à chacu
 
 ```
 Le prix y d'un appartement dépend de sa surface x, avec une ordonnée propre à chacun de deux quartiers N et S, et une pente commune. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, x]   · colonnes [1N, 1S, x·1N, x·1S] [p_design_separate_slopes]   ✔ colonnes [1, 1S, x]   · colonnes [1, 1N, 1S, x] [p_design_collinear]
+  ✔ colonnes [1, 1S, x]   · colonnes [1N, 1S, x·1N, x·1S] [p_design_separate_slopes]   · colonnes [1, x]   · colonnes [1, 1N, 1S, x] [p_design_collinear]
+  pièges : p_design_collinear, p_design_separate_slopes
+
+Le poids y d'un chien dépend de sa taille x, avec une ordonnée propre à chacune de deux races T et H, et la même pente pour les deux races. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
+  ✔ colonnes [1T, 1H, x]   · colonnes [1, 1T, 1H, x] [p_design_collinear]   · colonnes [1T, 1H, x·1T, x·1H] [p_design_separate_slopes]   · colonnes [1, x]
   pièges : p_design_collinear, p_design_separate_slopes
 
 Le rendement y d'une culture dépend de la dose d'engrais x, avec un effet propre à chacun de deux sols A et B, et la même pente pour les deux sols. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, 1A, 1B, x] [p_design_collinear]   ✔ colonnes [1, 1B, x]   · colonnes [1, 1B, x, x·1B] [p_design_separate_slopes]   · colonnes [1A, 1B]
-  pièges : p_design_collinear, p_design_separate_slopes
-
-Le rendement y d'une culture dépend de la dose d'engrais x, avec un effet propre à chacun de deux sols A et B, et la même pente pour les deux sols. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, 1A, 1B, x] [p_design_collinear]   · colonnes [1, 1B, x, x·1B] [p_design_separate_slopes]   ✔ colonnes [1, 1B, x]   · colonnes [1A, 1B]
+  ✔ colonnes [1, 1B, x]   · colonnes [1, 1A, 1B, x] [p_design_collinear]   · colonnes [1, 1B, x, x·1B] [p_design_separate_slopes]   · colonnes [1A, 1B]
   pièges : p_design_collinear, p_design_separate_slopes
 
 ```
@@ -14031,134 +14009,153 @@ Le rendement y d'une culture dépend de la dose d'engrais x, avec un effet propr
 ### Niveau 3
 
 ```
-Modèle y = a + bx, données x : 3, 4, 5, 6, 7 ; y : 0, 1, 3, 6, 5. Avec X = [1, x] : XᵀX = [[5, 25], [25, 135]] et Xᵀy = (15 ; 90). Résous les équations normales XᵀXβ̂ = Xᵀy.
+Modèle y = a + bx, données x : 3, 4, 5, 6, 7 ; y : 11, 9, 8, 11, 6. Avec X = [1, x] : XᵀX = [[5, 25], [25, 135]] et Xᵀy = (45 ; 217). Résous les équations normales XᵀXβ̂ = Xᵀy.
   [tap, suivre l'erreur, menu menu]  det(XᵀX)
     = 5·135 − 25²   ← n·Σx² − (Σx)²
     = 50
   — b̂  [juge prob]  départ : b̂
-    = (5·90 − 25·15)/50   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
-    = 1,5
-  — â  [juge prob]  départ : â
-    = (135·15 − 25·90)/50   ← Première ligne
-    = −4,5
-  aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 5·135 − 25² = □ | b̂ = 1,5, â = −4,5
-
-Modèle y = a + bx, données x : 3, 4, 5, 6 ; y : 7, 3, 7, 3. Avec X = [1, x] : XᵀX = [[4, 18], [18, 86]] et Xᵀy = (20 ; 86). Résous les équations normales XᵀXβ̂ = Xᵀy.
-  [tap, suivre l'erreur, menu menu]  det(XᵀX)
-    = 4·86 − 18²   ← n·Σx² − (Σx)²
-    = 20
-  — b̂  [juge prob]  départ : b̂
-    = (4·86 − 18·20)/20   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
+    = (5·217 − 25·45)/50   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
     = −0,8
   — â  [juge prob]  départ : â
-    = (86·20 − 18·86)/20   ← Première ligne
-    = 8,6
-  aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 4·86 − 18² = □ | b̂ = −0,8, â = 8,6
+    = (135·45 − 25·217)/50   ← Première ligne
+    = 13
+  aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 5·135 − 25² = □ | b̂ = −0,8, â = 13
 
-Modèle y = a + bx, données x : 3, 4, 5, 6 ; y : 9, 12, 8, 7. Avec X = [1, x] : XᵀX = [[4, 18], [18, 86]] et Xᵀy = (36 ; 157). Résous les équations normales XᵀXβ̂ = Xᵀy.
+Modèle y = a + bx, données x : 3, 4, 5, 6, 7 ; y : 9, 11, 10, 13, 12. Avec X = [1, x] : XᵀX = [[5, 25], [25, 135]] et Xᵀy = (55 ; 283). Résous les équations normales XᵀXβ̂ = Xᵀy.
   [tap, suivre l'erreur, menu menu]  det(XᵀX)
-    = 4·86 − 18²   ← n·Σx² − (Σx)²
+    = 5·135 − 25²   ← n·Σx² − (Σx)²
+    = 50
+  — b̂  [juge prob]  départ : b̂
+    = (5·283 − 25·55)/50   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
+    = 0,8
+  — â  [juge prob]  départ : â
+    = (135·55 − 25·283)/50   ← Première ligne
+    = 7
+  aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 5·135 − 25² = □ | b̂ = 0,8, â = 7
+
+Modèle y = a + bx, données x : 0, 1, 2, 3 ; y : 10, 10, 15, 13. Avec X = [1, x] : XᵀX = [[4, 6], [6, 14]] et Xᵀy = (48 ; 79). Résous les équations normales XᵀXβ̂ = Xᵀy.
+  [tap, suivre l'erreur, menu menu]  det(XᵀX)
+    = 4·14 − 6²   ← n·Σx² − (Σx)²
     = 20
   — b̂  [juge prob]  départ : b̂
-    = (4·157 − 18·36)/20   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
-    = −1
+    = (4·79 − 6·48)/20   ← Deuxième ligne de (XᵀX)⁻¹Xᵀy
+    = 1,4
   — â  [juge prob]  départ : â
-    = (86·36 − 18·157)/20   ← Première ligne
-    = 13,5
-  aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 4·86 − 18² = □ | b̂ = −1, â = 13,5
+    = (14·48 − 6·79)/20   ← Première ligne
+    = 9,9
+  aides : (XᵀX)⁻¹ = (1/det)·[[Σx², −Σx], [−Σx, n]] ; β̂ = (XᵀX)⁻¹Xᵀy. | det = 4·14 − 6² = □ | b̂ = 1,4, â = 9,9
 
 ```
 
 ### Niveau 4
 
 ```
-n = 24 observations. Modèle complet à p = 5 colonnes : SC_p = 19 ; modèle réduit à q = 2 colonnes : SC_q = 22. Test F emboîté au niveau 5 % (H₀ : les 3 coefficients ajoutés sont nuls). Quantile donné : F_{3, 19 ; 0,95} = 3,13.
-  [free, suivre l'erreur]  ν_1
-    = 5 − 2   ← Paramètres ajoutés
-    = 3
-  — ν₂  [juge prob]  départ : ν_2
-    = 24 − 5   ← Résidus du modèle complet
-    = 19
-  — F  [juge stat]  départ : F
-    = ((22 − 19)/3)/(19/19)   ← Gain par paramètre ajouté, sur la variance résiduelle
-    = 1÷1   ← Numérateur et dénominateur
-    = 1   ← Comparer à 3,13
-  aides : Numérateur : gain de SC par paramètre ajouté ; dénominateur : SC du modèle complet par degré de liberté. | F = (3/3)/(19/□) | F = 1
-  pièges : p_f_df_swap, p_f_ratio_inverted, p_pvalue_h0, p_accept_h0
-
-n = 30 observations. Modèle complet à p = 5 colonnes : SC_p = 50 ; modèle réduit à q = 2 colonnes : SC_q = 77. Test F emboîté au niveau 5 % (H₀ : les 3 coefficients ajoutés sont nuls). Quantile donné : F_{3, 25 ; 0,95} = 2,99.
-  [free, suivre l'erreur]  ν_1
-    = 5 − 2   ← Paramètres ajoutés
-    = 3
-  — ν₂  [juge prob]  départ : ν_2
-    = 30 − 5   ← Résidus du modèle complet
-    = 25
-  — F  [juge stat]  départ : F
-    = ((77 − 50)/3)/(50/25)   ← Gain par paramètre ajouté, sur la variance résiduelle
-    = 9÷2   ← Numérateur et dénominateur
-    = 4,5   ← Comparer à 2,99
-  aides : Numérateur : gain de SC par paramètre ajouté ; dénominateur : SC du modèle complet par degré de liberté. | F = (27/3)/(50/□) | F = 4,5
-  pièges : p_f_df_swap, p_f_ratio_inverted, p_pvalue_h0
-
-n = 24 observations. Modèle complet à p = 4 colonnes : SC_p = 40 ; modèle réduit à q = 1 colonne : SC_q = 49. Test F emboîté au niveau 5 % (H₀ : les 3 coefficients ajoutés sont nuls). Quantile donné : F_{3, 20 ; 0,95} = 3,1.
+n = 30 observations. Modèle complet à p = 4 colonnes : SC_p = 52 ; modèle réduit à q = 1 colonne : SC_q = 61. Test F emboîté au niveau 5 % (H₀ : les 3 coefficients ajoutés sont nuls). Quantile donné : F_{3, 26 ; 0,95} = 2,98.
   [free, suivre l'erreur]  ν_1
     = 4 − 1   ← Paramètres ajoutés
     = 3
   — ν₂  [juge prob]  départ : ν_2
-    = 24 − 4   ← Résidus du modèle complet
-    = 20
+    = 30 − 4   ← Résidus du modèle complet
+    = 26
   — F  [juge stat]  départ : F
-    = ((49 − 40)/3)/(40/20)   ← Gain par paramètre ajouté, sur la variance résiduelle
+    = ((61 − 52)/3)/(52/26)   ← Gain par paramètre ajouté, sur la variance résiduelle
     = 3÷2   ← Numérateur et dénominateur
-    = 1,5   ← Comparer à 3,1
-  aides : Numérateur : gain de SC par paramètre ajouté ; dénominateur : SC du modèle complet par degré de liberté. | F = (9/3)/(40/□) | F = 1,5
-  pièges : p_f_df_swap, p_f_ratio_inverted, p_accept_h0, p_pvalue_h0
+    = 1,5   ← Comparer à 2,98
+  aides : Numérateur : gain de SC par paramètre ajouté ; dénominateur : SC du modèle complet par degré de liberté. | F = (9/3)/(52/□) | F = 1,5
+  pièges : p_f_df_swap, p_f_ratio_inverted, p_pvalue_h0, p_accept_h0
+
+n = 30 observations. Modèle complet à p = 5 colonnes : SC_p = 25 ; modèle réduit à q = 1 colonne : SC_q = 28. Test F emboîté au niveau 5 % (H₀ : les 4 coefficients ajoutés sont nuls). Quantile donné : F_{4, 25 ; 0,95} = 2,76.
+  [free, suivre l'erreur]  ν_1
+    = 5 − 1   ← Paramètres ajoutés
+    = 4
+  — ν₂  [juge prob]  départ : ν_2
+    = 30 − 5   ← Résidus du modèle complet
+    = 25
+  — F  [juge stat]  départ : F
+    = ((28 − 25)/4)/(25/25)   ← Gain par paramètre ajouté, sur la variance résiduelle
+    = 0,75÷1   ← Numérateur et dénominateur
+    = 0,75   ← Comparer à 2,76
+  aides : Numérateur : gain de SC par paramètre ajouté ; dénominateur : SC du modèle complet par degré de liberté. | F = (3/4)/(25/□) | F = 0,75
+  pièges : p_f_df_swap, p_f_ratio_inverted, p_pvalue_h0, p_accept_h0
+
+n = 16 observations. Modèle complet à p = 4 colonnes : SC_p = 12 ; modèle réduit à q = 2 colonnes : SC_q = 31. Test F emboîté au niveau 5 % (H₀ : les 2 coefficients ajoutés sont nuls). Quantile donné : F_{2, 12 ; 0,95} = 3,89.
+  [free, suivre l'erreur]  ν_1
+    = 4 − 2   ← Paramètres ajoutés
+    = 2
+  — ν₂  [juge prob]  départ : ν_2
+    = 16 − 4   ← Résidus du modèle complet
+    = 12
+  — F  [juge stat]  départ : F
+    = ((31 − 12)/2)/(12/12)   ← Gain par paramètre ajouté, sur la variance résiduelle
+    = 9,5÷1   ← Numérateur et dénominateur
+    = 9,5   ← Comparer à 3,89
+  aides : Numérateur : gain de SC par paramètre ajouté ; dénominateur : SC du modèle complet par degré de liberté. | F = (19/2)/(12/□) | F = 9,5
+  pièges : p_f_df_swap, p_f_ratio_inverted, p_pvalue_h0
 
 ```
 
 ### Niveau 5
 
 ```
-Le rendement y d'une culture dépend de la dose d'engrais x, avec un effet propre à chacun de deux sols A et B, et la même pente pour les deux sols. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, 1A, 1B, x] [p_design_collinear]   ✔ colonnes [1, 1B, x]   · colonnes [1A, 1B]   · colonnes [1, 1B, x, x·1B] [p_design_separate_slopes]
-  pièges : p_design_collinear, p_design_separate_slopes
-
-Le rendement y d'une culture dépend de la dose d'engrais x, avec un effet propre à chacun de deux sols A et B, et la même pente pour les deux sols. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, 1A, 1B, x] [p_design_collinear]   · colonnes [1, 1B, x, x·1B] [p_design_separate_slopes]   ✔ colonnes [1, 1B, x]   · colonnes [1A, 1B]
-  pièges : p_design_collinear, p_design_separate_slopes
-
-n = 16 observations. Modèle complet à p = 5 colonnes : SC_p = 22 ; modèle réduit à q = 2 colonnes : SC_q = 28. Test F emboîté au niveau 5 % (H₀ : les 3 coefficients ajoutés sont nuls). Quantile donné : F_{3, 11 ; 0,95} = 3,59.
+n = 20 observations. Modèle complet à p = 3 colonnes : SC_p = 34 ; modèle réduit à q = 2 colonnes : SC_q = 52. Test F emboîté au niveau 5 % (H₀ : le coefficient ajouté est nul). Quantile donné : F_{1, 17 ; 0,95} = 4,45.
   [free, sans aide]  ν_1
-    = 5 − 2   ← Paramètres ajoutés
+    = 3 − 2   ← Paramètres ajoutés
+    = 1
+  — ν₂  [juge prob]  départ : ν_2
+    = 20 − 3   ← Résidus du modèle complet
+    = 17
+  — F  [juge stat]  départ : F
+    = ((52 − 34)/1)/(34/17)   ← Gain par paramètre ajouté, sur la variance résiduelle
+    = 18÷2   ← Numérateur et dénominateur
+    = 9   ← Comparer à 4,45
+  pièges : p_f_df_swap, p_f_ratio_inverted, p_pvalue_h0
+
+n = 30 observations. Modèle complet à p = 4 colonnes : SC_p = 52 ; modèle réduit à q = 1 colonne : SC_q = 58. Test F emboîté au niveau 5 % (H₀ : les 3 coefficients ajoutés sont nuls). Quantile donné : F_{3, 26 ; 0,95} = 2,98.
+  [free, sans aide]  ν_1
+    = 4 − 1   ← Paramètres ajoutés
     = 3
   — ν₂  [juge prob]  départ : ν_2
-    = 16 − 5   ← Résidus du modèle complet
-    = 11
+    = 30 − 4   ← Résidus du modèle complet
+    = 26
   — F  [juge stat]  départ : F
-    = ((28 − 22)/3)/(22/11)   ← Gain par paramètre ajouté, sur la variance résiduelle
+    = ((58 − 52)/3)/(52/26)   ← Gain par paramètre ajouté, sur la variance résiduelle
     = 2÷2   ← Numérateur et dénominateur
-    = 1   ← Comparer à 3,59
-  pièges : p_f_df_swap, p_f_ratio_inverted, p_pvalue_h0, p_accept_h0
+    = 1   ← Comparer à 2,98
+  pièges : p_f_df_swap, p_f_ratio_inverted, p_accept_h0, p_pvalue_h0
+
+n = 20 observations. Modèle complet à p = 5 colonnes : SC_p = 30 ; modèle réduit à q = 3 colonnes : SC_q = 37. Test F emboîté au niveau 5 % (H₀ : les 2 coefficients ajoutés sont nuls). Quantile donné : F_{2, 15 ; 0,95} = 3,68.
+  [free, sans aide]  ν_1
+    = 5 − 3   ← Paramètres ajoutés
+    = 2
+  — ν₂  [juge prob]  départ : ν_2
+    = 20 − 5   ← Résidus du modèle complet
+    = 15
+  — F  [juge stat]  départ : F
+    = ((37 − 30)/2)/(30/15)   ← Gain par paramètre ajouté, sur la variance résiduelle
+    = 3,5÷2   ← Numérateur et dénominateur
+    = 1,75   ← Comparer à 3,68
+  pièges : p_f_df_swap, p_f_ratio_inverted, p_accept_h0, p_pvalue_h0
 
 ```
 
 ### Variantes d'examen
 
 ```
-Le prix y d'un appartement dépend de sa surface x, avec une ordonnée propre à chacun de deux quartiers N et S, et une pente commune. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
-  · colonnes [1, 1N, 1S, x] [p_design_collinear]   · colonnes [1N, 1S, x·1N, x·1S] [p_design_separate_slopes]   · colonnes [1, x]   ✔ colonnes [1, 1S, x]
+Le poids y d'un chien dépend de sa taille x, avec une ordonnée propre à chacune de deux races T et H, et la même pente pour les deux races. Quelle matrice de design X (ses colonnes ; 1 = colonne de uns, 1_A = indicatrice du groupe A…) convient au modèle y = Xβ + ε ?
+  · colonnes [1, x]   · colonnes [1T, 1H, x·1T, x·1H] [p_design_separate_slopes]   · colonnes [1, 1T, 1H, x] [p_design_collinear]   ✔ colonnes [1T, 1H, x]
   [examen mcq]
   pièges : p_design_collinear, p_design_separate_slopes
 
 Vrai ou faux ?
-  « Dans le test F de modèles emboîtés, le numérateur a p − q degrés de liberté et le dénominateur n − p. » → VRAI
+  « Pour le modèle y = a + bx, la matrice XᵀX (X = [1, x]) est toujours inversible. » → FAUX
+    contre-exemple (refute) : a = 1, b = 1
   [examen tf]
 
-n = 20 observations. Modèle complet à p = 3 colonnes : SC_p = 34 ; modèle réduit à q = 1 colonne : SC_q = 54. Test F emboîté au niveau 5 % (H₀ : les 2 coefficients ajoutés sont nuls). Quantile donné : F_{2, 17 ; 0,95} = 3,59. Calcule F (à 0,01 près).
+n = 20 observations. Modèle complet à p = 3 colonnes : SC_p = 34 ; modèle réduit à q = 1 colonne : SC_q = 38. Test F emboîté au niveau 5 % (H₀ : les 2 coefficients ajoutés sont nuls). Quantile donné : F_{2, 17 ; 0,95} = 3,59. Calcule F (à 0,01 près).
   [free, sans aide, examen coef]  F
-    = ((54 − 34)/2)/(34/17)   ← Gain par paramètre ajouté, sur la variance résiduelle
-    = 10÷2   ← Numérateur et dénominateur
-    = 5   ← Comparer à 3,59
+    = ((38 − 34)/2)/(34/17)   ← Gain par paramètre ajouté, sur la variance résiduelle
+    = 2÷2   ← Numérateur et dénominateur
+    = 1   ← Comparer à 3,59
   pièges : p_f_ratio_inverted
 
 ```
@@ -14171,13 +14168,13 @@ _Vérifier les hypothèses d'une régression sur les graphiques des résidus._
 
 ```
 Graphique d'une régression linéaire :résidus en fonction de ŷŷrésidusQuel défaut ce graphique montre-t-il ?
-  ✔ un entonnoir (variance qui grandit)   · des résidus liés dans l'ordre (autocorrélation)   · une valeur aberrante
+  · des queues lourdes (QQ-plot en S)   ✔ un entonnoir (variance qui grandit)   · des résidus liés dans l'ordre (autocorrélation)
 
 Graphique d'une régression linéaire :résidus en fonction de ŷŷrésidusQuel défaut ce graphique montre-t-il ?
-  ✔ une valeur aberrante   · des queues lourdes (QQ-plot en S)   · un entonnoir (variance qui grandit)
+  · une valeur aberrante   ✔ aucun défaut visible   · des résidus liés dans l'ordre (autocorrélation)
 
 Graphique d'une régression linéaire :résidus en fonction de ŷŷrésidusQuel défaut ce graphique montre-t-il ?
-  ✔ une valeur aberrante   · un entonnoir (variance qui grandit)   · aucun défaut visible
+  · des résidus liés dans l'ordre (autocorrélation)   ✔ un entonnoir (variance qui grandit)   · aucun défaut visible
 
 ```
 
@@ -14185,13 +14182,13 @@ Graphique d'une régression linéaire :résidus en fonction de ŷŷrésidusQuel 
 
 ```
 Graphique d'une régression linéaire :résidus en fonction de ŷŷrésidusQuel défaut ce graphique montre-t-il ?
-  · des résidus liés dans l'ordre (autocorrélation)   · une courbure (relation non linéaire)   ✔ aucun défaut visible   · une valeur aberrante   · un entonnoir (variance qui grandit)
-
-Graphique d'une régression linéaire :résidus en fonction de ŷŷrésidusQuel défaut ce graphique montre-t-il ?
-  · des résidus liés dans l'ordre (autocorrélation)   · une valeur aberrante   · une courbure (relation non linéaire)   · un entonnoir (variance qui grandit)   ✔ aucun défaut visible
+  · une courbure (relation non linéaire)   · des queues lourdes (QQ-plot en S)   ✔ une valeur aberrante   · des résidus liés dans l'ordre (autocorrélation)   · aucun défaut visible
 
 Graphique d'une régression linéaire :résidus dans l'ordre des mesuresordre des mesuresrésidusQuel défaut ce graphique montre-t-il ?
-  · des résidus liés dans l'ordre (autocorrélation)   · des queues lourdes (QQ-plot en S)   · un entonnoir (variance qui grandit)   · une courbure (relation non linéaire)   ✔ aucun défaut visible
+  · une courbure (relation non linéaire)   · un entonnoir (variance qui grandit)   · une valeur aberrante   ✔ des résidus liés dans l'ordre (autocorrélation)   · des queues lourdes (QQ-plot en S)
+
+Graphique d'une régression linéaire :résidus dans l'ordre des mesuresordre des mesuresrésidusQuel défaut ce graphique montre-t-il ?
+  · un entonnoir (variance qui grandit)   · une courbure (relation non linéaire)   ✔ des résidus liés dans l'ordre (autocorrélation)   · des queues lourdes (QQ-plot en S)   · une valeur aberrante
 
 ```
 
@@ -14199,29 +14196,29 @@ Graphique d'une régression linéaire :résidus dans l'ordre des mesuresordre de
 
 ```
 Deux graphiques d'une régression linéaire :résidus en fonction de ŷŷrésidusQQ-plot des résidusquantiles de N(0, 1)résidus réduitsQuelle hypothèse est violée ?
-  · La normalité des erreurs   · Aucune : les deux graphiques sont sans défaut   · L'absence de points aberrants   ✔ La linéarité
+  · L'absence de points aberrants   · Aucune : les deux graphiques sont sans défaut   ✔ La normalité des erreurs   · La variance constante (homoscédasticité)
 
 Deux graphiques d'une régression linéaire :résidus en fonction de ŷŷrésidusQQ-plot des résidusquantiles de N(0, 1)résidus réduitsQuelle hypothèse est violée ?
-  · La variance constante (homoscédasticité)   · Aucune : les deux graphiques sont sans défaut   · La normalité des erreurs   ✔ L'absence de points aberrants
+  · La normalité des erreurs   · La linéarité   · Aucune : les deux graphiques sont sans défaut   ✔ L'absence de points aberrants
 
 Deux graphiques d'une régression linéaire :résidus en fonction de ŷŷrésidusQQ-plot des résidusquantiles de N(0, 1)résidus réduitsQuelle hypothèse est violée ?
-  · Aucune : les deux graphiques sont sans défaut   ✔ La normalité des erreurs   · La linéarité   · L'absence de points aberrants
+  · La normalité des erreurs   ✔ Aucune : les deux graphiques sont sans défaut   · L'absence de points aberrants   · La linéarité
 
 ```
 
 ### Niveau 4
 
 ```
-Régression linéaire, R² = 0,93. Graphique :QQ-plot des résidusquantiles de N(0, 1)résidus réduitsQue faut-il faire ?
-  ✔ Ne pas se fier aux tests t ; utiliser plus de données ou une méthode robuste   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   · Garder le modèle tel quel : R² = 0,93 montre qu'il est adapté [p_r2_high_good]   · Vérifier la normalité sur un QQ-plot des valeurs de y, plutôt que des résidus [p_diag_normal_y]
-  pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
-
-Régression linéaire, R² = 0,91. Graphique :résidus en fonction de ŷŷrésidusQue faut-il faire ?
-  ✔ Transformer y (par exemple log y)   · Garder le modèle tel quel : R² = 0,91 montre qu'il est adapté [p_r2_high_good]   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]
+Régression linéaire, R² = 0,97. Graphique :résidus en fonction de ŷŷrésidusQue faut-il faire ?
+  · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   ✔ Vérifier la mesure de ce point ; ne le retirer que si c'est une erreur, et comparer les deux ajustements   · Garder le modèle tel quel : R² = 0,97 montre qu'il est adapté [p_r2_high_good]   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]
   pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
 
 Régression linéaire, R² = 0,95. Graphique :résidus en fonction de ŷŷrésidusQue faut-il faire ?
-  ✔ Ajouter un terme en x² (modèle quadratique)   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   · Garder le modèle tel quel : R² = 0,95 montre qu'il est adapté [p_r2_high_good]
+  · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   · Garder le modèle tel quel : R² = 0,95 montre qu'il est adapté [p_r2_high_good]   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   ✔ Vérifier la mesure de ce point ; ne le retirer que si c'est une erreur, et comparer les deux ajustements
+  pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
+
+Régression linéaire, R² = 0,93. Graphique :résidus en fonction de ŷŷrésidusQue faut-il faire ?
+  · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   · Garder le modèle tel quel : R² = 0,93 montre qu'il est adapté [p_r2_high_good]   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   ✔ Ajouter un terme en x² (modèle quadratique)
   pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
 
 ```
@@ -14229,16 +14226,16 @@ Régression linéaire, R² = 0,95. Graphique :résidus en fonction de ŷŷrésid
 ### Niveau 5
 
 ```
-Régression linéaire, R² = 0,91. Graphique :résidus en fonction de ŷŷrésidusQuel diagnostic et quel remède ?
-  · Garder le modèle tel quel : R² = 0,91 montre qu'il est adapté [p_r2_high_good]   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   ✔ Hypothèse violée : la linéarité. Remède : ajouter un terme en x² (modèle quadratique).
+Régression linéaire, R² = 0,95. Graphique :QQ-plot des résidusquantiles de N(0, 1)résidus réduitsQuel diagnostic et quel remède ?
+  · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   · Vérifier la normalité sur un QQ-plot des valeurs de y, plutôt que des résidus [p_diag_normal_y]   · Garder le modèle tel quel : R² = 0,95 montre qu'il est adapté [p_r2_high_good]   ✔ Hypothèse violée : la normalité des erreurs. Remède : ne pas se fier aux tests t ; utiliser plus de données ou une méthode robuste.
   pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
 
-Régression linéaire, R² = 0,91. Graphique :résidus en fonction de ŷŷrésidusQuel diagnostic et quel remède ?
-  · Garder le modèle tel quel : R² = 0,91 montre qu'il est adapté [p_r2_high_good]   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   ✔ Hypothèse violée : la variance constante (homoscédasticité). Remède : transformer y (par exemple log y).   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]
+Régression linéaire, R² = 0,95. Graphique :résidus en fonction de ŷŷrésidusQuel diagnostic et quel remède ?
+  · Garder le modèle tel quel : R² = 0,95 montre qu'il est adapté [p_r2_high_good]   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   ✔ Hypothèse violée : l'absence de points aberrants. Remède : vérifier la mesure de ce point ; ne le retirer que si c'est une erreur, et comparer les deux ajustements.   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]
   pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
 
-Régression linéaire, R² = 0,93. Graphique :QQ-plot des résidusquantiles de N(0, 1)résidus réduitsQuel diagnostic et quel remède ?
-  · Vérifier la normalité sur un QQ-plot des valeurs de y, plutôt que des résidus [p_diag_normal_y]   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   ✔ Hypothèse violée : la normalité des erreurs. Remède : ne pas se fier aux tests t ; utiliser plus de données ou une méthode robuste.   · Garder le modèle tel quel : R² = 0,93 montre qu'il est adapté [p_r2_high_good]
+Régression linéaire, R² = 0,93. Graphique :résidus en fonction de ŷŷrésidusQuel diagnostic et quel remède ?
+  ✔ Hypothèse violée : la variance constante (homoscédasticité). Remède : transformer y (par exemple log y).   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   · Garder le modèle tel quel : R² = 0,93 montre qu'il est adapté [p_r2_high_good]   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]
   pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
 
 ```
@@ -14246,14 +14243,14 @@ Régression linéaire, R² = 0,93. Graphique :QQ-plot des résidusquantiles de N
 ### Variantes d'examen
 
 ```
-Régression linéaire, R² = 0,91. Graphique :résidus en fonction de ŷŷrésidusQue faut-il faire ?
-  · Garder le modèle tel quel : R² = 0,91 montre qu'il est adapté [p_r2_high_good]   · Tester la normalité de y plutôt que celle des résidus [p_diag_normal_y]   · Supprimer le point qui s'écarte le plus, puis refaire l'ajustement [p_outlier_delete]   ✔ Transformer y (par exemple log y)
+Graphique d'une régression linéaire :résidus dans l'ordre des mesuresordre des mesuresrésidusQuel défaut ce graphique montre-t-il ?
+  · des queues lourdes (QQ-plot en S)   · un entonnoir (variance qui grandit)   ✔ des résidus liés dans l'ordre (autocorrélation)   · une courbure (relation non linéaire)   · aucun défaut visible
   [examen mcq]
-  pièges : p_diag_normal_y, p_r2_high_good, p_outlier_delete
 
-Vrai ou faux ?
-  « Pour une droite des moindres carrés avec ordonnée à l'origine, la somme des résidus vaut 0. » → VRAI
+Vrai ou faux ? On vérifie la normalité sur les valeurs de y plutôt que sur les résidus.
+  · Vrai [p_diag_normal_y]   ✔ Faux
   [examen tf]
+  pièges : p_diag_normal_y
 
 ```
 
@@ -14264,6 +14261,23 @@ _Le modèle Beta-Bernoulli : loi a posteriori, moyenne a posteriori et MAP._
 ### Niveau 1
 
 ```
+Un capteur détecte l'objet 8 fois sur 18 essais. A priori, la probabilité de succès θ suit une loi Beta(2, 1) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
+  [guided]  α′
+    (Quelle famille pour la loi a posteriori ? Beta : la loi Beta est conjuguée au modèle de Bernoulli.)
+    = 2 + □   (trous : 2 + 8)   ← α′ = α + N (succès)
+    = □   (trous : 10)
+  — β′  [juge prob]  départ : β′
+    = 1 + □   (trous : 1 + 18 − 8)   ← β′ = β + n − N (échecs)
+    = □   (trous : 11)
+  — PM  [juge prob]  départ : PM
+    = 10/(10 + □)   (trous : 10/(10 + 11))   ← Moyenne d'une Beta(α′, β′)
+    = 10/21
+  — MAP  [juge prob]  départ : MAP
+    = (□)/(10 + 11 − 2)   (trous : (10 − 1)/(10 + 11 − 2))   ← Mode d'une Beta
+    = 9/19
+  aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(2 + 8, 1 + □) | Beta(10, 11), PM = 10/21, MAP = 9/19
+  pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
+
 Une publicité est cliquée 0 fois sur 12 affichages. A priori, la probabilité de succès θ suit une loi Beta(3, 5) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
   [guided]  α′
     (Quelle famille pour la loi a posteriori ? Beta : la loi Beta est conjuguée au modèle de Bernoulli.)
@@ -14300,9 +14314,14 @@ Un capteur détecte l'objet 9 fois sur 20 essais. A priori, la probabilité de s
   aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(3 + 9, 5 + □) | Beta(12, 16), PM = 3/7, MAP = 11/26
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
+```
+
+### Niveau 2
+
+```
 Un capteur détecte l'objet 1 fois sur 7 essais. A priori, la probabilité de succès θ suit une loi Beta(4, 1) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
   [guided]  α′
-    (Quelle famille pour la loi a posteriori ? Beta : la loi Beta est conjuguée au modèle de Bernoulli.)
+    ? Quelle famille pour la loi a posteriori ? ✔ Beta : la loi Beta est conjuguée au modèle de Bernoulli / · Binomiale, comme les données
     = 4 + □   (trous : 4 + 1)   ← α′ = α + N (succès)
     = □   (trous : 5)
   — β′  [juge prob]  départ : β′
@@ -14318,11 +14337,6 @@ Un capteur détecte l'objet 1 fois sur 7 essais. A priori, la probabilité de su
   aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(4 + 1, 1 + □) | Beta(5, 7), PM = 5/12, MAP = 0,4
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
-```
-
-### Niveau 2
-
-```
 Un joueur de basket réussit 3 tirs sur 4. A priori, la probabilité de succès θ suit une loi Beta(2, 5) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
   [guided]  α′
     ? Quelle famille pour la loi a posteriori ? ✔ Beta : la loi Beta est conjuguée au modèle de Bernoulli / · Binomiale, comme les données
@@ -14357,29 +14371,28 @@ Une pièce donne 4 piles sur 16 lancers. A priori, la probabilité de succès θ
   aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(5 + 4, 4 + □) | Beta(9, 16), PM = 0,36, MAP = 8/23
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
-Une publicité est cliquée 1 fois sur 8 affichages. A priori, la probabilité de succès θ suit une loi Beta(5, 2) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
-  [guided]  α′
-    ? Quelle famille pour la loi a posteriori ? ✔ Beta : la loi Beta est conjuguée au modèle de Bernoulli / · Binomiale, comme les données
-    = 5 + □   (trous : 5 + 1)   ← α′ = α + N (succès)
-    = □   (trous : 6)
-  — β′  [juge prob]  départ : β′
-    = 2 + □   (trous : 2 + 8 − 1)   ← β′ = β + n − N (échecs)
-    = □   (trous : 9)
-  — PM  [juge prob]  départ : PM
-    = 6/(6 + □)   (trous : 6/(6 + 9))   ← Moyenne d'une Beta(α′, β′)
-    = 6/15
-    = 2/5
-  — MAP  [juge prob]  départ : MAP
-    = (□)/(6 + 9 − 2)   (trous : (6 − 1)/(6 + 9 − 2))   ← Mode d'une Beta
-    = 5/13
-  aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(5 + 1, 2 + □) | Beta(6, 9), PM = 0,4, MAP = 5/13
-  pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
-
 ```
 
 ### Niveau 3
 
 ```
+Une publicité est cliquée 1 fois sur 8 affichages. A priori, la probabilité de succès θ suit une loi Beta(5, 2) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
+  [tap, suivre l'erreur, menu menu]  α′
+    = 5 + 1   ← α′ = α + N (succès)
+    = 6
+  — β′  [juge prob]  départ : β′
+    = 2 + 8 − 1   ← β′ = β + n − N (échecs)
+    = 9
+  — PM  [juge prob]  départ : PM
+    = 6/(6 + 9)   ← Moyenne d'une Beta(α′, β′)
+    = 6/15
+    = 2/5
+  — MAP  [juge prob]  départ : MAP
+    = (6 − 1)/(6 + 9 − 2)   ← Mode d'une Beta
+    = 5/13
+  aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(5 + 1, 2 + □) | Beta(6, 9), PM = 0,4, MAP = 5/13
+  pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
+
 Un capteur détecte l'objet 5 fois sur 11 essais. A priori, la probabilité de succès θ suit une loi Beta(3, 3) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
   [tap, suivre l'erreur, menu menu]  α′
     = 3 + 5   ← α′ = α + N (succès)
@@ -14413,8 +14426,13 @@ Une publicité est cliquée 14 fois sur 18 affichages. A priori, la probabilité
   aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(1 + 14, 3 + □) | Beta(15, 7), PM = 15/22, MAP = 0,7
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
-Un joueur de basket réussit 14 tirs sur 19. A priori, la probabilité de succès θ suit une loi Beta(2, 4) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP).
-  [tap, suivre l'erreur, menu menu]  α′
+```
+
+### Niveau 4
+
+```
+Un joueur de basket réussit 14 tirs sur 19. A priori, la probabilité de succès θ suit une loi Beta(2, 4) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP), puis sa variance.
+  [free, suivre l'erreur]  α′
     = 2 + 14   ← α′ = α + N (succès)
     = 16
   — β′  [juge prob]  départ : β′
@@ -14426,14 +14444,12 @@ Un joueur de basket réussit 14 tirs sur 19. A priori, la probabilité de succè
   — MAP  [juge prob]  départ : MAP
     = (16 − 1)/(16 + 9 − 2)   ← Mode d'une Beta
     = 15/23
+  — Var  [juge prob]  départ : Var
+    = 16/25·(1 − 16/25)/(1 + 16 + 9)   ← PM(1 − PM)/(1 + α′ + β′)
+    = 72/8125
   aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(2 + 14, 4 + □) | Beta(16, 9), PM = 0,64, MAP = 15/23
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
-```
-
-### Niveau 4
-
-```
 Une pièce donne 3 piles sur 5 lancers. A priori, la probabilité de succès θ suit une loi Beta(1, 4) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP), puis sa variance.
   [free, suivre l'erreur]  α′
     = 1 + 3   ← α′ = α + N (succès)
@@ -14474,8 +14490,13 @@ Une publicité est cliquée 4 fois sur 16 affichages. A priori, la probabilité 
   aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(3 + 4, 2 + □) | Beta(7, 14), PM = 1/3, MAP = 6/19
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
-Une publicité est cliquée 13 fois sur 14 affichages. A priori, la probabilité de succès θ suit une loi Beta(3, 4) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP), puis sa variance.
-  [free, suivre l'erreur]  α′
+```
+
+### Niveau 5
+
+```
+Une publicité est cliquée 13 fois sur 14 affichages. A priori, la probabilité de succès θ suit une loi Beta(3, 4) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP), puis sa variance, et compare au MLE.
+  [free, sans aide]  α′
     = 3 + 13   ← α′ = α + N (succès)
     = 16
   — β′  [juge prob]  départ : β′
@@ -14490,14 +14511,10 @@ Une publicité est cliquée 13 fois sur 14 affichages. A priori, la probabilité
   — Var  [juge prob]  départ : Var
     = 16/21·(1 − 16/21)/(1 + 16 + 5)   ← PM(1 − PM)/(1 + α′ + β′)
     = 40/4851
-  aides : Les succès s'ajoutent au premier paramètre, les échecs au second. | Beta(3 + 13, 4 + □) | Beta(16, 5), PM = 16/21, MAP = 15/19
+  — Comparer : le MLE N/n  [juge prob]  départ : MLE
+    = 13/14   ← Le MLE ignore l'a priori
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
-```
-
-### Niveau 5
-
-```
 Une publicité est cliquée 5 fois sur 11 affichages. A priori, la probabilité de succès θ suit une loi Beta(5, 2) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP), puis sa variance, et compare au MLE.
   [free, sans aide]  α′
     = 5 + 5   ← α′ = α + N (succès)
@@ -14541,41 +14558,21 @@ Une pièce donne 4 piles sur 6 lancers. A priori, la probabilité de succès θ 
     = 2/3
   pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
 
-Une pièce donne 0 piles sur 2 lancers. A priori, la probabilité de succès θ suit une loi Beta(3, 5) ; les essais sont indépendants. Donne la loi a posteriori Beta(α′, β′), puis sa moyenne (PM) et son mode (MAP), puis sa variance, et compare au MLE.
-  [free, sans aide]  α′
-    = 3 + 0   ← α′ = α + N (succès)
-    = 3
-  — β′  [juge prob]  départ : β′
-    = 5 + 2 − 0   ← β′ = β + n − N (échecs)
-    = 7
-  — PM  [juge prob]  départ : PM
-    = 3/(3 + 7)   ← Moyenne d'une Beta(α′, β′)
-    = 3/10
-  — MAP  [juge prob]  départ : MAP
-    = (3 − 1)/(3 + 7 − 2)   ← Mode d'une Beta
-    = 2/8
-    = 1/4
-  — Var  [juge prob]  départ : Var
-    = 3/10·(1 − 3/10)/(1 + 3 + 7)   ← PM(1 − PM)/(1 + α′ + β′)
-    = 21/1100
-  — Comparer : le MLE N/n  [juge prob]  départ : MLE
-    = 0/2   ← Le MLE ignore l'a priori
-    = 0
-  pièges : p_beta_prior_not_added, p_beta_swap, p_map_pm_confused
-
 ```
 
 ### Variantes d'examen
 
 ```
-Une publicité est cliquée 7 fois sur 14 affichages. A priori, la probabilité de succès θ suit une loi Beta(5, 4) ; les essais sont indépendants. Moyenne a posteriori (PM) et mode a posteriori (MAP) de θ ?
-  ✔ PM = 12/23 ; MAP = 11/21   · PM = 11/21 ; MAP = 11/21 [p_map_pm_confused]   · PM = 11/21 ; MAP = 12/23 [p_map_pm_confused]   · PM = 12/23 ; MAP = 12/23 [p_map_pm_confused]
+Une pièce donne 0 piles sur 2 lancers. A priori, la probabilité de succès θ suit une loi Beta(3, 5) ; les essais sont indépendants. Moyenne a posteriori (PM) et mode a posteriori (MAP) de θ ?
+  · PM = 0,25 ; MAP = 0,25 [p_map_pm_confused]   ✔ PM = 0,3 ; MAP = 0,25   · PM = 0,25 ; MAP = 0,3 [p_map_pm_confused]   · PM = 0,3 ; MAP = 0,3 [p_map_pm_confused]
   [examen mcq]
   pièges : p_map_pm_confused
 
 Vrai ou faux ?
-  « Avec un a priori uniforme Beta(1, 1), le MAP du modèle Beta-Bernoulli est égal au MLE N/n. » → VRAI
+  « Avec un a priori uniforme, la moyenne a posteriori (N + 1)/(n + 2) est égale au MLE N/n. » → FAUX
+    contre-exemple (refute) : N = 3, n = 4
   [examen tf]
+  pièges : p_map_pm_confused
 
 ```
 

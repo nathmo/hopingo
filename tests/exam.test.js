@@ -286,3 +286,50 @@ test('ba3-proba and ba4-stat produce complete exams, marked right with the refer
   assert.ok(EXAM_BY_ID['ba3-proba'].sections.every((s) => s.pool.skills.every((sk) => SKILL_BY_ID[sk].unit === 'combi' || SKILL_BY_ID[sk].tags.includes('MATH-234'))));
   assert.deepEqual(examsForUnit('proba').map((e) => e.id), ['ba3-proba', 'ba4-stat']);
 });
+
+// Step U9: ba4-numerique, 18 multiple choice with one or several right
+// answers (+1/N per right box, −1/M per wrong box, floor 0), 8 true/false
+// (+1/0/−1) and 2 open proofs of 3.5 to 10 points; skills of N, plus the M
+// skills of extraSkills. Every question answered with its reference earns
+// all its points; one wrong box costs 1/M.
+test('ba4-numerique: a complete exam, multiple answers marked +1/N −1/M', () => {
+  const bp = EXAM_BY_ID['ba4-numerique'];
+  const extra = new Set(bp.sections[0].pool.extraSkills);
+  assert.deepEqual([...extra].sort(), ['m-cholesky', 'm-cond', 'm-norms', 'm-power-method', 'm-rayleigh', 'm-svd-lowrank']);
+  const answer = (q) => {
+    if (q.kind === 'mcq') return q.item.options.map((o, i) => (o.correct ? i : -1)).filter((i) => i >= 0);
+    if (q.kind === 'tf') return q.item.truth;
+    return referenceLog(q.item);
+  };
+  let fromM = 0;
+  for (const seed of [1, 2, 3]) {
+    const exam = buildExam(bp, { rng: makeRng(seed), now: 0 });
+    assert.equal(exam.questions.length, 18 + 8 + 2);
+    for (const q of exam.questions) {
+      assert.ok(!q.item.stub, `${q.skill} is built`);
+      const unit = SKILL_BY_ID[q.skill].unit;
+      assert.ok(unit === 'numerique' || extra.has(q.skill), q.skill);
+      if (unit === 'matrices') fromM++;
+      const scoring = bp.sections[q.section].scoring;
+      if (q.kind === 'mcq') {
+        assert.equal(q.item.multi, true, `${q.item.key}: marked as multiple answers`);
+        assert.equal(q.max, 1);
+        const M = q.item.options.filter((o) => !o.correct).length;
+        const rights = answer(q);
+        const bad = q.item.options.findIndex((o) => !o.correct);
+        const r = scoreQuestion(q, scoring, [...rights, bad]);
+        assert.ok(Math.abs(r.points - Math.max(0, 1 - 1 / M)) < 1e-12, `${q.item.key}: one wrong box costs 1/M`);
+        assert.equal(r.state, 1 - 1 / M > 0 ? 'partial' : 'wrong');
+      }
+      if (q.kind === 'open') assert.ok(q.item.type === 'problem' && q.item.total >= 3.5 && q.item.total <= 10, `${q.item.key}: ${q.item.total} points`);
+      const r = scoreQuestion(q, scoring, answer(q));
+      assert.equal(r.state, 'right', `${q.kind} ${q.item.key}`);
+      assert.equal(r.points, q.max, `${q.kind} ${q.item.key}`);
+    }
+    const s = scoreExam(exam, exam.questions.map(answer), profile());
+    assert.equal(s.score, s.max);
+    assert.equal(s.grade, 6);
+  }
+  assert.ok(fromM > 0, 'the M skills of extraSkills are drawn');
+  assert.ok(examsForUnit('numerique').some((e) => e.id === 'ba4-numerique'));
+});
