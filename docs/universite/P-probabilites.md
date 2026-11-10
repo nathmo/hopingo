@@ -986,6 +986,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-ci-mean` — IC pour une moyenne : z ou Student
 - **Année** 15 · **Prérequis** `p-normal-inverse`, `p-clt-sum`, `p-desc-summary` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits σ connu (1,96 ou 2,576), Student sur un résumé (n, x̄, s²) ou sur des données brutes, asymptotique (n > 200, ligne ∞). Parties x̄, s², quantile (décision « quel quantile ? »), s/√n, demi-largeur, IC (à 0,001 près), puis « Interpréter ». Niveau 5 : données brutes, ou IC puis taille d'échantillon n ≥ (zσ/E)². Variante `coef` : la borne supérieure. QCM au format EE-209 Q12 (quantiles fournis). Pas d'item `code` ; l'arrondi d'EE-209 est exercé dans `p-ci-round`.
 - **Pourquoi ces prérequis** : `p-clt-sum` : données non normales : X̄ approximativement normale.
 - **Intro** : σ connu : x̄ ± z₁₋α/₂·σ/√n. σ inconnu et données normales : pivot T = (X̄ − μ)/(S/√n) ~ t_{n−1}, d'où x̄ ± t·s/√n avec ν = n − 1 (ν ≥ 200 : quantile normal). Données non normales, n grand : x̄ ± z·s/√n (asymptotique). Exemple : n = 9, x̄ = 20, s = 3 : `t = s₅(ν = 8) = 2,306` ; `IC₉₅ = 20 ± 2,306 · 3/3 = [17,694 ; 22,306]`.
 - **Juge** : protocole d'un IC (convention 8) ; lignes `ν`, `quantile` (table), `s/√n`, `demi-largeur`, `IC` (`stat {decimals: 3}`, `ciRule: 'outward'` pour les items EE-209) · **Forme finale** : IC avec ses deux bornes, puis « Interpréter ».
@@ -1010,6 +1011,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-ci-wald` — IC de Wald (avec −ℓ″) et de Wilson
 - **Année** 15 · **Prérequis** `p-ci-mean`, `p-mle` · **Étiquettes** `MATH-234`, `EE-209` (le gabarit Wilson est EE-209) · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits Bernoulli (n, p̂ de la liste), Poisson et exponentielle avec √J rationnel ; parties θ̂, J = −ℓ″(θ̂) (fraction exacte), se, IC à 0,001 près, puis « Interpréter » ; « Vérifier en simulant » tire la binomiale de paramètre p̂. Wilson (z = 2) seulement au niveau 5, suivi du QCM « lequel préférer ? ». La densité de l'exemple 11 n'est pas un gabarit. Variante `open` : 8 points (θ̂, J, se, IC, puis les hypothèses de validité). Le V/F faux demande p̂ = 0, qui réduit l'IC à un point (au lieu de la couverture simulée).
 - **Pourquoi ces prérequis** : `p-ci-mean` : même forme θ̂ ± z·se.
 - **Intro** : θ̂_ML ≈ N(θ, 1/J(θ̂)) avec J(θ̂) = −ℓ″(θ̂) (MATH-234) ou I(θ̂) = n·I₁(θ̂) (EE-209) : IC de Wald θ̂ ± z₁₋α/₂/√J(θ̂). Bernoulli : p̂ ± z·√(p̂(1 − p̂)/n). Wilson (EE-209) inverse n(p̂ − p)²/(p(1 − p)) ≤ z² : centre p̃ = (np̂ + z²/2)/(n + z²), demi-largeur z√n/(n + z²)·√(p̂(1 − p̂) + z²/(4n)). Wald est peu fiable si p̂ est près de 0 ou 1, ou si n est petit. Exemple : n = 100, 36 succès : `se = √(0,36 · 0,64/100) = 0,048` ; `IC = 0,36 ± 0,094 = [0,266 ; 0,454]`.
 - **Juge** : lignes `θ̂`, `ℓ″(θ̂)`, `J`, `se`, `IC` (`stat {decimals: 3}` ; EE-209 : `ciRule: 'outward'`) ; décision « Wald ou Wilson ? » · **Forme finale** : IC, puis « Interpréter ».
@@ -1034,6 +1036,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-ci-round` — Arrondir un IC (chiffres significatifs)
 - **Année** 16 · **Prérequis** `p-ci-mean`, `@alg:A-arrondir` · **Étiquettes** `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties u (2 chiffres significatifs, 1 accepté si le premier chiffre est 4 à 9 ; u brut est accepté comme étape, `stay`), θ̂, θ̂ ± u brut (à partir du niveau 2), IC vers l'extérieur (`ciRule: 'outward'`, précision lue sur la ligne u de l'élève). Une fois sur deux, l'arrondi au plus proche d'une borne diffère ; le QCM tire toujours un tel cas. Niveau 5 : u = t·s/√n d'un IC de Student (quantile donné), puis l'arrondi. Le V/F faux demande les deux arrondis de la borne.
 - **Pourquoi ces prérequis** : `p-ci-mean` : l'IC à arrondir.
 - **Intro** : règle EE-209 (partie 3b, rappelée dans les « Tables ») : u avec 2 chiffres significatifs (1 accepté si son premier chiffre est 4 à 9) ; θ̂ et les bornes avec la même dernière décimale que u ; borne inférieure arrondie **vers le bas**, borne supérieure **vers le haut**. On arrondit les bornes calculées avec les valeurs **non arrondies**. Exemple : `u = 0,002415 → 0,0024` ; `[1,067456 ; 1,072286] → [1,0674 ; 1,0723]`.
 - **Juge** : `stat {ciRule: 'outward'}` ; la précision est déduite de la ligne `u = …` de l'élève (si l'élève garde k = 1, la précision suit) · **Forme finale** : u, θ̂ et IC arrondis selon la règle.
@@ -1057,6 +1060,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-max-sample` — Maximum d'un échantillon ; IC exact
 - **Année** 15 · **Prérequis** `p-cont-quantile`, `p-indep`, `p-mle-special` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Densités (k + 1)xᵏ/θ^(k+1) sur [0 ; θ] (k = 0 : uniforme) : F, F_M et f_M sont trois parties en x et θ (une ligne chacune, juge `prob` en expressions). IC exact [M ; M·α^(−1/n)] à 0,01 près pour l'uniforme. Niveau 5 et `open` (8 points) : plaques vaudoises, F_M puis l'IC exact. Le minimum d'exponentielles n'est pas un gabarit. `coef` : la borne supérieure de l'IC.
 - **Pourquoi ces prérequis** : `p-mle-special` : le MLE de U[0, θ] est le maximum.
 - **Intro** : M = max Xᵢ pour X₁, …, Xₙ iid : F_M(x) = Pr(tous ≤ x) = F(x)ⁿ, f_M = n·F^(n−1)·f. Minimum : 1 − (1 − F)ⁿ. Pour U[0, θ], M/θ a pour fonction de répartition uⁿ sur [0 ; 1] : c'est un pivot, et Pr(α^(1/n) ≤ M/θ ≤ 1) = 1 − α donne l'IC **exact** θ ∈ [M ; M·α^(−1/n)]. Exemple : n = 10, M = 9 : `IC₉₅ = [9 ; 9 · 0,05^(−1/10)] = [9 ; 12,14]`.
 - **Juge** : `equiv` `{vars: ['x'], domain: {x: [0, θ]}}` pour F_M et f_M (θ symbole déclaré) ; `stat {decimals: 2}` pour l'IC · **Forme finale** : F_M ou f_M par morceaux ; IC exact.
@@ -1079,6 +1083,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-setup` — Formuler un test : H₀, H₁, région critique, p-valeur
 - **Année** 15 · **Prérequis** `p-normal-std` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Banque de 13 scénarios (dont filtre anti-spam et détection de tumeur). Décisions « hypothèses » (3 paires au niveau 1, 5 ensuite) et « côté », puis la valeur critique et la p-valeur (table de Φ ; Φ exacte acceptée à 0,0005). Niveau 5 : la question finale porte sur le lien IC–test. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Intro** : H₀ est l'hypothèse gardée par défaut (souvent une égalité, le statu quo) ; H₁ est ce que l'on cherche à établir. Unilatéral si seul un sens intéresse (« dépasse le seuil »). Au niveau α, la région critique R vérifie Pr₀(T ∈ R) = α. p-valeur : probabilité, sous H₀, d'une statistique au moins aussi extrême que t_obs ; bilatéral : p_obs = 2(1 − Φ(|t_obs|)). On rejette H₀ ⇔ t_obs ∈ R ⇔ p_obs < α. Bilatéral : rejet au niveau α ⇔ θ₀ hors de l'IC à 1 − α. Exemple : `t_obs = 2,1, bilatéral` ; `p_obs = 2(1 − Φ(2,1)) = 2(1 − 0,982) = 0,036` (note : rejet à 5 %, pas à 1 %).
 - **Juge** : décisions (H₀/H₁ dans un menu de 5 paires, côté, décision) ; `stat {decimals: 3}` pour p_obs ; lecture de table pour t_c · **Forme finale** : paire d'hypothèses, région critique ou p-valeur, décision.
 - **Niveaux** :
@@ -1101,6 +1106,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-power` — Erreurs de type 1 et 2, puissance
 - **Année** 15 · **Prérequis** `p-test-setup`, `p-normal-inverse` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 2
+- **Statut** : fait le 10 novembre 2026 (étape U7). Décisions sur les types d'erreur (dans la première partie, à la place du tableau 2 × 2 du niveau 1), puis se, t_c, δ, β et la puissance (à 0,01 près). Niveau 5 : n minimal pour une puissance de 0,9 (z₀,₉ = 1,28, 1,282 accepté). Les courbes de puissance (EE-209 Q18) ne sont pas faites. QCM : scénario « μ = 47 » (aucune erreur) ou valeur de la puissance.
 - **Pourquoi ces prérequis** : `p-normal-inverse` : seuil critique donné par un quantile normal.
 - **Intro** : erreur de type 1 : rejeter H₀ alors qu'elle est vraie (probabilité α). Type 2 : ne pas rejeter H₀ alors qu'elle est fausse (probabilité β). Puissance = 1 − β = Pr₁(rejeter). Test z unilatéral, H₁ : μ = μ₁ > μ₀ : β = Φ(z₁₋α − (μ₁ − μ₀)/(σ/√n)). La puissance augmente avec n, avec l'écart μ₁ − μ₀ et avec α. Rejeter H₀ quand H₁ est vraie n'est **pas** une erreur. Exemple : `δ = (103 − 100)/(10/√100) = 3` ; `β = Φ(1,645 − 3) = 1 − Φ(1,355) ≈ 0,09` (note : puissance ≈ 0,91).
 - **Juge** : décisions (quel type d'erreur ?) ; `stat {decimals: 2}` pour β et la puissance (z hors grille, convention 3) ; `value` pour n minimal · **Forme finale** : β, puissance, ou n.
@@ -1124,6 +1130,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-z` — Test z : σ connu, asymptotique, une proportion, Wald
 - **Année** 15 · **Prérequis** `p-test-setup`, `p-clt-binom` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Gabarits σ connu (compteurs), proportion bilatérale ou unilatérale, asymptotique (n ≥ 225), Wald sur Poisson (niveau 5). Parties se₀, t_obs, puis p_obs (proportions, Wald) ou t_c (moyennes) ; t_obs est un multiple de 0,05, à au moins 0,1 du seuil sauf au niveau 5. L'erreur standard calculée avec p̂ (version de Wald) n'est pas acceptée avec une note : seule celle de H₀ l'est. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Pourquoi ces prérequis** : `p-clt-binom` : p̂ ≈ N(p, p(1 − p)/n).
 - **Intro** : σ connu, données normales : T = (X̄ − μ₀)/(σ/√n) ~ N(0, 1) sous H₀. Asymptotique (n grand) : σ remplacé par s. Une proportion : T = (p̂ − p₀)/√(p₀(1 − p₀)/n) ; l'erreur standard calculée avec p̂ (test de Wald) est acceptée aussi, avec la note « c'est la version de Wald ». Wald pour un MLE (EE-209) : T = √(I(θ̂))·(θ̂ − θ₀). Exemple : `T = (0,6 − 0,5)/√(0,25/100) = 2` ; `p_obs = 2(1 − Φ(2)) = 0,046`.
 - **Juge** : protocole d'un test (convention 7) ; `stat {decimals: 2}` pour T ; table ; décision ; « Interpréter » · **Forme finale** : décision au niveau α et phrase choisie.
@@ -1148,6 +1155,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-t1` — Test t à un échantillon ; données appariées
 - **Année** 15 · **Prérequis** `p-test-z`, `p-ci-mean`, `p-interpret` · **Étiquettes** `MATH-234`, `EE-209` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties x̄, s² (données brutes dès le niveau 2), s/√n, t_obs, ν, t_c (décision « quel quantile ? »). Gabarit apparié (niveaux 2, 4, 5) : décision « différences », puis le test sur les différences. Niveau 5 : un cas limite sur trois. Variante `open` (10 points) : l'exemple 5 du catalogue (6 données), avec l'IC à 95 % à la fin. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Pourquoi ces prérequis** : `p-test-z` : même démarche que le test z ; `p-ci-mean` : quantile de Student et erreur standard S/√n.
 - **Intro** : données normales, σ inconnu : T = (X̄ − μ₀)/(S/√n) ~ t_{n−1} sous H₀ ; bilatéral à 5 % : rejet si |t_obs| > s₅(n − 1). Données appariées (mêmes individus mesurés deux fois) : on calcule les différences dᵢ = yᵢ − xᵢ et on fait un test t à un échantillon sur d, avec H₀ : μ_d = 0. Exemple : `t_obs = (88 − 84)/(√10/√5) = 2,83` ; `s₅(4) = 2,776` (note : rejet).
 - **Juge** : protocole d'un test (convention 7) ; lignes `x̄`, `s²`, `s/√n`, `t_obs` (`stat {decimals: 2}`), `ν` (`value`), `t_c` (table) · **Forme finale** : décision et interprétation.
@@ -1174,6 +1182,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-t2` — Test t à deux échantillons, variance poolée (et test F)
 - **Année** 15 · **Prérequis** `p-test-t1` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Résumés aux niveaux 1 à 3, données brutes (n₁ ≠ n₂) aux niveaux 4 et 5. Parties F (quantiles de F calculés et donnés dans l'énoncé), s_p², se, t_obs, ν, t_c ; décisions « indépendants ? » (leurre `p_paired_as_two`) et « variances compatibles ? ». Le rapport F est toujours dans l'intervalle d'acceptation : le cas « l'item s'arrête (Welch) » n'est pas tiré. Variante `open` : 10 points. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Pourquoi ces prérequis** : `p-test-t1` : même statistique t, avec deux échantillons.
 - **Intro** : deux échantillons normaux **indépendants** de même variance : s_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2) ; T = (x̄₁ − x̄₂)/(s_p·√(1/n₁ + 1/n₂)) ~ t_{n₁+n₂−2} sous H₀ : μ₁ = μ₂. Avant, le cours vérifie l'égalité des variances par F = s₁²/s₂² ~ F_{n₁−1, n₂−1} (quantiles donnés par l'énoncé). Si ce test rejette, il faudrait le test de Welch, qui n'est pas au programme : l'item s'arrête et le dit. Exemple : `s_p² = (4 · 2,5 + 4 · 5)/8 = 3,75` ; `t_obs = −3/√(3,75 · 0,4) = −2,45`.
 - **Juge** : protocole d'un test ; lignes `F`, `s_p²`, `se`, `t_obs`, `ν`, `t_c` · **Forme finale** : décision et interprétation.
@@ -1200,6 +1209,7 @@ Tables EE-209 (formulaire, à afficher telles quelles dans les items EE-209) :
 
 ### `p-test-two-prop` — Comparer deux proportions
 - **Année** 15 · **Prérequis** `p-test-z` · **Étiquettes** `MATH-234` · **Optionnelle** non · **Poids d'examen** 1
+- **Statut** : fait le 10 novembre 2026 (étape U7). Parties p̂₁, p̂₂, p̂ poolée (décision « poolée ? »), se, t_obs et p_obs (à 0,005 près, lecture de table). Niveau 5 : unilatéral (H₁ : p₁ > p₂) ; l'encadrement de la p-valeur par la table n'est pas demandé. La décision (rejeter H₀ au niveau α) et l'interprétation sont une seule question finale « Conclure et interpréter » (QCM après la dernière ligne, `final.interpret`) : une ligne de décision ne peut pas suivre la dernière ligne d'une partie.
 - **Intro** : H₀ : p₁ = p₂. Sous H₀, on estime la proportion commune p̂ = (k₁ + k₂)/(n₁ + n₂) et T = (p̂₁ − p̂₂)/√(p̂(1 − p̂)(1/n₁ + 1/n₂)) ≈ N(0, 1). Exemple : `p̂ = 100/400 = 0,25` ; `T = 0,1/√(0,25 · 0,75 · 0,01) ≈ 2,31`.
 - **Juge** : protocole d'un test ; `stat {decimals: 2}` · **Forme finale** : décision et interprétation.
 - **Niveaux** : L1 p̂ et se à trous ; L2 proportion poolée à calculer ; L3 protocole en touchant les étapes ; L4 libre ; L5 version unilatérale et p-valeur encadrée par la table.
