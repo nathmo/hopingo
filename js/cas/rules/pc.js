@@ -19,13 +19,13 @@ export const RULES = [
     source: "cours MATH-234, semaine 6",
     check: { bait: { skill: 'p-cov-corr' } },
     // P : « X cause Y », « il suffit d'agir sur X »
-    explain: (c) => fill("Une corrélation peut venir d'une cause commune ({z}) ou du hasard ; elle ne dit pas le sens de la cause.", c),
+    explain: () => "Une corrélation peut venir d'une cause commune (la chaleur fait vendre des glaces et fait nager), du hasard ou d'une cause dans l'autre sens : elle ne dit pas qui cause quoi.",
   }),
   trap({
     id: 'p_corr_scale', family: 'proba', tag: 'E', skill: 'p-cov-corr', repair: 'p-cov-corr',
     name: "Corrélation changée par l'échelle",
     example: ["corr(2X + 1, −Y) = −6", "−0,5"],
-    wrong: ['0.5', '6'],
+    wrong: ['-0.5', '-6'],
     // W : la covariance au lieu de la corrélation, a·c·corr
     explain: (c) => "La corrélation ne change pas d'échelle : seul le signe de a·c compte.",
   }),
@@ -35,7 +35,7 @@ export const RULES = [
     example: ["r = 0,5 ⇒ Y = 0,5X", ""],
     check: { bait: { skill: 'p-cov-corr' } },
     // P
-    explain: (c) => fill("r mesure l'alignement, pas la pente ; la pente vaut r·s_y/s_x = {b}.", c),
+    explain: () => "r mesure l'alignement des points, pas la pente : la pente de la droite des moindres carrés vaut r·s_y/s_x.",
   }),
   trap({
     id: 'p_total_var_forget', family: 'proba', tag: 'E', skill: 'p-total-expect', repair: 'p-total-expect',
@@ -43,15 +43,15 @@ export const RULES = [
     example: ["var = 1,17", "1,41"],
     wrong: ['1.41', '1.17'],
     // T : supprimer var(E[X | Y])
-    explain: (c) => fill("Il manque la variance due au choix de l'examinateur : var(E[N | ·]) = {v}.", c),
+    explain: (c) => fill("var(N) = E[var(N | ·)] + var(E[N | ·]) : il manque la variance des moyennes, due au choix de la situation, var(E[N | ·]) = {v}.", c),
   }),
   trap({
     id: 'p_total_expect_unweighted', family: 'proba', tag: 'E', skill: 'p-total-expect', repair: 'p-cond-total',
     name: "Moyenne non pondérée des espérances",
     example: ["E = (2,5 + 3,5)/2", "0,6 · 2,5 + 0,4 · 3,5"],
-    wrong: ['3.5', '2'],
+    wrong: ['2.9', '3'],
     // W : moyenne simple des espérances conditionnelles
-    explain: (c) => fill("Mary interroge plus souvent ({p}) : on pondère par les probabilités.", c),
+    explain: (c) => fill("Les deux cas n'arrivent pas aussi souvent (probabilité {p} pour le premier) : on pondère chaque espérance par la probabilité de son cas.", c),
   }),
   trap({
     id: 'p_mixture_vs_sum', family: 'proba', tag: 'C', skill: 'p-sum-mixture', repair: 'p-total-expect',
@@ -60,7 +60,7 @@ export const RULES = [
     source: "EE-209, partie 1B",
     wrong: ['4.36', '0.58'],
     // W : Σ πₖ² σₖ²
-    explain: (c) => "0,58 est la variance de 0,3X₁ + 0,7X₂. Un mélange <b>choisit</b> une composante ; l'écart entre les moyennes ajoute de la variance.",
+    explain: () => "π₁²σ₁² + π₂²σ₂² est la variance de la somme pondérée π₁X₁ + π₂X₂. Un mélange <b>choisit</b> une composante : var = Σ πₖ(σₖ² + μₖ²) − E², et l'écart entre les moyennes ajoute de la variance.",
   }),
   trap({
     id: 'p_sum_density_add', family: 'proba', tag: 'E', skill: 'p-sum-mixture', repair: 'p-sum-mixture',
@@ -92,7 +92,7 @@ export const RULES = [
     example: ["Markov pour X ~ N(0, 1)", "non applicable"],
     check: { bait: { skill: 'p-markov-cheb' } },
     // D : « Markov » quand X peut être négative
-    explain: (c) => "Markov demande X ≥ 0.",
+    explain: () => "Markov demande X ≥ 0 : pour une variable qui peut être négative, Pr(X ≥ a) ≤ E[X]/a peut être faux (et une borne négative n'a pas de sens).",
   }),
   trap({
     id: 'p_gambler', family: 'proba', tag: 'R', skill: 'p-markov-cheb', repair: 'p-indep',
@@ -115,7 +115,7 @@ export const RULES = [
     id: 'p_clt_sum_sd', family: 'calculus', tag: 'E', skill: 'p-clt-sum', repair: 'p-lin-combo',
     name: "Écart-type d'une somme en n·σ",
     example: ["sd(S) = 16 · 20", "√16 · 20"],
-    check: { bait: { skill: 'p-clt-sum' } },
+    wrong: ['80', '320'],
     // T : n·σ au lieu de σ√n
     explain: (c) => fill("Les variances s'additionnent : var(S) = {n} · {σ}², donc sd(S) = σ√n = {v}.", c),
   }),
@@ -175,7 +175,7 @@ export const RULES = [
     source: "cours MATH-234",
     check: { bait: { skill: 'p-mle' } },
     // le juge renvoie stay « Montre que c'est un maximum » si la ligne ℓ″ manque ; D : « ℓ′(θ̂) = 0 suffit »
-    explain: (c) => fill("Un point où ℓ′ s'annule peut être un minimum ; ℓ″ = {d2} < 0 le garantit.", c),
+    explain: () => "Un point où ℓ′ s'annule peut être un minimum ou un point d'inflexion : il faut montrer ℓ″ < 0 (partout, ou au point stationnaire unique).",
   }),
   trap({
     id: 'p_mle_constant_kept', family: 'calculus', tag: 'E', skill: 'p-mle', repair: 'g6-deriv-rules',
@@ -183,7 +183,7 @@ export const RULES = [
     example: ["d/dλ(−Σ ln xᵢ!) ≠ 0", "0"],
     check: { bait: { skill: 'p-mle' } },
     // T : dériver un terme sans θ comme s'il en dépendait (ou dériver Σxᵢ en θ)
-    explain: (c) => fill("Σxᵢ = {S} est une donnée : sa dérivée en λ est 0.", c),
+    explain: () => "Les données (Σxᵢ, Σ ln xᵢ!) ne dépendent pas du paramètre : leur dérivée est 0.",
   }),
   trap({
     id: 'p_mle_solve', family: 'calculus', tag: 'E', skill: 'p-mle', repair: 'iso-formula',
@@ -191,7 +191,7 @@ export const RULES = [
     example: ["16/λ − 8 = 0 ⇒ λ = 1/2", "2"],
     wrong: ['2', '1/2'],
     // W : inverse de la bonne valeur
-    explain: (c) => "16/λ = 8 donne λ = 16/8 = 2.",
+    explain: () => "Pour isoler λ dans n/λ − S = 0 : n/λ = S, donc λ = n/S. Tu as obtenu l'inverse.",
   }),
   trap({
     id: 'p_wald_var_inverse', family: 'method', tag: 'C', skill: 'p-mle', repair: 'p-ci-wald',
@@ -205,7 +205,7 @@ export const RULES = [
     id: 'p_wald_sign', family: 'calculus', tag: 'E', skill: 'p-mle', repair: 'p-ci-wald',
     name: "Signe de l'information observée",
     example: ["J = ℓ″(θ̂) = −4", "4"],
-    check: { bait: { skill: 'p-mle' } },
+    wrong: ['4', '-4'],
     // W : ℓ″(θ̂) sans le signe moins
     explain: (c) => fill("Au maximum ℓ″ < 0 ; J = −ℓ″(θ̂) = {J} est positive.", c),
   }),
@@ -233,7 +233,7 @@ export const RULES = [
     example: ["EQM = var + biais", "var + biais²"],
     check: { bait: { skill: 'p-bias-mse' } },
     // T : enlever le carré du biais
-    explain: (c) => fill("EQM = var + biais² ; un biais de {b} ajoute {b2}.", c),
+    explain: () => "EQM = E[(θ̂ − θ)²] = var(θ̂) + biais² : le biais entre au carré (un biais de −θ/4 ajoute θ²/16).",
   }),
   trap({
     id: 'p_unbiased_better', family: 'proba', tag: 'E', skill: 'p-bias-mse', repair: 'p-bias-mse',
@@ -250,7 +250,7 @@ export const RULES = [
     source: "formulaire EE-209",
     check: { bait: { skill: 'p-fisher-cr' } },
     // W : 1/I₁
-    explain: (c) => fill("Pour n observations, l'information est n·I₁ ; la borne est 1/(n·I₁) = {v}.", c),
+    explain: () => "Pour n observations iid, l'information est n·I₁(θ) : la borne de Cramér-Rao est 1/(n·I₁(θ)), pas 1/I₁(θ).",
   }),
   trap({
     id: 'p_fisher_sign', family: 'calculus', tag: 'E', skill: 'p-fisher-cr', repair: 'p-fisher-cr',
