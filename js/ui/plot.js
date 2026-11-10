@@ -131,7 +131,7 @@ export function mountPlot(item, ctx, body) {
       box.classList.add('locked');
       const r = checkPlot(item, placed);
       reveal();
-      const common = { hintsUsed: hints.used() };
+      const common = { hintsUsed: hints.used(), solo: r.ok && item.level === 5 && hints.used() === 0 };
       if (r.ok) return { correct: true, ...common };
       const wrong = r.parts.filter((p) => !p.ok);
       const rule = item.rules?.[wrong[0].id] ?? null;
