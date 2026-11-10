@@ -132,3 +132,22 @@ test('problem: points per step, a skipped step, save and resume from JSON', () =
   assert.equal(r2.score().parts[0].steps[0].got, 0);
   assert.equal(r2.linesRun.seg, 1);
 });
+
+test('lesson: a pending problem is resumed, then no longer pending', async () => {
+  const { Lesson } = await import('../js/engine/session.js');
+  const { newProfileData } = await import('../js/engine/rewards.js');
+  const p = { id: 'x', name: 'T', year: 13, track: 'mid', createdAt: 0, ...newProfileData() };
+  const it = generate('a1-improper-rational', 5, makeRng(9));
+  const run = new ProblemRun(it);
+  for (const e of referenceLog(it).slice(0, 3)) run.apply(e);
+  p.pending = JSON.parse(JSON.stringify(pendingOf(run)));
+  const lesson = new Lesson(p, { kind: 'resume' }, makeRng(1));
+  const item = lesson.next();
+  assert.equal(item.key, it.key);
+  assert.equal(item.resumeLog.length, run.log.length);
+  const back = resumeRun({ item, log: item.resumeLog });
+  for (const e of referenceLog(it).slice(3)) back.apply(e);
+  lesson.answer(item, { ...back.outcome(), rtSec: 300 });
+  assert.equal(p.pending, undefined);
+  assert.equal(lesson.next(), null);
+});

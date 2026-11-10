@@ -24,6 +24,7 @@ export function mountProblem(item, ctx, body, mountPart) {
   let ctrl = null;
   let shownPart = -1;
   let checkBtn = null;
+  let finished = false;
 
   const save = () => ctx.save?.(pendingOf(run));
 
@@ -49,13 +50,13 @@ export function mountProblem(item, ctx, body, mountPart) {
   function onChange() {
     paintBoard();
     save();
-    if (run.part !== shownPart && !run.done) setTimeout(showPart, 600);
+    if (run.done && !finished) { finished = true; setTimeout(finish, 600); } else if (run.part !== shownPart && !run.done) setTimeout(showPart, 600);
   }
   run.onChange = onChange;
 
   // The current part, drawn by its own mount.
   function showPart() {
-    if (run.done) return finish();
+    if (run.done) { if (!finished) { finished = true; finish(); } return; }
     shownPart = run.part;
     const part = run.current;
     partBox.replaceChildren();
