@@ -9,9 +9,8 @@
 //   LIN f = αx + βy on ax² + by² = c through (u, v): points ±(u, v)
 //   XY2 f = xy² on x² + by² = c, c = 3m (E2): (±√c, 0) and (±√m, ±√(2m/b))
 
-import { Q } from '../../math/rational.js';
 import {
-  q, XY, XYZ, N, rd, rootT, substT, sysCfg, SML, partsLines, mcq4, tfItem, problemItem, mcq, H, E, MT, blanked, examTag,
+  q, XY, XYZ, rd, rootT, substT, sysCfg, SML, partsLines, mcq4, tfItem, problemItem, mcq, H, E, MT, blanked, examTag,
 } from './analyse2-e-kit.js';
 
 export const LG = 'a2-lagrange';
@@ -506,6 +505,12 @@ function quadLines(level, rng, opts) {
   const parts = [
     {
       start: 'A = ?', judge: { kind: 'mat', expect: qm(d.A), a2quad: { doubled: qm(d.D) } },
+      pre: level === 3 ? [{
+        kind: 'decision', prompt: 'Quelle méthode pour les extrema de xᵀAx sur la sphère unité ?', options: [
+          { id: 'eig', label: 'Les valeurs propres de A : Ax = λx et f = λ aux points trouvés', valid: true },
+          { id: 'lag', label: 'Lagrange direct : 4 équations en x, y, z, λ', valid: true, quality: 'poor', why: 'Juste, mais 4 équations non linéaires : c\'est le système Ax = λx, autant prendre les valeurs propres.' },
+        ],
+      }] : [],
       lines: [E(qm(d.A), 'Chaque terme croisé se partage en deux cases : aᵢⱼ = aⱼᵢ = coefficient/2', 'matrix', 'matrix')],
     },
     {
@@ -521,12 +526,6 @@ function quadLines(level, rng, opts) {
     },
     {
       html: 'Sur la sphère unité, f = xᵀAx a pour maximum la plus grande valeur propre :', ask: 'max f =', start: 'M', judge: { kind: 'value', expect: d.max, form: 'exact' },
-      pre: level === 3 ? [{
-        kind: 'decision', prompt: 'Quelle méthode pour les extrema de xᵀAx sur la sphère unité ?', options: [
-          { id: 'eig', label: 'Les valeurs propres de A : Ax = λx et f = λ aux points trouvés', valid: true },
-          { id: 'lag', label: 'Lagrange direct : 4 équations en x, y, z, λ', valid: true, quality: 'poor', why: 'Juste, mais 4 équations non linéaires : c\'est le système Ax = λx, autant prendre les valeurs propres.' },
-        ],
-      }] : [],
       lines: [E(d.max, 'La plus grande valeur propre', 'compare', 'compare')],
     },
     {
@@ -566,4 +565,3 @@ export function lagrange3d(level, rng, profile, opts = {}) {
   return quadLines(level, rng, opts);
 }
 
-void Q; void N; void XYZ;

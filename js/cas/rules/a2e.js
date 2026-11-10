@@ -10,9 +10,9 @@
 // case « variable = 0 » of a line of cases. a2_quadform_matrix_half
 // replays on a `mat` line when the generator gives cfg.a2quad = {doubled:
 // text of the matrix with its off-diagonal entries doubled} (not
-// cfg.quadform, which makes l_quadform_offdiag of module L replay first). The other
-// traps are wrong answers: options of the multiple choices, decisions and
-// true/false statements of the skills.
+// cfg.quadform, which makes l_quadform_offdiag of module L replay first).
+// The other traps are wrong answers: options of the multiple choices,
+// decisions and true/false statements of the skills.
 
 import { parseLine, text as sysText } from '../../judges/system.js';
 import * as mat from '../../judges/mat.js';
@@ -20,7 +20,6 @@ import { sub, div, sym, num, rel, dependsOn } from '../ast.js';
 import { evalFloat } from '../numeric.js';
 import { parse } from '../parse.js';
 import { normalize, pretty } from '../normal.js';
-import { toText } from '../print.js';
 
 const pointVars = (cfg) => cfg.vars.filter((v) => !(cfg.elim || []).includes(v) && v !== 'λ');
 
@@ -201,4 +200,3 @@ export const DEFS = {
   },
 };
 
-void toText;

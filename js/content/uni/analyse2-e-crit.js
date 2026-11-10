@@ -11,7 +11,7 @@
 
 import {
   q, XY, KEYS, sysR, poly, padd, pscale, pmul, psub, pd, pat, ptxt, N, ptT, ptR, listT, rd, RD, substT,
-  sysCfg, SML, partsLines, linesItem, mcq4, vfMcq, tfItem, problemItem, natureDecision, H, E, MT, blanked, examTag,
+  sysCfg, SML, partsLines, mcq4, tfItem, problemItem, natureDecision, H, E, MT, blanked, examTag,
 } from './analyse2-e-kit.js';
 
 export const CP = 'a2-crit-points';
@@ -585,4 +585,3 @@ export function hessian2(level, rng, profile, opts = {}) {
   return hessLines(level, rng, opts);
 }
 
-void linesItem; void vfMcq;

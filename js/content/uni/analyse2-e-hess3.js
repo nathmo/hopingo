@@ -8,7 +8,7 @@
 // f = ½(x − p)ᵀS(x − p) expanded, without its constant.
 
 import {
-  q, XYZ, poly, padd, pd, pat, ptxt, N, ptR, rd, substT, sysCfg, partsLines, mcq4, tfItem, problemItem,
+  q, XYZ, poly, pd, pat, ptxt, N, ptR, rd, substT, sysCfg, partsLines, mcq4, tfItem, problemItem,
   natureDecision, H, E, MT, blanked, examTag, SML,
 } from './analyse2-e-kit.js';
 
@@ -253,4 +253,3 @@ export function hessian3(level, rng, profile, opts = {}) {
   return h3Lines(level, rng, opts);
 }
 
-void padd; void N; void pd;
