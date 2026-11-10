@@ -13,7 +13,7 @@
 // point x refuting a claimed interval).
 
 import { MT, linesItem, tfItem, examTag } from './kit.js';
-import { q, N, modeOf, H, E, SEG, blanked, stepMenus, fr, uniqOptions, examMcq, tfTag } from './analyse1-k-kit.js';
+import { q, N, modeOf, H, E, SEG, blanked, stepMenus, fr, RD, uniqOptions, examMcq, tfTag } from './analyse1-k-kit.js';
 
 // ======================================================================
 // a1-pow-domain
@@ -57,15 +57,29 @@ function domData(rng, { ps = [0, '1/2', 1, 1, 2], center0 = true } = {}) {
   // Texts of aₙ at the index m (a text: 'n', 'n+1').
   const num = (m) => (alt ? `(-${c})^${m.length > 1 ? `(${m})` : m}` : c === 1 ? '1' : `${c}^${m.length > 1 ? `(${m})` : m}`);
   const powOf = (m) => (p === 0 ? '' : p === '1/2' ? `√${m.length > 1 ? `(${m})` : m}` : p === 1 ? (m.length > 1 ? `(${m})` : m) : `${m.length > 1 ? `(${m})` : m}^2`);
-  const dPow = (m) => (d === 1 ? '' : `${d}^${k ? `(${m}+1)` : m.length > 1 ? `(${m})` : m}`);
+  // d^(n+k) at the index m ('n' or 'n+1').
+  const dPow = (m) => {
+    const s = (m === 'n' ? 0 : 1) + k;
+    return d === 1 ? '' : `${d}^${s ? `(n+${s})` : 'n'}`;
+  };
   const den = (m) => [powOf(m), dPow(m)].filter(Boolean).join('×');
-  const A = (m) => (den(m) ? `${num(m)}/(${den(m)})` : num(m));
+  // A denominator in brackets when it has × or + outside brackets.
+  const over = (t) => {
+    let depth = 0;
+    for (const ch of t) {
+      if (ch === '(') depth++;
+      else if (ch === ')') depth--;
+      else if (depth === 0 && (ch === '×' || ch === '+')) return `(${t})`;
+    }
+    return t;
+  };
+  const A = (m) => (den(m) ? `${num(m)}/${over(den(m))}` : num(m));
   const X = x0 === 0 ? 'x' : `(x${x0 > 0 ? '-' : '+'}${Math.abs(x0)})`;
-  const term = den('n') ? `${num('n')}/(${den('n')})×${X}^n` : `${num('n')}×${X}^n`;
+  const term = den('n') ? `${num('n')}/${over(den('n'))}×${X}^n` : `${num('n')}×${X}^n`;
   const series = `sum(${term},n,1,∞)`;
   // |aₙ₊₁|·1/|aₙ|, without a fraction of fractions (tiny denominators are
   // dropped by the numeric comparison).
-  const inv = (m) => (num(m) === '1' ? `(${den(m)})` : den(m) ? `(${den(m)})/${num(m)}` : `1/${num(m)}`);
+  const inv = (m) => (num(m) === '1' ? over(den(m)) : den(m) ? `${over(den(m))}/${num(m)}` : `1/${num(m)}`);
   const ratio = `abs(${A('n+1')}×${inv('n')})`;
   const rhoT = N(rho);
   const frac = rho.d === 1 ? String(rho.n) : `(${rhoT})`;
@@ -78,8 +92,9 @@ function domData(rng, { ps = [0, '1/2', 1, 1, 2], center0 = true } = {}) {
   // The series at the bounds: Σ (±1)ⁿ/(dᵏ·nᵖ).
   const dk = d ** k;
   const bodyDen = [dk > 1 ? String(dk) : '', POW[p]].filter(Boolean).join('');
-  const posT = bodyDen ? `1/${bodyDen.length > 1 ? `(${bodyDen})` : bodyDen}` : '1';
-  const altT = bodyDen ? `(-1)^n/${bodyDen.length > 1 ? `(${bodyDen})` : bodyDen}` : '(-1)^n';
+  const wrapD = dk > 1 && POW[p] ? `(${bodyDen})` : bodyDen;
+  const posT = bodyDen ? `1/${wrapD}` : '1';
+  const altT = bodyDen ? `(-1)^n/${wrapD}` : '(-1)^n';
   const natPos = p === 2 ? 'abs' : 'div';
   const natAlt = p === 2 ? 'abs' : p === 0 ? 'div' : 'semi';
   const right = alt ? { t: altT, nat: natAlt } : { t: posT, nat: natPos };
@@ -101,7 +116,7 @@ const natureOf = (s) => (s.nat === 'abs' ? 'converge absolument' : s.nat === 'se
 
 function boundDecision(x, s) {
   return {
-    kind: 'decision', prompt: `En x = ${fr(N(x))}, la série devient Σ ${MT(s.t)}. Nature ?`,
+    kind: 'decision', prompt: `En x = ${fr(N(x))}, la série devient Σ ${RD(s.t, { vars: ['n'] })}. Nature ?`,
     options: ['abs', 'semi', 'div'].map((id) => ({
       id, label: NATURE[id], valid: id === s.nat,
       ...(id !== s.nat && s.nat !== 'div' && id === 'div' ? { rule: 'a1_power_bounds_forgotten' } : {}),

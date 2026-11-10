@@ -153,16 +153,16 @@ function bisTableItem(level, rng, opts = {}) {
     then.noHints = true;
   }
   const r1 = d.rows[0];
-  const prompt = `Bissection pour f(x) = ${MT(d.f)} sur ${I} : f(${d.lo}) = ${fr(String(fa))} < 0 et f(${d.hi}) = ${fr(String(fb))} > 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe${level <= 2 ? ' (f(m) est donné)' : ''}. Arrondis f(m) à 10⁻⁴.`;
+  const prompt = `Bissection pour f(x) = ${MT(d.f)} sur ${I} : f(${d.lo}) = ${fr(String(fa))} &lt; 0 et f(${d.hi}) = ${fr(String(fb))} &gt; 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe${level <= 2 ? ' (f(m) est donné)' : ''}. Arrondis f(m) à 10⁻⁴.`;
   const solution = d.rows.map((r, k) => {
     const next = d.rows[k + 1] || d.next;
     const kept = next ? `on garde [${D(next.a).show} ; ${D(next.b).show}]` : '';
-    return { html: `m = ${D(r.m).show}, f(m) ${fmText(r.fm).approx ? '≈' : '='} ${fmText(r.fm).show} ${r.fm.n < 0 ? '< 0' : '> 0'}${kept ? ` : ${kept}` : ''}`, note: `Étape ${k + 1}` };
+    return { html: `m = ${D(r.m).show}, f(m) ${fmText(r.fm).approx ? '≈' : '='} ${fmText(r.fm).show} ${r.fm.n < 0 ? '&lt; 0' : '&gt; 0'}${kept ? ` : ${kept}` : ''}`, note: `Étape ${k + 1}` };
   });
   return tableItem({
     skill: BIS, level, prompt, table, phi: { kind: 'bisection', f: d.f, a0: String(d.lo), b0: String(d.hi) }, answers, then, baits,
     hints: H('Garde la moitié où f change de signe : si f(m) a le signe de f(a), on garde [m ; b], sinon [a ; m].',
-      `f(${D(r1.m).show}) ${r1.fm.n < 0 ? '< 0' : '> 0'} et f(${r1.fm.n < 0 ? d.hi : d.lo}) ${r1.fm.n < 0 ? '> 0' : '< 0'} : on garde [▢ ; ▢].`,
+      `f(${D(r1.m).show}) ${r1.fm.n < 0 ? '&lt; 0' : '&gt; 0'} et f(${r1.fm.n < 0 ? d.hi : d.lo}) ${r1.fm.n < 0 ? '&gt; 0' : '&lt; 0'} : on garde [▢ ; ▢].`,
       solution.map((s) => s.html).join('<br>')),
     noHints: level === 5 || !!opts.exam, subgoals: BIS_SUB, solution,
     key: `${level}:${d.f}:${d.lo}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -207,7 +207,7 @@ function bisTap(level, rng, opts = {}) {
     E(D(next.m).text, `Milieu de [${show(next.a)} ; ${show(next.b)}]`, 'steps'));
   return linesItem({
     skill: BIS, level, mode: 'tap', start: 'm_1', judge: { kind: 'value', expect: D(mid(0)).text, form: 'any' }, script,
-    prompt: `Bissection pour f(x) = ${MT(d.f)} sur ${I} : f(${d.lo}) = ${fr(String(fa))} < 0, f(${d.hi}) = ${fr(String(fb))} > 0. Précision voulue : un intervalle de longueur ≤ ${show(eps)}. À chaque étape, choisis la moitié, puis écris son milieu.`,
+    prompt: `Bissection pour f(x) = ${MT(d.f)} sur ${I} : f(${d.lo}) = ${fr(String(fa))} &lt; 0, f(${d.hi}) = ${fr(String(fb))} &gt; 0. Précision voulue : un intervalle de longueur ≤ ${show(eps)}. À chaque étape, choisis la moitié, puis écris son milieu.`,
     hints: H('Garde la moitié où f change de signe : compare le signe de f(m) à ceux de f(a) et f(b).',
       `m₂ est le milieu de la moitié gardée : (a + b)/2 = ▢.`,
       rows.map((r, k) => `m${'₁₂₃'[k]} = ${show(r.m)}`).join(', ') + `, puis c ≈ ${show(next.m)}.`),

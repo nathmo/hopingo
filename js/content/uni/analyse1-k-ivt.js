@@ -60,7 +60,7 @@ function ivtData(rng, kinds) {
     const c = rng.pick([1, 2, 3]);
     const cx = c === 1 ? 'x' : `${c}x`;
     const h = `cos(x)-${cx}`;
-    const B = `${c === 1 ? '' : c}π/2`;
+    const B = c === 1 ? 'π/2' : c === 2 ? 'π' : `${c}π/2`;
     return {
       kind, f: h, eq: `${MT('cos(x)')} = ${MT(cx)}`, name: 'h', def: `h(x) = ${MT(h)} : cos c = ${fr(cx.replace('x', 'c'))} ⇔ h(c) = 0`, a: '0', b: 'π/2', A: '0', B: 'π/2',
       cont: 'h est continue sur [0 ; π/2] (somme de fonctions continues).', fa: '1', fb: `-${B}`, sa: '>', sb: '<',
@@ -119,7 +119,7 @@ function ivtData(rng, kinds) {
   const d = rng.int(-9, 9);
   const P = `x^3${b ? `${b > 0 ? '+' : ''}${b === 1 ? '' : b === -1 ? '-' : b}x^2` : ''}${c ? `${c > 0 ? '+' : ''}${c === 1 ? '' : c === -1 ? '-' : c}x` : ''}${d ? `${d > 0 ? '+' : ''}${d}` : ''}`;
   return {
-    kind: 'odd', f: P, eq: '', name: 'P', a: 'a', b: 'b',
+    kind: 'odd', f: P, eq: '', name: 'P', a: 'a', b: 'b', A: 'a', B: 'b',
     stmt: `Montre que l'équation ${MT(P)} = 0 a au moins une solution réelle.`,
     def: `P(x) = ${MT(P)}, polynôme de degré 3 (impair)`,
     cont: 'P est continue sur ℝ (polynôme).',
@@ -191,7 +191,7 @@ function ivtBlocks(level, rng, opts = {}) {
     placed, goal: order.at(-1), order: order.filter((id) => !placed.includes(id)), decision,
     hints: H(`Il faut une fonction continue qui change de signe sur ${ab}.`,
       d.typed ? `${n}(${fr(d.A)}) = ▢ et ${n}(${fr(d.B)}) = ▢ : leurs signes sont contraires.` : `${d.faHtml} ; ${d.fbHtml}.`,
-      `${n} continue et ${n}(${fr(d.A)}) ${d.sa || '≥'} 0 ${d.sb || '≤'} ${n}(${fr(d.B)}) : TVI.`),
+      d.typed ? `${n} continue, ${n}(${fr(d.A)}) ${d.sa === '<' ? '&lt;' : '&gt;'} 0 et ${n}(${fr(d.B)}) ${d.sb === '<' ? '&lt;' : '&gt;'} 0 : TVI.` : `${n} continue et de signes contraires en ${fr(d.A)} et ${fr(d.B)} : TVI.`),
     noHints: level === 5 || !!opts.exam,
     subgoals: IVT_SUB, solution,
     key: `${level}:${d.kind}:${d.f}:${d.A ?? ''}`, exam: examTag(opts),
@@ -270,7 +270,7 @@ const IMG_CHOICES = [
 // k·π/4 as text: π/4, π/2, 3π/4, π.
 const PI4 = { 1: 'π/4', 2: 'π/2', 3: '3π/4', 4: 'π' };
 // e^(s·kπ/4) as text.
-const ex = (s, k) => (k === 0 ? '' : k === 4 ? `e^(${s < 0 ? '-' : ''}π)` : `e^(${s < 0 ? '-' : ''}${PI4[k]})`);
+const ex = (s, k) => (k === 0 ? '' : k === 4 ? (s < 0 ? 'e^(-π)' : 'e^π') : `e^(${s < 0 ? '-' : ''}${PI4[k]})`);
 // c·E as text, c in {0, ±1, ±√2/2}.
 function times(c, E) {
   if (c === '0') return '0';
