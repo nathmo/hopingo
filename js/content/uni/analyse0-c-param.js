@@ -46,9 +46,9 @@ const PT_CHOICES = [
 // ẏ = 3(t − r)(t − w); r ∈ {p, q} is the stationary point.
 function ptData(rng) {
   for (let i = 0; i < 300; i++) {
-    const p = rng.int(-2, 1);
-    const qq = rng.int(p + 1, 2);
-    if ((p + qq) % 2) continue;
+    const p = rng.int(-3, 2);
+    const qq = rng.int(p + 1, 3);
+    if ((p + qq) % 2 || Math.abs(p * qq) > 6) continue;
     const r = rng.pick([p, qq]);
     const u = r === p ? qq : p;
     const cubic = rng.chance(0.5);
@@ -58,8 +58,10 @@ function ptData(rng) {
       if (w === p || w === qq || (r + w) % 2) continue;
     }
     const S = (p + qq) / 2;
-    const xc = [0, 3 * p * qq, -3 * S, 1];
-    const yc = cubic ? [0, 3 * r * w, -3 * (r + w) / 2, 1] : [0, -2 * r, 1];
+    // Constants move the curve, not the speed.
+    const xc = [rng.int(-2, 2), 3 * p * qq, -3 * S, 1];
+    const yc = cubic ? [rng.int(-2, 2), 3 * r * w, -3 * (r + w) / 2, 1] : [rng.int(-2, 2), -2 * r, 1];
+    if (cubic && Math.abs(r * w) > 6) continue;
     const dx = pDeriv(xc);
     const dy = pDeriv(yc);
     const slope = cubic ? q(r - w, r - u) : q(2, 3 * (r - u));
@@ -320,11 +322,11 @@ function pbParts(d, level) {
   const lText = polyText(d.L, T);
   const hLines = [
     E(`(${dText})/(${tt})`, 'Même dénominateur', 'intercept', 'intercept'),
-    E(lText, `Le numérateur s'annule en ${fr(d.t0)} : on simplifie par t − ${fr(d.t0)}`, 'intercept', 'intercept'),
+    E(lText, `Le numérateur s'annule en ${fr(d.t0)} : on simplifie par ${RT(tt)}`, 'intercept', 'intercept'),
     E(N(d.h), `t = ${fr(d.t0)}`, 'intercept', 'intercept'),
   ];
   if (level <= 2) hLines[1] = blanked(hLines[1], [[String(Math.abs(d.L[0].n)), -1]].filter(() => d.L[0].n !== 0));
-  const mx = `(${N(d.m)})×${xt}`;
+  const mx = `${d.m.d === 1 && d.m.n > 0 ? d.m.n : `(${N(d.m)})`}×${xt}`;
   const inter = part(`Quand t → ${fr(d.t0)} : h = lim (y − mx).`, 'h =', `${yt}-${mx}`, lim(d.t0), hLines);
   const asym = part(`Asymptote quand t → ${fr(d.t0)} :`, 'y =', 'mx+h', asymJudge(d.m, d.h), [E(affText(d.m, d.h), 'y = mx + h', 'asym', 'asym')], [obliqueDecision(d.m, d.h)]);
   return { xt, yt, domain, xInf, yInf, xT0, yT0, slope, inter, asym };

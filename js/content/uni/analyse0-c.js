@@ -71,8 +71,8 @@ function apA(r1, r2, c, d) {
   return {
     kind: 'A', f, p, absArg: p,
     pieces: {
-      out: { cs: out, cond: `x &lt; ${fr(r1)} ou x > ${fr(r2)}`, dom: [r2 + 0.2, r2 + 3], sign: `${MT(p)} ≥ 0`, neg: false },
-      in: { cs: inn, cond: `${fr(r1)} &lt; x &lt; ${fr(r2)}`, dom: [r1 + 0.1, r2 - 0.1], sign: `${MT(p)} &lt; 0`, neg: true },
+      out: { cs: out, cond: `x &lt; ${fr(r1)} ou x > ${fr(r2)}`, dom: [r2 + 0.2, r2 + 3], sign: `${RT(p)} ≥ 0`, neg: false },
+      in: { cs: inn, cond: `${fr(r1)} &lt; x &lt; ${fr(r2)}`, dom: [r1 + 0.1, r2 - 0.1], sign: `${RT(p)} < 0`, neg: true },
     },
     points: [{ r: r2, left: 'in', right: 'out' }, { r: r1, left: 'out', right: 'in' }],
   };
@@ -89,8 +89,8 @@ function apDataB(rng) {
     return {
       kind: 'B', f: `|${xa}|(${xb})`, absArg: xa,
       pieces: {
-        R: { cs: right, cond: `x > ${fr(a)}`, dom: [a + 0.2, a + 3], sign: `${MT(xa)} > 0`, neg: false },
-        L: { cs: pScale(right, -1), cond: `x &lt; ${fr(a)}`, dom: [a - 3, a - 0.2], sign: `${MT(xa)} &lt; 0`, neg: true },
+        R: { cs: right, cond: `x > ${fr(a)}`, dom: [a + 0.2, a + 3], sign: `${RT(xa)} > 0`, neg: false },
+        L: { cs: pScale(right, -1), cond: `x &lt; ${fr(a)}`, dom: [a - 3, a - 0.2], sign: `${RT(xa)} < 0`, neg: true },
       },
       points: [{ r: a, left: 'L', right: 'R' }],
     };
@@ -382,7 +382,7 @@ function asRat(rng) {
 function asRatOf(m, h, a, k) {
   const num = polyText([k - h * a, h - m * a, m]);
   const xa = minusText(a);
-  return { kind: 'rat', m, h, a, k, num, xa, f: `(${num})/(${xa})`, aff: affText(m, h), rest: `${k}/(${xa})` };
+  return { kind: 'rat', m, h, a, k, num, xa, f: `(${num})/(${xa})`, aff: affText(m, h), rest: `${k}/(${xa})`, div: `${affText(m, h)}${sgnTerm(`${k}/(${xa})`)}` };
 }
 
 function ratParts(d, level, side) {
@@ -394,8 +394,9 @@ function ratParts(d, level, side) {
   const slope = part('Pente : m = lim f(x)/x quand x → ±∞.', 'm =', `(${f})/x`, { kind: 'limit', v: V, to: '+∞' },
     [E(`(${d.num})/(${polyText([0, -a, 1])})`, 'f(x)/x', 'slope', 'slope'), E(N(m), 'Termes de plus haut degré', 'slope', 'slope')]);
   const hNum = polyText([k - h * a, h]);
-  const inter = part(`Ordonnée à l'origine : h = lim (f(x) − ${MT(affText(m, 0))}) quand x → ±∞.`, 'h =', `${f}${mText}`, { kind: 'limit', v: V, to: '+∞' },
-    [level === 1 ? blanked(E(`(${hNum})/(${xa})`, 'Même dénominateur', 'intercept', 'intercept'), [hNum]) : E(`(${hNum})/(${xa})`, 'Même dénominateur', 'intercept', 'intercept'),
+  const hFrac = `${h === 0 ? hNum : `(${hNum})`}/(${xa})`;
+  const inter = part(`Ordonnée à l'origine : h = lim (f(x) − mx) quand x → ±∞, avec m = ${fr(N(m))}.`, 'h =', `${f}${mText}`, { kind: 'limit', v: V, to: '+∞' },
+    [level === 1 ? blanked(E(hFrac, 'Même dénominateur', 'intercept', 'intercept'), [hNum]) : E(hFrac, 'Même dénominateur', 'intercept', 'intercept'),
       E(N(h), 'Termes de plus haut degré', 'intercept', 'intercept')]);
   const diff = part(`Position : f(x) − (${MT(d.aff)}) =`, 'f(x) − (mx + h) =', `${f}-(${d.aff})`, { kind: 'equiv', vars: [V], domain: { x: [a + 0.3, a + 4] }, target: 'short', goal: d.rest, slack: 1 },
     [E(d.rest, 'Même dénominateur', 'position', 'position')]);
@@ -496,7 +497,7 @@ function asItem(level, rng, opts = {}) {
       parts = [p.inter, p.diff, p.asym];
     } else if (lv === 2) {
       const div = part('Division euclidienne :', 'f(x) =', d.f, { kind: 'equiv', vars: [V], domain: { x: [d.a + 0.3, d.a + 4] }, target: 'partial-fractions' },
-        [blanked(E(`${d.aff}+${d.rest}`, 'Quotient et reste', 'division', 'division'), [d.aff])],
+        [blanked(E(d.div, 'Quotient et reste', 'division', 'division'), [d.aff])],
         [D('Comment trouver l\'asymptote oblique ?', [
           { id: 'div', label: 'Division euclidienne : f(x) = mx + h + reste/(x − a)', valid: true, ref: true },
           { id: 'mh', label: 'm = lim f(x)/x, puis h = lim (f(x) − mx)', valid: true, quality: 'poor', why: 'Juste aussi ; mais pour une fraction rationnelle, la division donne m, h et la position d\'un coup.' },
@@ -547,7 +548,7 @@ function asMcq(rng) {
     return mcq({
       skill: AS, level: 4, prompt: `Quelle est l'asymptote oblique de f(x) = ${MT(d.f)} en ±∞ ?`, options,
       key: `${AS}:mcq:${d.f}`, exam: { format: 'mcq', points: 1 },
-      solution: [{ html: `f(x) = ${MT(`${d.aff}+${d.rest}`)} : m = ${fr(N(d.m))}, h = ${fr(N(d.h))}, asymptote y = ${MT(d.aff)}.`, note: '' }],
+      solution: [{ html: `f(x) = ${MT(d.div)} : m = ${fr(N(d.m))}, h = ${fr(N(d.h))}, asymptote y = ${MT(d.aff)}.`, note: '' }],
     }, rng);
   }
   // A common zero of numerator and denominator is a hole, not an asymptote.
@@ -593,7 +594,7 @@ function asTf(rng) {
   const d = asRat(rng);
   if (kind === 'pos' && d.k > 0) {
     return tfItem({
-      skill: AS, level: 4, statement: `Pour x > ${fr(d.a)}, la courbe de f(x) = ${MT(`${d.aff}+${d.rest}`)} est au-dessus de son asymptote oblique.`,
+      skill: AS, level: 4, statement: `Pour x > ${fr(d.a)}, la courbe de f(x) = ${MT(d.div)} est au-dessus de son asymptote oblique.`,
       truth: true, key: `pos:${d.f}`, exam: { format: 'tf', points: 1 },
       explanation: `Vrai : f(x) − (${MT(d.aff)}) = ${MT(d.rest)} > 0 pour x > ${fr(d.a)}.`,
     });
@@ -601,7 +602,7 @@ function asTf(rng) {
   return tfItem({
     skill: AS, level: 4, statement: `La droite y = ${MT(d.aff)} est asymptote à la courbe de f(x) = ${MT(d.f)} en +∞ et en −∞.`,
     truth: true, key: `t:${d.f}`, exam: { format: 'tf', points: 1 },
-    explanation: `Vrai : f(x) = ${MT(`${d.aff}+${d.rest}`)}, et ${MT(d.rest)} → 0.`,
+    explanation: `Vrai : f(x) = ${MT(d.div)}, et ${MT(d.rest)} → 0.`,
   });
 }
 

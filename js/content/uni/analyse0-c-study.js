@@ -116,7 +116,7 @@ function parts1(d, level, side) {
     [level === 2 ? blanked(d1Line, [`${d.px}^2`]) : d1Line]);
   const sq = `${d.px}^2=${d.s * d.s}`;
   const zeros = part('Zéros de f′ :', 'f′(x) = 0 ⇔', `${d.d1}=0`, { kind: 'solset', v: V },
-    [level === 2 ? blanked(E(sq, 'Isoler le carré', 'variation', 'deriv'), [String(d.s * d.s)]) : E(sq, 'Isoler le carré', 'variation', 'deriv'),
+    [level === 2 ? blanked(E(sq, 'Isoler le carré', 'variation', 'deriv'), [[String(d.s * d.s), -1]]) : E(sq, 'Isoler le carré', 'variation', 'deriv'),
       E(`x=${d.x1} ou x=${d.x2}`, 'Racine carrée', 'variation', 'deriv')]);
   const deriv2 = part('Dérivée seconde :', 'f″(x) =', `d(${d.d1})`, { kind: 'equiv', vars: [V], domain: { x: [d.a + 0.3, d.a + 4] }, target: 'no-prime' },
     [E(d.d2, 'Dériver −k(x − a)⁻²', 'concavity', 'second')]);
