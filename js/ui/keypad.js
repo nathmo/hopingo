@@ -312,10 +312,10 @@ Object.assign(LABEL, { 'pd(': '∂( , x)' });
 
 // Step U10 (V, C, F): parametrisations and boundaries (σ(r, φ), t ∈ [a ; b],
 // Γ₁ : point), and transforms (ℱ, ℒ, the transform û of the unknown,
-// Heaviside H, δ, the half-plane Re z > …).
+// Heaviside H, δ, the half-plane Re z > …; û, ŷ and f̂ of the transformed equations).
 KEYSETS.vecto = ['(', ';', ')', 't', 'r', 'φ', 'θ', 'σ', 'γ', '∈', '[', ']', '×', '∧', 'Γ', '_', ':', 'point', ' et ', "s'annulent", 'back'];
 TAB_LABEL.vecto = 'σ ∈ Γ';
-KEYSETS.transf = ['ℱ(', 'ℒ(', 'α', 'z', 'û', 'Y', 'U', 'H(', 'δ', '|', 'e^(', '√(2π)', ', Re z > ', 'back'];
+KEYSETS.transf = ['ℱ(', 'ℒ(', 'α', 'z', 'û', 'ŷ', 'f̂', 'Y', 'U', 'H(', 'δ', '|', 'e^(', '√(2π)', ', Re z > ', 'back'];
 TAB_LABEL.transf = 'ℱ ℒ';
 Object.assign(LABEL, { ', Re z > ': 'Re z >', 'H(': 'H( )', 'ℱ(': 'ℱ( )', 'ℒ(': 'ℒ( )' });
 // Residues and arcs (C, part b), distributions (F, part b).

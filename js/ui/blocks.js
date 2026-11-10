@@ -7,6 +7,7 @@
 
 import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
+import { keysFor } from './keys-needed.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { placeBlock } from '../judges/blocks.js';
@@ -76,7 +77,7 @@ export function mountBlocks(item, ctx, body) {
 
   // A block of the frame: the calculation is typed, then the block is placed.
   function askInput(b, btn) {
-    input = new MathInput({ keysets: b.input.keys || ['calc', 'relation'], placeholder: 'ton calcul', onEnter: () => send() });
+    input = new MathInput({ keysets: keysFor(b.input.keys || ['calc', 'relation'], [b.input.answer ?? '']), placeholder: 'ton calcul', onEnter: () => send() });
     const send = () => { if (input.value) tap(b, btn, input.value); };
     stage.replaceChildren(h('div.step-label', b.input.ask), h('div.step-line.current', input.display));
     footer.replaceChildren(input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: send }, 'Valider le calcul'));

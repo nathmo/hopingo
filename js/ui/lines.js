@@ -12,7 +12,8 @@ import { h, html, play } from './dom.js';
 import { MathInput } from './keypad.js';
 import { TokenInput } from './tokens.js';
 import { explainRule, solutionHtml } from './exercises.js';
-import { LinesRun, templateOf, fillBlanks } from '../judges/lines.js';
+import { LinesRun, templateOf, fillBlanks, segmentsOf } from '../judges/lines.js';
+import { keysFor } from './keys-needed.js';
 import { LoggedLinesRun, isLongLines, pendingOf, resumeRun } from '../judges/problem.js';
 import { actionsFor } from '../judges/actions.js';
 import { parseOpts } from '../judges/common.js';
@@ -38,6 +39,21 @@ const innerMath = (text, opts) => {
   return n ? MM(n).replace(/^<math[^>]*>/, '').replace(/<\/math>$/, '') : null;
 };
 
+// What the student types on the keypad: the reference lines of the parts
+// written with the keypad (not grids, not tokens) and the values asked
+// after a decision.
+function typedTexts(item) {
+  const out = [];
+  for (const seg of segmentsOf(item)) {
+    const typed = judgeFor(seg.judge).input !== 'matrix' && seg.judge.kind !== 'logic';
+    for (const l of seg.lines) {
+      if (l.kind === 'eq' && typed) out.push(l.math);
+      if (l.kind === 'decision') for (const o of l.options) if (o.then && o.valid) out.push(o.then.expect);
+    }
+  }
+  return out;
+}
+
 // opts.run: a run already made (a part of a problem, or a resumed item: its
 // lines so far are drawn again). A long item (§9.6) saves itself after each
 // action through ctx.save(pending) when the screen gives ctx.save.
@@ -48,7 +64,7 @@ export function mountLines(item, ctx, body, opts = {}) {
   if (!run) run = new LinesRun(item);
   if (!opts.run && run instanceof LoggedLinesRun && ctx.save) run.onChange = () => ctx.save(pendingOf(run));
   const popts = () => parseOpts(run.cfg);
-  const keysets = item.keys?.length ? item.keys : ['calcx', 'calcfn'];
+  const keysets = keysFor(item.keys?.length ? item.keys : ['calcx', 'calcfn'], typedTexts(item));
   const canHint = !item.noHints && item.hints?.length > 0;
 
   const history = h('div.steps-history.lines-history');

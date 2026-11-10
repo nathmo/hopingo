@@ -220,13 +220,13 @@ function pageLib() {
 
   S.ready = async () => {
     if (M.app) return true;
-    const [main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam] = await Promise.all([
+    const [main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam, mxitems, kn] = await Promise.all([
       '/js/main.js', '/js/content/generators.js', '/js/content/random.js', '/js/content/skills.js', '/js/content/uni/index.js',
       '/js/ui/keypad.js', '/js/ui/tokens.js', '/js/ui/matrix-input.js', '/js/judges/lines.js', '/js/judges/problem.js',
       '/js/judges/actions.js', '/js/judges/common.js', '/js/judges/index.js', '/js/judges/interpret.js',
-      '/js/content/uni/exams.js', '/js/engine/exam.js',
+      '/js/content/uni/exams.js', '/js/engine/exam.js', '/js/ui/matrix-items.js', '/js/ui/keys-needed.js',
     ].map((u) => import(u)));
-    Object.assign(M, { main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam });
+    Object.assign(M, { main, gen, rnd, skills, uni, keypad, tokens, mxin, lines, problem, actions, common, idx, interp, exams, exam, mxitems, kn });
     M.app = main.app;
     // Inputs and runs are found from the page: each input keeps itself on
     // its element, each run is listed (prototype hooks, nothing in the app).
@@ -324,6 +324,7 @@ function pageLib() {
           const what = [...S.scan(), ...S.checkKeypads()];
           if (!S.inputs(document.querySelector('.screen-lesson'))) what.push('no input on screen');
           if (document.querySelector('.feedback.show')) what.push('the item ended while mounting');
+          for (const c of S.coverage(item)) what.push(`keypad: cannot type « ${c.missing} » in « ${c.text} »${c.where} (keys ${JSON.stringify(c.keys)})`);
           for (const w of what) issues.push({ where: `${where} (${item.type}${item.mode ? ` ${item.mode}` : ''}) ${item.key}`, what: w });
         } catch (e) { issues.push({ where, what: `mount: ${e.stack || e.message}` }); }
         for (const e of S.takeErrors()) issues.push({ where: `${where} ${item?.key}`, what: e });
@@ -925,6 +926,81 @@ function pageLib() {
     };
   };
   S.examIds = () => M.exams.EXAMS.map((e) => e.id);
+
+  // ---------- can the reference be typed with the item's keypads? ----------
+  // Every text typed in a keypad input (lines, blanks, a decision's value,
+  // counter-examples, blocks, bounds, short answers) is checked against the
+  // keys of its keypads plus what a keyboard gives (ASCII the input takes).
+  const keyList = (spec) => {
+    const names = Array.isArray(spec) && spec.length && spec.every((k) => k.length > 1) ? spec : null;
+    const mk = (keys) => { const mi = new M.keypad.MathInput({ keys }); return mi.keyList; };
+    if (names) return names.flatMap((n) => mk(n) ?? [`?${n}`]);
+    if (Array.isArray(spec)) return spec;
+    return mk(spec) ?? [`?${spec}`];
+  };
+  const NOT_TEXT = new Set(['back', 'left', 'right', 'ok', 'enter', '']);
+  S.untypable = (text, spec) => {
+    const keys = keyList(spec).filter((k) => !NOT_TEXT.has(k));
+    const unknown = keys.filter((k) => k.startsWith('?'));
+    if (unknown.length) return `unknown keypad ${unknown.join(' ')}`;
+    const set = new Set(keys);
+    const letters = keys.some((k) => /^[a-zA-Zπ]$/.test(k));
+    const multi = keys.filter((k) => k.length > 1 && k !== 'frac').sort((a, b) => b.length - a.length);
+    const t = String(text).replace(/−/g, '-');
+    const out = new Set();
+    for (let i = 0; i < t.length;) {
+      const m = multi.find((k) => t.startsWith(k, i));
+      if (m) { i += m.length; continue; }
+      const c = t[i];
+      const ok = set.has(c) || /[0-9]/.test(c) || c === ' ' || (letters && /[a-zA-Z]/.test(c))
+        || ((c === '/' || c === '÷') && set.has('frac')) || ((c === '*' || c === '·') && set.has('×')) || (c === '.' && set.has(','))
+        || (c === '×' && set.has('·'));
+      if (!ok) out.add(c);
+      i++;
+    }
+    return out.size ? [...out].join('') : null;
+  };
+  // The texts of an item that are typed in keypad inputs: [{text, keys, where}].
+  S.typedTexts = (item, out = [], where = '') => {
+    const add = (text, keys, w) => { if (text !== undefined && text !== null && String(text) !== '') out.push({ text: String(text), keys, where: where + w }); };
+    switch (item.type) {
+      case 'lines': {
+        const keys = item.keys?.length ? item.keys : ['calcx', 'calcfn'];
+        M.lines.segmentsOf(item).forEach((seg, s) => {
+          const cfg = seg.judge;
+          const grid = M.idx.judgeFor(cfg).input === 'matrix';
+          for (const l of seg.lines) {
+            if (l.kind === 'decision') for (const o of l.options) if (o.then && (o.ref || o.valid)) add(o.then.expect, keys, ` part ${s + 1} then`);
+            if (l.kind !== 'eq' || grid || cfg.kind === 'logic') continue;
+            if (item.mode === 'guided' && l.blanks?.length) M.lines.blankAnswers(l, M.common.parseOpts(cfg)).forEach((b) => add(b, keys, ` part ${s + 1} blank`));
+            else add(l.math, keys, ` part ${s + 1}`);
+          }
+        });
+        break;
+      }
+      case 'tf': {
+        const c = item.counter;
+        if (!item.truth && c && c.kind !== 'truth' && !(M.mxitems?.usesGrid?.(c))) {
+          for (const a of c.ask?.length ? c.ask : [{ v: 'x' }]) add(c.answer?.[a.v], a.keys || ['calc', 'set'], ` counter ${a.v}`);
+        }
+        break;
+      }
+      case 'blocks': for (const b of item.blocks) if (b.input) add(b.input.answer, b.input.keys || ['calc', 'relation'], ' block'); break;
+      case 'domain': for (const f of item.fields) for (const x of item.answer[f.v]) add(x, item.keys || ['calc', 'calcfn'], ` bound ${f.v}`); break;
+      case 'answer': add(item.expected, item.keys ?? 'frac', ' answer'); break;
+      case 'problem': item.parts.forEach((p, i) => S.typedTexts(p, out, `${where} part ${i + 1}`)); break;
+      case 'table': case 'code': if (item.then) S.typedTexts(item.then, out, `${where} then`); break;
+      case 'readtable': S.typedTexts(item.question, out, `${where} question`); break;
+      default: break;
+    }
+    return out;
+  };
+  // With the keypads the screens add for the symbols (js/ui/keys-needed.js).
+  const isNames = (k) => Array.isArray(k) && k.length && k.every((x) => x.length > 1);
+  S.coverage = (item) => S.typedTexts(item).map((x) => {
+    const keys = isNames(x.keys) ? M.kn.keysFor(x.keys, [x.text]) : x.keys;
+    return { ...x, keys, missing: S.untypable(x.text, keys) };
+  }).filter((x) => x.missing);
 
   S.uniSkills = () => M.uni.UNI_SKILLS.map((s) => ({ id: s.id, unit: s.unit, exam: s.exam || [] }));
   return S;
