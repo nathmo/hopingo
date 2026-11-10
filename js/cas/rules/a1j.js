@@ -19,7 +19,7 @@ import { walk, replaceAt, stripParen, numValue, canonFn, lit } from '../ast.js';
 import { toReadable } from '../print.js';
 import { limit, targetOf, sameLimit } from '../limit.js';
 import { Q } from '../../math/rational.js';
-import { lexFor, walkF, replaceF, atomText, atomFromText } from '../logic.js';
+import { lexFor, norm, walkF, replaceF, atomText } from '../logic.js';
 
 const vOf = (ctx) => ctx?.cfg?.v || ctx?.v || 'x';
 const par = (e) => ({ t: 'paren', e });
@@ -186,19 +186,19 @@ export const RULES = [
       line: '∀ε > 0 ∃δ > 0 ∀x ∈ D, |x − x₀| ≤ ε ⇒ |f(x) − L| ≤ δ',
     },
     transform: (prev, ctx) => {
+      // Only with the item's own pieces (both swapped atoms are offered):
+      // a candidate made of other atoms could not be printed back.
       const lex = lexFor(ctx?.cfg || {});
-      let node = prev;
-      let hit = false;
       const paths = [];
       walkF(prev, (n, path) => { if (n.t === 'atom' && /[εδ]/.test(atomText(n, lex))) paths.push({ n, path }); return true; });
+      if (paths.length < 2) return [];
+      let node = prev;
       for (const { n, path } of paths) {
-        const text = atomText({ ...n, neg: false }, lex);
-        const a = atomFromText(swapED(text), lex);
-        if (!a) continue;
-        node = replaceF(node, path, { t: 'atom', key: a.key, neg: n.neg ? !a.neg : a.neg });
-        hit = true;
+        const hit = lex.texts.get(norm(swapED(atomText({ ...n, neg: false }, lex))));
+        if (!hit) return [];
+        node = replaceF(node, path, { t: 'atom', key: hit.key, neg: n.neg ? !hit.neg : hit.neg });
       }
-      return hit ? [{ node, ctx: {} }] : [];
+      return [{ node, ctx: {} }];
     },
     explain: () => 'ε mesure l\'écart des valeurs, |f(x) − L| ≤ ε ; δ mesure l\'écart des x, |x − x₀| ≤ δ. On se donne ε, puis on cherche δ.',
   },
