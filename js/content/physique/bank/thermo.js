@@ -22,18 +22,18 @@ export default [
       {
         find: 'h', given: ['g', 'c', 'ΔT'], quantities: { g: { value: 1.6, units: ['N/kg'] } },
         text: 'Sur la Lune (g = {g}), on lâche sans vitesse une pomme de terre (c = {c}). Toute son énergie à l\'impact devient de la chaleur en elle. De quelle hauteur faut-il la lâcher pour qu\'elle se réchauffe de {ΔT} ?',
-        lines: ['m g h = m c ΔT', 'g h = c ΔT', 'h = c ΔT/g'],
+        lines: ['m g h = m c ΔT', 'g h = c ΔT', 'h = (c ΔT)/g'],
       },
       {
         find: 'h', given: ['g', 'c', 'ΔT'], quantities: { g: { value: 3.7, units: ['N/kg'] } },
         text: 'Sur Mars (g = {g}), on lâche sans vitesse une pomme de terre (c = {c}). Toute son énergie à l\'impact devient de la chaleur en elle. De quelle hauteur faut-il la lâcher pour qu\'elle se réchauffe de {ΔT} ?',
-        lines: ['m g h = m c ΔT', 'g h = c ΔT', 'h = c ΔT/g'],
+        lines: ['m g h = m c ΔT', 'g h = c ΔT', 'h = (c ΔT)/g'],
       },
       {
         find: 'ΔT', given: ['g', 'h', 'c'],
         quantities: { h: { min: 400, max: 2000, step: 100, units: ['m', 'km'] }, ΔT: { min: 0.05, max: 20, step: 0.01, units: ['K'] } },
         text: 'Tu lâches une pomme de terre (c = {c}) du haut d\'une falaise : elle tombe de {h}. Toute son énergie à l\'impact devient de la chaleur en elle, et on néglige l\'air. De combien se réchauffe-t-elle ?',
-        lines: ['m g h = m c ΔT', 'g h = c ΔT', 'ΔT = g h/c'],
+        lines: ['m g h = m c ΔT', 'g h = c ΔT', 'ΔT = (g h)/c'],
       },
     ],
   },
@@ -53,17 +53,17 @@ export default [
       {
         find: 't', given: ['m', 'c', 'ΔT', 'P'],
         text: 'Une bouilloire de {P} contient {m} d\'eau (c = {c}) à réchauffer de {ΔT}. Combien de temps faut-il, sans pertes ?',
-        lines: ['P t = m c ΔT', 't = m c ΔT/P'],
+        lines: ['P t = m c ΔT', 't = (m c ΔT)/P'],
       },
       {
         find: 'P', given: ['m', 'c', 'ΔT', 't'],
         text: 'Une bouilloire réchauffe {m} d\'eau (c = {c}) de {ΔT} en {t}, sans pertes. Quelle est sa puissance ?',
-        lines: ['P = E/t', 'P = m c ΔT/t'],
+        lines: ['P = E/t', 'P = (m c ΔT)/t'],
       },
       {
         find: 'ΔT', given: ['m', 'c', 'P', 't'], minLevel: 3,
         text: 'Un chauffe-eau de {P} chauffe {m} d\'eau (c = {c}) pendant {t}, sans pertes. De combien la température de l\'eau monte-t-elle ?',
-        lines: ['m c ΔT = P t', 'ΔT = P t/(m c)'],
+        lines: ['m c ΔT = P t', 'ΔT = (P t)/(m c)'],
       },
     ],
   },
@@ -82,12 +82,12 @@ export default [
       {
         find: 't', given: ['m', 'L_f', 'P'],
         text: 'Un réchaud de {P} fait fondre {m} de glace à 0 °C (L<sub>f</sub> = {L_f}). Combien de temps faut-il, sans pertes ?',
-        lines: ['P t = m L_f', 't = m L_f/P'],
+        lines: ['P t = m L_f', 't = (m L_f)/P'],
       },
       {
         find: 'm', given: ['L_f', 'P', 't'], minLevel: 3,
         text: 'Un réchaud de {P} chauffe de la glace à 0 °C (L<sub>f</sub> = {L_f}) pendant {t}, sans pertes. Quelle masse de glace fond ?',
-        lines: ['m L_f = P t', 'm = P t/L_f'],
+        lines: ['m L_f = P t', 'm = (P t)/L_f'],
       },
     ],
   },
@@ -109,7 +109,7 @@ export default [
       {
         find: 'ΔT', given: ['m', 'g', 'h', 'm_f', 'c'],
         text: 'Un cycliste ({m} avec son vélo) descend un col de {h} de dénivelé à vitesse constante. Toute l\'énergie part en chaleur dans ses freins en acier : {m_f} en tout (c = {c}). De combien les freins se réchaufferaient-ils, sans refroidir ?',
-        lines: ['m g h = m_f c ΔT', 'ΔT = m g h/(m_f c)'],
+        lines: ['m g h = m_f c ΔT', 'ΔT = (m g h)/(m_f c)'],
       },
     ],
   },

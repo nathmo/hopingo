@@ -76,17 +76,17 @@ export default [
       {
         find: 'P', given: ['m', 'g', 'h', 't'],
         text: 'Un ascenseur et ses passagers ({m}) montent de {h} en {t}. Quelle puissance moyenne le moteur doit-il fournir, au minimum ?',
-        lines: ['P = E/t', 'P = m g h/t'],
+        lines: ['P = E/t', 'P = (m g h)/t'],
       },
       {
         find: 't', given: ['m', 'g', 'h', 'P'],
         text: 'Un monte-charge de {P} doit monter {m} de marchandises de {h}. Combien de temps lui faut-il, au minimum ?',
-        lines: ['P t = m g h', 't = m g h/P'],
+        lines: ['P t = m g h', 't = (m g h)/P'],
       },
       {
         find: 'm', given: ['P', 'g', 'h', 't'], minLevel: 3,
         text: 'Un treuil de {P} monte des sacs de {h} en {t}. Quelle masse de sacs peut-il monter, au plus ?',
-        lines: ['m g h = P t', 'm = P t/(g h)'],
+        lines: ['m g h = P t', 'm = (P t)/(g h)'],
       },
     ],
   },
@@ -105,17 +105,17 @@ export default [
       {
         find: 'd', given: ['m', 'v', 'F'],
         text: 'Une voiture de {m} roule à {v}. Elle freine avec une force constante de {F}. Sur quelle distance s\'arrête-t-elle ?',
-        lines: ['F d = 1/2 m v^2', 'd = m v^2/(2 F)'],
+        lines: ['F d = 1/2 m v^2', 'd = (m v^2)/(2 F)'],
       },
       {
         find: 'F', given: ['m', 'v', 'd'],
         text: 'Une voiture de {m} roule à {v}. Elle doit s\'arrêter sur {d}. Quelle force de freinage, constante, faut-il ?',
-        lines: ['F d = 1/2 m v^2', 'F = m v^2/(2 d)'],
+        lines: ['F d = 1/2 m v^2', 'F = (m v^2)/(2 d)'],
       },
       {
         find: 'v', given: ['m', 'F', 'd'], minLevel: 3,
         text: 'Après un freinage, une voiture de {m} a laissé des traces sur {d}. Les freins exercent une force de {F}. À quelle vitesse roulait-elle ?',
-        lines: ['F d = 1/2 m v^2', 'v^2 = 2 F d/m', 'v = √(2 F d/m)'],
+        lines: ['F d = 1/2 m v^2', 'v^2 = (2 F d)/m', 'v = √(2 F d/m)'],
       },
     ],
   },
@@ -134,17 +134,17 @@ export default [
       {
         find: 'P', given: ['F', 'd', 't'],
         text: 'Un cheval tire une charrue avec une force de {F} le long d\'un sillon de {d}. Il met {t}. Quelle puissance moyenne fournit-il ?',
-        lines: ['P = E/t', 'P = F d/t'],
+        lines: ['P = E/t', 'P = (F d)/t'],
       },
       {
         find: 't', given: ['F', 'd', 'P'],
         text: 'Un cheval de trait fournit {P} en tirant une charrue avec une force de {F}. Combien de temps met-il pour labourer un sillon de {d} ?',
-        lines: ['P t = F d', 't = F d/P'],
+        lines: ['P t = F d', 't = (F d)/P'],
       },
       {
         find: 'd', given: ['F', 'P', 't'], minLevel: 3,
         text: 'Un bœuf fournit {P} en tirant une charrue avec une force de {F}. Quelle longueur de sillon laboure-t-il en {t} ?',
-        lines: ['F d = P t', 'd = P t/F'],
+        lines: ['F d = P t', 'd = (P t)/F'],
       },
     ],
   },
@@ -164,12 +164,12 @@ export default [
       {
         find: 'P', given: ['m', 'g', 'h', 't'],
         text: 'Tu descends un col en vélo cargo, à vitesse constante : {m} en tout, {h} de dénivelé, en {t}. Un frein régénératif envoie toute l\'énergie dans la batterie. Quelle puissance moyenne la batterie doit-elle absorber ?',
-        lines: ['P = E/t', 'P = m g h/t'],
+        lines: ['P = E/t', 'P = (m g h)/t'],
       },
       {
         find: 'h', given: ['m', 'g', 'P', 't'], minLevel: 3,
         text: 'Un vélo cargo ({m} en tout) descend à vitesse constante pendant {t}. Son frein régénératif envoie {P} dans la batterie. Quel dénivelé a-t-il descendu ?',
-        lines: ['m g h = P t', 'h = P t/(m g)'],
+        lines: ['m g h = P t', 'h = (P t)/(m g)'],
       },
     ],
   },
@@ -190,12 +190,12 @@ export default [
       {
         find: 'P', given: ['ρ', 'V', 'g', 'h', 't'],
         text: 'Chaque seconde, {V} d\'eau tombent de {h} sur une turbine. Quelle puissance l\'eau apporte-t-elle à la turbine ?',
-        lines: ['P = m g h/t', 'P = ρ V g h/t'],
+        lines: ['P = (m g h)/t', 'P = (ρ V g h)/t'],
       },
       {
         find: 'h', given: ['ρ', 'V', 'g', 'P', 't'], minLevel: 3,
         text: 'Une petite centrale doit recevoir {P} de l\'eau. Le débit est de {V} par seconde. De quelle hauteur l\'eau doit-elle tomber ?',
-        lines: ['P t = ρ V g h', 'h = P t/(ρ V g)'],
+        lines: ['P t = ρ V g h', 'h = (P t)/(ρ V g)'],
       },
     ],
   },
@@ -215,7 +215,7 @@ export default [
       {
         find: 'P', given: ['ρ', 'V', 'v', 't'],
         text: 'Une pompe propulse {V} d\'eau par seconde, qui sort du tuyau à {v}. Quelle est la puissance de la pompe ?',
-        lines: ['P = 1/2 m v^2/t', 'P = ρ V v^2/(2 t)'],
+        lines: ['P = 1/2 m v^2/t', 'P = (ρ V v^2)/(2 t)'],
       },
     ],
   },
@@ -234,12 +234,12 @@ export default [
       {
         find: 't', given: ['P', 'F', 'd'], answerUnit: 'min',
         text: 'Une équipe de chiens fournit {P} pour tirer un traîneau avec une force de {F}. La traversée du lac fait {d}. Combien de minutes dure-t-elle ?',
-        lines: ['v = P/F', 't = d/v', 't = d F/P'],
+        lines: ['v = P/F', 't = d/v', 't = (d F)/P'],
       },
       {
         find: 'd', given: ['P', 'F', 't'], minLevel: 3,
         text: 'Des chiens de traîneau fournissent {P} et tirent avec une force de {F}. Quelle distance parcourent-ils en {t} ?',
-        lines: ['v = P/F', 'd = v t', 'd = P t/F'],
+        lines: ['v = P/F', 'd = v t', 'd = (P t)/F'],
       },
     ],
   },

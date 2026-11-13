@@ -33,9 +33,40 @@ function registerSymbols(symbols) {
 }
 registerSymbols(Object.keys(QUANTITIES));
 
-const STEP_NAMES = ['Trier', 'Chemin', 'Algèbre', 'Unités', 'Approximation', 'Nombres et verdict', 'Fourchette'];
+const STEP_NAMES = ['Trier', 'Chemin', 'Algèbre', 'Unités', 'Approx.', 'Verdict', 'Fourchette'];
 const ROLE_NAMES = { connue: 'connue', inconnue: 'inconnue', pont: 'pont' };
 const DIGITS = ['7', '8', '9', '4', '5', '6', '1', '2', '3', '0'];
+
+// A keypad 6 keys wide that keeps the digit block 7 8 9 / 4 5 6 / 1 2 3
+// (tests/input.test.js): each row of digits, then 3 other keys. The row
+// under 1 2 3 holds `under` (« , 0 − »), the rest follows.
+function pad6(others, under = ['', '0', '']) {
+  const o = [...others];
+  const take = () => (o.length ? o.shift() : '');
+  return ['7', '8', '9', take(), take(), take(), '4', '5', '6', take(), take(), take(), '1', '2', '3', take(), take(), take(), ...under, take(), take(), take(), ...o];
+}
+const NAV = ['back', 'left', 'right'];
+
+// A number as a calculator shows it: ten significant figures.
+const calcText = (v) => {
+  if (!Number.isFinite(v)) return '—';
+  const a = Math.abs(v);
+  if (a >= 1e10 || (a < 1e-4 && a !== 0)) {
+    const e = Math.floor(Math.log10(a));
+    return `${String(Number((v / 10 ** e).toPrecision(10))).replace('.', ',')}·10<sup>${e}</sup>`;
+  }
+  return String(Number(v.toPrecision(10))).replace('.', ',');
+};
+// An estimate as written: 9, 300, 2·10⁵.
+const estText = (v) => (Math.abs(v) >= 1e5 || (Math.abs(v) < 1e-2 && v !== 0) ? sci(v, 1) : nice(v, 2));
+
+// A unit in 2D: J/(kg·K) as a fraction.
+function unitHtml(u) {
+  const show = (x) => unitText(x).replace(/^\((.*)\)$/, '$1').split('·').join('<span class="m-op">·</span>');
+  const i = u.indexOf('/');
+  if (i < 0) return `<span class="recipe-unit">${show(u)}</span>`;
+  return `<span class="m-frac recipe-unit"><span class="m-n">${show(u.slice(0, i))}</span><span class="m-d">${show(u.slice(i + 1))}</span></span>`;
+}
 const POINTS = { 1: 1, 2: 2, 3: 3, 4: 1, 5: 1, 6: 2 };
 
 const M = (inner) => `<span class="m">${inner}</span>`;
@@ -74,6 +105,9 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     nudges: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0 },
     done: false,
   };
+  // Choices in an order fixed for this item (not always the right one first).
+  const seed = Math.floor(Math.random() * 97);
+  const order = (list) => list.map((x, i) => [x, (i * 31 + seed) % 7]).sort((a, b) => a[1] - b[1]).map(([x]) => x);
   const note = (k, rule) => { st.nudges[k] += 1; if (rule && !st.rules.includes(rule)) st.rules.push(rule); };
 
   // Steps before the first active one are shown done.
@@ -136,6 +170,7 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     input = new MathInput({ keysets: [{ id: 'phys', keys }], placeholder, onEnter });
     keypadSlot.innerHTML = '';
     keypadSlot.append(input.keypad());
+    panel.append(h('div.answer-row', input.display));
     return input;
   }
   const noKeys = () => { input = null; keypadSlot.innerHTML = ''; };
@@ -162,7 +197,7 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     for (const f of pb.sheet) {
       const kept = st.kept.includes(f.src);
       if (mode === 'kept' && !kept) continue;
-      const b = h(`button.recipe-formula${kept ? '.kept' : ''}`, { type: 'button', html: F(f.src) });
+      const b = h(`button.recipe-formula${kept ? '.kept' : ''}`, { type: 'button', html: F(f.src), 'data-src': f.src });
       if (mode === 'pick') {
         b.addEventListener('click', () => {
           if (kept) { st.kept = st.kept.filter((x) => x !== f.src); draw(); return; }
@@ -204,7 +239,7 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     const d = nextToConvert();
     if (d && isActive(1)) {
       const siU = unitText(quantityOf(d.sym)?.unit ?? '');
-      setKeys([...DIGITS.slice(0, 9), ',', DIGITS[9], '×', '^', '-', 'back', 'left', 'right'], t('{s} en {u}', { s: d.sym, u: siU }), () => convert(d));
+      setKeys(pad6(['×', '^', 'back', 'left', 'right', ''], [',', '0', '-']), t('{s} en {u}', { s: d.sym, u: siU }), () => convert(d));
       button.textContent = t('Valider la conversion');
       button.onclick = () => convert(d);
       return;
@@ -234,13 +269,13 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
   // ---------- step 2: the path ----------
   function draw2() {
     const colors = h('div.recipe-colors', ['connue', 'inconnue', 'pont', null].map((c) => h(`button.recipe-color.${c || 'none'}${st.color === c ? '.on' : ''}`, {
-      type: 'button', onclick: () => { st.color = c; draw(); },
+      type: 'button', 'data-color': c || 'none', onclick: () => { st.color = c; draw(); },
     }, c ? t(ROLE_NAMES[c]) : t('effacer'))));
     const list = h('div.recipe-sheet');
     for (const src of st.kept) {
       const node = parse(src, S);
       const htmlF = toHtml(node, { sym: (s, inner) => `<button type="button" class="hl ${st.marks[s] || ''}" data-sym="${s}">${inner}</button>` });
-      const row = h('div.recipe-formula.kept', html(M(htmlF)), isActive(2) ? h('button.recipe-x', { type: 'button', onclick: () => removeFormula(src), title: t('Retirer') }, '✕') : null);
+      const row = h('div.recipe-formula.kept', { 'data-src': src }, html(M(htmlF)), isActive(2) ? h('button.recipe-x', { type: 'button', onclick: () => removeFormula(src), title: t('Retirer') }, '✕') : null);
       row.querySelectorAll('.hl').forEach((b) => b.addEventListener('click', () => {
         if (!isActive(2) || st.step !== 2) return;
         const s = b.dataset.sym;
@@ -267,12 +302,12 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
   // ---------- step 3: algebra ----------
   const algKeys = () => {
     const letters = [...new Set(pb.formulas.flatMap((f) => [...symbolsIn(parse(f, S))]))];
-    return [...letters, '=', 'frac', '^', '√', '(', ')', '×', '+', '-', ...DIGITS.slice(0, 9), DIGITS[9], 'back', 'left', 'right'];
+    return pad6(['=', 'frac', '^', '√', '(', ')', '×', '+', '-', ...NAV, ...letters]);
   };
   const lineRow = (l, sign = '') => h(`div.step-line${l.flag ? `.${l.flag}` : ''}`, sign ? h('span.eq', sign) : null, html(l.html), l.note ? h('span.step-note', l.note) : null);
 
   function draw3() {
-    panel.append(h('div.recipe-formulas', html(pb.formulas.map(F).join(' &nbsp; '))));
+    panel.append(h('div.recipe-sheet', st.kept.map((src) => h('span.recipe-formula.kept', html(F(src))))));
     panel.append(h('p.recipe-ask', html(t('Combine les formules et isole {s}. <b>Que des lettres</b> : termine par une ligne {s} = …', { s: M(symHtml(pb.find)) }))));
     const hist = h('div.steps-history', st.alg.map((l) => lineRow(l)));
     panel.append(hist);
@@ -334,9 +369,9 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
       { id: 'none', text: t('Rien : une lettre qui disparaît ne veut rien dire.') },
     ];
     const box = h('div.recipe-cancel', h('p', html(t('{s} s\'est simplifiée. Qu\'est-ce que ça veut dire ?', { s: M(symHtml(sym)) }))));
-    for (const o of options) {
+    for (const o of order(options)) {
       box.append(h(`button.choice${st.cancel === o.id ? '.selected' : ''}`, {
-        type: 'button', html: `<span class="choice-body">${o.text}</span>`,
+        type: 'button', 'data-id': o.id, html: `<span class="choice-body">${o.text}</span>`,
         onclick: () => {
           st.cancel = o.id;
           if (o.id !== 'right' && item.feedback !== 'end') { nudge(3, { rule: 'ph_heavier_faster', message: t('Non : {s} est des deux côtés de l\'égalité, elle se simplifie. Le résultat ne dépend donc pas d\'elle.', { s: symHtml(sym) }) }); st.cancel = null; return; }
@@ -369,7 +404,7 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
   // ---------- step 4: units ----------
   const exprOfStudent = () => st.final;
   function substitutedHtml(expr) {
-    return toHtml(expr, { sym: (s) => `<span class="recipe-unit">${unitText(quantityOf(s)?.unit ?? '?')}</span>` });
+    return toHtml(expr, { sym: (s) => unitHtml(quantityOf(s)?.unit ?? '?') });
   }
   function draw4() {
     const expr = exprOfStudent();
@@ -381,10 +416,10 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     for (const l of st.units) hist.append(lineRow(l, '='));
     panel.append(hist);
     if (!isActive(4)) { button.textContent = t('Étape suivante'); button.onclick = advance; return; }
-    setKeys(['kg', 'm', 's', 'K', 'A', 'N', 'J', 'W', 'V', '·', 'frac', '^', '(', ')', ...DIGITS.slice(0, 9), DIGITS[9], 'back', 'left', 'right'], t('des unités'), () => addUnit(dim));
+    setKeys(pad6(['kg', 'm', 's', 'K', 'A', '·', 'frac', '^', 'back', '(', ')', 'left', 'right', 'N', 'J', 'W', 'V']), t('des unités'), () => addUnit(dim));
     const findU = unitText(quantityOf(pb.find)?.unit ?? '');
     const choice = (says, label) => h(`button.choice${st.unitVerdict === says ? '.selected' : ''}`, {
-      type: 'button', html: `<span class="choice-body">${label}</span>`,
+      type: 'button', 'data-id': says ? 'yes' : 'no', html: `<span class="choice-body">${label}</span>`,
       onclick: () => {
         if (!st.units.length) { message(t('Écris d\'abord au moins une ligne d\'unités.'), 'bad'); return; }
         const r = judgeUnitVerdict(pb, dim.d, says);
@@ -426,14 +461,14 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     panel.append(h('div.recipe-formulas', html(M(`${symHtml(pb.find)}<span class="m-op">=</span>${toHtml(expr)}`))));
     panel.append(h('div.recipe-data', pb.data.map((d) => h('div.recipe-datum', html(`${M(symHtml(d.sym))} = ${nice(d.si, 4)} ${unitText(quantityOf(d.sym)?.unit ?? '')}`)))));
     if (!isActive(5)) {
-      panel.append(h('p.recipe-ask', html(t('Approximation : {v}', { v: `<b>${sci(st.estimate, 1)}</b>` }))));
+      panel.append(h('p.recipe-ask', html(t('Approximation : {v}', { v: `<b>${estText(st.estimate)}</b>` }))));
       button.textContent = t('Étape suivante');
       button.onclick = advance;
       return;
     }
     panel.append(h('p.recipe-ask', html(t('Sans calculatrice : arrondis chaque nombre à un ou deux chiffres, et calcule de tête. La dernière ligne est ton approximation.'))));
     panel.append(h('div.steps-history', st.est.map((l) => lineRow(l))));
-    setKeys([...DIGITS.slice(0, 9), ',', DIGITS[9], '×', 'frac', '^', '=', '≈', '(', ')', 'back', 'left', 'right'], t('un calcul arrondi'), addEst);
+    setKeys(pad6(['×', 'frac', '^', '(', ')', '≈', 'back', 'left', 'right'], [',', '0', '=']), t('un calcul arrondi'), addEst);
     button.textContent = t('Étape suivante');
     button.onclick = leave5;
   }
@@ -470,11 +505,11 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     const v = valueOf(pb, expr);
     const siU = unitText(quantityOf(pb.find)?.unit ?? '');
     panel.append(h('div.recipe-result',
-      h('div', html(t('Le calcul de ton expression : {v}', { v: `${M(symHtml(pb.find))} = <b>${nice(v, 3)} ${siU}</b>` }))),
-      h('div', html(t('Ton approximation (étape 5) : {v}', { v: `<b>${sci(st.estimate, 1)}</b>` })))));
+      h('div', html(t('La calculatrice, avec ton expression : {v}', { v: `${M(symHtml(pb.find))} = <b>${calcText(v)} ${siU}</b>` }))),
+      h('div', html(t('Ton approximation (étape 5) : {v}', { v: `<b>${estText(st.estimate)}</b>` })))));
     if (!isActive(6)) { button.textContent = t('Étape suivante'); button.onclick = advance; return; }
     const choice = (says, label) => h(`button.choice${st.verdict === says ? '.selected' : ''}`, {
-      type: 'button', html: `<span class="choice-body">${label}</span>`,
+      type: 'button', 'data-id': says ? 'coherent' : 'incoherent', html: `<span class="choice-body">${label}</span>`,
       onclick: () => {
         const r = judgeVerdict(v, st.estimate, says);
         if (!r.ok) note(6, r.rule);
@@ -487,12 +522,12 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     });
     panel.append(h('div.recipe-cancel',
       choice(true, t('Cohérent : les deux ont le même ordre de grandeur.')),
-      choice(false, t('Pas cohérent : l'un des deux est faux.'))));
+      choice(false, t('Pas cohérent : l\'un des deux est faux.'))));
     // Not coherent: back to the step that is wrong.
     if (st.verdict === false) {
       const back = [];
-      if (isActive(5)) back.push(h('button.btn.small', { type: 'button', onclick: () => go(5) }, t('Revoir l'approximation')));
-      if (isActive(3)) back.push(h('button.btn.small', { type: 'button', onclick: () => go(3) }, t('Revoir l'algèbre')));
+      if (isActive(5)) back.push(h('button.btn.small', { type: 'button', onclick: () => go(5) }, t('Revoir l\'approximation')));
+      if (isActive(3)) back.push(h('button.btn.small', { type: 'button', onclick: () => go(3) }, t('Revoir l\'algèbre')));
       if (isActive(1)) back.push(h('button.btn.small', { type: 'button', onclick: () => go(1) }, t('Revoir les données')));
       if (back.length) { panel.append(h('div.step-tools', back)); button.disabled = true; button.textContent = t('Valider'); return; }
       button.textContent = t('Terminer');
@@ -502,7 +537,7 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     if (st.verdict == null) { button.disabled = true; button.textContent = t('Valider'); return; }
     const ansU = unitText(pb.answerUnit);
     panel.append(h('p.recipe-ask', html(t('Écris le résultat arrondi (2 ou 3 chiffres significatifs), en {u} :', { u: ansU }))));
-    setKeys([...DIGITS.slice(0, 9), ',', DIGITS[9], '×', '^', '-', 'back', 'left', 'right'], `${pb.find} = … ${ansU}`, answer);
+    setKeys(pad6(['×', '^', 'back', 'left', 'right', ''], [',', '0', '-']), `${pb.find} = … ${ansU}`, answer);
     button.textContent = t('Valider');
     button.onclick = answer;
   }
@@ -527,7 +562,7 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
     const rows = h('div.recipe-data');
     for (const s of syms) {
       const d = pb.data.find((x) => x.sym === s);
-      const opt = (end, label) => h(`button.btn.small${st.ends[s] === end ? '.primary' : '.ghost'}`, { type: 'button', onclick: () => { st.ends[s] = end; draw(); } }, label);
+      const opt = (end, label) => h(`button.btn.small${st.ends[s] === end ? '.primary' : '.ghost'}`, { type: 'button', 'data-sym': s, 'data-end': String(end), onclick: () => { st.ends[s] = end; draw(); } }, label);
       rows.append(h('div.recipe-datum', html(`${M(symHtml(s))} = ${num(d.shown)} ± ${num(pm[s])} ${unitText(d.unit)} `), opt(-1, t('la plus petite')), opt(1, t('la plus grande'))));
     }
     panel.append(rows);
@@ -535,9 +570,10 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
       const { lo, hi } = st.rangeShown;
       const siU = unitText(quantityOf(pb.find)?.unit ?? '');
       panel.append(h('div.recipe-result', html(t('{s} est compris entre {lo} et {hi}.', { s: M(symHtml(pb.find)), lo: `<b>${nice(lo, 3)} ${siU}</b>`, hi: `<b>${nice(hi, 3)} ${siU}</b>` }))));
-      const opts = digitOptions(lo, hi);
+      st.digitOpts = st.digitOpts || order(digitOptions(lo, hi));
+      const opts = st.digitOpts;
       panel.append(h('p.recipe-ask', html(t('Comment écris-tu le résultat ?'))));
-      panel.append(h('div.recipe-cancel', opts.map((o) => h(`button.choice${st.digits === o ? '.selected' : ''}`, { type: 'button', html: `<span class="choice-body">${o.text} ${siU}</span>`, onclick: () => { st.digits = o; draw(); } }))));
+      panel.append(h('div.recipe-cancel', opts.map((o) => h(`button.choice${st.digits === o ? '.selected' : ''}`, { type: 'button', 'data-ok': o.ok ? '1' : '0', html: `<span class="choice-body">${o.text} ${siU}</span>`, onclick: () => { st.digits = o; draw(); } }))));
       button.textContent = t('Valider');
       button.onclick = () => { if (st.digits) finish(); };
       return;

@@ -52,6 +52,7 @@ import { mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { physiquePage, phasePhysique } from './smoke-physique.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -63,7 +64,7 @@ const opt = (name, def) => {
 };
 const flag = (name) => argv.includes(`--${name}`);
 const list = (s) => (s ? String(s).split(',').map((x) => x.trim()).filter(Boolean) : null);
-const PHASES = ['start', 'mount', 'play', 'wrong', 'exams', 'problem', 'school', 'steps'];
+const PHASES = ['start', 'mount', 'play', 'wrong', 'exams', 'problem', 'school', 'steps', 'physique'];
 const ONLY = list(opt('only')) ?? PHASES;
 const UNITS = list(opt('unit'));
 const SKILLS = list(opt('skill'));
@@ -1562,7 +1563,9 @@ async function main() {
     if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error') report.console.push(`log: ${m.params.entry.text} ${m.params.entry.url ?? ''}`);
   });
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: `(${pageLib.toString()})();` });
-  const PH = { start: phaseStart, mount: phaseMount, play: phasePlay, wrong: phaseWrong, exams: phaseExams, problem: phaseProblem, school: phaseSchool, steps: phaseSteps, dump: phaseDump };
+  await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: `(${physiquePage.toString()})();` });
+  const PH = { start: phaseStart, mount: phaseMount, play: phasePlay, wrong: phaseWrong, exams: phaseExams, problem: phaseProblem, school: phaseSchool, steps: phaseSteps, dump: phaseDump,
+    physique: () => phasePhysique({ cdp, load, shot, fail, log, SKILLS, PER, SEED }) };
   for (const name of [...PHASES, 'dump'].filter((p) => ONLY.includes(p))) {
     if (!PH[name]) continue;
     const n0 = report.failures.length;

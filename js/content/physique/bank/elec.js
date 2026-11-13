@@ -44,7 +44,7 @@ export default [
       {
         find: 't', given: ['U', 'I', 'm', 'c', 'ΔT'],
         text: 'Une bouilloire branchée sur {U} est traversée par un courant de {I}. Elle contient {m} d\'eau (c = {c}) à réchauffer de {ΔT}. Combien de temps faut-il, sans pertes ?',
-        lines: ['U I t = m c ΔT', 't = m c ΔT/(U I)'],
+        lines: ['U I t = m c ΔT', 't = (m c ΔT)/(U I)'],
       },
     ],
   },
@@ -65,12 +65,12 @@ export default [
       {
         find: 't', given: ['m', 'g', 'h', 'U', 'I'], quantities: { U: { value: 230, units: ['V'] } },
         text: 'Un monte-charge électrique, branché sur {U}, consomme {I}. Il monte {m} de {h}. Combien de temps lui faut-il, sans pertes ?',
-        lines: ['U I t = m g h', 't = m g h/(U I)'],
+        lines: ['U I t = m g h', 't = (m g h)/(U I)'],
       },
       {
         find: 'I', given: ['m', 'g', 'h', 'U', 't'], minLevel: 3, quantities: { U: { value: 230, units: ['V'] } },
         text: 'Un treuil électrique branché sur {U} doit monter {m} de {h} en {t}. Quel courant consomme-t-il, sans pertes ?',
-        lines: ['U I t = m g h', 'I = m g h/(U t)'],
+        lines: ['U I t = m g h', 'I = (m g h)/(U t)'],
       },
     ],
   },

@@ -4,8 +4,8 @@
 .m-chunk sub, .key sub { font-size: .7em; }
 .m-thin { display: inline-block; width: .15em; }
 
-.recipe-strip { display: flex; gap: 4px; margin: 8px 0 10px; overflow-x: auto; }
-.recipe-tab { flex: 1 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 6px; border: 2px solid var(--line); border-radius: 10px; background: var(--card); color: var(--muted); font: inherit; font-size: .72rem; cursor: pointer; }
+.recipe-strip { display: flex; gap: 3px; margin: 8px 0 10px; }
+.recipe-tab { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 6px; border: 2px solid var(--line); border-radius: 10px; background: var(--card); color: var(--muted); font: inherit; font-size: .62rem; cursor: pointer; }
 .recipe-tab b { font-size: 1rem; }
 .recipe-tab.current { border-color: var(--violet); color: var(--violet-dark); background: var(--violet-soft); }
 .recipe-tab.done { color: var(--green-dark); border-color: var(--green); }
@@ -16,7 +16,7 @@
 .recipe-ask { margin: 4px 0; font-size: .92rem; }
 .recipe-find { margin: 2px 0; font-weight: 700; }
 .recipe-sheet { display: flex; flex-wrap: wrap; gap: 6px; }
-.recipe-formula { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; font-size: 1.05rem; cursor: pointer; }
+.recipe-formula { font-weight: 400; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; font-size: 1.05rem; cursor: pointer; }
 .recipe-formula.kept { border-color: var(--violet); background: var(--violet-soft); }
 .recipe-x { border: none; background: none; color: var(--red-dark); font-size: .9rem; cursor: pointer; padding: 0 2px; }
 .recipe-formulas { padding: 6px 10px; background: #f8f7ff; border-radius: 10px; font-size: 1.05rem; }
@@ -42,3 +42,5 @@
 .recipe-score .ko { color: var(--red-dark); }
 .step-line.bad { background: var(--red-soft); border-radius: 6px; }
 .step-line.shown { color: var(--muted); }
+.recipe-formula .m, .recipe-formulas .m { font-weight: 400; }
+.recipe-unit .m-op { margin: 0 1px; }
