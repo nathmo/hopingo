@@ -18,9 +18,10 @@ import {
   partsItem, problemItem, H, examTag, KEYS, pick,
 } from './cplx-b-kit.js';
 import { mcq } from './kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'c-int-fourier';
-const SUB = [SG('poles', 'pôles du bon demi-plan', 'c-res-theorem'), SG('residues', 'résidus de R(z)e^(iαz)', 'c-res-simple'), SG('arc', 'l\'arc tend vers 0', 'c-arc-estimate'), SG('sum', 'somme des résidus', SK), SG('value', 'valeur de l\'intégrale', SK)];
+const SUB = [SG('poles', t('pôles du bon demi-plan'), 'c-res-theorem'), SG('residues', t('résidus de R(z)e^(iαz)'), 'c-res-simple'), SG('arc', t('l\'arc tend vers 0'), 'c-arc-estimate'), SG('sum', t('somme des résidus'), SK), SG('value', t('valeur de l\'intégrale'), SK)];
 
 // e^(k) as text ('e^(-2)').
 const ek = (k) => `e^(${k})`;
@@ -86,32 +87,32 @@ function verify(d) {
   if (d.sumText) checkValue(d.sumText, evalComplex(parse(d.sumRes, { complex: true }), {}));
 }
 
-const halfName = (s) => (s > 0 ? 'supérieur (Im z ≥ 0)' : 'inférieur (Im z ≤ 0)');
+const halfPlane = (s) => (s > 0 ? t('Le demi-plan supérieur (Im z ≥ 0)') : t('Le demi-plan inférieur (Im z ≤ 0)'));
 const Jlabel = (d) => mathLabel('J', '<mi>J</mi>');
 
 export function fourierParts(d, level, { arc = false, decisions = true, sum = true } = {}) {
   const parts = [];
   const MENU = [
-    { id: 'eiaz', label: 'Intégrer R(z)e^(iαz) sur le contour', valid: true },
-    { id: 'res', label: 'Résidu : e^(iαz₀) · p(z₀)/q′(z₀)', valid: true },
-    { id: 'sum', label: `${d.s > 0 ? '2πi' : '−2πi'} × la somme des résidus`, valid: true },
-    { id: 'arc', label: 'Majorer l\'intégrale sur l\'arc', valid: true },
-    { id: 're', label: `Prendre la partie ${d.trig === 'cos' ? 'réelle' : 'imaginaire'}`, valid: true },
-    { id: 'cos', label: `Intégrer R(z)${d.trig}(${Math.abs(d.al) === 1 ? '' : Math.abs(d.al)}z) sur le contour`, valid: false, rule: 'c_eiax_cos', why: `${d.trig}(αz) contient e^(−iαz), qui explose dans l'autre demi-plan : l'arc ne tend pas vers 0.` },
+    { id: 'eiaz', label: t('Intégrer R(z)e^(iαz) sur le contour'), valid: true },
+    { id: 'res', label: t('Résidu : e^(iαz₀) · p(z₀)/q′(z₀)'), valid: true },
+    { id: 'sum', label: t('{a} × la somme des résidus', { a: d.s > 0 ? '2πi' : '−2πi' }), valid: true },
+    { id: 'arc', label: t('Majorer l\'intégrale sur l\'arc'), valid: true },
+    { id: 're', label: d.trig === 'cos' ? t('Prendre la partie réelle') : t('Prendre la partie imaginaire'), valid: true },
+    { id: 'cos', label: t('Intégrer R(z){trig}({a}z) sur le contour', { trig: d.trig, a: Math.abs(d.al) === 1 ? '' : Math.abs(d.al) }), valid: false, rule: 'c_eiax_cos', why: t('{trig}(αz) contient e^(−iαz), qui explose dans l\'autre demi-plan : l\'arc ne tend pas vers 0.', { trig: d.trig }) },
   ];
   const decs = decisions ? [
     {
-      kind: 'decision', prompt: 'Quelle fonction intégrer sur le contour ?', levels: [2, 3],
+      kind: 'decision', prompt: t('Quelle fonction intégrer sur le contour ?'), levels: [2, 3],
       options: [
-        { id: 'e', label: `R(z)e^(iαz) = ${CM(d.fz)}, puis la partie ${d.trig === 'cos' ? 'réelle' : 'imaginaire'}`, valid: true, ref: true },
-        { id: 'cos', label: `R(z)${d.trig}(αz), directement`, valid: false, rule: 'c_eiax_cos', why: `|${d.trig}(αz)| croît comme e^(|α| |Im z|) : l'intégrale sur l'arc ne tend pas vers 0.` },
+        { id: 'e', label: d.trig === 'cos' ? t('R(z)e^(iαz) = {a}, puis la partie réelle', { a: CM(d.fz) }) : t('R(z)e^(iαz) = {a}, puis la partie imaginaire', { a: CM(d.fz) }), valid: true, ref: true },
+        { id: 'cos', label: t('R(z){trig}(αz), directement', { trig: d.trig }), valid: false, rule: 'c_eiax_cos', why: t('|{trig}(αz)| croît comme e^(|α| |Im z|) : l\'intégrale sur l\'arc ne tend pas vers 0.', { trig: d.trig }) },
       ],
     },
     {
-      kind: 'decision', prompt: `α = ${d.al}. Quel demi-cercle ?`, levels: [2, 3],
+      kind: 'decision', prompt: t('α = {al}. Quel demi-cercle ?', { al: d.al }), levels: [2, 3],
       options: [
-        { id: 'good', label: `Le demi-plan ${halfName(d.s)}`, valid: true, ref: true },
-        { id: 'bad', label: `Le demi-plan ${halfName(-d.s)}`, valid: false, rule: 'c_jordan_alpha_sign', why: `|e^(iαz)| = e^(−α Im z) : avec α = ${d.al}, il est borné quand Im z ${d.s > 0 ? '≥' : '≤'} 0.` },
+        { id: 'good', label: halfPlane(d.s), valid: true, ref: true },
+        { id: 'bad', label: halfPlane(-d.s), valid: false, rule: 'c_jordan_alpha_sign', why: t('|e^(iαz)| = e^(−α Im z) : avec α = {al}, il est borné quand Im z {a} 0.', { al: d.al, a: d.s > 0 ? '≥' : '≤' }) },
       ],
     },
   ] : [];
@@ -119,17 +120,17 @@ export function fourierParts(d, level, { arc = false, decisions = true, sum = tr
     const J = CV(resLabel(cT(r.z)), r.val, { form: 'value' });
     const lines = chain(J, [r.sub, r.val]);
     parts.push({
-      html: k === 0 ? '' : `Pôle ${CM(cT(r.z))} :`, ask: 'Res =', start: J.label, judge: J, menu: MENU, decisions: k === 0 ? decs : [],
-      lines: lines.map((t, j) => L(t, j === lines.length - 1 ? 'Calculer l\'exposant' : `e^(iαz₀) · p(z₀)/q′(z₀), z₀ = ${rd(cT(r.z))}`, j === 0 && k === 0 ? 'poles' : 'residues', { blank: [t] })),
+      html: k === 0 ? '' : t('Pôle {a} :', { a: CM(cT(r.z)) }), ask: 'Res =', start: J.label, judge: J, menu: MENU, decisions: k === 0 ? decs : [],
+      lines: lines.map((tt, j) => L(tt, j === lines.length - 1 ? t('Calculer l\'exposant') : `e^(iαz₀) · p(z₀)/q′(z₀), z₀ = ${rd(cT(r.z))}`, j === 0 && k === 0 ? 'poles' : 'residues', { blank: [tt] })),
     });
   });
   if (sum && d.sumText) {
     const JS = CV(mathLabel('Σ Res', '<mo>Σ</mo><mi>Res</mi>'), d.sumText, { form: 'algebraic' });
-    parts.push({ html: 'La somme des résidus :', ask: 'Σ Res =', start: JS.label, judge: JS, menu: MENU, lines: chain(JS, [d.sumRes, d.sumText]).map((t, j, a) => L(t, j === a.length - 1 ? 'e^(ix) − e^(−ix) = 2i sin x' : 'Additionner', 'sum', { blank: [t] })) });
+    parts.push({ html: t('La somme des résidus :'), ask: 'Σ Res =', start: JS.label, judge: JS, menu: MENU, lines: chain(JS, [d.sumRes, d.sumText]).map((tt, j, a) => L(tt, j === a.length - 1 ? 'e^(ix) − e^(−ix) = 2i sin x' : t('Additionner'), 'sum', { blank: [tt] })) });
   }
   if (arc && d.arc) {
     const J = { kind: 'arcb', rel: '≤', arc: d.s > 0 ? [0, Math.PI] : [Math.PI, 2 * Math.PI], R: [d.arc.R0, 50], traps: { c_arc_triangle: [`πR·${d.arc.num}/(${d.arc.tri})`] } };
-    parts.push({ html: `L'arc C_R (demi-cercle ${d.s > 0 ? 'supérieur' : 'inférieur'}, longueur πR) : |e^(iαz)| ≤ 1 dessus.`, ask: '|∫_{C_R}| ≤', start: `πR|${d.fz}|`, judge: J, menu: MENU, lines: [L(`πR·${d.arc.num}/(${d.arc.low})`, 'Longueur × max ; tend vers 0', 'arc')] });
+    parts.push({ html: d.s > 0 ? t('L\'arc C_R (demi-cercle supérieur, longueur πR) : |e^(iαz)| ≤ 1 dessus.') : t('L\'arc C_R (demi-cercle inférieur, longueur πR) : |e^(iαz)| ≤ 1 dessus.'), ask: '|∫_{C_R}| ≤', start: `πR|${d.fz}|`, judge: J, menu: MENU, lines: [L(`πR·${d.arc.num}/(${d.arc.low})`, t('Longueur × max ; tend vers 0'), 'arc')] });
   }
   const traps = {
     c_jordan_alpha_sign: [{ line: `${d.s > 0 ? '-2πi' : '2πi'}(${d.others.map((o) => o.val).join('+')})`, ctx: { alpha: String(d.al).replace('-', '−'), sign: d.s > 0 ? '≥' : '≤' } }],
@@ -139,9 +140,9 @@ export function fourierParts(d, level, { arc = false, decisions = true, sum = tr
   };
   const JV = CV(Jlabel(d), d.J, { form: /i/.test(d.J) ? 'algebraic' : 'real', traps });
   const vl = chain(JV, [`${d.sgn}(${d.sumText && sum ? d.sumText : d.sumRes})`, d.J]);
-  parts.push({ html: `Théorème des résidus${d.arc ? ' (l\'arc tend vers 0)' : ' (lemme de Jordan pour l\'arc)'} : J = ∫_ℝ R(x)e^(iαx) dx.`, ask: 'J =', start: JV.label, judge: JV, menu: MENU, lines: vl.map((t, j) => L(t, j === vl.length - 1 ? 'Simplifier' : `${d.s > 0 ? '2πi' : '−2πi'} × Σ Res`, 'value', { blank: [t] })) });
+  parts.push({ html: d.arc ? t('Théorème des résidus (l\'arc tend vers 0) : J = ∫_ℝ R(x)e^(iαx) dx.') : t('Théorème des résidus (lemme de Jordan pour l\'arc) : J = ∫_ℝ R(x)e^(iαx) dx.'), ask: 'J =', start: JV.label, judge: JV, menu: MENU, lines: vl.map((tt, j) => L(tt, j === vl.length - 1 ? t('Simplifier') : `${d.s > 0 ? '2πi' : '−2πi'} × Σ Res`, 'value', { blank: [tt] })) });
   const known = { [toText(parse(d.intText))]: d.real };
-  parts.push({ html: `Partie ${d.trig === 'cos' ? 'réelle' : 'imaginaire'} de J :`, ask: '∫_ℝ … =', start: d.intText, judge: { kind: 'definite', known }, lines: [L(d.real, d.trig === 'cos' ? 'Re J' : 'Im J', 'value')] });
+  parts.push({ html: d.trig === 'cos' ? t('Partie réelle de J :') : t('Partie imaginaire de J :'), ask: '∫_ℝ … =', start: d.intText, judge: { kind: 'definite', known }, lines: [L(d.real, d.trig === 'cos' ? 'Re J' : 'Im J', 'value')] });
   return parts;
 }
 
@@ -151,11 +152,17 @@ function fourierLines(level, rng, opts = {}) {
   const d = fourierData(rng);
   verify(d);
   const parts = fourierParts(d, level, { arc: level >= 4 });
-  if (level === 1) parts[0].notes = [`On intègre f(z) = ${CM(d.fz)} sur [−R ; R] fermé par le demi-cercle ${halfName(d.s)}, puis on prend la partie ${d.trig === 'cos' ? 'réelle' : 'imaginaire'}.`];
+  if (level === 1) {
+    const fz = CM(d.fz);
+    const up = d.s > 0;
+    parts[0].notes = [d.trig === 'cos'
+      ? (up ? t('On intègre f(z) = {fz} sur [−R ; R] fermé par le demi-cercle supérieur (Im z ≥ 0), puis on prend la partie réelle.', { fz }) : t('On intègre f(z) = {fz} sur [−R ; R] fermé par le demi-cercle inférieur (Im z ≤ 0), puis on prend la partie réelle.', { fz }))
+      : (up ? t('On intègre f(z) = {fz} sur [−R ; R] fermé par le demi-cercle supérieur (Im z ≥ 0), puis on prend la partie imaginaire.', { fz }) : t('On intègre f(z) = {fz} sur [−R ; R] fermé par le demi-cercle inférieur (Im z ≤ 0), puis on prend la partie imaginaire.', { fz }))];
+  }
   return partsItem({
-    skill: SK, level, prompt: `Calcule ∫_ℝ ${intML(d)} dx avec le théorème des résidus${d.al < 0 ? `, en passant par J = ∫_ℝ ${CM(`${d.fz.replace(/z/g, 'x')}`)} dx (α = ${rd(String(d.al))})` : ''}.`,
+    skill: SK, level, prompt: d.al < 0 ? t('Calcule ∫_ℝ {a} dx avec le théorème des résidus, en passant par J = ∫_ℝ {b} dx (α = {c}).', { a: intML(d), b: CM(`${d.fz.replace(/z/g, 'x')}`), c: rd(String(d.al)) }) : t('Calcule ∫_ℝ {a} dx avec le théorème des résidus.', { a: intML(d) }),
     parts, keys: [...KEYS, 'anal'], subgoals: SUB,
-    hints: H(`Intègre R(z)e^(iαz) : avec α = ${d.al}, |e^(iαz)| ≤ 1 quand Im z ${d.s > 0 ? '≥' : '≤'} 0, on ferme ${d.s > 0 ? 'en haut' : 'en bas'}.`, `Res = e^(iαz₀) p(z₀)/q′(z₀) : ${d.res.map((r) => CM(r.sub)).join(' ; ')}`, `J = ${CM(d.J)}`),
+    hints: H(d.s > 0 ? t('Intègre R(z)e^(iαz) : avec α = {al}, |e^(iαz)| ≤ 1 quand Im z ≥ 0, on ferme en haut.', { al: d.al }) : t('Intègre R(z)e^(iαz) : avec α = {al}, |e^(iαz)| ≤ 1 quand Im z ≤ 0, on ferme en bas.', { al: d.al }), `Res = e^(iαz₀) p(z₀)/q′(z₀) : ${d.res.map((r) => CM(r.sub)).join(' ; ')}`, `J = ${CM(d.J)}`),
     key: `${SK}:${level}:${d.id}`, exam: examTag(opts),
     baits: ['c_eiax_cos', 'c_jordan_alpha_sign', 'c_upper_half_lower_pole', 'c_residue_2pii'],
   });
@@ -168,34 +175,34 @@ function fourierC1(level, rng, opts = {}) {
   verify(d);
   const p1 = mcq({
     skill: SK, level, key: `${SK}:c1f:${al}`,
-    prompt: 'Quelle fonction et quel contour ?',
+    prompt: t('Quelle fonction et quel contour ?'),
     options: [
-      { html: `f(z) = ${CM(d.fz)} ; segment [−R ; R] et demi-cercle supérieur`, correct: true },
-      { html: `f(z) = ${CM(d.fz)} ; segment [−R ; R] et demi-cercle inférieur`, correct: false, rule: 'c_jordan_alpha_sign' },
-      { html: `f(z) = ${CM(`z sin(${kT(al)}z)/(z^4+4)`)} ; segment [−R ; R] et demi-cercle supérieur`, correct: false, rule: 'c_eiax_cos' },
-      { html: `f(z) = ${CM(d.fz)} ; le cercle |z| = 1`, correct: false },
+      { html: t('f(z) = {a} ; segment [−R ; R] et demi-cercle supérieur', { a: CM(d.fz) }), correct: true },
+      { html: t('f(z) = {a} ; segment [−R ; R] et demi-cercle inférieur', { a: CM(d.fz) }), correct: false, rule: 'c_jordan_alpha_sign' },
+      { html: t('f(z) = {a} ; segment [−R ; R] et demi-cercle supérieur', { a: CM(`z sin(${kT(al)}z)/(z^4+4)`) }), correct: false, rule: 'c_eiax_cos' },
+      { html: t('f(z) = {a} ; le cercle |z| = 1', { a: CM(d.fz) }), correct: false },
     ],
   }, rng);
   const p2 = mcq({
     skill: SK, level, key: `${SK}:c1p:${al}`,
-    prompt: 'Les pôles de f dans le demi-plan supérieur :',
+    prompt: t('Les pôles de f dans le demi-plan supérieur :'),
     options: [
-      { html: `${CM('1+i')} et ${CM('-1+i')}`, correct: true },
-      { html: `${CM('1+i')}, ${CM('-1+i')}, ${CM('1-i')} et ${CM('-1-i')}`, correct: false, rule: 'c_pole_outside_counted' },
-      { html: `${CM('1-i')} et ${CM('-1-i')}`, correct: false, rule: 'c_upper_half_lower_pole' },
-      { html: `${CM('√2 i')} seulement`, correct: false },
+      { html: t('{a} et {b}', { a: CM('1+i'), b: CM('-1+i') }), correct: true },
+      { html: t('{a}, {b}, {c} et {d}', { a: CM('1+i'), b: CM('-1+i'), c: CM('1-i'), d: CM('-1-i') }), correct: false, rule: 'c_pole_outside_counted' },
+      { html: t('{a} et {b}', { a: CM('1-i'), b: CM('-1-i') }), correct: false, rule: 'c_upper_half_lower_pole' },
+      { html: t('{a} seulement', { a: CM('√2 i') }), correct: false },
     ],
   }, rng);
   const parts = fourierParts(d, 4, { arc: true, decisions: false });
-  const item = partsItem({ skill: SK, level, prompt: 'Les résidus, la somme, J, l\'arc et la conclusion.', parts, keys: [...KEYS, 'anal'], subgoals: SUB, hints: [], key: `${SK}:c1l:${al}` });
+  const item = partsItem({ skill: SK, level, prompt: t('Les résidus, la somme, J, l\'arc et la conclusion.'), parts, keys: [...KEYS, 'anal'], subgoals: SUB, hints: [], key: `${SK}:c1l:${al}` });
   return problemItem({
     skill: SK, level, key: `C1:${al}`, exam: opts.exam ? examTag(opts, 11) : false,
-    prompt: `Calculer, avec le théorème des résidus et en simplifiant, ∫_ℝ ${CM(`xe^(${kT(al)}ix)/(x^4+4)`)} dx (format 2022, 11 points). En déduire ∫_ℝ ${CM(`x sin(${kT(al)}x)/(x^4+4)`)} dx.`,
+    prompt: t('Calculer, avec le théorème des résidus et en simplifiant, ∫_ℝ {a} dx (format 2022, 11 points). En déduire ∫_ℝ {b} dx.', { a: CM(`xe^(${kT(al)}ix)/(x^4+4)`), b: CM(`x sin(${kT(al)}x)/(x^4+4)`) }),
     parts: [
-      { item: p1, points: 1, title: 'Fonction et contour' },
-      { item: p2, points: 1.5, title: 'Pôles du demi-plan supérieur' },
+      { item: p1, points: 1, title: t('Fonction et contour') },
+      { item: p2, points: 1.5, title: t('Pôles du demi-plan supérieur') },
       // Residues 1,5 + 1,5 ; sum 0,5 ; ∮ 1 ; arc 3 ; conclusion 1.
-      { item, points: [1.5, 1.5, 0.5, 3, 1, 1], title: 'Résidus, somme, arc et conclusion' },
+      { item, points: [1.5, 1.5, 0.5, 3, 1, 1], title: t('Résidus, somme, arc et conclusion') },
     ],
   });
 }
@@ -211,11 +218,11 @@ function fourierMcq(rng, opts) {
   if (opts.multi) {
     return choice({
       skill: SK, level: 4, key: `${SK}:mcq:m:${a}:${al}`, exam: examTag(opts, 2), multi: true, count: 5,
-      prompt: `I = ∫_ℝ ${CM(R)} dx. Quelles affirmations sont vraies ? (plusieurs réponses possibles)`,
+      prompt: t('I = ∫_ℝ {a} dx. Quelles affirmations sont vraies ? (plusieurs réponses possibles)', { a: CM(R) }),
       right: `I = ${CM(val)}`, rights: [`I = Re ∫_ℝ ${CM(`e^(${al}ix)/(x^2+${a * a})`)} dx`],
       wrongs: [
-        { html: `On ferme dans le demi-plan ${al > 0 ? 'inférieur' : 'supérieur'}`, rule: 'c_jordan_alpha_sign' },
-        { html: `On intègre ${CM(`cos(${al}z)/(z^2+${a * a})`)} sur le contour fermé`, rule: 'c_eiax_cos' },
+        { html: al > 0 ? t('On ferme dans le demi-plan inférieur') : t('On ferme dans le demi-plan supérieur'), rule: 'c_jordan_alpha_sign' },
+        { html: t('On intègre {a} sur le contour fermé', { a: CM(`cos(${al}z)/(z^2+${a * a})`) }), rule: 'c_eiax_cos' },
         { html: `I = ${CM(`πcosh(${k})${div}`)}`, rule: 'c_eiax_cos' },
       ],
       solution: [{ html: `I = Re(2πi Res) = ${CM(val)}.`, note: '' }],

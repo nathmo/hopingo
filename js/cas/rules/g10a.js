@@ -13,6 +13,7 @@
 
 import { readObject } from '../geomobj.js';
 import { analyzeConic, coefsOfText, lineThrough } from '../conic.js';
+import { t } from '../../i18n.js';
 
 const gl = (text, dim = 2) => { try { return { t: 'gline', text, obj: readObject(text, { dim }) }; } catch { return null; } };
 const P = (x) => String(x).replace('-', '−');
@@ -45,7 +46,7 @@ function elementsOf(type, C, u, w, a, b, c) {
 export const RULES = [
   {
     id: 'g10_vertical_tangent_lost', family: 'method', tag: 'E', skill: 'g10-circle-tangent', repair: 'g10-circle-tangent',
-    example: ['une seule tangente 3x + 4y − 19 = 0', 'aussi x = −3'], name: 'Tangente verticale oubliée',
+    example: [t('une seule tangente 3x + 4y − 19 = 0'), t('aussi x = −3')], name: t('Tangente verticale oubliée'),
     judges: ['geom'],
     transform(prev, ctx) {
       const t = ctx?.cfg?.tangents;
@@ -53,12 +54,14 @@ export const RULES = [
       const c = gl(t.others.join(' ou '));
       return c ? [{ node: c, ctx: { vertical: t.vertical } }] : [];
     },
-    explain: (ctx = {}) => `En écrivant y − y_Q = m(x − x_Q), tu as exclu la droite verticale${ctx.vertical ? ` ${P(ctx.vertical)}` : ''}. Sa distance au centre vaut r : c'est aussi une tangente.`,
+    explain: (ctx = {}) => (ctx.vertical
+      ? t('En écrivant y − y_Q = m(x − x_Q), tu as exclu la droite verticale {v}. Sa distance au centre vaut r : c\'est aussi une tangente.', { v: P(ctx.vertical) })
+      : t('En écrivant y − y_Q = m(x − x_Q), tu as exclu la droite verticale. Sa distance au centre vaut r : c\'est aussi une tangente.')),
     check: { judge: { kind: 'geom', object: 'line2', count: 2, ref: '3x + 4y - 19 = 0 ou x = -3', tangents: { others: ['3x + 4y - 19 = 0'], vertical: 'x = -3' } }, prev: 'T', line: '3x + 4y - 19 = 0' },
   },
   {
     id: 'g10_tangent_radius_direction', family: 'geometry', tag: 'E', skill: 'g10-circle-tangent', repair: 'g4-line2',
-    example: ['droite par T de direction ΩT⃗', 'de normale ΩT⃗'], name: 'Rayon pris pour la direction de la tangente',
+    example: [t('droite par T de direction ΩT⃗'), t('de normale ΩT⃗')], name: t('Rayon pris pour la direction de la tangente'),
     judges: ['geom'],
     transform(prev, ctx) {
       const t = ctx?.cfg?.tangentAt;
@@ -69,12 +72,14 @@ export const RULES = [
       const c = gl(`${-wy}x + ${wx}y + ${wy * Tx - wx * Ty} = 0`);
       return c ? [{ node: c, ctx: { w: `(${t.w.map(P).join(' ; ')})` } }] : [];
     },
-    explain: (ctx = {}) => `ΩT⃗${ctx.w ? ` = ${ctx.w}` : ''} est le rayon : la tangente lui est perpendiculaire. ΩT⃗ est donc un vecteur normal de la tangente, pas sa direction.`,
+    explain: (ctx = {}) => (ctx.w
+      ? t('ΩT⃗ = {w} est le rayon : la tangente lui est perpendiculaire. ΩT⃗ est donc un vecteur normal de la tangente, pas sa direction.', { w: ctx.w })
+      : t('ΩT⃗ est le rayon : la tangente lui est perpendiculaire. ΩT⃗ est donc un vecteur normal de la tangente, pas sa direction.')),
     check: { judge: { kind: 'geom', object: 'line2', ref: '3x + 4y - 19 = 0', tangentAt: { T: [5, 1], w: [3, 4] } }, prev: 't', line: '4x - 3y - 17 = 0' },
   },
   {
     id: 'g10_radical_unnormalized', family: 'rule', tag: 'E', skill: 'g10-power-radical', repair: 'g10-power-radical',
-    example: ['2γ₁ − γ₂ garde un x²', 'normaliser d\'abord'], name: 'Équations soustraites sans normaliser',
+    example: [t('2γ₁ − γ₂ garde un x²'), t('normaliser d\'abord')], name: t('Équations soustraites sans normaliser'),
     judges: ['geom'],
     transform(prev, ctx) {
       const r = ctx?.cfg?.radical;
@@ -82,19 +87,19 @@ export const RULES = [
       const c = gl(`(${r.g1}) - (${r.g2}) = 0`);
       return c && c.obj.kind === 'poly' ? [{ node: c, ctx: {} }] : [];
     },
-    explain: () => 'Après ta soustraction, il reste des termes en x² et y² : ce n\'est pas une droite. Divise chaque équation par son coefficient de x² avant de soustraire.',
+    explain: () => t('Après ta soustraction, il reste des termes en x² et y² : ce n\'est pas une droite. Divise chaque équation par son coefficient de x² avant de soustraire.'),
     check: { judge: { kind: 'geom', object: 'line2', ref: '3x - 2y + 5 = 0', radical: { g1: 'x^2 + y^2 - 4x - 2y - 4', g2: '2x^2 + 2y^2 + 4x - 12y + 12' } }, prev: 'Δ', line: '-x^2 - y^2 - 8x + 10y - 16 = 0' },
   },
   {
     id: 'g10_orthogonal_sum', family: 'geometry', tag: 'E', skill: 'g10-power-radical', repair: 'g10-power-radical',
-    example: ['Ω₁Ω₂ = r₁ + r₂ : orthogonaux', 'Ω₁Ω₂² = r₁² + r₂²'], name: 'Orthogonaux confondu avec tangents',
+    example: [t('Ω₁Ω₂ = r₁ + r₂ : orthogonaux'), 'Ω₁Ω₂² = r₁² + r₂²'], name: t('Orthogonaux confondu avec tangents'),
     judges: [],
-    explain: () => 'Ω₁Ω₂ = r₁ + r₂ veut dire tangents extérieurement. Deux cercles sont orthogonaux quand leurs rayons aux points communs sont perpendiculaires : par Pythagore, Ω₁Ω₂² = r₁² + r₂².',
+    explain: () => t('Ω₁Ω₂ = r₁ + r₂ veut dire tangents extérieurement. Deux cercles sont orthogonaux quand leurs rayons aux points communs sont perpendiculaires : par Pythagore, Ω₁Ω₂² = r₁² + r₂².'),
     check: { bait: { skill: 'g10-power-radical', level: 4 } },
   },
   {
     id: 'g10_polar_origin_formula', family: 'rule', tag: 'E', skill: 'g10-pole-polar', repair: 'g10-pole-polar',
-    example: ['x₀x + y₀y = r²', '(x₀ − h)(x − h) + (y₀ − k)(y − k) = r²'], name: 'Polaire écrite comme si le centre était O',
+    example: ['x₀x + y₀y = r²', '(x₀ − h)(x − h) + (y₀ − k)(y − k) = r²'], name: t('Polaire écrite comme si le centre était O'),
     judges: ['geom'],
     transform(prev, ctx) {
       const p = ctx?.cfg?.polar;
@@ -103,12 +108,12 @@ export const RULES = [
       const c = gl(`${x0}x + ${y0}y = ${p.r2}`);
       return c ? [{ node: c, ctx: {} }] : [];
     },
-    explain: () => 'x₀x + y₀y = r² ne vaut que si le centre est l\'origine. Ici, dédouble la forme réduite : (x₀ − h)(x − h) + (y₀ − k)(y − k) = r².',
+    explain: () => t('x₀x + y₀y = r² ne vaut que si le centre est l\'origine. Ici, dédouble la forme réduite : (x₀ − h)(x − h) + (y₀ − k)(y − k) = r².'),
     check: { judge: { kind: 'geom', object: 'line2', ref: '3x + y - 6 = 0', polar: { P: [4, -1], r2: 5 } }, prev: 'p', line: '4x - y - 5 = 0' },
   },
   {
     id: 'g10_c_wrong_formula', family: 'rule', tag: 'E', skill: 'g10-ellipse', repair: 'g10-ellipse',
-    example: ['ellipse : c² = a² + b²', 'c² = a² − b²'], name: 'c² de l\'autre conique',
+    example: [t('ellipse : c² = a² + b²'), 'c² = a² − b²'], name: t('c² de l\'autre conique'),
     judges: ['conic'],
     transform(prev, ctx) {
       const an = analysisOf(ctx?.cfg || {});
@@ -118,14 +123,21 @@ export const RULES = [
       if (c < 1e-9) return [];
       return [{ node: cl(elementsOf(an.type, C, u, w, a, b, c).filter((e) => ['F', 'c', 'e', 'directrices'].includes(e.kind))), ctx: { type: an.type, c2: fmt(c * c) } }];
     },
-    explain: (ctx = {}) => (ctx.type === 'hyperbola'
-      ? `Pour une hyperbole, les foyers sont plus loin que les sommets : c > a, donc c² = a² + b²${ctx.c2 ? ` (pas ${ctx.c2})` : ''}. C'est l'ellipse qui a c² = a² − b².`
-      : `Pour une ellipse, les foyers sont à l'intérieur : c < a, donc c² = a² − b²${ctx.c2 ? ` (pas ${ctx.c2})` : ''}. C'est l'hyperbole qui a c² = a² + b².`),
+    explain: (ctx = {}) => {
+      if (ctx.type === 'hyperbola') {
+        return ctx.c2
+          ? t('Pour une hyperbole, les foyers sont plus loin que les sommets : c > a, donc c² = a² + b² (pas {c2}). C\'est l\'ellipse qui a c² = a² − b².', { c2: ctx.c2 })
+          : t('Pour une hyperbole, les foyers sont plus loin que les sommets : c > a, donc c² = a² + b². C\'est l\'ellipse qui a c² = a² − b².');
+      }
+      return ctx.c2
+        ? t('Pour une ellipse, les foyers sont à l\'intérieur : c < a, donc c² = a² − b² (pas {c2}). C\'est l\'hyperbole qui a c² = a² + b².', { c2: ctx.c2 })
+        : t('Pour une ellipse, les foyers sont à l\'intérieur : c < a, donc c² = a² − b². C\'est l\'hyperbole qui a c² = a² + b².');
+    },
     check: { judge: { kind: 'conic', equation: '4x^2 + 9y^2 - 16x + 54y + 61 = 0', ask: ['F'] }, prev: 'E', line: 'F = (2 + √13 ; -3)' },
   },
   {
     id: 'g10_axis_swap', family: 'geometry', tag: 'E', skill: 'g10-ellipse', repair: 'g10-hyperbola',
-    example: ['grand axe lu sur le petit dénominateur', 'sur le grand'], name: 'Axes échangés',
+    example: [t('grand axe lu sur le petit dénominateur'), t('sur le grand')], name: t('Axes échangés'),
     judges: ['conic'],
     transform(prev, ctx) {
       const an = analysisOf(ctx?.cfg || {});
@@ -137,13 +149,13 @@ export const RULES = [
       return [{ node: cl(out.filter((e) => ['F', 'S', 'directrices', 'a', 'b'].includes(e.kind))), ctx: { type: an.type } }];
     },
     explain: (ctx = {}) => (ctx.type === 'hyperbola'
-      ? 'L\'axe réel est du côté du terme positif quand le second membre vaut +1 : les sommets et les foyers sont sur cet axe.'
-      : 'Le grand axe est du côté du plus grand dénominateur : les sommets principaux et les foyers sont sur cet axe.'),
+      ? t('L\'axe réel est du côté du terme positif quand le second membre vaut +1 : les sommets et les foyers sont sur cet axe.')
+      : t('Le grand axe est du côté du plus grand dénominateur : les sommets principaux et les foyers sont sur cet axe.')),
     check: { judge: { kind: 'conic', equation: '4x^2 + 9y^2 - 16x + 54y + 61 = 0', ask: ['F'] }, prev: 'E', line: 'F = (2 ; -3 + √5)' },
   },
   {
     id: 'g10_asymptote_ratio', family: 'rule', tag: 'E', skill: 'g10-hyperbola', repair: 'g10-hyperbola',
-    example: ['y − k = ±(a/b)(x − h)', '±(b/a)(x − h)'], name: 'Pente des asymptotes inversée',
+    example: ['y − k = ±(a/b)(x − h)', '±(b/a)(x − h)'], name: t('Pente des asymptotes inversée'),
     judges: ['conic'],
     transform(prev, ctx) {
       const an = analysisOf(ctx?.cfg || {});
@@ -152,12 +164,14 @@ export const RULES = [
       const L = [lineThrough(C, [b * u[0] + a * w[0], b * u[1] + a * w[1]]), lineThrough(C, [b * u[0] - a * w[0], b * u[1] - a * w[1]])];
       return [{ node: cl([els('asymptotes', 'asymptotes', L)]), ctx: { a: fmt(a), b: fmt(b) } }];
     },
-    explain: (ctx = {}) => `Pour x²/a² − y²/b² = 1, les asymptotes sont x/a = ±y/b, donc y = ±(b/a)x${ctx.a ? ` = ±(${ctx.b}/${ctx.a})x` : ''} : le dénominateur de la pente est a, sur l'axe réel.`,
+    explain: (ctx = {}) => (ctx.a
+      ? t('Pour x²/a² − y²/b² = 1, les asymptotes sont x/a = ±y/b, donc y = ±(b/a)x = ±({b}/{a})x : le dénominateur de la pente est a, sur l\'axe réel.', { a: ctx.a, b: ctx.b })
+      : t('Pour x²/a² − y²/b² = 1, les asymptotes sont x/a = ±y/b, donc y = ±(b/a)x : le dénominateur de la pente est a, sur l\'axe réel.')),
     check: { judge: { kind: 'conic', equation: '9x^2 - 16y^2 - 18x - 64y - 199 = 0', ask: ['asymptotes'] }, prev: 'H', line: 'asymptote : 4x - 3y - 10 = 0' },
   },
   {
     id: 'g10_parabola_p_half', family: 'rule', tag: 'E', skill: 'g10-parabola', repair: 'g10-parabola',
-    example: ['F = (3 ; 3)', '(3 ; 1)'], name: 'Foyer à p du sommet',
+    example: ['F = (3 ; 3)', '(3 ; 1)'], name: t('Foyer à p du sommet'),
     judges: ['conic'],
     transform(prev, ctx) {
       const an = analysisOf(ctx?.cfg || {});
@@ -166,7 +180,9 @@ export const RULES = [
       const v = an.focal;
       return [{ node: cl([el('F', 'F', at(S, an.p, v)), els('directrice', 'directrices', [lineThrough(at(S, -an.p, v), an.other)])]), ctx: { p: fmt(an.p) } }];
     },
-    explain: (ctx = {}) => `Dans (x − h)² = 2p(y − k), le foyer est à p/2 du sommet, pas à p${ctx.p ? ` : ici p = ${ctx.p}, donc F est à ${fmt(Number(String(ctx.p).replace('−', '-')) / 2)} du sommet` : ''}. La directrice est à p/2 de l'autre côté.`,
+    explain: (ctx = {}) => (ctx.p
+      ? t('Dans (x − h)² = 2p(y − k), le foyer est à p/2 du sommet, pas à p : ici p = {p}, donc F est à {d} du sommet. La directrice est à p/2 de l\'autre côté.', { p: ctx.p, d: fmt(Number(String(ctx.p).replace('−', '-')) / 2) })
+      : t('Dans (x − h)² = 2p(y − k), le foyer est à p/2 du sommet, pas à p. La directrice est à p/2 de l\'autre côté.')),
     check: { judge: { kind: 'conic', equation: 'x^2 - 6x - 8y + 1 = 0', ask: ['F'] }, prev: 'P', line: 'F = (3 ; 3)' },
   },
 ];

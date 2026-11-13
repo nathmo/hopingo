@@ -17,6 +17,7 @@ import { toText } from '../print.js';
 import { exactComplex, evalComplex, CQ, cText, cabs, carg, cpow, C, cadd, cmul } from '../complex.js';
 import { polyOf, qCoeffs } from '../polyx.js';
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 
 const par = (e) => ({ t: 'paren', e });
 const isI = (n) => n.t === 'const' && n.name === 'i';
@@ -88,7 +89,7 @@ export const RULES = [
   {
     id: 'g8_i_squared', family: 'sign', tag: 'E', skill: 'g8-algebraic', repair: 'g8-algebraic',
     judges: ['complex'],
-    name: 'i² remplacé par 1',
+    name: t('i² remplacé par 1'),
     example: ['−4i² = −4', '−4i² = +4'],
     check: { judge: { kind: 'complex', form: 'algebraic' }, prev: '3-6i+2i-4i^2-1+i', line: '3-6i+2i-4-1+i' },
     transform: (prev, ctx) => {
@@ -113,12 +114,12 @@ export const RULES = [
       }
       return out;
     },
-    explain: () => 'i² = −1, pas 1 : par exemple −4i² = −4·(−1) = +4. Et i³ = −i, i⁴ = 1.',
+    explain: () => t('i² = −1, pas 1 : par exemple −4i² = −4·(−1) = +4. Et i³ = −i, i⁴ = 1.'),
   },
   {
     id: 'g8_div_componentwise', family: 'rule', tag: 'E', skill: 'g8-algebraic', repair: 'g8-algebraic',
     judges: ['complex'],
-    name: 'Division partie par partie',
+    name: t('Division partie par partie'),
     example: ['(4 + 7i)/(2 + i) = 2 + 7i', '(4 + 7i)/(2 + i) = 3 + 2i'],
     check: { judge: { kind: 'complex', form: 'algebraic' }, prev: '(4+7i)/(2+i)', line: '2+7i' },
     // (a + bi)/(c + di) → a/c + (b/d)i.
@@ -134,13 +135,13 @@ export const RULES = [
       });
     },
     explain: (ctx = {}) => (ctx.den
-      ? `On ne divise pas partie par partie. Contrôle : (${cText(ctx.got)})(${cText(ctx.den)}) = ${cText(ctx.back)} ≠ ${cText(ctx.num)}. Multiplie en haut et en bas par le conjugué ${cText(ctx.den.conj())}.`
-      : 'On ne divise pas partie par partie : (a + bi)/(c + di) n\'est pas a/c + (b/d)i. Multiplie en haut et en bas par le conjugué c − di.'),
+      ? t('On ne divise pas partie par partie. Contrôle : ({g})({d}) = {b} ≠ {n}. Multiplie en haut et en bas par le conjugué {c}.', { g: cText(ctx.got), d: cText(ctx.den), b: cText(ctx.back), n: cText(ctx.num), c: cText(ctx.den.conj()) })
+      : t('On ne divise pas partie par partie : (a + bi)/(c + di) n\'est pas a/c + (b/d)i. Multiplie en haut et en bas par le conjugué c − di.')),
   },
   {
     id: 'g8_modulus_no_square', family: 'rule', tag: 'E', skill: 'g8-algebraic', repair: 'geo-pythagore',
     judges: ['complex'],
-    name: 'Module sans les carrés',
+    name: t('Module sans les carrés'),
     example: ['|3 + 4i| = 7', '|3 + 4i| = 5'],
     check: { judge: { kind: 'complex', form: 'real' }, prev: '|3+4i|', line: '7' },
     // |a + bi| → |a| + |b|, a + b, √(a + b), √(a² − b²).
@@ -161,17 +162,17 @@ export const RULES = [
       });
     },
     explain: (ctx = {}) => {
-      if (!ctx.a) return 'Le module est une longueur : par Pythagore, |a + bi| = √(a² + b²), par exemple |3 + 4i| = √(9 + 16) = 5.';
+      if (!ctx.a) return t('Le module est une longueur : par Pythagore, |a + bi| = √(a² + b²), par exemple |3 + 4i| = √(9 + 16) = 5.');
       const s = (x) => (x.n < 0 ? `(${x.toString().replace('-', '−')})` : x.toString());
       const r = ctx.a.mul(ctx.a).add(ctx.b.mul(ctx.b));
       const root = r.sqrt();
-      return `Le module est une longueur : Pythagore donne √(${s(ctx.a)}² + ${s(ctx.b)}²) = √${r}${root ? ` = ${root}` : ''}.`;
+      return t('Le module est une longueur : Pythagore donne √({a}² + {b}²) = {v}.', { a: s(ctx.a), b: s(ctx.b), v: `√${r}${root ? ` = ${root}` : ''}` });
     },
   },
   {
     id: 'g8_arg_quadrant', family: 'geometry', tag: 'E', skill: 'g8-polar', repair: 'g8-polar',
     judges: ['complex'],
-    name: 'Argument sans correction de quadrant',
+    name: t('Argument sans correction de quadrant'),
     example: ['arg(−1 + i√3) = −π/3', 'arg(−1 + i√3) = 2π/3'],
     check: { judge: { kind: 'complex', form: 'real', arg: 'principal' }, prev: 'arg(-1+i√3)', line: '-π/3' },
     transform: (prev, ctx) => {
@@ -202,15 +203,17 @@ export const RULES = [
       return out;
     },
     explain: (ctx = {}) => {
-      if (!ctx.z) return 'arctan(b/a) donne un angle de ]−π/2 ; π/2[ : quand a < 0, le point est à gauche, dans le 2e ou le 3e quadrant, et θ = arctan(b/a) ± π. Ainsi arg(−1 + i√3) = 2π/3, pas −π/3.';
-      const q = ctx.z.im > 0 ? '2e' : '3e';
-      return `arctan(b/a) donne un angle de ]−π/2 ; π/2[. Ici a < 0 : le point (${textOf(C(ctx.z.re, 0))} ; ${textOf(C(ctx.z.im, 0))}) est dans le ${q} quadrant, donc θ = arctan(b/a) ${ctx.z.im > 0 ? '+' : '−'} π. Utilise cos θ = a/r et sin θ = b/r ensemble.`;
+      if (!ctx.z) return t('arctan(b/a) donne un angle de ]−π/2 ; π/2[ : quand a < 0, le point est à gauche, dans le 2e ou le 3e quadrant, et θ = arctan(b/a) ± π. Ainsi arg(−1 + i√3) = 2π/3, pas −π/3.');
+      const pt = { x: textOf(C(ctx.z.re, 0)), y: textOf(C(ctx.z.im, 0)) };
+      return ctx.z.im > 0
+        ? t('arctan(b/a) donne un angle de ]−π/2 ; π/2[. Ici a < 0 : le point ({x} ; {y}) est dans le 2e quadrant, donc θ = arctan(b/a) + π. Utilise cos θ = a/r et sin θ = b/r ensemble.', pt)
+        : t('arctan(b/a) donne un angle de ]−π/2 ; π/2[. Ici a < 0 : le point ({x} ; {y}) est dans le 3e quadrant, donc θ = arctan(b/a) − π. Utilise cos θ = a/r et sin θ = b/r ensemble.', pt);
     },
   },
   {
     id: 'g8_moivre_modulus', family: 'rule', tag: 'E', skill: 'g8-moivre', repair: 'g8-moivre',
     judges: ['complex'],
-    name: 'Module pas élevé à la puissance',
+    name: t('Module pas élevé à la puissance'),
     example: ['(√2·e^(3iπ/4))¹⁰ = √2·e^(30iπ/4)', '(√2·e^(3iπ/4))¹⁰ = 32·e^(30iπ/4)'],
     check: { judge: { kind: 'complex', form: 'algebraic' }, prev: '(√2e^(3iπ/4))^10', line: '√2e^(30iπ/4)' },
     // z^n → |z|·(z/|z|)^n (module kept) or n|z|·(z/|z|)^n (module times n).
@@ -238,15 +241,17 @@ export const RULES = [
       return out;
     },
     explain: (ctx = {}) => {
-      if (!ctx.n) return 'On élève tout z à la puissance n : (r·e^(iθ))ⁿ = rⁿ·e^(inθ). Le module aussi est élevé à la puissance n.';
+      if (!ctx.n) return t('On élève tout z à la puissance n : (r·e^(iθ))ⁿ = rⁿ·e^(inθ). Le module aussi est élevé à la puissance n.');
       const r = Math.abs(ctx.r - Math.SQRT2) < 1e-9 ? '√2' : textOf(C(ctx.r, 0));
-      return `On élève tout z à la puissance ${ctx.n} : le module devient (${r})^${ctx.n}${ctx.times ? `, pas ${ctx.n}·${r}` : ''}. (r·e^(iθ))ⁿ = rⁿ·e^(inθ).`;
+      return ctx.times
+        ? t('On élève tout z à la puissance {n} : le module devient ({r})^{n}, pas {n}·{r}. (r·e^(iθ))ⁿ = rⁿ·e^(inθ).', { n: ctx.n, r })
+        : t('On élève tout z à la puissance {n} : le module devient ({r})^{n}. (r·e^(iθ))ⁿ = rⁿ·e^(inθ).', { n: ctx.n, r });
     },
   },
   {
     id: 'g8_roots_spacing', family: 'rule', tag: 'E', skill: 'g8-nth-roots', repair: 'g8-nth-roots',
     judges: ['solset'],
-    name: 'Racines n-ièmes mal espacées',
+    name: t('Racines n-ièmes mal espacées'),
     example: ['3θ = −π/2 + 2kπ ⇔ θ = −π/6 + 2kπ', 'θ = −π/6 + 2kπ/3'],
     check: { judge: { kind: 'solset', v: 'θ', vars: ['θ'], periodic: true }, prev: '3θ=-π/2+2kπ', line: 'θ=-π/6+2kπ' },
     // nθ = φ + 2kπ → θ = φ/n + 2kπ (one root repeated) or θ = φ/n + kπ/n.
@@ -269,13 +274,15 @@ export const RULES = [
       ];
     },
     explain: (ctx = {}) => (ctx.n
-      ? `Divise tout par ${ctx.n}, la période aussi : θ = φ/${ctx.n} + 2kπ/${ctx.n}. Les ${ctx.n} racines sont espacées de 2π/${ctx.n}${ctx.half ? '' : ' ; avec + 2kπ, tu retrouves toujours la même racine'}.`
-      : 'Divise tout par n, la période aussi : θ = φ/n + 2kπ/n. Les racines sont espacées de 2π/n ; avec + 2kπ, tu retrouves n fois la même racine.'),
+      ? (ctx.half
+        ? t('Divise tout par {n}, la période aussi : θ = φ/{n} + 2kπ/{n}. Les {n} racines sont espacées de 2π/{n}.', { n: ctx.n })
+        : t('Divise tout par {n}, la période aussi : θ = φ/{n} + 2kπ/{n}. Les {n} racines sont espacées de 2π/{n} ; avec + 2kπ, tu retrouves toujours la même racine.', { n: ctx.n }))
+      : t('Divise tout par n, la période aussi : θ = φ/n + 2kπ/n. Les racines sont espacées de 2π/n ; avec + 2kπ, tu retrouves n fois la même racine.')),
   },
   {
     id: 'g8_roots_only_one', family: 'method', tag: 'E', skill: 'g8-nth-roots', repair: 'g8-nth-roots',
     judges: ['complex'],
-    name: 'Une seule racine n-ième',
+    name: t('Une seule racine n-ième'),
     example: ['z³ = −8i : z = 2i', 'z ∈ {√3 − i ; 2i ; −√3 − i}'],
     check: { judge: { kind: 'complex', form: 'set' }, prev: 'z^3=-8i', line: '{2i}' },
     // A set of n roots → one of them only.
@@ -292,13 +299,13 @@ export const RULES = [
       return roots.map((z) => ({ node: setNode([z]), ctx: { n: roots.length, missing: roots.length - 1 } }));
     },
     explain: (ctx = {}) => (ctx.n
-      ? `Une équation zⁿ = w (w ≠ 0) a n solutions dans ℂ : ici ${ctx.n}. Il en manque ${ctx.missing}, d'arguments espacés de 2π/${ctx.n}.`
-      : 'Une équation zⁿ = w (w ≠ 0) a n solutions dans ℂ, d\'arguments espacés de 2π/n : il en manque.'),
+      ? t('Une équation zⁿ = w (w ≠ 0) a n solutions dans ℂ : ici {n}. Il en manque {m}, d\'arguments espacés de 2π/{n}.', { n: ctx.n, m: ctx.missing })
+      : t('Une équation zⁿ = w (w ≠ 0) a n solutions dans ℂ, d\'arguments espacés de 2π/n : il en manque.')),
   },
   {
     id: 'g8_sqrt_signs', family: 'sign', tag: 'E', skill: 'g8-sqrt-alg', repair: 'g8-sqrt-alg',
     judges: ['complex'],
-    name: 'Signes des racines carrées pris au hasard',
+    name: t('Signes des racines carrées pris au hasard'),
     example: ['z² = −5 + 12i : z = ±2 ± 3i', 'z = ±(2 + 3i)'],
     check: { judge: { kind: 'complex', form: 'set' }, prev: 'z^2=-5+12i', line: '{2+3i ; 2-3i ; -2+3i ; -2-3i}' },
     // z² = w with roots ±(x + iy): the four sign pairs, or the two pairs
@@ -316,20 +323,22 @@ export const RULES = [
       ];
     },
     explain: (ctx = {}) => {
-      if (ctx.w === undefined) return '2xy = b : quand b > 0, x et y ont le même signe ; quand b < 0, des signes contraires. Il reste deux racines opposées, pas quatre.';
-      const s = ctx.w.im > 0 ? 'le même signe' : 'des signes contraires';
+      if (ctx.w === undefined) return t('2xy = b : quand b > 0, x et y ont le même signe ; quand b < 0, des signes contraires. Il reste deux racines opposées, pas quatre.');
       const bad = C(ctx.x, -ctx.y);
       const sq = cpow(bad, C(2));
-      return `2xy = ${textOf(C(ctx.w.im, 0))} ${ctx.w.im > 0 ? '>' : '<'} 0 : x et y ont ${s}. (${textOf(bad)})² = ${textOf(sq)}, ce n'est pas une racine carrée de ${textOf(ctx.w)}.`;
+      const v = { b: textOf(C(ctx.w.im, 0)), z: textOf(bad), z2: textOf(sq), w: textOf(ctx.w) };
+      return ctx.w.im > 0
+        ? t('2xy = {b} > 0 : x et y ont le même signe. ({z})² = {z2}, ce n\'est pas une racine carrée de {w}.', v)
+        : t('2xy = {b} < 0 : x et y ont des signes contraires. ({z})² = {z2}, ce n\'est pas une racine carrée de {w}.', v);
     },
   },
   {
     id: 'g8_sqrt_symbol_complex', family: 'notation', tag: 'E', skill: 'g8-quadratic', repair: 'g8-sqrt-alg',
     judges: [],
-    name: '√ appliqué à un nombre complexe',
-    example: ['√(−8 − 6i) = i√(8 + 6i)', 'δ = 1 − 3i, avec δ² = −8 − 6i'],
+    name: t('√ appliqué à un nombre complexe'),
+    example: ['√(−8 − 6i) = i√(8 + 6i)', t('δ = 1 − 3i, avec δ² = −8 − 6i')],
     check: { bait: { skill: 'g8-quadratic', level: 2 } },
-    explain: () => 'La règle √(−a) = i√a ne vaut que pour a réel positif. Ici Δ n\'est pas réel : √Δ n\'a pas de sens. Cherche δ = x + iy avec δ² = Δ (x² − y² = Re Δ, 2xy = Im Δ, x² + y² = |Δ|).',
+    explain: () => t('La règle √(−a) = i√a ne vaut que pour a réel positif. Ici Δ n\'est pas réel : √Δ n\'a pas de sens. Cherche δ = x + iy avec δ² = Δ (x² − y² = Re Δ, 2xy = Im Δ, x² + y² = |Δ|).'),
   },
 ];
 

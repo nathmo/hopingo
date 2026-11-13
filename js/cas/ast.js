@@ -33,6 +33,7 @@
 // have none, and printers add brackets where precedence needs them.
 
 import { Q } from '../math/rational.js';
+import { t } from '../i18n.js';
 
 const CHILD_KEYS = {
   neg: ['e'], paren: ['e'], bin: ['l', 'r'], frac: ['n', 'd'], pow: ['b', 'e'], sqrt: ['e'],
@@ -296,7 +297,7 @@ export function mul(a, b) {
 export function div(a, b) {
   const va = numValue(a);
   const vb = numValue(b);
-  if (vb && vb.n === 0) throw new RangeError('Division par zéro');
+  if (vb && vb.n === 0) throw new RangeError(t('Division par zéro'));
   if (va && vb) return lit(va.div(vb));
   if (isZero(a)) return num(0);
   if (isOne(b)) return a;

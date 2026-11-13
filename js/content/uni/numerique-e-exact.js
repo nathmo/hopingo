@@ -25,6 +25,7 @@
 // est plus précis que le point milieu » (false; counter-example kind num,
 // trapNotBetter).
 
+import { t } from '../../i18n.js';
 import { linesItem, mcq, tfItem, examTag } from './kit.js';
 import { refCode, codeItem, holesFor, readtableItem, multiMcq, vfMcq, tableHtml, blankBy } from './numerique-kit.js';
 import { q, qd, qR, H, etraps, METHODS, FUNS, NS, errOf, E3, r2 } from './numerique-e-kit.js';
@@ -74,10 +75,10 @@ const tk = (k) => (k === 0 ? '1' : k === 1 ? 't' : `t${sup(k)}`);
 const pickForm = (rng, maxR = 3) => rng.pick(FORMS.filter((F) => degreeOf(F) <= maxR));
 
 const SUB_E = [
-  { id: 'monomial', label: 'tester un monôme', skill: EX },
-  { id: 'degree', label: 'conclure le degré', skill: EX },
-  { id: 'change-var', label: 'changement de variable', skill: 'a1-int-subst' },
-  { id: 'formula', label: 'formule composite', skill: 'n-quad-composite' },
+  { id: 'monomial', label: t('tester un monôme'), skill: EX },
+  { id: 'degree', label: t('conclure le degré'), skill: EX },
+  { id: 'change-var', label: t('changement de variable'), skill: 'a1-int-subst' },
+  { id: 'formula', label: t('formule composite'), skill: 'n-quad-composite' },
 ];
 
 function exactLines(rng, level) {
@@ -90,41 +91,46 @@ function exactLines(rng, level) {
     const J = Jmono(F, k);
     const I = intT(k);
     if (level === 2) {
-      parts.push({ html: `∫₋₁¹ ${tk(k)} dt.`, ask: `∫${tk(k)} =`, start: `I_${k}`, judge: { kind: 'value', expect: String(I) }, lines: [{ kind: 'eq', math: String(I), note: k % 2 ? 'Fonction impaire' : k === 0 ? 'Longueur de [−1 ; 1]' : `2/${k + 1}`, subgoal: 'monomial', ...blankBy(String(I), [String(I)]) }] });
+      parts.push({ html: `∫₋₁¹ ${tk(k)} dt.`, ask: `∫${tk(k)} =`, start: `I_${k}`, judge: { kind: 'value', expect: String(I) }, lines: [{ kind: 'eq', math: String(I), note: k % 2 ? t('Fonction impaire') : k === 0 ? t('Longueur de [−1 ; 1]') : `2/${k + 1}`, subgoal: 'monomial', ...blankBy(String(I), [String(I)]) }] });
     }
     const lines = [];
     if (level >= 3 && Jexpr(F, k) !== String(J)) lines.push({ kind: 'eq', math: Jexpr(F, k), note: `J(${tk(k)})`, subgoal: 'monomial' });
-    const vline = { kind: 'eq', math: String(J), note: `${level === 2 ? '' : `∫₋₁¹ ${tk(k)} dt = ${fq(I)} ; `}${J.eq(I) ? 'égal' : 'différent'}`, subgoal: 'monomial' };
+    const same = J.eq(I);
+    const vnote = level === 2 ? (same ? t('égal') : t('différent'))
+      : same ? t('∫₋₁¹ {tk} dt = {I} ; égal', { tk: tk(k), I: fq(I) }) : t('∫₋₁¹ {tk} dt = {I} ; différent', { tk: tk(k), I: fq(I) });
+    const vline = { kind: 'eq', math: String(J), note: vnote, subgoal: 'monomial' };
     if (level <= 2) Object.assign(vline, blankBy(String(J), [String(J)]));
     lines.push(vline);
     if (level === 3) {
       const last = k === r + 1;
       lines.push({
-        kind: 'decision', prompt: `J(${tk(k)}) = ${fq(J)} et ∫₋₁¹ ${tk(k)} dt = ${fq(I)}. Et maintenant ?`,
+        kind: 'decision', prompt: t('J({tk}) = {J} et ∫₋₁¹ {tk} dt = {I}. Et maintenant ?', { tk: tk(k), J: fq(J), I: fq(I) }),
         options: last ? [
-          { id: 'stop', label: `Conclure : degré d'exactitude ${r}`, valid: true, ref: true },
-          { id: 'go', label: `Tester ${tk(k + 1)}`, valid: false, why: `J(${tk(k)}) ≠ ∫${tk(k)} : le degré est atteint, c'est ${r}.` },
+          { id: 'stop', label: t('Conclure : degré d\'exactitude {r}', { r }), valid: true, ref: true },
+          { id: 'go', label: t('Tester {tk}', { tk: tk(k + 1) }), valid: false, why: t('J({tk}) ≠ ∫{tk} : le degré est atteint, c\'est {r}.', { tk: tk(k), r }) },
         ] : [
-          { id: 'go', label: `Tester ${tk(k + 1)}`, valid: true, ref: true },
-          { id: 'stop', label: `Conclure : degré d'exactitude ${k}`, valid: false, rule: 'n_exactness_stop_early', why: `J est exacte sur ${tk(k)}, mais le degré est atteint seulement quand un monôme échoue : teste ${tk(k + 1)}.` },
+          { id: 'go', label: t('Tester {tk}', { tk: tk(k + 1) }), valid: true, ref: true },
+          { id: 'stop', label: t('Conclure : degré d\'exactitude {r}', { r: k }), valid: false, rule: 'n_exactness_stop_early', why: t('J est exacte sur {tk}, mais le degré est atteint seulement quand un monôme échoue : teste {next}.', { tk: tk(k), next: tk(k + 1) }) },
         ],
       });
     }
     parts.push({ html: `J(${tk(k)}) =`, ask: `J(${tk(k)}) =`, start: `J_${k}`, judge: { kind: 'value', expect: String(J) }, lines });
   }
-  const rline = { kind: 'eq', math: String(r), note: `${tk(r + 1)} est le premier monôme qui échoue`, subgoal: 'degree' };
+  const rline = { kind: 'eq', math: String(r), note: t('{tk} est le premier monôme qui échoue', { tk: tk(r + 1) }), subgoal: 'degree' };
   if (level <= 2) Object.assign(rline, blankBy(String(r), [String(r)]));
-  parts.push({ html: 'Le degré d\'exactitude.', ask: 'r =', start: 'r', judge: { kind: 'value', expect: String(r), ...etraps([['n_exactness_stop_early', r >= 1 ? [String(r - 1)] : [], { j3: `J(${tk(r)})`, i3: `∫${tk(r)}` }]]) }, lines: [rline] });
+  parts.push({ html: t('Le degré d\'exactitude.'), ask: 'r =', start: 'r', judge: { kind: 'value', expect: String(r), ...etraps([['n_exactness_stop_early', r >= 1 ? [String(r - 1)] : [], { j3: `J(${tk(r)})`, i3: `∫${tk(r)}` }]]) }, lines: [rline] });
   const [p0, ...rest] = parts;
   const script = [{ kind: 'note', html: p0.html }, ...p0.lines];
   for (const p of rest) script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge: p.judge }, ...p.lines);
   return linesItem({
     skill: EX, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', keys: ['calc', 'calcfn'],
-    prompt: `${F.html}. Teste les monômes 1, t, t², … : compare J(tᵏ) à ∫₋₁¹ tᵏ dt${level === 1 ? ` (= 2/(k + 1) si k est pair, 0 si k est impair)` : ''}, puis donne le degré d'exactitude r de J.`,
+    prompt: level === 1
+      ? t('{J}. Teste les monômes 1, t, t², … : compare J(tᵏ) à ∫₋₁¹ tᵏ dt (= 2/(k + 1) si k est pair, 0 si k est impair), puis donne le degré d\'exactitude r de J.', { J: F.html })
+      : t('{J}. Teste les monômes 1, t, t², … : compare J(tᵏ) à ∫₋₁¹ tᵏ dt, puis donne le degré d\'exactitude r de J.', { J: F.html }),
     start: p0.start, judge: p0.judge, script,
-    hints: H('Teste 1, t, t², … et compare à ∫ de −1 à 1. La première égalité qui échoue donne le degré + 1.',
-      `J(t²) = ${R(Jexpr(F, 2))} et ∫t² = □`,
-      `J(t²) = ${fq(Jmono(F, 2))}, ∫t² = 2/3 ; le degré d'exactitude est ${r}.`),
+    hints: H(t('Teste 1, t, t², … et compare à ∫ de −1 à 1. La première égalité qui échoue donne le degré + 1.'),
+      t('J(t²) = {J} et ∫t² = □', { J: R(Jexpr(F, 2)) }),
+      t('J(t²) = {J}, ∫t² = 2/3 ; le degré d\'exactitude est {r}.', { J: fq(Jmono(F, 2)), r })),
     subgoals: SUB_E, key: `${EX}:${level}:${F.id}`,
   });
 }
@@ -151,25 +157,25 @@ function weightsLines(rng) {
   const bt = fq(beta);
   const sys = `ω₀ + ω₁ + ω₂ = 2 ; −ω₀ + ${beta.n < 0 ? `(${bt})` : bt}·ω₁ + ω₂ = 0 ; ω₀ + ${fq(beta.mul(beta))}·ω₁ + ω₂ = 2/3`;
   const parts = [
-    ['ω_1', 'ω₁', w1, 'Équation (1) − (3) : ω₁(1 − β²) = 2 − 2/3'],
-    ['ω_0', 'ω₀', w0, 'Avec ω₀ + ω₂ = 2 − ω₁ et ω₂ − ω₀ = −βω₁'],
-    ['ω_2', 'ω₂', w2, 'Avec ω₀ + ω₂ = 2 − ω₁ et ω₂ − ω₀ = −βω₁'],
+    ['ω_1', 'ω₁', w1, t('Équation (1) − (3) : ω₁(1 − β²) = 2 − 2/3')],
+    ['ω_0', 'ω₀', w0, t('Avec ω₀ + ω₂ = 2 − ω₁ et ω₂ − ω₀ = −βω₁')],
+    ['ω_2', 'ω₂', w2, t('Avec ω₀ + ω₂ = 2 − ω₁ et ω₂ − ω₀ = −βω₁')],
   ];
-  const script = [{ kind: 'note', html: `Exacte sur 1, t, t² : ${sys}.` }, { kind: 'eq', math: String(w1), note: parts[0][3], subgoal: 'monomial' }];
+  const script = [{ kind: 'note', html: t('Exacte sur 1, t, t² : {sys}.', { sys }) }, { kind: 'eq', math: String(w1), note: parts[0][3], subgoal: 'monomial' }];
   for (const [nm, lab, val, note] of parts.slice(1)) {
     script.push({ kind: 'segment', html: `${lab} :`, ask: `${lab} =`, start: { math: nm }, judge: { kind: 'value', expect: String(val) } }, { kind: 'eq', math: String(val), note, subgoal: 'monomial' });
   }
   script.push(
-    { kind: 'segment', html: `Le degré d'exactitude : J(t³) = ${fq(J(3))} ${J(3).eq(0) ? '=' : '≠'} 0${J(3).eq(0) ? ` ; J(t⁴) = ${fq(J(4))} ≠ 2/5` : ''}.`, ask: 'r =', start: { math: 'r' }, judge: { kind: 'value', expect: String(r), ...etraps([['n_exactness_stop_early', [String(r - 1)], { j3: 'J(t³)', i3: '∫t³' }]]) } },
-    { kind: 'eq', math: String(r), note: `${tk(r + 1)} échoue`, subgoal: 'degree' },
+    { kind: 'segment', html: t('Le degré d\'exactitude : {expr}.', { expr: `J(t³) = ${fq(J(3))} ${J(3).eq(0) ? '=' : '≠'} 0${J(3).eq(0) ? ` ; J(t⁴) = ${fq(J(4))} ≠ 2/5` : ''}` }), ask: 'r =', start: { math: 'r' }, judge: { kind: 'value', expect: String(r), ...etraps([['n_exactness_stop_early', [String(r - 1)], { j3: 'J(t³)', i3: '∫t³' }]]) } },
+    { kind: 'eq', math: String(r), note: t('{tk} échoue', { tk: tk(r + 1) }), subgoal: 'degree' },
   );
   return linesItem({
     skill: EX, level: 4, mode: 'free', keys: ['calc', 'greek'],
-    prompt: `Trouve les poids de J(g) = ω₀g(−1) + ω₁g(${bt}) + ω₂g(1) pour que J soit exacte sur P₂ (∫₋₁¹), puis son degré d'exactitude.`,
+    prompt: t('Trouve les poids de J(g) = ω₀g(−1) + ω₁g({b}) + ω₂g(1) pour que J soit exacte sur P₂ (∫₋₁¹), puis son degré d\'exactitude.', { b: bt }),
     start: 'ω_1', judge: { kind: 'value', expect: String(w1) }, script,
-    hints: H('Écris J(1) = 2, J(t) = 0, J(t²) = 2/3 : trois équations en ω₀, ω₁, ω₂.',
+    hints: H(t('Écris J(1) = 2, J(t) = 0, J(t²) = 2/3 : trois équations en ω₀, ω₁, ω₂.'),
       `ω₁·(1 − ${fq(beta.mul(beta))}) = □`,
-      `ω₀ = ${fq(w0)}, ω₁ = ${fq(w1)}, ω₂ = ${fq(w2)} ; degré ${r}.`),
+      t('ω₀ = {w0}, ω₁ = {w1}, ω₂ = {w2} ; degré {r}.', { w0: fq(w0), w1: fq(w1), w2: fq(w2), r })),
     subgoals: SUB_E, key: `${EX}:4:${beta}`,
   });
 }
@@ -198,19 +204,19 @@ const GAUSS_TESTS = [
 function gaussCode(rng, level) {
   const question = multiMcq({
     skill: EX, level, key: `${EX}:gaussread`,
-    prompt: 'Sur [0 ; 2] avec n = 1, gauss2 donne 4 pour x³ (∫ = 4) et 56/9 ≈ 6,2222 pour x⁴ (∫ = 32/5 = 6,4). Qu\'en déduis-tu ?',
+    prompt: t('Sur [0 ; 2] avec n = 1, gauss2 donne 4 pour x³ (∫ = 4) et 56/9 ≈ 6,2222 pour x⁴ (∫ = 32/5 = 6,4). Qu\'en déduis-tu ?'),
     options: [
-      { html: 'Gauss à 2 points est exacte sur P₃', correct: true },
-      { html: 'Elle n\'est pas exacte sur P₄', correct: true },
-      { html: 'La formule composite est d\'ordre 3', correct: false, rule: 'n_exactness_order' },
-      { html: 'Sans le facteur h/2, gauss2 donnerait encore 4 pour x³', correct: false, rule: 'n_map_jacobian' },
+      { html: t('Gauss à 2 points est exacte sur P₃'), correct: true },
+      { html: t('Elle n\'est pas exacte sur P₄'), correct: true },
+      { html: t('La formule composite est d\'ordre 3'), correct: false, rule: 'n_exactness_order' },
+      { html: t('Sans le facteur h/2, gauss2 donnerait encore 4 pour x³'), correct: false, rule: 'n_map_jacobian' },
     ],
-    solution: [{ html: 'Exacte sur P₃, pas sur P₄ : degré d\'exactitude 3, donc la formule composite est d\'ordre 4. Sans h/2, on obtiendrait le double (8).', note: '' }],
+    solution: [{ html: t('Exacte sur P₃, pas sur P₄ : degré d\'exactitude 3, donc la formule composite est d\'ordre 4. Sans h/2, on obtiendrait le double (8).'), note: '' }],
   }, rng);
-  const then = readtableItem({ skill: EX, level, key: 'gauss', prompt: 'Les tests de ton programme :', table: null, question });
+  const then = readtableItem({ skill: EX, level, key: 'gauss', prompt: t('Les tests de ton programme :'), table: null, question });
   return codeItem({
     skill: EX, level, ref: GAUSS, blanks: holesFor(5, GAUSS), traps: GAUSS_TRAPS, fillers: GAUSS_FILL, wrong: GAUSS_WRONG, rng,
-    prompt: 'Complète la formule de Gauss à 2 points composite : sur [xᵢ ; xᵢ + h], x = xᵢ + h(t + 1)/2 ramène à [−1 ; 1], et J(g) = g(−1/√3) + g(1/√3).',
+    prompt: t('Complète la formule de Gauss à 2 points composite : sur [xᵢ ; xᵢ + h], x = xᵢ + h(t + 1)/2 ramène à [−1 ; 1], et J(g) = g(−1/√3) + g(1/√3).'),
     tests: GAUSS_TESTS, then, hints: [], subgoals: SUB_E, key: `${level}`,
   });
 }
@@ -222,27 +228,27 @@ function exactMcq(rng, opts) {
   const r = degreeOf(F);
   const P = (k) => `P${['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇'][k]}`;
   const options = [
-    { html: `∫₋₁¹ p = J(p) pour tout p ∈ ${P(r)}`, correct: true },
-    { html: `∫₋₁¹ p = J(p) pour tout p ∈ ${P(r + 1)}`, correct: false },
-    ...(r >= 1 ? [{ html: `∫₋₁¹ p = J(p) pour tout p ∈ ${P(r - 1)}`, correct: true }] : []),
-    { html: `La formule composite associée est d'ordre ${r + 1}`, correct: true },
-    { html: `La formule composite associée est d'ordre ${r}`, correct: false, rule: 'n_exactness_order' },
+    { html: t('∫₋₁¹ p = J(p) pour tout p ∈ {P}', { P: P(r) }), correct: true },
+    { html: t('∫₋₁¹ p = J(p) pour tout p ∈ {P}', { P: P(r + 1) }), correct: false },
+    ...(r >= 1 ? [{ html: t('∫₋₁¹ p = J(p) pour tout p ∈ {P}', { P: P(r - 1) }), correct: true }] : []),
+    { html: t('La formule composite associée est d\'ordre {p}', { p: r + 1 }), correct: true },
+    { html: t('La formule composite associée est d\'ordre {p}', { p: r }), correct: false, rule: 'n_exactness_order' },
   ];
-  return { ...multiMcq({ skill: EX, level: 4, key: `${EX}:mcq:${F.id}`, prompt: `${F.html}. Que peut-on affirmer ?`, options, exam: examTag(opts), solution: [{ html: `J(tᵏ) = ∫₋₁¹ tᵏ dt jusqu'à k = ${r}, mais pas pour ${tk(r + 1)} : degré d'exactitude ${r}, ordre composite ${r + 1}.`, note: '' }] }, rng) };
+  return { ...multiMcq({ skill: EX, level: 4, key: `${EX}:mcq:${F.id}`, prompt: t('{J}. Que peut-on affirmer ?', { J: F.html }), options, exam: examTag(opts), solution: [{ html: t('J(tᵏ) = ∫₋₁¹ tᵏ dt jusqu\'à k = {r}, mais pas pour {tk} : degré d\'exactitude {r}, ordre composite {p}.', { r, tk: tk(r + 1), p: r + 1 }), note: '' }] }, rng) };
 }
 
 function exactTf(rng, opts) {
   const right = rng.chance(0.5);
-  const st = (f) => `Avec h = 1/N et xᵢ = ih (i = 0 … N − 1), ∫₀¹ f(x) dx = ${f}·Σᵢ ∫₋₁¹ f(xᵢ + h(t + 1)/2) dt.`;
+  const st = (f) => t('Avec h = 1/N et xᵢ = ih (i = 0 … N − 1), ∫₀¹ f(x) dx = {f}·Σᵢ ∫₋₁¹ f(xᵢ + h(t + 1)/2) dt.', { f });
   if (right) {
     return tfItem({
       skill: EX, level: 4, key: 'cv-true', exam: examTag(opts), statement: st('(h/2)'), truth: true,
-      explanation: 'Vrai : sur [xᵢ ; xᵢ + h], x = xᵢ + h(t + 1)/2 donne dx = (h/2)dt.',
+      explanation: t('Vrai : sur [xᵢ ; xᵢ + h], x = xᵢ + h(t + 1)/2 donne dx = (h/2)dt.'),
     });
   }
   return vfMcq({
     skill: EX, level: 4, key: `${EX}:cv-false`, exam: examTag(opts), statement: st('h'), truth: false, ruleIfTrue: 'n_map_jacobian',
-    explanation: 'Faux : dx = (h/2)dt, le facteur est h/2 (avec h, on obtient le double).',
+    explanation: t('Faux : dx = (h/2)dt, le facteur est h/2 (avec h, on obtient le double).'),
   }, rng);
 }
 
@@ -251,10 +257,38 @@ function exactTf(rng, opts) {
 // ======================================================================
 
 const SUB_O = [
-  { id: 'ratio', label: 'rapport des erreurs', skill: 'fn-affine' },
-  { id: 'theory', label: 'ordre = degré + 1', skill: OR },
-  { id: 'exact', label: 'degré d\'exactitude', skill: EX },
+  { id: 'ratio', label: t('rapport des erreurs'), skill: 'fn-affine' },
+  { id: 'theory', label: t('ordre = degré + 1'), skill: OR },
+  { id: 'exact', label: t('degré d\'exactitude'), skill: EX },
 ];
+// Whole sentences per method (the name alone does not fit French grammar).
+const L2_PROMPT = {
+  rect: t('Calcule le rapport e(10)/e(20) des erreurs de la formule du rectangle (à gauche), puis l\'ordre p.'),
+  mid: t('Calcule le rapport e(10)/e(20) des erreurs de la formule du point milieu, puis l\'ordre p.'),
+  trap: t('Calcule le rapport e(10)/e(20) des erreurs de la formule du trapèze, puis l\'ordre p.'),
+  simp: t('Calcule le rapport e(10)/e(20) des erreurs de la formule de Simpson, puis l\'ordre p.'),
+};
+const L3_PROMPT = {
+  rect: t('Quelle colonne est celle de la formule du rectangle (à gauche) ?'),
+  mid: t('Quelle colonne est celle de la formule du point milieu ?'),
+  trap: t('Quelle colonne est celle de la formule du trapèze ?'),
+  simp: t('Quelle colonne est celle de la formule de Simpson ?'),
+};
+const L4_PROMPT = {
+  rect: t('La formule élémentaire du rectangle (à gauche) : donne son degré d\'exactitude r, puis l\'ordre p de la formule composite, et vérifie-le sur le tableau.'),
+  mid: t('La formule élémentaire du point milieu : donne son degré d\'exactitude r, puis l\'ordre p de la formule composite, et vérifie-le sur le tableau.'),
+  trap: t('La formule élémentaire du trapèze : donne son degré d\'exactitude r, puis l\'ordre p de la formule composite, et vérifie-le sur le tableau.'),
+  simp: t('La formule élémentaire de Simpson : donne son degré d\'exactitude r, puis l\'ordre p de la formule composite, et vérifie-le sur le tableau.'),
+  gauss2: t('La formule élémentaire de Gauss à 2 points : donne son degré d\'exactitude r, puis l\'ordre p de la formule composite, et vérifie-le sur le tableau.'),
+};
+const L4_COLUMN = {
+  rect: t('erreur (formule rectangle (à gauche))'),
+  mid: t('erreur (formule point milieu)'),
+  trap: t('erreur (formule trapèze)'),
+  simp: t('erreur (formule Simpson)'),
+  gauss2: t('erreur (formule Gauss à 2 points)'),
+};
+const errCol = (m) => t('erreur ({name})', { name: METHODS[m].name });
 // A %e value written out in decimals: 1.962e-03 → 0,001962.
 const decOf = (x) => { const v = Number(E3(x)); return v.toFixed(Math.max(0, 3 - Math.floor(Math.log10(v)))).replace('.', ','); };
 // The (function, method) pairs whose table shows the theoretical order:
@@ -272,7 +306,7 @@ const tableOf = (F, ms, labels) => ({
   columns: ['n', ...labels],
   rows: NS.map((n) => [String(n), ...ms.map((m) => E3(errOf(F, m, n)))]),
 });
-const fPrompt = (F) => `Erreurs |∫ f − Q_h(f)| des formules composites pour f(x) = ${F.text} sur ${F.ab}, avec n sous-intervalles (h = (b − a)/n) :`;
+const fPrompt = (F) => t('Erreurs |∫ f − Q_h(f)| des formules composites pour f(x) = {f} sur {ab}, avec n sous-intervalles (h = (b − a)/n) :', { f: F.text, ab: F.ab });
 
 function orderMcqQ(rng, F, m, level, withRatio) {
   const p = METHODS[m].p;
@@ -284,19 +318,19 @@ function orderMcqQ(rng, F, m, level, withRatio) {
   for (const x of [1, 2, 3, 4, 8, 16]) { if (opts.length >= 4) break; if (!seen.has(x)) { opts.push({ html: `p = ${x}`, correct: false }); seen.add(x); } }
   return mcq({
     skill: OR, level, key: `${OR}:p:${F.id}:${m}`,
-    prompt: `Quel est l'ordre p de la formule ${withRatio ? '' : '(quand n double, l\'erreur est divisée par 2ᵖ) '}?`,
+    prompt: withRatio ? t('Quel est l\'ordre p de la formule ?') : t('Quel est l\'ordre p de la formule (quand n double, l\'erreur est divisée par 2ᵖ) ?'),
     options: opts,
-    solution: [{ html: `Le rapport des erreurs quand n double est ≈ ${r2(ratio, 1)} ≈ 2${sup(p)} : p = ${p}.`, note: '' }],
+    solution: [{ html: t('Le rapport des erreurs quand n double est ≈ {r} ≈ 2{sup} : p = {p}.', { r: r2(ratio, 1), sup: sup(p), p }), note: '' }],
   }, rng);
 }
 
 function orderL1(rng, level) {
   const { F, m } = pickPair(rng, ['rect', 'mid', 'trap', 'simp', 'gauss2']);
   const errs = NS.map((n) => errOf(F, m, n));
-  const table = { columns: ['n', `erreur (${METHODS[m].name})`, 'rapport e(n/2)/e(n)'], rows: NS.map((n, i) => [String(n), E3(errs[i]), i ? r2(errs[i - 1] / errs[i]) : '']) };
+  const table = { columns: ['n', errCol(m), t('rapport e(n/2)/e(n)')], rows: NS.map((n, i) => [String(n), E3(errs[i]), i ? r2(errs[i - 1] / errs[i]) : '']) };
   return readtableItem({
     skill: OR, level, key: `1:${F.id}:${m}`, prompt: fPrompt(F), table, question: orderMcqQ(rng, F, m, level, true),
-    hints: H('n double, donc h est divisé par 2 : regarde par combien l\'erreur est divisée.', '2ᵖ = rapport ≈ □', `Rapport ≈ ${r2(ratioOf(F, m), 1)} = 2${sup(METHODS[m].p)} : p = ${METHODS[m].p}.`),
+    hints: H(t('n double, donc h est divisé par 2 : regarde par combien l\'erreur est divisée.'), t('2ᵖ = rapport ≈ □'), t('Rapport ≈ {r} = 2{sup} : p = {p}.', { r: r2(ratioOf(F, m), 1), sup: sup(METHODS[m].p), p: METHODS[m].p })),
     subgoals: SUB_O, baits: ['n_order_ratio_is_p'],
   });
 }
@@ -310,20 +344,20 @@ function orderL2(rng) {
   const rt = r2(ratio);
   const q2 = linesItem({
     skill: OR, level: 2, mode: 'guided', keys: KEYS,
-    prompt: `Calcule le rapport e(10)/e(20) des erreurs de la formule ${METHODS[m].name === 'Simpson' ? 'de Simpson' : `du ${METHODS[m].name}`}, puis l'ordre p.`,
+    prompt: L2_PROMPT[m],
     start: 'ρ', judge: { kind: 'stat', expect: String(Number(ratio.toPrecision(7))).replace('.', ','), decimals: ratio < 10 ? 1 : 0 },
     script: [
       { kind: 'eq', math: `${decOf(e10)}/${decOf(e20)}`, note: 'e(10)/e(20)', subgoal: 'ratio' },
-      { kind: 'eq', math: ratio < 10 ? rt : String(Math.round(ratio)), note: 'h divisé par 2', subgoal: 'ratio' },
-      { kind: 'segment', html: 'L\'ordre : 2ᵖ ≈ rapport.', ask: 'p =', start: { math: 'p' }, judge: { kind: 'value', expect: String(p), ...etraps([['n_order_ratio_is_p', Math.round(ratio) !== p ? [String(Math.round(ratio))] : [], { r: rt, p: String(p) }]]) } },
+      { kind: 'eq', math: ratio < 10 ? rt : String(Math.round(ratio)), note: t('h divisé par 2'), subgoal: 'ratio' },
+      { kind: 'segment', html: t('L\'ordre : 2ᵖ ≈ rapport.'), ask: 'p =', start: { math: 'p' }, judge: { kind: 'value', expect: String(p), ...etraps([['n_order_ratio_is_p', Math.round(ratio) !== p ? [String(Math.round(ratio))] : [], { r: rt, p: String(p) }]]) } },
       { kind: 'eq', math: String(p), note: `2${sup(p)} = ${2 ** p}`, subgoal: 'theory', ...blankBy(String(p), [String(p)]) },
     ],
     subgoals: SUB_O, key: `${OR}:2q:${F.id}:${m}`, hints: [],
   });
   return readtableItem({
     skill: OR, level: 2, key: `2:${F.id}:${m}`, prompt: fPrompt(F),
-    table: tableOf(F, [m], [`erreur (${METHODS[m].name})`]), question: q2,
-    hints: H('n double, donc h est divisé par 2 : l\'erreur est divisée par 2ᵖ.', `rapport = ${E3(e10)}/${E3(e20)} ≈ □`, `rapport ≈ ${rt} ≈ ${2 ** p} = 2${sup(p)}, donc p = ${p}.`),
+    table: tableOf(F, [m], [errCol(m)]), question: q2,
+    hints: H(t('n double, donc h est divisé par 2 : l\'erreur est divisée par 2ᵖ.'), t('rapport = {a}/{b} ≈ □', { a: E3(e10), b: E3(e20) }), t('rapport ≈ {rt} ≈ {n} = 2{sup}, donc p = {p}.', { rt, n: 2 ** p, sup: sup(p), p })),
     subgoals: SUB_O, baits: ['n_order_ratio_is_p'],
   });
 }
@@ -333,19 +367,18 @@ function orderL3(rng) {
   const F = rng.pick(FUNS.filter((G) => okFor(G, ['rect', 'mid', 'trap', 'simp'])));
   const ms = rng.shuffle(['rect', 'mid', 'trap', 'simp']);
   const target = rng.pick(['rect', 'mid', 'simp', 'trap']);
-  const name = (m) => (m === 'simp' ? 'Simpson' : METHODS[m].name);
-  const options = ms.map((m, i) => ({ html: `La colonne ${LETTERS[i]}`, correct: m === target }));
+  const options = ms.map((m, i) => ({ html: t('La colonne {L}', { L: LETTERS[i] }), correct: m === target }));
   const why = {
-    rect: 'le rectangle est d\'ordre 1 : l\'erreur n\'est divisée que par 2',
-    simp: 'Simpson est d\'ordre 4 : l\'erreur est divisée par 16',
-    mid: 'point milieu et trapèze sont d\'ordre 2 (divisée par 4), et l\'erreur du point milieu est environ la moitié de celle du trapèze',
-    trap: 'point milieu et trapèze sont d\'ordre 2 (divisée par 4), et l\'erreur du trapèze est environ le double de celle du point milieu',
+    rect: t('le rectangle est d\'ordre 1 : l\'erreur n\'est divisée que par 2'),
+    simp: t('Simpson est d\'ordre 4 : l\'erreur est divisée par 16'),
+    mid: t('point milieu et trapèze sont d\'ordre 2 (divisée par 4), et l\'erreur du point milieu est environ la moitié de celle du trapèze'),
+    trap: t('point milieu et trapèze sont d\'ordre 2 (divisée par 4), et l\'erreur du trapèze est environ le double de celle du point milieu'),
   }[target];
-  const q3 = mcq({ skill: OR, level: 3, key: `${OR}:col:${F.id}:${ms.join('')}:${target}`, prompt: `Quelle colonne est celle de la formule ${target === 'simp' ? 'de Simpson' : `du ${name(target)}`} ?`, options, keepOrder: true, solution: [{ html: `Colonne ${LETTERS[ms.indexOf(target)]} : ${why}.`, note: '' }] }, rng);
+  const q3 = mcq({ skill: OR, level: 3, key: `${OR}:col:${F.id}:${ms.join('')}:${target}`, prompt: L3_PROMPT[target], options, keepOrder: true, solution: [{ html: t('Colonne {L} : {why}.', { L: LETTERS[ms.indexOf(target)], why }), note: '' }] }, rng);
   return readtableItem({
-    skill: OR, level: 3, key: `3:${F.id}:${ms.join('')}:${target}`, prompt: `${fPrompt(F)} (les colonnes A à D sont le rectangle, le point milieu, le trapèze et Simpson, dans le désordre)`,
+    skill: OR, level: 3, key: `3:${F.id}:${ms.join('')}:${target}`, prompt: t('{intro} (les colonnes A à D sont le rectangle, le point milieu, le trapèze et Simpson, dans le désordre)', { intro: fPrompt(F) }),
     table: tableOf(F, ms, LETTERS), question: q3,
-    hints: H('Calcule pour chaque colonne le rapport quand n double : 2 (ordre 1), 4 (ordre 2), 16 (ordre 4).', 'rapport de la colonne A ≈ □', `C'est la colonne ${LETTERS[ms.indexOf(target)]} : ${why}.`),
+    hints: H(t('Calcule pour chaque colonne le rapport quand n double : 2 (ordre 1), 4 (ordre 2), 16 (ordre 4).'), t('rapport de la colonne A ≈ □'), t('C\'est la colonne {L} : {why}.', { L: LETTERS[ms.indexOf(target)], why })),
     subgoals: SUB_O, baits: [],
   });
 }
@@ -353,22 +386,21 @@ function orderL3(rng) {
 function orderL4(rng) {
   const { F, m } = pickPair(rng, ['mid', 'trap', 'simp', 'gauss2', 'rect']);
   const { r, p } = METHODS[m];
-  const nm = m === 'simp' ? 'de Simpson' : m === 'gauss2' ? 'de Gauss à 2 points' : `du ${METHODS[m].name}`;
   const q4 = linesItem({
     skill: OR, level: 4, mode: 'free', keys: KEYS,
-    prompt: `La formule élémentaire ${nm} : donne son degré d'exactitude r, puis l'ordre p de la formule composite, et vérifie-le sur le tableau.`,
+    prompt: L4_PROMPT[m],
     start: 'r', judge: { kind: 'value', expect: String(r) },
     script: [
-      { kind: 'eq', math: String(r), note: `exacte sur P${['₀', '₁', '₂', '₃'][r]}`, subgoal: 'theory' },
-      { kind: 'segment', html: 'L\'ordre de la formule composite.', ask: 'p =', start: { math: 'p' }, judge: { kind: 'value', expect: String(p), ...etraps([['n_exactness_order', [String(r)], { r: String(r) }]]) } },
-      { kind: 'eq', math: String(p), note: `r + 1 ; rapport ≈ ${r2(ratioOf(F, m), 1)} ≈ 2${sup(p)}`, subgoal: 'theory' },
+      { kind: 'eq', math: String(r), note: t('exacte sur {P}', { P: `P${['₀', '₁', '₂', '₃'][r]}` }), subgoal: 'theory' },
+      { kind: 'segment', html: t('L\'ordre de la formule composite.'), ask: 'p =', start: { math: 'p' }, judge: { kind: 'value', expect: String(p), ...etraps([['n_exactness_order', [String(r)], { r: String(r) }]]) } },
+      { kind: 'eq', math: String(p), note: t('r + 1 ; rapport ≈ {r} ≈ 2{sup}', { r: r2(ratioOf(F, m), 1), sup: sup(p) }), subgoal: 'theory' },
     ],
     subgoals: SUB_O, key: `${OR}:4q:${F.id}:${m}`, hints: [],
   });
   return readtableItem({
     skill: OR, level: 4, key: `4:${F.id}:${m}`, prompt: fPrompt(F),
-    table: tableOf(F, [m], [`erreur (formule ${nm.replace(/^de |^du /, '')})`]), question: q4,
-    hints: H('Exactitude de degré r ⇒ ordre r + 1 pour la formule composite.', `r = □, donc p = r + 1`, `r = ${r}, p = ${p} : le rapport ≈ ${r2(ratioOf(F, m), 1)} ≈ ${2 ** p}.`),
+    table: tableOf(F, [m], [L4_COLUMN[m]]), question: q4,
+    hints: H(t('Exactitude de degré r ⇒ ordre r + 1 pour la formule composite.'), t('r = □, donc p = r + 1'), t('r = {r}, p = {p} : le rapport ≈ {ratio} ≈ {n}.', { r, p, ratio: r2(ratioOf(F, m), 1), n: 2 ** p })),
     subgoals: SUB_O, baits: ['n_exactness_order'],
   });
 }
@@ -378,20 +410,21 @@ function orderL5(rng, opts = {}) {
   const { p, r } = METHODS[m];
   const ratio = ratioOf(F, m);
   const options = rng.shuffle([
-    { html: `X est d'ordre ${p}`, correct: true },
-    { html: `X est exacte sur P${['₀', '₁', '₂', '₃'][r]} (degré d'exactitude ${r})`, correct: true },
-    { html: `X est d'ordre ${Math.round(ratio)}`, correct: false, rule: 'n_order_ratio_is_p' },
-    { html: p === 4 ? 'X pourrait être la formule du trapèze' : 'X pourrait être la formule de Simpson', correct: false },
-    { html: `Diviser h par 2 divise l'erreur par ${2 * 2 ** p}`, correct: false },
+    { html: t('X est d\'ordre {p}', { p }), correct: true },
+    { html: t('X est exacte sur {P} (degré d\'exactitude {r})', { P: `P${['₀', '₁', '₂', '₃'][r]}`, r }), correct: true },
+    { html: t('X est d\'ordre {p}', { p: Math.round(ratio) }), correct: false, rule: 'n_order_ratio_is_p' },
+    { html: p === 4 ? t('X pourrait être la formule du trapèze') : t('X pourrait être la formule de Simpson'), correct: false },
+    { html: t('Diviser h par 2 divise l\'erreur par {n}', { n: 2 * 2 ** p }), correct: false },
   ].filter((o, i, a) => a.findIndex((x) => x.html === o.html) === i)).slice(0, 4);
-  if (!options.some((o) => o.correct)) options[0] = { html: `X est d'ordre ${p}`, correct: true };
-  if (!options.some((o) => !o.correct)) options[3] = { html: `X est d'ordre ${p + 1}`, correct: false };
-  const table = tableOf(F, [m], ['méthode X']);
+  if (!options.some((o) => o.correct)) options[0] = { html: t('X est d\'ordre {p}', { p }), correct: true };
+  if (!options.some((o) => !o.correct)) options[3] = { html: t('X est d\'ordre {p}', { p: p + 1 }), correct: false };
+  const table = tableOf(F, [m], [t('méthode X')]);
+  const sol = t('Rapport ≈ {ratio} ≈ 2{sup} : ordre {p}, degré d\'exactitude {r}.', { ratio: r2(ratio, 1), sup: sup(p), p, r });
   if (opts.exam) {
-    return multiMcq({ skill: OR, level: 4, key: `${OR}:mcqX:${F.id}:${m}`, prompt: `${fPrompt(F)}${tableHtml(table)}`, options, exam: examTag(opts), solution: [{ html: `Rapport ≈ ${r2(ratio, 1)} ≈ 2${sup(p)} : ordre ${p}, degré d'exactitude ${r}.`, note: '' }] }, rng);
+    return multiMcq({ skill: OR, level: 4, key: `${OR}:mcqX:${F.id}:${m}`, prompt: `${fPrompt(F)}${tableHtml(table)}`, options, exam: examTag(opts), solution: [{ html: sol, note: '' }] }, rng);
   }
-  const q5 = multiMcq({ skill: OR, level: 5, key: `${OR}:X:${F.id}:${m}`, prompt: 'Qu\'en déduis-tu sur la méthode X ?', options, solution: [{ html: `Rapport ≈ ${r2(ratio, 1)} ≈ 2${sup(p)} : ordre ${p}, degré d'exactitude ${r}.`, note: '' }] }, rng);
-  return readtableItem({ skill: OR, level: 5, key: `5:${F.id}:${m}`, prompt: `${fPrompt(F)} (méthode X inconnue)`, table, question: q5, subgoals: SUB_O });
+  const q5 = multiMcq({ skill: OR, level: 5, key: `${OR}:X:${F.id}:${m}`, prompt: t('Qu\'en déduis-tu sur la méthode X ?'), options, solution: [{ html: sol, note: '' }] }, rng);
+  return readtableItem({ skill: OR, level: 5, key: `5:${F.id}:${m}`, prompt: t('{intro} (méthode X inconnue)', { intro: fPrompt(F) }), table, question: q5, subgoals: SUB_O });
 }
 
 function orderExamMcq(rng, opts) {
@@ -400,19 +433,19 @@ function orderExamMcq(rng, opts) {
   const P = ['P₀', 'P₁', 'P₂', 'P₃', 'P₄', 'P₅', 'P₆'];
   return mcq({
     skill: OR, level: 4, key: `${OR}:mcq:${r}`, exam: examTag(opts),
-    prompt: `Une formule J sur [−1 ; 1] est exacte sur ${P[r]} mais pas sur ${P[r + 1]}. Pour f assez régulière, la formule composite associée est d'ordre…`,
+    prompt: t('Une formule J sur [−1 ; 1] est exacte sur {P1} mais pas sur {P2}. Pour f assez régulière, la formule composite associée est d\'ordre…', { P1: P[r], P2: P[r + 1] }),
     options: [{ html: String(r + 1), correct: true }, { html: String(r), correct: false, rule: 'n_exactness_order' }, ...[...new Set([r + 2, 2 * (r + 1), r + 3])].filter((x) => x !== r + 1 && x !== r).slice(0, 2).map((x) => ({ html: String(x), correct: false }))],
-    solution: [{ html: `Degré d'exactitude r = ${r} ⇒ ordre r + 1 = ${r + 1}.`, note: '' }],
+    solution: [{ html: t('Degré d\'exactitude r = {r} ⇒ ordre r + 1 = {p}.', { r, p: r + 1 }), note: '' }],
   }, rng);
 }
 
 function orderTf(rng, opts) {
   return tfItem({
     skill: OR, level: 4, key: 'trap-mid', exam: examTag(opts),
-    statement: 'La formule du trapèze composite, qui utilise les extrémités des sous-intervalles, est toujours plus précise que celle du point milieu (même n).',
+    statement: t('La formule du trapèze composite, qui utilise les extrémités des sous-intervalles, est toujours plus précise que celle du point milieu (même n).'),
     truth: false,
     counter: { kind: 'num', prop: 'trapNotBetter', params: { n: 4 }, ask: [{ v: 'f', label: 'f(x) =' }], answer: { f: 'x^2' } },
-    explanation: 'Faux : pour f(x) = x² sur [0 ; 1] et n = 4, l\'erreur du trapèze est 1/96, celle du point milieu 1/192. Dans le tableau des erreurs, celle du trapèze est environ le double.',
+    explanation: t('Faux : pour f(x) = x² sur [0 ; 1] et n = 4, l\'erreur du trapèze est 1/96, celle du point milieu 1/192. Dans le tableau des erreurs, celle du trapèze est environ le double.'),
   });
 }
 

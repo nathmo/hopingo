@@ -15,40 +15,41 @@ import { parse } from '../parse.js';
 import { lit } from '../ast.js';
 import { Q } from '../../math/rational.js';
 import { buildLine } from '../../judges/matcommon.js';
+import { t } from '../../i18n.js';
 
-const qOf = (t) => { const m = /^(-?\d+)(?:\/(\d+))?$/.exec(String(t).replace(/\s|−/g, (c) => (c === '−' ? '-' : ''))); return m ? new Q(Number(m[1]), m[2] ? Number(m[2]) : 1) : null; };
-const vecOf = (t) => String(t).replace(/[()\s]/g, '').split(';').map(qOf);
+const qOf = (s) => { const m = /^(-?\d+)(?:\/(\d+))?$/.exec(String(s).replace(/\s|−/g, (c) => (c === '−' ? '-' : ''))); return m ? new Q(Number(m[1]), m[2] ? Number(m[2]) : 1) : null; };
+const vecOf = (s) => String(s).replace(/[()\s]/g, '').split(';').map(qOf);
 
 export const DEFS = {
   n_order_simple_ratio: {
-    name: 'Ordre 1 conclu d\'un rapport δₖ₊₁/δₖ qui tend vers 0',
+    name: t('Ordre 1 conclu d\'un rapport δₖ₊₁/δₖ qui tend vers 0'),
     judges: [],
     check: { bait: { skill: 'n-order-read', level: 1 } },
   },
   n_order_roundoff_rows: {
-    name: 'Ordre lu sur une ligne dominée par l\'arrondi',
+    name: t('Ordre lu sur une ligne dominée par l\'arrondi'),
     judges: [],
     check: { bait: { skill: 'n-order-read', level: 3 } },
   },
   n_newton_inverted: {
-    name: 'Newton : f′/f au lieu de f/f′',
+    name: t('Newton : f′/f au lieu de f/f′'),
     judges: [],
     code: { skill: 'n-newton', text: 'df(x) / f(x)', levels: [5] },
     check: { bait: { skill: 'n-newton', level: 3 } },
   },
   n_newton_sign: {
-    name: 'Newton : x + f/f′ au lieu de x − f/f′',
+    name: t('Newton : x + f/f′ au lieu de x − f/f′'),
     judges: [],
     code: { skill: 'n-newton', text: '-f(x) / df(x)', levels: [5] },
     check: { bait: { skill: 'n-newton', level: 3 } },
   },
   n_newton_always2: {
-    name: '« Newton est toujours d\'ordre 2 »',
+    name: t('« Newton est toujours d\'ordre 2 »'),
     judges: [],
     check: { bait: { skill: 'n-newton-multiple', level: 2 } },
   },
   n_mult_ratio: {
-    name: 'Multiplicité lue comme 1/rapport',
+    name: t('Multiplicité lue comme 1/rapport'),
     judges: ['value'],
     transform(prev, ctx) {
       const r = qOf(ctx?.cfg?.mult?.r);
@@ -61,7 +62,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '3', form: 'any', mult: { r: '2/3' } }, prev: 'm', line: '3/2' },
   },
   n_newton_sys_sign: {
-    name: 'Newton pour un système : x⁽⁰⁾ + δ au lieu de x⁽⁰⁾ − δ',
+    name: t('Newton pour un système : x⁽⁰⁾ + δ au lieu de x⁽⁰⁾ − δ'),
     judges: ['mat'],
     code: { skill: 'n-newton-system', text: 'x[0] + delta[0]', levels: [5] },
     transform(prev, ctx) {
@@ -79,7 +80,7 @@ export const DEFS = {
     check: { judge: { kind: 'mat', expect: '(5/4 ; 9/4)', nsys: { x0: '(1 ; 1)', delta: '(-1/4 ; -5/4)' } }, prev: 'x_1', line: '(3/4 ; -1/4)' },
   },
   n_secant_update: {
-    name: 'Sécante : le point de départ gardé au lieu des deux derniers',
+    name: t('Sécante : le point de départ gardé au lieu des deux derniers'),
     judges: [],
     code: { skill: 'n-secant', text: 'x0', levels: [5] },
     check: { bait: { skill: 'n-secant', level: 3 } },

@@ -16,6 +16,7 @@
 import { toText } from '../print.js';
 import { radicalNode } from '../matexpr.js';
 import * as LF from '../linalg-float.js';
+import { t } from '../../i18n.js';
 
 const numOf = (t) => {
   const s = String(t).replace(/−/g, '-').trim();
@@ -42,7 +43,7 @@ const show = (x) => {
 
 export const DEFS = {
   m_power_ratio: {
-    name: 'Vitesse |λ₁/λ₂| au lieu de |λ₂/λ₁|',
+    name: t('Vitesse |λ₁/λ₂| au lieu de |λ₂/λ₁|'),
     judges: ['value'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.speed;
@@ -55,7 +56,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '1/2', form: 'irreducible', speed: { l1: '4', l2: '2' } }, prev: '|λ_2/λ_1|', line: '2' },
   },
   m_inverse_power_value: {
-    name: 'Puissance inverse : μ pris pour λ',
+    name: t('Puissance inverse : μ pris pour λ'),
     judges: ['value'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.invpow;
@@ -69,7 +70,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '2', form: 'irreducible', invpow: { sigma: '1', mu: '1' } }, prev: 'λ', line: '1' },
   },
   m_rankk_wrong_sigma: {
-    name: 'Erreur de rang k : mauvais σ',
+    name: t('Erreur de rang k : mauvais σ'),
     judges: ['value'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.lowrank;
@@ -84,7 +85,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '3√2', form: 'exact', lowrank: { s2: ['72', '18'], k: 1 } }, prev: 'E_1', line: '6√2' },
   },
   m_norm_1_inf_swap: {
-    name: '‖·‖₁ et ‖·‖∞ échangées',
+    name: t('‖·‖₁ et ‖·‖∞ échangées'),
     judges: ['value'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.mnorm;
@@ -96,12 +97,12 @@ export const DEFS = {
       return [{ node: node(s.p === '1' ? inf : one), ctx: { c: show(one), l: show(inf) } }];
     },
     explain: (ctx = {}) => (ctx.c
-      ? `‖·‖₁ somme les <b>colonnes</b>, ‖·‖∞ les <b>lignes</b> : ici ‖A‖₁ = ${ctx.c} et ‖A‖∞ = ${ctx.l}. Moyen mnémotechnique : le 1 est vertical, le ∞ est couché.`
-      : '‖·‖₁ somme les <b>colonnes</b>, ‖·‖∞ les <b>lignes</b>. Moyen mnémotechnique : le 1 est vertical, le ∞ est couché.'),
+      ? t('‖·‖₁ somme les <b>colonnes</b>, ‖·‖∞ les <b>lignes</b> : ici ‖A‖₁ = {c} et ‖A‖∞ = {l}. Moyen mnémotechnique : le 1 est vertical, le ∞ est couché.', { c: ctx.c, l: ctx.l })
+      : t('‖·‖₁ somme les <b>colonnes</b>, ‖·‖∞ les <b>lignes</b>. Moyen mnémotechnique : le 1 est vertical, le ∞ est couché.')),
     check: { judge: { kind: 'value', expect: '7', form: 'irreducible', mnorm: { A: '[[3,0],[4,5]]', p: '1' } }, prev: 'N_1', line: '9' },
   },
   m_norm2_eig: {
-    name: '‖A‖₂ lue sur les valeurs propres de A',
+    name: t('‖A‖₂ lue sur les valeurs propres de A'),
     judges: ['value'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.mnorm;
@@ -118,7 +119,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '3√5', form: 'exact', mnorm: { A: '[[3,0],[4,5]]', p: '2' } }, prev: 'N_2', line: '5' },
   },
   m_cond_eig_nonsym: {
-    name: 'κ₂ lu sur les valeurs propres d\'une matrice non symétrique',
+    name: t('κ₂ lu sur les valeurs propres d\'une matrice non symétrique'),
     judges: ['value'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.mcond;
@@ -132,13 +133,13 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '3+2√2', form: 'exact', mcond: { A: '[[1,2],[0,1]]' } }, prev: 'κ_2', line: '1' },
   },
   m_cond_det: {
-    name: '« det petit ⇒ mal conditionnée »',
+    name: t('« det petit ⇒ mal conditionnée »'),
     judges: [],
-    explain: () => 'Un petit déterminant ne veut pas dire mauvais conditionnement : det(10⁻³I) = 10⁻⁹ en dimension 3, mais κ = 1. Multiplier A par un nombre ne change pas κ.',
+    explain: () => t('Un petit déterminant ne veut pas dire mauvais conditionnement : det(10⁻³I) = 10⁻⁹ en dimension 3, mais κ = 1. Multiplier A par un nombre ne change pas κ.'),
     check: { bait: { skill: 'm-cond', exam: 'tf' } },
   },
   m_gersh_radius_diag: {
-    name: 'Rayon de Gershgorin avec la diagonale',
+    name: t('Rayon de Gershgorin avec la diagonale'),
     judges: ['value'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.gersh;

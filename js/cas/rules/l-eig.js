@@ -18,6 +18,7 @@ import { mopts } from '../../judges/matcommon.js';
 import { detsOf } from '../../judges/det.js';
 import { expected } from '../../judges/mat.js';
 import { shifted } from '../../judges/eigvec.js';
+import { t } from '../../i18n.js';
 
 const T = (n) => toText(n).replace(/-/g, '−');
 const hasLam = (cfg) => (cfg?.vars || []).includes('λ');
@@ -71,19 +72,19 @@ const qVec = (v) => vecOf(v.map((x) => lit(x)));
 
 export const DEFS = {
   l_eigvec_zero: {
-    name: 'Le vecteur nul pris pour un vecteur propre',
+    name: t('Le vecteur nul pris pour un vecteur propre'),
     judges: ['eigvec'],
-    explain: () => 'Le vecteur nul vérifie A·0 = λ·0 pour tout λ : il est exclu par définition. Cherche une solution non nulle de (A − λI)v = 0 : donne la valeur 1 à une variable libre.',
+    explain: () => t('Le vecteur nul vérifie A·0 = λ·0 pour tout λ : il est exclu par définition. Cherche une solution non nulle de (A − λI)v = 0 : donne la valeur 1 à une variable libre.'),
     check: { judge: { kind: 'eigvec', A: '[[5,-2],[4,-1]]', lambda: '1' }, prev: 'v', line: '(0 ; 0)' },
   },
   l_eigen_rref: {
-    name: 'Valeurs propres lues sur la forme échelonnée',
+    name: t('Valeurs propres lues sur la forme échelonnée'),
     judges: [],
-    explain: () => 'Les opérations sur les lignes changent les valeurs propres : elles ne gardent que le rang (et le déterminant au signe près). Les valeurs propres sont les racines de det(A − λI).',
+    explain: () => t('Les opérations sur les lignes changent les valeurs propres : elles ne gardent que le rang (et le déterminant au signe près). Les valeurs propres sont les racines de det(A − λI).'),
     check: { bait: { skill: 'l-eig-charpoly', exam: 'mcq' } },
   },
   l_charpoly_sign: {
-    name: 'Signe du terme bc dans det(A − λI)',
+    name: t('Signe du terme bc dans det(A − λI)'),
     judges: ['det'],
     transform(prev, ctx) {
       if (!hasLam(ctx?.cfg)) return [];
@@ -94,12 +95,12 @@ export const DEFS = {
       });
     },
     explain: (ctx = {}) => (ctx.b
-      ? `Un déterminant 2 × 2 vaut « diagonale moins antidiagonale » : il faut retrancher ${ctx.b}·${ctx.c}, pas l'ajouter.`
-      : 'Un déterminant 2 × 2 vaut « diagonale moins antidiagonale » : (a − λ)(d − λ) − bc, avec un moins devant le produit bc.'),
+      ? t('Un déterminant 2 × 2 vaut « diagonale moins antidiagonale » : il faut retrancher {b}·{c}, pas l\'ajouter.', { b: ctx.b, c: ctx.c })
+      : t('Un déterminant 2 × 2 vaut « diagonale moins antidiagonale » : (a − λ)(d − λ) − bc, avec un moins devant le produit bc.')),
     check: { judge: { kind: 'det', vars: ['λ'], target: 'factored' }, prev: 'det[[4-λ,1],[2,3-λ]]', line: '(4-λ)(3-λ)+2' },
   },
   l_lambda_one_entry: {
-    name: 'λ soustrait à une seule case',
+    name: t('λ soustrait à une seule case'),
     judges: ['det', 'mat'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -119,11 +120,11 @@ export const DEFS = {
         return { n: evalAst({ op: 'det', e: { op: 'lit', rows: W } }, {}, mopts(cfg)).n, ctx: {} };
       });
     },
-    explain: () => 'λI a des λ sur <b>toute</b> la diagonale : chaque case diagonale de A perd λ, pas seulement la première.',
+    explain: () => t('λI a des λ sur <b>toute</b> la diagonale : chaque case diagonale de A perd λ, pas seulement la première.'),
     check: { judge: { kind: 'det', vars: ['λ'], target: 'factored', names: { A: '[[4,1],[2,3]]' } }, prev: 'det(A-λI)', line: '(4-λ)·3-2' },
   },
   l_eigvec_row: {
-    name: 'Une ligne de A − λI prise pour un vecteur propre',
+    name: t('Une ligne de A − λI prise pour un vecteur propre'),
     judges: ['eigvec', 'span'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -143,22 +144,26 @@ export const DEFS = {
       if (cfg.kind === 'span' && nz.length > 1) out.push({ node: line({ k: 'list', items: nz.map((r) => vecOf(r)) }), ctx: {} });
       return out;
     },
-    explain: (ctx = {}) => `v doit être <b>orthogonal</b> aux lignes de A − λI (chaque ligne · v = 0), pas égal à l'une d'elles${ctx.row ? ` : ${ctx.row} est une ligne` : ''}. Avec 2x + y = 0, par exemple, v = (1 ; −2).`,
+    explain: (ctx = {}) => (ctx.row
+      ? t('v doit être <b>orthogonal</b> aux lignes de A − λI (chaque ligne · v = 0), pas égal à l\'une d\'elles : {row} est une ligne. Avec 2x + y = 0, par exemple, v = (1 ; −2).', { row: ctx.row })
+      : t('v doit être <b>orthogonal</b> aux lignes de A − λI (chaque ligne · v = 0), pas égal à l\'une d\'elles. Avec 2x + y = 0, par exemple, v = (1 ; −2).')),
     check: { judge: { kind: 'eigvec', A: '[[3,1],[2,2]]', lambda: '1' }, prev: 'v', line: '(2 ; 1)' },
   },
   l_eig_inv_neg: {
-    name: 'Valeur propre de A⁻¹ : l\'opposé au lieu de l\'inverse',
+    name: t('Valeur propre de A⁻¹ : l\'opposé au lieu de l\'inverse'),
     judges: ['value'],
     transform(prev, ctx) {
       const e = ctx?.cfg?.eig;
       if (!e || !['inv'].includes(e.rule)) return [];
       return [{ node: parse(`-(${e.lambda})`), ctx: { l: String(e.lambda).replace('-', '−') } }];
     },
-    explain: (ctx = {}) => `Si Av = λv, alors v = λA⁻¹v, donc A⁻¹v = (1/λ)v : c'est l'inverse${ctx.l ? ` 1/${ctx.l}` : ''}, pas l'opposé.`,
+    explain: (ctx = {}) => (ctx.l
+      ? t('Si Av = λv, alors v = λA⁻¹v, donc A⁻¹v = (1/λ)v : c\'est l\'inverse 1/{l}, pas l\'opposé.', { l: ctx.l })
+      : t('Si Av = λv, alors v = λA⁻¹v, donc A⁻¹v = (1/λ)v : c\'est l\'inverse, pas l\'opposé.')),
     check: { judge: { kind: 'value', expect: '1/2', eig: { rule: 'inv', lambda: '2' } }, prev: 'μ', line: '-2' },
   },
   l_eig_shift_scale: {
-    name: 'Règles « + c » et « × c » échangées',
+    name: t('Règles « + c » et « × c » échangées'),
     judges: ['value'],
     transform(prev, ctx) {
       const e = ctx?.cfg?.eig;
@@ -167,23 +172,23 @@ export const DEFS = {
       if (e.rule === 'scale') return [{ node: parse(`(${e.lambda})+(${e.c})`), ctx: { c: e.c, l: e.lambda } }];
       return [];
     },
-    explain: () => '(A + cI)v = Av + cv = (λ + c)v : on ajoute c. (cA)v = c(Av) = cλv : on multiplie par c.',
+    explain: () => t('(A + cI)v = Av + cv = (λ + c)v : on ajoute c. (cA)v = c(Av) = cλv : on multiplie par c.'),
     check: { judge: { kind: 'value', expect: '5', eig: { rule: 'shift', lambda: '2', c: '3' } }, prev: 'μ', line: '6' },
   },
   l_eig_transpose_vec: {
-    name: 'Aᵀ et A ont les mêmes vecteurs propres',
+    name: t('Aᵀ et A ont les mêmes vecteurs propres'),
     judges: [],
-    explain: () => 'Aᵀ a les mêmes valeurs propres que A, pas les mêmes vecteurs propres : avec A = [[1, 1], [0, 2]], (1 ; 0) est propre pour A mais pas pour Aᵀ.',
+    explain: () => t('Aᵀ a les mêmes valeurs propres que A, pas les mêmes vecteurs propres : avec A = [[1, 1], [0, 2]], (1 ; 0) est propre pour A mais pas pour Aᵀ.'),
     check: { bait: { skill: 'l-eig-related', exam: 'tf' } },
   },
   l_eig_sum: {
-    name: 'Valeurs propres de A + B additionnées',
+    name: t('Valeurs propres de A + B additionnées'),
     judges: [],
-    explain: () => 'Les valeurs propres de A + B ne sont les sommes λ + μ que si A et B ont les mêmes vecteurs propres. Contre-exemple : [[0, 1], [0, 0]] et [[0, 0], [1, 0]] n\'ont que 0, leur somme a 1 et −1.',
+    explain: () => t('Les valeurs propres de A + B ne sont les sommes λ + μ que si A et B ont les mêmes vecteurs propres. Contre-exemple : [[0, 1], [0, 0]] et [[0, 0], [1, 0]] n\'ont que 0, leur somme a 1 et −1.'),
     check: { bait: { skill: 'l-eig-related', exam: 'tf' } },
   },
   l_pdp_inverse_side: {
-    name: 'P⁻¹DP au lieu de PDP⁻¹',
+    name: t('P⁻¹DP au lieu de PDP⁻¹'),
     judges: ['mat'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -193,16 +198,16 @@ export const DEFS = {
       const texts = ['P^(-1)·D·P'];
       if ((cfg.vars || []).includes('k')) texts.push('P^(-1)·D^k·P');
       const out = [];
-      for (const t of texts) {
-        try { out.push({ node: line(evalAst(parseExpr(t, opts), env, opts)), ctx: {} }); } catch { /* skip */ }
+      for (const tx of texts) {
+        try { out.push({ node: line(evalAst(parseExpr(tx, opts), env, opts)), ctx: {} }); } catch { /* skip */ }
       }
       return out;
     },
-    explain: () => 'Les colonnes de P sont les vecteurs propres : AP = PD, donc A = PDP⁻¹ (et Aᵏ = PDᵏP⁻¹). Teste sur v₁ : PDP⁻¹v₁ = PDe₁ = λ₁v₁.',
+    explain: () => t('Les colonnes de P sont les vecteurs propres : AP = PD, donc A = PDP⁻¹ (et Aᵏ = PDᵏP⁻¹). Teste sur v₁ : PDP⁻¹v₁ = PDe₁ = λ₁v₁.'),
     check: { judge: { kind: 'mat', names: { P: '[[1,1],[2,1]]', D: 'diag(1,3)' }, expect: '[[5,-2],[4,-1]]' }, prev: 'A', line: 'P^(-1)·D·P' },
   },
   l_pd_order: {
-    name: 'Colonnes de P dans un autre ordre que D',
+    name: t('Colonnes de P dans un autre ordre que D'),
     judges: ['factor'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -215,17 +220,19 @@ export const DEFS = {
       if (cols.length !== A.length) return [];
       return perms(cols).map((cs) => ({ node: line(null, { assigns: [{ name: 'P', value: Mx(MX.fromCols(cs).map((r) => r.map((x) => lit(x)))) }] }), ctx: {} }));
     },
-    explain: () => 'La colonne k de P doit être un vecteur propre de la valeur propre en position k de D. Contrôle : AP = PD, colonne par colonne.',
+    explain: () => t('La colonne k de P doit être un vecteur propre de la valeur propre en position k de D. Contrôle : AP = PD, colonne par colonne.'),
     check: { judge: { kind: 'factor', A: '[[5,-2],[4,-1]]', of: 'PDP' }, prev: 'A = PDP^(-1)', line: 'P = [[1,1],[1,2]] ; D = diag(1,3)' },
   },
   l_diag_distinct: {
-    name: '« Valeur propre double, donc pas diagonalisable »',
+    name: t('« Valeur propre double, donc pas diagonalisable »'),
     judges: [],
-    explain: (ctx = {}) => `Une valeur propre double n'empêche rien si son espace propre est de dimension 2${ctx.r ? ` : pour a = ${ctx.r}, dim E = ${ctx.d}` : ''}. Il faut comparer dim E_λ à la multiplicité, valeur par valeur.`,
+    explain: (ctx = {}) => (ctx.r
+      ? t('Une valeur propre double n\'empêche rien si son espace propre est de dimension 2 : pour a = {r}, dim E = {d}. Il faut comparer dim E_λ à la multiplicité, valeur par valeur.', { r: ctx.r, d: ctx.d })
+      : t('Une valeur propre double n\'empêche rien si son espace propre est de dimension 2. Il faut comparer dim E_λ à la multiplicité, valeur par valeur.')),
     check: { bait: { skill: 'l-eig-diag-param', exam: 'mcq' } },
   },
   l_powers_entrywise: {
-    name: 'Aᵏ calculée case par case',
+    name: t('Aᵏ calculée case par case'),
     judges: ['mat'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -235,11 +242,11 @@ export const DEFS = {
       if (A?.k !== 'm') return [];
       return [{ node: line(Mx(A.rows.map((r) => r.map((x) => pow(x, sym('k')))))), ctx: {} }];
     },
-    explain: () => 'Aᵏ = A·A·…·A, pas la matrice des aᵢⱼᵏ. Seule une matrice diagonale s\'élève case par case : d\'où Aᵏ = PDᵏP⁻¹.',
+    explain: () => t('Aᵏ = A·A·…·A, pas la matrice des aᵢⱼᵏ. Seule une matrice diagonale s\'élève case par case : d\'où Aᵏ = PDᵏP⁻¹.'),
     check: { judge: { kind: 'mat', vars: ['k'], ints: ['k'], names: { A: '[[5,-2],[4,-1]]', P: '[[1,1],[2,1]]', D: 'diag(1,3)' }, expect: 'P·D^k·P^(-1)' }, prev: 'A^k', line: '[[5^k,(-2)^k],[4^k,(-1)^k]]' },
   },
   l_markov_rows: {
-    name: 'Probabilités de transition rangées en lignes',
+    name: t('Probabilités de transition rangées en lignes'),
     judges: ['mat'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -249,11 +256,11 @@ export const DEFS = {
       if (want?.k !== 'm' || isVec(want)) return [];
       return [{ node: line(Mx(want.rows[0].map((_, j) => want.rows.map((r) => r[j])))), ctx: {} }];
     },
-    explain: () => 'Avec x_{k+1} = Mx_k, la colonne j dit où vont les personnes de l\'état j : chaque <b>colonne</b> somme à 1. Tu as rangé les probabilités en lignes.',
+    explain: () => t('Avec x_{k+1} = Mx_k, la colonne j dit où vont les personnes de l\'état j : chaque <b>colonne</b> somme à 1. Tu as rangé les probabilités en lignes.'),
     check: { judge: { kind: 'mat', markov: true, expect: '[[7/10,2/5],[3/10,3/5]]' }, prev: 'M', line: '[[7/10,3/10],[2/5,3/5]]' },
   },
   l_markov_normalize: {
-    name: 'Vecteur stationnaire non normalisé',
+    name: t('Vecteur stationnaire non normalisé'),
     judges: ['mat'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -268,11 +275,13 @@ export const DEFS = {
       for (const k of [0, v.length - 1]) if (v[k].n !== 0) cands.push(v.map((x) => x.div(v[k])));
       return cands.map((c) => ({ node: line(qVec(c)), ctx: { s: String(s) } }));
     },
-    explain: (ctx = {}) => `q est une répartition : ses composantes doivent sommer à 1. Divise ton vecteur propre par la somme de ses composantes${ctx.s ? ` (${ctx.s} pour le vecteur entier)` : ''}.`,
+    explain: (ctx = {}) => (ctx.s
+      ? t('q est une répartition : ses composantes doivent sommer à 1. Divise ton vecteur propre par la somme de ses composantes ({s} pour le vecteur entier).', { s: ctx.s })
+      : t('q est une répartition : ses composantes doivent sommer à 1. Divise ton vecteur propre par la somme de ses composantes.')),
     check: { judge: { kind: 'mat', markov: true, expect: '(4/7 ; 3/7)' }, prev: 'q', line: '(4/3 ; 1)' },
   },
   l_complex_conj_vec: {
-    name: 'Même vecteur propre pour λ et λ̄',
+    name: t('Même vecteur propre pour λ et λ̄'),
     judges: ['eigvec'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -285,7 +294,7 @@ export const DEFS = {
       if (!r) return [];
       return [{ node: line(vecOf([simp(neg(r[1])), r[0]])), ctx: {} }];
     },
-    explain: () => 'Pour une matrice réelle, si Av = λv, alors Av̄ = λ̄v̄ : le vecteur propre de λ̄ est le conjugué v̄ (on change le signe de chaque i), pas v lui-même.',
+    explain: () => t('Pour une matrice réelle, si Av = λv, alors Av̄ = λ̄v̄ : le vecteur propre de λ̄ est le conjugué v̄ (on change le signe de chaque i), pas v lui-même.'),
     check: { judge: { kind: 'eigvec', A: '[[1,-2],[1,3]]', lambda: '2-i', complex: true, pair: '2+i' }, prev: 'v', line: '(-1+i ; 1)' },
   },
 };

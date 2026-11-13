@@ -12,6 +12,7 @@ import {
   q, cn, cadd, cmul, cscale, ctext, cfloat, czero, closedOk, fr, jacJudge, domJudge, defKnown, blankChain, jacBlank,
   polyText, polyMul, polyPrim, polyInt0,
 } from './analyse2-g-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-volume';
 const PV = { vars: ['r', 'φ'] };
@@ -67,7 +68,7 @@ function roundShape(rng) {
 
 // A tetrahedron under the plane z = c − p·x − q·y, in the first octant.
 function tetraShape(rng) {
-  for (let t = 0; t < 50; t++) {
+  for (let tr = 0; tr < 50; tr++) {
     const p = rng.pick([1, 2, 3]);
     const qq = rng.pick([1, 2, 3]);
     const c = rng.pick([2, 3, 4, 6]);
@@ -90,29 +91,29 @@ function roundParts(sh, level) {
   const box2 = [[-R - 0.2, R + 0.2], [-R - 0.2, R + 0.2]];
   const start = `z = ${sh.top} ; z = ${sh.bot}`;
   const proj = `0 ≤ φ ≤ 2π ; 0 ≤ r ≤ ${R}`;
-  let rl = E(proj, `Les surfaces se coupent en r = ${R} : R est le disque x² + y² ≤ ${R * R}`, 'region', 'region');
+  let rl = E(proj, t('Les surfaces se coupent en r = {R} : R est le disque x² + y² ≤ {R2}', { R, R2: R * R }), 'region', 'region');
   if (level === 2) rl = { ...rl, ...blankChain(proj, [[1, 'hi']], PV.vars) };
-  const region = { html: 'Les surfaces se coupent au-dessus d\'un disque R. Décris R en polaires :', ask: 'R :', start, judge: domJudge('polar', [disk], box2, proj, { volume: true }), lines: [rl] };
+  const region = { html: t('Les surfaces se coupent au-dessus d\'un disque R. Décris R en polaires :'), ask: t('R :'), start, judge: domJudge('polar', [disk], box2, proj, { volume: true }), lines: [rl] };
   const D = `${proj} ; ${sh.botR} ≤ z ≤ ${sh.topR}`;
   const cylRegion = [`z ≥ ${sh.bot}`, `z ≤ ${sh.top}`];
-  let sl = E(D, `Sur R, ${fr(sup(sh.topR))} ≥ ${fr(sup(sh.botR))} : z va du dessous au dessus`, 'setup', 'setup');
+  let sl = E(D, t('Sur R, {a} ≥ {b} : z va du dessous au dessus', { a: fr(sup(sh.topR)), b: fr(sup(sh.botR)) }), 'setup', 'setup');
   if (level === 2) sl = { ...sl, ...blankChain(D, [[2, 'lo'], [2, 'hi']], ['r', 'φ', 'z']) };
   const box3 = [...box2, [Math.floor(sh.zmin - 0.3), Math.ceil(sh.zmax + 0.3)]];
-  const setup = { html: 'Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.', ask: 'D :', start, judge: domJudge('cyl', cylRegion, box3, D, { volume: true }), lines: [sl] };
+  const setup = { html: t('Décris le solide D en cylindriques : z entre la surface du dessous et celle du dessus.'), ask: t('D :'), start, judge: domJudge('cyl', cylRegion, box3, D, { volume: true }), lines: [sl] };
   const jac = jacJudge('polar', sh.height, { rMax: R, extra: { volume: true } });
   const F = sh.F || `(${heightR(sh)})×r`;
-  let jl = E(F, 'Hauteur dessus − dessous, en polaires, fois r', 'polar', 'jac');
+  let jl = E(F, t('Hauteur dessus − dessous, en polaires, fois r'), 'polar', 'jac');
   if (level <= 2) jl = { ...jl, ...jacBlank(sh.F ? sh.F.replace(/×r$/, '') : heightR(sh), 'r', jac.vars) };
-  const integrand = { html: 'La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :', ask: '(h − g)·r =', start: sh.height, judge: jac, lines: [jl] };
+  const integrand = { html: t('La hauteur est dessus − dessous. Écris-la en polaires, jacobien compris :'), ask: '(h − g)·r =', start: sh.height, judge: jac, lines: [jl] };
   const vStart = `int(int(${F},r,0,${R}),φ,0,2π)`;
   const prim = sh.prim || polyText(polyPrim(polyMul(sh.poly, { 1: q(1) })));
   const vlines = [
-    E(`int(${F},r,0,${R})×int(1,φ,0,2π)`, 'Bornes constantes : produit', 'compute', 'sep'),
-    E(`bracket(${prim},r,0,${R})×bracket(φ,φ,0,2π)`, 'Primitives', 'compute', 'prim'),
-    E(ctext(sh.value), 'Évaluer', 'compute', 'eval'),
+    E(`int(${F},r,0,${R})×int(1,φ,0,2π)`, t('Bornes constantes : produit'), 'compute', 'sep'),
+    E(`bracket(${prim},r,0,${R})×bracket(φ,φ,0,2π)`, t('Primitives'), 'compute', 'prim'),
+    E(ctext(sh.value), t('Évaluer'), 'compute', 'eval'),
   ];
   if (level <= 2) vlines[1] = { ...vlines[1], ...tpl(vlines[1].math, [prim], {}) };
-  const value = { html: 'Calcule le volume :', ask: 'Vol =', start: vStart, judge: defKnown(vStart, sh.value, { jacFactor: 'r', volume: true }), lines: vlines };
+  const value = { html: t('Calcule le volume :'), ask: 'Vol =', start: vStart, judge: defKnown(vStart, sh.value, { jacFactor: 'r', volume: true }), lines: vlines };
   return level === 1 ? [integrand, value] : [region, setup, integrand, value];
 }
 
@@ -120,54 +121,54 @@ function tetraParts(sh, level) {
   const box2 = [[-0.2, sh.a + 0.2], [-0.2, sh.b + 0.2]];
   const start = `z = ${sh.plane} ; z = 0 ; x ≥ 0 ; y ≥ 0`;
   const tri = `0 ≤ x ≤ ${sh.a} ; 0 ≤ y ≤ ${sh.yHi}`;
-  let rl = E(tri, `Le plan coupe z = 0 sur la droite ${fr(sh.plane)} = 0 : un triangle`, 'region', 'region');
+  let rl = E(tri, t('Le plan coupe z = 0 sur la droite {p} = 0 : un triangle', { p: fr(sh.plane) }), 'region', 'region');
   if (level === 2) rl = { ...rl, ...blankChain(tri, [[0, 'hi'], [1, 'hi']], ['x', 'y']) };
-  const region = { html: 'Le plan coupe le premier quadrant du plan z = 0 selon un triangle R. Décris R (x à l\'extérieur) :', ask: 'R :', start,
+  const region = { html: t('Le plan coupe le premier quadrant du plan z = 0 selon un triangle R. Décris R (x à l\'extérieur) :'), ask: t('R :'), start,
     judge: domJudge('cart', [`x ≥ 0`, 'y ≥ 0', `${sh.plane} ≥ 0`], box2, tri, { volume: true, order: ['x', 'y'], shape: 'typeI' }), lines: [rl] };
   const D = `${tri} ; 0 ≤ z ≤ ${sh.plane}`;
-  let sl = E(D, 'z va du plan z = 0 au plan incliné', 'setup', 'setup');
+  let sl = E(D, t('z va du plan z = 0 au plan incliné'), 'setup', 'setup');
   if (level === 2) sl = { ...sl, ...blankChain(D, [[2, 'hi']], ['x', 'y', 'z']) };
   const box3 = [...box2, [-0.2, sh.c + 0.2]];
-  const setup = { html: 'Décris le solide D : z entre le dessous et le dessus.', ask: 'D :', start,
+  const setup = { html: t('Décris le solide D : z entre le dessous et le dessus.'), ask: t('D :'), start,
     judge: domJudge('cart', ['x ≥ 0', 'y ≥ 0', 'z ≥ 0', `z ≤ ${sh.plane}`], box3, D, { volume: true, dim: 3, order: ['x', 'y', 'z'], shape: 'typeI3' }), lines: [sl] };
   const vStart = `int(int(${sh.plane},y,0,${sh.yHi}),x,0,${sh.a})`;
   const inner = `(${sh.c}-${sh.p === 1 ? '' : sh.p}x)^2/${2 * sh.q}`;
   const vlines = [
-    E(`int(${inner},x,0,${sh.a})`, 'On intègre d\'abord en y', 'compute', 'inner'),
-    E(`bracket(-(${sh.c}-${sh.p === 1 ? '' : sh.p}x)^3/${6 * sh.p * sh.q},x,0,${sh.a})`, 'Primitive en x', 'compute', 'prim'),
-    E(ctext(sh.value), 'Évaluer', 'compute', 'eval'),
+    E(`int(${inner},x,0,${sh.a})`, t('On intègre d\'abord en y'), 'compute', 'inner'),
+    E(`bracket(-(${sh.c}-${sh.p === 1 ? '' : sh.p}x)^3/${6 * sh.p * sh.q},x,0,${sh.a})`, t('Primitive en x'), 'compute', 'prim'),
+    E(ctext(sh.value), t('Évaluer'), 'compute', 'eval'),
   ];
   if (level <= 2) vlines[0] = { ...vlines[0], ...tpl(vlines[0].math, [String(2 * sh.q)], {}) };
-  const value = { html: 'Vol = ∬_R (dessus − dessous) dx dy :', ask: 'Vol =', start: vStart, judge: defKnown(vStart, sh.value, { volume: true }), lines: vlines };
+  const value = { html: t('Vol = ∬_R (dessus − dessous) dx dy :'), ask: 'Vol =', start: vStart, judge: defKnown(vStart, sh.value, { volume: true }), lines: vlines };
   return level === 1 ? [value] : [region, setup, value];
 }
 
 export const VOL_SUB = [
-  { id: 'region', label: 'la projection R', skill: 'a2-domain-describe' },
-  { id: 'setup', label: 'dessus − dessous', skill: SK },
-  { id: 'polar', label: 'passer en polaires', skill: 'a2-polar-int' },
-  { id: 'compute', label: 'calculer l\'intégrale', skill: 'a2-fubini-rect' },
+  { id: 'region', label: t('la projection R'), skill: 'a2-domain-describe' },
+  { id: 'setup', label: t('dessus − dessous'), skill: SK },
+  { id: 'polar', label: t('passer en polaires'), skill: 'a2-polar-int' },
+  { id: 'compute', label: t('calculer l\'intégrale'), skill: 'a2-fubini-rect' },
 ];
 const CHOICES = [
-  { id: 'region', label: 'Égaler les deux surfaces pour trouver R' },
-  { id: 'setup', label: 'z entre la surface du dessous et celle du dessus' },
-  { id: 'jac', label: 'Hauteur en polaires, fois r' },
-  { id: 'inner', label: 'Intégrer d\'abord en y' },
-  { id: 'sep', label: 'Séparer en produit' },
-  { id: 'prim', label: 'Primitives' },
-  { id: 'eval', label: 'Évaluer' },
-  { id: 'swap', label: 'z de la surface du dessus à celle du dessous', rule: 'a2_volume_surfaces_swapped', why: 'Le volume serait négatif : z va du dessous vers le dessus.' },
+  { id: 'region', label: t('Égaler les deux surfaces pour trouver R') },
+  { id: 'setup', label: t('z entre la surface du dessous et celle du dessus') },
+  { id: 'jac', label: t('Hauteur en polaires, fois r') },
+  { id: 'inner', label: t('Intégrer d\'abord en y') },
+  { id: 'sep', label: t('Séparer en produit') },
+  { id: 'prim', label: t('Primitives') },
+  { id: 'eval', label: t('Évaluer') },
+  { id: 'swap', label: t('z de la surface du dessus à celle du dessous'), rule: 'a2_volume_surfaces_swapped', why: t('Le volume serait négatif : z va du dessous vers le dessus.') },
 ];
 const topDecision = (sh) => ({
-  kind: 'decision', prompt: 'Au-dessus de R, quelle surface est en haut ?', options: [
+  kind: 'decision', prompt: t('Au-dessus de R, quelle surface est en haut ?'), options: [
     { id: 'top', label: `z = ${fr(sup(sh.top))}`, valid: true },
-    { id: 'bot', label: `z = ${fr(sup(sh.bot))}`, valid: false, rule: 'a2_volume_surfaces_swapped', why: `Au centre de R (x = y = 0), ${fr(sup(sh.top))} vaut plus que ${fr(sup(sh.bot))}.` },
+    { id: 'bot', label: `z = ${fr(sup(sh.bot))}`, valid: false, rule: 'a2_volume_surfaces_swapped', why: t('Au centre de R (x = y = 0), {a} vaut plus que {b}.', { a: fr(sup(sh.top)), b: fr(sup(sh.bot)) }) },
   ],
 });
 const coordDecision = (round) => ({
-  kind: 'decision', prompt: 'Quelles coordonnées pour R ?', options: [
-    { id: 'polar', label: 'Polaires', valid: round, why: round ? '' : 'R est un triangle : ses côtés sont des droites, les cartésiennes vont mieux.' },
-    { id: 'cart', label: 'Cartésiennes', valid: !round, why: round ? 'R est un disque : en polaires, les bornes sont constantes.' : '' },
+  kind: 'decision', prompt: t('Quelles coordonnées pour R ?'), options: [
+    { id: 'polar', label: t('Polaires'), valid: round, why: round ? '' : t('R est un triangle : ses côtés sont des droites, les cartésiennes vont mieux.') },
+    { id: 'cart', label: t('Cartésiennes'), valid: !round, why: round ? t('R est un disque : en polaires, les bornes sont constantes.') : '' },
   ],
 });
 
@@ -179,14 +180,14 @@ export function volume(level, rng, opts = {}) {
   if (level === 3) ps[0].pre = [coordDecision(round), ...(sh.s === 't' ? [] : [topDecision(sh)])];
   const { start, judge, script } = partsScript(ps, level, CHOICES);
   const what = round
-    ? `du solide compris entre les surfaces ${MT(`z = ${sh.top}`, XYZ)} et ${MT(`z = ${sh.bot}`, XYZ)}`
-    : `du tétraèdre sous le plan ${MT(`z = ${sh.plane}`, XYZ)}, dans le premier octant (x, y, z ≥ 0)`;
-  const given = level === 1 ? (round ? ` La projection est le disque R : ${MT(`x^2+y^2 ≤ ${sh.R * sh.R}`, XYZ)}, et ${MT(`z = ${sh.top}`, XYZ)} est au-dessus.` : ` R : ${MT(`0 ≤ x ≤ ${sh.a} ; 0 ≤ y ≤ ${sh.yHi}`, XYZ)}.`) : '';
+    ? t('Calcule le volume du solide compris entre les surfaces {top} et {bot}.', { top: MT(`z = ${sh.top}`, XYZ), bot: MT(`z = ${sh.bot}`, XYZ) })
+    : t('Calcule le volume du tétraèdre sous le plan {p}, dans le premier octant (x, y, z ≥ 0).', { p: MT(`z = ${sh.plane}`, XYZ) });
+  const given = level === 1 ? (round ? ` ${t('La projection est le disque R : {R}, et {top} est au-dessus.', { R: MT(`x^2+y^2 ≤ ${sh.R * sh.R}`, XYZ), top: MT(`z = ${sh.top}`, XYZ) })}` : ` ${t('R : {R}.', { R: MT(`0 ≤ x ≤ ${sh.a} ; 0 ≤ y ≤ ${sh.yHi}`, XYZ) })}`) : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Calcule le volume ${what}.${given}`,
-    hints: H('Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces.',
-      round ? `R est le disque x² + y² ≤ ${sh.R * sh.R} ; la hauteur est ${MT(sh.height, XYZ)}.` : `R : 0 ≤ x ≤ ${sh.a}, 0 ≤ y ≤ ${fr(sh.yHi)} ; la hauteur est ${MT(sh.plane, XYZ)}.`,
+    prompt: what + given,
+    hints: H(t('Volume = ∬ (dessus − dessous) sur la projection R ; on trouve R en égalant les deux surfaces.'),
+      round ? t('R est le disque x² + y² ≤ {R2} ; la hauteur est {h}.', { R2: sh.R * sh.R, h: MT(sh.height, XYZ) }) : t('R : 0 ≤ x ≤ {a}, 0 ≤ y ≤ {y} ; la hauteur est {h}.', { a: sh.a, y: fr(sh.yHi), h: MT(sh.plane, XYZ) }),
       round ? MT(`int(int(${sh.F || `(${heightR(sh)})×r`},r,0,${sh.R}),φ,0,2π)`, PV) : MT(`int(int(${sh.plane},y,0,${sh.yHi}),x,0,${sh.a})`, XYZ)),
     subgoals: VOL_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${sh.s}:${sh.R ?? `${sh.p}${sh.q}${sh.c}`}:${sh.top ?? ''}`, exam: examTag(opts), fallback: !!sh.fallback,
@@ -209,9 +210,9 @@ function volMcq(rng, opts) {
   add(cscale(sh.value, q(1, 2)), 'a2_volume_surfaces_swapped');
   add(cscale(sh.value, 4), 'a2_jacobian_forgot');
   return mcq({
-    skill: SK, level: 4, prompt: `Le volume du solide compris entre ${MT(`z = ${sh.top}`, XYZ)} et ${MT(`z = ${sh.bot}`, XYZ)} vaut :`,
+    skill: SK, level: 4, prompt: t('Le volume du solide compris entre {top} et {bot} vaut :', { top: MT(`z = ${sh.top}`, XYZ), bot: MT(`z = ${sh.bot}`, XYZ) }),
     options: options.map(({ x, ...o }) => o),
-    solution: [{ html: `R : x² + y² ≤ ${sh.R * sh.R} ; Vol = ${MT(`int(int(${sh.F || `(${heightR(sh)})×r`},r,0,${sh.R}),φ,0,2π)`, PV)} = ${MT(ctext(sh.value))}`, note: '' }],
+    solution: [{ html: t('R : x² + y² ≤ {R2} ; Vol = {I} = {v}', { R2: sh.R * sh.R, I: MT(`int(int(${sh.F || `(${heightR(sh)})×r`},r,0,${sh.R}),φ,0,2π)`, PV), v: MT(ctext(sh.value)) }), note: '' }],
     key: `mcq:${sh.s}:${sh.R}:${sh.top}`, exam: examTag(opts, 3),
   }, rng);
 }

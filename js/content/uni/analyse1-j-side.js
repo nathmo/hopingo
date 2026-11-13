@@ -5,6 +5,7 @@
 // `value`, b from the other side by `solset`; or the value f(0) of a
 // continuous extension). Catalogue: docs/universite/A1-analyse-1.md.
 
+import { t } from '../../i18n.js';
 import { MT, linesItem, mcq, tfItem } from './kit.js';
 import {
   q, V, KEYS, LIM, qt, pq, fq, kx, xc, sc, poly2, rd, tx, modeOf, H, E, examOf, uniqOptions, blanked, vfMcq, assemble, fitLines,
@@ -16,17 +17,17 @@ import {
 
 const OS = 'a1-fn-onesided';
 const OS_SUB = [
-  { id: 'side', label: 'limites latérales', skill: OS },
-  { id: 'calc', label: 'calculer chaque limite', skill: 'a1-fn-limits' },
+  { id: 'side', label: t('limites latérales'), skill: OS },
+  { id: 'calc', label: t('calculer chaque limite'), skill: 'a1-fn-limits' },
 ];
 const OS_CHOICES = [
-  { id: 'absR', label: 'Enlever la valeur absolue à droite' },
-  { id: 'absL', label: 'Enlever la valeur absolue à gauche', why: 'De ce côté, regarde le signe de ce qui est dans la valeur absolue.' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'inner', label: 'Limite de 1/x (ou de e^(1/x)) de ce côté' },
-  { id: 'seq', label: 'Calculer f(xₙ) le long d\'une suite xₙ → x₀' },
-  { id: 'limit', label: 'Passer à la limite' },
-  { id: 'concl', label: 'Conclure : comparer les deux limites' },
+  { id: 'absR', label: t('Enlever la valeur absolue à droite') },
+  { id: 'absL', label: t('Enlever la valeur absolue à gauche'), why: t('De ce côté, regarde le signe de ce qui est dans la valeur absolue.') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'inner', label: t('Limite de 1/x (ou de e^(1/x)) de ce côté') },
+  { id: 'seq', label: t('Calculer f(xₙ) le long d\'une suite xₙ → x₀') },
+  { id: 'limit', label: t('Passer à la limite') },
+  { id: 'concl', label: t('Conclure : comparer les deux limites') },
 ];
 
 const PI = (k) => (k === 1 ? 'π/2' : k === -1 ? '-π/2' : `${k}π/2`);
@@ -46,16 +47,16 @@ function osAbs(rng) {
     kind: 'abs', f, at: String(c), Lp: String(L), Lm: String(-L), key: f, abs: `x − ${c}`, c,
     right: [
       { ...E(`${fac}/(${xc(-c)})`, `x > ${c} : |x − ${c}| = x − ${c}`, 'side', 'absR'), holes: [`${xc(-c)}`] },
-      E(xc(r), 'Simplifier', 'calc', 'simplify'),
-      E(String(L), 'Passer à la limite', 'side', 'limit'),
+      E(xc(r), t('Simplifier'), 'calc', 'simplify'),
+      E(String(L), t('Passer à la limite'), 'side', 'limit'),
     ],
     left: [
       { ...E(`${fac}/(-(${xc(-c)}))`, `x < ${c} : |x − ${c}| = −(x − ${c})`, 'side', 'absL'), holes: [`-(${xc(-c)})`] },
-      { ...E(`-(${xc(r)})`, 'Simplifier', 'calc', 'simplify'), holes: [`-(${xc(r)})`] },
-      E(String(-L), 'Passer à la limite', 'side', 'limit'),
+      { ...E(`-(${xc(r)})`, t('Simplifier'), 'calc', 'simplify'), holes: [`-(${xc(r)})`] },
+      E(String(-L), t('Passer à la limite'), 'side', 'limit'),
     ],
     gap: String(2 * L), gapLine: `${L}-${pq(-L)}`,
-    h1: `Enlève la valeur absolue séparément pour x > ${c} et x < ${c}.`,
+    h1: t('Enlève la valeur absolue séparément pour x > {c} et x < {c}.', { c }),
     h2: `x < ${c} : |x − ${c}| = □`,
   };
 }
@@ -67,13 +68,13 @@ function osExp(rng) {
   const Lm = q(k, m);
   return {
     kind: 'exp', f, at: '0', Lp: '0', Lm: qt(Lm), key: f,
-    right: [E('0', 'x → 0⁺ : 1/x → +∞, donc e^(1/x) → +∞ et le quotient → 0', 'side', 'inner')],
+    right: [E('0', t('x → 0⁺ : 1/x → +∞, donc e^(1/x) → +∞ et le quotient → 0'), 'side', 'inner')],
     left: [
-      { ...E(`${k}/(${m}+0)`, 'x → 0⁻ : 1/x → −∞, donc e^(1/x) → 0', 'side', 'inner'), holes: ['0'] },
-      E(qt(Lm), 'Calculer', 'side', 'limit'),
+      { ...E(`${k}/(${m}+0)`, t('x → 0⁻ : 1/x → −∞, donc e^(1/x) → 0'), 'side', 'inner'), holes: ['0'] },
+      E(qt(Lm), t('Calculer'), 'side', 'limit'),
     ],
     gap: qt(Lm.neg()), gapLine: `0-${pq(Lm)}`,
-    h1: 'Regarde 1/x de chaque côté : e^(1/x) → +∞ en 0⁺, mais → 0 en 0⁻.',
+    h1: t('Regarde 1/x de chaque côté : e^(1/x) → +∞ en 0⁺, mais → 0 en 0⁻.'),
     h2: `x → 0⁻ : e^(1/x) → □`,
   };
 }
@@ -86,13 +87,13 @@ function osAtan(rng) {
   const f = `${k === 1 ? '' : k === -1 ? '-' : `${k}`}arctan(${inner})`;
   const Lp = PI(k);
   const Lm = PI(-k);
-  const one = (sgn) => (Math.abs(k) === 1 ? [] : [{ ...E(`${k}×(${sgn}π/2)`, `${say} → ${sgn === '-' ? '−∞' : '+∞'}, et Arctg → ${sgn === '-' ? '−' : ''}π/2`, 'side', 'inner'), holes: [`${sgn}π/2`] }]);
+  const one = (sgn) => (Math.abs(k) === 1 ? [] : [{ ...E(`${k}×(${sgn}π/2)`, t('{s} → {inf}, et Arctg → {sg}π/2', { s: say, inf: sgn === '-' ? '−∞' : '+∞', sg: sgn === '-' ? '−' : '' }), 'side', 'inner'), holes: [`${sgn}π/2`] }]);
   return {
     kind: 'atan', f, at: String(c), Lp, Lm, key: f, exact: true,
-    right: [...one(''), E(Lp, Math.abs(k) === 1 ? `${say} → +∞ et Arctg(u) → π/2` : 'Calculer', 'side', Math.abs(k) === 1 ? 'inner' : 'limit')],
-    left: [...one('-'), E(Lm, Math.abs(k) === 1 ? `${say} → −∞ et Arctg(u) → −π/2` : 'Calculer', 'side', Math.abs(k) === 1 ? 'inner' : 'limit')],
+    right: [...one(''), E(Lp, Math.abs(k) === 1 ? t('{s} → +∞ et Arctg(u) → π/2', { s: say }) : t('Calculer'), 'side', Math.abs(k) === 1 ? 'inner' : 'limit')],
+    left: [...one('-'), E(Lm, Math.abs(k) === 1 ? t('{s} → −∞ et Arctg(u) → −π/2', { s: say }) : t('Calculer'), 'side', Math.abs(k) === 1 ? 'inner' : 'limit')],
     gap: k === 1 ? 'π' : k === -1 ? '-π' : `${k}π`, gapLine: `${Lp}-(${Lm})`,
-    h1: `Regarde le signe de ${say} de chaque côté de ${c} : Arctg(u) → ±π/2 quand u → ±∞.`,
+    h1: t('Regarde le signe de {s} de chaque côté de {c} : Arctg(u) → ±π/2 quand u → ±∞.', { s: say, c }),
     h2: `x → ${c}⁻ : ${say} → □`,
   };
 }
@@ -104,14 +105,14 @@ function osSinAbs(rng) {
     kind: 'sinabs', f, at: '0', Lp: String(k), Lm: String(-k), key: f,
     right: [
       { ...E(`sin(${kx(k)})/x`, 'x > 0 : |x| = x', 'side', 'absR'), holes: ['x'] },
-      E(String(k), `sin(u)/u → 1 avec u = ${kx(k)}`, 'calc', 'limit'),
+      E(String(k), t('sin(u)/u → 1 avec u = {u}', { u: kx(k) }), 'calc', 'limit'),
     ],
     left: [
       { ...E(`sin(${kx(k)})/(-x)`, 'x < 0 : |x| = −x', 'side', 'absL'), holes: ['-x'] },
-      E(String(-k), `sin(u)/u → 1 avec u = ${kx(k)}`, 'calc', 'limit'),
+      E(String(-k), t('sin(u)/u → 1 avec u = {u}', { u: kx(k) }), 'calc', 'limit'),
     ],
     gap: String(2 * k), gapLine: `${k}-(${-k})`,
-    h1: 'Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche.',
+    h1: t('Enlève la valeur absolue de chaque côté de 0 : |x| = x à droite, −x à gauche.'),
     h2: 'x < 0 : |x| = □',
   };
 }
@@ -123,10 +124,10 @@ function osSeq(rng) {
   const f = `${T}(1/x)`;
   return {
     kind: 'seq', f, at: '0', Lp: xs.L, Lm: ys.L, key: f, seq: { xs, ys },
-    right: [E(xs.L, `${T}(2nπ) = ${xs.L === '0' ? '0' : '1'} pour tout n`, 'side', 'seq')],
-    left: [E(ys.L, `${T === 'sin' ? 'sin(2nπ + π/2) = 1' : 'cos((2n + 1)π) = −1'} pour tout n`, 'side', 'seq')],
+    right: [E(xs.L, t('{e} pour tout n', { e: `${T}(2nπ) = ${xs.L === '0' ? '0' : '1'}` }), 'side', 'seq')],
+    left: [E(ys.L, t('{e} pour tout n', { e: T === 'sin' ? 'sin(2nπ + π/2) = 1' : 'cos((2n + 1)π) = −1' }), 'side', 'seq')],
     gap: qt(q(Number(ys.L) - Number(xs.L))), gapLine: `${ys.L}-${pq(Number(xs.L))}`,
-    h1: `Prends deux suites qui tendent vers 0, sur lesquelles ${T}(1/x) vaut toujours la même chose : 1/xₙ = 2nπ, puis ${T === 'sin' ? '2nπ + π/2' : '(2n + 1)π'}.`,
+    h1: t('Prends deux suites qui tendent vers 0, sur lesquelles {T}(1/x) vaut toujours la même chose : 1/xₙ = 2nπ, puis {y}.', { T, y: T === 'sin' ? '2nπ + π/2' : '(2n + 1)π' }),
     h2: `xₙ = 1/(2nπ) : f(xₙ) = ${T}(2nπ) = □`,
   };
 }
@@ -146,10 +147,10 @@ const atText = (d, side) => `${d.at}${side}`;
 
 function osVerdict(d, rng) {
   return {
-    kind: 'decision', prompt: 'Conclusion ?', options: rng.shuffle([
-      { id: 'none', label: d.seq ? 'f(xₙ) et f(yₙ) ont des limites différentes : f n\'a pas de limite en 0' : `Les deux limites sont différentes : f n'a pas de limite en ${d.at}`, valid: true, ref: true },
-      { id: 'one', label: d.seq ? `f tend vers ${fq(d.Lp)} en 0 (la première suite suffit)` : `f tend vers ${d.Lp.replace(/-/g, '−')} en ${d.at} (la limite à droite suffit)`, valid: false, rule: 'a1_onesided_ignored', why: 'Une limite existe seulement si elle est la même de tous les côtés (et le long de toutes les suites).' },
-      { id: 'mean', label: `f tend vers la moyenne des deux valeurs en ${d.at}`, valid: false, why: 'Il n\'y a pas de moyenne : deux valeurs différentes, donc pas de limite.' },
+    kind: 'decision', prompt: t('Conclusion ?'), options: rng.shuffle([
+      { id: 'none', label: d.seq ? t('f(xₙ) et f(yₙ) ont des limites différentes : f n\'a pas de limite en 0') : t('Les deux limites sont différentes : f n\'a pas de limite en {a}', { a: d.at }), valid: true, ref: true },
+      { id: 'one', label: d.seq ? t('f tend vers {L} en 0 (la première suite suffit)', { L: fq(d.Lp) }) : t('f tend vers {L} en {a} (la limite à droite suffit)', { L: d.Lp.replace(/-/g, '−'), a: d.at }), valid: false, rule: 'a1_onesided_ignored', why: t('Une limite existe seulement si elle est la même de tous les côtés (et le long de toutes les suites).') },
+      { id: 'mean', label: t('f tend vers la moyenne des deux valeurs en {a}', { a: d.at }), valid: false, why: t('Il n\'y a pas de moyenne : deux valeurs différentes, donc pas de limite.') },
     ]),
   };
 }
@@ -172,30 +173,30 @@ function osLines(level, rng, opts = {}) {
   if (level === 2 && (d.kind === 'abs' || d.kind === 'sinabs')) {
     const u = d.kind === 'abs' ? `x − ${d.c}` : 'x';
     pre.push({
-      kind: 'decision', prompt: `Pour x < ${d.at}, |${u}| = ?`, options: rng.shuffle([
+      kind: 'decision', prompt: t('Pour x < {a}, |{u}| = ?', { a: d.at, u }), options: rng.shuffle([
         { id: 'neg', label: `−(${u})`, valid: true, ref: true },
-        { id: 'pos', label: u, valid: false, rule: 'a1_abs_removed', why: `Pour x < ${d.at}, ${u} < 0 : la valeur absolue change le signe.` },
+        { id: 'pos', label: u, valid: false, rule: 'a1_abs_removed', why: t('Pour x < {a}, {u} < 0 : la valeur absolue change le signe.', { a: d.at, u }) },
       ]),
     });
   }
   const parts = [
     { start: rStart, judge: right, lines: rLines, choices: OS_CHOICES, pre: level === 1 ? [{ kind: 'note', html: d.h1 }] : [] },
-    { html: seq ? `Avec yₙ = ${d.seq.ys.x} → 0 :` : `À gauche de ${d.at} :`, start: lStart, judge: left, lines: lLines, choices: OS_CHOICES, pre },
+    { html: seq ? t('Avec yₙ = {y} → 0 :', { y: d.seq.ys.x }) : t('À gauche de {a} :', { a: d.at }), start: lStart, judge: left, lines: lLines, choices: OS_CHOICES, pre },
     {
-      html: seq ? 'Conclusion, et l\'écart entre les deux limites :' : `Conclusion, et le saut de f en ${d.at} :`,
-      ask: seq ? 'écart =' : 'saut =', start: gapStart, judge: gapCfg,
-      lines: [E(d.gapLine, 'Différence des deux limites', 'side', 'concl'), E(d.gap, 'Calculer', 'side', 'concl')],
+      html: seq ? t('Conclusion, et l\'écart entre les deux limites :') : t('Conclusion, et le saut de f en {a} :', { a: d.at }),
+      ask: seq ? t('écart =') : t('saut ='), start: gapStart, judge: gapCfg,
+      lines: [E(d.gapLine, t('Différence des deux limites'), 'side', 'concl'), E(d.gap, t('Calculer'), 'side', 'concl')],
       choices: OS_CHOICES,
-      pre: level === 1 ? [{ kind: 'note', html: `Les deux limites sont différentes : f n'a pas de limite en ${d.at}.` }] : [osVerdict(d, rng)],
+      pre: level === 1 ? [{ kind: 'note', html: t('Les deux limites sont différentes : f n\'a pas de limite en {a}.', { a: d.at }) }] : [osVerdict(d, rng)],
     },
   ];
   const as = assemble(parts, level);
-  const first = seq ? `Avec xₙ = ${d.seq.xs.x} → 0⁺, calcule la limite de f(xₙ).` : `Commence par la limite à droite en ${d.at}.`;
+  const first = seq ? t('Avec xₙ = {x} → 0⁺, calcule la limite de f(xₙ).', { x: d.seq.xs.x }) : t('Commence par la limite à droite en {a}.', { a: d.at });
   return linesItem({
     skill: OS, level,
-    prompt: `Soit f(x) = ${MT(d.f)}. ${seq ? 'Montre avec deux suites que f n\'a pas de limite en 0.' : `Calcule les limites de f à droite et à gauche de ${d.at}, puis conclus.`} ${first}`,
+    prompt: `${t('Soit f(x) = {f}.', { f: MT(d.f) })} ${seq ? t('Montre avec deux suites que f n\'a pas de limite en 0.') : t('Calcule les limites de f à droite et à gauche de {a}, puis conclus.', { a: d.at })} ${first}`,
     ...as, mode: modeOf(level),
-    hints: H(d.h1, d.h2, seq ? `f(xₙ) → ${fq(d.Lp)} et f(yₙ) → ${fq(d.Lm)} : pas de limite.` : `À droite ${fq(d.Lp)}, à gauche ${fq(d.Lm)} : pas de limite en ${d.at}.`),
+    hints: H(d.h1, d.h2, seq ? t('f(xₙ) → {p} et f(yₙ) → {m} : pas de limite.', { p: fq(d.Lp), m: fq(d.Lm) }) : t('À droite {p}, à gauche {m} : pas de limite en {a}.', { p: fq(d.Lp), m: fq(d.Lm), a: d.at })),
     subgoals: OS_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, declares: { vars: seq ? ['n'] : ['x'] },
     key: `${OS}:${d.key}:${level}`, exam: examOf(opts), fallback: !!d.fallback,
   });
@@ -209,7 +210,7 @@ function osMcq(level, rng, opts = {}) {
   let why;
   let key;
   let fallback = false;
-  const none = 'n\'existe pas';
+  const none = t('n\'existe pas');
   if (kind === 'two' || kind === 'left') {
     const d = osData(rng, ['abs']);
     fallback = !!d.fallback;
@@ -222,7 +223,7 @@ function osMcq(level, rng, opts = {}) {
         { html: MT(d.Lm), correct: false, rule: 'a1_onesided_ignored' },
         { html: MT('0'), correct: false },
       ];
-      why = `À droite ${fq(d.Lp)}, à gauche ${fq(d.Lm)} : les deux côtés diffèrent.`;
+      why = t('À droite {p}, à gauche {m} : les deux côtés diffèrent.', { p: fq(d.Lp), m: fq(d.Lm) });
     } else {
       prompt = `${MT(`lim(${d.f},x,${d.at}⁻)`)} =`;
       options = [
@@ -231,7 +232,7 @@ function osMcq(level, rng, opts = {}) {
         { html: none, correct: false, rule: 'a1_onesided_ignored' },
         { html: MT('0'), correct: false },
       ];
-      why = `Pour x < ${d.at}, |x − ${d.at}| = −(x − ${d.at}) : la limite à gauche vaut ${fq(d.Lm)}.`;
+      why = t('Pour x < {a}, |x − {a}| = −(x − {a}) : la limite à gauche vaut {m}.', { a: d.at, m: fq(d.Lm) });
     }
   } else if (kind === 'sinexp') {
     key = 'sinexp';
@@ -242,7 +243,7 @@ function osMcq(level, rng, opts = {}) {
       { html: MT('1'), correct: false, rule: 'a1_onesided_ignored' },
       { html: '+∞', correct: false },
     ];
-    why = 'En 0⁺, u = e^(1/x) → +∞ et sin(u)/u → 0 ; en 0⁻, u → 0 et sin(u)/u → 1. Les deux côtés diffèrent (examen GM).';
+    why = t('En 0⁺, u = e^(1/x) → +∞ et sin(u)/u → 0 ; en 0⁻, u → 0 et sin(u)/u → 1. Les deux côtés diffèrent (examen GM).');
   } else {
     const k = rng.int(1, 4);
     key = `exp:${k}`;
@@ -253,7 +254,7 @@ function osMcq(level, rng, opts = {}) {
       { html: MT('0'), correct: false, rule: 'a1_onesided_ignored' },
       { html: MT(String(k)), correct: false },
     ];
-    why = 'En 0⁺, 1/x → +∞ et e^(1/x) → +∞ ; en 0⁻, 1/x → −∞ et e^(1/x) → 0 : pas de limite.';
+    why = t('En 0⁺, 1/x → +∞ et e^(1/x) → +∞ ; en 0⁻, 1/x → −∞ et e^(1/x) → 0 : pas de limite.');
   }
   return mcq({
     skill: OS, level: opts.exam ? 4 : level, prompt, options: uniqOptions(options), key: `mcq:${key}`,
@@ -265,32 +266,32 @@ function osTf(rng) {
   const kind = rng.pick(['cbrt', 'abs', 'equal', 'exp']);
   const ex = { format: 'tf', points: 1 };
   if (kind === 'cbrt') {
-    return vfMcq(OS, 'Si f est monotone et lim<sub>x→x₀⁻</sub> f(x) = f(x₀), alors f est dérivable à gauche en x₀.', false, null,
-      'Faux : f(x) = ∛x est croissante et continue en 0, mais (∛x − 0)/x = x^(−2/3) → +∞ : pas de dérivée à gauche en 0.', rng, 'cbrt');
+    return vfMcq(OS, t('Si f est monotone et lim<sub>x→x₀⁻</sub> f(x) = f(x₀), alors f est dérivable à gauche en x₀.'), false, null,
+      t('Faux : f(x) = ∛x est croissante et continue en 0, mais (∛x − 0)/x = x^(−2/3) → +∞ : pas de dérivée à gauche en 0.'), rng, 'cbrt');
   }
   if (kind === 'abs') {
     return tfItem({
       skill: OS, level: 4, truth: false, key: 'abs', exam: ex, expectedSec: 60, ruleIfTrue: 'a1_onesided_ignored',
-      statement: 'Si lim<sub>x→0</sub> |f(x)| existe, alors lim<sub>x→0</sub> f(x) existe.',
+      statement: t('Si lim<sub>x→0</sub> |f(x)| existe, alors lim<sub>x→0</sub> f(x) existe.'),
       counter: {
-        kind: 'function', hyp: [{ p: 'limitAt', at: '0', of: 'abs(f)', say: '|f| a une limite en 0' }], concl: { p: 'limitAt', at: '0' },
+        kind: 'function', hyp: [{ p: 'limitAt', at: '0', of: 'abs(f)', say: t('|f| a une limite en 0') }], concl: { p: 'limitAt', at: '0' },
         ask: [{ v: 'f', label: 'f(x) =', keys: ['calcx', 'calcfn'] }], answer: { f: 'abs(x)/x' },
       },
-      explanation: 'Faux : f(x) = |x|/x vaut 1 à droite et −1 à gauche ; |f(x)| = 1 a une limite, f n\'en a pas.',
+      explanation: t('Faux : f(x) = |x|/x vaut 1 à droite et −1 à gauche ; |f(x)| = 1 a une limite, f n\'en a pas.'),
     });
   }
   if (kind === 'equal') {
     const L = rng.pick([-3, -1, 2, 5]);
     return tfItem({
       skill: OS, level: 4, truth: true, key: `equal:${L}`, exam: ex, expectedSec: 60,
-      statement: `Si lim<sub>x→0⁺</sub> f(x) = lim<sub>x→0⁻</sub> f(x) = ${fq(L)}, alors lim<sub>x→0</sub> f(x) = ${fq(L)}.`,
-      explanation: 'Vrai : c\'est le critère des limites latérales ; les deux côtés existent et sont égaux.',
+      statement: t('Si lim<sub>x→0⁺</sub> f(x) = lim<sub>x→0⁻</sub> f(x) = {L}, alors lim<sub>x→0</sub> f(x) = {L}.', { L: fq(L) }),
+      explanation: t('Vrai : c\'est le critère des limites latérales ; les deux côtés existent et sont égaux.'),
     });
   }
   return tfItem({
     skill: OS, level: 4, truth: true, key: 'exp', exam: ex, expectedSec: 60, ruleIfFalse: 'a1_onesided_ignored',
-    statement: 'lim<sub>x→0</sub> e^(1/x) n\'existe pas.',
-    explanation: 'Vrai : e^(1/x) → +∞ en 0⁺ et → 0 en 0⁻.',
+    statement: t('lim<sub>x→0</sub> e^(1/x) n\'existe pas.'),
+    explanation: t('Vrai : e^(1/x) → +∞ en 0⁺ et → 0 en 0⁻.'),
   });
 }
 
@@ -306,18 +307,18 @@ function osItem(level, rng, profile, opts = {}) {
 
 const EX = 'a1-fn-extension';
 const EX_SUB = [
-  { id: 'simp', label: 'simplifier', skill: 'rat-simplify' },
-  { id: 'lims', label: 'limites latérales', skill: 'a1-fn-onesided' },
-  { id: 'params', label: 'paramètres', skill: EX },
+  { id: 'simp', label: t('simplifier'), skill: 'rat-simplify' },
+  { id: 'lims', label: t('limites latérales'), skill: 'a1-fn-onesided' },
+  { id: 'params', label: t('paramètres'), skill: EX },
 ];
 const EX_CHOICES = [
-  { id: 'factor', label: 'Factoriser' },
-  { id: 'simplify', label: 'Simplifier par (x − c)' },
-  { id: 'limit', label: 'Passer à la limite' },
-  { id: 'equal', label: 'Égaler à f(c)' },
-  { id: 'left', label: 'Limite à gauche avec le morceau de gauche' },
-  { id: 'solve', label: 'Résoudre' },
-  { id: 'wrong', label: 'Limite à gauche avec le morceau de droite', rule: 'a1_extension_wrong_branch', why: 'À gauche de c, f est définie par l\'autre morceau.' },
+  { id: 'factor', label: t('Factoriser') },
+  { id: 'simplify', label: t('Simplifier par (x − c)') },
+  { id: 'limit', label: t('Passer à la limite') },
+  { id: 'equal', label: t('Égaler à f(c)') },
+  { id: 'left', label: t('Limite à gauche avec le morceau de gauche') },
+  { id: 'solve', label: t('Résoudre') },
+  { id: 'wrong', label: t('Limite à gauche avec le morceau de droite'), rule: 'a1_extension_wrong_branch', why: t('À gauche de c, f est définie par l\'autre morceau.') },
 ];
 
 // The piecewise function: right piece p(x − c)(x + r)/((x − c)(x + s)),
@@ -360,40 +361,40 @@ function exFallback() {
 }
 
 function exShow(d) {
-  return `${MT(d.R)} si x > ${d.c}, f(${d.c}) = a, et ${MT(d.leftShow)} si x < ${d.c}`;
+  return t('{r} si x > {c}, f({c}) = a, et {l} si x < {c}', { r: MT(d.R), c: d.c, l: MT(d.leftShow) });
 }
 
 function exParam(level, rng, opts = {}) {
   const d = exData(rng);
   const lim = LIM(String(d.c), '+');
   let rLines = [
-    { ...E(d.fac, 'Factoriser le haut et le bas', 'simp', 'factor'), holes: [`${xc(-d.c)}`] },
-    { ...E(d.simp, `Simplifier par (x − ${d.c})`, 'simp', 'simplify'), holes: [xc(d.r)] },
-    E(qt(d.L), 'Passer à la limite', 'lims', 'limit'),
+    { ...E(d.fac, t('Factoriser le haut et le bas'), 'simp', 'factor'), holes: [`${xc(-d.c)}`] },
+    { ...E(d.simp, t('Simplifier par (x − {c})', { c: d.c }), 'simp', 'simplify'), holes: [xc(d.r)] },
+    E(qt(d.L), t('Passer à la limite'), 'lims', 'limit'),
   ];
   let bLines = [
-    { ...E(d.eq, `Limite à gauche de ${tx(d.leftShow)}, égale à f(${d.c})`, 'lims', 'left'), holes: [d.quad ? String(d.c * d.c) : qt(d.L)] },
-    E(`b=${qt(d.B)}`, 'Résoudre', 'params', 'solve'),
+    { ...E(d.eq, t('Limite à gauche de {l}, égale à f({c})', { l: tx(d.leftShow), c: d.c }), 'lims', 'left'), holes: [d.quad ? String(d.c * d.c) : qt(d.L)] },
+    E(`b=${qt(d.B)}`, t('Résoudre'), 'params', 'solve'),
   ];
   if (level === 1) { rLines = [rLines[0], rLines[1], blanked(rLines[2], [qt(d.L)])]; bLines = bLines.map((l) => (l.holes ? blanked(l, l.holes) : l)); }
   if (level === 2) { rLines = rLines.map((l) => (l.holes ? blanked(l, l.holes) : l)); }
   const bPre = level === 2 ? [{
-    kind: 'decision', prompt: `Quelle formule pour la limite à gauche de ${d.c} ?`, options: rng.shuffle([
-      { id: 'left', label: `${tx(d.leftShow)}, le morceau de x < ${d.c}`, valid: true, ref: true },
-      { id: 'right', label: `${tx(d.simp)}, la formule qu'on vient de simplifier`, valid: false, rule: 'a1_extension_wrong_branch', why: `À gauche de ${d.c}, c'est ${MT(d.leftShow)} qui définit f.` },
+    kind: 'decision', prompt: t('Quelle formule pour la limite à gauche de {c} ?', { c: d.c }), options: rng.shuffle([
+      { id: 'left', label: t('{l}, le morceau de x < {c}', { l: tx(d.leftShow), c: d.c }), valid: true, ref: true },
+      { id: 'right', label: t('{s}, la formule qu\'on vient de simplifier', { s: tx(d.simp) }), valid: false, rule: 'a1_extension_wrong_branch', why: t('À gauche de {c}, c\'est {l} qui définit f.', { c: d.c, l: MT(d.leftShow) }) },
     ]),
   }] : [];
   const parts = [
-    { start: d.R, judge: lim, lines: rLines, choices: EX_CHOICES, pre: level === 1 ? [{ kind: 'note', html: `Limite à droite : le morceau de x > ${d.c} se simplifie par (x − ${d.c}).` }] : [] },
-    { html: `Continuité à droite : f(${d.c}) = a doit valoir cette limite.`, ask: 'a =', start: 'a', judge: { kind: 'value', expect: qt(d.L) }, lines: [E(qt(d.L), 'Égaler à f(' + d.c + ')', 'params', 'equal')], choices: EX_CHOICES },
-    { html: `Continuité à gauche : la limite de ${MT(d.leftShow)} en ${d.c}⁻ doit valoir ${MT(qt(d.L))}.`, start: `lim(${d.left},x,${d.c}⁻)=${qt(d.L)}`, judge: { kind: 'solset', v: 'b' }, lines: bLines, choices: EX_CHOICES, pre: bPre },
+    { start: d.R, judge: lim, lines: rLines, choices: EX_CHOICES, pre: level === 1 ? [{ kind: 'note', html: t('Limite à droite : le morceau de x > {c} se simplifie par (x − {c}).', { c: d.c }) }] : [] },
+    { html: t('Continuité à droite : f({c}) = a doit valoir cette limite.', { c: d.c }), ask: 'a =', start: 'a', judge: { kind: 'value', expect: qt(d.L) }, lines: [E(qt(d.L), t('Égaler à f({c})', { c: d.c }), 'params', 'equal')], choices: EX_CHOICES },
+    { html: t('Continuité à gauche : la limite de {l} en {c}⁻ doit valoir {L}.', { l: MT(d.leftShow), c: d.c, L: MT(qt(d.L)) }), start: `lim(${d.left},x,${d.c}⁻)=${qt(d.L)}`, judge: { kind: 'solset', v: 'b' }, lines: bLines, choices: EX_CHOICES, pre: bPre },
   ];
   const as = assemble(parts, level);
   return linesItem({
     skill: EX, level,
-    prompt: `Soit f(x) = ${exShow(d)}. Trouve a et b pour que f soit continue en ${d.c}. Commence par la limite à droite.`,
+    prompt: t('Soit f(x) = {f}. Trouve a et b pour que f soit continue en {c}. Commence par la limite à droite.', { f: exShow(d), c: d.c }),
     ...as, mode: modeOf(level),
-    hints: H(`Calcule la limite de chaque morceau en ${d.c} ; elles doivent valoir f(${d.c}) = a.`, `${MT(d.simp)} → □`, `a = ${fq(d.L)} et b = ${fq(d.B)}`),
+    hints: H(t('Calcule la limite de chaque morceau en {c} ; elles doivent valoir f({c}) = a.', { c: d.c }), `${MT(d.simp)} → □`, t('a = {a} et b = {b}', { a: fq(d.L), b: fq(d.B) })),
     subgoals: EX_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, declares: { vars: ['x', 'b'] },
     key: `${EX}:${d.Rkey}:${d.left}:${level}`, exam: examOf(opts), fallback: !!d.fallback,
   });
@@ -401,36 +402,36 @@ function exParam(level, rng, opts = {}) {
 
 // f defined off 0: the value f(0) of the continuous extension.
 const PROL = [
-  (a) => ({ f: `sin(${kx(a)})/x`, lines: [{ m: `(sin(${kx(a)})/(${kx(a)}))×${a}`, n: `sin(u)/u → 1 avec u = ${kx(a)}`, act: 'remark' }], L: q(a) }),
-  (a) => ({ f: `(e^(${kx(a)})-1)/x`, lines: [{ m: `((e^(${kx(a)})-1)/(${kx(a)}))×${a}`, n: `(eᵘ − 1)/u → 1 avec u = ${kx(a)}`, act: 'remark' }], L: q(a) }),
-  (a) => ({ f: `(1-cos(${kx(a)}))/x^2`, lines: [{ m: `((1-cos(${kx(a)}))/(${kx(a)})^2)×${a * a}`, n: `(1 − cos u)/u² → 1/2 avec u = ${kx(a)}`, act: 'remark' }], L: q(a * a, 2) }),
-  (a) => ({ f: `arctan(${kx(a)})/x`, lines: [{ m: `(arctan(${kx(a)})/(${kx(a)}))×${a}`, n: `Arctg(u)/u → 1 avec u = ${kx(a)}`, act: 'remark' }], L: q(a) }),
-  () => ({ f: 'arctan(x^2)/(x×sin(x))', lines: [{ m: '(arctan(x^2)/x^2)×(x/sin(x))', n: 'Arctg(u)/u → 1 et u/sin(u) → 1', act: 'remark' }], L: q(1) }),
-  () => ({ f: 'x×ln(abs(x))', lines: [], L: q(0), why: 'Croissances comparées : x·Log|x| → 0' }),
+  (a) => ({ f: `sin(${kx(a)})/x`, lines: [{ m: `(sin(${kx(a)})/(${kx(a)}))×${a}`, n: t('sin(u)/u → 1 avec u = {u}', { u: kx(a) }), act: 'remark' }], L: q(a) }),
+  (a) => ({ f: `(e^(${kx(a)})-1)/x`, lines: [{ m: `((e^(${kx(a)})-1)/(${kx(a)}))×${a}`, n: t('(eᵘ − 1)/u → 1 avec u = {u}', { u: kx(a) }), act: 'remark' }], L: q(a) }),
+  (a) => ({ f: `(1-cos(${kx(a)}))/x^2`, lines: [{ m: `((1-cos(${kx(a)}))/(${kx(a)})^2)×${a * a}`, n: t('(1 − cos u)/u² → 1/2 avec u = {u}', { u: kx(a) }), act: 'remark' }], L: q(a * a, 2) }),
+  (a) => ({ f: `arctan(${kx(a)})/x`, lines: [{ m: `(arctan(${kx(a)})/(${kx(a)}))×${a}`, n: t('Arctg(u)/u → 1 avec u = {u}', { u: kx(a) }), act: 'remark' }], L: q(a) }),
+  () => ({ f: 'arctan(x^2)/(x×sin(x))', lines: [{ m: '(arctan(x^2)/x^2)×(x/sin(x))', n: t('Arctg(u)/u → 1 et u/sin(u) → 1'), act: 'remark' }], L: q(1) }),
+  () => ({ f: 'x×ln(abs(x))', lines: [], L: q(0), why: t('Croissances comparées : x·Log|x| → 0') }),
 ];
 const PROL_CHOICES = [
-  { id: 'remark', label: 'Faire apparaître une limite remarquable' },
-  { id: 'compare', label: 'Croissances comparées' },
-  { id: 'limit', label: 'Passer à la limite' },
-  { id: 'equal', label: 'Poser f(0) = la limite' },
+  { id: 'remark', label: t('Faire apparaître une limite remarquable') },
+  { id: 'compare', label: t('Croissances comparées') },
+  { id: 'limit', label: t('Passer à la limite') },
+  { id: 'equal', label: t('Poser f(0) = la limite') },
 ];
 
 function exProl(level, rng, opts = {}) {
   const a = rng.int(2, 5);
-  const t = rng.pick(PROL)(a);
-  const lines = [...t.lines.map((l) => E(l.m, l.n, 'lims', l.act)), E(qt(t.L), t.why || 'Passer à la limite', 'lims', t.lines.length ? 'limit' : 'compare')];
+  const pl = rng.pick(PROL)(a);
+  const lines = [...pl.lines.map((l) => E(l.m, l.n, 'lims', l.act)), E(qt(pl.L), pl.why || t('Passer à la limite'), 'lims', pl.lines.length ? 'limit' : 'compare')];
   const parts = [
-    { start: t.f, judge: LIM('0'), lines, choices: PROL_CHOICES },
-    { html: 'Le prolongement : f(0) = la limite.', ask: 'f(0) =', start: 'f(0)', judge: { kind: 'value', expect: qt(t.L) }, lines: [E(qt(t.L), 'Poser f(0) = la limite', 'params', 'equal')], choices: PROL_CHOICES },
+    { start: pl.f, judge: LIM('0'), lines, choices: PROL_CHOICES },
+    { html: t('Le prolongement : f(0) = la limite.'), ask: 'f(0) =', start: 'f(0)', judge: { kind: 'value', expect: qt(pl.L) }, lines: [E(qt(pl.L), t('Poser f(0) = la limite'), 'params', 'equal')], choices: PROL_CHOICES },
   ];
   const as = assemble(parts, level);
   return linesItem({
     skill: EX, level,
-    prompt: `Soit f(x) = ${MT(t.f)} pour x ≠ 0. Calcule sa limite en 0, puis la valeur f(0) qui prolonge f par continuité.`,
+    prompt: t('Soit f(x) = {f} pour x ≠ 0. Calcule sa limite en 0, puis la valeur f(0) qui prolonge f par continuité.', { f: MT(pl.f) }),
     ...as, mode: modeOf(level),
-    hints: H('f se prolonge par continuité en 0 si sa limite en 0 existe et est finie : on pose f(0) = cette limite.', `${MT(t.f)} → □`, `f(0) = ${fq(t.L)}`),
+    hints: H(t('f se prolonge par continuité en 0 si sa limite en 0 existe et est finie : on pose f(0) = cette limite.'), `${MT(pl.f)} → □`, `f(0) = ${fq(pl.L)}`),
     subgoals: EX_SUB.filter((s) => s.id !== 'simp'), keys: KEYS, tapActions: level === 3 ? 'steps' : null,
-    key: `${EX}:prol:${t.f}:${level}`, exam: examOf(opts),
+    key: `${EX}:prol:${pl.f}:${level}`, exam: examOf(opts),
   });
 }
 
@@ -452,16 +453,16 @@ const NOT_CONT = [
 function exMcq5(rng, opts) {
   const right = rng.pick(CONT);
   const wrong = rng.shuffle(NOT_CONT.filter((w) => w.f !== right.f)).slice(0, 2);
-  const show = (o) => `${MT(o.f)} pour x ≠ 0, f(0) = ${fq(o.v)}`;
+  const show = (o) => t('{f} pour x ≠ 0, f(0) = {v}', { f: MT(o.f), v: fq(o.v) });
   const options = [
     { html: show(right), correct: true },
     ...wrong.map((w) => ({ html: show(w), correct: false, rule: w.rule })),
-    { html: 'Aucune des trois', correct: false, ...(right.bounded ? { rule: 'a1_bounded_times_zero' } : {}) },
+    { html: t('Aucune des trois'), correct: false, ...(right.bounded ? { rule: 'a1_bounded_times_zero' } : {}) },
   ];
   return mcq({
-    skill: EX, level: opts.exam ? 4 : 5, prompt: 'Laquelle de ces fonctions est continue en 0 ?', options, keepOrder: false,
+    skill: EX, level: opts.exam ? 4 : 5, prompt: t('Laquelle de ces fonctions est continue en 0 ?'), options, keepOrder: false,
     key: `mcq5:${right.f}:${wrong.map((w) => w.f).join(',')}`, exam: examOf(opts), expectedSec: 180,
-    solution: [{ html: [right, ...wrong].map((o) => `${MT(o.f)} : ${o.why}`).join(' ; '), note: '' }],
+    solution: [{ html: [right, ...wrong].map((o) => `${MT(o.f)} : ${t(o.why)}`).join(' ; '), note: '' }],
   }, rng);
 }
 
@@ -469,19 +470,19 @@ function exMcq(rng, opts) {
   const d = exData(rng);
   // A factorisation slip: the sign of r.
   const slip = q(d.p * (d.c - d.r), d.c + d.s);
-  const pair = (a, b) => `a = ${fq(a)} et b = ${fq(b)}`;
+  const pair = (a, b) => t('a = {a} et b = {b}', { a: fq(a), b: fq(b) });
   const bOf = (L) => (d.quad ? L.sub(1).div(d.c * d.c) : L.sub(d.d).div(d.c));
   const options = uniqOptions([
     { html: pair(d.L, d.B), correct: true },
-    { html: `a = ${fq(d.L)}, et b quelconque`, correct: false, rule: 'a1_extension_wrong_branch' },
-    { html: `b = ${fq(d.B)}, et a quelconque`, correct: false, rule: 'a1_onesided_ignored' },
+    { html: t('a = {a}, et b quelconque', { a: fq(d.L) }), correct: false, rule: 'a1_extension_wrong_branch' },
+    { html: t('b = {b}, et a quelconque', { b: fq(d.B) }), correct: false, rule: 'a1_onesided_ignored' },
     ...(slip.eq(d.L) ? [] : [{ html: pair(slip, bOf(slip)), correct: false }]),
     { html: pair(d.L, d.B.neg()), correct: false },
   ]).slice(0, 4);
   return mcq({
-    skill: EX, level: 4, prompt: `Soit f(x) = ${exShow(d)}. Pour quelles valeurs f est-elle continue en ${d.c} ?`,
+    skill: EX, level: 4, prompt: t('Soit f(x) = {f}. Pour quelles valeurs f est-elle continue en {c} ?', { f: exShow(d), c: d.c }),
     options, key: `mcq:${d.Rkey}:${d.left}`, exam: examOf(opts), expectedSec: 240, fallback: !!d.fallback,
-    solution: [{ html: `À droite : ${MT(d.simp)} → ${fq(d.L)}, donc a = ${fq(d.L)}. À gauche : ${MT(d.eq)}, donc b = ${fq(d.B)}.`, note: '' }],
+    solution: [{ html: t('À droite : {s} → {L}, donc a = {L}. À gauche : {e}, donc b = {B}.', { s: MT(d.simp), L: fq(d.L), e: MT(d.eq), B: fq(d.B) }), note: '' }],
   }, rng);
 }
 
@@ -491,33 +492,33 @@ function exTf(rng) {
   if (kind === 'sinexp') {
     return tfItem({
       skill: EX, level: 4, truth: true, key: 'sinexp', exam: ex, expectedSec: 60,
-      statement: 'f(x) = sin((eˣ − 1)/x) se prolonge par continuité en 0.',
-      explanation: 'Vrai : (eˣ − 1)/x → 1 et sin est continue, donc f(x) → sin 1 ; on pose f(0) = sin 1.',
+      statement: t('f(x) = sin((eˣ − 1)/x) se prolonge par continuité en 0.'),
+      explanation: t('Vrai : (eˣ − 1)/x → 1 et sin est continue, donc f(x) → sin 1 ; on pose f(0) = sin 1.'),
     });
   }
   if (kind === 'sqrt') {
-    return vfMcq(EX, 'f(x) = √|x|·sin(1/x) pour x ≠ 0, et f(0) = 1, est continue en 0.', false, 'a1_bounded_times_zero',
-      'Faux : |√|x|·sin(1/x)| ≤ √|x| → 0, donc la limite vaut 0 ≠ f(0) = 1.', rng, 'sqrt');
+    return vfMcq(EX, t('f(x) = √|x|·sin(1/x) pour x ≠ 0, et f(0) = 1, est continue en 0.'), false, 'a1_bounded_times_zero',
+      t('Faux : |√|x|·sin(1/x)| ≤ √|x| → 0, donc la limite vaut 0 ≠ f(0) = 1.'), rng, 'sqrt');
   }
   if (kind === 'bounded') {
     return tfItem({
       skill: EX, level: 4, truth: false, key: 'bounded', exam: ex, expectedSec: 60,
-      statement: 'Si f est continue et bornée sur ℝ ∖ {0}, alors f se prolonge par continuité en 0.',
+      statement: t('Si f est continue et bornée sur ℝ ∖ {0}, alors f se prolonge par continuité en 0.'),
       counter: {
-        kind: 'function', hyp: [{ p: 'boundedOn', on: ['-1', '1'] }], concl: { p: 'limitAt', at: '0', say: 'f a une limite finie en 0 (elle se prolonge)' },
+        kind: 'function', hyp: [{ p: 'boundedOn', on: ['-1', '1'] }], concl: { p: 'limitAt', at: '0', say: t('f a une limite finie en 0 (elle se prolonge)') },
         ask: [{ v: 'f', label: 'f(x) =', keys: ['calcx', 'calcfn'] }], answer: { f: 'sin(1/x)' },
       },
-      explanation: 'Faux : sin(1/x) est continue et bornée sur ℝ ∖ {0}, mais n\'a pas de limite en 0.',
+      explanation: t('Faux : sin(1/x) est continue et bornée sur ℝ ∖ {0}, mais n\'a pas de limite en 0.'),
     });
   }
   return tfItem({
     skill: EX, level: 4, truth: false, key: 'hole', exam: ex, expectedSec: 60,
-    statement: 'Si lim<sub>x→0</sub> f(x) existe et est finie, alors f est continue en 0.',
+    statement: t('Si lim<sub>x→0</sub> f(x) existe et est finie, alors f est continue en 0.'),
     counter: {
       kind: 'function', hyp: [{ p: 'limitAt', at: '0' }], concl: { p: 'continuousAt', at: '0' },
       ask: [{ v: 'f', label: 'f(x) =', keys: ['calcx', 'calcfn'] }], answer: { f: 'sin(x)/x' },
     },
-    explanation: 'Faux : sin(x)/x → 1, mais f n\'est pas définie en 0 ; il faut encore f(0) = la limite (le prolongement).',
+    explanation: t('Faux : sin(x)/x → 1, mais f n\'est pas définie en 0 ; il faut encore f(0) = la limite (le prolongement).'),
   });
 }
 

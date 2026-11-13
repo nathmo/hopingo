@@ -6,6 +6,7 @@
 import { Q } from '../../math/rational.js';
 import { MT, mcq, tfItem } from './kit.js';
 import { problemItem } from './kit-problem.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
 export const qt = (x) => String(q(x));
@@ -20,7 +21,7 @@ export function term(c, body) {
   return `${C.n < 0 ? '-' : ''}(${Math.abs(C.n)}/${C.d})${body}`;
 }
 // Terms joined into a sum, empty ones skipped ('0' if none).
-export const sumT = (terms) => terms.filter((t) => t && t !== '0').reduce((s, t) => (s ? (t.startsWith('-') ? `${s}${t}` : `${s}+${t}`) : t), '') || '0';
+export const sumT = (terms) => terms.filter((u) => u && u !== '0').reduce((s, u) => (s ? (u.startsWith('-') ? `${s}${u}` : `${s}+${u}`) : u), '') || '0';
 // A sum of [c, mono] pairs.
 export const polyT = (pairs) => sumT(pairs.map(([c, m]) => term(c, m)));
 export const scaleP = (pairs, k) => pairs.map(([c, m]) => [q(c).mul(q(k)), m]);
@@ -29,9 +30,9 @@ export const fac = (c) => { const C = q(c); if (C.eq(1)) return ''; if (C.eq(-1)
 // A number as a factor in a product: 3, (−1/2).
 export const num = (c) => { const s = qt(c); return /^\d+$/.test(s) ? s : `(${s})`; };
 // e^(k·v) as text: e^x, e^(-2x), 1 for k = 0.
-export const expT = (k, v = 'x') => { const K = q(k); if (K.n === 0) return '1'; const t = term(K, v); return /^[a-z]$/.test(t) ? `e^${t}` : `e^(${t})`; };
+export const expT = (k, v = 'x') => { const K = q(k); if (K.n === 0) return '1'; const u = term(K, v); return /^[a-z]$/.test(u) ? `e^${u}` : `e^(${u})`; };
 // Readable text for the screen: − and spaces around + and =.
-export const rd = (t) => String(t).replace(/-/g, '−');
+export const rd = (s) => String(s).replace(/-/g, '−');
 export const H = (a, b, c) => [{ level: 1, html: a }, { level: 2, html: b }, { level: 3, html: c }];
 export const modeOf = (level) => (level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free');
 export const E = (math, note, subgoal, act) => ({ kind: 'eq', math, note, subgoal, act });
@@ -63,8 +64,8 @@ export function tfOf(skill, s, level, exam, hints) {
 // A problem made of several V/F (level 5: « 4 V/F au format des QCM »).
 export function tfProblem(skill, level, statements, key) {
   return problemItem({
-    skill, level, prompt: `Vrai ou faux ? ${statements.length} énoncés, un point chacun.`,
-    parts: statements.map((s, i) => ({ item: tfOf(skill, s, level, false, []), points: 1, title: `Énoncé ${i + 1}` })),
+    skill, level, prompt: t('Vrai ou faux ? {n} énoncés, un point chacun.', { n: statements.length }),
+    parts: statements.map((s, i) => ({ item: tfOf(skill, s, level, false, []), points: 1, title: t('Énoncé {n}', { n: i + 1 }) })),
     key, expectedSec: 60 * statements.length,
   });
 }

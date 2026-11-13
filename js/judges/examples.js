@@ -42,6 +42,7 @@ import { checkComplexCounter } from './counters-complex.js';
 
 import { checkA2 } from './a2-examples.js'; // step U6
 import { checkVcf } from './vcf-examples.js'; // step U10
+import { t as tr } from '../i18n.js';
 
 const SAMPLES = {
   R: ['-3', '-2', '-1', '-1/2', '0', '1/3', '1/2', '1', '2', '5/2', '3', '7'],
@@ -51,7 +52,7 @@ const SAMPLES = {
   Z: ['-6', '-3', '-2', '-1', '0', '1', '2', '3', '4', '7'],
 };
 
-const DOM_NAME = { R: 'ℝ', 'R+': ']0 ; +∞[', N: 'ℕ', 'N*': 'ℕ*', Z: 'ℤ', sets: 'les ensembles d\'entiers' };
+const DOM_NAME = { R: 'ℝ', 'R+': ']0 ; +∞[', N: 'ℕ', 'N*': 'ℕ*', Z: 'ℤ', sets: tr('les ensembles d\'entiers') };
 
 function inDomain(val, dom) {
   if (dom === 'sets') return val.set !== undefined;
@@ -131,27 +132,27 @@ function checkRefute(counter, answers) {
   };
   visit(0, {});
   if (!failure) return { ok: true };
-  if (failure.kind === 'missing') return { ok: false, message: `Donne une valeur pour ${failure.v}.` };
-  if (failure.kind === 'read') return { ok: false, message: `Je n'arrive pas à lire la valeur de ${failure.v}.` };
-  if (failure.kind === 'domain') return { ok: false, message: `${failure.v} doit être dans ${DOM_NAME[failure.dom] ?? 'le domaine'}.` };
+  if (failure.kind === 'missing') return { ok: false, message: tr('Donne une valeur pour {v}.', { v: failure.v }) };
+  if (failure.kind === 'read') return { ok: false, message: tr('Je n\'arrive pas à lire la valeur de {v}.', { v: failure.v }) };
+  if (failure.kind === 'domain') return { ok: false, message: tr('{v} doit être dans {dom}.', { v: failure.v, dom: DOM_NAME[failure.dom] ?? tr('le domaine') }) };
   if (counter.hyp) {
     let hypTrue = true;
     try { hypTrue = predHolds(counter.hyp, failure.env); } catch { hypTrue = true; }
-    if (!hypTrue) return { ok: false, rule: 'g9_counter_not_hyp', message: 'Avec cette valeur, l\'hypothèse est fausse : l\'implication est alors vraie. Il faut que l\'hypothèse soit vraie et la conclusion fausse.' };
+    if (!hypTrue) return { ok: false, rule: 'g9_counter_not_hyp', message: tr('Avec cette valeur, l\'hypothèse est fausse : l\'implication est alors vraie. Il faut que l\'hypothèse soit vraie et la conclusion fausse.') };
   }
-  return { ok: false, message: 'Avec cette valeur, l\'énoncé est vrai : ce n\'est pas un contre-exemple.' };
+  return { ok: false, message: tr('Avec cette valeur, l\'énoncé est vrai : ce n\'est pas un contre-exemple.') };
 }
 
 function checkTruth(counter, answers) {
   const lex = lexicon({ letters: counter.letters });
   const env = {};
   for (const l of counter.letters) {
-    if (typeof answers?.[l] !== 'boolean') return { ok: false, message: `Choisis vrai ou faux pour ${l}.` };
+    if (typeof answers?.[l] !== 'boolean') return { ok: false, message: tr('Choisis vrai ou faux pour {l}.', { l }) };
     env[l] = answers[l];
   }
   const a = truthOf(parseFormula(counter.left, lex), env);
   const b = truthOf(parseFormula(counter.right, lex), env);
-  return a !== b ? { ok: true } : { ok: false, message: `Avec ces valeurs, les deux formules valent ${a ? 'vrai' : 'faux'} : elles ne diffèrent pas.` };
+  return a !== b ? { ok: true } : { ok: false, message: a ? tr('Avec ces valeurs, les deux formules valent vrai : elles ne diffèrent pas.') : tr('Avec ces valeurs, les deux formules valent faux : elles ne diffèrent pas.') };
 }
 
 // Multiplicity of the rational root a in P.
@@ -193,10 +194,10 @@ const imagPart = (c) => [...c.terms.values()].filter((t) => t.m.length === 1 && 
 
 function checkPoly(counter, answers) {
   const text = answers?.P ?? answers?.p;
-  if (!text) return { ok: false, message: 'Écris un polynôme P(x).' };
+  if (!text) return { ok: false, message: tr('Écris un polynôme P(x).') };
   const node = tryParse(String(text).replace(/^\s*P(\(x\))?\s*=/, ''), { complex: !!counter.complex });
   const P = node && polyOf(node, { complex: !!counter.complex });
-  if (!P || [...P.vars()].some((v) => v !== 'x' && v !== I)) return { ok: false, message: 'Écris un polynôme en x.' };
+  if (!P || [...P.vars()].some((v) => v !== 'x' && v !== I)) return { ok: false, message: tr('Écris un polynôme en x.') };
   for (const c of counter.conds) {
     const at = (a) => {
       const cs = coeffs(P);
@@ -205,13 +206,13 @@ function checkPoly(counter, answers) {
       for (let k = cs.length - 1; k >= 0; k--) s = s.scale(x).add(cs[k]);
       return s;
     };
-    if (c.at !== undefined && c.eq !== undefined && !at(c.at).sub(Poly.const(c.eq)).isZero) return { ok: false, message: `Il faut P(${c.at}) = ${c.eq}.` };
-    if (c.at !== undefined && c.ne !== undefined && at(c.at).sub(Poly.const(c.ne)).isZero) return { ok: false, message: `Avec ton polynôme, P(${c.at}) = ${c.ne} : ce n'est pas un contre-exemple.` };
-    if (c.degree !== undefined && degree(P) !== c.degree) return { ok: false, message: `Il faut un polynôme de degré ${c.degree}.` };
-    if (c.noRealRoot && hasRealRoot(P)) return { ok: false, message: 'Ton polynôme a une racine réelle.' };
-    if (c.mult && multiplicity(P, c.mult.at) !== c.mult.k) return { ok: false, message: `${c.mult.at} doit être racine de multiplicité ${c.mult.k}.` };
-    if (c.minMult && multiplicity(P, c.minMult.at) < c.minMult.k) return { ok: false, message: `(x − ${c.minMult.at})^${c.minMult.k} doit diviser P.` };
-    if (c.notMult && multiplicity(P, c.notMult.at) === c.notMult.k) return { ok: false, message: `Avec ton polynôme, ${c.notMult.at} est racine de multiplicité ${c.notMult.k} : l'énoncé est vrai pour lui.` };
+    if (c.at !== undefined && c.eq !== undefined && !at(c.at).sub(Poly.const(c.eq)).isZero) return { ok: false, message: tr('Il faut P({at}) = {eq}.', { at: c.at, eq: c.eq }) };
+    if (c.at !== undefined && c.ne !== undefined && at(c.at).sub(Poly.const(c.ne)).isZero) return { ok: false, message: tr('Avec ton polynôme, P({at}) = {ne} : ce n\'est pas un contre-exemple.', { at: c.at, ne: c.ne }) };
+    if (c.degree !== undefined && degree(P) !== c.degree) return { ok: false, message: tr('Il faut un polynôme de degré {degree}.', { degree: c.degree }) };
+    if (c.noRealRoot && hasRealRoot(P)) return { ok: false, message: tr('Ton polynôme a une racine réelle.') };
+    if (c.mult && multiplicity(P, c.mult.at) !== c.mult.k) return { ok: false, message: tr('{at} doit être racine de multiplicité {k}.', { at: c.mult.at, k: c.mult.k }) };
+    if (c.minMult && multiplicity(P, c.minMult.at) < c.minMult.k) return { ok: false, message: tr('(x − {at})^{k} doit diviser P.', { at: c.minMult.at, k: c.minMult.k }) };
+    if (c.notMult && multiplicity(P, c.notMult.at) === c.notMult.k) return { ok: false, message: tr('Avec ton polynôme, {at} est racine de multiplicité {k} : l\'énoncé est vrai pour lui.', { at: c.notMult.at, k: c.notMult.k }) };
   }
   return { ok: true };
 }
@@ -225,26 +226,26 @@ const isPrime = (n) => {
 function checkComposite(counter, answers) {
   const v = counter.v || 'n';
   const val = valueOfAnswer(answers?.[v] ?? '', {}, 'N');
-  if (!val || !inDomain(val, 'N')) return { ok: false, message: `${v} doit être un entier naturel.` };
+  if (!val || !inDomain(val, 'N')) return { ok: false, message: tr('{v} doit être un entier naturel.', { v }) };
   const at = mapNode(parse(counter.expr), (n) => (n.t === 'sym' && n.name === v ? { t: 'paren', e: lit(val.q) } : n));
   const k = exactValue(at);
-  if (!k || k.d !== 1) return { ok: false, message: 'Je n\'arrive pas à calculer.' };
-  return isPrime(k.n) ? { ok: false, message: `Pour ${v} = ${val.q}, on obtient ${k.n}, qui est premier.` } : { ok: true };
+  if (!k || k.d !== 1) return { ok: false, message: tr('Je n\'arrive pas à calculer.') };
+  return isPrime(k.n) ? { ok: false, message: tr('Pour {v} = {q}, on obtient {k}, qui est premier.', { v, q: val.q, k: k.n }) } : { ok: true };
 }
 
 function checkHeredity(counter, answers) {
   const v = counter.v || 'n';
   const text = String(answers?.P ?? '').replace(/^\s*P\(\s*n\s*\)\s*:?/, '');
   const node = tryParse(text, { vars: [v] });
-  if (!node || !['rel', 'chain', 'logic', 'not'].includes(node.t)) return { ok: false, message: `Écris une propriété de ${v}, par exemple une inégalité.` };
+  if (!node || !['rel', 'chain', 'logic', 'not'].includes(node.t)) return { ok: false, message: tr('Écris une propriété de {v}, par exemple une inégalité.', { v }) };
   const at = (k) => closedHolds(mapNode(node, (n) => (n.t === 'sym' && n.name === v && !n.sub ? { t: 'paren', e: lit(new Q(k)) } : n)), {});
   const from = counter.from ?? 0;
   let vals;
-  try { vals = Array.from({ length: 42 }, (_, i) => at(from + i)); } catch { return { ok: false, message: 'Je n’arrive pas à calculer ta propriété.' }; }
+  try { vals = Array.from({ length: 42 }, (_, i) => at(from + i)); } catch { return { ok: false, message: tr('Je n’arrive pas à calculer ta propriété.') }; }
   for (let i = 0; i + 1 < vals.length; i++) {
-    if (vals[i] && !vals[i + 1]) return { ok: false, message: `Ton hérédité est fausse : P(${from + i}) est vraie, mais P(${from + i + 1}) est fausse.` };
+    if (vals[i] && !vals[i + 1]) return { ok: false, message: tr('Ton hérédité est fausse : P({i}) est vraie, mais P({j}) est fausse.', { i: from + i, j: from + i + 1 }) };
   }
-  if (vals.every(Boolean)) return { ok: false, message: 'Ta propriété est vraie pour tout n : ce n’est pas un contre-exemple.' };
+  if (vals.every(Boolean)) return { ok: false, message: tr('Ta propriété est vraie pour tout n : ce n’est pas un contre-exemple.') };
   return { ok: true };
 }
 
@@ -265,7 +266,7 @@ export function checkCounter(counter, answers) {
     case 'mx': return checkMx(counter, answers); // step U8 (js/judges/m-examples.js)
     case 'num': return checkNumCounter(counter, answers); // step U9 (js/judges/n-examples.js)
     case 'vcf': return checkVcf(counter, answers); // step U10
-    default: return checkLinalg(counter, answers) ?? { ok: false, message: 'Contre-exemple non vérifiable.' };
+    default: return checkLinalg(counter, answers) ?? { ok: false, message: tr('Contre-exemple non vérifiable.') };
   }
 }
 

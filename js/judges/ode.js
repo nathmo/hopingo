@@ -49,6 +49,7 @@ import { seedOf } from '../cas/equiv.js';
 import { diagnoseLine } from './diagnose.js';
 import { frNum } from './common.js';
 import { analyseSystem, sameHook } from './ode-system.js'; // vector unknown (cfg.system), step U6 part i
+import { t, tn } from '../i18n.js';
 
 export const sign = '';
 
@@ -75,21 +76,21 @@ function diffSide(text) {
 }
 
 export function parseLine(cfg, text) {
-  const t = String(text).replace(/^\s*=/, '');
+  const src = String(text).replace(/^\s*=/, '');
   const opts = { dvar: vOf(cfg), funcs: cfg.funcs || [] };
-  const parts = t.split('=');
+  const parts = src.split('=');
   // P(y) dy = Q(x) dx
-  if (parts.length === 2 && /(^|[^a-zA-Z(])d[a-zA-Z]\s*(\/|$|\s|\))/.test(t.replace(/d\(/g, ''))) {
+  if (parts.length === 2 && /(^|[^a-zA-Z(])d[a-zA-Z]\s*(\/|$|\s|\))/.test(src.replace(/d\(/g, ''))) {
     const L = diffSide(parts[0]);
     const R = diffSide(parts[1]);
     if (L && R) {
       const u = uOf(cfg);
       const [py, qx] = L.d === u ? [L, R] : [R, L];
-      if (py.d !== u || qx.d !== vOf(cfg)) throw new Error(`Écris la forme séparée P(${u}) d${u} = Q(${vOf(cfg)}) d${vOf(cfg)}.`);
+      if (py.d !== u || qx.d !== vOf(cfg)) throw new Error(t('Écris la forme séparée P({u}) d{u} = Q({v}) d{v}.', { u, v: vOf(cfg) }));
       return { t: 'odesep', P: parse(py.P, opts), Q: parse(qx.P, opts), u, v: vOf(cfg) };
     }
   }
-  return parse(t, opts);
+  return parse(src, opts);
 }
 
 export function show(cfg, node, opts = {}) {
@@ -377,34 +378,34 @@ function analyse(cfg, node, state = {}) {
       const homog = kind !== 'explicit' && kind !== 'particular';
       const r = residualCheck(cfg, phi, { homog, consts });
       if (!r.ok) {
-        if (r.undecided) return { kind: 'wrong', message: `Je n'arrive pas à vérifier ta ligne : elle n'est pas définie sur l'intervalle de l'énoncé.` };
-        const eqName = homog ? "l'équation homogène" : "l'équation";
-        return { kind: 'wrong', message: `Remplace ${u} par ta fonction dans ${eqName} : elle n'est pas vérifiée (par exemple en ${vOf(cfg)} = ${ftext(r.at[vOf(cfg)])}).` };
+        if (r.undecided) return { kind: 'wrong', message: t('Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie sur l\'intervalle de l\'énoncé.') };
+        const at = { u, v: vOf(cfg), x: ftext(r.at[vOf(cfg)]) };
+        return { kind: 'wrong', message: homog ? t('Remplace {u} par ta fonction dans l\'équation homogène : elle n\'est pas vérifiée (par exemple en {v} = {x}).', at) : t('Remplace {u} par ta fonction dans l\'équation : elle n\'est pas vérifiée (par exemple en {v} = {x}).', at) };
       }
       if (kind === 'particular') {
-        if (consts.length) return { kind: 'wrong', message: `Une solution particulière n'a pas de constante : enlève ${consts[0]}.` };
+        if (consts.length) return { kind: 'wrong', message: t('Une solution particulière n\'a pas de constante : enlève {c}.', { c: consts[0] }) };
         return { kind: cfg.final === 'particular' && clean(phi) ? 'done' : 'ok' };
       }
-      if (kind === 'homog1') return { kind: consts.length ? 'wrong' : 'ok', message: consts.length ? `${u}₁ et ${u}₂ sont des solutions précises, sans constante.` : undefined };
+      if (kind === 'homog1') return { kind: consts.length ? 'wrong' : 'ok', message: consts.length ? t('{u}₁ et {u}₂ sont des solutions précises, sans constante.', { u }) : undefined };
       const rank = constRank(cfg, phi, consts, order);
       if (consts.length) {
-        if (rank < order) return { kind: 'wrong', message: `Ta solution n'a que ${rank} constante${rank > 1 ? 's' : ''} indépendante${rank > 1 ? 's' : ''} : une équation d'ordre ${order} en demande ${order}.` };
-        if (consts.length > order) return { kind: 'stay', message: `Il y a trop de constantes : regroupe-les, il en faut ${order}.` };
+        if (rank < order) return { kind: 'wrong', message: tn(rank, 'Ta solution n\'a que {n} constante indépendante : une équation d\'ordre {order} en demande {order}.', 'Ta solution n\'a que {n} constantes indépendantes : une équation d\'ordre {order} en demande {order}.', { order }) };
+        if (consts.length > order) return { kind: 'stay', message: t('Il y a trop de constantes : regroupe-les, il en faut {order}.', { order }) };
         if (kind === 'homog') return { kind: cfg.final === 'homog' && clean(phi) ? 'done' : 'ok', general: phi };
         if (cfg.ic) return { kind: 'ok', general: phi };
         return { kind: clean(phi) ? 'done' : 'ok', general: phi };
       }
-      if (kind === 'homog') return { kind: 'wrong', message: `La solution homogène générale a ${order} constante${order > 1 ? 's' : ''}.` };
+      if (kind === 'homog') return { kind: 'wrong', message: tn(order, 'La solution homogène générale a {n} constante.', 'La solution homogène générale a {n} constantes.') };
       if (cfg.ic) {
         const ic = icHolds(cfg, phi);
-        if (!ic.ok) return { kind: 'wrong', message: `C'est une solution de l'équation, mais ${ic.which ? `${u}′` : u}(${ftext(ic.x0)}) = ${ftext(ic.got)} au lieu de ${ftext(ic.want)}.` };
+        if (!ic.ok) return { kind: 'wrong', message: t('C\'est une solution de l\'équation, mais {f}({x0}) = {got} au lieu de {want}.', { f: ic.which ? `${u}′` : u, x0: ftext(ic.x0), got: ftext(ic.got), want: ftext(ic.want) }) };
         return { kind: clean(phi) ? 'done' : 'ok' };
       }
       if (cfg.final === 'one') return { kind: clean(phi) ? 'done' : 'ok' };
-      return { kind: 'stay', message: `C'est une solution, mais pas la solution générale : il faut ${order} constante${order > 1 ? 's' : ''}.` };
+      return { kind: 'stay', message: tn(order, 'C\'est une solution, mais pas la solution générale : il faut {n} constante.', 'C\'est une solution, mais pas la solution générale : il faut {n} constantes.') };
     }
     case 'mu': {
-      if (!cfg.mu) return { kind: 'wrong', message: 'Ici, on n\'utilise pas de facteur intégrant.' };
+      if (!cfg.mu) return { kind: 'wrong', message: t('Ici, on n\'utilise pas de facteur intégrant.') };
       const mu = renameSubs(n.r);
       const a = parse(String(cfg.mu), { dvar: vOf(cfg) });
       const v = vOf(cfg);
@@ -417,32 +418,32 @@ function analyse(cfg, node, state = {}) {
         const aa = ev(a, env);
         if (![m, d, aa].every(Number.isFinite) || Math.abs(m) < 1e-9) continue;
         valid++;
-        if (!small(d / m - aa, Math.abs(aa))) return { kind: 'wrong', message: `Un facteur intégrant vérifie μ′/μ = a(${v}) = ${toText(a)} : avec ta ligne, en ${v} = ${ftext(env[v])}, μ′/μ = ${ftext(d / m)}.` };
+        if (!small(d / m - aa, Math.abs(aa))) return { kind: 'wrong', message: t('Un facteur intégrant vérifie μ′/μ = a({v}) = {a} : avec ta ligne, en {v} = {x}, μ′/μ = {r}.', { v, a: toText(a), x: ftext(env[v]), r: ftext(d / m) }) };
         if (valid >= 10) break;
       }
-      return valid >= 5 ? { kind: 'ok' } : { kind: 'wrong', message: 'Ton μ n\'est pas défini sur l\'intervalle de l\'énoncé.' };
+      return valid >= 5 ? { kind: 'ok' } : { kind: 'wrong', message: t('Ton μ n\'est pas défini sur l\'intervalle de l\'énoncé.') };
     }
     case 'sep': {
       const P = lettersOf(node.P, cfg);
       const Q = lettersOf(node.Q, cfg);
       const v = vOf(cfg);
-      if (symbolsIn(P).has(v)) return { kind: 'wrong', message: `Il reste du ${v} du côté de d${u} : sépare les variables.` };
-      if (symbolsIn(Q).has(Y[0])) return { kind: 'wrong', message: `Il reste du ${u} du côté de d${v} : sépare les variables.` };
+      if (symbolsIn(P).has(v)) return { kind: 'wrong', message: t('Il reste du {a} du côté de d{b} : sépare les variables.', { a: v, b: u }) };
+      if (symbolsIn(Q).has(Y[0])) return { kind: 'wrong', message: t('Il reste du {a} du côté de d{b} : sépare les variables.', { a: u, b: v }) };
       // ∫P dy − ∫Q dx is then a first integral: P·f − Q = 0.
       const G = sub({ t: 'int', e: P, v: Y[0] }, { t: 'int', e: Q, v });
       const r = relationCheck(cfg, G, [], true);
-      if (!r.ok) return { kind: 'wrong', message: r.undecided ? 'Je n\'arrive pas à vérifier ta ligne.' : `Ta séparation ne redonne pas l'équation : Q(${v})/P(${u}) doit valoir ${u}′.` };
+      if (!r.ok) return { kind: 'wrong', message: r.undecided ? t('Je n\'arrive pas à vérifier ta ligne.') : t('Ta séparation ne redonne pas l\'équation : Q({v})/P({u}) doit valoir {u}′.', { u, v }) };
       return { kind: 'ok' };
     }
     case 'relation': {
       const G = sub(lettersOf(n.l, cfg), lettersOf(n.r, cfg));
       const consts = constsIn(node, cfg);
-      if (order !== 1) return { kind: 'wrong', message: `Écris ${u} = … : une relation ne suffit pas ici.` };
+      if (order !== 1) return { kind: 'wrong', message: t('Écris {u} = … : une relation ne suffit pas ici.', { u }) };
       const withInt = contains(G, (x) => x.t === 'int');
       const r = relationCheck(cfg, G, consts, withInt || !!cfg.firstIntegral);
       if (!r.ok) {
-        if (r.flat) return { kind: 'wrong', message: `Ta relation ne dépend pas de ${u} : elle ne dit rien sur les solutions.` };
-        return { kind: 'wrong', message: r.undecided ? 'Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie là où je la teste.' : `Dérive ta relation (avec ${u} = ${u}(${vOf(cfg)})) : elle ne redonne pas l'équation.` };
+        if (r.flat) return { kind: 'wrong', message: t('Ta relation ne dépend pas de {u} : elle ne dit rien sur les solutions.', { u }) };
+        return { kind: 'wrong', message: r.undecided ? t('Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie là où je la teste.') : t('Dérive ta relation (avec {u} = {u}({v})) : elle ne redonne pas l\'équation.', { u, v: vOf(cfg) }) };
       }
       if (withInt) return { kind: 'ok' };
       if (consts.length) return { kind: !cfg.ic && cfg.final === 'implicit' && clean(G) ? 'done' : 'ok', general: G, implicit: true };
@@ -451,7 +452,7 @@ function analyse(cfg, node, state = {}) {
         const x0 = evalFloat(parse(String(cfg.ic.x)), {});
         const y0 = evalFloat(parse(String(cfg.ic.y)), {});
         const g = evalFloat(G, { [v]: x0, [Y[0]]: y0 });
-        if (!(Math.abs(g) <= 1e-7 * (1 + Math.abs(evalFloat(lettersOf(n.l, cfg), { [v]: x0, [Y[0]]: y0 }))))) return { kind: 'wrong', message: `Au point initial (${ftext(x0)} ; ${ftext(y0)}), ta relation n'est pas vérifiée.` };
+        if (!(Math.abs(g) <= 1e-7 * (1 + Math.abs(evalFloat(lettersOf(n.l, cfg), { [v]: x0, [Y[0]]: y0 }))))) return { kind: 'wrong', message: t('Au point initial ({x} ; {y}), ta relation n\'est pas vérifiée.', { x: ftext(x0), y: ftext(y0) }) };
         return { kind: cfg.final === 'implicit' && clean(G) ? 'done' : 'ok' };
       }
       return { kind: 'ok' };
@@ -460,32 +461,32 @@ function analyse(cfg, node, state = {}) {
       const G = sub(lettersOf(n.l, cfg), lettersOf(n.r, cfg));
       const r = odeCheck(cfg, G);
       if (!r.ok) {
-        if (r.order !== undefined) return { kind: 'wrong', message: `Ton équation est d'ordre ${r.order}, celle de l'énoncé d'ordre ${order}.` };
-        return { kind: 'wrong', message: r.undecided ? 'Je n\'arrive pas à vérifier ta ligne.' : `Ce n'est plus la même équation : ${u}${'′'.repeat(order)} n'a pas la même valeur (par exemple en ${vOf(cfg)} = ${ftext(r.at[vOf(cfg)])}).` };
+        if (r.order !== undefined) return { kind: 'wrong', message: t('Ton équation est d\'ordre {a}, celle de l\'énoncé d\'ordre {b}.', { a: r.order, b: order }) };
+        return { kind: 'wrong', message: r.undecided ? t('Je n\'arrive pas à vérifier ta ligne.') : t('Ce n\'est plus la même équation : {d} n\'a pas la même valeur (par exemple en {v} = {x}).', { d: `${u}${'′'.repeat(order)}`, v: vOf(cfg), x: ftext(r.at[vOf(cfg)]) }) };
       }
       return { kind: 'ok' };
     }
     case 'consts': {
       const g = state.general;
-      if (!g) return { kind: 'wrong', message: 'Écris d\'abord la solution générale, avec ses constantes.' };
+      if (!g) return { kind: 'wrong', message: t('Écris d\'abord la solution générale, avec ses constantes.') };
       const items = n.t === 'list' ? n.items : [n];
       const env = {};
       for (const it of items) env[stripParen(renameSubs(it.l)).name] = evalFloat(it.r, {});
-      if (!Object.values(env).every(Number.isFinite)) return { kind: 'wrong', message: 'Donne la valeur de chaque constante.' };
+      if (!Object.values(env).every(Number.isFinite)) return { kind: 'wrong', message: t('Donne la valeur de chaque constante.') };
       if (state.implicit) {
         const v = vOf(cfg);
         const at = { ...env, [v]: evalFloat(parse(String(cfg.ic?.x ?? 0)), {}), [Y[0]]: evalFloat(parse(String(cfg.ic?.y ?? 0)), {}) };
         const val = evalFloat(g, at);
-        if (!(Math.abs(val) <= 1e-7)) return { kind: 'wrong', message: `Avec cette valeur, la relation n'est pas vérifiée au point initial.` };
+        if (!(Math.abs(val) <= 1e-7)) return { kind: 'wrong', message: t('Avec cette valeur, la relation n\'est pas vérifiée au point initial.') };
         return { kind: 'ok' };
       }
       const missing = constsIn(g, cfg).filter((c) => !(c in env));
-      if (missing.length) return { kind: 'wrong', message: `Donne aussi ${missing[0].replace(/(\d)/, '_$1')}.` };
+      if (missing.length) return { kind: 'wrong', message: t('Donne aussi {c}.', { c: missing[0].replace(/(\d)/, '_$1') }) };
       const ic = icHolds(cfg, g, env);
-      if (!ic.ok) return { kind: 'wrong', message: `Avec ces constantes, ${ic.which ? `${u}′` : u}(${ftext(ic.x0)}) = ${ftext(ic.got)} au lieu de ${ftext(ic.want)}.` };
+      if (!ic.ok) return { kind: 'wrong', message: t('Avec ces constantes, {f}({x0}) = {got} au lieu de {want}.', { f: ic.which ? `${u}′` : u, x0: ftext(ic.x0), got: ftext(ic.got), want: ftext(ic.want) }) };
       return { kind: 'ok' };
     }
-    default: return { kind: 'parse', message: `Écris une égalité : ${u} = …, une relation entre ${vOf(cfg)} et ${u}, ou l'équation transformée.` };
+    default: return { kind: 'parse', message: t('Écris une égalité : {u} = …, une relation entre {v} et {u}, ou l\'équation transformée.', { u, v: vOf(cfg) }) };
   }
 }
 
@@ -531,9 +532,9 @@ export function judgeLine(cfg, prev, input, state = {}) {
   else {
     try { node = parseLine(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (prev && node.t !== 'odesep' && prev.t !== 'odesep' && equalsStructural(unparen(node), unparen(prev), { parens: false })) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev && node.t !== 'odesep' && prev.t !== 'odesep' && equalsStructural(unparen(node), unparen(prev), { parens: false })) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   let r;
-  try { r = analyse(cfg, node, state); } catch (e) { return { kind: 'parse', node, message: 'Je n\'arrive pas à lire cette ligne comme une égalité.' }; }
+  try { r = analyse(cfg, node, state); } catch (e) { return { kind: 'parse', node, message: t('Je n\'arrive pas à lire cette ligne comme une égalité.') }; }
   if (r.kind === 'wrong') {
     const diag = prev ? diagnoseLine('ode', prev, node, cfg, (cand, line) => sameLines(cfg, cand, line)) : null;
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: r.message };

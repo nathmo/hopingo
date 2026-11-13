@@ -20,6 +20,7 @@
 
 import { tryParse } from './parse.js';
 import { toMathML } from './mathml.js';
+import { t as tr } from '../i18n.js';
 
 export class LogicError extends Error {}
 
@@ -102,7 +103,7 @@ function lex1(text, lexicon) {
     const c = s[i];
     if (OPS.includes(c)) { out.push({ k: 'op', s: c }); i++; continue; }
     if (c === '=' && s[i + 1] === '>') { out.push({ k: 'op', s: '⇒' }); i += 2; continue; }
-    throw new LogicError(`Je ne reconnais pas « ${s.slice(i, i + 6)} » : utilise les morceaux proposés.`);
+    throw new LogicError(tr('Je ne reconnais pas « {c} » : utilise les morceaux proposés.', { c: s.slice(i, i + 6) }));
   }
   return out;
 }
@@ -113,7 +114,7 @@ export function parseFormula(text, lex) {
   const peek = () => toks[p];
   const isOp = (s) => peek()?.k === 'op' && peek().s === s;
   const fail = (m) => { throw new LogicError(m); };
-  if (!toks.length) fail('Rien à lire.');
+  if (!toks.length) fail(tr('Rien à lire.'));
 
   function formula() {
     const l = imp();
@@ -137,32 +138,32 @@ export function parseFormula(text, lex) {
   }
   function unary() {
     const t = peek();
-    if (!t) fail('La formule est incomplète.');
+    if (!t) fail(tr('La formule est incomplète.'));
     if (isOp('¬')) { p++; return { t: 'not', e: unary() }; }
     if (isOp('∀') || isOp('∃')) {
       p++;
       const b = peek();
-      if (!b || b.k !== 'piece') fail(`Après ${t.s}, il faut la variable, par exemple « x ∈ ℝ ».`);
+      if (!b || b.k !== 'piece') fail(tr('Après {q}, il faut la variable, par exemple « x ∈ ℝ ».', { q: t.s }));
       p++;
       const bind = { key: norm(b.text), text: b.text };
       if (isOp(',')) { p++; return { t: 'q', q: t.s, bind, body: formula() }; }
       if (isOp('∀') || isOp('∃')) return { t: 'q', q: t.s, bind, body: unary() };
-      if (!peek()) fail('Il manque ce que dit l\'énoncé après les quantificateurs.');
+      if (!peek()) fail(tr('Il manque ce que dit l\'énoncé après les quantificateurs.'));
       return { t: 'q', q: t.s, bind, body: formula() };
     }
     if (isOp('(')) {
       p++;
       const e = formula();
-      if (!isOp(')')) fail('Une parenthèse n\'est pas fermée.');
+      if (!isOp(')')) fail(tr('Une parenthèse n\'est pas fermée.'));
       p++;
       return { t: 'paren', e };
     }
     if (t.k === 'piece') { p++; return { t: 'atom', key: t.key, neg: t.neg }; }
-    if (isOp(')')) fail('Il y a une parenthèse fermante de trop.');
-    return fail(`Il manque quelque chose avant « ${t.s} ».`);
+    if (isOp(')')) fail(tr('Il y a une parenthèse fermante de trop.'));
+    return fail(tr('Il manque quelque chose avant « {s} ».', { s: t.s }));
   }
   const f = formula();
-  if (p < toks.length) fail(`Je ne m'attendais pas à « ${toks[p].s} ».`);
+  if (p < toks.length) fail(tr('Je ne m\'attendais pas à « {s} ».', { s: toks[p].s }));
   return f;
 }
 
@@ -232,7 +233,9 @@ const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 export function pieceML(text) {
   const n = /[a-zA-Z]{3,}/.test(text.replace(/sin|cos|tan|exp|ln|Log/g, '')) ? null : tryParse(text);
   if (n) return toMathML(n).replace(/^<math[^>]*>/, '').replace(/<\/math>$/, '');
-  return `<mtext>${esc(text)}</mtext>`;
+  // Words are shown in the chosen language; the formula keeps the French
+  // piece (the input language of the logic items).
+  return `<mtext>${esc(tr(text))}</mtext>`;
 }
 
 export function formulaML(f, lex, { display = false } = {}) {
@@ -357,7 +360,7 @@ export function finalIssue(f, lex) {
         const e = strip(n.e);
         if (e.t === 'atom') {
           const a = lex.atoms.get(e.key);
-          if (a?.table) issue = { kind: 'atom', message: `Écris « ${atomText({ ...e, neg: !e.neg }, lex)} » plutôt que la négation de « ${atomText(e, lex)} ».` };
+          if (a?.table) issue = { kind: 'atom', message: tr('Écris « {pos} » plutôt que la négation de « {neg} ».', { pos: atomText({ ...e, neg: !e.neg }, lex), neg: atomText(e, lex) }) };
         } else issue = { kind: 'go' };
         break;
       }

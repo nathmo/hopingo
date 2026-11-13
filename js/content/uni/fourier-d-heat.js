@@ -12,21 +12,22 @@
 
 import { q, qt, term, sumT, rd, piT, decay, argT, fdItem, fdProblem, mcqMulti, H, MT, KEYS } from './fourier-d-kit.js';
 import { examTag } from './kit.js';
+import { t } from '../../i18n.js';
 
 const SEP = 'f-heat-sep';
 const SRC = 'f-heat-source';
 const SUB = {
-  modes: { id: 'modes', label: 'modes selon les conditions au bord', skill: SEP },
-  ode: { id: 'ode', label: 'EDO de chaque coefficient', skill: 'a2-ode-linear1' },
-  initial: { id: 'initial', label: 'série de la condition initiale', skill: 'f-sine-cosine' },
-  assemble: { id: 'assemble', label: 'assembler u(x, t)', skill: SEP },
+  modes: { id: 'modes', label: t('modes selon les conditions au bord'), skill: SEP },
+  ode: { id: 'ode', label: t('EDO de chaque coefficient'), skill: 'a2-ode-linear1' },
+  initial: { id: 'initial', label: t('série de la condition initiale'), skill: 'f-sine-cosine' },
+  assemble: { id: 'assemble', label: t('assembler u(x, t)'), skill: SEP },
 };
 const SUB_SRC = {
-  initial: { id: 'initial', label: 'série de la condition initiale', skill: 'f-sine-cosine' },
-  source: { id: 'source', label: 'développer la source', skill: SRC },
-  ode: { id: 'ode', label: 'EDO de chaque mode', skill: SRC },
-  solve: { id: 'solve', label: 'résoudre les modes', skill: SRC },
-  assemble: { id: 'assemble', label: 'assembler u(x, t)', skill: SEP },
+  initial: { id: 'initial', label: t('série de la condition initiale'), skill: 'f-sine-cosine' },
+  source: { id: 'source', label: t('développer la source'), skill: SRC },
+  ode: { id: 'ode', label: t('EDO de chaque mode'), skill: SRC },
+  solve: { id: 'solve', label: t('résoudre les modes'), skill: SRC },
+  assemble: { id: 'assemble', label: t('assembler u(x, t)'), skill: SEP },
 };
 
 // ---------- the interval ]0 ; L[ ----------
@@ -129,30 +130,30 @@ function trigData(rng, o = {}) {
 function modeDecision(d) {
   const opts = d.bc === 'D'
     ? [
-      { id: 'sin', label: `Des sinus ${MT(`sin(${genArgR(d.L)})`)}, n ≥ 1 : ils s'annulent en 0 et en ${LT[d.L]}`, valid: true },
-      { id: 'cos', label: `Des cosinus ${MT(`cos(${genArgR(d.L)})`)}, n ≥ 0`, valid: false, why: 'cos 0 = 1 ≠ 0 : les cosinus ne vérifient pas u = 0 aux bords.' },
+      { id: 'sin', label: t('Des sinus {a}, n ≥ 1 : ils s\'annulent en 0 et en {b}', { a: MT(`sin(${genArgR(d.L)})`), b: LT[d.L] }), valid: true },
+      { id: 'cos', label: t('Des cosinus {a}, n ≥ 0', { a: MT(`cos(${genArgR(d.L)})`) }), valid: false, why: t('cos 0 = 1 ≠ 0 : les cosinus ne vérifient pas u = 0 aux bords.') },
     ]
     : [
-      { id: 'cos', label: `Des cosinus ${MT(`cos(${genArgR(d.L)})`)}, n ≥ 0 : leur dérivée s'annule en 0 et en ${LT[d.L]}`, valid: true },
-      { id: 'sin', label: `Des sinus ${MT(`sin(${genArgR(d.L)})`)}, n ≥ 1`, valid: false, rule: 'f_neumann_sine', why: 'u_x = 0 aux bords : ce sont les cosinus qui vérifient cette condition (la dérivée de sin vaut ±nπ/L aux bords).' },
+      { id: 'cos', label: t('Des cosinus {a}, n ≥ 0 : leur dérivée s\'annule en 0 et en {b}', { a: MT(`cos(${genArgR(d.L)})`), b: LT[d.L] }), valid: true },
+      { id: 'sin', label: t('Des sinus {a}, n ≥ 1', { a: MT(`sin(${genArgR(d.L)})`) }), valid: false, rule: 'f_neumann_sine', why: t('u_x = 0 aux bords : ce sont les cosinus qui vérifient cette condition (la dérivée de sin vaut ±nπ/L aux bords).') },
     ];
-  return { prompt: 'Quels modes ?', options: opts };
+  return { prompt: t('Quels modes ?'), options: opts };
 }
 const zeroDecision = () => ({
-  prompt: 'Le mode n = 0 ?', levels: [3], options: [
-    { id: 'keep', label: 'Il compte : X₀ = 1 vérifie u_x = 0, son coefficient est a₀/2', valid: true },
-    { id: 'drop', label: 'Il n\'existe pas : on commence à n = 1', valid: false, why: 'cos(0·x) = 1 a une dérivée nulle : c\'est un mode de Neumann, porté par a₀/2.' },
+  prompt: t('Le mode n = 0 ?'), levels: [3], options: [
+    { id: 'keep', label: t('Il compte : X₀ = 1 vérifie u_x = 0, son coefficient est a₀/2'), valid: true },
+    { id: 'drop', label: t('Il n\'existe pas : on commence à n = 1'), valid: false, why: t('cos(0·x) = 1 a une dérivée nulle : c\'est un mode de Neumann, porté par a₀/2.') },
   ],
 });
 const readDecision = (trig) => ({
-  prompt: 'La condition initiale est-elle déjà une somme de modes ?', levels: [2, 3], options: trig
+  prompt: t('La condition initiale est-elle déjà une somme de modes ?'), levels: [2, 3], options: trig
     ? [
-      { id: 'read', label: 'Oui : on lit ses coefficients sur les modes', valid: true, ref: true },
-      { id: 'int', label: 'Non : on calcule ses coefficients par des intégrales (2/L)∫₀ᴸ…', valid: true, quality: 'poor', why: 'Juste, mais inutile : les intégrales redonnent les coefficients qu\'on lit.' },
+      { id: 'read', label: t('Oui : on lit ses coefficients sur les modes'), valid: true, ref: true },
+      { id: 'int', label: t('Non : on calcule ses coefficients par des intégrales (2/L)∫₀ᴸ…'), valid: true, quality: 'poor', why: t('Juste, mais inutile : les intégrales redonnent les coefficients qu\'on lit.') },
     ]
     : [
-      { id: 'int', label: 'Non : on calcule bₙ(0) par la série en sinus', valid: true, ref: true },
-      { id: 'read', label: 'Oui : u(x, 0) est déjà un mode', valid: false, why: 'u(x, 0) n\'est pas une somme finie de sinus : il faut sa série en sinus sur ]0 ; L[.' },
+      { id: 'int', label: t('Non : on calcule bₙ(0) par la série en sinus'), valid: true, ref: true },
+      { id: 'read', label: t('Oui : u(x, 0) est déjà un mode'), valid: false, why: t('u(x, 0) n\'est pas une somme finie de sinus : il faut sa série en sinus sur ]0 ; L[.') },
     ],
 });
 
@@ -166,30 +167,30 @@ function trigItem(level, rng, opts, o = {}) {
   const parts = [];
   parts.push({
     label: 'X_n', shown: 'Xₙ(x)', labels: ['X_n(x)'], name: 'X', vars: ['x', 'n'], domain: { ...xDom, ...nDom }, expect: d.X,
-    title: 'Les modes', action: 'Choisir les modes selon les conditions au bord',
+    title: t('Les modes'), action: t('Choisir les modes selon les conditions au bord'),
     traps: d.bc === 'N' ? { f_neumann_sine: [`sin(${genArg(d.L)})`] } : undefined,
     decisions: [modeDecision(d), ...(d.bc === 'N' ? [zeroDecision()] : [])],
-    wrongActions: d.bc === 'N' ? [{ label: 'Prendre les sinus, comme pour Dirichlet', rule: 'f_neumann_sine', why: 'u_x = 0 aux bords : ce sont les cosinus qui vérifient cette condition.' }] : [],
+    wrongActions: d.bc === 'N' ? [{ label: t('Prendre les sinus, comme pour Dirichlet'), rule: 'f_neumann_sine', why: t('u_x = 0 aux bords : ce sont les cosinus qui vérifient cette condition.') }] : [],
     lines: [{ math: d.X, subgoal: 'modes', blank: [genArg(d.L)], blank2: [d.X] }],
   });
   if (d.a) {
     parts.push({
       label: 'A(t)', shown: 'A(t)', name: 'A', vars: ['t'], domain: { t: [0, 1] }, expect: d.a.A,
-      title: `Chaque coefficient vérifie bₙ′ = −n²a(t) bₙ, donc bₙ(t) = bₙ(0) e<sup>−n²A(t)</sup> avec A(t) = ∫₀ᵗ a(s) ds`,
-      action: 'Résoudre l\'EDO de chaque coefficient',
-      wrongActions: [{ label: 'Traiter a(t) comme une constante : e^(−n²a(t)t)', why: 'a dépend de t : la solution de b′ = −n²a(t)b est b(0)e^(−n²∫₀ᵗa).' }],
+      title: t('Chaque coefficient vérifie bₙ′ = −n²a(t) bₙ, donc bₙ(t) = bₙ(0) e<sup>−n²A(t)</sup> avec A(t) = ∫₀ᵗ a(s) ds'),
+      action: t('Résoudre l\'EDO de chaque coefficient'),
+      wrongActions: [{ label: t('Traiter a(t) comme une constante : e^(−n²a(t)t)'), why: t('a dépend de t : la solution de b′ = −n²a(t)b est b(0)e^(−n²∫₀ᵗa).') }],
       lines: [{ math: d.a.A, subgoal: 'ode', blank: [d.a.A.split(/(?=[+-])/)[0]], blank2: [d.a.A] }],
     });
   } else {
     const lin = sumT([d.L === 'pi' ? term(d.k, 'n') : `${d.k === 1 ? '' : d.k}nπ${d.L === 1 ? '' : `/${d.L}`}`, d.c ? qt(d.c) : '']);
     const noPi = sumT([term(d.k, 'n^2'), d.c ? qt(d.c) : '']);
-    const rateTraps = [lin, ...(d.L !== 'pi' ? [noPi] : [])].filter((t) => t !== d.rate);
+    const rateTraps = [lin, ...(d.L !== 'pi' ? [noPi] : [])].filter((tt) => tt !== d.rate);
     parts.push({
       label: 'λ_n', shown: 'λₙ', name: 'lambda', vars: ['n'], domain: nDom, expect: d.rate,
-      title: `Chaque coefficient vérifie ${co}ₙ′ = −λₙ ${co}ₙ, donc ${co}ₙ(t) = ${co}ₙ(0) e<sup>−λₙt</sup>`,
-      action: 'Résoudre l\'EDO de chaque coefficient',
+      title: t('Chaque coefficient vérifie {co}ₙ′ = −λₙ {co}ₙ, donc {co}ₙ(t) = {co}ₙ(0) e<sup>−λₙt</sup>', { co }),
+      action: t('Résoudre l\'EDO de chaque coefficient'),
       traps: { f_heat_rate: rateTraps },
-      wrongActions: [{ label: 'Décroissance e^(−nt), linéaire en n', rule: 'f_heat_rate', why: 'u_xx dérive deux fois Xₙ : le mode n décroît comme e^(−k(nπ/L)²t).' }],
+      wrongActions: [{ label: t('Décroissance e^(−nt), linéaire en n'), rule: 'f_heat_rate', why: t('u_xx dérive deux fois Xₙ : le mode n décroît comme e^(−k(nπ/L)²t).') }],
       lines: [{ math: d.rate, subgoal: 'ode', blank: [d.rate.split(/(?=[+])/)[0]], blank2: [d.rate] }],
     });
   }
@@ -199,17 +200,17 @@ function trigItem(level, rng, opts, o = {}) {
   const rates = d.modes.map(({ n }) => (d.a ? null : rateOf(d.L, d.k, d.c, n))).filter(Boolean);
   parts.push({
     label: 'u', shown: 'u(x, t)', labels: ['u(x,t)', 'u(x;t)'], name: 'u', vars: ['x', 't'], domain: { ...xDom, t: [0, 0.5] }, expect: d.u,
-    title: 'La solution', action: 'Sommer les modes, avec les coefficients de u(x, 0)',
+    title: t('La solution'), action: t('Sommer les modes, avec les coefficients de u(x, 0)'),
     traps: uTraps,
     decisions: [readDecision(true)],
-    wrongActions: [{ label: 'Garder u(x, 0) sans facteur en t', why: 'Chaque mode décroît avec son propre taux : u dépend de t.' }],
+    wrongActions: [{ label: t('Garder u(x, 0) sans facteur en t'), why: t('Chaque mode décroît avec son propre taux : u dépend de t.') }],
     lines: [{ math: d.u, subgoal: 'assemble', blank: rates.length ? [rates[rates.length - 1]] : [d.modes[0].n === 1 ? 'x' : String(d.modes[0].n)], blank2: rates.length > 1 ? rates : undefined }],
   });
-  const prompt = `Résous ${pdeHtml(d.k, d.c, d.a)} sur ]0 ; ${LT[d.L]}[, avec ${bcHtml(d.bc, d.L)} et <i>u</i>(<i>x</i>, 0) = ${MT(d.ic)}.`;
-  const hint2 = d.a ? `bₙ(t) = bₙ(0) e<sup>−n²A(t)</sup>, avec A(t) = ∫₀ᵗ (${rd(d.a.html)}) ds.` : `${co}ₙ(t) = ${co}ₙ(0) e<sup>−λₙt</sup> avec λₙ = ${rateR(d.rate)}.`;
+  const prompt = t('Résous {a} sur ]0 ; {b}[, avec {c} et <i>u</i>(<i>x</i>, 0) = {ic}.', { a: pdeHtml(d.k, d.c, d.a), b: LT[d.L], c: bcHtml(d.bc, d.L), ic: MT(d.ic) });
+  const hint2 = d.a ? t('bₙ(t) = bₙ(0) e<sup>−n²A(t)</sup>, avec A(t) = ∫₀ᵗ ({html}) ds.', { html: rd(d.a.html) }) : t('{co}ₙ(t) = {co}ₙ(0) e<sup>−λₙt</sup> avec λₙ = {a}.', { co, a: rateR(d.rate) });
   return fdItem({
     skill: SEP, level, key: `${level}:${d.id}`, prompt, parts, exam: opts.exam ? examTag(opts) : false,
-    hints: H(d.bc === 'D' ? 'Dirichlet : des sinus sin(nπx/L), n ≥ 1. Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne bₙ(0).' : 'Neumann : des cosinus cos(nπx/L), n = 0 compris (le terme constant a₀/2). Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne aₙ(0).',
+    hints: H(d.bc === 'D' ? t('Dirichlet : des sinus sin(nπx/L), n ≥ 1. Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne bₙ(0).') : t('Neumann : des cosinus cos(nπx/L), n = 0 compris (le terme constant a₀/2). Chaque coefficient vérifie une EDO linéaire en t ; la condition initiale donne aₙ(0).'),
       hint2, `u(x, t) = ${MT(d.u)}`),
     subgoals: [SUB.modes, SUB.ode, SUB.assemble], keys: KEYS,
     pde: { spec: d.spec, u: d.u },
@@ -238,15 +239,15 @@ function seriesParts(P, L) {
   return [
     {
       judge: { kind: 'equiv', vars: ['n'], domain: nDom, target: 'no-int' }, start: `int(${P.integrand}, x, 0, ${L === 'pi' ? 'π' : 1})`,
-      title: `La série en sinus de u(x, 0) : d'abord Iₙ = ∫₀${L === 'pi' ? '^π' : '¹'} u(x, 0) ${L === 'pi' ? 'sin(nx)' : 'sin(nπx)'} dx`,
-      action: 'Calculer l\'intégrale de la série en sinus',
+      title: L === 'pi' ? t('La série en sinus de u(x, 0) : d\'abord Iₙ = ∫₀^π u(x, 0) sin(nx) dx') : t('La série en sinus de u(x, 0) : d\'abord Iₙ = ∫₀¹ u(x, 0) sin(nπx) dx'),
+      action: t('Calculer l\'intégrale de la série en sinus'),
       lines: [{ math: P.I, subgoal: 'initial', blank: [first || P.I] }],
     },
     {
       label: 'b_n(0)', shown: 'bₙ(0)', labels: ['b_n'], name: 'b0', vars: ['n'], domain: nDom, expect: P.bn,
-      title: 'Le coefficient bₙ(0) de la série en sinus', action: 'Mettre le facteur de la série en sinus',
+      title: t('Le coefficient bₙ(0) de la série en sinus'), action: t('Mettre le facteur de la série en sinus'),
       traps: { f_heat_bc_coef: [`(1/2)(${P.bn})`] },
-      wrongActions: [{ label: 'bₙ(0) = (1/L)Iₙ', rule: 'f_heat_bc_coef', why: 'Sur ]0 ; L[, le prolongement impair double l\'intégrale : bₙ(0) = (2/L)Iₙ.' }],
+      wrongActions: [{ label: 'bₙ(0) = (1/L)Iₙ', rule: 'f_heat_bc_coef', why: t('Sur ]0 ; L[, le prolongement impair double l\'intégrale : bₙ(0) = (2/L)Iₙ.') }],
       lines: [{ math: P.bn, subgoal: 'initial', blank: [P.bn.split('/')[0]] }],
     },
   ];
@@ -274,34 +275,34 @@ function polyParts(d) {
   return [
     {
       label: 'X_n', shown: 'Xₙ(x)', labels: ['X_n(x)'], name: 'X', vars: ['x', 'n'], domain: { x: [0, Lnum(d.L)], ...nDom }, expect: `sin(${genArg(d.L)})`,
-      title: 'Les modes', action: 'Choisir les modes selon les conditions au bord',
+      title: t('Les modes'), action: t('Choisir les modes selon les conditions au bord'),
       decisions: [modeDecision({ bc: 'D', L: d.L })],
       lines: [{ math: `sin(${genArg(d.L)})`, subgoal: 'modes', blank: [genArg(d.L)] }],
     },
     ...seriesParts(d, d.L).map((p, i) => (i === 0 ? { ...p, decisions: [readDecision(false)] } : p)),
     {
       label: 'λ_n', shown: 'λₙ', name: 'lambda', vars: ['n'], domain: nDom, expect: d.rate,
-      title: 'Chaque coefficient vérifie bₙ′ = −λₙ bₙ', action: 'Résoudre l\'EDO de chaque coefficient',
+      title: t('Chaque coefficient vérifie bₙ′ = −λₙ bₙ'), action: t('Résoudre l\'EDO de chaque coefficient'),
       traps: { f_heat_rate: [d.L === 'pi' ? 'n' : 'nπ'] },
-      wrongActions: [{ label: 'Décroissance e^(−nt)', rule: 'f_heat_rate', why: 'Le mode n décroît comme e^(−(nπ/L)²t).' }],
+      wrongActions: [{ label: t('Décroissance e^(−nt)'), rule: 'f_heat_rate', why: t('Le mode n décroît comme e^(−(nπ/L)²t).') }],
       lines: [{ math: d.rate, subgoal: 'ode', blank: [d.rate] }],
     },
     {
       label: 'u', shown: 'u(x, t)', labels: ['u(x,t)', 'u(x;t)'], name: 'u', vars: ['x', 't'], domain: { x: [0, Lnum(d.L)], t: [0.05, 0.5] }, expect: d.u,
-      title: 'La solution (une série)', action: 'Sommer les modes',
+      title: t('La solution (une série)'), action: t('Sommer les modes'),
       traps: { f_heat_rate: [d.uLin], f_heat_bc_coef: [d.uHalf] },
       lines: [{ math: d.u, subgoal: 'assemble', blank: [d.rate] }],
     },
   ];
 }
 
-const polyPrompt = (d) => `Résous ${pdeHtml(1, 0)} sur ]0 ; ${LT[d.L]}[, avec ${bcHtml('D', d.L)} et <i>u</i>(<i>x</i>, 0) = ${MT(d.f)}. Écris u comme une série (sum(…, n, 1, ∞)).`;
+const polyPrompt = (d) => t('Résous {a} sur ]0 ; {b}[, avec {c} et <i>u</i>(<i>x</i>, 0) = {f}. Écris u comme une série (sum(…, n, 1, ∞)).', { a: pdeHtml(1, 0), b: LT[d.L], c: bcHtml('D', d.L), f: MT(d.f) });
 
 function polyItem(level, rng, opts) {
   const d = polyData(rng);
   return fdItem({
     skill: SEP, level, key: `${level}:${d.id}`, prompt: polyPrompt(d), parts: polyParts(d), exam: opts.exam ? examTag(opts) : false,
-    hints: H('Dirichlet : des sinus. u(x, 0) n\'est pas une somme de modes : calcule sa série en sinus, bₙ(0) = (2/L)∫₀ᴸ u(x, 0) sin(nπx/L) dx.', `bₙ(0) = ${MT(d.bn)}`, `u(x, t) = ${MT(d.u)}`),
+    hints: H(t('Dirichlet : des sinus. u(x, 0) n\'est pas une somme de modes : calcule sa série en sinus, bₙ(0) = (2/L)∫₀ᴸ u(x, 0) sin(nπx/L) dx.'), `bₙ(0) = ${MT(d.bn)}`, `u(x, t) = ${MT(d.u)}`),
     subgoals: [SUB.modes, SUB.initial, SUB.ode, SUB.assemble], keys: KEYS, pde: { spec: d.spec, u: d.u },
     noHints: level >= 5 || undefined,
   });
@@ -320,17 +321,17 @@ function sepMcq(rng, opts) {
     d.wrongs.sine && { html: `u(x, t) = ${MT(d.wrongs.sine)}`, rule: 'f_neumann_sine' },
     d.wrongs.cosine && { html: `u(x, t) = ${MT(d.wrongs.cosine)}` },
     d.wrongs.rateNoPi && { html: `u(x, t) = ${MT(d.wrongs.rateNoPi)}`, rule: 'f_heat_rate' },
-    { html: `Pour tout x, u(x, t) → ${MT(limWrong)} quand t → ∞.` },
-    { html: `Le coefficient du mode n vérifie ${co}ₙ′ = −${MT(d.L === 'pi' ? 'n' : 'nπ')}·${co}ₙ.`, rule: 'f_heat_rate' },
+    { html: t('Pour tout x, u(x, t) → {limWrong} quand t → ∞.', { limWrong: MT(limWrong) }) },
+    { html: t('Le coefficient du mode n vérifie {co}ₙ′ = −{a}·{co}ₙ.', { co, a: MT(d.L === 'pi' ? 'n' : 'nπ') }), rule: 'f_heat_rate' },
   ].filter(Boolean);
   const right = [`u(x, t) = ${MT(d.u)}`];
-  if (rng.chance(0.6)) right.push(`Pour tout x, u(x, t) → ${MT(lim)} quand t → ∞.`);
-  else right.push(`Le coefficient du mode n vérifie ${co}ₙ′ = −${MT(`(${rateN})`)}·${co}ₙ.`);
+  if (rng.chance(0.6)) right.push(t('Pour tout x, u(x, t) → {lim} quand t → ∞.', { lim: MT(lim) }));
+  else right.push(t('Le coefficient du mode n vérifie {co}ₙ′ = −{a}·{co}ₙ.', { co, a: MT(`(${rateN})`) }));
   return mcqMulti({
     skill: SEP, level: 4, key: `mcq:${d.id}`, exam: examTag(opts),
-    prompt: `On résout ${pdeHtml(d.k, 0)} sur ]0 ; ${LT[d.L]}[, avec ${bcHtml(d.bc, d.L)} et <i>u</i>(<i>x</i>, 0) = ${MT(d.ic)}. Cochez les affirmations vraies.`,
+    prompt: t('On résout {a} sur ]0 ; {b}[, avec {c} et <i>u</i>(<i>x</i>, 0) = {ic}. Cochez les affirmations vraies.', { a: pdeHtml(d.k, 0), b: LT[d.L], c: bcHtml(d.bc, d.L), ic: MT(d.ic) }),
     right, wrongs: rng.shuffle(wrongs), count: 5,
-    solution: [{ html: `${d.bc === 'D' ? 'Dirichlet : des sinus' : 'Neumann : des cosinus, n = 0 compris'} ; chaque mode décroît comme e<sup>−k(nπ/L)²t</sup> : u(x, t) = ${MT(d.u)}.`, note: '' }],
+    solution: [{ html: d.bc === 'D' ? t('Dirichlet : des sinus ; chaque mode décroît comme e<sup>−k(nπ/L)²t</sup> : u(x, t) = {u}.', { u: MT(d.u) }) : t('Neumann : des cosinus, n = 0 compris ; chaque mode décroît comme e<sup>−k(nπ/L)²t</sup> : u(x, t) = {u}.', { u: MT(d.u) }), note: '' }],
     expectedSec: 240,
   }, rng);
 }
@@ -395,44 +396,46 @@ function srcParts(d) {
     coef: seriesParts(d.IC, L)[1],
     source: {
       label: `β_${d.K}`, shown: `β${'₀₁₂₃₄₅'[d.K]}`, labels: [`β_${d.K}`], name: 'beta', vars: [], expect: String(d.s),
-      title: `La source sur les modes : ${MT(d.src)} = Σ βₙ ${MT(`sin(${genArg(L)})`)}`, action: 'Développer la source sur les modes',
-      notes: [`Seul le mode n = ${d.K} reçoit la source : les autres βₙ sont nuls.`],
-      wrongActions: [{ label: 'Calculer βₙ pour tout n par une intégrale', why: 'Juste mais inutile : la source est déjà un mode.' }],
+      title: t('La source sur les modes : {src} = Σ βₙ {a}', { src: MT(d.src), a: MT(`sin(${genArg(L)})`) }), action: t('Développer la source sur les modes'),
+      notes: [t('Seul le mode n = {K} reçoit la source : les autres βₙ sont nuls.', { K: d.K })],
+      wrongActions: [{ label: t('Calculer βₙ pour tout n par une intégrale'), why: t('Juste mais inutile : la source est déjà un mode.') }],
       lines: [{ math: String(d.s), subgoal: 'source', blank: [String(d.s)] }],
     },
     ode: {
       label: 'λ_n', shown: 'λₙ', name: 'lambda', vars: ['n'], domain: nDom, expect: d.rate,
-      title: 'Chaque mode vérifie bₙ′ + λₙ bₙ = βₙ', action: 'Écrire l\'EDO de chaque mode',
+      title: t('Chaque mode vérifie bₙ′ + λₙ bₙ = βₙ'), action: t('Écrire l\'EDO de chaque mode'),
       traps: { f_heat_rate: [L === 'pi' ? 'n' : 'nπ'] },
-      wrongActions: [{ label: 'bₙ′ + n bₙ = βₙ', rule: 'f_heat_rate', why: 'u_xx dérive deux fois sin(nπx/L) : le facteur est (nπ/L)².' }],
+      wrongActions: [{ label: 'bₙ′ + n bₙ = βₙ', rule: 'f_heat_rate', why: t('u_xx dérive deux fois sin(nπx/L) : le facteur est (nπ/L)².') }],
       lines: [{ math: d.rate, subgoal: 'ode', blank: [d.rate] }],
     },
     free: {
       label: 'b_n(t)', shown: `bₙ(t), n ≠ ${d.K}`, labels: ['b_n(t)', 'b_n'], name: 'bn', vars: ['n', 't'], domain: { ...nDom, t: [0, 0.5] }, expect: d.bnT,
-      title: `Les modes sans source (n ≠ ${d.K})`, action: 'Résoudre les modes sans source',
+      title: t('Les modes sans source (n ≠ {K})', { K: d.K }), action: t('Résoudre les modes sans source'),
       traps: { f_heat_rate: [`(${d.IC.bn})${decay(L === 'pi' ? 'n' : 'nπ')}`] },
       lines: [{ math: d.bnT, subgoal: 'solve', blank: [decay(d.rate)] }],
     },
     forced: {
       label: `b_${d.K}(t)`, shown: `b${'₀₁₂₃₄₅'[d.K]}(t)`, labels: [`b_${d.K}`], name: 'bK', vars: ['t'], domain: { t: [0, 1] }, expect: d.bK,
-      title: `Le mode n = ${d.K}, avec b${'₀₁₂₃₄₅'[d.K]}(0) = ${MT(d.b0K)}`, action: `Résoudre le mode n = ${d.K} (solution particulière + homogène)`,
+      title: t('Le mode n = {K}, avec b{a}(0) = {b0K}', { K: d.K, a: '₀₁₂₃₄₅'[d.K], b0K: MT(d.b0K) }), action: t('Résoudre le mode n = {K} (solution particulière + homogène)', { K: d.K }),
       traps: { f_heat_source_steady: d.wrongs.steady },
-      wrongActions: [{ label: `Prendre la solution stationnaire seule, b${'₀₁₂₃₄₅'[d.K]} = ${rd(d.steady)}`, rule: 'f_heat_source_steady', why: `b${'₀₁₂₃₄₅'[d.K]}(0) = ${rd(d.b0K)} : la partie stationnaire doit être corrigée par un terme en e^(−λt).` }],
+      wrongActions: [{ label: t('Prendre la solution stationnaire seule, b{a} = {steady}', { a: '₀₁₂₃₄₅'[d.K], steady: rd(d.steady) }), rule: 'f_heat_source_steady', why: t('b{a}(0) = {b0K} : la partie stationnaire doit être corrigée par un terme en e^(−λt).', { a: '₀₁₂₃₄₅'[d.K], b0K: rd(d.b0K) }) }],
       lines: [{ math: d.bK, subgoal: 'solve', blank: [d.steady], blank2: [d.steady, decay(d.rK)] }],
     },
     assemble: {
       label: 'u', shown: 'u(x, t)', labels: ['u(x,t)', 'u(x;t)'], name: 'u', vars: ['x', 't'], domain: { x: [0, Lnum(L)], t: [0.05, 0.5] }, expect: d.u,
-      title: 'La solution', action: 'Assembler u(x, t)',
+      title: t('La solution'), action: t('Assembler u(x, t)'),
       traps: { f_heat_source_steady: [d.wrongs.uSteady], f_heat_rate: [d.wrongs.uLin] },
       lines: [{ math: d.u, subgoal: 'assemble', blank: [d.steady] }],
     },
   };
 }
 
-const srcPrompt = (d, whole = true) => `${whole ? 'Résous' : 'On résout'} <i>u</i><sub>t</sub> − <i>u</i><sub>xx</sub> = ${MT(d.src)} sur ]0 ; ${LT[d.L]}[, avec ${bcHtml('D', d.L)} et <i>u</i>(<i>x</i>, 0) = ${MT(d.IC.f)}, en développant u(x, t) = Σ bₙ(t) ${MT(`sin(${genArg(d.L)})`)}.${whole ? ' Écris u avec une série (sum(…, n, 1, ∞)).' : ''}`;
+const srcPrompt = (d, whole = true) => (whole
+  ? t('Résous <i>u</i><sub>t</sub> − <i>u</i><sub>xx</sub> = {src} sur ]0 ; {a}[, avec {b} et <i>u</i>(<i>x</i>, 0) = {f}, en développant u(x, t) = Σ bₙ(t) {c}. Écris u avec une série (sum(…, n, 1, ∞)).', { src: MT(d.src), a: LT[d.L], b: bcHtml('D', d.L), f: MT(d.IC.f), c: MT(`sin(${genArg(d.L)})`) })
+  : t('On résout <i>u</i><sub>t</sub> − <i>u</i><sub>xx</sub> = {src} sur ]0 ; {a}[, avec {b} et <i>u</i>(<i>x</i>, 0) = {f}, en développant u(x, t) = Σ bₙ(t) {c}.', { src: MT(d.src), a: LT[d.L], b: bcHtml('D', d.L), f: MT(d.IC.f), c: MT(`sin(${genArg(d.L)})`) }));
 const srcHints = (d) => H(
-  'Développe aussi la source sur les modes sin(nπx/L) : chaque coefficient vérifie bₙ′ + λₙbₙ = βₙ, une EDO linéaire d\'ordre 1.',
-  `Le mode ${d.K} : b(t) = b(0)e<sup>−λt</sup> + (β/λ)(1 − e<sup>−λt</sup>), avec β = ${d.s}.`,
+  t('Développe aussi la source sur les modes sin(nπx/L) : chaque coefficient vérifie bₙ′ + λₙbₙ = βₙ, une EDO linéaire d\'ordre 1.'),
+  t('Le mode {K} : b(t) = b(0)e<sup>−λt</sup> + (β/λ)(1 − e<sup>−λt</sup>), avec β = {s}.', { K: d.K, s: d.s }),
   `b${'₀₁₂₃₄₅'[d.K]}(t) = ${MT(d.bK)}`);
 const srcSpec = (d) => ({ spec: d.spec, u: d.u });
 
@@ -446,9 +449,9 @@ function srcItem(level, rng, opts) {
       : level === 3 ? ['source', 'ode', 'integral', 'coef', 'forced']
         : ALL;
   const subs = [...new Set(pick.map((k) => ({ integral: 'initial', coef: 'initial', source: 'source', ode: 'ode', free: 'solve', forced: 'solve', assemble: 'assemble' })[k]))].map((k) => SUB_SRC[k]);
-  const lead = level === 1 ? ` On a b${'₀₁₂₃₄₅'[d.K]}(0) = ${MT(d.b0K)}.` : '';
+  const lead = level === 1 ? t(' On a b{a}(0) = {b0K}.', { a: '₀₁₂₃₄₅'[d.K], b0K: MT(d.b0K) }) : '';
   const item = {
-    skill: SRC, level, key: `${level}:${d.id}`, prompt: `${srcPrompt(d, level >= 4)}${level <= 3 ? ' Fais seulement les étapes demandées.' : ''}${lead}`,
+    skill: SRC, level, key: `${level}:${d.id}`, prompt: `${srcPrompt(d, level >= 4)}${level <= 3 ? t(' Fais seulement les étapes demandées.') : ''}${lead}`,
     parts: pick.map((k) => P[k]), hints: srcHints(d), subgoals: subs, keys: KEYS, pde: pick.includes('assemble') ? srcSpec(d) : undefined,
   };
   if (level === 5 || opts.exam) {

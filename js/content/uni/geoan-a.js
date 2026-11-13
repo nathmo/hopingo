@@ -15,6 +15,7 @@ import {
 import { GEN as LINE2 } from './geoan-a-line2.js';
 import { GEN as DOTS } from './geoan-a-dot.js';
 import { GEN as SPACE } from './geoan-a-space.js';
+import { t } from '../../i18n.js';
 
 const KEYS = ['calc', 'geo', 'pts'];
 
@@ -24,9 +25,9 @@ const KEYS = ['calc', 'geo', 'pts'];
 
 const VEC = 'g4-vectors';
 const VEC_SUB = [
-  { id: 'rel', label: 'écrire la relation vectorielle', skill: VEC },
-  { id: 'calc', label: 'calculer les coordonnées', skill: VEC },
-  { id: 'sys', label: 'résoudre le système en α et β', skill: 'eq-systems' },
+  { id: 'rel', label: t('écrire la relation vectorielle'), skill: VEC },
+  { id: 'calc', label: t('calculer les coordonnées'), skill: VEC },
+  { id: 'sys', label: t('résoudre le système en α et β'), skill: 'eq-systems' },
 ];
 
 // A, B, D whole in [−6 ; 6]², AB⃗ and AD⃗ not colinear; C = B + D − A; the
@@ -54,11 +55,11 @@ const par = (x) => (q(x).n < 0 || q(x).d !== 1 ? `(${qt(x)})` : qt(x));
 const plusMinus = (P, Q, R, k) => `${par(P[k])} + ${par(Q[k])} - ${par(R[k])}`;
 
 const VEC_MENU = (kind) => [
-  { id: 'mid', label: 'Milieu : M est le milieu de [AC], donc C = 2M − A', valid: kind === 'centre', why: 'Le centre n\'est pas donné ici.' },
-  { id: 'transl', label: 'Translation : D = A + BC⃗ (ABCD parallélogramme ⇔ AD⃗ = BC⃗)', valid: kind === 'fourth', why: 'Ici, on connaît le centre : utilise le milieu des diagonales.' },
-  { id: 'chasles', label: 'Chasles : AC⃗ = AB⃗ + BC⃗', valid: false, why: 'Chasles décompose un vecteur, mais ne donne pas le point cherché ici.' },
-  { id: 'det', label: 'Colinéarité : déterminant nul', valid: false, why: 'La colinéarité sert à tester un alignement, pas à trouver un sommet.' },
-  { id: 'half', label: 'C = M − A', valid: false, rule: 'g4_midpoint_half', why: 'M − A est le vecteur AM⃗, pas un point. Le centre est le milieu : M = (A + C)/2, donc C = 2M − A.' },
+  { id: 'mid', label: t('Milieu : M est le milieu de [AC], donc C = 2M − A'), valid: kind === 'centre', why: t('Le centre n\'est pas donné ici.') },
+  { id: 'transl', label: t('Translation : D = A + BC⃗ (ABCD parallélogramme ⇔ AD⃗ = BC⃗)'), valid: kind === 'fourth', why: t('Ici, on connaît le centre : utilise le milieu des diagonales.') },
+  { id: 'chasles', label: t('Chasles : AC⃗ = AB⃗ + BC⃗'), valid: false, why: t('Chasles décompose un vecteur, mais ne donne pas le point cherché ici.') },
+  { id: 'det', label: t('Colinéarité : déterminant nul'), valid: false, why: t('La colinéarité sert à tester un alignement, pas à trouver un sommet.') },
+  { id: 'half', label: 'C = M − A', valid: false, rule: 'g4_midpoint_half', why: t('M − A est le vecteur AM⃗, pas un point. Le centre est le milieu : M = (A + C)/2, donc C = 2M − A.') },
 ];
 
 // One part « point = ? » of a vectors item.
@@ -76,45 +77,45 @@ function vecItem(level, rng, opts = {}) {
   const hints = [];
   const symbols = { A: vt(A), B: vt(B), M: vt(M) };
   if (kind === 'centre') {
-    prompt = `Le parallélogramme ABCD a pour sommets ${ptR('A', A)} et ${ptR('B', B)}, et pour centre ${ptR('M', M)}. Calcule les coordonnées de C, puis de D.`;
+    prompt = t('Le parallélogramme ABCD a pour sommets {v1} et {v2}, et pour centre {v3}. Calcule les coordonnées de C, puis de D.', { v1: ptR('A', A), v2: ptR('B', B), v3: ptR('M', M) });
     const judgeC = { kind: 'vector', symbols, expect: vt(C), via: '2M - A', ...(level === 3 ? { menu: VEC_MENU('centre') } : {}) };
     const judgeD = { kind: 'vector', symbols, expect: vt(D), via: '2M - B', ...(level === 3 ? { menu: VEC_MENU('centre') } : {}) };
     const calcC = `C = (${twoMinus(M, A, 0)} ; ${twoMinus(M, A, 1)})`;
     const calcD = `D = (${twoMinus(M, B, 0)} ; ${twoMinus(M, B, 1)})`;
     first = { judge: judgeC, start: 'C' };
-    if (level === 1) script.push({ kind: 'note', html: `M est le milieu de [AC] : C = 2M − A.` });
+    if (level === 1) script.push({ kind: 'note', html: t('M est le milieu de [AC] : C = 2M − A.') });
     if (level === 2) {
       script.push({
-        kind: 'decision', prompt: 'Quelle relation donne C ?', options: rng.shuffle([
+        kind: 'decision', prompt: t('Quelle relation donne C ?'), options: rng.shuffle([
           { id: 'ok', label: 'C = 2M − A', valid: true, ref: true },
-          { id: 'half', label: 'C = M − A', valid: false, rule: 'g4_midpoint_half', why: 'M − A est le vecteur AM⃗. Comme M est le milieu de [AC], M = (A + C)/2, donc C = 2M − A.' },
-          { id: 'plus', label: 'C = 2M + A', valid: false, rule: 'g4_midpoint_half', why: 'De M = (A + C)/2, on tire 2M = A + C, donc C = 2M − A (on retranche A).' },
+          { id: 'half', label: 'C = M − A', valid: false, rule: 'g4_midpoint_half', why: t('M − A est le vecteur AM⃗. Comme M est le milieu de [AC], M = (A + C)/2, donc C = 2M − A.') },
+          { id: 'plus', label: 'C = 2M + A', valid: false, rule: 'g4_midpoint_half', why: t('De M = (A + C)/2, on tire 2M = A + C, donc C = 2M − A (on retranche A).') },
         ]),
       });
     }
-    if (level >= 3) script.push({ kind: 'eq', math: 'C = 2M - A', subgoal: 'rel', note: 'M est le milieu de [AC]' });
+    if (level >= 3) script.push({ kind: 'eq', math: 'C = 2M - A', subgoal: 'rel', note: t('M est le milieu de [AC]') });
     script.push(
-      { kind: 'eq', math: calcC, subgoal: 'calc', note: 'Coordonnée par coordonnée', ...(level <= 2 ? blanks(calcC, level === 1 ? [par(M[0]), par(M[1])] : [twoMinus(M, A, 0), twoMinus(M, A, 1)]) : {}) },
+      { kind: 'eq', math: calcC, subgoal: 'calc', note: t('Coordonnée par coordonnée'), ...(level <= 2 ? blanks(calcC, level === 1 ? [par(M[0]), par(M[1])] : [twoMinus(M, A, 0), twoMinus(M, A, 1)]) : {}) },
       { kind: 'eq', math: vt(C), subgoal: 'calc', note: '', ...(level <= 2 ? blanks(vt(C), [qt(C[0]), qt(C[1])]) : {}) },
     );
-    script.push(vecPart({ name: 'D', html: `C = ${vr(C)}. Et D ?`, judge: judgeD }));
-    if (level >= 3) script.push({ kind: 'eq', math: 'D = 2M - B', subgoal: 'rel', note: 'M est aussi le milieu de [BD]' });
-    else script.push({ kind: 'note', html: 'M est aussi le milieu de [BD] : D = 2M − B.' });
+    script.push(vecPart({ name: 'D', html: t('C = {v1}. Et D ?', { v1: vr(C) }), judge: judgeD }));
+    if (level >= 3) script.push({ kind: 'eq', math: 'D = 2M - B', subgoal: 'rel', note: t('M est aussi le milieu de [BD]') });
+    else script.push({ kind: 'note', html: t('M est aussi le milieu de [BD] : D = 2M − B.') });
     script.push(
       { kind: 'eq', math: calcD, subgoal: 'calc', note: '', ...(level <= 2 ? blanks(calcD, [twoMinus(M, B, 0), twoMinus(M, B, 1)]) : {}) },
       { kind: 'eq', math: vt(D), subgoal: 'calc', note: '', ...(level === 1 ? blanks(vt(D), [qt(D[0]), qt(D[1])]) : {}) },
     );
-    hints.push('Le centre d\'un parallélogramme est le milieu de chaque diagonale : M = (A + C)/2.', `C = 2M − □ = (2·${par(M[0]).replace(/-/g, '−')} − □ ; 2·${par(M[1]).replace(/-/g, '−')} − □)`, `C = 2M − A = ${vr(C)}`);
+    hints.push(t('Le centre d\'un parallélogramme est le milieu de chaque diagonale : M = (A + C)/2.'), `C = 2M − □ = (2·${par(M[0]).replace(/-/g, '−')} − □ ; 2·${par(M[1]).replace(/-/g, '−')} − □)`, `C = 2M − A = ${vr(C)}`);
   } else {
-    prompt = `Les points ${ptR('A', A)}, ${ptR('B', B)} et ${ptR('C', C)} sont trois sommets du parallélogramme ABCD. Calcule les coordonnées de D.`;
+    prompt = t('Les points {v1}, {v2} et {v3} sont trois sommets du parallélogramme ABCD. Calcule les coordonnées de D.', { v1: ptR('A', A), v2: ptR('B', B), v3: ptR('C', C) });
     const sym = { A: vt(A), B: vt(B), C: vt(C) };
     first = { judge: { kind: 'vector', symbols: sym, expect: vt(D), via: 'A + vec(B,C)', ...(level === 3 ? { menu: VEC_MENU('fourth') } : {}) }, start: 'D' };
     script.push(
-      { kind: 'eq', math: 'D = A + vec(B,C)', subgoal: 'rel', note: 'ABCD parallélogramme ⇔ AD⃗ = BC⃗' },
+      { kind: 'eq', math: 'D = A + vec(B,C)', subgoal: 'rel', note: t('ABCD parallélogramme ⇔ AD⃗ = BC⃗') },
       { kind: 'eq', math: `D = (${plusMinus(A, C, B, 0)} ; ${plusMinus(A, C, B, 1)})`, subgoal: 'calc', note: 'BC⃗ = C − B' },
       { kind: 'eq', math: vt(D), subgoal: 'calc', note: '' },
     );
-    hints.push('Dans un parallélogramme ABCD, AD⃗ = BC⃗ : D = A + BC⃗.', `D = A + (C − B) = (${fq(A[0])} + □ ; ${fq(A[1])} + □)`, `D = ${vr(D)}`);
+    hints.push(t('Dans un parallélogramme ABCD, AD⃗ = BC⃗ : D = A + BC⃗.'), `D = A + (C − B) = (${fq(A[0])} + □ ; ${fq(A[1])} + □)`, `D = ${vr(D)}`);
   }
   if (level === 5 || opts.exam) {
     // Problem: the vertices, the check AB⃗ = DC⃗, then w⃗ = αu⃗ + βv⃗.
@@ -125,14 +126,14 @@ function vecItem(level, rng, opts = {}) {
     const w = add(scale(u, al), scale(v, be));
     const sym2 = { A: vt(A), B: vt(B), C: vt(C), D: vt(D) };
     script.push(
-      { kind: 'segment', html: 'Vérifie que AB⃗ = DC⃗.', ask: 'AB⃗ =', start: { math: 'vec(D,C)' }, judge: { kind: 'vector', symbols: sym2 } },
-      { kind: 'eq', math: `vec(A,B) = ${vt(u)}`, subgoal: 'calc', note: 'Les deux vecteurs sont égaux' },
-      { kind: 'segment', html: `Écris w⃗ = ${vr(w)} comme combinaison αu⃗ + βv⃗ de u⃗ = AB⃗ = ${vr(u)} et v⃗ = AD⃗ = ${vr(v)}. Le système : ${readable(sumT([[u[0], 'α'], [v[0], 'β']]))} = ${fq(w[0])} et ${readable(sumT([[u[1], 'α'], [v[1], 'β']]))} = ${fq(w[1])}. Que vaut α ?`, ask: 'α =', start: { math: 'α' }, judge: { kind: 'value', expect: String(al) } },
-      { kind: 'eq', math: String(al), subgoal: 'sys', note: 'Par combinaison des deux équations' },
-      { kind: 'segment', html: 'Et β ?', ask: 'β =', start: { math: 'β' }, judge: { kind: 'value', expect: String(be) } },
+      { kind: 'segment', html: t('Vérifie que AB⃗ = DC⃗.'), ask: 'AB⃗ =', start: { math: 'vec(D,C)' }, judge: { kind: 'vector', symbols: sym2 } },
+      { kind: 'eq', math: `vec(A,B) = ${vt(u)}`, subgoal: 'calc', note: t('Les deux vecteurs sont égaux') },
+      { kind: 'segment', html: t('Écris w⃗ = {v1} comme combinaison αu⃗ + βv⃗ de u⃗ = AB⃗ = {v2} et v⃗ = AD⃗ = {v3}. Le système : {v4} = {v5} et {v6} = {v7}. Que vaut α ?', { v1: vr(w), v2: vr(u), v3: vr(v), v4: readable(sumT([[u[0], 'α'], [v[0], 'β']])), v5: fq(w[0]), v6: readable(sumT([[u[1], 'α'], [v[1], 'β']])), v7: fq(w[1]) }), ask: 'α =', start: { math: 'α' }, judge: { kind: 'value', expect: String(al) } },
+      { kind: 'eq', math: String(al), subgoal: 'sys', note: t('Par combinaison des deux équations') },
+      { kind: 'segment', html: t('Et β ?'), ask: 'β =', start: { math: 'β' }, judge: { kind: 'value', expect: String(be) } },
       { kind: 'eq', math: String(be), subgoal: 'sys', note: '' },
     );
-    prompt += ` Vérifie ensuite que AB⃗ = DC⃗, puis décompose un vecteur dans la base (AB⃗, AD⃗).`;
+    prompt += t(' Vérifie ensuite que AB⃗ = DC⃗, puis décompose un vecteur dans la base (AB⃗, AD⃗).');
   }
   return linesItem({
     skill: VEC, level, prompt, start: first.start, judge: first.judge, mode: modeOf(level), script,
@@ -148,8 +149,8 @@ function vecExam(rng, exam) {
     if (rng.int(0, 2) === 0) {
       return tfG({
         skill: VEC, key: 'mid-true', truth: true, exam: examTag({ exam }),
-        statement: 'M est le milieu de [AB] si et seulement si AM⃗ = MB⃗.',
-        explanation: 'Vrai : AM⃗ = MB⃗ ⇔ M − A = B − M ⇔ M = (A + B)/2.',
+        statement: t('M est le milieu de [AB] si et seulement si AM⃗ = MB⃗.'),
+        explanation: t('Vrai : AM⃗ = MB⃗ ⇔ M − A = B − M ⇔ M = (A + B)/2.'),
       });
     }
     // Four aligned points with AB⃗ = DC⃗ (the answer of the counter-example).
@@ -158,16 +159,16 @@ function vecExam(rng, exam) {
     const P = (x) => `(${x} ; ${2 * x - 1})`;
     return tfG({
       skill: VEC, key: `para:${a}:${k}`, truth: false, exam: examTag({ exam }),
-      statement: 'Si AB⃗ = DC⃗, alors ABCD est un parallélogramme (non aplati).',
+      statement: t('Si AB⃗ = DC⃗, alors ABCD est un parallélogramme (non aplati).'),
       counter: geoCounter('flatParallelogram', [['A', 'A ='], ['B', 'B ='], ['C', 'C ='], ['D', 'D =']], { A: P(a), B: P(a + k), C: P(a + 3 * k), D: P(a + 2 * k) }),
-      explanation: `Faux : quatre points alignés peuvent vérifier AB⃗ = DC⃗, par exemple A${P(a).replace(/-/g, '−')}, B${P(a + k).replace(/-/g, '−')}, C${P(a + 3 * k).replace(/-/g, '−')}, D${P(a + 2 * k).replace(/-/g, '−')} sur la droite y = 2x − 1. Il faut aussi que A, B, C ne soient pas alignés.`,
+      explanation: t('Faux : quatre points alignés peuvent vérifier AB⃗ = DC⃗, par exemple A{v1}, B{v2}, C{v3}, D{v4} sur la droite y = 2x − 1. Il faut aussi que A, B, C ne soient pas alignés.', { v1: P(a).replace(/-/g, '−'), v2: P(a + k).replace(/-/g, '−'), v3: P(a + 3 * k).replace(/-/g, '−'), v4: P(a + 2 * k).replace(/-/g, '−') }),
     });
   }
   const d = parallelogram(rng);
   const { A, B, C, M } = d;
   return mcqD({
     skill: VEC, level: 4, key: `mcq:${vt(A)}${vt(B)}${vt(M)}`, exam: examTag({ exam }),
-    prompt: `Le parallélogramme ABCD a pour sommets ${ptR('A', A)}, ${ptR('B', B)} et pour centre ${ptR('M', M)}. Quelles sont les coordonnées de C ?`,
+    prompt: t('Le parallélogramme ABCD a pour sommets {v1}, {v2} et pour centre {v3}. Quelles sont les coordonnées de C ?', { v1: ptR('A', A), v2: ptR('B', B), v3: ptR('M', M) }),
     right: vr(C),
     wrongs: [
       { html: vr(sub(M, A)), rule: 'g4_midpoint_half' },
@@ -176,7 +177,7 @@ function vecExam(rng, exam) {
       { html: vr(sub(scale(A, 2), M)), rule: 'g4_vector_reversed' },
     ],
     fillers: [{ html: vr(add(C, [q(1), q(0)])) }, { html: vr([C[1], C[0]]) }],
-    solution: [{ html: `M est le milieu de [AC] : C = 2M − A = ${vr(C)}.`, note: '' }],
+    solution: [{ html: t('M est le milieu de [AC] : C = 2M − A = {v1}.', { v1: vr(C) }), note: '' }],
     fallback: d.fallback,
   }, rng);
 }

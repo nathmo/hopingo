@@ -16,6 +16,7 @@ import { deriv } from '../../cas/ast.js';
 import { seedOf } from '../../cas/equiv.js';
 import { MT, linesItem, mcq, tfItem } from './kit.js';
 import { N, modeOf, H, E, examOf, uniqOptions, blanked, withMenus, segment, frN, vfMcq, mulT, fracT } from './analyse1-a-kit.js';
+import { t } from '../../i18n.js';
 
 const q = (n, d = 1) => new Q(n, d);
 
@@ -25,16 +26,16 @@ const q = (n, d = 1) => new Q(n, d);
 
 const INV = 'a1-deriv-inverse';
 const INV_SUB = [
-  { id: 'x0', label: 'trouver x₀ avec f(x₀) = y₀', skill: 'g1-inverse' },
-  { id: 'deriv', label: 'dériver f', skill: 'a1-deriv-rules' },
+  { id: 'x0', label: t('trouver x₀ avec f(x₀) = y₀'), skill: 'g1-inverse' },
+  { id: 'deriv', label: t('dériver f'), skill: 'a1-deriv-rules' },
   { id: 'inv', label: '(f⁻¹)′(y₀) = 1/f′(x₀)', skill: INV },
 ];
 const INV_CHOICES = [
-  { id: 'x0', label: 'Trouver x₀ avec f(x₀) = y₀' },
-  { id: 'deriv', label: 'Dériver f' },
-  { id: 'eval', label: 'Évaluer f′ en x₀' },
-  { id: 'invert', label: 'Inverser : (f⁻¹)′(y₀) = 1/f′(x₀)' },
-  { id: 'wrong', label: 'Évaluer f′ en y₀', rule: 'a1_inverse_deriv_wrong_point', why: 'f′ se prend en x₀ = f⁻¹(y₀), pas en y₀.' },
+  { id: 'x0', label: t('Trouver x₀ avec f(x₀) = y₀') },
+  { id: 'deriv', label: t('Dériver f') },
+  { id: 'eval', label: t('Évaluer f′ en x₀') },
+  { id: 'invert', label: t('Inverser : (f⁻¹)′(y₀) = 1/f′(x₀)') },
+  { id: 'wrong', label: t('Évaluer f′ en y₀'), rule: 'a1_inverse_deriv_wrong_point', why: t('f′ se prend en x₀ = f⁻¹(y₀), pas en y₀.') },
 ];
 
 // x₀ as text and value: whole numbers, multiples of π/2.
@@ -86,39 +87,39 @@ function invLines(level, rng, opts = {}) {
   const ans = q(1).div(d.fpx0);
   const exact = d.fam === 'sin' || d.fam === 'cos';
   const L0 = [E(d.x0, `f(${fr(d.x0)}) = ${fr(d.y0)}`, 'x0', 'x0')];
-  const L1 = [E(d.fp, 'Dériver f', 'deriv', 'deriv')];
-  const L2 = [E(d.fpAt(d.x0).replace(/\(\((.*?)\)\)/, '($1)'), 'Remplacer x par x₀', 'deriv', 'eval'), E(N(d.fpx0), 'Calculer', 'deriv', 'eval')];
+  const L1 = [E(d.fp, t('Dériver f'), 'deriv', 'deriv')];
+  const L2 = [E(d.fpAt(d.x0).replace(/\(\((.*?)\)\)/, '($1)'), t('Remplacer x par x₀'), 'deriv', 'eval'), E(N(d.fpx0), t('Calculer'), 'deriv', 'eval')];
   const L3 = [E(N(ans), `(f⁻¹)′(${fr(d.y0)}) = 1/f′(${fr(d.x0)})`, 'inv', 'invert')];
   const s0 = withMenus({ kind: 'value', expect: d.x0, form: exact ? 'exact' : 'irreducible' }, level, 'x_0', L0, INV_CHOICES);
   const s1 = withMenus({ kind: 'equiv', vars: ['x'], dvar: 'x', domain: { x: d.domain }, target: 'no-prime' }, level, toText(deriv(parse(d.f), 'x')), L1, INV_CHOICES);
   const s2 = withMenus({ kind: 'value', expect: N(d.fpx0) }, level, `f'(${d.x0})`, L2, INV_CHOICES);
   const s3 = withMenus({ kind: 'value', expect: N(ans), inv: { fp: d.fp, x0: d.x0, y0: d.y0 } }, level, `(f^(-1))'(${d.y0})`, L3, INV_CHOICES);
   const choose = {
-    kind: 'decision', prompt: `Quel x₀ vérifie f(x₀) = ${fr(d.y0)} ?`, options: uniqOptions([
+    kind: 'decision', prompt: t('Quel x₀ vérifie f(x₀) = {y0} ?', { y0: fr(d.y0) }), options: uniqOptions([
       { id: 'x0', html: d.x0, label: `x₀ = ${fr(d.x0)}`, valid: true },
-      { id: 'y0', html: d.y0, label: `x₀ = ${fr(d.y0)}`, valid: false, rule: 'a1_inverse_deriv_wrong_point', why: `f(${fr(d.y0)}) ≠ ${fr(d.y0)} : y₀ est la valeur, pas le point où l'on dérive.` },
+      { id: 'y0', html: d.y0, label: `x₀ = ${fr(d.y0)}`, valid: false, rule: 'a1_inverse_deriv_wrong_point', why: t('f({y0}) ≠ {y02} : y₀ est la valeur, pas le point où l\'on dérive.', { y0: fr(d.y0), y02: fr(d.y0) }) },
       { id: 'zero', html: '0', label: 'x₀ = 0', valid: false, why: `f(0) ≠ ${fr(d.y0)}.` },
     ]).filter((o) => o.id !== 'zero' || d.x0 !== '0'),
   };
   const script = [
     ...(level === 1 ? [{ kind: 'note', html: `f(${fr(d.x0)}) = ${fr(d.y0)}.` }] : level === 2 ? [choose] : []),
     ...L0,
-    segment('Dérive f.', 'f′(x) =', toText(deriv(parse(d.f), 'x')), s1),
+    segment(t('Dérive f.'), 'f′(x) =', toText(deriv(parse(d.f), 'x')), s1),
     ...L1,
-    segment(`Évalue f′ en x₀ = ${fr(d.x0)}.`, `f′(${fr(d.x0)}) =`, `f'(${d.x0})`, s2),
+    segment(t('Évalue f′ en x₀ = {x0}.', { x0: fr(d.x0) }), `f′(${fr(d.x0)}) =`, `f'(${d.x0})`, s2),
     ...(level === 1 ? [blanked(L2[0], [d.x0]), L2[1]] : L2),
-    segment('Conclus.', `(f⁻¹)′(${fr(d.y0)}) =`, `(f^(-1))'(${d.y0})`, s3),
+    segment(t('Conclus.'), `(f⁻¹)′(${fr(d.y0)}) =`, `(f^(-1))'(${d.y0})`, s3),
     ...L3,
   ];
   const key = `${INV}:${d.f}:${d.y0}:${level}`;
   return linesItem({
     skill: INV, level, prompt: rng.pick([
-      `Soit f(x) = ${MT(d.f)}, bijective de ℝ dans ℝ. Calcule (f⁻¹)′(${fr(d.y0)}).`,
-      `f(x) = ${MT(d.f)} est strictement croissante sur ℝ. Sans chercher la formule de f⁻¹, calcule la dérivée de f⁻¹ en ${fr(d.y0)}.`,
+      t('Soit f(x) = {f}, bijective de ℝ dans ℝ. Calcule (f⁻¹)′({y0}).', { f: MT(d.f), y0: fr(d.y0) }),
+      t('f(x) = {f} est strictement croissante sur ℝ. Sans chercher la formule de f⁻¹, calcule la dérivée de f⁻¹ en {y0}.', { f: MT(d.f), y0: fr(d.y0) }),
     ]),
     start: 'x_0', judge: s0, mode: modeOf(level), script, keys: ['calcx', 'calcfn', 'trig'], declares: { vars: ['x'] },
     subgoals: INV_SUB, tapActions: level === 3 ? 'steps' : null,
-    hints: H(`Cherche le x₀ dont l'image est ${fr(d.y0)} : c'est là qu'on dérive f.`, `(f⁻¹)′(${fr(d.y0)}) = 1/f′(□)`, `(f⁻¹)′(${fr(d.y0)}) = 1/f′(${fr(d.x0)}) = ${frN(ans)}`),
+    hints: H(t('Cherche le x₀ dont l\'image est {y0} : c\'est là qu\'on dérive f.', { y0: fr(d.y0) }), `(f⁻¹)′(${fr(d.y0)}) = 1/f′(□)`, `(f⁻¹)′(${fr(d.y0)}) = 1/f′(${fr(d.x0)}) = ${frN(ans)}`),
     key, exam: examOf(opts), fallback: d.fallback,
   });
 }
@@ -132,12 +133,12 @@ function invMcq(rng, opts) {
   if (d.fpy0 instanceof Q) options.push({ html: num(q(1).div(d.fpy0)), correct: false, rule: 'a1_inverse_deriv_wrong_point' });
   else options.push({ html: MT(`1/(${d.fpAt(d.y0)})`), correct: false, rule: 'a1_inverse_deriv_wrong_point' });
   options.push({ html: num(d.fpx0), correct: false, rule: 'g1_inverse_reciprocal' });
-  options.push({ html: `f⁻¹ n'est pas dérivable en ${fr(d.y0)}`, correct: false });
+  options.push({ html: t('f⁻¹ n\'est pas dérivable en {y0}', { y0: fr(d.y0) }), correct: false });
   options.push({ html: num(ans.neg()), correct: false });
   return mcq({
-    skill: INV, level: opts.exam ? 4 : 5, prompt: `Soit f(x) = ${MT(d.f)}, bijective de ℝ dans ℝ. Que vaut (f⁻¹)′(${fr(d.y0)}) ?`,
+    skill: INV, level: opts.exam ? 4 : 5, prompt: t('Soit f(x) = {f}, bijective de ℝ dans ℝ. Que vaut (f⁻¹)′({y0}) ?', { f: MT(d.f), y0: fr(d.y0) }),
     options: uniqOptions(options).slice(0, 4), key: `mcq:${d.f}:${d.y0}`, exam: examOf(opts), expectedSec: 240, fallback: d.fallback,
-    solution: [{ html: `f(${fr(d.x0)}) = ${fr(d.y0)}, f′(x) = ${MT(d.fp)}, f′(${fr(d.x0)}) = ${frN(d.fpx0)}, donc (f⁻¹)′(${fr(d.y0)}) = 1/f′(${fr(d.x0)}) = ${frN(ans)}.`, note: '' }],
+    solution: [{ html: t('f({x0}) = {y0}, f′(x) = {fp}, f′({x02}) = {fpx0}, donc (f⁻¹)′({y02}) = 1/f′({x03}) = {ans}.', { x0: fr(d.x0), y0: fr(d.y0), fp: MT(d.fp), x02: fr(d.x0), fpx0: frN(d.fpx0), y02: fr(d.y0), x03: fr(d.x0), ans: frN(ans) }), note: '' }],
   }, rng);
 }
 
@@ -147,9 +148,9 @@ const INV_TF = [
   { s: 'Si f est bijective, dérivable en x₀ avec f′(x₀) ≠ 0, et f⁻¹ continue en y₀ = f(x₀), alors (f⁻¹)′(y₀) = 1/f′(x₀).', truth: true, why: 'Vrai : c\'est le théorème de la dérivée de la réciproque.' },
 ];
 function invTf(rng) {
-  const t = rng.pick(INV_TF);
-  if (!t.truth) return vfMcq(INV, t.s, false, null, t.why, rng, t.s);
-  return tfItem({ skill: INV, level: 4, statement: t.s, truth: true, key: t.s, explanation: t.why, exam: { format: 'tf', points: 1 } });
+  const tf = rng.pick(INV_TF);
+  if (!tf.truth) return vfMcq(INV, t(tf.s), false, null, t(tf.why), rng, tf.s);
+  return tfItem({ skill: INV, level: 4, statement: t(tf.s), truth: true, key: tf.s, explanation: t(tf.why), exam: { format: 'tf', points: 1 } });
 }
 
 function derivInverse(level, rng, profile, opts = {}) {
@@ -165,16 +166,16 @@ function derivInverse(level, rng, profile, opts = {}) {
 const LOG = 'a1-deriv-log';
 const LOG_SUB = [
   { id: 'exp', label: 'u^v = e^(v·Log u)', skill: 'g2-real-powers' },
-  { id: 'deriv', label: 'dériver l\'exposant', skill: 'a1-deriv-rules' },
-  { id: 'eval', label: 'évaluer', skill: LOG },
+  { id: 'deriv', label: t('dériver l\'exposant'), skill: 'a1-deriv-rules' },
+  { id: 'eval', label: t('évaluer'), skill: LOG },
 ];
 const LOG_CHOICES = [
-  { id: 'exp', label: 'Écrire f = e^(v·Log u)' },
-  { id: 'deriv', label: 'Dériver l\'exposant (règle de chaîne)' },
-  { id: 'eval', label: 'Évaluer en x₀' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'base', label: '(aᵛ)′ = aᵛ·Log a·v′, avec a = u', rule: 'a1_exp_rule_var_base', why: 'La base u dépend de x : cette règle ne vaut que pour une base constante.' },
-  { id: 'power', label: '(xⁿ)′ = n·xⁿ⁻¹, avec n = v', rule: 'g6_power_rule_exp', why: 'L\'exposant dépend de x : la règle des puissances ne vaut que pour un exposant constant.' },
+  { id: 'exp', label: t('Écrire f = e^(v·Log u)') },
+  { id: 'deriv', label: t('Dériver l\'exposant (règle de chaîne)') },
+  { id: 'eval', label: t('Évaluer en x₀') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'base', label: t('(aᵛ)′ = aᵛ·Log a·v′, avec a = u'), rule: 'a1_exp_rule_var_base', why: t('La base u dépend de x : cette règle ne vaut que pour une base constante.') },
+  { id: 'power', label: t('(xⁿ)′ = n·xⁿ⁻¹, avec n = v'), rule: 'g6_power_rule_exp', why: t('L\'exposant dépend de x : la règle des puissances ne vaut que pour un exposant constant.') },
 ];
 
 // u and v: text, derivative, value at x₀ (whole numbers).
@@ -244,28 +245,28 @@ function logLines(level, rng, opts = {}) {
   const at = (t) => t.replace(/x/g, `(${d.x0})`).replace(/\(\((\d)\)\)/g, '($1)');
   const start = toText(deriv(parse(d.f), 'x'));
   const judge = { kind: 'equiv', vars: ['x'], dvar: 'x', domain: { x: [0.5, 2] }, target: 'no-prime' };
-  const expLine = E(`d(e^(${d.expo}))`, 'Forme exponentielle', 'exp', 'exp');
-  const dLine = E(d.fp, 'Dériver l\'exposant, puis revenir à f', 'deriv', 'deriv');
+  const expLine = E(`d(e^(${d.expo}))`, t('Forme exponentielle'), 'exp', 'exp');
+  const dLine = E(d.fp, t('Dériver l\'exposant, puis revenir à f'), 'deriv', 'deriv');
   const valStart = at(d.fp);
-  const vLines = [E(d.value, 'Évaluer et simplifier', 'eval', 'eval')];
+  const vLines = [E(d.value, t('Évaluer et simplifier'), 'eval', 'eval')];
   const lines1 = level === 1 ? [blanked(dLine, [d.vdl.includes(d.vdu) ? d.vdl : d.vdu])] : level === 2 ? [blanked(expLine, [d.expo]), blanked(dLine, [d.bracket])] : [expLine, dLine];
   const label = `f′(${d.x0})`;
   const script = [
-    ...(level === 1 ? [{ kind: 'note', html: `L'exposant dépend de x : f(x) = ${MT(`e^(${d.expo})`)}.` }] : []),
+    ...(level === 1 ? [{ kind: 'note', html: t('L\'exposant dépend de x : f(x) = {p1}.', { p1: MT(`e^(${d.expo})`) }) }] : []),
     ...lines1,
-    segment(`Calcule maintenant ${label}.`, `${label} =`, valStart, withMenus({ kind: 'definite' }, level, valStart, vLines, LOG_CHOICES)),
+    segment(t('Calcule maintenant {label}.', { label }), `${label} =`, valStart, withMenus({ kind: 'definite' }, level, valStart, vLines, LOG_CHOICES)),
     ...vLines,
   ];
   const key = `${LOG}:${d.f}:${d.x0}:${level}`;
   const s0 = withMenus({ ...judge, seed: seedOf(key) }, level, start, [expLine, dLine], LOG_CHOICES);
   return linesItem({
     skill: LOG, level, prompt: rng.pick([
-      `Soit f(x) = ${MT(d.f)}${d.u.t === 'x' ? ' (x > 0)' : ''}. Dérive f, puis calcule ${label}.`,
-      `Calcule la dérivée de f(x) = ${MT(d.f)}${d.u.t === 'x' ? ' sur ]0 ; +∞[' : ''}, puis sa valeur en ${d.x0}.`,
+      t('Soit f(x) = {f}{p1}. Dérive f, puis calcule {label}.', { f: MT(d.f), p1: d.u.t === 'x' ? ' (x > 0)' : '', label }),
+      t('Calcule la dérivée de f(x) = {f}{p1}, puis sa valeur en {x0}.', { f: MT(d.f), p1: d.u.t === 'x' ? t(' sur ]0 ; +∞[') : '', x0: d.x0 }),
     ]),
     start: level === 1 ? `d(e^(${d.expo}))` : start, judge: level === 1 ? { ...judge, seed: seedOf(key) } : s0, mode: modeOf(level), script,
     keys: ['calcx', 'calcfn', 'explog'], declares: { vars: ['x'], dvar: 'x' }, subgoals: LOG_SUB, tapActions: level === 3 ? 'steps' : null,
-    hints: H(`L'exposant dépend de x : écris f = ${MT(`e^(${d.expo})`)}, puis dérive avec la règle de chaîne.`, `f′ = f·(${MT(d.vdl)} + □)`, `f′(x) = ${MT(d.fp)} ; ${label} = ${MT(d.value)}`),
+    hints: H(t('L\'exposant dépend de x : écris f = {p1}, puis dérive avec la règle de chaîne.', { p1: MT(`e^(${d.expo})`) }), `f′ = f·(${MT(d.vdl)} + □)`, `f′(x) = ${MT(d.fp)} ; ${label} = ${MT(d.value)}`),
     key, exam: examOf(opts, opts.exam === 'open' ? 2 : 1), fallback: d.fallback,
   });
 }
@@ -298,7 +299,7 @@ function logMcq(rng, opts) {
     ...others.map((t) => ({ html: MT(t), correct: false })),
   ].filter((o, i) => i === 0 || o.html !== MT(d.value))).slice(0, 4);
   return mcq({
-    skill: LOG, level: 4, prompt: `Soit f(x) = ${MT(d.f)}. Que vaut f′(${x0}) ?`, options, key: `mcq:${d.f}:${x0}`,
+    skill: LOG, level: 4, prompt: t('Soit f(x) = {f}. Que vaut f′({x0}) ?', { f: MT(d.f), x0 }), options, key: `mcq:${d.f}:${x0}`,
     exam: examOf(opts), expectedSec: 240, fallback: d.fallback,
     solution: [{ html: `f = ${MT(`e^(${d.expo})`)}, f′(x) = ${MT(d.fp)}, f′(${x0}) = ${MT(d.value)}.`, note: '' }],
   }, rng);

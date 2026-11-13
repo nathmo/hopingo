@@ -24,6 +24,7 @@ import { PROPS as PF } from './a2-examples-f.js';
 import { PROPS as PG } from './a2-examples-g.js';
 import { PROPS as PH } from './a2-examples-h.js';
 import { PROPS as PI } from './a2-examples-i.js';
+import { t } from '../i18n.js';
 
 // The catalogue's library of counter-examples (A2, a2-diff-implications);
 // each is 0 at (0, 0) (K6: 2).
@@ -70,12 +71,12 @@ const SHARED = {
     const cfg = { eq: p.eq, v: p.v || 'x', unknown: p.unknown || 'y', domain: p.domain };
     const v = cfg.v;
     for (const k of ['y1', 'y2']) {
-      if (!String(ans[k] ?? '').trim()) return { ok: false, message: 'Donne deux solutions.' };
+      if (!String(ans[k] ?? '').trim()) return { ok: false, message: t('Donne deux solutions.') };
       let ok;
-      try { ok = solves(cfg, ans[k]); } catch { return { ok: false, message: `Je n'arrive pas à lire ${k === 'y1' ? 'la 1re' : 'la 2e'} solution.` }; }
-      if (!ok) return { ok: false, message: `${ans[k]} n'est pas une solution de l'équation.` };
+      try { ok = solves(cfg, ans[k]); } catch { return { ok: false, message: k === 'y1' ? t('Je n\'arrive pas à lire la 1re solution.') : t('Je n\'arrive pas à lire la 2e solution.') }; }
+      if (!ok) return { ok: false, message: t('{y} n\'est pas une solution de l\'équation.', { y: ans[k] }) };
       const at = evalFloat(parse(ans[k], { vars: [v] }), { [v]: Number(p.ic.x) });
-      if (!(Math.abs(at - Number(p.ic.y)) < 1e-9)) return { ok: false, message: `${ans[k]} ne vérifie pas la condition initiale.` };
+      if (!(Math.abs(at - Number(p.ic.y)) < 1e-9)) return { ok: false, message: t('{y} ne vérifie pas la condition initiale.', { y: ans[k] }) };
     }
     const [lo, hi] = p.domain?.[v] || [-2, 2];
     const f1 = parse(ans.y1, { vars: [v] });
@@ -86,14 +87,14 @@ const SHARED = {
       const b = evalFloat(f2, { [v]: x });
       if (Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) > 1e-6) return { ok: true };
     }
-    return { ok: false, message: 'Tes deux solutions sont la même fonction.' };
+    return { ok: false, message: t('Tes deux solutions sont la même fonction.') };
   },
   knownFn: (p, ans) => {
     const f = String(ans.f ?? '').trim();
-    if (!f) return { ok: false, message: 'Donne une fonction f(x, y).' };
+    if (!f) return { ok: false, message: t('Donne une fonction f(x, y).') };
     const hit = (p.want || []).find((k) => sameFn(f, K_LIBRARY[k], { scale: p.scale ?? true, shift: p.shift ?? false }));
     if (hit) return { ok: true, which: hit };
-    return { ok: false, message: p.why || 'Je ne reconnais pas un contre-exemple qui convient : pense aux fonctions du cours (xy/(x² + y²), x²y/(x⁴ + y²)…).' };
+    return { ok: false, message: p.why || t('Je ne reconnais pas un contre-exemple qui convient : pense aux fonctions du cours (xy/(x² + y²), x²y/(x⁴ + y²)…).') };
   },
 };
 
@@ -101,6 +102,6 @@ export const PROPS = { ...SHARED, ...PA, ...PB, ...PC, ...PD, ...PE, ...PF, ...P
 
 export function checkA2(counter, answers) {
   const f = PROPS[counter.prop];
-  if (!f) return { ok: false, message: 'Contre-exemple non vérifiable.' };
-  try { return f(counter.params || {}, answers || {}); } catch { return { ok: false, message: 'Je n\'arrive pas à lire ton contre-exemple.' }; }
+  if (!f) return { ok: false, message: t('Contre-exemple non vérifiable.') };
+  try { return f(counter.params || {}, answers || {}); } catch { return { ok: false, message: t('Je n\'arrive pas à lire ton contre-exemple.') }; }
 }

@@ -26,6 +26,7 @@ import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine } from './common.js';
 // Step U4 (G8): loci of the complex plane, cfg.mode 'locus' (js/judges/locus.js).
 import * as LOCUS from './locus.js';
+import { t as tr } from '../i18n.js';
 
 const V = (cfg) => cfg.v || 'x';
 
@@ -163,13 +164,13 @@ function isValuesLine(node, cfg) {
 
 function judgeIdentity(cfg, prev, node) {
   const eqs = equationsOf(node, cfg);
-  if (!eqs) return { kind: 'parse', node, message: 'Écris une égalité (ou plusieurs, séparées par « ; »).' };
+  if (!eqs) return { kind: 'parse', node, message: tr('Écris une égalité (ou plusieurs, séparées par « ; »).') };
   const sol = solutionPolys(cfg);
   const bad = eqs.find((e) => !subst(e, sol).isZero);
-  if (bad) return { kind: 'wrong', node, rule: null, message: 'Cette ligne n\'est pas une conséquence de l\'identité : vérifie le développement et les coefficients.' };
+  if (bad) return { kind: 'wrong', node, rule: null, message: tr('Cette ligne n\'est pas une conséquence de l\'identité : vérifie le développement et les coefficients.') };
   const rank = linearRank(eqs, cfg.params || []);
   if (rank !== null && rank < (cfg.params || []).length) {
-    return { kind: 'stay', node, message: `C'est juste, mais il manque des équations : ta ligne ne fixe pas ${(cfg.params || []).join(', ')}.` };
+    return { kind: 'stay', node, message: tr('C\'est juste, mais il manque des équations : ta ligne ne fixe pas {params}.', { params: (cfg.params || []).join(', ') }) };
   }
   if (isValuesLine(node, cfg)) return { kind: 'done', node };
   return { kind: 'ok', node };
@@ -194,7 +195,7 @@ function factoredR(expr, cfg) {
     if (f.node.t !== 'sym' && !isExpanded(f.node, v)) return false;
     keys.push(p.scale(new Q(1).div(cs[d])).canon());
   }
-  if (new Set(keys).size < keys.length) return 'Regroupe les facteurs égaux en une puissance, par exemple (x − 1)².';
+  if (new Set(keys).size < keys.length) return tr('Regroupe les facteurs égaux en une puissance, par exemple (x − 1)².');
   return factors.length > 1 || factors.some((f) => f.k > 1) || degree(polyOf(expr, { complex: cfg.complex }), v) <= 2;
 }
 
@@ -214,7 +215,7 @@ function monic(expr, cfg) {
   const p = polyOf(expr, { complex: cfg.complex });
   if (!p) return false;
   const l = leadCoeff(p, v);
-  if (!l?.isConst || !l.constValue().eq(1)) return 'Rends-le unitaire : divise par son coefficient dominant.';
+  if (!l?.isConst || !l.constValue().eq(1)) return tr('Rends-le unitaire : divise par son coefficient dominant.');
   const { coef, factors } = productFactors(expr);
   if (factors.length <= 1 && coef.eq(1)) return isExpanded(expr, v) || factors.length === 1;
   return coef.eq(1);
@@ -259,11 +260,11 @@ export function judgeLine(cfg, prev, input) {
   const read = readLine({ ...cfg, vars: [V(cfg)], params: [...(cfg.params || []), ...Object.keys(cfg.names || {}), 'P', 'Q', 'R', 'A', 'B', 'D'] }, input);
   if (read.error) return read.error;
   const { node } = read;
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   if ((cfg.mode || 'same') === 'identity') return judgeIdentity(cfg, prev, node);
   const v = V(cfg);
   const pl = polyLine(node, cfg);
-  if (!pl) return { kind: 'parse', node, message: `Écris un polynôme en ${v}.` };
+  if (!pl) return { kind: 'parse', node, message: tr('Écris un polynôme en {v}.', { v }) };
   const pp = cfg.mode === 'div' ? prep(cfg).dividend : polyLine(prev, cfg);
   const same = (a, b) => (cfg.mode === 'monic' ? proportional(a, b, v) : a.equals(b));
   if (!pp || !same(pl, pp)) {
@@ -274,7 +275,7 @@ export function judgeLine(cfg, prev, input) {
     };
     const diag = diagnoseLine('poly', prev, node, cfg, eq);
     const w = pp ? witness(pp, pl, v) : null;
-    const message = w ? `En ${v} = ${fmt(w.x)}, la ligne précédente vaut ${fmt(w.ya)}, mais ta ligne vaut ${fmt(w.yb)}.` : 'Ta ligne n\'est pas égale à la précédente.';
+    const message = w ? tr('En {v} = {x}, la ligne précédente vaut {ya}, mais ta ligne vaut {yb}.', { v, x: fmt(w.x), ya: fmt(w.ya), yb: fmt(w.yb) }) : tr('Ta ligne n\'est pas égale à la précédente.');
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   if (cfg.mode === 'div') {
@@ -282,11 +283,11 @@ export function judgeLine(cfg, prev, input) {
     if (!split || !split.hasB) return { kind: 'ok', node };
     const dB = degree(prep(cfg).divisor, v);
     if (degree(split.r, v) < dB) return { kind: 'done', node, q: split.q, r: split.r };
-    return { kind: 'ok', node, note: 'Le reste a encore un degré ≥ deg B : continue.' };
+    return { kind: 'ok', node, note: tr('Le reste a encore un degré ≥ deg B : continue.') };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais : ${fin}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais : {fin}', { fin }) };
   return { kind: 'ok', node };
 }
 

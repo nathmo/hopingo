@@ -17,6 +17,7 @@ import { parse } from '../parse.js';
 import { toText, toReadable } from '../print.js';
 import { stripParen, mapNode } from '../ast.js';
 import { evalFloat } from '../numeric.js';
+import { t } from '../../i18n.js';
 
 const fr = (x) => String(Number(x.toFixed(2))).replace('.', ',').replace('-', '−');
 
@@ -46,19 +47,21 @@ const rename = (node, a, b) => mapNode(node, (n) => (n.t === 'sym' && !n.sub && 
 
 export const DEFS = {
   a2_symmetry_wrong: {
-    name: 'Symétrie sur un domaine qui n\'est pas symétrique',
+    name: t('Symétrie sur un domaine qui n\'est pas symétrique'),
     judges: [],
     wrongValues: () => [{ value: '0' }],
     explain: (ctx = {}) => (ctx.f
-      ? `${ctx.f} est impaire en ${ctx.v}, mais D va de ${ctx.a} à ${ctx.b} en ${ctx.v} : ce n'est pas symétrique.`
-      : 'Une fonction impaire en y ne donne 0 que si le domaine est symétrique par rapport à y = 0 : les deux conditions sont nécessaires.'),
+      ? t('{f} est impaire en {v}, mais D va de {a} à {b} en {v} : ce n\'est pas symétrique.', { f: ctx.f, v: ctx.v, a: ctx.a, b: ctx.b })
+      : t('Une fonction impaire en y ne donne 0 que si le domaine est symétrique par rapport à y = 0 : les deux conditions sont nécessaires.')),
     check: { bait: { skill: 'a2-fubini-rect', exam: 'tf' } },
   },
 
   a2_fubini_outer_var: {
-    name: 'Borne extérieure qui dépend de la variable intérieure',
+    name: t('Borne extérieure qui dépend de la variable intérieure'),
     judges: ['domain'],
-    explain: (ctx = {}) => `L'intégrale extérieure doit donner un nombre : ses bornes ne peuvent pas dépendre de ${ctx.v || 'la variable intérieure'}.`,
+    explain: (ctx = {}) => (ctx.v
+      ? t('L\'intégrale extérieure doit donner un nombre : ses bornes ne peuvent pas dépendre de {v}.', { v: ctx.v })
+      : t('L\'intégrale extérieure doit donner un nombre : ses bornes ne peuvent pas dépendre de la variable intérieure.')),
     check: {
       judge: { kind: 'domain', coords: 'cart', vars: ['x', 'y'], region: ['y ≥ x^2', 'y ≤ 2x'], box: [[-0.5, 2.5], [-0.5, 4.5]], order: ['y', 'x'], shape: 'typeII' },
       prev: '0 ≤ x ≤ 2 ; x^2 ≤ y ≤ 2x',
@@ -68,7 +71,7 @@ export const DEFS = {
 
   // The order changed by renaming: x ↔ y in every bound.
   a2_fubini_swap_same: {
-    name: 'Ordre changé en renommant les variables',
+    name: t('Ordre changé en renommant les variables'),
     judges: ['domain'],
     transform: (prev, ctx = {}) => {
       const cs = chains(prev);
@@ -79,8 +82,8 @@ export const DEFS = {
       return [{ node: rename(lineOf(cs), a, b), ctx: c }];
     },
     explain: (ctx = {}) => (ctx.a
-      ? `Renommer ne suffit pas : dessine D. Pour ${ctx.v === 'x' ? 'x' : 'y'} fixé, ${ctx.v === 'x' ? 'y' : 'x'} va de ${ctx.a} à ${ctx.b}.`
-      : 'Renommer les variables ne suffit pas : dessine D, puis lis ses bornes dans l\'autre ordre.'),
+      ? t('Renommer ne suffit pas : dessine D. Pour {u} fixé, {w} va de {a} à {b}.', { u: ctx.v === 'x' ? 'x' : 'y', w: ctx.v === 'x' ? 'y' : 'x', a: ctx.a, b: ctx.b })
+      : t('Renommer les variables ne suffit pas : dessine D, puis lis ses bornes dans l\'autre ordre.')),
     check: {
       judge: { kind: 'domain', coords: 'cart', vars: ['x', 'y'], region: ['y ≥ x^2', 'y ≤ 1', 'x ≥ 0'], box: [[-0.3, 1.3], [-0.3, 1.3]], order: ['y', 'x'], shape: 'typeII', answers: ['0 ≤ y ≤ 1 ; 0 ≤ x ≤ √y'] },
       prev: '0 ≤ x ≤ 1 ; x^2 ≤ y ≤ 1',
@@ -91,7 +94,7 @@ export const DEFS = {
   // The lower and upper curves swapped (the right descriptions first, so
   // that the explanation names their curves, then the previous line).
   a2_domain_curve_order: {
-    name: 'Courbes du haut et du bas inversées',
+    name: t('Courbes du haut et du bas inversées'),
     judges: ['domain'],
     transform: (prev, ctx = {}) => {
       const out = [];
@@ -109,8 +112,10 @@ export const DEFS = {
       return out;
     },
     explain: (ctx = {}) => (ctx.haut
-      ? `Entre ${ctx['x₁']} et ${ctx['x₂']}, ${ctx.haut} est au-dessus de ${ctx.bas} : la borne du bas est ${ctx.bas}.${ctx.xt ? ` Teste ${ctx.xt}.` : ''}`
-      : 'Les bornes intérieures sont inversées : en bas la courbe du dessous, en haut celle du dessus. Teste une valeur de la variable extérieure.'),
+      ? (ctx.xt
+        ? t('Entre {x1} et {x2}, {haut} est au-dessus de {bas} : la borne du bas est {bas}. Teste {xt}.', { x1: ctx['x₁'], x2: ctx['x₂'], haut: ctx.haut, bas: ctx.bas, xt: ctx.xt })
+        : t('Entre {x1} et {x2}, {haut} est au-dessus de {bas} : la borne du bas est {bas}.', { x1: ctx['x₁'], x2: ctx['x₂'], haut: ctx.haut, bas: ctx.bas }))
+      : t('Les bornes intérieures sont inversées : en bas la courbe du dessous, en haut celle du dessus. Teste une valeur de la variable extérieure.')),
     check: {
       judge: { kind: 'domain', coords: 'cart', vars: ['x', 'y'], region: ['y ≥ x^2', 'y ≤ 2x'], box: [[-0.5, 2.5], [-0.5, 4.5]], order: ['x', 'y'], shape: 'typeI', answers: ['0 ≤ x ≤ 2 ; x^2 ≤ y ≤ 2x'] },
       prev: 'y ≥ x^2 ; y ≤ 2x',
@@ -121,7 +126,7 @@ export const DEFS = {
   // |det J_G| = 1/|det ∂(u, v)/∂(x, y)|: the factor written without its
   // inverse (the J line of an equiv part, or the rewritten integral).
   a2_jacobian_inverse: {
-    name: 'Jacobien de la réciproque pas inversé',
+    name: t('Jacobien de la réciproque pas inversé'),
     judges: ['equiv', 'definite'],
     transform: (prev, ctx = {}) => {
       const cv = ctx.cfg?.cv;
@@ -131,8 +136,8 @@ export const DEFS = {
       return [{ node: { t: 'frac', n: parse('1'), d: { t: 'paren', e: prev } }, ctx: c }, { node: parse(cv.jac), ctx: c }];
     },
     explain: (ctx = {}) => (ctx.J
-      ? `Tu as calculé ∂(u, v)/∂(x, y) = ${ctx.J}. La formule demande l'inverse : dx dy = du dv/|${ctx.J}|.`
-      : 'Le jacobien ∂(u, v)/∂(x, y) est celui de G⁻¹. La formule demande celui de G, son inverse : dx dy = du dv/|∂(u, v)/∂(x, y)|.'),
+      ? t('Tu as calculé ∂(u, v)/∂(x, y) = {J}. La formule demande l\'inverse : dx dy = du dv/|{J}|.', { J: ctx.J })
+      : t('Le jacobien ∂(u, v)/∂(x, y) est celui de G⁻¹. La formule demande celui de G, son inverse : dx dy = du dv/|∂(u, v)/∂(x, y)|.')),
     check: {
       judge: { kind: 'equiv', vars: ['x', 'y', 'u', 'v', 'J'], subst: { u: 'x y', v: 'y/x', J: 'x/(2y)' }, domain: { x: [0.5, 2], y: [0.5, 2] }, cv: { jac: '2v' } },
       prev: 'J',
@@ -141,7 +146,7 @@ export const DEFS = {
   },
 
   a2_changevar_domain_direction: {
-    name: 'D̃ = G(D) au lieu de G⁻¹(D)',
+    name: t('D̃ = G(D) au lieu de G⁻¹(D)'),
     judges: [],
     wrongValues: () => [{ value: 'G(D)' }],
     check: { bait: { skill: 'a2-change-var', exam: 'mcq' } },

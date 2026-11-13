@@ -24,12 +24,13 @@
 import { linesItem, mcq, examTag } from './kit.js';
 import { refCode, codeItem, holesFor, readtableItem, multiMcq, blankBy, PRELUDE_VEC, SIG_VEC } from './numerique-kit.js';
 import { q, qd, qR, qi, pEval, pInt, pText, quadQ, H, etraps } from './numerique-e-kit.js';
+import { t, tn } from '../../i18n.js';
 
 const QC = 'n-quad-composite';
 const RI = 'n-richardson';
 const KEYS = ['calc'];
 
-const NAMES = { rect: 'rectangle à gauche', mid: 'point milieu', trap: 'trapèze', simp: 'Simpson' };
+const NAMES = { rect: t('rectangle à gauche'), mid: t('point milieu'), trap: t('trapèze'), simp: 'Simpson' };
 const FORMULA = {
   rect: 'h·Σ f(xᵢ₋₁)',
   mid: 'h·Σ f(cᵢ)',
@@ -42,7 +43,7 @@ const FORMULA = {
 const small = (x, d = 48) => Math.abs(q(x).d) <= d;
 
 function compData(rng, { ns = [1, 2], k = [2, 3, 4] } = {}) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const deg = rng.pick(k);
     const cs = Array(deg + 1).fill(0);
     cs[deg] = rng.pick([1, 1, 2, -1, 3]);
@@ -113,7 +114,7 @@ function formulaLines(d, m) {
 
 const nodesNote = (d) => {
   const cl = cells(d);
-  return `h = ${qR(d.h)} ; nœuds ${[cl[0].x0, ...cl.map((c) => c.x1)].map(qR).join(' ; ')} ; milieux ${cl.map((c) => qR(c.c)).join(' ; ')}`;
+  return t('h = {h} ; nœuds {nodes} ; milieux {mids}', { h: qR(d.h), nodes: [cl[0].x0, ...cl.map((c) => c.x1)].map(qR).join(' ; '), mids: cl.map((c) => qR(c.c)).join(' ; ') });
 };
 
 // The wrong values of the traps for a formula.
@@ -129,10 +130,10 @@ function compTraps(d, m) {
 }
 
 const SUB_C = [
-  { id: 'nodes', label: 'nœuds et pas h', skill: 'g5-sigma' },
-  { id: 'sum', label: 'somme sur chaque sous-intervalle', skill: QC },
-  { id: 'total', label: 'total', skill: QC },
-  { id: 'exact', label: 'intégrale exacte', skill: 'a1-int-direct' },
+  { id: 'nodes', label: t('nœuds et pas h'), skill: 'g5-sigma' },
+  { id: 'sum', label: t('somme sur chaque sous-intervalle'), skill: QC },
+  { id: 'total', label: t('total'), skill: QC },
+  { id: 'exact', label: t('intégrale exacte'), skill: 'a1-int-direct' },
 ];
 
 function compScript(d, m, { blanks = null } = {}) {
@@ -142,8 +143,8 @@ function compScript(d, m, { blanks = null } = {}) {
   if (blanks === 'one') Object.assign(firstLine, blankBy(L.first, m === 'simp' ? [L.w, qi(L.cl[0].fc)] : m === 'trap' ? [L.w] : [L.w]));
   if (blanks === 'weights') Object.assign(firstLine, blankBy(L.first, L.groups ? L.groups.map(() => L.w) : [L.w]));
   script.push(firstLine);
-  if (L.groups) script.push({ kind: 'eq', math: sumT(L.groups), note: 'Chaque sous-intervalle', subgoal: 'sum' });
-  const last = { kind: 'eq', math: qd(L.value), note: 'Total', subgoal: 'total' };
+  if (L.groups) script.push({ kind: 'eq', math: sumT(L.groups), note: t('Chaque sous-intervalle'), subgoal: 'sum' });
+  const last = { kind: 'eq', math: qd(L.value), note: t('Total'), subgoal: 'total' };
   if (blanks) Object.assign(last, blankBy(last.math, [last.math]));
   script.push(last);
   return script;
@@ -157,22 +158,26 @@ function compLines(rng, level) {
   let script;
   if (level === 3) {
     const opts = m === 'simp' ? [
-      { id: 'h6', label: '(h/6)·(f(xᵢ₋₁) + 4f(cᵢ) + f(xᵢ)), h = longueur d\'un sous-intervalle', valid: true, ref: true },
-      { id: 'h3', label: '(h/3)·(f(xᵢ₋₁) + 4f(cᵢ) + f(xᵢ)), h = longueur d\'un sous-intervalle', valid: false, rule: 'n_simpson_h3_h6', why: 'Avec h la longueur du sous-intervalle, le poids est h/6 : h/3 vaut quand h est la distance de xᵢ₋₁ au milieu.' },
-      { id: 'eq', label: '(h/3)·(f(xᵢ₋₁) + f(cᵢ) + f(xᵢ))', valid: false, why: 'Le milieu pèse 4 fois plus que les bords : poids 1, 4, 1.' },
+      { id: 'h6', label: t('(h/6)·(f(xᵢ₋₁) + 4f(cᵢ) + f(xᵢ)), h = longueur d\'un sous-intervalle'), valid: true, ref: true },
+      { id: 'h3', label: t('(h/3)·(f(xᵢ₋₁) + 4f(cᵢ) + f(xᵢ)), h = longueur d\'un sous-intervalle'), valid: false, rule: 'n_simpson_h3_h6', why: t('Avec h la longueur du sous-intervalle, le poids est h/6 : h/3 vaut quand h est la distance de xᵢ₋₁ au milieu.') },
+      { id: 'eq', label: '(h/3)·(f(xᵢ₋₁) + f(cᵢ) + f(xᵢ))', valid: false, why: t('Le milieu pèse 4 fois plus que les bords : poids 1, 4, 1.') },
     ] : [
-      { id: 'h2', label: '(h/2)·(f(xᵢ₋₁) + f(xᵢ)) sur chaque sous-intervalle', valid: true, ref: true },
-      { id: 'h', label: 'h·(f(x₀) + f(x₁) + … + f(xₙ))', valid: false, rule: 'n_trap_weights', why: 'Les extrémités a et b n\'appartiennent qu\'à un seul trapèze : poids h/2.' },
-      { id: 'mid', label: 'h·f(cᵢ) sur chaque sous-intervalle', valid: false, why: 'C\'est le point milieu, pas le trapèze.' },
+      { id: 'h2', label: t('(h/2)·(f(xᵢ₋₁) + f(xᵢ)) sur chaque sous-intervalle'), valid: true, ref: true },
+      { id: 'h', label: 'h·(f(x₀) + f(x₁) + … + f(xₙ))', valid: false, rule: 'n_trap_weights', why: t('Les extrémités a et b n\'appartiennent qu\'à un seul trapèze : poids h/2.') },
+      { id: 'mid', label: t('h·f(cᵢ) sur chaque sous-intervalle'), valid: false, why: t('C\'est le point milieu, pas le trapèze.') },
     ];
-    script = [{ kind: 'decision', prompt: `Quelle formule pour la méthode ${m === 'simp' ? 'de Simpson' : 'du trapèze'} ?`, options: opts }, ...compScript(d, m)];
+    script = [{ kind: 'decision', prompt: m === 'simp' ? t('Quelle formule pour la méthode de Simpson ?') : t('Quelle formule pour la méthode du trapèze ?'), options: opts }, ...compScript(d, m)];
   } else script = compScript(d, m, { blanks: level === 1 ? 'one' : level === 2 ? 'weights' : null });
   const c0 = L.cl[0];
   return linesItem({
     skill: QC, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', keys: KEYS,
-    prompt: `Approche ∫ de ${R0(d.a)} à ${R0(d.b)} de ${fT(d)} par la formule ${m === 'simp' ? 'de Simpson' : m === 'trap' ? 'du trapèze' : 'du point milieu'} composite avec n = ${d.n} sous-intervalle${d.n > 1 ? 's' : ''}.`,
+    prompt: m === 'simp'
+      ? tn(d.n, 'Approche ∫ de {a} à {b} de {f} par la formule de Simpson composite avec n = {n} sous-intervalle.', 'Approche ∫ de {a} à {b} de {f} par la formule de Simpson composite avec n = {n} sous-intervalles.', { a: R0(d.a), b: R0(d.b), f: fT(d) })
+      : m === 'trap'
+        ? tn(d.n, 'Approche ∫ de {a} à {b} de {f} par la formule du trapèze composite avec n = {n} sous-intervalle.', 'Approche ∫ de {a} à {b} de {f} par la formule du trapèze composite avec n = {n} sous-intervalles.', { a: R0(d.a), b: R0(d.b), f: fT(d) })
+        : tn(d.n, 'Approche ∫ de {a} à {b} de {f} par la formule du point milieu composite avec n = {n} sous-intervalle.', 'Approche ∫ de {a} à {b} de {f} par la formule du point milieu composite avec n = {n} sous-intervalles.', { a: R0(d.a), b: R0(d.b), f: fT(d) }),
     start: 'Q_h', judge, script,
-    hints: H(m === 'simp' ? 'Simpson, sur chaque sous-intervalle de longueur h : (h/6)·(gauche + 4·milieu + droite).' : m === 'trap' ? 'Trapèze, sur chaque sous-intervalle de longueur h : (h/2)·(gauche + droite).' : 'Point milieu : h fois la somme des valeurs aux milieux cᵢ.',
+    hints: H(m === 'simp' ? t('Simpson, sur chaque sous-intervalle de longueur h : (h/6)·(gauche + 4·milieu + droite).') : m === 'trap' ? t('Trapèze, sur chaque sous-intervalle de longueur h : (h/2)·(gauche + droite).') : t('Point milieu : h fois la somme des valeurs aux milieux cᵢ.'),
       m === 'simp' ? `(${qR(L.W)})·(f(${qR(c0.x0)}) + 4f(□) + f(${qR(c0.x1)}))` : `h = (b − a)/n = □`,
       `${R0(L.first)} = ${qR(L.value)}`),
     subgoals: SUB_C, key: `${QC}:${level}:${m}:${d.cs.join(',')}:${d.a}:${d.b}:${d.n}`, fallback: d.fallback,
@@ -192,13 +197,13 @@ function compAll(rng) {
     else segs.push({ judge, sc, m });
   });
   const [s0, ...rest] = segs;
-  const script = [{ kind: 'note', html: `${nodesNote(d)}. ${NAMES.rect} :` }, ...s0.sc];
-  for (const s of rest) script.push({ kind: 'segment', html: `Formule ${s.m === 'simp' ? 'de Simpson' : s.m === 'trap' ? 'du trapèze' : 'du point milieu'} :`, ask: `${{ mid: 'M', trap: 'T', simp: 'S' }[s.m]} =`, start: { math: { mid: 'M', trap: 'T', simp: 'S' }[s.m] }, judge: s.judge }, ...s.sc);
+  const script = [{ kind: 'note', html: t('{nodes}. rectangle à gauche :', { nodes: nodesNote(d) }) }, ...s0.sc];
+  for (const s of rest) script.push({ kind: 'segment', html: s.m === 'simp' ? t('Formule de Simpson :') : s.m === 'trap' ? t('Formule du trapèze :') : t('Formule du point milieu :'), ask: `${{ mid: 'M', trap: 'T', simp: 'S' }[s.m]} =`, start: { math: { mid: 'M', trap: 'T', simp: 'S' }[s.m] }, judge: s.judge }, ...s.sc);
   return linesItem({
     skill: QC, level: 4, mode: 'free', keys: KEYS,
-    prompt: `Calcule ∫ de ${R0(d.a)} à ${R0(d.b)} de ${fT(d)} avec n = 2 par les quatre formules composites : rectangle à gauche (R), point milieu (M), trapèze (T), Simpson (S). La valeur exacte est ${qR(d.I)}.`,
+    prompt: t('Calcule ∫ de {a} à {b} de {f} avec n = 2 par les quatre formules composites : rectangle à gauche (R), point milieu (M), trapèze (T), Simpson (S). La valeur exacte est {I}.', { a: R0(d.a), b: R0(d.b), f: fT(d), I: qR(d.I) }),
     start: 'R', judge: s0.judge, script,
-    hints: H('h = (b − a)/n ; rectangle : h·f(gauche), point milieu : h·f(milieu), trapèze : (h/2)(gauche + droite), Simpson : (h/6)(gauche + 4 milieu + droite).',
+    hints: H(t('h = (b − a)/n ; rectangle : h·f(gauche), point milieu : h·f(milieu), trapèze : (h/2)(gauche + droite), Simpson : (h/6)(gauche + 4 milieu + droite).'),
       `R = ${qR(d.h)}·(f(${qR(d.a)}) + f(□))`,
       `R = ${qR(d.vals.rect)}, M = ${qR(d.vals.mid)}, T = ${qR(d.vals.trap)}, S = ${qR(d.vals.simp)}`),
     subgoals: SUB_C, key: `${QC}:4:${d.cs.join(',')}:${d.a}:${d.b}`, fallback: d.fallback,
@@ -252,24 +257,24 @@ function compCode(rng) {
   });
   const question = multiMcq({
     skill: QC, level: 5, key: `${QC}:readexact`,
-    prompt: 'Que montre ce tableau ?',
+    prompt: t('Que montre ce tableau ?'),
     options: [
-      { html: 'Simpson intègre exactement x² et x³', correct: true },
-      { html: 'Simpson n\'est pas exacte sur x⁴', correct: true },
-      { html: 'Simpson est exacte sur tous les polynômes', correct: false },
-      { html: 'Le poids h/3 donnerait les mêmes valeurs', correct: false, rule: 'n_simpson_h3_h6' },
+      { html: t('Simpson intègre exactement x² et x³'), correct: true },
+      { html: t('Simpson n\'est pas exacte sur x⁴'), correct: true },
+      { html: t('Simpson est exacte sur tous les polynômes'), correct: false },
+      { html: t('Le poids h/3 donnerait les mêmes valeurs'), correct: false, rule: 'n_simpson_h3_h6' },
     ],
-    solution: [{ html: 'Simpson est exacte sur P₃ (degré d\'exactitude 3), pas sur x⁴ : 20/3 ≠ 32/5.', note: '' }],
+    solution: [{ html: t('Simpson est exacte sur P₃ (degré d\'exactitude 3), pas sur x⁴ : 20/3 ≠ 32/5.'), note: '' }],
   }, rng);
   const then = readtableItem({
     skill: QC, level: 5, key: 'exact',
-    prompt: 'Avec ton programme, simpson(g, 0, 2, 2) pour g(x) = x², x³ et x⁴ donne :',
+    prompt: t('Avec ton programme, simpson(g, 0, 2, 2) pour g(x) = x², x³ et x⁴ donne :'),
     table: { columns: ['g', 'simpson(g, 0, 2, 2)', '∫₀² g'], rows },
     question,
   });
   return codeItem({
     skill: QC, level: 5, ref: COMP, blanks: holesFor(5, COMP), traps: COMP_TRAPS, rng,
-    prompt: 'Complète les trois formules composites (h est la longueur d\'un sous-intervalle, c son milieu).',
+    prompt: t('Complète les trois formules composites (h est la longueur d\'un sous-intervalle, c son milieu).'),
     tests: COMP_TESTS, then, hints: [], subgoals: SUB_C, key: '5',
   });
 }
@@ -294,7 +299,9 @@ function compMcq(rng, opts) {
   }
   return mcq({
     skill: QC, level: 4, key: `${QC}:mcq:${m}:${d.cs.join(',')}:${d.a}:${d.b}`, exam: examTag(opts),
-    prompt: `Que vaut la formule ${m === 'simp' ? 'de Simpson' : 'du trapèze'} composite pour ∫ de ${R0(d.a)} à ${R0(d.b)} de ${fT(d)}, avec n = 2 sous-intervalles ?`,
+    prompt: m === 'simp'
+      ? t('Que vaut la formule de Simpson composite pour ∫ de {a} à {b} de {f}, avec n = 2 sous-intervalles ?', { a: R0(d.a), b: R0(d.b), f: fT(d) })
+      : t('Que vaut la formule du trapèze composite pour ∫ de {a} à {b} de {f}, avec n = 2 sous-intervalles ?', { a: R0(d.a), b: R0(d.b), f: fT(d) }),
     options, solution: [{ html: `${nodesNote(d)} ; ${NAMES[m]} : ${R0(formulaLines(d, m).first)} = ${qR(right)}.`, note: '' }],
   }, rng);
 }
@@ -306,13 +313,13 @@ function compMcq(rng, opts) {
 const SUB_R = [
   { id: 'q2h', label: 'Q₂ₕ', skill: QC },
   { id: 'qh', label: 'Q_h', skill: QC },
-  { id: 'extrapolate', label: 'extrapoler', skill: RI },
-  { id: 'estimate', label: 'estimer l\'erreur', skill: RI },
-  { id: 'order', label: 'l\'ordre p', skill: 'n-quad-order' },
+  { id: 'extrapolate', label: t('extrapoler'), skill: RI },
+  { id: 'estimate', label: t('estimer l\'erreur'), skill: RI },
+  { id: 'order', label: t('l\'ordre p'), skill: 'n-quad-order' },
 ];
 
 function richData(rng) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const deg = rng.pick([2, 3]);
     const cs = Array(deg + 1).fill(0);
     cs[deg] = rng.pick([1, 1, 2, 3, -1]);
@@ -340,11 +347,23 @@ function richData(rng) {
   return { cs, b: 1, m: 'mid', n: 1, f, q2h: q(1, 4), qh: q(5, 16), qt: q(1, 3), eps: q(1, 48), I: q(1, 3), wrong: [q(3, 8), q(1, 3).add(q(1, 180))], swap: q(1, 4).mul(4).sub(q(5, 16)).div(3), fallback: true };
 }
 
+// The prompt of richLines: point milieu or trapèze, Q₂ₕ and Q_h given or not.
+function richPrompt(isMid, given, v) {
+  if (isMid) {
+    return given
+      ? t('On approche ∫ de 0 à {b} de {f} par la formule du point milieu composite (d\'ordre p = 2). Avec n = {n}, Q₂ₕ = {q2h} ; avec n = {n2}, Q_h = {qh}. Extrapole par Richardson, puis estime l\'erreur de Q_h.', v)
+      : t('On approche ∫ de 0 à {b} de {f} par la formule du point milieu composite (d\'ordre p = 2). Calcule Q₂ₕ (n = {n}) et Q_h (n = {n2}), extrapole par Richardson, puis estime l\'erreur de Q_h.', v);
+  }
+  return given
+    ? t('On approche ∫ de 0 à {b} de {f} par la formule du trapèze composite (d\'ordre p = 2). Avec n = {n}, Q₂ₕ = {q2h} ; avec n = {n2}, Q_h = {qh}. Extrapole par Richardson, puis estime l\'erreur de Q_h.', v)
+    : t('On approche ∫ de 0 à {b} de {f} par la formule du trapèze composite (d\'ordre p = 2). Calcule Q₂ₕ (n = {n}) et Q_h (n = {n2}), extrapole par Richardson, puis estime l\'erreur de Q_h.', v);
+}
+
 const richTraps = (d) => etraps([['n_richardson_wrong_p', d.wrong.map(String)], ['n_richardson_swap', [String(d.swap)]]]);
 
 function richLines(rng, level) {
   const d = richData(rng);
-  const M = d.m === 'mid' ? 'point milieu' : 'trapèze';
+  const isMid = d.m === 'mid';
   const formula = `(4×${qi(d.qh)}-${qi(d.q2h)})/3`;
   const script = [];
   const given = level === 1;
@@ -352,20 +371,20 @@ function richLines(rng, level) {
   let judge;
   const qtJudge = { kind: 'value', expect: String(d.qt), ...richTraps(d) };
   const epsSeg = [
-    { kind: 'segment', html: 'Estimation a posteriori de l\'erreur de Q_h : ε = |Q̃ − Q_h|.', ask: 'ε =', start: { math: 'E' }, judge: { kind: 'value', expect: String(d.eps) } },
+    { kind: 'segment', html: t('Estimation a posteriori de l\'erreur de Q_h : ε = |Q̃ − Q_h|.'), ask: 'ε =', start: { math: 'E' }, judge: { kind: 'value', expect: String(d.eps) } },
     { kind: 'eq', math: `|${qi(d.qt)}-${qi(d.qh)}|`, note: '|Q̃ − Q_h|', subgoal: 'estimate' },
     { kind: 'eq', math: qd(d.eps), note: 'ε', subgoal: 'estimate' },
   ];
   const qtLines = [
-    { kind: 'eq', math: formula, note: '(2ᵖQ_h − Q₂ₕ)/(2ᵖ − 1) avec p = 2', subgoal: 'extrapolate', ...(level <= 2 ? blankBy(formula, ['4', '3']) : {}) },
+    { kind: 'eq', math: formula, note: t('(2ᵖQ_h − Q₂ₕ)/(2ᵖ − 1) avec p = 2'), subgoal: 'extrapolate', ...(level <= 2 ? blankBy(formula, ['4', '3']) : {}) },
     { kind: 'eq', math: qd(d.qt), note: 'Q̃', subgoal: 'extrapolate', ...(level === 1 ? blankBy(qd(d.qt), [qd(d.qt)]) : {}) },
   ];
   const pDecision = {
-    kind: 'decision', prompt: `La formule du ${M} est d'ordre p = ? Quel facteur 2ᵖ utiliser ?`, options: [
+    kind: 'decision', prompt: isMid ? t('La formule du point milieu est d\'ordre p = ? Quel facteur 2ᵖ utiliser ?') : t('La formule du trapèze est d\'ordre p = ? Quel facteur 2ᵖ utiliser ?'), options: [
       { id: 'p2', label: 'p = 2 : Q̃ = (4Q_h − Q₂ₕ)/3', valid: true, ref: true },
-      { id: 'p1', label: 'p = 1 : Q̃ = 2Q_h − Q₂ₕ', valid: false, rule: 'n_richardson_wrong_p', why: `Le ${M} est d'ordre 2 : 2² = 4.` },
-      { id: 'p4', label: 'p = 4 : Q̃ = (16Q_h − Q₂ₕ)/15', valid: false, rule: 'n_richardson_wrong_p', why: `L'ordre 4 est celui de Simpson ; le ${M} est d'ordre 2.` },
-      { id: 'sw', label: 'p = 2 : Q̃ = (4Q₂ₕ − Q_h)/3', valid: false, rule: 'n_richardson_swap', why: 'Le poids 2ᵖ va sur la formule la plus fine, Q_h.' },
+      { id: 'p1', label: 'p = 1 : Q̃ = 2Q_h − Q₂ₕ', valid: false, rule: 'n_richardson_wrong_p', why: isMid ? t('Le point milieu est d\'ordre 2 : 2² = 4.') : t('Le trapèze est d\'ordre 2 : 2² = 4.') },
+      { id: 'p4', label: 'p = 4 : Q̃ = (16Q_h − Q₂ₕ)/15', valid: false, rule: 'n_richardson_wrong_p', why: isMid ? t('L\'ordre 4 est celui de Simpson ; le point milieu est d\'ordre 2.') : t('L\'ordre 4 est celui de Simpson ; le trapèze est d\'ordre 2.') },
+      { id: 'sw', label: 'p = 2 : Q̃ = (4Q₂ₕ − Q_h)/3', valid: false, rule: 'n_richardson_swap', why: t('Le poids 2ᵖ va sur la formule la plus fine, Q_h.') },
     ],
   };
   if (given) {
@@ -381,10 +400,10 @@ function richLines(rng, level) {
     script.push(
       { kind: 'eq', math: L2.first, note: `n = ${d.n}`, subgoal: 'q2h' },
       { kind: 'eq', math: qd(d.q2h), note: 'Q₂ₕ', subgoal: 'q2h' },
-      { kind: 'segment', html: `Q_h : la même formule avec n = ${2 * d.n}.`, ask: 'Q_h =', start: { math: 'Q_h' }, judge: { kind: 'value', expect: String(d.qh) } },
+      { kind: 'segment', html: t('Q_h : la même formule avec n = {n}.', { n: 2 * d.n }), ask: 'Q_h =', start: { math: 'Q_h' }, judge: { kind: 'value', expect: String(d.qh) } },
       { kind: 'eq', math: L1.first, note: `n = ${2 * d.n}`, subgoal: 'qh' },
       { kind: 'eq', math: qd(d.qh), note: 'Q_h', subgoal: 'qh' },
-      { kind: 'segment', html: 'Extrapolation de Richardson.', ask: 'Q̃ =', start: { math: 'Q' }, judge: qtJudge },
+      { kind: 'segment', html: t('Extrapolation de Richardson.'), ask: 'Q̃ =', start: { math: 'Q' }, judge: qtJudge },
       ...(level === 3 ? [pDecision] : []),
       ...qtLines,
       ...epsSeg,
@@ -392,9 +411,9 @@ function richLines(rng, level) {
   }
   return linesItem({
     skill: RI, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', keys: KEYS,
-    prompt: `On approche ∫ de 0 à ${d.b} de ${fT(d)} par la formule du ${M} composite (d'ordre p = 2).${given ? ` Avec n = ${d.n}, Q₂ₕ = ${qR(d.q2h)} ; avec n = ${2 * d.n}, Q_h = ${qR(d.qh)}. Extrapole` : ` Calcule Q₂ₕ (n = ${d.n}) et Q_h (n = ${2 * d.n}), extrapole`} par Richardson, puis estime l'erreur de Q_h.`,
+    prompt: richPrompt(isMid, given, { b: d.b, f: fT(d), n: d.n, n2: 2 * d.n, q2h: qR(d.q2h), qh: qR(d.qh) }),
     start, judge, script,
-    hints: H('Combine Q_h et Q₂ₕ pour éliminer le terme en hᵖ : Q̃ = (2ᵖQ_h − Q₂ₕ)/(2ᵖ − 1).',
+    hints: H(t('Combine Q_h et Q₂ₕ pour éliminer le terme en hᵖ : Q̃ = (2ᵖQ_h − Q₂ₕ)/(2ᵖ − 1).'),
       `Q̃ = (4·${R0(qi(d.qh))} − □)/3`,
       `Q̃ = ${R0(formula)} = ${qR(d.qt)}, ε = ${qR(d.eps)}.`),
     subgoals: SUB_R, key: `${RI}:${level}:${d.m}:${d.cs.join(',')}:${d.b}:${d.n}`, fallback: d.fallback,
@@ -446,28 +465,36 @@ function richCode(rng) {
   });
   const question = multiMcq({
     skill: RI, level: 5, key: `${RI}:readcode`,
-    prompt: 'Quand n double, que peut-on dire ?',
+    prompt: t('Quand n double, que peut-on dire ?'),
     options: [
-      { html: 'L\'erreur de Q_h est divisée par 4 : ordre 2', correct: true },
-      { html: 'L\'erreur de Q̃ est divisée par 16 : Q̃ est d\'ordre 4', correct: true },
-      { html: 'Q̃ est aussi d\'ordre 2', correct: false },
-      { html: 'ε = |Q̃ − Q_h| est une bonne estimation de l\'erreur de Q̃', correct: false },
+      { html: t('L\'erreur de Q_h est divisée par 4 : ordre 2'), correct: true },
+      { html: t('L\'erreur de Q̃ est divisée par 16 : Q̃ est d\'ordre 4'), correct: true },
+      { html: t('Q̃ est aussi d\'ordre 2'), correct: false },
+      { html: t('ε = |Q̃ − Q_h| est une bonne estimation de l\'erreur de Q̃'), correct: false },
     ],
-    solution: [{ html: 'Q_h (trapèze) est d\'ordre 2 ; l\'extrapolation élimine le terme en h² : Q̃ est d\'ordre 4 (c\'est Simpson). ε estime l\'erreur de Q_h, pas celle de Q̃.', note: '' }],
+    solution: [{ html: t('Q_h (trapèze) est d\'ordre 2 ; l\'extrapolation élimine le terme en h² : Q̃ est d\'ordre 4 (c\'est Simpson). ε estime l\'erreur de Q_h, pas celle de Q̃.'), note: '' }],
   }, rng);
   const then = readtableItem({
     skill: RI, level: 5, key: 'exp',
-    prompt: 'richardson(trapeze, math.exp, 0, 1, n, 2) donne, avec l\'intégrale exacte e − 1 :',
+    prompt: t('richardson(trapeze, math.exp, 0, 1, n, 2) donne, avec l\'intégrale exacte e − 1 :'),
     table: { columns: ['n', '|Q_h − I|', '|Q̃ − I|', 'ε = |Q̃ − Q_h|'], rows },
     question,
   });
   return codeItem({
     skill: RI, level: 5, ref: RICH, blanks: holesFor(5, RICH), traps: RICH_TRAPS, wrong: RICH_WRONG, rng,
-    preludes: [RICH_PRELUDE], signatures: [...SIG_VEC, 'trapeze(f, a, b, n), midpoint(f, a, b, n) : formules composites'],
-    prompt: 'Complète l\'extrapolation de Richardson : elle renvoie [Q̃, ε], avec ε = |Q̃ − Q_h| l\'estimation de l\'erreur de Q_h.',
+    preludes: [RICH_PRELUDE], signatures: [...SIG_VEC, t('trapeze(f, a, b, n), midpoint(f, a, b, n) : formules composites')],
+    prompt: t('Complète l\'extrapolation de Richardson : elle renvoie [Q̃, ε], avec ε = |Q̃ − Q_h| l\'estimation de l\'erreur de Q_h.'),
     tests: RICH_TESTS, then, hints: [], subgoals: SUB_R, key: '5',
   });
 }
+
+// The prompt of richMcq, by the French name of the method (kept in the key).
+const RICH_MCQ = {
+  'point milieu': (v) => t('Q_h est la formule du point milieu composite avec un pas h (d\'ordre {p}), Q₂ₕ la même avec le pas 2h. Quelle combinaison est d\'un ordre plus élevé (extrapolation de Richardson) ?', v),
+  'trapèze': (v) => t('Q_h est la formule du trapèze composite avec un pas h (d\'ordre {p}), Q₂ₕ la même avec le pas 2h. Quelle combinaison est d\'un ordre plus élevé (extrapolation de Richardson) ?', v),
+  Simpson: (v) => t('Q_h est la formule de Simpson composite avec un pas h (d\'ordre {p}), Q₂ₕ la même avec le pas 2h. Quelle combinaison est d\'un ordre plus élevé (extrapolation de Richardson) ?', v),
+  'rectangle à gauche': (v) => t('Q_h est la formule du rectangle à gauche composite avec un pas h (d\'ordre {p}), Q₂ₕ la même avec le pas 2h. Quelle combinaison est d\'un ordre plus élevé (extrapolation de Richardson) ?', v),
+};
 
 function richMcq(rng, opts) {
   const meth = rng.pick([['point milieu', 2], ['trapèze', 2], ['Simpson', 4], ['rectangle à gauche', 1]]);
@@ -479,9 +506,9 @@ function richMcq(rng, opts) {
   const swap = { html: P - 1 === 1 ? '2Q₂ₕ − Q_h' : `(${P}Q₂ₕ − Q_h)/${P - 1}`, correct: false, rule: 'n_richardson_swap' };
   return mcq({
     skill: RI, level: 4, key: `${RI}:mcq:${p}:${name}`, exam: examTag(opts),
-    prompt: `Q_h est la formule ${name === 'Simpson' ? 'de Simpson' : `du ${name}`} composite avec un pas h (d'ordre ${p}), Q₂ₕ la même avec le pas 2h. Quelle combinaison est d'un ordre plus élevé (extrapolation de Richardson) ?`,
+    prompt: RICH_MCQ[name]({ p }),
     options: [{ html: right, correct: true }, swap, ...others.slice(0, 2)],
-    solution: [{ html: `Q_h ≈ I + Chᵖ et Q₂ₕ ≈ I + 2ᵖChᵖ : (2ᵖQ_h − Q₂ₕ)/(2ᵖ − 1) élimine le terme en hᵖ, ici 2ᵖ = ${P}.`, note: '' }],
+    solution: [{ html: t('Q_h ≈ I + Chᵖ et Q₂ₕ ≈ I + 2ᵖChᵖ : (2ᵖQ_h − Q₂ₕ)/(2ᵖ − 1) élimine le terme en hᵖ, ici 2ᵖ = {P}.', { P }), note: '' }],
   }, rng);
 }
 

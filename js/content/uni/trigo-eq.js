@@ -7,6 +7,7 @@
 
 import { Q } from '../../math/rational.js';
 import { MT, fr, linesItem, mcq, tfItem } from './kit.js';
+import { t } from '../../i18n.js';
 import {
   q, PERIODIC, KEYS, lit0, tpl, piT, famT, famsT, famsHtml, modQ, valueFloat, trigVal, IDS,
 } from './trigo.js';
@@ -45,9 +46,9 @@ const famRel = (lhs, fams) => fams.map(([b, p]) => `${lhs}=${famT(b, p)}`).join(
 function isolate(m, phi, fams) {
   const lines = [];
   const shifted = fams.map(([b, p]) => [b.sub(phi), p]);
-  if (phi.n !== 0) lines.push({ math: famRel(mxT(m), shifted), note: `Isoler ${mxT(m)}`, subgoal: 'isolate' });
+  if (phi.n !== 0) lines.push({ math: famRel(mxT(m), shifted), note: t('Isoler {u}', { u: mxT(m) }), subgoal: 'isolate' });
   const xs = shifted.map(([b, p]) => [b.div(m), p.div(m)]);
-  if (!m.eq(1)) lines.push({ math: famRel('x', xs), note: 'Diviser aussi la période', subgoal: 'isolate' });
+  if (!m.eq(1)) lines.push({ math: famRel('x', xs), note: t('Diviser aussi la période'), subgoal: 'isolate' });
   return { lines, xs };
 }
 
@@ -74,8 +75,8 @@ export const INTERVALS = [
   { text: '[0;2π]', lo: q(0), hi: q(2), loOpen: false, hiOpen: false, html: '[0 ; 2π]' },
 ];
 const restrictSeg = (I, startMath, fams, extra = {}) => [
-  { kind: 'segment', html: `Solutions dans ${I.html} :`, start: { math: startMath }, judge: PERIODIC({ domain: I.text, ...extra }) },
-  { kind: 'eq', math: setT(pointsIn(fams, I.lo, I.hi, I.loOpen, I.hiOpen)), note: 'Garder les k qui tombent dans l\'intervalle', subgoal: 'restrict' },
+  { kind: 'segment', html: t('Solutions dans {I} :', { I: I.html }), start: { math: startMath }, judge: PERIODIC({ domain: I.text, ...extra }) },
+  { kind: 'eq', math: setT(pointsIn(fams, I.lo, I.hi, I.loOpen, I.hiOpen)), note: t('Garder les k qui tombent dans l\'intervalle'), subgoal: 'restrict' },
 ];
 const XK = { vars: ['x', 'k'] };
 
@@ -85,14 +86,14 @@ const XK = { vars: ['x', 'k'] };
 
 const BASIC = 'g3-basic-eq';
 const BASIC_SUB = [
-  { id: 'base', label: 'deux familles', skill: BASIC },
-  { id: 'isolate', label: 'isoler x', skill: BASIC },
-  { id: 'restrict', label: 'restreindre à un intervalle', skill: 'g9-intervals' },
+  { id: 'base', label: t('deux familles'), skill: BASIC },
+  { id: 'isolate', label: t('isoler x'), skill: BASIC },
+  { id: 'restrict', label: t('restreindre à un intervalle'), skill: 'g9-intervals' },
 ];
 const VALS = { cos: Object.keys(ACOS), sin: Object.keys(ASIN), tan: Object.keys(ATAN) };
 const FORMULA = {
-  cos: 'cos u = cos α ⇔ u = α + 2kπ ou u = −α + 2kπ',
-  sin: 'sin u = sin α ⇔ u = α + 2kπ ou u = π − α + 2kπ',
+  cos: t('cos u = cos α ⇔ u = α + 2kπ ou u = −α + 2kπ'),
+  sin: t('sin u = sin α ⇔ u = α + 2kπ ou u = π − α + 2kπ'),
   tan: 'tan u = tan α ⇔ u = α + kπ',
 };
 
@@ -112,7 +113,7 @@ function basicData(rng, level) {
 }
 
 function basicLines(d) {
-  const lines = [{ math: famRel(d.U, d.fams), note: d.fams.length > 1 ? 'Deux familles' : 'Une famille', subgoal: 'base' }];
+  const lines = [{ math: famRel(d.U, d.fams), note: d.fams.length > 1 ? t('Deux familles') : t('Une famille'), subgoal: 'base' }];
   const iso = isolate(d.m, d.phi, d.fams);
   lines.push(...iso.lines);
   return { lines, xs: iso.xs };
@@ -127,8 +128,8 @@ function basicItem(level, rng, opts = {}) {
   const script = [];
   if (level === 1) script.push({ kind: 'note', html: `${FORMULA[d.f]}.` });
   if (level === 3) {
-    script.push({ kind: 'decision', prompt: 'Quelle formule ?', options: ['cos', 'sin', 'tan'].map((g) => ({
-      id: g, label: FORMULA[g], valid: g === d.f, why: `L'équation porte sur ${d.f}.`, rule: d.f === 'sin' && g === 'cos' ? 'g3_sin_family' : undefined,
+    script.push({ kind: 'decision', prompt: t('Quelle formule ?'), options: ['cos', 'sin', 'tan'].map((g) => ({
+      id: g, label: FORMULA[g], valid: g === d.f, why: t('L\'équation porte sur {f}.', { f: d.f }), rule: d.f === 'sin' && g === 'cos' ? 'g3_sin_family' : undefined,
     })) });
   }
   lines.forEach((l, i) => {
@@ -142,11 +143,11 @@ function basicItem(level, rng, opts = {}) {
     script.push(...restrictSeg(I, famsT(xs), xs));
   }
   return linesItem({
-    skill: BASIC, level, prompt: `Résous ${MT(start)}${I ? `, puis donne les solutions dans ${I.html}` : ' dans ℝ'} (k désigne un entier).`,
+    skill: BASIC, level, prompt: I ? t('Résous {e}, puis donne les solutions dans {I} (k désigne un entier).', { e: MT(start), I: I.html }) : t('Résous {e} dans ℝ (k désigne un entier).', { e: MT(start) }),
     start, judge: PERIODIC(), mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     hints: [
-      { level: 1, html: `${FORMULA[d.f]}${d.m.eq(1) ? '' : ' ; puis on divise aussi la période'}.` },
-      { level: 2, html: `Ici α = ${fr(piT(d.fams[0][0]))}${d.m.eq(1) && d.phi.n === 0 ? '' : ` pour u = ${fr(d.U)}`}${d.m.eq(1) ? '' : ', puis on divise aussi la période'}.` },
+      { level: 1, html: d.m.eq(1) ? `${FORMULA[d.f]}.` : t('{f} ; puis on divise aussi la période.', { f: FORMULA[d.f] }) },
+      { level: 2, html: d.m.eq(1) && d.phi.n === 0 ? t('Ici α = {a}.', { a: fr(piT(d.fams[0][0])) }) : d.m.eq(1) ? t('Ici α = {a} pour u = {u}.', { a: fr(piT(d.fams[0][0])), u: fr(d.U) }) : t('Ici α = {a} pour u = {u}, puis on divise aussi la période.', { a: fr(piT(d.fams[0][0])), u: fr(d.U) }) },
       { level: 3, html: MT(lines[lines.length - 1].math, XK) },
     ],
     subgoals: BASIC_SUB, keys: KEYS, tapActions: level === 3 ? 'solset' : null, key: `${BASIC}:${start}:${I?.text ?? ''}`, exam,
@@ -164,12 +165,12 @@ function basicTwo(rng, exam) {
   const l1 = f === 'sin' ? `${ax(a)}=${ax(b)}+2kπ∨${ax(a)}=π-${ax(b)}+2kπ` : `${ax(a)}=${ax(b)}+2kπ∨${ax(a)}=-${ax(b)}+2kπ`;
   const fams = f === 'sin' ? [[q(0), q(2, a - b)], [q(1, a + b), q(2, a + b)]] : [[q(0), q(2, a - b)], [q(0), q(2, a + b)]];
   const script = [
-    { kind: 'eq', math: l1, note: f === 'sin' ? 'sin u = sin v : u = v + 2kπ ou u = π − v + 2kπ' : 'cos u = cos v : u = ±v + 2kπ', subgoal: 'base' },
-    { kind: 'eq', math: famsT(fams), note: 'Isoler x', subgoal: 'isolate' },
+    { kind: 'eq', math: l1, note: f === 'sin' ? t('sin u = sin v : u = v + 2kπ ou u = π − v + 2kπ') : 'cos u = cos v : u = ±v + 2kπ', subgoal: 'base' },
+    { kind: 'eq', math: famsT(fams), note: t('Isoler x'), subgoal: 'isolate' },
     ...restrictSeg(I, famsT(fams), fams),
   ];
   return linesItem({
-    skill: BASIC, level: 5, prompt: `Résous ${MT(start)} dans ${I.html}.`,
+    skill: BASIC, level: 5, prompt: t('Résous {e} dans {I}.', { e: MT(start), I: I.html }),
     start, judge: PERIODIC(), mode: 'free', script, hints: [], subgoals: BASIC_SUB, keys: KEYS, key: `${BASIC}:two:${start}:${I.text}`, exam,
   });
 }
@@ -177,15 +178,15 @@ function basicTwo(rng, exam) {
 function basicExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'Pour tous x, y réels, si cos x = cos y, alors x = y.', truth: false, pred: 'cos(x)=cos(y)⇒x=y', hyp: 'cos(x)=cos(y)', ans: { x: 'π/3', y: '-π/3' }, expl: 'Faux : cos(π/3) = cos(−π/3), mais π/3 ≠ −π/3.' },
-      { s: 'Pour tous x, y réels, si sin x = sin y, alors x = y.', truth: false, pred: 'sin(x)=sin(y)⇒x=y', hyp: 'sin(x)=sin(y)', ans: { x: 'π/6', y: '(5π)/6' }, expl: 'Faux : sin(π/6) = sin(5π/6) = 1/2.' },
-      { s: 'Pour tous x, y réels, si tan x = tan y, alors x = y.', truth: false, pred: 'tan(x)=tan(y)⇒x=y', hyp: 'tan(x)=tan(y)', ans: { x: '0', y: 'π' }, expl: 'Faux : tan 0 = tan π = 0.' },
-      { s: 'L\'équation sin x = 1/2 a exactement deux solutions dans [0 ; 2π[.', truth: true, expl: 'Vrai : π/6 et 5π/6.' },
-      { s: 'L\'équation tan x = 1 a exactement deux solutions dans [0 ; 2π[.', truth: true, expl: 'Vrai : π/4 et 5π/4.' },
+      { s: 'Pour tous x, y réels, si cos x = cos y, alors x = y.', truth: false, pred: 'cos(x)=cos(y)⇒x=y', hyp: 'cos(x)=cos(y)', ans: { x: 'π/3', y: '-π/3' }, expl: t('Faux : cos(π/3) = cos(−π/3), mais π/3 ≠ −π/3.') },
+      { s: 'Pour tous x, y réels, si sin x = sin y, alors x = y.', truth: false, pred: 'sin(x)=sin(y)⇒x=y', hyp: 'sin(x)=sin(y)', ans: { x: 'π/6', y: '(5π)/6' }, expl: t('Faux : sin(π/6) = sin(5π/6) = 1/2.') },
+      { s: 'Pour tous x, y réels, si tan x = tan y, alors x = y.', truth: false, pred: 'tan(x)=tan(y)⇒x=y', hyp: 'tan(x)=tan(y)', ans: { x: '0', y: 'π' }, expl: t('Faux : tan 0 = tan π = 0.') },
+      { s: 'L\'équation sin x = 1/2 a exactement deux solutions dans [0 ; 2π[.', truth: true, expl: t('Vrai : π/6 et 5π/6.') },
+      { s: 'L\'équation tan x = 1 a exactement deux solutions dans [0 ; 2π[.', truth: true, expl: t('Vrai : π/4 et 5π/4.') },
     ];
     const b = rng.pick(bank);
     return tfItem({
-      skill: BASIC, level: 4, statement: b.s, truth: b.truth, key: b.s, explanation: b.expl,
+      skill: BASIC, level: 4, statement: t(b.s), truth: b.truth, key: b.s, explanation: b.expl,
       counter: b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }, { q: '∀', v: 'y', dom: 'R' }], pred: b.pred, hyp: b.hyp, ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer: b.ans },
       ruleIfTrue: b.truth ? null : 'g3_family_missing', exam: { format: 'tf', points: 1 },
     });
@@ -202,7 +203,7 @@ function basicExam(rng, exam) {
   add(xs.map(([b, p]) => [b.neg(), p]), null);
   add(xs.map(([b, p]) => [b.add(q(1, 2)), p]), null);
   return mcq({
-    skill: BASIC, level: 4, prompt: `Les solutions de ${MT(start)} sont…`, options: options.slice(0, 4), key: `mcq:${start}`,
+    skill: BASIC, level: 4, prompt: t('Les solutions de {e} sont…', { e: MT(start) }), options: options.slice(0, 4), key: `mcq:${start}`,
     exam: { format: 'mcq', points: 1 }, solution: basicLines(d).lines.map((l) => ({ html: MT(l.math, XK), note: l.note })),
   }, rng);
 }
@@ -213,11 +214,11 @@ function basicExam(rng, exam) {
 
 const EQ = 'g3-eq';
 const EQ_SUB = [
-  { id: 'rewrite', label: 'une seule fonction', skill: IDS },
-  { id: 'factor', label: 'factoriser', skill: 'fac-trinomial' },
-  { id: 'product', label: 'produit nul', skill: 'eq-product' },
-  { id: 'base', label: 'équations de base', skill: BASIC },
-  { id: 'restrict', label: 'restreindre', skill: 'g9-intervals' },
+  { id: 'rewrite', label: t('une seule fonction'), skill: IDS },
+  { id: 'factor', label: t('factoriser'), skill: 'fac-trinomial' },
+  { id: 'product', label: t('produit nul'), skill: 'eq-product' },
+  { id: 'base', label: t('équations de base'), skill: BASIC },
+  { id: 'restrict', label: t('restreindre'), skill: 'g9-intervals' },
 ];
 const VAL_T = ['0', '1/2', '-1/2', '1', '-1', '2', '-2'];
 const parseQ = (t) => { const [n, d] = t.split('/'); return q(Number(n), Number(d ?? 1)); };
@@ -257,12 +258,12 @@ function eqTrinomial(rng, level) {
   const start = `${coefT(-A, `${g}(x)^2`, true)}${coefT(B, fx)}${coefT(A + C, '')}=0`;
   if (level !== 1) {
     lines.push({ math: `${A === 1 ? '-' : `-${A}`}(1-${fx}^2)${coefT(B, fx)}${coefT(A + C, '')}=0`, note: `${g}²x = 1 − ${f}²x`, subgoal: 'rewrite' });
-    lines.push({ math: `${polyT(A, B, C, fx)}=0`, note: 'Réduire', subgoal: 'rewrite' });
-    lines.push({ math: `${polyT(A, B, C, 'X')}=0`, note: `Posons X = ${f} x`, subgoal: 'rewrite' });
+    lines.push({ math: `${polyT(A, B, C, fx)}=0`, note: t('Réduire'), subgoal: 'rewrite' });
+    lines.push({ math: `${polyT(A, B, C, 'X')}=0`, note: t('Posons X = {f} x', { f }), subgoal: 'rewrite' });
   }
-  lines.push({ math: `${facT(v1, 'X')}${facT(v2, 'X')}=0`, note: 'Factoriser', subgoal: 'factor' });
-  lines.push({ math: `${fx}=${lit0(v1)}∨${fx}=${lit0(v2)}`, note: 'Revenir à x', subgoal: 'product' });
-  lines.push({ math: fams.length ? famsT(fams) : '∅', note: 'Équations de base', subgoal: 'base' });
+  lines.push({ math: `${facT(v1, 'X')}${facT(v2, 'X')}=0`, note: t('Factoriser'), subgoal: 'factor' });
+  lines.push({ math: `${fx}=${lit0(v1)}∨${fx}=${lit0(v2)}`, note: t('Revenir à x'), subgoal: 'product' });
+  lines.push({ math: fams.length ? famsT(fams) : '∅', note: t('Équations de base'), subgoal: 'base' });
   return {
     start: level === 1 ? `${polyT(A, B, C, 'X')}=0` : start, display: level === 1 ? `${polyT(A, B, C, fx)}=0` : start,
     lines, fams, subst: { X: fx }, kind: 'one', f,
@@ -280,9 +281,9 @@ function eqHomogeneous(rng) {
     const nice = (t) => Math.abs(t) <= 1;
     const famTxt = (t) => (nice(t) ? `x=${famT(q(t, 4), q(1))}` : `x=arctan(${t})+kπ`);
     const lines = [
-      { math: `tan(x)^2${coefT(-S, 'tan(x)')}${coefT(P, '')}=0`, note: 'cos x = 0 n\'est pas solution ; diviser par cos²x', subgoal: 'rewrite' },
-      { math: `tan(x)=${t1}∨tan(x)=${t2}`, note: 'Factoriser', subgoal: 'factor' },
-      { math: `${famTxt(t1)}∨${famTxt(t2)}`, note: 'Équations de base', subgoal: 'base' },
+      { math: `tan(x)^2${coefT(-S, 'tan(x)')}${coefT(P, '')}=0`, note: t('cos x = 0 n\'est pas solution ; diviser par cos²x'), subgoal: 'rewrite' },
+      { math: `tan(x)=${t1}∨tan(x)=${t2}`, note: t('Factoriser'), subgoal: 'factor' },
+      { math: `${famTxt(t1)}∨${famTxt(t2)}`, note: t('Équations de base'), subgoal: 'base' },
     ];
     const fams = [t1, t2].every(nice) ? [t1, t2].map((t) => [q(t, 4), q(1)]) : null;
     return { start, lines, fams, kind: 'homog' };
@@ -295,18 +296,18 @@ function eqFactor(rng) {
   const abs = neg ? c.slice(1) : c;
   const fams = [[q(1, 2), q(1)], ...baseFams('sin', s)];
   const lines = [
-    { math: `2sin(x)cos(x)${neg ? '+' : '-'}${abs === '1' ? '' : abs}cos(x)=0`, note: 'sin 2x = 2 sin x cos x, tout à gauche', subgoal: 'rewrite' },
-    { math: `cos(x)(2sin(x)${neg ? '+' : '-'}${abs})=0`, note: 'Factoriser par cos x (ne pas diviser !)', subgoal: 'factor' },
-    { math: `cos(x)=0∨sin(x)=${s}`, note: 'Produit nul', subgoal: 'product' },
-    { math: famsT(fams), note: 'Équations de base', subgoal: 'base' },
+    { math: `2sin(x)cos(x)${neg ? '+' : '-'}${abs === '1' ? '' : abs}cos(x)=0`, note: t('sin 2x = 2 sin x cos x, tout à gauche'), subgoal: 'rewrite' },
+    { math: `cos(x)(2sin(x)${neg ? '+' : '-'}${abs})=0`, note: t('Factoriser par cos x (ne pas diviser !)'), subgoal: 'factor' },
+    { math: `cos(x)=0∨sin(x)=${s}`, note: t('Produit nul'), subgoal: 'product' },
+    { math: famsT(fams), note: t('Équations de base'), subgoal: 'base' },
   ];
   return { start: `sin(2x)=${c === '1' ? '' : c === '-1' ? '-' : c}cos(x)`, lines, fams, kind: 'factor' };
 }
 
 const METHODS = {
-  one: { label: 'Une seule fonction, puis X = cos x ou X = sin x', why: 'On peut tout écrire avec une seule fonction (cos² = 1 − sin²).' },
-  factor: { label: 'Factoriser, puis produit nul', why: 'Un facteur commun apparaît après sin 2x = 2 sin x cos x.' },
-  homog: { label: 'Diviser par cos²x (après avoir vérifié cos x = 0)', why: 'Chaque terme est de degré 2 en sin et cos : l\'équation est homogène.' },
+  one: { label: t('Une seule fonction, puis X = cos x ou X = sin x'), why: t('On peut tout écrire avec une seule fonction (cos² = 1 − sin²).') },
+  factor: { label: t('Factoriser, puis produit nul'), why: t('Un facteur commun apparaît après sin 2x = 2 sin x cos x.') },
+  homog: { label: t('Diviser par cos²x (après avoir vérifié cos x = 0)'), why: t('Chaque terme est de degré 2 en sin et cos : l\'équation est homogène.') },
 };
 
 function eqItem(level, rng, opts = {}) {
@@ -315,18 +316,18 @@ function eqItem(level, rng, opts = {}) {
   const d = kind === 'one' ? eqTrinomial(rng, level) : kind === 'factor' ? eqFactor(rng) : eqHomogeneous(rng);
   const script = [];
   if (level === 3) {
-    script.push({ kind: 'decision', prompt: 'Quelle méthode ?', options: Object.entries(METHODS).map(([id, m]) => ({
+    script.push({ kind: 'decision', prompt: t('Quelle méthode ?'), options: Object.entries(METHODS).map(([id, m]) => ({
       id, label: m.label, valid: id === kind, why: METHODS[kind].why, rule: id === 'homog' && kind === 'factor' ? 'g3_divide_zero' : undefined,
     })) });
     if (kind === 'homog') {
-      script.push({ kind: 'decision', prompt: 'cos x = 0 donne-t-il des solutions ?', options: [
-        { id: 'no', label: 'Non : alors sin²x = 1, et l\'équation donne 1 = 0', valid: true },
-        { id: 'yes', label: 'Oui : x = π/2 + kπ', valid: false, why: 'Si cos x = 0, il reste sin²x = 0, impossible car sin²x = 1.' },
-        { id: 'skip', label: 'Pas besoin de vérifier', valid: false, rule: 'g3_divide_zero', why: 'On ne divise par cos²x qu\'après avoir vérifié que cos x = 0 ne donne pas de solution.' },
+      script.push({ kind: 'decision', prompt: t('cos x = 0 donne-t-il des solutions ?'), options: [
+        { id: 'no', label: t('Non : alors sin²x = 1, et l\'équation donne 1 = 0'), valid: true },
+        { id: 'yes', label: t('Oui : x = π/2 + kπ'), valid: false, why: t('Si cos x = 0, il reste sin²x = 0, impossible car sin²x = 1.') },
+        { id: 'skip', label: t('Pas besoin de vérifier'), valid: false, rule: 'g3_divide_zero', why: t('On ne divise par cos²x qu\'après avoir vérifié que cos x = 0 ne donne pas de solution.') },
       ] });
     }
   }
-  if (level === 1) script.push({ kind: 'note', html: `On a posé X = ${d.f} x.` });
+  if (level === 1) script.push({ kind: 'note', html: t('On a posé X = {f} x.', { f: d.f }) });
   script.push(...d.lines.map((l) => ({ kind: 'eq', ...l })));
   let I = null;
   if (level === 5 && d.fams) {
@@ -336,10 +337,10 @@ function eqItem(level, rng, opts = {}) {
   const shown = d.display ?? d.start;
   const vars = { vars: ['x', 'X', 'k'] };
   return linesItem({
-    skill: EQ, level, prompt: `Résous ${MT(shown)}${I ? ` dans ${I.html}` : ' dans ℝ'}.`,
+    skill: EQ, level, prompt: I ? t('Résous {e} dans {I}.', { e: MT(shown), I: I.html }) : t('Résous {e} dans ℝ.', { e: MT(shown) }),
     start: d.start, judge: PERIODIC(d.subst ? { subst: d.subst } : {}), mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     hints: level >= 5 ? [] : [
-      { level: 1, html: kind === 'one' ? `C'est un trinôme en ${d.f} x : pose X = ${d.f} x.` : kind === 'factor' ? 'Écris sin 2x = 2 sin x cos x, puis mets cos x en facteur : ne divise pas.' : 'Vérifie que cos x = 0 n\'est pas solution, puis divise par cos²x.' },
+      { level: 1, html: kind === 'one' ? t('C\'est un trinôme en {f} x : pose X = {f} x.', { f: d.f }) : kind === 'factor' ? t('Écris sin 2x = 2 sin x cos x, puis mets cos x en facteur : ne divise pas.') : t('Vérifie que cos x = 0 n\'est pas solution, puis divise par cos²x.') },
       { level: 2, html: MT(d.lines[Math.max(0, d.lines.length - 3)].math, vars) },
       { level: 3, html: MT(d.lines[d.lines.length - 2].math, vars) },
     ],
@@ -357,7 +358,7 @@ function eqExam(rng, exam) {
   add(d.fams.slice(0, 2), 'g3_family_missing');
   add([[q(1, 2), q(2)], ...d.fams.slice(1)], 'g3_period_divide');
   return mcq({
-    skill: EQ, level: 4, prompt: `Les solutions de ${MT(d.start)} sont…`, options, key: `mcq:${d.start}`,
+    skill: EQ, level: 4, prompt: t('Les solutions de {e} sont…', { e: MT(d.start) }), options, key: `mcq:${d.start}`,
     exam: { format: 'mcq', points: 1 }, solution: d.lines.map((l) => ({ html: MT(l.math, XK), note: l.note })),
   }, rng);
 }
@@ -368,10 +369,10 @@ function eqExam(rng, exam) {
 
 const ASB = 'g3-asinbcos';
 const ASB_SUB = [
-  { id: 'divide', label: 'diviser par R', skill: ASB },
-  { id: 'formula', label: 'formule d\'addition', skill: IDS },
-  { id: 'base', label: 'équation de base', skill: BASIC },
-  { id: 'restrict', label: 'restreindre', skill: 'g9-intervals' },
+  { id: 'divide', label: t('diviser par R'), skill: ASB },
+  { id: 'formula', label: t('formule d\'addition'), skill: IDS },
+  { id: 'base', label: t('équation de base'), skill: BASIC },
+  { id: 'restrict', label: t('restreindre'), skill: 'g9-intervals' },
 ];
 // a sin x + b cos x = R sin(x + φ): cos φ = a/R, sin φ = b/R.
 export const ABS = [
@@ -403,15 +404,15 @@ function asbData(rng, level) {
 function asbLines(d) {
   const cphi = trigVal('cos', d.phi);
   const sphi = trigVal('sin', d.phi);
-  const lines = [{ math: `(${cphi})sin(${d.X})+(${sphi})cos(${d.X})=${d.none ? `${d.c}/${d.R}` : d.s}`, note: `Diviser par R = ${fr(d.R)}`, subgoal: 'divide' }];
+  const lines = [{ math: `(${cphi})sin(${d.X})+(${sphi})cos(${d.X})=${d.none ? `${d.c}/${d.R}` : d.s}`, note: t('Diviser par R = {R}', { R: fr(d.R) }), subgoal: 'divide' }];
   if (d.none) {
-    lines.push({ math: `sin(${uT(d.m, d.phi)})=${d.c}/${d.R}`, note: 'Formule d\'addition', subgoal: 'formula' });
-    lines.push({ math: '∅', note: `${fr(d.c)}/${fr(d.R)} > 1 : pas de solution`, subgoal: 'base' });
+    lines.push({ math: `sin(${uT(d.m, d.phi)})=${d.c}/${d.R}`, note: t('Formule d\'addition'), subgoal: 'formula' });
+    lines.push({ math: '∅', note: t('{q} > 1 : pas de solution', { q: `${fr(d.c)}/${fr(d.R)}` }), subgoal: 'base' });
     return { lines, xs: [], fams: [] };
   }
-  lines.push({ math: `sin(${uT(d.m, d.phi)})=${d.s}`, note: `Formule d'addition, φ = ${fr(piT(d.phi))}`, subgoal: 'formula' });
+  lines.push({ math: `sin(${uT(d.m, d.phi)})=${d.s}`, note: t('Formule d\'addition, φ = {p}', { p: fr(piT(d.phi)) }), subgoal: 'formula' });
   const fams = baseFams('sin', d.s);
-  lines.push({ math: famRel(uT(d.m, d.phi), fams), note: 'Équation de base', subgoal: 'base' });
+  lines.push({ math: famRel(uT(d.m, d.phi), fams), note: t('Équation de base'), subgoal: 'base' });
   const iso = isolate(d.m, d.phi, fams);
   lines.push(...iso.lines.map((l) => ({ ...l, subgoal: 'base' })));
   return { lines, xs: iso.xs, fams };
@@ -424,22 +425,22 @@ function asbItem(level, rng, opts = {}) {
   const start = `${asbStart(d)}=${d.c}`;
   const { lines, xs } = asbLines(d);
   const script = [];
-  if (level === 1) script.push({ kind: 'note', html: `R = ${fr(d.R)} et ${MT(asbStart(d))} = ${MT(`${d.R}sin(${uT(d.m, d.phi)})`)}.` });
+  if (level === 1) script.push({ kind: 'note', html: t('R = {R} et {a} = {b}.', { R: fr(d.R), a: MT(asbStart(d)), b: MT(`${d.R}sin(${uT(d.m, d.phi)})`) }) });
   if (level === 2) {
     script.push({ kind: 'note', html: `R = √(a² + b²) = ${fr(d.R)}.` });
     const turned = modQ(d.phi.add(q(1)), q(2));
     const quad = turned.valueOf() > 1 ? turned.sub(q(2)) : turned;
-    script.push({ kind: 'decision', prompt: 'φ vérifie cos φ = a/R et sin φ = b/R. Donc φ =', options: [
+    script.push({ kind: 'decision', prompt: t('φ vérifie cos φ = a/R et sin φ = b/R. Donc φ ='), options: [
       { id: 'right', label: fr(piT(d.phi)), valid: true },
-      { id: 'quad', label: fr(piT(quad)), valid: false, rule: 'g3_rphi', why: 'Vérifie le quadrant : R cos φ doit valoir a et R sin φ doit valoir b.' },
-      { id: 'neg', label: fr(piT(d.phi.neg())), valid: false, rule: 'g3_rphi', why: 'Le signe : sin φ = b/R.' },
+      { id: 'quad', label: fr(piT(quad)), valid: false, rule: 'g3_rphi', why: t('Vérifie le quadrant : R cos φ doit valoir a et R sin φ doit valoir b.') },
+      { id: 'neg', label: fr(piT(d.phi.neg())), valid: false, rule: 'g3_rphi', why: t('Le signe : sin φ = b/R.') },
     ].filter((o, i, a) => a.findIndex((x) => x.label === o.label) === i) });
   }
   if (level === 3) {
-    script.push({ kind: 'decision', prompt: 'Quelle forme ?', options: [
+    script.push({ kind: 'decision', prompt: t('Quelle forme ?'), options: [
       { id: 'sin', label: 'R sin(x + φ)', valid: true },
-      { id: 'cos', label: 'R cos(x − ψ)', valid: true, why: 'Les deux formes sont justes.' },
-      { id: 'sum', label: '(|a| + |b|) sin(x + φ)', valid: false, rule: 'g3_rphi', why: 'R = √(a² + b²), pas |a| + |b|.' },
+      { id: 'cos', label: 'R cos(x − ψ)', valid: true, why: t('Les deux formes sont justes.') },
+      { id: 'sum', label: '(|a| + |b|) sin(x + φ)', valid: false, rule: 'g3_rphi', why: t('R = √(a² + b²), pas |a| + |b|.') },
     ] });
   }
   script.push(...lines.map((l, i) => ({ kind: 'eq', ...l, ...(level === 1 && i === 1 && !d.none ? tpl(l.math, (n) => [n.l.args[0]], { vars: ['x'] }) : {}) })));
@@ -449,11 +450,11 @@ function asbItem(level, rng, opts = {}) {
     script.push(...restrictSeg(I, famsT(xs), xs));
   }
   return linesItem({
-    skill: ASB, level, prompt: `Résous ${MT(start)}${I ? ` dans ${I.html}` : ' dans ℝ'}.`,
+    skill: ASB, level, prompt: I ? t('Résous {e} dans {I}.', { e: MT(start), I: I.html }) : t('Résous {e} dans ℝ.', { e: MT(start) }),
     start, judge: PERIODIC(), mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     hints: level >= 5 ? [] : [
-      { level: 1, html: `Divise par √(a² + b²) = ${fr(d.R)}.` },
-      { level: 2, html: `cos(φ) sin x + sin(φ) cos x = sin(x + φ), avec φ = ${fr(piT(d.phi))}` },
+      { level: 1, html: t('Divise par √(a² + b²) = {R}.', { R: fr(d.R) }) },
+      { level: 2, html: t('cos(φ) sin x + sin(φ) cos x = sin(x + φ), avec φ = {p}', { p: fr(piT(d.phi)) }) },
       { level: 3, html: MT(lines[1].math) },
     ],
     subgoals: ASB_SUB, keys: KEYS, tapActions: level === 3 ? 'solset' : null, key: `${ASB}:${start}:${I?.text ?? ''}`, exam, fallback: d.fallback,
@@ -473,7 +474,7 @@ function asbExam(rng, exam) {
   add(isolate(q(1), d.phi.neg(), fams).xs, 'g3_rphi');
   add([xs[0]], 'g3_family_missing');
   return mcq({
-    skill: ASB, level: 4, prompt: `Les solutions de ${MT(start)} sont…`, options: options.slice(0, 4), key: `mcq:${start}`,
+    skill: ASB, level: 4, prompt: t('Les solutions de {e} sont…', { e: MT(start) }), options: options.slice(0, 4), key: `mcq:${start}`,
     exam: { format: 'mcq', points: 1 }, solution: asbLines(d).lines.map((l) => ({ html: MT(l.math, XK), note: l.note })),
   }, rng);
 }
@@ -484,9 +485,9 @@ function asbExam(rng, exam) {
 
 const BIO = 'g3-bioche';
 const BIO_SUB = [
-  { id: 'subst', label: 'substituer', skill: BIO },
-  { id: 'teq', label: 'équation en t', skill: 'rat-equation' },
-  { id: 'back', label: 'revenir à x', skill: BASIC },
+  { id: 'subst', label: t('substituer'), skill: BIO },
+  { id: 'teq', label: t('équation en t'), skill: 'rat-equation' },
+  { id: 'back', label: t('revenir à x'), skill: BASIC },
 ];
 const TROOTS = [q(1), q(-1), q(2), q(-2), q(1, 2), q(-1, 2), q(3), q(-3), q(1, 3)];
 const gcd = (x, y) => (y ? gcd(y, x % y) : Math.abs(x));
@@ -533,8 +534,8 @@ function bioLines(d) {
   const { a, b, c } = d;
   const lines = [
     { math: `${intT(2 * a)}t/(1+t^2)${b < 0 ? '-' : '+'}${Math.abs(b) === 1 ? '' : Math.abs(b)}(1-t^2)/(1+t^2)=${c}`, note: 'sin x = 2t/(1 + t²), cos x = (1 − t²)/(1 + t²)', subgoal: 'subst' },
-    { math: `${polyT(b + c, -2 * a, c - b, 't')}=0`, note: 'Multiplier par 1 + t²', subgoal: 'teq' },
-    { math: d.roots.map((r) => `t=${lit0(r)}`).join('∨'), note: 'Résoudre en t', subgoal: 'teq' },
+    { math: `${polyT(b + c, -2 * a, c - b, 't')}=0`, note: t('Multiplier par 1 + t²'), subgoal: 'teq' },
+    { math: d.roots.map((r) => `t=${lit0(r)}`).join('∨'), note: t('Résoudre en t'), subgoal: 'teq' },
     { math: [...d.roots.map((r) => `x=${xOfT(r)}+2kπ`), ...(d.pi ? ['x=π+2kπ'] : [])].join('∨'), note: 'tan(x/2) = t : x = 2 arctan t + 2kπ', subgoal: 'back' },
   ];
   return lines;
@@ -547,17 +548,19 @@ function bioItem(level, rng, opts = {}) {
   const start = bioStart(d);
   const lines = bioLines(d);
   const piVal = -d.b;
-  const piNote = `x = π + 2kπ : sin x = 0 et cos x = −1, donc le membre de gauche vaut ${fr(String(piVal))}${piVal === d.c ? ` = ${fr(String(d.c))} : ce sont des solutions` : ` ≠ ${fr(String(d.c))} : pas des solutions`}.`;
+  const piNote = piVal === d.c
+    ? t('x = π + 2kπ : sin x = 0 et cos x = −1, donc le membre de gauche vaut {v} = {c} : ce sont des solutions.', { v: fr(String(piVal)), c: fr(String(d.c)) })
+    : t('x = π + 2kπ : sin x = 0 et cos x = −1, donc le membre de gauche vaut {v} ≠ {c} : pas des solutions.', { v: fr(String(piVal)), c: fr(String(d.c)) });
   const script = [];
   if (level === 3) {
-    script.push({ kind: 'decision', prompt: 'Que faire des x = π + 2kπ, où tan(x/2) n\'existe pas ?', options: [
-      { id: 'before', label: 'Les tester à part, avant de substituer', valid: true },
-      { id: 'after', label: 'Les tester à part, à la fin', valid: true },
-      { id: 'skip', label: 'Rien : la substitution donne toutes les solutions', valid: false, rule: 'g3_bioche_pi', why: 'tan(x/2) n\'existe pas en x = π : la substitution oublie ces valeurs.' },
+    script.push({ kind: 'decision', prompt: t('Que faire des x = π + 2kπ, où tan(x/2) n\'existe pas ?'), options: [
+      { id: 'before', label: t('Les tester à part, avant de substituer'), valid: true },
+      { id: 'after', label: t('Les tester à part, à la fin'), valid: true },
+      { id: 'skip', label: t('Rien : la substitution donne toutes les solutions'), valid: false, rule: 'g3_bioche_pi', why: t('tan(x/2) n\'existe pas en x = π : la substitution oublie ces valeurs.') },
     ] });
   }
   if (level <= 3) script.push({ kind: 'note', html: piNote });
-  if (level === 1) script.push({ kind: 'note', html: `Avec t = tan(x/2) : ${MT(lines[0].math, { vars: ['t'] })}` });
+  if (level === 1) script.push({ kind: 'note', html: t('Avec t = tan(x/2) : {e}', { e: MT(lines[0].math, { vars: ['t'] }) }) });
   const body = lines.map((l) => ({ kind: 'eq', ...l }));
   if (level === 1) body.shift();
   script.push(...body);
@@ -571,11 +574,11 @@ function bioItem(level, rng, opts = {}) {
     }
   }
   return linesItem({
-    skill: BIO, level, prompt: `Résous ${MT(start)}${I ? ` dans ${I.html}` : ' dans ℝ'} avec t = tan(x/2).`,
+    skill: BIO, level, prompt: I ? t('Résous {e} dans {I} avec t = tan(x/2).', { e: MT(start), I: I.html }) : t('Résous {e} dans ℝ avec t = tan(x/2).', { e: MT(start) }),
     start, judge: PERIODIC({ subst: { t: 'tan(x/2)' }, onDomain: true, onDomainOf: 'tan(x/2)' }),
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     hints: level >= 5 ? [] : [
-      { level: 1, html: 'La substitution oublie x = π + 2kπ : teste-les d\'abord. Puis sin x = 2t/(1 + t²), cos x = (1 − t²)/(1 + t²).' },
+      { level: 1, html: t('La substitution oublie x = π + 2kπ : teste-les d\'abord. Puis sin x = 2t/(1 + t²), cos x = (1 − t²)/(1 + t²).') },
       { level: 2, html: MT(lines[1].math, { vars: ['t'] }) },
       { level: 3, html: MT(lines[2].math, { vars: ['t'] }) },
     ],
@@ -592,13 +595,13 @@ function bioExam(rng, exam) {
   const fx = (t) => MT(t, XK);
   const pi = fx('x=π+2kπ');
   const options = [
-    { html: [...d.roots.map((r) => fx(`x=${xOfT(r)}+2kπ`)), pi].join(' ou '), correct: true },
-    { html: d.roots.map((r) => fx(`x=${xOfT(r)}+2kπ`)).join(' ou '), correct: false, rule: 'g3_bioche_pi' },
-    { html: [...d.roots.map((r) => fx(`x=arctan(${lit0(r)})+kπ`)), pi].join(' ou '), correct: false },
-    { html: [...d.roots.map((r) => fx(`x=${xOfT(r.neg())}+2kπ`)), pi].join(' ou '), correct: false },
+    { html: [...d.roots.map((r) => fx(`x=${xOfT(r)}+2kπ`)), pi].join(t(' ou ')), correct: true },
+    { html: d.roots.map((r) => fx(`x=${xOfT(r)}+2kπ`)).join(t(' ou ')), correct: false, rule: 'g3_bioche_pi' },
+    { html: [...d.roots.map((r) => fx(`x=arctan(${lit0(r)})+kπ`)), pi].join(t(' ou ')), correct: false },
+    { html: [...d.roots.map((r) => fx(`x=${xOfT(r.neg())}+2kπ`)), pi].join(t(' ou ')), correct: false },
   ].filter((o, i, a) => a.findIndex((x) => x.html === o.html) === i);
   return mcq({
-    skill: BIO, level: 4, prompt: `Les solutions de ${MT(start)} sont…`, options, key: `mcq:${start}`,
+    skill: BIO, level: 4, prompt: t('Les solutions de {e} sont…', { e: MT(start) }), options, key: `mcq:${start}`,
     exam: { format: 'mcq', points: 1 }, solution: bioLines(d).map((l) => ({ html: MT(l.math, { vars: ['x', 't', 'k'] }), note: l.note })),
   }, rng);
 }

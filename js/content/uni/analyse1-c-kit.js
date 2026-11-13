@@ -12,6 +12,7 @@ import { walk, stripParen } from '../../cas/ast.js';
 import { series } from '../../cas/series.js';
 import { blankLine } from '../../judges/lines.js';
 import { JUDGES, readWith } from '../../judges/index.js';
+import { t } from '../../i18n.js';
 
 export const V = 'x';
 export const q = (n, d = 1) => new Q(n, d);
@@ -182,7 +183,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));

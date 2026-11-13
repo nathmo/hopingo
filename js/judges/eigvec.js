@@ -9,6 +9,7 @@ import { parseExpr, evalAst, envOf, mmul, madd, identityV, S, sameScalar, isZero
 import { parse } from '../cas/parse.js';
 import { diagnoseLine } from './diagnose.js';
 import { readMat, mopts, wrongV, parseLine, show, text, input } from './matcommon.js';
+import { t } from '../i18n.js';
 
 export { parseLine, show, text, input };
 
@@ -46,14 +47,14 @@ export function judgeLine(cfg, prev, input) {
   const opts = mopts(cfg);
   const v = node.value;
   const n = shifted(cfg).rows.length;
-  if (!v || !isVec(v) || v.rows.length !== n) return { kind: 'form', node, message: `Écris un vecteur à ${n} composantes : (1 ; 2${n > 2 ? ' ; 0' : ''}).` };
+  if (!v || !isVec(v) || v.rows.length !== n) return { kind: 'form', node, message: t('Écris un vecteur à {n} composantes : {v}.', { n, v: `(1 ; 2${n > 2 ? ' ; 0' : ''})` }) };
   const same = (c, x) => isVec(c.value ?? c) && (c.value ?? c).rows.length === x.value.rows.length && proportional(c.value ?? c, x.value, opts);
   if (v.rows.every((r) => isZeroScalar(r[0], opts))) {
-    return wrongV(node, 'Le vecteur nul n\'est jamais un vecteur propre.', { rules: ['l_eigvec_zero'], ambiguous: 1, ctx: {} });
+    return wrongV(node, t('Le vecteur nul n\'est jamais un vecteur propre.'), { rules: ['l_eigvec_zero'], ambiguous: 1, ctx: {} });
   }
   if (!isEigen(cfg, v)) {
     const diag = diagnoseLine('eigvec', prev, node, cfg, same);
-    return wrongV(node, `(A − λI)v n'est pas nul : ce vecteur n'est pas propre pour λ = ${String(cfg.lambda).replace('-', '−')}.`, diag);
+    return wrongV(node, t('(A − λI)v n\'est pas nul : ce vecteur n\'est pas propre pour λ = {l}.', { l: String(cfg.lambda).replace('-', '−') }), diag);
   }
   return { kind: 'done', node };
 }

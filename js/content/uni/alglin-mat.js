@@ -19,6 +19,7 @@ import {
   q, mt, vt, ML, MLm, fq, qt, sub, unimodular, luPair, opLines, pickCells, withCells,
   matLines, coefItem, mcqDistinct, tfL, examTag, rowHoles, opR,
 } from './alglin-kit.js';
+import { t, tn } from '../../i18n.js';
 
 const nz = (rng, lo, hi) => { for (;;) { const k = rng.int(lo, hi); if (k) return k; } };
 const maxAbs = (A) => Math.max(...A.flat().map((x) => Math.abs(q(x).valueOf())));
@@ -34,7 +35,7 @@ const ij = (i, j) => `${sub(i + 1)}${sub(j + 1)}`;
 // Exact values of expressions with roots (geometry): their text and MathML.
 const EV = (text) => evalAst(parseExpr(text), {}, {});
 const VT = (text) => valueText(EV(text));
-const negT = (t) => (t === '0' ? '0' : t.startsWith('-') ? t.slice(1) : `-${t}`);
+const negT = (s) => (s === '0' ? '0' : s.startsWith('-') ? s.slice(1) : `-${s}`);
 const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
 const GRID2 = [[0, 0], [0, 0]];
 
@@ -70,14 +71,14 @@ function partsItem(level, rng, segs, o) {
 
 const PROD = 'l-mat-product';
 const PROD_SUB = [
-  { id: 'size', label: 'tailles', skill: PROD },
-  { id: 'rowcol', label: 'ligne fois colonne', skill: PROD },
+  { id: 'size', label: t('tailles'), skill: PROD },
+  { id: 'rowcol', label: t('ligne fois colonne'), skill: PROD },
 ];
 
 // A (m × p) and B (p × n), entries in [lo ; hi], AB with entries ≤ 20.
 // square: m = p = n (AB ≠ BA); same: n = m (BA exists too).
 function prodData(rng, { square = false, same = rng.chance(0.6), sizes } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     let [m, p, n] = sizes ?? [rng.pick([2, 3]), rng.pick([2, 3]), 0];
     if (!sizes) n = same ? m : rng.pick([2, 3, 4].filter((x) => x !== m));
     if (square) { m = rng.pick([2, 3]); p = m; n = m; }
@@ -111,11 +112,11 @@ function pickCell(d, rng) {
 }
 
 const prodAbout = (d, extra = {}) => ({ product: [mt(d.A), mt(d.B)], ...extra });
-const prodPrompt = (d) => `Soit A = ${MLm(d.A)} et B = ${MLm(d.B)}.`;
+const prodPrompt = (d) => t('Soit A = {A} et B = {B}.', { A: MLm(d.A), B: MLm(d.B) });
 
 function prodHints(d, [i, j]) {
   return [
-    { level: 1, html: 'Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme.' },
+    { level: 1, html: t('Case (i, j) de AB : la ligne i de A fois la colonne j de B, terme à terme, puis la somme.') },
     { level: 2, html: `(AB)${ij(i, j)} = ${holesR(d.A, d.B, i, j)}` },
     { level: 3, html: `(AB)${ij(i, j)} = ${expansionR(d.A, d.B, i, j)} = ${fq(d.AB[i][j])}` },
   ];
@@ -125,9 +126,9 @@ function prodHints(d, [i, j]) {
 function cellSegment(d, [i, j], extra = {}) {
   const v = d.AB[i][j];
   return [
-    { kind: 'segment', html: `Calcule le coefficient c${ij(i, j)} de C = AB.`, ask: `c${ij(i, j)} =`, start: { math: `c_${i + 1}${j + 1}` },
+    { kind: 'segment', html: t('Calcule le coefficient {c} de C = AB.', { c: `c${ij(i, j)}` }), ask: `c${ij(i, j)} =`, start: { math: `c_${i + 1}${j + 1}` },
       judge: { kind: 'mat', expect: qt(v), about: prodAbout(d, { coef: { i, j, of: mt(d.AB), name: 'c' } }), ...extra } },
-    { kind: 'eq', math: `(AB)_${i + 1}${j + 1} = ${expansion(d.A, d.B, i, j)}`, note: `Ligne ${i + 1} de A, colonne ${j + 1} de B : ${expansionR(d.A, d.B, i, j)}`, subgoal: 'rowcol' },
+    { kind: 'eq', math: `(AB)_${i + 1}${j + 1} = ${expansion(d.A, d.B, i, j)}`, note: t('Ligne {i} de A, colonne {j} de B : {e}', { i: i + 1, j: j + 1, e: expansionR(d.A, d.B, i, j) }), subgoal: 'rowcol' },
     { kind: 'eq', math: qt(v), note: '', subgoal: 'rowcol' },
   ];
 }
@@ -147,15 +148,15 @@ function prodItem(level, rng) {
       const right = `${d.m} × ${d.n}`;
       const opts = [
         { id: 'ok', label: right, valid: true },
-        d.n !== d.m ? { id: 'rev', label: `${d.n} × ${d.m}`, valid: false, why: `Les lignes de AB viennent de A (${d.m} lignes), ses colonnes de B (${d.n} colonnes) : AB est ${right}.` } : null,
-        d.p !== d.m || d.p !== d.n ? { id: 'inner', label: `${d.p} × ${d.p}`, valid: false, why: `Le nombre ${d.p} (colonnes de A = lignes de B) disparaît dans le produit : AB est ${right}.` } : null,
-        { id: 'none', label: 'Impossible', valid: false, why: `A a ${d.p} colonnes et B a ${d.p} lignes : le produit existe.` },
+        d.n !== d.m ? { id: 'rev', label: `${d.n} × ${d.m}`, valid: false, why: t('Les lignes de AB viennent de A ({m} lignes), ses colonnes de B ({n} colonnes) : AB est {s}.', { m: d.m, n: d.n, s: right }) } : null,
+        d.p !== d.m || d.p !== d.n ? { id: 'inner', label: `${d.p} × ${d.p}`, valid: false, why: t('Le nombre {p} (colonnes de A = lignes de B) disparaît dans le produit : AB est {s}.', { p: d.p, s: right }) } : null,
+        { id: 'none', label: t('Impossible'), valid: false, why: t('A a {p} colonnes et B a {p} lignes : le produit existe.', { p: d.p }) },
       ].filter(Boolean);
-      script.push({ kind: 'decision', prompt: 'Quelle est la taille de AB ?', options: rng.shuffle(opts) });
+      script.push({ kind: 'decision', prompt: t('Quelle est la taille de AB ?'), options: rng.shuffle(opts) });
     }
-    script.push(withCells({ kind: 'eq', math: mt(d.AB), note: 'Case (i, j) : ligne i de A · colonne j de B', subgoal: 'rowcol' }, cells));
+    script.push(withCells({ kind: 'eq', math: mt(d.AB), note: t('Case (i, j) : ligne i de A · colonne j de B'), subgoal: 'rowcol' }, cells));
     return matLines({
-      skill: PROD, level, prompt: `${prodPrompt(d)} ${level === 1 ? `AB est ${sizeR(d.AB)}. ` : ''}Complète le produit AB.`,
+      skill: PROD, level, prompt: level === 1 ? t('{p} AB est {s}. Complète le produit AB.', { p: prodPrompt(d), s: sizeR(d.AB) }) : t('{p} Complète le produit AB.', { p: prodPrompt(d) }),
       start: 'AB', judge, mode: 'guided', script, hints: prodHints(d, cell), subgoals: PROD_SUB, key: key(d, 'g'), fallback: d.fallback,
     });
   }
@@ -164,24 +165,24 @@ function prodItem(level, rng) {
     const cell = pickCell(d, rng);
     const [i, j] = cell;
     const menu1 = rng.shuffle([
-      { id: 'ok', label: `Ligne ${i + 1} de A et colonne ${j + 1} de B`, valid: true },
-      i !== j ? { id: 'swap', label: `Ligne ${j + 1} de A et colonne ${i + 1} de B`, valid: false, rule: 'l_coef_index_swap', why: `Le premier indice donne la ligne de A, le second la colonne de B : c${ij(i, j)} vient de la ligne ${i + 1} et de la colonne ${j + 1}.` } : null,
-      { id: 'cols', label: `Colonne ${i + 1} de A et ligne ${j + 1} de B`, valid: false, why: 'Dans AB, on prend une ligne de A et une colonne de B.' },
-      { id: 'cell', label: `La case (${i + 1}, ${j + 1}) de A fois la case (${i + 1}, ${j + 1}) de B`, valid: false, rule: 'l_product_entrywise', why: 'Une case de AB est une somme de produits « ligne fois colonne », pas le produit de deux cases.' },
+      { id: 'ok', label: t('Ligne {i} de A et colonne {j} de B', { i: i + 1, j: j + 1 }), valid: true },
+      i !== j ? { id: 'swap', label: t('Ligne {i} de A et colonne {j} de B', { i: j + 1, j: i + 1 }), valid: false, rule: 'l_coef_index_swap', why: t('Le premier indice donne la ligne de A, le second la colonne de B : {c} vient de la ligne {i} et de la colonne {j}.', { c: `c${ij(i, j)}`, i: i + 1, j: j + 1 }) } : null,
+      { id: 'cols', label: t('Colonne {i} de A et ligne {j} de B', { i: i + 1, j: j + 1 }), valid: false, why: t('Dans AB, on prend une ligne de A et une colonne de B.') },
+      { id: 'cell', label: t('La case ({i}, {j}) de A fois la case ({i}, {j}) de B', { i: i + 1, j: j + 1 }), valid: false, rule: 'l_product_entrywise', why: t('Une case de AB est une somme de produits « ligne fois colonne », pas le produit de deux cases.') },
     ].filter(Boolean));
     const menu2 = rng.shuffle([
-      { id: 'ok', label: 'Chaque case : une ligne de A fois une colonne de B', valid: true },
-      { id: 'cell', label: 'Multiplier les cases au même endroit', valid: false, rule: 'l_product_entrywise', why: 'Le produit matriciel n\'est pas le produit case par case.' },
-      { id: 'ba', label: 'Chaque case : une ligne de B fois une colonne de A', valid: false, rule: 'l_ab_commute', why: 'Ce serait BA, et le produit ne commute pas.' },
+      { id: 'ok', label: t('Chaque case : une ligne de A fois une colonne de B'), valid: true },
+      { id: 'cell', label: t('Multiplier les cases au même endroit'), valid: false, rule: 'l_product_entrywise', why: t('Le produit matriciel n\'est pas le produit case par case.') },
+      { id: 'ba', label: t('Chaque case : une ligne de B fois une colonne de A'), valid: false, rule: 'l_ab_commute', why: t('Ce serait BA, et le produit ne commute pas.') },
     ]);
     const [seg, ...rest] = cellSegment(d, cell, { menu: menu1 });
     const script = [
       ...rest,
-      { kind: 'segment', html: 'Calcule tout le produit AB.', start: { math: 'AB' }, judge: { kind: 'mat', expect: mt(d.AB), about: prodAbout(d), menu: menu2 } },
-      { kind: 'eq', math: mt(d.AB), note: `AB est ${sizeR(d.AB)}`, subgoal: 'rowcol' },
+      { kind: 'segment', html: t('Calcule tout le produit AB.'), start: { math: 'AB' }, judge: { kind: 'mat', expect: mt(d.AB), about: prodAbout(d), menu: menu2 } },
+      { kind: 'eq', math: mt(d.AB), note: t('AB est {s}', { s: sizeR(d.AB) }), subgoal: 'rowcol' },
     ];
     return matLines({
-      skill: PROD, level, prompt: `${prodPrompt(d)} Calcule d'abord le coefficient c${ij(i, j)} de C = AB : choisis la ligne et la colonne à multiplier. Puis calcule AB.`,
+      skill: PROD, level, prompt: t('{p} Calcule d\'abord le coefficient {c} de C = AB : choisis la ligne et la colonne à multiplier. Puis calcule AB.', { p: prodPrompt(d), c: `c${ij(i, j)}` }),
       start: seg.start.math, judge: seg.judge, mode: 'tap', tapActions: 'menu', script, hints: prodHints(d, cell), subgoals: PROD_SUB, key: key(d, 't'), fallback: d.fallback,
     });
   }
@@ -191,16 +192,16 @@ function prodItem(level, rng) {
     const Bt = MX.transpose(d.B);
     const ABt = MX.transpose(d.AB);
     const script = [
-      { kind: 'eq', math: mt(d.AB), note: `AB est ${sizeR(d.AB)} : ligne fois colonne`, subgoal: 'rowcol' },
-      { kind: 'segment', html: 'Calcule (AB)ᵀ en passant par BᵀAᵀ.', start: { math: '(AB)^T' }, judge: { kind: 'mat', expect: mt(ABt), about: { transpose: [mt(d.A), mt(d.B)] } } },
-      { kind: 'eq', math: `${mt(Bt)}·${mt(At)}`, note: '(AB)ᵀ = BᵀAᵀ : l\'ordre s\'inverse', subgoal: 'size' },
+      { kind: 'eq', math: mt(d.AB), note: t('AB est {s} : ligne fois colonne', { s: sizeR(d.AB) }), subgoal: 'rowcol' },
+      { kind: 'segment', html: t('Calcule (AB)ᵀ en passant par BᵀAᵀ.'), start: { math: '(AB)^T' }, judge: { kind: 'mat', expect: mt(ABt), about: { transpose: [mt(d.A), mt(d.B)] } } },
+      { kind: 'eq', math: `${mt(Bt)}·${mt(At)}`, note: t('(AB)ᵀ = BᵀAᵀ : l\'ordre s\'inverse'), subgoal: 'size' },
       { kind: 'eq', math: mt(ABt), note: '', subgoal: 'rowcol' },
     ];
     return matLines({
-      skill: PROD, level, prompt: `${prodPrompt(d)} Calcule AB, puis (AB)ᵀ.`,
+      skill: PROD, level, prompt: t('{p} Calcule AB, puis (AB)ᵀ.', { p: prodPrompt(d) }),
       start: 'AB', judge: { kind: 'mat', expect: mt(d.AB), about: prodAbout(d) }, mode: 'free', script,
       hints: [
-        { level: 1, html: 'Case (i, j) de AB : ligne i de A fois colonne j de B. Puis (AB)ᵀ = BᵀAᵀ : la transposée renverse l\'ordre.' },
+        { level: 1, html: t('Case (i, j) de AB : ligne i de A fois colonne j de B. Puis (AB)ᵀ = BᵀAᵀ : la transposée renverse l\'ordre.') },
         prodHints(d, pickCell(d, rng))[1],
         { level: 3, html: `AB = ${MLm(d.AB)}` },
       ],
@@ -212,7 +213,7 @@ function prodItem(level, rng) {
 
 // Level 5: (A + B)², AᵀB or A² − 2A + I, 2 × 2 or 3 × 3, without help.
 function prodExpr(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const n = rng.pick([2, 2, 3]);
     const lim = n === 3 ? 2 : 3;
     const A = randM(n, n, rng, -lim, lim);
@@ -237,10 +238,10 @@ function prodExpr(rng) {
     if (maxAbs(R) > 25 || R.flat().every((x) => x.n === 0)) continue;
     const about = kind === 'tA' ? { product: [mt(MX.transpose(A)), mt(B)] } : kind === 'sq' ? { product: [mt(MX.add(A, B)), mt(MX.add(A, B))] } : {};
     return matLines({
-      skill: PROD, level: 5, prompt: `Soit A = ${MLm(A)}${kind === 'poly' ? '' : ` et B = ${MLm(B)}`}. Calcule ${text}.`,
+      skill: PROD, level: 5, prompt: kind === 'poly' ? t('Soit A = {A}. Calcule {e}.', { A: MLm(A), e: text }) : t('Soit A = {A} et B = {B}. Calcule {e}.', { A: MLm(A), B: MLm(B), e: text }),
       start, judge: { kind: 'mat', expect: mt(R), about }, mode: 'free',
       script: [
-        { kind: 'eq', math: mid, note: kind === 'sq' ? '(A + B)² = (A + B)(A + B), sans développer' : kind === 'tA' ? 'Transposer A, puis multiplier' : 'A², puis 2A, puis + I', subgoal: 'rowcol' },
+        { kind: 'eq', math: mid, note: kind === 'sq' ? t('(A + B)² = (A + B)(A + B), sans développer') : kind === 'tA' ? t('Transposer A, puis multiplier') : t('A², puis 2A, puis + I'), subgoal: 'rowcol' },
         { kind: 'eq', math: mt(R), note: '', subgoal: 'rowcol' },
       ],
       hints: [], subgoals: PROD_SUB, key: `${PROD}:x:${kind}:${mt(A)}:${mt(B)}`,
@@ -248,7 +249,7 @@ function prodExpr(rng) {
   }
   const d = prodData(rng, { sizes: [3, 2, 3] });
   return matLines({
-    skill: PROD, level: 5, prompt: `${prodPrompt(d)} Calcule AB.`, start: 'AB', judge: { kind: 'mat', expect: mt(d.AB), about: prodAbout(d) },
+    skill: PROD, level: 5, prompt: t('{p} Calcule AB.', { p: prodPrompt(d) }), start: 'AB', judge: { kind: 'mat', expect: mt(d.AB), about: prodAbout(d) },
     mode: 'free', script: [{ kind: 'eq', math: mt(d.AB), subgoal: 'rowcol' }], hints: [], subgoals: PROD_SUB, key: `${PROD}:x:fb`, fallback: true,
   });
 }
@@ -270,41 +271,41 @@ function prodExam(rng, exam) {
       const pr = rng.pick(NONCOMMUTE);
       return tfL({
         skill: PROD, key: `sq:${mt(MX.mat(pr[0]))}`, truth: false, exam: tag, ruleIfTrue: 'l_ab_commute',
-        statement: 'Pour toutes matrices carrées A et B de même taille, (A + B)² = A² + 2AB + B².',
+        statement: t('Pour toutes matrices carrées A et B de même taille, (A + B)² = A² + 2AB + B².'),
         counter: pairCounter('(A+B)^2=A^2+2AB+B^2', pr),
-        explanation: `Faux : (A + B)² = A² + AB + BA + B², et AB ≠ BA en général. Par exemple A = ${MLm(MX.mat(pr[0]))}, B = ${MLm(MX.mat(pr[1]))}.`,
+        explanation: t('Faux : (A + B)² = A² + AB + BA + B², et AB ≠ BA en général. Par exemple A = {A}, B = {B}.', { A: MLm(MX.mat(pr[0])), B: MLm(MX.mat(pr[1])) }),
       });
     }
     if (which === 'zero') {
       const pr = rng.pick(ZERO_PAIRS);
       return tfL({
         skill: PROD, key: `zero:${mt(MX.mat(pr[0]))}`, truth: false, exam: tag,
-        statement: 'Si A et B sont des matrices carrées telles que AB = 0, alors A = 0 ou B = 0.',
+        statement: t('Si A et B sont des matrices carrées telles que AB = 0, alors A = 0 ou B = 0.'),
         counter: pairCounter('AB=0⇒A=0ouB=0', pr),
-        explanation: `Faux : A = ${MLm(MX.mat(pr[0]))} et B = ${MLm(MX.mat(pr[1]))} sont non nulles, et AB = 0.`,
+        explanation: t('Faux : A = {A} et B = {B} sont non nulles, et AB = 0.', { A: MLm(MX.mat(pr[0])), B: MLm(MX.mat(pr[1])) }),
       });
     }
     if (which === 'tr') {
       const pr = rng.pick(NONCOMMUTE);
       return tfL({
         skill: PROD, key: `tr:${mt(MX.mat(pr[0]))}`, truth: false, exam: tag, ruleIfTrue: 'l_transpose_product',
-        statement: 'Pour toutes matrices carrées A et B de même taille, (AB)ᵀ = AᵀBᵀ.',
+        statement: t('Pour toutes matrices carrées A et B de même taille, (AB)ᵀ = AᵀBᵀ.'),
         counter: pairCounter('(AB)^T=A^TB^T', pr),
-        explanation: `Faux : (AB)ᵀ = BᵀAᵀ, et AᵀBᵀ = (BA)ᵀ. Dès que AB ≠ BA, l'égalité tombe : A = ${MLm(MX.mat(pr[0]))}, B = ${MLm(MX.mat(pr[1]))}.`,
+        explanation: t('Faux : (AB)ᵀ = BᵀAᵀ, et AᵀBᵀ = (BA)ᵀ. Dès que AB ≠ BA, l\'égalité tombe : A = {A}, B = {B}.', { A: MLm(MX.mat(pr[0])), B: MLm(MX.mat(pr[1])) }),
       });
     }
     const T = {
-      trOk: ['Pour A de taille m × n et B de taille n × p, (AB)ᵀ = BᵀAᵀ.', 'Vrai : la case (i, j) de (AB)ᵀ est la ligne j de A fois la colonne i de B, c\'est-à-dire la ligne i de Bᵀ fois la colonne j de Aᵀ.'],
-      dist: ['Pour A de taille m × n et B, C de taille n × p, A(B + C) = AB + AC.', 'Vrai : le produit est distributif, à condition de garder A à gauche.'],
-      assoc: ['Pour A, B, C dont les produits existent, (AB)C = A(BC).', 'Vrai : le produit de matrices est associatif (c\'est la composition des applications).'],
+      trOk: [t('Pour A de taille m × n et B de taille n × p, (AB)ᵀ = BᵀAᵀ.'), t('Vrai : la case (i, j) de (AB)ᵀ est la ligne j de A fois la colonne i de B, c\'est-à-dire la ligne i de Bᵀ fois la colonne j de Aᵀ.')],
+      dist: [t('Pour A de taille m × n et B, C de taille n × p, A(B + C) = AB + AC.'), t('Vrai : le produit est distributif, à condition de garder A à gauche.')],
+      assoc: [t('Pour A, B, C dont les produits existent, (AB)C = A(BC).'), t('Vrai : le produit de matrices est associatif (c\'est la composition des applications).')],
     }[which];
     return tfL({ skill: PROD, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1], ruleIfFalse: null });
   }
   const d = prodData(rng, { square: exam === 'mcq' || rng.chance(0.5) });
   const [i, j] = pickCell(d, rng);
   const right = d.AB[i][j];
-  const prompt = `${prodPrompt(d)} Soit C = AB. Que vaut c${ij(i, j)} ?`;
-  const solution = [{ html: `c${ij(i, j)} = ${expansionR(d.A, d.B, i, j)} = ${fq(right)}`, note: `Ligne ${i + 1} de A, colonne ${j + 1} de B` }];
+  const prompt = t('{p} Soit C = AB. Que vaut {c} ?', { p: prodPrompt(d), c: `c${ij(i, j)}` });
+  const solution = [{ html: `c${ij(i, j)} = ${expansionR(d.A, d.B, i, j)} = ${fq(right)}`, note: t('Ligne {i} de A, colonne {j} de B', { i: i + 1, j: j + 1 }) }];
   if (exam === 'coef') {
     return coefItem({
       skill: PROD, level: 4, prompt, label: `c_${i + 1}${j + 1}`, value: qt(right), key: `${mt(d.A)}:${mt(d.B)}:${i}${j}`, exam: examTag({ exam }),
@@ -334,16 +335,16 @@ const INV = 'l-mat-inverse';
 const ECH = 'l-sys-echelon';
 const RREF = 'l-sys-rref';
 const INV_SUB = [
-  { id: 'down', label: 'descendre', skill: ECH },
-  { id: 'up', label: 'remonter', skill: RREF },
-  { id: 'read', label: 'lire', skill: INV },
+  { id: 'down', label: t('descendre'), skill: ECH },
+  { id: 'up', label: t('remonter'), skill: RREF },
+  { id: 'read', label: t('lire'), skill: INV },
 ];
 
 // A (n × n) with a nice inverse: unimodular (whole inverse), or
 // M·diag(1, …, 1, d) (fractions k/d in the last row of A⁻¹). The reduction
 // of [A | I] (no exchange) stays small. The asked entry b_ij ≠ b_ji, ≠ 0.
 function invData(rng, { n = 3, scaled = false, maxOps = 8, unitPivot = false } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     let A = unimodular(n, rng, { max: 3 });
     if (scaled) A = MX.mul(A, MX.diag([...Array(n - 1).fill(1), rng.pick([2, 3])]));
     if (maxAbs(A) > 6 || A.flat().filter((x) => x.n === 0).length > n - 1 || A.some((r) => r.filter((x) => x.n !== 0).length < 2)) continue;
@@ -373,17 +374,17 @@ function invData(rng, { n = 3, scaled = false, maxOps = 8, unitPivot = false } =
 const invAbout = (d, coef = false) => ({ inverse: mt(d.A), ...(coef ? { coef: { i: d.i, j: d.j, of: mt(d.Ai), name: 'b' } } : {}) });
 const bLabel = (d) => `b_${d.i + 1}${d.j + 1}`;
 const bName = (d) => `b${ij(d.i, d.j)}`;
-const invSeg = (d) => ({ kind: 'segment', html: 'Lis A⁻¹ dans la partie droite.', start: { math: 'A^(-1)' }, judge: { kind: 'mat', expect: mt(d.Ai), about: invAbout(d) } });
-const invLine = (d) => ({ kind: 'eq', math: mt(d.Ai), note: 'La partie droite de [I | A⁻¹]', subgoal: 'read' });
-const coefSeg = (d, html = `Que vaut ${bName(d)}, le coefficient (${d.i + 1}, ${d.j + 1}) de A⁻¹ ?`) => ({
+const invSeg = (d) => ({ kind: 'segment', html: t('Lis A⁻¹ dans la partie droite.'), start: { math: 'A^(-1)' }, judge: { kind: 'mat', expect: mt(d.Ai), about: invAbout(d) } });
+const invLine = (d) => ({ kind: 'eq', math: mt(d.Ai), note: t('La partie droite de [I | A⁻¹]'), subgoal: 'read' });
+const coefSeg = (d, html = t('Que vaut {b}, le coefficient ({i}, {j}) de A⁻¹ ?', { b: bName(d), i: d.i + 1, j: d.j + 1 })) => ({
   kind: 'segment', html, ask: `${bName(d)} =`, start: { math: bLabel(d) }, judge: { kind: 'mat', expect: qt(d.Ai[d.i][d.j]), about: invAbout(d, true) },
 });
-const coefLine = (d) => ({ kind: 'eq', math: qt(d.Ai[d.i][d.j]), note: `Ligne ${d.i + 1}, colonne ${d.j + 1} de A⁻¹`, subgoal: 'read' });
+const coefLine = (d) => ({ kind: 'eq', math: qt(d.Ai[d.i][d.j]), note: t('Ligne {i}, colonne {j} de A⁻¹', { i: d.i + 1, j: d.j + 1 }), subgoal: 'read' });
 
 function invLines(d) {
   return opLines(d.M, d.ops, {
     bar: d.n,
-    note: (op) => (op.kind === 'scale' ? `Pivot à 1 : ${opR(op)}` : op.i > op.j ? `Descendre : ${opR(op)}` : `Remonter : ${opR(op)}`),
+    note: (op) => (op.kind === 'scale' ? t('Pivot à 1 : {op}', { op: opR(op) }) : op.i > op.j ? t('Descendre : {op}', { op: opR(op) }) : t('Remonter : {op}', { op: opR(op) })),
     subgoal: (op) => (op.kind === 'add' && op.i > op.j ? 'down' : 'up'),
   });
 }
@@ -391,8 +392,8 @@ function invLines(d) {
 function invHints(d, lines) {
   const up = lines.find((l) => l.op.kind === 'add' && l.op.i < l.op.j) ?? lines[lines.length - 1];
   return [
-    { level: 1, html: `Réduis [A | I] jusqu'à [I | A⁻¹] : chaque opération porte sur les ${2 * d.n} colonnes.` },
-    { level: 2, html: `${opR(up.op)} : la ligne ${up.op.i + 1} devient ${rowHoles(up.result, up.op.i, d.n, d.n)}.` },
+    { level: 1, html: t('Réduis [A | I] jusqu\'à [I | A⁻¹] : chaque opération porte sur les {n} colonnes.', { n: 2 * d.n }) },
+    { level: 2, html: t('{op} : la ligne {i} devient {row}.', { op: opR(up.op), i: up.op.i + 1, row: rowHoles(up.result, up.op.i, d.n, d.n) }) },
     { level: 3, html: ML(lines[0].math) },
   ];
 }
@@ -425,10 +426,10 @@ function invItem(level, rng) {
       const bad = { ...op, k: op.k.neg() };
       const other = { kind: 'add', i: op.i, j: [0, 1, 2].find((x) => x !== op.i && x !== op.j), k: q(1) };
       script.push({
-        kind: 'decision', prompt: `Quelle opération annule la case (${op.i + 1}, 1) ?`, options: rng.shuffle([
+        kind: 'decision', prompt: t('Quelle opération annule la case ({i}, 1) ?', { i: op.i + 1 }), options: rng.shuffle([
           { id: 'ok', label: opR(op), valid: true },
-          { id: 'sign', label: opR(bad), valid: false, rule: 'l_rowop_sign', why: `Avec ce signe, la case devient ${fq(d.M[op.i][0].add(bad.k.mul(d.M[op.j][0])))} au lieu de 0.` },
-          { id: 'other', label: opR(other), valid: false, why: 'Cette opération ne crée pas de zéro sous le pivot : c\'est la ligne du pivot qu\'il faut ajouter.' },
+          { id: 'sign', label: opR(bad), valid: false, rule: 'l_rowop_sign', why: t('Avec ce signe, la case devient {v} au lieu de 0.', { v: fq(d.M[op.i][0].add(bad.k.mul(d.M[op.j][0]))) }) },
+          { id: 'other', label: opR(other), valid: false, why: t('Cette opération ne crée pas de zéro sous le pivot : c\'est la ligne du pivot qu\'il faut ajouter.') },
         ]),
       });
     }
@@ -440,13 +441,15 @@ function invItem(level, rng) {
     if (level === 1) script.push(invSeg(d), withCells(invLine(d), pickCells(d.Ai, [...Array(d.n).keys()], 3, rng)));
     else script.push(coefSeg(d), coefLine(d));
     return matLines({
-      ...base, prompt: `Inverse A = ${MLm(d.A)} en réduisant [A | I]${level === 2 ? `, puis lis ${bName(d)}` : ''}.`,
+      ...base, prompt: level === 2 ? t('Inverse A = {A} en réduisant [A | I], puis lis {b}.', { A: MLm(d.A), b: bName(d) }) : t('Inverse A = {A} en réduisant [A | I].', { A: MLm(d.A) }),
       mode: 'guided', script, key,
     });
   }
   return matLines({
     ...base,
-    prompt: `Réduis [A | I] avec A = ${MLm(d.A)}${level === 3 ? ' : choisis chaque opération, puis écris la matrice' : ''}. Puis donne ${level === 3 ? bName(d) : 'A⁻¹'}.`,
+    prompt: level === 3
+      ? t('Réduis [A | I] avec A = {A} : choisis chaque opération, puis écris la matrice. Puis donne {b}.', { A: MLm(d.A), b: bName(d) })
+      : t('Réduis [A | I] avec A = {A}. Puis donne {b}.', { A: MLm(d.A), b: 'A⁻¹' }),
     mode: level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
     script: [...lines, ...(level === 3 ? [coefSeg(d), coefLine(d)] : [invSeg(d), invLine(d)])], key,
   });
@@ -455,7 +458,7 @@ function invItem(level, rng) {
 // A 2 × 2 by the formula (level 4).
 function inv2x2(rng) {
   let A; let det;
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     A = randM(2, 2, rng, -5, 5);
     det = MX.det(A);
     if ([-1, 2, -2, 3, -3, 4, -4, 5, -5].includes(det.valueOf()) && A.flat().every((x) => x.n !== 0) && !A[0][0].eq(A[1][1])) break;
@@ -468,14 +471,14 @@ function inv2x2(rng) {
   const adj = [[dd, b.neg()], [c.neg(), a]];
   const mid = `(${qt(q(1).div(det))})·${mt(adj)}`;
   return matLines({
-    skill: INV, level: 4, prompt: `Calcule l'inverse de A = ${MLm(A)} par la formule des matrices 2 × 2.`,
+    skill: INV, level: 4, prompt: t('Calcule l\'inverse de A = {A} par la formule des matrices 2 × 2.', { A: MLm(A) }),
     start: 'A^(-1)', judge: { kind: 'mat', expect: mt(Ai), about: { inverse: mt(A) } }, mode: 'free',
     script: [
-      { kind: 'eq', math: mid, note: `ad − bc = ${fq(det)} ; échanger a et d, changer le signe de b et c`, subgoal: 'read' },
+      { kind: 'eq', math: mid, note: t('ad − bc = {d} ; échanger a et d, changer le signe de b et c', { d: fq(det) }), subgoal: 'read' },
       { kind: 'eq', math: mt(Ai), note: '', subgoal: 'read' },
     ],
     hints: [
-      { level: 1, html: 'Pour une 2 × 2 : [[a, b], [c, d]]⁻¹ = (1/(ad − bc))·[[d, −b], [−c, a]].' },
+      { level: 1, html: t('Pour une 2 × 2 : [[a, b], [c, d]]⁻¹ = (1/(ad − bc))·[[d, −b], [−c, a]].') },
       { level: 2, html: `ad − bc = ${parR(a)}·${parR(dd)} − ${parR(b)}·${parR(c)} = □` },
       { level: 3, html: `A⁻¹ = (1/${parR(det)})·${MLm(adj)}` },
     ],
@@ -487,7 +490,7 @@ function inv2x2(rng) {
 function invAlone(rng) {
   if (rng.chance(0.35)) {
     let A; let Ai;
-    for (let t = 0; t < 200 && !A; t++) {
+    for (let tries = 0; tries < 200 && !A; tries++) {
       const X = unimodular(4, rng, { max: 3 });
       const Xi = MX.inverse(X);
       if (maxAbs(Xi) > 9 || MX.trace(Xi).eq(MX.trace(X))) continue;
@@ -496,19 +499,19 @@ function invAlone(rng) {
     const fb = !A;
     if (fb) { A = MX.mat([[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 0, 1]]); Ai = MX.inverse(A); }
     return coefItem({
-      skill: INV, level: 5, prompt: `Soit A = ${MLm(A)} et B une matrice telle que AB = I₄. Que vaut la trace de B ?`,
+      skill: INV, level: 5, prompt: t('Soit A = {A} et B une matrice telle que AB = I₄. Que vaut la trace de B ?', { A: MLm(A) }),
       label: 'tr(B)', value: qt(MX.trace(Ai)), key: `tr:${mt(A)}`, askCoef: { label: 'tr B' },
       traps: [{ rule: 'l_inv_entrywise' }, { rule: 'l_coef_index_swap' }], subgoals: INV_SUB,
-      solution: [{ html: `B = A⁻¹ = ${MLm(Ai)}`, note: 'AB = I et A carrée : B = A⁻¹' }, { html: `tr B = ${fq(MX.trace(Ai))}`, note: 'Somme de la diagonale' }],
+      solution: [{ html: `B = A⁻¹ = ${MLm(Ai)}`, note: t('AB = I et A carrée : B = A⁻¹') }, { html: `tr B = ${fq(MX.trace(Ai))}`, note: t('Somme de la diagonale') }],
       fallback: fb,
     });
   }
   const d = invData(rng, { scaled: rng.chance(0.5), maxOps: 9 });
   return coefItem({
-    skill: INV, level: 5, prompt: `Soit A = ${MLm(d.A)} et B = A⁻¹. Que vaut ${bName(d)} ?`,
+    skill: INV, level: 5, prompt: t('Soit A = {A} et B = A⁻¹. Que vaut {b} ?', { A: MLm(d.A), b: bName(d) }),
     label: bLabel(d), value: qt(d.Ai[d.i][d.j]), key: `${mt(d.A)}:${d.i}${d.j}`, askCoef: { label: bName(d), path: [d.i, d.j] },
     traps: [{ rule: 'l_coef_index_swap' }, { rule: 'l_inv_entrywise' }, { rule: 'l_rhs_forgotten' }], subgoals: INV_SUB,
-    solution: [{ html: `A⁻¹ = ${MLm(d.Ai)}`, note: 'Réduire [A | I]' }, { html: `${bName(d)} = ${fq(d.Ai[d.i][d.j])}`, note: '' }],
+    solution: [{ html: `A⁻¹ = ${MLm(d.Ai)}`, note: t('Réduire [A | I]') }, { html: `${bName(d)} = ${fq(d.Ai[d.i][d.j])}`, note: '' }],
     fallback: d.fallback,
   });
 }
@@ -523,22 +526,22 @@ function invExam(rng, exam) {
       const pr = rng.pick(INV_PAIRS);
       return tfL({
         skill: INV, key: `prod:${mt(MX.mat(pr[0]))}`, truth: false, exam: tag, ruleIfTrue: 'l_inv_product_order',
-        statement: 'Si A et B sont des matrices n × n inversibles, alors AB est inversible et (AB)⁻¹ = A⁻¹B⁻¹.',
+        statement: t('Si A et B sont des matrices n × n inversibles, alors AB est inversible et (AB)⁻¹ = A⁻¹B⁻¹.'),
         counter: pairCounter('(AB)^-1=A^-1B^-1', pr),
-        explanation: `Faux : (AB)⁻¹ = B⁻¹A⁻¹, qui diffère de A⁻¹B⁻¹ dès que A et B ne commutent pas. Par exemple A = ${MLm(MX.mat(pr[0]))} et B = ${MLm(MX.mat(pr[1]))}.`,
+        explanation: t('Faux : (AB)⁻¹ = B⁻¹A⁻¹, qui diffère de A⁻¹B⁻¹ dès que A et B ne commutent pas. Par exemple A = {A} et B = {B}.', { A: MLm(MX.mat(pr[0])), B: MLm(MX.mat(pr[1])) }),
       });
     }
     const T = {
-      transp: ['Si A est inversible, alors Aᵀ est inversible et (Aᵀ)⁻¹ = (A⁻¹)ᵀ.', 'Vrai : Aᵀ(A⁻¹)ᵀ = (A⁻¹A)ᵀ = Iᵀ = I.'],
-      prodOk: ['Si A et B sont des matrices n × n inversibles, alors (AB)⁻¹ = B⁻¹A⁻¹.', 'Vrai : (AB)(B⁻¹A⁻¹) = A(BB⁻¹)A⁻¹ = AA⁻¹ = I.'],
-      twice: ['Si A est inversible, alors A⁻¹ est inversible et (A⁻¹)⁻¹ = A.', 'Vrai : A⁻¹A = AA⁻¹ = I dit justement que A est l\'inverse de A⁻¹.'],
+      transp: [t('Si A est inversible, alors Aᵀ est inversible et (Aᵀ)⁻¹ = (A⁻¹)ᵀ.'), t('Vrai : Aᵀ(A⁻¹)ᵀ = (A⁻¹A)ᵀ = Iᵀ = I.')],
+      prodOk: [t('Si A et B sont des matrices n × n inversibles, alors (AB)⁻¹ = B⁻¹A⁻¹.'), t('Vrai : (AB)(B⁻¹A⁻¹) = A(BB⁻¹)A⁻¹ = AA⁻¹ = I.')],
+      twice: [t('Si A est inversible, alors A⁻¹ est inversible et (A⁻¹)⁻¹ = A.'), t('Vrai : A⁻¹A = AA⁻¹ = I dit justement que A est l\'inverse de A⁻¹.')],
     }[which];
     return tfL({ skill: INV, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1], ruleIfFalse: which === 'prodOk' ? 'l_inv_product_order' : null });
   }
   const d = invData(rng, { scaled: rng.chance(0.4), maxOps: 9 });
   const right = d.Ai[d.i][d.j];
-  const prompt = `Soit A = ${MLm(d.A)} et B = A⁻¹. Que vaut ${bName(d)} ?`;
-  const solution = [{ html: `A⁻¹ = ${MLm(d.Ai)}`, note: 'Réduire [A | I]' }, { html: `${bName(d)} = ${fq(right)}`, note: `Ligne ${d.i + 1}, colonne ${d.j + 1}` }];
+  const prompt = t('Soit A = {A} et B = A⁻¹. Que vaut {b} ?', { A: MLm(d.A), b: bName(d) });
+  const solution = [{ html: `A⁻¹ = ${MLm(d.Ai)}`, note: t('Réduire [A | I]') }, { html: `${bName(d)} = ${fq(right)}`, note: t('Ligne {i}, colonne {j}', { i: d.i + 1, j: d.j + 1 }) }];
   if (exam === 'coef') {
     return coefItem({
       skill: INV, level: 4, prompt, label: bLabel(d), value: qt(right), key: `${mt(d.A)}:${d.i}${d.j}`, exam: tag,
@@ -565,11 +568,11 @@ function invExam(rng, exam) {
 
 const GEOM = 'l-map-geom';
 const GEOM_SUB = [
-  { id: 'images', label: 'images de e₁ et e₂', skill: 'l-map-std-matrix' },
-  { id: 'trig', label: 'cos θ et sin θ', skill: 'g3-exact' },
-  { id: 'dir', label: 'vecteur directeur d\'une droite', skill: 'g4-line2' },
-  { id: 'invP', label: 'inverser P', skill: INV },
-  { id: 'compose', label: 'recomposer', skill: GEOM },
+  { id: 'images', label: t('images de e₁ et e₂'), skill: 'l-map-std-matrix' },
+  { id: 'trig', label: t('cos θ et sin θ'), skill: 'g3-exact' },
+  { id: 'dir', label: t('vecteur directeur d\'une droite'), skill: 'g4-line2' },
+  { id: 'invP', label: t('inverser P'), skill: INV },
+  { id: 'compose', label: t('recomposer'), skill: GEOM },
 ];
 
 const THETA = [
@@ -581,8 +584,8 @@ const RAT_THETA = THETA.filter((x) => !/√/.test(x.c + x.s));
 const rotT = (th) => `[[${th.c},${negT(th.s)}],[${th.s},${th.c}]]`;
 const rotTT = (th) => `[[${th.c},${th.s}],[${negT(th.s)},${th.c}]]`;
 // A scalar with a root, as matexpr reads it alone: (√2)/2 (« √2/2 » alone is misread).
-const rootP = (t) => t.replace(/√(\d+)/g, '(√$1)');
-const rotR = (th) => `la rotation d'angle ${th.t} (de centre O)`;
+const rootP = (s) => s.replace(/√(\d+)/g, '(√$1)');
+const rotR = (th) => t('la rotation d\'angle {a} (de centre O)', { a: th.t });
 
 // « ax + by = 0 », readable (a ≥ 0).
 function lineEq(a, b) {
@@ -612,7 +615,7 @@ function projData(rng) {
 // Affinity of axis Span{a}, direction Span{u}, ratio k: M = P·diag(1, k)·P⁻¹.
 const KS = [q(-2), q(-1, 2), q(2, 3), q(-2, 3), q(3), q(2), q(1, 2)];
 function affData(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const a = direction(rng).map((x, i) => (i === 0 ? x * rng.pick([1, -1]) : x));
     const u = [rng.int(-3, 3), rng.int(-3, 3)];
     if (u.every((x) => x === 0) || gcd(u[0], u[1]) !== 1) continue;
@@ -633,14 +636,14 @@ function affData(rng) {
 
 // The matrix of a map « first, then second »: second·first.
 const SIMPLE_SYM = [
-  { M: '[[1,0],[0,-1]]', r: 'la symétrie d\'axe Ox' }, { M: '[[-1,0],[0,1]]', r: 'la symétrie d\'axe Oy' }, { M: '[[0,1],[1,0]]', r: 'la symétrie d\'axe y = x' },
+  { M: '[[1,0],[0,-1]]', r: t('la symétrie d\'axe Ox') }, { M: '[[-1,0],[0,1]]', r: t('la symétrie d\'axe Oy') }, { M: '[[0,1],[1,0]]', r: t('la symétrie d\'axe y = x') },
 ];
 function compData(rng) {
   const th = rng.pick(rng.chance(0.5) ? RAT_THETA : THETA);
   let S;
   if (!/√/.test(th.c + th.s) && rng.chance(0.6)) {
     const p = projData(rng);
-    S = rng.chance(0.5) ? { M: mt(p.S), r: `la symétrie orthogonale d'axe ${p.eq}`, p } : { M: mt(p.P), r: `la projection orthogonale sur la droite ${p.eq}`, p };
+    S = rng.chance(0.5) ? { M: mt(p.S), r: t('la symétrie orthogonale d\'axe {eq}', { eq: p.eq }), p } : { M: mt(p.P), r: t('la projection orthogonale sur la droite {eq}', { eq: p.eq }), p };
   } else S = rng.pick(SIMPLE_SYM);
   const R = { M: rotT(th), r: rotR(th), th };
   const rFirst = rng.chance(0.5);
@@ -655,27 +658,27 @@ const geomCfg = (expect, about) => ({ kind: 'mat', expect, ...(about ? { about }
 function rotParts(th, rng) {
   const a = th.t.replace('−', '-');
   const exact = () => rng.shuffle([
-    { id: 'ok', label: 'La valeur exacte, lue sur le cercle trigonométrique', valid: true },
-    { id: 'approx', label: 'Une valeur approchée à la calculatrice', valid: false, why: 'La matrice demande des valeurs exactes, avec des racines.' },
+    { id: 'ok', label: t('La valeur exacte, lue sur le cercle trigonométrique'), valid: true },
+    { id: 'approx', label: t('Une valeur approchée à la calculatrice'), valid: false, why: t('La matrice demande des valeurs exactes, avec des racines.') },
   ]);
   return [
     { start: `cos(${a})`, judge: geomCfg(rootP(th.c)), menu: exact(),
-      lines: [{ math: th.c, note: `cos θ, abscisse du point d'angle ${th.t} du cercle`, subgoal: 'trig' }] },
+      lines: [{ math: th.c, note: t('cos θ, abscisse du point d\'angle {a} du cercle', { a: th.t }), subgoal: 'trig' }] },
     { html: 'sin θ.', start: `sin(${a})`, judge: geomCfg(rootP(th.s)), menu: exact(),
-      lines: [{ math: th.s, note: `sin θ, ordonnée du même point`, subgoal: 'trig' }] },
-    { html: 'La matrice R de la rotation.', start: 'R', judge: geomCfg(rotT(th), { rotation: true }),
+      lines: [{ math: th.s, note: t('sin θ, ordonnée du même point'), subgoal: 'trig' }] },
+    { html: t('La matrice R de la rotation.'), start: 'R', judge: geomCfg(rotT(th), { rotation: true }),
       menu: rng.shuffle([
-        { id: 'ok', label: 'R·e₁ et R·e₂ en colonnes', valid: true },
-        { id: 'rows', label: 'R·e₁ et R·e₂ en lignes', valid: false, rule: 'l_rot_transpose', why: 'Les colonnes d\'une matrice sont les images des vecteurs de base : en lignes, on obtient la rotation d\'angle −θ.' },
+        { id: 'ok', label: t('R·e₁ et R·e₂ en colonnes'), valid: true },
+        { id: 'rows', label: t('R·e₁ et R·e₂ en lignes'), valid: false, rule: 'l_rot_transpose', why: t('Les colonnes d\'une matrice sont les images des vecteurs de base : en lignes, on obtient la rotation d\'angle −θ.') },
       ]),
       decision: {
-        kind: 'decision', prompt: 'Quelle est la matrice de la rotation d\'angle θ ?', options: rng.shuffle([
+        kind: 'decision', prompt: t('Quelle est la matrice de la rotation d\'angle θ ?'), options: rng.shuffle([
           { id: 'ok', label: '[[cos θ, −sin θ], [sin θ, cos θ]]', valid: true },
-          { id: 'tr', label: '[[cos θ, sin θ], [−sin θ, cos θ]]', valid: false, rule: 'l_rot_transpose', why: 'Sa première colonne est (cos θ ; −sin θ) : c\'est la rotation d\'angle −θ.' },
-          { id: 'sc', label: '[[sin θ, −cos θ], [cos θ, sin θ]]', valid: false, why: 'Sa première colonne doit être l\'image de e₁, (cos θ ; sin θ).' },
+          { id: 'tr', label: '[[cos θ, sin θ], [−sin θ, cos θ]]', valid: false, rule: 'l_rot_transpose', why: t('Sa première colonne est (cos θ ; −sin θ) : c\'est la rotation d\'angle −θ.') },
+          { id: 'sc', label: '[[sin θ, −cos θ], [cos θ, sin θ]]', valid: false, why: t('Sa première colonne doit être l\'image de e₁, (cos θ ; sin θ).') },
         ]),
       },
-      lines: [{ math: rotT(th), note: 'Colonnes : R·e₁ et R·e₂', subgoal: 'images', grid: GRID2 }] },
+      lines: [{ math: rotT(th), note: t('Colonnes : R·e₁ et R·e₂'), subgoal: 'images', grid: GRID2 }] },
   ];
 }
 
@@ -683,35 +686,35 @@ function projParts(p, sym, rng) {
   const parts = [
     { start: 'u', judge: { kind: 'span', basis: [vt(p.u.map((x) => q(x)))], require: 'basis' },
       menu: rng.shuffle([
-        { id: 'ok', label: 'Pour ax + by = 0 : u = (−b ; a)', valid: true },
-        { id: 'n', label: 'Pour ax + by = 0 : u = (a ; b)', valid: false, why: '(a ; b) est un vecteur normal : il est orthogonal à la droite.' },
+        { id: 'ok', label: t('Pour ax + by = 0 : u = (−b ; a)'), valid: true },
+        { id: 'n', label: t('Pour ax + by = 0 : u = (a ; b)'), valid: false, why: t('(a ; b) est un vecteur normal : il est orthogonal à la droite.') },
       ]),
-      lines: [{ math: vt(p.u.map((x) => q(x))), note: `Un vecteur directeur de ${p.eq}`, subgoal: 'dir' }] },
-    { html: 'La matrice P de la projection orthogonale sur la droite.', start: 'P', judge: geomCfg(mt(p.P)),
+      lines: [{ math: vt(p.u.map((x) => q(x))), note: t('Un vecteur directeur de {eq}', { eq: p.eq }), subgoal: 'dir' }] },
+    { html: t('La matrice P de la projection orthogonale sur la droite.'), start: 'P', judge: geomCfg(mt(p.P)),
       menu: rng.shuffle([
         { id: 'ok', label: 'P = uuᵀ/(uᵀu)', valid: true },
-        { id: 'sq', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: 'Il faut diviser par ‖u‖² = uᵀu : P·u doit redonner u.' },
-        { id: 'ut', label: 'P = uᵀu/(uuᵀ)', valid: false, why: 'uᵀu est un nombre, et on ne divise pas par une matrice.' },
+        { id: 'sq', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: t('Il faut diviser par ‖u‖² = uᵀu : P·u doit redonner u.') },
+        { id: 'ut', label: 'P = uᵀu/(uuᵀ)', valid: false, why: t('uᵀu est un nombre, et on ne divise pas par une matrice.') },
       ]),
       decision: {
-        kind: 'decision', prompt: 'Quelle formule donne la projection orthogonale sur la droite de direction u ?', options: rng.shuffle([
+        kind: 'decision', prompt: t('Quelle formule donne la projection orthogonale sur la droite de direction u ?'), options: rng.shuffle([
           { id: 'ok', label: 'P = uuᵀ/(uᵀu)', valid: true },
-          { id: 'sq', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: 'Il faut diviser par ‖u‖² = uᵀu : alors P·u = u.' },
-          { id: 'ut', label: 'P = uᵀu/(uuᵀ)', valid: false, why: 'uᵀu est un nombre, uuᵀ une matrice : on ne divise pas par une matrice.' },
+          { id: 'sq', label: 'P = uuᵀ/‖u‖', valid: false, rule: 'g4_proj_no_square', why: t('Il faut diviser par ‖u‖² = uᵀu : alors P·u = u.') },
+          { id: 'ut', label: 'P = uᵀu/(uuᵀ)', valid: false, why: t('uᵀu est un nombre, uuᵀ une matrice : on ne divise pas par une matrice.') },
         ]),
       },
       lines: [
-        { math: `(1/${p.n2})·${mt(p.uu)}`, note: `uuᵀ divisé par uᵀu = ${p.n2}`, subgoal: 'compose' },
+        { math: `(1/${p.n2})·${mt(p.uu)}`, note: t('uuᵀ divisé par uᵀu = {n}', { n: p.n2 }), subgoal: 'compose' },
         { math: mt(p.P), note: '', subgoal: 'compose', grid: GRID2 },
       ] },
   ];
   if (sym) {
     parts.push({
-      html: 'La matrice S de la symétrie orthogonale d\'axe la droite.', start: 'S', judge: geomCfg(mt(p.S)),
+      html: t('La matrice S de la symétrie orthogonale d\'axe la droite.'), start: 'S', judge: geomCfg(mt(p.S)),
       menu: rng.shuffle([
         { id: 'ok', label: 'S = 2P − I', valid: true },
-        { id: 'pi', label: 'S = P − I', valid: false, why: 'Le symétrique de x est P(x) + (P(x) − x) = 2P(x) − x.' },
-        { id: 'ip', label: 'S = I − 2P', valid: false, why: 'I − 2P est la symétrie d\'axe la droite perpendiculaire.' },
+        { id: 'pi', label: 'S = P − I', valid: false, why: t('Le symétrique de x est P(x) + (P(x) − x) = 2P(x) − x.') },
+        { id: 'ip', label: 'S = I − 2P', valid: false, why: t('I − 2P est la symétrie d\'axe la droite perpendiculaire.') },
       ]),
       lines: [
         { math: `2·${mt(p.P)}-I`, note: 'S = 2P − I', subgoal: 'compose' },
@@ -725,39 +728,39 @@ function projParts(p, sym, rng) {
 function affParts(d, given, rng) {
   const vec = (v) => vt(v.map((x) => q(x)));
   const mDecision = {
-    kind: 'decision', prompt: 'Comment écrire M ?', options: rng.shuffle([
+    kind: 'decision', prompt: t('Comment écrire M ?'), options: rng.shuffle([
       { id: 'ok', label: 'M = P·diag(1, k)·P⁻¹', valid: true },
-      { id: 'inv', label: 'M = P⁻¹·diag(1, k)·P', valid: false, rule: 'l_pdp_inverse_side', why: 'Les colonnes de P sont a et u : MP = P·diag(1, k), donc M = P·diag(1, k)·P⁻¹.' },
-      { id: 'k1', label: 'M = P·diag(k, 1)·P⁻¹', valid: false, why: 'M fixe a (1re colonne de P) et multiplie u par k : diag(1, k).' },
+      { id: 'inv', label: 'M = P⁻¹·diag(1, k)·P', valid: false, rule: 'l_pdp_inverse_side', why: t('Les colonnes de P sont a et u : MP = P·diag(1, k), donc M = P·diag(1, k)·P⁻¹.') },
+      { id: 'k1', label: 'M = P·diag(k, 1)·P⁻¹', valid: false, why: t('M fixe a (1re colonne de P) et multiplie u par k : diag(1, k).') },
     ]),
   };
   const mMenu = rng.shuffle([
-    { id: 'ok', label: 'M = P·diag(1, k)·P⁻¹ avec P = [a | u]', valid: true },
-    { id: 'inv', label: 'M = P⁻¹·diag(1, k)·P', valid: false, rule: 'l_pdp_inverse_side', why: 'MP = P·diag(1, k), donc M = P·diag(1, k)·P⁻¹.' },
-    { id: 'k1', label: 'M = P·diag(k, 1)·P⁻¹', valid: false, why: 'Le rapport k s\'applique à la direction u, pas à l\'axe.' },
+    { id: 'ok', label: t('M = P·diag(1, k)·P⁻¹ avec P = [a | u]'), valid: true },
+    { id: 'inv', label: 'M = P⁻¹·diag(1, k)·P', valid: false, rule: 'l_pdp_inverse_side', why: t('MP = P·diag(1, k), donc M = P·diag(1, k)·P⁻¹.') },
+    { id: 'k1', label: 'M = P·diag(k, 1)·P⁻¹', valid: false, why: t('Le rapport k s\'applique à la direction u, pas à l\'axe.') },
   ]);
   const prod = { math: `${mt(d.P)}·diag(1,${qt(d.k)})·${mt(d.Pi)}`, note: `M = P·diag(1, ${fq(d.k)})·P⁻¹`, subgoal: 'compose' };
-  const mPart = { html: 'Recompose M = P·diag(1, k)·P⁻¹.', start: 'M', judge: geomCfg(mt(d.M)), decision: mDecision, menu: mMenu,
-    lines: [prod, { math: mt(d.M), note: `Contrôle : M·a = a et M·u = ${parR(d.k)}·u`, subgoal: 'compose', grid: GRID2 }] };
-  const dirMenu = (what) => rng.shuffle([
-    { id: 'ok', label: `Un vecteur ${what} : (−b ; a) pour ax + by = 0`, valid: true },
-    { id: 'n', label: 'Le vecteur normal (a ; b)', valid: false, why: '(a ; b) est orthogonal à la droite, il n\'est pas sur elle.' },
+  const mPart = { html: t('Recompose M = P·diag(1, k)·P⁻¹.'), start: 'M', judge: geomCfg(mt(d.M)), decision: mDecision, menu: mMenu,
+    lines: [prod, { math: mt(d.M), note: t('Contrôle : M·a = a et M·u = {k}·u', { k: parR(d.k) }), subgoal: 'compose', grid: GRID2 }] };
+  const dirMenu = (label) => rng.shuffle([
+    { id: 'ok', label, valid: true },
+    { id: 'n', label: t('Le vecteur normal (a ; b)'), valid: false, why: t('(a ; b) est orthogonal à la droite, il n\'est pas sur elle.') },
   ]);
   if (!given) {
     return [
-      { start: 'a', judge: { kind: 'span', basis: [vec(d.a)], require: 'basis' }, menu: dirMenu('de l\'axe'),
-        lines: [{ math: vec(d.a), note: `Sur l'axe ${d.axis} : M·a = a`, subgoal: 'dir' }] },
-      { html: 'Un vecteur u de la direction.', start: 'u', judge: { kind: 'span', basis: [vec(d.u)], require: 'basis' }, menu: dirMenu('de la direction'),
-        lines: [{ math: vec(d.u), note: `Sur la droite ${d.dir} : M·u = k·u`, subgoal: 'dir' }] },
+      { start: 'a', judge: { kind: 'span', basis: [vec(d.a)], require: 'basis' }, menu: dirMenu(t('Un vecteur de l\'axe : (−b ; a) pour ax + by = 0')),
+        lines: [{ math: vec(d.a), note: t('Sur l\'axe {eq} : M·a = a', { eq: d.axis }), subgoal: 'dir' }] },
+      { html: t('Un vecteur u de la direction.'), start: 'u', judge: { kind: 'span', basis: [vec(d.u)], require: 'basis' }, menu: dirMenu(t('Un vecteur de la direction : (−b ; a) pour ax + by = 0')),
+        lines: [{ math: vec(d.u), note: t('Sur la droite {eq} : M·u = k·u', { eq: d.dir }), subgoal: 'dir' }] },
       mPart,
     ];
   }
   const adj = [[q(d.u[1]), q(-d.u[0])], [q(-d.a[1]), q(d.a[0])]];
   return [
-    { start: 'P', judge: geomCfg(mt(d.P)), menu: rng.shuffle([{ id: 'ok', label: 'P = [a | u] : a et u en colonnes', valid: true }, { id: 'rows', label: 'a et u en lignes', valid: false, why: 'MP = P·diag(1, k) demande a et u en colonnes.' }]),
-      lines: [{ math: mt(d.P), note: 'a et u en colonnes', subgoal: 'compose', grid: GRID2 }] },
-    { html: 'Inverse P.', start: 'P^(-1)', judge: geomCfg(mt(d.Pi), { inverse: mt(d.P) }),
-      menu: rng.shuffle([{ id: 'ok', label: 'Formule 2 × 2 : (1/det P)·[[d, −b], [−c, a]]', valid: true }, { id: 'each', label: 'Inverser chaque case', valid: false, rule: 'l_inv_entrywise', why: 'L\'inverse d\'une matrice n\'est pas la matrice des inverses.' }]),
+    { start: 'P', judge: geomCfg(mt(d.P)), menu: rng.shuffle([{ id: 'ok', label: t('P = [a | u] : a et u en colonnes'), valid: true }, { id: 'rows', label: t('a et u en lignes'), valid: false, why: t('MP = P·diag(1, k) demande a et u en colonnes.') }]),
+      lines: [{ math: mt(d.P), note: t('a et u en colonnes'), subgoal: 'compose', grid: GRID2 }] },
+    { html: t('Inverse P.'), start: 'P^(-1)', judge: geomCfg(mt(d.Pi), { inverse: mt(d.P) }),
+      menu: rng.shuffle([{ id: 'ok', label: t('Formule 2 × 2 : (1/det P)·[[d, −b], [−c, a]]'), valid: true }, { id: 'each', label: t('Inverser chaque case'), valid: false, rule: 'l_inv_entrywise', why: t('L\'inverse d\'une matrice n\'est pas la matrice des inverses.') }]),
       lines: [
         ...(d.det.eq(1) ? [] : [{ math: `(${qt(q(1).div(d.det))})·${mt(adj)}`, note: `det P = ${fq(d.det)}`, subgoal: 'invP' }]),
         { math: mt(d.Pi), note: '', subgoal: 'invP', grid: GRID2 },
@@ -768,25 +771,25 @@ function affParts(d, given, rng) {
 
 function compParts(c, rng) {
   const one = (x, name) => ({
-    html: name === 'R' ? 'La matrice R de la rotation.' : 'La matrice S de l\'autre application.', start: name,
+    html: name === 'R' ? t('La matrice R de la rotation.') : t('La matrice S de l\'autre application.'), start: name,
     judge: geomCfg(x.M, name === 'R' ? { rotation: true } : null),
-    menu: rng.shuffle([{ id: 'ok', label: 'Les images de e₁ et e₂ en colonnes', valid: true }, { id: 'rows', label: 'Les images de e₁ et e₂ en lignes', valid: false, rule: name === 'R' ? 'l_rot_transpose' : null, why: 'La colonne j est l\'image de eⱼ.' }]),
-    lines: [{ math: x.M, note: name === 'R' ? `Rotation d'angle ${c.th.t}` : 'Les images de e₁ et e₂ en colonnes', subgoal: 'images', grid: GRID2 }],
+    menu: rng.shuffle([{ id: 'ok', label: t('Les images de e₁ et e₂ en colonnes'), valid: true }, { id: 'rows', label: t('Les images de e₁ et e₂ en lignes'), valid: false, rule: name === 'R' ? 'l_rot_transpose' : null, why: t('La colonne j est l\'image de eⱼ.') }]),
+    lines: [{ math: x.M, note: name === 'R' ? t('Rotation d\'angle {a}', { a: c.th.t }) : t('Les images de e₁ et e₂ en colonnes'), subgoal: 'images', grid: GRID2 }],
   });
   const fn = c.rFirst ? 'R' : 'S';
   const sn = c.rFirst ? 'S' : 'R';
   return [
     ...(/√/.test(c.R.M) ? [one(c.S, 'S'), one(c.R, 'R')] : [one(c.R, 'R'), one(c.S, 'S')]),
-    { html: `La matrice M de la composée (d'abord ${fn}, puis ${sn}).`, start: 'M', judge: geomCfg(c.M, { compose: [c.first.M, c.second.M] }),
+    { html: t('La matrice M de la composée (d\'abord {f}, puis {s}).', { f: fn, s: sn }), start: 'M', judge: geomCfg(c.M, { compose: [c.first.M, c.second.M] }),
       decision: {
-        kind: 'decision', prompt: `On applique d'abord ${fn}, puis ${sn}. Quelle est la matrice de la composée ?`, options: rng.shuffle([
+        kind: 'decision', prompt: t('On applique d\'abord {f}, puis {s}. Quelle est la matrice de la composée ?', { f: fn, s: sn }), options: rng.shuffle([
           { id: 'ok', label: `${sn}·${fn}`, valid: true },
-          { id: 'rev', label: `${fn}·${sn}`, valid: false, rule: 'l_compose_order', why: `${sn}(${fn}(x)) = (${sn}${fn})x : la matrice appliquée en premier est à droite.` },
+          { id: 'rev', label: `${fn}·${sn}`, valid: false, rule: 'l_compose_order', why: t('{s}({f}(x)) = ({s}{f})x : la matrice appliquée en premier est à droite.', { f: fn, s: sn }) },
         ]),
       },
       menu: rng.shuffle([
-        { id: 'ok', label: `${sn}·${fn} : la première appliquée est à droite`, valid: true },
-        { id: 'rev', label: `${fn}·${sn} : dans l'ordre de l'énoncé`, valid: false, rule: 'l_compose_order', why: `${sn}(${fn}(x)) = (${sn}${fn})x.` },
+        { id: 'ok', label: t('{s}·{f} : la première appliquée est à droite', { f: fn, s: sn }), valid: true },
+        { id: 'rev', label: t('{f}·{s} : dans l\'ordre de l\'énoncé', { f: fn, s: sn }), valid: false, rule: 'l_compose_order', why: `${sn}(${fn}(x)) = (${sn}${fn})x.` },
       ]),
       lines: [{ math: c.expr, note: `${sn}·${fn}`, subgoal: 'compose' }, { math: c.M, note: '', subgoal: 'compose', grid: GRID2 }] },
   ];
@@ -799,9 +802,9 @@ function geomItem(level, rng) {
   if (kind === 'rot') {
     const th = rng.pick(THETA);
     return partsItem(level, rng, rotParts(th, rng), {
-      ...o, prompt: `Écris la matrice de ${rotR(th)} dans ℝ², en passant par les images de e₁ et e₂.`, key: `${GEOM}:rot:${th.t}`, blanks: 2,
+      ...o, prompt: t('Écris la matrice de {r} dans ℝ², en passant par les images de e₁ et e₂.', { r: rotR(th) }), key: `${GEOM}:rot:${th.t}`, blanks: 2,
       hints: level === 5 ? [] : [
-        { level: 1, html: 'Les colonnes de R sont les images de e₁ et e₂ : e₁ tourné de θ donne (cos θ ; sin θ), e₂ tourné donne (−sin θ ; cos θ).' },
+        { level: 1, html: t('Les colonnes de R sont les images de e₁ et e₂ : e₁ tourné de θ donne (cos θ ; sin θ), e₂ tourné donne (−sin θ ; cos θ).') },
         { level: 2, html: `R = [[cos(${th.t}), □], [□, cos(${th.t})]]` },
         { level: 3, html: `R = ${ML(rotT(th))}` },
       ],
@@ -812,9 +815,11 @@ function geomItem(level, rng) {
     const sym = kind === 'sym';
     return partsItem(level, rng, projParts(p, sym, rng), {
       ...o, key: `${GEOM}:${kind}:${p.eq}`,
-      prompt: `Écris la matrice de la ${sym ? 'symétrie orthogonale d\'axe' : 'projection orthogonale sur'} la droite d : ${p.eq}${sym ? ', en passant par la projection P sur d' : ''}. Commence par un vecteur directeur u de d.`,
+      prompt: sym
+        ? t('Écris la matrice de la symétrie orthogonale d\'axe la droite d : {eq}, en passant par la projection P sur d. Commence par un vecteur directeur u de d.', { eq: p.eq })
+        : t('Écris la matrice de la projection orthogonale sur la droite d : {eq}. Commence par un vecteur directeur u de d.', { eq: p.eq }),
       hints: [
-        { level: 1, html: `Un vecteur directeur u de d, puis P = uuᵀ/(uᵀu)${sym ? ', puis S = 2P − I' : ''}.` },
+        { level: 1, html: sym ? t('Un vecteur directeur u de d, puis P = uuᵀ/(uᵀu), puis S = 2P − I.') : t('Un vecteur directeur u de d, puis P = uuᵀ/(uᵀu).') },
         { level: 2, html: `u = ${vt(p.u.map((x) => q(x))).replace(/-/g, '−')}, P = (1/□)·${MLm(p.uu)}` },
         { level: 3, html: `${sym ? `S = ${MLm(p.S)}` : `P = ${MLm(p.P)}`}` },
       ],
@@ -825,9 +830,11 @@ function geomItem(level, rng) {
     const given = level <= 2;
     return partsItem(level, rng, affParts(d, given, rng), {
       ...o, key: `${GEOM}:aff:${mt(d.P)}:${qt(d.k)}`, fallback: d.fallback,
-      prompt: `Écris la matrice M de l'affinité d'axe ${d.axis}, de direction ${d.dir} et de rapport ${fq(d.k)}.${given ? ` On prend a = ${vt(d.a.map((x) => q(x))).replace(/-/g, '−')} sur l'axe, u = ${vt(d.u.map((x) => q(x))).replace(/-/g, '−')} dans la direction et P = [a | u].` : ' Cherche un vecteur a de l\'axe et un vecteur u de la direction.'}`,
+      prompt: given
+        ? t('Écris la matrice M de l\'affinité d\'axe {axis}, de direction {dir} et de rapport {k}. On prend a = {a} sur l\'axe, u = {u} dans la direction et P = [a | u].', { axis: d.axis, dir: d.dir, k: fq(d.k), a: vt(d.a.map((x) => q(x))).replace(/-/g, '−'), u: vt(d.u.map((x) => q(x))).replace(/-/g, '−') })
+        : t('Écris la matrice M de l\'affinité d\'axe {axis}, de direction {dir} et de rapport {k}. Cherche un vecteur a de l\'axe et un vecteur u de la direction.', { axis: d.axis, dir: d.dir, k: fq(d.k) }),
       hints: level === 5 ? [] : [
-        { level: 1, html: 'Cherche deux vecteurs dont tu connais l\'image : a sur l\'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u].' },
+        { level: 1, html: t('Cherche deux vecteurs dont tu connais l\'image : a sur l\'axe (M·a = a), u dans la direction (M·u = k·u). Puis M = P·diag(1, k)·P⁻¹ avec P = [a | u].') },
         { level: 2, html: `M = ${MLm(d.P)}·diag(1, □)·P⁻¹` },
         { level: 3, html: `M = ${MLm(d.M)}` },
       ],
@@ -838,10 +845,10 @@ function geomItem(level, rng) {
   const sn = c.rFirst ? 'S' : 'R';
   return partsItem(level, rng, compParts(c, rng), {
     ...o, key: `${GEOM}:comp:${c.expr}`,
-    prompt: `Soit R ${c.R.r} et S ${c.S.r}. Écris la matrice M de l'application qui fait d'abord ${fn}, puis ${sn}.`,
+    prompt: t('Soit R {r} et S {s}. Écris la matrice M de l\'application qui fait d\'abord {f}, puis {n}.', { r: c.R.r, s: c.S.r, f: fn, n: sn }),
     hints: level === 5 ? [] : [
-      { level: 1, html: `On applique d'abord ${fn} à x, puis ${sn} au résultat : ${sn}(${fn}(x)) = (${sn}${fn})x. La matrice appliquée en premier est à droite.` },
-      { level: 2, html: 'M = □·□ : écris R et S, puis leur produit dans le bon ordre.' },
+      { level: 1, html: t('On applique d\'abord {f} à x, puis {s} au résultat : {s}({f}(x)) = ({s}{f})x. La matrice appliquée en premier est à droite.', { f: fn, s: sn }) },
+      { level: 2, html: t('M = □·□ : écris R et S, puis leur produit dans le bon ordre.') },
       { level: 3, html: `M = ${ML(c.M)}` },
     ],
   });
@@ -856,15 +863,15 @@ function geomExam(rng, exam) {
       const nrm = vt([q(-p.u[1]), q(p.u[0])]);
       return tfL({
         skill: GEOM, key: `${which}:${p.eq}`, truth: false, exam: tag,
-        statement: which === 'inj' ? 'Une projection orthogonale de ℝ² sur une droite est injective.' : 'La matrice d\'une projection orthogonale de ℝ² sur une droite est inversible.',
+        statement: which === 'inj' ? t('Une projection orthogonale de ℝ² sur une droite est injective.') : t('La matrice d\'une projection orthogonale de ℝ² sur une droite est inversible.'),
         counter: { kind: 'mapWitness', params: { A: mt(p.P) }, ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer: { x: nrm, y: '(0 ; 0)' } },
-        explanation: `Faux : pour la projection sur ${p.eq}, de matrice ${MLm(p.P)}, le vecteur ${nrm.replace(/-/g, '−')} (orthogonal à la droite) et 0 ont la même image 0.`,
+        explanation: t('Faux : pour la projection sur {eq}, de matrice {P}, le vecteur {v} (orthogonal à la droite) et 0 ont la même image 0.', { eq: p.eq, P: MLm(p.P), v: nrm.replace(/-/g, '−') }),
       });
     }
     const T = {
-      p2: ['La matrice P d\'une projection orthogonale vérifie P² = P.', 'Vrai : un vecteur déjà projeté sur la droite ne bouge plus.'],
-      sym2: ['La matrice S d\'une symétrie orthogonale d\'axe une droite vérifie S² = I.', 'Vrai : appliquer deux fois la symétrie ramène chaque vecteur à sa place (S = 2P − I et P² = P donnent S² = 4P − 4P + I).'],
-      rot: ['La matrice R d\'une rotation de ℝ² vérifie R⁻¹ = Rᵀ.', 'Vrai : Rᵀ = [[cos θ, sin θ], [−sin θ, cos θ]] est la rotation d\'angle −θ, qui défait R.'],
+      p2: [t('La matrice P d\'une projection orthogonale vérifie P² = P.'), t('Vrai : un vecteur déjà projeté sur la droite ne bouge plus.')],
+      sym2: [t('La matrice S d\'une symétrie orthogonale d\'axe une droite vérifie S² = I.'), t('Vrai : appliquer deux fois la symétrie ramène chaque vecteur à sa place (S = 2P − I et P² = P donnent S² = 4P − 4P + I).')],
+      rot: [t('La matrice R d\'une rotation de ℝ² vérifie R⁻¹ = Rᵀ.'), t('Vrai : Rᵀ = [[cos θ, sin θ], [−sin θ, cos θ]] est la rotation d\'angle −θ, qui défait R.')],
     }[which];
     return tfL({ skill: GEOM, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1] });
   }
@@ -873,7 +880,7 @@ function geomExam(rng, exam) {
     const th = rng.pick(THETA.filter((x) => x.s !== '0'));
     const alt = { ...th, c: th.s, s: th.c };
     return mcqDistinct({
-      skill: GEOM, level: 4, key: `mcq:rot:${th.t}`, exam: tag, prompt: `Quelle est la matrice de ${rotR(th)} ?`,
+      skill: GEOM, level: 4, key: `mcq:rot:${th.t}`, exam: tag, prompt: t('Quelle est la matrice de {r} ?', { r: rotR(th) }),
       right: ML(rotT(th)),
       wrongs: [{ html: ML(rotTT(th)), rule: 'l_rot_transpose' }, { html: ML(rotT(alt)), rule: null }, { html: ML(`[[${th.c},${th.s}],[${th.s},${negT(th.c)}]]`), rule: null }],
       fillers: [{ html: ML(`[[${negT(th.c)},${th.s}],[${negT(th.s)},${negT(th.c)}]]`) }],
@@ -888,7 +895,7 @@ function geomExam(rng, exam) {
     const right = sym ? mt(p.S) : mt(p.P);
     return mcqDistinct({
       skill: GEOM, level: 4, key: `mcq:${kind}:${p.eq}`, exam: tag,
-      prompt: `Quelle est la matrice de la ${sym ? 'symétrie orthogonale d\'axe' : 'projection orthogonale sur'} la droite ${p.eq} ?`,
+      prompt: sym ? t('Quelle est la matrice de la symétrie orthogonale d\'axe la droite {eq} ?', { eq: p.eq }) : t('Quelle est la matrice de la projection orthogonale sur la droite {eq} ?', { eq: p.eq }),
       right: ML(right),
       wrongs: sym
         ? [{ html: MLm(p.P), rule: null }, { html: `(2/√${p.n2})·${MLm(p.uu)} − I`, rule: 'g4_proj_no_square' }, { html: MLm(MX.scale(p.S, -1)), rule: null }]
@@ -902,7 +909,7 @@ function geomExam(rng, exam) {
   const swapK = MX.mul(MX.mul(d.P, MX.diag([d.k, 1])), d.Pi);
   return mcqDistinct({
     skill: GEOM, level: 4, key: `mcq:aff:${mt(d.P)}:${qt(d.k)}`, exam: tag,
-    prompt: `Quelle est la matrice de l'affinité d'axe ${d.axis}, de direction ${d.dir} et de rapport ${fq(d.k)} ?`,
+    prompt: t('Quelle est la matrice de l\'affinité d\'axe {axis}, de direction {dir} et de rapport {k} ?', { axis: d.axis, dir: d.dir, k: fq(d.k) }),
     right: MLm(d.M),
     wrongs: [{ html: MLm(wrongInv), rule: 'l_pdp_inverse_side' }, { html: MLm(swapK), rule: null }, { html: MLm(MX.diag([1, d.k])), rule: null }],
     fillers: [{ html: MLm(MX.transpose(d.M)) }],
@@ -916,81 +923,83 @@ function geomExam(rng, exam) {
 
 const IMT = 'l-mat-imt';
 const IMT_SUB = [
-  { id: 'pivots', label: 'pivots', skill: 'l-sys-pivots-theory' },
-  { id: 'equiv', label: 'équivalence', skill: IMT },
+  { id: 'pivots', label: t('pivots'), skill: 'l-sys-pivots-theory' },
+  { id: 'equiv', label: t('équivalence'), skill: IMT },
 ];
 
 // Statements « always true? »: [statement, explanation, pivot hint].
 const SQ_TRUE = [
-  ['Si A est n × n et que ses colonnes sont libres, alors Ax = b a une solution pour tout b ∈ ℝⁿ.', 'Vrai : colonnes libres, c\'est n pivots. A est carrée, donc il y a aussi un pivot dans chaque ligne : Ax = b a une solution (unique) pour tout b.', 'nombre de pivots = □ sur n colonnes et n lignes'],
-  ['Si A est 3 × 3 et que Ax = 0 a une infinité de solutions, alors les colonnes de A n\'engendrent pas ℝ³.', 'Vrai : une infinité de solutions, c\'est une variable libre, donc moins de 3 pivots. Une ligne n\'a pas de pivot : les colonnes n\'engendrent pas ℝ³.', 'nombre de pivots = □ sur 3'],
-  ['Si A est n × n et que x ↦ Ax est injective, alors x ↦ Ax est surjective.', 'Vrai : injective, c\'est un pivot dans chaque colonne, donc n pivots ; A est carrée, donc un pivot dans chaque ligne : surjective.', 'nombre de pivots = □ sur n'],
-  ['Si A est n × n et que Aᵀ est inversible, alors les lignes de A sont libres.', 'Vrai : les lignes de A sont les colonnes de Aᵀ, qui sont libres puisque Aᵀ est inversible.', 'Aᵀ inversible : ses □ sont libres'],
-  ['Si A et B sont n × n et que AB = I, alors BA = I.', 'Vrai pour des matrices carrées : Bx = 0 donne x = ABx = 0, donc B est inversible (théorème), A = B⁻¹ et BA = I.', 'Bx = 0 ⇒ x = □'],
-  ['Si A et B sont n × n et que AB est inversible, alors A est inversible.', 'Vrai : avec C = (AB)⁻¹, A(BC) = I et A est carrée, donc A est inversible.', 'A(BC) = □'],
-  ['Si A est n × n et a deux colonnes égales, alors A n\'est pas inversible.', 'Vrai : deux colonnes égales sont liées, donc A n\'a pas n pivots.', 'nombre de pivots < □'],
-  ['Si 0 est valeur propre de la matrice carrée A, alors A n\'est pas inversible.', 'Vrai : Av = 0 avec v ≠ 0, donc Ax = 0 a une solution non nulle.', 'Av = □ avec v ≠ 0'],
-  ['Si A est n × n et que Ax = b a une solution unique pour un certain b, alors A est inversible.', 'Vrai : solution unique, donc aucune variable libre, donc n pivots ; A est carrée, donc inversible.', 'nombre de pivots = □ sur n'],
+  [t('Si A est n × n et que ses colonnes sont libres, alors Ax = b a une solution pour tout b ∈ ℝⁿ.'), t('Vrai : colonnes libres, c\'est n pivots. A est carrée, donc il y a aussi un pivot dans chaque ligne : Ax = b a une solution (unique) pour tout b.'), t('nombre de pivots = □ sur n colonnes et n lignes')],
+  [t('Si A est 3 × 3 et que Ax = 0 a une infinité de solutions, alors les colonnes de A n\'engendrent pas ℝ³.'), t('Vrai : une infinité de solutions, c\'est une variable libre, donc moins de 3 pivots. Une ligne n\'a pas de pivot : les colonnes n\'engendrent pas ℝ³.'), t('nombre de pivots = □ sur 3')],
+  [t('Si A est n × n et que x ↦ Ax est injective, alors x ↦ Ax est surjective.'), t('Vrai : injective, c\'est un pivot dans chaque colonne, donc n pivots ; A est carrée, donc un pivot dans chaque ligne : surjective.'), t('nombre de pivots = □ sur n')],
+  [t('Si A est n × n et que Aᵀ est inversible, alors les lignes de A sont libres.'), t('Vrai : les lignes de A sont les colonnes de Aᵀ, qui sont libres puisque Aᵀ est inversible.'), t('Aᵀ inversible : ses □ sont libres')],
+  [t('Si A et B sont n × n et que AB = I, alors BA = I.'), t('Vrai pour des matrices carrées : Bx = 0 donne x = ABx = 0, donc B est inversible (théorème), A = B⁻¹ et BA = I.'), 'Bx = 0 ⇒ x = □'],
+  [t('Si A et B sont n × n et que AB est inversible, alors A est inversible.'), t('Vrai : avec C = (AB)⁻¹, A(BC) = I et A est carrée, donc A est inversible.'), 'A(BC) = □'],
+  [t('Si A est n × n et a deux colonnes égales, alors A n\'est pas inversible.'), t('Vrai : deux colonnes égales sont liées, donc A n\'a pas n pivots.'), t('nombre de pivots < □')],
+  [t('Si 0 est valeur propre de la matrice carrée A, alors A n\'est pas inversible.'), t('Vrai : Av = 0 avec v ≠ 0, donc Ax = 0 a une solution non nulle.'), t('Av = □ avec v ≠ 0')],
+  [t('Si A est n × n et que Ax = b a une solution unique pour un certain b, alors A est inversible.'), t('Vrai : solution unique, donc aucune variable libre, donc n pivots ; A est carrée, donc inversible.'), t('nombre de pivots = □ sur n')],
 ];
 const SINGULAR = [[[1, 2], [2, 4]], [[1, 1], [1, 1]], [[0, 0], [0, 0]], [[1, 0], [0, 0]], [[2, 1], [4, 2]]];
 const SQ_FALSE = [
   (rng) => {
     const A = rng.pick(SINGULAR);
     return {
-      statement: 'Si A est n × n et que Ax = b a une solution pour un certain b, alors A est inversible.',
+      statement: t('Si A est n × n et que Ax = b a une solution pour un certain b, alors A est inversible.'),
       counter: { kind: 'matOne', params: { want: 'singular' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)) } },
-      explanation: `Faux : avec b = 0, Ax = b a toujours la solution x = 0. Une matrice non inversible comme ${MLm(MX.mat(A))} convient.`,
-      hint: 'avec b = □, il y a toujours une solution',
+      explanation: t('Faux : avec b = 0, Ax = b a toujours la solution x = 0. Une matrice non inversible comme {A} convient.', { A: MLm(MX.mat(A)) }),
+      hint: t('avec b = □, il y a toujours une solution'),
     };
   },
   (rng) => {
     const A = rng.pick([[[1, 0], [0, 1]], [[1, 1], [0, 1]], [[2, 1], [1, 1]]]);
     const B = MX.scale(MX.mat(A), -1);
     return {
-      statement: 'Si A et B sont des matrices n × n inversibles, alors A + B est inversible.',
+      statement: t('Si A et B sont des matrices n × n inversibles, alors A + B est inversible.'),
       counter: pairCounter('A,B inv⇒A+B inv', [A, B.map((r) => r.map((x) => x.valueOf()))]),
-      explanation: `Faux : A = ${MLm(MX.mat(A))} et B = −A sont inversibles, mais A + B = 0 ne l'est pas.`,
-      hint: 'essaie B = □A',
+      explanation: t('Faux : A = {A} et B = −A sont inversibles, mais A + B = 0 ne l\'est pas.', { A: MLm(MX.mat(A)) }),
+      hint: t('essaie B = □A'),
     };
   },
   (rng) => {
     const pr = rng.pick(INV_PAIRS);
     return {
-      statement: 'Si S et T sont des applications linéaires inversibles de ℝⁿ dans ℝⁿ, de matrices canoniques A et B, alors B⁻¹A⁻¹ est la matrice canonique de (T ∘ S)⁻¹.',
+      statement: t('Si S et T sont des applications linéaires inversibles de ℝⁿ dans ℝⁿ, de matrices canoniques A et B, alors B⁻¹A⁻¹ est la matrice canonique de (T ∘ S)⁻¹.'),
       counter: pairCounter('(AB)^-1=A^-1B^-1', pr), ruleIfTrue: 'l_inv_product_order',
-      explanation: `Faux : T ∘ S a pour matrice BA (S d'abord, donc A à droite), et (BA)⁻¹ = A⁻¹B⁻¹, qui diffère de B⁻¹A⁻¹ si A et B ne commutent pas : A = ${MLm(MX.mat(pr[0]))}, B = ${MLm(MX.mat(pr[1]))}.`,
-      hint: 'la matrice de T ∘ S est □',
+      explanation: t('Faux : T ∘ S a pour matrice BA (S d\'abord, donc A à droite), et (BA)⁻¹ = A⁻¹B⁻¹, qui diffère de B⁻¹A⁻¹ si A et B ne commutent pas : A = {A}, B = {B}.', { A: MLm(MX.mat(pr[0])), B: MLm(MX.mat(pr[1])) }),
+      hint: t('la matrice de T ∘ S est □'),
     };
   },
   (rng) => {
     const A = rng.pick(SINGULAR.slice(0, 2).concat([[[1, 2], [1, 2]]]));
     return {
-      statement: 'Si A est n × n et qu\'aucune colonne de A n\'est nulle, alors A est inversible.',
+      statement: t('Si A est n × n et qu\'aucune colonne de A n\'est nulle, alors A est inversible.'),
       counter: { kind: 'matOne', params: { want: 'singular' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)) } },
-      explanation: `Faux : ${MLm(MX.mat(A))} a des colonnes non nulles mais liées : un seul pivot.`,
-      hint: 'des colonnes non nulles peuvent être □',
+      explanation: t('Faux : {A} a des colonnes non nulles mais liées : un seul pivot.', { A: MLm(MX.mat(A)) }),
+      hint: t('des colonnes non nulles peuvent être □'),
     };
   },
 ];
 // Statements on m × n matrices (m ≠ n allowed): false, with sizes for a counter-example.
 const NS_FALSE = [
-  ['Si A est m × n et que ses colonnes sont libres, alors A est inversible.', ['r=n', 'm>n'], 'Seule une matrice carrée peut être inversible'],
-  ['Si A est m × n et que ses colonnes sont libres, alors Ax = b a une solution pour tout b ∈ ℝᵐ.', ['r=n', 'm>n'], 'Colonnes libres : n pivots, mais il en faudrait m pour avoir une solution pour tout b'],
-  ['Si A est m × n et que Ax = b a une solution pour tout b ∈ ℝᵐ, alors Ax = 0 n\'a que la solution nulle.', ['r=m', 'n>m'], 'Un pivot par ligne, c\'est m pivots ; avec n > m colonnes, il reste des variables libres'],
-  ['Si A est m × n et que x ↦ Ax est injective, alors x ↦ Ax est surjective.', ['r=n', 'm>n'], 'Injective : n pivots ; surjective demande m pivots'],
-  ['Si les colonnes d\'une matrice A de taille m × n engendrent ℝᵐ, alors elles sont libres.', ['r=m', 'n>m'], 'Engendrer ℝᵐ : m pivots ; libres demande n pivots'],
-  ['Si A est m × n avec un pivot dans chaque ligne, alors x ↦ Ax est injective.', ['r=m', 'n>m'], 'Un pivot par ligne donne la surjectivité ; l\'injectivité demande un pivot par colonne', 'l_inj_rows'],
+  [t('Si A est m × n et que ses colonnes sont libres, alors A est inversible.'), ['r=n', 'm>n'], t('Seule une matrice carrée peut être inversible')],
+  [t('Si A est m × n et que ses colonnes sont libres, alors Ax = b a une solution pour tout b ∈ ℝᵐ.'), ['r=n', 'm>n'], t('Colonnes libres : n pivots, mais il en faudrait m pour avoir une solution pour tout b')],
+  [t('Si A est m × n et que Ax = b a une solution pour tout b ∈ ℝᵐ, alors Ax = 0 n\'a que la solution nulle.'), ['r=m', 'n>m'], t('Un pivot par ligne, c\'est m pivots ; avec n > m colonnes, il reste des variables libres')],
+  [t('Si A est m × n et que x ↦ Ax est injective, alors x ↦ Ax est surjective.'), ['r=n', 'm>n'], t('Injective : n pivots ; surjective demande m pivots')],
+  [t('Si les colonnes d\'une matrice A de taille m × n engendrent ℝᵐ, alors elles sont libres.'), ['r=m', 'n>m'], t('Engendrer ℝᵐ : m pivots ; libres demande n pivots')],
+  [t('Si A est m × n avec un pivot dans chaque ligne, alors x ↦ Ax est injective.'), ['r=m', 'n>m'], t('Un pivot par ligne donne la surjectivité ; l\'injectivité demande un pivot par colonne'), 'l_inj_rows'],
 ];
 const exampleOf = (m, n) => MX.mat(Array.from({ length: m }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0))));
-// Sizes m ≠ n: true statements read on the pivots.
+// Sizes m ≠ n: true statements read on the pivots. [French statement (it
+// makes the key), statement shown, explanation].
+const SUP = '⁰¹²³⁴⁵⁶';
 const NS_TRUE = [
-  (m, n) => (m < n ? [`Si A est ${m} × ${n}, alors Ax = 0 a une infinité de solutions.`, `Vrai : au plus ${m} pivots pour ${n} colonnes, donc au moins ${n - m} variable${n - m > 1 ? 's' : ''} libre${n - m > 1 ? 's' : ''}.`] : null),
-  (m, n) => (m < n ? [`Si A est ${m} × ${n}, alors x ↦ Ax n'est pas injective.`, `Vrai : au plus ${m} pivots pour ${n} colonnes : une colonne n'a pas de pivot.`] : null),
-  (m, n) => (m > n ? [`Si A est ${m} × ${n}, alors x ↦ Ax n'est pas surjective.`, `Vrai : au plus ${n} pivots pour ${m} lignes : une ligne n'a pas de pivot.`] : null),
-  (m, n) => (m > n ? [`Si A est ${m} × ${n}, alors ses colonnes n'engendrent pas ℝ${'⁰¹²³⁴⁵⁶'[m]}.`, `Vrai : ${n} vecteurs ne peuvent pas engendrer ℝ${'⁰¹²³⁴⁵⁶'[m]}, il faut au moins ${m} pivots.`] : null),
-  (m, n) => (m !== n ? [`Une matrice ${m} × ${n} n'est jamais inversible.`, 'Vrai : seule une matrice carrée peut avoir un inverse des deux côtés.'] : null),
+  (m, n) => (m < n ? [`Si A est ${m} × ${n}, alors Ax = 0 a une infinité de solutions.`, t('Si A est {m} × {n}, alors Ax = 0 a une infinité de solutions.', { m, n }), tn(n - m, 'Vrai : au plus {m} pivots pour {c} colonnes, donc au moins {n} variable libre.', 'Vrai : au plus {m} pivots pour {c} colonnes, donc au moins {n} variables libres.', { m, c: n })] : null),
+  (m, n) => (m < n ? [`Si A est ${m} × ${n}, alors x ↦ Ax n'est pas injective.`, t('Si A est {m} × {n}, alors x ↦ Ax n\'est pas injective.', { m, n }), t('Vrai : au plus {m} pivots pour {n} colonnes : une colonne n\'a pas de pivot.', { m, n })] : null),
+  (m, n) => (m > n ? [`Si A est ${m} × ${n}, alors x ↦ Ax n'est pas surjective.`, t('Si A est {m} × {n}, alors x ↦ Ax n\'est pas surjective.', { m, n }), t('Vrai : au plus {n} pivots pour {m} lignes : une ligne n\'a pas de pivot.', { m, n })] : null),
+  (m, n) => (m > n ? [`Si A est ${m} × ${n}, alors ses colonnes n'engendrent pas ℝ${SUP[m]}.`, t('Si A est {m} × {n}, alors ses colonnes n\'engendrent pas {R}.', { m, n, R: `ℝ${SUP[m]}` }), t('Vrai : {n} vecteurs ne peuvent pas engendrer {R}, il faut au moins {m} pivots.', { m, n, R: `ℝ${SUP[m]}` })] : null),
+  (m, n) => (m !== n ? [`Une matrice ${m} × ${n} n'est jamais inversible.`, t('Une matrice {m} × {n} n\'est jamais inversible.', { m, n }), t('Vrai : seule une matrice carrée peut avoir un inverse des deux côtés.')] : null),
 ];
-const IMT_HINT1 = 'La matrice est-elle carrée ? Sinon, le théorème de la matrice inversible ne s\'applique pas : compte les pivots par ligne et par colonne.';
+const IMT_HINT1 = t('La matrice est-elle carrée ? Sinon, le théorème de la matrice inversible ne s\'applique pas : compte les pivots par ligne et par colonne.');
 
 function imtTf(level, rng, kind, exam) {
   const base = { skill: IMT, level, exam: exam ? examTag({ exam }) : false, noHints: level === 5 || !!exam };
@@ -1011,12 +1020,13 @@ function imtTf(level, rng, kind, exam) {
     const [st, conds, why, rule] = NS_FALSE[k];
     const [m, n] = conds[1] === 'm>n' ? rng.pick([[3, 2], [4, 3], [4, 2]]) : rng.pick([[2, 3], [3, 4], [2, 4]]);
     const r = Math.min(m, n);
-    const ex = `Faux si A n'est pas carrée. ${why}. Par exemple A = ${MLm(exampleOf(m, n))}, de taille ${m} × ${n} et de rang ${r}.`;
+    const ex = t('Faux si A n\'est pas carrée. {why}. Par exemple A = {A}, de taille {m} × {n} et de rang {r}.', { why, A: MLm(exampleOf(m, n)), m, n, r });
+    const cnd = conds.map((c) => c.replace(/r=/g, 'r = ').replace(/>/g, ' > '));
     return {
       ...tfL({
         ...base, key: `ns:${k}:${m}${n}`, truth: false, statement: st, explanation: ex, ruleIfTrue: rule || 'l_imt_nonsquare',
-        counter: { kind: 'dims', params: { conds }, ask: [{ v: 'm', label: 'm =' }, { v: 'n', label: 'n =' }, { v: 'r', label: 'rang r =' }], answer: { m: String(m), n: String(n), r: String(r) } },
-        hints: hints(`nombre de pivots ≤ min(m, n) ; ici, il faudrait ${conds.join(' et ').replace(/r=/g, 'r = ').replace(/>/g, ' > ')}`, ex),
+        counter: { kind: 'dims', params: { conds }, ask: [{ v: 'm', label: 'm =' }, { v: 'n', label: 'n =' }, { v: 'r', label: t('rang r =') }], answer: { m: String(m), n: String(n), r: String(r) } },
+        hints: hints(t('nombre de pivots ≤ min(m, n) ; ici, il faudrait {a} et {b}', { a: cnd[0], b: cnd[1] }), ex),
       }),
       ...sg,
     };
@@ -1026,7 +1036,7 @@ function imtTf(level, rng, kind, exam) {
     const [m, n] = rng.pick([[2, 3], [3, 5], [3, 4], [4, 3], [5, 3], [4, 2], [2, 4]]);
     const f = rng.pick(NS_TRUE)(m, n);
     if (!f) continue;
-    return { ...tfL({ ...base, key: `nst:${f[0]}`, truth: true, statement: f[0], explanation: f[1], ruleIfFalse: null, hints: hints(`nombre de pivots ≤ min(${m}, ${n}) = ${Math.min(m, n)}`, f[1]) }), ...sg };
+    return { ...tfL({ ...base, key: `nst:${f[0]}`, truth: true, statement: f[1], explanation: f[2], ruleIfFalse: null, hints: hints(t('nombre de pivots ≤ min({m}, {n}) = {r}', { m, n, r: Math.min(m, n) }), f[2]) }), ...sg };
   }
 }
 
@@ -1036,15 +1046,16 @@ const NOT_EQUIV = ['A n\'a aucun coefficient nul', 'A est symétrique', 'det A =
 function imtMcq(level, rng, exam) {
   const not = exam === 'mcq';
   const right = rng.pick(not ? NOT_EQUIV : EQUIV);
-  const wrongs = rng.shuffle([...(not ? EQUIV : NOT_EQUIV)]).slice(0, 3).map((html) => ({ html, rule: null }));
+  // EQUIV and NOT_EQUIV stay French: the key is built from them.
+  const wrongs = rng.shuffle([...(not ? EQUIV : NOT_EQUIV)]).slice(0, 3).map((html) => ({ html: t(html), rule: null }));
   return {
     ...mcqDistinct({
       skill: IMT, level, key: `mcq:${not ? 'not' : 'eq'}:${right}`, exam: exam ? examTag({ exam }) : false,
       prompt: not
-        ? 'A est une matrice carrée n × n. Lequel de ces énoncés <b>n\'est pas</b> équivalent à « A est inversible » ?'
-        : 'A est une matrice carrée n × n. Lequel de ces énoncés est équivalent à « A est inversible » ?',
-      right, wrongs,
-      solution: [{ html: not ? `« ${right} » ne suffit pas : une matrice peut le vérifier sans être inversible (ou être inversible sans le vérifier).` : `« ${right} » fait partie du théorème de la matrice inversible.`, note: '' }],
+        ? t('A est une matrice carrée n × n. Lequel de ces énoncés <b>n\'est pas</b> équivalent à « A est inversible » ?')
+        : t('A est une matrice carrée n × n. Lequel de ces énoncés est équivalent à « A est inversible » ?'),
+      right: t(right), wrongs,
+      solution: [{ html: not ? t('« {s} » ne suffit pas : une matrice peut le vérifier sans être inversible (ou être inversible sans le vérifier).', { s: t(right) }) : t('« {s} » fait partie du théorème de la matrice inversible.', { s: t(right) }), note: '' }],
     }, rng),
     subgoals: IMT_SUB,
   };
@@ -1069,14 +1080,14 @@ function imtExam(rng, exam) {
 
 const ELEM = 'l-mat-elementary';
 const ELEM_SUB = [
-  { id: 'elim', label: 'éliminer', skill: ECH },
-  { id: 'writeE', label: 'écrire E', skill: ELEM },
+  { id: 'elim', label: t('éliminer'), skill: ECH },
+  { id: 'writeE', label: t('écrire E'), skill: ELEM },
 ];
 
 // The operation that undoes op.
 const undo = (op) => (op.kind === 'add' ? { ...op, k: op.k.neg() } : op.kind === 'scale' ? { ...op, k: q(1).div(op.k) } : op);
 const elemOf = (n, op) => MX.applyOp(MX.identity(n), op);
-const opWords = (op) => (op.kind === 'add' ? `ajouter ${parR(op.k)} fois la ligne ${op.j + 1} à la ligne ${op.i + 1}` : op.kind === 'scale' ? `multiplier la ligne ${op.i + 1} par ${parR(op.k)}` : `échanger les lignes ${op.i + 1} et ${op.j + 1}`);
+const opWords = (op) => (op.kind === 'add' ? t('ajouter {k} fois la ligne {j} à la ligne {i}', { k: parR(op.k), j: op.j + 1, i: op.i + 1 }) : op.kind === 'scale' ? t('multiplier la ligne {i} par {k}', { i: op.i + 1, k: parR(op.k) }) : t('échanger les lignes {i} et {j}', { i: op.i + 1, j: op.j + 1 }));
 
 // One operation on n rows: Lᵢ ← Lᵢ + kLⱼ (k ∈ {±1, ±2, ±3}), Lᵢ ← kLᵢ or a swap.
 function randOp(n, rng, kinds = ['add', 'add', 'scale', 'swap']) {
@@ -1091,7 +1102,7 @@ function randOp(n, rng, kinds = ['add', 'add', 'scale', 'swap']) {
 
 // A 2 × 2 whole, det ±1 or ±2, reduced to I by 3 or 4 operations (no swap).
 function decompData(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const A = randM(2, 2, rng, -4, 4);
     const det = MX.det(A).valueOf();
     if (![1, -1, 2, -2].includes(det) || A.flat().some((x) => x.n === 0) || Math.abs(A[0][0].valueOf()) !== 1) continue;
@@ -1116,19 +1127,19 @@ function elemItem(level, rng) {
     const Ei = elemOf(n, undo(op));
     const changed = op.kind === 'swap' ? [op.i, op.j] : [op.i];
     const invSeg = { start: 'E^(-1)', judge: { kind: 'mat', expect: mt(Ei), about: { elementary: mt(E) } } };
-    const invLine = withCells({ kind: 'eq', math: mt(Ei), note: `E⁻¹ fait l'opération contraire : ${opR(undo(op))}`, subgoal: 'writeE' }, pickCells(Ei, changed, level === 1 ? 2 : 3, rng));
+    const invLine = withCells({ kind: 'eq', math: mt(Ei), note: t('E⁻¹ fait l\'opération contraire : {op}', { op: opR(undo(op)) }), subgoal: 'writeE' }, pickCells(Ei, changed, level === 1 ? 2 : 3, rng));
     const hints = [
-      { level: 1, html: 'Fais l\'opération sur I pour obtenir E ; E⁻¹ fait l\'opération contraire.' },
-      { level: 2, html: `E⁻¹ fait ${opR(undo(op))} : ${rowHoles(Ei, changed[0])} en ligne ${changed[0] + 1}` },
+      { level: 1, html: t('Fais l\'opération sur I pour obtenir E ; E⁻¹ fait l\'opération contraire.') },
+      { level: 2, html: t('E⁻¹ fait {op} : {row} en ligne {i}', { op: opR(undo(op)), row: rowHoles(Ei, changed[0]), i: changed[0] + 1 }) },
       { level: 3, html: `E⁻¹ = ${MLm(Ei)}` },
     ];
     if (level === 1) {
       return matLines({
-        skill: ELEM, level, prompt: `E est la matrice élémentaire 3 × 3 de l'opération ${opR(op)}. Écris E, puis E⁻¹.`,
+        skill: ELEM, level, prompt: t('E est la matrice élémentaire 3 × 3 de l\'opération {op}. Écris E, puis E⁻¹.', { op: opR(op) }),
         start: 'E', judge: { kind: 'mat', expect: mt(E) }, mode: 'guided',
         script: [
-          withCells({ kind: 'eq', math: mt(E), note: `I₃ après ${opR(op)}`, subgoal: 'writeE' }, pickCells(E, changed, 2, rng)),
-          { kind: 'segment', html: 'Écris E⁻¹.', start: { math: invSeg.start }, judge: invSeg.judge },
+          withCells({ kind: 'eq', math: mt(E), note: t('I₃ après {op}', { op: opR(op) }), subgoal: 'writeE' }, pickCells(E, changed, 2, rng)),
+          { kind: 'segment', html: t('Écris E⁻¹.'), start: { math: invSeg.start }, judge: invSeg.judge },
           invLine,
         ],
         hints, subgoals: ELEM_SUB, key: `${ELEM}:op:${mt(E)}`,
@@ -1138,13 +1149,13 @@ function elemItem(level, rng) {
     const other = op.kind === 'add' ? { ...op, i: op.j, j: op.i } : op.kind === 'scale' ? { kind: 'scale', i: (op.i + 1) % n, k: op.k } : { kind: 'swap', i: [0, 1, 2].find((x) => x !== op.i && x !== op.j), j: op.j };
     const opts = [
       { id: 'ok', label: opR(op), valid: true },
-      op.kind !== 'swap' ? { id: 'inv', label: opR(undo(op)), valid: false, rule: 'l_elementary_inverse', why: `Ça, c'est l'opération de E⁻¹. E est I après ${opR(op)} : regarde la case qui a changé.` } : null,
-      { id: 'other', label: opR(other), valid: false, why: 'Compare E à I : la ligne qui change est celle de l\'opération, et le coefficient hors diagonale dit quelle ligne on ajoute.' },
+      op.kind !== 'swap' ? { id: 'inv', label: opR(undo(op)), valid: false, rule: 'l_elementary_inverse', why: t('Ça, c\'est l\'opération de E⁻¹. E est I après {op} : regarde la case qui a changé.', { op: opR(op) }) } : null,
+      { id: 'other', label: opR(other), valid: false, why: t('Compare E à I : la ligne qui change est celle de l\'opération, et le coefficient hors diagonale dit quelle ligne on ajoute.') },
     ].filter(Boolean);
     return matLines({
-      skill: ELEM, level, prompt: `E = ${MLm(E)} est une matrice élémentaire. Quelle opération fait-elle ? Écris ensuite E⁻¹.`,
+      skill: ELEM, level, prompt: t('E = {E} est une matrice élémentaire. Quelle opération fait-elle ? Écris ensuite E⁻¹.', { E: MLm(E) }),
       start: invSeg.start, judge: invSeg.judge, mode: 'guided',
-      script: [{ kind: 'decision', prompt: 'Quelle opération E fait-elle sur les lignes ?', options: rng.shuffle(opts) }, invLine],
+      script: [{ kind: 'decision', prompt: t('Quelle opération E fait-elle sur les lignes ?'), options: rng.shuffle(opts) }, invLine],
       hints, subgoals: ELEM_SUB, key: `${ELEM}:read:${mt(E)}`,
     });
   }
@@ -1158,12 +1169,12 @@ function elemItem(level, rng) {
   d.ops.forEach((op, k) => {
     const menu = rng.shuffle([
       { id: 'ok', label: opR(op), valid: true },
-      op.kind === 'add' ? { id: 'sign', label: opR(undo(op)), valid: false, rule: 'l_rowop_sign', why: 'Avec ce signe, la case ne s\'annule pas.' } : { id: 'inv', label: opR(undo(op)), valid: false, why: 'Ce facteur n\'amène pas le pivot à 1.' },
-      { id: 'swap', label: 'L₁ ↔ L₂', valid: false, why: 'Le pivot n\'est pas nul : pas besoin d\'échanger.' },
+      op.kind === 'add' ? { id: 'sign', label: opR(undo(op)), valid: false, rule: 'l_rowop_sign', why: t('Avec ce signe, la case ne s\'annule pas.') } : { id: 'inv', label: opR(undo(op)), valid: false, why: t('Ce facteur n\'amène pas le pivot à 1.') },
+      { id: 'swap', label: 'L₁ ↔ L₂', valid: false, why: t('Le pivot n\'est pas nul : pas besoin d\'échanger.') },
     ]);
     segs.push({
-      html: `${eName(k)} : la matrice de l'opération ${k + 1}.`, start: `E_${k + 1}`, judge: { kind: 'mat', expect: mt(d.Es[k]), menu },
-      lines: [{ kind: 'eq', math: mt(d.Es[k]), note: `${opR(op)} appliquée à I`, subgoal: op.kind === 'add' && op.i > op.j ? 'elim' : 'writeE' }],
+      html: t('{E} : la matrice de l\'opération {k}.', { E: eName(k), k: k + 1 }), start: `E_${k + 1}`, judge: { kind: 'mat', expect: mt(d.Es[k]), menu },
+      lines: [{ kind: 'eq', math: mt(d.Es[k]), note: t('{op} appliquée à I', { op: opR(op) }), subgoal: op.kind === 'add' && op.i > op.j ? 'elim' : 'writeE' }],
     });
   });
   const order = [...Array(kk).keys()];
@@ -1174,13 +1185,13 @@ function elemItem(level, rng) {
   segs.push({
     html: `A⁻¹ = ${invR}.`, start: 'A^(-1)',
     judge: { kind: 'mat', expect: mt(d.Ai), about: { compose: d.Es.map((E) => mt(E)) }, ...(useNames ? { names } : {}),
-      menu: rng.shuffle([{ id: 'ok', label: `A⁻¹ = ${invR}`, valid: true }, { id: 'rev', label: `A⁻¹ = ${order.map(eName).join('')}`, valid: false, rule: 'l_compose_order', why: `${eName(0)} est faite en premier : elle est à droite.` }]) },
+      menu: rng.shuffle([{ id: 'ok', label: `A⁻¹ = ${invR}`, valid: true }, { id: 'rev', label: `A⁻¹ = ${order.map(eName).join('')}`, valid: false, rule: 'l_compose_order', why: t('{E} est faite en premier : elle est à droite.', { E: eName(0) }) }]) },
     lines: [{ kind: 'eq', math: prodInv, note: `${invR}·A = I`, subgoal: 'writeE' }, { kind: 'eq', math: mt(d.Ai), note: '', subgoal: 'writeE' }],
   });
   segs.push({
     html: `A = ${aR}.`, start: 'A',
     judge: { kind: 'mat', expect: mt(d.A), about: { compose: d.Eis.slice().reverse().map((E) => mt(E)) }, ...(useNames ? { names } : {}),
-      menu: rng.shuffle([{ id: 'ok', label: `A = ${aR}`, valid: true }, { id: 'rev', label: `A = ${order.slice().reverse().map((k) => `${eName(k)}⁻¹`).join('')}`, valid: false, rule: 'l_compose_order', why: 'A = (E_k⋯E₁)⁻¹ : l\'inverse d\'un produit renverse l\'ordre.' }]) },
+      menu: rng.shuffle([{ id: 'ok', label: `A = ${aR}`, valid: true }, { id: 'rev', label: `A = ${order.slice().reverse().map((k) => `${eName(k)}⁻¹`).join('')}`, valid: false, rule: 'l_compose_order', why: t('A = (E_k⋯E₁)⁻¹ : l\'inverse d\'un produit renverse l\'ordre.') }]) },
     lines: [{ kind: 'eq', math: prodA, note: `(${invR})⁻¹ = ${aR}`, subgoal: 'writeE' }, { kind: 'eq', math: mt(d.A), note: '', subgoal: 'writeE' }],
   });
   const script = [];
@@ -1193,12 +1204,12 @@ function elemItem(level, rng) {
   return matLines({
     skill: ELEM, level,
     prompt: level === 3
-      ? `Réduis A = ${MLm(d.A)} à I sans échange, en ${kk} opérations : choisis chaque opération et écris sa matrice élémentaire ${order.map(eName).join(', ')}. Puis écris A⁻¹ et A comme produits de matrices élémentaires.`
-      : `On réduit A = ${MLm(d.A)} à I par ${d.ops.map((op, k) => `${eName(k)} : ${opR(op)}`).join(', ')}. Écris ${order.map(eName).join(', ')}, puis A⁻¹ et A comme produits de matrices élémentaires.`,
+      ? t('Réduis A = {A} à I sans échange, en {k} opérations : choisis chaque opération et écris sa matrice élémentaire {Es}. Puis écris A⁻¹ et A comme produits de matrices élémentaires.', { A: MLm(d.A), k: kk, Es: order.map(eName).join(', ') })
+      : t('On réduit A = {A} à I par {ops}. Écris {Es}, puis A⁻¹ et A comme produits de matrices élémentaires.', { A: MLm(d.A), ops: d.ops.map((op, k) => `${eName(k)} : ${opR(op)}`).join(', '), Es: order.map(eName).join(', ') }),
     start: segs[0].start, judge: first, mode: level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null, script,
     hints: level === 5 ? [] : [
-      { level: 1, html: `Fais chaque opération sur I pour obtenir Eₖ. Si ${invR}·A = I, alors A⁻¹ = ${invR} et A = ${aR}.` },
-      { level: 2, html: `${eName(0)}⁻¹ = ${rowHoles(d.Eis[0], d.ops[0].i)} en ligne ${d.ops[0].i + 1}` },
+      { level: 1, html: t('Fais chaque opération sur I pour obtenir Eₖ. Si {inv}·A = I, alors A⁻¹ = {inv} et A = {a}.', { inv: invR, a: aR }) },
+      { level: 2, html: t('{E}⁻¹ = {row} en ligne {i}', { E: eName(0), row: rowHoles(d.Eis[0], d.ops[0].i), i: d.ops[0].i + 1 }) },
       { level: 3, html: `A⁻¹ = ${MLm(d.Ai)}` },
     ],
     subgoals: ELEM_SUB, key: `${ELEM}:dec:${mt(d.A)}`, fallback: d.fallback,
@@ -1215,23 +1226,23 @@ function elemTf(level, rng, exam) {
     const pr = rng.pick(ELEM_PAIRS);
     return tfL({
       ...base, key: `prod:${mt(MX.mat(pr[0]))}`, truth: false,
-      statement: 'Le produit de deux matrices élémentaires de même taille est une matrice élémentaire.',
+      statement: t('Le produit de deux matrices élémentaires de même taille est une matrice élémentaire.'),
       counter: pairCounter('elemProduct', pr),
-      explanation: `Faux : ${MLm(MX.mat(pr[0]))}·${MLm(MX.mat(pr[1]))} = ${MLm(MX.mul(MX.mat(pr[0]), MX.mat(pr[1])))} fait deux opérations à la fois.`,
+      explanation: t('Faux : {A}·{B} = {C} fait deux opérations à la fois.', { A: MLm(MX.mat(pr[0])), B: MLm(MX.mat(pr[1])), C: MLm(MX.mul(MX.mat(pr[0]), MX.mat(pr[1]))) }),
     });
   }
   if (which === 'rows') {
     const [A, B] = rng.pick(REL_PAIRS);
     return tfL({
       ...base, key: `rows:${mt(MX.mat(A))}`, truth: false,
-      statement: 'Si E₁, E₂, E₃ sont des matrices élémentaires, les lignes de E₃E₂E₁A sont reliées par les mêmes relations de dépendance que les lignes de A.',
+      statement: t('Si E₁, E₂, E₃ sont des matrices élémentaires, les lignes de E₃E₂E₁A sont reliées par les mêmes relations de dépendance que les lignes de A.'),
       counter: { kind: 'matOne', params: { want: 'rowRelations' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }, { v: 'B', label: 'B = EA =', shape: [2, 2] }], answer: { A: mt(MX.mat(A)), B: mt(MX.mat(B)) } },
-      explanation: `Faux : les opérations sur les lignes mélangent les lignes. Avec A = ${MLm(MX.mat(A))} et B = ${MLm(MX.mat(B))}, obtenue par une opération, les relations entre lignes changent. Ce sont les <b>colonnes</b> qui gardent leurs relations.`,
+      explanation: t('Faux : les opérations sur les lignes mélangent les lignes. Avec A = {A} et B = {B}, obtenue par une opération, les relations entre lignes changent. Ce sont les <b>colonnes</b> qui gardent leurs relations.', { A: MLm(MX.mat(A)), B: MLm(MX.mat(B)) }),
     });
   }
   const T = {
-    inv: ['Toute matrice élémentaire est inversible, et son inverse est une matrice élémentaire.', 'Vrai : l\'inverse de E fait l\'opération contraire, qui est aussi une seule opération élémentaire.'],
-    cols: ['Si E est une matrice élémentaire, les colonnes de EA sont reliées par les mêmes relations de dépendance que les colonnes de A.', 'Vrai : Ax = 0 ⇔ EAx = 0 puisque E est inversible ; les relations entre colonnes sont les solutions de Ax = 0.'],
+    inv: [t('Toute matrice élémentaire est inversible, et son inverse est une matrice élémentaire.'), t('Vrai : l\'inverse de E fait l\'opération contraire, qui est aussi une seule opération élémentaire.')],
+    cols: [t('Si E est une matrice élémentaire, les colonnes de EA sont reliées par les mêmes relations de dépendance que les colonnes de A.'), t('Vrai : Ax = 0 ⇔ EAx = 0 puisque E est inversible ; les relations entre colonnes sont les solutions de Ax = 0.')],
   }[which];
   return tfL({ ...base, key: which, truth: true, statement: T[0], explanation: T[1] });
 }
@@ -1243,10 +1254,10 @@ function elemExam(rng, exam) {
   const Ei = elemOf(3, undo(op));
   return mcqDistinct({
     skill: ELEM, level: 4, key: `mcq:${mt(E)}`, exam: examTag({ exam }),
-    prompt: `E = ${MLm(E)} est la matrice élémentaire de ${opR(op)}. Que vaut E⁻¹ ?`,
+    prompt: t('E = {E} est la matrice élémentaire de {op}. Que vaut E⁻¹ ?', { E: MLm(E), op: opR(op) }),
     right: MLm(Ei),
     wrongs: [{ html: MLm(E), rule: 'l_elementary_inverse' }, { html: MLm(MX.transpose(E)), rule: null }, { html: MLm(MX.transpose(Ei)), rule: null }],
-    solution: [{ html: `E⁻¹ fait ${opR(undo(op))} : E⁻¹ = ${MLm(Ei)}`, note: 'Contrôle : E·E⁻¹ = I' }],
+    solution: [{ html: t('E⁻¹ fait {op} : E⁻¹ = {E}', { op: opR(undo(op)), E: MLm(Ei) }), note: t('Contrôle : E·E⁻¹ = I') }],
   }, rng);
 }
 
@@ -1256,15 +1267,15 @@ function elemExam(rng, exam) {
 
 const LU = 'l-mat-lu';
 const LU_SUB = [
-  { id: 'elim', label: 'éliminer', skill: ECH },
-  { id: 'noteL', label: 'noter ℓ', skill: LU },
-  { id: 'assemble', label: 'assembler', skill: LU },
-  { id: 'solve', label: 'résoudre Ly = b', skill: LU },
+  { id: 'elim', label: t('éliminer'), skill: ECH },
+  { id: 'noteL', label: t('noter ℓ'), skill: LU },
+  { id: 'assemble', label: t('assembler'), skill: LU },
+  { id: 'solve', label: t('résoudre Ly = b'), skill: LU },
 ];
 
 // A = LU (luPair), the elimination Lᵢ ← Lᵢ − ℓᵢⱼLⱼ column by column.
 function luData(rng, { n = 3, fracL = false, far: needFar = false } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const { L, U, A, fallback } = luPair(n, rng, { fracL });
     if (fallback) continue;
     const ls = [];
@@ -1302,13 +1313,13 @@ function luItem(level, rng) {
   const judge = { kind: 'rowops', goal: 'echelon', lowerOnly: true, multi: level >= 4 };
   const below = [];
   for (let i = 1; i < d.n; i++) for (let j = 0; j < i; j++) below.push([i, j]);
-  const factorSeg = { kind: 'segment', html: 'Écris L et U.', start: { math: 'LU' }, judge: luCfg(d) };
-  const Lline = { kind: 'eq', math: `L = ${mt(d.L)}`, note: 'Sous la diagonale, les multiplicateurs ℓᵢⱼ', subgoal: 'noteL' };
-  const Uline = { kind: 'eq', math: `U = ${mt(d.U)}`, note: 'La forme échelonnée obtenue', subgoal: 'assemble' };
-  const both = { kind: 'eq', math: `L = ${mt(d.L)} ; U = ${mt(d.U)}`, note: 'L : les multiplicateurs ; U : la forme échelonnée', subgoal: 'assemble' };
+  const factorSeg = { kind: 'segment', html: t('Écris L et U.'), start: { math: 'LU' }, judge: luCfg(d) };
+  const Lline = { kind: 'eq', math: `L = ${mt(d.L)}`, note: t('Sous la diagonale, les multiplicateurs ℓᵢⱼ'), subgoal: 'noteL' };
+  const Uline = { kind: 'eq', math: `U = ${mt(d.U)}`, note: t('La forme échelonnée obtenue'), subgoal: 'assemble' };
+  const both = { kind: 'eq', math: `L = ${mt(d.L)} ; U = ${mt(d.U)}`, note: t('L : les multiplicateurs ; U : la forme échelonnée'), subgoal: 'assemble' };
   const first = d.ops[0];
   const hints = [
-    { level: 1, html: 'ℓᵢⱼ est le nombre k de Lᵢ ← Lᵢ − kLⱼ, avec son signe : on le range en ligne i, colonne j de L.' },
+    { level: 1, html: t('ℓᵢⱼ est le nombre k de Lᵢ ← Lᵢ − kLⱼ, avec son signe : on le range en ligne i, colonne j de L.') },
     { level: 2, html: `L${sub(first.i + 1)} ← L${sub(first.i + 1)} − □L${sub(first.j + 1)}, ${lName(first.i, first.j)} = □` },
     { level: 3, html: `${ML(lines[0].math)} ; ${lName(first.i, first.j)} = ${fq(first.k.neg())}` },
   ];
@@ -1322,29 +1333,31 @@ function luItem(level, rng) {
       const k = op.k.neg();
       const cands = [
         { id: 'ok', label: fq(k), valid: true },
-        { id: 'neg', label: fq(k.neg()), valid: false, rule: 'l_lu_sign', why: `On retranche ${parR(k)} fois la ligne ${op.j + 1} : ℓ = ${fq(k)}, avec ce signe.` },
-        { id: 'inv', label: fq(q(1).div(k)), valid: false, why: 'ℓᵢⱼ est le multiplicateur lui-même, pas son inverse.' },
-        { id: 'neginv', label: fq(q(1).div(k).neg()), valid: false, why: 'ℓᵢⱼ est le multiplicateur lui-même, avec son signe.' },
+        { id: 'neg', label: fq(k.neg()), valid: false, rule: 'l_lu_sign', why: t('On retranche {k} fois la ligne {j} : ℓ = {v}, avec ce signe.', { k: parR(k), j: op.j + 1, v: fq(k) }) },
+        { id: 'inv', label: fq(q(1).div(k)), valid: false, why: t('ℓᵢⱼ est le multiplicateur lui-même, pas son inverse.') },
+        { id: 'neginv', label: fq(q(1).div(k).neg()), valid: false, why: t('ℓᵢⱼ est le multiplicateur lui-même, avec son signe.') },
       ];
       const options = cands.filter((o, idx) => cands.findIndex((x) => x.label === o.label) === idx).slice(0, 3);
-      script.push({ kind: 'decision', prompt: `On a fait ${opR({ ...op })}. Que vaut ${lName(op.i, op.j)} ?`, options: rng.shuffle(options) });
+      script.push({ kind: 'decision', prompt: t('On a fait {op}. Que vaut {l} ?', { op: opR({ ...op }), l: lName(op.i, op.j) }), options: rng.shuffle(options) });
     }
     script.push(withCells(Lline, below.slice(0, level === 1 ? below.length : below.length)), withCells(Uline, pickCells(d.U, [0, 1, 2], level === 1 ? 2 : 3, rng).filter(([r, c]) => c >= r)));
-    return matLines({ ...base, prompt: `Factorise A = ${MLm(d.A)} en A = LU : échelonne sans échange, en notant chaque multiplicateur ℓᵢⱼ.`, mode: 'guided', script });
+    return matLines({ ...base, prompt: t('Factorise A = {A} en A = LU : échelonne sans échange, en notant chaque multiplicateur ℓᵢⱼ.', { A: MLm(d.A) }), mode: 'guided', script });
   }
   const script = [...lines, factorSeg, both];
-  let prompt = `Factorise A = ${MLm(d.A)} en A = LU${level === 3 ? ' : choisis chaque opération Lᵢ ← Lᵢ − kLⱼ (j < i), puis écris la matrice' : ''}. Écris ensuite L et U.`;
+  let prompt = level === 3
+    ? t('Factorise A = {A} en A = LU : choisis chaque opération Lᵢ ← Lᵢ − kLⱼ (j < i), puis écris la matrice. Écris ensuite L et U.', { A: MLm(d.A) })
+    : t('Factorise A = {A} en A = LU. Écris ensuite L et U.', { A: MLm(d.A) });
   if (level === 4 && rng.chance(0.5)) {
     const x = [rng.int(-3, 3), rng.int(-3, 3), rng.int(-3, 3)].map((v) => q(v));
     const y = MX.matVec(d.U, x);
     const b = MX.matVec(d.A, x);
     script.push(
-      { kind: 'segment', html: `Résous Ax = b avec b = ${vt(b).replace(/-/g, '−')} : d'abord Ly = b.`, start: { math: 'y' }, judge: { kind: 'mat', expect: vt(y) } },
-      { kind: 'eq', math: vt(y), note: 'Ly = b, de haut en bas', subgoal: 'solve' },
-      { kind: 'segment', html: 'Puis Ux = y.', start: { math: 'x' }, judge: { kind: 'mat', expect: vt(x) } },
-      { kind: 'eq', math: vt(x), note: 'Ux = y, de bas en haut', subgoal: 'solve' },
+      { kind: 'segment', html: t('Résous Ax = b avec b = {b} : d\'abord Ly = b.', { b: vt(b).replace(/-/g, '−') }), start: { math: 'y' }, judge: { kind: 'mat', expect: vt(y) } },
+      { kind: 'eq', math: vt(y), note: t('Ly = b, de haut en bas'), subgoal: 'solve' },
+      { kind: 'segment', html: t('Puis Ux = y.'), start: { math: 'x' }, judge: { kind: 'mat', expect: vt(x) } },
+      { kind: 'eq', math: vt(x), note: t('Ux = y, de bas en haut'), subgoal: 'solve' },
     );
-    prompt = `Factorise A = ${MLm(d.A)} en A = LU, puis résous Ax = b avec b = ${vt(b).replace(/-/g, '−')} par Ly = b et Ux = y.`;
+    prompt = t('Factorise A = {A} en A = LU, puis résous Ax = b avec b = {b} par Ly = b et Ux = y.', { A: MLm(d.A), b: vt(b).replace(/-/g, '−') });
   }
   return matLines({ ...base, prompt, mode: level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null, script });
 }
@@ -1353,8 +1366,8 @@ function luItem(level, rng) {
 function luCoef(rng, { level = 4, exam = null, n = 4 } = {}) {
   const d = luData(rng, { n, fracL: n === 4, far: exam === 'mcq' });
   const right = d.L[d.i][d.j];
-  const prompt = `On factorise A = ${MLm(d.A)} en A = LU sans échange (L unitriangulaire inférieure). Que vaut ${lName(d.i, d.j)} ?`;
-  const solution = [{ html: `L = ${MLm(d.L)}`, note: 'Les multiplicateurs de l\'élimination' }, { html: `U = ${MLm(d.U)}`, note: '' }];
+  const prompt = t('On factorise A = {A} en A = LU sans échange (L unitriangulaire inférieure). Que vaut {l} ?', { A: MLm(d.A), l: lName(d.i, d.j) });
+  const solution = [{ html: `L = ${MLm(d.L)}`, note: t('Les multiplicateurs de l\'élimination') }, { html: `U = ${MLm(d.U)}`, note: '' }];
   const traps = [{ rule: 'l_lu_sign' }, { rule: 'l_lu_inverse' }, { rule: 'l_coef_index_swap' }];
   if (exam !== 'mcq') {
     return coefItem({
@@ -1383,14 +1396,14 @@ function luExam(rng, exam) {
     const n = A.startsWith('[[0,1,0]') ? 3 : 2;
     return tfL({
       skill: LU, key: `notLU:${A}`, truth: false, exam: tag,
-      statement: 'Toute matrice inversible admet une factorisation A = LU sans échange de lignes.',
+      statement: t('Toute matrice inversible admet une factorisation A = LU sans échange de lignes.'),
       counter: { kind: 'matOne', params: { want: 'notLUable' }, ask: [{ v: 'A', label: 'A =', shape: [n, n] }], answer: { A } },
-      explanation: `Faux : ${ML(A)} est inversible, mais son premier pivot a₁₁ est nul : il faut échanger deux lignes (PA = LU).`,
+      explanation: t('Faux : {A} est inversible, mais son premier pivot a₁₁ est nul : il faut échanger deux lignes (PA = LU).', { A: ML(A) }),
     });
   }
   const T = {
-    det: ['Si A = LU avec L unitriangulaire inférieure et U triangulaire supérieure, alors det A est le produit des coefficients diagonaux de U.', 'Vrai : det A = det L · det U = 1 · (produit de la diagonale de U).'],
-    mult: ['Dans A = LU sans échange, si l\'élimination fait Lᵢ ← Lᵢ − kLⱼ, alors ℓᵢⱼ = k.', 'Vrai : L range les multiplicateurs eux-mêmes, avec leur signe.'],
+    det: [t('Si A = LU avec L unitriangulaire inférieure et U triangulaire supérieure, alors det A est le produit des coefficients diagonaux de U.'), t('Vrai : det A = det L · det U = 1 · (produit de la diagonale de U).')],
+    mult: [t('Dans A = LU sans échange, si l\'élimination fait Lᵢ ← Lᵢ − kLⱼ, alors ℓᵢⱼ = k.'), t('Vrai : L range les multiplicateurs eux-mêmes, avec leur signe.')],
   }[which];
   return tfL({ skill: LU, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1], ruleIfFalse: which === 'mult' ? 'l_lu_sign' : null });
 }
@@ -1401,8 +1414,8 @@ function luExam(rng, exam) {
 
 const BLK = 'l-mat-blocks';
 const BLK_SUB = [
-  { id: 'invBlock', label: 'inverser un bloc', skill: INV },
-  { id: 'formula', label: 'formule du bloc', skill: BLK },
+  { id: 'invBlock', label: t('inverser un bloc'), skill: INV },
+  { id: 'formula', label: t('formule du bloc'), skill: BLK },
 ];
 
 // [[X, Y], [Z, W]] from four 2 × 2 blocks.
@@ -1420,7 +1433,7 @@ function det2(rng, dets, lim = 3) {
 
 // M = [[A, B], [0, D]]: A and D of det ±1 (or D = 3I), M⁻¹ = [[A⁻¹, X], [0, D⁻¹]], X = −A⁻¹BD⁻¹.
 function blocksData(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const A = det2(rng, [1, -1]);
     const D = rng.chance(0.25) ? MX.scale(I2, 3) : det2(rng, [1, -1, 3, -3]);
     const B = randM(2, 2, rng, -3, 3);
@@ -1460,39 +1473,39 @@ function blocksItem(level, rng) {
   const names = blkNames(d);
   const Bi = MX.inverse(d.B);
   const decision = {
-    kind: 'decision', prompt: 'Quel est le bloc X₁₂ de M⁻¹ ?', options: rng.shuffle([
+    kind: 'decision', prompt: t('Quel est le bloc X₁₂ de M⁻¹ ?'), options: rng.shuffle([
       { id: 'ok', label: '−A⁻¹BD⁻¹', valid: true },
-      { id: 'order', label: '−D⁻¹BA⁻¹', valid: false, rule: 'l_blocks_order', why: 'Écris M·M⁻¹ = I bloc par bloc : A·X₁₂ + B·D⁻¹ = 0, donc X₁₂ = −A⁻¹BD⁻¹. Les blocs ne commutent pas.' },
-      Bi ? { id: 'each', label: 'B⁻¹', valid: false, rule: 'l_blocks_inverse_each', why: 'On n\'inverse pas une matrice par blocs case par case : A·B⁻¹ + B·D⁻¹ ≠ 0.' } : { id: 'sign', label: 'A⁻¹BD⁻¹', valid: false, why: 'A·X₁₂ + B·D⁻¹ = 0 donne un signe moins : X₁₂ = −A⁻¹BD⁻¹.' },
+      { id: 'order', label: '−D⁻¹BA⁻¹', valid: false, rule: 'l_blocks_order', why: t('Écris M·M⁻¹ = I bloc par bloc : A·X₁₂ + B·D⁻¹ = 0, donc X₁₂ = −A⁻¹BD⁻¹. Les blocs ne commutent pas.') },
+      Bi ? { id: 'each', label: 'B⁻¹', valid: false, rule: 'l_blocks_inverse_each', why: t('On n\'inverse pas une matrice par blocs case par case : A·B⁻¹ + B·D⁻¹ ≠ 0.') } : { id: 'sign', label: 'A⁻¹BD⁻¹', valid: false, why: t('A·X₁₂ + B·D⁻¹ = 0 donne un signe moins : X₁₂ = −A⁻¹BD⁻¹.') },
     ]),
   };
   const menu = (valid, others) => rng.shuffle([{ id: 'ok', label: valid, valid: true }, ...others]);
   const segs = [
     { start: 'X_11', judge: { kind: 'mat', expect: mt(d.Ai), about: { inverse: mt(d.A) } },
-      menu: menu('Inverser le bloc A', [{ id: 'each', label: 'Recopier A', valid: false, why: 'M·M⁻¹ = I donne A·X₁₁ = I : X₁₁ = A⁻¹.' }]),
+      menu: menu(t('Inverser le bloc A'), [{ id: 'each', label: t('Recopier A'), valid: false, why: t('M·M⁻¹ = I donne A·X₁₁ = I : X₁₁ = A⁻¹.') }]),
       lines: inv2Lines(d.A, 'invBlock').map((l) => ({ ...l, note: l.note || 'X₁₁ = A⁻¹' })) },
-    { html: 'Le bloc X₂₂ = D⁻¹.', start: 'X_22', judge: { kind: 'mat', expect: mt(d.Di), about: { inverse: mt(d.D) } },
-      menu: menu('Inverser le bloc D', [{ id: 'zero', label: 'Bloc nul', valid: false, why: 'D·X₂₂ = I : X₂₂ = D⁻¹, qui n\'est pas nul.' }]),
+    { html: t('Le bloc X₂₂ = D⁻¹.'), start: 'X_22', judge: { kind: 'mat', expect: mt(d.Di), about: { inverse: mt(d.D) } },
+      menu: menu(t('Inverser le bloc D'), [{ id: 'zero', label: t('Bloc nul'), valid: false, why: t('D·X₂₂ = I : X₂₂ = D⁻¹, qui n\'est pas nul.') }]),
       lines: inv2Lines(d.D, 'invBlock').map((l) => ({ ...l, note: l.note || 'X₂₂ = D⁻¹' })) },
-    { html: 'Le bloc X₁₂ (en haut à droite).', start: 'X_12', judge: { kind: 'mat', expect: mt(d.X), names, about: blkAbout(d) }, decision,
-      menu: menu('Formule du bloc : X₁₂ = −A⁻¹BD⁻¹', [
-        { id: 'order', label: 'X₁₂ = −D⁻¹BA⁻¹', valid: false, rule: 'l_blocks_order', why: 'A·X₁₂ + B·D⁻¹ = 0 donne X₁₂ = −A⁻¹BD⁻¹.' },
-        { id: 'zero', label: 'Bloc nul', valid: false, why: 'Le bloc nul est en bas à gauche ; en haut à droite, A·X₁₂ + B·D⁻¹ = 0.' },
+    { html: t('Le bloc X₁₂ (en haut à droite).'), start: 'X_12', judge: { kind: 'mat', expect: mt(d.X), names, about: blkAbout(d) }, decision,
+      menu: menu(t('Formule du bloc : X₁₂ = −A⁻¹BD⁻¹'), [
+        { id: 'order', label: 'X₁₂ = −D⁻¹BA⁻¹', valid: false, rule: 'l_blocks_order', why: t('A·X₁₂ + B·D⁻¹ = 0 donne X₁₂ = −A⁻¹BD⁻¹.') },
+        { id: 'zero', label: t('Bloc nul'), valid: false, why: t('Le bloc nul est en bas à gauche ; en haut à droite, A·X₁₂ + B·D⁻¹ = 0.') },
       ]),
       lines: [
         { math: '-A^(-1)·B·D^(-1)', note: 'A·X₁₂ + B·D⁻¹ = 0', subgoal: 'formula' },
         { math: mt(d.X), note: '', subgoal: 'formula', grid: GRID2 },
       ] },
-    { html: 'Assemble M⁻¹.', start: 'M^(-1)', judge: { kind: 'mat', expect: mt(d.Mi), about: blkAbout(d) },
-      menu: menu('Assembler [[X₁₁, X₁₂], [0, X₂₂]]', [{ id: 'each', label: 'Inverser chaque bloc de M', valid: false, rule: 'l_blocks_inverse_each', why: 'Le bloc haut droit n\'est pas B⁻¹ mais −A⁻¹BD⁻¹.' }]),
-      lines: [{ math: mt(d.Mi), note: 'Contrôle : M·M⁻¹ = I₄', subgoal: 'formula', grid: [[0, 0], [0, 0]] }] },
+    { html: t('Assemble M⁻¹.'), start: 'M^(-1)', judge: { kind: 'mat', expect: mt(d.Mi), about: blkAbout(d) },
+      menu: menu(t('Assembler [[X₁₁, X₁₂], [0, X₂₂]]'), [{ id: 'each', label: t('Inverser chaque bloc de M'), valid: false, rule: 'l_blocks_inverse_each', why: t('Le bloc haut droit n\'est pas B⁻¹ mais −A⁻¹BD⁻¹.') }]),
+      lines: [{ math: mt(d.Mi), note: t('Contrôle : M·M⁻¹ = I₄'), subgoal: 'formula', grid: [[0, 0], [0, 0]] }] },
   ];
   // The 4 × 4 line: blanks in the top right block.
   const item = partsItem(level, rng, segs, {
     skill: BLK, subgoals: BLK_SUB, key: `${BLK}:inv:${mt(d.M)}`, fallback: d.fallback,
-    prompt: `M = [[A, B], [0, D]] = ${MLm(d.M)}, avec A = ${MLm(d.A)}, B = ${MLm(d.B)} et D = ${MLm(d.D)}. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.`,
+    prompt: t('M = [[A, B], [0, D]] = {M}, avec A = {A}, B = {B} et D = {D}. Calcule M⁻¹ = [[X₁₁, X₁₂], [0, X₂₂]] par blocs.', { M: MLm(d.M), A: MLm(d.A), B: MLm(d.B), D: MLm(d.D) }),
     hints: [
-      { level: 1, html: 'Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0.' },
+      { level: 1, html: t('Écris M·M⁻¹ = I bloc par bloc et résous pour chaque bloc : A·X₁₁ = I, D·X₂₂ = I, A·X₁₂ + B·X₂₂ = 0.') },
       { level: 2, html: 'X₁₂ = −A⁻¹·B·□' },
       { level: 3, html: `X₁₂ = ${MLm(d.X)}` },
     ],
@@ -1511,9 +1524,9 @@ function blocksAlone(rng) {
     const M = blk(I2, X, Z2, I2);
     const P = blk(I2, MX.scale(X, k), Z2, I2);
     return matLines({
-      skill: BLK, level: 5, prompt: `Soit M = [[I, X], [0, I]] = ${MLm(M)} (blocs 2 × 2). Calcule M${'⁰¹²³⁴⁵'[k]} par blocs.`,
+      skill: BLK, level: 5, prompt: t('Soit M = [[I, X], [0, I]] = {M} (blocs 2 × 2). Calcule {Mk} par blocs.', { M: MLm(M), Mk: `M${'⁰¹²³⁴⁵'[k]}` }),
       start: `M^${k}`, judge: { kind: 'mat', expect: mt(P) }, mode: 'free',
-      script: [{ kind: 'eq', math: mt(P), note: `[[I, X], [0, I]]ᵏ = [[I, kX], [0, I]] : ici k = ${k}`, subgoal: 'formula' }],
+      script: [{ kind: 'eq', math: mt(P), note: t('[[I, X], [0, I]]ᵏ = [[I, kX], [0, I]] : ici k = {k}', { k }), subgoal: 'formula' }],
       hints: [], subgoals: BLK_SUB, key: `${BLK}:pow:${mt(X)}:${k}`,
     });
   }
@@ -1522,7 +1535,7 @@ function blocksAlone(rng) {
   const P = MX.mul(N, d.M);
   return matLines({
     skill: BLK, level: 5,
-    prompt: `Soit N = [[I, 0], [X, I]] = ${MLm(N)} et M = [[A, B], [0, D]] = ${MLm(d.M)} (blocs 2 × 2). Calcule NM par blocs.`,
+    prompt: t('Soit N = [[I, 0], [X, I]] = {N} et M = [[A, B], [0, D]] = {M} (blocs 2 × 2). Calcule NM par blocs.', { N: MLm(N), M: MLm(d.M) }),
     start: 'NM', judge: { kind: 'mat', expect: mt(P), names: { X: mt(X), A: mt(d.A), B: mt(d.B), D: mt(d.D) } }, mode: 'free',
     script: [{ kind: 'eq', math: mt(P), note: 'NM = [[A, B], [XA, XB + D]]', subgoal: 'formula' }],
     hints: [], subgoals: BLK_SUB, key: `${BLK}:prod:${mt(X)}:${mt(d.M)}`, fallback: d.fallback,
@@ -1539,14 +1552,14 @@ function blocksExam(rng, exam) {
       const A = rng.pick(BLOCK_DET);
       return tfL({
         skill: BLK, key: `det:${A}`, truth: false, exam: tag,
-        statement: 'Pour des blocs A, B, C, D de taille 2 × 2, det [[A, B], [C, D]] = det A · det D − det B · det C.',
+        statement: t('Pour des blocs A, B, C, D de taille 2 × 2, det [[A, B], [C, D]] = det A · det D − det B · det C.'),
         counter: { kind: 'matOne', params: { want: 'blockDet', n: 4 }, ask: [{ v: 'A', label: 'M =', shape: [4, 4] }], answer: { A } },
-        explanation: `Faux : la formule « ad − bc » ne vaut pas pour des blocs. Par exemple ${ML(A)} : la formule ne donne pas son déterminant.`,
+        explanation: t('Faux : la formule « ad − bc » ne vaut pas pour des blocs. Par exemple {A} : la formule ne donne pas son déterminant.', { A: ML(A) }),
       });
     }
     const T = {
-      det: ['Pour A et D carrées, det [[A, B], [0, D]] = det A · det D.', 'Vrai : une matrice triangulaire par blocs a pour déterminant le produit des déterminants des blocs diagonaux.'],
-      diag: ['Si A et D sont inversibles, [[A, 0], [0, D]]⁻¹ = [[A⁻¹, 0], [0, D⁻¹]].', 'Vrai : le produit par blocs donne [[AA⁻¹, 0], [0, DD⁻¹]] = I.'],
+      det: [t('Pour A et D carrées, det [[A, B], [0, D]] = det A · det D.'), t('Vrai : une matrice triangulaire par blocs a pour déterminant le produit des déterminants des blocs diagonaux.')],
+      diag: [t('Si A et D sont inversibles, [[A, 0], [0, D]]⁻¹ = [[A⁻¹, 0], [0, D⁻¹]].'), t('Vrai : le produit par blocs donne [[AA⁻¹, 0], [0, DD⁻¹]] = I.')],
     }[which];
     return tfL({ skill: BLK, key: which, truth: true, exam: tag, statement: T[0], explanation: T[1] });
   }
@@ -1554,7 +1567,7 @@ function blocksExam(rng, exam) {
   const Bi = MX.inverse(d.B);
   return mcqDistinct({
     skill: BLK, level: 4, key: `mcq:${mt(d.M)}`, exam: tag,
-    prompt: `M = [[A, B], [0, D]] avec A = ${MLm(d.A)}, B = ${MLm(d.B)} et D = ${MLm(d.D)}. Quel est le bloc (1, 2) de M⁻¹ ?`,
+    prompt: t('M = [[A, B], [0, D]] avec A = {A}, B = {B} et D = {D}. Quel est le bloc (1, 2) de M⁻¹ ?', { A: MLm(d.A), B: MLm(d.B), D: MLm(d.D) }),
     right: MLm(d.X),
     wrongs: [
       { html: MLm(d.Xbad), rule: 'l_blocks_order' },

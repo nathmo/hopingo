@@ -17,6 +17,7 @@ import * as MX from '../matrix.js';
 import { parse } from '../parse.js';
 import { lit } from '../ast.js';
 import { buildLine } from '../../judges/matcommon.js';
+import { t } from '../../i18n.js';
 
 const q = (x) => (x instanceof Q ? x : MX.q(String(x)));
 const fr = (x) => String(x).replace(/-/g, '−');
@@ -91,7 +92,7 @@ const valueNode = (x) => lit(q(x));
 
 export const DEFS = {
   m_chol_no_sqrt: {
-    name: 'Diagonale de L sans la racine',
+    name: t('Diagonale de L sans la racine'),
     judges: ['value'],
     transform(prev, ctx) {
       const st = cholStep(ctx?.cfg);
@@ -109,13 +110,13 @@ export const DEFS = {
     },
     explain: (ctx = {}) => (ctx.d
       ? (ctx.off
-        ? `Le pivot ℓ${ctx.ij} est une racine : ℓ${ctx.ij}² = ${ctx.d}, donc ℓ${ctx.ij} = √${ctx.d} = ${ctx['…']}. Divise par ${ctx['…']}, pas par ${ctx.d}.`
-        : `Sur la diagonale, ℓ${ctx.ij}² = ${ctx.d} : il faut prendre la racine, ℓ${ctx.ij} = √${ctx.d}. Contrôle : (LLᵀ) redonnerait ${ctx.d}² au lieu de ${ctx.d}.`)
-      : 'Sur la diagonale, ℓₖₖ² = aₖₖ − Σ ℓₖⱼ² : il faut prendre la racine. Contrôle : (LLᵀ)ₖₖ doit redonner aₖₖ.'),
+        ? t('Le pivot ℓ{ij} est une racine : ℓ{ij}² = {d}, donc ℓ{ij} = √{d} = {r}. Divise par {r}, pas par {d}.', { ij: ctx.ij, d: ctx.d, r: ctx['…'] })
+        : t('Sur la diagonale, ℓ{ij}² = {d} : il faut prendre la racine, ℓ{ij} = √{d}. Contrôle : (LLᵀ) redonnerait {d}² au lieu de {d}.', { ij: ctx.ij, d: ctx.d }))
+      : t('Sur la diagonale, ℓₖₖ² = aₖₖ − Σ ℓₖⱼ² : il faut prendre la racine. Contrôle : (LLᵀ)ₖₖ doit redonner aₖₖ.')),
     check: { judge: { kind: 'value', expect: '3', chol: { A: '[[4,2,-2],[2,10,5],[-2,5,6]]', i: 1, j: 1 } }, prev: 'l_22', line: '9' },
   },
   m_chol_sum_sign: {
-    name: 'Somme ajoutée au lieu d\'être retranchée',
+    name: t('Somme ajoutée au lieu d\'être retranchée'),
     judges: ['value'],
     transform(prev, ctx) {
       const st = cholStep(ctx?.cfg);
@@ -131,13 +132,13 @@ export const DEFS = {
     },
     explain: (ctx = {}) => (ctx.a
       ? (ctx.diag
-        ? `ℓ${ctx.ij}² = a − Σ ℓ² : on retranche les carrés déjà connus, ${ctx.a} − ${ctx.s}, on ne les ajoute pas.`
-        : `ℓ${ctx.ij} = (a − Σ ℓℓ)/ℓ : ici (${ctx.a} − ${ctx.s.startsWith('−') ? `(${ctx.s})` : ctx.s})/${ctx.p} = ${ctx.right}. La somme se retranche.`)
-      : 'ℓᵢₖ = (aᵢₖ − Σ ℓᵢⱼℓₖⱼ)/ℓₖₖ : la somme des produits déjà connus se retranche.'),
+        ? t('ℓ{ij}² = a − Σ ℓ² : on retranche les carrés déjà connus, {a} − {s}, on ne les ajoute pas.', { ij: ctx.ij, a: ctx.a, s: ctx.s })
+        : t('ℓ{ij} = (a − Σ ℓℓ)/ℓ : ici ({a} − {s})/{p} = {right}. La somme se retranche.', { ij: ctx.ij, a: ctx.a, s: ctx.s.startsWith('−') ? `(${ctx.s})` : ctx.s, p: ctx.p, right: ctx.right }))
+      : t('ℓᵢₖ = (aᵢₖ − Σ ℓᵢⱼℓₖⱼ)/ℓₖₖ : la somme des produits déjà connus se retranche.')),
     check: { judge: { kind: 'value', expect: '2', chol: { A: '[[4,2,-2],[2,10,5],[-2,5,6]]', i: 2, j: 1 } }, prev: 'l_32', line: '4/3' },
   },
   m_grad_factor: {
-    name: 'Facteur 2 ou ½ dans le gradient',
+    name: t('Facteur 2 ou ½ dans le gradient'),
     judges: ['mat'],
     transform(prev, ctx) {
       const g = ctx?.cfg?.qgrad;
@@ -150,11 +151,14 @@ export const DEFS = {
       }
       return out;
     },
-    explain: (ctx = {}) => `∇(xᵀAx) = 2Ax pour A symétrique ; le ½ devant le compense : ∇(½xᵀAx − bᵀx) = Ax − b${ctx.w ? `, pas ${ctx.w}` : ''}.${ctx.first ? ` Vérifie sur la 1re composante : ∂f/∂x = ${ctx.first}.` : ''}`,
+    explain: (ctx = {}) => (ctx.w
+      ? t('∇(xᵀAx) = 2Ax pour A symétrique ; le ½ devant le compense : ∇(½xᵀAx − bᵀx) = Ax − b, pas {w}.', { w: ctx.w })
+      : t('∇(xᵀAx) = 2Ax pour A symétrique ; le ½ devant le compense : ∇(½xᵀAx − bᵀx) = Ax − b.'))
+      + (ctx.first ? ` ${t('Vérifie sur la 1re composante : ∂f/∂x = {first}.', { first: ctx.first })}` : ''),
     check: { judge: { kind: 'mat', expect: '(2x+y-3 ; x+4y-5)', vars: ['x', 'y'], qgrad: { A: '[[2,1],[1,4]]', b: ['3', '5'] } }, prev: '∇f', line: '(4x+2y-3 ; 2x+8y-5)' },
   },
   m_grad_nonsym: {
-    name: '∇(xᵀMx) = 2Mx pour M non symétrique',
+    name: t('∇(xᵀMx) = 2Mx pour M non symétrique'),
     judges: ['mat'],
     transform(prev, ctx) {
       const g = ctx?.cfg?.qgrad;
@@ -164,11 +168,13 @@ export const DEFS = {
       const S = MX.add(M, MX.transpose(M));
       try { return [{ node: buildLine(ctx.cfg, gradText(M, g.b, 2)), ctx: { s: MX.text(S).replace(/-/g, '−') } }]; } catch { return []; }
     },
-    explain: (ctx = {}) => `Pour M non symétrique, ∇(xᵀMx) = (M + Mᵀ)x${ctx.s ? ` : ici M + Mᵀ = ${ctx.s}` : ''}. 2Mx ne vaut que si M = Mᵀ.`,
+    explain: (ctx = {}) => (ctx.s
+      ? t('Pour M non symétrique, ∇(xᵀMx) = (M + Mᵀ)x : ici M + Mᵀ = {s}. 2Mx ne vaut que si M = Mᵀ.', { s: ctx.s })
+      : t('Pour M non symétrique, ∇(xᵀMx) = (M + Mᵀ)x. 2Mx ne vaut que si M = Mᵀ.')),
     check: { judge: { kind: 'mat', expect: '(2x+4y-1 ; 4x+2y)', vars: ['x', 'y'], qgrad: { M: '[[1,3],[1,1]]', b: ['1', '0'] } }, prev: '∇f', line: '(2x+6y-1 ; 2x+2y)' },
   },
   m_var_no_inverse: {
-    name: 'Var(β̂) = σ²XᵀX, sans l\'inverse',
+    name: t('Var(β̂) = σ²XᵀX, sans l\'inverse'),
     judges: ['value'],
     transform(prev, ctx) {
       const v = ctx?.cfg?.nvar;
@@ -176,11 +182,13 @@ export const DEFS = {
       const w = q(v.s2).mul(q(v.d));
       return [{ node: valueNode(w), ctx: { d: fr(v.d), s2: fr(v.s2), j: v.j } }];
     },
-    explain: (ctx = {}) => `Plus il y a de données, plus XᵀX est grand et plus β̂ est précis : la variance est σ²(XᵀX)⁻¹${ctx.d ? `. Il faut la case de (XᵀX)⁻¹, pas (XᵀX)${SUBS[ctx.j + 1] ?? ''}${SUBS[ctx.j + 1] ?? ''} = ${ctx.d}` : ''}.`,
+    explain: (ctx = {}) => (ctx.d
+      ? t('Plus il y a de données, plus XᵀX est grand et plus β̂ est précis : la variance est σ²(XᵀX)⁻¹. Il faut la case de (XᵀX)⁻¹, pas (XᵀX){jj} = {d}.', { jj: `${SUBS[ctx.j + 1] ?? ''}${SUBS[ctx.j + 1] ?? ''}`, d: ctx.d })
+      : t('Plus il y a de données, plus XᵀX est grand et plus β̂ est précis : la variance est σ²(XᵀX)⁻¹.')),
     check: { judge: { kind: 'value', expect: '7/60', nvar: { s2: '7/6', d: '10', j: 1 } }, prev: 'V', line: '35/3' },
   },
   m_rayleigh_no_denominator: {
-    name: 'R(x) sans le dénominateur xᵀx',
+    name: t('R(x) sans le dénominateur xᵀx'),
     judges: ['value'],
     transform(prev, ctx) {
       const r = ctx?.cfg?.rayleigh;
@@ -188,7 +196,8 @@ export const DEFS = {
       const c = { den: fr(r.den), num: fr(r.num) };
       return [{ node: valueNode(r.num), ctx: c }, { node: parse(`(${r.num})/√(${r.den})`), ctx: c }];
     },
-    explain: (ctx = {}) => `R(x) = xᵀAx/xᵀx : sans le dénominateur, la valeur dépend de la longueur de x.${ctx.den ? ` Ici xᵀx = ${ctx.den}, donc R = ${ctx.num}/${ctx.den} (pas de racine : xᵀx = ‖x‖²).` : ''}`,
+    explain: (ctx = {}) => t('R(x) = xᵀAx/xᵀx : sans le dénominateur, la valeur dépend de la longueur de x.')
+      + (ctx.den ? ` ${t('Ici xᵀx = {den}, donc R = {num}/{den} (pas de racine : xᵀx = ‖x‖²).', { den: ctx.den, num: ctx.num })}` : ''),
     check: { judge: { kind: 'value', expect: '19/5', rayleigh: { num: '19', den: '5' } }, prev: 'R', line: '19' },
   },
 };

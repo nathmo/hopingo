@@ -25,20 +25,21 @@ import {
   refCode, codeItem, readtableItem, multiMcq, vfMcq, iterTable, H, fmt, expText, blankBy, PRELUDE_VEC, PRELUDE_MAT,
 } from './numerique-kit.js';
 import { referenceRows, fv } from '../../judges/iter-num.js';
+import { t } from '../../i18n.js';
 
 const JG = 'n-iter-jacobi-gs';
 const CV = 'n-iter-convergence';
 const SUB_J = [
-  { id: 'jacobi', label: 'une itération de Jacobi', skill: JG },
-  { id: 'gs', label: 'une itération de Gauss-Seidel', skill: JG },
-  { id: 'criterion', label: 'diagonale dominante', skill: JG },
-  { id: 'rows', label: 'une ligne du système', skill: 'l-sys-augmented' },
+  { id: 'jacobi', label: t('une itération de Jacobi'), skill: JG },
+  { id: 'gs', label: t('une itération de Gauss-Seidel'), skill: JG },
+  { id: 'criterion', label: t('diagonale dominante'), skill: JG },
+  { id: 'rows', label: t('une ligne du système'), skill: 'l-sys-augmented' },
 ];
 const SUB_C = [
   { id: 'B', label: 'B_J = I − D⁻¹A', skill: CV },
-  { id: 'rho', label: 'ρ(B) par les valeurs propres', skill: 'l-eig-charpoly' },
-  { id: 'stop', label: 'résidu et κ(A)', skill: 'm-cond' },
-  { id: 'iter', label: 'Jacobi et Gauss-Seidel', skill: JG },
+  { id: 'rho', label: t('ρ(B) par les valeurs propres'), skill: 'l-eig-charpoly' },
+  { id: 'stop', label: t('résidu et κ(A)'), skill: 'm-cond' },
+  { id: 'iter', label: t('Jacobi et Gauss-Seidel'), skill: JG },
 ];
 const R = (s) => String(s).replace(/-/g, '−');
 const pq = (x) => (fv(x) < 0 ? `(${x})` : `${x}`);
@@ -46,7 +47,7 @@ const pq = (x) => (fv(x) < 0 ? `(${x})` : `${x}`);
 // ---------- data: n-iter-jacobi-gs ----------
 
 function jgData(rng) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const tri = rng.chance(0.5);
     const A = [0, 1, 2].map((i) => [0, 1, 2].map((j) => {
       if (i === j) return rng.pick([2, 4, 5, 8]);
@@ -114,9 +115,11 @@ function jgTable(d, level, kind, { rows = 2, given = (k, id) => k === 0, then = 
   const name = kind === 'gs' ? 'Gauss-Seidel' : 'Jacobi';
   return iterTable({
     skill: JG, level, key: `${kind}:${level}:${mt(d.A)}:${d.b.join(',')}`, n: rows, cols: COLS, phi, given,
-    prompt: `Méthode de ${name} pour Ax = b, A = ${Atext(d)}, b = ${vecR(d.b)}, à partir de x⁽⁰⁾ = 0. ${rows === 2 ? 'Calcule x⁽¹⁾' : 'Calcule x⁽¹⁾ et x⁽²⁾'} (fractions exactes) ; l'app calcule le résidu.`,
+    prompt: rows === 2
+      ? t('Méthode de {name} pour Ax = b, A = {A}, b = {b}, à partir de x⁽⁰⁾ = 0. Calcule x⁽¹⁾ (fractions exactes) ; l\'app calcule le résidu.', { name, A: Atext(d), b: vecR(d.b) })
+      : t('Méthode de {name} pour Ax = b, A = {A}, b = {b}, à partir de x⁽⁰⁾ = 0. Calcule x⁽¹⁾ et x⁽²⁾ (fractions exactes) ; l\'app calcule le résidu.', { name, A: Atext(d), b: vecR(d.b) }),
     then, exam,
-    hints: H(`Ligne i : isole xᵢ ; ${kind === 'gs' ? 'utilise les composantes déjà calculées de l\'itération en cours (Gauss-Seidel)' : 'les autres xⱼ viennent de l\'itération précédente (Jacobi)'}.`,
+    hints: H(kind === 'gs' ? t('Ligne i : isole xᵢ ; utilise les composantes déjà calculées de l\'itération en cours (Gauss-Seidel).') : t('Ligne i : isole xᵢ ; les autres xⱼ viennent de l\'itération précédente (Jacobi).'),
       `x₂⁽¹⁾ = (${d.b[1]} − (${d.A[1][0]})·□ − (${d.A[1][2]})·□)/${d.A[1][1]}`.replace(/-/g, '−'),
       `x⁽¹⁾ = ${vecR(['x1', 'x2', 'x3'].map((k) => (kind === 'gs' ? d.G : d.J)[1][k]))}.`),
     subgoals: SUB_J, baits: kind === 'jacobi' ? ['n_jacobi_uses_new'] : [], fallback: d.fallback,
@@ -142,23 +145,23 @@ function jgLevel3(rng) {
   const x1 = ['x1', 'x2', 'x3'].map((k) => ref[1][k]);
   const x2 = ['x1', 'x2', 'x3'].map((k) => ref[2][k]);
   const menu = (i) => [
-    { id: 'old', label: 'Avec les valeurs de x⁽¹⁾ (itération précédente)', valid: kind === 'jacobi' || i === 0, why: 'Gauss-Seidel utilise déjà les composantes de x⁽²⁾ calculées au-dessus.' },
-    { id: 'new', label: 'Avec les composantes de x⁽²⁾ déjà calculées', valid: kind === 'gs' && i > 0, why: i === 0 ? 'Aucune composante de x⁽²⁾ n\'est encore calculée.' : 'Jacobi n\'utilise que les valeurs de l\'itération précédente.' },
-    { id: 'all', label: 'Avec la solution exacte x', valid: false, why: 'On ne la connaît pas : c\'est ce qu\'on cherche.' },
+    { id: 'old', label: t('Avec les valeurs de x⁽¹⁾ (itération précédente)'), valid: kind === 'jacobi' || i === 0, why: t('Gauss-Seidel utilise déjà les composantes de x⁽²⁾ calculées au-dessus.') },
+    { id: 'new', label: t('Avec les composantes de x⁽²⁾ déjà calculées'), valid: kind === 'gs' && i > 0, why: i === 0 ? t('Aucune composante de x⁽²⁾ n\'est encore calculée.') : t('Jacobi n\'utilise que les valeurs de l\'itération précédente.') },
+    { id: 'all', label: t('Avec la solution exacte x'), valid: false, why: t('On ne la connaît pas : c\'est ce qu\'on cherche.') },
   ];
   const script = [];
   [0, 1, 2].forEach((i) => {
     if (i > 0) script.push({ kind: 'segment', html: `x${'₁₂₃'[i]}⁽²⁾ :`, ask: `x${'₁₂₃'[i]}⁽²⁾ =`, start: { math: `x_${i + 1}` }, judge: { kind: 'value', expect: String(x2[i]), form: 'irreducible', menu: menu(i) } });
-    script.push({ kind: 'eq', math: compLine(d, i, x1, x2, kind), note: `Ligne ${i + 1}, isolée`, subgoal: kind === 'gs' ? 'gs' : 'jacobi' });
+    script.push({ kind: 'eq', math: compLine(d, i, x1, x2, kind), note: t('Ligne {i}, isolée', { i: i + 1 }), subgoal: kind === 'gs' ? 'gs' : 'jacobi' });
     script.push({ kind: 'eq', math: String(x2[i]), note: '', subgoal: kind === 'gs' ? 'gs' : 'jacobi' });
   });
   const name = kind === 'gs' ? 'Gauss-Seidel' : 'Jacobi';
   return linesItem({
     skill: JG, level: 3, mode: 'tap', tapActions: 'menu', keys: ['calc'],
-    prompt: `Méthode de ${name} pour A = ${Atext(d)}, b = ${vecR(d.b)}. On a x⁽¹⁾ = ${vecR(x1)}. Calcule x⁽²⁾ composante par composante : choisis d'abord quelles valeurs utiliser.`,
+    prompt: t('Méthode de {name} pour A = {A}, b = {b}. On a x⁽¹⁾ = {x1}. Calcule x⁽²⁾ composante par composante : choisis d\'abord quelles valeurs utiliser.', { name, A: Atext(d), b: vecR(d.b), x1: vecR(x1) }),
     start: 'x_1', judge: { kind: 'value', expect: String(x2[0]), form: 'irreducible', menu: menu(0) },
     script,
-    hints: H('Ligne i : isole xᵢ ; Jacobi prend les autres composantes dans x⁽¹⁾, Gauss-Seidel prend les plus récentes.',
+    hints: H(t('Ligne i : isole xᵢ ; Jacobi prend les autres composantes dans x⁽¹⁾, Gauss-Seidel prend les plus récentes.'),
       `x₂⁽²⁾ = (${d.b[1]} − (${d.A[1][0]})·□ − (${d.A[1][2]})·□)/${d.A[1][1]}`.replace(/-/g, '−'),
       `x⁽²⁾ = ${vecR(x2)}.`),
     subgoals: SUB_J, key: `${JG}:3:${kind}:${mt(d.A)}:${d.b}`, baits: ['n_jacobi_uses_new'], fallback: d.fallback,
@@ -171,19 +174,19 @@ function criterionMcq(rng, d, level) {
   const ok = bad < 0;
   return mcq({
     skill: JG, level, key: `${JG}:crit:${mt(d.A)}`,
-    prompt: `A = ${Atext(d)}. Que dit le critère de la diagonale strictement dominante (par lignes) ?`,
+    prompt: t('A = {A}. Que dit le critère de la diagonale strictement dominante (par lignes) ?', { A: Atext(d) }),
     options: ok ? [
-      { html: 'A est à diagonale strictement dominante : Jacobi et Gauss-Seidel convergent pour tout x⁽⁰⁾', correct: true },
-      { html: 'Il faut aussi que A soit symétrique', correct: false },
-      { html: 'Seule la méthode de Gauss-Seidel converge', correct: false },
-      { html: 'On ne peut rien dire sans calculer la solution', correct: false },
+      { html: t('A est à diagonale strictement dominante : Jacobi et Gauss-Seidel convergent pour tout x⁽⁰⁾'), correct: true },
+      { html: t('Il faut aussi que A soit symétrique'), correct: false },
+      { html: t('Seule la méthode de Gauss-Seidel converge'), correct: false },
+      { html: t('On ne peut rien dire sans calculer la solution'), correct: false },
     ] : [
-      { html: `A n'est pas à diagonale strictement dominante (ligne ${bad + 1} : ${Math.abs(d.A[bad][bad])} contre ${sums[bad]}) : ce critère ne permet pas de conclure`, correct: true },
-      { html: `|aᵢᵢ| ≥ Σ|aᵢⱼ| sur chaque ligne suffit : les deux méthodes convergent par ce critère`, correct: false, rule: 'n_diag_dominance' },
-      { html: 'Les deux méthodes divergent', correct: false },
-      { html: 'Seule la méthode de Jacobi converge', correct: false },
+      { html: t('A n\'est pas à diagonale strictement dominante (ligne {i} : {aii} contre {s}) : ce critère ne permet pas de conclure', { i: bad + 1, aii: Math.abs(d.A[bad][bad]), s: sums[bad] }), correct: true },
+      { html: t('|aᵢᵢ| ≥ Σ|aᵢⱼ| sur chaque ligne suffit : les deux méthodes convergent par ce critère'), correct: false, rule: 'n_diag_dominance' },
+      { html: t('Les deux méthodes divergent'), correct: false },
+      { html: t('Seule la méthode de Jacobi converge'), correct: false },
     ],
-    solution: [{ html: `Il faut |aᵢᵢ| > Σ<sub>j≠i</sub> |aᵢⱼ| strictement, sur chaque ligne : ${d.A.map((r, i) => `${Math.abs(r[i])} ${Math.abs(r[i]) > sums[i] ? '>' : '≤'} ${sums[i]}`).join(', ')}.`, note: '' }],
+    solution: [{ html: t('Il faut |aᵢᵢ| > Σ<sub>j≠i</sub> |aᵢⱼ| strictement, sur chaque ligne : {list}.', { list: d.A.map((r, i) => `${Math.abs(r[i])} ${Math.abs(r[i]) > sums[i] ? '>' : '≤'} ${sums[i]}`).join(', ') }), note: '' }],
   }, rng);
 }
 
@@ -231,18 +234,18 @@ function jgErrorTable(rng, level) {
   const table = { columns: ['k', 'Jacobi ‖x⁽ᵏ⁾ − x‖∞', 'Gauss-Seidel ‖x⁽ᵏ⁾ − x‖∞'], rows: J.map((e, k) => [String(k), expText(e, 3), expText(G[k], 3)]) };
   return readtableItem({
     skill: JG, level, key: 'errors',
-    prompt: `Les deux programmes, appelés pour A = tridiag(−1, 4, −1) de taille 3, b = ${vecR(b)} (solution (1 ; 1 ; 1)) et x⁽⁰⁾ = 0, donnent les erreurs :`,
+    prompt: t('Les deux programmes, appelés pour A = tridiag(−1, 4, −1) de taille 3, b = {b} (solution (1 ; 1 ; 1)) et x⁽⁰⁾ = 0, donnent les erreurs :', { b: vecR(b) }),
     table,
     question: multiMcq({
       skill: JG, level, key: `${JG}:errors`,
-      prompt: 'Que montre ce tableau ?',
+      prompt: t('Que montre ce tableau ?'),
       options: [
-        { html: 'Les deux méthodes convergent, avec une erreur divisée par un facteur à peu près constant à chaque pas', correct: true },
-        { html: 'Gauss-Seidel converge plus vite : son erreur décroît environ deux fois plus vite en échelle logarithmique', correct: true },
-        { html: 'Jacobi converge plus vite, parce qu\'il n\'utilise que les anciennes valeurs', correct: false },
-        { html: 'Les deux méthodes trouvent la solution exacte en 3 itérations (n = 3)', correct: false },
+        { html: t('Les deux méthodes convergent, avec une erreur divisée par un facteur à peu près constant à chaque pas'), correct: true },
+        { html: t('Gauss-Seidel converge plus vite : son erreur décroît environ deux fois plus vite en échelle logarithmique'), correct: true },
+        { html: t('Jacobi converge plus vite, parce qu\'il n\'utilise que les anciennes valeurs'), correct: false },
+        { html: t('Les deux méthodes trouvent la solution exacte en 3 itérations (n = 3)'), correct: false },
       ],
-      solution: [{ html: `Rapports successifs : Jacobi ≈ ${(J[4] / J[3]).toFixed(2).replace('.', ',')}, Gauss-Seidel ≈ ${(G[4] / G[3]).toFixed(2).replace('.', ',')} = (rapport de Jacobi)² : ρ(B_GS) = ρ(B_J)² pour une matrice tridiagonale.`, note: '' }],
+      solution: [{ html: t('Rapports successifs : Jacobi ≈ {rj}, Gauss-Seidel ≈ {rg} = (rapport de Jacobi)² : ρ(B_GS) = ρ(B_J)² pour une matrice tridiagonale.', { rj: (J[4] / J[3]).toFixed(2).replace('.', ','), rg: (G[4] / G[3]).toFixed(2).replace('.', ',') }), note: '' }],
     }, rng),
   });
 }
@@ -250,7 +253,7 @@ function jgErrorTable(rng, level) {
 function jgCode(rng, level) {
   return codeItem({
     skill: JG, level, ref: JG_CODE, blanks: [0, 1, 2], traps: JG_TRAPS, rng,
-    prompt: 'Complète une itération de Jacobi (dans un nouveau vecteur y) et une itération de Gauss-Seidel (en place dans x).',
+    prompt: t('Complète une itération de Jacobi (dans un nouveau vecteur y) et une itération de Gauss-Seidel (en place dans x).'),
     tests: JG_TESTS, then: jgErrorTable(rng, level), hints: [], subgoals: SUB_J, key: 'steps',
   });
 }
@@ -275,14 +278,14 @@ function jgTf(rng, opts) {
   if (k === 0) {
     return tfItem({
       skill: JG, level: 4, key: 'jnotgs', exam: tag,
-      statement: 'Si la méthode de Jacobi converge pour tout x⁽⁰⁾, alors la méthode de Gauss-Seidel converge aussi.',
+      statement: t('Si la méthode de Jacobi converge pour tout x⁽⁰⁾, alors la méthode de Gauss-Seidel converge aussi.'),
       truth: false,
       counter: { kind: 'num', prop: 'jacobiNotGs', params: {}, ask: [{ v: 'A', label: 'A =', shape: [3, 3] }], answer: { A: '[[1,2,-2],[1,1,1],[2,2,1]]' } },
-      explanation: 'Faux : pour A = [[1, 2, −2], [1, 1, 1], [2, 2, 1]], ρ(B_J) = 0 (Jacobi converge en 3 pas) mais ρ(B_GS) = 2.',
+      explanation: t('Faux : pour A = [[1, 2, −2], [1, 1, 1], [2, 2, 1]], ρ(B_J) = 0 (Jacobi converge en 3 pas) mais ρ(B_GS) = 2.'),
     });
   }
-  if (k === 1) return vfMcq({ skill: JG, key: `${JG}:tf:dom`, exam: tag, statement: 'Si A est à diagonale strictement dominante par lignes, la méthode de Jacobi converge pour tout x⁽⁰⁾.', truth: true, ruleIfFalse: 'n_diag_dominance', explanation: 'Vrai : alors ‖B_J‖∞ = maxᵢ Σⱼ≠ᵢ |aᵢⱼ|/|aᵢᵢ| < 1.' }, rng);
-  return vfMcq({ skill: JG, key: `${JG}:tf:new`, exam: tag, statement: 'Pour calculer xᵢ⁽ᵏ⁺¹⁾, la méthode de Jacobi utilise les composantes x₁⁽ᵏ⁺¹⁾, …, xᵢ₋₁⁽ᵏ⁺¹⁾ déjà calculées.', truth: false, ruleIfTrue: 'n_jacobi_uses_new', explanation: 'Faux : c\'est Gauss-Seidel. Jacobi n\'utilise que x⁽ᵏ⁾.' }, rng);
+  if (k === 1) return vfMcq({ skill: JG, key: `${JG}:tf:dom`, exam: tag, statement: t('Si A est à diagonale strictement dominante par lignes, la méthode de Jacobi converge pour tout x⁽⁰⁾.'), truth: true, ruleIfFalse: 'n_diag_dominance', explanation: t('Vrai : alors ‖B_J‖∞ = maxᵢ Σⱼ≠ᵢ |aᵢⱼ|/|aᵢᵢ| < 1.') }, rng);
+  return vfMcq({ skill: JG, key: `${JG}:tf:new`, exam: tag, statement: t('Pour calculer xᵢ⁽ᵏ⁺¹⁾, la méthode de Jacobi utilise les composantes x₁⁽ᵏ⁺¹⁾, …, xᵢ₋₁⁽ᵏ⁺¹⁾ déjà calculées.'), truth: false, ruleIfTrue: 'n_jacobi_uses_new', explanation: t('Faux : c\'est Gauss-Seidel. Jacobi n\'utilise que x⁽ᵏ⁾.') }, rng);
 }
 
 // ---------- n-iter-convergence ----------
@@ -325,16 +328,16 @@ function cvLevel12(rng, level) {
   const r2 = d.rho.mul(d.rho);
   const script = [
     ...cvBSeg(d, level === 1 ? [[0, 1]] : [[0, 1], [1, 0]]),
-    { kind: 'segment', html: 'Les valeurs propres de B_J vérifient λ² = b₁₂b₂₁ (det(B_J − λI) = λ² − b₁₂b₂₁).', ask: 'ρ(B_J) =', start: { math: 'ρ' }, judge: { kind: 'value', expect: String(d.rho), form: 'irreducible' } },
+    { kind: 'segment', html: t('Les valeurs propres de B_J vérifient λ² = b₁₂b₂₁ (det(B_J − λI) = λ² − b₁₂b₂₁).'), ask: 'ρ(B_J) =', start: { math: 'ρ' }, judge: { kind: 'value', expect: String(d.rho), form: 'irreducible' } },
     ...(level === 2 ? [{ kind: 'eq', math: `√(${r2})`, note: `λ² = ${R(String(d.B[0][1]))}·${R(String(d.B[1][0]))} = ${r2}`, subgoal: 'rho' }] : []),
-    { kind: 'eq', math: String(d.rho), ...blankBy(String(d.rho), [String(d.rho)]), note: `ρ = ${fmt(d.rho)} < 1 : Jacobi converge pour tout x⁽⁰⁾`, subgoal: 'rho' },
+    { kind: 'eq', math: String(d.rho), ...blankBy(String(d.rho), [String(d.rho)]), note: t('ρ = {rho} < 1 : Jacobi converge pour tout x⁽⁰⁾', { rho: fmt(d.rho) }), subgoal: 'rho' },
   ];
   return matLines({
     skill: CV, level, mode: 'guided',
-    prompt: `A = ${AofC(d)}. Écris la matrice d'itération de Jacobi B_J = I − D⁻¹A, puis son rayon spectral ρ(B_J).`,
+    prompt: t('A = {A}. Écris la matrice d\'itération de Jacobi B_J = I − D⁻¹A, puis son rayon spectral ρ(B_J).', { A: AofC(d) }),
     start: 'B_J', judge: { kind: 'mat', expect: bText(d) }, script,
-    hints: H('B_J = I − D⁻¹A : diagonale nulle, et −aᵢⱼ/aᵢᵢ hors de la diagonale.',
-      `B_J = [[0, □], [□, 0]], avec D = diag(${d.a}, ${d.d})`,
+    hints: H(t('B_J = I − D⁻¹A : diagonale nulle, et −aᵢⱼ/aᵢᵢ hors de la diagonale.'),
+      t('B_J = [[0, □], [□, 0]], avec D = diag({a}, {d})', { a: d.a, d: d.d }),
       `B_J = ${ML(bText(d))}, ρ = ${fmt(d.rho)}.`),
     subgoals: SUB_C, key: `${CV}:${level}:${d.a},${d.b},${d.d}`,
   });
@@ -343,23 +346,23 @@ function cvLevel12(rng, level) {
 function cvLevel3(rng) {
   const d = cvData(rng, { kappa: true });
   const script = [
-    { kind: 'decision', prompt: 'Quel critère dit si Jacobi converge pour tout x⁽⁰⁾ ?', options: rng.shuffle([
-      { id: 'rho', label: 'ρ(B_J) < 1 (nécessaire et suffisant)', valid: true, ref: true },
-      { id: 'norm', label: '‖B_J‖ < 1 pour une norme', valid: true, quality: 'poor', why: 'Juste, mais seulement suffisant : ρ(B) < 1 est le critère exact.' },
-      { id: 'det', label: 'det A ≠ 0', valid: false, why: 'Cela dit seulement que la solution existe, pas que la méthode y converge.' },
+    { kind: 'decision', prompt: t('Quel critère dit si Jacobi converge pour tout x⁽⁰⁾ ?'), options: rng.shuffle([
+      { id: 'rho', label: t('ρ(B_J) < 1 (nécessaire et suffisant)'), valid: true, ref: true },
+      { id: 'norm', label: t('‖B_J‖ < 1 pour une norme'), valid: true, quality: 'poor', why: t('Juste, mais seulement suffisant : ρ(B) < 1 est le critère exact.') },
+      { id: 'det', label: 'det A ≠ 0', valid: false, why: t('Cela dit seulement que la solution existe, pas que la méthode y converge.') },
     ]) },
     { kind: 'eq', math: String(d.rho), note: `λ² = ${fmt(d.rho.mul(d.rho))}, ρ = ${fmt(d.rho)} < 1`, subgoal: 'rho' },
-    { kind: 'segment', html: 'Gauss-Seidel, pour une matrice 2 × 2 : ρ(B_GS) = ρ(B_J)².', ask: 'ρ(B_GS) =', start: { math: 'ρ_GS' }, judge: { kind: 'value', expect: String(d.rhoGS), form: 'irreducible', menu: [{ id: 'sq', label: 'Élever ρ(B_J) au carré', valid: true }, { id: 'half', label: 'Diviser ρ(B_J) par 2', valid: false, why: 'Gauss-Seidel va deux fois plus vite en nombre d\'itérations : ρ_GS = ρ_J².' }] } },
-    { kind: 'eq', math: String(d.rhoGS), note: 'Deux fois moins d\'itérations', subgoal: 'iter' },
-    { kind: 'segment', html: 'Arrêt sur le résidu : ‖e‖/‖x‖ ≤ κ₂(A)·‖r‖/‖b‖. A est SDP : κ₂ = λ_max/λ_min.', ask: 'κ₂(A) =', start: { math: 'κ' }, judge: { kind: 'value', expect: String(d.kappa), form: 'irreducible', menu: [{ id: 'ratio', label: 'λ_max/λ_min de A', valid: true }, { id: 'det', label: '1/det A', valid: false, why: 'κ(A) = ‖A‖·‖A⁻¹‖ ; pour A SDP, c\'est λ_max/λ_min.' }] } },
-    { kind: 'eq', math: String(d.kappa), note: `Valeurs propres de A : ${fmt(d.lmax)} et ${fmt(d.lmin)}`, subgoal: 'stop' },
+    { kind: 'segment', html: t('Gauss-Seidel, pour une matrice 2 × 2 : ρ(B_GS) = ρ(B_J)².'), ask: 'ρ(B_GS) =', start: { math: 'ρ_GS' }, judge: { kind: 'value', expect: String(d.rhoGS), form: 'irreducible', menu: [{ id: 'sq', label: t('Élever ρ(B_J) au carré'), valid: true }, { id: 'half', label: t('Diviser ρ(B_J) par 2'), valid: false, why: t('Gauss-Seidel va deux fois plus vite en nombre d\'itérations : ρ_GS = ρ_J².') }] } },
+    { kind: 'eq', math: String(d.rhoGS), note: t('Deux fois moins d\'itérations'), subgoal: 'iter' },
+    { kind: 'segment', html: t('Arrêt sur le résidu : ‖e‖/‖x‖ ≤ κ₂(A)·‖r‖/‖b‖. A est SDP : κ₂ = λ_max/λ_min.'), ask: 'κ₂(A) =', start: { math: 'κ' }, judge: { kind: 'value', expect: String(d.kappa), form: 'irreducible', menu: [{ id: 'ratio', label: t('λ_max/λ_min de A'), valid: true }, { id: 'det', label: '1/det A', valid: false, why: t('κ(A) = ‖A‖·‖A⁻¹‖ ; pour A SDP, c\'est λ_max/λ_min.') }] } },
+    { kind: 'eq', math: String(d.kappa), note: t('Valeurs propres de A : {lmax} et {lmin}', { lmax: fmt(d.lmax), lmin: fmt(d.lmin) }), subgoal: 'stop' },
   ];
   return linesItem({
     skill: CV, level: 3, mode: 'tap', tapActions: 'menu', keys: ['calc', 'greek'],
-    prompt: `A = ${AofC(d)}, B_J = I − D⁻¹A = ${ML(bText(d))}. Donne ρ(B_J), ρ(B_GS) et κ₂(A). Choisis d'abord chaque action.`,
-    start: 'ρ_J', judge: { kind: 'value', expect: String(d.rho), form: 'irreducible', menu: [{ id: 'eig', label: 'Valeurs propres de B_J', valid: true }, { id: 'diag', label: 'La plus grande case de B_J', valid: false, why: 'ρ est le plus grand module des valeurs propres, pas des cases.' }] },
+    prompt: t('A = {A}, B_J = I − D⁻¹A = {B}. Donne ρ(B_J), ρ(B_GS) et κ₂(A). Choisis d\'abord chaque action.', { A: AofC(d), B: ML(bText(d)) }),
+    start: 'ρ_J', judge: { kind: 'value', expect: String(d.rho), form: 'irreducible', menu: [{ id: 'eig', label: t('Valeurs propres de B_J'), valid: true }, { id: 'diag', label: t('La plus grande case de B_J'), valid: false, why: t('ρ est le plus grand module des valeurs propres, pas des cases.') }] },
     script,
-    hints: H('ρ(B) est le plus grand module des valeurs propres de B ; pour A SDP, κ₂ = λ_max/λ_min.',
+    hints: H(t('ρ(B) est le plus grand module des valeurs propres de B ; pour A SDP, κ₂ = λ_max/λ_min.'),
       `λ² = ${R(String(d.B[0][1]))}·${R(String(d.B[1][0]))} = □`,
       `ρ_J = ${fmt(d.rho)}, ρ_GS = ${fmt(d.rhoGS)}, κ₂ = ${fmt(d.kappa)}.`),
     subgoals: SUB_C, key: `${CV}:3:${d.a},${d.b},${d.d}`,
@@ -367,7 +370,7 @@ function cvLevel3(rng) {
 }
 
 function cvLevel4(rng) {
-  for (let t = 0; t < 100; t++) {
+  for (let tries = 0; tries < 100; tries++) {
     const d = cvData(rng);
     const useGS = rng.chance(0.5);
     const r = useGS ? d.rhoGS : d.rho;
@@ -377,16 +380,16 @@ function cvLevel4(rng) {
     const k = Math.ceil(need);
     const script = [
       { kind: 'eq', math: String(d.rho), note: `λ² = ${fmt(d.rho.mul(d.rho))}`, subgoal: 'rho' },
-      { kind: 'segment', html: 'Gauss-Seidel : ρ(B_GS) = ρ(B_J)² pour cette matrice 2 × 2.', ask: 'ρ(B_GS) =', start: { math: 'ρ_GS' }, judge: { kind: 'value', expect: String(d.rhoGS), form: 'irreducible' } },
+      { kind: 'segment', html: t('Gauss-Seidel : ρ(B_GS) = ρ(B_J)² pour cette matrice 2 × 2.'), ask: 'ρ(B_GS) =', start: { math: 'ρ_GS' }, judge: { kind: 'value', expect: String(d.rhoGS), form: 'irreducible' } },
       { kind: 'eq', math: String(d.rhoGS), note: '', subgoal: 'iter' },
-      { kind: 'segment', html: `Nombre d'itérations de ${useGS ? 'Gauss-Seidel' : 'Jacobi'} pour diviser l'erreur par 10⁶ : ρᵏ ≤ 10⁻⁶ ⇔ k ≥ −6/log₁₀ ρ, avec log₁₀ ${fmt(r)} ≈ ${String(lg).replace('.', ',').replace('-', '−')}.`, ask: 'k =', start: { math: 'k' }, judge: { kind: 'value', expect: String(k), form: 'irreducible' } },
+      { kind: 'segment', html: t('Nombre d\'itérations de {name} pour diviser l\'erreur par 10⁶ : ρᵏ ≤ 10⁻⁶ ⇔ k ≥ −6/log₁₀ ρ, avec log₁₀ {r} ≈ {lg}.', { name: useGS ? 'Gauss-Seidel' : 'Jacobi', r: fmt(r), lg: String(lg).replace('.', ',').replace('-', '−') }), ask: 'k =', start: { math: 'k' }, judge: { kind: 'value', expect: String(k), form: 'irreducible' } },
       { kind: 'eq', math: String(k), note: `−6/(${R(String(lg).replace('.', ','))}) ≈ ${need.toFixed(2).replace('.', ',')}`, subgoal: 'iter' },
     ];
     return linesItem({
       skill: CV, level: 4, mode: 'free', keys: ['calc', 'greek'],
-      prompt: `A = ${AofC(d)}. Calcule ρ(B_J) pour Jacobi, puis ρ(B_GS), puis le nombre d'itérations nécessaires.`,
+      prompt: t('A = {A}. Calcule ρ(B_J) pour Jacobi, puis ρ(B_GS), puis le nombre d\'itérations nécessaires.', { A: AofC(d) }),
       start: 'ρ_J', judge: { kind: 'value', expect: String(d.rho), form: 'irreducible' }, script,
-      hints: H('B_J = [[0, −b/a], [−b/d, 0]] : ses valeurs propres sont ±√(b²/(ad)).', `ρ_J = √(${d.b * d.b}/□)`, `ρ_J = ${fmt(d.rho)}, ρ_GS = ${fmt(d.rhoGS)}, k = ${k}.`),
+      hints: H(t('B_J = [[0, −b/a], [−b/d, 0]] : ses valeurs propres sont ±√(b²/(ad)).'), `ρ_J = √(${d.b * d.b}/□)`, `ρ_J = ${fmt(d.rho)}, ρ_GS = ${fmt(d.rhoGS)}, k = ${k}.`),
       subgoals: SUB_C, key: `${CV}:4:${d.a},${d.b},${d.d}:${useGS}`,
     });
   }
@@ -449,7 +452,7 @@ let COUNTS = null;
 export function countsTable() {
   if (!COUNTS) {
     COUNTS = {
-      columns: ['n', 'Jacobi, tridiag(−1, 2,5, −1)', 'GS, idem', 'Jacobi, tridiag(−1, 2, −1)', 'GS, idem'],
+      columns: ['n', 'Jacobi, tridiag(−1, 2,5, −1)', t('GS, idem'), 'Jacobi, tridiag(−1, 2, −1)', t('GS, idem')],
       rows: [4, 8, 16, 32].map((n) => [String(n), String(counts(n, 2.5, false)), String(counts(n, 2.5, true)), String(counts(n, 2, false)), String(counts(n, 2, true))]),
     };
   }
@@ -459,19 +462,19 @@ export function countsTable() {
 function countsRead(rng, level) {
   return readtableItem({
     skill: CV, level, key: 'counts',
-    prompt: 'Nombre d\'itérations pour atteindre ‖r‖/‖b‖ ≤ 10⁻¹⁰ (x⁽⁰⁾ = 0, b = A·(1, …, 1)), pour des matrices tridiagonales n × n :',
+    prompt: t('Nombre d\'itérations pour atteindre ‖r‖/‖b‖ ≤ 10⁻¹⁰ (x⁽⁰⁾ = 0, b = A·(1, …, 1)), pour des matrices tridiagonales n × n :'),
     table: countsTable(),
     question: multiMcq({
       skill: CV, level, key: `${CV}:counts`,
-      prompt: 'Que peut-on en déduire ?',
+      prompt: t('Que peut-on en déduire ?'),
       options: [
-        { html: 'Gauss-Seidel demande environ deux fois moins d\'itérations que Jacobi', correct: true },
-        { html: 'Pour tridiag(−1, 2, −1), le nombre d\'itérations croît comme n², car ρ_J = cos(π/(n + 1)) → 1', correct: true },
-        { html: 'Pour tridiag(−1, 2,5, −1), ρ_J tend vers 0,8 et le nombre d\'itérations se stabilise', correct: true },
-        { html: 'Le nombre d\'itérations ne dépend pas de n, puisque les deux matrices sont SDP', correct: false },
-        { html: 'Un résidu ‖r‖/‖b‖ ≤ 10⁻¹⁰ garantit une erreur relative ≤ 10⁻¹⁰', correct: false, rule: 'n_residual_is_error' },
+        { html: t('Gauss-Seidel demande environ deux fois moins d\'itérations que Jacobi'), correct: true },
+        { html: t('Pour tridiag(−1, 2, −1), le nombre d\'itérations croît comme n², car ρ_J = cos(π/(n + 1)) → 1'), correct: true },
+        { html: t('Pour tridiag(−1, 2,5, −1), ρ_J tend vers 0,8 et le nombre d\'itérations se stabilise'), correct: true },
+        { html: t('Le nombre d\'itérations ne dépend pas de n, puisque les deux matrices sont SDP'), correct: false },
+        { html: t('Un résidu ‖r‖/‖b‖ ≤ 10⁻¹⁰ garantit une erreur relative ≤ 10⁻¹⁰'), correct: false, rule: 'n_residual_is_error' },
       ],
-      solution: [{ html: 'ρ_GS = ρ_J² pour ces matrices tridiagonales : deux fois moins d\'itérations. Pour diagonale 2, ρ_J = cos(π/(n + 1)) ≈ 1 − π²/(2n²) : le nombre d\'itérations ~ n². Pour diagonale 2,5, ρ_J = (2/2,5)cos(π/(n + 1)) → 0,8. L\'erreur relative n\'est bornée que par κ(A)·10⁻¹⁰.', note: '' }],
+      solution: [{ html: t('ρ_GS = ρ_J² pour ces matrices tridiagonales : deux fois moins d\'itérations. Pour diagonale 2, ρ_J = cos(π/(n + 1)) ≈ 1 − π²/(2n²) : le nombre d\'itérations ~ n². Pour diagonale 2,5, ρ_J = (2/2,5)cos(π/(n + 1)) → 0,8. L\'erreur relative n\'est bornée que par κ(A)·10⁻¹⁰.'), note: '' }],
     }, rng),
   });
 }
@@ -480,7 +483,7 @@ function cvCode(rng) {
   return codeItem({
     skill: CV, level: 5, ref: CV_CODE, blanks: [0, 1], traps: CV_TRAPS, rng,
     preludes: ['vec', 'mat', JSTEP], signatures: undefined,
-    prompt: 'Complète la boucle de Jacobi : elle s\'arrête quand le résidu relatif ‖r‖/‖b‖ passe sous tol (ou après nmax itérations). jacobi_step(A, b, x) est donnée.',
+    prompt: t('Complète la boucle de Jacobi : elle s\'arrête quand le résidu relatif ‖r‖/‖b‖ passe sous tol (ou après nmax itérations). jacobi_step(A, b, x) est donnée.'),
     tests: CV_TESTS, then: countsRead(rng, 5), hints: [], subgoals: SUB_C, key: 'solve',
   });
 }
@@ -491,14 +494,14 @@ function cvTf(rng, opts) {
   if (k === 0) {
     return tfItem({
       skill: CV, level: 4, key: 'norm', exam: tag, ruleIfTrue: 'n_norm_vs_radius',
-      statement: 'Si ‖B‖ ≥ 1 pour une norme matricielle subordonnée, la méthode itérative de matrice B diverge pour certains x⁽⁰⁾.',
+      statement: t('Si ‖B‖ ≥ 1 pour une norme matricielle subordonnée, la méthode itérative de matrice B diverge pour certains x⁽⁰⁾.'),
       truth: false,
       counter: { kind: 'num', prop: 'normNotRadius', params: {}, ask: [{ v: 'B', label: 'B =', shape: [2, 2] }], answer: { B: '[[1/2,4],[0,1/2]]' } },
-      explanation: 'Faux : ‖B‖ < 1 suffit mais n\'est pas nécessaire. B = [[1/2, 4], [0, 1/2]] a ‖B‖∞ = 4,5 mais ρ(B) = 1/2 < 1 : la méthode converge.',
+      explanation: t('Faux : ‖B‖ < 1 suffit mais n\'est pas nécessaire. B = [[1/2, 4], [0, 1/2]] a ‖B‖∞ = 4,5 mais ρ(B) = 1/2 < 1 : la méthode converge.'),
     });
   }
-  if (k === 1) return vfMcq({ skill: CV, key: `${CV}:tf:res`, exam: tag, statement: 'Si le résidu relatif ‖b − Ax⁽ᵏ⁾‖/‖b‖ est petit, l\'erreur relative ‖x − x⁽ᵏ⁾‖/‖x‖ est petite.', truth: false, ruleIfTrue: 'n_residual_is_error', explanation: 'Faux : ‖e‖/‖x‖ ≤ κ(A)·‖r‖/‖b‖. Si κ(A) est grand (matrice de Vandermonde, de Hilbert), un petit résidu peut cacher une grande erreur.' }, rng);
-  return vfMcq({ skill: CV, key: `${CV}:tf:rho`, exam: tag, statement: 'La méthode x⁽ᵏ⁺¹⁾ = Bx⁽ᵏ⁾ + c converge vers la solution pour tout x⁽⁰⁾ si et seulement si ρ(B) < 1.', truth: true, ruleIfFalse: 'n_norm_vs_radius', explanation: 'Vrai : l\'erreur vérifie e⁽ᵏ⁾ = Bᵏe⁽⁰⁾, et Bᵏ → 0 ⇔ ρ(B) < 1.' }, rng);
+  if (k === 1) return vfMcq({ skill: CV, key: `${CV}:tf:res`, exam: tag, statement: t('Si le résidu relatif ‖b − Ax⁽ᵏ⁾‖/‖b‖ est petit, l\'erreur relative ‖x − x⁽ᵏ⁾‖/‖x‖ est petite.'), truth: false, ruleIfTrue: 'n_residual_is_error', explanation: t('Faux : ‖e‖/‖x‖ ≤ κ(A)·‖r‖/‖b‖. Si κ(A) est grand (matrice de Vandermonde, de Hilbert), un petit résidu peut cacher une grande erreur.') }, rng);
+  return vfMcq({ skill: CV, key: `${CV}:tf:rho`, exam: tag, statement: t('La méthode x⁽ᵏ⁺¹⁾ = Bx⁽ᵏ⁾ + c converge vers la solution pour tout x⁽⁰⁾ si et seulement si ρ(B) < 1.'), truth: true, ruleIfFalse: 'n_norm_vs_radius', explanation: t('Vrai : l\'erreur vérifie e⁽ᵏ⁾ = Bᵏe⁽⁰⁾, et Bᵏ → 0 ⇔ ρ(B) < 1.') }, rng);
 }
 
 function cvGen(level, rng, opts) {

@@ -17,6 +17,7 @@ import { compileFloat } from '../cas/numeric.js';
 import { limit } from '../cas/limit.js';
 import { diagnoseLine } from './diagnose.js';
 import { frNum } from './common.js';
+import { t } from '../i18n.js';
 
 export const sign = '≤';
 const names = (cfg) => cfg.vars || ['r', 'φ'];
@@ -48,12 +49,12 @@ export function boundWitness2(cfg, prev, node) {
 
 export function isFinal(cfg, node) {
   const [r, p] = names(cfg);
-  if (symbolsIn(node).has(p)) return 'Ta borne dépend encore de φ : majore |cos φ| et |sin φ| par 1.';
+  if (symbolsIn(node).has(p)) return t('Ta borne dépend encore de φ : majore |cos φ| et |sin φ| par 1.');
   let lim;
   try { lim = limit(node, r, '0', '+'); } catch { lim = { value: null }; }
   const v = lim.value;
   const zero = v !== null && v !== undefined && typeof v !== 'string' && Math.abs(typeof v === 'number' ? v : v.valueOf()) < 1e-9;
-  if (!zero) return `Ta borne ne tend pas vers 0 quand ${r} → 0 : elle ne prouve rien.`;
+  if (!zero) return t('Ta borne ne tend pas vers 0 quand {r} → 0 : elle ne prouve rien.', { r });
   return true;
 }
 
@@ -65,13 +66,14 @@ export function judgeLine(cfg, prev, input, state = {}) {
   }
   const known = new Set(names(cfg));
   const unknown = [...symbolsIn(node)].filter((s) => !known.has(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Écris ta borne avec ${names(cfg).join(' et ')} seulement.` };
-  if (equalsStructural(unparen(node), unparen(prev), { parens: false })) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  const ns = names(cfg);
+  if (unknown.length) return { kind: 'parse', node, message: ns.length === 2 ? t('Écris ta borne avec {a} et {b} seulement.', { a: ns[0], b: ns[1] }) : t('Écris ta borne avec {a} seulement.', { a: ns.join(' et ') }) };
+  if (equalsStructural(unparen(node), unparen(prev), { parens: false })) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const w = boundWitness2(cfg, prev, node);
   if (w) {
     const diag = diagnoseLine('bound', prev, node, cfg, (cand, line) => !boundWitness2(cfg, cand, line) && !boundWitness2(cfg, line, cand));
     const [r, p] = names(cfg);
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `En ${r} = ${frNum(w.env[r], 3)}, ${p} = ${frNum(w.env[p], 3)}, la ligne précédente vaut ${frNum(w.a, 4)} en valeur absolue, mais ta borne vaut ${frNum(w.b, 4)} : ce n'est pas une majoration.` };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: t('En {r} = {rv}, {p} = {pv}, la ligne précédente vaut {a} en valeur absolue, mais ta borne vaut {b} : ce n\'est pas une majoration.', { r, rv: frNum(w.env[r], 3), p, pv: frNum(w.env[p], 3), a: frNum(w.a, 4), b: frNum(w.b, 4) }) };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };

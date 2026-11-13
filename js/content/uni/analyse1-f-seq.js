@@ -16,6 +16,7 @@
 // check), plus comparisons of n^p and aⁿ. Level 5: a multiple choice or
 // free lines without help.
 
+import { t } from '../../i18n.js';
 import { parse, tryParse } from '../../cas/parse.js';
 import { toReadable } from '../../cas/print.js';
 import { limitOf } from '../../judges/limit.js';
@@ -47,30 +48,31 @@ function gapOf(L) {
   return `|a_n − ${L}|`;
 }
 
-// The definitions: quantifiers, body, decoy pieces.
+// The definitions: quantifiers, body, decoy pieces. `name` (French) builds
+// the keys; `label` is shown.
 function edDef(rng, kind) {
   const L = rng.pick(['L', 'L', 'L', '0', '2', '3', '-1', '-2']);
   const gap = gapOf(L);
   const Lname = L === 'L' ? 'L' : frT(L);
   switch (kind) {
     case 'plus': return {
-      kind, name: 'lim aₙ = +∞', qs: [['∀', 'M > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'n ≥ N']], body: 'a_n ≥ M',
+      kind, name: 'lim aₙ = +∞', label: 'lim aₙ = +∞', qs: [['∀', 'M > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'n ≥ N']], body: 'a_n ≥ M',
       decoys: ['ε > 0', 'a_n ≤ M', '|a_n − L| ≤ ε'], L: null,
     };
     case 'minus': return {
-      kind, name: 'lim aₙ = −∞', qs: [['∀', 'M > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'n ≥ N']], body: 'a_n ≤ −M',
+      kind, name: 'lim aₙ = −∞', label: 'lim aₙ = −∞', qs: [['∀', 'M > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'n ≥ N']], body: 'a_n ≤ −M',
       decoys: ['ε > 0', 'a_n ≥ M', 'a_n ≤ M'], L: null,
     };
     case 'cauchy': return {
-      kind, name: '(aₙ) est une suite de Cauchy', qs: [['∀', 'ε > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'm, n ≥ N']], body: '|a_m − a_n| ≤ ε',
+      kind, name: '(aₙ) est une suite de Cauchy', label: t('(aₙ) est une suite de Cauchy'), qs: [['∀', 'ε > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'm, n ≥ N']], body: '|a_m − a_n| ≤ ε',
       decoys: ['ε ≥ 0', '|a_(n+1) − a_n| ≤ ε', 'n ≥ N'], L: null,
     };
     case 'neg': return {
-      kind, name: `(aₙ) ne tend pas vers ${Lname}`, qs: [['∃', 'ε > 0'], ['∀', 'N ∈ ℕ'], ['∃', 'n ≥ N']], body: `${gap} > ε`,
+      kind, name: `(aₙ) ne tend pas vers ${Lname}`, label: t('(aₙ) ne tend pas vers {L}', { L: Lname }), qs: [['∃', 'ε > 0'], ['∀', 'N ∈ ℕ'], ['∃', 'n ≥ N']], body: `${gap} > ε`,
       decoys: ['M > 0', 'a_n ≥ M', ...(L === '0' ? [] : ['|a_n| > ε'])], L,
     };
     default: return {
-      kind: 'lim', name: `lim aₙ = ${Lname}`, qs: [['∀', 'ε > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'n ≥ N']], body: `${gap} ≤ ε`,
+      kind: 'lim', name: `lim aₙ = ${Lname}`, label: `lim aₙ = ${Lname}`, qs: [['∀', 'ε > 0'], ['∃', 'N ∈ ℕ'], ['∀', 'n ≥ N']], body: `${gap} ≤ ε`,
       decoys: ['ε ≥ 0', 'M > 0', 'a_n ≥ M', ...(L === '0' ? [] : ['|a_n| ≤ ε'])], L,
     };
   }
@@ -78,21 +80,21 @@ function edDef(rng, kind) {
 const targetOf = (D) => `${D.qs.map(([s, b]) => `${s}${b}`).join(' ')}, ${D.body}`;
 const piecesOf = (D, decoys) => [...D.qs.map(([, b]) => b), D.body, ...(decoys ? D.decoys : [])].filter((t, i, a) => a.indexOf(t) === i).map((text) => ({ text }));
 
-const ED_HINT1 = 'On te donne ε (ou M) d\'abord ; tu dois trouver un rang N qui marche pour tous les n après. N dépend de ε, pas de n.';
+const ED_HINT1 = t('On te donne ε (ou M) d\'abord ; tu dois trouver un rang N qui marche pour tous les n après. N dépend de ε, pas de n.');
 
 function edBlocks(level, rng) {
   const D = edDef(rng, rng.pick(['lim', 'lim', 'lim', 'plus', 'minus']));
-  const blk = (t) => `<span class="blk-math">${t}</span>`;
+  const blk = (x) => `<span class="blk-math">${x}</span>`;
   const blocks = D.qs.map(([s, b], i) => ({
     id: `q${i}`, html: blk(`${s}${ML(b)}`), needs: i ? [`q${i - 1}`] : [],
-    ...(i ? { orderRule: 'g9_quant_order', earlyWhy: `Pas encore : « ${s}${b} » dépend de ce qui est choisi avant.` } : {}),
+    ...(i ? { orderRule: 'g9_quant_order', earlyWhy: t('Pas encore : « {q} » dépend de ce qui est choisi avant.', { q: `${s}${b}` }) } : {}),
   }));
-  blocks.push({ id: 'body', html: blk(`, ${ML(D.body)}`), needs: ['q2'], earlyWhy: 'Place d\'abord les trois quantificateurs.' });
+  blocks.push({ id: 'body', html: blk(`, ${ML(D.body)}`), needs: ['q2'], earlyWhy: t('Place d\'abord les trois quantificateurs.') });
   const first = D.qs[0];
   const DECOYS = [
-    { html: blk(`∃${ML(first[1])}`), distractor: 'g9_quant_order', why: `${first[1][0]} est donné d'abord, et pour tous les ${first[1]} : c'est ∀.` },
-    { html: blk(`∃${ML('N ∈ ℕ')} qui dépend de n`), distractor: 'a1_n_depends_on_n', why: 'N doit être fixé dès que ε est donné : il ne peut pas dépendre de n.' },
-    { html: blk(`∀${ML('N ∈ ℕ')}`), distractor: 'g9_quant_order', why: 'Il suffit d\'un rang N qui marche : c\'est ∃N, choisi après ε.' },
+    { html: blk(`∃${ML(first[1])}`), distractor: 'g9_quant_order', why: t('{v} est donné d\'abord, et pour tous les {b} : c\'est ∀.', { v: first[1][0], b: first[1] }) },
+    { html: blk(t('∃{N} qui dépend de n', { N: ML('N ∈ ℕ') })), distractor: 'a1_n_depends_on_n', why: t('N doit être fixé dès que ε est donné : il ne peut pas dépendre de n.') },
+    { html: blk(`∀${ML('N ∈ ℕ')}`), distractor: 'g9_quant_order', why: t('Il suffit d\'un rang N qui marche : c\'est ∃N, choisi après ε.') },
   ];
   const nDecoys = level === 3 ? 2 : 1;
   rng.shuffle(DECOYS).slice(0, nDecoys).forEach((x, i) => blocks.push({ id: `d${i}`, needs: [], ...x }));
@@ -105,11 +107,11 @@ function edBlocks(level, rng) {
   const cfg = { pieces: piecesOf(D, false) };
   return blocksItem({
     skill: ED, level, mode: 'define',
-    prompt: `Construis la définition : « ${D.name} ».${placed.length ? ' Le début est placé.' : ''} Touche les morceaux dans l'ordre.`,
+    prompt: placed.length ? t('Construis la définition : « {name} ». Le début est placé. Touche les morceaux dans l\'ordre.', { name: D.label }) : t('Construis la définition : « {name} ». Touche les morceaux dans l\'ordre.', { name: D.label }),
     blocks: rng.shuffle(blocks), goal: 'body', order, placed,
     hints: H(ED_HINT1, `${D.qs[0][0]}${D.qs[0][1]} ∃▢ ∀▢, ${D.body.replace(/_n/g, 'ₙ').replace(/_m/g, 'ₘ')}`, FM(targetOf(D), cfg)),
-    subgoals: [{ id: 'quant', label: 'ordre des quantificateurs', skill: 'g9-quant-write' }, { id: 'def', label: 'définition', skill: ED }],
-    solution: [{ html: FM(targetOf(D), cfg), note: D.name }],
+    subgoals: [{ id: 'quant', label: t('ordre des quantificateurs'), skill: 'g9-quant-write' }, { id: 'def', label: t('définition'), skill: ED }],
+    solution: [{ html: FM(targetOf(D), cfg), note: D.label }],
     key: `${D.name}:${placed.length}:${level}`,
   });
 }
@@ -124,13 +126,13 @@ function edTokens(level, rng, opts = {}) {
   const neg = kind === 'neg';
   return tokensItem({
     skill: ED, level, pieces, target, start: target,
-    prompt: neg ? `Écris avec des quantificateurs : « ${D.name} » (la négation de la définition de la limite).` : `Donne la définition précise : « ${D.name} ».`,
-    hints: H(neg ? 'Nie la définition de la limite : chaque ∀ devient ∃, chaque ∃ devient ∀, et l\'inégalité finale est niée.' : ED_HINT1,
+    prompt: neg ? t('Écris avec des quantificateurs : « {name} » (la négation de la définition de la limite).', { name: D.label }) : t('Donne la définition précise : « {name} ».', { name: D.label }),
+    hints: H(neg ? t('Nie la définition de la limite : chaque ∀ devient ∃, chaque ∃ devient ∀, et l\'inégalité finale est niée.') : ED_HINT1,
       `${D.qs[0][0]}${D.qs[0][1]} …`, FM(target, cfg)),
     noHints: level === 5 || !!opts.exam,
     // The decoy piece |a_(n+1) − a_n| ≤ ε of a Cauchy definition is a1_cauchy_consecutive.
     baits: neg ? ['g9_neg_one_quant', 'g9_neg_pred_kept'] : kind === 'cauchy' ? ['g9_quant_order', 'a1_cauchy_consecutive'] : ['g9_quant_order'],
-    key: `${D.name}:${level}`, solution: [{ html: FM(target, cfg), note: D.name }],
+    key: `${D.name}:${level}`, solution: [{ html: FM(target, cfg), note: D.label }],
     exam: opts.exam ? { format: opts.exam, points: 1 } : false,
   });
 }
@@ -139,26 +141,26 @@ function edTf(rng) {
   const kind = rng.pick(['swap', 'swap', 'strict', 'eps', 'n']);
   if (kind === 'swap') {
     return tfItem({
-      skill: ED, level: 4, statement: 'Toute suite (aₙ) qui converge vers L vérifie : ∃N ∈ ℕ ∀ε > 0 ∀n ≥ N, |aₙ − L| ≤ ε.', truth: false,
+      skill: ED, level: 4, statement: t('Toute suite (aₙ) qui converge vers L vérifie : ∃N ∈ ℕ ∀ε > 0 ∀n ≥ N, |aₙ − L| ≤ ε.'), truth: false,
       counter: {
         kind: 'sequence', v: 'n', from: 1, hyp: [{ p: 'converges' }],
-        concl: { p: 'eventuallyConstant', say: 'la suite vérifie ∃N ∀ε > 0 ∀n ≥ N, |aₙ − L| ≤ ε, c\'est-à-dire aₙ = L à partir d\'un rang' },
+        concl: { p: 'eventuallyConstant', say: t('la suite vérifie ∃N ∀ε > 0 ∀n ≥ N, |aₙ − L| ≤ ε, c\'est-à-dire aₙ = L à partir d\'un rang') },
         ask: [{ v: 'a', label: 'aₙ =', keys: SEQ_KEYS }], answer: { a: '1/n' },
       },
       ruleIfTrue: 'g9_quant_order', key: 'swap', exam: { format: 'tf', points: 1 },
-      explanation: 'Faux : avec ∃N avant ∀ε, |aₙ − L| ≤ ε pour tous les ε > 0 force aₙ = L dès n ≥ N. aₙ = 1/n converge vers 0 sans jamais valoir 0.',
+      explanation: t('Faux : avec ∃N avant ∀ε, |aₙ − L| ≤ ε pour tous les ε > 0 force aₙ = L dès n ≥ N. aₙ = 1/n converge vers 0 sans jamais valoir 0.'),
     });
   }
   if (kind === 'strict') {
-    return tfItem({ skill: ED, level: 4, statement: 'Dans la définition de lim aₙ = L, on peut remplacer |aₙ − L| ≤ ε par |aₙ − L| < ε.', truth: true, key: 'strict', exam: { format: 'tf', points: 1 },
-      explanation: 'Vrai : si |aₙ − L| ≤ ε/2 à partir d\'un rang, alors |aₙ − L| < ε. Les deux définitions disent la même chose.' });
+    return tfItem({ skill: ED, level: 4, statement: t('Dans la définition de lim aₙ = L, on peut remplacer |aₙ − L| ≤ ε par |aₙ − L| < ε.'), truth: true, key: 'strict', exam: { format: 'tf', points: 1 },
+      explanation: t('Vrai : si |aₙ − L| ≤ ε/2 à partir d\'un rang, alors |aₙ − L| < ε. Les deux définitions disent la même chose.') });
   }
   if (kind === 'eps') {
-    return tfItem({ skill: ED, level: 4, statement: 'Dans la définition de lim aₙ = L, le rang N peut dépendre de ε.', truth: true, key: 'eps', exam: { format: 'tf', points: 1 },
-      explanation: 'Vrai : ∃N vient après ∀ε, donc N est choisi en fonction de ε (N(ε) = 5/ε, par exemple).' });
+    return tfItem({ skill: ED, level: 4, statement: t('Dans la définition de lim aₙ = L, le rang N peut dépendre de ε.'), truth: true, key: 'eps', exam: { format: 'tf', points: 1 },
+      explanation: t('Vrai : ∃N vient après ∀ε, donc N est choisi en fonction de ε (N(ε) = 5/ε, par exemple).') });
   }
-  return vfMcq(ED, 'Dans la définition de lim aₙ = L, le rang N peut dépendre de n.', false, rng, {
-    key: 'n', ruleIfTrue: 'a1_n_depends_on_n', why: 'Faux : N est choisi avant n (∃N ∀n ≥ N). Il ne dépend que de ε.',
+  return vfMcq(ED, t('Dans la définition de lim aₙ = L, le rang N peut dépendre de n.'), false, rng, {
+    key: 'n', ruleIfTrue: 'a1_n_depends_on_n', why: t('Faux : N est choisi avant n (∃N ∀n ≥ N). Il ne dépend que de ε.'),
   });
 }
 
@@ -174,17 +176,17 @@ function epsDef(level, rng, profile, opts = {}) {
 // ======================================================================
 
 const EN_SUB = [
-  { id: 'simplify', label: 'simplifier |aₙ − L|', skill: EN },
-  { id: 'bound', label: 'majorer', skill: 'g1-bound' },
+  { id: 'simplify', label: t('simplifier |aₙ − L|'), skill: EN },
+  { id: 'bound', label: t('majorer'), skill: 'g1-bound' },
   { id: 'N', label: 'N(ε)', skill: EN },
-  { id: 'def', label: 'définition ε-N', skill: ED },
+  { id: 'def', label: t('définition ε-N'), skill: ED },
 ];
 const EN_CHOICES = [
-  { id: 'common', label: 'Réduire au même dénominateur' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'bound', label: 'Majorer : enlever le terme positif du dénominateur' },
-  { id: 'bigger', label: 'Majorer en ajoutant un terme au dénominateur', rule: 'a1_bound_wrong_direction', why: 'Un dénominateur plus grand donne une fraction plus petite : ce n\'est pas une majoration.' },
-  { id: 'solve', label: 'Résoudre « majorant ≤ ε » en n, puis choisir N' },
+  { id: 'common', label: t('Réduire au même dénominateur') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'bound', label: t('Majorer : enlever le terme positif du dénominateur') },
+  { id: 'bigger', label: t('Majorer en ajoutant un terme au dénominateur'), rule: 'a1_bound_wrong_direction', why: t('Un dénominateur plus grand donne une fraction plus petite : ce n\'est pas une majoration.') },
+  { id: 'solve', label: t('Résoudre « majorant ≤ ε » en n, puis choisir N') },
 ];
 
 // c·n + d written out.
@@ -208,8 +210,8 @@ function enData(rng, kinds) {
       return {
         kind, f, L, k, start: `abs(${f}${minusL(L)})`,
         simp: [
-          E(`abs(${lin(L, K)}${L < 0 ? '+' : '-'}${Math.abs(L) === 1 ? '' : Math.abs(L)}(n+${b}))/(n+${b})`, 'Réduire au même dénominateur', 'simplify', 'common'),
-          E(`${k}/(n+${b})`, 'Simplifier : il reste une constante en haut', 'simplify', 'simplify'),
+          E(`abs(${lin(L, K)}${L < 0 ? '+' : '-'}${Math.abs(L) === 1 ? '' : Math.abs(L)}(n+${b}))/(n+${b})`, t('Réduire au même dénominateur'), 'simplify', 'common'),
+          E(`${k}/(n+${b})`, t('Simplifier : il reste une constante en haut'), 'simplify', 'simplify'),
         ],
         hole1: lin(L, K) === `${L}n` ? null : `${lin(L, K)}${L < 0 ? '+' : '-'}${Math.abs(L) === 1 ? '' : Math.abs(L)}(n+${b})`,
         goal: `${k}/(n+${b})`, bound: `${k}/n`, boundNote: `n + ${b} ≥ n`, N: `${k}/ε`, p: 1,
@@ -226,8 +228,8 @@ function enData(rng, kinds) {
       return {
         kind, f, L, k, start: `abs(${f}${minusL(L)})`,
         simp: [
-          E(`abs(${num}${L < 0 ? '+' : '-'}${Math.abs(L) === 1 ? '' : Math.abs(L)}(n^2+${b}))/(n^2+${b})`, 'Réduire au même dénominateur', 'simplify', 'common'),
-          E(`${k}/(n^2+${b})`, 'Simplifier', 'simplify', 'simplify'),
+          E(`abs(${num}${L < 0 ? '+' : '-'}${Math.abs(L) === 1 ? '' : Math.abs(L)}(n^2+${b}))/(n^2+${b})`, t('Réduire au même dénominateur'), 'simplify', 'common'),
+          E(`${k}/(n^2+${b})`, t('Simplifier'), 'simplify', 'simplify'),
         ],
         hole1: `${num}${L < 0 ? '+' : '-'}${Math.abs(L) === 1 ? '' : Math.abs(L)}(n^2+${b})`,
         goal: `${k}/(n^2+${b})`, bound: `${k}/n^2`, boundNote: `n² + ${b} ≥ n²`, N: k === 1 ? '1/√ε' : `√(${k}/ε)`, p: 2,
@@ -240,7 +242,7 @@ function enData(rng, kinds) {
       const f = `${L}+${c}/(n^2+${b})`;
       return {
         kind, f, L, k: c, start: `abs(${f}${minusL(L)})`,
-        simp: [E(`${c}/(n^2+${b})`, `Simplifier : ${c}/(n² + ${b}) > 0`, 'simplify', 'simplify')],
+        simp: [E(`${c}/(n^2+${b})`, t('Simplifier : {c}/(n² + {b}) > 0', { c, b }), 'simplify', 'simplify')],
         goal: `${c}/(n^2+${b})`, bound: `${c}/n^2`, boundNote: `n² + ${b} ≥ n²`, N: c === 1 ? '1/√ε' : `√(${c}/ε)`, p: 2,
       };
     }
@@ -258,11 +260,11 @@ function enData(rng, kinds) {
 }
 const FALLBACK_EN = () => ({
   kind: 'aff', f: '(3n+1)/(n+2)', L: 3, k: 5, start: 'abs((3n+1)/(n+2)-3)',
-  simp: [E('abs(3n+1-3(n+2))/(n+2)', 'Réduire au même dénominateur', 'simplify', 'common'), E('5/(n+2)', 'Simplifier : il reste une constante en haut', 'simplify', 'simplify')],
+  simp: [E('abs(3n+1-3(n+2))/(n+2)', t('Réduire au même dénominateur'), 'simplify', 'common'), E('5/(n+2)', t('Simplifier : il reste une constante en haut'), 'simplify', 'simplify')],
   hole1: '3n+1-3(n+2)', goal: '5/(n+2)', bound: '5/n', boundNote: 'n + 2 ≥ n', N: '5/ε', p: 1, fallback: true,
 });
 
-function enLines(level, rng, opts = {}, { kinds, problemPart = false } = {}) {
+function enLines(level, rng, opts = {}, { kinds, problemPart = false, open = false } = {}) {
   const d = enData(rng, kinds || (level <= 2 ? ['aff', 'aff', 'quad', 'add'] : ['aff', 'aff', 'quad', 'add', 'alt'])) || FALLBACK_EN();
   const V = { vars: ['n'] };
   const sJudge = { kind: 'equiv', vars: ['n'], domain: { n: { int: [1, 40] } }, target: 'short', goal: d.goal };
@@ -273,22 +275,28 @@ function enLines(level, rng, opts = {}, { kinds, problemPart = false } = {}) {
   if (level === 2 && simp.length > 1 && d.hole1) simp[0] = blanked(simp[0], [d.hole1], V);
   if (level === 2) simp[simp.length - 1] = blanked(simp.at(-1), [String(d.k)], V);
   const parts = [{ start: d.start, judge: sJudge, lines: simp }];
+  const cn = `c/n${d.p === 2 ? '²' : ''}`;
   if (d.bound) {
-    const line = E(d.bound, `Majorer : ${d.boundNote}`, 'bound', 'bound');
-    parts.push({ html: `Majore ${MT(d.goal, V)} par une expression simple c/n${d.p === 2 ? '²' : ''} :`, ask: null, start: d.goal, judge: bJudge, lines: [level <= 2 ? blanked(line, [String(d.k)], V) : line] });
+    const line = E(d.bound, t('Majorer : {b}', { b: d.boundNote }), 'bound', 'bound');
+    parts.push({ html: t('Majore {g} par une expression simple {cn} :', { g: MT(d.goal, V), cn }), ask: null, start: d.goal, judge: bJudge, lines: [level <= 2 ? blanked(line, [String(d.k)], V) : line] });
   }
   const last = d.bound || d.goal;
-  const nLine = E(d.N, `${RD(last)} ≤ ε dès que n ≥ ${RD(d.N)}`, 'N', 'solve');
-  parts.push({ html: `Résous ${MT(last, V)} ≤ ε en n : choisis N(ε).`, ask: 'N =', start: 'N', judge: nJudge, lines: [level === 1 ? blanked(nLine, [String(d.k)]) : nLine] });
+  const nLine = E(d.N, t('{a} ≤ ε dès que n ≥ {N}', { a: RD(last), N: RD(d.N) }), 'N', 'solve');
+  parts.push({ html: t('Résous {a} ≤ ε en n : choisis N(ε).', { a: MT(last, V) }), ask: 'N =', start: 'N', judge: nJudge, lines: [level === 1 ? blanked(nLine, [String(d.k)]) : nLine] });
   const { start, judge, script } = partsScript(parts, level, EN_CHOICES);
-  script.push({ kind: 'note', html: `Pour tout n ≥ N(ε) = ${MT(d.N)}, ${gapT(d.L)} ≤ ${MT(last, V)} ≤ ε : lim aₙ = ${frT(d.L)}.` });
+  script.push({ kind: 'note', html: t('Pour tout n ≥ N(ε) = {N}, {gap} ≤ {a} ≤ ε : lim aₙ = {L}.', { N: MT(d.N), gap: gapT(d.L), a: MT(last, V), L: frT(d.L) }) });
   const fShow = MT(d.f, V);
+  const pv = { L: frT(d.L), f: fShow, gap: gapT(d.L), cn };
+  const second = problemPart && !open;
+  let prompt;
+  if (d.bound) prompt = second ? t('Deuxième partie : prouve par la définition que lim aₙ = {L} pour aₙ = {f} : simplifie {gap}, majore-le par {cn}, puis donne N(ε) tel que {gap} ≤ ε pour tout n ≥ N(ε).', pv) : t('Montre par la définition que lim aₙ = {L} pour aₙ = {f} : simplifie {gap}, majore-le par {cn}, puis donne N(ε) tel que {gap} ≤ ε pour tout n ≥ N(ε).', pv);
+  else prompt = second ? t('Deuxième partie : prouve par la définition que lim aₙ = {L} pour aₙ = {f} : simplifie {gap}, puis donne N(ε) tel que {gap} ≤ ε pour tout n ≥ N(ε).', pv) : t('Montre par la définition que lim aₙ = {L} pour aₙ = {f} : simplifie {gap}, puis donne N(ε) tel que {gap} ≤ ε pour tout n ≥ N(ε).', pv);
   return linesItem({
     skill: EN, level, mode: problemPart ? 'free' : modeOf(level), start, judge, script,
-    prompt: `${problemPart ? 'Deuxième partie : prouve' : 'Montre'} par la définition que lim aₙ = ${frT(d.L)} pour aₙ = ${fShow} : simplifie ${gapT(d.L)}${d.bound ? `, majore-le par c/n${d.p === 2 ? '²' : ''}` : ''}, puis donne N(ε) tel que ${gapT(d.L)} ≤ ε pour tout n ≥ N(ε).`,
-    hints: H('Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ».',
-      `${gapT(d.L)} = ${MT(d.goal, V)}${d.bound ? ` ≤ ${MT(d.bound, V)}` : ''} ≤ ε dès que n ≥ ▢`,
-      `${MT(d.goal, V)}${d.bound ? ` ≤ ${MT(d.bound, V)}` : ''} ≤ ε dès que n ≥ ${MT(d.N)} : N(ε) = ${MT(d.N)}`),
+    prompt,
+    hints: H(t('Calcule |aₙ − L|, puis remplace-le par plus grand et plus simple (c/n ou c/n²), et résous « c/n ≤ ε ».'),
+      t('{gap} = {g} ≤ ε dès que n ≥ ▢', { gap: gapT(d.L), g: `${MT(d.goal, V)}${d.bound ? ` ≤ ${MT(d.bound, V)}` : ''}` }),
+      t('{g} ≤ ε dès que n ≥ {N} : N(ε) = {N}', { g: `${MT(d.goal, V)}${d.bound ? ` ≤ ${MT(d.bound, V)}` : ''}`, N: MT(d.N) })),
     noHints: level === 5 || problemPart || !!opts.exam,
     subgoals: EN_SUB, keys: ['calc', 'greek', 'seq'], tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['n'] }, key: `${EN}:${level}:${d.f}`, exam: false, fallback: !!d.fallback,
@@ -297,21 +305,21 @@ function enLines(level, rng, opts = {}, { kinds, problemPart = false } = {}) {
 
 function enProblem(rng, opts) {
   const def = edTokens(4, rng, {});
-  const p1 = { ...def, prompt: 'Première partie : donne la définition de lim aₙ = L.', exam: false };
+  const p1 = { ...def, prompt: t('Première partie : donne la définition de lim aₙ = L.'), exam: false };
   const p2 = enLines(4, rng, {}, { kinds: ['aff', 'quad', 'add'], problemPart: true });
   const segs = p2.script.filter((l) => l.kind === 'segment').length + 1;
   return problemItem({
-    skill: EN, level: opts.exam ? 4 : 5, prompt: 'Définition, puis preuve par la définition.',
-    parts: [{ item: p1, points: 1, title: 'Définition' }, { item: p2, points: Array(segs).fill(1), title: 'Preuve' }],
+    skill: EN, level: opts.exam ? 4 : 5, prompt: t('Définition, puis preuve par la définition.'),
+    parts: [{ item: p1, points: 1, title: t('Définition') }, { item: p2, points: Array(segs).fill(1), title: t('Preuve') }],
     key: `l5:${p2.key}`, exam: false, expectedSec: 600, fallback: p2.fallback,
   });
 }
 
 function enOpen(rng, opts) {
-  const p = enLines(4, rng, {}, { kinds: ['aff', 'aff', 'quad', 'add'], problemPart: true });
+  const p = enLines(4, rng, {}, { kinds: ['aff', 'aff', 'quad', 'add'], problemPart: true, open: true });
   const segs = p.script.filter((l) => l.kind === 'segment').length + 1;
   return problemItem({
-    skill: EN, level: 4, prompt: p.prompt.replace('Deuxième partie : prouve', 'Montre'),
+    skill: EN, level: 4, prompt: p.prompt,
     parts: [{ item: { ...p, prompt: '' }, points: Array(segs).fill(1) }],
     key: `open:${p.key}`, exam: { format: 'open', points: segs }, expectedSec: 480, fallback: p.fallback,
   });
@@ -320,21 +328,21 @@ function enOpen(rng, opts) {
 function enTf(rng) {
   const kind = rng.pick(['dep', 'never', 'nines', 'bigger', 'square']);
   if (kind === 'dep') {
-    return vfMcq(EN, 'Pour aₙ = 1/n et L = 0, N(ε) = 1/n convient.', false, rng, { key: 'dep', ruleIfTrue: 'a1_n_depends_on_n', why: 'Faux : N doit être fixé dès que ε est donné ; il ne peut pas dépendre de n. N(ε) = 1/ε convient.' });
+    return vfMcq(EN, t('Pour aₙ = 1/n et L = 0, N(ε) = 1/n convient.'), false, rng, { key: 'dep', ruleIfTrue: 'a1_n_depends_on_n', why: t('Faux : N doit être fixé dès que ε est donné ; il ne peut pas dépendre de n. N(ε) = 1/ε convient.') });
   }
   if (kind === 'never') {
-    return vfMcq(EN, 'Une suite convergente n\'atteint jamais sa limite.', false, rng, { key: 'never', ruleIfTrue: 'a1_limit_never_reached', why: 'Faux : la suite constante aₙ = 3 tend vers 3 et vaut 3 à chaque rang. Ce qui compte : |aₙ − L| finit sous tout ε > 0.' });
+    return vfMcq(EN, t('Une suite convergente n\'atteint jamais sa limite.'), false, rng, { key: 'never', ruleIfTrue: 'a1_limit_never_reached', why: t('Faux : la suite constante aₙ = 3 tend vers 3 et vaut 3 à chaque rang. Ce qui compte : |aₙ − L| finit sous tout ε > 0.') });
   }
   if (kind === 'nines') {
-    return vfMcq(EN, '0,999… < 1, car la suite 0,9 ; 0,99 ; 0,999 ; … n\'atteint jamais 1.', false, rng, { key: 'nines', ruleIfTrue: 'a1_limit_never_reached', why: 'Faux : 0,999… est la limite de cette suite, et cette limite vaut 1 (|1 − 0,99…9| = 10⁻ⁿ → 0). Donc 0,999… = 1.' });
+    return vfMcq(EN, t('0,999… < 1, car la suite 0,9 ; 0,99 ; 0,999 ; … n\'atteint jamais 1.'), false, rng, { key: 'nines', ruleIfTrue: 'a1_limit_never_reached', why: t('Faux : 0,999… est la limite de cette suite, et cette limite vaut 1 (|1 − 0,99…9| = 10⁻ⁿ → 0). Donc 0,999… = 1.') });
   }
   if (kind === 'bigger') {
     const c = rng.int(2, 9);
-    return tfItem({ skill: EN, level: 4, statement: `Pour aₙ = ${c}/n et L = 0, N(ε) = ${c}/ε convient, et N(ε) = ${2 * c}/ε aussi.`, truth: true, key: `bigger:${c}`, exam: { format: 'tf', points: 1 },
-      explanation: `Vrai : pour n ≥ ${c}/ε, ${c}/n ≤ ε. Tout N plus grand convient aussi.` });
+    return tfItem({ skill: EN, level: 4, statement: t('Pour aₙ = {c}/n et L = 0, N(ε) = {c}/ε convient, et N(ε) = {c2}/ε aussi.', { c, c2: 2 * c }), truth: true, key: `bigger:${c}`, exam: { format: 'tf', points: 1 },
+      explanation: t('Vrai : pour n ≥ {c}/ε, {c}/n ≤ ε. Tout N plus grand convient aussi.', { c }) });
   }
-  return tfItem({ skill: EN, level: 4, statement: 'Pour aₙ = 1/n² et L = 0, N(ε) = 1/√ε convient.', truth: true, key: 'square', exam: { format: 'tf', points: 1 },
-    explanation: 'Vrai : n ≥ 1/√ε donne n² ≥ 1/ε, donc 1/n² ≤ ε.' });
+  return tfItem({ skill: EN, level: 4, statement: t('Pour aₙ = 1/n² et L = 0, N(ε) = 1/√ε convient.'), truth: true, key: 'square', exam: { format: 'tf', points: 1 },
+    explanation: t('Vrai : n ≥ 1/√ε donne n² ≥ 1/ε, donc 1/n² ≤ ε.') });
 }
 
 function epsN(level, rng, profile, opts = {}) {
@@ -349,18 +357,18 @@ function epsN(level, rng, profile, opts = {}) {
 // ======================================================================
 
 const SL_SUB = [
-  { id: 'simplify', label: 'conjugué, simplifier', skill: 'rat-simplify' },
-  { id: 'log', label: 'croissances comparées', skill: 'g2-log-rules' },
-  { id: 'limit', label: 'passer à la limite', skill: SL },
+  { id: 'simplify', label: t('conjugué, simplifier'), skill: 'rat-simplify' },
+  { id: 'log', label: t('croissances comparées'), skill: 'g2-log-rules' },
+  { id: 'limit', label: t('passer à la limite'), skill: SL },
 ];
 const SL_CHOICES = [
-  { id: 'factor', label: 'Mettre le terme dominant en facteur (diviser en haut et en bas)' },
-  { id: 'conj', label: 'Multiplier et diviser par la quantité conjuguée' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'exp', label: 'Écrire uᵛ = e^(v·ln u)' },
-  { id: 'growth', label: 'Croissances comparées' },
-  { id: 'limit', label: 'Passer à la limite' },
-  { id: 'zero', label: 'Remplacer ∞ − ∞ par 0', rule: 'a1_indet_inf_minus_inf', why: '∞ − ∞ est indéterminé : l\'écart peut tendre vers n\'importe quoi.' },
+  { id: 'factor', label: t('Mettre le terme dominant en facteur (diviser en haut et en bas)') },
+  { id: 'conj', label: t('Multiplier et diviser par la quantité conjuguée') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'exp', label: t('Écrire uᵛ = e^(v·ln u)') },
+  { id: 'growth', label: t('Croissances comparées') },
+  { id: 'limit', label: t('Passer à la limite') },
+  { id: 'zero', label: t('Remplacer ∞ − ∞ par 0'), rule: 'a1_indet_inf_minus_inf', why: t('∞ − ∞ est indéterminé : l\'écart peut tendre vers n\'importe quoi.') },
 ];
 const LIM = { kind: 'limit', v: 'n', to: '+∞', discrete: true, vars: ['n'] };
 const V = { vars: ['n'] };
@@ -370,7 +378,7 @@ function mono(c, k) {
   const head = k === 0 ? String(c) : `${c === 1 ? '' : c === -1 ? '-' : c}n${k === 1 ? '' : `^${k}`}`;
   return head;
 }
-const joinT = (ts) => ts.filter(Boolean).reduce((s, t) => (s ? (t.startsWith('-') ? `${s}${t}` : `${s}+${t}`) : t), '');
+const joinT = (ts) => ts.filter(Boolean).reduce((s, x) => (s ? (x.startsWith('-') ? `${s}${x}` : `${s}+${x}`) : x), '');
 // c·n^(k − m) after dividing by n^m.
 function divTerm(c, k, m) {
   const e = k - m;
@@ -409,12 +417,12 @@ function slPoly(rng, finite) {
     const wrongLow = lowP[1] === ib && P.length > 1 ? N(q(lowP[0], b2)) : null;
     return {
       kind: 'poly', start, value,
-      lines: [E(divided, `Diviser en haut et en bas par ${nPow(qd)}`, 'simplify', 'factor'), E(value, p === qd ? 'Les termes en 1/n tendent vers 0' : p < qd ? 'Le numérateur tend vers 0, le dénominateur vers ' + b : `Le numérateur tend vers ${a > 0 ? '+∞' : '−∞'}`, 'limit', 'limit')],
+      lines: [E(divided, t('Diviser en haut et en bas par {p}', { p: nPow(qd) }), 'simplify', 'factor'), E(value, p === qd ? t('Les termes en 1/n tendent vers 0') : p < qd ? t('Le numérateur tend vers 0, le dénominateur vers {b}', { b }) : t('Le numérateur tend vers {v}', { v: a > 0 ? '+∞' : '−∞' }), 'limit', 'limit')],
       blank: [0, [String(b)]],
-      method: `∞/∞ : divise en haut et en bas par ${nPow(qd)}, la plus grande puissance du dénominateur.`,
+      method: t('∞/∞ : divise en haut et en bas par {p}, la plus grande puissance du dénominateur.', { p: nPow(qd) }),
       choice: [
-        { id: 'factor', label: `Diviser en haut et en bas par ${nPow(qd)}`, valid: true },
-        { id: 'conj', label: 'Multiplier par la quantité conjuguée', valid: false, why: 'Il n\'y a pas de racine : le conjugué ne sert à rien. Mets le terme dominant en facteur.' },
+        { id: 'factor', label: t('Diviser en haut et en bas par {p}', { p: nPow(qd) }), valid: true },
+        { id: 'conj', label: t('Multiplier par la quantité conjuguée'), valid: false, why: t('Il n\'y a pas de racine : le conjugué ne sert à rien. Mets le terme dominant en facteur.') },
       ],
       wrong: [
         ...(wrongLow ? [{ text: wrongLow, rule: 'a1_dominant_term_wrong' }] : []),
@@ -440,16 +448,16 @@ function slSqrt(rng) {
     return {
       kind: 'sqrt', start: `√(${rad})-n`, value,
       lines: [
-        E(`(${rad}-n^2)/(√(${rad})+n)`, 'Multiplier et diviser par la quantité conjuguée √(…) + n', 'simplify', 'conj'),
-        E(`${r === 0 ? top : `(${top})`}/(√(${rad})+n)`, 'Simplifier : (√A)² − n² = A − n²', 'simplify', 'simplify'),
-        E(`${r === 0 ? divTop : `(${divTop})`}/(√(${divRad})+1)`, 'Diviser en haut et en bas par n', 'simplify', 'factor'),
-        E(value, `√(…) → 1 : la limite vaut ${frT(p)}/2`, 'limit', 'limit'),
+        E(`(${rad}-n^2)/(√(${rad})+n)`, t('Multiplier et diviser par la quantité conjuguée √(…) + n'), 'simplify', 'conj'),
+        E(`${r === 0 ? top : `(${top})`}/(√(${rad})+n)`, t('Simplifier : (√A)² − n² = A − n²'), 'simplify', 'simplify'),
+        E(`${r === 0 ? divTop : `(${divTop})`}/(√(${divRad})+1)`, t('Diviser en haut et en bas par n'), 'simplify', 'factor'),
+        E(value, t('√(…) → 1 : la limite vaut {p}/2', { p: frT(p) }), 'limit', 'limit'),
       ],
       blank: [1, [top]],
-      method: '∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée √(…) + n.',
+      method: t('∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée √(…) + n.'),
       choice: [
-        { id: 'conj', label: 'Multiplier et diviser par la quantité conjuguée √(…) + n', valid: true },
-        { id: 'factor', label: 'Mettre n en facteur : n·(√(1 + …) − 1)', valid: false, why: 'On obtient ∞ · 0 : c\'est encore indéterminé. Le conjugué fait disparaître la racine.' },
+        { id: 'conj', label: t('Multiplier et diviser par la quantité conjuguée √(…) + n'), valid: true },
+        { id: 'factor', label: t('Mettre n en facteur : n·(√(1 + …) − 1)'), valid: false, why: t('On obtient ∞ · 0 : c\'est encore indéterminé. Le conjugué fait disparaître la racine.') },
       ],
       wrong: [{ text: '0', rule: 'a1_indet_inf_minus_inf' }, { text: '+∞', rule: 'a1_sqrt_sum_split' }, { text: String(p) }, { text: '1' }, { text: N(q(p, 4)) }],
     };
@@ -465,15 +473,15 @@ function slSqrt2(rng) {
   return {
     kind: 'sqrt2', start: `(√(n+${a})-√n)×√(n+${b})`, value,
     lines: [
-      E(`${A}√(n+${b})/(√(n+${a})+√n)`, `Quantité conjuguée : (n + ${a}) − n = ${a}`, 'simplify', 'conj'),
-      E(`${A}√(1+${b}/n)/(√(1+${a}/n)+1)`, 'Diviser en haut et en bas par √n', 'simplify', 'factor'),
-      E(value, 'Les racines tendent vers 1', 'limit', 'limit'),
+      E(`${A}√(n+${b})/(√(n+${a})+√n)`, t('Quantité conjuguée : (n + {a}) − n = {a}', { a }), 'simplify', 'conj'),
+      E(`${A}√(1+${b}/n)/(√(1+${a}/n)+1)`, t('Diviser en haut et en bas par √n'), 'simplify', 'factor'),
+      E(value, t('Les racines tendent vers 1'), 'limit', 'limit'),
     ],
     blank: [0, [`√(n+${b})`]],
-    method: '∞ − ∞ avec des racines : multiplie et divise √(n + a) − √n par √(n + a) + √n.',
+    method: t('∞ − ∞ avec des racines : multiplie et divise √(n + a) − √n par √(n + a) + √n.'),
     choice: [
-      { id: 'conj', label: 'Multiplier et diviser par √(n + a) + √n', valid: true },
-      { id: 'zero', label: '√(n + a) − √n → 0, donc le produit tend vers 0', valid: false, rule: 'a1_indet_inf_minus_inf', why: 'C\'est 0 · ∞ : encore indéterminé. Le conjugué donne la vitesse à laquelle l\'écart tend vers 0.' },
+      { id: 'conj', label: t('Multiplier et diviser par √(n + a) + √n'), valid: true },
+      { id: 'zero', label: t('√(n + a) − √n → 0, donc le produit tend vers 0'), valid: false, rule: 'a1_indet_inf_minus_inf', why: t('C\'est 0 · ∞ : encore indéterminé. Le conjugué donne la vitesse à laquelle l\'écart tend vers 0.') },
     ],
     wrong: [{ text: '0', rule: 'a1_indet_inf_minus_inf' }, { text: String(a) }, { text: '+∞' }, { text: N(q(a, 4)) }, { text: '1' }],
   };
@@ -496,14 +504,14 @@ function slCbrt(rng) {
       kind: 'cbrt', start: `${R}-n`, value,
       lines: [
         E(`(${top})/(${R}^2+n×${R}+n^2)`, 'a − b = (a³ − b³)/(a² + ab + b²)', 'simplify', 'conj'),
-        E(`(${p}+${r}/n^2)/(${RD}^2+${RD}+1)`, 'Diviser en haut et en bas par n²', 'simplify', 'factor'),
-        E(value, 'Les racines tendent vers 1', 'limit', 'limit'),
+        E(`(${p}+${r}/n^2)/(${RD}^2+${RD}+1)`, t('Diviser en haut et en bas par n²'), 'simplify', 'factor'),
+        E(value, t('Les racines tendent vers 1'), 'limit', 'limit'),
       ],
       blank: [0, [top]],
-      method: 'Avec une racine cubique : a − b = (a³ − b³)/(a² + ab + b²), avec a = ∛(…) et b = n.',
+      method: t('Avec une racine cubique : a − b = (a³ − b³)/(a² + ab + b²), avec a = ∛(…) et b = n.'),
       choice: [
-        { id: 'conj', label: 'Écrire a − b = (a³ − b³)/(a² + ab + b²)', valid: true },
-        { id: 'zero', label: 'Les deux termes valent n à l\'infini : la limite est 0', valid: false, rule: 'a1_indet_inf_minus_inf', why: '∞ − ∞ est indéterminé : l\'écart peut tendre vers n\'importe quoi.' },
+        { id: 'conj', label: t('Écrire a − b = (a³ − b³)/(a² + ab + b²)'), valid: true },
+        { id: 'zero', label: t('Les deux termes valent n à l\'infini : la limite est 0'), valid: false, rule: 'a1_indet_inf_minus_inf', why: t('∞ − ∞ est indéterminé : l\'écart peut tendre vers n\'importe quoi.') },
       ],
       wrong: [{ text: '0', rule: 'a1_indet_inf_minus_inf' }, { text: String(p) }, { text: N(q(p, 2)) }, { text: '+∞' }],
     };
@@ -520,13 +528,13 @@ function slRoot(rng) {
     kind: 'root', start, value: '1',
     lines: [
       E(ex, 'uᵛ = e^(v·ln u)', 'log', 'exp'),
-      E('1', which === 'k' ? `ln(${k})/n → 0, et e⁰ = 1` : 'Croissances comparées : ln(n)/n → 0, et e⁰ = 1', 'limit', which === 'k' ? 'limit' : 'growth'),
+      E('1', which === 'k' ? t('ln({k})/n → 0, et e⁰ = 1', { k }) : t('Croissances comparées : ln(n)/n → 0, et e⁰ = 1'), 'limit', which === 'k' ? 'limit' : 'growth'),
     ],
     blank: [0, [which === 'n' ? 'ln(n)' : `ln(${k})`]],
-    method: 'Une puissance variable : écris uᵛ = e^(v·ln u), puis cherche la limite de l\'exposant.',
+    method: t('Une puissance variable : écris uᵛ = e^(v·ln u), puis cherche la limite de l\'exposant.'),
     choice: [
-      { id: 'exp', label: 'Écrire uᵛ = e^(v·ln u)', valid: true },
-      { id: 'one', label: `L'exposant 1/n tend vers 0, et ∞⁰ = 1`, valid: false, why: '∞⁰ est indéterminé : il faut la limite de v·ln u.' },
+      { id: 'exp', label: t('Écrire uᵛ = e^(v·ln u)'), valid: true },
+      { id: 'one', label: t('L\'exposant 1/n tend vers 0, et ∞⁰ = 1'), valid: false, why: t('∞⁰ est indéterminé : il faut la limite de v·ln u.') },
     ],
     wrong: [{ text: '+∞' }, { text: '0' }, { text: which === 'n' ? 'e' : String(k) }, { text: 'e' }],
   };
@@ -550,14 +558,14 @@ function slGrowth(rng, finite) {
     return {
       kind: 'growthln', start: `(${P}${g > 0 ? '+' : ''}${L})/(${B}+${d})`, value,
       lines: [
-        E(`(${c}${g > 0 ? '+' : ''}${L}/${np})/(${b}+${d}/${np})`, `Diviser en haut et en bas par ${nPow(p)}`, 'simplify', 'factor'),
-        E(value, `Croissances comparées : ln(n)/${nPow(p)} → 0`, 'log', 'growth'),
+        E(`(${c}${g > 0 ? '+' : ''}${L}/${np})/(${b}+${d}/${np})`, t('Diviser en haut et en bas par {p}', { p: nPow(p) }), 'simplify', 'factor'),
+        E(value, t('Croissances comparées : ln(n)/{p} → 0', { p: nPow(p) }), 'log', 'growth'),
       ],
       blank: [0, [String(b)]],
-      method: `ln n est négligeable devant ${nPow(p)} : divise en haut et en bas par ${nPow(p)}.`,
+      method: t('ln n est négligeable devant {p} : divise en haut et en bas par {p}.', { p: nPow(p) }),
       choice: [
-        { id: 'factor', label: `Diviser en haut et en bas par ${nPow(p)}`, valid: true },
-        { id: 'ln', label: 'Diviser en haut et en bas par ln n', valid: false, rule: 'a1_dominant_term_wrong', why: `${nPow(p)} grandit plus vite que ln n : c'est lui le terme dominant.` },
+        { id: 'factor', label: t('Diviser en haut et en bas par {p}', { p: nPow(p) }), valid: true },
+        { id: 'ln', label: t('Diviser en haut et en bas par ln n'), valid: false, rule: 'a1_dominant_term_wrong', why: t('{p} grandit plus vite que ln n : c\'est lui le terme dominant.', { p: nPow(p) }) },
       ],
       wrong: [{ text: N(q(g, d)), rule: 'a1_dominant_term_wrong' }, { text: '0' }, { text: '+∞' }, { text: N(q(b, c)) }, { text: '1' }],
     };
@@ -573,14 +581,14 @@ function slGrowth(rng, finite) {
     return {
       kind: 'growth', start: `(${cA}+n^${p})/(${a}^n+${nk})`, value,
       lines: [
-        E(`(${c}+n^${p}/${a}^n)/(1+${nk}/${a}^n)`, `Diviser en haut et en bas par ${a}ⁿ`, 'simplify', 'factor'),
-        E(value, 'Croissances comparées : nᵖ/aⁿ → 0', 'log', 'growth'),
+        E(`(${c}+n^${p}/${a}^n)/(1+${nk}/${a}^n)`, t('Diviser en haut et en bas par {p}', { p: `${a}ⁿ` }), 'simplify', 'factor'),
+        E(value, t('Croissances comparées : nᵖ/aⁿ → 0'), 'log', 'growth'),
       ],
       blank: [0, [String(c)]],
-      method: `${a}ⁿ domine toute puissance de n : divise en haut et en bas par ${a}ⁿ.`,
+      method: t('{a}ⁿ domine toute puissance de n : divise en haut et en bas par {a}ⁿ.', { a }),
       choice: [
-        { id: 'factor', label: `Diviser en haut et en bas par ${a}ⁿ`, valid: true },
-        { id: 'poly', label: `Diviser en haut et en bas par n^${Math.max(p, k)}`, valid: false, rule: 'a1_dominant_term_wrong', why: `${a}ⁿ grandit plus vite que toute puissance de n : c'est lui le terme dominant.` },
+        { id: 'factor', label: t('Diviser en haut et en bas par {p}', { p: `${a}ⁿ` }), valid: true },
+        { id: 'poly', label: t('Diviser en haut et en bas par {p}', { p: `n^${Math.max(p, k)}` }), valid: false, rule: 'a1_dominant_term_wrong', why: t('{a}ⁿ grandit plus vite que toute puissance de n : c\'est lui le terme dominant.', { a }) },
       ],
       wrong: [{ text: dom, rule: 'a1_dominant_term_wrong' }, { text: '0' }, { text: '+∞' }, { text: String(c + 1) }, { text: '1' }],
     };
@@ -590,14 +598,14 @@ function slGrowth(rng, finite) {
   return {
     kind: 'growth2', start: `(n^${p}+${a}^n)/${b}^n`, value: '0',
     lines: [
-      E(`n^${p}/${b}^n+(${a}/${b})^n`, 'Séparer la fraction', 'simplify', 'simplify'),
-      E('0', `Croissances comparées, et 0 < ${a}/${b} < 1`, 'log', 'growth'),
+      E(`n^${p}/${b}^n+(${a}/${b})^n`, t('Séparer la fraction'), 'simplify', 'simplify'),
+      E('0', t('Croissances comparées, et 0 < {a}/{b} < 1', { a, b }), 'log', 'growth'),
     ],
     blank: [0, [`${a}/${b}`]],
-    method: `Sépare en deux fractions : nᵖ/${b}ⁿ → 0 (croissances comparées) et (${a}/${b})ⁿ → 0.`,
+    method: t('Sépare en deux fractions : nᵖ/{b}ⁿ → 0 (croissances comparées) et ({a}/{b})ⁿ → 0.', { a, b }),
     choice: [
-      { id: 'split', label: 'Séparer en deux fractions', valid: true },
-      { id: 'poly', label: `Diviser en haut et en bas par n^${p}`, valid: false, rule: 'a1_dominant_term_wrong', why: 'Les exponentielles dominent les puissances : n^p n\'est pas le terme dominant.' },
+      { id: 'split', label: t('Séparer en deux fractions'), valid: true },
+      { id: 'poly', label: t('Diviser en haut et en bas par {p}', { p: `n^${p}` }), valid: false, rule: 'a1_dominant_term_wrong', why: t('Les exponentielles dominent les puissances : n^p n\'est pas le terme dominant.') },
     ],
     wrong: [{ text: '+∞', rule: 'a1_dominant_term_wrong' }, { text: '1' }, { text: N(q(a, b)) }, { text: '-∞' }],
   };
@@ -620,10 +628,10 @@ function slData(rng, kinds, { finite = false } = {}) {
   }
   return d || {
     kind: 'sqrt', start: '√(n^2+4n)-n', value: '2', fallback: true,
-    lines: [E('(n^2+4n-n^2)/(√(n^2+4n)+n)', 'Quantité conjuguée', 'simplify', 'conj'), E('4n/(√(n^2+4n)+n)', 'Simplifier', 'simplify', 'simplify'),
-      E('4/(√(1+4/n)+1)', 'Diviser par n', 'simplify', 'factor'), E('2', 'Passer à la limite', 'limit', 'limit')],
-    blank: [1, ['4n']], method: '∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée.',
-    choice: [{ id: 'conj', label: 'Quantité conjuguée', valid: true }, { id: 'factor', label: 'Mettre n en facteur', valid: false, why: '∞ · 0, encore indéterminé.' }],
+    lines: [E('(n^2+4n-n^2)/(√(n^2+4n)+n)', t('Quantité conjuguée'), 'simplify', 'conj'), E('4n/(√(n^2+4n)+n)', t('Simplifier'), 'simplify', 'simplify'),
+      E('4/(√(1+4/n)+1)', t('Diviser par n'), 'simplify', 'factor'), E('2', t('Passer à la limite'), 'limit', 'limit')],
+    blank: [1, ['4n']], method: t('∞ − ∞ avec une racine : multiplie et divise par la quantité conjuguée.'),
+    choice: [{ id: 'conj', label: t('Quantité conjuguée'), valid: true }, { id: 'factor', label: t('Mettre n en facteur'), valid: false, why: t('∞ · 0, encore indéterminé.') }],
     wrong: [{ text: '0', rule: 'a1_indet_inf_minus_inf' }, { text: '+∞', rule: 'a1_sqrt_sum_split' }, { text: '4' }],
   };
 }
@@ -633,12 +641,12 @@ function slLines(level, rng, opts = {}) {
   const d = slData(rng, level === 1 ? SL_KINDS.filter((k) => k !== 'cbrt') : SL_KINDS, { finite: true });
   const lines = [...d.lines];
   if (level === 1) lines[d.blank[0]] = blanked(lines[d.blank[0]], d.blank[1], V);
-  const parts = [{ start: d.start, judge: LIM, lines, pre: level === 2 ? [{ kind: 'decision', prompt: 'Quelle transformation ?', options: d.choice }] : [] }];
+  const parts = [{ start: d.start, judge: LIM, lines, pre: level === 2 ? [{ kind: 'decision', prompt: t('Quelle transformation ?'), options: d.choice }] : [] }];
   if (level === 1) parts[0].pre = [{ kind: 'note', html: d.method }];
   const { start, judge, script } = partsScript(parts, level, SL_CHOICES);
   return linesItem({
     skill: SL, level, mode: modeOf(level), start, judge, script,
-    prompt: `Calcule la limite de la suite aₙ = ${MT(d.start, V)}.`,
+    prompt: t('Calcule la limite de la suite aₙ = {a}.', { a: MT(d.start, V) }),
     hints: H(d.method, `= ${MT(d.lines[0].math, V)}`, `${MT(d.lines.at(-2)?.math ?? d.lines[0].math, V)} → ${MT(d.value)}`),
     noHints: level === 5, subgoals: SL_SUB, keys: ['calc', 'calcfn', 'seq'], tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['n'] }, key: `${SL}:${level}:${d.start}`, exam: false, fallback: !!d.fallback,
@@ -647,7 +655,7 @@ function slLines(level, rng, opts = {}) {
 
 function slMcq(rng, level, opts = {}) {
   const d = slData(rng, SL_KINDS);
-  const show = (t) => (t === '+∞' ? '+∞' : t === '-∞' ? '−∞' : MT(t));
+  const show = (x) => (x === '+∞' ? '+∞' : x === '-∞' ? '−∞' : MT(x));
   const options = [{ html: show(d.value), correct: true }];
   for (const w of d.wrong) {
     if (options.length >= 4) break;
@@ -667,38 +675,38 @@ function slTf(rng) {
   const T = (o) => tfItem({ skill: SL, level: 4, exam: { format: 'tf', points: 1 }, ...o });
   if (kind === 'quot') {
     return T({
-      statement: 'Si (aₙ) et (bₙ) convergent et bₙ ≠ 0 pour tout n, alors (aₙ/bₙ) converge.', truth: false, key: 'quot', ruleIfTrue: 'a1_lim_quotient_bn_nonzero',
-      counter: { kind: 'sequence', v: 'n', from: 1, seqs: ['a', 'b'], hyp: [{ p: 'converges', of: 'a', say: '(aₙ) converge' }, { p: 'converges', of: 'b', say: '(bₙ) converge' }], concl: { p: 'converges', of: 'a/b', say: '(aₙ/bₙ) converge' }, ask: [SEQ_ASK('a', 'aₙ ='), SEQ_ASK('b', 'bₙ =')], answer: { a: '1', b: '(-1)^n/n' } },
-      explanation: 'Faux : la règle du quotient demande lim bₙ ≠ 0. aₙ = 1 et bₙ = (−1)ⁿ/n → 0 donnent aₙ/bₙ = (−1)ⁿ·n, sans limite.',
+      statement: t('Si (aₙ) et (bₙ) convergent et bₙ ≠ 0 pour tout n, alors (aₙ/bₙ) converge.'), truth: false, key: 'quot', ruleIfTrue: 'a1_lim_quotient_bn_nonzero',
+      counter: { kind: 'sequence', v: 'n', from: 1, seqs: ['a', 'b'], hyp: [{ p: 'converges', of: 'a', say: t('(aₙ) converge') }, { p: 'converges', of: 'b', say: t('(bₙ) converge') }], concl: { p: 'converges', of: 'a/b', say: t('(aₙ/bₙ) converge') }, ask: [SEQ_ASK('a', 'aₙ ='), SEQ_ASK('b', 'bₙ =')], answer: { a: '1', b: '(-1)^n/n' } },
+      explanation: t('Faux : la règle du quotient demande lim bₙ ≠ 0. aₙ = 1 et bₙ = (−1)ⁿ/n → 0 donnent aₙ/bₙ = (−1)ⁿ·n, sans limite.'),
     });
   }
   if (kind === 'unb') {
     return T({
-      statement: 'Si (aₙ) est à termes strictement positifs et n\'est pas majorée, alors aₙ → +∞.', truth: false, key: 'unb',
-      counter: { kind: 'sequence', v: 'n', from: 1, hyp: [{ p: 'positive', say: 'la suite est à termes strictement positifs' }, { p: 'unbounded', say: 'la suite n\'est pas majorée' }], concl: { p: 'toInf' }, ask: [SEQ_ASK('a', 'aₙ =')], answer: { a: 'n(1+(-1)^n)+1' } },
-      explanation: 'Faux : aₙ = n(1 + (−1)ⁿ) + 1 vaut 1 pour n impair et 2n + 1 pour n pair : elle n\'est pas majorée, mais ne tend pas vers +∞.',
+      statement: t('Si (aₙ) est à termes strictement positifs et n\'est pas majorée, alors aₙ → +∞.'), truth: false, key: 'unb',
+      counter: { kind: 'sequence', v: 'n', from: 1, hyp: [{ p: 'positive', say: t('la suite est à termes strictement positifs') }, { p: 'unbounded', say: t('la suite n\'est pas majorée') }], concl: { p: 'toInf' }, ask: [SEQ_ASK('a', 'aₙ =')], answer: { a: 'n(1+(-1)^n)+1' } },
+      explanation: t('Faux : aₙ = n(1 + (−1)ⁿ) + 1 vaut 1 pour n impair et 2n + 1 pour n pair : elle n\'est pas majorée, mais ne tend pas vers +∞.'),
     });
   }
   if (kind === 'cos') {
     return T({
-      statement: 'Si bₙ = cos(aₙ) converge, alors (aₙ) converge.', truth: false, key: 'cos',
-      counter: { kind: 'sequence', v: 'n', from: 1, hyp: [{ p: 'converges', of: 'cos(a)', say: 'cos(aₙ) converge' }], concl: { p: 'converges' }, ask: [SEQ_ASK('a', 'aₙ =')], answer: { a: '2πn' } },
-      explanation: 'Faux : aₙ = 2πn → +∞, mais cos(aₙ) = 1 pour tout n.',
+      statement: t('Si bₙ = cos(aₙ) converge, alors (aₙ) converge.'), truth: false, key: 'cos',
+      counter: { kind: 'sequence', v: 'n', from: 1, hyp: [{ p: 'converges', of: 'cos(a)', say: t('cos(aₙ) converge') }], concl: { p: 'converges' }, ask: [SEQ_ASK('a', 'aₙ =')], answer: { a: '2πn' } },
+      explanation: t('Faux : aₙ = 2πn → +∞, mais cos(aₙ) = 1 pour tout n.'),
     });
   }
   if (kind === 'prod') {
     return T({
-      statement: 'Si (aₙ) converge et (bₙ) est bornée, alors (aₙbₙ) converge.', truth: false, key: 'prod',
-      counter: { kind: 'sequence', v: 'n', from: 1, seqs: ['a', 'b'], hyp: [{ p: 'converges', of: 'a', say: '(aₙ) converge' }, { p: 'bounded', of: 'b', say: '(bₙ) est bornée' }], concl: { p: 'converges', of: 'a×b', say: '(aₙbₙ) converge' }, ask: [SEQ_ASK('a', 'aₙ ='), SEQ_ASK('b', 'bₙ =')], answer: { a: '1', b: '(-1)^n' } },
-      explanation: 'Faux : aₙ = 1 et bₙ = (−1)ⁿ. C\'est vrai seulement si aₙ → 0.',
+      statement: t('Si (aₙ) converge et (bₙ) est bornée, alors (aₙbₙ) converge.'), truth: false, key: 'prod',
+      counter: { kind: 'sequence', v: 'n', from: 1, seqs: ['a', 'b'], hyp: [{ p: 'converges', of: 'a', say: t('(aₙ) converge') }, { p: 'bounded', of: 'b', say: t('(bₙ) est bornée') }], concl: { p: 'converges', of: 'a×b', say: t('(aₙbₙ) converge') }, ask: [SEQ_ASK('a', 'aₙ ='), SEQ_ASK('b', 'bₙ =')], answer: { a: '1', b: '(-1)^n' } },
+      explanation: t('Faux : aₙ = 1 et bₙ = (−1)ⁿ. C\'est vrai seulement si aₙ → 0.'),
     });
   }
   if (kind === 'mul') {
     const a = rng.int(-4, 5);
     const b = rng.int(2, 6);
-    return T({ statement: `Si aₙ → ${frT(a)} et bₙ → ${b}, alors aₙbₙ → ${frT(a * b)}.`, truth: true, key: `mul:${a}:${b}`, explanation: 'Vrai : la limite d\'un produit de suites convergentes est le produit des limites.' });
+    return T({ statement: t('Si aₙ → {a} et bₙ → {b}, alors aₙbₙ → {ab}.', { a: frT(a), b, ab: frT(a * b) }), truth: true, key: `mul:${a}:${b}`, explanation: t('Vrai : la limite d\'un produit de suites convergentes est le produit des limites.') });
   }
-  return T({ statement: 'Si aₙ → 0 et (bₙ) est bornée, alors aₙbₙ → 0.', truth: true, key: 'zero', explanation: 'Vrai : |aₙbₙ| ≤ M·|aₙ| → 0 (gendarmes).' });
+  return T({ statement: t('Si aₙ → 0 et (bₙ) est bornée, alors aₙbₙ → 0.'), truth: true, key: 'zero', explanation: t('Vrai : |aₙbₙ| ≤ M·|aₙ| → 0 (gendarmes).') });
 }
 
 function seqLimits(level, rng, profile, opts = {}) {

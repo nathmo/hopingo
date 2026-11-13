@@ -14,6 +14,7 @@ import { Interp, errorOf, runProgram } from './interp.js';
 import { parseExpr } from './parser.js';
 import { repr, isNum, toF, isInt } from './builtins.js';
 import { PyError } from './lexer.js';
+import { t as tr } from '../i18n.js';
 
 export { runProgram, Interp, PyError };
 export const show = (v) => repr(v);
@@ -71,7 +72,7 @@ export function runTests({ prelude = '', source, tests, maxSteps = 200000 }) {
   const base = runProgram(source, { prelude, maxSteps });
   if (!base.ok) {
     const e = base.error;
-    return { ok: false, results, error: e, failed: { n: 0, text: e.kind === 'limit' ? e.message : `Erreur ${e.line ? `ligne ${e.line}` : ''} : ${e.message}`.replace('Erreur  :', 'Erreur :') } };
+    return { ok: false, results, error: e, failed: { n: 0, text: e.kind === 'limit' ? e.message : e.line ? tr('Erreur ligne {line} : {message}', { line: e.line, message: e.message }) : tr('Erreur : {message}', { message: e.message }) } };
   }
   let failed = null;
   tests.forEach((t, k) => {
@@ -91,16 +92,17 @@ export function runTests({ prelude = '', source, tests, maxSteps = 200000 }) {
       got = it.evalSource(t.expr);
     } catch (e) {
       const err = errorOf(e);
-      const where = err.line && err.line < 10000 ? ` (ligne ${err.line})` : '';
       const text = err.kind === 'limit'
-        ? `Test ${n} : ${t.expr} — ${err.message}`
-        : `Test ${n} : ${t.expr} — erreur${where} : ${err.message}`;
+        ? tr('Test {n} : {expr} — {message}', { n, expr: t.expr, message: err.message })
+        : err.line && err.line < 10000
+          ? tr('Test {n} : {expr} — erreur (ligne {line}) : {message}', { n, expr: t.expr, line: err.line, message: err.message })
+          : tr('Test {n} : {expr} — erreur : {message}', { n, expr: t.expr, message: err.message });
       results.push({ n, expr: t.expr, ok: false, error: err, text });
       failed ||= results[results.length - 1];
       return;
     }
     const ok = sameValue(got, want, { tol: t.tol ?? 1e-9, atol: t.atol ?? 0 });
-    const text = ok ? '' : `Test ${n} : ${t.expr} donne ${brief(got)}, attendu ${brief(want)}`;
+    const text = ok ? '' : tr('Test {n} : {expr} donne {got}, attendu {want}', { n, expr: t.expr, got: brief(got), want: brief(want) });
     results.push({ n, expr: t.expr, got, expect: want, ok, text });
     if (!ok) failed ||= results[results.length - 1];
   });

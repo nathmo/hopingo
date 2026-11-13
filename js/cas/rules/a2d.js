@@ -25,6 +25,7 @@ import { toMathML } from '../mathml.js';
 import { walk, replaceAt, stripParen, dependsOn, mapNode, add, sub, mul, sym } from '../ast.js';
 import { diff, substVar } from '../diff.js';
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(typeof n === 'string' ? parse(n, { vars: ['x', 'y', 'z', 't'] }) : n));
 const par = (e) => ({ t: 'paren', e });
@@ -70,7 +71,7 @@ const fromCfg = (ctx, key) => {
 
 export const DEFS = {
   a2_implicit_sign: {
-    name: 'Signe moins oublié dans g′ = −F_x/F_y',
+    name: t('Signe moins oublié dans g′ = −F_x/F_y'),
     judges: ['value'],
     check: { judge: { kind: 'value', expect: '-3/4', imp: { role: 'first', num: '3', den: '4', var: 'y', value: '-3/4', others: [] } }, prev: '-F_x/F_y', line: '3/4' },
     transform: (prev, ctx) => {
@@ -78,10 +79,10 @@ export const DEFS = {
       if (m?.role !== 'first' || qOf(m.num).n === 0) return [];
       return [{ node: num(qOf(m.num).div(qOf(m.den))), ctx: { valeur: fr(m.value), var: m.var } }];
     },
-    explain: (ctx = {}) => `Dérive F = 0 le long de la fonction implicite : F_x + F_${ctx.var || 'y'}·g′ = 0, donc g′ = −F_x/F_${ctx.var || 'y'}${ctx.valeur ? ` = ${ctx.valeur}` : ''}. Le signe moins vient de ce passage de l'autre côté.`,
+    explain: (ctx = {}) => t('Dérive F = 0 le long de la fonction implicite : F_x + F_{v}·g′ = 0, donc g′ = −F_x/F_{v}{val}. Le signe moins vient de ce passage de l\'autre côté.', { v: ctx.var || 'y', val: ctx.valeur ? ` = ${ctx.valeur}` : '' }),
   },
   a2_implicit_inverted: {
-    name: 'Fraction −F_x/F_y inversée',
+    name: t('Fraction −F_x/F_y inversée'),
     judges: ['value'],
     check: { judge: { kind: 'value', expect: '-3/4', imp: { role: 'first', num: '3', den: '4', var: 'y', value: '-3/4', others: [] } }, prev: '-F_x/F_y', line: '-4/3' },
     transform: (prev, ctx) => {
@@ -89,10 +90,10 @@ export const DEFS = {
       if (m?.role !== 'first' || qOf(m.num).n === 0) return [];
       return [{ node: num(qOf(m.den).div(qOf(m.num)).neg()), ctx: { var: m.var } }];
     },
-    explain: (ctx = {}) => `Au dénominateur : la dérivée de la variable qui devient la fonction, ici ${ctx.var || 'y'}. g′ = −F_x/F_${ctx.var || 'y'}, pas −F_${ctx.var || 'y'}/F_x.`,
+    explain: (ctx = {}) => t('Au dénominateur : la dérivée de la variable qui devient la fonction, ici {v}. g′ = −F_x/F_{v}, pas −F_{v}/F_x.', { v: ctx.var || 'y' }),
   },
   a2_implicit_second_const: {
-    name: 'g″ calculée en gardant y constant',
+    name: t('g″ calculée en gardant y constant'),
     judges: ['value', 'equiv'],
     check: {
       judge: { kind: 'equiv', vars: ['x', 'y', 'p', 'q'], implicit: { y: 'p', p: 'q' }, target: 'no-prime', domain: { x: [-2, 2], y: [-2, 2], p: [-2, 2], q: [-2, 2] } },
@@ -115,10 +116,10 @@ export const DEFS = {
       });
       return changed ? [{ node, ctx: { var: w } }] : [];
     },
-    explain: (ctx = {}) => `${ctx.var || 'y'} = g(x) dépend de x : en dérivant F_x + F_${ctx.var || 'y'}·p, chaque terme en ${ctx.var || 'y'} donne aussi sa dérivée par rapport à ${ctx.var || 'y'}, fois p = g′ (règle de chaîne).`,
+    explain: (ctx = {}) => t('{v} = g(x) dépend de x : en dérivant F_x + F_{v}·p, chaque terme en {v} donne aussi sa dérivée par rapport à {v}, fois p = g′ (règle de chaîne).', { v: ctx.var || 'y' }),
   },
   a2_implicit_wrong_var: {
-    name: 'Mauvaise dérivée au dénominateur (3 variables)',
+    name: t('Mauvaise dérivée au dénominateur (3 variables)'),
     judges: ['value'],
     check: { judge: { kind: 'value', expect: '-10/3', imp: { role: 'first', num: '10', den: '3', var: 'z', value: '-10/3', others: [{ v: 'x', value: '-4' }] } }, prev: '-F_y/F_z', line: '5/2' },
     transform: (prev, ctx) => {
@@ -126,10 +127,12 @@ export const DEFS = {
       if (m?.role !== 'first') return [];
       return (m.others || []).filter((o) => qOf(o.value).n !== 0).map((o) => ({ node: num(qOf(m.num).div(qOf(o.value)).neg()), ctx: { var: m.var, autre: o.v } }));
     },
-    explain: (ctx = {}) => `La fonction est ${ctx.var || 'z'} = g(…) : c'est F_${ctx.var || 'z'} qui va au dénominateur${ctx.autre ? `, pas F_${ctx.autre}` : ''}.`,
+    explain: (ctx = {}) => (ctx.autre
+      ? t('La fonction est {v} = g(…) : c\'est F_{v} qui va au dénominateur, pas F_{autre}.', { v: ctx.var || 'z', autre: ctx.autre })
+      : t('La fonction est {v} = g(…) : c\'est F_{v} qui va au dénominateur.', { v: ctx.var || 'z' })),
   },
   a2_leibniz_wrong_var: {
-    name: 'Intégrande dérivée par rapport à x',
+    name: t('Intégrande dérivée par rapport à x'),
     judges: ['equiv'],
     check: { judge: { kind: 'equiv', vars: ['x', 't'], domain: { x: [0, 1], t: [0.5, 2] }, target: 'no-prime' }, prev: 'pd(arctan(t x),t)', line: 't/(1+t^2x^2)' },
     transform: (prev) => [
@@ -142,7 +145,7 @@ export const DEFS = {
     ],
   },
   a2_leibniz_no_integral: {
-    name: 'Règle de Leibniz sans l\'intégrale de ∂f/∂t',
+    name: t('Règle de Leibniz sans l\'intégrale de ∂f/∂t'),
     judges: ['equiv'],
     check: {
       judge: { kind: 'equiv', vars: ['t'], domain: { t: [0.3, 2] }, target: 'no-int', goal: '(2+2cos(t^2)-4cos(t^4))/t' },
@@ -156,10 +159,10 @@ export const DEFS = {
       }),
       ...fromCfg(ctx, 'noInt'),
     ],
-    explain: (ctx = {}) => `t est aussi dans l'intégrande : il manque le 3e terme, ∫ ∂f/∂t dx${ctx.terme ? ` = ${ctx.terme}` : ''}. Les bornes ne donnent que les deux premiers.`,
+    explain: (ctx = {}) => t('t est aussi dans l\'intégrande : il manque le 3e terme, ∫ ∂f/∂t dx{val}. Les bornes ne donnent que les deux premiers.', { val: ctx.terme ? ` = ${ctx.terme}` : '' }),
   },
   a2_leibniz_sign: {
-    name: 'Signe du terme de la borne du bas',
+    name: t('Signe du terme de la borne du bas'),
     judges: ['equiv'],
     check: {
       judge: { kind: 'equiv', vars: ['t'], domain: { t: [0.3, 2] }, target: 'no-int', goal: '(2+2cos(t^2)-4cos(t^4))/t' },
@@ -173,6 +176,6 @@ export const DEFS = {
       }),
       ...fromCfg(ctx, 'sign'),
     ],
-    explain: () => 'La borne du bas compte avec un signe moins : ∫ₐᵇ = F(b) − F(a), donc le terme f(a(t), t)·a′(t) est retranché.',
+    explain: () => t('La borne du bas compte avec un signe moins : ∫ₐᵇ = F(b) − F(a), donc le terme f(a(t), t)·a′(t) est retranché.'),
   },
 };

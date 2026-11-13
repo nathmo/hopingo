@@ -13,6 +13,7 @@ import {
   num, lit, neg, add, sub, mul, div, pow, sqrt, fn, deriv, numValue, dependsOn, mapNode, contains,
   stripParen, canonFn,
 } from './ast.js';
+import { t as tr } from '../i18n.js';
 
 const paren = (e) => (e.t === 'bin' || e.t === 'neg' ? { t: 'paren', e } : e);
 
@@ -174,7 +175,7 @@ export function diff(node, v = 'x', hooks = {}) {
     case 'int': {
       if (!node.lo) {
         if (node.v === v) return node.e;
-        throw new Error('Intégrale par rapport à une autre variable');
+        throw new Error(tr('Intégrale par rapport à une autre variable'));
       }
       const at = (b) => substVar(node.e, node.v, b);
       const ends = sub(mul(at(node.hi), D(node.hi)), mul(at(node.lo), D(node.lo)));
@@ -185,7 +186,7 @@ export function diff(node, v = 'x', hooks = {}) {
     }
     case 'bracket': return D(sub(substVar(node.e, node.v, node.hi), substVar(node.e, node.v, node.lo)));
     case 'side': return D(node.e);
-    default: throw new Error(`Je ne sais pas dériver ${node.t}`);
+    default: throw new Error(tr('Je ne sais pas dériver {t}', { t: node.t }));
   }
 }
 
@@ -198,7 +199,7 @@ function quotient(n, d, D, hooks, v) {
 
 function chain(node, D, hooks, v) {
   const outer = outerDerivative(node);
-  if (!outer) throw new Error('Fonction inconnue');
+  if (!outer) throw new Error(tr('Fonction inconnue'));
   const inner = innerOf(node);
   if (isVar(inner, v)) return outer;
   if (hooks.chain) return hooks.chain(outer, inner, D(inner), node);

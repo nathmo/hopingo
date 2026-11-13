@@ -9,6 +9,7 @@ import {
   q, cq, cT, cP, zMinus, rd, CM, resLabel, mathLabel, CV, P, resRat, checkRes, SG, L, chain, choice, opt,
   partsItem, problemItem, H, examTag, KEYS, pick,
 } from './cplx-b-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'c-res-theorem';
 const POOL = [cq(0), cq(1), cq(-1), cq(2), cq(-2), cq(3), cq(-3), cq(0, 1), cq(0, -1), cq(0, 2), cq(0, -2), cq(0), cq(1), cq(-1), cq(1, 1)];
@@ -39,6 +40,7 @@ function sqrtT(x) {
 }
 
 // The contours: {kind, text (screen), inside(z): 'in'|'out'|'on', dist(z)}.
+// `fr` is the French text, which the item keys are built from.
 function circle(c, R) {
   const Rf = R.valueOf();
   return {
@@ -49,16 +51,16 @@ function circle(c, R) {
 }
 function square(a) {
   return {
-    kind: 'square', a, html: `le carré de sommets ±${a} ± ${a}i`,
+    kind: 'square', a, html: t('le carré de sommets ±{a} ± {a}i', { a }), fr: `le carré de sommets ±${a} ± ${a}i`,
     where(z) { const x = Math.abs(z.re.valueOf()); const y = Math.abs(z.im.valueOf()); const m = Math.max(x, y); return Math.abs(m - a) < 0.2 ? 'on' : m < a ? 'in' : 'out'; },
-    ctx(z) { return { z: rd(cT(z)), d: 'hors du carré', R: String(a) }; },
+    ctx(z) { return { z: rd(cT(z)), d: t('hors du carré'), R: String(a) }; },
   };
 }
 function ellipse(a, b) {
   return {
-    kind: 'ellipse', a, b, html: `l'ellipse x²/${a * a} + y²/${b * b} = 1`,
+    kind: 'ellipse', a, b, html: t('l\'ellipse x²/{a} + y²/{b} = 1', { a: a * a, b: b * b }), fr: `l'ellipse x²/${a * a} + y²/${b * b} = 1`,
     where(z) { const x = z.re.valueOf(); const y = z.im.valueOf(); const r = Math.sqrt((x * x) / (a * a) + (y * y) / (b * b)); return Math.abs(r - 1) < 0.12 ? 'on' : r < 1 ? 'in' : 'out'; },
-    ctx(z) { return { z: rd(cT(z)), d: 'hors de l\'ellipse', R: `${a} et ${b}` }; },
+    ctx(z) { return { z: rd(cT(z)), d: t('hors de l\'ellipse'), R: t('{a} et {b}', { a, b }) }; },
   };
 }
 
@@ -91,7 +93,7 @@ function thmData(rng, { big = false } = {}) {
     const num = P.deg(N) === 0 ? cT(N[0]) : `(${P.deg(N) ? pTsimple(N) : cT(N[0])})`;
     const den = poles.map((p, i) => (mult[i] === 2 ? `(${zMinus(p)})^2` : (p.isZero() ? 'z' : `(${zMinus(p)})`))).join('');
     const f = `${num}/(${den})`;
-    return { poles, mult, N, D, f, Gamma, where, ins, outs, res, S, Sall, id: `${f}|${Gamma.html}` };
+    return { poles, mult, N, D, f, Gamma, where, ins, outs, res, S, Sall, id: `${f}|${Gamma.fr ?? Gamma.html}` };
   }
   return null;
 }
@@ -110,7 +112,7 @@ function subText(d, i) {
   return `${cP(P.ev(d.N, p))}/(${fs.join('')})`;
 }
 
-const SUBS = [SG('locate', 'singularités à l\'intérieur de Γ', 'c-cauchy-thm'), SG('residue-s', 'résidu en un pôle simple', 'c-res-simple'), SG('residue-m', 'résidu en un pôle double', 'c-res-multiple'), SG('sum', '∮ = 2πi Σ Res', SK)];
+const SUBS = [SG('locate', t('singularités à l\'intérieur de Γ'), 'c-cauchy-thm'), SG('residue-s', t('résidu en un pôle simple'), 'c-res-simple'), SG('residue-m', t('résidu en un pôle double'), 'c-res-multiple'), SG('sum', '∮ = 2πi Σ Res', SK)];
 
 function thmParts(d, level, { title = '' } = {}) {
   const parts = [];
@@ -125,16 +127,16 @@ function thmParts(d, level, { title = '' } = {}) {
   const decisions = d.poles.map((p, i) => ({
     kind: 'decision', prompt: `z = ${rd(cT(p))} :`, levels: [2, 3],
     options: [
-      { id: 'in', label: 'à l\'intérieur de Γ', valid: d.where[i] === 'in', rule: d.where[i] === 'in' ? undefined : 'c_pole_outside_counted', why: d.where[i] === 'in' ? undefined : `${rd(cT(p))} est hors de Γ : il ne compte pas.` },
-      { id: 'out', label: 'à l\'extérieur de Γ', valid: d.where[i] === 'out', why: d.where[i] === 'out' ? undefined : `${rd(cT(p))} est à l'intérieur de Γ.` },
-      { id: 'on', label: 'sur Γ', valid: false, rule: 'c_pole_on_contour', why: `${rd(cT(p))} n'est pas sur Γ (sinon l'intégrale ne serait pas définie).` },
+      { id: 'in', label: t('à l\'intérieur de Γ'), valid: d.where[i] === 'in', rule: d.where[i] === 'in' ? undefined : 'c_pole_outside_counted', why: d.where[i] === 'in' ? undefined : t('{a} est hors de Γ : il ne compte pas.', { a: rd(cT(p)) }) },
+      { id: 'out', label: t('à l\'extérieur de Γ'), valid: d.where[i] === 'out', why: d.where[i] === 'out' ? undefined : t('{a} est à l\'intérieur de Γ.', { a: rd(cT(p)) }) },
+      { id: 'on', label: t('sur Γ'), valid: false, rule: 'c_pole_on_contour', why: t('{a} n\'est pas sur Γ (sinon l\'intégrale ne serait pas définie).', { a: rd(cT(p)) }) },
     ],
   }));
   const MENU = [
-    { id: 'loc', label: 'Garder les pôles à l\'intérieur de Γ', valid: true },
-    { id: 'res', label: 'Calculer le résidu (formule du pôle)', valid: true },
-    { id: 'sum', label: 'Multiplier la somme des résidus intérieurs par 2πi', valid: true },
-    { id: 'all', label: 'Additionner les résidus de tous les pôles', valid: false, rule: 'c_pole_outside_counted', why: 'Seuls les pôles à l\'intérieur de Γ comptent.' },
+    { id: 'loc', label: t('Garder les pôles à l\'intérieur de Γ'), valid: true },
+    { id: 'res', label: t('Calculer le résidu (formule du pôle)'), valid: true },
+    { id: 'sum', label: t('Multiplier la somme des résidus intérieurs par 2πi'), valid: true },
+    { id: 'all', label: t('Additionner les résidus de tous les pôles'), valid: false, rule: 'c_pole_outside_counted', why: t('Seuls les pôles à l\'intérieur de Γ comptent.') },
   ];
   d.ins.forEach((i, k) => {
     const p = d.poles[i];
@@ -142,32 +144,32 @@ function thmParts(d, level, { title = '' } = {}) {
     const sg = d.mult[i] === 2 ? 'residue-m' : 'residue-s';
     const lines = d.mult[i] === 2 ? [cT(d.res[i])] : chain(J, [subText(d, i), cT(d.res[i])]);
     parts.push({
-      html: k === 0 ? title : `Résidu en ${CM(cT(p))} :`, ask: 'Res =', start: J.label, judge: J, menu: MENU,
+      html: k === 0 ? title : t('Résidu en {a} :', { a: CM(cT(p)) }), ask: 'Res =', start: J.label, judge: J, menu: MENU,
       decisions: k === 0 ? decisions : [],
-      lines: lines.map((t, j) => L(t, d.mult[i] === 2 ? 'Pôle double : dériver (z − z₀)² f' : j === lines.length - 1 ? 'Calculer' : 'Pôle simple : N(z₀)/Π(z₀ − z_j)', sg, { blank: [t] })),
+      lines: lines.map((tt, j) => L(tt, d.mult[i] === 2 ? t('Pôle double : dériver (z − z₀)² f') : j === lines.length - 1 ? t('Calculer') : t('Pôle simple : N(z₀)/Π(z₀ − z_j)'), sg, { blank: [tt] })),
     });
   });
   const JS = CV(mathLabel('∮_Γ f(z) dz', '<msub><mo>∮</mo><mi>Γ</mi></msub><mi>f</mi><mo>(</mo><mi>z</mi><mo>)</mo><mi>d</mi><mi>z</mi>'), value, { traps });
   const sumLines = chain(JS, [`2πi(${sumT})`, value]);
   parts.push({
-    html: 'Théorème des résidus :', ask: '∮ =', start: JS.label, judge: JS, menu: MENU,
-    lines: sumLines.map((t, j) => L(t, j === sumLines.length - 1 ? 'Calculer' : `Pôles intérieurs : ${d.ins.map((i) => rd(cT(d.poles[i]))).join(', ')}`, j === sumLines.length - 1 ? 'sum' : 'locate', { blank: [t] })),
+    html: t('Théorème des résidus :'), ask: '∮ =', start: JS.label, judge: JS, menu: MENU,
+    lines: sumLines.map((tt, j) => L(tt, j === sumLines.length - 1 ? t('Calculer') : t('Pôles intérieurs : {a}', { a: d.ins.map((i) => rd(cT(d.poles[i]))).join(', ') }), j === sumLines.length - 1 ? 'sum' : 'locate', { blank: [tt] })),
   });
   return parts;
 }
 
-const prompt = (d) => `Calcule ∮_Γ f(z) dz pour f(z) = ${CM(d.f)} et Γ = ${d.Gamma.kind === 'circle' ? `le cercle ${d.Gamma.html}` : d.Gamma.html}, parcouru une fois dans le sens positif.`;
+const prompt = (d) => t('Calcule ∮_Γ f(z) dz pour f(z) = {a} et Γ = {b}, parcouru une fois dans le sens positif.', { a: CM(d.f), b: d.Gamma.kind === 'circle' ? t('le cercle {html}', { html: d.Gamma.html }) : d.Gamma.html });
 
 function thmLines(level, rng, opts = {}) {
   const d = thmData(rng, { big: level === 5 }) || FALLBACK();
   d.ins.forEach((i) => checkRes(d.f, cT(d.poles[i]), cT(d.res[i])));
   const parts = thmParts(d, level);
   if (level === 1) {
-    parts[0].notes = [`Singularités : ${d.poles.map((p, i) => `${CM(cT(p))}${d.mult[i] === 2 ? ' (pôle double)' : ''}`).join(', ')}. À l'intérieur de Γ : ${d.ins.map((i) => CM(cT(d.poles[i]))).join(', ')} ; dehors : ${d.outs.map((i) => CM(cT(d.poles[i]))).join(', ')}.`];
+    parts[0].notes = [t('Singularités : {a}. À l\'intérieur de Γ : {b} ; dehors : {c}.', { a: d.poles.map((p, i) => `${CM(cT(p))}${d.mult[i] === 2 ? t(' (pôle double)') : ''}`).join(', '), b: d.ins.map((i) => CM(cT(d.poles[i]))).join(', '), c: d.outs.map((i) => CM(cT(d.poles[i]))).join(', ') })];
   }
   return partsItem({
     skill: SK, level, prompt: prompt(d), parts, keys: KEYS, subgoals: SUBS,
-    hints: H('Seuls les pôles à l\'intérieur de Γ comptent : compare leur distance au centre avec le rayon.', `∮ = 2πi (${d.ins.map((i) => `Res(f ; ${rd(cT(d.poles[i]))})`).join(' + ')})`, `${d.ins.map((i) => `Res(f ; ${CM(cT(d.poles[i]))}) = ${CM(cT(d.res[i]))}`).join(' ; ')}`),
+    hints: H(t('Seuls les pôles à l\'intérieur de Γ comptent : compare leur distance au centre avec le rayon.'), `∮ = 2πi (${d.ins.map((i) => `Res(f ; ${rd(cT(d.poles[i]))})`).join(' + ')})`, `${d.ins.map((i) => `Res(f ; ${CM(cT(d.poles[i]))}) = ${CM(cT(d.res[i]))}`).join(' ; ')}`),
     key: `${SK}:${level}:${d.id}`, exam: examTag(opts), fallback: !!d.fallback,
     baits: ['c_pole_outside_counted', 'c_residue_2pii'],
   });
@@ -182,7 +184,7 @@ const FALLBACK = () => {
 
 // Open (2022, 5 points): the same f on two contours.
 function thmOpen(level, rng, opts = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tt = 0; tt < 200; tt++) {
     const d1 = thmData(rng);
     if (!d1) continue;
     // A second circle with another set of inside poles.
@@ -195,11 +197,11 @@ function thmOpen(level, rng, opts = {}) {
     const S = ins.reduce((s, i) => s.add(d1.res[i]), cq(0));
     if (S.isZero() || S.eq(d1.Sall)) continue;
     const d2 = { ...d1, Gamma: G2, where, ins, outs, S };
-    const mk = (d, k) => partsItem({ skill: SK, level, prompt: `Contour Γ${k} = ${d.Gamma.kind === 'circle' ? `le cercle ${d.Gamma.html}` : d.Gamma.html}.`, parts: thmParts(d, 4), keys: KEYS, subgoals: SUBS, hints: [], key: `${SK}:o${k}:${d.id}` });
+    const mk = (d, k) => partsItem({ skill: SK, level, prompt: t('Contour Γ{k} = {a}.', { k, a: d.Gamma.kind === 'circle' ? t('le cercle {html}', { html: d.Gamma.html }) : d.Gamma.html }), parts: thmParts(d, 4), keys: KEYS, subgoals: SUBS, hints: [], key: `${SK}:o${k}:${d.id}` });
     d1.ins.forEach((i) => checkRes(d1.f, cT(d1.poles[i]), cT(d1.res[i])));
     return problemItem({
-      skill: SK, level, key: `${d1.id}|${G2.html}`, exam: opts.exam ? examTag(opts, 5) : false,
-      prompt: `Soit f(z) = ${CM(d1.f)}. Calcule ∮ f(z) dz sur deux contours parcourus dans le sens positif (format 2022, 5 points).`,
+      skill: SK, level, key: `${d1.id}|${G2.fr ?? G2.html}`, exam: opts.exam ? examTag(opts, 5) : false,
+      prompt: t('Soit f(z) = {a}. Calcule ∮ f(z) dz sur deux contours parcourus dans le sens positif (format 2022, 5 points).', { a: CM(d1.f) }),
       parts: [{ item: mk(d1, 1), points: 2.5, title: `Γ₁ : ${d1.Gamma.html}` }, { item: mk(d2, 2), points: 2.5, title: `Γ₂ : ${G2.html}` }],
     });
   }
@@ -219,10 +221,10 @@ function thmMcq(rng, opts) {
     const wrongs = pool.filter((x) => !x.zero).slice(0, 5 - rights.length);
     return choice({
       skill: SK, level: 4, key: `${SK}:mcq:multi:${rights.map((x) => x.f).join()}`, exam: examTag(opts, 2), multi: true, count: 5,
-      prompt: 'Pour quelles fonctions a-t-on ∮_{|z| = 1} f(z) dz = 0 (cercle parcouru une fois dans le sens positif) ? (plusieurs réponses possibles)',
+      prompt: t('Pour quelles fonctions a-t-on ∮_{|z| = 1} f(z) dz = 0 (cercle parcouru une fois dans le sens positif) ? (plusieurs réponses possibles)'),
       right: CM(rights[0].f), rights: rights.slice(1).map((x) => CM(x.f)),
       wrongs: wrongs.map((x) => opt(x.f, x.rule || null)),
-      solution: [{ html: 'La somme des résidus intérieurs est nulle pour les bonnes réponses ; 1/(z(z − 1)) et 1/(z + 1) ont un pôle sur le cercle : l\'intégrale n\'est pas définie.', note: '' }],
+      solution: [{ html: t('La somme des résidus intérieurs est nulle pour les bonnes réponses ; 1/(z(z − 1)) et 1/(z + 1) ont un pôle sur le cercle : l\'intégrale n\'est pas définie.'), note: '' }],
       expectedSec: 150,
     }, rng);
   }
@@ -235,7 +237,7 @@ function thmMcq(rng, opts) {
     right: CM(v), rightText: v,
     wrongs: [opt(twoPiI(d.Sall), 'c_pole_outside_counted'), opt(cT(d.S), 'c_residue_2pii'), opt(piC(d.S.mul(cq(0, 1))), 'c_residue_2pii'), opt(twoPiI(d.S.neg()))],
     fillers: [opt(twoPiI(d.S.mul(2))), opt('0')],
-    solution: [{ html: `Pôles intérieurs : ${d.ins.map((i) => CM(cT(d.poles[i]))).join(', ')} ; ∮ = 2πi × (${d.ins.map((i) => CM(cT(d.res[i]))).join(' + ')}) = ${CM(v)}.`, note: '' }],
+    solution: [{ html: t('Pôles intérieurs : {a} ; ∮ = 2πi × ({b}) = {c}.', { a: d.ins.map((i) => CM(cT(d.poles[i]))).join(', '), b: d.ins.map((i) => CM(cT(d.res[i]))).join(' + '), c: CM(v) }), note: '' }],
     expectedSec: 180,
   }, rng);
 }

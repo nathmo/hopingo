@@ -21,6 +21,7 @@ import {
   sqT, linT1, diffT, circleEq, circleRed, circleCompleted, par, parR, normVecs, lineRow, lineText, partsG, conicPlot,
 } from './coniques-a-kit.js';
 import { coefItem } from './alglin-kit.js';
+import { t } from '../../i18n.js';
 
 const KEYS = ['calc', 'geo', 'pts'];
 const Rd = (t) => readable(t).replace(/; − /g, '; −').replace(/\(− /g, '(−').replace(/= − /g, '= −').replace(/^− /, '−');
@@ -33,33 +34,33 @@ const sq = (x) => x * x;
 
 const CEQ = 'g10-circle-eq';
 const CEQ_SUB = [
-  { id: 'norm', label: 'normaliser l\'équation', skill: CEQ },
-  { id: 'sq', label: 'compléter les carrés', skill: 'quad-complete' },
-  { id: 'read', label: 'lire Ω et r', skill: CEQ },
-  { id: 'med', label: 'médiatrices', skill: 'g4-bisectors' },
+  { id: 'norm', label: t('normaliser l\'équation'), skill: CEQ },
+  { id: 'sq', label: t('compléter les carrés'), skill: 'quad-complete' },
+  { id: 'read', label: t('lire Ω et r'), skill: CEQ },
+  { id: 'med', label: t('médiatrices'), skill: 'g4-bisectors' },
 ];
 
 const CEQ_MENU = {
   sq: (m) => [
-    { id: 'norm', label: `Diviser par le coefficient de x²`, valid: m !== 1, why: 'Le coefficient de x² vaut déjà 1.' },
-    { id: 'sq', label: 'Compléter un carré en x et un en y', valid: true },
-    { id: 'read', label: 'Lire Ω = (−D/2 ; −E/2) tout de suite', valid: m === 1, rule: m === 1 ? null : 'g4_not_normalized', why: 'Le centre se lit sur une équation normalisée (1 devant x²) : divise d\'abord.' },
+    { id: 'norm', label: t('Diviser par le coefficient de x²'), valid: m !== 1, why: t('Le coefficient de x² vaut déjà 1.') },
+    { id: 'sq', label: t('Compléter un carré en x et un en y'), valid: true },
+    { id: 'read', label: t('Lire Ω = (−D/2 ; −E/2) tout de suite'), valid: m === 1, rule: m === 1 ? null : 'g4_not_normalized', why: t('Le centre se lit sur une équation normalisée (1 devant x²) : divise d\'abord.') },
   ],
   read: [
-    { id: 'read', label: 'Lire Ω sur la forme réduite (x − h)² + (y − k)² = r²', valid: true },
-    { id: 'sign', label: 'Ω = (−h ; −k)', valid: false, why: 'Dans (x − h)², le centre a pour abscisse h : (x − 2)² donne 2, (x + 3)² donne −3.' },
+    { id: 'read', label: t('Lire Ω sur la forme réduite (x − h)² + (y − k)² = r²'), valid: true },
+    { id: 'sign', label: 'Ω = (−h ; −k)', valid: false, why: t('Dans (x − h)², le centre a pour abscisse h : (x − 2)² donne 2, (x + 3)² donne −3.') },
   ],
   r: [
-    { id: 'root', label: 'r = √(second membre)', valid: true },
-    { id: 'same', label: 'r = second membre', valid: false, why: 'Le second membre de la forme réduite vaut r², pas r.' },
+    { id: 'root', label: t('r = √(second membre)'), valid: true },
+    { id: 'same', label: t('r = second membre'), valid: false, why: t('Le second membre de la forme réduite vaut r², pas r.') },
   ],
   med: [
-    { id: 'med', label: 'Médiatrice : PQ⃗·(M − I) = 0, avec I le milieu', valid: true },
-    { id: 'line', label: 'La droite (PQ)', valid: false, why: 'Le centre est à égale distance de P et de Q : il est sur la médiatrice, pas sur la droite (PQ).' },
+    { id: 'med', label: t('Médiatrice : PQ⃗·(M − I) = 0, avec I le milieu'), valid: true },
+    { id: 'line', label: t('La droite (PQ)'), valid: false, why: t('Le centre est à égale distance de P et de Q : il est sur la médiatrice, pas sur la droite (PQ).') },
   ],
   centre: [
-    { id: 'inter', label: 'Intersection des deux médiatrices', valid: true },
-    { id: 'mid', label: 'Milieu de [AB]', valid: false, why: 'Le milieu de [AB] n\'est le centre que si [AB] est un diamètre.' },
+    { id: 'inter', label: t('Intersection des deux médiatrices'), valid: true },
+    { id: 'mid', label: t('Milieu de [AB]'), valid: false, why: t('Le milieu de [AB] n\'est le centre que si [AB] est un diamètre.') },
   ],
 };
 
@@ -84,57 +85,57 @@ function ceqGeneral(level, rng, opts = {}) {
   const eqN = circleEq(h, k, r2, 1);
   const F = h * h + k * k - r2;
   const sqLines = [];
-  if (m !== 1) sqLines.push({ math: eqN, note: `Diviser par ${m}`, subgoal: 'norm' });
+  if (m !== 1) sqLines.push({ math: eqN, note: t('Diviser par {m}', { m }), subgoal: 'norm' });
   sqLines.push(
-    { math: circleCompleted(h, k, F), note: 'Compléter les carrés', subgoal: 'sq', blank: [{ after: sqT('x', h), text: qt(h * h) }, { after: sqT('y', k), text: qt(k * k) }].filter((b) => b.text !== '0') },
-    { math: circleRed(h, k, r2), note: 'Forme réduite', subgoal: 'sq', blank: [{ after: '=', text: qt(r2) }] },
+    { math: circleCompleted(h, k, F), note: t('Compléter les carrés'), subgoal: 'sq', blank: [{ after: sqT('x', h), text: qt(h * h) }, { after: sqT('y', k), text: qt(k * k) }].filter((b) => b.text !== '0') },
+    { math: circleRed(h, k, r2), note: t('Forme réduite'), subgoal: 'sq', blank: [{ after: '=', text: qt(r2) }] },
   );
   const parts = [{
     html: null, start: eq0,
     judge: r2 >= 0 ? { kind: 'geom', object: 'circle', ref: eqN, circleEq: eq0 } : { kind: 'conic', equation: eqN, target: 'standard' },
     menu: CEQ_MENU.sq(m),
     decisions: m !== 1 ? [{
-      levels: [2], kind: 'decision', prompt: 'Par quoi commencer ?', options: [
-        { id: 'div', label: `Diviser toute l'équation par ${m}`, valid: true, ref: true },
-        { id: 'read', label: 'Lire tout de suite Ω = (−D/2 ; −E/2)', valid: false, rule: 'g4_not_normalized', why: `Le centre se lit sur x² + y² + Dx + Ey + F = 0, avec 1 devant x² : ici il y a ${m}.` },
+      levels: [2], kind: 'decision', prompt: t('Par quoi commencer ?'), options: [
+        { id: 'div', label: t('Diviser toute l\'équation par {m}', { m }), valid: true, ref: true },
+        { id: 'read', label: t('Lire tout de suite Ω = (−D/2 ; −E/2)'), valid: false, rule: 'g4_not_normalized', why: t('Le centre se lit sur x² + y² + Dx + Ey + F = 0, avec 1 devant x² : ici il y a {m}.', { m }) },
       ],
     }] : [],
     lines: sqLines,
   }];
   if (r2 >= 0) {
     parts.push({
-      html: 'Le centre ?', ask: 'Ω =', start: 'Ω',
+      html: t('Le centre ?'), ask: 'Ω =', start: 'Ω',
       judge: { kind: 'vector', expect: vt([h, k]), circleEq: eq0 }, menu: CEQ_MENU.read,
       lines: [{ math: `Ω = ${vt([h, k])}`, note: '(x − h)² + (y − k)² = r² : Ω = (h ; k)', subgoal: 'read', blank: [qt(h), qt(k)] }],
     });
   }
   const nature = {
-    kind: 'decision', prompt: `r² = ${fq(r2)} : l'ensemble est…`, options: [
-      { id: 'circle', label: 'un cercle', valid: r2 > 0, ref: r2 > 0, why: r2 > 0 ? '' : 'Un rayon au carré ne peut pas être négatif ou nul.' },
-      { id: 'point', label: 'un seul point, Ω', valid: r2 === 0, ref: r2 === 0, why: 'Seul (x − h)² + (y − k)² = 0 réduit l\'ensemble au point Ω.' },
-      { id: 'empty', label: 'vide', valid: r2 < 0, ref: r2 < 0, why: r2 < 0 ? '' : 'Une somme de carrés peut valoir un nombre positif ou nul.' },
+    kind: 'decision', prompt: t('r² = {v1} : l\'ensemble est…', { v1: fq(r2) }), options: [
+      { id: 'circle', label: t('un cercle'), valid: r2 > 0, ref: r2 > 0, why: r2 > 0 ? '' : t('Un rayon au carré ne peut pas être négatif ou nul.') },
+      { id: 'point', label: t('un seul point, Ω'), valid: r2 === 0, ref: r2 === 0, why: t('Seul (x − h)² + (y − k)² = 0 réduit l\'ensemble au point Ω.') },
+      { id: 'empty', label: t('vide'), valid: r2 < 0, ref: r2 < 0, why: r2 < 0 ? '' : t('Une somme de carrés peut valoir un nombre positif ou nul.') },
     ],
   };
   if (r2 > 0) {
     parts.push({
-      html: 'Le rayon ?', ask: 'r =', start: 'r', judge: { kind: 'value', expect: String(Math.sqrt(r2)) }, menu: CEQ_MENU.r,
+      html: t('Le rayon ?'), ask: 'r =', start: 'r', judge: { kind: 'value', expect: String(Math.sqrt(r2)) }, menu: CEQ_MENU.r,
       decisions: [{ ...nature, levels: [2, 3] }],
       lines: [{ math: String(Math.sqrt(r2)), note: `r = √${r2}`, subgoal: 'read', blank: [String(Math.sqrt(r2))] }],
     });
   } else {
     parts.push({
-      html: 'Que vaut r² ?', ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r2) },
+      html: t('Que vaut r² ?'), ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r2) },
       decisions: [nature],
-      lines: [{ math: String(r2), note: 'Le second membre de la forme réduite', subgoal: 'read' }],
+      lines: [{ math: String(r2), note: t('Le second membre de la forme réduite'), subgoal: 'read' }],
     });
   }
   return partsG({
     skill: CEQ, level, parts, subgoals: CEQ_SUB, keys: KEYS,
     prompt: level <= 2 && r2 > 0
-      ? `Trouve le centre Ω et le rayon r du cercle γ : ${M(eq0)}.`
-      : `Mets γ : ${M(eq0)} sous forme réduite, puis donne son centre et son rayon (ou dis pourquoi ce n'est pas un cercle).`,
+      ? t('Trouve le centre Ω et le rayon r du cercle γ : {v1}.', { v1: M(eq0) })
+      : t('Mets γ : {v1} sous forme réduite, puis donne son centre et son rayon (ou dis pourquoi ce n\'est pas un cercle).', { v1: M(eq0) }),
     hints: H(
-      m !== 1 ? `Divise par ${m}, puis complète un carré en x et un en y.` : 'Complète un carré en x et un en y : x² − 2hx = (x − h)² − h².',
+      m !== 1 ? t('Divise par {m}, puis complète un carré en x et un en y.', { m }) : t('Complète un carré en x et un en y : x² − 2hx = (x − h)² − h².'),
       Rd(`${circleCompleted(h, k, F).replace(/- \d+ \+/, '- □ +')}`),
       Rd(circleRed(h, k, r2)),
     ),
@@ -161,11 +162,11 @@ function bisectorPart(P, Qp, names, html) {
   if (u[0]) terms.push(`${par(u[0])}(${dT('x', I[0])})`);
   if (u[1]) terms.push(`${par(u[1])}(${dT('y', I[1])})`);
   return {
-    html, ask: `médiatrice de [${names}] :`, start: 'm',
+    html, ask: t('médiatrice de [{names}] :', { names }), start: 'm',
     judge: { kind: 'geom', object: 'line2', ref: lineText(row) }, menu: CEQ_MENU.med,
     lines: [
-      ...(terms.length === 2 ? [{ math: `${terms.join(' + ')} = 0`, note: `${names[0]}${names[1]}⃗ = ${vr(u)}, milieu I = ${vr(I)}`, subgoal: 'med', blank: [qt(u[0]), qt(u[1])] }] : []),
-      { math: lineText(row), note: terms.length === 2 ? 'Forme cartésienne' : `${names[0]}${names[1]}⃗ = ${vr(u)}, milieu I = ${vr(I)}`, subgoal: 'med' },
+      ...(terms.length === 2 ? [{ math: `${terms.join(' + ')} = 0`, note: t('{v1}{v2}⃗ = {v3}, milieu I = {v4}', { v1: names[0], v2: names[1], v3: vr(u), v4: vr(I) }), subgoal: 'med', blank: [qt(u[0]), qt(u[1])] }] : []),
+      { math: lineText(row), note: terms.length === 2 ? t('Forme cartésienne') : t('{v1}{v2}⃗ = {v3}, milieu I = {v4}', { v1: names[0], v2: names[1], v3: vr(u), v4: vr(I) }), subgoal: 'med' },
     ],
   };
 }
@@ -175,30 +176,30 @@ function ceqThree(level, rng, opts = {}) {
   const { h, k, r, A, B, C } = d;
   const ref = circleEq(h, k, r * r);
   const parts = [
-    bisectorPart(A, B, 'AB', 'Le centre est à égale distance de A et de B : il est sur la médiatrice de [AB].'),
-    bisectorPart(A, C, 'AC', 'Et sur la médiatrice de [AC].'),
+    bisectorPart(A, B, 'AB', t('Le centre est à égale distance de A et de B : il est sur la médiatrice de [AB].')),
+    bisectorPart(A, C, 'AC', t('Et sur la médiatrice de [AC].')),
     {
-      html: 'Le centre est l\'intersection des deux médiatrices.', ask: 'Ω =', start: 'Ω',
+      html: t('Le centre est l\'intersection des deux médiatrices.'), ask: 'Ω =', start: 'Ω',
       judge: { kind: 'vector', expect: vt([h, k]) }, menu: CEQ_MENU.centre,
-      lines: [{ math: `Ω = ${vt([h, k])}`, note: 'Résoudre le système des deux médiatrices', subgoal: 'read', blank: [qt(h), qt(k)] }],
+      lines: [{ math: `Ω = ${vt([h, k])}`, note: t('Résoudre le système des deux médiatrices'), subgoal: 'read', blank: [qt(h), qt(k)] }],
     },
     {
-      html: 'Le rayon : r² = ΩA².', ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r * r) },
+      html: t('Le rayon : r² = ΩA².'), ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r * r) },
       lines: [
         { math: `(${qt(A[0])}-${par(h)})^2+(${qt(A[1])}-${par(k)})^2`, note: 'r² = (x_A − h)² + (y_A − k)²', subgoal: 'read', blank: [{ after: '(', text: qt(A[0]) }] },
         { math: String(r * r), note: '', subgoal: 'read' },
       ],
     },
     {
-      html: 'L\'équation du cercle.', ask: 'γ :', start: 'γ',
+      html: t('L\'équation du cercle.'), ask: 'γ :', start: 'γ',
       judge: { kind: 'geom', object: 'circle', ref },
       lines: [{ math: circleRed(h, k, r * r), note: '(x − h)² + (y − k)² = r²', subgoal: 'read', blank: [{ after: '=', text: qt(r * r) }] }],
     },
   ];
   return partsG({
     skill: CEQ, level, parts, subgoals: CEQ_SUB, keys: KEYS,
-    prompt: `Trouve l'équation du cercle qui passe par ${ptR('A', A)}, ${ptR('B', B)} et ${ptR('C', C)}.`,
-    hints: H('Le centre est à égale distance des trois points : il est sur les médiatrices de [AB] et de [AC].', `Médiatrice de [AB] : ${vr([B[0] - A[0], B[1] - A[1]])}·(M − I) = 0, I = □`, Rd(circleRed(h, k, r * r))),
+    prompt: t('Trouve l\'équation du cercle qui passe par {v1}, {v2} et {v3}.', { v1: ptR('A', A), v2: ptR('B', B), v3: ptR('C', C) }),
+    hints: H(t('Le centre est à égale distance des trois points : il est sur les médiatrices de [AB] et de [AC].'), t('Médiatrice de [AB] : {v1}·(M − I) = 0, I = □', { v1: vr([B[0] - A[0], B[1] - A[1]]) }), Rd(circleRed(h, k, r * r))),
     key: `${CEQ}:three:${vt(A)}${vt(B)}${vt(C)}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -215,25 +216,25 @@ function ceqDiameter(level, rng) {
   const r2 = (sq(B[0] - A[0]) + sq(B[1] - A[1])) / 4;
   const parts = [
     {
-      html: null, start: 'Ω', judge: { kind: 'vector', symbols: { A: vt(A), B: vt(B) }, expect: vt([h, k]) }, menu: CEQ_MENU.centre.map((o) => ({ ...o, valid: o.id === 'mid', why: o.id === 'inter' ? 'Ici, [AB] est un diamètre : son milieu est le centre.' : '' })),
-      lines: [{ math: 'Ω = (A + B)/2', note: 'Le centre est le milieu du diamètre', subgoal: 'read' }, { math: `Ω = ${vt([h, k])}`, note: '', subgoal: 'read', blank: [qt(h), qt(k)] }],
+      html: null, start: 'Ω', judge: { kind: 'vector', symbols: { A: vt(A), B: vt(B) }, expect: vt([h, k]) }, menu: CEQ_MENU.centre.map((o) => ({ ...o, valid: o.id === 'mid', why: o.id === 'inter' ? t('Ici, [AB] est un diamètre : son milieu est le centre.') : '' })),
+      lines: [{ math: 'Ω = (A + B)/2', note: t('Le centre est le milieu du diamètre'), subgoal: 'read' }, { math: `Ω = ${vt([h, k])}`, note: '', subgoal: 'read', blank: [qt(h), qt(k)] }],
     },
     {
-      html: 'Le rayon : r² = ΩA².', ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r2) },
+      html: t('Le rayon : r² = ΩA².'), ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r2) },
       lines: [
         { math: `(${qt(A[0])}-${par(h)})^2+(${qt(A[1])}-${par(k)})^2`, note: 'r² = (x_A − h)² + (y_A − k)²', subgoal: 'read' },
         { math: String(r2), note: '', subgoal: 'read' },
       ],
     },
     {
-      html: 'L\'équation du cercle.', ask: 'γ :', start: 'γ', judge: { kind: 'geom', object: 'circle', ref: circleEq(h, k, r2) },
+      html: t('L\'équation du cercle.'), ask: 'γ :', start: 'γ', judge: { kind: 'geom', object: 'circle', ref: circleEq(h, k, r2) },
       lines: [{ math: circleRed(h, k, r2), note: '', subgoal: 'read' }],
     },
   ];
   return partsG({
     skill: CEQ, level, parts, subgoals: CEQ_SUB, keys: KEYS,
-    prompt: `Trouve l'équation du cercle de diamètre [AB], avec ${ptR('A', A)} et ${ptR('B', B)}.`,
-    hints: H('Le centre est le milieu de [AB], le rayon la moitié de AB.', 'Ω = (A + B)/2, r² = ΩA² = □', Rd(circleRed(h, k, r2))),
+    prompt: t('Trouve l\'équation du cercle de diamètre [AB], avec {v1} et {v2}.', { v1: ptR('A', A), v2: ptR('B', B) }),
+    hints: H(t('Le centre est le milieu de [AB], le rayon la moitié de AB.'), 'Ω = (A + B)/2, r² = ΩA² = □', Rd(circleRed(h, k, r2))),
     key: `${CEQ}:diam:${vt(A)}${vt(B)}`,
   });
 }
@@ -253,17 +254,17 @@ function ceqExam(rng, exam) {
       const eq = circleEq(d.h, d.k, d.r2);
       return tfG({
         skill: CEQ, key: `empty:${eq}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'g4_square_constant',
-        statement: `${M(eq)} est l'équation d'un cercle.`,
+        statement: t('{v1} est l\'équation d\'un cercle.', { v1: M(eq) }),
         counter: geoCounter('r2Negative', [['r2', 'r² =']], { r2: String(d.r2) }, { value: d.r2 }),
-        explanation: `Faux : en complétant les carrés, ${M(circleRed(d.h, d.k, d.r2))}. Une somme de carrés ne vaut pas ${fq(d.r2)} : l'ensemble est vide.`,
+        explanation: t('Faux : en complétant les carrés, {v1}. Une somme de carrés ne vaut pas {v2} : l\'ensemble est vide.', { v1: M(circleRed(d.h, d.k, d.r2)), v2: fq(d.r2) }),
       });
     }
     const d = circleData(rng);
     const eq = circleEq(d.h, d.k, d.r2);
     return tfG({
       skill: CEQ, key: `circle:${eq}`, truth: true, exam: examTag({ exam }),
-      statement: `${M(eq)} est l'équation du cercle de centre ${ptR('Ω', [d.h, d.k])} et de rayon ${Math.sqrt(d.r2)}.`,
-      explanation: `Vrai : ${M(circleRed(d.h, d.k, d.r2))}.`,
+      statement: t('{v1} est l\'équation du cercle de centre {v2} et de rayon {v3}.', { v1: M(eq), v2: ptR('Ω', [d.h, d.k]), v3: Math.sqrt(d.r2) }),
+      explanation: t('Vrai : {v1}.', { v1: M(circleRed(d.h, d.k, d.r2)) }),
     });
   }
   const d = circleData(rng);
@@ -274,7 +275,7 @@ function ceqExam(rng, exam) {
   const Ob = [d.h * m, d.k * m];
   return mcqD({
     skill: CEQ, level: 4, key: `mcq:${eq0}`, exam: examTag({ exam }),
-    prompt: `Quels sont le centre Ω et le carré du rayon r² du cercle ${M(eq0)} ?`,
+    prompt: t('Quels sont le centre Ω et le carré du rayon r² du cercle {v1} ?', { v1: M(eq0) }),
     right: opt([d.h, d.k], d.r2),
     wrongs: [
       { html: opt(Ob, sq(Ob[0]) + sq(Ob[1]) - m * F), rule: 'g4_not_normalized' },
@@ -282,7 +283,7 @@ function ceqExam(rng, exam) {
       { html: opt([-d.h, -d.k], d.r2), rule: null },
     ],
     fillers: [{ html: opt([d.h, d.k], Math.sqrt(d.r2)) }, { html: opt([d.k, d.h], d.r2) }],
-    solution: [{ html: `On divise par ${m}, puis ${Rd(circleRed(d.h, d.k, d.r2))}.`, note: '' }],
+    solution: [{ html: t('On divise par {m}, puis {v1}.', { m, v1: Rd(circleRed(d.h, d.k, d.r2)) }), note: '' }],
   }, rng);
 }
 
@@ -292,40 +293,40 @@ function ceqExam(rng, exam) {
 
 const TAN = 'g10-circle-tangent';
 const TAN_SUB = [
-  { id: 'pos', label: 'position du point', skill: TAN },
-  { id: 'dist', label: 'distance au centre = r', skill: 'g4-bisectors' },
-  { id: 'solve', label: 'résoudre l\'équation', skill: 'quad-formula' },
-  { id: 'tan', label: 'écrire les tangentes', skill: TAN },
+  { id: 'pos', label: t('position du point'), skill: TAN },
+  { id: 'dist', label: t('distance au centre = r'), skill: 'g4-bisectors' },
+  { id: 'solve', label: t('résoudre l\'équation'), skill: 'quad-formula' },
+  { id: 'tan', label: t('écrire les tangentes'), skill: TAN },
 ];
 const dT = (v, c) => (q(c).n === 0 ? `${v} - 0` : diffT(v, c));
 const mT = (x) => qt(x); // a slope as text
 
 function tanMethod(kind) {
   return {
-    levels: [3], kind: 'decision', prompt: 'Quelle méthode ?', options: [
-      { id: 'dbl', label: 'En T : dédoubler l\'équation du cercle', valid: kind === 'at', ref: kind === 'at', why: 'Le point donné n\'est pas sur le cercle : on ne peut pas dédoubler en ce point.' },
-      { id: 'dist', label: 'Depuis Q : distance au centre = r', valid: kind !== 'at', ref: kind !== 'at', quality: 'good', why: 'Le point est sur le cercle : la tangente en T se trouve directement, en dédoublant.' },
-      { id: 'disc', label: 'Depuis Q : discriminant nul de l\'intersection', valid: kind !== 'at', quality: 'good', why: 'Le point est sur le cercle : dédouble l\'équation en T.' },
+    levels: [3], kind: 'decision', prompt: t('Quelle méthode ?'), options: [
+      { id: 'dbl', label: t('En T : dédoubler l\'équation du cercle'), valid: kind === 'at', ref: kind === 'at', why: t('Le point donné n\'est pas sur le cercle : on ne peut pas dédoubler en ce point.') },
+      { id: 'dist', label: t('Depuis Q : distance au centre = r'), valid: kind !== 'at', ref: kind !== 'at', quality: 'good', why: t('Le point est sur le cercle : la tangente en T se trouve directement, en dédoublant.') },
+      { id: 'disc', label: t('Depuis Q : discriminant nul de l\'intersection'), valid: kind !== 'at', quality: 'good', why: t('Le point est sur le cercle : dédouble l\'équation en T.') },
     ],
   };
 }
 const TAN_MENU = {
   at: [
     { id: 'dbl', label: '(x_T − h)(x − h) + (y_T − k)(y − k) = r²', valid: true },
-    { id: 'radius', label: 'La droite par T de direction ΩT⃗', valid: false, rule: 'g10_tangent_radius_direction', why: 'ΩT⃗ est le rayon : la tangente lui est perpendiculaire, ΩT⃗ en est un vecteur normal.' },
+    { id: 'radius', label: t('La droite par T de direction ΩT⃗'), valid: false, rule: 'g10_tangent_radius_direction', why: t('ΩT⃗ est le rayon : la tangente lui est perpendiculaire, ΩT⃗ en est un vecteur normal.') },
   ],
   pos: [
-    { id: 'd2', label: 'Calculer ΩQ² et comparer à r²', valid: true },
-    { id: 'eq', label: 'Remplacer Q dans l\'équation de la droite', valid: false, why: 'On ne connaît pas encore la droite : compare d\'abord ΩQ² et r².' },
+    { id: 'd2', label: t('Calculer ΩQ² et comparer à r²'), valid: true },
+    { id: 'eq', label: t('Remplacer Q dans l\'équation de la droite'), valid: false, why: t('On ne connaît pas encore la droite : compare d\'abord ΩQ² et r².') },
   ],
   m: [
-    { id: 'dist', label: 'Distance du centre à la droite = r', valid: true },
-    { id: 'sq', label: 'Élever au carré (les deux membres sont positifs)', valid: true },
-    { id: 'solve', label: 'Résoudre l\'équation du 2e degré', valid: true },
+    { id: 'dist', label: t('Distance du centre à la droite = r'), valid: true },
+    { id: 'sq', label: t('Élever au carré (les deux membres sont positifs)'), valid: true },
+    { id: 'solve', label: t('Résoudre l\'équation du 2e degré'), valid: true },
   ],
   both: [
-    { id: 'both', label: 'Écrire toutes les tangentes, verticale comprise', valid: true },
-    { id: 'one', label: 'Seulement les droites y − y_Q = m(x − x_Q)', valid: false, rule: 'g10_vertical_tangent_lost', why: 'Cette écriture exclut la droite verticale x = x_Q : teste-la à part.' },
+    { id: 'both', label: t('Écrire toutes les tangentes, verticale comprise'), valid: true },
+    { id: 'one', label: t('Seulement les droites y − y_Q = m(x − x_Q)'), valid: false, rule: 'g10_vertical_tangent_lost', why: t('Cette écriture exclut la droite verticale x = x_Q : teste-la à part.') },
   ],
 };
 
@@ -344,14 +345,14 @@ function tanAt(level, rng, opts = {}) {
     start: 't', judge: { kind: 'geom', object: 'line2', ref: lineText(row), tangentAt: { T, w } }, menu: TAN_MENU.at,
     decisions: [tanMethod('at')],
     lines: [
-      { math: `${terms.join(' + ')} = ${r2}`, note: `Dédoubler : ΩT⃗ = ${vr(w)}`, subgoal: 'tan', blank: [qt(w[0]), { after: '+', text: qt(w[1]) }] },
-      { math: lineText(row), note: 'Développer', subgoal: 'tan' },
+      { math: `${terms.join(' + ')} = ${r2}`, note: t('Dédoubler : ΩT⃗ = {v1}', { v1: vr(w) }), subgoal: 'tan', blank: [qt(w[0]), { after: '+', text: qt(w[1]) }] },
+      { math: lineText(row), note: t('Développer'), subgoal: 'tan' },
     ],
   }];
   return partsG({
     skill: TAN, level, parts, subgoals: TAN_SUB, keys: KEYS,
-    prompt: `Écris l'équation de la tangente au cercle γ : ${M(eq)} au point ${ptR('T', T)}.`,
-    hints: H('En T, dédouble : (x_T − h)(x − h) + (y_T − k)(y − k) = r². La tangente est perpendiculaire au rayon ΩT⃗.', Rd(`${par(w[0])}(${diffT('x', h)}) + □(${diffT('y', k)}) = ${r2}`), Rd(lineText(row))),
+    prompt: t('Écris l\'équation de la tangente au cercle γ : {v1} au point {v2}.', { v1: M(eq), v2: ptR('T', T) }),
+    hints: H(t('En T, dédouble : (x_T − h)(x − h) + (y_T − k)(y − k) = r². La tangente est perpendiculaire au rayon ΩT⃗.'), Rd(`${par(w[0])}(${diffT('x', h)}) + □(${diffT('y', k)}) = ${r2}`), Rd(lineText(row))),
     key: `${TAN}:at:${eq}:${vt(T)}`, exam: opts.exam ? examTag(opts, 4) : false,
   });
 }
@@ -399,37 +400,39 @@ function tanFromQ(level, rng, opts = {}) {
       html: null, start: 'ΩQ^2', judge: { kind: 'value', expect: String(d2) }, menu: TAN_MENU.pos,
       decisions: [tanMethod('from')],
       lines: [
-        { math: `(${qt(Qp[0])}-${par(h)})^2+(${qt(Qp[1])}-${par(k)})^2`, note: 'Position de Q : ΩQ²', subgoal: 'pos' },
-        { math: String(d2), note: `${d2} > ${r2} = r² : Q est extérieur`, subgoal: 'pos', blank: [String(d2)] },
+        { math: `(${qt(Qp[0])}-${par(h)})^2+(${qt(Qp[1])}-${par(k)})^2`, note: t('Position de Q : ΩQ²'), subgoal: 'pos' },
+        { math: String(d2), note: t('{d2} > {r2} = r² : Q est extérieur', { d2, r2 }), subgoal: 'pos', blank: [String(d2)] },
       ],
     },
     {
-      html: `Les droites non verticales par Q : ${Rd(diffT('y', Qp[1]))} = m(${Rd(diffT('x', Qp[0]))}). Elles sont tangentes si leur distance au centre vaut r = ${r}.`,
+      html: t('Les droites non verticales par Q : {v1} = m({v2}). Elles sont tangentes si leur distance au centre vaut r = {r}.', { v1: Rd(diffT('y', Qp[1])), v2: Rd(diffT('x', Qp[0])), r }),
       ask: 'm :', start: dist, judge: { kind: 'solset', v: 'm' }, menu: TAN_MENU.m,
-      notes: level === 2 ? [`La droite verticale x = ${fq(Qp[0])} est à la distance |${fq(Qp[0])} − ${parR(h)}| = ${Math.abs(a)} du centre : ${Math.abs(a) === r ? 'c\'est une tangente.' : 'ce n\'est pas une tangente.'}`] : [],
+      notes: level === 2 ? [Math.abs(a) === r
+        ? t('La droite verticale x = {v1} est à la distance |{v1} − {v2}| = {v3} du centre : c\'est une tangente.', { v1: fq(Qp[0]), v2: parR(h), v3: Math.abs(a) })
+        : t('La droite verticale x = {v1} est à la distance |{v1} − {v2}| = {v3} du centre : ce n\'est pas une tangente.', { v1: fq(Qp[0]), v2: parR(h), v3: Math.abs(a) })] : [],
       decisions: [{
-        levels: [1, 3, 4, 5], kind: 'decision', prompt: `La droite verticale x = ${fq(Qp[0])} est-elle tangente ? Sa distance au centre vaut |${fq(Qp[0])} − ${parR(h)}| = ${Math.abs(a)}.`,
+        levels: [1, 3, 4, 5], kind: 'decision', prompt: t('La droite verticale x = {v1} est-elle tangente ? Sa distance au centre vaut |{v1} − {v2}| = {v3}.', { v1: fq(Qp[0]), v2: parR(h), v3: Math.abs(a) }),
         options: [
-          { id: 'yes', label: `Oui : ${Math.abs(a)} = r`, valid: vert >= 0, ref: vert >= 0, why: `${Math.abs(a)} ≠ ${r} : elle n'est pas tangente.` },
-          { id: 'no', label: `Non : ${Math.abs(a)} ≠ r`, valid: vert < 0, ref: vert < 0, rule: vert >= 0 ? 'g10_vertical_tangent_lost' : null, why: `${Math.abs(a)} = ${r} = r : la droite verticale est tangente, et l'écriture y − y_Q = m(x − x_Q) l'exclut.` },
+          { id: 'yes', label: t('Oui : {v1} = r', { v1: Math.abs(a) }), valid: vert >= 0, ref: vert >= 0, why: t('{v1} ≠ {r} : elle n\'est pas tangente.', { v1: Math.abs(a), r }) },
+          { id: 'no', label: t('Non : {v1} ≠ r', { v1: Math.abs(a) }), valid: vert < 0, ref: vert < 0, rule: vert >= 0 ? 'g10_vertical_tangent_lost' : null, why: t('{v1} = {r} = r : la droite verticale est tangente, et l\'écriture y − y_Q = m(x − x_Q) l\'exclut.', { v1: Math.abs(a), r }) },
         ],
       }],
       lines: [
-        { math: `(${lin})^2 = ${r2}(m^2+1)`, note: 'Élever au carré', subgoal: 'dist', blank: [String(r2)] },
-        { math: `${sumT([[a * a - r2, 'm^2'], [2 * a * b, 'm'], [b * b - r2, '']])} = 0`, note: 'Développer', subgoal: 'solve' },
-        { math: slopes.map((s) => `m = ${mT(s)}`).join(' ou '), note: slopes.length === 1 ? 'Une seule pente : l\'autre tangente est verticale' : 'Deux pentes', subgoal: 'solve', blank: slopes.map((s) => mT(s)) },
+        { math: `(${lin})^2 = ${r2}(m^2+1)`, note: t('Élever au carré'), subgoal: 'dist', blank: [String(r2)] },
+        { math: `${sumT([[a * a - r2, 'm^2'], [2 * a * b, 'm'], [b * b - r2, '']])} = 0`, note: t('Développer'), subgoal: 'solve' },
+        { math: slopes.map((s) => `m = ${mT(s)}`).join(' ou '), note: slopes.length === 1 ? t('Une seule pente : l\'autre tangente est verticale') : t('Deux pentes'), subgoal: 'solve', blank: slopes.map((s) => mT(s)) },
       ],
     },
     {
-      html: 'Les tangentes issues de Q.', ask: 'tangentes :', start: 'T',
+      html: t('Les tangentes issues de Q.'), ask: t('tangentes :'), start: 'T',
       judge: { kind: 'geom', object: 'line2', count: 2, ref: final, ...(tangents ? { tangents } : {}) }, menu: TAN_MENU.both,
-      lines: [{ math: final, note: 'y − y_Q = m(x − x_Q), mis sous forme cartésienne', subgoal: 'tan' }],
+      lines: [{ math: final, note: t('y − y_Q = m(x − x_Q), mis sous forme cartésienne'), subgoal: 'tan' }],
     },
   ];
   return partsG({
     skill: TAN, level, parts, subgoals: TAN_SUB, keys: [...KEYS, 'ineq'],
-    prompt: `Trouve les tangentes au cercle γ : ${M(eq)} issues du point ${ptR('Q', Qp)}.`,
-    hints: H('Une tangente est à la distance r du centre. Pense à la droite verticale x = x_Q.', `|${Rd(lin)}| = ${r}·√(□)`, Rd(final)),
+    prompt: t('Trouve les tangentes au cercle γ : {v1} issues du point {v2}.', { v1: M(eq), v2: ptR('Q', Qp) }),
+    hints: H(t('Une tangente est à la distance r du centre. Pense à la droite verticale x = x_Q.'), `|${Rd(lin)}| = ${r}·√(□)`, Rd(final)),
     key: `${TAN}:q:${eq}:${vt(Qp)}`, fallback: d.fallback, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -449,23 +452,23 @@ function tanSlope(level, rng, opts = {}) {
   const absT = `|${sumT([[1, 'c'], [s, '']])}|`;
   const parts = [
     {
-      html: `Les droites parallèles : ${Rd(`${sumT([[n[0], 'x'], [n[1], 'y']])} + c = 0`)}. Leur distance au centre vaut r.`,
+      html: t('Les droites parallèles : {v1}. Leur distance au centre vaut r.', { v1: Rd(`${sumT([[n[0], 'x'], [n[1], 'y']])} + c = 0`) }),
       start: nn === 1 ? `${absT} = ${r}` : `${absT}/${nn} = ${r}`, judge: { kind: 'solset', v: 'c' }, menu: TAN_MENU.m,
       lines: [
-        ...(nn === 1 ? [] : [{ math: `${absT} = ${r * nn}`, note: `Multiplier par ‖n⃗‖ = ${nn}`, subgoal: 'dist' }]),
-        { math: `c = ${cs[0]} ou c = ${cs[1]}`, note: 'Deux cas : ± dans la valeur absolue', subgoal: 'solve' },
+        ...(nn === 1 ? [] : [{ math: `${absT} = ${r * nn}`, note: t('Multiplier par ‖n⃗‖ = {nn}', { nn }), subgoal: 'dist' }]),
+        { math: `c = ${cs[0]} ou c = ${cs[1]}`, note: t('Deux cas : ± dans la valeur absolue'), subgoal: 'solve' },
       ],
     },
     {
-      html: 'Les deux tangentes.', ask: 'tangentes :', start: 'T',
+      html: t('Les deux tangentes.'), ask: t('tangentes :'), start: 'T',
       judge: { kind: 'geom', object: 'line2', count: 2, ref: final },
       lines: [{ math: final, note: '', subgoal: 'tan' }],
     },
   ];
   return partsG({
     skill: TAN, level, parts, subgoals: TAN_SUB, keys: [...KEYS, 'ineq'],
-    prompt: `Trouve les tangentes au cercle γ : ${M(eq)} parallèles à la droite ${M(`${sumT([[n[0], 'x'], [n[1], 'y']])} = 0`)}.`,
-    hints: H('Une parallèle s\'écrit ax + by + c = 0 avec les mêmes a et b ; elle est tangente si sa distance au centre vaut r.', `${Rd(absT)} = □`, Rd(final)),
+    prompt: t('Trouve les tangentes au cercle γ : {v1} parallèles à la droite {v2}.', { v1: M(eq), v2: M(`${sumT([[n[0], 'x'], [n[1], 'y']])} = 0`) }),
+    hints: H(t('Une parallèle s\'écrit ax + by + c = 0 avec les mêmes a et b ; elle est tangente si sa distance au centre vaut r.'), `${Rd(absT)} = □`, Rd(final)),
     key: `${TAN}:slope:${eq}:${vt(n)}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -487,9 +490,9 @@ function tanExam(rng, exam) {
     const yq = k + rng.pick([-1, 1]) * (r + rng.int(1, 4));
     return tfG({
       skill: TAN, key: `vert:${h}:${k}:${r}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'g10_vertical_tangent_lost',
-      statement: `Pour tout point Q extérieur au cercle γ : ${M(circleRed(h, k, r * r))}, on trouve deux pentes m telles que la droite y − y_Q = m(x − x_Q) soit tangente à γ.`,
+      statement: t('Pour tout point Q extérieur au cercle γ : {v1}, on trouve deux pentes m telles que la droite y − y_Q = m(x − x_Q) soit tangente à γ.', { v1: M(circleRed(h, k, r * r)) }),
       counter: geoCounter('verticalTangent', [['Q', 'Q =']], { Q: vt([h + r, yq]) }, { h, k, r }),
-      explanation: `Faux : depuis Q${vr([h + r, yq])}, l'une des deux tangentes est la droite verticale x = ${fq(h + r)}, qui n'a pas de pente : on ne trouve qu'une valeur de m.`,
+      explanation: t('Faux : depuis Q{v1}, l\'une des deux tangentes est la droite verticale x = {v2}, qui n\'a pas de pente : on ne trouve qu\'une valeur de m.', { v1: vr([h + r, yq]), v2: fq(h + r) }),
     });
   }
   const d = fromQData(rng, { vertical: true, slanted: true });
@@ -503,14 +506,14 @@ function tanExam(rng, exam) {
   const radial = Rd(lineText(lineRow(-other[1], other[0], other[1] * T[0] - other[0] * T[1])));
   return mcqD({
     skill: TAN, level: 4, key: `mcq:${h}:${k}:${vt(Qp)}`, exam: examTag({ exam }),
-    prompt: `Quelles sont les tangentes au cercle ${M(circleRed(h, k, 25))} issues du point ${ptR('Q', Qp)} ?`,
+    prompt: t('Quelles sont les tangentes au cercle {v1} issues du point {v2} ?', { v1: M(circleRed(h, k, 25)), v2: ptR('Q', Qp) }),
     right: `${t1} et ${tv}`,
     wrongs: [
-      { html: `${t1} seulement`, rule: 'g10_vertical_tangent_lost' },
+      { html: t('{t1} seulement', { t1 }), rule: 'g10_vertical_tangent_lost' },
       { html: `${radial} et ${tv}`, rule: 'g10_tangent_radius_direction' },
       { html: `${t1} et y = ${fq(Qp[1])}`, rule: null },
     ],
-    solution: [{ html: `La droite x = ${fq(Qp[0])} est à la distance ${d.r} du centre : elle est tangente. L'autre tangente a une pente : ${t1}.`, note: '' }],
+    solution: [{ html: t('La droite x = {v1} est à la distance {r} du centre : elle est tangente. L\'autre tangente a une pente : {t1}.', { v1: fq(Qp[0]), r: d.r, t1 }), note: '' }],
     fallback: d.fallback,
   }, rng);
 }
@@ -521,28 +524,28 @@ function tanExam(rng, exam) {
 
 const POW = 'g10-power-radical';
 const POW_SUB = [
-  { id: 'norm', label: 'normaliser les équations', skill: POW },
-  { id: 'sub', label: 'soustraire les équations', skill: POW },
-  { id: 'cr', label: 'centres et rayons', skill: CEQ },
-  { id: 'cmp', label: 'comparer Ω₁Ω₂² et r₁² + r₂²', skill: POW },
+  { id: 'norm', label: t('normaliser les équations'), skill: POW },
+  { id: 'sub', label: t('soustraire les équations'), skill: POW },
+  { id: 'cr', label: t('centres et rayons'), skill: CEQ },
+  { id: 'cmp', label: t('comparer Ω₁Ω₂² et r₁² + r₂²'), skill: POW },
 ];
 const lhs = (eq) => eq.replace(/\s*=\s*0$/, '');
 const gcdA = (xs) => xs.reduce((g, x) => { let [a, b] = [Math.abs(g), Math.abs(x)]; while (b) [a, b] = [b, a % b]; return a; }, 0);
 
 const POW_MENU = {
   sub: [
-    { id: 'norm', label: 'Normaliser chaque équation (1 devant x²)', valid: true },
-    { id: 'sub', label: 'Soustraire γ₁ − γ₂', valid: true },
-    { id: 'raw', label: 'Soustraire les équations telles qu\'elles sont écrites', valid: false, rule: 'g10_radical_unnormalized', why: 'Si les coefficients de x² diffèrent, les carrés ne disparaissent pas : normalise d\'abord.' },
+    { id: 'norm', label: t('Normaliser chaque équation (1 devant x²)'), valid: true },
+    { id: 'sub', label: t('Soustraire γ₁ − γ₂'), valid: true },
+    { id: 'raw', label: t('Soustraire les équations telles qu\'elles sont écrites'), valid: false, rule: 'g10_radical_unnormalized', why: t('Si les coefficients de x² diffèrent, les carrés ne disparaissent pas : normalise d\'abord.') },
   ],
   pow: [
-    { id: 'eval', label: 'Remplacer P dans l\'équation normalisée', valid: true },
-    { id: 'dist', label: 'Calculer seulement ΩP', valid: false, why: 'La puissance est ΩP² − r² : c\'est la valeur de l\'équation normalisée en P.' },
+    { id: 'eval', label: t('Remplacer P dans l\'équation normalisée'), valid: true },
+    { id: 'dist', label: t('Calculer seulement ΩP'), valid: false, why: t('La puissance est ΩP² − r² : c\'est la valeur de l\'équation normalisée en P.') },
   ],
   ortho: [
-    { id: 'read', label: 'Lire le centre et le rayon', valid: true },
-    { id: 'cmp', label: 'Comparer Ω₁Ω₂² et r₁² + r₂²', valid: true },
-    { id: 'sum', label: 'Comparer Ω₁Ω₂ et r₁ + r₂', valid: false, rule: 'g10_orthogonal_sum', why: 'Ω₁Ω₂ = r₁ + r₂ veut dire tangents. Orthogonaux : Ω₁Ω₂² = r₁² + r₂² (Pythagore).' },
+    { id: 'read', label: t('Lire le centre et le rayon'), valid: true },
+    { id: 'cmp', label: t('Comparer Ω₁Ω₂² et r₁² + r₂²'), valid: true },
+    { id: 'sum', label: t('Comparer Ω₁Ω₂ et r₁ + r₂'), valid: false, rule: 'g10_orthogonal_sum', why: t('Ω₁Ω₂ = r₁ + r₂ veut dire tangents. Orthogonaux : Ω₁Ω₂² = r₁² + r₂² (Pythagore).') },
   ],
 };
 
@@ -564,14 +567,14 @@ function axisLines(c1, c2) {
   const diff = [2 * (c2.h - c1.h), 2 * (c2.k - c1.k), F1 - F2];
   const row = lineRow(...diff);
   const diffT = `${sumT([[diff[0], 'x'], [diff[1], 'y'], [diff[2], '']])} = 0`;
-  const lines = [{ math: `(${e1}) - (${e2}) = 0`, note: 'γ₁ − γ₂ = 0 : les carrés disparaissent', subgoal: 'sub' }];
-  if (gcdA(diff) === 1) lines.push({ math: diffT, note: 'Réduire', subgoal: 'sub', blank: diff[0] ? [qt(diff[0])] : [qt(diff[1])] });
+  const lines = [{ math: `(${e1}) - (${e2}) = 0`, note: t('γ₁ − γ₂ = 0 : les carrés disparaissent'), subgoal: 'sub' }];
+  if (gcdA(diff) === 1) lines.push({ math: diffT, note: t('Réduire'), subgoal: 'sub', blank: diff[0] ? [qt(diff[0])] : [qt(diff[1])] });
   else {
     // Reduced, the common factor put in front (not yet the final form).
     const i = diff[0] ? 0 : 1;
     const f = diff[i] / row[i].valueOf();
-    if (row.filter((x) => x.n !== 0).length > 1) lines.push({ math: `${f}(${lhs(lineText(row))}) = 0`, note: `Réduire : ${Rd(diffT)}`, subgoal: 'sub', blank: [String(f)] });
-    lines.push({ math: lineText(row), note: `Réduire, puis diviser par ${fq(f)}`, subgoal: 'sub' });
+    if (row.filter((x) => x.n !== 0).length > 1) lines.push({ math: `${f}(${lhs(lineText(row))}) = 0`, note: t('Réduire : {v1}', { v1: Rd(diffT) }), subgoal: 'sub', blank: [String(f)] });
+    lines.push({ math: lineText(row), note: t('Réduire, puis diviser par {v1}', { v1: fq(f) }), subgoal: 'sub' });
   }
   return { lines, ref: lineText(row), row, e1, e2 };
 }
@@ -585,17 +588,17 @@ function powAxis(level, rng, opts = {}) {
   const parts = [{
     start: 'Δ', judge: { kind: 'geom', object: 'line2', ref: ax.ref, ...(m !== 1 ? { radical: { g1: lhs(g1), g2: lhs(g2) } } : {}) }, menu: POW_MENU.sub,
     decisions: [{
-      levels: [2, 3], kind: 'decision', prompt: 'Les deux équations sont-elles normalisées (1 devant x² et y²) ?', options: [
-        { id: 'yes', label: 'Oui : on peut soustraire', valid: m === 1, ref: m === 1, rule: m === 1 ? null : 'g10_radical_unnormalized', why: `Non : γ₂ a ${m} devant x². Divise-la d'abord par ${m}, sinon les carrés ne disparaissent pas.` },
-        { id: 'no', label: m === 1 ? 'Non' : `Non : diviser γ₂ par ${m}, puis soustraire`, valid: m !== 1, ref: m !== 1, why: 'Les deux ont déjà 1 devant x² et y².' },
+      levels: [2, 3], kind: 'decision', prompt: t('Les deux équations sont-elles normalisées (1 devant x² et y²) ?'), options: [
+        { id: 'yes', label: t('Oui : on peut soustraire'), valid: m === 1, ref: m === 1, rule: m === 1 ? null : 'g10_radical_unnormalized', why: t('Non : γ₂ a {m} devant x². Divise-la d\'abord par {m}, sinon les carrés ne disparaissent pas.', { m }) },
+        { id: 'no', label: m === 1 ? t('Non') : t('Non : diviser γ₂ par {m}, puis soustraire', { m }), valid: m !== 1, ref: m !== 1, why: t('Les deux ont déjà 1 devant x² et y².') },
       ],
     }],
     lines: ax.lines,
   }];
   return partsG({
     skill: POW, level, parts, subgoals: POW_SUB, keys: KEYS,
-    prompt: `Trouve l'axe radical des cercles γ₁ : ${M(g1)} et γ₂ : ${M(g2)}.`,
-    hints: H('Normalise les deux équations, puis soustrais-les : les carrés disparaissent, il reste une droite.', `(${Rd(ax.e1)}) − (□) = 0`, Rd(ax.ref)),
+    prompt: t('Trouve l\'axe radical des cercles γ₁ : {v1} et γ₂ : {v2}.', { v1: M(g1), v2: M(g2) }),
+    hints: H(t('Normalise les deux équations, puis soustrais-les : les carrés disparaissent, il reste une droite.'), `(${Rd(ax.e1)}) − (□) = 0`, Rd(ax.ref)),
     key: `${POW}:axis:${g1}:${g2}`, exam: opts.exam ? examTag(opts, 4) : false,
   });
 }
@@ -611,20 +614,20 @@ function powPoint(level, rng) {
   const parts = [{
     start: 'γ(P)', judge: { kind: 'value', expect: String(val) }, menu: POW_MENU.pow,
     decisions: [{
-      levels: [2, 3, 4, 5], kind: 'decision', prompt: 'Que dit le signe de la puissance ?', options: [
-        { id: 'sign', label: 'γ(P) = ΩP² − r² : négatif à l\'intérieur, nul sur le cercle, positif à l\'extérieur', valid: true, ref: true },
-        { id: 'dist', label: 'γ(P) est la distance de P au cercle', valid: false, why: 'γ(P) = ΩP² − r², une différence de carrés, pas une distance.' },
+      levels: [2, 3, 4, 5], kind: 'decision', prompt: t('Que dit le signe de la puissance ?'), options: [
+        { id: 'sign', label: t('γ(P) = ΩP² − r² : négatif à l\'intérieur, nul sur le cercle, positif à l\'extérieur'), valid: true, ref: true },
+        { id: 'dist', label: t('γ(P) est la distance de P au cercle'), valid: false, why: t('γ(P) = ΩP² − r², une différence de carrés, pas une distance.') },
       ],
     }],
     lines: [
-      { math: subst, note: 'Remplacer x et y par les coordonnées de P', subgoal: 'cr' },
-      { math: String(val), note: { in: 'Négatif : P est à l\'intérieur', on: 'Nul : P est sur le cercle', out: 'Positif : P est à l\'extérieur' }[pos], subgoal: 'cmp', blank: [String(val)] },
+      { math: subst, note: t('Remplacer x et y par les coordonnées de P'), subgoal: 'cr' },
+      { math: String(val), note: { in: t('Négatif : P est à l\'intérieur'), on: t('Nul : P est sur le cercle'), out: t('Positif : P est à l\'extérieur') }[pos], subgoal: 'cmp', blank: [String(val)] },
     ],
   }];
   return partsG({
     skill: POW, level, parts, subgoals: POW_SUB, keys: KEYS,
-    prompt: `Calcule la puissance du point ${ptR('P', P)} par rapport au cercle γ : ${M(eq)}. P est-il à l'intérieur ou à l'extérieur ?`,
-    hints: H('La puissance de P est la valeur de l\'équation normalisée en P : γ(P) = ΩP² − r².', `γ(P) = ${parR(P[0])}² + ${parR(P[1])}² + □`, String(val).replace('-', '−')),
+    prompt: t('Calcule la puissance du point {v1} par rapport au cercle γ : {v2}. P est-il à l\'intérieur ou à l\'extérieur ?', { v1: ptR('P', P), v2: M(eq) }),
+    hints: H(t('La puissance de P est la valeur de l\'équation normalisée en P : γ(P) = ΩP² − r².'), `γ(P) = ${parR(P[0])}² + ${parR(P[1])}² + □`, String(val).replace('-', '−')),
     key: `${POW}:pt:${eq}:${vt(P)}`,
   });
 }
@@ -659,32 +662,32 @@ function powOrtho(level, rng, opts = {}) {
   const g2 = circleEq(h2, k2, r2 * r2);
   const parts = [
     {
-      html: 'Le centre de γ₂.', start: 'Ω_2', judge: { kind: 'vector', expect: vt([h2, k2]), circleEq: g2 }, menu: POW_MENU.ortho,
-      lines: [{ math: `Ω_2 = ${vt([h2, k2])}`, note: 'Compléter les carrés', subgoal: 'cr', blank: [qt(h2), qt(k2)] }],
+      html: t('Le centre de γ₂.'), start: 'Ω_2', judge: { kind: 'vector', expect: vt([h2, k2]), circleEq: g2 }, menu: POW_MENU.ortho,
+      lines: [{ math: `Ω_2 = ${vt([h2, k2])}`, note: t('Compléter les carrés'), subgoal: 'cr', blank: [qt(h2), qt(k2)] }],
     },
     {
-      html: 'Le carré de son rayon.', ask: 'r₂² =', start: 'r_2^2', judge: { kind: 'value', expect: String(r2 * r2) }, menu: POW_MENU.ortho,
+      html: t('Le carré de son rayon.'), ask: 'r₂² =', start: 'r_2^2', judge: { kind: 'value', expect: String(r2 * r2) }, menu: POW_MENU.ortho,
       lines: [{ math: String(r2 * r2), note: `(x − ${fq(h2)})² + (y − ${fq(k2)})² = ${r2 * r2}`.replace(/− −/g, '+ '), subgoal: 'cr', blank: [String(r2 * r2)] }],
     },
     {
-      html: `Avec Ω₁ = ${vr([h1, k1])} et r₁² = ${r1 * r1} : orthogonaux ?`, ask: 'Ω₁Ω₂² − (r₁² + r₂²) =', start: 'Ω_1Ω_2^2-(r_1^2+r_2^2)',
+      html: t('Avec Ω₁ = {v1} et r₁² = {v2} : orthogonaux ?', { v1: vr([h1, k1]), v2: r1 * r1 }), ask: 'Ω₁Ω₂² − (r₁² + r₂²) =', start: 'Ω_1Ω_2^2-(r_1^2+r_2^2)',
       judge: { kind: 'value', expect: String(d2 - s) }, menu: POW_MENU.ortho,
       decisions: [{
-        levels: [2, 3, 4, 5], kind: 'decision', prompt: 'Deux cercles sont orthogonaux si…', options: [
-          { id: 'pyth', label: 'Ω₁Ω₂² = r₁² + r₂² (les rayons aux points communs sont perpendiculaires)', valid: true, ref: true },
-          { id: 'sum', label: 'Ω₁Ω₂ = r₁ + r₂', valid: false, rule: 'g10_orthogonal_sum', why: 'Ω₁Ω₂ = r₁ + r₂ veut dire tangents extérieurement.' },
+        levels: [2, 3, 4, 5], kind: 'decision', prompt: t('Deux cercles sont orthogonaux si…'), options: [
+          { id: 'pyth', label: t('Ω₁Ω₂² = r₁² + r₂² (les rayons aux points communs sont perpendiculaires)'), valid: true, ref: true },
+          { id: 'sum', label: 'Ω₁Ω₂ = r₁ + r₂', valid: false, rule: 'g10_orthogonal_sum', why: t('Ω₁Ω₂ = r₁ + r₂ veut dire tangents extérieurement.') },
         ],
       }],
       lines: [
         { math: `(${qt(h2)}-${par(h1)})^2+(${qt(k2)}-${par(k1)})^2-(${r1 * r1}+${r2 * r2})`, note: 'Ω₁Ω₂² − (r₁² + r₂²)', subgoal: 'cmp' },
-        { math: String(d2 - s), note: d2 === s ? 'Nul : les cercles sont orthogonaux' : 'Non nul : les cercles ne sont pas orthogonaux', subgoal: 'cmp', blank: [String(d2 - s)] },
+        { math: String(d2 - s), note: d2 === s ? t('Nul : les cercles sont orthogonaux') : t('Non nul : les cercles ne sont pas orthogonaux'), subgoal: 'cmp', blank: [String(d2 - s)] },
       ],
     },
   ];
   return partsG({
     skill: POW, level, parts, subgoals: POW_SUB, keys: KEYS,
-    prompt: `Les cercles γ₁ : ${M(g1)} et γ₂ : ${M(g2)} sont-ils orthogonaux ?`,
-    hints: H('Deux cercles sont orthogonaux si Ω₁Ω₂² = r₁² + r₂².', `Ω₁Ω₂² = (${fq(h2)} − ${parR(h1)})² + (□)²`, `Ω₁Ω₂² = ${d2}, r₁² + r₂² = ${s} : ${d2 === s ? 'orthogonaux' : 'pas orthogonaux'}`),
+    prompt: t('Les cercles γ₁ : {v1} et γ₂ : {v2} sont-ils orthogonaux ?', { v1: M(g1), v2: M(g2) }),
+    hints: H(t('Deux cercles sont orthogonaux si Ω₁Ω₂² = r₁² + r₂².'), `Ω₁Ω₂² = (${fq(h2)} − ${parR(h1)})² + (□)²`, d2 === s ? t('Ω₁Ω₂² = {d2}, r₁² + r₂² = {s} : orthogonaux', { d2, s }) : t('Ω₁Ω₂² = {d2}, r₁² + r₂² = {s} : pas orthogonaux', { d2, s })),
     key: `${POW}:ortho:${g1}:${g2}`, exam: opts.exam ? examTag(opts, 4) : false,
   });
 }
@@ -692,7 +695,7 @@ function powOrtho(level, rng, opts = {}) {
 // A circle orthogonal to γ₁ and γ₂, centred on the line d: Ω is on the
 // radical axis of γ₁, γ₂ (γ₁(Ω) = γ₂(Ω) = r²).
 function powBuild(level, rng, opts = {}) {
-  for (let t = 0; t < 400; t++) {
+  for (let tries = 0; tries < 400; tries++) {
     const O = [rng.int(-3, 3), rng.int(-3, 3)];
     const r = rng.int(1, 4);
     const pick = () => {
@@ -719,18 +722,18 @@ function powBuild(level, rng, opts = {}) {
     const g2 = circleEq(c2.h, c2.k, c2.r2);
     const [D, E, F] = [-2 * c1.h, -2 * c1.k, c1.h * c1.h + c1.k * c1.k - c1.r2];
     const parts = [
-      { html: 'Le centre Ω a la même puissance par rapport aux deux cercles (r²) : il est sur leur axe radical.', start: 'Δ', judge: { kind: 'geom', object: 'line2', ref: ax.ref }, lines: ax.lines },
-      { html: `Ω est aussi sur d : ${Rd(lineText(drow))}.`, ask: 'Ω =', start: 'Ω', judge: { kind: 'vector', expect: vt(O) }, lines: [{ math: `Ω = ${vt(O)}`, note: 'Intersection de l\'axe radical et de d', subgoal: 'cmp' }] },
+      { html: t('Le centre Ω a la même puissance par rapport aux deux cercles (r²) : il est sur leur axe radical.'), start: 'Δ', judge: { kind: 'geom', object: 'line2', ref: ax.ref }, lines: ax.lines },
+      { html: t('Ω est aussi sur d : {v1}.', { v1: Rd(lineText(drow)) }), ask: 'Ω =', start: 'Ω', judge: { kind: 'vector', expect: vt(O) }, lines: [{ math: `Ω = ${vt(O)}`, note: t('Intersection de l\'axe radical et de d'), subgoal: 'cmp' }] },
       {
-        html: 'r² est la puissance de Ω par rapport à γ₁.', ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r * r) },
+        html: t('r² est la puissance de Ω par rapport à γ₁.'), ask: 'r² =', start: 'r^2', judge: { kind: 'value', expect: String(r * r) },
         lines: [{ math: `${par(O[0])}^2+${par(O[1])}^2+(${D})·${par(O[0])}+(${E})·${par(O[1])}+(${F})`, note: 'γ₁(Ω)', subgoal: 'cmp' }, { math: String(r * r), note: '', subgoal: 'cmp' }],
       },
-      { html: 'Le cercle cherché.', ask: 'γ :', start: 'γ', judge: { kind: 'geom', object: 'circle', ref: circleEq(O[0], O[1], r * r) }, lines: [{ math: circleRed(O[0], O[1], r * r), note: '', subgoal: 'cr' }] },
+      { html: t('Le cercle cherché.'), ask: 'γ :', start: 'γ', judge: { kind: 'geom', object: 'circle', ref: circleEq(O[0], O[1], r * r) }, lines: [{ math: circleRed(O[0], O[1], r * r), note: '', subgoal: 'cr' }] },
     ];
     return partsG({
       skill: POW, level, parts, subgoals: POW_SUB, keys: KEYS,
-      prompt: `Trouve le cercle γ orthogonal aux cercles γ₁ : ${M(g1)} et γ₂ : ${M(g2)}, dont le centre est sur la droite d : ${M(lineText(drow))}.`,
-      hints: H('γ est orthogonal à γᵢ si la puissance de son centre Ω par rapport à γᵢ vaut r².', 'Ω est sur l\'axe radical de γ₁ et γ₂ et sur d.', Rd(circleRed(O[0], O[1], r * r))),
+      prompt: t('Trouve le cercle γ orthogonal aux cercles γ₁ : {v1} et γ₂ : {v2}, dont le centre est sur la droite d : {v3}.', { v1: M(g1), v2: M(g2), v3: M(lineText(drow)) }),
+      hints: H(t('γ est orthogonal à γᵢ si la puissance de son centre Ω par rapport à γᵢ vaut r².'), t('Ω est sur l\'axe radical de γ₁ et γ₂ et sur d.'), Rd(circleRed(O[0], O[1], r * r))),
       key: `${POW}:build:${g1}:${g2}:${lineText(drow)}`, exam: opts.exam ? examTag(opts, 5) : false,
     });
   }
@@ -750,17 +753,17 @@ function powExam(rng, exam) {
     if (rng.chance(0.3)) {
       return tfG({
         skill: POW, key: 'perp', truth: true, exam: examTag({ exam }),
-        statement: 'L\'axe radical de deux cercles de centres distincts est perpendiculaire à la droite des centres.',
-        explanation: 'Vrai : γ₁ − γ₂ = 2(h₂ − h₁)x + 2(k₂ − k₁)y + … : son vecteur normal est Ω₁Ω₂⃗.',
+        statement: t('L\'axe radical de deux cercles de centres distincts est perpendiculaire à la droite des centres.'),
+        explanation: t('Vrai : γ₁ − γ₂ = 2(h₂ − h₁)x + 2(k₂ − k₁)y + … : son vecteur normal est Ω₁Ω₂⃗.'),
       });
     }
     const h = rng.int(-3, 3);
     const k = rng.int(-3, 3);
     return tfG({
       skill: POW, key: `chord:${h}:${k}`, truth: false, exam: examTag({ exam }),
-      statement: 'L\'axe radical de deux cercles de centres distincts est toujours la droite qui passe par leurs deux points communs.',
+      statement: t('L\'axe radical de deux cercles de centres distincts est toujours la droite qui passe par leurs deux points communs.'),
       counter: geoCounter('disjointCircles', [['O1', 'Ω₁ ='], ['r1', 'r₁ ='], ['O2', 'Ω₂ ='], ['r2', 'r₂ =']], { O1: vt([h, k]), r1: '1', O2: vt([h + 5, k]), r2: '2' }),
-      explanation: `Faux : deux cercles disjoints, comme ceux de centres ${vr([h, k])} et ${vr([h + 5, k])} et de rayons 1 et 2, ont un axe radical, mais pas de point commun.`,
+      explanation: t('Faux : deux cercles disjoints, comme ceux de centres {v1} et {v2} et de rayons 1 et 2, ont un axe radical, mais pas de point commun.', { v1: vr([h, k]), v2: vr([h + 5, k]) }),
     });
   }
   const [c1, c2] = twoCircles(rng);
@@ -778,11 +781,11 @@ function powExam(rng, exam) {
   const centres = lineText(lineRow(c2.k - c1.k, c1.h - c2.h, c1.k * (c2.h - c1.h) - c1.h * (c2.k - c1.k)));
   return mcqD({
     skill: POW, level: 4, key: `mcq:${g1}:${g2}`, exam: examTag({ exam }),
-    prompt: `Quel est l'axe radical des cercles γ₁ : ${M(g1)} et γ₂ : ${M(g2)} ?`,
+    prompt: t('Quel est l\'axe radical des cercles γ₁ : {v1} et γ₂ : {v2} ?', { v1: M(g1), v2: M(g2) }),
     right: M(ax.ref),
     wrongs: [{ html: M(rawEq), rule: 'g10_radical_unnormalized' }, { html: M(centres), rule: null }],
     fillers: [{ html: M(lineText(lineRow(ax.row[1], ax.row[0].neg(), ax.row[2]))) }, { html: M(lineText(lineRow(ax.row[0], ax.row[1], ax.row[2].add(1)))) }],
-    solution: [{ html: `On divise γ₂ par ${m}, puis on soustrait : ${M(ax.ref)}. (Sans diviser : ${M(raw)} garde des x².)`, note: '' }],
+    solution: [{ html: t('On divise γ₂ par {m}, puis on soustrait : {v1}. (Sans diviser : {v2} garde des x².)', { m, v1: M(ax.ref), v2: M(raw) }), note: '' }],
   }, rng);
 }
 
@@ -792,9 +795,9 @@ function powExam(rng, exam) {
 
 const POL = 'g10-pole-polar';
 const POL_SUB = [
-  { id: 'dbl', label: 'dédoubler l\'équation', skill: POL },
-  { id: 'inter', label: 'intersecter avec le cercle', skill: 'quad-formula' },
-  { id: 'tan', label: 'tangentes par les points de contact', skill: TAN },
+  { id: 'dbl', label: t('dédoubler l\'équation'), skill: POL },
+  { id: 'inter', label: t('intersecter avec le cercle'), skill: 'quad-formula' },
+  { id: 'tan', label: t('tangentes par les points de contact'), skill: TAN },
 ];
 // ΩP⃗ = d, w with w·d = ‖w‖² = r², w' = 2(r²/‖d‖²)d − w whole: the two
 // points of contact Ω + w, Ω + w' of the tangents from P.
@@ -816,19 +819,19 @@ for (let p = -5; p <= 5; p++) {
 }
 const POL_MENU = {
   dbl: [
-    { id: 'dbl', label: 'Dédoubler : (x₀ − h)(x − h) + (y₀ − k)(y − k) = r²', valid: true },
-    { id: 'origin', label: 'x₀x + y₀y = r²', valid: false, rule: 'g10_polar_origin_formula', why: 'Cette formule ne vaut que pour un cercle centré à l\'origine.' },
+    { id: 'dbl', label: t('Dédoubler : (x₀ − h)(x − h) + (y₀ − k)(y − k) = r²'), valid: true },
+    { id: 'origin', label: 'x₀x + y₀y = r²', valid: false, rule: 'g10_polar_origin_formula', why: t('Cette formule ne vaut que pour un cercle centré à l\'origine.') },
   ],
   pole: [
-    { id: 'id', label: 'Identifier : P − Ω est proportionnel au vecteur normal de la droite', valid: true },
-    { id: 'normal', label: 'Prendre P = vecteur normal de la droite', valid: false, why: 'P − Ω est proportionnel à (a ; b), et le coefficient se lit sur la constante.' },
+    { id: 'id', label: t('Identifier : P − Ω est proportionnel au vecteur normal de la droite'), valid: true },
+    { id: 'normal', label: t('Prendre P = vecteur normal de la droite'), valid: false, why: t('P − Ω est proportionnel à (a ; b), et le coefficient se lit sur la constante.') },
   ],
   inter: [
-    { id: 'sub', label: 'Remplacer y (ou x) de la polaire dans l\'équation du cercle', valid: true },
-    { id: 'solve', label: 'Résoudre l\'équation du 2e degré', valid: true },
+    { id: 'sub', label: t('Remplacer y (ou x) de la polaire dans l\'équation du cercle'), valid: true },
+    { id: 'solve', label: t('Résoudre l\'équation du 2e degré'), valid: true },
   ],
-  pt: [{ id: 'pt', label: 'Calculer l\'autre coordonnée sur la polaire', valid: true }, { id: 'circle', label: 'Prendre le centre', valid: false, why: 'Les points de contact sont sur le cercle et sur la polaire.' }],
-  tan: [{ id: 'pt', label: 'Les droites (PT₁) et (PT₂)', valid: true }, { id: 'polar', label: 'La polaire elle-même', valid: false, why: 'La polaire passe par les points de contact : ce n\'est pas une tangente.' }],
+  pt: [{ id: 'pt', label: t('Calculer l\'autre coordonnée sur la polaire'), valid: true }, { id: 'circle', label: t('Prendre le centre'), valid: false, why: t('Les points de contact sont sur le cercle et sur la polaire.') }],
+  tan: [{ id: 'pt', label: t('Les droites (PT₁) et (PT₂)'), valid: true }, { id: 'polar', label: t('La polaire elle-même'), valid: false, why: t('La polaire passe par les points de contact : ce n\'est pas une tangente.') }],
 };
 
 function polarData(rng) {
@@ -851,8 +854,8 @@ function polarPart(d, extra = {}) {
   return {
     start: 'p', judge: { kind: 'geom', object: 'line2', ref: lineText(d.row), polar: { P: d.P, r2: d.r2 } }, menu: POL_MENU.dbl,
     lines: [
-      { math: `${terms.join(' + ')} = ${d.r2}`, note: `Dédoubler : x₀ − h = ${fq(d.d[0])}, y₀ − k = ${fq(d.d[1])}`, subgoal: 'dbl', blank: d.d.filter((x) => x).map((x) => qt(x)) },
-      { math: lineText(d.row), note: 'Développer', subgoal: 'dbl' },
+      { math: `${terms.join(' + ')} = ${d.r2}`, note: t('Dédoubler : x₀ − h = {v1}, y₀ − k = {v2}', { v1: fq(d.d[0]), v2: fq(d.d[1]) }), subgoal: 'dbl', blank: d.d.filter((x) => x).map((x) => qt(x)) },
+      { math: lineText(d.row), note: t('Développer'), subgoal: 'dbl' },
     ],
     ...extra,
   };
@@ -863,16 +866,16 @@ function polPolar(level, rng, opts = {}) {
   const eq = circleRed(d.h, d.k, d.r2);
   const parts = [polarPart(d, {
     decisions: [{
-      levels: [2], kind: 'decision', prompt: 'On cherche…', options: [
-        { id: 'polar', label: 'la polaire d\'un point : dédoubler', valid: true, ref: true },
-        { id: 'pole', label: 'le pôle d\'une droite : identifier', valid: false, why: 'Le point P est donné : on cherche sa polaire.' },
+      levels: [2], kind: 'decision', prompt: t('On cherche…'), options: [
+        { id: 'polar', label: t('la polaire d\'un point : dédoubler'), valid: true, ref: true },
+        { id: 'pole', label: t('le pôle d\'une droite : identifier'), valid: false, why: t('Le point P est donné : on cherche sa polaire.') },
       ],
     }],
   })];
   return partsG({
     skill: POL, level, parts, subgoals: POL_SUB, keys: KEYS,
-    prompt: `Écris l'équation de la polaire du point ${ptR('P', d.P)} par rapport au cercle γ : ${M(eq)}.`,
-    hints: H('Remplace un des deux x par x₀ et un des deux y par y₀ dans la forme réduite.', dblHint(d), Rd(lineText(d.row))),
+    prompt: t('Écris l\'équation de la polaire du point {v1} par rapport au cercle γ : {v2}.', { v1: ptR('P', d.P), v2: M(eq) }),
+    hints: H(t('Remplace un des deux x par x₀ et un des deux y par y₀ dans la forme réduite.'), dblHint(d), Rd(lineText(d.row))),
     key: `${POL}:polar:${eq}:${vt(d.P)}`, exam: opts.exam ? examTag(opts, 3) : false,
   });
 }
@@ -884,20 +887,20 @@ function polPole(level, rng) {
   const parts = [{
     start: 'P', judge: { kind: 'vector', expect: vt(d.P) }, menu: POL_MENU.pole,
     decisions: [{
-      levels: [2], kind: 'decision', prompt: 'On cherche…', options: [
-        { id: 'pole', label: 'le pôle d\'une droite : identifier', valid: true, ref: true },
-        { id: 'polar', label: 'la polaire d\'un point : dédoubler', valid: false, why: 'La droite est donnée : on cherche son pôle P.' },
+      levels: [2], kind: 'decision', prompt: t('On cherche…'), options: [
+        { id: 'pole', label: t('le pôle d\'une droite : identifier'), valid: true, ref: true },
+        { id: 'polar', label: t('la polaire d\'un point : dédoubler'), valid: false, why: t('La droite est donnée : on cherche son pôle P.') },
       ],
     }],
     lines: [
-      { math: `P = ${vt([d.h, d.k])} + ${par(lam)}·${vt([d.row[0], d.row[1]])}`, note: `La polaire de P est (x₀ − h)(x − h) + (y₀ − k)(y − k) = r² : P − Ω est proportionnel à ${vr([d.row[0], d.row[1]])}, et la constante donne le coefficient`, subgoal: 'dbl', blank: [par(lam)] },
+      { math: `P = ${vt([d.h, d.k])} + ${par(lam)}·${vt([d.row[0], d.row[1]])}`, note: t('La polaire de P est (x₀ − h)(x − h) + (y₀ − k)(y − k) = r² : P − Ω est proportionnel à {v1}, et la constante donne le coefficient', { v1: vr([d.row[0], d.row[1]]) }), subgoal: 'dbl', blank: [par(lam)] },
       { math: `P = ${vt(d.P)}`, note: '', subgoal: 'dbl' },
     ],
   }];
   return partsG({
     skill: POL, level, parts, subgoals: POL_SUB, keys: KEYS,
-    prompt: `Trouve le pôle P de la droite ${M(lineText(d.row))} par rapport au cercle γ : ${M(eq)}.`,
-    hints: H('Écris la polaire d\'un point P(x₀ ; y₀) quelconque et identifie ses coefficients avec ceux de la droite.', `P = ${vr([d.h, d.k])} + □·${vr([d.row[0], d.row[1]])}`, `P = ${vr(d.P)}`),
+    prompt: t('Trouve le pôle P de la droite {v1} par rapport au cercle γ : {v2}.', { v1: M(lineText(d.row)), v2: M(eq) }),
+    hints: H(t('Écris la polaire d\'un point P(x₀ ; y₀) quelconque et identifie ses coefficients avec ceux de la droite.'), `P = ${vr([d.h, d.k])} + □·${vr([d.row[0], d.row[1]])}`, `P = ${vr(d.P)}`),
     key: `${POL}:pole:${eq}:${lineText(d.row)}`,
   });
 }
@@ -926,26 +929,26 @@ function polTangents(level, rng, opts = {}) {
   const tanRow = (X) => lineRow(X[0] - h, X[1] - k, -((X[0] - h) * h + (X[1] - k) * k + r2));
   const final = `${lineText(tanRow(Ts[0]))} ou ${lineText(tanRow(Ts[1]))}`;
   const parts = [
-    polarPart(d, { html: 'La polaire de P passe par les deux points de contact.' }),
+    polarPart(d, { html: t('La polaire de P passe par les deux points de contact.') }),
     {
-      html: `On remplace ${other} de la polaire dans l'équation du cercle.`, ask: `${v} :`, start, judge: { kind: 'solset', v }, menu: POL_MENU.inter,
+      html: t('On remplace {other} de la polaire dans l\'équation du cercle.', { other }), ask: `${v} :`, start, judge: { kind: 'solset', v }, menu: POL_MENU.inter,
       lines: [
-        { math: `${sumT([[qa / g, `${v}^2`], [qb / g, v], [qc / g, '']])} = 0`, note: 'Développer', subgoal: 'inter' },
-        { math: roots.map((x) => `${v} = ${x}`).join(' ou '), note: 'Résoudre', subgoal: 'inter', blank: roots.map(String) },
+        { math: `${sumT([[qa / g, `${v}^2`], [qb / g, v], [qc / g, '']])} = 0`, note: t('Développer'), subgoal: 'inter' },
+        { math: roots.map((x) => `${v} = ${x}`).join(' ou '), note: t('Résoudre'), subgoal: 'inter', blank: roots.map(String) },
       ],
     },
-    { html: `Le premier point de contact (${v} = ${fq(roots[0])}).`, ask: 'T₁ =', start: 'T_1', judge: { kind: 'vector', expect: vt(Ts[0]) }, menu: POL_MENU.pt, lines: [{ math: `T_1 = ${vt(Ts[0])}`, note: `${other} se lit sur la polaire`, subgoal: 'inter' }] },
-    { html: 'Le second.', ask: 'T₂ =', start: 'T_2', judge: { kind: 'vector', expect: vt(Ts[1]) }, menu: POL_MENU.pt, lines: [{ math: `T_2 = ${vt(Ts[1])}`, note: '', subgoal: 'inter' }] },
+    { html: t('Le premier point de contact ({v1} = {v2}).', { v1: v, v2: fq(roots[0]) }), ask: 'T₁ =', start: 'T_1', judge: { kind: 'vector', expect: vt(Ts[0]) }, menu: POL_MENU.pt, lines: [{ math: `T_1 = ${vt(Ts[0])}`, note: t('{other} se lit sur la polaire', { other }), subgoal: 'inter' }] },
+    { html: t('Le second.'), ask: 'T₂ =', start: 'T_2', judge: { kind: 'vector', expect: vt(Ts[1]) }, menu: POL_MENU.pt, lines: [{ math: `T_2 = ${vt(Ts[1])}`, note: '', subgoal: 'inter' }] },
     {
-      html: 'Les tangentes issues de P sont les droites (PT₁) et (PT₂).', ask: 'tangentes :', start: 't',
+      html: t('Les tangentes issues de P sont les droites (PT₁) et (PT₂).'), ask: t('tangentes :'), start: 't',
       judge: { kind: 'geom', object: 'line2', count: 2, ref: final }, menu: POL_MENU.tan,
       lines: [{ math: final, note: 'En Tᵢ : (x_T − h)(x − h) + (y_T − k)(y − k) = r²', subgoal: 'tan' }],
     },
   ];
   return partsG({
     skill: POL, level, parts, subgoals: POL_SUB, keys: KEYS,
-    prompt: `Par la polaire, trouve les points de contact et les tangentes au cercle γ : ${M(eq)} issues du point ${ptR('P', P)}.`,
-    hints: H('La polaire de P coupe le cercle aux points de contact des tangentes issues de P.', `Polaire : ${dblHint(d)}`, Rd(final)),
+    prompt: t('Par la polaire, trouve les points de contact et les tangentes au cercle γ : {v1} issues du point {v2}.', { v1: M(eq), v2: ptR('P', P) }),
+    hints: H(t('La polaire de P coupe le cercle aux points de contact des tangentes issues de P.'), t('Polaire : {v1}', { v1: dblHint(d) }), Rd(final)),
     key: `${POL}:tan:${eq}:${vt(P)}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -966,9 +969,9 @@ function polExam(rng, exam) {
     const r = rng.int(2, 4);
     return tfG({
       skill: POL, key: `interior:${h}:${k}:${r}`, truth: false, exam: examTag({ exam }),
-      statement: `La polaire de tout point P ≠ Ω par rapport au cercle γ : ${M(circleRed(h, k, r * r))} coupe ce cercle.`,
+      statement: t('La polaire de tout point P ≠ Ω par rapport au cercle γ : {v1} coupe ce cercle.', { v1: M(circleRed(h, k, r * r)) }),
       counter: geoCounter('interiorPolar', [['P', 'P =']], { P: vt([h + 1, k]) }, { h, k, r }),
-      explanation: `Faux : pour P = ${vr([h + 1, k])}, à l'intérieur, la polaire est ${M(lineText(lineRow(1, 0, -(h + r * r))))}, à la distance ${r * r} > ${r} du centre : elle ne coupe pas γ.`,
+      explanation: t('Faux : pour P = {v1}, à l\'intérieur, la polaire est {v2}, à la distance {v3} > {r} du centre : elle ne coupe pas γ.', { v1: vr([h + 1, k]), v2: M(lineText(lineRow(1, 0, -(h + r * r)))), v3: r * r, r }),
     });
   }
   const d = polarData(rng);
@@ -977,11 +980,11 @@ function polExam(rng, exam) {
   const radial = lineText(lineRow(-d.d[1], d.d[0], d.d[1] * d.h - d.d[0] * d.k));
   return mcqD({
     skill: POL, level: 4, key: `mcq:${eq}:${vt(d.P)}`, exam: examTag({ exam }),
-    prompt: `Quelle est la polaire du point ${ptR('P', d.P)} par rapport au cercle ${M(eq)} ?`,
+    prompt: t('Quelle est la polaire du point {v1} par rapport au cercle {v2} ?', { v1: ptR('P', d.P), v2: M(eq) }),
     right: M(lineText(d.row)),
     wrongs: [{ html: M(origin), rule: 'g10_polar_origin_formula' }, { html: M(radial), rule: null }],
     fillers: [{ html: M(lineText(lineRow(d.row[0], d.row[1], d.row[2].add(1)))) }, { html: M(lineText(lineRow(d.row[0], d.row[1], d.row[2].neg()))) }],
-    solution: [{ html: `On dédouble : ${Rd(`${par(d.d[0])}(${diffT('x', d.h)}) + ${par(d.d[1])}(${diffT('y', d.k)}) = ${d.r2}`)}, soit ${M(lineText(d.row))}.`, note: '' }],
+    solution: [{ html: t('On dédouble : {v1}, soit {v2}.', { v1: Rd(`${par(d.d[0])}(${diffT('x', d.h)}) + ${par(d.d[1])}(${diffT('y', d.k)}) = ${d.r2}`), v2: M(lineText(d.row)) }), note: '' }],
   }, rng);
 }
 
@@ -1021,16 +1024,20 @@ const pt2 = (P) => `(${P[0]} ; ${P[1]})`;
 const viewAround = (h, k, span) => ({ x: [Math.floor(h - span), Math.ceil(h + span)], y: [Math.floor(k - span), Math.ceil(k + span)] });
 const conicPart = (o) => ({ ...o, judge: { kind: 'conic', equation: o.eq, ...(o.els ? { ask: o.els } : { target: 'standard' }) } });
 
-const AXIS_DEC = (vertical, what) => ({
-  levels: [2], kind: 'decision', prompt: `${what} est…`, options: [
-    { id: 'h', label: 'horizontal', valid: !vertical, ref: !vertical, rule: vertical ? 'g10_axis_swap' : null, why: `Non : regarde de quel côté est ${what === 'Le grand axe' ? 'le plus grand dénominateur' : 'le terme positif'}.` },
-    { id: 'v', label: 'vertical', valid: vertical, ref: vertical, rule: vertical ? null : 'g10_axis_swap', why: `Non : regarde de quel côté est ${what === 'Le grand axe' ? 'le plus grand dénominateur' : 'le terme positif'}.` },
-  ],
-});
+// axis: 'major' (ellipse: the major axis) or 'real' (hyperbola: the transverse axis).
+const AXIS_DEC = (vertical, axis) => {
+  const why = axis === 'major' ? t('Non : regarde de quel côté est le plus grand dénominateur.') : t('Non : regarde de quel côté est le terme positif.');
+  return {
+    levels: [2], kind: 'decision', prompt: axis === 'major' ? t('Le grand axe est…') : t('L\'axe réel est…'), options: [
+      { id: 'h', label: t('horizontal'), valid: !vertical, ref: !vertical, rule: vertical ? 'g10_axis_swap' : null, why },
+      { id: 'v', label: t('vertical'), valid: vertical, ref: vertical, rule: vertical ? null : 'g10_axis_swap', why },
+    ],
+  };
+};
 const STD_MENU = [
-  { id: 'sq', label: 'Compléter les carrés', valid: true },
-  { id: 'div', label: 'Diviser par le second membre', valid: true },
-  { id: 'read', label: 'Lire les éléments sur l\'équation développée', valid: false, why: 'Les éléments se lisent sur la forme réduite : complète d\'abord les carrés.' },
+  { id: 'sq', label: t('Compléter les carrés'), valid: true },
+  { id: 'div', label: t('Diviser par le second membre'), valid: true },
+  { id: 'read', label: t('Lire les éléments sur l\'équation développée'), valid: false, why: t('Les éléments se lisent sur la forme réduite : complète d\'abord les carrés.') },
 ];
 
 // ======================================================================
@@ -1039,8 +1046,8 @@ const STD_MENU = [
 
 const ELL = 'g10-ellipse';
 const ELL_SUB = [
-  { id: 'sq', label: 'compléter les carrés', skill: 'quad-complete' },
-  { id: 'el', label: 'lire les éléments', skill: ELL },
+  { id: 'sq', label: t('compléter les carrés'), skill: 'quad-complete' },
+  { id: 'el', label: t('lire les éléments'), skill: ELL },
 ];
 
 function ellData(rng) {
@@ -1064,16 +1071,16 @@ function ellData(rng) {
 
 const ELL_MENU = {
   el: [
-    { id: 'read', label: 'Lire Ω, a et b : a sous le plus grand dénominateur', valid: true },
-    { id: 'small', label: 'a sous le premier dénominateur écrit', valid: false, rule: 'g10_axis_swap', why: 'Le grand axe est du côté du plus grand dénominateur, pas du premier écrit.' },
+    { id: 'read', label: t('Lire Ω, a et b : a sous le plus grand dénominateur'), valid: true },
+    { id: 'small', label: t('a sous le premier dénominateur écrit'), valid: false, rule: 'g10_axis_swap', why: t('Le grand axe est du côté du plus grand dénominateur, pas du premier écrit.') },
   ],
   foc: [
-    { id: 'minus', label: 'c² = a² − b², foyers sur le grand axe', valid: true },
-    { id: 'plus', label: 'c² = a² + b²', valid: false, rule: 'g10_c_wrong_formula', why: 'Pour une ellipse, les foyers sont à l\'intérieur : c < a, donc c² = a² − b².' },
+    { id: 'minus', label: t('c² = a² − b², foyers sur le grand axe'), valid: true },
+    { id: 'plus', label: 'c² = a² + b²', valid: false, rule: 'g10_c_wrong_formula', why: t('Pour une ellipse, les foyers sont à l\'intérieur : c < a, donc c² = a² − b².') },
   ],
   dir: [
-    { id: 'e', label: 'e = c/a, directrices à a²/c du centre', valid: true },
-    { id: 'inv', label: 'e = a/c', valid: false, why: 'Pour une ellipse, e = c/a < 1.' },
+    { id: 'e', label: t('e = c/a, directrices à a²/c du centre'), valid: true },
+    { id: 'inv', label: 'e = a/c', valid: false, why: t('Pour une ellipse, e = c/a < 1.') },
   ],
 };
 
@@ -1084,31 +1091,31 @@ function ellParts(d, level, kind) {
     parts.push(conicPart({
       start: eq, eq, menu: STD_MENU,
       lines: [
-        { math: completedOf(d.coefs, d.h, d.k), note: 'Compléter les carrés', subgoal: 'sq', blank: [{ after: sqT('x', d.h), text: qt(d.coefs[0] * d.h * d.h) }, { after: sqT('y', d.k), text: qt(d.coefs[2] * d.k * d.k) }].filter((b) => b.text !== '0') },
-        { math: d.std, note: 'Diviser par le second membre', subgoal: 'sq', blank: [String(d.ax * d.ax), String(d.ay * d.ay)] },
+        { math: completedOf(d.coefs, d.h, d.k), note: t('Compléter les carrés'), subgoal: 'sq', blank: [{ after: sqT('x', d.h), text: qt(d.coefs[0] * d.h * d.h) }, { after: sqT('y', d.k), text: qt(d.coefs[2] * d.k * d.k) }].filter((b) => b.text !== '0') },
+        { math: d.std, note: t('Diviser par le second membre'), subgoal: 'sq', blank: [String(d.ax * d.ax), String(d.ay * d.ay)] },
       ],
     }));
   }
   const first = (o) => (parts.length ? o : { ...o, start: d.std, html: null });
   parts.push(conicPart(first({
-    html: 'Le centre et les demi-axes.', ask: 'Ω, a, b :', start: 'E', eq, els: ['Ω', 'a', 'b'], menu: ELL_MENU.el,
-    decisions: [AXIS_DEC(d.vertical, 'Le grand axe')],
-    lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.A} ; b = ${d.B}`, note: `Grand axe ${d.vertical ? 'vertical' : 'horizontal'} : a² = ${d.A * d.A} sous ${d.vertical ? 'y' : 'x'}`, subgoal: 'el', blank: [{ after: 'a=', text: String(d.A) }, { after: 'b=', text: String(d.B) }] }],
+    html: t('Le centre et les demi-axes.'), ask: 'Ω, a, b :', start: 'E', eq, els: ['Ω', 'a', 'b'], menu: ELL_MENU.el,
+    decisions: [AXIS_DEC(d.vertical, 'major')],
+    lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.A} ; b = ${d.B}`, note: d.vertical ? t('Grand axe vertical : a² = {a2} sous y', { a2: d.A * d.A }) : t('Grand axe horizontal : a² = {a2} sous x', { a2: d.A * d.A }), subgoal: 'el', blank: [{ after: 'a=', text: String(d.A) }, { after: 'b=', text: String(d.B) }] }],
   })));
   parts.push(conicPart({
-    html: 'Les foyers.', ask: 'c, F, F′ :', start: 'E', eq, els: kind === 'foci' ? ['c', 'F', 'e'] : ['c', 'F'], menu: ELL_MENU.foc,
+    html: t('Les foyers.'), ask: 'c, F, F′ :', start: 'E', eq, els: kind === 'foci' ? ['c', 'F', 'e'] : ['c', 'F'], menu: ELL_MENU.foc,
     lines: [
       { math: `c = ${d.cT}`, note: `c² = a² − b² = ${d.c2}`, subgoal: 'el', blank: [d.cT] },
-      { math: `F = ${pt2(d.F[0])} ; F' = ${pt2(d.F[1])}`, note: `Sur le grand axe, à c du centre`, subgoal: 'el' },
+      { math: `F = ${pt2(d.F[0])} ; F' = ${pt2(d.F[1])}`, note: t('Sur le grand axe, à c du centre'), subgoal: 'el' },
       ...(kind === 'foci' ? [{ math: `e = ${d.eT}`, note: 'e = c/a', subgoal: 'el' }] : []),
     ],
   }));
   if (kind === 'all') {
     parts.push(conicPart({
-      html: 'L\'excentricité et les directrices.', ask: 'e, directrices :', start: 'E', eq, els: ['e', 'directrices'], menu: ELL_MENU.dir,
+      html: t('L\'excentricité et les directrices.'), ask: t('e, directrices :'), start: 'E', eq, els: ['e', 'directrices'], menu: ELL_MENU.dir,
       lines: [
         { math: `e = ${d.eT}`, note: 'e = c/a', subgoal: 'el', blank: [d.eT] },
-        { math: `directrices : ${d.dirs[0]} ou ${d.dirs[1]}`, note: `À a²/c = ${rootR(q(d.A ** 4, d.c2))} du centre, perpendiculaires au grand axe`, subgoal: 'el' },
+        { math: `directrices : ${d.dirs[0]} ou ${d.dirs[1]}`, note: t('À a²/c = {v1} du centre, perpendiculaires au grand axe', { v1: rootR(q(d.A ** 4, d.c2)) }), subgoal: 'el' },
       ],
     }));
   }
@@ -1122,9 +1129,13 @@ function ellItem(level, rng, opts = {}) {
   return partsG({
     skill: ELL, level, parts: ellParts(d, level, kind), subgoals: ELL_SUB, keys: KEYS,
     prompt: level === 1
-      ? `L'ellipse E a pour forme réduite ${M(d.std)}. Donne son centre, a et b, ses foyers${kind === 'all' ? ', son excentricité et ses directrices' : ''}.`
-      : `Pour l'ellipse E : ${M(d.eq)}, trouve la forme réduite, le centre, a et b, les foyers${kind === 'all' ? ', l\'excentricité et les directrices' : ' et l\'excentricité'}.`,
-    hints: H(level === 1 ? 'Le grand axe est du côté du plus grand dénominateur ; c² = a² − b² ; e = c/a.' : `Mets ${d.coefs[0]} en facteur dans les x, ${d.coefs[2]} dans les y, complète, puis divise par le second membre.`, `c² = a² − b² = □`, `F = ${Rd(pt2(d.F[0]))} et F′ = ${Rd(pt2(d.F[1]))}`),
+      ? (kind === 'all'
+        ? t('L\'ellipse E a pour forme réduite {v1}. Donne son centre, a et b, ses foyers, son excentricité et ses directrices.', { v1: M(d.std) })
+        : t('L\'ellipse E a pour forme réduite {v1}. Donne son centre, a et b, ses foyers.', { v1: M(d.std) }))
+      : (kind === 'all'
+        ? t('Pour l\'ellipse E : {v1}, trouve la forme réduite, le centre, a et b, les foyers, l\'excentricité et les directrices.', { v1: M(d.eq) })
+        : t('Pour l\'ellipse E : {v1}, trouve la forme réduite, le centre, a et b, les foyers et l\'excentricité.', { v1: M(d.eq) })),
+    hints: H(level === 1 ? t('Le grand axe est du côté du plus grand dénominateur ; c² = a² − b² ; e = c/a.') : t('Mets {v1} en facteur dans les x, {v2} dans les y, complète, puis divise par le second membre.', { v1: d.coefs[0], v2: d.coefs[2] }), `c² = a² − b² = □`, `F = ${Rd(pt2(d.F[0]))} et F′ = ${Rd(pt2(d.F[1]))}`),
     key: `${ELL}:${kind}:${d.eq}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -1134,10 +1145,10 @@ function ellPlot(level, rng, d = ellData(rng)) {
   const span = d.A + 1.5;
   return conicPlot({
     skill: ELL, level, equation: d.eq, view: viewAround(d.h, d.k, span), key: d.eq,
-    prompt: `Esquisse l'ellipse E : ${M(d.std)}. Place son centre Ω, les sommets du grand axe et les foyers.`,
-    place: [{ id: 'center', label: 'Ω', short: 'Ω', kind: 'point' }, { id: 'vertices', label: 'Sommets', short: 'S', kind: 'point' }, { id: 'foci', label: 'Foyers', short: 'F', kind: 'point' }],
-    hints: H('Le centre se lit sur la forme réduite ; les sommets sont à a du centre sur le grand axe.', `a = ${d.A}, sur l'axe ${d.vertical ? 'vertical' : 'horizontal'} ; c = □`, `Foyers ${Rd(pt2(d.F[0]))} et ${Rd(pt2(d.F[1]))}`),
-    solution: [{ html: `Ω = ${Rd(pt2([d.h, d.k]))}, a = ${d.A}, b = ${d.B}, c = ${Rd(d.cT)} ; foyers ${Rd(pt2(d.F[0]))} et ${Rd(pt2(d.F[1]))}.`, note: '' }],
+    prompt: t('Esquisse l\'ellipse E : {v1}. Place son centre Ω, les sommets du grand axe et les foyers.', { v1: M(d.std) }),
+    place: [{ id: 'center', label: 'Ω', short: 'Ω', kind: 'point' }, { id: 'vertices', label: t('Sommets'), short: 'S', kind: 'point' }, { id: 'foci', label: t('Foyers'), short: 'F', kind: 'point' }],
+    hints: H(t('Le centre se lit sur la forme réduite ; les sommets sont à a du centre sur le grand axe.'), d.vertical ? t('a = {A}, sur l\'axe vertical ; c = □', { A: d.A }) : t('a = {A}, sur l\'axe horizontal ; c = □', { A: d.A }), t('Foyers {F1} et {F2}', { F1: Rd(pt2(d.F[0])), F2: Rd(pt2(d.F[1])) })),
+    solution: [{ html: t('Ω = {v1}, a = {A}, b = {B}, c = {v2} ; foyers {v3} et {v4}.', { v1: Rd(pt2([d.h, d.k])), A: d.A, B: d.B, v2: Rd(d.cT), v3: Rd(pt2(d.F[0])), v4: Rd(pt2(d.F[1])) }), note: '' }],
     rules: { foci: 'g10_c_wrong_formula', vertices: 'g10_axis_swap' },
     baits: ['g10_c_wrong_formula', 'g10_axis_swap'],
     noHints: level === 5,
@@ -1151,7 +1162,9 @@ function ellExam(rng, exam) {
     const right = d.vertical ? d.F[0][1] : d.F[0][0];
     return coefItem({
       skill: ELL, key: `${d.eq}`, exam: examTag({ exam }), label: d.vertical ? 'y_F' : 'x_F',
-      prompt: `L'ellipse ${M(d.eq)} a un foyer F ${d.vertical ? 'au-dessus de l\'autre' : 'à droite de l\'autre'}. Que vaut ${d.vertical ? 'son ordonnée' : 'son abscisse'} ?`,
+      prompt: d.vertical
+        ? t('L\'ellipse {v1} a un foyer F au-dessus de l\'autre. Que vaut son ordonnée ?', { v1: M(d.eq) })
+        : t('L\'ellipse {v1} a un foyer F à droite de l\'autre. Que vaut son abscisse ?', { v1: M(d.eq) }),
       value: right, traps: [{ rule: 'g10_c_wrong_formula' }, { rule: 'g10_axis_swap' }],
       solution: [{ html: `${M(d.std)} : a = ${d.A}, b = ${d.B}, c = ${Rd(d.cT)}, F = ${Rd(pt2(d.F[0]))}.`, note: '' }],
     });
@@ -1160,15 +1173,15 @@ function ellExam(rng, exam) {
     if (rng.chance(0.4)) {
       return tfG({
         skill: ELL, key: 'e<1', truth: true, exam: examTag({ exam }),
-        statement: 'L\'excentricité e d\'une ellipse (qui n\'est pas un cercle) vérifie 0 < e < 1.',
-        explanation: 'Vrai : e = c/a et c² = a² − b² < a², donc c < a.',
+        statement: t('L\'excentricité e d\'une ellipse (qui n\'est pas un cercle) vérifie 0 < e < 1.'),
+        explanation: t('Vrai : e = c/a et c² = a² − b² < a², donc c < a.'),
       });
     }
     return tfG({
       skill: ELL, key: 'foci', truth: false, exam: examTag({ exam }), ruleIfTrue: 'g10_c_wrong_formula',
-      statement: 'Les foyers de l\'ellipse x²/a² + y²/b² = 1 (avec a > b > 0) sont à la distance √(a² + b²) du centre.',
+      statement: t('Les foyers de l\'ellipse x²/a² + y²/b² = 1 (avec a > b > 0) sont à la distance √(a² + b²) du centre.'),
       counter: geoCounter('ellipseFoci', [['a', 'a ='], ['b', 'b =']], { a: '5', b: '3' }),
-      explanation: 'Faux : c² = a² − b². Pour a = 5 et b = 3, les foyers sont à 4 du centre, pas à √34.',
+      explanation: t('Faux : c² = a² − b². Pour a = 5 et b = 3, les foyers sont à 4 du centre, pas à √34.'),
     });
   }
   const c2w = d.A * d.A + d.B * d.B;
@@ -1177,7 +1190,7 @@ function ellExam(rng, exam) {
   const opt = (P, Qq) => `${Rd(pt2(P))} et ${Rd(pt2(Qq))}`;
   return mcqD({
     skill: ELL, level: 4, key: `mcq:${d.eq}`, exam: examTag({ exam }),
-    prompt: `Quels sont les foyers de l'ellipse ${M(d.eq)} ?`,
+    prompt: t('Quels sont les foyers de l\'ellipse {v1} ?', { v1: M(d.eq) }),
     right: opt(d.F[0], d.F[1]),
     wrongs: [{ html: opt(fw(1), fw(-1)), rule: 'g10_c_wrong_formula' }, { html: opt(fs(1), fs(-1)), rule: 'g10_axis_swap' }],
     fillers: [{ html: opt(d.vertical ? [qt(d.h), qt(d.k + d.A)] : [qt(d.h + d.A), qt(d.k)], d.vertical ? [qt(d.h), qt(d.k - d.A)] : [qt(d.h - d.A), qt(d.k)]) }, { html: opt(d.F[0].map((x) => x.replace(/^-/, '')), d.F[1]) }],
@@ -1220,18 +1233,18 @@ function hypData(rng, kind = 'all') {
 
 const HYP_MENU = {
   el: [
-    { id: 'pos', label: 'L\'axe réel est du côté du terme positif (second membre +1)', valid: true },
-    { id: 'big', label: 'L\'axe réel est du côté du plus grand dénominateur', valid: false, rule: 'g10_axis_swap', why: 'Pour une hyperbole, c\'est le signe qui compte : le terme positif quand le second membre vaut 1.' },
+    { id: 'pos', label: t('L\'axe réel est du côté du terme positif (second membre +1)'), valid: true },
+    { id: 'big', label: t('L\'axe réel est du côté du plus grand dénominateur'), valid: false, rule: 'g10_axis_swap', why: t('Pour une hyperbole, c\'est le signe qui compte : le terme positif quand le second membre vaut 1.') },
   ],
   foc: [
     { id: 'plus', label: 'c² = a² + b²', valid: true },
-    { id: 'minus', label: 'c² = a² − b²', valid: false, rule: 'g10_c_wrong_formula', why: 'Pour une hyperbole, c > a : c² = a² + b².' },
+    { id: 'minus', label: 'c² = a² − b²', valid: false, rule: 'g10_c_wrong_formula', why: t('Pour une hyperbole, c > a : c² = a² + b².') },
   ],
   asy: [
-    { id: 'ba', label: 'y − k = ±(b/a)(x − h) pour l\'axe réel horizontal', valid: true },
-    { id: 'ab', label: 'y − k = ±(a/b)(x − h) pour l\'axe réel horizontal', valid: false, rule: 'g10_asymptote_ratio', why: 'x²/a² − y²/b² = 0 donne y = ±(b/a)x.' },
+    { id: 'ba', label: t('y − k = ±(b/a)(x − h) pour l\'axe réel horizontal'), valid: true },
+    { id: 'ab', label: t('y − k = ±(a/b)(x − h) pour l\'axe réel horizontal'), valid: false, rule: 'g10_asymptote_ratio', why: t('x²/a² − y²/b² = 0 donne y = ±(b/a)x.') },
   ],
-  dir: [{ id: 'dir', label: 'Directrices à a²/c du centre, perpendiculaires à l\'axe réel', valid: true }, { id: 'c', label: 'À c du centre', valid: false, why: 'À c du centre, ce sont les foyers.' }],
+  dir: [{ id: 'dir', label: t('Directrices à a²/c du centre, perpendiculaires à l\'axe réel'), valid: true }, { id: 'c', label: t('À c du centre'), valid: false, why: t('À c du centre, ce sont les foyers.') }],
 };
 
 function hypParts(d, level, kind) {
@@ -1240,34 +1253,34 @@ function hypParts(d, level, kind) {
     parts.push(conicPart({
       start: d.eq, eq: d.eq, menu: STD_MENU,
       lines: [
-        { math: completedOf(d.coefs, d.h, d.k), note: 'Compléter les carrés', subgoal: 'sq', blank: [{ after: sqT('x', d.h), text: qt(Math.abs(d.coefs[0] * d.h * d.h)) }, { after: sqT('y', d.k), text: qt(Math.abs(d.coefs[2] * d.k * d.k)) }].filter((b) => b.text !== '0') },
-        { math: d.std, note: `${Rd(d.sides).replace(/\^2/g, '²')}, puis diviser par le second membre (qui devient +1)`, subgoal: 'sq', blank: [String(d.a * d.a), String(d.b * d.b)] },
+        { math: completedOf(d.coefs, d.h, d.k), note: t('Compléter les carrés'), subgoal: 'sq', blank: [{ after: sqT('x', d.h), text: qt(Math.abs(d.coefs[0] * d.h * d.h)) }, { after: sqT('y', d.k), text: qt(Math.abs(d.coefs[2] * d.k * d.k)) }].filter((b) => b.text !== '0') },
+        { math: d.std, note: t('{v1}, puis diviser par le second membre (qui devient +1)', { v1: Rd(d.sides).replace(/\^2/g, '²') }), subgoal: 'sq', blank: [String(d.a * d.a), String(d.b * d.b)] },
       ],
     }));
   }
   const first = (o) => (parts.length ? o : { ...o, start: d.std, html: null });
   if (kind !== 'asym') {
     parts.push(conicPart(first({
-      html: 'Le centre, a, b et c.', ask: 'Ω, a, b, c :', start: 'H', eq: d.eq, els: ['Ω', 'a', 'b', 'c'], menu: HYP_MENU.el,
-      decisions: [AXIS_DEC(d.vertical, 'L\'axe réel')],
-      lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.a} ; b = ${d.b} ; c = ${d.cT}`, note: `Axe réel ${d.vertical ? 'vertical' : 'horizontal'} ; c² = a² + b² = ${d.c2}`, subgoal: 'el', blank: [{ after: 'a=', text: String(d.a) }, { after: 'b=', text: String(d.b) }] }],
+      html: t('Le centre, a, b et c.'), ask: 'Ω, a, b, c :', start: 'H', eq: d.eq, els: ['Ω', 'a', 'b', 'c'], menu: HYP_MENU.el,
+      decisions: [AXIS_DEC(d.vertical, 'real')],
+      lines: [{ math: `Ω = ${pt2([d.h, d.k])} ; a = ${d.a} ; b = ${d.b} ; c = ${d.cT}`, note: d.vertical ? t('Axe réel vertical ; c² = a² + b² = {c2}', { c2: d.c2 }) : t('Axe réel horizontal ; c² = a² + b² = {c2}', { c2: d.c2 }), subgoal: 'el', blank: [{ after: 'a=', text: String(d.a) }, { after: 'b=', text: String(d.b) }] }],
     })));
     parts.push(conicPart({
-      html: 'Les foyers et l\'excentricité.', ask: 'F, F′, e :', start: 'H', eq: d.eq, els: ['F', 'e'], menu: HYP_MENU.foc,
+      html: t('Les foyers et l\'excentricité.'), ask: 'F, F′, e :', start: 'H', eq: d.eq, els: ['F', 'e'], menu: HYP_MENU.foc,
       lines: [
-        { math: `F = ${pt2(d.F[0])} ; F' = ${pt2(d.F[1])}`, note: 'Sur l\'axe réel, à c du centre', subgoal: 'el' },
+        { math: `F = ${pt2(d.F[0])} ; F' = ${pt2(d.F[1])}`, note: t('Sur l\'axe réel, à c du centre'), subgoal: 'el' },
         { math: `e = ${d.eT}`, note: 'e = c/a > 1', subgoal: 'el', blank: [d.eT] },
       ],
     }));
   }
   parts.push(conicPart(first({
-    html: 'Les asymptotes.', ask: 'asymptotes :', start: 'H', eq: d.eq, els: ['asymptotes'], menu: HYP_MENU.asy,
-    lines: [{ math: `asymptotes : ${d.asymT}`, note: d.vertical ? `y − k = ±(a/b)(x − h) : l'axe réel est vertical` : 'y − k = ±(b/a)(x − h)', subgoal: 'el' }],
+    html: t('Les asymptotes.'), ask: t('asymptotes :'), start: 'H', eq: d.eq, els: ['asymptotes'], menu: HYP_MENU.asy,
+    lines: [{ math: `asymptotes : ${d.asymT}`, note: d.vertical ? t('y − k = ±(a/b)(x − h) : l\'axe réel est vertical') : 'y − k = ±(b/a)(x − h)', subgoal: 'el' }],
   })));
   if (kind === 'all' && level >= 4) {
     parts.push(conicPart({
-      html: 'Les directrices.', ask: 'directrices :', start: 'H', eq: d.eq, els: ['directrices'], menu: HYP_MENU.dir,
-      lines: [{ math: `directrices : ${d.dirs[0]} ou ${d.dirs[1]}`, note: `À a²/c = ${rootR(q(d.a ** 4, d.c2))} du centre`, subgoal: 'el' }],
+      html: t('Les directrices.'), ask: t('directrices :'), start: 'H', eq: d.eq, els: ['directrices'], menu: HYP_MENU.dir,
+      lines: [{ math: `directrices : ${d.dirs[0]} ou ${d.dirs[1]}`, note: t('À a²/c = {v1} du centre', { v1: rootR(q(d.a ** 4, d.c2)) }), subgoal: 'el' }],
     }));
   }
   return parts;
@@ -1281,9 +1294,13 @@ function hypItem(level, rng, opts = {}) {
   return partsG({
     skill: HYP, level, parts: hypParts(d, level, kk), subgoals: HYP_SUB, keys: KEYS,
     prompt: level === 1
-      ? `L'hyperbole H a pour forme réduite ${M(d.std)}. Donne son centre, a, b, c, ses foyers, son excentricité et ses asymptotes.`
-      : `Pour l'hyperbole H : ${M(d.eq)}, trouve la forme réduite${kk === 'asym' ? ' et les asymptotes' : ', le centre, a, b, c, les foyers, l\'excentricité, les asymptotes'}${kk === 'all' && level >= 4 ? ' et les directrices' : ''}.`,
-    hints: H('Pour une hyperbole, c² = a² + b² ; l\'axe réel est du côté du terme positif quand le second membre vaut +1.', `${d.vertical ? 'y − k = ±(□/□)(x − h)' : 'y − k = ±(□/□)(x − h)'}, Ω = ${Rd(pt2([d.h, d.k]))}`, `asymptotes : ${Rd(d.asymT)}`),
+      ? t('L\'hyperbole H a pour forme réduite {v1}. Donne son centre, a, b, c, ses foyers, son excentricité et ses asymptotes.', { v1: M(d.std) })
+      : kk === 'asym'
+        ? t('Pour l\'hyperbole H : {v1}, trouve la forme réduite et les asymptotes.', { v1: M(d.eq) })
+        : kk === 'all' && level >= 4
+          ? t('Pour l\'hyperbole H : {v1}, trouve la forme réduite, le centre, a, b, c, les foyers, l\'excentricité, les asymptotes et les directrices.', { v1: M(d.eq) })
+          : t('Pour l\'hyperbole H : {v1}, trouve la forme réduite, le centre, a, b, c, les foyers, l\'excentricité, les asymptotes.', { v1: M(d.eq) }),
+    hints: H(t('Pour une hyperbole, c² = a² + b² ; l\'axe réel est du côté du terme positif quand le second membre vaut +1.'), `${d.vertical ? 'y − k = ±(□/□)(x − h)' : 'y − k = ±(□/□)(x − h)'}, Ω = ${Rd(pt2([d.h, d.k]))}`, t('asymptotes : {v1}', { v1: Rd(d.asymT) })),
     key: `${HYP}:${kind}:${d.eq}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -1293,10 +1310,10 @@ function hypPlot(level, rng) {
   const d = hypData(rng);
   return conicPlot({
     skill: HYP, level, equation: d.eq, view: viewAround(d.h, d.k, Math.sqrt(d.c2) + 1.5), key: d.eq,
-    prompt: `Esquisse l'hyperbole H : ${M(d.eq)}. Place son centre Ω, ses sommets et ses deux asymptotes (chacune par deux points).`,
-    place: [{ id: 'center', label: 'Ω', short: 'Ω', kind: 'point' }, { id: 'vertices', label: 'Sommets', short: 'S', kind: 'point' }, { id: 'asymptotes', label: 'Asymptotes', short: '', kind: 'line' }],
+    prompt: t('Esquisse l\'hyperbole H : {v1}. Place son centre Ω, ses sommets et ses deux asymptotes (chacune par deux points).', { v1: M(d.eq) }),
+    place: [{ id: 'center', label: 'Ω', short: 'Ω', kind: 'point' }, { id: 'vertices', label: t('Sommets'), short: 'S', kind: 'point' }, { id: 'asymptotes', label: t('Asymptotes'), short: '', kind: 'line' }],
     hints: [], noHints: true,
-    solution: [{ html: `${M(d.std)} : Ω = ${Rd(pt2([d.h, d.k]))}, sommets ${d.S.map((P) => Rd(pt2(P))).join(' et ')}, asymptotes ${Rd(d.asymT)}.`, note: '' }],
+    solution: [{ html: t('{v1} : Ω = {v2}, sommets {v3}, asymptotes {v4}.', { v1: M(d.std), v2: Rd(pt2([d.h, d.k])), v3: d.S.map((P) => Rd(pt2(P))).join(' et '), v4: Rd(d.asymT) }), note: '' }],
     rules: { asymptotes: 'g10_asymptote_ratio', vertices: 'g10_axis_swap' },
     baits: ['g10_asymptote_ratio', 'g10_axis_swap'],
   });
@@ -1307,8 +1324,8 @@ function hypExam(rng, exam) {
   if (exam === 'tf') {
     return tfG({
       skill: HYP, key: 'perp', truth: true, exam: examTag({ exam }),
-      statement: 'Les asymptotes de l\'hyperbole x²/a² − y²/b² = 1 sont perpendiculaires si et seulement si a = b.',
-      explanation: 'Vrai : leurs pentes ±b/a ont pour produit −b²/a², qui vaut −1 si et seulement si a = b (hyperbole équilatère).',
+      statement: t('Les asymptotes de l\'hyperbole x²/a² − y²/b² = 1 sont perpendiculaires si et seulement si a = b.'),
+      explanation: t('Vrai : leurs pentes ±b/a ont pour produit −b²/a², qui vaut −1 si et seulement si a = b (hyperbole équilatère).'),
     });
   }
   let d;
@@ -1318,14 +1335,14 @@ function hypExam(rng, exam) {
   const opt = (t) => Rd(t.replace(' ou ', ' et '));
   return mcqD({
     skill: HYP, level: 4, key: `mcq:${d.eq}`, exam: examTag({ exam }),
-    prompt: `Quelles sont les asymptotes de l'hyperbole ${M(d.eq)} ?`,
+    prompt: t('Quelles sont les asymptotes de l\'hyperbole {v1} ?', { v1: M(d.eq) }),
     right: opt(d.asymT),
     wrongs: [{ html: opt(swap), rule: 'g10_asymptote_ratio' }],
     fillers: [
       { html: opt(`${lineText(lineRow(d.asym[0][0], d.asym[0][1], d.asym[0][2].neg()))} ou ${lineText(lineRow(d.asym[1][0], d.asym[1][1], d.asym[1][2].neg()))}`) },
       { html: opt(`${lineText(lineRow(1, -1, -d.h + d.k))} ou ${lineText(lineRow(1, 1, -d.h - d.k))}`) },
     ],
-    solution: [{ html: `${M(d.std)} : les asymptotes passent par Ω = ${Rd(pt2([d.h, d.k]))}, ${Rd(d.asymT.replace(' ou ', ' et '))}.`, note: '' }],
+    solution: [{ html: t('{v1} : les asymptotes passent par Ω = {v2}, {v3}.', { v1: M(d.std), v2: Rd(pt2([d.h, d.k])), v3: Rd(d.asymT.replace(' ou ', ' et ')) }), note: '' }],
   }, rng);
 }
 
@@ -1359,29 +1376,29 @@ function parData(rng, { small = false } = {}) {
 }
 
 const PAR_MENU = {
-  S: [{ id: 'read', label: 'Lire le sommet et l\'axe sur la forme réduite', valid: true }, { id: 'focus', label: 'Le sommet est le foyer', valid: false, why: 'Le foyer est à p/2 du sommet, sur l\'axe.' }],
-  p: [{ id: 'half', label: '2p est le coefficient devant (y − k)', valid: true }, { id: 'p', label: 'p est le coefficient devant (y − k)', valid: false, why: 'La forme est (x − h)² = 2p(y − k) : ce coefficient vaut 2p.' }],
+  S: [{ id: 'read', label: t('Lire le sommet et l\'axe sur la forme réduite'), valid: true }, { id: 'focus', label: t('Le sommet est le foyer'), valid: false, why: t('Le foyer est à p/2 du sommet, sur l\'axe.') }],
+  p: [{ id: 'half', label: t('2p est le coefficient devant (y − k)'), valid: true }, { id: 'p', label: t('p est le coefficient devant (y − k)'), valid: false, why: t('La forme est (x − h)² = 2p(y − k) : ce coefficient vaut 2p.') }],
   F: [
-    { id: 'half', label: 'F à p/2 du sommet, directrice à p/2 de l\'autre côté', valid: true },
-    { id: 'p', label: 'F à p du sommet', valid: false, rule: 'g10_parabola_p_half', why: 'Le foyer est à p/2 du sommet, pas à p.' },
+    { id: 'half', label: t('F à p/2 du sommet, directrice à p/2 de l\'autre côté'), valid: true },
+    { id: 'p', label: t('F à p du sommet'), valid: false, rule: 'g10_parabola_p_half', why: t('Le foyer est à p/2 du sommet, pas à p.') },
   ],
-  def: [{ id: 'def', label: 'MF² = d(M, D)², puis développer', valid: true }, { id: 'mf', label: 'MF = d(M, D) sans élever au carré', valid: true, quality: 'poor', why: 'Juste, mais avec les racines, on ne peut pas réduire : élève au carré.' }],
+  def: [{ id: 'def', label: t('MF² = d(M, D)², puis développer'), valid: true }, { id: 'mf', label: t('MF = d(M, D) sans élever au carré'), valid: true, quality: 'poor', why: t('Juste, mais avec les racines, on ne peut pas réduire : élève au carré.') }],
 };
 
 function parElements(d, first) {
   const st = first ? d.std : 'P';
   return [
     conicPart({
-      html: first ? null : 'Le sommet et l\'axe.', ask: 'S, axe :', start: st, eq: d.eq, els: ['S', 'axe'], menu: PAR_MENU.S,
-      lines: [{ math: `S = ${pt2([d.h, d.k])} ; axe : ${d.axe}`, note: `Axe ${d.vertical ? 'vertical' : 'horizontal'} : le carré porte sur ${d.vertical ? 'x' : 'y'}`, subgoal: 'el', blank: [String(d.h), String(d.k)] }],
+      html: first ? null : t('Le sommet et l\'axe.'), ask: t('S, axe :'), start: st, eq: d.eq, els: ['S', 'axe'], menu: PAR_MENU.S,
+      lines: [{ math: `S = ${pt2([d.h, d.k])} ; axe : ${d.axe}`, note: d.vertical ? t('Axe vertical : le carré porte sur x') : t('Axe horizontal : le carré porte sur y'), subgoal: 'el', blank: [String(d.h), String(d.k)] }],
     }),
     {
-      html: 'Le paramètre p.', ask: 'p =', start: 'p', judge: { kind: 'value', expect: String(d.p) }, menu: PAR_MENU.p,
+      html: t('Le paramètre p.'), ask: 'p =', start: 'p', judge: { kind: 'value', expect: String(d.p) }, menu: PAR_MENU.p,
       lines: [{ math: String(d.p), note: `2p = ${d.p * 2}`, subgoal: 'el', blank: [String(d.p)] }],
     },
     conicPart({
-      html: 'Le foyer et la directrice.', ask: 'F, directrice :', start: 'P', eq: d.eq, els: ['F', 'directrice'], menu: PAR_MENU.F,
-      lines: [{ math: `F = ${pt2(d.F)} ; directrice : ${d.dir}`, note: 'À p/2 du sommet, de part et d\'autre', subgoal: 'el', blank: [d.vertical ? d.F[1] : d.F[0]] }],
+      html: t('Le foyer et la directrice.'), ask: t('F, directrice :'), start: 'P', eq: d.eq, els: ['F', 'directrice'], menu: PAR_MENU.F,
+      lines: [{ math: `F = ${pt2(d.F)} ; directrice : ${d.dir}`, note: t('À p/2 du sommet, de part et d\'autre'), subgoal: 'el', blank: [d.vertical ? d.F[1] : d.F[0]] }],
     }),
   ];
 }
@@ -1394,21 +1411,21 @@ function parItem(level, rng, opts = {}) {
   if (gab === 'eq') {
     if (level > 1) {
       parts.push(conicPart({
-        start: d.eq, eq: d.eq, menu: STD_MENU.slice(0, 1).concat([{ id: 'iso', label: 'Isoler le carré, mettre 2p en facteur', valid: true }]),
+        start: d.eq, eq: d.eq, menu: STD_MENU.slice(0, 1).concat([{ id: 'iso', label: t('Isoler le carré, mettre 2p en facteur'), valid: true }]),
         decisions: [{
-          levels: [2], kind: 'decision', prompt: 'L\'axe de la parabole est…', options: [
-            { id: 'v', label: 'vertical (le carré porte sur x)', valid: d.vertical, ref: d.vertical, why: 'Le terme au carré est en y : l\'axe est horizontal.' },
-            { id: 'h', label: 'horizontal (le carré porte sur y)', valid: !d.vertical, ref: !d.vertical, why: 'Le terme au carré est en x : l\'axe est vertical.' },
+          levels: [2], kind: 'decision', prompt: t('L\'axe de la parabole est…'), options: [
+            { id: 'v', label: t('vertical (le carré porte sur x)'), valid: d.vertical, ref: d.vertical, why: t('Le terme au carré est en y : l\'axe est horizontal.') },
+            { id: 'h', label: t('horizontal (le carré porte sur y)'), valid: !d.vertical, ref: !d.vertical, why: t('Le terme au carré est en x : l\'axe est vertical.') },
           ],
         }],
         lines: [
-          { math: d.completed, note: 'Compléter le carré', subgoal: 'sq', blank: [{ after: d.vertical ? sqT('x', d.h) : sqT('y', d.k), text: qt((d.vertical ? d.h : d.k) ** 2) }].filter((b) => b.text !== '0') },
-          { math: d.std, note: 'Isoler le carré et mettre 2p en facteur', subgoal: 'sq', blank: [{ after: '=', text: String(2 * d.p) }] },
+          { math: d.completed, note: t('Compléter le carré'), subgoal: 'sq', blank: [{ after: d.vertical ? sqT('x', d.h) : sqT('y', d.k), text: qt((d.vertical ? d.h : d.k) ** 2) }].filter((b) => b.text !== '0') },
+          { math: d.std, note: t('Isoler le carré et mettre 2p en facteur'), subgoal: 'sq', blank: [{ after: '=', text: String(2 * d.p) }] },
         ],
       }));
     }
     parts.push(...parElements(d, level === 1));
-    prompt = level === 1 ? `La parabole P a pour forme réduite ${M(d.std)}. Donne son sommet, son axe, p, son foyer et sa directrice.` : `Pour la parabole P : ${M(d.eq)}, trouve la forme réduite, le sommet, l'axe, p, le foyer et la directrice.`;
+    prompt = level === 1 ? t('La parabole P a pour forme réduite {v1}. Donne son sommet, son axe, p, son foyer et sa directrice.', { v1: M(d.std) }) : t('Pour la parabole P : {v1}, trouve la forme réduite, le sommet, l\'axe, p, le foyer et la directrice.', { v1: M(d.eq) });
   } else if (gab === 'fd') {
     const [fx, fy] = d.Fq;
     const dv = d.dq;
@@ -1417,11 +1434,11 @@ function parItem(level, rng, opts = {}) {
       start: 'P', eq: d.eq, menu: PAR_MENU.def,
       lines: [
         { math: sq1, note: 'MF² = d(M, D)²', subgoal: 'sq' },
-        { math: d.std, note: 'Développer et réduire', subgoal: 'sq' },
+        { math: d.std, note: t('Développer et réduire'), subgoal: 'sq' },
       ],
     }));
     parts.push(parElements(d, false)[0]);
-    prompt = `Trouve l'équation de la parabole P de foyer F${Rd(pt2(d.F))} et de directrice D : ${Rd(d.dir)}, sous la forme réduite, puis son sommet et son axe.`;
+    prompt = t('Trouve l\'équation de la parabole P de foyer F{v1} et de directrice D : {v2}, sous la forme réduite, puis son sommet et son axe.', { v1: Rd(pt2(d.F)), v2: Rd(d.dir) });
   } else {
     // Axis and two points: (x − h)² = 2p(y − k), h known.
     let A; let B;
@@ -1440,21 +1457,21 @@ function parItem(level, rng, opts = {}) {
     parts.push(
       {
         start: '2p', judge: { kind: 'value', expect: String(2 * d.p) },
-        notes: [`A et B donnent ${Rd(`${par(dA)}^2 = 2p(${A[v]} - ${nm})`)} et ${Rd(`${par(dB)}^2 = 2p(${B[v]} - ${nm})`)}.`.replace(/\^2/g, '²')],
-        lines: [{ math: `(${par(dA)}^2-${par(dB)}^2)/(${A[v]}-${par(B[v])})`, note: 'Soustraire les deux équations', subgoal: 'sq' }, { math: String(2 * d.p), note: '', subgoal: 'sq' }],
+        notes: [t('A et B donnent {v1} et {v2}.', { v1: Rd(`${par(dA)}^2 = 2p(${A[v]} - ${nm})`), v2: Rd(`${par(dB)}^2 = 2p(${B[v]} - ${nm})`) }).replace(/\^2/g, '²')],
+        lines: [{ math: `(${par(dA)}^2-${par(dB)}^2)/(${A[v]}-${par(B[v])})`, note: t('Soustraire les deux équations'), subgoal: 'sq' }, { math: String(2 * d.p), note: '', subgoal: 'sq' }],
       },
       {
-        html: `Puis ${nm}.`, ask: `${nm} =`, start: nm, judge: { kind: 'value', expect: String(d.vertical ? d.k : d.h) },
-        lines: [{ math: `${A[v]}-${par(dA)}^2/${par(2 * d.p)}`, note: `De ${Rd(`${par(dA)}^2`).replace('^2', '²')} = 2p(${A[v]} − ${nm})`, subgoal: 'sq' }, { math: String(d.vertical ? d.k : d.h), note: '', subgoal: 'sq' }],
+        html: t('Puis {nm}.', { nm }), ask: `${nm} =`, start: nm, judge: { kind: 'value', expect: String(d.vertical ? d.k : d.h) },
+        lines: [{ math: `${A[v]}-${par(dA)}^2/${par(2 * d.p)}`, note: t('De {v1} = 2p({v2} − {nm})', { v1: Rd(`${par(dA)}^2`).replace('^2', '²'), v2: A[v], nm }), subgoal: 'sq' }, { math: String(d.vertical ? d.k : d.h), note: '', subgoal: 'sq' }],
       },
-      conicPart({ html: 'L\'équation.', ask: 'P :', start: 'P', eq: d.eq, lines: [{ math: d.std, note: '', subgoal: 'sq' }] }),
+      conicPart({ html: t('L\'équation.'), ask: 'P :', start: 'P', eq: d.eq, lines: [{ math: d.std, note: '', subgoal: 'sq' }] }),
     );
-    prompt = `Une parabole P d'axe ${Rd(d.axe)} passe par ${ptR('A', A)} et ${ptR('B', B)}. Trouve son équation sous la forme ${d.vertical ? `(x − ${fq(d.h)})² = 2p(y − k)` : `(y − ${fq(d.k)})² = 2p(x − h)`}.`.replace(/− −/g, '+ ');
+    prompt = t('Une parabole P d\'axe {v1} passe par {v2} et {v3}. Trouve son équation sous la forme {v4}.', { v1: Rd(d.axe), v2: ptR('A', A), v3: ptR('B', B), v4: d.vertical ? `(x − ${fq(d.h)})² = 2p(y − k)` : `(y − ${fq(d.k)})² = 2p(x − h)` }).replace(/− −/g, '+ ');
   }
   return partsG({
     skill: PAR, level, parts, subgoals: PAR_SUB, keys: KEYS,
     prompt,
-    hints: H('Isole le carré d\'un côté, mets le coefficient de l\'autre variable en facteur : (x − h)² = 2p(y − k).', `F = ${Rd(pt2(d.vertical ? [d.h, `${d.k} + □`] : [`${d.h} + □`, d.k]))}`, `${Rd(d.std)} ; F = ${Rd(pt2(d.F))} ; directrice ${Rd(d.dir)}`),
+    hints: H(t('Isole le carré d\'un côté, mets le coefficient de l\'autre variable en facteur : (x − h)² = 2p(y − k).'), `F = ${Rd(pt2(d.vertical ? [d.h, `${d.k} + □`] : [`${d.h} + □`, d.k]))}`, t('{v1} ; F = {v2} ; directrice {v3}', { v1: Rd(d.std), v2: Rd(pt2(d.F)), v3: Rd(d.dir) })),
     key: `${PAR}:${gab}:${d.eq}`, exam: opts.exam ? examTag(opts, 4) : false,
   });
 }
@@ -1466,26 +1483,26 @@ function parExam(rng, exam) {
     if (rng.chance(0.35)) {
       return tfG({
         skill: PAR, key: `true:${tp}`, truth: true, exam: examTag({ exam }),
-        statement: `Le foyer de la parabole x² = ${tp}y est (0 ; ${fq(q(tp, 4))}).`,
-        explanation: `Vrai : 2p = ${tp}, p = ${fq(q(tp, 2))}, et le foyer est à p/2 = ${fq(q(tp, 4))} du sommet O.`,
+        statement: t('Le foyer de la parabole x² = {tp}y est (0 ; {v1}).', { tp, v1: fq(q(tp, 4)) }),
+        explanation: t('Vrai : 2p = {tp}, p = {v1}, et le foyer est à p/2 = {v2} du sommet O.', { tp, v1: fq(q(tp, 2)), v2: fq(q(tp, 4)) }),
       });
     }
     return tfG({
       skill: PAR, key: `false:${tp}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'g10_parabola_p_half',
-      statement: `Le foyer de la parabole x² = ${tp}y est (0 ; ${tp}).`,
-      counter: geoCounter('parabolaFocus', [['F', 'le vrai foyer F =']], { F: `(0 ; ${qt(q(tp, 4))})` }, { fx: 0, fy: tp / 4 }),
-      explanation: `Faux : 2p = ${tp}, donc p = ${fq(q(tp, 2))} et le foyer est à p/2 du sommet : F = (0 ; ${fq(q(tp, 4))}).`,
+      statement: t('Le foyer de la parabole x² = {tp}y est (0 ; {tp}).', { tp }),
+      counter: geoCounter('parabolaFocus', [['F', t('le vrai foyer F =')]], { F: `(0 ; ${qt(q(tp, 4))})` }, { fx: 0, fy: tp / 4 }),
+      explanation: t('Faux : 2p = {tp}, donc p = {v1} et le foyer est à p/2 du sommet : F = (0 ; {v2}).', { tp, v1: fq(q(tp, 2)), v2: fq(q(tp, 4)) }),
     });
   }
   const d = parData(rng);
   const pF = (k) => (d.vertical ? [qt(d.h), qt(q(d.k).add(q(d.p).mul(q(k))))] : [qt(q(d.h).add(q(d.p).mul(q(k)))), qt(d.k)]);
   return mcqD({
     skill: PAR, level: 4, key: `mcq:${d.eq}`, exam: examTag({ exam }),
-    prompt: `Quel est le foyer de la parabole ${M(d.eq)} ?`,
+    prompt: t('Quel est le foyer de la parabole {v1} ?', { v1: M(d.eq) }),
     right: Rd(pt2(d.F)),
     wrongs: [{ html: Rd(pt2(pF(1))), rule: 'g10_parabola_p_half' }, { html: Rd(pt2(pF(2))), rule: 'g10_parabola_p_half' }, { html: Rd(pt2(pF(q(-1, 2)))), rule: null }],
     fillers: [{ html: Rd(pt2([d.h, d.k])) }],
-    solution: [{ html: `${M(d.std)} : 2p = ${2 * d.p}, le foyer est à p/2 = ${fq(q(d.p, 2))} du sommet.`, note: '' }],
+    solution: [{ html: t('{v1} : 2p = {v2}, le foyer est à p/2 = {v3} du sommet.', { v1: M(d.std), v2: 2 * d.p, v3: fq(q(d.p, 2)) }), note: '' }],
   }, rng);
 }
 

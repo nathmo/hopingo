@@ -13,10 +13,12 @@ import { PyError } from './lexer.js';
 import { parseProgram, parseExpr } from './parser.js';
 import {
   binop, unop, compare, truthy, getIndex, setIndex, getSlice, iterate, rangeLen, tuple, isTuple,
-  makeBuiltins, mathModule, listMethod, typeName, repr, MAX_LIST,
+  makeBuiltins, mathModule, listMethod, typeName, anType, argsMessage, repr, MAX_LIST,
 } from './builtins.js';
+import { t as tr } from '../i18n.js';
 
-export const LIMIT_MESSAGE = 'Le programme ne s\'arrête pas (boucle infinie ?)';
+export const LIMIT_MESSAGE = tr('Le programme ne s\'arrête pas (boucle infinie ?)');
+const RECURSION = tr('trop d\'appels imbriqués (récursion sans fin ?)');
 
 // Signals of control flow, returned by exec().
 const BREAK = { sig: 'break' };
@@ -103,7 +105,7 @@ export class Interp {
           let res;
           // a += [x] extends the list in place, as Python does.
           if (s.op === '+' && Array.isArray(cur) && !isTuple(cur) && Array.isArray(v)) {
-            if (cur.length + v.length > MAX_LIST) throw new PyError('liste trop longue');
+            if (cur.length + v.length > MAX_LIST) throw new PyError(tr('liste trop longue'));
             cur.push(...v);
             res = cur;
           } else res = binop(s.op, cur, v);
@@ -173,16 +175,16 @@ export class Interp {
         case 'pass': return null;
         case 'import': {
           const m = this.modules[s.name];
-          if (!m) throw new PyError(s.name === 'numpy' ? 'numpy n\'est pas disponible : les matrices sont des listes de listes, et les fonctions utiles (zeros, matvec…) sont données' : `seul le module math est disponible (pas « ${s.name} »)`);
+          if (!m) throw new PyError(s.name === 'numpy' ? tr('numpy n\'est pas disponible : les matrices sont des listes de listes, et les fonctions utiles (zeros, matvec…) sont données') : tr('seul le module math est disponible (pas « {name} »)', { name: s.name }));
           this.store(s.alias || s.name, m, scope);
           return null;
         }
         case 'from': {
           const m = this.modules[s.module];
-          if (!m) throw new PyError(s.module === 'numpy' ? 'numpy n\'est pas disponible : les matrices sont des listes de listes' : `seul le module math est disponible (pas « ${s.module} »)`);
+          if (!m) throw new PyError(s.module === 'numpy' ? tr('numpy n\'est pas disponible : les matrices sont des listes de listes') : tr('seul le module math est disponible (pas « {name} »)', { name: s.module }));
           const names = s.names[0] === '*' ? Object.keys(m.attrs) : s.names;
           for (const n of names) {
-            if (!(n in m.attrs)) throw new PyError(`math n'a pas de fonction « ${n} »`);
+            if (!(n in m.attrs)) throw new PyError(tr('{module} n\'a pas de fonction « {name} »', { module: 'math', name: n }));
             this.store(n, m.attrs[n], scope);
           }
           return null;
@@ -199,7 +201,7 @@ export class Interp {
       if (!e.line) e.line = line;
       return e;
     }
-    if (e instanceof RangeError) return new PyError('trop d\'appels imbriqués (récursion sans fin ?)', line, 'limit');
+    if (e instanceof RangeError) return new PyError(RECURSION, line, 'limit');
     return e;
   }
 
@@ -220,14 +222,14 @@ export class Interp {
       }
       case 'tuple': case 'list': {
         const items = Array.isArray(v) ? v : (v && v.k === 'range') || typeof v === 'string' ? iterate(v) : null;
-        if (!items) throw new PyError(`on ne peut pas répartir un ${typeName(v)} dans ${t.items.length} variables`);
-        if (items.length !== t.items.length) throw new PyError(`${t.items.length} variables à gauche, mais ${items.length} valeurs à droite`);
+        if (!items) throw new PyError(tr('on ne peut pas répartir un {type} dans {n} variables', { type: typeName(v), an: anType(v), n: t.items.length }));
+        if (items.length !== t.items.length) throw new PyError(tr('{n} variables à gauche, mais {m} valeurs à droite', { n: t.items.length, m: items.length }));
         const vals = items.slice();
         t.items.forEach((x, k) => this.assign(x, vals[k], scope));
         return;
       }
-      case 'attr': throw new PyError('on ne peut pas modifier un attribut ici');
-      default: throw new PyError('affectation impossible');
+      case 'attr': throw new PyError(tr('on ne peut pas modifier un attribut ici'));
+      default: throw new PyError(tr('affectation impossible'));
     }
   }
 
@@ -236,14 +238,14 @@ export class Interp {
   lookup(name, scope) {
     if (scope) {
       if (scope.vars.has(name)) return scope.vars.get(name);
-      if (scope.fn.locals.has(name)) throw new PyError(`la variable ${name} est utilisée avant d'avoir reçu une valeur`);
+      if (scope.fn.locals.has(name)) throw new PyError(tr('la variable {name} est utilisée avant d\'avoir reçu une valeur', { name }));
     }
     if (this.globals.has(name)) return this.globals.get(name);
     if (name in this.builtins) return this.builtins[name];
-    if (name === 'math') throw new PyError('nom inconnu : math (as-tu écrit « import math » ?)');
-    if (['sqrt', 'exp', 'log', 'sin', 'cos', 'tan', 'pi'].includes(name)) throw new PyError(`nom inconnu : ${name} (écris math.${name})`);
-    if (name === 'true' || name === 'false') throw new PyError(`nom inconnu : ${name} (en Python : ${name === 'true' ? 'True' : 'False'})`);
-    throw new PyError(`nom inconnu : ${name}`);
+    if (name === 'math') throw new PyError(tr('nom inconnu : math (as-tu écrit « import math » ?)'));
+    if (['sqrt', 'exp', 'log', 'sin', 'cos', 'tan', 'pi'].includes(name)) throw new PyError(tr('nom inconnu : {name} (écris math.{name})', { name }));
+    if (name === 'true' || name === 'false') throw new PyError(tr('nom inconnu : {name} (en Python : {py})', { name, py: name === 'true' ? 'True' : 'False' }));
+    throw new PyError(tr('nom inconnu : {name}', { name }));
   }
 
   eval(e, scope) {
@@ -305,14 +307,14 @@ export class Interp {
       case 'attr': {
         const obj = this.eval(e.e, scope);
         if (obj && obj.k === 'module') {
-          if (!(e.name in obj.attrs)) throw new PyError(`${obj.name} n'a pas de fonction « ${e.name} »`, e.line);
+          if (!(e.name in obj.attrs)) throw new PyError(tr('{module} n\'a pas de fonction « {name} »', { module: obj.name, name: e.name }), e.line);
           return obj.attrs[e.name];
         }
         if (Array.isArray(obj)) {
           try { return { ...listMethod(obj, e.name), k: 'builtin' }; } catch (err) { throw this.located(err, e.line); }
         }
-        if (obj === null) throw new PyError(`None n'a pas d'attribut « ${e.name} » : une fonction a-t-elle oublié son return ?`, e.line);
-        throw new PyError(`un ${typeName(obj)} n'a pas d'attribut « ${e.name} »`, e.line);
+        if (obj === null) throw new PyError(tr('None n\'a pas d\'attribut « {name} » : une fonction a-t-elle oublié son return ?', { name: e.name }), e.line);
+        throw new PyError(tr('un {type} n\'a pas d\'attribut « {name} »', { type: typeName(obj), an: anType(obj), name: e.name }), e.line);
       }
       case 'call': {
         const f = this.eval(e.f, scope);
@@ -327,7 +329,9 @@ export class Interp {
   call(f, args, line, fnode) {
     if (!f || (f.k !== 'func' && f.k !== 'builtin')) {
       const name = fnode?.k === 'name' ? fnode.id : null;
-      throw new PyError(`${name ? `${name} est un ${typeName(f)}, pas une fonction` : `un ${typeName(f)} n'est pas une fonction`} : on ne peut pas l'appeler avec (…)${Array.isArray(f) ? ' (pour une case, écris [i])' : ''}`, line);
+      const vars = { name, type: typeName(f), an: anType(f) };
+      const msg = name ? tr('{name} est un {type}, pas une fonction : on ne peut pas l\'appeler avec (…)', vars) : tr('un {type} n\'est pas une fonction : on ne peut pas l\'appeler avec (…)', vars);
+      throw new PyError(Array.isArray(f) ? `${msg} (${tr('pour une case, écris [i]')})` : msg, line);
     }
     if (f.k === 'builtin') {
       const prev = this.line;
@@ -337,10 +341,10 @@ export class Interp {
     const ps = f.params;
     if (args.length > ps.length || args.length < ps.filter((p) => p.dflt === undefined).length) {
       const need = ps.filter((p) => p.dflt === undefined).length;
-      const want = need === ps.length ? `${ps.length}` : `de ${need} à ${ps.length}`;
-      throw new PyError(`${f.name}() demande ${want} argument${ps.length > 1 ? 's' : ''}, ${args.length} donné${args.length > 1 ? 's' : ''}`, line);
+      const want = need === ps.length ? `${ps.length}` : tr('de {need} à {n}', { need, n: ps.length });
+      throw new PyError(argsMessage(f.name, want, ps.length > 1, args.length), line);
     }
-    if (this.depth >= this.maxDepth) throw new PyError('trop d\'appels imbriqués (récursion sans fin ?)', line, 'limit');
+    if (this.depth >= this.maxDepth) throw new PyError(RECURSION, line, 'limit');
     const scope = { fn: f, vars: new Map() };
     ps.forEach((p, i) => scope.vars.set(p.name, i < args.length ? args[i] : p.dflt));
     this.depth++;
@@ -369,7 +373,7 @@ export function runProgram(src, { maxSteps, prelude } = {}) {
 
 export function errorOf(e) {
   if (e instanceof PyError) return { message: e.message, line: e.line, kind: e.kind, text: e.text };
-  if (e instanceof RangeError) return { message: 'trop d\'appels imbriqués (récursion sans fin ?)', line: null, kind: 'limit', text: 'trop d\'appels imbriqués (récursion sans fin ?)' };
+  if (e instanceof RangeError) return { message: RECURSION, line: null, kind: 'limit', text: RECURSION };
   return { message: String(e?.message || e), line: null, kind: 'error', text: String(e?.message || e) };
 }
 

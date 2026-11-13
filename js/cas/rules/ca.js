@@ -24,20 +24,21 @@ import { evalComplex, carg, CQ } from '../complex.js';
 import { polyOf, coeffs, I } from '../polyx.js';
 import { Q } from '../../math/rational.js';
 import { trapLines, familyRef } from '../../judges/cplx-ca.js';
+import { t } from '../../i18n.js';
 
 const hasI = (n) => contains(n, (x) => x.t === 'const' && x.name === 'i');
 
 // tπ as readable text: −3π/4, 5π/4, π.
-function piR(t) {
+function piR(tt) {
   for (const d of [1, 2, 3, 4, 6, 12]) {
-    const n = Math.round(t * d);
-    if (Math.abs(t * d - n) < 1e-9) {
+    const n = Math.round(tt * d);
+    if (Math.abs(tt * d - n) < 1e-9) {
       if (n === 0) return '0';
       const a = Math.abs(n);
       return `${n < 0 ? '−' : ''}${a === 1 ? '' : a}π${d === 1 ? '' : `/${d}`}`;
     }
   }
-  return String(Math.round(t * Math.PI * 1000) / 1000).replace('.', ',');
+  return String(Math.round(tt * Math.PI * 1000) / 1000).replace('.', ',');
 }
 
 // Log w (or arg w) with an argument moved out of ]−π ; π].
@@ -96,9 +97,9 @@ function sqrtI(prev, ctx) {
   const [c0, c1, c2] = cq;
   const D = c1.mul(c1).sub(c2.mul(c0).mul(new CQ(4)));
   if (D.im.n !== 0 || D.re.n >= 0) return out;
-  const t = (z) => `(${toText(z.toNode())})`;
+  const tt = (z) => `(${toText(z.toNode())})`;
   const absD = toText(new CQ(D.re.neg()).toNode());
-  const text = `${u} = (-${t(c1)}+√(${absD}))/(2${t(c2)}) ou ${u} = (-${t(c1)}-√(${absD}))/(2${t(c2)})`;
+  const text = `${u} = (-${tt(c1)}+√(${absD}))/(2${tt(c2)}) ou ${u} = (-${tt(c1)}-√(${absD}))/(2${tt(c2)})`;
   try { out.push({ node: parse(text, { vars: [u, 'z', 'w', 'k'], complex: true }), ctx: { Delta: toText(D.toNode()).replace(/-/g, '−') } }); } catch { /* skip */ }
   return out;
 }
@@ -109,9 +110,9 @@ function gradTraps(id) {
     const cfg = ctx?.cfg || {};
     if (!cfg.grad) return [];
     const out = [];
-    for (const t of cfg.traps?.[id] || []) {
-      const text = typeof t === 'string' ? t : t.line;
-      try { out.push({ node: parse(text, { vars: [...cfg.vars, 'C', cfg.name || 'φ', ...(cfg.params || [])], funcs: cfg.funcs || ['α', 'β', 'γ', 'g', 'h', 'k'] }), ctx: typeof t === 'string' ? {} : t.ctx || {} }); } catch { /* skip */ }
+    for (const tt of cfg.traps?.[id] || []) {
+      const text = typeof tt === 'string' ? tt : tt.line;
+      try { out.push({ node: parse(text, { vars: [...cfg.vars, 'C', cfg.name || 'φ', ...(cfg.params || [])], funcs: cfg.funcs || ['α', 'β', 'γ', 'g', 'h', 'k'] }), ctx: typeof tt === 'string' ? {} : tt.ctx || {} }); } catch { /* skip */ }
     }
     return out;
   };
@@ -123,13 +124,13 @@ const CV = (extra = {}) => ({ kind: 'cvalue', complex: true, ...extra });
 
 export const DEFS = {
   c_log_branch: {
-    name: 'Argument hors de ]−π ; π]',
+    name: t('Argument hors de ]−π ; π]'),
     judges: ['cvalue'],
     transform: logBranch,
     check: { judge: CV(), prev: 'Log(-1-i)', line: 'ln(√2)+5πi/4' },
   },
   c_exp_periodic: {
-    name: 'Famille + 2kπi oubliée',
+    name: t('Famille + 2kπi oubliée'),
     judges: ['cfamily'],
     transform: expPeriodic,
     check: {
@@ -138,13 +139,13 @@ export const DEFS = {
     },
   },
   c_sqrt_i: {
-    name: '√(−a) lu comme √a',
+    name: t('√(−a) lu comme √a'),
     judges: ['complex', 'cfamily'],
     transform: sqrtI,
     check: { judge: { kind: 'complex', complex: true, form: 'set', unknown: 'w' }, prev: 'w^2+16 = 0', line: 'w = 4 ou w = -4' },
   },
   c_cr_sign: {
-    name: 'Signe de Cauchy-Riemann',
+    name: t('Signe de Cauchy-Riemann'),
     judges: ['antideriv'],
     transform: gradTraps('c_cr_sign'),
     check: {
@@ -153,40 +154,40 @@ export const DEFS = {
     },
   },
   c_conj_not_holo: {
-    name: 'z̄ pris pour holomorphe',
+    name: t('z̄ pris pour holomorphe'),
     judges: [],
     check: { bait: { skill: 'c-cauchy-riemann', exam: 'mcq' } },
   },
   c_harmonic_const_imag: {
-    name: 'Constante complexe',
+    name: t('Constante complexe'),
     judges: [],
     check: { bait: { skill: 'c-harmonic-conj' } },
   },
   c_contour_dz_forgot: {
-    name: 'γ′(t) oublié',
+    name: t('γ′(t) oublié'),
     judges: ['cvalue'],
     transform: fromCfg('c_contour_dz_forgot'),
     check: { judge: CV({ vars: ['t'], real: ['t'], domain: { t: [0, 1] }, expect: 't(1+i)', traps: { c_contour_dz_forgot: [{ line: 't', ctx: { gp: '1 + i' } }] } }), prev: 'Re((1+i)t)', line: 't' },
   },
   c_pole_on_contour: {
-    name: 'Singularité sur le contour',
+    name: t('Singularité sur le contour'),
     judges: [],
     check: { bait: { skill: 'c-cauchy-thm', exam: 'mcq' } },
   },
   c_cauchy_n_factor: {
-    name: 'Puissance n + 1 ou n! dans la formule de Cauchy',
+    name: t('Puissance n + 1 ou n! dans la formule de Cauchy'),
     judges: ['cvalue'],
     transform: fromCfg('c_cauchy_n_factor'),
     check: { judge: CV({ raw: { text: 'I' }, expect: '4πi', traps: { c_cauchy_n_factor: [{ line: '8πi', ctx: { n: 2 } }] } }), prev: 'I', line: '8πi' },
   },
   c_laurent_sign: {
-    name: '(−1)ⁿ oublié',
+    name: t('(−1)ⁿ oublié'),
     judges: ['cvalue'],
     transform: fromCfg('c_laurent_sign'),
     check: { judge: CV({ vars: ['z', 'n'], real: ['z'], domain: { z: [-0.6, 0.6] }, final: 'series', traps: { c_laurent_sign: ['sum(z^n, n, 0, ∞)'] } }), prev: '1/(1+z)', line: 'sum(z^n, n, 0, ∞)' },
   },
   c_laurent_wrong_annulus: {
-    name: 'Développement de la mauvaise couronne',
+    name: t('Développement de la mauvaise couronne'),
     judges: ['cvalue'],
     transform: fromCfg('c_laurent_wrong_annulus'),
     check: {
@@ -195,18 +196,18 @@ export const DEFS = {
     },
   },
   c_taylor_radius: {
-    name: 'Rayon : distance au carré',
+    name: t('Rayon : distance au carré'),
     judges: ['cvalue'],
     transform: fromCfg('c_taylor_radius'),
     check: { judge: CV({ raw: { text: 'R' }, expect: '√3', final: 'number', traps: { c_taylor_radius: [{ line: '3', ctx: { z0: '0', pole: 'i√3', R: '√3' } }] } }), prev: 'R', line: '3' },
   },
   c_removable_as_pole: {
-    name: 'Singularité apparente prise pour un pôle',
+    name: t('Singularité apparente prise pour un pôle'),
     judges: [],
     check: { bait: { skill: 'c-singularities', exam: 'mcq' } },
   },
   c_order_pole_numerator: {
-    name: 'Ordre du pôle sans le numérateur',
+    name: t('Ordre du pôle sans le numérateur'),
     judges: ['cvalue'],
     transform: fromCfg('c_order_pole_numerator'),
     check: { judge: CV({ raw: { text: 'm' }, expect: '1', final: 'number', traps: { c_order_pole_numerator: ['2'] } }), prev: 'm', line: '2' },

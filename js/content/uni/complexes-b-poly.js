@@ -14,26 +14,27 @@ import { problemItem } from './kit-problem.js';
 import {
   CQ, cq, N, nz, modeOf, H, E, CX, fr, ct, cm, mt, cw, xMinus, cpolyText, qpolyText, blanked, partsScript, decision, uniq, vfMcq,
 } from './complexes-b-kit.js';
+import { t } from '../../i18n.js';
 
 const ID = 'g8-poly';
 const KEYS = ['calc', 'cplx', 'letters'];
 const SUB = [
-  { id: 'conj', label: 'racine conjuguée', skill: ID },
-  { id: 'factor', label: 'facteur réel', skill: ID },
-  { id: 'cond', label: 'condition (théorème du reste)', skill: 'g0-long-div' },
-  { id: 'expand', label: 'développer', skill: ID },
-  { id: 'divide', label: 'division par le facteur', skill: 'g0-long-div' },
-  { id: 'roots', label: 'racines du facteur du 2e degré', skill: 'g8-quadratic' },
-  { id: 'pureim', label: 'parties réelle et imaginaire', skill: 'g8-algebraic' },
+  { id: 'conj', label: t('racine conjuguée'), skill: ID },
+  { id: 'factor', label: t('facteur réel'), skill: ID },
+  { id: 'cond', label: t('condition (théorème du reste)'), skill: 'g0-long-div' },
+  { id: 'expand', label: t('développer'), skill: ID },
+  { id: 'divide', label: t('division par le facteur'), skill: 'g0-long-div' },
+  { id: 'roots', label: t('racines du facteur du 2e degré'), skill: 'g8-quadratic' },
+  { id: 'pureim', label: t('parties réelle et imaginaire'), skill: 'g8-algebraic' },
 ];
 const CHOICES = [
-  { id: 'factor', label: 'Facteur réel (x − w)(x − w̄)' },
-  { id: 'cond', label: 'Condition : reste de la division = P(x₀)' },
-  { id: 'expand', label: 'Développer' },
-  { id: 'divide', label: 'Diviser P par le facteur connu' },
-  { id: 'roots', label: 'Écrire toutes les racines' },
-  { id: 'pureim', label: 'Séparer partie réelle et partie imaginaire' },
-  { id: 'conjnr', label: 'Ajouter la conjuguée de chaque racine', rule: 'g8_conj_root_nonreal', why: 'La règle de la conjuguée demande des coefficients réels.' },
+  { id: 'factor', label: t('Facteur réel (x − w)(x − w̄)') },
+  { id: 'cond', label: t('Condition : reste de la division = P(x₀)') },
+  { id: 'expand', label: t('Développer') },
+  { id: 'divide', label: t('Diviser P par le facteur connu') },
+  { id: 'roots', label: t('Écrire toutes les racines') },
+  { id: 'pureim', label: t('Séparer partie réelle et partie imaginaire') },
+  { id: 'conjnr', label: t('Ajouter la conjuguée de chaque racine'), rule: 'g8_conj_root_nonreal', why: t('La règle de la conjuguée demande des coefficients réels.') },
 ];
 
 // Complex polynomials (coefficients CQ, lowest degree first).
@@ -87,35 +88,37 @@ function distributed(d) {
   return out.replace(/^\+/, '');
 }
 
-const condWords = (d) => (d.rem ? `le reste de sa division par ${MT(xMinus('x', d.x0))} vaut ${fr(d.val)}` : `${MT(`P(${d.x0})`)} = ${fr(d.val)}`);
+const condWords = (d) => (d.rem ? t('le reste de sa division par {v1} vaut {val}', { v1: MT(xMinus('x', d.x0)), val: fr(d.val) }) : `${MT(`P(${d.x0})`)} = ${fr(d.val)}`);
 
 function conjDecision(d) {
-  return decision(`P est à coefficients réels et ${cw(d.w)} est racine. Que peut-on dire de ${cw(d.wb)} ?`, [
-    { id: 'yes', label: `${cw(d.wb)} est aussi racine : P est réel`, valid: true },
-    { id: 'no', label: 'Rien : il faut le calculer', valid: false, rule: 'g0_conj_missing', why: `P est réel : P(w̄) est le conjugué de P(w) = 0, donc ${cw(d.wb)} est racine.` },
-    { id: 'monic', label: 'Seulement si P est unitaire', valid: false, why: 'Le coefficient dominant ne joue aucun rôle : il suffit que les coefficients soient réels.' },
+  return decision(t('P est à coefficients réels et {w} est racine. Que peut-on dire de {wb} ?', { w: cw(d.w), wb: cw(d.wb) }), [
+    { id: 'yes', label: t('{wb} est aussi racine : P est réel', { wb: cw(d.wb) }), valid: true },
+    { id: 'no', label: t('Rien : il faut le calculer'), valid: false, rule: 'g0_conj_missing', why: t('P est réel : P(w̄) est le conjugué de P(w) = 0, donc {wb} est racine.', { wb: cw(d.wb) }) },
+    { id: 'monic', label: t('Seulement si P est unitaire'), valid: false, why: t('Le coefficient dominant ne joue aucun rôle : il suffit que les coefficients soient réels.') },
   ]);
 }
 
 // Part « facteur réel ».
 function factorPart(d, level) {
   const two = level <= 3 && d.p !== 0;
-  const lines = two ? [E(shifted(d), '(x − p)² − (qi)² = (x − p)² + q²', 'factor', 'factor'), E(Ftext(d), 'Développer', 'factor', 'expand')] : [E(Ftext(d), 'Facteur réel : (x − Re w)² + (Im w)²', 'factor', 'factor')];
+  const lines = two ? [E(shifted(d), '(x − p)² − (qi)² = (x − p)² + q²', 'factor', 'factor'), E(Ftext(d), t('Développer'), 'factor', 'expand')] : [E(Ftext(d), t('Facteur réel : (x − Re w)² + (Im w)²'), 'factor', 'factor')];
   if (level === 1 && two) lines[0] = blanked(lines[0], [String(d.qq * d.qq)]);
-  if (level === 2) lines[lines.length - 1] = blanked(lines[lines.length - 1], [String(d.F[0]), String(Math.abs(2 * d.p))].filter((t) => t !== '0'));
+  if (level === 2) lines[lines.length - 1] = blanked(lines[lines.length - 1], [String(d.F[0]), String(Math.abs(2 * d.p))].filter((tq) => tq !== '0'));
   return {
-    html: 'Facteur réel :', ask: '(x − w)(x − w̄) =',
+    html: t('Facteur réel :'), ask: '(x − w)(x − w̄) =',
     start: `(${xMinus('x', d.w)})(${xMinus('x', d.wb)})`,
     judge: { kind: 'poly', v: 'x', complex: true, target: 'expanded', realCoeffs: true }, lines,
   };
 }
 
 function condPart(d, level) {
-  const lines = [E(`${d.Fx0 === 1 ? '' : d.Fx0}(${d.x0}-r)=${d.val}`.replace(/^\((.*)\)=/, '$1='), 'Calculer le facteur en x₀', 'cond', 'cond'), E(`r=${d.r}`, 'Résoudre', 'cond', 'cond')];
+  const lines = [E(`${d.Fx0 === 1 ? '' : d.Fx0}(${d.x0}-r)=${d.val}`.replace(/^\((.*)\)=/, '$1='), t('Calculer le facteur en x₀'), 'cond', 'cond'), E(`r=${d.r}`, t('Résoudre'), 'cond', 'cond')];
   if (level >= 4) lines.shift();
-  if (level <= 2) lines[0] = blanked(lines[0], [String(d.Fx0)].filter((t) => t !== '1'), {}, true);
+  if (level <= 2) lines[0] = blanked(lines[0], [String(d.Fx0)].filter((tq) => tq !== '1'), {}, true);
   return {
-    html: `Troisième facteur : P(x) = (${MT(Ftext(d))})(x − r). Condition${d.rem ? ' (le reste de la division par x − x₀ est P(x₀))' : ''} :`, ask: 'r =',
+    html: d.rem
+      ? t('Troisième facteur : P(x) = ({F})(x − r). Condition (le reste de la division par x − x₀ est P(x₀)) :', { F: MT(Ftext(d)) })
+      : t('Troisième facteur : P(x) = ({F})(x − r). Condition :', { F: MT(Ftext(d)) }), ask: 'r =',
     start: `(${factorAt(d)})(${d.x0}-r)=${d.val}`,
     judge: { kind: 'poly', mode: 'identity', v: 'x', params: ['r'], solution: { r: String(d.r) } }, lines,
   };
@@ -123,26 +126,26 @@ function condPart(d, level) {
 
 function expandPart(d, level) {
   const two = level <= 3 && distributed(d) !== Ptext(d);
-  const lines = two ? [E(distributed(d), 'Distribuer', 'expand', 'expand'), E(Ptext(d), 'Regrouper', 'expand', 'expand')] : [E(Ptext(d), 'Développer', 'expand', 'expand')];
+  const lines = two ? [E(distributed(d), t('Distribuer'), 'expand', 'expand'), E(Ptext(d), t('Regrouper'), 'expand', 'expand')] : [E(Ptext(d), t('Développer'), 'expand', 'expand')];
   if (level <= 2 && two) lines[1] = blanked(lines[1], [String(Math.abs(d.P[0]))], {});
-  return { html: 'Développe P :', ask: 'P(x) =', start: `(${Ftext(d)})(${xMinus('x', d.r)})`, judge: { kind: 'poly', v: 'x', target: 'expanded' }, lines };
+  return { html: t('Développe P :'), ask: 'P(x) =', start: `(${Ftext(d)})(${xMinus('x', d.r)})`, judge: { kind: 'poly', v: 'x', target: 'expanded' }, lines };
 }
 
 function dividePart(d, level) {
   const rest = qpolyText(d.F.map((c) => -d.r * c), 'x');
-  const lines = [E(`(${Ftext(d)})×x${rest.startsWith('-') || rest === '0' ? '' : '+'}${rest === '0' ? '' : rest}`, 'Premier terme du quotient : x', 'divide', 'divide'), E(`(${Ftext(d)})(${xMinus('x', d.r)})`, 'Quotient x − r, reste 0', 'divide', 'divide')];
+  const lines = [E(`(${Ftext(d)})×x${rest.startsWith('-') || rest === '0' ? '' : '+'}${rest === '0' ? '' : rest}`, t('Premier terme du quotient : x'), 'divide', 'divide'), E(`(${Ftext(d)})(${xMinus('x', d.r)})`, t('Quotient x − r, reste 0'), 'divide', 'divide')];
   if (level >= 4 || d.r === 0) lines.shift();
   return {
-    html: `Divise P par ${MT(Ftext(d))} :`, ask: 'P(x) =', start: Ptext(d),
+    html: t('Divise P par {v1} :', { v1: MT(Ftext(d)) }), ask: 'P(x) =', start: Ptext(d),
     judge: { kind: 'poly', mode: 'div', v: 'x', dividend: Ptext(d), divisor: Ftext(d) }, lines,
   };
 }
 
 function rootsPart(d, factored) {
   return {
-    html: 'Toutes les racines de P :', ask: 'P(x) = 0 ⇔', start: `${factored}=0`,
+    html: t('Toutes les racines de P :'), ask: 'P(x) = 0 ⇔', start: `${factored}=0`,
     judge: { kind: 'complex', form: 'set', unknown: 'x', complex: true },
-    lines: [E(`x=${ct(d.w)} ou x=${ct(d.wb)} ou x=${d.r}`, 'Racines', 'roots', 'roots')],
+    lines: [E(`x=${ct(d.w)} ou x=${ct(d.wb)} ou x=${d.r}`, t('Racines'), 'roots', 'roots')],
   };
 }
 
@@ -155,17 +158,17 @@ function realItem(level, rng, opts, gab) {
   } else parts.push(factorPart(d, level), dividePart(d, level), rootsPart(d, `(${Ftext(d)})(${xMinus('x', d.r)})`));
   if (level >= 2 && level <= 4) parts[0].pre = [conjDecision(d)];
   const { start, judge, script } = partsScript(parts, level, CHOICES);
-  const given = gab === 1 && level === 1 ? ` Son facteur réel est ${MT(`(${xMinus('x', d.w)})(${xMinus('x', d.wb)})`, CX)} = ${MT(Ftext(d))}, donc P(x) = (${MT(Ftext(d))})(x − r).` : '';
+  const given = gab === 1 && level === 1 ? t(' Son facteur réel est {v1} = {v2}, donc P(x) = ({v2})(x − r).', { v1: MT(`(${xMinus('x', d.w)})(${xMinus('x', d.wb)})`, CX), v2: MT(Ftext(d)) }) : '';
   const prompt = gab === 1
-    ? `P est un polynôme à coefficients réels, unitaire, de degré 3. Il a pour racine ${cm(d.w)}, et ${condWords(d)}. Trouve P(x).${given}`
-    : `P(x) = ${MT(Ptext(d))} est à coefficients réels, et ${cm(d.w)} est une de ses racines. Trouve toutes ses racines dans ℂ.`;
+    ? t('P est un polynôme à coefficients réels, unitaire, de degré 3. Il a pour racine {w}, et {d}. Trouve P(x).{given}', { w: cm(d.w), d: condWords(d), given })
+    : t('P(x) = {v1} est à coefficients réels, et {w} est une de ses racines. Trouve toutes ses racines dans ℂ.', { v1: MT(Ptext(d)), w: cm(d.w) });
   const hints = gab === 1
-    ? H('Pour un polynôme réel, la conjuguée d\'une racine est racine : (x − w)(x − w̄) est un facteur réel de P.',
-      `${MT(shifted(d))} = ${MT(Ftext(d))}, puis P(${fr(d.x0)}) = ${fr(d.Fx0)}·(${fr(d.x0)} − r) = ${fr(d.val)}.`,
+    ? H(t('Pour un polynôme réel, la conjuguée d\'une racine est racine : (x − w)(x − w̄) est un facteur réel de P.'),
+      t('{v1} = {v2}, puis P({x0}) = {Fx0}·({x0} − r) = {val}.', { v1: MT(shifted(d)), v2: MT(Ftext(d)), x0: fr(d.x0), Fx0: fr(d.Fx0), val: fr(d.val) }),
       `P(x) = (${MT(Ftext(d))})(${MT(xMinus('x', d.r))}) = ${MT(Ptext(d))}`)
-    : H(`P est réel : ${cm(d.wb)} est aussi racine, et (x − w)(x − w̄) divise P.`,
+    : H(t('P est réel : {wb} est aussi racine, et (x − w)(x − w̄) divise P.', { wb: cm(d.wb) }),
       `(x − w)(x − w̄) = ${MT(Ftext(d))} ; P(x) = (${MT(Ftext(d))})(x − □).`,
-      `Racines : ${cm(d.w)}, ${cm(d.wb)} et ${fr(d.r)}.`);
+      t('Racines : {w}, {wb} et {r}.', { w: cm(d.w), wb: cm(d.wb), r: fr(d.r) }));
   return linesItem({
     skill: ID, level, mode: modeOf(level), start, judge, script, prompt, hints,
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -178,13 +181,13 @@ function realItem(level, rng, opts, gab) {
 
 function imagData(rng) {
   for (let k = 0; k < 200; k++) {
-    const t = nz(rng, -3, 3);
+    const tq = nz(rng, -3, 3);
     const r1 = nz(rng, -4, 4);
     const r2 = nz(rng, -4, 4);
     if (r1 >= r2 || r1 + r2 === 0) continue;
-    const cs = cmul(cmul(linF(cq(0, t)), linF(cq(r1))), linF(cq(r2)));
+    const cs = cmul(cmul(linF(cq(0, tq)), linF(cq(r1))), linF(cq(r2)));
     if (cs.some((c) => Math.abs(c.re.valueOf()) > 30 || Math.abs(c.im.valueOf()) > 30)) continue;
-    return { t, r1, r2, cs, quad: [r1 * r2, -(r1 + r2), 1] };
+    return { t: tq, r1, r2, cs, quad: [r1 * r2, -(r1 + r2), 1] };
   }
   return { t: 2, r1: -1, r2: 2, cs: cmul(cmul(linF(cq(0, 2)), linF(cq(-1))), linF(cq(2))), quad: [-2, -1, 1], fallback: true };
 }
@@ -202,33 +205,33 @@ function imagItem(level, rng, opts) {
     {
       start: `${cpolyText(hi(d.cs), '(iy)')}=0`,
       judge: { kind: 'poly', mode: 'identity', v: 'z', params: ['y'], solution: { y: String(d.t) }, complex: true },
-      lines: [E(`${re}=0 ; ${im}=0`, 'Partie réelle et partie imaginaire nulles', 'pureim', 'pureim'), E(`y=${d.t}`, 'Racine commune', 'pureim', 'pureim')],
+      lines: [E(`${re}=0 ; ${im}=0`, t('Partie réelle et partie imaginaire nulles'), 'pureim', 'pureim'), E(`y=${d.t}`, t('Racine commune'), 'pureim', 'pureim')],
     },
     {
-      html: `Divise P par ${MT(xMinus('z', ti), CX)} :`, ask: 'P(z) =', start: P,
+      html: t('Divise P par {v1} :', { v1: MT(xMinus('z', ti), CX) }), ask: 'P(z) =', start: P,
       judge: { kind: 'poly', mode: 'div', v: 'z', complex: true, dividend: P, divisor: xMinus('z', ti) },
       lines: [E(`(${xMinus('z', ti)})(${quad})`, 'Quotient', 'divide', 'divide')],
     },
     {
-      html: 'Toutes les racines de P :', ask: 'P(z) = 0 ⇔', start: `(${xMinus('z', ti)})(${quad})=0`,
+      html: t('Toutes les racines de P :'), ask: 'P(z) = 0 ⇔', start: `(${xMinus('z', ti)})(${quad})=0`,
       judge: { kind: 'complex', form: 'set', unknown: 'z', complex: true },
-      lines: [E(`z=${ct(ti)} ou z=${d.r1} ou z=${d.r2}`, 'Racines', 'roots', 'roots')],
+      lines: [E(`z=${ct(ti)} ou z=${d.r1} ou z=${d.r2}`, t('Racines'), 'roots', 'roots')],
     },
   ];
   const at = atQ(d.cs, ti.neg());
   if (level <= 4) {
-    parts[0].pre = [decision(`Les coefficients de P ne sont pas tous réels. Si ${cw(ti)} est racine, ${cw(ti.neg())} l'est-elle ?`, [
-      { id: 'no', label: 'Pas forcément : la règle de la conjuguée demande des coefficients réels', valid: true },
-      { id: 'yes', label: 'Oui : la conjuguée d\'une racine est toujours racine', valid: false, rule: 'g8_conj_root_nonreal', why: `Les coefficients ne sont pas réels : P(${cw(ti.neg())}) = ${cw(at)} ≠ 0.` },
+    parts[0].pre = [decision(t('Les coefficients de P ne sont pas tous réels. Si {ti} est racine, {v1} l\'est-elle ?', { ti: cw(ti), v1: cw(ti.neg()) }), [
+      { id: 'no', label: t('Pas forcément : la règle de la conjuguée demande des coefficients réels'), valid: true },
+      { id: 'yes', label: t('Oui : la conjuguée d\'une racine est toujours racine'), valid: false, rule: 'g8_conj_root_nonreal', why: t('Les coefficients ne sont pas réels : P({v1}) = {at} ≠ 0.', { v1: cw(ti.neg()), at: cw(at) }) },
     ])];
   }
   const { start, judge, script } = partsScript(parts, level, CHOICES);
   return linesItem({
     skill: ID, level, mode: modeOf(level), start, judge, script,
-    prompt: `P(z) = ${mt(P)} a une racine imaginaire pure iy (y réel). Pose z = iy, trouve y, puis toutes les racines de P.`,
-    hints: H('P(iy) = 0 : la partie réelle et la partie imaginaire sont nulles toutes les deux. Cherche le y commun.',
-      `Partie réelle : ${MT(re)} = 0 ; partie imaginaire : ${MT(im)} = 0.`,
-      `y = ${fr(d.t)} ; P(z) = (${mt(xMinus('z', ti))})(${MT(quad, { vars: ['z'] })}) ; racines ${cm(ti)}, ${fr(d.r1)}, ${fr(d.r2)}.`),
+    prompt: t('P(z) = {P} a une racine imaginaire pure iy (y réel). Pose z = iy, trouve y, puis toutes les racines de P.', { P: mt(P) }),
+    hints: H(t('P(iy) = 0 : la partie réelle et la partie imaginaire sont nulles toutes les deux. Cherche le y commun.'),
+      t('Partie réelle : {re} = 0 ; partie imaginaire : {im} = 0.', { re: MT(re), im: MT(im) }),
+      t('y = {v1} ; P(z) = ({v2})({v3}) ; racines {ti}, {r1}, {r2}.', { v1: fr(d.t), v2: mt(xMinus('z', ti)), v3: MT(quad, { vars: ['z'] }), ti: cm(ti), r1: fr(d.r1), r2: fr(d.r2) })),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['z', 'y'], complex: true }, baits: level <= 4 ? ['g8_conj_root_nonreal'] : [],
     key: `${ID}:${level}:3:${P}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -249,9 +252,9 @@ function mcqItem(rng, opts) {
       opt(`P(x) = ${MT(`(${Ftext(d)})(${xMinus('x', -d.r)})`)}`, false),
     ]);
     return mcq({
-      skill: ID, level: 4, prompt: `P est réel, unitaire, de degré 3, et ${cm(d.w)} et ${fr(d.r)} sont des racines de P. Que vaut P(x) ?`, options,
+      skill: ID, level: 4, prompt: t('P est réel, unitaire, de degré 3, et {w} et {r} sont des racines de P. Que vaut P(x) ?', { w: cm(d.w), r: fr(d.r) }), options,
       key: `${ID}:mcq:${Ptext(d)}`, exam: examTag(opts), fallback: !!d.fallback,
-      solution: [{ html: `P réel : ${cm(d.wb)} est aussi racine ; (x − w)(x − w̄) = ${MT(Ftext(d))}, donc P(x) = (${MT(Ftext(d))})(${MT(xMinus('x', d.r))}) = ${MT(Ptext(d))}.`, note: '' }],
+      solution: [{ html: t('P réel : {wb} est aussi racine ; (x − w)(x − w̄) = {v1}, donc P(x) = ({v1})({v2}) = {v3}.', { wb: cm(d.wb), v1: MT(Ftext(d)), v2: MT(xMinus('x', d.r)), v3: MT(Ptext(d)) }), note: '' }],
     }, rng);
   }
   const d = imagData(rng);
@@ -265,18 +268,18 @@ function mcqItem(rng, opts) {
     { html: set([ti, cq(-d.r1), cq(-d.r2)]), correct: false },
   ]);
   return mcq({
-    skill: ID, level: 4, prompt: `${cm(ti)} est racine de P(z) = ${mt(P)}. Quelles sont toutes les racines de P ?`, options,
+    skill: ID, level: 4, prompt: t('{ti} est racine de P(z) = {P}. Quelles sont toutes les racines de P ?', { ti: cm(ti), P: mt(P) }), options,
     key: `${ID}:mcq:${P}`, exam: examTag(opts), fallback: !!d.fallback,
-    solution: [{ html: `Les coefficients ne sont pas réels : ${cm(ti.neg())} n'est pas forcément racine. P(z) = (${mt(xMinus('z', ti))})(${MT(qpolyText(d.quad, 'z'), { vars: ['z'] })}), racines ${cm(ti)}, ${fr(d.r1)} et ${fr(d.r2)}.`, note: '' }],
+    solution: [{ html: t('Les coefficients ne sont pas réels : {v1} n\'est pas forcément racine. P(z) = ({v2})({v3}), racines {ti}, {r1} et {r2}.', { v1: cm(ti.neg()), v2: mt(xMinus('z', ti)), v3: MT(qpolyText(d.quad, 'z'), { vars: ['z'] }), ti: cm(ti), r1: fr(d.r1), r2: fr(d.r2) }), note: '' }],
   }, rng);
 }
 
 const TF = [
-  { s: 'Si i est racine d\'un polynôme P, alors −i est aussi racine de P.', t: false, rule: 'g8_conj_root_nonreal', why: 'Faux sans coefficients réels : P(z) = z − i a la racine i, mais pas −i.' },
-  { s: 'Si P est à coefficients réels et 1 + 2i est racine de P, alors 1 − 2i est racine de P.', t: true, why: 'Vrai : P(w̄) est le conjugué de P(w) quand les coefficients sont réels.' },
-  { s: 'Un polynôme à coefficients réels de degré 3 a au moins une racine réelle.', t: true, why: 'Vrai : les racines non réelles vont par paires conjuguées ; il en reste une réelle.' },
-  { s: 'Un polynôme de degré 4 a 4 racines distinctes dans ℂ.', t: false, why: 'Faux : 4 racines comptées avec multiplicité ; (z − 1)⁴ n\'en a qu\'une.' },
-  { s: 'Si P(z) = z² + iz + 2 a la racine i, alors −i est aussi racine.', t: false, rule: 'g8_conj_root_nonreal', why: 'Faux : P(−i) = −1 + 1 + 2 = 2 ≠ 0. Le coefficient i n\'est pas réel.' },
+  { s: t('Si i est racine d\'un polynôme P, alors −i est aussi racine de P.'), t: false, rule: 'g8_conj_root_nonreal', why: t('Faux sans coefficients réels : P(z) = z − i a la racine i, mais pas −i.') },
+  { s: t('Si P est à coefficients réels et 1 + 2i est racine de P, alors 1 − 2i est racine de P.'), t: true, why: t('Vrai : P(w̄) est le conjugué de P(w) quand les coefficients sont réels.') },
+  { s: t('Un polynôme à coefficients réels de degré 3 a au moins une racine réelle.'), t: true, why: t('Vrai : les racines non réelles vont par paires conjuguées ; il en reste une réelle.') },
+  { s: t('Un polynôme de degré 4 a 4 racines distinctes dans ℂ.'), t: false, why: t('Faux : 4 racines comptées avec multiplicité ; (z − 1)⁴ n\'en a qu\'une.') },
+  { s: t('Si P(z) = z² + iz + 2 a la racine i, alors −i est aussi racine.'), t: false, rule: 'g8_conj_root_nonreal', why: t('Faux : P(−i) = −1 + 1 + 2 = 2 ≠ 0. Le coefficient i n\'est pas réel.') },
 ];
 function tfItem(rng) {
   const k = rng.int(0, TF.length - 1);
@@ -293,24 +296,24 @@ function e7(rng, opts) {
   const a = partsScript(solveParts, 4, CHOICES);
   const part1 = linesItem({
     skill: ID, level: 5, mode: 'free', ...a,
-    prompt: `(a) Trouve P(x) développé.`, hints: [], subgoals: SUB, keys: KEYS,
+    prompt: t('(a) Trouve P(x) développé.'), hints: [], subgoals: SUB, keys: KEYS,
     declares: { vars: ['x', 'r'], complex: true }, baits: ['g0_conj_missing'], key: `${ID}:e7a:${Ptext(d)}`,
   });
   const facR = `(${xMinus('x', d.r)})(${Ftext(d)})`;
   const part2 = linesItem({
     skill: ID, level: 5, mode: 'free', start: Ptext(d), judge: { kind: 'poly', v: 'x', target: 'factored-R' },
     script: [
-      E(facR, 'Factorisation dans ℝ', 'factor'),
-      { kind: 'segment', html: 'Dans ℂ :', ask: 'P(x) =', start: { math: facR }, judge: { kind: 'poly', v: 'x', complex: true, target: 'factored-C' } },
-      E(`(${xMinus('x', d.r)})(${xMinus('x', d.w)})(${xMinus('x', d.wb)})`, 'Factorisation dans ℂ', 'roots'),
+      E(facR, t('Factorisation dans ℝ'), 'factor'),
+      { kind: 'segment', html: t('Dans ℂ :'), ask: 'P(x) =', start: { math: facR }, judge: { kind: 'poly', v: 'x', complex: true, target: 'factored-C' } },
+      E(`(${xMinus('x', d.r)})(${xMinus('x', d.w)})(${xMinus('x', d.wb)})`, t('Factorisation dans ℂ'), 'roots'),
     ],
-    prompt: '(b) Factorise P dans ℝ, puis dans ℂ.', hints: [], subgoals: SUB, keys: KEYS,
+    prompt: t('(b) Factorise P dans ℝ, puis dans ℂ.'), hints: [], subgoals: SUB, keys: KEYS,
     declares: { vars: ['x'], complex: true }, baits: [], key: `${ID}:e7b:${Ptext(d)}`,
   });
   return problemItem({
     skill: ID, level: 4,
-    prompt: `P est un polynôme à coefficients réels, unitaire, de degré 3. On sait que ${cm(d.w)} est racine de P et que ${condWords(d)}.`,
-    parts: [{ item: part1, points: [2, 2, 1], title: '(a) Trouver P' }, { item: part2, points: [1, 1], title: '(b) Factoriser' }],
+    prompt: t('P est un polynôme à coefficients réels, unitaire, de degré 3. On sait que {w} est racine de P et que {d}.', { w: cm(d.w), d: condWords(d) }),
+    parts: [{ item: part1, points: [2, 2, 1], title: t('(a) Trouver P') }, { item: part2, points: [1, 1], title: t('(b) Factoriser') }],
     key: `${Ptext(d)}:${d.x0}`, exam: examTag(opts, 7), fallback: !!d.fallback, expectedSec: 900,
   });
 }

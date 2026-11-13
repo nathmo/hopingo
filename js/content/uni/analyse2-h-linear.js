@@ -8,15 +8,16 @@
 import { MT, linesItem, examTag } from './kit.js';
 import { tpl, withMenus, sup } from './a2-kit.js';
 import { q, qt, term, sumT, fac, expT, rd, H, E, modeOf, mcq4, opt, tfOf } from './analyse2-h-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-linear1';
 const SUB = [
-  { id: 'normalize', label: 'normaliser (coefficient 1 devant y′)', skill: SK },
-  { id: 'mu', label: 'facteur intégrant μ', skill: SK },
+  { id: 'normalize', label: t('normaliser (coefficient 1 devant y′)'), skill: SK },
+  { id: 'mu', label: t('facteur intégrant μ'), skill: SK },
   { id: 'exact-deriv', label: '(μy)′ = μb', skill: SK },
-  { id: 'integrate', label: 'intégrer', skill: 'a1-int-direct' },
-  { id: 'ic', label: 'condition initiale', skill: SK },
-  { id: 'final', label: 'isoler y', skill: SK },
+  { id: 'integrate', label: t('intégrer'), skill: 'a1-int-direct' },
+  { id: 'ic', label: t('condition initiale'), skill: SK },
+  { id: 'final', label: t('isoler y'), skill: SK },
 ];
 const KEYS = ['calcx', 'calcfn', 'a2', 'anal'];
 const C3 = [1, 2, 3, -1, -2];
@@ -24,7 +25,7 @@ const C3 = [1, 2, 3, -1, -2];
 // x^n as text ('' for n = 0).
 const xp = (n) => (n === 0 ? '' : n === 1 ? 'x' : n < 0 ? `x^(${n})` : `x^${n}`);
 // k·y in a sum: '+2y', '-y'.
-const ky = (k) => { const t = term(k, 'y'); return t.startsWith('-') ? t : `+${t}`; };
+const ky = (k) => { const s = term(k, 'y'); return s.startsWith('-') ? s : `+${s}`; };
 // c·e^(p x) (p = 0: the number c).
 const ce = (c, p) => (q(p).n === 0 ? qt(c) : term(c, expT(p)));
 
@@ -164,25 +165,25 @@ function data(rng) {
 }
 
 const CHOICES = (d) => [
-  { id: 'norm', label: d.lead ? `Diviser par ${sup(d.lead)} : coefficient 1 devant y′` : 'Normaliser (coefficient 1 devant y′)' },
-  { id: 'mu', label: 'Facteur intégrant μ = e^(∫ a)' },
-  { id: 'exact', label: 'Multiplier par μ : (μy)′ = μb' },
-  { id: 'int', label: 'Intégrer des deux côtés' },
-  { id: 'ic', label: 'Appliquer la condition initiale' },
-  { id: 'solve', label: 'Isoler y' },
-  ...(d.lead ? [{ id: 'raw', label: 'Calculer μ avec le coefficient de y tel qu\'il est écrit', rule: 'a2_ode_if_not_normalized', why: `Le facteur intégrant suppose y′ seul : divise d'abord par ${sup(d.lead)}.` }] : []),
+  { id: 'norm', label: d.lead ? t('Diviser par {c} : coefficient 1 devant y′', { c: sup(d.lead) }) : t('Normaliser (coefficient 1 devant y′)') },
+  { id: 'mu', label: t('Facteur intégrant μ = e^(∫ a)') },
+  { id: 'exact', label: t('Multiplier par μ : (μy)′ = μb') },
+  { id: 'int', label: t('Intégrer des deux côtés') },
+  { id: 'ic', label: t('Appliquer la condition initiale') },
+  { id: 'solve', label: t('Isoler y') },
+  ...(d.lead ? [{ id: 'raw', label: t('Calculer μ avec le coefficient de y tel qu\'il est écrit'), rule: 'a2_ode_if_not_normalized', why: t('Le facteur intégrant suppose y′ seul : divise d\'abord par {c}.', { c: sup(d.lead) }) }] : []),
 ];
 
 function methodDecision(d) {
   return {
-    kind: 'decision', prompt: 'Quelle méthode ?', options: [
-      { id: 'if', label: 'Facteur intégrant', valid: true, ref: true },
+    kind: 'decision', prompt: t('Quelle méthode ?'), options: [
+      { id: 'if', label: t('Facteur intégrant'), valid: true, ref: true },
       d.shift
-        ? { id: 'shift', label: 'Décalage vers l\'équilibre (a et b constants)', valid: true, quality: 'poor', why: 'Juste aussi : a et b sont constants, y = b/a + Ce^(−ax). On fait ici le facteur intégrant.' }
-        : { id: 'shift', label: 'Décalage vers l\'équilibre (a et b constants)', valid: false, why: 'Le décalage demande a et b constants.' },
+        ? { id: 'shift', label: t('Décalage vers l\'équilibre (a et b constants)'), valid: true, quality: 'poor', why: t('Juste aussi : a et b sont constants, y = b/a + Ce^(−ax). On fait ici le facteur intégrant.') }
+        : { id: 'shift', label: t('Décalage vers l\'équilibre (a et b constants)'), valid: false, why: t('Le décalage demande a et b constants.') },
       d.sep
-        ? { id: 'sep', label: 'Variables séparables', valid: true, quality: 'poor', why: 'Juste aussi ici (y′ s\'écrit g(x)·h(y)), mais le facteur intégrant marche toujours.' }
-        : { id: 'sep', label: 'Variables séparables', valid: false, rule: 'a2_ode_method_separable_sum', why: 'b(x) − a(x)y n\'est pas un produit g(x)·h(y) : l\'équation n\'est pas séparable.' },
+        ? { id: 'sep', label: t('Variables séparables'), valid: true, quality: 'poor', why: t('Juste aussi ici (y′ s\'écrit g(x)·h(y)), mais le facteur intégrant marche toujours.') }
+        : { id: 'sep', label: t('Variables séparables'), valid: false, rule: 'a2_ode_method_separable_sum', why: t('b(x) − a(x)y n\'est pas un produit g(x)·h(y) : l\'équation n\'est pas séparable.') },
     ],
   };
 }
@@ -197,13 +198,13 @@ function linesVariant(level, rng, opts) {
   const judge0 = { kind: 'ode', eq: d.raw, unknown: 'y', v: 'x', order: 1, ic: { x: d.x0, y: d.y0 }, mu: d.a, domain: { x: d.domain }, yRange: [-40, 40], traps };
   const lines = [];
   const startNorm = level === 1 && d.lead;
-  if (d.lead && !startNorm) lines.push(E(d.norm, d.lead ? `Diviser par ${sup(d.lead)}` : 'Normaliser', 'normalize', 'norm'));
+  if (d.lead && !startNorm) lines.push(E(d.norm, d.lead ? t('Diviser par {c}', { c: sup(d.lead) }) : t('Normaliser'), 'normalize', 'norm'));
   if (level === 3) lines.unshift(methodDecision(d));
   lines.push(E(`μ = ${d.mu}`, `μ = e^(∫ a), a = ${sup(d.a)}`, 'mu', 'mu'));
   lines.push(E(d.exact, '(μy)′ = μ·b', 'exact-deriv', 'exact'));
-  lines.push(E(d.integ, 'Intégrer', 'integrate', 'int'));
+  lines.push(E(d.integ, t('Intégrer'), 'integrate', 'int'));
   lines.push(E(`C = ${d.C}`, `y(${d.x0}) = ${rd(d.y0)}`, 'ic', 'ic'));
-  lines.push(E(`y = ${d.y}`, 'Isoler y', 'final', 'solve'));
+  lines.push(E(`y = ${d.y}`, t('Isoler y'), 'final', 'solve'));
   const at = (pred) => lines.findIndex((l) => l.kind === 'eq' && pred(l.math));
   if (level === 1) {
     const i = at((m) => m.startsWith('μ'));
@@ -219,9 +220,10 @@ function linesVariant(level, rng, opts) {
   const judge = withMenus(judge0, level, start, lines, CHOICES(d));
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script: lines,
-    prompt: `Résous ${MT(d.raw)}, y(${d.x0}) = ${rd(d.y0)}${d.x0 === 1 ? ', pour x > 0' : ''}.${startNorm ? ` Forme normalisée : ${MT(d.norm)}.` : ''}`,
-    hints: H(d.lead ? `Divise par ${sup(d.lead)} pour avoir y′ seul, puis multiplie par μ = e^(∫ a).` : 'Multiplie par μ = e^(∫ a) : le membre de gauche devient (μy)′.',
-      `a(x) = ${sup(d.a)}, donc μ = ${MT(d.mu)} ; puis (μy)′ = μ·b et ${d.intHint}.`,
+    prompt: (d.x0 === 1 ? t('Résous {eq}, y({x0}) = {y0}, pour x > 0.', { eq: MT(d.raw), x0: d.x0, y0: rd(d.y0) }) : t('Résous {eq}, y({x0}) = {y0}.', { eq: MT(d.raw), x0: d.x0, y0: rd(d.y0) }))
+      + (startNorm ? ` ${t('Forme normalisée : {n}.', { n: MT(d.norm) })}` : ''),
+    hints: H(d.lead ? t('Divise par {c} pour avoir y′ seul, puis multiplie par μ = e^(∫ a).', { c: sup(d.lead) }) : t('Multiplie par μ = e^(∫ a) : le membre de gauche devient (μy)′.'),
+      t('a(x) = {a}, donc μ = {mu} ; puis (μy)′ = μ·b et {int}.', { a: sup(d.a), mu: MT(d.mu), int: d.intHint }),
       `${MT(d.exact)}`),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.id}:${d.y0}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -235,7 +237,7 @@ function mcqVariant(level, rng, opts) {
   const w = d.wrongs;
   return mcq4({
     skill: SK, level, key: `${SK}:mcq:${d.id}:${d.y0}`, exam: examTag(opts),
-    prompt: `La solution de ${MT(d.raw)}, y(${d.x0}) = ${rd(d.y0)}${d.x0 === 1 ? ' (x > 0)' : ''} est :`,
+    prompt: d.x0 === 1 ? t('La solution de {eq}, y({x0}) = {y0} (x > 0) est :', { eq: MT(d.raw), x0: d.x0, y0: rd(d.y0) }) : t('La solution de {eq}, y({x0}) = {y0} est :', { eq: MT(d.raw), x0: d.x0, y0: rd(d.y0) }),
     right: MT(`y = ${d.y}`),
     wrongs: [
       w.ic && opt(`y = ${w.ic}`, 'a2_ode_ic_before_particular'),
@@ -243,7 +245,7 @@ function mcqVariant(level, rng, opts) {
       w.rhs && opt(`y = ${w.rhs}`, 'a2_ode_if_rhs'),
     ],
     fillers: [opt(`y = -(${d.y})`), opt(`y = ${d.y}+1`), opt(`y = 2(${d.y})`)],
-    solution: [{ html: `${d.lead ? `On divise par ${sup(d.lead)} : ${MT(d.norm)} ; ` : ''}μ = ${MT(d.mu)}, ${MT(d.exact)}, ${MT(d.integ)}, C = ${rd(d.C)}.`, note: '' }],
+    solution: [{ html: d.lead ? t('On divise par {c} : {n} ; μ = {mu}, {ex}, {int}, C = {C}.', { c: sup(d.lead), n: MT(d.norm), mu: MT(d.mu), ex: MT(d.exact), int: MT(d.integ), C: rd(d.C) }) : `μ = ${MT(d.mu)}, ${MT(d.exact)}, ${MT(d.integ)}, C = ${rd(d.C)}.`, note: '' }],
     expectedSec: 180,
   }, rng);
 }
@@ -256,17 +258,17 @@ function statements(rng) {
   const e = b / k;
   const E = expT(-k);
   return [
-    { key: 'diff', truth: true, text: 'Si y₁ et y₂ sont deux solutions de y′ + a(x)y = b(x), alors y₁ − y₂ est une solution de y′ + a(x)y = 0.', why: 'Vrai : (y₁ − y₂)′ + a(y₁ − y₂) = b − b = 0.' },
+    { key: 'diff', truth: true, text: t('Si y₁ et y₂ sont deux solutions de y′ + a(x)y = b(x), alors y₁ − y₂ est une solution de y′ + a(x)y = 0.'), why: t('Vrai : (y₁ − y₂)′ + a(y₁ − y₂) = b − b = 0.') },
     {
-      key: `sum${k}${b}`, truth: false, text: `Si y₁ et y₂ sont deux solutions de y′ + ${fac(k)}y = ${b}, alors y₁ + y₂ en est une aussi.`, ruleIfTrue: 'a2_ode_superposition_nonhom',
-      why: `Faux : (y₁ + y₂)′ + ${fac(k)}(y₁ + y₂) = ${b} + ${b} = ${2 * b}. Par exemple y₁ = y₂ = ${e}.`,
+      key: `sum${k}${b}`, truth: false, text: t('Si y₁ et y₂ sont deux solutions de y′ + {k}y = {b}, alors y₁ + y₂ en est une aussi.', { k: fac(k), b }), ruleIfTrue: 'a2_ode_superposition_nonhom',
+      why: t('Faux : (y₁ + y₂)′ + {k}(y₁ + y₂) = {b} + {b} = {b2}. Par exemple y₁ = y₂ = {e}.', { k: fac(k), b, b2: 2 * b, e }),
       counter: { kind: 'a2', prop: 'odeSumFails', params: { eq: `y'+${fac(k)}y=${b}` }, ask: [{ v: 'y1', label: 'y₁(x) =', keys: KEYS }, { v: 'y2', label: 'y₂(x) =', keys: KEYS }], answer: { y1: String(e), y2: `${e}+${E}` } },
     },
-    { key: `gen${k}${b}`, truth: true, text: `La solution générale de y′ + ${fac(k)}y = ${b} est y = ${e} + C${E}.`, why: `Vrai : a et b sont constants, on décale vers l'équilibre y* = ${b}/${k} = ${e}.` },
+    { key: `gen${k}${b}`, truth: true, text: t('La solution générale de y′ + {k}y = {b} est y = {e} + C{E}.', { k: fac(k), b, e, E }), why: t('Vrai : a et b sont constants, on décale vers l\'équilibre y* = {b}/{k} = {e}.', { b, k, e }) },
     {
-      key: `late${k}${b}`, truth: false, text: `Toutes les solutions de y′ + ${fac(k)}y = ${b} sont de la forme y = ${e} + ${E} + C.`, ruleIfTrue: 'a2_ode_sep_constant_late',
-      why: `Faux : la constante multiplie la solution homogène, y = ${e} + C${E}. Par exemple y = ${e} + 2${E}.`,
-      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y'+${fac(k)}y=${b}`, family: `${e}+${E}+C`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: 'Une solution qui n\'est pas de cette forme : y(x) =', keys: KEYS }], answer: { y: `${e}+2${E}` } },
+      key: `late${k}${b}`, truth: false, text: t('Toutes les solutions de y′ + {k}y = {b} sont de la forme y = {e} + {E} + C.', { k: fac(k), b, e, E }), ruleIfTrue: 'a2_ode_sep_constant_late',
+      why: t('Faux : la constante multiplie la solution homogène, y = {e} + C{E}. Par exemple y = {e} + 2{E}.', { e, E }),
+      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y'+${fac(k)}y=${b}`, family: `${e}+${E}+C`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: t('Une solution qui n\'est pas de cette forme : y(x) ='), keys: KEYS }], answer: { y: `${e}+2${E}` } },
     },
   ];
 }

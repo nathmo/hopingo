@@ -30,6 +30,7 @@ import { makeRng } from '../content/random.js';
 import { seedOf } from '../cas/equiv.js';
 import { frNum } from './common.js';
 import { diagnoseLine } from './diagnose.js';
+import { t } from '../i18n.js';
 
 export const sign = '';
 
@@ -51,16 +52,16 @@ export function chainsOf(node, vars) {
     let lo; let hi; let v;
     if (it.t === 'chain' && it.items.length === 3) {
       const mid = stripParen(it.items[1]);
-      if (mid.t !== 'sym' || !vars.includes(mid.name)) return `Au milieu de « ${toText(it)} », mets la variable.`;
+      if (mid.t !== 'sym' || !vars.includes(mid.name)) return t('Au milieu de « {c} », mets la variable.', { c: toText(it) });
       v = mid.name;
       const up = it.ops.every((o) => o === '≤' || o === '<');
       const down = it.ops.every((o) => o === '≥' || o === '>');
-      if (!up && !down) return 'Écris chaque encadrement dans un seul sens : a ≤ x ≤ b.';
+      if (!up && !down) return t('Écris chaque encadrement dans un seul sens : a ≤ x ≤ b.');
       [lo, hi] = up ? [it.items[0], it.items[2]] : [it.items[2], it.items[0]];
     } else if (it.t === 'rel' && ['≤', '<', '≥', '>'].includes(it.op)) {
-      return `Encadre la variable des deux côtés : a ≤ … ≤ b.`;
-    } else return 'Écris des encadrements « a ≤ x ≤ b », séparés par « ; ».';
-    if (out.some((c) => c.v === v)) return `La variable ${v} est encadrée deux fois.`;
+      return t('Encadre la variable des deux côtés : a ≤ … ≤ b.');
+    } else return t('Écris des encadrements « a ≤ x ≤ b », séparés par « ; ».');
+    if (out.some((c) => c.v === v)) return t('La variable {v} est encadrée deux fois.', { v });
     out.push({ v, lo, hi });
   }
   return out;
@@ -72,7 +73,7 @@ function mapCoords(cfg) {
   const key = JSON.stringify([cfg.map, cfg.box?.length]);
   if (!MAPS.has(key)) {
     const xs = cfg.box?.length === 3 || cfg.dim === 3 ? ['x', 'y', 'z'] : ['x', 'y'];
-    const fs = Object.entries(cfg.map).map(([k, t]) => [k, compileFloat(parse(t, { vars: xs }))]);
+    const fs = Object.entries(cfg.map).map(([k, s]) => [k, compileFloat(parse(s, { vars: xs }))]);
     MAPS.set(key, (P) => {
       const env = Object.fromEntries(xs.map((v, i) => [v, P[i]]));
       return Object.fromEntries(fs.map(([k, f]) => [k, f(env)]));
@@ -114,18 +115,18 @@ function refMember(cfg) {
     let f;
     if (cfg.region) {
       const vars = (cfg.box?.length === 3 || cfg.dim === 3) ? ['x', 'y', 'z'] : ['x', 'y'];
-      const tests = cfg.region.map((t) => {
-        const n = parse(t, { vars });
+      const tests = cfg.region.map((s) => {
+        const n = parse(s, { vars });
         const parts = n.t === 'chain' ? n.items.slice(1).map((b, i) => ({ l: n.items[i], r: b, op: n.ops[i] })) : [n];
         return parts.map((p) => ({ l: compileFloat(p.l), r: compileFloat(p.r), op: p.op }));
       }).flat();
       f = (P) => {
         const env = Object.fromEntries(vars.map((v, i) => [v, P[i]]));
-        return tests.every((t) => {
-          const a = t.l(env);
-          const b = t.r(env);
+        return tests.every((u) => {
+          const a = u.l(env);
+          const b = u.r(env);
           if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
-          return t.op === '≤' || t.op === '<' ? a <= b + 1e-12 : t.op === '≥' || t.op === '>' ? a >= b - 1e-12 : Math.abs(a - b) < 1e-12;
+          return u.op === '≤' || u.op === '<' ? a <= b + 1e-12 : u.op === '≥' || u.op === '>' ? a >= b - 1e-12 : Math.abs(a - b) < 1e-12;
         });
       };
     } else {
@@ -173,14 +174,14 @@ export function sameDomain(cfg, a, b) {
   return true;
 }
 
-const ORDER_NAMES = { typeI: 'type I (x à l\'extérieur)', typeII: 'type II (y à l\'extérieur)', polar: 'polaires', cyl: 'cylindriques', sph: 'sphériques', typeI3: 'type I (z à l\'intérieur)' };
+const ORDER_NAMES = { typeI: t('type I (x à l\'extérieur)'), typeII: t('type II (y à l\'extérieur)'), polar: t('polaires'), cyl: t('cylindriques'), sph: t('sphériques'), typeI3: t('type I (z à l\'intérieur)') };
 
 // true, false (variables missing) or a message (another order than asked).
 export function isFinal(cfg, node) {
   const vars = varsOf(cfg);
   const chains = chainsOf(node, vars);
   if (typeof chains === 'string' || chains.length !== vars.length) return false;
-  if (cfg.order && chains.some((c, i) => c.v !== cfg.order[i])) return `ta description est juste, mais il faut l'ordre ${cfg.order.join(', ')} (${ORDER_NAMES[cfg.shape] || 'demandé'}) : ${cfg.order[0]} à l'extérieur.`;
+  if (cfg.order && chains.some((c, i) => c.v !== cfg.order[i])) return t('ta description est juste, mais il faut l\'ordre {order} ({name}) : {v} à l\'extérieur.', { order: cfg.order.join(', '), name: ORDER_NAMES[cfg.shape] || t('demandé'), v: cfg.order[0] });
   return true;
 }
 
@@ -192,7 +193,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   }
   const vars = varsOf(cfg);
   const unknown = [...symbolsIn(node)].filter((s) => !vars.includes(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Ici, les variables sont ${vars.join(', ')}.` };
+  if (unknown.length) return { kind: 'parse', node, message: t('Ici, les variables sont {v}.', { v: vars.join(', ') }) };
   const chains = chainsOf(node, vars);
   if (typeof chains === 'string') return { kind: 'parse', node, message: chains };
   // Each bound uses only the variables before it.
@@ -201,18 +202,19 @@ export function judgeLine(cfg, prev, input, state = {}) {
     const used = [...symbolsIn(chains[i].lo), ...symbolsIn(chains[i].hi)].filter((s) => vars.includes(s));
     const bad = used.find((s) => !allowed.has(s));
     if (bad) {
-      return { kind: 'wrong', node, rule: 'a2_fubini_outer_var', diag: { rules: ['a2_fubini_outer_var'], ambiguous: 1, ctx: { v: bad } }, message: i === 0 ? `Les bornes de ${chains[0].v}, à l'extérieur, doivent être des nombres : elles ne peuvent pas dépendre de ${bad}.` : `Les bornes de ${chains[i].v} ne peuvent dépendre que des variables écrites avant : pas de ${bad}.` };
+      return { kind: 'wrong', node, rule: 'a2_fubini_outer_var', diag: { rules: ['a2_fubini_outer_var'], ambiguous: 1, ctx: { v: bad } }, message: i === 0 ? t('Les bornes de {v}, à l\'extérieur, doivent être des nombres : elles ne peuvent pas dépendre de {b}.', { v: chains[0].v, b: bad }) : t('Les bornes de {v} ne peuvent dépendre que des variables écrites avant : pas de {b}.', { v: chains[i].v, b: bad }) };
     }
   }
-  if (chains.length < vars.length) return { kind: 'stay', node, message: `Encadre aussi ${vars.filter((v) => !chains.some((c) => c.v === v)).join(' et ')}.` };
+  const absent = vars.filter((v) => !chains.some((c) => c.v === v));
+  if (chains.length < vars.length) return { kind: 'stay', node, message: absent.length === 2 ? t('Encadre aussi {a} et {b}.', { a: absent[0], b: absent[1] }) : t('Encadre aussi {a}.', { a: absent.join(' et ') }) };
   const w = domainWitness(cfg, chains);
   if (w) {
     const pt = `(${w.P.map((x) => frNum(x, 2)).join(' ; ')})`;
     const diag = prev ? diagnoseLine('domain', prev, node, cfg, (cand, line) => sameDomain(cfg, cand, line)) : null;
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: w.inRef ? `Le point ${pt} est dans le domaine, mais pas dans ta description.` : `Le point ${pt} est dans ta description, mais pas dans le domaine.` };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: w.inRef ? t('Le point {p} est dans le domaine, mais pas dans ta description.', { p: pt }) : t('Le point {p} est dans ta description, mais pas dans le domaine.', { p: pt }) };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: t('C\'est juste, mais {fin}', { fin }) };
   return { kind: 'ok', node };
 }

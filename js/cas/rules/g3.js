@@ -12,6 +12,7 @@ import { parse } from '../parse.js';
 import { evalFloat } from '../numeric.js';
 import { toMathML } from '../mathml.js';
 import { toReadable } from '../print.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(n));
 const F = (x) => ({ t: 'float', x });
@@ -61,7 +62,7 @@ const fam = (U, alpha, period) => ({ t: 'rel', op: '=', l: U, r: { t: 'bin', op:
 const LINE_RULES = [
   {
     id: 'g3_deg_rad', family: 'notation', tag: 'E', skill: 'g3-radians', repair: 'g3-radians', judges: ['value', 'solset'],
-    name: 'Degrés et radians mélangés',
+    name: t('Degrés et radians mélangés'),
     example: ['L = 12·30 = 360 cm', 'L = 12·π/6 = 2π cm'],
     check: { judge: { kind: 'value', form: 'exact' }, prev: '12×30°', line: '360' },
     transform: (prev, ctx = {}) => {
@@ -75,22 +76,22 @@ const LINE_RULES = [
       }
       return out;
     },
-    explain: () => 'L = rθ demande θ en radians : 30° = π/6. Et une famille ne mélange pas degrés et radians : 2kπ, pas 360k.',
+    explain: () => t('L = rθ demande θ en radians : 30° = π/6. Et une famille ne mélange pas degrés et radians : 2kπ, pas 360k.'),
   },
   {
     id: 'g3_reduce_sign', family: 'sign', tag: 'E', skill: 'g3-reduce', repair: 'g3-reduce', judges: ['equiv', 'value'],
-    name: 'Signe oublié en réduisant l\'angle',
+    name: t('Signe oublié en réduisant l\'angle'),
     example: ['cos(5π/6) = cos(π/6)', 'cos(5π/6) = −cos(π/6)'],
     check: { judge: { kind: 'equiv', vars: [], target: 'exact' }, prev: 'cos((5π)/6)', line: 'cos(π/6)' },
     transform: (prev) => each(prev, (n) => n.t === 'fn' && TRIG.has(n.name) && constant(n.args[0]) && (piDen(n.args[0]) ?? 99) <= 6, (n) => {
       const v = evalFloat(n, {});
       return Number.isFinite(v) && v < -1e-12 ? { node: F(-v), ctx: { f: n } } : null;
     }),
-    explain: (ctx = {}) => (ctx.f ? `${M(ctx.f)} est négatif : regarde dans quel quadrant tombe l'angle. Dans le 2e quadrant, le cosinus est négatif.` : '5π/6 est dans le 2e quadrant, où le cosinus est négatif : cos(5π/6) = −cos(π/6).'),
+    explain: (ctx = {}) => (ctx.f ? t('{f} est négatif : regarde dans quel quadrant tombe l\'angle. Dans le 2e quadrant, le cosinus est négatif.', { f: M(ctx.f) }) : t('5π/6 est dans le 2e quadrant, où le cosinus est négatif : cos(5π/6) = −cos(π/6).')),
   },
   {
     id: 'g3_reduce_swap', family: 'rule', tag: 'E', skill: 'g3-reduce', repair: 'g3-reduce', judges: ['equiv'],
-    name: 'sin et cos pas échangés autour de π/2',
+    name: t('sin et cos pas échangés autour de π/2'),
     example: ['cos(π/2 + x) = cos x', 'cos(π/2 + x) = −sin x'],
     check: { judge: { kind: 'equiv', vars: ['x'], target: 'one-trig' }, prev: 'cos(π/2+x)', line: 'cos(x)' },
     transform: (prev) => paths(prev, (n) => n.t === 'fn' && (n.name === 'sin' || n.name === 'cos') && hasSym(n.args[0], 'x')).flatMap((path) => {
@@ -99,11 +100,13 @@ const LINE_RULES = [
       if (Math.abs(c - Math.round(c)) > 1e-9 || Math.round(c) % 2 === 0) return [];
       return [`${n.name}(x)`, `-${n.name}(x)`].map((t) => ({ node: replaceAt(prev, path, parse(t)), ctx: { f: n.name } }));
     }),
-    explain: (ctx = {}) => `Avec x = 0 : cos(π/2) = 0, mais cos 0 = 1. Autour de π/2, sin et cos s'échangent${ctx.f ? ` : ${ctx.f} devient ${ctx.f === 'sin' ? 'cos' : 'sin'}` : ''}.`,
+    explain: (ctx = {}) => (ctx.f
+      ? t('Avec x = 0 : cos(π/2) = 0, mais cos 0 = 1. Autour de π/2, sin et cos s\'échangent : {f} devient {g}.', { f: ctx.f, g: ctx.f === 'sin' ? 'cos' : 'sin' })
+      : t('Avec x = 0 : cos(π/2) = 0, mais cos 0 = 1. Autour de π/2, sin et cos s\'échangent.')),
   },
   {
     id: 'g3_linear', family: 'distribute', tag: 'E', skill: 'g3-identities', repair: 'g3-identities', judges: ['equiv'],
-    name: 'sin et cos traités comme linéaires',
+    name: t('sin et cos traités comme linéaires'),
     example: ['cos 2x = 2cos x', 'cos 2x = 2cos²x − 1'],
     check: { judge: { kind: 'equiv', vars: ['x'], target: 'any' }, prev: 'cos(2x)', line: '2cos(x)' },
     transform: (prev) => each(prev, (n) => n.t === 'fn' && TRIG.has(n.name), (n) => {
@@ -112,11 +115,13 @@ const LINE_RULES = [
       if (a.t === 'bin' && a.op === '×' && stripParen(a.l).t === 'num' && hasSym(a.r, 'x')) return { node: { t: 'bin', op: '×', l: a.l, r: { t: 'fn', name: n.name, args: [a.r] } }, ctx: { f: n } };
       return null;
     }),
-    explain: (ctx = {}) => `${ctx.f ? `${M(ctx.f)} ne se découpe pas ainsi. ` : ''}Avec a = b = π/2 : sin π = 0, mais sin(π/2) + sin(π/2) = 2. sin et cos ne sont pas linéaires : il faut les formules d'addition et d'angle double.`,
+    explain: (ctx = {}) => (ctx.f
+      ? t('{f} ne se découpe pas ainsi. Avec a = b = π/2 : sin π = 0, mais sin(π/2) + sin(π/2) = 2. sin et cos ne sont pas linéaires : il faut les formules d\'addition et d\'angle double.', { f: M(ctx.f) })
+      : t('Avec a = b = π/2 : sin π = 0, mais sin(π/2) + sin(π/2) = 2. sin et cos ne sont pas linéaires : il faut les formules d\'addition et d\'angle double.')),
   },
   {
     id: 'g3_add_sign', family: 'sign', tag: 'E', skill: 'g3-identities', repair: 'g3-identities', judges: ['equiv'],
-    name: 'Signe de la formule d\'addition',
+    name: t('Signe de la formule d\'addition'),
     example: ['cos(a + b) = cos a cos b + sin a sin b', 'cos(a + b) = cos a cos b − sin a sin b'],
     check: { judge: { kind: 'equiv', vars: ['x'], target: 'any' }, prev: 'cos(x+π/3)', line: 'cos(x)cos(π/3)+sin(x)sin(π/3)' },
     transform: (prev) => each(prev, (n) => n.t === 'fn' && (n.name === 'cos' || n.name === 'sin'), (n) => {
@@ -132,23 +137,25 @@ const LINE_RULES = [
       return { node, ctx: { f: n.name, op: a.op } };
     }),
     explain: (ctx = {}) => (ctx.f === 'sin'
-      ? 'sin(a + b) = sin a cos b + cos a sin b, et sin(a − b) = sin a cos b − cos a sin b : le signe suit celui de l\'angle.'
-      : 'Avec a = b = π/4 : cos(π/2) = 0, mais cos a cos b + sin a sin b = 1/2 + 1/2 = 1. Pour cos(a + b), c\'est un moins.'),
+      ? t('sin(a + b) = sin a cos b + cos a sin b, et sin(a − b) = sin a cos b − cos a sin b : le signe suit celui de l\'angle.')
+      : t('Avec a = b = π/4 : cos(π/2) = 0, mais cos a cos b + sin a sin b = 1/2 + 1/2 = 1. Pour cos(a + b), c\'est un moins.')),
   },
   {
     id: 'g3_half_sign', family: 'sign', tag: 'E', skill: 'g3-exact', repair: 'g3-exact', judges: ['equiv'],
-    name: 'Signe de la racine de bissection',
+    name: t('Signe de la racine de bissection'),
     example: ['cos(7π/8) = +√((1 + cos(7π/4))/2)', 'cos(7π/8) = −√((1 + cos(7π/4))/2)'],
     check: { judge: { kind: 'equiv', vars: [], target: 'exact' }, prev: 'cos((7π)/8)', line: '√((1+cos((7π)/4))/2)' },
     transform: (prev) => each(prev, (n) => n.t === 'fn' && TRIG.has(n.name) && constant(n.args[0]) && [8, 12, 24].includes(piDen(n.args[0])), (n) => {
       const v = evalFloat(n, {});
       return Number.isFinite(v) && v < -1e-12 ? { node: F(-v), ctx: { f: n } } : null;
     }),
-    explain: (ctx = {}) => `${ctx.f ? `${M(ctx.f)} : ` : ''}regarde le quadrant de l'angle. 7π/8 est dans le 2e quadrant : son cosinus est négatif, la racine prend le signe −.`,
+    explain: (ctx = {}) => (ctx.f
+      ? t('{f} : regarde le quadrant de l\'angle. 7π/8 est dans le 2e quadrant : son cosinus est négatif, la racine prend le signe −.', { f: M(ctx.f) })
+      : t('regarde le quadrant de l\'angle. 7π/8 est dans le 2e quadrant : son cosinus est négatif, la racine prend le signe −.')),
   },
   {
     id: 'g3_family_missing', family: 'method', tag: 'E', skill: 'g3-basic-eq', repair: 'g3-basic-eq', judges: ['solset'],
-    name: 'Une famille de solutions oubliée',
+    name: t('Une famille de solutions oubliée'),
     example: ['cos x = 1/2 : x = π/3 + 2kπ', 'x = ±π/3 + 2kπ'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true }, prev: 'cos(x)=1/2', line: 'x=π/3+2kπ' },
     transform: (prev) => {
@@ -159,12 +166,12 @@ const LINE_RULES = [
       const alpha = b.f === 'cos' ? Math.acos(b.a) : Math.asin(b.a);
       return [{ node: fam(b.U, alpha, 2 * Math.PI), ctx: { f: b.f } }];
     },
-    explain: () => 'Sur le cercle, il y a deux points : −π/3 a le même cosinus que π/3, et π − π/6 le même sinus que π/6. Il faut les deux familles.',
+    explain: () => t('Sur le cercle, il y a deux points : −π/3 a le même cosinus que π/3, et π − π/6 le même sinus que π/6. Il faut les deux familles.'),
   },
   {
     id: 'g3_sin_family', family: 'rule', tag: 'E', skill: 'g3-basic-eq', repair: 'g3-basic-eq', judges: ['solset'],
-    name: 'Seconde famille de sin écrite −α',
-    example: ['sin x = 1/2 : x = π/6 + 2kπ ou x = −π/6 + 2kπ', 'x = π/6 + 2kπ ou x = 5π/6 + 2kπ'],
+    name: t('Seconde famille de sin écrite −α'),
+    example: [t('sin x = 1/2 : x = π/6 + 2kπ ou x = −π/6 + 2kπ'), t('x = π/6 + 2kπ ou x = 5π/6 + 2kπ')],
     check: { judge: { kind: 'solset', v: 'x', periodic: true }, prev: 'sin(x)=1/2', line: 'x=π/6+2kπ ∨ x=-π/6+2kπ' },
     transform: (prev) => {
       const b = baseEq(prev);
@@ -172,11 +179,11 @@ const LINE_RULES = [
       const alpha = Math.asin(b.a);
       return [{ node: orOf([fam(b.U, alpha, 2 * Math.PI), fam(b.U, -alpha, 2 * Math.PI)]), ctx: {} }];
     },
-    explain: () => 'sin(−π/6) = −1/2, pas 1/2. Pour sin, le second point est π − α : x = 5π/6 + 2kπ.',
+    explain: () => t('sin(−π/6) = −1/2, pas 1/2. Pour sin, le second point est π − α : x = 5π/6 + 2kπ.'),
   },
   {
     id: 'g3_period_divide', family: 'rule', tag: 'E', skill: 'g3-basic-eq', repair: 'g3-basic-eq', judges: ['solset'],
-    name: 'Période pas divisée',
+    name: t('Période pas divisée'),
     example: ['2x = α + 2kπ : x = α/2 + 2kπ', 'x = α/2 + kπ'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true }, prev: '2x=(2π)/3+2kπ ∨ 2x=2kπ', line: 'x=π/3+2kπ ∨ x=2kπ' },
     transform: (prev) => {
@@ -197,19 +204,19 @@ const LINE_RULES = [
       if (b && b.f === 'tan') out.push({ node: fam(b.U, Math.atan(b.a), 2 * Math.PI), ctx: {} });
       return out;
     },
-    explain: () => 'Si 2x = α + 2kπ, alors x = α/2 + kπ : x = α/2 + π est aussi solution, car 2x = α + 2π. Divise aussi 2kπ par 2. Et tan a pour période π : u = α + kπ.',
+    explain: () => t('Si 2x = α + 2kπ, alors x = α/2 + kπ : x = α/2 + π est aussi solution, car 2x = α + 2π. Divise aussi 2kπ par 2. Et tan a pour période π : u = α + kπ.'),
   },
   {
     id: 'g3_bioche_pi', family: 'method', tag: 'E', skill: 'g3-bioche', repair: 'g3-bioche', judges: ['solset'],
-    name: 'x = π + 2kπ oublié avec t = tan(x/2)',
+    name: t('x = π + 2kπ oublié avec t = tan(x/2)'),
     example: ['2 sin x − cos x = 1 : S = {2 arctan(1/2) + 2kπ}', 'S = {2 arctan(1/2) + 2kπ} ∪ {π + 2kπ}'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true, subst: { t: 'tan(x/2)' } }, prev: '2sin(x)-cos(x)=1', line: 'x=2arctan(1/2)+2kπ' },
     transform: (prev, ctx = {}) => (ctx.cfg?.subst?.t && (hasSym(prev, 'x') || hasSym(prev, 't')) ? [{ node: andNot0(prev, parse('cos(x/2)')), ctx: {} }] : []),
-    explain: () => 'tan(x/2) n\'existe pas pour x = π : la substitution oublie ces valeurs. Or 2 sin π − cos π = 1 : x = π + 2kπ est solution. Teste toujours x = π + 2kπ à part.',
+    explain: () => t('tan(x/2) n\'existe pas pour x = π : la substitution oublie ces valeurs. Or 2 sin π − cos π = 1 : x = π + 2kπ est solution. Teste toujours x = π + 2kπ à part.'),
   },
   {
     id: 'g3_divide_zero', family: 'method', tag: 'E', skill: 'g3-eq', repair: 'eq-product', judges: ['solset'],
-    name: 'Division par cos x sans vérifier cos x = 0',
+    name: t('Division par cos x sans vérifier cos x = 0'),
     example: ['2 sin x cos x = cos x → 2 sin x = 1', 'cos x (2 sin x − 1) = 0'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true }, prev: '2sin(x)cos(x)=cos(x)', line: 'x=π/6+2kπ ∨ x=(5π)/6+2kπ' },
     transform: (prev) => {
@@ -228,11 +235,11 @@ const LINE_RULES = [
       });
       return out;
     },
-    explain: (ctx = {}) => `Tu as divisé par ${ctx.f ? M(ctx.f) : 'cos x'}. Là où il vaut 0 (par exemple cos x = 0 pour x = π/2), vérifie à part si ces x sont solutions : on ne peut pas diviser par 0.`,
+    explain: (ctx = {}) => t('Tu as divisé par {f}. Là où il vaut 0 (par exemple cos x = 0 pour x = π/2), vérifie à part si ces x sont solutions : on ne peut pas diviser par 0.', { f: ctx.f ? M(ctx.f) : 'cos x' }),
   },
   {
     id: 'g3_rphi', family: 'rule', tag: 'E', skill: 'g3-asinbcos', repair: 'g3-asinbcos', judges: ['solset'],
-    name: 'R ou φ faux dans a sin x + b cos x',
+    name: t('R ou φ faux dans a sin x + b cos x'),
     example: ['√3 sin x + cos x = (√3 + 1) sin(x + π/6)', '√3 sin x + cos x = 2 sin(x + π/6)'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true }, prev: '√3sin(x)+cos(x)=√2', line: '(√3+1)sin(x+π/6)=√2' },
     transform: (prev) => {
@@ -254,11 +261,11 @@ const LINE_RULES = [
         { node: s(R, Math.atan(b / a)), ctx: { R } },
       ];
     },
-    explain: (ctx = {}) => `R = √(a² + b²)${ctx.R ? ` = ${String(Math.round(ctx.R * 1000) / 1000).replace('.', ',')}` : ''}, pas |a| + |b|. Et φ se lit avec cos φ = a/R et sin φ = b/R, dans le bon quadrant. Vérifie avec x = 0 : R sin φ doit valoir b.`,
+    explain: (ctx = {}) => t('R = √(a² + b²){r}, pas |a| + |b|. Et φ se lit avec cos φ = a/R et sin φ = b/R, dans le bon quadrant. Vérifie avec x = 0 : R sin φ doit valoir b.', { r: ctx.R ? ` = ${String(Math.round(ctx.R * 1000) / 1000).replace('.', ',')}` : '' }),
   },
   {
     id: 'g3_ineq_arc', family: 'sign', tag: 'E', skill: 'g3-ineq', repair: 'g3-basic-eq', judges: ['solset'],
-    name: 'Arc complémentaire',
+    name: t('Arc complémentaire'),
     example: ['cos u ≥ 1/2 : [π/3 ; 5π/3]', '[−π/3 ; π/3] + 2kπ'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true, domain: '[0;2π]' }, prev: 'cos(x)≥1/2', line: '[π/3;(5π)/3]' },
     transform: (prev) => {
@@ -269,49 +276,51 @@ const LINE_RULES = [
       // The other arc: the relation turned, with or without its bounds.
       return [{ node: { ...n, op: KEEP[n.op] }, ctx: {} }, { node: { ...n, op: NEG[n.op] }, ctx: {} }];
     },
-    explain: () => 'Teste un point : pour u = π, cos π = −1, qui n\'est pas ≥ 1/2. L\'arc solution de cos u ≥ 1/2 entoure 0 : [−π/3 ; π/3] + 2kπ.',
+    explain: () => t('Teste un point : pour u = π, cos π = −1, qui n\'est pas ≥ 1/2. L\'arc solution de cos u ≥ 1/2 entoure 0 : [−π/3 ; π/3] + 2kπ.'),
   },
   {
     id: 'g3_ineq_window', family: 'method', tag: 'E', skill: 'g3-ineq', repair: 'g9-intervals', judges: ['solset'],
-    name: 'Un seul k, pas coupé à l\'intervalle',
+    name: t('Un seul k, pas coupé à l\'intervalle'),
     example: ['S = [−2π/3 ; 0]', 'S = {0} ∪ [4π/3 ; 2π]'],
     check: { judge: { kind: 'solset', v: 'x', periodic: true, domain: '[0;2π]' }, prev: '-(2π)/3+2kπ≤x≤2kπ', line: '[-(2π)/3;0]' },
     transform: (prev, ctx = {}) => (ctx.cfg?.periodic && hasSym(prev, 'k') ? [0, 1, -1, 2].map((k) => ({ node: mapNode(prev, (y) => (y.t === 'sym' && y.name === 'k' && !y.sub ? { t: 'paren', e: k < 0 ? { t: 'neg', e: num(-k) } : num(k) } : y)), ctx: { k } })) : []),
-    explain: (ctx = {}) => `Ta solution${ctx.k !== undefined ? ` ne garde que k = ${ctx.k} et` : ''} sort de l'intervalle ou oublie un k. Teste chaque k (… −1, 0, 1, 2 …) et coupe chaque morceau à l'intervalle.`,
+    explain: (ctx = {}) => (ctx.k !== undefined
+      ? t('Ta solution ne garde que k = {k} et sort de l\'intervalle ou oublie un k. Teste chaque k (… −1, 0, 1, 2 …) et coupe chaque morceau à l\'intervalle.', { k: ctx.k })
+      : t('Ta solution sort de l\'intervalle ou oublie un k. Teste chaque k (… −1, 0, 1, 2 …) et coupe chaque morceau à l\'intervalle.')),
   },
   {
     id: 'g3_cos_law_sign', family: 'sign', tag: 'E', skill: 'g3-triangle', repair: 'g3-triangle', judges: ['value'],
-    name: 'Signe du théorème du cosinus',
+    name: t('Signe du théorème du cosinus'),
     example: ['c² = a² + b² + 2ab cos γ', 'c² = a² + b² − 2ab cos γ'],
     check: { judge: { kind: 'value' }, prev: '5^2+8^2-2×5×8×cos(60°)', line: '129' },
     transform: (prev) => each(prev, (n) => n.t === 'bin' && n.op === '-' && contains(n.r, (y) => y.t === 'fn' && y.name === 'cos'), (n) => ({ node: { ...n, op: '+' }, ctx: {} })),
-    explain: () => 'Avec γ = 90°, on doit retrouver Pythagore, et avec γ = 60°, c doit être plus petit que pour 90° : c² = a² + b² − 2ab cos γ.',
+    explain: () => t('Avec γ = 90°, on doit retrouver Pythagore, et avec γ = 60°, c doit être plus petit que pour 90° : c² = a² + b² − 2ab cos γ.'),
   },
   {
     id: 'g3_ssa_lost', family: 'method', tag: 'E', skill: 'g3-triangle', repair: 'g3-triangle', judges: [],
-    name: 'Deuxième angle du cas ambigu oublié',
-    example: ['sin β = s : β seul', 'β ou 180° − β'],
+    name: t('Deuxième angle du cas ambigu oublié'),
+    example: [t('sin β = s : β seul'), t('β ou 180° − β')],
     check: { bait: { skill: 'g3-triangle', level: 4 } },
-    explain: () => '180° − β a le même sinus que β. Vérifie si la somme des angles permet aussi cet angle-là : il peut y avoir deux triangles.',
+    explain: () => t('180° − β a le même sinus que β. Vérifie si la somme des angles permet aussi cet angle-là : il peut y avoir deux triangles.'),
   },
   {
     id: 'g3_arc_cancel', family: 'rule', tag: 'E', skill: 'g3-arc-def', repair: 'g3-arc-def', judges: ['value'],
-    name: 'arccos(cos θ) = θ sans regarder l\'image',
+    name: t('arccos(cos θ) = θ sans regarder l\'image'),
     example: ['arccos(cos(13π/4)) = 13π/4', 'arccos(cos(13π/4)) = 3π/4'],
     check: { judge: { kind: 'value', form: 'exact' }, prev: 'arccos(cos((13π)/4))', line: '(13π)/4' },
     transform: (prev) => {
       const PAIR = { arcsin: 'sin', arccos: 'cos', arctan: 'tan', Arctg: 'tan', arctg: 'tan' };
       return each(prev, (n) => n.t === 'fn' && PAIR[n.name] && stripParen(n.args[0]).t === 'fn' && stripParen(n.args[0]).name === PAIR[n.name], (n) => ({ node: stripParen(n.args[0]).args[0], ctx: { f: n.name } }));
     },
-    explain: (ctx = {}) => `${ctx.f ?? 'arccos'} donne un angle de ${ctx.f === 'arccos' || !ctx.f ? '[0 ; π]' : ctx.f === 'arcsin' ? '[−π/2 ; π/2]' : ']−π/2 ; π/2['}. Si θ n'y est pas, cherche l'angle de cet intervalle qui a la même valeur.`,
+    explain: (ctx = {}) => t('{f} donne un angle de {i}. Si θ n\'y est pas, cherche l\'angle de cet intervalle qui a la même valeur.', { f: ctx.f ?? 'arccos', i: ctx.f === 'arccos' || !ctx.f ? '[0 ; π]' : ctx.f === 'arcsin' ? '[−π/2 ; π/2]' : ']−π/2 ; π/2[' }),
   },
   {
     id: 'g3_arc_root_sign', family: 'sign', tag: 'E', skill: 'g3-arc-comp', repair: 'g3-arc-def', judges: ['value'],
-    name: 'Signe de la racine pris sur l\'argument',
+    name: t('Signe de la racine pris sur l\'argument'),
     example: ['cos(arcsin(−3/5)) = −4/5', 'cos(arcsin(−3/5)) = 4/5'],
     check: { judge: { kind: 'value', form: 'exact' }, prev: 'cos(arcsin(-3/5))', line: '-4/5' },
     transform: (prev) => (contains(prev, (n) => n.t === 'fn' && ['arcsin', 'arccos', 'arctan'].includes(n.name) && evalFloat(n.args[0], {}) < 0) ? [{ node: { t: 'neg', e: { t: 'paren', e: prev } }, ctx: {} }] : []),
-    explain: () => 'θ = arcsin(−3/5) est dans [−π/2 ; 0] : son cosinus est positif. Le signe de la racine vient de l\'intervalle de θ, pas du signe de a.',
+    explain: () => t('θ = arcsin(−3/5) est dans [−π/2 ; 0] : son cosinus est positif. Le signe de la racine vient de l\'intervalle de θ, pas du signe de a.'),
   },
 ];
 

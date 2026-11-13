@@ -17,6 +17,7 @@
 import { parse } from '../cas/parse.js';
 import { compileFloat, evalFloat } from '../cas/numeric.js';
 import { readParam, compile } from '../cas/paramgeo.js';
+import { t } from '../i18n.js';
 
 const XYZ = ['x', 'y', 'z'];
 const CACHE = new Map();
@@ -43,8 +44,8 @@ export const inDomain = (dom, p) => dom.parts.some((conj) => conj.every((a) => a
 
 // A point written « (a ; b) » or « (a ; b ; c) », numbers read by the CAS.
 function readPoint(text, dim) {
-  const t = String(text ?? '').trim().replace(/^[A-Za-z]\s*=\s*/, '').replace(/[−–]/g, '-');
-  const m = /^\((.*)\)$/.exec(t);
+  const tt = String(text ?? '').trim().replace(/^[A-Za-z]\s*=\s*/, '').replace(/[−–]/g, '-');
+  const m = /^\((.*)\)$/.exec(tt);
   if (!m) return null;
   const xs = m[1].split(/[;]/).map((s) => s.trim());
   if (xs.length !== dim) return null;
@@ -58,34 +59,34 @@ export const PROPS = {
     const { dom } = params;
     const P = readPoint(answers.P, dom.dim);
     const Q = readPoint(answers.Q, dom.dim);
-    if (!P || !Q) return { ok: false, message: `Écris chaque point avec ses ${dom.dim} coordonnées : (a ; b${dom.dim === 3 ? ' ; c' : ''}).` };
-    if (!inDomain(dom, P)) return { ok: false, message: `Le point ${fmt(P)} n'est pas dans Ω.` };
-    if (!inDomain(dom, Q)) return { ok: false, message: `Le point ${fmt(Q)} n'est pas dans Ω.` };
+    if (!P || !Q) return { ok: false, message: t('Écris chaque point avec ses {dim} coordonnées : (a ; b{a}).', { dim: dom.dim, a: dom.dim === 3 ? ' ; c' : '' }) };
+    if (!inDomain(dom, P)) return { ok: false, message: t('Le point {a} n\'est pas dans Ω.', { a: fmt(P) }) };
+    if (!inDomain(dom, Q)) return { ok: false, message: t('Le point {a} n\'est pas dans Ω.', { a: fmt(Q) }) };
     for (let k = 1; k < 400; k++) {
       const s = k / 400;
       const M = P.map((x, i) => x + s * (Q[i] - x));
       if (!inDomain(dom, M)) return { ok: true };
     }
-    return { ok: false, message: 'Tout le segment entre tes deux points reste dans Ω : choisis-les de part et d\'autre du trou ou du morceau qui manque.', rule: 'v_convex_star_confuse' };
+    return { ok: false, message: t('Tout le segment entre tes deux points reste dans Ω : choisis-les de part et d\'autre du trou ou du morceau qui manque.'), rule: 'v_convex_star_confuse' };
   },
   loopAroundHole(params, answers) {
     const { dom, hole } = params;
     let par;
-    try { par = readParam(String(answers.g ?? ''), { params: ['t'] }); } catch { return { ok: false, message: 'Écris ta courbe : (… ; …), t ∈ [a ; b].' }; }
-    if (!par?.comps || par.comps.length !== dom.dim) return { ok: false, message: `Écris ta courbe avec ${dom.dim} composantes : (… ; …${dom.dim === 3 ? ' ; …' : ''}), t ∈ [a ; b].` };
+    try { par = readParam(String(answers.g ?? ''), { params: ['t'] }); } catch { return { ok: false, message: t('Écris ta courbe : (… ; …), t ∈ [a ; b].') }; }
+    if (!par?.comps || par.comps.length !== dom.dim) return { ok: false, message: t('Écris ta courbe avec {dim} composantes : (… ; …{a}), t ∈ [a ; b].', { dim: dom.dim, a: dom.dim === 3 ? ' ; …' : '' }) };
     const p = par.params[0];
     const b = par.bounds[p];
-    if (!b) return { ok: false, message: 'Donne aussi l\'intervalle du paramètre : t ∈ [a ; b].' };
+    if (!b) return { ok: false, message: t('Donne aussi l\'intervalle du paramètre : t ∈ [a ; b].') };
     const f = compile(par);
     const N = 400;
     const pts = [];
     for (let k = 0; k <= N; k++) pts.push(f(b[0] + ((b[1] - b[0]) * k) / N));
-    if (pts.some((q) => q.some((x) => !Number.isFinite(x)))) return { ok: false, message: 'Je n\'arrive pas à calculer ta courbe.' };
+    if (pts.some((q) => q.some((x) => !Number.isFinite(x)))) return { ok: false, message: t('Je n\'arrive pas à calculer ta courbe.') };
     const bad = pts.find((q) => !inDomain(dom, q));
-    if (bad) return { ok: false, message: `Ta courbe sort de Ω, par exemple en ${fmt(bad)}.` };
+    if (bad) return { ok: false, message: t('Ta courbe sort de Ω, par exemple en {a}.', { a: fmt(bad) }) };
     const a0 = pts[0];
     const a1 = pts[N];
-    if (Math.hypot(...a0.map((x, i) => x - a1[i])) > 1e-6) return { ok: false, message: 'Ta courbe n\'est pas fermée : elle ne revient pas à son point de départ.' };
+    if (Math.hypot(...a0.map((x, i) => x - a1[i])) > 1e-6) return { ok: false, message: t('Ta courbe n\'est pas fermée : elle ne revient pas à son point de départ.') };
     const c = hole === 'z' ? [0, 0] : hole;
     let turn = 0;
     for (let k = 0; k < N; k++) {
@@ -96,7 +97,7 @@ export const PROPS = {
       while (dlt < -Math.PI) dlt += 2 * Math.PI;
       turn += dlt;
     }
-    if (Math.abs(turn) < Math.PI) return { ok: false, message: 'Ta courbe fermée n\'entoure pas le trou : elle se réduit à un point dans Ω.', rule: 'v_rot_closed_zero' };
+    if (Math.abs(turn) < Math.PI) return { ok: false, message: t('Ta courbe fermée n\'entoure pas le trou : elle se réduit à un point dans Ω.'), rule: 'v_rot_closed_zero' };
     return { ok: true };
   },
 };

@@ -17,6 +17,7 @@
 // discussion is a decision per case before a computed line (the maximum of
 // f, lim aₙ), then the cases are joined into one set (solset).
 
+import { t } from '../../i18n.js';
 import { Q } from '../../math/rational.js';
 import { mcq } from './kit.js';
 import { problemItem } from './kit-problem.js';
@@ -27,18 +28,18 @@ import {
 const RS = 'a1-seq-rec-study';
 const KEYS = ['calcx', 'anal', 'set', 'seq'];
 const SUB = [
-  { id: 'deriv', label: 'dérivées', skill: 'a1-deriv-rules' },
-  { id: 'study', label: 'convexité, asymptotes', skill: 'a1-fn-study' },
-  { id: 'sign', label: 'signe de f(x) − x', skill: 'a1-seq-rec-fixed' },
-  { id: 'disc', label: 'discussion selon a₁', skill: RS },
+  { id: 'deriv', label: t('dérivées'), skill: 'a1-deriv-rules' },
+  { id: 'study', label: t('convexité, asymptotes'), skill: 'a1-fn-study' },
+  { id: 'sign', label: t('signe de f(x) − x'), skill: 'a1-seq-rec-fixed' },
+  { id: 'disc', label: t('discussion selon a₁'), skill: RS },
 ];
 const CHOICES = [
-  { id: 'solve', label: 'Résoudre L = f(L)' },
-  { id: 'sign', label: 'Étudier le signe de f(x) − x' },
-  { id: 'extremum', label: 'Utiliser l\'extremum local de f qui est un point fixe' },
-  { id: 'limit', label: 'Monotone et bornée : la limite est un point fixe' },
-  { id: 'merge', label: 'Réunir les cas' },
-  { id: 'fixed', label: 'Le point fixe est la limite pour tout a₁', rule: 'a1_rec_limit_without_convergence', why: 'Le point fixe n\'est que la limite possible : selon a₁, la suite peut partir à l\'infini.' },
+  { id: 'solve', label: t('Résoudre L = f(L)') },
+  { id: 'sign', label: t('Étudier le signe de f(x) − x') },
+  { id: 'extremum', label: t('Utiliser l\'extremum local de f qui est un point fixe') },
+  { id: 'limit', label: t('Monotone et bornée : la limite est un point fixe') },
+  { id: 'merge', label: t('Réunir les cas') },
+  { id: 'fixed', label: t('Le point fixe est la limite pour tout a₁'), rule: 'a1_rec_limit_without_convergence', why: t('Le point fixe n\'est que la limite possible : selon a₁, la suite peut partir à l\'infini.') },
 ];
 
 function draw(rng) {
@@ -88,21 +89,21 @@ function texts(d) {
 
 // ---------- decisions ----------
 
-const extDecision = (d) => decision(`f′ s'annule en x = ${fr(d.p)} et change de signe. En x = ${fr(d.p)}, f a :`, [
-  { id: 'ok', label: `un ${d.sig > 0 ? 'maximum' : 'minimum'} local, f(${fr(d.p)}) = ${fr(d.p)}`, valid: true },
-  { id: 'other', label: `un ${d.sig > 0 ? 'minimum' : 'maximum'} local`, valid: false, why: `f′ passe de ${d.sig > 0 ? '+ à −' : '− à +'} en ${fr(d.p)}.` },
-  { id: 'none', label: 'pas d\'extremum', valid: false, why: 'f′ change de signe en ce point : c\'est un extremum local.' },
+const extDecision = (d) => decision(t('f′ s\'annule en x = {p} et change de signe. En x = {p}, f a :', { p: fr(d.p) }), [
+  { id: 'ok', label: d.sig > 0 ? t('un maximum local, f({p}) = {p}', { p: fr(d.p) }) : t('un minimum local, f({p}) = {p}', { p: fr(d.p) }), valid: true },
+  { id: 'other', label: d.sig > 0 ? t('un minimum local') : t('un maximum local'), valid: false, why: t('f′ passe de {s} en {p}.', { s: d.sig > 0 ? t('+ à −') : t('− à +'), p: fr(d.p) }) },
+  { id: 'none', label: t('pas d\'extremum'), valid: false, why: t('f′ change de signe en ce point : c\'est un extremum local.') },
 ]);
 
-const avDecision = (T) => decision('Asymptote verticale :', [
-  { id: 'ok', label: `x = ${T.vr} : f n'y est pas définie et |f(x)| → +∞`, valid: true },
-  { id: 'p', label: `x = ${T.pr}`, valid: false, why: `f(${T.pr}) = ${T.pr} : f est définie en ${T.pr}.` },
-  { id: 'none', label: 'il n\'y en a pas', valid: false, why: `Le dénominateur s'annule en ${T.vr} et pas le numérateur.` },
+const avDecision = (T) => decision(t('Asymptote verticale :'), [
+  { id: 'ok', label: t('x = {v} : f n\'y est pas définie et |f(x)| → +∞', { v: T.vr }), valid: true },
+  { id: 'p', label: `x = ${T.pr}`, valid: false, why: t('f({p}) = {p} : f est définie en {p}.', { p: T.pr }) },
+  { id: 'none', label: t('il n\'y en a pas'), valid: false, why: t('Le dénominateur s\'annule en {v} et pas le numérateur.', { v: T.vr }) },
 ]);
 
-const aoDecision = () => decision('f(x)/x → 1 en ±∞ : la pente de l\'asymptote oblique est 1. Pour son équation y = x + p :', [
-  { id: 'ok', label: 'il faut encore p = lim (f(x) − x)', valid: true },
-  { id: 'slope', label: 'y = x suffit : la pente est connue', valid: false, rule: 'a1_oblique_asymptote_slope_only', why: 'La pente ne suffit pas : il faut encore p = lim (f(x) − x).' },
+const aoDecision = () => decision(t('f(x)/x → 1 en ±∞ : la pente de l\'asymptote oblique est 1. Pour son équation y = x + p :'), [
+  { id: 'ok', label: t('il faut encore p = lim (f(x) − x)'), valid: true },
+  { id: 'slope', label: t('y = x suffit : la pente est connue'), valid: false, rule: 'a1_oblique_asymptote_slope_only', why: t('La pente ne suffit pas : il faut encore p = lim (f(x) − x).') },
 ]);
 
 // The three cases of (d): [{prompt, options}] (options with one right).
@@ -112,31 +113,36 @@ function cases(d, T) {
   const v = T.vr;
   const m = fr(T.m);
   const up = sig > 0;
+  const w = { p, v, m };
+  // prompt: the case before a decision; ask: the same case as a question.
+  const divC = { c: `a₁ ${up ? '>' : '<'} ${v}` };
   const div = {
-    prompt: `Si a₁ ${up ? '>' : '<'} ${v} :`,
+    prompt: t('Si {c} :', divC), ask: t('(d) Si {c}, que fait la suite ?', divC),
     options: [
-      { id: 'ok', label: up ? `f(x) > x et f(x) ≥ ${m} > ${v} sur ]${v} ; +∞[ : (aₙ) croît ; une limite serait un point fixe > ${v}, il n'y en a pas : aₙ → +∞` : `f(x) < x et f(x) ≤ ${m} < ${v} sur ]−∞ ; ${v}[ : (aₙ) décroît ; une limite serait un point fixe < ${v}, il n'y en a pas : aₙ → −∞`, valid: true },
-      { id: 'fixed', label: `aₙ → ${p}, le seul point fixe`, valid: false, rule: 'a1_rec_limit_without_convergence', why: `${p} n'est que la limite possible. Ici la suite ${up ? 'croît et reste > ' : 'décroît et reste < '}${v} : elle s'éloigne de ${p}.` },
-      { id: 'bound', label: `(aₙ) ${up ? 'croît et elle est minorée' : 'décroît et elle est majorée'} par ${m} : elle converge`, valid: false, why: up ? 'Croissante et minorée ne suffit pas : il faudrait qu\'elle soit majorée.' : 'Décroissante et majorée ne suffit pas : il faudrait qu\'elle soit minorée.' },
+      { id: 'ok', label: up ? t('f(x) > x et f(x) ≥ {m} > {v} sur ]{v} ; +∞[ : (aₙ) croît ; une limite serait un point fixe > {v}, il n\'y en a pas : aₙ → +∞', w) : t('f(x) < x et f(x) ≤ {m} < {v} sur ]−∞ ; {v}[ : (aₙ) décroît ; une limite serait un point fixe < {v}, il n\'y en a pas : aₙ → −∞', w), valid: true },
+      { id: 'fixed', label: t('aₙ → {p}, le seul point fixe', w), valid: false, rule: 'a1_rec_limit_without_convergence', why: up ? t('{p} n\'est que la limite possible. Ici la suite croît et reste > {v} : elle s\'éloigne de {p}.', w) : t('{p} n\'est que la limite possible. Ici la suite décroît et reste < {v} : elle s\'éloigne de {p}.', w) },
+      { id: 'bound', label: up ? t('(aₙ) croît et elle est minorée par {m} : elle converge', w) : t('(aₙ) décroît et elle est majorée par {m} : elle converge', w), valid: false, why: up ? t('Croissante et minorée ne suffit pas : il faudrait qu\'elle soit majorée.') : t('Décroissante et majorée ne suffit pas : il faudrait qu\'elle soit minorée.') },
     ],
   };
+  const nearC = { c: `a₁ ${up ? '<' : '>'} ${p}` };
   const near = {
-    prompt: `Si a₁ ${up ? '<' : '>'} ${p} :`,
+    prompt: t('Si {c} :', nearC), ask: t('(d) Si {c}, que fait la suite ?', nearC),
     options: [
-      { id: 'ok', label: up ? `aₙ < ${p} pour tout n (${p} est le maximum de f sur ]−∞ ; ${v}[) et f(x) > x : (aₙ) croît, majorée par ${p}, donc aₙ → ${p}` : `aₙ > ${p} pour tout n (${p} est le minimum de f sur ]${v} ; +∞[) et f(x) < x : (aₙ) décroît, minorée par ${p}, donc aₙ → ${p}`, valid: true },
+      { id: 'ok', label: up ? t('aₙ < {p} pour tout n ({p} est le maximum de f sur ]−∞ ; {v}[) et f(x) > x : (aₙ) croît, majorée par {p}, donc aₙ → {p}', w) : t('aₙ > {p} pour tout n ({p} est le minimum de f sur ]{v} ; +∞[) et f(x) < x : (aₙ) décroît, minorée par {p}, donc aₙ → {p}', w), valid: true },
       up
-        ? { id: 'inf', label: `f est croissante sur ]−∞ ; ${p}] : (aₙ) croît sans borne, aₙ → +∞`, valid: false, why: `f(x) ≤ ${p} pour x < ${v} : la suite reste sous ${p}.` }
-        : { id: 'fup', label: `f est croissante sur [${p} ; +∞[, donc (aₙ) croît`, valid: false, rule: 'a1_monotone_by_f_increasing', why: `f croissante dit seulement que la suite est monotone. Ici f(x) < x : a₂ < a₁, elle décroît.` },
-      { id: 'away', label: `(aₙ) ${up ? 'décroît et tend vers −∞' : 'croît et tend vers +∞'}`, valid: false, why: `f(x) ${up ? '> x' : '< x'} sur cet intervalle : la suite ${up ? 'croît' : 'décroît'}.` },
-      { id: 'v', label: `(aₙ) ${up ? 'croît' : 'décroît'} et converge vers ${v}`, valid: false, why: `${v} n'est pas un point fixe : f n'y est même pas définie.` },
+        ? { id: 'inf', label: t('f est croissante sur ]−∞ ; {p}] : (aₙ) croît sans borne, aₙ → +∞', w), valid: false, why: t('f(x) ≤ {p} pour x < {v} : la suite reste sous {p}.', w) }
+        : { id: 'fup', label: t('f est croissante sur [{p} ; +∞[, donc (aₙ) croît', w), valid: false, rule: 'a1_monotone_by_f_increasing', why: t('f croissante dit seulement que la suite est monotone. Ici f(x) < x : a₂ < a₁, elle décroît.') },
+      { id: 'away', label: up ? t('(aₙ) décroît et tend vers −∞') : t('(aₙ) croît et tend vers +∞'), valid: false, why: up ? t('f(x) > x sur cet intervalle : la suite croît.') : t('f(x) < x sur cet intervalle : la suite décroît.') },
+      { id: 'v', label: up ? t('(aₙ) croît et converge vers {v}', w) : t('(aₙ) décroît et converge vers {v}', w), valid: false, why: t('{v} n\'est pas un point fixe : f n\'y est même pas définie.', w) },
     ],
   };
+  const midC = up ? { a: p, b: v } : { a: v, b: p };
   const mid = {
-    prompt: `Si a₁ est entre ${up ? `${p} et ${v}` : `${v} et ${p}`} :`,
+    prompt: t('Si a₁ est entre {a} et {b} :', midC), ask: t('(d) Si a₁ est entre {a} et {b}, que fait la suite ?', midC),
     options: [
-      { id: 'ok', label: `a₂ = f(a₁) ${up ? '<' : '>'} ${p} : on est ramené au cas a₁ ${up ? '<' : '>'} ${p}, donc aₙ → ${p}`, valid: true },
-      { id: 'away', label: `f(x) ${up ? '< x' : '> x'} sur cet intervalle : (aₙ) ${up ? 'décroît et tend vers −∞' : 'croît et tend vers +∞'}`, valid: false, why: `Seul a₁ est dans cet intervalle : a₂ = f(a₁) ${up ? '<' : '>'} ${p}, et là f(x) ${up ? '> x' : '< x'}.` },
-      { id: 'bound', label: `(aₙ) ${up ? 'décroît et elle est minorée' : 'croît et elle est majorée'} par ${p} : aₙ → ${p}`, valid: false, why: `a₂ ${up ? '<' : '>'} ${p} : la suite passe de l'autre côté de ${p}, puis ${up ? 'remonte' : 'redescend'}.` },
+      { id: 'ok', label: t('a₂ = f(a₁) {rel} {p} : on est ramené au cas a₁ {rel} {p}, donc aₙ → {p}', { rel: up ? '<' : '>', p }), valid: true },
+      { id: 'away', label: up ? t('f(x) < x sur cet intervalle : (aₙ) décroît et tend vers −∞') : t('f(x) > x sur cet intervalle : (aₙ) croît et tend vers +∞'), valid: false, why: up ? t('Seul a₁ est dans cet intervalle : a₂ = f(a₁) < {p}, et là f(x) > x.', w) : t('Seul a₁ est dans cet intervalle : a₂ = f(a₁) > {p}, et là f(x) < x.', w) },
+      { id: 'bound', label: up ? t('(aₙ) décroît et elle est minorée par {p} : aₙ → {p}', w) : t('(aₙ) croît et elle est majorée par {p} : aₙ → {p}', w), valid: false, why: up ? t('a₂ < {p} : la suite passe de l\'autre côté de {p}, puis remonte.', w) : t('a₂ > {p} : la suite passe de l\'autre côté de {p}, puis redescend.', w) },
     ],
   };
   return { div, near, mid };
@@ -154,54 +160,58 @@ function partsOf(d, level) {
   const mids = level <= 3;
   const C = cases(d, T);
   const P2 = {};
-  P2.A = part('(a) Seule limite possible : résous L = f(L).', 'L ∈', T.fL, { kind: 'solset', v: 'L' },
-    mids ? [E(T.aMid, 'Retrancher L', 'disc', 'solve'), E(T.aEnd, 'Une fraction est nulle si son numérateur l\'est', 'disc', 'solve')] : [E(T.aEnd, 'Le seul point fixe', 'disc', 'solve')]);
+  P2.A = part(t('(a) Seule limite possible : résous L = f(L).'), 'L ∈', T.fL, { kind: 'solset', v: 'L' },
+    mids ? [E(T.aMid, t('Retrancher L'), 'disc', 'solve'), E(T.aEnd, t('Une fraction est nulle si son numérateur l\'est'), 'disc', 'solve')] : [E(T.aEnd, t('Le seul point fixe'), 'disc', 'solve')]);
   if (g) P2.A.lines[1] = blanked(P2.A.lines[1], [String(d.p)]);
-  P2.b1 = part('(b) Dérive f :', 'f′(x) =', `d(${T.f})`, EQ, [E(T.fp, 'Dériver', 'deriv', 'deriv')]);
+  P2.b1 = part(t('(b) Dérive f :'), 'f′(x) =', `d(${T.f})`, EQ, [E(T.fp, t('Dériver'), 'deriv', 'deriv')]);
   if (g) P2.b1.lines[0] = blanked(P2.b1.lines[0], [`(${T.den})^2`]);
-  P2.b2 = part('f est croissante là où f′(x) > 0 :', 'f′(x) > 0 ⇔', `${T.fp}>0`, SOL,
-    mids ? [E(`${T.fpFact}>0`, 'Même dénominateur, factoriser', 'study', 'sign'), E(T.inc, 'Signe des facteurs', 'study', 'sign')] : [E(T.inc, 'Signe de f′', 'study', 'sign')]);
+  P2.b2 = part(t('f est croissante là où f′(x) > 0 :'), 'f′(x) > 0 ⇔', `${T.fp}>0`, SOL,
+    mids ? [E(`${T.fpFact}>0`, t('Même dénominateur, factoriser'), 'study', 'sign'), E(T.inc, t('Signe des facteurs'), 'study', 'sign')] : [E(T.inc, t('Signe de f′'), 'study', 'sign')]);
   if (g) P2.b2.lines[1] = blanked(P2.b2.lines[1], [String(Math.max(d.p, T.c))]);
-  P2.b3 = part(`Valeur de l'autre extremum local, en x = ${fr(T.c)} :`, `f(${fr(T.c)}) =`, T.fc, { kind: 'value', form: 'irreducible' }, [E(N(T.m), 'Calculer', 'study', 'eval')], [extDecision(d)]);
-  P2.b4 = part('Dérive encore :', 'f″(x) =', `d(${T.fp})`, EQ, [E(T.f2, 'Dériver', 'deriv', 'deriv')]);
+  P2.b3 = part(t('Valeur de l\'autre extremum local, en x = {c} :', { c: fr(T.c) }), `f(${fr(T.c)}) =`, T.fc, { kind: 'value', form: 'irreducible' }, [E(N(T.m), t('Calculer'), 'study', 'eval')], [extDecision(d)]);
+  P2.b4 = part(t('Dérive encore :'), 'f″(x) =', `d(${T.fp})`, EQ, [E(T.f2, t('Dériver'), 'deriv', 'deriv')]);
   if (g) P2.b4.lines[0] = blanked(P2.b4.lines[0], [String(2 * d.gam)]);
-  P2.b5 = part('f est convexe là où f″(x) > 0 :', 'f″(x) > 0 ⇔', `${T.f2}>0`, SOL, [E(T.convex, `Signe de (${RD(T.den)})³`, 'study', 'sign')]);
-  P2.b6 = part(`Asymptote verticale : limite quand x → ${T.vr}⁺`, 'lim f =', T.f, LIMX(T.v, '+'), [E('+∞', 'Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0', 'study', 'lim')], [avDecision(T)]);
-  P2.b7 = part(`Puis quand x → ${T.vr}⁻`, 'lim f =', T.f, LIMX(T.v, '-'), [E('-∞', 'Le dénominateur tend vers 0 de l\'autre côté', 'study', 'lim')]);
-  P2.b8 = part('Asymptote oblique en ±∞ : limite de f(x) − x', 'lim (f(x) − x) =', T.aoStart, LIMX('+∞'),
-    mids ? [E(T.aoMid, 'Simplifier', 'study', 'lim'), E(T.ao, 'Termes de plus haut degré', 'study', 'lim')] : [E(T.ao, `Asymptote y = ${RD(`x+${T.ao}`.replace('+-', '-'))}`, 'study', 'lim')], [aoDecision()]);
-  P2.c1 = part('(c) Où le graphe de f est-il au-dessus de la droite y = x ?', 'f(x) > x ⇔', T.gt, SOL,
-    mids ? [E(T.gtMid, 'Retrancher x', 'sign', 'sign'), E(T.gtSet, 'Signe du quotient', 'sign', 'sign')] : [E(T.gtSet, 'Signe de f(x) − x', 'sign', 'sign')]);
-  P2.c2 = part('Et en dessous ?', 'f(x) < x ⇔', T.lt, SOL,
-    mids ? [E(T.ltMid, 'Retrancher x', 'sign', 'sign'), E(T.ltSet, 'Signe du quotient', 'sign', 'sign')] : [E(T.ltSet, 'Signe de f(x) − x', 'sign', 'sign')]);
+  P2.b5 = part(t('f est convexe là où f″(x) > 0 :'), 'f″(x) > 0 ⇔', `${T.f2}>0`, SOL, [E(T.convex, t('Signe de ({d})³', { d: RD(T.den) }), 'study', 'sign')]);
+  P2.b6 = part(t('Asymptote verticale : limite quand x → {v}⁺', { v: T.vr }), 'lim f =', T.f, LIMX(T.v, '+'), [E('+∞', t('Le numérateur tend vers un nombre ≠ 0, le dénominateur vers 0'), 'study', 'lim')], [avDecision(T)]);
+  P2.b7 = part(t('Puis quand x → {v}⁻', { v: T.vr }), 'lim f =', T.f, LIMX(T.v, '-'), [E('-∞', t('Le dénominateur tend vers 0 de l\'autre côté'), 'study', 'lim')]);
+  P2.b8 = part(t('Asymptote oblique en ±∞ : limite de f(x) − x'), 'lim (f(x) − x) =', T.aoStart, LIMX('+∞'),
+    mids ? [E(T.aoMid, t('Simplifier'), 'study', 'lim'), E(T.ao, t('Termes de plus haut degré'), 'study', 'lim')] : [E(T.ao, t('Asymptote y = {y}', { y: RD(`x+${T.ao}`.replace('+-', '-')) }), 'study', 'lim')], [aoDecision()]);
+  P2.c1 = part(t('(c) Où le graphe de f est-il au-dessus de la droite y = x ?'), 'f(x) > x ⇔', T.gt, SOL,
+    mids ? [E(T.gtMid, t('Retrancher x'), 'sign', 'sign'), E(T.gtSet, t('Signe du quotient'), 'sign', 'sign')] : [E(T.gtSet, t('Signe de f(x) − x'), 'sign', 'sign')]);
+  P2.c2 = part(t('Et en dessous ?'), 'f(x) < x ⇔', T.lt, SOL,
+    mids ? [E(T.ltMid, t('Retrancher x'), 'sign', 'sign'), E(T.ltSet, t('Signe du quotient'), 'sign', 'sign')] : [E(T.ltSet, t('Signe de f(x) − x'), 'sign', 'sign')]);
   if (g) {
     P2.c1.lines[1] = blanked(P2.c1.lines[1], [T.v]);
     P2.c2.lines[1] = blanked(P2.c2.lines[1], [String(d.p)]);
   }
   const dec = (c) => (level === 1 ? { kind: 'note', html: `${c.prompt} ${c.options[0].label}.` } : decision(c.prompt, c.options));
   const up = d.sig > 0;
-  P2.d1 = part(`(d) Pour a₁ ${up ? '<' : '>'} ${T.vr} : le ${up ? 'maximum' : 'minimum'} de f sur ${up ? `]−∞ ; ${T.vr}[` : `]${T.vr} ; +∞[`} vaut`, up ? 'M =' : 'm =', up ? 'M' : 'm',
-    { kind: 'value', expect: String(d.p) }, [E(String(d.p), `f(${T.pr}) = ${T.pr}, extremum local et point fixe`, 'disc', 'extremum')], [dec(C.div)]);
-  P2.d2 = part(`Si a₁ ${up ? '<' : '>'} ${T.pr}, la limite de la suite :`, 'lim aₙ =', 'lim(a_n,n,∞)',
-    { kind: 'value', expect: String(d.p) }, [E(String(d.p), 'Monotone et bornée : la limite est le point fixe', 'disc', 'limit')], [dec(C.near), dec(C.mid)]);
-  P2.d3 = part(`Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = ${T.pr} donne une suite constante).`, 'a₁ ∈', T.cases, SOL, [E(T.conv, 'Réunir les cas', 'disc', 'merge')]);
+  const z = { v: T.vr, p: T.pr };
+  P2.d1 = part(up ? t('(d) Pour a₁ < {v} : le maximum de f sur ]−∞ ; {v}[ vaut', z) : t('(d) Pour a₁ > {v} : le minimum de f sur ]{v} ; +∞[ vaut', z), up ? 'M =' : 'm =', up ? 'M' : 'm',
+    { kind: 'value', expect: String(d.p) }, [E(String(d.p), t('f({p}) = {p}, extremum local et point fixe', z), 'disc', 'extremum')], [dec(C.div)]);
+  P2.d2 = part(t('Si a₁ {rel} {p}, la limite de la suite :', { rel: up ? '<' : '>', p: T.pr }), 'lim aₙ =', 'lim(a_n,n,∞)',
+    { kind: 'value', expect: String(d.p) }, [E(String(d.p), t('Monotone et bornée : la limite est le point fixe'), 'disc', 'limit')], [dec(C.near), dec(C.mid)]);
+  P2.d3 = part(t('Conclusion : réunis les cas où la suite converge (x = a₁ ; a₁ = {p} donne une suite constante).', z), 'a₁ ∈', T.cases, SOL, [E(T.conv, t('Réunir les cas'), 'disc', 'merge')]);
   return { T, C, P: P2 };
 }
 
 function prompt(T, more = '') {
-  return `On étudie la suite définie par a₁ ∈ ℝ et ${MN(T.rec)}, avec f(x) = ${MN(T.f)} (a₁ ≠ ${T.vr}).${more}`;
+  return `${t('On étudie la suite définie par a₁ ∈ ℝ et {rec}, avec f(x) = {f} (a₁ ≠ {v}).', { rec: MN(T.rec), f: MN(T.f), v: T.vr })}${more}`;
 }
 
 function givenStudy(d, T) {
   const up = d.sig > 0;
-  return ` On sait que : la seule limite possible est ${T.pr} ; f′(x) = ${MN(T.fpFact)} ; f croît sur ${RD(T.inc)} et décroît ailleurs (hors de ${T.vr}) ; ${up ? 'max' : 'min'} local f(${T.pr}) = ${T.pr}, ${up ? 'min' : 'max'} local f(${fr(T.c)}) = ${fr(T.m)} ; asymptotes x = ${T.vr} et ${RD(`y=x+${T.ao}`.replace('+-', '-'))}.`;
+  return ` ${t('On sait que : la seule limite possible est {p} ; f′(x) = {fp} ; f croît sur {inc} et décroît ailleurs (hors de {v}) ; {e1} local f({p}) = {p}, {e2} local f({c}) = {m} ; asymptotes x = {v} et {ao}.', {
+    p: T.pr, fp: MN(T.fpFact), inc: RD(T.inc), v: T.vr, e1: up ? 'max' : 'min', e2: up ? 'min' : 'max', c: fr(T.c), m: fr(T.m), ao: RD(`y=x+${T.ao}`.replace('+-', '-')),
+  })}`;
 }
 
 function hints(d, T) {
   const up = d.sig > 0;
-  return H('Compare le graphe de f à la droite y = x : c\'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend.',
-    `Sur ${up ? `]−∞ ; ${T.vr}[` : `]${T.vr} ; +∞[`}, le ${up ? 'maximum' : 'minimum'} de f vaut ▢ : c'est un point fixe.`,
-    `f(x) ${up ? '≤' : '≥'} ${T.pr} pour x ${up ? '<' : '>'} ${T.vr}, donc dès a₂ la suite reste ${up ? 'sous' : 'au-dessus de'} ${T.pr}, et elle converge vers ${T.pr}.`);
+  const z = { v: T.vr, p: T.pr };
+  return H(t('Compare le graphe de f à la droite y = x : c\'est ce qui dit si la suite monte (f(aₙ) > aₙ) ou descend.'),
+    up ? t('Sur ]−∞ ; {v}[, le maximum de f vaut ▢ : c\'est un point fixe.', z) : t('Sur ]{v} ; +∞[, le minimum de f vaut ▢ : c\'est un point fixe.', z),
+    up ? t('f(x) ≤ {p} pour x < {v}, donc dès a₂ la suite reste sous {p}, et elle converge vers {p}.', z) : t('f(x) ≥ {p} pour x > {v}, donc dès a₂ la suite reste au-dessus de {p}, et elle converge vers {p}.', z));
 }
 
 const SEQ = {
@@ -215,9 +225,10 @@ function studyLines(level, rng, opts) {
   const d = draw(rng);
   const { T, P: parts } = partsOf(d, level);
   const seq = SEQ[level].map((k) => ({ ...parts[k] }));
-  const more = level === 1 ? `${givenStudy(d, T)} (c) Compare le graphe de f à la droite y = x.`
-    : level === 3 ? ` On sait que f ${d.sig > 0 ? 'a un maximum local en' : 'a un minimum local en'} ${T.pr}, f(${T.pr}) = ${T.pr}, et que x = ${T.vr} est asymptote verticale. Trouve la limite possible, compare f à y = x, puis discute selon a₁.`
-      : ' (a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.';
+  const z = { v: T.vr, p: T.pr };
+  const more = level === 1 ? `${givenStudy(d, T)} ${t('(c) Compare le graphe de f à la droite y = x.')}`
+    : level === 3 ? ` ${d.sig > 0 ? t('On sait que f a un maximum local en {p}, f({p}) = {p}, et que x = {v} est asymptote verticale. Trouve la limite possible, compare f à y = x, puis discute selon a₁.', z) : t('On sait que f a un minimum local en {p}, f({p}) = {p}, et que x = {v} est asymptote verticale. Trouve la limite possible, compare f à y = x, puis discute selon a₁.', z)}`
+      : ` ${t('(a) Seule limite possible ; (b) étude de f ; (c) position par rapport à y = x ; (d) discussion selon a₁.')}`;
   return partsItem({
     skill: RS, level, prompt: prompt(T, more), parts: seq, choices: CHOICES, hints: hints(d, T), subgoals: SUB, keys: KEYS,
     key: `${RS}:${level}:${T.f}`, exam: false, fallback: d.fallback, expectedSec: { 1: 120, 2: 400, 3: 300, 4: 600 }[level],
@@ -230,7 +241,7 @@ export const BAREME = [[1], [2, 0.5, 0.5, 1, 1, 0.5, 0.5, 1], [1, 1], [1], [1], 
 
 function caseMcq(d, T, c, which, rng, level) {
   return mcq({
-    skill: RS, level, prompt: `(d) ${c.prompt.replace(/ :$/, '')}, que fait la suite ?`,
+    skill: RS, level, prompt: c.ask,
     options: c.options.map((o) => ({ html: o.label, correct: o.valid, ...(o.rule ? { rule: o.rule } : {}) })),
     key: `${RS}:case:${which}:${T.f}`, expectedSec: 120,
     solution: [{ html: c.options[0].label, note: '' }],
@@ -240,13 +251,13 @@ function caseMcq(d, T, c, which, rng, level) {
 function conclusionMcq(d, T, C, rng, level) {
   const up = d.sig > 0;
   const options = [
-    { html: `${C.mid.options[0].label}. Avec a₁ = ${T.pr} (suite constante), la suite converge, vers ${T.pr}, si et seulement si a₁ ${up ? '<' : '>'} ${T.vr}`, correct: true },
-    { html: `${C.mid.options[1].label}. La suite converge si et seulement si a₁ ${up ? '≤' : '≥'} ${T.pr}`, correct: false },
-    { html: `${C.mid.options[2].label}. La suite converge pour tout a₁ ≠ ${T.vr}`, correct: false, rule: 'a1_rec_limit_without_convergence' },
-    { html: `La suite converge seulement si a₁ = ${T.pr} (suite constante)`, correct: false },
+    { html: `${C.mid.options[0].label}. ${t('Avec a₁ = {p} (suite constante), la suite converge, vers {p}, si et seulement si a₁ {rel} {v}', { p: T.pr, rel: up ? '<' : '>', v: T.vr })}`, correct: true },
+    { html: `${C.mid.options[1].label}. ${t('La suite converge si et seulement si a₁ {rel} {p}', { rel: up ? '≤' : '≥', p: T.pr })}`, correct: false },
+    { html: `${C.mid.options[2].label}. ${t('La suite converge pour tout a₁ ≠ {v}', { v: T.vr })}`, correct: false, rule: 'a1_rec_limit_without_convergence' },
+    { html: t('La suite converge seulement si a₁ = {p} (suite constante)', { p: T.pr }), correct: false },
   ];
   return mcq({
-    skill: RS, level, prompt: `(d) Si a₁ est entre ${up ? `${T.pr} et ${T.vr}` : `${T.vr} et ${T.pr}`}, que fait la suite ? Conclus : pour quels a₁ converge-t-elle ?`,
+    skill: RS, level, prompt: t('(d) Si a₁ est entre {a} et {b}, que fait la suite ? Conclus : pour quels a₁ converge-t-elle ?', up ? { a: T.pr, b: T.vr } : { a: T.vr, b: T.pr }),
     options, key: `${RS}:conclusion:${T.f}`, expectedSec: 150,
     solution: [{ html: options[0].html, note: '' }],
   }, rng);
@@ -259,18 +270,18 @@ function studyProblem(level, rng, opts) {
     skill: RS, level, prompt, parts: keys.map((k) => ({ ...parts[k] })), hints: [], noHints: true, subgoals: sub || SUB, keys: KEYS,
     key: `${RS}:${keys.join('')}:${T.f}`, exam: false, fallback: d.fallback,
   });
-  const A = one('(a) Quelle est la seule limite possible de la suite ?', ['A']);
-  const B = one('(b) Étudie f : f′ et f″, monotonie et extrema, convexité, asymptotes.', ['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8']);
-  const Cp = one('(c) Compare le graphe de f à la droite y = x.', ['c1', 'c2']);
+  const A = one(t('(a) Quelle est la seule limite possible de la suite ?'), ['A']);
+  const B = one(t('(b) Étudie f : f′ et f″, monotonie et extrema, convexité, asymptotes.'), ['b1', 'b2', 'b3', 'b4', 'b5', 'b6', 'b7', 'b8']);
+  const Cp = one(t('(c) Compare le graphe de f à la droite y = x.'), ['c1', 'c2']);
   return problemItem({
-    skill: RS, level, prompt: prompt(T, ' Problème en 13 points : (a) seule limite possible, (b) étude de f, (c) position par rapport à y = x, (d) discussion selon a₁.'),
+    skill: RS, level, prompt: prompt(T, ` ${t('Problème en 13 points : (a) seule limite possible, (b) étude de f, (c) position par rapport à y = x, (d) discussion selon a₁.')}`),
     parts: [
-      { item: A, points: BAREME[0], title: '(a) Seule limite possible' },
-      { item: B, points: BAREME[1], title: '(b) Étude de f' },
-      { item: Cp, points: BAREME[2], title: '(c) Position par rapport à y = x' },
-      { item: caseMcq(d, T, C.div, 'div', rng, level), points: BAREME[3][0], title: '(d) Premier cas' },
-      { item: caseMcq(d, T, C.near, 'near', rng, level), points: BAREME[4][0], title: '(d) Deuxième cas' },
-      { item: conclusionMcq(d, T, C, rng, level), points: BAREME[5][0], title: '(d) Dernier cas et conclusion' },
+      { item: A, points: BAREME[0], title: t('(a) Seule limite possible') },
+      { item: B, points: BAREME[1], title: t('(b) Étude de f') },
+      { item: Cp, points: BAREME[2], title: t('(c) Position par rapport à y = x') },
+      { item: caseMcq(d, T, C.div, 'div', rng, level), points: BAREME[3][0], title: t('(d) Premier cas') },
+      { item: caseMcq(d, T, C.near, 'near', rng, level), points: BAREME[4][0], title: t('(d) Deuxième cas') },
+      { item: conclusionMcq(d, T, C, rng, level), points: BAREME[5][0], title: t('(d) Dernier cas et conclusion') },
     ],
     key: `${level}:${T.f}`, exam: examOf(opts, 13), expectedSec: 900, fallback: d.fallback,
   });

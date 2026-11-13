@@ -7,6 +7,7 @@
 // Every error is a PyError with a French message; the interpreter adds the line.
 
 import { PyError } from './lexer.js';
+import { t as tr } from '../i18n.js';
 
 export const TUPLE = Symbol('tuple');
 export const tuple = (arr) => { arr[TUPLE] = true; return arr; };
@@ -22,17 +23,20 @@ export const MAX_LIST = 10000;
 
 export function typeName(v) {
   if (v === null || v === undefined) return 'None';
-  if (typeof v === 'boolean') return 'booléen';
-  if (typeof v === 'bigint') return 'entier';
-  if (typeof v === 'number') return 'nombre à virgule';
-  if (typeof v === 'string') return 'texte';
+  if (typeof v === 'boolean') return tr('booléen');
+  if (typeof v === 'bigint') return tr('entier');
+  if (typeof v === 'number') return tr('nombre à virgule');
+  if (typeof v === 'string') return tr('texte');
   if (isTuple(v)) return 'tuple';
-  if (Array.isArray(v)) return 'liste';
+  if (Array.isArray(v)) return tr('liste');
   if (v.k === 'range') return 'range';
-  if (v.k === 'func' || v.k === 'builtin' || v.k === 'method') return 'fonction';
+  if (v.k === 'func' || v.k === 'builtin' || v.k === 'method') return tr('fonction');
   if (v.k === 'module') return 'module';
-  return 'objet';
+  return tr('objet');
 }
+// The type with its English article (« an int », « a list »), for the
+// English messages; the French ones write « un {type} ».
+export const anType = (v) => { const n = typeName(v); return `${/^[aeiou]/i.test(n) ? 'an' : 'a'} ${n}`; };
 
 // Python's repr of a float: 2.0, 0.1, 1e-08, 1.4142135623730951, inf.
 export function floatRepr(x) {
@@ -71,9 +75,9 @@ export function repr(v, seen = new Set()) {
     return `[${inner}]`;
   }
   if (v.k === 'range') return v.step === 1n ? `range(${v.start}, ${v.stop})` : `range(${v.start}, ${v.stop}, ${v.step})`;
-  if (v.k === 'func') return `<fonction ${v.name}>`;
-  if (v.k === 'builtin') return `<fonction ${v.name}>`;
-  if (v.k === 'method') return `<méthode ${v.name}>`;
+  if (v.k === 'func') return tr('<fonction {name}>', { name: v.name });
+  if (v.k === 'builtin') return tr('<fonction {name}>', { name: v.name });
+  if (v.k === 'method') return tr('<méthode {name}>', { name: v.name });
   if (v.k === 'module') return `<module ${v.name}>`;
   return String(v);
 }
@@ -92,7 +96,7 @@ export function truthy(v) {
 const err = (msg) => new PyError(msg);
 const opName = { '+': '+', '-': '−', '*': '*', '/': '/', '//': '//', '%': '%', '**': '**' };
 function typeErr(op, a, b) {
-  return err(`opération impossible : ${typeName(a)} ${opName[op] ?? op} ${typeName(b)}`);
+  return err(tr('opération impossible : {a} {op} {b}', { a: typeName(a), op: opName[op] ?? op, b: typeName(b) }));
 }
 
 function checkFloat(x) {
@@ -104,7 +108,7 @@ function repeat(seq, n) {
   const k = Number(big(n));
   if (k <= 0) return Array.isArray(seq) ? (isTuple(seq) ? tuple([]) : []) : '';
   if (typeof seq === 'string') return seq.repeat(k);
-  if (seq.length * k > MAX_LIST) throw err(`liste trop longue (plus de ${MAX_LIST.toLocaleString('fr-CH')} éléments)`);
+  if (seq.length * k > MAX_LIST) throw err(tr('liste trop longue (plus de {max} éléments)', { max: MAX_LIST.toLocaleString('fr-CH') }));
   const out = [];
   for (let i = 0; i < k; i++) out.push(...seq);
   return isTuple(seq) ? tuple(out) : out;
@@ -123,20 +127,20 @@ export function binop(op, a, b) {
         case '+': return x + y;
         case '-': return x - y;
         case '*': return x * y;
-        case '/': if (y === 0n) throw err('division par zéro'); return Number(x) / Number(y);
+        case '/': if (y === 0n) throw err(tr('division par zéro')); return Number(x) / Number(y);
         case '//': {
-          if (y === 0n) throw err('division par zéro');
+          if (y === 0n) throw err(tr('division par zéro'));
           const q = x / y;
           return (x % y !== 0n && (x < 0n) !== (y < 0n)) ? q - 1n : q;
         }
         case '%': {
-          if (y === 0n) throw err('division par zéro (modulo)');
+          if (y === 0n) throw err(tr('division par zéro (modulo)'));
           const r = x % y;
           return r !== 0n && (r < 0n) !== (y < 0n) ? r + y : r;
         }
         case '**': {
           if (y < 0n) {
-            if (x === 0n) throw err('division par zéro (0 à une puissance négative)');
+            if (x === 0n) throw err(tr('division par zéro (0 à une puissance négative)'));
             return Math.pow(Number(x), Number(y));
           }
           if (y > 2000n && (x > 1n || x < -1n)) return Math.pow(Number(x), Number(y));
@@ -151,18 +155,18 @@ export function binop(op, a, b) {
       case '+': return checkFloat(x + y);
       case '-': return checkFloat(x - y);
       case '*': return checkFloat(x * y);
-      case '/': if (y === 0) throw err('division par zéro'); return checkFloat(x / y);
-      case '//': if (y === 0) throw err('division par zéro'); return Math.floor(x / y);
+      case '/': if (y === 0) throw err(tr('division par zéro')); return checkFloat(x / y);
+      case '//': if (y === 0) throw err(tr('division par zéro')); return Math.floor(x / y);
       case '%': {
-        if (y === 0) throw err('division par zéro (modulo)');
+        if (y === 0) throw err(tr('division par zéro (modulo)'));
         const r = x % y;
         return r !== 0 && (r < 0) !== (y < 0) ? r + y : r;
       }
       case '**': {
-        if (x === 0 && y < 0) throw err('division par zéro (0 à une puissance négative)');
-        if (x < 0 && !Number.isInteger(y)) throw err('puissance non entière d\'un nombre négatif');
+        if (x === 0 && y < 0) throw err(tr('division par zéro (0 à une puissance négative)'));
+        if (x < 0 && !Number.isInteger(y)) throw err(tr('puissance non entière d\'un nombre négatif'));
         const r = Math.pow(x, y);
-        if (!Number.isFinite(r) && Number.isFinite(x) && Number.isFinite(y)) throw err('résultat trop grand (dépassement de capacité)');
+        if (!Number.isFinite(r) && Number.isFinite(x) && Number.isFinite(y)) throw err(tr('résultat trop grand (dépassement de capacité)'));
         return r;
       }
       default: break;
@@ -171,21 +175,21 @@ export function binop(op, a, b) {
   if (op === '+') {
     if (typeof a === 'string' && typeof b === 'string') return a + b;
     if (isList(a) && isList(b)) {
-      if (a.length + b.length > MAX_LIST) throw err(`liste trop longue (plus de ${MAX_LIST.toLocaleString('fr-CH')} éléments)`);
+      if (a.length + b.length > MAX_LIST) throw err(tr('liste trop longue (plus de {max} éléments)', { max: MAX_LIST.toLocaleString('fr-CH') }));
       return [...a, ...b];
     }
     if (isTuple(a) && isTuple(b)) return tuple([...a, ...b]);
-    if (Array.isArray(a) && nb) throw err('opération impossible : liste + nombre (pour ajouter un élément, utilise append ; pour additionner terme à terme, écris une boucle)');
-    if (na && Array.isArray(b)) throw err('opération impossible : nombre + liste (écris une boucle pour additionner terme à terme)');
+    if (Array.isArray(a) && nb) throw err(tr('opération impossible : liste + nombre (pour ajouter un élément, utilise append ; pour additionner terme à terme, écris une boucle)'));
+    if (na && Array.isArray(b)) throw err(tr('opération impossible : nombre + liste (écris une boucle pour additionner terme à terme)'));
   }
   if (op === '*') {
     if ((Array.isArray(a) || typeof a === 'string') && ib) return repeat(a, b);
     if (ia && (Array.isArray(b) || typeof b === 'string')) return repeat(b, a);
-    if (Array.isArray(a) && isFloat(b)) throw err('on ne multiplie pas une liste par un nombre à virgule : écris une boucle');
-    if (isFloat(a) && Array.isArray(b)) throw err('on ne multiplie pas une liste par un nombre à virgule : écris une boucle');
-    if (Array.isArray(a) && Array.isArray(b)) throw err('opération impossible : liste * liste (pour un produit matriciel, utilise matmul ou matvec)');
+    if (Array.isArray(a) && isFloat(b)) throw err(tr('on ne multiplie pas une liste par un nombre à virgule : écris une boucle'));
+    if (isFloat(a) && Array.isArray(b)) throw err(tr('on ne multiplie pas une liste par un nombre à virgule : écris une boucle'));
+    if (Array.isArray(a) && Array.isArray(b)) throw err(tr('opération impossible : liste * liste (pour un produit matriciel, utilise matmul ou matvec)'));
   }
-  if ((a === null || b === null)) throw err(`opération impossible avec None : une fonction a-t-elle oublié son return ?`);
+  if ((a === null || b === null)) throw err(tr('opération impossible avec None : une fonction a-t-elle oublié son return ?'));
   throw typeErr(op, a, b);
 }
 
@@ -198,8 +202,8 @@ export function unop(op, a) {
     if (isInt(a)) return big(a);
     if (isFloat(a)) return a;
   }
-  if (a === null) throw err('opération impossible avec None : une fonction a-t-elle oublié son return ?');
-  throw err(`opération impossible : ${op}${typeName(a)}`);
+  if (a === null) throw err(tr('opération impossible avec None : une fonction a-t-elle oublié son return ?'));
+  throw err(tr('opération impossible : {op}{a}', { op, a: typeName(a) }));
 }
 
 export function equal(a, b) {
@@ -224,7 +228,7 @@ export function compare(op, a, b) {
     if (typeof b === 'string' && typeof a === 'string') found = b.includes(a);
     else if (Array.isArray(b)) found = b.some((x) => equal(x, a));
     else if (b?.k === 'range') found = isInt(a) && iterate(b).some((x) => x === big(a));
-    else throw err(`« in » demande une liste, pas un ${typeName(b)}`);
+    else throw err(tr('« in » demande une liste, pas un {type}', { type: typeName(b), an: anType(b) }));
     return op === 'in' ? found : !found;
   }
   let c;
@@ -240,8 +244,8 @@ export function compare(op, a, b) {
     }
     if (c === 0) c = a.length - b.length;
   } else {
-    if (a === null || b === null) throw err('comparaison impossible avec None : une fonction a-t-elle oublié son return ?');
-    throw err(`comparaison impossible : ${typeName(a)} ${op} ${typeName(b)}`);
+    if (a === null || b === null) throw err(tr('comparaison impossible avec None : une fonction a-t-elle oublié son return ?'));
+    throw err(tr('comparaison impossible : {a} {op} {b}', { a: typeName(a), op, b: typeName(b) }));
   }
   if (Number.isNaN(c)) return false;
   switch (op) {
@@ -268,47 +272,48 @@ export function iterate(v) {
   if (typeof v === 'string') return [...v];
   if (v && v.k === 'range') {
     const n = rangeLen(v);
-    if (n > MAX_LIST * 10) throw err('range trop grand');
+    if (n > MAX_LIST * 10) throw err(tr('range trop grand'));
     const out = [];
     for (let i = 0n; i < BigInt(n); i++) out.push(v.start + i * v.step);
     return out;
   }
-  throw err(`on ne peut pas parcourir un ${typeName(v)}${isNum(v) ? ' (pour une boucle, écris range(n))' : ''}`);
+  throw err(isNum(v) ? tr('on ne peut pas parcourir un {type} (pour une boucle, écris range(n))', { type: typeName(v), an: anType(v) }) : tr('on ne peut pas parcourir un {type}', { type: typeName(v), an: anType(v) }));
 }
 
 export function toIndex(v, what = 'indice') {
   if (isInt(v)) return Number(big(v));
-  if (isFloat(v)) throw err(`un ${what} doit être un entier, pas un nombre à virgule (${floatRepr(v)}) : utilise int(…) ou //`);
-  throw err(`un ${what} doit être un entier, pas un ${typeName(v)}`);
+  // what: « indice », « pas de tranche »… (French; the article comes with it in the key).
+  if (isFloat(v)) throw err(tr('{what} doit être un entier, pas un nombre à virgule ({v}) : utilise int(…) ou //', { what: tr(`un ${what}`), v: floatRepr(v) }));
+  throw err(tr('{what} doit être un entier, pas un {type}', { what: tr(`un ${what}`), type: typeName(v), an: anType(v) }));
 }
 
 export function getIndex(seq, i) {
   if (!Array.isArray(seq) && typeof seq !== 'string') {
-    if (seq === null) throw err('None n\'a pas de cases : une fonction a-t-elle oublié son return ?');
-    throw err(`un ${typeName(seq)} n'a pas de cases : on ne peut pas écrire […] après`);
+    if (seq === null) throw err(tr('None n\'a pas de cases : une fonction a-t-elle oublié son return ?'));
+    throw err(tr('un {type} n\'a pas de cases : on ne peut pas écrire […] après', { type: typeName(seq), an: anType(seq) }));
   }
   let k = toIndex(i);
   const n = seq.length;
   if (k < 0) k += n;
-  if (k < 0 || k >= n) throw err(`indice hors de la liste (indice ${toIndex(i)}, longueur ${n})`);
+  if (k < 0 || k >= n) throw err(tr('indice hors de la liste (indice {i}, longueur {n})', { i: toIndex(i), n }));
   return seq[k];
 }
 
 export function setIndex(seq, i, value) {
-  if (isTuple(seq)) throw err('on ne peut pas modifier une case d\'un tuple');
-  if (!Array.isArray(seq)) throw err(`on ne peut pas modifier une case d'un ${typeName(seq)}`);
+  if (isTuple(seq)) throw err(tr('on ne peut pas modifier une case d\'un tuple'));
+  if (!Array.isArray(seq)) throw err(tr('on ne peut pas modifier une case d\'un {type}', { type: typeName(seq), an: anType(seq) }));
   let k = toIndex(i);
   const n = seq.length;
   if (k < 0) k += n;
-  if (k < 0 || k >= n) throw err(`indice hors de la liste (indice ${toIndex(i)}, longueur ${n}) : pour ajouter un élément, utilise append`);
+  if (k < 0 || k >= n) throw err(tr('indice hors de la liste (indice {i}, longueur {n}) : pour ajouter un élément, utilise append', { i: toIndex(i), n }));
   seq[k] = value;
 }
 
 export function getSlice(seq, lo, hi, step) {
-  if (!Array.isArray(seq) && typeof seq !== 'string') throw err(`un ${typeName(seq)} n'a pas de tranches`);
+  if (!Array.isArray(seq) && typeof seq !== 'string') throw err(tr('un {type} n\'a pas de tranches', { type: typeName(seq), an: anType(seq) }));
   const n = seq.length;
   const st = step === null || step === undefined ? 1 : toIndex(step, 'pas de tranche');
-  if (st === 0) throw err('le pas d\'une tranche ne peut pas être 0');
+  if (st === 0) throw err(tr('le pas d\'une tranche ne peut pas être 0'));
   const norm = (v, dflt) => {
     if (v === null || v === undefined) return dflt;
     let k = toIndex(v, 'indice de tranche');
@@ -327,22 +332,28 @@ export function getSlice(seq, lo, hi, step) {
 // ---------- built-in functions ----------
 
 const B = (name, fn) => ({ k: 'builtin', name, fn });
+// « f() demande 2 arguments, 1 donné » (plural: of the arguments wanted, of those given).
+export function argsMessage(name, want, many, given) {
+  const vars = { name, want, n: given };
+  if (many) return given > 1 ? tr('{name}() demande {want} arguments, {n} donnés', vars) : tr('{name}() demande {want} arguments, {n} donné', vars);
+  return given > 1 ? tr('{name}() demande {want} argument, {n} donnés', vars) : tr('{name}() demande {want} argument, {n} donné', vars);
+}
 const nargs = (name, args, lo, hi = lo) => {
   if (args.length < lo || args.length > hi) {
-    const want = lo === hi ? `${lo}` : hi === Infinity ? `au moins ${lo}` : `${lo} ou ${hi}`;
-    throw err(`${name}() demande ${want} argument${(hi === Infinity ? lo : hi) > 1 ? 's' : ''}, ${args.length} donné${args.length > 1 ? 's' : ''}`);
+    const want = lo === hi ? `${lo}` : hi === Infinity ? tr('au moins {lo}', { lo }) : tr('{lo} ou {hi}', { lo, hi });
+    throw err(argsMessage(name, want, (hi === Infinity ? lo : hi) > 1, args.length));
   }
 };
 const num = (name, v) => {
   if (isNum(v)) return v;
-  if (v === null) throw err(`${name}() a reçu None : une fonction a-t-elle oublié son return ?`);
-  throw err(`${name}() demande un nombre, pas un ${typeName(v)}`);
+  if (v === null) throw err(tr('{name}() a reçu None : une fonction a-t-elle oublié son return ?', { name }));
+  throw err(tr('{name}() demande un nombre, pas un {type}', { name, type: typeName(v), an: anType(v) }));
 };
 
 function minmax(name, args, sign) {
   let items = args;
   if (args.length === 1) items = iterate(args[0]);
-  if (!items.length) throw err(`${name}() d'une liste vide`);
+  if (!items.length) throw err(tr('{name}() d\'une liste vide', { name }));
   let best = items[0];
   for (const x of items.slice(1)) if (compare(sign < 0 ? '<' : '>', x, best)) best = x;
   return best;
@@ -352,9 +363,9 @@ export function makeBuiltins(ctx) {
   return {
     range: B('range', (args) => {
       nargs('range', args, 1, 3);
-      for (const a of args) if (!isInt(a)) throw err(`range demande des entiers, pas un ${typeName(a)}${isFloat(a) ? ' : utilise int(…)' : ''}`);
+      for (const a of args) if (!isInt(a)) throw err(isFloat(a) ? tr('range demande des entiers, pas un {type} : utilise int(…)', { type: typeName(a), an: anType(a) }) : tr('range demande des entiers, pas un {type}', { type: typeName(a), an: anType(a) }));
       const [start, stop, step] = args.length === 1 ? [0n, big(args[0]), 1n] : [big(args[0]), big(args[1]), args.length === 3 ? big(args[2]) : 1n];
-      if (step === 0n) throw err('le pas de range ne peut pas être 0');
+      if (step === 0n) throw err(tr('le pas de range ne peut pas être 0'));
       return { k: 'range', start, stop, step };
     }),
     len: B('len', (args) => {
@@ -362,8 +373,8 @@ export function makeBuiltins(ctx) {
       const v = args[0];
       if (Array.isArray(v) || typeof v === 'string') return BigInt(v.length);
       if (v?.k === 'range') return BigInt(rangeLen(v));
-      if (v === null) throw err('len(None) : une fonction a-t-elle oublié son return ?');
-      throw err(`len() d'un ${typeName(v)} : len demande une liste`);
+      if (v === null) throw err(tr('len(None) : une fonction a-t-elle oublié son return ?'));
+      throw err(tr('len() d\'un {type} : len demande une liste', { type: typeName(v), an: anType(v) }));
     }),
     abs: B('abs', (args) => {
       nargs('abs', args, 1);
@@ -389,10 +400,10 @@ export function makeBuiltins(ctx) {
         if (t === '-inf') return -Infinity;
         if (t === 'nan') return NaN;
         const x = Number(t);
-        if (t === '' || Number.isNaN(x)) throw err(`float() ne sait pas lire « ${v} »`);
+        if (t === '' || Number.isNaN(x)) throw err(tr('float() ne sait pas lire « {v} »', { v }));
         return x;
       }
-      throw err(`float() d'un ${typeName(v)}`);
+      throw err(tr('float() d\'un {type}', { type: typeName(v), an: anType(v) }));
     }),
     int: B('int', (args) => {
       nargs('int', args, 0, 1);
@@ -400,11 +411,11 @@ export function makeBuiltins(ctx) {
       const v = args[0];
       if (isInt(v)) return big(v);
       if (isFloat(v)) {
-        if (!Number.isFinite(v)) throw err('int() d\'un nombre infini ou NaN');
+        if (!Number.isFinite(v)) throw err(tr('int() d\'un nombre infini ou NaN'));
         return BigInt(Math.trunc(v));
       }
       if (typeof v === 'string' && /^\s*[+-]?\d+\s*$/.test(v)) return BigInt(v.trim());
-      throw err(`int() ne sait pas convertir un ${typeName(v)}`);
+      throw err(tr('int() ne sait pas convertir un {type}', { type: typeName(v), an: anType(v) }));
     }),
     round: B('round', (args) => {
       nargs('round', args, 1, 2);
@@ -448,7 +459,7 @@ export function makeBuiltins(ctx) {
       nargs('sorted', args, 1);
       return iterate(args[0]).sort((a, b) => (compare('<', a, b) ? -1 : compare('>', a, b) ? 1 : 0));
     }),
-    isinstance: B('isinstance', () => { throw err('isinstance n\'est pas accepté ici'); }),
+    isinstance: B('isinstance', () => { throw err(tr('isinstance n\'est pas accepté ici')); }),
   };
 }
 
@@ -457,9 +468,9 @@ export function makeBuiltins(ctx) {
 const realFn = (name, f, domain) => B(name, (args) => {
   nargs(`math.${name}`, args, 1);
   const x = toF(num(`math.${name}`, args[0]));
-  if (domain && !domain(x)) throw err(`math.${name}(${floatRepr(x)}) : hors du domaine de la fonction`);
+  if (domain && !domain(x)) throw err(tr('math.{name}({x}) : hors du domaine de la fonction', { name, x: floatRepr(x) }));
   const r = f(x);
-  if (!Number.isFinite(r) && Number.isFinite(x)) throw err(`math.${name}(${floatRepr(x)}) : résultat trop grand`);
+  if (!Number.isFinite(r) && Number.isFinite(x)) throw err(tr('math.{name}({x}) : résultat trop grand', { name, x: floatRepr(x) }));
   return r;
 });
 
@@ -486,10 +497,10 @@ export function mathModule() {
     log: B('log', (args) => {
       nargs('math.log', args, 1, 2);
       const x = toF(num('math.log', args[0]));
-      if (x <= 0) throw err(`math.log(${floatRepr(x)}) : le logarithme demande un nombre > 0`);
+      if (x <= 0) throw err(tr('math.log({x}) : le logarithme demande un nombre > 0', { x: floatRepr(x) }));
       if (args.length === 1) return Math.log(x);
       const b = toF(num('math.log', args[1]));
-      if (b <= 0 || b === 1) throw err('math.log : base invalide');
+      if (b <= 0 || b === 1) throw err(tr('math.log : base invalide'));
       return Math.log(x) / Math.log(b);
     }),
     atan2: B('atan2', (args) => { nargs('math.atan2', args, 2); return Math.atan2(toF(num('atan2', args[0])), toF(num('atan2', args[1]))); }),
@@ -505,7 +516,7 @@ export function mathModule() {
     factorial: B('factorial', (args) => {
       nargs('math.factorial', args, 1);
       const n = toIndex(args[0], 'argument de factorial');
-      if (n < 0) throw err('math.factorial d\'un nombre négatif');
+      if (n < 0) throw err(tr('math.factorial d\'un nombre négatif'));
       let r = 1n;
       for (let i = 2n; i <= BigInt(n); i++) r *= i;
       return r;
@@ -519,24 +530,24 @@ export function listMethod(self, name) {
   const M = {
     append: (args) => {
       nargs('append', args, 1);
-      if (self.length >= MAX_LIST) throw err(`liste trop longue (plus de ${MAX_LIST.toLocaleString('fr-CH')} éléments)`);
+      if (self.length >= MAX_LIST) throw err(tr('liste trop longue (plus de {max} éléments)', { max: MAX_LIST.toLocaleString('fr-CH') }));
       self.push(args[0]);
       return null;
     },
     extend: (args) => {
       nargs('extend', args, 1);
       const items = iterate(args[0]);
-      if (self.length + items.length > MAX_LIST) throw err(`liste trop longue (plus de ${MAX_LIST.toLocaleString('fr-CH')} éléments)`);
+      if (self.length + items.length > MAX_LIST) throw err(tr('liste trop longue (plus de {max} éléments)', { max: MAX_LIST.toLocaleString('fr-CH') }));
       self.push(...items);
       return null;
     },
     pop: (args) => {
       nargs('pop', args, 0, 1);
-      if (!self.length) throw err('pop() sur une liste vide');
+      if (!self.length) throw err(tr('pop() sur une liste vide'));
       if (!args.length) return self.pop();
       let k = toIndex(args[0]);
       if (k < 0) k += self.length;
-      if (k < 0 || k >= self.length) throw err('indice hors de la liste (pop)');
+      if (k < 0 || k >= self.length) throw err(tr('indice hors de la liste (pop)'));
       return self.splice(k, 1)[0];
     },
     insert: (args) => {
@@ -550,13 +561,13 @@ export function listMethod(self, name) {
     index: (args) => {
       nargs('index', args, 1);
       const k = self.findIndex((x) => equal(x, args[0]));
-      if (k < 0) throw err(`${repr(args[0])} n'est pas dans la liste`);
+      if (k < 0) throw err(tr('{v} n\'est pas dans la liste', { v: repr(args[0]) }));
       return BigInt(k);
     },
     count: (args) => { nargs('count', args, 1); return BigInt(self.filter((x) => equal(x, args[0])).length); },
     reverse: (args) => { nargs('reverse', args, 0); self.reverse(); return null; },
   };
-  if (isTuple(self) && name !== 'index' && name !== 'count') throw err(`un tuple n'a pas de méthode ${name}`);
-  if (!M[name]) throw err(`une liste n'a pas de méthode « ${name} »`);
+  if (isTuple(self) && name !== 'index' && name !== 'count') throw err(tr('un tuple n\'a pas de méthode {name}', { name }));
+  if (!M[name]) throw err(tr('une liste n\'a pas de méthode « {name} »', { name }));
   return B(name, M[name]);
 }

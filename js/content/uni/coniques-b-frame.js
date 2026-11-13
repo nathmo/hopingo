@@ -15,11 +15,12 @@ import { asProblem } from './kit-problem.js';
 import { coefItem } from './alglin-kit.js';
 import { analyzeConic } from '../../cas/conic.js';
 import { referenceAnswer } from '../../judges/plot.js';
+import { t } from '../../i18n.js';
 
 const FB = 'g10-conic-frame-back';
 const FB_SUB = [
-  { id: 'ru', label: 'éléments dans Ru', skill: 'g10-ellipse' },
-  { id: 'back', label: 'revenir dans Re', skill: FB },
+  { id: 'ru', label: t('éléments dans Ru'), skill: 'g10-ellipse' },
+  { id: 'back', label: t('revenir dans Re'), skill: FB },
 ];
 
 // √x for a rational x, or null.
@@ -76,14 +77,14 @@ const axisRow = (P, w) => prim([w[1].neg(), w[0], w[0].mul(P[1]).sub(w[1].mul(P[
 
 function framePrompt(d, what) {
   const eq = eqT(d.coefs);
-  return `La conique ${MT(eq, { vars: ['x', 'y'] })} a pour équation réduite ${MT(reducedT(d), { vars: ['X', 'Y'] })} dans le repère Ru = (Ω ; u₁, u₂), avec Ω = ${vr(d.O)}, u₁ = ${uR(d.w1, d.n)} et u₂ = ${uR(d.w2, d.n)}. ${what}`;
+  return t('La conique {v1} a pour équation réduite {v2} dans le repère Ru = (Ω ; u₁, u₂), avec Ω = {v3}, u₁ = {v4} et u₂ = {v5}. {what}', { v1: MT(eq, { vars: ['x', 'y'] }), v2: MT(reducedT(d), { vars: ['X', 'Y'] }), v3: vr(d.O), v4: uR(d.w1, d.n), v5: uR(d.w2, d.n), what });
 }
 
 const FB_MENU = [
-  { id: 'ru', label: 'Calculer l\'élément dans Ru', valid: true },
-  { id: 'back', label: 'Transporter : Ω + X·u₁ + Y·u₂', valid: true },
-  { id: 'ruonly', label: 'Donner les coordonnées de Ru', valid: false, rule: 'g10_foci_reduced_frame', why: 'La question demande les coordonnées dans Re : il faut transporter avec Ω + X·u₁ + Y·u₂.' },
-  { id: 'transpose', label: 'Transporter avec Ω + Pᵀ·(X ; Y)', valid: false, rule: 'g10_frame_back_transpose', why: 'Les colonnes de P sont u₁ et u₂ : x = Ω + P·(X ; Y).' },
+  { id: 'ru', label: t('Calculer l\'élément dans Ru'), valid: true },
+  { id: 'back', label: t('Transporter : Ω + X·u₁ + Y·u₂'), valid: true },
+  { id: 'ruonly', label: t('Donner les coordonnées de Ru'), valid: false, rule: 'g10_foci_reduced_frame', why: t('La question demande les coordonnées dans Re : il faut transporter avec Ω + X·u₁ + Y·u₂.') },
+  { id: 'transpose', label: t('Transporter avec Ω + Pᵀ·(X ; Y)'), valid: false, rule: 'g10_frame_back_transpose', why: t('Les colonnes de P sont u₁ et u₂ : x = Ω + P·(X ; Y).') },
 ];
 
 // Wrong points of the traps for the point (X ; Y) of Ru.
@@ -108,10 +109,10 @@ function pointParts(d, which, level, sign) {
   const symbols = { Ω: vt(d.O), u_1: uT(d.w1, d.n), u_2: uT(d.w2, d.n) };
   const step = vt(scale(d.w, r.mul(sign)));
   return {
-    html: `${lbl} est en ${ruT.replace(/-/g, '−')} dans Ru. Ses coordonnées dans Re ?`, ask: `${lbl} =`, start: lbl,
+    html: t('{lbl} est en {v1} dans Ru. Ses coordonnées dans Re ?', { lbl, v1: ruT.replace(/-/g, '−') }), ask: `${lbl} =`, start: lbl,
     judge: { kind: 'vector', symbols, expect: vt(P), trapPts: wrong }, menu: FB_MENU,
     lines: [
-      { math: `${lbl} = Ω ${sign < 0 ? '-' : '+'} ${dist}·${name(d)}`, note: `Ω + X·u₁ + Y·u₂ avec ${ruT.replace(/-/g, '−')}`, subgoal: 'back', blank: [dist] },
+      { math: `${lbl} = Ω ${sign < 0 ? '-' : '+'} ${dist}·${name(d)}`, note: t('Ω + X·u₁ + Y·u₂ avec {v1}', { v1: ruT.replace(/-/g, '−') }), subgoal: 'back', blank: [dist] },
       { math: `${lbl} = ${vt(d.O)} + ${step}`, note: `${dist.replace(/-/g, '−')}·${nameR(d)} = ${vr(scale(d.w, r.mul(sign)))}`, subgoal: 'back', blank: [step], blank2: [step] },
       { math: vt(P), note: '', subgoal: 'back', blank: [qt(P[0]), qt(P[1])] },
     ],
@@ -123,11 +124,11 @@ function cPart(d) {
   const A = qt(d.A2);
   const B = qt(ell ? d.B2 : d.B2.neg());
   return {
-    html: `Dans Ru, ${ell ? 'c² = a² − b²' : 'c² = a² + b²'}, avec a² = ${fq(d.A2)} et b² = ${fq(ell ? d.B2 : d.B2.neg())}.`, ask: 'c =', start: 'c',
+    html: t('Dans Ru, {v1}, avec a² = {v2} et b² = {v3}.', { v1: ell ? 'c² = a² − b²' : 'c² = a² + b²', v2: fq(d.A2), v3: fq(ell ? d.B2 : d.B2.neg()) }), ask: 'c =', start: 'c',
     judge: { kind: 'value', expect: rootT(d.c2), form: 'exact', trapValues: {} },
     lines: [
-      { math: `√(${A} ${ell ? '-' : '+'} ${B})`, note: ell ? 'Ellipse : c² = a² − b²' : 'Hyperbole : c² = a² + b²', subgoal: 'ru', blank: [B] },
-      { math: rootT(d.c2), note: 'Les foyers sont sur l\'axe focal, à c du centre', subgoal: 'ru', blank: [rootT(d.c2)] },
+      { math: `√(${A} ${ell ? '-' : '+'} ${B})`, note: ell ? t('Ellipse : c² = a² − b²') : t('Hyperbole : c² = a² + b²'), subgoal: 'ru', blank: [B] },
+      { math: rootT(d.c2), note: t('Les foyers sont sur l\'axe focal, à c du centre'), subgoal: 'ru', blank: [rootT(d.c2)] },
     ],
   };
 }
@@ -137,10 +138,10 @@ function axisPart(d, both = false) {
   const r2 = axisRow(d.O, d.wo);
   const ref = both ? `${linT(r1)} ou ${linT(r2)}` : linT(r1);
   return {
-    html: both ? 'Les deux axes de symétrie dans Re ?' : `L'axe ${d.kind === 'hyp' ? 'réel' : 'focal'} dans Re : la droite par Ω de direction ${nameR(d)} ?`,
-    ask: both ? 'axes :' : 'axe :', start: both ? 'axes' : 'axe',
+    html: both ? t('Les deux axes de symétrie dans Re ?') : (d.kind === 'hyp' ? t('L\'axe réel dans Re : la droite par Ω de direction {v2} ?', { v2: nameR(d) }) : t('L\'axe focal dans Re : la droite par Ω de direction {v2} ?', { v2: nameR(d) })),
+    ask: both ? t('axes :') : t('axe :'), start: both ? 'axes' : 'axe',
     judge: { kind: 'geom', object: 'line2', ref, ...(both ? { count: 2 } : {}) },
-    lines: [{ math: ref, note: `Direction ${vr(d.w)}${both ? ` et ${vr(d.wo)}` : ''}, par Ω`, subgoal: 'back' }],
+    lines: [{ math: ref, note: t('Direction {v1}{v2}, par Ω', { v1: vr(d.w), v2: both ? ` et ${vr(d.wo)}` : '' }), subgoal: 'back' }],
   };
 }
 
@@ -153,23 +154,31 @@ function sketchItem(level, rng, opts = {}) {
   const view = { x: [cx - 7, cx + 7], y: [cy - 7, cy + 7] };
   const place = [
     { id: 'center', label: 'Ω', short: 'Ω', kind: 'point', count: 1 },
-    { id: 'axes', label: 'axes', short: 'axe', kind: 'line', count: 2 },
-    { id: 'vertices', label: 'sommets (axe focal)', short: 'S', kind: 'point', count: 2 },
+    { id: 'axes', label: t('axes'), short: t('axe'), kind: 'line', count: 2 },
+    { id: 'vertices', label: t('sommets (axe focal)'), short: 'S', kind: 'point', count: 2 },
   ];
   const expect = { center: [an.center], axes: [an.axis, an.minorAxis], vertices: an.vertices };
-  if (an.type === 'hyperbola') { place.push({ id: 'asymptotes', label: 'asymptotes', short: 'as', kind: 'line', count: 2 }); expect.asymptotes = an.asymptotes; }
+  if (an.type === 'hyperbola') { place.push({ id: 'asymptotes', label: t('asymptotes'), short: 'as', kind: 'line', count: 2 }); expect.asymptotes = an.asymptotes; }
   const item = {
     skill: FB, level, type: 'plot', task: 'conic', view, place, expect, tol: { pos: 0.15, line: 0.25 },
     equation: eqT(d.coefs),
-    prompt: framePrompt(d, `Esquisse-la dans Re : place le centre Ω, les deux axes, les sommets de l'axe ${d.kind === 'hyp' ? 'réel' : 'focal'}${an.type === 'hyperbola' ? ' et les asymptotes' : ''}. (Les points se placent au quart d'unité près.)`),
+    prompt: framePrompt(d, d.kind === 'hyp'
+      ? (an.type === 'hyperbola'
+        ? t('Esquisse-la dans Re : place le centre Ω, les deux axes, les sommets de l\'axe réel et les asymptotes. (Les points se placent au quart d\'unité près.)')
+        : t('Esquisse-la dans Re : place le centre Ω, les deux axes, les sommets de l\'axe réel. (Les points se placent au quart d\'unité près.)'))
+      : (an.type === 'hyperbola'
+        ? t('Esquisse-la dans Re : place le centre Ω, les deux axes, les sommets de l\'axe focal et les asymptotes. (Les points se placent au quart d\'unité près.)')
+        : t('Esquisse-la dans Re : place le centre Ω, les deux axes, les sommets de l\'axe focal. (Les points se placent au quart d\'unité près.)'))),
     hints: opts.exam || level >= 5 ? [] : H(
-      'Un point (X ; Y) de Ru est Ω + X·u₁ + Y·u₂ : les axes passent par Ω, de directions u₁ et u₂.',
-      `Les sommets sont Ω ± a·u, avec a² = ${fq(d.A2)} et u = ${uR(d.w, d.n)}.`,
-      `Ω = ${vr(d.O)}, sommets ≈ ${an.vertices.map((P) => `(${P.map((x) => x.toFixed(2).replace('.', ',').replace('-', '−')).join(' ; ')})`).join(' et ')}.`,
+      t('Un point (X ; Y) de Ru est Ω + X·u₁ + Y·u₂ : les axes passent par Ω, de directions u₁ et u₂.'),
+      t('Les sommets sont Ω ± a·u, avec a² = {v1} et u = {v2}.', { v1: fq(d.A2), v2: uR(d.w, d.n) }),
+      t('Ω = {v1}, sommets ≈ {v2}.', { v1: vr(d.O), v2: an.vertices.map((P) => `(${P.map((x) => x.toFixed(2).replace('.', ',').replace('-', '−')).join(' ; ')})`).join(' et ') }),
     ),
     noHints: !!opts.exam || level >= 5,
     rules: { center: null, vertices: 'g10_foci_reduced_frame' },
-    solution: [{ html: `Ω = ${vr(d.O)}, axes de directions ${vr(d.w)} et ${vr(d.wo)}, sommets Ω ± ${rootT(d.A2).replace(/-/g, '−')}·${nameR(d)}${an.type === 'hyperbola' ? ', asymptotes par Ω de directions a·u ± b·v' : ''}.`, note: '' }],
+    solution: [{ html: an.type === 'hyperbola'
+      ? t('Ω = {v1}, axes de directions {v2} et {v3}, sommets Ω ± {v4}·{v5}, asymptotes par Ω de directions a·u ± b·v.', { v1: vr(d.O), v2: vr(d.w), v3: vr(d.wo), v4: rootT(d.A2).replace(/-/g, '−'), v5: nameR(d) })
+      : t('Ω = {v1}, axes de directions {v2} et {v3}, sommets Ω ± {v4}·{v5}.', { v1: vr(d.O), v2: vr(d.w), v3: vr(d.wo), v4: rootT(d.A2).replace(/-/g, '−'), v5: nameR(d) }), note: '' }],
     answerHtml: `Ω = ${vr(d.O)}`,
     baits: ['g10_foci_reduced_frame'], subgoals: FB_SUB,
     key: `${FB}:plot:${eqT(d.coefs)}`, expectedSec: 150, exam: opts.exam ? examTag(opts) : false,
@@ -189,13 +198,13 @@ function frameItem(level, rng, opts = {}) {
   }
   if (g === 'pb' && d.ra) parts.push(pointParts(d, 'S', level, 1), pointParts(d, 'S', level, -1));
   if (g === 'vertices') parts.push(pointParts(d, 'S', level, 1), pointParts(d, 'S', level, -1), axisPart(d, true));
-  const what = g === 'vertices' ? 'Donne ses sommets de l\'axe focal et ses deux axes dans Re.' : g === 'pb' ? 'Donne ses foyers, son axe focal' + (d.ra ? ' et ses sommets' : '') + ' dans Re.' : 'Donne ses foyers dans Re.';
+  const what = g === 'vertices' ? t('Donne ses sommets de l\'axe focal et ses deux axes dans Re.') : g === 'pb' ? (d.ra ? t('Donne ses foyers, son axe focal et ses sommets dans Re.') : t('Donne ses foyers, son axe focal dans Re.')) : t('Donne ses foyers dans Re.');
   const F = add(d.O, scale(d.w, d.rc ?? q(0)));
   return partsItem({
     skill: FB, level, parts, subgoals: FB_SUB,
     prompt: framePrompt(d, what),
     hints: H(
-      'Un point (X ; Y) de Ru est Ω + X·u₁ + Y·u₂.',
+      t('Un point (X ; Y) de Ru est Ω + X·u₁ + Y·u₂.'),
       `F = ${vr(d.O)} + ${rootT(d.c2).replace(/-/g, '−')}·(□)`,
       d.rc ? `F = ${vr(F)}` : `S = ${vr(add(d.O, scale(d.w, d.ra)))}`,
     ),
@@ -213,7 +222,7 @@ function frameExam(rng, exam) {
     const tie = F1[0].eq(F2[0]);
     return coefItem({
       skill: FB, key: `${eqT(d.coefs)}`, exam: examTag({ exam }), label: tie ? 'y' : 'x',
-      prompt: framePrompt(d, tie ? 'Quelle est l\'ordonnée du foyer le plus haut, dans Re ?' : 'Quelle est l\'abscisse du foyer le plus à droite, dans Re ?'),
+      prompt: framePrompt(d, tie ? t('Quelle est l\'ordonnée du foyer le plus haut, dans Re ?') : t('Quelle est l\'abscisse du foyer le plus à droite, dans Re ?')),
       value: qt(tie ? (F1[1].sub(F2[1]).n >= 0 ? F1[1] : F2[1]) : big[0]),
       traps: [{ rule: 'g10_foci_reduced_frame' }],
       solution: [{ html: `c = ${rootT(d.c2).replace(/-/g, '−')}, F = Ω ± c·${nameR(d)} : ${vr(F1)} et ${vr(F2)}.`, note: '' }],
@@ -226,7 +235,7 @@ function frameExam(rng, exam) {
   const t2 = trapPts(d, XY.map((x) => -x));
   return mcqD({
     skill: FB, level: 4, key: `mcq:${eqT(d.coefs)}`, exam: examTag({ exam }),
-    prompt: framePrompt(d, 'Quels sont ses foyers dans Re ?'),
+    prompt: framePrompt(d, t('Quels sont ses foyers dans Re ?')),
     right: `${vr(F1)} et ${vr(F2)}`,
     wrongs: [{ html: ru, rule: 'g10_foci_reduced_frame' }, t1 && t2 ? { html: `${t1.replace(/-/g, '−')} et ${t2.replace(/-/g, '−')}`, rule: 'g10_frame_back_transpose' } : null,
       { html: `${vr(add(d.O, scale(d.wo, d.rc)))} et ${vr(sub(d.O, scale(d.wo, d.rc)))}`, rule: null }],

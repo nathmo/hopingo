@@ -18,13 +18,14 @@ import { linesItem, examTag } from './kit.js';
 import {
   refCode, codeItem, codeMcq, readtableItem, multiMcq, vfMcq, H, blankBy, fmt,
 } from './numerique-kit.js';
+import { t } from '../../i18n.js';
 
 const TH = 'n-thomas';
 const SUB = [
-  { id: 'factor', label: 'factorisation ℓ, γ', skill: TH },
-  { id: 'forward', label: 'descente Ly = b', skill: TH },
-  { id: 'backward', label: 'remontée Ux = y', skill: TH },
-  { id: 'lu', label: 'LU sans pivot', skill: 'n-lu' },
+  { id: 'factor', label: t('factorisation ℓ, γ'), skill: TH },
+  { id: 'forward', label: t('descente Ly = b'), skill: TH },
+  { id: 'backward', label: t('remontée Ux = y'), skill: TH },
+  { id: 'lu', label: t('LU sans pivot'), skill: 'n-lu' },
 ];
 
 export const THOMAS = refCode(`def thomas(a, c, d, b):
@@ -69,15 +70,15 @@ export const THOMAS_TESTS = [
   { expr: 'thomas([4, 4, 4, 4], [1, 2, 1], [2, 1, 1], [6, 16, 18, 19])', expect: '[1, 2, 3, 4]', tol: 1e-12 },
 ];
 const LABEL = {
-  0: 'γ₁ = c₁/ℓ₁', 1: 'ℓᵢ = aᵢ − dᵢ₋₁γᵢ₋₁', 2: 'γᵢ = cᵢ/ℓᵢ', 3: 'ℓ_N = a_N − d_(N−1)γ_(N−1)', 4: 'y₁ = b₁/ℓ₁', 5: 'la descente', 6: 'la remontée',
+  0: 'γ₁ = c₁/ℓ₁', 1: 'ℓᵢ = aᵢ − dᵢ₋₁γᵢ₋₁', 2: 'γᵢ = cᵢ/ℓᵢ', 3: 'ℓ_N = a_N − d_(N−1)γ_(N−1)', 4: 'y₁ = b₁/ℓ₁', 5: t('la descente'), 6: t('la remontée'),
 };
 
-const MATRIX_NOTE = 'A est tridiagonale : diagonale a, sous-diagonale d (dᵢ en ligne i + 1, colonne i), sur-diagonale c (cᵢ en ligne i, colonne i + 1) ; les indices partent de 0 (b[i] est l\'inconnue de la ligne i).';
+const MATRIX_NOTE = t('A est tridiagonale : diagonale a, sous-diagonale d (dᵢ en ligne i + 1, colonne i), sur-diagonale c (cᵢ en ligne i, colonne i + 1) ; les indices partent de 0 (b[i] est l\'inconnue de la ligne i).');
 
 // ---------- data by hand ----------
 
 function handData(rng) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const N = rng.pick([3, 3, 4]);
     const a = Array.from({ length: N }, () => rng.int(2, 5));
     const c = Array.from({ length: N - 1 }, () => rng.pick([-1, 1, 2]));
@@ -115,17 +116,19 @@ function handLines(rng, level) {
   const script = [{ kind: 'eq', math: String(l2), ...blankBy(String(l2), [String(l2)]), note: 'ℓ₂ = a₂ − d₁γ₁', subgoal: 'factor' }];
   if (g2) {
     script.push(
-      { kind: 'segment', html: 'Puis γ₂ = c₂/ℓ₂.', ask: 'γ₂ =', start: { math: `${D.c[1]}/(${l2})` }, judge: { kind: 'value', form: 'irreducible' } },
+      { kind: 'segment', html: t('Puis γ₂ = c₂/ℓ₂.'), ask: 'γ₂ =', start: { math: `${D.c[1]}/(${l2})` }, judge: { kind: 'value', form: 'irreducible' } },
       { kind: 'eq', math: String(g2), ...blankBy(String(g2), [String(g2)]), note: 'γ₂', subgoal: 'factor' },
     );
   }
   return linesItem({
     skill: TH, level, mode: 'guided', keys: ['calc'],
-    prompt: `Algorithme de Thomas pour la matrice tridiagonale de diagonale a, sur-diagonale c et sous-diagonale d : ${triText(D)}. On a γ₁ = c₁/a₁ = ${fmt(D.g[0])}. Calcule ℓ₂ = a₂ − d₁γ₁${g2 ? ', puis γ₂ = c₂/ℓ₂' : ''}.`,
+    prompt: g2
+      ? t('Algorithme de Thomas pour la matrice tridiagonale de diagonale a, sur-diagonale c et sous-diagonale d : {D}. On a γ₁ = c₁/a₁ = {g1}. Calcule ℓ₂ = a₂ − d₁γ₁, puis γ₂ = c₂/ℓ₂.', { D: triText(D), g1: fmt(D.g[0]) })
+      : t('Algorithme de Thomas pour la matrice tridiagonale de diagonale a, sur-diagonale c et sous-diagonale d : {D}. On a γ₁ = c₁/a₁ = {g1}. Calcule ℓ₂ = a₂ − d₁γ₁.', { D: triText(D), g1: fmt(D.g[0]) }),
     start: `${D.a[1]}-(${D.d[0]})×(${D.g[0]})`,
     judge: { kind: 'value', form: 'irreducible' },
     script,
-    hints: H('Gauss sur une tridiagonale : la ligne i n\'élimine qu\'un coefficient, celui de la ligne au-dessus.',
+    hints: H(t('Gauss sur une tridiagonale : la ligne i n\'élimine qu\'un coefficient, celui de la ligne au-dessus.'),
       `ℓ₂ = ${D.a[1]} − ${p(D.d[0])}·□`.replace(/-/g, '−'),
       `ℓ₂ = ${D.a[1]} − ${p(D.d[0])}·${pq(D.g[0])} = ${fmt(l2)}${g2 ? `, γ₂ = ${D.c[1]}/(${l2}) = ${fmt(g2)}` : ''}.`.replace(/-/g, '−')),
     subgoals: SUB, key: `${TH}:hand:${triText(D)}`, baits: [], fallback: D.fallback,
@@ -149,9 +152,15 @@ function codeLevel(rng, level, opts = {}) {
   const then = level === 5 ? costTable(rng, 5) : null;
   return codeItem({
     skill: TH, level, ref: THOMAS, blanks, choice, traps: THOMAS_TRAPS, fillers: THOMAS_FILLERS, rng,
-    prompt: `${level === 1 ? 'Choisis' : 'Complète'} ${one ? `la ligne de ${one}` : blanks.length === 7 ? 'tous les trous' : blanks[0] === 5 ? 'la descente et la remontée' : 'la factorisation'} de l'algorithme de Thomas, en place. ${MATRIX_NOTE}`,
+    prompt: one
+      ? (level === 1
+        ? t('Choisis la ligne de {one} de l\'algorithme de Thomas, en place. {note}', { one, note: MATRIX_NOTE })
+        : t('Complète la ligne de {one} de l\'algorithme de Thomas, en place. {note}', { one, note: MATRIX_NOTE }))
+      : blanks.length === 7 ? t('Complète tous les trous de l\'algorithme de Thomas, en place. {note}', { note: MATRIX_NOTE })
+        : blanks[0] === 5 ? t('Complète la descente et la remontée de l\'algorithme de Thomas, en place. {note}', { note: MATRIX_NOTE })
+          : t('Complète la factorisation de l\'algorithme de Thomas, en place. {note}', { note: MATRIX_NOTE }),
     tests: THOMAS_TESTS, then,
-    hints: H('Fais Gauss sur une tridiagonale : chaque ligne n\'élimine qu\'un coefficient, celui de la ligne d\'au-dessus. L contient d (descente), U contient c (remontée).',
+    hints: H(t('Fais Gauss sur une tridiagonale : chaque ligne n\'élimine qu\'un coefficient, celui de la ligne d\'au-dessus. L contient d (descente), U contient c (remontée).'),
       'ℓᵢ = aᵢ − dᵢ₋₁·□ ; yᵢ₊₁ = (bᵢ₊₁ − dᵢ·□)/ℓᵢ₊₁ ; xᵢ = yᵢ − γᵢ·□',
       'a[i] − d[i − 1] * c[i − 1] ; b[i + 1] − d[i] * b[i] ; b[i] − c[i] * b[i + 1]'),
     subgoals: SUB, key: `${level}:${blanks.join('')}`, ...opts,
@@ -163,23 +172,23 @@ function costTable(rng, level) {
   const Ns = [10, 100, 1000, 10000];
   const fmtN = (x) => x.toExponential(1).replace('e+', 'e+0').replace(/e\+0(\d\d)/, 'e+$1');
   const table = {
-    columns: ['N', 'Thomas (≈ 8N)', 'LU pleine (≈ 2N³/3)'],
+    columns: ['N', 'Thomas (≈ 8N)', t('LU pleine (≈ 2N³/3)')],
     rows: Ns.map((N) => [String(N), fmtN(8 * N), fmtN((2 * N ** 3) / 3)]),
   };
   return readtableItem({
     skill: TH, level, key: 'costs',
-    prompt: 'Nombre d\'opérations pour résoudre un système tridiagonal N × N :',
+    prompt: t('Nombre d\'opérations pour résoudre un système tridiagonal N × N :'),
     table,
     question: multiMcq({
       skill: TH, level, key: `${TH}:costs`,
-      prompt: 'Que montre ce tableau ?',
+      prompt: t('Que montre ce tableau ?'),
       options: [
-        { html: 'Quand N est multiplié par 10, le coût de Thomas est multiplié par 10 : O(N)', correct: true },
-        { html: 'Pour N = 1000, la LU pleine coûte environ 80 000 fois plus que Thomas', correct: true },
-        { html: 'Thomas coûte O(N³), comme la LU pleine', correct: false },
-        { html: 'Quand N est multiplié par 10, le coût de Thomas est multiplié par 1000', correct: false },
+        { html: t('Quand N est multiplié par 10, le coût de Thomas est multiplié par 10 : O(N)'), correct: true },
+        { html: t('Pour N = 1000, la LU pleine coûte environ 80 000 fois plus que Thomas'), correct: true },
+        { html: t('Thomas coûte O(N³), comme la LU pleine'), correct: false },
+        { html: t('Quand N est multiplié par 10, le coût de Thomas est multiplié par 1000'), correct: false },
       ],
-      solution: [{ html: 'Chaque ligne demande quelques opérations (une élimination, une division, la descente et la remontée) : environ 8N en tout, contre 2N³/3 pour une LU qui ignore les zéros. Pour N = 1000 : 8·10³ contre 6,7·10⁸.', note: '' }],
+      solution: [{ html: t('Chaque ligne demande quelques opérations (une élimination, une division, la descente et la remontée) : environ 8N en tout, contre 2N³/3 pour une LU qui ignore les zéros. Pour N = 1000 : 8·10³ contre 6,7·10⁸.'), note: '' }],
     }, rng),
   });
 }
@@ -190,7 +199,7 @@ function examMcq(rng, opts) {
   const k = rng.pick([1, 5, 6, 1, 5, 6, 2, 3]);
   return codeMcq({
     skill: TH, ref: THOMAS, hole: k, traps: THOMAS_TRAPS, fillers: THOMAS_FILLERS, key: `hole${k}`, exam: examTag(opts),
-    prompt: `La fonction Python ci-dessous résout Ax = b par la LU tridiagonale (algorithme de Thomas), en place. ${MATRIX_NOTE}`,
+    prompt: t('La fonction Python ci-dessous résout Ax = b par la LU tridiagonale (algorithme de Thomas), en place. {MATRIX_NOTE}', { MATRIX_NOTE }),
   }, rng);
 }
 
@@ -198,12 +207,12 @@ function examTf(rng, opts) {
   const tag = examTag(opts);
   const k = rng.int(0, 2);
   if (k === 0) {
-    return { ...vfMcq({ skill: TH, key: `${TH}:tf:cost`, exam: tag, statement: 'Résoudre un système tridiagonal N × N par la factorisation LU coûte O(N³) opérations.', truth: false, explanation: 'Faux : L et U sont bidiagonales, chaque ligne coûte quelques opérations : environ 8N, donc O(N).' }, rng) };
+    return { ...vfMcq({ skill: TH, key: `${TH}:tf:cost`, exam: tag, statement: t('Résoudre un système tridiagonal N × N par la factorisation LU coûte O(N³) opérations.'), truth: false, explanation: t('Faux : L et U sont bidiagonales, chaque ligne coûte quelques opérations : environ 8N, donc O(N).') }, rng) };
   }
   if (k === 1) {
-    return vfMcq({ skill: TH, key: `${TH}:tf:shape`, exam: tag, statement: 'Si A est tridiagonale et admet une factorisation LU sans pivot, alors L et U sont bidiagonales.', truth: true, explanation: 'Vrai : l\'élimination de la ligne i n\'utilise que la ligne i − 1 ; aucun nouveau coefficient non nul n\'apparaît (pas de remplissage).' }, rng);
+    return vfMcq({ skill: TH, key: `${TH}:tf:shape`, exam: tag, statement: t('Si A est tridiagonale et admet une factorisation LU sans pivot, alors L et U sont bidiagonales.'), truth: true, explanation: t('Vrai : l\'élimination de la ligne i n\'utilise que la ligne i − 1 ; aucun nouveau coefficient non nul n\'apparaît (pas de remplissage).') }, rng);
   }
-  return vfMcq({ skill: TH, key: `${TH}:tf:place`, exam: tag, statement: 'Dans l\'algorithme de Thomas en place, après la remontée, le tableau b contient la solution x.', truth: true, explanation: 'Vrai : b devient y pendant la descente, puis x pendant la remontée.' }, rng);
+  return vfMcq({ skill: TH, key: `${TH}:tf:place`, exam: tag, statement: t('Dans l\'algorithme de Thomas en place, après la remontée, le tableau b contient la solution x.'), truth: true, explanation: t('Vrai : b devient y pendant la descente, puis x pendant la remontée.') }, rng);
 }
 
 export const GEN = {

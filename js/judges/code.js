@@ -17,12 +17,13 @@
 // fill(source, texts), holeTexts(item, answers), normalize(text).
 
 import { runTests } from '../py/index.js';
+import { t } from '../i18n.js';
 
 export const fill = (source, texts) => {
   let k = 0;
   return source.replace(/\?\?\?/g, () => {
-    const t = texts[k++];
-    return t === undefined || t === null ? '???' : String(t);
+    const tq = texts[k++];
+    return tq === undefined || tq === null ? '???' : String(tq);
   });
 };
 
@@ -62,30 +63,30 @@ export function run(item, texts) {
 
 export function judgeCode(item, answers) {
   const texts = holeTexts(item, answers);
-  if (texts.some((t) => String(t).trim() === '')) return { ok: false, empty: true, holes: texts.map((t) => (String(t).trim() === '' ? null : null)), message: 'Remplis tous les trous.' };
-  if (texts.some((t) => /\n/.test(t))) return { ok: false, holes: texts.map(() => null), message: 'Un trou tient sur une seule ligne.' };
+  if (texts.some((tq) => String(tq).trim() === '')) return { ok: false, empty: true, holes: texts.map((tq) => (String(tq).trim() === '' ? null : null)), message: t('Remplis tous les trous.') };
+  if (texts.some((tq) => /\n/.test(tq))) return { ok: false, holes: texts.map(() => null), message: t('Un trou tient sur une seule ligne.') };
   const r = run(item, texts);
   if (r.ok) return { ok: true, holes: texts.map(() => true), message: '' };
   // Known traps, hole by hole.
   const ref = reference(item);
-  const holes = texts.map((t, k) => (normalize(t) === normalize(ref[k]) ? true : null));
+  const holes = texts.map((tq, k) => (normalize(tq) === normalize(ref[k]) ? true : null));
   let rule = null;
   item.holes.forEach((h, k) => {
     const n = normalize(texts[k]);
     const traps = [...(h.traps || []), ...(h.options || []).filter((o) => !o.correct && o.rule).map((o) => ({ text: o.text, rule: o.rule }))];
-    const t = traps.find((x) => normalize(x.text) === n);
-    if (t) { holes[k] = false; rule ||= t.rule; }
+    const tq = traps.find((x) => normalize(x.text) === n);
+    if (tq) { holes[k] = false; rule ||= tq.rule; }
   });
   // Which holes break the program on their own.
   if (texts.length > 1) {
-    texts.forEach((t, k) => {
+    texts.forEach((tq, k) => {
       if (holes[k] !== null) return;
       const alone = ref.slice();
-      alone[k] = t;
+      alone[k] = tq;
       holes[k] = run(item, alone).ok;
     });
   } else if (holes[0] === null) holes[0] = false;
-  return { ok: false, holes, rule, failed: r.failed, message: r.failed?.text || 'Le programme ne passe pas les tests.' };
+  return { ok: false, holes, rule, failed: r.failed, message: r.failed?.text || t('Le programme ne passe pas les tests.') };
 }
 
 // The reference program passes; every trap text and the `wrong` of each

@@ -17,9 +17,10 @@
 import { lit } from '../ast.js';
 import { evalAt, num } from '../../judges/iter-num.js';
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 
 const node = (x) => (x instanceof Q ? lit(x) : { t: 'float', x });
-const fAt = (o, t, u) => evalAt(o.f, { t, u }, ['t', 'u']);
+const fAt = (o, tv, u) => evalAt(o.f, { t: tv, u }, ['t', 'u']);
 const add = (a, b) => (a instanceof Q && b instanceof Q ? a.add(b) : Number(a) + Number(b));
 const mul = (a, b) => (a instanceof Q && b instanceof Q ? a.mul(b) : Number(a) * Number(b));
 
@@ -32,7 +33,7 @@ function step(o) {
 
 export const DEFS = {
   n_implicit_as_explicit: {
-    name: 'Schéma implicite calculé comme explicite',
+    name: t('Schéma implicite calculé comme explicite'),
     judges: ['value'],
     transform(prev, ctx) {
       const o = ctx?.cfg?.ode;
@@ -43,7 +44,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '5/6', form: 'irreducible', ode: { scheme: 'ER', f: '-2u', t0: '0', u0: '1', h: '1/10' } }, prev: 'u_1', line: '4/5' },
   },
   n_euler_time_index: {
-    name: 'Euler progressif : f(tₙ₊₁, uₙ) au lieu de f(tₙ, uₙ)',
+    name: t('Euler progressif : f(tₙ₊₁, uₙ) au lieu de f(tₙ, uₙ)'),
     judges: ['value'],
     transform(prev, ctx) {
       const o = ctx?.cfg?.ode;
@@ -54,7 +55,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '4/5', form: 'irreducible', ode: { scheme: 'EP', f: '-2u+t', t0: '0', u0: '1', h: '1/10' } }, prev: 'u_1', line: '81/100' },
   },
   n_heun_k2: {
-    name: 'Heun : prédiction u + k₁ sans h',
+    name: t('Heun : prédiction u + k₁ sans h'),
     judges: ['value'],
     transform(prev, ctx) {
       const o = ctx?.cfg?.ode;
@@ -68,7 +69,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '41/50', form: 'irreducible', ode: { scheme: 'Heun', f: '-2u', t0: '0', u0: '1', h: '1/10' } }, prev: 'u_1', line: '1' },
   },
   n_cn_explicit: {
-    name: 'Crank-Nicolson calculé avec uₙ dans le second terme',
+    name: t('Crank-Nicolson calculé avec uₙ dans le second terme'),
     judges: ['value'],
     transform(prev, ctx) {
       const o = ctx?.cfg?.ode;
@@ -79,7 +80,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '9/11', form: 'irreducible', ode: { scheme: 'CN', f: '-2u', t0: '0', u0: '1', h: '1/10' } }, prev: 'u_1', line: '4/5' },
   },
   n_stab_factor2: {
-    name: 'Stabilité d\'Euler progressif : h < 1/|λ| au lieu de 2/|λ|',
+    name: t('Stabilité d\'Euler progressif : h < 1/|λ| au lieu de 2/|λ|'),
     example: ['h < 1/|λ|', 'h < 2/|λ|'],
     judges: ['value'],
     transform(prev, ctx) {
@@ -95,38 +96,38 @@ export const DEFS = {
     check: { judge: { kind: 'value', expect: '1/10', form: 'irreducible', stab: { lambda: '-20' } }, prev: 'h', line: '1/20' },
   },
   n_stab_order_confused: {
-    name: 'Ordre et stabilité confondus',
+    name: t('Ordre et stabilité confondus'),
     judges: [],
     check: { bait: { skill: 'n-ode-stability', level: 5 } },
   },
   n_stab_lambda_sign: {
-    name: 'R(hλ) écrit 1 − hλ',
-    example: ['|1 − hλ| < 1 avec λ = −20', '|1 + hλ| < 1'],
+    name: t('R(hλ) écrit 1 − hλ'),
+    example: [t('|1 − hλ| < 1 avec λ = −20'), '|1 + hλ| < 1'],
     judges: [],
-    explain: (ctx = {}) => `uₙ₊₁ = uₙ + hλuₙ : R = 1 + hλ${ctx.lambda ? ` = 1 − ${String(-Number(ctx.lambda))}h` : ''}. Avec λ < 0, c'est 1 − h|λ|, pas 1 + h|λ|.`,
+    explain: (ctx = {}) => t('uₙ₊₁ = uₙ + hλuₙ : R = 1 + hλ{value}. Avec λ < 0, c\'est 1 − h|λ|, pas 1 + h|λ|.', { value: ctx.lambda ? ` = 1 − ${String(-Number(ctx.lambda))}h` : '' }),
     check: { bait: { skill: 'n-ode-stability', level: 2 } },
   },
   n_euler_ineq_bound: {
-    name: 'Facteur N oublié dans |aᴺ − bᴺ|',
+    name: t('Facteur N oublié dans |aᴺ − bᴺ|'),
     example: ['|aᴺ − bᴺ| ≤ |a − b|', '|aᴺ − bᴺ| ≤ N|a − b|'],
     judges: [],
-    explain: () => 'aᴺ − bᴺ = (a − b)·(somme de N termes de module ≤ 1) : le facteur N reste. N·h²/2 = T·h/2.',
+    explain: () => t('aᴺ − bᴺ = (a − b)·(somme de N termes de module ≤ 1) : le facteur N reste. N·h²/2 = T·h/2.'),
     check: { bait: { skill: 'n-ode-euler-global', level: 4 } },
   },
   n_global_error_order: {
-    name: 'Erreur globale prise pour l\'erreur locale',
+    name: t('Erreur globale prise pour l\'erreur locale'),
     judges: [],
     check: { bait: { skill: 'n-ode-euler-global', level: 3 } },
   },
   n_h_le_2_forgotten: {
-    name: '|1 − h| ≤ 1 sans la condition h ≤ 2',
-    example: ['|1 − h| ≤ 1 pour tout h > 0', '|1 − h| ≤ 1 si 0 < h ≤ 2'],
+    name: t('|1 − h| ≤ 1 sans la condition h ≤ 2'),
+    example: [t('|1 − h| ≤ 1 pour tout h > 0'), t('|1 − h| ≤ 1 si 0 < h ≤ 2')],
     judges: [],
-    explain: () => 'Pour h = 3, |1 − h| = 2 > 1 : c\'est pourquoi l\'énoncé suppose 0 < h ≤ 2.',
+    explain: () => t('Pour h = 3, |1 − h| = 2 > 1 : c\'est pourquoi l\'énoncé suppose 0 < h ≤ 2.'),
     check: { bait: { skill: 'n-ode-euler-global', level: 4 } },
   },
   n_stiff_accuracy: {
-    name: 'Instabilité prise pour un manque de précision',
+    name: t('Instabilité prise pour un manque de précision'),
     judges: [],
     check: { bait: { skill: 'n-ode-stiff', level: 3 } },
   },

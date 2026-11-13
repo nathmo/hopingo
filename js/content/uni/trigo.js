@@ -16,6 +16,7 @@ import { toText } from '../../cas/print.js';
 import { blankLine } from '../../judges/lines.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { MT, fr, linesItem, mcq, tfItem } from './kit.js';
+import { t } from '../../i18n.js';
 
 const q = (n, d = 1) => new Q(n, d);
 const PERIODIC = (extra = {}) => ({ kind: 'solset', v: 'x', periodic: true, ...extra });
@@ -40,7 +41,7 @@ const perT = (p) => { p = Q.of(p); return `${p.n === 1 ? '' : p.n}kπ${p.d > 1 ?
 export const famT = (base, per) => (Q.of(base).n === 0 ? perT(per) : `${piT(base)}+${perT(per)}`);
 // x = … ∨ x = …
 const famsT = (fams, v = 'x') => fams.map(([b, p]) => `${v}=${famT(b, p)}`).join('∨');
-const famsHtml = (fams) => fams.map(([b, p]) => MT(`x=${famT(b, p)}`)).join(' ou ');
+const famsHtml = (fams) => fams.map(([b, p]) => MT(`x=${famT(b, p)}`)).join(t(' ou '));
 // Reduce a multiple of π into [0 ; m).
 const modQ = (k, m) => { k = Q.of(k); m = Q.of(m); const t = Math.floor(k.div(m).valueOf()); return k.sub(m.mul(t)); };
 
@@ -104,14 +105,14 @@ function radItem(level, rng, opts = {}) {
     const c = degToRad(deg);
     if (level <= 2) {
       const script = [
-        { kind: 'eq', ...(level === 1 ? tpl(c.line, (n) => [n.l.d]) : { math: c.line }), note: 'Multiplier par π/180', subgoal: 'convert' },
-        { kind: 'eq', math: c.final, note: 'Simplifier la fraction', subgoal: 'simplify' },
+        { kind: 'eq', ...(level === 1 ? tpl(c.line, (n) => [n.l.d]) : { math: c.line }), note: t('Multiplier par π/180'), subgoal: 'convert' },
+        { kind: 'eq', math: c.final, note: t('Simplifier la fraction'), subgoal: 'simplify' },
       ];
       return linesItem({
-        skill: RAD, level, prompt: `Convertis ${fr(String(deg))}° en radians.`,
+        skill: RAD, level, prompt: t('Convertis {d}° en radians.', { d: fr(String(deg)) }),
         start: c.start, judge: { kind: 'value', form: 'exact' }, mode: 'guided', script,
         hints: [
-          { level: 1, html: '180° = π rad : on multiplie par π/180.' },
+          { level: 1, html: t('180° = π rad : on multiplie par π/180.') },
           { level: 2, html: `${fr(String(deg))}° = ${MT(`${deg}/180×π`)}` },
           { level: 3, html: MT(c.final) },
         ],
@@ -122,23 +123,23 @@ function radItem(level, rng, opts = {}) {
     const k = rng.pick([q(5, 6), q(7, 4), q(2, 3), q(11, 6), q(3, 4), q(5, 3), q(7, 6), q(5, 4)]);
     const back = k.mul(180).valueOf();
     const menu = [
-      { id: 'to-rad', label: 'Multiplier par π/180', valid: true },
-      { id: 'to-deg', label: 'Multiplier par 180/π', valid: false, why: 'On passe de degrés à radians : π rad pour 180°.' },
-      { id: 'two-pi', label: 'Multiplier par 2π', valid: false, why: 'Un tour, c\'est 360° : 1° vaut π/180, pas 2π.' },
+      { id: 'to-rad', label: t('Multiplier par π/180'), valid: true },
+      { id: 'to-deg', label: t('Multiplier par 180/π'), valid: false, why: t('On passe de degrés à radians : π rad pour 180°.') },
+      { id: 'two-pi', label: t('Multiplier par 2π'), valid: false, why: t('Un tour, c\'est 360° : 1° vaut π/180, pas 2π.') },
     ];
-    const menu2 = menu.map((o) => ({ ...o, valid: o.id === 'to-deg', why: o.id === 'to-rad' ? 'L\'angle est en radians : pour des degrés, on multiplie par 180/π.' : o.why }));
+    const menu2 = menu.map((o) => ({ ...o, valid: o.id === 'to-deg', why: o.id === 'to-rad' ? t('L\'angle est en radians : pour des degrés, on multiplie par 180/π.') : o.why }));
     const script = [
-      { kind: 'eq', math: c.final, note: 'En radians', subgoal: 'convert' },
-      { kind: 'segment', html: `Et ${MT(piT(k))} en degrés :`, ask: 'θ =', start: { math: piT(k) }, judge: { kind: 'value', form: 'deg', menu: menu2 } },
-      { kind: 'eq', math: `${back}°`, note: 'Multiplier par 180/π', subgoal: 'convert' },
+      { kind: 'eq', math: c.final, note: t('En radians'), subgoal: 'convert' },
+      { kind: 'segment', html: t('Et {k} en degrés :', { k: MT(piT(k)) }), ask: 'θ =', start: { math: piT(k) }, judge: { kind: 'value', form: 'deg', menu: menu2 } },
+      { kind: 'eq', math: `${back}°`, note: t('Multiplier par 180/π'), subgoal: 'convert' },
     ];
     return linesItem({
-      skill: RAD, level, prompt: `Convertis ${fr(String(deg))}° en radians, puis ${MT(piT(k))} en degrés.`,
+      skill: RAD, level, prompt: t('Convertis {d}° en radians, puis {k} en degrés.', { d: fr(String(deg)), k: MT(piT(k)) }),
       start: c.start, judge: { kind: 'value', form: 'exact', menu }, mode: 'tap', script,
       hints: [
-        { level: 1, html: 'Degrés → radians : × π/180. Radians → degrés : × 180/π.' },
+        { level: 1, html: t('Degrés → radians : × π/180. Radians → degrés : × 180/π.') },
         { level: 2, html: `${MT(piT(k))} = ${MT(`(${k.n}×180/${k.d})°`)}` },
-        { level: 3, html: `${MT(c.final)} puis ${fr(String(back))}°` },
+        { level: 3, html: t('{a} puis {b}°', { a: MT(c.final), b: fr(String(back)) }) },
       ],
       subgoals: RAD_SUB, keys: KEYS, tapActions: 'menu', key: `${RAD}:${deg}:${toText(parse(piT(k)))}`,
     });
@@ -151,18 +152,18 @@ function radItem(level, rng, opts = {}) {
     const sector = rng.chance(0.35);
     const L = sector ? k.mul(r * r).div(2) : k.mul(r);
     const script = [
-      { kind: 'eq', math: piT(k), note: 'Convertir en radians', subgoal: 'convert' },
-      { kind: 'segment', html: sector ? 'Aire du secteur A = r²θ/2 :' : 'Longueur L = rθ :', ask: sector ? 'A =' : 'L =', start: { math: sector ? `${r}^2×${deg}°/2` : `${r}×${deg}°` }, judge: { kind: 'value', form: 'exact' } },
+      { kind: 'eq', math: piT(k), note: t('Convertir en radians'), subgoal: 'convert' },
+      { kind: 'segment', html: sector ? t('Aire du secteur A = r²θ/2 :') : t('Longueur L = rθ :'), ask: sector ? 'A =' : 'L =', start: { math: sector ? `${r}^2×${deg}°/2` : `${r}×${deg}°` }, judge: { kind: 'value', form: 'exact' } },
       { kind: 'eq', math: sector ? `${r * r}/2×${piT(k)}` : `${r}×${piT(k)}`, note: sector ? 'A = r²θ/2' : 'L = rθ', subgoal: 'arc' },
-      { kind: 'eq', math: piT(L), note: 'Calculer', subgoal: 'arc' },
+      { kind: 'eq', math: piT(L), note: t('Calculer'), subgoal: 'arc' },
     ].filter((l, i, a) => !(i === 2 && !sector && k.n === 1 && L.d === k.d));
     return linesItem({
       skill: RAD, level, prompt: sector
-        ? `Aire du secteur d'un disque de rayon ${r} cm et d'angle ${deg}° (en cm², valeur exacte).`
-        : `Longueur de l'arc d'un cercle de rayon ${r} cm sous-tendu par un angle de ${deg}° (en cm, valeur exacte).`,
+        ? t('Aire du secteur d\'un disque de rayon {r} cm et d\'angle {deg}° (en cm², valeur exacte).', { r, deg })
+        : t('Longueur de l\'arc d\'un cercle de rayon {r} cm sous-tendu par un angle de {deg}° (en cm, valeur exacte).', { r, deg }),
       start: `${deg}°`, judge: { kind: 'value', form: 'exact' }, mode: 'free', script,
       hints: [
-        { level: 1, html: sector ? 'A = r²θ/2 demande θ en radians.' : 'L = rθ demande θ en radians.' },
+        { level: 1, html: sector ? t('A = r²θ/2 demande θ en radians.') : t('L = rθ demande θ en radians.') },
         { level: 2, html: `${deg}° = ${MT(`${deg}/180×π`)} = …` },
         { level: 3, html: MT(piT(k)) },
       ],
@@ -173,19 +174,19 @@ function radItem(level, rng, opts = {}) {
   const n = rng.pick([5, 6, 8, 9, 10, 12]);
   const k = q(n - 2, n);
   const script = [
-    { kind: 'eq', math: `(${n}-2)×π/${n}`, note: 'Somme des angles (n − 2)π, partagée en n', subgoal: 'arc' },
-    { kind: 'eq', math: piT(k), note: 'Simplifier', subgoal: 'simplify' },
+    { kind: 'eq', math: `(${n}-2)×π/${n}`, note: t('Somme des angles (n − 2)π, partagée en n'), subgoal: 'arc' },
+    { kind: 'eq', math: piT(k), note: t('Simplifier'), subgoal: 'simplify' },
   ];
   return linesItem({
-    skill: RAD, level, prompt: `Un polygone régulier a ${n} côtés. Quel est chacun de ses angles intérieurs, en radians ?`,
+    skill: RAD, level, prompt: t('Un polygone régulier a {n} côtés. Quel est chacun de ses angles intérieurs, en radians ?', { n }),
     start: 'θ', judge: { kind: 'value', form: 'exact', expect: piT(k) }, mode: 'free', script,
     hints: [], subgoals: RAD_SUB, keys: KEYS, key: `${RAD}:poly:${n}`, exam,
   });
 }
 
 const RAD_SUB = [
-  { id: 'convert', label: 'convertir', skill: 'prop-rule3' },
-  { id: 'simplify', label: 'simplifier', skill: RAD },
+  { id: 'convert', label: t('convertir'), skill: 'prop-rule3' },
+  { id: 'simplify', label: t('simplifier'), skill: RAD },
   { id: 'arc', label: 'L = rθ', skill: RAD },
 ];
 
@@ -201,7 +202,7 @@ function radExam(rng) {
     { html: `${MT(piT(L.mul(2)))} cm`, correct: false },
   ].filter((o, i, a) => a.findIndex((x) => x.html === o.html) === i);
   return mcq({
-    skill: RAD, level: 4, prompt: `Longueur de l'arc d'un cercle de rayon ${r} cm sous-tendu par un angle de ${deg}° ?`, options,
+    skill: RAD, level: 4, prompt: t('Longueur de l\'arc d\'un cercle de rayon {r} cm sous-tendu par un angle de {deg}° ?', { r, deg }), options,
     key: `mcq:${deg}:${r}`, exam: { format: 'mcq', points: 1 },
     solution: [{ html: `θ = ${MT(piT(k))}, L = rθ = ${MT(piT(L))} cm`, note: '' }],
   }, rng);
@@ -219,9 +220,9 @@ function reduceLines(f, k) {
   const P = f === 'tan' || f === 'cot' ? q(1) : q(2);
   const { r, ref, sign } = assoc(f, k);
   const lines = [];
-  if (!r.eq(Q.of(k))) lines.push({ math: `${f}(${piT(r)})`, note: P.eq(1) ? 'Retirer des multiples de π' : 'Retirer des tours de 2π', subgoal: 'turns' });
-  if (!ref.eq(r)) lines.push({ math: `${sign < 0 ? '-' : ''}${f}(${piT(ref)})`, note: 'Angle associé', subgoal: 'assoc' });
-  lines.push({ math: trigVal(f, k), note: 'Valeur connue', subgoal: 'value' });
+  if (!r.eq(Q.of(k))) lines.push({ math: `${f}(${piT(r)})`, note: P.eq(1) ? t('Retirer des multiples de π') : t('Retirer des tours de 2π'), subgoal: 'turns' });
+  if (!ref.eq(r)) lines.push({ math: `${sign < 0 ? '-' : ''}${f}(${piT(ref)})`, note: t('Angle associé'), subgoal: 'assoc' });
+  lines.push({ math: trigVal(f, k), note: t('Valeur connue'), subgoal: 'value' });
   return { lines, r, ref, sign };
 }
 
@@ -256,8 +257,8 @@ function redExpr(rng) {
   if (s < 0 && g === 'sin') sg = sg === '-' ? '' : '-';
   const final = `${sg}${g}(x)`;
   const lines = [];
-  if (k !== m) lines.push({ math: `${f}(${argT(m)})`, note: 'Retirer des tours de 2π', subgoal: 'turns' });
-  lines.push({ math: final, note: m % 2 ? 'Autour de π/2 : sin et cos s\'échangent' : 'Angle associé', subgoal: 'assoc' });
+  if (k !== m) lines.push({ math: `${f}(${argT(m)})`, note: t('Retirer des tours de 2π'), subgoal: 'turns' });
+  lines.push({ math: final, note: m % 2 ? t('Autour de π/2 : sin et cos s\'échangent') : t('Angle associé'), subgoal: 'assoc' });
   return { start: `${f}(${argT(k)})`, lines, final, f, k, y };
 }
 
@@ -267,11 +268,11 @@ function redItem(level, rng, opts = {}) {
   if (expr) {
     const e = redExpr(rng);
     return linesItem({
-      skill: RED, level, prompt: `Écris ${MT(e.start)} avec une seule fonction de x.`,
+      skill: RED, level, prompt: t('Écris {e} avec une seule fonction de x.', { e: MT(e.start) }),
       start: e.start, judge: { kind: 'equiv', vars: ['x'], target: 'one-trig', domain: { x: [-1.4, 1.4] } }, mode: 'free',
       script: e.lines.map((l) => ({ kind: 'eq', ...l })),
       hints: level >= 5 ? [] : [
-        { level: 1, html: 'Retire des multiples de 2π, puis utilise un angle associé.' },
+        { level: 1, html: t('Retire des multiples de 2π, puis utilise un angle associé.') },
         { level: 2, html: MT(e.lines[0].math) },
         { level: 3, html: MT(e.final) },
       ],
@@ -289,10 +290,10 @@ function redItem(level, rng, opts = {}) {
   }
   const mode = level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free';
   return linesItem({
-    skill: RED, level, prompt: `Calcule ${MT(start)} sans calculatrice.`,
+    skill: RED, level, prompt: t('Calcule {e} sans calculatrice.', { e: MT(start) }),
     start, judge: { kind: 'equiv', vars: [], target: 'exact' }, mode, script,
     hints: level >= 5 ? [] : [
-      { level: 1, html: f === 'tan' || f === 'cot' ? `${f} a pour période π : retire des multiples de π, puis lis le quadrant.` : 'Retire des tours de 2π, puis lis le quadrant.' },
+      { level: 1, html: f === 'tan' || f === 'cot' ? t('{f} a pour période π : retire des multiples de π, puis lis le quadrant.', { f }) : t('Retire des tours de 2π, puis lis le quadrant.') },
       { level: 2, html: lines.length > 1 ? MT(lines[lines.length - 2].math) : `${MT(`${f}(${piT(ref)})`)} = …` },
       { level: 3, html: MT(lines[lines.length - 1].math) },
     ],
@@ -301,23 +302,23 @@ function redItem(level, rng, opts = {}) {
 }
 
 const RED_SUB = [
-  { id: 'turns', label: 'retirer des tours', skill: RED },
-  { id: 'assoc', label: 'angle associé', skill: RED },
-  { id: 'value', label: 'valeur connue', skill: RED },
+  { id: 'turns', label: t('retirer des tours'), skill: RED },
+  { id: 'assoc', label: t('angle associé'), skill: RED },
+  { id: 'value', label: t('valeur connue'), skill: RED },
 ];
 
 function redExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'tan(x+π)=-tan(x)', truth: false, counter: 'π/4', pred: 'cos(x)=0 ∨ tan(x+π)=-tan(x)', expl: 'Faux : tan a pour période π, donc tan(x + π) = tan x. Avec x = π/4 : tan(5π/4) = 1, pas −1.' },
-      { s: 'cos(π-x)=cos(x)', truth: false, counter: '0', pred: 'cos(π-x)=cos(x)', expl: 'Faux : cos(π − x) = −cos x. Avec x = 0 : cos π = −1, pas 1.' },
-      { s: 'sin(π/2+x)=sin(x)', truth: false, counter: '0', pred: 'sin(π/2+x)=sin(x)', expl: 'Faux : sin(π/2 + x) = cos x. Avec x = 0 : sin(π/2) = 1, mais sin 0 = 0.' },
-      { s: 'cos(x+2π)=cos(x)', truth: true, expl: 'Vrai : cos a pour période 2π.' },
-      { s: 'sin(π-x)=sin(x)', truth: true, expl: 'Vrai : x et π − x sont symétriques par rapport à l\'axe vertical.' },
+      { s: 'tan(x+π)=-tan(x)', truth: false, counter: 'π/4', pred: 'cos(x)=0 ∨ tan(x+π)=-tan(x)', expl: t('Faux : tan a pour période π, donc tan(x + π) = tan x. Avec x = π/4 : tan(5π/4) = 1, pas −1.') },
+      { s: 'cos(π-x)=cos(x)', truth: false, counter: '0', pred: 'cos(π-x)=cos(x)', expl: t('Faux : cos(π − x) = −cos x. Avec x = 0 : cos π = −1, pas 1.') },
+      { s: 'sin(π/2+x)=sin(x)', truth: false, counter: '0', pred: 'sin(π/2+x)=sin(x)', expl: t('Faux : sin(π/2 + x) = cos x. Avec x = 0 : sin(π/2) = 1, mais sin 0 = 0.') },
+      { s: 'cos(x+2π)=cos(x)', truth: true, expl: t('Vrai : cos a pour période 2π.') },
+      { s: 'sin(π-x)=sin(x)', truth: true, expl: t('Vrai : x et π − x sont symétriques par rapport à l\'axe vertical.') },
     ];
     const b = rng.pick(bank);
     return tfItem({
-      skill: RED, level: 4, statement: `Pour tout x réel, ${MT(b.s)}.`, truth: b.truth, key: b.s, explanation: b.expl,
+      skill: RED, level: 4, statement: t('Pour tout x réel, {s}.', { s: MT(b.s) }), truth: b.truth, key: b.s, explanation: b.expl,
       counter: b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, ask: [{ v: 'x', label: 'x =' }], answer: { x: b.counter } },
       ruleIfTrue: b.s.includes('π/2') ? 'g3_reduce_swap' : b.truth ? null : 'g3_reduce_sign',
       exam: { format: 'tf', points: 1 },
@@ -345,13 +346,13 @@ function redExam(rng, exam) {
 
 const IDS = 'g3-identities';
 const FORMULAS = {
-  double: 'Angle double : sin 2u = 2 sin u cos u, cos 2u = 2cos²u − 1 = 1 − 2sin²u',
-  add: 'Addition : cos(a ± b), sin(a ± b)',
+  double: t('Angle double : sin 2u = 2 sin u cos u, cos 2u = 2cos²u − 1 = 1 − 2sin²u'),
+  add: t('Addition : cos(a ± b), sin(a ± b)'),
   pyth: 'cos²u + sin²u = 1',
   quot: 'tan u = sin u / cos u',
-  sumprod: 'Somme-produit : sin p ± sin q, cos p ± cos q',
-  expand: 'Développer (identité remarquable)',
-  factor: 'Factoriser a² − b² = (a − b)(a + b)',
+  sumprod: t('Somme-produit : sin p ± sin q, cos p ± cos q'),
+  expand: t('Développer (identité remarquable)'),
+  factor: t('Factoriser a² − b² = (a − b)(a + b)'),
 };
 
 // A bank of identities, u = x, 2x or 3x where it reads well. Each line has
@@ -391,7 +392,7 @@ function identity(rng) {
   return { ...id, key: `${pick}:${u}:${b[0]}` };
 }
 
-const ID_RULE = { double: 'Angle double', add: 'Formule d\'addition', pyth: 'cos² + sin² = 1', quot: 'tan = sin/cos', sumprod: 'Somme-produit', expand: 'Développer', factor: 'Factoriser a² − b²' };
+const ID_RULE = { double: t('Angle double'), add: t('Formule d\'addition'), pyth: 'cos² + sin² = 1', quot: 'tan = sin/cos', sumprod: t('Somme-produit'), expand: t('Développer'), factor: t('Factoriser a² − b²') };
 
 function idItem(level, rng, opts = {}) {
   const exam = opts.exam ? { format: opts.exam, points: 3 } : false;
@@ -402,24 +403,24 @@ function idItem(level, rng, opts = {}) {
   const first = d.lines[0][1];
   if (level === 2) {
     const opts2 = [first, ...Object.keys(FORMULAS).filter((k) => k !== first).slice(0, 3)];
-    script.push({ kind: 'decision', prompt: 'Quelle formule pour commencer ?', options: opts2.map((k) => ({ id: k, label: FORMULAS[k], valid: k === first, why: 'Ce n\'est pas la formule qui fait avancer ici.', rule: k === 'add' && first !== 'add' ? 'g3_linear' : undefined })) });
+    script.push({ kind: 'decision', prompt: t('Quelle formule pour commencer ?'), options: opts2.map((k) => ({ id: k, label: FORMULAS[k], valid: k === first, why: t('Ce n\'est pas la formule qui fait avancer ici.'), rule: k === 'add' && first !== 'add' ? 'g3_linear' : undefined })) });
   }
-  if (level === 1) script.push({ kind: 'note', html: `Formule : ${FORMULAS[first]}.` });
+  if (level === 1) script.push({ kind: 'note', html: t('Formule : {f}.', { f: FORMULAS[first] }) });
   d.lines.forEach(([math, f], i) => {
     const line = { kind: 'eq', math, note: ID_RULE[f], subgoal: f === 'add' || f === 'double' || f === 'sumprod' ? 'formula' : 'develop' };
     if (level === 1 && i === 0) Object.assign(line, tpl(math, (n) => [blankable(n)]));
     script.push(line);
     if (level === 3 && i === 0) {
       const keys = Object.keys(ID_RULE).filter((k) => k === f).concat(Object.keys(ID_RULE).filter((k) => k !== f).slice(0, 3));
-      script.push({ kind: 'rule', ask: 'Quelle formule as-tu utilisée ?', options: keys.map((k) => ({ id: k, label: ID_RULE[k] })), correct: f });
+      script.push({ kind: 'rule', ask: t('Quelle formule as-tu utilisée ?'), options: keys.map((k) => ({ id: k, label: ID_RULE[k] })), correct: f });
     }
   });
-  const menu = Object.keys(FORMULAS).map((k) => ({ id: k, label: FORMULAS[k], valid: d.lines.some((l) => l[1] === k), why: 'Cette formule ne sert pas dans ce calcul.' }));
+  const menu = Object.keys(FORMULAS).map((k) => ({ id: k, label: FORMULAS[k], valid: d.lines.some((l) => l[1] === k), why: t('Cette formule ne sert pas dans ce calcul.') }));
   return linesItem({
-    skill: IDS, level, prompt: `Montre que ${MT(`${d.start}=${d.goal}`)} (transforme le membre de gauche).`,
+    skill: IDS, level, prompt: t('Montre que {e} (transforme le membre de gauche).', { e: MT(`${d.start}=${d.goal}`) }),
     start: d.start, judge: level === 3 ? { ...judge, menu } : judge, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', script,
     hints: [
-      { level: 1, html: `Commence par : ${FORMULAS[first]}.` },
+      { level: 1, html: t('Commence par : {f}.', { f: FORMULAS[first] }) },
       { level: 2, html: MT(d.lines[0][0]) },
       { level: 3, html: MT(d.lines[Math.min(1, d.lines.length - 1)][0]) },
     ],
@@ -440,8 +441,8 @@ function blankable(node) {
 }
 
 const ID_SUB = [
-  { id: 'formula', label: 'formule', skill: IDS },
-  { id: 'develop', label: 'développer', skill: 'lit-polynomial' },
+  { id: 'formula', label: t('formule'), skill: IDS },
+  { id: 'develop', label: t('développer'), skill: 'lit-polynomial' },
 ];
 
 // Level 5: a sum turned into a product to solve sin(px) ± sin(qx) = 0.
@@ -462,12 +463,12 @@ function idSolve(rng, exam) {
     const fams = plus ? [sinF(a), cosF(c)] : [cosF(a), sinF(c)];
     const zero = plus ? `sin(${ax(a)})=0∨cos(${ax(c)})=0` : `cos(${ax(a)})=0∨sin(${ax(c)})=0`;
     const script = [
-      { kind: 'eq', math: prod, note: 'Somme-produit', subgoal: 'formula' },
-      { kind: 'eq', math: zero, note: 'Produit nul', subgoal: 'formula' },
-      { kind: 'eq', math: famsT(fams), note: 'Équations de base', subgoal: 'formula' },
+      { kind: 'eq', math: prod, note: t('Somme-produit'), subgoal: 'formula' },
+      { kind: 'eq', math: zero, note: t('Produit nul'), subgoal: 'formula' },
+      { kind: 'eq', math: famsT(fams), note: t('Équations de base'), subgoal: 'formula' },
     ];
     return linesItem({
-      skill: IDS, level: 5, prompt: `Résous ${MT(start)} dans ℝ (k désigne un entier).`,
+      skill: IDS, level: 5, prompt: t('Résous {e} dans ℝ (k désigne un entier).', { e: MT(start) }),
       start, judge: PERIODIC(), mode: 'free', script, hints: [], subgoals: ID_SUB, keys: KEYS, key: `${IDS}:solve:${start}`, exam,
     });
   }
@@ -476,15 +477,15 @@ function idSolve(rng, exam) {
 function idExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'sin(a+b)=sin(a)+sin(b)', truth: false, ans: { a: 'π/2', b: 'π/2' }, rule: 'g3_linear', expl: 'Faux : avec a = b = π/2, sin π = 0 mais sin(π/2) + sin(π/2) = 2.' },
-      { s: 'cos(2a)=2cos(a)', truth: false, ans: { a: '0', b: '0' }, rule: 'g3_linear', expl: 'Faux : avec a = 0, cos 0 = 1 mais 2 cos 0 = 2.' },
-      { s: 'cos(a+b)=cos(a)cos(b)+sin(a)sin(b)', truth: false, ans: { a: 'π/4', b: 'π/4' }, rule: 'g3_add_sign', expl: 'Faux : avec a = b = π/4, cos(π/2) = 0 mais 1/2 + 1/2 = 1. C\'est un moins.' },
-      { s: 'cos(2a)=1-2sin(a)^2', truth: true, expl: 'Vrai : cos 2a = cos²a − sin²a = 1 − 2sin²a.' },
-      { s: 'sin(2a)=2sin(a)cos(a)', truth: true, expl: 'Vrai : c\'est sin(a + a).' },
+      { s: 'sin(a+b)=sin(a)+sin(b)', truth: false, ans: { a: 'π/2', b: 'π/2' }, rule: 'g3_linear', expl: t('Faux : avec a = b = π/2, sin π = 0 mais sin(π/2) + sin(π/2) = 2.') },
+      { s: 'cos(2a)=2cos(a)', truth: false, ans: { a: '0', b: '0' }, rule: 'g3_linear', expl: t('Faux : avec a = 0, cos 0 = 1 mais 2 cos 0 = 2.') },
+      { s: 'cos(a+b)=cos(a)cos(b)+sin(a)sin(b)', truth: false, ans: { a: 'π/4', b: 'π/4' }, rule: 'g3_add_sign', expl: t('Faux : avec a = b = π/4, cos(π/2) = 0 mais 1/2 + 1/2 = 1. C\'est un moins.') },
+      { s: 'cos(2a)=1-2sin(a)^2', truth: true, expl: t('Vrai : cos 2a = cos²a − sin²a = 1 − 2sin²a.') },
+      { s: 'sin(2a)=2sin(a)cos(a)', truth: true, expl: t('Vrai : c\'est sin(a + a).') },
     ];
     const b = rng.pick(bank);
     return tfItem({
-      skill: IDS, level: 4, statement: `Pour tous a, b réels, ${MT(b.s, { vars: ['a', 'b'] })}.`, truth: b.truth, key: b.s, explanation: b.expl,
+      skill: IDS, level: 4, statement: t('Pour tous a, b réels, {s}.', { s: MT(b.s, { vars: ['a', 'b'] }) }), truth: b.truth, key: b.s, explanation: b.expl,
       counter: b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }], pred: b.s, ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: b.ans },
       ruleIfTrue: b.truth ? null : b.rule, exam: { format: 'tf', points: 1 },
     });
@@ -507,7 +508,7 @@ function idExam(rng, exam) {
   const lhs = `${which.slice(0, 3)}(${aa}${s}${bb})`;
   return mcq({
     skill: IDS, level: 4, prompt: `${MT(lhs, vars)} = ?`, options, key: `mcq:${lhs}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `${MT(lhs, vars)} = ${MT(right, vars)}`, note: 'Formulaire' }],
+    solution: [{ html: `${MT(lhs, vars)} = ${MT(right, vars)}`, note: t('Formulaire') }],
   }, rng);
 }
 
@@ -554,19 +555,19 @@ function exactLines(d) {
   const vB = (f) => trigVal(f, d.b);
   const P = (t) => `(${t})`;
   const lines = [];
-  if (d.reduced) lines.push({ math: `${d.f}(${piT(modQ(d.k, q(2)))})`, note: 'Retirer un tour', subgoal: 'decompose' });
-  lines.push({ math: `${d.f}(${A}${s}${B})`, note: 'Décomposer', subgoal: 'decompose' });
+  if (d.reduced) lines.push({ math: `${d.f}(${piT(modQ(d.k, q(2)))})`, note: t('Retirer un tour'), subgoal: 'decompose' });
+  lines.push({ math: `${d.f}(${A}${s}${B})`, note: t('Décomposer'), subgoal: 'decompose' });
   if (d.f === 'cos') {
-    lines.push({ math: `cos(${A})cos(${B})${o}sin(${A})sin(${B})`, note: 'Formule d\'addition', subgoal: 'formula' });
-    lines.push({ math: `${P(vA('cos'))}${P(vB('cos'))}${o}${P(vA('sin'))}${P(vB('sin'))}`, note: 'Valeurs connues', subgoal: 'value' });
+    lines.push({ math: `cos(${A})cos(${B})${o}sin(${A})sin(${B})`, note: t('Formule d\'addition'), subgoal: 'formula' });
+    lines.push({ math: `${P(vA('cos'))}${P(vB('cos'))}${o}${P(vA('sin'))}${P(vB('sin'))}`, note: t('Valeurs connues'), subgoal: 'value' });
   } else if (d.f === 'sin') {
-    lines.push({ math: `sin(${A})cos(${B})${s}cos(${A})sin(${B})`, note: 'Formule d\'addition', subgoal: 'formula' });
-    lines.push({ math: `${P(vA('sin'))}${P(vB('cos'))}${s}${P(vA('cos'))}${P(vB('sin'))}`, note: 'Valeurs connues', subgoal: 'value' });
+    lines.push({ math: `sin(${A})cos(${B})${s}cos(${A})sin(${B})`, note: t('Formule d\'addition'), subgoal: 'formula' });
+    lines.push({ math: `${P(vA('sin'))}${P(vB('cos'))}${s}${P(vA('cos'))}${P(vB('sin'))}`, note: t('Valeurs connues'), subgoal: 'value' });
   } else {
-    lines.push({ math: `(tan(${A})${s}tan(${B}))/(1${o}tan(${A})tan(${B}))`, note: 'Formule d\'addition', subgoal: 'formula' });
-    lines.push({ math: `(${vA('tan')}${s}${P(vB('tan'))})/(1${o}${P(vA('tan'))}${P(vB('tan'))})`, note: 'Valeurs connues', subgoal: 'value' });
+    lines.push({ math: `(tan(${A})${s}tan(${B}))/(1${o}tan(${A})tan(${B}))`, note: t('Formule d\'addition'), subgoal: 'formula' });
+    lines.push({ math: `(${vA('tan')}${s}${P(vB('tan'))})/(1${o}${P(vA('tan'))}${P(vB('tan'))})`, note: t('Valeurs connues'), subgoal: 'value' });
   }
-  lines.push({ math: d.val, note: 'Simplifier', subgoal: 'simplify' });
+  lines.push({ math: d.val, note: t('Simplifier'), subgoal: 'simplify' });
   return lines;
 }
 
@@ -582,15 +583,15 @@ function exactItem(level, rng, opts = {}) {
     script = script.map((l, i) => (l.subgoal === 'value' ? { ...l, ...tpl(l.math, (n) => [n.r.t === 'bin' ? n.r.r : n.r]) } : l));
   }
   if (level === 2) {
-    script.unshift({ kind: 'decision', prompt: `Comment écrire ${fr(piT(d.k))} ?`, options: [
+    script.unshift({ kind: 'decision', prompt: t('Comment écrire {k} ?', { k: fr(piT(d.k)) }), options: [
       { id: 'sum', label: `${fr(piT(d.a))} ${d.s === '+' ? '+' : '−'} ${fr(piT(d.b))}`, valid: true },
-      { id: 'half', label: `La moitié de ${fr(piT(d.k.mul(2)))}`, valid: false, why: 'C\'est possible, mais la bissection donne une racine dans une racine : la somme d\'angles connus est plus simple ici.' },
-      { id: 'lin', label: `${d.f}(${fr(piT(d.a))}) ${d.s === '+' ? '+' : '−'} ${d.f}(${fr(piT(d.b))})`, valid: false, rule: 'g3_linear', why: `${d.f} n'est pas linéaire : il faut la formule d'addition.` },
+      { id: 'half', label: t('La moitié de {k}', { k: fr(piT(d.k.mul(2))) }), valid: false, why: t('C\'est possible, mais la bissection donne une racine dans une racine : la somme d\'angles connus est plus simple ici.') },
+      { id: 'lin', label: `${d.f}(${fr(piT(d.a))}) ${d.s === '+' ? '+' : '−'} ${d.f}(${fr(piT(d.b))})`, valid: false, rule: 'g3_linear', why: t('{f} n\'est pas linéaire : il faut la formule d\'addition.', { f: d.f }) },
     ] });
   }
   const mode = level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free';
   return linesItem({
-    skill: EXACT, level, prompt: `Calcule ${MT(start)} sans calculatrice (valeur exacte).`,
+    skill: EXACT, level, prompt: t('Calcule {e} sans calculatrice (valeur exacte).', { e: MT(start) }),
     start, judge: { kind: 'equiv', vars: [], target: 'exact' }, mode, script,
     hints: [
       { level: 1, html: `${MT(piT(d.k))} = ${MT(`${piT(d.a)}${d.s}${piT(d.b)}`)}.` },
@@ -602,10 +603,10 @@ function exactItem(level, rng, opts = {}) {
 }
 
 const EXACT_SUB = [
-  { id: 'decompose', label: 'décomposer', skill: EXACT },
-  { id: 'formula', label: 'formule d\'addition', skill: IDS },
-  { id: 'value', label: 'valeurs connues', skill: RED },
-  { id: 'simplify', label: 'simplifier', skill: 'root-rules' },
+  { id: 'decompose', label: t('décomposer'), skill: EXACT },
+  { id: 'formula', label: t('formule d\'addition'), skill: IDS },
+  { id: 'value', label: t('valeurs connues'), skill: RED },
+  { id: 'simplify', label: t('simplifier'), skill: 'root-rules' },
 ];
 
 // Level 5: sin x given with its quadrant; sin 2x and cos 2x.
@@ -623,15 +624,15 @@ function exactDouble(rng, exam) {
   const sin2 = sinV.mul(cosV).mul(2);
   const cos2 = q(1).sub(sinV.mul(sinV).mul(2));
   const script = [
-    { kind: 'eq', math: `${cosS < 0 ? '-' : ''}√(1-${s * s}/${c * c})`, note: `cos x ${cosS < 0 ? '< 0' : '> 0'} sur ${dom}`, subgoal: 'value' },
+    { kind: 'eq', math: `${cosS < 0 ? '-' : ''}√(1-${s * s}/${c * c})`, note: t('cos x {c} sur {dom}', { c: cosS < 0 ? '< 0' : '> 0', dom }), subgoal: 'value' },
     { kind: 'eq', math: lit0(cosV), note: 'cos x', subgoal: 'value' },
     { kind: 'segment', html: 'sin 2x = 2 sin x cos x :', ask: 'sin(2x) =', start: { math: `2×(${lit0(sinV)})×(${lit0(cosV)})` }, judge: { kind: 'value', form: 'exact' } },
-    { kind: 'eq', math: lit0(sin2), note: 'Angle double', subgoal: 'formula' },
+    { kind: 'eq', math: lit0(sin2), note: t('Angle double'), subgoal: 'formula' },
     { kind: 'segment', html: 'cos 2x = 1 − 2sin²x :', ask: 'cos(2x) =', start: { math: `1-2×(${lit0(sinV)})^2` }, judge: { kind: 'value', form: 'exact' } },
-    { kind: 'eq', math: lit0(cos2), note: 'Angle double', subgoal: 'formula' },
+    { kind: 'eq', math: lit0(cos2), note: t('Angle double'), subgoal: 'formula' },
   ];
   return linesItem({
-    skill: EXACT, level: 5, prompt: `On sait que sin x = ${fr(lit0(sinV))} et x ∈ ${dom}. Calcule cos x, sin 2x et cos 2x.`,
+    skill: EXACT, level: 5, prompt: t('On sait que sin x = {s} et x ∈ {dom}. Calcule cos x, sin 2x et cos 2x.', { s: fr(lit0(sinV)), dom }),
     start: 'cos(x)', judge: { kind: 'value', form: 'exact', expect: lit0(cosV) }, mode: 'free', script, hints: [],
     subgoals: EXACT_SUB, keys: KEYS, key: `${EXACT}:double:${lit0(sinV)}:${quad}`, exam,
   });

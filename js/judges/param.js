@@ -26,6 +26,7 @@ import { walk } from '../cas/ast.js';
 import { evalFloat } from '../cas/numeric.js';
 import { readParam, compile, compareCurve, compareSurface, someOnCurve, someOnSurface, splitTop, normText } from '../cas/paramgeo.js';
 import { diagnoseLine } from './diagnose.js';
+import { t } from '../i18n.js';
 
 export const sign = '=';
 
@@ -73,7 +74,7 @@ function boundML(x) {
 
 // MathML of the line's text, piece by piece (bounds as typed).
 function lineML(cfg, text, blanks = null) {
-  const t = normText(text).replace(/^=\s*/, '');
+  const tt = normText(text).replace(/^=\s*/, '');
   const offset = { n: 0 };
   const exprML = (s, vars) => {
     const node = parse(s, { vars, complex: !!cfg.complex });
@@ -81,7 +82,7 @@ function lineML(cfg, text, blanks = null) {
     return inner(toMathML(node, blanks ? { blanks } : {}));
   };
   const letters = ['t', 's', 'u', 'v', 'θ', 'φ', 'r', 'x', 'y', 'ρ', 'ψ'];
-  const pieces = splitTop(t, [', ', ',', ' pour ']);
+  const pieces = splitTop(tt, [', ', ',', ' pour ']);
   const out = [];
   for (const piece of pieces) {
     if (!piece) continue;
@@ -153,27 +154,27 @@ export function check(cfg, par) {
   if (!obj) return { partial: true };
   const any = cfg.orientation === 'any';
   if (ref.kind === 'curve') {
-    if (!(obj.lo < obj.hi)) return { ok: false, rule: 'v_param_bounds', message: 'La borne de gauche doit être plus petite que celle de droite.' };
+    if (!(obj.lo < obj.hi)) return { ok: false, rule: 'v_param_bounds', message: t('La borne de gauche doit être plus petite que celle de droite.') };
     const r = compareCurve(obj, ref);
     if (!r.on) {
       // On the curve carried further (the same formula on a longer interval): bounds too wide.
       const L = ref.hi - ref.lo;
       const wide = compareCurve(obj, { ...ref, lo: ref.lo - L, hi: ref.hi + L, closed: false });
-      if (wide.on && !ref.closed) return { ok: false, rule: 'v_param_bounds', message: 'Ta courbe dépasse Γ : vérifie les bornes.' };
-      return { ok: false, rule: null, message: 'Des points de ta courbe ne sont pas sur Γ.' };
+      if (wide.on && !ref.closed) return { ok: false, rule: 'v_param_bounds', message: t('Ta courbe dépasse Γ : vérifie les bornes.') };
+      return { ok: false, rule: null, message: t('Des points de ta courbe ne sont pas sur Γ.') };
     }
-    if (!r.covers) return { ok: false, rule: 'v_param_bounds', message: 'Ta courbe ne parcourt pas tout Γ : vérifie les bornes.' };
-    if (ref.closed && r.tours > 1.5) return { ok: false, rule: 'v_param_bounds', message: `Ta courbe fait ${Math.round(r.tours)} tours : un seul suffit.` };
-    if (r.orient === 0) return { ok: false, rule: null, message: 'Ta courbe repasse par les mêmes points : elle doit avancer dans un seul sens.' };
-    if (!any && r.orient < 0) return { ok: false, rule: 'v_orientation_reversed', message: 'Ta courbe est parcourue dans l\'autre sens.' };
+    if (!r.covers) return { ok: false, rule: 'v_param_bounds', message: t('Ta courbe ne parcourt pas tout Γ : vérifie les bornes.') };
+    if (ref.closed && r.tours > 1.5) return { ok: false, rule: 'v_param_bounds', message: t('Ta courbe fait {a} tours : un seul suffit.', { a: Math.round(r.tours) }) };
+    if (r.orient === 0) return { ok: false, rule: null, message: t('Ta courbe repasse par les mêmes points : elle doit avancer dans un seul sens.') };
+    if (!any && r.orient < 0) return { ok: false, rule: 'v_orientation_reversed', message: t('Ta courbe est parcourue dans l\'autre sens.') };
     return { ok: true, result: r };
   }
-  if (!(obj.u[0] < obj.u[1] && obj.v[0] < obj.v[1])) return { ok: false, rule: 'v_surf_domain', message: 'Chaque intervalle s\'écrit [a ; b] avec a < b.' };
+  if (!(obj.u[0] < obj.u[1] && obj.v[0] < obj.v[1])) return { ok: false, rule: 'v_surf_domain', message: t('Chaque intervalle s\'écrit [a ; b] avec a < b.') };
   const r = compareSurface(obj, ref);
-  if (!r.on) return { ok: false, rule: r.covers ? 'v_surf_domain' : null, message: 'Des points de ta surface ne sont pas sur Σ : vérifie la paramétrisation et le domaine.' };
-  if (!r.covers) return { ok: false, rule: 'v_surf_domain', message: 'Ta paramétrisation ne couvre pas toute la surface : vérifie le domaine des paramètres.' };
-  if (!any && r.orient < 0) return { ok: false, rule: 'v_cross_order', message: 'Ta normale σ_u ∧ σ_v pointe dans l\'autre sens : échange l\'ordre des paramètres, ou change le sens de l\'un.' };
-  if (!any && r.orient === 0) return { ok: false, rule: null, message: 'Ta paramétrisation n\'a pas une normale de sens constant.' };
+  if (!r.on) return { ok: false, rule: r.covers ? 'v_surf_domain' : null, message: t('Des points de ta surface ne sont pas sur Σ : vérifie la paramétrisation et le domaine.') };
+  if (!r.covers) return { ok: false, rule: 'v_surf_domain', message: t('Ta paramétrisation ne couvre pas toute la surface : vérifie le domaine des paramètres.') };
+  if (!any && r.orient < 0) return { ok: false, rule: 'v_cross_order', message: t('Ta normale σ_u ∧ σ_v pointe dans l\'autre sens : échange l\'ordre des paramètres, ou change le sens de l\'un.') };
+  if (!any && r.orient === 0) return { ok: false, rule: null, message: t('Ta paramétrisation n\'a pas une normale de sens constant.') };
   return { ok: true, result: r };
 }
 
@@ -211,21 +212,21 @@ export function judgeLine(cfg, prev, input, state = {}) {
   else {
     try { node = readStrict(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   let par = node.par;
   if (!par.comps) {
     // Bounds alone: with the parametrisation of an earlier line.
-    if (!state.par) return { kind: 'form', node, message: 'Écris d\'abord la paramétrisation : γ(t) = (… ; …).' };
+    if (!state.par) return { kind: 'form', node, message: t('Écris d\'abord la paramétrisation : γ(t) = (… ; …).') };
     par = { ...state.par, bounds: { ...state.par.bounds, ...par.bounds } };
   }
   const r = check(cfg, par);
   if (r.partial) {
-    if (!par.comps) return { kind: 'form', node, message: 'Il manque un intervalle.' };
+    if (!par.comps) return { kind: 'form', node, message: t('Il manque un intervalle.') };
     if (!partialOk(cfg, par)) {
-      return { kind: 'wrong', node, rule: null, message: cfg.surface ? 'Ta paramétrisation ne décrit pas cette surface.' : 'Ta paramétrisation ne décrit pas cette courbe.' };
+      return { kind: 'wrong', node, rule: null, message: cfg.surface ? t('Ta paramétrisation ne décrit pas cette surface.') : t('Ta paramétrisation ne décrit pas cette courbe.') };
     }
     state.par = par;
-    return { kind: 'ok', node, message: 'Donne maintenant les bornes.' };
+    return { kind: 'ok', node, message: t('Donne maintenant les bornes.') };
   }
   if (!r.ok) {
     const diag = diagnoseLine('param', prev, { ...node, par }, cfg, (cand, n) => sameObject(cfg, cand, n));

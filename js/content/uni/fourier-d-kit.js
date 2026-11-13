@@ -24,6 +24,7 @@ import { Q } from '../../math/rational.js';
 import { partsItem, H, modeOf } from './geo-kit.js';
 import { mcq, MT } from './kit.js';
 import { problemItem } from './kit-problem.js';
+import { t } from '../../i18n.js';
 
 export { H, modeOf, MT, problemItem };
 
@@ -46,9 +47,9 @@ export function term(c, body) {
   return `${C.n < 0 ? '-' : ''}(${Math.abs(C.n)}/${C.d})${body}`;
 }
 // Terms joined into a sum, empty ones skipped ('0' if none).
-export const sumT = (terms) => terms.filter((t) => t && t !== '0').reduce((s, t) => (s ? (t.startsWith('-') ? `${s}${t}` : `${s}+${t}`) : t), '') || '0';
+export const sumT = (terms) => terms.filter((tt) => tt && tt !== '0').reduce((s, tt) => (s ? (tt.startsWith('-') ? `${s}${tt}` : `${s}+${tt}`) : tt), '') || '0';
 // Readable text: − for -.
-export const rd = (t) => String(t).replace(/-/g, '−');
+export const rd = (tt) => String(tt).replace(/-/g, '−');
 // A rational times π^p as text: 'π', '3π', '9π^2/4', '(1/4)'… (p = 0: the number).
 export function piT(c, p = 1) {
   const C = q(c);
@@ -61,10 +62,10 @@ export function piT(c, p = 1) {
 }
 // e^(−r·t) as text, r a text ('16', 'n^2', '9π^2/4+1'); brackets only
 // around a sum or a fraction.
-export function decay(r, t = 't') {
+export function decay(r, tt = 't') {
   if (r === '0') return '';
-  if (r === '1') return `e^(-${t})`;
-  return /[+\-/]/.test(r.replace(/^-/, '')) ? `e^(-(${r})${t})` : `e^(-${r}${t})`;
+  if (r === '1') return `e^(-${tt})`;
+  return /[+\-/]/.test(r.replace(/^-/, '')) ? `e^(-(${r})${tt})` : `e^(-${r}${tt})`;
 }
 // c·f as a product text with the factor in front ('3sin(x)', '-cos(2x)').
 export const times = (c, f) => term(c, f);
@@ -96,7 +97,7 @@ function menuOf(parts, k) {
   const others = [];
   parts.forEach((o, i) => {
     if (i === k || !o.action || o.action === p.action) return;
-    others.push({ id: `a${i}`, label: o.action, valid: false, why: i < k ? 'C\'est déjà fait.' : 'Pas encore : il faut d\'abord la grandeur demandée maintenant.' });
+    others.push({ id: `a${i}`, label: o.action, valid: false, why: i < k ? t('C\'est déjà fait.') : t('Pas encore : il faut d\'abord la grandeur demandée maintenant.') });
   });
   const wrong = (p.wrongActions || []).map((w, j) => ({ id: `w${j}`, label: w.label, valid: false, why: w.why, ...(w.rule ? { rule: w.rule } : {}) }));
   return [...out, ...[...wrong, ...others].slice(0, 3)];
@@ -156,7 +157,7 @@ export function mcqMulti(o, rng) {
     if (!w || options.some((x) => x.html === w.html)) continue;
     options.push({ html: w.html, correct: false, rule: w.rule ?? null });
   }
-  const it = mcq({ ...o, options, multi: true, prompt: `${o.prompt} <i>(plusieurs réponses possibles)</i>` }, rng);
+  const it = mcq({ ...o, options, multi: true, prompt: t('{prompt} <i>(plusieurs réponses possibles)</i>', { prompt: o.prompt }) }, rng);
   it.baits = [...new Set(options.map((x) => x.rule).filter(Boolean))];
   return it;
 }

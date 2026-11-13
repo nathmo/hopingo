@@ -8,19 +8,20 @@
 import { Q } from '../../math/rational.js';
 import { tfItem } from './kit.js';
 import { N, nz, H, E, examOf, kx, joinSum, P, blanked, partsItem, mcqOf, vfItem, ML, RD } from './analyse1-b-common.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a1-mvt';
 const KEYS = ['calcx', 'letters', 'relation'];
 const SUB = [
-  { id: 'deriv', label: 'dériver f', skill: 'a1-deriv-rules' },
-  { id: 'image', label: 'image de f′ sur l\'intervalle', skill: 'a1-fn-image' },
-  { id: 'conclude', label: 'conclure par le TAF', skill: SK },
+  { id: 'deriv', label: t('dériver f'), skill: 'a1-deriv-rules' },
+  { id: 'image', label: t('image de f′ sur l\'intervalle'), skill: 'a1-fn-image' },
+  { id: 'conclude', label: t('conclure par le TAF'), skill: SK },
 ];
 const CHOICES = [
-  { id: 'deriv', label: 'Dériver f' },
-  { id: 'min', label: 'Minorer f′(c) : sa plus petite valeur sur l\'intervalle' },
-  { id: 'max', label: 'Majorer f′(c) : sa plus grande valeur sur l\'intervalle' },
-  { id: 'fvals', label: 'Calculer f aux bornes de l\'intervalle', rule: 'a1_mvt_endpoints_values', why: 'Le taux d\'accroissement est une valeur de f′, pas de f.' },
+  { id: 'deriv', label: t('Dériver f') },
+  { id: 'min', label: t('Minorer f′(c) : sa plus petite valeur sur l\'intervalle') },
+  { id: 'max', label: t('Majorer f′(c) : sa plus grande valeur sur l\'intervalle') },
+  { id: 'fvals', label: t('Calculer f aux bornes de l\'intervalle'), rule: 'a1_mvt_endpoints_values', why: t('Le taux d\'accroissement est une valeur de f′, pas de f.') },
 ];
 const RATE = '(f(x) − f(y))/(x − y)';
 
@@ -61,12 +62,12 @@ const I = (D) => `]${RD(D.p)} ; ${RD(D.q)}[`;
 
 function tafDecision(D) {
   return {
-    kind: 'decision', prompt: `Que dit le théorème des accroissements finis sur ${RATE} ?`,
+    kind: 'decision', prompt: t('Que dit le théorème des accroissements finis sur {RATE} ?', { RATE }),
     options: [
-      { id: 'taf', label: `${RATE} = f′(c) pour un c entre x et y`, valid: true },
-      { id: 'rolle', label: `Rolle : f′(c) = 0 pour un c, donc le taux vaut 0`, valid: false, rule: 'a1_rolle_without_hyp', why: 'Rolle demande f(x) = f(y) : ce n\'est pas le cas en général.' },
-      { id: 'fvals', label: `Le taux est compris entre f(${RD(D.p)}) et f(${RD(D.q)})`, valid: false, rule: 'a1_mvt_endpoints_values', why: 'Le taux d\'accroissement est une pente, une valeur de f′ : on encadre f′, pas f.' },
-      { id: 'tvi', label: 'TVI : f prend toutes les valeurs entre f(x) et f(y)', valid: false, why: 'Le TVI parle des valeurs de f ; le taux est une pente : c\'est le TAF.' },
+      { id: 'taf', label: t('{RATE} = f′(c) pour un c entre x et y', { RATE }), valid: true },
+      { id: 'rolle', label: t('Rolle : f′(c) = 0 pour un c, donc le taux vaut 0'), valid: false, rule: 'a1_rolle_without_hyp', why: t('Rolle demande f(x) = f(y) : ce n\'est pas le cas en général.') },
+      { id: 'fvals', label: t('Le taux est compris entre f({p}) et f({q})', { p: RD(D.p), q: RD(D.q) }), valid: false, rule: 'a1_mvt_endpoints_values', why: t('Le taux d\'accroissement est une pente, une valeur de f′ : on encadre f′, pas f.') },
+      { id: 'tvi', label: t('TVI : f prend toutes les valeurs entre f(x) et f(y)'), valid: false, why: t('Le TVI parle des valeurs de f ; le taux est une pente : c\'est le TAF.') },
     ],
   };
 }
@@ -82,25 +83,25 @@ function mvtLines(level, rng, opts) {
   let minLines;
   let maxLines;
   if (D.kind === 'quad') {
-    minLines = guided ? [blanked(E(atText(D, D.atLo), `f′ est affine : sa plus petite valeur est en c = ${RD(D.atLo)}`, 'image', 'min'), [N(D.atLo)]), E(N(D.lo), 'Calculer', 'conclude', 'min')] : [E(N(D.lo), `f′ est affine : minimum en c = ${RD(D.atLo)}`, 'conclude', 'min')];
-    maxLines = guided ? [blanked(E(atText(D, D.atHi), `Plus grande valeur en c = ${RD(D.atHi)}`, 'image', 'max'), [N(D.atHi)]), E(N(D.hi), 'Calculer', 'conclude', 'max')] : [E(N(D.hi), `Maximum en c = ${RD(D.atHi)}`, 'conclude', 'max')];
+    minLines = guided ? [blanked(E(atText(D, D.atLo), t('f′ est affine : sa plus petite valeur est en c = {atLo}', { atLo: RD(D.atLo) }), 'image', 'min'), [N(D.atLo)]), E(N(D.lo), t('Calculer'), 'conclude', 'min')] : [E(N(D.lo), t('f′ est affine : minimum en c = {atLo}', { atLo: RD(D.atLo) }), 'conclude', 'min')];
+    maxLines = guided ? [blanked(E(atText(D, D.atHi), t('Plus grande valeur en c = {atHi}', { atHi: RD(D.atHi) }), 'image', 'max'), [N(D.atHi)]), E(N(D.hi), t('Calculer'), 'conclude', 'max')] : [E(N(D.hi), t('Maximum en c = {atHi}', { atHi: RD(D.atHi) }), 'conclude', 'max')];
   } else {
     minLines = [E(N(D.lo), 'c² ≥ 0', 'conclude', 'min')];
-    maxLines = [E(N(D.hi), `c² ≤ ${D.far * D.far} sur ${I(D)}`, 'conclude', 'max')];
+    maxLines = [E(N(D.hi), t('c² ≤ {p1} sur {D}', { p1: D.far * D.far, D: I(D) }), 'conclude', 'max')];
   }
-  const derive = { start: `d(${f})`, html: 'Dérive f :', judge: { kind: 'equiv', vars: ['x'], domain: { x: [-3, 3] }, target: 'no-prime' }, lines: [level === 2 ? blanked(E(fp, 'Dériver', 'deriv', 'deriv'), [kx(2 * D.a, 'x')]) : E(fp, 'Dériver', 'deriv', 'deriv')] };
-  const minPart = { start: fc, judge: bound('≥'), html: `Pour c ∈ ${I(D)}, minore f′(c) au plus juste :`, ask: 'f′(c) ≥', lines: minLines };
-  const maxPart = { start: fc, judge: bound('≤'), html: `Pour c ∈ ${I(D)}, majore f′(c) au plus juste :`, ask: 'f′(c) ≤', lines: maxLines };
+  const derive = { start: `d(${f})`, html: t('Dérive f :'), judge: { kind: 'equiv', vars: ['x'], domain: { x: [-3, 3] }, target: 'no-prime' }, lines: [level === 2 ? blanked(E(fp, t('Dériver'), 'deriv', 'deriv'), [kx(2 * D.a, 'x')]) : E(fp, t('Dériver'), 'deriv', 'deriv')] };
+  const minPart = { start: fc, judge: bound('≥'), html: t('Pour c ∈ {D}, minore f′(c) au plus juste :', { D: I(D) }), ask: 'f′(c) ≥', lines: minLines };
+  const maxPart = { start: fc, judge: bound('≤'), html: t('Pour c ∈ {D}, majore f′(c) au plus juste :', { D: I(D) }), ask: 'f′(c) ≤', lines: maxLines };
   const parts = level === 1 ? [minPart, maxPart] : [derive, minPart, maxPart];
   const before = level === 1
-    ? [{ kind: 'note', html: `TAF : ${RATE} = f′(c) pour un c entre x et y. Ici f′(x) = ${ML(fp)}.` }]
+    ? [{ kind: 'note', html: t('TAF : {RATE} = f′(c) pour un c entre x et y. Ici f′(x) = {fp}.', { RATE, fp: ML(fp) }) }]
     : [tafDecision(D)];
   const prompt = rng.chance(0.5)
-    ? `Soit f(x) = ${ML(f)}. Encadre ${RATE} pour x ≠ y dans ${I(D)}, au plus juste.`
-    : `Soit f(x) = ${ML(f)} sur ${I(D)}. Trouve le plus grand m et le plus petit M tels que m ≤ ${RATE} ≤ M pour tous x ≠ y de l'intervalle.`;
+    ? t('Soit f(x) = {f}. Encadre {RATE} pour x ≠ y dans {D}, au plus juste.', { f: ML(f), RATE, D: I(D) })
+    : t('Soit f(x) = {f} sur {D}. Trouve le plus grand m et le plus petit M tels que m ≤ {RATE} ≤ M pour tous x ≠ y de l\'intervalle.', { f: ML(f), D: I(D), RATE });
   return partsItem({
     skill: SK, level, prompt, parts, before, choices: CHOICES,
-    hints: H('Le taux d\'accroissement est une valeur de f′ : encadre f′ sur l\'intervalle.', `f′(c) = ${ML(fc, ['c'])} ∈ [▢ ; ▢]`, `${RD(D.lo)} ≤ f′(c) ≤ ${RD(D.hi)}, donc ${RD(D.lo)} ≤ ${RATE} ≤ ${RD(D.hi)}.`),
+    hints: H(t('Le taux d\'accroissement est une valeur de f′ : encadre f′ sur l\'intervalle.'), `f′(c) = ${ML(fc, ['c'])} ∈ [▢ ; ▢]`, t('{lo} ≤ f′(c) ≤ {hi}, donc {lo2} ≤ {RATE} ≤ {hi2}.', { lo: RD(D.lo), hi: RD(D.hi), lo2: RD(D.lo), RATE, hi2: RD(D.hi) })),
     subgoals: SUB, keys: KEYS, key: `${SK}:${f}:${D.p}:${D.q}:${level}`, exam: examOf(opts), fallback: D.fallback,
   });
 }
@@ -117,14 +118,14 @@ function mcqVariant(rng, opts) {
     const options = [
       { html: r(D.lo, D.hi), correct: true },
       { html: r(Math.min(fa, fb), Math.max(fa, fb)), correct: false, rule: 'a1_mvt_endpoints_values' },
-      { html: `${RATE} = 0, par le théorème de Rolle`, correct: false, rule: 'a1_rolle_without_hyp' },
+      { html: t('{RATE} = 0, par le théorème de Rolle', { RATE }), correct: false, rule: 'a1_rolle_without_hyp' },
       { html: r(-D.hi, -D.lo), correct: false },
       { html: r(D.lo - 2, D.hi + 2), correct: false },
     ];
     return mcqOf({
-      skill: SK, level: 4, prompt: `Soit f(x) = ${ML(f)}. Pour tous x ≠ y dans ${I(D)}, quel est le meilleur encadrement ?`,
+      skill: SK, level: 4, prompt: t('Soit f(x) = {f}. Pour tous x ≠ y dans {D}, quel est le meilleur encadrement ?', { f: ML(f), D: I(D) }),
       options, key: `mcq:${f}:${D.p}:${D.q}`, expectedSec: 240, exam: examOf(opts),
-      solution: [{ html: `TAF : ${RATE} = f′(c) avec c entre x et y. f′(c) = ${ML(dText(D, 'c'), ['c'])} est affine : sur ${I(D)}, elle reste entre ${RD(D.lo)} et ${RD(D.hi)}.`, note: '' }],
+      solution: [{ html: t('TAF : {RATE} = f′(c) avec c entre x et y. f′(c) = {p1} est affine : sur {D}, elle reste entre {lo} et {hi}.', { RATE, p1: ML(dText(D, 'c'), ['c']), D: I(D), lo: RD(D.lo), hi: RD(D.hi) }), note: '' }],
       fallback: D.fallback,
     }, rng);
   }
@@ -141,9 +142,9 @@ function mcqVariant(rng, opts) {
     { html: `f(${L}) ≥ ${RD(w + 1)}`, correct: false },
   ];
   return mcqOf({
-    skill: SK, level: 4, prompt: `f est dérivable sur ℝ, f(0) = ${RD(a)} et f′(x) ≥ ${RD(k)} pour tout x. Que peut-on affirmer ?`,
+    skill: SK, level: 4, prompt: t('f est dérivable sur ℝ, f(0) = {a} et f′(x) ≥ {k} pour tout x. Que peut-on affirmer ?', { a: RD(a), k: RD(k) }),
     options, key: `mcq:b:${k}:${a}:${L}`, expectedSec: 240, exam: examOf(opts),
-    solution: [{ html: `TAF sur [0 ; ${L}] : f(${L}) − f(0) = ${L}·f′(c) ≥ ${RD(k * L)}, donc f(${L}) ≥ ${RD(a)} + ${RD(k * L)} = ${RD(w)}.`, note: '' }],
+    solution: [{ html: t('TAF sur [0 ; {L}] : f({L}) − f(0) = {L}·f′(c) ≥ {p1}, donc f({L}) ≥ {a} + {p2} = {w}.', { L, p1: RD(k * L), a: RD(a), p2: RD(k * L), w: RD(w) }), note: '' }],
   }, rng);
 }
 
@@ -174,16 +175,16 @@ function lipschitzTf(rng, opts) {
     const at = Math.abs(D.lo) > Math.abs(D.hi) ? D.atLo : D.atHi;
     return tfItem({
       skill: SK, level: 4, key: `lip:${f}:${D.p}:${D.q}:${K}`,
-      statement: `Pour f(x) = ${ML(f)} et tous x, y ∈ [${RD(D.p)} ; ${RD(D.q)}] : |f(x) − f(y)| ≤ ${K}·|x − y|.`,
+      statement: t('Pour f(x) = {f} et tous x, y ∈ [{p} ; {q}] : |f(x) − f(y)| ≤ {K}·|x − y|.', { f: ML(f), p: RD(D.p), q: RD(D.q), K }),
       truth,
       counter: truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }, { q: '∀', v: 'y', dom: 'R' }], pred, hyp, ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer },
-      explanation: `TAF : |f(x) − f(y)| = |f′(c)|·|x − y|, et |f′| vaut au plus ${M} sur l'intervalle (en ${RD(at)}). ${truth ? 'Vrai.' : `Faux : ${K} < ${M}, l'inégalité casse près de ${RD(at)}.`}`,
+      explanation: t('TAF : |f(x) − f(y)| = |f′(c)|·|x − y|, et |f′| vaut au plus {M} sur l\'intervalle (en {at}). {p1}', { M, at: RD(at), p1: truth ? t('Vrai.') : t('Faux : {K} < {M}, l\'inégalité casse près de {at}.', { K, M, at: RD(at) }) }),
       exam: examOf(opts),
     });
   }
   return tfItem({
-    skill: SK, level: 4, key: 'lip:sin', statement: 'Pour tous x, y réels : |sin x − sin y| ≤ |x − y|.', truth: true,
-    explanation: 'Vrai : TAF, |sin x − sin y| = |cos c|·|x − y| ≤ |x − y|.', exam: examOf(opts), fallback: true,
+    skill: SK, level: 4, key: 'lip:sin', statement: t('Pour tous x, y réels : |sin x − sin y| ≤ |x − y|.'), truth: true,
+    explanation: t('Vrai : TAF, |sin x − sin y| = |cos c|·|x − y| ≤ |x − y|.'), exam: examOf(opts), fallback: true,
   });
 }
 
@@ -197,7 +198,7 @@ const FIXED_TF = [
 function tfVariant(rng, opts) {
   if (rng.chance(0.5)) return lipschitzTf(rng, opts);
   const s = rng.pick(FIXED_TF);
-  return vfItem({ skill: SK, statement: s.statement, truth: s.truth, rule: s.rule, why: s.why, key: s.statement, exam: examOf(opts) }, rng);
+  return vfItem({ skill: SK, statement: t(s.statement), truth: s.truth, rule: s.rule, why: t(s.why), key: s.statement, exam: examOf(opts) }, rng);
 }
 
 export function mvtItem(level, rng, profile, opts = {}) {

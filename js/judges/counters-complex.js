@@ -13,6 +13,7 @@
 import { parse, tryParse } from '../cas/parse.js';
 import { stripParen } from '../cas/ast.js';
 import { evalComplex, cabs } from '../cas/complex.js';
+import { t } from '../i18n.js';
 
 const DOM_NAME = { R: 'ℝ', N: 'ℕ', 'N*': 'ℕ*', Z: 'ℤ' };
 
@@ -53,22 +54,22 @@ export function checkComplexCounter(counter, answers) {
   for (const v of counter.vars) {
     const label = counter.ask?.find((a) => a.v === v)?.label?.replace(/\s*=\s*$/, '') || v;
     const text = answers?.[v];
-    if (text === undefined || String(text).trim() === '') return { ok: false, message: `Donne une valeur pour ${label}.` };
+    if (text === undefined || String(text).trim() === '') return { ok: false, message: t('Donne une valeur pour {label}.', { label }) };
     const node = tryParse(String(text).replace(/^\s*[A-Za-zα-ω][₀-₉0-9_]*\s*=/, ''), { complex: true });
     const z = node && evalComplex(node);
-    if (!z) return { ok: false, message: `Je n'arrive pas à lire la valeur de ${label}.` };
+    if (!z) return { ok: false, message: t('Je n\'arrive pas à lire la valeur de {label}.', { label }) };
     const dom = counter.doms?.[v];
-    if (!inDom(z, dom)) return { ok: false, message: `${label} doit être dans ${DOM_NAME[dom] ?? 'le domaine'}.` };
+    if (!inDom(z, dom)) return { ok: false, message: t('{label} doit être dans {a}.', { label, a: DOM_NAME[dom] ?? t('le domaine') }) };
     env[v] = z;
   }
-  const read = (t) => parse(t, { complex: true, vars: counter.vars });
+  const read = (tt) => parse(tt, { complex: true, vars: counter.vars });
   if (counter.hyp) {
     const h = holds(read(counter.hyp), env);
-    if (h === null) return { ok: false, message: 'Avec ces valeurs, l\'énoncé n\'est pas défini (division par 0 ?).' };
-    if (!h) return { ok: false, message: 'Avec ces valeurs, l\'hypothèse est fausse : il faut qu\'elle soit vraie et la conclusion fausse.' };
+    if (h === null) return { ok: false, message: t('Avec ces valeurs, l\'énoncé n\'est pas défini (division par 0 ?).') };
+    if (!h) return { ok: false, message: t('Avec ces valeurs, l\'hypothèse est fausse : il faut qu\'elle soit vraie et la conclusion fausse.') };
   }
   const p = holds(read(counter.pred), env);
-  if (p === null) return { ok: false, message: 'Avec ces valeurs, l\'énoncé n\'est pas défini (division par 0 ?).' };
-  if (p) return { ok: false, message: 'Avec ces valeurs, l\'énoncé est vrai : ce n\'est pas un contre-exemple.' };
+  if (p === null) return { ok: false, message: t('Avec ces valeurs, l\'énoncé n\'est pas défini (division par 0 ?).') };
+  if (p) return { ok: false, message: t('Avec ces valeurs, l\'énoncé est vrai : ce n\'est pas un contre-exemple.') };
   return { ok: true };
 }

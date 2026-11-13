@@ -28,6 +28,7 @@ import { mapNode, symbolsIn } from '../cas/ast.js';
 import { compileFloat, evalFloat, seriesSum } from '../cas/numeric.js';
 import { limit } from '../cas/limit.js';
 import { Q } from '../math/rational.js';
+import { t as tr } from '../i18n.js';
 
 const F = (v) => (v instanceof Q ? v.n / v.d : v);
 
@@ -200,17 +201,28 @@ function fnProp(prop, node, counter) {
   }
 }
 
+// « {who} est bornée »: who is « la suite », « la fonction » or the
+// expression `of` (a + b).
 const SAY = {
-  converges: 'converge', diverges: 'diverge', bounded: 'est bornée', unbounded: 'n\'est pas bornée', toZero: 'tend vers 0',
-  toInf: 'tend vers +∞', increasing: 'est croissante', decreasing: 'est décroissante', monotone: 'est monotone',
-  positive: 'est positive', alternating: 'alterne de signe', seriesConverges: 'donne une série convergente',
-  seriesDiverges: 'donne une série divergente', absConverges: 'donne une série absolument convergente', limit: 'a la bonne limite',
-  eventuallyConstant: 'est constante à partir d\'un rang',
-  definedAt: 'est définie au point', continuousAt: 'est continue au point', limitAt: 'a une limite au point',
-  limitIs: 'a la bonne limite', differentiableAt: 'est dérivable au point', boundedOn: 'est bornée sur l\'intervalle',
-  continuousOn: 'est continue sur l\'intervalle', zeroIn: 's\'annule sur l\'intervalle', noZeroIn: 'ne s\'annule pas sur l\'intervalle',
+  converges: (who) => tr('{who} converge', { who }), diverges: (who) => tr('{who} diverge', { who }),
+  bounded: (who) => tr('{who} est bornée', { who }), unbounded: (who) => tr('{who} n\'est pas bornée', { who }),
+  toZero: (who) => tr('{who} tend vers 0', { who }), toInf: (who) => tr('{who} tend vers +∞', { who }),
+  increasing: (who) => tr('{who} est croissante', { who }), decreasing: (who) => tr('{who} est décroissante', { who }),
+  monotone: (who) => tr('{who} est monotone', { who }), positive: (who) => tr('{who} est positive', { who }),
+  alternating: (who) => tr('{who} alterne de signe', { who }), seriesConverges: (who) => tr('{who} donne une série convergente', { who }),
+  seriesDiverges: (who) => tr('{who} donne une série divergente', { who }), absConverges: (who) => tr('{who} donne une série absolument convergente', { who }),
+  limit: (who) => tr('{who} a la bonne limite', { who }), eventuallyConstant: (who) => tr('{who} est constante à partir d\'un rang', { who }),
+  definedAt: (who) => tr('{who} est définie au point', { who }), continuousAt: (who) => tr('{who} est continue au point', { who }),
+  limitAt: (who) => tr('{who} a une limite au point', { who }), limitIs: (who) => tr('{who} a la bonne limite', { who }),
+  differentiableAt: (who) => tr('{who} est dérivable au point', { who }), boundedOn: (who) => tr('{who} est bornée sur l\'intervalle', { who }),
+  continuousOn: (who) => tr('{who} est continue sur l\'intervalle', { who }), zeroIn: (who) => tr('{who} s\'annule sur l\'intervalle', { who }),
+  noZeroIn: (who) => tr('{who} ne s\'annule pas sur l\'intervalle', { who }),
 };
-const say = (prop, who) => prop.say || `${prop.of && prop.of.length > 1 ? prop.of : who} ${SAY[prop.p] ?? prop.p}`;
+const say = (prop, who) => {
+  if (prop.say) return prop.say;
+  const w = prop.of && prop.of.length > 1 ? prop.of : who;
+  return SAY[prop.p] ? SAY[prop.p](w) : `${w} ${prop.p}`;
+};
 
 export function checkSeqFn(counter, answers) {
   const isSeq = counter.kind === 'sequence';
@@ -220,22 +232,22 @@ export function checkSeqFn(counter, answers) {
   for (const name of names) {
     const raw = String(answers?.[name] ?? '').replace(/^\s*[a-zA-Z](_n|\(x\)|_\(n\))?\s*=/, '');
     const node = tryParse(raw, { vars: [v] });
-    if (!node) return { ok: false, message: 'Je n\'arrive pas à lire ta saisie.' };
+    if (!node) return { ok: false, message: tr('Je n\'arrive pas à lire ta saisie.') };
     const extra = [...symbolsIn(node)].filter((s) => s !== v);
-    if (extra.length) return { ok: false, message: `Écris une expression en ${v} seulement.` };
+    if (extra.length) return { ok: false, message: tr('Écris une expression en {v} seulement.', { v }) };
     nodes[name] = node;
   }
   const judge = isSeq ? seqProp : fnProp;
   for (const h of counter.hyp || []) {
     const e = exprOf(counter, h, nodes);
     const r = e ? judge(h, e, counter) : null;
-    if (r && r.undefined) return { ok: false, message: 'Ta suite n\'est pas définie pour tous les n.' };
-    if (r === null) return { ok: false, message: 'Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.' };
-    if (r === false) return { ok: false, rule: counter.hypRule ?? 'g9_counter_not_hyp', message: `Ton exemple ne vérifie pas l'hypothèse « ${say(h, isSeq ? 'la suite' : 'la fonction')} ».` };
+    if (r && r.undefined) return { ok: false, message: tr('Ta suite n\'est pas définie pour tous les n.') };
+    if (r === null) return { ok: false, message: tr('Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.') };
+    if (r === false) return { ok: false, rule: counter.hypRule ?? 'g9_counter_not_hyp', message: tr('Ton exemple ne vérifie pas l\'hypothèse « {h} ».', { h: say(h, isSeq ? tr('la suite') : tr('la fonction')) }) };
   }
   const e = exprOf(counter, counter.concl, nodes);
   const r = e ? judge(counter.concl, e, counter) : null;
-  if (r === null || (r && r.undefined)) return { ok: false, message: 'Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.' };
-  if (r === true) return { ok: false, message: `Avec ton exemple, la conclusion « ${say(counter.concl, isSeq ? 'la suite' : 'la fonction')} » est vraie : ce n'est pas un contre-exemple.` };
+  if (r === null || (r && r.undefined)) return { ok: false, message: tr('Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.') };
+  if (r === true) return { ok: false, message: tr('Avec ton exemple, la conclusion « {c} » est vraie : ce n\'est pas un contre-exemple.', { c: say(counter.concl, isSeq ? tr('la suite') : tr('la fonction')) }) };
   return { ok: true };
 }

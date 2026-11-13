@@ -25,7 +25,7 @@ export const sum = (xs) => xs.reduce((s, x) => s + x, 0);
 export const qsum = (xs) => xs.reduce((s, x) => s.add(q(x)), q(0));
 
 // « Interpréter » (convention 6): the right sentence and three traps, shuffled.
-export function interp(rng, right, wrongs, prompt = 'Interpréter : quelle phrase est juste ?') {
+export function interp(rng, right, wrongs, prompt = t('Interpréter : quelle phrase est juste ?')) {
   const options = rng.shuffle([{ html: right, correct: true }, ...wrongs.slice(0, 3).map(([html, rule]) => ({ html, correct: false, rule: rule ?? null }))]);
   return { prompt, options };
 }
@@ -34,8 +34,8 @@ export function interp(rng, right, wrongs, prompt = 'Interpréter : quelle phras
 // multiple choice « Vrai » / « Faux » (js/engine/exam.js makes it a tf item).
 export function vf({ skill, level = 4, statement, truth, rule = null, explanation = '', key, opts = {} }, rng) {
   const it = mcq({
-    skill, level, prompt: `Vrai ou faux ?<br>${statement}`, keepOrder: true, key: `vf:${key}`,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth, rule: truth ? rule : null }],
+    skill, level, prompt: `${t('Vrai ou faux ?')}<br>${statement}`, keepOrder: true, key: `vf:${key}`,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : rule }, { html: t('Faux'), correct: !truth, rule: truth ? rule : null }],
     solution: explanation ? [{ html: explanation, note: '' }] : [], exam: examTag(opts),
   }, rng);
   return it;
@@ -63,7 +63,7 @@ export function scatterSVG(points, { w = 260, h = 170, xlabel = '', ylabel = '',
   const dots = points.map(([x, y]) => `<circle cx="${X(x).toFixed(1)}" cy="${Y(y).toFixed(1)}" r="3" fill="#1c7ed6"/>`).join('');
   const axis = zero ? `<line x1="${pad}" y1="${Y(0).toFixed(1)}" x2="${w - pad}" y2="${Y(0).toFixed(1)}" stroke="#adb5bd" stroke-dasharray="4 3"/>` : '';
   const line = diag ? `<line x1="${X(x0).toFixed(1)}" y1="${Y(x0).toFixed(1)}" x2="${X(x1).toFixed(1)}" y2="${Y(x1).toFixed(1)}" stroke="#adb5bd" stroke-dasharray="4 3"/>` : '';
-  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:300px;display:block;margin:4px auto" role="img" aria-label="${ylabel} en fonction de ${xlabel}">`
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" style="max-width:300px;display:block;margin:4px auto" role="img" aria-label="${t('{y} en fonction de {x}', { y: ylabel, x: xlabel })}">`
     + `<rect x="${pad}" y="${pad / 2}" width="${w - 2 * pad}" height="${h - 1.5 * pad}" fill="none" stroke="#dee2e6"/>${axis}${line}${dots}`
     + `<text x="${w / 2}" y="${h - 4}" font-size="11" text-anchor="middle" fill="#495057">${xlabel}</text>`
     + `<text x="10" y="${h / 2}" font-size="11" text-anchor="middle" fill="#495057" transform="rotate(-90 10 ${h / 2})">${ylabel}</text></svg>`;
@@ -75,6 +75,7 @@ export function scatterSVG(points, { w = 260, h = 170, xlabel = '', ylabel = '',
 // constructors wrapped with it.
 import { statItem as kitStat, coefItem as kitCoef, openItem as kitOpen } from './proba-kit.js';
 import { JUDGES } from '../../judges/index.js';
+import { t } from '../../i18n.js';
 
 const isFinalLine = (p, math) => {
   const J = JUDGES[p.kind || 'prob'];

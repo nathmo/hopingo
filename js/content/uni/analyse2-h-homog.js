@@ -7,15 +7,16 @@
 import { MT, linesItem, examTag } from './kit.js';
 import { partsScript, tpl, sup } from './a2-kit.js';
 import { qt, q, sumT, term, rd, H, E, modeOf, mcq4, opt } from './analyse2-h-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-homog-subst';
 const SUB = [
-  { id: 'recognize', label: 'reconnaître y′ = F(y/x)', skill: SK },
+  { id: 'recognize', label: t('reconnaître y′ = F(y/x)'), skill: SK },
   { id: 'substitute', label: 'y = xv, y′ = v + xv′', skill: SK },
-  { id: 'reduce', label: 'équation en v', skill: SK },
-  { id: 'separate', label: 'séparer et intégrer', skill: 'a2-ode-separable' },
-  { id: 'ic', label: 'condition initiale', skill: SK },
-  { id: 'back', label: 'revenir à y', skill: SK },
+  { id: 'reduce', label: t('équation en v'), skill: SK },
+  { id: 'separate', label: t('séparer et intégrer'), skill: 'a2-ode-separable' },
+  { id: 'ic', label: t('condition initiale'), skill: SK },
+  { id: 'back', label: t('revenir à y'), skill: SK },
 ];
 const KEYS = ['calcx', 'calcfn', 'a2', 'anal'];
 
@@ -84,14 +85,14 @@ function family(rng) {
 }
 
 const CHOICES = [
-  { id: 'subst', label: 'Poser y = xv : y′ = v + xv′' },
-  { id: 'reduce', label: 'Simplifier : x·v′ = F(v) − v' },
-  { id: 'sep', label: 'Séparer : les v d\'un côté, les x de l\'autre' },
-  { id: 'int', label: 'Intégrer des deux côtés' },
-  { id: 'ic', label: 'Condition initiale : v(1) = y(1)' },
-  { id: 'solve', label: 'Isoler v' },
-  { id: 'back', label: 'Revenir à y = x·v' },
-  { id: 'yv', label: 'Dériver y = xv : y′ = v', rule: 'a2_ode_homog_derivative', why: 'y = x·v est un produit : y′ = v + x·v′.' },
+  { id: 'subst', label: t('Poser y = xv : y′ = v + xv′') },
+  { id: 'reduce', label: t('Simplifier : x·v′ = F(v) − v') },
+  { id: 'sep', label: t('Séparer : les v d\'un côté, les x de l\'autre') },
+  { id: 'int', label: t('Intégrer des deux côtés') },
+  { id: 'ic', label: t('Condition initiale : v(1) = y(1)') },
+  { id: 'solve', label: t('Isoler v') },
+  { id: 'back', label: t('Revenir à y = x·v') },
+  { id: 'yv', label: t('Dériver y = xv : y′ = v'), rule: 'a2_ode_homog_derivative', why: t('y = x·v est un produit : y′ = v + x·v′.') },
 ];
 
 function linesVariant(level, rng, opts) {
@@ -101,36 +102,36 @@ function linesVariant(level, rng, opts) {
   const odeV = { kind: 'ode', eq: vEq, unknown: 'v', v: 'x', order: 1, ic: { x: 1, y: f.v0 }, domain: { x: f.domain }, yRange: f.vRange };
   const odeY = { kind: 'ode', eq: form.eq, unknown: 'y', v: 'x', order: 1, ic: { x: 1, y: f.v0 }, domain: { x: f.domain } };
   const recognize = {
-    kind: 'decision', prompt: 'L\'équation s\'écrit-elle y′ = F(y/x) ?', options: [
-      { id: 'yes', label: `Oui : y′ = y/x + ${sup(f.R.replace(/v/g, '(y/x)'))}`, valid: true },
-      { id: 'no', label: 'Non, il faut une autre méthode', valid: false, why: 'Divise par x (ou x²) : chaque terme ne dépend que de y/x.' },
+    kind: 'decision', prompt: t('L\'équation s\'écrit-elle y′ = F(y/x) ?'), options: [
+      { id: 'yes', label: t('Oui : y′ = y/x + {R}', { R: sup(f.R.replace(/v/g, '(y/x)')) }), valid: true },
+      { id: 'no', label: t('Non, il faut une autre méthode'), valid: false, why: t('Divise par x (ou x²) : chaque terme ne dépend que de y/x.') },
     ],
   };
-  const vLines = [E(vEq, 'Simplifier', 'reduce', 'reduce'), E(f.sep, 'Séparer', 'separate', 'sep'), E(f.rel, 'Intégrer', 'separate', 'int'), E(`C = ${f.C}`, `v(1) = y(1)/1 = ${rd(f.v0)}`, 'ic', 'ic')];
-  if (f.mid) vLines.push(E(f.mid, 'Enlever ln et |…|', 'ic', 'solve'));
-  vLines.push(E(`v = ${f.v}`, 'Isoler v', 'ic', 'solve'));
+  const vLines = [E(vEq, t('Simplifier'), 'reduce', 'reduce'), E(f.sep, t('Séparer'), 'separate', 'sep'), E(f.rel, t('Intégrer'), 'separate', 'int'), E(`C = ${f.C}`, `v(1) = y(1)/1 = ${rd(f.v0)}`, 'ic', 'ic')];
+  if (f.mid) vLines.push(E(f.mid, t('Enlever ln et |…|'), 'ic', 'solve'));
+  vLines.push(E(`v = ${f.v}`, t('Isoler v'), 'ic', 'solve'));
   // The « choose the action » menus read the previous line with the CAS: the
   // separated form is written with ∫ there.
   if (level === 3 && f.kind === 'const') vLines.splice(1, 1);
-  else if (level === 3) vLines[1] = E(`int(1/(${f.R}),v) = int(1/x,x)`, 'Séparer', 'separate', 'sep');
+  else if (level === 3) vLines[1] = E(`int(1/(${f.R}),v) = int(1/x,x)`, t('Séparer'), 'separate', 'sep');
   if (level === 1) vLines[0] = { ...vLines[0], ...tpl(vEq, [f.R]) };
   if (level === 2) vLines[2] = { ...vLines[2], ...tpl(f.rel, [f.rel.split(' = ')[0]]) };
   const parts = [];
   if (level >= 2) {
     parts.push({
       start: 'd(x v)', judge: { kind: 'equiv', vars: ['x', 'v', 'w'], implicit: { v: 'w' }, target: 'no-prime', domain: { x: [0.5, 2] } },
-      pre: level === 3 ? [recognize] : [], lines: [E("v+x v'", 'Règle du produit', 'substitute', 'subst')],
+      pre: level === 3 ? [recognize] : [], lines: [E("v+x v'", t('Règle du produit'), 'substitute', 'subst')],
     });
   }
-  parts.push({ html: 'Remplace y par xv et y′ par v + xv′ : l\'équation en v.', ask: 'v =', start: form.sub, judge: odeV, lines: vLines });
-  parts.push({ html: 'Reviens à y = x·v.', ask: 'y =', start: 'y = x v', judge: odeY, lines: [E(`y = ${f.y}`, 'y = x·v', 'back', 'back')] });
+  parts.push({ html: t('Remplace y par xv et y′ par v + xv′ : l\'équation en v.'), ask: 'v =', start: form.sub, judge: odeV, lines: vLines });
+  parts.push({ html: t('Reviens à y = x·v.'), ask: 'y =', start: 'y = x v', judge: odeY, lines: [E(`y = ${f.y}`, 'y = x·v', 'back', 'back')] });
   const { start, judge, script } = partsScript(parts, level, CHOICES);
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Résous ${MT(form.eq)}, y(1) = ${MT(f.v0)}, pour x > 0.${level >= 2 ? ' Pose y = x·v(x), puis écris y′ = (xv)′.' : ' On pose y = x·v(x) : y′ = v + x·v′.'}`,
-    hints: H('Pose y = xv et dérive avec la règle du produit ; l\'équation devient séparable en v.',
-      `y′ = v + x·v′, puis x·v′ = ${sup(f.R)} ; ∫ dv/(${sup(f.R)}) = ${f.prim}.`,
-      `${MT(vEq)}, puis ${MT(f.rel)}.`),
+    prompt: `${t('Résous {eq}, y(1) = {v0}, pour x > 0.', { eq: MT(form.eq), v0: MT(f.v0) })} ${level >= 2 ? t('Pose y = x·v(x), puis écris y′ = (xv)′.') : t('On pose y = x·v(x) : y′ = v + x·v′.')}`,
+    hints: H(t('Pose y = xv et dérive avec la règle du produit ; l\'équation devient séparable en v.'),
+      t('y′ = v + x·v′, puis x·v′ = {R} ; ∫ dv/({R}) = {prim}.', { R: sup(f.R), prim: f.prim }),
+      t('{a}, puis {b}.', { a: MT(vEq), b: MT(f.rel) })),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${form.eq}:${f.v0}`, exam: examTag(opts),
   });
@@ -141,7 +142,7 @@ function mcqVariant(level, rng, opts) {
   const form = rng.pick(f.forms);
   return mcq4({
     skill: SK, level, key: `${SK}:mcq:${form.eq}:${f.v0}`, exam: examTag(opts),
-    prompt: `La solution de ${MT(form.eq)}, y(1) = ${MT(f.v0)}, pour x > 0, est :`,
+    prompt: t('La solution de {eq}, y(1) = {v0}, pour x > 0, est :', { eq: MT(form.eq), v0: MT(f.v0) }),
     right: MT(`y = ${f.y}`),
     wrongs: [
       opt(`y = ${f.v0 === '0' ? '0' : f.v0 === '1' ? 'x' : f.v0 === '-1' ? '-x' : `${f.v0}x`}`, 'a2_ode_homog_derivative'),
@@ -149,7 +150,7 @@ function mcqVariant(level, rng, opts) {
       opt(`y = ${f.wrongV}`),
     ],
     fillers: [opt(`y = x^2 ${f.wrongV}`), opt(`y = ${f.wrongV}/x`)],
-    solution: [{ html: `y = xv, y′ = v + xv′ : ${MT(`x v'=${f.R}`)} ; ${MT(f.rel)}, C = ${rd(f.C)}, v = ${MT(f.v)}.`, note: '' }],
+    solution: [{ html: t('y = xv, y′ = v + xv′ : {eq} ; {rel}, C = {C}, v = {v}.', { eq: MT(`x v'=${f.R}`), rel: MT(f.rel), C: rd(f.C), v: MT(f.v) }), note: '' }],
     expectedSec: 180,
   }, rng);
 }

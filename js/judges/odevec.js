@@ -36,6 +36,7 @@ import { mapNode, symbolsIn, stripParen } from '../cas/ast.js';
 import { toText } from '../cas/print.js';
 import { diagnoseLine } from './diagnose.js';
 import { frNum } from './common.js';
+import { t, tn } from '../i18n.js';
 
 export const sign = '';
 export const input = 'matrix';
@@ -79,10 +80,10 @@ function constantsLine(text) {
   }
   return env;
 }
-function parseScalar(t) {
-  const line = parseMatLine(normalizeMatText(t), { vars: [] });
+function parseScalar(text) {
+  const line = parseMatLine(normalizeMatText(text), { vars: [] });
   const v = evalAst(line.body, {}, {});
-  if (v.k !== 's') throw new ParseError('Une constante est un nombre.', 0);
+  if (v.k !== 's') throw new ParseError(t('Une constante est un nombre.'), 0);
   return v.n;
 }
 
@@ -92,7 +93,7 @@ function readLine(cfg, text0) {
   if (consts) return { t: 'mline', ops: [], assigns: [], label: null, body: null, value: null, consts, text, raw: true, ml: `<mtext>${text.replace(/</g, '&lt;')}</mtext>` };
   const opts = optsOf(cfg);
   const line = parseMatLine(text, opts);
-  if (line.ops.length || line.assigns.length > 1) throw new ParseError('Écris une seule matrice ou un seul vecteur, fonction de ' + vOf(cfg) + '.', 0);
+  if (line.ops.length || line.assigns.length > 1) throw new ParseError(t('Écris une seule matrice ou un seul vecteur, fonction de {v}.', { v: vOf(cfg) }), 0);
   const env = { ...envOf(opts) };
   line.value = line.body ? evalAst(line.body, env, opts, aOf(cfg).A.length) : null;
   // Shown as written (a sum of modes, e^(2t)(I + tN)), not as its value.
@@ -203,53 +204,61 @@ function analyse(cfg, node, state) {
   const tName = cfg.discrete ? 'k' : 't';
   if (node.consts) {
     const g = state.general;
-    if (!g) return { kind: 'wrong', message: 'Écris d\'abord la solution générale, avec ses constantes c₁, c₂.' };
+    if (!g) return { kind: 'wrong', message: t('Écris d\'abord la solution générale, avec ses constantes c₁, c₂.') };
     const missing = constsOf(g).filter((c) => !(c in node.consts));
-    if (missing.length) return { kind: 'wrong', message: `Donne aussi ${missing[0].replace(/(\d)/, '_$1')}.` };
+    if (missing.length) return { kind: 'wrong', message: t('Donne aussi {c}.', { c: missing[0].replace(/(\d)/, '_$1') }) };
     if (x0) {
       const X = at0(cfg, g, node.consts).map((r) => r[0]);
       const i = X.findIndex((x, k) => !near(x, x0[k]));
-      if (i >= 0) return { kind: 'wrong', message: `Avec ces constantes, la composante ${i + 1} de x(0) vaut ${ftext(X[i])} au lieu de ${ftext(x0[i])} : résous Pc = x(0).` };
+      if (i >= 0) return { kind: 'wrong', message: t('Avec ces constantes, la composante {i} de x(0) vaut {got} au lieu de {want} : résous Pc = x(0).', { i: i + 1, got: ftext(X[i]), want: ftext(x0[i]) }) };
     }
     return { kind: 'ok' };
   }
   const val = node.value;
-  if (!val || val.k !== 'm') return { kind: 'form', message: 'Écris une matrice ou un vecteur, fonction de ' + v + '.' };
+  if (!val || val.k !== 'm') return { kind: 'form', message: t('Écris une matrice ou un vecteur, fonction de {v}.', { v }) };
   const rows = entries(val);
-  if (rows.length !== n) return { kind: 'wrong', message: `Il faut ${n} lignes : la taille de A.` };
+  if (rows.length !== n) return { kind: 'wrong', message: t('Il faut {n} lignes : la taille de A.', { n }) };
   const isVec = rows[0].length === 1;
-  if (!isVec && rows[0].length !== n) return { kind: 'wrong', message: `Écris une matrice ${n}×${n} ou un vecteur.` };
+  if (!isVec && rows[0].length !== n) return { kind: 'wrong', message: t('Écris une matrice {n}×{n} ou un vecteur.', { n }) };
   const consts = constsOf(rows);
   const r = satisfies(cfg, rows, consts);
   if (!r.ok) {
-    if (r.undecided) return { kind: 'wrong', message: 'Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie là où je la teste.' };
+    if (r.undecided) return { kind: 'wrong', message: t('Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie là où je la teste.') };
     const [i, j] = r.entry;
-    const where = isVec ? `la composante ${i + 1}` : `la case (${i + 1}, ${j + 1})`;
-    return { kind: 'wrong', message: cfg.discrete
-      ? `Ta ligne ne vérifie pas x_{k+1} = Ax_k : regarde ${where}, par exemple pour k = ${r.at[v]}.`
-      : `Dérive ta ligne : ${where} de sa dérivée ne vaut pas celle de A·(ta ligne), par exemple en ${tName} = ${ftext(r.at[v])}.` };
+    const vars = { i: i + 1, j: j + 1, k: r.at[v], tName, at: ftext(r.at[v]) };
+    let message;
+    if (cfg.discrete) {
+      message = isVec
+        ? t('Ta ligne ne vérifie pas x_{k+1} = Ax_k : regarde la composante {i}, par exemple pour k = {k}.', vars)
+        : t('Ta ligne ne vérifie pas x_{k+1} = Ax_k : regarde la case ({i}, {j}), par exemple pour k = {k}.', vars);
+    } else {
+      message = isVec
+        ? t('Dérive ta ligne : la composante {i} de sa dérivée ne vaut pas celle de A·(ta ligne), par exemple en {tName} = {at}.', vars)
+        : t('Dérive ta ligne : la case ({i}, {j}) de sa dérivée ne vaut pas celle de A·(ta ligne), par exemple en {tName} = {at}.', vars);
+    }
+    return { kind: 'wrong', message };
   }
   if (!isVec) {
-    if (consts.length) return { kind: 'wrong', message: 'e^(At) n\'a pas de constante.' };
+    if (consts.length) return { kind: 'wrong', message: t('e^(At) n\'a pas de constante.') };
     const M0 = at0(cfg, rows);
     const bad = M0.flatMap((row, i) => row.map((x, j) => ({ i, j, x }))).find(({ i, j, x }) => !near(x, i === j ? 1 : 0));
-    if (bad) return { kind: 'wrong', message: `En ${tName} = 0, ta matrice ne vaut pas I : la case (${bad.i + 1}, ${bad.j + 1}) vaut ${ftext(bad.x)}.` };
+    if (bad) return { kind: 'wrong', message: t('En {tName} = 0, ta matrice ne vaut pas I : la case ({i}, {j}) vaut {x}.', { tName, i: bad.i + 1, j: bad.j + 1, x: ftext(bad.x) }) };
     if (cfg.want === 'expm') return { kind: writtenOut(node.body) ? 'done' : 'ok' };
     return { kind: 'ok' };
   }
   if (consts.length) {
     const rank = constRank(cfg, rows, consts);
-    if (rank < n) return { kind: 'wrong', message: `Ta solution n'a que ${rank} constante${rank > 1 ? 's' : ''} indépendante${rank > 1 ? 's' : ''} : il en faut ${n}, une par mode.` };
-    if (consts.length > n) return { kind: 'stay', message: `Il y a trop de constantes : il en faut ${n}.` };
+    if (rank < n) return { kind: 'wrong', message: tn(rank, 'Ta solution n\'a que {n} constante indépendante : il en faut {size}, une par mode.', 'Ta solution n\'a que {n} constantes indépendantes : il en faut {size}, une par mode.', { size: n }) };
+    if (consts.length > n) return { kind: 'stay', message: t('Il y a trop de constantes : il en faut {n}.', { n }) };
     return { kind: cfg.want === 'general' && writtenOut(node.body) ? 'done' : 'ok', general: rows };
   }
   if (x0) {
     const X = at0(cfg, rows).map((rw) => rw[0]);
     const i = X.findIndex((x, k) => !near(x, x0[k]));
-    if (i >= 0) return { kind: 'wrong', message: `C'est une solution, mais sa composante ${i + 1} vaut ${ftext(X[i])} en ${tName} = 0 au lieu de ${ftext(x0[i])}.` };
+    if (i >= 0) return { kind: 'wrong', message: t('C\'est une solution, mais sa composante {i} vaut {got} en {tName} = 0 au lieu de {want}.', { i: i + 1, got: ftext(X[i]), tName, want: ftext(x0[i]) }) };
     return { kind: cfg.want === 'solution' && writtenOut(node.body) ? 'done' : 'ok' };
   }
-  return { kind: 'stay', message: `C'est une solution, mais pas la solution générale : il faut ${n} constantes.` };
+  return { kind: 'stay', message: t('C\'est une solution, mais pas la solution générale : il faut {n} constantes.', { n }) };
 }
 
 // Two lines with the same values (for the traps): the same matrix or vector
@@ -284,11 +293,11 @@ export function judgeLine(cfg, prev, input0, state = {}) {
   let node;
   if (input0 && typeof input0 === 'object') node = input0;
   else {
-    try { node = readLine(cfg, input0); } catch (e) { return { kind: 'parse', message: e instanceof ParseError || e instanceof SyntaxError || e instanceof RangeError ? e.message : `Je n'arrive pas à lire cette ligne (${e.message}).` }; }
+    try { node = readLine(cfg, input0); } catch (e) { return { kind: 'parse', message: e instanceof ParseError || e instanceof SyntaxError || e instanceof RangeError ? e.message : t('Je n\'arrive pas à lire cette ligne ({m}).', { m: e.message }) }; }
   }
-  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   let r;
-  try { r = analyse(cfg, node, state); } catch (e) { return { kind: 'parse', node, message: `Je n'arrive pas à lire cette ligne (${e.message}).` }; }
+  try { r = analyse(cfg, node, state); } catch (e) { return { kind: 'parse', node, message: t('Je n\'arrive pas à lire cette ligne ({m}).', { m: e.message }) }; }
   if (r.kind === 'wrong') {
     const diag = prev ? diagnoseLine('odevec', prev, node, cfg, (cand, line) => sameLine(cfg, cand, line)) : null;
     return { kind: 'wrong', node, rule: diag?.rules?.[0] ?? null, diag, message: r.message };

@@ -14,11 +14,12 @@ import { PROPS as PA } from './m-examples-a.js';
 import { PROPS as PB } from './m-examples-b.js';
 import { PROPS as PC } from './m-examples-c.js';
 import { PROPS as PD } from './m-examples-d.js';
+import { t } from '../i18n.js';
 
 export const PROPS = { ...PA, ...PB, ...PC, ...PD };
 
 export function checkMx(counter, answers = {}) {
   const f = PROPS[counter.prop];
   if (!f) return { ok: false, message: 'Contre-exemple non vérifiable.' };
-  try { return f(counter.params || {}, answers); } catch (e) { return { ok: false, message: `Je n'arrive pas à lire ta réponse (${e.message}).` }; }
+  try { return f(counter.params || {}, answers); } catch (e) { return { ok: false, message: t('Je n\'arrive pas à lire ta réponse ({m}).', { m: e.message }) }; }
 }

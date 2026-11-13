@@ -15,6 +15,7 @@ import * as MX from '../matrix.js';
 import { Q } from '../../math/rational.js';
 import { parseExpr, evalAst, toQ, fromQ, Mx, S, valueText, radicalNode } from '../matexpr.js';
 import { lit, sqrt as sqrtNode, num } from '../ast.js';
+import { t } from '../../i18n.js';
 
 const matQ = (text) => { try { return toQ(evalAst(parseExpr(String(text), {}), {}, {})); } catch { return null; } };
 const mline = (value) => ({ t: 'mline', ops: [], assigns: [], label: null, body: null, value });
@@ -22,7 +23,7 @@ const R = (s) => String(s).replace(/-/g, '−');
 
 export const DEFS = {
   m_schur_order: {
-    name: 'Complément de Schur avec les facteurs dans le mauvais ordre',
+    name: t('Complément de Schur avec les facteurs dans le mauvais ordre'),
     judges: ['mat'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.schur;
@@ -36,7 +37,7 @@ export const DEFS = {
     check: { judge: { kind: 'mat', expect: '[[1,0],[0,1]]', names: { A_11: '[[2,1],[1,1]]', A_12: '[[1,0],[1,1]]', A_21: '[[0,1],[1,1]]', A_22: '[[2,2],[1,2]]' }, schur: { A11: '[[2,1],[1,1]]', A12: '[[1,0],[1,1]]', A21: '[[0,1],[1,1]]', A22: '[[2,2],[1,2]]' } }, prev: 'S', line: '[[3,2],[0,1]]' },
   },
   m_schur_sign: {
-    name: 'Complément de Schur avec un signe +',
+    name: t('Complément de Schur avec un signe +'),
     judges: ['mat'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.schur;
@@ -53,7 +54,7 @@ export const DEFS = {
     check: { judge: { kind: 'mat', expect: '[[1,0],[0,1]]', names: { A_11: '[[2,1],[1,1]]', A_12: '[[1,0],[1,1]]', A_21: '[[0,1],[1,1]]', A_22: '[[2,2],[1,2]]' }, schur: { A11: '[[2,1],[1,1]]', A12: '[[1,0],[1,1]]', A21: '[[0,1],[1,1]]', A22: '[[2,2],[1,2]]' } }, prev: 'S', line: '[[3,4],[2,3]]' },
   },
   m_householder_factor: {
-    name: 'Symétrie de Householder écrite I − P',
+    name: t('Symétrie de Householder écrite I − P'),
     judges: ['mat'],
     transform(prev, ctx) {
       const u = ctx?.cfg?.householder?.u;
@@ -68,7 +69,7 @@ export const DEFS = {
     check: { judge: { kind: 'mat', expect: '[[7/9,-4/9,-4/9],[-4/9,1/9,-8/9],[-4/9,-8/9,1/9]]', householder: { u: '(1 ; 2 ; 2)' } }, prev: 'H', line: '[[8/9,-2/9,-2/9],[-2/9,5/9,-4/9],[-2/9,-4/9,5/9]]' },
   },
   m_spectral_entrywise: {
-    name: 'f(A) calculée case par case',
+    name: t('f(A) calculée case par case'),
     judges: ['mat'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.spectral;
@@ -89,15 +90,15 @@ export const DEFS = {
     check: { judge: { kind: 'mat', expect: '[[2,1],[1,2]]', spectral: { A: '[[5,4],[4,5]]', f: 'sqrt' } }, prev: '√A', line: '[[√5,2],[2,√5]]' },
   },
   m_sylvester_semidef: {
-    name: 'Mineurs dominants ≥ 0 pris pour « semi-définie positive »',
+    name: t('Mineurs dominants ≥ 0 pris pour « semi-définie positive »'),
     judges: [],
-    explain: () => 'Pour « semi-définie », il faut tous les mineurs principaux ≥ 0, pas seulement les mineurs dominants. [[0, 0], [0, −1]] a Δ₁ = Δ₂ = 0, mais Q(0, 1) = −1 < 0.',
+    explain: () => t('Pour « semi-définie », il faut tous les mineurs principaux ≥ 0, pas seulement les mineurs dominants. [[0, 0], [0, −1]] a Δ₁ = Δ₂ = 0, mais Q(0, 1) = −1 < 0.'),
     check: { bait: { skill: 'm-posdef', exam: 'mcq' } },
   },
   m_sylvester_negdef: {
-    name: '« Définie négative » lue comme « tous les mineurs < 0 »',
+    name: t('« Définie négative » lue comme « tous les mineurs < 0 »'),
     judges: [],
-    explain: () => 'A est définie négative si −A est définie positive : les mineurs alternent, Δ₁ < 0, Δ₂ > 0, Δ₃ < 0. Ils ne sont pas tous négatifs.',
+    explain: () => t('A est définie négative si −A est définie positive : les mineurs alternent, Δ₁ < 0, Δ₂ > 0, Δ₃ < 0. Ils ne sont pas tous négatifs.'),
     check: { bait: { skill: 'm-posdef', level: 3 } },
   },
 };

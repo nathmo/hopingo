@@ -15,6 +15,7 @@
 import { tryParse } from '../cas/parse.js';
 import { compileFloat } from '../cas/numeric.js';
 import { quad } from '../cas/integrate.js';
+import { t } from '../i18n.js';
 
 function composite(m, f, n) {
   const h = 1 / n;
@@ -40,42 +41,42 @@ function reader(text, vars) {
   return (env) => c(env);
 }
 const finiteOn = (f) => [0, 0.25, 0.5, 0.75, 1, 0.1, 0.9].every((x) => Number.isFinite(f(x)));
-const READ = 'Je n\'arrive pas à lire ta fonction de x.';
+const READ = t('Je n\'arrive pas à lire ta fonction de x.');
 
 export const PROPS = {
   trapNotBetter(params, a) {
     const g = reader(a.f, ['x']);
     if (!g) return { ok: false, message: READ };
     const f = (x) => g({ x });
-    if (!finiteOn(f)) return { ok: false, message: 'Prends une fonction définie sur [0 ; 1].' };
+    if (!finiteOn(f)) return { ok: false, message: t('Prends une fonction définie sur [0 ; 1].') };
     const n = params.n ?? 4;
     const et = errorOf('trap', f, n);
     const em = errorOf('mid', f, n);
     if (et > em * 1.0001 + 1e-13) return { ok: true };
-    return { ok: false, message: `Avec cette f, l'erreur du trapèze (${et.toExponential(2)}) n'est pas plus grande que celle du point milieu (${em.toExponential(2)}). Essaie f(x) = x².` };
+    return { ok: false, message: t('Avec cette f, l\'erreur du trapèze ({v1}) n\'est pas plus grande que celle du point milieu ({v2}). Essaie f(x) = x².', { v1: et.toExponential(2), v2: em.toExponential(2) }) };
   },
   errScaling(params, a) {
     const g = reader(a.f, ['x', 'λ']);
-    if (!g) return { ok: false, message: 'Écris une famille f_λ(x), en x et λ.' };
+    if (!g) return { ok: false, message: t('Écris une famille f_λ(x), en x et λ.') };
     const at = (lam) => (x) => g({ x, λ: lam });
-    if (!finiteOn(at(1)) || !finiteOn(at(1000))) return { ok: false, message: 'Prends une fonction définie sur [0 ; 1].' };
+    if (!finiteOn(at(1)) || !finiteOn(at(1000))) return { ok: false, message: t('Prends une fonction définie sur [0 ; 1].') };
     const m = params.method || 'simp';
     const e1 = errorOf(m, at(1), 2);
     const e2 = errorOf(m, at(1000), 2);
-    if (e1 < 1e-9) return { ok: false, message: 'Pour λ = 1, la formule est exacte sur ta fonction : prends un polynôme de degré plus grand, comme λx⁴.' };
+    if (e1 < 1e-9) return { ok: false, message: t('Pour λ = 1, la formule est exacte sur ta fonction : prends un polynôme de degré plus grand, comme λx⁴.') };
     if (e2 > 100 * e1) return { ok: true };
-    return { ok: false, message: 'L\'erreur ne grandit pas avec λ : multiplie la fonction par λ.' };
+    return { ok: false, message: t('L\'erreur ne grandit pas avec λ : multiplie la fonction par λ.') };
   },
   notOrder(params, a) {
     const g = reader(a.f, ['x']);
     if (!g) return { ok: false, message: READ };
     const f = (x) => g({ x });
-    if (!finiteOn(f)) return { ok: false, message: 'Prends une fonction définie sur [0 ; 1].' };
+    if (!finiteOn(f)) return { ok: false, message: t('Prends une fonction définie sur [0 ; 1].') };
     const m = params.method || 'simp';
     const qq = params.q;
     const ratios = [4, 8, 16, 32].map((n) => errorOf(m, f, n) * n ** qq);
-    if (ratios[0] < 1e-12) return { ok: false, message: 'La formule est exacte sur ta fonction : son erreur est nulle.' };
+    if (ratios[0] < 1e-12) return { ok: false, message: t('La formule est exacte sur ta fonction : son erreur est nulle.') };
     if (ratios[3] > 1.5 * ratios[0] && ratios[3] > ratios[2] && ratios[2] > ratios[1]) return { ok: true };
-    return { ok: false, message: `Avec cette f, E_h(f)/h^${qq} reste borné : prends un polynôme qui n'est pas intégré exactement.` };
+    return { ok: false, message: t('Avec cette f, E_h(f)/h^{qq} reste borné : prends un polynôme qui n\'est pas intégré exactement.', { qq }) };
   },
 };

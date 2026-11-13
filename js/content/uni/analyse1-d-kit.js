@@ -10,6 +10,7 @@ import { toText } from '../../cas/print.js';
 import { walk } from '../../cas/ast.js';
 import { blankLine } from '../../judges/lines.js';
 import { linesItem, tfItem } from './kit.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => new Q(n, d);
 export const N = (x) => Q.of(x).toString();
@@ -224,7 +225,7 @@ function stepMenus(start, lines, choices) {
     at: i === 0 ? start : lines[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -262,7 +263,7 @@ export function intItem(s, level, rng, opts = {}) {
     if (i === 0) first = judge;
     else script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge });
     if (p.dec) {
-      if (lv === 1) script.push({ kind: 'note', html: `Méthode : ${p.dec.taken || p.dec.options[0].label}` });
+      if (lv === 1) script.push({ kind: 'note', html: t('Méthode : {p1}', { p1: p.dec.taken || p.dec.options[0].label }) });
       else if (lv === 2) script.push(p.dec2 ? decisionLine(p.dec2, p.dec2.options.map((o) => o.id), rng) : decisionLine(p.dec, [p.dec.options[0].id, ...p.dec.l2], rng));
       else if (lv === 3) script.push(decisionLine(p.dec, p.dec.options.map((o) => o.id), rng));
     }
@@ -292,7 +293,7 @@ export function intItem(s, level, rng, opts = {}) {
 export function examTf(bank, skill, rng) {
   const b = rng.pick(bank);
   return tfItem({
-    skill, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null,
-    key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 }, expectedSec: 60,
+    skill, level: 4, statement: t(b.s), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null,
+    key: b.s, explanation: t(b.why), exam: { format: 'tf', points: 1 }, expectedSec: 60,
   });
 }

@@ -12,11 +12,12 @@ import { PROPS as FA } from './vcf-examples-fa.js';
 import { PROPS as FB } from './vcf-examples-fb.js';
 import { PROPS as FC } from './vcf-examples-fc.js';
 import { PROPS as FD } from './vcf-examples-fd.js';
+import { t } from '../i18n.js';
 
 export const PROPS = { ...VA, ...VB, ...CA, ...CB, ...FA, ...FB, ...FC, ...FD };
 
 export function checkVcf(counter, answers) {
   const f = PROPS[counter.prop];
-  if (!f) return { ok: false, message: 'Contre-exemple non vérifiable.' };
-  try { return f(counter.params || {}, answers || {}); } catch { return { ok: false, message: 'Je n\'arrive pas à lire ta réponse.' }; }
+  if (!f) return { ok: false, message: t('Contre-exemple non vérifiable.') };
+  try { return f(counter.params || {}, answers || {}); } catch { return { ok: false, message: t('Je n\'arrive pas à lire ta réponse.') }; }
 }

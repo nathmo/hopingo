@@ -25,6 +25,7 @@ import { series, singularityType } from '../../cas/series.js';
 import {
   q, M, rd, joinT, term, CV, KEYS_SUM, linesOf, choice, opt, H, examTag, problemItem, answerItem, pickK,
 } from './cplx-a-kit.js';
+import { t } from '../../i18n.js';
 
 const eq = (math, note, subgoal, blank) => ({ math, note, subgoal, blank });
 const KEYS = KEYS_SUM;
@@ -40,9 +41,9 @@ const powT = (c, e) => (q(c).n < 0 || q(c).d !== 1 ? `(${qs(c)})^${e}` : `${qs(c
 
 const TA = 'c-taylor';
 const TA_SUB = [
-  { id: 'geometric', label: 'forme 1/(1 − w)', skill: 'a1-ser-geo-tele' },
-  { id: 'general-term', label: 'terme général', skill: TA },
-  { id: 'radius', label: 'rayon de convergence', skill: 'a1-pow-domain' },
+  { id: 'geometric', label: t('forme 1/(1 − w)'), skill: 'a1-ser-geo-tele' },
+  { id: 'general-term', label: t('terme général'), skill: TA },
+  { id: 'radius', label: t('rayon de convergence'), skill: 'a1-pow-domain' },
 ];
 
 // {f, geo (1/(1 − w) form), sumW, term (Σ final), R (text), Rv, pole, wrongR, wrongSign?}
@@ -85,38 +86,38 @@ function taData(rng) {
 }
 
 const TA_MENU = (right) => [
-  { id: 'geo', label: 'Faire apparaître 1/(1 − w), w → 0' },
-  { id: 'sum', label: '1/(1 − w) = Σ wⁿ, puis simplifier le terme général' },
-  { id: 'radius', label: 'Rayon : distance de 0 à la singularité la plus proche' },
-  { id: 'deriv', label: 'Calculer f⁽ⁿ⁾(0) pour chaque n', why: 'Juste en principe, mais bien plus long que la série géométrique.' },
-].map((o) => ({ ...o, valid: o.id === right, why: o.why || 'Ce n\'est pas l\'étape à faire maintenant.' }));
+  { id: 'geo', label: t('Faire apparaître 1/(1 − w), w → 0') },
+  { id: 'sum', label: t('1/(1 − w) = Σ wⁿ, puis simplifier le terme général') },
+  { id: 'radius', label: t('Rayon : distance de 0 à la singularité la plus proche') },
+  { id: 'deriv', label: t('Calculer f⁽ⁿ⁾(0) pour chaque n'), why: t('Juste en principe, mais bien plus long que la série géométrique.') },
+].map((o) => ({ ...o, valid: o.id === right, why: o.why || t('Ce n\'est pas l\'étape à faire maintenant.') }));
 
 function taParts(d, level) {
   const dom = [-0.6 * d.Rv, 0.6 * d.Rv];
   const parts = [];
   if (level >= 2) {
     parts.push({
-      html: d.kind === 'deriv' ? 'z/(1 − z)² = z · (1/(1 − z))′ :' : 'On fait apparaître la série géométrique :', start: d.f, judge: zcfg(dom, { final: 'any' }),
+      html: d.kind === 'deriv' ? 'z/(1 − z)² = z · (1/(1 − z))′ :' : t('On fait apparaître la série géométrique :'), start: d.f, judge: zcfg(dom, { final: 'any' }),
       decisions: [{
-        kind: 'decision', prompt: 'Quelle méthode ?', levels: [3], options: [
-          { id: 'geo', label: 'Série géométrique 1/(1 − w) = Σ wⁿ', valid: true, ref: true },
-          { id: 'dl', label: 'DL usuel', valid: false, why: 'Aucun DL usuel ne donne directement cette fraction : passe par 1/(1 − w).' },
-          { id: 'deriv', label: 'Dérivées en 0 : aₙ = f⁽ⁿ⁾(0)/n!', valid: true, quality: 'poor', why: 'Juste, mais le terme général se lit bien plus vite avec la série géométrique.' },
+        kind: 'decision', prompt: t('Quelle méthode ?'), levels: [3], options: [
+          { id: 'geo', label: t('Série géométrique 1/(1 − w) = Σ wⁿ'), valid: true, ref: true },
+          { id: 'dl', label: t('DL usuel'), valid: false, why: t('Aucun DL usuel ne donne directement cette fraction : passe par 1/(1 − w).') },
+          { id: 'deriv', label: t('Dérivées en 0 : aₙ = f⁽ⁿ⁾(0)/n!'), valid: true, quality: 'poor', why: t('Juste, mais le terme général se lit bien plus vite avec la série géométrique.') },
         ],
       }],
-      lines: [eq(d.geo, d.kind === 'deriv' ? '' : 'mettre en facteur', 'geometric', [d.geo.split('·').pop()])], menu: TA_MENU('geo'),
+      lines: [eq(d.geo, d.kind === 'deriv' ? '' : t('mettre en facteur'), 'geometric', [d.geo.split('·').pop()])], menu: TA_MENU('geo'),
     });
   }
   parts.push({
-    html: level === 1 ? `On a ${M(`${d.f} = ${d.geo}`)}.` : 'Le terme général :', ask: `${rd(d.f)} =`, start: d.geo,
+    html: level === 1 ? t('On a {a}.', { a: M(`${d.f} = ${d.geo}`) }) : t('Le terme général :'), ask: `${rd(d.f)} =`, start: d.geo,
     judge: zcfg(dom, { final: 'series', traps: d.wrongSign ? { c_laurent_sign: [d.wrongSign] } : {} }),
-    lines: [eq(d.sumW, '1/(1 − w) = Σ wⁿ', 'general-term', [d.sumW.replace(/^.*sum\(/, '').split(', n')[0]]), eq(d.term, 'simplifier le terme général', 'general-term', [d.term.replace(/^sum\(/, '').split(', n')[0]])],
+    lines: [eq(d.sumW, '1/(1 − w) = Σ wⁿ', 'general-term', [d.sumW.replace(/^.*sum\(/, '').split(', n')[0]]), eq(d.term, t('simplifier le terme général'), 'general-term', [d.term.replace(/^sum\(/, '').split(', n')[0]])],
     menu: TA_MENU('sum'),
   });
   parts.push({
-    html: `La singularité la plus proche de 0 est ${rd(d.pole)} :`, ask: 'R =', start: 'R',
+    html: t('La singularité la plus proche de 0 est {pole} :', { pole: rd(d.pole) }), ask: 'R =', start: 'R',
     judge: CV({ raw: { text: 'R', html: M('R') }, expect: d.R, final: 'number', traps: { c_taylor_radius: [{ line: d.wrongR, ctx: { z0: '0', pole: rd(d.pole), R: rd(d.R) } }] } }),
-    lines: [eq(d.R, 'distance de 0 à la singularité', 'radius', [d.R])], menu: TA_MENU('radius'),
+    lines: [eq(d.R, t('distance de 0 à la singularité'), 'radius', [d.R])], menu: TA_MENU('radius'),
   });
   return parts;
 }
@@ -125,9 +126,9 @@ function taLines(level, rng, opts) {
   const d = taData(rng);
   return linesOf({
     level, skill: TA, key: `${TA}:${level}:${d.key}`, keys: KEYS, subgoals: TA_SUB, exam: examTag(opts, 3),
-    prompt: `Développe ${M(`f(z) = ${d.f}`)} en série de Taylor en 0 (terme général), puis donne le rayon de convergence.`,
+    prompt: t('Développe {a} en série de Taylor en 0 (terme général), puis donne le rayon de convergence.', { a: M(`f(z) = ${d.f}`) }),
     parts: taParts(d, level),
-    hints: H('Fais apparaître 1/(1 − w) avec w → 0, puis 1/(1 − w) = Σ wⁿ pour |w| < 1.', M(d.geo), M(d.term)),
+    hints: H(t('Fais apparaître 1/(1 − w) avec w → 0, puis 1/(1 − w) = Σ wⁿ pour |w| < 1.'), M(d.geo), M(d.term)),
   });
 }
 
@@ -147,9 +148,9 @@ function taQuotient(level, rng, opts) {
   const line = dlText(cs);
   return linesOf({
     level, skill: TA, key: `${TA}:${level}:quot:${f}`, keys: KEYS, subgoals: TA_SUB, exam: examTag(opts, 3),
-    prompt: `Donne a₀, a₁, a₂, a₃ de la série de Taylor en 0 de ${M(`f(z) = ${f}`)}, sous la forme a₀ + a₁z + a₂z² + a₃z³ + o(z³).`,
-    parts: [{ start: f, judge: { kind: 'series', v: 'z', at: 0, order: 3 }, lines: [eq(line, 'DL des deux fonctions, puis 1/(1 − u) = 1 + u + u² + u³ + o(u³)', 'general-term')] }],
-    hints: H('Développe le numérateur et le dénominateur à l\'ordre 3, puis divise (1/(1 − u) = 1 + u + u² + …).', `a₀ = ${rd(qs(cs[0]))}`, M(line)),
+    prompt: t('Donne a₀, a₁, a₂, a₃ de la série de Taylor en 0 de {a}, sous la forme a₀ + a₁z + a₂z² + a₃z³ + o(z³).', { a: M(`f(z) = ${f}`) }),
+    parts: [{ start: f, judge: { kind: 'series', v: 'z', at: 0, order: 3 }, lines: [eq(line, t('DL des deux fonctions, puis 1/(1 − u) = 1 + u + u² + u³ + o(u³)'), 'general-term')] }],
+    hints: H(t('Développe le numérateur et le dénominateur à l\'ordre 3, puis divise (1/(1 − u) = 1 + u + u² + …).'), `a₀ = ${rd(qs(cs[0]))}`, M(line)),
   });
 }
 
@@ -159,7 +160,7 @@ function taCoef(level, rng, opts) {
   const c = coefsOf(f)[k];
   return answerItem({
     skill: TA, level, key: `${f}:${k}`, exam: examTag(opts, 2),
-    prompt: `Série de Taylor en 0 de ${M(`f(z) = ${f}`)} : a${k === 2 ? '₂' : '₃'} = ?`,
+    prompt: t('Série de Taylor en 0 de {a} : a{b} = ?', { a: M(`f(z) = ${f}`), b: k === 2 ? '₂' : '₃' }),
     expected: qs(c), solution: [{ html: `${M(`f(z) = ${dlText(coefsOf(f))}`)}`, note: '' }],
   });
 }
@@ -172,27 +173,27 @@ function taMcq(level, rng, opts) {
       { html: `${M('1/(1+z) = sum((-1)^n z^n, n, 0, ∞)')}, |z| < 1`, truth: true },
       { html: `${M('sin(z)/z = sum((-1)^n z^(2n)/(2n+1)!, n, 0, ∞)')}, z ≠ 0`, truth: true },
       { html: `${M('sin(z)/z = sum(z^(2n)/(2n+1)!, n, 0, ∞)')}, z ≠ 0`, truth: false, rule: 'c_laurent_sign' },
-      { html: `le rayon de convergence en 0 de ${M('1/(3+z^2)')} vaut 3`, truth: false, rule: 'c_taylor_radius' },
-      { html: `le rayon de convergence en 0 de ${M('1/(3+z^2)')} vaut √3`, truth: true },
+      { html: t('le rayon de convergence en 0 de {a} vaut 3', { a: M('1/(3+z^2)') }), truth: false, rule: 'c_taylor_radius' },
+      { html: t('le rayon de convergence en 0 de {a} vaut √3', { a: M('1/(3+z^2)') }), truth: true },
     ];
     const s = pickK(rng, pool, 5);
     if (!s.some((x) => x.truth)) s[0] = pool[0];
-    return choice({ skill: TA, level, multi: true, key: `multi:${s.map((x) => pool.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: 'Cochez les développements et rayons justes.', options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
+    return choice({ skill: TA, level, multi: true, key: `multi:${s.map((x) => pool.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: t('Cochez les développements et rayons justes.'), options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
   }
   const d = taData(rng);
   if (rng.chance(0.5) || !d.wrongSign) {
     return choice({
       skill: TA, level, key: `mcq:R:${d.key}`, exam: examTag(opts, 2),
-      prompt: `Le rayon de convergence de la série de Taylor en 0 de ${M(`f(z) = ${d.f}`)} est :`,
+      prompt: t('Le rayon de convergence de la série de Taylor en 0 de {a} est :', { a: M(`f(z) = ${d.f}`) }),
       right: M(d.R), wrongs: [opt(d.wrongR, 'c_taylor_radius'), opt('∞'), opt('1'), opt(d.R === '2' ? '4' : '1/2')],
-      solution: [{ html: `La singularité la plus proche de 0 est ${rd(d.pole)}, à distance ${rd(d.R)}.`, note: '' }],
+      solution: [{ html: t('La singularité la plus proche de 0 est {pole}, à distance {R}.', { pole: rd(d.pole), R: rd(d.R) }), note: '' }],
     }, rng);
   }
   return choice({
     skill: TA, level, key: `mcq:S:${d.key}`, exam: examTag(opts, 2),
-    prompt: `La série de Taylor en 0 de ${M(`f(z) = ${d.f}`)} est :`,
+    prompt: t('La série de Taylor en 0 de {a} est :', { a: M(`f(z) = ${d.f}`) }),
     right: M(d.term), wrongs: [opt(d.wrongSign, 'c_laurent_sign'), opt(d.term.replace(/\^\(n\+1\)/, '^n')), opt(d.term.replace('sum(', '-sum('))],
-    solution: [{ html: `${M(`${d.f} = ${d.geo}`)}, puis 1/(1 − w) = Σ wⁿ.`, note: '' }],
+    solution: [{ html: t('{a}, puis 1/(1 − w) = Σ wⁿ.', { a: M(`${d.f} = ${d.geo}`) }), note: '' }],
   }, rng);
 }
 
@@ -202,10 +203,10 @@ function taMcq(level, rng, opts) {
 
 const LA = 'c-laurent';
 const LA_SUB = [
-  { id: 'des', label: 'éléments simples', skill: 'g0-pfd-simple' },
-  { id: 'inner', label: 'développement en puissances de z', skill: LA },
-  { id: 'outer', label: 'développement en puissances de 1/z', skill: LA },
-  { id: 'assemble', label: 'assembler la série', skill: LA },
+  { id: 'des', label: t('éléments simples'), skill: 'g0-pfd-simple' },
+  { id: 'inner', label: t('développement en puissances de z'), skill: LA },
+  { id: 'outer', label: t('développement en puissances de 1/z'), skill: LA },
+  { id: 'assemble', label: t('assembler la série'), skill: LA },
 ];
 
 const lin = (c) => (q(c).n === 0 ? 'z' : `(z${q(c).n < 0 ? '+' : '-'}${qs(q(c).n < 0 ? q(c).neg() : c)})`);
@@ -288,11 +289,11 @@ function laCoef(d, k) {
 function powQ(c, e) { let r = q(1); for (let j = 0; j < e; j++) r = r.mul(q(c)); return r; }
 
 const LA_MENU = (right) => [
-  { id: 'des', label: 'Décomposer en éléments simples' },
-  { id: 'inner', label: '|z| < |c| : 1/(z − c) = −(1/c)·1/(1 − z/c), puissances de z' },
-  { id: 'outer', label: '|z| > |c| : 1/(z − c) = (1/z)·1/(1 − c/z), puissances de 1/z' },
-  { id: 'sum', label: 'Additionner les deux séries' },
-].map((o) => ({ ...o, valid: o.id === right, why: o.why || 'Ce n\'est pas l\'étape à faire maintenant.' }));
+  { id: 'des', label: t('Décomposer en éléments simples') },
+  { id: 'inner', label: t('|z| < |c| : 1/(z − c) = −(1/c)·1/(1 − z/c), puissances de z') },
+  { id: 'outer', label: t('|z| > |c| : 1/(z − c) = (1/z)·1/(1 − c/z), puissances de 1/z') },
+  { id: 'sum', label: t('Additionner les deux séries') },
+].map((o) => ({ ...o, valid: o.id === right, why: o.why || t('Ce n\'est pas l\'étape à faire maintenant.') }));
 
 function laTermPart(d, c, outer, first, level) {
   const e = expand(c, outer);
@@ -301,15 +302,15 @@ function laTermPart(d, c, outer, first, level) {
   const traps = { c_laurent_wrong_annulus: [{ line: e.wrong, ctx: { annulus: d.regT, a: rd(qs(C.n < 0 ? C.neg() : C)) } }] };
   if (e.sign) traps.c_laurent_sign = [e.sign];
   const decision = {
-    kind: 'decision', prompt: `Dans ${d.regT}, pour 1/${rd(lin(c))} :`, levels: [2, 3, 4, 5], options: [
-      { id: 'in', label: `|z| < ${Math.abs(c)} : puissances de z`, valid: !outer, ...(outer ? { rule: 'c_laurent_wrong_annulus', why: `Ici |z| > ${Math.abs(c)} : la série en z/${rd(qs(c))} diverge.` } : {}) },
-      { id: 'out', label: `|z| > ${Math.abs(c)} : puissances de 1/z`, valid: outer, ...(!outer ? { rule: 'c_laurent_wrong_annulus', why: `Ici |z| < ${Math.abs(c)} : la série en ${rd(qs(c))}/z diverge.` } : {}) },
+    kind: 'decision', prompt: t('Dans {regT}, pour 1/{a} :', { regT: d.regT, a: rd(lin(c)) }), levels: [2, 3, 4, 5], options: [
+      { id: 'in', label: t('|z| < {a} : puissances de z', { a: Math.abs(c) }), valid: !outer, ...(outer ? { rule: 'c_laurent_wrong_annulus', why: t('Ici |z| > {a} : la série en z/{b} diverge.', { a: Math.abs(c), b: rd(qs(c)) }) } : {}) },
+      { id: 'out', label: t('|z| > {a} : puissances de 1/z', { a: Math.abs(c) }), valid: outer, ...(!outer ? { rule: 'c_laurent_wrong_annulus', why: t('Ici |z| < {a} : la série en {b}/z diverge.', { a: Math.abs(c), b: rd(qs(c)) }) } : {}) },
     ],
   };
   return {
-    html: first ? 'Chaque élément simple, selon la couronne :' : '', ask: `1/${rd(lin(c))} =`, start: `1/${lin(c)}`,
+    html: first ? t('Chaque élément simple, selon la couronne :') : '', ask: `1/${rd(lin(c))} =`, start: `1/${lin(c)}`,
     judge: zcfg(d.dom, { final: 'series', alt: { z: altDom }, traps }), decisions: [decision],
-    lines: [eq(e.geo, outer ? '1/(z − c) = (1/z)·1/(1 − c/z)' : '1/(z − c) = −(1/c)·1/(1 − z/c)', outer ? 'outer' : 'inner'), eq(e.sum, 'série géométrique', outer ? 'outer' : 'inner', [e.sum.replace(/^-?sum\(/, '').split(', n')[0]])],
+    lines: [eq(e.geo, outer ? '1/(z − c) = (1/z)·1/(1 − c/z)' : '1/(z − c) = −(1/c)·1/(1 − z/c)', outer ? 'outer' : 'inner'), eq(e.sum, t('série géométrique'), outer ? 'outer' : 'inner', [e.sum.replace(/^-?sum\(/, '').split(', n')[0]])],
     menu: LA_MENU(outer ? 'outer' : 'inner'),
   };
 }
@@ -317,15 +318,15 @@ function laTermPart(d, c, outer, first, level) {
 function laParts(d, level) {
   const parts = [];
   parts.push({
-    html: level === 1 ? '' : 'Éléments simples :', start: d.f, judge: zcfg(d.dom, { final: 'pfd' }),
-    lines: [eq(d.des, 'éléments simples', 'des', [d.des])], menu: LA_MENU('des'),
+    html: level === 1 ? '' : t('Éléments simples :'), start: d.f, judge: zcfg(d.dom, { final: 'pfd' }),
+    lines: [eq(d.des, t('éléments simples'), 'des', [d.des])], menu: LA_MENU('des'),
   });
   if (level === 1) parts[0].lines[0].from = 99;
   if (d.a !== 0) parts.push(laTermPart(d, d.a, d.outerA, true, level));
   parts.push(laTermPart(d, d.b, d.outerB, d.a === 0, level));
   parts.push({
-    html: 'On assemble :', ask: 'f(z) =', start: d.des, judge: zcfg(d.dom, { final: 'series' }),
-    lines: [eq(d.total, 'somme des deux développements', 'assemble', [d.total])], menu: LA_MENU('sum'),
+    html: t('On assemble :'), ask: 'f(z) =', start: d.des, judge: zcfg(d.dom, { final: 'series' }),
+    lines: [eq(d.total, t('somme des deux développements'), 'assemble', [d.total])], menu: LA_MENU('sum'),
   });
   return level === 1 ? parts.slice(1).map((p, i) => (i === 0 ? { ...p, html: `${M(`f(z) = ${d.des}`)}. ${p.html}` } : p)) : parts;
 }
@@ -340,13 +341,13 @@ function laShifted(level, rng, opts) {
   const cfg = (extra) => CV({ vars: ZV, real: ['z'], domain: { z: [1.2, 1.7] }, at: 1, ...extra });
   return linesOf({
     level, skill: LA, key: `${LA}:${level}:shift:${s}`, keys: KEYS, subgoals: LA_SUB, exam: examTag(opts, 3),
-    prompt: `Développe ${M(`f(z) = ${f}`)} en série de Laurent autour de z₀ = 1, dans 0 < |z − 1| < 1.`,
+    prompt: t('Développe {a} en série de Laurent autour de z₀ = 1, dans 0 < |z − 1| < 1.', { a: M(`f(z) = ${f}`) }),
     parts: [
-      { html: 'Éléments simples :', start: f, judge: cfg({ final: 'pfd' }), lines: [eq(des, 'éléments simples', 'des')] },
-      { html: '1/z en puissances de z − 1 (|z − 1| < 1) :', ask: '1/z =', start: '1/z', judge: cfg({ final: 'series', traps: { c_laurent_sign: ['sum((z-1)^n, n, 0, ∞)'] } }), lines: [eq('1/(1-(-(z-1)))', 'z = 1 + (z − 1)', 'inner'), eq(zsum, 'série géométrique', 'inner')] },
-      { html: 'On assemble :', ask: 'f(z) =', start: des, judge: cfg({ final: 'series' }), lines: [eq(total, '1/(z − 1) est déjà une puissance de z − 1', 'assemble')] },
+      { html: t('Éléments simples :'), start: f, judge: cfg({ final: 'pfd' }), lines: [eq(des, t('éléments simples'), 'des')] },
+      { html: t('1/z en puissances de z − 1 (|z − 1| < 1) :'), ask: '1/z =', start: '1/z', judge: cfg({ final: 'series', traps: { c_laurent_sign: ['sum((z-1)^n, n, 0, ∞)'] } }), lines: [eq('1/(1-(-(z-1)))', 'z = 1 + (z − 1)', 'inner'), eq(zsum, t('série géométrique'), 'inner')] },
+      { html: t('On assemble :'), ask: 'f(z) =', start: des, judge: cfg({ final: 'series' }), lines: [eq(total, t('1/(z − 1) est déjà une puissance de z − 1'), 'assemble')] },
     ],
-    hints: H('Décompose, puis écris 1/z = 1/(1 + (z − 1)) en puissances de z − 1.', M('1/z = sum((-1)^n (z-1)^n, n, 0, ∞)'), M(total)),
+    hints: H(t('Décompose, puis écris 1/z = 1/(1 + (z − 1)) en puissances de z − 1.'), M('1/z = sum((-1)^n (z-1)^n, n, 0, ∞)'), M(total)),
   });
 }
 
@@ -355,9 +356,9 @@ function laLines(level, rng, opts) {
   const d = laData(rng);
   return linesOf({
     level, skill: LA, key: `${LA}:${level}:${d.key}`, keys: KEYS, subgoals: LA_SUB, exam: examTag(opts, 3),
-    prompt: `Développe ${M(`f(z) = ${d.f}`)} en série de Laurent dans la couronne ${d.regT}.`,
+    prompt: t('Développe {a} en série de Laurent dans la couronne {regT}.', { a: M(`f(z) = ${d.f}`), regT: d.regT }),
     parts: laParts(d, level),
-    hints: H('Décompose, puis regarde si |z| est plus petit ou plus grand que chaque pôle.', `${M(`f(z) = ${d.des}`)}`, M(d.total)),
+    hints: H(t('Décompose, puis regarde si |z| est plus petit ou plus grand que chaque pôle.'), `${M(`f(z) = ${d.des}`)}`, M(d.total)),
   });
 }
 
@@ -366,17 +367,17 @@ function laProblem(level, rng, opts) {
   const base = laData(rng, 'mid');
   const regs = ['in', 'mid', 'out'].map((reg) => laFrom(base.a, base.b, reg));
   const items = regs.map((d) => linesOf({
-    level: 4, skill: LA, key: `${LA}:5:${d.key}`, keys: KEYS, subgoals: LA_SUB, prompt: `Dans ${d.regT} :`,
+    level: 4, skill: LA, key: `${LA}:5:${d.key}`, keys: KEYS, subgoals: LA_SUB, prompt: t('Dans {regT} :', { regT: d.regT }),
     parts: [{ start: d.f, judge: zcfg(d.dom, { final: 'series' }), lines: [eq(d.total, '', 'assemble')] }], hints: H('', '', ''),
   }));
   const last = regs[2];
   const k = rng.pick([-3, -4]);
   const c = laCoef(last, k);
-  const coef = answerItem({ skill: LA, level, key: `5:${last.key}:${k}`, prompt: `Dans ${last.regT}, le coefficient a${kSub(k)} de ${M(`z^(${k})`)} vaut :`, expected: qs(c) });
+  const coef = answerItem({ skill: LA, level, key: `5:${last.key}:${k}`, prompt: t('Dans {regT}, le coefficient a{a} de {b} vaut :', { regT: last.regT, a: kSub(k), b: M(`z^(${k})`) }), expected: qs(c) });
   return problemItem({
     skill: LA, level, key: `5:${base.key}`, exam: examTag(opts, 4),
-    prompt: `${M(`f(z) = ${base.f}`)} : séries de Laurent dans les trois régions, puis un coefficient.`,
-    parts: [...items.map((it, i) => ({ item: it, points: 1, title: regs[i].regT })), { item: coef, points: 1, title: 'Coefficient' }],
+    prompt: t('{a} : séries de Laurent dans les trois régions, puis un coefficient.', { a: M(`f(z) = ${base.f}`) }),
+    parts: [...items.map((it, i) => ({ item: it, points: 1, title: regs[i].regT })), { item: coef, points: 1, title: t('Coefficient') }],
   });
 }
 
@@ -389,14 +390,14 @@ const kSub = (k) => String(k).replace('-', '₋').replace(/\d/g, (x) => '₀₁�
 function laCoefItem(level, rng, opts) {
   if (rng.chance(0.35)) {
     const e = rng.pick(ESS_COEF);
-    return answerItem({ skill: LA, level, key: `ess:${e.f}:${e.k}`, exam: examTag(opts, 2), prompt: `Série de Laurent de ${M(`f(z) = ${e.f}`)} dans |z| > 0 : a${kSub(e.k)} = ?`, expected: e.c });
+    return answerItem({ skill: LA, level, key: `ess:${e.f}:${e.k}`, exam: examTag(opts, 2), prompt: t('Série de Laurent de {a} dans |z| > 0 : a{b} = ?', { a: M(`f(z) = ${e.f}`), b: kSub(e.k) }), expected: e.c });
   }
   const d = laData(rng);
   const ks = d.reg === 'in' ? [1, 2] : d.reg === 'mid' ? [-2, -3, 1, 2].filter((k) => d.a !== 0 || k > 0) : [-3, -4];
   const k = rng.pick(ks);
   return answerItem({
     skill: LA, level, key: `${d.key}:${k}`, exam: examTag(opts, 2),
-    prompt: `Série de Laurent de ${M(`f(z) = ${d.f}`)} dans ${d.regT} : a${kSub(k)} (coefficient de ${M(`z^(${k})`)}) = ?`,
+    prompt: t('Série de Laurent de {a} dans {regT} : a{b} (coefficient de {c}) = ?', { a: M(`f(z) = ${d.f}`), regT: d.regT, b: kSub(k), c: M(`z^(${k})`) }),
     expected: qs(laCoef(d, k)), solution: [{ html: M(`f(z) = ${d.total}`), note: '' }],
   });
 }
@@ -406,21 +407,21 @@ function laMcq(level, rng, opts) {
   const regs = ['in', 'mid', 'out'].map((reg) => laFrom(d.a, d.b, reg));
   if (opts.multi) {
     const pool = [
-      { html: `dans ${regs[1].regT} : ${M(`f(z) = ${regs[1].total}`)}`, correct: true },
-      { html: `dans ${regs[1].regT} : ${M(`f(z) = ${regs[0].total}`)}`, correct: false, rule: 'c_laurent_wrong_annulus' },
-      { html: `dans ${regs[0].regT} : ${M(`f(z) = ${regs[0].total}`)}`, correct: true },
-      { html: `dans ${regs[2].regT} : ${M(`f(z) = ${regs[2].total}`)}`, correct: true },
-      { html: `dans ${regs[2].regT} : ${M(`f(z) = ${regs[1].total}`)}`, correct: false, rule: 'c_laurent_wrong_annulus' },
+      { html: t('dans {a} : {b}', { a: regs[1].regT, b: M(`f(z) = ${regs[1].total}`) }), correct: true },
+      { html: t('dans {a} : {b}', { a: regs[1].regT, b: M(`f(z) = ${regs[0].total}`) }), correct: false, rule: 'c_laurent_wrong_annulus' },
+      { html: t('dans {a} : {b}', { a: regs[0].regT, b: M(`f(z) = ${regs[0].total}`) }), correct: true },
+      { html: t('dans {a} : {b}', { a: regs[2].regT, b: M(`f(z) = ${regs[2].total}`) }), correct: true },
+      { html: t('dans {a} : {b}', { a: regs[2].regT, b: M(`f(z) = ${regs[1].total}`) }), correct: false, rule: 'c_laurent_wrong_annulus' },
     ];
-    return choice({ skill: LA, level, multi: true, key: `multi:${d.key}`, exam: examTag(opts, 2), prompt: `${M(`f(z) = ${d.f}`)}. Cochez les développements justes.`, options: pickK(rng, pool, 5) }, rng);
+    return choice({ skill: LA, level, multi: true, key: `multi:${d.key}`, exam: examTag(opts, 2), prompt: t('{a}. Cochez les développements justes.', { a: M(`f(z) = ${d.f}`) }), options: pickK(rng, pool, 5) }, rng);
   }
   const neg = regs[1].total.startsWith('-') ? regs[1].total.slice(1) : `-(${regs[1].total})`;
   return choice({
     skill: LA, level, key: `mcq:${d.key}`, exam: examTag(opts, 2),
-    prompt: `La série de Laurent de ${M(`f(z) = ${d.f}`)} dans ${d.regT} est :`,
+    prompt: t('La série de Laurent de {a} dans {regT} est :', { a: M(`f(z) = ${d.f}`), regT: d.regT }),
     right: M(regs[1].total),
     wrongs: [opt(regs[0].total, 'c_laurent_wrong_annulus'), opt(regs[2].total, 'c_laurent_wrong_annulus'), opt(neg)],
-    solution: [{ html: `${M(`f(z) = ${d.des}`)} ; |z| > ${Math.abs(d.a)} : puissances de 1/z ; |z| < ${Math.abs(d.b)} : puissances de z.`, note: '' }],
+    solution: [{ html: t('{a} ; |z| > {b} : puissances de 1/z ; |z| < {c} : puissances de z.', { a: M(`f(z) = ${d.des}`), b: Math.abs(d.a), c: Math.abs(d.b) }), note: '' }],
     expectedSec: 150,
   }, rng);
 }
@@ -431,9 +432,9 @@ function laMcq(level, rng, opts) {
 
 const SI = 'c-singularities';
 const SI_SUB = [
-  { id: 'zero-num', label: 'ordre du zéro du numérateur', skill: 'a1-dl-usual' },
-  { id: 'zero-den', label: 'ordre du zéro du dénominateur', skill: 'a1-dl-usual' },
-  { id: 'classify', label: 'classer la singularité', skill: SI },
+  { id: 'zero-num', label: t('ordre du zéro du numérateur'), skill: 'a1-dl-usual' },
+  { id: 'zero-den', label: t('ordre du zéro du dénominateur'), skill: 'a1-dl-usual' },
+  { id: 'classify', label: t('classer la singularité'), skill: SI },
 ];
 
 // Pieces in the variable v (z, or h = z − a): {t, ord, dl (leading term + o), trivial}.
@@ -447,9 +448,9 @@ const DENS = [
   { t: 'sin(V)', ord: 1, dl: 'V+o(V)' }, { t: '1-cos(V)', ord: 2, dl: 'V^2/2+o(V^2)' }, { t: 'V·sin(V)', ord: 2, dl: 'V^2+o(V^2)' },
 ];
 // The piece written in v: sin(V) → sin(z − 1), V^2 → (z − 1)^2.
-const sub = (t, v) => { const inner = v.replace(/^\((.*)\)$/, '$1'); return t.replace(/\(V\)/g, `(${inner})`).replace(/V/g, v); };
+const sub = (tt, v) => { const inner = v.replace(/^\((.*)\)$/, '$1'); return tt.replace(/\(V\)/g, `(${inner})`).replace(/V/g, v); };
 // A denominator in brackets when it is a sum or a product.
-const denT = (t) => (/[+\-·]/.test(t.replace(/\([^()]*\)/g, '')) ? `(${t})` : t);
+const denT = (tt) => (/[+\-·]/.test(tt.replace(/\([^()]*\)/g, '')) ? `(${tt})` : tt);
 
 function siData(rng) {
   for (let k = 0; k < 200; k++) {
@@ -474,43 +475,43 @@ function siData(rng) {
 }
 
 const natureDecision = (d) => ({
-  kind: 'decision', prompt: `ord(dénominateur) = ${d.qd.ord}, ord(numérateur) = ${d.p.ord} : la singularité est`, options: [
-    { id: 'rem', label: 'apparente (pas de puissance négative)', valid: d.kind === 'removable', ...(d.kind === 'removable' ? {} : { why: 'Le dénominateur s\'annule plus vite : il reste une puissance négative.' }) },
-    { id: 'pole', label: 'un pôle', valid: d.kind === 'pole', ...(d.kind === 'pole' ? {} : { rule: 'c_removable_as_pole', why: 'Le numérateur s\'annule au moins aussi vite : la limite est finie, la singularité est apparente.' }) },
-    { id: 'ess', label: 'essentielle', valid: false, why: 'Un quotient de fonctions holomorphes n\'a pas de singularité essentielle là : seulement un nombre fini de puissances négatives.' },
+  kind: 'decision', prompt: t('ord(dénominateur) = {ord}, ord(numérateur) = {ord2} : la singularité est', { ord: d.qd.ord, ord2: d.p.ord }), options: [
+    { id: 'rem', label: t('apparente (pas de puissance négative)'), valid: d.kind === 'removable', ...(d.kind === 'removable' ? {} : { why: t('Le dénominateur s\'annule plus vite : il reste une puissance négative.') }) },
+    { id: 'pole', label: t('un pôle'), valid: d.kind === 'pole', ...(d.kind === 'pole' ? {} : { rule: 'c_removable_as_pole', why: t('Le numérateur s\'annule au moins aussi vite : la limite est finie, la singularité est apparente.') }) },
+    { id: 'ess', label: 'essentielle', valid: false, why: t('Un quotient de fonctions holomorphes n\'a pas de singularité essentielle là : seulement un nombre fini de puissances négatives.') },
   ],
 });
 
 function siParts(d, level) {
   const parts = [];
   const v = d.v;
-  const shiftNote = d.a === 0 ? '' : `On pose h = z ${d.a < 0 ? '+' : '−'} ${Math.abs(d.a)} : f = ${M(d.fv)}. `;
+  const shiftNote = d.a === 0 ? '' : t('On pose h = z {a} {b} : f = {fv}. ', { a: d.a < 0 ? '+' : '−', b: Math.abs(d.a), fv: M(d.fv) });
   const series = (pc, subgoal, label) => ({
-    html: `${label} :`, ask: '', start: sub(pc.t, v), judge: { kind: 'series', v, at: 0, order: pc.ord },
-    lines: [eq(sub(pc.dl, v), 'DL usuel', subgoal, [sub(pc.dl, v).split('+o(')[0]])],
-    menu: [{ id: 'dl', label: 'Écrire le premier terme non nul du DL', valid: true }, { id: 'lim', label: 'Calculer la limite', valid: false, why: 'On veut l\'ordre du zéro : le premier terme non nul du DL.' }],
+    html: t('{label} :', { label }), ask: '', start: sub(pc.t, v), judge: { kind: 'series', v, at: 0, order: pc.ord },
+    lines: [eq(sub(pc.dl, v), t('DL usuel'), subgoal, [sub(pc.dl, v).split('+o(')[0]])],
+    menu: [{ id: 'dl', label: t('Écrire le premier terme non nul du DL'), valid: true }, { id: 'lim', label: t('Calculer la limite'), valid: false, why: t('On veut l\'ordre du zéro : le premier terme non nul du DL.') }],
   });
   if (level >= 2) {
-    if (!d.p.trivial) parts.push(series(d.p, 'zero-num', `${shiftNote}Le numérateur`));
-    if (!d.qd.trivial) parts.push(series(d.qd, 'zero-den', parts.length ? 'Le dénominateur' : `${shiftNote}Le dénominateur`));
+    if (!d.p.trivial) parts.push(series(d.p, 'zero-num', t('{shiftNote}Le numérateur', { shiftNote })));
+    if (!d.qd.trivial) parts.push(series(d.qd, 'zero-den', parts.length ? t('Le dénominateur') : t('{shiftNote}Le dénominateur', { shiftNote })));
   }
-  const ask = d.kind === 'pole' ? 'ordre du pôle m =' : 'ordre (0 : apparente) m =';
+  const ask = d.kind === 'pole' ? t('ordre du pôle m =') : t('ordre (0 : apparente) m =');
   const traps = d.p.ord > 0 && d.qd.ord !== d.m ? { c_order_pole_numerator: [String(d.qd.ord)] } : {};
   parts.push({
-    html: level === 1 ? `${shiftNote}${d.p.ord ? `Le numérateur a un zéro d'ordre ${d.p.ord}` : "Le numérateur ne s'annule pas"}, le dénominateur a un zéro d'ordre ${d.qd.ord}.` : (parts.length ? 'On conclut :' : `${shiftNote}On conclut :`), ask,
+    html: level === 1 ? (d.p.ord ? t('{shiftNote}Le numérateur a un zéro d\'ordre {ord}, le dénominateur a un zéro d\'ordre {ord2}.', { shiftNote, ord: d.p.ord, ord2: d.qd.ord }) : t('{shiftNote}Le numérateur ne s\'annule pas, le dénominateur a un zéro d\'ordre {ord}.', { shiftNote, ord: d.qd.ord })) : (parts.length ? t('On conclut :') : t('{shiftNote}On conclut :', { shiftNote })), ask,
     start: 'm', judge: CV({ raw: { text: 'm', html: M('m') }, expect: String(d.m), final: 'number', traps }),
     decisions: [
       ...(level === 3 ? [{
-        kind: 'decision', prompt: 'Quelle méthode ?', options: [
-          { id: 'zeros', label: 'Ordres des zéros en haut et en bas', valid: true, ref: true },
-          { id: 'laurent', label: 'Série de Laurent complète', valid: true, quality: 'poor', why: 'Juste, mais les ordres des zéros suffisent.' },
-          { id: 'lim', label: 'Limite de f en z₀', valid: true, quality: 'poor', why: 'Juste pour reconnaître une singularité apparente, mais elle ne donne pas l\'ordre du pôle.' },
+        kind: 'decision', prompt: t('Quelle méthode ?'), options: [
+          { id: 'zeros', label: t('Ordres des zéros en haut et en bas'), valid: true, ref: true },
+          { id: 'laurent', label: t('Série de Laurent complète'), valid: true, quality: 'poor', why: t('Juste, mais les ordres des zéros suffisent.') },
+          { id: 'lim', label: t('Limite de f en z₀'), valid: true, quality: 'poor', why: t('Juste pour reconnaître une singularité apparente, mais elle ne donne pas l\'ordre du pôle.') },
         ],
       }] : []),
       natureDecision(d),
     ],
-    lines: [eq(String(d.m), d.kind === 'pole' ? 'ord(bas) − ord(haut)' : 'le numérateur compense', 'classify', [String(d.m)])],
-    menu: [{ id: 'diff', label: 'm = ord(dénominateur) − ord(numérateur)', valid: true }, { id: 'den', label: 'm = ord(dénominateur)', valid: false, rule: 'c_order_pole_numerator', why: 'Le numérateur s\'annule aussi : retranche son ordre.' }],
+    lines: [eq(String(d.m), d.kind === 'pole' ? t('ord(bas) − ord(haut)') : t('le numérateur compense'), 'classify', [String(d.m)])],
+    menu: [{ id: 'diff', label: t('m = ord(dénominateur) − ord(numérateur)'), valid: true }, { id: 'den', label: t('m = ord(dénominateur)'), valid: false, rule: 'c_order_pole_numerator', why: t('Le numérateur s\'annule aussi : retranche son ordre.') }],
   });
   return parts;
 }
@@ -519,28 +520,28 @@ function siLines(level, rng, opts) {
   const d = siData(rng);
   return linesOf({
     level, skill: SI, key: `${SI}:${level}:${d.key}`, keys: KEYS, subgoals: SI_SUB, exam: examTag(opts, 1.5),
-    prompt: `Nature de la singularité de ${M(`f(z) = ${d.f}`)} en z₀ = ${rd(String(d.a))} ; si c'est un pôle, son ordre.`,
+    prompt: t('Nature de la singularité de {a} en z₀ = {b} ; si c\'est un pôle, son ordre.', { a: M(`f(z) = ${d.f}`), b: rd(String(d.a)) }),
     parts: siParts(d, level),
-    hints: H('Compte l\'ordre du zéro en haut et en bas.', `${d.p.dl ? M(sub(d.p.dl, d.v)) : `ordre ${d.p.ord}`} en haut, ${d.qd.dl ? M(sub(d.qd.dl, d.v)) : `ordre ${d.qd.ord}`} en bas`, d.kind === 'pole' ? `pôle d'ordre ${d.m}` : 'singularité apparente (m = 0)'),
+    hints: H(t('Compte l\'ordre du zéro en haut et en bas.'), t('{a} en haut, {b} en bas', { a: d.p.dl ? M(sub(d.p.dl, d.v)) : t('ordre {ord}', { ord: d.p.ord }), b: d.qd.dl ? M(sub(d.qd.dl, d.v)) : t('ordre {ord}', { ord: d.qd.ord }) }), d.kind === 'pole' ? t('pôle d\'ordre {m}', { m: d.m }) : t('singularité apparente (m = 0)')),
   });
 }
 
 const ESS = [{ f: 'e^(1/z)', z0: '0' }, { f: 'z^2·sin(1/z)', z0: '0' }, { f: 'sin(1/(1-2z))', z0: '1/2' }, { f: 'cos(1/z)', z0: '0' }, { f: 'z·e^(1/z)', z0: '0' }];
 
 function siMcqOf(level, rng, opts, f, z0, truth) {
-  const labels = ['une singularité apparente', 'un pôle simple', 'un pôle double', 'une singularité essentielle'];
+  const labels = [t('une singularité apparente'), t('un pôle simple'), t('un pôle double'), t('une singularité essentielle')];
   const right = truth.kind === 'removable' ? 0 : truth.kind === 'essential' ? 3 : truth.order === 1 ? 1 : truth.order === 2 ? 2 : -1;
   const options = labels.map((l, i) => ({
     html: l, correct: i === right,
     rule: i === right ? null : truth.kind === 'removable' && (i === 1 || i === 2) ? 'c_removable_as_pole' : truth.kind === 'pole' && (i === 1 || i === 2) ? 'c_order_pole_numerator' : null,
   }));
-  if (right < 0) options.push({ html: `un pôle d'ordre ${truth.order}`, correct: true });
-  return choice({ skill: SI, level, key: `mcq:${f}:${z0}`, exam: examTag(opts, 2), keepOrder: true, prompt: `En z₀ = ${rd(z0)}, ${M(`f(z) = ${f}`)} a :`, options }, rng);
+  if (right < 0) options.push({ html: t('un pôle d\'ordre {order}', { order: truth.order }), correct: true });
+  return choice({ skill: SI, level, key: `mcq:${f}:${z0}`, exam: examTag(opts, 2), keepOrder: true, prompt: t('En z₀ = {z0}, {a} a :', { z0: rd(z0), a: M(`f(z) = ${f}`) }), options }, rng);
 }
 
 // Several statements « en z₀, f a … », each true or false (opts.multi).
 function siMulti(level, rng, opts) {
-  const NAT = (t) => (t.kind === 'removable' ? 'une singularité apparente' : t.kind === 'essential' ? 'une singularité essentielle' : t.order === 1 ? 'un pôle simple' : t.order === 2 ? 'un pôle double' : `un pôle d'ordre ${t.order}`);
+  const NAT = (tt) => (tt.kind === 'removable' ? t('une singularité apparente') : tt.kind === 'essential' ? t('une singularité essentielle') : tt.order === 1 ? t('un pôle simple') : tt.order === 2 ? t('un pôle double') : t('un pôle d\'ordre {order}', { order: tt.order }));
   const items = [];
   const seen = new Set();
   for (let k = 0; k < 40 && items.length < 4; k++) {
@@ -560,13 +561,13 @@ function siMulti(level, rng, opts) {
       else if (x.d && x.d.p.ord > 0) { claim = { kind: 'pole', order: x.d.qd.ord }; rule = 'c_order_pole_numerator'; } else claim = { kind: 'pole', order: x.t.order + 1 };
     }
     const right = NAT(claim) === NAT(x.t);
-    return { html: `en z₀ = ${rd(x.z0)}, ${M(`f(z) = ${x.f}`)} a ${NAT(claim)}`, correct: right, rule: right ? null : rule };
+    return { html: t('en z₀ = {z0}, {a} a {b}', { z0: rd(x.z0), a: M(`f(z) = ${x.f}`), b: NAT(claim) }), correct: right, rule: right ? null : rule };
   });
   if (!options.some((o) => o.correct)) {
     const x = items[0];
-    options[0] = { html: `en z₀ = ${rd(x.z0)}, ${M(`f(z) = ${x.f}`)} a ${NAT(x.t)}`, correct: true };
+    options[0] = { html: t('en z₀ = {z0}, {a} a {b}', { z0: rd(x.z0), a: M(`f(z) = ${x.f}`), b: NAT(x.t) }), correct: true };
   }
-  return choice({ skill: SI, level, multi: true, key: `multi:${items.map((x) => x.f).join(',')}`, exam: examTag(opts, 2), prompt: 'Cochez les affirmations vraies.', options }, rng);
+  return choice({ skill: SI, level, multi: true, key: `multi:${items.map((x) => x.f).join(',')}`, exam: examTag(opts, 2), prompt: t('Cochez les affirmations vraies.'), options }, rng);
 }
 
 function siMcq(level, rng, opts) {
@@ -588,18 +589,18 @@ function siProblem(level, rng, opts) {
   const f = `${p}/(z${m > 1 ? `^${m}` : ''}(z${a > 0 ? '-' : '+'}${Math.abs(a)})${k > 1 ? `^${k}` : ''})`;
   const node = parse(f, { vars: ['z'], complex: true });
   const parts = [0, a].map((z0) => {
-    const t = singularityType(node, 'z', z0);
-    return { item: siMcqOf(level, rng, {}, f, String(z0), t), points: 1, title: `z₀ = ${rd(String(z0))}` };
+    const tt = singularityType(node, 'z', z0);
+    return { item: siMcqOf(level, rng, {}, f, String(z0), tt), points: 1, title: `z₀ = ${rd(String(z0))}` };
   });
-  return problemItem({ skill: SI, level, key: `5:${f}`, exam: examTag(opts, 2), prompt: `Les singularités de ${M(`f(z) = ${f}`)} sont 0 et ${rd(String(a))}. Classe-les.`, parts });
+  return problemItem({ skill: SI, level, key: `5:${f}`, exam: examTag(opts, 2), prompt: t('Les singularités de {a} sont 0 et {b}. Classe-les.', { a: M(`f(z) = ${f}`), b: rd(String(a)) }), parts });
 }
 
 function siOpen(level, rng, opts) {
   const a = siLines(4, rng, {});
   const b = siLines(4, rng, {});
   return problemItem({
-    skill: SI, level, key: `open:${a.key}:${b.key}`, exam: examTag(opts, 3), prompt: 'Classe les singularités de ces deux fonctions.',
-    parts: [{ item: a, points: 1.5, title: 'Première fonction' }, { item: b, points: 1.5, title: 'Seconde fonction' }],
+    skill: SI, level, key: `open:${a.key}:${b.key}`, exam: examTag(opts, 3), prompt: t('Classe les singularités de ces deux fonctions.'),
+    parts: [{ item: a, points: 1.5, title: t('Première fonction') }, { item: b, points: 1.5, title: t('Seconde fonction') }],
   });
 }
 

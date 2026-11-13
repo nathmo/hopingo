@@ -29,6 +29,7 @@ import { stripParen } from '../cas/ast.js';
 import { geomML, sideML } from './geom.js';
 import { toMathML } from '../cas/mathml.js';
 import { diagnoseLine } from './diagnose.js';
+import { t as tr } from '../i18n.js';
 
 export const sign = '⇔';
 
@@ -70,7 +71,7 @@ function readElement(name, body) {
   if (POINTS.has(kind)) {
     const ast = parseVec(body, {});
     const v = evalVec(ast, {}, {});
-    if (v.k !== 'v' || v.items.length !== 2) throw new Error(`${name} est un point (ou un vecteur) du plan : écris (x ; y).`);
+    if (v.k !== 'v' || v.items.length !== 2) throw new Error(tr('{name} est un point (ou un vecteur) du plan : écris (x ; y).', { name }));
     return { name, kind, ast, nodes: v.items, value: floats(v) };
   }
   if (LINES.has(kind)) {
@@ -79,7 +80,7 @@ function readElement(name, body) {
     const lines = parts.map((p) => {
       // A line with irrational coefficients (x = 2 + 9√5/5) is read numerically.
       if (p.kind === 'poly' && p.coefs.slice(0, 3).every((c) => Math.abs(c) < 1e-12) && Math.hypot(p.coefs[3], p.coefs[4]) > 1e-12) return normLine(p.coefs.slice(3));
-      if (p.kind !== 'affine' || p.rows.length !== 1) throw new Error('Écris une droite : ax + by + c = 0.');
+      if (p.kind !== 'affine' || p.rows.length !== 1) throw new Error(tr('Écris une droite : ax + by + c = 0.'));
       const r = p.rows[0].map((q) => q.valueOf());
       return normLine(r);
     });
@@ -87,7 +88,7 @@ function readElement(name, body) {
   }
   const node = parse(body, {});
   const x = evalFloat(node, {});
-  if (!Number.isFinite(x)) throw new Error(`Je n'arrive pas à calculer ${name}.`);
+  if (!Number.isFinite(x)) throw new Error(tr('Je n\'arrive pas à calculer {name}.', { name }));
   return { name, kind, node, value: x };
 }
 
@@ -98,12 +99,12 @@ function readStrict(cfg, text) {
   if (els.every(Boolean)) {
     return { t: 'cline', text: String(text).trim(), elements: els.map((m) => readElement(m[1], m[2])) };
   }
-  if (els.some(Boolean) && items.length > 1) throw new Error('Une ligne donne soit des éléments (Ω = …, a = …), soit une équation.');
+  if (els.some(Boolean) && items.length > 1) throw new Error(tr('Une ligne donne soit des éléments (Ω = …, a = …), soit une équation.'));
   // An equation in x, y or in X, Y.
   const reduced = /[XY]/.test(t);
-  if (reduced && /[xy]/.test(t)) throw new Error('Écris l\'équation en x et y, ou en X et Y, pas les deux.');
+  if (reduced && /[xy]/.test(t)) throw new Error(tr('Écris l\'équation en x et y, ou en X et Y, pas les deux.'));
   const coefs = coefsOfText(t, reduced ? ['X', 'Y'] : ['x', 'y']);
-  if (!coefs) throw new Error('Écris une équation du 2e degré en x et y.');
+  if (!coefs) throw new Error(tr('Écris une équation du 2e degré en x et y.'));
   const body = reduced ? t.replace(/X/g, 'x').replace(/Y/g, 'y') : t;
   const sides = splitTop(body, '=');
   return { t: 'cline', text: String(text).trim(), eq: { coefs, reduced, sides: sides.map((s) => parse(s, { vars: ['x', 'y'] })) } };
@@ -175,32 +176,32 @@ function checkElement(cfg, el) {
   switch (el.kind) {
     case 'Ω': {
       const C = an.center ?? an.vertex;
-      if (!C || an.type === 'parabola') return { ok: false, message: 'Une parabole n\'a pas de centre.' };
-      return samePoint(C, el.value) ? { ok: true } : { ok: false, message: 'Ce n\'est pas le centre.' };
+      if (!C || an.type === 'parabola') return { ok: false, message: tr('Une parabole n\'a pas de centre.') };
+      return samePoint(C, el.value) ? { ok: true } : { ok: false, message: tr('Ce n\'est pas le centre.') };
     }
-    case 'F': { const i = pick(an.foci, el.value); return i >= 0 ? { ok: true, hit: ['F', i] } : { ok: false, message: 'Ce n\'est pas un foyer.' }; }
-    case 'S': { const i = pick(an.allVertices, el.value); return i >= 0 ? { ok: true, hit: ['S', i] } : { ok: false, message: 'Ce n\'est pas un sommet.' }; }
+    case 'F': { const i = pick(an.foci, el.value); return i >= 0 ? { ok: true, hit: ['F', i] } : { ok: false, message: tr('Ce n\'est pas un foyer.') }; }
+    case 'S': { const i = pick(an.allVertices, el.value); return i >= 0 ? { ok: true, hit: ['S', i] } : { ok: false, message: tr('Ce n\'est pas un sommet.') }; }
     case 'u_1': case 'u_2': {
       const unit = Math.abs(Math.hypot(...el.value) - 1) < 1e-7;
       const eig = an.vecs.some((u) => Math.abs(Math.abs(u[0] * el.value[0] + u[1] * el.value[1]) - Math.hypot(...el.value)) < 1e-7);
-      if (!eig) return { ok: false, message: 'Ce n\'est pas un vecteur propre de A.' };
-      if (!unit) return { ok: false, message: 'Ce vecteur n\'est pas normé : divise-le par sa norme.', rule: 'g10_eigvec_not_normed' };
+      if (!eig) return { ok: false, message: tr('Ce n\'est pas un vecteur propre de A.') };
+      if (!unit) return { ok: false, message: tr('Ce vecteur n\'est pas normé : divise-le par sa norme.'), rule: 'g10_eigvec_not_normed' };
       return { ok: true };
     }
     case 'asymptotes': case 'directrices': {
       const list = an[el.kind];
       const idx = el.lines.map((L) => list.findIndex((M) => sameLine(L, M)));
-      if (!list.length) return { ok: false, message: el.kind === 'asymptotes' ? 'Cette conique n\'a pas d\'asymptote.' : 'Cette conique n\'a pas de directrice.' };
-      return idx.every((i) => i >= 0) ? { ok: true, hit: [el.kind, ...idx] } : { ok: false, message: el.kind === 'asymptotes' ? 'Ce n\'est pas une asymptote.' : 'Ce n\'est pas une directrice.' };
+      if (!list.length) return { ok: false, message: el.kind === 'asymptotes' ? tr('Cette conique n\'a pas d\'asymptote.') : tr('Cette conique n\'a pas de directrice.') };
+      return idx.every((i) => i >= 0) ? { ok: true, hit: [el.kind, ...idx] } : { ok: false, message: el.kind === 'asymptotes' ? tr('Ce n\'est pas une asymptote.') : tr('Ce n\'est pas une directrice.') };
     }
     case 'axe': {
       const ok = el.lines.every((L) => (an.axis && sameLine(L, an.axis)) || (an.minorAxis && sameLine(L, an.minorAxis)));
-      return ok ? { ok: true } : { ok: false, message: 'Ce n\'est pas un axe de la conique.' };
+      return ok ? { ok: true } : { ok: false, message: tr('Ce n\'est pas un axe de la conique.') };
     }
     default: {
       const want = an[el.kind];
-      if (want === undefined) return { ok: false, message: `Cette conique n'a pas de ${el.kind}.` };
-      return sameNum(want, el.value) ? { ok: true } : { ok: false, message: `${el.name} n'a pas la bonne valeur.` };
+      if (want === undefined) return { ok: false, message: tr('Cette conique n\'a pas de {k}.', { k: el.kind }) };
+      return sameNum(want, el.value) ? { ok: true } : { ok: false, message: tr('{name} n\'a pas la bonne valeur.', { name: el.name }) };
     }
   }
 }
@@ -300,13 +301,13 @@ export function judgeLine(cfg, prev, input, state = {}) {
   else {
     try { node = readStrict(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   const ctxCfg = Object.assign(Object.create(cfg), { _an: analysis(cfg) });
   const diag = () => diagnoseLine('conic', prev, node, ctxCfg, (c, n) => sameLineNode(cfg, c, n));
   if (node.eq) {
     if (!sameEquation(cfg, node.eq)) {
       const d = diag();
-      const message = node.eq.reduced ? 'Ce n\'est pas l\'équation de la conique dans un repère de ses axes.' : 'Ce n\'est pas une équation de la même conique.';
+      const message = node.eq.reduced ? tr('Ce n\'est pas l\'équation de la conique dans un repère de ses axes.') : tr('Ce n\'est pas une équation de la même conique.');
       return { kind: 'wrong', node, rule: d?.rules[0] ?? null, diag: d, message };
     }
   } else if (node.elements) {
@@ -328,7 +329,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
         state.given[k] = [...new Set([...(state.given[k] || []), ...idx])];
       } else state.given[el.kind] = true;
     }
-  } else return { kind: 'form', node, message: 'Écris une équation, ou des éléments comme « Ω = (1 ; 2) ».' };
+  } else return { kind: 'form', node, message: tr('Écris une équation, ou des éléments comme « Ω = (1 ; 2) ».') };
   const fin = finalOf(cfg, node, state);
   if (fin === true) return { kind: 'done', node };
   return { kind: 'ok', node };

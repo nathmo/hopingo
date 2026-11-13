@@ -19,6 +19,7 @@ import { Q } from '../../math/rational.js';
 import { MT, mcq, tfItem, linesItem } from './kit.js';
 import { modeOf, H, E, tpl, withMenus, SEG, sup } from './analyse1-e-kit.js';
 import { blanks } from './geo-kit.js';
+import { t } from '../../i18n.js';
 
 const CP = 'a2-curve-param';
 const CL = 'a2-curve-length';
@@ -112,26 +113,26 @@ const vT = (xs) => `(${xs.join(' ; ')})`;
 const vR = (xs) => fr(vT(xs)).replace(/\^2/g, '²');
 const gammaML = (comps) => `γ(t) = (${comps.map((c) => MT(c.text, TV)).join(' ; ')})`;
 const CP_SUB = [
-  { id: 'deriv', label: 'dériver chaque composante', skill: 'g6-deriv-rules' },
-  { id: 'evaluate', label: 'évaluer en t₀', skill: CP },
-  { id: 'tangent', label: 'droite tangente', skill: CP },
+  { id: 'deriv', label: t('dériver chaque composante'), skill: 'g6-deriv-rules' },
+  { id: 'evaluate', label: t('évaluer en t₀'), skill: CP },
+  { id: 'tangent', label: t('droite tangente'), skill: CP },
 ];
 const CP_CHOICES = [
-  { id: 'table', label: 'Dérivée usuelle' },
-  { id: 'product', label: 'Règle du produit' },
-  { id: 'chain', label: 'Règle de chaîne' },
-  { id: 'simplify', label: 'Simplifier' },
+  { id: 'table', label: t('Dérivée usuelle') },
+  { id: 'product', label: t('Règle du produit') },
+  { id: 'chain', label: t('Règle de chaîne') },
+  { id: 'simplify', label: t('Simplifier') },
 ];
-const vmenu = (label) => [{ id: 'ok', label, valid: true }, { id: 'bad', label: 'Dériver encore une fois', valid: false, why: 'Il suffit de remplacer t par t₀ dans ce qu\'on a déjà.' }];
+const vmenu = (label) => [{ id: 'ok', label, valid: true }, { id: 'bad', label: t('Dériver encore une fois'), valid: false, why: t('Il suffit de remplacer t par t₀ dans ce qu\'on a déjà.') }];
 
 function cpLines(level, rng) {
   const d = drawCurve(rng);
   const t0 = d.t0.text;
   const eqj = { kind: 'equiv', vars: ['t'], dvar: 't', domain: { t: [-3, 3] }, target: 'no-prime' };
   const parts = d.comps.map((c, i) => ({
-    html: `γ′ : composante ${i + 1}`, ask: `γ′${['₁', '₂', '₃'][i]}(t) =`, start: `d(${c.text},t)`, judge: eqj,
+    html: t('γ′ : composante {n}', { n: i + 1 }), ask: `γ′${['₁', '₂', '₃'][i]}(t) =`, start: `d(${c.text},t)`, judge: eqj,
     lines: c.d.map((l, j) => {
-      const line = E(l.math, l.act === 'product' ? 'Règle du produit' : l.act === 'chain' ? 'Règle de chaîne' : j ? 'Simplifier' : 'Dérivée usuelle', 'deriv', l.act);
+      const line = E(l.math, l.act === 'product' ? t('Règle du produit') : l.act === 'chain' ? t('Règle de chaîne') : j ? t('Simplifier') : t('Dérivée usuelle'), 'deriv', l.act);
       if (level === 1 && j === c.d.length - 1 && l.math.length > 2) return { ...line, ...tpl(l.math, [l.math.replace(/^-?\d*/, '').split(/[+-]/)[0] || l.math], TV) };
       return line;
     }),
@@ -139,11 +140,11 @@ function cpLines(level, rng) {
   const vjudge = (expect, label, params) => ({ kind: 'vector', expect, form: 'any', ...(params ? { params } : {}), ...(level === 3 ? { menu: vmenu(label) } : {}) });
   const Pv = vT(d.Pt);
   const Vv = vT(d.Vt);
-  if (level >= 2) parts.push({ html: `Le point γ(${t0}) :`, ask: `γ(${t0}) =`, start: `γ(${t0})`, judge: vjudge(Pv, `Remplacer t par ${t0} dans γ`), lines: [{ ...E(Pv, `t = ${t0}`, 'evaluate'), ...(level === 2 ? blanks(Pv, [d.Pt[0]]) : {}) }] });
-  parts.push({ html: `Le vecteur γ′(${t0}) :`, ask: `γ′(${t0}) =`, start: `γ′(${t0})`, judge: vjudge(Vv, `Remplacer t par ${t0} dans γ′`), lines: [{ ...E(Vv, `t = ${t0} dans γ′`, 'evaluate'), ...(level <= 2 ? blanks(Vv, [d.Vt[level === 1 ? 0 : 1]]) : {}) }] });
+  if (level >= 2) parts.push({ html: t('Le point γ({t0}) :', { t0 }), ask: `γ(${t0}) =`, start: `γ(${t0})`, judge: vjudge(Pv, t('Remplacer t par {t0} dans γ', { t0 })), lines: [{ ...E(Pv, `t = ${t0}`, 'evaluate'), ...(level === 2 ? blanks(Pv, [d.Pt[0]]) : {}) }] });
+  parts.push({ html: t('Le vecteur γ′({t0}) :', { t0 }), ask: `γ′(${t0}) =`, start: `γ′(${t0})`, judge: vjudge(Vv, t('Remplacer t par {t0} dans γ′', { t0 })), lines: [{ ...E(Vv, t('t = {t0} dans γ′', { t0 }), 'evaluate'), ...(level <= 2 ? blanks(Vv, [d.Vt[level === 1 ? 0 : 1]]) : {}) }] });
   if (level >= 3) {
     const Tl = `${Pv} + s${Vv}`;
-    parts.push({ html: `La tangente en t = ${t0} :`, ask: 'T(s) =', start: 'T(s)', judge: vjudge(Tl, 'γ(t₀) + s·γ′(t₀)', ['s']), lines: [E(Tl, 'Le point, plus s fois le vecteur tangent', 'tangent')] });
+    parts.push({ html: t('La tangente en t = {t0} :', { t0 }), ask: 'T(s) =', start: 'T(s)', judge: vjudge(Tl, 'γ(t₀) + s·γ′(t₀)', ['s']), lines: [E(Tl, t('Le point, plus s fois le vecteur tangent'), 'tangent')] });
   }
   const script = [];
   parts.forEach((p, i) => {
@@ -151,11 +152,14 @@ function cpLines(level, rng) {
     if (i === 0) script.push(...p.lines);
     else script.push(SEG(p.html, p.ask, p.start, judge), ...p.lines);
   });
-  const ask = level >= 3 ? `, γ(${t0}), γ′(${t0}) et la tangente T(s) = γ(${t0}) + s·γ′(${t0})` : level === 2 ? `, le point γ(${t0}) et γ′(${t0})` : `, puis γ′(${t0})`;
+  const g = gammaML(d.comps);
+  const prompt = level >= 3 ? t('{g}. Calcule γ′(t), composante par composante, γ({t0}), γ′({t0}) et la tangente T(s) = γ({t0}) + s·γ′({t0}).', { g, t0 })
+    : level === 2 ? t('{g}. Calcule γ′(t), composante par composante, le point γ({t0}) et γ′({t0}).', { g, t0 })
+      : t('{g}. Calcule γ′(t), composante par composante, puis γ′({t0}).', { g, t0 });
   return linesItem({
     skill: CP, level, mode: modeOf(level), start: parts[0].start, judge: withMenus(parts[0].judge, level, parts[0].start, parts[0].lines, CP_CHOICES), script,
-    prompt: `${gammaML(d.comps)}. Calcule γ′(t), composante par composante${ask}.`,
-    hints: H('Dérive chaque composante séparément ; puis remplace t par t₀.',
+    prompt,
+    hints: H(t('Dérive chaque composante séparément ; puis remplace t par t₀.'),
       `γ′(t) = (${d.comps.map((c) => MT(c.d.at(-1).math, TV)).join(' ; ')})`,
       level >= 3 ? `T(s) = ${vR(d.Pt)} + s·${vR(d.Vt)}` : `γ′(${t0}) = ${vR(d.Vt)}`),
     subgoals: CP_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -182,9 +186,9 @@ function contMcq(level, rng, exam) {
   const opt = (cs) => `γ(t) = (${cs.map((c) => c.show).join(' ; ')})`;
   const options = [{ html: opt(right), correct: true }, ...wrongs.map((cs) => ({ html: opt(cs), correct: false, rule: cs.some((c) => c.g0 === 0) ? 'a2_curve_sign_factor' : null }))];
   return mcq({
-    skill: CP, level, prompt: 'sign(t) vaut 1 si t > 0, −1 si t < 0 et 0 si t = 0. Laquelle de ces courbes γ : ℝ → ℝ³ a un point de discontinuité ?', options,
+    skill: CP, level, prompt: t('sign(t) vaut 1 si t > 0, −1 si t < 0 et 0 si t = 0. Laquelle de ces courbes γ : ℝ → ℝ³ a un point de discontinuité ?'), options,
     key: `cont:${bad.show}:${okSigns.slice(0, 3).map((c) => c.show).join(',')}`, expectedSec: 90,
-    solution: [{ html: `${bad.show} saute en t = ${bad.at} : les limites à gauche et à droite diffèrent. Les produits sign(t)·g(t) avec g(0) = 0 (comme ${okSigns[0].show}) tendent vers 0 des deux côtés : ils sont continus.`, note: '' }],
+    solution: [{ html: t('{bad} saute en t = {at} : les limites à gauche et à droite diffèrent. Les produits sign(t)·g(t) avec g(0) = 0 (comme {ok}) tendent vers 0 des deux côtés : ils sont continus.', { bad: bad.show, at: bad.at, ok: okSigns[0].show }), note: '' }],
     exam: exam ? { format: 'mcq', points: 1 } : false,
   }, rng);
 }
@@ -203,17 +207,17 @@ function helixMcq(level, rng, exam) {
     { html: `γ(t) = (t cos t ; t sin t ; ${B}t)`, correct: false },
   ];
   return mcq({
-    skill: CP, level, prompt: `Quelle courbe est une hélice d'axe Oz, sur le cylindre x² + y² = ${a * a}, qui monte de ${b === 1 ? '' : b}2π à chaque tour ?`.replace('de 2π', 'de 2π').replace(/de (\d)2π/, 'de $1·2π'), options,
+    skill: CP, level, prompt: t('Quelle courbe est une hélice d\'axe Oz, sur le cylindre x² + y² = {r2}, qui monte de {h} à chaque tour ?', { r2: a * a, h: b === 1 ? '2π' : `${b}·2π` }), options,
     key: `helix:${a}:${b}`, expectedSec: 60,
-    solution: [{ html: `x² + y² = ${a * a}(cos²t + sin²t) = ${a * a} : le rayon est ${a}. Un tour, c'est t → t + 2π, et z augmente de ${b === 1 ? '' : `${b}·`}2π. (t cos t, t sin t, …) a un rayon qui grandit : c'est une spirale sur un cône.`, note: '' }],
+    solution: [{ html: t('x² + y² = {r2}(cos²t + sin²t) = {r2} : le rayon est {a}. Un tour, c\'est t → t + 2π, et z augmente de {h}. (t cos t, t sin t, …) a un rayon qui grandit : c\'est une spirale sur un cône.', { r2: a * a, a, h: b === 1 ? '2π' : `${b}·2π` }), note: '' }],
     exam: exam ? { format: 'mcq', points: 1 } : false,
   }, rng);
 }
 
 function vfMcq(skill, statement, truth, rng, { key, why, ruleIfTrue = null, ruleIfFalse = null }) {
   return mcq({
-    skill, level: 4, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth, rule: truth ? ruleIfFalse : null }],
+    skill, level: 4, prompt: t('Vrai ou faux ?<br>« {s} »', { s: statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth, rule: truth ? ruleIfFalse : null }],
     key: `tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: { format: 'tf', points: 1 },
   }, rng);
 }
@@ -223,18 +227,18 @@ function cpTf(rng) {
   const kind = rng.pick(['comp', 'cont', 'c1', 'norm', 'tangent', 'signOk', 'signBad']);
   if (kind === 'c1') {
     return tfItem({
-      skill: CP, level: 4, statement: 'Une courbe γ : ℝ → ℝ² de classe C¹ est lisse : γ′(t) ≠ 0 pour tout t.', truth: false, exam, key: kind,
+      skill: CP, level: 4, statement: t('Une courbe γ : ℝ → ℝ² de classe C¹ est lisse : γ′(t) ≠ 0 pour tout t.'), truth: false, exam, key: kind,
       counter: { kind: 'a2', prop: 'curveNotSmooth', params: { dim: 2 }, ask: [{ v: 'x', label: 'x(t) =', keys: ['calc'] }, { v: 'y', label: 'y(t) =', keys: ['calc'] }], answer: { x: 't^2', y: 't^3' } },
-      explanation: 'Faux : γ(t) = (t², t³) est de classe C¹, mais γ′(0) = (0, 0) : la courbe a un point de rebroussement en 0.',
+      explanation: t('Faux : γ(t) = (t², t³) est de classe C¹, mais γ′(0) = (0, 0) : la courbe a un point de rebroussement en 0.'),
     });
   }
-  if (kind === 'norm') return vfMcq(CP, 'Si t ↦ ‖γ(t)‖ est continue, alors γ est continue.', false, rng, { key: kind, why: 'Faux : γ(t) = (1, 0) pour t ≥ 0 et (−1, 0) pour t < 0 ; ‖γ(t)‖ = 1 est continue, mais γ saute en 0.' });
-  if (kind === 'signOk') return vfMcq(CP, 't ↦ sign(t)·(eᵗ − 1) est continue en 0.', true, rng, { key: kind, ruleIfFalse: 'a2_curve_sign_factor', why: 'Vrai : |sign(t)·(eᵗ − 1)| ≤ |eᵗ − 1| → 0, et la valeur en 0 est 0.' });
-  if (kind === 'signBad') return vfMcq(CP, 't ↦ sign(t)·cos t est continue en 0.', false, rng, { key: kind, why: 'Faux : elle tend vers 1 à droite et vers −1 à gauche.' });
+  if (kind === 'norm') return vfMcq(CP, t('Si t ↦ ‖γ(t)‖ est continue, alors γ est continue.'), false, rng, { key: kind, why: t('Faux : γ(t) = (1, 0) pour t ≥ 0 et (−1, 0) pour t < 0 ; ‖γ(t)‖ = 1 est continue, mais γ saute en 0.') });
+  if (kind === 'signOk') return vfMcq(CP, t('t ↦ sign(t)·(eᵗ − 1) est continue en 0.'), true, rng, { key: kind, ruleIfFalse: 'a2_curve_sign_factor', why: t('Vrai : |sign(t)·(eᵗ − 1)| ≤ |eᵗ − 1| → 0, et la valeur en 0 est 0.') });
+  if (kind === 'signBad') return vfMcq(CP, t('t ↦ sign(t)·cos t est continue en 0.'), false, rng, { key: kind, why: t('Faux : elle tend vers 1 à droite et vers −1 à gauche.') });
   const T = {
-    comp: ['Si chaque composante de γ : I → ℝ³ est continue, alors γ est continue.', 'Vrai : γ est continue si et seulement si chaque composante l\'est.'],
-    cont: ['Si γ : I → ℝ³ est continue, alors chacune de ses composantes est continue.', 'Vrai : |γᵢ(t) − γᵢ(t₀)| ≤ ‖γ(t) − γ(t₀)‖.'],
-    tangent: ['Si γ est dérivable en t₀ et γ′(t₀) ≠ 0, la droite γ(t₀) + s·γ′(t₀), s ∈ ℝ, est tangente à la courbe en γ(t₀).', 'Vrai : c\'est la définition de la tangente.'],
+    comp: [t('Si chaque composante de γ : I → ℝ³ est continue, alors γ est continue.'), t('Vrai : γ est continue si et seulement si chaque composante l\'est.')],
+    cont: [t('Si γ : I → ℝ³ est continue, alors chacune de ses composantes est continue.'), t('Vrai : |γᵢ(t) − γᵢ(t₀)| ≤ ‖γ(t) − γ(t₀)‖.')],
+    tangent: [t('Si γ est dérivable en t₀ et γ′(t₀) ≠ 0, la droite γ(t₀) + s·γ′(t₀), s ∈ ℝ, est tangente à la courbe en γ(t₀).'), t('Vrai : c\'est la définition de la tangente.')],
   }[kind];
   return tfItem({ skill: CP, level: 4, statement: T[0], truth: true, exam, key: kind, explanation: T[1] });
 }
@@ -321,19 +325,19 @@ function lengthData(rng, { family = null } = {}) {
 }
 
 const CL_SUB = [
-  { id: 'deriv', label: 'dériver γ', skill: CP },
-  { id: 'square', label: 'reconnaître un carré', skill: 'rat-simplify' },
+  { id: 'deriv', label: t('dériver γ'), skill: CP },
+  { id: 'square', label: t('reconnaître un carré'), skill: 'rat-simplify' },
   { id: 'setup', label: 'L = ∫ ‖γ′‖ dt', skill: CL },
-  { id: 'integrate', label: 'primitive et bornes', skill: 'a1-int-direct' },
+  { id: 'integrate', label: t('primitive et bornes'), skill: 'a1-int-direct' },
 ];
 const CL_CHOICES = [
-  { id: 'deriv', label: 'Dériver chaque composante, puis élever au carré' },
-  { id: 'expand', label: 'Développer et réduire' },
-  { id: 'square', label: 'Reconnaître un carré (ou une constante)' },
-  { id: 'root', label: 'Prendre la racine : ‖γ′(t)‖' },
-  { id: 'sum', label: 'Remplacer ‖γ′‖ par x′ + y′ + z′', rule: 'a2_arc_sum_components', why: 'La vitesse est la norme de γ′, pas la somme de ses composantes.' },
-  { id: 'nosqrt', label: 'Intégrer ‖γ′‖² sans la racine', rule: 'a1_arc_length_no_sqrt', why: 'La longueur intègre ‖γ′‖, avec la racine.' },
-  { id: 'prim', label: 'Primitive, puis les bornes' },
+  { id: 'deriv', label: t('Dériver chaque composante, puis élever au carré') },
+  { id: 'expand', label: t('Développer et réduire') },
+  { id: 'square', label: t('Reconnaître un carré (ou une constante)') },
+  { id: 'root', label: t('Prendre la racine : ‖γ′(t)‖') },
+  { id: 'sum', label: t('Remplacer ‖γ′‖ par x′ + y′ + z′'), rule: 'a2_arc_sum_components', why: t('La vitesse est la norme de γ′, pas la somme de ses composantes.') },
+  { id: 'nosqrt', label: t('Intégrer ‖γ′‖² sans la racine'), rule: 'a1_arc_length_no_sqrt', why: t('La longueur intègre ‖γ′‖, avec la racine.') },
+  { id: 'prim', label: t('Primitive, puis les bornes') },
 ];
 const fmtB = (b) => fr(b).replace(/\^(\d)/g, (m, d) => ({ 2: '²', 4: '⁴' }[d] || m));
 
@@ -346,31 +350,33 @@ function clLines(level, rng, opts = {}) {
   const start = d.comps.map((c) => `d(${c},t)^2`).join('+');
   const dsq = d.d.map((x) => `(${x})^2`).join('+');
   const sqLines = [
-    E(dsq, 'Dériver chaque composante', 'deriv', 'deriv'),
-    E(d.sq, 'Développer', 'square', 'expand'),
-    E(d.goal, d.f === 'helix' ? 'cos² + sin² = 1 : une constante' : 'Un carré', 'square', 'square'),
+    E(dsq, t('Dériver chaque composante'), 'deriv', 'deriv'),
+    E(d.sq, t('Développer'), 'square', 'expand'),
+    E(d.goal, d.f === 'helix' ? t('cos² + sin² = 1 : une constante') : t('Un carré'), 'square', 'square'),
   ];
   // Level 1: the first term of the square is left blank (when it is one).
   const first = d.speed.split('+')[0];
   if (level === 1 && first !== d.speed && !/[(√]/.test(first)) Object.assign(sqLines[2], tpl(d.goal, [first], TV));
   const I0 = `int(√(${d.sq}),t,${d.a},${d.b})`;
-  const Lp = [E(`int(${d.speed},t,${d.a},${d.b})`, `‖γ′(t)‖ = ${sup(d.speed).replace(/×/g, '·')}${d.f === 'cyc' ? ' (sin(t/2) ≥ 0 sur l\'intervalle)' : d.f === 'astro' || d.f === 'cusp' ? ' (positif sur l\'intervalle)' : ''}`, 'setup', 'root'),
-    E(`bracket(${d.prim},t,${d.a},${d.b})`, 'Une primitive', 'integrate', 'prim'),
-    E(d.L, 'Les bornes', 'integrate', 'prim')];
+  const v = sup(d.speed).replace(/×/g, '·');
+  const vNote = d.f === 'cyc' ? t('‖γ′(t)‖ = {v} (sin(t/2) ≥ 0 sur l\'intervalle)', { v }) : d.f === 'astro' || d.f === 'cusp' ? t('‖γ′(t)‖ = {v} (positif sur l\'intervalle)', { v }) : `‖γ′(t)‖ = ${v}`;
+  const Lp = [E(`int(${d.speed},t,${d.a},${d.b})`, vNote, 'setup', 'root'),
+    E(`bracket(${d.prim},t,${d.a},${d.b})`, t('Une primitive'), 'integrate', 'prim'),
+    E(d.L, t('Les bornes'), 'integrate', 'prim')];
   if (level === 1) Object.assign(Lp[0], tpl(Lp[0].math, [d.speed], TV));
   if (level <= 2) Object.assign(Lp[2], tpl(d.L, [d.L], TV));
   const defj = { kind: 'definite', arc: { sum: d.sum, a: d.a, b: d.b } };
   const choice = {
-    kind: 'decision', prompt: 'La vitesse ‖γ′(t)‖ vaut :',
+    kind: 'decision', prompt: t('La vitesse ‖γ′(t)‖ vaut :'),
     options: [
       { id: 'root', label: sup(d.speed), valid: true },
-      { id: 'sum', label: sup(d.sum), valid: false, rule: 'a2_arc_sum_components', why: 'C\'est la somme des composantes de γ′, pas sa norme.' },
-      { id: 'nosqrt', label: sup(d.goal), valid: false, rule: 'a1_arc_length_no_sqrt', why: 'C\'est ‖γ′‖² : il manque la racine.' },
+      { id: 'sum', label: sup(d.sum), valid: false, rule: 'a2_arc_sum_components', why: t('C\'est la somme des composantes de γ′, pas sa norme.') },
+      { id: 'nosqrt', label: sup(d.goal), valid: false, rule: 'a1_arc_length_no_sqrt', why: t('C\'est ‖γ′‖² : il manque la racine.') },
     ],
   };
   const parts = [
     { start, judge: eqj, lines: sqLines },
-    { html: 'La longueur L :', ask: 'L =', start: I0, judge: defj, pre: level === 1 ? [{ kind: 'note', html: `‖γ′(t)‖ = ${MT(`√(${d.goal})`, TV)} = ${MT(d.speed, TV)}` }] : level === 2 ? [choice] : [], lines: Lp },
+    { html: t('La longueur L :'), ask: 'L =', start: I0, judge: defj, pre: level === 1 ? [{ kind: 'note', html: `‖γ′(t)‖ = ${MT(`√(${d.goal})`, TV)} = ${MT(d.speed, TV)}` }] : level === 2 ? [choice] : [], lines: Lp },
   ];
   const script = [];
   parts.forEach((p, i) => {
@@ -379,10 +385,13 @@ function clLines(level, rng, opts = {}) {
     script.push(...(p.pre || []), ...p.lines);
   });
   const ab = `[${fmtB(d.a)} ; ${fmtB(d.b)}]`;
+  const pv = { c: d.comps.map((c) => MT(c, TV)).join(' ; '), ab };
   return linesItem({
     skill: CL, level, mode: modeOf(level), start, judge: withMenus(eqj, level, start, sqLines, CL_CHOICES), script,
-    prompt: `γ(t) = (${d.comps.map((c) => MT(c, TV)).join(' ; ')}), t ∈ ${ab}. Calcule ‖γ′(t)‖² et écris-le comme un carré${d.f === 'helix' ? ' (ici une constante)' : d.f === 'cusp' ? ' (ici t² fois un facteur)' : ''}, puis la longueur L de la courbe.`,
-    hints: H('L = ∫ ‖γ′(t)‖ dt : dérive chaque composante, additionne les carrés, cherche un carré parfait.',
+    prompt: d.f === 'helix' ? t('γ(t) = ({c}), t ∈ {ab}. Calcule ‖γ′(t)‖² et écris-le comme un carré (ici une constante), puis la longueur L de la courbe.', pv)
+      : d.f === 'cusp' ? t('γ(t) = ({c}), t ∈ {ab}. Calcule ‖γ′(t)‖² et écris-le comme un carré (ici t² fois un facteur), puis la longueur L de la courbe.', pv)
+        : t('γ(t) = ({c}), t ∈ {ab}. Calcule ‖γ′(t)‖² et écris-le comme un carré, puis la longueur L de la courbe.', pv),
+    hints: H(t('L = ∫ ‖γ′(t)‖ dt : dérive chaque composante, additionne les carrés, cherche un carré parfait.'),
       `‖γ′(t)‖² = ${MT(d.sq, TV)} = ${MT(d.goal, TV)}`,
       `L = ${MT(Lp[0].math, TV)} = ${MT(d.L, TV)}`),
     subgoals: CL_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -402,9 +411,9 @@ function clMcq(rng) {
     { html: I(`√(${d.sum})`), correct: false },
   ];
   return mcq({
-    skill: CL, level: 4, prompt: `γ(t) = (${d.comps.map((c) => MT(c, TV)).join(' ; ')}), t ∈ [${fmtB(d.a)} ; ${fmtB(d.b)}]. Quelle intégrale donne la longueur de la courbe ?`, options,
+    skill: CL, level: 4, prompt: t('γ(t) = ({c}), t ∈ [{a} ; {b}]. Quelle intégrale donne la longueur de la courbe ?', { c: d.comps.map((c) => MT(c, TV)).join(' ; '), a: fmtB(d.a), b: fmtB(d.b) }), options,
     key: `mcq:${d.comps.join(',')}:${d.b}`, expectedSec: 120, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `γ′(t) = (${d.d.map((x) => MT(x, TV)).join(' ; ')}), ‖γ′(t)‖² = ${MT(d.goal, TV)}, donc L = ${I(d.speed)} = ${MT(d.L, TV)}.`, note: '' }],
+    solution: [{ html: t('γ′(t) = ({d}), ‖γ′(t)‖² = {sq}, donc L = {I} = {L}.', { d: d.d.map((x) => MT(x, TV)).join(' ; '), sq: MT(d.goal, TV), I: I(d.speed), L: MT(d.L, TV) }), note: '' }],
   }, rng);
 }
 
@@ -414,31 +423,31 @@ function clTf(rng) {
   const kind = rng.pick(['param', 'sum', 'chord', 'ineq', 'unit', 'square']);
   if (kind === 'sum') {
     return tfItem({
-      skill: CL, level: 4, statement: 'La longueur de γ = (x, y, z) sur [0 ; 1] vaut ∫₀¹ (x′(t) + y′(t) + z′(t)) dt.', truth: false, exam, key: kind,
+      skill: CL, level: 4, statement: t('La longueur de γ = (x, y, z) sur [0 ; 1] vaut ∫₀¹ (x′(t) + y′(t) + z′(t)) dt.'), truth: false, exam, key: kind,
       counter: { kind: 'a2', prop: 'arcCurve', params: { test: 'sum', a: '0', b: '1' }, ask: C3, answer: { x: 't', y: '-t', z: '0' } },
       ruleIfTrue: 'a2_arc_sum_components',
-      explanation: 'Faux : la vitesse est ‖γ′‖ = √(x′² + y′² + z′²). Pour γ(t) = (t, −t, 0), ∫ (x′ + y′ + z′) dt = 0, mais L = √2.',
+      explanation: t('Faux : la vitesse est ‖γ′‖ = √(x′² + y′² + z′²). Pour γ(t) = (t, −t, 0), ∫ (x′ + y′ + z′) dt = 0, mais L = √2.'),
     });
   }
   if (kind === 'square') {
     return tfItem({
-      skill: CL, level: 4, statement: 'La longueur de γ sur [0 ; 1] vaut ∫₀¹ ‖γ′(t)‖² dt.', truth: false, exam, key: kind,
+      skill: CL, level: 4, statement: t('La longueur de γ sur [0 ; 1] vaut ∫₀¹ ‖γ′(t)‖² dt.'), truth: false, exam, key: kind,
       counter: { kind: 'a2', prop: 'arcCurve', params: { test: 'square', a: '0', b: '1' }, ask: C3, answer: { x: '2t', y: '0', z: '0' } },
       ruleIfTrue: 'a1_arc_length_no_sqrt',
-      explanation: 'Faux : il faut la racine. γ(t) = (2t, 0, 0) a la longueur 2 sur [0 ; 1], mais ∫₀¹ ‖γ′‖² dt = 4.',
+      explanation: t('Faux : il faut la racine. γ(t) = (2t, 0, 0) a la longueur 2 sur [0 ; 1], mais ∫₀¹ ‖γ′‖² dt = 4.'),
     });
   }
   if (kind === 'chord') {
     return tfItem({
-      skill: CL, level: 4, statement: 'La longueur de γ sur [0 ; 1] vaut ‖γ(1) − γ(0)‖.', truth: false, exam, key: kind,
+      skill: CL, level: 4, statement: t('La longueur de γ sur [0 ; 1] vaut ‖γ(1) − γ(0)‖.'), truth: false, exam, key: kind,
       counter: { kind: 'a2', prop: 'arcCurve', params: { test: 'chord', a: '0', b: '1' }, ask: C3, answer: { x: 't', y: 't^2', z: '0' } },
-      explanation: 'Faux : ‖γ(1) − γ(0)‖ est la longueur du segment ; une courbe qui n\'est pas droite est plus longue. Pour (t, t², 0) : L ≈ 1,48 > √2.',
+      explanation: t('Faux : ‖γ(1) − γ(0)‖ est la longueur du segment ; une courbe qui n\'est pas droite est plus longue. Pour (t, t², 0) : L ≈ 1,48 > √2.'),
     });
   }
   const T = {
-    param: ['La longueur d\'une courbe ne dépend pas de sa paramétrisation (injective et régulière).', 'Vrai : avec t = φ(u), φ′ > 0, ∫ ‖γ′(φ(u))‖·φ′(u) du = ∫ ‖γ′(t)‖ dt.'],
-    ineq: ['La longueur de γ sur [a ; b] est au moins ‖γ(b) − γ(a)‖.', 'Vrai : ‖γ(b) − γ(a)‖ = ‖∫ γ′‖ ≤ ∫ ‖γ′‖ ; la ligne droite est le plus court chemin.'],
-    unit: ['Si ‖γ′(t)‖ = 1 pour tout t, la longueur de γ sur [a ; b] vaut b − a.', 'Vrai : L = ∫ₐᵇ 1 dt = b − a (paramétrage par la longueur d\'arc).'],
+    param: [t('La longueur d\'une courbe ne dépend pas de sa paramétrisation (injective et régulière).'), t('Vrai : avec t = φ(u), φ′ > 0, ∫ ‖γ′(φ(u))‖·φ′(u) du = ∫ ‖γ′(t)‖ dt.')],
+    ineq: [t('La longueur de γ sur [a ; b] est au moins ‖γ(b) − γ(a)‖.'), t('Vrai : ‖γ(b) − γ(a)‖ = ‖∫ γ′‖ ≤ ∫ ‖γ′‖ ; la ligne droite est le plus court chemin.')],
+    unit: [t('Si ‖γ′(t)‖ = 1 pour tout t, la longueur de γ sur [a ; b] vaut b − a.'), t('Vrai : L = ∫ₐᵇ 1 dt = b − a (paramétrage par la longueur d\'arc).')],
   }[kind];
   return tfItem({ skill: CL, level: 4, statement: T[0], truth: true, exam, key: kind, explanation: T[1] });
 }

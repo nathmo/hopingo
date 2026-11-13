@@ -18,13 +18,14 @@ import { linesItem, tfItem, examTag, A2_KEYS } from './a2-kit.js';
 import { N, H, E, fr } from './analyse1-e-kit.js';
 import { assemble } from './analyse2-i-part.js';
 import { sum, blankMatches, mcq4, M } from './analyse2-i-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-stability';
 const SUB = [
-  { id: 'char', label: 'équation caractéristique', skill: 'a2-ode-const2' },
-  { id: 'criterion', label: 'critère p > 0 et q > 0', skill: SK },
-  { id: 'solve', label: 'résoudre les inégalités en a', skill: 'param-quadratic' },
-  { id: 'boundary', label: 'les bornes', skill: SK },
+  { id: 'char', label: t('équation caractéristique'), skill: 'a2-ode-const2' },
+  { id: 'criterion', label: t('critère p > 0 et q > 0'), skill: SK },
+  { id: 'solve', label: t('résoudre les inégalités en a'), skill: 'param-quadratic' },
+  { id: 'boundary', label: t('les bornes'), skill: SK },
 ];
 
 const setOf = (text) => solutionSet(parse(text), { v: 'a' });
@@ -37,7 +38,7 @@ function polyA([c0, c1, c2]) {
   const t0 = c0 === 0 ? '' : String(c0);
   return c2 < 0 && c0 > 0 ? sum([t0, t1, t2]) : sum([t2, t1, t0]);
 }
-const paren = (t) => (/^[a-z]$|^\d+(\/\d+)?$/.test(t) ? t : `(${t})`);
+const paren = (s) => (/^[a-z]$|^\d+(\/\d+)?$/.test(s) ? s : `(${s})`);
 
 // The closed version of a set of one interval: [1 ; 2], [−1 ; +∞[.
 function closedText(S) {
@@ -90,7 +91,7 @@ export function stabData(rng) {
     const end = Number.isFinite(part.lo.x) ? part.lo : part.hi;
     const bq = end.q ?? null;
     if (!bq) continue;
-    const at = (t) => evalFloat(parse(t), { a: bq.n / bq.d });
+    const at = (s) => evalFloat(parse(s), { a: bq.n / bq.d });
     const pb = at(P);
     const qb = at(Qt);
     let racine;
@@ -121,30 +122,31 @@ const FALLBACK = {
 };
 
 const CHOICES = [
-  { id: 'char', label: 'Remplacer y par e^(rx) : l\'équation caractéristique' },
-  { id: 'solve', label: 'Résoudre chaque inégalité en a' },
-  { id: 'inter', label: 'Prendre l\'intersection (les deux conditions)' },
-  { id: 'union', label: 'Prendre la réunion des deux ensembles', rule: 'a2_ode_stability_one_coef', why: 'Il faut p > 0 et q > 0 : c\'est l\'intersection.' },
+  { id: 'char', label: t('Remplacer y par e^(rx) : l\'équation caractéristique') },
+  { id: 'solve', label: t('Résoudre chaque inégalité en a') },
+  { id: 'inter', label: t('Prendre l\'intersection (les deux conditions)') },
+  { id: 'union', label: t('Prendre la réunion des deux ensembles'), rule: 'a2_ode_stability_one_coef', why: t('Il faut p > 0 et q > 0 : c\'est l\'intersection.') },
 ];
 
 function decisions(d, level) {
   const out = [];
   if (level === 3) {
-    out.push({ kind: 'decision', prompt: 'Comment décider ?', options: [
-      { id: 'coef', label: 'Critère des coefficients : p > 0 et q > 0', valid: true },
-      { id: 'delta', label: 'Calculer les racines selon le signe de Δ', valid: true, quality: 'poor', why: 'Juste, mais il y a trois cas à traiter (Δ > 0, Δ = 0, Δ < 0) : le critère des coefficients est plus court.' },
+    out.push({ kind: 'decision', prompt: t('Comment décider ?'), options: [
+      { id: 'coef', label: t('Critère des coefficients : p > 0 et q > 0'), valid: true },
+      { id: 'delta', label: t('Calculer les racines selon le signe de Δ'), valid: true, quality: 'poor', why: t('Juste, mais il y a trois cas à traiter (Δ > 0, Δ = 0, Δ < 0) : le critère des coefficients est plus court.') },
     ] });
   }
-  out.push({ kind: 'decision', prompt: 'Toutes les solutions tendent vers 0 si et seulement si :', options: [
-    { id: 'pq', label: `${M(`${d.P}>0`)} et ${M(`${d.Qt}>0`)}`, valid: true },
-    { id: 'disc', label: `Δ = ${M(d.delta)} < 0`, valid: false, rule: 'a2_ode_stability_discriminant', why: 'Δ < 0 donne des oscillations, amorties ou non. C\'est le signe de la partie réelle des racines qui compte.' },
-    { id: 'p', label: `${M(`${d.P}>0`)} seulement`, valid: false, rule: 'a2_ode_stability_one_coef', why: 'Si q < 0, une racine est positive même si p > 0 : il faut les deux conditions.' },
-    d.kind !== 'const' && { id: 'q', label: `${M(`${d.Qt}>0`)} seulement`, valid: false, rule: 'a2_ode_stability_one_coef', why: 'Si p < 0, la somme des racines −p est positive : une racine a une partie réelle positive.' },
+  out.push({ kind: 'decision', prompt: t('Toutes les solutions tendent vers 0 si et seulement si :'), options: [
+    { id: 'pq', label: t('{a} et {b}', { a: M(`${d.P}>0`), b: M(`${d.Qt}>0`) }), valid: true },
+    { id: 'disc', label: `Δ = ${M(d.delta)} < 0`, valid: false, rule: 'a2_ode_stability_discriminant', why: t('Δ < 0 donne des oscillations, amorties ou non. C\'est le signe de la partie réelle des racines qui compte.') },
+    { id: 'p', label: t('{a} seulement', { a: M(`${d.P}>0`) }), valid: false, rule: 'a2_ode_stability_one_coef', why: t('Si q < 0, une racine est positive même si p > 0 : il faut les deux conditions.') },
+    d.kind !== 'const' && { id: 'q', label: t('{a} seulement', { a: M(`${d.Qt}>0`) }), valid: false, rule: 'a2_ode_stability_one_coef', why: t('Si p < 0, la somme des racines −p est positive : une racine a une partie réelle positive.') },
   ].filter(Boolean) });
   if (level >= 2) {
-    out.push({ kind: 'decision', prompt: `En a = ${d.ctx.borne}, les solutions tendent-elles toutes vers 0 ?`, options: [
-      { id: 'no', label: `Non : r = ${d.ctx.racine} est racine, ${d.ctx.sol} ne tend pas vers 0. Inégalités strictes.`, valid: true },
-      { id: 'yes', label: 'Oui : on garde les bornes', valid: false, rule: 'a2_ode_stability_boundary', why: `En a = ${d.ctx.borne}, r = ${d.ctx.racine} est racine : ${d.ctx.sol} ne tend pas vers 0.` },
+    const c = { b: d.ctx.borne, r: d.ctx.racine, sol: d.ctx.sol };
+    out.push({ kind: 'decision', prompt: t('En a = {b}, les solutions tendent-elles toutes vers 0 ?', c), options: [
+      { id: 'no', label: t('Non : r = {r} est racine, {sol} ne tend pas vers 0. Inégalités strictes.', c), valid: true },
+      { id: 'yes', label: t('Oui : on garde les bornes'), valid: false, rule: 'a2_ode_stability_boundary', why: t('En a = {b}, r = {r} est racine : {sol} ne tend pas vers 0.', c) },
     ] });
   }
   return out;
@@ -152,10 +154,10 @@ function decisions(d, level) {
 
 function stabItem(level, rng, opts, d) {
   const stab = { closed: d.closed, one: d.one, ...(d.disc ? { disc: d.disc } : {}), ctx: d.ctx };
-  const charLine = E(d.char, 'y = e^{rx}, puis diviser par e^{rx}', 'char', 'char');
+  const charLine = E(d.char, t('y = e^{rx}, puis diviser par e^{rx}'), 'char', 'char');
   const lines = [];
-  if (level <= 3 && d.inter !== d.crit) lines.push(E(d.inter, 'Chaque inégalité', 'solve', 'solve'));
-  lines.push(E(d.st, 'Intersection, bornes exclues', 'boundary', 'inter'));
+  if (level <= 3 && d.inter !== d.crit) lines.push(E(d.inter, t('Chaque inégalité'), 'solve', 'solve'));
+  lines.push(E(d.st, t('Intersection, bornes exclues'), 'boundary', 'inter'));
   if (level <= 2) {
     if (lines.length > 1) Object.assign(lines[0], blankMatches(lines[0].math, /-?\d+/g, level === 1 ? 2 : 4));
     Object.assign(lines[lines.length - 1], blankMatches(lines[lines.length - 1].math, level === 1 ? /-?\d+/g : /-?\d+|[+-]∞/g, level === 1 ? 1 : 2));
@@ -163,17 +165,17 @@ function stabItem(level, rng, opts, d) {
   const parts = [
     { start: `(d(e^(r x),x,2)+${paren(d.P)} d(e^(r x),x)+${paren(d.Qt)} e^(r x))/e^(r x)`, judge: { kind: 'equiv', vars: ['r', 'a', 'x'], target: 'no-prime' }, lines: [charLine] },
     {
-      html: 'L\'ensemble des valeurs de a :', ask: 'a :', start: d.crit, judge: { kind: 'solset', v: 'a', _stab: stab },
-      notes: level === 1 ? [`Critère : toutes les solutions tendent vers 0 ⇔ ${M(`${d.P}>0`)} et ${M(`${d.Qt}>0`)} (bornes exclues).`] : [],
+      html: t('L\'ensemble des valeurs de a :'), ask: t('a :'), start: d.crit, judge: { kind: 'solset', v: 'a', _stab: stab },
+      notes: level === 1 ? [t('Critère : toutes les solutions tendent vers 0 ⇔ {p} et {q} (bornes exclues).', { p: M(`${d.P}>0`), q: M(`${d.Qt}>0`) })] : [],
       pre: level >= 2 ? decisions(d, level) : [], lines,
     },
   ];
   const { start, judge, script } = assemble(parts, level, CHOICES);
   return linesItem({
     skill: SK, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', start, judge, script,
-    prompt: `Pour quelles valeurs de a toutes les solutions de ${M(d.eq)} tendent-elles vers 0 en +∞ ? Écris d'abord le polynôme caractéristique (remplace y par ${M('e^(r x)')}).`,
-    hints: H('Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues).',
-      `${M(`${d.P}>0`)} et ${M(`${d.Qt}>0`)}, puis l'intersection.`, `${M(d.inter)}, donc a ∈ ${M(d.st)}.`),
+    prompt: t('Pour quelles valeurs de a toutes les solutions de {eq} tendent-elles vers 0 en +∞ ? Écris d\'abord le polynôme caractéristique (remplace y par {e}).', { eq: M(d.eq), e: M('e^(r x)') }),
+    hints: H(t('Pour r² + pr + q, les deux racines ont une partie réelle négative si et seulement si p > 0 et q > 0 (bornes exclues).'),
+      t('{p} et {q}, puis l\'intersection.', { p: M(`${d.P}>0`), q: M(`${d.Qt}>0`) }), t('{i}, donc a ∈ {s}.', { i: M(d.inter), s: M(d.st) })),
     subgoals: SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.eq}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -183,36 +185,36 @@ function stabItem(level, rng, opts, d) {
 function stabMcq(level, rng, opts, d) {
   const wrongs = [
     { html: M(d.closed), rule: 'a2_ode_stability_boundary' },
-    ...d.one.map((t) => ({ html: M(t), rule: 'a2_ode_stability_one_coef' })),
+    ...d.one.map((s) => ({ html: M(s), rule: 'a2_ode_stability_one_coef' })),
     d.disc && { html: M(d.disc), rule: 'a2_ode_stability_discriminant' },
   ].filter(Boolean);
-  const fillers = ['ℝ', '∅', ']0 ; +∞['].map((t) => ({ html: M(t) }));
+  const fillers = ['ℝ', '∅', ']0 ; +∞['].map((s) => ({ html: M(s) }));
   return mcq4({
-    skill: SK, level, prompt: `Soit X l'ensemble des a ∈ ℝ pour lesquels toutes les solutions de ${M(d.eq)} tendent vers 0 en +∞. Alors X =`,
+    skill: SK, level, prompt: t('Soit X l\'ensemble des a ∈ ℝ pour lesquels toutes les solutions de {eq} tendent vers 0 en +∞. Alors X =', { eq: M(d.eq) }),
     right: M(d.st), wrongs, fillers, key: `${SK}:mcq:${d.eq}`,
-    solution: [{ html: `${M(`${d.P}>0`)} et ${M(`${d.Qt}>0`)} : ${M(d.inter)}`, note: 'Critère p > 0 et q > 0' }, { html: `X = ${M(d.st)}`, note: `En a = ${d.ctx.borne}, ${d.ctx.sol} ne tend pas vers 0.` }],
+    solution: [{ html: t('{p} et {q} : {i}', { p: M(`${d.P}>0`), q: M(`${d.Qt}>0`), i: M(d.inter) }), note: t('Critère p > 0 et q > 0') }, { html: `X = ${M(d.st)}`, note: t('En a = {b}, {sol} ne tend pas vers 0.', { b: d.ctx.borne, sol: d.ctx.sol }) }],
     exam: opts.exam ? examTag(opts) : false, expectedSec: 150, fallback: !!d.fallback,
   }, rng);
 }
 
 // The catalogue's V/F: « Si p > 0, toutes les solutions … tendent vers 0 ».
 const TF = [
-  { hyp: 'p>0', say: 'p > 0', truth: false, rule: 'a2_ode_stability_one_coef', answer: { p: '1', q: '-1' }, why: 'Faux : avec p = 1 et q = −1, r² + r − 1 = 0 a une racine positive, et e^{rx} ne tend pas vers 0.' },
-  { hyp: 'q>0', say: 'q > 0', truth: false, rule: 'a2_ode_stability_one_coef', answer: { p: '0', q: '1' }, why: 'Faux : avec p = 0 et q = 1, y = cos x oscille sans s\'amortir.' },
-  { hyp: 'p^2-4q<0', say: 'p² − 4q < 0', truth: false, rule: 'a2_ode_stability_discriminant', answer: { p: '0', q: '1' }, why: 'Faux : avec p = 0, q = 1 (Δ = −4), y = cos x ne tend pas vers 0. Δ < 0 donne des oscillations, amorties seulement si p > 0.' },
-  { hyp: null, say: 'p > 0 et q > 0', truth: true, why: 'Vrai : la somme des racines −p est négative et leur produit q positif, donc les deux parties réelles sont négatives (−p/2 pour des racines complexes).' },
+  { hyp: 'p>0', say: 'p > 0', truth: false, rule: 'a2_ode_stability_one_coef', answer: { p: '1', q: '-1' }, why: t('Faux : avec p = 1 et q = −1, r² + r − 1 = 0 a une racine positive, et e^{rx} ne tend pas vers 0.') },
+  { hyp: 'q>0', say: 'q > 0', truth: false, rule: 'a2_ode_stability_one_coef', answer: { p: '0', q: '1' }, why: t('Faux : avec p = 0 et q = 1, y = cos x oscille sans s\'amortir.') },
+  { hyp: 'p^2-4q<0', say: 'p² − 4q < 0', truth: false, rule: 'a2_ode_stability_discriminant', answer: { p: '0', q: '1' }, why: t('Faux : avec p = 0, q = 1 (Δ = −4), y = cos x ne tend pas vers 0. Δ < 0 donne des oscillations, amorties seulement si p > 0.') },
+  { hyp: null, say: 'p > 0 et q > 0', truth: true, why: t('Vrai : la somme des racines −p est négative et leur produit q positif, donc les deux parties réelles sont négatives (−p/2 pour des racines complexes).') },
 ];
 
 function stabTf(level, rng, opts) {
-  const t = rng.pick(TF);
+  const st = rng.pick(TF);
   return tfItem({
-    skill: SK, level, statement: `Si ${t.say}, toutes les solutions de y″ + py′ + qy = 0 tendent vers 0 en +∞.`, truth: t.truth,
-    counter: t.truth ? null : {
-      kind: 'refute', quants: [{ q: '∀', v: 'p', dom: 'R' }, { q: '∀', v: 'q', dom: 'R' }], pred: `${t.hyp}⇒(p>0∧q>0)`, hyp: t.hyp,
-      ask: [{ v: 'p', label: 'p =' }, { v: 'q', label: 'q =' }], answer: t.answer,
+    skill: SK, level, statement: t('Si {say}, toutes les solutions de y″ + py′ + qy = 0 tendent vers 0 en +∞.', { say: st.say === 'p > 0 et q > 0' ? t('p > 0 et q > 0') : st.say }), truth: st.truth,
+    counter: st.truth ? null : {
+      kind: 'refute', quants: [{ q: '∀', v: 'p', dom: 'R' }, { q: '∀', v: 'q', dom: 'R' }], pred: `${st.hyp}⇒(p>0∧q>0)`, hyp: st.hyp,
+      ask: [{ v: 'p', label: 'p =' }, { v: 'q', label: 'q =' }], answer: st.answer,
     },
-    ruleIfTrue: t.rule || null, explanation: t.why, key: t.say, exam: examTag(opts),
-    hints: H('Toutes les solutions tendent vers 0 ⇔ les deux racines ont une partie réelle < 0 ⇔ p > 0 et q > 0.', 'Cherche p, q qui vérifient l\'hypothèse avec p ≤ 0 ou q ≤ 0.', 'p = 0, q = 1 : y = cos x.'),
+    ruleIfTrue: st.rule || null, explanation: st.why, key: st.say, exam: examTag(opts),
+    hints: H(t('Toutes les solutions tendent vers 0 ⇔ les deux racines ont une partie réelle < 0 ⇔ p > 0 et q > 0.'), t('Cherche p, q qui vérifient l\'hypothèse avec p ≤ 0 ou q ≤ 0.'), 'p = 0, q = 1 : y = cos x.'),
   });
 }
 

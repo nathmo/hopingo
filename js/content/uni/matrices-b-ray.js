@@ -16,19 +16,20 @@ import { q, mt, vt, MLm, fq, qt, mcqDistinct, tfL, examTag, withCells } from './
 import { mcq } from './kit.js';
 import { problemItem } from './kit-problem.js';
 import { rootT, sub, par, eq, eqG, menu, hints3, modeOf, menuOf, partsItem, vR, symWhole } from './matrices-b-kit.js';
+import { t } from '../../i18n.js';
 
 const RA = 'm-rayleigh';
 const RA_SUB = [
-  { id: 'prod', label: 'produit Ax', skill: 'l-mat-product' },
-  { id: 'quot', label: 'quotient', skill: RA },
-  { id: 'bound', label: 'encadrer par les valeurs propres', skill: 'm-spectral' },
+  { id: 'prod', label: t('produit Ax'), skill: 'l-mat-product' },
+  { id: 'quot', label: t('quotient'), skill: RA },
+  { id: 'bound', label: t('encadrer par les valeurs propres'), skill: 'm-spectral' },
 ];
 const RA_MENU = [
-  { id: 'prod', label: 'Calculer Ax', why: 'Ax est déjà calculé.' },
-  { id: 'num', label: 'Calculer le numérateur xᵀ(Ax)', why: 'Il faut d\'abord Ax, ou ce nombre est déjà calculé.' },
-  { id: 'den', label: 'Calculer le dénominateur xᵀx', why: 'Ce n\'est pas l\'étape demandée ici.' },
-  { id: 'quot', label: 'Diviser : R(x) = xᵀAx / xᵀx', why: 'Il faut d\'abord le numérateur et le dénominateur.' },
-  { id: 'eig', label: 'Chercher les valeurs propres de A', why: 'R(x) se calcule sans les valeurs propres.' },
+  { id: 'prod', label: t('Calculer Ax'), why: t('Ax est déjà calculé.') },
+  { id: 'num', label: t('Calculer le numérateur xᵀ(Ax)'), why: t('Il faut d\'abord Ax, ou ce nombre est déjà calculé.') },
+  { id: 'den', label: t('Calculer le dénominateur xᵀx'), why: t('Ce n\'est pas l\'étape demandée ici.') },
+  { id: 'quot', label: t('Diviser : R(x) = xᵀAx / xᵀx'), why: t('Il faut d\'abord le numérateur et le dénominateur.') },
+  { id: 'eig', label: t('Chercher les valeurs propres de A'), why: t('R(x) se calcule sans les valeurs propres.') },
 ];
 
 const dotT = (u, v) => u.map((x, i) => `${par(x)}×${par(v[i])}`).join('+');
@@ -36,7 +37,7 @@ const sqT = (u) => u.map((x) => `${par(x)}^2`).join('+');
 const lamsR = (lams) => { const s = [...new Set(lams)].sort((a, b) => a - b).map((l) => fq(l)); return s.length > 1 ? `${s.slice(0, -1).join(', ')} et ${s.at(-1)}` : s[0]; };
 
 function rayData(rng, n = 2, { pos = false } = {}) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const s = symWhole(n, rng, { pos });
     if (s.fallback) continue;
     const x = Array.from({ length: n }, () => q(rng.int(-2, 3)));
@@ -63,29 +64,29 @@ const quotLines = (d) => {
 
 function parts(d, { guided = false, rng = null, menuOn = false, denDecision = false, boundDecision = false } = {}) {
   const M = (id) => (menuOn ? { menu: menuOf(RA_MENU, id) } : {});
-  const axLine = eq(vt(d.Ax), 'Ligne par ligne', 'prod');
+  const axLine = eq(vt(d.Ax), t('Ligne par ligne'), 'prod');
   const ps = [
-    { judge: { kind: 'mat', expect: vt(d.Ax), names: { A: mt(d.A) }, ...M('prod') }, start: 'Ax', html: 'Le produit Ax', ask: 'Ax =',
+    { judge: { kind: 'mat', expect: vt(d.Ax), names: { A: mt(d.A) }, ...M('prod') }, start: 'Ax', html: t('Le produit Ax'), ask: 'Ax =',
       lines: [eq(`A·${vt(d.x)}`, '', 'prod'), guided ? withCells(axLine, rng.shuffle(d.x.map((_, i) => [i, 0])).slice(0, d.n - 1).sort((a, b) => a[0] - b[0])) : axLine] },
-    { judge: { kind: 'value', expect: qt(d.num), ...M('num') }, start: 'x^T·Ax', html: 'Le numérateur xᵀ(Ax)', ask: 'xᵀAx =',
-      lines: [eqG(dotT(d.x, d.Ax), guided ? [-1] : null, 'Produit scalaire de x et Ax', 'quot'), eqG(qt(d.num), guided ? [0] : null, '', 'quot')] },
-    { judge: { kind: 'value', expect: qt(d.den), ...M('den') }, start: 'x^T·x', html: 'Le dénominateur xᵀx', ask: 'xᵀx =',
-      lines: [eq(sqT(d.x), 'Somme des carrés', 'quot'), eqG(qt(d.den), guided ? [0] : null, '', 'quot')] },
-    { judge: { kind: 'value', expect: qt(d.R), rayleigh: { num: qt(d.num), den: qt(d.den) }, ...M('quot') }, start: 'R(x)', html: 'Le quotient de Rayleigh', ask: 'R(x) =',
+    { judge: { kind: 'value', expect: qt(d.num), ...M('num') }, start: 'x^T·Ax', html: t('Le numérateur xᵀ(Ax)'), ask: 'xᵀAx =',
+      lines: [eqG(dotT(d.x, d.Ax), guided ? [-1] : null, t('Produit scalaire de x et Ax'), 'quot'), eqG(qt(d.num), guided ? [0] : null, '', 'quot')] },
+    { judge: { kind: 'value', expect: qt(d.den), ...M('den') }, start: 'x^T·x', html: t('Le dénominateur xᵀx'), ask: 'xᵀx =',
+      lines: [eq(sqT(d.x), t('Somme des carrés'), 'quot'), eqG(qt(d.den), guided ? [0] : null, '', 'quot')] },
+    { judge: { kind: 'value', expect: qt(d.R), rayleigh: { num: qt(d.num), den: qt(d.den) }, ...M('quot') }, start: 'R(x)', html: t('Le quotient de Rayleigh'), ask: 'R(x) =',
       lines: quotLines(d) },
   ];
   const pre = [];
   if (denDecision) {
-    pre.push({ kind: 'decision', prompt: 'Par quoi divise-t-on xᵀAx ?', options: rng.shuffle(menu('Par xᵀx', [
-      ['Par ‖x‖', `xᵀx = ‖x‖² : il faut le carré de la norme. Ici xᵀx = ${fq(d.den)}.`, 'm_rayleigh_no_denominator'],
-      ['Par rien : R(x) = xᵀAx', 'Sans dénominateur, la valeur dépend de la longueur de x : 2x donnerait 4 fois plus.', 'm_rayleigh_no_denominator'],
+    pre.push({ kind: 'decision', prompt: t('Par quoi divise-t-on xᵀAx ?'), options: rng.shuffle(menu(t('Par xᵀx'), [
+      [t('Par ‖x‖'), t('xᵀx = ‖x‖² : il faut le carré de la norme. Ici xᵀx = {den}.', { den: fq(d.den) }), 'm_rayleigh_no_denominator'],
+      [t('Par rien : R(x) = xᵀAx'), t('Sans dénominateur, la valeur dépend de la longueur de x : 2x donnerait 4 fois plus.'), 'm_rayleigh_no_denominator'],
     ])) });
   }
   if (boundDecision) {
     const [lo, hi] = [Math.min(...d.lams), Math.max(...d.lams)];
-    pre.push({ kind: 'decision', prompt: `Les valeurs propres de A sont ${lamsR(d.lams)}. Sans calculer, où est R(x) ?`, options: rng.shuffle(menu(`Entre ${fq(lo)} et ${fq(hi)}`, [
-      [`Au-dessus de ${fq(hi)}`, 'Pour A symétrique, R(x) ne dépasse jamais λ_max : c\'est une moyenne pondérée des valeurs propres.'],
-      [`Exactement ${fq(hi)}`, 'R(x) = λ_max seulement si x est un vecteur propre de λ_max.'],
+    pre.push({ kind: 'decision', prompt: t('Les valeurs propres de A sont {lams}. Sans calculer, où est R(x) ?', { lams: lamsR(d.lams) }), options: rng.shuffle(menu(t('Entre {lo} et {hi}', { lo: fq(lo), hi: fq(hi) }), [
+      [t('Au-dessus de {hi}', { hi: fq(hi) }), t('Pour A symétrique, R(x) ne dépasse jamais λ_max : c\'est une moyenne pondérée des valeurs propres.')],
+      [t('Exactement {hi}', { hi: fq(hi) }), t('R(x) = λ_max seulement si x est un vecteur propre de λ_max.')],
     ])) });
   }
   ps[3].pre = pre;
@@ -93,7 +94,7 @@ function parts(d, { guided = false, rng = null, menuOn = false, denDecision = fa
 }
 
 const raHints = (d) => hints3(
-  'Numérateur xᵀ(Ax), dénominateur xᵀx.',
+  t('Numérateur xᵀ(Ax), dénominateur xᵀx.'),
   `R = □/${fq(d.den)}`,
   `R(x) = ${fq(d.num)}/${fq(d.den)}${d.R.d === d.den.valueOf() ? '' : ` = ${fq(d.R)}`}`,
 );
@@ -112,23 +113,23 @@ function sphereItem(rng, base) {
   const order = s.lams.map((l, i) => ({ l, v: s.vecs[i] })).sort((a, b) => b.l - a.l);
   const [mx, mn] = order;
   const ps = [
-    { judge: { kind: 'det', vars: ['λ'], names: { A: mt(s.A) }, target: 'factored' }, start: 'det(A-λI)', html: 'Les valeurs propres de A', ask: '',
-      lines: [eq(detMatText(s.A), 'A − λI', 'bound'), eq(charText(s.lams), `Valeurs propres ${fq(mn.l)} et ${fq(mx.l)}`, 'bound')] },
-    { judge: { kind: 'value', expect: qt(mx.l) }, start: 'λ_max', html: 'Le maximum de xᵀAx sur ‖x‖ = 1', ask: 'max =', lines: [eq(qt(mx.l), 'La plus grande valeur propre', 'bound')] },
-    { judge: { kind: 'span', basis: [vt(mx.v)], require: 'orthonormal' }, start: 'x_max', html: 'Un point où il est atteint (‖x‖ = 1)', ask: 'x =', lines: [eq(unitText(mx.v), 'Vecteur propre de λ_max, normé', 'bound')] },
-    { judge: { kind: 'value', expect: qt(mn.l) }, start: 'λ_min', html: 'Le minimum de xᵀAx sur ‖x‖ = 1', ask: 'min =', lines: [eq(qt(mn.l), 'La plus petite valeur propre', 'bound')] },
-    { judge: { kind: 'span', basis: [vt(mn.v)], require: 'orthonormal' }, start: 'x_min', html: 'Un point où il est atteint', ask: 'x =', lines: [eq(unitText(mn.v), 'Vecteur propre de λ_min, normé', 'bound')] },
+    { judge: { kind: 'det', vars: ['λ'], names: { A: mt(s.A) }, target: 'factored' }, start: 'det(A-λI)', html: t('Les valeurs propres de A'), ask: '',
+      lines: [eq(detMatText(s.A), 'A − λI', 'bound'), eq(charText(s.lams), t('Valeurs propres {lmin} et {lmax}', { lmin: fq(mn.l), lmax: fq(mx.l) }), 'bound')] },
+    { judge: { kind: 'value', expect: qt(mx.l) }, start: 'λ_max', html: t('Le maximum de xᵀAx sur ‖x‖ = 1'), ask: 'max =', lines: [eq(qt(mx.l), t('La plus grande valeur propre'), 'bound')] },
+    { judge: { kind: 'span', basis: [vt(mx.v)], require: 'orthonormal' }, start: 'x_max', html: t('Un point où il est atteint (‖x‖ = 1)'), ask: 'x =', lines: [eq(unitText(mx.v), t('Vecteur propre de λ_max, normé'), 'bound')] },
+    { judge: { kind: 'value', expect: qt(mn.l) }, start: 'λ_min', html: t('Le minimum de xᵀAx sur ‖x‖ = 1'), ask: 'min =', lines: [eq(qt(mn.l), t('La plus petite valeur propre'), 'bound')] },
+    { judge: { kind: 'span', basis: [vt(mn.v)], require: 'orthonormal' }, start: 'x_min', html: t('Un point où il est atteint'), ask: 'x =', lines: [eq(unitText(mn.v), t('Vecteur propre de λ_min, normé'), 'bound')] },
   ];
   return partsItem({
     ...base, key: `${RA}:sphere:${mt(s.A)}`, fallback: s.fallback, baits: ['m_rayleigh_no_denominator'],
-    hints: hints3('Sur la sphère unité, xᵀAx = R(x) : son maximum est λ_max, atteint en un vecteur propre unitaire.', `det(A − λI) = (□ − λ)(□ − λ)`, `max = ${fq(mx.l)} en ${unitText(mx.v).replace(/-/g, '−')} ; min = ${fq(mn.l)} en ${unitText(mn.v).replace(/-/g, '−')}`),
-    prompt: `A = ${MLm(s.A)}. Trouve le maximum et le minimum de xᵀAx sous la contrainte ‖x‖ = 1, et un point où chacun est atteint.`,
+    hints: hints3(t('Sur la sphère unité, xᵀAx = R(x) : son maximum est λ_max, atteint en un vecteur propre unitaire.'), `det(A − λI) = (□ − λ)(□ − λ)`, t('max = {lmax} en {vmax} ; min = {lmin} en {vmin}', { lmax: fq(mx.l), vmax: unitText(mx.v).replace(/-/g, '−'), lmin: fq(mn.l), vmin: unitText(mn.v).replace(/-/g, '−') })),
+    prompt: t('A = {A}. Trouve le maximum et le minimum de xᵀAx sous la contrainte ‖x‖ = 1, et un point où chacun est atteint.', { A: MLm(s.A) }),
   }, ps);
 }
 
 // Level 5: x = m·u + e close to the eigenvector u: R(x) against (Ax)ᵢ/xᵢ.
 function closeItem(rng) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const s = symWhole(2, rng, {});
     if (s.fallback) continue;
     const k = rng.int(0, 1);
@@ -150,22 +151,22 @@ function closeItem(rng) {
     if (!(eR < eQ / 2) || Math.abs(num.valueOf()) > 600 || ratio.eq(lam)) continue;
     const d = { ...s, n: 2, x, Ax, num, den, R };
     const ps = parts(d);
-    ps.push({ judge: { kind: 'value', expect: qt(ratio) }, start: 'ρ', html: `Le rapport de composantes (Ax)${sub(i + 1)}/x${sub(i + 1)}`, ask: 'rapport =',
+    ps.push({ judge: { kind: 'value', expect: qt(ratio) }, start: 'ρ', html: t('Le rapport de composantes (Ax){i}/x{i}', { i: sub(i + 1) }), ask: 'rapport =',
       lines: ratio.d === 1 || (ratio.n === Ax[i].valueOf() && ratio.d === x[i].valueOf()) ? [eq(qt(ratio), '', 'quot')] : [eq(`${qt(Ax[i])}÷${par(x[i])}`, '', 'quot'), eq(qt(ratio), '', 'quot')] });
     const key = `${RA}:close:${mt(s.A)}:${vt(x)}`;
-    const lines = partsItem({ skill: RA, level: 5, mode: 'free', hints: [], noHints: true, subgoals: RA_SUB, key, prompt: `Calcule R(x), puis le rapport (Ax)${sub(i + 1)}/x${sub(i + 1)}.`, baits: ['m_rayleigh_no_denominator'] }, ps);
+    const lines = partsItem({ skill: RA, level: 5, mode: 'free', hints: [], noHints: true, subgoals: RA_SUB, key, prompt: t('Calcule R(x), puis le rapport (Ax){i}/x{i}.', { i: sub(i + 1) }), baits: ['m_rayleigh_no_denominator'] }, ps);
     const best = mcq({
-      skill: RA, level: 5, key: `${key}:best`, prompt: `La valeur propre proche est λ = ${fq(lam)}. Quelle estimation en est la plus proche ?`,
+      skill: RA, level: 5, key: `${key}:best`, prompt: t('La valeur propre proche est λ = {l}. Quelle estimation en est la plus proche ?', { l: fq(lam) }),
       options: [
-        { html: `R(x) = ${fq(R)} : l'erreur est de l'ordre de ε², ε l'écart de x à un vecteur propre`, correct: true },
-        { html: `(Ax)${sub(i + 1)}/x${sub(i + 1)} = ${fq(ratio)} : le rapport d'une seule composante ne dépend pas des autres`, correct: false },
-        { html: 'Les deux sont aussi proches', correct: false },
-        { html: `R(x) = ${fq(R)}, mais seulement parce que x est un vecteur propre`, correct: false },
+        { html: t('R(x) = {R} : l\'erreur est de l\'ordre de ε², ε l\'écart de x à un vecteur propre', { R: fq(R) }), correct: true },
+        { html: t('(Ax){i}/x{i} = {r} : le rapport d\'une seule composante ne dépend pas des autres', { i: sub(i + 1), r: fq(ratio) }), correct: false },
+        { html: t('Les deux sont aussi proches'), correct: false },
+        { html: t('R(x) = {R}, mais seulement parce que x est un vecteur propre', { R: fq(R) }), correct: false },
       ],
     }, rng);
     return problemItem({
-      skill: RA, level: 5, key, prompt: `A = ${MLm(s.A)} et x = ${vR(x)}, proche d'un vecteur propre de A. Compare deux estimations de la valeur propre : le quotient de Rayleigh R(x) et le rapport de composantes (Ax)${sub(i + 1)}/x${sub(i + 1)}.`,
-      parts: [{ item: lines, points: 3, title: 'Calculs' }, { item: best, points: 1, title: 'Comparaison' }],
+      skill: RA, level: 5, key, prompt: t('A = {A} et x = {x}, proche d\'un vecteur propre de A. Compare deux estimations de la valeur propre : le quotient de Rayleigh R(x) et le rapport de composantes (Ax){i}/x{i}.', { A: MLm(s.A), x: vR(x), i: sub(i + 1) }),
+      parts: [{ item: lines, points: 3, title: t('Calculs') }, { item: best, points: 1, title: t('Comparaison') }],
     });
   }
   return null;
@@ -178,15 +179,15 @@ function rayItem(level, rng) {
   const d = rayData(rng, n);
   const key = `${RA}:${mt(d.A)}:${vt(d.x)}:${level}`;
   const base = { skill: RA, level, subgoals: RA_SUB, key, fallback: d.fallback, hints: raHints(d), mode: modeOf(level), baits: ['m_rayleigh_no_denominator'] };
-  const eigs = `Ses valeurs propres sont ${lamsR(d.lams)}.`;
+  const eigs = t('Ses valeurs propres sont {lams}.', { lams: lamsR(d.lams) });
   if (level <= 2) {
     const ps = parts(d, { guided: true, rng, denDecision: level === 2, boundDecision: true });
-    return partsItem({ ...base, prompt: `A = ${MLm(d.A)} est symétrique et x = ${vR(d.x)}. Calcule le quotient de Rayleigh R(x) = xᵀAx / xᵀx.` }, ps);
+    return partsItem({ ...base, prompt: t('A = {A} est symétrique et x = {x}. Calcule le quotient de Rayleigh R(x) = xᵀAx / xᵀx.', { A: MLm(d.A), x: vR(d.x) }) }, ps);
   }
   if (level === 3) {
-    return partsItem({ ...base, prompt: `A = ${MLm(d.A)}, x = ${vR(d.x)}. ${eigs} Calcule R(x) en choisissant d'abord chaque action ; vérifie qu'il est entre λ_min et λ_max.`, tapActions: 'menu' }, parts(d, { menuOn: true, rng, boundDecision: true }));
+    return partsItem({ ...base, prompt: t('A = {A}, x = {x}. {eigs} Calcule R(x) en choisissant d\'abord chaque action ; vérifie qu\'il est entre λ_min et λ_max.', { A: MLm(d.A), x: vR(d.x), eigs }), tapActions: 'menu' }, parts(d, { menuOn: true, rng, boundDecision: true }));
   }
-  return partsItem({ ...base, prompt: rng.chance(0.5) ? `Calcule le quotient de Rayleigh de x = ${vR(d.x)} pour A = ${MLm(d.A)}.` : `A = ${MLm(d.A)} est symétrique. Estime une valeur propre par R(x), avec x = ${vR(d.x)}.` }, parts(d));
+  return partsItem({ ...base, prompt: rng.chance(0.5) ? t('Calcule le quotient de Rayleigh de x = {x} pour A = {A}.', { x: vR(d.x), A: MLm(d.A) }) : t('A = {A} est symétrique. Estime une valeur propre par R(x), avec x = {x}.', { A: MLm(d.A), x: vR(d.x) }) }, parts(d));
 }
 
 const NONSYM = [['[[0,4],[0,0]]', '(1 ; 1)'], ['[[1,4],[0,1]]', '(1 ; 1)'], ['[[2,6],[0,2]]', '(1 ; 1)'], ['[[0,2],[0,1]]', '(1 ; 1)']];
@@ -199,16 +200,16 @@ function rayExam(rng, exam) {
       const [A, x] = rng.pick(NONSYM);
       return tfL({
         skill: RA, key: `nonsym:${A}`, truth: false, exam: tag,
-        statement: 'Pour toute matrice carrée A à valeurs propres réelles et tout x ≠ 0, λ_min ≤ xᵀAx/xᵀx ≤ λ_max.',
+        statement: t('Pour toute matrice carrée A à valeurs propres réelles et tout x ≠ 0, λ_min ≤ xᵀAx/xᵀx ≤ λ_max.'),
         counter: { kind: 'mx', prop: 'rayleighOutside', params: {}, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }, { v: 'x', label: 'x =', shape: [2, 1] }], answer: { A, x } },
-        explanation: `Faux sans symétrie : A = ${MLm(MX.mat(JSON.parse(A)))} est triangulaire, de valeurs propres sur sa diagonale, mais avec x = ${x.replace(/-/g, '−')}, R(x) en sort. L'encadrement vient de la décomposition spectrale, qui demande A symétrique.`,
+        explanation: t('Faux sans symétrie : A = {A} est triangulaire, de valeurs propres sur sa diagonale, mais avec x = {x}, R(x) en sort. L\'encadrement vient de la décomposition spectrale, qui demande A symétrique.', { A: MLm(MX.mat(JSON.parse(A))), x: x.replace(/-/g, '−') }),
       });
     }
     const T = [
       null,
-      ['Si A est symétrique, R(x) = xᵀAx/xᵀx ≤ λ_max pour tout x ≠ 0.', 'Vrai : x = Σ cᵢuᵢ en base orthonormée de vecteurs propres, R(x) = Σ λᵢcᵢ² / Σ cᵢ² ≤ λ_max.'],
-      ['R(3x) = R(x) pour tout x ≠ 0.', 'Vrai : le facteur 9 se simplifie entre xᵀAx et xᵀx.'],
-      ['Si A est symétrique, le maximum de xᵀAx sur la sphère ‖x‖ = 1 vaut λ_max.', 'Vrai : sur la sphère, xᵀAx = R(x) ≤ λ_max, avec égalité en un vecteur propre unitaire.'],
+      [t('Si A est symétrique, R(x) = xᵀAx/xᵀx ≤ λ_max pour tout x ≠ 0.'), t('Vrai : x = Σ cᵢuᵢ en base orthonormée de vecteurs propres, R(x) = Σ λᵢcᵢ² / Σ cᵢ² ≤ λ_max.')],
+      [t('R(3x) = R(x) pour tout x ≠ 0.'), t('Vrai : le facteur 9 se simplifie entre xᵀAx et xᵀx.')],
+      [t('Si A est symétrique, le maximum de xᵀAx sur la sphère ‖x‖ = 1 vaut λ_max.'), t('Vrai : sur la sphère, xᵀAx = R(x) ≤ λ_max, avec égalité en un vecteur propre unitaire.')],
     ][which];
     return tfL({ skill: RA, key: `t${which}`, truth: true, exam: tag, statement: T[0], explanation: T[1], ruleIfFalse: which === 2 ? 'm_rayleigh_no_denominator' : null });
   }
@@ -216,7 +217,7 @@ function rayExam(rng, exam) {
   const rootDen = rootT(d.den);
   return mcqDistinct({
     skill: RA, level: 4, key: `mcq:${mt(d.A)}:${vt(d.x)}`, exam: tag,
-    prompt: `A = ${MLm(d.A)} et x = ${vR(d.x)}. Que vaut le quotient de Rayleigh R(x) ?`,
+    prompt: t('A = {A} et x = {x}. Que vaut le quotient de Rayleigh R(x) ?', { A: MLm(d.A), x: vR(d.x) }),
     right: fq(d.R),
     // xᵀAx/‖x‖ in closed form (28/(2√2) = 7√2).
     wrongs: [{ html: fq(d.num), rule: 'm_rayleigh_no_denominator' }, { html: (() => { const r = radicalNode(d.num.valueOf() / Math.sqrt(d.den.valueOf())); return r ? toText(r).replace(/-/g, '−') : `${fq(d.num)}/(${rootDen})`; })(), rule: 'm_rayleigh_no_denominator' }],

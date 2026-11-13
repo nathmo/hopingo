@@ -23,6 +23,7 @@ import {
 import {
   matA, matM, mtQ, deltaOf, DeltaOf, traceOf, detLines, natureOf, NATURE_NAME,
 } from './coniques-b-kit.js';
+import { t } from '../../i18n.js';
 
 const MTm = (t) => MT(t, { vars: ['x', 'y', 'm'] });
 const MTxy = (t) => MT(t, { vars: ['x', 'y'] });
@@ -40,9 +41,9 @@ const lin2 = ([p, r, s]) => sumT([[p, 'x'], [r, 'y'], [s, '']]);
 
 const FAM = 'g10-conic-family';
 const FAM_SUB = [
-  { id: 'delta', label: 'δ(m) et son signe', skill: 'param-quadratic' },
-  { id: 'centre', label: 'équations du centre, éliminer m', skill: FAM },
-  { id: 'nature', label: 'nature du lieu', skill: 'g10-conic-nature' },
+  { id: 'delta', label: t('δ(m) et son signe'), skill: 'param-quadratic' },
+  { id: 'centre', label: t('équations du centre, éliminer m'), skill: FAM },
+  { id: 'nature', label: t('nature du lieu'), skill: 'g10-conic-nature' },
 ];
 
 // The roots of A m² + B m + C (Q), or null if irrational; [] if none.
@@ -59,7 +60,7 @@ function roots2(A, B, C) {
 }
 
 export function familyData(rng, { needLocus = true } = {}) {
-  for (let t = 0; t < 600; t++) {
+  for (let tries = 0; tries < 600; tries++) {
     const [a0, a1, b0, b1, c0, c1] = Array.from({ length: 6 }, () => rng.int(-3, 3));
     const [d0, d1, e0, e1] = Array.from({ length: 4 }, () => rng.int(-3, 3));
     const f0 = rng.int(-3, 3);
@@ -140,23 +141,23 @@ function genreParts(d, level) {
       html: 'δ(m) = a(m)·c(m) − (b(m)/2)² ?', ask: 'δ(m) =', start,
       judge: { kind: 'equiv', vars: ['m'], target: 'goal', goal: dT },
       menu: [
-        { id: 'ac', label: 'δ = ac − (b/2)², développé', valid: true },
+        { id: 'ac', label: t('δ = ac − (b/2)², développé'), valid: true },
         { id: 'acb', label: 'δ = ac − b²', valid: false, rule: 'g10_bhalf_matrix', why: 'A = [[a, b/2], [b/2, c]] : δ = ac − (b/2)².' },
       ],
-      lines: [{ math: dT, note: 'Développer', subgoal: 'delta' }],
+      lines: [{ math: dT, note: t('Développer'), subgoal: 'delta' }],
     });
   }
-  const names = { pos: ['δ(m) > 0 : genre ellipse', '>'], zero: ['δ(m) = 0 : genre parabole', '='], neg: ['δ(m) < 0 : genre hyperbole', '<'] };
+  const names = { pos: [t('δ(m) > 0 : genre ellipse'), '>'], zero: [t('δ(m) = 0 : genre parabole'), '='], neg: [t('δ(m) < 0 : genre hyperbole'), '<'] };
   for (const k of ['pos', 'zero', 'neg']) {
     if (sets[k] === '∅') continue;
     parts.push({
-      html: `${level === 1 && !parts.length ? `δ(m) = ${readable(dT)}. ` : ''}${names[k][0]} pour quels m ?`, ask: 'm ∈', start: `${dT} ${names[k][1]} 0`,
+      html: { pos: () => t('{v1}δ(m) > 0 : genre ellipse pour quels m ?', { v1: level === 1 && !parts.length ? `δ(m) = ${readable(dT)}. ` : '' }), zero: () => t('{v1}δ(m) = 0 : genre parabole pour quels m ?', { v1: level === 1 && !parts.length ? `δ(m) = ${readable(dT)}. ` : '' }), neg: () => t('{v1}δ(m) < 0 : genre hyperbole pour quels m ?', { v1: level === 1 && !parts.length ? `δ(m) = ${readable(dT)}. ` : '' }) }[k](), ask: 'm ∈', start: `${dT} ${names[k][1]} 0`,
       judge: { kind: 'solset', v: 'm', vars: ['m'] },
       menu: [
-        { id: 'roots', label: 'Racines de δ(m), puis signe du trinôme', valid: true },
-        { id: 'swap', label: 'δ > 0 : genre hyperbole', valid: false, rule: 'g10_det_sign_nature', why: 'δ = λ₁λ₂ > 0 : valeurs propres de même signe, genre ellipse.' },
+        { id: 'roots', label: t('Racines de δ(m), puis signe du trinôme'), valid: true },
+        { id: 'swap', label: t('δ > 0 : genre hyperbole'), valid: false, rule: 'g10_det_sign_nature', why: t('δ = λ₁λ₂ > 0 : valeurs propres de même signe, genre ellipse.') },
       ],
-      lines: [{ math: sets[k], note: k === 'zero' ? 'Les racines de δ(m)' : 'Signe du trinôme : celui de a à l\'extérieur des racines', subgoal: 'delta', blank: k === 'zero' ? d.r.map(qt) : [] }],
+      lines: [{ math: sets[k], note: k === 'zero' ? t('Les racines de δ(m)') : t('Signe du trinôme : celui de a à l\'extérieur des racines'), subgoal: 'delta', blank: k === 'zero' ? d.r.map(qt) : [] }],
     });
   }
   return { parts, sets, dT };
@@ -177,16 +178,16 @@ function locusParts(d, level) {
   const ex = d.excl;
   return [
     {
-      html: `Le centre vérifie ½∂f/∂x = 0 et ½∂f/∂y = 0 : ${MTm(e1)} et ${MTm(e2)}. Isole m dans la 1re (si ${MTxy(`${lin2(Q1)} ≠ 0`)}) : m = −(${readable(lin2(P1))})/(${readable(lin2(Q1))}), et remplace dans la 2e.`,
-      ask: 'lieu :', start: 'lieu', judge: { kind: 'conic', equation: Lt, target: 'none' },
-      lines: [{ math: `${prodT} = 0`, note: 'Multiplier par le dénominateur', subgoal: 'centre', blank: [`(${lin2(P1)})`] }],
+      html: t('Le centre vérifie ½∂f/∂x = 0 et ½∂f/∂y = 0 : {v1} et {v2}. Isole m dans la 1re (si {v3}) : m = −({v4})/({v5}), et remplace dans la 2e.', { v1: MTm(e1), v2: MTm(e2), v3: MTxy(`${lin2(Q1)} ≠ 0`), v4: readable(lin2(P1)), v5: readable(lin2(Q1)) }),
+      ask: t('lieu :'), start: 'lieu', judge: { kind: 'conic', equation: Lt, target: 'none' },
+      lines: [{ math: `${prodT} = 0`, note: t('Multiplier par le dénominateur'), subgoal: 'centre', blank: [`(${lin2(P1)})`] }],
     },
     {
-      html: 'Développe.', ask: '', start: prodT, judge: { kind: 'equiv', vars: ['x', 'y'], target: 'goal', goal: Lexpr },
-      lines: [{ math: Lexpr, note: 'Le lieu des centres : … = 0', subgoal: 'centre' }],
+      html: t('Développe.'), ask: '', start: prodT, judge: { kind: 'equiv', vars: ['x', 'y'], target: 'goal', goal: Lexpr },
+      lines: [{ math: Lexpr, note: t('Le lieu des centres : … = 0'), subgoal: 'centre' }],
     },
     {
-      html: 'Sa nature : Δ = det M ?', ask: 'Δ =', start: 'det(M)',
+      html: t('Sa nature : Δ = det M ?'), ask: 'Δ =', start: 'det(M)',
       judge: { kind: 'det', target: 'number', names: { M: mtQ(M) }, abc: d.L.slice(0, 3).map(qt), co6: d.L.map(qt) },
       lines: [
         { math: dl.matrix, note: 'M = [[a, b/2, d/2], [b/2, c, e/2], [d/2, e/2, f]]', subgoal: 'nature', from: 3 },
@@ -194,20 +195,20 @@ function locusParts(d, level) {
       ],
     },
     {
-      html: 'Et δ = det A ?', ask: 'δ =', start: 'δ', judge: { kind: 'value', expect: qt(dL), delta: true, abc: d.L.slice(0, 3).map(qt) },
+      html: t('Et δ = det A ?'), ask: 'δ =', start: 'δ', judge: { kind: 'value', expect: qt(dL), delta: true, abc: d.L.slice(0, 3).map(qt) },
       lines: [{ math: qt(dL), note: '', subgoal: 'nature' }],
     },
     {
-      html: 'Un point du lieu peut-il ne pas être un centre ?', ask: 'point exclu :', start: 'P',
+      html: t('Un point du lieu peut-il ne pas être un centre ?'), ask: t('point exclu :'), start: 'P',
       judge: { kind: 'vector', expect: vt(ex) },
       decisions: [
-        { kind: 'decision', prompt: `δ = ${fq(dL)}, Δ = ${fq(DL)} : le lieu est…`, options: ['ell', 'hyp', 'par'].map((k) => ({ id: k, label: NATURE_NAME[k], valid: k === nat, rule: (k === 'ell' && nat === 'hyp') || (k === 'hyp' && nat === 'ell') ? 'g10_det_sign_nature' : undefined, why: 'δ = λ₁λ₂ donne le genre, Δ ≠ 0 : non dégénérée.' })) },
-        { kind: 'decision', prompt: 'Tout point du lieu est-il le centre d\'une conique de la famille ?', options: [
-          { id: 'yes', label: 'Oui, tous', valid: false, rule: 'g10_family_division_by_zero', why: `On a divisé par ${readable(lin2(Q1))} : là où ${readable(lin2(Q1))} = 0 et ${readable(lin2(Q2))} = 0, aucune valeur de m ne convient.` },
-          { id: 'no', label: `Non : là où ${readable(lin2(Q1))} = 0 et ${readable(lin2(Q2))} = 0, aucun m ne convient`, valid: true },
+        { kind: 'decision', prompt: t('δ = {v1}, Δ = {v2} : le lieu est…', { v1: fq(dL), v2: fq(DL) }), options: ['ell', 'hyp', 'par'].map((k) => ({ id: k, label: NATURE_NAME[k], valid: k === nat, rule: (k === 'ell' && nat === 'hyp') || (k === 'hyp' && nat === 'ell') ? 'g10_det_sign_nature' : undefined, why: t('δ = λ₁λ₂ donne le genre, Δ ≠ 0 : non dégénérée.') })) },
+        { kind: 'decision', prompt: t('Tout point du lieu est-il le centre d\'une conique de la famille ?'), options: [
+          { id: 'yes', label: t('Oui, tous'), valid: false, rule: 'g10_family_division_by_zero', why: t('On a divisé par {v1} : là où {v1} = 0 et {v2} = 0, aucune valeur de m ne convient.', { v1: readable(lin2(Q1)), v2: readable(lin2(Q2)) }) },
+          { id: 'no', label: t('Non : là où {v1} = 0 et {v2} = 0, aucun m ne convient', { v1: readable(lin2(Q1)), v2: readable(lin2(Q2)) }), valid: true },
         ] },
       ],
-      lines: [{ math: vt(ex), note: 'Q₁ = Q₂ = 0 : le système en m devient P₁ = P₂ = 0, impossible ici', subgoal: 'centre' }],
+      lines: [{ math: vt(ex), note: t('Q₁ = Q₂ = 0 : le système en m devient P₁ = P₂ = 0, impossible ici'), subgoal: 'centre' }],
     },
   ];
 }
@@ -220,13 +221,13 @@ function familyItem(level, rng, opts = {}) {
   if (g !== 'genre' && d.excl) parts.push(...locusParts(d, level));
   if (!parts.length) parts.push(...genreParts(d, level).parts);
   const dT = sumT([[d.A, 'm^2'], [d.B, 'm'], [d.C, '']]);
-  const ask = g === 'genre' ? 'Donne son genre selon m.' : g === 'locus' ? 'Trouve le lieu des centres et sa nature.' : 'Donne son genre selon m, puis le lieu des centres et sa nature.';
+  const ask = g === 'genre' ? t('Donne son genre selon m.') : g === 'locus' ? t('Trouve le lieu des centres et sa nature.') : t('Donne son genre selon m, puis le lieu des centres et sa nature.');
   return partsItem({
     skill: FAM, level, parts, subgoals: FAM_SUB,
-    prompt: `On donne la famille de coniques ${MTm(`F_m : ${d.eq}`.replace('F_m : ', ''))}, m ∈ ℝ. ${ask}`,
+    prompt: t('On donne la famille de coniques {v1}, m ∈ ℝ. {ask}', { v1: MTm(`F_m : ${d.eq}`.replace('F_m : ', '')), ask }),
     hints: H(
-      g === 'genre' ? 'δ(m) = a(m)·c(m) − (b(m)/2)², puis le signe du trinôme en m.' : 'Isole m dans une des équations du centre et remplace dans l\'autre.',
-      g === 'genre' ? `δ(m) = ${readable(dT)} : ses racines ?` : `m = −(${readable(lin2(d.P1))})/(□)`,
+      g === 'genre' ? t('δ(m) = a(m)·c(m) − (b(m)/2)², puis le signe du trinôme en m.') : t('Isole m dans une des équations du centre et remplace dans l\'autre.'),
+      g === 'genre' ? t('δ(m) = {v1} : ses racines ?', { v1: readable(dT) }) : `m = −(${readable(lin2(d.P1))})/(□)`,
       g === 'genre' ? `δ(m) = ${readable(dT)}` : readable(eqT(d.L)),
     ),
     key: `${FAM}:${g}:${d.eq}`, exam: opts.exam ? examTag(opts, 5) : false,
@@ -240,16 +241,16 @@ function familyExam(rng, exam) {
   const m = rng.int(-3, 3);
   const co = d.co(m).map((x) => q(x));
   const nat = natureOf(co);
-  const name = { ell: 'Une ellipse réelle', empty: 'L\'ensemble vide', hyp: 'Une hyperbole', par: 'Une parabole', pt: 'Un point', lines: 'Deux droites sécantes', par2: 'Deux droites parallèles (ou rien)' };
+  const name = { ell: t('Une ellipse réelle'), empty: t('L\'ensemble vide'), hyp: t('Une hyperbole'), par: t('Une parabole'), pt: t('Un point'), lines: t('Deux droites sécantes'), par2: t('Deux droites parallèles (ou rien)') };
   const bf = natureOf([co[0], co[1].mul(2), ...co.slice(2)]);
   const swapped = { ell: 'hyp', hyp: 'ell', empty: 'hyp', par: 'ell', pt: 'lines', lines: 'pt', par2: 'hyp' }[nat];
   return mcqD({
     skill: FAM, level: 4, key: `mcq:${d.eq}:${m}`, exam: examTag({ exam }),
-    prompt: `Pour m = ${fq(m)}, que décrit la conique ${MTm(d.eq)} ?`,
+    prompt: t('Pour m = {v1}, que décrit la conique {v2} ?', { v1: fq(m), v2: MTm(d.eq) }),
     right: name[nat],
     wrongs: [bf !== nat ? { html: name[bf], rule: 'g10_bhalf_matrix' } : null, { html: name[swapped], rule: 'g10_det_sign_nature' }].filter(Boolean),
     fillers: ['ell', 'hyp', 'par', 'lines'].filter((k) => k !== nat).map((k) => ({ html: name[k] })),
-    solution: [{ html: `Pour m = ${fq(m)} : ${MTxy(eqT(co))}, δ = ${fq(deltaOf(co))}, Δ = ${fq(DeltaOf(co))} : ${NATURE_NAME[nat]}.`, note: '' }],
+    solution: [{ html: t('Pour m = {v1} : {v2}, δ = {v3}, Δ = {v4} : {v5}.', { v1: fq(m), v2: MTxy(eqT(co)), v3: fq(deltaOf(co)), v4: fq(DeltaOf(co)), v5: NATURE_NAME[nat] }), note: '' }],
   }, rng);
 }
 
@@ -259,9 +260,9 @@ function familyExam(rng, exam) {
 
 const LOC = 'g10-locus';
 const LOC_SUB = [
-  { id: 'trad', label: 'traduire la condition', skill: LOC },
-  { id: 'square', label: 'élever au carré (avec condition)', skill: 'g1-irr-eq' },
-  { id: 'recog', label: 'reconnaître la conique', skill: 'g10-ellipse' },
+  { id: 'trad', label: t('traduire la condition'), skill: LOC },
+  { id: 'square', label: t('élever au carré (avec condition)'), skill: 'g1-irr-eq' },
+  { id: 'recog', label: t('reconnaître la conique'), skill: 'g10-ellipse' },
 ];
 
 // [a, c, b] of the ellipse: R = 2a, OA = 2c.
@@ -318,31 +319,33 @@ function ellipseLocusItem(level, rng, opts = {}) {
   const cond = `${v} ${sgn} ${qt(d.bound.mul(d.s))}`;
   const judge = { kind: 'conic', equation: d.eq, target: 'standard' };
   const parts = [{
-    html: `M(x ; y) est le centre d'un cercle de rayon r qui passe par A : MA = r ; il est tangent intérieurement à γ : OM = ${Rt} − r. Donc OM = ${Rt} − MA, soit √(x² + y²) = ${Rt} − √(${readable(d.MA)}).`,
+    html: t('M(x ; y) est le centre d\'un cercle de rayon r qui passe par A : MA = r ; il est tangent intérieurement à γ : OM = {Rt} − r. Donc OM = {Rt} − MA, soit √(x² + y²) = {Rt} − √({v1}).', { Rt, v1: readable(d.MA) }),
     ask: '', start: 'lieu', judge,
-    decisions: [{ levels: [2, 3, 4], kind: 'decision', prompt: 'Comment enlever les racines ?', options: [
-      { id: 'iso', label: 'Élever au carré, puis isoler la racine qui reste et élever encore (avec la condition de signe)', valid: true, quality: 'good', ref: true },
-      { id: 'now', label: 'Élever au carré les deux membres tels quels et développer', valid: true, quality: 'poor', why: 'Il reste un double produit avec une racine : il faut l\'isoler et élever au carré une seconde fois.' },
+    decisions: [{ levels: [2, 3, 4], kind: 'decision', prompt: t('Comment enlever les racines ?'), options: [
+      { id: 'iso', label: t('Élever au carré, puis isoler la racine qui reste et élever encore (avec la condition de signe)'), valid: true, quality: 'good', ref: true },
+      { id: 'now', label: t('Élever au carré les deux membres tels quels et développer'), valid: true, quality: 'poor', why: t('Il reste un double produit avec une racine : il faut l\'isoler et élever au carré une seconde fois.') },
     ] }],
-    notes: [`Au carré : x² + y² = ${qt(d.R.mul(d.R))} − ${qt(d.R.mul(2))}√(…) + ${readable(d.MA)}, donc ${qt(d.R.mul(2))}√(${readable(d.MA)}) = ${readable(d.lin)}, avec la condition ${readable(d.lin)} ≥ 0.`],
+    notes: [t('Au carré : x² + y² = {v1} − {v2}√(…) + {v3}, donc {v2}√({v3}) = {v4}, avec la condition {v4} ≥ 0.', { v1: qt(d.R.mul(d.R)), v2: qt(d.R.mul(2)), v3: readable(d.MA), v4: readable(d.lin) })],
     lines: [
-      { math: d.sq, note: 'Élever au carré (les deux membres sont positifs)', subgoal: 'square', blank: [`(${d.lin})^2`] },
-      { math: d.eq, note: 'Développer et réduire', subgoal: 'square' },
-      { math: d.std, note: 'Compléter le carré : une ellipse de foyers O et A', subgoal: 'recog' },
+      { math: d.sq, note: t('Élever au carré (les deux membres sont positifs)'), subgoal: 'square', blank: [`(${d.lin})^2`] },
+      { math: d.eq, note: t('Développer et réduire'), subgoal: 'square' },
+      { math: d.std, note: t('Compléter le carré : une ellipse de foyers O et A'), subgoal: 'recog' },
     ],
   }, {
-    html: `La condition ${readable(d.lin)} ≥ 0 s'écrit ${cond.replace(/-/g, '−')}. Sur l'ellipse, quelle est la ${d.s > 0 ? 'plus grande' : 'plus petite'} valeur de ${v} ?`,
+    html: d.s > 0
+      ? t('La condition {v1} ≥ 0 s\'écrit {v2}. Sur l\'ellipse, quelle est la plus grande valeur de {v4} ?', { v1: readable(d.lin), v2: cond.replace(/-/g, '−'), v4: v })
+      : t('La condition {v1} ≥ 0 s\'écrit {v2}. Sur l\'ellipse, quelle est la plus petite valeur de {v4} ?', { v1: readable(d.lin), v2: cond.replace(/-/g, '−'), v4: v }),
     ask: `${v} =`, start: v, judge: { kind: 'value', expect: qt(d.xmax.mul(d.s)) },
-    decisions: [{ kind: 'decision', prompt: 'La condition retire-t-elle des points du lieu ?', options: [
-      { id: 'no', label: `Non : sur l'ellipse, ${v} reste ${sgn} ${fq(d.xmax.mul(d.s))}, donc la condition est toujours vraie`, valid: true },
-      { id: 'half', label: 'Oui : seule une moitié de l\'ellipse convient', valid: false, rule: 'g10_locus_square_condition', why: 'Compare la condition avec les points de l\'ellipse : elle est vraie partout.' },
+    decisions: [{ kind: 'decision', prompt: t('La condition retire-t-elle des points du lieu ?'), options: [
+      { id: 'no', label: t('Non : sur l\'ellipse, {v1} reste {sgn} {v2}, donc la condition est toujours vraie', { v1: v, sgn, v2: fq(d.xmax.mul(d.s)) }), valid: true },
+      { id: 'half', label: t('Oui : seule une moitié de l\'ellipse convient'), valid: false, rule: 'g10_locus_square_condition', why: t('Compare la condition avec les points de l\'ellipse : elle est vraie partout.') },
     ] }],
-    lines: [{ math: qt(d.xmax.mul(d.s)), note: `Centre ± a, avec a = ${fq(d.a)}`, subgoal: 'recog' }],
+    lines: [{ math: qt(d.xmax.mul(d.s)), note: t('Centre ± a, avec a = {v1}', { v1: fq(d.a) }), subgoal: 'recog' }],
   }];
   return partsItem({
     skill: LOC, level, parts, subgoals: LOC_SUB,
-    prompt: `On donne le cercle γ : x² + y² = ${qt(d.R.mul(d.R))} et le point A${vr(d.A)}. Trouve le lieu des centres M des cercles qui passent par A et sont tangents intérieurement à γ.`,
-    hints: H('La tangence intérieure donne OM = R − r, et r = MA.', `${qt(d.R.mul(2))}√(…) = □`, readable(d.eq)),
+    prompt: t('On donne le cercle γ : x² + y² = {v1} et le point A{v2}. Trouve le lieu des centres M des cercles qui passent par A et sont tangents intérieurement à γ.', { v1: qt(d.R.mul(d.R)), v2: vr(d.A) }),
+    hints: H(t('La tangence intérieure donne OM = R − r, et r = MA.'), `${qt(d.R.mul(2))}√(…) = □`, readable(d.eq)),
     key: `${LOC}:ell:${vt(d.A)}:${qt(d.R)}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -369,13 +372,13 @@ function parabolaLocusItem(level, rng, opts = {}) {
       html: `MF = d(M, D) : √(${readable(sqF)}) = |${minus(v, dv).replace(/-/g, '−')}|.`, ask: '', start: 'lieu',
       judge: { kind: 'conic', equation: eq, target: 'standard' },
       lines: [
-        { math: line, note: 'Élever au carré (deux distances positives)', subgoal: 'square', blank: [`(${minus(v, dv)})^2`] },
-        { math: eq, note: 'Développer et réduire', subgoal: 'square' },
-        { math: std, note: 'Une parabole de foyer F et de directrice D', subgoal: 'recog' },
+        { math: line, note: t('Élever au carré (deux distances positives)'), subgoal: 'square', blank: [`(${minus(v, dv)})^2`] },
+        { math: eq, note: t('Développer et réduire'), subgoal: 'square' },
+        { math: std, note: t('Une parabole de foyer F et de directrice D'), subgoal: 'recog' },
       ],
     }],
-    prompt: `Trouve le lieu des points M(x ; y) à égale distance du point F${vr(F)} et de la droite D : ${v} = ${fq(dv)}.`,
-    hints: H('Écris MF et la distance de M à D, puis élève au carré.', `${readable(sqF)} = (□)²`, readable(std)),
+    prompt: t('Trouve le lieu des points M(x ; y) à égale distance du point F{v1} et de la droite D : {v2} = {v3}.', { v1: vr(F), v2: v, v3: fq(dv) }),
+    hints: H(t('Écris MF et la distance de M à D, puis élève au carré.'), `${readable(sqF)} = (□)²`, readable(std)),
     key: `${LOC}:par:${vt(F)}:${v}${dv}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -393,14 +396,14 @@ function locusExam(rng, exam) {
   const D = r1 + r2 + rng.int(2, 6);
   return mcqD({
     skill: LOC, level: 4, key: `mcq:${r1}:${r2}:${D}`, exam: examTag({ exam }),
-    prompt: `Les cercles γ₁ de centre O₁ et de rayon ${r1}, et γ₂ de centre O₂ et de rayon ${r2} sont extérieurs (O₁O₂ = ${D}). Quel est le lieu des centres M des cercles tangents extérieurement à γ₁ et à γ₂ ?`,
-    right: `Une seule branche d'hyperbole de foyers O₁ et O₂ (MO₁ − MO₂ = ${r1 - r2})`,
+    prompt: t('Les cercles γ₁ de centre O₁ et de rayon {r1}, et γ₂ de centre O₂ et de rayon {r2} sont extérieurs (O₁O₂ = {D}). Quel est le lieu des centres M des cercles tangents extérieurement à γ₁ et à γ₂ ?', { r1, r2, D }),
+    right: t('Une seule branche d\'hyperbole de foyers O₁ et O₂ (MO₁ − MO₂ = {v1})', { v1: r1 - r2 }),
     wrongs: [
-      { html: `L'hyperbole entière de foyers O₁ et O₂ (|MO₁ − MO₂| = ${r1 - r2})`, rule: 'g10_locus_square_condition' },
-      { html: `L'ellipse de foyers O₁ et O₂ (MO₁ + MO₂ = ${r1 + r2})`, rule: null },
-      { html: 'La médiatrice de [O₁O₂]', rule: null },
+      { html: t('L\'hyperbole entière de foyers O₁ et O₂ (|MO₁ − MO₂| = {v1})', { v1: r1 - r2 }), rule: 'g10_locus_square_condition' },
+      { html: t('L\'ellipse de foyers O₁ et O₂ (MO₁ + MO₂ = {v1})', { v1: r1 + r2 }), rule: null },
+      { html: t('La médiatrice de [O₁O₂]'), rule: null },
     ],
-    solution: [{ html: `MO₁ = ${r1} + r et MO₂ = ${r2} + r, donc MO₁ − MO₂ = ${r1 - r2} > 0 : seulement la branche la plus proche de O₂ (en élevant au carré, on obtiendrait aussi l'autre).`, note: '' }],
+    solution: [{ html: t('MO₁ = {r1} + r et MO₂ = {r2} + r, donc MO₁ − MO₂ = {v1} > 0 : seulement la branche la plus proche de O₂ (en élevant au carré, on obtiendrait aussi l\'autre).', { r1, r2, v1: r1 - r2 }), note: '' }],
   }, rng);
 }
 
@@ -410,8 +413,8 @@ function locusExam(rng, exam) {
 
 const HOM = 'g10-homogeneous';
 const HOM_SUB = [
-  { id: 'homog', label: 'homogénéiser', skill: HOM },
-  { id: 'inf', label: 'points à l\'infini, genre', skill: 'g10-conic-nature' },
+  { id: 'homog', label: t('homogénéiser'), skill: HOM },
+  { id: 'inf', label: t('points à l\'infini, genre'), skill: 'g10-conic-nature' },
 ];
 
 function homogData(rng, kind) {
@@ -456,29 +459,29 @@ function homogItem(level, rng, opts = {}) {
   const goal = homT(h.co);
   const quad = `${sumT([[a, 'x^2'], [b, 'x'], [c, '']])} = 0`;
   const sol = h.pts.length === 0 ? '∅' : h.pts.length === 1 ? `x = ${h.pts[0]}` : `x = ${h.pts[0]} ou x = ${h.pts[1]}`;
-  const ptsT = h.pts.length ? h.pts.map((p) => `(${fq(p)} : 1 : 0)`).join(' et ') : 'aucun point réel';
-  const genre = { hyp: 'genre hyperbole', par: 'genre parabole', ell: 'genre ellipse' }[kind];
+  const ptsT = h.pts.length ? h.pts.map((p) => `(${fq(p)} : 1 : 0)`).join(' et ') : t('aucun point réel');
+  const genre = { hyp: t('genre hyperbole'), par: t('genre parabole'), ell: t('genre ellipse') }[kind];
   const parts = [
     {
-      html: 'Remplace x par x/t et y par y/t, puis multiplie par t².', ask: '', start: subT(h.co),
+      html: t('Remplace x par x/t et y par y/t, puis multiplie par t².'), ask: '', start: subT(h.co),
       judge: { kind: 'equiv', vars: ['x', 'y', 't'], target: 'goal', goal, domain: { x: [-2, 2], y: [-2, 2], t: [0.5, 2] }, homog: plain },
-      lines: [{ math: goal, note: 'Chaque terme de degré 2', subgoal: 'homog', blank: [sumT([[h.co[5], 't^2']]).replace(/^-/, '')] }],
+      lines: [{ math: goal, note: t('Chaque terme de degré 2'), subgoal: 'homog', blank: [sumT([[h.co[5], 't^2']]).replace(/^-/, '')] }],
     },
     {
-      html: 'Les points à l\'infini ont t = 0 : il reste la partie du 2e degré. Avec y = 1 (un point à l\'infini est défini à un facteur près) :', ask: '', start: quad,
+      html: t('Les points à l\'infini ont t = 0 : il reste la partie du 2e degré. Avec y = 1 (un point à l\'infini est défini à un facteur près) :'), ask: '', start: quad,
       judge: { kind: 'solset', v: 'x', vars: ['x'] },
-      decisions: [{ kind: 'decision', prompt: 'Combien de points réels à l\'infini, et quel genre ?', options: [
-        { id: 'hyp', label: 'Deux : genre hyperbole (directions des asymptotes)', valid: kind === 'hyp', rule: kind === 'ell' ? 'g10_det_sign_nature' : undefined, why: 'Compte les solutions de l\'équation en x.' },
-        { id: 'par', label: 'Un point double : genre parabole (direction de l\'axe)', valid: kind === 'par', why: 'Compte les solutions de l\'équation en x.' },
-        { id: 'ell', label: 'Aucun : genre ellipse', valid: kind === 'ell', rule: kind === 'hyp' ? 'g10_det_sign_nature' : undefined, why: 'Compte les solutions de l\'équation en x.' },
+      decisions: [{ kind: 'decision', prompt: t('Combien de points réels à l\'infini, et quel genre ?'), options: [
+        { id: 'hyp', label: t('Deux : genre hyperbole (directions des asymptotes)'), valid: kind === 'hyp', rule: kind === 'ell' ? 'g10_det_sign_nature' : undefined, why: t('Compte les solutions de l\'équation en x.') },
+        { id: 'par', label: t('Un point double : genre parabole (direction de l\'axe)'), valid: kind === 'par', why: t('Compte les solutions de l\'équation en x.') },
+        { id: 'ell', label: t('Aucun : genre ellipse'), valid: kind === 'ell', rule: kind === 'hyp' ? 'g10_det_sign_nature' : undefined, why: t('Compte les solutions de l\'équation en x.') },
       ] }],
-      lines: [{ math: sol, note: `Points à l'infini : ${ptsT} ; ${genre}`, subgoal: 'inf' }],
+      lines: [{ math: sol, note: t('Points à l\'infini : {ptsT} ; {genre}', { ptsT, genre }), subgoal: 'inf' }],
     },
   ];
   return partsItem({
     skill: HOM, level, parts, subgoals: HOM_SUB,
-    prompt: `Écris l'équation homogène de la conique ${MTxy(`${plain} = 0`)}, puis trouve ses points à l'infini.`,
-    hints: H('Multiplie chaque terme par la puissance de t qui manque pour atteindre le degré 2.', `${readable(goal.replace(/t\^2$/, '□'))}`, readable(goal)),
+    prompt: t('Écris l\'équation homogène de la conique {v1}, puis trouve ses points à l\'infini.', { v1: MTxy(`${plain} = 0`) }),
+    hints: H(t('Multiplie chaque terme par la puissance de t qui manque pour atteindre le degré 2.'), `${readable(goal.replace(/t\^2$/, '□'))}`, readable(goal)),
     key: `${HOM}:${plain}`, fallback: h.fallback, exam: opts.exam ? examTag(opts) : false,
   });
 }
@@ -493,15 +496,15 @@ function lineHomogItem(level, rng) {
   return partsItem({
     skill: HOM, level, subgoals: HOM_SUB,
     parts: [
-      { html: 'Remplace x par x/t et y par y/t, puis multiplie par t.', ask: '', start: `t·(${sumT([[a, '(x/t)'], [b, '(y/t)'], [c, '']])})`,
+      { html: t('Remplace x par x/t et y par y/t, puis multiplie par t.'), ask: '', start: `t·(${sumT([[a, '(x/t)'], [b, '(y/t)'], [c, '']])})`,
         judge: { kind: 'equiv', vars: ['x', 'y', 't'], target: 'goal', goal, domain: { x: [-2, 2], y: [-2, 2], t: [0.5, 2] }, homog: plain },
-        lines: [{ math: goal, note: 'Degré 1 pour chaque terme', subgoal: 'homog' }] },
-      { html: `t = 0 : ${readable(sumT([[a, 'x'], [b, 'y']]))} = 0. Le point à l'infini (x : y : 0) donne une direction de la droite ?`, ask: 'direction :', start: 'w',
+        lines: [{ math: goal, note: t('Degré 1 pour chaque terme'), subgoal: 'homog' }] },
+      { html: t('t = 0 : {v1} = 0. Le point à l\'infini (x : y : 0) donne une direction de la droite ?', { v1: readable(sumT([[a, 'x'], [b, 'y']])) }), ask: t('direction :'), start: 'w',
         judge: { kind: 'vector', expect: vt([q(-b), q(a)]), multiple: true },
-        lines: [{ math: vt([q(-b), q(a)]), note: `Le point (${fq(-b)} : ${fq(a)} : 0)`, subgoal: 'inf' }] },
+        lines: [{ math: vt([q(-b), q(a)]), note: t('Le point ({v1} : {v2} : 0)', { v1: fq(-b), v2: fq(a) }), subgoal: 'inf' }] },
     ],
-    prompt: `Écris l'équation homogène de la droite ${MTxy(`${plain} = 0`)} et trouve son point à l'infini.`,
-    hints: H('Le terme constant devient c·t.', readable(sumT([[a, 'x'], [b, 'y']])) + ' + □·t = 0', `(${fq(-b)} : ${fq(a)} : 0)`),
+    prompt: t('Écris l\'équation homogène de la droite {v1} et trouve son point à l\'infini.', { v1: MTxy(`${plain} = 0`) }),
+    hints: H(t('Le terme constant devient c·t.'), readable(sumT([[a, 'x'], [b, 'y']])) + ' + □·t = 0', `(${fq(-b)} : ${fq(a)} : 0)`),
     key: `${HOM}:line:${plain}`,
   });
 }
@@ -517,15 +520,15 @@ function cubicItem(level, rng) {
   return partsItem({
     skill: HOM, level, subgoals: HOM_SUB,
     parts: [
-      { html: 'Homogénéise (degré 3).', ask: '', start: `t^3·(${sumT([[1, '(x/t)^3'], [s * c ** 3, '(y/t)^3'], [k, '(x/t)(y/t)']])})`,
+      { html: t('Homogénéise (degré 3).'), ask: '', start: `t^3·(${sumT([[1, '(x/t)^3'], [s * c ** 3, '(y/t)^3'], [k, '(x/t)(y/t)']])})`,
         judge: { kind: 'equiv', vars: ['x', 'y', 't'], target: 'goal', goal, domain: { x: [-2, 2], y: [-2, 2], t: [0.5, 2] }, homog: plain },
-        lines: [{ math: goal, note: 'Le terme du 2e degré reçoit un t', subgoal: 'homog' }] },
+        lines: [{ math: goal, note: t('Le terme du 2e degré reçoit un t'), subgoal: 'homog' }] },
       { html: 't = 0 et y = 1 :', ask: '', start: `${sumT([[1, 'x^3'], [s * c ** 3, '']])} = 0`, judge: { kind: 'solset', v: 'x', vars: ['x'] },
-        lines: [{ math: `x = ${x0}`, note: `Un seul point réel à l'infini : (${fq(x0)} : 1 : 0)`, subgoal: 'inf' }] },
-      { html: 'Une direction asymptotique de la courbe ?', ask: 'direction :', start: 'w', judge: { kind: 'vector', expect: vt([q(x0), q(1)]), multiple: true },
+        lines: [{ math: `x = ${x0}`, note: t('Un seul point réel à l\'infini : ({v1} : 1 : 0)', { v1: fq(x0) }), subgoal: 'inf' }] },
+      { html: t('Une direction asymptotique de la courbe ?'), ask: t('direction :'), start: 'w', judge: { kind: 'vector', expect: vt([q(x0), q(1)]), multiple: true },
         lines: [{ math: vt([q(x0), q(1)]), note: '', subgoal: 'inf' }] },
     ],
-    prompt: `On donne la courbe ${MTxy(`${plain} = 0`)}. Écris son équation homogène, puis trouve son point à l'infini et sa direction asymptotique.`,
+    prompt: t('On donne la courbe {v1}. Écris son équation homogène, puis trouve son point à l\'infini et sa direction asymptotique.', { v1: MTxy(`${plain} = 0`) }),
     hints: [], noHints: true,
     key: `${HOM}:cubic:${plain}`,
   });
@@ -536,14 +539,14 @@ function homogExam(rng, exam) {
   const h = homogData(rng, kind);
   const n = h.pts.length;
   const plain = sumT([[h.co[0], 'x^2'], [h.co[1], 'xy'], [h.co[2], 'y^2'], [h.co[3], 'x'], [h.co[4], 'y'], [h.co[5], '']]);
-  const label = (k) => ['Aucun', 'Un seul (double)', 'Deux', 'Une infinité'][k];
+  const label = (k) => [t('Aucun'), t('Un seul (double)'), t('Deux'), t('Une infinité')][k];
   return mcqD({
     skill: HOM, level: 4, key: `mcq:${plain}`, exam: examTag({ exam }),
-    prompt: `Combien la conique ${MTxy(`${plain} = 0`)} a-t-elle de points réels à l'infini ?`,
+    prompt: t('Combien la conique {v1} a-t-elle de points réels à l\'infini ?', { v1: MTxy(`${plain} = 0`) }),
     right: label(n),
     wrongs: [{ html: label(n === 0 ? 2 : n === 2 ? 0 : 2), rule: 'g10_det_sign_nature' }],
     fillers: [0, 1, 2, 3].filter((k) => k !== n).map((k) => ({ html: label(k) })),
-    solution: [{ html: `t = 0 : ${MTxy(`${sumT([[h.co[0], 'x^2'], [h.co[1], 'xy'], [h.co[2], 'y^2']])} = 0`)} ; ${n === 0 ? 'aucune solution réelle (genre ellipse)' : n === 1 ? 'un carré parfait (genre parabole)' : 'deux facteurs (genre hyperbole)'}.`, note: '' }],
+    solution: [{ html: `t = 0 : ${MTxy(`${sumT([[h.co[0], 'x^2'], [h.co[1], 'xy'], [h.co[2], 'y^2']])} = 0`)} ; ${n === 0 ? t('aucune solution réelle (genre ellipse)') : n === 1 ? t('un carré parfait (genre parabole)') : t('deux facteurs (genre hyperbole)')}.`, note: '' }],
     fallback: h.fallback,
   }, rng);
 }

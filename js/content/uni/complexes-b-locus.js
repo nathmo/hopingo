@@ -20,10 +20,11 @@ import { MT, linesItem, mcq, examTag } from './kit.js';
 import {
   q, N, nz, modeOf, H, E, fr, ct, cp, cm, mt, cq, xMinus, ptText, blanked, partsScript, decision, uniq, vfMcq, rd, coefText, surd,
 } from './complexes-b-kit.js';
+import { t } from '../../i18n.js';
 
 const KEYS = ['calc', 'cplx', 'ineq', 'relation'];
 const XYV = { vars: ['x', 'y'] };
-const mxy = (t) => MT(t, XYV);
+const mxy = (tq) => MT(tq, XYV);
 const gcd = (a, b) => { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a; };
 
 // ---------- writing equations ----------
@@ -63,20 +64,20 @@ const locusCfg = (locus, target, extra = {}) => ({ kind: 'poly', mode: 'locus', 
 
 const LO = 'g8-locus';
 const LO_SUB = [
-  { id: 'read', label: 'lecture géométrique', skill: 'g4-bisectors' },
-  { id: 'square', label: 'module au carré', skill: 'g8-algebraic' },
-  { id: 'expand', label: 'développer', skill: LO },
-  { id: 'circle', label: 'cercle : centre et rayon', skill: 'g10-circle-eq' },
+  { id: 'read', label: t('lecture géométrique'), skill: 'g4-bisectors' },
+  { id: 'square', label: t('module au carré'), skill: 'g8-algebraic' },
+  { id: 'expand', label: t('développer'), skill: LO },
+  { id: 'circle', label: t('cercle : centre et rayon'), skill: 'g10-circle-eq' },
 ];
 const LO_CHOICES = [
-  { id: 'square', label: 'Poser z = x + iy et élever les modules au carré' },
-  { id: 'expand', label: 'Développer et simplifier' },
-  { id: 'gather', label: 'Tout passer d\'un côté' },
-  { id: 'divide', label: 'Diviser par le coefficient de x²' },
-  { id: 'circle', label: 'Compléter les carrés : centre et rayon' },
-  { id: 'line', label: 'Écrire l\'équation de la droite' },
-  { id: 'flip', label: 'Remplacer |z + a| par la distance au point +a', rule: 'g8_locus_sign', why: '|z + a| = |z − (−a)| : c\'est la distance au point −a.' },
-  { id: 'nosq', label: 'Écrire |z − a| = (x − a₁) + (y − a₂), sans carrés', rule: 'g8_modulus_no_square', why: 'Le module est une longueur : |z − a|² = (x − a₁)² + (y − a₂)² (Pythagore).' },
+  { id: 'square', label: t('Poser z = x + iy et élever les modules au carré') },
+  { id: 'expand', label: t('Développer et simplifier') },
+  { id: 'gather', label: t('Tout passer d\'un côté') },
+  { id: 'divide', label: t('Diviser par le coefficient de x²') },
+  { id: 'circle', label: t('Compléter les carrés : centre et rayon') },
+  { id: 'line', label: t('Écrire l\'équation de la droite') },
+  { id: 'flip', label: t('Remplacer |z + a| par la distance au point +a'), rule: 'g8_locus_sign', why: t('|z + a| = |z − (−a)| : c\'est la distance au point −a.') },
+  { id: 'nosq', label: t('Écrire |z − a| = (x − a₁) + (y − a₂), sans carrés'), rule: 'g8_modulus_no_square', why: t('Le module est une longueur : |z − a|² = (x − a₁)² + (y − a₂)² (Pythagore).') },
 ];
 
 // Médiatrice or half-plane: |z − a| (op) |z − b|.
@@ -110,14 +111,14 @@ function bisectorItem(level, rng, opts, region) {
   const left = lin([-2 * d.a1, -2 * d.a2, d.a1 * d.a1 + d.a2 * d.a2]);
   const right = lin([-2 * d.b1, -2 * d.b2, d.b1 * d.b1 + d.b2 * d.b2]);
   const final = `${lin(d.co)}${opF}0`;
-  const lines = [E(`${sqA}${op0}${sqB}`, 'Module au carré (les deux côtés sont positifs)', 'square', 'square')];
+  const lines = [E(`${sqA}${op0}${sqB}`, t('Module au carré (les deux côtés sont positifs)'), 'square', 'square')];
   const cfg = locusCfg({ kind: 'line', a: d.co[0], b: d.co[1], c: d.co[2] }, 'line');
   const developed = `${left}${op0}${right}`;
   // The developed line may already be final (|z| = |z − b|): then it is the last one.
   const devFinal = locusFinal(cfg, locusRead(cfg, developed)) !== false;
-  if (level <= 3 && !devFinal) lines.push(E(developed, 'Développer : x² et y² disparaissent', 'expand', 'expand'));
-  lines.push(E(final, region ? 'Inéquation du demi-plan' : 'Équation de la droite', 'expand', 'line'));
-  if (level === 1) lines[0] = blanked(lines[0], [String(Math.abs(d.a1)), String(Math.abs(d.a2)), String(Math.abs(d.b1)), String(Math.abs(d.b2))].filter((t) => t !== '0').slice(0, 2), XYV);
+  if (level <= 3 && !devFinal) lines.push(E(developed, t('Développer : x² et y² disparaissent'), 'expand', 'expand'));
+  lines.push(E(final, region ? t('Inéquation du demi-plan') : t('Équation de la droite'), 'expand', 'line'));
+  if (level === 1) lines[0] = blanked(lines[0], [String(Math.abs(d.a1)), String(Math.abs(d.a2)), String(Math.abs(d.b1)), String(Math.abs(d.b2))].filter((tq) => tq !== '0').slice(0, 2), XYV);
   if (level === 2 && !devFinal) lines[1] = blanked(lines[1], [left], XYV);
   const start = `${dist('z', d.a)}${op0}${dist('z', d.b)}`;
   const A = `A${ptText(d.a)}`;
@@ -125,20 +126,22 @@ function bisectorItem(level, rng, opts, region) {
   const pre = [];
   if (level <= 3) {
     const bb = d.b.neg();
-    pre.push(decision(`Que décrit ${rd(`${dist('z', d.a)}=${dist('z', d.b)}`)} ?`, [
-      { id: 'med', label: `La médiatrice de [AB], avec ${A} et ${B}`, valid: true },
-      ...(d.b.isZero() ? [] : [{ id: 'flip', label: `La médiatrice de [AB′], avec ${A} et B′${ptText(bb)}`, valid: false, rule: 'g8_locus_sign', why: `${rd(dist('z', d.b))} est la distance au point ${ptText(d.b)}.` }]),
-      { id: 'circle', label: 'Le cercle de centre A passant par B', valid: false, why: 'Les deux côtés sont des distances à deux points différents : on cherche les points à égale distance de A et de B.' },
-      { id: 'ab', label: 'La droite (AB)', valid: false, why: 'Seul le milieu de [AB] est sur (AB) à égale distance de A et B.' },
+    pre.push(decision(t('Que décrit {v1} ?', { v1: rd(`${dist('z', d.a)}=${dist('z', d.b)}`) }), [
+      { id: 'med', label: t('La médiatrice de [AB], avec {A} et {B}', { A, B }), valid: true },
+      ...(d.b.isZero() ? [] : [{ id: 'flip', label: t('La médiatrice de [AB′], avec {A} et B′{bb}', { A, bb: ptText(bb) }), valid: false, rule: 'g8_locus_sign', why: t('{v1} est la distance au point {b}.', { v1: rd(dist('z', d.b)), b: ptText(d.b) }) }]),
+      { id: 'circle', label: t('Le cercle de centre A passant par B'), valid: false, why: t('Les deux côtés sont des distances à deux points différents : on cherche les points à égale distance de A et de B.') },
+      { id: 'ab', label: t('La droite (AB)'), valid: false, why: t('Seul le milieu de [AB] est sur (AB) à égale distance de A et B.') },
     ]));
   }
   const { start: s0, judge, script } = partsScript([{ start, judge: cfg, lines, pre }], level, LO_CHOICES);
-  const side = region ? ` C'est le demi-plan des points plus proches de A que de B${op0 === '≤' ? ', bord compris' : ''}.` : '';
+  const side = region ? (op0 === '≤' ? t(' C\'est le demi-plan des points plus proches de A que de B, bord compris.') : t(' C\'est le demi-plan des points plus proches de A que de B.')) : '';
   return linesItem({
     skill: LO, level, mode: modeOf(level), start: s0, judge, script,
-    prompt: `Pose z = x + iy et trouve ${region ? 'l\'inéquation' : 'l\'équation'} en x et y du lieu des points z tels que ${mt(start)}.`,
-    hints: H(`${mt(dist('z', d.a))} est la distance de z au point ${A}. Élève au carré : |z − a|² = (x − a₁)² + (y − a₂)².`,
-      `${mxy(`${sqA}${op0}${sqB}`)}, puis développe : x² et y² disparaissent.`,
+    prompt: region
+      ? t('Pose z = x + iy et trouve l\'inéquation en x et y du lieu des points z tels que {s}.', { s: mt(start) })
+      : t('Pose z = x + iy et trouve l\'équation en x et y du lieu des points z tels que {s}.', { s: mt(start) }),
+    hints: H(t('{v1} est la distance de z au point {A}. Élève au carré : |z − a|² = (x − a₁)² + (y − a₂)².', { v1: mt(dist('z', d.a)), A }),
+      t('{v1}, puis développe : x² et y² disparaissent.', { v1: mxy(`${sqA}${op0}${sqB}`) }),
       `${mxy(final)}.${side}`),
     subgoals: LO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['z', 'x', 'y'], complex: true }, baits: ['g8_locus_sign', ...(level === 3 ? ['g8_modulus_no_square'] : [])],
@@ -176,27 +179,27 @@ function apolloItem(level, rng, opts) {
   const divided = `x^2+y^2${signed(lin([q(Dx, d.m), q(Ey, d.m), q(F0, d.m)]))}=0`;
   const final = circleText(d.c, d.r2);
   const lines = [
-    E(`${sqA}=${K}(${sqB})`, 'Module au carré', 'square', 'square'),
-    E(`x^2+y^2${signed(lin([-2 * a1, -2 * a2, a1 * a1 + a2 * a2]))}=${K}x^2+${K}y^2${signed(lin([-2 * K * b1, -2 * K * b2, K * (b1 * b1 + b2 * b2)]))}`, 'Développer', 'expand', 'expand'),
-    E(gathered, 'Tout regrouper d\'un côté', 'expand', 'gather'),
-    E(divided, `Diviser par ${d.m}`, 'circle', 'divide'),
-    E(final, 'Compléter les carrés', 'circle', 'circle'),
+    E(`${sqA}=${K}(${sqB})`, t('Module au carré'), 'square', 'square'),
+    E(`x^2+y^2${signed(lin([-2 * a1, -2 * a2, a1 * a1 + a2 * a2]))}=${K}x^2+${K}y^2${signed(lin([-2 * K * b1, -2 * K * b2, K * (b1 * b1 + b2 * b2)]))}`, t('Développer'), 'expand', 'expand'),
+    E(gathered, t('Tout regrouper d\'un côté'), 'expand', 'gather'),
+    E(divided, t('Diviser par {m}', { m: d.m }), 'circle', 'divide'),
+    E(final, t('Compléter les carrés'), 'circle', 'circle'),
   ];
-  if (level >= 4) { lines.splice(1, 2); lines[1] = { ...lines[1], note: `Développer, tout regrouper d'un côté, diviser par ${d.m}` }; }
+  if (level >= 4) { lines.splice(1, 2); lines[1] = { ...lines[1], note: t('Développer, tout regrouper d\'un côté, diviser par {m}', { m: d.m }) }; }
   if (level === 1) lines[4] = blanked(lines[4], [N(d.r2)], XYV);
   if (level === 2) lines[3] = blanked(lines[3], [String(d.m)], XYV);
-  const pre = level <= 3 ? [decision(`Que décrit ${rd(start)} (k = ${d.k}) ?`, [
-    { id: 'circle', label: 'Un cercle : k ≠ 1 (cercle d\'Apollonius)', valid: true },
-    { id: 'med', label: 'La médiatrice de [AB]', valid: false, why: `Avec le facteur ${d.k}, les distances ne sont pas égales : ce n'est une médiatrice que pour k = 1.` },
-    { id: 'line', label: 'Une droite', valid: false, why: `Les termes en x² ne se simplifient pas (1 ≠ ${K}) : c'est un cercle.` },
+  const pre = level <= 3 ? [decision(t('Que décrit {start} (k = {k}) ?', { start: rd(start), k: d.k }), [
+    { id: 'circle', label: t('Un cercle : k ≠ 1 (cercle d\'Apollonius)'), valid: true },
+    { id: 'med', label: t('La médiatrice de [AB]'), valid: false, why: t('Avec le facteur {k}, les distances ne sont pas égales : ce n\'est une médiatrice que pour k = 1.', { k: d.k }) },
+    { id: 'line', label: t('Une droite'), valid: false, why: t('Les termes en x² ne se simplifient pas (1 ≠ {K}) : c\'est un cercle.', { K }) },
   ])] : [];
   const { start: s0, judge, script } = partsScript([{ start, judge: locusCfg({ kind: 'circle', c: d.c.map(Number), r2: Number(d.r2) }, 'circle'), lines, pre }], level, LO_CHOICES);
   return linesItem({
     skill: LO, level, mode: modeOf(level), start: s0, judge, script,
-    prompt: `Pose z = x + iy et trouve l'équation du lieu des points z tels que ${mt(start)}. Donne-la sous la forme (x − a)² + (y − b)² = r².`,
-    hints: H('Élève au carré : |z − a|² = (x − a₁)² + (y − a₂)², et le facteur k devient k². Puis tout d\'un côté, et complète les carrés.',
-      `${mxy(`${sqA}=${K}(${sqB})`)}, puis ${mxy(divided)}.`,
-      `${mxy(final)} : cercle de centre ${fr(`(${N(d.c[0])} ; ${N(d.c[1])})`)} et de rayon ${fr(absT(Number(d.r2)))}.`),
+    prompt: t('Pose z = x + iy et trouve l\'équation du lieu des points z tels que {start}. Donne-la sous la forme (x − a)² + (y − b)² = r².', { start: mt(start) }),
+    hints: H(t('Élève au carré : |z − a|² = (x − a₁)² + (y − a₂)², et le facteur k devient k². Puis tout d\'un côté, et complète les carrés.'),
+      t('{v1}, puis {divided}.', { v1: mxy(`${sqA}=${K}(${sqB})`), divided: mxy(divided) }),
+      t('{final} : cercle de centre {v1} et de rayon {v2}.', { final: mxy(final), v1: fr(`(${N(d.c[0])} ; ${N(d.c[1])})`), v2: fr(absT(Number(d.r2))) })),
     subgoals: LO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['z', 'x', 'y'], complex: true }, baits: ['g8_locus_sign', ...(level === 3 ? ['g8_modulus_no_square'] : [])],
     key: `${LO}:${level}:apo:${start}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -235,25 +238,25 @@ function diskItem(level, rng, opts) {
   const final = circleText(center, d.R, d.op);
   const lines = [
     E(line1, 'z·z̄ = x² + y², z = x + iy, z̄ = x − iy', 'square', 'square'),
-    E(line2, 'Développer : les parties imaginaires s\'annulent', 'expand', 'expand'),
-    E(final, 'Compléter le carré', 'circle', 'circle'),
+    E(line2, t('Développer : les parties imaginaires s\'annulent'), 'expand', 'expand'),
+    E(final, t('Compléter le carré'), 'circle', 'circle'),
   ];
   if (level >= 4) lines.shift();
   if (level === 1) lines[2] = blanked(lines[2], [String(d.R)], XYV);
   if (level === 2) lines[1] = blanked(lines[1], [String(Math.abs(k))], XYV);
-  const where = { '<': 'l\'intérieur (bord exclu) du disque', '≤': 'le disque fermé (bord compris)', '>': 'l\'extérieur du disque' }[d.op];
-  const pre = level <= 3 ? [decision('Avec z = x + iy, que vaut z·z̄ ?', [
+  const where = { '<': t('l\'intérieur (bord exclu) du disque'), '≤': t('le disque fermé (bord compris)'), '>': t('l\'extérieur du disque') }[d.op];
+  const pre = level <= 3 ? [decision(t('Avec z = x + iy, que vaut z·z̄ ?'), [
     { id: 'mod', label: 'x² + y² = |z|²', valid: true },
     { id: 'diff', label: 'x² − y²', valid: false, why: '(x + iy)(x − iy) = x² − (iy)² = x² + y².' },
-    { id: 'two', label: 'x² + 2ixy − y²', valid: false, why: 'C\'est z², pas z·z̄.' },
+    { id: 'two', label: 'x² + 2ixy − y²', valid: false, why: t('C\'est z², pas z·z̄.') },
   ])] : [];
   const { start: s0, judge, script } = partsScript([{ start, judge: locusCfg({ kind: 'circle', c: center, r2: d.R }, 'circle'), lines, pre }], level, LO_CHOICES);
   return linesItem({
     skill: LO, level, mode: modeOf(level), start: s0, judge, script,
-    prompt: `Pose z = x + iy et décris la région des points z tels que ${mt(start)} : écris-la sous la forme (x − a)² + (y − b)² ${fr(d.op)} r².`,
-    hints: H('Remplace z par x + iy et z̄ par x − iy : z·z̄ = x² + y², et les parties imaginaires des deux côtés s\'annulent.',
-      `${mxy(line2)}, puis complète le carré.`,
-      `${mxy(final)} : ${where} de centre ${fr(`(${center[0]} ; ${center[1]})`)} et de rayon ${fr(absT(d.R))}.`),
+    prompt: t('Pose z = x + iy et décris la région des points z tels que {start} : écris-la sous la forme (x − a)² + (y − b)² {op} r².', { start: mt(start), op: fr(d.op) }),
+    hints: H(t('Remplace z par x + iy et z̄ par x − iy : z·z̄ = x² + y², et les parties imaginaires des deux côtés s\'annulent.'),
+      t('{line2}, puis complète le carré.', { line2: mxy(line2) }),
+      t('{final} : {where} de centre {v1} et de rayon {v2}.', { final: mxy(final), where, v1: fr(`(${center[0]} ; ${center[1]})`), v2: fr(absT(d.R)) })),
     subgoals: LO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['z', 'x', 'y'], complex: true }, baits: level === 3 ? ['g8_modulus_no_square'] : [],
     key: `${LO}:${level}:disk:${start}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -286,9 +289,9 @@ function locusMcq(rng, opts) {
     { html: mxy(ab), correct: false },
   ]);
   return mcq({
-    skill: LO, level: 4, prompt: `Quel est le lieu des points z = x + iy tels que ${mt(start)} ?`, options,
+    skill: LO, level: 4, prompt: t('Quel est le lieu des points z = x + iy tels que {start} ?', { start: mt(start) }), options,
     key: `${LO}:mcq:${start}`, exam: examTag(opts), fallback: !!d.fallback,
-    solution: [{ html: `C'est la médiatrice de [AB], A${ptText(d.a)}, B${ptText(d.b)} : ${mxy(eq(d.a, d.b))}.`, note: '' }],
+    solution: [{ html: t('C\'est la médiatrice de [AB], A{a}, B{b} : {v1}.', { a: ptText(d.a), b: ptText(d.b), v1: mxy(eq(d.a, d.b)) }), note: '' }],
   }, rng);
 }
 
@@ -297,11 +300,11 @@ function locusTf(rng) {
   const k = rng.pick([2, 3]);
   const r = rng.int(1, 5);
   const all = [
-    { s: `|z − ${a}| = ${k}|z + ${a}| est une droite.`, t: false, why: `Faux : k = ${k} ≠ 1, les termes en x² ne s'annulent pas : c'est un cercle (d'Apollonius).` },
-    { s: `|z − ${a}i| = |z + ${a}| est la médiatrice du segment d'extrémités ${a}i et −${a}.`, t: true, why: 'Vrai : |z − u| est la distance au point d\'affixe u ; on cherche les points à égale distance des deux.' },
-    { s: `|z + ${a}| = ${r} est le cercle de centre ${a} et de rayon ${r}.`, t: false, rule: 'g8_locus_sign', why: `Faux : |z + ${a}| = |z − (−${a})|, le centre est −${a}.` },
-    { s: `z·z̄ = ${r * r} est le cercle de centre 0 et de rayon ${r}.`, t: true, why: `Vrai : z·z̄ = |z|² = x² + y² = ${r * r}.` },
-    { s: `|z − ${a}i| < |z + ${a}i| est le demi-plan Im(z) > 0.`, t: true, why: `Vrai : les points plus proches de ${a}i que de −${a}i sont au-dessus de l'axe réel (y > 0).` },
+    { s: t('|z − {a}| = {k}|z + {a}| est une droite.', { a, k }), t: false, why: t('Faux : k = {k} ≠ 1, les termes en x² ne s\'annulent pas : c\'est un cercle (d\'Apollonius).', { k }) },
+    { s: t('|z − {a}i| = |z + {a}| est la médiatrice du segment d\'extrémités {a}i et −{a}.', { a }), t: true, why: t('Vrai : |z − u| est la distance au point d\'affixe u ; on cherche les points à égale distance des deux.') },
+    { s: t('|z + {a}| = {r} est le cercle de centre {a} et de rayon {r}.', { a, r }), t: false, rule: 'g8_locus_sign', why: t('Faux : |z + {a}| = |z − (−{a})|, le centre est −{a}.', { a }) },
+    { s: t('z·z̄ = {v1} est le cercle de centre 0 et de rayon {r}.', { v1: r * r, r }), t: true, why: t('Vrai : z·z̄ = |z|² = x² + y² = {v1}.', { v1: r * r }) },
+    { s: t('|z − {a}i| < |z + {a}i| est le demi-plan Im(z) > 0.', { a }), t: true, why: t('Vrai : les points plus proches de {a}i que de −{a}i sont au-dessus de l\'axe réel (y > 0).', { a }) },
   ];
   const i = rng.int(0, all.length - 1);
   return vfMcq(LO, all[i].s, all[i].t, rng, { key: `${i}:${a}:${k}:${r}`, why: all[i].why, ruleIfTrue: all[i].rule || null });
@@ -322,19 +325,19 @@ export function genLocus(level, rng, profile, opts = {}) {
 
 const IN = 'g8-inversion';
 const IN_SUB = [
-  { id: 'express', label: 'exprimer z en w', skill: IN },
-  { id: 'replace', label: 'remplacer dans le lieu', skill: 'g8-locus' },
-  { id: 'clear', label: 'multiplier par |w|²', skill: IN },
-  { id: 'circle', label: 'reconnaître le cercle', skill: 'g10-circle-eq' },
+  { id: 'express', label: t('exprimer z en w'), skill: IN },
+  { id: 'replace', label: t('remplacer dans le lieu'), skill: 'g8-locus' },
+  { id: 'clear', label: t('multiplier par |w|²'), skill: IN },
+  { id: 'circle', label: t('reconnaître le cercle'), skill: 'g10-circle-eq' },
 ];
 const IN_CHOICES = [
-  { id: 'replace', label: 'Remplacer z par 1/w̄ = w/|w|² (w = x + iy)' },
-  { id: 'clear', label: 'Multiplier par |w|² = x² + y² (w ≠ 0)' },
-  { id: 'square', label: 'Élever les modules au carré' },
-  { id: 'expand', label: 'Développer et simplifier' },
-  { id: 'circle', label: 'Compléter les carrés : centre et rayon' },
-  { id: 'line', label: 'Écrire l\'équation de la droite' },
-  { id: 'nobar', label: 'Remplacer z par 1/w', rule: 'g8_inversion_conj', why: 'w = 1/z̄ donne z = 1/w̄, pas 1/w.' },
+  { id: 'replace', label: t('Remplacer z par 1/w̄ = w/|w|² (w = x + iy)') },
+  { id: 'clear', label: t('Multiplier par |w|² = x² + y² (w ≠ 0)') },
+  { id: 'square', label: t('Élever les modules au carré') },
+  { id: 'expand', label: t('Développer et simplifier') },
+  { id: 'circle', label: t('Compléter les carrés : centre et rayon') },
+  { id: 'line', label: t('Écrire l\'équation de la droite') },
+  { id: 'nobar', label: t('Remplacer z par 1/w'), rule: 'g8_inversion_conj', why: t('w = 1/z̄ donne z = 1/w̄, pas 1/w.') },
 ];
 const invCfg = (locus, target) => ({ ...locusCfg(locus, target, { cv: 'w', vars: ['w', 'x', 'y'], inversion: true, exclude: [[0, 0]] }) });
 const K_LIST = [q(1), q(-1), q(2), q(-2), q(1, 2), q(-1, 2)];
@@ -366,28 +369,28 @@ function lineItem(level, rng, opts) {
   const final = circleText(d.center, d.r2);
   const lines = [
     E(line1, d.kind === 'Re' ? 'Re z = Re(w)/|w|²' : d.kind === 'Im' ? 'Im z = Im(w)/|w|²' : 'Re z = x/|w|², Im z = y/|w|²', 'replace', 'replace'),
-    E(line2, 'Multiplier par |w|² (w ≠ 0)', 'clear', 'clear'),
-    { kind: 'decision', prompt: 'Le point w = 0 est-il dans l\'image ?', options: [
-      { id: 'no', label: 'Non : w = 1/z̄ n\'est jamais nul ; on retire 0 du cercle', valid: true },
-      { id: 'yes', label: 'Oui : il vérifie l\'équation', valid: false, why: 'w = 1/z̄ ne vaut jamais 0 : le cercle passe par 0, mais 0 n\'est l\'image d\'aucun point. On le retire.' },
+    E(line2, t('Multiplier par |w|² (w ≠ 0)'), 'clear', 'clear'),
+    { kind: 'decision', prompt: t('Le point w = 0 est-il dans l\'image ?'), options: [
+      { id: 'no', label: t('Non : w = 1/z̄ n\'est jamais nul ; on retire 0 du cercle'), valid: true },
+      { id: 'yes', label: t('Oui : il vérifie l\'équation'), valid: false, why: t('w = 1/z̄ ne vaut jamais 0 : le cercle passe par 0, mais 0 n\'est l\'image d\'aucun point. On le retire.') },
     ] },
-    E(final, 'Compléter les carrés', 'circle', 'circle'),
+    E(final, t('Compléter les carrés'), 'circle', 'circle'),
   ];
   if (level >= 4) lines.splice(1, 1);
   if (level === 1) lines[0] = blanked(lines[0], ['x^2+y^2'], XYV);
   if (level === 2) lines[3] = blanked(lines[3], [N(d.r2)], XYV);
-  const pre = level === 2 || level === 3 ? [decision('Avant le calcul : la droite ne passe pas par 0. Son image par w = 1/z̄ est…', [
-    { id: 'circle', label: 'un cercle qui passe par 0 (privé de 0)', valid: true },
-    { id: 'line', label: 'une droite', valid: false, why: 'Seules les droites qui passent par 0 restent des droites.' },
-    { id: 'circle2', label: 'un cercle qui ne passe pas par 0', valid: false, why: 'Les points très loin sur la droite ont une image proche de 0 : le cercle passe par 0.' },
+  const pre = level === 2 || level === 3 ? [decision(t('Avant le calcul : la droite ne passe pas par 0. Son image par w = 1/z̄ est…'), [
+    { id: 'circle', label: t('un cercle qui passe par 0 (privé de 0)'), valid: true },
+    { id: 'line', label: t('une droite'), valid: false, why: t('Seules les droites qui passent par 0 restent des droites.') },
+    { id: 'circle2', label: t('un cercle qui ne passe pas par 0'), valid: false, why: t('Les points très loin sur la droite ont une image proche de 0 : le cercle passe par 0.') },
   ])] : [];
   const { start: s0, judge, script } = partsScript([{ start, judge: invCfg({ kind: 'circle', c: d.center.map(Number), r2: Number(d.r2) }, 'circle'), lines, pre }], level, IN_CHOICES);
   return linesItem({
     skill: IN, level, mode: modeOf(level), start: s0, judge, script,
-    prompt: `Trouve l'image de la droite ${mt(startZ)} par w = 1/z̄. On pose w = x + iy ; comme z = 1/w̄ = w/|w|², la droite s'écrit ${mt(start)}.${level === 1 ? ' Re(1/w̄) = x/(x² + y²), Im(1/w̄) = y/(x² + y²).' : ''}`,
-    hints: H('Exprime z en w : z = 1/w̄ = w/|w|². Remplace, puis multiplie par |w|² = x² + y².',
-      `${mxy(line1)}, donc ${mxy(line2)}.`,
-      `${mxy(final)} : cercle privé de 0.`),
+    prompt: t('Trouve l\'image de la droite {startZ} par w = 1/z̄. On pose w = x + iy ; comme z = 1/w̄ = w/|w|², la droite s\'écrit {start}.{v1}', { startZ: mt(startZ), start: mt(start), v1: level === 1 ? ' Re(1/w̄) = x/(x² + y²), Im(1/w̄) = y/(x² + y²).' : '' }),
+    hints: H(t('Exprime z en w : z = 1/w̄ = w/|w|². Remplace, puis multiplie par |w|² = x² + y².'),
+      t('{line1}, donc {line2}.', { line1: mxy(line1), line2: mxy(line2) }),
+      t('{final} : cercle privé de 0.', { final: mxy(final) })),
     subgoals: IN_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['w', 'x', 'y'], complex: true }, baits: d.kind === 'Re' ? [] : ['g8_inversion_conj'],
     key: `${IN}:${level}:line:${start}`, exam: examTag(opts), fallback: false,
@@ -409,25 +412,25 @@ function circleItem(level, rng, opts) {
   const line2 = `(${re})^2+(${im})^2=${n === 1 ? '' : n}(x^2+y^2)`;
   const final = `${lin([2 * c1, 2 * c2, 0])}=1`;
   const lines = [
-    E(line1, 'Multiplier par |w̄| = |w|', 'clear', 'clear'),
-    E(line2, `1 − c·w̄ = (${rd(re)}) − i(${rd(lin([c2, -c1, 0]))}) ; module au carré`, 'replace', 'square'),
-    E(final, 'Développer : x² et y² disparaissent', 'clear', 'line'),
+    E(line1, t('Multiplier par |w̄| = |w|'), 'clear', 'clear'),
+    E(line2, t('1 − c·w̄ = ({re}) − i({v1}) ; module au carré', { re: rd(re), v1: rd(lin([c2, -c1, 0])) }), 'replace', 'square'),
+    E(final, t('Développer : x² et y² disparaissent'), 'clear', 'line'),
   ];
   if (level >= 4) lines.splice(1, 1);
-  if (level === 1) lines[1] = blanked(lines[1], [String(n)].filter((t) => t !== '1'), XYV);
+  if (level === 1) lines[1] = blanked(lines[1], [String(n)].filter((tq) => tq !== '1'), XYV);
   if (level === 2) lines[2] = blanked(lines[2], [lin([2 * c1, 2 * c2, 0])], XYV);
-  const pre = level === 2 || level === 3 ? [decision('Le cercle passe par 0. Son image par w = 1/z̄ est…', [
-    { id: 'line', label: 'une droite (qui ne passe pas par 0)', valid: true },
-    { id: 'circle', label: 'un cercle qui passe par 0', valid: false, why: 'Le point 0 du cercle part à l\'infini : l\'image est une droite.' },
-    { id: 'circle2', label: 'un cercle qui ne passe pas par 0', valid: false, why: 'Le point 0 du cercle part à l\'infini : l\'image n\'est pas bornée, c\'est une droite.' },
+  const pre = level === 2 || level === 3 ? [decision(t('Le cercle passe par 0. Son image par w = 1/z̄ est…'), [
+    { id: 'line', label: t('une droite (qui ne passe pas par 0)'), valid: true },
+    { id: 'circle', label: t('un cercle qui passe par 0'), valid: false, why: t('Le point 0 du cercle part à l\'infini : l\'image est une droite.') },
+    { id: 'circle2', label: t('un cercle qui ne passe pas par 0'), valid: false, why: t('Le point 0 du cercle part à l\'infini : l\'image n\'est pas bornée, c\'est une droite.') },
   ])] : [];
   const { start: s0, judge, script } = partsScript([{ start, judge: invCfg({ kind: 'line', a: 2 * c1, b: 2 * c2, c: -1 }, 'line'), lines, pre }], level, IN_CHOICES);
   return linesItem({
     skill: IN, level, mode: modeOf(level), start: s0, judge, script,
-    prompt: `Trouve l'image du cercle ${mt(startZ)} (il passe par 0) par w = 1/z̄. On pose w = x + iy ; avec z = 1/w̄, le cercle s'écrit ${mt(start)}.`,
-    hints: H('Multiplie par |w̄| = |w| pour enlever la fraction, puis élève au carré avec w = x + iy.',
-      `${mt(line1)}, puis ${mxy(line2)}.`,
-      `${mxy(final)} : une droite.`),
+    prompt: t('Trouve l\'image du cercle {startZ} (il passe par 0) par w = 1/z̄. On pose w = x + iy ; avec z = 1/w̄, le cercle s\'écrit {start}.', { startZ: mt(startZ), start: mt(start) }),
+    hints: H(t('Multiplie par |w̄| = |w| pour enlever la fraction, puis élève au carré avec w = x + iy.'),
+      t('{line1}, puis {line2}.', { line1: mt(line1), line2: mxy(line2) }),
+      t('{final} : une droite.', { final: mxy(final) })),
     subgoals: IN_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['w', 'x', 'y'], complex: true }, baits: c2 === 0 ? [] : ['g8_inversion_conj'],
     key: `${IN}:${level}:circle:${start}`, exam: examTag(opts), fallback: false,
@@ -441,23 +444,23 @@ function pointItem(level, rng, opts) {
   const zb = z.conj();
   const w = z.div(n);
   const lines = [
-    E(`1/(${ct(zb)})`, 'Conjugué', 'express', 'replace'),
-    E(`(${ct(z)})/((${ct(zb)})(${ct(z)}))`, 'Multiplier par le conjugué du dénominateur', 'express', 'clear'),
+    E(`1/(${ct(zb)})`, t('Conjugué'), 'express', 'replace'),
+    E(`(${ct(z)})/((${ct(zb)})(${ct(z)}))`, t('Multiplier par le conjugué du dénominateur'), 'express', 'clear'),
     E(`(${ct(z)})/${n}`, `z·z̄ = |z|² = ${n}`, 'express', 'clear'),
-    E(ct(w), 'Forme algébrique', 'express', 'expand'),
+    E(ct(w), t('Forme algébrique'), 'express', 'expand'),
   ];
   if (level >= 4) lines.splice(1, 2);
   if (level === 1) lines[2] = blanked(lines[2], [String(n)]);
   if (level === 2) lines[3] = blanked(lines[3], [N(w.re)]);
   const judge = { kind: 'complex', form: 'algebraic', complex: true };
   const { start: s0, judge: j, script } = partsScript([{ start: `1/conj(${ct(z)})`, judge, lines }], level, [
-    { id: 'replace', label: 'Écrire le conjugué de z' }, { id: 'clear', label: 'Multiplier en haut et en bas par le conjugué' },
-    { id: 'expand', label: 'Écrire a + bi' }, { id: 'nobar', label: 'Calculer 1/z', rule: 'g8_inversion_conj', why: 'w = 1/z̄, pas 1/z.' },
+    { id: 'replace', label: t('Écrire le conjugué de z') }, { id: 'clear', label: t('Multiplier en haut et en bas par le conjugué') },
+    { id: 'expand', label: t('Écrire a + bi') }, { id: 'nobar', label: 'Calculer 1/z', rule: 'g8_inversion_conj', why: t('w = 1/z̄, pas 1/z.') },
   ]);
   return linesItem({
     skill: IN, level, mode: modeOf(level), start: s0, judge: j, script,
-    prompt: `Calcule l'image w = 1/z̄ du point z = ${cm(z)}, sous forme algébrique.`,
-    hints: H('1/z̄ = z/(z·z̄) = z/|z|² : même argument que z, module inversé.', `w = ${mt(`(${ct(z)})/${n}`)} = □`, `w = ${cm(w)}`),
+    prompt: t('Calcule l\'image w = 1/z̄ du point z = {z}, sous forme algébrique.', { z: cm(z) }),
+    hints: H(t('1/z̄ = z/(z·z̄) = z/|z|² : même argument que z, module inversé.'), `w = ${mt(`(${ct(z)})/${n}`)} = □`, `w = ${cm(w)}`),
     subgoals: IN_SUB, keys: ['calc', 'cplx'], tapActions: level === 3 ? 'steps' : null,
     declares: { vars: [], complex: true }, baits: [],
     key: `${IN}:${level}:point:${ct(z)}`, exam: examTag(opts), fallback: false,
@@ -474,9 +477,9 @@ function inversionMcq(rng, opts) {
     { html: mxy(`${lin([d.a, d.b, 0])}=${N(new Q(1).div(d.c))}`), correct: false },
   ]);
   return mcq({
-    skill: IN, level: 4, prompt: `Quelle est l'image de la droite ${mt(startZ)} par w = 1/z̄ (w = x + iy, privée de 0) ?`, options,
+    skill: IN, level: 4, prompt: t('Quelle est l\'image de la droite {startZ} par w = 1/z̄ (w = x + iy, privée de 0) ?', { startZ: mt(startZ) }), options,
     key: `${IN}:mcq:${startZ}`, exam: examTag(opts),
-    solution: [{ html: `z = 1/w̄ = w/|w|², donc ${mxy(`${lin([d.a, d.b, 0])}=${coefText(d.c, '(x^2+y^2)')}`)} : ${mxy(circleText(d.center, d.r2))}.`, note: '' }],
+    solution: [{ html: t('z = 1/w̄ = w/|w|², donc {v1} : {v2}.', { v1: mxy(`${lin([d.a, d.b, 0])}=${coefText(d.c, '(x^2+y^2)')}`), v2: mxy(circleText(d.center, d.r2)) }), note: '' }],
   }, rng);
 }
 

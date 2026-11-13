@@ -23,6 +23,7 @@ import { toText } from '../cas/print.js';
 import { makeRng } from '../content/random.js';
 import { seedOf } from '../cas/equiv.js';
 import { frNum } from './common.js';
+import { t, tn } from '../i18n.js';
 
 const CONSTS = ['C', 'K', 'C1', 'C2', 'C3', 'C4'];
 const vOf = (cfg) => cfg.v || 't';
@@ -145,35 +146,35 @@ export function analyseSystem(cfg, node, state = {}) {
     const consts = [...new Set(phis.flatMap((p) => constsIn(p)))];
     const r = solvesSystem(cfg, phis, consts);
     if (!r.ok) {
-      if (r.undecided) return { kind: 'wrong', message: 'Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie là où je la teste.' };
-      return { kind: 'wrong', message: `Dérive ta composante ${names[r.comp]} : ${names[r.comp]}′ ne vaut pas la ligne ${r.comp + 1} de AX (par exemple en ${vOf(cfg)} = ${ftext(r.at[vOf(cfg)])}).` };
+      if (r.undecided) return { kind: 'wrong', message: t('Je n\'arrive pas à vérifier ta ligne : elle n\'est pas définie là où je la teste.') };
+      return { kind: 'wrong', message: t('Dérive ta composante {c} : {c}′ ne vaut pas la ligne {k} de AX (par exemple en {v} = {x}).', { c: names[r.comp], k: r.comp + 1, v: vOf(cfg), x: ftext(r.at[vOf(cfg)]) }) };
     }
     if (consts.length) {
       const rank = constRank(cfg, phis, consts);
-      if (rank < n) return { kind: 'wrong', message: `Ta solution n'a que ${rank} constante${rank > 1 ? 's' : ''} indépendante${rank > 1 ? 's' : ''} : un système de ${n} équations en demande ${n}.` };
-      if (consts.length > n) return { kind: 'stay', message: `Il y a trop de constantes : il en faut ${n}.` };
+      if (rank < n) return { kind: 'wrong', message: tn(rank, 'Ta solution n\'a que {n} constante indépendante : un système de {m} équations en demande {m}.', 'Ta solution n\'a que {n} constantes indépendantes : un système de {m} équations en demande {m}.', { m: n }) };
+      if (consts.length > n) return { kind: 'stay', message: t('Il y a trop de constantes : il en faut {n}.', { n }) };
       if (cfg.system.X0) return { kind: 'ok', general: phis };
       return { kind: clean(phis) ? 'done' : 'ok', general: phis };
     }
     if (cfg.system.X0) {
       const ic = icHolds(cfg, phis);
-      if (!ic.ok) return { kind: 'wrong', message: `C'est une solution du système, mais ${names[ic.i]}(${ftext(ic.t0)}) = ${ftext(ic.got)} au lieu de ${ftext(ic.want)}.` };
+      if (!ic.ok) return { kind: 'wrong', message: t('C\'est une solution du système, mais {f}({x0}) = {got} au lieu de {want}.', { f: names[ic.i], x0: ftext(ic.t0), got: ftext(ic.got), want: ftext(ic.want) }) };
       return { kind: clean(phis) ? 'done' : 'ok' };
     }
-    return { kind: 'stay', message: `C'est une solution, mais pas la solution générale : il faut ${n} constantes.` };
+    return { kind: 'stay', message: t('C\'est une solution, mais pas la solution générale : il faut {n} constantes.', { n }) };
   }
   const env = constants(node);
   if (env) {
     const g = state.general;
-    if (!Array.isArray(g)) return { kind: 'wrong', message: 'Écris d\'abord la solution générale, avec ses constantes.' };
-    if (!Object.values(env).every(Number.isFinite)) return { kind: 'wrong', message: 'Donne la valeur de chaque constante.' };
+    if (!Array.isArray(g)) return { kind: 'wrong', message: t('Écris d\'abord la solution générale, avec ses constantes.') };
+    if (!Object.values(env).every(Number.isFinite)) return { kind: 'wrong', message: t('Donne la valeur de chaque constante.') };
     const missing = [...new Set(g.flatMap((p) => constsIn(p)))].filter((c) => !(c in env));
-    if (missing.length) return { kind: 'wrong', message: `Donne aussi ${missing[0].replace(/(\d)/, '_$1')}.` };
+    if (missing.length) return { kind: 'wrong', message: t('Donne aussi {c}.', { c: missing[0].replace(/(\d)/, '_$1') }) };
     const ic = icHolds(cfg, g, env);
-    if (!ic.ok) return { kind: 'wrong', message: `Avec ces constantes, ${names[ic.i]}(${ftext(ic.t0)}) = ${ftext(ic.got)} au lieu de ${ftext(ic.want)}.` };
+    if (!ic.ok) return { kind: 'wrong', message: t('Avec ces constantes, {f}({x0}) = {got} au lieu de {want}.', { f: names[ic.i], x0: ftext(ic.t0), got: ftext(ic.got), want: ftext(ic.want) }) };
     return { kind: 'ok' };
   }
-  return { kind: 'parse', message: `Écris les composantes : ${names.map((x, i) => `${x} = …`).join(' ; ')}.` };
+  return { kind: 'parse', message: t('Écris les composantes : {c}.', { c: names.map((x, i) => `${x} = …`).join(' ; ') }) };
 }
 
 // Two lines that say the same (for the traps): the same components, or the

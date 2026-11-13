@@ -7,6 +7,7 @@ import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
 import { walk } from '../../cas/ast.js';
 import { blankLine } from '../../judges/lines.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => new Q(n, d);
 export const qText = (x) => { const v = Q.of(x); return v.d === 1 ? String(v.n) : `${v.n}/${v.d}`; };
@@ -30,12 +31,12 @@ export function polyText(cs, v = 'x') {
     if (c.n === 0) continue;
     const body = k === 0 ? '' : k === 1 ? v : `${v}^${k}`;
     const a = c.n < 0 ? c.neg() : c;
-    let t;
-    if (!body) t = qText(a);
-    else if (a.eq(1)) t = body;
-    else if (a.d === 1) t = `${a.n}${body}`;
-    else t = `${a.n === 1 ? '' : a.n}${body}/${a.d}`;
-    out.push(c.n < 0 ? `-${t}` : out.length ? `+${t}` : t);
+    let tx;
+    if (!body) tx = qText(a);
+    else if (a.eq(1)) tx = body;
+    else if (a.d === 1) tx = `${a.n}${body}`;
+    else tx = `${a.n === 1 ? '' : a.n}${body}/${a.d}`;
+    out.push(c.n < 0 ? `-${tx}` : out.length ? `+${tx}` : tx);
   }
   return out.join('') || '0';
 }
@@ -57,8 +58,8 @@ export const polyTrim = (a) => { const b = [...a]; while (b.length > 1 && Q.of(b
 export function tpl(math, texts, opts = {}) {
   const node = parse(math, opts);
   const holes = [];
-  for (const t of texts) {
-    const want = toText(parse(t, opts));
+  for (const tx of texts) {
+    const want = toText(parse(tx, opts));
     let found = null;
     walk(node, (n) => {
       if (found) return false;
@@ -91,7 +92,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -100,5 +101,5 @@ export const withMenus = (judge, level, start, lines, choices) => (level === 3 ?
 
 // A true/false question as a two-option multiple choice (the pilot's form).
 export function vfOptions(truth, rule) {
-  return [{ html: 'Vrai', correct: truth, rule: truth ? null : rule || null }, { html: 'Faux', correct: !truth }];
+  return [{ html: t('Vrai'), correct: truth, rule: truth ? null : rule || null }, { html: t('Faux'), correct: !truth }];
 }

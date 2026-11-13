@@ -10,6 +10,7 @@ import { q, linT, mcqV, R, pickW } from './analyse2-f-kit.js';
 import { blankLine } from '../../judges/lines.js';
 import { parse } from '../../cas/parse.js';
 import { stripParen } from '../../cas/ast.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-triple-int';
 const XYZ = { vars: ['x', 'y', 'z'] };
@@ -77,7 +78,7 @@ function tripleData(rng) {
       bounds: `0 ≤ x ≤ ${a} ; 0 ≤ y ≤ ${Yt} ; 0 ≤ z ≤ ${Zt}`, f: mono(i, j, k) || '1', Yt, Zt, a,
       inner: `int(int(${cBody(q(1, k + 1), [mono(i, j, 0), pw(Zt, k + 1)].filter(Boolean).join(' '))},y,0,${Yt}),x,0,${a})`,
       middle: `int(${cBody(K, [mono(i, 0, 0), pw(oneMinus(a), n)].filter(Boolean).join(' '))},x,0,${a})`,
-      value, words: `le tétraèdre x, y, z ≥ 0, ${R(plane)} ≤ ${rhs}`, zWhy: `z va du sol au plan ${R(plane)} = ${rhs}`,
+      value, words: t('le tétraèdre x, y, z ≥ 0, {p} ≤ {r}', { p: R(plane), r: rhs }), zWhy: t('z va du sol au plan {p} = {r}', { p: R(plane), r: rhs }),
     };
   }
   if (kind === 'prism') {
@@ -95,7 +96,7 @@ function tripleData(rng) {
       bounds: `0 ≤ x ≤ ${a} ; 0 ≤ y ≤ ${Yt} ; 0 ≤ z ≤ ${h}`, f: mono(i, j, k) || '1', Yt, Zt: String(h), a,
       inner: `int(int(${cBody(K1, mono(i, j, 0))},y,0,${Yt}),x,0,${a})`,
       middle: `int(${cBody(K, [mono(i, 0, 0), pw(oneMinus(a), n)].filter(Boolean).join(' '))},x,0,${a})`,
-      value, words: `le prisme de hauteur ${h} sur le triangle x, y ≥ 0, ${R(tri)} ≤ 1`, zWhy: `z va de 0 à ${h}`,
+      value, words: t('le prisme de hauteur {h} sur le triangle x, y ≥ 0, {p} ≤ 1', { h, p: R(tri) }), zWhy: t('z va de 0 à {h}', { h }),
     };
   }
   const [a, b] = [rng.int(1, 2), rng.int(1, 3)];
@@ -111,7 +112,7 @@ function tripleData(rng) {
     bounds: `0 ≤ x ≤ ${a} ; 0 ≤ y ≤ ${b} ; 0 ≤ z ≤ ${Zt}`, f: mono(i, j, k) || '1', Yt: String(b), Zt, a,
     inner: `int(int(${cBody(q(1, k + 1), [mono(i, j, 0), pw(Zt, k + 1)].filter(Boolean).join(' '))},y,0,${b}),x,0,${a})`,
     middle: `int(${polyXText(mid)},x,0,${a})`,
-    value: intX(mid, a), words: `le solide au-dessus du rectangle [0 ; ${a}] × [0 ; ${b}] et sous le plan z = ${R(Zt)}`, zWhy: `z va de 0 au plan z = ${R(Zt)}`,
+    value: intX(mid, a), words: t('le solide au-dessus du rectangle [0 ; {a}] × [0 ; {b}] et sous le plan z = {z}', { a, b, z: R(Zt) }), zWhy: t('z va de 0 au plan z = {z}', { z: R(Zt) }),
   };
 }
 const boxOf = (ranges) => ranges.map(([lo, hi]) => { const m = 0.1 * (hi - lo) + 0.1; return [lo - m, hi + m]; });
@@ -121,17 +122,17 @@ const tripleOf = (d) => {
 };
 
 const SUB = [
-  { id: 'bounds', label: 'les bornes (tranches en z, projection)', skill: SK },
-  { id: 'inner', label: 'l\'intégrale en z', skill: 'a1-int-direct' },
-  { id: 'middle', label: 'l\'intégrale en y', skill: 'a1-int-direct' },
-  { id: 'outer', label: 'l\'intégrale en x', skill: 'a1-int-direct' },
+  { id: 'bounds', label: t('les bornes (tranches en z, projection)'), skill: SK },
+  { id: 'inner', label: t('l\'intégrale en z'), skill: 'a1-int-direct' },
+  { id: 'middle', label: t('l\'intégrale en y'), skill: 'a1-int-direct' },
+  { id: 'outer', label: t('l\'intégrale en x'), skill: 'a1-int-direct' },
 ];
 const CHOICES = [
-  { id: 'bounds', label: 'z entre deux surfaces, puis la projection sur le plan (x, y)' },
-  { id: 'inner', label: 'Intégrer en z' },
-  { id: 'middle', label: 'Intégrer en y' },
-  { id: 'outer', label: 'Intégrer en x' },
-  { id: 'outerFirst', label: 'Intégrer d\'abord en x de 0 à 1', rule: 'a2_fubini_outer_var', why: 'L\'intégrale extérieure doit donner un nombre : on intègre d\'abord la variable intérieure.' },
+  { id: 'bounds', label: t('z entre deux surfaces, puis la projection sur le plan (x, y)') },
+  { id: 'inner', label: t('Intégrer en z') },
+  { id: 'middle', label: t('Intégrer en y') },
+  { id: 'outer', label: t('Intégrer en x') },
+  { id: 'outerFirst', label: t('Intégrer d\'abord en x de 0 à 1'), rule: 'a2_fubini_outer_var', why: t('L\'intégrale extérieure doit donner un nombre : on intègre d\'abord la variable intérieure.') },
 ];
 
 // The bounds of z blank, or the whole projection.
@@ -151,35 +152,35 @@ function tripleItem(level, rng, opts) {
     order: ['x', 'y', 'z'], shape: 'typeI3', answers: [d.bounds],
   };
   const def = { kind: 'definite', seq: { I: value }, nRange: [1, 1] };
-  let bl = E(d.bounds, 'z entre deux surfaces ; projection', 'bounds', 'bounds');
+  let bl = E(d.bounds, t('z entre deux surfaces ; projection'), 'bounds', 'bounds');
 
-  let inner = E(d.inner, 'Intégrale en z', 'inner', 'inner');
-  let middle = E(d.middle, 'Intégrale en y', 'middle', 'middle');
-  const outer = E(value, 'Intégrale en x', 'outer', 'outer');
+  let inner = E(d.inner, t('Intégrale en {v}', { v: 'z' }), 'inner', 'inner');
+  let middle = E(d.middle, t('Intégrale en {v}', { v: 'y' }), 'middle', 'middle');
+  const outer = E(value, t('Intégrale en {v}', { v: 'x' }), 'outer', 'outer');
   const innerF = d.inner.match(/^int\(int\((.*),y,[^,]*,[^,]*\),x,[^,]*,[^,]*\)$/)[1];
   const middleF = d.middle.match(/^int\((.*),x,[^,]*,[^,]*\)$/)[1];
   if (level === 1) { inner = blanked(inner, [innerF]); middle = blanked(middle, [middleF]); }
   if (level === 2) { bl = blankZ(bl, [[2, 'hi']]); middle = blanked(middle, [middleF]); }
   const dec = {
-    kind: 'decision', prompt: 'Quelle variable à l\'intérieur ?', options: [
-      { id: 'z', label: `z : ${d.zWhy}`, valid: true, ref: true },
-      { id: 'x', label: 'x', valid: true, quality: 'poor', why: 'Possible, mais la projection sur le plan (y, z) est moins simple : z est bornée par deux surfaces simples.' },
+    kind: 'decision', prompt: t('Quelle variable à l\'intérieur ?'), options: [
+      { id: 'z', label: t('z : {why}', { why: d.zWhy }), valid: true, ref: true },
+      { id: 'x', label: 'x', valid: true, quality: 'poor', why: t('Possible, mais la projection sur le plan (y, z) est moins simple : z est bornée par deux surfaces simples.') },
     ],
   };
   const parts = [];
   if (level >= 2) parts.push({ start: d.region.join(' ; '), judge: dom, lines: [bl], pre: level === 3 ? [dec] : [] });
-  parts.push({ html: `Calcule I<sub>D</sub> = ${MT(T)}, de l'intérieur vers l'extérieur (d'abord en z) :`, ask: 'I =', start: 'I_D', judge: def, lines: [inner, middle, outer] });
+  parts.push({ html: t('Calcule I<sub>D</sub> = {I}, de l\'intérieur vers l\'extérieur (d\'abord en z) :', { I: MT(T) }), ask: 'I =', start: 'I_D', judge: def, lines: [inner, middle, outer] });
   const [first, ...rest] = parts;
   const menuOf = (p) => (level === 3 ? { ...p.judge, menus: stepMenus(p.start, p.lines, CHOICES) } : p.judge);
   const script = [...(first.pre || []), ...first.lines];
   for (const p of rest) script.push(SEG(p.html, p.ask, p.start, menuOf(p)), ...(p.pre || []), ...p.lines);
   const D = `D = {(x, y, z) : ${d.region.map(R).join(', ')}}`;
-  const given = level === 1 ? ` Les bornes sont ${MT(d.bounds, XYZ)}.` : ' Écris d\'abord les bornes : x à l\'extérieur, puis y, puis z.';
+  const given = level === 1 ? ` ${t('Les bornes sont {b}.', { b: MT(d.bounds, XYZ) })}` : ` ${t('Écris d\'abord les bornes : x à l\'extérieur, puis y, puis z.')}`;
   return linesItem({
     skill: SK, level, mode: modeOf(level), start: first.start, judge: menuOf(first), script,
-    prompt: `Calcule I<sub>D</sub> = ∭<sub>D</sub> ${d.f === '1' ? '' : MT(d.f)} dV, où D est ${d.words} : ${D}.${given}`,
-    hints: H(`En z : ${d.zWhy} ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D.`,
-      `${MT(d.bounds, XYZ)}, puis ${MT(d.inner)}`, `= ${MT(d.middle)} = ${MT(value)}`),
+    prompt: t('Calcule I<sub>D</sub> = ∭<sub>D</sub> {f} dV, où D est {words} : {D}.', { f: d.f === '1' ? '' : MT(d.f), words: d.words, D }) + given,
+    hints: H(t('En z : {why} ; ensuite, (x, y) parcourt la projection de D sur le plan (x, y), décrite comme en 2D.', { why: d.zWhy }),
+      t('{a}, puis {b}', { a: MT(d.bounds, XYZ), b: MT(d.inner) }), `= ${MT(d.middle)} = ${MT(value)}`),
     subgoals: SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.kind}:${d.bounds}:${d.f}`, exam: examTag(opts), baits: ['a2_fubini_outer_var'],
   });
@@ -208,10 +209,10 @@ function tripleMcq(rng, opts, level) {
     { html: MT(cBody(C, `(a-x)^${p}`)), x: null, rule: 'a2_fubini_outer_var' },
   ];
   return mcqV({
-    skill: SK, level, prompt: `Soit a > 0 et T<sub>a</sub> = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭<sub>T<sub>a</sub></sub> ${f === '1' ? '' : MT(f)} dV ?`,
+    skill: SK, level, prompt: t('Soit a > 0 et T<sub>a</sub> = {(x, y, z) : x, y, z ≥ 0, x + y + z ≤ a}. Que vaut ∭<sub>T<sub>a</sub></sub> {f} dV ?', { f: f === '1' ? '' : MT(f) }),
     right: { html: MT(aText(C, p)), x: at(C, p) }, wrongs: [wrongs[5], ...rng.shuffle(wrongs.slice(0, 5))],
     key: `${SK}:mcq:${f}`, expectedSec: 240, exam: examTag(opts) || false,
-    solution: [{ html: `Bornes : ${MT('0 ≤ x ≤ a ; 0 ≤ y ≤ a-x ; 0 ≤ z ≤ a-x-y', { vars: ['x', 'y', 'z', 'a'] })}. Chaque intégration ajoute 1 au degré en a : le résultat est ${MT(aText(C, p))} (degré ${n} + 3).`, note: '' }],
+    solution: [{ html: t('Bornes : {b}. Chaque intégration ajoute 1 au degré en a : le résultat est {r} (degré {n} + 3).', { b: MT('0 ≤ x ≤ a ; 0 ≤ y ≤ a-x ; 0 ≤ z ≤ a-x-y', { vars: ['x', 'y', 'z', 'a'] }), r: MT(aText(C, p)), n }), note: '' }],
   }, rng);
 }
 

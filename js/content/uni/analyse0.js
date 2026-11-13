@@ -17,6 +17,7 @@ import { blankLine, templateOf } from '../../judges/lines.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { isFinal } from '../../judges/equiv.js';
 import { mcqItem } from '../items.js';
+import { t } from '../../i18n.js';
 
 const SKILL = 'g6-deriv-rules';
 const V = 'x';
@@ -73,15 +74,18 @@ const NOTES = {
 };
 const SUBGOAL_OF = (rules) => (rules.has('product') ? 'product' : rules.has('quotient') ? 'quotient' : rules.has('chain') ? 'chain' : 'table');
 const SUBGOALS = [
-  { id: 'product', label: 'règle du produit', skill: SKILL },
-  { id: 'quotient', label: 'règle du quotient', skill: SKILL },
-  { id: 'chain', label: 'règle de chaîne', skill: SKILL },
-  { id: 'table', label: 'dérivées usuelles', skill: 'g6-deriv-usual' },
-  { id: 'simplify', label: 'simplifier', skill: 'lit-monomial' },
-  { id: 'evaluate', label: 'évaluer f′(a)', skill: SKILL },
+  { id: 'product', label: t('règle du produit'), skill: SKILL },
+  { id: 'quotient', label: t('règle du quotient'), skill: SKILL },
+  { id: 'chain', label: t('règle de chaîne'), skill: SKILL },
+  { id: 'table', label: t('dérivées usuelles'), skill: 'g6-deriv-usual' },
+  { id: 'simplify', label: t('simplifier'), skill: 'lit-monomial' },
+  { id: 'evaluate', label: t('évaluer f′(a)'), skill: SKILL },
 ];
 
-function noteOf(rules) {
+// The note is built in French, then looked up whole (every combination is
+// in the dictionary js/i18n/en/uni-17.js).
+const noteOf = (rules) => t(noteFr(rules));
+function noteFr(rules) {
   const named = ['product', 'quotient', 'chain'].filter((r) => rules.has(r)).map((r) => NOTES[r]);
   const table = [...rules].some((r) => ['table', 'poly', 'var', 'sum', 'constfactor', 'linear'].includes(r));
   if (!named.length) return table ? NOTES.table : 'Calcul';
@@ -111,7 +115,7 @@ function derivation(f) {
     const { node, rules } = stepAll(cur);
     if (!hasDeriv(node)) {
       const fin = pretty(node);
-      const note = [...rules].some((r) => ['product', 'quotient', 'chain'].includes(r)) ? `${noteOf(rules)}, simplifier` : 'Simplifier';
+      const note = [...rules].some((r) => ['product', 'quotient', 'chain'].includes(r)) ? t(`${noteFr(rules)}, simplifier`) : t('Simplifier');
       out.push({ node: fin, note, subgoal: 'simplify', rules });
       return out;
     }
@@ -197,24 +201,24 @@ function judgeCfg(f, key) {
 function ruleHint(f, rule) {
   const e = stripParen(f);
   const MM = (n) => toMathML(stripParen(n));
-  if (rule === 'product') return `C'est un produit : (uv)′ = u′v + uv′, avec u = ${MM(e.l)} et v = ${MM(e.r)}.`;
+  if (rule === 'product') return t('C\'est un produit : (uv)′ = u′v + uv′, avec u = {u} et v = {v}.', { u: MM(e.l), v: MM(e.r) });
   if (rule === 'quotient') {
     const [u, w] = e.t === 'frac' ? [e.n, e.d] : [e.l, e.r];
-    return `C'est un quotient : (u/v)′ = (u′v − uv′)/v², avec u = ${MM(u)} et v = ${MM(w)}.`;
+    return t('C\'est un quotient : (u/v)′ = (u′v − uv′)/v², avec u = {u} et v = {v}.', { u: MM(u), v: MM(w) });
   }
-  return `C'est une composée f(g(x)) avec g(x) = ${MM(innerOf(e))} : (f∘g)′ = f′(g)·g′.`;
+  return t('C\'est une composée f(g(x)) avec g(x) = {g} : (f∘g)′ = f′(g)·g′.', { g: MM(innerOf(e)) });
 }
 
 function solutionOf(start, lines) {
   return [
-    { html: MM(start), note: 'Départ' },
+    { html: MM(start), note: t('Départ') },
     ...lines.map((l) => ({ html: `<span class="eq">=</span> ${MM(l.node)}`, note: l.note })),
   ];
 }
 
 const PROMPTS = [
-  (f) => `Dérive f(x) = ${MM(f)}.`,
-  (f) => `Calcule f′(x) pour f(x) = ${MM(f)}.`,
+  (f) => t('Dérive f(x) = {f}.', { f: MM(f) }),
+  (f) => t('Calcule f′(x) pour f(x) = {f}.', { f: MM(f) }),
 ];
 
 // The value a where f′(a) is a nice exact number, or null.
@@ -266,9 +270,9 @@ export function derivItem(level, rng, profile, opts = {}) {
     { level: 3, html: `= ${MM(final)}` },
   ];
   const ruleOptions = [
-    { id: 'product', label: 'Règle du produit', valid: topRule === 'product', why: 'Ce n\'est pas un produit de deux fonctions de x.' },
-    { id: 'quotient', label: 'Règle du quotient', valid: topRule === 'quotient', why: 'Il n\'y a pas de x au dénominateur.' },
-    { id: 'chain', label: 'Règle de chaîne', valid: topRule === 'chain', why: topRule === 'chain' ? '' : 'Regarde l\'opération la plus extérieure : c\'est elle qui décide de la première règle.' },
+    { id: 'product', label: t('Règle du produit'), valid: topRule === 'product', why: t('Ce n\'est pas un produit de deux fonctions de x.') },
+    { id: 'quotient', label: t('Règle du quotient'), valid: topRule === 'quotient', why: t('Il n\'y a pas de x au dénominateur.') },
+    { id: 'chain', label: t('Règle de chaîne'), valid: topRule === 'chain', why: topRule === 'chain' ? '' : t('Regarde l\'opération la plus extérieure : c\'est elle qui décide de la première règle.') },
   ];
   let mode = 'free';
   let script = lines.map((l) => ({ kind: 'eq', math: toText(l.node), subgoal: l.subgoal, note: l.note }));
@@ -281,15 +285,15 @@ export function derivItem(level, rng, profile, opts = {}) {
     script = [
       level === 1
         ? { kind: 'note', html: ruleHint(f, topRule) }
-        : { kind: 'decision', prompt: 'Quelle règle d\'abord ?', options: ruleOptions },
+        : { kind: 'decision', prompt: t('Quelle règle d\'abord ?'), options: ruleOptions },
       { kind: 'eq', math: rl.math, blanks: rl.blanks, subgoal: topRule === 'quotient' ? 'quotient' : topRule === 'product' ? 'product' : 'chain', note: noteOf(new Set([topRule, 'table'])) },
-      ...(firstFinal ? [] : [{ kind: 'eq', math: guidedFinal.math, blanks: guidedFinal.blanks, subgoal: 'simplify', note: 'Simplifier' }]),
+      ...(firstFinal ? [] : [{ kind: 'eq', math: guidedFinal.math, blanks: guidedFinal.blanks, subgoal: 'simplify', note: t('Simplifier') }]),
     ];
   } else if (level === 3) {
     mode = 'tap';
   } else if (level === 4 && !opts.exam) {
     script.splice(1, 0, {
-      kind: 'rule', ask: 'Quelle règle as-tu utilisée en premier ?', correct: topRule,
+      kind: 'rule', ask: t('Quelle règle as-tu utilisée en premier ?'), correct: topRule,
       options: [
         { id: 'product', label: '(uv)′ = u′v + uv′' }, { id: 'quotient', label: '(u/v)′ = (u′v − uv′)/v²' },
         { id: 'chain', label: '(f∘g)′ = f′(g)·g′' }, { id: 'sum', label: '(u + v)′ = u′ + v′' },
@@ -302,14 +306,14 @@ export function derivItem(level, rng, profile, opts = {}) {
   if (wantValue) {
     if (nice) {
       const label = `f′(${String(nice.a).replace('-', '−')})`;
-      script.push({ kind: 'segment', html: `Calcule maintenant ${label}.`, ask: `${label} =`, start: { math: toText(nice.at) }, judge: { kind: 'value', form: 'irreducible' } });
+      script.push({ kind: 'segment', html: t('Calcule maintenant {label}.', { label }), ask: `${label} =`, start: { math: toText(nice.at) }, judge: { kind: 'value', form: 'irreducible' } });
       script.push({ kind: 'eq', math: nice.q.toString(), subgoal: 'evaluate', note: `${label} = ${toReadable(lit(nice.q))}` });
-      prompt = `Soit f(x) = ${MM(f)}. Dérive f, puis calcule ${label}.`;
+      prompt = t('Soit f(x) = {f}. Dérive f, puis calcule {label}.', { f: MM(f), label });
       if (opts.exam === 'coef') finalCfg = { form: 'no-prime', askCoef: { label } };
     }
   }
   const used = new Set(script.filter((l) => l.subgoal).map((l) => l.subgoal));
-  const baits = [...new Set(trapAnswers('equiv', startNode, judge).map((t) => t.rule))];
+  const baits = [...new Set(trapAnswers('equiv', startNode, judge).map((tr) => tr.rule))];
   const item = {
     skill: SKILL, level, type: 'lines', prompt,
     start: { math: toText(startNode) },
@@ -348,8 +352,8 @@ function mcqVariant(rng) {
   const opts = { vars: [V], domain: judge.domain, seed: judge.seed };
   const options = [{ node: right, correct: true, rule: null }];
   const isNew = (n) => options.every((o) => !equivalent(o.node, n, opts).equal);
-  for (const t of rng.shuffle(trapAnswers('equiv', startNode, judge, (n) => pretty(expandDerivs(n))))) {
-    if (options.length < 4 && isNew(t.node)) options.push({ node: t.node, correct: false, rule: t.rule });
+  for (const tr of rng.shuffle(trapAnswers('equiv', startNode, judge, (n) => pretty(expandDerivs(n))))) {
+    if (options.length < 4 && isNew(tr.node)) options.push({ node: tr.node, correct: false, rule: tr.rule });
   }
   // Without enough traps: the sign of one term, or the inner derivative forgotten twice.
   // Without enough traps: the sign of the answer, a minus in the product
@@ -363,7 +367,7 @@ function mcqVariant(rng) {
   for (const n of extra) if (options.length < 4 && isNew(n)) options.push({ node: n, correct: false, rule: null });
   const html = (n) => MM(n);
   return {
-    ...mcqItem(SKILL, 4, `Quelle est la dérivée de f(x) = ${MM(f)} ?`, options.map((o) => ({ html: html(o.node), correct: o.correct, rule: o.rule })), rng, {
+    ...mcqItem(SKILL, 4, t('Quelle est la dérivée de f(x) = {f} ?', { f: MM(f) }), options.map((o) => ({ html: html(o.node), correct: o.correct, rule: o.rule })), rng, {
       key, solution: solutionOf(startNode, lines), expectedSec: 45,
     }),
     exam: { format: 'mcq', points: 1 },
@@ -374,11 +378,11 @@ function tfVariant(rng) {
   const kind = rng.pick(['general', 'trap', 'true', 'trap']);
   if (kind === 'general') {
     return {
-      ...mcqItem(SKILL, 4, 'Vrai ou faux ? <br>« Si f et g sont dérivables, alors (f/g)′ = f′/g′. »', [
-        { html: 'Vrai', correct: false, rule: 'g6_quotient_sign' }, { html: 'Faux', correct: true },
+      ...mcqItem(SKILL, 4, t('Vrai ou faux ? <br>« Si f et g sont dérivables, alors (f/g)′ = f′/g′. »'), [
+        { html: t('Vrai'), correct: false, rule: 'g6_quotient_sign' }, { html: t('Faux'), correct: true },
       ], rng, {
         keepOrder: true, key: `${SKILL}:tf:quotient`, expectedSec: 20,
-        solution: [{ html: `Faux. Contre-exemple : f(x) = x, g(x) = x², en x = 1. Alors f/g = 1/x et ${MT('d(1/x)')} = −1/x² vaut −1, mais f′/g′ = 1/(2x) vaut 1/2.`, note: '' }],
+        solution: [{ html: t('Faux. Contre-exemple : f(x) = x, g(x) = x², en x = 1. Alors f/g = 1/x et {d} = −1/x² vaut −1, mais f′/g′ = 1/(2x) vaut 1/2.', { d: MT('d(1/x)') }), note: '' }],
       }),
       exam: { format: 'tf', points: 1 },
     };
@@ -391,13 +395,13 @@ function tfVariant(rng) {
   let rule = null;
   if (kind === 'trap') {
     const opts = { vars: [V], domain: judge.domain, seed: judge.seed };
-    const wrong = trapAnswers('equiv', startNode, judge, (n) => pretty(expandDerivs(n))).find((t) => !equivalent(t.node, right, opts).equal);
+    const wrong = trapAnswers('equiv', startNode, judge, (n) => pretty(expandDerivs(n))).find((tm) => !equivalent(tm.node, right, opts).equal);
     if (wrong) { claim = wrong.node; rule = wrong.rule; }
   }
   const truth = claim === right;
   return {
-    ...mcqItem(SKILL, 4, `Vrai ou faux ?<br>${MM({ t: 'rel', op: '=', l: startNode, r: claim }, true)}`, [
-      { html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth },
+    ...mcqItem(SKILL, 4, t('Vrai ou faux ?<br>{e}', { e: MM({ t: 'rel', op: '=', l: startNode, r: claim }, true) }), [
+      { html: t('Vrai'), correct: truth, rule: truth ? null : rule }, { html: t('Faux'), correct: !truth },
     ], rng, {
       keepOrder: true, key: `${SKILL}:tf:${toText(f)}:${truth}`, expectedSec: 30,
       solution: solutionOf(startNode, lines),

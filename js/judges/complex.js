@@ -37,6 +37,7 @@ import { Q } from '../math/rational.js';
 import { diagnoseLine } from './diagnose.js';
 import { sameLine } from './common.js';
 import { makeRng } from '../content/random.js';
+import { t as tr } from '../i18n.js';
 
 export const sign = '=';
 
@@ -189,8 +190,8 @@ function realOf(node) {
 function argOk(cfg, theta) {
   const t = realOf(theta);
   if (!Number.isFinite(t)) return false;
-  if (cfg.arg === 'principal' && !(t > -Math.PI - 1e-12 && t <= Math.PI + 1e-12)) return 'Prends l\'argument principal, dans ]−π ; π].';
-  if (cfg.arg === 'positive' && !(t >= -1e-12 && t < 2 * Math.PI - 1e-12)) return 'Prends l\'argument dans [0 ; 2π[.';
+  if (cfg.arg === 'principal' && !(t > -Math.PI - 1e-12 && t <= Math.PI + 1e-12)) return tr('Prends l\'argument principal, dans ]−π ; π].');
+  if (cfg.arg === 'positive' && !(t >= -1e-12 && t < 2 * Math.PI - 1e-12)) return tr('Prends l\'argument dans [0 ; 2π[.');
   return true;
 }
 
@@ -212,15 +213,15 @@ function finalOne(cfg, node, form) {
     const re = stripParen(parts.re);
     const im = stripParen(parts.im);
     const zero = (x) => x.t === 'num' && x.v.n === 0;
-    if (zero(re) && !zero(im) && contains(n, (x) => x === parts.re && x.t === 'num')) return 'Inutile d\'écrire 0 + … : écris seulement la partie imaginaire.';
-    if (zero(im) && contains(n, (x) => x.t === 'const' && x.name === 'i')) return 'La partie imaginaire est nulle : écris seulement le réel.';
+    if (zero(re) && !zero(im) && contains(n, (x) => x === parts.re && x.t === 'num')) return tr('Inutile d\'écrire 0 + … : écris seulement la partie imaginaire.');
+    if (zero(im) && contains(n, (x) => x.t === 'const' && x.name === 'i')) return tr('La partie imaginaire est nulle : écris seulement le réel.');
     return true;
   }
   if (form === 'exp' || form === 'trig' || form === 'polar') {
     const p = polarParts(n);
     if (!p || (form !== 'polar' && p.kind !== form)) return false;
     const r = realOf(p.r);
-    if (!(r > 0)) return 'Le module r d\'une forme polaire est positif : change d\'argument (−1 = e^(iπ)).';
+    if (!(r > 0)) return tr('Le module r d\'une forme polaire est positif : change d\'argument (−1 = e^(iπ)).');
     for (const x of [p.r, p.theta]) {
       const c = closed(x);
       if (c !== true) return c;
@@ -246,10 +247,10 @@ export function isFinal(cfg, node) {
     if (items.some((x) => contains(x, (y) => y.t === 'sym' && y.name === unknownOf(cfg)))) return false;
     for (const x of items) {
       const f = finalOne(cfg, x, cfg.itemForm || 'algebraic');
-      if (f !== true) return f || 'Écris chaque solution sous la forme a + bi.';
+      if (f !== true) return f || tr('Écris chaque solution sous la forme a + bi.');
     }
     const vals = items.map((x) => complexValue(x));
-    if (vals.some((v, i) => vals.some((w, j) => j < i && v && w && near(v, w)))) return 'Une solution est écrite deux fois.';
+    if (vals.some((v, i) => vals.some((w, j) => j < i && v && w && near(v, w)))) return tr('Une solution est écrite deux fois.');
     return true;
   }
   if (cfg.vars?.length && [...symbolsIn(node)].some((s) => cfg.vars.includes(s))) return form === 'any';
@@ -259,11 +260,11 @@ export function isFinal(cfg, node) {
 export const start = (cfg) => cfg.start;
 
 const FORM_MSG = {
-  algebraic: 'écris-le sous la forme a + bi',
-  exp: 'écris-le sous la forme r·e^(iθ)',
-  trig: 'écris-le sous la forme r(cos θ + i sin θ)',
-  polar: 'écris-le sous forme polaire',
-  real: 'calcule ce nombre réel',
+  algebraic: tr('écris-le sous la forme a + bi'),
+  exp: tr('écris-le sous la forme r·e^(iθ)'),
+  trig: tr('écris-le sous la forme r(cos θ + i sin θ)'),
+  polar: tr('écris-le sous forme polaire'),
+  real: tr('calcule ce nombre réel'),
 };
 
 const say = (v) => cText(v.exact ?? v);
@@ -276,24 +277,24 @@ export function judgeLine(cfg, prev, input, state = {}) {
   }
   const allowed = new Set([...(cfg.vars || []), unknownOf(cfg)]);
   const unknown = [...symbolsIn(node)].filter((s) => !allowed.has(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici.` };
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (unknown.length) return { kind: 'parse', node, message: tr('Je ne connais pas la lettre « {c} » ici.', { c: unknown[0].replace(/_$/, '') }) };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   const setMode = (cfg.form === 'set') || isSetLine(prev, cfg);
   if (setMode) {
     const A = solutionsOf(cfg, prev);
     const B = solutionsOf(cfg, node);
-    if (!B) return { kind: 'stay', node, message: 'Je n\'arrive pas à lire les solutions de cette ligne : écris une équation, ou les solutions.' };
+    if (!B) return { kind: 'stay', node, message: tr('Je n\'arrive pas à lire les solutions de cette ligne : écris une équation, ou les solutions.') };
     if (A && !sameSolutions(A, B)) {
       const diag = diagnoseLine('complex', prev, node, cfg, (cand, line) => sameSolutions(solutionsOf(cfg, cand), solutionsOf(cfg, line)));
       const miss = A.find((a) => !B.some((b) => near(a, b)));
       const extra = B.find((b) => !A.some((a) => near(a, b)));
-      const msg = miss ? `${cText(miss)} est solution de la ligne précédente, mais pas de la tienne.` : `${cText(extra)} est solution de ta ligne, mais pas de la précédente.`;
+      const msg = miss ? tr('{z} est solution de la ligne précédente, mais pas de la tienne.', { z: cText(miss) }) : tr('{z} est solution de ta ligne, mais pas de la précédente.', { z: cText(extra) });
       return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: msg };
     }
   } else {
     const a = valuesOf(cfg, prev);
     const b = valuesOf(cfg, node);
-    if (!b) return { kind: 'stay', node, message: 'Ce nombre n\'est pas défini (division par 0 ?) : écris-le autrement.' };
+    if (!b) return { kind: 'stay', node, message: tr('Ce nombre n\'est pas défini (division par 0 ?) : écris-le autrement.') };
     if (a && !a.every((x, k) => sameComplex(x, b[k]))) {
       const diag = diagnoseLine('complex', prev, node, cfg, (cand, line) => {
         const x = valuesOf(cfg, cand);
@@ -301,13 +302,16 @@ export function judgeLine(cfg, prev, input, state = {}) {
         return !!x && !!y && x.every((u, k) => sameComplex(u, y[k]));
       });
       const k = a.findIndex((x, i) => !sameComplex(x, b[i]));
-      const where = cfg.vars?.length ? ` (en ${cfg.vars.map((v) => `${v} = ${String(Math.round(envsOf(cfg)[k][v] * 100) / 100).replace('.', ',')}`).join(', ')})` : '';
-      return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `Ta ligne vaut ${say(b[k])}, mais la précédente vaut ${say(a[k])}${where}.` };
+      const vals = { b: say(b[k]), a: say(a[k]) };
+      const message = cfg.vars?.length
+        ? tr('Ta ligne vaut {b}, mais la précédente vaut {a} (en {at}).', { ...vals, at: cfg.vars.map((v) => `${v} = ${String(Math.round(envsOf(cfg)[k][v] * 100) / 100).replace('.', ',')}`).join(', ') })
+        : tr('Ta ligne vaut {b}, mais la précédente vaut {a}.', vals);
+      return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
     }
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais {rest}', { rest: `${fin.charAt(0).toLowerCase()}${fin.slice(1)}` }) };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
 }

@@ -8,6 +8,7 @@ import { parse } from '../../cas/parse.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { toReadable } from '../../cas/print.js';
 import { mcq } from './kit.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
 
@@ -49,7 +50,7 @@ export function vText(V) {
 
 // ---------- texts ----------
 // The letters x and y swapped (texts without other x or y).
-export const swapXY = (t) => String(t).replace(/[xy]/g, (c) => (c === 'x' ? 'y' : 'x')).replace(/(^|[^\w^])y x(?![\w^])/g, '$1x y').replace(/y\^2\+x\^2/g, 'x^2+y^2');
+export const swapXY = (s) => String(s).replace(/[xy]/g, (c) => (c === 'x' ? 'y' : 'x')).replace(/(^|[^\w^])y x(?![\w^])/g, '$1x y').replace(/y\^2\+x\^2/g, 'x^2+y^2');
 // a·x + b·y + c as text: 2x-y+1, x, -y.
 export function linT(terms) {
   let out = '';
@@ -62,10 +63,10 @@ export function linT(terms) {
   }
   return out || '0';
 }
-export const R = (t) => toReadable(parse(t));
-export const num = (t) => evalFloat(parse(String(t)), {});
+export const R = (s) => toReadable(parse(s));
+export const num = (s) => evalFloat(parse(String(s)), {});
 // A bound as text for an interval written in the prompt: π/2, ln 2, √π.
-export const bT = (t) => R(String(t));
+export const bT = (s) => R(String(s));
 
 // ---------- multiple choices ----------
 // Options distinct in value (1e−6 relative, values by quadrature) and in
@@ -89,8 +90,8 @@ export function mcqV(o, rng) {
 export function vfMcq(o, rng) {
   const { skill, statement, truth, key, why, ruleIfTrue = null, ruleIfFalse = null, level = 4, exam = { format: 'tf', points: 1 } } = o;
   return mcq({
-    skill, level, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth, rule: truth ? ruleIfFalse : null }],
+    skill, level, prompt: t('Vrai ou faux ?<br>« {statement} »', { statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth, rule: truth ? ruleIfFalse : null }],
     key: `${skill}:tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam,
   }, rng);
 }

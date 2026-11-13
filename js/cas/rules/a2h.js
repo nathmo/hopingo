@@ -21,6 +21,7 @@ import { parse } from '../parse.js';
 import { toText } from '../print.js';
 import { stripParen, mapNode, contains } from '../ast.js';
 import { pretty } from '../normal.js';
+import { t } from '../../i18n.js';
 
 
 // A line of the judge of cfg, read as the judge reads it (ode lines are
@@ -125,64 +126,70 @@ function charSign(prev, ctx) {
 
 export const DEFS = {
   a2_ode_continuity_unique: {
-    name: 'Continue, donc solution unique',
+    name: t('Continue, donc solution unique'),
     judges: [],
     wrongValues: () => [{ value: 'Vrai', rule: 'a2_ode_continuity_unique' }],
-    explain: () => 'La continuité de f donne une solution (Peano), pas son unicité : y′ = 3y^(2/3), y(0) = 0 a deux solutions, y = 0 et y = t³. Pour l\'unicité, il faut f Lipschitz en y (par exemple ∂f/∂y bornée).',
+    explain: () => t('La continuité de f donne une solution (Peano), pas son unicité : y′ = 3y^(2/3), y(0) = 0 a deux solutions, y = 0 et y = t³. Pour l\'unicité, il faut f Lipschitz en y (par exemple ∂f/∂y bornée).'),
     check: { bait: { skill: 'a2-ode-cauchy', level: 4 } },
   },
   a2_ode_local_global: {
-    name: 'C¹, donc solution globale',
+    name: t('C¹, donc solution globale'),
     judges: [],
     wrongValues: () => [{ value: 'Vrai', rule: 'a2_ode_local_global' }],
-    explain: () => 'f ∈ C¹ donne une solution unique, mais seulement locale : y′ = y², y(0) = 1 donne y = 1/(1 − t), qui explose en t = 1.',
+    explain: () => t('f ∈ C¹ donne une solution unique, mais seulement locale : y′ = y², y(0) = 1 donne y = 1/(1 − t), qui explose en t = 1.'),
     check: { bait: { skill: 'a2-ode-cauchy', level: 4 } },
   },
   a2_ode_sep_constant_late: {
-    name: 'Constante ajoutée après l\'exponentielle',
+    name: t('Constante ajoutée après l\'exponentielle'),
     judges: ['ode'],
     transform: constantLate,
     wrongValues: () => [],
-    explain: (ctx = {}) => `e^(${ctx.R ? toText(parse(ctx.R)) : 'G(x)'} + C) = e^C·e^(${ctx.R ? toText(parse(ctx.R)) : 'G(x)'}) : la constante multiplie, elle ne s'ajoute pas. Vérifie en dérivant : e^G + C ne redonne pas l'équation.`,
+    explain: (ctx = {}) => t('e^({G} + C) = e^C·e^({G}) : la constante multiplie, elle ne s\'ajoute pas. Vérifie en dérivant : e^G + C ne redonne pas l\'équation.', { G: ctx.R ? toText(parse(ctx.R)) : 'G(x)' }),
     check: { judge: { kind: 'ode', eq: "y'=2x×y", order: 1 }, prev: 'ln(|y|) = x^2 + C', line: 'y = e^(x^2) + C' },
   },
   a2_ode_sep_lost_constant: {
-    name: 'Solution constante perdue en divisant',
+    name: t('Solution constante perdue en divisant'),
     judges: [],
     wrongValues: () => [],
-    explain: (ctx = {}) => `Quand h(${ctx.y0 ?? 'y₀'}) = 0, la fonction constante y ≡ ${ctx.y0 ?? 'y₀'} est une solution, et c'est la seule qui vérifie la condition initiale (unicité). Diviser par h(y) l'avait perdue.`,
+    explain: (ctx = {}) => t('Quand h({y0}) = 0, la fonction constante y ≡ {y0} est une solution, et c\'est la seule qui vérifie la condition initiale (unicité). Diviser par h(y) l\'avait perdue.', { y0: ctx.y0 ?? 'y₀' }),
     check: { bait: { skill: 'a2-ode-separable', level: 2 } },
   },
   a2_ode_sign_abs: {
-    name: 'Mauvais signe en enlevant la valeur absolue',
+    name: t('Mauvais signe en enlevant la valeur absolue'),
     judges: ['ode'],
     transform: signAbs,
-    explain: (ctx = {}) => `En enlevant |${ctx.E ? toText(parse(ctx.E)) : '…'}|, on garde le signe qu'il a au point initial : la condition initiale le donne. Avec le signe −, la relation n'est pas vérifiée au point initial.`,
+    explain: (ctx = {}) => t('En enlevant |{E}|, on garde le signe qu\'il a au point initial : la condition initiale le donne. Avec le signe −, la relation n\'est pas vérifiée au point initial.', { E: ctx.E ? toText(parse(ctx.E)) : '…' }),
     check: { judge: { kind: 'ode', eq: "y'=9-y^2", order: 1, ic: { x: 0, y: 0 }, yRange: [-2.9, 2.9] }, prev: '(1/6)ln(|(3+y)/(3-y)|) = x', line: '(3+y)/(3-y) = -e^(6x)' },
   },
   a2_ode_if_not_normalized: {
-    name: 'Facteur intégrant avant de normaliser',
+    name: t('Facteur intégrant avant de normaliser'),
     judges: ['ode'],
     transform: (prev, ctx) => fromCfg('a2_ode_if_not_normalized', ctx),
-    explain: (ctx = {}) => `Le facteur intégrant suppose y′ seul (coefficient 1)${ctx.coef ? ` : divise d'abord par ${ctx.coef}` : ' : divise d\'abord par le coefficient de y′'}${ctx.a ? `, et a = ${ctx.a}` : ''}. Pour le wronskien, p est aussi le coefficient de y′ après division par celui de y″.`,
+    explain: (ctx = {}) => {
+      const v = { coef: ctx.coef, a: ctx.a };
+      if (ctx.coef && ctx.a) return t('Le facteur intégrant suppose y′ seul (coefficient 1) : divise d\'abord par {coef}, et a = {a}. Pour le wronskien, p est aussi le coefficient de y′ après division par celui de y″.', v);
+      if (ctx.coef) return t('Le facteur intégrant suppose y′ seul (coefficient 1) : divise d\'abord par {coef}. Pour le wronskien, p est aussi le coefficient de y′ après division par celui de y″.', v);
+      if (ctx.a) return t('Le facteur intégrant suppose y′ seul (coefficient 1) : divise d\'abord par le coefficient de y′, et a = {a}. Pour le wronskien, p est aussi le coefficient de y′ après division par celui de y″.', v);
+      return t('Le facteur intégrant suppose y′ seul (coefficient 1) : divise d\'abord par le coefficient de y′. Pour le wronskien, p est aussi le coefficient de y′ après division par celui de y″.');
+    },
     check: { judge: { kind: 'ode', eq: "x×y'+2y=4x^2", order: 1, ic: { x: 1, y: 2 }, mu: '2/x', domain: { x: [0.2, 4] }, traps: { a2_ode_if_not_normalized: [{ line: 'μ = e^(2x)', ctx: { coef: 'x', a: '2/x' } }] } }, prev: "x×y'+2y=4x^2", line: 'μ = e^(2x)' },
   },
   a2_ode_if_sign: {
-    name: 'Facteur intégrant e^(−∫a)',
+    name: t('Facteur intégrant e^(−∫a)'),
     judges: ['ode'],
     transform: (prev, ctx) => fromCfg('a2_ode_if_sign', ctx),
-    explain: () => 'Avec μ = e^(∫a), μ′ = aμ, donc (μy)′ = μ(y′ + ay) : c\'est e^(+∫a). Avec e^(−∫a), le membre de gauche n\'est plus une dérivée.',
+    explain: () => t('Avec μ = e^(∫a), μ′ = aμ, donc (μy)′ = μ(y′ + ay) : c\'est e^(+∫a). Avec e^(−∫a), le membre de gauche n\'est plus une dérivée.'),
     check: { judge: { kind: 'ode', eq: "x×y'+2y=4x^2", order: 1, ic: { x: 1, y: 2 }, mu: '2/x', domain: { x: [0.2, 4] }, traps: { a2_ode_if_sign: ['μ = 1/x^2'] } }, prev: "y'+(2/x)y=4x", line: 'μ = 1/x^2' },
   },
   a2_ode_if_rhs: {
-    name: '(μy)′ = b au lieu de μb',
+    name: t('(μy)′ = b au lieu de μb'),
     judges: ['ode'],
     transform: (prev, ctx) => fromCfg('a2_ode_if_rhs', ctx),
-    explain: (ctx = {}) => `On a multiplié toute l'équation par μ : le second membre devient μ·b${ctx.mub ? ` = ${ctx.mub}` : ''}, pas b.`,
+    explain: (ctx = {}) => t('On a multiplié toute l\'équation par μ : le second membre devient μ·b{val}, pas b.', { val: ctx.mub ? ` = ${ctx.mub}` : '' }),
     check: { judge: { kind: 'ode', eq: "x×y'+2y=4x^2", order: 1, ic: { x: 1, y: 2 }, mu: '2/x', domain: { x: [0.2, 4] }, traps: { a2_ode_if_rhs: [{ line: 'd(x^2 y) = 4x', ctx: { mub: '4x³' } }] } }, prev: 'μ = x^2', line: 'd(x^2 y) = 4x' },
   },
   a2_ode_homog_derivative: {
-    name: 'y = xv dérivé sans la règle du produit',
+    name: t('y = xv dérivé sans la règle du produit'),
     judges: ['equiv'],
     transform: (prev, ctx) => {
       const imp = ctx?.cfg?.implicit;
@@ -193,49 +200,51 @@ export const DEFS = {
       if (toText(stripParen(p.e)) !== toText(parse(`${x} ${vName}`))) return [];
       return [{ node: parse(vName), ctx: {} }, { node: parse(`${x}×${vName}'`, { dvar: x }), ctx: {} }];
     },
-    explain: () => 'y = x·v est un produit de deux fonctions de x : y′ = 1·v + x·v′. Ni v seul, ni x·v′ seul.',
+    explain: () => t('y = x·v est un produit de deux fonctions de x : y′ = 1·v + x·v′. Ni v seul, ni x·v′ seul.'),
     check: { judge: { kind: 'equiv', vars: ['x', 'v', 'w'], implicit: { v: 'w' }, target: 'no-prime' }, prev: 'd(x v)', line: 'v' },
   },
   a2_ode_superposition_nonhom: {
-    name: 'y₀ + C·y₁ solution de L(y) = b',
+    name: t('y₀ + C·y₁ solution de L(y) = b'),
     judges: [],
     wrongValues: () => [{ value: 'Vrai', rule: 'a2_ode_superposition_nonhom' }],
-    explain: () => 'Si L(y₀) = 0 et L(y₁) = b, alors L(y₀ + C·y₁) = 0 + C·b : c\'est égal à b seulement pour C = 1. La somme de deux solutions de L(y) = b donne L(y) = 2b.',
+    explain: () => t('Si L(y₀) = 0 et L(y₁) = b, alors L(y₀ + C·y₁) = 0 + C·b : c\'est égal à b seulement pour C = 1. La somme de deux solutions de L(y) = b donne L(y) = 2b.'),
     check: { counter: { kind: 'a2', prop: 'odeComboFails', params: { eq: "y'+y=1", homog: "y'+y=0" } }, answers: { y0: 'e^(-x)', y1: '1', C: '1' } },
   },
   a2_ode_constant_count: {
-    name: 'Une seule constante à l\'ordre 2',
+    name: t('Une seule constante à l\'ordre 2'),
     judges: ['ode'],
     transform: constantCount,
-    explain: () => 'Une équation d\'ordre 2 a un espace de solutions de dimension 2 : il faut deux constantes indépendantes, C₁ et C₂, devant deux solutions indépendantes.',
+    explain: () => t('Une équation d\'ordre 2 a un espace de solutions de dimension 2 : il faut deux constantes indépendantes, C₁ et C₂, devant deux solutions indépendantes.'),
     check: { judge: { kind: 'ode', eq: "y''+y=0", order: 2 }, prev: 'y = C_1 cos(x) + C_2 sin(x)', line: 'y = C_1 cos(x) + C_1 sin(x)' },
   },
   a2_ode_double_root: {
-    name: 'Racine double sans le facteur x',
+    name: t('Racine double sans le facteur x'),
     judges: ['ode'],
     transform: (prev, ctx) => fromChar(ctx, (ch, v) => (ch.kind === 'double' ? `(C_1 + C_2) e^((${ch.r})${v})` : null)),
-    explain: (ctx = {}) => `C₁e^(${ctx.r ?? 'r'}x) + C₂e^(${ctx.r ?? 'r'}x) = (C₁ + C₂)e^(${ctx.r ?? 'r'}x) : il n'y a en fait qu'une constante. Pour une racine double, la 2e solution est x·e^(${ctx.r ?? 'r'}x).`,
+    explain: (ctx = {}) => t('C₁e^({r}x) + C₂e^({r}x) = (C₁ + C₂)e^({r}x) : il n\'y a en fait qu\'une constante. Pour une racine double, la 2e solution est x·e^({r}x).', { r: ctx.r ?? 'r' }),
     check: { judge: { kind: 'ode', eq: "y''-4y'+4y=0", order: 2, char: { kind: 'double', r: '2' } }, prev: "y''-4y'+4y=0", line: 'y = C_1 e^(2x) + C_2 e^(2x)' },
   },
   a2_ode_complex_swap: {
-    name: 'α et β échangés',
+    name: t('α et β échangés'),
     judges: ['ode'],
     transform: (prev, ctx) => fromChar(ctx, (ch, v) => (ch.kind === 'complex' ? `e^((${ch.b})${v})(C_1 cos((${ch.a})${v}) + C_2 sin((${ch.a})${v}))` : null)),
-    explain: (ctx = {}) => `e^((α + iβ)x) = e^(αx)(cos βx + i sin βx) : la partie réelle${ctx.a ? ` α = ${ctx.a}` : ''} va dans l'exponentielle, la partie imaginaire${ctx.b ? ` β = ${ctx.b}` : ''} dans cos et sin.`,
+    explain: (ctx = {}) => t('e^((α + iβ)x) = e^(αx)(cos βx + i sin βx) : la partie réelle{a} va dans l\'exponentielle, la partie imaginaire{b} dans cos et sin.', { a: ctx.a ? ` α = ${ctx.a}` : '', b: ctx.b ? ` β = ${ctx.b}` : '' }),
     check: { judge: { kind: 'ode', eq: "y''-4y'+13y=0", order: 2, char: { kind: 'complex', a: '2', b: '3' } }, prev: "y''-4y'+13y=0", line: 'y = e^(3x)(C_1 cos(2x) + C_2 sin(2x))' },
   },
   a2_ode_char_sign: {
-    name: 'Racines de signe opposé',
+    name: t('Racines de signe opposé'),
     judges: ['complex', 'ode'],
     transform: charSign,
-    explain: (ctx = {}) => `Remplace r par ${ctx.r ? String(ctx.r).replace(/-/g, '−') : 'ta racine'} dans l'équation caractéristique : tu n'obtiens pas 0. Les racines de r² + pr + q = 0 ont pour somme −p : attention au signe.`,
+    explain: (ctx = {}) => (ctx.r
+      ? t('Remplace r par {r} dans l\'équation caractéristique : tu n\'obtiens pas 0. Les racines de r² + pr + q = 0 ont pour somme −p : attention au signe.', { r: String(ctx.r).replace(/-/g, '−') })
+      : t('Remplace r par ta racine dans l\'équation caractéristique : tu n\'obtiens pas 0. Les racines de r² + pr + q = 0 ont pour somme −p : attention au signe.')),
     check: { judge: { kind: 'complex', form: 'set', unknown: 'r', char: { kind: 'real', r1: '1', r2: '2' } }, prev: 'r^2-3r+2 = 0', line: 'r = -1 ou r = -2' },
   },
   a2_wronskian_abel_sign: {
-    name: 'Abel avec e^(+∫p)',
+    name: t('Abel avec e^(+∫p)'),
     judges: ['ode'],
     transform: (prev, ctx) => fromCfg('a2_wronskian_abel_sign', ctx),
-    explain: () => 'W vérifie W′ = −p·W (formule d\'Abel) : W = W(t₀)·e^(−∫p), avec le signe −.',
+    explain: () => t('W vérifie W′ = −p·W (formule d\'Abel) : W = W(t₀)·e^(−∫p), avec le signe −.'),
     check: { judge: { kind: 'ode', eq: "W'=-(1/t-2)W", unknown: 'W', v: 't', order: 1, final: 'one', domain: { t: [0.2, 4] }, traps: { a2_wronskian_abel_sign: ['W = t e^(-2t)'] } }, prev: "W'=-(1/t-2)W", line: 'W = t e^(-2t)' },
   },
 };

@@ -8,6 +8,7 @@ import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
 import { MT, mcq } from './kit.js';
 import { q, N, H, uniq, cm, joinSum, Val, E, intItem, examTf, lin, shift, KEYS } from './analyse1-d-kit.js';
+import { t } from '../../i18n.js';
 
 const V = 'x';
 const GEN_ = {};
@@ -23,18 +24,18 @@ const firstPart = (start, vars, lines, { judge = {}, ...rest } = {}) => ({ start
 
 const RD = 'a1-int-reduction';
 const RD_SUB = [
-  { id: 'ipp', label: 'intégration par parties', skill: 'a1-int-parts' },
-  { id: 'rec', label: 'formule de récurrence', skill: RD },
-  { id: 'zero', label: 'calculer I₀', skill: 'a1-int-direct' },
-  { id: 'up', label: 'remonter la récurrence', skill: 'g5-induction-frame' },
+  { id: 'ipp', label: t('intégration par parties'), skill: 'a1-int-parts' },
+  { id: 'rec', label: t('formule de récurrence'), skill: RD },
+  { id: 'zero', label: t('calculer I₀'), skill: 'a1-int-direct' },
+  { id: 'up', label: t('remonter la récurrence'), skill: 'g5-induction-frame' },
 ];
 const RD_CHOICES = [
-  { id: 'ipp', label: 'Intégration par parties qui fait baisser l\'indice' },
-  { id: 'rec', label: 'Reconnaître Iₙ₋₁ (ou Iₙ₋₂) et écrire la récurrence' },
-  { id: 'zero', label: 'Calculer I₀ (ou I₁)' },
-  { id: 'up', label: 'Remonter la récurrence' },
-  { id: 'eval', label: 'Calculer la valeur' },
-  { id: 'index', label: 'Écrire le coefficient n − 1', rule: 'a1_reduction_index', why: 'u = xⁿ donne u′ = n·xⁿ⁻¹ : le coefficient est n.' },
+  { id: 'ipp', label: t('Intégration par parties qui fait baisser l\'indice') },
+  { id: 'rec', label: t('Reconnaître Iₙ₋₁ (ou Iₙ₋₂) et écrire la récurrence') },
+  { id: 'zero', label: t('Calculer I₀ (ou I₁)') },
+  { id: 'up', label: t('Remonter la récurrence') },
+  { id: 'eval', label: t('Calculer la valeur') },
+  { id: 'index', label: t('Écrire le coefficient n − 1'), rule: 'a1_reduction_index', why: t('u = xⁿ donne u′ = n·xⁿ⁻¹ : le coefficient est n.') },
 ];
 
 // The families: J (name), its integral in n, the IPP line, the recurrence
@@ -114,41 +115,41 @@ function rdItem(level, rng, opts = {}) {
   const valJudge = { kind: 'definite', seq };
   const chain = rdChain(fam, k);
   const dec = {
-    prompt: 'Quelle méthode ?',
+    prompt: t('Quelle méthode ?'),
     options: [
-      { id: 'ipp', label: `IPP avec u = ${fam.u}, v′ = ${fam.dv}`, valid: true, quality: 'good' },
+      { id: 'ipp', label: t('IPP avec u = {u}, v′ = {dv}', { u: fam.u, dv: fam.dv }), valid: true, quality: 'good' },
       fam.name === 'I'
-        ? { id: 'subst', label: 'Substitution t = Log x', valid: true, quality: 'poor', why: 'Juste : on retrouve ∫ tⁿeᵗ dt, la même récurrence, avec une étape de plus.' }
-        : { id: 'swap', label: `IPP avec u = ${fam.dv}, v′ = ${fam.u}`, valid: true, quality: 'poor', why: 'Juste, mais l\'indice monte (xⁿ⁺¹/(n + 1)) : on n\'obtient pas Jₙ₋₁.' },
-      { id: 'subst2', label: `Substitution t = ${fam.u}`, valid: false, why: 'dt = n·xⁿ⁻¹ dx ne se trouve pas dans l\'intégrale.' },
-      { id: 'noborder', label: `IPP sans terme de bord : ${fam.name}ₙ = −n·${fam.name}ₙ₋₁`, valid: false, rule: 'a1_ibp_boundary_term', why: 'Le terme de bord [u·v] ne s\'annule pas ici.' },
+        ? { id: 'subst', label: t('Substitution t = Log x'), valid: true, quality: 'poor', why: t('Juste : on retrouve ∫ tⁿeᵗ dt, la même récurrence, avec une étape de plus.') }
+        : { id: 'swap', label: t('IPP avec u = {dv}, v′ = {u}', { dv: fam.dv, u: fam.u }), valid: true, quality: 'poor', why: t('Juste, mais l\'indice monte (xⁿ⁺¹/(n + 1)) : on n\'obtient pas Jₙ₋₁.') },
+      { id: 'subst2', label: t('Substitution t = {u}', { u: fam.u }), valid: false, why: t('dt = n·xⁿ⁻¹ dx ne se trouve pas dans l\'intégrale.') },
+      { id: 'noborder', label: t('IPP sans terme de bord : {name}ₙ = −n·{name}ₙ₋₁', { name: fam.name }), valid: false, rule: 'a1_ibp_boundary_term', why: t('Le terme de bord [u·v] ne s\'annule pas ici.') },
     ],
-    l2: ['noborder'], taken: `IPP avec u = ${fam.u}, v′ = ${fam.dv}`,
+    l2: ['noborder'], taken: t('IPP avec u = {u}, v′ = {dv}', { u: fam.u, dv: fam.dv }),
   };
   const recLines = [
     E(fam.ipp, `u = ${fam.u}, v′ = ${fam.dv}`, 'ipp', 'ipp'),
-    E(fam.rec, `Reconnaître ${fam.name}ₙ₋₁`, 'rec', 'rec', [fam.A.replace(/^-/, ''), 'n'], [fam.A.replace(/^-/, '')]),
+    E(fam.rec, t('Reconnaître {name}ₙ₋₁', { name: fam.name }), 'rec', 'rec', [fam.A.replace(/^-/, ''), 'n'], [fam.A.replace(/^-/, '')]),
   ];
   const parts = [{
     start: `${fam.name}_n`, judge: recJudge, dec, choices: RD_CHOICES,
     // Level 1: the IPP is done (a note), only the recurrence is asked.
     lines: lv === 1 ? recLines.slice(1) : recLines,
-    note: lv === 1 ? `L'intégration par parties donne ${MT(fam.ipp)}.` : null,
+    note: lv === 1 ? t('L\'intégration par parties donne {ipp}.', { ipp: MT(fam.ipp) }) : null,
   }];
   if (lv !== 2) {
-    parts.push({ html: `Calcule ${fam.name}₀`, start: `${fam.name}_0`, judge: valJudge, choices: RD_CHOICES,
-      lines: [E(fam.zero[0], 'Primitive', 'zero', 'zero'), E(eaVal(fam.J0, fam.a).text(), 'Valeur', 'zero', 'eval')] });
+    parts.push({ html: t('Calcule {name}₀', { name: fam.name }), start: `${fam.name}_0`, judge: valJudge, choices: RD_CHOICES,
+      lines: [E(fam.zero[0], t('Primitive'), 'zero', 'zero'), E(eaVal(fam.J0, fam.a).text(), t('Valeur'), 'zero', 'eval')] });
   }
   parts.push({
-    html: `Remonte la récurrence jusqu'à ${fam.name}${'₀₁₂₃₄₅'[k]}`, start: `${fam.name}_${k}`, judge: valJudge, choices: RD_CHOICES,
+    html: t('Remonte la récurrence jusqu\'à {name}{p1}', { name: fam.name, p1: '₀₁₂₃₄₅'[k] }), start: `${fam.name}_${k}`, judge: valJudge, choices: RD_CHOICES,
     note: lv === 2 ? `${fam.name}₀ = ${MT(fam.J0text)}.` : null,
-    lines: [...chain.lines.map((m, i) => E(m, i === chain.lines.length - 1 ? `${fam.name}₀ = ${fam.J0text.replace(/-/g, ' − ').replace('^2', '²')}` : 'Récurrence', 'up', 'up')), E(chain.value.text(), 'Calculer', 'up', 'eval')],
+    lines: [...chain.lines.map((m, i) => E(m, i === chain.lines.length - 1 ? `${fam.name}₀ = ${fam.J0text.replace(/-/g, ' − ').replace('^2', '²')}` : t('Récurrence'), 'up', 'up')), E(chain.value.text(), t('Calculer'), 'up', 'eval')],
   });
   return intItem({
-    skill: RD, prompt: `Soit ${fam.title} (n ≥ 0). Trouve une formule de récurrence, puis calcule ${fam.name}${'₀₁₂₃₄₅'[k]}.`,
+    skill: RD, prompt: t('Soit {title} (n ≥ 0). Trouve une formule de récurrence, puis calcule {name}{p1}.', { title: fam.title, name: fam.name, p1: '₀₁₂₃₄₅'[k] }),
     key: `${fam.name}:${fam.seq}:${k}`, points: 3, keys: ['calcx', 'anal', 'seq', 'letters'], vars: ['x', 'n'],
     parts, subgoals: RD_SUB,
-    hints: H('Une intégration par parties qui fait baisser la puissance : u = la puissance n-ième.', MT(fam.ipp), MT(fam.rec)),
+    hints: H(t('Une intégration par parties qui fait baisser la puissance : u = la puissance n-ième.'), MT(fam.ipp), MT(fam.rec)),
     baits: ['a1_reduction_index', 'a1_ibp_boundary_term'],
   }, level, rng, opts);
 }
@@ -158,9 +159,9 @@ function rdWallis(level, rng, opts) {
   const k = rng.pick([3, 4, 5]);
   const seq = { W: 'int(sin(x)^n,x,0,π/2)' };
   const lines = [
-    E('(n-1)×int(sin(x)^(n-2)×cos(x)^2,x,0,π/2)', 'IPP : u = sinⁿ⁻¹x, v′ = sin x (le terme de bord est nul)', 'ipp', 'ipp'),
+    E('(n-1)×int(sin(x)^(n-2)×cos(x)^2,x,0,π/2)', t('IPP : u = sinⁿ⁻¹x, v′ = sin x (le terme de bord est nul)'), 'ipp', 'ipp'),
     E('(n-1)×(W_(n-2)-W_n)', 'cos²x = 1 − sin²x', 'ipp', 'rec'),
-    E('(n-1)/n×W_(n-2)', 'Résoudre en Wₙ', 'rec', 'rec'),
+    E('(n-1)/n×W_(n-2)', t('Résoudre en Wₙ'), 'rec', 'rec'),
   ];
   // Wₖ = ∏ (j − 1)/j · W₀ or W₁.
   let c = q(1);
@@ -171,11 +172,11 @@ function rdWallis(level, rng, opts) {
   for (let j = k; j >= 2; j -= 2) prodText.push(`(${j - 1}/${j})`);
   const parts = [
     { start: 'W_n', judge: { kind: 'definite', seq, param: 'n', nRange: [2, 6], recurrence: true }, lines },
-    { html: `Calcule W${'₀₁₂₃₄₅'[k]}`, start: `W_${k}`, judge: { kind: 'definite', seq },
-      lines: [E(`${prodText.join('')}W_${base}`, 'Remonter', 'up', 'up'), E(val.text(), base ? 'W₁ = 1' : 'W₀ = π/2', 'up', 'eval')] },
+    { html: t('Calcule W{p1}', { p1: '₀₁₂₃₄₅'[k] }), start: `W_${k}`, judge: { kind: 'definite', seq },
+      lines: [E(`${prodText.join('')}W_${base}`, t('Remonter'), 'up', 'up'), E(val.text(), base ? 'W₁ = 1' : 'W₀ = π/2', 'up', 'eval')] },
   ];
   return intItem({
-    skill: RD, prompt: `Soit Wₙ = ∫₀^(π/2) sinⁿx dx. Trouve une relation entre Wₙ et Wₙ₋₂ (n ≥ 2), puis calcule W${'₀₁₂₃₄₅'[k]}.`,
+    skill: RD, prompt: t('Soit Wₙ = ∫₀^(π/2) sinⁿx dx. Trouve une relation entre Wₙ et Wₙ₋₂ (n ≥ 2), puis calcule W{p1}.', { p1: '₀₁₂₃₄₅'[k] }),
     key: `W:${k}`, points: 3, keys: ['calcx', 'calcfn', 'anal', 'seq', 'letters'], vars: ['x', 'n'], parts, subgoals: RD_SUB,
     hints: [], baits: ['a1_reduction_index'],
   }, level, rng, opts);
@@ -197,9 +198,9 @@ function rdMcq(rng) {
     { html: MT(run((j) => q(-j), fam.Aval).text()), correct: false, rule: 'a1_ibp_sign' },
   ];
   return mcq({
-    skill: RD, level: 4, prompt: `Soit ${fam.title}. Alors ${fam.name}${'₀₁₂₃₄₅'[k]} =`, key: `mcq:${fam.name}${k}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240,
+    skill: RD, level: 4, prompt: t('Soit {title}. Alors {name}{p1} =', { title: fam.title, name: fam.name, p1: '₀₁₂₃₄₅'[k] }), key: `mcq:${fam.name}${k}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240,
     options: uniq(opts),
-    solution: [{ html: `${MT(`${fam.name}_n`)} = ${MT(fam.rec)}, ${MT(`${fam.name}_0`)} = ${MT(fam.J0text)}, donc ${MT(`${fam.name}_${k}`)} = ${MT(right.text())}.`, note: '' }],
+    solution: [{ html: t('{p1} = {rec}, {p2} = {J0text}, donc {p3} = {p4}.', { p1: MT(`${fam.name}_n`), rec: MT(fam.rec), p2: MT(`${fam.name}_0`), J0text: MT(fam.J0text), p3: MT(`${fam.name}_${k}`), p4: MT(right.text()) }), note: '' }],
   }, rng);
 }
 
@@ -211,18 +212,18 @@ GEN_[RD] = (level, rng, profile, opts = {}) => (opts.exam === 'mcq' ? rdMcq(rng)
 
 const RA = 'a1-int-rational';
 const RA_SUB = [
-  { id: 'div', label: 'division', skill: 'g0-long-div' },
-  { id: 'des', label: 'décomposition en éléments simples', skill: 'g0-pfd-general' },
-  { id: 'int', label: 'intégrer', skill: RA },
+  { id: 'div', label: t('division'), skill: 'g0-long-div' },
+  { id: 'des', label: t('décomposition en éléments simples'), skill: 'g0-pfd-general' },
+  { id: 'int', label: t('intégrer'), skill: RA },
 ];
 const RA_CHOICES = [
-  { id: 'div', label: 'Division euclidienne' },
-  { id: 'factor', label: 'Factoriser Q' },
-  { id: 'des', label: 'Décomposer en éléments simples' },
-  { id: 'split', label: 'Séparer dérivée + constante, compléter le carré' },
-  { id: 'int', label: 'Intégrer : Log et Arctg' },
-  { id: 'eval', label: 'Évaluer aux bornes' },
-  { id: 'log', label: 'Prendre Log|Q|', rule: 'a1_int_log_of_denominator', why: 'Log|Q| a pour dérivée Q′/Q : le numérateur n\'est pas Q′.' },
+  { id: 'div', label: t('Division euclidienne') },
+  { id: 'factor', label: t('Factoriser Q') },
+  { id: 'des', label: t('Décomposer en éléments simples') },
+  { id: 'split', label: t('Séparer dérivée + constante, compléter le carré') },
+  { id: 'int', label: t('Intégrer : Log et Arctg') },
+  { id: 'eval', label: t('Évaluer aux bornes') },
+  { id: 'log', label: t('Prendre Log|Q|'), rule: 'a1_int_log_of_denominator', why: t('Log|Q| a pour dérivée Q′/Q : le numérateur n\'est pas Q′.') },
 ];
 
 // Polynomials as arrays of Q (c[i] for xⁱ).
@@ -391,21 +392,21 @@ function raValue(d) {
 
 function raDecisions(d, T) {
   const dec = {
-    prompt: 'Quelle méthode ?',
+    prompt: t('Quelle méthode ?'),
     options: [
-      { id: 'des', label: d.kind === 'div' ? 'Division, puis décomposition en éléments simples' : 'Décomposition en éléments simples', valid: true, quality: 'good' },
-      { id: 'subst-den', label: d.kind === 'L' ? `t = ${pl(T.Q2t)}` : 't = dénominateur', valid: false, why: 'Le numérateur n\'est pas proportionnel à la dérivée du dénominateur.' },
-      { id: 'parts', label: 'Intégration par parties', valid: true, quality: 'poor', why: 'Juste en principe, mais chaque IPP laisse une fraction rationnelle aussi compliquée.' },
-      { id: 'log-den', label: 'Log|dénominateur|', valid: false, rule: 'a1_int_log_of_denominator', why: 'Log|Q| a pour dérivée Q′/Q : le numérateur n\'est pas Q′.' },
+      { id: 'des', label: d.kind === 'div' ? t('Division, puis décomposition en éléments simples') : t('Décomposition en éléments simples'), valid: true, quality: 'good' },
+      { id: 'subst-den', label: d.kind === 'L' ? `t = ${pl(T.Q2t)}` : t('t = dénominateur'), valid: false, why: t('Le numérateur n\'est pas proportionnel à la dérivée du dénominateur.') },
+      { id: 'parts', label: t('Intégration par parties'), valid: true, quality: 'poor', why: t('Juste en principe, mais chaque IPP laisse une fraction rationnelle aussi compliquée.') },
+      { id: 'log-den', label: t('Log|dénominateur|'), valid: false, rule: 'a1_int_log_of_denominator', why: t('Log|Q| a pour dérivée Q′/Q : le numérateur n\'est pas Q′.') },
     ],
-    l2: ['log-den'], taken: d.kind === 'div' ? 'division (deg P = deg Q), puis décomposition en éléments simples' : `décomposition en éléments simples : ${T.forms.good}`,
+    l2: ['log-den'], taken: d.kind === 'div' ? t('division (deg P = deg Q), puis décomposition en éléments simples') : t('décomposition en éléments simples : {good}', { good: T.forms.good }),
   };
   const dec2 = {
-    prompt: 'Quelle forme pour la décomposition ?',
+    prompt: t('Quelle forme pour la décomposition ?'),
     options: [
       { id: 'good', label: T.forms.good, valid: true, quality: 'good' },
-      { id: 'bad1', label: T.forms.bad1, valid: false, rule: 'a1_des_wrong_form', why: d.kind === 'L' ? 'Sur un facteur de degré 2 sans racine, le numérateur est de degré 1 : Bx + C.' : d.kind === 'D' ? 'La racine double demande aussi un terme B/(x − a)².' : 'deg P = deg Q : il faut d\'abord diviser (partie entière 1).' },
-      { id: 'bad2', label: T.forms.bad2, valid: false, ...(d.kind === 'D' ? { rule: 'a1_des_wrong_form' } : {}), why: d.kind === 'L' ? 'Ce facteur de degré 2 n\'a pas de racine réelle (Δ < 0) : il ne se factorise pas.' : d.kind === 'D' ? 'Il faut les deux termes A/(x − a) et B/(x − a)².' : 'Les deux facteurs sont de degré 1 : des numérateurs constants suffisent.' },
+      { id: 'bad1', label: T.forms.bad1, valid: false, rule: 'a1_des_wrong_form', why: d.kind === 'L' ? t('Sur un facteur de degré 2 sans racine, le numérateur est de degré 1 : Bx + C.') : d.kind === 'D' ? t('La racine double demande aussi un terme B/(x − a)².') : t('deg P = deg Q : il faut d\'abord diviser (partie entière 1).') },
+      { id: 'bad2', label: T.forms.bad2, valid: false, ...(d.kind === 'D' ? { rule: 'a1_des_wrong_form' } : {}), why: d.kind === 'L' ? t('Ce facteur de degré 2 n\'a pas de racine réelle (Δ < 0) : il ne se factorise pas.') : d.kind === 'D' ? t('Il faut les deux termes A/(x − a) et B/(x − a)².') : t('Les deux facteurs sont de degré 1 : des numérateurs constants suffisent.') },
     ],
   };
   return { dec, dec2 };
@@ -428,34 +429,34 @@ function raItem(level, rng, opts = {}) {
     const { lo, hi } = d.bounds;
     const start = `int(${T.f},x,${lo},${hi})`;
     const lines = [
-      ...(d.kind === 'div' ? [E(`int(${T.div},x,${lo},${hi})`, 'Division', 'div', 'div')] : []),
-      E(`int(${T.des},x,${lo},${hi})`, 'Éléments simples', 'des', 'des'),
-      E(`bracket(${T.F},x,${lo},${hi})`, 'Intégrer', 'int', 'int'),
-      E(raValue(d).text(), 'Évaluer', 'int', 'eval'),
+      ...(d.kind === 'div' ? [E(`int(${T.div},x,${lo},${hi})`, t('Division'), 'div', 'div')] : []),
+      E(`int(${T.des},x,${lo},${hi})`, t('Éléments simples'), 'des', 'des'),
+      E(`bracket(${T.F},x,${lo},${hi})`, t('Intégrer'), 'int', 'int'),
+      E(raValue(d).text(), t('Évaluer'), 'int', 'eval'),
     ];
     return intItem({
-      skill: RA, prompt: `Calcule ${MT(start)}.`, key: start, points: 4, fallback: d.fallback,
+      skill: RA, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 4, fallback: d.fallback,
       parts: [{ start, judge: { kind: 'definite', prims }, lines, dec, dec2, choices: RA_CHOICES }],
       hints: [], subgoals: RA_SUB,
     }, level, rng, opts);
   }
   const start = `int(${f0},x)`;
   const desLines = [];
-  if (expanded) desLines.push(E(T.f, 'Factoriser Q', 'des', 'factor'));
-  if (d.kind === 'div') desLines.push(E(T.div, 'Division euclidienne', 'div', 'div'));
+  if (expanded) desLines.push(E(T.f, t('Factoriser Q'), 'des', 'factor'));
+  if (d.kind === 'div') desLines.push(E(T.div, t('Division euclidienne'), 'div', 'div'));
   const coefs = d.kind === 'L' ? [{ num: `${d.A}/${pf(lin(d.a))}` }, { num: `(${ptext([q(d.C), q(d.B)])})/(${T.Q2t})` }]
     : d.kind === 'D' ? [{ num: `${d.B}/${pf(lin(d.a))}^2` }, { num: `${d.C}/${pf(lin(d.b))}` }] : [{ num: `${d.A}/${pf(lin(d.a))}` }, { num: `${d.B}/${pf(lin(d.b))}` }];
-  desLines.push(E(T.des, 'Éléments simples', 'des', 'des', coefs, coefs.slice(0, 1)));
-  const intLines = [E(`int(${T.des},x)`, 'Intégrer les éléments simples', 'int', 'des')];
-  if (T.split) intLines.push(E(T.split, 'Dérivée du dénominateur + constante, carré complété', 'int', 'split'));
-  intLines.push(E(`${T.F}+C`, d.kind === 'L' && d.E.n ? 'Log et Arctg' : 'Log', 'int', 'int'));
+  desLines.push(E(T.des, t('Éléments simples'), 'des', 'des', coefs, coefs.slice(0, 1)));
+  const intLines = [E(`int(${T.des},x)`, t('Intégrer les éléments simples'), 'int', 'des')];
+  if (T.split) intLines.push(E(T.split, t('Dérivée du dénominateur + constante, carré complété'), 'int', 'split'));
+  intLines.push(E(`${T.F}+C`, d.kind === 'L' && d.E.n ? t('Log et Arctg') : 'Log', 'int', 'int'));
   const parts = [
-    firstPart(f0, [V], desLines, { judge: { domain, target: 'partial-fractions' }, dec, dec2, choices: RA_CHOICES, note: 'Décompose la fraction.' }),
-    { html: 'L’intégrale', start, judge: { kind: 'antideriv', v: V, domain, prims }, lines: intLines, choices: RA_CHOICES },
+    firstPart(f0, [V], desLines, { judge: { domain, target: 'partial-fractions' }, dec, dec2, choices: RA_CHOICES, note: t('Décompose la fraction.') }),
+    { html: t('L’intégrale'), start, judge: { kind: 'antideriv', v: V, domain, prims }, lines: intLines, choices: RA_CHOICES },
   ];
   return intItem({
-    skill: RA, prompt: `Calcule ${MT(start)}.`, key: start, points: 4, fallback: d.fallback, parts,
-    hints: H(d.kind === 'L' ? 'Facteur de degré 2 sans racine : numérateur Bx + C. Ensuite, sépare la dérivée du dénominateur et complète le carré.' : d.kind === 'D' ? 'Racine double : A/(x − a) + B/(x − a)², puis C/(x − b).' : 'deg P = deg Q : divise d\'abord, puis décompose le reste.', MT(T.des), MT(`${T.F}+C`)),
+    skill: RA, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 4, fallback: d.fallback, parts,
+    hints: H(d.kind === 'L' ? t('Facteur de degré 2 sans racine : numérateur Bx + C. Ensuite, sépare la dérivée du dénominateur et complète le carré.') : d.kind === 'D' ? t('Racine double : A/(x − a) + B/(x − a)², puis C/(x − b).') : t('deg P = deg Q : divise d\'abord, puis décompose le reste.'), MT(T.des), MT(`${T.F}+C`)),
     subgoals: RA_SUB, baits: ['a1_des_wrong_form'],
   }, level, rng, opts);
 }
@@ -498,18 +499,18 @@ GEN_[RA] = (level, rng, profile, opts = {}) => (opts.exam === 'mcq' ? raMcq(rng)
 
 const TR = 'a1-int-trig';
 const TR_SUB = [
-  { id: 'bioche', label: 'règles de Bioche, changer dx', skill: 'g3-bioche' },
-  { id: 'frac', label: 'fraction en t', skill: RA },
-  { id: 'back', label: 'revenir en x', skill: TR },
+  { id: 'bioche', label: t('règles de Bioche, changer dx'), skill: 'g3-bioche' },
+  { id: 'frac', label: t('fraction en t'), skill: RA },
+  { id: 'back', label: t('revenir en x'), skill: TR },
 ];
 const TR_CHOICES = [
-  { id: 'dt', label: 'Exprimer dt (ou dx)' },
-  { id: 'subst', label: 'Exprimer en t' },
-  { id: 'div', label: 'Diviser, ou décomposer en éléments simples' },
-  { id: 'int', label: 'Intégrer en t' },
-  { id: 'back', label: 'Revenir en x' },
-  { id: 'eval', label: 'Évaluer aux bornes' },
-  { id: 'nodx', label: 'Remplacer dx par dt', rule: 'a1_trig_subst_dx', why: 'dx = 2 dt/(1 + t²) avec t = tan(x/2).' },
+  { id: 'dt', label: t('Exprimer dt (ou dx)') },
+  { id: 'subst', label: t('Exprimer en t') },
+  { id: 'div', label: t('Diviser, ou décomposer en éléments simples') },
+  { id: 'int', label: t('Intégrer en t') },
+  { id: 'back', label: t('Revenir en x') },
+  { id: 'eval', label: t('Évaluer aux bornes') },
+  { id: 'nodx', label: t('Remplacer dx par dt'), rule: 'a1_trig_subst_dx', why: t('dx = 2 dt/(1 + t²) avec t = tan(x/2).') },
 ];
 
 // Bioche with t = cos x (fn 'cos', f = sinᵐx·R(cos x)) or t = sin x.
@@ -605,28 +606,28 @@ function trDecision(d) {
   if (d.tpl === 'bioche') {
     const inv = d.fn === 'cos' ? 'x → −x' : 'x → π − x';
     const dec = {
-      prompt: 'Quelle méthode ?',
+      prompt: t('Quelle méthode ?'),
       options: [
-        { id: 'bioche', label: 'Règles de Bioche', valid: true, quality: 'good', then: { ask: 't =', expect: d.t, vars: [V], why: `f(x) dx est invariant par ${inv} : pose t = ${d.fn} x.` } },
-        { id: 'tan-half', label: 't = tan(x/2)', valid: true, quality: 'poor', why: 'Juste, mais on obtient une fraction de degré 6 en t ; Bioche donnait une fraction de degré 2.' },
-        { id: 'lin', label: `Linéariser ${d.other}³x`, valid: true, quality: 'poor', why: 'Juste pour le numérateur, mais le dénominateur reste.' },
-        { id: 'parts', label: 'Intégration par parties', valid: false, why: 'Aucun facteur simple à dériver.' },
+        { id: 'bioche', label: t('Règles de Bioche'), valid: true, quality: 'good', then: { ask: 't =', expect: d.t, vars: [V], why: t('f(x) dx est invariant par {inv} : pose t = {fn} x.', { inv, fn: d.fn }) } },
+        { id: 'tan-half', label: 't = tan(x/2)', valid: true, quality: 'poor', why: t('Juste, mais on obtient une fraction de degré 6 en t ; Bioche donnait une fraction de degré 2.') },
+        { id: 'lin', label: t('Linéariser {other}³x', { other: d.other }), valid: true, quality: 'poor', why: t('Juste pour le numérateur, mais le dénominateur reste.') },
+        { id: 'parts', label: t('Intégration par parties'), valid: false, why: t('Aucun facteur simple à dériver.') },
       ],
-      l2: [], taken: `${inv} laisse f(x) dx invariant : t = ${d.fn} x, dt = ${d.dtw} dx`,
+      l2: [], taken: t('{inv} laisse f(x) dx invariant : t = {fn} x, dt = {dtw} dx', { inv, fn: d.fn, dtw: d.dtw }),
     };
     const dec2 = {
-      prompt: 'Quelle transformation laisse f(x) dx invariant ?',
-      options: [inv, ...['x → −x', 'x → π − x', 'x → π + x'].filter((o) => o !== inv)].map((o) => ({ id: o, label: `${o} : ${o === 'x → −x' ? 't = cos x' : o === 'x → π − x' ? 't = sin x' : 't = tan x'}`, valid: o === inv, ...(o === inv ? { quality: 'good' } : { why: `f(x) dx change de signe par ${o}.` }) })),
+      prompt: t('Quelle transformation laisse f(x) dx invariant ?'),
+      options: [inv, ...['x → −x', 'x → π − x', 'x → π + x'].filter((o) => o !== inv)].map((o) => ({ id: o, label: `${o} : ${o === 'x → −x' ? 't = cos x' : o === 'x → π − x' ? 't = sin x' : 't = tan x'}`, valid: o === inv, ...(o === inv ? { quality: 'good' } : { why: t('f(x) dx change de signe par {o}.', { o }) }) })),
     };
     return { dec, dec2 };
   }
   const dec = {
-    prompt: 'Quelle méthode ?',
+    prompt: t('Quelle méthode ?'),
     options: [
-      { id: 'tan-half', label: 't = tan(x/2)', valid: true, quality: 'good', then: { ask: 't =', expect: 'tan(x/2)', vars: [V], domain: { x: [0.2, 2.5] }, why: 'Aucune règle de Bioche ne s\'applique : t = tan(x/2) marche toujours.' } },
-      { id: 'cos', label: 't = cos x', valid: false, why: 'f(x) dx n\'est pas invariant par x → −x.' },
-      { id: 'nodx', label: 't = tan(x/2) et dx = dt', valid: false, rule: 'a1_trig_subst_dx', why: 'x = 2 Arctg t, donc dx = 2 dt/(1 + t²).' },
-      { id: 'parts', label: 'Intégration par parties', valid: false, why: 'Aucun facteur simple à dériver.' },
+      { id: 'tan-half', label: 't = tan(x/2)', valid: true, quality: 'good', then: { ask: 't =', expect: 'tan(x/2)', vars: [V], domain: { x: [0.2, 2.5] }, why: t('Aucune règle de Bioche ne s\'applique : t = tan(x/2) marche toujours.') } },
+      { id: 'cos', label: 't = cos x', valid: false, why: t('f(x) dx n\'est pas invariant par x → −x.') },
+      { id: 'nodx', label: t('t = tan(x/2) et dx = dt'), valid: false, rule: 'a1_trig_subst_dx', why: t('x = 2 Arctg t, donc dx = 2 dt/(1 + t²).') },
+      { id: 'parts', label: t('Intégration par parties'), valid: false, why: t('Aucun facteur simple à dériver.') },
     ],
     l2: ['nodx'], taken: 't = tan(x/2) : cos x = (1 − t²)/(1 + t²), sin x = 2t/(1 + t²), dx = 2 dt/(1 + t²)',
   };
@@ -647,34 +648,34 @@ function trItem(level, rng, opts = {}) {
     const start = `int(${d.f},x,${B.a},${B.b})`;
     const value = d.tpl === 'bioche' ? biocheValue(d) : d.value();
     const lines = [
-      E(`int(${d.inT},t,${ta},${tb})`, 'Exprimer en t, avec dt et les bornes', 'bioche', 'subst', [], []),
-      ...(d.simple ? [E(`int(${d.simple},t,${ta},${tb})`, 'Simplifier', 'frac', 'div')] : []),
-      E(`bracket(${d.Ft},t,${ta},${tb})`, 'Intégrer en t', 'frac', 'int'),
-      E(value.text(), 'Évaluer', 'frac', 'eval'),
+      E(`int(${d.inT},t,${ta},${tb})`, t('Exprimer en t, avec dt et les bornes'), 'bioche', 'subst', [], []),
+      ...(d.simple ? [E(`int(${d.simple},t,${ta},${tb})`, t('Simplifier'), 'frac', 'div')] : []),
+      E(`bracket(${d.Ft},t,${ta},${tb})`, t('Intégrer en t'), 'frac', 'int'),
+      E(value.text(), t('Évaluer'), 'frac', 'eval'),
     ];
     return intItem({
-      skill: TR, prompt: `Calcule ${MT(start)}.`, key: start, points: 4,
+      skill: TR, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 4,
       parts: [{ start, judge: { kind: 'definite', change: { t: d.t, x: d.tpl === 'bioche' ? `arc${d.fn}(t)` : '2arctan(t)' } }, lines, dec, dec2, choices: TR_CHOICES }],
-      hints: H(d.tpl === 'bioche' ? `Teste ${d.fn === 'cos' ? 'x → −x' : 'x → π − x'} : pose t = ${d.fn} x.` : 'Pose t = tan(x/2) : dx = 2 dt/(1 + t²).', MT(lines[0].math, { vars: ['t'] }), MT(lines[1].math, { vars: ['t'] })),
+      hints: H(d.tpl === 'bioche' ? t('Teste {p1} : pose t = {fn} x.', { p1: d.fn === 'cos' ? 'x → −x' : 'x → π − x', fn: d.fn }) : t('Pose t = tan(x/2) : dx = 2 dt/(1 + t²).'), MT(lines[0].math, { vars: ['t'] }), MT(lines[1].math, { vars: ['t'] })),
       subgoals: TR_SUB, keys: [...KEYS, 'trig'],
     }, level, rng, opts);
   }
   const start = `int(${d.f},x)`;
   const lines = [
-    E(`int(${d.inT},t)`, 'Exprimer en t', 'bioche', 'subst', d.tpl === 'bioche' ? [d.form === 'sq1' ? '1' : '1-t^2'] : ['2/(1+t^2)'], []),
-    ...(d.simple && d.tpl !== 'sin' ? [E(`int(${d.simple},t)`, 'Diviser', 'frac', 'div')] : d.simple ? [E(`int(${d.simple},t)`, 'Simplifier', 'frac', 'div')] : []),
-    E(`${d.Ft}+C`, 'Intégrer en t', 'frac', 'int'),
-    E(`${d.Fx}+C`, 'Revenir en x', 'back', 'back'),
+    E(`int(${d.inT},t)`, t('Exprimer en t'), 'bioche', 'subst', d.tpl === 'bioche' ? [d.form === 'sq1' ? '1' : '1-t^2'] : ['2/(1+t^2)'], []),
+    ...(d.simple && d.tpl !== 'sin' ? [E(`int(${d.simple},t)`, t('Diviser'), 'frac', 'div')] : d.simple ? [E(`int(${d.simple},t)`, t('Simplifier'), 'frac', 'div')] : []),
+    E(`${d.Ft}+C`, t('Intégrer en t'), 'frac', 'int'),
+    E(`${d.Fx}+C`, t('Revenir en x'), 'back', 'back'),
   ];
   const parts = [
     d.tpl === 'bioche'
-      ? firstPart(`d(${d.t})`, [V], [E(d.dt, `t = ${d.fn} x : dt = ${d.dtw} dx`, 'bioche', 'dt')], { dec, dec2, choices: TR_CHOICES, note: `t = ${d.fn} x : calcule dt/dx.` })
-      : firstPart('d(2arctan(t))', ['t'], [E('2/(1+t^2)', 'x = 2 Arctg t', 'bioche', 'dt')], { judge: { dvar: 't' }, dec, dec2, choices: TR_CHOICES, note: 't = tan(x/2), donc x = 2 Arctg t : calcule dx/dt.' }),
-    { html: 'L’intégrale', start, judge: { kind: 'antideriv', v: V, domain, subst, change: { t: d.t, x: d.tpl === 'bioche' ? `arc${d.fn}(t)` : '2arctan(t)' } }, lines, choices: TR_CHOICES },
+      ? firstPart(`d(${d.t})`, [V], [E(d.dt, `t = ${d.fn} x : dt = ${d.dtw} dx`, 'bioche', 'dt')], { dec, dec2, choices: TR_CHOICES, note: t('t = {fn} x : calcule dt/dx.', { fn: d.fn }) })
+      : firstPart('d(2arctan(t))', ['t'], [E('2/(1+t^2)', 'x = 2 Arctg t', 'bioche', 'dt')], { judge: { dvar: 't' }, dec, dec2, choices: TR_CHOICES, note: t('t = tan(x/2), donc x = 2 Arctg t : calcule dx/dt.') }),
+    { html: t('L’intégrale'), start, judge: { kind: 'antideriv', v: V, domain, subst, change: { t: d.t, x: d.tpl === 'bioche' ? `arc${d.fn}(t)` : '2arctan(t)' } }, lines, choices: TR_CHOICES },
   ];
   return intItem({
-    skill: TR, prompt: `Calcule ${MT(start)}.`, key: start, points: 4, parts,
-    hints: H(d.tpl === 'bioche' ? `Teste ${d.fn === 'cos' ? 'x → −x' : 'x → π − x'} : f(x) dx ne change pas. Pose t = ${d.fn} x.` : 'Pose t = tan(x/2) : cos x = (1 − t²)/(1 + t²), sin x = 2t/(1 + t²), dx = 2 dt/(1 + t²).', MT(lines[0].math, { vars: ['t'] }), MT(lines[lines.length - 2].math, { vars: ['t'] })),
+    skill: TR, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 4, parts,
+    hints: H(d.tpl === 'bioche' ? t('Teste {p1} : f(x) dx ne change pas. Pose t = {fn} x.', { p1: d.fn === 'cos' ? 'x → −x' : 'x → π − x', fn: d.fn }) : t('Pose t = tan(x/2) : cos x = (1 − t²)/(1 + t²), sin x = 2t/(1 + t²), dx = 2 dt/(1 + t²).'), MT(lines[0].math, { vars: ['t'] }), MT(lines[lines.length - 2].math, { vars: ['t'] })),
     subgoals: TR_SUB, keys: [...KEYS, 'trig'], baits: d.tpl === 'bioche' ? ['a1_subst_dx_kept'] : ['a1_trig_subst_dx'],
   }, level, rng, opts);
 }
@@ -689,7 +690,7 @@ function trMcq(rng) {
       { html: MT(`${cm(k, 'ln(|sin(x)|)')}+C`), correct: false, rule: 'a1_int_log_of_denominator' },
     ];
     return mcq({
-      skill: TR, level: 4, prompt: `Sur ]0 ; π[, ${MT(`int(${k}/sin(x),x)`)} =`, key: `mcq:sin${k}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240, options: opts,
+      skill: TR, level: 4, prompt: t('Sur ]0 ; π[, {p1} =', { p1: MT(`int(${k}/sin(x),x)`) }), key: `mcq:sin${k}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240, options: opts,
       solution: [{ html: `t = tan(x/2), dx = 2 dt/(1 + t²), sin x = 2t/(1 + t²) : ${MT(`int(${k}/t,t)`, { vars: ['t'] })}.`, note: '' }],
     }, rng);
   }
@@ -717,18 +718,18 @@ GEN_[TR] = (level, rng, profile, opts = {}) => (opts.exam === 'mcq' ? trMcq(rng)
 
 const HY = 'a1-int-hyper';
 const HY_SUB = [
-  { id: 'subst', label: 'changement de variable', skill: 'a1-int-subst' },
+  { id: 'subst', label: t('changement de variable'), skill: 'a1-int-subst' },
   { id: 'identity', label: 'cosh² − sinh² = 1', skill: 'g2-hyp-formulas' },
-  { id: 'int', label: 'intégrer, revenir en x', skill: HY },
+  { id: 'int', label: t('intégrer, revenir en x'), skill: HY },
 ];
 const HY_CHOICES = [
-  { id: 'dx', label: 'Exprimer dx' },
-  { id: 'subst', label: 'Remplacer x et dx' },
-  { id: 'identity', label: 'Simplifier la racine : cosh² − sinh² = 1' },
-  { id: 'int', label: 'Intégrer' },
-  { id: 'back', label: 'Revenir en x (Argsh, Argch)' },
-  { id: 'eval', label: 'Évaluer' },
-  { id: 'trig', label: 'Utiliser cosh² + sinh² = 1', rule: 'a1_hyper_identity_sign', why: 'Pour les hyperboliques : cosh² − sinh² = 1.' },
+  { id: 'dx', label: t('Exprimer dx') },
+  { id: 'subst', label: t('Remplacer x et dx') },
+  { id: 'identity', label: t('Simplifier la racine : cosh² − sinh² = 1') },
+  { id: 'int', label: t('Intégrer') },
+  { id: 'back', label: t('Revenir en x (Argsh, Argch)') },
+  { id: 'eval', label: t('Évaluer') },
+  { id: 'trig', label: t('Utiliser cosh² + sinh² = 1'), rule: 'a1_hyper_identity_sign', why: t('Pour les hyperboliques : cosh² − sinh² = 1.') },
 ];
 // x = a·sinh t on [0 ; b·a]: t from 0 to Log m (argsh(b) = Log m).
 const SH_B = [[q(3, 4), 2], [q(4, 3), 3], [q(12, 5), 5]];
@@ -775,21 +776,21 @@ function hyExpItem(level, rng, opts) {
   const start = `int(e^x/(e^(2x)-1),x,${b},∞)`;
   const lines = [
     E(`int(1/(t^2-1),t,${tb},∞)`, 't = eˣ, dt = eˣ dx, e²ˣ = t²', 'subst', 'subst'),
-    E(`int((1/2)(1/(t-1)-1/(t+1)),t,${tb},∞)`, 'Éléments simples', 'int', 'int'),
-    E(value, '[½·Log((t − 1)/(t + 1))] : la limite en +∞ vaut 0', 'int', 'eval'),
+    E(`int((1/2)(1/(t-1)-1/(t+1)),t,${tb},∞)`, t('Éléments simples'), 'int', 'int'),
+    E(value, t('[½·Log((t − 1)/(t + 1))] : la limite en +∞ vaut 0'), 'int', 'eval'),
   ];
   const dec = {
-    prompt: 'Quelle méthode ?',
+    prompt: t('Quelle méthode ?'),
     options: [
-      { id: 'exp', label: 'Changement de variable', valid: true, quality: 'good', then: { ask: 't =', expect: 'e^x', vars: [V], why: 'Avec eˣ partout, pose t = eˣ.' } },
-      { id: 'sinh', label: 'Écrire 1/(2 sinh x)', valid: true, quality: 'poor', why: 'Juste, mais il faut encore une substitution pour intégrer 1/sinh x.' },
-      { id: 'keep', label: 't = eˣ en gardant les bornes', valid: false, rule: 'a1_subst_bounds_kept', why: 'Quand x va de b à +∞, t = eˣ va de eᵇ à +∞.' },
-      { id: 'parts', label: 'Intégration par parties', valid: false, why: 'Aucun facteur ne se simplifie en dérivant.' },
+      { id: 'exp', label: t('Changement de variable'), valid: true, quality: 'good', then: { ask: 't =', expect: 'e^x', vars: [V], why: t('Avec eˣ partout, pose t = eˣ.') } },
+      { id: 'sinh', label: t('Écrire 1/(2 sinh x)'), valid: true, quality: 'poor', why: t('Juste, mais il faut encore une substitution pour intégrer 1/sinh x.') },
+      { id: 'keep', label: t('t = eˣ en gardant les bornes'), valid: false, rule: 'a1_subst_bounds_kept', why: t('Quand x va de b à +∞, t = eˣ va de eᵇ à +∞.') },
+      { id: 'parts', label: t('Intégration par parties'), valid: false, why: t('Aucun facteur ne se simplifie en dérivant.') },
     ],
     l2: ['keep'], taken: 't = eˣ',
   };
   return intItem({
-    skill: HY, prompt: `Calcule l'intégrale généralisée ${MT(start)} (elle converge : l'intégrande se comporte comme e⁻ˣ en +∞).`, key: start, points: 4,
+    skill: HY, prompt: t('Calcule l\'intégrale généralisée {start} (elle converge : l\'intégrande se comporte comme e⁻ˣ en +∞).', { start: MT(start) }), key: start, points: 4,
     parts: [{ start, judge: { kind: 'definite', change: { t: 'e^x', x: 'ln(t)' } }, lines, dec, choices: HY_CHOICES }],
     hints: [], subgoals: HY_SUB, keys: [...KEYS, 'explog'],
   }, level, rng, opts);
@@ -804,12 +805,12 @@ function hyItem(level, rng, opts = {}) {
   const d = hyRoot(rng, def, lv === 2 ? rng.chance(0.7) : rng.chance(0.65));
   const sh = d.tpl === 'sinh';
   const dec = {
-    prompt: 'Quelle méthode ?',
+    prompt: t('Quelle méthode ?'),
     options: [
       { id: 'good', label: `x = ${d.a === 1 ? '' : d.a} ${d.fn} t`, valid: true, quality: 'good' },
-      { id: 'other', label: sh ? `x = ${d.a === 1 ? '' : d.a} tan t` : `x = ${d.a === 1 ? '' : d.a}/cos t`, valid: true, quality: 'poor', why: 'Juste, mais on arrive à une intégrale de 1/cos t, qui demande encore une substitution.' },
-      { id: 'wrong', label: `x = ${d.a === 1 ? '' : d.a} ${d.gn} t`, valid: false, why: sh ? 'cosh t ≥ 1 : x ne parcourt pas ℝ, et la racine ne se simplifie pas.' : `${d.a * d.a}sinh²t − ${d.a * d.a} ne se simplifie pas.` },
-      { id: 'log', label: `Log(x² ${sh ? '+' : '−'} ${d.a * d.a})`, valid: false, rule: 'a1_int_log_of_denominator', why: 'La dérivée de Log(x² + a²) est 2x/(x² + a²) : ce n\'est pas l\'intégrande.' },
+      { id: 'other', label: sh ? `x = ${d.a === 1 ? '' : d.a} tan t` : `x = ${d.a === 1 ? '' : d.a}/cos t`, valid: true, quality: 'poor', why: t('Juste, mais on arrive à une intégrale de 1/cos t, qui demande encore une substitution.') },
+      { id: 'wrong', label: `x = ${d.a === 1 ? '' : d.a} ${d.gn} t`, valid: false, why: sh ? t('cosh t ≥ 1 : x ne parcourt pas ℝ, et la racine ne se simplifie pas.') : t('{p1}sinh²t − {p1} ne se simplifie pas.', { p1: d.a * d.a }) },
+      { id: 'log', label: `Log(x² ${sh ? '+' : '−'} ${d.a * d.a})`, valid: false, rule: 'a1_int_log_of_denominator', why: t('La dérivée de Log(x² + a²) est 2x/(x² + a²) : ce n\'est pas l\'intégrande.') },
     ],
     l2: ['wrong'], taken: `x = ${d.a === 1 ? '' : d.a} ${d.fn} t, dx = ${d.a === 1 ? '' : d.a} ${d.gn} t dt`,
   };
@@ -820,32 +821,32 @@ function hyItem(level, rng, opts = {}) {
     const B = d.bounds;
     const start = `int(${d.f},x,${B.a},${B.b})`;
     const lines = [
-      E(`int(${d.inT},t,${B.ta},${B.tb})`, 'Remplacer x, dx et les bornes', 'subst', 'subst', [d.dx], [d.dx]),
+      E(`int(${d.inT},t,${B.ta},${B.tb})`, t('Remplacer x, dx et les bornes'), 'subst', 'subst', [d.dx], [d.dx]),
       E(`int(${d.simple},t,${B.ta},${B.tb})`, idNote, 'identity', 'identity'),
-      E(`bracket(t,t,${B.ta},${B.tb})`, 'Intégrer', 'int', 'int'),
-      E(B.value.text(), 'Évaluer', 'int', 'eval'),
+      E(`bracket(t,t,${B.ta},${B.tb})`, t('Intégrer'), 'int', 'int'),
+      E(B.value.text(), t('Évaluer'), 'int', 'eval'),
     ];
     return intItem({
-      skill: HY, prompt: `Calcule ${MT(start)}.`, key: start, points: 3,
+      skill: HY, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 3,
       parts: [{ start, judge: { kind: 'definite', change }, lines, dec, choices: HY_CHOICES }],
-      hints: H(`√(x² ${sh ? '+' : '−'} ${d.a * d.a}) : pense à ${idNote}. Pose x = ${d.a === 1 ? '' : d.a} ${d.fn} t.`, MT(lines[0].math, { vars: ['t'] }), MT(lines[1].math, { vars: ['t'] })),
+      hints: H(t('√(x² {p1} {p2}) : pense à {idNote}. Pose x = {p3} {fn} t.', { p1: sh ? '+' : '−', p2: d.a * d.a, idNote, p3: d.a === 1 ? '' : d.a, fn: d.fn }), MT(lines[0].math, { vars: ['t'] }), MT(lines[1].math, { vars: ['t'] })),
       subgoals: HY_SUB, keys: [...KEYS, 'explog'],
     }, level, rng, opts);
   }
   const start = `int(${d.f},x)`;
   const lines = [
-    E(`int(${d.inT},t)`, 'Remplacer x et dx', 'subst', 'subst', [d.dx], []),
+    E(`int(${d.inT},t)`, t('Remplacer x et dx'), 'subst', 'subst', [d.dx], []),
     E(`int(${d.simple},t)`, idNote, 'identity', 'identity'),
-    E('t+C', 'Intégrer', 'int', 'int'),
-    E(`${d.Fx}+C`, 'Revenir en x', 'back', 'back'),
+    E('t+C', t('Intégrer'), 'int', 'int'),
+    E(`${d.Fx}+C`, t('Revenir en x'), 'back', 'back'),
   ];
   const parts = [
-    firstPart(`d(${d.xt})`, ['t'], [E(d.dx, `x = ${d.a === 1 ? '' : d.a} ${d.fn} t`, 'subst', 'dx')], { judge: { dvar: 't' }, dec, choices: HY_CHOICES, note: `x = ${d.a === 1 ? '' : d.a} ${d.fn} t : calcule dx/dt.` }),
-    { html: 'L’intégrale', start, judge: { kind: 'antideriv', v: V, domain: { x: d.dom }, subst, change }, lines, choices: HY_CHOICES },
+    firstPart(`d(${d.xt})`, ['t'], [E(d.dx, `x = ${d.a === 1 ? '' : d.a} ${d.fn} t`, 'subst', 'dx')], { judge: { dvar: 't' }, dec, choices: HY_CHOICES, note: t('x = {p1} {fn} t : calcule dx/dt.', { p1: d.a === 1 ? '' : d.a, fn: d.fn }) }),
+    { html: t('L’intégrale'), start, judge: { kind: 'antideriv', v: V, domain: { x: d.dom }, subst, change }, lines, choices: HY_CHOICES },
   ];
   return intItem({
-    skill: HY, prompt: `Calcule ${MT(start)}${sh ? '' : ` sur ]${d.a} ; +∞[`}.`, key: start, points: 3, parts,
-    hints: H(`√(x² ${sh ? '+' : '−'} ${d.a * d.a}) : pense à ${idNote}. Pose x = ${d.a === 1 ? '' : d.a} ${d.fn} t.`, MT(lines[0].math, { vars: ['t'] }), MT(lines[1].math, { vars: ['t'] })),
+    skill: HY, prompt: t('Calcule {start}{p1}.', { start: MT(start), p1: sh ? '' : t(' sur ]{a} ; +∞[', { a: d.a }) }), key: start, points: 3, parts,
+    hints: H(t('√(x² {p1} {p2}) : pense à {idNote}. Pose x = {p3} {fn} t.', { p1: sh ? '+' : '−', p2: d.a * d.a, idNote, p3: d.a === 1 ? '' : d.a, fn: d.fn }), MT(lines[0].math, { vars: ['t'] }), MT(lines[1].math, { vars: ['t'] })),
     subgoals: HY_SUB, keys: [...KEYS, 'explog'],
   }, level, rng, opts);
 }
@@ -853,37 +854,37 @@ function hyItem(level, rng, opts = {}) {
 function hySquareItem(level, rng, opts, def) {
   const d = hySquare(rng, def);
   const dec = {
-    prompt: 'Quelle méthode ?',
+    prompt: t('Quelle méthode ?'),
     options: [
-      { id: 'lin', label: `Linéariser : ${d.fn}²x = (cosh 2x ${d.fn === 'cosh' ? '+' : '−'} 1)/2`, valid: true, quality: 'good' },
-      { id: 'sign', label: `${d.fn}²x = (${d.fn === 'cosh' ? '1 − cosh 2x' : '1 − cosh 2x'})/2`, valid: false, rule: 'a1_hyper_identity_sign', why: 'Ce sont les formules de la trigonométrie ; pour les hyperboliques, cosh 2x = cosh²x + sinh²x = 2cosh²x − 1 = 1 + 2sinh²x.' },
-      { id: 'exp', label: 'Écrire avec eˣ et e⁻ˣ', valid: true, quality: 'poor', why: 'Juste, mais plus long : il faut développer le carré.' },
-      { id: 'parts', label: `Parties avec u = ${d.fn} x`, valid: true, quality: 'poor', why: 'Juste, mais l\'intégrale revient : il faut résoudre une équation.' },
+      { id: 'lin', label: t('Linéariser : {fn}²x = (cosh 2x {p1} 1)/2', { fn: d.fn, p1: d.fn === 'cosh' ? '+' : '−' }), valid: true, quality: 'good' },
+      { id: 'sign', label: `${d.fn}²x = (${d.fn === 'cosh' ? '1 − cosh 2x' : '1 − cosh 2x'})/2`, valid: false, rule: 'a1_hyper_identity_sign', why: t('Ce sont les formules de la trigonométrie ; pour les hyperboliques, cosh 2x = cosh²x + sinh²x = 2cosh²x − 1 = 1 + 2sinh²x.') },
+      { id: 'exp', label: t('Écrire avec eˣ et e⁻ˣ'), valid: true, quality: 'poor', why: t('Juste, mais plus long : il faut développer le carré.') },
+      { id: 'parts', label: t('Parties avec u = {fn} x', { fn: d.fn }), valid: true, quality: 'poor', why: t('Juste, mais l\'intégrale revient : il faut résoudre une équation.') },
     ],
-    l2: ['sign'], taken: `linéariser : ${d.fn}²x = (cosh 2x ${d.fn === 'cosh' ? '+' : '−'} 1)/2`,
+    l2: ['sign'], taken: t('linéariser : {fn}²x = (cosh 2x {p1} 1)/2', { fn: d.fn, p1: d.fn === 'cosh' ? '+' : '−' }),
   };
   if (def) {
     const start = `int(${d.f},x,0,ln(${d.m}))`;
     const lines = [
-      E(`int(${d.lin},x,0,ln(${d.m}))`, 'Linéariser', 'identity', 'identity'),
-      E(`bracket(${d.F},x,0,ln(${d.m}))`, 'Intégrer', 'int', 'int'),
+      E(`int(${d.lin},x,0,ln(${d.m}))`, t('Linéariser'), 'identity', 'identity'),
+      E(`bracket(${d.F},x,0,ln(${d.m}))`, t('Intégrer'), 'int', 'int'),
       E(d.bounds.value.text(), `sinh(2 Log ${d.m}) = (${d.m}² − 1/${d.m}²)/2`, 'int', 'eval'),
     ];
     return intItem({
-      skill: HY, prompt: `Calcule ${MT(start)}.`, key: start, points: 3,
+      skill: HY, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 3,
       parts: [{ start, judge: { kind: 'definite' }, lines, dec, choices: HY_CHOICES }],
-      hints: H(`cosh 2x = 2cosh²x − 1 = 1 + 2sinh²x : linéarise.`, MT(lines[0].math), MT(lines[1].math)),
+      hints: H(t('cosh 2x = 2cosh²x − 1 = 1 + 2sinh²x : linéarise.'), MT(lines[0].math), MT(lines[1].math)),
       subgoals: HY_SUB, keys: [...KEYS, 'explog'], baits: ['a1_hyper_identity_sign'],
     }, level, rng, opts);
   }
   const start = `int(${d.f},x)`;
   const parts = [
-    firstPart(d.f, [V], [E(d.lin, 'cosh 2x = 2cosh²x − 1 = 1 + 2sinh²x', 'identity', 'identity')], { judge: { domain: { x: [-2, 2] } }, dec, choices: HY_CHOICES, note: `Linéarise ${d.fn}²x.` }),
-    { html: 'L’intégrale', start, judge: { kind: 'antideriv', v: V, domain: { x: [-2, 2] } }, lines: [E(`int(${d.lin},x)`, 'Linéariser', 'identity', 'identity'), E(`${d.F}+C`, 'Intégrer', 'int', 'int')], choices: HY_CHOICES },
+    firstPart(d.f, [V], [E(d.lin, 'cosh 2x = 2cosh²x − 1 = 1 + 2sinh²x', 'identity', 'identity')], { judge: { domain: { x: [-2, 2] } }, dec, choices: HY_CHOICES, note: t('Linéarise {fn}²x.', { fn: d.fn }) }),
+    { html: t('L’intégrale'), start, judge: { kind: 'antideriv', v: V, domain: { x: [-2, 2] } }, lines: [E(`int(${d.lin},x)`, t('Linéariser'), 'identity', 'identity'), E(`${d.F}+C`, t('Intégrer'), 'int', 'int')], choices: HY_CHOICES },
   ];
   return intItem({
-    skill: HY, prompt: `Calcule ${MT(start)}.`, key: start, points: 3, parts,
-    hints: H('cosh 2x = 2cosh²x − 1 = 1 + 2sinh²x : linéarise.', MT(d.lin), MT(`${d.F}+C`)),
+    skill: HY, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 3, parts,
+    hints: H(t('cosh 2x = 2cosh²x − 1 = 1 + 2sinh²x : linéarise.'), MT(d.lin), MT(`${d.F}+C`)),
     subgoals: HY_SUB, keys: [...KEYS, 'explog'], baits: ['a1_hyper_identity_sign'],
   }, level, rng, opts);
 }
@@ -903,7 +904,7 @@ function hyMcq(rng) {
     ];
     return mcq({
       skill: HY, level: 4, prompt: `${MT(start)} =`, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240, options: uniq(opts),
-      solution: [{ html: `x = ${a === 1 ? '' : a} sinh t, dx = ${a === 1 ? '' : a} cosh t dt, √(x² + ${a * a}) = ${a === 1 ? '' : a} cosh t ; t va de 0 à Argsh(${fmt(b)}) = Log ${mm}.`, note: '' }],
+      solution: [{ html: t('x = {p1} sinh t, dx = {p1} cosh t dt, √(x² + {p2}) = {p1} cosh t ; t va de 0 à Argsh({b}) = Log {mm}.', { p1: a === 1 ? '' : a, p2: a * a, b: fmt(b), mm }), note: '' }],
     }, rng);
   }
   const m = rng.pick([2, 3]);
@@ -917,7 +918,7 @@ function hyMcq(rng) {
   ];
   return mcq({
     skill: HY, level: 4, prompt: `${MT(`int(sinh(x)^2,x,0,ln(${m}))`)} =`, key: `mcq:sinh2:${m}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240, options: uniq(opts),
-    solution: [{ html: `sinh²x = (cosh 2x − 1)/2, primitive sinh(2x)/4 − x/2 ; sinh(2 Log ${m}) = ${fmt(sh2)}.`, note: '' }],
+    solution: [{ html: t('sinh²x = (cosh 2x − 1)/2, primitive sinh(2x)/4 − x/2 ; sinh(2 Log {m}) = {sh2}.', { m, sh2: fmt(sh2) }), note: '' }],
   }, rng);
 }
 const fmt = (x) => N(x).replace('-', '−');

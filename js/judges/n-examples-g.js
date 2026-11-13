@@ -7,30 +7,31 @@
 //   absOneMinusH     {h}: h > 0 with |1 − h| > 1.
 
 import { numberOf } from './n-examples-util.js';
+import { t } from '../i18n.js';
 
 export const PROPS = {
   epNotDecreasing(params, a) {
     const L = numberOf(a.lambda);
     const h = numberOf(a.h);
-    if (L === null || h === null) return { ok: false, message: 'Donne deux nombres λ et h.' };
-    if (!(L < 0)) return { ok: false, message: 'L\'énoncé suppose λ < 0.' };
-    if (!(h > 0)) return { ok: false, message: 'Le pas h doit être > 0.' };
+    if (L === null || h === null) return { ok: false, message: t('Donne deux nombres λ et h.') };
+    if (!(L < 0)) return { ok: false, message: t('L\'énoncé suppose λ < 0.') };
+    if (!(h > 0)) return { ok: false, message: t('Le pas h doit être > 0.') };
     if (Math.abs(1 + h * L) >= 1) return { ok: true };
-    return { ok: false, message: `Ici |1 + hλ| = ${String(Math.abs(1 + h * L)).replace('.', ',')} < 1 : |uₙ| décroît. Prends h plus grand.`, rule: 'n_stab_factor2' };
+    return { ok: false, message: t('Ici |1 + hλ| = {v1} < 1 : |uₙ| décroît. Prends h plus grand.', { v1: String(Math.abs(1 + h * L)).replace('.', ',') }), rule: 'n_stab_factor2' };
   },
   heunUnstable(params, a) {
     const z = numberOf(a.z);
-    if (z === null) return { ok: false, message: 'Donne un nombre z = hλ.' };
-    if (!(z < 0)) return { ok: false, message: 'Pour le problème modèle, z = hλ < 0.' };
+    if (z === null) return { ok: false, message: t('Donne un nombre z = hλ.') };
+    if (!(z < 0)) return { ok: false, message: t('Pour le problème modèle, z = hλ < 0.') };
     const R = 1 + z + (z * z) / 2;
     if (Math.abs(R) >= 1) return { ok: true };
-    return { ok: false, message: `Ici R(z) = ${String(Number(R.toPrecision(4))).replace('.', ',')} : |R| < 1, Heun est stable pour ce pas.` };
+    return { ok: false, message: t('Ici R(z) = {v1} : |R| < 1, Heun est stable pour ce pas.', { v1: String(Number(R.toPrecision(4))).replace('.', ',') }) };
   },
   absOneMinusH(params, a) {
     const h = numberOf(a.h);
-    if (h === null) return { ok: false, message: 'Donne un nombre h.' };
-    if (!(h > 0)) return { ok: false, message: 'Le pas h doit être > 0.' };
+    if (h === null) return { ok: false, message: t('Donne un nombre h.') };
+    if (!(h > 0)) return { ok: false, message: t('Le pas h doit être > 0.') };
     if (Math.abs(1 - h) > 1) return { ok: true };
-    return { ok: false, message: `Ici |1 − h| = ${String(Math.abs(1 - h)).replace('.', ',')} ≤ 1.`, rule: 'n_h_le_2_forgotten' };
+    return { ok: false, message: t('Ici |1 − h| = {v1} ≤ 1.', { v1: String(Math.abs(1 - h)).replace('.', ',') }), rule: 'n_h_le_2_forgotten' };
   },
 };

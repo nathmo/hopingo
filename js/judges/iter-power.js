@@ -17,6 +17,7 @@ import { tryParse } from '../cas/parse.js';
 import { exactValue } from '../cas/normal.js';
 import { evalFloat } from '../cas/numeric.js';
 import * as MX from '../cas/matrix.js';
+import { t } from '../i18n.js';
 
 const num = (t) => {
   if (t === null || t === undefined || String(t).trim() === '') return null;
@@ -75,9 +76,9 @@ export function checkPower(item, values) {
   for (const r of item.table.rows) {
     const vals = r.cells.map((c, j) => {
       if (!c) return null;
-      const t = c.given !== undefined ? c.given : values?.[r.id]?.[j];
-      if (c.input && (t === null || t === undefined || String(t).trim() === '')) filled = false;
-      return num(t);
+      const cell = c.given !== undefined ? c.given : values?.[r.id]?.[j];
+      if (c.input && (cell === null || cell === undefined || String(cell).trim() === '')) filled = false;
+      return num(cell);
     });
     const y = vals.slice(0, n);
     const z = vals.slice(n, 2 * n);
@@ -96,15 +97,15 @@ export function checkPower(item, values) {
       const z0 = prev.z;
       if (z0.every((x) => x !== null)) {
         const nz = Math.hypot(...z0.map(fv));
-        if (y.every((x, k) => x !== null && Math.abs(fv(x) - fv(z0[k]) / nz) < 1e-6)) message = 'Le cours divise par la composante de plus grand module (μ), pas par la norme : ainsi y a un 1 et μ tend vers λ₁.';
+        if (y.every((x, k) => x !== null && Math.abs(fv(x) - fv(z0[k]) / nz) < 1e-6)) message = t('Le cours divise par la composante de plus grand module (μ), pas par la norme : ainsi y a un 1 et μ tend vers λ₁.');
       }
     }
     if (!message && r.cells[2 * n]?.input && mu !== null && wantMu !== null && !same(mu, wantMu, tol) && z.some((x) => same(mu, x, tol))) {
-      message = 'μ est la composante de plus grand module de z (en valeur absolue), avec son signe.';
+      message = t('μ est la composante de plus grand module de z (en valeur absolue), avec son signe.');
     }
     if (!message && phi.inverse && r.cells.slice(n, 2 * n).some((c) => c?.input) && y.every((x) => x !== null)) {
       const direct = apply(MX.mat(phi.A.map((rw) => rw.map(String))), y);
-      if (z.every((x, k) => same(x, direct[k], tol))) { message = 'Pour la puissance inverse, z résout (A − σI)z = y : on ne multiplie pas par A.'; rule = 'm_inverse_power_value'; }
+      if (z.every((x, k) => same(x, direct[k], tol))) { message = t('Pour la puissance inverse, z résout (A − σI)z = y : on ne multiplie pas par A.'); rule = 'm_inverse_power_value'; }
     }
     prev = { y, z, mu };
   }

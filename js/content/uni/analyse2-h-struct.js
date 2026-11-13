@@ -9,12 +9,13 @@ import { MT, linesItem, examTag } from './kit.js';
 import { partsScript, tpl } from './a2-kit.js';
 import { q, qt, term, sumT, fac, expT, rd, H, E, modeOf, tfOf, tfProblem, pickK } from './analyse2-h-kit.js';
 import { rootsData } from './analyse2-h-const2.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-structure';
 const SUB = [
-  { id: 'homog', label: 'solution homogène', skill: 'a2-ode-const2' },
-  { id: 'particular', label: 'solution particulière', skill: 'a2-ode-particular' },
-  { id: 'superpose', label: 'superposition', skill: SK },
+  { id: 'homog', label: t('solution homogène'), skill: 'a2-ode-const2' },
+  { id: 'particular', label: t('solution particulière'), skill: 'a2-ode-particular' },
+  { id: 'superpose', label: t('superposition'), skill: SK },
 ];
 const KEYS = ['calcx', 'calcfn', 'a2', 'anal'];
 
@@ -34,7 +35,7 @@ function operator(rng) {
 // A piece of the right side and its y_p, built from the y_p: {b, yp, form}.
 function piece(rng, L, kind) {
   const A = rng.pick([1, 2, 3, -1, -2, 3]);
-  if (kind === 'const') return { kind, yp: String(A), b: String(A * L.qq), desc: 'A (une constante)' };
+  if (kind === 'const') return { kind, yp: String(A), b: String(A * L.qq), desc: t('A (une constante)') };
   if (kind === 'exp') {
     for (let i = 0; ; i++) {
       const m = rng.pick([1, 2, -1, 3, -2]);
@@ -64,11 +65,11 @@ function data(rng) {
 }
 
 const CHOICES = [
-  { id: 'homog', label: 'Résoudre l\'équation homogène' },
-  { id: 'p1', label: 'Solution particulière pour le 1er morceau du second membre' },
-  { id: 'p2', label: 'Solution particulière pour le 2e morceau' },
-  { id: 'sum', label: 'Additionner : y = y_h + y_p1 + y_p2' },
-  { id: 'twice', label: 'Additionner y_h et deux fois la même y_p', rule: 'a2_ode_superposition_nonhom', why: 'L(2y_p) = 2b : chaque morceau du second membre compte une seule fois.' },
+  { id: 'homog', label: t('Résoudre l\'équation homogène') },
+  { id: 'p1', label: t('Solution particulière pour le 1er morceau du second membre') },
+  { id: 'p2', label: t('Solution particulière pour le 2e morceau') },
+  { id: 'sum', label: t('Additionner : y = y_h + y_p1 + y_p2') },
+  { id: 'twice', label: t('Additionner y_h et deux fois la même y_p'), rule: 'a2_ode_superposition_nonhom', why: t('L(2y_p) = 2b : chaque morceau du second membre compte une seule fois.') },
 ];
 
 function linesVariant(level, rng, opts) {
@@ -78,26 +79,26 @@ function linesVariant(level, rng, opts) {
   // One constant instead of two (order 2): C₂ written C₁.
   const one = (label, text) => (L.order === 2 ? { a2_ode_constant_count: [`${label} = ${text.replace(/C_2/g, 'C_1')}`] } : null);
   const parts = [];
-  if (level >= 2) parts.push({ start: d.homog, judge: ode(d.eq, 'homog', one('y_h', L.yh)), lines: [E(`y_h = ${L.yh}`, L.order === 1 ? 'Équation homogène' : `Racines : ${rd(L.homDesc.replace(/ ou /, ', '))}`, 'homog', 'homog')] });
+  if (level >= 2) parts.push({ start: d.homog, judge: ode(d.eq, 'homog', one('y_h', L.yh)), lines: [E(`y_h = ${L.yh}`, L.order === 1 ? t('Équation homogène') : t('Racines : {r}', { r: rd(L.homDesc.replace(/ ou /, ', ')) }), 'homog', 'homog')] });
   const pl = (b, i) => {
-    const line = E(`y_p = ${b.yp}`, `On essaie ${b.desc}`, 'particular', i === 1 ? 'p1' : 'p2');
+    const line = E(`y_p = ${b.yp}`, t('On essaie {d}', { d: b.desc }), 'particular', i === 1 ? 'p1' : 'p2');
     return level === 1 ? { ...line, ...tpl(line.math, [b.kind === 'exp' ? b.A : b.yp]) } : line;
   };
-  parts.push({ html: `Une solution particulière pour le second membre ${MT(b1.b)} :`, ask: 'y_p =', start: d.eq1, judge: ode(d.eq1, 'particular'), lines: [pl(b1, 1)] });
-  parts.push({ html: `Une solution particulière pour ${MT(b2.b)} :`, ask: 'y_p =', start: d.eq2, judge: ode(d.eq2, 'particular'), lines: [pl(b2, 2)] });
+  parts.push({ html: t('Une solution particulière pour le second membre {b} :', { b: MT(b1.b) }), ask: 'y_p =', start: d.eq1, judge: ode(d.eq1, 'particular'), lines: [pl(b1, 1)] });
+  parts.push({ html: t('Une solution particulière pour {b} :', { b: MT(b2.b) }), ask: 'y_p =', start: d.eq2, judge: ode(d.eq2, 'particular'), lines: [pl(b2, 2)] });
   const combo = {
-    kind: 'decision', prompt: 'y = y_h + 2·y_p1 + y_p2 est-elle aussi une solution de l’équation ?', options: [
-      { id: 'no', label: 'Non : L(2y_p1) = 2b₁', valid: true },
-      { id: 'yes', label: 'Oui : on peut multiplier une solution par une constante', valid: false, rule: 'a2_ode_superposition_nonhom', why: 'Seules les solutions de l\'équation homogène se multiplient par une constante : L(2y_p1) = 2b₁ ≠ b₁.' },
+    kind: 'decision', prompt: t('y = y_h + 2·y_p1 + y_p2 est-elle aussi une solution de l’équation ?'), options: [
+      { id: 'no', label: t('Non : L(2y_p1) = 2b₁'), valid: true },
+      { id: 'yes', label: t('Oui : on peut multiplier une solution par une constante'), valid: false, rule: 'a2_ode_superposition_nonhom', why: t('Seules les solutions de l\'équation homogène se multiplient par une constante : L(2y_p1) = 2b₁ ≠ b₁.') },
     ],
   };
-  parts.push({ html: 'Superposition : la solution générale.', ask: 'y =', start: d.eq, judge: ode(d.eq, null, one('y', d.gen)), pre: level === 3 ? [combo] : [], lines: [E(`y = ${d.gen}`, 'y = y_h + y_p1 + y_p2', 'superpose', 'sum')] });
+  parts.push({ html: t('Superposition : la solution générale.'), ask: 'y =', start: d.eq, judge: ode(d.eq, null, one('y', d.gen)), pre: level === 3 ? [combo] : [], lines: [E(`y = ${d.gen}`, 'y = y_h + y_p1 + y_p2', 'superpose', 'sum')] });
   const { start, judge, script } = partsScript(parts, level, CHOICES);
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Solution générale de ${MT(d.eq)} : une solution particulière par morceau du second membre, puis superposition.${level === 1 ? ` La solution homogène est ${MT(`y_h = ${L.yh}`)}.` : ''}`,
-    hints: H('Une solution particulière par morceau du second membre, puis on additionne avec y_h.',
-      `Pour ${MT(b2.b)}, essaie y_p = ${b2.desc} et remplace dans ${MT(d.eq2)}.`,
+    prompt: t('Solution générale de {eq} : une solution particulière par morceau du second membre, puis superposition.', { eq: MT(d.eq) }) + (level === 1 ? ` ${t('La solution homogène est {yh}.', { yh: MT(`y_h = ${L.yh}`) })}` : ''),
+    hints: H(t('Une solution particulière par morceau du second membre, puis on additionne avec y_h.'),
+      t('Pour {b}, essaie y_p = {d} et remplace dans {eq}.', { b: MT(b2.b), d: b2.desc, eq: MT(d.eq2) }),
       `${MT(`y = ${d.gen}`)}`),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.eq}`, exam: examTag(opts),
@@ -113,27 +114,27 @@ function statements(rng) {
   const kx = term(-k, 'x');
   return [
     {
-      key: `combo${k}${b}`, truth: false, text: `Si y₀ résout y′ + ${fac(k)}y = 0 et y₁ résout y′ + ${fac(k)}y = ${b}, alors y₀ + C·y₁ résout y′ + ${fac(k)}y = ${b} pour tout réel C.`, ruleIfTrue: 'a2_ode_superposition_nonhom',
-      why: `Faux : L(y₀ + Cy₁) = 0 + C·${b}, égal à ${b} seulement pour C = 1. Par exemple y₀ = e^(${kx}), y₁ = ${e}, C = 2.`,
+      key: `combo${k}${b}`, truth: false, text: t('Si y₀ résout y′ + {k}y = 0 et y₁ résout y′ + {k}y = {b}, alors y₀ + C·y₁ résout y′ + {k}y = {b} pour tout réel C.', { k: fac(k), b }), ruleIfTrue: 'a2_ode_superposition_nonhom',
+      why: t('Faux : L(y₀ + Cy₁) = 0 + C·{b}, égal à {b} seulement pour C = 1. Par exemple y₀ = e^({kx}), y₁ = {e}, C = 2.', { b, kx, e }),
       counter: { kind: 'a2', prop: 'odeComboFails', params: { eq: `y'+${fac(k)}y=${b}`, homog: `y'+${fac(k)}y=0` }, ask: [{ v: 'y0', label: 'y₀(x) =', keys: KEYS }, { v: 'y1', label: 'y₁(x) =', keys: KEYS }, { v: 'C', label: 'C =', keys: ['calc'] }], answer: { y0: `e^(${kx})`, y1: String(e), C: '2' } },
     },
-    { key: 'yhyp', truth: true, text: 'Si y_p résout L(y) = b, alors y_h + y_p résout L(y) = b pour toute solution y_h de L(y) = 0.', why: 'Vrai : L est linéaire, L(y_h + y_p) = 0 + b = b.' },
-    { key: 'diff', truth: true, text: 'La différence de deux solutions de L(y) = b est une solution de L(y) = 0.', why: 'Vrai : L(y₁ − y₂) = b − b = 0.' },
+    { key: 'yhyp', truth: true, text: t('Si y_p résout L(y) = b, alors y_h + y_p résout L(y) = b pour toute solution y_h de L(y) = 0.'), why: t('Vrai : L est linéaire, L(y_h + y_p) = 0 + b = b.') },
+    { key: 'diff', truth: true, text: t('La différence de deux solutions de L(y) = b est une solution de L(y) = 0.'), why: t('Vrai : L(y₁ − y₂) = b − b = 0.') },
     {
-      key: `sum${k}`, truth: false, text: `Si y₁ et y₂ résolvent y″ + ${k * k === 1 ? '' : k * k}y = 1, alors y₁ + y₂ aussi.`, ruleIfTrue: 'a2_ode_superposition_nonhom',
-      why: `Faux : L(y₁ + y₂) = 1 + 1 = 2. Par exemple y₁ = y₂ = 1/${k * k}.`,
+      key: `sum${k}`, truth: false, text: t('Si y₁ et y₂ résolvent y″ + {k2}y = 1, alors y₁ + y₂ aussi.', { k2: k * k === 1 ? '' : k * k }), ruleIfTrue: 'a2_ode_superposition_nonhom',
+      why: t('Faux : L(y₁ + y₂) = 1 + 1 = 2. Par exemple y₁ = y₂ = 1/{k2}.', { k2: k * k }),
       counter: { kind: 'a2', prop: 'odeSumFails', params: { eq: `y''+${k * k === 1 ? '' : k * k}y=1` }, ask: [{ v: 'y1', label: 'y₁(x) =', keys: KEYS }, { v: 'y2', label: 'y₂(x) =', keys: KEYS }], answer: { y1: `1/${k * k}`, y2: `1/${k * k}+cos(${k === 1 ? '' : k}x)` } },
     },
-    { key: 'dim', truth: true, text: 'Si p et q sont continues sur I, les solutions de y″ + p(x)y′ + q(x)y = 0 sur I forment un espace vectoriel de dimension 2.', why: 'Vrai : une solution est fixée par (y(x₀), y′(x₀)) ∈ ℝ², et cette correspondance est linéaire et bijective.' },
+    { key: 'dim', truth: true, text: t('Si p et q sont continues sur I, les solutions de y″ + p(x)y′ + q(x)y = 0 sur I forment un espace vectoriel de dimension 2.'), why: t('Vrai : une solution est fixée par (y(x₀), y′(x₀)) ∈ ℝ², et cette correspondance est linéaire et bijective.') },
     {
-      key: 'count', truth: false, text: 'y = C·e^(2x) est la solution générale de y″ − 3y′ + 2y = 0.', ruleIfTrue: 'a2_ode_constant_count',
-      why: 'Faux : l\'équation est d\'ordre 2, il faut deux constantes : y = C₁eˣ + C₂e^(2x). Par exemple eˣ n\'est pas de la forme Ce^(2x).',
-      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: "y''-3y'+2y=0", family: 'C e^(2x)', domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: 'Une solution qui n\'est pas de cette forme : y(x) =', keys: KEYS }], answer: { y: 'e^x' } },
+      key: 'count', truth: false, text: t('y = C·e^(2x) est la solution générale de y″ − 3y′ + 2y = 0.'), ruleIfTrue: 'a2_ode_constant_count',
+      why: t('Faux : l\'équation est d\'ordre 2, il faut deux constantes : y = C₁eˣ + C₂e^(2x). Par exemple eˣ n\'est pas de la forme Ce^(2x).'),
+      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: "y''-3y'+2y=0", family: 'C e^(2x)', domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: t('Une solution qui n\'est pas de cette forme : y(x) ='), keys: KEYS }], answer: { y: 'e^x' } },
     },
   ];
 }
 
-const tfHints = H('Écris L(y₁ + y₂) ou L(y₀ + Cy₁) avec la linéarité de L.', 'L(y₀ + Cy₁) = L(y₀) + C·L(y₁) = 0 + C·b.', 'Un énoncé faux se réfute avec un exemple simple : constantes, exponentielles.');
+const tfHints = H(t('Écris L(y₁ + y₂) ou L(y₀ + Cy₁) avec la linéarité de L.'), 'L(y₀ + Cy₁) = L(y₀) + C·L(y₁) = 0 + C·b.', t('Un énoncé faux se réfute avec un exemple simple : constantes, exponentielles.'));
 
 export const GEN = {
   [SK]: (level, rng, profile, opts = {}) => {

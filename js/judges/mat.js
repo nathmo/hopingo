@@ -11,6 +11,7 @@ import { evalAst, sameValue, isLiteralAst, parseExpr, envOf, valueText } from '.
 import { exactValue } from '../cas/normal.js';
 import { diagnoseLine } from './diagnose.js';
 import { readMat, mopts, wrongV, parseLine, show, text, input, litNum } from './matcommon.js';
+import { t } from '../i18n.js';
 
 export { parseLine, show, text, input };
 
@@ -32,7 +33,7 @@ export function isFinal(cfg, node) {
   if ((cfg.form ?? 'literal') === 'any') return true;
   if (node.assigns?.length > 1) return node.assigns.every((a) => isLiteralAst(a.ast));
   if (!isLiteralAst(node.body)) return false;
-  return tidy(node.value) ? true : 'C\'est juste : calcule encore chaque case.';
+  return tidy(node.value) ? true : t('C\'est juste : calcule encore chaque case.');
 }
 
 export const start = (cfg) => cfg.start;
@@ -42,15 +43,15 @@ export function judgeLine(cfg, prev, input) {
   if (read.error) return read.error;
   const node = read.node;
   const opts = mopts(cfg);
-  if (!node.value) return { kind: 'form', node, message: 'Écris une matrice, un vecteur ou un nombre.' };
+  if (!node.value) return { kind: 'form', node, message: t('Écris une matrice, un vecteur ou un nombre.') };
   const want = expected(cfg) ?? prev.value;
-  if (cfg.expect === undefined && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (cfg.expect === undefined && node.text === prev.text) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   if (!sameValue(node.value, want, opts)) {
     const diag = diagnoseLine('mat', prev, node, cfg, (c, n) => sameValue(c.value ?? c, n.value, opts));
     const dims = (v) => (v.k === 'm' ? `${v.rows.length}×${v.rows[0].length}` : null);
     const msg = want.k === 'm' && node.value.k === 'm' && dims(want) !== dims(node.value)
-      ? `Le résultat doit être de taille ${dims(want)}.`
-      : 'Ce n\'est pas la bonne valeur.';
+      ? t('Le résultat doit être de taille {d}.', { d: dims(want) })
+      : t('Ce n\'est pas la bonne valeur.');
     return wrongV(node, msg, diag);
   }
   const fin = isFinal(cfg, node);

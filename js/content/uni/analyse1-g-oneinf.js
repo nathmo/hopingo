@@ -6,6 +6,7 @@
 // (d) ((mn + 1)/(mn))ⁿ, (e) (1 + (a + 1/n)/(bn))^(cn) (the catalogue's
 // 1/√n is replaced by 1/n: the numeric limit of 1/√n terms is too slow).
 
+import { t } from '../../i18n.js';
 import { linesItem, mcq, tfItem } from './kit.js';
 import { modeOf, H, E, assemble, blanked, uniq } from './analyse1-c-kit.js';
 import { M, LIMN, EQN, q, qt, qh, cv, lin, coef, fr, seqCounter } from './analyse1-g-kit.js';
@@ -13,9 +14,9 @@ import { M, LIMN, EQN, q, qt, qh, cv, lin, coef, fr, seqCounter } from './analys
 const OI = 'a1-seq-1inf';
 const KEYS = ['calc', 'calcfn', 'seq'];
 const SUB = [
-  { id: 'exp', label: 'forme exponentielle', skill: 'g2-real-powers' },
-  { id: 'lim', label: 'limite de l\'exposant', skill: 'a1-seq-limits' },
-  { id: 'concl', label: 'continuité de exp', skill: OI },
+  { id: 'exp', label: t('forme exponentielle'), skill: 'g2-real-powers' },
+  { id: 'lim', label: t('limite de l\'exposant'), skill: 'a1-seq-limits' },
+  { id: 'concl', label: t('continuité de exp'), skill: OI },
 ];
 // e^K as text.
 const eText = (K) => (K.d === 1 && K.n === 1 ? 'e' : K.d === 1 && K.n > 0 ? `e^${K.n}` : `e^(${qt(K)})`);
@@ -33,12 +34,12 @@ function dataA(rng) {
     kind: 'a', start: `(${base})^${c === 1 ? 'n' : `(${cn})`}`, exp: `e^(${cn}×ln(${base}))`, K: q(c * D),
     eStart: `${cn}×ln(${base})`,
     eLines: [
-      E(`${cn}×ln(1${sg(D)}/${nb})`, 'Faire apparaître 1 + h, avec h → 0', 'lim', 'oneh'),
+      E(`${cn}×ln(1${sg(D)}/${nb})`, t('Faire apparaître 1 + h, avec h → 0'), 'lim', 'oneh'),
       E(`${cn}×(${D})/${nb}`, 'Log(1 + h) = h + h·ε(h)', 'lim', 'equiv'),
-      E(String(c * D), 'Limite de l\'exposant', 'lim', 'lim'),
+      E(String(c * D), t('Limite de l\'exposant'), 'lim', 'lim'),
     ],
     blankH: [`${Math.abs(D)}/${nb}`],
-    hints: [`Base → 1, exposant → ∞ : passe en e^(${cn}·Log(…)) et écris la base 1 + h.`, `${M(base)} = 1 + □/${M(nb)}`, `${M(`${cn}×ln(1${sg(D)}/${nb})`)} ~ ${M(`${cn}×(${D})/${nb}`)} → ${fr(c * D)}`],
+    hints: [t('Base → 1, exposant → ∞ : passe en e^({cn}·Log(…)) et écris la base 1 + h.', { cn }), `${M(base)} = 1 + □/${M(nb)}`, `${M(`${cn}×ln(1${sg(D)}/${nb})`)} ~ ${M(`${cn}×(${D})/${nb}`)} → ${fr(c * D)}`],
   };
 }
 
@@ -53,11 +54,11 @@ function dataB(rng) {
     eStart: `${rn}×ln(${inner})`,
     eLines: [
       E(`${rn}×(${p}/n${sg(qq)}/n^2)`, 'Log(1 + h) = h + h·ε(h), h → 0', 'lim', 'equiv'),
-      E(`${p * r}${sg(qq * r)}/n`, 'Développer', 'lim', 'simplify'),
-      E(String(p * r), 'Limite de l\'exposant', 'lim', 'lim'),
+      E(`${p * r}${sg(qq * r)}/n`, t('Développer'), 'lim', 'simplify'),
+      E(String(p * r), t('Limite de l\'exposant'), 'lim', 'lim'),
     ],
     blankH: [`${p}/n${sg(qq)}/n^2`],
-    hints: [`La base est déjà 1 + h avec h = ${p}/n ${qq < 0 ? '−' : '+'} ${Math.abs(qq)}/n² → 0 : passe en exponentielle et remplace Log(1 + h) par h.`, `${M(`${rn}×ln(${inner})`)} ~ ${M(rn)}·(□)`, `${M(`${rn}×(${p}/n${sg(qq)}/n^2)`)} = ${M(`${p * r}${sg(qq * r)}/n`)} → ${p * r}`],
+    hints: [t('La base est déjà 1 + h avec h = {h} → 0 : passe en exponentielle et remplace Log(1 + h) par h.', { h: `${p}/n ${qq < 0 ? '−' : '+'} ${Math.abs(qq)}/n²` }), `${M(`${rn}×ln(${inner})`)} ~ ${M(rn)}·(□)`, `${M(`${rn}×(${p}/n${sg(qq)}/n^2)`)} = ${M(`${p * r}${sg(qq * r)}/n`)} → ${p * r}`],
   };
 }
 
@@ -69,11 +70,11 @@ function dataC(rng) {
   return {
     kind: 'c', start: `e^(${eStart})`, exp: null, K, eStart, dl2: true,
     eLines: [
-      E(`n^2×(${p}/n-${p * p}/(2n^2))-${P}n`, 'Log(1 + h) = h − h²/2 + h²·ε(h) : l\'ordre 2 est nécessaire', 'lim', 'dl2'),
-      E(qt(K), 'Simplifier', 'lim', 'lim'),
+      E(`n^2×(${p}/n-${p * p}/(2n^2))-${P}n`, t('Log(1 + h) = h − h²/2 + h²·ε(h) : l\'ordre 2 est nécessaire'), 'lim', 'dl2'),
+      E(qt(K), t('Simplifier'), 'lim', 'lim'),
     ],
     blankH: [`${p * p}/(2n^2)`],
-    hints: [`À l'ordre 1, n²·(${p}/n) − ${cv(p)} = 0 ne dit rien : il faut Log(1 + h) = h − h²/2 + h²·ε(h).`, `${M(`n^2×(${p}/n-□)-${P}n`)}`, `${M(`n^2×(${p}/n-${p * p}/(2n^2))-${P}n`)} = ${qh(K)}`],
+    hints: [t('À l\'ordre 1, n²·({p}/n) − {pn} = 0 ne dit rien : il faut Log(1 + h) = h − h²/2 + h²·ε(h).', { p, pn: cv(p) }), `${M(`n^2×(${p}/n-□)-${P}n`)}`, `${M(`n^2×(${p}/n-${p * p}/(2n^2))-${P}n`)} = ${qh(K)}`],
   };
 }
 
@@ -84,12 +85,12 @@ function dataD(rng) {
     kind: 'd', start: `(${base})^n`, exp: `e^(n×ln(${base}))`, K: q(1, m),
     eStart: `n×ln(${base})`,
     eLines: [
-      E(`n×ln(1+1/(${m}n))`, `Faire apparaître 1 + h, h = 1/(${m}n)`, 'lim', 'oneh'),
+      E(`n×ln(1+1/(${m}n))`, t('Faire apparaître 1 + h, h = 1/({m}n)', { m }), 'lim', 'oneh'),
       E(`n×1/(${m}n)`, 'Log(1 + h) = h + h·ε(h)', 'lim', 'equiv'),
-      E(`1/${m}`, 'Limite de l\'exposant', 'lim', 'lim'),
+      E(`1/${m}`, t('Limite de l\'exposant'), 'lim', 'lim'),
     ],
     blankH: [`1/(${m}n)`],
-    hints: ['Base → 1, exposant → ∞ : passe en e^(n·Log(…)).', `${M(base)} = 1 + □`, `${M(`n×ln(1+1/(${m}n))`)} ~ ${M(`n×1/(${m}n)`)} = 1/${m}`],
+    hints: [t('Base → 1, exposant → ∞ : passe en e^(n·Log(…)).'), `${M(base)} = 1 + □`, `${M(`n×ln(1+1/(${m}n))`)} ~ ${M(`n×1/(${m}n)`)} = 1/${m}`],
   };
 }
 
@@ -105,11 +106,11 @@ function dataE(rng) {
     eStart: `${cn}×ln(${inner})`,
     eLines: [
       E(`${cn}×(${a}+1/n)/(${b}n)`, 'Log(1 + h) = h + h·ε(h), h → 0', 'lim', 'equiv'),
-      E(`${coef(c) === '' ? '' : c}(${a}+1/n)/${b}`, 'Simplifier par n', 'lim', 'simplify'),
-      E(qt(K), 'Limite de l\'exposant', 'lim', 'lim'),
+      E(`${coef(c) === '' ? '' : c}(${a}+1/n)/${b}`, t('Simplifier par n'), 'lim', 'simplify'),
+      E(qt(K), t('Limite de l\'exposant'), 'lim', 'lim'),
     ],
     blankH: [`(${a}+1/n)/(${b}n)`],
-    hints: [`h = (${a} + 1/n)/(${b}n) → 0 : passe en exponentielle, puis Log(1 + h) ≈ h.`, `${M(`${cn}×ln(${inner})`)} ~ ${M(cn)}·□`, `${M(`${cn}×(${a}+1/n)/(${b}n)`)} → ${qh(K)}`],
+    hints: [t('h = ({a} + 1/n)/({b}n) → 0 : passe en exponentielle, puis Log(1 + h) ≈ h.', { a, b }), `${M(`${cn}×ln(${inner})`)} ~ ${M(cn)}·□`, `${M(`${cn}×(${a}+1/n)/(${b}n)`)} → ${qh(K)}`],
   };
 }
 
@@ -117,23 +118,23 @@ const DATA = { a: dataA, b: dataB, c: dataC, d: dataD, e: dataE };
 const oiData = (rng, kinds = ['a', 'a', 'b', 'c', 'd', 'e']) => DATA[rng.pick(kinds)](rng);
 
 const CHOICES = [
-  { id: 'expo', label: 'Écrire en exponentielle e^(v·Log u)' },
-  { id: 'oneh', label: 'Faire apparaître 1 + h, h → 0' },
-  { id: 'equiv', label: 'Remplacer Log(1 + h) par h' },
-  { id: 'dl2', label: 'DL d\'ordre 2 du Log' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'lim', label: 'Passer à la limite' },
-  { id: 'cont', label: 'Continuité de exp' },
-  { id: 'one', label: 'La base tend vers 1, donc la suite tend vers 1', rule: 'a1_indet_one_inf', why: '1^∞ est indéterminé : l\'exposant explose.' },
+  { id: 'expo', label: t('Écrire en exponentielle e^(v·Log u)') },
+  { id: 'oneh', label: t('Faire apparaître 1 + h, h → 0') },
+  { id: 'equiv', label: t('Remplacer Log(1 + h) par h') },
+  { id: 'dl2', label: t('DL d\'ordre 2 du Log') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'lim', label: t('Passer à la limite') },
+  { id: 'cont', label: t('Continuité de exp') },
+  { id: 'one', label: t('La base tend vers 1, donc la suite tend vers 1'), rule: 'a1_indet_one_inf', why: t('1^∞ est indéterminé : l\'exposant explose.') },
 ];
 
 function contDecision(d) {
   const opts = [
-    { id: 'eK', label: `${M(eText(d.K))}, par continuité de exp`, valid: true, ref: true },
-    { id: 'one', label: '1, car la base tend vers 1', valid: false, rule: 'a1_indet_one_inf', why: '1^∞ est indéterminé : seule la limite de l\'exposant compte.' },
-    { id: 'K', label: `${qh(d.K)}, la limite de l'exposant`, valid: false, why: `La suite vaut e^(exposant) : elle tend vers e^(${qh(d.K)}).` },
+    { id: 'eK', label: t('{e}, par continuité de exp', { e: M(eText(d.K)) }), valid: true, ref: true },
+    { id: 'one', label: t('1, car la base tend vers 1'), valid: false, rule: 'a1_indet_one_inf', why: t('1^∞ est indéterminé : seule la limite de l\'exposant compte.') },
+    { id: 'K', label: t('{K}, la limite de l\'exposant', { K: qh(d.K) }), valid: false, why: t('La suite vaut e^(exposant) : elle tend vers e^({K}).', { K: qh(d.K) }) },
   ];
-  return { kind: 'decision', prompt: `L'exposant tend vers ${qh(d.K)}. Donc la suite tend vers :`, options: opts };
+  return { kind: 'decision', prompt: t('L\'exposant tend vers {K}. Donc la suite tend vers :', { K: qh(d.K) }), options: opts };
 }
 
 function oiLines(level, rng, opts = {}) {
@@ -141,30 +142,30 @@ function oiLines(level, rng, opts = {}) {
   const guided = level <= 2;
   const parts = [];
   if (d.exp && level >= 2) {
-    parts.push({ html: 'Forme exponentielle :', start: d.start, judge: EQN({ domain: { n: { int: [20, 60] } }, target: 'goal', goal: d.exp }), lines: [E(d.exp, 'uᵛ = e^(v·Log u)', 'exp', 'expo')], choices: CHOICES });
+    parts.push({ html: t('Forme exponentielle :'), start: d.start, judge: EQN({ domain: { n: { int: [20, 60] } }, target: 'goal', goal: d.exp }), lines: [E(d.exp, 'uᵛ = e^(v·Log u)', 'exp', 'expo')], choices: CHOICES });
   }
   let eLines = d.eLines;
   if (level === 1) eLines = [blanked(eLines[0], d.blankH), ...eLines.slice(1, -1), blanked(eLines.at(-1), [eLines.at(-1).math])];
   else if (level === 2) eLines = [...eLines.slice(0, -1), blanked(eLines.at(-1), [eLines.at(-1).math])];
   const pre = [];
-  if (level === 1 && d.exp) pre.push({ kind: 'note', html: `Forme exponentielle : ${M(d.start)} = ${M(d.exp)}.` });
+  if (level === 1 && d.exp) pre.push({ kind: 'note', html: t('Forme exponentielle : {s} = {e}.', { s: M(d.start), e: M(d.exp) }) });
   if (d.dl2 && (level === 2 || level === 3)) {
     pre.push({
-      kind: 'decision', prompt: 'Quel développement de Log(1 + h) faut-il ?', options: [
-        { id: 'o1', label: 'Log(1 + h) = h + h·ε(h)', valid: false, rule: 'a1_dl_order_too_low', why: 'À l\'ordre 1, il reste n²·h − pn = 0 + n²·h·ε(h) : on ne peut pas conclure. Il faut l\'ordre 2.' },
+      kind: 'decision', prompt: t('Quel développement de Log(1 + h) faut-il ?'), options: [
+        { id: 'o1', label: 'Log(1 + h) = h + h·ε(h)', valid: false, rule: 'a1_dl_order_too_low', why: t('À l\'ordre 1, il reste n²·h − pn = 0 + n²·h·ε(h) : on ne peut pas conclure. Il faut l\'ordre 2.') },
         { id: 'o2', label: 'Log(1 + h) = h − h²/2 + h²·ε(h)', valid: true, ref: true },
       ],
     });
   }
-  parts.push({ html: 'Limite de l\'exposant :', start: d.eStart, judge: LIMN(), lines: eLines, pre, choices: CHOICES });
+  parts.push({ html: t('Limite de l\'exposant :'), start: d.eStart, judge: LIMN(), lines: eLines, pre, choices: CHOICES });
   parts.push({
-    html: 'Conclusion :', start: d.start, judge: LIMN(), lines: [E(eText(d.K), 'Continuité de exp', 'concl', 'cont')],
+    html: t('Conclusion :'), start: d.start, judge: LIMN(), lines: [E(eText(d.K), t('Continuité de exp'), 'concl', 'cont')],
     pre: level <= 3 ? [contDecision(d)] : [], choices: CHOICES,
   });
   const as = assemble(parts, level);
   return linesItem({
     skill: OI, level,
-    prompt: `Calcule ${M(`lim(${d.start},n,∞)`)}.${d.kind === 'c' ? ' Tout est déjà en exponentielle : étudie l\'exposant.' : ''}`,
+    prompt: d.kind === 'c' ? t('Calcule {l}. Tout est déjà en exponentielle : étudie l\'exposant.', { l: M(`lim(${d.start},n,∞)`) }) : t('Calcule {l}.', { l: M(`lim(${d.start},n,∞)`) }),
     ...as, mode: modeOf(level), keys: KEYS, subgoals: SUB, tapActions: level === 3 ? 'steps' : null,
     hints: H(...d.hints), key: `${OI}:${d.start}`, exam: opts.exam ? { format: opts.exam, points: 1 } : false,
   });
@@ -182,7 +183,7 @@ function oiMcq(rng) {
   return mcq({
     skill: OI, level: 4, prompt: `${M(`lim(${d.start},n,∞)`)} =`, options: uniq(opts).slice(0, 4),
     key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240,
-    solution: [{ html: `${M(d.eStart)} → ${qh(d.K)}, donc la suite tend vers ${M(eText(d.K))}.`, note: 'Forme 1^∞' }],
+    solution: [{ html: t('{e} → {K}, donc la suite tend vers {l}.', { e: M(d.eStart), K: qh(d.K), l: M(eText(d.K)) }), note: t('Forme 1^∞') }],
   }, rng);
 }
 
@@ -208,10 +209,10 @@ const TF = [
 ];
 
 function oiTf(rng) {
-  const t = rng.pick(TF);
+  const tf = rng.pick(TF);
   return tfItem({
-    skill: OI, level: 4, truth: t.truth, key: t.key, statement: t.s, ruleIfTrue: t.truth ? null : 'a1_indet_one_inf',
-    counter: t.truth ? null : t.counter(), explanation: t.why, exam: { format: 'tf', points: 1 }, expectedSec: 60,
+    skill: OI, level: 4, truth: tf.truth, key: tf.key, statement: t(tf.s), ruleIfTrue: tf.truth ? null : 'a1_indet_one_inf',
+    counter: tf.truth ? null : tf.counter(), explanation: t(tf.why), exam: { format: 'tf', points: 1 }, expectedSec: 60,
   });
 }
 

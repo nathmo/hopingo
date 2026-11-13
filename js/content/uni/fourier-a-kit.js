@@ -27,6 +27,7 @@ import { parse } from '../../cas/parse.js';
 import { complexValue } from '../../cas/complex.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { judgeFor, readWith } from '../../judges/index.js';
+import { t } from '../../i18n.js';
 
 export { MT, H, modeOf };
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
@@ -70,9 +71,9 @@ export const vZero = (a) => a.size === 0;
 export const vNeg = (a) => vScale(a, -1);
 // The value at n (a float), to check a text against.
 export function vAt(a, n) {
-  let t = 0;
-  for (const [kk, x] of a) { const [e, k, s] = kk.split(',').map(Number); t += x.valueOf() * Math.PI ** e * (s ? (-1) ** n : 1) / n ** k; }
-  return t;
+  let tt = 0;
+  for (const [kk, x] of a) { const [e, k, s] = kk.split(',').map(Number); tt += x.valueOf() * Math.PI ** e * (s ? (-1) ** n : 1) / n ** k; }
+  return tt;
 }
 
 // c·π^e as a factor text: numerator and denominator lists.
@@ -117,8 +118,8 @@ export function vText(a, { split = false } = {}) {
   let out = '';
   for (const [c, pat, e, k] of terms) {
     const neg = c.n < 0;
-    const t = termText(neg ? c.neg() : c, pat, e, k);
-    out += out ? (neg ? `-${t}` : `+${t}`) : (neg ? `-${t}` : t);
+    const tt = termText(neg ? c.neg() : c, pat, e, k);
+    out += out ? (neg ? `-${tt}` : `+${tt}`) : (neg ? `-${tt}` : tt);
   }
   return out;
 }
@@ -143,16 +144,16 @@ export function pText(p, x = 'x') {
   for (let j = p.length - 1; j >= 0; j--) {
     const c = p[j];
     if (vZero(c)) continue;
-    let t = cText(c);
-    const neg = t.startsWith('-');
-    if (neg) t = t.slice(1);
+    let tt = cText(c);
+    const neg = tt.startsWith('-');
+    if (neg) tt = tt.slice(1);
     const mono = j === 0 ? '' : j === 1 ? x : `${x}^${j}`;
     let body;
-    if (!mono) body = t;
-    else if (t === '1') body = mono;
-    else if (/[+\-]/.test(t)) body = `(${t})${mono}`;
-    else if (/\//.test(t)) body = `(${t})${mono}`;
-    else body = `${t}${mono}`;
+    if (!mono) body = tt;
+    else if (tt === '1') body = mono;
+    else if (/[+\-]/.test(tt)) body = `(${tt})${mono}`;
+    else if (/\//.test(tt)) body = `(${tt})${mono}`;
+    else body = `${tt}${mono}`;
     out += out ? (neg ? `-${body}` : `+${body}`) : (neg ? `-${body}` : body);
   }
   return out || '0';
@@ -188,11 +189,11 @@ function bracketValue(p, trig, L) {
 }
 
 // A coefficient text before a factor: '3x^2 cos(…)', '(π-2x) sin(…)', 'cos(…)', '-cos(…)'.
-const isMono = (t) => !/[+\-]/.test(t.slice(1));
-function times(t, rest) {
-  if (t === '1') return rest;
-  if (t === '-1') return `-${rest}`;
-  return isMono(t) ? `${t} ${rest}` : `(${t}) ${rest}`;
+const isMono = (tt) => !/[+\-]/.test(tt.slice(1));
+function times(tt, rest) {
+  if (tt === '1') return rest;
+  if (tt === '-1') return `-${rest}`;
+  return isMono(tt) ? `${tt} ${rest}` : `(${tt}) ${rest}`;
 }
 const integrand = (p, trig, arg) => times(pText(p), `${trig}(${arg})`);
 
@@ -225,7 +226,7 @@ export function vOdd(a) {
   for (const [kk, x] of a) { const [e, k, s] = kk.split(',').map(Number); vAddTo(m, key(e, k, 0), s ? x.neg() : x); }
   return m;
 }
-export const kText = (t) => t.replace(/n\^(\d+)/g, '(2k+1)^$1').replace(/\bn\b/g, '(2k+1)');
+export const kText = (tt) => tt.replace(/n\^(\d+)/g, '(2k+1)^$1').replace(/\bn\b/g, '(2k+1)');
 export const vOddText = (a) => kText(vText(vOdd(a)));
 
 // The lines of K∫₀^L p trig(ax) dx: IPP steps, evaluated brackets, value.
@@ -290,7 +291,7 @@ const STATIC = new Set(['prob', 'fcomplex', 'eigen', 'complex', 'stat']);
 function cleanTraps(judge) {
   if (judge.traps && judge.kind === 'equiv' && judge.goal) return cleanEquiv(judge);
   if (!judge.traps || judge.expect === undefined || !['value', 'fcomplex'].includes(judge.kind)) return judge;
-  const val = (t) => complexValue(parse(String(t), { complex: true, vars: judge.vars }));
+  const val = (tt) => complexValue(parse(String(tt), { complex: true, vars: judge.vars }));
   let want;
   try { want = val(judge.expect); } catch { return judge; }
   if (!want) return judge;
@@ -307,7 +308,7 @@ function cleanTraps(judge) {
 // The same for a coefficient in n (or k): equal to the goal at n = 1 … 6.
 function cleanEquiv(judge) {
   const v = judge.vars[0];
-  const at = (t) => { const node = parse(String(t), { vars: judge.vars }); return [1, 2, 3, 4, 5, 6].map((n) => evalFloat(node, { [v]: n })); };
+  const at = (tt) => { const node = parse(String(tt), { vars: judge.vars }); return [1, 2, 3, 4, 5, 6].map((n) => evalFloat(node, { [v]: n })); };
   let want;
   try { want = at(judge.goal); } catch { return judge; }
   const traps = {};
@@ -352,7 +353,7 @@ export function build(o) {
     if (level !== 3) return p.judge;
     if (STATIC.has(p.judge.kind) || p.menu) {
       const acts = new Set(p.lines.map((l) => l.act).filter(Boolean));
-      const menu = p.menu || choices.map((c) => ({ id: c.id, label: c.label, valid: acts.has(c.id), why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.', ...(c.rule && !acts.has(c.id) ? { rule: c.rule } : {}) }));
+      const menu = p.menu || choices.map((c) => ({ id: c.id, label: c.label, valid: acts.has(c.id), why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'), ...(c.rule && !acts.has(c.id) ? { rule: c.rule } : {}) }));
       return { ...p.judge, menu };
     }
     const lines = p.lines.map((l) => ({ kind: 'eq', math: l.math, act: l.act }));
@@ -429,6 +430,6 @@ export function mcqMulti(o, rng) {
     seen.add(x.html);
     options.push({ html: x.html, correct: !!x.correct, rule: x.correct ? null : x.rule ?? null });
   }
-  return mcq({ ...o, options, multi: true, prompt: `${o.prompt} (plusieurs réponses possibles)` }, rng);
+  return mcq({ ...o, options, multi: true, prompt: t('{prompt} (plusieurs réponses possibles)', { prompt: o.prompt }) }, rng);
 }
 export const opt = (text, rule = null, mopts = {}) => ({ html: MT(text, mopts), rule });

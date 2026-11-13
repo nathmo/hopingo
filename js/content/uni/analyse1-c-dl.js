@@ -20,6 +20,7 @@ import {
   V, q, isQ, modeOf, H, E, KEYS, xp, examOf, fact, qPow, coefs, isZero, maxDen, maxNum, mono, remText, termAbs,
   joinTerms, polyText, dlText, termCount, blankDL, tpl, assemble, uniq,
 } from './analyse1-c-kit.js';
+import { t } from '../../i18n.js';
 
 // Text for the student: x^2/2 → x²/2, − signs.
 export const rd = (t) => toReadable(parse(t));
@@ -114,7 +115,7 @@ export function substText(c, U, p, n) {
 // ======================================================================
 
 const US = 'a1-dl-usual';
-const US_SUB = [{ id: 'coef', label: 'coefficients', skill: US }];
+const US_SUB = [{ id: 'coef', label: t('coefficients'), skill: US }];
 const AS = [q(-3), q(-2), q(-1), q(1, 2), q(2), q(3)];
 const ALPHAS = [q(-1), q(-2), q(1, 2), q(-1, 2), q(1, 3)];
 const FAMS = ['exp', 'sin', 'cos', 'ln', 'pow', 'geom', 'arctan', 'sinh', 'cosh'];
@@ -155,16 +156,16 @@ function usOk(d) {
 }
 
 const US_CHOICES = (d, U) => [
-  { id: 'subst', label: `Remplacer u par ${rd(U)} dans le DL de ${familyWord(d.F, d.alpha)}` },
-  { id: 'trunc', label: `Calculer les puissances et garder les termes jusqu'à ${xp(d.n)}` },
-  { id: 'deriv', label: 'Calculer f′(0), f″(0)… une à une', why: 'Possible, mais bien plus long : le DL usuel donne tous les coefficients d\'un coup.' },
-  { id: 'rem', label: `Écrire le reste ${xp(d.n - 1)}·ε(x)`, rule: 'a1_dl_remainder_wrong_order', why: `Le reste se met à l'ordre demandé : ${xp(d.n)}·ε(x).` },
+  { id: 'subst', label: t('Remplacer u par {U} dans le DL de {p1}', { U: rd(U), p1: familyWord(d.F, d.alpha) }) },
+  { id: 'trunc', label: t('Calculer les puissances et garder les termes jusqu\'à {n}', { n: xp(d.n) }) },
+  { id: 'deriv', label: t('Calculer f′(0), f″(0)… une à une'), why: t('Possible, mais bien plus long : le DL usuel donne tous les coefficients d\'un coup.') },
+  { id: 'rem', label: t('Écrire le reste {p1}·ε(x)', { p1: xp(d.n - 1) }), rule: 'a1_dl_remainder_wrong_order', why: t('Le reste se met à l\'ordre demandé : {n}·ε(x).', { n: xp(d.n) }) },
 ];
 
 function usLines(d, level) {
   const b = usBuild(d);
-  let l1 = E(b.sub, `DL de ${familyWord(d.F, d.alpha)} avec u = ${rd(b.U)}`, 'coef', 'subst');
-  let l2 = E(b.fin, `Puissances calculées, termes jusqu'à ${xp(d.n)}`, 'coef', 'trunc');
+  let l1 = E(b.sub, t('DL de {p1} avec u = {U}', { p1: familyWord(d.F, d.alpha), U: rd(b.U) }), 'coef', 'subst');
+  let l2 = E(b.fin, t('Puissances calculées, termes jusqu\'à {n}', { n: xp(d.n) }), 'coef', 'trunc');
   if (level === 1) {
     l1 = { ...l1, ...tpl(b.sub, [b.U]) };
     l2 = { ...l2, ...blankDL(b.fin, (i) => (i > 0 || isZero(b.cs[0]) ? 'coef' : false)) };
@@ -185,18 +186,18 @@ function usItem(level, rng, profile, opts) {
   const judge = { kind: 'series', v: V, at: 0, order: d.n };
   // Level 2: the reference DL to choose.
   const pre = level !== 2 ? [] : [{
-    kind: 'decision', prompt: 'Quel DL de référence ?', options: rng.shuffle([
-      { id: d.F, label: `${familyWord(d.F, d.alpha)} avec u = ${rd(b.U)}`, valid: true, ref: true },
-      ...rng.shuffle(FAMS.filter((F) => F !== d.F && F !== 'pow')).slice(0, 2).map((F) => ({ id: F, label: `${USUAL[F].name} avec u = ${rd(b.U)}`, valid: false, why: `${rd(b.f)} n'est pas ${USUAL[F].name}.` })),
+    kind: 'decision', prompt: t('Quel DL de référence ?'), options: rng.shuffle([
+      { id: d.F, label: t('{p1} avec u = {U}', { p1: familyWord(d.F, d.alpha), U: rd(b.U) }), valid: true, ref: true },
+      ...rng.shuffle(FAMS.filter((F) => F !== d.F && F !== 'pow')).slice(0, 2).map((F) => ({ id: F, label: t('{p1} avec u = {U}', { p1: USUAL[F].name, U: rd(b.U) }), valid: false, why: t('{f} n\'est pas {p1}.', { f: rd(b.f), p1: USUAL[F].name }) })),
     ]),
   }];
   const parts = [{ start: b.f, judge, lines, pre, choices: US_CHOICES(d, b.U) }];
   const as = assemble(parts, level);
   return linesItem({
     skill: US, level,
-    prompt: `Écris le DL d'ordre ${d.n} de ${MT(b.f)} en 0.${level <= 2 ? `<br>Rappel : ${USUAL[d.F].formula}${d.F === 'pow' ? `, ici α = ${d.alpha.toString().replace('-', '−')}` : ''}.` : ''}`,
+    prompt: t('Écris le DL d\'ordre {n} de {f} en 0.{p1}', { n: d.n, f: MT(b.f), p1: level <= 2 ? t('<br>Rappel : {p1}{p2}.', { p1: USUAL[d.F].formula, p2: d.F === 'pow' ? t(', ici α = {p1}', { p1: d.alpha.toString().replace('-', '−') }) : '' }) : '' }),
     ...as, mode: modeOf(level),
-    hints: H(`C'est ${familyWord(d.F, d.alpha)} avec u = ${rd(b.U)} : écris son DL, puis remplace u.`, `${boxText(blankDL(b.fin, (i) => (i > 0 ? 'coef' : false)))}`, MT(b.fin)),
+    hints: H(t('C\'est {p1} avec u = {U} : écris son DL, puis remplace u.', { p1: familyWord(d.F, d.alpha), U: rd(b.U) }), `${boxText(blankDL(b.fin, (i) => (i > 0 ? 'coef' : false)))}`, MT(b.fin)),
     subgoals: US_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${US}:${b.f}:${d.n}`, exam: examOf(opts), fallback: !!d.fallback,
   });
@@ -208,12 +209,12 @@ function usSeries(rng, opts) {
   for (let i = 0; i < 3; i++) ds.push(usData(rng, ds.map((x) => x.F)));
   const parts = ds.map((d, i) => {
     const b = usBuild(d);
-    return { html: i ? `DL d'ordre ${d.n} de ${MT(b.f)} en 0 :` : '', start: b.f, judge: { kind: 'series', v: V, at: 0, order: d.n }, lines: [E(b.fin, 'DL usuel', 'coef')] };
+    return { html: i ? t('DL d\'ordre {n} de {f} en 0 :', { n: d.n, f: MT(b.f) }) : '', start: b.f, judge: { kind: 'series', v: V, at: 0, order: d.n }, lines: [E(b.fin, t('DL usuel'), 'coef')] };
   });
   const as = assemble(parts, 5);
   const f0 = parts[0].start;
   return linesItem({
-    skill: US, level: 5, prompt: `Trois DL usuels en 0, sans aide. D'abord ${MT(f0)} à l'ordre ${ds[0].n}.`,
+    skill: US, level: 5, prompt: t('Trois DL usuels en 0, sans aide. D\'abord {f0} à l\'ordre {p1}.', { f0: MT(f0), p1: ds[0].n }),
     ...as, mode: 'free', hints: [], subgoals: US_SUB, keys: KEYS,
     key: `${US}:L5:${parts.map((p) => p.start).join('|')}`, exam: examOf(opts), fallback: ds.some((d) => d.fallback),
   });
@@ -253,9 +254,9 @@ function usMcq(rng) {
     const noSign = polyText(Array.from({ length: d.n + 1 }, (_, k) => q(1, d.b).mul(qPow(q(d.c, d.b), k))), { rem: d.n });
     const options = uniq([{ html: rightHtml, correct: true }, ...wrong, { html: MT(noSign), correct: false }]).slice(0, 4);
     return mcq({
-      skill: US, level: 4, prompt: `Le DL d'ordre ${d.n} de ${MT(d.f)} en 0 est :`, options, key: `mcq:${d.f}:${d.n}`,
+      skill: US, level: 4, prompt: t('Le DL d\'ordre {n} de {f} en 0 est :', { n: d.n, f: MT(d.f) }), options, key: `mcq:${d.f}:${d.n}`,
       exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: !!d.fallback,
-      solution: [{ html: `${MT(d.f)} = (1/${d.b})·1/(1 + ${uText(q(d.c, d.b)).replace(/-/g, '−')}) = ${rightHtml}`, note: 'Mettre la constante en facteur' }],
+      solution: [{ html: `${MT(d.f)} = (1/${d.b})·1/(1 + ${uText(q(d.c, d.b)).replace(/-/g, '−')}) = ${rightHtml}`, note: t('Mettre la constante en facteur') }],
     }, rng);
   }
   let d = usData(rng);
@@ -270,9 +271,9 @@ function usMcq(rng) {
   const pick = [...wrong.filter((o) => o.rule === 'a1_dl_factorial_missing'), { html: MT(plus), correct: false }, { html: MT(minus), correct: false }, ...wrong];
   const options = uniq([{ html: rightHtml, correct: true }, ...pick]).filter((o, i) => i === 0 || o.html !== rightHtml).slice(0, 4);
   return mcq({
-    skill: US, level: 4, prompt: `Le DL d'ordre ${d.n} de ${MT(b.f)} en 0 est :`, options, key: `mcq:${b.f}:${d.n}`,
+    skill: US, level: 4, prompt: t('Le DL d\'ordre {n} de {f} en 0 est :', { n: d.n, f: MT(b.f) }), options, key: `mcq:${b.f}:${d.n}`,
     exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: !!d.fallback,
-    solution: [{ html: `${MT(b.f)} = ${MT(b.sub)} = ${rightHtml}`, note: `DL de ${familyWord(d.F, d.alpha)}` }],
+    solution: [{ html: `${MT(b.f)} = ${MT(b.sub)} = ${rightHtml}`, note: t('DL de {p1}', { p1: familyWord(d.F, d.alpha) }) }],
   }, rng);
 }
 
@@ -281,16 +282,16 @@ function usTf(rng) {
   if (kind === 'taylor') {
     return tfItem({
       skill: US, level: 4, truth: true, key: 'taylor',
-      statement: 'Si f est infiniment dérivable au voisinage de 0 et si pₙ est la partie polynomiale de son DL d\'ordre n en 0, alors f⁽ᵏ⁾(0) = pₙ⁽ᵏ⁾(0) pour tout k ≤ n.',
-      explanation: 'Vrai (examen 2022) : par Taylor, le coefficient de xᵏ est f⁽ᵏ⁾(0)/k!, et c\'est aussi pₙ⁽ᵏ⁾(0)/k!.',
+      statement: t('Si f est infiniment dérivable au voisinage de 0 et si pₙ est la partie polynomiale de son DL d\'ordre n en 0, alors f⁽ᵏ⁾(0) = pₙ⁽ᵏ⁾(0) pour tout k ≤ n.'),
+      explanation: t('Vrai (examen 2022) : par Taylor, le coefficient de xᵏ est f⁽ᵏ⁾(0)/k!, et c\'est aussi pₙ⁽ᵏ⁾(0)/k!.'),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
   if (kind === 'even') {
     return tfItem({
       skill: US, level: 4, truth: true, key: 'even',
-      statement: 'Si f est paire et admet un DL d\'ordre 4 en 0, alors les coefficients de x et de x³ de ce DL sont nuls.',
-      explanation: 'Vrai : f(−x) = f(x) donne un DL qui ne change pas quand on remplace x par −x ; par unicité du DL, les coefficients des puissances impaires sont nuls.',
+      statement: t('Si f est paire et admet un DL d\'ordre 4 en 0, alors les coefficients de x et de x³ de ce DL sont nuls.'),
+      explanation: t('Vrai : f(−x) = f(x) donne un DL qui ne change pas quand on remplace x par −x ; par unicité du DL, les coefficients des puissances impaires sont nuls.'),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
@@ -303,9 +304,9 @@ function usTf(rng) {
   ];
   const b = rng.pick(bank);
   return tfItem({
-    skill: US, level: 4, truth: false, key: b.s, statement: b.s, ruleIfTrue: b.rule,
+    skill: US, level: 4, truth: false, key: b.s, statement: t(b.s), ruleIfTrue: b.rule,
     counter: { kind: 'refute', quants: [{ q: '∀', v: b.v, dom: b.dom }], pred: b.pred, ask: [{ v: b.v, label: `${b.v} =` }], answer: { [b.v]: b.ans } },
-    explanation: b.why, exam: { format: 'tf', points: 1 }, expectedSec: 60,
+    explanation: t(b.why), exam: { format: 'tf', points: 1 }, expectedSec: 60,
   });
 }
 

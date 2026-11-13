@@ -8,6 +8,7 @@ import {
   mcqD, tfG, examTag, geoCounter, GML, det2,
 } from './geo-kit.js';
 import { stepsItem, par, coordT, rowThrough, minusT, gcdN, isPrim, substT } from './geoan-a-kit.js';
+import { t } from '../../i18n.js';
 
 const gR = (t) => GML(t, 2);
 
@@ -17,10 +18,10 @@ const gR = (t) => GML(t, 2);
 
 const L2 = 'g4-line2';
 const L2_SUB = [
-  { id: 'param', label: 'écrire la paramétrique A + t·v⃗', skill: 'g4-vectors' },
-  { id: 'elim', label: 'éliminer t : la cartésienne', skill: L2 },
-  { id: 'solve', label: 'résoudre l\'équation en t', skill: 'eq-systems' },
-  { id: 'inter', label: 'le point d\'intersection', skill: L2 },
+  { id: 'param', label: t('écrire la paramétrique A + t·v⃗'), skill: 'g4-vectors' },
+  { id: 'elim', label: t('éliminer t : la cartésienne'), skill: L2 },
+  { id: 'solve', label: t('résoudre l\'équation en t'), skill: 'eq-systems' },
+  { id: 'inter', label: t('le point d\'intersection'), skill: L2 },
 ];
 
 // d through A with direction v (primitive), g through I = A + t₀v with a
@@ -50,18 +51,18 @@ const elimT = (n, A) => `${sumT([[n[0], 'x'], [n[1], 'y']])} = ${par(n[0])}·${p
 
 const L2_MENU = {
   line: [
-    { id: 'param', label: 'Écrire la paramétrique A + t·v⃗', valid: true },
-    { id: 'elim', label: 'Éliminer t (ou prendre la normale (v₂ ; −v₁))', valid: true },
-    { id: 'normal', label: 'Prendre v⃗ comme vecteur normal', valid: false, rule: 'g4_normal_as_direction', why: 'v⃗ est un vecteur directeur : il est parallèle à la droite. Un vecteur normal est (v₂ ; −v₁).' },
+    { id: 'param', label: t('Écrire la paramétrique A + t·v⃗'), valid: true },
+    { id: 'elim', label: t('Éliminer t (ou prendre la normale (v₂ ; −v₁))'), valid: true },
+    { id: 'normal', label: t('Prendre v⃗ comme vecteur normal'), valid: false, rule: 'g4_normal_as_direction', why: t('v⃗ est un vecteur directeur : il est parallèle à la droite. Un vecteur normal est (v₂ ; −v₁).') },
   ],
   solve: [
-    { id: 'subst', label: 'Remplacer x et y de la paramétrique dans l\'autre équation', valid: true },
-    { id: 'solve', label: 'Résoudre en t', valid: true },
-    { id: 'add', label: 'Additionner les deux équations cartésiennes', valid: false, why: 'Ici, une droite est paramétrique : on remplace, c\'est plus court.' },
+    { id: 'subst', label: t('Remplacer x et y de la paramétrique dans l\'autre équation'), valid: true },
+    { id: 'solve', label: t('Résoudre en t'), valid: true },
+    { id: 'add', label: t('Additionner les deux équations cartésiennes'), valid: false, why: t('Ici, une droite est paramétrique : on remplace, c\'est plus court.') },
   ],
   point: [
-    { id: 'back', label: 'Remplacer t dans la paramétrique', valid: true },
-    { id: 'tvec', label: 'Le point est (t ; t)', valid: false, why: 't est le paramètre, pas une coordonnée : le point est A + t·v⃗.' },
+    { id: 'back', label: t('Remplacer t dans la paramétrique'), valid: true },
+    { id: 'tvec', label: t('Le point est (t ; t)'), valid: false, why: t('t est le paramètre, pas une coordonnée : le point est A + t·v⃗.') },
   ],
 };
 
@@ -70,29 +71,29 @@ function line2Item(level, rng, opts = {}) {
   const { A, v, n, row, t0, I, m, g } = d;
   const kind = level <= 2 || level === 5 || opts.exam ? 'dir' : rng.pick(['dir', 'two', 'par', 'perp']);
   let prompt;
-  let given = '';
   const lineCfg = { kind: 'geom', object: 'line2', ref: linT(row), lineData: { A: A.map(qt), n: n.map(qt) } };
-  if (kind === 'dir') given = `la droite d passe par ${ptR('A', A)} et a pour direction v⃗ = ${vr(v)}`;
-  if (kind === 'two') given = `la droite d passe par ${ptR('A', A)} et ${ptR('B', add(A, v))}`;
   let h = null;
   if (kind === 'par' || kind === 'perp') {
     const c = rng.int(-9, 9);
     h = kind === 'par' ? [n[0], n[1], q(c)] : [v[0], v[1], q(c)];
     if (dot(h.slice(0, 2), A).add(h[2]).n === 0) h[2] = h[2].add(1);
-    given = `la droite d passe par ${ptR('A', A)} et est ${kind === 'par' ? 'parallèle' : 'perpendiculaire'} à la droite h : ${gR(linT(h))}`;
   }
   const gText = linT(g);
-  prompt = `Dans le plan, ${given}. Donne une équation cartésienne de d (coefficients entiers), puis le point d'intersection I de d et de la droite g : ${gR(gText)}.`;
+  const pv = { A: ptR('A', A), g: gR(gText) };
+  if (kind === 'dir') prompt = t('Dans le plan, la droite d passe par {A} et a pour direction v⃗ = {v}. Donne une équation cartésienne de d (coefficients entiers), puis le point d\'intersection I de d et de la droite g : {g}.', { ...pv, v: vr(v) });
+  if (kind === 'two') prompt = t('Dans le plan, la droite d passe par {A} et {B}. Donne une équation cartésienne de d (coefficients entiers), puis le point d\'intersection I de d et de la droite g : {g}.', { ...pv, B: ptR('B', add(A, v)) });
+  if (kind === 'par') prompt = t('Dans le plan, la droite d passe par {A} et est parallèle à la droite h : {h}. Donne une équation cartésienne de d (coefficients entiers), puis le point d\'intersection I de d et de la droite g : {g}.', { ...pv, h: gR(linT(h)) });
+  if (kind === 'perp') prompt = t('Dans le plan, la droite d passe par {A} et est perpendiculaire à la droite h : {h}. Donne une équation cartésienne de d (coefficients entiers), puis le point d\'intersection I de d et de la droite g : {g}.', { ...pv, h: gR(linT(h)) });
   const pT = paramT(A, [v]);
   const steps1 = [];
-  if (kind === 'two') steps1.push({ note: `Une direction : v⃗ = AB⃗ = ${vr(v)}.` });
-  if (kind === 'par') steps1.push({ note: `d est parallèle à h : une direction de h est (−b ; a) = ${vr(v)}.` });
-  if (kind === 'perp') steps1.push({ note: `d est perpendiculaire à h : le vecteur normal de h, ${vr(v)}, dirige d.` });
+  if (kind === 'two') steps1.push({ note: t('Une direction : v⃗ = AB⃗ = {v1}.', { v1: vr(v) }) });
+  if (kind === 'par') steps1.push({ note: t('d est parallèle à h : une direction de h est (−b ; a) = {v1}.', { v1: vr(v) }) });
+  if (kind === 'perp') steps1.push({ note: t('d est perpendiculaire à h : le vecteur normal de h, {v1}, dirige d.', { v1: vr(v) }) });
   steps1.push(
-    { decision: { prompt: 'Comment passer à la cartésienne ?', options: [{ id: 'elim', label: 'Éliminer t entre x et y', valid: true, quality: 'good', ref: true }, { id: 'normal', label: `Prendre la normale (v₂ ; −v₁) = ${vr(n)}, puis la constante`, valid: true, quality: 'good' }, { id: 'dir', label: `Prendre ${vr(v)} comme normale`, valid: false, rule: 'g4_normal_as_direction', why: `${vr(v)} est un vecteur directeur : il est parallèle à la droite. La normale est (v₂ ; −v₁) = ${vr(n)}.` }] }, levels: [2] },
-    { math: pT, note: 'Paramétrique', subgoal: 'param', blank: [vt(A)], blank2: [vt(A), vt(v)] },
-    { math: elimT(n, A), note: `${fq(n[0])}·x et ${fq(n[1])}·y : t disparaît`, subgoal: 'elim', blank: [par(A[0]), par(A[1])], blank2: [sumT([[n[0], 'x'], [n[1], 'y']])] },
-    { math: linT(row), note: 'Cartésienne', subgoal: 'elim', blank: [qt(row[2].n < 0 ? row[2].neg() : row[2])] },
+    { decision: { prompt: t('Comment passer à la cartésienne ?'), options: [{ id: 'elim', label: t('Éliminer t entre x et y'), valid: true, quality: 'good', ref: true }, { id: 'normal', label: t('Prendre la normale (v₂ ; −v₁) = {v1}, puis la constante', { v1: vr(n) }), valid: true, quality: 'good' }, { id: 'dir', label: t('Prendre {v1} comme normale', { v1: vr(v) }), valid: false, rule: 'g4_normal_as_direction', why: t('{v1} est un vecteur directeur : il est parallèle à la droite. La normale est (v₂ ; −v₁) = {v2}.', { v1: vr(v), v2: vr(n) }) }] }, levels: [2] },
+    { math: pT, note: t('Paramétrique'), subgoal: 'param', blank: [vt(A)], blank2: [vt(A), vt(v)] },
+    { math: elimT(n, A), note: t('{v1}·x et {v2}·y : t disparaît', { v1: fq(n[0]), v2: fq(n[1]) }), subgoal: 'elim', blank: [par(A[0]), par(A[1])], blank2: [sumT([[n[0], 'x'], [n[1], 'y']])] },
+    { math: linT(row), note: t('Cartésienne'), subgoal: 'elim', blank: [qt(row[2].n < 0 ? row[2].neg() : row[2])] },
   );
   // Substituting the parametric into g.
   const sub0 = substT(m, A, v, g[2]);
@@ -102,33 +103,33 @@ function line2Item(level, rng, opts = {}) {
   const parts = [
     { start: 'd', judge: lineCfg, menu: L2_MENU.line, steps: steps1 },
     {
-      html: `d : ${gR(linT(row))}. Remplace la paramétrique de d dans g.`, ask: 'équation en t :', start: sub0,
+      html: t('d : {v1}. Remplace la paramétrique de d dans g.', { v1: gR(linT(row)) }), ask: t('équation en t :'), start: sub0,
       judge: { kind: 'solset', v: 't', vars: ['t'] }, menu: L2_MENU.solve,
       steps: [
-        { math: red, note: 'Développer', subgoal: 'solve', blank: [qt(mv)] },
+        { math: red, note: t('Développer'), subgoal: 'solve', blank: [qt(mv)] },
         { math: `t = ${t0}`, note: '', subgoal: 'solve', blank: [String(t0)] },
       ],
     },
     {
-      html: `t = ${fq(t0)}. Le point d'intersection ?`, ask: 'I =', start: 'I',
+      html: t('t = {v1}. Le point d\'intersection ?', { v1: fq(t0) }), ask: 'I =', start: 'I',
       judge: { kind: 'vector', symbols: { A: vt(A), v: vt(v) }, expect: vt(I) }, menu: L2_MENU.point,
       steps: [
-        { math: `I = (${qt(A[0])} + ${par(v[0])}·${par(t0)} ; ${qt(A[1])} + ${par(v[1])}·${par(t0)})`, note: 'Remplacer t', subgoal: 'inter', upTo: 2 },
+        { math: `I = (${qt(A[0])} + ${par(v[0])}·${par(t0)} ; ${qt(A[1])} + ${par(v[1])}·${par(t0)})`, note: t('Remplacer t'), subgoal: 'inter', upTo: 2 },
         { math: `I = ${vt(I)}`, note: '', subgoal: 'inter', blank: [qt(I[0]), qt(I[1])] },
       ],
     },
   ];
   if (level === 5 || opts.exam) {
-    parts[1].steps.unshift({ decision: { prompt: `Les normales ${vr(n)} et ${vr(m)} sont-elles colinéaires ?`, options: [
-      { id: 'sec', label: 'Non : les droites sont sécantes', valid: true, ref: true },
-      { id: 'par', label: 'Oui : parallèles (sans point commun)', valid: false, why: `${fq(n[0])}·${fq(m[1])} − ${fq(n[1])}·${fq(m[0])} = ${fq(det2(n, m))} ≠ 0 : les normales ne sont pas colinéaires.` },
-      { id: 'same', label: 'Oui : confondues', valid: false, why: 'Des droites confondues ont des normales colinéaires ; ce n\'est pas le cas.' },
+    parts[1].steps.unshift({ decision: { prompt: t('Les normales {v1} et {v2} sont-elles colinéaires ?', { v1: vr(n), v2: vr(m) }), options: [
+      { id: 'sec', label: t('Non : les droites sont sécantes'), valid: true, ref: true },
+      { id: 'par', label: t('Oui : parallèles (sans point commun)'), valid: false, why: t('{v1}·{v2} − {v3}·{v4} = {v5} ≠ 0 : les normales ne sont pas colinéaires.', { v1: fq(n[0]), v2: fq(m[1]), v3: fq(n[1]), v4: fq(m[0]), v5: fq(det2(n, m)) }) },
+      { id: 'same', label: t('Oui : confondues'), valid: false, why: t('Des droites confondues ont des normales colinéaires ; ce n\'est pas le cas.') },
     ] } });
   }
   return stepsItem({
     skill: L2, level, prompt, parts, subgoals: L2_SUB, key: `${L2}:${kind}:${vt(A)}${vt(v)}${gText}`, fallback: d.fallback,
     hints: [
-      { level: 1, html: `Écris d sous forme paramétrique A + t·v⃗, puis élimine t : la normale (v₂ ; −v₁) = ${vr(n)} donne ${readable(sumT([[n[0], 'x'], [n[1], 'y']]))} = ${readable(sumT([[n[0], 'x_A'], [n[1], 'y_A']]))}.` },
+      { level: 1, html: t('Écris d sous forme paramétrique A + t·v⃗, puis élimine t : la normale (v₂ ; −v₁) = {v1} donne {v2} = {v3}.', { v1: vr(n), v2: readable(sumT([[n[0], 'x'], [n[1], 'y']])), v3: readable(sumT([[n[0], 'x_A'], [n[1], 'y_A']])) }) },
       { level: 2, html: `${readable(sumT([[n[0], 'x'], [n[1], 'y']]))} = ${par(n[0]).replace(/-/g, '−')}·(□) + ${par(n[1]).replace(/-/g, '−')}·(□)` },
       { level: 3, html: gR(linT(row)) },
     ],
@@ -146,23 +147,23 @@ function line2Exam(rng, exam) {
       const c = r[2].mul(k).add(nz(rng, -3, 3));
       return tfG({
         skill: L2, key: `par:${linT(r)}:${k}`, truth: true, exam: examTag({ exam }),
-        statement: `Les droites ${gR(linT(r))} et ${gR(linT([r[0].mul(k), r[1].mul(k), c]))} sont parallèles et distinctes.`,
-        explanation: `Vrai : les normales sont colinéaires (facteur ${k}), mais les constantes ne le sont pas dans le même rapport.`,
+        statement: t('Les droites {v1} et {v2} sont parallèles et distinctes.', { v1: gR(linT(r)), v2: gR(linT([r[0].mul(k), r[1].mul(k), c])) }),
+        explanation: t('Vrai : les normales sont colinéaires (facteur {k}), mais les constantes ne le sont pas dans le même rapport.', { k }),
       });
     }
     const r2 = r.map((x) => x.mul(k));
     return tfG({
       skill: L2, key: `same:${linT(r)}:${k}`, truth: false, exam: examTag({ exam }), ruleIfTrue: 'g4_line_constant',
-      statement: `Les droites ${gR(linT(r))} et ${gR(linT(r2))} sont parallèles et distinctes.`,
-      counter: geoCounter('commonPoint', [['P', 'un point commun P =']], { P: vt(d.A) }, { rows: [r.map(Number), r2.map(Number)] }),
-      explanation: `Faux : la seconde équation est la première multipliée par ${k}, les droites sont confondues. Par exemple ${ptR('A', d.A)} est sur les deux.`,
+      statement: t('Les droites {v1} et {v2} sont parallèles et distinctes.', { v1: gR(linT(r)), v2: gR(linT(r2)) }),
+      counter: geoCounter('commonPoint', [['P', t('un point commun P =')]], { P: vt(d.A) }, { rows: [r.map(Number), r2.map(Number)] }),
+      explanation: t('Faux : la seconde équation est la première multipliée par {k}, les droites sont confondues. Par exemple {v1} est sur les deux.', { k, v1: ptR('A', d.A) }),
     });
   }
   const { A, v, row } = d;
   const nd = rowThrough(v, A);
   return mcqD({
     skill: L2, level: 4, key: `mcq:${vt(A)}${vt(v)}`, exam: examTag({ exam }),
-    prompt: `Quelle est une équation cartésienne de la droite passant par ${ptR('A', A)}, de direction v⃗ = ${vr(v)} ?`,
+    prompt: t('Quelle est une équation cartésienne de la droite passant par {v1}, de direction v⃗ = {v2} ?', { v1: ptR('A', A), v2: vr(v) }),
     right: gR(linT(row)),
     wrongs: [
       { html: gR(linT(nd)), rule: 'g4_normal_as_direction' },
@@ -170,7 +171,7 @@ function line2Exam(rng, exam) {
       row[2].n !== 0 ? { html: gR(linT([row[0], row[1], q(0)])), rule: 'g4_line_constant' } : null,
     ],
     fillers: [{ html: gR(linT(prim([row[0], row[1].neg(), row[2]]))) }, { html: gR(linT([row[0], row[1], row[2].add(1)])) }, { html: gR(linT([row[1], row[0], row[2]])) }],
-    solution: [{ html: `Normale (v₂ ; −v₁) = ${vr(row.slice(0, 2))}, puis la constante avec A : ${gR(linT(row))}.`, note: '' }],
+    solution: [{ html: t('Normale (v₂ ; −v₁) = {v1}, puis la constante avec A : {v2}.', { v1: vr(row.slice(0, 2)), v2: gR(linT(row)) }), note: '' }],
     fallback: d.fallback,
   }, rng);
 }
@@ -181,10 +182,10 @@ function line2Exam(rng, exam) {
 
 const BIS = 'g4-bisectors';
 const BIS_SUB = [
-  { id: 'norm', label: 'normes des vecteurs normaux', skill: 'g4-dot' },
-  { id: 'eq', label: 'égalité des distances', skill: BIS },
-  { id: 'cases', label: 'cas + et cas −', skill: 'g1-abs-eq' },
-  { id: 'line', label: 'équations cartésiennes', skill: 'g4-line2' },
+  { id: 'norm', label: t('normes des vecteurs normaux'), skill: 'g4-dot' },
+  { id: 'eq', label: t('égalité des distances'), skill: BIS },
+  { id: 'cases', label: t('cas + et cas −'), skill: 'g1-abs-eq' },
+  { id: 'line', label: t('équations cartésiennes'), skill: 'g4-line2' },
 ];
 
 // Normals of whole norm: (3 ; 4) → 5, (5 ; 12) → 13, (8 ; 15) → 17, (1 ; 0) → 1.
@@ -218,10 +219,10 @@ function bisData(rng, { equal = null } = {}) {
 
 const pairT = (a, b) => `${linT(a)} ou ${linT(b)}`;
 const BIS_MENU = [
-  { id: 'norm', label: 'Calculer les normes des vecteurs normaux', valid: true },
-  { id: 'dist', label: 'Égaler les distances |…|/‖n₁‖ = |…|/‖n₂‖', valid: true },
-  { id: 'cases', label: 'Séparer les cas + et −', valid: true },
-  { id: 'nonorm', label: 'Égaler |a₁x + b₁y + c₁| et |a₂x + b₂y + c₂| sans les normes', valid: false, rule: 'g4_bisector_unnormalized', why: 'a x + b y + c n\'est une distance qu\'après division par √(a² + b²).' },
+  { id: 'norm', label: t('Calculer les normes des vecteurs normaux'), valid: true },
+  { id: 'dist', label: t('Égaler les distances |…|/‖n₁‖ = |…|/‖n₂‖'), valid: true },
+  { id: 'cases', label: t('Séparer les cas + et −'), valid: true },
+  { id: 'nonorm', label: t('Égaler |a₁x + b₁y + c₁| et |a₂x + b₂y + c₂| sans les normes'), valid: false, rule: 'g4_bisector_unnormalized', why: t('a x + b y + c n\'est une distance qu\'après division par √(a² + b²).') },
 ];
 
 function bisLinesSteps(d, level) {
@@ -232,13 +233,13 @@ function bisLinesSteps(d, level) {
   const f = (N) => (N === 1 ? '' : String(N));
   const casesT = same ? `${L1} - (${L2t}) = 0 ou ${L1} + (${L2t}) = 0` : `${f(N2)}(${L1}) - ${f(N1)}(${L2t}) = 0 ou ${f(N2)}(${L1}) + ${f(N1)}(${L2t}) = 0`;
   return [
-    { decision: { prompt: 'Comment écrire l\'égalité des distances ?', options: [
-      { id: 'div', label: 'Diviser chaque valeur absolue par la norme de sa normale', valid: true, ref: true },
-      { id: 'direct', label: 'Égaler directement les deux valeurs absolues', valid: same, quality: same ? 'poor' : undefined, rule: same ? undefined : 'g4_bisector_unnormalized', why: same ? `Juste ici, parce que les deux normes valent ${N1} ; en général il faut diviser par chaque norme.` : `Les normes diffèrent (${N1} et ${N2}) : a x + b y + c n'est une distance qu'après division par √(a² + b²).` },
+    { decision: { prompt: t('Comment écrire l\'égalité des distances ?'), options: [
+      { id: 'div', label: t('Diviser chaque valeur absolue par la norme de sa normale'), valid: true, ref: true },
+      { id: 'direct', label: t('Égaler directement les deux valeurs absolues'), valid: same, quality: same ? 'poor' : undefined, rule: same ? undefined : 'g4_bisector_unnormalized', why: same ? t('Juste ici, parce que les deux normes valent {N1} ; en général il faut diviser par chaque norme.', { N1 }) : t('Les normes diffèrent ({N1} et {N2}) : a x + b y + c n\'est une distance qu\'après division par √(a² + b²).', { N1, N2 }) },
     ] }, levels: [2] },
-    { math: `|${L1}|/${N1} = |${L2t}|/${N2}`, note: 'Égalité des distances', subgoal: 'eq', blank: [String(N1), String(N2)], blank2: [] },
+    { math: `|${L1}|/${N1} = |${L2t}|/${N2}`, note: t('Égalité des distances'), subgoal: 'eq', blank: [String(N1), String(N2)], blank2: [] },
     { math: casesT, note: '|A| = |B| ⇔ A = B ou A = −B', subgoal: 'cases', from: 1 },
-    { math: pairT(plus, minus), note: 'Les deux bissectrices', subgoal: 'line', blank: [qt(plus[2].n < 0 ? plus[2].neg() : plus[2])], blank2: [] },
+    { math: pairT(plus, minus), note: t('Les deux bissectrices'), subgoal: 'line', blank: [qt(plus[2].n < 0 ? plus[2].neg() : plus[2])], blank2: [] },
   ];
 }
 
@@ -250,23 +251,23 @@ function bisItem(level, rng, opts = {}) {
   const { r1, r2, N1, N2, plus, minus } = d;
   const parts = [];
   const normStep = (n, N, name) => ({
-    html: `La norme de ${name} = ${vr(n)} ?`, ask: `‖${name}‖ =`, start: `‖${vt(n)}‖`,
+    html: t('La norme de {name} = {v1} ?', { name, v1: vr(n) }), ask: `‖${name}‖ =`, start: `‖${vt(n)}‖`,
     judge: { kind: 'vector', expect: String(N) }, menu: BIS_MENU,
-    steps: [{ math: `√(${sqTN(n)})`, note: 'Pythagore', subgoal: 'norm' }, { math: String(N), note: '', subgoal: 'norm' }],
+    steps: [{ math: `√(${sqTN(n)})`, note: t('Pythagore'), subgoal: 'norm' }, { math: String(N), note: '', subgoal: 'norm' }],
   });
   if (level >= 2) parts.push(normStep(r1.slice(0, 2), N1, 'n⃗₁'), normStep(r2.slice(0, 2), N2, 'n⃗₂'));
   parts.push({
-    html: level >= 2 ? `‖n⃗₁‖ = ${N1}, ‖n⃗₂‖ = ${N2}. Les bissectrices ?` : `Les normes valent ‖n⃗₁‖ = ${N1} et ‖n⃗₂‖ = ${N2}.`, ask: 'bissectrices :', start: 'b',
+    html: level >= 2 ? t('‖n⃗₁‖ = {N1}, ‖n⃗₂‖ = {N2}. Les bissectrices ?', { N1, N2 }) : t('Les normes valent ‖n⃗₁‖ = {N1} et ‖n⃗₂‖ = {N2}.', { N1, N2 }), ask: t('bissectrices :'), start: 'b',
     judge: { kind: 'geom', object: 'line2', count: 2, ref: pairT(plus, minus), bis: { r1: r1.map(qt), r2: r2.map(qt), N1, N2 } }, menu: BIS_MENU,
     steps: bisLinesSteps(d, level),
   });
   return stepsItem({
     skill: BIS, level, parts, subgoals: BIS_SUB, key: `${BIS}:${linT(r1)}|${linT(r2)}`, fallback: d.fallback,
     keys: ['calc', 'geo', 'pts', 'calcfn'], // | | of the distances
-    prompt: `Donne les équations des deux bissectrices des droites d₁ : ${gR(linT(r1))} et d₂ : ${gR(linT(r2))}, à coefficients entiers.`,
+    prompt: t('Donne les équations des deux bissectrices des droites d₁ : {v1} et d₂ : {v2}, à coefficients entiers.', { v1: gR(linT(r1)), v2: gR(linT(r2)) }),
     hints: [
-      { level: 1, html: 'Un point de la bissectrice est à la même distance des deux droites : |a₁x + b₁y + c₁|/‖n⃗₁‖ = |a₂x + b₂y + c₂|/‖n⃗₂‖.' },
-      { level: 2, html: `${readable(absT(r1))} = ±(□) (après avoir multiplié par les normes)` },
+      { level: 1, html: t('Un point de la bissectrice est à la même distance des deux droites : |a₁x + b₁y + c₁|/‖n⃗₁‖ = |a₂x + b₂y + c₂|/‖n⃗₂‖.') },
+      { level: 2, html: t('{v1} = ±(□) (après avoir multiplié par les normes)', { v1: readable(absT(r1)) }) },
       { level: 3, html: gR(pairT(plus, minus)) },
     ],
   });
@@ -288,17 +289,17 @@ function mediatorItem(level, rng) {
   const lineT = `${par(u[0])}(${minusT('x', I[0])}) + ${par(u[1])}(${minusT('y', I[1])}) = 0`;
   return stepsItem({
     skill: BIS, level, subgoals: BIS_SUB, key: `${BIS}:med:${vt(A)}${vt(B)}`,
-    prompt: `Donne une équation cartésienne (coefficients entiers) de la médiatrice de [AB], avec ${ptR('A', A)} et ${ptR('B', B)}.`,
+    prompt: t('Donne une équation cartésienne (coefficients entiers) de la médiatrice de [AB], avec {v1} et {v2}.', { v1: ptR('A', A), v2: ptR('B', B) }),
     parts: [
-      { html: `Le milieu de [AB] est I${vr(I)}, et AB⃗ = ${vr(u)} est normal à la médiatrice.`, start: 'm', judge: { kind: 'geom', object: 'line2', ref: linT(row) },
-        menu: [{ id: 'mid', label: 'AB⃗·(X − I) = 0, avec I le milieu', valid: true }, { id: 'dir', label: 'La droite par I de direction AB⃗', valid: false, rule: 'g4_normal_as_direction', why: 'La médiatrice est perpendiculaire à [AB] : AB⃗ est un vecteur normal, pas directeur.' }],
+      { html: t('Le milieu de [AB] est I{v1}, et AB⃗ = {v2} est normal à la médiatrice.', { v1: vr(I), v2: vr(u) }), start: 'm', judge: { kind: 'geom', object: 'line2', ref: linT(row) },
+        menu: [{ id: 'mid', label: t('AB⃗·(X − I) = 0, avec I le milieu'), valid: true }, { id: 'dir', label: t('La droite par I de direction AB⃗'), valid: false, rule: 'g4_normal_as_direction', why: t('La médiatrice est perpendiculaire à [AB] : AB⃗ est un vecteur normal, pas directeur.') }],
         steps: [
           { math: lineT, note: 'AB⃗·(X − I) = 0', subgoal: 'eq' },
-          { math: linT(row), note: 'Développer et simplifier', subgoal: 'line' },
+          { math: linT(row), note: t('Développer et simplifier'), subgoal: 'line' },
         ] },
     ],
     hints: [
-      { level: 1, html: 'Un point M de la médiatrice vérifie MA = MB, ou AB⃗·(M − I) = 0 avec I le milieu de [AB].' },
+      { level: 1, html: t('Un point M de la médiatrice vérifie MA = MB, ou AB⃗·(M − I) = 0 avec I le milieu de [AB].') },
       { level: 2, html: `${fq(u[0])}(x − □) ${q(u[1]).n < 0 ? '−' : '+'} ${fq(q(u[1]).n < 0 ? q(u[1]).neg() : u[1])}(y − □) = 0` },
       { level: 3, html: gR(linT(row)) },
     ],
@@ -307,7 +308,7 @@ function mediatorItem(level, rng) {
 
 // Level 5 and the problem: the interior bisector of the angle A of a triangle.
 function bisInterior(level, rng, opts) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const A = [q(rng.int(-4, 4)), q(rng.int(-4, 4))];
     const fa = rng.pick(NORMALS);
     const a = normalOf(rng, fa);
@@ -336,18 +337,18 @@ function bisInterior(level, rng, opts) {
     const label = (r) => readable(linT(r));
     return stepsItem({
       skill: BIS, level, subgoals: BIS_SUB, key: `${BIS}:int:${vt(A)}${vt(B)}${vt(C)}`, exam: opts.exam ? examTag(opts, 4) : false,
-      prompt: `Le triangle ABC a pour sommets ${ptR('A', A)}, ${ptR('B', B)} et ${ptR('C', C)}. Donne une équation de la bissectrice intérieure de l'angle en A.`,
+      prompt: t('Le triangle ABC a pour sommets {v1}, {v2} et {v3}. Donne une équation de la bissectrice intérieure de l\'angle en A.', { v1: ptR('A', A), v2: ptR('B', B), v3: ptR('C', C) }),
       parts: [
-        { start: '(AB)', judge: { kind: 'geom', object: 'line2', ref: linT(r1) }, steps: [{ math: linT(r1), note: `Normale ${vr(r1.slice(0, 2))}, par A`, subgoal: 'line' }] },
-        { html: 'La droite (AC) ?', ask: '(AC) :', start: '(AC)', judge: { kind: 'geom', object: 'line2', ref: linT(r2) }, steps: [{ math: linT(r2), note: `Normale ${vr(r2.slice(0, 2))}, par A`, subgoal: 'line' }] },
-        { html: 'Les deux bissectrices de (AB) et (AC) ?', ask: 'bissectrices :', start: 'b', judge: { kind: 'geom', object: 'line2', count: 2, ref: pairT(s1, s2), bis: { r1: r1.map(qt), r2: r2.map(qt), N1, N2 } }, steps },
-        { html: 'Laquelle est intérieure ?', ask: 'bissectrice intérieure :', start: 'b_A', judge: { kind: 'geom', object: 'line2', ref: linT(interior) },
+        { start: '(AB)', judge: { kind: 'geom', object: 'line2', ref: linT(r1) }, steps: [{ math: linT(r1), note: t('Normale {v1}, par A', { v1: vr(r1.slice(0, 2)) }), subgoal: 'line' }] },
+        { html: t('La droite (AC) ?'), ask: '(AC) :', start: '(AC)', judge: { kind: 'geom', object: 'line2', ref: linT(r2) }, steps: [{ math: linT(r2), note: t('Normale {v1}, par A', { v1: vr(r2.slice(0, 2)) }), subgoal: 'line' }] },
+        { html: t('Les deux bissectrices de (AB) et (AC) ?'), ask: t('bissectrices :'), start: 'b', judge: { kind: 'geom', object: 'line2', count: 2, ref: pairT(s1, s2), bis: { r1: r1.map(qt), r2: r2.map(qt), N1, N2 } }, steps },
+        { html: t('Laquelle est intérieure ?'), ask: t('bissectrice intérieure :'), start: 'b_A', judge: { kind: 'geom', object: 'line2', ref: linT(interior) },
           steps: [
-            { decision: { prompt: 'La bissectrice intérieure sépare B et C. Laquelle est-ce ?', options: [
+            { decision: { prompt: t('La bissectrice intérieure sépare B et C. Laquelle est-ce ?'), options: [
               { id: 'in', label: label(interior), valid: true, ref: true },
-              { id: 'out', label: label(exterior), valid: false, why: `B et C sont du même côté de cette droite (même signe en remplaçant leurs coordonnées) : c'est la bissectrice extérieure.` },
+              { id: 'out', label: label(exterior), valid: false, why: t('B et C sont du même côté de cette droite (même signe en remplaçant leurs coordonnées) : c\'est la bissectrice extérieure.') },
             ] } },
-            { math: linT(interior), note: 'Signes opposés en B et en C', subgoal: 'eq' },
+            { math: linT(interior), note: t('Signes opposés en B et en C'), subgoal: 'eq' },
           ] },
       ],
       hints: [], noHints: true,
@@ -359,11 +360,12 @@ function bisInterior(level, rng, opts) {
 function bisExam(rng, exam) {
   if (exam === 'open') return bisItem(5, rng, { exam });
   if (exam === 'tf') {
+    // French texts: the key is built from the French statement.
     const st = rng.pick([
       ['Les deux bissectrices de deux droites sécantes sont perpendiculaires.', 'Vrai : leurs normales N₂n⃗₁ − N₁n⃗₂ et N₂n⃗₁ + N₁n⃗₂ ont un produit scalaire N₂²‖n⃗₁‖² − N₁²‖n⃗₂‖² = 0.'],
       ['Un point de la médiatrice de [AB] est à égale distance de A et de B.', 'Vrai : c\'est la définition de la médiatrice (MA = MB).'],
     ]);
-    return tfG({ skill: BIS, key: `true:${st[0].length}`, truth: true, exam: examTag({ exam }), statement: st[0], explanation: st[1] });
+    return tfG({ skill: BIS, key: `true:${st[0].length}`, truth: true, exam: examTag({ exam }), statement: t(st[0]), explanation: t(st[1]) });
   }
   const d = bisData(rng, { equal: false });
   const { r1, r2, plus, minus } = d;
@@ -371,11 +373,11 @@ function bisExam(rng, exam) {
   const un2 = prim(r1.map((x, i) => x.add(r2[i])), true);
   return mcqD({
     skill: BIS, level: 4, key: `mcq:${linT(r1)}|${linT(r2)}`, exam: examTag({ exam }),
-    prompt: `Quelles sont les bissectrices des droites d₁ : ${gR(linT(r1))} et d₂ : ${gR(linT(r2))} ?`,
+    prompt: t('Quelles sont les bissectrices des droites d₁ : {v1} et d₂ : {v2} ?', { v1: gR(linT(r1)), v2: gR(linT(r2)) }),
     right: gR(pairT(plus, minus)),
     wrongs: [{ html: gR(pairT(un1, un2)), rule: 'g4_bisector_unnormalized' }, { html: gR(linT(plus)), rule: 'g4_bisector_one_sign' }],
     fillers: [{ html: gR(pairT(plus, [minus[0], minus[1], minus[2].add(1)])) }, { html: gR(pairT([plus[1], plus[0], plus[2]], minus)) }],
-    solution: [{ html: `|${readable(absT(r1))}|/${d.N1} = |${readable(absT(r2))}|/${d.N2}, d'où ${gR(pairT(plus, minus))}.`, note: '' }],
+    solution: [{ html: t('|{v1}|/{N1} = |{v2}|/{N2}, d\'où {v3}.', { v1: readable(absT(r1)), N1: d.N1, v2: readable(absT(r2)), N2: d.N2, v3: gR(pairT(plus, minus)) }), note: '' }],
     fallback: d.fallback,
   }, rng);
 }

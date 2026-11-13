@@ -14,6 +14,7 @@ import { exactForm } from './exactform.js';
 import { exactValue } from './normal.js';
 import { toText } from './print.js';
 import { evalFloat } from './numeric.js';
+import { t as tr } from '../i18n.js';
 
 const literal = (n) => { n = stripParen(n); if (n.t === 'neg') n = stripParen(n.e); return n.t === 'num' || (n.t === 'frac' && stripParen(n.n).t === 'num' && stripParen(n.d).t === 'num'); };
 const qOf = (n) => (literal(n) ? numValue(stripParen(n)) : null);
@@ -28,7 +29,8 @@ const NICE = {
   sin: [], cos: [], tan: [],
 };
 
-// The key of an atom, a message, or null (not an atom).
+// The key of an atom, a message, or null (not an atom). A message ends
+// with « . » (keys never do): its English text must end with « . » too.
 function atomKey(x) {
   x = stripParen(x);
   if (x.t === 'const' && (x.name === 'pi' || x.name === 'e')) return x.name;
@@ -36,11 +38,11 @@ function atomKey(x) {
   if (x.t === 'sqrt' && stripParen(x.e).t === 'const' && stripParen(x.e).name === 'pi') return '√π';
   if (x.t === 'sqrt' || x.t === 'root') {
     const q = qOf(x.e);
-    if (!q || q.d !== 1 || q.n < 2) return q && q.d !== 1 ? 'Écris la racine sans fraction dedans.' : null;
+    if (!q || q.d !== 1 || q.n < 2) return q && q.d !== 1 ? tr('Écris la racine sans fraction dedans.') : null;
     if (x.t === 'sqrt') {
       const r = Math.round(Math.sqrt(q.n));
-      if (r * r === q.n) return `Calcule la racine : √${q.n} = ${r}.`;
-      if (!squarefree(q.n)) return 'Simplifie la racine : sors les carrés (√8 = 2√2).';
+      if (r * r === q.n) return tr('Calcule la racine : √{n} = {r}.', { n: q.n, r });
+      if (!squarefree(q.n)) return tr('Simplifie la racine : sors les carrés (√8 = 2√2).');
     }
     return toText(x);
   }
@@ -87,7 +89,7 @@ function atomKey(x) {
       if (q && q.n !== 0 && (name === 'sin' || name === 'cos' || name === 'tan')) return toText(x);
       if (!ok || name === 'sin' || name === 'cos' || name === 'tan') return null;
       const y = evalFloat(a, {});
-      if (NICE[name].some((z) => Math.abs(z - y) < 1e-12)) return `Calcule ${toText(x)} : c'est une valeur connue.`;
+      if (NICE[name].some((z) => Math.abs(z - y) < 1e-12)) return tr('Calcule {x} : c\'est une valeur connue.', { x: toText(x) });
       return toText(x);
     }
   }
@@ -116,7 +118,7 @@ function termOf(t) {
       const v = qOf(f);
       if (v) {
         if (!(v.eq(1) && !below && list.length > 1)) nums++;
-        if (v.n === 0) return below ? null : 'Un produit par 0 vaut 0.';
+        if (v.n === 0) return below ? null : tr('Un produit par 0 vaut 0.');
         q = below ? q.div(v) : q.mul(v);
         continue;
       }
@@ -127,12 +129,12 @@ function termOf(t) {
     }
   }
   // Step U6: one number above and one below, atoms around them: 8/(3π).
-  if (nums > 2 || (nums === 2 && !(ups.some((f) => qOf(f)) && downs.filter((f) => qOf(f)).length === 1))) return 'Multiplie les nombres entre eux.';
+  if (nums > 2 || (nums === 2 && !(ups.some((f) => qOf(f)) && downs.filter((f) => qOf(f)).length === 1))) return tr('Multiplie les nombres entre eux.');
   if (nums === 2 && downs.length > 1) {
     const g = (x, y) => (y ? g(y, x % y) : Math.abs(x));
     const [u] = ups.filter((f) => qOf(f)).map(qOf);
     const [w] = downs.filter((f) => qOf(f)).map(qOf);
-    if (u.d !== 1 || w.d !== 1 || g(u.n, w.n) !== 1) return 'Simplifie la fraction.';
+    if (u.d !== 1 || w.d !== 1 || g(u.n, w.n) !== 1) return tr('Simplifie la fraction.');
   }
   return { q, key: keys.sort().join('·') };
 }
@@ -155,7 +157,7 @@ export function closedNumber(node) {
       const a = numValue(stripParen(f.n)).n;
       const b = numValue(stripParen(f.d)).n;
       const g = (x, y) => (y ? g(y, x % y) : Math.abs(x));
-      if (b === 1 || g(a, b) !== 1) return 'Simplifie la fraction.';
+      if (b === 1 || g(a, b) !== 1) return tr('Simplifie la fraction.');
     }
     return true;
   }
@@ -173,7 +175,7 @@ export function closedNumber(node) {
   for (const t of ts) if (!t || typeof t === 'string') return t ?? false;
   const keys = new Set();
   for (const t of ts) {
-    if (keys.has(t.key)) return t.key ? 'Regroupe les termes semblables.' : 'Additionne les nombres entre eux.';
+    if (keys.has(t.key)) return t.key ? tr('Regroupe les termes semblables.') : tr('Additionne les nombres entre eux.');
     keys.add(t.key);
   }
   void sign;

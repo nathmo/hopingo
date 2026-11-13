@@ -22,6 +22,7 @@ import { GEN as NATURE } from './coniques-b-nature.js';
 import { GEN as FRAME } from './coniques-b-frame.js';
 import { GEN as DATA } from './coniques-b-data.js';
 import { GEN as FAMILY } from './coniques-b-family.js';
+import { t } from '../../i18n.js';
 
 // ======================================================================
 // Reductions built backwards
@@ -47,9 +48,9 @@ function charLines(d) {
   const fac = (l) => (l === 0 ? 'λ' : `(λ${l > 0 ? '-' : '+'}${Math.abs(l)})`);
   const factored = d.l2 === 0 ? `λ(λ${d.l1 > 0 ? '-' : '+'}${Math.abs(d.l1)})` : `${fac(d.l1)}${fac(d.l2)}`;
   return [
-    { math: m, note: `A = [[a, b/2], [b/2, c]] : b/2 = ${fq(b2)} hors de la diagonale`, subgoal: 'eig', cells: [[0, 1], [1, 0]] },
-    { math: formula, note: 'Déterminant 2 × 2', subgoal: 'eig', blank: [parT(b2)] },
-    { math: expanded, note: 'Développer', subgoal: 'eig', blank: [qt(det)], blank2: [] },
+    { math: m, note: t('A = [[a, b/2], [b/2, c]] : b/2 = {v1} hors de la diagonale', { v1: fq(b2) }), subgoal: 'eig', cells: [[0, 1], [1, 0]] },
+    { math: formula, note: t('Déterminant 2 × 2'), subgoal: 'eig', blank: [parT(b2)] },
+    { math: expanded, note: t('Développer'), subgoal: 'eig', blank: [qt(det)], blank2: [] },
     { math: factored, note: `λ₁ = ${fq(d.l1)}, λ₂ = ${fq(d.l2)}`, subgoal: 'eig' },
   ];
 }
@@ -60,36 +61,36 @@ function charLines(d) {
 
 const RED = 'g10-conic-reduce';
 const RED_SUB = [
-  { id: 'eig', label: 'valeurs propres de A', skill: 'l-eig-charpoly' },
-  { id: 'vec', label: 'vecteurs propres normés', skill: 'l-eig-space' },
-  { id: 'centre', label: 'centre (système)', skill: 'eq-systems' },
-  { id: 'nature', label: 'nature : centre ou pas', skill: 'g10-conic-nature' },
-  { id: 'red', label: 'équation réduite', skill: RED },
+  { id: 'eig', label: t('valeurs propres de A'), skill: 'l-eig-charpoly' },
+  { id: 'vec', label: t('vecteurs propres normés'), skill: 'l-eig-space' },
+  { id: 'centre', label: t('centre (système)'), skill: 'eq-systems' },
+  { id: 'nature', label: t('nature : centre ou pas'), skill: 'g10-conic-nature' },
+  { id: 'red', label: t('équation réduite'), skill: RED },
 ];
 
 const RED_MENU = {
   char: [
-    { id: 'char', label: 'Polynôme caractéristique det(A − λI)', valid: true },
-    { id: 'bfull', label: 'A = [[a, b], [b, c]] avec b entier', valid: false, rule: 'g10_bhalf_matrix', why: 'Hors de la diagonale de A, on met la moitié du coefficient de xy : xᵀAx = ax² + 2a₁₂xy + cy².' },
-    { id: 'complete', label: 'Compléter les carrés tout de suite', valid: false, why: 'Le terme en xy empêche de compléter les carrés séparément : il faut d\'abord tourner le repère.' },
+    { id: 'char', label: t('Polynôme caractéristique det(A − λI)'), valid: true },
+    { id: 'bfull', label: t('A = [[a, b], [b, c]] avec b entier'), valid: false, rule: 'g10_bhalf_matrix', why: t('Hors de la diagonale de A, on met la moitié du coefficient de xy : xᵀAx = ax² + 2a₁₂xy + cy².') },
+    { id: 'complete', label: t('Compléter les carrés tout de suite'), valid: false, why: t('Le terme en xy empêche de compléter les carrés séparément : il faut d\'abord tourner le repère.') },
   ],
   vec: [
-    { id: 'ker', label: 'Résoudre (A − λI)v = 0', valid: true },
-    { id: 'norm', label: 'Diviser par la norme', valid: true },
-    { id: 'col', label: 'Prendre une colonne de A', valid: false, why: 'Une colonne de A n\'est pas un vecteur propre en général.' },
+    { id: 'ker', label: t('Résoudre (A − λI)v = 0'), valid: true },
+    { id: 'norm', label: t('Diviser par la norme'), valid: true },
+    { id: 'col', label: t('Prendre une colonne de A'), valid: false, why: t('Une colonne de A n\'est pas un vecteur propre en général.') },
   ],
   centre: [
     { id: 'grad', label: '∂f/∂x = 0 et ∂f/∂y = 0', valid: true },
-    { id: 'eig', label: 'Le centre est un vecteur propre', valid: false, why: 'Le centre se trouve par les dérivées partielles nulles : c\'est le point de symétrie.' },
+    { id: 'eig', label: t('Le centre est un vecteur propre'), valid: false, why: t('Le centre se trouve par les dérivées partielles nulles : c\'est le point de symétrie.') },
   ],
   const: [
-    { id: 'sub', label: 'Remplacer x et y par les coordonnées de Ω', valid: true },
-    { id: 'keep', label: 'Garder la constante de départ', valid: false, rule: 'g10_constant_not_updated', why: 'Après la translation au centre, la constante est f(Ω), pas celle de départ.' },
+    { id: 'sub', label: t('Remplacer x et y par les coordonnées de Ω'), valid: true },
+    { id: 'keep', label: t('Garder la constante de départ'), valid: false, rule: 'g10_constant_not_updated', why: t('Après la translation au centre, la constante est f(Ω), pas celle de départ.') },
   ],
   red: [
     { id: 'diag', label: 'λ₁X² + λ₂Y² + f(Ω) = 0', valid: true },
-    { id: 'square', label: 'Compléter le carré après la rotation', valid: true },
-    { id: 'unnorm', label: 'Garder les vecteurs propres non normés', valid: false, rule: 'g10_eigvec_not_normed', why: 'Le repère doit être orthonormé : avec un vecteur de norme √n, X² est multiplié par n.' },
+    { id: 'square', label: t('Compléter le carré après la rotation'), valid: true },
+    { id: 'unnorm', label: t('Garder les vecteurs propres non normés'), valid: false, rule: 'g10_eigvec_not_normed', why: t('Le repère doit être orthonormé : avec un vecteur de norme √n, X² est multiplié par n.') },
   ],
 };
 
@@ -99,23 +100,23 @@ function reduceParts(d, level, { foci = false } = {}) {
   const parts = [];
   const trapCfg = { reduce: { l1: d.l1, l2: d.l2, n: d.n, f: qt(d.coefs[5]), fO: d.k === null ? null : qt(-d.k) }, abc: d.coefs.slice(0, 3).map(qt) };
   parts.push({
-    html: `A = ${MLm(d.A)} (b/2 = ${fq(d.A[0][1])} hors de la diagonale).`, ask: 'det(A − λI) =', start: 'det(A-λI)',
+    html: t('A = {v1} (b/2 = {v2} hors de la diagonale).', { v1: MLm(d.A), v2: fq(d.A[0][1]) }), ask: 'det(A − λI) =', start: 'det(A-λI)',
     judge: { kind: 'det', vars: ['λ'], target: 'factored', names: { A: Atext }, ...trapCfg }, menu: RED_MENU.char,
     lines: charLines(d),
   });
   const v1 = d.w1;
   parts.push({
-    html: `λ₁ = ${fq(d.l1)}. Un vecteur propre ?`, ask: 'v₁ =', start: 'v_1',
+    html: t('λ₁ = {v1}. Un vecteur propre ?', { v1: fq(d.l1) }), ask: 'v₁ =', start: 'v_1',
     judge: { kind: 'eigvec', A: Atext, lambda: String(d.l1) }, menu: RED_MENU.vec,
     lines: [{ math: vt(v1), note: `(A ${d.l1 < 0 ? '+' : '−'} ${Math.abs(d.l1)}I)v = 0`, subgoal: 'vec', cells: [[1, 0]], cells2: [[0, 0], [1, 0]] }],
   });
   parts.push({
-    html: 'Norme-le.', ask: 'u₁ =', start: 'u_1',
+    html: t('Norme-le.'), ask: 'u₁ =', start: 'u_1',
     judge: { kind: 'vector', expect: unitT(v1, d.n), signed: true, form: 'any' }, menu: RED_MENU.vec,
     lines: [{ math: `u_1 = ${unitT(v1, d.n)}`, note: `‖${vr(v1)}‖ = √${d.n}`, subgoal: 'vec', blank: [`√${d.n}`] }],
   });
   parts.push({
-    html: `u₂ est orthogonal à u₁ (A est symétrique), et le repère est direct : u₂ = u₁ tourné de +90°.`, ask: 'u₂ =', start: 'u_2',
+    html: t('u₂ est orthogonal à u₁ (A est symétrique), et le repère est direct : u₂ = u₁ tourné de +90°.'), ask: 'u₂ =', start: 'u_2',
     judge: { kind: 'vector', expect: unitT(d.w2, d.n), signed: true, form: 'any' }, menu: RED_MENU.vec,
     lines: [{ math: `u_2 = ${unitT(d.w2, d.n)}`, note: `λ₂ = ${fq(d.l2)}`, subgoal: 'vec', blank: [qt(d.w2[0])], blank2: [vt(d.w2)] }],
   });
@@ -125,15 +126,15 @@ function reduceParts(d, level, { foci = false } = {}) {
     const gx = readable(sumT([[a.mul(2), 'x'], [b, 'y'], [dd, '']]));
     const gy = readable(sumT([[b, 'x'], [c.mul(2), 'y'], [e, '']]));
     parts.push({
-      html: `Le centre Ω : ∂f/∂x = ${gx} = 0 et ∂f/∂y = ${gy} = 0.`, ask: 'Ω =', start: 'Ω',
+      html: t('Le centre Ω : ∂f/∂x = {gx} = 0 et ∂f/∂y = {gy} = 0.', { gx, gy }), ask: 'Ω =', start: 'Ω',
       judge: { kind: 'vector', expect: vt(d.O) }, menu: RED_MENU.centre,
       decisions: [{
-        levels: [2], kind: 'decision', prompt: 'La conique a-t-elle un centre ?', options: [
-          { id: 'yes', label: `Oui : δ = λ₁λ₂ = ${fq(d.l1 * d.l2)} ≠ 0`, valid: true, ref: true },
-          { id: 'no', label: 'Non : il faut compléter un carré après la rotation', valid: false, why: `δ = λ₁λ₂ = ${fq(d.l1 * d.l2)} ≠ 0 : le système du centre a une solution unique.` },
+        levels: [2], kind: 'decision', prompt: t('La conique a-t-elle un centre ?'), options: [
+          { id: 'yes', label: t('Oui : δ = λ₁λ₂ = {v1} ≠ 0', { v1: fq(d.l1 * d.l2) }), valid: true, ref: true },
+          { id: 'no', label: t('Non : il faut compléter un carré après la rotation'), valid: false, why: t('δ = λ₁λ₂ = {v1} ≠ 0 : le système du centre a une solution unique.', { v1: fq(d.l1 * d.l2) }) },
         ],
       }],
-      lines: [{ math: `Ω = ${vt(d.O)}`, note: 'Résoudre le système', subgoal: 'centre', blank: [qt(d.O[0]), qt(d.O[1])] }],
+      lines: [{ math: `Ω = ${vt(d.O)}`, note: t('Résoudre le système'), subgoal: 'centre', blank: [qt(d.O[0]), qt(d.O[1])] }],
     });
     const [x0, y0] = d.O.map(parT);
     // a·x₀² + b·x₀y₀ + … with the zero terms left out, a coefficient 1 not written.
@@ -141,16 +142,16 @@ function reduceParts(d, level, { foci = false } = {}) {
     const sub0 = [term(a, `${x0}^2`), term(b, `${x0}·${y0}`), term(c, `${y0}^2`), term(dd, x0), term(e, y0), d.coefs[5].n === 0 ? null : parT(d.coefs[5])]
       .filter(Boolean).join(' + ').replace(/\+ -/g, '- ');
     parts.push({
-      html: 'La constante f(Ω) ?', ask: 'f(Ω) =', start: sub0.replace(/\+ \(-/g, '+ (-'),
+      html: t('La constante f(Ω) ?'), ask: 'f(Ω) =', start: sub0.replace(/\+ \(-/g, '+ (-'),
       judge: { kind: 'value', expect: String(-d.k), ...trapCfg }, menu: RED_MENU.const,
-      lines: [{ math: String(-d.k), note: 'Remplacer x et y par les coordonnées de Ω', subgoal: 'centre', blank: [String(-d.k)] }],
+      lines: [{ math: String(-d.k), note: t('Remplacer x et y par les coordonnées de Ω'), subgoal: 'centre', blank: [String(-d.k)] }],
     });
     const redT = `${sumT([[d.l1, 'X^2'], [d.l2, 'Y^2'], [-d.k, '']])} = 0`;
     const a2 = new Q(d.k, d.l1);
     const b2 = new Q(d.k, d.l2);
     const stdT = `${sumT([[new Q(1).div(a2), 'X^2'], [new Q(1).div(b2), 'Y^2']])} = 1`;
     parts.push({
-      html: 'L\'équation dans le repère Ru = (Ω ; u₁, u₂).', ask: 'équation réduite :', start: eq,
+      html: t('L\'équation dans le repère Ru = (Ω ; u₁, u₂).'), ask: t('équation réduite :'), start: eq,
       judge: { kind: 'conic', equation: eq, target: 'reduced', frame: fr, ...trapCfg }, menu: RED_MENU.red,
       lines: [
         { math: redT, note: 'λ₁X² + λ₂Y² + f(Ω) = 0', subgoal: 'red', blank: [sumT([[d.l1, 'X^2']]), sumT([[Math.abs(d.l2), 'Y^2']])] },
@@ -161,9 +162,9 @@ function reduceParts(d, level, { foci = false } = {}) {
       const F = an.foci.map((P) => P.map((x) => Math.round(x * 1e6) / 1e6));
       const fT = (P) => `(${P.map((x) => qt(toQ(x))).join(' ; ')})`;
       parts.push({
-        html: 'Les foyers dans le repère initial Re.', ask: 'foyers :', start: stdT,
+        html: t('Les foyers dans le repère initial Re.'), ask: t('foyers :'), start: stdT,
         judge: { kind: 'conic', equation: eq, ask: ['F'] },
-        lines: [{ math: `F = ${fT(F[0])} ; F' = ${fT(F[1])}`, note: `c² = ${an.type === 'hyperbola' ? 'a² + b²' : 'a² − b²'} ; F = Ω ± c·u, u sur l'axe ${an.type === 'hyperbola' ? 'réel' : 'focal'}`, subgoal: 'red' }],
+        lines: [{ math: `F = ${fT(F[0])} ; F' = ${fT(F[1])}`, note: an.type === 'hyperbola' ? t('c² = a² + b² ; F = Ω ± c·u, u sur l\'axe réel') : t('c² = a² − b² ; F = Ω ± c·u, u sur l\'axe focal'), subgoal: 'red' }],
       });
     }
   } else {
@@ -174,17 +175,17 @@ function reduceParts(d, level, { foci = false } = {}) {
     const Dw2 = dd.mul(d.w2[0]).add(e.mul(d.w2[1]));
     const rot = `${d.l1}X^2 + (${qt(Dw1)}/√${d.n})X + (${qt(Dw2)}/√${d.n})Y + ${parT(f)} = 0`;
     parts.push({
-      html: 'Dans le repère (O ; u₁, u₂), x = X·u₁ + Y·u₂ : l\'équation sans terme en XY.', ask: 'équation :', start: eq,
+      html: t('Dans le repère (O ; u₁, u₂), x = X·u₁ + Y·u₂ : l\'équation sans terme en XY.'), ask: t('équation :'), start: eq,
       judge: { kind: 'conic', equation: eq, target: 'reduced', frame: fr, ...trapCfg }, menu: RED_MENU.red,
       decisions: [{
-        levels: [2], kind: 'decision', prompt: 'La conique a-t-elle un centre ?', options: [
-          { id: 'no', label: 'Non : λ₂ = 0, on tourne d\'abord puis on complète le carré', valid: true, ref: true },
-          { id: 'yes', label: 'Oui : on résout ∂f/∂x = ∂f/∂y = 0', valid: false, why: 'δ = λ₁λ₂ = 0 : le système du centre n\'a pas de solution unique, une parabole n\'a pas de centre.' },
+        levels: [2], kind: 'decision', prompt: t('La conique a-t-elle un centre ?'), options: [
+          { id: 'no', label: t('Non : λ₂ = 0, on tourne d\'abord puis on complète le carré'), valid: true, ref: true },
+          { id: 'yes', label: t('Oui : on résout ∂f/∂x = ∂f/∂y = 0'), valid: false, why: t('δ = λ₁λ₂ = 0 : le système du centre n\'a pas de solution unique, une parabole n\'a pas de centre.') },
         ],
       }],
       lines: [
-        { math: rot, note: `λ₁ = ${fq(d.l1)} devant X², λ₂ = 0 : pas de Y²`, subgoal: 'red' },
-        { math: `${d.l1}X^2 + ${d.m}√${d.n}·Y = 0`.replace('+ -', '- '), note: 'Compléter le carré et translater au sommet S', subgoal: 'red' },
+        { math: rot, note: t('λ₁ = {v1} devant X², λ₂ = 0 : pas de Y²', { v1: fq(d.l1) }), subgoal: 'red' },
+        { math: `${d.l1}X^2 + ${d.m}√${d.n}·Y = 0`.replace('+ -', '- '), note: t('Compléter le carré et translater au sommet S'), subgoal: 'red' },
       ],
     });
   }
@@ -204,13 +205,13 @@ function reduceItem(level, rng, opts = {}) {
   const eq = eqT(d.coefs);
   const parts = reduceParts(d, level, { foci });
   const hints = H(
-    'Diagonalise A : les valeurs propres sont les coefficients de X² et Y². Le centre annule ∂f/∂x et ∂f/∂y.',
+    t('Diagonalise A : les valeurs propres sont les coefficients de X² et Y². Le centre annule ∂f/∂x et ∂f/∂y.'),
     `(${fq(d.A[0][0])} − λ)(${fq(d.A[1][1])} − λ) − □ = 0`,
-    d.kind === 'par' ? 'λ₁X² + μY = 0 au sommet' : `${readable(sumT([[d.l1, 'X^2'], [d.l2, 'Y^2'], [-d.k, '']]))} = 0`,
+    d.kind === 'par' ? t('λ₁X² + μY = 0 au sommet') : `${readable(sumT([[d.l1, 'X^2'], [d.l2, 'Y^2'], [-d.k, '']]))} = 0`,
   );
   return partsItem({
     skill: RED, level, parts, hints, subgoals: RED_SUB,
-    prompt: `Dans un repère orthonormé Re, on donne la conique ${MT(eq, { vars: ['x', 'y'] })}. Réduis-la : valeurs propres et vecteurs propres normés de A${d.kind === 'par' ? '' : ', centre Ω, constante f(Ω)'}, puis l'équation dans le repère Ru${foci ? ', et enfin les foyers dans Re' : ''}.`,
+    prompt: reducePrompt(MT(eq, { vars: ['x', 'y'] }), d.kind === 'par', foci),
     key: `${RED}:${d.kind}:${eq}${foci ? ':foci' : ''}`, fallback: d.fallback,
     exam: opts.exam ? examTag(opts, opts.exam === 'open' ? 7.5 : 1) : false,
     keys: ['calc', 'geo', 'mat'],
@@ -225,12 +226,24 @@ function reduceExam(rng, exam) {
   const big = Math.max(d.l1, d.l2);
   return coefItem({
     skill: RED, key: `${eq}:${askConst ? 'c' : 'l'}`, exam: examTag({ exam }), label: askConst ? 'c' : 'λ_1',
-    prompt: `On réduit la conique ${MT(eq, { vars: ['x', 'y'] })} dans un repère orthonormé de ses axes, centré en son centre : λ₁X² + λ₂Y² + c = 0, avec λ₁ > λ₂. ${askConst ? 'Que vaut c ?' : 'Que vaut λ₁ ?'}`,
+    prompt: t('On réduit la conique {v1} dans un repère orthonormé de ses axes, centré en son centre : λ₁X² + λ₂Y² + c = 0, avec λ₁ > λ₂. {v2}', { v1: MT(eq, { vars: ['x', 'y'] }), v2: askConst ? t('Que vaut c ?') : t('Que vaut λ₁ ?') }),
     value: askConst ? String(-d.k) : String(big),
     traps: askConst ? [{ rule: 'g10_constant_not_updated' }] : [{ rule: 'g10_bhalf_matrix' }],
     solution: [{ html: `λ₁ = ${fq(big)}, λ₂ = ${fq(Math.min(d.l1, d.l2))}, Ω = ${vr(d.O)}, c = f(Ω) = ${fq(-d.k)}.`, note: '' }],
     fallback: d.fallback,
   });
+}
+
+// The prompt of the reduction: with a centre or not (parabola), with the foci or not.
+function reducePrompt(v1, par, foci) {
+  if (par) {
+    return foci
+      ? t('Dans un repère orthonormé Re, on donne la conique {v1}. Réduis-la : valeurs propres et vecteurs propres normés de A, puis l\'équation dans le repère Ru, et enfin les foyers dans Re.', { v1 })
+      : t('Dans un repère orthonormé Re, on donne la conique {v1}. Réduis-la : valeurs propres et vecteurs propres normés de A, puis l\'équation dans le repère Ru.', { v1 });
+  }
+  return foci
+    ? t('Dans un repère orthonormé Re, on donne la conique {v1}. Réduis-la : valeurs propres et vecteurs propres normés de A, centre Ω, constante f(Ω), puis l\'équation dans le repère Ru, et enfin les foyers dans Re.', { v1 })
+    : t('Dans un repère orthonormé Re, on donne la conique {v1}. Réduis-la : valeurs propres et vecteurs propres normés de A, centre Ω, constante f(Ω), puis l\'équation dans le repère Ru.', { v1 });
 }
 
 // ======================================================================

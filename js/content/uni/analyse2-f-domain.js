@@ -11,6 +11,7 @@ import { evalFloat } from '../../cas/numeric.js';
 import { blankLine } from '../../judges/lines.js';
 import { MT, linesItem, examTag, H, E, SEG, modeOf, blanked, stepMenus, A2_KEYS, domainItem } from './a2-kit.js';
 import { q, val, vText, vFloat, vScale, linT, swapXY, mcqV, R } from './analyse2-f-kit.js';
+import { t } from '../../i18n.js';
 
 const DD = 'a2-domain-describe';
 const SW = 'a2-fubini-swap';
@@ -37,7 +38,7 @@ function baseRegion(rng) {
     return {
       kind, region: ['y ≥ x^2', `y ≤ ${mx}`], xr: [0, m], yr: [0, m * m],
       I: `0 ≤ x ≤ ${m} ; x^2 ≤ y ≤ ${mx}`, II: `0 ≤ y ≤ ${m * m} ; ${m === 1 ? 'y' : `y/${m}`} ≤ x ≤ √y`,
-      inter: { v: 'x', eq: `x^2 = ${mx}`, sol: `x = 0 ou x = ${m}`, said: (S) => `${S('x = 0')} et ${S(`x = ${m}`)}` }, curves: (S) => `${R(S('y = x^2'))} et ${R(S(`y = ${mx}`))}`,
+      inter: { v: 'x', eq: `x^2 = ${mx}`, sol: `x = 0 ou x = ${m}`, said: (S) => t('{a} et {b}', { a: S('x = 0'), b: S(`x = ${m}`) }) }, curves: (S) => t('{a} et {b}', { a: R(S('y = x^2')), b: R(S(`y = ${mx}`)) }),
     };
   }
   if (kind === 'cub') {
@@ -47,7 +48,7 @@ function baseRegion(rng) {
     return {
       kind, region: ['y ≥ x^3', `y ≤ ${mx}`, 'x ≥ 0'], xr: [0, s], yr: [0, m * s],
       I: `0 ≤ x ≤ ${s} ; x^3 ≤ y ≤ ${mx}`, II: `0 ≤ y ≤ ${m * s} ; ${m === 1 ? 'y' : `y/${m}`} ≤ x ≤ root(3,y)`,
-      inter: { v: 'x', eq: `x^3 = ${mx}`, sol: `x = -${s} ou x = 0 ou x = ${s}`, said: (S) => `${S('x = 0')} et ${S(`x = ${s}`)} (pour ${S('x ≥ 0')})` }, curves: (S) => `${R(S('y = x^3'))} et ${R(S(`y = ${mx}`))}, avec ${S('x ≥ 0')}`,
+      inter: { v: 'x', eq: `x^3 = ${mx}`, sol: `x = -${s} ou x = 0 ou x = ${s}`, said: (S) => t('{a} et {b} (pour {c})', { a: S('x = 0'), b: S(`x = ${s}`), c: S('x ≥ 0') }) }, curves: (S) => t('{a} et {b}, avec {c}', { a: R(S('y = x^3')), b: R(S(`y = ${mx}`)), c: S('x ≥ 0') }),
     };
   }
   if (kind === 'sqrt') {
@@ -55,7 +56,7 @@ function baseRegion(rng) {
     return {
       kind, region: ['y ≥ 0', 'y ≤ √x', `x ≤ ${c * c}`], xr: [0, c * c], yr: [0, c],
       I: `0 ≤ x ≤ ${c * c} ; 0 ≤ y ≤ √x`, II: `0 ≤ y ≤ ${c} ; y^2 ≤ x ≤ ${c * c}`,
-      inter: { v: 'x', eq: `√x = ${c}`, sol: `x = ${c * c}`, said: (S) => `${S(`x = ${c * c}`)} (${R(S('y = √x'))} rencontre ${S(`y = ${c}`)})` }, curves: (S) => `${R(S('y = √x'))}, ${S('y = 0')} et ${S(`x = ${c * c}`)}`,
+      inter: { v: 'x', eq: `√x = ${c}`, sol: `x = ${c * c}`, said: (S) => t('{a} ({b} rencontre {c})', { a: S(`x = ${c * c}`), b: R(S('y = √x')), c: S(`y = ${c}`) }) }, curves: (S) => t('{a}, {b} et {c}', { a: R(S('y = √x')), b: S('y = 0'), c: S(`x = ${c * c}`) }),
     };
   }
   if (kind === 'quarter' || kind === 'half') {
@@ -66,7 +67,7 @@ function baseRegion(rng) {
       kind, region: [`x^2+y^2 ≤ ${R2}`, 'y ≥ 0', ...(half ? [] : ['x ≥ 0'])], xr: [half ? -r : 0, r], yr: [0, r],
       I: `${half ? -r : 0} ≤ x ≤ ${r} ; 0 ≤ y ≤ √(${R2}-x^2)`,
       II: half ? `0 ≤ y ≤ ${r} ; -√(${R2}-y^2) ≤ x ≤ √(${R2}-y^2)` : `0 ≤ y ≤ ${r} ; 0 ≤ x ≤ √(${R2}-y^2)`,
-      inter: null, curves: (S) => `le cercle x² + y² = ${R2}${half ? ` et l'axe O${S('x')} (${S('y ≥ 0')})` : ' et les deux axes (x ≥ 0, y ≥ 0)'}`,
+      inter: null, curves: (S) => (half ? t('le cercle x² + y² = {r2} et l\'axe O{x} ({c})', { r2: R2, x: S('x'), c: S('y ≥ 0') }) : t('le cercle x² + y² = {r2} et les deux axes (x ≥ 0, y ≥ 0)', { r2: R2 })),
     };
   }
   if (kind === 'tri') {
@@ -76,7 +77,7 @@ function baseRegion(rng) {
     return {
       kind, region: ['y ≥ 0', `y ≤ ${mx}`, `x ≤ ${c}`], xr: [0, c], yr: [0, m * c],
       I: `0 ≤ x ≤ ${c} ; 0 ≤ y ≤ ${mx}`, II: `0 ≤ y ≤ ${m * c} ; ${m === 1 ? 'y' : `y/${m}`} ≤ x ≤ ${c}`,
-      inter: null, curves: (S) => `les droites ${S('y = 0')}, ${R(S(`y = ${mx}`))} et ${S(`x = ${c}`)}`,
+      inter: null, curves: (S) => t('les droites {a}, {b} et {c}', { a: S('y = 0'), b: R(S(`y = ${mx}`)), c: S(`x = ${c}`) }),
     };
   }
   // A line above a parabola: one piece in type I only.
@@ -88,7 +89,7 @@ function baseRegion(rng) {
   return {
     kind, region: ['y ≥ x^2', `y ≤ ${L}`], xr: [r1, r2], yr: [0, Math.max(r1 * r1, r2 * r2)],
     I: `${r1} ≤ x ≤ ${r2} ; x^2 ≤ y ≤ ${L}`, II: null,
-    inter: { v: 'x', eq: `x^2 = ${L}`, sol: `x = ${r1} ou x = ${r2}`, said: (S) => `${S(`x = ${r1}`)} et ${S(`x = ${r2}`)}` }, curves: (S) => `${R(S('y = x^2'))} et ${R(S(`y = ${L}`))}`,
+    inter: { v: 'x', eq: `x^2 = ${L}`, sol: `x = ${r1} ou x = ${r2}`, said: (S) => t('{a} et {b}', { a: S(`x = ${r1}`), b: S(`x = ${r2}`) }) }, curves: (S) => t('{a} et {b}', { a: R(S('y = x^2')), b: R(S(`y = ${L}`)) }),
   };
 }
 
@@ -98,9 +99,9 @@ const boxOf = (xr, yr) => [xr, yr].map(([a, b]) => { const m = 0.15 * (b - a) + 
 export function regionData(rng) {
   const b = baseRegion(rng);
   const box = boxOf(b.xr, b.yr);
-  const id = (t) => t;
+  const id = (s) => s;
   if (!rng.chance(0.4)) return { ...b, box, mirror: false, curves: b.curves(id), inter: b.inter && { ...b.inter, said: b.inter.said(id) } };
-  const S = (t) => (t ? swapXY(t) : t);
+  const S = (s) => (s ? swapXY(s) : s);
   return {
     kind: b.kind, mirror: true, region: b.region.map(S), box: [box[1], box[0]],
     I: S(b.II), II: S(b.I),
@@ -116,27 +117,28 @@ const domCfg = (d, shape) => ({
 const regionText = (d) => `D = {(x, y) : ${d.region.map(R).join(', ')}}`;
 
 const DD_SUB = [
-  { id: 'intersect', label: 'points d\'intersection', skill: 'fac-trinomial' },
-  { id: 'order', label: 'la courbe du bas et celle du haut', skill: DD },
-  { id: 'typeI', label: 'type I', skill: DD },
-  { id: 'typeII', label: 'type II', skill: DD },
+  { id: 'intersect', label: t('points d\'intersection'), skill: 'fac-trinomial' },
+  { id: 'order', label: t('la courbe du bas et celle du haut'), skill: DD },
+  { id: 'typeI', label: t('type I'), skill: DD },
+  { id: 'typeII', label: t('type II'), skill: DD },
 ];
 const DD_CHOICES = [
-  { id: 'solve', label: 'Résoudre : où les courbes se coupent-elles ?' },
-  { id: 'typeI', label: 'x à l\'extérieur, entre deux nombres ; y de la courbe du bas à celle du haut' },
-  { id: 'typeII', label: 'y à l\'extérieur, entre deux nombres ; x de la courbe de gauche à celle de droite' },
-  { id: 'outer', label: 'Mettre les bornes qui contiennent x à l\'extérieur', rule: 'a2_fubini_outer_var', why: 'L\'intégrale extérieure doit donner un nombre : ses bornes sont des nombres.' },
-  { id: 'rename', label: 'Échanger simplement x et y dans les bornes', rule: 'a2_fubini_swap_same', why: 'Renommer ne décrit pas le même domaine : dessine D.' },
+  { id: 'solve', label: t('Résoudre : où les courbes se coupent-elles ?') },
+  { id: 'typeI', label: t('x à l\'extérieur, entre deux nombres ; y de la courbe du bas à celle du haut') },
+  { id: 'typeII', label: t('y à l\'extérieur, entre deux nombres ; x de la courbe de gauche à celle de droite') },
+  { id: 'outer', label: t('Mettre les bornes qui contiennent x à l\'extérieur'), rule: 'a2_fubini_outer_var', why: t('L\'intégrale extérieure doit donner un nombre : ses bornes sont des nombres.') },
+  { id: 'rename', label: t('Échanger simplement x et y dans les bornes'), rule: 'a2_fubini_swap_same', why: t('Renommer ne décrit pas le même domaine : dessine D.') },
 ];
 
 // The decision « which curve is below / on the left ? » of a domain line.
 function curveDecision(line) {
   const [o, i] = chainTexts(line);
-  const where = i.v === 'y' ? 'en dessous' : 'à gauche';
+  const below = i.v === 'y';
+  const w = { lo: R(o.lo), hi: R(o.hi), o: o.v, i: i.v, ilo: R(i.lo), ihi: R(i.hi) };
   return {
-    kind: 'decision', prompt: `Pour ${R(o.lo)} ≤ ${o.v} ≤ ${R(o.hi)}, quelle courbe est ${where} ?`, options: [
+    kind: 'decision', prompt: below ? t('Pour {lo} ≤ {o} ≤ {hi}, quelle courbe est en dessous ?', w) : t('Pour {lo} ≤ {o} ≤ {hi}, quelle courbe est à gauche ?', w), options: [
       { id: 'lo', label: `${i.v} = ${R(i.lo)}`, valid: true },
-      { id: 'hi', label: `${i.v} = ${R(i.hi)}`, valid: false, rule: 'a2_domain_curve_order', why: `Teste ${o.v} = ${R(o.lo)}…${R(o.hi)} : ${i.v} = ${R(i.lo)} reste ${where === 'en dessous' ? 'sous' : 'à gauche de'} ${i.v} = ${R(i.hi)}.` },
+      { id: 'hi', label: `${i.v} = ${R(i.hi)}`, valid: false, rule: 'a2_domain_curve_order', why: below ? t('Teste {o} = {lo}…{hi} : {i} = {ilo} reste sous {i} = {ihi}.', w) : t('Teste {o} = {lo}…{hi} : {i} = {ilo} reste à gauche de {i} = {ihi}.', w) },
     ],
   };
 }
@@ -145,16 +147,16 @@ function cartItem(level, rng, opts) {
   const d = regionData(rng);
   const parts = [];
   if (d.inter && level >= 2) {
-    parts.push({ start: d.inter.eq, judge: { kind: 'solset', v: d.inter.v }, lines: [E(d.inter.sol, 'Intersections', 'intersect', 'solve')] });
+    parts.push({ start: d.inter.eq, judge: { kind: 'solset', v: d.inter.v }, lines: [E(d.inter.sol, t('Intersections'), 'intersect', 'solve')] });
   }
-  const types = [['typeI', d.I], ['typeII', d.II]].filter(([, t]) => t);
+  const types = [['typeI', d.I], ['typeII', d.II]].filter(([, l]) => l);
   let prevLine = d.region.join(' ; ');
   types.forEach(([shape, line], k) => {
-    let l = E(line, shape === 'typeI' ? 'Type I' : 'Type II', shape, shape);
+    let l = E(line, shape === 'typeI' ? t('Type I') : t('Type II'), shape, shape);
     if (level === 1) l = blankBounds(l, [[1, 'lo'], [1, 'hi']]);
     if (level === 2) l = blankBounds(l, [[0, 'hi'], [1, k === 0 ? 'hi' : 'lo']]);
     parts.push({
-      html: shape === 'typeI' ? 'Décris D en type I : x à l\'extérieur.' : 'Décris D en type II : y à l\'extérieur.', ask: 'D :',
+      html: shape === 'typeI' ? t('Décris D en type I : x à l\'extérieur.') : t('Décris D en type II : y à l\'extérieur.'), ask: t('D :'),
       start: prevLine, judge: domCfg(d, shape), pre: k === 0 && (level === 2 || level === 3) ? [curveDecision(line)] : [], lines: [l],
     });
     prevLine = line;
@@ -164,16 +166,18 @@ function cartItem(level, rng, opts) {
   const menuOf = (p) => (level === 3 ? { ...p.judge, menus: stepMenus(p.start, p.lines, DD_CHOICES) } : p.judge);
   const script = [...(first.pre || []), ...first.lines];
   for (const p of rest) script.push(SEG(p.html, p.ask, p.start, menuOf(p)), ...(p.pre || []), ...p.lines);
-  const asks = types.map(([s]) => (s === 'typeI' ? 'en type I (x à l\'extérieur)' : 'en type II (y à l\'extérieur)')).join(', puis ');
-  const given = level === 1 && d.inter ? ` Les courbes se coupent en ${d.inter.said}.` : '';
-  const firstAsk = first.judge.kind === 'solset' ? ` D'abord, où les courbes se coupent-elles ? (${R(d.inter.eq)})` : '';
+  const asks = types.length === 2 ? t('Décris D en type I (x à l\'extérieur), puis en type II (y à l\'extérieur).')
+    : types[0][0] === 'typeI' ? t('Décris D en type I (x à l\'extérieur).') : t('Décris D en type II (y à l\'extérieur).');
+  const given = level === 1 && d.inter ? ` ${t('Les courbes se coupent en {p}.', { p: d.inter.said })}` : '';
+  const firstAsk = first.judge.kind === 'solset' ? ` ${t('D\'abord, où les courbes se coupent-elles ? ({eq})', { eq: R(d.inter.eq) })}` : '';
   const [o1, i1] = chainTexts(types[0][1]);
+  const typed = types.map(([, l]) => MT(l, XY));
   return linesItem({
     skill: DD, level, mode: modeOf(level), start: first.start, judge: menuOf(first), script,
-    prompt: `D est la région bornée par ${d.curves} : ${regionText(d)}.${given} Décris D ${asks}.${firstAsk}`,
-    hints: H(`Dessine les courbes${d.inter ? ' et trouve leurs points d\'intersection' : ''}. Les bornes extérieures sont des nombres.`,
-      `${o1.v} va de ${R(o1.lo)} à … ; ${i1.v} va de … à ${R(i1.hi)}`,
-      types.map(([, t]) => MT(t, XY)).join(' puis ')),
+    prompt: `${t('D est la région bornée par {curves} : {region}.', { curves: d.curves, region: regionText(d) })}${given} ${asks}${firstAsk}`,
+    hints: H(d.inter ? t('Dessine les courbes et trouve leurs points d\'intersection. Les bornes extérieures sont des nombres.') : t('Dessine les courbes. Les bornes extérieures sont des nombres.'),
+      t('{o} va de {lo} à … ; {i} va de … à {hi}', { o: o1.v, lo: R(o1.lo), i: i1.v, hi: R(i1.hi) }),
+      typed.length === 2 ? t('{a} puis {b}', { a: typed[0], b: typed[1] }) : typed[0]),
     subgoals: DD_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${DD}:${level}:${d.kind}:${d.I || d.II}:${d.mirror}`, exam: examTag(opts),
     baits: ['a2_fubini_outer_var', 'a2_domain_curve_order'],
@@ -184,21 +188,21 @@ function cartItem(level, rng, opts) {
 function polarData(rng) {
   const kind = rng.pick(['tri1', 'tri2', 'quarter', 'para', 'half']);
   const c = rng.int(1, 3);
-  if (kind === 'tri1') return { kind, ref: `0 ≤ φ ≤ π/4 ; 0 ≤ r ≤ ${c}/cos(φ)`, I: `0 ≤ x ≤ ${c} ; 0 ≤ y ≤ x`, xr: [0, c], yr: [0, c], read: `le triangle 0 ≤ y ≤ x ≤ ${c} (r cos φ ≤ ${c} veut dire x ≤ ${c})` };
-  if (kind === 'tri2') return { kind, ref: `π/4 ≤ φ ≤ π/2 ; 0 ≤ r ≤ ${c}/sin(φ)`, I: `0 ≤ x ≤ ${c} ; x ≤ y ≤ ${c}`, xr: [0, c], yr: [0, c], read: `le triangle 0 ≤ x ≤ y ≤ ${c} (r sin φ ≤ ${c} veut dire y ≤ ${c})` };
-  if (kind === 'quarter') return { kind, ref: `0 ≤ φ ≤ π/2 ; 0 ≤ r ≤ ${c}`, I: `0 ≤ x ≤ ${c} ; 0 ≤ y ≤ √(${c * c}-x^2)`, xr: [0, c], yr: [0, c], read: `le quart de disque de rayon ${c}` };
-  if (kind === 'half') return { kind, ref: `0 ≤ φ ≤ π ; 0 ≤ r ≤ ${c}`, I: `${-c} ≤ x ≤ ${c} ; 0 ≤ y ≤ √(${c * c}-x^2)`, xr: [-c, c], yr: [0, c], read: `le demi-disque de rayon ${c}, y ≥ 0` };
-  return { kind, ref: '0 ≤ φ ≤ π/4 ; 0 ≤ r ≤ sin(φ)/cos(φ)^2', I: '0 ≤ x ≤ 1 ; x^2 ≤ y ≤ x', xr: [0, 1], yr: [0, 1], read: 'la région x² ≤ y ≤ x (r cos²φ ≤ sin φ veut dire x² ≤ y, et φ ≤ π/4 veut dire y ≤ x)' };
+  if (kind === 'tri1') return { kind, ref: `0 ≤ φ ≤ π/4 ; 0 ≤ r ≤ ${c}/cos(φ)`, I: `0 ≤ x ≤ ${c} ; 0 ≤ y ≤ x`, xr: [0, c], yr: [0, c], read: t('le triangle 0 ≤ y ≤ x ≤ {c} (r cos φ ≤ {c} veut dire x ≤ {c})', { c }) };
+  if (kind === 'tri2') return { kind, ref: `π/4 ≤ φ ≤ π/2 ; 0 ≤ r ≤ ${c}/sin(φ)`, I: `0 ≤ x ≤ ${c} ; x ≤ y ≤ ${c}`, xr: [0, c], yr: [0, c], read: t('le triangle 0 ≤ x ≤ y ≤ {c} (r sin φ ≤ {c} veut dire y ≤ {c})', { c }) };
+  if (kind === 'quarter') return { kind, ref: `0 ≤ φ ≤ π/2 ; 0 ≤ r ≤ ${c}`, I: `0 ≤ x ≤ ${c} ; 0 ≤ y ≤ √(${c * c}-x^2)`, xr: [0, c], yr: [0, c], read: t('le quart de disque de rayon {c}', { c }) };
+  if (kind === 'half') return { kind, ref: `0 ≤ φ ≤ π ; 0 ≤ r ≤ ${c}`, I: `${-c} ≤ x ≤ ${c} ; 0 ≤ y ≤ √(${c * c}-x^2)`, xr: [-c, c], yr: [0, c], read: t('le demi-disque de rayon {c}, y ≥ 0', { c }) };
+  return { kind, ref: '0 ≤ φ ≤ π/4 ; 0 ≤ r ≤ sin(φ)/cos(φ)^2', I: '0 ≤ x ≤ 1 ; x^2 ≤ y ≤ x', xr: [0, 1], yr: [0, 1], read: t('la région x² ≤ y ≤ x (r cos²φ ≤ sin φ veut dire x² ≤ y, et φ ≤ π/4 veut dire y ≤ x)') };
 }
 
 function polarItem(level, rng, opts) {
   const d = polarData(rng);
   const judge = { kind: 'domain', coords: 'cart', vars: ['x', 'y'], ref: d.ref, refCoords: 'polar', box: boxOf(d.xr, d.yr), order: ['x', 'y'], shape: 'typeI', answers: [d.I] };
-  const line = E(d.I, 'Type I', 'typeI', 'typeI');
+  const line = E(d.I, t('Type I'), 'typeI', 'typeI');
   return linesItem({
     skill: DD, level, mode: modeOf(level), start: d.ref, judge: level === 3 ? { ...judge, menus: stepMenus(d.ref, [line], DD_CHOICES) } : judge, script: [line],
-    prompt: `En coordonnées polaires, D̃ = {(r, φ) : ${R(d.ref).replace(' ; ', ', ')}}. Décris le même domaine D en coordonnées cartésiennes, en type I (x à l'extérieur).`,
-    hints: H('Écris chaque inégalité avec x = r cos φ et y = r sin φ, puis dessine D.', `C'est ${d.read}.`, MT(d.I, XY)),
+    prompt: t('En coordonnées polaires, D̃ = {(r, φ) : {ref}}. Décris le même domaine D en coordonnées cartésiennes, en type I (x à l\'extérieur).', { ref: R(d.ref).replace(' ; ', ', ') }),
+    hints: H(t('Écris chaque inégalité avec x = r cos φ et y = r sin φ, puis dessine D.'), t('C\'est {read}.', { read: d.read }), MT(d.I, XY)),
     subgoals: DD_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${DD}:${level}:polar:${d.ref}`, exam: examTag(opts), baits: ['a2_fubini_outer_var', 'a2_domain_curve_order'],
   });
@@ -210,8 +214,8 @@ const intOf = (f, line) => {
   const [o, i] = chainTexts(line);
   return `int(int(${f},${i.v},${i.lo},${i.hi}),${o.v},${o.lo},${o.hi})`;
 };
-const numOf = (t) => { try { const x = evalFloat(parse(t), {}); return Number.isFinite(x) ? x : null; } catch { return null; } };
-const opt = (t, rule = null) => ({ html: MT(t), x: numOf(t), rule });
+const numOf = (s) => { try { const x = evalFloat(parse(s), {}); return Number.isFinite(x) ? x : null; } catch { return null; } };
+const opt = (s, rule = null) => ({ html: MT(s), x: numOf(s), rule });
 
 // The wrong writings of `from` turned into the other order `to`.
 function writings(f, from, to) {
@@ -240,7 +244,7 @@ function describeMcq(rng, opts, level = 4) {
       const [from, to] = rng.chance(0.5) ? [d.I, d.II] : [d.II, d.I];
       right = opt(intOf(f, to));
       wrongs = writings(f, from, to);
-      prompt = `D est la région bornée par ${d.curves}. Laquelle de ces écritures est égale à ${MT(intOf(f, from))} ?`;
+      prompt = t('D est la région bornée par {curves}. Laquelle de ces écritures est égale à {I} ?', { curves: d.curves, I: MT(intOf(f, from)) });
     } else {
       const line = d.I || d.II;
       const [o, i] = chainTexts(line);
@@ -251,13 +255,13 @@ function describeMcq(rng, opts, level = 4) {
         opt(`int(int(${f},${i.v},${i.lo},${i.hi}),${o.v},0,${o.hi})`),
         opt(`int(int(${f},${o.v},${swapXY(i.lo)},${swapXY(i.hi)}),${i.v},${o.lo},${o.hi})`, 'a2_fubini_swap_same'),
       ];
-      prompt = `D est la région bornée par ${d.curves} : ${regionText(d)}. Laquelle de ces écritures est égale à ∬<sub>D</sub> ${MT(f)} dx dy ?`;
+      prompt = t('D est la région bornée par {curves} : {region}. Laquelle de ces écritures est égale à ∬<sub>D</sub> {f} dx dy ?', { curves: d.curves, region: regionText(d), f: MT(f) });
     }
     if (right.x === null) continue;
     const it = mcqV({
       skill: DD, level, prompt, right, wrongs: rng.shuffle(wrongs), key: `${DD}:mcq:${d.kind}:${d.I || d.II}:${d.mirror}:${f}`,
       expectedSec: 150, exam: examTag(opts) || false,
-      solution: [{ html: `D en ${d.I && d.II ? 'type I : ' + MT(d.I, XY) + ' ; type II : ' + MT(d.II, XY) : MT(d.I || d.II, XY)}. Les bornes extérieures sont des nombres.`, note: '' }],
+      solution: [{ html: d.I && d.II ? t('D en type I : {I} ; type II : {II}. Les bornes extérieures sont des nombres.', { I: MT(d.I, XY), II: MT(d.II, XY) }) : t('D en {D}. Les bornes extérieures sont des nombres.', { D: MT(d.I || d.II, XY) }), note: '' }],
     }, rng);
     if (it) return it;
   }
@@ -268,15 +272,16 @@ function describeMcq(rng, opts, level = 4) {
 // variable, in the order asked.
 function boundsItem(level, rng, opts) {
   const d = regionData(rng);
-  const types = [['typeI', d.I], ['typeII', d.II]].filter(([, t]) => t);
+  const types = [['typeI', d.I], ['typeII', d.II]].filter(([, l]) => l);
   const [shape, line] = rng.pick(types);
   const cs = chainTexts(line);
   const [o, i] = cs;
+  const pv = { curves: d.curves, region: regionText(d) };
   return domainItem({
-    skill: DD, level, prompt: `D est la région bornée par ${d.curves} : ${regionText(d)}. Écris les bornes de D ${shape === 'typeI' ? 'en type I (x à l’extérieur)' : 'en type II (y à l’extérieur)'}.`,
+    skill: DD, level, prompt: shape === 'typeI' ? t('D est la région bornée par {curves} : {region}. Écris les bornes de D en type I (x à l’extérieur).', pv) : t('D est la région bornée par {curves} : {region}. Écris les bornes de D en type II (y à l’extérieur).', pv),
     judge: domCfg(d, shape), answer: Object.fromEntries(cs.map((c) => [c.v, [c.lo, c.hi]])),
-    hints: H(`Dessine les courbes${d.inter ? ' et trouve leurs points d’intersection' : ''}. Les bornes de ${o.v}, à l'extérieur, sont des nombres.`,
-      `${o.v} va de ${R(o.lo)} à … ; ${i.v} va de … à ${R(i.hi)}`, MT(line, XY)),
+    hints: H(d.inter ? t('Dessine les courbes et trouve leurs points d’intersection. Les bornes de {v}, à l\'extérieur, sont des nombres.', { v: o.v }) : t('Dessine les courbes. Les bornes de {v}, à l\'extérieur, sont des nombres.', { v: o.v }),
+      t('{o} va de {lo} à … ; {i} va de … à {hi}', { o: o.v, lo: R(o.lo), i: i.v, hi: R(i.hi) }), MT(line, XY)),
     subgoals: DD_SUB.filter((g) => g.id === shape || g.id === 'order'),
     key: `${d.kind}:${line}:${d.mirror}`, exam: examTag(opts),
     baits: ['a2_fubini_outer_var', 'a2_domain_curve_order'],
@@ -316,28 +321,28 @@ const SWAPS = [
 ];
 
 const SW_SUB = [
-  { id: 'read', label: 'lire D sur les bornes', skill: DD },
-  { id: 'swap', label: 'décrire D dans l\'autre ordre', skill: DD },
-  { id: 'inner', label: 'l\'intégrale intérieure', skill: 'a1-int-direct' },
-  { id: 'outer', label: 'l\'intégrale extérieure', skill: 'a1-int-direct' },
+  { id: 'read', label: t('lire D sur les bornes'), skill: DD },
+  { id: 'swap', label: t('décrire D dans l\'autre ordre'), skill: DD },
+  { id: 'inner', label: t('l\'intégrale intérieure'), skill: 'a1-int-direct' },
+  { id: 'outer', label: t('l\'intégrale extérieure'), skill: 'a1-int-direct' },
 ];
 const SW_CHOICES = [
-  { id: 'read', label: 'Écrire D avec ses inégalités, en lisant les bornes' },
-  { id: 'swap', label: 'Décrire D dans l\'autre ordre (dessin)' },
-  { id: 'rename', label: 'Échanger x et y dans les bornes', rule: 'a2_fubini_swap_same', why: 'Renommer ne décrit pas le même domaine : dessine D.' },
-  { id: 'inner', label: 'Intégrer l\'intégrale intérieure' },
-  { id: 'prim', label: 'Primitive, puis crochet' },
-  { id: 'calc', label: 'Calculer le nombre' },
-  { id: 'prim0', label: 'Chercher une primitive de l\'intégrande intérieur', why: 'Il n\'a pas de primitive élémentaire : change l\'ordre.' },
+  { id: 'read', label: t('Écrire D avec ses inégalités, en lisant les bornes') },
+  { id: 'swap', label: t('Décrire D dans l\'autre ordre (dessin)') },
+  { id: 'rename', label: t('Échanger x et y dans les bornes'), rule: 'a2_fubini_swap_same', why: t('Renommer ne décrit pas le même domaine : dessine D.') },
+  { id: 'inner', label: t('Intégrer l\'intégrale intérieure') },
+  { id: 'prim', label: t('Primitive, puis crochet') },
+  { id: 'calc', label: t('Calculer le nombre') },
+  { id: 'prim0', label: t('Chercher une primitive de l\'intégrande intérieur'), why: t('Il n\'a pas de primitive élémentaire : change l\'ordre.') },
 ];
 
 // The texts of one swap: hard (given) and easy (new) integrals and lines.
 function swapData(rng) {
   const s = rng.pick(SWAPS);
   const mirror = rng.chance(0.4);
-  const S = (t) => (mirror ? swapXY(t) : t);
+  const S = (s) => (mirror ? swapXY(s) : s);
   const [X, Y] = mirror ? ['y', 'x'] : ['x', 'y'];
-  const t = {
+  const w = {
     s, mirror, X, Y, g: S(s.g || s.f), f: S(s.f), inner: S(s.inner), prim: S(s.prim), V: s.V,
     oldLine: `0 ≤ ${X} ≤ ${s.cx} ; ${S(s.inv)} ≤ ${Y} ≤ ${s.c}`,
     newLine: `0 ≤ ${Y} ≤ ${s.c} ; 0 ≤ ${X} ≤ ${S(s.phi)}`,
@@ -345,70 +350,70 @@ function swapData(rng) {
   };
   const xr = [0, numOf(s.cx)];
   const yr = [0, numOf(s.c)];
-  t.box = mirror ? boxOf(yr, xr) : boxOf(xr, yr);
-  t.hard = intOf(t.f, t.oldLine);
-  t.easy = intOf(t.f, t.newLine);
-  t.value = vText(t.V);
-  return t;
+  w.box = mirror ? boxOf(yr, xr) : boxOf(xr, yr);
+  w.hard = intOf(w.f, w.oldLine);
+  w.easy = intOf(w.f, w.newLine);
+  w.value = vText(w.V);
+  return w;
 }
-const swapCfg = (t, outer) => ({
-  kind: 'domain', coords: 'cart', vars: ['x', 'y'], region: t.region, box: t.box,
-  order: outer === 'x' ? ['x', 'y'] : ['y', 'x'], shape: outer === 'x' ? 'typeI' : 'typeII', answers: outer === t.X ? [t.oldLine] : [t.newLine],
+const swapCfg = (w, outer) => ({
+  kind: 'domain', coords: 'cart', vars: ['x', 'y'], region: w.region, box: w.box,
+  order: outer === 'x' ? ['x', 'y'] : ['y', 'x'], shape: outer === 'x' ? 'typeI' : 'typeII', answers: outer === w.X ? [w.oldLine] : [w.newLine],
 });
 
 function swapItem(level, rng, opts) {
-  const t = swapData(rng);
-  const { X, Y } = t;
-  const readL = E(t.oldLine, 'Lire D sur les bornes', 'read', 'read');
-  let swapL = E(t.newLine, `D dans l'autre ordre : ${Y} à l'extérieur`, 'swap', 'swap');
-  let innerL = E(`int(${t.inner},${Y},0,${t.s.c})`, `Intégrale en ${X}`, 'inner', 'inner');
-  let primL = E(`bracket(${t.prim},${Y},0,${t.s.c})`, 'Primitive', 'outer', 'prim');
-  const valL = E(t.value, 'Calculer', 'outer', 'calc');
-  if (level === 1) { swapL = blankBounds(swapL, [[1, 'hi']]); innerL = blanked(innerL, [t.inner]); }
-  if (level === 2) { swapL = blankBounds(swapL, [[0, 'hi'], [1, 'hi']]); primL = blanked(primL, [t.prim]); }
+  const w = swapData(rng);
+  const { X, Y } = w;
+  const readL = E(w.oldLine, t('Lire D sur les bornes'), 'read', 'read');
+  let swapL = E(w.newLine, t('D dans l\'autre ordre : {v} à l\'extérieur', { v: Y }), 'swap', 'swap');
+  let innerL = E(`int(${w.inner},${Y},0,${w.s.c})`, t('Intégrale en {v}', { v: X }), 'inner', 'inner');
+  let primL = E(`bracket(${w.prim},${Y},0,${w.s.c})`, t('Primitive'), 'outer', 'prim');
+  const valL = E(w.value, t('Calculer'), 'outer', 'calc');
+  if (level === 1) { swapL = blankBounds(swapL, [[1, 'hi']]); innerL = blanked(innerL, [w.inner]); }
+  if (level === 2) { swapL = blankBounds(swapL, [[0, 'hi'], [1, 'hi']]); primL = blanked(primL, [w.prim]); }
   const dec = {
-    kind: 'decision', prompt: 'Comment calculer ?', options: [
-      { id: 'as', label: `Intégrer tel quel, d'abord en ${Y}`, valid: false, why: `${R(t.g)} n'a pas de primitive élémentaire.` },
-      { id: 'swap', label: 'Changer l\'ordre d\'intégration', valid: true },
+    kind: 'decision', prompt: t('Comment calculer ?'), options: [
+      { id: 'as', label: t('Intégrer tel quel, d\'abord en {v}', { v: Y }), valid: false, why: t('{g} n\'a pas de primitive élémentaire.', { g: R(w.g) }) },
+      { id: 'swap', label: t('Changer l\'ordre d\'intégration'), valid: true },
     ],
   };
   const parts = [
-    ...(level >= 2 ? [{ html: '', start: t.hard, judge: swapCfg(t, X), lines: [readL], pre: level === 3 ? [dec] : [] }] : []),
-    { html: `Décris D dans l'autre ordre : ${Y} à l'extérieur.`, ask: 'D :', start: t.oldLine, judge: swapCfg(t, Y), lines: [swapL], pre: level === 1 ? [] : [] },
-    { html: 'Calcule l\'intégrale dans le nouvel ordre :', ask: '=', start: t.easy, judge: { kind: 'definite' }, lines: [innerL, primL, valL] },
+    ...(level >= 2 ? [{ html: '', start: w.hard, judge: swapCfg(w, X), lines: [readL], pre: level === 3 ? [dec] : [] }] : []),
+    { html: t('Décris D dans l\'autre ordre : {v} à l\'extérieur.', { v: Y }), ask: t('D :'), start: w.oldLine, judge: swapCfg(w, Y), lines: [swapL], pre: level === 1 ? [] : [] },
+    { html: t('Calcule l\'intégrale dans le nouvel ordre :'), ask: '=', start: w.easy, judge: { kind: 'definite' }, lines: [innerL, primL, valL] },
   ];
   const [first, ...rest] = parts;
   const menuOf = (p) => (level === 3 ? { ...p.judge, menus: stepMenus(p.start, p.lines, SW_CHOICES) } : p.judge);
   const script = [...(first.pre || []), ...first.lines];
   for (const p of rest) script.push(SEG(p.html, p.ask, p.start, menuOf(p)), ...(p.pre || []), ...p.lines);
-  const ask = level >= 2 ? ` Écris d'abord D avec ses inégalités (${X} à l'extérieur, comme dans l'intégrale).` : ` Ici D = {(x, y) : ${R(t.oldLine).replace(' ; ', ', ')}}. Décris D avec ${Y} à l'extérieur.`;
+  const ask = level >= 2 ? ` ${t('Écris d\'abord D avec ses inégalités ({v} à l\'extérieur, comme dans l\'intégrale).', { v: X })}` : ` ${t('Ici D = {(x, y) : {D}}. Décris D avec {v} à l\'extérieur.', { D: R(w.oldLine).replace(' ; ', ', '), v: Y })}`;
   return linesItem({
     skill: SW, level, mode: modeOf(level), start: first.start, judge: menuOf(first), script,
-    prompt: `Calcule ${MT(t.hard)}. ${R(t.g)} n'a pas de primitive élémentaire : change l'ordre d'intégration.${ask}`,
-    hints: H(`${R(t.g)} n'a pas de primitive : change l'ordre. Dessine D = {${R(t.oldLine).replace(' ; ', ', ')}}.`,
-      `${Y} va de 0 à ${R(t.s.c)} ; ${X} va de 0 à …`, MT(t.newLine, XY)),
+    prompt: t('Calcule {I}. {g} n\'a pas de primitive élémentaire : change l\'ordre d\'intégration.', { I: MT(w.hard), g: R(w.g) }) + ask,
+    hints: H(t('{g} n\'a pas de primitive : change l\'ordre. Dessine D = {{D}}.', { g: R(w.g), D: R(w.oldLine).replace(' ; ', ', ') }),
+      t('{y} va de 0 à {c} ; {x} va de 0 à …', { y: Y, c: R(w.s.c), x: X }), MT(w.newLine, XY)),
     subgoals: SW_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
-    key: `${SW}:${level}:${t.hard}`, exam: examTag(opts), baits: ['a2_fubini_swap_same', 'a2_fubini_outer_var'],
+    key: `${SW}:${level}:${w.hard}`, exam: examTag(opts), baits: ['a2_fubini_swap_same', 'a2_fubini_outer_var'],
   });
 }
 
 function swapMcq(rng, opts, level = 4) {
   for (let k = 0; k < 200; k++) {
-    const t = swapData(rng);
-    const sol = [{ html: `D = {${R(t.oldLine).replace(' ; ', ', ')}} = {${R(t.newLine).replace(' ; ', ', ')}}, donc ${MT(t.hard)} = ${MT(t.easy)} = ${MT(t.value)}.`, note: '' }];
+    const w = swapData(rng);
+    const sol = [{ html: t('D = {{A}} = {{B}}, donc {I} = {J} = {v}.', { A: R(w.oldLine).replace(' ; ', ', '), B: R(w.newLine).replace(' ; ', ', '), I: MT(w.hard), J: MT(w.easy), v: MT(w.value) }), note: '' }];
     let it;
     if (rng.chance(0.6)) {
       it = mcqV({
-        skill: SW, level, prompt: `${R(t.g)} n'a pas de primitive élémentaire. Laquelle de ces écritures est égale à ${MT(t.hard)} ?`,
-        right: opt(t.easy), wrongs: rng.shuffle(writings(t.f, t.oldLine, t.newLine)), key: `${SW}:mcq:w:${t.hard}`,
+        skill: SW, level, prompt: t('{g} n\'a pas de primitive élémentaire. Laquelle de ces écritures est égale à {I} ?', { g: R(w.g), I: MT(w.hard) }),
+        right: opt(w.easy), wrongs: rng.shuffle(writings(w.f, w.oldLine, w.newLine)), key: `${SW}:mcq:w:${w.hard}`,
         expectedSec: 150, exam: examTag(opts) || false, solution: sol,
       }, rng);
     } else {
-      const x = vFloat(t.V);
-      const wrongs = [vScale(t.V, 2), vScale(t.V, q(1, 2)), vScale(t.V, 3), vScale(t.V, -1)].map((W) => ({ html: MT(vText(W)), x: vFloat(W) }));
+      const x = vFloat(w.V);
+      const wrongs = [vScale(w.V, 2), vScale(w.V, q(1, 2)), vScale(w.V, 3), vScale(w.V, -1)].map((W) => ({ html: MT(vText(W)), x: vFloat(W) }));
       it = mcqV({
-        skill: SW, level, prompt: `Que vaut ${MT(t.hard)} ?`, right: { html: MT(t.value), x }, wrongs: rng.shuffle(wrongs),
-        key: `${SW}:mcq:v:${t.hard}`, expectedSec: 180, exam: examTag(opts) || false, solution: sol,
+        skill: SW, level, prompt: t('Que vaut {I} ?', { I: MT(w.hard) }), right: { html: MT(w.value), x }, wrongs: rng.shuffle(wrongs),
+        key: `${SW}:mcq:v:${w.hard}`, expectedSec: 180, exam: examTag(opts) || false, solution: sol,
       }, rng);
       if (it) it.baits = ['a2_fubini_swap_same'];
     }

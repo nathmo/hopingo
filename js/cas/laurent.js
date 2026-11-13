@@ -18,6 +18,7 @@
 import { Q } from '../math/rational.js';
 import { CQ, C, evalComplex, exactComplex, cabs } from './complex.js';
 import { series } from './series.js';
+import { t } from '../i18n.js';
 
 const N = 256;
 
@@ -33,7 +34,7 @@ export function toC(z0) {
     const z = evalComplex(z0, {});
     if (z) return z;
   }
-  throw new Error('Point de développement illisible.');
+  throw new Error(t('Point de développement illisible.'));
 }
 
 // Samples f(z₀ + r e^(iθⱼ)), or null if f is undefined somewhere on the circle.
@@ -90,7 +91,7 @@ export function laurentCoefs(node, v = 'z', z0 = 0, { from = -1, to = -1, env = 
     prevR = rad;
   }
   if (prev && prevR) return prev;
-  throw new Error('Développement de Laurent impossible ici.');
+  throw new Error(t('Développement de Laurent impossible ici.'));
 }
 
 const tidy = (x) => (Math.abs(x) < 1e-11 ? 0 : x);
@@ -135,7 +136,7 @@ export function singularityType(node, v = 'z', z0 = 0, { env = {}, r = null, dep
     if (low <= -depth + 2) return { kind: 'essential' };
     return { kind: 'pole', order: -low };
   }
-  throw new Error('Singularité impossible à classer ici.');
+  throw new Error(t('Singularité impossible à classer ici.'));
 }
 
 // Order of the zero of f at z₀: the first k ≥ 0 with a_k ≠ 0 (f holomorphic at z₀).

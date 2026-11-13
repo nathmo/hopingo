@@ -15,8 +15,9 @@
 
 import { parse } from '../parse.js';
 import { mapNode } from '../ast.js';
+import { t } from '../../i18n.js';
 
-const P = (t) => parse(String(t), { vars: ['h', 'A', 'B', 'C', 'D', 'U', 'V', 'x', 't'] });
+const P = (s) => parse(String(s), { vars: ['h', 'A', 'B', 'C', 'D', 'U', 'V', 'x', 't'] });
 const plusText = (k, L) => {
   const K = Math.abs(k);
   const c2 = K * K;
@@ -26,7 +27,7 @@ const plusText = (k, L) => {
 
 export const DEFS = {
   n_fd_centered_h: {
-    name: 'Différence centrée divisée par h au lieu de 2h',
+    name: t('Différence centrée divisée par h au lieu de 2h'),
     judges: ['value', 'code'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.fd;
@@ -37,7 +38,7 @@ export const DEFS = {
     check: { judge: { kind: 'value', form: 'any', expect: '3,01', fd: { fp: '1,331', fm: '0,729', h: '0,1' } }, prev: 'δ', line: '6,02' },
   },
   n_fd_taylor_sign: {
-    name: 'Développement de f(x − h) avec tous les signes +',
+    name: t('Développement de f(x − h) avec tous les signes +'),
     judges: ['equiv'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.taylor;
@@ -50,17 +51,17 @@ export const DEFS = {
     },
   },
   n_fd_smaller_h: {
-    name: '« Plus h est petit, mieux c’est » (arrondi oublié)',
+    name: t('« Plus h est petit, mieux c’est » (arrondi oublié)'),
     judges: ['readtable'],
     check: { bait: { skill: 'n-fd-roundoff', level: 3 } },
   },
   n_fd_order_conditions: {
-    name: 'Ordre 2 annoncé avec la consistance seule',
+    name: t('Ordre 2 annoncé avec la consistance seule'),
     judges: ['readtable'],
     check: { bait: { skill: 'n-fd-build', level: 3 } },
   },
   n_proof_same_xi: {
-    name: 'Les deux restes f‴(ξ₁) et f‴(ξ₂) simplifiés ensemble',
+    name: t('Les deux restes f‴(ξ₁) et f‴(ξ₂) simplifiés ensemble'),
     judges: ['equiv', 'blocks'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.sameXi;
@@ -73,11 +74,11 @@ export const DEFS = {
     },
   },
   n_proof_constant_depends_h: {
-    name: 'Constante qui dépend de ξ ou de h',
+    name: t('Constante qui dépend de ξ ou de h'),
     // The catalogue's row has « | » inside its cells: META (rules/n.js)
     // reads it wrongly, so the example and the explanation are given here.
-    example: ['C = |f‴(ξ)|/3', 'C = 1, avec max|f‴|'],
-    explain: (ctx = {}) => `Ta constante contient ${ctx.sym ?? 'ξ ou h'} : elle doit être indépendante de h (et de f si l'énoncé met max|f⁽ᵖ⁾|). On majore |f‴(ξ)| par max|f‴|.`,
+    example: ['C = |f‴(ξ)|/3', t('C = 1, avec max|f‴|')],
+    explain: (ctx = {}) => t('Ta constante contient {sym} : elle doit être indépendante de h (et de f si l\'énoncé met max|f⁽ᵖ⁾|). On majore |f‴(ξ)| par max|f‴|.', { sym: ctx.sym ?? t('ξ ou h') }),
     judges: ['equiv', 'blocks'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.proofC;

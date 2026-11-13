@@ -22,6 +22,7 @@ import { evalFloat } from '../cas/numeric.js';
 import { diff } from '../cas/diff.js';
 import { symbolsIn } from '../cas/ast.js';
 import { solves } from './ode.js';
+import { t } from '../i18n.js';
 
 const read = (text, v) => parse(String(text), { vars: [v, 'y'], dvar: v });
 const val = (n, env) => { const r = evalFloat(n, env); return typeof r === 'number' ? r : NaN; };
@@ -29,9 +30,9 @@ const val = (n, env) => { const r = evalFloat(n, env); return typeof r === 'numb
 // The answer is a function of v alone (no constant, no other letter).
 function onlyV(text, v) {
   let n;
-  try { n = read(text, v); } catch { return { error: 'Je n\'arrive pas à lire ta fonction.' }; }
+  try { n = read(text, v); } catch { return { error: t('Je n\'arrive pas à lire ta fonction.') }; }
   const extra = [...symbolsIn(n)].filter((s) => s !== v);
-  if (extra.length) return { error: `Donne une fonction précise de ${v}, sans ${extra[0]}.` };
+  if (extra.length) return { error: t('Donne une fonction précise de {v}, sans {e}.', { v, e: extra[0] }) };
   return { node: n };
 }
 
@@ -86,20 +87,20 @@ export const PROPS = {
     const v = p.v || 'x';
     const x0 = Number(p.ic.x);
     let f;
-    try { f = read(ans.f, v); } catch { return { ok: false, message: 'Je n\'arrive pas à lire f.' }; }
+    try { f = read(ans.f, v); } catch { return { ok: false, message: t('Je n\'arrive pas à lire f.') }; }
     const extra = [...symbolsIn(f)].filter((s) => s !== v && s !== 'y');
-    if (extra.length) return { ok: false, message: `f ne doit dépendre que de ${v} et y.` };
+    if (extra.length) return { ok: false, message: t('f ne doit dépendre que de {v} et y.', { v }) };
     const fy = diff(f, 'y');
     for (let i = -6; i <= 6; i++) {
       for (let j = -6; j <= 6; j++) {
         const env = { [v]: i / 2, y: j / 2 };
-        if (!Number.isFinite(val(f, env)) || !Number.isFinite(val(fy, env))) return { ok: false, message: `f doit être C¹ sur ℝ² : en (${String(i / 2).replace('-', '−')} ; ${String(j / 2).replace('-', '−')}), f ou ∂f/∂y n'est pas définie.` };
+        if (!Number.isFinite(val(f, env)) || !Number.isFinite(val(fy, env))) return { ok: false, message: t('f doit être C¹ sur ℝ² : en ({a} ; {b}), f ou ∂f/∂y n\'est pas définie.', { a: String(i / 2).replace('-', '−'), b: String(j / 2).replace('-', '−') }) };
       }
     }
     const y = onlyV(ans.y, v);
     if (y.error) return { ok: false, message: y.error };
-    if (!icOk(p, y.node)) return { ok: false, message: `Ta solution ne vérifie pas y(${x0}) = ${p.ic.y}.` };
-    if (!isSolution({ eq: `y'=${ans.f}`, v, domain: { [v]: [x0 - 0.1, x0 + 0.1] } }, ans.y)) return { ok: false, message: `Ta fonction ne vérifie pas y′ = f(${v}, y) près de ${x0}.` };
+    if (!icOk(p, y.node)) return { ok: false, message: t('Ta solution ne vérifie pas y({x}) = {y}.', { x: x0, y: p.ic.y }) };
+    if (!isSolution({ eq: `y'=${ans.f}`, v, domain: { [v]: [x0 - 0.1, x0 + 0.1] } }, ans.y)) return { ok: false, message: t('Ta fonction ne vérifie pas y′ = f({v}, y) près de {x}.', { v, x: x0 }) };
     // A blow-up: within 10 of x₀, |y| passes 10³ while ln|y| changes faster
     // than 200 per unit (a pole, not an exponential).
     for (const dir of [1, -1]) {
@@ -115,18 +116,18 @@ export const PROPS = {
         }
       }
     }
-    return { ok: false, message: 'Ta solution reste bornée près de chaque point : elle ne montre pas qu\'une solution peut exploser en un temps fini.' };
+    return { ok: false, message: t('Ta solution reste bornée près de chaque point : elle ne montre pas qu\'une solution peut exploser en un temps fini.') };
   },
 
   odeOutside: (p, ans) => {
     const v = p.v || 'x';
     const y = onlyV(ans.y, v);
     if (y.error) return { ok: false, message: y.error };
-    if (!isSolution(cfgOf(p), ans.y)) return { ok: false, message: 'Ta fonction n\'est pas une solution de l\'équation.' };
-    if (!icOk(p, y.node)) return { ok: false, message: 'Ta fonction ne vérifie pas la condition initiale.' };
+    if (!isSolution(cfgOf(p), ans.y)) return { ok: false, message: t('Ta fonction n\'est pas une solution de l\'équation.') };
+    if (!icOk(p, y.node)) return { ok: false, message: t('Ta fonction ne vérifie pas la condition initiale.') };
     if (!p.family) return { ok: true };
     const fam = parse(p.family, { vars: [v, 'C'], dvar: v });
-    if (inFamily(y.node, fam, v, p.domain?.[v] || [-2, 2])) return { ok: false, rule: p.rule, message: 'Ta solution est bien de cette forme, pour une valeur de C : cherche-en une autre.' };
+    if (inFamily(y.node, fam, v, p.domain?.[v] || [-2, 2])) return { ok: false, rule: p.rule, message: t('Ta solution est bien de cette forme, pour une valeur de C : cherche-en une autre.') };
     return { ok: true };
   },
 
@@ -138,12 +139,12 @@ export const PROPS = {
     if (y1.error) return { ok: false, message: y1.error };
     let C;
     try { C = val(parse(String(ans.C)), {}); } catch { C = NaN; }
-    if (!Number.isFinite(C)) return { ok: false, message: 'Donne un nombre C.' };
+    if (!Number.isFinite(C)) return { ok: false, message: t('Donne un nombre C.') };
     const cfg = cfgOf(p);
-    if (!isSolution({ ...cfg, eq: p.homog }, ans.y0)) return { ok: false, message: 'y₀ doit résoudre l\'équation homogène.' };
-    if (!isSolution(cfg, ans.y1)) return { ok: false, message: 'y₁ doit résoudre l\'équation complète.' };
+    if (!isSolution({ ...cfg, eq: p.homog }, ans.y0)) return { ok: false, message: t('y₀ doit résoudre l\'équation homogène.') };
+    if (!isSolution(cfg, ans.y1)) return { ok: false, message: t('y₁ doit résoudre l\'équation complète.') };
     if (isSolution(cfg, `(${ans.y0})+(${ans.C})×(${ans.y1})`)) {
-      return { ok: false, rule: 'a2_ode_superposition_nonhom', message: Math.abs(C - 1) < 1e-12 ? 'Avec C = 1, y₀ + y₁ est bien une solution : prends un autre C.' : 'Avec ce C, y₀ + C·y₁ est une solution : prends un autre C.' };
+      return { ok: false, rule: 'a2_ode_superposition_nonhom', message: Math.abs(C - 1) < 1e-12 ? t('Avec C = 1, y₀ + y₁ est bien une solution : prends un autre C.') : t('Avec ce C, y₀ + C·y₁ est une solution : prends un autre C.') };
     }
     return { ok: true };
   },
@@ -153,9 +154,9 @@ export const PROPS = {
     for (const k of ['y1', 'y2']) {
       const y = onlyV(ans[k], v);
       if (y.error) return { ok: false, message: y.error };
-      if (!isSolution(cfgOf(p), ans[k])) return { ok: false, message: `${k === 'y1' ? 'y₁' : 'y₂'} n'est pas une solution de l'équation.` };
+      if (!isSolution(cfgOf(p), ans[k])) return { ok: false, message: t('{y} n\'est pas une solution de l\'équation.', { y: k === 'y1' ? 'y₁' : 'y₂' }) };
     }
-    if (isSolution(cfgOf(p), `(${ans.y1})+(${ans.y2})`)) return { ok: false, rule: 'a2_ode_superposition_nonhom', message: 'Leur somme est encore une solution : l\'énoncé n\'est pas réfuté par ces deux-là.' };
+    if (isSolution(cfgOf(p), `(${ans.y1})+(${ans.y2})`)) return { ok: false, rule: 'a2_ode_superposition_nonhom', message: t('Leur somme est encore une solution : l\'énoncé n\'est pas réfuté par ces deux-là.') };
     return { ok: true };
   },
 
@@ -163,11 +164,11 @@ export const PROPS = {
     const v = p.v || 'x';
     const y = onlyV(ans.y, v);
     if (y.error) return { ok: false, message: y.error };
-    if (!isSolution(cfgOf(p), ans.y)) return { ok: false, message: 'Ta fonction n\'est pas une solution de l\'équation.' };
+    if (!isSolution(cfgOf(p), ans.y)) return { ok: false, message: t('Ta fonction n\'est pas une solution de l\'équation.') };
     for (let k = 0; k <= 600; k++) {
       const yx = val(y.node, { [v]: k / 10 });
       if (!Number.isFinite(yx) || Math.abs(yx) > 1e6) return { ok: true };
     }
-    return { ok: false, message: 'Ta solution reste bornée : il en faut une qui ne l\'est pas.' };
+    return { ok: false, message: t('Ta solution reste bornée : il en faut une qui ne l\'est pas.') };
   },
 };

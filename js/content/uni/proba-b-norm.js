@@ -11,6 +11,7 @@ import { statItem, coefItem, openItem, choice, tf, numCounter, H, SM, examTag } 
 import { MT } from './kit.js';
 import { q, qt, qs, dx, dl, fr } from './proba-b-kit.js';
 import { Phi, PhiInv, phiTable, phiAccepted, phiInvTable, roundTo } from '../../cas/stats.js';
+import { t } from '../../i18n.js';
 
 const pickOf = (rng, xs) => xs[rng.int(0, xs.length - 1)];
 const v6 = (x) => String(Number(Number(x).toFixed(6)));
@@ -24,7 +25,7 @@ const phiT = (z) => phiTable(z) ?? roundTo(Phi(z), 3);
 // ======================================================================
 
 const NS = 'p-normal-std';
-const NS_SUB = [{ id: 'std', label: 'standardiser, lire Φ', skill: NS }];
+const NS_SUB = [{ id: 'std', label: t('standardiser, lire Φ'), skill: NS }];
 const SIGMAS = [2, 4, 5, 8, 10, 15, 20, 25];
 
 // z on the grid with x = μ + zσ written with at most one decimal.
@@ -41,15 +42,15 @@ const xOf = (mu, z, s) => Number((mu + z * s).toFixed(1));
 
 function zPart(name, x, mu, s, viaVar = false) {
   const z = (x - mu) / s;
-  return { label: `z${name}`, name: `z${name}`, kind: 'stat', expect: `(${x}-${mu})/${s}`, action: 'Standardiser : z = (x − μ)/σ',
+  return { label: `z${name}`, name: `z${name}`, kind: 'stat', expect: `(${x}-${mu})/${s}`, action: t('Standardiser : z = (x − μ)/σ'),
     traps: { p_standardize_var: { values: [v6((x - mu) / (s * s))], ctx: { var: s * s, 'σ': s } } },
-    wrongActions: [{ label: 'Diviser par la variance', rule: 'p_standardize_var', why: `On divise par l'écart-type σ = ${s}, pas par la variance.` }],
+    wrongActions: [{ label: t('Diviser par la variance'), rule: 'p_standardize_var', why: t('On divise par l\'écart-type σ = {s}, pas par la variance.', { s }) }],
     lines: [{ math: `(${fr(x)}-${mu})/${s}`, blank: [fr(x)], subgoal: 'std' }, { math: zt(z), blank: [zt(z)] }], z, viaVar };
 }
 // Φ at |z| (a positive grid value), read in the table; carried: #phi of the student's z.
 function phiPart(name, zName, z, neg = false) {
   const a = Math.abs(z);
-  return { label: `Φ(${zs(a)})`, name, kind: 'stat', expect: neg ? `#phi(-$${zName})` : `#phi($${zName})`, accept: phiAccepted(a), action: 'Lire Φ dans la table',
+  return { label: `Φ(${zs(a)})`, name, kind: 'stat', expect: neg ? `#phi(-$${zName})` : `#phi($${zName})`, accept: phiAccepted(a), action: t('Lire Φ dans la table'),
     lines: [{ math: zt(phiT(a)), blank: [zt(phiT(a))], subgoal: 'std' }] };
 }
 
@@ -67,38 +68,38 @@ function nsItem(level, rng, profile, opts = {}) {
     const Pv = 1 - phiT(z);
     const parts = [];
     if (kind === 'var') {
-      parts.push({ label: 'σ', name: 'sig', kind: 'prob', expect: String(s), action: 'σ = √(variance)',
+      parts.push({ label: 'σ', name: 'sig', kind: 'prob', expect: String(s), action: t('σ = √(variance)'),
         traps: { p_normal_sigma2: { values: [String(s * s)] } },
-        decisions: [{ prompt: `Dans N(${mu} ; ${s * s}), que vaut ${s * s} ?`, options: [
-          { id: 'var', label: 'La variance σ²', valid: true },
-          { id: 'sd', label: 'L\'écart-type σ', valid: false, rule: 'p_normal_sigma2', why: `Le cours écrit N(μ, σ²) : ${s * s} est la variance, σ = √${s * s} = ${s}.` }] }],
+        decisions: [{ prompt: t('Dans N({mu} ; {v}), que vaut {v} ?', { mu, v: s * s }), options: [
+          { id: 'var', label: t('La variance σ²'), valid: true },
+          { id: 'sd', label: t('L\'écart-type σ'), valid: false, rule: 'p_normal_sigma2', why: t('Le cours écrit N(μ, σ²) : {v} est la variance, σ = √{v} = {s}.', { v: s * s, s }) }] }],
         lines: [{ math: `√${s * s}`, blank: [String(s * s)] }, { math: String(s) }] });
     }
     parts.push(zPart('', x, mu, s), phiPart('phi', 'z', z),
-      { label: `Pr(X>${fr(x)})`, name: 'P', kind: 'stat', expect: '1-$phi', action: 'Complément : 1 − Φ(z)',
+      { label: `Pr(X>${fr(x)})`, name: 'P', kind: 'stat', expect: '1-$phi', action: t('Complément : 1 − Φ(z)'),
         traps: { p_upper_tail: { values: [v6(phiT(z))], ctx: { z: zs(z), v: zt(phiT(z)) } } },
-        decisions: [{ prompt: 'Queue gauche ou droite ?', levels: [2], options: [
-          { id: 'r', label: 'À droite : Pr(X > x) = 1 − Φ(z)', valid: true },
-          { id: 'l', label: 'Φ(z) directement', valid: false, rule: 'p_upper_tail', why: 'Φ(z) est Pr(Z ≤ z) ; on demande au-dessus.' }] }],
+        decisions: [{ prompt: t('Queue gauche ou droite ?'), levels: [2], options: [
+          { id: 'r', label: t('À droite : Pr(X > x) = 1 − Φ(z)'), valid: true },
+          { id: 'l', label: t('Φ(z) directement'), valid: false, rule: 'p_upper_tail', why: t('Φ(z) est Pr(Z ≤ z) ; on demande au-dessus.') }] }],
         lines: [{ math: `1-${zt(phiT(z))}`, blank: [zt(phiT(z))], subgoal: 'std' }, { math: zt(Pv) }] });
     return statItem({ ...base, key: `${level}:${kind}:${mu}:${s}:${x}`, parts,
-      prompt: `X ~ N(${mu} ; ${kind === 'var' ? s * s : `${s}²`}). Calcule Pr(X > ${fr(x)}) avec la table de Φ.`,
-      hints: H('Ramène-toi à Z = (X − μ)/σ, puis Pr(Z > z) = 1 − Φ(z).', `z = (${fr(x)} − ${mu})/□`, `Pr = 1 − ${zt(phiT(z))} = ${zt(Pv)}`) });
+      prompt: t('X ~ N({mu} ; {v}). Calcule Pr(X > {x}) avec la table de Φ.', { mu, v: kind === 'var' ? s * s : `${s}²`, x: fr(x) }),
+      hints: H(t('Ramène-toi à Z = (X − μ)/σ, puis Pr(Z > z) = 1 − Φ(z).'), `z = (${fr(x)} − ${mu})/□`, `Pr = 1 − ${zt(phiT(z))} = ${zt(Pv)}`) });
   }
   if (kind === 'left') {
     const z = -gridZ(rng, s, 0.5, 2.5);
     const x = xOf(mu, z, s);
     const p = phiT(-z);
     return statItem({ ...base, key: `${level}:left:${mu}:${s}:${x}`,
-      prompt: `X ~ N(${mu} ; ${s}²). Calcule Pr(X < ${fr(x)}) avec la table de Φ.`,
+      prompt: t('X ~ N({mu} ; {s}²). Calcule Pr(X < {x}) avec la table de Φ.', { mu, s, x: fr(x) }),
       parts: [zPart('', x, mu, s), phiPart('phi', 'z', z, true),
-        { label: `Pr(X<${fr(x)})`, name: 'P', kind: 'stat', expect: '1-$phi', action: 'Symétrie : Φ(−a) = 1 − Φ(a)',
+        { label: `Pr(X<${fr(x)})`, name: 'P', kind: 'stat', expect: '1-$phi', action: t('Symétrie : Φ(−a) = 1 − Φ(a)'),
           traps: { p_phi_negative: { values: [v6(p), v6(-p)], ctx: { z: zs(-z), v: zt(1 - p) } } },
-          decisions: [{ prompt: `Φ(${zs(z)}) avec une valeur négative ?`, levels: [1, 2], options: [
+          decisions: [{ prompt: t('Φ({z}) avec une valeur négative ?', { z: zs(z) }), levels: [1, 2], options: [
             { id: 'sym', label: `Φ(${zs(z)}) = 1 − Φ(${zs(-z)})`, valid: true },
-            { id: 'neg', label: `Φ(${zs(z)}) = −Φ(${zs(-z)})`, valid: false, rule: 'p_phi_negative', why: 'Φ est une probabilité, entre 0 et 1 : par symétrie Φ(−a) = 1 − Φ(a).' }] }],
+            { id: 'neg', label: `Φ(${zs(z)}) = −Φ(${zs(-z)})`, valid: false, rule: 'p_phi_negative', why: t('Φ est une probabilité, entre 0 et 1 : par symétrie Φ(−a) = 1 − Φ(a).') }] }],
           lines: [{ math: `1-${zt(p)}`, blank: [zt(p)], subgoal: 'std' }, { math: zt(1 - p) }] }],
-      hints: H('z est négatif : Φ(−a) = 1 − Φ(a).', `Pr = 1 − Φ(□)`, `Pr = 1 − ${zt(p)} = ${zt(1 - p)}`) });
+      hints: H(t('z est négatif : Φ(−a) = 1 − Φ(a).'), `Pr = 1 − Φ(□)`, `Pr = 1 − ${zt(p)} = ${zt(1 - p)}`) });
   }
   if (kind === 'between') {
     const z1 = -gridZ(rng, s, 0.5, 2);
@@ -109,12 +110,12 @@ function nsItem(level, rng, profile, opts = {}) {
     const p2 = phiT(z2);
     const Pv = p2 - (1 - p1);
     return statItem({ ...base, key: `${level}:between:${mu}:${s}:${x1}:${x2}`,
-      prompt: `X ~ N(${mu} ; ${s}²). Calcule Pr(${fr(x1)} < X < ${fr(x2)}) avec la table de Φ.`,
+      prompt: t('X ~ N({mu} ; {s}²). Calcule Pr({a} < X < {b}) avec la table de Φ.', { mu, s, a: fr(x1), b: fr(x2) }),
       parts: [zPart('1', x1, mu, s), zPart('2', x2, mu, s), phiPart('p2', 'z2', z2), phiPart('p1', 'z1', z1, true),
-        { label: 'Pr', name: 'P', kind: 'stat', expect: '$p2-(1-$p1)', action: 'Φ(z₂) − Φ(z₁), avec la symétrie',
+        { label: 'Pr', name: 'P', kind: 'stat', expect: '$p2-(1-$p1)', action: t('Φ(z₂) − Φ(z₁), avec la symétrie'),
           traps: { p_phi_negative: { values: [v6(p2 - p1), v6(p2 + p1)], ctx: { z: zs(-z1), v: zt(1 - p1) } }, p_upper_tail: { values: [v6(1 - p2 + (1 - p1))] } },
           lines: [{ math: `${zt(p2)}-(1-${zt(p1)})`, blank: [`1-${zt(p1)}`], subgoal: 'std' }, { math: zt(Pv) }] }],
-      hints: H('Pr(a < X < b) = Φ(z₂) − Φ(z₁), et Φ(−a) = 1 − Φ(a).', `Pr = ${zt(p2)} − (1 − □)`, `Pr = ${zt(Pv)}`) });
+      hints: H(t('Pr(a < X < b) = Φ(z₂) − Φ(z₁), et Φ(−a) = 1 − Φ(a).'), `Pr = ${zt(p2)} − (1 − □)`, `Pr = ${zt(Pv)}`) });
   }
   // cond: Pr(X > b | X > a), a < b above the mean.
   const za = gridZ(rng, s, 0.25, 1);
@@ -124,9 +125,9 @@ function nsItem(level, rng, profile, opts = {}) {
   const pa = phiT(za);
   const pb = phiT(zb);
   return statItem({ ...base, key: `${level}:cond:${mu}:${s}:${xa}:${xb}`,
-    prompt: `La taille X (cm) suit N(${mu} ; ${s}²). Calcule Pr(X > ${fr(xb)} | X > ${fr(xa)}) avec la table de Φ.`,
+    prompt: t('La taille X (cm) suit N({mu} ; {s}²). Calcule Pr(X > {b} | X > {a}) avec la table de Φ.', { mu, s, b: fr(xb), a: fr(xa) }),
     parts: [zPart('1', xa, mu, s), zPart('2', xb, mu, s), phiPart('pa', 'z1', za), phiPart('pb', 'z2', zb),
-      { label: 'Pr', name: 'P', kind: 'stat', expect: '(1-$pb)/(1-$pa)', tol: 0.002, action: 'Conditionner',
+      { label: 'Pr', name: 'P', kind: 'stat', expect: '(1-$pb)/(1-$pa)', tol: 0.002, action: t('Conditionner'),
         traps: { p_upper_tail: { values: [v6(pb / pa)] }, p_cond_denominator: { values: [v6(1 - pb)] } },
         lines: [{ math: `(1-${zt(pb)})/(1-${zt(pa)})`, subgoal: 'std' }, { math: dl((1 - pb) / (1 - pa), 3) }] }],
     hints: [] });
@@ -141,7 +142,7 @@ function nsDiff(level, rng, opts) {
   const m1 = m2 + dmu;
   const p = phiT(z);
   return statItem({ skill: NS, level, key: `${level}:diff:${m1}:${m2}:${c}`, exam: examTag(opts), subgoals: NS_SUB, hints: [],
-    prompt: `X ~ N(${fr(m1)} ; ${a}²) et Y ~ N(${m2} ; ${b}²) sont indépendantes. Calcule Pr(X > Y) avec la table de Φ.`,
+    prompt: t('X ~ N({m1} ; {a}²) et Y ~ N({m2} ; {b}²) sont indépendantes. Calcule Pr(X > Y) avec la table de Φ.', { m1: fr(m1), a, m2, b }),
     parts: [
       { label: 'E[X−Y]', name: 'm', kind: 'prob', expect: `${m1}-${m2}`, lines: [{ math: `${fr(m1)}-${m2}`, subgoal: 'std' }, { math: fr(dmu) }] },
       { label: 'σ(X−Y)', name: 's', kind: 'prob', expect: `√(${a * a}+${b * b})`, traps: { p_standardize_var: { values: [String(a + b), String(a * a + b * b)] } },
@@ -160,7 +161,7 @@ function nsMcq(rng, opts) {
   const right = 1 - phiT(z);
   const wv = (x - mu) / (s * s);
   return choice({ skill: NS, level: 4, key: `mcq:${mu}:${s}:${x}`, exam: examTag(opts),
-    prompt: `X ~ N(${mu} ; ${s * s}). Que vaut Pr(X > ${fr(x)}) ?`,
+    prompt: t('X ~ N({mu} ; {v}). Que vaut Pr(X > {x}) ?', { mu, v: s * s, x: fr(x) }),
     right: zt(right), wrongs: [{ html: zt(phiT(z)), rule: 'p_upper_tail' }, { html: zt(1 - phiT(Math.round(wv / 0.025) * 0.025)), rule: 'p_standardize_var' }],
     fillers: [{ html: zt(1 - phiT(z / 2)) }, { html: zt(phiT(z) - 0.5) }, { html: '0,5' }] }, rng);
 }
@@ -168,11 +169,11 @@ function nsMcq(rng, opts) {
 function nsTf(rng, opts) {
   const s = pickOf(rng, [2, 3, 4]);
   if (rng.chance(0.4)) {
-    return tf({ skill: NS, key: 'abs196', exam: examTag(opts), truth: true, statement: 'Si X ~ N(0 ; 1), alors Pr(|X| < 1,96) ≈ 0,95.', explanation: 'Vrai : 2Φ(1,96) − 1 = 2 · 0,975 − 1 = 0,95.' });
+    return tf({ skill: NS, key: 'abs196', exam: examTag(opts), truth: true, statement: t('Si X ~ N(0 ; 1), alors Pr(|X| < 1,96) ≈ 0,95.'), explanation: t('Vrai : 2Φ(1,96) − 1 = 2 · 0,975 − 1 = 0,95.') });
   }
   return tf({ skill: NS, key: `var:${s}`, exam: examTag(opts), truth: false, ruleIfTrue: 'p_normal_sigma2',
-    statement: `Si X ~ N(0 ; ${s * s}), alors Pr(X > ${s}) = 1 − Φ(${s}).`,
-    explanation: `Faux : σ = ${s}, donc Pr(X > ${s}) = 1 − Φ(1) = 0,159, alors que 1 − Φ(${s}) = ${zt(1 - phiT(s))}.`,
+    statement: t('Si X ~ N(0 ; {v}), alors Pr(X > {s}) = 1 − Φ({s}).', { v: s * s, s }),
+    explanation: t('Faux : σ = {s}, donc Pr(X > {s}) = 1 − Φ(1) = 0,159, alors que 1 − Φ({s}) = {p}.', { s, p: zt(1 - phiT(s)) }),
     counter: numCounter({ vars: [{ v: 'p', label: `Pr(X > ${s}) =` }], hyp: '|p-0,159|<0,002', pred: `|p-${dl(1 - phiT(s), 4)}|<0,002`, answer: { p: '0,159' } }) });
 }
 
@@ -182,7 +183,7 @@ function nsCoef(rng) {
   const z = gridZ(rng, s, 0.5, 2.5);
   const x = xOf(mu, z, s);
   return coefItem({ skill: NS, key: `coef:${mu}:${s}:${x}`, exam: { format: 'coef', points: 1 },
-    prompt: `X ~ N(${mu} ; ${s}²). Calcule Pr(X > ${fr(x)}) avec la table de Φ (au millième).`,
+    prompt: t('X ~ N({mu} ; {s}²). Calcule Pr(X > {x}) avec la table de Φ (au millième).', { mu, s, x: fr(x) }),
     parts: [{ label: `Pr(X>${fr(x)})`, kind: 'stat', expect: v6(1 - phiT(z)), accept: phiAccepted(z).map((v) => 1 - v), traps: { p_upper_tail: { values: [v6(phiT(z))] } }, lines: [{ math: zt(1 - phiT(z)) }] }],
     subgoals: NS_SUB });
 }
@@ -192,25 +193,25 @@ function nsCoef(rng) {
 // ======================================================================
 
 const NI = 'p-normal-inverse';
-const NI_SUB = [{ id: 'std', label: 'complément, standardiser', skill: NS }, { id: 'inv', label: 'lire Φ⁻¹', skill: NI }, { id: 'iso', label: 'isoler σ', skill: 'iso-formula' }];
+const NI_SUB = [{ id: 'std', label: t('complément, standardiser'), skill: NS }, { id: 'inv', label: t('lire Φ⁻¹'), skill: NI }, { id: 'iso', label: t('isoler σ'), skill: 'iso-formula' }];
 // Upper share s, level p = 1 − s, as texts.
 // d: the decimals Table 2 prints for that p (0,990 → 2,326).
 const SHARES = [{ s: '0,1', p: '0,9', d: 2 }, { s: '0,2', p: '0,8', d: 2 }, { s: '0,25', p: '0,75', d: 2 }, { s: '0,05', p: '0,95', d: 2 }, { s: '0,025', p: '0,975', d: 3 }, { s: '0,01', p: '0,99', d: 3 }, { s: '0,02', p: '0,98', d: 3 }];
 const zOf = (S) => roundTo(PhiInv(num(S.p)), S.d);
-const num = (t) => Number(t.replace(',', '.'));
-const pct = (t) => fr(String(Number((num(t) * 100).toFixed(1))));
+const num = (s) => Number(s.replace(',', '.'));
+const pct = (s) => fr(String(Number((num(s) * 100).toFixed(1))));
 
 function levelPart(S, phiArg) {
-  return { label: `Φ(${phiArg})`, name: 'lev', kind: 'prob', expect: S.p, action: 'Complément : la part en dessous',
+  return { label: `Φ(${phiArg})`, name: 'lev', kind: 'prob', expect: S.p, action: t('Complément : la part en dessous'),
     traps: { p_upper_tail: { values: [S.s] } },
     lines: [{ math: `1-${S.s}`, blank: [S.s], subgoal: 'std' }, { math: S.p }] };
 }
 function zInvPart(S) {
   const z = zOf(S);
   const dec = S.d;
-  return { label: 'z', name: 'z', kind: 'stat', expect: v6(z), decimals: Math.max(2, dec), accept: [z], action: 'Lire Φ⁻¹ dans la table 2',
+  return { label: 'z', name: 'z', kind: 'stat', expect: v6(z), decimals: Math.max(2, dec), accept: [z], action: t('Lire Φ⁻¹ dans la table 2'),
     traps: { p_phi_inverse_side: { values: [v6(-z)], ctx: {} }, p_quantile_inverse: { values: [v6(roundTo(Phi(num(S.p)), 3))] } },
-    wrongActions: [{ label: `Lire Φ(${S.p})`, rule: 'p_quantile_inverse', why: `On cherche z tel que Φ(z) = ${S.p}, pas la valeur de Φ en ${S.p}.` }],
+    wrongActions: [{ label: t('Lire Φ({p})', { p: S.p }), rule: 'p_quantile_inverse', why: t('On cherche z tel que Φ(z) = {p}, pas la valeur de Φ en {p}.', { p: S.p }) }],
     lines: [{ math: `Φ⁻¹(${S.p})`, subgoal: 'inv' }, { math: dl(z, dec) }], z };
 }
 
@@ -228,22 +229,22 @@ function niItem(level, rng, profile, opts = {}) {
     const c = mu - Math.round(z * sig);
     const M = c + z * sig;
     return statItem({ ...base, key: `${level}:mu:${S.s}:${sig}:${c}`,
-      prompt: `Le poids X d'un paquet suit N(μ ; ${sig}²). ${pct(S.s)} % des paquets pèsent moins de ${c} g. Trouve μ (au dixième).`,
+      prompt: t('Le poids X d\'un paquet suit N(μ ; {sig}²). {p} % des paquets pèsent moins de {c} g. Trouve μ (au dixième).', { sig, p: pct(S.s), c }),
       parts: [levelPart(S, `(μ − ${c})/${sig}`), zInvPart(S),
-        { label: 'μ', name: 'mu', kind: 'stat', decimals: 1, expect: `${c}+$z*${sig}`, action: 'Isoler μ',
+        { label: 'μ', name: 'mu', kind: 'stat', decimals: 1, expect: `${c}+$z*${sig}`, action: t('Isoler μ'),
           traps: { p_phi_inverse_side: { values: [v6(c - z * sig)] } },
           lines: [{ math: `${c}+${dl(z, 3)}×${sig}`, subgoal: 'iso' }, { math: dl(M, 1) }] }],
-      hints: H(`${pct(S.s)} % en dessous de ${c} : (μ − ${c})/σ = Φ⁻¹(${S.p}).`, `μ = ${c} + □·${sig}`, `μ = ${dx(M, 1)}`) });
+      hints: H(t('{p} % en dessous de {c} : (μ − {c})/σ = Φ⁻¹({q}).', { p: pct(S.s), c, q: S.p }), `μ = ${c} + □·${sig}`, `μ = ${dx(M, 1)}`) });
   }
   if (kind === 'seuil') {
     const c = mu + z * sig;
     return statItem({ ...base, key: `${level}:seuil:${S.s}:${sig}:${mu}`,
-      prompt: `X ~ N(${mu} ; ${sig}²). Trouve le seuil c dépassé par seulement ${pct(S.s)} % des valeurs (au dixième).`,
+      prompt: t('X ~ N({mu} ; {sig}²). Trouve le seuil c dépassé par seulement {p} % des valeurs (au dixième).', { mu, sig, p: pct(S.s) }),
       parts: [levelPart(S, `(c − ${mu})/${sig}`), zInvPart(S),
-        { label: 'c', name: 'c', kind: 'stat', decimals: 1, expect: `${mu}+$z*${sig}`, action: 'Isoler c',
+        { label: 'c', name: 'c', kind: 'stat', decimals: 1, expect: `${mu}+$z*${sig}`, action: t('Isoler c'),
           traps: { p_phi_inverse_side: { values: [v6(mu - z * sig)] } },
           lines: [{ math: `${mu}+${dl(z, 3)}×${sig}`, subgoal: 'iso' }, { math: dl(c, 1) }] }],
-      hints: H('Les valeurs du haut : Φ((c − μ)/σ) = 1 − part.', `c = ${mu} + □·${sig}`, `c = ${dx(c, 1)}`) });
+      hints: H(t('Les valeurs du haut : Φ((c − μ)/σ) = 1 − part.'), `c = ${mu} + □·${sig}`, `c = ${dx(c, 1)}`) });
   }
   // sigma: Pr(X > c) = s with c = μ + d.
   const mj = pickOf(rng, [60, 70, 84]);
@@ -252,7 +253,7 @@ function niItem(level, rng, profile, opts = {}) {
   const c = mj + d;
   const sg = Number((d / z).toFixed(2));
   const parts = [levelPart(S, `${d}/σ`), zInvPart(S),
-    { label: 'σ', name: 'sig', kind: 'stat', decimals: 2, expect: `${d}/$z`, action: 'Isoler σ',
+    { label: 'σ', name: 'sig', kind: 'stat', decimals: 2, expect: `${d}/$z`, action: t('Isoler σ'),
       traps: { p_phi_inverse_side: { values: [v6(-d / z)] } },
       lines: [{ math: `${d}/${dl(z, 3)}`, subgoal: 'iso' }, { math: dl(sg, 2) }] }];
   if (kind === 'sigma5') {
@@ -263,9 +264,9 @@ function niItem(level, rng, profile, opts = {}) {
         lines: [{ math: `1-Φ(${dl(z2, 2)})`, subgoal: 'std' }, { math: dl(1 - Phi(z2), 3) }] });
   }
   const o = { ...base, key: `${level}:${kind}:${S.s}:${mj}:${d}`,
-    prompt: `Un lancer de javelot X (m) suit N(${mj} ; σ²). On sait que Pr(X > ${c}) = ${S.s}. Trouve σ (au centième)${kind === 'sigma5' ? `, puis Pr(X > ${c + d})` : ''}.`,
+    prompt: kind === 'sigma5' ? t('Un lancer de javelot X (m) suit N({mj} ; σ²). On sait que Pr(X > {c}) = {s}. Trouve σ (au centième), puis Pr(X > {c2}).', { mj, c, s: S.s, c2: c + d }) : t('Un lancer de javelot X (m) suit N({mj} ; σ²). On sait que Pr(X > {c}) = {s}. Trouve σ (au centième).', { mj, c, s: S.s }),
     parts,
-    hints: H(`Pr(X > ${c}) = ${S.s}, c'est Φ(${d}/σ) = ${S.p} : cherche ${S.p} dans la table 2.`, `${d}/σ = ${dl(z, 3)}, donc σ = □`, `σ = ${dx(sg, 2)}`) };
+    hints: H(t('Pr(X > {c}) = {s}, c\'est Φ({d}/σ) = {p} : cherche {p} dans la table 2.', { c, s: S.s, d, p: S.p }), t('{d}/σ = {z}, donc σ = □', { d, z: dl(z, 3) }), `σ = ${dx(sg, 2)}`) };
   if (opts.exam === 'open') return openItem({ ...o, exam: { format: 'open', points: 8 } }, 8, rng);
   if (opts.exam === 'coef') return coefItem({ ...o, exam: { format: 'coef', points: 1 }, parts: parts.slice(0, 3) });
   return statItem(o);
@@ -275,16 +276,16 @@ function niMcq(rng, opts) {
   const S = pickOf(rng, SHARES.slice(0, 5));
   const z = zOf(S);
   return choice({ skill: NI, level: 4, key: `mcq:${S.s}`, exam: examTag(opts),
-    prompt: `Z ~ N(0 ; 1). Quel nombre z vérifie Pr(Z > z) = ${S.s} ?`,
+    prompt: t('Z ~ N(0 ; 1). Quel nombre z vérifie Pr(Z > z) = {s} ?', { s: S.s }),
     right: dl(z, 3), wrongs: [{ html: fr(dl(-z, 3)), rule: 'p_phi_inverse_side' }, { html: dl(roundTo(Phi(num(S.p)), 3), 3), rule: 'p_quantile_inverse' }],
     fillers: [{ html: dl(phiInvTable(1 - num(S.s) / 2), 3) }, { html: dl(z + 0.5, 3) }] }, rng);
 }
 
 function niTf(rng, opts) {
-  if (rng.chance(0.5)) return tf({ skill: NI, key: 'q975', exam: examTag(opts), truth: true, statement: 'Le quantile d\'ordre 0,975 de N(0 ; 1) vaut 1,96.', explanation: 'Vrai : Φ(1,96) = 0,975 (table 2).' });
+  if (rng.chance(0.5)) return tf({ skill: NI, key: 'q975', exam: examTag(opts), truth: true, statement: t('Le quantile d\'ordre 0,975 de N(0 ; 1) vaut 1,96.'), explanation: t('Vrai : Φ(1,96) = 0,975 (table 2).') });
   return tf({ skill: NI, key: 'q95', exam: examTag(opts), truth: false, ruleIfTrue: 'p_one_two_sided',
-    statement: 'Le quantile d\'ordre 0,95 de N(0 ; 1) vaut 1,96.',
-    explanation: 'Faux : Φ⁻¹(0,95) = 1,64 (1,645). 1,96 est le quantile d\'ordre 0,975.',
+    statement: t('Le quantile d\'ordre 0,95 de N(0 ; 1) vaut 1,96.'),
+    explanation: t('Faux : Φ⁻¹(0,95) = 1,64 (1,645). 1,96 est le quantile d\'ordre 0,975.'),
     counter: numCounter({ vars: [{ v: 'z', label: 'Φ⁻¹(0,95) =' }], hyp: '|z-1,645|<0,01', pred: '|z-1,96|<0,01', answer: { z: '1,645' } }) });
 }
 
@@ -293,7 +294,7 @@ function niTf(rng, opts) {
 // ======================================================================
 
 const TR = 'p-transform';
-const TR_SUB = [{ id: 'dinv', label: 'dériver g⁻¹', skill: 'a1-deriv-inverse' }, { id: 'rec', label: 'reconnaître', skill: 'p-family' }, { id: 'form', label: 'formule', skill: TR }];
+const TR_SUB = [{ id: 'dinv', label: t('dériver g⁻¹'), skill: 'a1-deriv-inverse' }, { id: 'rec', label: t('reconnaître'), skill: 'p-family' }, { id: 'form', label: t('formule'), skill: TR }];
 const LAMS = [q(1, 2), q(1), q(2), q(3)];
 // λ·x and e^(−λx) as texts for the core: x/2, 2x.
 const lx = (lam, v = 'x') => (lam.eq(1) ? v : lam.d === 1 ? `${lam.n}${v}` : `${v}/${lam.d}`);
@@ -306,42 +307,42 @@ function trExp(level, rng) {
   const fx = lam.eq(1) ? expT(lam) : `${lamT(lam)}${expT(lam)}`;
   const dg = lam.eq(1) ? `-${expT(lam)}` : `-${lamT(lam)}${expT(lam)}`;
   return {
-    key: `exp:${L}`, prompt: `U ~ U(0 ; 1) et X = −ln(U)/λ avec λ = ${qs(lam)}. Trouve la densité de X.`,
+    key: `exp:${L}`, prompt: t('U ~ U(0 ; 1) et X = −ln(U)/λ avec λ = {l}. Trouve la densité de X.', { l: qs(lam) }),
     parts: [
-      { label: 'g⁻¹(x)', name: 'gi', kind: 'prob', vars: ['x'], domain: { x: [0.1, 3] }, expect: expT(lam), action: 'Inverser g',
-        decisions: [{ prompt: 'Le support de X ?', options: [
-          { id: 'ok', label: 'u ∈ ]0 ; 1[ donne x ∈ ]0 ; +∞[', valid: true },
-          { id: 'same', label: 'x ∈ ]0 ; 1[, comme U', valid: false, rule: 'p_transform_support', why: 'Le support change avec g : u ∈ ]0 ; 1[ donne x = −ln(u)/λ ∈ ]0 ; ∞[.' }] }],
+      { label: 'g⁻¹(x)', name: 'gi', kind: 'prob', vars: ['x'], domain: { x: [0.1, 3] }, expect: expT(lam), action: t('Inverser g'),
+        decisions: [{ prompt: t('Le support de X ?'), options: [
+          { id: 'ok', label: t('u ∈ ]0 ; 1[ donne x ∈ ]0 ; +∞['), valid: true },
+          { id: 'same', label: t('x ∈ ]0 ; 1[, comme U'), valid: false, rule: 'p_transform_support', why: t('Le support change avec g : u ∈ ]0 ; 1[ donne x = −ln(u)/λ ∈ ]0 ; ∞[.') }] }],
         lines: [{ math: expT(lam), blank: [lx(lam)], subgoal: 'form' }] },
-      { label: '(g⁻¹)′(x)', name: 'dg', kind: 'prob', vars: ['x'], domain: { x: [0.1, 3] }, expect: dg, action: 'Dériver g⁻¹',
+      { label: '(g⁻¹)′(x)', name: 'dg', kind: 'prob', vars: ['x'], domain: { x: [0.1, 3] }, expect: dg, action: t('Dériver g⁻¹'),
         lines: [{ math: dg, subgoal: 'dinv', blank: [lx(lam)] }] },
       { label: 'f_X(x)', name: 'f', kind: 'prob', vars: ['x'], domain: { x: [0.1, 3] }, expect: fx, action: 'f_U(g⁻¹(x))·|(g⁻¹)′(x)|',
         traps: { p_transform_jacobian: { values: ['1'], ctx: { d: `${qs(lam)}e^(−${qs(lam)}x)`, v: '∞' } }, p_transform_abs: { values: [dg] } },
-        decisions: [{ prompt: 'Que reconnais-tu ?', levels: [3, 4, 5], options: [
+        decisions: [{ prompt: t('Que reconnais-tu ?'), levels: [3, 4, 5], options: [
           { id: 'exp', label: `X ~ exp(${qs(lam)})`, valid: true },
-          { id: 'unif', label: 'X ~ U(0 ; 1)', valid: false, rule: 'p_transform_jacobian', why: 'f_U vaut 1, mais il faut multiplier par |(g⁻¹)′(x)|.' }] }],
+          { id: 'unif', label: 'X ~ U(0 ; 1)', valid: false, rule: 'p_transform_jacobian', why: t('f_U vaut 1, mais il faut multiplier par |(g⁻¹)′(x)|.') }] }],
         lines: [{ math: `1×${lam.eq(1) ? expT(lam) : `${lamT(lam)}${expT(lam)}`}`, subgoal: 'form', blank: [lam.eq(1) ? expT(lam) : `${lamT(lam)}${expT(lam)}`] }] },
     ],
-    hints: H('Inverse g, dérive l\'inverse, prends la valeur absolue.', `f_X(x) = 1·|□|`, `f_X(x) = ${SM(fx, { vars: ['x'] })} : X ~ exp(${qs(lam)})`),
+    hints: H(t('Inverse g, dérive l\'inverse, prends la valeur absolue.'), `f_X(x) = 1·|□|`, `f_X(x) = ${SM(fx, { vars: ['x'] })} : X ~ exp(${qs(lam)})`),
     fx, lam,
   };
 }
 
 function trSquare() {
   return {
-    key: 'sq', prompt: 'X ~ U(0 ; 1) et Y = X². Trouve la densité de Y sur son support.',
+    key: 'sq', prompt: t('X ~ U(0 ; 1) et Y = X². Trouve la densité de Y sur son support.'),
     parts: [
-      { label: 'g⁻¹(y)', name: 'gi', kind: 'prob', vars: ['y'], domain: { y: [0.05, 0.95] }, expect: '√y', action: 'Inverser g',
-        decisions: [{ prompt: 'Le support de Y ?', options: [
-          { id: 'ok', label: 'x ∈ ]0 ; 1[ donne y = x² ∈ ]0 ; 1[', valid: true },
-          { id: 'big', label: 'y ∈ ]0 ; +∞[', valid: false, rule: 'p_transform_support', why: 'Le support change avec g : x ∈ ]0 ; 1[ donne y = x² ∈ ]0 ; 1[.' }] }],
+      { label: 'g⁻¹(y)', name: 'gi', kind: 'prob', vars: ['y'], domain: { y: [0.05, 0.95] }, expect: '√y', action: t('Inverser g'),
+        decisions: [{ prompt: t('Le support de Y ?'), options: [
+          { id: 'ok', label: t('x ∈ ]0 ; 1[ donne y = x² ∈ ]0 ; 1['), valid: true },
+          { id: 'big', label: 'y ∈ ]0 ; +∞[', valid: false, rule: 'p_transform_support', why: t('Le support change avec g : x ∈ ]0 ; 1[ donne y = x² ∈ ]0 ; 1[.') }] }],
         lines: [{ math: '√y', subgoal: 'form' }] },
-      { label: '(g⁻¹)′(y)', name: 'dg', kind: 'prob', vars: ['y'], domain: { y: [0.05, 0.95] }, expect: '1/(2√y)', action: 'Dériver g⁻¹', lines: [{ math: '1/(2√y)', subgoal: 'dinv', blank: ['2√y'] }] },
+      { label: '(g⁻¹)′(y)', name: 'dg', kind: 'prob', vars: ['y'], domain: { y: [0.05, 0.95] }, expect: '1/(2√y)', action: t('Dériver g⁻¹'), lines: [{ math: '1/(2√y)', subgoal: 'dinv', blank: ['2√y'] }] },
       { label: 'f_Y(y)', name: 'f', kind: 'prob', vars: ['y'], domain: { y: [0.05, 0.95] }, expect: '1/(2√y)', action: 'f_X(g⁻¹(y))·|(g⁻¹)′(y)|',
         traps: { p_transform_jacobian: { values: ['1'], ctx: { d: '1/(2√y)', v: '∞' } } },
         lines: [{ math: '1×1/(2√y)', subgoal: 'form', blank: ['1/(2√y)'] }] },
     ],
-    hints: H('Inverse g sur ]0 ; 1[ : x = √y, puis dérive.', 'f_Y(y) = 1·|□|', 'f_Y(y) = 1/(2√y) sur ]0 ; 1[') };
+    hints: H(t('Inverse g sur ]0 ; 1[ : x = √y, puis dérive.'), 'f_Y(y) = 1·|□|', t('f_Y(y) = 1/(2√y) sur ]0 ; 1[')) };
 }
 
 function trAffine(rng) {
@@ -353,10 +354,10 @@ function trAffine(rng) {
   const rp = qt(r).includes('/') ? `(${qt(r)})` : qt(r);
   const f = r.eq(1) ? `e^(-${inner})` : `${rp}e^(-${rp}×${inner})`;
   return {
-    key: `aff:${qt(lam)}:${a}:${b}`, prompt: `X ~ exp(λ) avec λ = ${qs(lam)}, et Y = ${a}X${b ? ` + ${b}` : ''}. Trouve la densité de Y sur ]${b} ; +∞[.`,
+    key: `aff:${qt(lam)}:${a}:${b}`, prompt: t('X ~ exp(λ) avec λ = {l}, et Y = {y}. Trouve la densité de Y sur ]{b} ; +∞[.', { l: qs(lam), y: `${a}X${b ? ` + ${b}` : ''}`, b }),
     parts: [
-      { label: 'g⁻¹(y)', name: 'gi', kind: 'prob', vars: ['y'], domain: { y: [b + 0.2, b + 4] }, expect: `${inner}/${a}`, action: 'Inverser g', lines: [{ math: `${inner}/${a}`, subgoal: 'form' }] },
-      { label: '(g⁻¹)′(y)', name: 'dg', kind: 'prob', vars: ['y'], domain: { y: [b + 0.2, b + 4] }, expect: `1/${a}`, action: 'Dériver g⁻¹', lines: [{ math: `1/${a}`, subgoal: 'dinv' }] },
+      { label: 'g⁻¹(y)', name: 'gi', kind: 'prob', vars: ['y'], domain: { y: [b + 0.2, b + 4] }, expect: `${inner}/${a}`, action: t('Inverser g'), lines: [{ math: `${inner}/${a}`, subgoal: 'form' }] },
+      { label: '(g⁻¹)′(y)', name: 'dg', kind: 'prob', vars: ['y'], domain: { y: [b + 0.2, b + 4] }, expect: `1/${a}`, action: t('Dériver g⁻¹'), lines: [{ math: `1/${a}`, subgoal: 'dinv' }] },
       { label: 'f_Y(y)', name: 'f', kind: 'prob', vars: ['y'], domain: { y: [b + 0.2, b + 4] }, expect: f, action: 'f_X(g⁻¹(y))·|(g⁻¹)′(y)|',
         traps: {
           p_scale_density: { values: [`${a}×${qt(lam)}e^(-${qt(lam)}×${inner})`, `${qt(lam)}e^(-${qt(lam)}×${a}y)`], ctx: { a } },
@@ -364,30 +365,30 @@ function trAffine(rng) {
         },
         lines: [{ math: `${qt(lam)}e^(-${qt(lam)}×${inner}/${a})×1/${a}`, subgoal: 'form', blank: [`1/${a}`] }] },
     ],
-    hints: H('Inverse g : x = (y − b)/a ; la densité est divisée par a.', `f_Y(y) = f_X(□)·1/${a}`, `f_Y(y) = ${SM(f, { vars: ['y'] })}`) };
+    hints: H(t('Inverse g : x = (y − b)/a ; la densité est divisée par a.'), `f_Y(y) = f_X(□)·1/${a}`, `f_Y(y) = ${SM(f, { vars: ['y'] })}`) };
 }
 
 function trSample(rng) {
   const kind = pickOf(rng, ['exp', 'pareto', 'weib']);
   if (kind === 'exp') {
     const lam = pickOf(rng, [2, 3, 4]);
-    return { key: `samp:exp:${lam}`, prompt: `On veut tirer X de fonction de répartition F(x) = 1 − e^(−${lam}x) (x ≥ 0) à partir de U ~ U(0 ; 1). Donne F⁻¹(u).`,
-      parts: [{ label: 'F⁻¹(u)', name: 'Fi', kind: 'prob', vars: ['u'], domain: { u: [0.05, 0.95] }, expect: `-ln(1-u)/${lam}`, action: 'Résoudre F(x) = u',
+    return { key: `samp:exp:${lam}`, prompt: t('On veut tirer X de fonction de répartition F(x) = 1 − e^(−{l}x) (x ≥ 0) à partir de U ~ U(0 ; 1). Donne F⁻¹(u).', { l: lam }),
+      parts: [{ label: 'F⁻¹(u)', name: 'Fi', kind: 'prob', vars: ['u'], domain: { u: [0.05, 0.95] }, expect: `-ln(1-u)/${lam}`, action: t('Résoudre F(x) = u'),
         traps: { p_quantile_inverse: { values: [`1-e^(-${lam}u)`] } }, lines: [{ math: `-ln(1-u)/${lam}`, subgoal: 'form', blank: ['1-u'] }] }],
-      hints: H('Résous F(x) = u en x.', `e^(−${lam}x) = □`, `F⁻¹(u) = −ln(1 − u)/${lam}`) };
+      hints: H(t('Résous F(x) = u en x.'), `e^(−${lam}x) = □`, `F⁻¹(u) = −ln(1 − u)/${lam}`) };
   }
   if (kind === 'pareto') {
     const al = pickOf(rng, [2, 3, 4]);
-    return { key: `samp:par:${al}`, prompt: `On veut tirer X de fonction de répartition F(x) = 1 − x^(−${al}) (x ≥ 1) à partir de U ~ U(0 ; 1). Donne F⁻¹(u).`,
-      parts: [{ label: 'F⁻¹(u)', name: 'Fi', kind: 'prob', vars: ['u'], domain: { u: [0.05, 0.95] }, expect: `(1-u)^(-1/${al})`, action: 'Résoudre F(x) = u',
+    return { key: `samp:par:${al}`, prompt: t('On veut tirer X de fonction de répartition F(x) = 1 − x^(−{al}) (x ≥ 1) à partir de U ~ U(0 ; 1). Donne F⁻¹(u).', { al }),
+      parts: [{ label: 'F⁻¹(u)', name: 'Fi', kind: 'prob', vars: ['u'], domain: { u: [0.05, 0.95] }, expect: `(1-u)^(-1/${al})`, action: t('Résoudre F(x) = u'),
         traps: { p_quantile_inverse: { values: [`1-u^(-${al})`] } }, lines: [{ math: `(1-u)^(-1/${al})`, subgoal: 'form', blank: ['1-u'] }] }],
-      hints: H('Résous F(x) = u en x.', `x^(−${al}) = □`, `F⁻¹(u) = (1 − u)^(−1/${al})`) };
+      hints: H(t('Résous F(x) = u en x.'), `x^(−${al}) = □`, `F⁻¹(u) = (1 − u)^(−1/${al})`) };
   }
   const k = pickOf(rng, [2, 3]);
-  return { key: `samp:weib:${k}`, prompt: `On veut tirer X de fonction de répartition F(x) = 1 − e^(−x^${k}) (x ≥ 0, Weibull) à partir de U ~ U(0 ; 1). Donne F⁻¹(u).`,
-    parts: [{ label: 'F⁻¹(u)', name: 'Fi', kind: 'prob', vars: ['u'], domain: { u: [0.05, 0.95] }, expect: `(-ln(1-u))^(1/${k})`, action: 'Résoudre F(x) = u',
+  return { key: `samp:weib:${k}`, prompt: t('On veut tirer X de fonction de répartition F(x) = 1 − e^(−x^{k}) (x ≥ 0, Weibull) à partir de U ~ U(0 ; 1). Donne F⁻¹(u).', { k }),
+    parts: [{ label: 'F⁻¹(u)', name: 'Fi', kind: 'prob', vars: ['u'], domain: { u: [0.05, 0.95] }, expect: `(-ln(1-u))^(1/${k})`, action: t('Résoudre F(x) = u'),
       lines: [{ math: `(-ln(1-u))^(1/${k})`, subgoal: 'form', blank: ['1-u'] }] }],
-    hints: H('Résous F(x) = u en x.', `x^${k} = −ln(□)`, `F⁻¹(u) = (−ln(1 − u))^(1/${k})`) };
+    hints: H(t('Résous F(x) = u en x.'), `x^${k} = −ln(□)`, `F⁻¹(u) = (−ln(1 − u))^(1/${k})`) };
 }
 
 function trItem(level, rng, profile, opts = {}) {
@@ -406,18 +407,18 @@ function trMcq(rng, opts) {
   const fx = `${lamT(lam)}${expT(lam)}`;
   const V = { vars: ['x'] };
   return choice({ skill: TR, level: 4, key: `mcq:${qt(lam)}`, exam: examTag(opts),
-    prompt: `U ~ U(0 ; 1) et X = −ln(U)/λ avec λ = ${qs(lam)}. Quelle est la densité de X ?`,
-    right: `${SM(fx, V)} pour x > 0`,
-    wrongs: [{ html: `${SM('1', V)} pour x > 0`, rule: 'p_transform_jacobian' }, { html: `${SM(`-${fx}`, V)} pour x > 0`, rule: 'p_transform_abs' }, { html: `${SM(fx, V)} pour 0 < x < 1`, rule: 'p_transform_support' }],
+    prompt: t('U ~ U(0 ; 1) et X = −ln(U)/λ avec λ = {l}. Quelle est la densité de X ?', { l: qs(lam) }),
+    right: t('{f} pour x > 0', { f: SM(fx, V) }),
+    wrongs: [{ html: t('{f} pour x > 0', { f: SM('1', V) }), rule: 'p_transform_jacobian' }, { html: t('{f} pour x > 0', { f: SM(`-${fx}`, V) }), rule: 'p_transform_abs' }, { html: t('{f} pour 0 < x < 1', { f: SM(fx, V) }), rule: 'p_transform_support' }],
     fillers: [] }, rng);
 }
 
 function trTf(rng, opts) {
-  if (rng.chance(0.4)) return tf({ skill: TR, key: 'chi', exam: examTag(opts), truth: true, statement: 'Si Z ~ N(0 ; 1), alors Z² ~ χ²(1).', explanation: 'Vrai : c\'est la définition de χ²(1) (et χ²(1) = Γ(1/2, 2)).' });
+  if (rng.chance(0.4)) return tf({ skill: TR, key: 'chi', exam: examTag(opts), truth: true, statement: t('Si Z ~ N(0 ; 1), alors Z² ~ χ²(1).'), explanation: t('Vrai : c\'est la définition de χ²(1) (et χ²(1) = Γ(1/2, 2)).') });
   const a = pickOf(rng, [2, 3]);
   return tf({ skill: TR, key: `scale:${a}`, exam: examTag(opts), truth: false, ruleIfTrue: 'p_scale_density',
-    statement: `Si Y = ${a}X, alors f_Y(y) = ${a}·f_X(y).`,
-    explanation: `Faux : pour X ~ U(0 ; 1), ${a}·f_X vaut ${a} sur [0 ; 1] et intègre à ${a}, pas à 1. La bonne formule est f_Y(y) = f_X(y/${a})/${a}.`,
+    statement: t('Si Y = {a}X, alors f_Y(y) = {a}·f_X(y).', { a }),
+    explanation: t('Faux : pour X ~ U(0 ; 1), {a}·f_X vaut {a} sur [0 ; 1] et intègre à {a}, pas à 1. La bonne formule est f_Y(y) = f_X(y/{a})/{a}.', { a }),
     counter: numCounter({ vars: [{ v: 'I', label: `X ~ U(0 ; 1) : ∫ ${a}·f_X(y) dy =` }], hyp: `I=${a}`, pred: 'I=1', answer: { I: String(a) } }) });
 }
 
@@ -425,7 +426,7 @@ function trCoef(rng) {
   const lam = pickOf(rng, [2, 3]);
   const v = lam * Math.exp(-lam);
   return coefItem({ skill: TR, key: `coef:${lam}`, exam: { format: 'coef', points: 1 },
-    prompt: `U ~ U(0 ; 1) et X = −ln(U)/${lam}. Que vaut la densité de X en x = 1 (au millième) ?`,
+    prompt: t('U ~ U(0 ; 1) et X = −ln(U)/{l}. Que vaut la densité de X en x = 1 (au millième) ?', { l: lam }),
     parts: [{ label: 'f_X(1)', kind: 'stat', expect: `${lam}e^(-${lam})`, traps: { p_transform_jacobian: { values: ['1'] }, p_transform_abs: { values: [v6(-v)] } }, lines: [{ math: dl(v, 3) }] }], subgoals: TR_SUB });
 }
 

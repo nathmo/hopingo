@@ -11,6 +11,7 @@
 
 import { diff, expandDerivs } from './diff.js';
 import { evalFloat } from './numeric.js';
+import { t } from '../i18n.js';
 
 const fact = (k) => { let f = 1; for (let i = 2; i <= k; i++) f *= i; return f; };
 const close = (a, b) => Math.abs(a - b) <= 1e-9 * (1 + Math.abs(a) + Math.abs(b));
@@ -51,5 +52,5 @@ export function monoText(key, vars = ['x', 'y'], at = {}) {
     const base = a === 0 ? vars[i] : `(${vars[i]} ${a > 0 ? '−' : '+'} ${Math.abs(a)})`;
     parts.push(k === 1 ? base : `${base}${SUP[k] ?? `^${k}`}`);
   });
-  return parts.length ? parts.join('·') : 'le terme constant';
+  return parts.length ? parts.join('·') : t('le terme constant');
 }

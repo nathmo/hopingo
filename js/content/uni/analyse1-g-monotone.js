@@ -8,6 +8,7 @@
 // bound, or ℓ). Level 5 and the `tf` variant: true/false of exams, with
 // sequences as counter-examples.
 
+import { t } from '../../i18n.js';
 import { linesItem, tfItem } from './kit.js';
 import { modeOf, H, E, assemble, blanked } from './analyse1-c-kit.js';
 import { M, VAL, EQN, seqCounter } from './analyse1-g-kit.js';
@@ -15,31 +16,31 @@ import { M, VAL, EQN, seqCounter } from './analyse1-g-kit.js';
 const MO = 'a1-seq-monotone';
 const KEYS = ['calc', 'seq', 'fact'];
 const SUB = [
-  { id: 'tele', label: 'somme télescopique ou géométrique', skill: 'a1-ser-geo-tele' },
-  { id: 'ind', label: 'récurrence', skill: 'g5-induction-more' },
-  { id: 'concl', label: 'monotone et bornée', skill: MO },
+  { id: 'tele', label: t('somme télescopique ou géométrique'), skill: 'a1-ser-geo-tele' },
+  { id: 'ind', label: t('récurrence'), skill: 'g5-induction-more' },
+  { id: 'concl', label: t('monotone et bornée'), skill: MO },
 ];
 const CHOICES = [
-  { id: 'diff', label: 'Calculer uₙ₊₁ − uₙ' },
-  { id: 'cmp', label: 'Majorer chaque terme par un terme plus simple' },
-  { id: 'tele', label: 'Comparer à une somme télescopique' },
-  { id: 'telesum', label: 'Télescoper' },
-  { id: 'geo', label: 'Comparer à une somme géométrique' },
-  { id: 'geosum', label: 'Sommer la suite géométrique' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'bound', label: 'Majorer par une constante' },
-  { id: 'induct', label: 'Récurrence : utiliser u ≤ ℓ' },
-  { id: 'conj', label: 'Multiplier par la quantité conjuguée' },
-  { id: 'concl', label: 'Conclure : monotone et bornée' },
-  { id: 'bounded', label: 'Conclure : elle est bornée, donc elle converge', rule: 'a1_bounded_implies_convergent', why: 'Bornée ne suffit pas : (−1)ⁿ est bornée et diverge.' },
+  { id: 'diff', label: t('Calculer uₙ₊₁ − uₙ') },
+  { id: 'cmp', label: t('Majorer chaque terme par un terme plus simple') },
+  { id: 'tele', label: t('Comparer à une somme télescopique') },
+  { id: 'telesum', label: t('Télescoper') },
+  { id: 'geo', label: t('Comparer à une somme géométrique') },
+  { id: 'geosum', label: t('Sommer la suite géométrique') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'bound', label: t('Majorer par une constante') },
+  { id: 'induct', label: t('Récurrence : utiliser u ≤ ℓ') },
+  { id: 'conj', label: t('Multiplier par la quantité conjuguée') },
+  { id: 'concl', label: t('Conclure : monotone et bornée') },
+  { id: 'bounded', label: t('Conclure : elle est bornée, donc elle converge'), rule: 'a1_bounded_implies_convergent', why: t('Bornée ne suffit pas : (−1)ⁿ est bornée et diverge.') },
 ];
 
 function concludeDecision(up, bound) {
   return {
-    kind: 'decision', prompt: 'Que conclure ?', options: [
-      { id: 'mono', label: `(uₙ) est croissante et majorée par ${bound} : elle converge`, valid: true, ref: true },
-      { id: 'bounded', label: '(uₙ) est bornée, donc elle converge', valid: false, rule: 'a1_bounded_implies_convergent', why: 'Bornée ne suffit pas : (−1)ⁿ est bornée et diverge. C\'est « croissante et majorée » qui donne la convergence.' },
-      { id: 'inf', label: '(uₙ) est croissante, donc elle tend vers +∞', valid: false, why: `Elle est croissante mais majorée par ${bound} : elle ne peut pas tendre vers +∞.` },
+    kind: 'decision', prompt: t('Que conclure ?'), options: [
+      { id: 'mono', label: t('(uₙ) est croissante et majorée par {b} : elle converge', { b: bound }), valid: true, ref: true },
+      { id: 'bounded', label: t('(uₙ) est bornée, donc elle converge'), valid: false, rule: 'a1_bounded_implies_convergent', why: t('Bornée ne suffit pas : (−1)ⁿ est bornée et diverge. C\'est « croissante et majorée » qui donne la convergence.') },
+      { id: 'inf', label: t('(uₙ) est croissante, donc elle tend vers +∞'), valid: false, why: t('Elle est croissante mais majorée par {b} : elle ne peut pas tendre vers +∞.', { b: bound }) },
     ],
   };
 }
@@ -55,27 +56,27 @@ function sumItem(level, rng, opts) {
   const step = fact ? '1/(n+1)!' : `1/(n+1)^${p}`;
   const bound = fact ? '3' : '2';
   const bLines = fact ? [
-    E('1+sum(1/2^(k-1),k,1,n)', '1/k! ≤ 1/2^(k−1) pour k ≥ 1', 'tele', 'geo'),
-    E('1+2(1-1/2^n)', 'Somme géométrique de raison 1/2', 'tele', 'geosum'),
-    E('3-1/2^(n-1)', 'Simplifier', 'tele', 'simplify'),
-    E('3', 'Majorer par une constante', 'concl', 'bound'),
+    E('1+sum(1/2^(k-1),k,1,n)', t('1/k! ≤ 1/2^(k−1) pour k ≥ 1'), 'tele', 'geo'),
+    E('1+2(1-1/2^n)', t('Somme géométrique de raison 1/2'), 'tele', 'geosum'),
+    E('3-1/2^(n-1)', t('Simplifier'), 'tele', 'simplify'),
+    E('3', t('Majorer par une constante'), 'concl', 'bound'),
   ] : [
     ...(p === 3 ? [E('sum(1/k^2,k,1,n)', '1/k³ ≤ 1/k²', 'tele', 'cmp')] : []),
-    E('1+sum(1/(k-1)-1/k,k,2,n)', '1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2', 'tele', 'tele'),
-    E('2-1/n', 'Télescoper', 'tele', 'telesum'),
-    E('2', 'Majorer par une constante', 'concl', 'bound'),
+    E('1+sum(1/(k-1)-1/k,k,2,n)', t('1/k² ≤ 1/(k(k − 1)) = 1/(k − 1) − 1/k pour k ≥ 2'), 'tele', 'tele'),
+    E('2-1/n', t('Télescoper'), 'tele', 'telesum'),
+    E('2', t('Majorer par une constante'), 'concl', 'bound'),
   ];
-  let mLines = [E(step, 'Tous les termes s\'en vont sauf le dernier', 'concl', 'diff')];
+  let mLines = [E(step, t('Tous les termes s\'en vont sauf le dernier'), 'concl', 'diff')];
   if (level === 1) {
     mLines = [blanked(mLines[0], [fact ? 'n+1' : `(n+1)^${p}`])];
     bLines.splice(bLines.length - 2, 1, blanked(bLines[bLines.length - 2], [fact ? '1/2^(n-1)' : '1/n']));
   }
   const choice = fact ? {
-    prompt: 'Quel majorant de 1/k! (k ≥ 1) donne une somme bornée ?', ok: '1/2^(k−1)',
-    bad: [{ label: '1/k', why: 'Σ 1/k n\'est pas bornée : ce majorant ne prouve rien.' }, { label: '1/2^k', why: 'Pour k = 1 : 1/1! = 1 > 1/2. Ce n\'est pas un majorant.' }],
+    prompt: t('Quel majorant de 1/k! (k ≥ 1) donne une somme bornée ?'), ok: '1/2^(k−1)',
+    bad: [{ label: '1/k', why: t('Σ 1/k n\'est pas bornée : ce majorant ne prouve rien.') }, { label: '1/2^k', why: t('Pour k = 1 : 1/1! = 1 > 1/2. Ce n\'est pas un majorant.') }],
   } : {
-    prompt: `Quel majorant de 1/k${p === 3 ? '³' : '²'} (k ≥ 2) donne une somme bornée ?`, ok: '1/(k − 1) − 1/k',
-    bad: [{ label: '1/k', why: 'Σ 1/k n\'est pas bornée : ce majorant ne prouve rien.' }, { label: '1/(k(k + 1))', why: '1/(k(k + 1)) < 1/k² : ce n\'est pas un majorant.' }],
+    prompt: t('Quel majorant de {k} (k ≥ 2) donne une somme bornée ?', { k: `1/k${p === 3 ? '³' : '²'}` }), ok: '1/(k − 1) − 1/k',
+    bad: [{ label: '1/k', why: t('Σ 1/k n\'est pas bornée : ce majorant ne prouve rien.') }, { label: '1/(k(k + 1))', why: t('1/(k(k + 1)) < 1/k² : ce n\'est pas un majorant.') }],
   };
   const pick = {
     kind: 'decision', prompt: choice.prompt, options: [
@@ -84,24 +85,24 @@ function sumItem(level, rng, opts) {
     ],
   };
   const parts = [
-    { html: 'Sens de variation :', start: diff, judge: EQN({ domain: { n: { int: [1, 30] } }, target: 'goal', goal: step }), lines: mLines, choices: CHOICES },
+    { html: t('Sens de variation :'), start: diff, judge: EQN({ domain: { n: { int: [1, 30] } }, target: 'goal', goal: step }), lines: mLines, choices: CHOICES },
     {
-      html: 'Un majorant :', start: u, judge: { kind: 'equiv', vars: ['n'], from: 1, span: 60, maxN: 1000, rel: '≤' },
+      html: t('Un majorant :'), start: u, judge: { kind: 'equiv', vars: ['n'], from: 1, span: 60, maxN: 1000, rel: '≤' },
       lines: bLines, pre: level === 2 ? [pick] : [], choices: CHOICES,
     },
     {
-      html: 'Conclusion :', start: 'lim(u_n,n,∞)', ask: '≤', judge: VAL(bound), lines: [E(bound, 'Croissante et majorée', 'concl', 'concl')],
+      html: t('Conclusion :'), start: 'lim(u_n,n,∞)', ask: '≤', judge: VAL(bound), lines: [E(bound, t('Croissante et majorée'), 'concl', 'concl')],
       pre: level <= 3 ? [concludeDecision(true, bound)] : [], choices: CHOICES,
     },
   ];
   const as = assemble(parts, level);
   return linesItem({
     skill: MO, level,
-    prompt: `Soit uₙ = ${M(u)}. Montre que (uₙ) est croissante et majorée par ${bound}, et conclus.`,
+    prompt: t('Soit uₙ = {u}. Montre que (uₙ) est croissante et majorée par {b}, et conclus.', { u: M(u), b: bound }),
     ...as, mode: modeOf(level), keys: KEYS, subgoals: SUB, tapActions: level === 3 ? 'steps' : null,
     hints: H(
-      'Montre qu\'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n.',
-      fact ? '1/k! ≤ 1/2^(k−1), donc uₙ ≤ 1 + Σ 1/2^(k−1)' : '1/k² ≤ 1/(k − 1) − □ pour k ≥ 2',
+      t('Montre qu\'elle croît (uₙ₊₁ − uₙ), puis trouve un majorant qui ne dépend pas de n.'),
+      fact ? t('1/k! ≤ 1/2^(k−1), donc uₙ ≤ 1 + Σ 1/2^(k−1)') : t('1/k² ≤ 1/(k − 1) − □ pour k ≥ 2'),
       fact ? `uₙ ≤ 1 + 2(1 − 1/2ⁿ) ≤ 3` : 'uₙ ≤ 1 + (1 − 1/n) ≤ 2',
     ),
     key: `${MO}:${u}`, exam: opts.exam ? { format: opts.exam, points: 2 } : false,
@@ -112,44 +113,44 @@ function recItem(level, rng, opts) {
   const l = rng.pick([2, 3, 4, 5]);
   const c = l * (l - 1);
   const rel = (r) => ({ kind: 'equiv', vars: ['u'], domain: { u: [0, l] }, rel: r });
-  let hLines = [E(`√(${c}+${l})`, `u ≤ ${l} et √ est croissante`, 'ind', 'induct'), E(String(l), 'Calculer', 'ind', 'simplify')];
-  let mLines = [E(`(${c}+u-u^2)/(√(${c}+u)+u)`, 'Quantité conjuguée', 'concl', 'conj'), E('0', `${c} + u − u² = (${l} − u)(u + ${l - 1}) ≥ 0 sur [0 ; ${l}]`, 'concl', 'bound')];
+  let hLines = [E(`√(${c}+${l})`, t('u ≤ {l} et √ est croissante', { l }), 'ind', 'induct'), E(String(l), t('Calculer'), 'ind', 'simplify')];
+  let mLines = [E(`(${c}+u-u^2)/(√(${c}+u)+u)`, t('Quantité conjuguée'), 'concl', 'conj'), E('0', t('{c} + u − u² = ({l} − u)(u + {l1}) ≥ 0 sur [0 ; {l}]', { c, l, l1: l - 1 }), 'concl', 'bound')];
   if (level === 1) {
     hLines = [blanked(hLines[0], [`${c}+${l}`]), hLines[1]];
     mLines = [blanked(mLines[0], [`${c}+u-u^2`]), mLines[1]];
   }
   const how = {
-    kind: 'decision', prompt: `Comment montrer que uₙ ≤ ${l} pour tout n ?`, options: [
-      { id: 'ind', label: `Par récurrence : u₀ = 0 ≤ ${l}, et uₙ ≤ ${l} ⇒ uₙ₊₁ ≤ ${l}`, valid: true, ref: true },
-      { id: 'lim', label: `La limite est ${l}, donc uₙ ≤ ${l}`, valid: false, why: 'On ne sait pas encore que la suite converge : c\'est ce qu\'on veut prouver.' },
+    kind: 'decision', prompt: t('Comment montrer que uₙ ≤ {l} pour tout n ?', { l }), options: [
+      { id: 'ind', label: t('Par récurrence : u₀ = 0 ≤ {l}, et uₙ ≤ {l} ⇒ uₙ₊₁ ≤ {l}', { l }), valid: true, ref: true },
+      { id: 'lim', label: t('La limite est {l}, donc uₙ ≤ {l}', { l }), valid: false, why: t('On ne sait pas encore que la suite converge : c\'est ce qu\'on veut prouver.') },
     ],
   };
   const parts = [
     {
-      html: `Majorée par ${l} (récurrence) : on suppose 0 ≤ u ≤ ${l}, avec u = uₙ.`, start: `√(${c}+u)`, judge: rel('≤'), lines: hLines,
-      pre: [{ kind: 'note', html: `u₀ = 0 ≤ ${l}. Hérédité : si 0 ≤ uₙ ≤ ${l}, alors uₙ₊₁ = √(${c} + uₙ) ≤ ?` }, ...(level === 2 ? [how] : [])], choices: CHOICES,
+      html: t('Majorée par {l} (récurrence) : on suppose 0 ≤ u ≤ {l}, avec u = uₙ.', { l }), start: `√(${c}+u)`, judge: rel('≤'), lines: hLines,
+      pre: [{ kind: 'note', html: t('u₀ = 0 ≤ {l}. Hérédité : si 0 ≤ uₙ ≤ {l}, alors uₙ₊₁ = √({c} + uₙ) ≤ ?', { l, c }) }, ...(level === 2 ? [how] : [])], choices: CHOICES,
     },
     {
-      html: `Croissante : uₙ₊₁ − uₙ = √(${c} + u) − u pour 0 ≤ u ≤ ${l}.`, start: `√(${c}+u)-u`, judge: rel('≥'), lines: mLines, choices: CHOICES,
+      html: t('Croissante : uₙ₊₁ − uₙ = √({c} + u) − u pour 0 ≤ u ≤ {l}.', { c, l }), start: `√(${c}+u)-u`, judge: rel('≥'), lines: mLines, choices: CHOICES,
       pre: level === 2 || level === 3 ? [{
-        kind: 'decision', prompt: 'Comment montrer que (uₙ) est croissante ?', options: [
-          { id: 'sign', label: 'Montrer que uₙ₊₁ − uₙ = √(' + c + ' + uₙ) − uₙ ≥ 0', valid: true, ref: true },
-          { id: 'f', label: `f(x) = √(${c} + x) est croissante, donc (uₙ) est croissante`, valid: false, rule: 'a1_monotone_by_f_increasing', why: `f croissante dit seulement que (uₙ) est monotone ; le sens vient du signe de u₁ − u₀ = √${c} − 0, ou de uₙ₊₁ − uₙ.` },
+        kind: 'decision', prompt: t('Comment montrer que (uₙ) est croissante ?'), options: [
+          { id: 'sign', label: t('Montrer que uₙ₊₁ − uₙ = √({c} + uₙ) − uₙ ≥ 0', { c }), valid: true, ref: true },
+          { id: 'f', label: t('f(x) = √({c} + x) est croissante, donc (uₙ) est croissante', { c }), valid: false, rule: 'a1_monotone_by_f_increasing', why: t('f croissante dit seulement que (uₙ) est monotone ; le sens vient du signe de u₁ − u₀ = √{c} − 0, ou de uₙ₊₁ − uₙ.', { c }) },
         ],
       }] : [],
     },
     {
-      html: `Conclusion : la limite ℓ vérifie ℓ = √(${c} + ℓ) et ℓ ≥ 0.`, start: 'lim(u_n,n,∞)', judge: VAL(l), lines: [E(String(l), `ℓ² − ℓ − ${c} = 0, ℓ ≥ 0`, 'concl', 'concl')],
+      html: t('Conclusion : la limite ℓ vérifie ℓ = √({c} + ℓ) et ℓ ≥ 0.', { c }), start: 'lim(u_n,n,∞)', judge: VAL(l), lines: [E(String(l), `ℓ² − ℓ − ${c} = 0, ℓ ≥ 0`, 'concl', 'concl')],
       pre: level <= 3 ? [concludeDecision(true, l)] : [], choices: CHOICES,
     },
   ];
   const as = assemble(parts, level);
   return linesItem({
     skill: MO, level,
-    prompt: `Soit u₀ = 0 et uₙ₊₁ = √(${c} + uₙ). Montre que (uₙ) est majorée par ${l} et croissante, puis calcule sa limite.`,
+    prompt: t('Soit u₀ = 0 et uₙ₊₁ = √({c} + uₙ). Montre que (uₙ) est majorée par {l} et croissante, puis calcule sa limite.', { c, l }),
     ...as, declares: { vars: ['u', 'n'] }, mode: modeOf(level), keys: ['calc', 'seq'], subgoals: SUB, tapActions: level === 3 ? 'steps' : null,
     hints: H(
-      `Récurrence : si uₙ ≤ ${l}, alors √(${c} + uₙ) ≤ √(${c} + ${l}). Puis le signe de uₙ₊₁ − uₙ.`,
+      t('Récurrence : si uₙ ≤ {l}, alors √({c} + uₙ) ≤ √({c} + {l}). Puis le signe de uₙ₊₁ − uₙ.', { l, c }),
       `√(${c} + u) − u = (${c} + u − u²)/(□)`,
       `√(${c} + u) ≤ √(${c + l}) = ${l} ; ${c} + u − u² = (${l} − u)(u + ${l - 1}) ≥ 0`,
     ),
@@ -171,15 +172,15 @@ const TF = [
 ];
 
 function moTf(level, rng, opts = {}) {
-  const t = rng.pick(TF);
+  const tf = rng.pick(TF);
   return tfItem({
-    skill: MO, level, truth: t.truth, key: t.key, statement: t.s, ruleIfTrue: t.truth ? null : t.rule || null,
-    counter: t.truth ? null : t.counter(), explanation: t.why,
+    skill: MO, level, truth: tf.truth, key: tf.key, statement: t(tf.s), ruleIfTrue: tf.truth ? null : tf.rule || null,
+    counter: tf.truth ? null : tf.counter(), explanation: t(tf.why),
     exam: opts.exam ? { format: 'tf', points: 1 } : false, noHints: level === 5, expectedSec: 60,
     hints: H(
-      'Pense aux exemples simples : (−1)ⁿ, n, −n, 1/n.',
-      'Bornée ne suffit pas ; monotone non plus. Les deux ensemble, oui.',
-      t.truth ? 'Cet énoncé est vrai.' : 'Cet énoncé est faux : cherche un contre-exemple.',
+      t('Pense aux exemples simples : (−1)ⁿ, n, −n, 1/n.'),
+      t('Bornée ne suffit pas ; monotone non plus. Les deux ensemble, oui.'),
+      tf.truth ? t('Cet énoncé est vrai.') : t('Cet énoncé est faux : cherche un contre-exemple.'),
     ),
   });
 }

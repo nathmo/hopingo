@@ -15,6 +15,7 @@ import { linesItem, mcq, examTag } from './kit.js';
 import {
   q, N, modeOf, H, E, fr, ct, cp, cd, cm, coefText, cw, rd, mt, cq, CQ, gauss, blanked, partsScript, decision, uniq, vfMcq, piText, surd, argPi,
 } from './complexes-b-kit.js';
+import { t } from '../../i18n.js';
 
 const KEYS = ['calc', 'cplx', 'greek'];
 const CXP = { complex: true };
@@ -33,19 +34,19 @@ const argT = (z) => piText(argPi(z));
 
 const RA = 'g8-ratio-angle';
 const RA_SUB = [
-  { id: 'diff', label: 'différences', skill: RA },
+  { id: 'diff', label: t('différences'), skill: RA },
   { id: 'quot', label: 'quotient', skill: 'g8-algebraic' },
-  { id: 'mod', label: 'rapport (module)', skill: RA },
-  { id: 'arg', label: 'angle (argument)', skill: 'g8-polar' },
+  { id: 'mod', label: t('rapport (module)'), skill: RA },
+  { id: 'arg', label: t('angle (argument)'), skill: 'g8-polar' },
 ];
 const RA_CHOICES = [
   { id: 'diff', label: 'Calculer c − a et b − a' },
-  { id: 'conj', label: 'Multiplier par le conjugué du dénominateur' },
-  { id: 'calc', label: 'Calculer, forme a + bi' },
-  { id: 'mod', label: 'Module : √(a² + b²)' },
-  { id: 'arg', label: 'Argument (le quadrant de q)' },
-  { id: 'swap', label: 'Calculer (b − a)/(c − a)', rule: 'g8_ratio_order', why: 'L\'angle de AB⃗ vers AC⃗ et le rapport AC/AB sont donnés par (c − a)/(b − a).' },
-  { id: 'parts', label: 'Diviser partie réelle par partie réelle, partie imaginaire par partie imaginaire', rule: 'g8_div_componentwise', why: 'On ne divise pas partie par partie : on multiplie par le conjugué du dénominateur.' },
+  { id: 'conj', label: t('Multiplier par le conjugué du dénominateur') },
+  { id: 'calc', label: t('Calculer, forme a + bi') },
+  { id: 'mod', label: t('Module : √(a² + b²)') },
+  { id: 'arg', label: t('Argument (le quadrant de q)') },
+  { id: 'swap', label: 'Calculer (b − a)/(c − a)', rule: 'g8_ratio_order', why: t('L\'angle de AB⃗ vers AC⃗ et le rapport AC/AB sont donnés par (c − a)/(b − a).') },
+  { id: 'parts', label: t('Diviser partie réelle par partie réelle, partie imaginaire par partie imaginaire'), rule: 'g8_div_componentwise', why: t('On ne divise pas partie par partie : on multiplie par le conjugué du dénominateur.') },
 ];
 // Quotients with a remarkable argument.
 const QS = [[1, 1], [1, -1], [-1, 1], [-1, -1], [0, 2], [0, -2], [0, 1], [0, -1], [2, 2], [-2, 2], [q(1, 2), q(1, 2)], [q(1, 2), q(-1, 2)], [0, 3], [-3, 3]];
@@ -72,29 +73,29 @@ function ratioData(rng, list) {
 function quotientPart(d, level) {
   const start = `(${diff(d.c, d.a)})/(${diff(d.b, d.a)})`;
   const plain = `${cp(d.w)}/${cd(d.u)}`;
-  const lines = [E(plain, 'Différences c − a et b − a', 'diff', 'diff')];
+  const lines = [E(plain, t('Différences c − a et b − a'), 'diff', 'diff')];
   if (!d.u.isReal() && level <= 3) {
     const ub = d.u.conj();
-    lines.push(E(`(${ct(d.w)})(${ct(ub)})/((${ct(d.u)})(${ct(ub)}))`, 'Multiplier par le conjugué', 'quot', 'conj'));
-    lines.push(E(`(${ct(d.w.mul(ub))})/${N(d.u.abs2())}`, 'Calculer', 'quot', 'calc'));
+    lines.push(E(`(${ct(d.w)})(${ct(ub)})/((${ct(d.u)})(${ct(ub)}))`, t('Multiplier par le conjugué'), 'quot', 'conj'));
+    lines.push(E(`(${ct(d.w.mul(ub))})/${N(d.u.abs2())}`, t('Calculer'), 'quot', 'calc'));
   }
-  lines.push(E(ct(d.qq), 'q sous forme a + bi', 'quot', 'calc'));
+  lines.push(E(ct(d.qq), t('q sous forme a + bi'), 'quot', 'calc'));
   if (level === 1) lines[0] = blanked(lines[0], [ct(d.u)]);
   if (level === 2 && lines.length > 2) lines[2] = blanked(lines[2], [N(d.u.abs2())]);
   return { start, judge: CJ({ ratio: true }), lines };
 }
 const modPart = (d, level) => ({
-  html: 'Rapport : AC/AB = |q| =', ask: '|q| =', start: `|${ct(d.qq)}|`, judge: RJ({ ratio: true }),
-  lines: level <= 2 && modT(d.qq) !== '1' ? [E(`√(${sqT(d.qq.re)}^2+${sqT(d.qq.im)}^2)`, 'Module', 'mod', 'mod'), E(modT(d.qq), 'Simplifier', 'mod', 'mod')] : [E(modT(d.qq), 'Module', 'mod', 'mod')],
+  html: t('Rapport : AC/AB = |q| ='), ask: '|q| =', start: `|${ct(d.qq)}|`, judge: RJ({ ratio: true }),
+  lines: level <= 2 && modT(d.qq) !== '1' ? [E(`√(${sqT(d.qq.re)}^2+${sqT(d.qq.im)}^2)`, t('Module'), 'mod', 'mod'), E(modT(d.qq), t('Simplifier'), 'mod', 'mod')] : [E(modT(d.qq), t('Module'), 'mod', 'mod')],
 });
 const argPart = (d, pre = []) => ({
-  html: 'Angle : (AB⃗, AC⃗) = arg q =', ask: 'arg q =', start: `arg(${ct(d.qq)})`, judge: RJ({ ratio: true }), pre,
-  lines: [E(argT(d.qq), 'Argument (quadrant)', 'arg', 'arg')],
+  html: t('Angle : (AB⃗, AC⃗) = arg q ='), ask: 'arg q =', start: `arg(${ct(d.qq)})`, judge: RJ({ ratio: true }), pre,
+  lines: [E(argT(d.qq), t('Argument (quadrant)'), 'arg', 'arg')],
 });
-const orderDecision = () => decision('Quel quotient donne l\'angle (AB⃗, AC⃗) et le rapport AC/AB ?', [
+const orderDecision = () => decision(t('Quel quotient donne l\'angle (AB⃗, AC⃗) et le rapport AC/AB ?'), [
   { id: 'right', label: '(c − a)/(b − a)', valid: true },
-  { id: 'swap', label: '(b − a)/(c − a)', valid: false, rule: 'g8_ratio_order', why: 'Ce quotient donne l\'angle de AC⃗ vers AB⃗ (l\'opposé) et le rapport AB/AC.' },
-  { id: 'other', label: '(c − b)/(a − b)', valid: false, why: 'Ce quotient regarde l\'angle en B, pas en A.' },
+  { id: 'swap', label: '(b − a)/(c − a)', valid: false, rule: 'g8_ratio_order', why: t('Ce quotient donne l\'angle de AC⃗ vers AB⃗ (l\'opposé) et le rapport AB/AC.') },
+  { id: 'other', label: '(c − b)/(a − b)', valid: false, why: t('Ce quotient regarde l\'angle en B, pas en A.') },
 ]);
 
 function ratioItem(level, rng, opts) {
@@ -105,10 +106,10 @@ function ratioItem(level, rng, opts) {
   const { start, judge, script } = partsScript(parts, level, RA_CHOICES);
   return linesItem({
     skill: RA, level, mode: modeOf(level), start, judge, script,
-    prompt: `A, B et C ont pour affixes a = ${cm(d.a)}, b = ${cm(d.b)} et c = ${cm(d.c)}. Calcule q = (c − a)/(b − a), puis le rapport AC/AB et l'angle orienté (AB⃗, AC⃗).`,
-    hints: H('Le quotient (c − a)/(b − a) contient le rapport (son module) et l\'angle (son argument).',
-      `q = ${mt(`${cp(d.w)}/${cd(d.u)}`)} : multiplie en haut et en bas par ${cm(d.u.conj())}.`,
-      `q = ${cm(d.qq)} : AC/AB = ${fr(modT(d.qq))}, angle ${fr(argT(d.qq))}.`),
+    prompt: t('A, B et C ont pour affixes a = {a}, b = {b} et c = {c}. Calcule q = (c − a)/(b − a), puis le rapport AC/AB et l\'angle orienté (AB⃗, AC⃗).', { a: cm(d.a), b: cm(d.b), c: cm(d.c) }),
+    hints: H(t('Le quotient (c − a)/(b − a) contient le rapport (son module) et l\'angle (son argument).'),
+      t('q = {v1} : multiplie en haut et en bas par {v2}.', { v1: mt(`${cp(d.w)}/${cd(d.u)}`), v2: cm(d.u.conj()) }),
+      t('q = {qq} : AC/AB = {v1}, angle {v2}.', { qq: cm(d.qq), v1: fr(modT(d.qq)), v2: fr(argT(d.qq)) })),
     subgoals: RA_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: [], complex: true }, baits: ['g8_ratio_order', 'g8_div_componentwise'],
     key: `${RA}:${level}:1:${ct(d.a)}:${ct(d.b)}:${ct(d.c)}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -118,18 +119,18 @@ function ratioItem(level, rng, opts) {
 function alignItem(level, rng, opts) {
   const real = rng.chance(0.5);
   const d = ratioData(rng, real ? QREAL : QS);
-  const pre = [decision('Que dit q sur A, B et C ?', [
-    { id: 'yes', label: 'q est réel : A, B et C sont alignés', valid: real, why: 'q n\'est pas réel : son argument n\'est ni 0 ni π.' },
-    { id: 'no', label: 'q n\'est pas réel : A, B et C ne sont pas alignés', valid: !real, why: 'q est réel : son argument est 0 ou π, les vecteurs AB⃗ et AC⃗ sont colinéaires.' },
+  const pre = [decision(t('Que dit q sur A, B et C ?'), [
+    { id: 'yes', label: t('q est réel : A, B et C sont alignés'), valid: real, why: t('q n\'est pas réel : son argument n\'est ni 0 ni π.') },
+    { id: 'no', label: t('q n\'est pas réel : A, B et C ne sont pas alignés'), valid: !real, why: t('q est réel : son argument est 0 ou π, les vecteurs AB⃗ et AC⃗ sont colinéaires.') },
   ])];
   const parts = [quotientPart(d, level), argPart(d, pre)];
   const { start, judge, script } = partsScript(parts, level, RA_CHOICES);
   return linesItem({
     skill: RA, level, mode: modeOf(level), start, judge, script,
-    prompt: `A, B et C ont pour affixes a = ${cm(d.a)}, b = ${cm(d.b)} et c = ${cm(d.c)}. Calcule q = (c − a)/(b − a), puis son argument : A, B et C sont-ils alignés ?`,
-    hints: H('A, B et C sont alignés exactement quand q = (c − a)/(b − a) est réel (argument 0 ou π).',
+    prompt: t('A, B et C ont pour affixes a = {a}, b = {b} et c = {c}. Calcule q = (c − a)/(b − a), puis son argument : A, B et C sont-ils alignés ?', { a: cm(d.a), b: cm(d.b), c: cm(d.c) }),
+    hints: H(t('A, B et C sont alignés exactement quand q = (c − a)/(b − a) est réel (argument 0 ou π).'),
       `q = ${mt(`${cp(d.w)}/${cd(d.u)}`)}.`,
-      `q = ${cm(d.qq)}, arg q = ${fr(argT(d.qq))} : ${real ? 'alignés' : 'pas alignés'}.`),
+      real ? t('q = {q}, arg q = {a} : alignés.', { q: cm(d.qq), a: fr(argT(d.qq)) }) : t('q = {q}, arg q = {a} : pas alignés.', { q: cm(d.qq), a: fr(argT(d.qq)) })),
     subgoals: RA_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: [], complex: true }, baits: ['g8_ratio_order', 'g8_div_componentwise'],
     key: `${RA}:${level}:2:${ct(d.a)}:${ct(d.b)}:${ct(d.c)}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -145,12 +146,12 @@ function s3(r, s) {
   return sq3 ? `${N(R)}${sq3.startsWith('-') ? '' : '+'}${sq3}` : N(R);
 }
 // x + yi with x = r + s√3, y = t + u√3.
-function s3c(r, s, t, u) {
+function s3c(r, s, tq, u) {
   const re = s3(r, s);
   let im;
-  if (q(u).n === 0) im = q(t).n === 0 ? '' : ct(cq(0, t));
-  else if (q(t).n === 0) im = `${q(u).eq(1) ? '' : q(u).eq(-1) ? '-' : N(u)}i√3`;
-  else im = `(${s3(t, u)})i`;
+  if (q(u).n === 0) im = q(tq).n === 0 ? '' : ct(cq(0, tq));
+  else if (q(tq).n === 0) im = `${q(u).eq(1) ? '' : q(u).eq(-1) ? '-' : N(u)}i√3`;
+  else im = `(${s3(tq, u)})i`;
   if (!im) return re;
   if (re === '0') return im;
   return `${re}${im.startsWith('-') ? '' : '+'}${im}`;
@@ -173,26 +174,26 @@ function equilateralItem(level, rng, opts) {
   const lines = [
     E(`${cp(d.a)}+e^(iπ/3)×${cp(d.u)}`, 'b − a', 'diff', 'diff'),
     E(`${cp(d.a)}+(1/2+i√3/2)×${cp(d.u)}`, 'e^(iπ/3) = 1/2 + i√3/2', 'arg', 'polar'),
-    E(`${cp(d.a)}+${cp(ue)}${ue.isReal() ? (ue.re.n > 0 ? '+' : '') + coefText(ue, 'i√3') : `${ue.im.n > 0 ? '-' : '+'}${coefText(cq(Math.abs(ue.im.n)), '√3')}`}`, 'Développer', 'quot', 'calc'),
-    E(final, 'Regrouper : c = x + iy', 'quot', 'calc'),
+    E(`${cp(d.a)}+${cp(ue)}${ue.isReal() ? (ue.re.n > 0 ? '+' : '') + coefText(ue, 'i√3') : `${ue.im.n > 0 ? '-' : '+'}${coefText(cq(Math.abs(ue.im.n)), '√3')}`}`, t('Développer'), 'quot', 'calc'),
+    E(final, t('Regrouper : c = x + iy'), 'quot', 'calc'),
   ];
   if (level >= 4) lines.splice(0, 1);
   if (level >= 4) lines.splice(1, 1);
   if (level === 1) lines[1] = blanked(lines[1], ['1/2']);
-  const pre = level === 2 || level === 3 ? [decision('ABC est équilatéral d\'orientation positive (de AB⃗ vers AC⃗ : +π/3). Que vaut (c − a)/(b − a) ?', [
+  const pre = level === 2 || level === 3 ? [decision(t('ABC est équilatéral d\'orientation positive (de AB⃗ vers AC⃗ : +π/3). Que vaut (c − a)/(b − a) ?'), [
     { id: 'p3', label: 'e^(iπ/3)', valid: true },
-    { id: 'm3', label: 'e^(−iπ/3)', valid: false, why: 'C\'est le triangle d\'orientation négative.' },
-    { id: 'swap', label: '(b − a)/(c − a) = e^(iπ/3)', valid: false, rule: 'g8_ratio_order', why: 'Ce quotient tourne de AC⃗ vers AB⃗ : il donne le triangle d\'orientation négative.' },
+    { id: 'm3', label: 'e^(−iπ/3)', valid: false, why: t('C\'est le triangle d\'orientation négative.') },
+    { id: 'swap', label: '(b − a)/(c − a) = e^(iπ/3)', valid: false, rule: 'g8_ratio_order', why: t('Ce quotient tourne de AC⃗ vers AB⃗ : il donne le triangle d\'orientation négative.') },
   ])] : [];
   const choices = [
-    { id: 'diff', label: 'Calculer b − a' }, { id: 'polar', label: 'Écrire e^(iπ/3) = 1/2 + i√3/2' },
-    { id: 'calc', label: 'Développer et regrouper' }, RA_CHOICES[5],
+    { id: 'diff', label: 'Calculer b − a' }, { id: 'polar', label: t('Écrire e^(iπ/3) = 1/2 + i√3/2') },
+    { id: 'calc', label: t('Développer et regrouper') }, RA_CHOICES[5],
   ];
   const { start: s0, judge, script } = partsScript([{ start, judge: CJ({ ratio: true }), lines, pre }], level, choices);
   return linesItem({
     skill: RA, level, mode: modeOf(level), start: s0, judge, script,
-    prompt: `A et B ont pour affixes a = ${cm(d.a)} et b = ${cm(d.b)}. Trouve l'affixe c du point C tel que ABC soit un triangle équilatéral d'orientation positive : c = a + e^(iπ/3)(b − a).`,
-    hints: H('(c − a)/(b − a) = e^(iπ/3) : on tourne AB⃗ de π/3 autour de A.',
+    prompt: t('A et B ont pour affixes a = {a} et b = {b}. Trouve l\'affixe c du point C tel que ABC soit un triangle équilatéral d\'orientation positive : c = a + e^(iπ/3)(b − a).', { a: cm(d.a), b: cm(d.b) }),
+    hints: H(t('(c − a)/(b − a) = e^(iπ/3) : on tourne AB⃗ de π/3 autour de A.'),
       `c = ${mt(`${cp(d.a)}+(1/2+i√3/2)×${cp(d.u)}`)}`,
       `c = ${mt(final)}`),
     subgoals: RA_SUB, keys: [...KEYS, 'calcfn'], tapActions: level === 3 ? 'steps' : null,
@@ -204,7 +205,7 @@ function equilateralItem(level, rng, opts) {
 function ratioMcq(rng, opts) {
   const d = ratioData(rng, QS.filter((x) => !(x[0] === 0 && Math.abs(x[1]) === 1)));
   const inv = cq(1).div(d.qq);
-  const opt = (m, a) => `AC/AB = ${fr(m)}, angle (AB⃗, AC⃗) = ${fr(a)}`;
+  const opt = (m, a) => t('AC/AB = {m}, angle (AB⃗, AC⃗) = {a}', { m: fr(m), a: fr(a) });
   const options = uniq([
     { html: opt(modT(d.qq), argT(d.qq)), correct: true },
     { html: opt(modT(inv), argT(inv)), correct: false, rule: 'g8_ratio_order' },
@@ -212,19 +213,19 @@ function ratioMcq(rng, opts) {
     { html: opt(surd(d.qq.abs2().mul(d.qq.abs2())), argT(d.qq)), correct: false },
   ]);
   return mcq({
-    skill: RA, level: 4, prompt: `A, B et C ont pour affixes a = ${cm(d.a)}, b = ${cm(d.b)} et c = ${cm(d.c)}. Que valent le rapport AC/AB et l'angle (AB⃗, AC⃗) ?`, options,
+    skill: RA, level: 4, prompt: t('A, B et C ont pour affixes a = {a}, b = {b} et c = {c}. Que valent le rapport AC/AB et l\'angle (AB⃗, AC⃗) ?', { a: cm(d.a), b: cm(d.b), c: cm(d.c) }), options,
     key: `${RA}:mcq:${ct(d.a)}:${ct(d.b)}:${ct(d.c)}`, exam: examTag(opts), fallback: !!d.fallback,
     solution: [{ html: `q = (c − a)/(b − a) = ${cm(d.qq)} : |q| = ${fr(modT(d.qq))} et arg q = ${fr(argT(d.qq))}.`, note: '' }],
   }, rng);
 }
 
 const RA_TF = [
-  { s: 'Si (c − a)/(b − a) est imaginaire pur, l\'angle en A du triangle ABC est droit.', t: true, why: 'Vrai : son argument est ±π/2.' },
-  { s: 'Si (c − a)/(b − a) est réel, les points A, B et C sont alignés.', t: true, why: 'Vrai : son argument est 0 ou π, AB⃗ et AC⃗ sont colinéaires.' },
-  { s: 'Si (c − a)/(b − a) = 2i, alors AC = 2AB et l\'angle (AB⃗, AC⃗) vaut π/2.', t: true, why: 'Vrai : |2i| = 2 et arg(2i) = π/2.' },
-  { s: 'Si (c − a)/(b − a) = 1 + i, alors AB/AC = √2.', t: false, rule: 'g8_ratio_order', why: 'Faux : |q| = √2 est le rapport AC/AB ; AB/AC = 1/√2.' },
-  { s: 'Si (c − a)/(b − a) = e^(iπ/3), le triangle ABC est équilatéral.', t: true, why: 'Vrai : AC = AB et l\'angle en A vaut π/3.' },
-  { s: 'Si (c − a)/(b − a) = i, alors l\'angle (AC⃗, AB⃗) vaut π/2.', t: false, rule: 'g8_ratio_order', why: 'Faux : arg q est l\'angle de AB⃗ vers AC⃗ ; (AC⃗, AB⃗) = −π/2.' },
+  { s: t('Si (c − a)/(b − a) est imaginaire pur, l\'angle en A du triangle ABC est droit.'), t: true, why: t('Vrai : son argument est ±π/2.') },
+  { s: t('Si (c − a)/(b − a) est réel, les points A, B et C sont alignés.'), t: true, why: t('Vrai : son argument est 0 ou π, AB⃗ et AC⃗ sont colinéaires.') },
+  { s: t('Si (c − a)/(b − a) = 2i, alors AC = 2AB et l\'angle (AB⃗, AC⃗) vaut π/2.'), t: true, why: t('Vrai : |2i| = 2 et arg(2i) = π/2.') },
+  { s: t('Si (c − a)/(b − a) = 1 + i, alors AB/AC = √2.'), t: false, rule: 'g8_ratio_order', why: t('Faux : |q| = √2 est le rapport AC/AB ; AB/AC = 1/√2.') },
+  { s: t('Si (c − a)/(b − a) = e^(iπ/3), le triangle ABC est équilatéral.'), t: true, why: t('Vrai : AC = AB et l\'angle en A vaut π/3.') },
+  { s: t('Si (c − a)/(b − a) = i, alors l\'angle (AC⃗, AB⃗) vaut π/2.'), t: false, rule: 'g8_ratio_order', why: t('Faux : arg q est l\'angle de AB⃗ vers AC⃗ ; (AC⃗, AB⃗) = −π/2.') },
 ];
 
 export function genRatio(level, rng, profile, opts = {}) {
@@ -246,23 +247,24 @@ export function genRatio(level, rng, profile, opts = {}) {
 
 const TR = 'g8-transform';
 const TR_SUB = [
-  { id: 'fixed', label: 'point fixe', skill: 'g8-algebraic' },
-  { id: 'mod', label: 'rapport |a|', skill: 'g8-polar' },
-  { id: 'arg', label: 'angle arg a', skill: 'g8-polar' },
-  { id: 'write', label: 'écrire z′ = az + b', skill: TR },
+  { id: 'fixed', label: t('point fixe'), skill: 'g8-algebraic' },
+  { id: 'mod', label: t('rapport |a|'), skill: 'g8-polar' },
+  { id: 'arg', label: t('angle arg a'), skill: 'g8-polar' },
+  { id: 'write', label: t('écrire z′ = az + b'), skill: TR },
 ];
 const TR_CHOICES = [
-  { id: 'fixed', label: 'Point fixe : regrouper les ω' },
+  { id: 'fixed', label: t('Point fixe : regrouper les ω') },
   { id: 'solve', label: 'Diviser : ω = …' },
-  { id: 'mod', label: 'Rapport : |a|' },
-  { id: 'arg', label: 'Angle : arg a' },
-  { id: 'a', label: 'a = r·e^(iθ) sous forme a + bi' },
+  { id: 'mod', label: t('Rapport : |a|') },
+  { id: 'arg', label: t('Angle : arg a') },
+  { id: 'a', label: t('a = r·e^(iθ) sous forme a + bi') },
   { id: 'b', label: 'b = ω − aω' },
-  { id: 'origin', label: 'Prendre b = ω', rule: 'g8_rotation_about_origin', why: 'Avec b = ω, le centre ω n\'est pas fixe.' },
+  { id: 'origin', label: 'Prendre b = ω', rule: 'g8_rotation_about_origin', why: t('Avec b = ω, le centre ω n\'est pas fixe.') },
 ];
 // a: [re, im] of ℚ(i), with |a| and arg a remarkable; translations excluded.
 const AS = [[0, 1], [0, -1], [2, 0], [3, 0], [-2, 0], [q(1, 2), 0], [1, 1], [1, -1], [-1, 1], [0, 2], [0, -2], [q(1, 2), q(1, 2)], [-1, -1]];
 const natureOf = (a) => (a.abs2().eq(1) ? 'rotation' : a.isReal() ? 'homothétie' : 'similitude');
+const NAT_NAME = (n) => ({ rotation: t('rotation'), homothétie: t('homothétie'), similitude: t('similitude') }[n]);
 
 function trData(rng) {
   for (let i = 0; i < 200; i++) {
@@ -285,20 +287,20 @@ function mapText(a, b) {
 function natureDecision(d) {
   const nat = natureOf(d.a);
   const opts = [
-    { id: 'rotation', label: 'une rotation (|a| = 1)' },
-    { id: 'homothétie', label: 'une homothétie (a réel)' },
-    { id: 'similitude', label: 'une similitude (|a| ≠ 1, a non réel)' },
-    { id: 'translation', label: 'une translation' },
-  ].map((o) => ({ ...o, valid: o.id === nat, why: o.id === 'translation' ? 'a ≠ 1 : ce n\'est pas une translation.' : `a = ${cw(d.a)} : |a| = ${fr(modT(d.a))}${d.a.isReal() ? ', a réel' : ''}.` }));
-  opts.push({ id: 'origin', label: `une transformation de centre 0`, valid: false, rule: 'g8_rotation_about_origin', why: `b = ${cw(d.b)} ≠ 0 : 0 n'est pas fixe. Le centre est la solution de ω = aω + b.` });
-  return decision(`z ↦ ${rd(mapText(d.a, d.b))} : a = ${cw(d.a)}. C'est…`, opts);
+    { id: 'rotation', label: t('une rotation (|a| = 1)') },
+    { id: 'homothétie', label: t('une homothétie (a réel)') },
+    { id: 'similitude', label: t('une similitude (|a| ≠ 1, a non réel)') },
+    { id: 'translation', label: t('une translation') },
+  ].map((o) => ({ ...o, valid: o.id === nat, why: o.id === 'translation' ? t('a ≠ 1 : ce n\'est pas une translation.') : (d.a.isReal() ? t('a = {a} : |a| = {m}, a réel.', { a: cw(d.a), m: fr(modT(d.a)) }) : `a = ${cw(d.a)} : |a| = ${fr(modT(d.a))}.`) }));
+  opts.push({ id: 'origin', label: t('une transformation de centre 0'), valid: false, rule: 'g8_rotation_about_origin', why: t('b = {b} ≠ 0 : 0 n\'est pas fixe. Le centre est la solution de ω = aω + b.', { b: cw(d.b) }) });
+  return decision(t('z ↦ {v1} : a = {a}. C\'est…', { v1: rd(mapText(d.a, d.b)), a: cw(d.a) }), opts);
 }
 
 function fixedPart(d, level) {
   const one = cq(1).sub(d.a);
-  const lines = [E(`${coefText(one, 'ω')}=${ct(d.b)}`, 'Regrouper les ω : (1 − a)ω = b', 'fixed', 'fixed')];
-  if (level <= 2) lines.push(E(`ω=(${ct(d.b)})/${cd(one)}`, 'Diviser', 'fixed', 'solve'));
-  lines.push(E(`ω=${ct(d.w)}`, 'Calculer', 'fixed', 'solve'));
+  const lines = [E(`${coefText(one, 'ω')}=${ct(d.b)}`, t('Regrouper les ω : (1 − a)ω = b'), 'fixed', 'fixed')];
+  if (level <= 2) lines.push(E(`ω=(${ct(d.b)})/${cd(one)}`, t('Diviser'), 'fixed', 'solve'));
+  lines.push(E(`ω=${ct(d.w)}`, t('Calculer'), 'fixed', 'solve'));
   if (level === 1) lines[0] = blanked(lines[0], [ct(one)]);
   return { start: `ω=${mapText(d.a, d.b).replace(/z/g, 'ω')}`, judge: { kind: 'complex', form: 'set', unknown: 'ω', complex: true }, lines };
 }
@@ -307,16 +309,16 @@ function elementsItem(level, rng, opts) {
   const d = trData(rng);
   const parts = [
     fixedPart(d, level),
-    { html: 'Rapport :', ask: '|a| =', start: `|${ct(d.a)}|`, judge: RJ(), lines: [E(modT(d.a), 'Rapport |a|', 'mod', 'mod')] },
-    { html: 'Angle :', ask: 'arg a =', start: `arg(${ct(d.a)})`, judge: RJ(), lines: [E(argT(d.a), 'Angle arg a', 'arg', 'arg')], pre: level >= 2 && level <= 4 ? [natureDecision(d)] : [] },
+    { html: t('Rapport :'), ask: '|a| =', start: `|${ct(d.a)}|`, judge: RJ(), lines: [E(modT(d.a), t('Rapport |a|'), 'mod', 'mod')] },
+    { html: t('Angle :'), ask: 'arg a =', start: `arg(${ct(d.a)})`, judge: RJ(), lines: [E(argT(d.a), t('Angle arg a'), 'arg', 'arg')], pre: level >= 2 && level <= 4 ? [natureDecision(d)] : [] },
   ];
   const { start, judge, script } = partsScript(parts, level, TR_CHOICES);
   return linesItem({
     skill: TR, level, mode: modeOf(level), start, judge, script,
-    prompt: `Trouve le centre ω, le rapport et l'angle de la transformation z ↦ ${mt(mapText(d.a, d.b))}.`,
-    hints: H('Le centre est le point fixe : résous ω = aω + b. Le rapport est |a|, l\'angle arg a.',
-      `${mt(`${coefText(cq(1).sub(d.a), 'ω')}=${ct(d.b)}`)}, donc ω = □.`,
-      `ω = ${cm(d.w)}, rapport ${fr(modT(d.a))}, angle ${fr(argT(d.a))} : ${natureOf(d.a)}.`),
+    prompt: t('Trouve le centre ω, le rapport et l\'angle de la transformation z ↦ {v1}.', { v1: mt(mapText(d.a, d.b)) }),
+    hints: H(t('Le centre est le point fixe : résous ω = aω + b. Le rapport est |a|, l\'angle arg a.'),
+      t('{v1}, donc ω = □.', { v1: mt(`${coefText(cq(1).sub(d.a), 'ω')}=${ct(d.b)}`) }),
+      t('ω = {w}, rapport {v1}, angle {v2} : {a}.', { w: cm(d.w), v1: fr(modT(d.a)), v2: fr(argT(d.a)), a: NAT_NAME(natureOf(d.a)) })),
     subgoals: TR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['ω'], complex: true }, baits: level >= 2 && level <= 4 ? ['g8_rotation_about_origin'] : [],
     key: `${TR}:${level}:1:${mapText(d.a, d.b)}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -329,29 +331,31 @@ function writeItem(level, rng, opts) {
   const nat = natureOf(d.a);
   const r = modT(d.a);
   const th = argT(d.a);
-  const what = nat === 'rotation' ? `la rotation de centre ${cm(d.w)} et d'angle ${fr(th)}`
-    : nat === 'homothétie' ? `l'homothétie de centre ${cm(d.w)} et de rapport ${fr(N(d.a.re))}`
-      : `la similitude de centre ${cm(d.w)}, de rapport ${fr(r)} et d'angle ${fr(th)}`;
+  const what = nat === 'rotation' ? t('la rotation de centre {w} et d\'angle {th}', { w: cm(d.w), th: fr(th) })
+    : nat === 'homothétie' ? t('l\'homothétie de centre {w} et de rapport {v1}', { w: cm(d.w), v1: fr(N(d.a.re)) })
+      : t('la similitude de centre {w}, de rapport {r} et d\'angle {th}', { w: cm(d.w), r: fr(r), th: fr(th) });
   const parts = [];
   if (nat !== 'homothétie') {
     const expA = `${r === '1' ? '' : `${r}×`}e^(${th === 'π' ? 'iπ' : `${th.replace('π', 'iπ')}`})`.replace('e^(-iπ', 'e^(-iπ');
-    parts.push({ start: expA, judge: CJ(), lines: [E(ct(d.a), 'a = r·e^(iθ) en forme algébrique', 'arg', 'a')] });
+    parts.push({ start: expA, judge: CJ(), lines: [E(ct(d.a), t('a = r·e^(iθ) en forme algébrique'), 'arg', 'a')] });
   }
   const aw = d.a.mul(d.w);
   const bStart = `${cp(d.w)}-${cp(d.a)}×${cp(d.w)}`;
-  const bLines = level <= 3 ? [E(`${cp(d.w)}-${cp(aw)}`, 'Calculer aω', 'write', 'b'), E(ct(d.b), 'b = ω − aω', 'write', 'b')] : [E(ct(d.b), 'b = ω − aω', 'write', 'b')];
+  const bLines = level <= 3 ? [E(`${cp(d.w)}-${cp(aw)}`, t('Calculer aω'), 'write', 'b'), E(ct(d.b), 'b = ω − aω', 'write', 'b')] : [E(ct(d.b), 'b = ω − aω', 'write', 'b')];
   if (level === 1) bLines[0] = blanked(bLines[0], [ct(aw)]);
-  const pre = level === 2 || level === 3 ? [decision(`Quelle écriture a ${nat === 'homothétie' ? 'cette homothétie' : 'cette transformation'} de centre ω ?`, [
-    { id: 'right', label: 'z′ − ω = a(z − ω), donc b = ω − aω', valid: true },
-    { id: 'origin', label: 'z′ = az + ω, donc b = ω', valid: false, rule: 'g8_rotation_about_origin', why: 'Avec z′ = az + ω, le point ω n\'est pas fixe : aω + ω ≠ ω.' },
-    { id: 'plus', label: 'z′ = a(z + ω), donc b = aω', valid: false, rule: 'g8_rotation_about_origin', why: 'Avec z′ = a(z + ω), le point ω n\'est pas fixe.' },
+  const pre = level === 2 || level === 3 ? [decision(nat === 'homothétie' ? t('Quelle écriture a cette homothétie de centre ω ?') : t('Quelle écriture a cette transformation de centre ω ?'), [
+    { id: 'right', label: t('z′ − ω = a(z − ω), donc b = ω − aω'), valid: true },
+    { id: 'origin', label: t('z′ = az + ω, donc b = ω'), valid: false, rule: 'g8_rotation_about_origin', why: t('Avec z′ = az + ω, le point ω n\'est pas fixe : aω + ω ≠ ω.') },
+    { id: 'plus', label: t('z′ = a(z + ω), donc b = aω'), valid: false, rule: 'g8_rotation_about_origin', why: t('Avec z′ = a(z + ω), le point ω n\'est pas fixe.') },
   ])] : [];
-  parts.push({ html: 'Puis b = ω − aω :', ask: 'b =', start: bStart, judge: CJ({ center: true }), lines: bLines, pre });
+  parts.push({ html: t('Puis b = ω − aω :'), ask: 'b =', start: bStart, judge: CJ({ center: true }), lines: bLines, pre });
   const { start, judge, script } = partsScript(parts, level, TR_CHOICES);
   return linesItem({
     skill: TR, level, mode: modeOf(level), start, judge, script,
-    prompt: `Écris ${what} sous la forme z′ = az + b : ${nat === 'homothétie' ? 'a est le rapport' : 'a = r·e^(iθ)'}, puis b = ω − aω (car z′ − ω = a(z − ω)).`,
-    hints: H('z′ − ω = a(z − ω) : le centre ω reste fixe. Donc z′ = az + (ω − aω).',
+    prompt: nat === 'homothétie'
+      ? t('Écris {what} sous la forme z′ = az + b : a est le rapport, puis b = ω − aω (car z′ − ω = a(z − ω)).', { what })
+      : t('Écris {what} sous la forme z′ = az + b : a = r·e^(iθ), puis b = ω − aω (car z′ − ω = a(z − ω)).', { what }),
+    hints: H(t('z′ − ω = a(z − ω) : le centre ω reste fixe. Donc z′ = az + (ω − aω).'),
       `a = ${cm(d.a)} ; b = ${mt(`${cp(d.w)}-${cp(aw)}`)} = □`,
       `z′ = ${mt(mapText(d.a, d.b))}`),
     subgoals: TR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -380,16 +384,16 @@ function composeItem(level, rng, opts) {
   d = d || { a1: cq(0, 1), a2: cq(2), b1: cq(1), b2: cq(-1, 1), a: cq(0, 2), b: cq(1, 1), w: cq(-1, 3).div(5), fallback: true };
   const parts = [
     { start: `${cp(d.a2)}×${cp(d.a1)}`, judge: CJ(), lines: [E(ct(d.a), 'a = a₂a₁', 'write', 'a')] },
-    { html: 'f₂(f₁(z)) = a₂(a₁z + b₁) + b₂, donc b = a₂b₁ + b₂ :', ask: 'b =', start: `${cp(d.a2)}×${cp(d.b1)}+${cp(d.b2)}`, judge: CJ(), lines: [E(ct(d.b), 'b = a₂b₁ + b₂', 'write', 'b')] },
-    { html: 'Centre de f₂ ∘ f₁ :', ask: 'ω', start: `ω=${mapText(d.a, d.b).replace(/z/g, 'ω')}`, judge: { kind: 'complex', form: 'set', unknown: 'ω', complex: true }, lines: fixedPart(d, 4).lines, pre: level <= 4 ? [natureDecision(d)] : [] },
+    { html: t('f₂(f₁(z)) = a₂(a₁z + b₁) + b₂, donc b = a₂b₁ + b₂ :'), ask: 'b =', start: `${cp(d.a2)}×${cp(d.b1)}+${cp(d.b2)}`, judge: CJ(), lines: [E(ct(d.b), 'b = a₂b₁ + b₂', 'write', 'b')] },
+    { html: t('Centre de f₂ ∘ f₁ :'), ask: 'ω', start: `ω=${mapText(d.a, d.b).replace(/z/g, 'ω')}`, judge: { kind: 'complex', form: 'set', unknown: 'ω', complex: true }, lines: fixedPart(d, 4).lines, pre: level <= 4 ? [natureDecision(d)] : [] },
   ];
   const { start, judge, script } = partsScript(parts, level, TR_CHOICES);
   return linesItem({
     skill: TR, level, mode: modeOf(level), start, judge, script,
-    prompt: `f₁(z) = ${mt(mapText(d.a1, d.b1))} et f₂(z) = ${mt(mapText(d.a2, d.b2))}. Écris f₂ ∘ f₁ sous la forme z ↦ az + b, puis trouve son centre ω.`,
-    hints: H('f₂(f₁(z)) = a₂(a₁z + b₁) + b₂ : a = a₂a₁ et b = a₂b₁ + b₂. Le centre résout ω = aω + b.',
+    prompt: t('f₁(z) = {v1} et f₂(z) = {v2}. Écris f₂ ∘ f₁ sous la forme z ↦ az + b, puis trouve son centre ω.', { v1: mt(mapText(d.a1, d.b1)), v2: mt(mapText(d.a2, d.b2)) }),
+    hints: H(t('f₂(f₁(z)) = a₂(a₁z + b₁) + b₂ : a = a₂a₁ et b = a₂b₁ + b₂. Le centre résout ω = aω + b.'),
       `a = ${cm(d.a)}, b = ${cm(d.b)} ; ${mt(`${coefText(cq(1).sub(d.a), 'ω')}=${ct(d.b)}`)}.`,
-      `f₂ ∘ f₁ : z ↦ ${mt(mapText(d.a, d.b))}, centre ω = ${cm(d.w)}.`),
+      t('f₂ ∘ f₁ : z ↦ {v1}, centre ω = {w}.', { v1: mt(mapText(d.a, d.b)), w: cm(d.w) })),
     subgoals: TR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     declares: { vars: ['ω'], complex: true }, baits: level <= 4 ? ['g8_rotation_about_origin'] : [],
     key: `${TR}:${level}:3:${mapText(d.a1, d.b1)}:${mapText(d.a2, d.b2)}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -407,7 +411,7 @@ function trMcq(rng, opts) {
     ]);
     const nat = natureOf(d.a);
     return mcq({
-      skill: TR, level: 4, prompt: `Quelle est l'écriture complexe de la transformation de centre ${cm(d.w)}, de rapport ${fr(modT(d.a))} et d'angle ${fr(argT(d.a))} (${nat}) ?`, options,
+      skill: TR, level: 4, prompt: t('Quelle est l\'écriture complexe de la transformation de centre {w}, de rapport {v1} et d\'angle {v2} ({nat}) ?', { w: cm(d.w), v1: fr(modT(d.a)), v2: fr(argT(d.a)), nat: NAT_NAME(nat) }), options,
       key: `${TR}:mcq:w:${mapText(d.a, d.b)}`, exam: examTag(opts), fallback: !!d.fallback,
       solution: [{ html: `a = ${cm(d.a)} et z′ − ω = a(z − ω) : b = ω − aω = ${cm(d.b)}.`, note: '' }],
     }, rng);
@@ -419,19 +423,19 @@ function trMcq(rng, opts) {
     { html: cm(d.b.div(cq(1).add(d.a).isZero() ? cq(2) : cq(1).add(d.a))), correct: false },
   ]);
   return mcq({
-    skill: TR, level: 4, prompt: `Quel est le centre de la transformation z ↦ ${mt(mapText(d.a, d.b))} ?`, options,
+    skill: TR, level: 4, prompt: t('Quel est le centre de la transformation z ↦ {v1} ?', { v1: mt(mapText(d.a, d.b)) }), options,
     key: `${TR}:mcq:c:${mapText(d.a, d.b)}`, exam: examTag(opts), fallback: !!d.fallback,
     solution: [{ html: `ω = aω + b ⇔ ω = b/(1 − a) = ${cm(d.w)}.`, note: '' }],
   }, rng);
 }
 
 const TR_TF = [
-  { s: 'z ↦ iz + 1 est une rotation de centre 0.', t: false, rule: 'g8_rotation_about_origin', why: 'Faux : c\'est une rotation d\'angle π/2, mais de centre (1 + i)/2 (ω = iω + 1).' },
-  { s: 'z ↦ 2z + 3 est une homothétie de rapport 2.', t: true, why: 'Vrai : a = 2 est réel ; son centre est −3.' },
-  { s: 'z ↦ (1 + i)z est une rotation.', t: false, why: 'Faux : |1 + i| = √2 ≠ 1, c\'est une similitude de centre 0, de rapport √2 et d\'angle π/4.' },
-  { s: 'z ↦ −z + 4 est la symétrie de centre 2.', t: true, why: 'Vrai : a = −1 (rotation d\'angle π), et ω = −ω + 4 donne ω = 2.' },
-  { s: 'z ↦ z + 2i est une rotation.', t: false, why: 'Faux : a = 1, c\'est la translation de vecteur 2i.' },
-  { s: 'La rotation de centre 1 et d\'angle π/2 est z ↦ iz + 1.', t: false, rule: 'g8_rotation_about_origin', why: 'Faux : z′ − 1 = i(z − 1), donc z′ = iz + 1 − i.' },
+  { s: t('z ↦ iz + 1 est une rotation de centre 0.'), t: false, rule: 'g8_rotation_about_origin', why: t('Faux : c\'est une rotation d\'angle π/2, mais de centre (1 + i)/2 (ω = iω + 1).') },
+  { s: t('z ↦ 2z + 3 est une homothétie de rapport 2.'), t: true, why: t('Vrai : a = 2 est réel ; son centre est −3.') },
+  { s: t('z ↦ (1 + i)z est une rotation.'), t: false, why: t('Faux : |1 + i| = √2 ≠ 1, c\'est une similitude de centre 0, de rapport √2 et d\'angle π/4.') },
+  { s: t('z ↦ −z + 4 est la symétrie de centre 2.'), t: true, why: t('Vrai : a = −1 (rotation d\'angle π), et ω = −ω + 4 donne ω = 2.') },
+  { s: t('z ↦ z + 2i est une rotation.'), t: false, why: t('Faux : a = 1, c\'est la translation de vecteur 2i.') },
+  { s: t('La rotation de centre 1 et d\'angle π/2 est z ↦ iz + 1.'), t: false, rule: 'g8_rotation_about_origin', why: t('Faux : z′ − 1 = i(z − 1), donc z′ = iz + 1 − i.') },
 ];
 
 export function genTransform(level, rng, profile, opts = {}) {

@@ -32,6 +32,7 @@
 // {t:'fn', name:'fact', args:[e]} and printed back with « ! ».
 
 import { Q } from '../math/rational.js';
+import { t as tr } from '../i18n.js';
 
 export class ParseError extends Error {
   constructor(message, pos = 0) {
@@ -139,7 +140,7 @@ export function tokenize(text, opts = {}) {
       i++;
       continue;
     }
-    throw new ParseError(`Je ne connais pas le symbole « ${c} ».`, i);
+    throw new ParseError(tr('Je ne connais pas le symbole « {c} ».', { c }), i);
   }
   return out;
 }
@@ -156,7 +157,7 @@ export function parse(text, opts = {}) {
   const isOp = (t, s) => t && t.k === 'op' && t.s === s;
   const fail = (msg, at = p) => {
     const pos = toks[at]?.pos ?? (toks.length ? toks[toks.length - 1].pos + 1 : 0);
-    throw new ParseError(at < toks.length ? `${msg} (près de « ${SNIP(toks, at)} »)` : msg, pos);
+    throw new ParseError(at < toks.length ? tr('{msg} (près de « {near} »)', { msg, near: SNIP(toks, at) }) : msg, pos);
   };
   const expect = (s, msg) => { if (!isOp(peek(), s)) fail(msg); p++; };
 
@@ -203,7 +204,7 @@ export function parse(text, opts = {}) {
       const items = [l, r];
       const ops = [t.s];
       while (peek() && peek().k === 'op' && RELOPS.has(peek().s)) { ops.push(toks[p++].s); items.push(setexpr()); }
-      if (!(ops.every((o) => UP.has(o)) || ops.every((o) => DOWN.has(o)))) fail('Écris une seule relation par ligne.');
+      if (!(ops.every((o) => UP.has(o)) || ops.every((o) => DOWN.has(o)))) fail(tr('Écris une seule relation par ligne.'));
       return { t: 'chain', items, ops };
     }
     return l;
@@ -220,10 +221,10 @@ export function parse(text, opts = {}) {
   }
   function interval(open) {
     const lo = sum();
-    expect(';', 'Sépare les deux bornes par « ; ».');
+    expect(';', tr('Sépare les deux bornes par « ; ».'));
     const hi = sum();
     const c = peek();
-    if (!(isOp(c, ']') || isOp(c, '['))) fail("Ferme l'intervalle avec ] ou [.");
+    if (!(isOp(c, ']') || isOp(c, '['))) fail(tr("Ferme l'intervalle avec ] ou [."));
     p++;
     return { t: 'set', kind: 'interval', lo, hi, loOpen: open, hiOpen: c.s === '[' };
   }
@@ -235,12 +236,12 @@ export function parse(text, opts = {}) {
     if (isOp(peek(), '|')) {
       p++;
       const cond = formula();
-      expect('}', "Une accolade n'est pas fermée.");
+      expect('}', tr("Une accolade n'est pas fermée."));
       return { t: 'set', kind: 'builder', head: first, cond };
     }
     const items = [first];
     while (isOp(peek(), ';')) { p++; items.push(formula()); }
-    expect('}', "Une accolade n'est pas fermée. Sépare les éléments par « ; ».");
+    expect('}', tr("Une accolade n'est pas fermée. Sépare les éléments par « ; »."));
     return { t: 'set', kind: 'finite', items };
   }
   function sum() {
@@ -292,9 +293,9 @@ export function parse(text, opts = {}) {
     const b = degrees(atom());
     if (!isOp(peek(), '^')) return b;
     p++;
-    if (!peek()) fail('Il manque l\'exposant.');
+    if (!peek()) fail(tr('Il manque l\'exposant.'));
     const e = isOp(peek(), '-') ? (p++, { t: 'neg', e: atom() }) : atom();
-    if (isOp(peek(), '^')) fail('Mets l\'exposant entre parenthèses : x^(a^b).');
+    if (isOp(peek(), '^')) fail(tr('Mets l\'exposant entre parenthèses : x^(a^b).'));
     return { t: 'pow', b, e };
   }
   const primes = (node) => {
@@ -303,10 +304,10 @@ export function parse(text, opts = {}) {
     return n ? { t: 'deriv', e: node, v: dvar, n } : node;
   };
   function args(name) {
-    expect('(', `Il faut une parenthèse après ${name}.`);
+    expect('(', tr('Il faut une parenthèse après {name}.', { name }));
     const out = [sum()];
     while (isOp(peek(), ',') || (MINMAX.includes(name) && isOp(peek(), ';'))) { p++; out.push(sum()); }
-    expect(')', 'Une parenthèse n\'est pas fermée.');
+    expect(')', tr('Une parenthèse n\'est pas fermée.'));
     return out;
   }
   function call(name) {
@@ -315,85 +316,85 @@ export function parse(text, opts = {}) {
     if (name === 'log' && isOp(peek(), '_')) {
       p++;
       const s = toks[p];
-      if (!s) fail('Il manque la base du logarithme.');
+      if (!s) fail(tr('Il manque la base du logarithme.'));
       let base;
       if (isOp(s, '(')) {
         p++;
         base = { t: 'paren', e: sum() };
-        expect(')', 'Une parenthèse n\'est pas fermée.');
+        expect(')', tr('Une parenthèse n\'est pas fermée.'));
       } else if (s.k === 'num') {
         p++;
         base = { t: 'num', s: s.s, v: Q.fromDecimal(s.s.replace('.', ',')) };
       } else if (s.k === 'name' && !FUNCS.includes(s.s)) {
         p++;
         base = s.s === 'e' ? { t: 'const', name: 'e' } : { t: 'sym', name: s.s };
-      } else fail('Écris la base du logarithme : log_2(x).');
+      } else fail(tr('Écris la base du logarithme : log_2(x).'));
       let arg;
       if (isOp(peek(), '(')) {
         p++;
         arg = sum();
-        expect(')', 'Une parenthèse n\'est pas fermée.');
+        expect(')', tr('Une parenthèse n\'est pas fermée.'));
       } else arg = bareArg('log').args[0];
       return primes({ t: 'fn', name: 'logb', args: [base, arg] });
     }
     if (name === 'pd') {
       // Step U6: a partial derivative, one variable after another.
       const a = args('pd');
-      if (a.length < 2) fail('Écris pd(f, x) : la fonction, puis la variable.', at);
-      if (a.slice(1).some((v) => v.t !== 'sym' || v.sub)) fail('Dans pd(f, x, y), après la fonction viennent les variables.', at);
+      if (a.length < 2) fail(tr('Écris pd(f, x) : la fonction, puis la variable.'), at);
+      if (a.slice(1).some((v) => v.t !== 'sym' || v.sub)) fail(tr('Dans pd(f, x, y), après la fonction viennent les variables.'), at);
       return primes(a.slice(1).reduce((e, v) => ({ t: 'deriv', e, v: v.name, n: 1, partial: true }), a[0]));
     }
     if (name === 'd') {
       const a = args('d');
-      if (a.length > 3) fail('d(f, x) prend au plus trois arguments.', at);
+      if (a.length > 3) fail(tr('d(f, x) prend au plus trois arguments.'), at);
       const v = a[1] ? a[1] : null;
-      if (v && (v.t !== 'sym' || v.sub)) fail('Dans d(f, x), le 2e argument est la variable.', at);
+      if (v && (v.t !== 'sym' || v.sub)) fail(tr('Dans d(f, x), le 2e argument est la variable.'), at);
       const n = a[2] ? a[2] : null;
-      if (n && (n.t !== 'num' || !n.v.isInt() || n.v.n < 1)) fail('Dans d(f, x, n), n est un entier ≥ 1.', at);
+      if (n && (n.t !== 'num' || !n.v.isInt() || n.v.n < 1)) fail(tr('Dans d(f, x, n), n est un entier ≥ 1.'), at);
       return primes({ t: 'deriv', e: a[0], v: v ? v.name : dvar, n: n ? n.v.n : 1 });
     }
     if (name === 'sum') {
       // sum(f, k, a, b) = Σ_{k=a}^{b} f (the Σ key writes it).
       const a = args('sum');
-      if (a.length !== 4) fail('Écris sum(terme, k, début, fin), par exemple sum(2k+1, k, 1, n).', at);
+      if (a.length !== 4) fail(tr('Écris sum(terme, k, début, fin), par exemple sum(2k+1, k, 1, n).'), at);
       const k = a[1];
-      if (k.t !== 'sym' || k.sub) fail("Dans sum(terme, k, début, fin), le 2e argument est l'indice.", at);
+      if (k.t !== 'sym' || k.sub) fail(tr("Dans sum(terme, k, début, fin), le 2e argument est l'indice."), at);
       return { t: 'sum', e: a[0], k: k.name, lo: a[2], hi: a[3] };
     }
     if (name === 'int' || name === '∫') {
       // int(f, x) = ∫ f dx; int(f, x, a, b) from a to b.
       const a = args('int');
-      if (a.length !== 2 && a.length !== 4) fail('Écris int(f, x) pour une primitive, int(f, x, a, b) pour une intégrale de a à b.', at);
-      if (a[1].t !== 'sym' || a[1].sub) fail("Dans int(f, x, …), le 2e argument est la variable d'intégration.", at);
+      if (a.length !== 2 && a.length !== 4) fail(tr('Écris int(f, x) pour une primitive, int(f, x, a, b) pour une intégrale de a à b.'), at);
+      if (a[1].t !== 'sym' || a[1].sub) fail(tr("Dans int(f, x, …), le 2e argument est la variable d'intégration."), at);
       return a.length === 2 ? { t: 'int', e: a[0], v: a[1].name } : { t: 'int', e: a[0], v: a[1].name, lo: a[2], hi: a[3] };
     }
     if (name === 'bracket') {
       const a = args('bracket');
-      if (a.length !== 4) fail('Écris bracket(F, x, a, b) pour [F] de a à b.', at);
-      if (a[1].t !== 'sym' || a[1].sub) fail('Dans bracket(F, x, a, b), le 2e argument est la variable.', at);
+      if (a.length !== 4) fail(tr('Écris bracket(F, x, a, b) pour [F] de a à b.'), at);
+      if (a[1].t !== 'sym' || a[1].sub) fail(tr('Dans bracket(F, x, a, b), le 2e argument est la variable.'), at);
       return { t: 'bracket', e: a[0], v: a[1].name, lo: a[2], hi: a[3] };
     }
     if (name === 'lim') {
       const a = args('lim');
-      if (a.length !== 3) fail("Écris lim(f, x, a), avec a⁺ ou a⁻ pour une limite d'un côté.", at);
-      if (a[1].t !== 'sym' || a[1].sub) fail('Dans lim(f, x, a), le 2e argument est la variable.', at);
+      if (a.length !== 3) fail(tr("Écris lim(f, x, a), avec a⁺ ou a⁻ pour une limite d'un côté."), at);
+      if (a[1].t !== 'sym' || a[1].sub) fail(tr('Dans lim(f, x, a), le 2e argument est la variable.'), at);
       return { t: 'lim', e: a[0], v: a[1].name, to: a[2] };
     }
     if (name === 'o') {
       // o(x^n) = xⁿ·ε(x), the remainder of a DL.
       const a = args('o');
-      if (a.length !== 1) fail('Écris o(x^n) avec un seul argument.', at);
+      if (a.length !== 1) fail(tr('Écris o(x^n) avec un seul argument.'), at);
       const v = firstSym(a[0]) || dvar;
       return { t: 'bin', op: '×', l: a[0], r: { t: 'eps', v } };
     }
     if (name === 'root') {
       const a = args('root');
-      if (a.length !== 2) fail('Écris root(3, x) pour la racine cubique de x.', at);
+      if (a.length !== 2) fail(tr('Écris root(3, x) pour la racine cubique de x.'), at);
       return primes({ t: 'root', n: a[0], e: a[1] });
     }
     if (isOp(peek(), '^')) {
       p++;
-      if (isOp(peek(), '-') || (isOp(peek(), '(') && isOp(peek(1), '-'))) fail(`Pour la fonction réciproque, écris arc${name.replace(/^arc/, '')} (pas ${name}^(-1)).`, at);
+      if (isOp(peek(), '-') || (isOp(peek(), '(') && isOp(peek(1), '-'))) fail(tr('Pour la fonction réciproque, écris {arc} (pas {name}^(-1)).', { arc: `arc${name.replace(/^arc/, '')}`, name }), at);
       const e = atom();
       const inner = isOp(peek(), '(') ? callArgs(name) : bareArg(name);
       return { t: 'pow', b: inner, e };
@@ -402,26 +403,26 @@ export function parse(text, opts = {}) {
   }
   function callArgs(name) {
     const a = args(name);
-    if (name === 'sqrt') { if (a.length !== 1) fail('sqrt prend un seul argument.'); return { t: 'sqrt', e: { t: 'paren', e: a[0] } }; }
-    if (name === 'abs') { if (a.length !== 1) fail('abs prend un seul argument.'); return { t: 'abs', e: a[0] }; }
-    if (MINMAX.includes(name)) { if (a.length < 2) fail(`${name} prend au moins deux nombres : ${name}(a ; b).`); return { t: 'fn', name, args: a }; }
-    if (a.length !== 1 && !userFuncs.has(name)) fail(`${name} prend un seul argument.`);
+    if (name === 'sqrt') { if (a.length !== 1) fail(tr('sqrt prend un seul argument.')); return { t: 'sqrt', e: { t: 'paren', e: a[0] } }; }
+    if (name === 'abs') { if (a.length !== 1) fail(tr('abs prend un seul argument.')); return { t: 'abs', e: a[0] }; }
+    if (MINMAX.includes(name)) { if (a.length < 2) fail(tr('{name} prend au moins deux nombres : {name}(a ; b).', { name })); return { t: 'fn', name, args: a }; }
+    if (a.length !== 1 && !userFuncs.has(name)) fail(tr('{name} prend un seul argument.', { name }));
     return { t: 'fn', name, args: a };
   }
   // sin x: only a single number or letter, never more.
   function bareArg(name) {
     const t = peek();
-    if (!t || !(t.k === 'num' || (t.k === 'name' && !FUNCS.includes(t.s)))) fail(`Écris ${name}(…) avec des parenthèses.`);
+    if (!t || !(t.k === 'num' || (t.k === 'name' && !FUNCS.includes(t.s)))) fail(tr('Écris {name}(…) avec des parenthèses.', { name }));
     const arg = atom();
     const nx = peek();
-    if (isOp(nx, '^') || startsFactor(nx) || isOp(nx, '/') || isOp(nx, '_')) fail(`Écris ${name}(…) avec des parenthèses.`);
+    if (isOp(nx, '^') || startsFactor(nx) || isOp(nx, '/') || isOp(nx, '_')) fail(tr('Écris {name}(…) avec des parenthèses.', { name }));
     if (name === 'sqrt') return { t: 'sqrt', e: arg };
     if (name === 'abs') return { t: 'abs', e: arg };
     return { t: 'fn', name, args: [arg] };
   }
   function atom() {
     const t = toks[p++];
-    if (!t) fail('L\'expression est incomplète.', p - 1);
+    if (!t) fail(tr('L\'expression est incomplète.'), p - 1);
     if (t.k === 'num') {
       const s = t.s.replace('.', ',');
       return { t: 'num', s, v: Q.fromDecimal(s) };
@@ -429,26 +430,26 @@ export function parse(text, opts = {}) {
     if (t.k === 'op') {
       if (t.s === '(') {
         const e = formula();
-        expect(')', 'Une parenthèse n\'est pas fermée.');
+        expect(')', tr('Une parenthèse n\'est pas fermée.'));
         return primes({ t: 'paren', e });
       }
       if (t.s === '|') {
         absDepth++;
         const e = sum();
         absDepth--;
-        expect('|', 'Une barre de valeur absolue n\'est pas fermée.');
+        expect('|', tr('Une barre de valeur absolue n\'est pas fermée.'));
         return primes({ t: 'abs', e });
       }
       if (t.s === '√') {
-        if (!peek()) fail('Il manque ce qui est sous la racine.');
+        if (!peek()) fail(tr('Il manque ce qui est sous la racine.'));
         return { t: 'sqrt', e: atom() };
       }
       if (t.s === '□') return { t: 'blank', id: blanks++ };
       if (t.s === '[' || t.s === ']') return interval(t.s === ']');
       if (t.s === '{') return braces();
       if (SET_NAMES.has(t.s)) return { t: 'set', kind: 'named', name: t.s };
-      if (t.s === ')') fail('Il y a une parenthèse fermante de trop.', p - 1);
-      fail(`Il manque quelque chose avant « ${t.s} ».`, p - 1);
+      if (t.s === ')') fail(tr('Il y a une parenthèse fermante de trop.'), p - 1);
+      fail(tr('Il manque quelque chose avant « {s} ».', { s: t.s }), p - 1);
     }
     const name = t.s;
     if (name === 'pi' || name === 'π') return { t: 'const', name: 'pi' };
@@ -456,7 +457,7 @@ export function parse(text, opts = {}) {
       // ε(x): the remainder factor of a DL (step U2).
       const at = p - 1;
       const a = args('ε');
-      if (a.length !== 1 || stripP(a[0]).t !== 'sym' || stripP(a[0]).sub) fail('Écris ε(x), avec la variable entre les parenthèses.', at);
+      if (a.length !== 1 || stripP(a[0]).t !== 'sym' || stripP(a[0]).sub) fail(tr('Écris ε(x), avec la variable entre les parenthèses.'), at);
       return { t: 'eps', v: stripP(a[0]).name };
     }
     if (name === '∫' && isOp(peek(), '(')) return call('int');
@@ -482,12 +483,12 @@ export function parse(text, opts = {}) {
     if (isOp(peek(), '_')) {
       p++;
       const s = peek();
-      if (!s) fail('Il manque l\'indice.');
-      if (isOp(s, '(')) { p++; node.sub = sum(); expect(')', 'Une parenthèse n\'est pas fermée.'); node.sub = { t: 'paren', e: node.sub }; } else {
+      if (!s) fail(tr('Il manque l\'indice.'));
+      if (isOp(s, '(')) { p++; node.sub = sum(); expect(')', tr('Une parenthèse n\'est pas fermée.')); node.sub = { t: 'paren', e: node.sub }; } else {
         p++;
         if (s.k === 'num') node.sub = { t: 'num', s: s.s, v: Q.fromDecimal(s.s.replace('.', ',')) };
         else if (s.k === 'name') node.sub = { t: 'sym', name: s.s };
-        else fail('Indice illisible.');
+        else fail(tr('Indice illisible.'));
       }
       node = { ...node };
     }
@@ -501,13 +502,13 @@ export function parse(text, opts = {}) {
     return null;
   }
 
-  if (!toks.length) throw new ParseError('Rien à lire.', 0);
+  if (!toks.length) throw new ParseError(tr('Rien à lire.'), 0);
   const node = list();
   if (p < toks.length) {
     const t = toks[p];
-    if (isOp(t, ')')) fail('Il y a une parenthèse fermante de trop.');
-    if (isOp(t, ',')) fail('Pour un nombre décimal, écris la virgule entre deux chiffres.');
-    fail(`Je ne m'attendais pas à « ${t.s} ».`);
+    if (isOp(t, ')')) fail(tr('Il y a une parenthèse fermante de trop.'));
+    if (isOp(t, ',')) fail(tr('Pour un nombre décimal, écris la virgule entre deux chiffres.'));
+    fail(tr('Je ne m\'attendais pas à « {s} ».', { s: t.s }));
   }
   return node;
 }
