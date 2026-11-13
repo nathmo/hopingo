@@ -191,3 +191,49 @@ Three research rules are recognised by structure rather than by an operation: `n
 8. [Programme cycle 4 annex](https://www.education.gouv.fr/sites/default/files/document/Annexe%202%20%E2%80%93%20Programme%20de%20math%C3%A9matiques%20pour%20le%20cycle%204-480716.pdf) and [rollout note](https://ent2d.ac-bordeaux.fr/disciplines/mathematiques/publication-du-nouveau-programme-cycle-4/)
 9. [Whole-number bias and fraction error classes, seventh grade](https://journal-fkip.unsika.ac.id/index.php/radian/article/download/13406/5363/40272)
 10. [Frequent fraction errors, CRPE](https://www.pass-education.fr/quelles-sont-les-erreurs-frequentes-en-lien-avec-les-fractions-ou-les-nombres-decimaux-crpe/)
+
+## Physics: energy, power and the 6-step method
+
+Added with the physics units (docs/plan-physique.md). The families follow the error codes of the class diagnostic: **U** unit not converted or wrong, **F** wrong formula, **A** right formula but isolation failed, plus estimation and ranges. Most rules come from that classroom (tag E, to be checked by the teacher); three are documented misconceptions (tag R). Rules: `js/content/physique/rules.js`, plus `rules-*.js` per unit.
+
+| Rule | Wrong → correct | Tag | Skill |
+|---|---|---|---|
+| `ph_not_si` | t = 3 min used as 3 (180 s) | E | ph-si |
+| `ph_gram_as_kg` | 450 g → m = 450 (0,45 kg) | E | ph-si |
+| `ph_kmh_not_converted` | v = 72 km/h used as 72 (20 m/s) | E | ph-conv-chain |
+| `ph_wh_forget_3600` | 500 Wh = 500 J (1,8·10⁶ J) | E | ph-elec-energy |
+| `ph_deltaT_add_273` | ΔT = 80 °C = 353 K (80 K) | E | ph-deltaT |
+| `ph_minutes_decimal` | 1 h 30 = 1,30 h (1,5 h) | E | ph-si |
+| `ph_ec_forget_half` | E_c = m v² (½ m v²) | E | ph-ec |
+| `ph_ec_forget_square` | E_c = ½ m v (½ m v²) | E | ph-ec |
+| `ph_power_times` | P = E·t (E/t) | E | ph-power |
+| `ph_elec_divide` | P = U/I (U·I) | E | ph-elec-power |
+| `ph_heat_forget_mass` | E = c ΔT (m c ΔT) | E | ph-heat |
+| `ph_density_inverted` | ρ = V/m (m/V) | E | ph-density |
+| `ph_efficiency_inverted` | E_f = η E_u (E_u/η) | E | ph-efficiency |
+| `ph_mix_average` | 1 kg at 90 °C + 4 kg at 20 °C → 55 °C (34 °C) | R [P2] | ph-mix |
+| `ph_latent_temperature` | the melting ice warms up (stays at 0 °C) | R [P3] | ph-latent |
+| `ph_heavier_faster` | the heavier sled arrives faster (same speed) | R [P1] | ph-conservation |
+| `ph_decoy_formula` | E = m c ΔT kept for a sled (no temperature in the statement) | E | ph6-trier |
+| `ph_needed_removed` | E = m g h removed (it gives the bridge E) | E | ph6-chemin |
+| `ph_bridge_missed` | E marked as given (it is the bridge) | E | ph6-chemin |
+| `ph_iso_flip` | h = g/(c ΔT) (c ΔT/g) | E | ph-isolate |
+| `ph_forget_sqrt` | v = 2 g h (√(2 g h)) | E | ph-isolate |
+| `ph_numbers_in_algebra` | h = 3500·80/1,6 at step 3 (letters only) | E | ph6-algebre |
+| `ph_not_simplified` | h = m c ΔT/(m g) (c ΔT/g) | E | ph6-algebre |
+| `ph_units_lie` | « [v] = m/s ✓ » for v = 2 g h | E | ph6-unites |
+| `ph_estimate_power10` | 3500 × 80 ≈ 30 000 (300 000) | E | ph-estimate |
+| `ph_verdict_ignored` | estimate 2·10⁵, result 2·10³ called coherent | E | ph6-verdict |
+| `ph_too_many_digits` | h = 175 239,826 m (1,8·10⁵ m) | E | rg-digits |
+| `rg_same_ends` | v_min = d_min/t_min (d_min/t_max) | E | rg-ends |
+| `rg_conclude_middle` | 1,02 ± 0,08 > 1,00, so it sinks (cannot conclude) | E | rg-conclude |
+| `rg_percent_absolute` | ± 1 g better than ± 5 mL (compare 0,6 % and 2,8 %) | E | rg-percent |
+| `rg_half_width` | 400 ± 20 → 400 to 420 (380 to 420) | E | rg-read |
+
+How the 6-step problem catches them: steps 1 and 2 answer at once (a decoy tapped, a needed formula removed, a letter in the wrong colour); algebra lines are checked on random situations where every formula of the problem holds, so any correct rearrangement is accepted and a wrong one is caught whatever its form; step 4 computes the unit of the student's own expression; step 6 computes its value, so a wrong algebra shows up as an incoherent result.
+
+Sources (physics):
+
+- P1. I. A. Halloun, D. Hestenes, « Common sense concepts about motion », *American Journal of Physics* 53 (1985) 1056.
+- P2. R. Stavy, B. Berkovitz, « Cognitive conflict as a basis for teaching quantitative aspects of the concept of temperature », *Science Education* 64 (1980) 679.
+- P3. G. Erickson, A. Tiberghien, « Heat and temperature », in R. Driver, E. Guesne, A. Tiberghien (eds), *Children's Ideas in Science*, Open University Press, 1985.

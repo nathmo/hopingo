@@ -34,7 +34,7 @@ export const PHYS_RULES = [
   R('ph_wh_forget_3600', 'ph_units', 'E', 'ph-elec-energy', 'ph-conv-chain',
     t('Wh pris pour des joules'), ['500 Wh = 500 J', '500 Wh = 1 800 000 J'],
     () => t('1 Wh, c\'est 1 W pendant une heure : 1 J/s × 3600 s = 3600 J. Les Wh se multiplient par 3600 pour passer en joules.')),
-  R('ph_deltaT_add_273', 'ph_units', 'R', 'ph-deltaT', 'ph-deltaT',
+  R('ph_deltaT_add_273', 'ph_units', 'E', 'ph-deltaT', 'ph-deltaT',
     t('273 ajouté à un écart de température'), ['ΔT = 80 °C = 353 K', 'ΔT = 80 °C = 80 K'],
     () => t('On ajoute 273 pour passer d\'une température en °C à une température en K. Mais un écart de 1 °C est un écart de 1 K : un ΔT ne change pas.')),
   R('ph_minutes_decimal', 'ph_units', 'E', 'ph-si', 'u-time',
