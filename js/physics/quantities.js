@@ -66,3 +66,12 @@ export function symText(sym) {
   if (!sub) return base;
   return [...sub].every((c) => SUBS[c]) ? base + [...sub].map((c) => SUBS[c]).join('') : `${base}_${sub}`;
 }
+
+// A symbol of a problem may carry its own subscript (m_eau, T_1): it has
+// the unit of its base letter, unless it is in the table.
+export function quantityOf(sym) {
+  if (QUANTITIES[sym]) return QUANTITIES[sym];
+  const base = String(sym).split('_')[0];
+  return QUANTITIES[base] ? { ...QUANTITIES[base], sym } : null;
+}
+export const dimsOf = (symbols) => Object.fromEntries(symbols.map((s) => [s, quantityOf(s)?.d]).filter(([, d]) => d));

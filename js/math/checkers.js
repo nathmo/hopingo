@@ -5,6 +5,7 @@
 // Result: {kind: 'done'} | {kind: 'stay', message} | {kind: 'wrong', rule?}
 
 import { parseAlg, tryParseAlg, equivalent, isReducedForm, factoredProblem, evalAt, varsIn } from './algebra.js';
+import { checkPhys } from '../physics/checker.js';
 
 const isPrime = (n) => {
   if (n < 2) return false;
@@ -212,4 +213,6 @@ export const CHECKERS = {
   primes: checkPrimes, surd: checkSurd, rounded: checkRounded, alg: checkAlg,
   solset: checkSolset, system: checkSystem, isolate: checkIsolate,
   paramset: checkParamset, eqzero: checkEqZero,
+  // Physics: a rounded number (js/physics/checker.js).
+  phys: checkPhys,
 };
