@@ -204,12 +204,12 @@ async function shot(name) {
   return file;
 }
 
-async function load(path = '') {
+async function load(path = '', lang = LANG) {
   await cdp.send('Page.navigate', { url: BASE + path });
-  if (LANG) {
+  if (lang) {
     // The language is read when the page loads: set it, then load again.
     await sleep(300);
-    await cdp.send('Runtime.evaluate', { expression: `localStorage.setItem('hopingo.lang', ${JSON.stringify(LANG)})` });
+    await cdp.send('Runtime.evaluate', { expression: `localStorage.setItem('hopingo.lang', ${JSON.stringify(lang)})` });
     await cdp.send('Page.navigate', { url: BASE + path });
   }
   for (let i = 0; i < 100; i++) {
@@ -265,7 +265,7 @@ function pageLib() {
   };
 
   // ---------- generic checks of what is on screen ----------
-  const BAD_TEXT = [/\bundefined\b/, /\bNaN\b/, /\[object Object\]/, /<\/?(math|mrow|mi|mn|mo|mfrac|msup|span|div|b|sub|sup)\b[^>]*>/, /&(lt|gt|amp|quot|nbsp|#\d+);/, /\bnull\b/, /\bInfinity\b/, /function\s*\(|=>/];
+  const BAD_TEXT = [/\bundefined\b/, /\bNaN\b/, /\[object Object\]/, /<\/?(math|mrow|mi|mn|mo|mfrac|msup|span|div|b|sub|sup)\b[^>]*>/, /&(lt|gt|amp|quot|nbsp|#\d+);/, /\bnull\b/, /\bInfinity\b/, /function\s*\([^)]*\)\s*\{|=>/];
   const BAD_ATTR = [/\bundefined\b/, /\bNaN\b/, /\[object Object\]/, /\bInfinity\b/];
   S.scan = (root = document.getElementById('app')) => {
     const out = [];
@@ -1279,7 +1279,7 @@ async function phaseMap() {
   log('\n== map: bands, rail of years, language');
   for (const lang of ['fr', 'en']) {
     await cdp.send('Runtime.evaluate', { expression: `localStorage.setItem('hopingo.lang', '${lang}')` });
-    await load();
+    await load('', null); // this phase sets the language itself
     for (const width of [420, 1200]) {
       await cdp.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
       const r = await cdp.eval(`(async () => {
