@@ -176,7 +176,9 @@ export function keysForItem(item, base = baseKeysOf(item)) {
   const have = new Set(tabs.flatMap((t) => t.keys));
   const missing = [];
   const add = (k) => { if (k && !have.has(k) && !missing.includes(k)) missing.push(k); };
-  for (const k of promptKeys(item.prompt)) if (!(k === '√' && have.has('√('))) add(k);
+  // Physics items build their own keypad: a symbol like E_c is one key, not E and c.
+  const physics = String(item.checker || '').startsWith('phys');
+  if (!physics) for (const k of promptKeys(item.prompt)) if (!(k === '√' && have.has('√('))) add(k);
   if (isAlgebraic(item)) for (const k of ['frac', '^', '(', ')']) add(k);
   if (isAlgebraic(item) && !have.has('√(')) add('√');
   for (const t of typedTexts(item)) for (const k of planKeys(t, [...have, ...missing]).missing) add(k);

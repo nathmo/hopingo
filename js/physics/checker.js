@@ -4,7 +4,8 @@
 // Too few significant figures (« 2·10^5 » when two are asked) is sent back.
 //
 // Item fields: value (the exact answer, in the unit of the suffix),
-// minSig (default 2), physTraps [{value, rule}], unitTraps.
+// minSig (default 2), physTraps [{value, rule}], factor (an estimate: right
+// within that factor).
 
 import { t } from '../i18n.js';
 import { tryParse, isolated, symbolsIn, evaluate, numbersIn, parse as parsePhys } from './expr.js';
@@ -34,6 +35,8 @@ export function checkPhys(item, raw) {
   if (!r) return { kind: 'stay', message: t('Écris un nombre, par exemple 1,8 ou 1,8·10^5.') };
   const exact = item.value;
   const minSig = item.minSig ?? 2;
+  // An estimate (item.factor): right within that factor, any precision.
+  if (item.factor && r.v > 0 && exact > 0 && Math.max(r.v / exact, exact / r.v) <= item.factor) return { kind: 'done' };
   // Within half of the last digit written, or within 0,5 % (more digits).
   const ok = Math.abs(r.v - exact) <= r.ulp / 2 + 1e-9 * Math.abs(exact) || near(r.v, exact, 0.005);
   if (ok) {
