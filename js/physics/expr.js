@@ -47,6 +47,8 @@ export function tokenize(src, symbols) {
     if (c.length > 1) { flush(); toks.push(...tokenize([...c], symbols)); continue; }
     if (c === 'π') { flush(); toks.push({ k: 'num', v: Math.PI, s: 'π' }); continue; }
     if (isLetter(c)) { run += c; continue; }
+    // A digit right after « _ » is a subscript (m_1).
+    if (/[0-9]/.test(c) && /_[0-9]*$/.test(run)) { run += c; continue; }
     flush();
     if (c === ' ') continue;
     if (/[0-9]/.test(c)) {

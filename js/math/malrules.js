@@ -16,6 +16,7 @@
 
 import { Q, lcm } from './rational.js';
 import { CAS_RULES } from '../cas/rules/index.js';
+import { PHYS_RULES, PHYS_FAMILIES } from '../content/physique/rules.js';
 
 export const FAMILIES = {
   whole: {
@@ -1238,7 +1239,9 @@ const SCHOOL_RULES = [
 
 
 // The university traps (js/cas/rules) share the catalogue.
-export const RULES = [...SCHOOL_RULES, ...CAS_RULES];
+// Physics traps and their families (js/content/physique/rules.js).
+Object.assign(FAMILIES, PHYS_FAMILIES);
+export const RULES = [...SCHOOL_RULES, ...CAS_RULES, ...PHYS_RULES];
 
 export const RULE_BY_ID = Object.fromEntries(RULES.map((r) => [r.id, r]));
 

@@ -29,13 +29,20 @@ import uni14 from './uni-14.js';
 import uni15 from './uni-15.js';
 import uni16 from './uni-16.js';
 import uni17 from './uni-17.js';
+import physique from './physique.js';
+import physiqueOutils from './physique-outils.js';
+import physiqueEnergie from './physique-energie.js';
+import physiqueIncertitudes from './physique-incertitudes.js';
+import skillsPhysique from './skills-physique.js';
+
+const PHYS = [physique, physiqueOutils, physiqueEnergie, physiqueIncertitudes];
 
 // Texts of questions, corrections and screens: their own parts first, so a
 // short word (« Simplifier ») reads as an instruction (Simplify).
-const PARTS = [uiShell, uiScreens, uiItems, trapsSchool, genSchool1, genSchool2, uni1, uni2, uni3, uni4, uni5, uni6, uni7, uni8, uni9, uni10, uni11, uni12, uni13, uni14, uni15, uni16, uni17, skillsSchool, skillsUni1, skillsUni2, skillsUni3];
+const PARTS = [uiShell, uiScreens, uiItems, trapsSchool, genSchool1, genSchool2, uni1, uni2, uni3, uni4, uni5, uni6, uni7, uni8, uni9, uni10, uni11, uni12, uni13, uni14, uni15, uni16, uni17, ...PHYS, skillsSchool, skillsUni1, skillsUni2, skillsUni3, skillsPhysique];
 // Texts of the skill catalogue (titles, intro cards): its parts first, so
 // the same word reads as a title (Simplifying). Used by localize().
-const CATALOG_PARTS = [skillsSchool, skillsUni1, skillsUni2, skillsUni3, uiShell, uiScreens, uiItems, trapsSchool, genSchool1, genSchool2, uni1, uni2, uni3, uni4, uni5, uni6, uni7, uni8, uni9, uni10, uni11, uni12, uni13, uni14, uni15, uni16, uni17];
+const CATALOG_PARTS = [skillsSchool, skillsUni1, skillsUni2, skillsUni3, skillsPhysique, uiShell, uiScreens, uiItems, trapsSchool, genSchool1, genSchool2, uni1, uni2, uni3, uni4, uni5, uni6, uni7, uni8, uni9, uni10, uni11, uni12, uni13, uni14, uni15, uni16, uni17, ...PHYS];
 
 const merge = (parts) => {
   const out = {};

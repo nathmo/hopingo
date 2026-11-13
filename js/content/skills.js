@@ -9,6 +9,7 @@
 // path branches after mental arithmetic: see nextFocus in engine/learner.js.
 
 import { UNI_UNITS, UNI_SKILLS, UNBUILT } from './uni/index.js';
+import { PHYS_UNITS, PHYS_SKILLS } from './physique/index.js';
 
 export const UNITS = [
   { id: 'calcul', title: 'Calcul mental', color: '#f08c00', ready: true },
@@ -29,6 +30,7 @@ export const UNITS = [
   { id: 'unites', title: 'Grandeurs et unités', color: '#e67700', ready: true },
   { id: 'geometrie', title: 'Géométrie calculée', color: '#a61e4d', ready: true },
   { id: 'melanges', title: 'Calculs mélangés', color: '#c2255c', ready: true },
+  ...PHYS_UNITS,
   ...UNI_UNITS,
 ];
 
@@ -1284,7 +1286,7 @@ const MELANGES = [
 ];
 
 const UNIT_ORDER = UNITS.map((u) => u.id);
-const DECLARED = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...FONCTIONS, ...SECOND, ...RATIONNELLES, ...SYNTHESE, ...GEOMETRIE, ...MELANGES, ...UNI_SKILLS];
+const DECLARED = [...CALCUL, ...FRACTIONS, ...RELATIFS, ...ARITHMETIQUE, ...PROPORTION, ...UNITES, ...PUISSANCES, ...RACINES, ...ALGEBRE, ...FACTORISATION, ...EQUATIONS, ...FORMULES, ...FONCTIONS, ...SECOND, ...RATIONNELLES, ...SYNTHESE, ...GEOMETRIE, ...MELANGES, ...PHYS_SKILLS, ...UNI_SKILLS];
 
 // Prerequisites on skills of modules not built yet stand for built ones
 // (content/uni/index.js). The catalogue's list stays in `declaredPrereqs`.

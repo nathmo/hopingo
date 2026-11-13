@@ -14,13 +14,14 @@ import { GEN as EQUATIONS } from './equations.js';
 import { GEN as FONCTIONS } from './fonctions.js';
 import { GEN as SECONDDEGRE } from './seconddegre.js';
 import { UNI_GEN } from './uni/generators.js';
+import { PHYS_GEN } from './physique/index.js';
 import { segmentsOf, templateOf } from '../judges/lines.js';
 import { readWith, textWith } from '../judges/index.js';
 import { parse as parseCas } from '../cas/parse.js';
 import { toReadable } from '../cas/print.js';
 import { asProblem } from './uni/kit-problem.js';
 
-const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS, ...FONCTIONS, ...SECONDDEGRE, ...UNI_GEN };
+const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS, ...FONCTIONS, ...SECONDDEGRE, ...PHYS_GEN, ...UNI_GEN };
 
 // The profile is optional: fact skills use it to pick from the student's
 // fact memory. opts.exam asks for an exam variant (spec §6).
