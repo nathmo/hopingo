@@ -5,11 +5,7 @@ import { h, bubble } from '../dom.js';
 import { currentStreak } from '../../engine/rewards.js';
 import { members, weeklyRanking, groupFlame, weeklyQuest, MAX_SAVES, WEEKS_PER_SAVE } from '../../engine/social.js';
 import { topBar, bottomNav } from './common.js';
-
-// Stand-in for t() of js/i18n.js (same signature) until the translation work
-// is merged; then import { t, tn } from '../../i18n.js' instead.
-const t = (s, vars = {}) => s.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
-const tn = (n, one, many, vars = {}) => t(Math.abs(n) >= 2 ? many : one, { n, ...vars });
+import { t, tn } from '../../i18n.js';
 
 const LAST = {
   grew: () => t('La semaine dernière, tout le monde a joué : la flamme grandit !'),
