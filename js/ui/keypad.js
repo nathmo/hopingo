@@ -450,8 +450,16 @@ const CARET = '<span class="caret"></span>';
 // How some chunks are drawn while typing (step U2).
 const CHUNK_SHOW = { 'int(': '∫(', 'bracket(': '[F](', 'lim(': 'lim(' };
 
+// Keys of several characters drawn as HTML, both on the key and in the
+// line (physics symbols: E_p is E with p below). See registerChunks.
+const CHUNK_HTML = {};
+export function registerChunks(map) {
+  for (const [k, v] of Object.entries(map)) { CHUNK_HTML[k] = v; LABEL[k] = v; }
+}
+
 function charHtml(chars, i, end = i + 1) {
   const c = chars[i];
+  if (c.length > 1 && CHUNK_HTML[c]) return `<span class="m-chunk" data-i="${i}">${CHUNK_HTML[c]}</span>`;
   if (c.length > 1) return `<span class="m-fn" data-i="${i}">${esc(CHUNK_SHOW[c] ?? c)}</span>`;
   if (c === "'") return `<span class="m-op" data-i="${i}">′</span>`;
   if (isLetter(c)) return `<i class="m-var" data-i="${end - 1}">${esc(chars.slice(i, end).join(''))}</i>`;

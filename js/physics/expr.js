@@ -215,26 +215,28 @@ export function isolated(n) {
 
 const numHtml = (n) => (n.s === 'π' ? 'π' : String(n.s ?? n.v).replace('.', ','));
 const PREC = { eq: 0, add: 1, sub: 1, neg: 2, mul: 3, div: 3, pow: 5, sqrt: 6, num: 6, sym: 6, paren: 6 };
-const wrap = (n, min) => ((PREC[n.t] ?? 6) < min ? `<span class="m-par">(</span>${toHtml(n)}<span class="m-par">)</span>` : toHtml(n));
-const box = (n) => toHtml(n.t === 'paren' ? n.a : n);
+const wrap = (n, min, o) => ((PREC[n.t] ?? 6) < min ? `<span class="m-par">(</span>${toHtml(n, o)}<span class="m-par">)</span>` : toHtml(n, o));
+const box = (n, o) => toHtml(n.t === 'paren' ? n.a : n, o);
 
-export function toHtml(n) {
+// o.sym(symbol, html) may wrap each letter (the highlighter of step 2).
+export function toHtml(n, o = {}) {
+  const R = (x) => toHtml(x, o);
   switch (n.t) {
     case 'num': return `<span>${numHtml(n)}</span>`;
-    case 'sym': return symHtml(n.s);
-    case 'paren': return `<span class="m-par">(</span>${toHtml(n.a)}<span class="m-par">)</span>`;
-    case 'neg': return `<span class="m-op">−</span>${wrap(n.a, 3)}`;
-    case 'add': return `${toHtml(n.a)}<span class="m-op">+</span>${wrap(n.b, 2)}`;
-    case 'sub': return `${toHtml(n.a)}<span class="m-op">−</span>${wrap(n.b, 2)}`;
+    case 'sym': return o.sym ? o.sym(n.s, symHtml(n.s)) : symHtml(n.s);
+    case 'paren': return `<span class="m-par">(</span>${R(n.a)}<span class="m-par">)</span>`;
+    case 'neg': return `<span class="m-op">−</span>${wrap(n.a, 3, o)}`;
+    case 'add': return `${R(n.a)}<span class="m-op">+</span>${wrap(n.b, 2, o)}`;
+    case 'sub': return `${R(n.a)}<span class="m-op">−</span>${wrap(n.b, 2, o)}`;
     case 'mul': {
       const num = (x) => x.t === 'num' || (x.t === 'pow' && x.a.t === 'num');
-      const dot = !n.implicit || (num(n.b)) ? '<span class="m-op">·</span>' : '<span class="m-thin"></span>';
-      return `${wrap(n.a, 3)}${dot}${wrap(n.b, 3)}`;
+      const dot = !n.implicit || num(n.b) ? '<span class="m-op">·</span>' : '<span class="m-thin"></span>';
+      return `${wrap(n.a, 3, o)}${dot}${wrap(n.b, 3, o)}`;
     }
-    case 'div': return `<span class="m-frac"><span class="m-n">${box(n.a)}</span><span class="m-d">${box(n.b)}</span></span>`;
-    case 'pow': return `${wrap(n.a, 6)}<sup class="m-sup">${box(n.b)}</sup>`;
-    case 'sqrt': return `<span class="m-sqrt"><span class="m-rad">√</span><span class="m-under">${box(n.a)}</span></span>`;
-    case 'eq': return n.sides.map(toHtml).join('<span class="m-op">=</span>');
+    case 'div': return `<span class="m-frac"><span class="m-n">${box(n.a, o)}</span><span class="m-d">${box(n.b, o)}</span></span>`;
+    case 'pow': return `${wrap(n.a, 6, o)}<sup class="m-sup">${box(n.b, o)}</sup>`;
+    case 'sqrt': return `<span class="m-sqrt"><span class="m-rad">√</span><span class="m-under">${box(n.a, o)}</span></span>`;
+    case 'eq': return n.sides.map(R).join('<span class="m-op">=</span>');
     default: return '';
   }
 }

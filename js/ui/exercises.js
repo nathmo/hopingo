@@ -36,6 +36,7 @@ import { mountProblem } from './problem.js';
 import { mountDomain } from './domain.js';
 import { mountCode } from './code-input.js';
 import { mountReadtable } from './readtable.js';
+import { mountRecipe } from './recipe.js';
 
 const M = (s) => `<span class="m">${renderText(s)}</span>`;
 
@@ -106,6 +107,8 @@ MOUNTS.domain = (item, ctx, body) => mountDomain(item, ctx, body);
 // Step U9: a Python program with holes, a table to read.
 MOUNTS.code = (item, ctx, body) => mountCode(item, ctx, body);
 MOUNTS.readtable = (item, ctx, body) => mountReadtable(item, ctx, body);
+// Physics: the 6-step problem (js/ui/recipe.js).
+MOUNTS.recipe = (item, ctx, body) => mountRecipe(item, ctx, body, { explainRule, solutionHtml });
 
 // ---------- multiple choice ----------
 
