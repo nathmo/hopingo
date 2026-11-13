@@ -128,7 +128,7 @@ export default [
       F: { min: 150, max: 600, step: 50, units: ['N'] },
       d: { min: 50, max: 500, step: 10, units: ['m', 'km'] },
       t: { min: 30, max: 1200, step: 10, units: ['s', 'min'] },
-      P: { min: 100, max: 2000, step: 50, units: ['W'] },
+      P: { min: 200, max: 900, step: 50, units: ['W'] },
     },
     cases: [
       {
