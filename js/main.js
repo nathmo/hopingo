@@ -11,6 +11,7 @@ import { trapsScreen } from './ui/screens/traps.js';
 import { progressScreen } from './ui/screens/progress.js';
 import { settingsScreen } from './ui/screens/settings.js';
 import { examScreen } from './ui/screens/exam.js';
+import { boardScreen } from './ui/screens/board.js';
 
 const SCREENS = {
   profiles: profilesScreen,
@@ -24,6 +25,8 @@ const SCREENS = {
   settings: settingsScreen,
   // Step U3: the mock exams.
   exam: examScreen,
+  // The class on this computer: ranking and group flame.
+  board: boardScreen,
 };
 
 const root = document.getElementById('app');

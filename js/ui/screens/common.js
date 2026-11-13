@@ -33,6 +33,7 @@ export function bottomNav(app, current) {
     item('home', '🧭', 'Chemin'),
     item('traps', '🪤', 'Pièges'),
     item('progress', '📈', 'Progrès'),
+    app.store.listProfiles().length > 1 ? item('board', '🏆', 'Classe') : null,
     item('settings', '⚙️', 'Réglages'));
 }
 
