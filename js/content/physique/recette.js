@@ -18,7 +18,7 @@ import { t } from '../../i18n.js';
 import { TEMPLATES, drawProblem } from './problems.js';
 import { F, nice, qty, sci, fix } from './format.js';
 import { parse, toHtml, evaluate, dimension, symbolsIn } from '../../physics/expr.js';
-import { formatDim } from '../../physics/units.js';
+import { formatDim, dimEq } from '../../physics/units.js';
 import { dimsOf, quantityOf } from '../../physics/quantities.js';
 import { valueOf } from '../../physics/recipe.js';
 
@@ -39,7 +39,9 @@ export function estimateOf(pb, expr) {
 // A wrong expression close to the right one (for steps shown with a
 // mistake): the root dropped, a division turned into a product, or a
 // factor dropped. → {node, rule}
-export function mutate(node, rng) {
+// prefer(node) → true for the mistakes to choose first (those the units
+// reveal, for step 4).
+export function mutate(node, rng, prefer = null) {
   const options = [];
   if (node.t === 'sqrt') options.push({ node: node.a.t === 'paren' ? node.a.a : node.a, rule: 'ph_forget_sqrt' });
   const divToMul = (n) => {
@@ -54,6 +56,8 @@ export function mutate(node, rng) {
   const m = divToMul(node);
   if (m) options.push({ node: m, rule: 'ph_iso_flip' });
   if (node.t === 'mul') options.push({ node: node.a, rule: null });
+  const best = prefer ? options.filter((o) => prefer(o.node)) : [];
+  if (best.length) return rng.pick(best);
   return options.length ? rng.pick(options) : { node: { t: 'mul', a: node, b: { t: 'num', v: 2, s: '2' } }, rule: null };
 }
 
@@ -134,7 +138,11 @@ function shownWork(pb, rng, { wrongExpr = 0, wrongEstimate = 0 } = {}) {
   let expr = right;
   let exprRule = null;
   const exprRight = !rng.chance(wrongExpr);
-  if (!exprRight) ({ node: expr, rule: exprRule } = mutate(right, rng));
+  // A wrong expression that its units betray, when there is one.
+  const dims = dimsOf(pb.symbols);
+  const want = dimension(right, dims);
+  const betrayed = (n) => { try { return !dimEq(dimension(n, dims), want); } catch { return true; } };
+  if (!exprRight) ({ node: expr, rule: exprRule } = mutate(right, rng, betrayed));
   const v = valueOf(pb, expr);
   let estimate = round1(estimateOf(pb, expr));
   const estimateRight = !rng.chance(wrongEstimate);

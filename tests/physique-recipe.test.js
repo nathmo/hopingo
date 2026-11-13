@@ -9,7 +9,7 @@ import {
   valueOf, judgeVerdict, minEnds,
 } from '../js/physics/recipe.js';
 import { parse } from '../js/physics/expr.js';
-import { formatDim } from '../js/physics/units.js';
+import { formatDim, dimEq } from '../js/physics/units.js';
 import { estimateOf, GEN, mutate } from '../js/content/physique/recette.js';
 import { generate } from '../js/content/generators.js';
 import { RULE_BY_ID } from '../js/math/malrules.js';
@@ -52,9 +52,10 @@ test('the reference work passes every step, on every case', () => {
       assert.equal(judgeUnitLine(dim.d, formatDim(dim.d)).kind, 'ok', `${where} unit ${formatDim(dim.d)}`);
       assert.ok(judgeUnitVerdict(pb, dim.d, true).ok, where);
       // A broken expression: its units betray it (or it is not even a sum of like units).
-      const bad = mutate(expr, rng);
+      const betrayed = (n) => { const x = dimOfExpr(pb, n); return !x.d || !dimEq(x.d, dim.d); };
+      const bad = mutate(expr, rng, betrayed);
       const badDim = dimOfExpr(pb, bad.node);
-      if (badDim.d && bad.rule) assert.ok(!judgeUnitVerdict(pb, badDim.d, true).ok, `${where}: ${bad.rule} not caught by units`);
+      if (badDim.d && bad.rule && betrayed(bad.node)) assert.ok(!judgeUnitVerdict(pb, badDim.d, true).ok, `${where}: ${bad.rule} not caught by units`);
       // 5 and 6: the estimate of the correction is coherent with the value.
       const v = valueOf(pb, expr);
       const est = Number(estimateOf(pb, expr).toPrecision(1));
