@@ -2,6 +2,7 @@
 // affine functions, from expression to graph and back, intersections.
 
 import { answerItem, mcqItem } from './items.js';
+import { t } from '../i18n.js';
 import { algHtml } from '../math/algebra.js';
 import { graphSvg } from '../math/graph.js';
 
@@ -29,14 +30,14 @@ GEN['fn-read'] = (level, rng) => {
   do { x = rng.int(-3, 3); } while (Math.abs(a * x + b) > 5);
   const y = a * x + b;
   if (level <= 3) {
-    return answerItem('fn-read', level, `Voici le graphique d'une fonction f. Que vaut f(${show(x)}) ?${fig({ lines: [{ a, b }] })}`, String(y), {
+    return answerItem('fn-read', level, `${t('Voici le graphique d\'une fonction f. Que vaut f({x}) ?', { x: show(x) })}${fig({ lines: [{ a, b }] })}`, String(y), {
       keys: 'rel', signed: true, traps: y !== x ? [{ value: [x, 1], rule: 'graph_xy_swap' }] : [],
-      solution: [{ html: '', note: `On part de x = ${show(x)} sur l'axe horizontal, on monte (ou descend) jusqu'à la droite, puis on lit la hauteur : ${show(y)}.` }], key: `r:${a}:${b}:${x}`,
+      solution: [{ html: '', note: t('On part de x = {x} sur l\'axe horizontal, on monte (ou descend) jusqu\'à la droite, puis on lit la hauteur : {y}.', { x: show(x), y: show(y) }) }], key: `r:${a}:${b}:${x}`,
     });
   }
-  return answerItem('fn-read', level, `Voici le graphique d'une fonction f. Pour quel x a-t-on f(x) = ${show(y)} ?${fig({ lines: [{ a, b }] })}`, String(x), {
+  return answerItem('fn-read', level, `${t('Voici le graphique d\'une fonction f. Pour quel x a-t-on f(x) = {y} ?', { y: show(y) })}${fig({ lines: [{ a, b }] })}`, String(x), {
     keys: 'rel', signed: true, traps: y !== x ? [{ value: [y, 1], rule: 'graph_xy_swap' }] : [],
-    solution: [{ html: '', note: `On part de y = ${show(y)} sur l'axe vertical, on va jusqu'à la droite, puis on descend lire x : ${show(x)}.` }], key: `x:${a}:${b}:${y}`,
+    solution: [{ html: '', note: t('On part de y = {y} sur l\'axe vertical, on va jusqu\'à la droite, puis on descend lire x : {x}.', { x: show(x), y: show(y) }) }], key: `x:${a}:${b}:${y}`,
   });
 };
 
@@ -48,18 +49,18 @@ GEN['fn-table'] = (level, rng) => {
     const { a, b } = affine(rng, { maxA: 5 });
     const expr = lin(a, b);
     const num = `${a}×${x < 0 ? `(${x})` : x}${b < 0 ? b : `+${b}`}`;
-    return answerItem('fn-table', level, `f(x) = ${algHtml(expr)}. Calcule f(${show(x)}).`, String(a * x + b), {
+    return answerItem('fn-table', level, t('f(x) = {e}. Calcule f({x}).', { e: algHtml(expr), x: show(x) }), String(a * x + b), {
       keys: 'rel', signed: true, tree: num, key: `t:${expr}:${x}`,
-      solution: [{ math: num, note: `On remplace x par ${show(x)}.` }],
+      solution: [{ math: num, note: t('On remplace x par {x}.', { x: show(x) }) }],
     });
   }
   const c = nz(rng, -5, 5);
   const k = level === 4 ? 1 : rng.int(2, 3);
   const expr = `${k === 1 ? '' : k}x^2${c < 0 ? c : `+${c}`}`;
   const num = `${k}×(${x})^2${c < 0 ? c : `+${c}`}`;
-  return answerItem('fn-table', level, `f(x) = ${algHtml(expr)}. Calcule f(${show(x)}).`, String(k * x * x + c), {
+  return answerItem('fn-table', level, t('f(x) = {e}. Calcule f({x}).', { e: algHtml(expr), x: show(x) }), String(k * x * x + c), {
     keys: 'rel', signed: true, tree: num, key: `q:${expr}:${x}`,
-    solution: [{ math: num, note: `On remplace x par (${show(x)}) : le carré d'un nombre négatif est positif.` }],
+    solution: [{ math: num, note: t('On remplace x par ({x}) : le carré d\'un nombre négatif est positif.', { x: show(x) }) }],
   });
 };
 
@@ -76,9 +77,9 @@ GEN['fn-point'] = (level, rng) => {
   if (onLine && Math.abs(py) > 5) return GEN['fn-point'](level, rng);
   return {
     skill: 'fn-point', level, type: 'graphpoint',
-    prompt: onLine ? `Place le point de la droite d'équation ${algHtml(`y=${lin(a, b)}`)} qui a pour abscisse x = ${show(px)}.` : `Place le point A(${show(px)} ; ${show(py)}).`,
+    prompt: onLine ? t('Place le point de la droite d\'équation {e} qui a pour abscisse x = {x}.', { e: algHtml(`y=${lin(a, b)}`), x: show(px) }) : t('Place le point A({x} ; {y}).', { x: show(px), y: show(py) }),
     grid: { xmin: -5, xmax: 5, ymin: -5, ymax: 5 }, target: [px, py],
-    baits: ['graph_xy_swap'], solution: [{ html: '', note: onLine ? `y = ${a} × ${show(px)} ${b < 0 ? '−' : '+'} ${Math.abs(b)} = ${show(py)}` : `D'abord x = ${show(px)} (horizontal), puis y = ${show(py)} (vertical).` }],
+    baits: ['graph_xy_swap'], solution: [{ html: '', note: onLine ? `y = ${a} × ${show(px)} ${b < 0 ? '−' : '+'} ${Math.abs(b)} = ${show(py)}` : t('D\'abord x = {x} (horizontal), puis y = {y} (vertical).', { x: show(px), y: show(py) }) }],
     expectedSec: 15, key: `fn-point:${px}:${py}:${onLine}`,
   };
 };
@@ -89,16 +90,16 @@ GEN['fn-linear'] = (level, rng) => {
   const a = level <= 2 ? rng.int(2, 4) : nz(rng, -3, 3);
   if (level <= 3) {
     const x = rng.pick([1, 2]);
-    return answerItem('fn-linear', level, `Ce graphique représente une fonction linéaire f(x) = a·x. Que vaut a ?${fig({ lines: [{ a, b: 0 }], points: [[x, a * x]] })}`, String(a), {
+    return answerItem('fn-linear', level, `${t('Ce graphique représente une fonction linéaire f(x) = a·x. Que vaut a ?')}${fig({ lines: [{ a, b: 0 }], points: [[x, a * x]] })}`, String(a), {
       keys: 'rel', signed: true, traps: a * x !== a ? [{ value: [a * x, 1], rule: 'slope_y_over_x' }] : [],
-      solution: [{ html: '', note: `La droite passe par (0 ; 0) et (${x} ; ${show(a * x)}) : a = ${show(a * x)} ÷ ${x} = ${show(a)}.` }], key: `l:${a}:${x}`,
+      solution: [{ html: '', note: t('La droite passe par (0 ; 0) et ({x} ; {y}) : a = {y} ÷ {x} = {a}.', { x, y: show(a * x), a: show(a) }) }], key: `l:${a}:${x}`,
     });
   }
   const x = rng.int(2, 5);
   const y = a * x;
-  return answerItem('fn-linear', level, `Une fonction linéaire vérifie f(${x}) = ${show(y)}. Que vaut f(${x + 1}) ?`, String(a * (x + 1)), {
+  return answerItem('fn-linear', level, t('Une fonction linéaire vérifie f({x}) = {y}. Que vaut f({x1}) ?', { x, y: show(y), x1: x + 1 }), String(a * (x + 1)), {
     keys: 'rel', signed: true, traps: [{ value: [y + 1, 1], rule: 'additive_reasoning' }],
-    solution: [{ html: '', note: `a = ${show(y)} ÷ ${x} = ${show(a)}, donc f(${x + 1}) = ${show(a)} × ${x + 1} = ${show(a * (x + 1))}.` }], key: `p:${a}:${x}`,
+    solution: [{ html: '', note: t('a = {y} ÷ {x} = {a}, donc f({x1}) = {a} × {x1} = {v}.', { y: show(y), x, a: show(a), x1: x + 1, v: show(a * (x + 1)) }) }], key: `p:${a}:${x}`,
   });
 };
 
@@ -108,9 +109,9 @@ GEN['fn-affine'] = (level, rng) => {
   const { a, b } = affine(rng, { maxA: 3 });
   if (level <= 2) {
     const which = level === 1 ? 'b' : 'a';
-    return answerItem('fn-affine', level, `Pour f(x) = ${algHtml(lin(a, b))}, que vaut ${which === 'a' ? 'la pente a' : 'l\'ordonnée à l\'origine b'} ?`, String(which === 'a' ? a : b), {
+    return answerItem('fn-affine', level, which === 'a' ? t('Pour f(x) = {e}, que vaut la pente a ?', { e: algHtml(lin(a, b)) }) : t('Pour f(x) = {e}, que vaut l\'ordonnée à l\'origine b ?', { e: algHtml(lin(a, b)) }), String(which === 'a' ? a : b), {
       keys: 'rel', signed: true, traps: [{ value: [which === 'a' ? b : a, 1], rule: 'slope_intercept_swap' }],
-      solution: [{ html: algHtml(`f(x)=${lin(a, b)}`), note: 'Dans f(x) = ax + b, a est le nombre devant x (la pente) et b le nombre seul (là où la droite coupe l\'axe vertical).' }], key: `${which}:${a}:${b}`,
+      solution: [{ html: algHtml(`f(x)=${lin(a, b)}`), note: t('Dans f(x) = ax + b, a est le nombre devant x (la pente) et b le nombre seul (là où la droite coupe l\'axe vertical).') }], key: `${which}:${a}:${b}`,
     });
   }
   // Which graph? The wrong graphs swap the slope and intercept, or the sign of the slope.
@@ -120,8 +121,8 @@ GEN['fn-affine'] = (level, rng) => {
     { html: graphSvg({ lines: [{ a: -a, b }], small: true }), correct: false, rule: 'slope_sign' },
     { html: graphSvg({ lines: [{ a, b: -b }], small: true }), correct: false, rule: 'intercept_sign' },
   ].filter((o, i, all) => all.findIndex((p) => p.html === o.html) === i);
-  return mcqItem('fn-affine', level, `Quel graphique représente f(x) = ${algHtml(lin(a, b))} ?`, options, rng, {
-    solution: [{ html: '', note: `La droite coupe l'axe vertical en ${show(b)} (b), et monte de ${show(a)} quand x augmente de 1 (a).` }], key: `g:${a}:${b}`, expectedSec: 20,
+  return mcqItem('fn-affine', level, t('Quel graphique représente f(x) = {e} ?', { e: algHtml(lin(a, b)) }), options, rng, {
+    solution: [{ html: '', note: t('La droite coupe l\'axe vertical en {b} (b), et monte de {a} quand x augmente de 1 (a).', { a: show(a), b: show(b) }) }], key: `g:${a}:${b}`, expectedSec: 20,
   });
 };
 
@@ -131,11 +132,11 @@ GEN['fn-from-graph'] = (level, rng) => {
   const { a, b } = affine(rng, { maxA: level <= 2 ? 2 : 3, linear: level === 1 });
   return {
     skill: 'fn-from-graph', level, type: 'answer',
-    prompt: `Écris l'expression de la fonction affine représentée : y = …${fig({ lines: [{ a, b }], points: [[0, b], [1, a + b]] })}`,
+    prompt: `${t('Écris l\'expression de la fonction affine représentée : y = …')}${fig({ lines: [{ a, b }], points: [[0, b], [1, a + b]] })}`,
     expected: `y=${lin(a, b)}`, form: 'any', exact: null, tree: null, traps: [], suffix: '', figure: null,
     keys: ['7', '8', '9', 'x', 'y', '=', '4', '5', '6', '+', '-', 'frac', '1', '2', '3', 'left', 'right', 'back', '', '0'],
     baits: ['slope_intercept_swap', 'slope_sign', 'slope_inverted'],
-    solution: [{ html: algHtml(`y=${lin(a, b)}`), note: `b = ${show(b)} (la droite coupe l'axe vertical en ${show(b)}) ; a = ${show(a)} (de x = 0 à x = 1, y change de ${show(a)}).` }],
+    solution: [{ html: algHtml(`y=${lin(a, b)}`), note: t('b = {b} (la droite coupe l\'axe vertical en {b}) ; a = {a} (de x = 0 à x = 1, y change de {a}).', { a: show(a), b: show(b) }) }],
     expectedSec: 45, key: `fg:${a}:${b}`,
     checker: 'isolate', variable: 'y', target: lin(a, b),
     isoTraps: [
@@ -162,10 +163,10 @@ GEN['fn-intersection'] = (level, rng) => {
     const graph = level <= 3;
     return {
       skill: 'fn-intersection', level, type: 'answer',
-      prompt: `Où se coupent les droites ${algHtml(`y=${lin(a1, b1)}`)} et ${algHtml(`y=${lin(a2, b2)}`)} ? Écris x = … ; y = …${graph ? fig({ lines: [{ a: a1, b: b1 }, { a: a2, b: b2 }] }) : ''}`,
+      prompt: `${t('Où se coupent les droites {d1} et {d2} ? Écris x = … ; y = …', { d1: algHtml(`y=${lin(a1, b1)}`), d2: algHtml(`y=${lin(a2, b2)}`) })}${graph ? fig({ lines: [{ a: a1, b: b1 }, { a: a2, b: b2 }] }) : ''}`,
       expected: `x=${x};y=${y}`, form: 'any', exact: null, tree: null, traps: [], keys: 'sys', suffix: '', figure: null,
       baits: ['system_one_equation', 'graph_xy_swap'],
-      solution: [{ html: algHtml(`${lin(a1, b1)}=${lin(a2, b2)}`), note: `Au point commun, les deux y sont égaux : on résout, x = ${show(x)}, puis y = ${show(y)}.` }],
+      solution: [{ html: algHtml(`${lin(a1, b1)}=${lin(a2, b2)}`), note: t('Au point commun, les deux y sont égaux : on résout, x = {x}, puis y = {y}.', { x: show(x), y: show(y) }) }],
       expectedSec: 60, key: `i:${a1}:${b1}:${a2}:${b2}`, start: { math: `y=${lin(a1, b1)};y=${lin(a2, b2)}` },
       checker: 'system', pair: [x, y], eqs: [[-a1, 1, b1], [-a2, 1, b2]],
       expectedHtml: `${algHtml(`x=${x}`)} ; ${algHtml(`y=${y}`)}`,

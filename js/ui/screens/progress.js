@@ -7,8 +7,10 @@ import { isAutomatic } from '../../engine/facts.js';
 import { stars, isUnlocked, isTester } from '../../engine/learner.js';
 import { BADGES, xpHistory, xpToday, currentStreak } from '../../engine/rewards.js';
 import { topBar, bottomNav, starRow } from './common.js';
+import { t } from '../../i18n.js';
 
-const DAYS = ['di', 'lu', 'ma', 'me', 'je', 've', 'sa'];
+// Short day names, Sunday first (Date.getDay order).
+const DAYS = t('di lu ma me je ve sa').split(' ');
 
 function xpChart(p) {
   const data = xpHistory(p, 14);
@@ -20,12 +22,12 @@ function xpChart(p) {
   const bars = data.map((d, i) => {
     const bh = ((H - 30) * d.xp) / max;
     const day = DAYS[new Date(`${d.day}T12:00:00`).getDay()];
-    return `<rect x="${i * bw + 3}" y="${H - 20 - bh}" width="${bw - 6}" height="${Math.max(bh, d.xp ? 2 : 0)}" rx="3" class="bar${d.xp >= p.dailyGoal ? ' met' : ''}"><title>${d.day} : ${d.xp} XP</title></rect>
+    return `<rect x="${i * bw + 3}" y="${H - 20 - bh}" width="${bw - 6}" height="${Math.max(bh, d.xp ? 2 : 0)}" rx="3" class="bar${d.xp >= p.dailyGoal ? ' met' : ''}"><title>${t('{day} : {xp} XP', { day: d.day, xp: d.xp })}</title></rect>
       <text x="${i * bw + bw / 2}" y="${H - 6}" class="bar-label">${day}</text>`;
   }).join('');
-  return html(`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="XP des 14 derniers jours">
+  return html(`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${t('XP des 14 derniers jours')}">
     <line x1="0" x2="${W}" y1="${goalY}" y2="${goalY}" class="goal-line"/>
-    <text x="${W - 2}" y="${goalY - 4}" class="goal-label" text-anchor="end">objectif ${p.dailyGoal}</text>
+    <text x="${W - 2}" y="${goalY - 4}" class="goal-label" text-anchor="end">${t('objectif {n}', { n: p.dailyGoal })}</text>
     ${bars}</svg>`);
 }
 
@@ -36,16 +38,16 @@ export function progressScreen(root, _args, app) {
   const mins = Math.round((p.stats.seconds % 3600) / 60);
   const mastered = SKILLS.filter((s) => p.skills[s.id]?.mastered).length;
   const main = h('main.page',
-    h('h1', 'Mes progrès'),
+    h('h1', t('Mes progrès')),
     h('div.tiles',
-      h('div.tile', h('small', 'XP total'), h('b', String(p.xp))),
-      h('div.tile', h('small', 'Aujourd\'hui'), h('b', `${xpToday(p)}/${p.dailyGoal}`)),
-      h('div.tile', h('small', 'Série'), h('b', `🔥 ${currentStreak(p).count}`), h('small', `record ${p.streak.best}`)),
-      h('div.tile', h('small', 'Compétences'), h('b', `👑 ${mastered}/${SKILLS.length}`)),
-      h('div.tile', h('small', 'Réussite'), h('b', `${acc} %`), h('small', `${p.stats.answers} réponses`)),
-      h('div.tile', h('small', 'Temps'), h('b', hours ? `${hours} h ${mins}` : `${mins} min`), h('small', `${p.stats.lessons} leçons`))),
-    h('section', h('h2', 'XP des 14 derniers jours'), xpChart(p)),
-    h('section', h('h2', 'Compétences'),
+      h('div.tile', h('small', t('XP total')), h('b', String(p.xp))),
+      h('div.tile', h('small', t('Aujourd\'hui')), h('b', `${xpToday(p)}/${p.dailyGoal}`)),
+      h('div.tile', h('small', t('Série')), h('b', `🔥 ${currentStreak(p).count}`), h('small', t('record {n}', { n: p.streak.best }))),
+      h('div.tile', h('small', t('Compétences')), h('b', `👑 ${mastered}/${SKILLS.length}`)),
+      h('div.tile', h('small', t('Réussite')), h('b', t('{n} %', { n: acc })), h('small', t('{n} réponses', { n: p.stats.answers }))),
+      h('div.tile', h('small', t('Temps')), h('b', hours ? t('{h} h {m}', { h: hours, m: mins }) : `${mins} min`), h('small', t('{n} leçons', { n: p.stats.lessons })))),
+    h('section', h('h2', t('XP des 14 derniers jours')), xpChart(p)),
+    h('section', h('h2', t('Compétences')),
       UNITS.map((u) => h('div.skill-unit',
         h('h3.skill-unit-title', { style: { '--unit': u.color } }, u.title),
         h('div.skill-list', unitSkills(u.id).map((s) => {
@@ -56,9 +58,9 @@ export function progressScreen(root, _args, app) {
             h('div.skill-main', h('b', s.title),
               s.facts ? factCount(p, s.id) : null,
               h('div.meter', h('div.meter-fill', { style: { width: `${Math.round((st?.p ?? 0) * 100)}%` } }))),
-            h('div.skill-side', starRow(stars(st)), st ? h('small', st.testedOut && !st.attempts ? 'test' : `niv. ${st.level}`) : null));
+            h('div.skill-side', starRow(stars(st)), st ? h('small', st.testedOut && !st.attempts ? 'test' : t('niv. {n}', { n: st.level })) : null));
         }))))),
-    h('section', h('h2', 'Succès'),
+    h('section', h('h2', t('Succès')),
       h('div.badges', BADGES.map((b) => h(`div.badge-card${p.badges[b.id] ? '.earned' : ''}`, h('span.badge-icon', p.badges[b.id] ? b.icon : '🔒'), h('b', b.name), h('small', b.desc))))));
   root.append(topBar(app), main, bottomNav(app, 'progress'));
 }
@@ -67,5 +69,5 @@ export function progressScreen(root, _args, app) {
 function factCount(p, skillId) {
   const keys = skillFacts(skillId);
   const n = keys.filter((k) => isAutomatic(p, k)).length;
-  return h('div.skill-facts', `${n} / ${keys.length} faits automatiques`);
+  return h('div.skill-facts', t('{n} / {total} faits automatiques', { n, total: keys.length }));
 }

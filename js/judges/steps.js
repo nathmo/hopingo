@@ -15,6 +15,7 @@
 // The final answer is still judged by the item's own checker.
 
 import { JUDGES } from './index.js';
+import { t } from '../i18n.js';
 import { parse } from '../cas/parse.js';
 import { tryParseAlg, evalAt, varsIn, printAlg } from '../math/algebra.js';
 import { judgeEquationLine, solutionSet } from '../math/equations.js';
@@ -171,15 +172,15 @@ function nameExprMistake(spec, input) {
 function judgeSystem(spec, prev, input) {
   const parts = String(input).replace(/−/g, '-').split(/;|\set\s/).map((p) => p.trim()).filter(Boolean);
   const nodes = parts.map((p) => tryParseAlg(p));
-  if (!nodes.length || nodes.some((n) => !n)) return { kind: 'parse', message: 'Je n\'arrive pas à lire cette ligne.' };
-  if (nodes.some((n) => n.t !== 'eq')) return { kind: 'parse', message: 'Écris des équations, avec « = » ; sépare-les par « ; ».' };
-  if (String(input).replace(/\s/g, '') === String(prev).replace(/\s/g, '')) return { kind: 'same', message: 'C\'est la même ligne : fais une transformation.' };
+  if (!nodes.length || nodes.some((n) => !n)) return { kind: 'parse', message: t('Je n\'arrive pas à lire cette ligne.') };
+  if (nodes.some((n) => n.t !== 'eq')) return { kind: 'parse', message: t('Écris des équations, avec « = » ; sépare-les par « ; ».') };
+  if (String(input).replace(/\s/g, '') === String(prev).replace(/\s/g, '')) return { kind: 'same', message: t('C\'est la même ligne : fais une transformation.') };
   const [X, Y] = spec.item.pair;
   const holds = (n, env) => { try { return close(evalAt(n.l, env), evalAt(n.r, env)); } catch { return false; } };
   const bad = nodes.find((n) => !holds(n, { x: X, y: Y }));
   if (bad) {
     const swapped = nodes.every((n) => holds(n, { x: Y, y: X })) && X !== Y;
-    return { kind: 'wrong', rule: swapped ? 'graph_xy_swap' : null, message: `La solution du système ne vérifie plus ${printAlg(bad).replace(/-/g, '−')} : cette ligne n'est pas une conséquence des équations.` };
+    return { kind: 'wrong', rule: swapped ? 'graph_xy_swap' : null, message: t('La solution du système ne vérifie plus {eq} : cette ligne n\'est pas une conséquence des équations.', { eq: printAlg(bad).replace(/-/g, '−') }) };
   }
   return { kind: 'ok' };
 }
@@ -189,10 +190,10 @@ function judgeSystem(spec, prev, input) {
 function judgeFormula(spec, prev, input) {
   const v = spec.item.variable;
   const node = tryParseAlg(input);
-  if (!node) return { kind: 'parse', message: 'Je n\'arrive pas à lire cette ligne.' };
-  if (node.t !== 'eq') return { kind: 'parse', message: 'Écris une égalité, avec « = ».' };
-  if (String(input).replace(/\s/g, '') === String(prev).replace(/\s/g, '')) return { kind: 'same', message: 'C\'est la même ligne : fais une transformation.' };
-  if (!varsIn(node).has(v)) return { kind: 'parse', message: `Garde la lettre ${v} dans ta ligne.` };
+  if (!node) return { kind: 'parse', message: t('Je n\'arrive pas à lire cette ligne.') };
+  if (node.t !== 'eq') return { kind: 'parse', message: t('Écris une égalité, avec « = ».') };
+  if (String(input).replace(/\s/g, '') === String(prev).replace(/\s/g, '')) return { kind: 'same', message: t('C\'est la même ligne : fais une transformation.') };
+  if (!varsIn(node).has(v)) return { kind: 'parse', message: t('Garde la lettre {v} dans ta ligne.', { v }) };
   const holdsWith = (expr) => {
     const target = tryParseAlg(expr);
     if (!target) return false;
@@ -213,8 +214,10 @@ function judgeFormula(spec, prev, input) {
     return seen > 0;
   };
   if (holdsWith(spec.item.target)) return { kind: 'ok' };
-  const trap = (spec.item.isoTraps || []).find((t) => holdsWith(t.expr));
-  return { kind: 'wrong', rule: trap?.rule ?? null, message: `Cette égalité n'est plus vraie avec la bonne valeur de ${v} : une opération n'a pas été faite des deux côtés.` };
+  // The item's own traps, then the quotient upside down (x = 2a/c for c/(2a)).
+  const trap = (spec.item.isoTraps || []).find((t) => holdsWith(t.expr))
+    || (holdsWith(`1/(${spec.item.target})`) ? { rule: 'iso_flip_quotient' } : null);
+  return { kind: 'wrong', rule: trap?.rule ?? null, message: t('Cette égalité n\'est plus vraie avec la bonne valeur de {v} : une opération n\'a pas été faite des deux côtés.', { v }) };
 }
 
 // One step. → {kind: ok|wrong|parse|same, rule?, diag?, message?, note?}
@@ -227,8 +230,8 @@ export function judgeStep(spec, prev, input) {
     const p = tryParseNum(prev);
     if (p) {
       const r = judgeValueLine(p, text, { requireIrreducible: false });
-      if (r.kind === 'wrong') return { kind: 'wrong', rule: r.diag?.rules?.[r.diag.rules.length - 1] ?? null, diag: r.diag ?? null, message: 'Cette ligne n\'a plus la même valeur que la précédente.' };
-      if (r.kind === 'same') return { kind: 'same', message: 'C\'est la même ligne : fais au moins un calcul.' };
+      if (r.kind === 'wrong') return { kind: 'wrong', rule: r.diag?.rules?.[r.diag.rules.length - 1] ?? null, diag: r.diag ?? null, message: t('Cette ligne n\'a plus la même valeur que la précédente.') };
+      if (r.kind === 'same') return { kind: 'same', message: t('C\'est la même ligne : fais au moins un calcul.') };
       if (r.kind !== 'parse') return { kind: 'ok' };
     }
     // Roots that are not whole: compared by the symbolic core.
@@ -246,7 +249,7 @@ export function judgeStep(spec, prev, input) {
   if (v.kind !== 'wrong') return { kind: v.kind, message: v.message, note: v.note };
   const rule = (spec.kind === 'eq' ? nameEqMistake(spec, prev, text) : nameExprMistake(spec, text)) ?? v.rule ?? null;
   // A number without letters (√540 = 6√15): no « en x = … » in the message.
-  const message = spec.kind === 'expr' && !lettersOf(spec.start).length ? 'Cette ligne n\'a plus la même valeur que la précédente.' : v.message;
+  const message = spec.kind === 'expr' && !lettersOf(spec.start).length ? t('Cette ligne n\'a plus la même valeur que la précédente.') : v.message;
   return { kind: 'wrong', rule, diag: rule === v.rule ? v.diag : null, message };
 }
 
@@ -267,10 +270,10 @@ export class StepChain {
 
   submit(input) {
     const text = String(input ?? '').trim();
-    if (!text) return { kind: 'parse', message: 'Écris d\'abord une ligne.' };
+    if (!text) return { kind: 'parse', message: t('Écris d\'abord une ligne.') };
     let v = this.spec ? judgeStep(this.spec, this.prev, text) : { kind: 'draft' };
     // A line the judge cannot read is kept as brouillon only if no start is known.
-    if (v.kind === 'draft' && this.spec) v = { kind: 'draft', message: 'Je ne peux pas vérifier cette ligne : elle reste au brouillon.' };
+    if (v.kind === 'draft' && this.spec) v = { kind: 'draft', message: t('Je ne peux pas vérifier cette ligne : elle reste au brouillon.') };
     if (v.kind === 'wrong') {
       this.mistakes += 1;
       if (v.rule) this.rules.push(v.rule);

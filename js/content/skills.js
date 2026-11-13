@@ -9,6 +9,7 @@
 // path branches after mental arithmetic: see nextFocus in engine/learner.js.
 
 import { UNI_UNITS, UNI_SKILLS, UNBUILT } from './uni/index.js';
+import { localize } from '../i18n.js';
 
 export const UNITS = [
   { id: 'calcul', title: 'Calcul mental', color: '#f08c00', ready: true },
@@ -1301,6 +1302,11 @@ const ALL = DECLARED.map((s) => {
   return { ...s, declaredPrereqs: s.prereqs, prereqs: [...new Set(s.prereqs.flatMap((p) => resolvePrereq(p)))] };
 });
 
+// The texts of the catalogue in the chosen language (js/i18n.js): titles,
+// descriptions, intro cards and the reasons of the prerequisites.
+for (const s of ALL) localize(s, ['title', 'desc', 'intro', 'prereqWhy']);
+for (const u of UNITS) localize(u, ['title']);
+
 // Topological order (Kahn): among the skills whose prerequisites are all
 // placed, the smallest key (year, unit order, map order) goes next.
 function topological(skills) {
@@ -1363,7 +1369,7 @@ export const YEARS = [
   { id: 14, label: 'BA2', age: '1re année, 2e semestre' },
   { id: 15, label: 'BA3', age: '2e année uni' },
   { id: 16, label: 'BA4', age: '2e année, 2e semestre' },
-];
+].map((y) => localize(y, ['label', 'age']));
 
 // From BA1 on, the placement is done unit by unit (spec §8.4).
 export const isUniversity = (year) => year >= 13;
@@ -1377,7 +1383,7 @@ export const TRACKS = [
   { id: 'mid', label: 'Exigences moyennes', shift: 0 },
   { id: 'base', label: 'Exigences de base', shift: -1 },
   { id: 'unknown', label: 'Je ne sais pas', shift: 0 },
-];
+].map((x) => localize(x, ['label']));
 
 // Where the placement skim starts searching: the last skill usually met
 // before the student's year.

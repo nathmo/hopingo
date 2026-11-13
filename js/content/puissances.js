@@ -7,6 +7,7 @@ import { solve, sup as supChars } from '../math/solver.js';
 import {
   mathHtml, BLANK, stepsItem, answerItem, mcqItem, computeMcq, coprimeNum, powHtml,
 } from './items.js';
+import { t } from '../i18n.js';
 
 export const GEN = {};
 
@@ -28,7 +29,7 @@ GEN['pow-def'] = (level, rng) => {
   if (level === 1) {
     const e = rng.int(2, 3);
     const b = rng.int(2, e === 3 ? 4 : 6);
-    return stepsItem('pow-def', level, `${b}^${e}`, { mode: 'guided', irreducible: false, prompt: 'Calcule.', solveOpts: { expandPowers: true } });
+    return stepsItem('pow-def', level, `${b}^${e}`, { mode: 'guided', irreducible: false, prompt: t('Calcule.'), solveOpts: { expandPowers: true } });
   }
   if (level === 2) {
     const b = rng.int(2, 9);
@@ -41,14 +42,14 @@ GEN['pow-def'] = (level, rng) => {
       { html: mathHtml(`${b}×${k}`), correct: false, rule: 'pow_times_exponent' },
       { html: powHtml(b, k + 1), correct: false },
     ];
-    return mcqItem('pow-def', level, `Comment écrire ${mathHtml(product)} avec une puissance ?`, opts, rng, {
-      solution: [{ math: `${b}^${k}`, note: `${k} facteurs égaux à ${b}.` }], key: `write:${b}^${k}`,
+    return mcqItem('pow-def', level, t('Comment écrire {p} avec une puissance ?', { p: mathHtml(product) }), opts, rng, {
+      solution: [{ math: `${b}^${k}`, note: t('{k} facteurs égaux à {b}.', { k, b }) }], key: `write:${b}^${k}`,
     });
   }
   if (level === 3) {
     const [b, e] = rng.pick([[rng.int(3, 12), 2], [rng.int(2, 5), 3], [2, rng.int(4, 6)], [rng.int(1, 3) * 10, 2]]);
     const expr = `${b}^${e}`;
-    return answerItem('pow-def', level, `Calcule ${mathHtml(expr)}.`, evaluate(parse(expr)).toString(), { tree: expr, keys: 'int', key: expr });
+    return answerItem('pow-def', level, t('Calcule {e}.', { e: mathHtml(expr) }), evaluate(parse(expr)).toString(), { tree: expr, keys: 'int', key: expr });
   }
   if (level === 4) {
     if (rng.chance(0.5)) {
@@ -56,22 +57,22 @@ GEN['pow-def'] = (level, rng) => {
       const n = coprimeNum(rng, d, 1, d - 1);
       const e = d <= 3 && rng.chance(0.4) ? 3 : 2;
       const expr = `(${n}/${d})^${e}`;
-      return answerItem('pow-def', level, `Calcule ${mathHtml(expr)}.`, evaluate(parse(expr)).toString(), { tree: expr, keys: 'frac', key: expr });
+      return answerItem('pow-def', level, t('Calcule {e}.', { e: mathHtml(expr) }), evaluate(parse(expr)).toString(), { tree: expr, keys: 'frac', key: expr });
     }
     const a = rng.int(1, 9);
     const expr = `0,${a}^2`;
-    return answerItem('pow-def', level, `Calcule ${mathHtml(expr)}.`, evaluate(parse(expr)).toDecimal(), { tree: expr, keys: 'dec', form: 'decimal', key: expr });
+    return answerItem('pow-def', level, t('Calcule {e}.', { e: mathHtml(expr) }), evaluate(parse(expr)).toDecimal(), { tree: expr, keys: 'dec', form: 'decimal', key: expr });
   }
   // Level 5: the missing exponent or base.
   const [b, e] = rng.pick([[2, rng.int(3, 7)], [3, rng.int(2, 4)], [rng.int(4, 9), 2], [rng.int(2, 5), 3], [10, rng.int(2, 6)]]);
   const v = b ** e;
   if (rng.chance(0.6)) {
-    return answerItem('pow-def', level, `Complète : ${powHtml(b, '?')} = ${numHtml(v)}`, `${e}`, {
+    return answerItem('pow-def', level, t('Complète : {q}', { q: `${powHtml(b, '?')} = ${numHtml(v)}` }), `${e}`, {
       keys: 'int', traps: [{ value: [v / b, 1], rule: Number.isInteger(v / b) && v / b !== e && v / b <= 30 ? 'pow_times_exponent' : null }],
       solution: [{ math: `${b}^${e}`, note: `= ${Array(e).fill(b).join(' × ')} = ${v}` }], key: `exp:${b}^${e}`,
     });
   }
-  return answerItem('pow-def', level, `Complète : ${BLANK}<span class="m">${sup(e)}</span> = ${numHtml(v)}`, `${b}`, {
+  return answerItem('pow-def', level, t('Complète : {q}', { q: `${BLANK}<span class="m">${sup(e)}</span> = ${numHtml(v)}` }), `${b}`, {
     keys: 'int', traps: [{ value: [v / e, 1], rule: Number.isInteger(v / e) && v / e !== b ? 'pow_times_exponent' : null }],
     solution: [{ math: `${b}^${e}`, note: `= ${Array(e).fill(b).join(' × ')} = ${v}` }], key: `base:${b}^${e}`,
   });
@@ -115,9 +116,9 @@ GEN['pow-priority'] = (level, rng) => {
     if (!pattern.startsWith('F') && !evaluate(parse(expr)).isInt()) continue;
     if (level === 2) return computeMcq('pow-priority', level, expr, rng);
     const mode = level === 1 ? 'guided' : level === 3 ? 'tap' : 'free';
-    return stepsItem('pow-priority', level, expr, { mode, prompt: pattern.startsWith('F') ? undefined : 'Calcule.' });
+    return stepsItem('pow-priority', level, expr, { mode, prompt: pattern.startsWith('F') ? undefined : t('Calcule.') });
   }
-  return stepsItem('pow-priority', level, '2×3^2+1', { prompt: 'Calcule.' });
+  return stepsItem('pow-priority', level, '2×3^2+1', { prompt: t('Calcule.') });
 };
 
 // ---------- Puissances et signes ----------
@@ -126,7 +127,7 @@ GEN['pow-sign'] = (level, rng) => {
   const b = rng.int(1, level < 3 ? 4 : 6);
   if (level === 1) {
     const e = rng.int(2, b <= 2 ? 4 : 3);
-    return stepsItem('pow-sign', level, `(-${Math.max(2, b)})^${e}`, { mode: 'guided', prompt: 'Calcule.', solveOpts: { expandPowers: true } });
+    return stepsItem('pow-sign', level, `(-${Math.max(2, b)})^${e}`, { mode: 'guided', prompt: t('Calcule.'), solveOpts: { expandPowers: true } });
   }
   const bb = Math.max(2, b);
   if (level === 2) {
@@ -136,21 +137,21 @@ GEN['pow-sign'] = (level, rng) => {
   if (level === 3) {
     const e = rng.int(2, bb <= 3 ? 4 : 3);
     const expr = rng.pick([`(-${bb})^${e}`, `-${bb}^${e}`, `-(-${bb})^${e}`]);
-    return answerItem('pow-sign', level, `Calcule ${mathHtml(expr)}.`, evaluate(parse(expr)).toString(), { tree: expr, keys: 'rel', signed: true, key: expr });
+    return answerItem('pow-sign', level, t('Calcule {e}.', { e: mathHtml(expr) }), evaluate(parse(expr)).toString(), { tree: expr, keys: 'rel', signed: true, key: expr });
   }
   if (level === 4) {
     const n = rng.int(5, 30);
     const expr = rng.pick([`(-1)^${n}`, `-1^${n}`, `(-1)^${n}×(-1)^${n + 1}`]);
-    return answerItem('pow-sign', level, `Calcule ${mathHtml(expr)}.`, evaluate(parse(expr)).toString(), { tree: expr, keys: 'rel', signed: true, key: expr });
+    return answerItem('pow-sign', level, t('Calcule {e}.', { e: mathHtml(expr) }), evaluate(parse(expr)).toString(), { tree: expr, keys: 'rel', signed: true, key: expr });
   }
   for (let i = 0; i < 100; i++) {
     const [x, y] = [rng.int(2, 5), rng.int(2, 5)];
     const expr = rng.pick([`-${x}^2+(-${y})^2`, `(-${x})^3-${y}^2`, `(-${x})^2×(-${y})`, `-(${x}-${y + x})^2`]);
     try {
-      if (Math.abs(evaluate(parse(expr)).n) <= 200 && solve(parse(expr)).length <= 8) return stepsItem('pow-sign', level, expr, { prompt: 'Calcule.' });
+      if (Math.abs(evaluate(parse(expr)).n) <= 200 && solve(parse(expr)).length <= 8) return stepsItem('pow-sign', level, expr, { prompt: t('Calcule.') });
     } catch { /* try another */ }
   }
-  return stepsItem('pow-sign', level, '-3^2+(-2)^2', { prompt: 'Calcule.' });
+  return stepsItem('pow-sign', level, '-3^2+(-2)^2', { prompt: t('Calcule.') });
 };
 
 // ---------- Puissances de 10 ----------
@@ -158,19 +159,19 @@ GEN['pow-sign'] = (level, rng) => {
 GEN['pow-ten'] = (level, rng) => {
   if (level === 1) {
     const n = rng.int(1, 7);
-    return answerItem('pow-ten', level, `Écris ${powHtml(10, n)} en chiffres.`, `${10 ** n}`, { tree: `10^${n}`, keys: 'int', key: `10^${n}` });
+    return answerItem('pow-ten', level, t('Écris {e} en chiffres.', { e: powHtml(10, n) }), `${10 ** n}`, { tree: `10^${n}`, keys: 'int', key: `10^${n}` });
   }
   if (level === 2) {
     const n = rng.int(2, 9);
-    return answerItem('pow-ten', level, `Complète : ${numHtml(10 ** n)} = ${powHtml(10, '?')}`, `${n}`, {
+    return answerItem('pow-ten', level, t('Complète : {q}', { q: `${numHtml(10 ** n)} = ${powHtml(10, '?')}` }), `${n}`, {
       keys: 'int', traps: [{ value: [n + 1, 1], rule: 'pow_ten_count_digits' }],
-      solution: [{ math: `10^${n}`, note: `1 suivi de ${n} zéros.` }], key: `exp:${n}`,
+      solution: [{ math: `10^${n}`, note: t('1 suivi de {n} zéros.', { n }) }], key: `exp:${n}`,
     });
   }
   if (level === 3) {
     const n = rng.int(1, 5);
     const expr = `10^-${n}`;
-    return answerItem('pow-ten', level, `Écris ${powHtml(10, -n)} sous forme décimale.`, new Q(1, 10 ** n).toDecimal(), {
+    return answerItem('pow-ten', level, t('Écris {e} sous forme décimale.', { e: powHtml(10, -n) }), new Q(1, 10 ** n).toDecimal(), {
       tree: expr, keys: 'reldec', form: 'decimal', signed: true, key: expr,
     });
   }
@@ -180,7 +181,7 @@ GEN['pow-ten'] = (level, rng) => {
   }
   const n = rng.int(1, 6);
   const small = new Q(1, 10 ** n);
-  return answerItem('pow-ten', level, `Complète : ${numHtml(small)} = ${powHtml(10, '?')}`, `${-n}`, {
+  return answerItem('pow-ten', level, t('Complète : {q}', { q: `${numHtml(small)} = ${powHtml(10, '?')}` }), `${-n}`, {
     keys: 'rel', signed: true, traps: [{ value: [n, 1], rule: 'exp_sign_small_number' }],
     solution: [{ math: `10^-${n}`, note: `= 1/10${supChars(n)} = ${small.toDecimal()}` }],
     key: `exp:-${n}`,
@@ -194,22 +195,22 @@ const BASES = [2, 3, 5, 7, 10, 'a'];
 function exponentItem(level, rng, kind, b, m, n) {
   const P = (e) => powHtml(b, e);
   if (kind === 'product') {
-    return answerItem('pow-rules', level, `Complète : ${P(m)} × ${P(n)} = ${P('?')}`, `${m + n}`, {
+    return answerItem('pow-rules', level, t('Complète : {q}', { q: `${P(m)} × ${P(n)} = ${P('?')}` }), `${m + n}`, {
       keys: 'rel', signed: true, traps: [{ value: [m * n, 1], rule: 'pow_product_multiply_exp' }],
-      solution: [{ math: `${m}+${n}`, note: `= ${show(m + n)} : on additionne les exposants.` }], key: `prod:${b}:${m}:${n}`,
+      solution: [{ math: `${m}+${n}`, note: t('= {v} : on additionne les exposants.', { v: show(m + n) }) }], key: `prod:${b}:${m}:${n}`,
     });
   }
   if (kind === 'quotient') {
     const div = n !== 0 && m % n === 0 && m / n !== m - n ? m / n : null;
-    return answerItem('pow-rules', level, `Complète : ${P(m)} ÷ ${P(n)} = ${P('?')}`, `${m - n}`, {
+    return answerItem('pow-rules', level, t('Complète : {q}', { q: `${P(m)} ÷ ${P(n)} = ${P('?')}` }), `${m - n}`, {
       keys: 'rel', signed: true, traps: [{ value: [div ?? 0, 1], rule: div !== null ? 'pow_quotient_divide_exp' : null }],
-      solution: [{ math: `${m}-${op(n)}`, note: `= ${show(m - n)} : on soustrait les exposants.` }], key: `quot:${b}:${m}:${n}`,
+      solution: [{ math: `${m}-${op(n)}`, note: t('= {v} : on soustrait les exposants.', { v: show(m - n) }) }], key: `quot:${b}:${m}:${n}`,
     });
   }
   const inner = `<span class="m"><span class="m-par">(</span>${P(m)}<span class="m-par">)</span><sup class="m-sup"><span class="m-num">${show(n)}</span></sup></span>`;
-  return answerItem('pow-rules', level, `Complète : ${inner} = ${P('?')}`, `${m * n}`, {
+  return answerItem('pow-rules', level, t('Complète : {q}', { q: `${inner} = ${P('?')}` }), `${m * n}`, {
     keys: 'rel', signed: true, traps: [{ value: [m + n, 1], rule: 'pow_power_add_exp' }],
-    solution: [{ math: `${m}×${op(n)}`, note: `= ${show(m * n)} : on multiplie les exposants.` }], key: `pow:${b}:${m}:${n}`,
+    solution: [{ math: `${m}×${op(n)}`, note: t('= {v} : on multiplie les exposants.', { v: show(m * n) }) }], key: `pow:${b}:${m}:${n}`,
   });
 }
 const op = (x) => (x < 0 ? `(${x})` : `${x}`);
@@ -241,8 +242,8 @@ GEN['pow-rules'] = (level, rng) => {
         { html: powHtml(4, k), correct: false, rule: 'pow_product_multiply_bases' },
         { html: powHtml(4, 2 * k), correct: false },
       ];
-      return mcqItem('pow-rules', level, `Combien vaut ${powHtml(2, k)} + ${powHtml(2, k)} ?`, opts, rng, {
-        solution: [{ math: `2×2^${k}`, note: `= 2^${k + 1} : deux fois le même nombre, c'est le double.` }], key: `sum:${k}`,
+      return mcqItem('pow-rules', level, t('Combien vaut {e} ?', { e: `${powHtml(2, k)} + ${powHtml(2, k)}` }), opts, rng, {
+        solution: [{ math: `2×2^${k}`, note: t('= {p} : deux fois le même nombre, c\'est le double.', { p: `2^${k + 1}` }) }], key: `sum:${k}`,
       });
     }
     const base = rng.pick([2, 3, 5]);
@@ -252,8 +253,8 @@ GEN['pow-rules'] = (level, rng) => {
       { html: powHtml(base * base, m + n), correct: false, rule: 'pow_product_multiply_bases' },
       { html: powHtml(base * base, m * n), correct: false },
     ];
-    return mcqItem('pow-rules', level, `Combien vaut ${powHtml(base, m)} × ${powHtml(base, n)} ?`, opts, rng, {
-      solution: [{ math: `${base}^${m + n}`, note: `${m} + ${n} = ${m + n} facteurs égaux à ${base}.` }], key: `mcq:${base}:${m}:${n}`,
+    return mcqItem('pow-rules', level, t('Combien vaut {e} ?', { e: `${powHtml(base, m)} × ${powHtml(base, n)}` }), opts, rng, {
+      solution: [{ math: `${base}^${m + n}`, note: t('{m} + {n} = {s} facteurs égaux à {b}.', { m, n, s: m + n, b: base }) }], key: `mcq:${base}:${m}:${n}`,
     });
   }
   // Level 5: negative exponents.
@@ -282,9 +283,9 @@ GEN['pow-sci'] = (level, rng) => {
     const wrongZeros = n > 0 ? trailingZeros(v) : -zerosAfterComma(v);
     const traps = [{ value: [wrongZeros, 1], rule: wrongZeros !== n ? 'sci_count_zeros' : null }];
     if (n < 0) traps.push({ value: [-n, 1], rule: 'exp_sign_small_number' });
-    return answerItem('pow-sci', level, `Complète : ${numHtml(v)} = <span class="m">${a.toDecimal()}</span> × ${powHtml(10, '?')}`, `${n}`, {
+    return answerItem('pow-sci', level, t('Complète : {q}', { q: `${numHtml(v)} = <span class="m">${a.toDecimal()}</span> × ${powHtml(10, '?')}` }), `${n}`, {
       keys: 'rel', signed: true, traps,
-      solution: [{ math: `${a.toDecimal()}×10^${n}`, note: `La virgule se déplace de ${Math.abs(n)} rangs vers la ${n > 0 ? 'droite' : 'gauche'}.` }],
+      solution: [{ math: `${a.toDecimal()}×10^${n}`, note: n > 0 ? t('La virgule se déplace de {n} rangs vers la droite.', { n: Math.abs(n) }) : t('La virgule se déplace de {n} rangs vers la gauche.', { n: Math.abs(n) }) }],
       key: `exp:${v}`,
     });
   }
@@ -298,15 +299,15 @@ GEN['pow-sci'] = (level, rng) => {
       { html: s(a.div(10), n + 1), correct: false, rule: 'sci_mantissa_range' },
       { html: s(a, zeros !== n ? zeros : n + 1), correct: false, rule: zeros !== n ? 'sci_count_zeros' : null },
     ];
-    return mcqItem('pow-sci', level, `Quelle est la notation scientifique de ${numHtml(v)} ?`, opts, rng, {
-      solution: [{ math: `${a.toDecimal()}×10^${n}`, note: `${a.toDecimal()} est entre 1 et 10.` }], key: `which:${v}`,
+    return mcqItem('pow-sci', level, t('Quelle est la notation scientifique de {v} ?', { v: numHtml(v) }), opts, rng, {
+      solution: [{ math: `${a.toDecimal()}×10^${n}`, note: t('{a} est entre 1 et 10.', { a: a.toDecimal() }) }], key: `which:${v}`,
     });
   }
   if (level === 4) {
     const { a, n } = sciNumber(rng, rng.chance(0.5));
     const nn = n > 0 ? Math.min(n, 5) : n;
     const expr = `${a.toDecimal()}×10^${nn}`;
-    return answerItem('pow-sci', level, `Écris ${mathHtml(expr)} sous forme décimale.`, evaluate(parse(expr)).toDecimal(), {
+    return answerItem('pow-sci', level, t('Écris {e} sous forme décimale.', { e: mathHtml(expr) }), evaluate(parse(expr)).toDecimal(), {
       tree: expr, keys: 'reldec', form: 'decimal', signed: true, key: expr,
     });
   }
@@ -315,15 +316,15 @@ GEN['pow-sci'] = (level, rng) => {
     const m = rng.int(2, 6);
     const n = rng.int(2, 6);
     const X = Q.fromDecimal(String(x)).toDecimal();
-    return answerItem('pow-sci', level, `Complète : (<span class="m">${X}</span> × ${powHtml(10, m)}) × (<span class="m">${y}</span> × ${powHtml(10, n)}) = <span class="m">${Q.fromDecimal(String(x * y)).toDecimal()}</span> × ${powHtml(10, '?')}`, `${m + n}`, {
+    return answerItem('pow-sci', level, t('Complète : {q}', { q: `(<span class="m">${X}</span> × ${powHtml(10, m)}) × (<span class="m">${y}</span> × ${powHtml(10, n)}) = <span class="m">${Q.fromDecimal(String(x * y)).toDecimal()}</span> × ${powHtml(10, '?')}` }), `${m + n}`, {
       keys: 'rel', signed: true, traps: [{ value: [m * n, 1], rule: m * n !== m + n ? 'pow_product_multiply_exp' : null }],
-      solution: [{ math: `${m}+${n}`, note: `= ${m + n} : on multiplie ${X} × ${y} et on additionne les exposants.` }], key: `prod:${x}:${m}:${y}:${n}`,
+      solution: [{ math: `${m}+${n}`, note: t('= {s} : on multiplie {x} × {y} et on additionne les exposants.', { s: m + n, x: X, y }) }], key: `prod:${x}:${m}:${y}:${n}`,
     });
   }
   const a = rng.int(2, 3);
   const m = rng.int(2, 5);
-  return answerItem('pow-sci', level, `Complète : (<span class="m">${a}</span> × ${powHtml(10, m)})<sup>2</sup> = ${BLANK} × ${powHtml(10, 2 * m)}`, `${a * a}`, {
+  return answerItem('pow-sci', level, t('Complète : {q}', { q: `(<span class="m">${a}</span> × ${powHtml(10, m)})<sup>2</sup> = ${BLANK} × ${powHtml(10, 2 * m)}` }), `${a * a}`, {
     keys: 'int', traps: [{ value: [a, 1], rule: 'pow_forget_coefficient' }],
-    solution: [{ math: `${a}^2`, note: `= ${a * a} : le carré porte sur ${a} aussi, pas seulement sur 10${supChars(m)}.` }], key: `sq:${a}:${m}`,
+    solution: [{ math: `${a}^2`, note: t('= {s} : le carré porte sur {a} aussi, pas seulement sur {p}.', { s: a * a, a, p: `10${supChars(m)}` }) }], key: `sq:${a}:${m}`,
   });
 };

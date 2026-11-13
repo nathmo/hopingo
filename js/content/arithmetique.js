@@ -5,6 +5,7 @@
 
 import { gcd } from '../math/rational.js';
 import { answerItem, mcqItem, mathHtml, stepsItem } from './items.js';
+import { t } from '../i18n.js';
 
 const m = (s) => `<span class="m">${s}</span>`;
 const num = (x) => `<span class="m-num">${String(x).replace('-', '−')}</span>`;
@@ -46,7 +47,7 @@ function factorLines(n) {
     rest /= p;
     lines.push({ math: [...done, rest].join('×'), note: `${rest * p} = ${p} × ${rest}` });
   }
-  lines.push({ math: factorString(n), note: 'Tous les facteurs sont premiers.' });
+  lines.push({ math: factorString(n), note: t('Tous les facteurs sont premiers.') });
   return lines;
 }
 
@@ -72,10 +73,17 @@ GEN['ar-div'] = (level, rng) => {
       if (d === 4 && i % 2) { n = n - (n % 2); rule = 'div_last_digit'; } // even, not a multiple of 4
       add(n, rule);
     }
-    const rule = { 2: 'son dernier chiffre est pair', 5: 'il se termine par 0 ou 5', 10: 'il se termine par 0', 3: `la somme de ses chiffres (${digitSum(right)}) est un multiple de 3`, 9: `la somme de ses chiffres (${digitSum(right)}) est un multiple de 9`, 4: `le nombre formé par ses deux derniers chiffres (${right % 100}) est un multiple de 4` }[d];
-    return yesNo('ar-div', level, `Lequel de ces nombres est divisible par ${d} ?`, m(num(big(right))),
+    const why = {
+      2: 'Divisible par 2 : son dernier chiffre est pair.',
+      5: 'Divisible par 5 : il se termine par 0 ou 5.',
+      10: 'Divisible par 10 : il se termine par 0.',
+      3: 'Divisible par 3 : la somme de ses chiffres ({s}) est un multiple de 3.',
+      9: 'Divisible par 9 : la somme de ses chiffres ({s}) est un multiple de 9.',
+      4: 'Divisible par 4 : le nombre formé par ses deux derniers chiffres ({e}) est un multiple de 4.',
+    }[d];
+    return yesNo('ar-div', level, t('Lequel de ces nombres est divisible par {d} ?', { d }), m(num(big(right))),
       wrongs.map(([n, r]) => [m(num(big(n))), r]), rng, {
-        solution: [{ math: String(right), note: `Divisible par ${d} : ${rule}.` }], key: `${d}:${right}`,
+        solution: [{ math: String(right), note: t(why, { s: digitSum(right), e: right % 100 }) }], key: `${d}:${right}`,
       });
   }
   if (level === 4) {
@@ -85,11 +93,11 @@ GEN['ar-div'] = (level, rng) => {
     for (;;) { n = rng.int(1000, 9999); if ((n % d === 0) === yes && n % 10 !== d) break; }
     const s = digitSum(n);
     const digits = String(n).split('').join(' + ');
-    const right = yes ? `Oui : ${digits} = ${s}, un multiple de ${d}` : `Non : ${digits} = ${s}, pas un multiple de ${d}`;
+    const right = yes ? t('Oui : {sum} = {s}, un multiple de {d}', { sum: digits, s, d }) : t('Non : {sum} = {s}, pas un multiple de {d}', { sum: digits, s, d });
     const wrongs = yes
-      ? [[`Non : il ne se termine pas par ${d}`, 'div_last_digit'], [`Non : ${n % 2 ? 'il est impair' : 'il est pair'}`, null]]
-      : [[`Oui : ${n % 2 ? 'il est impair' : 'il est pair'}`, null], [`Oui : son dernier chiffre est ${n % 10}`, 'div_last_digit']];
-    return yesNo('ar-div', level, `${m(num(big(n)))} est-il divisible par ${d} ?`, right, wrongs, rng, { key: `yn${d}:${n}` });
+      ? [[t('Non : il ne se termine pas par {d}', { d }), 'div_last_digit'], [n % 2 ? t('Non : il est impair') : t('Non : il est pair'), null]]
+      : [[n % 2 ? t('Oui : il est impair') : t('Oui : il est pair'), null], [t('Oui : son dernier chiffre est {u}', { u: n % 10 }), 'div_last_digit']];
+    return yesNo('ar-div', level, t('{n} est-il divisible par {d} ?', { n: m(num(big(n))), d }), right, wrongs, rng, { key: `yn${d}:${n}` });
   }
   const n = rng.pick([180, 240, 360, 450, 540, 630, 720, 900, 1260, 2340, 1080]) * rng.pick([1, 1, 7, 11]);
   const cands = [2, 3, 4, 5, 6, 8, 9, 10, 12, 25];
@@ -98,7 +106,7 @@ GEN['ar-div'] = (level, rng) => {
   if (!not.length) return GEN['ar-div'](4, rng);
   const right = rng.pick(not);
   const opts = rng.shuffle(yes).slice(0, 3);
-  return yesNo('ar-div', level, `Par lequel de ces nombres ${m(num(big(n)))} n'est-il <b>pas</b> divisible ?`, m(num(right)),
+  return yesNo('ar-div', level, t('Par lequel de ces nombres {n} n\'est-il <b>pas</b> divisible ?', { n: m(num(big(n))) }), m(num(right)),
     opts.map((d) => [m(num(d)), null]), rng, { key: `not:${n}:${right}` });
 };
 
@@ -111,27 +119,27 @@ GEN['ar-divisors'] = (level, rng) => {
       const ds = divisors(n).filter((d) => d > 1 && d < n);
       const right = rng.pick(ds);
       const wrongs = rng.shuffle(range(2, n - 1).filter((d) => n % d !== 0)).slice(0, 3);
-      return yesNo('ar-divisors', level, `Lequel est un diviseur de ${m(num(n))} ?`, m(num(right)), wrongs.map((d) => [m(num(d)), null]), rng, {
-        solution: [{ math: `${n}÷${right}`, note: `= ${n / right}, sans reste.` }], key: `div:${n}:${right}`,
+      return yesNo('ar-divisors', level, t('Lequel est un diviseur de {n} ?', { n: m(num(n)) }), m(num(right)), wrongs.map((d) => [m(num(d)), null]), rng, {
+        solution: [{ math: `${n}÷${right}`, note: t('= {q}, sans reste.', { q: n / right }) }], key: `div:${n}:${right}`,
       });
     }
     const right = n * rng.int(3, 12);
     const wrongs = [right + 1, right - 2, right + n - 1].map((x) => [m(num(x)), null]);
-    return yesNo('ar-divisors', level, `Lequel est un multiple de ${m(num(n))} ?`, m(num(right)), wrongs, rng, {
+    return yesNo('ar-divisors', level, t('Lequel est un multiple de {n} ?', { n: m(num(n)) }), m(num(right)), wrongs, rng, {
       solution: [{ math: `${n}×${right / n}`, note: `= ${right}` }], key: `mul:${n}:${right}`,
     });
   }
   if (level === 2 || level === 5) {
     const n = level === 2 ? rng.pick([6, 8, 10, 12, 14, 15, 16, 18, 20]) : rng.pick([24, 30, 36, 40, 48, 60, 72, 100]);
     const ds = divisors(n);
-    return answerItem('ar-divisors', level, `Combien de diviseurs a ${m(num(n))} ? (1 et ${n} comptent aussi)`, String(ds.length), {
+    return answerItem('ar-divisors', level, t('Combien de diviseurs a {x} ? (1 et {n} comptent aussi)', { x: m(num(n)), n }), String(ds.length), {
       keys: 'int', traps: [{ value: [ds.length - 2, 1], rule: 'divisors_forget_ends' }],
-      solution: [{ math: String(n), note: `Diviseurs : ${ds.join(', ')}.` }], key: `count:${n}`,
+      solution: [{ math: String(n), note: t('Diviseurs : {list}.', { list: ds.join(', ') }) }], key: `count:${n}`,
     });
   }
   const n = rng.int(11, 25);
   const k = rng.int(4, 9);
-  return answerItem('ar-divisors', level, `Quel est le ${k}<sup>e</sup> multiple de ${m(num(n))} (en commençant par ${n}) ?`, String(n * k), {
+  return answerItem('ar-divisors', level, t('Quel est le {k}<sup>e</sup> multiple de {x} (en commençant par {n}) ?', { k, x: m(num(n)), n }), String(n * k), {
     keys: 'int', solution: [{ math: `${n}×${k}`, note: `= ${n * k}` }], key: `kth:${n}:${k}`,
   });
 };
@@ -147,21 +155,21 @@ GEN['ar-prime'] = (level, rng) => {
     if (level === 1) traps.push([1, 'one_is_prime']);
     const odd = rng.shuffle(pool.filter((n) => n % 2 && !isPrime(n) && n > 1));
     for (const n of odd) if (traps.length < 3) traps.push([n, 'odd_is_prime']);
-    return yesNo('ar-prime', level, 'Lequel de ces nombres est premier ?', m(num(right)), traps.map(([n, r]) => [m(num(n)), r]), rng, {
-      solution: [{ math: String(right), note: 'Il n\'a que deux diviseurs : 1 et lui-même.' }, ...traps.filter(([n]) => n > 1).map(([n]) => ({ math: factorString(n), note: `${n} n'est pas premier.` }))],
+    return yesNo('ar-prime', level, t('Lequel de ces nombres est premier ?'), m(num(right)), traps.map(([n, r]) => [m(num(n)), r]), rng, {
+      solution: [{ math: String(right), note: t('Il n\'a que deux diviseurs : 1 et lui-même.') }, ...traps.filter(([n]) => n > 1).map(([n]) => ({ math: factorString(n), note: t('{n} n\'est pas premier.', { n }) }))],
       key: `p:${right}`,
     });
   }
   if (level === 3) {
     const n = rng.pick([21, 27, 33, 39, 49, 51, 57, 63, 69, 77, 81, 87, 91, 93]);
     const [p] = primeFactors(n)[0];
-    return yesNo('ar-prime', level, `${m(num(n))} est-il un nombre premier ?`, `Non : ${n} = ${p} × ${n / p}`,
-      [['Oui : il est impair', 'odd_is_prime'], ['Oui : il n\'est pas dans les livrets de 2, 5 et 10', 'odd_is_prime'], ['Oui : on ne peut pas le diviser par 2', 'odd_is_prime']], rng, { key: `q:${n}` });
+    return yesNo('ar-prime', level, t('{n} est-il un nombre premier ?', { n: m(num(n)) }), t('Non : {n} = {p} × {q}', { n, p, q: n / p }),
+      [[t('Oui : il est impair'), 'odd_is_prime'], [t('Oui : il n\'est pas dans les livrets de 2, 5 et 10'), 'odd_is_prime'], [t('Oui : on ne peut pas le diviser par 2'), 'odd_is_prime']], rng, { key: `q:${n}` });
   }
   const [lo, hi] = rng.pick([[20, 40], [40, 60], [60, 80], [80, 100], [10, 30]]);
   const ps = range(lo, hi).filter(isPrime);
-  return answerItem('ar-prime', level, `Combien y a-t-il de nombres premiers entre ${lo} et ${hi} ?`, String(ps.length), {
-    keys: 'int', solution: [{ math: String(ps.length), note: `Ce sont ${ps.join(', ')}.` }], key: `count:${lo}`,
+  return answerItem('ar-prime', level, t('Combien y a-t-il de nombres premiers entre {lo} et {hi} ?', { lo, hi }), String(ps.length), {
+    keys: 'int', solution: [{ math: String(ps.length), note: t('Ce sont {list}.', { list: ps.join(', ') }) }], key: `count:${lo}`,
   });
 };
 
@@ -178,7 +186,7 @@ const FACTOR_POOLS = {
 GEN['ar-factor'] = (level, rng) => {
   const n = rng.pick(FACTOR_POOLS[level]());
   return {
-    ...answerItem('ar-factor', level, `Décompose ${m(num(big(n)))} en produit de facteurs premiers.`, factorString(n), {
+    ...answerItem('ar-factor', level, t('Décompose {n} en produit de facteurs premiers.', { n: m(num(big(n))) }), factorString(n), {
       keys: 'prod', solution: factorLines(n), key: `f:${n}`, expectedSec: 30,
     }),
     start: { math: String(n) },
@@ -210,13 +218,13 @@ GEN['ar-gcd'] = (level, rng) => {
   const lines = [
     { math: factorString(a), note: `${a} = ${factorText(a)}` },
     { math: factorString(b), note: `${b} = ${factorText(b)}` },
-    { math: String(value), note: want === 'gcd' ? 'PGDC : les facteurs communs, avec le plus petit exposant.' : 'PPMC : tous les facteurs, avec le plus grand exposant.' },
+    { math: String(value), note: want === 'gcd' ? t('PGDC : les facteurs communs, avec le plus petit exposant.') : t('PPMC : tous les facteurs, avec le plus grand exposant.') },
   ];
-  let prompt = want === 'gcd' ? `PGDC(${a} ; ${b}) = ?` : `PPMC(${a} ; ${b}) = ?`;
+  let prompt = want === 'gcd' ? t('PGDC({a} ; {b}) = ?', { a, b }) : t('PPMC({a} ; {b}) = ?', { a, b });
   if (level === 5) {
     prompt = want === 'gcd'
-      ? `On veut couper deux rubans de ${a} cm et de ${b} cm en morceaux tous de même longueur, la plus grande possible, sans chute. Quelle longueur (en cm) ?`
-      : `Un bus passe toutes les ${a} minutes, un autre toutes les ${b} minutes. Ils partent ensemble. Dans combien de minutes repartent-ils ensemble ?`;
+      ? t('On veut couper deux rubans de {a} cm et de {b} cm en morceaux tous de même longueur, la plus grande possible, sans chute. Quelle longueur (en cm) ?', { a, b })
+      : t('Un bus passe toutes les {a} minutes, un autre toutes les {b} minutes. Ils partent ensemble. Dans combien de minutes repartent-ils ensemble ?', { a, b });
   }
   return answerItem('ar-gcd', level, prompt, String(value), { keys: 'int', traps, solution: lines, key: `${want}:${a}:${b}`, expectedSec: 30 });
 };
@@ -237,7 +245,7 @@ GEN['ar-fractions'] = (level, rng) => {
       break;
     }
     return stepsItem('ar-fractions', level, `${n}/${d}`, {
-      mode: 'free', prompt: `Simplifie en une seule étape, en divisant par le PGDC de ${n} et ${d}.`,
+      mode: 'free', prompt: t('Simplifie en une seule étape, en divisant par le PGDC de {n} et {d}.', { n, d }),
     });
   }
   if (level <= 4) {
@@ -251,9 +259,9 @@ GEN['ar-fractions'] = (level, rng) => {
     const n1 = rng.pick(range(1, a - 1).filter((x) => gcd(x, a) === 1));
     const n2 = rng.pick(range(1, b - 1).filter((x) => gcd(x, b) === 1));
     if (level === 3) {
-      return answerItem('ar-fractions', level, `Quel est le plus petit dénominateur commun de ${mathHtml(`${n1}/${a}`)} et ${mathHtml(`${n2}/${b}`)} ?`, String(lcm(a, b)), {
+      return answerItem('ar-fractions', level, t('Quel est le plus petit dénominateur commun de {x} et {y} ?', { x: mathHtml(`${n1}/${a}`), y: mathHtml(`${n2}/${b}`) }), String(lcm(a, b)), {
         keys: 'int', traps: [{ value: [a * b, 1], rule: 'lcm_product' }],
-        solution: [{ math: String(lcm(a, b)), note: `PPMC(${a} ; ${b}) : ${factorText(a)} et ${factorText(b)}.` }], key: `den:${a}:${b}`,
+        solution: [{ math: String(lcm(a, b)), note: t('PPMC({a} ; {b}) : {fa} et {fb}.', { a, b, fa: factorText(a), fb: factorText(b) }) }], key: `den:${a}:${b}`,
       });
     }
     return stepsItem('ar-fractions', level, `${n1}/${a}+${n2}/${b}`, { mode: 'free' });
@@ -279,12 +287,12 @@ GEN['ar-surd'] = (level, rng) => {
   for (let s = k; s > 1; s--) if (n % (s * s) === 0) { steps.push(s); break; }
   return {
     skill: 'ar-surd', level, type: 'answer',
-    prompt: `Écris ${mathHtml(expr)} sous la forme a√b, avec b le plus petit possible.`,
+    prompt: t('Écris {x} sous la forme a√b, avec b le plus petit possible.', { x: mathHtml(expr) }),
     expected: `${k}√${r}`, form: 'any', exact: null, tree: null,
     traps: [], keys: 'surd', suffix: '', figure: null,
     baits: ['surd_forget_root'],
     solution: [
-      { math: `√(${k * k}×${r})`, note: `${n} = ${k * k} × ${r}, et ${k * k} est un carré.` },
+      { math: `√(${k * k}×${r})`, note: t('{n} = {s} × {r}, et {s} est un carré.', { n, s: k * k, r }) },
       { math: `√${k * k}×√${r}`, note: '√(a × b) = √a × √b' },
       { math: `${k}×√${r}`, note: `√${k * k} = ${k}` },
     ],
@@ -305,9 +313,9 @@ GEN['nb-convert'] = (level, rng) => {
     const traps = [];
     // 0,4 read as 1/4: the decimal digits become the denominator.
     if (digits.length === 1 && n === 1) traps.push({ value: [1, Number(digits)], rule: 'frac_decimal_digits' });
-    return answerItem('nb-convert', level, `Écris ${m(num(dec(x)))} sous forme de fraction irréductible.`, `${n}/${d}`, {
+    return answerItem('nb-convert', level, t('Écris {x} sous forme de fraction irréductible.', { x: m(num(dec(x))) }), `${n}/${d}`, {
       form: 'irreducible', traps,
-      solution: [{ math: `${digits}/${10 ** digits.length}`, note: `${dec(x)} = ${digits} ${digits.length === 1 ? 'dixièmes' : digits.length === 2 ? 'centièmes' : 'millièmes'}` }, { math: `${n}/${d}`, note: 'On simplifie.' }],
+      solution: [{ math: `${digits}/${10 ** digits.length}`, note: t(digits.length === 1 ? '{x} = {k} dixièmes' : digits.length === 2 ? '{x} = {k} centièmes' : '{x} = {k} millièmes', { x: dec(x), k: digits }) }, { math: `${n}/${d}`, note: t('On simplifie.') }],
       key: `d2f:${n}/${d}`,
     });
   }
@@ -317,29 +325,29 @@ GEN['nb-convert'] = (level, rng) => {
     // 3/8 written 0,38, and 1/4 written 0,4: the digits are copied.
     const traps = [{ value: [Number(`${n}${d}`), 10 ** (String(n).length + String(d).length)], rule: 'frac_decimal_digits' }];
     if (n === 1 && d < 10) traps.push({ value: [d, 10], rule: 'frac_decimal_digits' });
-    return answerItem('nb-convert', level, `Écris ${mathHtml(`${n}/${d}`)} sous forme décimale.`, dec(x), {
-      form: 'decimal', keys: 'dec', traps: traps.filter((t) => t.value[0] / t.value[1] !== x),
-      solution: [{ math: `${n}÷${d}`, note: `La barre de fraction veut dire « divisé par » : ${n} ÷ ${d} = ${dec(x)}.` }], key: `f2d:${n}/${d}`,
+    return answerItem('nb-convert', level, t('Écris {x} sous forme décimale.', { x: mathHtml(`${n}/${d}`) }), dec(x), {
+      form: 'decimal', keys: 'dec', traps: traps.filter((tr) => tr.value[0] / tr.value[1] !== x),
+      solution: [{ math: `${n}÷${d}`, note: t('La barre de fraction veut dire « divisé par » : {n} ÷ {d} = {x}.', { n, d, x: dec(x) }) }], key: `f2d:${n}/${d}`,
     });
   }
   if (level === 3) {
     const p = rng.pick([5, 8, 12, 15, 35, 40, 60, 75, 120, 150, 3, 0.5]);
     const x = fix(p / 100);
     if (rng.chance(0.5)) {
-      return answerItem('nb-convert', level, `Écris ${m(num(dec(p)))} % sous forme décimale.`, dec(x), {
-        form: 'decimal', keys: 'dec', traps: [{ value: [Math.round(p * 10), 100], rule: 'percent_shift' }].filter((t) => t.value[0] / t.value[1] !== x),
-        solution: [{ math: `${dec(p)}÷100`, note: `Pour cent veut dire « sur 100 » : ${dec(p)} % = ${dec(x)}.` }], key: `p2d:${p}`,
+      return answerItem('nb-convert', level, t('Écris {x} % sous forme décimale.', { x: m(num(dec(p))) }), dec(x), {
+        form: 'decimal', keys: 'dec', traps: [{ value: [Math.round(p * 10), 100], rule: 'percent_shift' }].filter((tr) => tr.value[0] / tr.value[1] !== x),
+        solution: [{ math: `${dec(p)}÷100`, note: t('Pour cent veut dire « sur 100 » : {p} % = {x}.', { p: dec(p), x: dec(x) }) }], key: `p2d:${p}`,
       });
     }
-    return answerItem('nb-convert', level, `Écris ${m(num(dec(x)))} en pourcentage.`, dec(p), {
-      keys: 'dec', suffix: '%', traps: [{ value: [Math.round(p * 10), 100], rule: 'percent_shift' }].filter((t) => t.value[0] / t.value[1] !== p),
+    return answerItem('nb-convert', level, t('Écris {x} en pourcentage.', { x: m(num(dec(x))) }), dec(p), {
+      keys: 'dec', suffix: '%', traps: [{ value: [Math.round(p * 10), 100], rule: 'percent_shift' }].filter((tr) => tr.value[0] / tr.value[1] !== p),
       solution: [{ math: `${dec(x)}×100`, note: `= ${dec(p)} %` }], key: `d2p:${p}`,
     });
   }
   if (level === 4) {
     const [n, d] = rng.pick([[1, 4], [3, 4], [2, 5], [3, 8], [7, 20], [9, 25], [1, 8], [3, 40], [11, 20], [13, 50]]);
     const p = fix((n / d) * 100);
-    return answerItem('nb-convert', level, `Écris ${mathHtml(`${n}/${d}`)} en pourcentage.`, dec(p), {
+    return answerItem('nb-convert', level, t('Écris {x} en pourcentage.', { x: mathHtml(`${n}/${d}`) }), dec(p), {
       keys: 'dec', suffix: '%',
       solution: [{ math: `${n}/${d}×100`, note: `= ${dec(p)} %` }], key: `f2p:${n}/${d}`,
     });
@@ -348,13 +356,13 @@ GEN['nb-convert'] = (level, rng) => {
   const [n, d] = rng.pick([[1, 3], [2, 3], [1, 9], [4, 9], [1, 6], [5, 6], [1, 11], [2, 11]]);
   const rep = (n / d).toFixed(6).replace('.', ',').replace(/0+$/, '');
   const wrong = (Math.round((n / d) * 10) / 10);
-  return mcqItem('nb-convert', level, `Quelle fraction vaut ${m(num(`${rep.slice(0, 6)}…`))} ?`, [
+  return mcqItem('nb-convert', level, t('Quelle fraction vaut {x} ?', { x: m(num(`${rep.slice(0, 6)}…`)) }), [
     { html: mathHtml(`${n}/${d}`), correct: true },
     { html: mathHtml(`${Math.round(wrong * 10)}/10`), correct: false, rule: 'repeating_as_finite' },
     { html: mathHtml(`${Math.round((n / d) * 100)}/100`), correct: false, rule: 'repeating_as_finite' },
     { html: mathHtml(`${d}/${n * 10}`), correct: false },
   ].filter((o, i, all) => all.findIndex((x) => x.html === o.html) === i), rng, {
-    solution: [{ math: `${n}÷${d}`, note: `= ${rep.slice(0, 6)}… : les chiffres se répètent sans fin.` }], key: `rep:${n}/${d}`,
+    solution: [{ math: `${n}÷${d}`, note: t('= {x}… : les chiffres se répètent sans fin.', { x: rep.slice(0, 6) }) }], key: `rep:${n}/${d}`,
   });
 };
 
@@ -377,9 +385,9 @@ GEN['nb-sets'] = (level, rng) => {
     'C\'est un quotient d\'entiers, mais pas un entier : ℚ.',
     'Ce n\'est pas un quotient d\'entiers : il est irrationnel, dans ℝ seulement.',
   ][k];
-  return mcqItem('nb-sets', level, `Quel est le plus petit ensemble qui contient ${m(num(x))} ?`,
+  return mcqItem('nb-sets', level, t('Quel est le plus petit ensemble qui contient {x} ?', { x: m(num(x)) }),
     [{ html: SETS[k], correct: true }, ...wrongs.map(([s, r]) => ({ html: s, correct: false, rule: r || null }))], rng, {
-      keepOrder: true, solution: [{ html: m(x), note: `${why} Rappel : ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ.` }], key: `set:${x}`,
+      keepOrder: true, solution: [{ html: m(x), note: `${t(why)} ${t('Rappel : ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ.')}` }], key: `set:${x}`,
     });
 };
 
@@ -388,10 +396,10 @@ GEN['nb-sets'] = (level, rng) => {
 GEN['nb-irrational'] = (level, rng) => {
   const irr = rng.pick(['√2', '√3', '√5', '√10', '√50', 'π', '√20', '2√3']);
   const rationals = rng.shuffle([['√49', 'root_always_irrational'], ['√(9/16)', 'root_always_irrational'], ['0,25', null], ['2/3', null], ['√100', 'root_always_irrational'], ['−5', null], ['1,5', null], ['√0,01', 'root_always_irrational']]).slice(0, 3);
-  return mcqItem('nb-irrational', level, 'Lequel de ces nombres est irrationnel ?', [
+  return mcqItem('nb-irrational', level, t('Lequel de ces nombres est irrationnel ?'), [
     { html: m(irr), correct: true }, ...rationals.map(([x, rule]) => ({ html: m(x), correct: false, rule })),
   ], rng, {
-    solution: [{ html: m(irr), note: `${irr} ne peut pas s'écrire comme un quotient de deux entiers. Une racine d'un carré parfait (√49 = 7) est rationnelle.` }], key: `irr:${irr}`,
+    solution: [{ html: m(irr), note: t('{x} ne peut pas s\'écrire comme un quotient de deux entiers. Une racine d\'un carré parfait (√49 = 7) est rationnelle.', { x: irr }) }], key: `irr:${irr}`,
   });
 };
 
@@ -403,7 +411,7 @@ GEN['nb-cube'] = (level, rng) => {
     const [n, d] = rng.pick([[1, 2], [2, 3], [1, 3], [3, 4], [1, 5]]);
     const neg = rng.chance(0.5) ? '−' : '';
     const sign = neg ? '-' : '';
-    return answerItem('nb-cube', level, `Calcule ${m(`∛(${neg}${n ** 3}/${d ** 3})`)}.`, `${sign}${n}/${d}`, {
+    return answerItem('nb-cube', level, t('Calcule {e}.', { e: m(`∛(${neg}${n ** 3}/${d ** 3})`) }), `${sign}${n}/${d}`, {
       keys: 'relfrac', signed: true, form: 'irreducible',
       solution: [{ math: `(${sign}${n}/${d})^3`, note: `= ${neg}${n ** 3}/${d ** 3}` }], key: `cf:${sign}${n}/${d}`,
     });
@@ -413,8 +421,8 @@ GEN['nb-cube'] = (level, rng) => {
   if (c % 3 === 0 && c / 3 !== k) traps.push({ value: [c / 3, 1], rule: 'cube_root_third' });
   if (k < 0) traps.push({ value: [-k, 1], rule: 'cube_root_negative' });
   const inside = c < 0 ? `(${String(c).replace('-', '−')})` : big(c);
-  return answerItem('nb-cube', level, `Calcule ${m(`∛${inside}`)}.`, String(k), {
+  return answerItem('nb-cube', level, t('Calcule {e}.', { e: m(`∛${inside}`) }), String(k), {
     keys: k < 0 ? 'rel' : 'int', signed: true, traps,
-    solution: [{ math: `(${k})^3`, note: `= ${c}, donc ∛${inside} = ${k}.` }], key: `c:${c}`,
+    solution: [{ math: `(${k})^3`, note: t('= {c}, donc ∛{x} = {k}.', { c, x: inside, k }) }], key: `c:${c}`,
   });
 };

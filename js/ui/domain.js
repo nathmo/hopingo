@@ -3,6 +3,7 @@
 // (js/judges/domain-item.js judges them).
 
 import { h, html, play } from './dom.js';
+import { t } from '../i18n.js';
 import { MathInput } from './keypad.js';
 import { keysFor } from './keys-needed.js';
 import { explainRule, solutionHtml } from './exercises.js';
@@ -33,7 +34,7 @@ export function mountDomain(item, ctx, body) {
     const values = Object.fromEntries(Object.entries(inputs).map(([v, [lo, hi]]) => [v, [lo.value, hi.value]]));
     const r = judgeDomainItem(item, values);
     if (r.correct) { play('good'); ctx.complete({ correct: mistakes === 0, hintsUsed: hints.used() }); return; }
-    if (r.verdict.kind === 'parse' || r.verdict.kind === 'stay' || r.verdict.kind === 'ok') { say(`<p>${r.verdict.message || 'Il manque quelque chose.'}</p>`); return; }
+    if (r.verdict.kind === 'parse' || r.verdict.kind === 'stay' || r.verdict.kind === 'ok') { say(`<p>${r.verdict.message || t('Il manque quelque chose.')}</p>`); return; }
     play('bad');
     mistakes++;
     say(r.verdict.rule ? explainRule(r.verdict.rule, r.verdict.diag) + `<p>${r.verdict.message}</p>` : `<p>${r.verdict.message}</p>`, 'bad');
@@ -45,7 +46,7 @@ export function mountDomain(item, ctx, body) {
     }
   }
   void html;
-  const footer = h('div', h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, 'Valider'));
+  const footer = h('div', h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, t('Valider')));
   // The keyboard types in the bound last touched.
   return { ownFlow: true, footer, onKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } else active?.handleKey(e); } };
 }

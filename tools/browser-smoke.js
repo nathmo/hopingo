@@ -6,6 +6,8 @@
 // Node's global WebSocket (Node 22+, no package), and checks:
 //   start    the app loads without errors; profiles 7H, Gymnase and BA1 are
 //            created through the screens, and the map draws every unit;
+//   map      the map in French and English, phone and wide screen: the rail of
+//            years jumps to its band (screenshots map-<lang>-<width>-<year>).
 //   mount    every university skill, levels 1 to 5 and each exam variant it
 //            declares, N items each (--per), mounted by the lesson screen:
 //            no exception or console error, no « undefined », « NaN »,
@@ -35,12 +37,13 @@
 //   node tools/browser-smoke.js --only mount --unit alglin --per 1
 //   node tools/browser-smoke.js --only play --skill l-sys-rref
 // Options:
-//   --only a,b        phases to run (start, mount, play, wrong, exams, problem, school, steps)
+//   --only a,b        phases to run (start, map, mount, play, wrong, exams, problem, school, steps)
 //   --unit u1,u2      university units to check (default: all)
 //   --skill s1,s2     skills to check (default: all of the units)
 //   --per N           items per skill, level and exam variant (default 2)
 //   --play N          skills played per unit (default 2, plus one per item type)
 //   --seed N          seed of the generators (default 7)
+//   --lang en         the page in English (phases map and mount)
 //   --port N          HTTP port (default 8765); --cdp N the DevTools port (9333)
 //   --out DIR         screenshots and report (default: <tmp>/hopingo-smoke)
 //   --browser PATH    the browser (default: Edge, then Chrome)
@@ -63,13 +66,18 @@ const opt = (name, def) => {
 };
 const flag = (name) => argv.includes(`--${name}`);
 const list = (s) => (s ? String(s).split(',').map((x) => x.trim()).filter(Boolean) : null);
-const PHASES = ['start', 'mount', 'play', 'wrong', 'exams', 'problem', 'school', 'steps'];
+const PHASES = ['start', 'map', 'mount', 'play', 'wrong', 'exams', 'problem', 'school', 'steps'];
 const ONLY = list(opt('only')) ?? PHASES;
 const UNITS = list(opt('unit'));
 const SKILLS = list(opt('skill'));
 const PER = Number(opt('per', 2));
 const PLAY = Number(opt('play', 2));
 const SEED = Number(opt('seed', 7));
+// --lang en: the page in English (js/i18n.js). Only the phases that do not
+// click buttons by their French label check English: map and mount (every
+// item drawn, scanned for errors and broken text). The others drive the
+// French screens.
+const LANG = opt('lang', null);
 const PORT = Number(opt('port', 8765));
 const CDP_PORT = Number(opt('cdp', 9333));
 const OUT = resolve(opt('out', join(tmpdir(), 'hopingo-smoke')));
@@ -197,6 +205,12 @@ async function shot(name) {
 
 async function load(path = '') {
   await cdp.send('Page.navigate', { url: BASE + path });
+  if (LANG) {
+    // The language is read when the page loads: set it, then load again.
+    await sleep(300);
+    await cdp.send('Runtime.evaluate', { expression: `localStorage.setItem('hopingo.lang', ${JSON.stringify(LANG)})` });
+    await cdp.send('Page.navigate', { url: BASE + path });
+  }
   for (let i = 0; i < 100; i++) {
     await sleep(100);
     try { if (await cdp.eval('!!(window.__smoke && document.readyState === "complete" && document.querySelector("#app").children.length)', 5000)) break; } catch { /* navigating */ }
@@ -1236,7 +1250,8 @@ async function phaseStart() {
       await S.wait(50);
       if (!S.click('Commencer depuis le début')) return {err: 'no skip button on ' + document.querySelector('#app').className};
       await S.wait(100);
-      const units = [...document.querySelectorAll('section.unit')];
+      // The map draws a unit as one column per school year (home.js): count units, not columns.
+      const units = [...new Map([...document.querySelectorAll('section.unit')].map((u) => [u.dataset.unit, u])).values()];
       const nodes = document.querySelectorAll('.node').length;
       return {screen: document.querySelector('#app').className, units: units.length, ready: units.filter((u) => !u.classList.contains('locked')).length, nodes,
         all: S.M.skills.UNITS.length, skills: S.M.skills.SKILLS.length, scan: S.scan(), exams: document.querySelectorAll('.unit-tools .btn.secondary').length};
@@ -1254,6 +1269,55 @@ async function phaseStart() {
   if (r.screen !== 'screen-lesson') fail('start', 'Continuer', `ends on ${r.screen}`);
   for (const s of [...r.scan, ...r.errors]) fail('start', 'first lesson', s);
   await shot('first-lesson-BA1');
+}
+
+// The map as a tree by year (home.js) and the language setting: in French
+// and in English, on a phone and on a wide screen, the rail of years jumps
+// to its band. Screenshots map-<lang>-<width>-<year>.
+async function phaseMap() {
+  log('\n== map: bands, rail of years, language');
+  for (const lang of ['fr', 'en']) {
+    await cdp.send('Runtime.evaluate', { expression: `localStorage.setItem('hopingo.lang', '${lang}')` });
+    await load();
+    for (const width of [420, 1200]) {
+      await cdp.send('Emulation.setDeviceMetricsOverride', { width, height: 900, deviceScaleFactor: 1, mobile: false });
+      const r = await cdp.eval(`(async () => {
+        const S = window.__smoke;
+        const app = S.M.app;
+        if (!app.profile) {
+          const p = app.store.createProfile({ name: 'Map', avatar: '🦊', year: 9, track: 'mid' });
+          p.placement.done = true;
+          app.save();
+        }
+        app.go('home');
+        await S.wait(100);
+        const out = { lang: document.documentElement.lang, bands: document.querySelectorAll('.band').length, rail: document.querySelectorAll('.rail-year').length, cta: document.querySelector('.cta .btn.primary')?.firstChild?.textContent, jumps: [] };
+        for (const y of ['9', '13']) {
+          document.querySelector('.rail-year[data-year="' + y + '"]').click();
+          await S.wait(900);
+          const top = document.querySelector('.band[data-year="' + y + '"]').getBoundingClientRect().top;
+          out.jumps.push({ y, top: Math.round(top), active: document.querySelector('.rail-year.active')?.dataset.year });
+        }
+        return { ...out, errors: S.takeErrors() };
+      })()`);
+      for (const e of r.errors) fail('map', `${lang} ${width}`, e);
+      if (r.lang !== lang) fail('map', `${lang} ${width}`, `page language ${r.lang}`);
+      if (lang === 'en' && r.cta !== 'Continue' && r.cta !== 'Review') fail('map', `${lang} ${width}`, `call to action in ${r.cta}`);
+      if (r.rail !== r.bands) fail('map', `${lang} ${width}`, `${r.rail} years on the rail for ${r.bands} bands`);
+      for (const j of r.jumps) {
+        if (j.top < 0 || j.top > 220) fail('map', `${lang} ${width} rail ${j.y}`, `band at ${j.top}px from the top`);
+        if (j.active !== j.y) fail('map', `${lang} ${width} rail ${j.y}`, `rail lights ${j.active}`);
+      }
+      log(`  ${lang} ${width}px: ${r.bands} bands, rail jumps ${r.jumps.map((j) => `${j.y}→${j.top}px`).join(', ')}`);
+      // Screenshots of a band of the school years and of BA1.
+      for (const y of ['9', '13']) {
+        await cdp.eval(`(async () => { document.querySelector('.rail-year[data-year="${y}"]').click(); await window.__smoke.wait(900); return 1; })()`);
+        await shot(`map-${lang}-${width}-${y === '9' ? '9H' : 'BA1'}`);
+      }
+    }
+  }
+  await cdp.send('Runtime.evaluate', { expression: 'localStorage.removeItem(\'hopingo.lang\')' });
+  await cdp.send('Emulation.setDeviceMetricsOverride', { width: 420, height: 900, deviceScaleFactor: 1, mobile: false });
 }
 
 // The skills to check: --skill, else the skills of --unit, else all.
@@ -1562,7 +1626,7 @@ async function main() {
     if (m.method === 'Log.entryAdded' && m.params.entry.level === 'error') report.console.push(`log: ${m.params.entry.text} ${m.params.entry.url ?? ''}`);
   });
   await cdp.send('Page.addScriptToEvaluateOnNewDocument', { source: `(${pageLib.toString()})();` });
-  const PH = { start: phaseStart, mount: phaseMount, play: phasePlay, wrong: phaseWrong, exams: phaseExams, problem: phaseProblem, school: phaseSchool, steps: phaseSteps, dump: phaseDump };
+  const PH = { start: phaseStart, map: phaseMap, mount: phaseMount, play: phasePlay, wrong: phaseWrong, exams: phaseExams, problem: phaseProblem, school: phaseSchool, steps: phaseSteps, dump: phaseDump };
   for (const name of [...PHASES, 'dump'].filter((p) => ONLY.includes(p))) {
     if (!PH[name]) continue;
     const n0 = report.failures.length;

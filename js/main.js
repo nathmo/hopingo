@@ -2,6 +2,7 @@
 
 import * as store from './store.js';
 import { setSound } from './ui/dom.js';
+import { t, LANG } from './i18n.js';
 import { adoptNewSkills } from './engine/learner.js';
 import { profilesScreen, createProfileScreen } from './ui/screens/profiles.js';
 import { homeScreen } from './ui/screens/home.js';
@@ -25,6 +26,10 @@ const SCREENS = {
   // Step U3: the mock exams.
   exam: examScreen,
 };
+
+// The page in the chosen language (js/i18n.js).
+document.documentElement.lang = LANG;
+document.title = t('Hopingo — le calcul en jouant');
 
 const root = document.getElementById('app');
 let cleanup = null;

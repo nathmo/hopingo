@@ -5,6 +5,7 @@
 // unit « fonctions »), with a layer for what is placed.
 
 import { h, play } from './dom.js';
+import { t as tr } from '../i18n.js';
 import { graphSvg } from '../math/graph.js';
 import { checkPlot, snap, implicitSegments } from '../judges/plot.js';
 import { explainRule, solutionHtml } from './exercises.js';
@@ -74,7 +75,8 @@ export function mountPlot(item, ctx, body) {
     if (pending) layer.appendChild(el('circle', { cx: X(pending[0]), cy: Y(pending[1]), r: 5, class: 'plot-pending' }));
     const p = item.place.find((x) => x.id === tool);
     const left = p.count - placed[p.id].length;
-    status.textContent = left > 0 ? `${p.label} : ${p.kind === 'line' ? (pending ? 'touche un 2e point de la droite' : 'touche deux points de la droite') : 'touche le point'} (encore ${left}).` : `${p.label} : placé. Touche un élément pour l'enlever.`;
+    const action = p.kind === 'line' ? (pending ? tr('touche un 2e point de la droite') : tr('touche deux points de la droite')) : tr('touche le point');
+    status.textContent = left > 0 ? tr('{label} : {action} (encore {n}).', { label: p.label, action, n: left }) : tr('{label} : placé. Touche un élément pour l\'enlever.', { label: p.label });
     ctx.ready(item.place.every((x) => placed[x.id].length === x.count));
   }
 
@@ -138,7 +140,7 @@ export function mountPlot(item, ctx, body) {
       return {
         correct: false, rules: rule ? [rule] : [], ambiguous: 1, ...common,
         answerHtml: item.answerHtml || '',
-        explainHtml: [rule ? explainRule(rule, null) : '', `<p>${wrong.map((p) => p.message).join('<br>')}</p>`, `<p class="muted">En vert : les éléments attendus, et la courbe.</p>`, solutionHtml(item.solution)].join(''),
+        explainHtml: [rule ? explainRule(rule, null) : '', `<p>${wrong.map((p) => p.message).join('<br>')}</p>`, tr('<p class="muted">En vert : les éléments attendus, et la courbe.</p>'), solutionHtml(item.solution)].join(''),
       };
     },
   };
