@@ -170,6 +170,7 @@ export function describe(item) {
   if (item.type === 'fact') lines.push(`  ${strip(item.left)} [${item.expected}] ${strip(item.right)}`.replace(/\s+\[/, ' [') + (item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''));
   if (item.type === 'answer') lines.push(`  → ${item.expected}${item.form !== 'any' ? ` (${item.form})` : ''}${item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''}`);
   if (item.type === 'mcq') lines.push(`  ${item.options.map((o) => `${o.correct ? '✔' : '·'} ${strip(mathText(o.html))}${o.rule ? ` [${o.rule}]` : ''}`).join('   ')}`);
+  if (item.type === 'recipe') lines.push(`  [étapes ${item.active.join(', ')} · ${item.feedback} · ${item.sheet}] → ${item.problem.find} = ${item.problem.answerValue} ${item.problem.answerUnit}${item.shown ? `   (montré : ${item.shown.exprText}${item.shown.exprRight ? '' : ' ✗'}, ≈ ${item.shown.estimate}${item.shown.estimateRight ? '' : ' ✗'})` : ''}`);
   if (item.type === 'lines') lines.push(...describeLines(item));
   if (item.type === 'tf') lines.push(...describeTf(item));
   if (item.type === 'tokens') lines.push(...describeTokens(item));

@@ -205,9 +205,10 @@ export async function phasePhysique({ cdp, load, shot, fail, log, SKILLS, PER, S
   if (skills.includes('ph6-algebre')) {
     for (let seed = SEED; seed < SEED + 40; seed++) {
       const info = await cdp.call('physStart', 'ph6-algebre', 1, seed);
-      if (!/luge|toboggan/.test(info.key) || !/^(luge|toboggan):v:/.test(info.key)) continue;
+      if (!/:(luge|toboggan):v:/.test(info.key)) continue;
       const r = await cdp.call('physWrongLine', 'v = 2 g h');
       if (!r.bad || r.lines !== 0) fail('physique', 'wrong line', `v = 2 g h not refused: ${r.feedback}`);
+      else if (!/Racine oubliée/.test(r.feedback)) fail('physique', 'wrong line', `the trap is not named: ${r.feedback}`);
       else log(`  wrong line refused: ${r.feedback.slice(0, 120)}`);
       await shot('phys-wrong-line');
       break;

@@ -136,8 +136,19 @@ export function mountRecipe(item, ctx, body, { explainRule, solutionHtml }) {
   const footer = h('div.steps-footer', keypadSlot, button);
   let input = null;
 
-  const message = (msg, kind = 'info') => { say.className = `step-feedback ${kind}`; say.innerHTML = msg ? `<p>${msg}</p>` : ''; };
-  const nudge = (k, res) => { note(k, res.rule); play('bad'); message(res.message, 'bad'); };
+  const message = (msg, kind = 'info') => {
+    say.className = `step-feedback ${kind}`;
+    say.innerHTML = msg ? `<p>${msg}</p>` : '';
+    // Under the keypad otherwise.
+    if (msg) requestAnimationFrame(() => say.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' }));
+  };
+  // Steps 3 to 7: a recognised trap explains itself (its name, why).
+  const nudge = (k, res) => {
+    note(k, res.rule);
+    play('bad');
+    message(res.message, 'bad');
+    if (k >= 3 && res.rule) say.insertAdjacentHTML('beforeend', explainRule(res.rule, null));
+  };
 
   function drawStrip() {
     strip.innerHTML = '';
