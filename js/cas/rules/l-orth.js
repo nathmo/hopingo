@@ -19,6 +19,7 @@ import * as MX from '../matrix.js';
 import { parse } from '../parse.js';
 import { lit } from '../ast.js';
 import { Mx, vecOf, simp } from '../matexpr.js';
+import { t } from '../../i18n.js';
 
 const q = (x) => (x instanceof Q ? x : typeof x === 'string' ? MX.q(x) : new Q(x));
 const Qv = (v) => v.map(q);
@@ -35,7 +36,7 @@ const rootOf = (n) => { const r = Math.round(Math.sqrt(n.valueOf())); return r *
 
 export const DEFS = {
   l_dot_no_sum: {
-    name: 'Produit scalaire laissé en vecteur',
+    name: t('Produit scalaire laissé en vecteur'),
     judges: ['mat'],
     transform(prev, ctx) {
       const d = ctx?.cfg?.dot;
@@ -45,18 +46,18 @@ export const DEFS = {
       return [{ node: node(vecOf(items)), ctx: { n: d[0].length } }];
     },
     explain: (ctx = {}) => (ctx.n
-      ? `Le produit scalaire est un <b>nombre</b> : après les ${ctx.n} produits terme à terme, il faut les additionner.`
-      : 'Le produit scalaire est un <b>nombre</b> : la somme des produits terme à terme, pas le vecteur de ces produits.'),
+      ? t('Le produit scalaire est un <b>nombre</b> : après les {n} produits terme à terme, il faut les additionner.', { n: ctx.n })
+      : t('Le produit scalaire est un <b>nombre</b> : la somme des produits terme à terme, pas le vecteur de ces produits.')),
     check: { judge: { kind: 'mat', expect: '-5', dot: [['1', '2', '2'], ['3', '0', '-4']] }, prev: 'u·v', line: '(3 ; 0 ; -8)' },
   },
   l_orth_transitive: {
-    name: 'L\'orthogonalité n\'est pas transitive',
+    name: t('L\'orthogonalité n\'est pas transitive'),
     judges: [],
-    explain: () => 'u ⊥ v et v ⊥ w ne disent rien sur u et w : avec u = w = e₁ et v = e₂, u ⊥ v, v ⊥ w, mais u · w = 1.',
+    explain: () => t('u ⊥ v et v ⊥ w ne disent rien sur u et w : avec u = w = e₁ et v = e₂, u ⊥ v, v ⊥ w, mais u · w = 1.'),
     check: { bait: { skill: 'l-orth-dot', exam: 'tf' } },
   },
   l_perp_one_vector: {
-    name: 'Orthogonal à un seul vecteur de W',
+    name: t('Orthogonal à un seul vecteur de W'),
     judges: ['span'],
     transform(prev, ctx) {
       const ws = ctx?.cfg?.perp;
@@ -68,15 +69,15 @@ export const DEFS = {
       });
     },
     explain: (ctx = {}) => (ctx.v
-      ? `Tes vecteurs sont orthogonaux à w${'₀₁₂₃'[ctx.k]} seulement. Un vecteur de W⊥ doit être orthogonal à <b>tous</b> les vecteurs de W : ${ctx.v} · ${ctx.w} = ${ctx.d} ≠ 0. Mets tous les wᵢ en lignes dans M.`
-      : 'Un vecteur de W⊥ doit être orthogonal à <b>tous</b> les vecteurs de W : la matrice M a une ligne par vecteur wᵢ, pas une seule.'),
+      ? t('Tes vecteurs sont orthogonaux à w{k} seulement. Un vecteur de W⊥ doit être orthogonal à <b>tous</b> les vecteurs de W : {v} · {w} = {d} ≠ 0. Mets tous les wᵢ en lignes dans M.', { k: '₀₁₂₃'[ctx.k], v: ctx.v, w: ctx.w, d: ctx.d })
+      : t('Un vecteur de W⊥ doit être orthogonal à <b>tous</b> les vecteurs de W : la matrice M a une ligne par vecteur wᵢ, pas une seule.')),
     check: {
       judge: { kind: 'span', basis: ['(1;-1;1;0)', '(-3;1;0;1)'], require: 'basis', perp: [['1', '1', '0', '2'], ['0', '1', '1', '-1']] },
       prev: 'W⊥', line: '(-1;1;0;0), (0;0;1;0), (-2;0;0;1)',
     },
   },
   l_proj_nonorth: {
-    name: 'Projection sur une base non orthogonale',
+    name: t('Projection sur une base non orthogonale'),
     judges: ['mat'],
     transform(prev, ctx) {
       const p = ctx?.cfg?.proj;
@@ -85,24 +86,24 @@ export const DEFS = {
       return [{ node: node(qVec(v)), ctx: { d: fq(dot(p.basis[0], p.basis[1])) } }];
     },
     explain: (ctx = {}) => (ctx.d && ctx.d !== '0'
-      ? `La formule Σ (y · wᵢ / wᵢ · wᵢ) wᵢ n'est juste que si les wᵢ sont orthogonaux ; ici w₁ · w₂ = ${ctx.d}. Orthogonalise d'abord (Gram-Schmidt).`
-      : 'La formule Σ (y · wᵢ / wᵢ · wᵢ) wᵢ n\'est juste que si les wᵢ sont orthogonaux deux à deux. Orthogonalise d\'abord la base (Gram-Schmidt).'),
+      ? t('La formule Σ (y · wᵢ / wᵢ · wᵢ) wᵢ n\'est juste que si les wᵢ sont orthogonaux ; ici w₁ · w₂ = {d}. Orthogonalise d\'abord (Gram-Schmidt).', { d: ctx.d })
+      : t('La formule Σ (y · wᵢ / wᵢ · wᵢ) wᵢ n\'est juste que si les wᵢ sont orthogonaux deux à deux. Orthogonalise d\'abord la base (Gram-Schmidt).')),
     check: { judge: { kind: 'mat', expect: '(1;3;1;3)', proj: { y: ['3', '1', '-1', '5'], basis: [['1', '1', '1', '1'], ['2', '0', '2', '0']] } }, prev: 'ŷ', line: '(3;2;3;2)' },
   },
   l_orth_cols_only: {
-    name: 'Colonnes orthogonales mais pas normées',
+    name: t('Colonnes orthogonales mais pas normées'),
     judges: [],
-    explain: () => 'Des colonnes orthogonales ne suffisent pas : il faut aussi qu\'elles soient de norme 1. Avec U = 2I, les colonnes sont orthogonales, mais UᵀU = 4I et U⁻¹ = (1/2)I ≠ Uᵀ.',
+    explain: () => t('Des colonnes orthogonales ne suffisent pas : il faut aussi qu\'elles soient de norme 1. Avec U = 2I, les colonnes sont orthogonales, mais UᵀU = 4I et U⁻¹ = (1/2)I ≠ Uᵀ.'),
     check: { bait: { skill: 'l-orth-matrices', exam: 'tf' } },
   },
   l_orth_det_one: {
-    name: 'Orthogonale n\'implique pas det = 1',
+    name: t('Orthogonale n\'implique pas det = 1'),
     judges: [],
-    explain: () => 'Une matrice orthogonale a det U = ±1, pas forcément 1 : une symétrie, comme (1/3)·[[1, 2, 2], [2, 1, −2], [2, −2, 1]] ou [[1, 0], [0, −1]], a det U = −1.',
+    explain: () => t('Une matrice orthogonale a det U = ±1, pas forcément 1 : une symétrie, comme (1/3)·[[1, 2, 2], [2, 1, −2], [2, −2, 1]] ou [[1, 0], [0, −1]], a det U = −1.'),
     check: { bait: { skill: 'l-orth-matrices', exam: 'tf' } },
   },
   l_gs_use_x: {
-    name: 'Projeter sur les xᵢ au lieu des vᵢ',
+    name: t('Projeter sur les xᵢ au lieu des vᵢ'),
     judges: ['mat'],
     transform(prev, ctx) {
       const g = ctx?.cfg?.gs;
@@ -113,15 +114,15 @@ export const DEFS = {
       return [{ node: node(qVec(v)), ctx: { d: fq(dot(v, g.vs[g.j - 1])), k: g.j } }];
     },
     explain: (ctx = {}) => (ctx.d
-      ? `x₁ et x₂ ne sont pas orthogonaux entre eux : il faut projeter sur v₁ et v₂, déjà orthogonaux. Contrôle : ton vecteur · v${'₀₁₂₃₄'[ctx.k]} = ${ctx.d} ≠ 0.`
-      : 'Les xᵢ ne sont pas orthogonaux entre eux : il faut projeter sur les vᵢ déjà obtenus, qui le sont.'),
+      ? t('x₁ et x₂ ne sont pas orthogonaux entre eux : il faut projeter sur v₁ et v₂, déjà orthogonaux. Contrôle : ton vecteur · v{k} = {d} ≠ 0.', { k: '₀₁₂₃₄'[ctx.k], d: ctx.d })
+      : t('Les xᵢ ne sont pas orthogonaux entre eux : il faut projeter sur les vᵢ déjà obtenus, qui le sont.')),
     check: {
       judge: { kind: 'mat', expect: '(1;1;-1;-1)', gs: { xs: [['1', '1', '1', '1'], ['2', '0', '2', '0'], ['2', '4', '0', '2']], vs: [['1', '1', '1', '1'], ['1', '-1', '1', '-1'], ['1', '1', '-1', '-1']], j: 2 } },
       prev: 'v_3', line: '(-1;2;-3;0)',
     },
   },
   l_gs_sign: {
-    name: 'Projection ajoutée au lieu d\'être retranchée',
+    name: t('Projection ajoutée au lieu d\'être retranchée'),
     judges: ['mat'],
     transform(prev, ctx) {
       const g = ctx?.cfg?.gs;
@@ -132,15 +133,15 @@ export const DEFS = {
       return [{ node: node(qVec(v)), ctx: { d: fq(dot(v, prevs[0])) } }];
     },
     explain: (ctx = {}) => (ctx.d
-      ? `On <b>retire</b> à xⱼ sa composante selon chaque vᵢ. Contrôle : ton vecteur · v₁ = ${ctx.d}, alors qu'il doit valoir 0.`
-      : 'On <b>retire</b> à xⱼ sa composante selon chaque vᵢ : vⱼ = xⱼ − (xⱼ · vᵢ / vᵢ · vᵢ) vᵢ. Contrôle : vⱼ · vᵢ doit valoir 0.'),
+      ? t('On <b>retire</b> à xⱼ sa composante selon chaque vᵢ. Contrôle : ton vecteur · v₁ = {d}, alors qu\'il doit valoir 0.', { d: ctx.d })
+      : t('On <b>retire</b> à xⱼ sa composante selon chaque vᵢ : vⱼ = xⱼ − (xⱼ · vᵢ / vᵢ · vᵢ) vᵢ. Contrôle : vⱼ · vᵢ doit valoir 0.')),
     check: {
       judge: { kind: 'mat', expect: '(1;-1;1;-1)', gs: { xs: [['1', '1', '1', '1'], ['2', '0', '2', '0']], vs: [['1', '1', '1', '1'], ['1', '-1', '1', '-1']], j: 1 } },
       prev: 'v_2', line: '(3;1;3;1)',
     },
   },
   l_qr_r_from_gs: {
-    name: 'R remplie avec les coefficients de Gram-Schmidt',
+    name: t('R remplie avec les coefficients de Gram-Schmidt'),
     judges: ['factor', 'value'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg || {};
@@ -157,12 +158,12 @@ export const DEFS = {
       return [{ node: node(qMat(g.C), [{ name: 'R', value: qMat(g.C) }]), ctx: { n: rootOf(g.norms2[0]), i: 1 } }];
     },
     explain: (ctx = {}) => (ctx.n
-      ? `Avec Q normée, rᵢⱼ = qᵢ · xⱼ = cᵢⱼ·‖vᵢ‖ : le coefficient de Gram-Schmidt est multiplié par la norme, et rᵢᵢ = ‖vᵢ‖ (ici ‖v${'₀₁₂₃₄'[ctx.i]}‖ = ${ctx.n}), pas 1.`
-      : 'Avec Q normée, rᵢⱼ = qᵢ · xⱼ = cᵢⱼ·‖vᵢ‖, et rᵢᵢ = ‖vᵢ‖ : les coefficients de Gram-Schmidt ne suffisent pas, il faut les multiplier par les normes.'),
+      ? t('Avec Q normée, rᵢⱼ = qᵢ · xⱼ = cᵢⱼ·‖vᵢ‖ : le coefficient de Gram-Schmidt est multiplié par la norme, et rᵢᵢ = ‖vᵢ‖ (ici ‖v{i}‖ = {n}), pas 1.', { i: '₀₁₂₃₄'[ctx.i], n: ctx.n })
+      : t('Avec Q normée, rᵢⱼ = qᵢ · xⱼ = cᵢⱼ·‖vᵢ‖, et rᵢᵢ = ‖vᵢ‖ : les coefficients de Gram-Schmidt ne suffisent pas, il faut les multiplier par les normes.')),
     check: { judge: { kind: 'factor', A: '[[1,2,2],[1,0,4],[1,2,0],[1,0,2]]', of: 'QR' }, prev: 'A', line: 'R = [[1,1,2],[0,1,-1],[0,0,1]]' },
   },
   l_lsq_square_subsystem: {
-    name: 'Seulement les premières équations',
+    name: t('Seulement les premières équations'),
     judges: ['mat', 'value'],
     transform(prev, ctx) {
       const L = ctx?.cfg?.lsq;
@@ -176,11 +177,13 @@ export const DEFS = {
       if (ctx.cfg.kind === 'value') return L.i !== undefined ? [{ node: lit(x[L.i]), ctx: c }] : [];
       return [{ node: node(qVec(x)), ctx: c }];
     },
-    explain: (ctx = {}) => `Le système est incompatible : une solution ${ctx.n ? `des ${ctx.n} premières équations` : 'de quelques équations'} ignore les autres. Les moindres carrés tiennent compte de toutes, par AᵀAx = Aᵀb.`,
+    explain: (ctx = {}) => (ctx.n
+      ? t('Le système est incompatible : une solution des {n} premières équations ignore les autres. Les moindres carrés tiennent compte de toutes, par AᵀAx = Aᵀb.', { n: ctx.n })
+      : t('Le système est incompatible : une solution de quelques équations ignore les autres. Les moindres carrés tiennent compte de toutes, par AᵀAx = Aᵀb.')),
     check: { judge: { kind: 'mat', expect: '(1;1)', lsq: { A: [[1, 0], [1, 1], [1, 2], [1, 3]], b: [2, 1, 2, 5], ask: 'x' } }, prev: 'x', line: '(2;-1)' },
   },
   l_lsq_line_swap: {
-    name: 'β₀ et β₁ échangés',
+    name: t('β₀ et β₁ échangés'),
     judges: ['mat', 'value'],
     transform(prev, ctx) {
       const L = ctx?.cfg?.lsq;
@@ -193,12 +196,12 @@ export const DEFS = {
       return [{ node: node(qVec([x[1], x[0]])), ctx: { b0: fq(x[0]), b1: fq(x[1]) } }];
     },
     explain: (ctx = {}) => (ctx.b0
-      ? `La colonne de 1 porte l'ordonnée à l'origine β₀ = ${ctx.b0} ; la colonne des x porte la pente β₁ = ${ctx.b1}. La droite est y = β₀ + β₁x.`
-      : 'La colonne de 1 porte l\'ordonnée à l\'origine β₀ ; la colonne des x porte la pente β₁. La droite est y = β₀ + β₁x.'),
+      ? t('La colonne de 1 porte l\'ordonnée à l\'origine β₀ = {b0} ; la colonne des x porte la pente β₁ = {b1}. La droite est y = β₀ + β₁x.', { b0: ctx.b0, b1: ctx.b1 })
+      : t('La colonne de 1 porte l\'ordonnée à l\'origine β₀ ; la colonne des x porte la pente β₁. La droite est y = β₀ + β₁x.')),
     check: { judge: { kind: 'mat', expect: '(1;2)', lsq: { A: [[1, 0], [1, 1], [1, 2], [1, 3]], b: [2, 2, 4, 8], ask: 'x', line: true } }, prev: 'x', line: '(2;1)' },
   },
   l_lsq_normal_aat: {
-    name: 'AAᵀ au lieu de AᵀA',
+    name: t('AAᵀ au lieu de AᵀA'),
     judges: ['mat'],
     transform(prev, ctx) {
       const L = ctx?.cfg?.lsq;
@@ -207,14 +210,14 @@ export const DEFS = {
       return [{ node: node(qMat(MX.mul(A, MX.transpose(A)))), ctx: { n: A[0].length, m: A.length } }];
     },
     explain: (ctx = {}) => (ctx.n
-      ? `On multiplie Ax = b à gauche par Aᵀ : AᵀA est ${ctx.n}×${ctx.n}, de la taille de x ; AAᵀ est ${ctx.m}×${ctx.m}.`
-      : 'On multiplie Ax = b à gauche par Aᵀ : AᵀA est n×n, de la taille de x, alors que AAᵀ est m×m.'),
+      ? t('On multiplie Ax = b à gauche par Aᵀ : AᵀA est {n}×{n}, de la taille de x ; AAᵀ est {m}×{m}.', { n: ctx.n, m: ctx.m })
+      : t('On multiplie Ax = b à gauche par Aᵀ : AᵀA est n×n, de la taille de x, alors que AAᵀ est m×m.')),
     check: { judge: { kind: 'mat', expect: '[[4,6],[6,14]]', lsq: { A: [[1, 0], [1, 1], [1, 2], [1, 3]], b: [2, 1, 2, 5], ask: 'AtA' } }, prev: 'AᵀA', line: '[[1,1,1,1],[1,2,3,4],[1,3,5,7],[1,4,7,10]]' },
   },
   l_inner_positivity: {
-    name: 'uᵀAᵀAv n\'est pas toujours un produit scalaire',
+    name: t('uᵀAᵀAv n\'est pas toujours un produit scalaire'),
     judges: [],
-    explain: () => 'Si A n\'est pas inversible, il existe u ≠ 0 avec Au = 0, et alors ⟨u, u⟩ = ‖Au‖² = 0 : l\'axiome « défini positif » tombe.',
+    explain: () => t('Si A n\'est pas inversible, il existe u ≠ 0 avec Au = 0, et alors ⟨u, u⟩ = ‖Au‖² = 0 : l\'axiome « défini positif » tombe.'),
     check: { bait: { skill: 'l-orth-inner', exam: 'tf' } },
   },
 };
@@ -230,7 +233,7 @@ function parseMatrix(text) {
 // g4_proj_no_square is a trap of module G4 (skill g4-dot, step U5: js/cas/rules/g4a.js).
 // What makes it work on the lines of module L stays here.
 export const PROJ_NO_SQUARE_L = {
-  name: 'Division par ‖v‖ au lieu de ‖v‖²',
+  name: t('Division par ‖v‖ au lieu de ‖v‖²'),
   judges: ['mat', 'value'],
   transform(prev, ctx) {
     const cfg = ctx?.cfg || {};
@@ -263,7 +266,7 @@ export const PROJ_NO_SQUARE_L = {
     return out;
   },
   explain: (ctx = {}) => (ctx.n2
-    ? `u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v = ${ctx.n2}.`
-    : 'u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v.'),
+    ? t('u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v = {n2}.', { n2: ctx.n2 })
+    : t('u · v/‖v‖ est une longueur. Pour un vecteur, on multiplie par le vecteur unitaire v/‖v‖ : il faut diviser par ‖v‖ deux fois, donc par ‖v‖² = v · v.')),
   check: { judge: { kind: 'mat', expect: '(1;3;1;3)', proj: { y: ['3', '1', '-1', '5'], basis: [['1', '1', '1', '1'], ['1', '-1', '1', '-1']] } }, prev: 'ŷ', line: '(2;6;2;6)' },
 };

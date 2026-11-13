@@ -1,5 +1,7 @@
 // Small DOM helpers, sounds and the mascot.
 
+import { t } from '../i18n.js';
+
 // h('div.card#id', {onclick}, child, ...) — children may be strings (text),
 // nodes, arrays, or {html: '...'} for trusted markup.
 export function h(sel, attrs = {}, ...kids) {
@@ -50,10 +52,10 @@ export function clear(el) {
 }
 
 export function toast(msg, kind = '') {
-  const t = h(`div.toast${kind ? `.${kind}` : ''}`, msg);
-  document.body.appendChild(t);
-  requestAnimationFrame(() => t.classList.add('show'));
-  setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2600);
+  const el = h(`div.toast${kind ? `.${kind}` : ''}`, msg);
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 2600);
 }
 
 // Bottom sheet; returns a close function.
@@ -72,14 +74,14 @@ export function sheet(content, { onClose } = {}) {
   return close;
 }
 
-export function confirmBox(message, okLabel = 'Oui') {
+export function confirmBox(message, okLabel = t('Oui')) {
   return new Promise((resolve) => {
     let done = false;
     const finish = (v) => { if (!done) { done = true; resolve(v); close(); } };
     const close = sheet(h('div.confirm',
       h('p', message),
       h('div.row',
-        h('button.btn.ghost', { onclick: () => finish(false) }, 'Annuler'),
+        h('button.btn.ghost', { onclick: () => finish(false) }, t('Annuler')),
         h('button.btn.danger', { onclick: () => finish(true) }, okLabel))), { onClose: () => finish(false) });
   });
 }

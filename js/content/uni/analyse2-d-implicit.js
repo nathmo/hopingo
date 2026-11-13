@@ -21,6 +21,7 @@ import { parse } from '../../cas/parse.js';
 import { toReadable } from '../../cas/print.js';
 import { MT, linesItem, mcq, tfItem, examTag } from './kit.js';
 import { modeOf, H, E, blanked, partsScript, fr, A2_KEYS } from './a2-kit.js';
+import { t } from '../../i18n.js';
 
 // ---------- terms c·xⁱyʲzᵏpˡqᵐ (·e^(z − x)) ----------
 
@@ -124,7 +125,7 @@ const positive = (ts) => (sorted(ts)[0].c.n < 0 ? ts.map((t) => term(t.c.neg(), 
 // quotient alone when it is already the value, brackets aside).
 function quot(top, den, val, note) {
   const line = `-(${top})/(${qText(den)})`;
-  const last = E(qText(val), 'Simplifier', 'first', 'first');
+  const last = E(qText(val), t('Simplifier'), 'first', 'first');
   return line.replace(/[()]/g, '') === qText(val) ? [{ ...last, note }] : [E(line, note, 'first', 'first'), last];
 }
 // True if the text is only a number (a value line that would end the part).
@@ -160,11 +161,11 @@ function analyse(F, pt, u, w, v = null) {
 
 const I2 = 'a2-implicit-2var';
 const I2_SUB = [
-  { id: 'hyp', label: 'hypothèse F_y ≠ 0', skill: I2 },
+  { id: 'hyp', label: t('hypothèse F_y ≠ 0'), skill: I2 },
   { id: 'first', label: 'g′ = −F_x/F_y', skill: I2 },
-  { id: 'second-id', label: 'dériver l\'identité (règle de chaîne)', skill: 'a2-chain' },
-  { id: 'substitute', label: 'remplacer les valeurs', skill: 'rat-simplify' },
-  { id: 'solve', label: 'isoler g″', skill: 'rat-simplify' },
+  { id: 'second-id', label: t('dériver l\'identité (règle de chaîne)'), skill: 'a2-chain' },
+  { id: 'substitute', label: t('remplacer les valeurs'), skill: 'rat-simplify' },
+  { id: 'solve', label: t('isoler g″'), skill: 'rat-simplify' },
 ];
 
 const POOL2 = [[2, 0], [1, 1], [0, 2], [0, 3], [1, 2], [2, 1], [3, 0], [1, 0], [0, 1]];
@@ -214,12 +215,12 @@ function implicitParts(d, level, names, { g1Label, g2Label, g2Start, sub = [] })
   const P = pointText(d, names);
   const FwAt = atText(d.Fw, d.pt);
   const FuAt = atText(d.Fu, d.pt);
-  const hypLines = [...(literal(FwAt) ? [] : [E(FwAt, `F_${w} en ${P}`, 'hyp', 'partial')]), E(qText(d.FwV), '≠ 0 : le théorème s\'applique', 'hyp', 'partial')];
+  const hypLines = [...(literal(FwAt) ? [] : [E(FwAt, t('F_{w} en {P}', { w, P }), 'hyp', 'partial')]), E(qText(d.FwV), t('≠ 0 : le théorème s\'applique'), 'hyp', 'partial')];
   const theorem = {
-    kind: 'decision', prompt: `F_${w}${P} = ${fr(qText(d.FwV))}. Le théorème des fonctions implicites donne-t-il ${w} = g(…) près de ${P} ?`,
+    kind: 'decision', prompt: t('F_{w}{P} = {v}. Le théorème des fonctions implicites donne-t-il {w} = g(…) près de {P} ?', { w, P, v: fr(qText(d.FwV)) }),
     options: [
-      { id: 'yes', label: `Oui : F${P} = 0, F est C¹ et F_${w}${P} ≠ 0`, valid: true },
-      { id: 'no', label: `Non : il faudrait aussi F_${u}${P} = 0`, valid: false, why: `Seule la dérivée de la variable qui devient la fonction, ici ${w}, doit être non nulle.` },
+      { id: 'yes', label: t('Oui : F{P} = 0, F est C¹ et F_{w}{P} ≠ 0', { P, w }), valid: true },
+      { id: 'no', label: t('Non : il faudrait aussi F_{u}{P} = 0', { u, P }), valid: false, why: t('Seule la dérivée de la variable qui devient la fonction, ici {w}, doit être non nulle.', { w }) },
     ],
   };
   const firstLines = quot(FuAt, d.FwV, d.g1, `F_${u}${P} = ${fr(qText(d.FuV))}`);
@@ -231,18 +232,18 @@ function implicitParts(d, level, names, { g1Label, g2Label, g2Start, sub = [] })
   parts.push(...sub);
   parts.push({
     html: `${g1Label} = −F_${u}/F_${w} :`, ask: `${g1Label} =`, start: `-F_${u}/F_${w}`, judge: valueJ(d.g1, firstImp(d)),
-    pre: level >= 2 && level <= 4 ? [theorem] : [{ kind: 'note', html: `F${P} = 0 et F_${w}${P} ≠ 0 : le théorème s'applique.` }],
+    pre: level >= 2 && level <= 4 ? [theorem] : [{ kind: 'note', html: t('F{P} = 0 et F_{w}{P} ≠ 0 : le théorème s\'applique.', { P, w }) }],
     lines: firstLines,
   });
   if (level >= 2) {
     parts.push({
-      html: `Dérive l'identité F_${u} + F_${w}·p = 0 par rapport à ${u}, en se souvenant que ${w} = g(…) dépend de ${u} ; on note p = ${g1Label.replace(/\(.*$/, '')} et q = ${g2Label.replace(/\(.*$/, '')} :`,
+      html: t('Dérive l\'identité F_{u} + F_{w}·p = 0 par rapport à {u}, en se souvenant que {w} = g(…) dépend de {u} ; on note p = {p} et q = {q} :', { u, w, p: g1Label.replace(/\(.*$/, ''), q: g2Label.replace(/\(.*$/, '') }),
       ask: '0 =', start: idStart, judge: idJudge(d), lines: [E(idLine, `F_${u}${u} + 2F_${u}${w}·p + F_${w}${w}·p² + F_${w}·q`, 'second-id', 'derive')],
     });
     parts.push({
-      html: `Remplace ${names.map((n) => `${n} = ${fr(qText(d.pt[n]))}`).join(', ')} et p = ${fr(qText(d.g1))}, puis isole q :`,
+      html: t('Remplace {vals} et p = {p}, puis isole q :', { vals: names.map((n) => `${n} = ${fr(qText(d.pt[n]))}`).join(', '), p: fr(qText(d.g1)) }),
       ask: `${g2Label} =`, start: g2Start || `g_(${u}${u})`, judge: valueJ(d.g2, secondImp(d)),
-      lines: [E(subst, 'Remplacer', 'substitute', 'subst'), E(qText(d.g2), 'Isoler q', 'solve', 'solve')],
+      lines: [E(subst, t('Remplacer'), 'substitute', 'subst'), E(qText(d.g2), t('Isoler q'), 'solve', 'solve')],
     });
   }
   return { parts, idText: idLine, subst, FuAt, FwAt, P };
@@ -268,13 +269,13 @@ function blankFirstNumbers(l, k) {
 }
 
 const CHOICES = [
-  { id: 'partial', label: 'Dérivée partielle de F au point' },
-  { id: 'first', label: 'g′ = −F_u/F_w (dérivée de la variable éliminée au dénominateur)' },
-  { id: 'derive', label: 'Dériver F_u + F_w·g′ = 0 (règle de chaîne)' },
-  { id: 'subst', label: 'Remplacer les valeurs au point' },
-  { id: 'solve', label: 'Isoler la dérivée seconde' },
-  { id: 'flip', label: 'g′ = −F_w/F_u', rule: 'a2_implicit_inverted', why: 'La dérivée de la variable qui devient la fonction va au dénominateur.' },
-  { id: 'const', label: 'Dériver F_u/F_w en gardant la fonction constante', rule: 'a2_implicit_second_const', why: 'La fonction implicite dépend de la variable : dérive aussi par rapport à elle, fois g′.' },
+  { id: 'partial', label: t('Dérivée partielle de F au point') },
+  { id: 'first', label: t('g′ = −F_u/F_w (dérivée de la variable éliminée au dénominateur)') },
+  { id: 'derive', label: t('Dériver F_u + F_w·g′ = 0 (règle de chaîne)') },
+  { id: 'subst', label: t('Remplacer les valeurs au point') },
+  { id: 'solve', label: t('Isoler la dérivée seconde') },
+  { id: 'flip', label: 'g′ = −F_w/F_u', rule: 'a2_implicit_inverted', why: t('La dérivée de la variable qui devient la fonction va au dénominateur.') },
+  { id: 'const', label: t('Dériver F_u/F_w en gardant la fonction constante'), rule: 'a2_implicit_second_const', why: t('La fonction implicite dépend de la variable : dérive aussi par rapport à elle, fois g′.') },
 ];
 
 function i2Lines(level, rng, opts, d) {
@@ -285,11 +286,11 @@ function i2Lines(level, rng, opts, d) {
   if (level === 3) {
     const solvable = d.F.every((t) => t.e[1] <= 1);
     parts[0].pre = [{
-      kind: 'decision', prompt: `Comment obtiens-tu g′(${a}) et g″(${a}) ?`, options: [
-        { id: 'implicit', label: 'Dérivation implicite : F(x, g(x)) = 0', valid: true, ref: true },
+      kind: 'decision', prompt: t('Comment obtiens-tu g′({a}) et g″({a}) ?', { a }), options: [
+        { id: 'implicit', label: t('Dérivation implicite : F(x, g(x)) = 0'), valid: true, ref: true },
         solvable
-          ? { id: 'solve', label: 'Résoudre en y, puis dériver deux fois', valid: true, quality: 'poor', why: 'Juste, mais le quotient se dérive deux fois : la dérivation implicite est plus courte.' }
-          : { id: 'solve', label: 'Résoudre en y, puis dériver deux fois', valid: false, why: 'On ne sait pas isoler y dans cette équation : c\'est tout l\'intérêt du théorème.' },
+          ? { id: 'solve', label: t('Résoudre en y, puis dériver deux fois'), valid: true, quality: 'poor', why: t('Juste, mais le quotient se dérive deux fois : la dérivation implicite est plus courte.') }
+          : { id: 'solve', label: t('Résoudre en y, puis dériver deux fois'), valid: false, why: t('On ne sait pas isoler y dans cette équation : c\'est tout l\'intérêt du théorème.') },
       ],
     }];
   }
@@ -297,9 +298,11 @@ function i2Lines(level, rng, opts, d) {
   const F = polyText(d.F);
   return linesItem({
     skill: I2, level, mode: modeOf(level), start, judge, script,
-    prompt: `L'équation ${MT(`${F}=0`, { vars: VARS })} définit y = g(x) près de ${pointText(d, ['x', 'y'])}. Vérifie F_y ≠ 0, puis calcule g′(${a})${level >= 2 ? ` et g″(${a})` : ''}.`,
-    hints: H(`Vérifie F_y ≠ 0, puis g′ = −F_x/F_y.${level >= 2 ? ' Pour g″, dérive F_x + F_y·g′ = 0 avec y = g(x).' : ''}`,
-      level >= 2 ? `F_xx + 2F_xy·p + F_yy·p² + F_y·q = 0 : ici ${MT(idText, { vars: VARS })} = 0, avec p = g′(${a}) = ${MT(qText(d.g1))}.` : `g′(${a}) = −(${fr(qText(d.FuV))})/(…)`,
+    prompt: level >= 2
+      ? t('L\'équation {eq} définit y = g(x) près de {P}. Vérifie F_y ≠ 0, puis calcule g′({a}) et g″({a}).', { eq: MT(`${F}=0`, { vars: VARS }), P: pointText(d, ['x', 'y']), a })
+      : t('L\'équation {eq} définit y = g(x) près de {P}. Vérifie F_y ≠ 0, puis calcule g′({a}).', { eq: MT(`${F}=0`, { vars: VARS }), P: pointText(d, ['x', 'y']), a }),
+    hints: H(level >= 2 ? t('Vérifie F_y ≠ 0, puis g′ = −F_x/F_y. Pour g″, dérive F_x + F_y·g′ = 0 avec y = g(x).') : t('Vérifie F_y ≠ 0, puis g′ = −F_x/F_y.'),
+      level >= 2 ? t('F_xx + 2F_xy·p + F_yy·p² + F_y·q = 0 : ici {id} = 0, avec p = g′({a}) = {g1}.', { id: MT(idText, { vars: VARS }), a, g1: MT(qText(d.g1)) }) : `g′(${a}) = −(${fr(qText(d.FuV))})/(…)`,
       level >= 2 ? `g″(${a}) = ${MT(subst)}` : `g′(${a}) = ${MT(qText(d.g1))}`),
     subgoals: I2_SUB, keys: [...A2_KEYS, 'calc'], tapActions: level === 3 ? 'steps' : null,
     declares: { vars: VARS },
@@ -329,10 +332,10 @@ function i2Mcq(rng, level, opts) {
     ? [{ value: d.g2c, rule: 'a2_implicit_second_const' }, { value: d.g2.neg() }, { value: d.g2.mul(2) }]
     : [{ value: d.g1.neg(), rule: 'a2_implicit_sign' }, ...(d.FuV.n ? [{ value: d.FwV.div(d.FuV).neg(), rule: 'a2_implicit_inverted' }] : []), { value: d.FwV.div(d.FuV) }];
   return mcq({
-    skill: I2, level, prompt: `L'équation ${MT(`${F}=0`, { vars: VARS })} définit y = g(x) près de ${pointText(d, ['x', 'y'])}. ${second ? `g″(${a})` : `g′(${a})`} vaut :`,
+    skill: I2, level, prompt: t('L\'équation {eq} définit y = g(x) près de {P}. {g} vaut :', { eq: MT(`${F}=0`, { vars: VARS }), P: pointText(d, ['x', 'y']), g: second ? `g″(${a})` : `g′(${a})` }),
     options: valueOptions(right, wrongs, [right.add(1), right.sub(1), right.mul(3)]),
     key: `${I2}:mcq:${second ? 2 : 1}:${F}:${a}`, expectedSec: 180, exam: opts.exam ? { format: 'mcq', points: 1 } : false,
-    solution: [{ html: `F_x = ${MT(polyText(d.Fu), { vars: VARS })}, F_y = ${MT(polyText(d.Fw), { vars: VARS })} : g′(${a}) = −F_x/F_y = ${MT(qText(d.g1))}.${second ? ` Puis ${MT(idText(d.id), { vars: VARS })} = 0 avec p = g′, q = g″ : g″(${a}) = ${MT(qText(d.g2))}.` : ''}`, note: '' }],
+    solution: [{ html: `F_x = ${MT(polyText(d.Fu), { vars: VARS })}, F_y = ${MT(polyText(d.Fw), { vars: VARS })} : g′(${a}) = −F_x/F_y = ${MT(qText(d.g1))}.${second ? t(' Puis {id} = 0 avec p = g′, q = g″ : g″({a}) = {g2}.', { id: MT(idText(d.id), { vars: VARS }), a, g2: MT(qText(d.g2)) }) : ''}`, note: '' }],
     fallback: !!d.fallback,
   }, rng);
 }
@@ -341,8 +344,8 @@ function i2Mcq(rng, level, opts) {
 // 2-option multiple choices (no checker for a function F of two variables).
 function vf(skill, statement, truth, rng, { key, why, ruleIfTrue = null, level = 4, exam = true }) {
   return mcq({
-    skill, level, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth }],
+    skill, level, prompt: t('Vrai ou faux ?<br>« {s} »', { s: statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth }],
     key: `${skill}:tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: exam ? { format: 'tf', points: 1 } : false,
   }, rng);
 }
@@ -352,15 +355,15 @@ function i2Tf(rng, level, opts) {
   if (kind === 'swap') {
     const [a, b] = rng.pick([[1, 0], [0, 1], [2, -1], [-1, 2]]);
     return tfItem({
-      skill: I2, level, statement: `Si F est de classe C¹ sur ℝ², F(${fr(a)}, ${fr(b)}) = 0 et ∂F/∂x(${fr(a)}, ${fr(b)}) ≠ 0, alors il existe une fonction f définie près de ${fr(b)}, avec f(${fr(b)}) = ${fr(a)} et F(f(y), y) = 0.`,
+      skill: I2, level, statement: t('Si F est de classe C¹ sur ℝ², F({a}, {b}) = 0 et ∂F/∂x({a}, {b}) ≠ 0, alors il existe une fonction f définie près de {b}, avec f({b}) = {a} et F(f(y), y) = 0.', { a: fr(a), b: fr(b) }),
       truth: true, key: `swap:${a}:${b}`, exam: exam ? { format: 'tf', points: 1 } : false, noHints: level >= 5,
-      explanation: 'Vrai : c\'est le théorème des fonctions implicites, les rôles de x et y échangés : x = f(y) existe dès que la dérivée par rapport à x (la variable éliminée) est non nulle.',
+      explanation: t('Vrai : c\'est le théorème des fonctions implicites, les rôles de x et y échangés : x = f(y) existe dès que la dérivée par rapport à x (la variable éliminée) est non nulle.'),
     });
   }
   if (kind === 'wrongvar') {
-    return vf(I2, 'Si F est C¹, F(1, 0) = 0 et ∂F/∂x(1, 0) ≠ 0, alors il existe g avec g(1) = 0 et F(x, g(x)) = 0 près de 1.', false, rng, {
+    return vf(I2, t('Si F est C¹, F(1, 0) = 0 et ∂F/∂x(1, 0) ≠ 0, alors il existe g avec g(1) = 0 et F(x, g(x)) = 0 près de 1.'), false, rng, {
       key: 'wrongvar', level, exam, ruleIfTrue: 'a2_implicit_inverted',
-      why: 'Faux : pour y = g(x), c\'est ∂F/∂y(1, 0) ≠ 0 qu\'il faut. Avec F = x − 1 − y², ∂F/∂x = 1, mais x − 1 = y² ne définit pas y comme fonction de x près de 1.',
+      why: t('Faux : pour y = g(x), c\'est ∂F/∂y(1, 0) ≠ 0 qu\'il faut. Avec F = x − 1 − y², ∂F/∂x = 1, mais x − 1 = y² ne définit pas y comme fonction de x près de 1.'),
     });
   }
   const d = i2Data(rng);
@@ -368,9 +371,12 @@ function i2Tf(rng, level, opts) {
   const F = polyText(d.F);
   const truth = rng.chance(0.4);
   const shown = truth ? d.g1 : d.g1.neg();
-  return vf(I2, `L'équation ${MT(`${F}=0`, { vars: VARS })} définit y = g(x) près de ${pointText(d, ['x', 'y'])}, et g′(${a}) = ${MT(qText(shown))}.`, truth, rng, {
+  const whyVars = { P: pointText(d, ['x', 'y']), v: fr(qText(d.FwV)), a, g1: MT(qText(d.g1)) };
+  return vf(I2, t('L\'équation {eq} définit y = g(x) près de {P}, et g′({a}) = {g}.', { eq: MT(`${F}=0`, { vars: VARS }), P: pointText(d, ['x', 'y']), a, g: MT(qText(shown)) }), truth, rng, {
     key: `value:${F}:${truth}`, level, exam, ruleIfTrue: truth ? null : 'a2_implicit_sign',
-    why: `${truth ? 'Vrai' : 'Faux'} : F_y${pointText(d, ['x', 'y'])} = ${fr(qText(d.FwV))} ≠ 0 et g′(${a}) = −F_x/F_y = ${MT(qText(d.g1))}.`,
+    why: truth
+      ? t('Vrai : F_y{P} = {v} ≠ 0 et g′({a}) = −F_x/F_y = {g1}.', whyVars)
+      : t('Faux : F_y{P} = {v} ≠ 0 et g′({a}) = −F_x/F_y = {g1}.', whyVars),
   });
 }
 
@@ -390,11 +396,11 @@ function i2Item(level, rng, opts = {}) {
 
 const I3 = 'a2-implicit-3var';
 const I3_SUB = [
-  { id: 'hyp', label: 'hypothèse F_w ≠ 0', skill: I3 },
-  { id: 'partials', label: 'dérivées partielles au point', skill: 'a2-partials' },
+  { id: 'hyp', label: t('hypothèse F_w ≠ 0'), skill: I3 },
+  { id: 'partials', label: t('dérivées partielles au point'), skill: 'a2-partials' },
   { id: 'first', label: 'g_x = −F_x/F_w', skill: I3 },
-  { id: 'second-id', label: 'dériver l\'identité', skill: I2 },
-  { id: 'solve', label: 'isoler la dérivée seconde', skill: 'rat-simplify' },
+  { id: 'second-id', label: t('dériver l\'identité'), skill: I2 },
+  { id: 'solve', label: t('isoler la dérivée seconde'), skill: 'rat-simplify' },
 ];
 
 const POOL3 = [[1, 0, 1], [0, 1, 1], [1, 1, 0], [2, 0, 0], [0, 2, 0], [0, 0, 2], [1, 0, 2], [0, 1, 2], [2, 0, 1], [0, 2, 1], [1, 1, 1], [0, 0, 3], [1, 0, 0], [0, 1, 0], [0, 0, 1]];
@@ -445,7 +451,7 @@ function i3Lines(level, rng, opts, d) {
   // F_u(p) and F_v(p) (partials), then g_v after g_u.
   const partial = (n, ts, val) => ({
     html: `F_${n}${P} :`, ask: `F_${n}${P} =`, start: `F_${n}`, judge: valueJ(val),
-    lines: [...(literal(atText(ts, d.pt)) ? [] : [E(atText(ts, d.pt), `F_${n} = ${RD(polyText(ts))}`, 'partials', 'partial')]), E(qText(val), 'Calculer', 'partials', 'partial')],
+    lines: [...(literal(atText(ts, d.pt)) ? [] : [E(atText(ts, d.pt), `F_${n} = ${RD(polyText(ts))}`, 'partials', 'partial')]), E(qText(val), t('Calculer'), 'partials', 'partial')],
   });
   const sub = level >= 2 ? [partial(u, d.Fu, d.FuV), partial(v, d.Fv, d.FvV)] : [];
   const { parts, idText, subst } = implicitParts(d, level, names, { g1Label, g2Label: `g_${u}${u}(${others})`, sub });
@@ -464,9 +470,9 @@ function i3Lines(level, rng, opts, d) {
   if (level <= 2) guide(parts, level);
   if (level === 3) {
     parts[0].pre = [{
-      kind: 'decision', prompt: `L'énoncé dit ${w} = g(${names.filter((n) => n !== w).join(', ')}). Quelle dérivée de F va au dénominateur ?`, options: [
+      kind: 'decision', prompt: t('L\'énoncé dit {w} = g({args}). Quelle dérivée de F va au dénominateur ?', { w, args: names.filter((n) => n !== w).join(', ') }), options: [
         ...names.map((n) => ({
-          id: n, label: `F_${n}`, valid: n === w, ...(n === w ? { ref: true } : { rule: 'a2_implicit_wrong_var', why: `La fonction est ${w} = g(…) : c'est F_${w} qui va au dénominateur.` }),
+          id: n, label: `F_${n}`, valid: n === w, ...(n === w ? { ref: true } : { rule: 'a2_implicit_wrong_var', why: t('La fonction est {w} = g(…) : c\'est F_{w} qui va au dénominateur.', { w }) }),
         })),
       ],
     }];
@@ -475,10 +481,12 @@ function i3Lines(level, rng, opts, d) {
   const eqText = eq3(d, rng);
   return linesItem({
     skill: I3, level, mode: modeOf(level), start, judge, script,
-    prompt: `L'équation ${MT(eqText, { vars: VARS })} définit ${w} = g(${names.filter((n) => n !== w).join(', ')}) près de ${P}. Vérifie F_${w} ≠ 0, puis calcule ${g1Label.replace(/\(.*/, '')}, ${gvLabel.replace(/\(.*/, '')}${level >= 2 ? ` et g_${u}${u}` : ''} en (${others}).`,
-    hints: H(`La dérivée de la variable éliminée, ${w}, va au dénominateur, avec un signe moins : g_${u} = −F_${u}/F_${w}.`,
+    prompt: level >= 2
+      ? t('L\'équation {eq} définit {w} = g({args}) près de {P}. Vérifie F_{w} ≠ 0, puis calcule {g1}, {gv} et g_{u}{u} en ({others}).', { eq: MT(eqText, { vars: VARS }), w, args: names.filter((n) => n !== w).join(', '), P, g1: g1Label.replace(/\(.*/, ''), gv: gvLabel.replace(/\(.*/, ''), u, others })
+      : t('L\'équation {eq} définit {w} = g({args}) près de {P}. Vérifie F_{w} ≠ 0, puis calcule {g1}, {gv} en ({others}).', { eq: MT(eqText, { vars: VARS }), w, args: names.filter((n) => n !== w).join(', '), P, g1: g1Label.replace(/\(.*/, ''), gv: gvLabel.replace(/\(.*/, ''), others }),
+    hints: H(t('La dérivée de la variable éliminée, {w}, va au dénominateur, avec un signe moins : g_{u} = −F_{u}/F_{w}.', { w, u }),
       `${g1Label} = −(${fr(qText(d.FuV))})/(${fr(qText(d.FwV))})`,
-      level >= 2 ? `${MT(idText, { vars: VARS })} = 0, puis ${MT(subst)}` : MT(qText(d.g1))),
+      level >= 2 ? t('{id} = 0, puis {subst}', { id: MT(idText, { vars: VARS }), subst: MT(subst) }) : MT(qText(d.g1))),
     subgoals: I3_SUB, keys: [...A2_KEYS, 'calc'], tapActions: level === 3 ? 'steps' : null,
     declares: { vars: VARS },
     key: `${I3}:${level}:${eqText}:${P}:${w}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -492,7 +500,7 @@ function i3Mcq(rng, level, opts) {
   const { u, v, w } = d;
   const others = names.filter((n) => n !== w).map((n) => fr(qText(d.pt[n]))).join(' ; ');
   const eqText = eq3(d, rng);
-  const pair = (a, b) => `g_${u}(${others}) = ${MT(qText(a))} et g_${v}(${others}) = ${MT(qText(b))}`;
+  const pair = (a, b) => t('g_{u}({others}) = {a} et g_{v}({others}) = {b}', { u, v, others, a: MT(qText(a)), b: MT(qText(b)) });
   const second = rng.chance(0.3);
   let options;
   if (second) {
@@ -508,9 +516,11 @@ function i3Mcq(rng, level, opts) {
     options = cands.filter((o, i) => cands.findIndex((x) => x.html === o.html) === i).slice(0, 4);
   }
   return mcq({
-    skill: I3, level, prompt: `L'équation ${MT(eqText, { vars: VARS })} définit ${w} = g(${names.filter((n) => n !== w).join(', ')}) près de ${P}. ${second ? `g_${u}${u}(${others}) vaut :` : 'Alors :'}`,
+    skill: I3, level, prompt: second
+      ? t('L\'équation {eq} définit {w} = g({args}) près de {P}. g_{u}{u}({others}) vaut :', { eq: MT(eqText, { vars: VARS }), w, args: names.filter((n) => n !== w).join(', '), P, u, others })
+      : t('L\'équation {eq} définit {w} = g({args}) près de {P}. Alors :', { eq: MT(eqText, { vars: VARS }), w, args: names.filter((n) => n !== w).join(', '), P }),
     options, key: `${I3}:mcq:${second ? 2 : 1}:${eqText}:${P}:${w}`, expectedSec: 240, exam: opts.exam ? { format: 'mcq', points: 1 } : false,
-    solution: [{ html: `F_${u}${P} = ${fr(qText(d.FuV))}, F_${v}${P} = ${fr(qText(d.FvV))}, F_${w}${P} = ${fr(qText(d.FwV))} : g_${u} = −F_${u}/F_${w} = ${MT(qText(d.g1))}, g_${v} = −F_${v}/F_${w} = ${MT(qText(d.gv))}.${second ? ` Puis ${MT(idText(d.id), { vars: VARS })} = 0 (p = g_${u}, q = g_${u}${u}) donne ${MT(qText(d.g2))}.` : ''}`, note: '' }],
+    solution: [{ html: `F_${u}${P} = ${fr(qText(d.FuV))}, F_${v}${P} = ${fr(qText(d.FvV))}, F_${w}${P} = ${fr(qText(d.FwV))} : g_${u} = −F_${u}/F_${w} = ${MT(qText(d.g1))}, g_${v} = −F_${v}/F_${w} = ${MT(qText(d.gv))}.${second ? t(' Puis {id} = 0 (p = g_{u}, q = g_{u}{u}) donne {g2}.', { id: MT(idText(d.id), { vars: VARS }), u, g2: MT(qText(d.g2)) }) : ''}`, note: '' }],
     fallback: !!d.fallback,
   }, rng);
 }

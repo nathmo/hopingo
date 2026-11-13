@@ -1,0 +1,46 @@
+/* Physics: the 6-step problem (js/ui/recipe.js) and physics symbols. */
+.m-sub { font-size: .7em; vertical-align: -.25em; font-style: normal; }
+.m-chunk { display: inline-block; }
+.m-chunk sub, .key sub { font-size: .7em; }
+.m-thin { display: inline-block; width: .15em; }
+
+.recipe-strip { display: flex; gap: 3px; margin: 8px 0 10px; }
+.recipe-tab { flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 4px 6px; border: 2px solid var(--line); border-radius: 10px; background: var(--card); color: var(--muted); font: inherit; font-size: .62rem; cursor: pointer; }
+.recipe-tab b { font-size: 1rem; }
+.recipe-tab.current { border-color: var(--violet); color: var(--violet-dark); background: var(--violet-soft); }
+.recipe-tab.done { color: var(--green-dark); border-color: var(--green); }
+.recipe-tab.shown { border-style: dashed; }
+.recipe-tab:disabled { opacity: .45; cursor: default; }
+
+.recipe-panel { display: flex; flex-direction: column; gap: 8px; }
+.recipe-ask { margin: 4px 0; font-size: .92rem; }
+.recipe-find { margin: 2px 0; font-weight: 700; }
+.recipe-sheet { display: flex; flex-wrap: wrap; gap: 6px; }
+.recipe-formula { font-weight: 400; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 2px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; font-size: 1.05rem; cursor: pointer; }
+.recipe-formula.kept { border-color: var(--violet); background: var(--violet-soft); }
+.recipe-x { border: none; background: none; color: var(--red-dark); font-size: .9rem; cursor: pointer; padding: 0 2px; }
+.recipe-formulas { padding: 6px 10px; background: #f8f7ff; border-radius: 10px; font-size: 1.05rem; }
+.recipe-data { display: flex; flex-direction: column; gap: 4px; }
+.recipe-datum { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 8px; background: var(--card); border: 1.5px solid var(--line); }
+.recipe-datum.todo { border-color: var(--orange); }
+.recipe-unit { font-style: normal; padding: 0 1px; }
+
+/* The highlighter of step 2: one colour per role. */
+.recipe-colors { display: flex; gap: 6px; flex-wrap: wrap; }
+.recipe-color { padding: 4px 10px; border-radius: 999px; border: 2px solid var(--line); background: var(--card); font: inherit; font-size: .85rem; cursor: pointer; }
+.recipe-color.on { border-color: var(--ink); font-weight: 700; }
+.recipe-color.connue, .hl.connue { background: #d3f9d8; }
+.recipe-color.inconnue, .hl.inconnue { background: #ffe3e3; }
+.recipe-color.pont, .hl.pont { background: #fff3bf; }
+.hl { border: 1.5px dashed var(--muted); border-radius: 6px; background: transparent; padding: 0 3px; margin: 0 1px; font: inherit; cursor: pointer; }
+.hl.connue, .hl.inconnue, .hl.pont { border-style: solid; border-color: transparent; }
+
+.recipe-cancel { display: flex; flex-direction: column; gap: 6px; }
+.recipe-result { padding: 8px 10px; border-radius: 10px; background: var(--violet-soft); display: flex; flex-direction: column; gap: 4px; }
+.recipe-score { display: flex; flex-wrap: wrap; gap: 4px 10px; margin-bottom: 8px; font-size: .85rem; }
+.recipe-score .ok { color: var(--green-dark); }
+.recipe-score .ko { color: var(--red-dark); }
+.step-line.bad { background: var(--red-soft); border-radius: 6px; }
+.step-line.shown { color: var(--muted); }
+.recipe-formula .m, .recipe-formulas .m { font-weight: 400; }
+.recipe-unit .m-op { margin: 0 1px; }

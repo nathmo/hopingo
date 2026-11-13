@@ -3,6 +3,7 @@
 // for the judges (point decimals) and for the lines (comma decimals).
 
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
 // A rational for the judges: 0.24, 15/28, −3.
@@ -56,4 +57,4 @@ export function finalText(t) {
   return !!m && gcd(Number(m[1]), Number(m[2])) === 1 && m[2] !== '1';
 }
 // The lines « text », then the value if text is not final yet.
-export const thenValue = (text, value, note, subgoal, blank) => [L(text, note, subgoal, blank), ...(finalText(text) ? [] : [L(T(value), 'Calculer', subgoal, [T(value)])])];
+export const thenValue = (text, value, note, subgoal, blank) => [L(text, note, subgoal, blank), ...(finalText(text) ? [] : [L(T(value), t('Calculer'), subgoal, [T(value)])])];

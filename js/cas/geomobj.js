@@ -25,6 +25,7 @@ import { compileFloat } from './numeric.js';
 import { parseVec, evalVec, envFrom, namesOf, splitTop, normVecText } from './vecexpr.js';
 import { Q } from '../math/rational.js';
 import * as MX from './matrix.js';
+import { t as tr } from '../i18n.js';
 
 const fail = (msg) => { throw new ParseError(msg, 0); };
 export const COORDS = { 2: ['x', 'y'], 3: ['x', 'y', 'z'] };
@@ -145,7 +146,7 @@ function polyOfEq(l, r, dim) {
 // One equation, or a chain a = b = c (each « = »).
 function readEquations(text, dim, opts) {
   const sides = splitBy(text, '=');
-  if (sides.length < 2) fail('Écris une équation, avec « = ».');
+  if (sides.length < 2) fail(tr('Écris une équation, avec « = ».'));
   const nodes = sides.map((s) => parse(s, { vars: [...coordsOf(dim), ...(opts.extraVars || [])] }));
   const out = [];
   for (let i = 1; i < nodes.length; i++) out.push({ l: nodes[i - 1], r: nodes[i] });
@@ -156,11 +157,11 @@ function readEquations(text, dim, opts) {
 function readParam(lhs, rhs, dim, opts) {
   const want = coordsOf(dim);
   const left = lhs.replace(/[()\s]/g, '').split(';');
-  if (left.length !== dim || left.some((v, i) => v !== want[i])) fail(`À gauche, écris (${want.join(' ; ')}).`);
+  if (left.length !== dim || left.some((v, i) => v !== want[i])) fail(tr('À gauche, écris ({names}).', { names: want.join(' ; ') }));
   const env = envFrom(opts.symbols || {}, { params: PARAMS });
   const vo = { params: PARAMS, names: namesOf(env) };
   const val = evalVec(parseVec(rhs, vo), env, vo);
-  if (val.k !== 'v' || val.items.length !== dim) fail(`À droite, il faut un point à ${dim} coordonnées.`);
+  if (val.k !== 'v' || val.items.length !== dim) fail(tr('À droite, il faut un point à {dim} coordonnées.', { dim }));
   return paramFromItems(val.items, dim);
 }
 
@@ -168,11 +169,11 @@ function readParam(lhs, rhs, dim, opts) {
 function paramFromItems(items, dim) {
   const ps = [...new Set(items.flatMap((n) => [...symbolsIn(n)]))];
   const bad = ps.find((p) => !PARAMS.includes(p));
-  if (bad) fail(`Je ne connais pas la lettre « ${bad} » ici : le paramètre s'écrit t, s, k ou λ.`);
+  if (bad) fail(tr('Je ne connais pas la lettre « {c} » ici : le paramètre s\'écrit t, s, k ou λ.', { c: bad }));
   const at = (vals) => items.map((n) => {
     const m = mapNode(n, (x) => (x.t === 'sym' && vals[x.name] !== undefined ? { t: 'paren', e: lit(vals[x.name]) } : x));
     const q = exactValue(m);
-    if (!q) fail('Les coordonnées de ta paramétrisation doivent être des nombres rationnels.');
+    if (!q) fail(tr('Les coordonnées de ta paramétrisation doivent être des nombres rationnels.'));
     return q;
   });
   const zero = Object.fromEntries(ps.map((p) => [p, new Q(0)]));
@@ -181,11 +182,11 @@ function paramFromItems(items, dim) {
   // Affine in each parameter (no t²).
   for (const p of ps) {
     const two = at({ ...zero, [p]: new Q(2) });
-    if (two.some((x, i) => !x.eq(point[i].add(dirs[ps.indexOf(p)][i].mul(2))))) fail('Une paramétrisation de droite ou de plan est du 1er degré en t.');
+    if (two.some((x, i) => !x.eq(point[i].add(dirs[ps.indexOf(p)][i].mul(2))))) fail(tr('Une paramétrisation de droite ou de plan est du 1er degré en t.'));
   }
   for (let a = 0; a < ps.length; a++) for (let b = a + 1; b < ps.length; b++) {
     const both = at({ ...zero, [ps[a]]: new Q(1), [ps[b]]: new Q(1) });
-    if (both.some((x, i) => !x.eq(point[i].add(dirs[a][i]).add(dirs[b][i])))) fail('Les paramètres ne doivent pas être multipliés entre eux.');
+    if (both.some((x, i) => !x.eq(point[i].add(dirs[a][i]).add(dirs[b][i])))) fail(tr('Les paramètres ne doivent pas être multipliés entre eux.'));
   }
   return affineFromParam(point, dirs.filter((d) => d.some((x) => x.n !== 0)), dim);
 }
@@ -231,9 +232,9 @@ function objectOfSystem(eqs, dim) {
     return { kind: 'affine', dim, rows: R };
   }
   const nonClosed = eqs.filter(({ l, r }) => coordsOf(dim).some((v) => symbolsIn(l).has(v) || symbolsIn(r).has(v)));
-  if (nonClosed.length !== 1) fail('Je ne sais comparer qu\'une seule équation du 2e degré.');
+  if (nonClosed.length !== 1) fail(tr('Je ne sais comparer qu\'une seule équation du 2e degré.'));
   const coefs = polyOfEq(nonClosed[0].l, nonClosed[0].r, dim);
-  if (!coefs) fail('Cette équation n\'est pas du 2e degré au plus en x et y.');
+  if (!coefs) fail(tr('Cette équation n\'est pas du 2e degré au plus en x et y.'));
   return { kind: 'poly', dim, coefs };
 }
 
@@ -246,7 +247,7 @@ function readPart(text, dim, opts) {
   for (const it of items) {
     const m = /^\(\s*x\s*;[^)]*\)\s*=(.*)$/.exec(it);
     if (m) {
-      if (items.length > 1) fail('Une paramétrisation s\'écrit seule sur sa ligne.');
+      if (items.length > 1) fail(tr('Une paramétrisation s\'écrit seule sur sa ligne.'));
       const o = readParam(it.slice(0, it.indexOf('=')), m[1], dim, opts);
       return { ...o, shape: 'param' };
     }
@@ -264,11 +265,11 @@ function readPart(text, dim, opts) {
     eqs.push(...e);
   }
   if (Object.keys(paramDefs).length) {
-    if (eqs.length || Object.keys(paramDefs).length !== dim) fail(`Donne les ${dim} coordonnées en fonction du paramètre.`);
+    if (eqs.length || Object.keys(paramDefs).length !== dim) fail(tr('Donne les {dim} coordonnées en fonction du paramètre.', { dim }));
     return { ...paramFromItems(coordsOf(dim).map((v) => paramDefs[v]), dim), shape: 'param' };
   }
   const extra = [...new Set(eqs.flatMap(({ l, r }) => [...symbolsIn(l), ...symbolsIn(r)]))].filter((s) => !coordsOf(dim).includes(s));
-  if (extra.length) fail(`Je ne connais pas la lettre « ${extra[0]} » ici.`);
+  if (extra.length) fail(tr('Je ne connais pas la lettre « {c} » ici.', { c: extra[0] }));
   const o = objectOfSystem(eqs, dim);
   return { ...o, shape: shapes.length === 1 ? (shapes[0] === 'chain' ? 'chain' : 'eq') : 'system', eqs };
 }
@@ -285,10 +286,10 @@ export function readObject(text, opts = {}) {
 // A union: the product of the parts' polynomials (each of degree 1 here).
 function unionOf(objs, dim) {
   const polys = objs.map((o) => polyOfObject(o));
-  if (polys.some((p) => !p)) fail('Chaque morceau de la réunion doit être une droite (ou un plan).');
+  if (polys.some((p) => !p)) fail(tr('Chaque morceau de la réunion doit être une droite (ou un plan).'));
   const f = (p) => polys.reduce((s, c) => s * evalMono(c, p, dim), 1);
   const coefs = fitPoly(f, dim);
-  if (!coefs) fail('Je ne sais comparer que la réunion de deux droites.');
+  if (!coefs) fail(tr('Je ne sais comparer que la réunion de deux droites.'));
   return { kind: 'poly', dim, coefs, shape: 'union', parts: objs };
 }
 

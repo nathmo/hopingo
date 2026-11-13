@@ -8,6 +8,7 @@ import { toText, toReadable } from '../../cas/print.js';
 import { walk, lit } from '../../cas/ast.js';
 import { blankLine } from '../../judges/lines.js';
 import { linesItem, mcq, MT } from './kit.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => new Q(n, d);
 export const N = (x) => toText(lit(Q.of(x)));
@@ -64,7 +65,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -108,8 +109,8 @@ export function mcqOf(o, rng) {
 export function vfItem(o, rng) {
   return mcq({
     skill: o.skill, level: o.level ?? 4, keepOrder: true,
-    prompt: `Vrai ou faux ?<br>« ${o.statement} »`,
-    options: [{ html: 'Vrai', correct: o.truth, rule: o.truth ? null : o.rule || null }, { html: 'Faux', correct: !o.truth, rule: o.truth ? o.rule || null : null }],
+    prompt: t('Vrai ou faux ?<br>« {statement} »', { statement: o.statement }),
+    options: [{ html: t('Vrai'), correct: o.truth, rule: o.truth ? null : o.rule || null }, { html: t('Faux'), correct: !o.truth, rule: o.truth ? o.rule || null : null }],
     key: `tf:${o.key}`, solution: [{ html: o.why, note: '' }], expectedSec: 60,
     exam: o.exam || false, fallback: o.fallback,
   }, rng);

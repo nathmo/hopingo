@@ -4,6 +4,7 @@
 // (item.simulate, js/engine/simulate.js). Styles are inline: no new sheet.
 
 import { h, html, play } from './dom.js';
+import { t, LANG } from '../i18n.js';
 import { interpretOf, judgeInterpret } from '../judges/interpret.js';
 import { simulate, seedOfKey } from '../engine/simulate.js';
 import { explainRule } from './exercises.js';
@@ -22,15 +23,15 @@ export function interpretTask(item, stage, setFooter, done) {
       play(r.correct ? 'good' : 'bad');
       if (!r.correct) {
         say.className = 'step-feedback bad';
-        say.innerHTML = r.rule ? explainRule(r.rule, null) : '<p>Ce n\'est pas la bonne lecture.</p>';
+        say.innerHTML = r.rule ? explainRule(r.rule, null) : t('<p>Ce n\'est pas la bonne lecture.</p>');
         const right = it.options.findIndex((x) => x.correct);
         list.children[right]?.classList.add('right');
-        stage.append(h('button.btn.primary.wide', { type: 'button', onclick: () => done(r) }, 'Continuer'));
+        stage.append(h('button.btn.primary.wide', { type: 'button', onclick: () => done(r) }, t('Continuer')));
       } else setTimeout(() => done(r), 500);
     });
     list.appendChild(b);
   });
-  stage.replaceChildren(h('div.step-label', it.prompt || 'Interpréter : quelle phrase est juste ?'), list, say);
+  stage.replaceChildren(h('div.step-label', it.prompt || t('Interpréter : quelle phrase est juste ?')), list, say);
   setFooter();
 }
 
@@ -47,16 +48,17 @@ function histogram(hist, mark) {
     return `<rect x="${(i * bw + 1).toFixed(1)}" y="${(H - 16 - hgt).toFixed(1)}" width="${Math.max(bw - 2, 1).toFixed(1)}" height="${hgt.toFixed(1)}" fill="${on ? '#e8590c' : '#adb5bd'}"/>`;
   }).join('');
   const labels = hist.length <= 16 ? hist.map((b, i) => `<text x="${(i * bw + bw / 2).toFixed(1)}" y="${H - 3}" font-size="10" text-anchor="middle" fill="#495057">${Number.isInteger(b.x) ? b.x : ''}</text>`).join('') : '';
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:340px;display:block;margin:6px auto" role="img" aria-label="Histogramme de la simulation">${bars}${labels}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:340px;display:block;margin:6px auto" role="img" aria-label="${t('Histogramme de la simulation')}">${bars}${labels}</svg>`;
 }
 
-const pct = (x) => String((Math.round(x * 1000) / 1000).toFixed(3)).replace('.', ',');
+const pct = (x) => String((Math.round(x * 1000) / 1000).toFixed(3)).replace('.', LANG === 'fr' ? ',' : '.');
+const num = (x) => x.toLocaleString(LANG === 'fr' ? 'fr-CH' : 'en-GB');
 
 // The button, then the frequency next to the answer.
 export function simulateBox(item) {
   const spec = item.simulate;
   const box = h('div.lines-note', { style: { 'margin-top': '10px' } });
-  const btn = h('button.btn.small.secondary', { type: 'button' }, `🎲 Vérifier en simulant (${(spec.draws ?? 10000).toLocaleString('fr-CH')} fois)`);
+  const btn = h('button.btn.small.secondary', { type: 'button' }, t('🎲 Vérifier en simulant ({n} fois)', { n: num(spec.draws ?? 10000) }));
   btn.addEventListener('click', () => {
     btn.disabled = true;
     const r = simulate(spec, seedOfKey(item.key));
@@ -72,11 +74,13 @@ export function simulateBox(item) {
         default: return false;
       }
     } : null;
-    const of = spec.given ? ` parmi ${r.kept.toLocaleString('fr-CH')} tirages retenus` : ` sur ${r.n.toLocaleString('fr-CH')}`;
+    const freq = t(spec.given ? 'fréquence observée <b>{f}</b> ({hits} parmi {n} tirages retenus)' : 'fréquence observée <b>{f}</b> ({hits} sur {n})',
+      { f: pct(r.freq), hits: num(r.hits), n: num(spec.given ? r.kept : r.n) });
+    const calc = spec.answer !== undefined ? t('{freq} ; la probabilité calculée : <b>{p}</b>', { freq, p: pct(spec.answer) }) : freq;
     box.append(
-      h('p', html(`${spec.label ? `${spec.label} : ` : ''}fréquence observée <b>${pct(r.freq)}</b> (${r.hits.toLocaleString('fr-CH')}${of})${spec.answer !== undefined ? ` ; la probabilité calculée : <b>${pct(spec.answer)}</b>` : ''}.`)),
+      h('p', html(`${spec.label ? t('{label} : {text}', { label: spec.label, text: calc }) : calc}.`)),
       h('div', html(histogram(r.hist, mark) || '')),
-      h('p.muted', 'Une fréquence n’est pas une probabilité : elle s’en approche quand le nombre de tirages grandit (loi des grands nombres).'),
+      h('p.muted', t('Une fréquence n’est pas une probabilité : elle s’en approche quand le nombre de tirages grandit (loi des grands nombres).')),
     );
   });
   box.append(btn);

@@ -18,6 +18,7 @@ import { diagnoseLine } from './diagnose.js';
 import {
   readMat, mopts, wrongV, parseLine, show, text, input, toF, fmul, ftr, fclose, fident,
 } from './matcommon.js';
+import { t } from '../i18n.js';
 
 export { parseLine, show, text, input };
 
@@ -100,69 +101,69 @@ const isUpperF = (X) => X.every((r, i) => r.every((x, j) => j >= i || Math.abs(x
 const isLowerF = (X) => X.every((r, i) => r.every((x, j) => j <= i || Math.abs(x) < 1e-9));
 const isDiagF = (X) => X.every((r, i) => r.every((x, j) => i === j || Math.abs(x) < 1e-9));
 const orthCols = (X) => fclose(fmul(ftr(X), X), fident(X[0].length));
-const sizeMsg = (name, m, n) => `${name} doit être de taille ${m}×${n}.`;
+const sizeMsg = (name, m, n) => t('{name} doit être de taille {s}.', { name, s: `${m}×${n}` });
 
 // One factor: null if it is fine, else a message.
 function checkFactor(cfg, name, v, R, all) {
-  if (v.k !== 'm') return `${name} doit être une matrice.`;
+  if (v.k !== 'm') return t('{name} doit être une matrice.', { name });
   const F = toF(v);
-  if (F.flat().some((x) => !Number.isFinite(x))) return `Je n'arrive pas à calculer les cases de ${name}.`;
+  if (F.flat().some((x) => !Number.isFinite(x))) return t('Je n\'arrive pas à calculer les cases de {name}.', { name });
   const [m, n] = [F.length, F[0].length];
   const { m: am, n: an } = R;
   const sq = (k) => (m !== k || n !== k ? sizeMsg(name, k, k) : null);
   switch (`${cfg.of}:${name}`) {
     case 'LU:L': case 'PLU:L': {
       if (sq(am)) return sq(am);
-      if (!isLowerF(F) || F.some((r, i) => Math.abs(r[i] - 1) > 1e-9)) return 'L doit être triangulaire inférieure, avec des 1 sur la diagonale.';
-      if (cfg.of === 'LU' && R.lu && !fclose(F, MX.toNumbers(R.lu.L))) return 'Ce n\'est pas la matrice L de l\'élimination : chaque ℓᵢⱼ est le multiplicateur de Lᵢ ← Lᵢ − ℓᵢⱼLⱼ.';
+      if (!isLowerF(F) || F.some((r, i) => Math.abs(r[i] - 1) > 1e-9)) return t('L doit être triangulaire inférieure, avec des 1 sur la diagonale.');
+      if (cfg.of === 'LU' && R.lu && !fclose(F, MX.toNumbers(R.lu.L))) return t('Ce n\'est pas la matrice L de l\'élimination : chaque ℓᵢⱼ est le multiplicateur de Lᵢ ← Lᵢ − ℓᵢⱼLⱼ.');
       return null;
     }
     case 'LU:U': case 'PLU:U': {
       if (m !== am || n !== an) return sizeMsg('U', am, an);
-      if (!isUpperF(F)) return 'U doit être triangulaire supérieure (échelonnée).';
-      if (cfg.of === 'LU' && R.lu && !fclose(F, MX.toNumbers(R.lu.U))) return 'Ce n\'est pas la forme échelonnée obtenue sans échange.';
+      if (!isUpperF(F)) return t('U doit être triangulaire supérieure (échelonnée).');
+      if (cfg.of === 'LU' && R.lu && !fclose(F, MX.toNumbers(R.lu.U))) return t('Ce n\'est pas la forme échelonnée obtenue sans échange.');
       return null;
     }
     case 'PLU:P': {
       if (sq(am)) return sq(am);
       const perm = F.every((r) => r.filter((x) => Math.abs(x - 1) < 1e-9).length === 1 && r.every((x) => Math.abs(x) < 1e-9 || Math.abs(x - 1) < 1e-9)) && orthCols(F);
-      return perm ? null : 'P doit être une matrice de permutation.';
+      return perm ? null : t('P doit être une matrice de permutation.');
     }
     case 'QR:Q': {
       if (m !== am || n !== an) return sizeMsg('Q', am, an);
-      if (!orthCols(F)) return 'Les colonnes de Q doivent être orthonormées : orthogonales et de norme 1.';
-      if (R.Q && !fclose(F, R.Q)) return 'Ce n\'est pas le Q de Gram-Schmidt sur les colonnes de A, dans l\'ordre.';
+      if (!orthCols(F)) return t('Les colonnes de Q doivent être orthonormées : orthogonales et de norme 1.');
+      if (R.Q && !fclose(F, R.Q)) return t('Ce n\'est pas le Q de Gram-Schmidt sur les colonnes de A, dans l\'ordre.');
       return null;
     }
     case 'QR:R': {
       if (sq(an)) return sq(an);
-      if (!isUpperF(F)) return 'R doit être triangulaire supérieure.';
-      if (F.some((r, i) => r[i] <= 1e-12)) return 'La diagonale de R doit être strictement positive.';
-      if (R.R && !fclose(F, R.R)) return 'Ce n\'est pas R = QᵀA.';
+      if (!isUpperF(F)) return t('R doit être triangulaire supérieure.');
+      if (F.some((r, i) => r[i] <= 1e-12)) return t('La diagonale de R doit être strictement positive.');
+      if (R.R && !fclose(F, R.R)) return t('Ce n\'est pas R = QᵀA.');
       return null;
     }
     case 'cholesky:L': {
       if (sq(am)) return sq(am);
-      if (!isLowerF(F) || F.some((r, i) => r[i] <= 1e-12)) return 'L doit être triangulaire inférieure, à diagonale strictement positive.';
-      return fclose(fmul(F, ftr(F)), R.Af) ? null : 'LLᵀ ne redonne pas A.';
+      if (!isLowerF(F) || F.some((r, i) => r[i] <= 1e-12)) return t('L doit être triangulaire inférieure, à diagonale strictement positive.');
+      return fclose(fmul(F, ftr(F)), R.Af) ? null : t('LLᵀ ne redonne pas A.');
     }
     case 'PDP:D': case 'orthodiag:D': {
       if (sq(am)) return sq(am);
-      if (!isDiagF(F)) return 'D doit être diagonale.';
+      if (!isDiagF(F)) return t('D doit être diagonale.');
       if (R.charpoly) {
         // The diagonal is the list of eigenvalues, with multiplicities.
         const d = F.map((r, i) => r[i]);
         const val = (l) => R.charpoly.reduceRight((s, c) => s * l + c.valueOf(), 0);
-        if (d.some((l) => Math.abs(val(l)) > 1e-6)) return 'La diagonale de D doit contenir les valeurs propres de A.';
+        if (d.some((l) => Math.abs(val(l)) > 1e-6)) return t('La diagonale de D doit contenir les valeurs propres de A.');
         const prod = (l) => d.reduce((s, x) => s * (x - l), 1);
-        for (const l of [0.31, 1.7, -2.3, 3.9]) if (Math.abs(prod(l) - val(l)) > 1e-6 * (1 + Math.abs(val(l)))) return 'Chaque valeur propre doit apparaître dans D autant de fois que sa multiplicité.';
+        for (const l of [0.31, 1.7, -2.3, 3.9]) if (Math.abs(prod(l) - val(l)) > 1e-6 * (1 + Math.abs(val(l)))) return t('Chaque valeur propre doit apparaître dans D autant de fois que sa multiplicité.');
       }
       return null;
     }
     case 'PDP:P': case 'orthodiag:Q': {
       if (sq(am)) return sq(am);
-      if (Math.abs(fdet(F)) < 1e-9) return `${name} doit être inversible : ses colonnes doivent être libres.`;
-      if (cfg.of === 'orthodiag' && !orthCols(F)) return 'Q doit être orthogonale : colonnes orthonormées.';
+      if (Math.abs(fdet(F)) < 1e-9) return t('{name} doit être inversible : ses colonnes doivent être libres.', { name });
+      if (cfg.of === 'orthodiag' && !orthCols(F)) return t('Q doit être orthogonale : colonnes orthonormées.');
       // Each column is an eigenvector.
       const AP = fmul(R.Af, F);
       for (let j = 0; j < n; j++) {
@@ -170,34 +171,34 @@ function checkFactor(cfg, name, v, R, all) {
         const ac = AP.map((r) => r[j]);
         const i = c.findIndex((x) => Math.abs(x) > 1e-9);
         const lam = ac[i] / c[i];
-        if (c.some((x, k) => Math.abs(ac[k] - lam * x) > 1e-8 * (1 + Math.abs(ac[k])))) return `La colonne ${j + 1} de ${name} n'est pas un vecteur propre de A.`;
+        if (c.some((x, k) => Math.abs(ac[k] - lam * x) > 1e-8 * (1 + Math.abs(ac[k])))) return t('La colonne {j} de {name} n\'est pas un vecteur propre de A.', { j: j + 1, name });
       }
       const D = all.D;
       if (D) {
         const Df = toF(D);
-        if (!fclose(AP, fmul(F, Df))) return `La colonne k de ${name} doit être un vecteur propre de la valeur propre en position k de D : vérifie l'ordre.`;
+        if (!fclose(AP, fmul(F, Df))) return t('La colonne k de {name} doit être un vecteur propre de la valeur propre en position k de D : vérifie l\'ordre.', { name });
       }
       return null;
     }
     case 'SVD:Σ': {
       if (m !== am || n !== an) return sizeMsg('Σ', am, an);
-      if (!isDiagF(F)) return 'Σ n\'a de cases non nulles que sur sa diagonale.';
+      if (!isDiagF(F)) return t('Σ n\'a de cases non nulles que sur sa diagonale.');
       const d = Array.from({ length: Math.min(m, n) }, (_, i) => F[i][i]);
-      if (d.some((x) => x < -1e-12)) return 'Les valeurs singulières sont positives.';
-      if (d.some((x, i) => i && x > d[i - 1] + 1e-12)) return 'Range les valeurs singulières dans l\'ordre décroissant.';
-      if (d.some((x, i) => Math.abs(x - R.sigmas[i]) > 1e-8 * (1 + x))) return 'Les valeurs singulières sont les racines des valeurs propres de AᵀA.';
+      if (d.some((x) => x < -1e-12)) return t('Les valeurs singulières sont positives.');
+      if (d.some((x, i) => i && x > d[i - 1] + 1e-12)) return t('Range les valeurs singulières dans l\'ordre décroissant.');
+      if (d.some((x, i) => Math.abs(x - R.sigmas[i]) > 1e-8 * (1 + x))) return t('Les valeurs singulières sont les racines des valeurs propres de AᵀA.');
       return null;
     }
     case 'SVD:V': case 'SVD:U': {
       const k = name === 'V' ? an : am;
       if (sq(k)) return sq(k);
-      if (!orthCols(F)) return `${name} doit être orthogonale : colonnes orthonormées.`;
+      if (!orthCols(F)) return t('{name} doit être orthogonale : colonnes orthonormées.', { name });
       const B = name === 'V' ? R.AtA : R.AAt;
       const BF = fmul(B, F);
       for (let j = 0; j < k; j++) {
         const s2 = (R.sigmas[j] ?? 0) ** 2;
         if (F.some((r, i) => Math.abs(BF[i][j] - s2 * r[j]) > 1e-7 * (1 + Math.abs(BF[i][j])))) {
-          return `La colonne ${j + 1} de ${name} doit être un vecteur propre de ${name === 'V' ? 'AᵀA' : 'AAᵀ'} pour σ${'₀₁₂₃₄₅₆₇₈₉'[j + 1] ?? ''}².`;
+          return t('La colonne {j} de {name} doit être un vecteur propre de {M} pour {s}.', { j: j + 1, name, M: name === 'V' ? 'AᵀA' : 'AAᵀ', s: `σ${'₀₁₂₃₄₅₆₇₈₉'[j + 1] ?? ''}²` });
         }
       }
       // With V, uᵢ = Avᵢ/σᵢ for σᵢ ≠ 0.
@@ -206,7 +207,7 @@ function checkFactor(cfg, name, v, R, all) {
         for (let j = 0; j < Math.min(am, an); j++) {
           const s = R.sigmas[j];
           if (s < 1e-9) continue;
-          if (F.some((r, i) => Math.abs(r[j] - AV[i][j] / s) > 1e-8)) return `u${'₀₁₂₃₄₅₆₇₈₉'[j + 1]} doit valoir Av${'₀₁₂₃₄₅₆₇₈₉'[j + 1]}/σ${'₀₁₂₃₄₅₆₇₈₉'[j + 1]}.`;
+          if (F.some((r, i) => Math.abs(r[j] - AV[i][j] / s) > 1e-8)) return t('{u} doit valoir {v}.', { u: `u${'₀₁₂₃₄₅₆₇₈₉'[j + 1]}`, v: `Av${'₀₁₂₃₄₅₆₇₈₉'[j + 1]}/σ${'₀₁₂₃₄₅₆₇₈₉'[j + 1]}` });
         }
       }
       return null;
@@ -257,11 +258,11 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const R = ref(cfg);
   const want = namesOf(cfg);
   const given = node.assigns.length ? node.assigns : [];
-  if (!given.length) return { kind: 'form', node, message: `Nomme les facteurs : ${want.map((x) => `${x} = [[…]]`).join(' ; ')}.` };
+  if (!given.length) return { kind: 'form', node, message: t('Nomme les facteurs : {f}.', { f: want.map((x) => `${x} = [[…]]`).join(' ; ') }) };
   const f = { ...(state.factors || {}) };
   for (const a of given) {
     const name = ALIAS[cfg.of]?.[a.name] ?? a.name;
-    if (!want.includes(name)) return { kind: 'form', node, message: `Les facteurs sont ${want.join(', ')}.` };
+    if (!want.includes(name)) return { kind: 'form', node, message: t('Les facteurs sont {f}.', { f: want.join(', ') }) };
     f[name] = a.value;
   }
   for (const a of given) {
@@ -278,7 +279,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   }
   state.factors = f;
   if (want.every((k) => f[k])) {
-    if (!productOk(cfg, f, R)) return wrongV(node, 'Le produit des facteurs ne redonne pas A.');
+    if (!productOk(cfg, f, R)) return wrongV(node, t('Le produit des facteurs ne redonne pas A.'));
     return { kind: 'done', node };
   }
   return { kind: 'ok', node };

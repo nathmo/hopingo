@@ -20,6 +20,7 @@ import { toReadable } from '../print.js';
 import { limit, targetOf, sameLimit } from '../limit.js';
 import { Q } from '../../math/rational.js';
 import { lexFor, norm, walkF, replaceF, atomText } from '../logic.js';
+import { t } from '../../i18n.js';
 
 const vOf = (ctx) => ctx?.cfg?.v || ctx?.v || 'x';
 const par = (e) => ({ t: 'paren', e });
@@ -94,7 +95,7 @@ const swapED = (t) => t.replace(/[εδ]/g, (c) => (c === 'ε' ? 'δ' : 'ε'));
 export const RULES = [
   {
     id: 'a1_remarkable_limit_scale', family: 'rule', tag: 'E', skill: 'a1-fn-limits', repair: 'a1-fn-limits', judges: ['limit'],
-    name: 'Limite remarquable sans le facteur de l\'argument',
+    name: t('Limite remarquable sans le facteur de l\'argument'),
     example: ['sin(3x)/x → 1', 'sin(3x)/x = 3·sin(3x)/(3x) → 3'],
     check: { judge: { kind: 'limit', v: 'x', to: '0' }, prev: 'sin(3x)/x', line: '1' },
     transform: (prev, ctx) => {
@@ -109,16 +110,16 @@ export const RULES = [
       return out;
     },
     explain: (ctx = {}) => {
-      if (!ctx.a) return 'sin(u)/u → 1 seulement si le haut et le bas ont le même u : sin(3x)/x = 3·sin(3x)/(3x) → 3. Fais apparaître le facteur de l\'argument.';
-      if (ctx.F === 'cos') return `(1 − cos u)/u² → 1/2 avec u = ${ctx.a}x : (1 − cos(${ctx.a}x))/x² = (${ctx.a}x)²/x² · (1 − cos(${ctx.a}x))/(${ctx.a}x)² → ${ctx.a}²/2. Le facteur ${ctx.a}² ne disparaît pas.`;
+      if (!ctx.a) return t('sin(u)/u → 1 seulement si le haut et le bas ont le même u : sin(3x)/x = 3·sin(3x)/(3x) → 3. Fais apparaître le facteur de l\'argument.');
+      if (ctx.F === 'cos') return t('(1 − cos u)/u² → 1/2 avec u = {a}x : (1 − cos({a}x))/x² = ({a}x)²/x² · (1 − cos({a}x))/({a}x)² → {a}²/2. Le facteur {a}² ne disparaît pas.', { a: ctx.a });
       const shape = SHAPE[ctx.F] ? ` : ${SHAPE[ctx.F](ctx.a)}` : '';
-      return `La limite remarquable demande le même argument en haut et en bas. Avec u = ${ctx.a}x, on multiplie et divise par ${ctx.a}${shape}, pas 1.`;
+      return t('La limite remarquable demande le même argument en haut et en bas. Avec u = {a}x, on multiplie et divise par {a}{shape}, pas 1.', { a: ctx.a, shape });
     },
   },
   {
     id: 'a1_onesided_ignored', family: 'method', tag: 'E', skill: 'a1-fn-onesided', repair: 'a1-fn-onesided', judges: ['limit'],
-    name: 'Une seule limite latérale donnée comme limite',
-    example: ['lim e^(1/x) en 0 = 0 (vu à gauche)', 'à gauche 0, à droite +∞ : pas de limite en 0'],
+    name: t('Une seule limite latérale donnée comme limite'),
+    example: [t('lim e^(1/x) en 0 = 0 (vu à gauche)'), t('à gauche 0, à droite +∞ : pas de limite en 0')],
     check: { judge: { kind: 'limit', v: 'x', to: '0' }, prev: 'e^(1/x)', line: '0' },
     transform: (prev, ctx) => {
       const cfg = ctx?.cfg || {};
@@ -137,13 +138,13 @@ export const RULES = [
       return [{ node: valueNode(right), ctx: c }, { node: valueNode(left), ctx: c }];
     },
     explain: (ctx = {}) => (ctx.right
-      ? `À droite la limite vaut ${ctx.right}, à gauche ${ctx.left} : les deux côtés diffèrent, donc la limite n'existe pas.`
-      : 'La limite existe seulement si les limites à gauche et à droite existent et sont égales. En 0⁻, 1/x → −∞ et e^(1/x) → 0, alors qu\'en 0⁺, e^(1/x) → +∞ : les deux côtés diffèrent.'),
+      ? t('À droite la limite vaut {right}, à gauche {left} : les deux côtés diffèrent, donc la limite n\'existe pas.', { right: ctx.right, left: ctx.left })
+      : t('La limite existe seulement si les limites à gauche et à droite existent et sont égales. En 0⁻, 1/x → −∞ et e^(1/x) → 0, alors qu\'en 0⁺, e^(1/x) → +∞ : les deux côtés diffèrent.')),
   },
   {
     id: 'a1_abs_removed', family: 'sign', tag: 'E', skill: 'a1-fn-onesided', repair: 'a1-fn-onesided', judges: ['limit'],
-    name: 'Valeur absolue enlevée sans regarder le signe',
-    example: ['|x − 2| = x − 2 pour x < 2', '|x − 2| = −(x − 2) pour x < 2'],
+    name: t('Valeur absolue enlevée sans regarder le signe'),
+    example: [t('|x − 2| = x − 2 pour x < 2'), t('|x − 2| = −(x − 2) pour x < 2')],
     check: { judge: { kind: 'limit', v: 'x', to: '2', dir: '-' }, prev: '(x^2-4)/abs(x-2)', line: '4' },
     transform: (prev) => {
       const swaps = [];
@@ -160,13 +161,13 @@ export const RULES = [
       return out;
     },
     explain: (ctx = {}) => (ctx.u
-      ? `|${ctx.u}| = ${ctx.u} seulement là où ${ctx.u} ≥ 0. Du côté où ${ctx.u} < 0, |${ctx.u}| = −(${ctx.u}).`
-      : 'Pour x < 2, x − 2 < 0, donc |x − 2| = −(x − 2) : on enlève la valeur absolue en regardant le signe de chaque côté.'),
+      ? t('|{u}| = {u} seulement là où {u} ≥ 0. Du côté où {u} < 0, |{u}| = −({u}).', { u: ctx.u })
+      : t('Pour x < 2, x − 2 < 0, donc |x − 2| = −(x − 2) : on enlève la valeur absolue en regardant le signe de chaque côté.')),
   },
   {
     id: 'a1_extension_wrong_branch', family: 'rule', tag: 'E', skill: 'a1-fn-extension', repair: 'a1-fn-extension', judges: ['limit'],
-    name: 'Limite latérale prise avec le mauvais morceau',
-    example: ['limite à gauche de 3 avec le morceau de x > 3', 'à gauche de 3, le morceau de x < 3'],
+    name: t('Limite latérale prise avec le mauvais morceau'),
+    example: [t('limite à gauche de 3 avec le morceau de x > 3'), t('à gauche de 3, le morceau de x < 3')],
     check: { judge: { kind: 'limit', v: 'x', to: '3', dir: '-', otherPiece: '(x+3)/x', at: '3' }, prev: 'x^2+1', line: '2' },
     transform: (prev, ctx) => {
       const cfg = ctx?.cfg || {};
@@ -176,12 +177,14 @@ export const RULES = [
       return [{ node: parse(String(cfg.otherPiece), { vars: [v] }), ctx: { c: fr(cfg.at ?? cfg.to), side, g: R(prev) } }];
     },
     explain: (ctx = {}) => (ctx.c
-      ? `À ${ctx.side} de ${ctx.c}, c'est ${ctx.g} qui définit f : chaque limite latérale se calcule avec le morceau de son côté.`
-      : 'Chaque limite latérale se calcule avec le morceau de f de ce côté-là : à gauche de c, le morceau défini pour x < c.'),
+      ? (ctx.side === 'droite'
+        ? t('À droite de {c}, c\'est {g} qui définit f : chaque limite latérale se calcule avec le morceau de son côté.', { c: ctx.c, g: ctx.g })
+        : t('À {side} de {c}, c\'est {g} qui définit f : chaque limite latérale se calcule avec le morceau de son côté.', { side: ctx.side, c: ctx.c, g: ctx.g }))
+      : t('Chaque limite latérale se calcule avec le morceau de f de ce côté-là : à gauche de c, le morceau défini pour x < c.')),
   },
   {
     id: 'a1_epsdelta_swapped', family: 'notation', tag: 'E', skill: 'a1-fn-epsdelta-def', repair: 'a1-fn-epsdelta-def', judges: ['logic'],
-    name: 'ε et δ échangés dans la définition',
+    name: t('ε et δ échangés dans la définition'),
     example: ['|x − x₀| ≤ ε ⇒ |f(x) − L| ≤ δ', '|x − x₀| ≤ δ ⇒ |f(x) − L| ≤ ε'],
     check: {
       judge: { kind: 'logic', pieces: [{ text: 'ε > 0' }, { text: 'δ > 0' }, { text: 'x ∈ D' }, { text: '|x − x₀| ≤ δ' }, { text: '|f(x) − L| ≤ ε' }, { text: '|x − x₀| ≤ ε' }, { text: '|f(x) − L| ≤ δ' }] },
@@ -203,22 +206,22 @@ export const RULES = [
       }
       return [{ node, ctx: {} }];
     },
-    explain: () => 'ε mesure l\'écart des valeurs, |f(x) − L| ≤ ε ; δ mesure l\'écart des x, |x − x₀| ≤ δ. On se donne ε, puis on cherche δ.',
+    explain: () => t('ε mesure l\'écart des valeurs, |f(x) − L| ≤ ε ; δ mesure l\'écart des x, |x − x₀| ≤ δ. On se donne ε, puis on cherche δ.'),
   },
   {
     id: 'a1_delta_depends_on_x', family: 'logic', tag: 'E', skill: 'a1-fn-epsdelta', repair: 'a1-fn-epsdelta-def', judges: ['delta'],
-    name: 'δ qui dépend de x',
+    name: t('δ qui dépend de x'),
     example: ['δ = ε/|x + 3|', 'δ = min(1 ; ε/7)'],
     check: { judge: { kind: 'delta', mode: 'delta', f: 'x^2', a: '3', L: '9', rules: { dependsOnVar: 'a1_delta_depends_on_x' } }, prev: 'δ', line: 'ε/abs(x+3)' },
     transform: (prev, ctx) => {
       const dep = ctx?.cfg?.dep;
       return dep ? [{ node: parse(String(dep), { vars: ['ε', 'x'] }), ctx: {} }] : [];
     },
-    explain: () => 'δ se choisit avant x : il ne peut dépendre que de ε (et de x₀). Borne d\'abord l\'autre facteur en imposant |x − x₀| ≤ 1, puis prends δ = min(1 ; ε/M).',
+    explain: () => t('δ se choisit avant x : il ne peut dépendre que de ε (et de x₀). Borne d\'abord l\'autre facteur en imposant |x − x₀| ≤ 1, puis prends δ = min(1 ; ε/M).'),
   },
   {
     id: 'a1_delta_inverted', family: 'rule', tag: 'E', skill: 'a1-fn-epsdelta', repair: 'a1-fn-epsdelta', judges: ['delta'],
-    name: 'δ = k·ε au lieu de ε/k',
+    name: t('δ = k·ε au lieu de ε/k'),
     example: ['|f(x) − 7| = 4|x + 1| : δ = 4ε', 'δ = ε/4'],
     check: { judge: { kind: 'delta', mode: 'delta', f: '3-4x', a: '-1', L: '7', k: '4' }, prev: 'δ', line: '4ε' },
     transform: (prev, ctx) => {
@@ -233,7 +236,7 @@ export const RULES = [
       ];
     },
     explain: (ctx = {}) => (ctx.a
-      ? `|f(x) − L| = ${ctx.a}·|x − x₀| : avec δ = ${ctx.a}ε, cet écart peut valoir ${ctx.a}·${ctx.a}ε, plus que ε. Il faut ${ctx.a}·δ ≤ ε, donc δ = ε/${ctx.a}.`
-      : 'Si |f(x) − L| = k·|x − x₀|, il faut k·δ ≤ ε : δ = ε/k, pas k·ε.'),
+      ? t('|f(x) − L| = {a}·|x − x₀| : avec δ = {a}ε, cet écart peut valoir {a}·{a}ε, plus que ε. Il faut {a}·δ ≤ ε, donc δ = ε/{a}.', { a: ctx.a })
+      : t('Si |f(x) − L| = k·|x − x₀|, il faut k·δ ≤ ε : δ = ε/k, pas k·ε.')),
   },
 ];

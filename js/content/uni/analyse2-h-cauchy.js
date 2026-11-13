@@ -7,13 +7,14 @@
 import { MT, linesItem, examTag } from './kit.js';
 import { partsScript, tpl } from './a2-kit.js';
 import { q, qt, H, E, modeOf, mcq4, opt, tfOf, tfProblem, pickK } from './analyse2-h-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-cauchy';
 const SUB = [
-  { id: 'partial', label: 'dériver f par rapport à y', skill: 'a2-partials' },
-  { id: 'lipschitz', label: 'constante de Lipschitz M', skill: SK },
-  { id: 'bound', label: 'borne K de |f| sur R', skill: SK },
-  { id: 'interval', label: 'intervalle min(a, b/K)', skill: SK },
+  { id: 'partial', label: t('dériver f par rapport à y'), skill: 'a2-partials' },
+  { id: 'lipschitz', label: t('constante de Lipschitz M'), skill: SK },
+  { id: 'bound', label: t('borne K de |f| sur R'), skill: SK },
+  { id: 'interval', label: t('intervalle min(a, b/K)'), skill: SK },
 ];
 const KEYS = ['calcx', 'calcfn', 'a2', 'anal'];
 const TY = { vars: ['t', 'y'] };
@@ -41,20 +42,20 @@ function data(rng) {
 }
 
 const CHOICES = [
-  { id: 'pd', label: 'Dériver f par rapport à y' },
-  { id: 'lip', label: 'Majorer |∂f/∂y| sur R : constante de Lipschitz M' },
-  { id: 'K', label: 'Majorer |f| sur R : borne K' },
-  { id: 'h', label: 'Intervalle : min(a, b/K)' },
-  { id: 'calc', label: 'Calculer' },
-  { id: 'cont', label: 'f est continue : la solution est unique', rule: 'a2_ode_continuity_unique', why: 'La continuité donne l\'existence (Peano), pas l\'unicité : il faut Lipschitz en y.' },
-  { id: 'hM', label: 'Intervalle : min(a, b/M)', why: 'L\'intervalle vient de la borne K de |f| : la solution ne peut pas quitter le rectangle avant le temps b/K.' },
+  { id: 'pd', label: t('Dériver f par rapport à y') },
+  { id: 'lip', label: t('Majorer |∂f/∂y| sur R : constante de Lipschitz M') },
+  { id: 'K', label: t('Majorer |f| sur R : borne K') },
+  { id: 'h', label: t('Intervalle : min(a, b/K)') },
+  { id: 'calc', label: t('Calculer') },
+  { id: 'cont', label: t('f est continue : la solution est unique'), rule: 'a2_ode_continuity_unique', why: t('La continuité donne l\'existence (Peano), pas l\'unicité : il faut Lipschitz en y.') },
+  { id: 'hM', label: t('Intervalle : min(a, b/M)'), why: t('L\'intervalle vient de la borne K de |f| : la solution ne peut pas quitter le rectangle avant le temps b/K.') },
 ];
 
 const uniqueness = {
-  kind: 'decision', prompt: 'Quelle hypothèse donne l\'unicité de la solution ?', options: [
-    { id: 'lip', label: 'f est Lipschitz en y sur R (par exemple ∂f/∂y bornée)', valid: true },
-    { id: 'cont', label: 'f est continue sur R', valid: false, rule: 'a2_ode_continuity_unique', why: 'Continue seule ne suffit pas : y′ = 3y^(2/3), y(0) = 0 a deux solutions, 0 et t³.' },
-    { id: 'K', label: 'f est bornée par K sur R', valid: false, why: 'K donne la taille de l\'intervalle, pas l\'unicité.' },
+  kind: 'decision', prompt: t('Quelle hypothèse donne l\'unicité de la solution ?'), options: [
+    { id: 'lip', label: t('f est Lipschitz en y sur R (par exemple ∂f/∂y bornée)'), valid: true },
+    { id: 'cont', label: t('f est continue sur R'), valid: false, rule: 'a2_ode_continuity_unique', why: t('Continue seule ne suffit pas : y′ = 3y^(2/3), y(0) = 0 a deux solutions, 0 et t³.') },
+    { id: 'K', label: t('f est bornée par K sur R'), valid: false, why: t('K donne la taille de l\'intervalle, pas l\'unicité.') },
   ],
 };
 
@@ -65,12 +66,12 @@ function linesVariant(level, rng, opts) {
   const kLine = fam.Kline(a, B);
   const hLine = `min(${a} ; ${b}/${K})`;
   const value = (expect) => ({ kind: 'value', expect: String(expect) });
-  const two = (line, val, note, sub, act) => (line === String(val) ? [E(String(val), note, sub, act)] : [E(line, note, sub, act), E(String(val), 'Calculer', sub, 'calc')]);
+  const two = (line, val, note, sub, act) => (line === String(val) ? [E(String(val), note, sub, act)] : [E(line, note, sub, act), E(String(val), t('Calculer'), sub, 'calc')]);
   const parts = [
-    { start: `pd(${fam.f},y)`, judge: { kind: 'equiv', ...TY, target: 'no-prime', domain: { t: [-a, a], y: [y0 - b, y0 + b] } }, lines: [E(fam.fy, 'Dériver en y (t est une constante)', 'partial', 'pd')] },
-    { html: `Majore |∂f/∂y| sur R (${fam.why(a, B)}) : f est M-Lipschitz en y.`, ask: 'M =', start: 'M', judge: value(M), pre: level === 3 ? [uniqueness] : [], lines: two(mLine, M, 'Majorer chaque facteur', 'lipschitz', 'lip') },
-    { html: 'Majore |f| sur R : borne K.', ask: 'K =', start: 'K', judge: value(K), lines: two(kLine, K, 'Majorer chaque terme', 'bound', 'K') },
-    { html: 'Solution unique sur |t| ≤ h, avec h = min(a, b/K) :', ask: 'h =', start: 'h', judge: value(qt(h)), lines: [E(hLine, 'min(a, b/K)', 'interval', 'h'), E(qt(h), 'Calculer', 'interval', 'calc')] },
+    { start: `pd(${fam.f},y)`, judge: { kind: 'equiv', ...TY, target: 'no-prime', domain: { t: [-a, a], y: [y0 - b, y0 + b] } }, lines: [E(fam.fy, t('Dériver en y (t est une constante)'), 'partial', 'pd')] },
+    { html: t('Majore |∂f/∂y| sur R ({why}) : f est M-Lipschitz en y.', { why: fam.why(a, B) }), ask: 'M =', start: 'M', judge: value(M), pre: level === 3 ? [uniqueness] : [], lines: two(mLine, M, t('Majorer chaque facteur'), 'lipschitz', 'lip') },
+    { html: t('Majore |f| sur R : borne K.'), ask: 'K =', start: 'K', judge: value(K), lines: two(kLine, K, t('Majorer chaque terme'), 'bound', 'K') },
+    { html: t('Solution unique sur |t| ≤ h, avec h = min(a, b/K) :'), ask: 'h =', start: 'h', judge: value(qt(h)), lines: [E(hLine, 'min(a, b/K)', 'interval', 'h'), E(qt(h), t('Calculer'), 'interval', 'calc')] },
   ];
   if (level === 1) {
     parts[1].lines[0] = { ...parts[1].lines[0], ...tpl(parts[1].lines[0].math, [String(B), '1']) };
@@ -80,8 +81,9 @@ function linesVariant(level, rng, opts) {
   const R = `|t| ≤ ${a}, |y${y0 ? (y0 > 0 ? ` − ${y0}` : ` + ${-y0}`) : ''}| ≤ ${b}`;
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Problème de Cauchy y′ = f(t, y) = ${MT(fam.f, TY)}, y(0) = ${y0} sur le rectangle R : ${R}${y0 ? ` (donc |y| ≤ ${B})` : ''}. Trouve une constante de Lipschitz M, une borne K de |f| et l'intervalle |t| ≤ h où la solution existe et est unique.`,
-    hints: H('Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K).', `Sur R : ${fam.why(a, B)}. Par exemple |∂f/∂y| ≤ ${mLine.replace(/×/g, '·')}.`, `M = ${M}, K = ${K}, h = min(${a}, ${b}/${K}) = ${qt(h)}.`),
+    prompt: y0 ? t('Problème de Cauchy y′ = f(t, y) = {f}, y(0) = {y0} sur le rectangle R : {R} (donc |y| ≤ {B}). Trouve une constante de Lipschitz M, une borne K de |f| et l\'intervalle |t| ≤ h où la solution existe et est unique.', { f: MT(fam.f, TY), y0, R, B })
+      : t('Problème de Cauchy y′ = f(t, y) = {f}, y(0) = {y0} sur le rectangle R : {R}. Trouve une constante de Lipschitz M, une borne K de |f| et l\'intervalle |t| ≤ h où la solution existe et est unique.', { f: MT(fam.f, TY), y0, R }),
+    hints: H(t('Lipschitz : majore |∂f/∂y| sur R. Intervalle : min(a, b/K).'), t('Sur R : {why}. Par exemple |∂f/∂y| ≤ {m}.', { why: fam.why(a, B), m: mLine.replace(/×/g, '·') }), `M = ${M}, K = ${K}, h = min(${a}, ${b}/${K}) = ${qt(h)}.`),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${fam.f}:${a}:${b}:${y0}`, exam: examTag(opts),
   });
@@ -91,37 +93,37 @@ function linesVariant(level, rng, opts) {
 
 const T_KEYS = ['calcx', 'calcfn', 'anal'];
 const STATEMENTS = [
-  { key: 'int', truth: true, text: 'Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution.', why: 'Vrai : on intègre, y(t) = y₀ + ∫ de t₀ à t de f(s) ds, et deux solutions ont la même dérivée et la même valeur en t₀.', ruleIfFalse: null },
+  { key: 'int', truth: true, text: t('Si f est continue et bornée sur ℝ, le problème y′ = f(t), y(t₀) = y₀ a une unique solution.'), why: t('Vrai : on intègre, y(t) = y₀ + ∫ de t₀ à t de f(s) ds, et deux solutions ont la même dérivée et la même valeur en t₀.'), ruleIfFalse: null },
   {
-    key: 'cont', truth: false, text: 'Si f est continue et bornée, le problème y′ = f(y), y(0) = 0 a une unique solution locale.', why: 'Faux : y′ = 3y^(2/3) (tronquée pour être bornée) a les solutions y = 0 et y = t³. La continuité ne donne que l\'existence ; l\'unicité demande f Lipschitz en y.', ruleIfTrue: 'a2_ode_continuity_unique',
-    counter: { kind: 'a2', prop: 'odeTwoSolutions', params: { eq: "y'=3y^(2/3)", v: 't', ic: { x: 0, y: 0 }, domain: { t: [0.1, 2] } }, ask: [{ v: 'y1', label: 'Pour y′ = 3y^(2/3), y(0) = 0 : y₁(t) =', keys: T_KEYS }, { v: 'y2', label: 'y₂(t) =', keys: T_KEYS }], answer: { y1: '0', y2: 't^3' } },
+    key: 'cont', truth: false, text: t('Si f est continue et bornée, le problème y′ = f(y), y(0) = 0 a une unique solution locale.'), why: t('Faux : y′ = 3y^(2/3) (tronquée pour être bornée) a les solutions y = 0 et y = t³. La continuité ne donne que l\'existence ; l\'unicité demande f Lipschitz en y.'), ruleIfTrue: 'a2_ode_continuity_unique',
+    counter: { kind: 'a2', prop: 'odeTwoSolutions', params: { eq: "y'=3y^(2/3)", v: 't', ic: { x: 0, y: 0 }, domain: { t: [0.1, 2] } }, ask: [{ v: 'y1', label: t('Pour y′ = 3y^(2/3), y(0) = 0 : y₁(t) ='), keys: T_KEYS }, { v: 'y2', label: 'y₂(t) =', keys: T_KEYS }], answer: { y1: '0', y2: 't^3' } },
   },
   {
-    key: 'sqrt', truth: false, text: 'Si f est continue, le problème y′ = f(y), y(0) = 0 a une unique solution sur [0 ; 1].', why: 'Faux : y′ = 2√|y| a les solutions y = 0 et y = t² sur [0 ; 1]. √|y| n\'est pas Lipschitz près de 0.', ruleIfTrue: 'a2_ode_continuity_unique',
-    counter: { kind: 'a2', prop: 'odeTwoSolutions', params: { eq: "y'=2√(|y|)", v: 't', ic: { x: 0, y: 0 }, domain: { t: [0.1, 1] } }, ask: [{ v: 'y1', label: 'Pour y′ = 2√|y|, y(0) = 0 : y₁(t) =', keys: T_KEYS }, { v: 'y2', label: 'y₂(t) =', keys: T_KEYS }], answer: { y1: '0', y2: 't^2' } },
+    key: 'sqrt', truth: false, text: t('Si f est continue, le problème y′ = f(y), y(0) = 0 a une unique solution sur [0 ; 1].'), why: t('Faux : y′ = 2√|y| a les solutions y = 0 et y = t² sur [0 ; 1]. √|y| n\'est pas Lipschitz près de 0.'), ruleIfTrue: 'a2_ode_continuity_unique',
+    counter: { kind: 'a2', prop: 'odeTwoSolutions', params: { eq: "y'=2√(|y|)", v: 't', ic: { x: 0, y: 0 }, domain: { t: [0.1, 1] } }, ask: [{ v: 'y1', label: t('Pour y′ = 2√|y|, y(0) = 0 : y₁(t) ='), keys: T_KEYS }, { v: 'y2', label: 'y₂(t) =', keys: T_KEYS }], answer: { y1: '0', y2: 't^2' } },
   },
-  { key: 'c1', truth: true, text: 'Si f ∈ C¹(ℝ²), le problème y′ = f(t, y), y(t₀) = y₀ a une unique solution locale.', why: 'Vrai : ∂f/∂y est continue, donc bornée sur un rectangle autour de (t₀, y₀) : f est Lipschitz en y, et le théorème s\'applique.' },
+  { key: 'c1', truth: true, text: t('Si f ∈ C¹(ℝ²), le problème y′ = f(t, y), y(t₀) = y₀ a une unique solution locale.'), why: t('Vrai : ∂f/∂y est continue, donc bornée sur un rectangle autour de (t₀, y₀) : f est Lipschitz en y, et le théorème s\'applique.') },
   {
-    key: 'global', truth: false, text: 'Si f ∈ C¹(ℝ²), la solution de y′ = f(t, y), y(0) = 1 est définie pour tout t ∈ ℝ.', why: 'Faux : y′ = y², y(0) = 1 donne y = 1/(1 − t), qui explose en t = 1. Le théorème est local.', ruleIfTrue: 'a2_ode_local_global',
+    key: 'global', truth: false, text: t('Si f ∈ C¹(ℝ²), la solution de y′ = f(t, y), y(0) = 1 est définie pour tout t ∈ ℝ.'), why: t('Faux : y′ = y², y(0) = 1 donne y = 1/(1 − t), qui explose en t = 1. Le théorème est local.'), ruleIfTrue: 'a2_ode_local_global',
     counter: { kind: 'a2', prop: 'odeBlowUp', params: { v: 't', ic: { x: 0, y: 1 } }, ask: [{ v: 'f', label: 'f(t, y) =', keys: T_KEYS }, { v: 'y', label: 'y(t) =', keys: T_KEYS }], answer: { f: 'y^2', y: '1/(1-t)' } },
   },
-  { key: 'order', truth: true, text: 'L\'équation y‴ = f(t, y, y′, y″) demande trois conditions initiales, y(t₀), y′(t₀) et y″(t₀), pour une solution unique.', why: 'Vrai : on la ramène au système d\'ordre 1 en (y, y′, y″), qui a trois inconnues, donc trois conditions initiales.' },
-  { key: 'peano', truth: true, text: 'Si f est continue sur ℝ², le problème y′ = f(t, y), y(t₀) = y₀ a au moins une solution locale.', why: 'Vrai : c\'est le théorème d\'existence (Peano). L\'unicité, elle, demande plus.' },
+  { key: 'order', truth: true, text: t('L\'équation y‴ = f(t, y, y′, y″) demande trois conditions initiales, y(t₀), y′(t₀) et y″(t₀), pour une solution unique.'), why: t('Vrai : on la ramène au système d\'ordre 1 en (y, y′, y″), qui a trois inconnues, donc trois conditions initiales.') },
+  { key: 'peano', truth: true, text: t('Si f est continue sur ℝ², le problème y′ = f(t, y), y(t₀) = y₀ a au moins une solution locale.'), why: t('Vrai : c\'est le théorème d\'existence (Peano). L\'unicité, elle, demande plus.') },
 ];
 
 function tfVariant(level, rng, opts, hints = true) {
   const s = rng.pick(STATEMENTS);
-  return tfOf(SK, s, level, examTag(opts), hints && !opts?.exam ? H('Existence : f continue. Unicité locale : f Lipschitz en y. Rien de global.', 'Pense à y′ = 3y^(2/3) (deux solutions) et à y′ = y² (explosion).', s.truth ? 'L\'énoncé est vrai.' : `L'énoncé est faux : ${s.why}`) : undefined);
+  return tfOf(SK, s, level, examTag(opts), hints && !opts?.exam ? H(t('Existence : f continue. Unicité locale : f Lipschitz en y. Rien de global.'), t('Pense à y′ = 3y^(2/3) (deux solutions) et à y′ = y² (explosion).'), s.truth ? t('L\'énoncé est vrai.') : t('L\'énoncé est faux : {why}', { why: s.why })) : undefined);
 }
 
 function mcqVariant(level, rng, opts) {
   if (rng.chance(0.5)) {
     return mcq4({
       skill: SK, level, key: `${SK}:mcq:third`, exam: examTag(opts),
-      prompt: 'Une condition suffisante pour que y‴ = y″·f₂(x) + f₀(y), y(0) = a, y′(0) = b, y″(0) = c ait une unique solution locale est :',
-      right: 'f₂ continue et f₀ Lipschitz',
-      wrongs: [{ html: 'f₂ et f₀ continues', rule: 'a2_ode_continuity_unique' }, { html: 'f₂ et f₀ bornées', rule: null }, { html: 'f₀ Lipschitz, sans condition sur f₂', rule: null }],
-      solution: [{ html: 'Le système (y, y′, y″)′ = (y′, y″, y″f₂(x) + f₀(y)) a un second membre continu en x et Lipschitz en (y, y′, y″) si f₂ est continue et f₀ Lipschitz.', note: '' }],
+      prompt: t('Une condition suffisante pour que y‴ = y″·f₂(x) + f₀(y), y(0) = a, y′(0) = b, y″(0) = c ait une unique solution locale est :'),
+      right: t('f₂ continue et f₀ Lipschitz'),
+      wrongs: [{ html: t('f₂ et f₀ continues'), rule: 'a2_ode_continuity_unique' }, { html: t('f₂ et f₀ bornées'), rule: null }, { html: t('f₀ Lipschitz, sans condition sur f₂'), rule: null }],
+      solution: [{ html: t('Le système (y, y′, y″)′ = (y′, y″, y″f₂(x) + f₀(y)) a un second membre continu en x et Lipschitz en (y, y′, y″) si f₂ est continue et f₀ Lipschitz.'), note: '' }],
       expectedSec: 90,
     }, rng);
   }
@@ -129,7 +131,7 @@ function mcqVariant(level, rng, opts) {
   const hM = q(d.b, d.M).cmp(d.a) < 0 ? q(d.b, d.M) : q(d.a);
   return mcq4({
     skill: SK, level, key: `${SK}:mcq:${d.fam.f}:${d.a}:${d.b}:${d.y0}`, exam: examTag(opts),
-    prompt: `y′ = ${MT(d.fam.f, TY)}, y(0) = ${d.y0}, sur R : |t| ≤ ${d.a}, |y${d.y0 ? (d.y0 > 0 ? ` − ${d.y0}` : ` + ${-d.y0}`) : ''}| ≤ ${d.b}. Le théorème de Cauchy-Lipschitz garantit une solution unique sur |t| ≤ h avec h =`,
+    prompt: t('y′ = {f}, y(0) = {y0}, sur R : {R}. Le théorème de Cauchy-Lipschitz garantit une solution unique sur |t| ≤ h avec h =', { f: MT(d.fam.f, TY), y0: d.y0, R: `|t| ≤ ${d.a}, |y${d.y0 ? (d.y0 > 0 ? ` − ${d.y0}` : ` + ${-d.y0}`) : ''}| ≤ ${d.b}` }),
     right: MT(qt(d.h)),
     wrongs: [opt(qt(hM)), opt(String(d.a)), opt(qt(q(d.b, d.K))), opt(qt(q(d.a, d.K))), opt(qt(q(d.b, d.K + 1)))],
     solution: [{ html: `M = ${d.M}, K = ${d.K} ; h = min(${d.a}, ${d.b}/${d.K}) = ${qt(d.h)}.`, note: '' }],

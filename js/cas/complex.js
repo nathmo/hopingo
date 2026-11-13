@@ -21,6 +21,7 @@
 import { Q } from '../math/rational.js';
 import { canonFn, stripParen, contains, num, lit, add, mul, neg as negN, cst } from './ast.js';
 import { evalFloat } from './numeric.js';
+import { t as tr } from '../i18n.js';
 
 // ---------- exact ℚ(i) ----------
 
@@ -46,12 +47,12 @@ export class CQ {
   neg() { return new CQ(this.re.neg(), this.im.neg()); }
   inv() {
     const m = this.abs2();
-    if (m.n === 0) throw new RangeError('Division par zéro');
+    if (m.n === 0) throw new RangeError(tr('Division par zéro'));
     return new CQ(this.re.div(m), this.im.neg().div(m));
   }
   div(o) { return this.mul(CQ.of(o).inv()); }
   pow(k) {
-    if (!Number.isInteger(k)) throw new RangeError('Exposant non entier');
+    if (!Number.isInteger(k)) throw new RangeError(tr('Exposant non entier'));
     if (k < 0) return this.inv().pow(-k);
     let out = new CQ(1);
     let b = this;

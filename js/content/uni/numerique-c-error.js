@@ -16,6 +16,7 @@
 // table. Exam: tf.
 
 import { Q } from '../../math/rational.js';
+import { t, tn } from '../../i18n.js';
 import { linesItem, tfItem, examTag } from './kit.js';
 import { mcqDistinct } from './alglin-kit.js';
 import {
@@ -57,10 +58,10 @@ const readable = (t) => t.replace(/\^(\d+)/g, (_, d) => sup(d)).replace(/-/g, '�
 // max|f⁽ᵏ⁾| on [0 ; b]: {c, atom} (c rational).
 function maxDeriv(kind, k, b) {
   switch (kind) {
-    case 'sin': case 'cos': return { c: q(1), atom: null, note: `|${readable(DERIV[kind](k))}| ≤ 1, atteint sur l'intervalle` };
-    case 'inv': return { c: q(fact(k)), atom: null, note: `|f⁽${sup(k)}⁾(x)| = ${fact(k)}/(1 + x)${sup(k + 1)} décroît : maximum en x = 0` };
-    case 'ln': return { c: q(fact(k - 1)), atom: null, note: `|f⁽${sup(k)}⁾(x)| = ${fact(k - 1)}/(1 + x)${sup(k)} décroît : maximum en x = 0` };
-    default: return { c: q(1), atom: ePow(b), note: `eˣ croît : maximum en x = ${b}` };
+    case 'sin': case 'cos': return { c: q(1), atom: null, note: t('|{d}| ≤ 1, atteint sur l\'intervalle', { d: readable(DERIV[kind](k)) }) };
+    case 'inv': return { c: q(fact(k)), atom: null, note: t('|f⁽{k}⁾(x)| = {c}/(1 + x){p} décroît : maximum en x = 0', { k: sup(k), c: fact(k), p: sup(k + 1) }) };
+    case 'ln': return { c: q(fact(k - 1)), atom: null, note: t('|f⁽{k}⁾(x)| = {c}/(1 + x){p} décroît : maximum en x = 0', { k: sup(k), c: fact(k - 1), p: sup(k) }) };
+    default: return { c: q(1), atom: ePow(b), note: t('eˣ croît : maximum en x = {b}', { b }) };
   }
 }
 
@@ -98,18 +99,18 @@ function ieData(rng) {
 }
 
 const SUB_IE = [
-  { id: 'deriv', label: 'la dérivée d\'ordre n + 1', skill: 'g6-deriv-rules' },
-  { id: 'max', label: 'majorer sur [a ; b]', skill: 'a1-extrema-global' },
-  { id: 'bound', label: 'la borne d\'erreur', skill: IE },
-  { id: 'interp', label: 'le polynôme d\'interpolation', skill: 'n-interp-lagrange' },
+  { id: 'deriv', label: t('la dérivée d\'ordre n + 1'), skill: 'g6-deriv-rules' },
+  { id: 'max', label: t('majorer sur [a ; b]'), skill: 'a1-extrema-global' },
+  { id: 'bound', label: t('la borne d\'erreur'), skill: IE },
+  { id: 'interp', label: t('le polynôme d\'interpolation'), skill: 'n-interp-lagrange' },
 ];
 const MENU = [
-  { id: 'deriv', label: 'Dériver n + 1 fois' },
-  { id: 'max', label: 'Majorer |f⁽ⁿ⁺¹⁾| sur [a ; b]' },
-  { id: 'h', label: 'Calculer h' },
-  { id: 'bound', label: 'Assembler la borne' },
+  { id: 'deriv', label: t('Dériver n + 1 fois') },
+  { id: 'max', label: t('Majorer |f⁽ⁿ⁺¹⁾| sur [a ; b]') },
+  { id: 'h', label: t('Calculer h') },
+  { id: 'bound', label: t('Assembler la borne') },
 ];
-const menuOf = (id) => MENU.map((o) => ({ id: o.id, label: o.label, valid: o.id === id, why: o.id === id ? undefined : 'Pas maintenant : ce n\'est pas l\'étape suivante.' }));
+const menuOf = (id) => MENU.map((o) => ({ id: o.id, label: o.label, valid: o.id === id, why: o.id === id ? undefined : t('Pas maintenant : ce n\'est pas l\'étape suivante.') }));
 
 function ieScript(d, { guided = false, deriv = true, menu = false } = {}) {
   const M = (id) => (menu ? { menu: menuOf(id) } : {});
@@ -117,15 +118,15 @@ function ieScript(d, { guided = false, deriv = true, menu = false } = {}) {
   const out = [];
   const dtext = DERIV[d.kind](d.k);
   if (deriv) {
-    out.push({ kind: 'segment', html: `La dérivée d'ordre n + 1 = ${d.k} de f(x) = ${FNAME[d.kind]}.`, ask: `f⁽${sup(d.k)}⁾(x) =`, start: { math: `d(${FTEXT[d.kind]},x,${d.k})` }, judge: { kind: 'equiv', vars: ['x'], domain: { x: [0.1, 2] }, target: 'no-prime', ...M('deriv') } });
-    out.push(g({ kind: 'eq', math: dtext, note: 'Dériver n + 1 fois', subgoal: 'deriv' }));
+    out.push({ kind: 'segment', html: t('La dérivée d\'ordre n + 1 = {k} de f(x) = {f}.', { k: d.k, f: FNAME[d.kind] }), ask: `f⁽${sup(d.k)}⁾(x) =`, start: { math: `d(${FTEXT[d.kind]},x,${d.k})` }, judge: { kind: 'equiv', vars: ['x'], domain: { x: [0.1, 2] }, target: 'no-prime', ...M('deriv') } });
+    out.push(g({ kind: 'eq', math: dtext, note: t('Dériver n + 1 fois'), subgoal: 'deriv' }));
   }
-  out.push({ kind: 'segment', html: `Le maximum de |f⁽${sup(d.k)}⁾| sur [0 ; ${d.bHtml}].`, ask: 'M =', start: { math: 'M' }, judge: { kind: 'value', expect: d.Mc.text, form: 'closed', ...M('max') } });
+  out.push({ kind: 'segment', html: t('Le maximum de |f⁽{k}⁾| sur [0 ; {b}].', { k: sup(d.k), b: d.bHtml }), ask: 'M =', start: { math: 'M' }, judge: { kind: 'value', expect: d.Mc.text, form: 'closed', ...M('max') } });
   out.push(g({ kind: 'eq', math: d.Mc.text, note: d.M.note, subgoal: 'max' }));
-  out.push({ kind: 'segment', html: `Le pas : h = (b − a)/n avec n = ${d.n}.`, ask: 'h =', start: { math: 'h' }, judge: { kind: 'value', expect: d.h.text, form: 'closed', ...M('h') } });
-  out.push(g({ kind: 'eq', math: d.h.text, note: `[0 ; ${d.bHtml}] en ${d.n} sous-intervalle${d.n > 1 ? 's' : ''}`, subgoal: 'bound' }));
+  out.push({ kind: 'segment', html: t('Le pas : h = (b − a)/n avec n = {n}.', { n: d.n }), ask: 'h =', start: { math: 'h' }, judge: { kind: 'value', expect: d.h.text, form: 'closed', ...M('h') } });
+  out.push(g({ kind: 'eq', math: d.h.text, note: tn(d.n, '[0 ; {b}] en {n} sous-intervalle', '[0 ; {b}] en {n} sous-intervalles', { b: d.bHtml }), subgoal: 'bound' }));
   const startB = `(${d.Mc.text})/(4×${d.k})×(${d.h.text})^${d.k}`;
-  out.push({ kind: 'segment', html: 'La borne max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹.', ask: 'borne =', start: { math: startB }, judge: { kind: 'value', form: 'closed', interr: { wrong: d.wrong.text, n1: d.n + 1, fact: fact(d.n + 1) }, ...M('bound') } });
+  out.push({ kind: 'segment', html: t('La borne max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹.'), ask: t('borne ='), start: { math: startB }, judge: { kind: 'value', form: 'closed', interr: { wrong: d.wrong.text, n1: d.n + 1, fact: fact(d.n + 1) }, ...M('bound') } });
   out.push(g({ kind: 'eq', math: d.bound.text, note: `≈ ${String(Number(d.value.toPrecision(3))).replace('.', ',')}`, subgoal: 'bound' }));
   return out;
 }
@@ -136,9 +137,9 @@ function split(script) {
 }
 
 const ieHints = (d) => H(
-  'La borne fait intervenir la dérivée d\'ordre n + 1 et hⁿ⁺¹ : max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹.',
-  `borne = (${d.Mc.html})/(4·□)·(${d.h.html})${sup(d.k)}`,
-  `borne = ${d.bound.html} ≈ ${String(Number(d.value.toPrecision(3))).replace('.', ',')}.`,
+  t('La borne fait intervenir la dérivée d\'ordre n + 1 et hⁿ⁺¹ : max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹.'),
+  t('borne = ({M})/(4·□)·({h}){k}', { M: d.Mc.html, h: d.h.html, k: sup(d.k) }),
+  t('borne = {b} ≈ {v}.', { b: d.bound.html, v: String(Number(d.value.toPrecision(3))).replace('.', ',') }),
 );
 
 function ieLines(rng, level) {
@@ -146,10 +147,10 @@ function ieLines(rng, level) {
   const mode = level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free';
   const parts = ieScript(d, { guided: level <= 2, deriv: level >= 2, menu: level === 3 });
   const { start, judge, script } = split(parts);
-  const given = level === 1 ? ` On donne f⁽${sup(d.k)}⁾(x) = ${readable(DERIV[d.kind](d.k))}.` : '';
+  const given = level === 1 ? t(' On donne f⁽{k}⁾(x) = {d}.', { k: sup(d.k), d: readable(DERIV[d.kind](d.k)) }) : '';
   return linesItem({
     skill: IE, level, mode, keys: KEYS, ...(level === 3 ? { tapActions: 'menu' } : {}),
-    prompt: `On interpole f(x) = ${FNAME[d.kind]} sur [0 ; ${d.bHtml}] en n + 1 = ${d.n + 1} nœuds équirépartis. Majore l'erreur : max|f − Πₙf| ≤ max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹.${given}`,
+    prompt: t('On interpole f(x) = {f} sur [0 ; {b}] en n + 1 = {n1} nœuds équirépartis. Majore l\'erreur : max|f − Πₙf| ≤ max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹.{given}', { f: FNAME[d.kind], b: d.bHtml, n1: d.n + 1, given }),
     start, judge, script,
     hints: ieHints(d), subgoals: SUB_IE, baits: ['n_interp_error_factorial'],
     key: `${IE}:${level}:${d.kind}:${d.n}:${d.b}`,
@@ -170,17 +171,17 @@ function ieTable(rng) {
   const table = { columns: ['n', 'max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹'], rows: rows.map((r) => [String(r.n), expText(r.v, 3)]) };
   return readtableItem({
     skill: IE, level: 4, key: `${b}:${k}`,
-    prompt: `On interpole f(x) = eˣ sur [0 ; ${b}] en n + 1 nœuds équirépartis (h = ${b}/n). Le tableau donne la borne de l'erreur pour chaque n.`,
+    prompt: t('On interpole f(x) = eˣ sur [0 ; {b}] en n + 1 nœuds équirépartis (h = {b}/n). Le tableau donne la borne de l\'erreur pour chaque n.', { b }),
     table,
     question: mcqDistinct({
       skill: IE, level: 4, key: `${IE}:4q:${b}:${k}`,
-      prompt: `Quel est le plus petit n qui garantit une erreur ≤ 10⁻${sup(k)} ?`,
+      prompt: t('Quel est le plus petit n qui garantit une erreur ≤ 10⁻{k} ?', { k: sup(k) }),
       right: String(nmin),
       wrongs: [{ html: String(nmin - 1) }, { html: String(nmin + 1) }],
-      fillers: [{ html: String(nmin + 2) }, { html: 'Aucun : la borne ne descend pas assez' }],
-      solution: [{ html: `La borne passe sous 10⁻${sup(k)} pour la première fois en n = ${nmin} (${expText(rows[nmin - 1].v, 3)}) ; pour n = ${nmin - 1}, elle vaut ${expText(rows[nmin - 2].v, 3)}.`, note: '' }],
+      fillers: [{ html: String(nmin + 2) }, { html: t('Aucun : la borne ne descend pas assez') }],
+      solution: [{ html: t('La borne passe sous 10⁻{k} pour la première fois en n = {n} ({v}) ; pour n = {n0}, elle vaut {v0}.', { k: sup(k), n: nmin, v: expText(rows[nmin - 1].v, 3), n0: nmin - 1, v0: expText(rows[nmin - 2].v, 3) }), note: '' }],
     }, rng),
-    hints: H('Cherche la première ligne où la borne est ≤ la tolérance.', `10⁻${sup(k)} = 1e-${String(k).padStart(2, '0')} : compare les exposants.`, `n = ${nmin}.`),
+    hints: H(t('Cherche la première ligne où la borne est ≤ la tolérance.'), t('10⁻{k} = 1e-{e} : compare les exposants.', { k: sup(k), e: String(k).padStart(2, '0') }), `n = ${nmin}.`),
     subgoals: SUB_IE,
   });
 }
@@ -189,22 +190,22 @@ function ieTable(rng) {
 let RUNGE = null;
 export function rungeTable() {
   RUNGE ||= rungeRows();
-  return { columns: ['n', 'nœuds équirépartis', 'nœuds de Tchebychev'], rows: RUNGE.map((r) => [String(r.n), expText(r.equi, 3), expText(r.cheb, 3)]) };
+  return { columns: ['n', t('nœuds équirépartis'), t('nœuds de Tchebychev')], rows: RUNGE.map((r) => [String(r.n), expText(r.equi, 3), expText(r.cheb, 3)]) };
 }
-const RUNGE_PROMPT = 'f(x) = 1/(1 + x²) sur [−5 ; 5] : max|f − Πₙf| pour n + 1 nœuds.';
+const RUNGE_PROMPT = t('f(x) = 1/(1 + x²) sur [−5 ; 5] : max|f − Πₙf| pour n + 1 nœuds.');
 
 export function rungeQuestion(skill, level, rng, key) {
-  const t = rungeTable();
+  const tb = rungeTable();
   return multiMcq({
     skill, level, key: `${skill}:runge:${key}`,
-    prompt: 'Que montre ce tableau ?',
+    prompt: t('Que montre ce tableau ?'),
     options: [
-      { html: 'Avec des nœuds équirépartis, l\'erreur augmente avec n', correct: true },
-      { html: 'Avec les nœuds de Tchebychev, l\'erreur diminue quand n augmente', correct: true },
-      { html: 'Plus de nœuds donne toujours une meilleure approximation', correct: false, rule: 'n_runge_more_nodes' },
-      { html: 'Les deux jeux de nœuds donnent la même erreur pour n grand', correct: false },
+      { html: t('Avec des nœuds équirépartis, l\'erreur augmente avec n'), correct: true },
+      { html: t('Avec les nœuds de Tchebychev, l\'erreur diminue quand n augmente'), correct: true },
+      { html: t('Plus de nœuds donne toujours une meilleure approximation'), correct: false, rule: 'n_runge_more_nodes' },
+      { html: t('Les deux jeux de nœuds donnent la même erreur pour n grand'), correct: false },
     ],
-    solution: [{ html: `Équirépartis : l'erreur passe de ${t.rows[0][1]} à ${t.rows[3][1]} (phénomène de Runge, aux bords) ; Tchebychev : de ${t.rows[0][2]} à ${t.rows[3][2]}.`, note: '' }],
+    solution: [{ html: t('Équirépartis : l\'erreur passe de {e0} à {e3} (phénomène de Runge, aux bords) ; Tchebychev : de {c0} à {c3}.', { e0: tb.rows[0][1], e3: tb.rows[3][1], c0: tb.rows[0][2], c3: tb.rows[3][2] }), note: '' }],
   }, rng);
 }
 
@@ -226,7 +227,7 @@ function ieMcq(rng, opts) {
   const alt = closed(q(d.M.c).div(fact(k)).mul(d.hq.pow(k)), d.h.text.includes('π') ? piPow(k) : d.M.atom);
   return mcqDistinct({
     skill: IE, level: 4, key: `${IE}:mcq:${d.kind}:${d.n}:${d.b}`, exam: examTag(opts),
-    prompt: `On interpole f(x) = ${FNAME[d.kind]} sur [0 ; ${d.bHtml}] en ${d.n + 1} nœuds équirépartis. Quelle borne donne max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹ ?`,
+    prompt: t('On interpole f(x) = {f} sur [0 ; {b}] en {n1} nœuds équirépartis. Quelle borne donne max|f⁽ⁿ⁺¹⁾|/(4(n + 1))·hⁿ⁺¹ ?', { f: FNAME[d.kind], b: d.bHtml, n1: d.n + 1 }),
     right: d.bound.html,
     wrongs: [{ html: d.wrong.html, rule: 'n_interp_error_factorial' }, { html: alt.html }],
     fillers: [{ html: closed(q(d.M.c).div(4 * k).mul(d.hq.pow(k + 1)), d.h.text.includes('π') ? piPow(k + 1) : d.M.atom).html }, { html: closed(q(d.M.c).mul(d.hq.pow(k)), d.h.text.includes('π') ? piPow(k) : d.M.atom).html }],
@@ -238,14 +239,14 @@ function ieTf(rng, opts) {
   if (rng.chance(0.5)) {
     return vfMcq({
       skill: IE, level: 4, key: `${IE}:tf:runge`, exam: examTag(opts), truth: false, ruleIfTrue: 'n_runge_more_nodes',
-      statement: 'Plus on prend de nœuds équirépartis, plus le polynôme d\'interpolation est proche de f.',
-      explanation: `Faux : pour f(x) = 1/(1 + x²) sur [−5 ; 5], l'erreur maximale vaut ${rungeTable().rows[0][1]} pour n = 4 et ${rungeTable().rows[3][1]} pour n = 16 (phénomène de Runge).`,
+      statement: t('Plus on prend de nœuds équirépartis, plus le polynôme d\'interpolation est proche de f.'),
+      explanation: t('Faux : pour f(x) = 1/(1 + x²) sur [−5 ; 5], l\'erreur maximale vaut {e0} pour n = 4 et {e3} pour n = 16 (phénomène de Runge).', { e0: rungeTable().rows[0][1], e3: rungeTable().rows[3][1] }),
     }, rng);
   }
   return tfItem({
     skill: IE, level: 4, key: 'nodes', exam: examTag(opts), truth: true,
-    statement: 'L\'erreur d\'interpolation f(x) − Πₙf(x) est nulle en chaque nœud xᵢ.',
-    explanation: 'Vrai : Πₙf(xᵢ) = f(xᵢ) par définition, et le facteur Π(x − xⱼ) s\'annule en xᵢ.',
+    statement: t('L\'erreur d\'interpolation f(x) − Πₙf(x) est nulle en chaque nœud xᵢ.'),
+    explanation: t('Vrai : Πₙf(xᵢ) = f(xᵢ) par définition, et le facteur Π(x − xⱼ) s\'annule en xᵢ.'),
   });
 }
 
@@ -291,16 +292,16 @@ function chData(rng, { general = true } = {}) {
 }
 
 const SUB_CH = [
-  { id: 'nodes', label: 'les nœuds tᵢ', skill: CH },
-  { id: 'map', label: 'le transport vers [a ; b]', skill: CH },
-  { id: 'error', label: 'le facteur Π(x − xᵢ) de l\'erreur', skill: 'n-interp-error' },
+  { id: 'nodes', label: t('les nœuds tᵢ'), skill: CH },
+  { id: 'map', label: t('le transport vers [a ; b]'), skill: CH },
+  { id: 'error', label: t('le facteur Π(x − xᵢ) de l\'erreur'), skill: 'n-interp-error' },
 ];
 const CMENU = [
-  { id: 'nodes', label: 'Calculer tᵢ = cos((2i + 1)π/(2(n + 1)))' },
-  { id: 'map', label: 'Transporter : xᵢ = (a + b)/2 + (b − a)/2·tᵢ' },
-  { id: 'max', label: 'Calculer max|Π(x − xᵢ)|' },
+  { id: 'nodes', label: t('Calculer tᵢ = cos((2i + 1)π/(2(n + 1)))') },
+  { id: 'map', label: t('Transporter : xᵢ = (a + b)/2 + (b − a)/2·tᵢ') },
+  { id: 'max', label: t('Calculer max|Π(x − xᵢ)|') },
 ];
-const cmenu = (id) => CMENU.map((o) => ({ id: o.id, label: o.label, valid: o.id === id, why: o.id === id ? undefined : 'Pas maintenant.' }));
+const cmenu = (id) => CMENU.map((o) => ({ id: o.id, label: o.label, valid: o.id === id, why: o.id === id ? undefined : t('Pas maintenant.') }));
 
 function chScript(d, { cos = true, map = true, guided = false, menu = false, maxPi = false } = {}) {
   const out = [];
@@ -310,30 +311,30 @@ function chScript(d, { cos = true, map = true, guided = false, menu = false, max
   if (cos) {
     d.nodes.forEach((x, i) => {
       out.push({ kind: 'segment', html: `t${'₀₁₂'[i]} = cos((2·${i} + 1)π/(2·${N})).`, ask: `t${'₀₁₂'[i]} =`, start: { math: `cos(${x.ang})` }, judge: { kind: 'value', expect: tText(x) || '0', form: 'exact', ...M('nodes') } });
-      out.push(g({ kind: 'eq', math: tText(x) || '0', note: 'Valeur exacte du cosinus', subgoal: 'nodes' }));
+      out.push(g({ kind: 'eq', math: tText(x) || '0', note: t('Valeur exacte du cosinus'), subgoal: 'nodes' }));
     });
   }
   if (map) {
     d.nodes.forEach((x, i) => {
-      const t = tText(x) || '0';
-      out.push({ kind: 'segment', html: `x${'₀₁₂'[i]} = (a + b)/2 + (b − a)/2·t${'₀₁₂'[i]} = ${fq(d.c)} + ${fq(d.r)}·(${rd(tText(x))}).`, ask: `x${'₀₁₂'[i]} =`, start: { math: `x_${i}` }, judge: { kind: 'value', expect: x.x, form: 'exact', cheb: { t }, ...M('map') } });
+      const tv = tText(x) || '0';
+      out.push({ kind: 'segment', html: `x${'₀₁₂'[i]} = (a + b)/2 + (b − a)/2·t${'₀₁₂'[i]} = ${fq(d.c)} + ${fq(d.r)}·(${rd(tText(x))}).`, ask: `x${'₀₁₂'[i]} =`, start: { math: `x_${i}` }, judge: { kind: 'value', expect: x.x, form: 'exact', cheb: { t: tv }, ...M('map') } });
       out.push(g({ kind: 'eq', math: x.x, note: `(a + b)/2 = ${fq(d.c)}, (b − a)/2 = ${fq(d.r)}`, subgoal: 'map' }));
     });
   }
   if (maxPi) {
     const v = q(d.r).pow(d.n + 1).div(2 ** d.n);
-    out.push({ kind: 'segment', html: `max|Π(x − xᵢ)| sur [${fq(d.a)} ; ${fq(d.b)}] = 2⁻ⁿ·((b − a)/2)ⁿ⁺¹.`, ask: 'max|Π| =', start: { math: `2^(-${d.n})×${d.r}^${d.n + 1}` }, judge: { kind: 'value', form: 'irreducible', ...M('max') } });
-    out.push({ kind: 'eq', math: String(v), note: 'Le plus petit possible pour n + 1 nœuds', subgoal: 'error' });
+    out.push({ kind: 'segment', html: t('max|Π(x − xᵢ)| sur [{a} ; {b}] = 2⁻ⁿ·((b − a)/2)ⁿ⁺¹.', { a: fq(d.a), b: fq(d.b) }), ask: 'max|Π| =', start: { math: `2^(-${d.n})×${d.r}^${d.n + 1}` }, judge: { kind: 'value', form: 'irreducible', ...M('max') } });
+    out.push({ kind: 'eq', math: String(v), note: t('Le plus petit possible pour n + 1 nœuds'), subgoal: 'error' });
   }
   return out;
 }
 const split2 = split;
 
-const rd = (t) => String(t).replace(/\+/g, ' + ').replace(/(\S)-/g, '$1 − ').replace(/^-/, '−');
+const rd = (s) => String(s).replace(/\+/g, ' + ').replace(/(\S)-/g, '$1 − ').replace(/^-/, '−');
 const chHints = (d, level) => H(
-  'Les nœuds de Tchebychev sont les cosinus des angles (2i + 1)π/(2(n + 1)), puis on les transporte de [−1 ; 1] vers [a ; b].',
+  t('Les nœuds de Tchebychev sont les cosinus des angles (2i + 1)π/(2(n + 1)), puis on les transporte de [−1 ; 1] vers [a ; b].'),
   level === 1 ? `t₀ = cos(□/(2·${d.n + 1}))` : `x₀ = ${fq(d.c)} + ${fq(d.r)}·□`,
-  level === 1 ? `t = ${d.nodes.map((x) => rd(tText(x))).join(' ; ')}.` : `Sur [−1 ; 1] : ${d.nodes.map((x) => rd(tText(x))).join(' ; ')} ; sur [${fq(d.a)} ; ${fq(d.b)}] : ${d.nodes.map((x) => rd(x.x)).join(' ; ')}.`,
+  level === 1 ? `t = ${d.nodes.map((x) => rd(tText(x))).join(' ; ')}.` : t('Sur [−1 ; 1] : {t} ; sur [{a} ; {b}] : {x}.', { t: d.nodes.map((x) => rd(tText(x))).join(' ; '), a: fq(d.a), b: fq(d.b), x: d.nodes.map((x) => rd(x.x)).join(' ; ') }),
 );
 
 function chLines(rng, level) {
@@ -345,17 +346,17 @@ function chLines(rng, level) {
   const parts = chScript(d, opts);
   const { start, judge, script } = split2(parts);
   const decision = level === 3 ? [{
-    kind: 'decision', prompt: 'Pour interpoler 1/(1 + x²) sur un grand intervalle, quels nœuds choisir ?', options: [
-      { id: 'cheb', label: 'Les nœuds de Tchebychev, resserrés près des bords', valid: true, ref: true },
-      { id: 'equi', label: 'Des nœuds équirépartis, et beaucoup', valid: false, rule: 'n_runge_more_nodes', why: 'Avec des nœuds équirépartis, l\'erreur explose aux bords quand n augmente : c\'est le phénomène de Runge.' },
+    kind: 'decision', prompt: t('Pour interpoler 1/(1 + x²) sur un grand intervalle, quels nœuds choisir ?'), options: [
+      { id: 'cheb', label: t('Les nœuds de Tchebychev, resserrés près des bords'), valid: true, ref: true },
+      { id: 'equi', label: t('Des nœuds équirépartis, et beaucoup'), valid: false, rule: 'n_runge_more_nodes', why: t('Avec des nœuds équirépartis, l\'erreur explose aux bords quand n augmente : c\'est le phénomène de Runge.') },
     ],
   }] : [];
-  const given = level === 2 ? ` Sur [−1 ; 1], les nœuds sont ${d.nodes.map((x) => rd(tText(x))).join(' ; ')}.` : '';
+  const given = level === 2 ? t(' Sur [−1 ; 1], les nœuds sont {t}.', { t: d.nodes.map((x) => rd(tText(x))).join(' ; ') }) : '';
   return linesItem({
     skill: CH, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', keys: KEYS, ...(level === 3 ? { tapActions: 'menu' } : {}),
     prompt: level === 1
-      ? `Calcule les ${d.n + 1} nœuds de Tchebychev sur [−1 ; 1] pour n = ${d.n} : tᵢ = cos((2i + 1)π/(2(n + 1))).`
-      : `Nœuds de Tchebychev pour n = ${d.n} sur [${fq(d.a)} ; ${fq(d.b)}].${given}${level >= 4 ? ' Donne les nœuds, puis max|Π(x − xᵢ)| sur l\'intervalle.' : ''}`,
+      ? t('Calcule les {n1} nœuds de Tchebychev sur [−1 ; 1] pour n = {n} : tᵢ = cos((2i + 1)π/(2(n + 1))).', { n1: d.n + 1, n: d.n })
+      : t('Nœuds de Tchebychev pour n = {n} sur [{a} ; {b}].', { n: d.n, a: fq(d.a), b: fq(d.b) }) + given + (level >= 4 ? t(' Donne les nœuds, puis max|Π(x − xᵢ)| sur l\'intervalle.') : ''),
     start, judge, script: [...decision, ...script],
     hints: chHints(d, level), subgoals: SUB_CH, baits: level >= 2 ? ['n_cheb_no_mapping'] : [],
     key: `${CH}:${level}:${d.n}:${d.a}:${d.b}`,
@@ -378,12 +379,12 @@ const CH_TESTS = [
 
 function ch5(rng) {
   const then = readtableItem({
-    skill: CH, level: 5, key: 'runge', prompt: `Avec ces nœuds, on interpole ${RUNGE_PROMPT}`, table: rungeTable(),
+    skill: CH, level: 5, key: 'runge', prompt: t('Avec ces nœuds, on interpole f(x) = 1/(1 + x²) sur [−5 ; 5] : max|f − Πₙf| pour n + 1 nœuds.'), table: rungeTable(),
     question: rungeQuestion(CH, 5, rng, 'ch5'),
   });
   return codeItem({
     skill: CH, level: 5, ref: CHEB, blanks: holesFor(5, CHEB), traps: CH_TRAPS, rng,
-    prompt: 'Complète la fonction qui renvoie les n + 1 nœuds de Tchebychev sur [a ; b].',
+    prompt: t('Complète la fonction qui renvoie les n + 1 nœuds de Tchebychev sur [a ; b].'),
     tests: CH_TESTS, then, hints: [], subgoals: SUB_CH, key: '5',
   });
 }
@@ -393,14 +394,14 @@ function chTf(rng, opts) {
   if (pick === 0) {
     return tfItem({
       skill: CH, level: 4, key: 'conv', exam: examTag(opts), truth: true,
-      statement: 'Avec les nœuds de Tchebychev, l\'interpolant de 1/(1 + x²) sur [−5 ; 5] converge vers f quand n → ∞.',
-      explanation: `Vrai : l'erreur maximale passe de ${rungeTable().rows[0][2]} (n = 4) à ${rungeTable().rows[3][2]} (n = 16).`,
+      statement: t('Avec les nœuds de Tchebychev, l\'interpolant de 1/(1 + x²) sur [−5 ; 5] converge vers f quand n → ∞.'),
+      explanation: t('Vrai : l\'erreur maximale passe de {c0} (n = 4) à {c3} (n = 16).', { c0: rungeTable().rows[0][2], c3: rungeTable().rows[3][2] }),
     });
   }
   return tfItem({
     skill: CH, level: 4, key: 'max', exam: examTag(opts), truth: true,
-    statement: 'Pour les n + 1 nœuds de Tchebychev de [−1 ; 1], max|Π(x − tᵢ)| = 2⁻ⁿ sur [−1 ; 1].',
-    explanation: 'Vrai : Π(x − tᵢ) = Tₙ₊₁(x)/2ⁿ, et |Tₙ₊₁| ≤ 1. Pour n = 2 : x³ − 3x/4, de maximum 1/4.',
+    statement: t('Pour les n + 1 nœuds de Tchebychev de [−1 ; 1], max|Π(x − tᵢ)| = 2⁻ⁿ sur [−1 ; 1].'),
+    explanation: t('Vrai : Π(x − tᵢ) = Tₙ₊₁(x)/2ⁿ, et |Tₙ₊₁| ≤ 1. Pour n = 2 : x³ − 3x/4, de maximum 1/4.'),
   });
 }
 

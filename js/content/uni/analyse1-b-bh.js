@@ -11,23 +11,24 @@ import { limitOf } from '../../judges/limit.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { templateOf } from '../../judges/lines.js';
 import { N, q, nz, H, E, examOf, kx, joinSum, blanked, tpl, partsItem, mcqOf, vfItem, ML, RD } from './analyse1-b-common.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a1-bh';
 const KEYS = ['calcx', 'calcfn', 'anal'];
 const SUB = [
-  { id: 'bh', label: 'appliquer BH', skill: SK },
-  { id: 'simp', label: 'dériver et simplifier', skill: 'a1-deriv-rules' },
-  { id: 'subst', label: 'forme qui n\'est plus indéterminée', skill: 'a1-fn-limits' },
-  { id: 'rewrite', label: 'écrire en quotient', skill: 'a1-fn-limits' },
+  { id: 'bh', label: t('appliquer BH'), skill: SK },
+  { id: 'simp', label: t('dériver et simplifier'), skill: 'a1-deriv-rules' },
+  { id: 'subst', label: t('forme qui n\'est plus indéterminée'), skill: 'a1-fn-limits' },
+  { id: 'rewrite', label: t('écrire en quotient'), skill: 'a1-fn-limits' },
 ];
 const CHOICES = [
-  { id: 'bh', label: 'Appliquer BH : dériver le haut et le bas' },
-  { id: 'simp', label: 'Simplifier' },
-  { id: 'subst', label: 'Substituer : la forme n\'est plus indéterminée' },
-  { id: 'rewrite', label: 'Réécrire le produit comme un quotient' },
-  { id: 'quot', label: 'Dériver le quotient f/g', rule: 'a1_bh_quotient_rule', why: 'BH dérive le haut et le bas séparément, pas le quotient.' },
+  { id: 'bh', label: t('Appliquer BH : dériver le haut et le bas') },
+  { id: 'simp', label: t('Simplifier') },
+  { id: 'subst', label: t('Substituer : la forme n\'est plus indéterminée') },
+  { id: 'rewrite', label: t('Réécrire le produit comme un quotient') },
+  { id: 'quot', label: t('Dériver le quotient f/g'), rule: 'a1_bh_quotient_rule', why: t('BH dérive le haut et le bas séparément, pas le quotient.') },
 ];
-const FORMS = { '0/0': '0/0', inf: '∞/∞', none: 'pas indéterminé', '0inf': '0·∞' };
+const FORMS = { '0/0': '0/0', inf: '∞/∞', none: t('pas indéterminé'), '0inf': '0·∞' };
 const E_ = (a) => (a === 1 ? 'e^x' : `e^(${kx(a)})`);
 
 // Each template: {to, dir?, start, form, steps: [{math, act, holes?, form?}], L}.
@@ -175,53 +176,55 @@ const limHtml = (d, e = d.start) => ML(`lim(${e},x,${toLim(d)})`);
 
 function formDecision(form, start) {
   const opts = [
-    { id: '0/0', label: '0/0 : on peut appliquer BH' },
-    { id: 'inf', label: '∞/∞ : on peut appliquer BH' },
-    { id: 'none', label: 'Pas indéterminé : on substitue' },
-    { id: '1inf', label: '1^∞ : on passe par e^(…·ln …)' },
+    { id: '0/0', label: t('0/0 : on peut appliquer BH') },
+    { id: 'inf', label: t('∞/∞ : on peut appliquer BH') },
+    { id: 'none', label: t('Pas indéterminé : on substitue') },
+    { id: '1inf', label: t('1^∞ : on passe par e^(…·ln …)') },
   ];
   return {
-    kind: 'decision', prompt: 'Quelle forme ?',
+    kind: 'decision', prompt: t('Quelle forme ?'),
     options: opts.map((o) => ({
       ...o, valid: o.id === form,
-      why: o.id === form ? '' : `Regarde les limites du haut et du bas : ici c'est ${FORMS[form]}.`,
+      why: o.id === form ? '' : t('Regarde les limites du haut et du bas : ici c\'est {p1}.', { p1: FORMS[form] }),
       ...(form === 'none' && o.id === '0/0' ? { rule: 'a1_bh_not_indeterminate' } : {}),
     })),
   };
 }
 const formRule = (form) => ({
-  kind: 'rule', ask: 'Quelle forme ?', correct: form,
-  options: [{ id: '0/0', label: '0/0' }, { id: 'inf', label: '∞/∞' }, { id: 'none', label: 'pas indéterminé' }, { id: '0inf', label: '0·∞ (à réécrire)' }],
+  kind: 'rule', ask: t('Quelle forme ?'), correct: form,
+  options: [{ id: '0/0', label: '0/0' }, { id: 'inf', label: '∞/∞' }, { id: 'none', label: t('pas indéterminé') }, { id: '0inf', label: t('0·∞ (à réécrire)') }],
 });
 
 // A line with its holes as boxes, in words (for the second hint).
 const blankText = (s) => templateOf(tpl(s.math, s.holes || [])).replace(/×/g, '·').replace(/-/g, '−');
 
-const NOTES = { bh: 'BH : dériver le haut et le bas', simp: 'Simplifier', subst: 'Substituer', rewrite: 'Écrire en quotient' };
+const NOTES = { bh: t('BH : dériver le haut et le bas'), simp: t('Simplifier'), subst: t('Substituer'), rewrite: t('Écrire en quotient') };
 
 function bhLines(level, rng, opts) {
   const d = draw(level, rng);
   const lines = [];
-  if (level === 1 && d.form !== 'none') lines.push({ kind: 'note', html: `Forme ${FORMS[d.form]} : on peut appliquer BH.` });
-  if (level === 1 && d.form === 'none') lines.push({ kind: 'note', html: 'Le dénominateur ne tend pas vers 0 : ce n\'est pas indéterminé, on substitue.' });
+  if (level === 1 && d.form !== 'none') lines.push({ kind: 'note', html: t('Forme {p1} : on peut appliquer BH.', { p1: FORMS[d.form] }) });
+  if (level === 1 && d.form === 'none') lines.push({ kind: 'note', html: t('Le dénominateur ne tend pas vers 0 : ce n\'est pas indéterminé, on substitue.') });
   if (level === 2 && (d.steps[0].act === 'bh' || d.form === 'none')) lines.push(formDecision(d.form, d.start));
   if (level === 3 || level === 4) lines.push(formRule(d.form));
   d.steps.forEach((s, i) => {
     if (i > 0 && s.act === 'bh' && level === 2) lines.push(formDecision(s.form, d.steps[i - 1].math));
-    if (i > 0 && s.act === 'bh' && level === 1) lines.push({ kind: 'note', html: `Encore ${FORMS[s.form]} : BH une ${i === 1 ? 'deuxième' : 'nouvelle'} fois.` });
+    if (i > 0 && s.act === 'bh' && level === 1) lines.push({ kind: 'note', html: i === 1 ? t('Encore {form} : BH une deuxième fois.', { form: FORMS[s.form] }) : t('Encore {form} : BH une nouvelle fois.', { form: FORMS[s.form] }) });
     const sub = s.act === 'bh' ? 'bh' : s.act === 'subst' ? 'subst' : s.act === 'rewrite' ? 'rewrite' : 'simp';
     const line = E(s.math, NOTES[s.act], sub, s.act);
     lines.push(level === 1 && s.holes && s.act !== 'subst' ? blanked(line, s.holes) : line);
   });
   const first = d.steps.find((s) => s.act === 'bh');
   const prompt = rng.chance(0.5)
-    ? `Calcule ${limHtml(d)}.`
-    : `Trouve ${limHtml(d)}, avec la règle de Bernoulli-l'Hôpital si elle s'applique.`;
+    ? t('Calcule {d}.', { d: limHtml(d) })
+    : t('Trouve {d}, avec la règle de Bernoulli-l\'Hôpital si elle s\'applique.', { d: limHtml(d) });
   const h1 = d.form === '0inf'
-    ? 'Une forme 0·∞ : écris le produit comme un quotient (ln x en haut), puis vérifie 0/0 ou ∞/∞.'
-    : 'Vérifie la forme ; si c\'est 0/0 ou ∞/∞, dérive le haut et le bas séparément.';
-  const h2 = first ? `Après BH : ${blankText(first)}` : `En 0, le haut vaut ${RD(d.num0)} et le bas vaut ${RD(d.den0)} : substitue x = 0.`;
-  const h3 = `${d.k ? `${d.k === 1 ? 'Une fois' : `${d.k} fois`} BH, puis la` : 'La'} limite vaut ${RD(N(d.L))}.`;
+    ? t('Une forme 0·∞ : écris le produit comme un quotient (ln x en haut), puis vérifie 0/0 ou ∞/∞.')
+    : t('Vérifie la forme ; si c\'est 0/0 ou ∞/∞, dérive le haut et le bas séparément.');
+  const h2 = first ? t('Après BH : {first}', { first: blankText(first) }) : t('En 0, le haut vaut {num0} et le bas vaut {den0} : substitue x = 0.', { num0: RD(d.num0), den0: RD(d.den0) });
+  const h3 = d.k
+    ? (d.k === 1 ? t('Une fois BH, puis la limite vaut {L}.', { L: RD(N(d.L)) }) : t('{k} fois BH, puis la limite vaut {L}.', { k: d.k, L: RD(N(d.L)) }))
+    : t('La limite vaut {L}.', { L: RD(N(d.L)) });
   return partsItem({
     skill: SK, level, prompt,
     parts: [{ start: d.start, judge: judgeOf(d), lines }],
@@ -253,7 +256,7 @@ function mcqVariant(rng, opts) {
   for (const v of [N(d.L.mul(2)), N(d.L.neg()), '+∞', '1', '0', N(d.L.add(1))]) options.push({ html: html(v), correct: false });
   return mcqOf({
     skill: SK, level: 4, prompt: `${limHtml(d)} = ?`, options, key: `mcq:${d.start}`, expectedSec: 240, exam: examOf(opts),
-    solution: [{ html: `${d.form === 'none' ? 'Pas indéterminé : on substitue.' : `Forme ${FORMS[d.form]}, BH ${d.k} fois.`} Limite : ${RD(N(d.L))}.`, note: '' }],
+    solution: [{ html: t('{p1} Limite : {p2}.', { p1: d.form === 'none' ? t('Pas indéterminé : on substitue.') : t('Forme {p1}, BH {k} fois.', { p1: FORMS[d.form], k: d.k }), p2: RD(N(d.L)) }), note: '' }],
     fallback: d.fallback,
   }, rng);
 }
@@ -263,22 +266,22 @@ function tfVariant(rng, opts) {
   if (kind === 'converse') {
     return vfItem({
       skill: SK, key: 'converse', exam: examOf(opts), rule: 'a1_bh_converse', truth: false,
-      statement: 'Soit g, h dérivables avec g(0) = h(0) = 0 et h′ ≠ 0 près de 0. Si lim<sub>x→0</sub> g′/h′ n\'existe pas, alors lim<sub>x→0</sub> g/h n\'existe pas.',
-      why: 'Faux : g(x) = x²·sin(1/x), h(x) = x. g/h = x·sin(1/x) → 0, mais g′/h′ = 2x·sin(1/x) − cos(1/x) n\'a pas de limite. BH ne va que dans un sens.',
+      statement: t('Soit g, h dérivables avec g(0) = h(0) = 0 et h′ ≠ 0 près de 0. Si lim<sub>x→0</sub> g′/h′ n\'existe pas, alors lim<sub>x→0</sub> g/h n\'existe pas.'),
+      why: t('Faux : g(x) = x²·sin(1/x), h(x) = x. g/h = x·sin(1/x) → 0, mais g′/h′ = 2x·sin(1/x) − cos(1/x) n\'a pas de limite. BH ne va que dans un sens.'),
     }, rng);
   }
   if (kind === 'quotient') {
     return vfItem({
       skill: SK, key: 'quotient', exam: examOf(opts), rule: 'a1_bh_quotient_rule', truth: false,
-      statement: 'Si f/g est de la forme 0/0 en a, alors lim<sub>x→a</sub> f/g = lim<sub>x→a</sub> (f/g)′.',
-      why: 'Faux : BH dérive le haut et le bas séparément, lim f′/g′. Avec f = sin x, g = x en 0 : f′/g′ = cos x → 1, mais (sin x/x)′ → 0.',
+      statement: t('Si f/g est de la forme 0/0 en a, alors lim<sub>x→a</sub> f/g = lim<sub>x→a</sub> (f/g)′.'),
+      why: t('Faux : BH dérive le haut et le bas séparément, lim f′/g′. Avec f = sin x, g = x en 0 : f′/g′ = cos x → 1, mais (sin x/x)′ → 0.'),
     }, rng);
   }
   if (kind === 'true') {
     return vfItem({
       skill: SK, key: 'true', exam: examOf(opts), truth: true,
-      statement: 'Si f(0) = g(0) = 0, f et g sont dérivables en 0 et g′(0) ≠ 0, alors lim<sub>x→0</sub> f/g = f′(0)/g′(0).',
-      why: 'Vrai : f(x)/g(x) = ((f(x) − f(0))/x)/((g(x) − g(0))/x) → f′(0)/g′(0).',
+      statement: t('Si f(0) = g(0) = 0, f et g sont dérivables en 0 et g′(0) ≠ 0, alors lim<sub>x→0</sub> f/g = f′(0)/g′(0).'),
+      why: t('Vrai : f(x)/g(x) = ((f(x) − f(0))/x)/((g(x) − g(0))/x) → f′(0)/g′(0).'),
     }, rng);
   }
   const d = draw(rng.pick([2, 4]), rng);
@@ -292,7 +295,7 @@ function tfVariant(rng, opts) {
   return vfItem({
     skill: SK, key: `gen:${d.start}:${N(claim)}`, exam: examOf(opts), truth, rule,
     statement: `${limHtml(d)} = ${RD(N(claim))}`,
-    why: `${truth ? 'Vrai' : 'Faux'} : ${d.form === 'none' ? 'ce n\'est pas indéterminé, on substitue' : `forme ${FORMS[d.form]}, BH ${d.k} fois`} ; la limite vaut ${RD(N(d.L))}.`,
+    why: t('{p1} : {p2} ; la limite vaut {p3}.', { p1: truth ? t('Vrai') : t('Faux'), p2: d.form === 'none' ? t('ce n\'est pas indéterminé, on substitue') : t('forme {p1}, BH {k} fois', { p1: FORMS[d.form], k: d.k }), p3: RD(N(d.L)) }),
     fallback: d.fallback,
   }, rng);
 }

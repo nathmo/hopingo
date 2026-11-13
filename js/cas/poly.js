@@ -7,6 +7,7 @@
 // school units; this one serves the symbolic core.
 
 import { Q, gcd } from '../math/rational.js';
+import { t as tr } from '../i18n.js';
 
 const ZERO = new Q(0);
 const ONE = new Q(1);
@@ -83,7 +84,7 @@ export class Poly {
   }
 
   pow(n) {
-    if (!Number.isInteger(n) || n < 0) throw new RangeError('Exposant entier ≥ 0 attendu');
+    if (!Number.isInteger(n) || n < 0) throw new RangeError(tr('Exposant entier ≥ 0 attendu'));
     let r = Poly.const(1);
     let b = this;
     while (n > 0) {

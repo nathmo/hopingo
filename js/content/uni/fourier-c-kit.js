@@ -9,6 +9,7 @@ import { CQ } from '../../cas/complex.js';
 import { MT, mcq, linesItem, examTag } from './kit.js';
 import { term, sumT, qt, q, fac } from './analyse2-h-kit.js';
 import { laplaceTableHtml } from './fourier-tables.js';
+import { t } from '../../i18n.js';
 
 export { MT, mcq, linesItem, examTag, term, sumT, qt, q, fac, laplaceTableHtml };
 
@@ -16,7 +17,7 @@ export const H = (a, b, c) => [{ level: 1, html: a }, { level: 2, html: b }, { l
 export const modeOf = (level) => (level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free');
 export const KEYS = ['calc', 'transf', 'calcfn', 'calcx', 'cplx'];
 // Readable text: − for -, spaces around + and =.
-export const rd = (t) => String(t).replace(/\s*([+=])\s*/g, ' $1 ').replace(/([^(\s^,;=])\s*-\s*/g, '$1 − ').replace(/-/g, '−').replace(/\^2(?![0-9])/g, '²').replace(/\^3(?![0-9])/g, '³').replace(/\^4(?![0-9])/g, '⁴');
+export const rd = (tt) => String(tt).replace(/\s*([+=])\s*/g, ' $1 ').replace(/([^(\s^,;=])\s*-\s*/g, '$1 − ').replace(/-/g, '−').replace(/\^2(?![0-9])/g, '²').replace(/\^3(?![0-9])/g, '³').replace(/\^4(?![0-9])/g, '⁴');
 export const TABLE = () => laplaceTableHtml();
 
 // ---------- polynomials over ℚ(i) (lowest degree first) ----------
@@ -85,7 +86,7 @@ export const zpow = (p, m) => { const b = zp(p); const w = b === 'z' ? 'z' : `($
 export function et(p) {
   const c = C(p);
   if (c.isZero()) return '';
-  if (c.im.n === 0) { const t = term(c.re, 't'); return t === 't' ? 'e^t' : `e^(${t})`; }
+  if (c.im.n === 0) { const tt = term(c.re, 't'); return tt === 't' ? 'e^t' : `e^(${tt})`; }
   return `e^((${cqT(c)})t)`;
 }
 const tk = (k) => (k === 0 ? '' : k === 1 ? 't' : `t^${k}`);
@@ -227,7 +228,7 @@ export function mcqMulti(o, rng) {
     seen.add(x.html);
     options.push(x);
   }
-  return mcq({ ...o, prompt: `${o.prompt} <i>(Plusieurs réponses possibles.)</i>`, options, multi: true }, rng);
+  return mcq({ ...o, prompt: t('{prompt} <i>(Plusieurs réponses possibles.)</i>', { prompt: o.prompt }), options, multi: true }, rng);
 }
 // Single-answer multiple choice (lessons): the right one, then wrongs.
 export function mcqOne(o, rng) {
@@ -252,21 +253,21 @@ export const small = (x, n = 12, d = 6) => q(x).d <= d && Math.abs(q(x).n) <= n;
 // for u = A cos ωt + B sin ωt (Simpson's rule, 400 intervals): the largest
 // absolute value of the residual.
 export function integroResidual({ a, c, K, A, B, w }) {
-  const u = (t) => A * Math.cos(w * t) + B * Math.sin(w * t);
-  const du = (t) => -A * w * Math.sin(w * t) + B * w * Math.cos(w * t);
+  const u = (tt) => A * Math.cos(w * tt) + B * Math.sin(w * tt);
+  const du = (tt) => -A * w * Math.sin(w * tt) + B * w * Math.cos(w * tt);
   let worst = 0;
-  for (const t of [0.3, 0.7, 1.1, 1.6, 2.2, 2.9]) {
+  for (const tt of [0.3, 0.7, 1.1, 1.6, 2.2, 2.9]) {
     const n = 400;
-    const h = t / n;
+    const h = tt / n;
     let s = 0;
     for (let k = 0; k <= n; k++) {
       const x = k * h;
-      const f = u(x) * Math.exp(a * (t - x));
+      const f = u(x) * Math.exp(a * (tt - x));
       s += f * (k === 0 || k === n ? 1 : k % 2 ? 4 : 2);
     }
     const integral = (s * h) / 3;
-    const r = du(t) + a * u(t) + c * integral - K * Math.exp(a * t);
-    worst = Math.max(worst, Math.abs(r) / (1 + Math.abs(K * Math.exp(a * t))));
+    const r = du(tt) + a * u(tt) + c * integral - K * Math.exp(a * tt);
+    worst = Math.max(worst, Math.abs(r) / (1 + Math.abs(K * Math.exp(a * tt))));
   }
   return worst;
 }

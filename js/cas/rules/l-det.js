@@ -20,6 +20,7 @@ import { parse } from '../parse.js';
 import { toText } from '../print.js';
 import { detsOf } from '../../judges/det.js';
 import { mopts } from '../../judges/matcommon.js';
+import { t } from '../../i18n.js';
 
 const SUB = '₀₁₂₃₄₅₆₇₈₉';
 const sb = (n) => String(n).split('').map((d) => SUB[d] ?? d).join('');
@@ -65,8 +66,8 @@ const trueSign = (i, j) => ((i + j) % 2 ? -1 : 1);
 function expand(rows, line, sign, minor) {
   let s = lit(MX.q(0));
   for (const [i, j] of line.nz) {
-    const t = mul(rows[i][j], detN(minor(i, j)));
-    s = sign(i, j) > 0 ? add(s, t) : sub(s, t);
+    const term = mul(rows[i][j], detN(minor(i, j)));
+    s = sign(i, j) > 0 ? add(s, term) : sub(s, term);
   }
   return simp(s);
 }
@@ -131,7 +132,7 @@ function minorVariants(rows, line) {
     const minor = line.kind === 'row' ? (i, j) => minorOf(rows, i, shift(j)) : (i, j) => minorOf(rows, shift(i), j);
     const [i, j] = line.nz[0];
     const value = expand(rows, line, trueSign, minor);
-    out.push({ value, ctx: line.kind === 'row' ? { i: i + 1, j: j + 1, wrong: `la colonne ${shift(j) + 1}` } : { i: i + 1, j: j + 1, wrong: `la ligne ${shift(i) + 1}` } });
+    out.push({ value, ctx: line.kind === 'row' ? { i: i + 1, j: j + 1, wrong: t('la colonne {n}', { n: shift(j) + 1 }) } : { i: i + 1, j: j + 1, wrong: t('la ligne {n}', { n: shift(i) + 1 }) } });
   }
   return out;
 }
@@ -176,91 +177,94 @@ function fromCfg(id) {
 
 export const DEFS = {
   l_cofactor_sign: {
-    name: 'Signe du damier oublié',
+    name: t('Signe du damier oublié'),
     judges: ['det'],
     transform: cofactorTrap(signVariants, { minSize: 2 }),
     explain: (ctx = {}) => (ctx.i
-      ? `La case (${ctx.i}, ${ctx.j}) porte le signe (−1)^(${ctx.i}+${ctx.j}) = ${ctx.s}. Le damier commence par + en haut à gauche : + − + / − + − / + − +.`
-      : 'Chaque terme du développement porte le signe (−1)^(i+j) de sa case. Le damier commence par + en haut à gauche : + − + / − + − / + − +.'),
+      ? t('La case ({i}, {j}) porte le signe (−1)^({i}+{j}) = {s}. Le damier commence par + en haut à gauche : + − + / − + − / + − +.', { i: ctx.i, j: ctx.j, s: ctx.s })
+      : t('Chaque terme du développement porte le signe (−1)^(i+j) de sa case. Le damier commence par + en haut à gauche : + − + / − + − / + − +.')),
     check: { judge: { kind: 'det' }, prev: 'det[[2,0,1,3],[0,0,4,0],[1,-1,2,0],[3,0,5,1]]', line: '4·det[[2,0,3],[1,-1,0],[3,0,1]]' },
   },
   l_minor_wrong: {
-    name: 'Mauvais mineur',
+    name: t('Mauvais mineur'),
     judges: ['det'],
     transform: cofactorTrap(minorVariants, { minSize: 3 }),
     explain: (ctx = {}) => (ctx.i
-      ? `Le mineur A${sb(ctx.i)}${sb(ctx.j)} s'obtient en barrant la ligne ${ctx.i} <b>et</b> la colonne ${ctx.j} de la case développée. Tu as barré ${ctx.wrong} à la place.`
-      : 'Le mineur Aᵢⱼ s\'obtient en barrant la ligne i <b>et</b> la colonne j de la case développée, et rien d\'autre.'),
+      ? t('Le mineur A{ij} s\'obtient en barrant la ligne {i} <b>et</b> la colonne {j} de la case développée. Tu as barré {wrong} à la place.', { ij: `${sb(ctx.i)}${sb(ctx.j)}`, i: ctx.i, j: ctx.j, wrong: ctx.wrong })
+      : t('Le mineur Aᵢⱼ s\'obtient en barrant la ligne i <b>et</b> la colonne j de la case développée, et rien d\'autre.')),
     check: { judge: { kind: 'det' }, prev: 'det[[2,0,1,3],[0,0,4,0],[1,-1,2,0],[3,0,5,1]]', line: '-4·det[[2,1,3],[1,2,0],[3,5,1]]' },
   },
   l_det_swap_sign: {
-    name: 'Échange sans changer le signe',
+    name: t('Échange sans changer le signe'),
     judges: ['rowops'],
     transform: forgetFactor((op) => op.kind === 'swap', (ops) => ({ s: ops.length })),
     explain: (ctx = {}) => (ctx.s
-      ? `Chaque échange de deux lignes change le signe du déterminant. Tu en as fait ${ctx.s} : le facteur devant det change ${ctx.s > 1 ? `${ctx.s} fois ` : ''}de signe.`
-      : 'Chaque échange de deux lignes change le signe du déterminant : le facteur devant det doit changer de signe.'),
+      ? (ctx.s > 1
+        ? t('Chaque échange de deux lignes change le signe du déterminant. Tu en as fait {s} : le facteur devant det change {s} fois de signe.', { s: ctx.s })
+        : t('Chaque échange de deux lignes change le signe du déterminant. Tu en as fait {s} : le facteur devant det change de signe.', { s: ctx.s }))
+      : t('Chaque échange de deux lignes change le signe du déterminant : le facteur devant det doit changer de signe.')),
     check: { judge: { kind: 'rowops', track: 'det' }, prev: 'det[[0,2],[3,4]]', line: 'L1 ↔ L2 : det[[3,4],[0,2]]' },
   },
   l_det_scale_row: {
-    name: 'Ligne multipliée sans corriger det',
+    name: t('Ligne multipliée sans corriger det'),
     judges: ['rowops'],
     transform: forgetFactor((op) => op.kind === 'scale', (ops) => ({ k: T(ops[0].k), inv: T(simp(div(ONE, ops[0].k))) })),
     explain: (ctx = {}) => (ctx.k
-      ? `Multiplier une ligne par ${ctx.k} multiplie det par ${ctx.k} : pour garder la même valeur, le facteur devant det est multiplié par ${ctx.inv}.`
-      : 'Multiplier une ligne par k multiplie det par k : le facteur devant det doit être divisé par k (c\'est « sortir un facteur »).'),
+      ? t('Multiplier une ligne par {k} multiplie det par {k} : pour garder la même valeur, le facteur devant det est multiplié par {inv}.', { k: ctx.k, inv: ctx.inv })
+      : t('Multiplier une ligne par k multiplie det par k : le facteur devant det doit être divisé par k (c\'est « sortir un facteur »).')),
     check: { judge: { kind: 'rowops', track: 'det' }, prev: 'det[[2,4],[3,4]]', line: 'L1 ← (1/2)L1 : det[[1,2],[3,4]]' },
   },
   l_det_rowop_combo: {
-    name: 'Lᵢ ← cLᵢ + kLⱼ compté sans effet',
+    name: t('Lᵢ ← cLᵢ + kLⱼ compté sans effet'),
     judges: ['rowops'],
     transform: forgetFactor((op) => op.kind === 'combo', (ops) => ({ i: ops[0].i + 1, c: T(ops[0].c), inv: T(simp(div(ONE, ops[0].c))) })),
     explain: (ctx = {}) => (ctx.i
-      ? `L${sb(ctx.i)} ← ${ctx.c}L${sb(ctx.i)} + … multiplie la ligne ${ctx.i} par ${ctx.c} avant d'ajouter : det est multiplié par ${ctx.c}, donc le facteur devant det par ${ctx.inv}.`
-      : 'Lᵢ ← cLᵢ + kLⱼ multiplie la ligne i par c avant d\'ajouter : det est multiplié par c. Seule Lᵢ ← Lᵢ + kLⱼ garde det.'),
+      ? t('L{si} ← {c}L{si} + … multiplie la ligne {i} par {c} avant d\'ajouter : det est multiplié par {c}, donc le facteur devant det par {inv}.', { si: sb(ctx.i), i: ctx.i, c: ctx.c, inv: ctx.inv })
+      : t('Lᵢ ← cLᵢ + kLⱼ multiplie la ligne i par c avant d\'ajouter : det est multiplié par c. Seule Lᵢ ← Lᵢ + kLⱼ garde det.')),
     check: { judge: { kind: 'rowops', track: 'det' }, prev: 'det[[2,4],[3,4]]', line: 'L2 ← 2L2 - 3L1 : det[[2,4],[0,-4]]' },
   },
   l_det_sum: {
-    name: 'det additif',
+    name: t('det additif'),
     judges: ['value'],
     transform: fromCfg('l_det_sum'),
-    explain: (ctx = {}) => `Le déterminant n'est pas additif : avec A = B = I₂, det(A + B) = det(2I₂) = 4 mais det A + det B = 2.${ctx.why ? ` ${ctx.why}` : ''}`,
+    explain: (ctx = {}) => `${t('Le déterminant n\'est pas additif : avec A = B = I₂, det(A + B) = det(2I₂) = 4 mais det A + det B = 2.')}${ctx.why ? ` ${ctx.why}` : ''}`,
     check: { judge: { kind: 'value', expect: '12', trapValues: { l_det_sum: ['6'] } }, prev: 'D', line: '6' },
   },
   l_det_scalar: {
-    name: 'det(kA) = k·det A',
+    name: t('det(kA) = k·det A'),
     judges: ['value'],
     transform: fromCfg('l_det_scalar'),
     explain: (ctx = {}) => (ctx.n
-      ? `${ctx.k}A multiplie <b>chacune</b> des ${ctx.n} lignes de A par ${ctx.k} : det est multiplié par ${ctx.k}^${ctx.n} = ${ctx.p}, pas par ${ctx.k}.`
-      : 'kA multiplie <b>chacune</b> des n lignes de A par k : det(kA) = kⁿ·det A, pas k·det A.'),
+      ? t('{k}A multiplie <b>chacune</b> des {n} lignes de A par {k} : det est multiplié par {k}^{n} = {p}, pas par {k}.', { k: ctx.k, n: ctx.n, p: ctx.p })
+      : t('kA multiplie <b>chacune</b> des n lignes de A par k : det(kA) = kⁿ·det A, pas k·det A.')),
     check: { judge: { kind: 'value', expect: '48', trapValues: { l_det_scalar: [{ value: '6', ctx: { k: 2, n: 4, p: 16 } }] } }, prev: 'D', line: '6' },
   },
   l_det_transpose_sign: {
-    name: 'det(Aᵀ) = −det A',
+    name: t('det(Aᵀ) = −det A'),
     judges: ['value'],
     transform: fromCfg('l_det_transpose_sign'),
-    explain: () => 'det(Aᵀ) = det A : transposer ne change pas le déterminant (développer selon une ligne de Aᵀ, c\'est développer selon une colonne de A). Contre-exemple immédiat à −det A : A = I.',
+    explain: () => t('det(Aᵀ) = det A : transposer ne change pas le déterminant (développer selon une ligne de Aᵀ, c\'est développer selon une colonne de A). Contre-exemple immédiat à −det A : A = I.'),
     check: { judge: { kind: 'value', expect: '6', trapValues: { l_det_transpose_sign: ['-6'] } }, prev: 'D', line: '-6' },
   },
   l_area_half_abs: {
-    name: 'Aire sans ½ ou sans valeur absolue',
+    name: t('Aire sans ½ ou sans valeur absolue'),
     judges: ['value'],
     transform: fromCfg('l_area_half_abs'),
     explain: (ctx = {}) => {
-      if (ctx.half && ctx.d) return `Un triangle est la moitié du parallélogramme, et une aire est positive : ½·|${ctx.d}| = ${ctx.area}.`;
-      if (ctx.d) return `Une aire (ou un volume) est positive : on prend la valeur absolue du déterminant, |${ctx.d}| = ${ctx.area}${ctx.factor ? `, multipliée par ${ctx.factor}` : ''}.`;
-      return 'Un triangle est la moitié du parallélogramme, et une aire est positive : aire = ½·|det[u v]|.';
+      if (ctx.half && ctx.d) return t('Un triangle est la moitié du parallélogramme, et une aire est positive : ½·|{d}| = {area}.', { d: ctx.d, area: ctx.area });
+      if (ctx.d && ctx.factor) return t('Une aire (ou un volume) est positive : on prend la valeur absolue du déterminant, |{d}| = {area}, multipliée par {factor}.', { d: ctx.d, area: ctx.area, factor: ctx.factor });
+      if (ctx.d) return t('Une aire (ou un volume) est positive : on prend la valeur absolue du déterminant, |{d}| = {area}.', { d: ctx.d, area: ctx.area });
+      return t('Un triangle est la moitié du parallélogramme, et une aire est positive : aire = ½·|det[u v]|.');
     },
     check: { judge: { kind: 'value', expect: '11/2', trapValues: { l_area_half_abs: [{ value: '11', ctx: { half: true, d: '11', area: '11/2' } }] } }, prev: 'S', line: '11' },
   },
   l_cramer_row: {
-    name: 'Cramer : ligne remplacée',
+    name: t('Cramer : ligne remplacée'),
     judges: ['mat', 'value'],
     transform: fromCfg('l_cramer_row'),
     explain: (ctx = {}) => (ctx.i
-      ? `Cramer remplace la <b>colonne</b> ${ctx.i} de A (les coefficients de x${sb(ctx.i)}) par b, pas la ligne ${ctx.i}.`
-      : 'Cramer remplace la <b>colonne</b> de l\'inconnue (ses coefficients dans chaque équation) par b, pas une ligne.'),
+      ? t('Cramer remplace la <b>colonne</b> {i} de A (les coefficients de x{si}) par b, pas la ligne {i}.', { i: ctx.i, si: sb(ctx.i) })
+      : t('Cramer remplace la <b>colonne</b> de l\'inconnue (ses coefficients dans chaque équation) par b, pas une ligne.')),
     check: { judge: { kind: 'mat', expect: '1', trapValues: { l_cramer_row: [{ value: '19/10', ctx: { i: 1 } }] } }, prev: 'x', line: 'det[[7,9],[1,4]]/10' },
   },
 };

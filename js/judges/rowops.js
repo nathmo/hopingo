@@ -30,6 +30,7 @@ import {
 } from './matcommon.js';
 import * as polyJudge from './poly.js';
 import { ACTIONS } from './actions.js';
+import { t } from '../i18n.js';
 
 export { show, text, input };
 
@@ -126,7 +127,7 @@ export function isFinal(cfg, node) {
 function finalNumber(cfg, node) {
   if (!(cfg.vars || []).length || !cfg.factored) return true;
   const v = cfg.vars[0];
-  return polyJudge.isFinal({ v, target: 'factored-R' }, node.value.n) === true ? true : 'Juste. Factorise le déterminant pour lire ses racines.';
+  return polyJudge.isFinal({ v, target: 'factored-R' }, node.value.n) === true ? true : t('Juste. Factorise le déterminant pour lire ses racines.');
 }
 
 export const start = (cfg) => cfg.start;
@@ -143,11 +144,11 @@ function dividesByParam(op, cfg, opts) {
 function legal(op, rows, cfg, opts) {
   const m = rows.length;
   const bad = (i) => !Number.isInteger(i) || i < 0 || i >= m;
-  if (bad(op.i) || (op.j !== undefined && bad(op.j))) return `La matrice n'a que ${m} lignes.`;
-  if (op.j !== undefined && op.j === op.i && op.kind !== 'swap') return 'Ajoute à une ligne le multiple d\'une autre ligne.';
-  if (op.kind === 'scale' && isZeroScalar(op.k, opts)) return 'Multiplier une ligne par 0 perd l\'équation : ce n\'est pas une opération permise.';
-  if (op.kind === 'combo' && isZeroScalar(op.c, opts)) return 'Multiplier une ligne par 0 perd l\'équation : ce n\'est pas une opération permise.';
-  if (cfg.lowerOnly && !(op.kind === 'add' && op.j < op.i)) return 'Pour LU, on ne fait que Lᵢ ← Lᵢ − k·Lⱼ avec j < i : pas d\'échange ni de multiplication.';
+  if (bad(op.i) || (op.j !== undefined && bad(op.j))) return t('La matrice n\'a que {m} lignes.', { m });
+  if (op.j !== undefined && op.j === op.i && op.kind !== 'swap') return t('Ajoute à une ligne le multiple d\'une autre ligne.');
+  if (op.kind === 'scale' && isZeroScalar(op.k, opts)) return t('Multiplier une ligne par 0 perd l\'équation : ce n\'est pas une opération permise.');
+  if (op.kind === 'combo' && isZeroScalar(op.c, opts)) return t('Multiplier une ligne par 0 perd l\'équation : ce n\'est pas une opération permise.');
+  if (cfg.lowerOnly && !(op.kind === 'add' && op.j < op.i)) return t('Pour LU, on ne fait que Lᵢ ← Lᵢ − k·Lⱼ avec j < i : pas d\'échange ni de multiplication.');
   return null;
 }
 
@@ -189,7 +190,7 @@ function judgeDet(cfg, prev, node, state) {
   if (!node.ops.length && node.value?.k === 's' && !node.body?.op?.startsWith?.('det') && !detParts(node)) {
     if (!sameScalar(node.value.n, target, opts)) {
       const diag = diagnoseLine('rowops', prev, node, cfg, (c, n) => c.value?.k === 's' && sameScalar(c.value.n, n.value.n, opts));
-      return wrongV(node, 'Ce n\'est pas la valeur du déterminant.', diag);
+      return wrongV(node, t('Ce n\'est pas la valeur du déterminant.'), diag);
     }
     const fin = finalNumber(cfg, node);
     return fin === true ? { kind: 'done', node } : { kind: 'stay', node, message: fin };
@@ -201,23 +202,23 @@ function judgeDet(cfg, prev, node, state) {
     const rows = ops.reduce((r, op) => applyRowOp(r, op), P.value.rows);
     const factor = ops.reduce((f, op) => simp(div(f, detFactorN(op))), P.factor);
     if (!D.det) D = { ...node, det: true, factor, value: Mx(rows, { aug: P.value.aug }) };
-    else if (!sameValue(D.value, Mx(rows), opts)) return wrongV(D, `Ta matrice n'est pas le résultat de ${ops.map(opReadable).join(' ; ')}.`, diagnose(cfg, P, D, ops));
+    else if (!sameValue(D.value, Mx(rows), opts)) return wrongV(D, t('Ta matrice n\'est pas le résultat de {ops}.', { ops: ops.map(opReadable).join(' ; ') }), diagnose(cfg, P, D, ops));
   } else {
-    if (!D.det) return { kind: 'form', node, message: 'Écris la ligne comme « facteur · det[[…]] », ou la valeur du déterminant.' };
-    if (sameValue(D.value, P.value, opts) && sameScalar(D.factor, P.factor, opts)) return { kind: 'same', node: D, message: 'Avance d\'au moins une étape.' };
+    if (!D.det) return { kind: 'form', node, message: t('Écris la ligne comme « facteur · det[[…]] », ou la valeur du déterminant.') };
+    if (sameValue(D.value, P.value, opts) && sameScalar(D.factor, P.factor, opts)) return { kind: 'same', node: D, message: t('Avance d\'au moins une étape.') };
     const op = identifyOp(P.value.rows, D.value.rows, opts);
-    if (!op && !sameValue(D.value, P.value, opts)) return wrongV(D, 'Je ne reconnais pas une opération sur les lignes de la matrice précédente.', diagnose(cfg, P, D, candidateOps(P.value.rows, opts)));
+    if (!op && !sameValue(D.value, P.value, opts)) return wrongV(D, t('Je ne reconnais pas une opération sur les lignes de la matrice précédente.'), diagnose(cfg, P, D, candidateOps(P.value.rows, opts)));
     ops = op ? [op] : [];
   }
   const want = ops.reduce((f, op) => simp(div(f, detFactorN(op))), P.factor);
   if (!sameScalar(D.factor, want, opts)) {
-    return wrongV(D, `Le facteur devant det ne suit pas l'opération : il faut ${toTextN(want)}.`, diagnose(cfg, P, D, ops));
+    return wrongV(D, t('Le facteur devant det ne suit pas l\'opération : il faut {f}.', { f: toTextN(want) }), diagnose(cfg, P, D, ops));
   }
   D = { ...D, ops };
   return { kind: 'ok', node: D };
 }
 
-const toTextN = (n) => { const q = exactValue(n); return q ? String(q).replace('-', '−') : 'un autre facteur'; };
+const toTextN = (n) => { const q = exactValue(n); return q ? String(q).replace('-', '−') : t('un autre facteur'); };
 const detFactorN = (op) => (op.kind === 'swap' ? qn(-1) : op.kind === 'scale' ? op.k : op.kind === 'combo' ? op.c : ONE);
 
 // ---------- the judge ----------
@@ -229,7 +230,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (cfg.track === 'det') return judgeDet(cfg, prev, node, state);
   const opts = mopts(cfg);
   const P = prev.value;
-  if (!isMatrix(P)) return { kind: 'parse', message: 'La ligne précédente n\'est pas une matrice.' };
+  if (!isMatrix(P)) return { kind: 'parse', message: t('La ligne précédente n\'est pas une matrice.') };
   let out = node;
   if (node.ops.length) {
     for (const op of node.ops) {
@@ -238,39 +239,39 @@ export function judgeLine(cfg, prev, input, state = {}) {
       const k = dividesByParam(op, cfg, opts);
       if (k) {
         const diag = { rules: ['l_param_divide_zero'], ambiguous: 1, ctx: { k } };
-        return wrongV(node, 'Tu multiplies une ligne par une expression du paramètre, qui peut valoir 0 : traite ce cas à part.', diag);
+        return wrongV(node, t('Tu multiplies une ligne par une expression du paramètre, qui peut valoir 0 : traite ce cas à part.'), diag);
       }
     }
     const rows = node.ops.reduce((r, op) => applyRowOp(r, op), P.rows);
     const R = Mx(rows, { aug: P.aug });
     if (node.value) {
       if (!isMatrix(node.value) || node.value.rows.length !== rows.length || node.value.rows[0].length !== rows[0].length) {
-        return { kind: 'parse', node, message: `Après les opérations, écris une matrice ${rows.length}×${rows[0].length}.` };
+        return { kind: 'parse', node, message: t('Après les opérations, écris une matrice {s}.', { s: `${rows.length}×${rows[0].length}` }) };
       }
       if (!sameValue(node.value, R, opts)) {
-        return wrongV(node, `Ta matrice n'est pas le résultat de ${node.ops.map(opReadable).join(' ; ')}.`, diagnose(cfg, prev, node, node.ops));
+        return wrongV(node, t('Ta matrice n\'est pas le résultat de {ops}.', { ops: node.ops.map(opReadable).join(' ; ') }), diagnose(cfg, prev, node, node.ops));
       }
     }
     out = { ...node, value: R };
   } else {
     const V = node.value;
-    if (!isMatrix(V)) return { kind: 'form', node, message: 'Écris une opération (L2 ← L2 − 3L1) ou la matrice obtenue.' };
+    if (!isMatrix(V)) return { kind: 'form', node, message: t('Écris une opération (L2 ← L2 − 3L1) ou la matrice obtenue.') };
     if (V.rows.length !== P.rows.length || V.rows[0].length !== P.rows[0].length) {
-      return { kind: 'parse', node, message: `La matrice doit rester de taille ${P.rows.length}×${P.rows[0].length}.` };
+      return { kind: 'parse', node, message: t('La matrice doit rester de taille {s}.', { s: `${P.rows.length}×${P.rows[0].length}` }) };
     }
     if (P.aug && !V.aug) out = { ...node, value: { ...V, aug: P.aug } };
-    if (sameValue(V, P, opts)) return { kind: 'same', node: out, message: 'Avance d\'au moins une étape.' };
+    if (sameValue(V, P, opts)) return { kind: 'same', node: out, message: t('Avance d\'au moins une étape.') };
     const op = identifyOp(P.rows, V.rows, opts);
     if (op) {
       const why = legal(op, P.rows, cfg, opts);
       if (why) return { kind: 'form', node, message: why };
       const k = dividesByParam(op, cfg, opts);
-      if (k) return wrongV(node, 'Tu as multiplié une ligne par une expression du paramètre, qui peut valoir 0 : traite ce cas à part.', { rules: ['l_param_divide_zero'], ambiguous: 1, ctx: { k } });
+      if (k) return wrongV(node, t('Tu as multiplié une ligne par une expression du paramètre, qui peut valoir 0 : traite ce cas à part.'), { rules: ['l_param_divide_zero'], ambiguous: 1, ctx: { k } });
       out = { ...out, inferred: [op] };
     } else if (!(cfg.multi && rowEquivalentV(P, V, cfg))) {
       const message = cfg.multi
-        ? 'Cette matrice n\'est pas équivalente à la précédente : une opération a changé l\'ensemble des solutions.'
-        : 'Je ne reconnais pas une seule opération élémentaire : fais une opération par ligne.';
+        ? t('Cette matrice n\'est pas équivalente à la précédente : une opération a changé l\'ensemble des solutions.')
+        : t('Je ne reconnais pas une seule opération élémentaire : fais une opération par ligne.');
       return wrongV(out, message, diagnose(cfg, prev, out, candidateOps(P.rows, opts)));
     }
   }
@@ -318,8 +319,8 @@ ACTIONS.rowops = (prev, cfg) => {
   const wrong = useful[0] ?? ops[0];
   if (wrong) {
     const bad = { ...wrong, k: simp(neg(wrong.k)) };
-    out.push({ id: 'sign', label: opReadable(bad), valid: false, rule: 'l_rowop_sign', why: 'Avec ce signe, la case ne devient pas 0 : elle double.' });
+    out.push({ id: 'sign', label: opReadable(bad), valid: false, rule: 'l_rowop_sign', why: t('Avec ce signe, la case ne devient pas 0 : elle double.') });
   }
-  if (!out.some((o) => o.valid)) out.push({ id: 'done', label: 'C\'est déjà échelonné', valid: true });
+  if (!out.some((o) => o.valid)) out.push({ id: 'done', label: t('C\'est déjà échelonné'), valid: true });
   return out;
 };

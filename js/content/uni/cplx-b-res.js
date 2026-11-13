@@ -11,6 +11,7 @@ import {
   q, cq, cT, cP, zMinus, rd, CM, inner, resLabel, mathLabel, CV, P, pT, checkRes, SG, L, chain, choice, opt, niceC, scaledOpt,
   partsItem, H, examTag, KEYS, pick,
 } from './cplx-b-kit.js';
+import { t } from '../../i18n.js';
 
 const RS = 'c-res-simple';
 const RM = 'c-res-multiple';
@@ -93,44 +94,44 @@ function simpleData(rng, { trig = true } = {}) {
 const fOf = (d) => (d.p === '1' ? `1/(${d.q})` : `(${d.p})/(${d.q})`);
 const fML = (d) => CM(d.p === '1' ? `1/(${d.q})` : `${d.p}/(${d.q})`);
 
-const SUB_S = [SG('derivative', 'q′ et q′(z₀)', RS), SG('value', 'Res = p(z₀)/q′(z₀)', RS)];
+const SUB_S = [SG('derivative', t('q′ et q′(z₀)'), RS), SG('value', 'Res = p(z₀)/q′(z₀)', RS)];
 
 function simpleParts(d, level, { only = false } = {}) {
   const dqJ = CV(mathLabel('q′(z)', qpML('<mi>z</mi>')), d.dq, { vars: ['z'], form: 'any' });
   const dq0J = CV(mathLabel(`q′(${rd(d.z0T)})`, qpML(inner(d.z0T))), d.dq0);
   const resJ = CV(resLabel(d.z0T), d.res, d.noExp ? { traps: { c_essential_factor: [{ line: d.noExp, ctx: {} }] } } : {});
   const MENU_D = [
-    { id: 'der', label: 'Dériver le dénominateur q', valid: true },
-    { id: 'q0', label: 'Calculer q(z₀)', valid: false, why: 'q(z₀) = 0 : c\'est justement le pôle. On dérive q.' },
+    { id: 'der', label: t('Dériver le dénominateur q'), valid: true },
+    { id: 'q0', label: t('Calculer q(z₀)'), valid: false, why: t('q(z₀) = 0 : c\'est justement le pôle. On dérive q.') },
   ];
   const MENU_E = [
-    { id: 'subst', label: 'Remplacer z par z₀ dans q′', valid: true },
-    { id: 'calc', label: 'Calculer (i² = −1)', valid: true },
+    { id: 'subst', label: t('Remplacer z par z₀ dans q′'), valid: true },
+    { id: 'calc', label: t('Calculer (i² = −1)'), valid: true },
   ];
   const MENU_R = [
-    { id: 'div', label: 'Diviser p(z₀) par q′(z₀)', valid: true },
-    { id: 'alg', label: 'Écrire sous la forme a + bi (multiplier par le conjugué)', valid: true },
-    { id: 'mul', label: 'Multiplier p(z₀) par q′(z₀)', valid: false, why: 'Le résidu est un quotient : p(z₀)/q′(z₀).' },
+    { id: 'div', label: t('Diviser p(z₀) par q′(z₀)'), valid: true },
+    { id: 'alg', label: t('Écrire sous la forme a + bi (multiplier par le conjugué)'), valid: true },
+    { id: 'mul', label: t('Multiplier p(z₀) par q′(z₀)'), valid: false, why: t('Le résidu est un quotient : p(z₀)/q′(z₀).') },
   ];
-  const resLines = chain(resJ, [d.sub, d.res]).map((t, i, a) => L(t, i === a.length - 1 ? 'Simplifier' : `p(z₀) = ${rd(d.pv)}, q′(z₀) = ${rd(d.dq0)}`, 'value', { blank: i === 0 ? [d.dq0] : [t], blank2: [t] }));
+  const resLines = chain(resJ, [d.sub, d.res]).map((tt, i, a) => L(tt, i === a.length - 1 ? t('Simplifier') : `p(z₀) = ${rd(d.pv)}, q′(z₀) = ${rd(d.dq0)}`, 'value', { blank: i === 0 ? [d.dq0] : [tt], blank2: [tt] }));
   const partRes = {
-    html: only ? '' : 'Le résidu :', ask: 'Res =', start: resJ.label, judge: resJ, menu: MENU_R, lines: resLines,
+    html: only ? '' : t('Le résidu :'), ask: 'Res =', start: resJ.label, judge: resJ, menu: MENU_R, lines: resLines,
   };
   if (only) return [partRes];
   const decision = {
-    kind: 'decision', prompt: 'Quelle formule pour ce pôle simple ?', levels: [2, 3],
+    kind: 'decision', prompt: t('Quelle formule pour ce pôle simple ?'), levels: [2, 3],
     options: [
       { id: 'pq', label: 'Res = p(z₀)/q′(z₀)', valid: true, ref: true },
       d.factored
-        ? { id: 'lim', label: 'Res = lim (z − z₀)·f(z)', valid: true, why: 'Juste aussi : q est déjà factorisé, on simplifie par z − z₀.' }
-        : { id: 'lim', label: 'Res = lim (z − z₀)·f(z)', valid: true, quality: 'poor', why: `Juste, mais il faudrait factoriser ${rd(d.q)} : p/q′ évite ce calcul.` },
-      { id: 'laurent', label: 'Développer f en série de Laurent', valid: true, quality: 'poor', why: 'Juste, mais bien plus long : en un pôle simple, la formule p/q′ suffit.' },
-      { id: 'pq0', label: 'Res = p(z₀)/q(z₀)', valid: false, why: 'q(z₀) = 0 : on ne divise pas par q(z₀). C\'est q′(z₀) qui compte.' },
+        ? { id: 'lim', label: 'Res = lim (z − z₀)·f(z)', valid: true, why: t('Juste aussi : q est déjà factorisé, on simplifie par z − z₀.') }
+        : { id: 'lim', label: 'Res = lim (z − z₀)·f(z)', valid: true, quality: 'poor', why: t('Juste, mais il faudrait factoriser {q} : p/q′ évite ce calcul.', { q: rd(d.q) }) },
+      { id: 'laurent', label: t('Développer f en série de Laurent'), valid: true, quality: 'poor', why: t('Juste, mais bien plus long : en un pôle simple, la formule p/q′ suffit.') },
+      { id: 'pq0', label: 'Res = p(z₀)/q(z₀)', valid: false, why: t('q(z₀) = 0 : on ne divise pas par q(z₀). C\'est q′(z₀) qui compte.') },
     ],
   };
   return [
-    { start: dqJ.label, judge: dqJ, decisions: [decision], menu: MENU_D, lines: [L(d.dq, 'Dériver q', 'derivative', { blank: [d.dq] })] },
-    { html: `q′(z) = ${CM(d.dq)}. En z₀ :`, ask: `q′(${rd(d.z0T)}) =`, start: dq0J.label, judge: dq0J, menu: MENU_E, lines: chain(dq0J, [d.dq0Sub, d.dq0]).map((t, i, a) => L(t, i === a.length - 1 ? 'Calculer' : 'Remplacer z par z₀', 'derivative', { blank: [t] })) },
+    { start: dqJ.label, judge: dqJ, decisions: [decision], menu: MENU_D, lines: [L(d.dq, t('Dériver q'), 'derivative', { blank: [d.dq] })] },
+    { html: t('q′(z) = {a}. En z₀ :', { a: CM(d.dq) }), ask: `q′(${rd(d.z0T)}) =`, start: dq0J.label, judge: dq0J, menu: MENU_E, lines: chain(dq0J, [d.dq0Sub, d.dq0]).map((tt, i, a) => L(tt, i === a.length - 1 ? t('Calculer') : t('Remplacer z par z₀'), 'derivative', { blank: [tt] })) },
     partRes,
   ];
 }
@@ -140,11 +141,11 @@ function simpleLines(level, rng, opts = {}) {
   const d = simpleData(rng);
   checkRes(fOf(d), d.z0T, d.res);
   const parts = simpleParts(d, level, { only: level === 1 || coef });
-  if (level === 1) parts[0].notes = [`Le dénominateur est q(z) = ${CM(d.q)}, q′(z) = ${CM(d.dq)} et q′(${CM(d.z0T)}) = ${CM(d.dq0)}. Le numérateur vaut p(${CM(d.z0T)}) = ${CM(d.pv)}.`];
+  if (level === 1) parts[0].notes = [t('Le dénominateur est q(z) = {a}, q′(z) = {b} et q′({c}) = {d}. Le numérateur vaut p({c}) = {e}.', { a: CM(d.q), b: CM(d.dq), c: CM(d.z0T), d: CM(d.dq0), e: CM(d.pv) })];
   return partsItem({
-    skill: RS, level, prompt: `z₀ = ${CM(d.z0T)} est un pôle simple de f(z) = ${fML(d)}. Calcule Res(f ; ${CM(d.z0T)}).`,
+    skill: RS, level, prompt: t('z₀ = {a} est un pôle simple de f(z) = {b}. Calcule Res(f ; {a}).', { a: CM(d.z0T), b: fML(d) }),
     parts, keys: KEYS, subgoals: SUB_S,
-    hints: H('Pôle simple de p/q : Res(f ; z₀) = p(z₀)/q′(z₀).', `q′(z) = ${CM(d.dq)}, donc q′(${CM(d.z0T)}) = ${CM(d.dq0)}.`, `Res = ${CM(d.sub)} = ${CM(d.res)}`),
+    hints: H(t('Pôle simple de p/q : Res(f ; z₀) = p(z₀)/q′(z₀).'), t('q′(z) = {a}, donc q′({b}) = {c}.', { a: CM(d.dq), b: CM(d.z0T), c: CM(d.dq0) }), `Res = ${CM(d.sub)} = ${CM(d.res)}`),
     key: `${RS}:${level}:${d.id}`, exam: examTag(opts, coef ? 2 : 1),
     baits: d.noExp ? ['c_essential_factor'] : [],
   });
@@ -177,10 +178,10 @@ function simpleAll(level, rng) {
   poles.forEach((pl, i) => {
     const J = CV(resLabel(cT(pl.z)), cT(pl.res));
     checkRes(f, cT(pl.z), cT(pl.res));
-    parts.push({ html: i ? `Pôle suivant, z = ${CM(cT(pl.z))} :` : '', ask: 'Res =', start: J.label, judge: J, lines: chain(J, [pl.sub, cT(pl.res)]).map((t) => L(t, 'p(z₀)/q′(z₀)', 'value')) });
+    parts.push({ html: i ? t('Pôle suivant, z = {a} :', { a: CM(cT(pl.z)) }) : '', ask: 'Res =', start: J.label, judge: J, lines: chain(J, [pl.sub, cT(pl.res)]).map((tt) => L(tt, 'p(z₀)/q′(z₀)', 'value')) });
   });
   return partsItem({
-    skill: RS, level, prompt: `Calcule les résidus de f(z) = ${fm} en tous ses pôles du demi-plan ${up ? 'Im z > 0' : 'Im z < 0'}${dq ? '' : ' (ce sont des pôles simples)'}. Commence par le pôle de plus petit module.`,
+    skill: RS, level, prompt: dq ? t('Calcule les résidus de f(z) = {fm} en tous ses pôles du demi-plan {a}. Commence par le pôle de plus petit module.', { fm, a: up ? 'Im z > 0' : 'Im z < 0' }) : t('Calcule les résidus de f(z) = {fm} en tous ses pôles du demi-plan {a} (ce sont des pôles simples). Commence par le pôle de plus petit module.', { fm, a: up ? 'Im z > 0' : 'Im z < 0' }),
     parts, keys: KEYS, subgoals: SUB_S, hints: [], key: `${RS}:5:${kind}:${up}:${f}`,
   });
 }
@@ -192,11 +193,11 @@ function simpleMcq(rng, opts) {
   const inv = d.pv === '0' || d.noExp ? null : niceC(`(${d.dq0})/(${d.pv})`);
   return choice({
     skill: RS, level: 4, key: `${RS}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
-    prompt: `Soit f(z) = ${fML(d)}. Res(f ; ${CM(d.z0T)}) =${multi ? ' (plusieurs réponses possibles)' : ''}`,
+    prompt: multi ? t('Soit f(z) = {a}. Res(f ; {b}) = (plusieurs réponses possibles)', { a: fML(d), b: CM(d.z0T) }) : t('Soit f(z) = {a}. Res(f ; {b}) =', { a: fML(d), b: CM(d.z0T) }),
     right: CM(niceC(d.res) || d.res), rightText: d.res, rights: multi ? [CM(d.sub)] : [],
     wrongs: [d.noExp && opt(niceC(d.noExp) || d.noExp, 'c_essential_factor'), scaledOpt('-1', d.res), inv && opt(inv), scaledOpt('2', d.res)],
     fillers: [scaledOpt('i', d.res), scaledOpt('1/2', d.res), scaledOpt('-i', d.res)],
-    solution: [{ html: `Pôle simple : Res = p(z₀)/q′(z₀) = ${CM(d.sub)} = ${CM(d.res)}.`, note: '' }],
+    solution: [{ html: t('Pôle simple : Res = p(z₀)/q′(z₀) = {a} = {b}.', { a: CM(d.sub), b: CM(d.res) }), note: '' }],
     expectedSec: 120,
   }, rng);
 }
@@ -237,26 +238,26 @@ function phiDeriv(g, b, k) {
     const coef = binom(k, j) * fact(j) * (j % 2 ? -1 : 1);
     const cp = k - j === 0 ? '' : c ? powT('t', k - j) : '';
     const wp = k - j === 0 ? '' : powT(W, k - j);
-    let t = `${cp}${wp}`;
+    let tt = `${cp}${wp}`;
     const abs = Math.abs(coef);
-    t = abs === 1 ? (t || '1') : `${abs}${t}`;
-    terms.push({ s: coef < 0 ? '-' : '+', t });
+    tt = abs === 1 ? (tt || '1') : `${abs}${tt}`;
+    terms.push({ s: coef < 0 ? '-' : '+', t: tt });
   }
   const num = terms.map((x, i) => (i === 0 && x.s === '+' ? x.t : `${x.s}${x.t}`)).join('');
   return `${E}(${num})/${W}^${k + 1}`;
 }
 
-function multipleData(rng, { t = false } = {}) {
+function multipleData(rng, { t: tt = false } = {}) {
   for (let tries = 0; tries < 200; tries++) {
     const m = pick(rng, [2, 2, 3]);
     const a = pick(rng, [-2, -1, 0, 1, 2]);
     const hasB = rng.chance(0.75);
     const b = hasB ? pick(rng, [-3, -2, -1, 0, 1, 2, 3]) : null;
     if (b === a) continue;
-    const g = t ? 'e^(zt)' : pick(rng, ['1', 'z', 'z', 'e^z', 'e^z']);
+    const g = tt ? 'e^(zt)' : pick(rng, ['1', 'z', 'z', 'e^z', 'e^z']);
     if (g === '1' && !hasB) continue;
     if (g === 'z' && a === 0) continue;
-    const env = t ? { t: 1.3 } : {};
+    const env = tt ? { t: 1.3 } : {};
     const fT = `${g === '1' || g === 'z' || g === 'e^z' ? g : `(${g})`}/(${powT(zf(a), m)}${hasB ? zf(b) : ''})`;
     const phi = phiDeriv(g, b, 0);
     const der = phiDeriv(g, b, m - 1);
@@ -266,7 +267,7 @@ function multipleData(rng, { t = false } = {}) {
     if (!val) continue;
     const wrong0 = phiDeriv(g, b, 0).replace(/z/g, `(${a})`);
     void env;
-    return { m, a, b, g, f: fT, phi, der, dAt, ...val, wrong0, t, id: `${m}:${a}:${b}:${g}` };
+    return { m, a, b, g, f: fT, phi, der, dAt, ...val, wrong0, t: tt, id: `${m}:${a}:${b}:${g}` };
   }
   return null;
 }
@@ -306,7 +307,7 @@ function resValue(g, a, b, m) {
   return { res: a === 0 ? poly : terms.length === 1 && !/[+-]/.test(poly.slice(1)) ? `${poly}${eat(a)}` : `(${poly})${eat(a)}`, raw: null };
 }
 
-const SUB_M = [SG('order', 'ordre m du pôle', 'c-singularities'), SG('derivative', 'dériver (z − z₀)^m f', RM), SG('value', 'diviser par (m − 1)!', RM)];
+const SUB_M = [SG('order', t('ordre m du pôle'), 'c-singularities'), SG('derivative', t('dériver (z − z₀)^m f'), RM), SG('value', t('diviser par (m − 1)!'), RM)];
 const phiML = (m, a) => `<msup>${a === 0 ? '<mi>z</mi>' : `<mrow><mo>(</mo>${inner(zMinus(a))}<mo>)</mo></mrow>`}<mn>${m}</mn></msup><mi>f</mi><mo>(</mo><mi>z</mi><mo>)</mo>`;
 const derML = (m) => (m === 2 ? '<msup><mi>φ</mi><mo>′</mo></msup><mo>(</mo><mi>z</mi><mo>)</mo>' : '<msup><mi>φ</mi><mo>″</mo></msup><mo>(</mo><mi>z</mi><mo>)</mo>');
 
@@ -324,24 +325,24 @@ function multipleParts(d, level, { only = false, label = null } = {}) {
   const resJ = CV(label || resLabel(String(d.a)), d.res, { vars, domain: tDom, form: d.t ? 'value' : 'algebraic', traps: wrongs });
   const subst = F === 1 ? d.dAt : `(1/${F})(${d.dAt})`;
   const MENU = [
-    { id: 'mult', label: `Multiplier f par (z − z₀)^${d.m}`, valid: true },
-    { id: 'der', label: `Dériver ${d.m - 1} fois`, valid: true },
-    { id: 'eval', label: 'Évaluer en z₀', valid: true },
-    { id: 'fact', label: `Diviser par (m − 1)! = ${F}`, valid: true },
-    { id: 'simple', label: 'Res = lim (z − z₀)f(z)', valid: false, rule: 'c_simple_formula_double', why: `z₀ est un pôle d'ordre ${d.m} : (z − z₀)f(z) tend vers l'infini.` },
+    { id: 'mult', label: t('Multiplier f par (z − z₀)^{m}', { m: d.m }), valid: true },
+    { id: 'der', label: t('Dériver {a} fois', { a: d.m - 1 }), valid: true },
+    { id: 'eval', label: t('Évaluer en z₀'), valid: true },
+    { id: 'fact', label: t('Diviser par (m − 1)! = {F}', { F }), valid: true },
+    { id: 'simple', label: 'Res = lim (z − z₀)f(z)', valid: false, rule: 'c_simple_formula_double', why: t('z₀ est un pôle d\'ordre {m} : (z − z₀)f(z) tend vers l\'infini.', { m: d.m }) },
   ];
   const parts = [];
   if (!only) {
-    parts.push({ start: phiJ.label, judge: phiJ, menu: MENU, lines: [L(d.phi, `z₀ = ${rd(String(d.a))} est un pôle d'ordre ${d.m} : on simplifie`, 'order', { blank: [d.phi] })] });
-    parts.push({ html: `φ(z) = (z − z₀)^${d.m} f(z) = ${CM(d.phi)}. On dérive ${d.m === 2 ? 'une fois' : 'deux fois'} :`, ask: d.m === 2 ? 'φ′(z) =' : 'φ″(z) =', start: derJ.label, judge: derJ, menu: MENU, lines: [L(d.der, 'Dériver', 'derivative', { blank: [d.der] })] });
+    parts.push({ start: phiJ.label, judge: phiJ, menu: MENU, lines: [L(d.phi, t('z₀ = {a} est un pôle d\'ordre {m} : on simplifie', { a: rd(String(d.a)), m: d.m }), 'order', { blank: [d.phi] })] });
+    parts.push({ html: d.m === 2 ? t('φ(z) = (z − z₀)^{m} f(z) = {a}. On dérive une fois :', { m: d.m, a: CM(d.phi) }) : t('φ(z) = (z − z₀)^{m} f(z) = {a}. On dérive deux fois :', { m: d.m, a: CM(d.phi) }), ask: d.m === 2 ? 'φ′(z) =' : 'φ″(z) =', start: derJ.label, judge: derJ, menu: MENU, lines: [L(d.der, t('Dériver'), 'derivative', { blank: [d.der] })] });
   }
-  parts.push({ html: only ? '' : `En z₀ = ${rd(String(d.a))} :`, ask: 'Res =', start: resJ.label, judge: resJ, menu: MENU, lines: chain(resJ, [subst, d.res]).map((t, i, a) => L(t, i === a.length - 1 ? 'Simplifier' : `1/(m − 1)! · φ${d.m === 2 ? '′' : '″'}(z₀)`, 'value', { blank: [t] })) });
+  parts.push({ html: only ? '' : t('En z₀ = {a} :', { a: rd(String(d.a)) }), ask: 'Res =', start: resJ.label, judge: resJ, menu: MENU, lines: chain(resJ, [subst, d.res]).map((tt, i, a) => L(tt, i === a.length - 1 ? t('Simplifier') : `1/(m − 1)! · φ${d.m === 2 ? '′' : '″'}(z₀)`, 'value', { blank: [tt] })) });
   if (level >= 2 && level <= 3 && !only) {
     parts[0].decisions = [{
-      kind: 'decision', prompt: `z₀ = ${rd(String(d.a))} : quelle formule ?`,
+      kind: 'decision', prompt: t('z₀ = {a} : quelle formule ?', { a: rd(String(d.a)) }),
       options: [
-        { id: 'multi', label: `Pôle d'ordre ${d.m} : Res = 1/(m − 1)! · lim d^(m−1)/dz^(m−1) [(z − z₀)^m f(z)]`, valid: true, ref: true },
-        { id: 'simple', label: 'Pôle simple : Res = lim (z − z₀)f(z)', valid: false, rule: 'c_simple_formula_double', why: `z₀ est un pôle d'ordre ${d.m} : la limite de (z − z₀)f(z) est infinie.` },
+        { id: 'multi', label: t('Pôle d\'ordre {m} : Res = 1/(m − 1)! · lim d^(m−1)/dz^(m−1) [(z − z₀)^m f(z)]', { m: d.m }), valid: true, ref: true },
+        { id: 'simple', label: t('Pôle simple : Res = lim (z − z₀)f(z)'), valid: false, rule: 'c_simple_formula_double', why: t('z₀ est un pôle d\'ordre {m} : la limite de (z − z₀)f(z) est infinie.', { m: d.m }) },
       ],
     }];
   }
@@ -354,12 +355,12 @@ function multipleLines(level, rng, opts = {}) {
   checkRes(d.f, String(d.a), d.res);
   const { parts } = multipleParts(d, level, { only: coef });
   if (level === 1) {
-    parts[0].notes = [`z₀ = ${rd(String(d.a))} est un pôle d'ordre m = ${d.m}. On pose φ(z) = (z − z₀)^${d.m} f(z) ; alors Res(f ; z₀) = φ${d.m === 2 ? '′' : '″'}(z₀)/${fact(d.m - 1)}!.`];
+    parts[0].notes = [t('z₀ = {a} est un pôle d\'ordre m = {m}. On pose φ(z) = (z − z₀)^{m} f(z) ; alors Res(f ; z₀) = φ{b}(z₀)/{c}!.', { a: rd(String(d.a)), m: d.m, b: d.m === 2 ? '′' : '″', c: fact(d.m - 1) })];
   }
   return partsItem({
-    skill: RM, level, prompt: `Calcule Res(f ; ${CM(String(d.a))}) pour f(z) = ${CM(d.f)}.`,
+    skill: RM, level, prompt: t('Calcule Res(f ; {a}) pour f(z) = {b}.', { a: CM(String(d.a)), b: CM(d.f) }),
     parts, keys: KEYS, subgoals: SUB_M,
-    hints: H(`Ordre m = ${d.m} : on dérive ${d.m - 1} fois (z − z₀)^${d.m} f et on divise par ${fact(d.m - 1)}!.`, `φ(z) = ${CM(d.phi)}, φ${d.m === 2 ? '′' : '″'}(z) = ${CM(d.der)}.`, `Res = ${CM(d.res)}`),
+    hints: H(t('Ordre m = {m} : on dérive {a} fois (z − z₀)^{m} f et on divise par {b}!.', { m: d.m, a: d.m - 1, b: fact(d.m - 1) }), `φ(z) = ${CM(d.phi)}, φ${d.m === 2 ? '′' : '″'}(z) = ${CM(d.der)}.`, `Res = ${CM(d.res)}`),
     key: `${RM}:${level}:${d.id}`, exam: examTag(opts, coef ? 2 : 1), fallback: !!d.fallback,
     baits: ['c_simple_formula_double', 'c_multiple_factorial'],
   });
@@ -375,19 +376,19 @@ function multipleLaplace(level, rng) {
   d.dAt = d.der.replace(/z/g, `(${a})`);
   Object.assign(d, resValue('e^(zt)', a, b, 2));
   d.wrong0 = d.phi.replace(/z/g, `(${a})`);
-  for (const t of [0.7, 1.9]) checkRes(d.f, String(a), d.res, { t });
+  for (const tt of [0.7, 1.9]) checkRes(d.f, String(a), d.res, { t: tt });
   const { parts } = multipleParts(d, level);
   const rb = q(1, (b - a) ** 2);
   const resB = b === 0 ? String(rb) : `${rb.eq(1) ? '' : `(${rb})`}${eat(b)}`;
-  for (const t of [0.7, 1.9]) checkRes(d.f, String(b), resB, { t });
+  for (const tt of [0.7, 1.9]) checkRes(d.f, String(b), resB, { t: tt });
   const JB = CV(resLabel(String(b)), resB, { vars: ['t'], domain: { t: [0.3, 2] }, form: 'value' });
-  parts.push({ html: `Le pôle simple z = ${b} :`, ask: 'Res =', start: JB.label, judge: JB, lines: chain(JB, [`e^(${b}t)/((${b})-(${a}))^2`, resB]).map((t) => L(t, 'p(z₀)/q′(z₀)', 'value')) });
+  parts.push({ html: t('Le pôle simple z = {b} :', { b }), ask: 'Res =', start: JB.label, judge: JB, lines: chain(JB, [`e^(${b}t)/((${b})-(${a}))^2`, resB]).map((tt) => L(tt, 'p(z₀)/q′(z₀)', 'value')) });
   const sum = `${d.res}+${resB}`;
   const JS = CV(mathLabel('y(t)', '<mi>y</mi><mo>(</mo><mi>t</mi><mo>)</mo>'), sum, { vars: ['t'], domain: { t: [0.3, 2] }, form: 'value' });
-  parts.push({ html: 'La fonction est la somme des résidus :', ask: 'y(t) =', start: JS.label, judge: JS, lines: [L(sum, 'Somme des résidus', 'sum')] });
+  parts.push({ html: t('La fonction est la somme des résidus :'), ask: 'y(t) =', start: JS.label, judge: JS, lines: [L(sum, t('Somme des résidus'), 'sum')] });
   return partsItem({
-    skill: RM, level, prompt: `Laplace inverse par les résidus : y(t) = Σ Res(e^(zt)F(z)) pour F(z) = ${CM(`1/(${zf(a)}^2${zf(b)})`)}, t > 0. Calcule les résidus de ${CM(d.f)}, puis y(t).`,
-    parts, keys: [...KEYS, 'calcx'], subgoals: [...SUB_M, SG('sum', 'somme des résidus', RM)], hints: [],
+    skill: RM, level, prompt: t('Laplace inverse par les résidus : y(t) = Σ Res(e^(zt)F(z)) pour F(z) = {a}, t > 0. Calcule les résidus de {b}, puis y(t).', { a: CM(`1/(${zf(a)}^2${zf(b)})`), b: CM(d.f) }),
+    parts, keys: [...KEYS, 'calcx'], subgoals: [...SUB_M, SG('sum', t('somme des résidus'), RM)], hints: [],
     key: `${RM}:5:${d.id}`, baits: ['c_simple_formula_double', 'c_multiple_factorial'],
   });
 }
@@ -397,7 +398,7 @@ function multipleMcq(rng, opts) {
   checkRes(d.f, String(d.a), d.res);
   const multi = !!opts.multi;
   const F = fact(d.m - 1);
-  const nice = (t, rule) => { const x = niceC(t); return x ? opt(x, rule) : null; };
+  const nice = (tt, rule) => { const x = niceC(tt); return x ? opt(x, rule) : null; };
   const wrongs = [
     nice(d.wrong0, 'c_simple_formula_double'),
     d.m === 3 ? nice(d.dAt, 'c_multiple_factorial') : nice(`(${d.res})/2`, 'c_multiple_factorial'),
@@ -406,10 +407,10 @@ function multipleMcq(rng, opts) {
   ];
   return choice({
     skill: RM, level: 4, key: `${RM}:mcq:${d.id}:${multi}`, exam: examTag(opts, 2), multi,
-    prompt: `Soit f(z) = ${CM(d.f)}. Res(f ; ${CM(String(d.a))}) =${multi ? ' (plusieurs réponses possibles)' : ''}`,
+    prompt: multi ? t('Soit f(z) = {a}. Res(f ; {b}) = (plusieurs réponses possibles)', { a: CM(d.f), b: CM(String(d.a)) }) : t('Soit f(z) = {a}. Res(f ; {b}) =', { a: CM(d.f), b: CM(String(d.a)) }),
     right: CM(niceC(d.res) || d.res), rightText: d.res, rights: multi && F > 1 ? [CM(`(1/${F})(${d.dAt})`)] : [],
     wrongs, fillers: [scaledOpt('2', d.res), nice(`(${d.res})+1`), scaledOpt('1/2', d.res), scaledOpt('-2', d.res), scaledOpt('3', d.res), scaledOpt('-1/2', d.res)],
-    solution: [{ html: `Pôle d'ordre ${d.m} : φ(z) = ${CM(d.phi)}, φ${d.m === 2 ? '′' : '″'}(z) = ${CM(d.der)}, Res = ${CM(d.res)}.`, note: '' }],
+    solution: [{ html: t('Pôle d\'ordre {m} : φ(z) = {a}, φ{b}(z) = {c}, Res = {d}.', { m: d.m, a: CM(d.phi), b: d.m === 2 ? '′' : '″', c: CM(d.der), d: CM(d.res) }), note: '' }],
     expectedSec: 150,
   }, rng);
 }

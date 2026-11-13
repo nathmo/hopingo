@@ -2,6 +2,7 @@
 // declarations, the « same line » test, and readable messages.
 
 import { parse } from '../cas/parse.js';
+import { t } from '../i18n.js';
 import { equalsStructural, symbolsIn } from '../cas/ast.js';
 
 export const parseOpts = (cfg = {}) => ({
@@ -23,7 +24,7 @@ export function readLine(cfg, input) {
     const known = new Set([...cfg.vars, ...(cfg.params || [])]);
     const unknown = [...symbolsIn(node)].filter((s) => !known.has(s));
     if (unknown.length) {
-      return { error: { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici : la variable est ${cfg.vars.join(', ')}.` } };
+      return { error: { kind: 'parse', node, message: t('Je ne connais pas la lettre « {x} » ici : la variable est {vars}.', { x: unknown[0].replace(/_$/, ''), vars: cfg.vars.join(', ') }) } };
     }
   }
   return { node };

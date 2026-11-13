@@ -18,6 +18,7 @@ import {
   q, mt, aug, vt, famT, polyT, polyR, ML, MLm, MLv, opR, fq, qt, sub, unimodular, rrefWith, opLines,
   pickCells, withCells, matLines, coefItem, mcqDistinct, tfL, examTag, polyBasis,
 } from './alglin-kit.js';
+import { t, tn } from '../../i18n.js';
 
 // ---------- helpers ----------
 
@@ -68,7 +69,7 @@ function partsItem(o, parts) {
 function rrefPart(A, ops, level, rng, { bar = null, cols, subgoal = 'reduce', note } = {}) {
   const lines = opLines(A, ops, {
     bar,
-    note: note || ((op) => (op.kind === 'scale' ? 'Pivot à 1' : op.kind === 'swap' ? 'Échanger' : op.i < op.j ? `Remonter : ${opR(op)}` : `Descendre : ${opR(op)}`)),
+    note: note || ((op) => (op.kind === 'scale' ? t('Pivot à 1') : op.kind === 'swap' ? t('Échanger') : op.i < op.j ? t('Remonter : {opR}', { opR: opR(op) }) : t('Descendre : {opR}', { opR: opR(op) }))),
     subgoal,
   });
   const out = level <= 2 ? lines.map((l) => (l.op.kind === 'swap' ? l : withCells(l, pickCells(l.result, [l.op.i], level === 1 ? 2 : 3, rng)))) : lines;
@@ -95,7 +96,7 @@ function niceOps(A, ops, maxOps, { whole = false } = {}) {
 // A menu of the « choose the action » mode: the first option is right.
 const menu = (right, ...wrongs) => [
   { id: 'ok', label: right, valid: true },
-  ...wrongs.map((w, k) => ({ id: `w${k}`, label: w.label ?? w, valid: false, why: w.why || 'Ce n\'est pas l\'étape qui fait avancer ici.', rule: w.rule })),
+  ...wrongs.map((w, k) => ({ id: `w${k}`, label: w.label ?? w, valid: false, why: w.why || t('Ce n\'est pas l\'étape qui fait avancer ici.'), rule: w.rule })),
 ];
 
 // ======================================================================
@@ -104,16 +105,16 @@ const menu = (right, ...wrongs) => [
 
 const SUBSP = 'l-vs-subspace';
 const SUBSP_SUB = [
-  { id: 'param', label: 'paramétrer', skill: SUBSP },
-  { id: 'counter', label: 'contre-exemple', skill: SUBSP },
+  { id: 'param', label: t('paramétrer'), skill: SUBSP },
+  { id: 'counter', label: t('contre-exemple'), skill: SUBSP },
 ];
 
 // The spaces: coordinates names, how an element is written.
 const SPACES = {
-  R3: { n: 3, names: xs(3), label: 'ℝ³', el: '(x₁ ; x₂ ; x₃)', what: 'vecteurs' },
-  P2: { n: 3, names: ['a', 'b', 'c'], label: 'P₂', el: 'a + bt + ct²', what: 'coordonnées dans (1, t, t²)' },
-  P3: { n: 4, names: ['a', 'b', 'c', 'd'], label: 'P₃', el: 'a + bt + ct² + dt³', what: 'coordonnées dans (1, t, t², t³)' },
-  M22: { n: 4, names: ['a', 'b', 'c', 'd'], label: 'M₂ₓ₂', el: '[[a, b], [c, d]]', what: 'coordonnées (a ; b ; c ; d), ligne par ligne' },
+  R3: { n: 3, names: xs(3), label: 'ℝ³', el: '(x₁ ; x₂ ; x₃)', what: t('vecteurs') },
+  P2: { n: 3, names: ['a', 'b', 'c'], label: 'P₂', el: 'a + bt + ct²', what: t('coordonnées dans (1, t, t²)') },
+  P3: { n: 4, names: ['a', 'b', 'c', 'd'], label: 'P₃', el: 'a + bt + ct² + dt³', what: t('coordonnées dans (1, t, t², t³)') },
+  M22: { n: 4, names: ['a', 'b', 'c', 'd'], label: 'M₂ₓ₂', el: '[[a, b], [c, d]]', what: t('coordonnées (a ; b ; c ; d), ligne par ligne') },
 };
 const elML = (sp) => (sp === 'M22' ? ML('[[a,b],[c,d]]', { vars: ['a', 'b', 'c', 'd'] }) : SPACES[sp].el);
 // An element from its coordinates: text for the judges, and for the screen.
@@ -162,7 +163,7 @@ function setData(rng, kind, sp) {
     const basis = free.map((j) => Array.from({ length: n }, (_, i) => (i === j ? 1 : i === d ? co[j] : 0)));
     return {
       kind, sp, cond, d, co, c0, free, basis, member: member(co, d, c0),
-      zero: kind === 'aff' ? `pour l'élément nul, la condition devient 0 = ${fq(c0)}` : null,
+      zero: kind === 'aff' ? t('pour l\'élément nul, la condition devient 0 = {fq}', { fq: fq(c0) }) : null,
     };
   }
   if (kind === 'quad') {
@@ -179,11 +180,11 @@ function setData(rng, kind, sp) {
         { cond: 'det A = 0', member: 'x_1*x_4-x_2*x_3=0', pairs: [[[1, 0, 0, 0], [0, 0, 0, 1]], [[1, 1, 1, 1], [1, -1, 0, 0]], [[0, 1, 0, 0], [0, 0, 1, 0]]], f: (v) => v[0] * v[3] - v[1] * v[2], ft: (v) => `(${v[0]})*(${v[3]})-(${v[1]})*(${v[2]})`, fr: 'ad − bc' },
       ],
     };
-    const t = rng.pick(T[sp === 'P3' ? 'P2' : sp]);
+    const pick = rng.pick(T[sp === 'P3' ? 'P2' : sp]);
     const sp2 = sp === 'P3' ? 'P2' : sp;
-    const [x, y] = rng.pick(t.pairs);
+    const [x, y] = rng.pick(pick.pairs);
     const s = x.map((a, i) => a + y[i]);
-    return { kind, sp: sp2, cond: t.cond, member: t.member, x, y, s, f: t.f(s), ft: t.ft(s), fr: t.fr };
+    return { kind, sp: sp2, cond: pick.cond, member: pick.member, x, y, s, f: pick.f(s), ft: pick.ft(s), fr: pick.fr };
   }
   // half: the first coordinate ≥ 0.
   const sp2 = sp === 'P3' ? 'P2' : sp;
@@ -202,9 +203,9 @@ function setCounter(s) {
   if (s.kind === 'quad') return { kind: 'setWitness', params, ask: [{ v: 'x', label: 'x =', ...shape }, { v: 'y', label: 'y =', ...shape }], answer: { x: elText(s.sp, s.x), y: elText(s.sp, s.y) } };
   return { kind: 'setWitness', params, ask: [{ v: 'x', label: 'x =', ...shape }, { v: 'c', label: 'c =' }], answer: { x: elText(s.sp, s.x), c: '-1' } };
 }
-const whyNot = (s) => (s.kind === 'aff' ? `0 n'est pas dans H : ${s.zero}.`
-  : s.kind === 'quad' ? `${elShow(s.sp, s.x)} et ${elShow(s.sp, s.y)} sont dans H, mais pas leur somme ${elShow(s.sp, s.s)} (${s.fr} = ${s.f}).`
-    : `${elShow(s.sp, s.x)} est dans H, mais pas (−1)·${elShow(s.sp, s.x)} = ${elShow(s.sp, s.s)}.`);
+const whyNot = (s) => (s.kind === 'aff' ? t('0 n\'est pas dans H : {zero}.', { zero: s.zero })
+  : s.kind === 'quad' ? t('{elShow} et {elShow2} sont dans H, mais pas leur somme {elShow3} ({fr} = {f}).', { elShow: elShow(s.sp, s.x), elShow2: elShow(s.sp, s.y), elShow3: elShow(s.sp, s.s), fr: s.fr, f: s.f })
+    : t('{elShow} est dans H, mais pas (−1)·{elShow} = {elShow2}.', { elShow: elShow(s.sp, s.x), elShow2: elShow(s.sp, s.s) }));
 
 // Parts of a subspace: one vector per free coordinate, then H = Span{…}.
 function spanParts(s, level, rng, { menus = false } = {}) {
@@ -215,14 +216,14 @@ function spanParts(s, level, rng, { menus = false } = {}) {
     const cells = level === 1 ? [[s.d, 0]] : level === 2 ? [[s.d, 0], [j, 0]] : null;
     const line = { kind: 'eq', math: vt(v), note: fix, subgoal: 'param' };
     return {
-      judge: { kind: 'mat', expect: vt(v), ...(menus ? { menu: menu(`Fixer ${fix}`, { label: 'Vérifier que 0 est dans H', why: 'Juste, mais cela ne donne pas de vecteur de base.' }) } : {}) },
-      start: `v_${k + 1}`, html: `Élément de H avec ${fix}`, ask: `v${sub(k + 1)} =`,
+      judge: { kind: 'mat', expect: vt(v), ...(menus ? { menu: menu(t('Fixer {fix}', { fix }), { label: t('Vérifier que 0 est dans H'), why: t('Juste, mais cela ne donne pas de vecteur de base.') }) } : {}) },
+      start: `v_${k + 1}`, html: t('Élément de H avec {fix}', { fix }), ask: `v${sub(k + 1)} =`,
       lines: [cells ? withCells(line, cells) : line],
     };
   });
   parts.push({
-    judge: { kind: 'span', basis: s.basis.map(vt), require: 'basis', ...(menus ? { menu: menu('Réunir les vecteurs : H = Span{…}', { label: 'Compter les conditions', why: 'Cela donne la dimension, pas une base.' }) } : {}) },
-    start: 'H', html: `H comme un Span (${S.what})`, ask: 'H =',
+    judge: { kind: 'span', basis: s.basis.map(vt), require: 'basis', ...(menus ? { menu: menu(t('Réunir les vecteurs : H = Span{…}'), { label: t('Compter les conditions'), why: t('Cela donne la dimension, pas une base.') }) } : {}) },
+    start: 'H', html: t('H comme un Span ({what})', { what: S.what }), ask: 'H =',
     lines: [{ kind: 'eq', math: `H = Span{${famT(s.basis)}}`, note: `dim H = ${s.basis.length}`, subgoal: 'param' }],
   });
   return parts;
@@ -235,28 +236,28 @@ function witnessParts(s, level, { menus = false } = {}) {
   const N = SPACES[s.sp].names;
   if (s.kind === 'aff') {
     parts.push({
-      judge: { kind: 'value', expect: String(s.c0), ...(menus ? { menu: menu('Tester l\'élément nul', { label: 'Additionner deux éléments', why: 'Plus long : ici, 0 suffit.' }) } : {}) },
-      start: 'r', html: 'Remplace chaque coordonnée par 0 : la condition devient 0 = ?', ask: '0 =',
+      judge: { kind: 'value', expect: String(s.c0), ...(menus ? { menu: menu(t('Tester l\'élément nul'), { label: t('Additionner deux éléments'), why: t('Plus long : ici, 0 suffit.') }) } : {}) },
+      start: 'r', html: t('Remplace chaque coordonnée par 0 : la condition devient 0 = ?'), ask: '0 =',
       lines: [{ kind: 'eq', math: String(s.c0), note: `${fq(s.c0)} ≠ 0 : 0 ∉ H`, subgoal: 'counter' }],
     });
     return parts;
   }
   const sumLine = elLine(s.sp, s.s);
   parts.push({
-    judge: { kind: 'mat', expect: sumLine, ...(menus ? { menu: menu(s.kind === 'quad' ? 'Additionner x et y' : 'Multiplier x par −1', { label: 'Tester l\'élément nul', why: '0 est dans H : ce test ne conclut pas.' }) } : {}) },
-    start: s.kind === 'quad' ? 'x + y' : '(-1)·x', html: `${s.sp[0] === 'P' ? 'Coordonnées de ' : ''}${s.kind === 'quad' ? 'x + y' : '(−1)·x'}${s.sp[0] === 'P' ? ' dans (1, t, t²)' : ''}`, ask: s.kind === 'quad' ? 'x + y =' : '(−1)·x =',
-    lines: [{ kind: 'eq', math: sumLine, note: s.sp === 'R3' ? '' : 'Coefficient par coefficient', subgoal: 'counter' }],
+    judge: { kind: 'mat', expect: sumLine, ...(menus ? { menu: menu(s.kind === 'quad' ? t('Additionner x et y') : t('Multiplier x par −1'), { label: t('Tester l\'élément nul'), why: t('0 est dans H : ce test ne conclut pas.') }) } : {}) },
+    start: s.kind === 'quad' ? 'x + y' : '(-1)·x', html: s.sp[0] === 'P' ? t('Coordonnées de {e} dans (1, t, t²)', { e: s.kind === 'quad' ? 'x + y' : '(−1)·x' }) : (s.kind === 'quad' ? 'x + y' : '(−1)·x'), ask: s.kind === 'quad' ? 'x + y =' : '(−1)·x =',
+    lines: [{ kind: 'eq', math: sumLine, note: s.sp === 'R3' ? '' : t('Coefficient par coefficient'), subgoal: 'counter' }],
   });
   if (s.kind === 'quad') {
     parts.push({
-      judge: { kind: 'value', expect: String(s.f), ...(menus ? { menu: menu(`Calculer ${s.fr} pour x + y`) } : {}) },
-      start: 'r', html: `${s.fr} pour x + y`, ask: `${s.fr} =`,
+      judge: { kind: 'value', expect: String(s.f), ...(menus ? { menu: menu(t('Calculer {fr} pour x + y', { fr: s.fr })) } : {}) },
+      start: 'r', html: t('{fr} pour x + y', { fr: s.fr }), ask: `${s.fr} =`,
       lines: [...(level <= 2 ? [{ kind: 'eq', math: s.ft, note: '' }] : []), { kind: 'eq', math: String(s.f), note: `≠ 0 : x + y ∉ H`, subgoal: 'counter' }],
     });
   } else {
     parts.push({
-      judge: { kind: 'value', expect: String(s.s[0]), ...(menus ? { menu: menu(`Lire ${N[0] === 'x₁' ? 'x₁' : 'le premier coefficient'}`) } : {}) },
-      start: 'r', html: s.sp === 'R3' ? 'Sa première composante' : s.sp === 'P2' ? 'Sa valeur en 0' : 'Son coefficient a', ask: '=',
+      judge: { kind: 'value', expect: String(s.s[0]), ...(menus ? { menu: menu(N[0] === 'x₁' ? t('Lire x₁') : t('Lire le premier coefficient')) } : {}) },
+      start: 'r', html: s.sp === 'R3' ? t('Sa première composante') : s.sp === 'P2' ? t('Sa valeur en 0') : t('Son coefficient a'), ask: '=',
       lines: [{ kind: 'eq', math: String(s.s[0]), note: '< 0 : (−1)·x ∉ H', subgoal: 'counter' }],
     });
   }
@@ -265,17 +266,17 @@ function witnessParts(s, level, { menus = false } = {}) {
 
 function subspaceDecision(s) {
   const opts = [
-    { id: 'span', label: 'Oui : la condition est linéaire et homogène, H est un Span', valid: s.kind === 'lin' },
-    { id: 'zero', label: 'Non : 0 n\'est pas dans H', valid: s.kind === 'aff' },
-    { id: 'sum', label: 'Non : H n\'est pas stable par somme', valid: s.kind === 'quad' },
-    { id: 'mul', label: 'Non : H n\'est pas stable par multiplication par un scalaire', valid: s.kind === 'half' },
+    { id: 'span', label: t('Oui : la condition est linéaire et homogène, H est un Span'), valid: s.kind === 'lin' },
+    { id: 'zero', label: t('Non : 0 n\'est pas dans H'), valid: s.kind === 'aff' },
+    { id: 'sum', label: t('Non : H n\'est pas stable par somme'), valid: s.kind === 'quad' },
+    { id: 'mul', label: t('Non : H n\'est pas stable par multiplication par un scalaire'), valid: s.kind === 'half' },
   ];
   const rule = s.kind === 'aff' ? 'l_subspace_zero' : s.kind === 'quad' ? 'l_subspace_nonlinear' : null;
   return {
-    kind: 'decision', prompt: 'H est-il un sous-espace ? Choisis la justification la plus courte.',
+    kind: 'decision', prompt: t('H est-il un sous-espace ? Choisis la justification la plus courte.'),
     options: opts.map((o) => (o.valid ? o : {
       ...o, ...(o.id === 'span' && rule ? { rule } : {}),
-      why: s.kind === 'lin' ? 'Si : 0 vérifie la condition, et elle est stable par somme et par multiple (c\'est une équation linéaire homogène).' : o.id === 'span' ? whyNot(s) : 'Ce n\'est pas ce qui échoue ici, ou pas le plus court.',
+      why: s.kind === 'lin' ? t('Si : 0 vérifie la condition, et elle est stable par somme et par multiple (c\'est une équation linéaire homogène).') : o.id === 'span' ? whyNot(s) : t('Ce n\'est pas ce qui échoue ici, ou pas le plus court.'),
     })),
   };
 }
@@ -288,21 +289,23 @@ function subspaceItem(level, rng) {
   const menus = level === 3;
   const parts = kind === 'lin' ? spanParts(s, level, rng, { menus }) : witnessParts(s, level, { menus });
   if (level >= 2) parts[0].lines.unshift(subspaceDecision(s));
-  const given = kind === 'quad' ? ` On donne x = ${elShow(s.sp, s.x)} et y = ${elShow(s.sp, s.y)}, deux éléments de H.` : kind === 'half' ? ` On donne x = ${elShow(s.sp, s.x)}, un élément de H.` : '';
+  const given = kind === 'quad' ? t(' On donne x = {elShow} et y = {elShow2}, deux éléments de H.', { elShow: elShow(s.sp, s.x), elShow2: elShow(s.sp, s.y) }) : kind === 'half' ? t(' On donne x = {elShow}, un élément de H.', { elShow: elShow(s.sp, s.x) }) : '';
   const hints = kind === 'lin'
     ? [
-      { level: 1, html: 'Exprime un élément de H avec des paramètres libres : si c\'est une combinaison fixe de vecteurs, H est un Span.' },
-      { level: 2, html: `Avec ${SPACES[s.sp].names[s.free[0]]} = 1 et les autres coordonnées libres à 0 : v₁ = (${s.basis[0].map((x, i) => (i === s.d ? '□' : fq(x))).join(' ; ')}).` },
+      { level: 1, html: t('Exprime un élément de H avec des paramètres libres : si c\'est une combinaison fixe de vecteurs, H est un Span.') },
+      { level: 2, html: t('Avec {x} = 1 et les autres coordonnées libres à 0 : v₁ = ({x2}).', { x: SPACES[s.sp].names[s.free[0]], x2: s.basis[0].map((x, i) => (i === s.d ? '□' : fq(x))).join(' ; ') }) },
       { level: 3, html: `H = ${Spn(s.basis)}` },
     ]
     : [
-      { level: 1, html: 'Une condition non homogène exclut 0 ; une condition non linéaire n\'est pas stable par somme ; une inégalité n\'est pas stable par −1.' },
-      { level: 2, html: s.kind === 'aff' ? 'Remplace chaque coordonnée par 0 dans la condition.' : `Calcule ${s.kind === 'quad' ? 'x + y' : '(−1)·x'} coefficient par coefficient.` },
+      { level: 1, html: t('Une condition non homogène exclut 0 ; une condition non linéaire n\'est pas stable par somme ; une inégalité n\'est pas stable par −1.') },
+      { level: 2, html: s.kind === 'aff' ? t('Remplace chaque coordonnée par 0 dans la condition.') : t('Calcule {x} coefficient par coefficient.', { x: s.kind === 'quad' ? 'x + y' : '(−1)·x' }) },
       { level: 3, html: whyNot(s) },
     ];
   return partsItem({
     skill: SUBSP, level,
-    prompt: `${setML(s)}.${given} ${level === 1 ? `H est un sous-espace : écris un élément de H pour chaque coordonnée libre, puis H comme un Span (${SPACES[s.sp].what}).` : `H est-il un sous-espace de ${SPACES[s.sp].label} ? Justifie : un Span, ou un contre-exemple.`}`,
+    prompt: level === 1
+      ? t('{set}.{given} H est un sous-espace : écris un élément de H pour chaque coordonnée libre, puis H comme un Span ({what}).', { set: setML(s), given, what: SPACES[s.sp].what })
+      : t('{set}.{given} H est-il un sous-espace de {space} ? Justifie : un Span, ou un contre-exemple.', { set: setML(s), given, space: SPACES[s.sp].label }),
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null,
     hints, subgoals: SUBSP_SUB, key: `${SUBSP}:${s.sp}:${s.cond}`,
   }, parts);
@@ -313,9 +316,9 @@ function subspaceCount(rng, exam) {
   const kinds = rng.shuffle(['lin', rng.pick(['lin', 'half', 'quad']), 'aff', 'quad']);
   const sets = [];
   for (const k of kinds) {
-    for (let t = 0; t < 50; t++) {
+    for (let tries = 0; tries < 50; tries++) {
       const s = setData(rng, k, rng.pick(['R3', 'P2', 'M22']));
-      if (t < 49 && sets.some((x) => x.cond === s.cond && x.sp === s.sp)) continue;
+      if (tries < 49 && sets.some((x) => x.cond === s.cond && x.sp === s.sp)) continue;
       sets.push(s);
       break;
     }
@@ -326,11 +329,11 @@ function subspaceCount(rng, exam) {
   const list = sets.map((s, i) => `(${i + 1}) ${setML(s).replace(/^H = /, '')}`).join('<br>');
   return mcqDistinct({
     skill: SUBSP, level: exam ? 4 : 5, key: `count:${sets.map((s) => s.cond).join('|')}`, exam: examTag({ exam }),
-    prompt: `Combien de ces ensembles sont des sous-espaces vectoriels ?<br>${list}`,
+    prompt: t('Combien de ces ensembles sont des sous-espaces vectoriels ?<br>{list}', { list }),
     right: String(nLin),
     wrongs: [{ html: String(nLin + nAff), rule: 'l_subspace_zero' }, { html: String(nLin + nQuad), rule: 'l_subspace_nonlinear' }],
     fillers: [0, 1, 2, 3, 4].map((k) => ({ html: String(k) })),
-    solution: sets.map((s, i) => ({ html: `(${i + 1}) ${s.kind === 'lin' ? `oui : ${Spn(s.basis)}` : `non : ${whyNot(s)}`}`, note: '' })),
+    solution: sets.map((s, i) => ({ html: s.kind === 'lin' ? t('({i}) oui : {span}', { i: i + 1, span: Spn(s.basis) }) : t('({i}) non : {why}', { i: i + 1, why: whyNot(s) }), note: '' })),
   }, rng);
 }
 
@@ -341,24 +344,24 @@ function subspaceExam(rng, exam) {
   if (which === 0) {
     return tfL({
       skill: SUBSP, key: 'at4', truth: true, exam: tag,
-      statement: '{p ∈ P₄ : p(t) = at⁴, a ∈ ℝ} est un sous-espace de P₄.',
-      explanation: 'Vrai : c\'est Span{t⁴}, et un Span est toujours un sous-espace.',
+      statement: t('{p ∈ P₄ : p(t) = at⁴, a ∈ ℝ} est un sous-espace de P₄.'),
+      explanation: t('Vrai : c\'est Span{t⁴}, et un Span est toujours un sous-espace.'),
     });
   }
   if (which === 1) {
     return tfL({
       skill: SUBSP, key: 'p-2q', truth: true, exam: tag,
-      statement: 'Si H est un sous-espace de P₃ qui contient p et q, alors H contient p − 2q.',
-      explanation: 'Vrai : H est stable par multiplication (−2q ∈ H) et par somme (p + (−2q) ∈ H).',
+      statement: t('Si H est un sous-espace de P₃ qui contient p et q, alors H contient p − 2q.'),
+      explanation: t('Vrai : H est stable par multiplication (−2q ∈ H) et par somme (p + (−2q) ∈ H).'),
     });
   }
   if (which === 2) {
     const s = setData(rng, 'quad', 'M22');
     return tfL({
       skill: SUBSP, key: `det0:${s.x}`, truth: false, exam: tag, ruleIfTrue: 'l_subspace_nonlinear',
-      statement: '{A ∈ M₂ₓ₂ : det A = 0} est un sous-espace de M₂ₓ₂.',
+      statement: t('{A ∈ M₂ₓ₂ : det A = 0} est un sous-espace de M₂ₓ₂.'),
       counter: setCounter(s),
-      explanation: `Faux : ${whyNot(s)}`,
+      explanation: t('Faux : {whyNot}', { whyNot: whyNot(s) }),
     });
   }
   const kind = rng.pick(['lin', 'aff', 'quad', 'half']);
@@ -367,9 +370,9 @@ function subspaceExam(rng, exam) {
   return tfL({
     skill: SUBSP, key: `${s.sp}:${s.cond}`, truth: kind === 'lin', exam: tag,
     ...(rule ? { ruleIfTrue: rule } : {}),
-    statement: `${setML(s)} est un sous-espace de ${SPACES[s.sp].label}.`,
+    statement: t('{setML} est un sous-espace de {label}.', { setML: setML(s), label: SPACES[s.sp].label }),
     ...(kind === 'lin' ? {} : { counter: setCounter(s) }),
-    explanation: kind === 'lin' ? `Vrai : H = ${Spn(s.basis)} (${SPACES[s.sp].what}).` : `Faux : ${whyNot(s)}`,
+    explanation: kind === 'lin' ? t('Vrai : H = {Spn} ({what}).', { Spn: Spn(s.basis), what: SPACES[s.sp].what }) : t('Faux : {whyNot}', { whyNot: whyNot(s) }),
   });
 }
 
@@ -379,9 +382,9 @@ function subspaceExam(rng, exam) {
 
 const KER = 'l-vs-kernel';
 const KER_SUB = [
-  { id: 'reduce', label: 'réduire', skill: 'l-sys-rref' },
-  { id: 'param', label: 'paramétrer', skill: 'l-sys-solution' },
-  { id: 'separate', label: 'séparer', skill: KER },
+  { id: 'reduce', label: t('réduire'), skill: 'l-sys-rref' },
+  { id: 'param', label: t('paramétrer'), skill: 'l-sys-solution' },
+  { id: 'separate', label: t('séparer'), skill: KER },
 ];
 
 // A (m × n) with nFree free columns, its reduced form R, the operations of
@@ -389,7 +392,7 @@ const KER_SUB = [
 // free variable, that variable 1). colDiff: a pivot column of A differs
 // from that of R.
 function spaceData(rng, { m = 3, n = 4, nFree, maxOps = 6, colDiff = false } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const f = nFree ?? rng.pick(n === 5 ? [2, 3] : [1, 2]);
     const r = n - f;
     if (r > m || r < 2 || (colDiff && r >= m)) continue;
@@ -427,14 +430,14 @@ function kernelParts(d, level, rng, name = 'A') {
       const fix = free.map((j) => `${X[j]} = ${j === free[k] ? 1 : 0}`).join(', ');
       const cells = level === 1 ? d.pivots.map((p) => [p, 0]) : v.map((_, i) => [i, 0]);
       parts.push({
-        judge: { kind: 'mat', expect: vt(v) }, start: `v_${k + 1}`, html: `Vecteur de ${X[free[k]]}`, ask: `v${sub(k + 1)} =`,
+        judge: { kind: 'mat', expect: vt(v) }, start: `v_${k + 1}`, html: t('Vecteur de {x}', { x: X[free[k]] }), ask: `v${sub(k + 1)} =`,
         lines: [withCells({ kind: 'eq', math: vt(v), note: fix, subgoal: 'param' }, cells)],
       });
     });
   } else parts.push(rrefPart(d.A, d.ops, level, rng));
   parts.push({
-    judge: { kind: 'span', basis: d.K.map(vt), require: 'basis' }, start: mt(d.R), html: `Une base de Ker ${name}`, ask: `Ker ${name} =`,
-    lines: [{ kind: 'eq', math: `Ker ${name} = Span{${famT(d.K)}}`, note: `Une variable libre, un vecteur : dim Ker ${name} = ${d.K.length}`, subgoal: 'separate' }],
+    judge: { kind: 'span', basis: d.K.map(vt), require: 'basis' }, start: mt(d.R), html: t('Une base de Ker {name}', { name }), ask: `Ker ${name} =`,
+    lines: [{ kind: 'eq', math: `Ker ${name} = Span{${famT(d.K)}}`, note: t('Une variable libre, un vecteur : dim Ker {name} = {length}', { name, length: d.K.length }), subgoal: 'separate' }],
   });
   return parts;
 }
@@ -448,24 +451,24 @@ function kernelItem(level, rng) {
   if (level === 2) {
     const piv = d.pivots.map((j) => X[j]);
     parts[0].lines.unshift({
-      kind: 'decision', prompt: 'Quelles variables sont libres ?', options: rng.shuffle([
+      kind: 'decision', prompt: t('Quelles variables sont libres ?'), options: rng.shuffle([
         { id: 'free', label: join(free.map((j) => X[j])), valid: true },
-        { id: 'piv', label: join(piv), valid: false, why: `${join(piv)} sont les variables des colonnes pivots : elles s'expriment en fonction des autres.` },
-        { id: 'last', label: X[d.n - 1], valid: free.length === 1 && free[0] === d.n - 1, why: `Il y a ${free.length} colonnes sans pivot, donc ${free.length} variables libres.` },
+        { id: 'piv', label: join(piv), valid: false, why: t('{join} sont les variables des colonnes pivots : elles s\'expriment en fonction des autres.', { join: join(piv) }) },
+        { id: 'last', label: X[d.n - 1], valid: free.length === 1 && free[0] === d.n - 1, why: t('Il y a {length} colonnes sans pivot, donc {length} variables libres.', { length: free.length }) },
       ].filter((o, i, arr) => arr.findIndex((p) => p.label === o.label) === i)),
     });
   }
   const sol = d.pivots.map((p, i) => `${X[p]} = ${linText(free.map((j) => d.R[i][j].neg()), free.map((j) => X[j]))}`);
   const hints = [
-    { level: 1, html: 'Une variable libre = un vecteur de base : mets-la à 1, les autres libres à 0, et lis les variables pivots sur R (avec le signe changé).' },
-    { level: 2, html: `Solution générale : ${sol.join(' ; ')}.` },
+    { level: 1, html: t('Une variable libre = un vecteur de base : mets-la à 1, les autres libres à 0, et lis les variables pivots sur R (avec le signe changé).') },
+    { level: 2, html: t('Solution générale : {x}.', { x: sol.join(' ; ') }) },
     { level: 3, html: `Ker A = ${Spn(d.K)}` },
   ];
   const prompt = level <= 2
-    ? `A = ${MLm(d.A)} a pour forme réduite R = ${MLm(d.R)}. Écris le vecteur de chaque variable libre, puis une base de Ker A.`
+    ? t('A = {MLm} a pour forme réduite R = {MLm2}. Écris le vecteur de chaque variable libre, puis une base de Ker A.', { MLm: MLm(d.A), MLm2: MLm(d.R) })
     : level === 5
-      ? `Soit ${mapML(d.A)}. Donne une base de Ker T : réduis sa matrice, puis écris Ker T = Span{…}.`
-      : `Donne une base de Ker A, pour A = ${MLm(d.A)}${level === 3 ? ' : choisis chaque opération, puis écris la base' : ''}.`;
+      ? t('Soit {mapML}. Donne une base de Ker T : réduis sa matrice, puis écris Ker T = Span{…}.', { mapML: mapML(d.A) })
+      : level === 3 ? t('Donne une base de Ker A, pour A = {A} : choisis chaque opération, puis écris la base.', { A: MLm(d.A) }) : t('Donne une base de Ker A, pour A = {A}.', { A: MLm(d.A) });
   return partsItem({
     skill: KER, level, prompt, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
     hints, subgoals: KER_SUB, key: `${KER}:${mt(d.A)}`, fallback: d.fallback,
@@ -483,26 +486,26 @@ function kernelExam(rng, exam) {
     const flip = signFlip(d);
     return mcqDistinct({
       skill: KER, level: 4, key: `mcq:${mt(d.A)}`, exam: tag,
-      prompt: `Soit A = ${MLm(d.A)}. Laquelle de ces familles est une base de Ker A ?`,
+      prompt: t('Soit A = {MLm}. Laquelle de ces familles est une base de Ker A ?', { MLm: MLm(d.A) }),
       right: Spn(d.K),
       wrongs: [famOpt(flip, 'l_ker_sign'), famOpt(nonZeroRows(d.R), 'l_ker_from_rows')].filter(notBasis(d.K)),
       fillers: [famOpt([d.K[0]]), famOpt(d.K.map((v) => v.map((x, i) => (i === d.pivots[0] ? x.add(1) : x)))), famOpt([d.K[0], d.K[0].map((x) => x.mul(2))])].filter(notBasis(d.K)),
-      solution: [{ html: `R = ${MLm(d.R)}`, note: 'Forme réduite' }, { html: `Ker A = ${Spn(d.K)}`, note: 'Une variable libre, un vecteur' }],
+      solution: [{ html: `R = ${MLm(d.R)}`, note: t('Forme réduite') }, { html: `Ker A = ${Spn(d.K)}`, note: t('Une variable libre, un vecteur') }],
     }, rng);
   }
   const which = rng.int(0, 3);
   if (which === 0) {
     return tfL({
       skill: KER, key: 'dimker', truth: true, exam: tag,
-      statement: 'dim Ker A est égal au nombre de colonnes de A sans pivot.',
-      explanation: 'Vrai : chaque colonne sans pivot donne une variable libre, et chaque variable libre un vecteur de base du noyau.',
+      statement: t('dim Ker A est égal au nombre de colonnes de A sans pivot.'),
+      explanation: t('Vrai : chaque colonne sans pivot donne une variable libre, et chaque variable libre un vecteur de base du noyau.'),
     });
   }
   if (which === 1) {
     return tfL({
       skill: KER, key: 'kerR', truth: true, exam: tag,
-      statement: 'Si R est la forme échelonnée réduite de A, alors Ker A = Ker R.',
-      explanation: 'Vrai : les opérations sur les lignes ne changent pas l\'ensemble des solutions de Ax = 0.',
+      statement: t('Si R est la forme échelonnée réduite de A, alors Ker A = Ker R.'),
+      explanation: t('Vrai : les opérations sur les lignes ne changent pas l\'ensemble des solutions de Ax = 0.'),
     });
   }
   // 2021 Q25: these vectors form a basis of Ker A (true, or a sign wrong).
@@ -511,9 +514,9 @@ function kernelExam(rng, exam) {
   const bad = F.find((v) => MX.matVec(d.A, v).some((x) => x.n !== 0));
   return tfL({
     skill: KER, key: `fam:${mt(d.A)}:${famT(F)}`, truth, exam: tag, ...(truth ? {} : { ruleIfTrue: 'l_ker_sign' }),
-    statement: `Soit A = ${MLm(d.A)}, de forme réduite R = ${MLm(d.R)}. Les vecteurs ${ML(famT(F))} forment une base de Ker A.`,
+    statement: t('Soit A = {MLm}, de forme réduite R = {MLm2}. Les vecteurs {ML} forment une base de Ker A.', { MLm: MLm(d.A), MLm2: MLm(d.R), ML: ML(famT(F)) }),
     ...(truth ? {} : { counter: { kind: 'vecFamily', params: { want: 'notInKer', A: mt(d.A), F: F.map(vt) }, ask: [{ v: 'v', label: 'v =' }], answer: { v: vt(bad) } } }),
-    explanation: truth ? `Vrai : ces deux vecteurs sont dans Ker A (A·v = 0) et libres, et dim Ker A = 2.` : `Faux : A·${MLv(bad)} ≠ 0. Une base est ${Spn(d.K)}.`,
+    explanation: truth ? t('Vrai : ces deux vecteurs sont dans Ker A (A·v = 0) et libres, et dim Ker A = 2.') : t('Faux : A·{MLv} ≠ 0. Une base est {Spn}.', { MLv: MLv(bad), Spn: Spn(d.K) }),
   });
 }
 
@@ -521,8 +524,8 @@ function kernelExam(rng, exam) {
 
 const COL = 'l-vs-col-row';
 const COL_SUB = [
-  { id: 'reduce', label: 'réduire', skill: 'l-sys-rref' },
-  { id: 'pivots', label: 'colonnes pivots', skill: COL },
+  { id: 'reduce', label: t('réduire'), skill: 'l-sys-rref' },
+  { id: 'pivots', label: t('colonnes pivots'), skill: COL },
 ];
 const colBasisOf = (d) => d.pivots.map((j) => MX.col(d.A, j));
 
@@ -530,28 +533,28 @@ function colRowParts(d, level, rng, { rows = true, ker = false } = {}) {
   const parts = [];
   const pc = d.pivots.map((j) => j + 1);
   if (level <= 2) {
-    const line = { kind: 'eq', math: vt(pc), note: 'Lues sur R', subgoal: 'pivots' };
-    parts.push({ judge: { kind: 'mat', expect: vt(pc) }, start: 'colonnes', html: 'Les numéros des colonnes pivots, lus sur R, sous la forme (1 ; 3)', lines: [level === 1 ? withCells(line, pc.map((_, i) => [i, 0])) : line] });
+    const line = { kind: 'eq', math: vt(pc), note: t('Lues sur R'), subgoal: 'pivots' };
+    parts.push({ judge: { kind: 'mat', expect: vt(pc) }, start: 'colonnes', html: t('Les numéros des colonnes pivots, lus sur R, sous la forme (1 ; 3)'), lines: [level === 1 ? withCells(line, pc.map((_, i) => [i, 0])) : line] });
   } else parts.push(rrefPart(d.A, d.ops, level, rng));
   const colPart = {
-    judge: { kind: 'span', basis: colBasisOf(d).map(vt), require: 'basis' }, start: mt(d.A), html: 'Une base de Col A', ask: 'Col A =',
-    lines: [{ kind: 'eq', math: `Col A = Span{${famT(colBasisOf(d))}}`, note: `Colonnes ${join(pc.map(String))} de A`, subgoal: 'pivots' }],
+    judge: { kind: 'span', basis: colBasisOf(d).map(vt), require: 'basis' }, start: mt(d.A), html: t('Une base de Col A'), ask: 'Col A =',
+    lines: [{ kind: 'eq', math: `Col A = Span{${famT(colBasisOf(d))}}`, note: t('Colonnes {join} de A', { join: join(pc.map(String)) }), subgoal: 'pivots' }],
   };
   const rowPart = {
-    judge: { kind: 'span', basis: nonZeroRows(d.R).map(vt), require: 'basis', rowsA: mt(d.A) }, start: mt(d.R), html: 'Une base de Lgn A (lignes écrites en colonnes)', ask: 'Lgn A =',
-    lines: [{ kind: 'eq', math: `Lgn A = Span{${famT(nonZeroRows(d.R))}}`, note: 'Lignes non nulles de R', subgoal: 'pivots' }],
+    judge: { kind: 'span', basis: nonZeroRows(d.R).map(vt), require: 'basis', rowsA: mt(d.A) }, start: mt(d.R), html: t('Une base de Lgn A (lignes écrites en colonnes)'), ask: t('Lgn A ='),
+    lines: [{ kind: 'eq', math: `Lgn A = Span{${famT(nonZeroRows(d.R))}}`, note: t('Lignes non nulles de R'), subgoal: 'pivots' }],
   };
   if (level === 2) {
     colPart.lines.unshift({
-      kind: 'decision', prompt: 'Où prendre les vecteurs de Col A ?', options: [
-        { id: 'A', label: 'Les colonnes pivots de A', valid: true },
-        { id: 'R', label: 'Les colonnes pivots de R', valid: false, rule: 'l_col_from_rref', why: 'Les opérations sur les lignes changent l\'espace des colonnes : les pivots disent quelles colonnes garder, les vecteurs se prennent dans A.' },
+      kind: 'decision', prompt: t('Où prendre les vecteurs de Col A ?'), options: [
+        { id: 'A', label: t('Les colonnes pivots de A'), valid: true },
+        { id: 'R', label: t('Les colonnes pivots de R'), valid: false, rule: 'l_col_from_rref', why: t('Les opérations sur les lignes changent l\'espace des colonnes : les pivots disent quelles colonnes garder, les vecteurs se prennent dans A.') },
       ],
     });
     rowPart.lines.unshift({
-      kind: 'decision', prompt: 'Où prendre les vecteurs de Lgn A ?', options: [
-        { id: 'R', label: 'Les lignes non nulles de R', valid: true },
-        { id: 'A', label: 'Les lignes de A aux positions des lignes pivots de R', valid: false, rule: 'l_row_from_A', why: 'Les opérations ont mélangé les lignes : celles de A à ces positions peuvent être liées. Les lignes non nulles de R forment toujours une base.' },
+      kind: 'decision', prompt: t('Où prendre les vecteurs de Lgn A ?'), options: [
+        { id: 'R', label: t('Les lignes non nulles de R'), valid: true },
+        { id: 'A', label: t('Les lignes de A aux positions des lignes pivots de R'), valid: false, rule: 'l_row_from_A', why: t('Les opérations ont mélangé les lignes : celles de A à ces positions peuvent être liées. Les lignes non nulles de R forment toujours une base.') },
       ],
     });
   }
@@ -559,8 +562,8 @@ function colRowParts(d, level, rng, { rows = true, ker = false } = {}) {
   if (rows) parts.push(rowPart);
   if (ker) {
     parts.push({
-      judge: { kind: 'span', basis: d.K.map(vt), require: 'basis' }, start: mt(d.R), html: 'Une base de Ker A', ask: 'Ker A =',
-      lines: [{ kind: 'eq', math: `Ker A = Span{${famT(d.K)}}`, note: `rang A + dim Ker A = ${d.pivots.length} + ${d.K.length} = ${d.n}`, subgoal: 'pivots' }],
+      judge: { kind: 'span', basis: d.K.map(vt), require: 'basis' }, start: mt(d.R), html: t('Une base de Ker A'), ask: 'Ker A =',
+      lines: [{ kind: 'eq', math: `Ker A = Span{${famT(d.K)}}`, note: t('rang A + dim Ker A = {length} + {length2} = {n}', { length: d.pivots.length, length2: d.K.length, n: d.n }), subgoal: 'pivots' }],
     });
   }
   return parts;
@@ -573,15 +576,17 @@ function colRowItem(level, rng) {
   const parts = colRowParts(d, level, rng, { rows: level !== 1, ker: level === 3 || level === 5 });
   const images = level >= 4 && rng.chance(0.5);
   const hints = [
-    { level: 1, html: 'Les pivots se lisent sur R, mais les vecteurs de Col A se prennent dans A. Lgn A : les lignes non nulles de R.' },
-    { level: 2, html: `Col A = Span{${d.pivots.map((j) => `a${sub(j + 1)}`).join(', ')}}, avec les colonnes de A.` },
+    { level: 1, html: t('Les pivots se lisent sur R, mais les vecteurs de Col A se prennent dans A. Lgn A : les lignes non nulles de R.') },
+    { level: 2, html: t('Col A = Span{{x}}, avec les colonnes de A.', { x: d.pivots.map((j) => `a${sub(j + 1)}`).join(', ') }) },
     { level: 3, html: `Col A = ${Spn(colBasisOf(d))}` },
   ];
-  const what = level === 1 ? 'Col A' : level === 3 || level === 5 ? 'Col A, Lgn A et Ker A' : 'Col A et Lgn A';
-  const Aname = images ? `T : ℝ${sup(d.n)} → ℝ${sup(d.m)} telle que ${colsOf(d.A).map((c, j) => `T(e${sub(j + 1)}) = ${MLv(c)}`).join(', ')}` : `A = ${MLm(d.A)}`;
+  const what = level === 1 ? 'Col A' : level === 3 || level === 5 ? t('Col A, Lgn A et Ker A') : t('Col A et Lgn A');
+  const Aname = images ? t('T : ℝ{sup} → ℝ{sup2} telle que {colsOf}', { sup: sup(d.n), sup2: sup(d.m), colsOf: colsOf(d.A).map((c, j) => `T(e${sub(j + 1)}) = ${MLv(c)}`).join(', ') }) : `A = ${MLm(d.A)}`;
   const prompt = level <= 2
-    ? `A = ${MLm(d.A)} a pour forme réduite R = ${MLm(d.R)}. Donne les colonnes pivots, puis une base de ${what}.`
-    : `Soit ${Aname}${images ? ', et A sa matrice canonique (Col A = Im T)' : ''}. Réduis A, puis donne une base de ${what}${level === 3 ? ' : choisis chaque opération' : ''}.`;
+    ? t('A = {MLm} a pour forme réduite R = {MLm2}. Donne les colonnes pivots, puis une base de {what}.', { MLm: MLm(d.A), MLm2: MLm(d.R), what })
+    : images
+      ? (level === 3 ? t('Soit {Aname}, et A sa matrice canonique (Col A = Im T). Réduis A, puis donne une base de {what} : choisis chaque opération.', { Aname, what }) : t('Soit {Aname}, et A sa matrice canonique (Col A = Im T). Réduis A, puis donne une base de {what}.', { Aname, what }))
+      : (level === 3 ? t('Soit {Aname}. Réduis A, puis donne une base de {what} : choisis chaque opération.', { Aname, what }) : t('Soit {Aname}. Réduis A, puis donne une base de {what}.', { Aname, what }));
   return partsItem({
     skill: COL, level, prompt, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
     hints, subgoals: COL_SUB, key: `${COL}:${mt(d.A)}`, fallback: d.fallback,
@@ -597,26 +602,26 @@ function colRowExam(rng, exam) {
     const nonPiv = freeOf(d).map((j) => MX.col(d.A, j));
     return mcqDistinct({
       skill: COL, level: 4, key: `mcq:${mt(d.A)}`, exam: tag,
-      prompt: `Soit T(x) = Ax avec A = ${MLm(d.A)}, de forme réduite R = ${MLm(d.R)}. Laquelle de ces familles est une base de Im T ?`,
+      prompt: t('Soit T(x) = Ax avec A = {MLm}, de forme réduite R = {MLm2}. Laquelle de ces familles est une base de Im T ?', { MLm: MLm(d.A), MLm2: MLm(d.R) }),
       right: Spn(cols),
       wrongs: [famOpt(rCols, 'l_col_from_rref'), famOpt(nonPiv.slice(0, 2))].filter(notBasis(cols)),
       fillers: [famOpt([cols[0]]), famOpt([cols[0], cols[0].map((x, i) => x.add(rCols[1][i]))]), famOpt([cols[0], cols[0].map((x) => x.mul(-2))]), famOpt([nonPiv[0], rCols[1]])].filter(notBasis(cols)),
-      solution: [{ html: `Pivots en colonnes ${join(d.pivots.map((j) => String(j + 1)))}`, note: 'Lus sur R' }, { html: `Im T = Col A = ${Spn(cols)}`, note: 'Colonnes pivots de A' }],
+      solution: [{ html: t('Pivots en colonnes {join}', { join: join(d.pivots.map((j) => String(j + 1))) }), note: t('Lus sur R') }, { html: `Im T = Col A = ${Spn(cols)}`, note: t('Colonnes pivots de A') }],
     }, rng);
   }
   if (rng.chance(0.5)) {
     return tfL({
       skill: COL, key: 'dimcolrow', truth: true, exam: tag,
-      statement: 'Pour toute matrice A, dim Col A = dim Lgn A.',
-      explanation: 'Vrai : les deux dimensions valent le nombre de pivots, le rang de A.',
+      statement: t('Pour toute matrice A, dim Col A = dim Lgn A.'),
+      explanation: t('Vrai : les deux dimensions valent le nombre de pivots, le rang de A.'),
     });
   }
   const A = rng.pick([[[1, 1], [1, 1]], [[1, 2], [2, 4]], [[1, 0], [1, 0]]]);
   return tfL({
     skill: COL, key: `rrefcols:${mt(A)}`, truth: false, exam: tag, ruleIfTrue: 'l_col_from_rref',
-    statement: 'Si R est la forme échelonnée réduite de A, les colonnes pivots de R forment une base de Col A.',
+    statement: t('Si R est la forme échelonnée réduite de A, les colonnes pivots de R forment une base de Col A.'),
     counter: { kind: 'matOne', params: { want: 'rrefColsNotBasis' }, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: mt(A) } },
-    explanation: `Faux : pour A = ${MLm(MX.mat(A))}, R = ${MLm(MX.rref(MX.mat(A)).R)} ; la colonne pivot de R, (1 ; 0), n'est pas dans Col A = Span{${ML(vt(MX.col(MX.mat(A), 0)))}}.`,
+    explanation: t('Faux : pour A = {MLm}, R = {MLm2} ; la colonne pivot de R, (1 ; 0), n\'est pas dans Col A = Span{{ML}}.', { MLm: MLm(MX.mat(A)), MLm2: MLm(MX.rref(MX.mat(A)).R), ML: ML(vt(MX.col(MX.mat(A), 0))) }),
   });
 }
 
@@ -626,15 +631,15 @@ function colRowExam(rng, exam) {
 
 const BASIS = 'l-vs-basis';
 const BASIS_SUB = [
-  { id: 'coords', label: 'coordonnées', skill: 'l-vs-coords' },
-  { id: 'echelon', label: 'échelonner', skill: 'l-sys-echelon' },
-  { id: 'extract', label: 'extraire', skill: BASIS },
+  { id: 'coords', label: t('coordonnées'), skill: 'l-vs-coords' },
+  { id: 'echelon', label: t('échelonner'), skill: 'l-sys-echelon' },
+  { id: 'extract', label: t('extraire'), skill: BASIS },
 ];
 
 // Four vectors of P₃ or M₂ₓ₂ (coordinates in the columns of M): a basis,
 // or three free vectors and a combination of them (coefficients ±1, ±2).
 function basisData(rng, { dep = rng.chance(0.6), maxOps = 6 } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const sp = rng.pick(['P3', 'M22']);
     const U = colsOf(unimodular(4, rng, { max: 2 }));
     let vs;
@@ -663,44 +668,47 @@ const famShow = (d, vs = d.vs) => vs.map((v) => elShow(d.sp, v)).join(', ');
 function basisItem(level, rng) {
   const d = basisData(rng, { maxOps: level >= 4 ? 8 : 6 });
   const S = SPACES[d.sp];
-  const coordsLine = { kind: 'eq', math: mt(d.M), note: `Coordonnées en colonnes (${S.what})`, subgoal: 'coords' };
+  const coordsLine = { kind: 'eq', math: mt(d.M), note: t('Coordonnées en colonnes ({what})', { what: S.what }), subgoal: 'coords' };
   const parts = [{
-    judge: { kind: 'mat', expect: mt(d.M) }, start: 'Coordonnées', html: 'La matrice des coordonnées, un vecteur par colonne',
+    judge: { kind: 'mat', expect: mt(d.M) }, start: 'Coordonnées', html: t('La matrice des coordonnées, un vecteur par colonne'),
     lines: [level === 1 ? withCells(coordsLine, pickCells(d.M, [0, 1, 2, 3], 4, rng)) : coordsLine],
   }];
-  const ech = opLines(d.M, d.ops, { note: (op) => (op.kind === 'swap' ? 'Échanger' : `Annuler sous le pivot : ${opR(op)}`), subgoal: 'echelon' });
+  const ech = opLines(d.M, d.ops, { note: (op) => (op.kind === 'swap' ? t('Échanger') : t('Annuler sous le pivot : {opR}', { opR: opR(op) })), subgoal: 'echelon' });
   parts.push({
-    judge: { kind: 'rowops', goal: 'echelon', multi: level >= 4 }, start: mt(d.M), html: 'Échelonne la matrice des coordonnées',
+    judge: { kind: 'rowops', goal: 'echelon', multi: level >= 4 }, start: mt(d.M), html: t('Échelonne la matrice des coordonnées'),
     lines: ech.map((l) => (level <= 2 && l.op.kind !== 'swap' ? withCells(l, pickCells(l.result, [l.op.i], 2, rng)) : l)).map(({ result, op, ...l }) => l),
   });
   parts.push({
-    judge: { kind: 'value', expect: String(d.r) }, start: 'r', html: 'Le rang de la famille', ask: 'rang =',
-    lines: [{ kind: 'eq', math: String(d.r), note: d.dep ? `${d.r} pivots pour 4 vecteurs : pas une base de ${S.label}` : `4 pivots : une base de ${S.label}`, subgoal: 'extract' }],
+    judge: { kind: 'value', expect: String(d.r) }, start: 'r', html: t('Le rang de la famille'), ask: t('rang ='),
+    lines: [{ kind: 'eq', math: String(d.r), note: d.dep ? t('{r} pivots pour 4 vecteurs : pas une base de {label}', { r: d.r, label: S.label }) : t('4 pivots : une base de {label}', { label: S.label }), subgoal: 'extract' }],
   });
   if (d.dep) {
     const keep = d.pivots.map((j) => d.vs[j]);
     parts.push({
-      judge: { kind: 'span', basis: keep.map(vt), require: 'basis' }, start: mt(d.M), html: 'Une base du Span de la famille (en coordonnées)', ask: 'base =',
-      lines: [{ kind: 'eq', math: `Span{${famT(keep)}}`, note: `Les vecteurs ${join(d.pivots.map((j) => String(j + 1)))} (colonnes pivots) : dimension ${d.r}`, subgoal: 'extract' }],
+      judge: { kind: 'span', basis: keep.map(vt), require: 'basis' }, start: mt(d.M), html: t('Une base du Span de la famille (en coordonnées)'), ask: t('base ='),
+      lines: [{ kind: 'eq', math: `Span{${famT(keep)}}`, note: t('Les vecteurs {join} (colonnes pivots) : dimension {r}', { join: join(d.pivots.map((j) => String(j + 1))), r: d.r }), subgoal: 'extract' }],
     });
   }
   if (level === 2) {
     parts[0].lines.unshift({
-      kind: 'decision', prompt: `Quel critère décide si ces 4 vecteurs forment une base de ${S.label} (de dimension 4) ?`, options: [
-        { id: 'rank', label: 'Ils sont libres : la matrice des coordonnées a 4 pivots', valid: true },
-        { id: 'count', label: `Il y en a 4 et dim ${S.label} = 4 : c'est toujours une base`, valid: false, rule: 'l_span_count', why: 'Le nombre ne suffit pas : 4 vecteurs peuvent être liés. Il faut 4 pivots.' },
-        { id: 'zero', label: 'Aucun n\'est nul', valid: false, why: 'Des vecteurs non nuls peuvent être liés (l\'un combinaison des autres).' },
+      kind: 'decision', prompt: t('Quel critère décide si ces 4 vecteurs forment une base de {label} (de dimension 4) ?', { label: S.label }), options: [
+        { id: 'rank', label: t('Ils sont libres : la matrice des coordonnées a 4 pivots'), valid: true },
+        { id: 'count', label: t('Il y en a 4 et dim {label} = 4 : c\'est toujours une base', { label: S.label }), valid: false, rule: 'l_span_count', why: t('Le nombre ne suffit pas : 4 vecteurs peuvent être liés. Il faut 4 pivots.') },
+        { id: 'zero', label: t('Aucun n\'est nul'), valid: false, why: t('Des vecteurs non nuls peuvent être liés (l\'un combinaison des autres).') },
       ],
     });
   }
   const hints = [
-    { level: 1, html: 'Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span.' },
-    { level: 2, html: 'rang = □ : compte les pivots de la forme échelonnée.' },
-    { level: 3, html: d.dep ? `rang ${d.r} : pas une base ; base du Span : les vecteurs ${join(d.pivots.map((j) => String(j + 1)))}` : 'rang 4 : une base' },
+    { level: 1, html: t('Coordonnées en colonnes, puis pivots : 4 pivots ⇔ base. Sinon, les colonnes pivots donnent une base du Span.') },
+    { level: 2, html: t('rang = □ : compte les pivots de la forme échelonnée.') },
+    { level: 3, html: d.dep ? t('rang {r} : pas une base ; base du Span : les vecteurs {join}', { r: d.r, join: join(d.pivots.map((j) => String(j + 1))) }) : t('rang 4 : une base') },
   ];
   return partsItem({
     skill: BASIS, level,
-    prompt: `Les vecteurs ${famShow(d)} forment-ils une base de ${S.label} ? Écris leurs coordonnées en colonnes (${S.what}), échelonne, donne le rang${d.dep ? ', puis une base du Span de la famille' : ''}${level === 3 ? ' : choisis chaque opération' : ''}.`,
+    prompt: (d.dep
+      ? (level === 3 ? t('Les vecteurs {fam} forment-ils une base de {space} ? Écris leurs coordonnées en colonnes ({what}), échelonne, donne le rang, puis une base du Span de la famille : choisis chaque opération.', { fam: famShow(d), space: S.label, what: S.what }) : t('Les vecteurs {fam} forment-ils une base de {space} ? Écris leurs coordonnées en colonnes ({what}), échelonne, donne le rang, puis une base du Span de la famille.', { fam: famShow(d), space: S.label, what: S.what }))
+      : (level === 3 ? t('Les vecteurs {fam} forment-ils une base de {space} ? Écris leurs coordonnées en colonnes ({what}), échelonne, donne le rang : choisis chaque opération.', { fam: famShow(d), space: S.label, what: S.what }) : t('Les vecteurs {fam} forment-ils une base de {space} ? Écris leurs coordonnées en colonnes ({what}), échelonne, donne le rang.', { fam: famShow(d), space: S.label, what: S.what }))
+    ),
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
     hints, subgoals: BASIS_SUB, key: `${BASIS}:${mt(d.M)}`, fallback: d.fallback,
   }, parts);
@@ -714,11 +722,11 @@ function basisExam(rng, exam) {
     const opt = (k, rule = null) => ({ html: String(k), rule });
     return mcqDistinct({
       skill: BASIS, level: 4, key: `mcq:${mt(d.M)}`, exam: tag,
-      prompt: `Quelle est la dimension du sous-espace de ${S.label} engendré par ${famShow(d)} ?`,
+      prompt: t('Quelle est la dimension du sous-espace de {label} engendré par {famShow} ?', { label: S.label, famShow: famShow(d) }),
       right: String(d.r),
       wrongs: [opt(4, 'l_span_count')],
       fillers: [opt(d.r - 1), opt(d.r + 1), opt(d.r - 2), opt(5)].filter((o) => Number(o.html) >= 1),
-      solution: [{ html: `Coordonnées en colonnes : ${MLm(d.M)}`, note: '' }, { html: `Forme échelonnée : ${MLm(d.E)}`, note: `${d.r} pivots` }],
+      solution: [{ html: t('Coordonnées en colonnes : {MLm}', { MLm: MLm(d.M) }), note: '' }, { html: t('Forme échelonnée : {MLm}', { MLm: MLm(d.E) }), note: `${d.r} pivots` }],
     }, rng);
   }
   const which = rng.int(0, 2);
@@ -727,25 +735,25 @@ function basisExam(rng, exam) {
   if (which === 0) {
     return tfL({
       skill: BASIS, key: `indep:${n}`, truth: false, exam: tag,
-      statement: `Si dim V = ${n} et si S est une famille libre de V, alors S est une base de V.`,
+      statement: t('Si dim V = {n} et si S est une famille libre de V, alors S est une base de V.', { n }),
       counter: { kind: 'vecFamily', params: { want: 'indepNotBasis', n }, ask: [{ v: 'F', label: 'S =' }], answer: { F: vt(Array.from({ length: n }, (_, i) => (i === 0 ? 1 : 0))) } },
-      explanation: `Faux : une famille libre peut être trop petite. Dans ${R(n)}, S = {e₁} est libre mais n'engendre pas ${R(n)}.`,
+      explanation: t('Faux : une famille libre peut être trop petite. Dans {R}, S = {e₁} est libre mais n\'engendre pas {R}.', { R: R(n) }),
     });
   }
   if (which === 1) {
     const k = rng.pick([4, 5, 6]);
     return tfL({
       skill: BASIS, key: `count:${k}`, truth: true, exam: tag,
-      statement: `${k - 1} vecteurs de ${R(k)} ne peuvent pas engendrer ${R(k)}, mais ${k} vecteurs de ${R(k - 1)} peuvent engendrer ${R(k - 1)}.`,
-      explanation: `Vrai : il faut au moins ${k} vecteurs pour engendrer un espace de dimension ${k} ; ${k} vecteurs de ${R(k - 1)} peuvent l'engendrer (une base et un vecteur de plus).`,
+      statement: t('{x} vecteurs de {R} ne peuvent pas engendrer {R}, mais {k} vecteurs de {R2} peuvent engendrer {R2}.', { x: k - 1, R: R(k), k, R2: R(k - 1) }),
+      explanation: t('Vrai : il faut au moins {k} vecteurs pour engendrer un espace de dimension {k} ; {k} vecteurs de {R} peuvent l\'engendrer (une base et un vecteur de plus).', { k, R: R(k - 1) }),
     });
   }
   const F = n === 3 ? '(1 ; 0 ; 0), (1 ; 0 ; 0), (0 ; 0 ; 1)' : '(1 ; 0 ; 0 ; 0), (0 ; 1 ; 0 ; 0), (1 ; 1 ; 0 ; 0), (0 ; 0 ; 0 ; 1)';
   return tfL({
     skill: BASIS, key: `nvec:${n}`, truth: false, exam: tag, ruleIfTrue: 'l_span_count',
-    statement: `${n} vecteurs de ${R(n)} forment toujours une base de ${R(n)}.`,
-    counter: { kind: 'vecFamily', params: { want: 'spanNotBasis', n }, ask: [{ v: 'F', label: 'vecteurs =' }], answer: { F } },
-    explanation: `Faux : ${n} vecteurs peuvent être liés, par exemple ${ML(F)}.`,
+    statement: t('{n} vecteurs de {R} forment toujours une base de {R}.', { n, R: R(n) }),
+    counter: { kind: 'vecFamily', params: { want: 'spanNotBasis', n }, ask: [{ v: 'F', label: t('vecteurs =') }], answer: { F } },
+    explanation: t('Faux : {n} vecteurs peuvent être liés, par exemple {ML}.', { n, ML: ML(F) }),
   });
 }
 
@@ -754,7 +762,7 @@ function basisExam(rng, exam) {
 // ======================================================================
 
 const RANK = 'l-vs-rank';
-const RANK_SUB = [{ id: 'formula', label: 'théorème du rang', skill: RANK }];
+const RANK_SUB = [{ id: 'formula', label: t('théorème du rang'), skill: RANK }];
 
 // A value part: a number asked, with the wrong answer of the trap.
 function valPart({ ask, html, value, steps = [], note = '', wrong, ctx, menu: m }) {
@@ -786,17 +794,17 @@ function rankItem(level, rng) {
   let prompt;
   if (guided) {
     parts = [
-      valPart({ ask: 'dim Ker A =', html: 'dim Ker A', value: n - r, steps: steps(n, r), note: `n − r, avec n = ${n} colonnes`, wrong: m - r, ctx }),
-      valPart({ ask: 'dim Ker Aᵀ =', html: 'dim Ker Aᵀ', value: m - r, steps: steps(m, r), note: `m − r : Aᵀ a ${m} colonnes` }),
-      valPart({ ask: 'dim Lgn A =', html: 'dim Lgn A', value: r, note: 'dim Lgn A = dim Col A = rang A' }),
+      valPart({ ask: 'dim Ker A =', html: 'dim Ker A', value: n - r, steps: steps(n, r), note: t('n − r, avec n = {n} colonnes', { n }), wrong: m - r, ctx }),
+      valPart({ ask: 'dim Ker Aᵀ =', html: 'dim Ker Aᵀ', value: m - r, steps: steps(m, r), note: t('m − r : Aᵀ a {m} colonnes', { m }) }),
+      valPart({ ask: t('dim Lgn A ='), html: t('dim Lgn A'), value: r, note: t('dim Lgn A = dim Col A = rang A') }),
     ];
-    prompt = `A est une matrice ${m} × ${n} de rang ${r}. ${level === 1 ? 'Avec rang A + dim Ker A = n (n = nombre de colonnes), donne' : 'Donne'} dim Ker A, dim Ker Aᵀ et dim Lgn A.`;
+    prompt = level === 1 ? t('A est une matrice {m} × {n} de rang {r}. Avec rang A + dim Ker A = n (n = nombre de colonnes), donne dim Ker A, dim Ker Aᵀ et dim Lgn A.', { m, n, r }) : t('A est une matrice {m} × {n} de rang {r}. Donne dim Ker A, dim Ker Aᵀ et dim Lgn A.', { m, n, r });
     if (level === 2) {
       parts[0].lines.unshift({
-        kind: 'decision', prompt: 'Quelle formule donne dim Ker A ?', options: [
+        kind: 'decision', prompt: t('Quelle formule donne dim Ker A ?'), options: [
           { id: 'n', label: `n − r = ${n} − ${r}`, valid: true },
-          { id: 'm', label: `m − r = ${m} − ${r}`, valid: false, rule: 'l_rank_dim_confusion', why: `Le noyau vit dans l'espace de départ ℝ${sup(n)} : n = ${n}, le nombre de colonnes. m − r est dim Ker Aᵀ.` },
-          { id: 'r', label: `r = ${r}`, valid: false, why: 'r est la dimension de Col A et de Lgn A, pas celle du noyau.' },
+          { id: 'm', label: `m − r = ${m} − ${r}`, valid: false, rule: 'l_rank_dim_confusion', why: t('Le noyau vit dans l\'espace de départ ℝ{sup} : n = {n}, le nombre de colonnes. m − r est dim Ker Aᵀ.', { sup: sup(n), n }) },
+          { id: 'r', label: `r = ${r}`, valid: false, why: t('r est la dimension de Col A et de Lgn A, pas celle du noyau.') },
         ],
       });
     }
@@ -804,16 +812,16 @@ function rankItem(level, rng) {
     const k = n - r;
     const M3 = level === 3;
     parts = [
-      valPart({ ask: 'rang A =', html: 'Le rang', value: r, note: `n − dim Ker A = ${n} − ${k}`, wrong: m - k, ctx: { n, r }, menu: M3 ? menu('rang A = n − dim Ker A', { label: 'rang A = m − dim Ker A', rule: 'l_rank_dim_confusion', why: 'Le théorème du rang porte sur les colonnes : rang A + dim Ker A = n.' }) : null }),
-      valPart({ ask: 'dim Ker Aᵀ =', html: 'dim Ker Aᵀ', value: m - r, note: `m − rang A = ${m} − ${r}`, menu: M3 ? menu('dim Ker Aᵀ = m − rang A', { label: 'dim Ker Aᵀ = dim Ker A', why: 'Aᵀ est de taille n × m : son noyau est dans ℝᵐ, sa dimension est m − r.' }) : null }),
-      valPart({ ask: 'dim Lgn A =', html: 'dim Lgn A', value: r, note: 'rang des lignes = rang des colonnes', menu: M3 ? menu('dim Lgn A = rang A', { label: 'dim Lgn A = m', why: 'Les lignes peuvent être liées : la dimension est le rang.' }) : null }),
+      valPart({ ask: t('rang A ='), html: t('Le rang'), value: r, note: `n − dim Ker A = ${n} − ${k}`, wrong: m - k, ctx: { n, r }, menu: M3 ? menu(t('rang A = n − dim Ker A'), { label: t('rang A = m − dim Ker A'), rule: 'l_rank_dim_confusion', why: t('Le théorème du rang porte sur les colonnes : rang A + dim Ker A = n.') }) : null }),
+      valPart({ ask: 'dim Ker Aᵀ =', html: 'dim Ker Aᵀ', value: m - r, note: t('m − rang A = {m} − {r}', { m, r }), menu: M3 ? menu(t('dim Ker Aᵀ = m − rang A'), { label: 'dim Ker Aᵀ = dim Ker A', why: t('Aᵀ est de taille n × m : son noyau est dans ℝᵐ, sa dimension est m − r.') }) : null }),
+      valPart({ ask: t('dim Lgn A ='), html: t('dim Lgn A'), value: r, note: t('rang des lignes = rang des colonnes'), menu: M3 ? menu(t('dim Lgn A = rang A'), { label: t('dim Lgn A = m'), why: t('Les lignes peuvent être liées : la dimension est le rang.') }) : null }),
     ];
-    prompt = `A est une matrice ${m} × ${n}, et dim Ker A = ${k}. Donne le rang de A, dim Ker Aᵀ et dim Lgn A.`;
+    prompt = t('A est une matrice {m} × {n}, et dim Ker A = {k}. Donne le rang de A, dim Ker Aᵀ et dim Lgn A.', { m, n, k });
   }
   const hints = [
-    { level: 1, html: 'n est le nombre de colonnes, la dimension de départ : rang A + dim Ker A = n. Pour Aᵀ (n × m) : rang + dim Ker Aᵀ = m.' },
-    { level: 2, html: guided ? `dim Ker A = □ − ${r}` : `rang A = ${n} − □` },
-    { level: 3, html: guided ? `dim Ker A = ${n - r}` : `rang A = ${r}` },
+    { level: 1, html: t('n est le nombre de colonnes, la dimension de départ : rang A + dim Ker A = n. Pour Aᵀ (n × m) : rang + dim Ker Aᵀ = m.') },
+    { level: 2, html: guided ? `dim Ker A = □ − ${r}` : t('rang A = {n} − □', { n }) },
+    { level: 3, html: guided ? `dim Ker A = ${n - r}` : t('rang A = {r}', { r }) },
   ];
   return partsItem({
     skill: RANK, level, prompt, mode: guided ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null,
@@ -832,14 +840,14 @@ function rankMapItem(rng) {
   do { V = rng.pick(VSPACES.filter((x) => !x.rn)); W = rng.pick(VSPACES); } while (W.dim === V.dim);
   const r = rng.int(1, Math.min(V.dim, W.dim));
   const parts = [
-    { judge: { kind: 'value', expect: String(V.dim) }, start: 'k', html: `La dimension de ${V.label}`, ask: `dim ${V.label} =`, lines: [{ kind: 'eq', math: String(V.dim), note: V.poly ? `Base 1, t, …, t${sup(V.poly)} : ${V.dim} vecteurs` : 'Une coordonnée par case', subgoal: 'formula' }] },
+    { judge: { kind: 'value', expect: String(V.dim) }, start: 'k', html: t('La dimension de {label}', { label: V.label }), ask: `dim ${V.label} =`, lines: [{ kind: 'eq', math: String(V.dim), note: V.poly ? t('Base 1, t, …, t{sup} : {dim} vecteurs', { sup: sup(V.poly), dim: V.dim }) : t('Une coordonnée par case'), subgoal: 'formula' }] },
     valPart({ ask: 'dim Ker T =', html: 'dim Ker T', value: V.dim - r, note: `dim V − dim Im T = ${V.dim} − ${r}`, wrong: W.dim - r, ctx: { n: V.dim, r } }),
   ];
   return partsItem({
     skill: RANK, level: 4,
-    prompt: `T : ${V.label} → ${W.label} est linéaire et dim Im T = ${r}. Donne dim ${V.label}, puis dim Ker T.`,
+    prompt: t('T : {label} → {label2} est linéaire et dim Im T = {r}. Donne dim {label}, puis dim Ker T.', { label: V.label, label2: W.label, r }),
     mode: 'free', hints: [
-      { level: 1, html: 'dim Im T + dim Ker T = dim V, la dimension de l\'espace de <b>départ</b>.' },
+      { level: 1, html: t('dim Im T + dim Ker T = dim V, la dimension de l\'espace de <b>départ</b>.') },
       { level: 2, html: `dim Ker T = ${V.dim} − □` },
       { level: 3, html: `dim Ker T = ${V.dim - r}` },
     ],
@@ -854,11 +862,11 @@ function rankExam(rng, exam) {
     const opt = (k, rule = null) => ({ html: String(k), rule });
     return mcqDistinct({
       skill: RANK, level: 4, key: `mcq:${m}x${n}:${r}`, exam: tag,
-      prompt: `A est une matrice ${m} × ${n} et dim Col A = ${r}. Que vaut dim Ker Aᵀ ?`,
+      prompt: t('A est une matrice {m} × {n} et dim Col A = {r}. Que vaut dim Ker Aᵀ ?', { m, n, r }),
       right: String(m - r),
       wrongs: [opt(n - r, 'l_rank_dim_confusion'), opt(r), opt(m)],
       fillers: [opt(n), opt(m - r + 1), opt(Math.abs(m - n))],
-      solution: [{ html: `Aᵀ est ${n} × ${m}, de rang ${r} : dim Ker Aᵀ = ${m} − ${r} = ${m - r}`, note: '' }],
+      solution: [{ html: t('Aᵀ est {n} × {m}, de rang {r} : dim Ker Aᵀ = {m} − {r} = {x}', { n, m, r, x: m - r }), note: '' }],
     }, rng);
   }
   const which = rng.int(0, 3);
@@ -867,15 +875,15 @@ function rankExam(rng, exam) {
     const n = rng.int(2, 5);
     return tfL({
       skill: RANK, key: `kerfull:${m}x${n}`, truth: true, exam: tag,
-      statement: `Si A est une matrice ${m} × ${n} avec dim Ker A = ${n}, alors dim Im A = 0.`,
-      explanation: `Vrai : dim Im A = ${n} − dim Ker A = 0 (A est la matrice nulle).`,
+      statement: t('Si A est une matrice {m} × {n} avec dim Ker A = {n}, alors dim Im A = 0.', { m, n }),
+      explanation: t('Vrai : dim Im A = {n} − dim Ker A = 0 (A est la matrice nulle).', { n }),
     });
   }
   if (which === 1) {
     return tfL({
       skill: RANK, key: 'ata', truth: true, exam: tag,
-      statement: 'Pour toute matrice A, rang A = rang AᵀA.',
-      explanation: 'Vrai : Ker AᵀA = Ker A (si AᵀAx = 0, alors ‖Ax‖² = xᵀAᵀAx = 0), et les deux matrices ont n colonnes.',
+      statement: t('Pour toute matrice A, rang A = rang AᵀA.'),
+      explanation: t('Vrai : Ker AᵀA = Ker A (si AᵀAx = 0, alors ‖Ax‖² = xᵀAᵀAx = 0), et les deux matrices ont n colonnes.'),
     });
   }
   if (which === 2) {
@@ -883,15 +891,15 @@ function rankExam(rng, exam) {
     const n = m + rng.int(1, 3);
     return tfL({
       skill: RANK, key: `wide:${m}x${n}`, truth: true, exam: tag,
-      statement: `Une matrice ${m} × ${n} a un noyau de dimension au moins ${n - m}.`,
-      explanation: `Vrai : rang A ≤ ${m}, donc dim Ker A = ${n} − rang A ≥ ${n - m}.`,
+      statement: t('Une matrice {m} × {n} a un noyau de dimension au moins {x}.', { m, n, x: n - m }),
+      explanation: t('Vrai : rang A ≤ {m}, donc dim Ker A = {n} − rang A ≥ {x}.', { m, n, x: n - m }),
     });
   }
   return tfL({
     skill: RANK, key: 'mr', truth: false, exam: tag, ruleIfTrue: 'l_rank_dim_confusion',
-    statement: 'Pour toute matrice A de taille m × n et de rang r, dim Ker A = m − r.',
+    statement: t('Pour toute matrice A de taille m × n et de rang r, dim Ker A = m − r.'),
     counter: { kind: 'dims', params: { conds: ['m≠n'] }, ask: [{ v: 'm', label: 'm =' }, { v: 'n', label: 'n =' }, { v: 'r', label: 'r =' }], answer: { m: '2', n: '3', r: '1' } },
-    explanation: 'Faux : dim Ker A = n − r. Avec m = 2, n = 3, r = 1 : dim Ker A = 2, mais m − r = 1.',
+    explanation: t('Faux : dim Ker A = n − r. Avec m = 2, n = 3, r = 1 : dim Ker A = 2, mais m − r = 1.'),
   });
 }
 
@@ -901,14 +909,14 @@ function rankExam(rng, exam) {
 
 const COORD = 'l-vs-coords';
 const COORD_SUB = [
-  { id: 'reduce', label: 'réduire', skill: 'l-sys-rref' },
-  { id: 'identify', label: 'identifier', skill: COORD },
+  { id: 'reduce', label: t('réduire'), skill: 'l-sys-rref' },
+  { id: 'identify', label: t('identifier'), skill: COORD },
 ];
 
 // A basis B of ℝ³ or P₂ (columns of a unimodular matrix), coordinates c
 // whole in [−6 ; 6], x = Bc.
 function coordsData(rng, { sp = rng.pick(['R3', 'P2']), maxOps = 7 } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const B = unimodular(3, rng, { max: 2 });
     const c = [rng.int(-6, 6), rng.int(-6, 6), rng.int(-6, 6)].map((x) => q(x));
     if (c.some((x) => x.n === 0) || c.every((x) => Math.abs(x.valueOf()) < 2)) continue;
@@ -929,7 +937,7 @@ function coordsData(rng, { sp = rng.pick(['R3', 'P2']), maxOps = 7 } = {}) {
 }
 const xName = (d) => (d.sp === 'P2' ? 'p' : 'x');
 const basisShow = (d) => `B = (${d.bs.map((b) => elShow(d.sp, b)).join(', ')})`;
-const ord = (i) => ['1re', '2e', '3e'][i];
+const ord = (i) => [t('1re'), t('2e'), t('3e')][i];
 
 function coordsItem(level, rng) {
   if (level === 5 && rng.chance(0.5)) return coordsBack(rng);
@@ -939,25 +947,28 @@ function coordsItem(level, rng) {
   const cLine = { kind: 'eq', math: vt(d.c), note: `${X} = ${linText(d.c, ['b₁', 'b₂', 'b₃'])}`, subgoal: 'identify' };
   parts.push({
     judge: { kind: 'mat', expect: vt(d.c), wrong: { l_coords_canonical: [vt(d.x)], l_change_basis_direction: [vt(d.Bx)] } },
-    start: `[${X}]_B = ?`, html: `Les coordonnées de ${X} dans B`, ask: `[${X}]_B =`,
+    start: `[${X}]_B = ?`, html: t('Les coordonnées de {X} dans B', { X }), ask: `[${X}]_B =`,
     lines: [level === 1 ? withCells(cLine, [[0, 0], [1, 0], [2, 0]]) : cLine],
   });
   if (level === 2) {
     parts[0].lines.unshift({
-      kind: 'decision', prompt: `Comment obtenir [${X}]_B ?`, options: [
-        { id: 'solve', label: `Écrire ${X} = c₁b₁ + c₂b₂ + c₃b₃ : réduire [b₁ b₂ b₃ | ${X}]`, valid: true },
-        { id: 'read', label: `Lire les coefficients de ${X}`, valid: false, rule: 'l_coords_canonical', why: `Les coefficients de ${X} sont ses coordonnées dans la base canonique, pas dans B.` },
+      kind: 'decision', prompt: t('Comment obtenir [{X}]_B ?', { X }), options: [
+        { id: 'solve', label: t('Écrire {X} = c₁b₁ + c₂b₂ + c₃b₃ : réduire [b₁ b₂ b₃ | {X}]', { X }), valid: true },
+        { id: 'read', label: t('Lire les coefficients de {X}', { X }), valid: false, rule: 'l_coords_canonical', why: t('Les coefficients de {X} sont ses coordonnées dans la base canonique, pas dans B.', { X }) },
       ],
     });
   }
   const hints = [
-    { level: 1, html: `Écris ${X} comme combinaison des vecteurs de B : c'est le système de matrice augmentée [b₁ b₂ b₃ | ${X}]${d.sp === 'P2' ? ', coefficient par coefficient de 1, t, t²' : ''}.` },
+    { level: 1, html: d.sp === 'P2' ? t('Écris {X} comme combinaison des vecteurs de B : c\'est le système de matrice augmentée [b₁ b₂ b₃ | {X}], coefficient par coefficient de 1, t, t².', { X }) : t('Écris {X} comme combinaison des vecteurs de B : c\'est le système de matrice augmentée [b₁ b₂ b₃ | {X}].', { X }) },
     { level: 2, html: `[${X}]_B = (□ ; □ ; ${fq(d.c[2])})` },
     { level: 3, html: `[${X}]_B = ${MLv(d.c)}` },
   ];
   return partsItem({
     skill: COORD, level,
-    prompt: `${basisShow(d)} est une base de ${SPACES[d.sp].label}. Trouve les coordonnées de ${X} = ${elShow(d.sp, d.x)} dans B : réduis [b₁ b₂ b₃ | ${X}]${d.sp === 'P2' ? ' (coefficients dans 1, t, t²)' : ''}${level === 3 ? ', en choisissant chaque opération' : ''}.`,
+    prompt: (d.sp === 'P2'
+      ? (level === 3 ? t('{basis} est une base de {space}. Trouve les coordonnées de {X} = {el} dans B : réduis [b₁ b₂ b₃ | {X}] (coefficients dans 1, t, t²), en choisissant chaque opération.', { basis: basisShow(d), space: SPACES[d.sp].label, X, el: elShow(d.sp, d.x) }) : t('{basis} est une base de {space}. Trouve les coordonnées de {X} = {el} dans B : réduis [b₁ b₂ b₃ | {X}] (coefficients dans 1, t, t²).', { basis: basisShow(d), space: SPACES[d.sp].label, X, el: elShow(d.sp, d.x) }))
+      : (level === 3 ? t('{basis} est une base de {space}. Trouve les coordonnées de {X} = {el} dans B : réduis [b₁ b₂ b₃ | {X}], en choisissant chaque opération.', { basis: basisShow(d), space: SPACES[d.sp].label, X, el: elShow(d.sp, d.x) }) : t('{basis} est une base de {space}. Trouve les coordonnées de {X} = {el} dans B : réduis [b₁ b₂ b₃ | {X}].', { basis: basisShow(d), space: SPACES[d.sp].label, X, el: elShow(d.sp, d.x) }))
+    ),
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
     hints, subgoals: COORD_SUB, key: `${COORD}:${mt(d.Ax)}`, fallback: d.fallback,
   }, parts);
@@ -970,7 +981,9 @@ function coordsBack(rng) {
   const comb = d.c.map((ci, j) => `${qt(ci)}·${vt(d.bs[j])}`).join('+').replace(/\+-/g, '-');
   return partsItem({
     skill: COORD, level: 5,
-    prompt: `${basisShow(d)} est une base de ${SPACES[d.sp].label}, et [${X}]_B = ${MLv(d.c)}. Trouve ${X}${d.sp === 'P2' ? ' (ses coefficients dans 1, t, t²)' : ''}.`,
+    prompt: d.sp === 'P2'
+      ? t('{basis} est une base de {space}, et [{X}]_B = {c}. Trouve {X} (ses coefficients dans 1, t, t²).', { basis: basisShow(d), space: SPACES[d.sp].label, X, c: MLv(d.c) })
+      : t('{basis} est une base de {space}, et [{X}]_B = {c}. Trouve {X}.', { basis: basisShow(d), space: SPACES[d.sp].label, X, c: MLv(d.c) }),
     mode: 'free', hints: [], subgoals: COORD_SUB, key: `${COORD}:back:${mt(d.Ax)}`, fallback: d.fallback,
   }, [{
     judge: { kind: 'mat', expect: vt(d.x) }, start: `${X} = ?`,
@@ -982,12 +995,12 @@ function coordsExam(rng, exam) {
   const d = coordsData(rng);
   const X = xName(d);
   const tag = examTag({ exam });
-  const q0 = `${basisShow(d)} est une base de ${SPACES[d.sp].label} et ${X} = ${elShow(d.sp, d.x)}.`;
+  const q0 = t('{basisShow} est une base de {label} et {X} = {elShow}.', { basisShow: basisShow(d), label: SPACES[d.sp].label, X, elShow: elShow(d.sp, d.x) });
   const sol = [{ html: `${X} = ${d.c.map((ci, j) => `(${fq(ci)})·${elShow(d.sp, d.bs[j])}`).join(' + ')}`, note: '' }, { html: `[${X}]_B = ${MLv(d.c)}`, note: '' }];
   if (exam === 'coef') {
     const i = rng.pick([0, 1, 2].filter((k) => !d.x[k].eq(d.c[k])));
     return coefItem({
-      skill: COORD, level: 4, prompt: `${q0} Que vaut la ${ord(i)} coordonnée c${sub(i + 1)} de ${X} dans B ?`,
+      skill: COORD, level: 4, prompt: t('{q0} Que vaut la {ord} coordonnée c{sub} de {X} dans B ?', { q0, ord: ord(i), sub: sub(i + 1), X }),
       label: `c_${i + 1}`, value: qt(d.c[i]), key: `${mt(d.Ax)}:${i}`, exam: tag, askCoef: { label: `c${sub(i + 1)}`, path: [i, 0] },
       traps: [{ rule: 'l_coords_canonical' }], solution: sol, fallback: d.fallback,
     });
@@ -995,7 +1008,7 @@ function coordsExam(rng, exam) {
   if (exam === 'mcq') {
     return mcqDistinct({
       skill: COORD, level: 4, key: `mcq:${mt(d.Ax)}`, exam: tag,
-      prompt: `${q0} Que vaut [${X}]_B ?`,
+      prompt: t('{q0} Que vaut [{X}]_B ?', { q0, X }),
       right: MLv(d.c),
       wrongs: [{ html: MLv(d.x), rule: 'l_coords_canonical' }, { html: MLv(d.Bx), rule: 'l_change_basis_direction' }],
       fillers: [{ html: MLv(d.c.map((x, i) => (i === 0 ? x.neg() : x))) }, { html: MLv([d.c[1], d.c[0], d.c[2]]) }, { html: MLv(d.c.map((x, i) => (i === 2 ? x.neg() : x))) }],
@@ -1005,8 +1018,8 @@ function coordsExam(rng, exam) {
   if (rng.chance(0.25)) {
     return tfL({
       skill: COORD, key: 'unique', truth: true, exam: tag,
-      statement: 'Si B est une base de V, chaque vecteur de V a une seule suite de coordonnées dans B.',
-      explanation: 'Vrai : si x = Σcᵢbᵢ = Σdᵢbᵢ, alors Σ(cᵢ − dᵢ)bᵢ = 0, et la famille est libre : cᵢ = dᵢ.',
+      statement: t('Si B est une base de V, chaque vecteur de V a une seule suite de coordonnées dans B.'),
+      explanation: t('Vrai : si x = Σcᵢbᵢ = Σdᵢbᵢ, alors Σ(cᵢ − dᵢ)bᵢ = 0, et la famille est libre : cᵢ = dᵢ.'),
     });
   }
   const i = rng.int(0, 2);
@@ -1014,9 +1027,9 @@ function coordsExam(rng, exam) {
   const claim = truth ? d.c[i] : d.x[i];
   return tfL({
     skill: COORD, key: `comp:${mt(d.Ax)}:${i}:${truth}`, truth, exam: tag, ...(truth ? {} : { ruleIfTrue: 'l_coords_canonical' }),
-    statement: `${q0} La ${ord(i)} coordonnée de ${X} dans B vaut ${fq(claim)}.`,
+    statement: t('{q0} La {ord} coordonnée de {X} dans B vaut {fq}.', { q0, ord: ord(i), X, fq: fq(claim) }),
     ...(truth ? {} : { counter: { kind: 'vecFamily', params: { want: 'coordsWitness', B: d.bs.map(vt), x: vt(d.x), i, claim: claim.valueOf() }, ask: [{ v: 'c', label: `[${X}]_B =` }], answer: { c: vt(d.c) } } }),
-    explanation: `${truth ? 'Vrai' : 'Faux'} : [${X}]_B = ${MLv(d.c)}${truth ? '' : `. ${fq(claim)} est la coordonnée dans la base canonique`}.`,
+    explanation: truth ? t('Vrai : [{X}]_B = {c}.', { X, c: MLv(d.c) }) : t('Faux : [{X}]_B = {c}. {k} est la coordonnée dans la base canonique.', { X, c: MLv(d.c), k: fq(claim) }),
   });
 }
 
@@ -1026,9 +1039,9 @@ function coordsExam(rng, exam) {
 
 const MAPM = 'l-vs-map-matrix';
 const MAPM_SUB = [
-  { id: 'images', label: 'images', skill: 'l-map-std-matrix' },
-  { id: 'coords', label: 'coordonnées', skill: 'l-vs-coords' },
-  { id: 'place', label: 'placer en colonnes', skill: MAPM },
+  { id: 'images', label: t('images'), skill: 'l-map-std-matrix' },
+  { id: 'coords', label: t('coordonnées'), skill: 'l-vs-coords' },
+  { id: 'place', label: t('placer en colonnes'), skill: MAPM },
 ];
 const ABC = ['a', 'b', 'c'];
 
@@ -1036,7 +1049,7 @@ const ABC = ['a', 'b', 'c'];
 // coefficients; B = polyBasis(2) at the start, the canonical basis at the
 // end: [T]_{C B} = AT·B.
 function mapData(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const AT = Array.from({ length: 3 }, () => Array.from({ length: 3 }, () => q(rng.int(-2, 2))));
     if (AT.some((r) => r.filter((x) => x.n !== 0).length === 0) || AT.flat().filter((x) => x.n !== 0).length < 4) continue;
     const { M: B, polys } = polyBasis(2, rng);
@@ -1066,38 +1079,38 @@ function mapItem(level, rng) {
   const d = mapData(rng);
   if (level === 5) return mapCoef(rng, null, d);
   const M3 = level === 3;
-  const arrive = d.target === 'R3' ? '' : ' (coordonnées dans 1, t, t²)';
+  const arrive = d.target === 'R3' ? '' : t(' (coordonnées dans 1, t, t²)');
   const parts = d.bs.map((b, j) => {
     const col = MX.col(d.M, j);
     const line = { kind: 'eq', math: vt(col), note: `T(${polyR(b)})${d.target === 'R3' ? '' : ` = ${polyR(col)}`}`, subgoal: 'images' };
     return {
-      judge: { kind: 'mat', expect: vt(col), ...(M3 ? { menu: menu(`Appliquer la formule à b${sub(j + 1)} = ${polyR(b)}`, { label: `Appliquer la formule à t${j ? sup(j) : ''}`, rule: 'l_map_basis_ignored', why: 'La colonne j est l\'image du j-ième vecteur de B, pas de la base canonique.' }) } : {}) },
+      judge: { kind: 'mat', expect: vt(col), ...(M3 ? { menu: menu(t('Appliquer la formule à b{sub} = {polyR}', { sub: sub(j + 1), polyR: polyR(b) }), { label: t('Appliquer la formule à t{x}', { x: j ? sup(j) : '' }), rule: 'l_map_basis_ignored', why: t('La colonne j est l\'image du j-ième vecteur de B, pas de la base canonique.') }) } : {}) },
       start: `T(b_${j + 1}) = ?`, html: `T(b${sub(j + 1)}) = T(${polyR(b)})${arrive}`, ask: `T(b${sub(j + 1)}) =`,
       lines: [level <= 2 ? withCells(line, level === 1 ? [[0, 0], [2, 0]] : [[0, 0], [1, 0], [2, 0]]) : line],
     };
   });
-  const fin = { kind: 'eq', math: mt(d.M), note: 'Colonne j : coordonnées de T(bⱼ)', subgoal: 'place' };
+  const fin = { kind: 'eq', math: mt(d.M), note: t('Colonne j : coordonnées de T(bⱼ)'), subgoal: 'place' };
   parts.push({
-    judge: { kind: 'mat', expect: mt(d.M), wrong: { l_map_basis_ignored: [mt(d.AT)] }, ...(M3 ? { menu: menu('Placer T(bⱼ) dans la colonne j', { label: 'Placer T(bⱼ) dans la ligne j', rule: 'l_matrix_rows_cols', why: 'La colonne j contient les coordonnées de T(bⱼ) : c\'est ce qui donne [T(x)] = [T]·[x]_B.' }) } : {}) },
-    start: '[T] = ?', html: 'La matrice de T dans les bases B et canonique', ask: '[T] =',
+    judge: { kind: 'mat', expect: mt(d.M), wrong: { l_map_basis_ignored: [mt(d.AT)] }, ...(M3 ? { menu: menu(t('Placer T(bⱼ) dans la colonne j'), { label: t('Placer T(bⱼ) dans la ligne j'), rule: 'l_matrix_rows_cols', why: t('La colonne j contient les coordonnées de T(bⱼ) : c\'est ce qui donne [T(x)] = [T]·[x]_B.') }) } : {}) },
+    start: '[T] = ?', html: t('La matrice de T dans les bases B et canonique'), ask: '[T] =',
     lines: [level === 1 ? withCells(fin, [[0, 1], [1, 1], [2, 1]]) : fin],
   });
   if (level === 2) {
     parts[3].lines.unshift({
-      kind: 'decision', prompt: 'Où placer les coordonnées de T(bⱼ) ?', options: [
-        { id: 'col', label: 'Dans la colonne j', valid: true },
-        { id: 'row', label: 'Dans la ligne j', valid: false, rule: 'l_matrix_rows_cols', why: 'La colonne j de la matrice est l\'image du j-ième vecteur de base : [T]·eⱼ redonne [T(bⱼ)].' },
+      kind: 'decision', prompt: t('Où placer les coordonnées de T(bⱼ) ?'), options: [
+        { id: 'col', label: t('Dans la colonne j'), valid: true },
+        { id: 'row', label: t('Dans la ligne j'), valid: false, rule: 'l_matrix_rows_cols', why: t('La colonne j de la matrice est l\'image du j-ième vecteur de base : [T]·eⱼ redonne [T(bⱼ)].') },
       ],
     });
   }
   const hints = [
-    { level: 1, html: 'Colonne j = coordonnées de T(bⱼ) dans la base d\'arrivée (ici canonique) : applique la formule aux coefficients de bⱼ.' },
+    { level: 1, html: t('Colonne j = coordonnées de T(bⱼ) dans la base d\'arrivée (ici canonique) : applique la formule aux coefficients de bⱼ.') },
     { level: 2, html: `T(b₂) = T(${polyR(d.bs[1])}) = (□ ; □ ; □)` },
     { level: 3, html: `[T] = ${MLm(d.M)}` },
   ];
   return partsItem({
     skill: MAPM, level,
-    prompt: `T : ${mapSpace(d)} est linéaire, ${mapFormula(d)}. Soit B = (${d.bs.map((b) => polyR(b)).join(', ')}) au départ, et la base canonique à l'arrivée${arrive}. Calcule T(b₁), T(b₂), T(b₃), puis la matrice de T par rapport à ces bases.`,
+    prompt: t('T : {mapSpace} est linéaire, {mapFormula}. Soit B = ({x}) au départ, et la base canonique à l\'arrivée{arrive}. Calcule T(b₁), T(b₂), T(b₃), puis la matrice de T par rapport à ces bases.', { mapSpace: mapSpace(d), mapFormula: mapFormula(d), x: d.bs.map((b) => polyR(b)).join(', '), arrive }),
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: M3 ? 'menu' : null,
     hints, subgoals: MAPM_SUB, key: `${MAPM}:${mt(d.AT)}:${mt(d.B)}:${d.target}`, fallback: d.fallback,
   }, parts);
@@ -1109,10 +1122,10 @@ function mapCoef(rng, exam, d0) {
   const [i, j] = rng.pick(d.cells);
   return coefItem({
     skill: MAPM, level: exam ? 4 : 5,
-    prompt: `T : ${mapSpace(d)} est linéaire, ${mapFormula(d)}. Soit [T] sa matrice par rapport à B = (${d.bs.map((b) => polyR(b)).join(', ')}) au départ et à la base canonique à l'arrivée. Que vaut ${coefName(i, j)} ?`,
+    prompt: t('T : {mapSpace} est linéaire, {mapFormula}. Soit [T] sa matrice par rapport à B = ({x}) au départ et à la base canonique à l\'arrivée. Que vaut {coefName} ?', { mapSpace: mapSpace(d), mapFormula: mapFormula(d), x: d.bs.map((b) => polyR(b)).join(', '), coefName: coefName(i, j) }),
     label: `a_${i + 1}${j + 1}`, value: qt(d.M[i][j]), key: `${mt(d.AT)}:${mt(d.B)}:${i}${j}`, exam: examTag({ exam }), askCoef: { label: coefName(i, j), path: [i, j] },
     traps: [{ rule: 'l_map_basis_ignored' }, { rule: 'l_coef_index_swap' }],
-    subgoals: MAPM_SUB, solution: [{ html: `T(b${sub(j + 1)}) = T(${polyR(d.bs[j])}) = ${MLv(MX.col(d.M, j))}`, note: `Colonne ${j + 1}` }, { html: `${coefName(i, j)} = ${fq(d.M[i][j])}`, note: '' }],
+    subgoals: MAPM_SUB, solution: [{ html: `T(b${sub(j + 1)}) = T(${polyR(d.bs[j])}) = ${MLv(MX.col(d.M, j))}`, note: t('Colonne {x}', { x: j + 1 }) }, { html: `${coefName(i, j)} = ${fq(d.M[i][j])}`, note: '' }],
     fallback: d.fallback,
   });
 }
@@ -1123,11 +1136,11 @@ function mapExam(rng, exam) {
   const perm = MX.fromCols([MX.col(d.M, 1), MX.col(d.M, 0), MX.col(d.M, 2)]);
   return mcqDistinct({
     skill: MAPM, level: 4, key: `mcq:${mt(d.AT)}:${mt(d.B)}`, exam: examTag({ exam }),
-    prompt: `T : ${mapSpace(d)} est linéaire, ${mapFormula(d)}. Quelle est sa matrice par rapport à B = (${d.bs.map((b) => polyR(b)).join(', ')}) au départ et à la base canonique à l'arrivée ?`,
+    prompt: t('T : {mapSpace} est linéaire, {mapFormula}. Quelle est sa matrice par rapport à B = ({x}) au départ et à la base canonique à l\'arrivée ?', { mapSpace: mapSpace(d), mapFormula: mapFormula(d), x: d.bs.map((b) => polyR(b)).join(', ') }),
     right: MLm(d.M),
     wrongs: [{ html: MLm(d.AT), rule: 'l_map_basis_ignored' }, { html: MLm(MX.transpose(d.M)), rule: 'l_matrix_rows_cols' }],
     fillers: [{ html: MLm(perm) }, { html: MLm(MX.transpose(d.AT)) }, { html: MLm(MX.mul(d.B, d.AT)) }],
-    solution: d.bs.map((b, j) => ({ html: `T(${polyR(b)}) = ${MLv(MX.col(d.M, j))}`, note: `Colonne ${j + 1}` })),
+    solution: d.bs.map((b, j) => ({ html: `T(${polyR(b)}) = ${MLv(MX.col(d.M, j))}`, note: t('Colonne {x}', { x: j + 1 }) })),
   }, rng);
 }
 
@@ -1137,13 +1150,13 @@ function mapExam(rng, exam) {
 
 const CHB = 'l-vs-change-basis';
 const CHB_SUB = [
-  { id: 'reduce', label: 'réduire', skill: 'l-sys-rref' },
-  { id: 'read', label: 'lire', skill: CHB },
+  { id: 'reduce', label: t('réduire'), skill: 'l-sys-rref' },
+  { id: 'read', label: t('lire'), skill: CHB },
 ];
 
 // C = unimodular(n) in columns, P = unimodular(n), B = C·P.
 function cbData(rng, { n = 2, sp = 'R', maxOps = 6 } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const C = unimodular(n, rng, { max: 2 });
     const P = unimodular(n, rng, { max: 2 });
     const B = MX.mul(C, P);
@@ -1171,37 +1184,39 @@ function cbItem(level, rng) {
   const n = level === 4 ? rng.pick([2, 3]) : 2;
   const d = cbData(rng, { n, sp: n === 3 && rng.chance(0.5) ? 'P2' : 'R', maxOps: n === 3 ? 9 : 6 });
   const parts = [rrefPart(d.CB, d.ops, level, rng, { bar: n, subgoal: 'reduce' })];
-  const pLine = { kind: 'eq', math: mt(d.P), note: 'Lue à droite de la barre', subgoal: 'read' };
+  const pLine = { kind: 'eq', math: mt(d.P), note: t('Lue à droite de la barre'), subgoal: 'read' };
   parts.push({
-    judge: { kind: 'mat', expect: mt(d.P), wrong: cbWrong(d) }, start: 'P_{C←B} = ?', html: 'P_{C←B}, lue à droite', ask: 'P_{C←B} =',
+    judge: { kind: 'mat', expect: mt(d.P), wrong: cbWrong(d) }, start: 'P_{C←B} = ?', html: t('P_{C←B}, lue à droite'), ask: 'P_{C←B} =',
     lines: [level === 1 ? withCells(pLine, pickCells(d.P, [0, 1], 2, rng)) : pLine],
   });
   if (level === 3) {
     const b1 = MX.col(d.B, 0);
     const comb = colsOf(d.C).map((c, i) => `${qt(d.P[i][0])}·${vt(c)}`).join('+').replace(/\+-/g, '-');
     parts.push({
-      judge: { kind: 'mat', expect: vt(b1), menu: menu('Contrôler : p₁₁c₁ + p₂₁c₂ doit redonner b₁', { label: 'Contrôler : p₁₁b₁ + p₂₁b₂ doit redonner c₁', rule: 'l_change_basis_direction', why: 'La 1re colonne de P_{C←B} donne b₁ dans la base C.' }) },
-      start: 'p₁₁c₁ + p₂₁c₂ = ?', html: 'Contrôle : la 1re colonne de P donne b₁ dans la base C', ask: 'p₁₁c₁ + p₂₁c₂ =',
-      lines: [{ kind: 'eq', math: comb, note: '' }, { kind: 'eq', math: vt(b1), note: '= b₁ : juste', subgoal: 'read' }],
+      judge: { kind: 'mat', expect: vt(b1), menu: menu(t('Contrôler : p₁₁c₁ + p₂₁c₂ doit redonner b₁'), { label: t('Contrôler : p₁₁b₁ + p₂₁b₂ doit redonner c₁'), rule: 'l_change_basis_direction', why: t('La 1re colonne de P_{C←B} donne b₁ dans la base C.') }) },
+      start: 'p₁₁c₁ + p₂₁c₂ = ?', html: t('Contrôle : la 1re colonne de P donne b₁ dans la base C'), ask: 'p₁₁c₁ + p₂₁c₂ =',
+      lines: [{ kind: 'eq', math: comb, note: '' }, { kind: 'eq', math: vt(b1), note: t('= b₁ : juste'), subgoal: 'read' }],
     });
   }
   if (level === 2) {
     parts[0].lines.unshift({
-      kind: 'decision', prompt: 'Quelle matrice réduire ?', options: [
-        { id: 'CB', label: '[C | B] : on lit P_{C←B} à droite', valid: true },
-        { id: 'BC', label: '[B | C]', valid: false, rule: 'l_change_basis_direction', why: 'Réduire [B | C] donne P_{B←C}, la matrice du passage inverse.' },
+      kind: 'decision', prompt: t('Quelle matrice réduire ?'), options: [
+        { id: 'CB', label: t('[C | B] : on lit P_{C←B} à droite'), valid: true },
+        { id: 'BC', label: '[B | C]', valid: false, rule: 'l_change_basis_direction', why: t('Réduire [B | C] donne P_{B←C}, la matrice du passage inverse.') },
       ],
     });
   }
-  const what = d.sp === 'P2' ? ' (coordonnées dans 1, t, t²)' : '';
+  const what = d.sp === 'P2' ? t(' (coordonnées dans 1, t, t²)') : '';
   const hints = [
-    { level: 1, html: `Les colonnes de P_{C←B} sont les coordonnées des vecteurs de B dans la base C : réduis [C | B]${what}.` },
-    { level: 2, html: `[I | P] : la 1re ligne finale est [1, 0${n === 3 ? ', 0' : ''} | □, □${n === 3 ? ', □' : ''}].` },
+    { level: 1, html: t('Les colonnes de P_{C←B} sont les coordonnées des vecteurs de B dans la base C : réduis [C | B]{what}.', { what }) },
+    { level: 2, html: t('[I | P] : la 1re ligne finale est [1, 0{x} | □, □{x2}].', { x: n === 3 ? ', 0' : '', x2: n === 3 ? ', □' : '' }) },
     { level: 3, html: `P_{C←B} = ${MLm(d.P)}` },
   ];
   return partsItem({
     skill: CHB, level,
-    prompt: `Dans ${d.sp === 'P2' ? 'P₂' : `ℝ${sup(n)}`}, ${baseShow(d, d.B, 'B')} et ${baseShow(d, d.C, 'C')}. Trouve la matrice de passage P_{C←B} en réduisant [C | B]${what}${level === 3 ? ', puis contrôle sa 1re colonne' : ''}.`,
+    prompt: level === 3
+      ? t('Dans {space}, {B} et {C}. Trouve la matrice de passage P_{C←B} en réduisant [C | B]{what}, puis contrôle sa 1re colonne.', { space: d.sp === 'P2' ? 'P₂' : `ℝ${sup(n)}`, B: baseShow(d, d.B, 'B'), C: baseShow(d, d.C, 'C'), what })
+      : t('Dans {space}, {B} et {C}. Trouve la matrice de passage P_{C←B} en réduisant [C | B]{what}.', { space: d.sp === 'P2' ? 'P₂' : `ℝ${sup(n)}`, B: baseShow(d, d.B, 'B'), C: baseShow(d, d.C, 'C'), what }),
     mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null,
     hints, subgoals: CHB_SUB, key: `${CHB}:${mt(d.CB, n)}`, fallback: d.fallback,
   }, parts);
@@ -1215,10 +1230,10 @@ function cbCoef(rng, exam) {
   const [i, j] = cells.length ? rng.pick(cells) : [0, 0];
   return coefItem({
     skill: CHB, level: exam ? 4 : 5,
-    prompt: `Dans ℝ${sup(n)}, ${baseShow(d, d.B, 'B')} et ${baseShow(d, d.C, 'C')}. Que vaut le coefficient ${pName(i, j)} de P_{C←B} ?`,
+    prompt: t('Dans ℝ{sup}, {baseShow} et {baseShow2}. Que vaut le coefficient {pName} de P_{C←B} ?', { sup: sup(n), baseShow: baseShow(d, d.B, 'B'), baseShow2: baseShow(d, d.C, 'C'), pName: pName(i, j) }),
     label: `p_${i + 1}${j + 1}`, value: qt(d.P[i][j]), key: `${mt(d.CB, n)}:${i}${j}`, exam: examTag({ exam }), askCoef: { label: pName(i, j), path: [i, j] },
     traps: [{ rule: 'l_change_basis_direction' }, { rule: 'l_coef_index_swap' }],
-    subgoals: CHB_SUB, solution: [{ html: `[C | B] réduite : ${MLm(MX.hcat(MX.identity(n), d.P), n)}`, note: '' }, { html: `${pName(i, j)} = ${fq(d.P[i][j])}`, note: '' }],
+    subgoals: CHB_SUB, solution: [{ html: t('[C | B] réduite : {MLm}', { MLm: MLm(MX.hcat(MX.identity(n), d.P), n) }), note: '' }, { html: `${pName(i, j)} = ${fq(d.P[i][j])}`, note: '' }],
     fallback: d.fallback,
   });
 }
@@ -1230,25 +1245,25 @@ function cbExam(rng, exam) {
     if (rng.chance(0.5)) {
       return tfL({
         skill: CHB, key: 'inverse', truth: true, exam: tag,
-        statement: 'Pour deux bases B et C, P_{B←C}·P_{C←B} = I.',
-        explanation: 'Vrai : passer de B à C puis de C à B redonne les coordonnées de départ : P_{B←C} = (P_{C←B})⁻¹.',
+        statement: t('Pour deux bases B et C, P_{B←C}·P_{C←B} = I.'),
+        explanation: t('Vrai : passer de B à C puis de C à B redonne les coordonnées de départ : P_{B←C} = (P_{C←B})⁻¹.'),
       });
     }
     return tfL({
       skill: CHB, key: 'BinvC', truth: false, exam: tag, ruleIfTrue: 'l_change_basis_direction',
-      statement: 'Si B et C sont deux bases de ℝ² (vecteurs en colonnes), P_{C←B} = B⁻¹C.',
-      counter: { kind: 'matPair', params: { n: 2, test: 'P_CB=B^-1C' }, ask: [{ v: 'A', label: 'B (vecteurs en colonnes) =', shape: [2, 2] }, { v: 'B', label: 'C (vecteurs en colonnes) =', shape: [2, 2] }], answer: { A: '[[1,1],[0,1]]', B: '[[1,0],[0,1]]' } },
-      explanation: 'Faux : P_{C←B} = C⁻¹B ; B⁻¹C est P_{B←C}. Avec B = {(1 ; 0), (1 ; 1)} et C canonique : C⁻¹B = [[1, 1], [0, 1]] mais B⁻¹C = [[1, −1], [0, 1]].',
+      statement: t('Si B et C sont deux bases de ℝ² (vecteurs en colonnes), P_{C←B} = B⁻¹C.'),
+      counter: { kind: 'matPair', params: { n: 2, test: 'P_CB=B^-1C' }, ask: [{ v: 'A', label: t('B (vecteurs en colonnes) ='), shape: [2, 2] }, { v: 'B', label: t('C (vecteurs en colonnes) ='), shape: [2, 2] }], answer: { A: '[[1,1],[0,1]]', B: '[[1,0],[0,1]]' } },
+      explanation: t('Faux : P_{C←B} = C⁻¹B ; B⁻¹C est P_{B←C}. Avec B = {(1 ; 0), (1 ; 1)} et C canonique : C⁻¹B = [[1, 1], [0, 1]] mais B⁻¹C = [[1, −1], [0, 1]].'),
     });
   }
   const d = cbData(rng, { n: 2 });
   return mcqDistinct({
     skill: CHB, level: 4, key: `mcq:${mt(d.CB, 2)}`, exam: tag,
-    prompt: `Dans ℝ², ${baseShow(d, d.B, 'B')} et ${baseShow(d, d.C, 'C')}. Quelle est la matrice de passage P_{C←B} ?`,
+    prompt: t('Dans ℝ², {baseShow} et {baseShow2}. Quelle est la matrice de passage P_{C←B} ?', { baseShow: baseShow(d, d.B, 'B'), baseShow2: baseShow(d, d.C, 'C') }),
     right: MLm(d.P),
     wrongs: [{ html: MLm(d.Pi), rule: 'l_change_basis_direction' }, { html: MLm(MX.transpose(d.P)), rule: 'l_matrix_rows_cols' }, { html: MLm(d.Ci), rule: 'l_change_basis_product' }, { html: MLm(d.BCi), rule: 'l_change_basis_product' }],
     fillers: [{ html: MLm(d.B) }, { html: MLm(d.C) }],
-    solution: [{ html: `[C | B] réduite : ${MLm(MX.hcat(MX.identity(2), d.P), 2)}`, note: '' }],
+    solution: [{ html: t('[C | B] réduite : {MLm}', { MLm: MLm(MX.hcat(MX.identity(2), d.P), 2) }), note: '' }],
   }, rng);
 }
 
@@ -1258,15 +1273,15 @@ function cbExam(rng, exam) {
 
 const SIM = 'l-vs-similar';
 const SIM_SUB = [
-  { id: 'inverse', label: 'inverser P', skill: 'l-mat-inverse' },
-  { id: 'product', label: 'produits', skill: 'l-mat-product' },
-  { id: 'formula', label: 'formule', skill: SIM },
+  { id: 'inverse', label: t('inverser P'), skill: 'l-mat-inverse' },
+  { id: 'product', label: t('produits'), skill: 'l-mat-product' },
+  { id: 'formula', label: t('formule'), skill: SIM },
 ];
 
 // P = unimodular(n) (the vectors of B), T = [T]_B whole in [−3 ; 3],
 // A = P·T·P⁻¹ whole.
 function simData(rng, n = 2) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const P = unimodular(n, rng, { max: 2, swaps: false });
     const T = Array.from({ length: n }, () => Array.from({ length: n }, () => q(rng.int(-3, 3))));
     if (T.flat().filter((x) => x.n !== 0).length < n + 1) continue;
@@ -1296,38 +1311,38 @@ function simItem(level, rng) {
   const mid = toT ? MX.mul(d.A, d.P) : MX.mul(d.P, d.T);
   const parts = [
     {
-      judge: { kind: 'mat', names, expect: mt(d.Pi), ...(M3 ? { menu: menu('Inverser P', { label: 'Transposer P', why: 'P n\'est pas orthogonale : Pᵀ n\'est pas son inverse.' }) } : {}) },
-      start: 'P⁻¹ = ?', html: 'L’inverse de P', ask: 'P⁻¹ =', lines: [eq(d.Pi, d.n === 2 ? 'Échanger la diagonale, opposer le reste, diviser par det P' : 'Réduire [P | I]', 'inverse')],
+      judge: { kind: 'mat', names, expect: mt(d.Pi), ...(M3 ? { menu: menu(t('Inverser P'), { label: t('Transposer P'), why: t('P n\'est pas orthogonale : Pᵀ n\'est pas son inverse.') }) } : {}) },
+      start: 'P⁻¹ = ?', html: t('L’inverse de P'), ask: 'P⁻¹ =', lines: [eq(d.Pi, d.n === 2 ? t('Échanger la diagonale, opposer le reste, diviser par det P') : t('Réduire [P | I]'), 'inverse')],
     },
     {
-      judge: { kind: 'mat', names, expect: mt(mid), ...(M3 ? { menu: menu(toT ? 'Calculer A·P' : 'Calculer P·[T]_B', { label: toT ? 'Calculer P·A' : 'Calculer [T]_B·P', rule: 'l_similar_order', why: toT ? '[T]_B = P⁻¹AP : P est à droite de A.' : 'A = P·[T]_B·P⁻¹ : P est à gauche.' }) } : {}) },
-      start: toT ? 'A·P = ?' : 'P·[T]_B = ?', html: toT ? 'Le produit A·P' : 'Le produit P·[T]_B', ask: toT ? 'A·P =' : 'P·[T]_B =',
+      judge: { kind: 'mat', names, expect: mt(mid), ...(M3 ? { menu: menu(toT ? t('Calculer A·P') : t('Calculer P·[T]_B'), { label: toT ? t('Calculer P·A') : t('Calculer [T]_B·P'), rule: 'l_similar_order', why: toT ? t('[T]_B = P⁻¹AP : P est à droite de A.') : t('A = P·[T]_B·P⁻¹ : P est à gauche.') }) } : {}) },
+      start: toT ? 'A·P = ?' : 'P·[T]_B = ?', html: toT ? t('Le produit A·P') : t('Le produit P·[T]_B'), ask: toT ? 'A·P =' : 'P·[T]_B =',
       lines: [eq(mid, '', 'product')],
     },
     {
-      judge: { kind: 'mat', names, expect: mt(toT ? d.T : d.A), wrong: { l_similar_order: [mt(toT ? d.V : d.W)] }, ...(M3 ? { menu: menu(toT ? 'Multiplier à gauche par P⁻¹' : 'Multiplier à droite par P⁻¹', { label: toT ? 'Multiplier à droite par P⁻¹' : 'Multiplier à gauche par P⁻¹', rule: 'l_similar_order', why: 'L\'ordre compte : [T]_B = P⁻¹AP, A = P·[T]_B·P⁻¹.' }) } : {}) },
+      judge: { kind: 'mat', names, expect: mt(toT ? d.T : d.A), wrong: { l_similar_order: [mt(toT ? d.V : d.W)] }, ...(M3 ? { menu: menu(toT ? t('Multiplier à gauche par P⁻¹') : t('Multiplier à droite par P⁻¹'), { label: toT ? t('Multiplier à droite par P⁻¹') : t('Multiplier à gauche par P⁻¹'), rule: 'l_similar_order', why: t('L\'ordre compte : [T]_B = P⁻¹AP, A = P·[T]_B·P⁻¹.') }) } : {}) },
       start: toT ? '[T]_B = P⁻¹·(AP) = ?' : 'A = (P·[T]_B)·P⁻¹ = ?', html: toT ? '[T]_B = P⁻¹AP' : 'A = P·[T]_B·P⁻¹', ask: toT ? '[T]_B =' : 'A =',
-      lines: [eq(toT ? d.T : d.A, toT ? `Contrôle : T(b₁) = A·b₁ = ${linText(MX.col(d.T, 0), ['b₁', 'b₂', 'b₃'])}` : `T(x) = (${d.A.map((r) => linText(r, xs(d.n))).join(' ; ')})`, 'formula')],
+      lines: [eq(toT ? d.T : d.A, toT ? t('Contrôle : T(b₁) = A·b₁ = {linText}', { linText: linText(MX.col(d.T, 0), ['b₁', 'b₂', 'b₃']) }) : `T(x) = (${d.A.map((r) => linText(r, xs(d.n))).join(' ; ')})`, 'formula')],
     },
   ];
   if (level === 2) {
     parts[2].lines.unshift({
-      kind: 'decision', prompt: toT ? 'Quelle formule donne [T]_B ?' : 'Quelle formule donne A ?', options: [
+      kind: 'decision', prompt: toT ? t('Quelle formule donne [T]_B ?') : t('Quelle formule donne A ?'), options: [
         { id: 'ok', label: toT ? '[T]_B = P⁻¹AP' : 'A = P·[T]_B·P⁻¹', valid: true },
-        { id: 'swap', label: toT ? '[T]_B = PAP⁻¹' : 'A = P⁻¹·[T]_B·P', valid: false, rule: 'l_similar_order', why: 'P fait passer des coordonnées dans B aux coordonnées canoniques : [T]_B = P⁻¹AP, donc A = P·[T]_B·P⁻¹.' },
+        { id: 'swap', label: toT ? '[T]_B = PAP⁻¹' : 'A = P⁻¹·[T]_B·P', valid: false, rule: 'l_similar_order', why: t('P fait passer des coordonnées dans B aux coordonnées canoniques : [T]_B = P⁻¹AP, donc A = P·[T]_B·P⁻¹.') },
       ],
     });
   }
   const hints = [
-    { level: 1, html: '[T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹.' },
+    { level: 1, html: t('[T]_B = P⁻¹AP, avec les vecteurs de B en colonnes dans P ; donc A = P·[T]_B·P⁻¹.') },
     { level: 2, html: toT ? '[T]_B = P⁻¹·(A·P) = P⁻¹·□' : 'A = (P·[T]_B)·□' },
     { level: 3, html: `${toT ? '[T]_B' : 'A'} = ${MLm(toT ? d.T : d.A)}` },
   ];
   return partsItem({
     skill: SIM, level,
     prompt: toT
-      ? `T : ℝ${sup(d.n)} → ℝ${sup(d.n)} a pour matrice canonique A = ${MLm(d.A)}. Soit ${bVecs(d)}, et P = ${MLm(d.P)} (les vecteurs de B en colonnes). Calcule P⁻¹, A·P, puis [T]_B.`
-      : `${bVecs(d)} est une base de ℝ${sup(d.n)}, P = ${MLm(d.P)}, et la matrice de T dans B est [T]_B = ${MLm(d.T)}. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.`,
+      ? t('T : ℝ{sup} → ℝ{sup} a pour matrice canonique A = {MLm}. Soit {bVecs}, et P = {MLm2} (les vecteurs de B en colonnes). Calcule P⁻¹, A·P, puis [T]_B.', { sup: sup(d.n), MLm: MLm(d.A), bVecs: bVecs(d), MLm2: MLm(d.P) })
+      : t('{bVecs} est une base de ℝ{sup}, P = {MLm}, et la matrice de T dans B est [T]_B = {MLm2}. Calcule P⁻¹, P·[T]_B, puis la matrice canonique A de T.', { bVecs: bVecs(d), sup: sup(d.n), MLm: MLm(d.P), MLm2: MLm(d.T) }),
     mode: level <= 2 ? 'guided' : M3 ? 'tap' : 'free', tapActions: M3 ? 'menu' : null,
     hints, subgoals: SIM_SUB, key: `${SIM}:${mt(d.P)}:${mt(d.T)}:${toT}`, fallback: d.fallback,
   }, parts);
@@ -1340,23 +1355,23 @@ function simExam(rng, exam) {
     if (which < 2) {
       return tfL({
         skill: SIM, key: `inv:${which}`, truth: true, exam: tag,
-        statement: which === 0 ? 'Deux matrices semblables ont les mêmes valeurs propres.' : 'Deux matrices semblables ont le même déterminant et la même trace.',
-        explanation: 'Vrai : si B = P⁻¹AP, alors det(B − λI) = det(P⁻¹(A − λI)P) = det(A − λI) : même polynôme caractéristique, donc mêmes valeurs propres, même déterminant et même trace.',
+        statement: which === 0 ? t('Deux matrices semblables ont les mêmes valeurs propres.') : t('Deux matrices semblables ont le même déterminant et la même trace.'),
+        explanation: t('Vrai : si B = P⁻¹AP, alors det(B − λI) = det(P⁻¹(A − λI)P) = det(A − λI) : même polynôme caractéristique, donc mêmes valeurs propres, même déterminant et même trace.'),
       });
     }
     const k = rng.pick([1, 2, -1, 3]);
     return tfL({
       skill: SIM, key: `notsim:${k}`, truth: false, exam: tag,
-      statement: 'Deux matrices qui ont les mêmes valeurs propres (avec multiplicités) sont semblables.',
-      counter: { kind: 'matOne', params: { want: 'sameEigNotSimilar', B: mt(MX.scale(MX.identity(2), k)), n: 2 }, ask: [{ v: 'A', label: `A (mêmes valeurs propres que ${fq(k)}I₂) =`, shape: [2, 2] }], answer: { A: mt([[k, 1], [0, k]]) } },
-      explanation: `Faux : ${MLm(MX.mat([[k, 1], [0, k]]))} a la valeur propre double ${fq(k)}, comme ${fq(k)}I₂, mais la seule matrice semblable à ${fq(k)}I₂ est ${fq(k)}I₂ elle-même (P⁻¹(kI)P = kI).`,
+      statement: t('Deux matrices qui ont les mêmes valeurs propres (avec multiplicités) sont semblables.'),
+      counter: { kind: 'matOne', params: { want: 'sameEigNotSimilar', B: mt(MX.scale(MX.identity(2), k)), n: 2 }, ask: [{ v: 'A', label: t('A (mêmes valeurs propres que {fq}I₂) =', { fq: fq(k) }), shape: [2, 2] }], answer: { A: mt([[k, 1], [0, k]]) } },
+      explanation: t('Faux : {MLm} a la valeur propre double {fq}, comme {fq}I₂, mais la seule matrice semblable à {fq}I₂ est {fq}I₂ elle-même (P⁻¹(kI)P = kI).', { MLm: MLm(MX.mat([[k, 1], [0, k]])), fq: fq(k) }),
     });
   }
   const d = simData(rng, 2);
   const f = (M) => `T(x) = (${M.map((r) => linText(r, xs(2))).join(' ; ')})`;
   return mcqDistinct({
     skill: SIM, level: 4, key: `mcq:${mt(d.P)}:${mt(d.T)}`, exam: tag,
-    prompt: `${bVecs(d)} est une base de ℝ², et la matrice de T dans B est [T]_B = ${MLm(d.T)}. Que vaut T(x) ?`,
+    prompt: t('{bVecs} est une base de ℝ², et la matrice de T dans B est [T]_B = {MLm}. Que vaut T(x) ?', { bVecs: bVecs(d), MLm: MLm(d.T) }),
     right: f(d.A),
     wrongs: [{ html: f(d.W), rule: 'l_similar_order' }, { html: f(MX.transpose(d.A)), rule: 'l_matrix_rows_cols' }],
     fillers: [{ html: f(d.T) }, { html: f(MX.mul(d.P, d.T)) }, { html: f(MX.mul(d.T, d.Pi)) }],

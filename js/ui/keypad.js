@@ -8,6 +8,7 @@
 // §11); js/ui/keys-needed.js adds the keys the item needs (keysForItem).
 
 import { h, play } from './dom.js';
+import { t as tr, LANG } from '../i18n.js';
 import { esc } from '../math/expr.js';
 
 export const KEYSETS = {
@@ -87,6 +88,15 @@ const LABEL = {
 // Step U5.
 Object.assign(LABEL, { 'vec(': 'AB⃗', ' ou ': 'ou', ' et ': 'et' });
 Object.assign(LABEL, { 'C(': 'C(n, k)', 'A(': 'A(n, k)', 'Φ(': 'Φ( )', 'Φ⁻¹(': 'Φ⁻¹( )' }); // step U7
+
+// English (js/i18n.js): the answer keeps the French input language, which
+// the parsers and checkers read (decimal comma, « ou », « et »); only what
+// the student sees changes. The keys show « or », « and », and the comma of
+// a number is drawn as a point (decimalComma below).
+if (LANG === 'en') Object.assign(LABEL, { ' ou ': 'or', ' et ': 'and', "s'annulent": 'cancel' });
+// Functions whose arguments are separated by commas: a comma inside them
+// is a separator, not a decimal comma.
+const MULTI_ARG = new Set(['int(', 'bracket(', 'lim(', 'sum(', 'd(', 'pd(', 'C(', 'A(', 'vec(', 'o(', 'min(', 'max(']);
 
 
 // ---------- the typed line: a list of characters and a caret ----------
@@ -337,7 +347,7 @@ export class MathInput extends MathModel {
     this.tab = 0;
     this.onChange = onChange;
     this.onEnter = onEnter;
-    this.display = h('div.mi-display', { tabindex: 0, role: 'textbox', 'aria-label': 'Ta réponse' });
+    this.display = h('div.mi-display', { tabindex: 0, role: 'textbox', 'aria-label': tr('Ta réponse') });
     this.display.addEventListener('click', (e) => {
       const i = e.target.closest('[data-i]')?.dataset.i;
       if (i != null) { this.caret = settle(this.layout(), Number(i) + 1, 1, this.chars.length); this.render(); }
@@ -410,7 +420,7 @@ export class MathInput extends MathModel {
       panel.replaceChildren(this.pad(this.tabs[i]));
       row.querySelectorAll('button').forEach((b, j) => b.classList.toggle('active', j === i));
     };
-    this.tabs.forEach((t, i) => row.appendChild(h('button.keytab', { type: 'button', 'data-set': t.id, title: t.id === 'auto' ? 'Les autres touches de la question' : null, onclick: () => show(i) }, tabLabel(t, i))));
+    this.tabs.forEach((t, i) => row.appendChild(h('button.keytab', { type: 'button', 'data-set': t.id, title: t.id === 'auto' ? tr('Les autres touches de la question') : null, onclick: () => show(i) }, tabLabel(t, i))));
     box.append(row, panel);
     show(0);
     return box;
@@ -423,7 +433,9 @@ export class MathInput extends MathModel {
       const letter = /^[a-zA-Zπα-ωΑ-Ω]$/.test(k);
       const word = k.length > 1 && /[a-z]/i.test(k) && !LABEL[k];
       const cls = /^[0-9]$/.test(k) ? 'key' : letter ? 'key key-fn key-letter' : word ? 'key key-fn key-word' : `key key-fn key-${k === '-' ? 'minus' : k.replace(/[^a-z]/g, '') || 'op'}`;
-      pad.appendChild(h('button', { class: cls, type: 'button', onclick: () => this.press(k), html: LABEL[k] ?? esc(word ? k.replace(/\($/, '').trim() : k) }));
+      // English: the comma of a keypad of numbers is the decimal point.
+      const decimal = LANG === 'en' && k === ',' && tab.keys.includes('0') && !tab.keys.some((x) => MULTI_ARG.has(x));
+      pad.appendChild(h('button', { class: cls, type: 'button', onclick: () => this.press(k), html: decimal ? '.' : LABEL[k] ?? esc(word ? k.replace(/\($/, '').trim() : k) }));
     }
     return pad;
   }
@@ -449,13 +461,39 @@ function tabLabel(t, i) {
 const CARET = '<span class="caret"></span>';
 // How some chunks are drawn while typing (step U2).
 const CHUNK_SHOW = { 'int(': '∫(', 'bracket(': '[F](', 'lim(': 'lim(' };
+if (LANG === 'en') Object.assign(CHUNK_SHOW, { ' ou ': ' or ', ' et ': ' and ', "s'annulent": 'cancel' });
+
+// Is the comma at i the decimal comma of a number (drawn as a point in
+// English)? After a digit, and not directly inside a function with several
+// arguments or a bracket [ ] (matrices, lists).
+function decimalComma(chars, i) {
+  if (!/^[0-9]$/.test(chars[i - 1] ?? '')) return false;
+  let depth = 0;
+  for (let j = i - 1; j >= 0; j--) {
+    const c = chars[j];
+    if (c === ')' || c === ']') depth += 1;
+    else if (c === '(' || c === '[' || isOpenChunk(c)) {
+      if (depth === 0) return c !== '[' && !MULTI_ARG.has(c);
+      depth -= 1;
+    }
+  }
+  return true;
+}
+
+// Keys of several characters drawn as HTML, both on the key and in the
+// line (physics symbols: E_p is E with p below). See registerChunks.
+const CHUNK_HTML = {};
+export function registerChunks(map) {
+  for (const [k, v] of Object.entries(map)) { CHUNK_HTML[k] = v; LABEL[k] = v; }
+}
 
 function charHtml(chars, i, end = i + 1) {
   const c = chars[i];
+  if (c.length > 1 && CHUNK_HTML[c]) return `<span class="m-chunk" data-i="${i}">${CHUNK_HTML[c]}</span>`;
   if (c.length > 1) return `<span class="m-fn" data-i="${i}">${esc(CHUNK_SHOW[c] ?? c)}</span>`;
   if (c === "'") return `<span class="m-op" data-i="${i}">′</span>`;
   if (isLetter(c)) return `<i class="m-var" data-i="${end - 1}">${esc(chars.slice(i, end).join(''))}</i>`;
-  const show = c === '-' ? '−' : c;
+  const show = c === '-' ? '−' : c === ',' && LANG === 'en' && decimalComma(chars, i) ? '.' : c;
   // A minus at the start, after a bracket or an operator is a sign.
   const prev = chars[i - 1];
   const sign = c === '-' && (i === 0 || '(+-×÷^=;'.includes(prev) || isOpenChunk(prev ?? ''));

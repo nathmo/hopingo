@@ -18,6 +18,7 @@ import { equivalent, seedOf } from '../cas/equiv.js';
 import { evalFloat, sample } from '../cas/numeric.js';
 import { makeRng } from '../content/random.js';
 import { toText } from '../cas/print.js';
+import { t as tr } from '../i18n.js';
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine, frNum, parseOpts } from './common.js';
 import { presentationIssue } from './equiv.js';
@@ -81,10 +82,10 @@ export function isFinal(cfg, node, state = {}) {
   if (contains(node, (n) => n.t === 'int')) return false;
   const map = substOf(cfg, state);
   if (map && Object.keys(map).some((t) => dependsOn(node, t))) return false;
-  if (!symbolsIn(node).has('C')) return 'N\'oublie pas la constante : ajoute + C.';
+  if (!symbolsIn(node).has('C')) return tr('N\'oublie pas la constante : ajoute + C.');
   let dc;
   try { dc = equivalent(diff(node, 'C'), parse('1'), { vars: [vOf(cfg), 'C'], domain: cfg.domain }).equal; } catch { dc = false; }
-  if (!dc) return 'La constante s\'ajoute seule : écris … + C.';
+  if (!dc) return tr('La constante s\'ajoute seule : écris … + C.');
   return presentationIssue(node) ?? true;
 }
 
@@ -98,23 +99,23 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const read = readLine({ ...cfg, vars: varsOf(cfg) }, input);
   if (read.error) return read.error;
   const { node } = read;
-  if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression, sans « = » au milieu.' };
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (node.t === 'rel') return { kind: 'parse', node, message: tr('Écris seulement l\'expression, sans « = » au milieu.') };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   let da;
   let db;
   try { da = derivOf(cfg, prev, state); } catch { da = null; }
   try { db = derivOf(cfg, node, state); } catch (e) {
-    return { kind: 'wrong', node, message: e.message === 'mixed' ? 'N\'écris qu\'une seule variable par ligne : tout en x, ou tout en t.' : 'Je n\'arrive pas à dériver ta ligne pour la vérifier.' };
+    return { kind: 'wrong', node, message: e.message === 'mixed' ? tr('N\'écris qu\'une seule variable par ligne : tout en x, ou tout en t.') : tr('Je n\'arrive pas à dériver ta ligne pour la vérifier.') };
   }
   const o = opts(cfg, prev);
   const r = da ? equivalent(da, db, o) : { equal: true };
   if (!r.equal) {
     const diag = diagnoseLine('antideriv', prev, node, cfg, (cand, line) => sameDerivative(cfg, cand, line, state));
-    let message = 'Dérive ta ligne : tu ne retrouves pas la fonction à intégrer.';
+    let message = tr('Dérive ta ligne : tu ne retrouves pas la fonction à intégrer.');
     if (r.witness) {
       const v = vOf(cfg);
       const [x, y] = r.witness.values;
-      message = `Dérive ta ligne pour la contrôler : en ${v} = ${frNum(r.witness.env[v])}, elle donne ${frNum(y)} au lieu de ${frNum(x)}.`;
+      message = tr('Dérive ta ligne pour la contrôler : en {v} = {at}, elle donne {y} au lieu de {x}.', { v, at: frNum(r.witness.env[v]), y: frNum(y), x: frNum(x) });
     }
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: r.witness ?? null, message };
   }
@@ -122,11 +123,11 @@ export function judgeLine(cfg, prev, input, state = {}) {
   if (bad) {
     const v = vOf(cfg);
     const diag = diagnoseLine('antideriv', prev, node, cfg, (cand, line) => toText(cand) === toText(line) || (sameDerivative(cfg, cand, line, state) && !!undefinedAt(cfg, da, cand, state)));
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `Ta primitive n'est pas définie en ${v} = ${frNum(bad[v])}, alors que la fonction à intégrer l'est.` };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: tr('Ta primitive n\'est pas définie en {v} = {at}, alors que la fonction à intégrer l\'est.', { v, at: frNum(bad[v]) }) };
   }
   const fin = isFinal(cfg, node, state);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais {rest}', { rest: `${fin.charAt(0).toLowerCase()}${fin.slice(1)}` }) };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
 }

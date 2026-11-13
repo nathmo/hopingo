@@ -9,6 +9,7 @@
 // Level 5: a sum mixing a telescoping and a geometric series (definite), or
 // a multiple choice.
 
+import { t } from '../../i18n.js';
 import { Q } from '../../math/rational.js';
 import { mcq, tfItem } from './kit.js';
 import {
@@ -18,19 +19,19 @@ import {
 const GT = 'a1-ser-geo-tele';
 const KEYS = ['calc', 'seq', 'anal'];
 const SUB = [
-  { id: 'geo', label: 'série géométrique', skill: 'g5-geom' },
-  { id: 'des', label: 'décomposition en éléments simples', skill: 'g0-pfd-simple' },
-  { id: 'shift', label: 'changement d\'indice', skill: 'g5-reindex' },
-  { id: 'lim', label: 'limite des sommes partielles', skill: GT },
+  { id: 'geo', label: t('série géométrique'), skill: 'g5-geom' },
+  { id: 'des', label: t('décomposition en éléments simples'), skill: 'g0-pfd-simple' },
+  { id: 'shift', label: t('changement d\'indice'), skill: 'g5-reindex' },
+  { id: 'lim', label: t('limite des sommes partielles'), skill: GT },
 ];
 const CHOICES = [
-  { id: 'geo', label: 'Série géométrique : premier terme sur 1 − raison' },
-  { id: 'split', label: 'Séparer en deux séries géométriques' },
-  { id: 'des', label: 'Décomposer en éléments simples' },
-  { id: 'sn', label: 'Écrire S_N et télescoper' },
-  { id: 'lim', label: 'Passer à la limite' },
-  { id: 'eval', label: 'Calculer' },
-  { id: 'start0', label: 'Appliquer 1/(1 − q)', rule: 'a1_geo_sum_start', why: '1/(1 − q) est la somme à partir de k = 0 : regarde d\'abord le premier terme.' },
+  { id: 'geo', label: t('Série géométrique : premier terme sur 1 − raison') },
+  { id: 'split', label: t('Séparer en deux séries géométriques') },
+  { id: 'des', label: t('Décomposer en éléments simples') },
+  { id: 'sn', label: t('Écrire S_N et télescoper') },
+  { id: 'lim', label: t('Passer à la limite') },
+  { id: 'eval', label: t('Calculer') },
+  { id: 'start0', label: t('Appliquer 1/(1 − q)'), rule: 'a1_geo_sum_start', why: t('1/(1 − q) est la somme à partir de k = 0 : regarde d\'abord le premier terme.') },
 ];
 
 const DEF = { kind: 'definite' };
@@ -93,9 +94,9 @@ function snText(d) {
   return heads.join('+') + tails.join('');
 }
 const termsNote = (d) => {
-  const t = (k) => `1/${d.a + k}`;
-  if (d.p === 1) return `S_N = (${t(1)} − ${t(2)}) + (${t(2)} − ${t(3)}) + … + (1/(N${d.a ? ` + ${d.a}` : ''}) − 1/(N + ${d.a + 1}))`;
-  return `S_N = (${t(1)} − ${t(3)}) + (${t(2)} − ${t(4)}) + (${t(3)} − ${t(5)}) + … : il reste ${t(1)} et ${t(2)}, et les deux derniers termes négatifs`;
+  const u = (k) => `1/${d.a + k}`;
+  if (d.p === 1) return `S_N = (${u(1)} − ${u(2)}) + (${u(2)} − ${u(3)}) + … + (1/(N${d.a ? ` + ${d.a}` : ''}) − 1/(N + ${d.a + 1}))`;
+  return t('S_N = ({u1} − {u3}) + ({u2} − {u4}) + ({u3} − {u5}) + … : il reste {u1} et {u2}, et les deux derniers termes négatifs', { u1: u(1), u2: u(2), u3: u(3), u4: u(4), u5: u(5) });
 };
 
 // ---------- lines items ----------
@@ -104,13 +105,13 @@ function geoLines(level, rng, opts) {
   const d = geoData(rng);
   const start = S(geoTerm(d.c, d.R, 'k'), d.k0);
   const formula = `(${N(d.first)})/(1-${P(d.R)})`;
-  const lines = level <= 3 ? [E(formula, 'Premier terme sur 1 − raison', 'geo', 'geo'), E(N(d.sum), 'Calculer', 'geo', 'eval')] : [E(N(d.sum), 'Premier terme sur 1 − raison', 'geo', 'geo')];
+  const lines = level <= 3 ? [E(formula, t('Premier terme sur 1 − raison'), 'geo', 'geo'), E(N(d.sum), t('Calculer'), 'geo', 'eval')] : [E(N(d.sum), t('Premier terme sur 1 − raison'), 'geo', 'geo')];
   if (level === 1) lines[0] = blanked(lines[0], [`1-${P(d.R)}`]);
   if (level === 2) lines[0] = blanked(lines[0], [N(d.first)]);
-  const given = level === 1 ? ` Le premier terme vaut ${fr(d.first)} et la raison ${fr(d.R)}.` : '';
+  const given = level === 1 ? ` ${t('Le premier terme vaut {a} et la raison {q}.', { a: fr(d.first), q: fr(d.R) })}` : '';
   return partsItem({
-    skill: GT, level, prompt: `Calcule ${MN(start)}.${given}`, parts: [part(null, null, start, DEF, lines)], choices: CHOICES,
-    hints: H('Une série géométrique de raison q, |q| < 1, vaut premier terme sur (1 − q).', `${MN(start)} = ▢/(1 − ${fr(P(d.R))})`, `${MN(formula)} = ${fr(d.sum)}`),
+    skill: GT, level, prompt: `${t('Calcule {s}.', { s: MN(start) })}${given}`, parts: [part(null, null, start, DEF, lines)], choices: CHOICES,
+    hints: H(t('Une série géométrique de raison q, |q| < 1, vaut premier terme sur (1 − q).'), `${MN(start)} = ▢/(1 − ${fr(P(d.R))})`, `${MN(formula)} = ${fr(d.sum)}`),
     subgoals: SUB, keys: KEYS, key: `${GT}:${level}:${start}`, exam: examOf(opts), fallback: d.fallback,
   });
 }
@@ -123,13 +124,13 @@ function comboLines(level, rng, opts) {
   const fa = d.k0 ? `(${N(d.ra)})/(1-${N(d.ra)})` : `1/(1-${N(d.ra)})`;
   const fb = d.k0 ? `(${N(d.rb)})/(1-${N(d.rb)})` : `1/(1-${N(d.rb)})`;
   const lines = level <= 3
-    ? [E(split, 'Séparer : deux séries géométriques', 'geo', 'split'), E(`${fa}+${fb}`, 'Premier terme sur 1 − raison', 'geo', 'geo'), E(N(d.sum), 'Calculer', 'geo', 'eval')]
-    : [E(split, 'Deux séries géométriques', 'geo', 'split'), E(N(d.sum), 'Premier terme sur 1 − raison', 'geo', 'geo')];
+    ? [E(split, t('Séparer : deux séries géométriques'), 'geo', 'split'), E(`${fa}+${fb}`, t('Premier terme sur 1 − raison'), 'geo', 'geo'), E(N(d.sum), t('Calculer'), 'geo', 'eval')]
+    : [E(split, t('Deux séries géométriques'), 'geo', 'split'), E(N(d.sum), t('Premier terme sur 1 − raison'), 'geo', 'geo')];
   if (level === 1) lines[1] = blanked(lines[1], [`1-${N(d.rb)}`]);
   if (level === 2) lines[0] = blanked(lines[0], [`(${d.b}/${d.cc})^k`]);
   return partsItem({
-    skill: GT, level, prompt: `Calcule ${MN(start)}.`, parts: [part(null, null, start, DEF, lines)], choices: CHOICES,
-    hints: H(`Sépare la fraction : (${top.replace('^k', 'ᵏ').replace('^k', 'ᵏ')})/${d.cc}ᵏ est une somme de deux puissances k-ièmes.`, `${MN(start)} = ${MN(S(`(${d.a}/${d.cc})^k`, d.k0))} + ▢`, `${MN(`${fa}+${fb}`)} = ${fr(d.sum)}`),
+    skill: GT, level, prompt: t('Calcule {s}.', { s: MN(start) }), parts: [part(null, null, start, DEF, lines)], choices: CHOICES,
+    hints: H(t('Sépare la fraction : ({top})/{c}ᵏ est une somme de deux puissances k-ièmes.', { top: top.replace('^k', 'ᵏ').replace('^k', 'ᵏ'), c: d.cc }), `${MN(start)} = ${MN(S(`(${d.a}/${d.cc})^k`, d.k0))} + ▢`, `${MN(`${fa}+${fb}`)} = ${fr(d.sum)}`),
     subgoals: SUB, keys: KEYS, key: `${GT}:${level}:${start}`, exam: examOf(opts), fallback: d.fallback,
   });
 }
@@ -140,19 +141,19 @@ function teleLines(level, rng, opts) {
   const sn = snText(d);
   const parts = [];
   if (level >= 2) {
-    const l = [E(desText(d), 'Décomposition en éléments simples', 'des', 'des')];
+    const l = [E(desText(d), t('Décomposition en éléments simples'), 'des', 'des')];
     if (level === 2) l[0] = blanked(l[0], [`1/(${kpa(d.a + d.p)})`]);
-    parts.push(part('Décompose le terme général :', `${d.p}/(…) =`, termText(d), DES, l));
+    parts.push(part(t('Décompose le terme général :'), `${d.p}/(…) =`, termText(d), DES, l));
   }
-  const snLines = [E(sn, d.p === 1 ? 'Télescoper : il reste le premier et le dernier terme' : `Télescoper : décalage de ${d.p}, il reste ${d.p} termes au début et ${d.p} à la fin`, 'shift', 'sn')];
+  const snLines = [E(sn, d.p === 1 ? t('Télescoper : il reste le premier et le dernier terme') : t('Télescoper : décalage de {p}, il reste {p} termes au début et {p} à la fin', { p: d.p }), 'shift', 'sn')];
   if (level <= 2) snLines[0] = blanked(snLines[0], [`1/(${lin(-(d.a + d.p), 'N')})`]);
-  const snPart = part('Somme partielle :', 'S_N =', S(desText(d), 1, 'N'), SN, snLines, level <= 3 ? [{ kind: 'note', html: termsNote(d) }] : null);
+  const snPart = part(t('Somme partielle :'), 'S_N =', S(desText(d), 1, 'N'), SN, snLines, level <= 3 ? [{ kind: 'note', html: termsNote(d) }] : null);
   parts.push(snPart);
-  parts.push(part('Passe à la limite :', 'lim S_N =', sn, LIMN, [E(N(d.sum), 'Les termes en N tendent vers 0', 'lim', 'lim')]));
-  const given = level === 1 ? ` On donne ${MN(termText(d))} = ${MN(desText(d))}.` : '';
+  parts.push(part(t('Passe à la limite :'), 'lim S_N =', sn, LIMN, [E(N(d.sum), t('Les termes en N tendent vers 0'), 'lim', 'lim')]));
+  const given = level === 1 ? ` ${t('On donne {a} = {b}.', { a: MN(termText(d)), b: MN(desText(d)) })}` : '';
   return partsItem({
-    skill: GT, level, prompt: `Calcule ${MN(start)} à l'aide des sommes partielles S_N.${given}`, parts, choices: CHOICES,
-    hints: H('Décompose en deux fractions, puis écris les premiers termes de S_N : beaucoup s\'annulent.', `S_N = ${fr(N(d.heads[0]))} + … − 1/(N + ${d.a + 1}) − …`, `${MN(sn)} → ${fr(d.sum)}`),
+    skill: GT, level, prompt: `${t('Calcule {s} à l\'aide des sommes partielles S_N.', { s: MN(start) })}${given}`, parts, choices: CHOICES,
+    hints: H(t('Décompose en deux fractions, puis écris les premiers termes de S_N : beaucoup s\'annulent.'), `S_N = ${fr(N(d.heads[0]))} + … − 1/(N + ${d.a + 1}) − …`, `${MN(sn)} → ${fr(d.sum)}`),
     subgoals: SUB, keys: KEYS, key: `${GT}:${level}:${start}`, exam: examOf(opts), declares: { vars: ['k', 'N'] },
   });
 }
@@ -161,12 +162,12 @@ function teleLines(level, rng, opts) {
 // Σ (√(k + 1) − √k) written 1/(√(k + 1) + √k) (S_N = √(N + 1) − 1).
 const DIVERGENT = {
   ln: {
-    term: 'ln((k+1)/k)', split: 'ln(k+1)-ln(k)', sn: 'ln(N+1)', splitNote: 'ln(a/b) = ln a − ln b', snNote: 'Télescoper : ln 1 = 0', blank: 'N+1',
-    hints: ['ln((k + 1)/k) = ln(k + 1) − ln k : la somme télescope.', 'S_N = ln(N + 1) − ln ▢', 'S_N = ln(N + 1) → +∞ : la série diverge, même si ses termes tendent vers 0.'],
+    term: 'ln((k+1)/k)', split: 'ln(k+1)-ln(k)', sn: 'ln(N+1)', splitNote: 'ln(a/b) = ln a − ln b', snNote: t('Télescoper : ln 1 = 0'), blank: 'N+1',
+    hints: [t('ln((k + 1)/k) = ln(k + 1) − ln k : la somme télescope.'), 'S_N = ln(N + 1) − ln ▢', t('S_N = ln(N + 1) → +∞ : la série diverge, même si ses termes tendent vers 0.')],
   },
   sqrt: {
-    term: '1/(√(k+1)+√(k))', split: '√(k+1)-√(k)', sn: '√(N+1)-1', splitNote: 'Multiplier par la quantité conjuguée √(k + 1) − √k', snNote: 'Télescoper : il reste −√1 et √(N + 1)', blank: '√(N+1)',
-    hints: ['Multiplie par la quantité conjuguée : 1/(√(k + 1) + √k) = √(k + 1) − √k, puis la somme télescope.', 'S_N = ▢ − 1', 'S_N = √(N + 1) − 1 → +∞ : la série diverge, même si ses termes tendent vers 0.'],
+    term: '1/(√(k+1)+√(k))', split: '√(k+1)-√(k)', sn: '√(N+1)-1', splitNote: t('Multiplier par la quantité conjuguée √(k + 1) − √k'), snNote: t('Télescoper : il reste −√1 et √(N + 1)'), blank: '√(N+1)',
+    hints: [t('Multiplie par la quantité conjuguée : 1/(√(k + 1) + √k) = √(k + 1) − √k, puis la somme télescope.'), 'S_N = ▢ − 1', t('S_N = √(N + 1) − 1 → +∞ : la série diverge, même si ses termes tendent vers 0.')],
   },
 };
 
@@ -175,33 +176,33 @@ function lnLines(level, rng, opts) {
   const D = DIVERGENT[kind];
   const start = S(D.term, 1);
   const parts = [
-    part('Somme partielle :', 'S_N =', S(D.term, 1, 'N'), SN,
-      level <= 3 ? [E(S(D.split, 1, 'N'), D.splitNote, 'shift', 'des'), E(D.sn, D.snNote, 'shift', 'sn')] : [E(D.sn, 'Télescoper', 'shift', 'sn')]),
-    part('Passe à la limite :', 'lim S_N =', D.sn, LIMN, [E('+∞', 'S_N → +∞ : la série diverge', 'lim', 'lim')]),
+    part(t('Somme partielle :'), 'S_N =', S(D.term, 1, 'N'), SN,
+      level <= 3 ? [E(S(D.split, 1, 'N'), D.splitNote, 'shift', 'des'), E(D.sn, D.snNote, 'shift', 'sn')] : [E(D.sn, t('Télescoper'), 'shift', 'sn')]),
+    part(t('Passe à la limite :'), 'lim S_N =', D.sn, LIMN, [E('+∞', t('S_N → +∞ : la série diverge'), 'lim', 'lim')]),
   ];
   if (level <= 2) parts[0].lines[1] = blanked(parts[0].lines[1], [D.blank]);
   return partsItem({
-    skill: GT, level, prompt: `La série ${MN(start)} converge-t-elle ? Calcule ses sommes partielles S_N.`, parts, choices: CHOICES,
+    skill: GT, level, prompt: t('La série {s} converge-t-elle ? Calcule ses sommes partielles S_N.', { s: MN(start) }), parts, choices: CHOICES,
     hints: H(...D.hints), subgoals: SUB, keys: KEYS, key: `${GT}:${level}:${kind}`, exam: examOf(opts),
   });
 }
 
 // Level 5: a telescoping and a geometric series in one sum (definite).
 function mixedLines(rng, opts) {
-  const t = teleData(rng);
+  const tl = teleData(rng);
   const g = geoData(rng);
   const R = g.R;
   const geo = geoTerm(1, R, 'k');
-  const start = S(`${termText(t)}+${geo}`, 1);
+  const start = S(`${termText(tl)}+${geo}`, 1);
   const gsum = R.div(Q.of(1).sub(R));
-  const total = t.sum.add(gsum);
+  const total = tl.sum.add(gsum);
   const lines = [
-    E(`${S(desText(t), 1)}+${S(geo, 1)}`, 'Séparer ; décomposer le premier terme', 'des', 'des'),
-    E(`${t.heads.map((h) => N(h)).join('+')}+(${N(R)})/(1-${P(R)})`, 'Télescoper ; premier terme sur 1 − raison', 'geo', 'sn'),
-    E(N(total), 'Calculer', 'lim', 'eval'),
+    E(`${S(desText(tl), 1)}+${S(geo, 1)}`, t('Séparer ; décomposer le premier terme'), 'des', 'des'),
+    E(`${tl.heads.map((h) => N(h)).join('+')}+(${N(R)})/(1-${P(R)})`, t('Télescoper ; premier terme sur 1 − raison'), 'geo', 'sn'),
+    E(N(total), t('Calculer'), 'lim', 'eval'),
   ];
   return partsItem({
-    skill: GT, level: 5, prompt: `Calcule ${MN(start)}.`, parts: [part(null, null, start, DEF, lines)],
+    skill: GT, level: 5, prompt: t('Calcule {s}.', { s: MN(start) }), parts: [part(null, null, start, DEF, lines)],
     hints: [], subgoals: SUB, keys: KEYS, key: `${GT}:5:${start}`, exam: examOf(opts), fallback: g.fallback,
   });
 }
@@ -221,12 +222,12 @@ function seriesMcq(rng, opts, level = 4) {
       { html: fr(next), correct: false },
       { html: fr(plus), correct: false },
       { html: fr(d.first), correct: false },
-      { html: 'La série diverge', correct: false },
+      { html: t('La série diverge'), correct: false },
     ];
     for (const o of options) if (!o.rule) delete o.rule;
     return mcqOf({
       skill: GT, level, prompt: `${MN(start)} =`, options, key: `${GT}:mcq:${start}`, expectedSec: 240, exam: examOf(opts), fallback: d.fallback,
-      solution: [{ html: `Premier terme ${fr(d.first)}, raison ${fr(d.R)} : ${fr(d.first)}/(1 − ${fr(P(d.R))}) = ${fr(d.sum)}.`, note: '' }],
+      solution: [{ html: t('Premier terme {a}, raison {q} : {a}/(1 − {qp}) = {s}.', { a: fr(d.first), q: fr(d.R), qp: fr(P(d.R)), s: fr(d.sum) }), note: '' }],
     }, rng);
   }
   const d = teleData(rng);
@@ -240,7 +241,7 @@ function seriesMcq(rng, opts, level = 4) {
     { html: fr(d.sum.mul(2)), correct: false },
     { html: fr(q(1, d.a + d.p + 1)), correct: false },
     { html: '1', correct: false },
-    { html: 'La série diverge', correct: false },
+    { html: t('La série diverge'), correct: false },
   ];
   return mcqOf({
     skill: GT, level, prompt: `${MN(start)} =`, options, key: `${GT}:mcq:${start}`, expectedSec: 240, exam: examOf(opts),
@@ -253,25 +254,25 @@ function seriesTf(rng, opts) {
   if (kind === 'partial') {
     return tfItem({
       skill: GT, level: 4, truth: true, key: 'partial', exam: examOf(opts),
-      statement: 'Si les sommes partielles sₙ d\'une série vérifient lim sₙ = 1, alors lim (s₂ₙ − sₙ) = 0.',
-      explanation: 'Vrai : s₂ₙ et sₙ tendent toutes deux vers 1 (s₂ₙ est une sous-suite de sₙ), donc leur différence tend vers 0.',
+      statement: t('Si les sommes partielles sₙ d\'une série vérifient lim sₙ = 1, alors lim (s₂ₙ − sₙ) = 0.'),
+      explanation: t('Vrai : s₂ₙ et sₙ tendent toutes deux vers 1 (s₂ₙ est une sous-suite de sₙ), donc leur différence tend vers 0.'),
     });
   }
   if (kind === 'start') {
     const k0 = rng.pick([1, 2]);
     return tfItem({
       skill: GT, level: 4, truth: false, key: `start:${k0}`, exam: examOf(opts), ruleIfTrue: 'a1_geo_sum_start',
-      statement: `Pour tout q ∈ ]0 ; 1[, ${MN(S('q^k', k0))} = 1/(1 − q).`,
+      statement: t('Pour tout q ∈ ]0 ; 1[, {s} = 1/(1 − q).', { s: MN(S('q^k', k0)) }),
       counter: { kind: 'refute', quants: [{ q: '∀', v: 'q', dom: 'R' }], pred: `0<q<1⇒q^${k0}/(1-q)=1/(1-q)`, hyp: '0<q<1', ask: [{ v: 'q', label: 'q =', keys: ['calc'] }], answer: { q: '1/2' } },
-      explanation: `Faux : la somme commence à k = ${k0}, son premier terme est q${k0 === 1 ? '' : '²'} : elle vaut q${k0 === 1 ? '' : '²'}/(1 − q). Pour q = 1/2 : ${k0 === 1 ? '1' : '1/2'}, et pas 2.`,
+      explanation: t('Faux : la somme commence à k = {k0}, son premier terme est {qk} : elle vaut {qk}/(1 − q). Pour q = 1/2 : {v}, et pas 2.', { k0, qk: `q${k0 === 1 ? '' : '²'}`, v: k0 === 1 ? '1' : '1/2' }),
     });
   }
   if (kind === 'zero') {
     return tfItem({
       skill: GT, level: 4, truth: false, key: 'zero', exam: examOf(opts),
-      statement: 'Si uₙ → 0, alors la série Σ uₙ converge.',
+      statement: t('Si uₙ → 0, alors la série Σ uₙ converge.'),
       counter: { kind: 'sequence', v: 'n', from: 1, hyp: [{ p: 'toZero' }], concl: { p: 'seriesConverges' }, ask: [{ v: 'a', label: 'uₙ =', keys: ['calc', 'seq'] }], answer: { a: 'ln((n+1)/n)' } },
-      explanation: 'Faux : uₙ = ln((n + 1)/n) → 0, mais la série télescope : S_N = ln(N + 1) → +∞.',
+      explanation: t('Faux : uₙ = ln((n + 1)/n) → 0, mais la série télescope : S_N = ln(N + 1) → +∞.'),
     });
   }
   const d = geoData(rng);
@@ -279,7 +280,7 @@ function seriesTf(rng, opts) {
   return tfItem({
     skill: GT, level: 4, truth: true, key: `geo:${start}`, exam: examOf(opts), fallback: d.fallback,
     statement: `${MN(start)} = ${fr(d.sum)}.`,
-    explanation: `Vrai : premier terme ${fr(d.first)}, raison ${fr(d.R)} : ${fr(d.first)}/(1 − ${fr(P(d.R))}) = ${fr(d.sum)}.`,
+    explanation: t('Vrai : premier terme {a}, raison {q} : {a}/(1 − {qp}) = {s}.', { a: fr(d.first), q: fr(d.R), qp: fr(P(d.R)), s: fr(d.sum) }),
   });
 }
 

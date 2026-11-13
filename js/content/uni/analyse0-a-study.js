@@ -19,6 +19,12 @@ import {
   V, q, N, nz, modeOf, H, E, NOTE, examOf, fr, tpl, blanked, partsItem, polyText, fromRoots, dPoly, iPoly, evalPoly, at, valueAt,
   lin, factoredText, tangentText, tangentFinal, tangentCfg, tangentLines, pre,
 } from './analyse0-a-kit.js';
+import { t } from '../../i18n.js';
+
+// {name} filled in French: a key built from a statement stays French.
+const frFill = (s, v) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? String(v[k]) : m));
+// « A et B et C » with the words of the language.
+const andJoin = (xs) => xs.reduce((a, b) => t('{a} et {b}', { a, b }));
 
 const KEYS = ['calcx', 'relation', 'set'];
 const setText = (rel) => toText(setToNode(solutionSet(parse(rel), { v: V })));
@@ -62,19 +68,21 @@ function signTable(bounds, factors) {
 
 const SV = 'g6-sign-variation';
 const SV_SUB = [
-  { id: 'derive', label: 'dériver', skill: 'g6-deriv-rules' },
-  { id: 'factor', label: 'factoriser', skill: 'fac-complete' },
-  { id: 'sign', label: 'signe de f′', skill: 'g1-sign-table' },
-  { id: 'extrema', label: 'extrema', skill: SV },
+  { id: 'derive', label: t('dériver'), skill: 'g6-deriv-rules' },
+  { id: 'factor', label: t('factoriser'), skill: 'fac-complete' },
+  { id: 'sign', label: t('signe de f′'), skill: 'g1-sign-table' },
+  { id: 'extrema', label: t('extrema'), skill: SV },
 ];
 const SV_CHOICES = [
-  { id: 'derive', label: 'Dériver' },
-  { id: 'factor', label: 'Factoriser f′' },
-  { id: 'sign', label: 'Signe de chaque facteur, puis de f′' },
-  { id: 'value', label: 'Valeur de f au point critique' },
-  { id: 'expand', label: 'Développer f′', why: 'Pour le signe, il faut f′ factorisée, pas développée.' },
+  { id: 'derive', label: t('Dériver') },
+  { id: 'factor', label: t('Factoriser f′') },
+  { id: 'sign', label: t('Signe de chaque facteur, puis de f′') },
+  { id: 'value', label: t('Valeur de f au point critique') },
+  { id: 'expand', label: t('Développer f′'), why: t('Pour le signe, il faut f′ factorisée, pas développée.') },
 ];
+// French: the keys of the texts built from it. NAT: the words on screen.
 const NATURE = { max: 'maximum local', min: 'minimum local', none: 'ni maximum ni minimum' };
+const NAT = (kind) => t(NATURE[kind]);
 
 // f with f′ = k·Π(x − r)^m: {f, fcs, d1 (f′ expanded), fac (f′ factored),
 // crit: [{r, kind}], dom, factors (sign table), lines1 (the f′ lines)}.
@@ -101,7 +109,7 @@ function svData(rng, gab) {
       const fac = `(${lin(m)})(${lin(-m)})/x^2`;
       return {
         gab, f, dom: [0.3, 3], fac,
-        lines1: [E(`(2x×x-(x^2+${c}))/x^2`, 'Règle du quotient', 'derive', 'derive'), E(`(x^2-${c})/x^2`, 'Réduire', 'derive', 'derive'), E(fac, 'Factoriser', 'factor', 'factor')],
+        lines1: [E(`(2x×x-(x^2+${c}))/x^2`, t('Règle du quotient'), 'derive', 'derive'), E(`(x^2-${c})/x^2`, t('Réduire'), 'derive', 'derive'), E(fac, t('Factoriser'), 'factor', 'factor')],
         crit: [{ r: -m, kind: 'max', fr: q(-2 * m) }, { r: m, kind: 'min', fr: q(2 * m) }],
         bounds: [-m, 0, m], factors: [{ id: 'f0', f: lin(m), label: lin(m) }, { id: 'f1', f: lin(-m), label: lin(-m) }, { id: 'f2', f: 'x^2', label: 'x²', den: true, even: true }],
       };
@@ -121,12 +129,12 @@ function svData(rng, gab) {
     const flip = k < 0 ? sorted.findIndex(([, m]) => m === 1) : -1;
     const factors = sorted.map(([r, m], j) => {
       const base = j === flip ? (r === 0 ? '-x' : `${N(r)}-x`) : lin(r);
-      const t = m === 2 ? (base === 'x' ? 'x^2' : `(${base})^2`) : base;
-      return { id: `f${j}`, f: t, label: t.replace('^2', '²'), even: m === 2 };
+      const fx = m === 2 ? (base === 'x' ? 'x^2' : `(${base})^2`) : base;
+      return { id: `f${j}`, f: fx, label: fx.replace('^2', '²'), even: m === 2 };
     });
     return {
       gab, f, fcs, dom: [-3, 3], fac,
-      lines1: [E(polyText(d1), 'Dériver', 'derive', 'derive'), E(fac, 'Factoriser', 'factor', 'factor')],
+      lines1: [E(polyText(d1), t('Dériver'), 'derive', 'derive'), E(fac, t('Factoriser'), 'factor', 'factor')],
       crit, bounds: sorted.map(([r]) => r), factors,
     };
   }
@@ -136,7 +144,7 @@ const SV_FALLBACK = () => {
   const fcs = [q(1), q(-3), q(-9), q(2)];
   return {
     gab: 'cubic', f: 'x^3-3x^2-9x+2', fcs, dom: [-3, 3], fac: '3(x+1)(x-3)',
-    lines1: [E('3x^2-6x-9', 'Dériver', 'derive', 'derive'), E('3(x+1)(x-3)', 'Factoriser', 'factor', 'factor')],
+    lines1: [E('3x^2-6x-9', t('Dériver'), 'derive', 'derive'), E('3(x+1)(x-3)', t('Factoriser'), 'factor', 'factor')],
     crit: [{ r: -1, kind: 'max', fr: q(7) }, { r: 3, kind: 'min', fr: q(-25) }], bounds: [-1, 3],
     factors: [{ id: 'f0', f: 'x+1', label: 'x+1' }, { id: 'f1', f: 'x-3', label: 'x-3' }], fallback: true,
   };
@@ -145,11 +153,11 @@ const SV_FALLBACK = () => {
 // The decision at a critical point; a wrong extremum where there is none
 // is the trap g6_critical_is_extremum.
 function natureDecision(c, word = 'f′') {
-  const why = { max: `${word} passe de + à − : maximum local.`, min: `${word} passe de − à + : minimum local.`, none: `${word} garde le même signe des deux côtés : ni maximum ni minimum.` }[c.kind];
+  const why = { max: t('{w} passe de + à − : maximum local.', { w: word }), min: t('{w} passe de − à + : minimum local.', { w: word }), none: t('{w} garde le même signe des deux côtés : ni maximum ni minimum.', { w: word }) }[c.kind];
   return {
-    kind: 'decision', prompt: `En x = ${R(c.r)}, f a…`,
+    kind: 'decision', prompt: t('En x = {r}, f a…', { r: R(c.r) }),
     options: ['max', 'min', 'none'].map((id) => ({
-      id, label: `un ${NATURE[id]}`.replace('un ni', 'ni'), valid: id === c.kind, why,
+      id, label: t(`un ${NATURE[id]}`.replace('un ni', 'ni')), valid: id === c.kind, why,
       ...(c.kind === 'none' && id !== 'none' ? { rule: 'g6_critical_is_extremum' } : {}),
     })),
   };
@@ -158,23 +166,23 @@ function natureDecision(c, word = 'f′') {
 function svParts(d, level) {
   const parts = [];
   if (level >= 2) {
-    parts.push({ html: 'Dérive et factorise f′.', ask: 'f′(x) =', start: `d(${d.f})`, judge: derivJudge(d.dom), lines: level === 2 ? [d.lines1[0], ...d.lines1.slice(1, -1), blanked(d.lines1.at(-1), [lin(d.crit.at(-1).r)])] : d.lines1 });
+    parts.push({ html: t('Dérive et factorise f′.'), ask: 'f′(x) =', start: `d(${d.f})`, judge: derivJudge(d.dom), lines: level === 2 ? [d.lines1[0], ...d.lines1.slice(1, -1), blanked(d.lines1.at(-1), [lin(d.crit.at(-1).r)])] : d.lines1 });
   }
   const set = setText(`${d.fac}>0`);
-  parts.push({ html: 'Où f′ est-elle positive ?', start: `${d.fac}>0`, judge: { kind: 'solset', v: V }, lines: [level <= 2 ? blanked(E(set, 'Tableau de signes de f′', 'sign', 'sign'), [N(d.crit[0].r)]) : E(set, 'Tableau de signes de f′', 'sign', 'sign')] });
+  parts.push({ html: t('Où f′ est-elle positive ?'), start: `${d.fac}>0`, judge: { kind: 'solset', v: V }, lines: [level <= 2 ? blanked(E(set, t('Tableau de signes de f′'), 'sign', 'sign'), [N(d.crit[0].r)]) : E(set, t('Tableau de signes de f′'), 'sign', 'sign')] });
   for (const c of d.crit) {
     parts.push({
-      html: `Point critique x = ${R(c.r)} :`, ask: `f(${R(c.r)}) =`, start: at(d.f, c.r), judge: VAL,
-      pre: level === 1 ? [NOTE(`f′ change ${c.kind === 'none' ? 'pas ' : ''}de signe : ${NATURE[c.kind]}.`)] : [natureDecision(c)],
-      lines: [E(N(c.fr), NATURE[c.kind], 'extrema', 'value')],
+      html: t('Point critique x = {r} :', { r: R(c.r) }), ask: `f(${R(c.r)}) =`, start: at(d.f, c.r), judge: VAL,
+      pre: level === 1 ? [NOTE(t(`f′ change ${c.kind === 'none' ? 'pas ' : ''}de signe : ${NATURE[c.kind]}.`))] : [natureDecision(c)],
+      lines: [E(N(c.fr), NAT(c.kind), 'extrema', 'value')],
     });
   }
   return parts;
 }
 
 const svPrompt = (rng, d) => rng.pick([
-  `Étudie la variation de f(x) = ${MT(d.f)} : signe de f′, puis nature et valeur de chaque point critique.`,
-  `Soit f(x) = ${MT(d.f)}. Où f croît-elle ? Donne ses extrema locaux.`,
+  t('Étudie la variation de f(x) = {f} : signe de f′, puis nature et valeur de chaque point critique.', { f: MT(d.f) }),
+  t('Soit f(x) = {f}. Où f croît-elle ? Donne ses extrema locaux.', { f: MT(d.f) }),
 ]);
 
 function svItem(level, rng, opts = {}) {
@@ -186,7 +194,7 @@ function svItem(level, rng, opts = {}) {
   const parts = svParts(d, level);
   return partsItem({
     skill: SV, level, parts, choices: SV_CHOICES, prompt: svPrompt(rng, d),
-    hints: H('Factorise f′, puis fais le tableau de signes : f croît où f′ > 0. Un extremum demande que f′ <b>change de signe</b>.', `f′(x) = ${MT(templateOf(tpl(d.fac, [lin(d.crit.at(-1).r)])))}`, d.crit.map((c) => `en ${R(c.r)} : ${NATURE[c.kind]}, f(${R(c.r)}) = ${R(c.fr)}`).join(' ; ')),
+    hints: H(t('Factorise f′, puis fais le tableau de signes : f croît où f′ > 0. Un extremum demande que f′ <b>change de signe</b>.'), `f′(x) = ${MT(templateOf(tpl(d.fac, [lin(d.crit.at(-1).r)])))}`, d.crit.map((c) => t('en {r} : {n}, f({r}) = {v}', { r: R(c.r), n: NAT(c.kind), v: R(c.fr) })).join(' ; ')),
     subgoals: SV_SUB, keys: KEYS, key: `${SV}:${level}:${d.f}`, exam: examOf(opts, 3), fallback: d.fallback, expectedSec: 60 + 40 * parts.length,
   });
 }
@@ -194,31 +202,31 @@ function svItem(level, rng, opts = {}) {
 // Level 1: the sign table of f′ (factors given), then the extrema.
 function svTable(rng, d) {
   const { cols, prod } = signTable(d.bounds, d.factors);
-  const rows = d.factors.map((f) => ({ id: f.id, label: `${f.label}${f.den ? ' (dén.)' : ''}`, cells: f.signs.map((s) => ({ input: true, kind: 'sign' })) }));
+  const rows = d.factors.map((f) => ({ id: f.id, label: `${f.label}${f.den ? t(' (dén.)') : ''}`, cells: f.signs.map((s) => ({ input: true, kind: 'sign' })) }));
   rows.push({ id: 'f', label: 'f′(x)', cells: prod.map(() => ({ input: true, kind: 'sign' })) });
   const answers = Object.fromEntries(d.factors.map((f) => [f.id, f.signs]));
   answers.f = prod;
   const then = linesItem({
-    skill: SV, level: 1, prompt: 'Lis le tableau : nature et valeur de chaque point critique.',
+    skill: SV, level: 1, prompt: t('Lis le tableau : nature et valeur de chaque point critique.'),
     ...thenParts(d), mode: 'guided', noHints: true, hints: [], subgoals: SV_SUB, keys: KEYS, key: `${SV}:then:${d.f}`,
   });
   const line = (s) => s.join(' ');
   return tableItem({
-    skill: SV, level: 1, prompt: `f(x) = ${MT(d.f)}, et f′(x) = ${MT(d.fac)}. Fais le tableau de signes de f′ (touche une case pour choisir + , − , 0 ou ‖).`,
+    skill: SV, level: 1, prompt: t('f(x) = {f}, et f′(x) = {df}. Fais le tableau de signes de f′ (touche une case pour choisir + , − , 0 ou ‖).', { f: MT(d.f), df: MT(d.fac) }),
     table: { cols, rows }, phi: { kind: 'signs', v: V, bounds: d.bounds.map(String), factors: d.factors.map((f) => ({ id: f.id, f: f.f, den: !!f.den, even: !!f.even })) },
     answers, then,
-    hints: H('Une ligne par facteur : il change de signe en sa racine, sauf s\'il est au carré. La dernière ligne : la règle des signes.', `${d.factors[0].label} : ${line(d.factors[0].signs)}`, `f′(x) : ${line(prod)}`),
+    hints: H(t('Une ligne par facteur : il change de signe en sa racine, sauf s\'il est au carré. La dernière ligne : la règle des signes.'), `${d.factors[0].label} : ${line(d.factors[0].signs)}`, `f′(x) : ${line(prod)}`),
     baits: d.crit.some((c) => c.kind === 'none') ? ['g6_critical_is_extremum'] : [],
     subgoals: SV_SUB, key: `${SV}:1:${d.f}`, fallback: d.fallback,
-    solution: [...d.factors.map((f) => ({ html: `${f.label} : ${line(f.signs)}`, note: '' })), { html: `f′(x) : ${line(prod)}`, note: 'Règle des signes' }],
+    solution: [...d.factors.map((f) => ({ html: `${f.label} : ${line(f.signs)}`, note: '' })), { html: `f′(x) : ${line(prod)}`, note: t('Règle des signes') }],
   });
 }
 
 // The parts after the table: one per critical point (decision given).
 function thenParts(d) {
   const [first, ...rest] = d.crit.map((c) => ({
-    html: `x = ${R(c.r)} : ${NATURE[c.kind]}`, ask: `f(${R(c.r)}) =`, start: at(d.f, c.r), judge: VAL,
-    lines: [E(N(c.fr), `${NATURE[c.kind]} : f(${R(c.r)})`, 'extrema')],
+    html: `x = ${R(c.r)} : ${NAT(c.kind)}`, ask: `f(${R(c.r)}) =`, start: at(d.f, c.r), judge: VAL,
+    lines: [E(N(c.fr), `${NAT(c.kind)} : f(${R(c.r)})`, 'extrema')],
   }));
   const script = [NOTE(`<b>${first.html}</b>`), ...first.lines];
   for (const p of rest) script.push({ kind: 'segment', html: p.html, ask: p.ask, start: { math: p.start }, judge: p.judge }, ...p.lines);
@@ -227,7 +235,7 @@ function thenParts(d) {
 
 function svMcq(rng) {
   const d = svData(rng, 'quartic') ?? SV_FALLBACK();
-  const say = (cs) => (cs.length ? cs.map((c) => `un ${NATURE[c.kind]} en x = ${R(c.r)}`).join(' et ') : 'aucun extremum local');
+  const say = (cs) => (cs.length ? andJoin(cs.map((c) => t(`un ${NATURE[c.kind]} en x = {r}`, { r: R(c.r) }))) : t('aucun extremum local'));
   const ext = d.crit.filter((c) => c.kind !== 'none');
   const none = d.crit.filter((c) => c.kind === 'none');
   const all = d.crit.map((c) => ({ ...c, kind: c.kind === 'none' ? (ext[0]?.kind === 'max' ? 'min' : 'max') : c.kind }));
@@ -240,8 +248,8 @@ function svMcq(rng) {
   ];
   const options = cand.filter((o, i) => cand.findIndex((x) => x.html === o.html) === i);
   return mcq({
-    skill: SV, level: 4, prompt: `f(x) = ${MT(d.f)}, avec f′(x) = ${MT(d.fac)}. Quels sont les extrema locaux de f ?`, options,
-    key: `${SV}:mcq:${d.f}`, solution: [{ html: `Signe de f′ : f′ > 0 sur ${MT(setText(`${d.fac}>0`))}.`, note: '' }, ...d.crit.map((c) => ({ html: `x = ${R(c.r)} : ${NATURE[c.kind]}`, note: '' }))],
+    skill: SV, level: 4, prompt: t('f(x) = {f}, avec f′(x) = {df}. Quels sont les extrema locaux de f ?', { f: MT(d.f), df: MT(d.fac) }), options,
+    key: `${SV}:mcq:${d.f}`, solution: [{ html: t('Signe de f′ : f′ > 0 sur {s}.', { s: MT(setText(`${d.fac}>0`)) }), note: '' }, ...d.crit.map((c) => ({ html: `x = ${R(c.r)} : ${NAT(c.kind)}`, note: '' }))],
     exam: { format: 'mcq', points: 1 }, fallback: d.fallback,
   }, rng);
 }
@@ -251,21 +259,24 @@ function svMcq(rng) {
 function svTf(rng) {
   const d = svData(rng, rng.pick(['cubic', 'quartic'])) ?? SV_FALLBACK();
   const bank = [
-    { s: 'Si f est dérivable et f′(a) = 0, alors f a un extremum local en a.', truth: false, rule: 'g6_critical_is_extremum', why: 'Faux : f(x) = x³ a f′(0) = 0, mais f croît des deux côtés de 0 : pas d\'extremum.' },
-    { s: 'f(x) = x³ a un extremum local en 0, car f′(0) = 0.', truth: false, rule: 'g6_critical_is_extremum', why: 'Faux : f′(x) = 3x² ≥ 0 ne change pas de signe en 0.' },
-    { s: 'Si f est dérivable et que f′ passe de + à − en a, alors f a un maximum local en a.', truth: true, why: 'Vrai : f croît avant a et décroît après.' },
+    { s: 'Si f est dérivable et f′(a) = 0, alors f a un extremum local en a.', truth: false, rule: 'g6_critical_is_extremum', why: t('Faux : f(x) = x³ a f′(0) = 0, mais f croît des deux côtés de 0 : pas d\'extremum.') },
+    { s: 'f(x) = x³ a un extremum local en 0, car f′(0) = 0.', truth: false, rule: 'g6_critical_is_extremum', why: t('Faux : f′(x) = 3x² ≥ 0 ne change pas de signe en 0.') },
+    { s: 'Si f est dérivable et que f′ passe de + à − en a, alors f a un maximum local en a.', truth: true, why: t('Vrai : f croît avant a et décroît après.') },
   ];
   const c = rng.pick(d.crit);
   const claim = rng.pick(['max', 'min', 'none'].filter((k) => k !== c.kind || rng.chance(0.5)));
+  // The statement: French for the key, the language of the page on screen.
+  const sk = `f(x) = {f} ${claim === 'none' ? 'n’a ni maximum ni minimum local' : `a un ${NATURE[claim]}`} en x = {r}.`;
+  const sv = { f: MT(d.f), r: R(c.r) };
   bank.push({
-    s: `f(x) = ${MT(d.f)} ${claim === 'none' ? 'n’a ni maximum ni minimum local' : `a un ${NATURE[claim]}`} en x = ${R(c.r)}.`, truth: claim === c.kind,
+    s: frFill(sk, sv), st: t(sk, sv), truth: claim === c.kind,
     rule: c.kind === 'none' && claim !== 'none' ? 'g6_critical_is_extremum' : null,
-    why: `${claim === c.kind ? 'Vrai' : 'Faux'} : f′(x) = ${MT(d.fac)} ; en ${R(c.r)}, ${NATURE[c.kind]}.`,
+    why: t(`${claim === c.kind ? 'Vrai' : 'Faux'} : f′(x) = {df} ; en {r}, ${NATURE[c.kind]}.`, { df: MT(d.fac), r: R(c.r) }),
   });
   const b = rng.pick(bank);
   return mcq({
-    skill: SV, level: 4, prompt: `Vrai ou faux ?<br>« ${b.s} »`,
-    options: [{ html: 'Vrai', correct: b.truth, rule: b.truth ? null : b.rule }, { html: 'Faux', correct: !b.truth }],
+    skill: SV, level: 4, prompt: t('Vrai ou faux ?<br>« {s} »', { s: b.st ?? t(b.s) }),
+    options: [{ html: t('Vrai'), correct: b.truth, rule: b.truth ? null : b.rule }, { html: t('Faux'), correct: !b.truth }],
     keepOrder: true, key: `${SV}:tf:${b.s}`, solution: [{ html: b.why, note: '' }], exam: { format: 'tf', points: 1 }, expectedSec: 40,
   }, rng);
 }
@@ -276,20 +287,20 @@ function svTf(rng) {
 
 const CX = 'g6-convexity';
 const CX_SUB = [
-  { id: 'derive', label: 'dériver deux fois', skill: 'g6-deriv-rules' },
-  { id: 'sign', label: 'signe de f″', skill: SV },
-  { id: 'inflection', label: 'point d\'inflexion', skill: CX },
-  { id: 'tangent', label: 'tangente d\'inflexion', skill: 'g6-tangent' },
+  { id: 'derive', label: t('dériver deux fois'), skill: 'g6-deriv-rules' },
+  { id: 'sign', label: t('signe de f″'), skill: SV },
+  { id: 'inflection', label: t('point d\'inflexion'), skill: CX },
+  { id: 'tangent', label: t('tangente d\'inflexion'), skill: 'g6-tangent' },
 ];
 const CX_CHOICES = [
-  { id: 'derive1', label: 'Dériver une première fois' },
-  { id: 'derive2', label: 'Dériver une deuxième fois' },
-  { id: 'factor', label: 'Factoriser f″' },
-  { id: 'sign', label: 'Signe de f″' },
-  { id: 'value', label: 'Valeur de f au point' },
-  { id: 'slope', label: 'Pente f′ au point d\'inflexion' },
-  { id: 'line', label: 'Écrire y = f(a) + f′(a)(x − a)' },
-  { id: 'expand', label: 'Développer : y = mx + p' },
+  { id: 'derive1', label: t('Dériver une première fois') },
+  { id: 'derive2', label: t('Dériver une deuxième fois') },
+  { id: 'factor', label: t('Factoriser f″') },
+  { id: 'sign', label: t('Signe de f″') },
+  { id: 'value', label: t('Valeur de f au point') },
+  { id: 'slope', label: t('Pente f′ au point d\'inflexion') },
+  { id: 'line', label: t('Écrire y = f(a) + f′(a)(x − a)') },
+  { id: 'expand', label: t('Développer : y = mx + p') },
 ];
 
 // f with f″ = k·Π(x − p)^m: cubic (one inflection), quartic with two, or
@@ -317,7 +328,7 @@ function cxData(rng, gab) {
     const d2t = polyText(d2);
     return {
       gab, f, fcs, d1: polyText(d1), d2: d2t, fac, crit, dom: [-3, 3],
-      lines1: [E(`d(${polyText(d1)})`, 'Dériver une fois', 'derive', 'derive1'), E(d2t, 'Dériver une deuxième fois', 'derive', 'derive2'), ...(d2t === fac ? [] : [E(fac, 'Factoriser', 'derive', 'factor')])],
+      lines1: [E(`d(${polyText(d1)})`, t('Dériver une fois'), 'derive', 'derive1'), E(d2t, t('Dériver une deuxième fois'), 'derive', 'derive2'), ...(d2t === fac ? [] : [E(fac, t('Factoriser'), 'derive', 'factor')])],
     };
   }
   return null;
@@ -325,15 +336,15 @@ function cxData(rng, gab) {
 const CX_FALLBACK = () => ({
   gab: 'cubic', f: 'x^3-3x^2-9x+2', fcs: [q(1), q(-3), q(-9), q(2)], d1: '3x^2-6x-9', d2: '6x-6', fac: '6(x-1)', dom: [-3, 3],
   crit: [{ r: 1, kind: 'yes', fr: q(-9), dfr: q(-12) }],
-  lines1: [E('d(3x^2-6x-9)', 'Dériver une fois', 'derive', 'derive1'), E('6x-6', 'Dériver une deuxième fois', 'derive', 'derive2'), E('6(x-1)', 'Factoriser', 'derive', 'factor')], fallback: true,
+  lines1: [E('d(3x^2-6x-9)', t('Dériver une fois'), 'derive', 'derive1'), E('6x-6', t('Dériver une deuxième fois'), 'derive', 'derive2'), E('6(x-1)', t('Factoriser'), 'derive', 'factor')], fallback: true,
 });
 
 function inflectionDecision(c) {
   return {
-    kind: 'decision', prompt: `f″(${R(c.r)}) = 0. Le graphe a-t-il un point d'inflexion en x = ${R(c.r)} ?`,
+    kind: 'decision', prompt: t('f″({r}) = 0. Le graphe a-t-il un point d\'inflexion en x = {r} ?', { r: R(c.r) }),
     options: [
-      { id: 'yes', label: 'Oui', valid: c.kind === 'yes', why: c.kind === 'yes' ? '' : 'f″ garde le même signe des deux côtés : la concavité ne change pas.', ...(c.kind === 'no' ? { rule: 'g6_inflection_f2_zero' } : {}) },
-      { id: 'no', label: 'Non', valid: c.kind === 'no', why: 'f″ change de signe : la concavité change, c\'est un point d\'inflexion.' },
+      { id: 'yes', label: t('Oui'), valid: c.kind === 'yes', why: c.kind === 'yes' ? '' : t('f″ garde le même signe des deux côtés : la concavité ne change pas.'), ...(c.kind === 'no' ? { rule: 'g6_inflection_f2_zero' } : {}) },
+      { id: 'no', label: t('Non'), valid: c.kind === 'no', why: t('f″ change de signe : la concavité change, c\'est un point d\'inflexion.') },
     ],
   };
 }
@@ -342,24 +353,24 @@ function cxParts(d, level) {
   const parts = [];
   if (level >= 2) {
     const l1 = level === 2 ? d.lines1.map((l, k) => (k === d.lines1.length - 1 ? blanked(l, [String(Math.abs(d.crit[0].r)) === '0' ? 'x' : lin(d.crit[0].r)]) : l)) : d.lines1;
-    parts.push({ html: 'Dérive deux fois.', ask: 'f″(x) =', start: `d(d(${d.f}))`, judge: derivJudge(d.dom), lines: l1 });
+    parts.push({ html: t('Dérive deux fois.'), ask: 'f″(x) =', start: `d(d(${d.f}))`, judge: derivJudge(d.dom), lines: l1 });
   }
   const set = setText(`${d.fac}>0`);
-  parts.push({ html: 'Où f″ est-elle positive (f convexe) ?', start: `${d.fac}>0`, judge: { kind: 'solset', v: V }, lines: [level === 1 ? blanked(E(set, 'Signe de f″', 'sign', 'sign'), [N(d.crit[0].r)]) : E(set, 'Signe de f″', 'sign', 'sign')] });
+  parts.push({ html: t('Où f″ est-elle positive (f convexe) ?'), start: `${d.fac}>0`, judge: { kind: 'solset', v: V }, lines: [level === 1 ? blanked(E(set, t('Signe de f″'), 'sign', 'sign'), [N(d.crit[0].r)]) : E(set, t('Signe de f″'), 'sign', 'sign')] });
   for (const c of d.crit) {
     parts.push({
       html: `x = ${R(c.r)} :`, ask: `f(${R(c.r)}) =`, start: at(d.f, c.r), judge: VAL,
-      pre: level === 1 ? [NOTE(c.kind === 'yes' ? 'f″ change de signe : point d\'inflexion.' : 'f″ ne change pas de signe : pas d\'inflexion.')] : [inflectionDecision(c)],
-      lines: [E(N(c.fr), c.kind === 'yes' ? 'Point d\'inflexion' : 'Pas d\'inflexion', 'inflection', 'value')],
+      pre: level === 1 ? [NOTE(c.kind === 'yes' ? t('f″ change de signe : point d\'inflexion.') : t('f″ ne change pas de signe : pas d\'inflexion.'))] : [inflectionDecision(c)],
+      lines: [E(N(c.fr), c.kind === 'yes' ? t('Point d\'inflexion') : t('Pas d\'inflexion'), 'inflection', 'value')],
     });
   }
   // The tangent at the first inflection point.
   const c = d.crit.find((x) => x.kind === 'yes');
   if (c && level >= 2) {
-    const t = { fa: c.fr, dfa: c.dfr, a: c.r, df: d.d1, dom: d.dom };
-    parts.push({ html: 'Tangente d\'inflexion : pente', ask: `f′(${R(c.r)}) =`, start: at(d.d1, c.r), judge: VAL, lines: [E(N(c.dfr), 'Pente au point d\'inflexion', 'tangent', 'slope')] });
+    const tg = { fa: c.fr, dfa: c.dfr, a: c.r, df: d.d1, dom: d.dom };
+    parts.push({ html: t('Tangente d\'inflexion : pente'), ask: `f′(${R(c.r)}) =`, start: at(d.d1, c.r), judge: VAL, lines: [E(N(c.dfr), t('Pente au point d\'inflexion'), 'tangent', 'slope')] });
     const lines = tangentLines(c.fr, c.dfr, c.r, 'tangent');
-    parts.push({ html: 'Tangente d\'inflexion :', ask: 'y =', start: 'y', judge: tangentCfg(t), lines: level === 2 ? lines.map((l, k) => (k === lines.length - 1 ? l : blanked(l, [N(c.dfr)], { vars: [V, 'y'] }))) : lines });
+    parts.push({ html: t('Tangente d\'inflexion :'), ask: 'y =', start: 'y', judge: tangentCfg(tg), lines: level === 2 ? lines.map((l, k) => (k === lines.length - 1 ? l : blanked(l, [N(c.dfr)], { vars: [V, 'y'] }))) : lines });
   }
   return parts;
 }
@@ -374,12 +385,12 @@ function cxItem(level, rng, opts = {}) {
   const c = d.crit.find((x) => x.kind === 'yes');
   return partsItem({
     skill: CX, level, parts, choices: CX_CHOICES,
-    before: level === 1 ? [NOTE(`On donne f″(x) = ${MT(d.fac)}.`)] : [],
+    before: level === 1 ? [NOTE(t('On donne f″(x) = {d}.', { d: MT(d.fac) }))] : [],
     prompt: rng.pick([
-      `Soit f(x) = ${MT(d.f)}. Où f est-elle convexe ? Donne ses points d'inflexion${level >= 2 && c ? ' et la tangente au premier' : ''}.`,
-      `Étudie la concavité de f(x) = ${MT(d.f)} : signe de f″, points d'inflexion${level >= 2 && c ? ', tangente d\'inflexion' : ''}.`,
+      level >= 2 && c ? t('Soit f(x) = {f}. Où f est-elle convexe ? Donne ses points d\'inflexion et la tangente au premier.', { f: MT(d.f) }) : t('Soit f(x) = {f}. Où f est-elle convexe ? Donne ses points d\'inflexion.', { f: MT(d.f) }),
+      level >= 2 && c ? t('Étudie la concavité de f(x) = {f} : signe de f″, points d\'inflexion, tangente d\'inflexion.', { f: MT(d.f) }) : t('Étudie la concavité de f(x) = {f} : signe de f″, points d\'inflexion.', { f: MT(d.f) }),
     ]),
-    hints: H('Calcule f″ et cherche où elle <b>change de signe</b> : f″(a) = 0 ne suffit pas.', `f″(x) = ${MT(d.fac)}`, d.crit.map((x) => (x.kind === 'yes' ? `inflexion en (${R(x.r)} ; ${R(x.fr)})` : `pas d'inflexion en ${R(x.r)}`)).join(' ; ')),
+    hints: H(t('Calcule f″ et cherche où elle <b>change de signe</b> : f″(a) = 0 ne suffit pas.'), `f″(x) = ${MT(d.fac)}`, d.crit.map((x) => (x.kind === 'yes' ? t('inflexion en ({r} ; {v})', { r: R(x.r), v: R(x.fr) }) : t('pas d\'inflexion en {r}', { r: R(x.r) }))).join(' ; ')),
     subgoals: CX_SUB, keys: KEYS, key: `${CX}:${level}:${d.f}`, exam: examOf(opts, 3), fallback: d.fallback, expectedSec: 60 + 40 * parts.length,
   });
 }
@@ -394,18 +405,18 @@ function cxParams(rng) {
   const g = `x^3+p×x^2+q×x`;
   const gg = polyText([1, p, qq, 0]);
   const ga = evalPoly([1, p, qq, 0], a);
-  const t = { fa: ga, dfa: q(m), a, df: polyText([3, 2 * p, qq]), dom: [-3, 3] };
+  const tg = { fa: ga, dfa: q(m), a, df: polyText([3, 2 * p, qq]), dom: [-3, 3] };
   const A = R(a);
   const parts = [
-    { html: 'Dérive deux fois g.', ask: 'g″(x) =', start: `d(d(${g}))`, judge: { kind: 'equiv', vars: [V, 'p', 'q'], dvar: V, domain: { x: [-2, 2], p: [-3, 3], q: [-3, 3] }, target: 'no-prime' }, lines: [E(`d(3x^2+2p×x+q)`, 'Dériver une fois', 'derive'), E('6x+2p', 'Dériver une deuxième fois', 'derive')] },
-    { html: `Inflexion en ${A} : g″(${A}) = 0.`, start: `${at('6x+2p', a)}=0`, judge: { kind: 'solset', v: 'p' }, lines: [E(`p=${p}`, 'Résoudre', 'inflection')] },
-    { html: `Pente ${fr(m)} en ${A} : g′(${A}) = ${fr(m)}.`, start: `${at(`3x^2${p < 0 ? '' : '+'}${2 * p}x+q`, a)}=${m}`, judge: { kind: 'solset', v: 'q' }, lines: [E(`q=${qq}`, 'Résoudre', 'inflection')] },
-    { html: `Point d'inflexion : g(x) = ${MT(gg)}.`, ask: `g(${A}) =`, start: at(gg, a), judge: VAL, lines: [E(N(ga), 'Valeur en a', 'inflection')] },
-    { html: 'Tangente d\'inflexion :', ask: 'y =', start: 'y', judge: tangentCfg(t), lines: tangentLines(ga, m, a, 'tangent', 'g') },
+    { html: t('Dérive deux fois g.'), ask: 'g″(x) =', start: `d(d(${g}))`, judge: { kind: 'equiv', vars: [V, 'p', 'q'], dvar: V, domain: { x: [-2, 2], p: [-3, 3], q: [-3, 3] }, target: 'no-prime' }, lines: [E(`d(3x^2+2p×x+q)`, t('Dériver une fois'), 'derive'), E('6x+2p', t('Dériver une deuxième fois'), 'derive')] },
+    { html: t('Inflexion en {a} : g″({a}) = 0.', { a: A }), start: `${at('6x+2p', a)}=0`, judge: { kind: 'solset', v: 'p' }, lines: [E(`p=${p}`, t('Résoudre'), 'inflection')] },
+    { html: t('Pente {m} en {a} : g′({a}) = {m}.', { m: fr(m), a: A }), start: `${at(`3x^2${p < 0 ? '' : '+'}${2 * p}x+q`, a)}=${m}`, judge: { kind: 'solset', v: 'q' }, lines: [E(`q=${qq}`, t('Résoudre'), 'inflection')] },
+    { html: t('Point d\'inflexion : g(x) = {g}.', { g: MT(gg) }), ask: `g(${A}) =`, start: at(gg, a), judge: VAL, lines: [E(N(ga), t('Valeur en a'), 'inflection')] },
+    { html: t('Tangente d\'inflexion :'), ask: 'y =', start: 'y', judge: tangentCfg(tg), lines: tangentLines(ga, m, a, 'tangent', 'g') },
   ];
   return partsItem({
     skill: CX, level: 5, parts, declares: { vars: [V, 'p', 'q'] },
-    prompt: `g(x) = x³ + px² + qx. Trouve p et q pour que le graphe de g ait un point d'inflexion en x = ${A}, avec une tangente de pente ${fr(m)} ; donne cette tangente.`,
+    prompt: t('g(x) = x³ + px² + qx. Trouve p et q pour que le graphe de g ait un point d\'inflexion en x = {a}, avec une tangente de pente {m} ; donne cette tangente.', { a: A, m: fr(m) }),
     hints: [], subgoals: CX_SUB, keys: [...KEYS, 'letters'], key: `${CX}:5:${a}:${m}`, exam: false, expectedSec: 240,
   });
 }
@@ -419,44 +430,48 @@ function cxMcq(rng) {
   if (rng.chance(0.5)) {
     // f″ = 20x²(x − 3s): an inflection at 3s only.
     cs = [1, -5 * s, 0, 0, rng.int(-4, 4), rng.int(-3, 3)].map((c) => q(c));
-    right = `en x = ${R(3 * s)} seulement`;
-    trap = `en x = 0 et en x = ${R(3 * s)}`;
-    others = ['en x = 0 seulement', 'aucun point d’inflexion'];
+    right = t('en x = {r} seulement', { r: R(3 * s) });
+    trap = t('en x = 0 et en x = {r}', { r: R(3 * s) });
+    others = [t('en x = 0 seulement'), t('aucun point d’inflexion')];
   } else {
     // f″ = 12(x − p)²: no inflection.
     const p = s * rng.int(1, 2);
     cs = iPoly(iPoly(fromRoots(12, [[p, 2]]), rng.int(-4, 4)), rng.int(-3, 3));
-    right = 'aucun point d’inflexion';
-    trap = `en x = ${R(p)}`;
-    others = [`en x = 0 et en x = ${R(p)}`, `en x = ${R(-p)}`];
+    right = t('aucun point d’inflexion');
+    trap = t('en x = {r}', { r: R(p) });
+    others = [t('en x = 0 et en x = {r}', { r: R(p) }), t('en x = {r}', { r: R(-p) })];
   }
   const f = polyText(cs);
   const d2 = polyText(dPoly(dPoly(cs)));
   return mcq({
-    skill: CX, level: 4, prompt: `Soit f(x) = ${MT(f)}, avec f″(x) = ${MT(d2)}. Où le graphe de f a-t-il un point d'inflexion ?`,
+    skill: CX, level: 4, prompt: t('Soit f(x) = {f}, avec f″(x) = {d}. Où le graphe de f a-t-il un point d\'inflexion ?', { f: MT(f), d: MT(d2) }),
     options: [{ html: right, correct: true }, { html: trap, correct: false, rule: 'g6_inflection_f2_zero' }, ...others.map((h) => ({ html: h, correct: false }))],
-    key: `${CX}:mcq:${f}`, solution: [{ html: `f″(x) = ${MT(d2)} : une inflexion là où f″ <b>change de signe</b> (un zéro double ne compte pas).`, note: '' }],
+    key: `${CX}:mcq:${f}`, solution: [{ html: t('f″(x) = {d} : une inflexion là où f″ <b>change de signe</b> (un zéro double ne compte pas).', { d: MT(d2) }), note: '' }],
     exam: { format: 'mcq', points: 1 },
   }, rng);
 }
 
 function cxTf(rng) {
   const bank = [
-    { s: 'Si f est deux fois dérivable et f″(a) = 0, alors le graphe de f a un point d\'inflexion en a.', truth: false, rule: 'g6_inflection_f2_zero', why: 'Faux : f(x) = x⁴ a f″(0) = 0, mais f″(x) = 12x² ≥ 0 ne change pas de signe : f est convexe partout.' },
-    { s: 'Le graphe de f(x) = x⁴ a un point d\'inflexion en 0.', truth: false, rule: 'g6_inflection_f2_zero', why: 'Faux : f″(x) = 12x² garde le même signe des deux côtés de 0.' },
-    { s: 'Si f″ change de signe en a, le graphe de f a un point d\'inflexion en a.', truth: true, why: 'Vrai : c\'est la définition, la concavité change en a.' },
+    { s: 'Si f est deux fois dérivable et f″(a) = 0, alors le graphe de f a un point d\'inflexion en a.', truth: false, rule: 'g6_inflection_f2_zero', why: t('Faux : f(x) = x⁴ a f″(0) = 0, mais f″(x) = 12x² ≥ 0 ne change pas de signe : f est convexe partout.') },
+    { s: 'Le graphe de f(x) = x⁴ a un point d\'inflexion en 0.', truth: false, rule: 'g6_inflection_f2_zero', why: t('Faux : f″(x) = 12x² garde le même signe des deux côtés de 0.') },
+    { s: 'Si f″ change de signe en a, le graphe de f a un point d\'inflexion en a.', truth: true, why: t('Vrai : c\'est la définition, la concavité change en a.') },
   ];
   const d = cxData(rng, rng.pick(['cubic', 'two'])) ?? CX_FALLBACK();
   const set = setText(`${d.fac}>0`);
   const claimConvex = rng.chance(0.5);
+  // The statement: French for the key, the language of the page on screen.
+  const sk = claimConvex ? 'f(x) = {f} est convexe sur {s}.' : 'f(x) = {f} est concave sur {s}.';
+  const sv = { f: MT(d.f), s: MT(set) };
+  const wv = { d: MT(d.fac), s: MT(set) };
   bank.push({
-    s: `f(x) = ${MT(d.f)} est ${claimConvex ? 'convexe' : 'concave'} sur ${MT(set)}.`, truth: claimConvex,
-    why: `${claimConvex ? 'Vrai' : 'Faux'} : f″(x) = ${MT(d.fac)} > 0 sur ${MT(set)}, donc f y est convexe.`,
+    s: frFill(sk, sv), st: t(sk, sv), truth: claimConvex,
+    why: claimConvex ? t('Vrai : f″(x) = {d} > 0 sur {s}, donc f y est convexe.', wv) : t('Faux : f″(x) = {d} > 0 sur {s}, donc f y est convexe.', wv),
   });
   const b = rng.pick(bank);
   return mcq({
-    skill: CX, level: 4, prompt: `Vrai ou faux ?<br>« ${b.s} »`,
-    options: [{ html: 'Vrai', correct: b.truth, rule: b.truth ? null : b.rule }, { html: 'Faux', correct: !b.truth }],
+    skill: CX, level: 4, prompt: t('Vrai ou faux ?<br>« {s} »', { s: b.st ?? t(b.s) }),
+    options: [{ html: t('Vrai'), correct: b.truth, rule: b.truth ? null : b.rule }, { html: t('Faux'), correct: !b.truth }],
     keepOrder: true, key: `${CX}:tf:${b.s}`, solution: [{ html: b.why, note: '' }], exam: { format: 'tf', points: 1 }, expectedSec: 40,
   }, rng);
 }
@@ -467,20 +482,20 @@ function cxTf(rng) {
 
 const OP = 'g6-optim';
 const OP_SUB = [
-  { id: 'domain', label: 'variable et domaine', skill: 'g1-domain' },
-  { id: 'model', label: 'grandeur à optimiser', skill: OP },
-  { id: 'derive', label: 'dériver, factoriser', skill: 'g6-deriv-rules' },
-  { id: 'roots', label: 'racines dans le domaine', skill: 'quad-formula' },
-  { id: 'max', label: 'justifier le maximum', skill: SV },
+  { id: 'domain', label: t('variable et domaine'), skill: 'g1-domain' },
+  { id: 'model', label: t('grandeur à optimiser'), skill: OP },
+  { id: 'derive', label: t('dériver, factoriser'), skill: 'g6-deriv-rules' },
+  { id: 'roots', label: t('racines dans le domaine'), skill: 'quad-formula' },
+  { id: 'max', label: t('justifier le maximum'), skill: SV },
 ];
 const OP_CHOICES = [
-  { id: 'domain', label: 'Variable et domaine' },
-  { id: 'model', label: 'Écrire la grandeur avec la seule variable x' },
-  { id: 'expand', label: 'Développer' },
-  { id: 'derive', label: 'Dériver' },
-  { id: 'factor', label: 'Factoriser la dérivée' },
-  { id: 'roots', label: 'Garder les racines du domaine' },
-  { id: 'value', label: 'Calculer la valeur maximale' },
+  { id: 'domain', label: t('Variable et domaine') },
+  { id: 'model', label: t('Écrire la grandeur avec la seule variable x') },
+  { id: 'expand', label: t('Développer') },
+  { id: 'derive', label: t('Dériver') },
+  { id: 'factor', label: t('Factoriser la dérivée') },
+  { id: 'roots', label: t('Garder les racines du domaine') },
+  { id: 'value', label: t('Calculer la valeur maximale') },
 ];
 
 // Boxes cut from an L × l sheet whose V′ has rational roots, the right one
@@ -509,7 +524,9 @@ function opData(rng, kind) {
     const k = q(12).div(x1.d * x2.d);
     const fac = `${pre(k)}(${x1.d === 1 ? lin(x1) : `${x1.d}x-${x1.n}`})(${x2.d === 1 ? lin(x2) : `${x2.d}x-${x2.n}`})`;
     return {
-      kind, name: 'V', L, l, words: `Dans une feuille de ${L} cm × ${l} cm, on découpe un carré de côté x aux quatre coins, puis on plie pour faire une boîte sans couvercle. Pour quel x le volume est-il maximal, et que vaut-il ?`,
+      kind, name: 'V', L, l, words: t('Dans une feuille de {L} cm × {l} cm, on découpe un carré de côté x aux quatre coins, puis on plie pour faire une boîte sans couvercle. Pour quel x le volume est-il maximal, et que vaut-il ?', { L, l }),
+      // The question of the multiple choice: x only.
+      short: t('Dans une feuille de {L} cm × {l} cm, on découpe un carré de côté x aux quatre coins, puis on plie pour faire une boîte sans couvercle. Pour quel x le volume est-il maximal ?', { L, l }),
       constraint: `x>0 et ${L}-2x>0 et ${l}-2x>0`, hi: q(l, 2), model, expanded: polyText(cs), d1: polyText(d1), fac,
       roots: [{ x: x1, keep: true }, { x: x2, keep: false }], vmax: evalPoly(cs, x1), unit: 'cm³',
     };
@@ -519,7 +536,8 @@ function opData(rng, kind) {
     const c = 3 * k * k;
     const cs = [q(-2), q(0), q(2 * c), q(0)];
     return {
-      kind, name: 'A', words: `Un rectangle a deux sommets sur l'axe des x et deux sur la parabole y = ${c} − x², symétriques par rapport à l'axe des y (sommets (±x ; 0) et (±x ; ${c} − x²)). Pour quel x son aire est-elle maximale, et que vaut-elle ?`,
+      kind, name: 'A', words: t('Un rectangle a deux sommets sur l\'axe des x et deux sur la parabole y = {c} − x², symétriques par rapport à l\'axe des y (sommets (±x ; 0) et (±x ; {c} − x²)). Pour quel x son aire est-elle maximale, et que vaut-elle ?', { c }),
+      short: t('Un rectangle a deux sommets sur l\'axe des x et deux sur la parabole y = {c} − x², symétriques par rapport à l\'axe des y (sommets (±x ; 0) et (±x ; {c} − x²)). Pour quel x son aire est-elle maximale ?', { c }),
       constraint: `x>0 et ${c}-x^2>0`, hi: null, model: `2x(${c}-x^2)`, expanded: polyText(cs), d1: polyText(dPoly(cs)), fac: `-6(${lin(k)})(${lin(-k)})`,
       roots: [{ x: q(k), keep: true }, { x: q(-k), keep: false }], vmax: evalPoly(cs, k), unit: '',
     };
@@ -527,17 +545,17 @@ function opData(rng, kind) {
   const P = rng.pick([20, 24, 40, 60, 80, 100, 120]);
   const cs = [q(-2), q(P), q(0)];
   return {
-    kind, name: 'A', words: `Avec ${P} m de clôture, on entoure un enclos rectangulaire le long d'un mur (le mur ferme le quatrième côté). x est la longueur des deux côtés perpendiculaires au mur. Pour quel x l'aire est-elle maximale, et que vaut-elle ?`,
+    kind, name: 'A', words: t('Avec {P} m de clôture, on entoure un enclos rectangulaire le long d\'un mur (le mur ferme le quatrième côté). x est la longueur des deux côtés perpendiculaires au mur. Pour quel x l\'aire est-elle maximale, et que vaut-elle ?', { P }),
     constraint: `x>0 et ${P}-2x>0`, hi: q(P, 2), model: `x(${P}-2x)`, expanded: polyText(cs), d1: polyText(dPoly(cs)), fac: `4(${P / 4}-x)`,
     roots: [{ x: q(P / 4), keep: true }], vmax: evalPoly(cs, P / 4), unit: 'm²',
   };
 }
 
 const keepDecision = (r, dom) => ({
-  kind: 'decision', prompt: `La racine x = ${R(r.x)} de la dérivée : on la…`,
+  kind: 'decision', prompt: t('La racine x = {x} de la dérivée : on la…', { x: R(r.x) }),
   options: [
-    { id: 'keep', label: 'garde', valid: r.keep, why: r.keep ? '' : `x = ${R(r.x)} n'est pas dans le domaine ${dom} : l'objet n'existe pas.`, ...(r.keep ? {} : { rule: 'g6_optim_outside_domain' }) },
-    { id: 'drop', label: 'rejette (hors du domaine)', valid: !r.keep, why: `x = ${R(r.x)} est dans le domaine ${dom}.` },
+    { id: 'keep', label: t('garde'), valid: r.keep, why: r.keep ? '' : t('x = {x} n\'est pas dans le domaine {dom} : l\'objet n\'existe pas.', { x: R(r.x), dom }), ...(r.keep ? {} : { rule: 'g6_optim_outside_domain' }) },
+    { id: 'drop', label: t('rejette (hors du domaine)'), valid: !r.keep, why: t('x = {x} est dans le domaine {dom}.', { x: R(r.x), dom }) },
   ],
 });
 
@@ -546,28 +564,28 @@ function opParts(d, level) {
   const x = d.roots[0].x;
   const parts = [];
   if (level >= 2) {
-    parts.push({ html: 'Domaine de x :', start: d.constraint, judge: { kind: 'solset', v: V }, lines: [level === 2 ? blanked(E(domSet, 'Contraintes : longueurs positives', 'domain', 'domain'), ['0']) : E(domSet, 'Contraintes : longueurs positives', 'domain', 'domain')] });
-    const m = [E(d.model, 'La grandeur avec la seule variable x', 'model', 'model'), E(d.expanded, 'Développer', 'model', 'expand')];
-    parts.push({ html: `${d.name}(x) en fonction de x :`, ask: `${d.name}(x) =`, start: d.name, judge: { kind: 'equiv', vars: [V, d.name], subst: { [d.name]: d.model }, domain: { x: [0.1, 1.5] }, target: 'expanded' }, lines: level === 2 ? [blanked(m[0], [m[0].math.match(/\((\d+)-2x\)/)?.[1] ?? 'x']), m[1]] : m });
+    parts.push({ html: t('Domaine de x :'), start: d.constraint, judge: { kind: 'solset', v: V }, lines: [level === 2 ? blanked(E(domSet, t('Contraintes : longueurs positives'), 'domain', 'domain'), ['0']) : E(domSet, t('Contraintes : longueurs positives'), 'domain', 'domain')] });
+    const m = [E(d.model, t('La grandeur avec la seule variable x'), 'model', 'model'), E(d.expanded, t('Développer'), 'model', 'expand')];
+    parts.push({ html: t('{n}(x) en fonction de x :', { n: d.name }), ask: `${d.name}(x) =`, start: d.name, judge: { kind: 'equiv', vars: [V, d.name], subst: { [d.name]: d.model }, domain: { x: [0.1, 1.5] }, target: 'expanded' }, lines: level === 2 ? [blanked(m[0], [m[0].math.match(/\((\d+)-2x\)/)?.[1] ?? 'x']), m[1]] : m });
   }
   parts.push({
-    html: `Dérive ${d.name} et factorise.`, ask: `${d.name}′(x) =`, start: `d(${d.expanded})`, judge: derivJudge([0.1, 2]),
-    lines: [E(d.d1, 'Dériver', 'derive', 'derive'), level === 1 ? blanked(E(d.fac, 'Factoriser', 'derive', 'factor'), [N(x.d === 1 ? x : x.n)]) : E(d.fac, 'Factoriser', 'derive', 'factor')],
+    html: t('Dérive {n} et factorise.', { n: d.name }), ask: `${d.name}′(x) =`, start: `d(${d.expanded})`, judge: derivJudge([0.1, 2]),
+    lines: [E(d.d1, t('Dériver'), 'derive', 'derive'), level === 1 ? blanked(E(d.fac, t('Factoriser'), 'derive', 'factor'), [N(x.d === 1 ? x : x.n)]) : E(d.fac, t('Factoriser'), 'derive', 'factor')],
   });
   const out = d.roots.filter((r) => !r.keep);
   parts.push({
-    html: `Zéros de ${d.name}′ dans le domaine ${MT(domSet)} :`, start: `${d.fac}=0`, judge: { kind: 'solset', v: V, domain: domSet, inCase: true },
-    pre: level === 1 ? (out.length ? [NOTE(`x = ${R(out[0].x)} est hors du domaine : on le rejette.`)] : []) : out.map((r) => keepDecision(r, domSet)),
-    lines: [E(`x=${N(x)}`, 'La racine du domaine', 'roots', 'roots')],
+    html: t('Zéros de {n}′ dans le domaine {dom} :', { n: d.name, dom: MT(domSet) }), start: `${d.fac}=0`, judge: { kind: 'solset', v: V, domain: domSet, inCase: true },
+    pre: level === 1 ? (out.length ? [NOTE(t('x = {x} est hors du domaine : on le rejette.', { x: R(out[0].x) }))] : []) : out.map((r) => keepDecision(r, domSet)),
+    lines: [E(`x=${N(x)}`, t('La racine du domaine'), 'roots', 'roots')],
   });
-  const before = `${d.name}′ > 0 sur ]0 ; ${R(x)}[ et ${d.name}′ < 0 après`;
+  const bv = { n: d.name, x: R(x) };
   parts.push({
-    html: 'Maximum :', ask: `${d.name}(${R(x)}) =`, start: at(d.model, x), judge: VAL,
-    pre: level === 1 ? [NOTE(`${before} : maximum en x = ${R(x)}.`)] : [{
-      kind: 'decision', prompt: `${before}. En x = ${R(x)}, ${d.name} a…`,
-      options: [{ id: 'max', label: 'un maximum', valid: true }, { id: 'min', label: 'un minimum', valid: false, why: `${d.name} croît puis décroît : c'est un maximum.` }, { id: 'none', label: 'on ne peut rien dire', valid: false, why: 'Le signe de la dérivée change de + à − : c\'est un maximum.' }],
+    html: t('Maximum :'), ask: `${d.name}(${R(x)}) =`, start: at(d.model, x), judge: VAL,
+    pre: level === 1 ? [NOTE(t('{n}′ > 0 sur ]0 ; {x}[ et {n}′ < 0 après : maximum en x = {x}.', bv))] : [{
+      kind: 'decision', prompt: t('{n}′ > 0 sur ]0 ; {x}[ et {n}′ < 0 après. En x = {x}, {n} a…', bv),
+      options: [{ id: 'max', label: t('un maximum'), valid: true }, { id: 'min', label: t('un minimum'), valid: false, why: t('{n} croît puis décroît : c\'est un maximum.', bv) }, { id: 'none', label: t('on ne peut rien dire'), valid: false, why: t('Le signe de la dérivée change de + à − : c\'est un maximum.') }],
     }],
-    lines: [E(N(d.vmax), 'Valeur maximale', 'max', 'value')],
+    lines: [E(N(d.vmax), t('Valeur maximale'), 'max', 'value')],
   });
   return parts;
 }
@@ -580,8 +598,8 @@ function opItem(level, rng, opts = {}) {
   const x = d.roots[0].x;
   return partsItem({
     skill: OP, level, parts, choices: OP_CHOICES, prompt: d.words,
-    before: level === 1 ? [NOTE(`Le domaine est ${MT(setText(d.constraint))} et ${d.name}(x) = ${MT(d.model)} = ${MT(d.expanded)}.`)] : [],
-    hints: H('Écris la grandeur avec la seule variable x, note pour quels x l\'objet existe, puis cherche les zéros de la dérivée <b>dans ce domaine</b>.', `${d.name}(x) = ${MT(d.model)}`, `x = ${R(x)}, et ${d.name}(${R(x)}) = ${R(d.vmax)}`),
+    before: level === 1 ? [NOTE(t('Le domaine est {dom} et {n}(x) = {m} = {e}.', { dom: MT(setText(d.constraint)), n: d.name, m: MT(d.model), e: MT(d.expanded) }))] : [],
+    hints: H(t('Écris la grandeur avec la seule variable x, note pour quels x l\'objet existe, puis cherche les zéros de la dérivée <b>dans ce domaine</b>.'), `${d.name}(x) = ${MT(d.model)}`, t('x = {x}, et {n}({x}) = {v}', { x: R(x), n: d.name, v: R(d.vmax) })),
     subgoals: OP_SUB, keys: KEYS, key: `${OP}:${level}:${d.kind}:${d.model}`, exam: examOf(opts, 4), expectedSec: 60 + 45 * parts.length,
   });
 }
@@ -599,8 +617,8 @@ function opMcq(rng) {
   ];
   const options = cand.filter((o, i) => cand.findIndex((y) => y.html === o.html) === i).slice(0, 4);
   return mcq({
-    skill: OP, level: 4, prompt: `${d.words.replace(/, et que vaut-(il|elle) \?$/, ' ?')} (${d.name}(x) = ${MT(d.model)}, ${d.name}′(x) = ${MT(d.fac)}.)`, options,
-    key: `${OP}:mcq:${d.model}`, solution: [{ html: `Domaine ${MT(setText(d.constraint))} : x = ${R(outR)} en sort. ${d.name}′ change de signe de + à − en ${R(x)} : maximum.`, note: '' }],
+    skill: OP, level: 4, prompt: `${d.short} (${d.name}(x) = ${MT(d.model)}, ${d.name}′(x) = ${MT(d.fac)}.)`, options,
+    key: `${OP}:mcq:${d.model}`, solution: [{ html: t('Domaine {dom} : x = {o} en sort. {n}′ change de signe de + à − en {x} : maximum.', { dom: MT(setText(d.constraint)), o: R(outR), n: d.name, x: R(x) }), note: '' }],
     exam: { format: 'mcq', points: 1 },
   }, rng);
 }

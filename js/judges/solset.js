@@ -48,6 +48,7 @@ import { evalFloat } from '../cas/numeric.js';
 import { Q } from '../math/rational.js';
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine, frNum } from './common.js';
+import { t as tr } from '../i18n.js';
 
 const asNode = (x) => (typeof x === 'string' ? parse(x) : x);
 const substMap = (cfg) => Object.fromEntries(Object.entries(cfg.subst || {}).map(([k, t]) => [k, asNode(t)]));
@@ -138,20 +139,31 @@ function numText(w) {
   return frNum(w.x, 3);
 }
 
-function witnessMessage(w, cfg, env = {}) {
-  const pre = Object.keys(env).length ? `Pour ${Object.entries(env).map(([k, q]) => `${k} = ${toReadable(lit(q))}`).join(', ')} : ` : '';
-  if (!w) return `${pre}Ta ligne ne décrit pas le même ensemble que la précédente.`;
+// fromStart: the set compared is the one of the statement (« de l'énoncé »
+// instead of « de la ligne précédente »).
+function witnessMessage(w, cfg, env = {}, fromStart = false) {
+  const body = witnessBody(w, cfg, fromStart);
+  if (!Object.keys(env).length) return body;
+  return tr('Pour {env} : {message}', { env: Object.entries(env).map(([k, q]) => `${k} = ${toReadable(lit(q))}`).join(', '), message: body });
+}
+function witnessBody(w, cfg, fromStart) {
+  if (!w) return tr('Ta ligne ne décrit pas le même ensemble que la précédente.');
   const v = cfg.v || 'x';
   const x = numText(w);
   const discrete = cfg.domain === 'N' || cfg.domain === 'Z';
   if (discrete) {
-    return pre + (w.inA
-      ? `${x} est dans l'ensemble de la ligne précédente, mais pas dans le tien.`
-      : `${x} est dans ton ensemble, mais pas dans celui de la ligne précédente.`);
+    return w.inA
+      ? tr('{x} est dans l\'ensemble de la ligne précédente, mais pas dans le tien.', { x })
+      : tr('{x} est dans ton ensemble, mais pas dans celui de la ligne précédente.', { x });
   }
-  return pre + (w.inA
-    ? `${v} = ${x} est solution de la ligne précédente, mais pas de ta ligne.`
-    : `${v} = ${x} est solution de ta ligne, mais pas de la ligne précédente.`);
+  if (fromStart) {
+    return w.inA
+      ? tr('{v} = {x} est solution de l\'énoncé, mais pas de ta ligne.', { v, x })
+      : tr('{v} = {x} est solution de ta ligne, mais pas de l\'énoncé.', { v, x });
+  }
+  return w.inA
+    ? tr('{v} = {x} est solution de la ligne précédente, mais pas de ta ligne.', { v, x })
+    : tr('{v} = {x} est solution de ta ligne, mais pas de la ligne précédente.', { v, x });
 }
 
 // A sub-expression without the variable that does not exist: ln(−2), √(−4).
@@ -182,28 +194,28 @@ export function judgeLine(cfg, prevIn, input, state = {}) {
   const { node } = read;
   if (!state.start) state.start = prevIn;
   const prev = isDomainLine(prevIn) ? (state.lastEq ?? state.start) : prevIn;
-  if (sameLine(node, prevIn)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (sameLine(node, prevIn)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   const bad = undefinedPart(node, cfg);
   if (bad) {
     const diag = diagnoseLine('solset', prev, node, cfg, (cand, line) => !!undefinedPart(cand, cfg) && sameSet(cand, line, cfg));
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `${toReadable(bad)} n'existe pas : ${bad.t === 'sqrt' ? 'on ne prend la racine que d\'un nombre ≥ 0' : 'regarde le signe de ce qui est dedans'}.` };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: bad.t === 'sqrt' ? tr('{e} n\'existe pas : on ne prend la racine que d\'un nombre ≥ 0.', { e: toReadable(bad) }) : tr('{e} n\'existe pas : regarde le signe de ce qui est dedans.', { e: toReadable(bad) }) };
   }
   // A domain line: checked against the domain of the first line.
   if ((cfg.onDomain || cfg.domainLine) && isDomainLine(node)) {
     for (const env of paramSamples(cfg)) {
       let D;
       let B;
-      try { D = startDomain(state.start, cfg, env); B = lineSet(stripParen(node).r, cfg, env); } catch { return { kind: 'parse', node, message: 'Écris le domaine comme un ensemble : D = ]1 ; +∞[.' }; }
+      try { D = startDomain(state.start, cfg, env); B = lineSet(stripParen(node).r, cfg, env); } catch { return { kind: 'parse', node, message: tr('Écris le domaine comme un ensemble : D = ]1 ; +∞[.') }; }
       if (!setEqual(D, B)) {
         const w = setWitness(D, B);
         const diag = diagnoseLine('solset', prev, node, cfg, (cand, line) => sameSet(cand, line, cfg));
         const x = w ? numText(w) : '';
-        return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: w ? (w.inA ? `En ${cfg.v || 'x'} = ${x}, tout est défini : ${x} est dans le domaine.` : `En ${cfg.v || 'x'} = ${x}, une expression n'est pas définie : ${x} n'est pas dans le domaine.`) : 'Ce n\'est pas le domaine.' };
+        return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: w ? (w.inA ? tr('En {v} = {x}, tout est défini : {x} est dans le domaine.', { v: cfg.v || 'x', x }) : tr('En {v} = {x}, une expression n\'est pas définie : {x} n\'est pas dans le domaine.', { v: cfg.v || 'x', x })) : tr('Ce n\'est pas le domaine.') };
       }
     }
     state.domain = true;
     state.lastEq = prev;
-    return { kind: 'ok', node, note: 'Domaine' };
+    return { kind: 'ok', node, note: tr('Domaine') };
   }
   let checks;
   try {
@@ -216,16 +228,15 @@ export function judgeLine(cfg, prevIn, input, state = {}) {
       return { A, B, ref: state.ref[k] };
     });
   } catch (e) {
-    try { sets(cfg, (env) => ({ A: lineSet(prev, cfg, env) })); } catch { return { kind: 'parse', node, message: 'Je n\'arrive pas à lire la ligne précédente.' }; }
-    return { kind: 'parse', node, message: `Écris une condition sur ${cfg.v || 'x'} (par exemple ${cfg.v || 'x'} < 3) ou un ensemble (par exemple ]1 ; 4]).` };
+    try { sets(cfg, (env) => ({ A: lineSet(prev, cfg, env) })); } catch { return { kind: 'parse', node, message: tr('Je n\'arrive pas à lire la ligne précédente.') }; }
+    return { kind: 'parse', node, message: tr('Écris une condition sur {v} (par exemple {v} < 3) ou un ensemble (par exemple ]1 ; 4]).', { v: cfg.v || 'x' }) };
   }
   const fin = isFinal(cfg, node);
   const wrong = (env, A, B, fromStart = false) => {
     const same = (cand, line) => sameSet(cand, line, cfg);
     const diag = diagnoseLine('solset', prev, node, cfg, same);
     const w = setWitness(A, B);
-    let message = witnessMessage(w, cfg, env);
-    if (fromStart && w && !cfg.domain) message = message.replace('de la ligne précédente', "de l'énoncé");
+    const message = witnessMessage(w, cfg, env, fromStart && !!w && !cfg.domain);
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message };
   };
   let note;
@@ -233,7 +244,7 @@ export function judgeLine(cfg, prevIn, input, state = {}) {
     if (state.superset) {
       // Squared without its condition: the line may hold more solutions.
       if (minus(ref, B).parts.length) return wrong(env, ref, B, true);
-      if (fin !== false && !setEqual(ref, B)) note = 'Vérifie maintenant chaque solution dans l\'équation de départ : élever au carré a pu en ajouter.';
+      if (fin !== false && !setEqual(ref, B)) note = tr('Vérifie maintenant chaque solution dans l\'équation de départ : élever au carré a pu en ajouter.');
       continue;
     }
     if (cfg.onDomain && fin === false) {
@@ -246,7 +257,7 @@ export function judgeLine(cfg, prevIn, input, state = {}) {
     if (cfg.onDomain && !setEqual(ref, B)) {
       // « x = 3 ou x = −3 » before sorting: right on the domain, still to sort.
       const D = startDomain(state.start, cfg, env);
-      if (!isSetNode(stripParen(node), baseCfg(cfg)) && setEqual(intersect(B, D), ref) && setEqual(intersect(A, D), ref)) { note = 'Garde maintenant seulement les solutions qui sont dans le domaine.'; continue; }
+      if (!isSetNode(stripParen(node), baseCfg(cfg)) && setEqual(intersect(B, D), ref) && setEqual(intersect(A, D), ref)) { note = tr('Garde maintenant seulement les solutions qui sont dans le domaine.'); continue; }
       return wrong(env, ref, B, true);
     }
     if (!cfg.onDomain && !setEqual(A, B)) return wrong(env, A, B);
@@ -260,11 +271,11 @@ export function judgeLine(cfg, prevIn, input, state = {}) {
     for (const env of paramSamples(cfg)) {
       const raw = lineSet(node, { ...cfg, domain: undefined }, env);
       const C = lineSet(parse('ℝ'), cfg, env);
-      if (minus(raw, C).parts.length) return { kind: 'ok', node, note: 'Garde seulement les solutions qui sont dans le cas.' };
+      if (minus(raw, C).parts.length) return { kind: 'ok', node, note: tr('Garde seulement les solutions qui sont dans le cas.') };
     }
   }
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais {rest}', { rest: `${fin.charAt(0).toLowerCase()}${fin.slice(1)}` }) };
   return { kind: 'ok', node };
 }
 

@@ -13,6 +13,7 @@ import { DEFS as A } from './ma.js';
 import { DEFS as B } from './mb.js';
 import { DEFS as C } from './mc.js';
 import { DEFS as D } from './md.js';
+import { t } from '../../i18n.js';
 
 export const META = [
   { id: "m_schur_order", family: "rule", tag: "E", skill: "m-blocks-schur", repair: "l-mat-blocks", example: ["S = A₂₂ − A₁₂A₁₁⁻¹A₂₁", ""], transformText: "Ligne S avec les facteurs dans l'ordre inverse (si les tailles le permettent)", explainText: "On élimine A₂₁ avec A₁₁ : S = A₂₂ − A₂₁·A₁₁⁻¹·A₁₂, dans cet ordre (la ligne du bas, puis le pivot, puis la colonne de droite)." },
@@ -48,14 +49,20 @@ export const META = [
 
 const DEFS = { ...A, ...B, ...C, ...D };
 
-// « {k} » in the catalogue's explanation, from ctx (or « … »).
+// « {k} » in the catalogue's explanation, from ctx (or « … »). Braces that
+// are math, not a name (σ_{k+1}), stay as they are.
 export function fill(text, ctx = {}) {
-  return text.replace(/\{([^{}]*)\}/g, (_, k) => (ctx[k] !== undefined && ctx[k] !== null ? String(ctx[k]) : '…'));
+  return text.replace(/\{([^{}]*)\}/g, (m, k) => {
+    if (ctx[k] !== undefined && ctx[k] !== null) return String(ctx[k]);
+    return k === '…' || /^[A-Za-z_]\w*$/.test(k) ? '…' : m;
+  });
 }
 
+// The examples and the catalogue's explanation are shown: translated whole
+// (a math-only example is its own translation).
 export const RULES = META.map((m) => {
   const d = DEFS[m.id];
-  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example };
-  if (!d) return { ...base, name: `Piège ${m.id}`, stub: true, judges: [], explain: (ctx) => fill(m.explainText, ctx) };
-  return { ...base, explain: (ctx) => fill(m.explainText, ctx), ...d };
+  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example.map((e) => (e ? t(e) : e)) };
+  if (!d) return { ...base, name: t('Piège {id}', { id: m.id }), stub: true, judges: [], explain: (ctx) => fill(t(m.explainText), ctx) };
+  return { ...base, explain: (ctx) => fill(t(m.explainText), ctx), ...d };
 });

@@ -33,6 +33,14 @@ import { recordAnswer } from './learner.js';
 import { judgeFor, readWith } from '../judges/index.js';
 import { now as clock } from './time.js';
 import { ProblemRun } from '../judges/problem.js';
+import { t } from '../i18n.js';
+
+// « Vrai » / « Faux » options, in French or in the interface's language.
+const isVrai = (s) => /^\s*Vrai\s*$/.test(s) || String(s).trim() === t('Vrai');
+const isFaux = (s) => /^\s*Faux\s*$/.test(s) || String(s).trim() === t('Faux');
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+// The « Vrai ou faux ? » that opens the prompt of such an item.
+const TF_HEAD = new RegExp(`^\\s*(?:Vrai ou faux\\s*\\?|${escapeRe(t('Vrai ou faux ?'))})\\s*(?:<br\\s*\\/?>)?\\s*`);
 
 // ---------- the pool of a section ----------
 
@@ -86,13 +94,14 @@ function maxOf(section, item) {
 // « Faux » with the statement in the prompt: a tf item for the exam.
 function asTf(item) {
   const [v, f] = item.options;
-  const m = /^Vrai ou faux \?\s*(?:<br>)?\s*([\s\S]*)$/.exec(item.prompt || '');
+  const prompt = item.prompt || '';
+  const rest = TF_HEAD.test(prompt) ? prompt.replace(TF_HEAD, '') : '';
   return {
-    ...item, type: 'tf', prompt: 'Vrai ou faux ?', statement: m && m[1] ? m[1] : item.prompt,
+    ...item, type: 'tf', prompt: t('Vrai ou faux ?'), statement: rest || item.prompt,
     truth: !!v.correct, ruleIfTrue: v.rule ?? null, ruleIfFalse: f.rule ?? null, options: undefined,
   };
 }
-const isVfMcq = (item) => item.type === 'mcq' && item.options?.length === 2 && item.options[0].html === 'Vrai' && item.options[1].html === 'Faux';
+const isVfMcq = (item) => item.type === 'mcq' && item.options?.length === 2 && isVrai(item.options[0].html) && isFaux(item.options[1].html);
 
 // An open question must be a problem, within pool.points if given.
 function fits(section, item) {
@@ -144,14 +153,14 @@ export function buildExam(blueprint, { rng, profile = null, now = clock() } = {}
 // choice (no checker fits its counter-example, as in A2) becomes a `tf`
 // question of the exam: only the choice is marked there.
 export function vfAsTf(item) {
-  const t = item.options?.find((o) => /^\s*Vrai\s*$/.test(o.html));
-  const f = item.options?.find((o) => /^\s*Faux\s*$/.test(o.html));
-  if (!t || !f || item.options.length !== 2) return item;
+  const v = item.options?.find((o) => isVrai(o.html));
+  const f = item.options?.find((o) => isFaux(o.html));
+  if (!v || !f || item.options.length !== 2) return item;
   return {
-    ...item, type: 'tf', prompt: 'Vrai ou faux ?',
-    statement: String(item.prompt).replace(/^\s*Vrai ou faux\s*\?\s*(<br\s*\/?>)?\s*/, ''),
-    truth: !!t.correct, decided: false, counter: null,
-    ruleIfTrue: t.correct ? null : t.rule ?? null, ruleIfFalse: f.correct ? null : f.rule ?? null,
+    ...item, type: 'tf', prompt: t('Vrai ou faux ?'),
+    statement: String(item.prompt).replace(TF_HEAD, ''),
+    truth: !!v.correct, decided: false, counter: null,
+    ruleIfTrue: v.correct ? null : v.rule ?? null, ruleIfFalse: f.correct ? null : f.rule ?? null,
     explanation: item.solution?.map((x) => x.html).join(' ') || '',
   };
 }
@@ -229,9 +238,9 @@ export function gradeOf(score, max) {
 }
 
 export function verdictOf(grade) {
-  if (grade >= 4.5) return { id: 'ready', label: 'Prêt' };
-  if (grade >= 4) return { id: 'almost', label: 'Presque' };
-  return { id: 'notyet', label: 'Pas encore' };
+  if (grade >= 4.5) return { id: 'ready', label: t('Prêt') };
+  if (grade >= 4) return { id: 'almost', label: t('Presque') };
+  return { id: 'notyet', label: t('Pas encore') };
 }
 
 // The probability of mastery of a skill (BKT), 0 for a skill never seen.

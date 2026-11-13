@@ -12,6 +12,7 @@ import { parse } from '../cas/parse.js';
 import { toReadable, toText } from '../cas/print.js';
 import { mul, lit, num, pow } from '../cas/ast.js';
 import { evalFloat } from '../cas/numeric.js';
+import { t as tr } from '../i18n.js';
 
 function derivRules(prev, v) {
   const rules = new Set();
@@ -28,11 +29,11 @@ export const ACTIONS = {
     const left = rules.size > 0;
     const table = ['table', 'poly', 'var', 'const', 'sum', 'constfactor', 'linear'].some((r) => rules.has(r));
     return [
-      { id: 'product', label: 'Règle du produit', valid: rules.has('product'), why: 'Aucune dérivée de la ligne ne porte sur un produit de deux fonctions de x.' },
-      { id: 'quotient', label: 'Règle du quotient', valid: rules.has('quotient'), why: 'Aucune dérivée de la ligne ne porte sur un quotient avec x au dénominateur.' },
-      { id: 'chain', label: 'Règle de chaîne', valid: rules.has('chain'), why: 'Aucune dérivée de la ligne ne porte sur une fonction composée : ce qui est dedans est x lui-même.' },
-      { id: 'table', label: 'Dérivées usuelles', valid: table, why: 'Les dérivées qui restent demandent d\'abord une règle (produit, quotient ou chaîne).' },
-      { id: 'simplify', label: 'Simplifier', valid: !left, why: 'Il reste des dérivées à calculer avant de simplifier.' },
+      { id: 'product', label: tr('Règle du produit'), valid: rules.has('product'), why: tr('Aucune dérivée de la ligne ne porte sur un produit de deux fonctions de x.') },
+      { id: 'quotient', label: tr('Règle du quotient'), valid: rules.has('quotient'), why: tr('Aucune dérivée de la ligne ne porte sur un quotient avec x au dénominateur.') },
+      { id: 'chain', label: tr('Règle de chaîne'), valid: rules.has('chain'), why: tr('Aucune dérivée de la ligne ne porte sur une fonction composée : ce qui est dedans est x lui-même.') },
+      { id: 'table', label: tr('Dérivées usuelles'), valid: table, why: tr('Les dérivées qui restent demandent d\'abord une règle (produit, quotient ou chaîne).') },
+      { id: 'simplify', label: tr('Simplifier'), valid: !left, why: tr('Il reste des dérivées à calculer avant de simplifier.') },
     ];
   },
 };
@@ -60,17 +61,17 @@ function logicNegations(prev, cfg) {
 
 ACTIONS.logic = (prev, cfg) => {
   const f = logicNegations(prev, cfg);
-  const none = 'Il n\'y a plus de ¬ à cet endroit de la formule.';
+  const none = tr('Il n\'y a plus de ¬ à cet endroit de la formule.');
   let orForm = false;
   walkF(prev, (n) => { if (n.t === 'or' && strip(n.l).t === 'not') orForm = true; return true; });
   return [
-    { id: 'forall', label: 'Faire passer ¬ à travers ∀ (il devient ∃)', valid: f.has('forall'), why: none },
-    { id: 'exists', label: 'Faire passer ¬ à travers ∃ (il devient ∀)', valid: f.has('exists'), why: none },
-    { id: 'demorgan', label: 'De Morgan : ¬(A ∧ B), ¬(A ∨ B)', valid: f.has('demorgan'), why: 'Aucun ¬ ne porte sur un ∧ ou un ∨.' },
-    { id: 'negimp', label: 'Nier une implication : ¬(A ⇒ B) ≡ A ∧ ¬B', valid: f.has('negimp'), why: 'Aucun ¬ ne porte sur une implication.' },
-    { id: 'double', label: 'Double négation : ¬¬A ≡ A', valid: f.has('double'), why: 'Il n\'y a pas de ¬¬ dans la ligne.' },
-    { id: 'atom', label: 'Nier un morceau avec la table (¬(x < 3) : x ≥ 3)', valid: f.has('atom'), why: 'Aucun ¬ ne porte directement sur une inégalité ou une appartenance.' },
-    ...(cfg.maxSize ? [{ id: 'imp', label: 'Écrire ¬A ∨ B comme A ⇒ B', valid: orForm && !f.size, why: 'Fais d\'abord entrer toutes les négations.' }] : []),
+    { id: 'forall', label: tr('Faire passer ¬ à travers ∀ (il devient ∃)'), valid: f.has('forall'), why: none },
+    { id: 'exists', label: tr('Faire passer ¬ à travers ∃ (il devient ∀)'), valid: f.has('exists'), why: none },
+    { id: 'demorgan', label: tr('De Morgan : ¬(A ∧ B), ¬(A ∨ B)'), valid: f.has('demorgan'), why: tr('Aucun ¬ ne porte sur un ∧ ou un ∨.') },
+    { id: 'negimp', label: tr('Nier une implication : ¬(A ⇒ B) ≡ A ∧ ¬B'), valid: f.has('negimp'), why: tr('Aucun ¬ ne porte sur une implication.') },
+    { id: 'double', label: tr('Double négation : ¬¬A ≡ A'), valid: f.has('double'), why: tr('Il n\'y a pas de ¬¬ dans la ligne.') },
+    { id: 'atom', label: tr('Nier un morceau avec la table (¬(x < 3) : x ≥ 3)'), valid: f.has('atom'), why: tr('Aucun ¬ ne porte directement sur une inégalité ou une appartenance.') },
+    ...(cfg.maxSize ? [{ id: 'imp', label: tr('Écrire ¬A ∨ B comme A ⇒ B'), valid: orForm && !f.size, why: tr('Fais d\'abord entrer toutes les négations.') }] : []),
   ];
 };
 
@@ -91,12 +92,12 @@ ACTIONS.solset = (prev, cfg) => {
   const image = builder && sp(n.head).t !== 'in';
   const toCompute = n.t === 'set' && n.kind === 'finite' && n.items.some((x) => contains(x, (y) => y.t === 'bin' || y.t === 'pow'));
   return [
-    { id: 'abs', label: 'Ôter la valeur absolue', valid: hasAbs, why: "Il n'y a pas de valeur absolue." },
-    { id: 'not', label: 'Écrire la négation sans ¬', valid: hasNot && !hasAbs, why: hasAbs ? 'Commence par la valeur absolue.' : "Il n'y a pas de ¬ dans la ligne." },
-    { id: 'solve', label: `Isoler ${v}`, valid: ((!solved && !isSet) || (builder && !image)) && !hasAbs && !hasNot, why: 'La variable est déjà seule de son côté.' },
-    { id: 'write', label: "Écrire l'ensemble (intervalles ou éléments)", valid: image || (!isSet && solved && !hasAbs && !hasNot), why: isSet ? "C'est déjà un ensemble." : "Isole d'abord la variable." },
-    { id: 'compute', label: 'Calculer les éléments', valid: toCompute, why: 'Les éléments sont déjà calculés.' },
-    { id: 'op', label: 'Calculer ∩, ∪ ou ∖', valid: hasSetop, why: "Il n'y a pas d'opération entre ensembles dans la ligne." },
+    { id: 'abs', label: tr('Ôter la valeur absolue'), valid: hasAbs, why: tr("Il n'y a pas de valeur absolue.") },
+    { id: 'not', label: tr('Écrire la négation sans ¬'), valid: hasNot && !hasAbs, why: hasAbs ? tr('Commence par la valeur absolue.') : tr("Il n'y a pas de ¬ dans la ligne.") },
+    { id: 'solve', label: tr('Isoler {v}', { v }), valid: ((!solved && !isSet) || (builder && !image)) && !hasAbs && !hasNot, why: tr('La variable est déjà seule de son côté.') },
+    { id: 'write', label: tr("Écrire l'ensemble (intervalles ou éléments)"), valid: image || (!isSet && solved && !hasAbs && !hasNot), why: isSet ? tr("C'est déjà un ensemble.") : tr("Isole d'abord la variable.") },
+    { id: 'compute', label: tr('Calculer les éléments'), valid: toCompute, why: tr('Les éléments sont déjà calculés.') },
+    { id: 'op', label: tr('Calculer ∩, ∪ ou ∖'), valid: hasSetop, why: tr("Il n'y a pas d'opération entre ensembles dans la ligne.") },
   ];
 };
 
@@ -118,9 +119,9 @@ ACTIONS.factor = (prev) => {
     if (d === 2 && discriminant(cs).n >= 0) tri = true;
   }
   return [
-    { id: 'common', label: 'Mettre x en facteur', valid: common, why: 'Aucun facteur ne s\'annule en 0.' },
-    { id: 'root', label: 'Chercher une racine évidente et diviser', valid: root, why: 'Il ne reste pas de facteur de degré 3 ou plus avec une racine entière.' },
-    { id: 'tri', label: 'Factoriser un trinôme (Δ ≥ 0)', valid: tri, why: 'Il ne reste pas de trinôme à Δ ≥ 0.' },
+    { id: 'common', label: tr('Mettre x en facteur'), valid: common, why: tr('Aucun facteur ne s\'annule en 0.') },
+    { id: 'root', label: tr('Chercher une racine évidente et diviser'), valid: root, why: tr('Il ne reste pas de facteur de degré 3 ou plus avec une racine entière.') },
+    { id: 'tri', label: tr('Factoriser un trinôme (Δ ≥ 0)'), valid: tri, why: tr('Il ne reste pas de trinôme à Δ ≥ 0.') },
   ];
 };
 
@@ -131,9 +132,9 @@ ACTIONS.identify = (prev, cfg) => {
   const hasX = contains(n, (x) => x.t === 'sym' && x.name === v);
   const expanded = n.t === 'rel' && !contains(n.l, (x) => x.t === 'paren' && contains(x, (y) => y.t === 'sym' && y.name === v) && contains(x, (y) => y.t === 'sym' && (cfg.params || []).includes(y.name)));
   return [
-    { id: 'develop', label: 'Développer et ordonner', valid: hasX && !expanded, why: hasX ? "C'est déjà développé." : "Il n'y a plus de x : les coefficients sont identifiés." },
-    { id: 'identify', label: 'Identifier les coefficients, degré par degré', valid: hasX && expanded, why: hasX ? "Développe d'abord." : "C'est déjà fait." },
-    { id: 'solve', label: 'Résoudre le système', valid: !hasX, why: "Écris d'abord une équation par puissance de x." },
+    { id: 'develop', label: tr('Développer et ordonner'), valid: hasX && !expanded, why: hasX ? tr("C'est déjà développé.") : tr("Il n'y a plus de x : les coefficients sont identifiés.") },
+    { id: 'identify', label: tr('Identifier les coefficients, degré par degré'), valid: hasX && expanded, why: hasX ? tr("Développe d'abord.") : tr("C'est déjà fait.") },
+    { id: 'solve', label: tr('Résoudre le système'), valid: !hasX, why: tr("Écris d'abord une équation par puissance de x.") },
   ];
 };
 
@@ -154,9 +155,9 @@ ACTIONS.polydiv = (prev, cfg) => {
   const term = (c, k) => toReadable(mul(lit(c), k === 0 ? num(1) : k === 1 ? { t: 'sym', name: v } : pow({ t: 'sym', name: v }, num(k))));
   const k = dR - dB;
   return [
-    { id: 'right', label: `Terme suivant du quotient : ${term(t, k)}`, valid: true },
-    { id: 'sign', label: `Terme suivant du quotient : ${term(t.neg(), k)}`, valid: false, why: 'Le signe : le terme dominant du reste divisé par celui de B.' },
-    { id: 'deg', label: `Terme suivant du quotient : ${term(t, k + 1)}`, valid: false, why: `Le degré : x^${dR} divisé par x^${dB} donne x^${k}.` },
+    { id: 'right', label: tr('Terme suivant du quotient : {term}', { term: term(t, k) }), valid: true },
+    { id: 'sign', label: tr('Terme suivant du quotient : {term}', { term: term(t.neg(), k) }), valid: false, why: tr('Le signe : le terme dominant du reste divisé par celui de B.') },
+    { id: 'deg', label: tr('Terme suivant du quotient : {term}', { term: term(t, k + 1) }), valid: false, why: tr('Le degré : x^{dR} divisé par x^{dB} donne x^{k}.', { dR, dB, k }) },
   ];
 };
 
@@ -182,9 +183,9 @@ ACTIONS.sigma = (prev) => {
   const ss = sumNodes(prev);
   const linear = ss.some((s) => !plainTerm(s));
   return [
-    { id: 'linear', label: 'Linéarité : séparer la somme et sortir les constantes', valid: linear, why: ss.length ? 'Chaque somme est déjà une somme de k, de k² ou d’une constante.' : 'Il n’y a plus de Σ.' },
-    { id: 'formula', label: 'Formules du cours : Σ k, Σ k², Σ c', valid: ss.length > 0 && !linear, why: ss.length ? 'Sépare d’abord la somme : les formules portent sur Σ k, Σ k² et Σ c.' : 'Il n’y a plus de Σ.' },
-    { id: 'compute', label: 'Calculer et réduire', valid: !ss.length, why: 'Il reste des Σ à remplacer par leur formule.' },
+    { id: 'linear', label: tr('Linéarité : séparer la somme et sortir les constantes'), valid: linear, why: ss.length ? tr('Chaque somme est déjà une somme de k, de k² ou d’une constante.') : tr('Il n’y a plus de Σ.') },
+    { id: 'formula', label: tr('Formules du cours : Σ k, Σ k², Σ c'), valid: ss.length > 0 && !linear, why: ss.length ? tr('Sépare d’abord la somme : les formules portent sur Σ k, Σ k² et Σ c.') : tr('Il n’y a plus de Σ.') },
+    { id: 'compute', label: tr('Calculer et réduire'), valid: !ss.length, why: tr('Il reste des Σ à remplacer par leur formule.') },
   ];
 };
 
@@ -193,9 +194,9 @@ ACTIONS.telescope = (prev) => {
   const ss = sumNodes(prev);
   const diff = ss.some((s) => { const e = sp(s.e); return e.t === 'bin' && e.op === '-'; });
   return [
-    { id: 'decompose', label: 'Décomposer le terme en une différence', valid: ss.length > 0 && !diff, why: diff ? 'Le terme est déjà une différence.' : 'Il n’y a plus de Σ.' },
-    { id: 'telescope', label: 'Écrire les termes et télescoper', valid: diff, why: ss.length ? 'Décompose d’abord le terme en une différence aₖ − aₖ₊₁.' : 'Il n’y a plus de Σ.' },
-    { id: 'reduce', label: 'Simplifier ou réduire au même dénominateur', valid: !ss.length && topSum(prev), why: ss.length ? 'Il reste une Σ.' : 'C’est déjà réduit.' },
+    { id: 'decompose', label: tr('Décomposer le terme en une différence'), valid: ss.length > 0 && !diff, why: diff ? tr('Le terme est déjà une différence.') : tr('Il n’y a plus de Σ.') },
+    { id: 'telescope', label: tr('Écrire les termes et télescoper'), valid: diff, why: ss.length ? tr('Décompose d’abord le terme en une différence aₖ − aₖ₊₁.') : tr('Il n’y a plus de Σ.') },
+    { id: 'reduce', label: tr('Simplifier ou réduire au même dénominateur'), valid: !ss.length && topSum(prev), why: ss.length ? tr('Il reste une Σ.') : tr('C’est déjà réduit.') },
   ];
 };
 
@@ -204,9 +205,9 @@ ACTIONS.induction = (prev) => {
   const ss = sumNodes(prev);
   const top = ss.some((s) => { const h = sp(s.hi); return h.t === 'bin' && h.op === '+'; });
   return [
-    { id: 'split', label: 'Séparer le dernier terme (k = n + 1)', valid: top, why: 'La somme s’arrête déjà à n.' },
-    { id: 'hyp', label: 'Remplacer la somme jusqu’à n par l’hypothèse de récurrence', valid: ss.length > 0 && !top, why: top ? 'Sépare d’abord le dernier terme : l’hypothèse parle de la somme jusqu’à n.' : 'Il n’y a plus de Σ.' },
-    { id: 'factor', label: 'Mettre en facteur pour retrouver la formule au rang n + 1', valid: !ss.length, why: 'Il reste une Σ à remplacer.' },
+    { id: 'split', label: tr('Séparer le dernier terme (k = n + 1)'), valid: top, why: tr('La somme s’arrête déjà à n.') },
+    { id: 'hyp', label: tr('Remplacer la somme jusqu’à n par l’hypothèse de récurrence'), valid: ss.length > 0 && !top, why: top ? tr('Sépare d’abord le dernier terme : l’hypothèse parle de la somme jusqu’à n.') : tr('Il n’y a plus de Σ.') },
+    { id: 'factor', label: tr('Mettre en facteur pour retrouver la formule au rang n + 1'), valid: !ss.length, why: tr('Il reste une Σ à remplacer.') },
   ];
 };
 
@@ -267,9 +268,9 @@ ACTIONS.trig = (prev) => {
     assoc = Math.abs(slope) > eps ? Math.abs(c0) > eps : c0 > 0.5 + eps;
   }
   return [
-    { id: 'tours', label: half ? 'Retirer des multiples de π' : 'Retirer des tours de 2π', valid: tours, why: 'L\'angle est déjà dans un seul tour.' },
-    { id: 'assoc', label: arc ? 'Prendre l\'angle de même valeur dans l\'image de la fonction arc' : 'Utiliser un angle associé (π − x, π + x, π/2 ± x…)', valid: !tours && assoc, why: tours ? 'Retire d\'abord les tours entiers.' : 'L\'angle est déjà dans le bon intervalle.' },
-    { id: 'value', label: arc ? 'Conclure : l\'angle est dans l\'image' : 'Écrire la valeur connue', valid: !tours && !assoc, why: 'Réduis d\'abord l\'angle.' },
+    { id: 'tours', label: half ? tr('Retirer des multiples de π') : tr('Retirer des tours de 2π'), valid: tours, why: tr('L\'angle est déjà dans un seul tour.') },
+    { id: 'assoc', label: arc ? tr('Prendre l\'angle de même valeur dans l\'image de la fonction arc') : tr('Utiliser un angle associé (π − x, π + x, π/2 ± x…)'), valid: !tours && assoc, why: tours ? tr('Retire d\'abord les tours entiers.') : tr('L\'angle est déjà dans le bon intervalle.') },
+    { id: 'value', label: arc ? tr('Conclure : l\'angle est dans l\'image') : tr('Écrire la valeur connue'), valid: !tours && !assoc, why: tr('Réduis d\'abord l\'angle.') },
   ];
 };
 
@@ -284,10 +285,10 @@ ACTIONS.exact = (prev) => {
   const unknown = !sum && fns.some((f) => !KNOWN_DEN.has(den(f.args[0])));
   const known = !sum && !unknown && fns.length > 0;
   return [
-    { id: 'decompose', label: 'Écrire l\'angle comme somme ou différence d\'angles connus', valid: unknown, why: 'Les angles de la ligne sont déjà des angles connus.' },
-    { id: 'add', label: 'Formule d\'addition', valid: sum, why: 'Aucun sinus ou cosinus de la ligne ne porte sur une somme.' },
-    { id: 'values', label: 'Remplacer par les valeurs connues', valid: known, why: unknown || sum ? 'Il reste un angle qui n\'est pas dans la table.' : 'Il n\'y a plus de sinus ni de cosinus.' },
-    { id: 'simplify', label: 'Simplifier les racines et les fractions', valid: !fns.length, why: 'Il reste des fonctions trigonométriques à calculer.' },
-    { id: 'half', label: 'Formule de bissection', valid: false, why: 'Ici l\'angle s\'écrit comme une somme d\'angles connus : la formule d\'addition suffit.' },
+    { id: 'decompose', label: tr('Écrire l\'angle comme somme ou différence d\'angles connus'), valid: unknown, why: tr('Les angles de la ligne sont déjà des angles connus.') },
+    { id: 'add', label: tr('Formule d\'addition'), valid: sum, why: tr('Aucun sinus ou cosinus de la ligne ne porte sur une somme.') },
+    { id: 'values', label: tr('Remplacer par les valeurs connues'), valid: known, why: unknown || sum ? tr('Il reste un angle qui n\'est pas dans la table.') : tr('Il n\'y a plus de sinus ni de cosinus.') },
+    { id: 'simplify', label: tr('Simplifier les racines et les fractions'), valid: !fns.length, why: tr('Il reste des fonctions trigonométriques à calculer.') },
+    { id: 'half', label: tr('Formule de bissection'), valid: false, why: tr('Ici l\'angle s\'écrit comme une somme d\'angles connus : la formule d\'addition suffit.') },
   ];
 };

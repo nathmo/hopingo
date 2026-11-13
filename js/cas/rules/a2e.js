@@ -20,6 +20,7 @@ import { sub, div, sym, num, rel, dependsOn } from '../ast.js';
 import { evalFloat } from '../numeric.js';
 import { parse } from '../parse.js';
 import { normalize, pretty } from '../normal.js';
+import { t } from '../../i18n.js';
 
 const pointVars = (cfg) => cfg.vars.filter((v) => !(cfg.elim || []).includes(v) && v !== 'λ');
 
@@ -70,10 +71,10 @@ function lostText(cfg, v) {
   const seen = new Set();
   const out = [];
   for (const s of pts) {
-    const t = `(${pv.map((w) => String(s[cfg.vars.indexOf(w)]).replace(/-/g, '−')).join(' ; ')})`;
-    if (!seen.has(t)) { seen.add(t); out.push(t); }
+    const pt = `(${pv.map((w) => String(s[cfg.vars.indexOf(w)]).replace(/-/g, '−')).join(' ; ')})`;
+    if (!seen.has(pt)) { seen.add(pt); out.push(pt); }
   }
-  return out.join(', ') || 'd\'autres points';
+  return out.join(', ') || t('d\'autres points');
 }
 
 // The candidates of a division by a variable (lagrange: the system has λ).
@@ -111,82 +112,82 @@ function divideCands(prev, cfg, lagrange) {
 
 export const DEFS = {
   a2_crit_divide: {
-    name: 'Division par une variable qui peut être nulle',
+    name: t('Division par une variable qui peut être nulle'),
     judges: ['system'],
     transform: (prev, ctx) => divideCands(prev, ctx.cfg, false),
     explain: (ctx = {}) => (ctx.facteur
-      ? `Tu as divisé par ${ctx.facteur}. Il peut valoir 0 : le cas ${ctx.facteur} = 0 donne aussi ${ctx.points}.`
-      : 'Tu as divisé par une variable. Elle peut valoir 0 : ce cas donne aussi des points stationnaires. Factorise et sépare les cas.'),
+      ? t('Tu as divisé par {facteur}. Il peut valoir 0 : le cas {facteur} = 0 donne aussi {points}.', { facteur: ctx.facteur, points: ctx.points })
+      : t('Tu as divisé par une variable. Elle peut valoir 0 : ce cas donne aussi des points stationnaires. Factorise et sépare les cas.')),
     check: {
       judge: { kind: 'system', vars: ['x', 'y'], solutions: [['0', '0'], ['-1', '-1']] },
       prev: 'y = -x^2 ; x(x^3+1) = 0', line: 'y = -x^2 ; x^3+1 = 0',
     },
   },
   a2_stationary_is_extremum: {
-    name: 'Point stationnaire pris pour un extremum',
+    name: t('Point stationnaire pris pour un extremum'),
     judges: [],
     check: { counter: { kind: 'a2', prop: 'stationaryNotExtremum', params: {} }, answers: { f: 'x^2+y^2' } },
   },
   a2_hess_det_only: {
-    name: 'det H > 0 lu comme « minimum »',
+    name: t('det H > 0 lu comme « minimum »'),
     judges: [],
     explain: (ctx = {}) => (ctx.det !== undefined
-      ? `det H = ${ctx.det} > 0 dit seulement que les deux valeurs propres ont le même signe. f_xx = ${ctx.fxx} < 0 : c'est un maximum.`
-      : 'det H > 0 dit seulement que les valeurs propres ont le même signe (en 2 × 2). C\'est le signe de f_xx qui sépare le minimum du maximum ; en 3 × 3, il faut aussi Δ₁ et Δ₂.'),
+      ? t('det H = {det} > 0 dit seulement que les deux valeurs propres ont le même signe. f_xx = {fxx} < 0 : c\'est un maximum.', { det: ctx.det, fxx: ctx.fxx })
+      : t('det H > 0 dit seulement que les valeurs propres ont le même signe (en 2 × 2). C\'est le signe de f_xx qui sépare le minimum du maximum ; en 3 × 3, il faut aussi Δ₁ et Δ₂.')),
     check: { bait: { skill: 'a2-hessian-2x2', exam: 'mcq' } },
   },
   a2_hess_degenerate: {
-    name: 'det H = 0 lu comme « point selle »',
+    name: t('det H = 0 lu comme « point selle »'),
     judges: [],
     check: { bait: { skill: 'a2-hessian-2x2', exam: 'mcq' } },
   },
   a2_hess_partial_minors: {
-    name: 'Nature lue sur Δ₁ et Δ₃ seulement',
+    name: t('Nature lue sur Δ₁ et Δ₃ seulement'),
     judges: [],
     explain: (ctx = {}) => (ctx.d2 !== undefined
-      ? `Il faut les trois mineurs : −, +, −. Ici Δ₂ = ${ctx.d2} < 0 : H n'est pas définie négative.`
-      : 'Il faut les trois mineurs : −, +, − pour un maximum. Avec Δ₁ < 0 et Δ₃ < 0 seulement, Δ₂ peut être négatif : H n\'est alors pas définie négative.'),
+      ? t('Il faut les trois mineurs : −, +, −. Ici Δ₂ = {d2} < 0 : H n\'est pas définie négative.', { d2: ctx.d2 })
+      : t('Il faut les trois mineurs : −, +, − pour un maximum. Avec Δ₁ < 0 et Δ₃ < 0 seulement, Δ₂ peut être négatif : H n\'est alors pas définie négative.')),
     check: { bait: { skill: 'a2-hessian-3x3', exam: 'tf' } },
   },
   a2_compact_boundary_forgot: {
-    name: 'Bord oublié sur un compact',
+    name: t('Bord oublié sur un compact'),
     judges: [],
     check: { bait: { skill: 'a2-extrema-compact', exam: 'mcq' } },
   },
   a2_compact_corner_forgot: {
-    name: 'Coins du bord oubliés',
+    name: t('Coins du bord oubliés'),
     judges: [],
     check: { bait: { skill: 'a2-extrema-compact', exam: 'mcq' } },
   },
   a2_lagrange_divide: {
-    name: 'Lagrange : division par une variable qui peut être nulle',
+    name: t('Lagrange : division par une variable qui peut être nulle'),
     judges: ['system'],
     transform: (prev, ctx) => divideCands(prev, ctx.cfg, true),
     explain: (ctx = {}) => (ctx.facteur
-      ? `Diviser par ${ctx.facteur} suppose ${ctx.facteur} ≠ 0. Le cas ${ctx.facteur} = 0 donne les points ${ctx.points}, à comparer aussi.`
-      : 'Diviser par une variable suppose qu\'elle n\'est pas nulle. Le cas « variable = 0 » donne d\'autres candidats, à comparer aussi.'),
+      ? t('Diviser par {facteur} suppose {facteur} ≠ 0. Le cas {facteur} = 0 donne les points {points}, à comparer aussi.', { facteur: ctx.facteur, points: ctx.points })
+      : t('Diviser par une variable suppose qu\'elle n\'est pas nulle. Le cas « variable = 0 » donne d\'autres candidats, à comparer aussi.')),
     check: {
       judge: { kind: 'system', vars: ['x', 'y', 'λ'], elim: ['λ'], solutions: [['√6', '0', '0'], ['-√6', '0', '0'], ['√2', '√2', '√2/2'], ['√2', '-√2', '√2/2'], ['-√2', '√2', '-√2/2'], ['-√2', '-√2', '-√2/2']] },
       prev: 'y^2 = 2λx ; 2x y = 4λy ; x^2+2y^2 = 6', line: 'y^2 = 2λx ; x = 2λ ; x^2+2y^2 = 6',
     },
   },
   a2_lagrange_no_constraint: {
-    name: 'Lagrange : point hors de la contrainte',
+    name: t('Lagrange : point hors de la contrainte'),
     judges: [],
     check: { bait: { skill: 'a2-lagrange', exam: 'mcq' } },
   },
   a2_lagrange_count: {
-    name: 'Lagrange : points de max comptés à moitié',
+    name: t('Lagrange : points de max comptés à moitié'),
     judges: [],
     check: { bait: { skill: 'a2-lagrange', exam: 'mcq' } },
   },
   a2_lagrange_no_compare: {
-    name: 'Lagrange : candidat pris pour l\'extremum sans comparer',
+    name: t('Lagrange : candidat pris pour l\'extremum sans comparer'),
     judges: [],
     check: { bait: { skill: 'a2-lagrange', exam: 'mcq' } },
   },
   a2_quadform_matrix_half: {
-    name: 'Matrice d\'une forme quadratique : termes croisés non partagés',
+    name: t('Matrice d\'une forme quadratique : termes croisés non partagés'),
     judges: ['mat'],
     transform: (prev, ctx) => {
       const d = ctx.cfg?.a2quad?.doubled;

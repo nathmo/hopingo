@@ -23,6 +23,7 @@ import { readObject } from '../geomobj.js';
 import { parseExpr, evalAst, envOf, valueText } from '../matexpr.js';
 import { buildLine, mopts } from '../../judges/matcommon.js';
 import { jet } from '../jet.js';
+import { t } from '../../i18n.js';
 
 const tryV = (f) => { try { return f(); } catch { return null; } };
 const fr = (s) => String(s).replace(/-/g, '−');
@@ -50,7 +51,7 @@ const planeT = (n, p, sign, rhs = '0') => `${['x', 'y', 'z'].map((v, i) => `(${n
 
 export const DEFS = {
   a2_jacobian_transposed: {
-    name: 'Jacobienne transposée',
+    name: t('Jacobienne transposée'),
     judges: ['mat'],
     // The transpose of the expected matrix (m ≠ n, or a transpose that differs).
     transform(prev, ctx) {
@@ -65,12 +66,12 @@ export const DEFS = {
     check: { judge: { kind: 'mat', expect: '[[2,1,4],[-2,1,0]]' }, prev: 'J_u', line: '[[2,-2],[1,1],[4,0]]' },
   },
   a2_schwarz_no_c2: {
-    name: 'Schwarz sans l\'hypothèse C²',
+    name: t('Schwarz sans l\'hypothèse C²'),
     judges: [],
     check: { bait: { skill: 'a2-partials', exam: 'tf' } },
   },
   a2_tangent_point_sign: {
-    name: 'Plan tangent : (x + a) au lieu de (x − a)',
+    name: t('Plan tangent : (x + a) au lieu de (x − a)'),
     judges: ['geom'],
     // n·(X + p) = 0 (only x and y for the graph z = c + …, every coordinate otherwise).
     transform(prev, ctx) {
@@ -88,7 +89,7 @@ export const DEFS = {
     check: { judge: { kind: 'geom', object: 'plane', ref: 'z = -x+7y+5', tangent: { p: ['1', '-1', '-3'], n: ['-1', '7', '-1'] } }, prev: 'π', line: 'z = -3-(x+1)+7(y-1)' },
   },
   a2_tangent_level_rhs: {
-    name: 'Plan tangent : = c au lieu de = 0',
+    name: t('Plan tangent : = c au lieu de = 0'),
     judges: ['geom'],
     transform(prev, ctx) {
       const l = ctx?.cfg?.level;
@@ -99,7 +100,7 @@ export const DEFS = {
     check: { judge: { kind: 'geom', object: 'plane', ref: 'x+2y+3z = 8', level: { p: ['0', '1', '2'], n: ['4', '8', '12'], c: '10' } }, prev: 'π', line: '4x+8(y-1)+12(z-2) = 10' },
   },
   a2_chain_wrong_point: {
-    name: 'J_f évaluée en a au lieu de g(a)',
+    name: t('J_f évaluée en a au lieu de g(a)'),
     judges: ['mat', 'value'],
     transform(prev, ctx) {
       const ch = ctx?.cfg?.chain;
@@ -111,7 +112,7 @@ export const DEFS = {
     check: { judge: { kind: 'mat', expect: '[[2,1]]', chain: { outerAtA: '[[3,2]]', ga: '(1 ; 0)', a: '(1 ; 1)' } }, prev: 'J_f', line: '[[3,2]]' },
   },
   a2_chain_no_inner: {
-    name: 'Règle de chaîne : un seul terme gardé',
+    name: t('Règle de chaîne : un seul terme gardé'),
     judges: ['mat', 'value'],
     transform(prev, ctx) {
       const ch = ctx?.cfg?.chain;
@@ -121,15 +122,15 @@ export const DEFS = {
       return node ? [{ node, ctx: {} }] : [];
     },
     check: { judge: { kind: 'value', expect: '1', chain: { coefNoInner: '-1' } }, prev: 'd', line: '-1' },
-    explain: () => 'h dépend de chaque variable à travers les deux composantes de g : ∂h/∂v = ∂f/∂x·∂g₁/∂v + ∂f/∂y·∂g₂/∂v. Il manque un des deux produits.',
+    explain: () => t('h dépend de chaque variable à travers les deux composantes de g : ∂h/∂v = ∂f/∂x·∂g₁/∂v + ∂f/∂y·∂g₂/∂v. Il manque un des deux produits.'),
   },
   a2_polar_grad_factor: {
-    name: 'f̃_φ² sans le facteur 1/r²',
+    name: t('f̃_φ² sans le facteur 1/r²'),
     judges: [],
     check: { bait: { skill: 'a2-chain-polar', exam: 'mcq' } },
   },
   a2_laplacian_n: {
-    name: 'Laplacien radial : mauvais coefficient n − 1',
+    name: t('Laplacien radial : mauvais coefficient n − 1'),
     judges: ['equiv', 'value'],
     // g″ + (k/r)g′ with k = 1, n or n − 2 instead of n − 1 (or only k, when k is asked).
     transform(prev, ctx) {
@@ -145,7 +146,7 @@ export const DEFS = {
     check: { judge: { kind: 'equiv', vars: ['r'], domain: { r: [0.1, 3] }, lap: { n: 3, g: 'r^4' }, target: 'no-prime' }, prev: 'd(d(r^4,r),r)+(2/r)×d(r^4,r)', line: '16r^2' },
   },
   a2_taylor_cross: {
-    name: 'Taylor : coefficient de XY doublé ou divisé par 2',
+    name: t('Taylor : coefficient de XY doublé ou divisé par 2'),
     judges: ['equiv', 'value'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg || {};
@@ -166,7 +167,7 @@ export const DEFS = {
     check: { judge: { kind: 'equiv', vars: ['x', 'y'], jet: { at: { x: 0, y: 0 }, order: 2 }, target: 'taylor2' }, prev: 'ln(1+2x-y+x y)', line: '2x-y-2x^2+6x y-y^2/2' },
   },
   a2_taylor_no_half: {
-    name: 'Taylor : le ½ oublié',
+    name: t('Taylor : le ½ oublié'),
     judges: ['equiv'],
     // The part of degree 2 doubled (all of it, or only X² and Y²).
     transform(prev, ctx) {
@@ -191,7 +192,7 @@ export const DEFS = {
     check: { judge: { kind: 'equiv', vars: ['x', 'y'], jet: { at: { x: 0, y: 0 }, order: 2 }, target: 'taylor2' }, prev: 'cos(2x+3y+y^2)', line: '1-4x^2-12x y-9y^2' },
   },
   a2_taylor_no_truncate: {
-    name: 'Taylor : termes de degré > 2 gardés',
+    name: t('Taylor : termes de degré > 2 gardés'),
     judges: [],
     check: { bait: { skill: 'a2-taylor2', exam: 'mcq' } },
   },

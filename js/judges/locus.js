@@ -31,6 +31,7 @@ import { evalComplex } from '../cas/complex.js';
 import { polyOf, sumTerms } from '../cas/polyx.js';
 import { diagnoseLine } from './diagnose.js';
 import { sameLine, frNum } from './common.js';
+import { t as tr } from '../i18n.js';
 
 const CV = (cfg) => cfg.cv || 'z';
 const XY = (cfg) => cfg.xy || ['x', 'y'];
@@ -319,7 +320,7 @@ function lineForm(n, cfg) {
   const cs = [k.D, k.E, k.F].filter((c) => c !== 0);
   if (cs.every(Number.isInteger)) {
     const g = cs.reduce((a, c) => { let [u, v] = [Math.abs(a), Math.abs(c)]; while (v) [u, v] = [v, u % v]; return u; });
-    if (g > 1) return `Simplifie : tous les coefficients sont divisibles par ${g}.`;
+    if (g > 1) return tr('Simplifie : tous les coefficients sont divisibles par {g}.', { g });
   }
   return true;
 }
@@ -346,21 +347,21 @@ export function judgeLine(cfg, prev, input) {
   }
   const letters = new Set([CV(cfg), ...XY(cfg)]);
   const unknown = [...symbolsIn(node)].filter((s) => !letters.has(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici : écris avec ${[CV(cfg), ...XY(cfg)].join(', ')}.` };
+  if (unknown.length) return { kind: 'parse', node, message: tr('Je ne connais pas la lettre « {x} » ici : écris avec {list}.', { x: unknown[0].replace(/_$/, ''), list: [CV(cfg), ...XY(cfg)].join(', ') }) };
   const n = stripParen(node);
-  if (n.t !== 'rel' || !OPS.has(n.op)) return { kind: 'parse', node, message: `Écris une équation (ou une inéquation) en ${XY(cfg).join(' et ')}.` };
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (n.t !== 'rel' || !OPS.has(n.op)) return { kind: 'parse', node, message: tr('Écris une équation (ou une inéquation) en {xy}.', { xy: XY(cfg).join(' et ') }) };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   const r = sameLocus(cfg, prev, node);
   if (!r.same) {
     const diag = diagnoseLine('poly', prev, node, cfg, (cand, line) => sameLocus(cfg, cand, line).same);
-    let message = 'Ta ligne ne décrit pas le même ensemble de points que la précédente.';
-    if (r.kind === 'op') message = 'Une égalité est devenue une inégalité (ou l\'inverse) : garde la même relation.';
-    if (r.kind === 'strict') message = 'Une inégalité stricte doit le rester (et une large aussi) : le bord du lieu a changé.';
-    if (r.witness) message = r.witness.a ? `Le point ${pt(r.witness.p)} vérifie la ligne précédente, mais pas la tienne.` : `Le point ${pt(r.witness.p)} vérifie ta ligne, mais pas la précédente.`;
+    let message = tr('Ta ligne ne décrit pas le même ensemble de points que la précédente.');
+    if (r.kind === 'op') message = tr('Une égalité est devenue une inégalité (ou l\'inverse) : garde la même relation.');
+    if (r.kind === 'strict') message = tr('Une inégalité stricte doit le rester (et une large aussi) : le bord du lieu a changé.');
+    if (r.witness) message = r.witness.a ? tr('Le point {p} vérifie la ligne précédente, mais pas la tienne.', { p: pt(r.witness.p) }) : tr('Le point {p} vérifie ta ligne, mais pas la précédente.', { p: pt(r.witness.p) });
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais : ${fin}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais : {fin}', { fin }) };
   return { kind: 'ok', node };
 }

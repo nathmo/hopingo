@@ -3,6 +3,7 @@
 import { h, html } from '../dom.js';
 import { currentStreak, xpToday } from '../../engine/rewards.js';
 import { activeTraps } from '../../engine/learner.js';
+import { t } from '../../i18n.js';
 
 function ring(value, max) {
   const r = 15;
@@ -20,21 +21,21 @@ export function topBar(app) {
   const xp = xpToday(p);
   const traps = activeTraps(p).length;
   return h('header.topbar',
-    h('button.who', { onclick: () => app.go('profiles'), title: 'Changer de profil' }, h('span.avatar.small', p.avatar), h('span', p.name)),
+    h('button.who', { onclick: () => app.go('profiles'), title: t('Changer de profil') }, h('span.avatar.small', p.avatar), h('span', p.name)),
     h('div.stats',
-      h(`span.stat.streak${s.today ? '.lit' : ''}`, { title: s.today ? 'Série de jours' : 'Fais une leçon aujourd\'hui pour garder ta série' }, '🔥', h('b', String(s.count)), p.streak.freezes ? h('small', `❄${p.streak.freezes}`) : null),
-      h('button.stat.goal', { onclick: () => app.go('progress'), title: `Objectif du jour : ${xp}/${p.dailyGoal} XP` }, ring(xp, p.dailyGoal), h('b', `${xp}`)),
-      h(`button.stat.traps${traps ? '.has' : ''}`, { onclick: () => app.go('traps'), title: 'Mes pièges' }, '🪤', h('b', String(traps)))));
+      h(`span.stat.streak${s.today ? '.lit' : ''}`, { title: s.today ? t('Série de jours') : t('Fais une leçon aujourd\'hui pour garder ta série') }, '🔥', h('b', String(s.count)), p.streak.freezes ? h('small', `❄${p.streak.freezes}`) : null),
+      h('button.stat.goal', { onclick: () => app.go('progress'), title: t('Objectif du jour : {xp}/{goal} XP', { xp, goal: p.dailyGoal }) }, ring(xp, p.dailyGoal), h('b', `${xp}`)),
+      h(`button.stat.traps${traps ? '.has' : ''}`, { onclick: () => app.go('traps'), title: t('Mes pièges') }, '🪤', h('b', String(traps)))));
 }
 
 export function bottomNav(app, current) {
   const item = (name, icon, label) => h(`button.nav-item${current === name ? '.active' : ''}`, { onclick: () => app.go(name) }, h('span.nav-icon', icon), h('span', label));
   return h('nav.bottomnav',
-    item('home', '🧭', 'Chemin'),
-    item('traps', '🪤', 'Pièges'),
-    item('progress', '📈', 'Progrès'),
-    app.store.listProfiles().length > 1 ? item('board', '🏆', 'Classe') : null,
-    item('settings', '⚙️', 'Réglages'));
+    item('home', '🧭', t('Chemin')),
+    item('traps', '🪤', t('Pièges')),
+    item('progress', '📈', t('Progrès')),
+    app.store.listProfiles().length > 1 ? item('board', '🏆', t('Classe')) : null,
+    item('settings', '⚙️', t('Réglages')));
 }
 
 export const starRow = (n) => h('span.stars', [0, 1, 2].map((i) => h(`span.star${i < n ? '.on' : ''}`, '★')));

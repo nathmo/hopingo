@@ -4,6 +4,7 @@
 // items judged by `logic` (js/ui/lines.js).
 
 import { h, html, play } from './dom.js';
+import { t as tr } from '../i18n.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { pieceML, norm } from '../cas/logic.js';
 import { judgeTokens } from '../judges/logic.js';
@@ -21,7 +22,7 @@ export class TokenInput {
     this.caret = 0;
     this.onChange = onChange;
     this.onEnter = onEnter;
-    this.display = h('div.tok-display', { tabindex: 0, role: 'textbox', 'aria-label': 'Ta formule' });
+    this.display = h('div.tok-display', { tabindex: 0, role: 'textbox', 'aria-label': tr('Ta formule') });
     this.display.addEventListener('click', (e) => {
       const i = e.target.closest('[data-i]')?.dataset.i;
       if (i != null) { this.caret = Number(i) + 1; this.render(); }
@@ -65,7 +66,7 @@ export class TokenInput {
 
   render() {
     const caret = '<span class="caret"></span>';
-    if (!this.tokens.length) { this.display.innerHTML = `<span class="mi-ph">touche les morceaux</span>${caret}`; return; }
+    if (!this.tokens.length) { this.display.innerHTML = `<span class="mi-ph">${tr('touche les morceaux')}</span>${caret}`; return; }
     this.display.innerHTML = this.tokens.map((t, i) => `${i === this.caret ? caret : ''}<span class="tok" data-i="${i}">${tokenHtml(t)}</span>`).join('') + (this.caret === this.tokens.length ? caret : '');
   }
 
@@ -91,7 +92,7 @@ export function hintsBox(item, box) {
   const button = can ? h('button.btn.small.ghost', { type: 'button' }) : null;
   const paint = () => {
     if (!button) return;
-    button.textContent = shown < item.hints.length ? `💡 Aide (${shown + 1}/${item.hints.length})` : '💡 Aide';
+    button.textContent = shown < item.hints.length ? tr('💡 Aide ({k}/{n})', { k: shown + 1, n: item.hints.length }) : tr('💡 Aide');
     button.disabled = shown >= item.hints.length;
   };
   button?.addEventListener('click', () => {
@@ -133,6 +134,6 @@ export function mountTokens(item, ctx, body) {
     say(v.rule ? explainRule(v.rule, v.diag) : `<p>${v.message}</p>`, 'bad');
     if (mistakes >= 3) finish(false);
   }
-  const footer = h('div', input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, 'Valider'));
+  const footer = h('div', input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, tr('Valider')));
   return { ownFlow: true, footer, onKey: (e) => input.handleKey(e) };
 }

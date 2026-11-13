@@ -153,7 +153,7 @@ Some traps were added while writing the units and are not in the tables above. T
 | Powers | `pow_zero_is_base` (5⁰ = 5), `pow_fraction_numerator_only` ((2/3)² = 4/3), `pow_decimal_places` (0,3² = 0,9), `pow_before_product` (2 × 3² = 36), `pow_product_multiply_bases` (2³ × 2⁴ = 4⁷), `pow_quotient_divide_exp`, `pow_ten_count_digits` (1 000 = 10⁴), `exp_sign_small_number` (0,001 = 10³), `sci_count_zeros` |
 | Rational fractions, quadratics | `cancel_terms` ((x + 3)/3 = x; Matz 1982) and `forbidden_value_kept` from research. [E]: `forbidden_numerator`, `discriminant_b_sign` ((−3)² = −9), `discriminant_forget_4`, `formula_minus_b`, `formula_2a_partial`, `complete_square_half` |
 | Functions | `graph_xy_swap` (x and y swapped; Leinhardt, Zaslavsky & Stein 1990). [E]: `slope_y_over_x`, `slope_intercept_swap`, `slope_sign`, `intercept_sign` |
-| Equations, formulas, geometry | From research: `equals_as_result` (Kieran 1981; Knuth et al. 2006), `eq_inverse_op` (3x = 15 → x = 15 − 3; Kieran 1981), `eq_divide_one_term`, `eq_one_side_only`, `zero_product_misuse` (Vaiyavutjamai & Clements 2006), `iso_sum_invert` (1/f = 1/a + 1/b → f = a + b). [E]: `eq_move_no_sign`, `eq_change_side_sign_mult`, `zero_product_sign`, `zero_product_forget_zero`, `system_one_equation`, `iso_wrong_inverse`, `iso_forget_root`, `iso_var_both_sides`, `triangle_forget_half`, `circle_formula_swap`, `radius_diameter`, `pyramid_forget_third`, `pythagore_hypotenuse`, `thales_ratio_mismatch` |
+| Equations, formulas, geometry | From research: `equals_as_result` (Kieran 1981; Knuth et al. 2006), `eq_inverse_op` (3x = 15 → x = 15 − 3; Kieran 1981), `eq_divide_one_term`, `eq_one_side_only`, `zero_product_misuse` (Vaiyavutjamai & Clements 2006), `iso_sum_invert` (1/f = 1/a + 1/b → f = a + b). [E]: `eq_move_no_sign`, `eq_change_side_sign_mult`, `zero_product_sign`, `zero_product_forget_zero`, `system_one_equation`, `iso_wrong_inverse`, `iso_flip_quotient` (2ax = c → 2a = c/x → x = 2a/c; reported by a teacher in class, 2026-11: the student divides correctly, then turns the quotient upside down when x is in a denominator. Caught in « Isoler une variable » on the items 2ax = c and 2a = c/x, and on any formula whose answer comes out exactly inverted, final answer or step), `iso_forget_root`, `iso_var_both_sides`, `triangle_forget_half`, `circle_formula_swap`, `radius_diameter`, `pyramid_forget_third`, `pythagore_hypotenuse`, `thales_ratio_mismatch` |
 | Algebra | From research: `subst_juxtapose` (3x for x = 4 → 34; Küchemann 1981, Booth 1984), `conjoin_terms` (2x + 3 = 5x; Booth 1984), `distribute_partial` (3(x + 2) = 3x + 2; Matz 1982), `double_distribution_partial`, and `pow_distribute_sum` reused for (a + b)² = a² + b² (Matz 1982; Kirshner & Awtry 2004). [E]: `translate_order`, `alg_x_plus_x`, `alg_x_times_x`, `alg_coeff_power` ((2x)² = 2x²), `alg_coeff_add`, `identity_middle_term`, `identity_sign_square`, `fac_forget_one` (x² + x = x(x)), `fac_forget_divide`, `fac_diff_squares_as_square`, `fac_trinomial_signs` |
 | Proportionality, percentages, units | `additive_reasoning` (3 → 5 so 6 → 8; Hart 1984) and `linearity_illusion` (side × 2 so area × 2; De Bock et al. 2002) come from research. [E]: `rule3_inverted`, `scale_forget_convert`, `convert_wrong_direction`, `percent_as_amount`, `percent_inverted`, `percent_reverse_subtract`, `percent_add_successive`, `time_decimal_minutes` (1,5 h = 1 h 50), `slope_inverted`, `area_factor_10` (1 m² = 100 cm²), `volume_factor_10`, `speed_factor_wrong_way`, `imperial_linear_factor` (1 pied² = 30,48 cm²) |
 | Arithmetic and writings of a number | `div_last_digit`, `divisors_forget_ends`, `one_is_prime`, `odd_is_prime` (51 is prime), `gcd_lcm_swap`, `lcm_product`, `surd_forget_root` (√72 = 36√2), `frac_decimal_digits` (1/4 = 0,4), `percent_shift` (35 % = 3,5), `repeating_as_finite`, `set_by_writing`, `root_always_irrational`, `cube_root_third` (∛27 = 9), `cube_root_negative` |
@@ -191,3 +191,49 @@ Three research rules are recognised by structure rather than by an operation: `n
 8. [Programme cycle 4 annex](https://www.education.gouv.fr/sites/default/files/document/Annexe%202%20%E2%80%93%20Programme%20de%20math%C3%A9matiques%20pour%20le%20cycle%204-480716.pdf) and [rollout note](https://ent2d.ac-bordeaux.fr/disciplines/mathematiques/publication-du-nouveau-programme-cycle-4/)
 9. [Whole-number bias and fraction error classes, seventh grade](https://journal-fkip.unsika.ac.id/index.php/radian/article/download/13406/5363/40272)
 10. [Frequent fraction errors, CRPE](https://www.pass-education.fr/quelles-sont-les-erreurs-frequentes-en-lien-avec-les-fractions-ou-les-nombres-decimaux-crpe/)
+
+## Physics: energy, power and the 6-step method
+
+Added with the physics units (docs/plan-physique.md). The families follow the error codes of the class diagnostic: **U** unit not converted or wrong, **F** wrong formula, **A** right formula but isolation failed, plus estimation and ranges. Most rules come from that classroom (tag E, to be checked by the teacher); three are documented misconceptions (tag R). Rules: `js/content/physique/rules.js`, plus `rules-*.js` per unit.
+
+| Rule | Wrong → correct | Tag | Skill |
+|---|---|---|---|
+| `ph_not_si` | t = 3 min used as 3 (180 s) | E | ph-si |
+| `ph_gram_as_kg` | 450 g → m = 450 (0,45 kg) | E | ph-si |
+| `ph_kmh_not_converted` | v = 72 km/h used as 72 (20 m/s) | E | ph-conv-chain |
+| `ph_wh_forget_3600` | 500 Wh = 500 J (1,8·10⁶ J) | E | ph-elec-energy |
+| `ph_deltaT_add_273` | ΔT = 80 °C = 353 K (80 K) | E | ph-deltaT |
+| `ph_minutes_decimal` | 1 h 30 = 1,30 h (1,5 h) | E | ph-si |
+| `ph_ec_forget_half` | E_c = m v² (½ m v²) | E | ph-ec |
+| `ph_ec_forget_square` | E_c = ½ m v (½ m v²) | E | ph-ec |
+| `ph_power_times` | P = E·t (E/t) | E | ph-power |
+| `ph_elec_divide` | P = U/I (U·I) | E | ph-elec-power |
+| `ph_heat_forget_mass` | E = c ΔT (m c ΔT) | E | ph-heat |
+| `ph_density_inverted` | ρ = V/m (m/V) | E | ph-density |
+| `ph_efficiency_inverted` | E_f = η E_u (E_u/η) | E | ph-efficiency |
+| `ph_mix_average` | 1 kg at 90 °C + 4 kg at 20 °C → 55 °C (34 °C) | R [P2] | ph-mix |
+| `ph_latent_temperature` | the melting ice warms up (stays at 0 °C) | R [P3] | ph-latent |
+| `ph_heavier_faster` | the heavier sled arrives faster (same speed) | R [P1] | ph-conservation |
+| `ph_decoy_formula` | E = m c ΔT kept for a sled (no temperature in the statement) | E | ph6-trier |
+| `ph_needed_removed` | E = m g h removed (it gives the bridge E) | E | ph6-chemin |
+| `ph_bridge_missed` | E marked as given (it is the bridge) | E | ph6-chemin |
+| `ph_iso_flip` | h = g/(c ΔT) (c ΔT/g) | E | ph-isolate |
+| `ph_forget_sqrt` | v = 2 g h (√(2 g h)) | E | ph-isolate |
+| `ph_numbers_in_algebra` | h = 3500·80/1,6 at step 3 (letters only) | E | ph6-algebre |
+| `ph_not_simplified` | h = m c ΔT/(m g) (c ΔT/g) | E | ph6-algebre |
+| `ph_units_lie` | « [v] = m/s ✓ » for v = 2 g h | E | ph6-unites |
+| `ph_estimate_power10` | 3500 × 80 ≈ 30 000 (300 000) | E | ph-estimate |
+| `ph_verdict_ignored` | estimate 2·10⁵, result 2·10³ called coherent | E | ph6-verdict |
+| `ph_too_many_digits` | h = 175 239,826 m (1,8·10⁵ m) | E | rg-digits |
+| `rg_same_ends` | v_min = d_min/t_min (d_min/t_max) | E | rg-ends |
+| `rg_conclude_middle` | 1,02 ± 0,08 > 1,00, so it sinks (cannot conclude) | E | rg-conclude |
+| `rg_percent_absolute` | ± 1 g better than ± 5 mL (compare 0,6 % and 2,8 %) | E | rg-percent |
+| `rg_half_width` | 400 ± 20 → 400 to 420 (380 to 420) | E | rg-read |
+
+How the 6-step problem catches them: steps 1 and 2 answer at once (a decoy tapped, a needed formula removed, a letter in the wrong colour); algebra lines are checked on random situations where every formula of the problem holds, so any correct rearrangement is accepted and a wrong one is caught whatever its form; step 4 computes the unit of the student's own expression; step 6 computes its value, so a wrong algebra shows up as an incoherent result.
+
+Sources (physics):
+
+- P1. I. A. Halloun, D. Hestenes, « Common sense concepts about motion », *American Journal of Physics* 53 (1985) 1056.
+- P2. R. Stavy, B. Berkovitz, « Cognitive conflict as a basis for teaching quantitative aspects of the concept of temperature », *Science Education* 64 (1980) 679.
+- P3. G. Erickson, A. Tiberghien, « Heat and temperature », in R. Driver, E. Guesne, A. Tiberghien (eds), *Children's Ideas in Science*, Open University Press, 1985.

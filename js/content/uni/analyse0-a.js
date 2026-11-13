@@ -26,6 +26,10 @@ import {
   pre, over, tangentText, tangentFinal, tangentCfg,
 } from './analyse0-a-kit.js';
 import { GEN as STUDY } from './analyse0-a-study.js';
+import { t } from '../../i18n.js';
+
+// {name} filled in French: a key built from a statement stays French.
+const frFill = (s, v) => s.replace(/\{(\w+)\}/g, (m, k) => (k in v ? String(v[k]) : m));
 
 const KEYS = ['calcx', 'calcfn'];
 const LKEYS = ['calcx', 'calcfn', 'anal'];
@@ -37,9 +41,9 @@ const tmpl = (line) => MT(line.blanks?.length ? templateOf(line) : line.math);
 
 const DU = 'g6-deriv-usual';
 const DU_SUB = [
-  { id: 'powers', label: 'réécrire en puissances', skill: 'g2-real-powers' },
-  { id: 'table', label: 'table des dérivées', skill: DU },
-  { id: 'value', label: 'évaluer f′(a)', skill: DU },
+  { id: 'powers', label: t('réécrire en puissances'), skill: 'g2-real-powers' },
+  { id: 'table', label: t('table des dérivées'), skill: DU },
+  { id: 'value', label: t('évaluer f′(a)'), skill: DU },
 ];
 
 // x^m written c·x^m for a whole or fractional m (power form).
@@ -97,7 +101,7 @@ function term(kind, c, n) {
   return { kind, c: C, show, form: fx, d, dPow: d, rewrite: false };
 }
 // c·d(form): 3d(x^4), -d(e^x).
-const dTerm = (t) => `${pre(t.c)}d(${t.form})`;
+const dTerm = (tm) => `${pre(tm.c)}d(${tm.form})`;
 const sumOf = (xs) => joinSum(xs);
 
 function duTerms(rng, tpl) {
@@ -124,24 +128,24 @@ function duDraw(rng, tpl) {
   for (let i = 0; i < 200; i++) {
     const ts = duTerms(rng, tpl);
     if (ts.length < 2) continue;
-    if (tpl === 'poly' && !ts.some((t) => t.rewrite)) continue;
-    if (tpl === 'mix' && ts.every((t) => t.kind === 'pow')) continue;
+    if (tpl === 'poly' && !ts.some((tm) => tm.rewrite)) continue;
+    if (tpl === 'mix' && ts.every((tm) => tm.kind === 'pow')) continue;
     return { ts };
   }
   return { ts: [term('pow', 3, 4), term('pow', -2, q(1, 2)), term('pow', 5, -1)], fallback: true };
 }
 
-const duJudge = (ts) => ({ kind: 'equiv', vars: [V], dvar: V, target: 'no-prime', domain: { x: ts.some((t) => t.kind === 'tan') ? [0.2, 1.4] : [0.2, 3] } });
+const duJudge = (ts) => ({ kind: 'equiv', vars: [V], dvar: V, target: 'no-prime', domain: { x: ts.some((tm) => tm.kind === 'tan') ? [0.2, 1.4] : [0.2, 3] } });
 
 // The rewrite in powers, for the note of level 1: √x = x^(1/2), 5/x = 5x⁻¹.
-const rewriteNote = (ts) => ts.filter((t) => t.rewrite).map((t) => `${MT(t.show)} = ${MT(powForm(t.c, t.n))}`).join(', ');
+const rewriteNote = (ts) => ts.filter((tm) => tm.rewrite).map((tm) => `${MT(tm.show)} = ${MT(powForm(tm.c, tm.n))}`).join(', ');
 
 const DU_CHOICES = (ts) => [
-  { id: 'split', label: 'Séparer les termes et sortir les constantes (racines et fractions écrites en puissances)' },
-  { id: 'table', label: 'Dériver chaque terme avec la table' },
-  { id: 'product', label: 'Règle du produit', why: 'Il n\'y a pas de produit de deux fonctions de x : seulement des constantes devant les termes.' },
-  ...(ts.some((t) => t.kind === 'two') ? [{ id: 'powexp', label: '(2ˣ)′ = x·2ˣ⁻¹', rule: 'g6_power_rule_exp', why: 'L\'exposant n\'est pas constant : (aˣ)′ = aˣ·ln a.' }] : []),
-  { id: 'simplify', label: 'Simplifier', why: 'Il reste des dérivées à calculer.' },
+  { id: 'split', label: t('Séparer les termes et sortir les constantes (racines et fractions écrites en puissances)') },
+  { id: 'table', label: t('Dériver chaque terme avec la table') },
+  { id: 'product', label: t('Règle du produit'), why: t('Il n\'y a pas de produit de deux fonctions de x : seulement des constantes devant les termes.') },
+  ...(ts.some((tm) => tm.kind === 'two') ? [{ id: 'powexp', label: '(2ˣ)′ = x·2ˣ⁻¹', rule: 'g6_power_rule_exp', why: t('L\'exposant n\'est pas constant : (aˣ)′ = aˣ·ln a.') }] : []),
+  { id: 'simplify', label: t('Simplifier'), why: t('Il reste des dérivées à calculer.') },
 ];
 
 function duItem(level, rng, opts = {}) {
@@ -150,54 +154,54 @@ function duItem(level, rng, opts = {}) {
   if (level === 5) return duSeries(rng);
   const tpl = level === 1 ? 'poly' : rng.pick(['poly', 'mix', 'mix']);
   const { ts, fallback } = duDraw(rng, tpl);
-  const f = sumOf(ts.map((t) => t.show));
+  const f = sumOf(ts.map((tm) => tm.show));
   const start = `d(${f})`;
   const judge = duJudge(ts);
-  const lineSplit = E(sumOf(ts.map(dTerm)), ts.some((t) => t.rewrite) ? 'Linéarité, réécrire en puissances' : 'Linéarité : les constantes sortent', 'powers', 'split');
-  const final = sumOf(ts.map((t) => t.d));
-  const lineD = E(final, 'Table des dérivées', 'table', 'table');
+  const lineSplit = E(sumOf(ts.map(dTerm)), ts.some((tm) => tm.rewrite) ? t('Linéarité, réécrire en puissances') : t('Linéarité : les constantes sortent'), 'powers', 'split');
+  const final = sumOf(ts.map((tm) => tm.d));
+  const lineD = E(final, t('Table des dérivées'), 'table', 'table');
   let script;
   if (level === 1) {
-    const finalPow = sumOf(ts.map((t) => t.dPow));
-    const exps = ts.filter((t) => t.kind === 'pow').map((t) => (t.n.sub(1).d === 1 && t.n.sub(1).n > 0 ? String(t.n.sub(1).n) : N(t.n.sub(1))));
+    const finalPow = sumOf(ts.map((tm) => tm.dPow));
+    const exps = ts.filter((tm) => tm.kind === 'pow').map((tm) => (tm.n.sub(1).d === 1 && tm.n.sub(1).n > 0 ? String(tm.n.sub(1).n) : N(tm.n.sub(1))));
     script = [
-      NOTE(`En puissances : ${rewriteNote(ts)}.`),
-      blanked(lineSplit, ts.filter((t) => t.rewrite).map((t) => N(t.n))),
-      blanked(E(finalPow, 'Table : (xⁿ)′ = nxⁿ⁻¹', 'table'), exps),
+      NOTE(t('En puissances : {r}.', { r: rewriteNote(ts) })),
+      blanked(lineSplit, ts.filter((tm) => tm.rewrite).map((tm) => N(tm.n))),
+      blanked(E(finalPow, t('Table : (xⁿ)′ = nxⁿ⁻¹'), 'table'), exps),
     ];
   } else if (level === 2) {
     // One term at a time; a decision on the table entry of a term.
-    const pick = ts.find((t) => WRONG_ENTRY[t.kind]) ?? ts[0];
-    const lines = ts.map((t, k) => E(sumOf(ts.map((s, j) => (j <= k ? s.d : dTerm(s)))), k === 0 ? 'Table, premier terme' : 'Terme suivant', 'table'));
+    const pick = ts.find((tm) => WRONG_ENTRY[tm.kind]) ?? ts[0];
+    const lines = ts.map((_, k) => E(sumOf(ts.map((s, j) => (j <= k ? s.d : dTerm(s)))), k === 0 ? t('Table, premier terme') : t('Terme suivant'), 'table'));
     const others = Object.keys(ENTRY).filter((x) => x !== pick.kind && !WRONG_ENTRY[pick.kind]?.label.includes(x));
-    const wrong = WRONG_ENTRY[pick.kind] ? { id: 'trap', label: WRONG_ENTRY[pick.kind].label, valid: false, rule: WRONG_ENTRY[pick.kind].rule, why: `Non : ${ENTRY[pick.kind]}.` }
-      : { id: 'other', label: ENTRY[rng.pick(others)], valid: false, why: `Non : ${ENTRY[pick.kind]}.` };
+    const wrong = WRONG_ENTRY[pick.kind] ? { id: 'trap', label: WRONG_ENTRY[pick.kind].label, valid: false, rule: WRONG_ENTRY[pick.kind].rule, why: t('Non : {e}.', { e: ENTRY[pick.kind] }) }
+      : { id: 'other', label: ENTRY[rng.pick(others)], valid: false, why: t('Non : {e}.', { e: ENTRY[pick.kind] }) };
     const decision = {
-      kind: 'decision', prompt: `Quelle règle pour dériver ${MT(pick.show)} ?`,
-      options: rng.shuffle([{ id: 'right', label: ENTRY[pick.kind], valid: true }, wrong, { id: 'pow', label: pick.kind === 'pow' ? '(xⁿ)′ = xⁿ⁻¹' : ENTRY.pow, valid: false, why: `Non : ${ENTRY[pick.kind]}.` }]),
+      kind: 'decision', prompt: t('Quelle règle pour dériver {f} ?', { f: MT(pick.show) }),
+      options: rng.shuffle([{ id: 'right', label: ENTRY[pick.kind], valid: true }, wrong, { id: 'pow', label: pick.kind === 'pow' ? '(xⁿ)′ = xⁿ⁻¹' : ENTRY.pow, valid: false, why: t('Non : {e}.', { e: ENTRY[pick.kind] }) }]),
     };
     const k = ts.indexOf(pick);
-    script = [blanked(lineSplit, ts.filter((t) => t.rewrite).map((t) => t.form)), ...lines.flatMap((l, j) => [
+    script = [blanked(lineSplit, ts.filter((tm) => tm.rewrite).map((tm) => tm.form)), ...lines.flatMap((l, j) => [
       ...(j === k ? [decision] : []), blanked(l, [ts[j].d]),
     ])];
   } else {
     script = [lineSplit, lineD];
   }
   // Template 3 (level 4): f′(a) at a point where the value is exact.
-  let prompt = rng.pick([`Dérive f(x) = ${MT(f)}.`, `Calcule f′(x) pour f(x) = ${MT(f)}, à l'aide de la table.`]);
+  let prompt = rng.pick([t('Dérive f(x) = {f}.', { f: MT(f) }), t('Calcule f′(x) pour f(x) = {f}, à l\'aide de la table.', { f: MT(f) })]);
   if (level === 4 && rng.chance(0.4)) {
     const nice = (v) => v && Math.abs(v.n) <= 300 && v.d <= 16;
-    const a = rng.shuffle([4, 1, 1, 0]).find((x) => ts.every((t) => (t.kind === 'two' ? false : t.kind === 'pow' || t.kind === 'ln' ? x > 0 : true)) && nice(valueAt(final, x)));
+    const a = rng.shuffle([4, 1, 1, 0]).find((x) => ts.every((tm) => (tm.kind === 'two' ? false : tm.kind === 'pow' || tm.kind === 'ln' ? x > 0 : true)) && nice(valueAt(final, x)));
     if (a !== undefined) {
-      script.push({ kind: 'segment', html: `Calcule f′(${a}).`, ask: `f′(${a}) =`, start: { math: at(final, a) }, judge: { kind: 'value', form: 'irreducible' } },
+      script.push({ kind: 'segment', html: t('Calcule f′({a}).', { a }), ask: `f′(${a}) =`, start: { math: at(final, a) }, judge: { kind: 'value', form: 'irreducible' } },
         E(N(valueAt(final, a)), `f′(${a})`, 'value'));
-      prompt = `Soit f(x) = ${MT(f)}. Dérive f, puis calcule f′(${a}).`;
+      prompt = t('Soit f(x) = {f}. Dérive f, puis calcule {label}.', { f: MT(f), label: `f′(${a})` });
     }
   }
   return linesItem({
     skill: DU, level, prompt, start, judge: level === 3 ? { ...judge, menus: stepMenus(start, [lineSplit, lineD], DU_CHOICES(ts)) } : judge,
     mode: modeOf(level), script,
-    hints: H(ts.some((t) => t.rewrite) ? 'Écris chaque terme comme une puissance de x, puis utilise (xⁿ)′ = nxⁿ⁻¹.' : 'Dérive terme par terme avec la table ; les constantes restent devant.',
+    hints: H(ts.some((tm) => tm.rewrite) ? t('Écris chaque terme comme une puissance de x, puis utilise (xⁿ)′ = nxⁿ⁻¹.') : t('Dérive terme par terme avec la table ; les constantes restent devant.'),
       `= ${tmpl(blanked(lineD, [ts[ts.length - 1].d]))}`, `= ${MT(final)}`),
     subgoals: DU_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${DU}:${level}:${f}`, exam: examOf(opts), fallback,
@@ -210,26 +214,26 @@ function duSeries(rng) {
   const used = new Set();
   const fs = [];
   for (const kind of kinds) {
-    let t;
+    let tm;
     for (let g = 0; g < 20; g++) {
       const nn = kind === 'pow' ? rng.pick(POWERS) : null;
       let c = nz(rng, -5, 5);
       if (nn && Q.of(nn).d === 2 && c % 2) c *= 2;
-      t = term(kind, c, nn);
-      if (!used.has(t.form)) break;
+      tm = term(kind, c, nn);
+      if (!used.has(tm.form)) break;
     }
-    used.add(t.form);
+    used.add(tm.form);
     // Half the functions get a second term (a power) to keep linearity in play.
-    const two = rng.chance(0.4) && kind !== 'pow' ? [t, term('pow', nz(rng, -4, 4), rng.pick([2, 3]))] : [t];
+    const two = rng.chance(0.4) && kind !== 'pow' ? [tm, term('pow', nz(rng, -4, 4), rng.pick([2, 3]))] : [tm];
     fs.push(two);
   }
   const parts = fs.map((ts, i) => ({
-    html: `f${'₁₂₃₄₅₆'[i]}(x) = ${MT(sumOf(ts.map((t) => t.show)))}`, ask: `f${'₁₂₃₄₅₆'[i]}′(x) =`,
-    start: `d(${sumOf(ts.map((t) => t.show))})`, judge: duJudge(ts),
-    lines: [E(sumOf(ts.map((t) => t.d)), 'Table', 'table')],
+    html: `f${'₁₂₃₄₅₆'[i]}(x) = ${MT(sumOf(ts.map((tm) => tm.show)))}`, ask: `f${'₁₂₃₄₅₆'[i]}′(x) =`,
+    start: `d(${sumOf(ts.map((tm) => tm.show))})`, judge: duJudge(ts),
+    lines: [E(sumOf(ts.map((tm) => tm.d)), t('Table'), 'table')],
   }));
   return partsItem({
-    skill: DU, level: 5, prompt: 'Série rapide, sans aide : dérive les six fonctions.', parts, hints: [], subgoals: DU_SUB, keys: KEYS,
+    skill: DU, level: 5, prompt: t('Série rapide, sans aide : dérive les six fonctions.'), parts, hints: [], subgoals: DU_SUB, keys: KEYS,
     key: `${DU}:5:${parts.map((p) => p.start).join('|')}`, exam: false, expectedSec: 150,
   });
 }
@@ -246,42 +250,42 @@ function duMcq(rng) {
     ts = cand;
   }
   if (!ts) { ts = [term('pow', 3, 2), term('two', 1), term('cos', 2)]; fallback = true; }
-  const f = sumOf(ts.map((t) => t.show));
+  const f = sumOf(ts.map((tm) => tm.show));
   const start = parse(`d(${f})`);
   const judge = duJudge(ts);
-  const right = sumOf(ts.map((t) => t.d));
-  const wrongExp = ts.map((t) => (t.kind === 'two' ? `${pre(t.c)}x×2^(x-1)` : t.kind === 'exp' ? `${pre(t.c)}x×e^(x-1)` : t.d));
-  const wrongTrig = ts.map((t) => (t.kind === 'cos' ? `${pre(t.c)}sin(x)` : t.kind === 'sin' ? `${pre(t.c.neg())}cos(x)` : t.d));
-  const both = ts.map((t, i) => (t.kind === 'cos' || t.kind === 'sin' ? wrongTrig[i] : wrongExp[i]));
+  const right = sumOf(ts.map((tm) => tm.d));
+  const wrongExp = ts.map((tm) => (tm.kind === 'two' ? `${pre(tm.c)}x×2^(x-1)` : tm.kind === 'exp' ? `${pre(tm.c)}x×e^(x-1)` : tm.d));
+  const wrongTrig = ts.map((tm) => (tm.kind === 'cos' ? `${pre(tm.c)}sin(x)` : tm.kind === 'sin' ? `${pre(tm.c.neg())}cos(x)` : tm.d));
+  const both = ts.map((tm, i) => (tm.kind === 'cos' || tm.kind === 'sin' ? wrongTrig[i] : wrongExp[i]));
   const options = [
     { html: MT(right), correct: true },
     { html: MT(sumOf(wrongExp)), correct: false, rule: 'g6_power_rule_exp' },
     { html: MT(sumOf(wrongTrig)), correct: false, rule: 'g6_cos_sign' },
     { html: MT(sumOf(both)), correct: false, rule: 'g6_power_rule_exp' },
   ];
-  const sol = [{ html: `${MT(`d(${f})`)} = ${MT(right)}`, note: ts.map((t) => ENTRY[t.kind]).join(' ; ') }];
+  const sol = [{ html: `${MT(`d(${f})`)} = ${MT(right)}`, note: ts.map((tm) => ENTRY[tm.kind]).join(' ; ') }];
   void start; void judge;
-  return { ...mcq({ skill: DU, level: 4, prompt: `Quelle est la dérivée de f(x) = ${MT(f)} ?`, options, key: `${DU}:mcq:${f}`, solution: sol, exam: { format: 'mcq', points: 1 } }, rng), fallback };
+  return { ...mcq({ skill: DU, level: 4, prompt: t('Quelle est la dérivée de f(x) = {f} ?', { f: MT(f) }), options, key: `${DU}:mcq:${f}`, solution: sol, exam: { format: 'mcq', points: 1 } }, rng), fallback };
 }
 
 // True or false on one entry of the table (a false one has a counter-example x).
 function duTf(rng) {
   const c = rng.int(2, 5);
   const bank = [
-    { s: 'Pour tout x : (2ˣ)′ = x·2ˣ⁻¹.', truth: false, pred: '2^x×ln(2)=x×2^(x-1)', x: '0', rule: 'g6_power_rule_exp', why: 'Faux : (2ˣ)′ = 2ˣ·ln 2. En x = 0, la vraie dérivée vaut ln 2 ≠ 0, mais x·2ˣ⁻¹ vaut 0.' },
-    { s: 'Pour tout x : (eˣ)′ = x·eˣ⁻¹.', truth: false, pred: 'e^x=x×e^(x-1)', x: '0', rule: 'g6_power_rule_exp', why: 'Faux : (eˣ)′ = eˣ. En x = 0, eˣ vaut 1, mais x·eˣ⁻¹ vaut 0.' },
-    { s: `Pour tout x : (${c} cos x)′ = ${c} sin x.`, truth: false, pred: `-${c}sin(x)=${c}sin(x)`, x: '1', rule: 'g6_cos_sign', why: `Faux : (cos x)′ = −sin x. En x = 1, −${c} sin 1 ≠ ${c} sin 1.` },
-    { s: 'Pour tout x : (sin x)′ = −cos x.', truth: false, pred: 'cos(x)=-cos(x)', x: '0', rule: 'g6_cos_sign', why: 'Faux : (sin x)′ = cos x. En x = 0 : 1 ≠ −1.' },
-    { s: 'Pour tout x > 0 : (1/x)′ = 1/x².', truth: false, pred: '-1/x^2=1/x^2', x: '1', dom: 'R+', why: 'Faux : 1/x = x⁻¹, donc (1/x)′ = −x⁻² = −1/x². En x = 1 : −1 ≠ 1.' },
-    { s: 'Pour tout x > 0 : (√x)′ = 1/(2√x).', truth: true, why: 'Vrai : √x = x^(1/2), et (1/2)·x^(−1/2) = 1/(2√x).' },
-    { s: 'Pour tout x > 0 : (ln x)′ = 1/x.', truth: true, why: 'Vrai : c\'est une ligne de la table.' },
-    { s: 'Pour tout x : (arctan x)′ = 1/(1 + x²).', truth: true, why: 'Vrai : c\'est une ligne de la table.' },
-    { s: 'Pour tout x : (cosh x)′ = sinh x.', truth: true, why: 'Vrai : cosh x = (eˣ + e⁻ˣ)/2 se dérive en (eˣ − e⁻ˣ)/2 = sinh x, sans signe moins.' },
+    { s: 'Pour tout x : (2ˣ)′ = x·2ˣ⁻¹.', truth: false, pred: '2^x×ln(2)=x×2^(x-1)', x: '0', rule: 'g6_power_rule_exp', why: t('Faux : (2ˣ)′ = 2ˣ·ln 2. En x = 0, la vraie dérivée vaut ln 2 ≠ 0, mais x·2ˣ⁻¹ vaut 0.') },
+    { s: 'Pour tout x : (eˣ)′ = x·eˣ⁻¹.', truth: false, pred: 'e^x=x×e^(x-1)', x: '0', rule: 'g6_power_rule_exp', why: t('Faux : (eˣ)′ = eˣ. En x = 0, eˣ vaut 1, mais x·eˣ⁻¹ vaut 0.') },
+    { s: `Pour tout x : (${c} cos x)′ = ${c} sin x.`, st: t('Pour tout x : ({c} cos x)′ = {c} sin x.', { c }), truth: false, pred: `-${c}sin(x)=${c}sin(x)`, x: '1', rule: 'g6_cos_sign', why: t('Faux : (cos x)′ = −sin x. En x = 1, −{c} sin 1 ≠ {c} sin 1.', { c }) },
+    { s: 'Pour tout x : (sin x)′ = −cos x.', truth: false, pred: 'cos(x)=-cos(x)', x: '0', rule: 'g6_cos_sign', why: t('Faux : (sin x)′ = cos x. En x = 0 : 1 ≠ −1.') },
+    { s: 'Pour tout x > 0 : (1/x)′ = 1/x².', truth: false, pred: '-1/x^2=1/x^2', x: '1', dom: 'R+', why: t('Faux : 1/x = x⁻¹, donc (1/x)′ = −x⁻² = −1/x². En x = 1 : −1 ≠ 1.') },
+    { s: 'Pour tout x > 0 : (√x)′ = 1/(2√x).', truth: true, why: t('Vrai : √x = x^(1/2), et (1/2)·x^(−1/2) = 1/(2√x).') },
+    { s: 'Pour tout x > 0 : (ln x)′ = 1/x.', truth: true, why: t('Vrai : c\'est une ligne de la table.') },
+    { s: 'Pour tout x : (arctan x)′ = 1/(1 + x²).', truth: true, why: t('Vrai : c\'est une ligne de la table.') },
+    { s: 'Pour tout x : (cosh x)′ = sinh x.', truth: true, why: t('Vrai : cosh x = (eˣ + e⁻ˣ)/2 se dérive en (eˣ − e⁻ˣ)/2 = sinh x, sans signe moins.') },
   ];
   const b = rng.pick(bank);
   const dom = b.dom || 'R';
   return tfItem({
-    skill: DU, level: 4, statement: b.s, truth: b.truth,
+    skill: DU, level: 4, statement: b.st ?? t(b.s), truth: b.truth,
     counter: b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom }], pred: b.pred, ask: [{ v: 'x', label: 'x =' }], answer: { x: b.x } },
     ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 },
   });
@@ -293,10 +297,10 @@ function duTf(rng) {
 
 const TG = 'g6-tangent';
 const TG_SUB = [
-  { id: 'deriv', label: 'dériver', skill: 'g6-deriv-rules' },
-  { id: 'value', label: 'valeur et pente en a', skill: TG },
-  { id: 'line', label: 'écrire la droite', skill: 'g4-line2' },
-  { id: 'approx', label: 'approximation linéaire', skill: TG },
+  { id: 'deriv', label: t('dériver'), skill: 'g6-deriv-rules' },
+  { id: 'value', label: t('valeur et pente en a'), skill: TG },
+  { id: 'line', label: t('écrire la droite'), skill: 'g4-line2' },
+  { id: 'approx', label: t('approximation linéaire'), skill: TG },
 ];
 const VAL = { kind: 'value', form: 'irreducible' };
 const YV = { vars: [V, 'y'] };
@@ -344,15 +348,15 @@ function tgFunction(rng, family) {
 const derivCfg = (dom) => ({ kind: 'equiv', vars: [V], dvar: V, target: 'no-prime', domain: { x: dom } });
 
 const TG_CHOICES = [
-  { id: 'deriv', label: 'Dériver f' },
-  { id: 'fa', label: 'Calculer f(a)' },
-  { id: 'dfa', label: 'Calculer la pente f′(a)' },
-  { id: 'solve', label: 'Résoudre f′(x) = m' },
-  { id: 'line', label: 'Écrire y = f(a) + f′(a)(x − a)' },
-  { id: 'slopefn', label: 'Écrire y = f(a) + f′(x)(x − a)', rule: 'g6_tangent_slope_function', why: 'La pente d\'une droite est un nombre : f′(a), pas f′(x).' },
-  { id: 'expand', label: 'Développer : y = mx + p' },
+  { id: 'deriv', label: t('Dériver f') },
+  { id: 'fa', label: t('Calculer f(a)') },
+  { id: 'dfa', label: t('Calculer la pente f′(a)') },
+  { id: 'solve', label: t('Résoudre f′(x) = m') },
+  { id: 'line', label: t('Écrire y = f(a) + f′(a)(x − a)') },
+  { id: 'slopefn', label: t('Écrire y = f(a) + f′(x)(x − a)'), rule: 'g6_tangent_slope_function', why: t('La pente d\'une droite est un nombre : f′(a), pas f′(x).') },
+  { id: 'expand', label: t('Développer : y = mx + p') },
   { id: 'approx', label: 'f(a + h) ≈ f(a) + f′(a)·h' },
-  { id: 'compute', label: 'Calculer' },
+  { id: 'compute', label: t('Calculer') },
 ];
 
 // The parts of « tangent at a »: f′(x), f(a), f′(a), y = …
@@ -361,10 +365,10 @@ function tgParts(d, { given = false } = {}) {
   const formula = tangentText(d.fa, d.dfa, d.a);
   const final = tangentFinal(d.fa, d.dfa, d.a);
   return [
-    ...(given ? [] : [{ html: 'Dérive f.', ask: 'f′(x) =', start: `d(${d.f})`, judge: derivCfg(d.dom), lines: [E(d.df, 'Dériver', 'deriv', 'deriv')] }]),
-    { html: `Valeur en a = ${A} :`, ask: `f(${A}) =`, start: at(d.f, d.a), judge: VAL, lines: [E(N(d.fa), 'Remplacer x par a', 'value', 'fa')] },
-    { html: 'Pente de la tangente :', ask: `f′(${A}) =`, start: at(d.df, d.a), judge: VAL, lines: [E(N(d.dfa), 'Pente en a', 'value', 'dfa')] },
-    { html: 'Tangente :', ask: 'y =', start: 'y', judge: tangentCfg(d), lines: [E(formula, 'y = f(a) + f′(a)(x − a)', 'line', 'line'), E(final, 'Développer', 'line', 'expand')] },
+    ...(given ? [] : [{ html: t('Dérive f.'), ask: 'f′(x) =', start: `d(${d.f})`, judge: derivCfg(d.dom), lines: [E(d.df, t('Dériver'), 'deriv', 'deriv')] }]),
+    { html: t('Valeur en a = {a} :', { a: A }), ask: `f(${A}) =`, start: at(d.f, d.a), judge: VAL, lines: [E(N(d.fa), t('Remplacer x par a'), 'value', 'fa')] },
+    { html: t('Pente de la tangente :'), ask: `f′(${A}) =`, start: at(d.df, d.a), judge: VAL, lines: [E(N(d.dfa), t('Pente en a'), 'value', 'dfa')] },
+    { html: t('Tangente :'), ask: 'y =', start: 'y', judge: tangentCfg(d), lines: [E(formula, 'y = f(a) + f′(a)(x − a)', 'line', 'line'), E(final, t('Développer'), 'line', 'expand')] },
   ];
 }
 
@@ -380,17 +384,17 @@ function tgItem(level, rng, opts = {}) {
   const A = fr(N(d.a));
   const p = d.fa.sub(d.dfa.mul(d.a));
   if (level <= 2) {
-    const t = parts[parts.length - 1];
-    t.lines = [blanked(t.lines[0], [N(d.fa), N(d.dfa)], YV), blanked(t.lines[1], [N(p)], YV)];
+    const tp = parts[parts.length - 1];
+    tp.lines = [blanked(tp.lines[0], [N(d.fa), N(d.dfa)], YV), blanked(tp.lines[1], [N(p)], YV)];
   }
   return partsItem({
     skill: TG, level, parts, choices: TG_CHOICES,
-    before: level === 1 ? [NOTE(`On donne f′(x) = ${MT(d.df)}.`)] : [],
+    before: level === 1 ? [NOTE(t('On donne f′(x) = {df}.', { df: MT(d.df) }))] : [],
     prompt: rng.pick([
-      `Équation de la tangente au graphe de f(x) = ${MT(d.f)} en a = ${A}.`,
-      `Soit f(x) = ${MT(d.f)}. Donne la tangente à son graphe au point d'abscisse ${A}, sous la forme y = mx + p.`,
+      t('Équation de la tangente au graphe de f(x) = {f} en a = {a}.', { f: MT(d.f), a: A }),
+      t('Soit f(x) = {f}. Donne la tangente à son graphe au point d\'abscisse {a}, sous la forme y = mx + p.', { f: MT(d.f), a: A }),
     ]),
-    hints: H('y = f(a) + f′(a)(x − a) : calcule f(a) et f′(a) <b>en a</b>, puis écris la droite.', `y = ${tmpl(blanked(E(tangentText(d.fa, d.dfa, d.a)), [N(d.dfa)], YV))}`, `y = ${MT(tangentFinal(d.fa, d.dfa, d.a), YV)}`),
+    hints: H(t('y = f(a) + f′(a)(x − a) : calcule f(a) et f′(a) <b>en a</b>, puis écris la droite.'), `y = ${tmpl(blanked(E(tangentText(d.fa, d.dfa, d.a)), [N(d.dfa)], YV))}`, `y = ${MT(tangentFinal(d.fa, d.dfa, d.a), YV)}`),
     subgoals: TG_SUB, keys: KEYS, key: `${TG}:${level}:${d.f}:${d.a}`, exam: examOf(opts, 3), fallback: d.fallback,
     answerHtml: `y = ${MT(tangentFinal(d.fa, d.dfa, d.a), YV)}`, expectedSec: 150,
   });
@@ -413,15 +417,15 @@ function tgParallel(level, rng, opts) {
   d ||= { f: 'x^2-2x+3', df: '2x-2', a: 2, fa: q(3), dfa: q(2), dom: [-3, 3], m: 2, p0: 1, fallback: true };
   const lineText = polyText([d.m, d.p0]);
   const parts = [
-    { html: 'Dérive f.', ask: 'f′(x) =', start: `d(${d.f})`, judge: derivCfg(d.dom), lines: [E(d.df, 'Dériver', 'deriv', 'deriv')] },
-    { html: `Même pente que la droite : f′(x) = ${fr(d.m)}.`, start: `${d.df}=${d.m}`, judge: { kind: 'solset', v: V }, lines: [E(`x=${d.a}`, 'Résoudre', 'value', 'solve')] },
-    ...tgParts(d).slice(1).filter((p) => p.html !== 'Pente de la tangente :'),
+    { html: t('Dérive f.'), ask: 'f′(x) =', start: `d(${d.f})`, judge: derivCfg(d.dom), lines: [E(d.df, t('Dériver'), 'deriv', 'deriv')] },
+    { html: t('Même pente que la droite : f′(x) = {m}.', { m: fr(d.m) }), start: `${d.df}=${d.m}`, judge: { kind: 'solset', v: V }, lines: [E(`x=${d.a}`, t('Résoudre'), 'value', 'solve')] },
+    ...tgParts(d).slice(1).filter((p) => p.html !== t('Pente de la tangente :')),
   ];
   if (level <= 2) parts[1].lines = [blanked(parts[1].lines[0], [String(d.a)])];
   return partsItem({
     skill: TG, level, parts, choices: TG_CHOICES,
-    prompt: `Soit f(x) = ${MT(d.f)}. En quel point la tangente au graphe de f est-elle parallèle à la droite y = ${MT(lineText)} ? Donne l'équation de cette tangente.`,
-    hints: H(`Deux droites parallèles ont la même pente : résous f′(x) = ${fr(d.m)}.`, `x = ${fr(d.a)}, puis y = f(${fr(d.a)}) ${d.m < 0 ? '−' : '+'} ${fr(Math.abs(d.m)) === '1' ? '' : fr(Math.abs(d.m))}(${MT(lin(d.a))}) avec f(${fr(d.a)}) = □`, `y = ${MT(tangentFinal(d.fa, d.dfa, d.a), YV)}`),
+    prompt: t('Soit f(x) = {f}. En quel point la tangente au graphe de f est-elle parallèle à la droite y = {l} ? Donne l\'équation de cette tangente.', { f: MT(d.f), l: MT(lineText) }),
+    hints: H(t('Deux droites parallèles ont la même pente : résous f′(x) = {m}.', { m: fr(d.m) }), t('x = {a}, puis y = f({a}) {op} {m}({l}) avec f({a}) = □', { a: fr(d.a), op: d.m < 0 ? '−' : '+', m: fr(Math.abs(d.m)) === '1' ? '' : fr(Math.abs(d.m)), l: MT(lin(d.a)) }), `y = ${MT(tangentFinal(d.fa, d.dfa, d.a), YV)}`),
     subgoals: TG_SUB, keys: [...KEYS, 'relation'], key: `${TG}:par:${level}:${d.f}:${d.m}`, exam: examOf(opts, 3), fallback: d.fallback, expectedSec: 150,
   });
 }
@@ -434,18 +438,18 @@ function tgApprox(level, rng, opts) {
   const slope = q(1, 2 * m);
   const val = slope.mul(h).add(m);
   const parts = [
-    { html: 'Dérive f(x) = √x.', ask: 'f′(x) =', start: 'd(√x)', judge: derivCfg([0.2, 4]), lines: [E('1/(2√x)', 'Table', 'deriv', 'deriv')] },
-    { html: `Pente en a = ${a} :`, ask: `f′(${a}) =`, start: at('1/(2√x)', a), judge: VAL, lines: [E(N(slope), 'Pente en a', 'value', 'dfa')] },
+    { html: t('Dérive f(x) = √x.'), ask: 'f′(x) =', start: 'd(√x)', judge: derivCfg([0.2, 4]), lines: [E('1/(2√x)', t('Table'), 'deriv', 'deriv')] },
+    { html: t('Pente en a = {a} :', { a }), ask: `f′(${a}) =`, start: at('1/(2√x)', a), judge: VAL, lines: [E(N(slope), t('Pente en a'), 'value', 'dfa')] },
     {
-      html: `Approximation linéaire, avec h = ${fr(dec(h))} :`, ask: `√(${dec(h.add(a))}) ≈`, start: `√(${dec(h.add(a))})`, judge: { ...VAL, expect: N(val) },
-      lines: [E(`${m}+${N(slope)}×(${N(h)})`, 'f(a) + f′(a)·h', 'approx', 'approx'), E(N(val), 'Calculer', 'approx', 'compute')],
+      html: t('Approximation linéaire, avec h = {h} :', { h: fr(dec(h)) }), ask: `√(${dec(h.add(a))}) ≈`, start: `√(${dec(h.add(a))})`, judge: { ...VAL, expect: N(val) },
+      lines: [E(`${m}+${N(slope)}×(${N(h)})`, 'f(a) + f′(a)·h', 'approx', 'approx'), E(N(val), t('Calculer'), 'approx', 'compute')],
     },
   ];
   if (level <= 2) parts[2].lines[0] = blanked(parts[2].lines[0], [N(slope)]);
   return partsItem({
     skill: TG, level, parts, choices: TG_CHOICES,
-    prompt: `Donne une valeur approchée de √(${dec(h.add(a))}) (fraction exacte) par l'approximation linéaire de f(x) = √x en a = ${a}.`,
-    hints: H('f(a + h) ≈ f(a) + f′(a)·h, avec f′(x) = 1/(2√x).', `√(${dec(h.add(a))}) ≈ ${m} + □·(${fr(N(h))})`, `${m} + ${fr(N(slope))}·(${fr(N(h))}) = ${fr(N(val))}`),
+    prompt: t('Donne une valeur approchée de √({x}) (fraction exacte) par l\'approximation linéaire de f(x) = √x en a = {a}.', { x: dec(h.add(a)), a }),
+    hints: H(t('f(a + h) ≈ f(a) + f′(a)·h, avec f′(x) = 1/(2√x).'), `√(${dec(h.add(a))}) ≈ ${m} + □·(${fr(N(h))})`, `${m} + ${fr(N(slope))}·(${fr(N(h))}) = ${fr(N(val))}`),
     subgoals: TG_SUB, keys: KEYS, key: `${TG}:approx:${level}:${a}:${h}`, exam: examOf(opts), expectedSec: 120,
   });
 }
@@ -459,12 +463,12 @@ function tgLevel5(rng, opts) {
   const parts = [
     ...tgParts(d),
     {
-      html: `Avec la tangente, donne une valeur approchée de f(${dec(x1)}).`, ask: `f(${dec(x1)}) ≈`, start: `f(${dec(x1)})`, judge: { ...VAL, expect: N(val) },
+      html: t('Avec la tangente, donne une valeur approchée de f({x}).', { x: dec(x1) }), ask: `f(${dec(x1)}) ≈`, start: `f(${dec(x1)})`, judge: { ...VAL, expect: N(val) },
       lines: [E(N(val), 'f(a + h) ≈ f(a) + f′(a)·h', 'approx', 'approx')],
     },
   ];
   return partsItem({
-    skill: TG, level: 5, parts, prompt: `Soit f(x) = ${MT(d.f)}. Donne la tangente à son graphe en a = ${fr(N(d.a))}, puis une valeur approchée de f(${dec(x1)}) (fraction exacte).`,
+    skill: TG, level: 5, parts, prompt: t('Soit f(x) = {f}. Donne la tangente à son graphe en a = {a}, puis une valeur approchée de f({x}) (fraction exacte).', { f: MT(d.f), a: fr(N(d.a)), x: dec(x1) }),
     hints: [], subgoals: TG_SUB, keys: KEYS, key: `${TG}:5:${d.f}:${d.a}:${h}`, exam: examOf(opts, 3), fallback: d.fallback, expectedSec: 180,
   });
 }
@@ -472,7 +476,7 @@ function tgLevel5(rng, opts) {
 function tgMcq(rng) {
   const d = tgFunction(rng, 'cubic');
   const right = tangentFinal(d.fa, d.dfa, d.a);
-  const Y = (t) => MT(`y=${t}`, YV);
+  const Y = (s) => MT(`y=${s}`, YV);
   const cands = [
     { html: Y(right), correct: true },
     { html: Y(`${N(d.fa)}+(${d.df})(${lin(d.a)})`), correct: false, rule: 'g6_tangent_slope_function' },
@@ -482,7 +486,7 @@ function tgMcq(rng) {
   ];
   const options = cands.filter((o, i) => cands.findIndex((x) => x.html === o.html) === i).slice(0, 4);
   return mcq({
-    skill: TG, level: 4, prompt: `Quelle est la tangente au graphe de f(x) = ${MT(d.f)} en a = ${fr(N(d.a))} ?`, options, key: `${TG}:mcq:${d.f}:${d.a}`,
+    skill: TG, level: 4, prompt: t('Quelle est la tangente au graphe de f(x) = {f} en a = {a} ?', { f: MT(d.f), a: fr(N(d.a)) }), options, key: `${TG}:mcq:${d.f}:${d.a}`,
     solution: [{ html: `f(${fr(N(d.a))}) = ${fr(N(d.fa))}, f′(x) = ${MT(d.df)}, f′(${fr(N(d.a))}) = ${fr(N(d.dfa))}`, note: '' }, { html: `y = ${MT(tangentText(d.fa, d.dfa, d.a))} = ${MT(right)}`, note: 'y = f(a) + f′(a)(x − a)' }],
     exam: { format: 'mcq', points: 1 }, fallback: d.fallback,
   }, rng);
@@ -492,7 +496,7 @@ function tgCoef(rng) {
   const d = tgFunction(rng, rng.pick(['cubic', 'cubic', 'exp', 'ln']));
   const p = d.fa.sub(d.dfa.mul(d.a));
   return answerItem({
-    skill: TG, level: 4, prompt: `La tangente au graphe de f(x) = ${MT(d.f)} en a = ${fr(N(d.a))} s'écrit y = mx + p. Donne p (l'ordonnée à l'origine).`,
+    skill: TG, level: 4, prompt: t('La tangente au graphe de f(x) = {f} en a = {a} s\'écrit y = mx + p. Donne p (l\'ordonnée à l\'origine).', { f: MT(d.f), a: fr(N(d.a)) }),
     expected: N(p), key: `${d.f}:${d.a}`, exam: { format: 'coef', points: 1 }, fallback: d.fallback,
     traps: [], solution: [{ html: `y = ${MT(tangentText(d.fa, d.dfa, d.a))} = ${MT(tangentFinal(d.fa, d.dfa, d.a))}`, note: `p = ${fr(N(p))}` }],
   });
@@ -504,23 +508,23 @@ function tgCoef(rng) {
 
 const LI = 'g6-limits';
 const LI_SUB = [
-  { id: 'dominant', label: 'mettre en évidence', skill: LI },
-  { id: 'conj', label: 'expression conjuguée', skill: 'rat-simplify' },
-  { id: 'simplify', label: 'simplifier', skill: 'rat-simplify' },
-  { id: 'sign', label: 'signe au voisinage du pôle', skill: LI },
-  { id: 'limit', label: 'passer à la limite', skill: LI },
+  { id: 'dominant', label: t('mettre en évidence'), skill: LI },
+  { id: 'conj', label: t('expression conjuguée'), skill: 'rat-simplify' },
+  { id: 'simplify', label: t('simplifier'), skill: 'rat-simplify' },
+  { id: 'sign', label: t('signe au voisinage du pôle'), skill: LI },
+  { id: 'limit', label: t('passer à la limite'), skill: LI },
 ];
 const LIM = (to, dir) => ({ kind: 'limit', v: V, to, ...(dir ? { dir } : {}) });
 const INF_T = (s) => (s > 0 ? '+∞' : '-∞');
 const toWord = (to, dir) => `${fr(to)}${dir === '-' ? '⁻' : dir === '+' ? '⁺' : ''}`;
 const LI_CHOICES = [
-  { id: 'dominant', label: 'Mettre en évidence le terme dominant' },
-  { id: 'conj', label: 'Multiplier et diviser par l\'expression conjuguée' },
-  { id: 'divide', label: 'Diviser en haut et en bas par x (signe de x !)' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'num', label: 'Calculer le numérateur au pôle' },
-  { id: 'limit', label: 'Passer à la limite' },
-  { id: 'zero', label: '∞ − ∞ = 0', rule: 'g6_infinity_minus_infinity', why: '∞ − ∞ est une forme indéterminée : il faut transformer l\'expression.' },
+  { id: 'dominant', label: t('Mettre en évidence le terme dominant') },
+  { id: 'conj', label: t('Multiplier et diviser par l\'expression conjuguée') },
+  { id: 'divide', label: t('Diviser en haut et en bas par x (signe de x !)') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'num', label: t('Calculer le numérateur au pôle') },
+  { id: 'limit', label: t('Passer à la limite') },
+  { id: 'zero', label: '∞ − ∞ = 0', rule: 'g6_infinity_minus_infinity', why: t('∞ − ∞ est une forme indéterminée : il faut transformer l\'expression.') },
 ];
 
 // c_k/x^j terms of a polynomial divided by its leading power.
@@ -533,7 +537,7 @@ function overPowers(cs) {
   }));
 }
 const xPow = (k) => (k === 0 ? '' : k === 1 ? 'x' : `x^${k}`);
-const wrapP = (t) => (/[+-]/.test(t.slice(1)) ? `(${t})` : t);
+const wrapP = (s) => (/[+-]/.test(s.slice(1)) ? `(${s})` : s);
 
 // A polynomial with whole roots: lead·Π(x − r), coefficients within 9.
 function rootsPoly(rng, deg, lead, avoid = []) {
@@ -572,9 +576,9 @@ function liRationalLines(d) {
   return {
     f,
     lines: [
-      E(l1, 'Mettre en évidence le terme dominant', 'dominant', 'dominant'),
-      E(l2, `Simplifier par ${xPow(d.n).replace('^2', '²').replace('^3', '³')}`, 'simplify', 'simplify'),
-      E(N(d.value), d.n === d.m ? 'Les termes en 1/x tendent vers 0' : 'Le dénominateur tend vers l\'infini', 'limit', 'limit'),
+      E(l1, t('Mettre en évidence le terme dominant'), 'dominant', 'dominant'),
+      E(l2, t('Simplifier par {p}', { p: xPow(d.n).replace('^2', '²').replace('^3', '³') }), 'simplify', 'simplify'),
+      E(N(d.value), d.n === d.m ? t('Les termes en 1/x tendent vers 0') : t('Le dénominateur tend vers l\'infini'), 'limit', 'limit'),
     ],
     holes: [[xPow(d.n)], [N(d.N[0])], [N(d.value)]],
   };
@@ -595,9 +599,9 @@ function liConj(rng, to) {
   return {
     f, to, value, b, c,
     lines: [
-      E(`(${top})/(√(${P})${plus ? '+' : '-'}x)`, 'Multiplier et diviser par la conjuguée', 'conj', 'conj'),
-      E(`${wrapP(nTop)}/(${plus ? '' : '-'}√(${inner})${plus ? '+' : '-'}1)`, plus ? 'Diviser par x (x > 0)' : 'Diviser par x : x < 0, donc √(x²) = −x', 'simplify', 'divide'),
-      E(N(value), 'Passer à la limite', 'limit', 'limit'),
+      E(`(${top})/(√(${P})${plus ? '+' : '-'}x)`, t('Multiplier et diviser par la conjuguée'), 'conj', 'conj'),
+      E(`${wrapP(nTop)}/(${plus ? '' : '-'}√(${inner})${plus ? '+' : '-'}1)`, plus ? t('Diviser par x (x > 0)') : t('Diviser par x : x < 0, donc √(x²) = −x'), 'simplify', 'divide'),
+      E(N(value), t('Passer à la limite'), 'limit', 'limit'),
     ],
     holes: [[top], [N(b)], [N(value)]],
   };
@@ -619,9 +623,9 @@ function liSqrtRatio(rng, to) {
     return {
       f, to, value, a, b,
       lines: [
-        E(`√(x^2(${iP}))/(x(${iQ}))`, 'Mettre en évidence x² sous la racine, x en bas', 'dominant', 'dominant'),
-        E(`${plus ? '' : '-'}√(${iP})/(${iQ})`, plus ? '√(x²) = x pour x > 0' : '√(x²) = |x| = −x pour x < 0', 'simplify', 'simplify'),
-        E(N(value), 'Passer à la limite', 'limit', 'limit'),
+        E(`√(x^2(${iP}))/(x(${iQ}))`, t('Mettre en évidence x² sous la racine, x en bas'), 'dominant', 'dominant'),
+        E(`${plus ? '' : '-'}√(${iP})/(${iQ})`, plus ? t('√(x²) = x pour x > 0') : t('√(x²) = |x| = −x pour x < 0'), 'simplify', 'simplify'),
+        E(N(value), t('Passer à la limite'), 'limit', 'limit'),
       ],
       holes: [[iP], [iQ], [N(value)]],
     };
@@ -654,18 +658,18 @@ function poleParts(d, level) {
   const side = (dir) => {
     const sd = dir === '-' ? d.sl : d.sr;
     const sign = {
-      kind: 'decision', prompt: `Quand x → ${R}${dir === '-' ? '⁻' : '⁺'}, le dénominateur tend vers 0 par valeurs…`,
-      options: [{ id: 'pos', label: 'positives (0⁺)', valid: sd > 0, why: 'Regarde le signe de chaque facteur juste à côté du pôle.' }, { id: 'neg', label: 'négatives (0⁻)', valid: sd < 0, why: 'Regarde le signe de chaque facteur juste à côté du pôle.' }],
+      kind: 'decision', prompt: t('Quand x → {x}, le dénominateur tend vers 0 par valeurs…', { x: `${R}${dir === '-' ? '⁻' : '⁺'}` }),
+      options: [{ id: 'pos', label: t('positives (0⁺)'), valid: sd > 0, why: t('Regarde le signe de chaque facteur juste à côté du pôle.') }, { id: 'neg', label: t('négatives (0⁻)'), valid: sd < 0, why: t('Regarde le signe de chaque facteur juste à côté du pôle.') }],
     };
     const res = dir === '-' ? d.left : d.right;
     return {
-      html: `Limite quand x → ${R}${dir === '-' ? '⁻' : '⁺'} :`, start: d.f, judge: LIM(String(d.r), dir),
-      pre: level === 1 ? [NOTE(`Le dénominateur tend vers 0${sd > 0 ? '⁺' : '⁻'}, le numérateur vers ${fr(N(d.Nr))}.`)] : level === 2 ? [sign] : [],
+      html: t('Limite quand x → {x} :', { x: `${R}${dir === '-' ? '⁻' : '⁺'}` }), start: d.f, judge: LIM(String(d.r), dir),
+      pre: level === 1 ? [NOTE(t('Le dénominateur tend vers {z}, le numérateur vers {n}.', { z: `0${sd > 0 ? '⁺' : '⁻'}`, n: fr(N(d.Nr)) }))] : level === 2 ? [sign] : [],
       lines: [E(res, `${fr(N(d.Nr))}/0${sd > 0 ? '⁺' : '⁻'}`, 'sign', 'limit')],
     };
   };
   return [
-    { html: `Le numérateur en x = ${R} :`, ask: `N(${R}) =`, start: at(polyText(d.N), d.r), judge: { kind: 'value', form: 'irreducible' }, lines: [E(N(d.Nr), 'Pas nul : le pôle donne ±∞', 'sign', 'num')] },
+    { html: t('Le numérateur en x = {r} :', { r: R }), ask: `N(${R}) =`, start: at(polyText(d.N), d.r), judge: { kind: 'value', form: 'irreducible' }, lines: [E(N(d.Nr), t('Pas nul : le pôle donne ±∞'), 'sign', 'num')] },
     side('-'), side('+'),
   ];
 }
@@ -680,8 +684,8 @@ function liItem(level, rng, opts = {}) {
     const parts = poleParts(d, level);
     return partsItem({
       skill: LI, level, parts, choices: LI_CHOICES,
-      prompt: `Soit f(x) = ${MT(d.f)}. Calcule les limites de f à gauche et à droite de ${fr(String(d.r))}.`,
-      hints: H('Le numérateur ne s\'annule pas au pôle : la limite est ±∞, avec le signe du numérateur fois le signe du dénominateur.', `N(${fr(String(d.r))}) = ${fr(N(d.Nr))}, et le dénominateur tend vers 0${d.sl > 0 ? '⁺' : '⁻'} à gauche`, `À gauche : ${fr(d.left)} ; à droite : ${fr(d.right)}.`),
+      prompt: t('Soit f(x) = {f}. Calcule les limites de f à gauche et à droite de {r}.', { f: MT(d.f), r: fr(String(d.r)) }),
+      hints: H(t('Le numérateur ne s\'annule pas au pôle : la limite est ±∞, avec le signe du numérateur fois le signe du dénominateur.'), t('N({r}) = {n}, et le dénominateur tend vers {z} à gauche', { r: fr(String(d.r)), n: fr(N(d.Nr)), z: `0${d.sl > 0 ? '⁺' : '⁻'}` }), t('À gauche : {l} ; à droite : {r}.', { l: fr(d.left), r: fr(d.right) })),
       subgoals: LI_SUB, keys: LKEYS, key: `${LI}:pole:${level}:${d.f}`, exam: examOf(opts), fallback: d.fallback, expectedSec: 120,
     });
   }
@@ -695,20 +699,20 @@ function liItem(level, rng, opts = {}) {
   if (level === 1) lines = lines.map((l, k) => blanked(l, d.holes[k]));
   const methodId = gab === 'conj' ? 'conj' : 'dominant';
   const decision = {
-    kind: 'decision', prompt: 'Quelle méthode ?',
+    kind: 'decision', prompt: t('Quelle méthode ?'),
     options: [
-      { id: 'dominant', label: 'Mettre en évidence le terme dominant', valid: methodId === 'dominant', why: gab === 'conj' ? 'Mettre x en évidence donne x·(√(1 + …) − 1) : encore ∞·0. Avec une différence de racine, prends la conjuguée.' : 'Oui.' },
-      { id: 'conj', label: 'Expression conjuguée', valid: methodId === 'conj', why: 'Il n\'y a pas de différence ∞ − ∞ avec une racine ici.' },
-      { id: 'zero', label: '∞ − ∞ = 0, c\'est fini', valid: false, rule: gab === 'conj' ? 'g6_infinity_minus_infinity' : undefined, why: '∞ − ∞ est une forme indéterminée.' },
+      { id: 'dominant', label: t('Mettre en évidence le terme dominant'), valid: methodId === 'dominant', why: gab === 'conj' ? t('Mettre x en évidence donne x·(√(1 + …) − 1) : encore ∞·0. Avec une différence de racine, prends la conjuguée.') : t('Oui.') },
+      { id: 'conj', label: t('Expression conjuguée'), valid: methodId === 'conj', why: t('Il n\'y a pas de différence ∞ − ∞ avec une racine ici.') },
+      { id: 'zero', label: t('∞ − ∞ = 0, c\'est fini'), valid: false, rule: gab === 'conj' ? 'g6_infinity_minus_infinity' : undefined, why: t('∞ − ∞ est une forme indéterminée.') },
     ].filter((o) => gab === 'conj' || o.id !== 'zero'),
   };
   if (level === 2) lines = [decision, ...lines.map((l, k) => (k === 2 ? l : blanked(l, d.holes[k])))];
-  const methodHint = { rat: 'En ±∞ : mets en évidence la plus grande puissance de x en haut et en bas.', conj: '∞ − ∞ avec une racine : multiplie et divise par l\'expression conjuguée.', sqrt: 'Mets x² en évidence sous la racine : √(x²) = |x|, et |x| = −x quand x → −∞.' }[gab];
+  const methodHint = { rat: t('En ±∞ : mets en évidence la plus grande puissance de x en haut et en bas.'), conj: t('∞ − ∞ avec une racine : multiplie et divise par l\'expression conjuguée.'), sqrt: t('Mets x² en évidence sous la racine : √(x²) = |x|, et |x| = −x quand x → −∞.') }[gab];
   const eqs = d.lines;
   return linesItem({
-    skill: LI, level, prompt: rng.pick([`Calcule ${MT(`lim(${d.f},x,${d.to})`)}.`, `Calcule la limite de f(x) = ${MT(d.f)} quand x → ${fr(d.to)}.`]),
+    skill: LI, level, prompt: rng.pick([t('Calcule {e}.', { e: MT(`lim(${d.f},x,${d.to})`) }), t('Calcule la limite de f(x) = {f} quand x → {to}.', { f: MT(d.f), to: fr(d.to) })]),
     start: d.f, judge: level === 3 ? { ...LIM(d.to), menus: stepMenus(d.f, eqs, LI_CHOICES) } : LIM(d.to), mode: modeOf(level), script: lines,
-    hints: H(methodHint, `= ${tmpl(blanked(eqs[0], d.holes[0]))}`, `= ${MT(eqs[0].math)}, et la limite vaut ${fr(N(d.value))}.`),
+    hints: H(methodHint, `= ${tmpl(blanked(eqs[0], d.holes[0]))}`, t('= {e}, et la limite vaut {v}.', { e: MT(eqs[0].math), v: fr(N(d.value)) })),
     subgoals: LI_SUB, keys: LKEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${LI}:${gab}:${level}:${d.f}:${d.to}`, exam: examOf(opts), fallback: d.fallback, expectedSec: 120,
   });
@@ -736,15 +740,15 @@ function liLevel5(rng) {
   const left = INF_T(d.double ? d.sN : -d.sN);
   const right = INF_T(d.sN);
   const parts = [
-    { html: 'En +∞ :', start: f, judge: LIM('+∞'), lines: [rl.lines[0], rl.lines[1], rl.lines[2]].map((l) => ({ ...l, math: l.math })) },
-    { html: 'En −∞ :', start: f, judge: LIM('-∞'), lines: [E(N(d.value), 'Même calcul : les termes en 1/x tendent vers 0', 'limit', 'limit')] },
-    { html: `Quand x → ${fr(R)}⁻ :`, start: f, judge: LIM(R, '-'), lines: [E(left, `${fr(N(d.Nr))}/0${d.double ? '⁺' : '⁻'}`, 'sign', 'limit')] },
-    { html: `Quand x → ${fr(R)}⁺ :`, start: f, judge: LIM(R, '+'), lines: [E(right, `${fr(N(d.Nr))}/0⁺`, 'sign', 'limit')] },
+    { html: t('En +∞ :'), start: f, judge: LIM('+∞'), lines: [rl.lines[0], rl.lines[1], rl.lines[2]].map((l) => ({ ...l, math: l.math })) },
+    { html: t('En −∞ :'), start: f, judge: LIM('-∞'), lines: [E(N(d.value), t('Même calcul : les termes en 1/x tendent vers 0'), 'limit', 'limit')] },
+    { html: t('Quand x → {x} :', { x: `${fr(R)}⁻` }), start: f, judge: LIM(R, '-'), lines: [E(left, `${fr(N(d.Nr))}/0${d.double ? '⁺' : '⁻'}`, 'sign', 'limit')] },
+    { html: t('Quand x → {x} :', { x: `${fr(R)}⁺` }), start: f, judge: LIM(R, '+'), lines: [E(right, `${fr(N(d.Nr))}/0⁺`, 'sign', 'limit')] },
   ];
   // The first line must be written from the item's own function.
-  parts[0].lines[0] = E(`${xPow(d.n)}(${overPowers(d.N)})/(${xPow(d.m)}(${overPowers(d.D)}))`, 'Mettre en évidence le terme dominant', 'dominant', 'dominant');
+  parts[0].lines[0] = E(`${xPow(d.n)}(${overPowers(d.N)})/(${xPow(d.m)}(${overPowers(d.D)}))`, t('Mettre en évidence le terme dominant'), 'dominant', 'dominant');
   return partsItem({
-    skill: LI, level: 5, parts, prompt: `Soit f(x) = ${MT(f)}. Calcule ses limites en +∞, en −∞, et à gauche et à droite de ${fr(R)}.`,
+    skill: LI, level: 5, parts, prompt: t('Soit f(x) = {f}. Calcule ses limites en +∞, en −∞, et à gauche et à droite de {r}.', { f: MT(f), r: fr(R) }),
     hints: [], subgoals: LI_SUB, keys: LKEYS, key: `${LI}:5:${f}`, exam: false, fallback: d.fallback, expectedSec: 200,
   });
 }
@@ -765,49 +769,56 @@ function liMcq(rng) {
   }
   const uniq = options.filter((o, i) => options.findIndex((x) => x.html === o.html) === i).slice(0, 4);
   return mcq({
-    skill: LI, level: 4, prompt: `Que vaut ${MT(`lim(${d.f},x,${d.to})`)} ?`, options: uniq, key: `${LI}:mcq:${d.f}:${d.to}`,
-    solution: [{ html: MT(d.f), note: 'Départ' }, ...d.lines.map((l) => ({ html: `= ${MT(l.math)}`, note: l.note }))], exam: { format: 'mcq', points: 1 },
+    skill: LI, level: 4, prompt: t('Que vaut {e} ?', { e: MT(`lim(${d.f},x,${d.to})`) }), options: uniq, key: `${LI}:mcq:${d.f}:${d.to}`,
+    solution: [{ html: MT(d.f), note: t('Départ') }, ...d.lines.map((l) => ({ html: `= ${MT(l.math)}`, note: l.note }))], exam: { format: 'mcq', points: 1 },
   }, rng);
 }
 
 // True or false: a Vrai/Faux choice (no checker fits a limit counter-example).
 function liTf(rng) {
   const kind = rng.pick(['conj', 'sqrt', 'pole', 'rat']);
-  let s;
+  // The statement: a French template and its values (the key stays French).
+  let sk;
+  let sv;
   let truth;
   let rule = null;
   let why;
   if (kind === 'conj') {
     const d = liConj(rng, '+∞');
-    s = `lim (${MT(d.f)}) en +∞ vaut 0, car ${MT(`√(${polyText([1, d.b, d.c])})`)} ≈ x.`;
+    sk = 'lim ({f}) en +∞ vaut 0, car {r} ≈ x.';
+    sv = { f: MT(d.f), r: MT(`√(${polyText([1, d.b, d.c])})`) };
     truth = false; rule = 'g6_infinity_minus_infinity';
-    why = `Faux : ∞ − ∞ est indéterminé. Avec la conjuguée, la limite vaut ${fr(N(d.value))}.`;
+    why = t('Faux : ∞ − ∞ est indéterminé. Avec la conjuguée, la limite vaut {v}.', { v: fr(N(d.value)) });
   } else if (kind === 'sqrt') {
     const d = liSqrtRatio(rng, '-∞');
     const claim = rng.chance(0.5) ? d.value.neg() : d.value;
     truth = claim.eq(d.value);
     rule = truth ? null : 'g6_sqrt_x2_abs';
-    s = `lim ${MT(d.f)} en −∞ vaut ${fr(N(claim))}.`;
-    why = `${truth ? 'Vrai' : 'Faux'} : en −∞, √(x²) = |x| = −x, donc la limite vaut ${fr(N(d.value))}.`;
+    sk = 'lim {f} en −∞ vaut {c}.';
+    sv = { f: MT(d.f), c: fr(N(claim)) };
+    why = truth ? t('Vrai : en −∞, √(x²) = |x| = −x, donc la limite vaut {v}.', { v: fr(N(d.value)) }) : t('Faux : en −∞, √(x²) = |x| = −x, donc la limite vaut {v}.', { v: fr(N(d.value)) });
   } else if (kind === 'pole') {
     const d = liPoleData(rng);
     const dir = rng.pick(['-', '+']);
     const res = dir === '-' ? d.left : d.right;
     const claim = rng.chance(0.5) ? res : res === '+∞' ? '-∞' : '+∞';
     truth = claim === res;
-    s = `Quand x → ${fr(String(d.r))}${dir === '-' ? '⁻' : '⁺'}, ${MT(d.f)} tend vers ${fr(claim)}.`;
-    why = `${truth ? 'Vrai' : 'Faux'} : le numérateur tend vers ${fr(N(d.Nr))} et le dénominateur vers 0${(dir === '-' ? d.sl : d.sr) > 0 ? '⁺' : '⁻'}, donc la limite est ${fr(res)}.`;
+    sk = 'Quand x → {x}, {f} tend vers {c}.';
+    sv = { x: `${fr(String(d.r))}${dir === '-' ? '⁻' : '⁺'}`, f: MT(d.f), c: fr(claim) };
+    const wv = { n: fr(N(d.Nr)), z: `0${(dir === '-' ? d.sl : d.sr) > 0 ? '⁺' : '⁻'}`, v: fr(res) };
+    why = truth ? t('Vrai : le numérateur tend vers {n} et le dénominateur vers {z}, donc la limite est {v}.', wv) : t('Faux : le numérateur tend vers {n} et le dénominateur vers {z}, donc la limite est {v}.', wv);
   } else {
     const r = liRational(rng);
     const claim = rng.chance(0.5) ? r.value : r.value.add(1);
     truth = claim.eq(r.value);
-    s = `lim ${MT(`(${polyText(r.N)})/(${polyText(r.D)})`)} en ${fr(r.to)} vaut ${fr(N(claim))}.`;
-    why = `${truth ? 'Vrai' : 'Faux'} : on met en évidence le terme dominant, la limite vaut ${fr(N(r.value))}.`;
+    sk = 'lim {f} en {to} vaut {c}.';
+    sv = { f: MT(`(${polyText(r.N)})/(${polyText(r.D)})`), to: fr(r.to), c: fr(N(claim)) };
+    why = truth ? t('Vrai : on met en évidence le terme dominant, la limite vaut {v}.', { v: fr(N(r.value)) }) : t('Faux : on met en évidence le terme dominant, la limite vaut {v}.', { v: fr(N(r.value)) });
   }
   return mcq({
-    skill: LI, level: 4, prompt: `Vrai ou faux ?<br>« ${s} »`,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth }],
-    keepOrder: true, key: `${LI}:tf:${s}`, solution: [{ html: why, note: '' }], exam: { format: 'tf', points: 1 }, expectedSec: 40,
+    skill: LI, level: 4, prompt: t('Vrai ou faux ?<br>« {s} »', { s: t(sk, sv) }),
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : rule }, { html: t('Faux'), correct: !truth }],
+    keepOrder: true, key: `${LI}:tf:${frFill(sk, sv)}`, solution: [{ html: why, note: '' }], exam: { format: 'tf', points: 1 }, expectedSec: 40,
   }, rng);
 }
 

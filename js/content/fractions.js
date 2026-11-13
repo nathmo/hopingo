@@ -8,10 +8,11 @@ import {
   mathHtml, Fh, BLANK, valStr, solutionOf, stepsItem, answerItem, mcqItem, computeMcq,
   coprimeNum, coprimeFraction,
 } from './items.js';
+import { t, tn } from '../i18n.js';
 
 // ---------- helpers ----------
 
-const SHAPE_WORD = { circle: 'du disque', bar: 'de la bande', grid: 'du rectangle' };
+const SHADE_PROMPT = { circle: 'Colorie {f} du disque.', bar: 'Colorie {f} de la bande.', grid: 'Colorie {f} du rectangle.' };
 const GRIDS = { 4: [2, 2], 6: [2, 3], 8: [2, 4], 9: [3, 3], 10: [2, 5], 12: [3, 4] };
 
 function properFraction(rng, dens, { maxNum } = {}) {
@@ -34,11 +35,11 @@ GEN['frac-read'] = (level, rng) => {
       const k = rng.int(1, n - 1);
       return {
         skill: 'frac-read', level, type: 'shade',
-        prompt: `Colorie ${Fh(k, n)} ${SHAPE_WORD[shape]}.`,
+        prompt: t(SHADE_PROMPT[shape], { f: Fh(k, n) }),
         figure: { kind: 'shape', shape, n, k: 0 },
         target: { count: k },
         baits: ['read_swap'],
-        solution: [{ math: `${k}/${n}`, note: `On colorie ${k} parts sur ${n}.` }],
+        solution: [{ math: `${k}/${n}`, note: t('On colorie {k} parts sur {n}.', { k, n }) }],
         expectedSec: 12, key: `frac-read:shade:${shape}:${k}/${n}`,
       };
     }
@@ -49,11 +50,11 @@ GEN['frac-read'] = (level, rng) => {
     const [rows, cols] = GRIDS[n];
     return {
       skill: 'frac-read', level, type: 'shade',
-      prompt: `Colorie ${Fh(a, b)} du rectangle.`,
+      prompt: t('Colorie {f} du rectangle.', { f: Fh(a, b) }),
       figure: { kind: 'shape', shape: 'grid', n, rows, cols, k: 0 },
       target: { count: (n * a) / b },
       baits: [],
-      solution: [{ math: `${a}/${b}`, note: `${a}/${b} = ${(n * a) / b}/${n} : on colorie ${(n * a) / b} cases sur ${n}.` }],
+      solution: [{ math: `${a}/${b}`, note: t('{a}/{b} = {k}/{n} : on colorie {k} cases sur {n}.', { a, b, k: (n * a) / b, n }) }],
       expectedSec: 15, key: `frac-read:grid:${a}/${b}:${n}`,
     };
   }
@@ -61,10 +62,10 @@ GEN['frac-read'] = (level, rng) => {
     const n = rng.int(2, 6);
     const wholes = 2;
     const k = rng.int(n + 1, wholes * n - 1);
-    return answerItem('frac-read', level, 'Chaque disque est une unité. Quelle fraction est coloriée ?', `${k}/${n}`, {
+    return answerItem('frac-read', level, t('Chaque disque est une unité. Quelle fraction est coloriée ?'), `${k}/${n}`, {
       figure: { kind: 'shape', shape: 'circle', n, k, wholes },
       traps: [{ value: [k, wholes * n], rule: 'read_total_parts' }, { value: [n, k], rule: 'read_swap' }],
-      solution: [{ math: `${k}/${n}`, note: `Chaque unité est coupée en ${n}. On compte ${k} parts de 1/${n}.` }],
+      solution: [{ math: `${k}/${n}`, note: t('Chaque unité est coupée en {n}. On compte {k} parts de 1/{n}.', { n, k }) }],
       key: `big:${k}/${n}`,
     });
   }
@@ -76,7 +77,7 @@ GEN['frac-read'] = (level, rng) => {
   const figure = shape === 'grid'
     ? { kind: 'shape', shape, n, rows: GRIDS[n][0], cols: GRIDS[n][1], k }
     : { kind: 'shape', shape, n, k };
-  const solution = [{ math: `${k}/${n}`, note: `${n} parts égales, ${k} coloriées.` }];
+  const solution = [{ math: `${k}/${n}`, note: t('{n} parts égales, {k} coloriées.', { n, k }) }];
   if (level === 2) {
     const opts = [{ html: Fh(k, n), correct: true }];
     const seen = new Set([valStr(k, n)]);
@@ -91,9 +92,9 @@ GEN['frac-read'] = (level, rng) => {
     if (n - k > 1) add(k, n - k, 'read_part_over_rest');
     add(n - k, n, null);
     add(k + 1, n, null);
-    return mcqItem('frac-read', level, 'Quelle fraction est coloriée ?', opts.slice(0, 4), rng, { figure, solution, key: `${shape}:${k}/${n}` });
+    return mcqItem('frac-read', level, t('Quelle fraction est coloriée ?'), opts.slice(0, 4), rng, { figure, solution, key: `${shape}:${k}/${n}` });
   }
-  return answerItem('frac-read', level, 'Quelle fraction est coloriée ?', `${k}/${n}`, {
+  return answerItem('frac-read', level, t('Quelle fraction est coloriée ?'), `${k}/${n}`, {
     figure,
     traps: [{ value: [n, k], rule: 'read_swap' }, { value: [k, n - k], rule: 'read_part_over_rest' }],
     solution, key: `${shape}:${k}/${n}`,
@@ -103,10 +104,10 @@ GEN['frac-read'] = (level, rng) => {
 GEN['frac-line'] = (level, rng) => {
   const place = (max, den, n, d) => ({
     skill: 'frac-line', level, type: 'numberline',
-    prompt: `Place ${Fh(n, d)} sur la droite.`,
+    prompt: t('Place {x} sur la droite.', { x: Fh(n, d) }),
     line: { max, den }, target: valStr(n, d),
     baits: [],
-    solution: [{ math: `${n}/${d}`, note: d === den ? `${n} graduations de 1/${den} depuis 0.` : `${n}/${d} = ${(n * den) / d}/${den} : ${(n * den) / d} graduations.` }],
+    solution: [{ math: `${n}/${d}`, note: d === den ? t('{n} graduations de 1/{den} depuis 0.', { n, den }) : t('{n}/{d} = {k}/{den} : {k} graduations.', { n, d, k: (n * den) / d, den }) }],
     expectedSec: 12, key: `frac-line:place:${n}/${d}:${max}:${den}`,
   });
   if (level === 1) { const [n, d] = properFraction(rng, [2, 4]); return place(1, d, n, d); }
@@ -130,10 +131,10 @@ GEN['frac-line'] = (level, rng) => {
   const den = rng.pick([3, 4, 5, 6, 8]);
   let n = rng.int(1, max * den - 1);
   if (n % den === 0) n++;
-  return answerItem('frac-line', level, 'Quelle fraction est repérée par le point ?', `${n}/${den}`, {
+  return answerItem('frac-line', level, t('Quelle fraction est repérée par le point ?'), `${n}/${den}`, {
     figure: { kind: 'line', max, den, mark: [n, den] },
     traps: [{ value: [n, den + 1], rule: null }],
-    solution: [{ math: `${n}/${den}`, note: `L'unité est coupée en ${den} : le point est à ${n} graduations de 0.` }],
+    solution: [{ math: `${n}/${den}`, note: t('L\'unité est coupée en {den} : le point est à {n} graduations de 0.', { den, n }) }],
     key: `read:${n}/${den}:${max}`,
   });
 };
@@ -149,7 +150,7 @@ GEN['frac-decimal'] = (level, rng) => {
     const pool = rng.shuffle(level === 1 ? basic : DECIMALS).slice(0, level === 1 ? 4 : 5);
     return {
       skill: 'frac-decimal', level, type: 'match',
-      prompt: 'Relie chaque fraction à son écriture décimale.',
+      prompt: t('Relie chaque fraction à son écriture décimale.'),
       pairs: pool.map(([n, d, s]) => [Fh(n, d), `<span class="m">${s}</span>`]),
       baits: [],
       solution: pool.map(([n, d, s]) => ({ math: `${n}/${d}`, note: `= ${s}` })),
@@ -166,13 +167,13 @@ GEN['frac-decimal'] = (level, rng) => {
     return mcqItem('frac-decimal', level, `${Fh(n, d)} = ?`, opts, rng, { solution, key: `${n}/${d}`, big: true });
   }
   if (level === 3) {
-    return answerItem('frac-decimal', level, `Écris ${Fh(n, d)} sous forme décimale.`, s, {
+    return answerItem('frac-decimal', level, t('Écris {x} sous forme décimale.', { x: Fh(n, d) }), s, {
       form: 'decimal', keys: 'dec',
       traps: [{ value: [Q.fromDecimal(digits).n, Q.fromDecimal(digits).d], rule: 'decimal_digits' }],
       solution, key: `${n}/${d}`,
     });
   }
-  return answerItem('frac-decimal', level, `Écris <span class="m">${s}</span> sous forme de fraction.`, `${n}/${d}`, {
+  return answerItem('frac-decimal', level, t('Écris {x} sous forme de fraction.', { x: `<span class="m">${s}</span>` }), `${n}/${d}`, {
     form: 'fraction', keys: 'frac', solution, key: `rev:${s}`,
   });
 };
@@ -195,10 +196,10 @@ GEN['frac-of'] = (level, rng) => {
   }
   const res = new Q(k * N, d);
   const traps = [{ value: [N, d], rule: k > 1 ? 'of_divide_only' : null }, { value: [N * k, 1], rule: 'of_multiply_only' }];
-  const solution = [{ math: `${N}÷${d}`, note: `= ${new Q(N, d).toString().replace('/', ' / ')} : une part.` }, { math: `${k}×${N}/${d}`, note: `= ${res.toDecimal() ?? res.toString()} : ${k} part${k > 1 ? 's' : ''}.` }];
+  const solution = [{ math: `${N}÷${d}`, note: t('= {v} : une part.', { v: new Q(N, d).toString().replace('/', ' / ') }) }, { math: `${k}×${N}/${d}`, note: tn(k, '= {v} : {n} part.', '= {v} : {n} parts.', { v: res.toDecimal() ?? res.toString() }) }];
   const prompt = level === 5
-    ? `Combien font ${Fh(k, d)} de ${N} litres ?`
-    : `Combien font ${Fh(k, d)} de ${N} ${thing} ?`;
+    ? t('Combien font {f} de {N} litres ?', { f: Fh(k, d), N })
+    : t('Combien font {f} de {N} {thing} ?', { f: Fh(k, d), N, thing: t(thing) });
   return answerItem('frac-of', level, prompt, res.toString(), {
     keys: level === 5 ? 'fracdec' : 'int', traps, solution, key: `${k}/${d}:${N}`,
   });
@@ -210,8 +211,8 @@ GEN['frac-equiv'] = (level, rng) => {
     const k = rng.int(1, 4);
     const ms = rng.shuffle([2, 3, 4, 5, 10]).slice(0, 3);
     const opts = [{ html: Fh(a + k, b + k), correct: true }, ...ms.map((m) => ({ html: Fh(a * m, b * m), correct: false }))];
-    return mcqItem('frac-equiv', level, `Quelle fraction n'est <b>pas</b> égale à ${Fh(a, b)} ?`, opts, rng, {
-      solution: [{ math: `${a + k}/${b + k}`, note: `On a ajouté ${k} en haut et en bas : ça change la fraction.` }],
+    return mcqItem('frac-equiv', level, t('Quelle fraction n\'est <b>pas</b> égale à {f} ?', { f: Fh(a, b) }), opts, rng, {
+      solution: [{ math: `${a + k}/${b + k}`, note: t('On a ajouté {k} en haut et en bas : ça change la fraction.', { k }) }],
       key: `${a}/${b}:${k}`,
     });
   }
@@ -221,9 +222,9 @@ GEN['frac-equiv'] = (level, rng) => {
   if (level === 1) { [a, b] = coprimeFraction(rng, [2, 3, 4, 5]); m = rng.int(2, 3); }
   else if (level === 2 || level === 3) { [a, b] = coprimeFraction(rng, [2, 3, 4, 5, 6, 7, 8]); m = rng.int(2, 5); }
   if (level === 3) {
-    return answerItem('frac-equiv', level, `Complète : ${Fh(a, b)} = ${Fh(a * m, BLANK)}`, b * m, {
+    return answerItem('frac-equiv', level, t('Complète : {l} = {r}', { l: Fh(a, b), r: Fh(a * m, BLANK) }), b * m, {
       keys: 'int', traps: [{ value: [b + a * m - a, 1], rule: 'equiv_additive' }],
-      solution: [{ math: `${a}/${b}`, note: `= ${a * m}/${b * m} : on a multiplié par ${m} en haut, donc aussi en bas.` }],
+      solution: [{ math: `${a}/${b}`, note: t('= {n}/{d} : on a multiplié par {m} en haut, donc aussi en bas.', { n: a * m, d: b * m, m }) }],
       key: `num:${a}/${b}:${m}`,
     });
   }
@@ -234,16 +235,16 @@ GEN['frac-equiv'] = (level, rng) => {
     if (m2 === g) m2++;
     a = p * g; b = qq * g;
     const target = qq * m2;
-    return answerItem('frac-equiv', level, `Complète : ${Fh(a, b)} = ${Fh(BLANK, target)}`, p * m2, {
+    return answerItem('frac-equiv', level, t('Complète : {l} = {r}', { l: Fh(a, b), r: Fh(BLANK, target) }), p * m2, {
       keys: 'int', traps: [{ value: [a + target - b, 1], rule: 'equiv_additive' }],
       solution: [{ math: `${a}/${b}`, note: `= ${p}/${qq} (÷ ${g}) = ${p * m2}/${target} (× ${m2})` }],
       key: `2step:${a}/${b}:${target}`,
     });
   }
-  return answerItem('frac-equiv', level, `Complète : ${Fh(a, b)} = ${Fh(BLANK, b * m)}`, a * m, {
+  return answerItem('frac-equiv', level, t('Complète : {l} = {r}', { l: Fh(a, b), r: Fh(BLANK, b * m) }), a * m, {
     keys: 'int',
     traps: [{ value: [a + b * m - b, 1], rule: 'equiv_additive' }, { value: [a, 1], rule: 'equiv_denominator_only' }],
-    solution: [{ math: `${a}/${b}`, note: `= ${a * m}/${b * m} : ${b} × ${m} = ${b * m}, donc ${a} × ${m} = ${a * m}.` }],
+    solution: [{ math: `${a}/${b}`, note: t('= {n}/{d} : {b} × {m} = {d}, donc {a} × {m} = {n}.', { n: a * m, d: b * m, a, b, m }) }],
     key: `${a}/${b}:${m}`,
   });
 };
@@ -287,36 +288,36 @@ GEN['frac-unit'] = (level, rng) => {
   if (level <= 2) {
     const k = level === 1 ? 1 : rng.int(2, 4);
     const n = k * d + r;
-    return answerItem('frac-unit', level, `Complète : ${Fh(n, d)} = ${k} + ${Fh(BLANK, d)}`, r, {
+    return answerItem('frac-unit', level, t('Complète : {l} = {r}', { l: Fh(n, d), r: `${k} + ${Fh(BLANK, d)}` }), r, {
       keys: 'int', traps: [{ value: [n - k, 1], rule: 'mixed_subtract_whole' }],
-      solution: [{ math: `${k}`, note: `= ${k * d}/${d}, et ${n} − ${k * d} = ${r}` }],
+      solution: [{ math: `${k}`, note: t('= {kd}/{d}, et {n} − {kd} = {r}', { kd: k * d, d, n, r }) }],
       key: `${n}/${d}`,
     });
   }
   while (gcd(r, d) !== 1) r--;
   const k = rng.int(1, 4);
   if (level === 3) {
-    return answerItem('frac-unit', level, `Complète : ${k} + ${Fh(r, d)} = ${Fh(BLANK, d)}`, k * d + r, {
+    return answerItem('frac-unit', level, t('Complète : {l} = {r}', { l: `${k} + ${Fh(r, d)}`, r: Fh(BLANK, d) }), k * d + r, {
       keys: 'int', traps: [{ value: [k + r, 1], rule: 'int_plus_frac' }],
-      solution: [{ math: `${k}`, note: `= ${k * d}/${d}, puis ${k * d} + ${r} = ${k * d + r}` }],
+      solution: [{ math: `${k}`, note: t('= {kd}/{d}, puis {kd} + {r} = {s}', { kd: k * d, d, r, s: k * d + r }) }],
       key: `${k}+${r}/${d}`,
     });
   }
   if (level === 4) {
-    return answerItem('frac-unit', level, `Écris ${mathHtml(`${k}+${r}/${d}`)} sous forme d'une seule fraction.`, `${k * d + r}/${d}`, {
+    return answerItem('frac-unit', level, t('Écris {x} sous forme d\'une seule fraction.', { x: mathHtml(`${k}+${r}/${d}`) }), `${k * d + r}/${d}`, {
       tree: `${k}+${r}/${d}`, form: 'fraction', solution: solutionOf(`${k}+${r}/${d}`), key: `one:${k}+${r}/${d}`,
     });
   }
   const n = rng.int(2, 8) * d + r;
   const lo = Math.floor(n / d);
   const opts = [
-    { html: `${lo} et ${lo + 1}`, correct: true },
-    { html: `${lo - 1} et ${lo}`, correct: false },
-    { html: `${lo + 1} et ${lo + 2}`, correct: false },
-    { html: `${n} et ${n + 1}`, correct: false, rule: null },
+    { html: t('{a} et {b}', { a: lo, b: lo + 1 }), correct: true },
+    { html: t('{a} et {b}', { a: lo - 1, b: lo }), correct: false },
+    { html: t('{a} et {b}', { a: lo + 1, b: lo + 2 }), correct: false },
+    { html: t('{a} et {b}', { a: n, b: n + 1 }), correct: false, rule: null },
   ];
-  return mcqItem('frac-unit', level, `Entre quels entiers se trouve ${Fh(n, d)} ?`, opts, rng, {
-    solution: [{ math: `${n}/${d}`, note: `= ${lo} + ${r}/${d} : entre ${lo} et ${lo + 1}.` }],
+  return mcqItem('frac-unit', level, t('Entre quels entiers se trouve {f} ?', { f: Fh(n, d) }), opts, rng, {
+    solution: [{ math: `${n}/${d}`, note: t('= {lo} + {r}/{d} : entre {lo} et {hi}.', { lo, r, d, hi: lo + 1 }) }],
     key: `between:${n}/${d}`, keepOrder: false,
   });
 };
@@ -325,9 +326,9 @@ GEN['frac-quotient'] = (level, rng) => {
   if (level === 1) {
     const b = rng.int(3, 8);
     const a = rng.int(1, b - 1);
-    return answerItem('frac-quotient', level, `On partage équitablement ${a} pizza${a > 1 ? 's' : ''} entre ${b} enfants. Quelle part de pizza reçoit chaque enfant ?`, `${a}/${b}`, {
+    return answerItem('frac-quotient', level, tn(a, 'On partage équitablement {n} pizza entre {b} enfants. Quelle part de pizza reçoit chaque enfant ?', 'On partage équitablement {n} pizzas entre {b} enfants. Quelle part de pizza reçoit chaque enfant ?', { b }), `${a}/${b}`, {
       traps: [{ value: [b, a], rule: 'quotient_larger_by_smaller' }],
-      solution: [{ math: `${a}÷${b}`, note: `= ${a}/${b} de pizza chacun.` }],
+      solution: [{ math: `${a}÷${b}`, note: t('= {a}/{b} de pizza chacun.', { a, b }) }],
       key: `share:${a}/${b}`,
     });
   }
@@ -340,7 +341,7 @@ GEN['frac-quotient'] = (level, rng) => {
       { html: Fh(d, d * m), correct: false },
       { html: Fh(d * m - 1, d), correct: false },
     ];
-    return mcqItem('frac-quotient', level, 'Laquelle de ces fractions est égale à un nombre entier ?', opts, rng, {
+    return mcqItem('frac-quotient', level, t('Laquelle de ces fractions est égale à un nombre entier ?'), opts, rng, {
       solution: [{ math: `${d * m}/${d}`, note: `= ${d * m} ÷ ${d} = ${m}` }], key: `int:${d}:${m}`,
     });
   }
@@ -349,18 +350,18 @@ GEN['frac-quotient'] = (level, rng) => {
   do { a = rng.int(1, 9); b = rng.int(2, 9); } while (a === b || gcd(a, b) !== 1 || (level === 2 && a > b));
   if (level === 4) {
     const g = rng.int(2, 3);
-    return answerItem('frac-quotient', level, `Complète : ${b * g} × ${BLANK} = ${a * g}`, `${a}/${b}`, {
+    return answerItem('frac-quotient', level, t('Complète : {l} = {r}', { l: `${b * g} × ${BLANK}`, r: a * g }), `${a}/${b}`, {
       form: 'irreducible', traps: [{ value: [b, a], rule: 'quotient_larger_by_smaller' }],
       solution: [{ math: `${a * g}/${b * g}`, note: `= ${a}/${b}` }], key: `mf:${a * g}/${b * g}`,
     });
   }
   if (level === 2) {
-    return answerItem('frac-quotient', level, `Complète : ${b} × ${BLANK} = ${a}`, `${a}/${b}`, {
+    return answerItem('frac-quotient', level, t('Complète : {l} = {r}', { l: `${b} × ${BLANK}`, r: a }), `${a}/${b}`, {
       traps: [{ value: [b, a], rule: 'quotient_larger_by_smaller' }],
       solution: [{ math: `${b}×${a}/${b}`, note: `= ${a}` }], key: `mf:${a}/${b}`,
     });
   }
-  return answerItem('frac-quotient', level, `Écris ${a} ÷ ${b} sous forme de fraction.`, `${a}/${b}`, {
+  return answerItem('frac-quotient', level, t('Écris {x} sous forme de fraction.', { x: `${a} ÷ ${b}` }), `${a}/${b}`, {
     form: 'fraction', traps: [{ value: [b, a], rule: 'quotient_larger_by_smaller' }],
     solution: [{ math: `${a}/${b}`, note: `${a} ÷ ${b} = ${a}/${b}` }], key: `div:${a}/${b}`,
   });
@@ -374,13 +375,13 @@ GEN['frac-simplify'] = (level, rng) => {
   const a = p * g;
   const b = qq * g;
   const traps = [{ value: [a - g, b - g], rule: 'simplify_subtract' }, { value: [a / g, b], rule: 'simplify_one_part' }];
-  const solution = [{ math: `${a}/${b}`, note: `On divise en haut et en bas par ${g} : ${frac([p, qq])}.` }];
+  const solution = [{ math: `${a}/${b}`, note: t('On divise en haut et en bas par {g} : {f}.', { g, f: frac([p, qq]) }) }];
   if (level === 1) {
-    return answerItem('frac-simplify', level, `Simplifie ${Fh(a, b)} par ${g}.`, `${p}/${qq}`, {
+    return answerItem('frac-simplify', level, t('Simplifie {f} par {g}.', { f: Fh(a, b), g }), `${p}/${qq}`, {
       exact: [p, qq], traps, solution, key: `by:${a}/${b}`,
     });
   }
-  return answerItem('frac-simplify', level, `Rends ${Fh(a, b)} irréductible.`, frac([p, qq]), {
+  return answerItem('frac-simplify', level, t('Rends {f} irréductible.', { f: Fh(a, b) }), frac([p, qq]), {
     form: 'irreducible', traps, solution, key: `irr:${a}/${b}`,
   });
 };
@@ -400,9 +401,9 @@ function compareItem(level, a, b, c, d, rng) {
     rule: s === right ? null : (preds.find(([, p]) => p === s)?.[0] ?? null),
   }));
   const L = lcm(b, d);
-  return mcqItem('frac-compare', level, `Compare : ${Fh(a, b)} <span class="m-q">?</span> ${Fh(c, d)}`, options, rng, {
+  return mcqItem('frac-compare', level, t('Compare : {a} <span class="m-q">?</span> {b}', { a: Fh(a, b), b: Fh(c, d) }), options, rng, {
     keepOrder: true, big: true,
-    solution: [{ math: `${a}/${b}`, note: `= ${a * L / b}/${L} et ${c}/${d} = ${c * L / d}/${L}, donc ${a}/${b} ${right} ${c}/${d}.` }],
+    solution: [{ math: `${a}/${b}`, note: t('= {x}/{L} et {c}/{d} = {y}/{L}, donc {a}/{b} {s} {c}/{d}.', { x: a * L / b, y: c * L / d, L, a, b, c, d, s: right }) }],
     key: `${a}/${b}:${c}/${d}`,
   });
 }
@@ -463,8 +464,8 @@ GEN['frac-compare'] = (level, rng) => {
     if (!rules[bySmall] && bySmall !== best) rules[bySmall] = 'compare_smallest_denominator';
     const opts = fr.map(([n, d], i2) => ({ html: Fh(n, d), correct: i2 === best, rule: i2 === best ? null : rules[i2] || null }));
     const [bn, bd] = fr[best];
-    return mcqItem('frac-compare', level, 'Quelle est la plus grande fraction ?', opts, rng, {
-      solution: [{ math: `${bn}/${bd}`, note: `≈ ${(bn / bd).toFixed(2).replace('.', ',')}, la plus grande.` }],
+    return mcqItem('frac-compare', level, t('Quelle est la plus grande fraction ?'), opts, rng, {
+      solution: [{ math: `${bn}/${bd}`, note: t('≈ {v}, la plus grande.', { v: (bn / bd).toFixed(2).replace('.', ',') }) }],
       key: `max:${fr.map(frac).join()}`,
     });
   }
@@ -567,7 +568,7 @@ GEN['frac-mul'] = (level, rng) => {
   }
   const people = rng.pick(['Léa', 'Noé', 'Yanis', 'Elif', 'Malia', 'Luca']);
   const tree = `${a}/${b}×${c}/${d}`;
-  return answerItem('frac-mul', level, `${people} mange les ${Fh(a, b)} des ${Fh(c, d)} d'une tarte. Quelle fraction de la tarte a-t-il ou elle mangée ?`, new Q(a * c, b * d).toString(), {
+  return answerItem('frac-mul', level, t('{name} mange les {a} des {b} d\'une tarte. Quelle fraction de la tarte a-t-il ou elle mangée ?', { name: people, a: Fh(a, b), b: Fh(c, d) }), new Q(a * c, b * d).toString(), {
     tree, form: 'irreducible', solution: solutionOf(tree), key: `pb:${tree}`,
   });
 };
@@ -576,13 +577,13 @@ GEN['frac-div'] = (level, rng) => {
   if (level === 1) {
     if (rng.chance(0.3)) {
       const k = rng.int(2, 9);
-      return answerItem('frac-div', level, `Quel est l'inverse de ${k} ?`, `1/${k}`, {
+      return answerItem('frac-div', level, t('Quel est l\'inverse de {x} ?', { x: k }), `1/${k}`, {
         solution: [{ math: `${k}×1/${k}`, note: '= 1' }], key: `inv:${k}`,
       });
     }
     const [a, b] = coprimeFraction(rng, [2, 3, 4, 5, 6, 7, 8, 9]);
-    return answerItem('frac-div', level, `Quel est l'inverse de ${Fh(a, b)} ?`, `${b}/${a}`, {
-      solution: [{ math: `${a}/${b}×${b}/${a}`, note: '= 1 : on échange le numérateur et le dénominateur.' }], key: `inv:${a}/${b}`,
+    return answerItem('frac-div', level, t('Quel est l\'inverse de {x} ?', { x: Fh(a, b) }), `${b}/${a}`, {
+      solution: [{ math: `${a}/${b}×${b}/${a}`, note: t('= 1 : on échange le numérateur et le dénominateur.') }], key: `inv:${a}/${b}`,
     });
   }
   const [a, b] = coprimeFraction(rng, [2, 3, 4, 5, 6, 7]);

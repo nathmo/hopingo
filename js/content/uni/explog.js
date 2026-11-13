@@ -18,6 +18,7 @@ import { walk, lit, getAt } from '../../cas/ast.js';
 import { solutionSet } from '../../cas/sets.js';
 import { blankLine } from '../../judges/lines.js';
 import { MT, fr, linesItem, mcq, tfItem } from './kit.js';
+import { t } from '../../i18n.js';
 
 const V = 'x';
 const q = (n, d = 1) => new Q(n, d);
@@ -58,7 +59,7 @@ function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -107,16 +108,16 @@ const orEq = (xs, v = V) => xs.map((x) => `${v}=${x}`).join(' ou ');
 
 const RP = 'g2-real-powers';
 const RP_SUB = [
-  { id: 'prod', label: 'puissance d\'un produit', skill: 'pow-rules' },
+  { id: 'prod', label: t('puissance d\'un produit'), skill: 'pow-rules' },
   { id: 'root', label: 'a^(1/n) = ⁿ√a', skill: 'root-rules' },
-  { id: 'quot', label: 'quotient de puissances', skill: RP },
-  { id: 'reduce', label: 'réduire', skill: RP },
+  { id: 'quot', label: t('quotient de puissances'), skill: RP },
+  { id: 'reduce', label: t('réduire'), skill: RP },
 ];
 const RP_CHOICES = [
-  { id: 'prod', label: 'Puissance d\'un produit ou d\'une puissance : multiplier les exposants' },
-  { id: 'quot', label: 'Même base : additionner (produit) ou soustraire (quotient) les exposants' },
-  { id: 'reduce', label: 'Calculer les exposants' },
-  { id: 'add', label: '(aᵖ)ᵠ = a^(p + q)', rule: 'g2_power_power', why: '(aᵖ)ᵠ = aᵖᵠ : on multiplie les exposants.' },
+  { id: 'prod', label: t('Puissance d\'un produit ou d\'une puissance : multiplier les exposants') },
+  { id: 'quot', label: t('Même base : additionner (produit) ou soustraire (quotient) les exposants') },
+  { id: 'reduce', label: t('Calculer les exposants') },
+  { id: 'add', label: '(aᵖ)ᵠ = a^(p + q)', rule: 'g2_power_power', why: t('(aᵖ)ᵠ = aᵖᵠ : on multiplie les exposants.') },
 ];
 const ROOT_WORD = { 2: 'carrée', 3: 'cubique', 4: 'quatrième', 5: 'cinquième', 6: 'sixième' };
 const ROOTS = [[4, 2, 2], [8, 3, 2], [9, 2, 3], [16, 2, 4], [16, 4, 2], [25, 2, 5], [27, 3, 3], [32, 5, 2], [64, 2, 8], [64, 3, 4], [64, 6, 2], [81, 2, 9], [81, 4, 3]];
@@ -135,13 +136,13 @@ function rpNumber(level, rng, opts) {
   const start = `${B}^(${p}/${n})`;
   const value = p > 0 ? q(r ** k) : q(1, r ** k);
   const lines = p > 0
-    ? [E(`(${B}^(1/${n}))^${k}`, `a^(p/q) = (a^(1/q))^p`, 'root'), E(`${r}^${k}`, `racine ${ROOT_WORD[n]} de ${B} : ${r}`, 'root'), E(N(value), 'Calculer', 'reduce')]
-    : [E(`1/${B}^(${k}/${n})`, 'a^(−p) = 1/aᵖ', 'prod'), E(`1/(${B}^(1/${n}))^${k}`, 'a^(p/q) = (a^(1/q))^p', 'root'), E(`1/${r}^${k}`, `racine ${ROOT_WORD[n]} de ${B} : ${r}`, 'root'), E(N(value), 'Calculer', 'reduce')];
+    ? [E(`(${B}^(1/${n}))^${k}`, `a^(p/q) = (a^(1/q))^p`, 'root'), E(`${r}^${k}`, t(`racine ${ROOT_WORD[n]} de {B} : {r}`, { B, r }), 'root'), E(N(value), t('Calculer'), 'reduce')]
+    : [E(`1/${B}^(${k}/${n})`, 'a^(−p) = 1/aᵖ', 'prod'), E(`1/(${B}^(1/${n}))^${k}`, 'a^(p/q) = (a^(1/q))^p', 'root'), E(`1/${r}^${k}`, t(`racine ${ROOT_WORD[n]} de {B} : {r}`, { B, r }), 'root'), E(N(value), t('Calculer'), 'reduce')];
   const script = level === 1 ? lines.map((l) => (l.math.includes('^(1/') ? blanked(l, [`1/${n}`]) : l.math === `${r}^${k}` || l.math === `1/${r}^${k}` ? blanked(l, [String(r)]) : l)) : lines;
   return linesItem({
-    skill: RP, level, prompt: `Calcule ${MT(start)} sans calculatrice.`,
+    skill: RP, level, prompt: t('Calcule {a} sans calculatrice.', { a: MT(start) }),
     start, judge: { kind: 'value', form: 'irreducible' }, mode: modeOf(level), script,
-    hints: H(`a^(p/q) = (ⁿ√a)ᵖ avec n = q : prends d'abord la racine ${ROOT_WORD[n]} de ${B}.`, `${MT(`${B}^(1/${n})`)} = ${r}`, MT(lines[lines.length - 2].math)),
+    hints: H(t(`a^(p/q) = (ⁿ√a)ᵖ avec n = q : prends d'abord la racine ${ROOT_WORD[n]} de {B}.`, { B }), `${MT(`${B}^(1/${n})`)} = ${r}`, MT(lines[lines.length - 2].math)),
     subgoals: RP_SUB, keys: ['calc'], key: `${RP}:${start}`, exam: examOf(opts),
   });
 }
@@ -186,18 +187,18 @@ function rpItem(level, rng, opts = {}) {
   const d = rpData(rng, level >= 3);
   const { start, l1, l2, ans } = rpLetters(d);
   const lines = [
-    E(l1, 'Puissance d\'un produit : multiplier les exposants', 'prod', 'prod'),
-    E(l2, 'Quotient : soustraire les exposants', 'quot', 'quot'),
-    E(ans, 'Réduire', 'reduce', 'reduce'),
+    E(l1, t('Puissance d\'un produit : multiplier les exposants'), 'prod', 'prod'),
+    E(l2, t('Quotient : soustraire les exposants'), 'quot', 'quot'),
+    E(ans, t('Réduire'), 'reduce', 'reduce'),
   ];
   const opt = { vars: ['a', 'b'] };
   const script = level === 2 ? [blanked(lines[0], [String(d.A)], opt), lines[1], lines[2]] : lines;
   const judge = { kind: 'equiv', vars: ['a', 'b'], domain: { a: [0.2, 4], b: [0.2, 4] }, target: 'powers' };
   return linesItem({
-    skill: RP, level, prompt: `Simplifie ${MT(start, opt)} (a${d.two ? ', b' : ''} > 0) : une seule puissance par lettre.`,
+    skill: RP, level, prompt: t('Simplifie {a} (a{b} > 0) : une seule puissance par lettre.', { a: MT(start, opt), b: d.two ? ', b' : '' }),
     start, judge: withMenus(judge, level, start, lines, RP_CHOICES), mode: modeOf(level), script,
     declares: { vars: ['a', 'b'] },
-    hints: H('(xy)ⁿ = xⁿyⁿ, puis (aᵖ)ᵠ = aᵖᵠ. Ensuite aᵖ/aᵠ = a^(p − q).', `${MT(`(${pw('a', q(d.A, d.n))})^${d.n}`, opt)} = a^(…)`, MT(l1, opt)),
+    hints: H(t('(xy)ⁿ = xⁿyⁿ, puis (aᵖ)ᵠ = aᵖᵠ. Ensuite aᵖ/aᵠ = a^(p − q).'), `${MT(`(${pw('a', q(d.A, d.n))})^${d.n}`, opt)} = a^(…)`, MT(l1, opt)),
     subgoals: RP_SUB, keys: ['calc', 'letters'], tapActions: level === 3 ? 'steps' : null,
     key: `${RP}:${start}`, exam: examOf(opts),
   });
@@ -222,13 +223,13 @@ function rpEquation(rng, opts) {
   const lb = lin(-be);
   const start = `${bx}×${b * b}^(${lb})=${b ** ga}`;
   const lines = [
-    E(`${bx}×${b}^(2(${lb}))=${b}^${ga}`, ga === 2 ? `${b * b} = ${b}²` : `${b * b} = ${b}² et ${b ** ga} = ${b}^${ga}`, 'prod'),
-    E(`${b}^(${xa}+2(${lb}))=${b}^${ga}`, 'Produit de même base', 'quot'),
-    E(`${xa}+2(${lb})=${ga}`, 'Comparer les exposants', 'reduce'),
-    E(`x=${x0}`, 'Résoudre', 'reduce'),
+    E(`${bx}×${b}^(2(${lb}))=${b}^${ga}`, ga === 2 ? `${b * b} = ${b}²` : t('{a} = {b}² et {c} = {b}^{g}', { a: b * b, b, c: b ** ga, g: ga }), 'prod'),
+    E(`${b}^(${xa}+2(${lb}))=${b}^${ga}`, t('Produit de même base'), 'quot'),
+    E(`${xa}+2(${lb})=${ga}`, t('Comparer les exposants'), 'reduce'),
+    E(`x=${x0}`, t('Résoudre'), 'reduce'),
   ];
   return linesItem({
-    skill: RP, level: 5, prompt: `Résous ${MT(start)}.`,
+    skill: RP, level: 5, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V }, mode: 'free', script: lines,
     hints: [], subgoals: RP_SUB, keys: KEYS, key: `${RP}:${start}`, exam: examOf(opts, 2),
   });
@@ -237,15 +238,15 @@ function rpEquation(rng, opts) {
 function rpExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'Pour tous a, b > 0 : (a + b)^(1/2) = a^(1/2) + b^(1/2).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }, { q: '∀', v: 'b', dom: 'R+' }], pred: '(a+b)^(1/2)=a^(1/2)+b^(1/2)', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '1', b: '1' } }, why: 'Faux : avec a = b = 1, √2 ≈ 1,41 mais 1 + 1 = 2.', rule: 'g2_exp_sum' },
-      { s: 'Pour tout a > 0 : a^(1/2)·a^(1/3) = a^(1/6).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }], pred: 'a^(1/2)×a^(1/3)=a^(1/6)', ask: [{ v: 'a', label: 'a =' }], answer: { a: '2' } }, why: 'Faux : on additionne les exposants, a^(1/2 + 1/3) = a^(5/6). Avec a = 2, les deux côtés diffèrent.' },
-      { s: 'Pour tout a > 0 : (a^(2/3))^(3/2) = a.', truth: true, why: 'Vrai : (2/3)·(3/2) = 1.' },
-      { s: 'Pour tout a > 0 : a^(−1/2) = 1/√a.', truth: true, why: 'Vrai : a^(−p) = 1/aᵖ et a^(1/2) = √a.' },
-      { s: 'Pour tout a > 0 : (a³)^(1/2) = a^(7/2).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }], pred: '(a^3)^(1/2)=a^(7/2)', ask: [{ v: 'a', label: 'a =' }], answer: { a: '2' } }, why: 'Faux : on multiplie les exposants, (a³)^(1/2) = a^(3/2).', rule: 'g2_power_power' },
+      { s: 'Pour tous a, b > 0 : (a + b)^(1/2) = a^(1/2) + b^(1/2).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }, { q: '∀', v: 'b', dom: 'R+' }], pred: '(a+b)^(1/2)=a^(1/2)+b^(1/2)', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '1', b: '1' } }, why: t('Faux : avec a = b = 1, √2 ≈ 1,41 mais 1 + 1 = 2.'), rule: 'g2_exp_sum' },
+      { s: 'Pour tout a > 0 : a^(1/2)·a^(1/3) = a^(1/6).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }], pred: 'a^(1/2)×a^(1/3)=a^(1/6)', ask: [{ v: 'a', label: 'a =' }], answer: { a: '2' } }, why: t('Faux : on additionne les exposants, a^(1/2 + 1/3) = a^(5/6). Avec a = 2, les deux côtés diffèrent.') },
+      { s: 'Pour tout a > 0 : (a^(2/3))^(3/2) = a.', truth: true, why: t('Vrai : (2/3)·(3/2) = 1.') },
+      { s: 'Pour tout a > 0 : a^(−1/2) = 1/√a.', truth: true, why: t('Vrai : a^(−p) = 1/aᵖ et a^(1/2) = √a.') },
+      { s: 'Pour tout a > 0 : (a³)^(1/2) = a^(7/2).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }], pred: '(a^3)^(1/2)=a^(7/2)', ask: [{ v: 'a', label: 'a =' }], answer: { a: '2' } }, why: t('Faux : on multiplie les exposants, (a³)^(1/2) = a^(3/2).'), rule: 'g2_power_power' },
     ];
     const b = rng.pick(bank);
     return tfItem({
-      skill: RP, level: 4, statement: b.s.replace(/\^\(([^)]*)\)/g, '<sup>$1</sup>'), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null,
+      skill: RP, level: 4, statement: t(b.s).replace(/\^\(([^)]*)\)/g, '<sup>$1</sup>'), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null,
       key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 },
     });
   }
@@ -262,7 +263,7 @@ function rpExam(rng, exam) {
   add(mono(al.sub(d.g), be.sub(d.dd)));
   add(mono(q(d.p).neg(), q(d.q)));
   return mcq({
-    skill: RP, level: 4, prompt: `Pour a, b > 0, ${MT(start, opt)} =`, options: uniq(options).slice(0, 4), key: `mcq:${start}`,
+    skill: RP, level: 4, prompt: t('Pour a, b > 0, {a} =', { a: MT(start, opt) }), options: uniq(options).slice(0, 4), key: `mcq:${start}`,
     exam: { format: 'mcq', points: 1 }, solution: [{ html: `${MT(rpLetters(d).l1, opt)} = ${MT(ans, opt)}`, note: '' }],
   }, rng);
 }
@@ -273,15 +274,15 @@ function rpExam(rng, exam) {
 
 const LR = 'g2-log-rules';
 const LR_SUB = [
-  { id: 'split', label: 'produit et quotient', skill: LR },
-  { id: 'pow', label: 'puissances', skill: RP },
-  { id: 'reduce', label: 'réduire', skill: LR },
+  { id: 'split', label: t('produit et quotient'), skill: LR },
+  { id: 'pow', label: t('puissances'), skill: RP },
+  { id: 'reduce', label: t('réduire'), skill: LR },
 ];
 const LR_CHOICES = [
   { id: 'split', label: 'ln(uv) = ln u + ln v, ln(u/v) = ln u − ln v' },
   { id: 'pow', label: 'ln(uᵖ) = p·ln u (√u = u^(1/2), ln(eᵏ) = k)' },
-  { id: 'reduce', label: 'Réduire les termes semblables' },
-  { id: 'sum', label: 'ln(u + v) = ln u + ln v', rule: 'g2_log_sum', why: 'Il n\'y a pas de règle pour ln d\'une somme.' },
+  { id: 'reduce', label: t('Réduire les termes semblables') },
+  { id: 'sum', label: 'ln(u + v) = ln u + ln v', rule: 'g2_log_sum', why: t('Il n\'y a pas de règle pour ln d\'une somme.') },
 ];
 const LR_BASES = [
   { b: '2', B: q(2), rs: [-4, -3, -2, 2, 3, 4, 5] },
@@ -313,12 +314,12 @@ function lrValue(level, rng, opts) {
   }
   const start = `log_${d.b}(${N(d.arg)})`;
   const rt = N(d.r);
-  const lines = [E(`log_${d.b}(${d.b}^${ex(d.r)})`, `${N(d.arg)} est une puissance de ${d.b.replace(/[()]/g, '')}`, 'pow'), E(rt, 'log_a(aʳ) = r', 'reduce')];
+  const lines = [E(`log_${d.b}(${d.b}^${ex(d.r)})`, t('{a} est une puissance de {b}', { a: N(d.arg), b: d.b.replace(/[()]/g, '') }), 'pow'), E(rt, 'log_a(aʳ) = r', 'reduce')];
   const script = level === 1 ? [blanked(lines[0], [rt.startsWith('-') || rt.includes('/') ? rt : rt]), lines[1]] : lines;
   return linesItem({
-    skill: LR, level, prompt: `Calcule ${MT(start)}.`,
+    skill: LR, level, prompt: t('Calcule {a}.', { a: MT(start) }),
     start, judge: { kind: 'value', form: 'irreducible' }, mode: modeOf(level), script,
-    hints: H(`log_a y = x ⇔ aˣ = y : écris ${N(d.arg)} comme une puissance de ${d.b.replace(/[()]/g, '')}.`, `${fr(N(d.arg))} = ${d.b}^…`, MT(lines[0].math)),
+    hints: H(t('log_a y = x ⇔ aˣ = y : écris {a} comme une puissance de {b}.', { a: N(d.arg), b: d.b.replace(/[()]/g, '') }), `${fr(N(d.arg))} = ${d.b}^…`, MT(lines[0].math)),
     subgoals: LR_SUB, keys: KEYS, key: `${LR}:${start}`, exam: examOf(opts),
   });
 }
@@ -373,20 +374,20 @@ function lrItem(level, rng, opts = {}) {
   if (condense) return lrCondense(level, rng, opts);
   const d = lrDevelopData(rng, level);
   const { start, l1, l2, fin, combine } = lrDevelopLines(d);
-  let lines = [E(l1, 'Produit et quotient', 'split', 'split'), E(l2, 'Puissances', 'pow', 'pow')];
-  if (combine) lines = level === 2 ? [...lines, E(fin, 'Réduire', 'reduce', 'reduce')] : [lines[0], E(fin, 'Puissances, puis réduire', 'pow', 'pow')];
+  let lines = [E(l1, t('Produit et quotient'), 'split', 'split'), E(l2, t('Puissances'), 'pow', 'pow')];
+  if (combine) lines = level === 2 ? [...lines, E(fin, t('Réduire'), 'reduce', 'reduce')] : [lines[0], E(fin, t('Puissances, puis réduire'), 'pow', 'pow')];
   const script = level === 2 ? [blanked(lines[0], [`ln(${d.num[0].text.replace(/^\((.*)\)$/, '$1')})`]), ...lines.slice(1)] : [...lines];
   if (level === 3) {
-    script.push({ kind: 'rule', ask: 'Quelle règle as-tu utilisée à la première ligne ?', correct: 'prod', options: [
+    script.push({ kind: 'rule', ask: t('Quelle règle as-tu utilisée à la première ligne ?'), correct: 'prod', options: [
       { id: 'prod', label: 'ln(uv) = ln u + ln v' }, { id: 'pow', label: 'ln(uᵖ) = p·ln u' },
       { id: 'sum', label: 'ln(u + v) = ln u + ln v' }, { id: 'chg', label: 'log_a y = ln y / ln a' },
     ] });
   }
   const judge = { kind: 'equiv', vars: [V], domain: { x: [0.2, 5] }, target: 'log-expanded' };
   return linesItem({
-    skill: LR, level, prompt: `Développe ${MT(start)} (x > 0) : écris-le avec ln x et des ln(x + c) seulement.`,
+    skill: LR, level, prompt: t('Développe {a} (x > 0) : écris-le avec ln x et des ln(x + c) seulement.', { a: MT(start) }),
     start, judge: withMenus(judge, level, start, lines, LR_CHOICES), mode: modeOf(level), script,
-    hints: H('ln d\'un produit = somme des ln ; ln d\'un quotient = différence. Puis l\'exposant sort devant.', `${MT(l1)}, puis ln(√u) = (1/2)·ln u`, MT(lines[0].math)),
+    hints: H(t('ln d\'un produit = somme des ln ; ln d\'un quotient = différence. Puis l\'exposant sort devant.'), t('{a}, puis ln(√u) = (1/2)·ln u', { a: MT(l1) }), MT(lines[0].math)),
     subgoals: LR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${LR}:${start}`, exam: examOf(opts),
   });
@@ -401,12 +402,12 @@ function lrCondense(level, rng, opts) {
   const den = b === 1 ? `(x+${c})` : `(x+${c})^${b}`;
   const lines = [
     E(`ln(x^${a})-ln(${den.replace(/^\((.*)\)$/, '$1')})+ln(${k === 1 ? 'e' : `e^${k}`})`, 'p·ln u = ln(uᵖ), k = ln(eᵏ)', 'pow'),
-    E(`ln(${k === 1 ? 'e' : `e^${k}`}×x^${a}/${den})`, 'Un seul logarithme', 'split'),
+    E(`ln(${k === 1 ? 'e' : `e^${k}`}×x^${a}/${den})`, t('Un seul logarithme'), 'split'),
   ];
   return linesItem({
-    skill: LR, level, prompt: `Écris ${MT(start)} (x > 0) avec un seul logarithme.`,
+    skill: LR, level, prompt: t('Écris {a} (x > 0) avec un seul logarithme.', { a: MT(start) }),
     start, judge: { kind: 'equiv', vars: [V], domain: { x: [0.2, 5] }, target: 'log-single' }, mode: 'free', script: lines,
-    hints: H('Fais d\'abord entrer chaque coefficient dans son ln (p·ln u = ln(uᵖ)), et écris le nombre comme un ln : k = ln(eᵏ).', `${MT(lines[0].math)}`, MT(lines[1].math)),
+    hints: H(t('Fais d\'abord entrer chaque coefficient dans son ln (p·ln u = ln(uᵖ)), et écris le nombre comme un ln : k = ln(eᵏ).'), `${MT(lines[0].math)}`, MT(lines[1].math)),
     subgoals: LR_SUB, keys: KEYS, key: `${LR}:${start}`, exam: examOf(opts),
   });
 }
@@ -419,12 +420,12 @@ function lrChangeBase(rng, opts) {
   const start = `log_${a}(${b})×log_${b}(${c})`;
   const lines = [
     E(`ln(${b})/ln(${a})×ln(${c})/ln(${b})`, 'log_a y = ln y / ln a', 'pow'),
-    E(`ln(${c})/ln(${a})`, `Simplifier par ln ${b}`, 'reduce'),
+    E(`ln(${c})/ln(${a})`, t('Simplifier par ln {b}', { b }), 'reduce'),
     E(`${k}ln(${a})/ln(${a})`, `${c} = ${a}^${k}`, 'pow'),
-    E(String(k), 'Simplifier', 'reduce'),
+    E(String(k), t('Simplifier'), 'reduce'),
   ];
   return linesItem({
-    skill: LR, level: 5, prompt: `Calcule ${MT(start)} sans calculatrice.`,
+    skill: LR, level: 5, prompt: t('Calcule {a} sans calculatrice.', { a: MT(start) }),
     start, judge: { kind: 'value', form: 'any' }, mode: 'free', script: lines,
     hints: [], subgoals: LR_SUB, keys: KEYS, key: `${LR}:${start}`, exam: examOf(opts),
   });
@@ -433,15 +434,15 @@ function lrChangeBase(rng, opts) {
 function lrExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'Pour tous a, b > 0 : ln(a + b) = ln a · ln b.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }, { q: '∀', v: 'b', dom: 'R+' }], pred: 'ln(a+b)=ln(a)×ln(b)', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '1', b: '1' } }, why: 'Faux : avec a = b = 1, ln 2 ≈ 0,69, mais ln 1 · ln 1 = 0.', rule: 'g2_log_sum' },
-      { s: 'log₂ 8 · log₈ 2 = 1.', truth: true, why: 'Vrai : log₂ 8 = 3 et log₈ 2 = 1/3.' },
-      { s: 'Pour tout x > 0 : ln(x²) = (ln x)².', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R+' }], pred: 'ln(x^2)=ln(x)^2', ask: [{ v: 'x', label: 'x =' }], answer: { x: 'e' } }, why: 'Faux : ln(e²) = 2, mais (ln e)² = 1. L\'exposant sort devant : ln(x²) = 2 ln x.', rule: 'g2_log_power' },
-      { s: 'Pour tous a, b > 0 : ln(a/b) = ln a − ln b.', truth: true, why: 'Vrai : c\'est la règle du quotient.' },
-      { s: 'Pour tous a, b > 0 : ln a / ln b = ln(a − b)… n\'a pas de sens, mais ln(a/b) = ln a / ln b.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }, { q: '∀', v: 'b', dom: 'R+' }], pred: 'ln(a/b)=ln(a)/ln(b)', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '8', b: '2' } }, why: 'Faux : ln(8/2) = ln 4 ≈ 1,39, mais ln 8 / ln 2 = 3.', rule: 'g2_log_quotient' },
+      { s: 'Pour tous a, b > 0 : ln(a + b) = ln a · ln b.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }, { q: '∀', v: 'b', dom: 'R+' }], pred: 'ln(a+b)=ln(a)×ln(b)', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '1', b: '1' } }, why: t('Faux : avec a = b = 1, ln 2 ≈ 0,69, mais ln 1 · ln 1 = 0.'), rule: 'g2_log_sum' },
+      { s: 'log₂ 8 · log₈ 2 = 1.', truth: true, why: t('Vrai : log₂ 8 = 3 et log₈ 2 = 1/3.') },
+      { s: 'Pour tout x > 0 : ln(x²) = (ln x)².', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R+' }], pred: 'ln(x^2)=ln(x)^2', ask: [{ v: 'x', label: 'x =' }], answer: { x: 'e' } }, why: t('Faux : ln(e²) = 2, mais (ln e)² = 1. L\'exposant sort devant : ln(x²) = 2 ln x.'), rule: 'g2_log_power' },
+      { s: 'Pour tous a, b > 0 : ln(a/b) = ln a − ln b.', truth: true, why: t('Vrai : c\'est la règle du quotient.') },
+      { s: 'Pour tous a, b > 0 : ln a / ln b = ln(a − b)… n\'a pas de sens, mais ln(a/b) = ln a / ln b.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }, { q: '∀', v: 'b', dom: 'R+' }], pred: 'ln(a/b)=ln(a)/ln(b)', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '8', b: '2' } }, why: t('Faux : ln(8/2) = ln 4 ≈ 1,39, mais ln 8 / ln 2 = 3.'), rule: 'g2_log_quotient' },
     ];
     const b = rng.pick(bank.filter((x) => !x.s.includes('n\'a pas de sens')).concat([{ ...bank[4], s: 'Pour tous a, b > 0 avec b ≠ 1 : ln(a/b) = ln a / ln b.' }]));
     return tfItem({
-      skill: LR, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null,
+      skill: LR, level: 4, statement: t(b.s), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null,
       key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 },
     });
   }
@@ -455,7 +456,7 @@ function lrExam(rng, exam) {
     { html: MT(`${n}ln(x)-ln(x)-ln(${c})`), correct: false, rule: 'g2_log_sum' },
   ];
   return mcq({
-    skill: LR, level: 4, prompt: `Pour x > 0, ${MT(start)} =`, options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    skill: LR, level: 4, prompt: t('Pour x > 0, {a} =', { a: MT(start) }), options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
     solution: [{ html: `${MT(`ln(x^${n})-ln(x+${c})`)} = ${MT(`${n}ln(x)-ln(x+${c})`)}`, note: '' }],
   }, rng);
 }
@@ -466,17 +467,17 @@ function lrExam(rng, exam) {
 
 const XE = 'g2-exp-eq';
 const XE_SUB = [
-  { id: 'base', label: 'même base, ln des deux membres', skill: XE },
-  { id: 'subst', label: 'poser t = eˣ', skill: XE },
-  { id: 'trinome', label: 'résoudre en t', skill: 'quad-formula' },
-  { id: 'back', label: 'revenir à x', skill: LR },
+  { id: 'base', label: t('même base, ln des deux membres'), skill: XE },
+  { id: 'subst', label: t('poser t = eˣ'), skill: XE },
+  { id: 'trinome', label: t('résoudre en t'), skill: 'quad-formula' },
+  { id: 'back', label: t('revenir à x'), skill: LR },
 ];
 const XE_CHOICES = [
-  { id: 'subst', label: 'Poser t = eˣ (ou t = 2ˣ)' },
-  { id: 'solve', label: 'Résoudre le trinôme en t' },
-  { id: 'sort', label: 'Garder les t > 0 et revenir à x' },
-  { id: 'ln', label: 'Résoudre en x avec ln' },
-  { id: 'lnall', label: 'Prendre ln de chaque terme', rule: 'g2_log_sum', why: 'ln d\'une somme ne se découpe pas : ln(e²ˣ − eˣ) ≠ 2x − x.' },
+  { id: 'subst', label: t('Poser t = eˣ (ou t = 2ˣ)') },
+  { id: 'solve', label: t('Résoudre le trinôme en t') },
+  { id: 'sort', label: t('Garder les t > 0 et revenir à x') },
+  { id: 'ln', label: t('Résoudre en x avec ln') },
+  { id: 'lnall', label: t('Prendre ln de chaque terme'), rule: 'g2_log_sum', why: t('ln d\'une somme ne se découpe pas : ln(e²ˣ − eˣ) ≠ 2x − x.') },
 ];
 
 function xeSameBase(level, rng, opts) {
@@ -499,14 +500,14 @@ function xeSameBase(level, rng, opts) {
   const start = `${b}^(${left})=${b ** k}^(${right})`;
   const lines = [
     E(`${b}^(${left})=${b}^(${k}(${right}))`, `${b ** k} = ${b}^${k}`, 'base', 'base'),
-    E(`${left}=${k}(${right})`, 'Comparer les exposants', 'base', 'base'),
-    E(`x=${x0}`, 'Résoudre', 'base', 'solve'),
+    E(`${left}=${k}(${right})`, t('Comparer les exposants'), 'base', 'base'),
+    E(`x=${x0}`, t('Résoudre'), 'base', 'solve'),
   ];
   const script = level === 1 ? [blanked(lines[0], [`${k}(${right})`]), lines[1], lines[2]] : lines;
   return linesItem({
-    skill: XE, level, prompt: `Résous ${MT(start)}.`,
+    skill: XE, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V }, mode: modeOf(level), script,
-    hints: H(`Écris ${b ** k} comme une puissance de ${b}, puis compare les exposants.`, `${b ** k} = ${b}^…, donc ${MT(start.split('=')[1])} = ${b}^(${k}(${right}))`, MT(lines[1].math)),
+    hints: H(t('Écris {a} comme une puissance de {b}, puis compare les exposants.', { a: b ** k, b }), t('{a} = {b}^…, donc {c} = {d}^({k}({right}))', { a: b ** k, b, c: MT(start.split('=')[1]), d: b, k, right }), MT(lines[1].math)),
     subgoals: XE_SUB, keys: KEYS, key: `${XE}:${start}`, exam: examOf(opts),
   });
 }
@@ -516,16 +517,16 @@ function xeLn(level, rng, opts) {
   const p = nz(rng, -3, 3);
   const start = `${a}^(x${p > 0 ? '+' : '-'}${Math.abs(p)})=${b}^x`;
   const lines = [
-    E(`(x${p > 0 ? '+' : '-'}${Math.abs(p)})ln(${a})=x ln(${b})`, 'ln des deux membres', 'base', 'ln'),
+    E(`(x${p > 0 ? '+' : '-'}${Math.abs(p)})ln(${a})=x ln(${b})`, t('ln des deux membres'), 'base', 'ln'),
     ...(b > a
-      ? [E(`x(ln(${b})-ln(${a}))=${coefText(p, `ln(${a})`)}`, 'Regrouper les x', 'base', 'ln'), E(`x=${coefText(p, `ln(${a})`)}/(ln(${b})-ln(${a}))`, 'Diviser', 'base', 'ln')]
-      : [E(`x(ln(${a})-ln(${b}))=${coefText(-p, `ln(${a})`)}`, 'Regrouper les x', 'base', 'ln'), E(`x=${coefText(-p, `ln(${a})`)}/(ln(${a})-ln(${b}))`, 'Diviser', 'base', 'ln')]),
+      ? [E(`x(ln(${b})-ln(${a}))=${coefText(p, `ln(${a})`)}`, t('Regrouper les x'), 'base', 'ln'), E(`x=${coefText(p, `ln(${a})`)}/(ln(${b})-ln(${a}))`, t('Diviser'), 'base', 'ln')]
+      : [E(`x(ln(${a})-ln(${b}))=${coefText(-p, `ln(${a})`)}`, t('Regrouper les x'), 'base', 'ln'), E(`x=${coefText(-p, `ln(${a})`)}/(ln(${a})-ln(${b}))`, t('Diviser'), 'base', 'ln')]),
   ];
   const script = level <= 2 ? [blanked(lines[0], [`ln(${a})`, `ln(${b})`]), lines[1], lines[2]] : lines;
   return linesItem({
-    skill: XE, level, prompt: `Résous ${MT(start)} (valeur exacte).`,
+    skill: XE, level, prompt: t('Résous {a} (valeur exacte).', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V }, mode: modeOf(level), script,
-    hints: H('Les bases sont différentes : prends ln des deux membres, ln(aᵘ) = u·ln a.', `(x ${p > 0 ? '+' : '−'} ${Math.abs(p)})·ln ${a} = x·…`, MT(lines[0].math)),
+    hints: H(t('Les bases sont différentes : prends ln des deux membres, ln(aᵘ) = u·ln a.'), `(x ${p > 0 ? '+' : '−'} ${Math.abs(p)})·ln ${a} = x·…`, MT(lines[0].math)),
     subgoals: XE_SUB, keys: KEYS, key: `${XE}:${start}`, exam: examOf(opts),
   });
 }
@@ -569,26 +570,26 @@ function xeSubst(level, rng, opts, { base = 'e', negative = 'maybe' } = {}) {
   const xOf = (t) => (base === 'e' ? lnOf(t) : N(q(Math.round(Math.log2(t.valueOf())))));
   const xs = pos.map((t) => ({ t: xOf(t), v: Math.log(t.valueOf()) }));
   const lines = [
-    E(tEq, `Posons t = ${base === 'e' ? 'eˣ' : '2ˣ'} > 0`, 'subst', 'subst'),
-    E(orEq(ts.map(N), 't'), 'Résoudre le trinôme', 'trinome', 'solve'),
-    E(pos.map((t) => `${T}=${N(t)}`).join(' ou '), ts.length > pos.length ? 'Garder t > 0, puis revenir à x' : 'Revenir à x', 'back', 'sort'),
-    E(orEq(xs.sort((a, b) => a.v - b.v).map((x) => x.t)), 'Résoudre', 'back', 'ln'),
+    E(tEq, t('Posons t = {a} > 0', { a: base === 'e' ? 'eˣ' : '2ˣ' }), 'subst', 'subst'),
+    E(orEq(ts.map(N), 't'), t('Résoudre le trinôme'), 'trinome', 'solve'),
+    E(pos.map((t) => `${T}=${N(t)}`).join(' ou '), ts.length > pos.length ? t('Garder t > 0, puis revenir à x') : t('Revenir à x'), 'back', 'sort'),
+    E(orEq(xs.sort((a, b) => a.v - b.v).map((x) => x.t)), t('Résoudre'), 'back', 'ln'),
   ];
   const script = [];
   if (level === 3) {
-    script.push({ kind: 'decision', prompt: 'Que fais-tu ?', options: [
-      { id: 'subst', label: `Poser t = ${base === 'e' ? 'eˣ' : '2ˣ'} : ${base === 'e' ? 'e²ˣ' : '4ˣ'} = t²`, valid: true },
-      { id: 'lnall', label: 'Prendre ln de chaque terme', valid: false, rule: 'g2_log_sum', why: 'ln d\'une somme ne se découpe pas.' },
-      { id: 'same', label: 'Comparer les exposants', valid: false, why: 'Il y a trois termes : ce n\'est pas une égalité entre deux puissances.' },
+    script.push({ kind: 'decision', prompt: t('Que fais-tu ?'), options: [
+      { id: 'subst', label: t('Poser t = {a} : {b} = t²', { a: base === 'e' ? 'eˣ' : '2ˣ', b: base === 'e' ? 'e²ˣ' : '4ˣ' }), valid: true },
+      { id: 'lnall', label: t('Prendre ln de chaque terme'), valid: false, rule: 'g2_log_sum', why: t('ln d\'une somme ne se découpe pas.') },
+      { id: 'same', label: t('Comparer les exposants'), valid: false, why: t('Il y a trois termes : ce n\'est pas une égalité entre deux puissances.') },
     ] });
   }
   script.push(...lines);
   const judge = { kind: 'solset', v: V, subst: { t: T } };
   return linesItem({
-    skill: XE, level, prompt: `Résous ${MT(start)}.${level >= 4 && level < 5 ? ` Tu peux poser t = ${base === 'e' ? 'eˣ' : '2ˣ'}.` : ''}`,
+    skill: XE, level, prompt: level >= 4 && level < 5 ? t('Résous {e}. Tu peux poser t = {t}.', { e: MT(start), t: base === 'e' ? 'eˣ' : '2ˣ' }) : t('Résous {e}.', { e: MT(start) }),
     start, judge: withMenus(judge, level, start, lines, XE_CHOICES), mode: modeOf(level), script,
     declares: { vars: [V, 't'] },
-    hints: H(`${base === 'e' ? 'e²ˣ = (eˣ)²' : '4ˣ = (2ˣ)²'} : pose t = ${base === 'e' ? 'eˣ' : '2ˣ'}, qui est toujours > 0.`, `${MT(tEq)}, donc t = …`, MT(lines[1].math)),
+    hints: H(t('{a} : pose t = {b}, qui est toujours > 0.', { a: base === 'e' ? 'e²ˣ = (eˣ)²' : '4ˣ = (2ˣ)²', b: base === 'e' ? 'eˣ' : '2ˣ' }), t('{a}, donc t = …', { a: MT(tEq) }), MT(lines[1].math)),
     subgoals: XE_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${XE}:${start}`, exam: examOf(opts, 3), fallback: false,
   });
@@ -604,13 +605,13 @@ function xeLevel5(rng, opts) {
   const ts = [d.t1, d.t2].sort((a, b) => b.valueOf() - a.valueOf());
   const xs = ts.map((t) => ({ t: N(q(Math.round(Math.log2(t.valueOf())))), v: Math.log2(t.valueOf()) }));
   const lines = [
-    E(tEq, 'Posons t = 2ˣ, 4ˣ = t², 2^(x+1) = 2t', 'subst'),
-    E(orEq(ts.map(N), 't'), 'Résoudre', 'trinome'),
-    E(ts.map((t) => `2^x=${N(t)}`).join(' ou '), 'Revenir à x', 'back'),
-    E(orEq(xs.sort((a, b) => a.v - b.v).map((x) => x.t)), 'Puissances de 2', 'back'),
+    E(tEq, t('Posons t = 2ˣ, 4ˣ = t², 2^(x+1) = 2t'), 'subst'),
+    E(orEq(ts.map(N), 't'), t('Résoudre'), 'trinome'),
+    E(ts.map((t) => `2^x=${N(t)}`).join(' ou '), t('Revenir à x'), 'back'),
+    E(orEq(xs.sort((a, b) => a.v - b.v).map((x) => x.t)), t('Puissances de 2'), 'back'),
   ];
   return linesItem({
-    skill: XE, level: 5, prompt: `Résous ${MT(start)}.`,
+    skill: XE, level: 5, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V, subst: { t: '2^x' } }, mode: 'free', script: lines,
     declares: { vars: [V, 't'] }, hints: [], subgoals: XE_SUB, keys: KEYS, key: `${XE}:${start}`, exam: examOf(opts, 3),
   });
@@ -636,8 +637,8 @@ function xeMcq(rng) {
     { html: MT(`{${pos.eq(1) ? '1' : `e^${ex(pos)}`}}`), correct: false },
   ];
   return mcq({
-    skill: XE, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `t = eˣ : t = ${fr(N(pos))} ou t = ${fr(N(negT))} ; t > 0, donc eˣ = ${fr(N(pos))}.`, note: '' }],
+    skill: XE, level: 4, prompt: t('Ensemble des solutions de {a} :', { a: MT(start) }), options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('t = eˣ : t = {a} ou t = {b} ; t > 0, donc eˣ = {c}.', { a: fr(N(pos)), b: fr(N(negT)), c: fr(N(pos)) }), note: '' }],
   }, rng);
 }
 
@@ -647,18 +648,18 @@ function xeMcq(rng) {
 
 const LE = 'g2-log-eq';
 const LE_SUB = [
-  { id: 'domain', label: 'domaine', skill: 'g1-domain' },
-  { id: 'merge', label: 'regrouper les logarithmes', skill: LR },
-  { id: 'exp', label: 'passer à l\'exponentielle', skill: LE },
-  { id: 'solve', label: 'résoudre', skill: 'quad-formula' },
-  { id: 'sort', label: 'trier selon le domaine', skill: LE },
+  { id: 'domain', label: t('domaine'), skill: 'g1-domain' },
+  { id: 'merge', label: t('regrouper les logarithmes'), skill: LR },
+  { id: 'exp', label: t('passer à l\'exponentielle'), skill: LE },
+  { id: 'solve', label: t('résoudre'), skill: 'quad-formula' },
+  { id: 'sort', label: t('trier selon le domaine'), skill: LE },
 ];
 const LE_CHOICES = [
-  { id: 'domain', label: 'Écrire le domaine' },
-  { id: 'merge', label: 'Regrouper en un seul logarithme' },
-  { id: 'exp', label: 'Passer à l\'exponentielle : log_a u = k ⇔ u = aᵏ' },
-  { id: 'solve', label: 'Résoudre l\'équation' },
-  { id: 'sort', label: 'Garder les solutions du domaine' },
+  { id: 'domain', label: t('Écrire le domaine') },
+  { id: 'merge', label: t('Regrouper en un seul logarithme') },
+  { id: 'exp', label: t('Passer à l\'exponentielle : log_a u = k ⇔ u = aᵏ') },
+  { id: 'solve', label: t('Résoudre l\'équation') },
+  { id: 'sort', label: t('Garder les solutions du domaine') },
 ];
 // (x − r) as a factor: x alone when r = 0.
 const fac = (r) => (r === 0 ? V : `(${lin(r)})`);
@@ -688,21 +689,21 @@ function leMain(level, rng, opts) {
   const { a, k, A, p, q: qq, r1, r2 } = d;
   const start = `${logT(a, lin(p))}+${logT(a, lin(qq))}=${k}`;
   const lines = [
-    E(`D=]${qq};+∞[`, `Domaine : ${RD(lin(p))} > 0 et ${RD(lin(qq))} > 0`, 'domain', 'domain'),
-    E(`${logT(a, `${fac(p)}${fac(qq)}`)}=${k}`, 'Regrouper', 'merge', 'merge'),
-    E(`${fac(p)}${fac(qq)}=${A}`, `Passer à l'exponentielle : ${a}^${k} = ${A}`, 'exp', 'exp'),
-    E(orEq([r1, r2].map(String)), 'Résoudre', 'solve', 'solve'),
-    E(`{${r1}}`, `Trier selon D : ${fr(String(r2))} n'est pas dans D`, 'sort', 'sort'),
+    E(`D=]${qq};+∞[`, t('Domaine : {a} > 0 et {b} > 0', { a: RD(lin(p)), b: RD(lin(qq)) }), 'domain', 'domain'),
+    E(`${logT(a, `${fac(p)}${fac(qq)}`)}=${k}`, t('Regrouper'), 'merge', 'merge'),
+    E(`${fac(p)}${fac(qq)}=${A}`, t('Passer à l\'exponentielle : {a}^{k} = {A}', { a, k, A }), 'exp', 'exp'),
+    E(orEq([r1, r2].map(String)), t('Résoudre'), 'solve', 'solve'),
+    E(`{${r1}}`, t('Trier selon D : {a} n\'est pas dans D', { a: fr(String(r2)) }), 'sort', 'sort'),
   ];
   let script = lines;
-  if (level === 1) script = [{ kind: 'note', html: `Domaine : D = ]${fr(String(qq))} ; +∞[.` }, ...lines.slice(1).map((l, i) => (i === 1 ? blanked(l, [String(A)]) : l))];
+  if (level === 1) script = [{ kind: 'note', html: t('Domaine : D = ]{a} ; +∞[.', { a: fr(String(qq)) }) }, ...lines.slice(1).map((l, i) => (i === 1 ? blanked(l, [String(A)]) : l))];
   if (level === 2) script = [blanked(lines[0], [String(qq)]), ...lines.slice(1)];
   const judge = { kind: 'solset', v: V, onDomain: true, logs: true };
   const sLines = level === 1 ? lines.slice(1) : lines;
   return linesItem({
-    skill: LE, level, prompt: `Résous ${MT(start)}.`,
+    skill: LE, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: withMenus(judge, level, start, sLines, LE_CHOICES), mode: modeOf(level), script,
-    hints: H(`Commence par le domaine : ${MT(`${lin(p)}>0`)} et ${MT(`${lin(qq)}>0`)}.`, `log_${a}(…) = ${k} ⇔ (…) = ${a}^${k}`, MT(lines[2].math)),
+    hints: H(t('Commence par le domaine : {a} et {b}.', { a: MT(`${lin(p)}>0`), b: MT(`${lin(qq)}>0`) }), `log_${a}(…) = ${k} ⇔ (…) = ${a}^${k}`, MT(lines[2].math)),
     subgoals: LE_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${LE}:${start}`, exam: examOf(opts),
   });
@@ -714,16 +715,16 @@ function leSquare(level, rng, opts) {
   const start = `ln(x^2)=2ln(x+${c})`;
   const sol = N(q(-c, 2));
   const lines = [
-    E(`D=]-${c};0[∪]0;+∞[`, 'Domaine : x ≠ 0 et x > −c', 'domain', 'domain'),
+    E(`D=]-${c};0[∪]0;+∞[`, t('Domaine : x ≠ 0 et x > −c'), 'domain', 'domain'),
     E(`ln(x^2)=ln((x+${c})^2)`, '2 ln u = ln(u²)', 'merge', 'merge'),
-    E(`x^2=(x+${c})^2`, 'ln est injective', 'exp', 'exp'),
-    E(`${2 * c}x+${c * c}=0`, 'Développer', 'solve', 'solve'),
-    E(`x=${sol}`, `Résoudre ; ${fr(sol)} est dans D`, 'sort', 'sort'),
+    E(`x^2=(x+${c})^2`, t('ln est injective'), 'exp', 'exp'),
+    E(`${2 * c}x+${c * c}=0`, t('Développer'), 'solve', 'solve'),
+    E(`x=${sol}`, t('Résoudre ; {a} est dans D', { a: fr(sol) }), 'sort', 'sort'),
   ];
   return linesItem({
-    skill: LE, level, prompt: `Résous ${MT(start)}.`,
+    skill: LE, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V, onDomain: true, logs: true }, mode: modeOf(level), script: lines,
-    hints: H('Attention : ln(x²) existe aussi pour x < 0. Ne remplace pas ln(x²) par 2 ln x.', `2 ln(x + ${c}) = ln((x + ${c})²)`, MT(lines[2].math)),
+    hints: H(t('Attention : ln(x²) existe aussi pour x < 0. Ne remplace pas ln(x²) par 2 ln x.'), `2 ln(x + ${c}) = ln((x + ${c})²)`, MT(lines[2].math)),
     subgoals: LE_SUB, keys: KEYS, key: `${LE}:${start}`, exam: examOf(opts),
   });
 }
@@ -735,15 +736,15 @@ function leBases(rng, opts) {
   const qq = -u1 * u2 - p;
   const start = `log_2(${lin(p)})=log_4(${lin(-qq)})`;
   const lines = [
-    E(`D=]${p};+∞[`, `Domaine : ${RD(lin(p))} > 0 et ${RD(lin(-qq))} > 0`, 'domain'),
+    E(`D=]${p};+∞[`, t('Domaine : {a} > 0 et {b} > 0', { a: RD(lin(p)), b: RD(lin(-qq)) }), 'domain'),
     E(`log_2(${lin(p)})=(1/2)log_2(${lin(-qq)})`, 'log₄ u = log₂ u / log₂ 4 = (1/2) log₂ u', 'merge'),
-    E(`2log_2(${lin(p)})=log_2(${lin(-qq)})`, 'Multiplier par 2', 'merge'),
-    E(`${p === 0 ? 'x' : `(${lin(p)})`}^2=${lin(-qq)}`, '2 log₂ u = log₂(u²), puis exponentielle', 'exp'),
-    E(orEq([p + u2, p + u1].map(String)), 'Résoudre', 'solve'),
-    E(`{${p + u1}}`, 'Trier selon D', 'sort'),
+    E(`2log_2(${lin(p)})=log_2(${lin(-qq)})`, t('Multiplier par 2'), 'merge'),
+    E(`${p === 0 ? 'x' : `(${lin(p)})`}^2=${lin(-qq)}`, t('2 log₂ u = log₂(u²), puis exponentielle'), 'exp'),
+    E(orEq([p + u2, p + u1].map(String)), t('Résoudre'), 'solve'),
+    E(`{${p + u1}}`, t('Trier selon D'), 'sort'),
   ];
   return linesItem({
-    skill: LE, level: 5, prompt: `Résous ${MT(start)}.`,
+    skill: LE, level: 5, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V, onDomain: true, logs: true }, mode: 'free', script: lines,
     hints: [], subgoals: LE_SUB, keys: KEYS, key: `${LE}:${start}`, exam: examOf(opts),
   });
@@ -758,12 +759,12 @@ function leItem(level, rng, opts = {}) {
 function leExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'Pour tout x ≠ 0 : ln(x²) = 2 ln x.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x≠0⇒ln(x^2)=2ln(x)', hyp: 'x≠0', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: 'Faux : pour x = −1, ln 1 = 0 existe, mais 2 ln(−1) n\'existe pas. ln(x²) = 2 ln|x|.', rule: 'g2_log_square_abs' },
-      { s: 'Pour tout x > 0 : ln(x²) = 2 ln x.', truth: true, why: 'Vrai : pour x > 0, |x| = x.' },
-      { s: 'Pour tous x, y > 0 : ln x + ln y = ln(x + y).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R+' }, { q: '∀', v: 'y', dom: 'R+' }], pred: 'ln(x)+ln(y)=ln(x+y)', ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer: { x: '1', y: '1' } }, why: 'Faux : ln 1 + ln 1 = 0, mais ln 2 ≠ 0. ln x + ln y = ln(xy).', rule: 'g2_log_sum' },
+      { s: 'Pour tout x ≠ 0 : ln(x²) = 2 ln x.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x≠0⇒ln(x^2)=2ln(x)', hyp: 'x≠0', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: t('Faux : pour x = −1, ln 1 = 0 existe, mais 2 ln(−1) n\'existe pas. ln(x²) = 2 ln|x|.'), rule: 'g2_log_square_abs' },
+      { s: 'Pour tout x > 0 : ln(x²) = 2 ln x.', truth: true, why: t('Vrai : pour x > 0, |x| = x.') },
+      { s: 'Pour tous x, y > 0 : ln x + ln y = ln(x + y).', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R+' }, { q: '∀', v: 'y', dom: 'R+' }], pred: 'ln(x)+ln(y)=ln(x+y)', ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer: { x: '1', y: '1' } }, why: t('Faux : ln 1 + ln 1 = 0, mais ln 2 ≠ 0. ln x + ln y = ln(xy).'), rule: 'g2_log_sum' },
     ];
     const b = rng.pick(bank);
-    return tfItem({ skill: LE, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    return tfItem({ skill: LE, level: 4, statement: t(b.s), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const d = leData(rng);
   const start = `${logT(d.a, lin(d.p))}+${logT(d.a, lin(d.q))}=${d.k}`;
@@ -776,8 +777,8 @@ function leExam(rng, exam) {
   if (!wrongSum.eq(d.r1)) options.push({ html: MT(`{${N(wrongSum)}}`), correct: false, rule: 'g2_log_sum' });
   else options.push({ html: MT('∅'), correct: false });
   return mcq({
-    skill: LE, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `D = ]${fr(String(d.q))} ; +∞[ ; (${MT(lin(d.p))})(${MT(lin(d.q))}) = ${d.A} donne x = ${fr(String(d.r1))} ou x = ${fr(String(d.r2))} ; seul ${fr(String(d.r1))} est dans D.`, note: '' }],
+    skill: LE, level: 4, prompt: t('Ensemble des solutions de {a} :', { a: MT(start) }), options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('D = ]{a} ; +∞[ ; ({b})({c}) = {d} donne x = {e} ou x = {f} ; seul {g} est dans D.', { a: fr(String(d.q)), b: MT(lin(d.p)), c: MT(lin(d.q)), d: d.A, e: fr(String(d.r1)), f: fr(String(d.r2)), g: fr(String(d.r1)) }), note: '' }],
   }, rng);
 }
 
@@ -787,20 +788,20 @@ function leExam(rng, exam) {
 
 const IQ = 'g2-ineq';
 const IQ_SUB = [
-  { id: 'domain', label: 'domaine', skill: 'g1-domain' },
-  { id: 'base', label: 'base < 1 : retourner', skill: IQ },
-  { id: 'merge', label: 'regrouper les logarithmes', skill: LE },
-  { id: 'exp', label: 'passer à l\'exponentielle', skill: XE },
-  { id: 'trinome', label: 'inéquation du 2e degré', skill: 'g1-trinome-sign' },
-  { id: 'inter', label: 'intersecter avec D', skill: IQ },
+  { id: 'domain', label: t('domaine'), skill: 'g1-domain' },
+  { id: 'base', label: t('base < 1 : retourner'), skill: IQ },
+  { id: 'merge', label: t('regrouper les logarithmes'), skill: LE },
+  { id: 'exp', label: t('passer à l\'exponentielle'), skill: XE },
+  { id: 'trinome', label: t('inéquation du 2e degré'), skill: 'g1-trinome-sign' },
+  { id: 'inter', label: t('intersecter avec D'), skill: IQ },
 ];
 const IQ_CHOICES = [
-  { id: 'domain', label: 'Écrire le domaine' },
-  { id: 'drop', label: 'Enlever les logarithmes (en retournant si la base est < 1)' },
-  { id: 'merge', label: 'Ramener à une base, regrouper' },
-  { id: 'exp', label: 'Passer à l\'exponentielle' },
-  { id: 'solve', label: 'Résoudre' },
-  { id: 'inter', label: 'Intersecter avec le domaine' },
+  { id: 'domain', label: t('Écrire le domaine') },
+  { id: 'drop', label: t('Enlever les logarithmes (en retournant si la base est < 1)') },
+  { id: 'merge', label: t('Ramener à une base, regrouper') },
+  { id: 'exp', label: t('Passer à l\'exponentielle') },
+  { id: 'solve', label: t('Résoudre') },
+  { id: 'inter', label: t('Intersecter avec le domaine') },
 ];
 const FLIP = { '<': '>', '>': '<', '≤': '≥', '≥': '≤' };
 const IQ_BASES = [{ b: '(1/2)', lt1: true }, { b: '(1/3)', lt1: true }, { b: '(1/10)', lt1: true }, { b: '2', lt1: false }, { b: '3', lt1: false }, { b: '10', lt1: false }];
@@ -844,27 +845,27 @@ function iqSimple(level, rng, opts) {
   const rel = d.lt1 ? FLIP[d.R] : d.R;
   const ans = iqAnswer(d, rel);
   const lines = [
-    E(`D=]${N(d.dlo)};+∞[`, `Domaine : ${RD(linP)} > 0 et ${RD(linR)} > 0`, 'domain', 'domain'),
-    E(`${linP}${rel}${linR}`, d.lt1 ? `Base ${d.b.replace(/[()]/g, '')} < 1 : on retourne` : 'Base > 1 : même sens', 'base', 'drop'),
-    E(`x${ans.rel}${N(d.xs)}`, 'Résoudre', 'inter', 'solve'),
-    E(ans.set, 'Intersecter avec D', 'inter', 'inter'),
+    E(`D=]${N(d.dlo)};+∞[`, t('Domaine : {a} > 0 et {b} > 0', { a: RD(linP), b: RD(linR) }), 'domain', 'domain'),
+    E(`${linP}${rel}${linR}`, d.lt1 ? t('Base {a} < 1 : on retourne', { a: d.b.replace(/[()]/g, '') }) : t('Base > 1 : même sens'), 'base', 'drop'),
+    E(`x${ans.rel}${N(d.xs)}`, t('Résoudre'), 'inter', 'solve'),
+    E(ans.set, t('Intersecter avec D'), 'inter', 'inter'),
   ];
   const script = [];
-  if (level === 1) script.push({ kind: 'note', html: `Domaine : D = ]${fr(N(d.dlo))} ; +∞[.` });
+  if (level === 1) script.push({ kind: 'note', html: t('Domaine : D = ]{a} ; +∞[.', { a: fr(N(d.dlo)) }) });
   else script.push(lines[0]);
   if (level === 2) {
-    script.push({ kind: 'decision', prompt: 'Quand on enlève les logarithmes, faut-il retourner l\'inégalité ?', options: [
-      { id: 'yes', label: `Oui : la base ${d.b.replace(/[()]/g, '')} est < 1`, valid: true },
-      { id: 'no', label: 'Non : on garde le même sens', valid: false, rule: 'g2_base_lt1', why: `La fonction log de base ${d.b.replace(/[()]/g, '')} est décroissante : le plus grand logarithme a le plus petit argument.` },
+    script.push({ kind: 'decision', prompt: t('Quand on enlève les logarithmes, faut-il retourner l\'inégalité ?'), options: [
+      { id: 'yes', label: t('Oui : la base {a} est < 1', { a: d.b.replace(/[()]/g, '') }), valid: true },
+      { id: 'no', label: t('Non : on garde le même sens'), valid: false, rule: 'g2_base_lt1', why: t('La fonction log de base {a} est décroissante : le plus grand logarithme a le plus petit argument.', { a: d.b.replace(/[()]/g, '') }) },
     ] });
   }
   script.push(level <= 2 ? blanked(lines[1], [linP]) : lines[1], lines[2], lines[3]);
   const sLines = level === 1 ? lines.slice(1) : lines;
   const judge = { kind: 'solset', v: V, onDomain: true, logs: true };
   return linesItem({
-    skill: IQ, level, prompt: `Résous ${MT(start)}.`,
+    skill: IQ, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: withMenus(judge, level, start, sLines, IQ_CHOICES), mode: modeOf(level), script,
-    hints: H(d.lt1 ? `La fonction log de base ${d.b.replace(/[()]/g, '')} est décroissante : le plus grand logarithme a le plus petit argument.` : 'log est croissante si la base est > 1 : on garde le sens.', `${MT(linP)} ${rel} …`, MT(lines[1].math)),
+    hints: H(d.lt1 ? t('La fonction log de base {a} est décroissante : le plus grand logarithme a le plus petit argument.', { a: d.b.replace(/[()]/g, '') }) : t('log est croissante si la base est > 1 : on garde le sens.'), `${MT(linP)} ${rel} …`, MT(lines[1].math)),
     subgoals: IQ_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${IQ}:${start}`, exam: examOf(opts, 3),
   });
@@ -899,19 +900,19 @@ function iqMan(level, rng, opts) {
   const tri = polyText([[1, 'x^2'], [qq - p, 'x'], [-p * qq - A, '']]);
   const inner = le ? '≤' : '≥';
   const lines = [
-    E(`D=]${p};+∞[`, `Domaine : ${RD(lin(p))} > 0 et ${RD(lin(-qq))} > 0`, 'domain', 'domain'),
+    E(`D=]${p};+∞[`, t('Domaine : {a} > 0 et {b} > 0', { a: RD(lin(p)), b: RD(lin(-qq)) }), 'domain', 'domain'),
     E(`-log_${b}(${lin(p)})${R}-${k}+log_${b}(${lin(-qq)})`, `log_{1/${b}} u = −log_${b} u`, 'merge', 'merge'),
-    E(`${k}${R}log_${b}(${fac(p)}${fac(-qq)})`, 'Regrouper', 'merge', 'merge'),
-    E(`${fac(p)}${fac(-qq)}${inner}${A}`, `Base ${b} > 1 : exponentielle, même sens`, 'exp', 'exp'),
-    E(`${tri}${inner}0`, 'Développer', 'trinome', 'solve'),
-    E(le ? `${r2}≤x≤${r1}` : `x≤${r2} ou x≥${r1}`, 'Signe du trinôme', 'trinome', 'solve'),
-    E(le ? `]${p};${r1}]` : `[${r1};+∞[`, 'Intersecter avec D', 'inter', 'inter'),
+    E(`${k}${R}log_${b}(${fac(p)}${fac(-qq)})`, t('Regrouper'), 'merge', 'merge'),
+    E(`${fac(p)}${fac(-qq)}${inner}${A}`, t('Base {b} > 1 : exponentielle, même sens', { b }), 'exp', 'exp'),
+    E(`${tri}${inner}0`, t('Développer'), 'trinome', 'solve'),
+    E(le ? `${r2}≤x≤${r1}` : `x≤${r2} ou x≥${r1}`, t('Signe du trinôme'), 'trinome', 'solve'),
+    E(le ? `]${p};${r1}]` : `[${r1};+∞[`, t('Intersecter avec D'), 'inter', 'inter'),
   ];
   const judge = { kind: 'solset', v: V, onDomain: true, logs: true };
   return linesItem({
-    skill: IQ, level, prompt: `Résous ${MT(start)}.`,
+    skill: IQ, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: withMenus(judge, level, start, lines, IQ_CHOICES), mode: modeOf(level), script: lines,
-    hints: H(`Domaine d'abord. Puis log_{1/${b}} u = −log_${b} u : tout en base ${b}.`, `${k} ${R} log_${b}(…), donc (${MT(lin(p))})(${MT(lin(-qq))}) ${inner} ${b}^${k}`, MT(lines[2].math)),
+    hints: H(t('Domaine d\'abord. Puis log_{1/{b}} u = −log_{a} u : tout en base {c}.', { b, a: b, c: b }), t('{k} {R} log_{b}(…), donc ({a})({c}) {inner} {d}^{e}', { k, R, b, a: MT(lin(p)), c: MT(lin(-qq)), inner, d: b, e: k }), MT(lines[2].math)),
     subgoals: IQ_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${IQ}:${start}`, exam: examOf(opts, 8),
   });
@@ -935,14 +936,14 @@ function iqExp(level, rng, opts) {
   const open = R2 === '<' || R2 === '>';
   const set = R2 === '<' || R2 === '≤' ? `]-∞;${xs}${open ? '[' : ']'}` : `${open ? ']' : '['}${xs};+∞[`;
   const lines = [
-    E(`${lp}${rel}${lr}`, lt1 ? `Base ${Bt} < 1 : on retourne` : 'Base > 1 : même sens', 'base', 'drop'),
-    E(`x${R2}${xs}`, 'Résoudre', 'base', 'solve'),
-    E(set, 'Écrire l\'ensemble', 'base', 'inter'),
+    E(`${lp}${rel}${lr}`, lt1 ? t('Base {Bt} < 1 : on retourne', { Bt }) : t('Base > 1 : même sens'), 'base', 'drop'),
+    E(`x${R2}${xs}`, t('Résoudre'), 'base', 'solve'),
+    E(set, t('Écrire l\'ensemble'), 'base', 'inter'),
   ];
   return linesItem({
-    skill: IQ, level, prompt: `Résous ${MT(start)}.`,
+    skill: IQ, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V }, mode: modeOf(level), script: lines,
-    hints: H(lt1 ? `x ↦ (${Bt})ˣ est décroissante : on retourne l'inégalité entre les exposants.` : `x ↦ ${Bt}ˣ est croissante : même sens entre les exposants.`, `${MT(lp)} ${rel} ${MT(lr)}`, MT(lines[0].math)),
+    hints: H(lt1 ? t('x ↦ ({Bt})ˣ est décroissante : on retourne l\'inégalité entre les exposants.', { Bt }) : t('x ↦ {Bt}ˣ est croissante : même sens entre les exposants.', { Bt }), `${MT(lp)} ${rel} ${MT(lr)}`, MT(lines[0].math)),
     subgoals: IQ_SUB, keys: KEYS, key: `${IQ}:${start}`, exam: examOf(opts, 3),
   });
 }
@@ -970,8 +971,8 @@ function iqMcq(rng) {
   if (nodom) options.push({ html: MT(nodom), correct: false, rule: 'g2_log_domain' });
   options.push({ html: MT(`]${N(d.dlo)};+∞[`), correct: false });
   return mcq({
-    skill: IQ, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `D = ]${fr(N(d.dlo))} ; +∞[ ; base < 1 : ${MT(`${linP}${FLIP[d.R]}${linR}`)}.`, note: '' }],
+    skill: IQ, level: 4, prompt: t('Ensemble des solutions de {a} :', { a: MT(start) }), options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('D = ]{a} ; +∞[ ; base < 1 : {b}.', { a: fr(N(d.dlo)), b: MT(`${linP}${FLIP[d.R]}${linR}`) }), note: '' }],
   }, rng);
 }
 
@@ -981,17 +982,17 @@ function iqMcq(rng) {
 
 const XX = 'g2-xx';
 const XX_SUB = [
-  { id: 'exp', label: 'écrire avec e', skill: XX },
-  { id: 'compare', label: 'comparer les exposants', skill: LE },
-  { id: 'factor', label: 'factoriser', skill: XX },
-  { id: 'zero', label: 'produit nul', skill: 'eq-product' },
+  { id: 'exp', label: t('écrire avec e'), skill: XX },
+  { id: 'compare', label: t('comparer les exposants'), skill: LE },
+  { id: 'factor', label: t('factoriser'), skill: XX },
+  { id: 'zero', label: t('produit nul'), skill: 'eq-product' },
 ];
 const XX_CHOICES = [
-  { id: 'exp', label: 'Écrire chaque membre avec e : xᵃ = e^(a ln x)' },
-  { id: 'compare', label: 'Comparer les exposants (exp est injective)' },
-  { id: 'factor', label: 'Factoriser par ln x' },
-  { id: 'zero', label: 'Produit nul : chaque facteur' },
-  { id: 'div', label: 'Diviser par ln x', rule: 'g2_xx_lost_one', why: 'ln x peut être nul : on perd x = 1.' },
+  { id: 'exp', label: t('Écrire chaque membre avec e : xᵃ = e^(a ln x)') },
+  { id: 'compare', label: t('Comparer les exposants (exp est injective)') },
+  { id: 'factor', label: t('Factoriser par ln x') },
+  { id: 'zero', label: t('Produit nul : chaque facteur') },
+  { id: 'div', label: t('Diviser par ln x'), rule: 'g2_xx_lost_one', why: t('ln x peut être nul : on perd x = 1.') },
 ];
 
 function xxData(rng, kind) {
@@ -1025,21 +1026,21 @@ function xxItem(level, rng, opts = {}) {
   const [f, g] = d.exps;
   const fin = `{${d.sols.join(';')}}`;
   const lines = [
-    E(`e^(${f})=e^(${g})`, 'Écrire avec e', 'exp', 'exp'),
-    E(`${f}=${g}`, 'Comparer les exposants', 'compare', 'compare'),
-    ...(d.mid ? [E(d.mid, 'Tout d\'un côté, factoriser par ln x', 'factor', 'factor')] : []),
-    E(d.factor, 'Factoriser', 'factor', 'factor'),
-    E(fin, d.kind === 'root' ? (d.sols[1] === 4 ? 'ln x = 0, ou √x = x/2 : x = 4' : 'ln x = 0, ou x^(2/3) = 3 : x = 3√3') : 'Produit nul (x = 0 exclu)', 'zero', 'zero'),
+    E(`e^(${f})=e^(${g})`, t('Écrire avec e'), 'exp', 'exp'),
+    E(`${f}=${g}`, t('Comparer les exposants'), 'compare', 'compare'),
+    ...(d.mid ? [E(d.mid, t('Tout d\'un côté, factoriser par ln x'), 'factor', 'factor')] : []),
+    E(d.factor, t('Factoriser'), 'factor', 'factor'),
+    E(fin, d.kind === 'root' ? (d.sols[1] === 4 ? t('ln x = 0, ou √x = x/2 : x = 4') : t('ln x = 0, ou x^(2/3) = 3 : x = 3√3')) : t('Produit nul (x = 0 exclu)'), 'zero', 'zero'),
   ];
   let script = lines;
-  if (level === 1) script = [{ kind: 'note', html: `Avec e : ${MT(lines[0].math)}` }, ...lines.slice(1).map((l) => (l.subgoal === 'factor' && l.math === d.factor ? blanked(l, [d.kind === 'pow' ? `${d.sols[1]}-x` : `x-${d.sols[2]}`]) : l))];
+  if (level === 1) script = [{ kind: 'note', html: t('Avec e : {a}', { a: MT(lines[0].math) }) }, ...lines.slice(1).map((l) => (l.subgoal === 'factor' && l.math === d.factor ? blanked(l, [d.kind === 'pow' ? `${d.sols[1]}-x` : `x-${d.sols[2]}`]) : l))];
   if (level === 2) script = [blanked(lines[0], [f]), ...lines.slice(1)];
   const sLines = level === 1 ? lines.slice(1) : lines;
   const judge = { kind: 'solset', v: V, domain: ']0;+∞[' };
   return linesItem({
-    skill: XX, level, prompt: `Résous ${MT(d.start)} pour x > 0.`,
+    skill: XX, level, prompt: t('Résous {a} pour x > 0.', { a: MT(d.start) }),
     start: d.start, judge: withMenus(judge, level, d.start, sLines, XX_CHOICES), mode: modeOf(level), script,
-    hints: H('Pour x > 0 : xᵃ = e^(a ln x). Puis compare les exposants, sans diviser par ln x.', `${MT(`${f}-(${g})`)} = ln x·(…)`, MT(lines[1].math)),
+    hints: H(t('Pour x > 0 : xᵃ = e^(a ln x). Puis compare les exposants, sans diviser par ln x.'), `${MT(`${f}-(${g})`)} = ln x·(…)`, MT(lines[1].math)),
     subgoals: XX_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, baits: ['g2_xx_lost_one'],
     key: `${XX}:${d.start}`, exam: examOf(opts, 5),
   });
@@ -1055,8 +1056,8 @@ function xxMcq(rng) {
     { html: MT(`{${rest.map((x) => -x).reverse().join(';')};${d.sols.join(';')}}`), correct: false },
   ];
   return mcq({
-    skill: XX, level: 4, prompt: `Pour x > 0, ensemble des solutions de ${MT(d.start)} :`, options: uniq(options), key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `${MT(d.factor)} : ln x = 0 donne x = 1.`, note: '' }],
+    skill: XX, level: 4, prompt: t('Pour x > 0, ensemble des solutions de {a} :', { a: MT(d.start) }), options: uniq(options), key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('{a} : ln x = 0 donne x = 1.', { a: MT(d.factor) }), note: '' }],
   }, rng);
 }
 
@@ -1069,10 +1070,10 @@ function xxMcq(rng) {
 
 const HD = 'g2-hyp-def';
 const HD_SUB = [
-  { id: 'def', label: 'définitions de sinh, cosh', skill: HD },
+  { id: 'def', label: t('définitions de sinh, cosh'), skill: HD },
   { id: 'eln', label: 'e^(ln a) = a', skill: LR },
-  { id: 'parity', label: 'parité', skill: 'g1-parity-period' },
-  { id: 'calc', label: 'calculer', skill: HD },
+  { id: 'parity', label: t('parité'), skill: 'g1-parity-period' },
+  { id: 'calc', label: t('calculer'), skill: HD },
 ];
 
 function hdValue(level, rng, opts, fn = rng.pick(['sinh', 'cosh'])) {
@@ -1083,15 +1084,15 @@ function hdValue(level, rng, opts, fn = rng.pick(['sinh', 'cosh'])) {
   const value = fn === 'sinh' ? a.sub(inv).div(2) : a.add(inv).div(2);
   const start = `${fn}(ln(${A}))`;
   const lines = [
-    E(`(e^(ln(${A}))${s}e^(-ln(${A})))/2`, `Définition de ${fn}`, 'def'),
-    E(`(${A}${s}${N(inv)})/2`, 'e^(ln a) = a et e^(−ln a) = 1/a', 'eln'),
-    E(N(value), 'Calculer', 'calc'),
+    E(`(e^(ln(${A}))${s}e^(-ln(${A})))/2`, t('Définition de {fn}', { fn }), 'def'),
+    E(`(${A}${s}${N(inv)})/2`, t('e^(ln a) = a et e^(−ln a) = 1/a'), 'eln'),
+    E(N(value), t('Calculer'), 'calc'),
   ];
   const script = level === 1 ? [lines[0], blanked(lines[1], [N(inv)]), lines[2]] : lines;
   return linesItem({
-    skill: HD, level, prompt: `Calcule ${MT(start)}.`,
+    skill: HD, level, prompt: t('Calcule {a}.', { a: MT(start) }),
     start, judge: { kind: 'value', form: 'irreducible' }, mode: modeOf(level), script,
-    hints: H(`${fn} u = (eᵘ ${s === '-' ? '−' : '+'} e⁻ᵘ)/2, et e^(ln a) = a.`, `e^(ln ${fr(A)}) = ${fr(A)} et e^(−ln ${fr(A)}) = …`, MT(lines[1].math)),
+    hints: H(t('{fn} u = (eᵘ {s} e⁻ᵘ)/2, et e^(ln a) = a.', { fn, s: s === '-' ? '−' : '+' }), t('e^(ln {a}) = {a} et e^(−ln {a}) = …', { a: fr(A) }), MT(lines[1].math)),
     subgoals: HD_SUB, keys: KEYS, key: `${HD}:${start}`, exam: examOf(opts),
   });
 }
@@ -1105,34 +1106,34 @@ function hdTanh(level, rng, opts) {
   const start = `tanh(ln(${A}))`;
   const lines = [
     E(`sinh(ln(${A}))/cosh(ln(${A}))`, 'tanh = sinh / cosh', 'def'),
-    E(`(${N(sv)})/(${N(cv)})`, 'Valeurs de sinh et cosh', 'eln'),
-    E(N(sv.div(cv)), 'Simplifier', 'calc'),
+    E(`(${N(sv)})/(${N(cv)})`, t('Valeurs de sinh et cosh'), 'eln'),
+    E(N(sv.div(cv)), t('Simplifier'), 'calc'),
   ];
   const script = level === 2 ? [lines[0], blanked(lines[1], [N(sv)]), lines[2]] : lines;
   return linesItem({
-    skill: HD, level, prompt: `Calcule ${MT(start)}.`,
+    skill: HD, level, prompt: t('Calcule {a}.', { a: MT(start) }),
     start, judge: { kind: 'value', form: 'irreducible' }, mode: modeOf(level), script,
-    hints: H('tanh = sinh / cosh : calcule sinh(ln a) et cosh(ln a).', `sinh(ln ${fr(A)}) = (${fr(A)} − ${fr(N(inv))})/2 = …`, MT(lines[1].math)),
+    hints: H(t('tanh = sinh / cosh : calcule sinh(ln a) et cosh(ln a).'), `sinh(ln ${fr(A)}) = (${fr(A)} − ${fr(N(inv))})/2 = …`, MT(lines[1].math)),
     subgoals: HD_SUB, keys: KEYS, key: `${HD}:${start}`, exam: examOf(opts),
   });
 }
 
 const HD_IDENT = [
-  { start: 'cosh(x)^2-sinh(x)^2', goal: '1', lines: [['((e^x+e^(-x))/2)^2-((e^x-e^(-x))/2)^2', 'Définitions'], ['(e^(2x)+2+e^(-2x))/4-(e^(2x)-2+e^(-2x))/4', 'Développer les carrés'], ['1', 'Réduire']] },
-  { start: 'cosh(x)+sinh(x)', goal: 'e^x', lines: [['(e^x+e^(-x))/2+(e^x-e^(-x))/2', 'Définitions'], ['e^x', 'Réduire']] },
-  { start: 'cosh(x)-sinh(x)', goal: 'e^(-x)', lines: [['(e^x+e^(-x))/2-(e^x-e^(-x))/2', 'Définitions'], ['e^(-x)', 'Réduire']] },
-  { start: 'sinh(-x)', goal: '-sinh(x)', parity: true, lines: [['(e^(-x)-e^x)/2', 'Définition, avec −x'], ['-(e^x-e^(-x))/2', 'Sortir le signe'], ['-sinh(x)', 'sinh est impaire']] },
-  { start: 'cosh(-x)', goal: 'cosh(x)', parity: true, lines: [['(e^(-x)+e^x)/2', 'Définition, avec −x'], ['cosh(x)', 'cosh est paire']] },
-  { start: '1-tanh(x)^2', goal: '1/cosh(x)^2', lines: [['(cosh(x)^2-sinh(x)^2)/cosh(x)^2', 'tanh = sinh/cosh, même dénominateur'], ['1/cosh(x)^2', 'cosh² − sinh² = 1']] },
+  { start: 'cosh(x)^2-sinh(x)^2', goal: '1', lines: [['((e^x+e^(-x))/2)^2-((e^x-e^(-x))/2)^2', t('Définitions')], ['(e^(2x)+2+e^(-2x))/4-(e^(2x)-2+e^(-2x))/4', t('Développer les carrés')], ['1', t('Réduire')]] },
+  { start: 'cosh(x)+sinh(x)', goal: 'e^x', lines: [['(e^x+e^(-x))/2+(e^x-e^(-x))/2', t('Définitions')], ['e^x', t('Réduire')]] },
+  { start: 'cosh(x)-sinh(x)', goal: 'e^(-x)', lines: [['(e^x+e^(-x))/2-(e^x-e^(-x))/2', t('Définitions')], ['e^(-x)', t('Réduire')]] },
+  { start: 'sinh(-x)', goal: '-sinh(x)', parity: true, lines: [['(e^(-x)-e^x)/2', t('Définition, avec −x')], ['-(e^x-e^(-x))/2', t('Sortir le signe')], ['-sinh(x)', t('sinh est impaire')]] },
+  { start: 'cosh(-x)', goal: 'cosh(x)', parity: true, lines: [['(e^(-x)+e^x)/2', t('Définition, avec −x')], ['cosh(x)', t('cosh est paire')]] },
+  { start: '1-tanh(x)^2', goal: '1/cosh(x)^2', lines: [['(cosh(x)^2-sinh(x)^2)/cosh(x)^2', t('tanh = sinh/cosh, même dénominateur')], ['1/cosh(x)^2', 'cosh² − sinh² = 1']] },
 ];
 
 function hdIdentity(level, rng, opts) {
   const b = rng.pick(HD_IDENT);
   const lines = b.lines.map(([math, note], i) => E(math, note, i === 0 ? 'def' : b.parity && i === b.lines.length - 1 ? 'parity' : 'calc'));
   return linesItem({
-    skill: HD, level, prompt: `Montre que ${MT(`${b.start}=${b.goal}`)} pour tout x, avec les exponentielles.`,
+    skill: HD, level, prompt: t('Montre que {a} pour tout x, avec les exponentielles.', { a: MT(`${b.start}=${b.goal}`) }),
     start: b.start, judge: { kind: 'equiv', vars: [V], domain: { x: [-2, 2] }, target: 'goal', goal: b.goal }, mode: modeOf(level), script: lines,
-    hints: H('Remplace sinh et cosh par leurs formules en eˣ et e⁻ˣ, puis développe.', `cosh x = (eˣ + e⁻ˣ)/2, sinh x = (eˣ − e⁻ˣ)/2 : ${MT(lines[0].math)}`, MT(lines[Math.max(0, lines.length - 2)].math)),
+    hints: H(t('Remplace sinh et cosh par leurs formules en eˣ et e⁻ˣ, puis développe.'), `cosh x = (eˣ + e⁻ˣ)/2, sinh x = (eˣ − e⁻ˣ)/2 : ${MT(lines[0].math)}`, MT(lines[Math.max(0, lines.length - 2)].math)),
     subgoals: HD_SUB, keys: KEYS, key: `${HD}:id:${b.start}`, exam: examOf(opts),
   });
 }
@@ -1144,13 +1145,13 @@ const HD_PROPS = [
   { q: 'Laquelle est croissante sur ℝ ?', right: 'sinh', wrong: ['cosh', 'x ↦ 1/cosh x', 'x ↦ e⁻ˣ'] },
   { q: 'Que vaut cosh 0 ?', right: '1', wrong: ['0', '1/2', '2'] },
   { q: 'Quelle fonction est impaire ?', right: 'tanh', wrong: ['cosh', 'x ↦ eˣ', 'x ↦ cosh x − 1'] },
-  { q: 'Le graphe de cosh ressemble à…', right: 'une chaînette : paire, minimum 1 en 0', wrong: ['une droite croissante', 'une courbe impaire bornée par −1 et 1', 'une exponentielle croissante'] },
+  { q: 'Le graphe de cosh ressemble à…', right: t('une chaînette : paire, minimum 1 en 0'), wrong: [t('une droite croissante'), t('une courbe impaire bornée par −1 et 1'), t('une exponentielle croissante')] },
 ];
 
 function hdProps(level, rng, opts = {}) {
   const b = rng.pick(HD_PROPS);
   return mcq({
-    skill: HD, level, prompt: b.q, key: `${HD}:prop:${b.q}`,
+    skill: HD, level, prompt: t(b.q), key: `${HD}:prop:${b.q}`,
     options: [{ html: b.right, correct: true }, ...b.wrong.map((w) => ({ html: w, correct: false }))],
     exam: examOf(opts), solution: [{ html: `${b.right}.`, note: '' }],
   }, rng);
@@ -1168,15 +1169,15 @@ function hdExam(rng, exam) {
   if (exam === 'tf') {
     const one = (v, dom = 'R') => ({ q: '∀', v, dom });
     const bank = [
-      { s: 'cosh est croissante sur ℝ : si a < b, alors cosh a < cosh b.', truth: false, counter: { kind: 'refute', quants: [one('a'), one('b')], pred: 'a<b⇒cosh(a)<cosh(b)', hyp: 'a<b', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '-1', b: '0' } }, why: 'Faux : cosh(−1) ≈ 1,54 > cosh 0 = 1. cosh décroît sur ]−∞ ; 0].' },
-      { s: 'tanh x < 1 pour tout réel x.', truth: true, why: 'Vrai : sinh x < cosh x, car cosh x − sinh x = e⁻ˣ > 0.' },
-      { s: 'sinh(−x) = −sinh x pour tout réel x.', truth: true, why: 'Vrai : sinh est impaire.' },
-      { s: 'cosh x ≥ 1 pour tout réel x.', truth: true, why: 'Vrai : cosh x = (eˣ + e⁻ˣ)/2 ≥ 1, avec égalité en 0.' },
-      { s: 'sinh x ≥ 0 pour tout réel x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: 'sinh(x)≥0', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: 'Faux : sinh(−1) < 0, sinh est impaire.' },
-      { s: 'tanh est paire : tanh(−x) = tanh x pour tout x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: 'tanh(-x)=tanh(x)', ask: [{ v: 'x', label: 'x =' }], answer: { x: '1' } }, why: 'Faux : tanh est impaire, tanh(−1) = −tanh 1 ≠ tanh 1.' },
+      { s: 'cosh est croissante sur ℝ : si a < b, alors cosh a < cosh b.', truth: false, counter: { kind: 'refute', quants: [one('a'), one('b')], pred: 'a<b⇒cosh(a)<cosh(b)', hyp: 'a<b', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '-1', b: '0' } }, why: t('Faux : cosh(−1) ≈ 1,54 > cosh 0 = 1. cosh décroît sur ]−∞ ; 0].') },
+      { s: 'tanh x < 1 pour tout réel x.', truth: true, why: t('Vrai : sinh x < cosh x, car cosh x − sinh x = e⁻ˣ > 0.') },
+      { s: 'sinh(−x) = −sinh x pour tout réel x.', truth: true, why: t('Vrai : sinh est impaire.') },
+      { s: 'cosh x ≥ 1 pour tout réel x.', truth: true, why: t('Vrai : cosh x = (eˣ + e⁻ˣ)/2 ≥ 1, avec égalité en 0.') },
+      { s: 'sinh x ≥ 0 pour tout réel x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: 'sinh(x)≥0', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: t('Faux : sinh(−1) < 0, sinh est impaire.') },
+      { s: 'tanh est paire : tanh(−x) = tanh x pour tout x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: 'tanh(-x)=tanh(x)', ask: [{ v: 'x', label: 'x =' }], answer: { x: '1' } }, why: t('Faux : tanh est impaire, tanh(−1) = −tanh 1 ≠ tanh 1.') },
     ];
     const b = rng.pick(bank);
-    return tfItem({ skill: HD, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    return tfItem({ skill: HD, level: 4, statement: t(b.s), truth: b.truth, counter: b.counter || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const a = rng.pick([2, 3, 4, 5]);
   const inv = q(1, a);
@@ -1199,31 +1200,31 @@ function hdExam(rng, exam) {
 
 const HF = 'g2-hyp-formulas';
 const HF_SUB = [
-  { id: 'def', label: 'définitions', skill: HD },
-  { id: 'formula', label: 'formules', skill: HF },
+  { id: 'def', label: t('définitions'), skill: HD },
+  { id: 'formula', label: t('formules'), skill: HF },
 ];
 const HF_VERIFY = [
-  { start: '2sinh(x)cosh(x)', goal: 'sinh(2x)', lines: [['2×(e^x-e^(-x))/2×(e^x+e^(-x))/2', 'Définitions'], ['(e^(2x)-e^(-2x))/2', '(a − b)(a + b) = a² − b²'], ['sinh(2x)', 'Définition de sinh 2x']], blank: '(e^x+e^(-x))/2' },
-  { start: 'cosh(x)^2+sinh(x)^2', goal: 'cosh(2x)', lines: [['((e^x+e^(-x))/2)^2+((e^x-e^(-x))/2)^2', 'Définitions'], ['(e^(2x)+e^(-2x))/2', 'Développer, réduire'], ['cosh(2x)', 'Définition de cosh 2x']], blank: '((e^x-e^(-x))/2)^2' },
+  { start: '2sinh(x)cosh(x)', goal: 'sinh(2x)', lines: [['2×(e^x-e^(-x))/2×(e^x+e^(-x))/2', t('Définitions')], ['(e^(2x)-e^(-2x))/2', '(a − b)(a + b) = a² − b²'], ['sinh(2x)', t('Définition de sinh 2x')]], blank: '(e^x+e^(-x))/2' },
+  { start: 'cosh(x)^2+sinh(x)^2', goal: 'cosh(2x)', lines: [['((e^x+e^(-x))/2)^2+((e^x-e^(-x))/2)^2', t('Définitions')], ['(e^(2x)+e^(-2x))/2', t('Développer, réduire')], ['cosh(2x)', t('Définition de cosh 2x')]], blank: '((e^x-e^(-x))/2)^2' },
 ];
 const HF_ADD = [
-  { start: 'cosh(x)cosh(y)+sinh(x)sinh(y)', goal: 'cosh(x+y)', lines: [['((e^x+e^(-x))(e^y+e^(-y))+(e^x-e^(-x))(e^y-e^(-y)))/4', 'Définitions'], ['(2e^(x+y)+2e^(-x-y))/4', 'Développer : les termes croisés s\'annulent'], ['cosh(x+y)', 'Définition de cosh(x + y)']], blank: '2e^(x+y)' },
-  { start: 'sinh(x)cosh(y)+cosh(x)sinh(y)', goal: 'sinh(x+y)', lines: [['((e^x-e^(-x))(e^y+e^(-y))+(e^x+e^(-x))(e^y-e^(-y)))/4', 'Définitions'], ['(2e^(x+y)-2e^(-x-y))/4', 'Développer : les termes croisés s\'annulent'], ['sinh(x+y)', 'Définition de sinh(x + y)']], blank: '2e^(x+y)' },
+  { start: 'cosh(x)cosh(y)+sinh(x)sinh(y)', goal: 'cosh(x+y)', lines: [['((e^x+e^(-x))(e^y+e^(-y))+(e^x-e^(-x))(e^y-e^(-y)))/4', t('Définitions')], ['(2e^(x+y)+2e^(-x-y))/4', t('Développer : les termes croisés s\'annulent')], ['cosh(x+y)', t('Définition de cosh(x + y)')]], blank: '2e^(x+y)' },
+  { start: 'sinh(x)cosh(y)+cosh(x)sinh(y)', goal: 'sinh(x+y)', lines: [['((e^x-e^(-x))(e^y+e^(-y))+(e^x+e^(-x))(e^y-e^(-y)))/4', t('Définitions')], ['(2e^(x+y)-2e^(-x-y))/4', t('Développer : les termes croisés s\'annulent')], ['sinh(x+y)', t('Définition de sinh(x + y)')]], blank: '2e^(x+y)' },
 ];
 const HF_T = {
-  cosh2: { start: 'cosh(2x)', fin: '(1+t^2)/(1-t^2)', lines: [['cosh(x)^2+sinh(x)^2', 'Angle double', 'double'], ['cosh(x)^2(1+tanh(x)^2)', 'cosh²x en facteur', 'factor'], ['(1+tanh(x)^2)/(1-tanh(x)^2)', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['(1+t^2)/(1-t^2)', 'Remplacer tanh x par t', 'rename']] },
-  sinh2: { start: 'sinh(2x)', fin: '2t/(1-t^2)', lines: [['2sinh(x)cosh(x)', 'Angle double', 'double'], ['2tanh(x)cosh(x)^2', 'sinh x = tanh x · cosh x', 'factor'], ['2tanh(x)/(1-tanh(x)^2)', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['2t/(1-t^2)', 'Remplacer tanh x par t', 'rename']] },
-  sh2: { start: 'sinh(x)^2', fin: 't^2/(1-t^2)', lines: [['tanh(x)^2cosh(x)^2', 'sinh x = tanh x · cosh x', 'factor'], ['tanh(x)^2/(1-tanh(x)^2)', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['t^2/(1-t^2)', 'Remplacer tanh x par t', 'rename']] },
-  ch2: { start: 'cosh(x)^2', fin: '1/(1-t^2)', lines: [['1/(1-tanh(x)^2)', '1 − tanh²x = 1/cosh²x', 'tanh'], ['1/(1-t^2)', 'Remplacer tanh x par t', 'rename']] },
-  em2x: { start: 'e^(-2x)', fin: '(1-t)/(1+t)', lines: [['cosh(2x)-sinh(2x)', 'e^(−u) = cosh u − sinh u', 'double'], ['cosh(x)^2+sinh(x)^2-2sinh(x)cosh(x)', 'Angles doubles', 'double'], ['cosh(x)^2(1-tanh(x))^2', 'cosh²x en facteur', 'factor'], ['(1-tanh(x))^2/((1-tanh(x))(1+tanh(x)))', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['(1-t)/(1+t)', 'Simplifier, remplacer tanh x par t', 'rename']] },
-  e2x: { start: 'e^(2x)', fin: '(1+t)/(1-t)', lines: [['cosh(2x)+sinh(2x)', 'e^u = cosh u + sinh u', 'double'], ['cosh(x)^2+sinh(x)^2+2sinh(x)cosh(x)', 'Angles doubles', 'double'], ['cosh(x)^2(1+tanh(x))^2', 'cosh²x en facteur', 'factor'], ['(1+tanh(x))^2/((1-tanh(x))(1+tanh(x)))', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['(1+t)/(1-t)', 'Simplifier, remplacer tanh x par t', 'rename']] },
+  cosh2: { start: 'cosh(2x)', fin: '(1+t^2)/(1-t^2)', lines: [['cosh(x)^2+sinh(x)^2', t('Angle double'), 'double'], ['cosh(x)^2(1+tanh(x)^2)', t('cosh²x en facteur'), 'factor'], ['(1+tanh(x)^2)/(1-tanh(x)^2)', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['(1+t^2)/(1-t^2)', t('Remplacer tanh x par t'), 'rename']] },
+  sinh2: { start: 'sinh(2x)', fin: '2t/(1-t^2)', lines: [['2sinh(x)cosh(x)', t('Angle double'), 'double'], ['2tanh(x)cosh(x)^2', 'sinh x = tanh x · cosh x', 'factor'], ['2tanh(x)/(1-tanh(x)^2)', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['2t/(1-t^2)', t('Remplacer tanh x par t'), 'rename']] },
+  sh2: { start: 'sinh(x)^2', fin: 't^2/(1-t^2)', lines: [['tanh(x)^2cosh(x)^2', 'sinh x = tanh x · cosh x', 'factor'], ['tanh(x)^2/(1-tanh(x)^2)', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['t^2/(1-t^2)', t('Remplacer tanh x par t'), 'rename']] },
+  ch2: { start: 'cosh(x)^2', fin: '1/(1-t^2)', lines: [['1/(1-tanh(x)^2)', '1 − tanh²x = 1/cosh²x', 'tanh'], ['1/(1-t^2)', t('Remplacer tanh x par t'), 'rename']] },
+  em2x: { start: 'e^(-2x)', fin: '(1-t)/(1+t)', lines: [['cosh(2x)-sinh(2x)', 'e^(−u) = cosh u − sinh u', 'double'], ['cosh(x)^2+sinh(x)^2-2sinh(x)cosh(x)', t('Angles doubles'), 'double'], ['cosh(x)^2(1-tanh(x))^2', t('cosh²x en facteur'), 'factor'], ['(1-tanh(x))^2/((1-tanh(x))(1+tanh(x)))', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['(1-t)/(1+t)', t('Simplifier, remplacer tanh x par t'), 'rename']] },
+  e2x: { start: 'e^(2x)', fin: '(1+t)/(1-t)', lines: [['cosh(2x)+sinh(2x)', 'e^u = cosh u + sinh u', 'double'], ['cosh(x)^2+sinh(x)^2+2sinh(x)cosh(x)', t('Angles doubles'), 'double'], ['cosh(x)^2(1+tanh(x))^2', t('cosh²x en facteur'), 'factor'], ['(1+tanh(x))^2/((1-tanh(x))(1+tanh(x)))', 'cosh²x = 1/(1 − tanh²x)', 'tanh'], ['(1+t)/(1-t)', t('Simplifier, remplacer tanh x par t'), 'rename']] },
 };
 const HF_CHOICES = [
-  { id: 'double', label: 'Formule de l\'angle double (ou eᵘ = cosh u + sinh u)' },
-  { id: 'factor', label: 'Mettre cosh²x en facteur pour faire apparaître tanh x' },
-  { id: 'tanh', label: 'Remplacer cosh²x par 1/(1 − tanh²x)' },
-  { id: 'rename', label: 'Écrire avec t = tanh x' },
-  { id: 'trig', label: 'cosh 2x = cosh²x − sinh²x', rule: 'g2_hyp_trig_sign', why: 'cosh²x − sinh²x vaut 1 : en hyperbolique, cosh 2x = cosh²x + sinh²x.' },
+  { id: 'double', label: t('Formule de l\'angle double (ou eᵘ = cosh u + sinh u)') },
+  { id: 'factor', label: t('Mettre cosh²x en facteur pour faire apparaître tanh x') },
+  { id: 'tanh', label: t('Remplacer cosh²x par 1/(1 − tanh²x)') },
+  { id: 'rename', label: t('Écrire avec t = tanh x') },
+  { id: 'trig', label: 'cosh 2x = cosh²x − sinh²x', rule: 'g2_hyp_trig_sign', why: t('cosh²x − sinh²x vaut 1 : en hyperbolique, cosh 2x = cosh²x + sinh²x.') },
 ];
 
 function hfVerify(level, rng, opts) {
@@ -1234,10 +1235,10 @@ function hfVerify(level, rng, opts) {
   const blankAt = add ? 1 : 0;
   const script = lines.map((l, i) => (i === blankAt ? blanked(l, [b.blank], { vars }) : l));
   return linesItem({
-    skill: HF, level, prompt: `Montre que ${MT(`${b.start}=${b.goal}`, { vars })} avec les exponentielles.`,
+    skill: HF, level, prompt: t('Montre que {a} avec les exponentielles.', { a: MT(`${b.start}=${b.goal}`, { vars }) }),
     start: b.start, judge: { kind: 'equiv', vars, domain: { x: [-2, 2], y: [-2, 2] }, target: 'goal', goal: b.goal }, mode: 'guided', script,
     declares: { vars },
-    hints: H('Remplace chaque sinh et cosh par sa formule en exponentielles, puis développe.', MT(lines[0].math, { vars }), MT(lines[1].math, { vars })),
+    hints: H(t('Remplace chaque sinh et cosh par sa formule en exponentielles, puis développe.'), MT(lines[0].math, { vars }), MT(lines[1].math, { vars })),
     subgoals: HF_SUB, keys: KEYS, key: `${HF}:${b.start}`, exam: examOf(opts),
   });
 }
@@ -1249,19 +1250,19 @@ function hfT(level, rng, opts) {
   const script = [];
   if (level === 3) {
     script.push(lines[0], lines[1]);
-    script.push({ kind: 'decision', prompt: 'Quelle identité permet de remplacer cosh²x ?', options: [
+    script.push({ kind: 'decision', prompt: t('Quelle identité permet de remplacer cosh²x ?'), options: [
       { id: 'right', label: '1 − tanh²x = 1/cosh²x', valid: true },
-      { id: 'plus', label: '1 + tanh²x = 1/cosh²x', valid: false, rule: 'g2_hyp_trig_sign', why: 'En hyperbolique : cosh² − sinh² = 1, donc 1 − tanh² = 1/cosh². Le signe est celui de la trigonométrie inversé.' },
-      { id: 'cos2', label: 'cosh²x − sinh²x = cosh 2x', valid: false, rule: 'g2_hyp_trig_sign', why: 'cosh²x − sinh²x vaut 1, pas cosh 2x.' },
+      { id: 'plus', label: '1 + tanh²x = 1/cosh²x', valid: false, rule: 'g2_hyp_trig_sign', why: t('En hyperbolique : cosh² − sinh² = 1, donc 1 − tanh² = 1/cosh². Le signe est celui de la trigonométrie inversé.') },
+      { id: 'cos2', label: 'cosh²x − sinh²x = cosh 2x', valid: false, rule: 'g2_hyp_trig_sign', why: t('cosh²x − sinh²x vaut 1, pas cosh 2x.') },
     ] });
     script.push(...lines.slice(2));
   } else script.push(...lines);
   const judge = { kind: 'equiv', vars: [V, 't'], domain: { x: [-2, 2], t: [-0.5, 0.5] }, subst: { t: 'tanh(x)' }, target: 'only', finalVars: ['t'] };
   return linesItem({
-    skill: HF, level, prompt: `Exprime ${MT(b.start)} en fonction de t = tanh x.`,
+    skill: HF, level, prompt: t('Exprime {a} en fonction de t = tanh x.', { a: MT(b.start) }),
     start: b.start, judge: withMenus(judge, level, b.start, lines, HF_CHOICES), mode: modeOf(level), script,
     declares: { vars: [V, 't'] },
-    hints: H('Angle double, puis mets cosh²x en facteur pour faire apparaître tanh x = sinh x / cosh x.', '1 − tanh²x = 1/cosh²x, donc cosh²x = …', MT(lines[lines.length - 2].math)),
+    hints: H(t('Angle double, puis mets cosh²x en facteur pour faire apparaître tanh x = sinh x / cosh x.'), t('1 − tanh²x = 1/cosh²x, donc cosh²x = …'), MT(lines[lines.length - 2].math)),
     subgoals: HF_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${HF}:${b.start}`, exam: examOf(opts, 4),
   });
@@ -1279,7 +1280,7 @@ function hfMcq(rng) {
     sinh2: [['2t/(1-t^2)', true], ['2t/(1+t^2)', false, 'g2_hyp_trig_sign'], ['(1+t^2)/(1-t^2)', false], ['t^2/(1-t^2)', false]],
   }[kind];
   return mcq({
-    skill: HF, level: 4, prompt: `Avec t = tanh x, ${MT(HF_T[kind].start)} =`, key: `mcq:${kind}`,
+    skill: HF, level: 4, prompt: t('Avec t = tanh x, {a} =', { a: MT(HF_T[kind].start) }), key: `mcq:${kind}`,
     options: opts.map(([m, c, rule]) => ({ html: MT(m, { vars: ['t'] }), correct: c, rule })), exam: { format: 'mcq', points: 1 },
     solution: HF_T[kind].lines.map(([m, note]) => ({ html: MT(m, { vars: ['x', 't'] }), note })),
   }, rng);
@@ -1291,17 +1292,17 @@ function hfMcq(rng) {
 
 const HE = 'g2-hyp-eq';
 const HE_SUB = [
-  { id: 'def', label: 'exponentielles', skill: HD },
-  { id: 'mult', label: 'multiplier par 2eˣ', skill: HE },
-  { id: 'trinome', label: 'trinôme en t', skill: XE },
-  { id: 'back', label: 'revenir à x', skill: LR },
+  { id: 'def', label: t('exponentielles'), skill: HD },
+  { id: 'mult', label: t('multiplier par 2eˣ'), skill: HE },
+  { id: 'trinome', label: t('trinôme en t'), skill: XE },
+  { id: 'back', label: t('revenir à x'), skill: LR },
 ];
 const HE_CHOICES = [
-  { id: 'def', label: 'Remplacer cosh et sinh par leurs exponentielles' },
-  { id: 'mult', label: 'Multiplier par 2eˣ' },
-  { id: 'subst', label: 'Poser t = eˣ' },
-  { id: 'solve', label: 'Résoudre le trinôme en t' },
-  { id: 'back', label: 'Revenir à x (t > 0)' },
+  { id: 'def', label: t('Remplacer cosh et sinh par leurs exponentielles') },
+  { id: 'mult', label: t('Multiplier par 2eˣ') },
+  { id: 'subst', label: t('Poser t = eˣ') },
+  { id: 'solve', label: t('Résoudre le trinôme en t') },
+  { id: 'back', label: t('Revenir à x (t > 0)') },
 ];
 
 // a cosh x + b sinh x = c ⇔ p t² − 2c t + q = 0 with p = a + b, q = a − b.
@@ -1336,23 +1337,23 @@ function heItem(level, rng, opts = {}) {
   const pos = ts.filter((t) => t.n > 0);
   const xs = pos.map((t) => ({ t: lnOf(t), v: Math.log(t.valueOf()) })).sort((a, b) => a.v - b.v);
   const lines = [
-    E(l1, 'Exponentielles', 'def', 'def'),
-    E(l2, 'Multiplier par 2eˣ', 'mult', 'mult'),
-    E(l3, 'Posons t = eˣ > 0', 'trinome', 'subst'),
-    E(orEq(ts.map(N), 't'), 'Résoudre le trinôme', 'trinome', 'solve'),
-    ...(negative ? [E(pos.map((t) => `e^x=${N(t)}`).join(' ou '), 't > 0 : une seule racine', 'back', 'back')] : []),
-    E(orEq(xs.map((x) => x.t)), 'Revenir à x', 'back', 'back'),
+    E(l1, t('Exponentielles'), 'def', 'def'),
+    E(l2, t('Multiplier par 2eˣ'), 'mult', 'mult'),
+    E(l3, t('Posons t = eˣ > 0'), 'trinome', 'subst'),
+    E(orEq(ts.map(N), 't'), t('Résoudre le trinôme'), 'trinome', 'solve'),
+    ...(negative ? [E(pos.map((t) => `e^x=${N(t)}`).join(' ou '), t('t > 0 : une seule racine'), 'back', 'back')] : []),
+    E(orEq(xs.map((x) => x.t)), t('Revenir à x'), 'back', 'back'),
   ];
   let script = lines;
-  if (level === 1) script = [{ kind: 'note', html: `Exponentielles : ${MT(l1)}` }, ...lines.slice(1).map((l, i) => (i === 2 ? blanked(l, [N(ts[1])], { vars: ['t'] }) : l))];
+  if (level === 1) script = [{ kind: 'note', html: t('Exponentielles : {a}', { a: MT(l1) }) }, ...lines.slice(1).map((l, i) => (i === 2 ? blanked(l, [N(ts[1])], { vars: ['t'] }) : l))];
   if (level === 2) script = [lines[0], blanked(lines[1], [coefText(d.p, 'e^(2x)')]), ...lines.slice(2)];
   const sLines = level === 1 ? lines.slice(1) : lines;
   const judge = { kind: 'solset', v: V, subst: { t: 'e^x' } };
   return linesItem({
-    skill: HE, level, prompt: `Résous ${MT(start)}.`,
+    skill: HE, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: withMenus(judge, level, start, sLines, HE_CHOICES), mode: modeOf(level), script,
     declares: { vars: [V, 't'] },
-    hints: H('Remplace cosh et sinh par leurs formules en eˣ, multiplie par 2eˣ, puis pose t = eˣ.', `× 2eˣ : ${MT(l2)}`, MT(lines[1].math)),
+    hints: H(t('Remplace cosh et sinh par leurs formules en eˣ, multiplie par 2eˣ, puis pose t = eˣ.'), `× 2eˣ : ${MT(l2)}`, MT(lines[1].math)),
     subgoals: HE_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${HE}:${start}`, exam: examOf(opts, 5),
   });
@@ -1367,9 +1368,9 @@ function heCount(rng, opts = {}, level = 5) {
   const n = solutionSet(parse(start), { v: V }).parts.length;
   const options = ['0', '1', '2', '3'].map((k) => ({ html: k, correct: Number(k) === n }));
   return mcq({
-    skill: HE, level, prompt: `Combien de solutions a l'équation ${MT(start)} ? (Pense aux graphes, sans calcul.)`,
+    skill: HE, level, prompt: t('Combien de solutions a l\'équation {a} ? (Pense aux graphes, sans calcul.)', { a: MT(start) }),
     options, keepOrder: true, key: `count:${start}`, exam: opts.exam ? { format: 'mcq', points: 2 } : false,
-    solution: [{ html: `cosh est convexe, de minimum 1 en 0 : la droite y = ${fr(rhs)} la coupe ${n} fois.`, note: '' }],
+    solution: [{ html: t('cosh est convexe, de minimum 1 en 0 : la droite y = {a} la coupe {n} fois.', { a: fr(rhs), n }), note: '' }],
   }, rng);
 }
 
@@ -1379,18 +1380,18 @@ function heCount(rng, opts = {}, level = 5) {
 
 const AR = 'g2-arg';
 const AR_SUB = [
-  { id: 'def', label: 'définitions', skill: HD },
-  { id: 'solve', label: 'trinôme en eᵘ', skill: HE },
-  { id: 'sort', label: 'garder eᵘ > 0', skill: AR },
-  { id: 'inverse', label: 'réciproque', skill: 'g1-inverse' },
+  { id: 'def', label: t('définitions'), skill: HD },
+  { id: 'solve', label: t('trinôme en eᵘ'), skill: HE },
+  { id: 'sort', label: t('garder eᵘ > 0'), skill: AR },
+  { id: 'inverse', label: t('réciproque'), skill: 'g1-inverse' },
 ];
 const AR_CHOICES = [
-  { id: 'def', label: 'Écrire avec les exponentielles' },
-  { id: 'mult', label: 'Multiplier par eᵘ (ou 2eᵘ)' },
-  { id: 'subst', label: 'Poser t = eᵘ' },
-  { id: 'solve', label: 'Résoudre en t' },
-  { id: 'sort', label: 'Garder la racine positive' },
-  { id: 'back', label: 'Revenir à u avec ln' },
+  { id: 'def', label: t('Écrire avec les exponentielles') },
+  { id: 'mult', label: t('Multiplier par eᵘ (ou 2eᵘ)') },
+  { id: 'subst', label: t('Poser t = eᵘ') },
+  { id: 'solve', label: t('Résoudre en t') },
+  { id: 'sort', label: t('Garder la racine positive') },
+  { id: 'back', label: t('Revenir à u avec ln') },
 ];
 
 function arValue(level, rng, opts) {
@@ -1404,11 +1405,11 @@ function arValue(level, rng, opts) {
   const lines = [
     E(`ln(${Y}+sqrt((${Y})^2${pm}1))`, `${fn} y = ln(y + √(y² ${pm === '+' ? '+' : '−'} 1))`, 'def'),
     E(`ln(${Y}+${N(r)})`, `√((${fr(Y)})² ${pm === '+' ? '+' : '−'} 1) = ${fr(N(r))}`, 'solve'),
-    E(`ln(${k})`, 'Additionner', 'sort'),
+    E(`ln(${k})`, t('Additionner'), 'sort'),
   ];
   const script = level === 1 ? [lines[0], blanked(lines[1], [N(r)]), lines[2]] : lines;
   return linesItem({
-    skill: AR, level, prompt: `Calcule ${MT(start)} sous la forme ln(…).`,
+    skill: AR, level, prompt: t('Calcule {a} sous la forme ln(…).', { a: MT(start) }),
     start, judge: { kind: 'value', form: 'log' }, mode: modeOf(level), script,
     hints: H(`${fn} y = ln(y + √(y² ${pm === '+' ? '+' : '−'} 1)).`, `(${fr(Y)})² ${pm === '+' ? '+' : '−'} 1 = (${fr(N(r))})²`, MT(lines[1].math)),
     subgoals: AR_SUB, keys: KEYS, key: `${AR}:${start}`, exam: examOf(opts),
@@ -1417,27 +1418,27 @@ function arValue(level, rng, opts) {
 
 function arArgsh(level, rng, opts) {
   const lines = [
-    E('(e^u-e^(-u))/2=y', 'Définition de sinh', 'def', 'def'),
-    E('e^(2u)-2ye^u-1=0', 'Multiplier par 2eᵘ', 'def', 'mult'),
-    E('t^2-2yt-1=0', 'Posons t = eᵘ > 0', 'solve', 'subst'),
-    E('t=y+sqrt(y^2+1) ou t=y-sqrt(y^2+1)', 'Trinôme : Δ/4 = y² + 1', 'solve', 'solve'),
-    E('t=y+sqrt(y^2+1)', 'y − √(y² + 1) < 0 : rejeté', 'sort', 'sort'),
-    E('u=ln(y+sqrt(y^2+1))', 'Revenir à u', 'inverse', 'back'),
+    E('(e^u-e^(-u))/2=y', t('Définition de sinh'), 'def', 'def'),
+    E('e^(2u)-2ye^u-1=0', t('Multiplier par 2eᵘ'), 'def', 'mult'),
+    E('t^2-2yt-1=0', t('Posons t = eᵘ > 0'), 'solve', 'subst'),
+    E('t=y+sqrt(y^2+1) ou t=y-sqrt(y^2+1)', t('Trinôme : Δ/4 = y² + 1'), 'solve', 'solve'),
+    E('t=y+sqrt(y^2+1)', t('y − √(y² + 1) < 0 : rejeté'), 'sort', 'sort'),
+    E('u=ln(y+sqrt(y^2+1))', t('Revenir à u'), 'inverse', 'back'),
   ];
   let script = lines;
   if (level <= 2) script = lines.map((l, i) => (i === 3 ? blanked(l, ['sqrt(y^2+1)']) : l));
   if (level === 3) {
-    script = [...lines.slice(0, 4), { kind: 'decision', prompt: 'Quelle racine garder ?', options: [
+    script = [...lines.slice(0, 4), { kind: 'decision', prompt: t('Quelle racine garder ?'), options: [
       { id: 'plus', label: 't = y + √(y² + 1)', valid: true },
-      { id: 'minus', label: 't = y − √(y² + 1)', valid: false, rule: 'g2_argsh_sign', why: '√(y² + 1) > |y|, donc y − √(y² + 1) < 0. Or t = eᵘ > 0.' },
+      { id: 'minus', label: 't = y − √(y² + 1)', valid: false, rule: 'g2_argsh_sign', why: t('√(y² + 1) > |y|, donc y − √(y² + 1) < 0. Or t = eᵘ > 0.') },
     ] }, ...lines.slice(4)];
   }
   const judge = { kind: 'solset', v: 'u', subst: { t: 'e^u' }, params: { y: 'ℝ' } };
   return linesItem({
-    skill: AR, level, prompt: `Établis la formule de argsh : résous ${MT('sinh(u)=y', { vars: ['u'] })} en u, pour y ∈ ℝ.`,
+    skill: AR, level, prompt: t('Établis la formule de argsh : résous {a} en u, pour y ∈ ℝ.', { a: MT('sinh(u)=y', { vars: ['u'] }) }),
     start: 'sinh(u)=y', judge: withMenus(judge, level, 'sinh(u)=y', lines, AR_CHOICES), mode: modeOf(level), script,
     declares: { vars: ['u', 't', 'y'] },
-    hints: H('Écris sinh avec les exponentielles, multiplie par 2eᵘ et pose t = eᵘ > 0.', 't² − 2yt − 1 = 0 : t = y ± √(…)', MT(lines[3].math, { vars: ['t', 'y'] })),
+    hints: H(t('Écris sinh avec les exponentielles, multiplie par 2eᵘ et pose t = eᵘ > 0.'), 't² − 2yt − 1 = 0 : t = y ± √(…)', MT(lines[3].math, { vars: ['t', 'y'] })),
     subgoals: AR_SUB, keys: [...KEYS, 'letters'], tapActions: level === 3 ? 'steps' : null,
     key: `${AR}:argsh:${level}`, exam: examOf(opts),
   });
@@ -1445,27 +1446,27 @@ function arArgsh(level, rng, opts) {
 
 function arArgch(level, rng, opts) {
   const lines = [
-    E('(e^u+e^(-u))/2=y', 'Définition de cosh', 'def', 'def'),
-    E('e^(2u)-2ye^u+1=0', 'Multiplier par 2eᵘ', 'def', 'mult'),
-    E('t^2-2yt+1=0', 'Posons t = eᵘ, avec u ≥ 0 : t ≥ 1', 'solve', 'subst'),
-    E('t=y+sqrt(y^2-1) ou t=y-sqrt(y^2-1)', 'Trinôme : Δ/4 = y² − 1 ≥ 0', 'solve', 'solve'),
-    E('t=y+sqrt(y^2-1)', 'Le produit des racines vaut 1 : y − √(y² − 1) ≤ 1 donne u ≤ 0', 'sort', 'sort'),
-    E('u=ln(y+sqrt(y^2-1))', 'Revenir à u', 'inverse', 'back'),
+    E('(e^u+e^(-u))/2=y', t('Définition de cosh'), 'def', 'def'),
+    E('e^(2u)-2ye^u+1=0', t('Multiplier par 2eᵘ'), 'def', 'mult'),
+    E('t^2-2yt+1=0', t('Posons t = eᵘ, avec u ≥ 0 : t ≥ 1'), 'solve', 'subst'),
+    E('t=y+sqrt(y^2-1) ou t=y-sqrt(y^2-1)', t('Trinôme : Δ/4 = y² − 1 ≥ 0'), 'solve', 'solve'),
+    E('t=y+sqrt(y^2-1)', t('Le produit des racines vaut 1 : y − √(y² − 1) ≤ 1 donne u ≤ 0'), 'sort', 'sort'),
+    E('u=ln(y+sqrt(y^2-1))', t('Revenir à u'), 'inverse', 'back'),
   ];
   let script = lines;
   if (level <= 2) script = lines.map((l, i) => (i === 3 ? blanked(l, ['sqrt(y^2-1)']) : l));
   if (level === 3) {
-    script = [...lines.slice(0, 4), { kind: 'decision', prompt: 'Quelle racine garder, pour u ≥ 0 ?', options: [
+    script = [...lines.slice(0, 4), { kind: 'decision', prompt: t('Quelle racine garder, pour u ≥ 0 ?'), options: [
       { id: 'plus', label: 't = y + √(y² − 1) ≥ 1', valid: true },
-      { id: 'minus', label: 't = y − √(y² − 1) ≤ 1', valid: false, why: 'Les deux racines ont pour produit 1 : la plus petite est ≤ 1 et donne u = ln t ≤ 0.' },
+      { id: 'minus', label: 't = y − √(y² − 1) ≤ 1', valid: false, why: t('Les deux racines ont pour produit 1 : la plus petite est ≤ 1 et donne u = ln t ≤ 0.') },
     ] }, ...lines.slice(4)];
   }
   const judge = { kind: 'solset', v: 'u', domain: '[0;+∞[', subst: { t: 'e^u' }, params: { y: '[1;+∞[' } };
   return linesItem({
-    skill: AR, level, prompt: `Établis la formule de argch : résous ${MT('cosh(u)=y', { vars: ['u'] })} en u ≥ 0, pour y ≥ 1.`,
+    skill: AR, level, prompt: t('Établis la formule de argch : résous {a} en u ≥ 0, pour y ≥ 1.', { a: MT('cosh(u)=y', { vars: ['u'] }) }),
     start: 'cosh(u)=y', judge: withMenus(judge, level, 'cosh(u)=y', lines, AR_CHOICES), mode: modeOf(level), script,
     declares: { vars: ['u', 't', 'y'] },
-    hints: H('Écris cosh avec les exponentielles, multiplie par 2eᵘ et pose t = eᵘ. Avec u ≥ 0, il faut t ≥ 1.', 't² − 2yt + 1 = 0 : t = y ± √(…)', MT(lines[3].math, { vars: ['t', 'y'] })),
+    hints: H(t('Écris cosh avec les exponentielles, multiplie par 2eᵘ et pose t = eᵘ. Avec u ≥ 0, il faut t ≥ 1.'), 't² − 2yt + 1 = 0 : t = y ± √(…)', MT(lines[3].math, { vars: ['t', 'y'] })),
     subgoals: AR_SUB, keys: [...KEYS, 'letters'], tapActions: level === 3 ? 'steps' : null,
     key: `${AR}:argch:${level}`, exam: examOf(opts),
   });
@@ -1474,16 +1475,16 @@ function arArgch(level, rng, opts) {
 function arArgth(level, rng, opts) {
   const lines = [
     E('(e^(2u)-1)/(e^(2u)+1)=y', 'tanh u = (e²ᵘ − 1)/(e²ᵘ + 1)', 'def'),
-    E('e^(2u)-1=y(e^(2u)+1)', 'Multiplier par e²ᵘ + 1 > 0', 'solve'),
-    E('e^(2u)(1-y)=1+y', 'Regrouper', 'solve'),
-    E('e^(2u)=(1+y)/(1-y)', 'Diviser par 1 − y > 0', 'sort'),
-    E('u=(1/2)ln((1+y)/(1-y))', 'ln, puis diviser par 2', 'inverse'),
+    E('e^(2u)-1=y(e^(2u)+1)', t('Multiplier par e²ᵘ + 1 > 0'), 'solve'),
+    E('e^(2u)(1-y)=1+y', t('Regrouper'), 'solve'),
+    E('e^(2u)=(1+y)/(1-y)', t('Diviser par 1 − y > 0'), 'sort'),
+    E('u=(1/2)ln((1+y)/(1-y))', t('ln, puis diviser par 2'), 'inverse'),
   ];
   return linesItem({
-    skill: AR, level, prompt: `Établis la formule de argth : résous ${MT('tanh(u)=y', { vars: ['u'] })} en u, pour −1 < y < 1.`,
+    skill: AR, level, prompt: t('Établis la formule de argth : résous {a} en u, pour −1 < y < 1.', { a: MT('tanh(u)=y', { vars: ['u'] }) }),
     start: 'tanh(u)=y', judge: { kind: 'solset', v: 'u', params: { y: ']-1;1[' } }, mode: 'free', script: lines,
     declares: { vars: ['u', 'y'] },
-    hints: H('tanh u = (e²ᵘ − 1)/(e²ᵘ + 1) : multiplie par le dénominateur et isole e²ᵘ.', 'e²ᵘ(1 − y) = …', MT(lines[3].math, { vars: ['u', 'y'] })),
+    hints: H(t('tanh u = (e²ᵘ − 1)/(e²ᵘ + 1) : multiplie par le dénominateur et isole e²ᵘ.'), 'e²ᵘ(1 − y) = …', MT(lines[3].math, { vars: ['u', 'y'] })),
     subgoals: AR_SUB, keys: [...KEYS, 'letters'], key: `${AR}:argth:${level}`, exam: examOf(opts),
   });
 }
@@ -1493,17 +1494,17 @@ function arCosh(level, rng, opts) {
   const a = q(k * k + 1, 2 * k);
   const start = `cosh(x)=${N(a)}`;
   const lines = [
-    E(`e^x+e^(-x)=${N(a.mul(2))}`, 'Exponentielles', 'def'),
-    E(`${k}e^(2x)-${k * k + 1}e^x+${k}=0`, `Multiplier par ${k}eˣ`, 'solve'),
-    E(`${k}t^2-${k * k + 1}t+${k}=0`, 'Posons t = eˣ', 'solve'),
-    E(`t=${k} ou t=1/${k}`, 'Résoudre : deux racines > 0', 'sort'),
-    E(`x=-ln(${k}) ou x=ln(${k})`, 'Revenir à x : x = ±argch a', 'inverse'),
+    E(`e^x+e^(-x)=${N(a.mul(2))}`, t('Exponentielles'), 'def'),
+    E(`${k}e^(2x)-${k * k + 1}e^x+${k}=0`, t('Multiplier par {k}eˣ', { k }), 'solve'),
+    E(`${k}t^2-${k * k + 1}t+${k}=0`, t('Posons t = eˣ'), 'solve'),
+    E(`t=${k} ou t=1/${k}`, t('Résoudre : deux racines > 0'), 'sort'),
+    E(`x=-ln(${k}) ou x=ln(${k})`, t('Revenir à x : x = ±argch a'), 'inverse'),
   ];
   return linesItem({
-    skill: AR, level, prompt: `Résous ${MT(start)}.`,
+    skill: AR, level, prompt: t('Résous {a}.', { a: MT(start) }),
     start, judge: { kind: 'solset', v: V, subst: { t: 'e^x' } }, mode: 'free', script: lines,
     declares: { vars: [V, 't'] },
-    hints: H('cosh est paire : si x est solution, −x aussi. Pose t = eˣ.', `${k}t² − ${k * k + 1}t + ${k} = 0`, MT(lines[3].math, { vars: ['t'] })),
+    hints: H(t('cosh est paire : si x est solution, −x aussi. Pose t = eˣ.'), `${k}t² − ${k * k + 1}t + ${k} = 0`, MT(lines[3].math, { vars: ['t'] })),
     subgoals: AR_SUB, keys: KEYS, key: `${AR}:${start}`, exam: examOf(opts),
   });
 }
@@ -1518,13 +1519,13 @@ function arExam(rng, exam) {
   if (exam === 'tf') {
     const one = (v) => ({ q: '∀', v, dom: 'R' });
     const bank = [
-      { s: 'argch(cosh x) = x pour tout réel x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: 'argch(cosh(x))=x', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: 'Faux : argch est à valeurs ≥ 0, argch(cosh(−1)) = 1 ≠ −1.' },
-      { s: 'argsh est impaire.', truth: true, why: 'Vrai : c\'est la réciproque de sinh, qui est impaire.' },
-      { s: 'argth x est défini pour tout réel x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: '-1<x<1', ask: [{ v: 'x', label: 'x =' }], answer: { x: '2' } }, why: 'Faux : tanh prend ses valeurs dans ]−1 ; 1[, argth n\'est défini que là.' },
-      { s: 'cosh(argch y) = y pour tout y ≥ 1.', truth: true, why: 'Vrai : argch est la réciproque de cosh restreint à [0 ; +∞[.' },
+      { s: 'argch(cosh x) = x pour tout réel x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: 'argch(cosh(x))=x', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: t('Faux : argch est à valeurs ≥ 0, argch(cosh(−1)) = 1 ≠ −1.') },
+      { s: 'argsh est impaire.', truth: true, why: t('Vrai : c\'est la réciproque de sinh, qui est impaire.') },
+      { s: 'argth x est défini pour tout réel x.', truth: false, counter: { kind: 'refute', quants: [one('x')], pred: '-1<x<1', ask: [{ v: 'x', label: 'x =' }], answer: { x: '2' } }, why: t('Faux : tanh prend ses valeurs dans ]−1 ; 1[, argth n\'est défini que là.') },
+      { s: 'cosh(argch y) = y pour tout y ≥ 1.', truth: true, why: t('Vrai : argch est la réciproque de cosh restreint à [0 ; +∞[.') },
     ];
     const b = rng.pick(bank);
-    return tfItem({ skill: AR, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    return tfItem({ skill: AR, level: 4, statement: t(b.s), truth: b.truth, counter: b.counter || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const k = rng.int(2, 4);
   const a = q(k * k + 1, 2 * k);
@@ -1535,8 +1536,8 @@ function arExam(rng, exam) {
     { html: MT(`{0;ln(${k})}`), correct: false },
   ]);
   return mcq({
-    skill: AR, level: 4, prompt: `Ensemble des solutions de ${MT(`cosh(x)=${N(a)}`)} :`, options, key: `mcq:cosh=${N(a)}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `t = eˣ : t = ${k} ou t = 1/${k}, deux racines > 0 : x = ±ln ${k}.`, note: '' }],
+    skill: AR, level: 4, prompt: t('Ensemble des solutions de {a} :', { a: MT(`cosh(x)=${N(a)}`) }), options, key: `mcq:cosh=${N(a)}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('t = eˣ : t = {k} ou t = 1/{a}, deux racines > 0 : x = ±ln {b}.', { k, a: k, b: k }), note: '' }],
   }, rng);
 }
 

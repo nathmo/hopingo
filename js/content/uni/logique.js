@@ -25,9 +25,10 @@ import { closedHolds } from '../../cas/sets.js';
 import {
   MM, MT, FM, fr, linesItem, mcq, tfItem, tokensItem, blocksItem, tableItem,
 } from './kit.js';
+import { t } from '../../i18n.js';
 
 const T = (node) => toText(node);
-const esc = (t) => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const esc = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const setText = (S) => toText(setToNode(S));
 const tpl = (line) => (line.blanks.length ? templateOf(line) : line.math);
 const hintLine = (math) => MT(math);
@@ -38,9 +39,9 @@ const hintLine = (math) => MT(math);
 
 const SETS = 'g9-sets';
 const SETS_SUB = [
-  { id: 'solve', label: 'résoudre la condition', skill: 'eq-both-sides' },
-  { id: 'list', label: 'lister les éléments', skill: SETS },
-  { id: 'op', label: 'opérer sur les ensembles', skill: SETS },
+  { id: 'solve', label: t('résoudre la condition'), skill: 'eq-both-sides' },
+  { id: 'list', label: t('lister les éléments'), skill: SETS },
+  { id: 'op', label: t('opérer sur les ensembles'), skill: SETS },
 ];
 
 // {n ∈ ℕ | an + b < c}: lines an < c − b, n < (c − b)/a, then the set.
@@ -55,10 +56,10 @@ function setsLinear(rng) {
   const op = strict ? '<' : '≤';
   const lhs = `${a === 1 ? '' : a}n${b > 0 ? `+${b}` : b < 0 ? `${b}` : ''}`;
   const lines = [];
-  if (b !== 0) lines.push({ math: `${a === 1 ? '' : a}n${op}${cb}`, note: `${b > 0 ? 'Soustraire' : 'Ajouter'} ${Math.abs(b)}`, subgoal: 'solve' });
-  if (a !== 1) lines.push({ math: `n${op}${toText(lit(new Q(cb, a)))}`, note: `Diviser par ${a}`, subgoal: 'solve' });
+  if (b !== 0) lines.push({ math: `${a === 1 ? '' : a}n${op}${cb}`, note: b > 0 ? t('Soustraire {n}', { n: Math.abs(b) }) : t('Ajouter {n}', { n: Math.abs(b) }), subgoal: 'solve' });
+  if (a !== 1) lines.push({ math: `n${op}${toText(lit(new Q(cb, a)))}`, note: t('Diviser par {a}', { a }), subgoal: 'solve' });
   const S = solutionSet(parse(`${lhs}${op}${c}`), { v: 'n', domain: 'N' });
-  lines.push({ math: setText(S), note: 'Garder les entiers naturels', subgoal: 'list' });
+  lines.push({ math: setText(S), note: t('Garder les entiers naturels'), subgoal: 'list' });
   return { start: `{n∈ℕ|${lhs}${op}${c}}`, cond: `${lhs}${op}${c}`, lines, S, v: 'n', domain: 'N', kind: 'linear', bound: lines.length > 1 ? lines[lines.length - 2].math : null };
 }
 
@@ -73,8 +74,8 @@ function setsImage(rng) {
   const S = solutionSet(parse(`{${head}|n∈ℕ∧n≤${m}}`), { v: 'n', domain: 'Z' });
   return {
     start: `{${head}|n∈ℕ∧n≤${m}}`, lines: [
-      { math: `{${items.join(';')}}`, note: 'Remplacer n par 0, 1, 2…', subgoal: 'list' },
-      { math: setText(S), note: 'Calculer', subgoal: 'list' },
+      { math: `{${items.join(';')}}`, note: t('Remplacer n par 0, 1, 2…'), subgoal: 'list' },
+      { math: setText(S), note: t('Calculer'), subgoal: 'list' },
     ], S, v: 'n', domain: 'Z', kind: 'image', head, m,
   };
 }
@@ -86,8 +87,8 @@ function setsSquare(rng) {
   const S = solutionSet(parse(`x^2≤${k}`), { v: 'x', domain: 'Z' });
   return {
     start: `{x∈ℤ|x^2≤${k}}`, lines: [
-      { math: `${-r}≤x≤${r}`, note: `x² ≤ ${k} et x entier : |x| ≤ ${r}`, subgoal: 'solve' },
-      { math: setText(S), note: 'Lister', subgoal: 'list' },
+      { math: `${-r}≤x≤${r}`, note: t('x² ≤ {k} et x entier : |x| ≤ {r}', { k, r }), subgoal: 'solve' },
+      { math: setText(S), note: t('Lister'), subgoal: 'list' },
     ], S, v: 'x', domain: 'Z', kind: 'square', k, r,
   };
 }
@@ -144,25 +145,25 @@ function setsItem(level, rng, opts) {
     });
   }
   const segs = [];
-  let prompt = `Écris en extension ${MT(d.start)}.`;
+  let prompt = t('Écris en extension {S}.', { S: MT(d.start) });
   if (level >= 4 && d.kind === 'linear' && !opts.exam) {
     const op = setsOperation(rng, d.S);
     const opSet = setText(op.R);
-    segs.push({ kind: 'segment', html: `Avec B = ${MT(op.B)}, calcule ${OP_WORD[op.op]}.`, ask: `${OP_WORD[op.op]} =`, start: { math: `A${op.op}B` }, judge: { kind: 'solset', ...op.cfg } });
-    segs.push({ kind: 'eq', math: opSet, note: 'Opérer', subgoal: 'op' });
-    prompt = `Soit A = ${MT(d.start)} et B = ${MT(op.B)}. Écris A en extension, puis calcule ${OP_WORD[op.op]}.`;
+    segs.push({ kind: 'segment', html: t('Avec B = {B}, calcule {op}.', { B: MT(op.B), op: OP_WORD[op.op] }), ask: `${OP_WORD[op.op]} =`, start: { math: `A${op.op}B` }, judge: { kind: 'solset', ...op.cfg } });
+    segs.push({ kind: 'eq', math: opSet, note: t('Opérer'), subgoal: 'op' });
+    prompt = t('Soit A = {A} et B = {B}. Écris A en extension, puis calcule {op}.', { A: MT(d.start), B: MT(op.B), op: OP_WORD[op.op] });
     if (level === 5) {
       const C = `{n∈ℕ|n≤${d.S.parts[d.S.parts.length - 1].lo.x + rng.int(1, 3)}}`;
       const cfg3 = { v: 'n', domain: 'N', sets: { A: setText(d.S), C } };
       const R3 = solutionSet(parse('C∖A'), cfg3);
-      segs.push({ kind: 'segment', html: `Avec C = ${MT(C)}, calcule le complémentaire de A dans C.`, ask: 'C ∖ A =', start: { math: 'C∖A' }, judge: { kind: 'solset', ...cfg3 } });
-      segs.push({ kind: 'eq', math: setText(R3), note: 'Complémentaire C_C(A) = C ∖ A', subgoal: 'op' });
-      prompt = `Soit A = ${MT(d.start)}, B = ${MT(op.B)} et C = ${MT(C)}. Écris A en extension, puis calcule ${OP_WORD[op.op]} et le complémentaire de A dans C.`;
+      segs.push({ kind: 'segment', html: t('Avec C = {C}, calcule le complémentaire de A dans C.', { C: MT(C) }), ask: 'C ∖ A =', start: { math: 'C∖A' }, judge: { kind: 'solset', ...cfg3 } });
+      segs.push({ kind: 'eq', math: setText(R3), note: t('Complémentaire C_C(A) = C ∖ A'), subgoal: 'op' });
+      prompt = t('Soit A = {A}, B = {B} et C = {C}. Écris A en extension, puis calcule {op} et le complémentaire de A dans C.', { A: MT(d.start), B: MT(op.B), C: MT(C), op: OP_WORD[op.op] });
     }
   }
   const firstLine = d.lines[0];
   const hints = [
-    { level: 1, html: d.kind === 'image' ? 'Remplace n par chaque entier permis : les éléments sont les valeurs obtenues, pas les n.' : 'Résous d\'abord la condition, puis garde les entiers permis.' },
+    { level: 1, html: d.kind === 'image' ? t('Remplace n par chaque entier permis : les éléments sont les valeurs obtenues, pas les n.') : t('Résous d\'abord la condition, puis garde les entiers permis.') },
     { level: 2, html: `${hintLine(tpl(blankLine(parse(firstLine.math), [parse(firstLine.math).r ?? parse(firstLine.math)].filter(Boolean))))}` },
     { level: 3, html: hintLine(final) },
   ];
@@ -189,7 +190,7 @@ function setsMcq(rng) {
   add(asSet(pts.slice(1)));
   add(asSet([...pts, pts[pts.length - 1].add(d.kind === 'image' ? pts[1].sub(pts[0]) : 1)]));
   add(asSet(pts.slice(0, -1)));
-  return { ...mcq({ skill: SETS, level: 4, prompt: `Quel est l'ensemble ${MT(d.start)} ?`, options: opts, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 } }, rng) };
+  return { ...mcq({ skill: SETS, level: 4, prompt: t('Quel est l\'ensemble {S} ?', { S: MT(d.start) }), options: opts, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 } }, rng) };
 }
 
 function setsTf(rng) {
@@ -200,20 +201,20 @@ function setsTf(rng) {
     const n = rng.int(2, 5);
     const x = a * n + b;
     return tfItem({
-      skill: SETS, level: 4, statement: `${MT(`{${a}n+${b}|n∈ℕ}`)} contient ${x}.`, truth: true, key: `contains:${a}:${b}:${x}`,
-      explanation: `Vrai : n = ${n} donne ${a}·${n} + ${b} = ${x}.`, exam: { format: 'tf', points: 1 },
+      skill: SETS, level: 4, statement: t('{S} contient {x}.', { S: MT(`{${a}n+${b}|n∈ℕ}`), x }), truth: true, key: `contains:${a}:${b}:${x}`,
+      explanation: t('Vrai : n = {n} donne {a}·{n} + {b} = {x}.', { n, a, b, x }), exam: { format: 'tf', points: 1 },
     });
   }
   const laws = [
-    { s: 'A∖B=B∖A', truth: false, counter: { A: '{1}', B: '∅' }, why: 'Avec A = {1} et B = ∅ : A ∖ B = {1}, mais B ∖ A = ∅.' },
-    { s: 'A∪B=A∩B', truth: false, counter: { A: '{1}', B: '∅' }, why: 'Avec A = {1} et B = ∅ : A ∪ B = {1}, mais A ∩ B = ∅.' },
-    { s: '(A∪B)∖B=A', truth: false, counter: { A: '{1}', B: '{1}' }, why: 'Avec A = B = {1} : (A ∪ B) ∖ B = ∅, mais A = {1}.' },
-    { s: 'A∖(A∖B)=A∩B', truth: true, why: 'Vrai : enlever de A ce qui n\'est pas dans B, c\'est garder ce qui est dans les deux.' },
-    { s: '(A∩B)∪(A∖B)=A', truth: true, why: 'Vrai : chaque élément de A est dans B ou n\'y est pas.' },
+    { s: 'A∖B=B∖A', truth: false, counter: { A: '{1}', B: '∅' }, why: t('Avec A = {1} et B = ∅ : A ∖ B = {1}, mais B ∖ A = ∅.') },
+    { s: 'A∪B=A∩B', truth: false, counter: { A: '{1}', B: '∅' }, why: t('Avec A = {1} et B = ∅ : A ∪ B = {1}, mais A ∩ B = ∅.') },
+    { s: '(A∪B)∖B=A', truth: false, counter: { A: '{1}', B: '{1}' }, why: t('Avec A = B = {1} : (A ∪ B) ∖ B = ∅, mais A = {1}.') },
+    { s: 'A∖(A∖B)=A∩B', truth: true, why: t('Vrai : enlever de A ce qui n\'est pas dans B, c\'est garder ce qui est dans les deux.') },
+    { s: '(A∩B)∪(A∖B)=A', truth: true, why: t('Vrai : chaque élément de A est dans B ou n\'y est pas.') },
   ];
   const L = rng.pick(laws.filter((l) => (kind === 'law' ? l.truth : !l.truth)));
   return tfItem({
-    skill: SETS, level: 4, statement: `Pour tous ensembles A et B : ${MT(L.s)}.`, truth: L.truth, key: `law:${L.s}`,
+    skill: SETS, level: 4, statement: t('Pour tous ensembles A et B : {S}.', { S: MT(L.s) }), truth: L.truth, key: `law:${L.s}`,
     counter: L.truth ? null : {
       kind: 'refute', quants: [{ q: '∀', v: 'A', dom: 'sets' }, { q: '∀', v: 'B', dom: 'sets' }], pred: L.s,
       ask: [{ v: 'A', label: 'A =', keys: ['set'] }, { v: 'B', label: 'B =', keys: ['set'] }], answer: L.counter,
@@ -228,10 +229,10 @@ function setsTf(rng) {
 
 const INTER = 'g9-intervals';
 const INTER_SUB = [
-  { id: 'abs', label: 'ôter la valeur absolue', skill: 'g1-abs-eq' },
-  { id: 'solve', label: 'isoler x', skill: INTER },
-  { id: 'translate', label: 'traduire en intervalles', skill: INTER },
-  { id: 'op', label: 'intersecter ou réunir', skill: SETS },
+  { id: 'abs', label: t('ôter la valeur absolue'), skill: 'g1-abs-eq' },
+  { id: 'solve', label: t('isoler x'), skill: INTER },
+  { id: 'translate', label: t('traduire en intervalles'), skill: INTER },
+  { id: 'op', label: t('intersecter ou réunir'), skill: SETS },
 ];
 const RCFG = { v: 'x', domain: 'R' };
 
@@ -255,8 +256,8 @@ const INTERVAL_TEMPLATES = {
     const [a, c, b] = distinct(rng, 3);
     const start = `${bt(a)}<x≤${bt(b)}∧x≥${bt(c)}`;
     return { start, lines: [
-      { math: `]${bt(a)};${bt(b)}]∩[${bt(c)};+∞[`, note: 'Traduire en intervalles', subgoal: 'translate' },
-      { math: setText(solutionSet(parse(start), RCFG)), note: 'Intersecter', subgoal: 'op' },
+      { math: `]${bt(a)};${bt(b)}]∩[${bt(c)};+∞[`, note: t('Traduire en intervalles'), subgoal: 'translate' },
+      { math: setText(solutionSet(parse(start), RCFG)), note: t('Intersecter'), subgoal: 'op' },
     ] };
   },
   // x < a ∨ x ≥ b
@@ -264,7 +265,7 @@ const INTERVAL_TEMPLATES = {
     const [a, b] = distinct(rng, 2);
     const start = `x<${bt(a)}∨x≥${bt(b)}`;
     return { start, lines: [
-      { math: `]-∞;${bt(a)}[∪[${bt(b)};+∞[`, note: 'Traduire : « ou » donne ∪', subgoal: 'translate' },
+      { math: `]-∞;${bt(a)}[∪[${bt(b)};+∞[`, note: t('Traduire : « ou » donne ∪'), subgoal: 'translate' },
     ] };
   },
   // ¬(a ≤ x < b)
@@ -272,8 +273,8 @@ const INTERVAL_TEMPLATES = {
     const [a, b] = distinct(rng, 2);
     const start = `¬(${bt(a)}≤x<${bt(b)})`;
     return { start, lines: [
-      { math: `x<${bt(a)}∨x≥${bt(b)}`, note: 'Nier : « non (a ≤ x < b) » donne « x < a ou x ≥ b »', subgoal: 'solve' },
-      { math: `]-∞;${bt(a)}[∪[${bt(b)};+∞[`, note: 'Traduire en intervalles', subgoal: 'translate' },
+      { math: `x<${bt(a)}∨x≥${bt(b)}`, note: t('Nier : « non (a ≤ x < b) » donne « x < a ou x ≥ b »'), subgoal: 'solve' },
+      { math: `]-∞;${bt(a)}[∪[${bt(b)};+∞[`, note: t('Traduire en intervalles'), subgoal: 'translate' },
     ] };
   },
   // |x − m| < r ∧ x ≥ c, with m − r < c < m + r
@@ -284,10 +285,10 @@ const INTERVAL_TEMPLATES = {
     const xm = m === 0 ? 'x' : `x${m > 0 ? '-' : '+'}${Math.abs(m)}`;
     const start = `|${xm}|<${r}∧x≥${c}`;
     return { start, lines: [
-      { math: `${-r}<${xm}<${r}∧x≥${c}`, note: 'Ôter la valeur absolue', subgoal: 'abs' },
-      ...(m === 0 ? [] : [{ math: `${m - r}<x<${m + r}∧x≥${c}`, note: `Isoler x : ${m > 0 ? 'ajouter' : 'soustraire'} ${Math.abs(m)}`, subgoal: 'solve' }]),
-      { math: `]${m - r};${m + r}[∩[${c};+∞[`, note: 'Traduire en intervalles', subgoal: 'translate' },
-      { math: setText(solutionSet(parse(start), RCFG)), note: 'Intersecter', subgoal: 'op' },
+      { math: `${-r}<${xm}<${r}∧x≥${c}`, note: t('Ôter la valeur absolue'), subgoal: 'abs' },
+      ...(m === 0 ? [] : [{ math: `${m - r}<x<${m + r}∧x≥${c}`, note: m > 0 ? t('Isoler x : ajouter {n}', { n: Math.abs(m) }) : t('Isoler x : soustraire {n}', { n: Math.abs(m) }), subgoal: 'solve' }]),
+      { math: `]${m - r};${m + r}[∩[${c};+∞[`, note: t('Traduire en intervalles'), subgoal: 'translate' },
+      { math: setText(solutionSet(parse(start), RCFG)), note: t('Intersecter'), subgoal: 'op' },
     ] };
   },
   // |x − m| ≤ r ∧ ¬(x < c) ∧ x ≠ d (level 5)
@@ -299,9 +300,9 @@ const INTERVAL_TEMPLATES = {
     const xm = m === 0 ? 'x' : `x${m > 0 ? '-' : '+'}${Math.abs(m)}`;
     const start = `|${xm}|≤${r}∧¬(x<${c})∧x≠${dd}`;
     return { start, lines: [
-      { math: `${m - r}≤x≤${m + r}∧x≥${c}∧x≠${dd}`, note: 'Ôter la valeur absolue, nier x < c', subgoal: 'abs' },
-      { math: `[${m - r};${m + r}]∩[${c};+∞[∖{${dd}}`, note: 'Traduire en ensembles', subgoal: 'translate' },
-      { math: setText(solutionSet(parse(start), RCFG)), note: 'Calculer', subgoal: 'op' },
+      { math: `${m - r}≤x≤${m + r}∧x≥${c}∧x≠${dd}`, note: t('Ôter la valeur absolue, nier x < c'), subgoal: 'abs' },
+      { math: `[${m - r};${m + r}]∩[${c};+∞[∖{${dd}}`, note: t('Traduire en ensembles'), subgoal: 'translate' },
+      { math: setText(solutionSet(parse(start), RCFG)), note: t('Calculer'), subgoal: 'op' },
     ] };
   },
   // a < x ≤ b (level 2)
@@ -309,7 +310,7 @@ const INTERVAL_TEMPLATES = {
     const [a, b] = distinct(rng, 2);
     const kind = rng.pick(['chain', 'chain', 'ge', 'lt']);
     const start = kind === 'chain' ? `${bt(a)}<x≤${bt(b)}` : kind === 'ge' ? `x≥${bt(a)}` : `x<${bt(b)}`;
-    return { start, lines: [{ math: setText(solutionSet(parse(start), RCFG)), note: 'Traduire en intervalle', subgoal: 'translate' }] };
+    return { start, lines: [{ math: setText(solutionSet(parse(start), RCFG)), note: t('Traduire en intervalle'), subgoal: 'translate' }] };
   },
 };
 const INTER_BY_LEVEL = { 2: ['simple'], 3: ['andChain', 'notRange', 'absAnd'], 4: ['andChain', 'notRange', 'absAnd', 'orSplit'], 5: ['three', 'absAnd'] };
@@ -335,10 +336,10 @@ function interItem(level, rng, opts) {
   const firstNode = parse(first);
   const hole = firstNode.t === 'setop' ? firstNode.r : firstNode.t === 'logic' ? firstNode.r : null;
   return linesItem({
-    skill: INTER, level, prompt: `Écris l'ensemble des réels x tels que ${MT(d.start)} à l'aide d'intervalles.`,
+    skill: INTER, level, prompt: t('Écris l\'ensemble des réels x tels que {S} à l\'aide d\'intervalles.', { S: MT(d.start) }),
     start: d.start, judge: { kind: 'solset', ...RCFG }, mode, script,
     hints: [
-      { level: 1, html: 'Écris chaque condition comme un intervalle : « et » donne ∩, « ou » donne ∪. Un crochet tourné vers le nombre l\'inclut.' },
+      { level: 1, html: t('Écris chaque condition comme un intervalle : « et » donne ∩, « ou » donne ∪. Un crochet tourné vers le nombre l\'inclut.') },
       { level: 2, html: hole ? MT(tpl(blankLine(firstNode, [hole]))) : MT(first) },
       { level: 3, html: MT(final) },
     ],
@@ -353,13 +354,13 @@ function bracketMcq(rng, level, exam = false) {
   const right = solutionSet(parse(d.start), RCFG);
   const options = [{ html: MM(setToNode(right)), correct: true }];
   const seen = [right];
-  for (const t of rng.shuffle(trapAnswers('solset', parse(d.start), { kind: 'solset', ...RCFG }))) {
+  for (const tr of rng.shuffle(trapAnswers('solset', parse(d.start), { kind: 'solset', ...RCFG }))) {
     if (options.length >= 4) break;
     let S;
-    try { S = solutionSet(t.node, RCFG); } catch { continue; }
+    try { S = solutionSet(tr.node, RCFG); } catch { continue; }
     if (seen.some((x) => setEqual(x, S))) continue;
     seen.push(S);
-    options.push({ html: MM(setToNode(S)), correct: false, rule: t.rule });
+    options.push({ html: MM(setToNode(S)), correct: false, rule: tr.rule });
   }
   // Each bound turned, if the traps gave too few options.
   for (const p of right.parts) for (const side of ['lo', 'hi']) {
@@ -372,7 +373,7 @@ function bracketMcq(rng, level, exam = false) {
   const bothTurned = { parts: right.parts.map((q) => ({ ...q, loC: Number.isFinite(q.lo.x) ? !q.loC : false, hiC: Number.isFinite(q.hi.x) ? !q.hiC : false })) };
   if (options.length < 4 && !seen.some((x) => setEqual(x, bothTurned))) options.push({ html: MM(setToNode(bothTurned)), correct: false, rule: 'g9_bracket' });
   return mcq({
-    skill: INTER, level, prompt: `Quel ensemble décrit les réels x tels que ${MT(d.start)} ?`, options, key: `mcq:${d.start}`,
+    skill: INTER, level, prompt: t('Quel ensemble décrit les réels x tels que {S} ?', { S: MT(d.start) }), options, key: `mcq:${d.start}`,
     solution: d.lines.map((l) => ({ html: MT(l.math), note: l.note })), exam,
   }, rng);
 }
@@ -388,10 +389,10 @@ function interTf(rng) {
     skill: INTER, level: 4, statement: MT(`${lhs}=${claim}`), truth, key: `${lhs}=${claim}`,
     counter: truth ? null : {
       kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: `x∈${lhs}⇔x∈${claim}`,
-      ask: [{ v: 'x', label: 'Un réel dans un seul des deux ensembles : x =', keys: ['calc'] }], answer: { x: bt(a) },
+      ask: [{ v: 'x', label: t('Un réel dans un seul des deux ensembles : x ='), keys: ['calc'] }], answer: { x: bt(a) },
     },
     ruleIfTrue: truth ? null : 'g9_bracket',
-    explanation: `Le complémentaire de ]${fr(bt(a))} ; ${fr(bt(b))}] contient ${fr(bt(a))} (qui n'est pas dans ]${fr(bt(a))} ; …]) et pas ${fr(bt(b))} : c'est ${MT(right)}.`,
+    explanation: t('Le complémentaire de ]{a} ; {b}] contient {a} (qui n\'est pas dans ]{a} ; …]) et pas {b} : c\'est {R}.', { a: fr(bt(a)), b: fr(bt(b)), R: MT(right) }),
     exam: { format: 'tf', points: 1 },
   });
 }
@@ -449,7 +450,8 @@ function negSteps(f, lex, opts) {
   return out;
 }
 
-function stepNote(prev) {
+// The note of a step: [French key, vars] (the key also tells the subgoal).
+function stepNoteKey(prev) {
   let note = null;
   walkF(prev, (n) => {
     if (note) return false;
@@ -457,11 +459,12 @@ function stepNote(prev) {
     const e = strip(n.e);
     // ¬P on a letter stays as it is: it is not a step.
     if (e.t === 'atom' && !/[<>=≤≥≠∈]|est /.test(e.key)) return true;
-    note = e.t === 'q' ? `Franchir ${e.q}${e.bind.text}` : e.t === 'imp' ? 'Nier l\'implication : A ∧ ¬B' : e.t === 'and' || e.t === 'or' ? 'De Morgan' : e.t === 'not' ? 'Double négation' : 'Nier le morceau';
+    note = e.t === 'q' ? ['Franchir {q}', { q: `${e.q}${e.bind.text}` }] : [e.t === 'imp' ? 'Nier l\'implication : A ∧ ¬B' : e.t === 'and' || e.t === 'or' ? 'De Morgan' : e.t === 'not' ? 'Double négation' : 'Nier le morceau'];
     return false;
   });
-  return note ?? 'Faire entrer ¬';
+  return note ?? ['Faire entrer ¬'];
 }
+const stepNote = (prev) => t(...stepNoteKey(prev));
 
 // Pieces: the formula's own, plus decoys (strict negations, negated
 // restrictions) so the palette does not give the answer away.
@@ -473,7 +476,7 @@ function swapIn(text, table) {
 }
 function paletteOf(pieces, binds, { decoys = true } = {}) {
   const out = [];
-  const push = (t) => { if (t && !out.includes(t)) out.push(t); };
+  const push = (x) => { if (x && !out.includes(x)) out.push(x); };
   for (const b of binds) push(b);
   for (const p of pieces) {
     push(p.text);
@@ -485,9 +488,9 @@ function paletteOf(pieces, binds, { decoys = true } = {}) {
 }
 const piecesOf = (palette, explicit = []) => {
   const out = [];
-  for (const t of palette) {
-    const p = explicit.find((x) => x.text === t || x.neg === t);
-    const piece = p ?? { text: t };
+  for (const s of palette) {
+    const p = explicit.find((x) => x.text === s || x.neg === s);
+    const piece = p ?? { text: s };
     if (!out.some((q) => q.text === piece.text)) out.push(piece);
   }
   return out;
@@ -499,9 +502,9 @@ const P = (text, cfg) => parseFormula(text, lexFor(cfg));
 // The binds and the body of « ∀ε > 0 ∃δ > 0, body » (« x, y ∈ I » is one bind).
 const PAIR = 'x, y ∈ I';
 function splitQ(S) {
-  const t = S.replace(PAIR, '§');
-  const binds = [...t.matchAll(/[∀∃]([^∀∃,]+?)(?=\s*[∀∃,])/g)].map((m) => m[1].trim().replace('§', PAIR));
-  const body = t.slice(t.lastIndexOf(', ') + 2).replace('§', PAIR);
+  const u = S.replace(PAIR, '§');
+  const binds = [...u.matchAll(/[∀∃]([^∀∃,]+?)(?=\s*[∀∃,])/g)].map((m) => m[1].trim().replace('§', PAIR));
+  const body = u.slice(u.lastIndexOf(', ') + 2).replace('§', PAIR);
   return { binds, body };
 }
 
@@ -530,13 +533,13 @@ function connLines(start, target, withImp) {
   const f = P(start, PQ);
   const steps = negSteps(f, lex, { merge: false });
   const out = steps.map((g, i) => ({ math: fText(g, PQ), note: stepNote(i ? steps[i - 1] : f), subgoal: 'push' }));
-  if (withImp) out.push({ math: target, note: 'Reconnaître l\'implication : ¬A ∨ B ≡ A ⇒ B', subgoal: 'imp' });
+  if (withImp) out.push({ math: target, note: t('Reconnaître l\'implication : ¬A ∨ B ≡ A ⇒ B'), subgoal: 'imp' });
   return out;
 }
 
 const CONN_SUB = [
-  { id: 'push', label: 'faire entrer la négation', skill: CONN },
-  { id: 'imp', label: 'reconnaître l\'implication', skill: CONN },
+  { id: 'push', label: t('faire entrer la négation'), skill: CONN },
+  { id: 'imp', label: t('reconnaître l\'implication'), skill: CONN },
 ];
 
 function connLinesItem(level, rng, opts) {
@@ -548,12 +551,12 @@ function connLinesItem(level, rng, opts) {
   const judge = { kind: 'logic', letters: LETTERS, maxSize };
   return linesItem({
     skill: CONN, level,
-    prompt: withImp ? `Montre que ${FM(start, PQ)} ≡ ${FM(target, PQ)}, une règle par ligne.` : `Simplifie ${FM(start, PQ)} : fais entrer la négation, une règle par ligne.`,
+    prompt: withImp ? t('Montre que {A} ≡ {B}, une règle par ligne.', { A: FM(start, PQ), B: FM(target, PQ) }) : t('Simplifie {A} : fais entrer la négation, une règle par ligne.', { A: FM(start, PQ) }),
     start, judge, mode: level === 3 ? 'tap' : 'free',
     script: lines.map((l) => ({ kind: 'eq', ...l })),
     hints: [
-      { level: 1, html: 'Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A.' },
-      { level: 2, html: `Première ligne : ${FM(lines[0].math, PQ)}` },
+      { level: 1, html: t('Fais entrer la négation dans la parenthèse : ∧ devient ∨, ∨ devient ∧, et ¬¬A = A.') },
+      { level: 2, html: t('Première ligne : {l}', { l: FM(lines[0].math, PQ) }) },
       { level: 3, html: FM(lines[lines.length - 1].math, PQ) },
     ],
     subgoals: CONN_SUB, keys: ['logic'], tapActions: level === 3 ? 'logic' : null,
@@ -568,27 +571,27 @@ function truthTable(level, rng) {
   const V = (b) => (b ? 'V' : 'F');
   const rows = envs.map(([p, q], i) => ({
     id: `r${i}`, label: '', env: { P: p, Q: q },
-    cells: [{ given: V(p) }, { given: V(q) }, ...cols.map(() => ({ input: true, kind: 'tf' }))],
+    cells: [{ given: t(V(p)) }, { given: t(V(q)) }, ...cols.map(() => ({ input: true, kind: 'tf' }))],
   }));
   const answers = {};
   for (const r of rows) answers[r.id] = [null, null, ...cols.map((c) => V(truthOf(P(c, PQ), r.env)))];
   const then = level === 2 ? mcq({
-    skill: CONN, level: 2, prompt: 'La dernière colonne est la table de…',
+    skill: CONN, level: 2, prompt: t('La dernière colonne est la table de…'),
     options: [{ html: FM('P⇔Q', PQ), correct: true }, { html: FM('P∧Q', PQ), correct: false }, { html: FM('P∨Q', PQ), correct: false }, { html: FM('P⇒Q', PQ), correct: false }],
-    key: 'iff', solution: [{ html: 'P ⇔ Q est vrai quand P et Q ont la même valeur : c\'est (P ⇒ Q) ∧ (Q ⇒ P).', note: '' }],
+    key: 'iff', solution: [{ html: t('P ⇔ Q est vrai quand P et Q ont la même valeur : c\'est (P ⇒ Q) ∧ (Q ⇒ P).'), note: '' }],
   }, rng) : null;
   const last = cols.length + 1;
   return tableItem({
-    skill: CONN, level, prompt: `Complète la table de vérité${cols.length > 1 ? '' : ` de ${FM(cols[0], PQ)}`} (V = vrai, F = faux).`,
+    skill: CONN, level, prompt: cols.length > 1 ? t('Complète la table de vérité (V = vrai, F = faux).') : t('Complète la table de vérité de {f} (V = vrai, F = faux).', { f: FM(cols[0], PQ) }),
     table: { cols: ['P', 'Q', ...cols.map((c) => FM(c, PQ))], rows },
     phi: { kind: 'truth', letters: ['P', 'Q'], columns: [null, null, ...cols] },
     answers, then, key: cols.join('|'),
     hints: [
-      { level: 1, html: 'P ⇒ Q est faux seulement quand P est vrai et Q faux. P ∧ Q : vrai seulement si les deux le sont. P ∨ Q : faux seulement si les deux sont faux.' },
-      { level: 2, html: 'Ligne P = V, Q = F : P ⇒ Q vaut F.' },
-      { level: 3, html: `Dernière colonne : ${rows.map((r) => answers[r.id][last]).join(', ')}.` },
+      { level: 1, html: t('P ⇒ Q est faux seulement quand P est vrai et Q faux. P ∧ Q : vrai seulement si les deux le sont. P ∨ Q : faux seulement si les deux sont faux.') },
+      { level: 2, html: t('Ligne P = V, Q = F : P ⇒ Q vaut F.') },
+      { level: 3, html: t('Dernière colonne : {v}.', { v: rows.map((r) => t(answers[r.id][last])).join(', ') }) },
     ],
-    solution: rows.map((r) => ({ html: `P = ${V(r.env.P)}, Q = ${V(r.env.Q)} : ${cols.map((c, j) => `${FM(c, PQ)} = ${answers[r.id][2 + j]}`).join(' ; ')}`, note: '' })),
+    solution: rows.map((r) => ({ html: `P = ${t(V(r.env.P))}, Q = ${t(V(r.env.Q))} : ${cols.map((c, j) => `${FM(c, PQ)} = ${t(answers[r.id][2 + j])}`).join(' ; ')}`, note: '' })),
   });
 }
 
@@ -609,7 +612,7 @@ function connTf(rng) {
     skill: CONN, level: 4, statement: `${FM(c.left, PQ)} ≡ ${FM(c.right, PQ)}`, truth: c.truth, key: `${c.left}=${c.right}`,
     counter: c.truth ? null : { kind: 'truth', left: c.left, right: c.right, letters: ['P', 'Q'], ask: [{ v: 'P' }, { v: 'Q' }], answer: c.answer },
     ruleIfTrue: c.truth ? null : c.rule,
-    explanation: c.truth ? 'Vrai : les deux formules ont la même table de vérité.' : `Faux : avec P ${c.answer.P ? 'vrai' : 'faux'} et Q ${c.answer.Q ? 'vrai' : 'faux'}, les deux côtés n'ont pas la même valeur.`,
+    explanation: c.truth ? t('Vrai : les deux formules ont la même table de vérité.') : t(`Faux : avec P ${c.answer.P ? 'vrai' : 'faux'} et Q ${c.answer.Q ? 'vrai' : 'faux'}, les deux côtés n'ont pas la même valeur.`),
     exam: { format: 'tf', points: 1 },
   });
 }
@@ -625,11 +628,11 @@ function connMcq(rng) {
     shown.push(g);
     options.push({ html: FM(fText(g, PQ), PQ), correct: false, rule });
   };
-  for (const t of trapAnswers('logic', f, { kind: 'logic', letters: LETTERS })) tryAdd(t.node, t.rule);
+  for (const tr of trapAnswers('logic', f, { kind: 'logic', letters: LETTERS })) tryAdd(tr.node, tr.rule);
   for (const w of ['P∧Q', 'P∨Q', '¬P∧Q', 'P∨¬Q', '¬P⇒Q']) tryAdd(P(w, PQ), null);
   return mcq({
-    skill: CONN, level: 4, prompt: `Quelle formule est équivalente à ${FM(start, PQ)} ?`, options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `${FM(start, PQ)} ≡ ${FM(fText(right, PQ), PQ)}`, note: 'Faire entrer la négation' }],
+    skill: CONN, level: 4, prompt: t('Quelle formule est équivalente à {f} ?', { f: FM(start, PQ) }), options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: `${FM(start, PQ)} ≡ ${FM(fText(right, PQ), PQ)}`, note: t('Faire entrer la négation') }],
   }, rng);
 }
 
@@ -652,11 +655,11 @@ function implBank(rng) {
   const k = rng.pick([2, 3, 5]);
   const a = rng.int(1, 5);
   return [
-    { id: 'mult', bind: 'n ∈ ℤ', A: { text: `n² est multiple de ${k}`, neg: `n² n'est pas multiple de ${k}` }, B: { text: `n est multiple de ${k}`, neg: `n n'est pas multiple de ${k}` }, sentence: `si n² est multiple de ${k}, alors n est multiple de ${k}` },
-    { id: 'pair', bind: 'n ∈ ℤ', A: { text: 'n² est pair', neg: 'n² est impair' }, B: { text: 'n est pair', neg: 'n est impair' }, sentence: 'si n² est pair, alors n est pair' },
-    { id: 'sq', bind: 'x ∈ ℝ', A: { text: `x² > ${a * a}` }, B: { text: `x > ${a}` }, sentence: `si x² > ${a * a}, alors x > ${a}` },
-    { id: 'sq2', bind: 'x ∈ ℝ', A: { text: `x > ${a}` }, B: { text: `x² > ${a * a}` }, sentence: `si x > ${a}, alors x² > ${a * a}` },
-    { id: 'sets', bind: 'A, B, C ⊂ ℕ', A: { text: 'A ∩ C = B ∩ C' }, B: { text: 'A = B' }, sentence: 'si A ∩ C = B ∩ C, alors A = B' },
+    { id: 'mult', bind: 'n ∈ ℤ', A: { text: `n² est multiple de ${k}`, neg: `n² n'est pas multiple de ${k}` }, B: { text: `n est multiple de ${k}`, neg: `n n'est pas multiple de ${k}` }, sentence: t('si n² est multiple de {k}, alors n est multiple de {k}', { k }) },
+    { id: 'pair', bind: 'n ∈ ℤ', A: { text: 'n² est pair', neg: 'n² est impair' }, B: { text: 'n est pair', neg: 'n est impair' }, sentence: t('si n² est pair, alors n est pair') },
+    { id: 'sq', bind: 'x ∈ ℝ', A: { text: `x² > ${a * a}` }, B: { text: `x > ${a}` }, sentence: t('si x² > {a2}, alors x > {a}', { a2: a * a, a }) },
+    { id: 'sq2', bind: 'x ∈ ℝ', A: { text: `x > ${a}` }, B: { text: `x² > ${a * a}` }, sentence: t('si x > {a}, alors x² > {a2}', { a, a2: a * a }) },
+    { id: 'sets', bind: 'A, B, C ⊂ ℕ', A: { text: 'A ∩ C = B ∩ C' }, B: { text: 'A = B' }, sentence: t('si A ∩ C = B ∩ C, alors A = B') },
   ];
 }
 
@@ -675,10 +678,20 @@ function implForms(I, withQ) {
   };
 }
 
+// French keys, translated where shown (t(TASK[task].hint)).
 const TASK = {
-  contra: { word: 'la contraposée', hint: 'On nie les deux côtés et on les échange : ¬B ⇒ ¬A.' },
-  converse: { word: 'la réciproque', hint: 'On échange les deux côtés : B ⇒ A.' },
-  neg: { word: 'la négation', hint: 'Une implication est fausse quand A est vrai et B faux : sa négation est A ∧ ¬B. Le ∀ devient ∃.' },
+  contra: {
+    word: 'la contraposée', hint: 'On nie les deux côtés et on les échange : ¬B ⇒ ¬A.',
+    ask: 'Écris la contraposée de l\'énoncé {S}.', askSentence: 'Écris la contraposée de l\'énoncé {S} (« {sentence} »).', which: 'Laquelle est la contraposée de {S} ?',
+  },
+  converse: {
+    word: 'la réciproque', hint: 'On échange les deux côtés : B ⇒ A.',
+    ask: 'Écris la réciproque de l\'énoncé {S}.', askSentence: 'Écris la réciproque de l\'énoncé {S} (« {sentence} »).', which: 'Laquelle est la réciproque de {S} ?',
+  },
+  neg: {
+    word: 'la négation', hint: 'Une implication est fausse quand A est vrai et B faux : sa négation est A ∧ ¬B. Le ∀ devient ∃.',
+    ask: 'Écris la négation de l\'énoncé {S}.', askSentence: 'Écris la négation de l\'énoncé {S} (« {sentence} »).', which: 'Laquelle est la négation de {S} ?',
+  },
 };
 
 function implPieces(I, withQ, decoys) {
@@ -705,16 +718,16 @@ function implTokens(level, rng, opts = {}) {
   const target = F[task];
   return tokensItem({
     skill: IMPL, level,
-    prompt: `Écris ${TASK[task].word} de l'énoncé ${FM(F.S, cfg)}${withQ ? '' : ` (« ${I.sentence} »)`}.`,
+    prompt: withQ ? t(TASK[task].ask, { S: FM(F.S, cfg) }) : t(TASK[task].askSentence, { S: FM(F.S, cfg), sentence: I.sentence }),
     pieces, palette, target, start: task === 'neg' ? `¬(${F.S})` : F.S, sides: task === 'neg' ? null : sidesOf(target, cfg), task,
     hints: [
-      { level: 1, html: TASK[task].hint },
+      { level: 1, html: t(TASK[task].hint) },
       { level: 2, html: task === 'neg' ? `${withQ ? `∃${I.bind}, ` : ''}${I.A.text} ∧ …` : `… ⇒ ${task === 'contra' ? negText(I.A) : I.A.text}` },
       { level: 3, html: FM(target, cfg) },
     ],
     noHints: level === 5 || !!opts.exam,
     baits: task === 'neg' ? ['g9_neg_implication'] : ['g9_converse_contra'],
-    solution: [{ html: FM(target, cfg), note: TASK[task].word }],
+    solution: [{ html: FM(target, cfg), note: t(TASK[task].word) }],
     key: `${I.id}:${task}:${withQ}:${I.A.text}`, exam: opts.exam ? { format: opts.exam, points: 2 } : false,
   });
 }
@@ -735,8 +748,8 @@ function implMcq(rng, level = 1, exam = false) {
       { html: FM(`${all}${I.A.text} ∧ ${negText(I.B)}`, cfg), correct: false, rule: 'g9_neg_one_quant' },
       { html: FM(`${some}${I.A.text} ⇒ ${negText(I.B)}`, cfg), correct: false, rule: 'g9_neg_implication' }];
   return mcq({
-    skill: IMPL, level, prompt: `Laquelle est ${TASK[task].word} de ${FM(F.S, cfg)} ?`, options, key: `mcq:${I.id}:${task}:${withQ}`, exam,
-    solution: [{ html: FM(F[task], cfg), note: TASK[task].hint }],
+    skill: IMPL, level, prompt: t(TASK[task].which, { S: FM(F.S, cfg) }), options, key: `mcq:${I.id}:${task}:${withQ}`, exam,
+    solution: [{ html: FM(F[task], cfg), note: t(TASK[task].hint) }],
   }, rng);
 }
 
@@ -744,15 +757,15 @@ function implTf(rng) {
   const a = rng.int(2, 5);
   if (rng.chance(0.4)) {
     return tfItem({
-      skill: IMPL, level: 4, statement: `« ∀x ∈ ℝ, x > ${a} ⇒ x² > ${a * a} » est vraie. Sa contraposée est donc vraie aussi.`, truth: true,
-      key: `contra:${a}`, explanation: 'Vrai : la contraposée est équivalente à l\'implication.', exam: { format: 'tf', points: 1 },
+      skill: IMPL, level: 4, statement: t('« ∀x ∈ ℝ, x > {a} ⇒ x² > {a2} » est vraie. Sa contraposée est donc vraie aussi.', { a, a2: a * a }), truth: true,
+      key: `contra:${a}`, explanation: t('Vrai : la contraposée est équivalente à l\'implication.'), exam: { format: 'tf', points: 1 },
     });
   }
   return tfItem({
-    skill: IMPL, level: 4, statement: `« ∀x ∈ ℝ, x > ${a} ⇒ x² > ${a * a} » est vraie. Sa réciproque « ∀x ∈ ℝ, x² > ${a * a} ⇒ x > ${a} » est donc vraie aussi.`,
+    skill: IMPL, level: 4, statement: t('« ∀x ∈ ℝ, x > {a} ⇒ x² > {a2} » est vraie. Sa réciproque « ∀x ∈ ℝ, x² > {a2} ⇒ x > {a} » est donc vraie aussi.', { a, a2: a * a }),
     truth: false, key: `conv:${a}`, ruleIfTrue: 'g9_converse_contra',
-    counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: `x^2>${a * a}⇒x>${a}`, hyp: `x^2>${a * a}`, ask: [{ v: 'x', label: 'Contre-exemple à la réciproque : x =' }], answer: { x: String(-a - 1) } },
-    explanation: `Faux : x = ${-a - 1} vérifie x² > ${a * a} mais pas x > ${a}. La réciproque d'une implication vraie peut être fausse.`,
+    counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: `x^2>${a * a}⇒x>${a}`, hyp: `x^2>${a * a}`, ask: [{ v: 'x', label: t('Contre-exemple à la réciproque : x =') }], answer: { x: String(-a - 1) } },
+    explanation: t('Faux : x = {x} vérifie x² > {a2} mais pas x > {a}. La réciproque d\'une implication vraie peut être fausse.', { x: -a - 1, a2: a * a, a }),
     exam: { format: 'tf', points: 1 },
   });
 }
@@ -808,21 +821,21 @@ function finiteTf(d, which, level, rng, opts = {}) {
   if (!truth) {
     if (ae) {
       const x = d.A.find((xx, i) => d.tab[i].every((v) => !v));
-      counter = { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: d.A }, { q: '∃', v: 'y', dom: d.A }], pred: d.pred, ask: [{ v: 'x', label: 'Un x pour lequel aucun y ne marche : x =' }], answer: { x: String(x) } };
+      counter = { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: d.A }, { q: '∃', v: 'y', dom: d.A }], pred: d.pred, ask: [{ v: 'x', label: t('Un x pour lequel aucun y ne marche : x =') }], answer: { x: String(x) } };
     } else {
-      counter = { kind: 'refute', quants: [{ q: '∃', v: 'y', dom: d.A }, { q: '∀', v: 'x', dom: d.A }], pred: d.pred, ask: [{ v: 'x', label: 'Un x qui fait échouer chaque y : x =' }], answer: { x: String(d.block) } };
+      counter = { kind: 'refute', quants: [{ q: '∃', v: 'y', dom: d.A }, { q: '∀', v: 'x', dom: d.A }], pred: d.pred, ask: [{ v: 'x', label: t('Un x qui fait échouer chaque y : x =') }], answer: { x: String(d.block) } };
     }
   }
   return tfItem({
     skill: QREAD, level, statement: `A = ${As}. ${FM(statement, cfg)}`, truth, counter,
     ruleIfTrue: !truth && swapped ? 'g9_quant_order' : null, ruleIfFalse: truth && !swapped ? 'g9_quant_order' : null,
     hints: [
-      { level: 1, html: ae ? 'Pour ∀x ∃y : prends chaque x et cherche un y qui marche.' : 'Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois.' },
-      { level: 2, html: `Teste x = ${d.A[d.A.length - 1]} avec le plus petit y.` },
-      { level: 3, html: truth ? 'L\'énoncé est vrai.' : `L'énoncé est faux : x = ${counter.answer.x}.` },
+      { level: 1, html: ae ? t('Pour ∀x ∃y : prends chaque x et cherche un y qui marche.') : t('Pour ∃y ∀x : cherche un seul y qui marche pour tous les x à la fois.') },
+      { level: 2, html: t('Teste x = {x} avec le plus petit y.', { x: d.A[d.A.length - 1] }) },
+      { level: 3, html: truth ? t('L\'énoncé est vrai.') : t('L\'énoncé est faux : x = {x}.', { x: counter.answer.x }) },
     ],
     noHints: level === 5 || !!opts.exam,
-    explanation: d.A.map((x, i) => `x = ${x} : ${d.A.filter((y, j) => d.tab[i][j]).map((y) => `y = ${y}`).join(', ') || 'aucun y'}`).join(' ; '),
+    explanation: d.A.map((x, i) => `x = ${x} : ${d.A.filter((y, j) => d.tab[i][j]).map((y) => `y = ${y}`).join(', ') || t('aucun y')}`).join(' ; '),
     key: `${statement}:${As}`, exam: opts.exam ? { format: opts.exam, points: 1 } : false,
     fallback: !!d.fallback,
   });
@@ -855,18 +868,18 @@ function bankTf(level, rng, opts = {}) {
   const cfg = bankCfg(b.s);
   const counter = b.truth ? null : {
     kind: 'refute', quants: b.quants.map(([q, v, dom]) => ({ q, v, dom })), pred: b.pred,
-    ask: Object.keys(b.answer).map((v) => ({ v, label: `Contre-exemple : ${b.ask}` })), answer: b.answer,
+    ask: Object.keys(b.answer).map((v) => ({ v, label: t('Contre-exemple : {ask}', { ask: t(b.ask) }) })), answer: b.answer,
   };
   return tfItem({
     skill: QREAD, level, statement: FM(b.s, cfg), truth: b.truth, counter, key: b.s,
     ruleIfTrue: b.truth ? null : 'g9_quant_order', ruleIfFalse: b.truth ? 'g9_quant_order' : null,
     hints: [
-      { level: 1, html: '∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x.' },
-      { level: 2, html: b.truth ? 'Essaie de trouver le y (ou le x) qui marche.' : 'Essaie de faire échouer chaque choix possible.' },
-      { level: 3, html: b.truth ? 'Vrai.' : `Faux : ${Object.entries(b.answer).map(([v, t]) => `${v} = ${fr(t)}`).join(', ')}.` },
+      { level: 1, html: t('∀x ∃y : y peut dépendre de x. ∃y ∀x : un même y pour tous les x.') },
+      { level: 2, html: b.truth ? t('Essaie de trouver le y (ou le x) qui marche.') : t('Essaie de faire échouer chaque choix possible.') },
+      { level: 3, html: b.truth ? t('Vrai.') : t('Faux : {c}.', { c: Object.entries(b.answer).map(([v, x]) => `${v} = ${fr(x)}`).join(', ') }) },
     ],
     noHints: level === 5 || !!opts.exam,
-    explanation: b.truth ? 'Vrai.' : `Faux. Contre-exemple : ${Object.entries(b.answer).map(([v, t]) => `${v} = ${fr(t)}`).join(', ')}.`,
+    explanation: b.truth ? t('Vrai.') : t('Faux. Contre-exemple : {c}.', { c: Object.entries(b.answer).map(([v, x]) => `${v} = ${fr(x)}`).join(', ') }),
     exam: opts.exam ? { format: opts.exam, points: 1 } : false,
   });
 }
@@ -878,13 +891,13 @@ function gridTable(rng) {
   const answers = Object.fromEntries(rows.map((r, i) => [r.id, d.tab[i].map(V)]));
   const which = rng.pick(['ae', 'ea']);
   return tableItem({
-    skill: QREAD, level: 1, prompt: `A = {${d.A.join(' ; ')}}. Coche les cases où ${MT(d.pred)} est vraie.`,
+    skill: QREAD, level: 1, prompt: t('A = {A}. Coche les cases où {p} est vraie.', { A: `{${d.A.join(' ; ')}}`, p: MT(d.pred) }),
     table: { cols: d.A.map((y) => `y = ${y}`), rows }, phi: { kind: 'grid', xs: d.A, ys: d.A, pred: d.pred }, answers,
     then: finiteTf(d, which, 1, rng), key: `${d.pred}:${d.A.join()}`,
     hints: [
-      { level: 1, html: 'Remplace x et y par leurs valeurs et calcule.' },
-      { level: 2, html: `Pour x = ${d.A[0]}, y = ${d.A[0]} : ${MT(d.pred.replace(/x/g, `(${d.A[0]})`).replace(/y/g, `(${d.A[0]})`))} ?` },
-      { level: 3, html: rows.map((r, i) => `${r.label} : ${answers[r.id].join(' ')}`).join(' ; ') },
+      { level: 1, html: t('Remplace x et y par leurs valeurs et calcule.') },
+      { level: 2, html: t('Pour x = {x}, y = {x} : {e} ?', { x: d.A[0], e: MT(d.pred.replace(/x/g, `(${d.A[0]})`).replace(/y/g, `(${d.A[0]})`)) }) },
+      { level: 3, html: rows.map((r) => `${r.label} : ${answers[r.id].map((v) => t(v)).join(' ')}`).join(' ; ') },
     ],
     fallback: !!d.fallback,
   });
@@ -900,11 +913,11 @@ const QSENT = [
 
 function sentenceTokens(level, rng) {
   const q = rng.pick(QSENT);
-  const pieces = q.pieces.map((t) => ({ text: t }));
+  const pieces = q.pieces.map((x) => ({ text: x }));
   return tokensItem({
-    skill: QREAD, level, prompt: `Écris avec des quantificateurs : « ${q.phrase} »`, pieces, target: q.target,
+    skill: QREAD, level, prompt: t('Écris avec des quantificateurs : « {p} »', { p: t(q.phrase) }), pieces, target: q.target,
     hints: [
-      { level: 1, html: '« Pour tout » donne ∀, « il existe » donne ∃. Garde l\'ordre de la phrase.' },
+      { level: 1, html: t('« Pour tout » donne ∀, « il existe » donne ∃. Garde l\'ordre de la phrase.') },
       { level: 2, html: `${q.target.slice(0, 1)}…` },
       { level: 3, html: FM(q.target, { pieces }) },
     ],
@@ -915,12 +928,12 @@ function sentenceTokens(level, rng) {
 
 function qreadMcq(rng) {
   const q = rng.pick(QSENT);
-  const pieces = q.pieces.map((t) => ({ text: t }));
+  const pieces = q.pieces.map((x) => ({ text: x }));
   const cfg = { pieces };
   const f = P(q.target, cfg);
   const sw = { t: 'q', q: strip(f.body).q, bind: strip(f.body).bind, body: { t: 'q', q: f.q, bind: f.bind, body: strip(f.body).body } };
   return mcq({
-    skill: QREAD, level: 4, prompt: `Quelle phrase dit la même chose que ${FM(q.target, cfg)} ?`,
+    skill: QREAD, level: 4, prompt: t('Quelle phrase dit la même chose que {f} ?', { f: FM(q.target, cfg) }),
     options: [
       { html: rephrase(f, cfg), correct: true },
       { html: rephrase(sw, cfg), correct: false, rule: 'g9_quant_order' },
@@ -928,7 +941,7 @@ function qreadMcq(rng) {
       { html: rephrase({ ...f, body: { ...strip(f.body), q: flip(strip(f.body).q) } }, cfg), correct: false },
     ].filter((o, i, a) => a.findIndex((x) => x.html === o.html) === i),
     key: `mcq:${q.target}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: q.phrase, note: '' }],
+    solution: [{ html: t(q.phrase), note: '' }],
   }, rng);
 }
 
@@ -941,8 +954,9 @@ function rephrase(f, cfg) {
   const set = (s) => (s === 'ℝ' ? 'réel' : 'entier naturel');
   const word = (q, v, s) => (q === '∀' ? `pour tout ${set(s)} ${v}` : `il existe un ${set(s)} ${v}`);
   const body = formulaText(strip(inner.body), lex);
-  const a = word(f.q, v1, s1);
-  return `${a.charAt(0).toUpperCase()}${a.slice(1)}, ${word(inner.q, v2, s2)}${inner.q === '∃' ? ' tel que' : ','} ${body}.`;
+  // A whole sentence as the key: 'Pour tout réel {v1}, il existe un réel {v2} tel que {body}.'
+  const a = word(f.q, '{v1}', s1);
+  return t(`${a.charAt(0).toUpperCase()}${a.slice(1)}, ${word(inner.q, '{v2}', s2)}${inner.q === '∃' ? ' tel que' : ','} {body}.`, { v1, v2, body });
 }
 
 function qreadItem(level, rng, opts) {
@@ -984,7 +998,7 @@ const DEFS = [
 // Pieces of a definition: binds and atoms as written in the target.
 function defPieces(D, decoys) {
   const texts = [];
-  const add = (t) => { if (!texts.includes(t)) texts.push(t); };
+  const add = (x) => { if (!texts.includes(x)) texts.push(x); };
   const { binds, body } = splitQ(D.target);
   for (const b of binds) add(b);
   for (const part of body.split(/\s*[⇒⇔]\s*/)) add(part.trim());
@@ -997,14 +1011,14 @@ function defTokens(level, rng, opts = {}) {
   const pieces = defPieces(D, level >= 4 || !!opts.exam);
   const cfg = { pieces };
   return tokensItem({
-    skill: QWRITE, level, prompt: `Écris avec des quantificateurs : « ${D.name} ».`, pieces, target: D.target,
+    skill: QWRITE, level, prompt: t('Écris avec des quantificateurs : « {name} ».', { name: t(D.name) }), pieces, target: D.target,
     hints: [
-      { level: 1, html: 'Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu\'elle contrôle.' },
+      { level: 1, html: t('Qui est choisi en premier ? Une borne, un seuil (∃) vient avant les x (∀) qu\'elle contrôle.') },
       { level: 2, html: `${D.target.split(',')[0]}, …` },
       { level: 3, html: FM(D.target, cfg) },
     ],
     noHints: level === 5 || !!opts.exam, baits: ['g9_quant_order'], start: D.target, key: `${D.name}:${level}`,
-    solution: [{ html: FM(D.target, cfg), note: D.name }],
+    solution: [{ html: FM(D.target, cfg), note: t(D.name) }],
     exam: opts.exam ? { format: opts.exam, points: 1 } : false,
   });
 }
@@ -1017,19 +1031,19 @@ function defBlocks(level, rng) {
   const cfg = { pieces: defPieces(D, true) };
   const blocks = parts.map((p, i) => ({
     id: `q${i}`, html: `<span class="blk-math">${p}</span>`, needs: i ? [`q${i - 1}`] : [],
-    orderRule: i ? 'g9_quant_order' : null, earlyWhy: i ? `Pas encore : « ${p} » dépend de ce qui est choisi avant.` : undefined,
+    orderRule: i ? 'g9_quant_order' : null, earlyWhy: i ? t('Pas encore : « {p} » dépend de ce qui est choisi avant.', { p }) : undefined,
   }));
-  blocks.push({ id: 'body', html: `<span class="blk-math">, ${body}</span>`, needs: [`q${parts.length - 1}`], earlyWhy: 'Place d\'abord tous les quantificateurs.' });
+  blocks.push({ id: 'body', html: `<span class="blk-math">, ${body}</span>`, needs: [`q${parts.length - 1}`], earlyWhy: t('Place d\'abord tous les quantificateurs.') });
   blocks[0].earlyWhy = undefined;
   // The decoy: a quantifier of the wrong kind (∀M for ∃M).
   const first = parts[0];
   const decoy = D.decoys.find((x) => /^[∀∃]/.test(x)) ?? `${first[0] === '∀' ? '∃' : '∀'}${first.slice(1)}`;
-  blocks.push({ id: 'd1', html: `<span class="blk-math">${decoy}</span>`, needs: [], distractor: 'g9_quant_order', why: 'Ce quantificateur ne donne pas la bonne définition : qui est choisi, et pour combien de valeurs ?' });
+  blocks.push({ id: 'd1', html: `<span class="blk-math">${decoy}</span>`, needs: [], distractor: 'g9_quant_order', why: t('Ce quantificateur ne donne pas la bonne définition : qui est choisi, et pour combien de valeurs ?') });
   return blocksItem({
-    skill: QWRITE, level, mode: 'define', prompt: `Construis la définition : « ${D.name} ». Touche les morceaux dans l'ordre.`,
+    skill: QWRITE, level, mode: 'define', prompt: t('Construis la définition : « {name} ». Touche les morceaux dans l\'ordre.', { name: t(D.name) }),
     blocks: rng.shuffle(blocks), goal: 'body', order: [...parts.map((_, i) => `q${i}`), 'body'],
     hints: [
-      { level: 1, html: 'Qui est choisi en premier : la borne ou x ?' },
+      { level: 1, html: t('Qui est choisi en premier : la borne ou x ?') },
       { level: 2, html: `${parts[0]} …` },
       { level: 3, html: FM(D.target, cfg) },
     ],
@@ -1050,13 +1064,13 @@ function defMcq(rng, level = 4, exam = { format: 'mcq', points: 1 }) {
   const { body } = splitQ(D.target);
   const parts = body.split(/\s*[⇒⇔]\s*/);
   const last = parts[parts.length - 1];
-  const lhs = (t) => t.split(/[<>=≤≥≠∈∉]/)[0].trim();
+  const lhs = (x) => x.split(/[<>=≤≥≠∈∉]/)[0].trim();
   const decoyBody = D.decoys.find((x) => !/^[∀∃]/.test(x) && lhs(x) === lhs(last));
   if (decoyBody) options.push({ html: FM(D.target.replace(last, decoyBody), cfg), correct: false });
   options.push({ html: FM(fText({ ...f, q: flip(f.q) }, cfg), cfg), correct: false });
   return mcq({
-    skill: QWRITE, level, prompt: `Quelle formule dit « ${D.name} » ?`, options: options.filter((o, i, a) => a.findIndex((x) => x.html === o.html) === i),
-    key: `mcq:${D.name}`, exam, solution: [{ html: FM(D.target, cfg), note: D.name }],
+    skill: QWRITE, level, prompt: t('Quelle formule dit « {name} » ?', { name: t(D.name) }), options: options.filter((o, i, a) => a.findIndex((x) => x.html === o.html) === i),
+    key: `mcq:${D.name}`, exam, solution: [{ html: FM(D.target, cfg), note: t(D.name) }],
   }, rng);
 }
 
@@ -1081,16 +1095,16 @@ function negBank(rng) {
   const uL = L > 0 ? `|u_n − ${L}|` : `|u_n + ${-L}|`;
   const c = rng.int(6, 14);
   return [
-    { id: 'cont', q: 3, imp: true, name: `f est continue en ${a}`, S: `∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − ${a}| < δ ⇒ |f(x) − f(${a})| < ε` },
-    { id: 'lim', q: 3, imp: false, name: `(uₙ) tend vers ${fr(String(L))}`, S: `∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, ${uL} < ε` },
-    { id: 'maj', q: 2, imp: false, name: 'f est majorée', S: '∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M' },
-    { id: 'crois', q: 1, imp: true, name: 'f est croissante sur I', S: '∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y)' },
+    { id: 'cont', q: 3, imp: true, name: t('f est continue en {a}', { a }), S: `∀ε > 0 ∃δ > 0 ∀x ∈ ℝ, |x − ${a}| < δ ⇒ |f(x) − f(${a})| < ε` },
+    { id: 'lim', q: 3, imp: false, name: t('(uₙ) tend vers {L}', { L: fr(String(L)) }), S: `∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, ${uL} < ε` },
+    { id: 'maj', q: 2, imp: false, name: t('f est majorée'), S: '∃M ∈ ℝ ∀x ∈ ℝ, f(x) ≤ M' },
+    { id: 'crois', q: 1, imp: true, name: t('f est croissante sur I'), S: '∀x, y ∈ I, x < y ⇒ f(x) ≤ f(y)' },
     { id: 'fin1', q: 2, imp: false, name: 'A = {1 ; 2 ; 3}', S: `∀x ∈ A ∃y ∈ A, x² + y < ${c}` },
     { id: 'fin2', q: 2, imp: false, name: 'A = {1 ; 2 ; 3}', S: `∃y ∈ A ∀x ∈ A, x + 2y < ${Math.min(c, 9)}` },
     { id: 'sq', q: 1, imp: false, name: '', S: `∀x ∈ ℝ, x² ≥ ${a}` },
     { id: 'par', q: 1, imp: false, name: '', S: '∀n ∈ ℕ, n² + n est pair', explicit: [{ text: 'n² + n est pair', neg: 'n² + n est impair' }] },
-    { id: 'inj', q: 1, imp: true, name: 'f est injective sur I', S: '∀x, y ∈ I, f(x) = f(y) ⇒ x = y' },
-    { id: 'nonmaj', q: 2, imp: false, name: 'f n\'est pas majorée', S: '∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M' },
+    { id: 'inj', q: 1, imp: true, name: t('f est injective sur I'), S: '∀x, y ∈ I, f(x) = f(y) ⇒ x = y' },
+    { id: 'nonmaj', q: 2, imp: false, name: t('f n\'est pas majorée'), S: '∀M ∈ ℝ ∃x ∈ ℝ, f(x) > M' },
   ];
 }
 
@@ -1098,14 +1112,14 @@ function negBank(rng) {
 // and decoys.
 function negPieces(B, decoys) {
   const { binds, body } = splitQ(B.S);
-  const atoms = body.split(/\s*[⇒⇔∧∨]\s*/).map((t) => B.explicit?.find((p) => p.text === t) ?? { text: t });
+  const atoms = body.split(/\s*[⇒⇔∧∨]\s*/).map((x) => B.explicit?.find((p) => p.text === x) ?? { text: x });
   const palette = paletteOf(atoms, binds, { decoys });
   return { palette, pieces: piecesOf(palette, B.explicit || []) };
 }
 
 const NEG_SUB = [
-  { id: 'cross', label: 'franchir les quantificateurs', skill: NEGATE },
-  { id: 'imp', label: 'nier l\'implication', skill: 'g9-implication' },
+  { id: 'cross', label: t('franchir les quantificateurs'), skill: NEGATE },
+  { id: 'imp', label: t('nier l\'implication'), skill: 'g9-implication' },
 ];
 
 function negLines(level, rng, opts = {}) {
@@ -1119,16 +1133,16 @@ function negLines(level, rng, opts = {}) {
   const steps = negSteps(P(start, cfg), lex, { merge: true });
   let prev = P(start, cfg);
   const script = steps.map((g) => {
-    const note = stepNote(prev);
+    const [nk, nv] = stepNoteKey(prev);
     prev = g;
-    return { kind: 'eq', math: fText(g, cfg), note, subgoal: /implication/.test(note) ? 'imp' : 'cross' };
+    return { kind: 'eq', math: fText(g, cfg), note: t(nk, nv), subgoal: /implication/.test(nk) ? 'imp' : 'cross' };
   });
   return linesItem({
-    skill: NEGATE, level, prompt: `Écris la négation de ${FM(B.S, cfg)}${B.name ? ` (« ${B.name} »)` : ''} : fais entrer ¬, un symbole par ligne.`,
+    skill: NEGATE, level, prompt: B.name ? t('Écris la négation de {S} (« {name} ») : fais entrer ¬, un symbole par ligne.', { S: FM(B.S, cfg), name: B.name }) : t('Écris la négation de {S} : fais entrer ¬, un symbole par ligne.', { S: FM(B.S, cfg) }),
     start, judge: { kind: 'logic', pieces }, mode: level === 3 ? 'tap' : 'free', script,
     hints: [
-      { level: 1, html: 'Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée.' },
-      { level: 2, html: `Première ligne : ${FM(script[0].math, cfg)}` },
+      { level: 1, html: t('Un symbole à la fois, de gauche à droite : ∀ devient ∃, ∃ devient ∀, la restriction (ε > 0) reste, et la propriété à la fin est niée.') },
+      { level: 2, html: t('Première ligne : {l}', { l: FM(script[0].math, cfg) }) },
       { level: 3, html: FM(script[script.length - 1].math, cfg) },
     ],
     subgoals: NEG_SUB, keys: ['logic'], tapActions: level === 3 ? 'logic' : null,
@@ -1143,14 +1157,14 @@ function negTokens(level, rng) {
   const cfg = { pieces };
   const target = fText(nnf(P(`¬(${B.S})`, cfg)), cfg);
   return tokensItem({
-    skill: NEGATE, level, prompt: `Écris la négation de ${FM(B.S, cfg)}.`, pieces, palette, target, start: `¬(${B.S})`,
+    skill: NEGATE, level, prompt: t('Écris la négation de {S}.', { S: FM(B.S, cfg) }), pieces, palette, target, start: `¬(${B.S})`,
     hints: [
-      { level: 1, html: 'Chaque ∀ devient ∃, chaque ∃ devient ∀, et la propriété à la fin est niée.' },
+      { level: 1, html: t('Chaque ∀ devient ∃, chaque ∃ devient ∀, et la propriété à la fin est niée.') },
       { level: 2, html: `${target.split(',')[0]}, …` },
       { level: 3, html: FM(target, cfg) },
     ],
     baits: ['g9_neg_one_quant', 'g9_neg_pred_kept', 'g9_neg_strict'], key: B.S,
-    solution: [{ html: FM(target, cfg), note: 'Négation' }],
+    solution: [{ html: FM(target, cfg), note: t('Négation') }],
   });
 }
 
@@ -1165,15 +1179,15 @@ function negNextMcq(rng, level = 1, exam = false) {
   const s2 = negStep(s1, lex);
   const options = [{ html: FM(fText(s2, cfg), cfg), correct: true }];
   const seen = [s2];
-  for (const t of rng.shuffle(trapAnswers('logic', s1, { kind: 'logic', pieces }))) {
+  for (const tr of rng.shuffle(trapAnswers('logic', s1, { kind: 'logic', pieces }))) {
     if (options.length >= 4) break;
-    if (seen.some((x) => equivalentLogic(x, t.node))) continue;
-    seen.push(t.node);
-    options.push({ html: FM(fText(t.node, cfg), cfg), correct: false, rule: t.rule });
+    if (seen.some((x) => equivalentLogic(x, tr.node))) continue;
+    seen.push(tr.node);
+    options.push({ html: FM(fText(tr.node, cfg), cfg), correct: false, rule: tr.rule });
   }
   return mcq({
-    skill: NEGATE, level, prompt: `On nie ${FM(B.S, cfg)}. Première ligne : ${FM(fText(s1, cfg), cfg)}. Quelle est la ligne suivante ?`,
-    options, key: `next:${B.S}`, exam, solution: [{ html: FM(fText(s2, cfg), cfg), note: 'Franchir le quantificateur suivant' }],
+    skill: NEGATE, level, prompt: t('On nie {S}. Première ligne : {l}. Quelle est la ligne suivante ?', { S: FM(B.S, cfg), l: FM(fText(s1, cfg), cfg) }),
+    options, key: `next:${B.S}`, exam, solution: [{ html: FM(fText(s2, cfg), cfg), note: t('Franchir le quantificateur suivant') }],
   }, rng);
 }
 
@@ -1185,16 +1199,16 @@ function negMcq(rng) {
   const right = nnf(f0);
   const options = [{ html: FM(fText(right, cfg), cfg), correct: true }];
   const seen = [right];
-  for (const t of rng.shuffle(trapAnswers('logic', f0, { kind: 'logic', pieces }))) {
+  for (const tr of rng.shuffle(trapAnswers('logic', f0, { kind: 'logic', pieces }))) {
     if (options.length >= 4) break;
-    const g = nnf(t.node);
+    const g = nnf(tr.node);
     if (seen.some((x) => equivalentLogic(x, g))) continue;
     seen.push(g);
-    options.push({ html: FM(fText(g, cfg), cfg), correct: false, rule: t.rule });
+    options.push({ html: FM(fText(g, cfg), cfg), correct: false, rule: tr.rule });
   }
   return mcq({
-    skill: NEGATE, level: 4, prompt: `Quelle est la négation de ${FM(B.S, cfg)} ?`, options, key: `mcq:${B.S}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: FM(fText(right, cfg), cfg), note: 'Négation' }],
+    skill: NEGATE, level: 4, prompt: t('Quelle est la négation de {S} ?', { S: FM(B.S, cfg) }), options, key: `mcq:${B.S}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: FM(fText(right, cfg), cfg), note: t('Négation') }],
   }, rng);
 }
 
@@ -1216,27 +1230,27 @@ function counterBank(rng) {
   const a = rng.int(1, 5);
   const k = rng.pick([11, 17, 41]);
   return [
-    { s: '∀x ∈ ℝ, x² ≥ x', truth: false, quants: [['∀', 'x', 'R']], pred: 'x^2≥x', answer: { x: '1/2' }, why: 'x = 1/2 donne 1/4 < 1/2.' },
-    { s: '∀x ∈ ℝ, √(x²) = x', truth: false, quants: [['∀', 'x', 'R']], pred: '√(x^2)=x', answer: { x: '-1' }, why: 'x = −1 donne √1 = 1 ≠ −1.' },
-    { s: '∀a, b ∈ ℝ, (a + b)² = a² + b²', truth: false, quants: [['∀', 'a', 'R'], ['∀', 'b', 'R']], pred: '(a+b)^2=a^2+b^2', answer: { a: '1', b: '1' }, why: 'a = b = 1 : 4 ≠ 2.' },
-    { s: '∀x > 0, 1/x < 1', truth: false, quants: [['∀', 'x', 'R+']], pred: '1/x<1', answer: { x: '1/2' }, why: 'x = 1/2 donne 2, qui n\'est pas < 1.' },
-    { s: `∀n ∈ ℕ, n² + n + ${k} est premier`, truth: false, composite: { expr: `n^2+n+${k}`, v: 'n' }, answer: { n: String(k - 1) }, why: `n = ${k - 1} donne ${k}², qui n'est pas premier.`, rule: 'g9_proof_by_example', hint: `Cherche un n qui rend n² + n + ${k} divisible par ${k} : par exemple n = ${k}.` },
-    { s: `∀x ∈ ℝ, x² > ${a * a} ⇒ x > ${a}`, truth: false, quants: [['∀', 'x', 'R']], pred: `x^2>${a * a}⇒x>${a}`, hyp: `x^2>${a * a}`, answer: { x: String(-a - 1) }, why: `x = ${-a - 1} : x² = ${(a + 1) ** 2} > ${a * a}, mais x ≤ ${a}.`, imp: true },
-    { s: '∀x ∈ ℝ, x² ≥ x ⇒ x ≥ 1', truth: false, quants: [['∀', 'x', 'R']], pred: 'x^2≥x⇒x≥1', hyp: 'x^2≥x', answer: { x: '-1' }, why: 'x = −1 : 1 ≥ −1, mais −1 < 1.', imp: true },
-    { s: `∀x ∈ ℝ, x < ${a} ⇒ x² < ${a * a}`, truth: false, quants: [['∀', 'x', 'R']], pred: `x<${a}⇒x^2<${a * a}`, hyp: `x<${a}`, answer: { x: String(-a - 1) }, why: `x = ${-a - 1} < ${a}, mais x² = ${(a + 1) ** 2} ≥ ${a * a}.`, imp: true },
-    { s: '∀x ∈ ℝ, x² ≥ 0', truth: true, why: 'Vrai : un carré est toujours positif ou nul.' },
-    { s: '∀x ∈ ℝ, |x| ≥ x', truth: true, why: 'Vrai : |x| = x si x ≥ 0, et |x| > 0 > x sinon.' },
-    { s: '∀a, b ∈ ℝ, (a + b)² = a² + 2ab + b²', truth: true, why: 'Vrai : c\'est une identité remarquable.' },
-    { s: `∀x ∈ ℝ, x > ${a} ⇒ x² > ${a * a}`, truth: true, why: `Vrai : si x > ${a} > 0, alors x² > ${a * a}.`, imp: true },
-    { s: '∀x ∈ ℝ, x² + 1 > 0', truth: true, why: 'Vrai : x² + 1 ≥ 1.' },
+    { s: '∀x ∈ ℝ, x² ≥ x', truth: false, quants: [['∀', 'x', 'R']], pred: 'x^2≥x', answer: { x: '1/2' }, why: t('x = 1/2 donne 1/4 < 1/2.') },
+    { s: '∀x ∈ ℝ, √(x²) = x', truth: false, quants: [['∀', 'x', 'R']], pred: '√(x^2)=x', answer: { x: '-1' }, why: t('x = −1 donne √1 = 1 ≠ −1.') },
+    { s: '∀a, b ∈ ℝ, (a + b)² = a² + b²', truth: false, quants: [['∀', 'a', 'R'], ['∀', 'b', 'R']], pred: '(a+b)^2=a^2+b^2', answer: { a: '1', b: '1' }, why: t('a = b = 1 : 4 ≠ 2.') },
+    { s: '∀x > 0, 1/x < 1', truth: false, quants: [['∀', 'x', 'R+']], pred: '1/x<1', answer: { x: '1/2' }, why: t('x = 1/2 donne 2, qui n\'est pas < 1.') },
+    { s: `∀n ∈ ℕ, n² + n + ${k} est premier`, st: t('∀n ∈ ℕ, n² + n + {k} est premier', { k }), truth: false, composite: { expr: `n^2+n+${k}`, v: 'n' }, answer: { n: String(k - 1) }, why: t('n = {n} donne {k}², qui n\'est pas premier.', { n: k - 1, k }), rule: 'g9_proof_by_example', hint: t('Cherche un n qui rend n² + n + {k} divisible par {k} : par exemple n = {k}.', { k }) },
+    { s: `∀x ∈ ℝ, x² > ${a * a} ⇒ x > ${a}`, truth: false, quants: [['∀', 'x', 'R']], pred: `x^2>${a * a}⇒x>${a}`, hyp: `x^2>${a * a}`, answer: { x: String(-a - 1) }, why: t('x = {x} : x² = {x2} > {a2}, mais x ≤ {a}.', { x: -a - 1, x2: (a + 1) ** 2, a2: a * a, a }), imp: true },
+    { s: '∀x ∈ ℝ, x² ≥ x ⇒ x ≥ 1', truth: false, quants: [['∀', 'x', 'R']], pred: 'x^2≥x⇒x≥1', hyp: 'x^2≥x', answer: { x: '-1' }, why: t('x = −1 : 1 ≥ −1, mais −1 < 1.'), imp: true },
+    { s: `∀x ∈ ℝ, x < ${a} ⇒ x² < ${a * a}`, truth: false, quants: [['∀', 'x', 'R']], pred: `x<${a}⇒x^2<${a * a}`, hyp: `x<${a}`, answer: { x: String(-a - 1) }, why: t('x = {x} < {a}, mais x² = {x2} ≥ {a2}.', { x: -a - 1, a, x2: (a + 1) ** 2, a2: a * a }), imp: true },
+    { s: '∀x ∈ ℝ, x² ≥ 0', truth: true, why: t('Vrai : un carré est toujours positif ou nul.') },
+    { s: '∀x ∈ ℝ, |x| ≥ x', truth: true, why: t('Vrai : |x| = x si x ≥ 0, et |x| > 0 > x sinon.') },
+    { s: '∀a, b ∈ ℝ, (a + b)² = a² + 2ab + b²', truth: true, why: t('Vrai : c\'est une identité remarquable.') },
+    { s: `∀x ∈ ℝ, x > ${a} ⇒ x² > ${a * a}`, truth: true, why: t('Vrai : si x > {a} > 0, alors x² > {a2}.', { a, a2: a * a }), imp: true },
+    { s: '∀x ∈ ℝ, x² + 1 > 0', truth: true, why: t('Vrai : x² + 1 ≥ 1.') },
   ];
 }
 
-const SET_HINT = 'Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}.';
+const SET_HINT = t('Essaie de tout petits ensembles : ∅, {1}, {1 ; 2}.');
 const SETS_COUNTER = [
-  { s: 'Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅', pred: 'A∪B=A⇒B=∅', hyp: 'A∪B=A', answer: { A: '{1}', B: '{1}' }, why: 'A = B = {1} : A ∪ B = A, mais B ≠ ∅.', hint: SET_HINT, imp: true },
-  { s: 'Pour tous ensembles A, B : (A ∪ B) ∖ B = A', pred: '(A∪B)∖B=A', answer: { A: '{1}', B: '{1}' }, why: 'A = B = {1} : (A ∪ B) ∖ B = ∅ ≠ A.', hint: SET_HINT },
-  { s: 'Pour tous ensembles A, B : A ∖ B = B ∖ A', pred: 'A∖B=B∖A', answer: { A: '{1}', B: '∅' }, why: 'A = {1}, B = ∅ : A ∖ B = {1}, B ∖ A = ∅.', hint: SET_HINT },
+  { s: 'Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅', st: t('Pour tous ensembles A, B : A ∪ B = A ⇒ B = ∅'), pred: 'A∪B=A⇒B=∅', hyp: 'A∪B=A', answer: { A: '{1}', B: '{1}' }, why: t('A = B = {1} : A ∪ B = A, mais B ≠ ∅.'), hint: SET_HINT, imp: true },
+  { s: 'Pour tous ensembles A, B : (A ∪ B) ∖ B = A', st: t('Pour tous ensembles A, B : (A ∪ B) ∖ B = A'), pred: '(A∪B)∖B=A', answer: { A: '{1}', B: '{1}' }, why: t('A = B = {1} : (A ∪ B) ∖ B = ∅ ≠ A.'), hint: SET_HINT },
+  { s: 'Pour tous ensembles A, B : A ∖ B = B ∖ A', st: t('Pour tous ensembles A, B : A ∖ B = B ∖ A'), pred: 'A∖B=B∖A', answer: { A: '{1}', B: '∅' }, why: t('A = {1}, B = ∅ : A ∖ B = {1}, B ∖ A = ∅.'), hint: SET_HINT },
 ];
 
 function counterOf(c) {
@@ -1258,16 +1272,16 @@ function counterTf(level, rng, opts = {}) {
     c = rng.pick(pool);
   }
   return tfItem({
-    skill: COUNTER, level, statement: esc(c.s), truth: c.truth, decided: level === 2,
+    skill: COUNTER, level, statement: esc(c.st ?? c.s), truth: c.truth, decided: level === 2,
     counter: c.truth ? null : counterOf(c),
     ruleIfTrue: c.truth ? null : c.rule ?? 'g9_proof_by_example',
     hints: [
-      { level: 1, html: c.imp ? 'Cherche un x qui vérifie l\'hypothèse mais pas la conclusion.' : 'Un seul exemple qui ne marche pas suffit à montrer qu\'un « pour tout » est faux.' },
-      { level: 2, html: c.hint ?? (c.truth ? 'Essaie quelques valeurs : trouves-tu un exemple qui ne marche pas ?' : 'Essaie une valeur négative, ou entre 0 et 1.') },
-      { level: 3, html: c.truth ? esc(c.why) : `${Object.entries(c.answer).map(([v, t]) => `${v} = ${fr(t)}`).join(', ')}` },
+      { level: 1, html: c.imp ? t('Cherche un x qui vérifie l\'hypothèse mais pas la conclusion.') : t('Un seul exemple qui ne marche pas suffit à montrer qu\'un « pour tout » est faux.') },
+      { level: 2, html: c.hint ?? (c.truth ? t('Essaie quelques valeurs : trouves-tu un exemple qui ne marche pas ?') : t('Essaie une valeur négative, ou entre 0 et 1.')) },
+      { level: 3, html: c.truth ? esc(c.why) : `${Object.entries(c.answer).map(([v, x]) => `${v} = ${fr(x)}`).join(', ')}` },
     ],
     noHints: level === 5 || !!opts.exam,
-    explanation: esc(c.truth ? c.why : `Faux : ${c.why}`), key: `${c.s}:${level}`,
+    explanation: esc(c.truth ? c.why : t('Faux : {why}', { why: c.why })), key: `${c.s}:${level}`,
     exam: opts.exam ? { format: opts.exam, points: 1 } : false,
   });
 }
@@ -1284,8 +1298,8 @@ function counterMcq(rng, level = 1, exam = false) {
     { html: `x = ${fr(-a)}`, correct: false, rule: 'g9_counter_not_hyp' },
   ].filter((o, i, all) => all.findIndex((x) => x.html === o.html) === i);
   return mcq({
-    skill: COUNTER, level, prompt: `Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > ${a * a} ⇒ x > ${a} » ?`, options, key: `mcq:${a}:${right}`, exam,
-    solution: [{ html: `x = ${fr(right)} : x² = ${right * right} > ${a * a}, mais x ≤ ${a}. Avec x = ${fr(notHyp)}, l'hypothèse est fausse.`, note: '' }],
+    skill: COUNTER, level, prompt: t('Lequel est un contre-exemple à « ∀x ∈ ℝ, x² > {a2} ⇒ x > {a} » ?', { a2: a * a, a }), options, key: `mcq:${a}:${right}`, exam,
+    solution: [{ html: t('x = {r} : x² = {r2} > {a2}, mais x ≤ {a}. Avec x = {h}, l\'hypothèse est fausse.', { r: fr(right), r2: right * right, a2: a * a, a, h: fr(notHyp) }), note: '' }],
   }, rng);
 }
 
@@ -1309,62 +1323,62 @@ function contraProofs(rng) {
   const p = rng.pick([2, 3]);
   return [
     p === 2 ? {
-      id: 'pair', statement: 'si n² est pair, alors n est pair (n ∈ ℤ)',
+      id: 'pair', statement: t('si n² est pair, alors n est pair (n ∈ ℤ)'),
       steps: [
-        'Montrons la contraposée : si n est impair, alors n² est impair.',
-        'Soit n impair : n = 2k + 1, avec k ∈ ℤ.',
-        'n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1.',
-        'Donc n² est impair.',
-        'La contraposée est vraie, donc l\'énoncé l\'est aussi.',
+        t('Montrons la contraposée : si n est impair, alors n² est impair.'),
+        t('Soit n impair : n = 2k + 1, avec k ∈ ℤ.'),
+        t('n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1.'),
+        t('Donc n² est impair.'),
+        t('La contraposée est vraie, donc l\'énoncé l\'est aussi.'),
       ],
       input: { at: 2, kind: 'expr', vars: ['k'], expect: '(2k+1)^2', mod: 2, rem: 1, ask: 'n² = (2k + 1)² =', answer: '2(2k^2+2k)+1' },
       decoys: [
-        { html: '2² = 4 et 4² = 16 sont pairs, donc c\'est vrai.', rule: 'g9_proof_by_example', why: 'Des exemples ne prouvent pas un « pour tout ».' },
-        { html: 'Soit n pair : n = 2k, donc n² = 4k² est pair.', rule: 'g9_converse_contra', why: 'Tu prouves la réciproque (n pair ⇒ n² pair), pas l\'énoncé.' },
+        { html: t('2² = 4 et 4² = 16 sont pairs, donc c\'est vrai.'), rule: 'g9_proof_by_example', why: t('Des exemples ne prouvent pas un « pour tout ».') },
+        { html: t('Soit n pair : n = 2k, donc n² = 4k² est pair.'), rule: 'g9_converse_contra', why: t('Tu prouves la réciproque (n pair ⇒ n² pair), pas l\'énoncé.') },
       ],
     } : {
-      id: 'mult3', statement: 'si n² est multiple de 3, alors n est multiple de 3 (n ∈ ℤ)',
+      id: 'mult3', statement: t('si n² est multiple de 3, alors n est multiple de 3 (n ∈ ℤ)'),
       steps: [
-        'Montrons la contraposée : si n n\'est pas multiple de 3, alors n² n\'est pas multiple de 3.',
-        'n n\'est pas multiple de 3 : n = 3k + 1 ou n = 3k + 2, avec k ∈ ℤ.',
-        'Si n = 3k + 1 : n² = 9k² + 6k + 1 = 3(3k² + 2k) + 1.',
-        'Si n = 3k + 2 : n² = 9k² + 12k + 4 = 3(3k² + 4k + 1) + 1.',
-        'Dans les deux cas, n² = 3m + 1 : n² n\'est pas multiple de 3.',
-        'La contraposée est vraie, donc l\'énoncé l\'est aussi.',
+        t('Montrons la contraposée : si n n\'est pas multiple de 3, alors n² n\'est pas multiple de 3.'),
+        t('n n\'est pas multiple de 3 : n = 3k + 1 ou n = 3k + 2, avec k ∈ ℤ.'),
+        t('Si n = 3k + 1 : n² = 9k² + 6k + 1 = 3(3k² + 2k) + 1.'),
+        t('Si n = 3k + 2 : n² = 9k² + 12k + 4 = 3(3k² + 4k + 1) + 1.'),
+        t('Dans les deux cas, n² = 3m + 1 : n² n\'est pas multiple de 3.'),
+        t('La contraposée est vraie, donc l\'énoncé l\'est aussi.'),
       ],
       input: { at: 2, kind: 'expr', vars: ['k'], expect: '(3k+1)^2', mod: 3, rem: 1, ask: 'n² = (3k + 1)² =', answer: '3(3k^2+2k)+1' },
       decoys: [
-        { html: '3² = 9 et 6² = 36 sont multiples de 3, donc c\'est vrai.', rule: 'g9_proof_by_example', why: 'Des exemples ne prouvent pas un « pour tout ».' },
-        { html: 'Soit n = 3k : n² = 9k² est multiple de 3.', rule: 'g9_converse_contra', why: 'Tu prouves la réciproque, pas l\'énoncé.' },
+        { html: t('3² = 9 et 6² = 36 sont multiples de 3, donc c\'est vrai.'), rule: 'g9_proof_by_example', why: t('Des exemples ne prouvent pas un « pour tout ».') },
+        { html: t('Soit n = 3k : n² = 9k² est multiple de 3.'), rule: 'g9_converse_contra', why: t('Tu prouves la réciproque, pas l\'énoncé.') },
       ],
     },
     {
-      id: 'sum', statement: 'si n + m est impair, alors n ou m est pair (n, m ∈ ℤ)',
+      id: 'sum', statement: t('si n + m est impair, alors n ou m est pair (n, m ∈ ℤ)'),
       steps: [
-        'Montrons la contraposée : si n et m sont impairs, alors n + m est pair.',
-        'Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.',
-        'n + m = 2k + 2l + 2 = 2(k + l + 1).',
-        'Donc n + m est pair.',
-        'La contraposée est vraie, donc l\'énoncé l\'est aussi.',
+        t('Montrons la contraposée : si n et m sont impairs, alors n + m est pair.'),
+        t('Soit n = 2k + 1 et m = 2l + 1, avec k, l ∈ ℤ.'),
+        t('n + m = 2k + 2l + 2 = 2(k + l + 1).'),
+        t('Donc n + m est pair.'),
+        t('La contraposée est vraie, donc l\'énoncé l\'est aussi.'),
       ],
       input: { at: 2, kind: 'expr', vars: ['k', 'l'], expect: '(2k+1)+(2l+1)', mod: 2, rem: 0, ask: 'n + m = (2k + 1) + (2l + 1) =', answer: '2(k+l+1)' },
       decoys: [
-        { html: '3 + 4 = 7 est impair et 4 est pair, donc c\'est vrai.', rule: 'g9_proof_by_example', why: 'Un exemple ne prouve pas un « pour tout ».' },
-        { html: 'Soit n pair : alors n + m a la parité de m.', rule: 'g9_converse_contra', why: 'Tu supposes la conclusion au lieu de sa négation.' },
+        { html: t('3 + 4 = 7 est impair et 4 est pair, donc c\'est vrai.'), rule: 'g9_proof_by_example', why: t('Un exemple ne prouve pas un « pour tout ».') },
+        { html: t('Soit n pair : alors n + m a la parité de m.'), rule: 'g9_converse_contra', why: t('Tu supposes la conclusion au lieu de sa négation.') },
       ],
     },
     {
-      id: 'abs', statement: 'si x² < 1, alors |x| < 1 (x ∈ ℝ)',
+      id: 'abs', statement: t('si x² < 1, alors |x| < 1 (x ∈ ℝ)'),
       steps: [
-        'Montrons la contraposée : si |x| ≥ 1, alors x² ≥ 1.',
-        'Soit x avec |x| ≥ 1.',
-        'x² = |x|² ≥ 1² = 1, car t ↦ t² est croissante sur [0 ; +∞[.',
-        'Donc x² ≥ 1.',
-        'La contraposée est vraie, donc l\'énoncé l\'est aussi.',
+        t('Montrons la contraposée : si |x| ≥ 1, alors x² ≥ 1.'),
+        t('Soit x avec |x| ≥ 1.'),
+        t('x² = |x|² ≥ 1² = 1, car t ↦ t² est croissante sur [0 ; +∞[.'),
+        t('Donc x² ≥ 1.'),
+        t('La contraposée est vraie, donc l\'énoncé l\'est aussi.'),
       ],
       decoys: [
-        { html: 'x = 1/2 donne x² = 1/4 < 1 et |x| < 1, donc c\'est vrai.', rule: 'g9_proof_by_example', why: 'Un exemple ne prouve pas un « pour tout ».' },
-        { html: 'Soit |x| < 1 : alors x² < 1.', rule: 'g9_converse_contra', why: 'Tu prouves la réciproque, pas l\'énoncé.' },
+        { html: t('x = 1/2 donne x² = 1/4 < 1 et |x| < 1, donc c\'est vrai.'), rule: 'g9_proof_by_example', why: t('Un exemple ne prouve pas un « pour tout ».') },
+        { html: t('Soit |x| < 1 : alors x² < 1.'), rule: 'g9_converse_contra', why: t('Tu prouves la réciproque, pas l\'énoncé.') },
       ],
     },
   ];
@@ -1374,45 +1388,45 @@ function absurdProofs(rng) {
   const p = rng.pick([2, 3, 5, 7]);
   return [
     {
-      id: `sqrt${p}`, statement: `√${p} est irrationnel`,
+      id: `sqrt${p}`, statement: t('√{p} est irrationnel', { p }),
       steps: [
-        `Supposons √${p} = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.`,
-        `Alors a² = ${p}b².`,
-        `${p} divise a², et ${p} est premier, donc ${p} divise a : a = ${p}c.`,
-        `${p * p}c² = ${p}b², donc b² = ${p}c², donc ${p} divise b.`,
-        `${p} divise a et b : contradiction avec pgcd(a, b) = 1.`,
-        `Donc √${p} est irrationnel.`,
+        t('Supposons √{p} = a/b, avec a, b ∈ ℕ* et pgcd(a, b) = 1.', { p }),
+        t('Alors a² = {p}b².', { p }),
+        t('{p} divise a², et {p} est premier, donc {p} divise a : a = {p}c.', { p }),
+        t('{pp}c² = {p}b², donc b² = {p}c², donc {p} divise b.', { p, pp: p * p }),
+        t('{p} divise a et b : contradiction avec pgcd(a, b) = 1.', { p }),
+        t('Donc √{p} est irrationnel.', { p }),
       ],
-      input: { at: 1, kind: 'rel', vars: ['a', 'b'], expect: `a^2=${p}b^2`, ask: `En élevant √${p} = a/b au carré :`, answer: `a^2=${p}b^2` },
+      input: { at: 1, kind: 'rel', vars: ['a', 'b'], expect: `a^2=${p}b^2`, ask: t('En élevant √{p} = a/b au carré :', { p }), answer: `a^2=${p}b^2` },
       decoys: [
-        { html: `Supposons √${p} irrationnel.`, rule: 'g9_absurd_wrong_assumption', why: 'Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.' },
-        { html: `√${p} ≈ ${Math.sqrt(p).toFixed(4).replace('.', ',')}… n'a pas de période visible, donc il est irrationnel.`, rule: 'g9_proof_by_example', why: 'Quelques décimales ne prouvent rien.' },
+        { html: t('Supposons √{p} irrationnel.', { p }), rule: 'g9_absurd_wrong_assumption', why: t('Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.') },
+        { html: t('√{p} ≈ {v}… n\'a pas de période visible, donc il est irrationnel.', { p, v: Math.sqrt(p).toFixed(4).replace('.', ',') }), rule: 'g9_proof_by_example', why: t('Quelques décimales ne prouvent rien.') },
       ],
     },
     {
-      id: 'maxint', statement: 'il n\'existe pas de plus grand entier',
+      id: 'maxint', statement: t('il n\'existe pas de plus grand entier'),
       steps: [
-        'Supposons qu\'il existe un plus grand entier N.',
-        'Alors N + 1 est aussi un entier.',
-        'N + 1 > N : N n\'est pas le plus grand, contradiction.',
-        'Donc il n\'existe pas de plus grand entier.',
+        t('Supposons qu\'il existe un plus grand entier N.'),
+        t('Alors N + 1 est aussi un entier.'),
+        t('N + 1 > N : N n\'est pas le plus grand, contradiction.'),
+        t('Donc il n\'existe pas de plus grand entier.'),
       ],
       decoys: [
-        { html: 'Supposons qu\'il n\'existe pas de plus grand entier.', rule: 'g9_absurd_wrong_assumption', why: 'Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.' },
-        { html: '10, 100 et 1000 ont tous un entier plus grand, donc c\'est vrai.', rule: 'g9_proof_by_example', why: 'Des exemples ne prouvent pas un « pour tout ».' },
+        { html: t('Supposons qu\'il n\'existe pas de plus grand entier.'), rule: 'g9_absurd_wrong_assumption', why: t('Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.') },
+        { html: t('10, 100 et 1000 ont tous un entier plus grand, donc c\'est vrai.'), rule: 'g9_proof_by_example', why: t('Des exemples ne prouvent pas un « pour tout ».') },
       ],
     },
     {
-      id: 'log23', statement: 'log₂ 3 est irrationnel',
+      id: 'log23', statement: t('log₂ 3 est irrationnel'),
       steps: [
-        'Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.',
-        'Alors 2^(a/b) = 3, donc 2^a = 3^b.',
-        '2^a est pair et 3^b est impair : contradiction.',
-        'Donc log₂ 3 est irrationnel.',
+        t('Supposons log₂ 3 = a/b, avec a, b ∈ ℕ*.'),
+        t('Alors 2^(a/b) = 3, donc 2^a = 3^b.'),
+        t('2^a est pair et 3^b est impair : contradiction.'),
+        t('Donc log₂ 3 est irrationnel.'),
       ],
       decoys: [
-        { html: 'Supposons log₂ 3 irrationnel.', rule: 'g9_absurd_wrong_assumption', why: 'Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.' },
-        { html: 'log₂ 3 ≈ 1,585 n\'est pas une fraction simple, donc il est irrationnel.', rule: 'g9_proof_by_example', why: 'Une valeur approchée ne prouve rien.' },
+        { html: t('Supposons log₂ 3 irrationnel.'), rule: 'g9_absurd_wrong_assumption', why: t('Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.') },
+        { html: t('log₂ 3 ≈ 1,585 n\'est pas une fraction simple, donc il est irrationnel.'), rule: 'g9_proof_by_example', why: t('Une valeur approchée ne prouve rien.') },
       ],
     },
   ];
@@ -1420,19 +1434,19 @@ function absurdProofs(rng) {
 
 const DECISIONS = {
   [CONTRA]: (pr) => ({
-    prompt: 'Preuve directe ou par contraposée ?',
+    prompt: t('Preuve directe ou par contraposée ?'),
     options: [
-      { id: 'contra', label: 'Par contraposée', valid: true },
-      { id: 'direct', label: 'Preuve directe', valid: true, quality: 'poor', why: pr.id === 'abs' ? 'Possible, mais la contraposée donne un calcul plus simple.' : 'En partant de l\'hypothèse, on ne sait pas écrire n : la contraposée donne n = 2k + 1, une écriture utile.' },
+      { id: 'contra', label: t('Par contraposée'), valid: true },
+      { id: 'direct', label: t('Preuve directe'), valid: true, quality: 'poor', why: pr.id === 'abs' ? t('Possible, mais la contraposée donne un calcul plus simple.') : t('En partant de l\'hypothèse, on ne sait pas écrire n : la contraposée donne n = 2k + 1, une écriture utile.') },
     ],
   }),
   [ABSURD]: () => ({
-    prompt: 'Que suppose-t-on ?',
+    prompt: t('Que suppose-t-on ?'),
     options: [
-      { id: 'neg', label: 'La négation de l\'énoncé', valid: true },
-      { id: 'stmt', label: 'L\'énoncé lui-même', valid: false, rule: 'g9_absurd_wrong_assumption', why: 'Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.' },
-      { id: 'conv', label: 'La réciproque', valid: false, why: 'La réciproque n\'a rien à voir ici : on suppose la négation.' },
-      { id: 'ex', label: 'Un exemple', valid: false, rule: 'g9_proof_by_example', why: 'Un exemple ne prouve rien.' },
+      { id: 'neg', label: t('La négation de l\'énoncé'), valid: true },
+      { id: 'stmt', label: t('L\'énoncé lui-même'), valid: false, rule: 'g9_absurd_wrong_assumption', why: t('Par l\'absurde, on suppose le contraire de ce qu\'on veut montrer.') },
+      { id: 'conv', label: t('La réciproque'), valid: false, why: t('La réciproque n\'a rien à voir ici : on suppose la négation.') },
+      { id: 'ex', label: t('Un exemple'), valid: false, rule: 'g9_proof_by_example', why: t('Un exemple ne prouve rien.') },
     ],
   }),
 };
@@ -1449,17 +1463,17 @@ function proofBlocks(skill, level, rng, opts = {}) {
   pr.decoys.slice(0, nDecoys).forEach((d, i) => blocks.push({ id: `d${i}`, html: esc(d.html), needs: [], distractor: d.rule, why: d.why }));
   return blocksItem({
     skill, level, mode: withInput ? 'frame' : 'order',
-    prompt: `Montre que ${esc(pr.statement)}. Touche les blocs dans l'ordre de la preuve.`,
+    prompt: t('Montre que {s}. Touche les blocs dans l\'ordre de la preuve.', { s: esc(pr.statement) }),
     blocks: rng.shuffle(blocks), goal: `b${pr.steps.length - 1}`, order: pr.steps.map((_, i) => `b${i}`),
     decision: level >= 3 ? DECISIONS[skill](pr) : null,
     hints: [
-      { level: 1, html: skill === CONTRA ? 'Essaie la contraposée : que veut dire la conclusion niée, en formule ?' : 'Suppose le contraire de ce qu\'on veut montrer.' },
+      { level: 1, html: skill === CONTRA ? t('Essaie la contraposée : que veut dire la conclusion niée, en formule ?') : t('Suppose le contraire de ce qu\'on veut montrer.') },
       { level: 2, html: esc(pr.steps[1]) },
       { level: 3, html: esc(pr.steps[pr.input?.at ?? 2]) },
     ],
     noHints: level === 5 || !!opts.exam,
     key: `${pr.id}:${level}`, exam: opts.exam ? { format: opts.exam, points: 3 } : false,
-    subgoals: skill === CONTRA && pr.input ? [{ id: 'calc', label: 'calculer', skill: 'lit-identities' }] : [],
+    subgoals: skill === CONTRA && pr.input ? [{ id: 'calc', label: t('calculer'), skill: 'lit-identities' }] : [],
   });
 }
 
@@ -1469,7 +1483,7 @@ function proofHoleMcq(skill, pr, rng) {
   const shown = pr.steps.map((s, i) => (i === k ? '<b>…</b>' : esc(s))).map((s) => `<div class="proof-line">${s}</div>`).join('');
   const d = rng.pick(pr.decoys);
   return mcq({
-    skill, level: 1, prompt: `Preuve : ${esc(pr.statement)}.${shown}Quel bloc manque ?`,
+    skill, level: 1, prompt: t('Preuve : {s}.{shown}Quel bloc manque ?', { s: esc(pr.statement), shown }),
     options: [{ html: esc(pr.steps[k]), correct: true }, { html: esc(d.html), correct: false, rule: d.rule }],
     key: `hole:${pr.id}:${k}`, solution: pr.steps.map((s) => ({ html: esc(s), note: '' })),
   }, rng);

@@ -11,6 +11,7 @@
 // checks that js/judges/code.js names them).
 
 import { parse } from '../parse.js';
+import { t } from '../../i18n.js';
 
 function fromCfg(id) {
   return (prev, ctx) => {
@@ -26,101 +27,101 @@ function fromCfg(id) {
 const valueTrap = (id, name, extra = {}) => ({ name, judges: ['value'], transform: fromCfg(id), ...extra });
 
 export const DEFS = {
-  n_bvp_bc_rhs: valueTrap('n_bvp_bc_rhs', 'Conditions aux bords oubliées dans le second membre', {
+  n_bvp_bc_rhs: valueTrap('n_bvp_bc_rhs', t('Conditions aux bords oubliées dans le second membre'), {
     judges: ['value', 'code'],
     code: { skill: 'n-bvp-fd', text: 'rhs[0]', levels: [5] },
     check: { judge: { kind: 'value', expect: '33', form: 'irreducible', ntraps: { n_bvp_bc_rhs: ['1'] }, nctx: { α: '2' } }, prev: '1+2/(1/4)^2', line: '1' },
   }),
-  n_bvp_h2_missing: valueTrap('n_bvp_h2_missing', 'Facteur 1/h² oublié dans la matrice', {
+  n_bvp_h2_missing: valueTrap('n_bvp_h2_missing', t('Facteur 1/h² oublié dans la matrice'), {
     judges: ['value', 'code'],
     code: { skill: 'n-bvp-fd', text: '2', levels: [5] },
     check: { judge: { kind: 'value', expect: '32', form: 'irreducible', ntraps: { n_bvp_h2_missing: ['2'] }, nctx: { h2: '1/16' } }, prev: '2/(1/4)^2', line: '2' },
   }),
   n_spd_semidefinite: {
-    name: 'xᵀAx ≥ 0 pris pour « définie positive »',
+    name: t('xᵀAx ≥ 0 pris pour « définie positive »'),
     judges: [],
     check: { bait: { skill: 'n-bvp-fd', level: 4 } },
   },
-  n_truncation_constant: valueTrap('n_truncation_constant', 'Constante de troncature h²/24 ou h²/6 au lieu de h²/12', {
+  n_truncation_constant: valueTrap('n_truncation_constant', t('Constante de troncature h²/24 ou h²/6 au lieu de h²/12'), {
     check: { judge: { kind: 'value', expect: '1/12', form: 'irreducible', ntraps: { n_truncation_constant: ['1/24', '1/6'] } }, prev: '2×(1/24)', line: '1/24' },
   }),
   n_stability_skipped: {
-    name: 'Convergence tirée de la consistance seule',
+    name: t('Convergence tirée de la consistance seule'),
     judges: [],
     check: { bait: { skill: 'n-bvp-convergence', level: 3 } },
   },
   n_jacobian_vs_F: {
-    name: 'Terme de F mis dans la jacobienne (ou l\'inverse)',
+    name: t('Terme de F mis dans la jacobienne (ou l\'inverse)'),
     judges: ['code'],
     code: { skill: 'n-bvp-newton', text: 'x[i] ** 3 - 1', levels: [1, 3, 5] },
     check: { bait: { skill: 'n-bvp-newton', level: 1 } },
   },
   n_cholesky_tridiag_sq: {
-    name: 'Cholesky tridiagonal : mauvais carré retiré',
+    name: t('Cholesky tridiagonal : mauvais carré retiré'),
     judges: ['code'],
     code: { skill: 'n-bvp-newton', text: 'a[i] * a[i]', levels: [4, 5] },
     check: { bait: { skill: 'n-bvp-newton', level: 5 } },
   },
   n_heat_tau_h: {
-    name: 'Chaleur : τ au lieu de τ/h²',
+    name: t('Chaleur : τ au lieu de τ/h²'),
     judges: ['code', 'value'],
     transform: fromCfg('n_heat_tau_h'),
     code: { skill: 'n-heat-implicit', text: '2 * tau', levels: [1, 2, 4] },
     check: { bait: { skill: 'n-heat-implicit', level: 2 } },
   },
   n_heat_2tau: {
-    name: 'Chaleur : facteur 2 oublié sur la diagonale',
+    name: t('Chaleur : facteur 2 oublié sur la diagonale'),
     judges: ['code', 'value'],
     transform: fromCfg('n_heat_2tau'),
     code: { skill: 'n-heat-implicit', text: 'tau / (h * h)', levels: [1, 2, 4] },
     check: { bait: { skill: 'n-heat-implicit', level: 2 } },
   },
   n_heat_ic_tau: {
-    name: 'Chaleur : condition initiale multipliée par τ',
+    name: t('Chaleur : condition initiale multipliée par τ'),
     judges: ['code'],
     code: { skill: 'n-heat-implicit', text: 'tau * math.sin(math.pi * (i + 1) * h)', levels: [1, 4, 5] },
     check: { bait: { skill: 'n-heat-implicit', level: 1 } },
   },
   n_heat_order_h_tau: {
-    name: 'Ordre lu O(h + τ) au lieu de O(h² + τ)',
+    name: t('Ordre lu O(h + τ) au lieu de O(h² + τ)'),
     judges: [],
     check: { bait: { skill: 'n-heat-implicit', level: 4 } },
   },
   n_cfl_direction: {
-    name: 'Transport : décentrement du mauvais côté',
+    name: t('Transport : décentrement du mauvais côté'),
     judges: ['code'],
     code: { skill: 'n-pde-cfl', text: 'uold[i] * (1 - tau / h) + tau / h * uold[i - 1]', levels: [1, 5] },
     check: { bait: { skill: 'n-pde-cfl', level: 3 } },
   },
-  n_wave_lambda: valueTrap('n_wave_lambda', 'Ondes : λ = τ/h au lieu de τ²/h²', {
+  n_wave_lambda: valueTrap('n_wave_lambda', t('Ondes : λ = τ/h au lieu de τ²/h²'), {
     check: { judge: { kind: 'value', expect: '1/4', form: 'irreducible', ntraps: { n_wave_lambda: ['1/2', '5', '1/20'] } }, prev: '(1/20)^2/(1/10)^2', line: '1/2' },
   }),
   n_weak_space_bc: {
-    name: 'Espace V de la forme faible : mauvaises conditions',
+    name: t('Espace V de la forme faible : mauvaises conditions'),
     judges: [],
     check: { bait: { skill: 'n-fem-hat', level: 1 } },
   },
-  n_hat_derivative: valueTrap('n_hat_derivative', 'Fonction chapeau : pente ou ∫(φ′)² fausse', {
+  n_hat_derivative: valueTrap('n_hat_derivative', t('Fonction chapeau : pente ou ∫(φ′)² fausse'), {
     check: { judge: { kind: 'value', expect: '4', form: 'irreducible', ntraps: { n_hat_derivative: ['2', '8'] } }, prev: '2^2×(1/2)+2^2×(1/2)', line: '2' },
   }),
   n_weak_sign: {
-    name: 'Forme faible : signe de l\'intégration par parties',
+    name: t('Forme faible : signe de l\'intégration par parties'),
     judges: [],
     check: { bait: { skill: 'n-fem-hat', level: 3 } },
   },
   n_kkt_sign: {
-    name: 'KKT : signes des multiplicateurs inversés',
+    name: t('KKT : signes des multiplicateurs inversés'),
     judges: ['equiv'],
     transform: fromCfg('n_kkt_sign'),
     check: { judge: { kind: 'equiv', vars: ['x', 'λ'], domain: { x: [-3, 3], λ: [0, 3] }, target: 'no-prime', ntraps: { n_kkt_sign: ['x-3-λ'] } }, prev: 'd(1/2×(x-3)^2-λ×(1-x), x)', line: 'x-3-λ' },
   },
   n_kkt_complementarity: {
-    name: 'KKT : complémentarité avec la mauvaise contrainte',
+    name: t('KKT : complémentarité avec la mauvaise contrainte'),
     judges: [],
     check: { bait: { skill: 'n-opt-kkt', level: 2 } },
   },
   n_kkt_multiplier_sign: {
-    name: 'KKT : multiplicateur négatif accepté',
+    name: t('KKT : multiplicateur négatif accepté'),
     judges: [],
     check: { bait: { skill: 'n-opt-kkt', level: 3 } },
   },

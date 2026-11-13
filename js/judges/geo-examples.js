@@ -8,6 +8,7 @@
 // part of the modules adds its table in its own file.
 
 import { parseVec, evalVec, floats } from '../cas/vecexpr.js';
+import { t } from '../i18n.js';
 import { WANT as G4A } from './geo-examples-g4a.js';
 import { WANT as G4B } from './geo-examples-g4b.js';
 import { WANT as G10A } from './geo-examples-g10a.js';
@@ -25,18 +26,18 @@ export function readGeo(text) {
 
 export function checkGeo(counter, answers = {}) {
   const want = GEO_WANT[counter.want];
-  if (!want) return { ok: false, message: 'Contre-exemple non vérifiable.' };
+  if (!want) return { ok: false, message: t('Contre-exemple non vérifiable.') };
   const vals = {};
   for (const a of counter.ask || []) {
-    const t = answers[a.v];
-    if (t === undefined || String(t).trim() === '') return { ok: false, message: `Donne ${a.label || a.v}.` };
-    const v = readGeo(t);
-    if (!v) return { ok: false, message: `Je n'arrive pas à lire ${a.label || a.v}.` };
+    const ans = answers[a.v];
+    if (ans === undefined || String(ans).trim() === '') return { ok: false, message: t('Donne {x}.', { x: a.label || a.v }) };
+    const v = readGeo(ans);
+    if (!v) return { ok: false, message: t('Je n\'arrive pas à lire {x}.', { x: a.label || a.v }) };
     vals[a.v] = v;
   }
   let r;
-  try { r = want(vals, counter.params || {}); } catch { r = 'Ces valeurs ne conviennent pas.'; }
-  return r === true ? { ok: true } : { ok: false, message: typeof r === 'string' ? r : 'Ce n\'est pas un contre-exemple.' };
+  try { r = want(vals, counter.params || {}); } catch { r = t('Ces valeurs ne conviennent pas.'); }
+  return r === true ? { ok: true } : { ok: false, message: typeof r === 'string' ? r : t('Ce n\'est pas un contre-exemple.') };
 }
 
 // Tools for the tables.

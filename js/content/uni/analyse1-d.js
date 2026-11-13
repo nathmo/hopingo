@@ -19,6 +19,7 @@ import { toText } from '../../cas/print.js';
 import { MT, mcq } from './kit.js';
 import { q, N, H, uniq, cm, joinSum, Val, E, intItem, examTf } from './analyse1-d-kit.js';
 import { GEN as MORE } from './analyse1-d-more.js';
+import { t } from '../../i18n.js';
 
 const V = 'x';
 const LOCAL = {};
@@ -43,15 +44,15 @@ const tf = (s) => s.replace(/\^\(([^)]*)\)/g, '<sup>$1</sup>');
 
 const DI = 'a1-int-direct';
 const DI_SUB = [
-  { id: 'recognize', label: 'reconnaître u′', skill: 'a1-deriv-rules' },
-  { id: 'prim', label: 'primitive', skill: 'g6-antideriv-usual' },
-  { id: 'eval', label: 'évaluer aux bornes', skill: DI },
+  { id: 'recognize', label: t('reconnaître u′'), skill: 'a1-deriv-rules' },
+  { id: 'prim', label: t('primitive'), skill: 'g6-antideriv-usual' },
+  { id: 'eval', label: t('évaluer aux bornes'), skill: DI },
 ];
 const DI_CHOICES = [
-  { id: 'adjust', label: 'Faire apparaître u′ : ajuster la constante' },
-  { id: 'prim', label: 'Écrire la primitive G(u)' },
-  { id: 'eval', label: 'Évaluer aux bornes' },
-  { id: 'log', label: 'Prendre le Log du dénominateur', rule: 'a1_int_log_of_denominator', why: 'Log|Q| a pour dérivée Q′/Q : le numérateur n\'est pas Q′.' },
+  { id: 'adjust', label: t('Faire apparaître u′ : ajuster la constante') },
+  { id: 'prim', label: t('Écrire la primitive G(u)') },
+  { id: 'eval', label: t('Évaluer aux bornes') },
+  { id: 'log', label: t('Prendre le Log du dénominateur'), rule: 'a1_int_log_of_denominator', why: t('Log|Q| a pour dérivée Q′/Q : le numérateur n\'est pas Q′.') },
 ];
 
 // u: text, w: u′/k (what the integrand shows), k, u² (written), label,
@@ -173,7 +174,7 @@ function diLines(d) {
     return {
       f, F, start: `int(${f},x)`,
       lines: [
-        E(cm(c, `int(${adj},x)`), `u = ${u.label}, u′ = ${u.du} : ajuster la constante`, 'prim', 'adjust', [N(c.n < 0 ? c.neg() : c)], [u.u]),
+        E(cm(c, `int(${adj},x)`), t('u = {label}, u′ = {du} : ajuster la constante', { label: u.label, du: u.du }), 'prim', 'adjust', [N(c.n < 0 ? c.neg() : c)], [u.u]),
         E(`${F}+C`, `∫ ${FORM[G]} = ${G === 'pow' ? 'uʳ⁺¹/(r + 1)' : `${G_NAME[G]} u`}`, 'prim', 'prim', [u.u], [u.u]),
       ],
     };
@@ -187,32 +188,32 @@ function diLines(d) {
   return {
     f, F, val, start: `int(${f},x,${bounds.a},${bounds.b})`,
     lines: [
-      E(cm(c, `int(${adj},x,${bounds.a},${bounds.b})`), `u = ${u.label}, u′ = ${u.du} : ajuster la constante`, 'recognize', 'adjust', [N(c.n < 0 ? c.neg() : c)], [u.u]),
-      E(br, 'Primitive', 'prim', 'prim', [], []),
-      E(val.text(), `Évaluer en ${bounds.b} et en ${bounds.a}`, 'eval', 'eval', [], []),
+      E(cm(c, `int(${adj},x,${bounds.a},${bounds.b})`), t('u = {label}, u′ = {du} : ajuster la constante', { label: u.label, du: u.du }), 'recognize', 'adjust', [N(c.n < 0 ? c.neg() : c)], [u.u]),
+      E(br, t('Primitive'), 'prim', 'prim', [], []),
+      E(val.text(), t('Évaluer en {b} et en {a}', { b: bounds.b, a: bounds.a }), 'eval', 'eval', [], []),
     ],
   };
 }
 
 function diDecision(d) {
   const { G, u } = d;
-  const good = { id: 'direct', label: `Forme ${FORM[G]} avec u = ${u.label}`, valid: true, quality: 'good' };
+  const good = { id: 'direct', label: t('Forme {p1} avec u = {label}', { p1: FORM[G], label: u.label }), valid: true, quality: 'good' };
   const options = [
     good,
-    { id: 'subst', label: `Changement de variable t = ${u.label}, puis dt = ${u.du} dx`, valid: true, quality: 'poor', why: 'Juste, mais c\'est la même méthode écrite plus longuement : u′ est déjà là, la primitive se lit directement.' },
-    { id: 'nofactor', label: `${G === 'pow' ? 'uʳ⁺¹/(r + 1)' : `${G_NAME[G]}(${u.label})`} + C, sans constante devant`, valid: false, rule: 'a1_int_missing_inner_factor', why: `Dérive : il apparaît u′ = ${u.du}, et l'intégrale n'a pas exactement ce facteur. Ajuste la constante.` },
+    { id: 'subst', label: t('Changement de variable t = {label}, puis dt = {du} dx', { label: u.label, du: u.du }), valid: true, quality: 'poor', why: t('Juste, mais c\'est la même méthode écrite plus longuement : u′ est déjà là, la primitive se lit directement.') },
+    { id: 'nofactor', label: t('{p1} + C, sans constante devant', { p1: G === 'pow' ? 'uʳ⁺¹/(r + 1)' : `${G_NAME[G]}(${u.label})` }), valid: false, rule: 'a1_int_missing_inner_factor', why: t('Dérive : il apparaît u′ = {du}, et l\'intégrale n\'a pas exactement ce facteur. Ajuste la constante.', { du: u.du }) },
     G === 'atan'
-      ? { id: 'log', label: `Log(1 + ${u.label === 'x²' ? 'x⁴' : `(${u.label})²`})`, valid: false, rule: 'a1_int_arctg_as_log', why: 'La dérivée de Log(1 + u²) est 2uu′/(1 + u²) : il y aurait un u en trop. Ici, c\'est un Arctg.' }
-      : { id: 'parts', label: 'Intégration par parties', valid: false, why: 'Aucun facteur ne se simplifie en dérivant : la nouvelle intégrale serait plus difficile.' },
+      ? { id: 'log', label: `Log(1 + ${u.label === 'x²' ? 'x⁴' : `(${u.label})²`})`, valid: false, rule: 'a1_int_arctg_as_log', why: t('La dérivée de Log(1 + u²) est 2uu′/(1 + u²) : il y aurait un u en trop. Ici, c\'est un Arctg.') }
+      : { id: 'parts', label: t('Intégration par parties'), valid: false, why: t('Aucun facteur ne se simplifie en dérivant : la nouvelle intégrale serait plus difficile.') },
   ];
-  return { prompt: 'Quelle méthode ?', options, l2: [G === 'atan' ? 'log' : 'nofactor'], taken: `forme ${FORM[G]} avec u = ${u.label}, u′ = ${u.du}` };
+  return { prompt: t('Quelle méthode ?'), options, l2: [G === 'atan' ? 'log' : 'nofactor'], taken: t('forme {p1} avec u = {label}, u′ = {du}', { p1: FORM[G], label: u.label, du: u.du }) };
 }
 
-const DERIV_CHOICES = (base) => [{ id: 'deriv', label: 'Dériver' }, ...base];
+const DERIV_CHOICES = (base) => [{ id: 'deriv', label: t('Dériver') }, ...base];
 // The first part of a primitive item (see intItem): u′, judged by equiv.
 const derivPart = (u, ut, dut, note, dec, choices) => ({
   start: `d(${ut})`, judge: { kind: 'equiv', vars: [V] }, dec, note, choices,
-  lines: [E(dut, `Dériver u = ${u}`, 'recognize', 'deriv')],
+  lines: [E(dut, t('Dériver u = {u}', { u }), 'recognize', 'deriv')],
 });
 
 function diItem(level, rng, opts = {}) {
@@ -224,12 +225,12 @@ function diItem(level, rng, opts = {}) {
   const parts = def
     ? [{ start: L.start, judge: { kind: 'definite', prims }, lines: L.lines, dec, choices: DI_CHOICES }]
     : [
-      derivPart(d.u.label, d.u.u, d.u.dut, `u = ${d.u.label} : sa dérivée apparaît-elle dans l'intégrale ?`, dec, DERIV_CHOICES(DI_CHOICES)),
-      { html: 'L’intégrale', start: L.start, judge: { kind: 'antideriv', v: V, domain: { x: d.u.dom }, prims }, lines: L.lines, choices: DI_CHOICES },
+      derivPart(d.u.label, d.u.u, d.u.dut, t('u = {label} : sa dérivée apparaît-elle dans l\'intégrale ?', { label: d.u.label }), dec, DERIV_CHOICES(DI_CHOICES)),
+      { html: t('L’intégrale'), start: L.start, judge: { kind: 'antideriv', v: V, domain: { x: d.u.dom }, prims }, lines: L.lines, choices: DI_CHOICES },
     ];
   return intItem({
-    skill: DI, prompt: `Calcule ${MT(L.start)}.`, key: L.start, fallback: d.fallback, parts,
-    hints: H(`${d.u.du} est (à une constante près) la dérivée de u = ${d.u.label} : forme ${FORM[d.G]}. Ajuste la constante.`, MT(L.lines[0].math), MT(L.lines[1].math)),
+    skill: DI, prompt: t('Calcule {start}.', { start: MT(L.start) }), key: L.start, fallback: d.fallback, parts,
+    hints: H(t('{du} est (à une constante près) la dérivée de u = {label} : forme {p1}. Ajuste la constante.', { du: d.u.du, label: d.u.label, p1: FORM[d.G] }), MT(L.lines[0].math), MT(L.lines[1].math)),
     subgoals: DI_SUB,
   }, level, rng, opts);
 }
@@ -270,18 +271,18 @@ GEN_ADD(DI, (level, rng, profile, opts = {}) => {
 
 const SU = 'a1-int-subst';
 const SU_SUB = [
-  { id: 'phi', label: 'choisir φ, changer dx et les bornes', skill: SU },
-  { id: 'simplify', label: 'simplifier en t', skill: SU },
-  { id: 'integrate', label: 'intégrer en t', skill: DI },
-  { id: 'back', label: 'revenir à x', skill: SU },
+  { id: 'phi', label: t('choisir φ, changer dx et les bornes'), skill: SU },
+  { id: 'simplify', label: t('simplifier en t'), skill: SU },
+  { id: 'integrate', label: t('intégrer en t'), skill: DI },
+  { id: 'back', label: t('revenir à x'), skill: SU },
 ];
 const SU_CHOICES = (def) => [
-  { id: 'subst', label: def ? 'Remplacer x, dx et les bornes' : 'Remplacer x et dx' },
-  { id: 'simplify', label: 'Simplifier la fraction en t' },
-  { id: 'integrate', label: 'Intégrer en t' },
-  def ? { id: 'eval', label: 'Évaluer aux bornes' } : { id: 'back', label: 'Revenir à x' },
-  def ? { id: 'keep', label: 'Garder les bornes en x', rule: 'a1_subst_bounds_kept', why: 'Les bornes changent avec la variable.' }
-    : { id: 'dt', label: 'Remplacer dx par dt', rule: 'a1_subst_dx_kept', why: 'dx = φ′(t) dt : il y a un facteur.' },
+  { id: 'subst', label: def ? t('Remplacer x, dx et les bornes') : t('Remplacer x et dx') },
+  { id: 'simplify', label: t('Simplifier la fraction en t') },
+  { id: 'integrate', label: t('Intégrer en t') },
+  def ? { id: 'eval', label: t('Évaluer aux bornes') } : { id: 'back', label: t('Revenir à x') },
+  def ? { id: 'keep', label: t('Garder les bornes en x'), rule: 'a1_subst_bounds_kept', why: t('Les bornes changent avec la variable.') }
+    : { id: 'dt', label: t('Remplacer dx par dt'), rule: 'a1_subst_dx_kept', why: t('dx = φ′(t) dt : il y a un facteur.') },
 ];
 
 // The templates. Each gives the integrand, t, x = ψ(t), the lines in t and
@@ -359,37 +360,37 @@ function suItem(level, rng, opts = {}) {
   const start = def ? `int(${T.f},x,${bd.xa},${bd.xb})` : `int(${T.f},x)`;
   const lines = def
     ? [
-      E(`int(${T.inT},t,${bd.ta},${bd.tb})`, 'Remplacer x, dx et les bornes', 'phi', 'subst', [T.dx, { bound: 'lo' }, { bound: 'hi' }], [T.dx, { bound: 'lo' }, { bound: 'hi' }]),
-      E(`int(${T.simple},t,${bd.ta},${bd.tb})`, 'Simplifier', 'simplify', 'simplify'),
-      E(B(T.brT), 'Intégrer en t', 'integrate', 'integrate'),
-      E(T.value().text(), 'Évaluer', 'integrate', 'eval'),
+      E(`int(${T.inT},t,${bd.ta},${bd.tb})`, t('Remplacer x, dx et les bornes'), 'phi', 'subst', [T.dx, { bound: 'lo' }, { bound: 'hi' }], [T.dx, { bound: 'lo' }, { bound: 'hi' }]),
+      E(`int(${T.simple},t,${bd.ta},${bd.tb})`, t('Simplifier'), 'simplify', 'simplify'),
+      E(B(T.brT), t('Intégrer en t'), 'integrate', 'integrate'),
+      E(T.value().text(), t('Évaluer'), 'integrate', 'eval'),
     ]
     : [
-      E(`int(${T.inT},t)`, 'Remplacer x et dx', 'phi', 'subst', [T.dx], [T.dx]),
-      E(`int(${T.simple},t)`, 'Simplifier', 'simplify', 'simplify'),
-      E(`${T.Ft}+C`, 'Intégrer en t', 'integrate', 'integrate'),
-      E(`${T.Fx}+C`, 'Revenir à x', 'back', 'back', [T.root === 'Log x' ? 'ln(x)' : T.t.replace('sqrt', '√')]),
+      E(`int(${T.inT},t)`, t('Remplacer x et dx'), 'phi', 'subst', [T.dx], [T.dx]),
+      E(`int(${T.simple},t)`, t('Simplifier'), 'simplify', 'simplify'),
+      E(`${T.Ft}+C`, t('Intégrer en t'), 'integrate', 'integrate'),
+      E(`${T.Fx}+C`, t('Revenir à x'), 'back', 'back', [T.root === 'Log x' ? 'ln(x)' : T.t.replace('sqrt', '√')]),
     ];
   const judge = def ? { kind: 'definite', change } : { kind: 'antideriv', v: V, domain: { x: T.dom }, subst: { t: T.t }, change };
   const dec = {
-    prompt: 'Quelle méthode ?',
+    prompt: t('Quelle méthode ?'),
     options: [
-      { id: 'subst', label: 'Changement de variable', valid: true, quality: 'good', then: { ask: 't =', expect: T.t, vars: [V], why: `Pose t égal à ce qui gêne : ${T.root}.` } },
-      { id: 'parts', label: `Parties avec ${T.parts}`, valid: true, quality: 'poor', why: 'Juste, mais la nouvelle intégrale n\'est pas plus simple que celle de départ.' },
-      { id: 'dx', label: `Remplacer ${T.root} par t, et dx par dt`, valid: false, rule: 'a1_subst_dx_kept', why: 'dx change aussi : dx = φ′(t) dt.' },
-      { id: 'des', label: 'Décomposer en éléments simples en x', valid: false, why: `Ce n'est pas une fraction rationnelle en x : ${T.root} gêne.` },
+      { id: 'subst', label: t('Changement de variable'), valid: true, quality: 'good', then: { ask: 't =', expect: T.t, vars: [V], why: t('Pose t égal à ce qui gêne : {root}.', { root: T.root }) } },
+      { id: 'parts', label: t('Parties avec {parts}', { parts: T.parts }), valid: true, quality: 'poor', why: t('Juste, mais la nouvelle intégrale n\'est pas plus simple que celle de départ.') },
+      { id: 'dx', label: t('Remplacer {root} par t, et dx par dt', { root: T.root }), valid: false, rule: 'a1_subst_dx_kept', why: t('dx change aussi : dx = φ′(t) dt.') },
+      { id: 'des', label: t('Décomposer en éléments simples en x'), valid: false, why: t('Ce n\'est pas une fraction rationnelle en x : {root} gêne.', { root: T.root }) },
     ],
-    l2: ['dx'], taken: `changement de variable ${T.tl}, dx = ${T.dx.replace('e^t', 'eᵗ')} dt`,
+    l2: ['dx'], taken: t('changement de variable {tl}, dx = {p1} dt', { tl: T.tl, p1: T.dx.replace('e^t', 'eᵗ') }),
   };
   const parts = def
     ? [{ start, judge, lines, dec, choices: SU_CHOICES(def) }]
     : [
-      { start: `d(${T.psi})`, judge: { kind: 'equiv', vars: ['t'], dvar: 't' }, dec, note: `${T.tl} : dx = (${pretty(T.psi.replace('e^t', 'eᵗ'))})′ dt.`, choices: [{ id: 'dx', label: 'Exprimer dx' }, ...SU_CHOICES(def)], lines: [E(T.dx, 'dx/dt', 'phi', 'dx')] },
-      { html: 'L’intégrale', start, judge, lines, choices: SU_CHOICES(def) },
+      { start: `d(${T.psi})`, judge: { kind: 'equiv', vars: ['t'], dvar: 't' }, dec, note: `${T.tl} : dx = (${pretty(T.psi.replace('e^t', 'eᵗ'))})′ dt.`, choices: [{ id: 'dx', label: t('Exprimer dx') }, ...SU_CHOICES(def)], lines: [E(T.dx, 'dx/dt', 'phi', 'dx')] },
+      { html: t('L’intégrale'), start, judge, lines, choices: SU_CHOICES(def) },
     ];
   const it = intItem({
-    skill: SU, prompt: `Calcule ${MT(start)}.`, key: start, points: 3, parts,
-    hints: H(`Pose ${T.tl} ; n'oublie ni dx${def ? ' ni les bornes' : ''}.`, MT(lines[0].math, { vars: [V, 't'] }), MT(lines[1].math, { vars: [V, 't'] })),
+    skill: SU, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 3, parts,
+    hints: H(t('Pose {tl} ; n\'oublie ni dx{p1}.', { tl: T.tl, p1: def ? t(' ni les bornes') : '' }), MT(lines[0].math, { vars: [V, 't'] }), MT(lines[1].math, { vars: [V, 't'] })),
     subgoals: SU_SUB, baits: def ? ['a1_subst_bounds_kept'] : [],
   }, level, rng, opts);
   return it;
@@ -438,7 +439,7 @@ function suMcq(rng) {
         { html: MT(bounds.text()), correct: false, rule: 'a1_subst_bounds_kept' },
         { html: MT(both.text()), correct: false, rule: 'a1_subst_dx_kept' },
       ],
-      solution: [{ html: `${T.tl}, dx = 2t dt ; t va de ${T.bounds.ta.replace('√', '√')} à ${T.bounds.tb} : ${MT(`int(${T.simple},t,${T.bounds.ta},${T.bounds.tb})`, { vars: ['t'] })} = ${MT(right.text())}.`, note: '' }],
+      solution: [{ html: t('{tl}, dx = 2t dt ; t va de {p1} à {tb} : {p2} = {p3}.', { tl: T.tl, p1: T.bounds.ta.replace('√', '√'), tb: T.bounds.tb, p2: MT(`int(${T.simple},t,${T.bounds.ta},${T.bounds.tb})`, { vars: ['t'] }), p3: MT(right.text()) }), note: '' }],
     }, rng);
   }
   return mcq({
@@ -467,18 +468,18 @@ GEN_ADD(SU, (level, rng, profile, opts = {}) => {
 
 const IP = 'a1-int-parts';
 const IP_SUB = [
-  { id: 'formula', label: 'choisir u, appliquer la formule', skill: IP },
-  { id: 'second', label: 'deuxième intégration par parties', skill: IP },
-  { id: 'finish', label: 'intégrer v′ et réduire', skill: DI },
+  { id: 'formula', label: t('choisir u, appliquer la formule'), skill: IP },
+  { id: 'second', label: t('deuxième intégration par parties'), skill: IP },
+  { id: 'finish', label: t('intégrer v′ et réduire'), skill: DI },
 ];
 const IP_CHOICES = [
-  { id: 'formula', label: 'Appliquer la formule uv − ∫u′v' },
-  { id: 'second', label: 'Deuxième intégration par parties' },
-  { id: 'simplify', label: 'Simplifier l\'intégrale restante' },
-  { id: 'solve', label: 'Résoudre en I : l\'intégrale de départ revient' },
-  { id: 'finish', label: 'Intégrer ce qui reste et réduire' },
-  { id: 'eval', label: 'Évaluer aux bornes' },
-  { id: 'plus', label: 'Appliquer uv + ∫u′v', rule: 'a1_ibp_plus', why: '(uv)′ = u′v + uv′, donc ∫uv′ = uv − ∫u′v.' },
+  { id: 'formula', label: t('Appliquer la formule uv − ∫u′v') },
+  { id: 'second', label: t('Deuxième intégration par parties') },
+  { id: 'simplify', label: t('Simplifier l\'intégrale restante') },
+  { id: 'solve', label: t('Résoudre en I : l\'intégrale de départ revient') },
+  { id: 'finish', label: t('Intégrer ce qui reste et réduire') },
+  { id: 'eval', label: t('Évaluer aux bornes') },
+  { id: 'plus', label: t('Appliquer uv + ∫u′v'), rule: 'a1_ibp_plus', why: t('(uv)′ = u′v + uv′, donc ∫uv′ = uv − ∫u′v.') },
 ];
 
 // Polynomials: arrays of Q, c[i] for xⁱ.
@@ -534,16 +535,16 @@ function pexp(P, a, bounds, sq) {
     const u2 = P_scale(dP, q(1, a));
     const c2 = P_d(u2)[0];
     const in2 = cm(c2.div(a), ea);
-    L.push(E(`${brk(uv)}-(${brk(`${wrap(P_text(u2))}×${vv}`)}-int(${in2},x${lo}))`, 'Deuxième intégration par parties', 'second', 'second', [P_text(u2)], [P_text(u2)]));
+    L.push(E(`${brk(uv)}-(${brk(`${wrap(P_text(u2))}×${vv}`)}-int(${in2},x${lo}))`, t('Deuxième intégration par parties'), 'second', 'second', [P_text(u2)], [P_text(u2)]));
   }
   if (!bounds) {
-    L.push(E(`${Ftxt}+C`, 'Intégrer et réduire', 'finish', 'finish'));
+    L.push(E(`${Ftxt}+C`, t('Intégrer et réduire'), 'finish', 'finish'));
     return { f, F: Ftxt, lines: L, u: Pt, du: dPt, dv: ea, dvLabel: pretty(ea), uLabel: pretty(Pt) };
   }
   const val = new Val();
   for (const [x0, s] of [[bounds.xb, 1], [bounds.xa, -1]]) val.exp(P_at(Qx, x0).mul(s), q(a).mul(x0));
-  L.push(E(`bracket(${Ftxt},x${lo})`, 'Intégrer ce qui reste', 'finish', 'finish'));
-  L.push(E(val.text(), 'Évaluer', 'finish', 'eval'));
+  L.push(E(`bracket(${Ftxt},x${lo})`, t('Intégrer ce qui reste'), 'finish', 'finish'));
+  L.push(E(val.text(), t('Évaluer'), 'finish', 'eval'));
   return { f, F: Ftxt, lines: L, val, u: Pt, du: dPt, dv: ea, dvLabel: pretty(ea), uLabel: pretty(Pt), Qx };
 }
 const gcd = (x, y) => (y ? gcd(y, x % y) : Math.abs(x));
@@ -572,7 +573,7 @@ function ptrig(al, be, a, fn, bounds) {
   const lo = bounds ? `,${bounds.a},${bounds.b}` : '';
   const L = [E(`${bounds ? `bracket(${uv},x${lo})` : uv}-int(${I1},x${lo})`, `u = ${pretty(Pt)}, v′ = ${fn === 'sin' ? s : c} : u′ = ${al}, v = ${v}`, 'formula', 'formula', [v], [uv, I1])];
   if (!bounds) {
-    L.push(E(`${F}+C`, 'Intégrer et réduire', 'finish', 'finish'));
+    L.push(E(`${F}+C`, t('Intégrer et réduire'), 'finish', 'finish'));
     return { f, F, lines: L, u: Pt, du: String(al), dv: fn === 'sin' ? s : c, uLabel: pretty(Pt), dvLabel: fn === 'sin' ? s : c };
   }
   // Values at 0, π/2, π, −π: P(x0) has π; sin and cos are 0 or ±1.
@@ -583,8 +584,8 @@ function ptrig(al, be, a, fn, bounds) {
     const [cf, cg] = fn === 'sin' ? [q(-trig('cos', x0), a), q(al * trig('sin', x0), a * a)] : [q(trig('sin', x0), a), q(al * trig('cos', x0), a * a)];
     val.plus(Pv, cf.mul(sg)).rat(cg.mul(sg));
   }
-  L.push(E(`bracket(${F},x${lo})`, 'Intégrer ce qui reste', 'finish', 'finish'));
-  L.push(E(val.text(), 'Évaluer', 'finish', 'eval'));
+  L.push(E(`bracket(${F},x${lo})`, t('Intégrer ce qui reste'), 'finish', 'finish'));
+  L.push(E(val.text(), t('Évaluer'), 'finish', 'eval'));
   return { f, F, lines: L, val, u: Pt, du: String(al), dv: fn === 'sin' ? s : c, uLabel: pretty(Pt), dvLabel: fn === 'sin' ? s : c, P, a, fn };
 }
 
@@ -604,15 +605,15 @@ function xln(n, bounds) {
   ];
   // ∫ 1 dx is not differentiated as x by the judge (a constant integrand):
   // for Log x alone, the next line is the primitive.
-  if (n > 0) L.push(E(`${brk(`${v}×ln(x)`)}-int(${restI},x${lo})`, 'Simplifier', 'formula', 'simplify'));
+  if (n > 0) L.push(E(`${brk(`${v}×ln(x)`)}-int(${restI},x${lo})`, t('Simplifier'), 'formula', 'simplify'));
   if (!bounds) {
-    L.push(E(`${F}+C`, 'Intégrer et réduire', 'finish', 'finish'));
+    L.push(E(`${F}+C`, t('Intégrer et réduire'), 'finish', 'finish'));
     return { f, F, lines: L, u: 'ln(x)', du: '1/x', dv: rest, uLabel: 'Log x', dvLabel: n === 0 ? '1' : pretty(rest), domain: [0.3, 4] };
   }
   // [x^(n+1)/(n+1)·ln x − x^(n+1)/(n+1)²] from 1 to e.
   const val = new Val().exp(q(1, n + 1).sub(q(1, k)), n + 1).rat(q(1, k));
-  L.push(E(`bracket(${F},x${lo})`, 'Intégrer ce qui reste', 'finish', 'finish'));
-  L.push(E(val.text(), 'Évaluer', 'finish', 'eval'));
+  L.push(E(`bracket(${F},x${lo})`, t('Intégrer ce qui reste'), 'finish', 'finish'));
+  L.push(E(val.text(), t('Évaluer'), 'finish', 'eval'));
   return { f, F, lines: L, val, u: 'ln(x)', du: '1/x', dv: rest, uLabel: 'Log x', dvLabel: n === 0 ? '1' : pretty(rest), domain: [0.3, 4] };
 }
 
@@ -636,8 +637,8 @@ function xatan(n, bounds) {
     val = new Val().pi(q(1, 4)).ln(q(-1, 2), 2);
   }
   const f = n === 1 ? 'x×arctan(x)' : 'arctan(x)';
-  if (!bounds) L.push(E(`${F}+C`, 'Intégrer et réduire', 'finish', 'finish'));
-  else { L.push(E(`bracket(${F},x${lo})`, 'Intégrer ce qui reste', 'finish', 'finish')); L.push(E(val.text(), 'Évaluer', 'finish', 'eval')); }
+  if (!bounds) L.push(E(`${F}+C`, t('Intégrer et réduire'), 'finish', 'finish'));
+  else { L.push(E(`bracket(${F},x${lo})`, t('Intégrer ce qui reste'), 'finish', 'finish')); L.push(E(val.text(), t('Évaluer'), 'finish', 'eval')); }
   return { f, F, lines: L, val: bounds ? val : null, u: 'arctan(x)', du: '1/(1+x^2)', dv: n === 1 ? 'x' : '1', uLabel: 'Arctg x', dvLabel: n === 1 ? 'x' : '1', bounds: bounds ? { a: '0', b: '1' } : null };
 }
 
@@ -654,8 +655,8 @@ function loop(b, fn) {
   const F = fn === 'sin' ? `e^x(${s}-${bb}${c})${k === 1 ? '' : `/${k}`}` : `e^x(${c}+${bb}${s})/${k}`;
   const L = [
     E(`e^x×${g}${sg}${bb ? `${bb}×` : ''}int(e^x×${h},x)`, `u = ${g}, v′ = eˣ`, 'formula', 'formula', [], []),
-    E(`e^x×${g}${sg}${bb}(e^x×${h}${fn === 'sin' ? '+' : '-'}${bb ? `${bb}×` : ''}int(e^x×${g},x))`, 'Deuxième intégration par parties : I revient', 'second', 'second'),
-    E(`${F}+C`, `Résoudre en I : ${k}I = …`, 'finish', 'solve'),
+    E(`e^x×${g}${sg}${bb}(e^x×${h}${fn === 'sin' ? '+' : '-'}${bb ? `${bb}×` : ''}int(e^x×${g},x))`, t('Deuxième intégration par parties : I revient'), 'second', 'second'),
+    E(`${F}+C`, t('Résoudre en I : {k}I = …', { k }), 'finish', 'solve'),
   ];
   return { f, F, lines: L, u: g, du: fn === 'sin' ? `${bb}${c}` : `-${bb}${s}`, dv: 'e^x', uLabel: g, dvLabel: 'eˣ' };
 }
@@ -694,13 +695,13 @@ function ipDecision(d) {
   const dv = d.dvLabel;
   const swapOk = d.kind === 'loop';
   const options = [
-    { id: 'ipp', label: 'Intégration par parties', valid: true, quality: 'good', then: { ask: 'u =', expect: d.u, vars: [V], why: 'Prends pour u ce qui se simplifie en dérivant (polynôme, Log, Arctg).' } },
-    { id: 'swap', label: `Parties avec u = ${dv}, v′ = ${u}`, valid: swapOk || d.kind.startsWith('p'), quality: swapOk ? 'good' : 'poor', why: swapOk ? 'Juste aussi : les deux choix font revenir l\'intégrale.' : d.kind.startsWith('p') ? 'Juste, mais le degré du polynôme monte en l\'intégrant : l\'intégrale devient plus difficile.' : `Il faudrait intégrer ${u}, ce qu'on ne sait pas faire directement.` },
-    { id: 'subst', label: `Substitution t = ${u}`, valid: false, why: 'Aucun facteur n\'est la dérivée de l\'autre à une constante près.' },
-    { id: 'split', label: `∫ ${u} · ∫ ${dv}`, valid: false, rule: 'a1_int_product', why: 'La primitive d\'un produit n\'est pas le produit des primitives : dérive-le, tu trouves deux termes.' },
+    { id: 'ipp', label: t('Intégration par parties'), valid: true, quality: 'good', then: { ask: 'u =', expect: d.u, vars: [V], why: t('Prends pour u ce qui se simplifie en dérivant (polynôme, Log, Arctg).') } },
+    { id: 'swap', label: t('Parties avec u = {dv}, v′ = {u}', { dv, u }), valid: swapOk || d.kind.startsWith('p'), quality: swapOk ? 'good' : 'poor', why: swapOk ? t('Juste aussi : les deux choix font revenir l\'intégrale.') : d.kind.startsWith('p') ? t('Juste, mais le degré du polynôme monte en l\'intégrant : l\'intégrale devient plus difficile.') : t('Il faudrait intégrer {u}, ce qu\'on ne sait pas faire directement.', { u }) },
+    { id: 'subst', label: t('Substitution t = {u}', { u }), valid: false, why: t('Aucun facteur n\'est la dérivée de l\'autre à une constante près.') },
+    { id: 'split', label: `∫ ${u} · ∫ ${dv}`, valid: false, rule: 'a1_int_product', why: t('La primitive d\'un produit n\'est pas le produit des primitives : dérive-le, tu trouves deux termes.') },
   ];
-  const dec2 = { prompt: 'Quel choix pour u et v′ ?', options: [{ id: 'good', label: `u = ${u}, v′ = ${dv}`, valid: true, quality: 'good' }, { ...options[1], id: 'swap', label: `u = ${dv}, v′ = ${u}` }] };
-  return { dec: { prompt: 'Quelle méthode ?', options, l2: [], taken: `intégration par parties avec u = ${u}, v′ = ${dv}` }, dec2 };
+  const dec2 = { prompt: t('Quel choix pour u et v′ ?'), options: [{ id: 'good', label: `u = ${u}, v′ = ${dv}`, valid: true, quality: 'good' }, { ...options[1], id: 'swap', label: `u = ${dv}, v′ = ${u}` }] };
+  return { dec: { prompt: t('Quelle méthode ?'), options, l2: [], taken: t('intégration par parties avec u = {u}, v′ = {dv}', { u, dv }) }, dec2 };
 }
 
 function ipItem(level, rng, opts = {}) {
@@ -714,13 +715,13 @@ function ipItem(level, rng, opts = {}) {
   const parts = bounds
     ? [{ start, judge, lines: d.lines, dec, dec2, choices: IP_CHOICES }]
     : [
-      derivPart(d.uLabel, d.u, d.du, `u = ${d.uLabel}, v′ = ${d.dvLabel} : dérive u.`, dec, DERIV_CHOICES(IP_CHOICES)),
-      { html: 'L’intégrale', start, judge, lines: d.lines, choices: IP_CHOICES },
+      derivPart(d.uLabel, d.u, d.du, t('u = {uLabel}, v′ = {dvLabel} : dérive u.', { uLabel: d.uLabel, dvLabel: d.dvLabel }), dec, DERIV_CHOICES(IP_CHOICES)),
+      { html: t('L’intégrale'), start, judge, lines: d.lines, choices: IP_CHOICES },
     ];
   if (!bounds) parts[0].dec2 = dec2;
   return intItem({
-    skill: IP, prompt: `Calcule ${MT(start)}.`, key: start, points: 2, parts,
-    hints: H(d.kind === 'loop' ? 'Deux intégrations par parties font revenir I : résous l\'équation en I.' : 'Dérive ce qui se simplifie (polynôme, Log, Arctg), intègre ce qui reste stable.', MT(d.lines[0].math), MT(d.lines[1].math)),
+    skill: IP, prompt: t('Calcule {start}.', { start: MT(start) }), key: start, points: 2, parts,
+    hints: H(d.kind === 'loop' ? t('Deux intégrations par parties font revenir I : résous l\'équation en I.') : t('Dérive ce qui se simplifie (polynôme, Log, Arctg), intègre ce qui reste stable.'), MT(d.lines[0].math), MT(d.lines[1].math)),
     subgoals: IP_SUB, baits: ['a1_int_product'],
   }, level, rng, opts);
 }
@@ -788,9 +789,9 @@ function ipTf(rng) {
   if (!b.mcq) return examTf([b], IP, rng);
   // No counter-example checker takes a pair of functions: a Vrai/Faux choice.
   return mcq({
-    skill: IP, level: 4, prompt: `Vrai ou faux ? ${b.s}`, key: `tf:${b.s}`, exam: { format: 'tf', points: 1 }, expectedSec: 60, keepOrder: true,
-    options: [{ html: 'Vrai', correct: false, rule: b.rule }, { html: 'Faux', correct: true }],
-    solution: [{ html: b.why, note: '' }],
+    skill: IP, level: 4, prompt: t('Vrai ou faux ? {s}', { s: t(b.s) }), key: `tf:${b.s}`, exam: { format: 'tf', points: 1 }, expectedSec: 60, keepOrder: true,
+    options: [{ html: t('Vrai'), correct: false, rule: b.rule }, { html: t('Faux'), correct: true }],
+    solution: [{ html: t(b.why), note: '' }],
   }, rng);
 }
 

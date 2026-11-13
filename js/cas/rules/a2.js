@@ -18,6 +18,7 @@ import { DEFS as F } from './a2f.js';
 import { DEFS as G } from './a2g.js';
 import { DEFS as H } from './a2h.js';
 import { DEFS as I } from './a2i.js';
+import { t } from '../../i18n.js';
 
 export const META = [
   { id: "a2_topo_not_open_closed", family: "logic", tag: "E", skill: "a2-rn-topology", repair: "a2-rn-boundary", example: ["« pas ouvert, donc fermé »", "ni l'un ni l'autre"], transformText: "wrongValues : on remplace la case « fermé » par la négation de la case « ouvert »", explainText: "« Ouvert et fermé ne sont pas contraires. Ton ensemble contient le point {p₁} du bord, mais pas {p₂} : il n'est ni ouvert ni fermé. »" },
@@ -119,9 +120,11 @@ export function fill(text, ctx = {}) {
   return text.replace(/\{([^{}]*)\}/g, (_, k) => (ctx[k] !== undefined && ctx[k] !== null ? String(ctx[k]) : '…'));
 }
 
+// The examples and the catalogue's explanation are shown: translated whole
+// (a math-only example is its own translation).
 export const RULES = META.map((m) => {
   const d = DEFS[m.id];
-  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example };
-  if (!d) return { ...base, name: `Piège ${m.id}`, stub: true, judges: [], explain: (ctx) => fill(m.explainText, ctx) };
-  return { ...base, explain: (ctx) => fill(m.explainText, ctx), ...d };
+  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example.map((e) => (e ? t(e) : e)) };
+  if (!d) return { ...base, name: t('Piège {id}', { id: m.id }), stub: true, judges: [], explain: (ctx) => fill(t(m.explainText), ctx) };
+  return { ...base, explain: (ctx) => fill(t(m.explainText), ctx), ...d };
 });

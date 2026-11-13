@@ -8,14 +8,15 @@
 import { MT, linesItem, examTag } from './kit.js';
 import { partsScript, tpl, sup } from './a2-kit.js';
 import { q, qt, term, sumT, polyT, fac, expT, rd, H, E, modeOf, mcq4, opt, tfOf } from './analyse2-h-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-const2';
 const SUB = [
-  { id: 'char', label: 'équation caractéristique', skill: 'quad-formula' },
-  { id: 'roots', label: 'racines', skill: 'quad-formula' },
-  { id: 'form', label: 'forme de la solution', skill: SK },
-  { id: 'ic', label: 'constantes (système 2 × 2)', skill: 'eq-systems' },
-  { id: 'final', label: 'solution du problème de Cauchy', skill: SK },
+  { id: 'char', label: t('équation caractéristique'), skill: 'quad-formula' },
+  { id: 'roots', label: t('racines'), skill: 'quad-formula' },
+  { id: 'form', label: t('forme de la solution'), skill: SK },
+  { id: 'ic', label: t('constantes (système 2 × 2)'), skill: 'eq-systems' },
+  { id: 'final', label: t('solution du problème de Cauchy'), skill: SK },
 ];
 const KEYS = ['calcx', 'calcfn', 'a2', 'anal', 'cplx'];
 
@@ -88,25 +89,25 @@ function cauchy(d, Y0, Y1) {
 const formOptions = (d) => {
   const o = (id, label, why, rule) => ({ id, label, valid: d.kind === id, ...(d.kind === id ? {} : { why, ...(rule ? { rule } : {}) }) });
   return [
-    o('real', 'Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x)', d.kind === 'double' ? 'Une racine double ne donne qu\'une exponentielle : C₁e^(rx) + C₂e^(rx) n\'a qu\'une constante.' : 'Les racines ne sont pas réelles.', d.kind === 'double' ? 'a2_ode_double_root' : null),
-    o('double', 'Racine double : (C₁ + C₂x)e^(rx)', 'Les deux racines sont distinctes.'),
-    o('complex', 'Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)', 'Les racines sont réelles.'),
+    o('real', t('Deux racines réelles distinctes : C₁e^(r₁x) + C₂e^(r₂x)'), d.kind === 'double' ? t('Une racine double ne donne qu\'une exponentielle : C₁e^(rx) + C₂e^(rx) n\'a qu\'une constante.') : t('Les racines ne sont pas réelles.'), d.kind === 'double' ? 'a2_ode_double_root' : null),
+    o('double', t('Racine double : (C₁ + C₂x)e^(rx)'), t('Les deux racines sont distinctes.')),
+    o('complex', t('Racines α ± iβ : e^(αx)(C₁ cos βx + C₂ sin βx)'), t('Les racines sont réelles.')),
   ];
 };
 const deltaDecision = (d) => {
   const D = d.b * d.b - 4 * d.a * d.c;
   const o = (id, label, ok) => ({ id, label, valid: ok, ...(ok ? {} : { why: `Δ = ${rd(d.b)}² − 4·${d.a}·${rd(d.c)} = ${rd(D)}.` }) });
-  return { kind: 'decision', prompt: `Le discriminant de ${sup(d.P)} est :`, options: [o('pos', 'Δ > 0 : deux racines réelles', D > 0), o('zero', 'Δ = 0 : une racine double', D === 0), o('neg', 'Δ < 0 : deux racines complexes conjuguées', D < 0)] };
+  return { kind: 'decision', prompt: t('Le discriminant de {P} est :', { P: sup(d.P) }), options: [o('pos', t('Δ > 0 : deux racines réelles'), D > 0), o('zero', t('Δ = 0 : une racine double'), D === 0), o('neg', t('Δ < 0 : deux racines complexes conjuguées'), D < 0)] };
 };
 
 const CHOICES = [
-  { id: 'subst', label: 'Remplacer y par e^(rx)' },
-  { id: 'factor', label: 'Mettre e^(rx) en facteur' },
-  { id: 'solve', label: 'Résoudre l\'équation caractéristique' },
-  { id: 'form', label: 'Écrire la forme de la solution' },
-  { id: 'ic', label: 'Trouver C₁ et C₂ avec les conditions initiales' },
-  { id: 'final', label: 'Écrire la solution du problème' },
-  { id: 'sign', label: 'Racines : changer le signe des coefficients', rule: 'a2_ode_char_sign', why: 'Les racines de r² + pr + q ont pour somme −p : vérifie en remplaçant.' },
+  { id: 'subst', label: t('Remplacer y par e^(rx)') },
+  { id: 'factor', label: t('Mettre e^(rx) en facteur') },
+  { id: 'solve', label: t('Résoudre l\'équation caractéristique') },
+  { id: 'form', label: t('Écrire la forme de la solution') },
+  { id: 'ic', label: t('Trouver C₁ et C₂ avec les conditions initiales') },
+  { id: 'final', label: t('Écrire la solution du problème') },
+  { id: 'sign', label: t('Racines : changer le signe des coefficients'), rule: 'a2_ode_char_sign', why: t('Les racines de r² + pr + q ont pour somme −p : vérifie en remplaçant.') },
 ];
 
 function data(rng, withIc) {
@@ -128,32 +129,32 @@ function linesVariant(level, rng, opts) {
   const ode = { kind: 'ode', eq: d.eq, unknown: 'y', v: 'x', order: 2, char: d.char, ...(withIc ? { ic: { x: 0, y: d.Y0, dy: d.Y1 } } : {}), domain: { x: [-1, 1] } };
   const parts = [];
   if (level >= 2) {
-    parts.push({ start: d.start, judge: { kind: 'equiv', vars: ['x', 'r'], target: 'goal', goal: d.factored, domain: { x: [-1, 1], r: [-2, 2] } }, lines: [...(level <= 3 ? [E(d.expanded, 'Dériver e^(rx)', 'char', 'subst')] : []), E(d.factored, 'Mettre e^(rx) en facteur', 'char', 'factor')] });
+    parts.push({ start: d.start, judge: { kind: 'equiv', vars: ['x', 'r'], target: 'goal', goal: d.factored, domain: { x: [-1, 1], r: [-2, 2] } }, lines: [...(level <= 3 ? [E(d.expanded, t('Dériver e^(rx)'), 'char', 'subst')] : []), E(d.factored, t('Mettre e^(rx) en facteur'), 'char', 'factor')] });
   }
-  const rootLines = [E(d.mid, 'Factoriser (ou Δ)', 'roots', 'solve'), E(d.rootsLine, 'Racines', 'roots', 'solve')];
+  const rootLines = [E(d.mid, t('Factoriser (ou Δ)'), 'roots', 'solve'), E(d.rootsLine, t('Racines'), 'roots', 'solve')];
   if (d.kind === 'real' && level >= 4) rootLines.shift();
   if (level === 1) {
     const hole = d.kind === 'real' ? String(d.r2) : d.kind === 'double' ? String(d.r) : (d.be === 1 ? 'i' : `${d.be}i`);
     rootLines[rootLines.length - 1] = { ...rootLines[rootLines.length - 1], ...tpl(d.rootsLine, [hole], { complex: true, vars: ['r'] }) };
   }
   parts.push({
-    html: 'e^(rx) ≠ 0 : équation caractéristique. Ses racines :', ask: 'r =', start: `${d.P} = 0`, judge: { kind: 'complex', form: 'set', unknown: 'r', char: d.char },
+    html: t('e^(rx) ≠ 0 : équation caractéristique. Ses racines :'), ask: 'r =', start: `${d.P} = 0`, judge: { kind: 'complex', form: 'set', unknown: 'r', char: d.char },
     pre: level === 3 ? [deltaDecision(d)] : [], lines: rootLines,
   });
-  const yLines = [E(`y = ${d.gen}`, 'Forme de la solution', 'form', 'form')];
-  if (withIc) yLines.push(E(d.line, `y(0) = ${rd(d.Y0)}, y′(0) = ${rd(d.Y1)}`, 'ic', 'ic'), E(`y = ${d.y}`, 'Solution du problème', 'final', 'final'));
+  const yLines = [E(`y = ${d.gen}`, t('Forme de la solution'), 'form', 'form')];
+  if (withIc) yLines.push(E(d.line, `y(0) = ${rd(d.Y0)}, y′(0) = ${rd(d.Y1)}`, 'ic', 'ic'), E(`y = ${d.y}`, t('Solution du problème'), 'final', 'final'));
   if (level === 1) {
-    const holes = d.kind === 'real' ? [expT(d.r1), expT(d.r2)].filter((t) => t !== '1') : d.kind === 'double' ? [expT(d.r)].filter((t) => t !== '1') : [trig('cos', d.be), trig('sin', d.be)];
+    const holes = d.kind === 'real' ? [expT(d.r1), expT(d.r2)].filter((s) => s !== '1') : d.kind === 'double' ? [expT(d.r)].filter((s) => s !== '1') : [trig('cos', d.be), trig('sin', d.be)];
     yLines[0] = { ...yLines[0], ...tpl(yLines[0].math, holes) };
   }
-  parts.push({ html: withIc ? 'Solution générale, puis les conditions initiales.' : 'Solution générale :', ask: 'y =', start: d.eq, judge: ode, pre: level === 2 || level === 3 ? [{ kind: 'decision', prompt: 'Quelle forme ?', options: formOptions(d) }] : [], lines: yLines });
+  parts.push({ html: withIc ? t('Solution générale, puis les conditions initiales.') : t('Solution générale :'), ask: 'y =', start: d.eq, judge: ode, pre: level === 2 || level === 3 ? [{ kind: 'decision', prompt: t('Quelle forme ?'), options: formOptions(d) }] : [], lines: yLines });
   const { start, judge, script } = partsScript(parts, level, CHOICES);
   const icText = withIc ? `, y(0) = ${rd(d.Y0)}, y′(0) = ${rd(d.Y1)}` : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `${withIc ? 'Résous' : 'Donne la solution générale de'} ${MT(d.eq)}${icText}.${level === 1 ? ` Équation caractéristique : ${MT(`${d.P} = 0`, { vars: ['r'] })}.` : ' Remplace d\'abord y par e^(rx).'}`,
-    hints: H(`Remplace y par e^(rx) : tu obtiens ${MT(`${d.P} = 0`, { vars: ['r'] })}.`,
-      `Racines : ${MT(d.rootsLine, { complex: true })} ; donc y = …`,
+    prompt: `${withIc ? t('Résous {eq}{ic}.', { eq: MT(d.eq), ic: icText }) : t('Donne la solution générale de {eq}{ic}.', { eq: MT(d.eq), ic: icText })} ${level === 1 ? t('Équation caractéristique : {P}.', { P: MT(`${d.P} = 0`, { vars: ['r'] }) }) : t('Remplace d\'abord y par e^(rx).')}`,
+    hints: H(t('Remplace y par e^(rx) : tu obtiens {P}.', { P: MT(`${d.P} = 0`, { vars: ['r'] }) }),
+      t('Racines : {r} ; donc y = …', { r: MT(d.rootsLine, { complex: true }) }),
       `${MT(`y = ${d.gen}`)}`),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.eq}${icText}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -185,10 +186,10 @@ function mcqVariant(level, rng, opts) {
   const d = rootsData(rng, ['real', 'double', 'double', 'complex', 'complex']);
   return mcq4({
     skill: SK, level, key: `${SK}:mcq:${d.eq}`, exam: examTag(opts),
-    prompt: `La solution générale de ${MT(d.eq)} est :`,
+    prompt: t('La solution générale de {eq} est :', { eq: MT(d.eq) }),
     right: MT(`y = ${d.gen}`), wrongs: wrongForms(d),
     fillers: [opt(`y = C_1 ${expT(1)}+C_2 ${expT(2)}`), opt(`y = C_1 x+C_2`), opt(`y = C_1 ${trig('cos', 1)}+C_2 ${trig('sin', 1)}`)],
-    solution: [{ html: `Équation caractéristique ${MT(`${d.P} = 0`, { vars: ['r'] })} : ${MT(d.rootsLine, { complex: true })}.`, note: '' }],
+    solution: [{ html: t('Équation caractéristique {P} : {r}.', { P: MT(`${d.P} = 0`, { vars: ['r'] }), r: MT(d.rootsLine, { complex: true }) }), note: '' }],
     expectedSec: 120,
   }, rng);
 }
@@ -201,22 +202,22 @@ function statements(rng) {
   const r = rng.pick([1, 2, 3]);
   const kx = k === 1 ? 'x' : `${k}x`;
   return [
-    { key: `bnd${k}`, truth: true, text: `Toutes les solutions de y″ + ${k2 === 1 ? '' : k2}y = 0 sont bornées sur ℝ.`, why: `Vrai : r = ±${k === 1 ? '' : k}i, y = C₁ cos ${kx} + C₂ sin ${kx}, bornée par |C₁| + |C₂|.` },
+    { key: `bnd${k}`, truth: true, text: t('Toutes les solutions de y″ + {k2}y = 0 sont bornées sur ℝ.', { k2: k2 === 1 ? '' : k2 }), why: t('Vrai : r = ±{k}i, y = C₁ cos {kx} + C₂ sin {kx}, bornée par |C₁| + |C₂|.', { k: k === 1 ? '' : k, kx }) },
     {
-      key: `unb${k}`, truth: false, text: `Toutes les solutions de y″ − ${k2 === 1 ? '' : k2}y = 0 sont bornées sur [0 ; +∞[.`,
-      why: `Faux : r = ±${k}, et y = e^(${kx}) est une solution qui tend vers +∞.`,
-      counter: { kind: 'a2', prop: 'odeUnbounded', params: { eq: `y''-${k2 === 1 ? '' : k2}y=0` }, ask: [{ v: 'y', label: 'Une solution non bornée : y(x) =', keys: KEYS }], answer: { y: `e^(${kx})` } },
+      key: `unb${k}`, truth: false, text: t('Toutes les solutions de y″ − {k2}y = 0 sont bornées sur [0 ; +∞[.', { k2: k2 === 1 ? '' : k2 }),
+      why: t('Faux : r = ±{k}, et y = e^({kx}) est une solution qui tend vers +∞.', { k, kx }),
+      counter: { kind: 'a2', prop: 'odeUnbounded', params: { eq: `y''-${k2 === 1 ? '' : k2}y=0` }, ask: [{ v: 'y', label: t('Une solution non bornée : y(x) ='), keys: KEYS }], answer: { y: `e^(${kx})` } },
     },
-    { key: `damp${k}`, truth: true, text: `Toute solution de y″ + 2y′ + ${1 + k2}y = 0 tend vers 0 en +∞.`, why: `Vrai : r = −1 ± ${k === 1 ? '' : k}i, y = e^(−x)(C₁ cos ${kx} + C₂ sin ${kx}) → 0.` },
+    { key: `damp${k}`, truth: true, text: t('Toute solution de y″ + 2y′ + {c}y = 0 tend vers 0 en +∞.', { c: 1 + k2 }), why: t('Vrai : r = −1 ± {k}i, y = e^(−x)(C₁ cos {kx} + C₂ sin {kx}) → 0.', { k: k === 1 ? '' : k, kx }) },
     {
-      key: `grow${k}`, truth: false, text: `Toute solution de y″ − 2y′ + ${1 + k2}y = 0 tend vers 0 en +∞.`, ruleIfTrue: 'a2_ode_char_sign',
-      why: `Faux : r = 1 ± ${k === 1 ? '' : k}i, la partie réelle est positive : e^x cos ${kx} n'est même pas bornée.`,
-      counter: { kind: 'a2', prop: 'odeUnbounded', params: { eq: `y''-2y'+${1 + k2}y=0` }, ask: [{ v: 'y', label: 'Une solution qui ne tend pas vers 0 : y(x) =', keys: KEYS }], answer: { y: `e^x cos(${kx})` } },
+      key: `grow${k}`, truth: false, text: t('Toute solution de y″ − 2y′ + {c}y = 0 tend vers 0 en +∞.', { c: 1 + k2 }), ruleIfTrue: 'a2_ode_char_sign',
+      why: t('Faux : r = 1 ± {k}i, la partie réelle est positive : e^x cos {kx} n\'est même pas bornée.', { k: k === 1 ? '' : k, kx }),
+      counter: { kind: 'a2', prop: 'odeUnbounded', params: { eq: `y''-2y'+${1 + k2}y=0` }, ask: [{ v: 'y', label: t('Une solution qui ne tend pas vers 0 : y(x) ='), keys: KEYS }], answer: { y: `e^x cos(${kx})` } },
     },
     {
-      key: `dbl${r}`, truth: false, text: `La solution générale de y″ − ${2 * r}y′ + ${r * r}y = 0 est y = C₁e^(${r === 1 ? '' : r}x) + C₂e^(${r === 1 ? '' : r}x).`, ruleIfTrue: 'a2_ode_double_root',
-      why: `Faux : C₁e^(${r}x) + C₂e^(${r}x) = (C₁ + C₂)e^(${r}x) n'a qu'une constante. La racine ${r} est double : y = (C₁ + C₂x)e^(${r}x).`,
-      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y''-${2 * r}y'+${r * r}y=0`, family: `C e^(${r}x)`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: 'Une solution qui n\'est pas de cette forme : y(x) =', keys: KEYS }], answer: { y: `x e^(${r}x)` } },
+      key: `dbl${r}`, truth: false, text: t('La solution générale de y″ − {b}y′ + {c}y = 0 est y = C₁e^({r}x) + C₂e^({r}x).', { b: 2 * r, c: r * r, r: r === 1 ? '' : r }), ruleIfTrue: 'a2_ode_double_root',
+      why: t('Faux : C₁e^({r}x) + C₂e^({r}x) = (C₁ + C₂)e^({r}x) n\'a qu\'une constante. La racine {r} est double : y = (C₁ + C₂x)e^({r}x).', { r }),
+      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y''-${2 * r}y'+${r * r}y=0`, family: `C e^(${r}x)`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: t('Une solution qui n\'est pas de cette forme : y(x) ='), keys: KEYS }], answer: { y: `x e^(${r}x)` } },
     },
   ];
 }

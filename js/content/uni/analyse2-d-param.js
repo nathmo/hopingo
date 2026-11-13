@@ -19,6 +19,7 @@ import { evalFloat } from '../../cas/numeric.js';
 import { MT, linesItem, mcq, tfItem, examTag } from './kit.js';
 import { modeOf, H, E, blanked, partsScript, fr, sup, A2_KEYS } from './a2-kit.js';
 import { problemItem } from './kit-problem.js';
+import { t } from '../../i18n.js';
 
 const K = { vars: ['x', 't'] };
 const KT = { vars: ['t'] };
@@ -50,8 +51,8 @@ function distinctOptions(cands) {
 const witnessT = (a, b) => ['1', '2', '1/2', '3/2'].find((t) => { const v = Number(eval(t)); const x = num(a, v); const y = num(b, v); return Number.isFinite(x) && Number.isFinite(y) && Math.abs(x - y) > 1e-3; });
 function vf(skill, statement, truth, rng, { key, why, ruleIfTrue = null, level = 4, exam = true }) {
   return mcq({
-    skill, level, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth }],
+    skill, level, prompt: t('Vrai ou faux ?<br>« {s} »', { s: statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth }],
     key: `${skill}:tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: exam ? { format: 'tf', points: 1 } : false,
   }, rng);
 }
@@ -62,17 +63,17 @@ function vf(skill, statement, truth, rng, { key, why, ruleIfTrue = null, level =
 
 const PI = 'a2-param-int';
 const PI_SUB = [
-  { id: 'hyp', label: 'hypothèses : f et ∂f/∂t continues', skill: PI },
-  { id: 'differentiate', label: 'dériver sous ∫ par rapport à t', skill: PI },
-  { id: 'integrate', label: 'intégrer en x', skill: 'a1-int-direct' },
-  { id: 'evaluate', label: 'évaluer en t₀', skill: PI },
+  { id: 'hyp', label: t('hypothèses : f et ∂f/∂t continues'), skill: PI },
+  { id: 'differentiate', label: t('dériver sous ∫ par rapport à t'), skill: PI },
+  { id: 'integrate', label: t('intégrer en x'), skill: 'a1-int-direct' },
+  { id: 'evaluate', label: t('évaluer en t₀'), skill: PI },
 ];
 const PI_CHOICES = [
-  { id: 'dt', label: 'Dériver l\'intégrande par rapport à t (x fixé)' },
-  { id: 'dx', label: 'Dériver l\'intégrande par rapport à x', rule: 'a2_leibniz_wrong_var', why: 'F dépend de t : x est la variable d\'intégration, on dérive en t.' },
-  { id: 'prim', label: 'Primitive en x (t fixé)' },
-  { id: 'eval', label: 'Évaluer entre les bornes et simplifier' },
-  { id: 'value', label: 'Remplacer t par t₀' },
+  { id: 'dt', label: t('Dériver l\'intégrande par rapport à t (x fixé)') },
+  { id: 'dx', label: t('Dériver l\'intégrande par rapport à x'), rule: 'a2_leibniz_wrong_var', why: t('F dépend de t : x est la variable d\'intégration, on dérive en t.') },
+  { id: 'prim', label: t('Primitive en x (t fixé)') },
+  { id: 'eval', label: t('Évaluer entre les bornes et simplifier') },
+  { id: 'value', label: t('Remplacer t par t₀') },
 ];
 
 // f(x, t) on [a ; b]: ∂f/∂t, a primitive G of it in x, F′(t), F′(t₀) for
@@ -80,16 +81,16 @@ const PI_CHOICES = [
 // f(b, t) (the confusion F′ = f(b, t)).
 const PI_DATA = [
   { f: 'arctan(t x)', a: '0', b: '1', df: 'x/(1+t^2x^2)', prim: 'ln(1+t^2x^2)/(2t^2)', Fp: 'ln(1+t^2)/(2t^2)', at: { 1: 'ln(2)/2', 2: 'ln(5)/8' }, wv: 'arctan(t)', fb: 'arctan(t)', how: 'u = 1 + t²x², du = 2t²x dx' },
-  { f: 'x e^(-t x^2)', a: '0', b: '1', df: '-x^3 e^(-t x^2)', prim: '(t x^2+1)e^(-t x^2)/(2t^2)', Fp: '((t+1)e^(-t)-1)/(2t^2)', at: { 1: 'e^(-1)-1/2', 2: '(3e^(-2)-1)/8' }, wv: 'e^(-t)', fb: 'e^(-t)', how: 'par parties, après u = x²' },
+  { f: 'x e^(-t x^2)', a: '0', b: '1', df: '-x^3 e^(-t x^2)', prim: '(t x^2+1)e^(-t x^2)/(2t^2)', Fp: '((t+1)e^(-t)-1)/(2t^2)', at: { 1: 'e^(-1)-1/2', 2: '(3e^(-2)-1)/8' }, wv: 'e^(-t)', fb: 'e^(-t)', how: t('par parties, après u = x²') },
   { f: 'ln(1+t x)', a: '0', b: '1', df: 'x/(1+t x)', prim: 'x/t-ln(1+t x)/t^2', Fp: '1/t-ln(1+t)/t^2', at: { 1: '1-ln(2)', 2: '1/2-ln(3)/4' }, wv: 'ln(1+t)', fb: 'ln(1+t)', how: 'x/(1 + tx) = 1/t − 1/(t(1 + tx))' },
-  { f: 'sin(t x)/x', a: '0', b: '1', df: 'cos(t x)', prim: 'sin(t x)/t', Fp: 'sin(t)/t', at: { 1: 'sin(1)', 2: 'sin(2)/2' }, wv: 'sin(t)-t', fb: 'sin(t)', how: 'une primitive de cos(tx) en x est sin(tx)/t' },
-  { f: 'sin(t x)/x', a: '0', b: 'π', df: 'cos(t x)', prim: 'sin(t x)/t', Fp: 'sin(π t)/t', at: { '1/2': '2', '3/2': '-2/3' }, wv: 'sin(π t)/π-t', fb: 'sin(π t)/π', how: 'une primitive de cos(tx) en x est sin(tx)/t' },
-  { f: 'ln(t+x)', a: '0', b: '1', df: '1/(t+x)', prim: 'ln(t+x)', Fp: 'ln(t+1)-ln(t)', at: { 1: 'ln(2)', 2: 'ln(3)-ln(2)' }, wv: null, fb: 'ln(t+1)', how: 'une primitive de 1/(t + x) en x est ln(t + x)' },
-  { f: 'ln(t+x)', a: '1', b: '2', df: '1/(t+x)', prim: 'ln(t+x)', Fp: 'ln(t+2)-ln(t+1)', at: { 1: 'ln(3)-ln(2)' }, wv: null, fb: 'ln(t+2)', how: 'une primitive de 1/(t + x) en x est ln(t + x)' },
-  { f: 'e^(t x)', a: '0', b: '1', df: 'x e^(t x)', prim: 'x e^(t x)/t-e^(t x)/t^2', Fp: '((t-1)e^t+1)/t^2', at: { 1: '1', 2: '(e^2+1)/4' }, wv: 'e^t-1', fb: 'e^t', how: 'par parties : u = x, v′ = e^(tx)' },
+  { f: 'sin(t x)/x', a: '0', b: '1', df: 'cos(t x)', prim: 'sin(t x)/t', Fp: 'sin(t)/t', at: { 1: 'sin(1)', 2: 'sin(2)/2' }, wv: 'sin(t)-t', fb: 'sin(t)', how: t('une primitive de cos(tx) en x est sin(tx)/t') },
+  { f: 'sin(t x)/x', a: '0', b: 'π', df: 'cos(t x)', prim: 'sin(t x)/t', Fp: 'sin(π t)/t', at: { '1/2': '2', '3/2': '-2/3' }, wv: 'sin(π t)/π-t', fb: 'sin(π t)/π', how: t('une primitive de cos(tx) en x est sin(tx)/t') },
+  { f: 'ln(t+x)', a: '0', b: '1', df: '1/(t+x)', prim: 'ln(t+x)', Fp: 'ln(t+1)-ln(t)', at: { 1: 'ln(2)', 2: 'ln(3)-ln(2)' }, wv: null, fb: 'ln(t+1)', how: t('une primitive de 1/(t + x) en x est ln(t + x)') },
+  { f: 'ln(t+x)', a: '1', b: '2', df: '1/(t+x)', prim: 'ln(t+x)', Fp: 'ln(t+2)-ln(t+1)', at: { 1: 'ln(3)-ln(2)' }, wv: null, fb: 'ln(t+2)', how: t('une primitive de 1/(t + x) en x est ln(t + x)') },
+  { f: 'e^(t x)', a: '0', b: '1', df: 'x e^(t x)', prim: 'x e^(t x)/t-e^(t x)/t^2', Fp: '((t-1)e^t+1)/t^2', at: { 1: '1', 2: '(e^2+1)/4' }, wv: 'e^t-1', fb: 'e^t', how: t('par parties : u = x, v′ = e^(tx)') },
 ];
 // The catalogue's fallback: F(t) = ∫₀^π cos(tx) dx.
-const PI_FALLBACK = { f: 'cos(t x)', a: '0', b: 'π', df: '-x sin(t x)', prim: 'x cos(t x)/t-sin(t x)/t^2', Fp: 'π cos(π t)/t-sin(π t)/t^2', at: { 1: '-π', 2: 'π/2' }, wv: 'cos(π t)-1', fb: 'cos(π t)', how: 'par parties : u = x, v′ = sin(tx)', fallback: true };
+const PI_FALLBACK = { f: 'cos(t x)', a: '0', b: 'π', df: '-x sin(t x)', prim: 'x cos(t x)/t-sin(t x)/t^2', Fp: 'π cos(π t)/t-sin(π t)/t^2', at: { 1: '-π', 2: 'π/2' }, wv: 'cos(π t)-1', fb: 'cos(π t)', how: t('par parties : u = x, v′ = sin(tx)'), fallback: true };
 
 function piData(rng) {
   const d = rng.chance(0.06) ? PI_FALLBACK : rng.pick(PI_DATA);
@@ -109,39 +110,39 @@ const valueStart = (start, val) => (flat(start) === flat(val)
 const t0Text = (t0) => fr(t0);
 
 const hypDecision = (d) => ({
-  kind: 'decision', prompt: 'Peut-on dériver sous le signe ∫ ?', options: [
-    { id: 'yes', label: `Oui : f et ∂f/∂t sont continues sur ${interval(d)} × [1/2 ; 2]`, valid: true, ref: true },
-    { id: 'cont', label: 'Oui : il suffit que f soit continue', valid: false, why: 'Il faut aussi ∂f/∂t continue. Avec f(x, t) = |t| (continue), F(t) = |t| n\'est pas dérivable en 0.' },
-    { id: 'no', label: 'Non : les bornes ne dépendent pas de t', valid: false, why: 'Des bornes fixes simplifient : F′(t) = ∫ ∂f/∂t dx, sans terme de bord.' },
+  kind: 'decision', prompt: t('Peut-on dériver sous le signe ∫ ?'), options: [
+    { id: 'yes', label: t('Oui : f et ∂f/∂t sont continues sur {I} × [1/2 ; 2]', { I: interval(d) }), valid: true, ref: true },
+    { id: 'cont', label: t('Oui : il suffit que f soit continue'), valid: false, why: t('Il faut aussi ∂f/∂t continue. Avec f(x, t) = |t| (continue), F(t) = |t| n\'est pas dérivable en 0.') },
+    { id: 'no', label: t('Non : les bornes ne dépendent pas de t'), valid: false, why: t('Des bornes fixes simplifient : F′(t) = ∫ ∂f/∂t dx, sans terme de bord.') },
   ],
 });
 
 function piParts(d, level) {
-  const diff = { start: `pd(${d.f},t)`, judge: dJudge(d), lines: [E(d.df, 'Dériver par rapport à t, x fixé', 'differentiate', 'dt')] };
+  const diff = { start: `pd(${d.f},t)`, judge: dJudge(d), lines: [E(d.df, t('Dériver par rapport à t, x fixé'), 'differentiate', 'dt')] };
   const integ = {
-    html: `Intègre en x : F′(t) = ∫ ∂f/∂t dx sur ${interval(d)} (${d.how}).`, ask: 'F′(t) =', start: `int(${d.df},x,${d.a},${d.b})`, judge: tJudge(d.Fp),
-    lines: [E(d.B, 'Primitive en x, t fixé', 'integrate', 'prim'), E(d.Fp, 'Évaluer entre les bornes', 'integrate', 'eval')],
+    html: t('Intègre en x : F′(t) = ∫ ∂f/∂t dx sur {I} ({how}).', { I: interval(d), how: d.how }), ask: 'F′(t) =', start: `int(${d.df},x,${d.a},${d.b})`, judge: tJudge(d.Fp),
+    lines: [E(d.B, t('Primitive en x, t fixé'), 'integrate', 'prim'), E(d.Fp, t('Évaluer entre les bornes'), 'integrate', 'eval')],
   };
   const value = {
-    html: `Calcule F′(${t0Text(d.t0)}) :`, ask: `F′(${t0Text(d.t0)}) =`, ...valueStart(atT(d.Fp, d.t0), d.at[d.t0]),
+    html: t('Calcule F′({t0}) :', { t0: t0Text(d.t0) }), ask: `F′(${t0Text(d.t0)}) =`, ...valueStart(atT(d.Fp, d.t0), d.at[d.t0]),
     lines: [E(d.at[d.t0], `t = ${t0Text(d.t0)}`, 'evaluate', 'value')],
   };
   if (level === 1) {
-    diff.pre = [{ kind: 'note', html: `f(x, t) = ${M(d.f)} et ∂f/∂t sont continues sur ${interval(d)} × [1/2 ; 2] : on peut dériver sous ∫.` }];
+    diff.pre = [{ kind: 'note', html: t('f(x, t) = {f} et ∂f/∂t sont continues sur {I} × [1/2 ; 2] : on peut dériver sous ∫.', { f: M(d.f), I: interval(d) }) }];
     diff.lines = [blanked(diff.lines[0], [d.df.includes('/') ? d.df.split('/')[0] : d.df], K)];
     integ.lines = [blanked(integ.lines[0], [d.prim], K), integ.lines[1]];
     return [diff, integ];
   }
   if (level === 2) {
-    diff.pre = [{ kind: 'note', html: `f et ∂f/∂t sont continues sur ${interval(d)} × [1/2 ; 2] : F′(t) = ∫ ∂f/∂t dx.` }];
+    diff.pre = [{ kind: 'note', html: t('f et ∂f/∂t sont continues sur {I} × [1/2 ; 2] : F′(t) = ∫ ∂f/∂t dx.', { I: interval(d) }) }];
     integ.lines = [blanked(integ.lines[0], [d.prim], K), integ.lines[1]];
     return [diff, integ, value];
   }
   if (level === 3) {
     diff.pre = [{
-      kind: 'decision', prompt: 'Comment calcules-tu F′(t) ?', options: [
-        { id: 'under', label: 'Dériver sous l\'intégrale, puis intégrer en x', valid: true, ref: true },
-        { id: 'first', label: 'Calculer F(t), puis dériver', valid: true, quality: 'poor', why: 'Juste, mais une primitive de f en x est plus longue à trouver que celle de ∂f/∂t.' },
+      kind: 'decision', prompt: t('Comment calcules-tu F′(t) ?'), options: [
+        { id: 'under', label: t('Dériver sous l\'intégrale, puis intégrer en x'), valid: true, ref: true },
+        { id: 'first', label: t('Calculer F(t), puis dériver'), valid: true, quality: 'poor', why: t('Juste, mais une primitive de f en x est plus longue à trouver que celle de ∂f/∂t.') },
       ],
     }];
     return [diff, integ, value];
@@ -149,7 +150,7 @@ function piParts(d, level) {
   // Level 4: everything in one go from d/dt ∫ f dx, then F′(t₀).
   const chain = {
     start: `d(${d.I},t)`, judge: tJudge(d.Fp), pre: [hypDecision(d)],
-    lines: [E(`int(${d.df},x,${d.a},${d.b})`, 'Dériver sous ∫', 'differentiate', 'dt'), ...integ.lines],
+    lines: [E(`int(${d.df},x,${d.a},${d.b})`, t('Dériver sous ∫'), 'differentiate', 'dt'), ...integ.lines],
   };
   return [chain, value];
 }
@@ -160,8 +161,10 @@ function piLines(level, rng, opts) {
   const { start, judge, script } = partsScript(parts, level, PI_CHOICES);
   return linesItem({
     skill: PI, level, mode: modeOf(level), start, judge, script,
-    prompt: `F(t) = ${M(d.I)} pour t ∈ [1/2 ; 2]. Dérive sous le signe ∫ pour trouver F′(t)${level >= 2 ? `, puis F′(${t0Text(d.t0)})` : ''}.`,
-    hints: H('Dérive l\'intégrande par rapport à t (x reste fixe), puis intègre en x.',
+    prompt: level >= 2
+      ? t('F(t) = {I} pour t ∈ [1/2 ; 2]. Dérive sous le signe ∫ pour trouver F′(t), puis F′({t0}).', { I: M(d.I), t0: t0Text(d.t0) })
+      : t('F(t) = {I} pour t ∈ [1/2 ; 2]. Dérive sous le signe ∫ pour trouver F′(t).', { I: M(d.I) }),
+    hints: H(t('Dérive l\'intégrande par rapport à t (x reste fixe), puis intègre en x.'),
       `∂f/∂t = ${M(d.df)} ; ∫ ${M(d.df)} dx : ${d.how}.`,
       `F′(t) = ${M(d.B)} = ${M(d.Fp)}`),
     subgoals: PI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, declares: K,
@@ -187,19 +190,19 @@ function piFeynman(level, rng, opts) {
   const parts = [
     {
       start: `d(${I},t)`, judge: tJudge(Fp),
-      pre: [{ kind: 'note', html: `f(x, t) = ${M(f)} se prolonge par continuité en x = 0 et x = 1, et ∂f/∂t = ${M(df)} est continue : on dérive sous ∫.` }],
-      lines: [E(`int(${df},x,0,1)`, 'Dériver sous ∫ : le ln x se simplifie', 'differentiate', 'dt'), E(`bracket(${prim},x,0,1)`, 'Primitive en x', 'integrate', 'prim'), E(Fp, 'Évaluer', 'integrate', 'eval')],
+      pre: [{ kind: 'note', html: t('f(x, t) = {f} se prolonge par continuité en x = 0 et x = 1, et ∂f/∂t = {df} est continue : on dérive sous ∫.', { f: M(f), df: M(df) }) }],
+      lines: [E(`int(${df},x,0,1)`, t('Dériver sous ∫ : le ln x se simplifie'), 'differentiate', 'dt'), E(`bracket(${prim},x,0,1)`, t('Primitive en x'), 'integrate', 'prim'), E(Fp, t('Évaluer'), 'integrate', 'eval')],
     },
     {
-      html: `F(${t0}) = 0 (l'intégrande est nul). Donc F(t) = F(${t0}) + ∫ de ${t0} à t de F′(s) ds :`, ask: 'F(t) =',
+      html: t('F({t0}) = 0 (l\'intégrande est nul). Donc F(t) = F({t0}) + ∫ de {t0} à t de F′(s) ds :', { t0 }), ask: 'F(t) =',
       start: `int(${Fs},s,${t0},t)`, judge: tJudge(F),
-      lines: [E(`bracket(${G},s,${t0},t)`, 'Primitive', 'integrate', 'prim'), E(F, 'Évaluer', 'evaluate', 'eval')],
+      lines: [E(`bracket(${G},s,${t0},t)`, t('Primitive'), 'integrate', 'prim'), E(F, t('Évaluer'), 'evaluate', 'eval')],
     },
   ];
   const { start, judge, script } = partsScript(parts, level, PI_CHOICES);
   return linesItem({
     skill: PI, level, mode: 'free', start, judge, script, noHints: true,
-    prompt: `Astuce de Feynman : F(t) = ${M(I)} pour t ≥ 0. Calcule F′(t) en dérivant sous ∫, puis F(t) à l'aide de F(${t0}).`,
+    prompt: t('Astuce de Feynman : F(t) = {I} pour t ≥ 0. Calcule F′(t) en dérivant sous ∫, puis F(t) à l\'aide de F({t0}).', { I: M(I), t0 }),
     hints: [], subgoals: PI_SUB, keys: KEYS, declares: K,
     key: `${PI}:5:${I}`, exam: examTag(opts),
   });
@@ -217,9 +220,9 @@ function piMcq(rng, level, opts) {
     { text: `2(${d.Fp})` },
   ]);
   return mcq({
-    skill: PI, level, prompt: `Soit F(t) = ${M(d.I)} pour t ∈ [1/2 ; 2]. Alors F′(t) =`,
+    skill: PI, level, prompt: t('Soit F(t) = {I} pour t ∈ [1/2 ; 2]. Alors F′(t) =', { I: M(d.I) }),
     options, key: `${PI}:mcq:${d.I}`, expectedSec: 180, exam: opts.exam ? { format: 'mcq', points: 1 } : false,
-    solution: [{ html: `On dérive sous ∫ : ∂f/∂t = ${M(d.df)}, puis F′(t) = ${M(d.B)} = ${M(d.Fp)}.`, note: '' }],
+    solution: [{ html: t('On dérive sous ∫ : ∂f/∂t = {df}, puis F′(t) = {B} = {Fp}.', { df: M(d.df), B: M(d.B), Fp: M(d.Fp) }), note: '' }],
     fallback: !!d.fallback,
   }, rng);
 }
@@ -227,24 +230,24 @@ function piMcq(rng, level, opts) {
 function piTf(rng, opts) {
   const kind = rng.pick(['cont', 'thm', 'wrongvar', 'wrongvar']);
   if (kind === 'cont') {
-    return vf(PI, 'Si f est continue sur [0 ; 1] × ℝ, alors F(t) = ∫₀¹ f(x, t) dx est dérivable sur ℝ.', false, rng, {
-      key: 'cont', why: 'Faux : il faut aussi ∂f/∂t continue. Avec f(x, t) = |t|, continue, F(t) = |t| n\'est pas dérivable en 0.',
+    return vf(PI, t('Si f est continue sur [0 ; 1] × ℝ, alors F(t) = ∫₀¹ f(x, t) dx est dérivable sur ℝ.'), false, rng, {
+      key: 'cont', why: t('Faux : il faut aussi ∂f/∂t continue. Avec f(x, t) = |t|, continue, F(t) = |t| n\'est pas dérivable en 0.'),
     });
   }
   if (kind === 'thm') {
     return tfItem({
-      skill: PI, level: 4, statement: 'Si f et ∂f/∂t sont continues sur [a ; b] × ]c ; d[, alors F(t) = ∫ₐᵇ f(x, t) dx est dérivable sur ]c ; d[ et F′(t) = ∫ₐᵇ ∂f/∂t(x, t) dx.',
-      truth: true, key: 'thm', exam: { format: 'tf', points: 1 }, explanation: 'Vrai : c\'est le théorème de dérivation sous le signe ∫ (bornes fixes).',
+      skill: PI, level: 4, statement: t('Si f et ∂f/∂t sont continues sur [a ; b] × ]c ; d[, alors F(t) = ∫ₐᵇ f(x, t) dx est dérivable sur ]c ; d[ et F′(t) = ∫ₐᵇ ∂f/∂t(x, t) dx.'),
+      truth: true, key: 'thm', exam: { format: 'tf', points: 1 }, explanation: t('Vrai : c\'est le théorème de dérivation sous le signe ∫ (bornes fixes).'),
     });
   }
   const d = { ...rng.pick(PI_DATA.filter((x) => x.wv)), t0: '1' };
   const I = `int(${d.f},x,${d.a},${d.b})`;
-  const t = witnessT(d.Fp, d.wv);
+  const tw = witnessT(d.Fp, d.wv);
   return tfItem({
-    skill: PI, level: 4, statement: `Pour tout t ∈ ]0 ; 2], ${M(`d(${I},t)`)} = ${M(d.wv)}.`, truth: false,
-    counter: { kind: 'refute', quants: [{ q: '∀', v: 't', dom: 'R+' }], pred: `${d.Fp}=${d.wv}`, ask: [{ v: 't', label: 't =' }], answer: { t } },
+    skill: PI, level: 4, statement: t('Pour tout t ∈ ]0 ; 2], {lhs} = {rhs}.', { lhs: M(`d(${I},t)`), rhs: M(d.wv) }), truth: false,
+    counter: { kind: 'refute', quants: [{ q: '∀', v: 't', dom: 'R+' }], pred: `${d.Fp}=${d.wv}`, ask: [{ v: 't', label: 't =' }], answer: { t: tw } },
     ruleIfTrue: 'a2_leibniz_wrong_var', key: `wv:${I}`, exam: { format: 'tf', points: 1 },
-    explanation: `Faux : ${M(d.wv)} = ∫ ∂f/∂x dx (dérivée en x). En dérivant en t : F′(t) = ${M(d.Fp)}, et les deux diffèrent en t = ${t}.`,
+    explanation: t('Faux : {wv} = ∫ ∂f/∂x dx (dérivée en x). En dérivant en t : F′(t) = {Fp}, et les deux diffèrent en t = {tw}.', { wv: M(d.wv), Fp: M(d.Fp), tw }),
   });
 }
 
@@ -261,21 +264,21 @@ function piItem(level, rng, opts = {}) {
 
 const PB = 'a2-param-int-bounds';
 const PB_SUB = [
-  { id: 'leibniz', label: 'règle de Leibniz à trois termes', skill: PB },
-  { id: 'upper', label: 'borne du haut', skill: 'a1-ftc' },
-  { id: 'lower', label: 'borne du bas', skill: 'a1-ftc' },
-  { id: 'inner', label: 'intégrale de ∂f/∂t', skill: PI },
-  { id: 'collect', label: 'regrouper', skill: 'rat-simplify' },
+  { id: 'leibniz', label: t('règle de Leibniz à trois termes'), skill: PB },
+  { id: 'upper', label: t('borne du haut'), skill: 'a1-ftc' },
+  { id: 'lower', label: t('borne du bas'), skill: 'a1-ftc' },
+  { id: 'inner', label: t('intégrale de ∂f/∂t'), skill: PI },
+  { id: 'collect', label: t('regrouper'), skill: 'rat-simplify' },
 ];
 const PB_CHOICES = [
-  { id: 'formula', label: 'Écrire les trois termes : f(b, t)·b′ − f(a, t)·a′ + ∫ ∂f/∂t dx' },
-  { id: 'upper', label: 'Borne du haut : f(b(t), t)·b′(t)' },
-  { id: 'lower', label: 'Borne du bas : f(a(t), t)·a′(t), retranché' },
-  { id: 'inner', label: 'Intégrale de ∂f/∂t : dériver l\'intégrande en t' },
-  { id: 'prim', label: 'Primitive en x, puis évaluer entre a(t) et b(t)' },
-  { id: 'collect', label: 'Regrouper sur le dénominateur t' },
-  { id: 'fbb', label: 'Borne du haut : f(b(t), t)·b(t)', why: 'On multiplie par la dérivée de la borne, b′(t), pas par b(t).' },
-  { id: 'dfx', label: 'Intégrale de ∂f/∂x', rule: 'a2_leibniz_wrong_var', why: 'Le 3e terme dérive l\'intégrande par rapport au paramètre t.' },
+  { id: 'formula', label: t('Écrire les trois termes : f(b, t)·b′ − f(a, t)·a′ + ∫ ∂f/∂t dx') },
+  { id: 'upper', label: t('Borne du haut : f(b(t), t)·b′(t)') },
+  { id: 'lower', label: t('Borne du bas : f(a(t), t)·a′(t), retranché') },
+  { id: 'inner', label: t('Intégrale de ∂f/∂t : dériver l\'intégrande en t') },
+  { id: 'prim', label: t('Primitive en x, puis évaluer entre a(t) et b(t)') },
+  { id: 'collect', label: t('Regrouper sur le dénominateur t') },
+  { id: 'fbb', label: t('Borne du haut : f(b(t), t)·b(t)'), why: t('On multiplie par la dérivée de la borne, b′(t), pas par b(t).') },
+  { id: 'dfx', label: t('Intégrale de ∂f/∂x'), rule: 'a2_leibniz_wrong_var', why: t('Le 3e terme dérive l\'intégrande par rapport au paramètre t.') },
 ];
 
 // φ(u) = k0 + k1·g(u); f(x, t) = φ(tx)/x, ∂f/∂t = φ′(tx), a primitive in x.
@@ -351,9 +354,9 @@ const E4 = () => pbOf(PHI[2], BOUNDS[2]);
 
 const bJudge = (goal, d, leib = false) => ({ kind: 'equiv', vars: ['t'], domain: { t: [0.3, 2] }, target: 'no-int', goal, ...(leib ? { leib: d.leib } : {}) });
 const hypB = (d) => ({
-  kind: 'decision', prompt: 'Peut-on appliquer la règle de Leibniz pour t > 0 ?', options: [
-    { id: 'yes', label: `Oui : f(x, t) = ${toReadable(parse(d.f, K))} et ∂f/∂t sont continues pour x > 0, et les bornes sont dérivables et > 0`, valid: true, ref: true },
-    { id: 'no', label: 'Non : les bornes dépendent de t', valid: false, why: 'Des bornes dérivables sont permises : elles donnent les deux termes de bord.' },
+  kind: 'decision', prompt: t('Peut-on appliquer la règle de Leibniz pour t > 0 ?'), options: [
+    { id: 'yes', label: t('Oui : f(x, t) = {f} et ∂f/∂t sont continues pour x > 0, et les bornes sont dérivables et > 0', { f: toReadable(parse(d.f, K)) }), valid: true, ref: true },
+    { id: 'no', label: t('Non : les bornes dépendent de t'), valid: false, why: t('Des bornes dérivables sont permises : elles donnent les deux termes de bord.') },
   ],
 });
 
@@ -365,25 +368,25 @@ function pbParts(d, level, { value = null } = {}) {
     lines: [E(d.formula, 'f(b, t)·b′ − f(a, t)·a′ + ∫ ∂f/∂t dx', 'leibniz', 'formula')],
   };
   const upper = {
-    html: `Borne du haut : f(${sup(bd.b)}, t)·(${sup(bd.b)})′ =`, ask: '=', start: d.upRaw, judge: bJudge(d.up, d),
-    lines: [E(d.up, 'Simplifier', 'upper', 'upper')],
+    html: t('Borne du haut : f({b}, t)·({b})′ =', { b: sup(bd.b) }), ask: '=', start: d.upRaw, judge: bJudge(d.up, d),
+    lines: [E(d.up, t('Simplifier'), 'upper', 'upper')],
   };
   const lower = {
-    html: `Borne du bas : f(${sup(bd.a)}, t)·(${sup(bd.a)})′ =`, ask: '=', start: d.lowRaw, judge: bJudge(d.low, d),
-    lines: [E(d.low, 'Simplifier', 'lower', 'lower')],
+    html: t('Borne du bas : f({a}, t)·({a})′ =', { a: sup(bd.a) }), ask: '=', start: d.lowRaw, judge: bJudge(d.low, d),
+    lines: [E(d.low, t('Simplifier'), 'lower', 'lower')],
   };
   const inner = {
-    html: `Intégrale : ∫ de ${sup(bd.a)} à ${sup(bd.b)} de ∂f/∂t dx =`, ask: '=', start: d.innerInt, judge: bJudge(d.inner, d),
-    lines: [E(d.innerDf, `∂f/∂t = ${toReadable(parse(d.p.df, K))}`, 'inner', 'inner'), E(d.innerB, 'Primitive en x', 'inner', 'prim'), E(d.inner, 'Évaluer entre les bornes', 'inner', 'prim')],
+    html: t('Intégrale : ∫ de {a} à {b} de ∂f/∂t dx =', { a: sup(bd.a), b: sup(bd.b) }), ask: '=', start: d.innerInt, judge: bJudge(d.inner, d),
+    lines: [E(d.innerDf, `∂f/∂t = ${toReadable(parse(d.p.df, K))}`, 'inner', 'inner'), E(d.innerB, t('Primitive en x'), 'inner', 'prim'), E(d.inner, t('Évaluer entre les bornes'), 'inner', 'prim')],
   };
   const sum = {
-    html: 'Somme des trois termes (le terme du bas est retranché) :', ask: 'F′(t) =', start: `${d.up}-${d.low}+${d.inner}`, judge: bJudge(d.final, d, true),
-    lines: [E(d.final, 'Regrouper sur t', 'collect', 'collect')],
+    html: t('Somme des trois termes (le terme du bas est retranché) :'), ask: 'F′(t) =', start: `${d.up}-${d.low}+${d.inner}`, judge: bJudge(d.final, d, true),
+    lines: [E(d.final, t('Regrouper sur t'), 'collect', 'collect')],
   };
   const parts = [formula, upper, lower, inner, sum];
   if (value) {
     parts.push({
-      html: `Calcule F′(${value}) :`, ask: `F′(${value}) =`, ...valueStart(atT(d.final, value), lin(d.p, d.bd.cb, d.bd.ca, atNum(d.bd.B, value), atNum(d.bd.A, value), value)),
+      html: t('Calcule F′({t0}) :', { t0: value }), ask: `F′(${value}) =`, ...valueStart(atT(d.final, value), lin(d.p, d.bd.cb, d.bd.ca, atNum(d.bd.B, value), atNum(d.bd.A, value), value)),
       lines: [E(lin(d.p, d.bd.cb, d.bd.ca, atNum(d.bd.B, value), atNum(d.bd.A, value), value), `t = ${value}`, null, 'value')],
     });
   }
@@ -406,20 +409,22 @@ function pbLines(level, rng, opts) {
     parts = [{
       start: `d(${d.I},t)`, judge: bJudge(d.final, d, true), pre: [hypB(d)],
       lines: [
-        E(d.formula, 'Règle de Leibniz : trois termes', 'leibniz', 'formula'),
-        E(`${d.up}-${d.low}+${d.innerDf}`, 'Bornes simplifiées ; ∂f/∂t', 'upper', 'upper'),
-        E(`${d.up}-${d.low}+${d.innerB}`, 'Primitive en x', 'inner', 'prim'),
-        E(`${d.up}-${d.low}+${d.inner}`, 'Évaluer entre les bornes', 'inner', 'prim'),
-        E(d.final, 'Regrouper sur t', 'collect', 'collect'),
+        E(d.formula, t('Règle de Leibniz : trois termes'), 'leibniz', 'formula'),
+        E(`${d.up}-${d.low}+${d.innerDf}`, t('Bornes simplifiées ; ∂f/∂t'), 'upper', 'upper'),
+        E(`${d.up}-${d.low}+${d.innerB}`, t('Primitive en x'), 'inner', 'prim'),
+        E(`${d.up}-${d.low}+${d.inner}`, t('Évaluer entre les bornes'), 'inner', 'prim'),
+        E(d.final, t('Regrouper sur t'), 'collect', 'collect'),
       ],
     }];
   }
   const { start, judge, script } = partsScript(parts, level, PB_CHOICES);
   return linesItem({
     skill: PB, level, mode: modeOf(level), start, judge, script,
-    prompt: `F(t) = ${M(d.I)} pour t > 0. Calcule F′(t) par la règle de Leibniz${level === 1 ? ' : F′(t) = f(b(t), t)·b′(t) − f(a(t), t)·a′(t) + ∫ ∂f/∂t dx' : ''}.`,
-    hints: H('Trois termes : borne du haut, borne du bas (retranchée), et l\'intégrale de la dérivée en t.',
-      `Borne du haut : f(${sup(bd.b)}, t)·(${sup(bd.b)})′ = ${M(d.upRaw)} ; ∂f/∂t = ${M(d.p.df)}.`,
+    prompt: level === 1
+      ? t('F(t) = {I} pour t > 0. Calcule F′(t) par la règle de Leibniz : F′(t) = f(b(t), t)·b′(t) − f(a(t), t)·a′(t) + ∫ ∂f/∂t dx.', { I: M(d.I) })
+      : t('F(t) = {I} pour t > 0. Calcule F′(t) par la règle de Leibniz.', { I: M(d.I) }),
+    hints: H(t('Trois termes : borne du haut, borne du bas (retranchée), et l\'intégrale de la dérivée en t.'),
+      t('Borne du haut : f({b}, t)·({b})′ = {up} ; ∂f/∂t = {df}.', { b: sup(bd.b), up: M(d.upRaw), df: M(d.p.df) }),
       `F′(t) = ${M(d.formula)}`),
     subgoals: PB_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null, declares: K,
     key: `${PB}:${level}:${d.I}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -435,12 +440,12 @@ function pbProblem(level, rng, opts) {
   const { start, judge, script } = partsScript(parts, 4, PB_CHOICES);
   const item = linesItem({
     skill: PB, level, mode: 'free', start, judge, script, noHints: true,
-    prompt: `Soit F(t) = ${M(d.I)} pour t > 0. Calcule F′(t) (hypothèses, formule, puis chaque terme), puis F′(1).`,
+    prompt: t('Soit F(t) = {I} pour t > 0. Calcule F′(t) (hypothèses, formule, puis chaque terme), puis F′(1).', { I: M(d.I) }),
     hints: [], subgoals: PB_SUB, keys: KEYS, declares: K,
     key: `${PB}:e4:${d.I}`, fallback: !!d.fallback,
   });
   return problemItem({
-    skill: PB, level, prompt: item.prompt, parts: [{ item, points: [1, 2, 1, 2, 1, 1], title: 'Hypothèses et formule' }],
+    skill: PB, level, prompt: item.prompt, parts: [{ item, points: [1, 2, 1, 2, 1, 1], title: t('Hypothèses et formule') }],
     key: `e4:${d.I}`, exam: opts.exam === 'open' ? { format: 'open', points: 8 } : false, expectedSec: 900,
   });
 }
@@ -456,7 +461,7 @@ function pbMcq(rng, level, opts) {
     { text: d.up },
   ]);
   return mcq({
-    skill: PB, level, prompt: `Soit F(t) = ${M(d.I)} pour t > 0. Alors F′(t) =`,
+    skill: PB, level, prompt: t('Soit F(t) = {I} pour t > 0. Alors F′(t) =', { I: M(d.I) }),
     options, key: `${PB}:mcq:${d.I}`, expectedSec: 240, exam: opts.exam ? { format: 'mcq', points: 1 } : false,
     solution: [{ html: `F′(t) = ${M(d.upRaw)} − ${M(d.lowRaw)} + ${M(d.innerDf)} = ${M(d.up)} − ${M(d.low)} + ${M(d.inner)} = ${M(d.final)}.`, note: '' }],
     fallback: !!d.fallback,
@@ -469,7 +474,7 @@ function pbCoef(rng, opts) {
   const t0 = rng.pick(['1', '2']);
   const value = lin(d.p, d.bd.cb, d.bd.ca, atNum(d.bd.B, t0), atNum(d.bd.A, t0), t0);
   const item = linesItem({
-    skill: PB, level: 4, mode: 'free', prompt: `Soit F(t) = ${M(d.I)} pour t > 0. F′(${t0}) vaut :`,
+    skill: PB, level: 4, mode: 'free', prompt: t('Soit F(t) = {I} pour t > 0. F′({t0}) vaut :', { I: M(d.I), t0 }),
     start: "F'", judge: { kind: 'value', expect: value, form: 'closed' },
     script: [E(value, `F′(t) = ${toReadable(parse(d.final, KT))}`, 'collect', 'value')],
     hints: [], noHints: true, subgoals: PB_SUB, keys: KEYS,
@@ -484,19 +489,19 @@ function pbTf(rng, opts) {
   const kind = rng.pick(['thm', 'noInt', 'sign', 'chain']);
   if (kind === 'thm') {
     return tfItem({
-      skill: PB, level: 4, statement: 'Si f est continue sur ℝ et F(t) = ∫₀ᵗ f(x) dx, alors F est dérivable et F′(t) = f(t).',
-      truth: true, key: 'thm', exam: { format: 'tf', points: 1 }, explanation: 'Vrai : c\'est le théorème fondamental ; la règle de Leibniz avec b(t) = t et f sans t.',
+      skill: PB, level: 4, statement: t('Si f est continue sur ℝ et F(t) = ∫₀ᵗ f(x) dx, alors F est dérivable et F′(t) = f(t).'),
+      truth: true, key: 'thm', exam: { format: 'tf', points: 1 }, explanation: t('Vrai : c\'est le théorème fondamental ; la règle de Leibniz avec b(t) = t et f sans t.'),
     });
   }
   const d = pbData(rng);
   const wrong = d[kind === 'chain' ? 'noChain' : kind];
-  const t = witnessT(d.final, wrong);
+  const tw = witnessT(d.final, wrong);
   const rule = { noInt: 'a2_leibniz_no_integral', sign: 'a2_leibniz_sign', chain: 'a1_ftc_no_chain' }[kind];
   return tfItem({
-    skill: PB, level: 4, statement: `Pour tout t ∈ ]0 ; 2], ${M(`d(${d.I},t)`)} = ${M(wrong)}.`, truth: false,
-    counter: { kind: 'refute', quants: [{ q: '∀', v: 't', dom: 'R+' }], pred: `${d.final}=${wrong}`, ask: [{ v: 't', label: 't =' }], answer: { t } },
+    skill: PB, level: 4, statement: t('Pour tout t ∈ ]0 ; 2], {lhs} = {rhs}.', { lhs: M(`d(${d.I},t)`), rhs: M(wrong) }), truth: false,
+    counter: { kind: 'refute', quants: [{ q: '∀', v: 't', dom: 'R+' }], pred: `${d.final}=${wrong}`, ask: [{ v: 't', label: 't =' }], answer: { t: tw } },
     ruleIfTrue: rule, key: `${kind}:${d.I}`, exam: { format: 'tf', points: 1 },
-    explanation: `Faux : F′(t) = ${M(d.final)} (trois termes : ${M(d.up)}, −${M(wrapP(d.low))} et ${M(d.inner)}). En t = ${t}, les deux membres diffèrent.`,
+    explanation: t('Faux : F′(t) = {final} (trois termes : {up}, −{low} et {inner}). En t = {tw}, les deux membres diffèrent.', { final: M(d.final), up: M(d.up), low: M(wrapP(d.low)), inner: M(d.inner), tw }),
   });
 }
 

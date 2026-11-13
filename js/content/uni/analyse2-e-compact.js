@@ -12,25 +12,26 @@ import {
   q, XY, poly, pat, ptxt, N, rd, rootT, substT, sysCfg, partsLines, mcq4, vfMcq, tfItem, problemItem, mcq,
   H, E, MT, blanked, examTag,
 } from './analyse2-e-kit.js';
+import { t } from '../../i18n.js';
 
 export const EC = 'a2-extrema-compact';
 
 const EC_SUB = [
-  { id: 'interior', label: 'points stationnaires intérieurs', skill: 'a2-crit-points' },
-  { id: 'boundary', label: 'restriction au bord', skill: 'a1-extrema-global' },
-  { id: 'boundary-crit', label: 'points critiques du bord', skill: 'a1-extrema-global' },
-  { id: 'corners', label: 'extrémités et coins', skill: 'a1-extrema-global' },
-  { id: 'compare', label: 'comparer les valeurs', skill: EC },
+  { id: 'interior', label: t('points stationnaires intérieurs'), skill: 'a2-crit-points' },
+  { id: 'boundary', label: t('restriction au bord'), skill: 'a1-extrema-global' },
+  { id: 'boundary-crit', label: t('points critiques du bord'), skill: 'a1-extrema-global' },
+  { id: 'corners', label: t('extrémités et coins'), skill: 'a1-extrema-global' },
+  { id: 'compare', label: t('comparer les valeurs'), skill: EC },
 ];
 const EC_CHOICES = [
-  { id: 'interior', label: 'Résoudre ∇f = 0 à l\'intérieur' },
-  { id: 'value', label: 'Calculer la valeur de f en un candidat' },
-  { id: 'restrict', label: 'Restreindre f à un morceau du bord' },
-  { id: 'crit', label: 'Annuler la dérivée de la restriction' },
-  { id: 'ends', label: 'Valeur aux extrémités (coins)' },
-  { id: 'compare', label: 'Comparer toutes les valeurs' },
-  { id: 'hessian', label: 'Classer le point intérieur avec la hessienne', rule: 'a2_compact_boundary_forgot', why: 'Inutile ici : sur un compact on compare des valeurs, et le max peut être sur le bord.' },
-  { id: 'skipends', label: 'Passer au morceau suivant sans les extrémités', rule: 'a2_compact_corner_forgot', why: 'Les extrémités d\'un morceau du bord sont des candidats, comme a et b sur [a ; b].' },
+  { id: 'interior', label: t('Résoudre ∇f = 0 à l\'intérieur') },
+  { id: 'value', label: t('Calculer la valeur de f en un candidat') },
+  { id: 'restrict', label: t('Restreindre f à un morceau du bord') },
+  { id: 'crit', label: t('Annuler la dérivée de la restriction') },
+  { id: 'ends', label: t('Valeur aux extrémités (coins)') },
+  { id: 'compare', label: t('Comparer toutes les valeurs') },
+  { id: 'hessian', label: t('Classer le point intérieur avec la hessienne'), rule: 'a2_compact_boundary_forgot', why: t('Inutile ici : sur un compact on compare des valeurs, et le max peut être sur le bord.') },
+  { id: 'skipends', label: t('Passer au morceau suivant sans les extrémités'), rule: 'a2_compact_corner_forgot', why: t('Les extrémités d\'un morceau du bord sont des candidats, comme a et b sur [a ; b].') },
 ];
 
 const lin = (a, v) => (a === 1 ? v : a === -1 ? `-${v}` : `${a}${v}`);
@@ -158,10 +159,10 @@ function interiorParts(d, level) {
   if (level >= 2) {
     parts.push({
       html: '', start: `${g[0]} = 0 ; ${g[1]} = 0`, judge: cfg,
-      lines: [E(`(${p0.p[0]} ; ${p0.p[1]})`, `∇f = (${rd(g[0])} ; ${rd(g[1])}) = 0 : un point, intérieur à D`, 'interior', 'interior')],
+      lines: [E(`(${p0.p[0]} ; ${p0.p[1]})`, t('∇f = ({a} ; {b}) = 0 : un point, intérieur à D', { a: rd(g[0]), b: rd(g[1]) }), 'interior', 'interior')],
     });
   }
-  parts.push(valuePart(d, p0, `Valeur de f au point intérieur ${ptR2(p0.p)} :`, 'interior', 'value', level));
+  parts.push(valuePart(d, p0, t('Valeur de f au point intérieur {p} :', { p: ptR2(p0.p) }), 'interior', 'value', level));
   return parts;
 }
 
@@ -181,17 +182,17 @@ function discParts(d, level) {
   const restrict = `${lin(d.a, 'x^2')}+${d.b === 1 ? '' : d.b === -1 ? '-' : d.b}(${R2}-x^2)${d.c ? `${d.c > 0 ? '+' : ''}${lin(d.c, 'x')}` : ''}`.replace('+-', '-');
   if (level >= 2) {
     parts.push({
-      html: `Bord : y² = ${R2} − x², avec x ∈ [−${d.R} ; ${d.R}]. Restriction de f :`, ask: 'f =', start: restrict, judge: { kind: 'equiv', vars: ['x'], target: 'expanded' },
-      lines: [E(d.gT, 'Remplacer y² et développer', 'boundary', 'restrict')],
+      html: t('Bord : y² = {R2} − x², avec x ∈ [−{R} ; {R}]. Restriction de f :', { R2, R: d.R }), ask: 'f =', start: restrict, judge: { kind: 'equiv', vars: ['x'], target: 'expanded' },
+      lines: [E(d.gT, t('Remplacer y² et développer'), 'boundary', 'restrict')],
     });
     parts.push({
-      html: 'Point critique de la restriction :', ask: '⇔', start: `${sumT([[2 * (d.a - d.b), 'x'], [d.c, '']])} = 0`, judge: sysCfg(['x'], [[String(d.xs)]]),
-      lines: [E(`x = ${d.xs}`, 'Dérivée nulle', 'boundary-crit', 'crit')],
+      html: t('Point critique de la restriction :'), ask: '⇔', start: `${sumT([[2 * (d.a - d.b), 'x'], [d.c, '']])} = 0`, judge: sysCfg(['x'], [[String(d.xs)]]),
+      lines: [E(`x = ${d.xs}`, t('Dérivée nulle'), 'boundary-crit', 'crit')],
     });
   }
-  parts.push(valuePart(d, arc, `En x = ${rd(String(d.xs))}, y = ±${rd(d.yT)} : valeur de f en ${ptR2(arc.p)} (et en son symétrique)`, 'boundary-crit', 'value', level));
-  parts.push(valuePart(d, val(d, 'endR'), `Extrémité x = ${d.R} de l'intervalle : point (${d.R} ; 0)`, 'corners', 'ends', level));
-  parts.push(valuePart(d, val(d, 'endL'), `Extrémité x = −${d.R} : point (−${d.R} ; 0)`, 'corners', 'ends', level));
+  parts.push(valuePart(d, arc, t('En x = {x}, y = ±{y} : valeur de f en {p} (et en son symétrique)', { x: rd(String(d.xs)), y: rd(d.yT), p: ptR2(arc.p) }), 'boundary-crit', 'value', level));
+  parts.push(valuePart(d, val(d, 'endR'), t('Extrémité x = {R} de l\'intervalle : point ({R} ; 0)', { R: d.R }), 'corners', 'ends', level));
+  parts.push(valuePart(d, val(d, 'endL'), t('Extrémité x = −{R} : point (−{R} ; 0)', { R: d.R }), 'corners', 'ends', level));
   return parts;
 }
 
@@ -201,59 +202,59 @@ function halfParts(d, level) {
   // The segment y = 0.
   if (level >= 2) {
     parts.push({
-      html: `Segment y = 0, x ∈ [−${d.R} ; ${d.R}] : restriction de f.`, ask: 'f =', start: substT(d.fT, { y: '0' }, XY), judge: { kind: 'equiv', vars: ['x'], target: 'expanded' },
-      lines: [E(lin(d.a, 'x^2'), 'Remplacer y par 0', 'boundary', 'restrict')],
+      html: t('Segment y = 0, x ∈ [−{R} ; {R}] : restriction de f.', { R: d.R }), ask: 'f =', start: substT(d.fT, { y: '0' }, XY), judge: { kind: 'equiv', vars: ['x'], target: 'expanded' },
+      lines: [E(lin(d.a, 'x^2'), t('Remplacer y par 0'), 'boundary', 'restrict')],
     });
   }
-  parts.push(valuePart(d, val(d, 'seg'), 'Sur le segment, la dérivée s\'annule en x = 0 : valeur de f en (0 ; 0)', 'boundary-crit', 'value', level));
-  parts.push(valuePart(d, val(d, 'cR'), `Coins (±${d.R} ; 0) : valeur de f en (${d.R} ; 0) (la même en (−${d.R} ; 0))`, 'corners', 'ends', level));
+  parts.push(valuePart(d, val(d, 'seg'), t('Sur le segment, la dérivée s\'annule en x = 0 : valeur de f en (0 ; 0)'), 'boundary-crit', 'value', level));
+  parts.push(valuePart(d, val(d, 'cR'), t('Coins (±{R} ; 0) : valeur de f en ({R} ; 0) (la même en (−{R} ; 0))', { R: d.R }), 'corners', 'ends', level));
   // The arc: x² = R² − y², y ∈ [0 ; R].
   const restrict = `${d.a === 1 ? '' : d.a === -1 ? '-' : d.a}(${R2}-y^2)${d.b > 0 ? '+' : '-'}${Math.abs(d.b) === 1 ? '' : Math.abs(d.b)}y^2${d.e > 0 ? '+' : '-'}${Math.abs(d.e) === 1 ? '' : Math.abs(d.e)}y`;
   const ysT = String(d.ys);
   if (level >= 2) {
     parts.push({
-      html: `Arc : x² = ${R2} − y², avec y ∈ [0 ; ${d.R}]. Restriction de f :`, ask: 'f =', start: restrict, judge: { kind: 'equiv', vars: ['y'], target: 'expanded' },
-      lines: [E(d.gT, 'Remplacer x² et développer', 'boundary', 'restrict')],
+      html: t('Arc : x² = {R2} − y², avec y ∈ [0 ; {R}]. Restriction de f :', { R2, R: d.R }), ask: 'f =', start: restrict, judge: { kind: 'equiv', vars: ['y'], target: 'expanded' },
+      lines: [E(d.gT, t('Remplacer x² et développer'), 'boundary', 'restrict')],
     });
     parts.push({
-      html: 'Point critique de la restriction :', ask: '⇔', start: `${sumT([[2 * (d.b - d.a), 'y'], [d.e, '']])} = 0`, judge: sysCfg(['y'], [[ysT]]),
-      lines: [E(`y = ${ysT}`, 'Dérivée nulle', 'boundary-crit', 'crit')],
+      html: t('Point critique de la restriction :'), ask: '⇔', start: `${sumT([[2 * (d.b - d.a), 'y'], [d.e, '']])} = 0`, judge: sysCfg(['y'], [[ysT]]),
+      lines: [E(`y = ${ysT}`, t('Dérivée nulle'), 'boundary-crit', 'crit')],
     });
   }
-  const arcDecision = choiceDecision(`y = ${rd(ysT)} est-il sur l'arc (0 ≤ y ≤ ${d.R}) ?`,
-    d.inside ? `Oui : il donne les points (±${rd(d.xT)} ; ${rd(ysT)})` : 'Non : l\'arc n\'a pas de point critique à l\'intérieur',
-    [{ label: d.inside ? 'Non : on l\'écarte' : 'Oui : on le garde comme candidat', why: d.inside ? `0 < ${rd(ysT)} < ${d.R} : le point est sur l'arc.` : `${rd(ysT)} n'est pas dans [0 ; ${d.R}] : ce point n'est pas sur l'arc.` }]);
-  if (d.inside) parts.push(valuePart(d, val(d, 'arc'), `Point critique de l'arc ${ptR2(val(d, 'arc').p)} (et son symétrique)`, 'boundary-crit', 'value', level, { pre: level >= 2 ? [arcDecision] : [] }));
-  parts.push(valuePart(d, val(d, 'top'), `Extrémité y = ${d.R} de l'arc : point (0 ; ${d.R})`, 'corners', 'ends', level, { pre: level >= 2 && !d.inside ? [arcDecision] : [] }));
+  const arcDecision = choiceDecision(t('y = {y} est-il sur l\'arc (0 ≤ y ≤ {R}) ?', { y: rd(ysT), R: d.R }),
+    d.inside ? t('Oui : il donne les points (±{x} ; {y})', { x: rd(d.xT), y: rd(ysT) }) : t('Non : l\'arc n\'a pas de point critique à l\'intérieur'),
+    [{ label: d.inside ? t('Non : on l\'écarte') : t('Oui : on le garde comme candidat'), why: d.inside ? t('0 < {y} < {R} : le point est sur l\'arc.', { y: rd(ysT), R: d.R }) : t('{y} n\'est pas dans [0 ; {R}] : ce point n\'est pas sur l\'arc.', { y: rd(ysT), R: d.R }) }]);
+  if (d.inside) parts.push(valuePart(d, val(d, 'arc'), t('Point critique de l\'arc {p} (et son symétrique)', { p: ptR2(val(d, 'arc').p) }), 'boundary-crit', 'value', level, { pre: level >= 2 ? [arcDecision] : [] }));
+  parts.push(valuePart(d, val(d, 'top'), t('Extrémité y = {R} de l\'arc : point (0 ; {R})', { R: d.R }), 'corners', 'ends', level, { pre: level >= 2 && !d.inside ? [arcDecision] : [] }));
   return parts;
 }
 
-const listPts = (cs) => cs.map((x) => ptR2(x.p)).join(' et ');
+const listPts = (cs) => cs.map((x) => ptR2(x.p)).join(t(' et '));
 
 function compareParts(d) {
   const wrongPts = (which) => {
     const arg = which === 'max' ? d.argmax : d.argmin;
     const out = [];
-    if (arg.length > 1) out.push({ label: `En ${ptR2(arg[0].p)} seulement`, why: `f a la même valeur en ${listPts(arg)} : il y a ${arg.length} points.` });
+    if (arg.length > 1) out.push({ label: t('En {p} seulement', { p: ptR2(arg[0].p) }), why: t('f a la même valeur en {pts} : il y a {n} points.', { pts: listPts(arg), n: arg.length }) });
     const other = d.cands.find((x) => !arg.includes(x) && x.kind === 'interior') || d.cands.find((x) => !arg.includes(x));
-    out.push({ label: `En ${ptR2(other.p)}`, why: `f${ptR2(other.p)} = ${rd(N(other.v))} ; compare avec les autres valeurs.`, rule: which === 'max' && other.kind === 'interior' ? 'a2_compact_boundary_forgot' : null });
+    out.push({ label: t('En {p}', { p: ptR2(other.p) }), why: t('f{p} = {v} ; compare avec les autres valeurs.', { p: ptR2(other.p), v: rd(N(other.v)) }), rule: which === 'max' && other.kind === 'interior' ? 'a2_compact_boundary_forgot' : null });
     return out;
   };
   return [
     {
-      html: 'Comparer toutes les valeurs : le maximum absolu.', ask: 'max f =', start: 'M', judge: { kind: 'value', expect: N(d.maxQ) },
-      pre: [choiceDecision('Où le maximum absolu est-il atteint ?', `En ${listPts(d.argmax)}`, wrongPts('max'))],
-      lines: [E(N(d.maxQ), 'La plus grande valeur', 'compare', 'compare')],
+      html: t('Comparer toutes les valeurs : le maximum absolu.'), ask: 'max f =', start: 'M', judge: { kind: 'value', expect: N(d.maxQ) },
+      pre: [choiceDecision(t('Où le maximum absolu est-il atteint ?'), t('En {p}', { p: listPts(d.argmax) }), wrongPts('max'))],
+      lines: [E(N(d.maxQ), t('La plus grande valeur'), 'compare', 'compare')],
     },
     {
-      html: 'Le minimum absolu.', ask: 'min f =', start: 'm', judge: { kind: 'value', expect: N(d.minQ) },
-      pre: [choiceDecision('Où le minimum absolu est-il atteint ?', `En ${listPts(d.argmin)}`, wrongPts('min'))],
-      lines: [E(N(d.minQ), 'La plus petite valeur', 'compare', 'compare')],
+      html: t('Le minimum absolu.'), ask: 'min f =', start: 'm', judge: { kind: 'value', expect: N(d.minQ) },
+      pre: [choiceDecision(t('Où le minimum absolu est-il atteint ?'), t('En {p}', { p: listPts(d.argmin) }), wrongPts('min'))],
+      lines: [E(N(d.minQ), t('La plus petite valeur'), 'compare', 'compare')],
     },
   ];
 }
 
-const domText = (d) => (d.dom === 'disc' ? `le disque D = {x² + y² ≤ ${d.R * d.R}}` : `le demi-disque D = {x² + y² ≤ ${d.R * d.R}, y ≥ 0}`);
+const domText = (d) => (d.dom === 'disc' ? t('le disque D = {{s}}', { s: `x² + y² ≤ ${d.R * d.R}` }) : t('le demi-disque D = {{s}, y ≥ 0}', { s: `x² + y² ≤ ${d.R * d.R}` }));
 function candTable(d) {
   return d.cands.filter((x) => x.key !== 'arc2' && x.key !== 'cL').map((x) => ptR2(x.p)).join(', ');
 }
@@ -262,15 +263,15 @@ function compactLines(level, rng, opts) {
   const d = compactData(rng);
   const parts = [...interiorParts(d, level), ...(d.dom === 'disc' ? discParts(d, level) : halfParts(d, level)), ...compareParts(d)];
   const fML = MT(d.fT, { vars: XY });
-  const given = level === 1 ? `<br>Candidats (un par symétrie) : ${candTable(d)}. Calcule f en chacun, puis compare.` : level === 2 ? '<br>Candidats : le point stationnaire intérieur, les points critiques de f sur chaque morceau du bord (paramétré comme indiqué), les extrémités des morceaux.' : '';
-  const first = level === 1 ? `Valeur de f en ${ptR2(val(d, 'int').p)} :` : 'Résous ∇f = 0 :';
+  const given = level === 1 ? t('<br>Candidats (un par symétrie) : {c}. Calcule f en chacun, puis compare.', { c: candTable(d) }) : level === 2 ? t('<br>Candidats : le point stationnaire intérieur, les points critiques de f sur chaque morceau du bord (paramétré comme indiqué), les extrémités des morceaux.') : '';
+  const first = level === 1 ? t('Valeur de f en {p} :', { p: ptR2(val(d, 'int').p) }) : t('Résous ∇f = 0 :');
   const acts = [...new Set(parts.flatMap((p) => p.lines.map((l) => l.act)))];
   return partsLines({
     skill: EC, level, parts, choices: EC_CHOICES.filter((c) => acts.includes(c.id) || c.rule),
-    prompt: `Trouve le maximum et le minimum absolus de f(x, y) = ${fML} sur ${domText(d)}.${given}<br>${first}`,
-    hints: H('Candidats : points stationnaires intérieurs, points critiques sur chaque morceau du bord, extrémités des morceaux. Puis compare les valeurs.',
-      d.dom === 'disc' ? `Sur le bord, remplace y² par ${d.R * d.R} − x² : f = ${MT(d.gT, { vars: ['x'] })}, x ∈ [−${d.R} ; ${d.R}].` : `Sur l'arc, remplace x² par ${d.R * d.R} − y² : f = ${MT(d.gT, { vars: ['y'] })}, y ∈ [0 ; ${d.R}].`,
-      `max f = ${rd(N(d.maxQ))} en ${listPts(d.argmax)} ; min f = ${rd(N(d.minQ))} en ${listPts(d.argmin)}.`),
+    prompt: `${t('Trouve le maximum et le minimum absolus de f(x, y) = {f} sur {D}.', { f: fML, D: domText(d) })}${given}<br>${first}`,
+    hints: H(t('Candidats : points stationnaires intérieurs, points critiques sur chaque morceau du bord, extrémités des morceaux. Puis compare les valeurs.'),
+      d.dom === 'disc' ? t('Sur le bord, remplace y² par {R2} − x² : f = {g}, x ∈ [−{R} ; {R}].', { R2: d.R * d.R, g: MT(d.gT, { vars: ['x'] }), R: d.R }) : t('Sur l\'arc, remplace x² par {R2} − y² : f = {g}, y ∈ [0 ; {R}].', { R2: d.R * d.R, g: MT(d.gT, { vars: ['y'] }), R: d.R }),
+      t('max f = {M} en {pM} ; min f = {m} en {pm}.', { M: rd(N(d.maxQ)), pM: listPts(d.argmax), m: rd(N(d.minQ)), pm: listPts(d.argmin) })),
     subgoals: EC_SUB, key: `${EC}:${level}:${d.dom}:${d.R}:${d.fT}`, exam: examTag(opts), fallback: !!d.fallback,
   });
 }
@@ -287,24 +288,24 @@ function compactProblem(level, rng, opts) {
   const corners = [hp[2]];
   const arc = hp.slice(3);
   const exist = mcq({
-    skill: EC, level, prompt: 'Pourquoi f atteint-elle un maximum et un minimum absolus sur D ?', keepOrder: false,
+    skill: EC, level, prompt: t('Pourquoi f atteint-elle un maximum et un minimum absolus sur D ?'), keepOrder: false,
     options: [
-      { html: 'D est fermé et borné (compact) et f est continue', correct: true },
-      { html: 'f est un polynôme, donc bornée sur ℝ²', correct: false },
-      { html: 'f a un point stationnaire dans D', correct: false, rule: 'a2_stationary_is_extremum' },
-      { html: 'D est borné', correct: false, rule: 'a2_compact_open' },
+      { html: t('D est fermé et borné (compact) et f est continue'), correct: true },
+      { html: t('f est un polynôme, donc bornée sur ℝ²'), correct: false },
+      { html: t('f a un point stationnaire dans D'), correct: false, rule: 'a2_stationary_is_extremum' },
+      { html: t('D est borné'), correct: false, rule: 'a2_compact_open' },
     ],
-    key: `exist:${d.fT}`, solution: [{ html: 'Théorème des bornes atteintes : f continue sur un compact non vide.', note: '' }],
+    key: `exist:${d.fT}`, solution: [{ html: t('Théorème des bornes atteintes : f continue sur un compact non vide.'), note: '' }],
   }, rng);
   return problemItem({
-    skill: EC, level, prompt: `Trouve le maximum et le minimum absolus de f(x, y) = ${fML} sur ${domText(d)}.`,
+    skill: EC, level, prompt: t('Trouve le maximum et le minimum absolus de f(x, y) = {f} sur {D}.', { f: fML, D: domText(d) }),
     parts: [
-      { item: exist, points: 0.5, title: 'Existence' },
-      { item: sub(interiorParts(d, L), `Points stationnaires intérieurs. Résous ∇f = 0 :`, 'int'), points: 2, title: 'Intérieur' },
-      { item: sub(seg, `Segment y = 0, x ∈ [−${d.R} ; ${d.R}]. Restriction de f :`, 'seg'), points: 2, title: 'Segment' },
-      { item: sub(arc, `Arc x² + y² = ${d.R * d.R}, y ∈ [0 ; ${d.R}] : x² = ${d.R * d.R} − y². Restriction de f :`, 'arc'), points: 3, title: 'Arc' },
-      { item: sub(corners, `Coins (±${d.R} ; 0). Valeur de f en (${d.R} ; 0) :`, 'corners'), points: 1, title: 'Coins' },
-      { item: sub(compareParts(d), 'Compare toutes les valeurs. Le maximum absolu :', 'cmp'), points: 1.5, title: 'Comparaison' },
+      { item: exist, points: 0.5, title: t('Existence') },
+      { item: sub(interiorParts(d, L), t('Points stationnaires intérieurs. Résous ∇f = 0 :'), 'int'), points: 2, title: t('Intérieur') },
+      { item: sub(seg, t('Segment y = 0, x ∈ [−{R} ; {R}]. Restriction de f :', { R: d.R }), 'seg'), points: 2, title: t('Segment') },
+      { item: sub(arc, t('Arc x² + y² = {R2}, y ∈ [0 ; {R}] : x² = {R2} − y². Restriction de f :', { R2: d.R * d.R, R: d.R }), 'arc'), points: 3, title: t('Arc') },
+      { item: sub(corners, t('Coins (±{R} ; 0). Valeur de f en ({R} ; 0) :', { R: d.R }), 'corners'), points: 1, title: t('Coins') },
+      { item: sub(compareParts(d), t('Compare toutes les valeurs. Le maximum absolu :'), 'cmp'), points: 1.5, title: t('Comparaison') },
     ],
     key: `${level}:${d.fT}:${d.R}`, exam: examTag(opts, 10), expectedSec: 900, fallback: !!d.fallback,
   });
@@ -318,20 +319,20 @@ function compactMcq(level, rng, opts) {
   const which = rng.pick(['max', 'max', 'min']);
   const pick = (cs) => (which === 'max' ? Math.max(...cs.map((x) => Number(x.v))) : Math.min(...cs.map((x) => Number(x.v))));
   const qOf = (num) => d.cands.find((x) => Number(x.v) === num).v;
-  const word = which === 'max' ? 'maximum' : 'minimum';
+  const vaut = (v) => (which === 'max' ? t('Le maximum absolu de f sur D vaut {v}', { v }) : t('Le minimum absolu de f sur D vaut {v}', { v }));
   const right = qOf(which === 'max' ? d.max : d.min);
   const noCorner = d.cands.filter((x) => x.kind !== 'corner' && x.kind !== 'ends');
   const wrongs = [
-    { html: `Le ${word} absolu de f sur D vaut ${rd(N(qOf(pick(noCorner))))}`, rule: 'a2_compact_corner_forgot' },
-    { html: `Le ${word} absolu de f sur D vaut ${rd(N(val(d, 'int').v))}`, rule: 'a2_compact_boundary_forgot' },
-    { html: `f n'a pas de ${word} absolu sur D`, rule: 'a2_compact_open' },
+    { html: vaut(rd(N(qOf(pick(noCorner))))), rule: 'a2_compact_corner_forgot' },
+    { html: vaut(rd(N(val(d, 'int').v))), rule: 'a2_compact_boundary_forgot' },
+    { html: which === 'max' ? t('f n\'a pas de maximum absolu sur D') : t('f n\'a pas de minimum absolu sur D'), rule: 'a2_compact_open' },
   ];
-  const fillers = [...new Set(d.cands.map((x) => N(x.v)))].map((v) => ({ html: `Le ${word} absolu de f sur D vaut ${rd(v)}` }));
+  const fillers = [...new Set(d.cands.map((x) => N(x.v)))].map((v) => ({ html: vaut(rd(v)) }));
   return mcq4({
-    skill: EC, level, prompt: `Soit f(x, y) = ${MT(d.fT, { vars: XY })} sur ${domText(d)}. Laquelle de ces affirmations est vraie ?`,
-    right: `Le ${word} absolu de f sur D vaut ${rd(N(right))}`, wrongs, fillers,
+    skill: EC, level, prompt: t('Soit f(x, y) = {f} sur {D}. Laquelle de ces affirmations est vraie ?', { f: MT(d.fT, { vars: XY }), D: domText(d) }),
+    right: vaut(rd(N(right))), wrongs, fillers,
     key: `mcq:${d.dom}:${d.R}:${d.fT}:${which}`, exam: examTag(opts, 3), expectedSec: 240, fallback: !!d.fallback,
-    solution: d.cands.map((x) => ({ html: `f${ptR2(x.p)} = ${rd(N(x.v))}`, note: x.kind === 'interior' ? 'intérieur' : x.kind === 'boundary' ? 'bord' : 'extrémité' })),
+    solution: d.cands.map((x) => ({ html: `f${ptR2(x.p)} = ${rd(N(x.v))}`, note: x.kind === 'interior' ? t('intérieur') : x.kind === 'boundary' ? t('bord') : t('extrémité') })),
   }, rng);
 }
 
@@ -339,27 +340,27 @@ function compactTf(level, rng, opts) {
   const kind = rng.pick(['compact', 'bounded', 'grad', 'interior']);
   if (kind === 'compact') {
     return tfItem({
-      skill: EC, level, statement: 'Si D ⊂ ℝ² est compact et non vide, et f : D → ℝ est continue, alors f atteint son maximum sur D.', truth: true,
-      explanation: 'Vrai : c\'est le théorème des bornes atteintes (Weierstrass).', key: 'compact', exam: examTag(opts),
-      hints: H('Compact = fermé et borné.', 'f continue sur un compact.', 'Théorème des bornes atteintes.'),
+      skill: EC, level, statement: t('Si D ⊂ ℝ² est compact et non vide, et f : D → ℝ est continue, alors f atteint son maximum sur D.'), truth: true,
+      explanation: t('Vrai : c\'est le théorème des bornes atteintes (Weierstrass).'), key: 'compact', exam: examTag(opts),
+      hints: H(t('Compact = fermé et borné.'), t('f continue sur un compact.'), t('Théorème des bornes atteintes.')),
     });
   }
   if (kind === 'interior') {
     return tfItem({
-      skill: EC, level, statement: 'Si f ∈ C¹ atteint son maximum absolu sur D en un point p intérieur à D, alors ∇f(p) = 0.', truth: true,
-      explanation: 'Vrai : p est aussi un maximum local, et en un extremum local intérieur le gradient est nul.', key: 'interior', exam: examTag(opts),
-      hints: H('Un maximum absolu est aussi un maximum local.', 'p est intérieur.', 'Condition nécessaire : ∇f(p) = 0.'),
+      skill: EC, level, statement: t('Si f ∈ C¹ atteint son maximum absolu sur D en un point p intérieur à D, alors ∇f(p) = 0.'), truth: true,
+      explanation: t('Vrai : p est aussi un maximum local, et en un extremum local intérieur le gradient est nul.'), key: 'interior', exam: examTag(opts),
+      hints: H(t('Un maximum absolu est aussi un maximum local.'), t('p est intérieur.'), t('Condition nécessaire : ∇f(p) = 0.')),
     });
   }
   if (kind === 'bounded') {
-    return vfMcq(EC, 'Si D ⊂ ℝ² est borné et f : D → ℝ est continue, alors f atteint son maximum sur D.', false, rng, {
+    return vfMcq(EC, t('Si D ⊂ ℝ² est borné et f : D → ℝ est continue, alors f atteint son maximum sur D.'), false, rng, {
       key: 'bounded', ruleIfTrue: 'a2_compact_open', exam: !!opts.exam, level,
-      why: 'Faux : sur le disque ouvert x² + y² &lt; 1, f(x, y) = x² + y² ne dépasse pas 1 sans l\'atteindre. Il faut D fermé et borné.',
+      why: t('Faux : sur le disque ouvert x² + y² &lt; 1, f(x, y) = x² + y² ne dépasse pas 1 sans l\'atteindre. Il faut D fermé et borné.'),
     });
   }
-  return vfMcq(EC, 'Sur un compact D, le maximum absolu d\'une fonction f ∈ C¹ est atteint en un point où ∇f = 0.', false, rng, {
+  return vfMcq(EC, t('Sur un compact D, le maximum absolu d\'une fonction f ∈ C¹ est atteint en un point où ∇f = 0.'), false, rng, {
     key: 'grad', ruleIfTrue: 'a2_compact_boundary_forgot', exam: !!opts.exam, level,
-    why: 'Faux : f(x, y) = x sur le disque unité a son maximum 1 en (1, 0), sur le bord, et ∇f = (1, 0) ne s\'annule jamais.',
+    why: t('Faux : f(x, y) = x sur le disque unité a son maximum 1 en (1, 0), sur le bord, et ∇f = (1, 0) ne s\'annule jamais.'),
   });
 }
 

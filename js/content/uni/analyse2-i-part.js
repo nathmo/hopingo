@@ -27,16 +27,17 @@ import {
   q, cmul, sum, basisText, trigText, T, combine, scale, termsText, initial, fit, valueAt,
   applyL, qp, qpText, identify, blankValues, blankMatches, blankTail, mcq4, vfMcq, M,
 } from './analyse2-i-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-particular';
 export const PART_SUB = [
-  { id: 'char', label: 'équation caractéristique et racines', skill: 'a2-ode-const2' },
-  { id: 'homog', label: 'solution homogène', skill: 'a2-ode-const2' },
-  { id: 'form', label: 'forme de y_p', skill: SK },
+  { id: 'char', label: t('équation caractéristique et racines'), skill: 'a2-ode-const2' },
+  { id: 'homog', label: t('solution homogène'), skill: 'a2-ode-const2' },
+  { id: 'form', label: t('forme de y_p'), skill: SK },
   { id: 'derive', label: 'L[y_p]', skill: SK },
-  { id: 'coeffs', label: 'coefficients de y_p', skill: SK },
+  { id: 'coeffs', label: t('coefficients de y_p'), skill: SK },
   { id: 'general', label: 'y = y_h + y_p', skill: 'a2-ode-structure' },
-  { id: 'ic', label: 'conditions initiales', skill: SK },
+  { id: 'ic', label: t('conditions initiales'), skill: SK },
 ];
 
 // ---------- the data ----------
@@ -281,15 +282,15 @@ export function e1Data(rng) {
 // ---------- the parts ----------
 
 const CHOICES = [
-  { id: 'roots', label: 'Résoudre l\'équation caractéristique' },
-  { id: 'homog', label: 'Écrire la solution homogène y_h' },
-  { id: 'derive', label: 'Remplacer y_p par la forme dans le membre de gauche' },
-  { id: 'ident', label: 'Identifier les coefficients' },
-  { id: 'yp', label: 'Écrire y_p avec ses coefficients' },
-  { id: 'general', label: 'Écrire y = y_h + y_p' },
-  { id: 'consts', label: 'Fixer C₁ et C₂ avec les conditions initiales' },
-  { id: 'final', label: 'Remplacer C₁ et C₂ dans y' },
-  { id: 'icfirst', label: 'Fixer C₁ et C₂ sur y_h, puis ajouter y_p', rule: 'a2_ode_ic_before_particular', why: 'Les conditions initiales portent sur la solution entière y = y_h + y_p : écris d\'abord y.' },
+  { id: 'roots', label: t('Résoudre l\'équation caractéristique') },
+  { id: 'homog', label: t('Écrire la solution homogène y_h') },
+  { id: 'derive', label: t('Remplacer y_p par la forme dans le membre de gauche') },
+  { id: 'ident', label: t('Identifier les coefficients') },
+  { id: 'yp', label: t('Écrire y_p avec ses coefficients') },
+  { id: 'general', label: t('Écrire y = y_h + y_p') },
+  { id: 'consts', label: t('Fixer C₁ et C₂ avec les conditions initiales') },
+  { id: 'final', label: t('Remplacer C₁ et C₂ dans y') },
+  { id: 'icfirst', label: t('Fixer C₁ et C₂ sur y_h, puis ajouter y_p'), rule: 'a2_ode_ic_before_particular', why: t('Les conditions initiales portent sur la solution entière y = y_h + y_p : écris d\'abord y.') },
 ];
 
 // Decision lines on the form of y_p: « m racine ? » (level 3) and the form.
@@ -299,47 +300,49 @@ function formDecisions(d, level) {
   const what = rhs === 'exp' ? `m = ${m}` : rhs === 'trig' ? `${k === 1 ? '' : k}i` : '0';
   if (level === 3) {
     const opts = [
-      { id: 's0', label: `${what} n'est pas racine de l'équation caractéristique`, valid: s === 0, why: `Remplace r par ${what} dans l'équation caractéristique.` },
-      { id: 's1', label: `${what} est racine simple`, valid: s === 1, why: s === 0 ? `${what} n'annule pas l'équation caractéristique.` : 'Relis les racines.' },
+      { id: 's0', label: t('{w} n\'est pas racine de l\'équation caractéristique', { w: what }), valid: s === 0, why: t('Remplace r par {w} dans l\'équation caractéristique.', { w: what }) },
+      { id: 's1', label: t('{w} est racine simple', { w: what }), valid: s === 1, why: s === 0 ? t('{w} n\'annule pas l\'équation caractéristique.', { w: what }) : t('Relis les racines.') },
     ];
-    if (rhs === 'exp') opts.push({ id: 's2', label: `${what} est racine double`, valid: s === 2, why: 'Relis les racines.' });
-    out.push({ kind: 'decision', prompt: `Le second membre est ${M(d.rhsText)}. Est-ce un cas de résonance ?`, options: opts });
+    if (rhs === 'exp') opts.push({ id: 's2', label: t('{w} est racine double', { w: what }), valid: s === 2, why: t('Relis les racines.') });
+    out.push({ kind: 'decision', prompt: t('Le second membre est {r}. Est-ce un cas de résonance ?', { r: M(d.rhsText) }), options: opts });
   }
   const opts = [];
   const res = (label, valid, why, rule = null) => opts.push({ id: `f${opts.length}`, label, valid, why, ...(rule && !valid ? { rule } : {}) });
   if (rhs === 'exp') {
     for (const j of [0, 1, 2]) {
       const valid = j === s;
-      const why = j < s ? `${M(basisText(T(1, j, m)))} est solution de l'équation homogène : elle donne 0. ${m} est racine${s === 2 ? ' double' : ''} : multiplie par ${s === 2 ? 'x²' : 'x'}.` : `${m} ${s ? `est racine ${s === 1 ? 'simple' : 'double'}` : 'n\'est pas racine'} : la forme est A${s ? (s === 1 ? 'x' : 'x²') : ''}e^{${m}x}.`;
+      const wv = { f: M(basisText(T(1, j, m))), m };
+      const why = j < s ? (s === 2 ? t('{f} est solution de l\'équation homogène : elle donne 0. {m} est racine double : multiplie par x².', wv) : t('{f} est solution de l\'équation homogène : elle donne 0. {m} est racine : multiplie par x.', wv))
+        : s === 0 ? t('{m} n\'est pas racine : la forme est Ae^{{m}x}.', wv) : s === 1 ? t('{m} est racine simple : la forme est Axe^{{m}x}.', wv) : t('{m} est racine double : la forme est Ax²e^{{m}x}.', wv);
       res(M(`A ${basisText(T(1, j, m))}`), valid, why, j < s ? 'a2_ode_resonance_no_x' : null);
     }
   } else if (rhs === 'trig') {
     const kx = k === 1 ? 'x' : `${k}x`;
     const both = `A cos(${kx})+B sin(${kx})`;
     if (s) {
-      res(M(both), false, `A cos ${kx} + B sin ${kx} est solution de l'équation homogène : elle donne 0. Comme ${what} est racine, multiplie par x.`, 'a2_ode_resonance_no_x');
+      res(M(both), false, t('A cos {kx} + B sin {kx} est solution de l\'équation homogène : elle donne 0. Comme {w} est racine, multiplie par x.', { kx, w: what }), 'a2_ode_resonance_no_x');
       res(M(`x(${both})`), true, '');
-      res(M(`x^2(${both})`), false, `${what} est racine simple : un seul facteur x.`);
+      res(M(`x^2(${both})`), false, t('{w} est racine simple : un seul facteur x.', { w: what }));
     } else {
       res(M(both), true, '');
       if (d.info.p !== 0) {
         const tr = d.rhsQP.has('0|s') && d.rhsQP.get('0|s')[''].n !== 0 ? 'sin' : 'cos';
-        res(M(`A ${tr}(${kx})`), false, `Le terme en ${d.unknown || 'y'}′ crée un ${tr === 'sin' ? 'cos' : 'sin'} : il faut les deux termes.`, 'a2_ode_yp_incomplete');
+        res(M(`A ${tr}(${kx})`), false, t('Le terme en {u}′ crée un {f} : il faut les deux termes.', { u: d.unknown || 'y', f: tr === 'sin' ? 'cos' : 'sin' }), 'a2_ode_yp_incomplete');
       }
-      res(M(`x(${both})`), false, `${what} n'est pas racine : pas de facteur x.`);
+      res(M(`x(${both})`), false, t('{w} n\'est pas racine : pas de facteur x.', { w: what }));
     }
   } else {
     const deg = d.unknowns.length - 1;
     if (deg === 1) {
       res(M('A x+B'), true, '');
-      if (d.info.p !== 0) res(M('A x'), false, 'Le terme en y′ crée une constante à partir de Ax : il faut aussi B.', 'a2_ode_yp_incomplete');
-      res(M('x(A x+B)'), false, '0 n\'est pas racine : pas de facteur x.');
+      if (d.info.p !== 0) res(M('A x'), false, t('Le terme en y′ crée une constante à partir de Ax : il faut aussi B.'), 'a2_ode_yp_incomplete');
+      res(M('x(A x+B)'), false, t('0 n\'est pas racine : pas de facteur x.'));
     } else {
       res(M('A'), true, '');
-      res(M('A x'), false, '0 n\'est pas racine : une constante suffit.');
+      res(M('A x'), false, t('0 n\'est pas racine : une constante suffit.'));
     }
   }
-  out.push({ kind: 'decision', prompt: `Quelle forme pour ${d.u}_p ?`, options: opts });
+  out.push({ kind: 'decision', prompt: t('Quelle forme pour {u}_p ?', { u: d.u }), options: opts });
   return out;
 }
 
@@ -350,21 +353,21 @@ function partsOf(d, o) {
   const parts = [];
   const odeCfg = (extra = {}) => ({ kind: 'ode', eq: d.eq, unknown: u, order: 2, _p: d.trap, ...extra });
   if (o.roots) {
-    parts.push({ html: 'Équation caractéristique : ses racines.', ask: 'r :', start: info.char, judge: info.judge, lines: [E(info.line, 'Racines de l\'équation caractéristique', 'char', 'roots')] });
+    parts.push({ html: t('Équation caractéristique : ses racines.'), ask: t('r :'), start: info.char, judge: info.judge, lines: [E(info.line, t('Racines de l\'équation caractéristique'), 'char', 'roots')] });
   }
   if (o.homog) {
-    const l = E(`${u}_h = ${info.yh}`, 'Solution de l\'équation homogène', 'homog', 'homog');
-    parts.push({ html: `Solution de l'équation homogène ${M(`${info.lhs}=0`)} :`, ask: `${u}_h =`, start: d.eq, judge: odeCfg({ final: 'homog' }), lines: [l] });
+    const l = E(`${u}_h = ${info.yh}`, t('Solution de l\'équation homogène'), 'homog', 'homog');
+    parts.push({ html: t('Solution de l\'équation homogène {eq} :', { eq: M(`${info.lhs}=0`) }), ask: `${u}_h =`, start: d.eq, judge: odeCfg({ final: 'homog' }), lines: [l] });
   }
   // L[y_p] with the trial form.
   const F = d.form.text;
   const Lstart = sum([`d(${F},x,2)`, cmul(info.p, `d(${F},x)`), cmul(info.q, `(${F})`)]);
   const Lline = qpText(d.Lform, d.m, d.k);
   const vars = ['x', ...d.unknowns];
-  const derive = E(Lline, `${u}_p = ${d.form.text} remplacée dans le membre de gauche`, 'derive', 'derive');
+  const derive = E(Lline, t('{u}_p = {f} remplacée dans le membre de gauche', { u, f: d.form.text }), 'derive', 'derive');
   if (level <= 2) Object.assign(derive, blankMatches(Lline, /-?\d+(?=[AB])/g, level === 1 ? 1 : 2));
   parts.push({
-    html: `Remplace ${u}_p = ${M(d.form.text)} dans le membre de gauche :`, ask: `L[${u}_p] =`,
+    html: t('Remplace {u}_p = {f} dans le membre de gauche :', { u, f: M(d.form.text) }), ask: `L[${u}_p] =`,
     start: Lstart, judge: { kind: 'equiv', vars, target: 'no-prime' },
     pre: level >= 2 ? formDecisions(d, level) : [],
     lines: [derive],
@@ -375,14 +378,14 @@ function partsOf(d, o) {
   // (Not at level 3: the menus of the « choose the action » mode read CAS lines.)
   if (sysStart !== solLine && d.id.eqs.length && level !== 3) {
     parts.push({
-      html: `Identifie les coefficients de ${M(Lline)} = ${M(d.rhsText)} :`, ask: d.unknowns.join(', ') + ' :',
+      html: t('Identifie les coefficients de {L} = {r} :', { L: M(Lline), r: M(d.rhsText) }), ask: d.unknowns.join(', ') + ' :',
       start: sysStart, judge: { kind: 'system', vars: d.unknowns, solutions: [d.unknowns.map((x) => N(d.id.sol[x]))] },
-      lines: [E(solLine, 'Résoudre', 'coeffs', 'ident')],
+      lines: [E(solLine, t('Résoudre'), 'coeffs', 'ident')],
     });
   }
-  const ypl = E(`${u}_p = ${d.ypText}`, 'Les coefficients dans la forme', 'coeffs', 'yp');
+  const ypl = E(`${u}_p = ${d.ypText}`, t('Les coefficients dans la forme'), 'coeffs', 'yp');
   if (level <= 2) Object.assign(ypl, blankMatches(ypl.math, /(?<=[=+)]\s*|^)-?(\d+|\(\d+\/\d+\))(?=[a-zA-Z]|$)/g, level === 1 ? 1 : 2));
-  parts.push({ html: 'La solution particulière :', ask: `${u}_p =`, start: d.eq, judge: odeCfg({ final: 'particular' }), lines: [ypl] });
+  parts.push({ html: t('La solution particulière :'), ask: `${u}_p =`, start: d.eq, judge: odeCfg({ final: 'particular' }), lines: [ypl] });
   // y = y_h + y_p, then the constants.
   const gl = E(d.general, 'y = y_h + y_p', 'general', 'general');
   if (level === 1) Object.assign(gl, blankTail(gl.math, d.ypText));
@@ -390,14 +393,14 @@ function partsOf(d, o) {
   if (o.ic) {
     const cl = E(d.consts, `${u}(0) = ${fr(N(d.y0))}, ${u}′(0) = ${fr(N(d.y1))}`, 'ic', 'consts');
     if (level <= 2) Object.assign(cl, blankValues(cl.math, level === 1 ? 1 : null));
-    lines.push(cl, E(d.final, 'La solution du problème de Cauchy', 'ic', 'final'));
+    lines.push(cl, E(d.final, t('La solution du problème de Cauchy'), 'ic', 'final'));
   }
   parts.push({
-    html: o.ic ? 'La solution générale, puis les conditions initiales :' : 'La solution générale :', ask: `${u} =`,
+    html: o.ic ? t('La solution générale, puis les conditions initiales :') : t('La solution générale :'), ask: `${u} =`,
     start: d.eq, judge: odeCfg(o.ic ? { ic: { x: 0, y: N(d.y0), dy: N(d.y1) } } : {}), lines,
   });
   if (o.value) {
-    parts.push({ html: `La valeur demandée :`, ask: `${u}(${d.x1}) =`, start: `${u}(${d.x1})`, judge: { kind: 'value', expect: d.value, form: 'closed' }, lines: [E(d.value, `Remplacer x par ${d.x1}`, 'ic', 'value')] });
+    parts.push({ html: t('La valeur demandée :'), ask: `${u}(${d.x1}) =`, start: `${u}(${d.x1})`, judge: { kind: 'value', expect: d.value, form: 'closed' }, lines: [E(d.value, t('Remplacer x par {x}', { x: d.x1 }), 'ic', 'value')] });
   }
   return parts;
 }
@@ -425,14 +428,14 @@ export function assemble(parts, level, choices) {
   return { ...first, script };
 }
 
-const icText = (d) => `${d.u}(0) = ${fr(N(d.y0))} et ${d.u}′(0) = ${fr(N(d.y1))}`;
+const icText = (d) => t('{u}(0) = {a} et {u}′(0) = {b}', { u: d.u, a: fr(N(d.y0)), b: fr(N(d.y1)) });
 
 function hintsOf(d) {
   const { s, m, rhs, k } = d;
   const what = rhs === 'exp' ? `${m}` : rhs === 'trig' ? `${k === 1 ? '' : k}i` : '0';
   return H(
-    `Racines de l'équation caractéristique : ${M(d.info.line)}. ${what} ${s ? `est racine${s === 2 ? ' double' : ''} : multiplie la forme habituelle par ${s === 2 ? 'x²' : 'x'}` : 'n\'est pas racine : la forme habituelle suffit'}.`,
-    `${d.u}_p = ${M(d.form.text)}, et ${M(qpText(d.Lform, d.m, d.k))} = ${M(d.rhsText)}.`,
+    `${t('Racines de l\'équation caractéristique : {l}.', { l: M(d.info.line) })} ${s ? (s === 2 ? t('{w} est racine double : multiplie la forme habituelle par x².', { w: what }) : t('{w} est racine : multiplie la forme habituelle par x.', { w: what })) : t('{w} n\'est pas racine : la forme habituelle suffit.', { w: what })}`,
+    t('{u}_p = {f}, et {L} = {r}.', { u: d.u, f: M(d.form.text), L: M(qpText(d.Lform, d.m, d.k)), r: M(d.rhsText) }),
     `${M(`${d.u}_p = ${d.ypText}`)}`,
   );
 }
@@ -441,10 +444,10 @@ function particularItem(level, rng, opts, d) {
   const ic = level >= 3 && level !== 3 ? true : level === 3 ? rng.chance(0.5) : false;
   const parts = partsOf(d, { level, ic, roots: false, homog: level >= 2, value: false });
   const { start, judge, script } = assemble(parts, level, CHOICES);
-  const given = level === 1 ? ` Solution homogène : ${M(`${d.u}_h = ${d.info.yh}`)}.` : '';
+  const given = level === 1 ? ` ${t('Solution homogène : {yh}.', { yh: M(`${d.u}_h = ${d.info.yh}`) })}` : '';
   return linesItem({
     skill: SK, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', start, judge, script,
-    prompt: ic ? `Résous ${M(d.eq)} avec ${icText(d)}.${given}` : `Trouve la solution générale de ${M(d.eq)}.${given}`,
+    prompt: (ic ? t('Résous {eq} avec {ic}.', { eq: M(d.eq), ic: icText(d) }) : t('Trouve la solution générale de {eq}.', { eq: M(d.eq) })) + given,
     hints: hintsOf(d), subgoals: PART_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.eq}:${ic ? d.consts : ''}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -457,7 +460,7 @@ function particularProblem(rng, opts, d) {
   const { start, judge, script } = assemble(parts, 5, CHOICES);
   const it = linesItem({
     skill: SK, level: 5, mode: 'free', start, judge, script, noHints: true,
-    prompt: `Trouve la solution de ${M(d.eq)} avec ${icText(d)}, puis calcule ${d.u}(${d.x1}).`,
+    prompt: t('Trouve la solution de {eq} avec {ic}, puis calcule {u}({x}).', { eq: M(d.eq), ic: icText(d), u: d.u, x: d.x1 }),
     hints: [], subgoals: PART_SUB, keys: A2_KEYS,
     key: `${SK}:5:${d.eq}:${d.consts}`, exam: opts.exam === 'open' ? { format: 'open', points: 10 } : false, fallback: !!d.fallback,
   });
@@ -476,11 +479,11 @@ function particularMcq(level, rng, opts, d) {
     val(d.wrong.flip),
     val(d.wrong.half),
   ].filter((w) => w && w.html);
-  const fillers = [scale(d.sol, -1), combine([...d.sol, T(1, 0, 0)]), combine([...d.sol, T(-1, 0, 0)])].map((t) => ({ html: M(valueAt(t, d.x1)) }));
+  const fillers = [scale(d.sol, -1), combine([...d.sol, T(1, 0, 0)]), combine([...d.sol, T(-1, 0, 0)])].map((f) => ({ html: M(valueAt(f, d.x1)) }));
   return mcq4({
-    skill: SK, level, prompt: `Soit ${d.u} la solution de ${M(d.eq)} avec ${icText(d)}. Alors ${d.u}(${d.x1}) vaut :`,
+    skill: SK, level, prompt: t('Soit {u} la solution de {eq} avec {ic}. Alors {u}({x}) vaut :', { u: d.u, eq: M(d.eq), ic: icText(d), x: d.x1 }),
     right: M(d.value), wrongs, fillers,
-    key: `${SK}:mcq:${d.eq}:${d.consts}`, solution: [{ html: M(d.general), note: 'Solution générale' }, { html: M(d.final), note: 'Conditions initiales' }, { html: `${d.u}(${d.x1}) = ${M(d.value)}`, note: '' }],
+    key: `${SK}:mcq:${d.eq}:${d.consts}`, solution: [{ html: M(d.general), note: t('Solution générale') }, { html: M(d.final), note: t('Conditions initiales') }, { html: `${d.u}(${d.x1}) = ${M(d.value)}`, note: '' }],
     exam: opts.exam ? examTag(opts) : false, expectedSec: 240, fallback: !!d.fallback,
   }, rng);
 }
@@ -489,22 +492,22 @@ function particularMcq(level, rng, opts, d) {
 function particularTf(rng, opts, d) {
   const cands = [];
   const good = d.form.text;
-  cands.push({ form: good, truth: true, why: `C'est la bonne forme : ${M(`${d.u}_p = ${d.ypText}`)} convient.` });
+  cands.push({ form: good, truth: true, why: t('C\'est la bonne forme : {f} convient.', { f: M(`${d.u}_p = ${d.ypText}`) }) });
   if (d.res) {
     const noX = d.rhs === 'exp' ? `A ${basisText(T(1, 0, d.m))}` : d.form.text.replace(/^x\(/, '').replace(/\)$/, '');
-    cands.push({ form: noX, truth: false, rule: 'a2_ode_resonance_no_x', why: `Résonance : ${M(noX)} est solution de l'équation homogène, elle donne 0. Il faut ${M(good)}.` });
+    cands.push({ form: noX, truth: false, rule: 'a2_ode_resonance_no_x', why: t('Résonance : {f} est solution de l\'équation homogène, elle donne 0. Il faut {g}.', { f: M(noX), g: M(good) }) });
     if (d.rhs === 'trig') {
       const tr = d.rhsQP.has('0|s') && d.rhsQP.get('0|s')[''].n !== 0 ? 'sin' : 'cos';
       const one = `A ${tr}(${d.k === 1 ? 'x' : `${d.k}x`})`;
-      cands.push({ form: one, truth: false, rule: 'a2_ode_resonance_no_x', why: `Résonance : ${M(one)} est solution de l'équation homogène, elle donne 0. Il faut ${M(good)}.` });
+      cands.push({ form: one, truth: false, rule: 'a2_ode_resonance_no_x', why: t('Résonance : {f} est solution de l\'équation homogène, elle donne 0. Il faut {g}.', { f: M(one), g: M(good) }) });
     }
   }
   if (d.wrong.incomplete) {
     const one = d.wrong.incomplete.form;
-    cands.push({ form: one, truth: false, rule: 'a2_ode_yp_incomplete', why: `${M(one)} ne suffit pas : le terme en ${d.u}′ crée un terme de plus. Il faut ${M(good)}.` });
+    cands.push({ form: one, truth: false, rule: 'a2_ode_yp_incomplete', why: t('{f} ne suffit pas : le terme en {u}′ crée un terme de plus. Il faut {g}.', { f: M(one), u: d.u, g: M(good) }) });
   }
   const c = rng.pick(cands);
-  return vfMcq(SK, `Pour ${M(d.eq)}, il existe une solution particulière de la forme ${M(`${d.u}_p = ${c.form}`)}.`, c.truth, rng, {
+  return vfMcq(SK, t('Pour {eq}, il existe une solution particulière de la forme {f}.', { eq: M(d.eq), f: M(`${d.u}_p = ${c.form}`) }), c.truth, rng, {
     key: `${d.eq}:${c.form}`, why: c.why, ruleIfTrue: c.rule || null,
   });
 }

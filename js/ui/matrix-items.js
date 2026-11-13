@@ -4,6 +4,7 @@
 // the counter-examples of linear algebra in true/false items (ui/tf.js).
 
 import { h, html, play } from './dom.js';
+import { t } from '../i18n.js';
 import { explainRule, solutionHtml } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { MatrixInput } from './matrix-input.js';
@@ -63,14 +64,14 @@ export function mountMatrix(item, ctx, body) {
     const r = judgeMatrixItem(item, input.value);
     const v = r.verdict;
     if (v.kind === 'parse' || v.kind === 'form') { input.flash(); say(`<p>${v.message}</p>`); return; }
-    if (v.kind === 'stay' || v.kind === 'ok') { say(`<p>${v.message || 'C\'est juste, mais ce n\'est pas encore la réponse finale.'}</p>`, 'good'); return; }
+    if (v.kind === 'stay' || v.kind === 'ok') { say(`<p>${v.message || t('C\'est juste, mais ce n\'est pas encore la réponse finale.')}</p>`, 'good'); return; }
     if (r.correct) { play('good'); finish(mistakes === 0); return; }
     play('bad');
     mistakes++;
-    say(v.rule ? explainRule(v.rule, v.diag) : `<p>${v.message || 'Ce n\'est pas la bonne réponse.'}</p>`, 'bad');
+    say(v.rule ? explainRule(v.rule, v.diag) : `<p>${v.message || t('Ce n\'est pas la bonne réponse.')}</p>`, 'bad');
     if (mistakes >= 2) finish(false, v.rule ?? null, v.diag);
   }
-  const footer = h('div', input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, 'Valider'));
+  const footer = h('div', input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, t('Valider')));
   setTimeout(() => input.focus(), 0);
   return { ownFlow: true, footer, onKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } } };
 }
@@ -96,7 +97,7 @@ export function mountExample(item, ctx, body) {
       });
     }
   }
-  const footer = h('div', h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, 'Valider'));
+  const footer = h('div', h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, t('Valider')));
   return { ownFlow: true, footer, onKey: (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } } };
 }
 

@@ -8,6 +8,7 @@ import { toText } from '../../cas/print.js';
 import { walk, lit } from '../../cas/ast.js';
 import { blankLine, templateOf } from '../../judges/lines.js';
 import { MT, mcq } from './kit.js';
+import { t } from '../../i18n.js';
 
 export const N = (x) => toText(lit(Q.of(x)));
 export const modeOf = (level) => (level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free');
@@ -52,7 +53,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -69,8 +70,8 @@ export const frN = (x) => N(x).replace(/-/g, '−');
 // about one function: no counter-example to type).
 export function vfMcq(skill, statement, truth, rule, why, rng, key) {
   return mcq({
-    skill, level: 4, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth, rule: truth ? rule : null }],
+    skill, level: 4, prompt: t('Vrai ou faux ?<br>« {statement} »', { statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : rule }, { html: t('Faux'), correct: !truth, rule: truth ? rule : null }],
     key: `tf:${key}`, exam: { format: 'tf', points: 1 }, expectedSec: 60, solution: [{ html: why, note: '' }],
   }, rng);
 }

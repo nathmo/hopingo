@@ -15,6 +15,7 @@ import {
   jacJudge, domJudge, defKnown, blankChain, jacBlank, vfItem, integrandML, polyText, polyMul, polyPrim, polyInt0,
 } from './analyse2-g-kit.js';
 import { angPrim } from './analyse2-g-polar.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-cyl-sph';
 const SV = { vars: ['r', 'θ', 'φ'] };
@@ -53,14 +54,14 @@ function sphBox(d) {
   const P = [[0, 0, 0]];
   for (let a = 0; a <= 16; a++) {
     for (let b = 0; b <= 16; b++) {
-      const t = Math.PI * (d.dom.t[0].valueOf() + ((d.dom.t[1].valueOf() - d.dom.t[0].valueOf()) * a) / 16);
+      const th = Math.PI * (d.dom.t[0].valueOf() + ((d.dom.t[1].valueOf() - d.dom.t[0].valueOf()) * a) / 16);
       const p = Math.PI * (d.dom.p[0].valueOf() + ((d.dom.p[1].valueOf() - d.dom.p[0].valueOf()) * b) / 16);
-      for (const r of [d.R1, d.R2]) P.push([r * Math.sin(t) * Math.cos(p), r * Math.sin(t) * Math.sin(p), r * Math.cos(t)]);
+      for (const r of [d.R1, d.R2]) P.push([r * Math.sin(th) * Math.cos(p), r * Math.sin(th) * Math.sin(p), r * Math.cos(th)]);
     }
   }
   return [0, 1, 2].map((k) => [Math.floor((Math.min(...P.map((x) => x[k])) - 0.2) * 10) / 10, Math.ceil((Math.max(...P.map((x) => x[k])) + 0.2) * 10) / 10]);
 }
-export const sphValue = (k, i, j, d, t = d.dom.t) => cmul(powInt(k, d.R1, d.R2), angInt(i, j, t[0], t[1]), cn(d.dom.p[1].sub(d.dom.p[0]), 'π'));
+export const sphValue = (k, i, j, d, th = d.dom.t) => cmul(powInt(k, d.R1, d.R2), angInt(i, j, th[0], th[1]), cn(d.dom.p[1].sub(d.dom.p[0]), 'π'));
 
 function drawSph(rng) {
   for (let n = 0; n < 200; n++) {
@@ -83,25 +84,25 @@ function sphParts(d, level) {
   const region = sphRegion(d);
   const ref = sphLine(d);
   const dom = domJudge('sph', region, sphBox(d), ref);
-  let bl = E(ref, 'r entre les sphères, θ depuis l\'axe z, φ autour de l\'axe z', 'bounds', 'bounds');
+  let bl = E(ref, t('r entre les sphères, θ depuis l\'axe z, φ autour de l\'axe z'), 'bounds', 'bounds');
   if (level === 1) bl = { ...bl, ...blankChain(ref, [[0, 'hi'], [1, 'hi']], SV.vars) };
-  const bounds = { html: 'Décris D en coordonnées sphériques (θ mesuré depuis l\'axe z) :', ask: 'D̃ :', start: region.join(' ; '), judge: dom, lines: [bl] };
+  const bounds = { html: t('Décris D en coordonnées sphériques (θ mesuré depuis l\'axe z) :'), ask: t('D̃ :'), start: region.join(' ; '), judge: dom, lines: [bl] };
   const jac = jacJudge('sph', f.cart);
   const F = sphF(f);
   let jl = E(F, 'x = r sin θ cos φ, y = r sin θ sin φ, z = r cos θ ; dV = r² sin θ dr dθ dφ', 'jacobian', 'jac');
   if (level <= 2) jl = { ...jl, ...jacBlank(f.sub, 'r^2×sin(θ)', jac.vars) };
-  const integrand = { html: 'Écris l\'intégrande en sphériques, jacobien compris :', ask: 'f·r² sin θ =', start: f.cart, judge: jac, lines: [jl] };
+  const integrand = { html: t('Écris l\'intégrande en sphériques, jacobien compris :'), ask: 'f·r² sin θ =', start: f.cart, judge: jac, lines: [jl] };
   const [t0, t1] = d.dom.t.map(piText);
   const [p0, p1] = d.dom.p.map(piText);
   const H0 = prod(trig('cos', f.i, 'θ'), trig('sin', f.j, 'θ'));
   const lines = [
-    E(`int(${rk(f.k)},r,${d.R1},${d.R2})×int(${H0},θ,${t0},${t1})×int(1,φ,${p0},${p1})`, 'Bornes constantes et intégrande produit : trois intégrales', 'separate', 'sep'),
-    E(`bracket(r^${f.k + 1}/${f.k + 1},r,${d.R1},${d.R2})×bracket(${angPrim(f.i, f.j, 'θ')},θ,${t0},${t1})×bracket(φ,φ,${p0},${p1})`, 'Primitives', 'compute', 'prim'),
-    E(ctext(d.value), 'Évaluer', 'compute', 'eval'),
+    E(`int(${rk(f.k)},r,${d.R1},${d.R2})×int(${H0},θ,${t0},${t1})×int(1,φ,${p0},${p1})`, t('Bornes constantes et intégrande produit : trois intégrales'), 'separate', 'sep'),
+    E(`bracket(r^${f.k + 1}/${f.k + 1},r,${d.R1},${d.R2})×bracket(${angPrim(f.i, f.j, 'θ')},θ,${t0},${t1})×bracket(φ,φ,${p0},${p1})`, t('Primitives'), 'compute', 'prim'),
+    E(ctext(d.value), t('Évaluer'), 'compute', 'eval'),
   ];
   if (level === 1) lines[1] = { ...lines[1], ...tplOf(lines[1].math, [angPrim(f.i, f.j, 'θ')]) };
   const sStart = `int(int(int(${F},r,${d.R1},${d.R2}),θ,${t0},${t1}),φ,${p0},${p1})`;
-  const value = { html: 'Calcule l\'intégrale :', ask: 'I =', start: sStart, judge: defKnown(sStart, d.value, { jacFactor: 'r^2×sin(θ)' }), lines };
+  const value = { html: t('Calcule l\'intégrale :'), ask: 'I =', start: sStart, judge: defKnown(sStart, d.value, { jacFactor: 'r^2×sin(θ)' }), lines };
   return [bounds, integrand, value];
 }
 
@@ -159,32 +160,32 @@ function cylParts(d, level) {
   const { f, sh } = d;
   const region = cylRegion(d);
   const ref = cylLine(d);
-  let bl = E(ref, 'φ et r décrivent l\'ombre de D sur le plan xy, puis z va du bas au haut', 'bounds', 'bounds');
+  let bl = E(ref, t('φ et r décrivent l\'ombre de D sur le plan xy, puis z va du bas au haut'), 'bounds', 'bounds');
   if (level === 1) bl = { ...bl, ...blankChain(ref, [[1, 'hi'], [2, 'hi']], CV.vars) };
-  const bounds = { html: 'Décris D en coordonnées cylindriques :', ask: 'D̃ :', start: region.join(' ; '), judge: domJudge('cyl', region, cylBox(d), ref), lines: [bl] };
+  const bounds = { html: t('Décris D en coordonnées cylindriques :'), ask: t('D̃ :'), start: region.join(' ; '), judge: domJudge('cyl', region, cylBox(d), ref), lines: [bl] };
   const jac = jacJudge('cyl', f.cart, { rMax: sh.R + 0.5 });
   const F = cylF(f);
   let jl = E(F, 'x = r cos φ, y = r sin φ, z = z ; dV = r dr dφ dz', 'jacobian', 'jac');
   if (level <= 2) jl = { ...jl, ...jacBlank(f.sub, 'r', jac.vars) };
-  const integrand = { html: 'Écris l\'intégrande en cylindriques, jacobien compris :', ask: 'f·r =', start: f.cart, judge: jac, lines: [jl] };
+  const integrand = { html: t('Écris l\'intégrande en cylindriques, jacobien compris :'), ask: 'f·r =', start: f.cart, judge: jac, lines: [jl] };
   const A = piText(d.a);
   const B = piText(d.b);
   const start = `int(int(int(${F},z,${sh.zlo},${sh.zhi}),r,0,${sh.R}),φ,${A},${B})`;
   const Gt = polyText(d.G);
   const lines = sh.s === 'cyl'
     ? [
-      E(`int(${rk(f.m)},r,0,${sh.R})×int(1,φ,${A},${B})×int(${f.e ? 'z' : '1'},z,0,${sh.zhi})`, 'Bornes constantes : trois intégrales', 'separate', 'sep'),
-      E(`bracket(r^${f.m + 1}/${f.m + 1},r,0,${sh.R})×bracket(φ,φ,${A},${B})×bracket(${f.e ? 'z^2/2' : 'z'},z,0,${sh.zhi})`, 'Primitives', 'compute', 'prim'),
-      E(ctext(d.value), 'Évaluer', 'compute', 'eval'),
+      E(`int(${rk(f.m)},r,0,${sh.R})×int(1,φ,${A},${B})×int(${f.e ? 'z' : '1'},z,0,${sh.zhi})`, t('Bornes constantes : trois intégrales'), 'separate', 'sep'),
+      E(`bracket(r^${f.m + 1}/${f.m + 1},r,0,${sh.R})×bracket(φ,φ,${A},${B})×bracket(${f.e ? 'z^2/2' : 'z'},z,0,${sh.zhi})`, t('Primitives'), 'compute', 'prim'),
+      E(ctext(d.value), t('Évaluer'), 'compute', 'eval'),
     ]
     : [
-      E(`int(int(${Gt},r,0,${sh.R}),φ,${A},${B})`, `On intègre d'abord en z, de ${fr(sh.zlo)} à ${fr(sh.zhi)}`, 'separate', 'inner'),
-      E(`int(${Gt},r,0,${sh.R})×int(1,φ,${A},${B})`, 'Plus rien ne dépend de φ : produit', 'separate', 'sep'),
-      E(`bracket(${polyText(polyPrim(d.G))},r,0,${sh.R})×bracket(φ,φ,${A},${B})`, 'Primitives', 'compute', 'prim'),
-      E(ctext(d.value), 'Évaluer', 'compute', 'eval'),
+      E(`int(int(${Gt},r,0,${sh.R}),φ,${A},${B})`, t('On intègre d\'abord en z, de {lo} à {hi}', { lo: fr(sh.zlo), hi: fr(sh.zhi) }), 'separate', 'inner'),
+      E(`int(${Gt},r,0,${sh.R})×int(1,φ,${A},${B})`, t('Plus rien ne dépend de φ : produit'), 'separate', 'sep'),
+      E(`bracket(${polyText(polyPrim(d.G))},r,0,${sh.R})×bracket(φ,φ,${A},${B})`, t('Primitives'), 'compute', 'prim'),
+      E(ctext(d.value), t('Évaluer'), 'compute', 'eval'),
     ];
   if (level === 1) lines[lines.length - 2] = { ...lines[lines.length - 2], ...tplOf(lines[lines.length - 2].math, [sh.s === 'cyl' ? `r^${f.m + 1}/${f.m + 1}` : polyText(polyPrim(d.G))]) };
-  const value = { html: 'Calcule l\'intégrale :', ask: 'I =', start, judge: defKnown(start, d.value, { jacFactor: 'r' }), lines };
+  const value = { html: t('Calcule l\'intégrale :'), ask: 'I =', start, judge: defKnown(start, d.value, { jacFactor: 'r' }), lines };
   return [bounds, integrand, value];
 }
 
@@ -192,24 +193,24 @@ function cylParts(d, level) {
 const tplOf = (math, texts) => tpl(math, texts, {});
 
 export const CS_SUB = [
-  { id: 'bounds', label: 'bornes en cylindriques ou sphériques', skill: SK },
-  { id: 'jacobian', label: 'intégrande et jacobien', skill: 'a2-change-var' },
-  { id: 'separate', label: 'séparer, intégrer de l\'intérieur', skill: 'a2-fubini-rect' },
-  { id: 'compute', label: 'primitives et valeur', skill: 'a2-fubini-rect' },
+  { id: 'bounds', label: t('bornes en cylindriques ou sphériques'), skill: SK },
+  { id: 'jacobian', label: t('intégrande et jacobien'), skill: 'a2-change-var' },
+  { id: 'separate', label: t('séparer, intégrer de l\'intérieur'), skill: 'a2-fubini-rect' },
+  { id: 'compute', label: t('primitives et valeur'), skill: 'a2-fubini-rect' },
 ];
 const CS_CHOICES = [
-  { id: 'bounds', label: 'Décrire D : les bornes de chaque coordonnée' },
-  { id: 'jac', label: 'Remplacer x, y, z et multiplier par le jacobien' },
-  { id: 'inner', label: 'Intégrer d\'abord en z' },
-  { id: 'sep', label: 'Séparer en un produit d\'intégrales' },
-  { id: 'prim', label: 'Écrire les primitives' },
-  { id: 'eval', label: 'Évaluer' },
-  { id: 'cosjac', label: 'Multiplier par r² cos θ', rule: 'a2_sph_theta_from_plane', why: 'θ part de l\'axe z : dV = r² sin θ dr dθ dφ.' },
+  { id: 'bounds', label: t('Décrire D : les bornes de chaque coordonnée') },
+  { id: 'jac', label: t('Remplacer x, y, z et multiplier par le jacobien') },
+  { id: 'inner', label: t('Intégrer d\'abord en z') },
+  { id: 'sep', label: t('Séparer en un produit d\'intégrales') },
+  { id: 'prim', label: t('Écrire les primitives') },
+  { id: 'eval', label: t('Évaluer') },
+  { id: 'cosjac', label: t('Multiplier par r² cos θ'), rule: 'a2_sph_theta_from_plane', why: t('θ part de l\'axe z : dV = r² sin θ dr dθ dφ.') },
 ];
 const decision = (sph) => ({
-  kind: 'decision', prompt: 'Quelles coordonnées ?', options: [
-    { id: 'sph', label: 'Sphériques : boule, coquille, cône depuis l\'origine', valid: sph, why: sph ? '' : 'Les bornes de D parlent de x² + y² et de z séparément : un cylindre, un paraboloïde ou un cône à sommet en bas se décrit en cylindriques.' },
-    { id: 'cyl', label: 'Cylindriques : cylindre, paraboloïde, z entre deux surfaces', valid: !sph, why: !sph ? '' : 'D est bordé par des sphères x² + y² + z² = R² (et des cônes depuis l\'origine) : en sphériques, toutes les bornes sont constantes.' },
+  kind: 'decision', prompt: t('Quelles coordonnées ?'), options: [
+    { id: 'sph', label: t('Sphériques : boule, coquille, cône depuis l\'origine'), valid: sph, why: sph ? '' : t('Les bornes de D parlent de x² + y² et de z séparément : un cylindre, un paraboloïde ou un cône à sommet en bas se décrit en cylindriques.') },
+    { id: 'cyl', label: t('Cylindriques : cylindre, paraboloïde, z entre deux surfaces'), valid: !sph, why: !sph ? '' : t('D est bordé par des sphères x² + y² + z² = R² (et des cônes depuis l\'origine) : en sphériques, toutes les bornes sont constantes.') },
   ],
 });
 
@@ -223,16 +224,16 @@ export function cylSph(level, rng, opts = {}) {
   if (level === 3) parts[0].pre = [decision(isSph)];
   const { start, judge, script } = partsScript(parts, level, CS_CHOICES);
   const region = isSph ? sphRegion(d) : cylRegion(d);
-  const given = level <= 2 ? ` En coordonnées ${isSph ? 'sphériques (θ depuis l\'axe z)' : 'cylindriques'}.` : '';
+  const given = level <= 2 ? ` ${isSph ? t('En coordonnées sphériques (θ depuis l\'axe z).') : t('En coordonnées cylindriques.')}` : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Calcule ∭<sub>D</sub> ${integrandML(d.f.cart, XYZ.vars)} dV, avec D = {${MT(region.join(' ; '), XYZ)}}.${given}`,
+    prompt: t('Calcule ∭<sub>D</sub> {f} dV, avec D = {{D}}.', { f: integrandML(d.f.cart, XYZ.vars), D: MT(region.join(' ; '), XYZ) }) + given,
     hints: isSph
-      ? H('Une boule, une coquille ou un cône depuis l\'origine : sphériques, avec dV = r² sin θ dr dθ dφ.',
-        `θ part de l'axe z : ${MT(`${piText(d.dom.t[0])} ≤ θ ≤ ${piText(d.dom.t[1])}`, SV)} ; l'intégrande devient ${MT(sphF(d.f), SV)}.`,
+      ? H(t('Une boule, une coquille ou un cône depuis l\'origine : sphériques, avec dV = r² sin θ dr dθ dφ.'),
+        t('θ part de l\'axe z : {b} ; l\'intégrande devient {F}.', { b: MT(`${piText(d.dom.t[0])} ≤ θ ≤ ${piText(d.dom.t[1])}`, SV), F: MT(sphF(d.f), SV) }),
         `${MT(sphLine(d), SV)}`)
-      : H('z entre deux surfaces au-dessus d\'un disque : cylindriques, avec dV = r dr dφ dz.',
-        `z va de ${MT(d.sh.zlo, CV)} à ${MT(d.sh.zhi, CV)} ; l'intégrande devient ${MT(cylF(d.f), CV)}.`,
+      : H(t('z entre deux surfaces au-dessus d\'un disque : cylindriques, avec dV = r dr dφ dz.'),
+        t('z va de {lo} à {hi} ; l\'intégrande devient {F}.', { lo: MT(d.sh.zlo, CV), hi: MT(d.sh.zhi, CV), F: MT(cylF(d.f), CV) }),
         `${MT(cylLine(d), CV)}`),
     subgoals: CS_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.kind}:${d.f.id}:${isSph ? `${d.dom.id}:${d.R1}:${d.R2}` : `${d.sh.s}:${d.sh.R}:${d.sh.zhi}:${piText(d.b)}`}`,
@@ -277,9 +278,9 @@ function csMcq(level, rng, opts) {
     options.push(c);
   }
   return mcq({
-    skill: SK, level, prompt: `Soit D = {${MT(sphRegion(d).join(' ; '), XYZ)}}. En sphériques (θ mesuré depuis l'axe z), ∭<sub>D</sub> ${integrandML(f.cart, XYZ.vars)} dV est égale à :`,
+    skill: SK, level, prompt: t('Soit D = {{D}}. En sphériques (θ mesuré depuis l\'axe z), ∭<sub>D</sub> {f} dV est égale à :', { D: MT(sphRegion(d).join(' ; '), XYZ), f: integrandML(f.cart, XYZ.vars) }),
     options: options.map(({ x, ...o }) => o),
-    solution: [{ html: MT(sphLine(d), SV), note: 'Bornes' }, { html: MT(sphF(f), SV), note: 'f·r² sin θ' }, { html: `= ${MT(ctext(d.value))}`, note: 'Valeur' }],
+    solution: [{ html: MT(sphLine(d), SV), note: t('Bornes') }, { html: MT(sphF(f), SV), note: 'f·r² sin θ' }, { html: `= ${MT(ctext(d.value))}`, note: t('Valeur') }],
     key: `mcq:${f.id}:${d.dom.id}:${d.R1}:${d.R2}`, exam: examTag(opts, 3), fallback: !!d.fallback,
   }, rng);
 }
@@ -287,20 +288,20 @@ function csMcq(level, rng, opts) {
 // V/F on the coordinates (the counter-example would be a formula: a
 // two-option multiple choice, exam format tf).
 const STATEMENTS = [
-  { s: 'En sphériques, dV = r² sin θ dr dθ dφ.', truth: true, why: 'θ est mesuré depuis l\'axe z : |det J| = r² sin θ.' },
-  { s: 'En sphériques, dV = r² cos θ dr dθ dφ.', truth: false, rule: 'a2_sph_theta_from_plane', why: 'Avec θ mesuré depuis l\'axe z (convention du cours), z = r cos θ et dV = r² sin θ dr dθ dφ. r² cos θ est la formule d\'un angle mesuré depuis le plan xy.' },
-  { s: 'En sphériques, z = r sin θ.', truth: false, rule: 'a2_sph_theta_from_plane', why: 'θ part de l\'axe z : z = r cos θ.' },
-  { s: 'En sphériques, dV = r dr dθ dφ.', truth: false, rule: 'a2_jacobian_forgot', why: 'Le jacobien des sphériques est r² sin θ.' },
-  { s: 'En cylindriques, dV = r dr dφ dz.', truth: true, why: 'Les cylindriques sont les polaires en (x, y), et z ne change pas : le jacobien est r.' },
-  { s: 'En cylindriques, dV = dr dφ dz.', truth: false, rule: 'a2_jacobian_forgot', why: 'Le jacobien des cylindriques est r : dV = r dr dφ dz.' },
-  { s: 'En sphériques, le cône z ≥ √(x² + y²) devient 0 ≤ θ ≤ π/4.', truth: true, why: 'Sur le cône, z = √(x² + y²), donc cos θ = sin θ : θ = π/4 ; au-dessus, θ est plus petit.' },
-  { s: 'En sphériques, le cône z ≥ √(x² + y²) devient π/4 ≤ θ ≤ π/2.', truth: false, rule: 'a2_sph_theta_from_plane', why: 'θ part de l\'axe z : au-dessus du cône, θ ≤ π/4. π/4 ≤ θ ≤ π/2 décrit l\'extérieur du cône (z ≥ 0).' },
-  { s: 'En sphériques, le demi-espace z ≥ 0 devient 0 ≤ θ ≤ π/2.', truth: true, why: 'z = r cos θ ≥ 0 ⇔ cos θ ≥ 0 ⇔ θ ≤ π/2 (θ ∈ [0 ; π]).' },
-  { s: 'En sphériques, le premier octant x, y, z ≥ 0 devient 0 ≤ θ ≤ π/2, 0 ≤ φ ≤ π.', truth: false, rule: 'a2_polar_angle_bounds', why: 'x ≥ 0 et y ≥ 0 donnent 0 ≤ φ ≤ π/2, pas π.' },
-  { s: 'Pour la boule entière, θ va de 0 à 2π et φ de 0 à π.', truth: false, rule: 'a2_polar_angle_bounds', why: 'θ ∈ [0 ; π] (de l\'axe z vers le bas), φ ∈ [0 ; 2π] (un tour complet).' },
-  { s: 'Le volume de la boule de rayon R vaut ∫₀^{2π}∫₀^π∫₀^R r² sin θ dr dθ dφ = 4πR³/3.', truth: true, why: '(R³/3)·2·2π = 4πR³/3.' },
+  { s: t('En sphériques, dV = r² sin θ dr dθ dφ.'), truth: true, why: t('θ est mesuré depuis l\'axe z : |det J| = r² sin θ.') },
+  { s: t('En sphériques, dV = r² cos θ dr dθ dφ.'), truth: false, rule: 'a2_sph_theta_from_plane', why: t('Avec θ mesuré depuis l\'axe z (convention du cours), z = r cos θ et dV = r² sin θ dr dθ dφ. r² cos θ est la formule d\'un angle mesuré depuis le plan xy.') },
+  { s: t('En sphériques, z = r sin θ.'), truth: false, rule: 'a2_sph_theta_from_plane', why: t('θ part de l\'axe z : z = r cos θ.') },
+  { s: t('En sphériques, dV = r dr dθ dφ.'), truth: false, rule: 'a2_jacobian_forgot', why: t('Le jacobien des sphériques est r² sin θ.') },
+  { s: t('En cylindriques, dV = r dr dφ dz.'), truth: true, why: t('Les cylindriques sont les polaires en (x, y), et z ne change pas : le jacobien est r.') },
+  { s: t('En cylindriques, dV = dr dφ dz.'), truth: false, rule: 'a2_jacobian_forgot', why: t('Le jacobien des cylindriques est r : dV = r dr dφ dz.') },
+  { s: t('En sphériques, le cône z ≥ √(x² + y²) devient 0 ≤ θ ≤ π/4.'), truth: true, why: t('Sur le cône, z = √(x² + y²), donc cos θ = sin θ : θ = π/4 ; au-dessus, θ est plus petit.') },
+  { s: t('En sphériques, le cône z ≥ √(x² + y²) devient π/4 ≤ θ ≤ π/2.'), truth: false, rule: 'a2_sph_theta_from_plane', why: t('θ part de l\'axe z : au-dessus du cône, θ ≤ π/4. π/4 ≤ θ ≤ π/2 décrit l\'extérieur du cône (z ≥ 0).') },
+  { s: t('En sphériques, le demi-espace z ≥ 0 devient 0 ≤ θ ≤ π/2.'), truth: true, why: t('z = r cos θ ≥ 0 ⇔ cos θ ≥ 0 ⇔ θ ≤ π/2 (θ ∈ [0 ; π]).') },
+  { s: t('En sphériques, le premier octant x, y, z ≥ 0 devient 0 ≤ θ ≤ π/2, 0 ≤ φ ≤ π.'), truth: false, rule: 'a2_polar_angle_bounds', why: t('x ≥ 0 et y ≥ 0 donnent 0 ≤ φ ≤ π/2, pas π.') },
+  { s: t('Pour la boule entière, θ va de 0 à 2π et φ de 0 à π.'), truth: false, rule: 'a2_polar_angle_bounds', why: t('θ ∈ [0 ; π] (de l\'axe z vers le bas), φ ∈ [0 ; 2π] (un tour complet).') },
+  { s: t('Le volume de la boule de rayon R vaut ∫₀^{2π}∫₀^π∫₀^R r² sin θ dr dθ dφ = 4πR³/3.'), truth: true, why: '(R³/3)·2·2π = 4πR³/3.' },
 ];
 function csTf(rng, opts) {
-  const t = rng.pick(STATEMENTS);
-  return vfItem(mcq, { skill: SK, statement: t.s, truth: t.truth, rule: t.rule, why: t.why, key: STATEMENTS.indexOf(t) }, rng);
+  const st = rng.pick(STATEMENTS);
+  return vfItem(mcq, { skill: SK, statement: st.s, truth: st.truth, rule: st.rule, why: st.why, key: STATEMENTS.indexOf(st) }, rng);
 }

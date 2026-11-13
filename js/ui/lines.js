@@ -9,6 +9,7 @@
 // lines that follow still give their sub-goal credit.
 
 import { h, html, play } from './dom.js';
+import { t } from '../i18n.js';
 import { MathInput } from './keypad.js';
 import { TokenInput } from './tokens.js';
 import { explainRule, solutionHtml } from './exercises.js';
@@ -104,17 +105,17 @@ export function mountLines(item, ctx, body, opts = {}) {
       if (e.how === 'start') {
         if (i > 0) addNote(run.segments[e.seg].html || '', 'segment');
         else addLine(e.node, 'first', '', false, run.segments[0].judge);
-      } else addLine(e.node, e.how === 'ok' ? 'ok' : e.how, e.how === 'followed' ? 'ta ligne' : '', true, run.segments[e.seg].judge);
+      } else addLine(e.node, e.how === 'ok' ? 'ok' : e.how, e.how === 'followed' ? t('ta ligne') : '', true, run.segments[e.seg].judge);
     });
   } else addLine(run.prev, 'first', '', false);
 
   // ---------- tools ----------
   const hintBtn = canHint ? h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }) : null;
-  const copyBtn = h('button.btn.small.ghost', { type: 'button', onclick: () => input?.set(textWith(run.cfg, run.prev)) }, '⧉ Recopier la ligne');
+  const copyBtn = h('button.btn.small.ghost', { type: 'button', onclick: () => input?.set(textWith(run.cfg, run.prev)) }, t('⧉ Recopier la ligne'));
   const paintTools = () => {
     tools.replaceChildren(...[item.mode !== 'guided' && run.seg === 0 ? copyBtn : null, hintBtn].filter(Boolean));
     if (hintBtn) {
-      hintBtn.textContent = hintShown < item.hints.length ? `💡 Aide (${hintShown + 1}/${item.hints.length})` : '💡 Aide';
+      hintBtn.textContent = hintShown < item.hints.length ? t('💡 Aide ({k}/{n})', { k: hintShown + 1, n: item.hints.length }) : t('💡 Aide');
       hintBtn.disabled = hintShown >= item.hints.length;
     }
   };
@@ -178,7 +179,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       input = new TokenInput({ pieces, onEnter: () => submit(), onChange: (v) => preview(v) });
       preview = () => {};
     } else {
-      input = new MathInput({ keysets, placeholder: 'écris la ligne suivante', onEnter: () => submit(), onChange: (v) => preview(v) });
+      input = new MathInput({ keysets, placeholder: t('écris la ligne suivante'), onEnter: () => submit(), onChange: (v) => preview(v) });
       preview = (v) => {
         let m = null;
         if (v) { try { m = showWith(run.cfg, readWith(run.cfg, v)); } catch { m = innerMath(v, popts()); m = m ? `<math>${m}</math>` : null; } }
@@ -190,7 +191,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       if (!input.value || locked()) return;
       handle(run.submit(input.value, { guided: item.mode === 'guided' }));
     };
-    setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider la ligne'));
+    setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, t('Valider la ligne')));
   }
 
   // Step U3: a judge whose lines are matrices is written in a grid.
@@ -213,13 +214,13 @@ export function mountLines(item, ctx, body, opts = {}) {
         wrong(v, { follow: false });
         if (tries >= 2) {
           const r = run.reveal();
-          if (r) { addLine(r.node, 'shown', line.note, true, keptCfg()); say('<p>Voilà cette ligne. À toi pour la suite !</p>'); afterAccept(r); }
+          if (r) { addLine(r.node, 'shown', line.note, true, keptCfg()); say(t('<p>Voilà cette ligne. À toi pour la suite !</p>')); afterAccept(r); }
         }
         return;
       }
       handle(v, line.note);
     };
-    setFooter(h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider l’étape'));
+    setFooter(h('button.btn.primary.wide', { onclick: () => submit() }, t('Valider l\'étape')));
   }
 
   // A reference line with blanks: the keypad fills the active blank.
@@ -240,8 +241,8 @@ export function mountLines(item, ctx, body, opts = {}) {
       box.querySelectorAll('[data-blank]').forEach((el) => el.addEventListener('click', () => select(Number(el.dataset.blank))));
     };
     const select = (i) => { active = i; input.set(values[i]); paint(); };
-    input = new MathInput({ keysets, placeholder: 'case active', onEnter: () => submit(), onChange: (v) => { values[active] = v; paint(); } });
-    stage.append(box, h('div.lines-blank-input', h('small.muted', n > 1 ? 'Touche une case pour la remplir.' : 'Remplis la case.'), input.display));
+    input = new MathInput({ keysets, placeholder: t('case active'), onEnter: () => submit(), onChange: (v) => { values[active] = v; paint(); } });
+    stage.append(box, h('div.lines-blank-input', h('small.muted', n > 1 ? t('Touche une case pour la remplir.') : t('Remplis la case.')), input.display));
     if (line.note) stage.prepend(h('div.step-label', rich(line.note)));
     paint();
     nextBlank = () => select((active + 1) % n);
@@ -262,7 +263,7 @@ export function mountLines(item, ctx, body, opts = {}) {
           const r = run.reveal();
           if (r) {
             addLine(r.node, 'shown', line.note, true, keptCfg());
-            say('<p>Voilà cette ligne. À toi pour la suite !</p>');
+            say(t('<p>Voilà cette ligne. À toi pour la suite !</p>'));
             afterAccept(r);
           }
         }
@@ -270,7 +271,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       }
       handle(v, line.note);
     };
-    setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider l\'étape'));
+    setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, t('Valider l\'étape')));
   }
 
   function decisionTask(line, index) {
@@ -296,7 +297,7 @@ export function mountLines(item, ctx, body, opts = {}) {
           play('bad');
           b.classList.add('wrong');
           b.disabled = true;
-          say(`<p>${o.why || 'Ce n\'est pas la bonne règle ici.'}</p>`, 'bad');
+          say(`<p>${o.why || t('Ce n\'est pas la bonne règle ici.')}</p>`, 'bad');
           pauseForReading();
         }
       });
@@ -322,7 +323,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       run.passScript(index);
       nextTask();
     };
-    setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, 'Valider'));
+    setFooter(input.keypad(), h('button.btn.primary.wide', { onclick: () => submit() }, t('Valider')));
   }
 
   // Tap mode: the action first, then the line.
@@ -350,7 +351,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       });
       list.appendChild(b);
     }
-    stage.append(h('div.step-label', 'Que fais-tu maintenant ?'), list);
+    stage.append(h('div.step-label', t('Que fais-tu maintenant ?')), list);
     setFooter();
   }
 
@@ -361,7 +362,7 @@ export function mountLines(item, ctx, body, opts = {}) {
       const b = h('button.choice', { type: 'button' }, rich(o.label));
       b.addEventListener('click', () => {
         const right = line.options.find((x) => x.id === line.correct);
-        if (o.id === line.correct) { play('good'); addNote(`✔ ${o.label}`, 'decided'); } else addNote(`La règle utilisée : ${right.label}`, 'decided');
+        if (o.id === line.correct) { play('good'); addNote(`✔ ${o.label}`, 'decided'); } else addNote(t('La règle utilisée : {rule}', { rule: right.label }), 'decided');
         nextTask();
       });
       list.appendChild(b);
@@ -395,13 +396,13 @@ export function mountLines(item, ctx, body, opts = {}) {
 
   function wrong(v, { follow }) {
     play('bad');
-    const why = v.rule ? explainRule(v.rule, v.diag) : `<p>${v.message || 'Cette ligne n\'est pas égale à la précédente.'}</p>`;
+    const why = v.rule ? explainRule(v.rule, v.diag) : `<p>${v.message || t('Cette ligne n\'est pas égale à la précédente.')}</p>`;
     say(why, 'bad');
-    if (run.wrongHere >= 2 && canHint && hintShown < item.hints.length) feedback.insertAdjacentHTML('beforeend', '<p class="muted">Tu peux demander une aide.</p>');
+    if (run.wrongHere >= 2 && canHint && hintShown < item.hints.length) feedback.insertAdjacentHTML('beforeend', t('<p class="muted">Tu peux demander une aide.</p>'));
     if (follow) {
       feedback.append(h('div.row.lines-follow',
-        h('button.btn.small.ghost', { type: 'button', onclick: () => { clearSay(); lockedUntil = 0; } }, 'Corriger'),
-        h('button.btn.small.secondary', { type: 'button', onclick: () => followLine() }, 'Continuer avec ma ligne')));
+        h('button.btn.small.ghost', { type: 'button', onclick: () => { clearSay(); lockedUntil = 0; } }, t('Corriger')),
+        h('button.btn.small.secondary', { type: 'button', onclick: () => followLine() }, t('Continuer avec ma ligne'))));
     }
     pauseForReading();
   }
@@ -412,7 +413,7 @@ export function mountLines(item, ctx, body, opts = {}) {
     if (!r) return;
     lockedUntil = 0;
     clearSay();
-    addLine(node, 'followed', 'ta ligne', true, keptCfg());
+    addLine(node, 'followed', t('ta ligne'), true, keptCfg());
     tapChoice = null;
     afterAccept(r);
   }

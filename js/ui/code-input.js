@@ -7,6 +7,7 @@
 // asked in the same place.
 
 import { h, html, play } from './dom.js';
+import { t as tr } from '../i18n.js';
 import { explainRule, solutionHtml, mountExercise } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { judgeCode } from '../judges/code.js';
@@ -35,7 +36,7 @@ export function mountCode(item, ctx, body) {
   const say = (msg, kind = 'info') => { feedback.className = `step-feedback ${kind}`; feedback.innerHTML = msg; };
 
   if (item.signatures?.length) {
-    body.append(h('details.code-sigs', h('summary', 'Fonctions disponibles'), h('ul', item.signatures.map((s) => h('li', h('code', s))))));
+    body.append(h('details.code-sigs', h('summary', tr('Fonctions disponibles')), h('ul', item.signatures.map((s) => h('li', h('code', s))))));
   }
   // The program, ??? replaced by fields.
   const pre = h('pre.code-block.code-edit');
@@ -46,11 +47,11 @@ export function mountCode(item, ctx, body) {
     const hole = item.holes[k];
     let el;
     if (hole.options) {
-      el = h('select.code-hole', { 'aria-label': `trou ${k + 1}` }, h('option', { value: '' }, '???'), hole.options.map((o, i) => h('option', { value: String(i) }, o.text)));
+      el = h('select.code-hole', { 'aria-label': tr('trou {n}', { n: k + 1 }) }, h('option', { value: '' }, '???'), hole.options.map((o, i) => h('option', { value: String(i) }, o.text)));
       el.addEventListener('change', () => { answers[k] = el.value === '' ? null : Number(el.value); el.classList.remove('right', 'wrong'); });
     } else {
       const width = Math.max(4, Math.min(40, (hole.answer || '').length + 2));
-      el = h('input.code-hole', { type: 'text', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', size: width, 'aria-label': `trou ${k + 1}`, placeholder: '???' });
+      el = h('input.code-hole', { type: 'text', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', size: width, 'aria-label': tr('trou {n}', { n: k + 1 }), placeholder: '???' });
       el.addEventListener('input', () => { answers[k] = el.value; el.classList.remove('right', 'wrong'); });
       el.addEventListener('focus', () => { active = el; });
       el.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
@@ -92,7 +93,7 @@ export function mountCode(item, ctx, body) {
       complete: (o) => ctx.complete({ ...o, correct: o.correct && mistakes === 0, hintsUsed: (o.hintsUsed || 0) + hints.used(), rules: [...rules, ...(o.rules || [])] }),
     };
     const ctrl = mountExercise(item.then, sub);
-    after.replaceChildren(h('div.lines-note.segment', 'Et maintenant :'), ctrl.el);
+    after.replaceChildren(h('div.lines-note.segment', tr('Et maintenant :')), ctrl.el);
     if (ctrl.ownFlow) {
       footer.replaceChildren(ctrl.footer || '');
       keyHandler = ctrl.onKey || null;
@@ -101,13 +102,13 @@ export function mountCode(item, ctx, body) {
     footer.replaceChildren(ctrl.footer || '', h('button.btn.primary.wide', {
       type: 'button',
       onclick: () => { const o = ctrl.check(); if (o && !o.stayOpen) sub.complete(o); },
-    }, 'Valider'));
+    }, tr('Valider')));
     keyHandler = ctrl.onKey || null;
   }
 
   function submit() {
     const r = judgeCode(item, answers);
-    if (r.empty) { say('<p>Remplis tous les trous.</p>'); return; }
+    if (r.empty) { say(tr('<p>Remplis tous les trous.</p>')); return; }
     r.holes.forEach((ok, k) => {
       fields[k].classList.toggle('right', ok === true);
       fields[k].classList.toggle('wrong', ok === false);
@@ -115,7 +116,7 @@ export function mountCode(item, ctx, body) {
     if (r.ok) {
       play('good');
       fields.forEach((f) => { f.disabled = true; });
-      if (item.then) { say('<p>Le programme passe tous les tests.</p>', 'good'); thenTask(); return; }
+      if (item.then) { say(tr('<p>Le programme passe tous les tests.</p>'), 'good'); thenTask(); return; }
       ctx.complete(outcome(mistakes === 0));
       return;
     }
@@ -127,7 +128,7 @@ export function mountCode(item, ctx, body) {
     if (mistakes >= 3) ctx.complete(outcome(false));
   }
 
-  footer.append(h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, 'Vérifier le programme'));
+  footer.append(h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, tr('Vérifier le programme')));
   return { ownFlow: true, footer, onKey: (e) => keyHandler?.(e) };
 }
 

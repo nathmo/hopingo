@@ -12,6 +12,7 @@ import { qNode } from '../../cas/polyx.js';
 import { blankLine } from '../../judges/lines.js';
 import { judgeFor, readWith } from '../../judges/index.js';
 import { MT, mcq } from './kit.js';
+import { t } from '../../i18n.js';
 
 export { CQ };
 export const q = (n, d = 1) => new Q(n, d);
@@ -71,16 +72,16 @@ export function cpolyText(cs, v) {
     const k = n - i;
     if (c.isZero()) return;
     const mono = k === 0 ? '' : k === 1 ? v : `${v}^${k}`;
-    let t;
+    let tq;
     if (c.isReal() || c.re.n === 0) {
       const neg = c.isReal() ? c.re.n < 0 : c.im.n < 0;
       const m = neg ? c.neg() : c;
       const body = k === 0 ? ct(m) : (m.eq(1) ? '' : ct(m)) + mono;
-      t = neg ? `-${body}` : `+${body}`;
-    } else if (k === 0) t = `+${ct(c)}`.replace('+-', '-');
-    else if (c.re.n < 0 && c.im.n < 0) t = `-(${ct(c.neg())})${mono}`;
-    else t = `+(${ct(c)})${mono}`;
-    out += t;
+      tq = neg ? `-${body}` : `+${body}`;
+    } else if (k === 0) tq = `+${ct(c)}`.replace('+-', '-');
+    else if (c.re.n < 0 && c.im.n < 0) tq = `-(${ct(c.neg())})${mono}`;
+    else tq = `+(${ct(c)})${mono}`;
+    out += tq;
   });
   return out.replace(/^\+/, '') || '0';
 }
@@ -94,8 +95,8 @@ export const qpolyText = (cs, v) => toText(qNode(cs.map((c) => Q.of(c)), v));
 export function tpl(math, texts, opts = CX, first = false) {
   const node = parse(math, opts);
   const holes = [];
-  for (const t of texts) {
-    const want = toText(parse(t, opts));
+  for (const tq of texts) {
+    const want = toText(parse(tq, opts));
     let found = null;
     walk(node, (n) => {
       if (n.t !== 'paren' && !holes.includes(n) && toText(n) === want && !(first && found)) found = n;
@@ -118,7 +119,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -158,8 +159,8 @@ export const uniq = (opts) => opts.filter((o, i, a) => a.findIndex((x) => x.html
 // statement, a complex root).
 export function vfMcq(skill, statement, truth, rng, { key, why, ruleIfTrue = null, ruleIfFalse = null }) {
   return mcq({
-    skill, level: 4, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth, rule: truth ? ruleIfFalse : null }],
+    skill, level: 4, prompt: t('Vrai ou faux ?<br>« {statement} »', { statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth, rule: truth ? ruleIfFalse : null }],
     key: `${skill}:tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: { format: 'tf', points: 1 },
   }, rng);
 }
@@ -191,9 +192,9 @@ const gcdN = (a, b) => { while (b) [a, b] = [b, a % b]; return Math.abs(a); };
 // The argument of z ∈ ℚ(i) as a multiple of π/4 (or null).
 export function argPi(z) {
   z = CQ.of(z);
-  const t = Math.atan2(z.im.valueOf() + 0, z.re.valueOf());
-  const k = Math.round(t / (Math.PI / 4));
-  return Math.abs(k * (Math.PI / 4) - t) < 1e-12 ? q(k, 4) : null;
+  const tq = Math.atan2(z.im.valueOf() + 0, z.re.valueOf());
+  const k = Math.round(tq / (Math.PI / 4));
+  return Math.abs(k * (Math.PI / 4) - tq) < 1e-12 ? q(k, 4) : null;
 }
 // As a denominator: 5, (2i), (4+2i), (-3).
 export function cd(z) {

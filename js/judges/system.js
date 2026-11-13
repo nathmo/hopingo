@@ -28,6 +28,7 @@ import { symbolsIn, stripParen, unparen, sub, dependsOn } from '../cas/ast.js';
 import { evalFloat, compileFloat } from '../cas/numeric.js';
 import { diagnoseLine } from './diagnose.js';
 import { frNum } from './common.js';
+import { t } from '../i18n.js';
 
 export const sign = '⇔';
 
@@ -71,13 +72,13 @@ function readTree(cfg, s) {
     if (!inner.includes('=')) {
       const xs = splitTop(inner, [';']);
       const pv = pointVars(cfg);
-      if (xs.length !== pv.length) throw new Error(`Un point a ${pv.length} coordonnées : (${pv.join(' ; ')}).`);
+      if (xs.length !== pv.length) throw new Error(t('Un point a {n} coordonnées : ({c}).', { n: pv.length, c: pv.join(' ; ') }));
       return { point: xs.map((x, i) => parse(`${pv[i]}=${x}`, { vars: cfg.vars })), coords: xs.map((x) => parse(x, { vars: cfg.vars })) };
     }
     return { group: readTree(cfg, inner) };
   }
   const n = parse(s, { vars: cfg.vars });
-  if (n.t !== 'rel' || n.op !== '=') throw new Error('Écris des équations « … = … », séparées par « ; », et « ou » entre les cas.');
+  if (n.t !== 'rel' || n.op !== '=') throw new Error(t('Écris des équations « … = … », séparées par « ; », et « ou » entre les cas.'));
   return { rel: n };
 }
 // Tree → cases: [[rel]] (disjunctive form).
@@ -259,7 +260,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   else {
     try { node = parseLine(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (prev?.t === 'sys' && text(cfg, prev) === text(cfg, node)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev?.t === 'sys' && text(cfg, prev) === text(cfg, node)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const r = compare(cfg, node);
   const fail = (message) => {
     const same = (cand, line) => {
@@ -271,9 +272,9 @@ export function judgeLine(cfg, prev, input, state = {}) {
     const diag = prev ? diagnoseLine('system', prev, node, cfg, same) : null;
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   };
-  if (r.lost.length) return fail(`Tu as perdu la solution ${ptText(r.lost[0])} : elle vérifie le système de départ, mais pas ta ligne.`);
-  if (r.short) return fail(`Dans le cas « ${r.short.map((x) => toText(x)).join(' ; ')} », il manque une équation : le système de départ en a ${r.vars.length}.`);
-  if (r.extra.length) return fail(`Ta ligne a une solution en trop : ${ptText(r.extra[0])} ne vérifie pas le système de départ.`);
+  if (r.lost.length) return fail(t('Tu as perdu la solution {p} : elle vérifie le système de départ, mais pas ta ligne.', { p: ptText(r.lost[0]) }));
+  if (r.short) return fail(t('Dans le cas « {c} », il manque une équation : le système de départ en a {n}.', { c: r.short.map((x) => toText(x)).join(' ; '), n: r.vars.length }));
+  if (r.extra.length) return fail(t('Ta ligne a une solution en trop : {p} ne vérifie pas le système de départ.', { p: ptText(r.extra[0]) }));
   return { kind: isFinal(cfg, node) ? 'done' : 'ok', node };
 }
 

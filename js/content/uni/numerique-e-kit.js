@@ -3,6 +3,7 @@
 // float arithmetic, the error tables of the catalogue, and the number
 // writings of the part.
 
+import { t } from '../../i18n.js';
 import { Q } from '../../math/rational.js';
 import { expText } from './numerique-kit.js';
 
@@ -45,11 +46,11 @@ export function pText(cs, input = false) {
 // ---------- composite formulas ----------
 
 export const METHODS = {
-  rect: { name: 'rectangle (à gauche)', p: 1, r: 0 },
-  mid: { name: 'point milieu', p: 2, r: 1 },
-  trap: { name: 'trapèze', p: 2, r: 1 },
-  simp: { name: 'Simpson', p: 4, r: 3 },
-  gauss2: { name: 'Gauss à 2 points', p: 4, r: 3 },
+  rect: { name: t('rectangle (à gauche)'), p: 1, r: 0 },
+  mid: { name: t('point milieu'), p: 2, r: 1 },
+  trap: { name: t('trapèze'), p: 2, r: 1 },
+  simp: { name: t('Simpson'), p: 4, r: 3 },
+  gauss2: { name: t('Gauss à 2 points'), p: 4, r: 3 },
 };
 
 // Exact (f: x ↦ Q) for rect, mid, trap, simp; float (f: x ↦ number) for all.

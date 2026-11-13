@@ -6,6 +6,7 @@
 import { parseAlg, toPoly, polyText, algHtml } from '../math/algebra.js';
 import { answerItem, mcqItem } from './items.js';
 import { gcd } from '../math/rational.js';
+import { t } from '../i18n.js';
 
 const nz = (rng, lo, hi) => { for (;;) { const x = rng.int(lo, hi); if (x !== 0) return x; } };
 const sgn = (x) => (x < 0 ? `-${-x}` : `+${x}`);
@@ -68,37 +69,40 @@ GEN['lit-value'] = (level, rng) => {
       num = `(${x})^2+(${y})^2-2×(${x})×(${y})`;
     }
     const value = toPoly(parseAlg(num)).constValue().toString();
-    return answerItem('lit-value', level, `Calcule ${algHtml(expr)} pour <i class="m-var">a</i> = ${show(x)} et <i class="m-var">b</i> = ${show(y)}.`, value, {
+    return answerItem('lit-value', level, t('Calcule {e} pour <i class="m-var">a</i> = {a} et <i class="m-var">b</i> = {b}.', { e: algHtml(expr), a: show(x), b: show(y) }), value, {
       tree: num, keys: 'rel', signed: true, key: `${expr}:${x}:${y}`,
-      solution: [{ math: num, note: 'On remplace chaque lettre par sa valeur, avec des parenthèses si elle est négative.' }],
+      solution: [{ math: num, note: t('On remplace chaque lettre par sa valeur, avec des parenthèses si elle est négative.') }],
     });
   }
   const value = toPoly(parseAlg(num)).constValue().toString();
-  return answerItem('lit-value', level, `Calcule ${algHtml(expr)} pour <i class="m-var">x</i> = ${show(x)}.`, value, {
+  return answerItem('lit-value', level, t('Calcule {e} pour <i class="m-var">x</i> = {x}.', { e: algHtml(expr), x: show(x) }), value, {
     tree: num, keys: 'rel', signed: true, key: `${expr}:${x}`,
     traps: jux != null ? [{ value: [jux, 1], rule: 'subst_juxtapose' }] : [],
-    solution: [{ math: num, note: `${a}x veut dire ${a} × x : on remplace x par ${x}${x < 0 ? ', entre parenthèses' : ''}.` }],
+    solution: [{ math: num, note: x < 0 ? t('{a}x veut dire {a} × x : on remplace x par {x}, entre parenthèses.', { a, x }) : t('{a}x veut dire {a} × x : on remplace x par {x}.', { a, x }) }],
   });
 };
 
 // ---------- Traduire en expression ----------
 
 const PHRASES = [
-  (k) => [`Le double de <i>x</i>, augmenté de ${k}`, `2x+${k}`, [[`2(x+${k})`, 'translate_order'], [`x^2+${k}`, null], [`2+x+${k}`, null]]],
-  (k) => [`Le triple de la somme de <i>x</i> et ${k}`, `3(x+${k})`, [[`3x+${k}`, 'translate_order'], [`x+3×${k}`, null], [`3+x+${k}`, null]]],
-  (k) => [`Le carré de <i>x</i>, diminué de ${k}`, `x^2-${k}`, [[`(x-${k})^2`, 'translate_order'], [`2x-${k}`, null], [`x-${k}^2`, null]]],
-  (k) => [`Le périmètre d'un rectangle de côtés <i>x</i> et ${k}`, `2x+${2 * k}`, [[`${k}x`, null], [`x+${k}`, null], [`2x+${k}`, 'translate_order']]],
-  (k) => [`L'aire d'un carré de côté <i>x</i> + ${k}`, `(x+${k})^2`, [[`x^2+${k}`, 'pow_distribute_sum'], [`4(x+${k})`, null], [`2(x+${k})`, null]]],
-  () => ['La somme de trois nombres entiers qui se suivent, le premier étant <i>n</i>', '3n+3', [['3n', null], ['n+3', null], ['n^3', null]]],
-  (k) => [`${k} de moins que le double de <i>x</i>`, `2x-${k}`, [[`${k}-2x`, 'translate_order'], [`2(x-${k})`, 'translate_order'], [`2x+${k}`, null]]],
+  (k) => ['Le double de <i>x</i>, augmenté de {k}', { k }, `2x+${k}`, [[`2(x+${k})`, 'translate_order'], [`x^2+${k}`, null], [`2+x+${k}`, null]]],
+  (k) => ['Le triple de la somme de <i>x</i> et {k}', { k }, `3(x+${k})`, [[`3x+${k}`, 'translate_order'], [`x+3×${k}`, null], [`3+x+${k}`, null]]],
+  (k) => ['Le carré de <i>x</i>, diminué de {k}', { k }, `x^2-${k}`, [[`(x-${k})^2`, 'translate_order'], [`2x-${k}`, null], [`x-${k}^2`, null]]],
+  (k) => ['Le périmètre d\'un rectangle de côtés <i>x</i> et {k}', { k }, `2x+${2 * k}`, [[`${k}x`, null], [`x+${k}`, null], [`2x+${k}`, 'translate_order']]],
+  (k) => ['L\'aire d\'un carré de côté <i>x</i> + {k}', { k }, `(x+${k})^2`, [[`x^2+${k}`, 'pow_distribute_sum'], [`4(x+${k})`, null], [`2(x+${k})`, null]]],
+  () => ['La somme de trois nombres entiers qui se suivent, le premier étant <i>n</i>', {}, '3n+3', [['3n', null], ['n+3', null], ['n^3', null]]],
+  (k) => ['{k} de moins que le double de <i>x</i>', { k }, `2x-${k}`, [[`${k}-2x`, 'translate_order'], [`2(x-${k})`, 'translate_order'], [`2x+${k}`, null]]],
 ];
 
 GEN['lit-write'] = (level, rng) => {
   const pool = level <= 2 ? PHRASES.slice(0, 4) : PHRASES;
-  const [q, right, wrongs] = rng.pick(pool)(rng.int(2, 7));
-  return mcqItem('lit-write', level, `Quelle expression traduit : « ${q} » ?`, [
+  const [fr, vars, right, wrongs] = rng.pick(pool)(rng.int(2, 7));
+  const q = t(fr, vars);
+  // The key stays the French text, whatever the language.
+  const frq = fr.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m));
+  return mcqItem('lit-write', level, t('Quelle expression traduit : « {q} » ?', { q }), [
     { html: algHtml(right), correct: true }, ...wrongs.map(([e, rule]) => ({ html: algHtml(e), correct: false, rule })),
-  ], rng, { key: q, expectedSec: 15 });
+  ], rng, { key: frq, expectedSec: 15 });
 };
 
 // ---------- Égal ou pas ? (exercice éclair) ----------
@@ -135,13 +139,13 @@ GEN['lit-equal'] = (level, rng) => {
   const [l, r, rule] = equalPair(rng, level);
   const [left, right] = rng.chance(0.5) ? [l, r] : [r, l];
   const opts = [
-    { html: 'Oui, pour toutes les valeurs de <i>x</i>', correct: !rule, rule: null },
-    { html: 'Non, pas toujours', correct: !!rule, rule: null },
+    { html: t('Oui, pour toutes les valeurs de <i>x</i>'), correct: !rule, rule: null },
+    { html: t('Non, pas toujours'), correct: !!rule, rule: null },
   ];
   if (rule) opts[0].rule = rule;
-  return mcqItem('lit-equal', level, `${algHtml(left)} et ${algHtml(right)} sont-elles égales ?`, opts, rng, {
+  return mcqItem('lit-equal', level, t('{a} et {b} sont-elles égales ?', { a: algHtml(left), b: algHtml(right) }), opts, rng, {
     keepOrder: true, key: `${left}~${right}`, expectedSec: 6,
-    solution: [{ html: '', note: rule ? `Essaie avec x = 3 : on trouve deux valeurs différentes.` : 'On peut passer de l\'une à l\'autre par les règles du calcul.' }],
+    solution: [{ html: '', note: rule ? t('Essaie avec x = 3 : on trouve deux valeurs différentes.') : t('On peut passer de l\'une à l\'autre par les règles du calcul.') }],
   });
 };
 
@@ -163,9 +167,9 @@ GEN['lit-reduce'] = (level, rng) => {
   if (level === 5) expr += `${sgn(nz(rng, -4, 4))}x×x`.replace(/^\+/, '+');
   const target = canon(expr);
   const total = terms.reduce((s, [c]) => s + c, 0);
-  return algItem('lit-reduce', level, `Réduis : ${algHtml(expr)}`, target, { start: expr,
+  return algItem('lit-reduce', level, t('Réduis : {e}', { e: algHtml(expr) }), target, { start: expr,
     traps: [[`${total}x`, 'conjoin_terms'], [`${total}`, 'conjoin_terms']],
-    solution: [{ math: '0', html: algHtml(target), note: 'On regroupe les termes de même sorte : les x ensemble, les x² ensemble, les nombres ensemble.' }],
+    solution: [{ math: '0', html: algHtml(target), note: t('On regroupe les termes de même sorte : les x ensemble, les x² ensemble, les nombres ensemble.') }],
     key: expr,
   });
 };
@@ -193,9 +197,9 @@ GEN['lit-monomial'] = (level, rng) => {
     traps = [[`${a * b}x^${p * q}`, 'pow_product_multiply_exp'], [`${a + b}x^${p + q}`, 'alg_coeff_add']];
   }
   const target = canon(expr);
-  return algItem('lit-monomial', level, `Calcule et écris le plus simplement possible : ${algHtml(expr)}`, target, { start: expr,
+  return algItem('lit-monomial', level, t('Calcule et écris le plus simplement possible : {e}', { e: algHtml(expr) }), target, { start: expr,
     traps, key: expr, sec: 25,
-    solution: [{ html: algHtml(target), note: 'On multiplie les nombres entre eux, et on additionne les exposants de x : x² × x³ = x⁵.' }],
+    solution: [{ html: algHtml(target), note: t('On multiplie les nombres entre eux, et on additionne les exposants de x : x² × x³ = x⁵.') }],
   });
 };
 
@@ -224,9 +228,9 @@ GEN['lit-expand1'] = (level, rng) => {
     traps = [[`${term(k * a, 'x', true)}${term(b, '')}`, 'distribute_partial']];
   }
   const target = canon(expr);
-  return algItem('lit-expand1', level, `Développe et réduis : ${algHtml(expr)}`, target, { start: expr,
+  return algItem('lit-expand1', level, t('Développe et réduis : {e}', { e: algHtml(expr) }), target, { start: expr,
     traps, key: expr, sec: 30,
-    solution: [{ html: algHtml(target), note: 'Le facteur devant la parenthèse multiplie <b>chaque</b> terme, avec son signe.' }],
+    solution: [{ html: algHtml(target), note: t('Le facteur devant la parenthèse multiplie <b>chaque</b> terme, avec son signe.') }],
   });
 };
 
@@ -243,9 +247,9 @@ GEN['lit-expand2'] = (level, rng) => {
     expr += `${k < 0 ? '-' : '+'}${Math.abs(k)}x(x${sgn(nz(rng, -5, 5))})`;
   }
   const target = canon(expr);
-  return algItem('lit-expand2', level, `Développe et réduis : ${algHtml(expr)}`, target, { start: expr,
+  return algItem('lit-expand2', level, t('Développe et réduis : {e}', { e: algHtml(expr) }), target, { start: expr,
     traps: [[`${term(a * c, 'x^2', true)}${term(b * d, '')}`, 'double_distribution_partial']], key: expr, sec: 45,
-    solution: [{ html: algHtml(target), note: 'Chaque terme de la première parenthèse multiplie chaque terme de la deuxième : 4 produits, puis on réduit.' }],
+    solution: [{ html: algHtml(target), note: t('Chaque terme de la première parenthèse multiplie chaque terme de la deuxième : 4 produits, puis on réduit.') }],
   });
 };
 
@@ -271,9 +275,9 @@ GEN['lit-identities'] = (level, rng) => {
     ];
   }
   const target = canon(expr);
-  return algItem('lit-identities', level, `Développe avec une identité remarquable : ${algHtml(expr)}`, target, { start: expr,
+  return algItem('lit-identities', level, t('Développe avec une identité remarquable : {e}', { e: algHtml(expr) }), target, { start: expr,
     traps, key: expr, sec: 30,
-    solution: [{ html: algHtml(target), note: kind === '±' ? '(a + b)(a − b) = a² − b²' : `(a ${kind === '+' ? '+' : '−'} b)² = a² ${kind === '+' ? '+' : '−'} 2ab + b² : n'oublie pas le double produit.` }],
+    solution: [{ html: algHtml(target), note: kind === '±' ? '(a + b)(a − b) = a² − b²' : t('{id} : n\'oublie pas le double produit.', { id: `(a ${kind === '+' ? '+' : '−'} b)² = a² ${kind === '+' ? '+' : '−'} 2ab + b²` }) }],
   });
 };
 
@@ -292,9 +296,9 @@ GEN['lit-polynomial'] = (level, rng) => {
   ];
   const expr = patterns[Math.min(patterns.length - 1, level - 1 + rng.int(0, 1))];
   const target = canon(expr);
-  return algItem('lit-polynomial', level, `Développe, réduis et ordonne : ${algHtml(expr)}`, target, { start: expr,
+  return algItem('lit-polynomial', level, t('Développe, réduis et ordonne : {e}', { e: algHtml(expr) }), target, { start: expr,
     key: expr, sec: 90,
-    solution: [{ html: algHtml(target), note: 'On développe chaque morceau, puis on regroupe les termes de même degré, du plus grand au plus petit.' }],
+    solution: [{ html: algHtml(target), note: t('On développe chaque morceau, puis on regroupe les termes de même degré, du plus grand au plus petit.') }],
   });
 };
 
@@ -328,9 +332,9 @@ GEN['fac-common'] = (level, rng) => {
   }
   const target = `${factor}(${inner})`;
   const shown = canon(target);
-  return algItem('fac-common', level, `Factorise en mettant le plus grand facteur commun en évidence : ${algHtml(shown)}`, target, { start: shown,
+  return algItem('fac-common', level, t('Factorise en mettant le plus grand facteur commun en évidence : {e}', { e: algHtml(shown) }), target, { start: shown,
     form: 'common', traps, key: shown, sec: 30,
-    solution: [{ html: algHtml(target), note: `Le facteur commun ${factor} sort devant ; dans la parenthèse, on divise chaque terme par ${factor}. Vérifie en redéveloppant.` }],
+    solution: [{ html: algHtml(target), note: t('Le facteur commun {f} sort devant ; dans la parenthèse, on divise chaque terme par {f}. Vérifie en redéveloppant.', { f: factor }) }],
   });
 };
 
@@ -349,9 +353,9 @@ GEN['fac-bracket'] = (level, rng) => {
     const g = p.terms().reduce((acc, t) => gcd(acc, Math.abs(t.c.n)), 0);
     if (g > 1 || p.isConst) return GEN['fac-bracket'](level, rng);
   } catch { /* fine */ }
-  return algItem('fac-bracket', level, `Factorise : ${algHtml(expr)}`, target, { start: expr,
+  return algItem('fac-bracket', level, t('Factorise : {e}', { e: algHtml(expr) }), target, { start: expr,
     form: 'common', key: expr, sec: 45,
-    solution: [{ html: algHtml(target), note: `La parenthèse ${common.replace(/[()]/g, '')} est un facteur commun : on la sort, et on écrit ce qui reste dans une seule parenthèse.` }],
+    solution: [{ html: algHtml(target), note: t('La parenthèse {c} est un facteur commun : on la sort, et on écrit ce qui reste dans une seule parenthèse.', { c: common.replace(/[()]/g, '') }) }],
   });
 };
 
@@ -368,9 +372,9 @@ GEN['fac-identities'] = (level, rng) => {
   const traps = kind === '±'
     ? [[`(${ax}-${b})^2`, 'fac_diff_squares_as_square']]
     : [[`(${ax}${kind === '+' ? '-' : '+'}${b})^2`, 'identity_sign_square'], [`(${ax}+${b})(${ax}-${b})`, 'fac_diff_squares_as_square']];
-  return algItem('fac-identities', level, `Factorise avec une identité remarquable : ${algHtml(shown)}`, target, { start: shown,
+  return algItem('fac-identities', level, t('Factorise avec une identité remarquable : {e}', { e: algHtml(shown) }), target, { start: shown,
     form: 'factored', traps, key: shown, sec: 35,
-    solution: [{ html: algHtml(target), note: kind === '±' ? 'a² − b² = (a − b)(a + b)' : 'a² ± 2ab + b² = (a ± b)² : repère les deux carrés et vérifie le double produit.' }],
+    solution: [{ html: algHtml(target), note: kind === '±' ? 'a² − b² = (a − b)(a + b)' : t('a² ± 2ab + b² = (a ± b)² : repère les deux carrés et vérifie le double produit.') }],
   });
 };
 
@@ -388,9 +392,9 @@ GEN['fac-trinomial'] = (level, rng) => {
   const [r, s] = roots(rng, level);
   const target = `(x${sgn(-r)})(x${sgn(-s)})`;
   const shown = canon(target);
-  return algItem('fac-trinomial', level, `Factorise : ${algHtml(shown)}`, target, { start: shown,
+  return algItem('fac-trinomial', level, t('Factorise : {e}', { e: algHtml(shown) }), target, { start: shown,
     form: 'factored', traps: [[`(x${sgn(r)})(x${sgn(s)})`, 'fac_trinomial_signs']], key: shown, sec: 45,
-    solution: [{ html: algHtml(target), note: `Deux nombres de somme ${-(r + s) < 0 ? '−' : ''}${Math.abs(r + s)} et de produit ${r * s < 0 ? '−' : ''}${Math.abs(r * s)} : ${-r < 0 ? '−' : ''}${Math.abs(r)} et ${-s < 0 ? '−' : ''}${Math.abs(s)}. Vérifie en redéveloppant.` }],
+    solution: [{ html: algHtml(target), note: t('Deux nombres de somme {s} et de produit {p} : {u} et {v}. Vérifie en redéveloppant.', { s: `${-(r + s) < 0 ? '−' : ''}${Math.abs(r + s)}`, p: `${r * s < 0 ? '−' : ''}${Math.abs(r * s)}`, u: `${-r < 0 ? '−' : ''}${Math.abs(r)}`, v: `${-s < 0 ? '−' : ''}${Math.abs(s)}` }) }],
   });
 };
 
@@ -403,9 +407,9 @@ GEN['fac-trinomial-a'] = (level, rng) => {
     if (gcd(a, Math.abs(b)) !== 1 || gcd(c, Math.abs(d)) !== 1) continue;
     const target = `(${a}x${sgn(b)})(${c === 1 ? '' : c}x${sgn(d)})`;
     const shown = canon(target);
-    return algItem('fac-trinomial-a', level, `Factorise : ${algHtml(shown)}`, target, { start: shown,
+    return algItem('fac-trinomial-a', level, t('Factorise : {e}', { e: algHtml(shown) }), target, { start: shown,
       form: 'factored', traps: [[`(${a}x${sgn(-b)})(${c === 1 ? '' : c}x${sgn(-d)})`, 'fac_trinomial_signs']], key: shown, sec: 90,
-      solution: [{ html: algHtml(target), note: 'Méthode ac : cherche deux nombres de produit a·c et de somme b, coupe le terme du milieu en deux, puis regroupe.' }],
+      solution: [{ html: algHtml(target), note: t('Méthode ac : cherche deux nombres de produit a·c et de somme b, coupe le terme du milieu en deux, puis regroupe.') }],
     });
   }
 };
@@ -425,8 +429,8 @@ GEN['fac-complete'] = (level, rng) => {
   ];
   const target = targets[Math.min(4, level - 1)];
   const shown = canon(target);
-  return algItem('fac-complete', level, `Factorise complètement : ${algHtml(shown)}`, target, { start: shown,
+  return algItem('fac-complete', level, t('Factorise complètement : {e}', { e: algHtml(shown) }), target, { start: shown,
     form: 'factored', key: shown, sec: 90,
-    solution: [{ html: algHtml(target), note: 'D\'abord le facteur commun, puis une identité ou un trinôme sur ce qui reste. On s\'arrête quand plus rien ne se factorise.' }],
+    solution: [{ html: algHtml(target), note: t('D\'abord le facteur commun, puis une identité ou un trinôme sur ce qui reste. On s\'arrête quand plus rien ne se factorise.') }],
   });
 };

@@ -23,6 +23,7 @@ import { evalFloat } from '../cas/numeric.js';
 import * as MX from '../cas/matrix.js';
 import { diagnoseLine } from './diagnose.js';
 import { readMat, mopts, wrongV, parseLine, show, text, input, rankOfVectors, fRank } from './matcommon.js';
+import { t } from '../i18n.js';
 
 export { parseLine, show, text, input };
 
@@ -84,29 +85,29 @@ export function judgeFamily(cfg, fam, node) {
   const ref = reference(cfg);
   const opts = optsOf(cfg);
   const need = cfg.require || 'basis';
-  if (!fam) return { kind: 'form', node, message: cfg.affine ? 'Écris l\'ensemble sous la forme (point) + t·(vecteur) + s·(vecteur).' : 'Écris une liste de vecteurs : (1 ; 0 ; 2), (0 ; 1 ; −1).' };
+  if (!fam) return { kind: 'form', node, message: cfg.affine ? t('Écris l\'ensemble sous la forme (point) + t·(vecteur) + s·(vecteur).') : t('Écris une liste de vecteurs : (1 ; 0 ; 2), (0 ; 1 ; −1).') };
   const n = ref.n;
-  if (fam.vecs.some((v) => v.rows.length !== n)) return { kind: 'form', node, message: `Chaque vecteur doit avoir ${n} composantes.` };
+  if (fam.vecs.some((v) => v.rows.length !== n)) return { kind: 'form', node, message: t('Chaque vecteur doit avoir {n} composantes.', { n }) };
   if (cfg.affine) {
-    if (!fam.p) return { kind: 'form', node, message: 'Écris aussi le point : x = p + t·v.' };
+    if (!fam.p) return { kind: 'form', node, message: t('Écris aussi le point : x = p + t·v.') };
     const d = vecOf(fam.p.rows.map((r, i) => simp({ t: 'bin', op: '-', l: r[0], r: ref.p.rows[i][0] })));
     const dZero = d.rows.every((r) => isZeroScalar(r[0]));
-    if (!dZero && !inSpan([d], ref.basis)) return { kind: 'wrong', node, message: 'Ton point n\'est pas une solution du système.', why: 'point' };
+    if (!dZero && !inSpan([d], ref.basis)) return { kind: 'wrong', node, message: t('Ton point n\'est pas une solution du système.'), why: 'point' };
   }
   const vecs = fam.vecs.filter((v) => !v.rows.every((r) => isZeroScalar(r[0])));
   if (cfg.nested) {
     for (let k = 1; k <= vecs.length; k++) {
-      if (!sameSpan(vecs.slice(0, k), ref.basis.slice(0, k))) return { kind: 'wrong', node, message: `Les ${k} premiers vecteurs n'engendrent pas le même espace que x₁${k > 1 ? `, …, x${'₀₁₂₃₄₅₆₇₈₉'[k]}` : ''}.` };
+      if (!sameSpan(vecs.slice(0, k), ref.basis.slice(0, k))) return { kind: 'wrong', node, message: t('Les {k} premiers vecteurs n\'engendrent pas le même espace que {xs}.', { k, xs: `x₁${k > 1 ? `, …, x${'₀₁₂₃₄₅₆₇₈₉'[k]}` : ''}` }) };
     }
-    if (vecs.length < fam.vecs.length) return { kind: 'wrong', node, message: 'Un vecteur nul n\'a pas sa place dans une base.' };
+    if (vecs.length < fam.vecs.length) return { kind: 'wrong', node, message: t('Un vecteur nul n\'a pas sa place dans une base.') };
   } else if (!sameSpan(vecs, ref.basis)) {
-    const msg = inSpan(vecs, ref.basis) ? 'Tes vecteurs sont bien dans l\'espace, mais ils ne l\'engendrent pas tout entier.' : 'Un de tes vecteurs n\'est pas dans l\'espace demandé.';
+    const msg = inSpan(vecs, ref.basis) ? t('Tes vecteurs sont bien dans l\'espace, mais ils ne l\'engendrent pas tout entier.') : t('Un de tes vecteurs n\'est pas dans l\'espace demandé.');
     return { kind: 'wrong', node, message: msg };
   }
   const rk = rankOfVectors(vecs);
-  if (need !== 'span' && (rk !== vecs.length || vecs.length < fam.vecs.length)) return { kind: 'stay', node, message: 'Tes vecteurs engendrent le bon espace, mais ils sont liés : garde-en une base.' };
-  if ((need === 'orthogonal' || need === 'orthonormal') && !orthogonal(vecs)) return { kind: 'stay', node, message: 'Ces vecteurs engendrent le bon espace, mais ils ne sont pas orthogonaux deux à deux.' };
-  if (need === 'orthonormal' && !unit(vecs)) return { kind: 'stay', node, message: 'Ces vecteurs sont orthogonaux ; il reste à les diviser par leur norme.' };
+  if (need !== 'span' && (rk !== vecs.length || vecs.length < fam.vecs.length)) return { kind: 'stay', node, message: t('Tes vecteurs engendrent le bon espace, mais ils sont liés : garde-en une base.') };
+  if ((need === 'orthogonal' || need === 'orthonormal') && !orthogonal(vecs)) return { kind: 'stay', node, message: t('Ces vecteurs engendrent le bon espace, mais ils ne sont pas orthogonaux deux à deux.') };
+  if (need === 'orthonormal' && !unit(vecs)) return { kind: 'stay', node, message: t('Ces vecteurs sont orthogonaux ; il reste à les diviser par leur norme.') };
   if (cfg.nested && vecs.length < ref.basis.length) return { kind: 'ok', node };
   return { kind: 'done', node };
 }

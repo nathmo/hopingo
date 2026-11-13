@@ -13,6 +13,7 @@ import { add, mul, neg, lit } from '../ast.js';
 import { exactValue } from '../normal.js';
 import { toText } from '../print.js';
 import { candidateOps } from '../../judges/rowops.js';
+import { t } from '../../i18n.js';
 
 const T = (n) => toText(n).replace(/-/g, '−');
 const opsOf = (prev, ctx) => (ctx?.cfg?._ops?.length ? ctx.cfg._ops : candidateOps(prev.value.rows, { vars: ctx?.cfg?.vars || [] })).filter((op) => op.kind === 'add');
@@ -21,7 +22,7 @@ const matrixOf = (prev) => (prev?.value?.k === 'm' ? prev.value : null);
 
 export const DEFS = {
   l_rhs_forgotten: {
-    name: 'Second membre oublié',
+    name: t('Second membre oublié'),
     judges: ['rowops'],
     transform(prev, ctx) {
       const v = matrixOf(prev);
@@ -32,12 +33,12 @@ export const DEFS = {
       });
     },
     explain: (ctx = {}) => (ctx.i
-      ? `Tu as transformé les coefficients de la ligne ${ctx.i}, mais pas son second membre : il reste ${ctx.b} au lieu de ${ctx.bk}. Une équation se transforme en entier, des deux côtés du signe =.`
-      : 'Tu as transformé les coefficients de la ligne, mais pas son second membre. Une équation se transforme en entier, des deux côtés du signe = : la colonne après la barre change aussi.'),
+      ? t('Tu as transformé les coefficients de la ligne {i}, mais pas son second membre : il reste {b} au lieu de {bk}. Une équation se transforme en entier, des deux côtés du signe =.', { i: ctx.i, b: ctx.b, bk: ctx.bk })
+      : t('Tu as transformé les coefficients de la ligne, mais pas son second membre. Une équation se transforme en entier, des deux côtés du signe = : la colonne après la barre change aussi.')),
     check: { judge: { kind: 'rowops', goal: 'echelon' }, prev: '[[1,2,-1|3],[2,5,1|7],[-1,1,4|0]]', line: 'L2 ← L2 - 2L1 : [[1,2,-1|3],[0,1,3|7],[-1,1,4|0]]' },
   },
   l_rowop_sign: {
-    name: 'Ajouter au lieu de retrancher',
+    name: t('Ajouter au lieu de retrancher'),
     judges: ['rowops'],
     transform(prev, ctx) {
       const v = matrixOf(prev);
@@ -49,12 +50,12 @@ export const DEFS = {
       });
     },
     explain: (ctx = {}) => (ctx.i
-      ? `Pour annuler ${ctx.a} avec le pivot ${ctx.p}, il faut faire ${ctx.op}. Tu as fait ${ctx.bad} : la case double au lieu de devenir 0.`
-      : 'Pour annuler une case sous le pivot, il faut retrancher le bon multiple de la ligne du pivot. Avec le mauvais signe, la case double au lieu de devenir 0.'),
+      ? t('Pour annuler {a} avec le pivot {p}, il faut faire {op}. Tu as fait {bad} : la case double au lieu de devenir 0.', { a: ctx.a, p: ctx.p, op: ctx.op, bad: ctx.bad })
+      : t('Pour annuler une case sous le pivot, il faut retrancher le bon multiple de la ligne du pivot. Avec le mauvais signe, la case double au lieu de devenir 0.')),
     check: { judge: { kind: 'rowops', goal: 'echelon' }, prev: '[[1,2,-1|3],[2,5,1|7],[-1,1,4|0]]', line: 'L2 ← L2 - 2L1 : [[1,2,-1|3],[4,9,-1|13],[-1,1,4|0]]' },
   },
   l_rowop_partial: {
-    name: 'Multiplicateur oublié hors du pivot',
+    name: t('Multiplicateur oublié hors du pivot'),
     judges: ['rowops'],
     transform(prev, ctx) {
       const v = matrixOf(prev);
@@ -74,12 +75,12 @@ export const DEFS = {
       return out;
     },
     explain: (ctx = {}) => (ctx.k && ctx.c > 0
-      ? `Le facteur ${ctx.k} multiplie <b>toute</b> la ligne ${ctx.j}, pas seulement son pivot. Dans la colonne ${ctx.c}, il fallait ${ctx.a} − ${ctx.k}·(${ctx.b}) = ${ctx.right}.`
-      : 'Le facteur multiplie <b>toute</b> la ligne du pivot, pas seulement le pivot : chaque case de la ligne se retranche avec ce facteur.'),
+      ? t('Le facteur {k} multiplie <b>toute</b> la ligne {j}, pas seulement son pivot. Dans la colonne {c}, il fallait {a} − {k}·({b}) = {right}.', { k: ctx.k, j: ctx.j, c: ctx.c, a: ctx.a, b: ctx.b, right: ctx.right })
+      : t('Le facteur multiplie <b>toute</b> la ligne du pivot, pas seulement le pivot : chaque case de la ligne se retranche avec ce facteur.')),
     check: { judge: { kind: 'rowops', goal: 'echelon' }, prev: '[[1,2,-1],[2,5,1]]', line: 'L2 ← L2 - 2L1 : [[1,2,-1],[0,3,2]]' },
   },
   l_rowop_wrong_row: {
-    name: 'Résultat écrit dans la mauvaise ligne',
+    name: t('Résultat écrit dans la mauvaise ligne'),
     judges: ['rowops'],
     transform(prev, ctx) {
       const v = matrixOf(prev);
@@ -91,48 +92,48 @@ export const DEFS = {
       });
     },
     explain: (ctx = {}) => (ctx.i
-      ? `L${ctx.i} ← … veut dire que c'est la ligne ${ctx.i} qui change ; la ligne ${ctx.j} reste telle quelle.`
-      : 'Lᵢ ← … veut dire que c\'est la ligne i qui change ; la ligne qu\'on ajoute reste telle quelle.'),
+      ? t('L{i} ← … veut dire que c\'est la ligne {i} qui change ; la ligne {j} reste telle quelle.', { i: ctx.i, j: ctx.j })
+      : t('Lᵢ ← … veut dire que c\'est la ligne i qui change ; la ligne qu\'on ajoute reste telle quelle.')),
     check: { judge: { kind: 'rowops', goal: 'echelon' }, prev: '[[1,2|3],[2,5|7]]', line: 'L2 ← L2 - 2L1 : [[0,1|1],[2,5|7]]' },
   },
   l_rref_not_reduced: {
-    name: 'Échelonnée mais pas réduite',
+    name: t('Échelonnée mais pas réduite'),
     judges: [],
     explain: (ctx = {}) => (ctx.x
-      ? `Ta matrice est échelonnée, mais pas réduite : il reste ${ctx.x} au-dessus du pivot de la colonne ${ctx.c}. La forme réduite est la seule qui soit unique.`
-      : 'Ta matrice est échelonnée, mais pas réduite : il reste des cases non nulles au-dessus d\'un pivot, ou un pivot différent de 1. La forme réduite est la seule qui soit unique.'),
+      ? t('Ta matrice est échelonnée, mais pas réduite : il reste {x} au-dessus du pivot de la colonne {c}. La forme réduite est la seule qui soit unique.', { x: ctx.x, c: ctx.c })
+      : t('Ta matrice est échelonnée, mais pas réduite : il reste des cases non nulles au-dessus d\'un pivot, ou un pivot différent de 1. La forme réduite est la seule qui soit unique.')),
     check: { bait: { skill: 'l-sys-rref', exam: 'mcq' } },
   },
   // The particular solution alone: cfg.particular is p (the free variables
   // at 0), cfg.free names them (judge mat of « x = (2 + 3t ; …) »).
   l_free_var_zero: {
-    name: 'Variables libres mises à 0',
+    name: t('Variables libres mises à 0'),
     judges: ['mat'],
     transform(prev, ctx) {
       const p = ctx?.cfg?.particular;
       if (!p) return [];
       const value = evalAst(parseExpr(p, {}), {}, {});
-      return [{ node: { ...line([]), value }, ctx: { p: p.replace(/-/g, '−'), free: ctx.cfg.free || 'une variable' } }];
+      return [{ node: { ...line([]), value }, ctx: { p: p.replace(/-/g, '−'), free: ctx.cfg.free || t('une variable') } }];
     },
     explain: (ctx = {}) => (ctx.p
-      ? `${ctx.p} est bien une solution, mais ${ctx.free} est libre : chaque valeur de ${ctx.free} donne une autre solution. Il y en a une infinité, de la forme p + t·v : garde la variable libre comme paramètre.`
-      : 'Tu as donné une seule solution (les variables libres à 0), mais une variable libre peut prendre n\'importe quelle valeur : il y a une infinité de solutions, de la forme p + t·v.'),
+      ? t('{p} est bien une solution, mais {free} est libre : chaque valeur de {free} donne une autre solution. Il y en a une infinité, de la forme p + t·v : garde la variable libre comme paramètre.', { p: ctx.p, free: ctx.free })
+      : t('Tu as donné une seule solution (les variables libres à 0), mais une variable libre peut prendre n\'importe quelle valeur : il y a une infinité de solutions, de la forme p + t·v.')),
     check: { judge: { kind: 'mat', vars: ['t'], expect: '(2-3t ; -1+t ; t)', particular: '(2 ; -1 ; 0)', free: 'x₃' }, prev: 'x', line: 'x = (2 ; -1 ; 0)' },
   },
   // Named by the judge rowops itself: an operation that multiplies a row
   // by an expression of the parameter (ctx.k, the factor).
   l_param_divide_zero: {
-    name: 'Division par une expression qui peut s\'annuler',
+    name: t('Division par une expression qui peut s\'annuler'),
     judges: ['rowops'],
     explain: (ctx = {}) => (ctx.k
-      ? `Tu as multiplié une ligne par ${T(ctx.k)}, qui vaut 0 ou n'existe pas pour certaines valeurs du paramètre. Ces valeurs doivent être traitées à part : on échelonne sans diviser, puis on discute selon les zéros du pivot.`
-      : 'Tu as divisé par une expression du paramètre, qui peut valoir 0. Ce cas doit être traité à part : on échelonne sans diviser, puis on discute selon les valeurs qui annulent le pivot.'),
+      ? t('Tu as multiplié une ligne par {k}, qui vaut 0 ou n\'existe pas pour certaines valeurs du paramètre. Ces valeurs doivent être traitées à part : on échelonne sans diviser, puis on discute selon les zéros du pivot.', { k: T(ctx.k) })
+      : t('Tu as divisé par une expression du paramètre, qui peut valoir 0. Ce cas doit être traité à part : on échelonne sans diviser, puis on discute selon les valeurs qui annulent le pivot.')),
     check: { judge: { kind: 'rowops', vars: ['a'], goal: 'echelon' }, prev: '[[1,1|1],[0,a-1|a-1]]', line: 'L2 ← (1/(a-1))L2' },
   },
   // The cases « none » and « infinity » exchanged: cfg.swapCase is the
   // other case's answer (judge solset of l-sys-param).
   l_param_none_vs_inf: {
-    name: 'Aucune solution et une infinité échangées',
+    name: t('Aucune solution et une infinité échangées'),
     judges: ['solset'],
     transform(prev, ctx) {
       const s = ctx?.cfg?.swapCase;
@@ -140,26 +141,26 @@ export const DEFS = {
       return [{ node: parse(s, { vars: [ctx.cfg.v || 'a'] }), ctx: { other: s.replace(/-/g, '−').replace('=', ' = ') } }];
     },
     explain: (ctx = {}) => (ctx.other
-      ? `Pour ${ctx.other}, c'est l'autre cas. Une ligne 0 = c avec c ≠ 0 est impossible : aucune solution. Une infinité, c'est quand la ligne devient 0 = 0.`
-      : 'La ligne 0 = c est impossible quand c ≠ 0 : aucune solution. Une infinité, c\'est quand la ligne devient 0 = 0.'),
+      ? t('Pour {other}, c\'est l\'autre cas. Une ligne 0 = c avec c ≠ 0 est impossible : aucune solution. Une infinité, c\'est quand la ligne devient 0 = 0.', { other: ctx.other })
+      : t('La ligne 0 = c est impossible quand c ≠ 0 : aucune solution. Une infinité, c\'est quand la ligne devient 0 = 0.')),
     check: { judge: { kind: 'solset', v: 'a', sets: { S: '{1}' }, swapCase: 'a=-2' }, prev: 'S', line: 'a=-2' },
   },
   l_indep_scaled: {
-    name: 'Multiples d\'une famille libre',
+    name: t('Multiples d\'une famille libre'),
     judges: [],
-    explain: () => 'Si un des αᵢ vaut 0, la famille α₁v₁, …, α_kv_k contient le vecteur nul : elle est liée. Contre-exemple : v₁ = (1 ; 0), v₂ = (0 ; 1), α₁ = 0, α₂ = 1.',
+    explain: () => t('Si un des αᵢ vaut 0, la famille α₁v₁, …, α_kv_k contient le vecteur nul : elle est liée. Contre-exemple : v₁ = (1 ; 0), v₂ = (0 ; 1), α₁ = 0, α₂ = 1.'),
     check: { bait: { skill: 'l-vec-indep', exam: 'tf' } },
   },
   l_inj_rows: {
-    name: 'Injective et surjective échangées',
+    name: t('Injective et surjective échangées'),
     judges: [],
-    explain: () => 'Injective, c\'est « au plus une solution » : il faut un pivot dans chaque <b>colonne</b> (pas de variable libre). Un pivot dans chaque ligne donne la surjectivité : une solution pour tout b.',
+    explain: () => t('Injective, c\'est « au plus une solution » : il faut un pivot dans chaque <b>colonne</b> (pas de variable libre). Un pivot dans chaque ligne donne la surjectivité : une solution pour tout b.'),
     check: { bait: { skill: 'l-map-inj-surj', exam: 'mcq' } },
   },
   // The images (or the vectors) in rows: the transposed matrix (judge mat
   // with cfg.rowsCols, the expected matrix or the previous one).
   l_matrix_rows_cols: {
-    name: 'Images rangées en lignes',
+    name: t('Images rangées en lignes'),
     judges: ['mat'],
     transform(prev, ctx) {
       if (!ctx?.cfg?.rowsCols) return [];
@@ -170,19 +171,19 @@ export const DEFS = {
       }
       return out;
     },
-    explain: () => 'La colonne j de la matrice, c\'est l\'image (ou le vecteur) numéro j : c\'est pour cela que A·eⱼ redonne T(eⱼ). Tu as rangé les vecteurs en lignes : il faut les mettre en colonnes.',
+    explain: () => t('La colonne j de la matrice, c\'est l\'image (ou le vecteur) numéro j : c\'est pour cela que A·eⱼ redonne T(eⱼ). Tu as rangé les vecteurs en lignes : il faut les mettre en colonnes.'),
     check: { judge: { kind: 'mat', expect: '[[2,2,-1],[-1,1,3],[3,-3,4]]', rowsCols: true }, prev: 'A', line: '[[2,-1,3],[2,1,-3],[-1,3,4]]' },
   },
   // The given images placed as they are (cfg.given: that matrix).
   l_map_scaled_image: {
-    name: 'Images données placées telles quelles',
+    name: t('Images données placées telles quelles'),
     judges: ['mat'],
     transform(prev, ctx) {
       const g = ctx?.cfg?.given;
       if (!g) return [];
       return [{ node: { ...line([]), value: evalAst(parseExpr(g, {}), {}, {}) }, ctx: {} }];
     },
-    explain: () => 'On t\'a donné par exemple T(2e₂), qui vaut 2·T(e₂) : la colonne 2 doit contenir T(e₂), la moitié. De même, T(e₃) = T(e₂ + e₃) − T(e₂). Retrouve d\'abord chaque T(eⱼ), puis place-les en colonnes.',
+    explain: () => t('On t\'a donné par exemple T(2e₂), qui vaut 2·T(e₂) : la colonne 2 doit contenir T(e₂), la moitié. De même, T(e₃) = T(e₂ + e₃) − T(e₂). Retrouve d\'abord chaque T(eⱼ), puis place-les en colonnes.'),
     check: { judge: { kind: 'mat', expect: '[[2,2,-1],[-1,1,3],[3,-3,4]]', given: '[[2,4,1],[-1,2,4],[3,-6,1]]' }, prev: 'A', line: '[[2,4,1],[-1,2,4],[3,-6,1]]' },
   },
 };

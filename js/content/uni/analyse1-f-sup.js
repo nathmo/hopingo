@@ -13,6 +13,7 @@
 // judged by `delta` in mode 'sup'. The `open` variant is a problem in three
 // parts (majorant 0,5 ; x(ε) 1 ; conclusion 0,5).
 
+import { t } from '../../i18n.js';
 import { parse } from '../../cas/parse.js';
 import { toReadable } from '../../cas/print.js';
 import { evalFloat } from '../../cas/numeric.js';
@@ -33,18 +34,18 @@ const same = (a, b) => Math.abs(num(a) - num(b)) < 1e-9;
 // ======================================================================
 
 const SI_SUB = [
-  { id: 'mono', label: 'appliquer une fonction monotone', skill: 'g3-arc-def' },
-  { id: 'invert', label: 'inverser une inégalité', skill: 'g1-sign-table' },
-  { id: 'interval', label: 'écrire en intervalles', skill: 'g9-intervals' },
-  { id: 'read', label: 'lire les bornes', skill: SI },
+  { id: 'mono', label: t('appliquer une fonction monotone'), skill: 'g3-arc-def' },
+  { id: 'invert', label: t('inverser une inégalité'), skill: 'g1-sign-table' },
+  { id: 'interval', label: t('écrire en intervalles'), skill: 'g9-intervals' },
+  { id: 'read', label: t('lire les bornes'), skill: SI },
 ];
 const SI_CHOICES = [
-  { id: 'tan', label: 'Appliquer tan (croissante sur ]−π/2 ; π/2[)' },
-  { id: 'exp', label: 'Appliquer exp (croissante)' },
-  { id: 'invert', label: 'Inverser, ou multiplier (attention au signe)' },
-  { id: 'drop', label: 'Enlever une inégalité toujours vraie' },
-  { id: 'interval', label: 'Écrire en intervalles' },
-  { id: 'read', label: 'Lire Inf ou Sup' },
+  { id: 'tan', label: t('Appliquer tan (croissante sur ]−π/2 ; π/2[)') },
+  { id: 'exp', label: t('Appliquer exp (croissante)') },
+  { id: 'invert', label: t('Inverser, ou multiplier (attention au signe)') },
+  { id: 'drop', label: t('Enlever une inégalité toujours vraie') },
+  { id: 'interval', label: t('Écrire en intervalles') },
+  { id: 'read', label: t('Lire Inf ou Sup') },
 ];
 
 // tan of the angles used, and k/tan written simply.
@@ -91,18 +92,18 @@ function siData(rng, kinds) {
     return {
       kind, k, cond: `${c1}${o1}arctan(${u})${o2}${c2}`, domain: 'ℝ∖{0}', domText: 'x ∈ ℝ*',
       lines: [
-        E(`tan(${c1})${o1}${u}${o2}tan(${c2})`, 'Appliquer tan, strictement croissante sur ]−π/2 ; π/2[', 'mono', 'tan'),
-        E(`${t1}${o1}${u}${o2}${t2}`, 'Valeurs de tan', 'mono', 'tan'),
-        E(inv, t1 === '0' || t2 === '0' ? 'Le signe de x, puis inverser' : 'Inverser : 1/u est décroissante sur chaque demi-droite', 'invert', 'invert'),
-        E(final, 'Écrire en intervalles', 'interval', 'interval'),
+        E(`tan(${c1})${o1}${u}${o2}tan(${c2})`, t('Appliquer tan, strictement croissante sur ]−π/2 ; π/2['), 'mono', 'tan'),
+        E(`${t1}${o1}${u}${o2}${t2}`, t('Valeurs de tan'), 'mono', 'tan'),
+        E(inv, t1 === '0' || t2 === '0' ? t('Le signe de x, puis inverser') : t('Inverser : 1/u est décroissante sur chaque demi-droite'), 'invert', 'invert'),
+        E(final, t('Écrire en intervalles'), 'interval', 'interval'),
       ],
       blanks: [1, [t1 === '0' ? t2 : t1, ...((t1 === '0' ? t2 : t1) === String(k) ? [String(k)] : [])]],
       final, lo, loC: large2, hi, hiC: large1,
       u: { name: `${k}/x`, lo: t1, hi: t2 },
-      method: 'Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[.',
+      method: t('Arctg est strictement croissante : applique tan aux trois membres, ils sont tous dans ]−π/2 ; π/2[.'),
       choice2: [
-        { id: 'tan', label: 'Appliquer tan aux trois membres : tan est croissante sur ]−π/2 ; π/2[', valid: true },
-        { id: 'arctg', label: 'Appliquer Arctg aux trois membres', valid: false, why: 'Il faut faire disparaître Arctg : on applique sa réciproque, tan.' },
+        { id: 'tan', label: t('Appliquer tan aux trois membres : tan est croissante sur ]−π/2 ; π/2['), valid: true },
+        { id: 'arctg', label: t('Appliquer Arctg aux trois membres'), valid: false, why: t('Il faut faire disparaître Arctg : on applique sa réciproque, tan.') },
       ],
     };
   }
@@ -119,18 +120,18 @@ function siData(rng, kinds) {
     return {
       kind, k, c2, cond: `${c1}${o1}arctan(${k}/x)<${c2}`, domain: 'ℝ∖{0}', domText: 'x ∈ ℝ*', trap: true,
       lines: [
-        E(`${c1}${o1}arctan(${k}/x)`, `Arctg prend ses valeurs dans ]−π/2 ; π/2[, et π/2 < ${c2} : la seconde inégalité est toujours vraie`, 'mono', 'drop'),
-        E(`${t1}${o1}${k}/x`, 'Appliquer tan, croissante sur ]−π/2 ; π/2[', 'mono', 'tan'),
-        E(`0<x${o1}${hi}`, 'k/x > 0 donne x > 0, puis inverser', 'invert', 'invert'),
-        E(final, 'Écrire en intervalles', 'interval', 'interval'),
+        E(`${c1}${o1}arctan(${k}/x)`, t('Arctg prend ses valeurs dans ]−π/2 ; π/2[, et π/2 < {c2} : la seconde inégalité est toujours vraie', { c2 }), 'mono', 'drop'),
+        E(`${t1}${o1}${k}/x`, t('Appliquer tan, croissante sur ]−π/2 ; π/2['), 'mono', 'tan'),
+        E(`0<x${o1}${hi}`, t('k/x > 0 donne x > 0, puis inverser'), 'invert', 'invert'),
+        E(final, t('Écrire en intervalles'), 'interval', 'interval'),
       ],
       blanks: [1, [t1]],
       final, lo: '0', loC: false, hi, hiC: large1,
       u: { name: `${k}/x`, lo: t1, hi: null },
-      method: `tan n'est croissante que sur ]−π/2 ; π/2[ : ${c2} n'y est pas. Arctg(…) < π/2 < ${c2} est toujours vrai.`,
+      method: t('tan n\'est croissante que sur ]−π/2 ; π/2[ : {c2} n\'y est pas. Arctg(…) < π/2 < {c2} est toujours vrai.', { c2 }),
       choice2: [
-        { id: 'drop', label: `Arctg(…) < ${c2} est toujours vrai : il reste ${c1} ${o1} Arctg(${k}/x)`, valid: true },
-        { id: 'tanall', label: 'Appliquer tan aux trois membres', valid: false, rule: 'a1_tan_monotone_range', why: `tan n'est croissante que sur ]−π/2 ; π/2[, et ${c2} n'y est pas.` },
+        { id: 'drop', label: t('Arctg(…) < {c2} est toujours vrai : il reste {c1} {o1} Arctg({k}/x)', { c2, c1, o1, k }), valid: true },
+        { id: 'tanall', label: t('Appliquer tan aux trois membres'), valid: false, rule: 'a1_tan_monotone_range', why: t('tan n\'est croissante que sur ]−π/2 ; π/2[, et {c2} n\'y est pas.', { c2 }) },
       ],
     };
   }
@@ -144,35 +145,35 @@ function siData(rng, kinds) {
       return {
         kind, m, cond: `1/ln(x)<-${m}`, domain: ']0 ; +∞[', domText: 'x > 0',
         lines: [
-          E(`-${r}<ln(x)<0`, `1/ln x < 0 force ln x < 0 ; multiplier par ln x < 0 change le sens : 1 > −${m}·ln x`, 'invert', 'invert'),
-          E(`${eShow}<x<1`, 'Appliquer exp, croissante', 'mono', 'exp'),
-          E(`]${eShow} ; 1[`, 'Écrire en intervalles', 'interval', 'interval'),
+          E(`-${r}<ln(x)<0`, t('1/ln x < 0 force ln x < 0 ; multiplier par ln x < 0 change le sens : 1 > −{m}·ln x', { m }), 'invert', 'invert'),
+          E(`${eShow}<x<1`, t('Appliquer exp, croissante'), 'mono', 'exp'),
+          E(`]${eShow} ; 1[`, t('Écrire en intervalles'), 'interval', 'interval'),
         ],
         blanks: [0, [`-${r}`]],
         final: `]${eShow} ; 1[`, lo: eShow, loC: false, hi: '1', hiC: false,
         u: { name: 'ln x', lo: `-${r}`, hi: '0' },
         flipped: { lo: '0', hi: eShow },
-        method: `1/ln x < 0 demande ln x < 0. En multipliant par ln x < 0, l'inégalité change de sens.`,
+        method: t('1/ln x < 0 demande ln x < 0. En multipliant par ln x < 0, l\'inégalité change de sens.'),
         choice2: [
-          { id: 'flip', label: 'Multiplier par ln x, qui est négatif : l\'inégalité change de sens', valid: true },
-          { id: 'keep', label: 'Multiplier par ln x sans changer le sens', valid: false, rule: 'g1_ineq_not_flipped', why: 'ln x < 0 ici : multiplier par un nombre négatif change le sens de l\'inégalité.' },
+          { id: 'flip', label: t('Multiplier par ln x, qui est négatif : l\'inégalité change de sens'), valid: true },
+          { id: 'keep', label: t('Multiplier par ln x sans changer le sens'), valid: false, rule: 'g1_ineq_not_flipped', why: t('ln x < 0 ici : multiplier par un nombre négatif change le sens de l\'inégalité.') },
         ],
       };
     }
     return {
       kind, m, cond: `1/ln(x)>${m}`, domain: ']0 ; +∞[', domText: 'x > 0',
       lines: [
-        E(`0<ln(x)<${r}`, `1/ln x > 0 force ln x > 0 ; multiplier par ln x > 0 garde le sens : 1 > ${m === 1 ? '' : m}ln x`, 'invert', 'invert'),
-        E(`1<x<${eShow}`, 'Appliquer exp, croissante', 'mono', 'exp'),
-        E(`]1 ; ${eShow}[`, 'Écrire en intervalles', 'interval', 'interval'),
+        E(`0<ln(x)<${r}`, t('1/ln x > 0 force ln x > 0 ; multiplier par ln x > 0 garde le sens : 1 > {m}ln x', { m: m === 1 ? '' : m }), 'invert', 'invert'),
+        E(`1<x<${eShow}`, t('Appliquer exp, croissante'), 'mono', 'exp'),
+        E(`]1 ; ${eShow}[`, t('Écrire en intervalles'), 'interval', 'interval'),
       ],
       blanks: [0, [r]],
       final: `]1 ; ${eShow}[`, lo: '1', loC: false, hi: eShow, hiC: false,
       u: { name: 'ln x', lo: '0', hi: r },
-      method: '1/ln x > 0 demande ln x > 0 : on peut multiplier par ln x sans changer le sens.',
+      method: t('1/ln x > 0 demande ln x > 0 : on peut multiplier par ln x sans changer le sens.'),
       choice2: [
-        { id: 'keep', label: 'Multiplier par ln x, qui est positif : le sens ne change pas', valid: true },
-        { id: 'flip', label: 'Multiplier par ln x en changeant le sens', valid: false, why: 'ln x > 0 ici : multiplier par un nombre positif garde le sens.' },
+        { id: 'keep', label: t('Multiplier par ln x, qui est positif : le sens ne change pas'), valid: true },
+        { id: 'flip', label: t('Multiplier par ln x en changeant le sens'), valid: false, why: t('ln x > 0 ici : multiplier par un nombre positif garde le sens.') },
       ],
     };
   }
@@ -188,16 +189,16 @@ function siData(rng, kinds) {
   return {
     kind: 'ln', cond: `${a}${o1}ln(x)${o2}${b}`, domain: ']0 ; +∞[', domText: 'x > 0',
     lines: [
-      E(`${ex(a)}${o1}x${o2}${ex(b)}`, 'Appliquer exp, strictement croissante', 'mono', 'exp'),
-      E(final, 'Écrire en intervalles', 'interval', 'interval'),
+      E(`${ex(a)}${o1}x${o2}${ex(b)}`, t('Appliquer exp, strictement croissante'), 'mono', 'exp'),
+      E(final, t('Écrire en intervalles'), 'interval', 'interval'),
     ],
     blanks: [0, [ex(b)]],
     final, lo: ex(a), loC: large1, hi: ex(b), hiC: large2,
     u: { name: 'ln x', lo: String(a), hi: String(b) },
-    method: 'exp est strictement croissante : applique-la aux trois membres.',
+    method: t('exp est strictement croissante : applique-la aux trois membres.'),
     choice2: [
-      { id: 'exp', label: 'Appliquer exp aux trois membres (croissante)', valid: true },
-      { id: 'ln', label: 'Appliquer ln aux trois membres', valid: false, why: 'Il faut faire disparaître ln : on applique sa réciproque, exp.' },
+      { id: 'exp', label: t('Appliquer exp aux trois membres (croissante)'), valid: true },
+      { id: 'ln', label: t('Appliquer ln aux trois membres'), valid: false, why: t('Il faut faire disparaître ln : on applique sa réciproque, exp.') },
     ],
   };
 }
@@ -206,25 +207,25 @@ const setHtml = (d) => `A = {${d.domText} : ${MT(d.cond)}}`;
 
 // The decisions on a bound: in A (Min, Max) or not; unbounded side.
 function boundDecision(side, v, closed) {
-  const word = side === 'lo' ? 'minimum' : 'maximum';
-  const W = side === 'lo' ? 'Min A = Inf A' : 'Max A = Sup A';
-  const name = side === 'lo' ? 'Inf A' : 'Sup A';
+  const lo = side === 'lo';
+  const W = lo ? 'Min A = Inf A' : 'Max A = Sup A';
+  const name = lo ? 'Inf A' : 'Sup A';
   return {
-    kind: 'decision', prompt: `${name} = ${RD(v)} : est-il dans A ?`, options: closed ? [
-      { id: 'in', label: `Oui : le crochet est fermé, ${W}`, valid: true },
-      { id: 'out', label: `Non : A n'a pas de ${word}`, valid: false, why: `Le crochet est fermé : ${RD(v)} ∈ A, c'est le ${side === 'lo' ? 'plus petit' : 'plus grand'} élément.` },
+    kind: 'decision', prompt: t('{name} = {v} : est-il dans A ?', { name, v: RD(v) }), options: closed ? [
+      { id: 'in', label: t('Oui : le crochet est fermé, {W}', { W }), valid: true },
+      { id: 'out', label: lo ? t('Non : A n\'a pas de minimum') : t('Non : A n\'a pas de maximum'), valid: false, why: lo ? t('Le crochet est fermé : {v} ∈ A, c\'est le plus petit élément.', { v: RD(v) }) : t('Le crochet est fermé : {v} ∈ A, c\'est le plus grand élément.', { v: RD(v) }) },
     ] : [
-      { id: 'out', label: `Non : ${RD(v)} ∉ A, A n'a pas de ${word}`, valid: true },
-      { id: 'in', label: `Oui : ${W}`, valid: false, rule: 'a1_sup_in_set', why: `Le crochet est ouvert : ${RD(v)} ∉ A. ${name} n'est pas forcément dans A.` },
+      { id: 'out', label: lo ? t('Non : {v} ∉ A, A n\'a pas de minimum', { v: RD(v) }) : t('Non : {v} ∉ A, A n\'a pas de maximum', { v: RD(v) }), valid: true },
+      { id: 'in', label: t('Oui : {W}', { W }), valid: false, rule: 'a1_sup_in_set', why: t('Le crochet est ouvert : {v} ∉ A. {name} n\'est pas forcément dans A.', { v: RD(v), name }) },
     ],
   };
 }
 function unboundedDecision(side) {
   const up = side === 'hi';
   return {
-    kind: 'decision', prompt: `A est-il ${up ? 'majoré' : 'minoré'} ?`, options: [
-      { id: 'no', label: `Non : ${up ? 'Sup A = +∞' : 'Inf A = −∞'}, et A n'a pas de ${up ? 'maximum' : 'minimum'}`, valid: true },
-      { id: 'yes', label: `Oui, par ${up ? 'la borne de droite des valeurs' : 'la borne de gauche des valeurs'}`, valid: false, rule: 'a1_supinf_on_values', why: `A contient des x aussi ${up ? 'grands' : 'petits'} qu'on veut : l'intervalle va jusqu'à ${up ? '+∞' : '−∞'}.` },
+    kind: 'decision', prompt: up ? t('A est-il majoré ?') : t('A est-il minoré ?'), options: [
+      { id: 'no', label: up ? t('Non : Sup A = +∞, et A n\'a pas de maximum') : t('Non : Inf A = −∞, et A n\'a pas de minimum'), valid: true },
+      { id: 'yes', label: up ? t('Oui, par la borne de droite des valeurs') : t('Oui, par la borne de gauche des valeurs'), valid: false, rule: 'a1_supinf_on_values', why: up ? t('A contient des x aussi grands qu\'on veut : l\'intervalle va jusqu\'à +∞.') : t('A contient des x aussi petits qu\'on veut : l\'intervalle va jusqu\'à −∞.') },
     ],
   };
 }
@@ -238,7 +239,7 @@ function siLines(level, rng, opts = {}) {
     const [i, texts] = d.blanks;
     first.lines[i] = blanked(first.lines[i], texts);
   }
-  if (level === 2) first.pre = [{ kind: 'decision', prompt: 'Comment commencer ?', options: d.choice2 }];
+  if (level === 2) first.pre = [{ kind: 'decision', prompt: t('Comment commencer ?'), options: d.choice2 }];
   const parts = [first];
   const ends = [['lo', d.lo, d.loC], ['hi', d.hi, d.hiC]].filter(([, v]) => v !== null);
   const infinite = d.lo === null ? 'lo' : d.hi === null ? 'hi' : null;
@@ -250,22 +251,22 @@ function siLines(level, rng, opts = {}) {
       pre.push(boundDecision(side, v, closed));
     } else {
       const note = (html) => pre.push({ kind: 'note', html });
-      if (i === 0 && infinite) note(infinite === 'hi' ? 'A n\'est pas majoré : Sup A = +∞, pas de Max.' : 'A n\'est pas minoré : Inf A = −∞, pas de Min.');
-      note(closed ? `${RD(v)} ∈ A : ${side === 'lo' ? 'Min A = Inf A' : 'Max A = Sup A'}.` : `${RD(v)} ∉ A : pas de ${side === 'lo' ? 'Min' : 'Max'}.`);
+      if (i === 0 && infinite) note(infinite === 'hi' ? t('A n\'est pas majoré : Sup A = +∞, pas de Max.') : t('A n\'est pas minoré : Inf A = −∞, pas de Min.'));
+      note(closed ? `${RD(v)} ∈ A : ${side === 'lo' ? 'Min A = Inf A' : 'Max A = Sup A'}.` : side === 'lo' ? t('{v} ∉ A : pas de Min.', { v: RD(v) }) : t('{v} ∉ A : pas de Max.', { v: RD(v) }));
     }
     parts.push({
-      html: i === 0 ? `A = ${MT(d.final)}. Lis ses bornes. ${name} :` : `${name} :`, ask: `${name} =`,
+      html: i === 0 ? t('A = {A}. Lis ses bornes. {name} :', { A: MT(d.final), name }) : `${name} :`, ask: `${name} =`,
       start: side === 'lo' ? 'I' : 'S', judge: { kind: 'value', form: 'closed', expect: v }, pre,
       lines: [E(v, closed ? `${RD(v)} ∈ A` : `${RD(v)} ∉ A`, 'read', 'read')],
     });
   });
-  const choices = d.trap ? SI_CHOICES.map((c) => (c.id === 'tan' ? { ...c, rule: 'a1_tan_monotone_range', why: `${d.c2} n'est pas dans ]−π/2 ; π/2[ : tan n'y est pas croissante.` } : c)) : SI_CHOICES;
+  const choices = d.trap ? SI_CHOICES.map((c) => (c.id === 'tan' ? { ...c, rule: 'a1_tan_monotone_range', why: t('{c2} n\'est pas dans ]−π/2 ; π/2[ : tan n\'y est pas croissante.', { c2: d.c2 }) } : c)) : SI_CHOICES;
   const { start, judge: j0, script } = partsScript(parts, level, choices);
   const boundsText = [d.lo === null ? 'Inf A = −∞' : `Inf A = ${frT(d.lo)}`, d.hi === null ? 'Sup A = +∞' : `Sup A = ${frT(d.hi)}`].join(' ; ');
   return linesItem({
     skill: SI, level, mode: modeOf(level), start, judge: j0, script,
-    prompt: `${setHtml(d)}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s'ils sont un Min ou un Max.${level === 1 ? ` ${d.method}` : ''}`,
-    hints: H(d.method, `Première ligne : ${MT(d.lines[0].math)}`, `A = ${MT(d.final)} : ${boundsText}`),
+    prompt: `${t('{set}. Écris A en intervalles, puis donne Inf A et Sup A, et dis s\'ils sont un Min ou un Max.', { set: setHtml(d) })}${level === 1 ? ` ${d.method}` : ''}`,
+    hints: H(d.method, t('Première ligne : {m}', { m: MT(d.lines[0].math) }), `A = ${MT(d.final)} : ${boundsText}`),
     subgoals: SI_SUB, keys: ['calc', 'calcfn', 'set', 'relation'], tapActions: level === 3 ? 'steps' : null,
     noHints: level === 5, key: `${SI}:${level}:${d.cond}`, exam: false,
   });
@@ -293,16 +294,16 @@ function claimTruth(c, A) {
   }
 }
 const CLAIM = {
-  infNoMin: (v) => `Inf A = ${MT(v)}, et A n'a pas de minimum`,
-  supNoMax: (v) => `Sup A = ${MT(v)}, et A n'a pas de maximum`,
+  infNoMin: (v) => t('Inf A = {v}, et A n\'a pas de minimum', { v: MT(v) }),
+  supNoMax: (v) => t('Sup A = {v}, et A n\'a pas de maximum', { v: MT(v) }),
   min: (v) => `Min A = ${MT(v)}`,
   max: (v) => `Max A = ${MT(v)}`,
   inf: (v) => `Inf A = ${MT(v)}`,
   sup: (v) => `Sup A = ${MT(v)}`,
-  noUpper: () => 'A n\'est pas majoré',
-  noLower: () => 'A n\'est pas minoré',
-  bounded: () => 'A est borné',
-  empty: () => 'A est vide',
+  noUpper: () => t('A n\'est pas majoré'),
+  noLower: () => t('A n\'est pas minoré'),
+  bounded: () => t('A est borné'),
+  empty: () => t('A est vide'),
 };
 const claim = (t, v, rule = null) => ({ t, v, rule });
 
@@ -346,7 +347,7 @@ function siMcq(rng, level, opts = {}) {
     if (d.u.lo !== null && d.u.lo !== '0') wrong.push(claim('inf', d.u.lo, 'a1_supinf_on_values'));
     return claimsMcq(rng, {
       A: d, wrong, level, opts, key: `${SI}:mcq:${d.cond}`,
-      prompt: `Soit ${setHtml(d)}. Quelle affirmation est vraie ?`,
+      prompt: t('Soit {set}. Quelle affirmation est vraie ?', { set: setHtml(d) }),
       why: `${d.method} A = ${MT(d.final)}.`,
     });
   }
@@ -356,8 +357,8 @@ function siMcq(rng, level, opts = {}) {
     return claimsMcq(rng, {
       A, level, opts, key: `${SI}:mcq:cos`,
       wrong: [claim('sup', 'π/2', 'a1_supinf_on_values'), claim('inf', '2/π'), claim('min', '0', 'a1_sup_in_set')],
-      prompt: `Soit A = {x > 0 : ${MT('cos(1/x)>0')}}. Quelle affirmation est vraie ?`,
-      why: 'Avec u = 1/x : cos u > 0 pour u ∈ ]0 ; π/2[ (x > 2/π, donc A n\'est pas majoré) et pour u ∈ ]2kπ − π/2 ; 2kπ + π/2[ (des x aussi proches de 0 qu\'on veut). Inf A = 0, et 0 ∉ A. Les bornes portent sur x, pas sur u.',
+      prompt: t('Soit A = {x > 0 : {c}}. Quelle affirmation est vraie ?', { c: MT('cos(1/x)>0') }),
+      why: t('Avec u = 1/x : cos u > 0 pour u ∈ ]0 ; π/2[ (x > 2/π, donc A n\'est pas majoré) et pour u ∈ ]2kπ − π/2 ; 2kπ + π/2[ (des x aussi proches de 0 qu\'on veut). Inf A = 0, et 0 ∉ A. Les bornes portent sur x, pas sur u.'),
     });
   }
   if (kind === 'image') {
@@ -369,9 +370,9 @@ function siMcq(rng, level, opts = {}) {
     return claimsMcq(rng, {
       A, level, opts, key: `${SI}:mcq:image:${f}`,
       wrong: [claim('noUpper', null, 'a1_supinf_on_values'), claim('min', '0', 'a1_sup_in_set')],
-      prompt: `Soit A = {${MT(f)} : ${dom}}, l'ensemble des valeurs. Quelle affirmation est vraie ?`,
-      why: which ? `x ↦ ${MT(f)} est décroissante de 1 (en 0, exclu) vers 0 (en +∞, jamais atteint) : A = ]0 ; 1[. Ici, A est un ensemble de valeurs : ses bornes sont des valeurs de f.`
-        : `x ↦ ${MT(f)} vaut 1 en 0 et décroît vers 0 sans l'atteindre : A = ]0 ; 1], Max A = 1. Ici, A est un ensemble de valeurs.`,
+      prompt: t('Soit A = {{f} : {dom}}, l\'ensemble des valeurs. Quelle affirmation est vraie ?', { f: MT(f), dom }),
+      why: which ? t('x ↦ {f} est décroissante de 1 (en 0, exclu) vers 0 (en +∞, jamais atteint) : A = ]0 ; 1[. Ici, A est un ensemble de valeurs : ses bornes sont des valeurs de f.', { f: MT(f) })
+        : t('x ↦ {f} vaut 1 en 0 et décroît vers 0 sans l\'atteindre : A = ]0 ; 1], Max A = 1. Ici, A est un ensemble de valeurs.', { f: MT(f) }),
     });
   }
   // {b − c/n : n ≥ 1}: Min b − c, Sup b.
@@ -381,8 +382,8 @@ function siMcq(rng, level, opts = {}) {
   return claimsMcq(rng, {
     A, level, opts, key: `${SI}:mcq:index:${b}:${c}`,
     wrong: [claim('max', String(b), 'a1_sup_in_set'), claim('noLower')],
-    prompt: `Soit A = {${MT(`${b}-${c}/n`)} : n ∈ ℕ*}. Quelle affirmation est vraie ?`,
-    why: `Les termes croissent avec n : le plus petit est ${frT(b - c)} (n = 1), et ils s'approchent de ${frT(b)} sans l'atteindre. Min A = ${frT(b - c)}, Sup A = ${frT(b)}, pas de Max.`,
+    prompt: t('Soit A = {{u} : n ∈ ℕ*}. Quelle affirmation est vraie ?', { u: MT(`${b}-${c}/n`) }),
+    why: t('Les termes croissent avec n : le plus petit est {lo} (n = 1), et ils s\'approchent de {b} sans l\'atteindre. Min A = {lo}, Sup A = {b}, pas de Max.', { lo: frT(b - c), b: frT(b) }),
   });
 }
 
@@ -395,9 +396,9 @@ const SI_TF = [
   { s: 'Pour A = {x > 0 : Log(x) < 2}, Sup A = 2.', truth: false, rule: 'a1_supinf_on_values', why: 'Faux : A = ]0 ; e²[, donc Sup A = e². 2 est la borne des valeurs de Log(x), pas des x.' },
 ];
 function siTf(rng) {
-  const t = rng.pick(SI_TF);
-  if (!t.truth) return vfMcq(SI, t.s, false, rng, { key: t.s, why: t.why, ruleIfTrue: t.rule || null });
-  return tfItem({ skill: SI, level: 4, statement: t.s, truth: true, key: t.s, explanation: t.why, exam: { format: 'tf', points: 1 } });
+  const tf = rng.pick(SI_TF);
+  if (!tf.truth) return vfMcq(SI, t(tf.s), false, rng, { key: tf.s, why: t(tf.why), ruleIfTrue: tf.rule || null });
+  return tfItem({ skill: SI, level: 4, statement: t(tf.s), truth: true, key: tf.s, explanation: t(tf.why), exam: { format: 'tf', points: 1 } });
 }
 
 function supInf(level, rng, profile, opts = {}) {
@@ -412,8 +413,8 @@ function supInf(level, rng, profile, opts = {}) {
 // ======================================================================
 
 const SP_SUB = [
-  { id: 'x', label: 'construire x(ε)', skill: SP },
-  { id: 'quant', label: 'ordre des quantificateurs', skill: 'g9-quant-write' },
+  { id: 'x', label: t('construire x(ε)'), skill: SP },
+  { id: 'quant', label: t('ordre des quantificateurs'), skill: 'g9-quant-write' },
 ];
 const KEYS_EPS = ['calc', 'greek', 'letters'];
 // « < » in HTML that also holds MathML.
@@ -451,33 +452,42 @@ function spData(rng, { indexed = false } = {}) {
   };
 }
 
+// « S est un majorant de A » / « … plus petit que S … » in both directions.
+const isBound = (upper, S) => (upper ? t('{S} est un majorant de A.', { S }) : t('{S} est un minorant de A.', { S }));
+const noneBetter = (upper, S) => (upper
+  ? t('Aucun nombre plus petit que {S} n\'est un majorant : {S} = Sup A.', { S })
+  : t('Aucun nombre plus grand que {S} n\'est un minorant : {S} = Inf A.', { S }));
+
 function spBlocks(d, { inputs = [], decoys = 0, rng, xShown = null }) {
   const S = frT(d.s);
   const upper = d.sup;
-  const W = upper ? 'majorant' : 'minorant';
   const xText = xShown ?? d.xShow;
+  const shown = inputs.includes('maj') ? '…' : S;
   const blocks = d.indexed ? [
-    { id: 'maj', html: `Pour tout n ≥ 1, ${d.c}/n > 0, donc ${MT(d.term)} ${upper ? LT : '>'} ${inputs.includes('maj') ? '…' : S} : ${inputs.includes('maj') ? '…' : S} est un ${W} de A.`, needs: [] },
-    { id: 'eps', html: 'Soit ε > 0.', needs: [] },
-    { id: 'x', html: `Prenons un entier n ≥ ${inputs.includes('x') ? '…' : d.xShow}.`, needs: ['eps'] },
-    { id: 'chk', html: `Alors ${d.c}/n ${LT} ε, donc x = ${MT(d.term)} ∈ A et x ${upper ? '>' : LT} ${S} ${upper ? '−' : '+'} ε.`, needs: ['x'] },
-    { id: 'concl', html: `Aucun nombre ${upper ? 'plus petit' : 'plus grand'} que ${S} n'est un ${W} : ${S} = ${upper ? 'Sup' : 'Inf'} A.`, needs: ['maj', 'chk'] },
+    { id: 'maj', html: t('Pour tout n ≥ 1, {c}/n > 0, donc {u} {rel} {S} : {bound}', { c: d.c, u: MT(d.term), rel: upper ? LT : '>', S: shown, bound: isBound(upper, shown) }), needs: [] },
+    { id: 'eps', html: t('Soit ε > 0.'), needs: [] },
+    { id: 'x', html: t('Prenons un entier n ≥ {n}.', { n: inputs.includes('x') ? '…' : d.xShow }), needs: ['eps'] },
+    { id: 'chk', html: t('Alors {c}/n {lt} ε, donc x = {u} ∈ A et x {rel} {S} {op} ε.', { c: d.c, lt: LT, u: MT(d.term), rel: upper ? '>' : LT, S, op: upper ? '−' : '+' }), needs: ['x'] },
+    { id: 'concl', html: noneBetter(upper, S), needs: ['maj', 'chk'] },
   ] : [
-    { id: 'maj', html: `Pour tout x ∈ A, x ${(upper ? d.set.endsWith(']') : d.set.startsWith('[')) ? (upper ? '≤' : '≥') : (upper ? LT : '>')} ${inputs.includes('maj') ? '…' : S} : ${inputs.includes('maj') ? '…' : S} est un ${W} de A.`, needs: [] },
-    { id: 'eps', html: 'Soit ε > 0.', needs: [] },
-    { id: 'x', html: `Posons x = ${inputs.includes('x') ? '…' : xText}.`, needs: ['eps'] },
-    { id: 'chk', html: `Alors x ∈ A et x ${upper ? '>' : LT} ${S} ${upper ? '−' : '+'} ε.`, needs: ['x'] },
-    { id: 'concl', html: `Aucun nombre ${upper ? 'plus petit' : 'plus grand'} que ${S} n'est un ${W} : ${S} = ${upper ? 'Sup' : 'Inf'} A.`, needs: ['maj', 'chk'] },
+    { id: 'maj', html: t('Pour tout x ∈ A, x {rel} {S} : {bound}', { rel: (upper ? d.set.endsWith(']') : d.set.startsWith('[')) ? (upper ? '≤' : '≥') : (upper ? LT : '>'), S: shown, bound: isBound(upper, shown) }), needs: [] },
+    { id: 'eps', html: t('Soit ε > 0.'), needs: [] },
+    { id: 'x', html: t('Posons x = {x}.', { x: inputs.includes('x') ? '…' : xText }), needs: ['eps'] },
+    { id: 'chk', html: t('Alors x ∈ A et x {rel} {S} {op} ε.', { rel: upper ? '>' : LT, S, op: upper ? '−' : '+' }), needs: ['x'] },
+    { id: 'concl', html: noneBetter(upper, S), needs: ['maj', 'chk'] },
   ];
   for (const b of blocks) b.html = b.html.replace('….', '…');
-  if (inputs.includes('maj')) blocks[0].input = { kind: 'expr', vars: [], expect: d.s, ask: `${upper ? 'Majorant' : 'Minorant'} :`, answer: d.s };
-  if (inputs.includes('x')) blocks[2].input = { kind: 'delta', cfg: d.cfg, answer: d.answer, show: d.xShow, ask: d.indexed ? 'Seuil : n ≥' : 'x =', keys: KEYS_EPS };
-  blocks[2].earlyWhy = 'Pas encore : x se construit à partir de ε, qu\'il faut d\'abord fixer.';
-  blocks[4].earlyWhy = `Pas encore : il faut les deux points, ${W} et approximation.`;
+  if (inputs.includes('maj')) blocks[0].input = { kind: 'expr', vars: [], expect: d.s, ask: upper ? t('Majorant :') : t('Minorant :'), answer: d.s };
+  if (inputs.includes('x')) blocks[2].input = { kind: 'delta', cfg: d.cfg, answer: d.answer, show: d.xShow, ask: d.indexed ? t('Seuil : n ≥') : 'x =', keys: KEYS_EPS };
+  blocks[2].earlyWhy = t('Pas encore : x se construit à partir de ε, qu\'il faut d\'abord fixer.');
+  blocks[4].earlyWhy = upper ? t('Pas encore : il faut les deux points, majorant et approximation.') : t('Pas encore : il faut les deux points, minorant et approximation.');
+  const outside = d.indexed || !(upper ? d.set.endsWith(']') : d.set.startsWith('['));
   const DECOYS = [
-    { html: `${S} ∈ A, donc ${S} = ${upper ? 'Sup' : 'Inf'} A.`, distractor: 'a1_sup_in_set', why: `Le ${upper ? 'Sup' : 'Inf'} n'est pas forcément dans A${d.indexed || !(upper ? d.set.endsWith(']') : d.set.startsWith('[')) ? ` (ici ${S} ∉ A)` : ''}, et être dans A ne suffit pas : il faut que ce soit un ${W}, le ${upper ? 'plus petit' : 'plus grand'}.` },
-    { html: `Prenons ε = 0,1 : x = ${S} ${upper ? '−' : '+'} 0,05 convient.`, distractor: 'g9_proof_by_example', why: 'Un exemple de ε ne prouve rien : il faut un x pour chaque ε > 0.' },
-    { html: `Il existe x ∈ A tel que, pour tout ε > 0, x ${upper ? '>' : LT} ${S} ${upper ? '−' : '+'} ε.`, distractor: 'g9_quant_order', why: `Un tel x serait ${upper ? '≥' : '≤'} ${S} : l'ordre est « pour tout ε > 0, il existe x », et x dépend de ε.` },
+    { html: upper ? t('{S} ∈ A, donc {S} = Sup A.', { S }) : t('{S} ∈ A, donc {S} = Inf A.', { S }), distractor: 'a1_sup_in_set', why: upper
+      ? (outside ? t('Le Sup n\'est pas forcément dans A (ici {S} ∉ A), et être dans A ne suffit pas : il faut que ce soit un majorant, le plus petit.', { S }) : t('Le Sup n\'est pas forcément dans A, et être dans A ne suffit pas : il faut que ce soit un majorant, le plus petit.'))
+      : (outside ? t('Le Inf n\'est pas forcément dans A (ici {S} ∉ A), et être dans A ne suffit pas : il faut que ce soit un minorant, le plus grand.', { S }) : t('Le Inf n\'est pas forcément dans A, et être dans A ne suffit pas : il faut que ce soit un minorant, le plus grand.')) },
+    { html: t('Prenons ε = 0,1 : x = {S} {op} 0,05 convient.', { S, op: upper ? '−' : '+' }), distractor: 'g9_proof_by_example', why: t('Un exemple de ε ne prouve rien : il faut un x pour chaque ε > 0.') },
+    { html: t('Il existe x ∈ A tel que, pour tout ε > 0, x {rel} {S} {op} ε.', { rel: upper ? '>' : LT, S, op: upper ? '−' : '+' }), distractor: 'g9_quant_order', why: t('Un tel x serait {rel} {S} : l\'ordre est « pour tout ε > 0, il existe x », et x dépend de ε.', { rel: upper ? '≥' : '≤', S }) },
   ];
   rng.shuffle(DECOYS).slice(0, decoys).forEach((x, i) => blocks.push({ id: `d${i}`, needs: [], ...x }));
   return blocks;
@@ -505,11 +515,11 @@ function spItem(level, rng, opts = {}) {
     todo = ['x', 'chk', 'concl'];
     const [w1, w2] = d.wrongs;
     decision = {
-      prompt: `Soit ε > 0. Quel x convient (x ∈ A et x ${d.sup ? '>' : '<'} ${frT(d.s)} ${d.sup ? '−' : '+'} ε) ?`,
+      prompt: t('Soit ε > 0. Quel x convient (x ∈ A et x {rel} {s} {op} ε) ?', { rel: d.sup ? '>' : '<', s: frT(d.s), op: d.sup ? '−' : '+' }),
       options: rng.shuffle([
         { id: 'ok', label: `x = ${d.xShow}`, valid: true },
-        { id: 'w1', label: `x = ${spaced(w1)}`, valid: false, why: `Alors x = ${frT(d.s)} ${d.sup ? '−' : '+'} ε exactement : l'inégalité stricte n'est pas vérifiée.` },
-        { id: 'w2', label: `x = ${spaced(w2)}`, valid: false, why: `Pour ε grand (ε = 20), ce x sort de A. Le ${d.sup ? 'max' : 'min'} avec le milieu le garde dans A.` },
+        { id: 'w1', label: `x = ${spaced(w1)}`, valid: false, why: t('Alors x = {s} {op} ε exactement : l\'inégalité stricte n\'est pas vérifiée.', { s: frT(d.s), op: d.sup ? '−' : '+' }) },
+        { id: 'w2', label: `x = ${spaced(w2)}`, valid: false, why: d.sup ? t('Pour ε grand (ε = 20), ce x sort de A. Le max avec le milieu le garde dans A.') : t('Pour ε grand (ε = 20), ce x sort de A. Le min avec le milieu le garde dans A.') },
       ]),
     };
   } else if (level === 2) {
@@ -522,10 +532,10 @@ function spItem(level, rng, opts = {}) {
   const hasInput = blocks.some((b) => b.input);
   return blocksItem({
     skill: SP, level, mode: hasInput || level <= 2 ? 'frame' : 'order',
-    prompt: `${d.setHtml}. Montre que ${W} A = ${frT(d.s)}. Touche les blocs dans l'ordre${hasInput ? ' et complète les calculs' : ''}.${placed.length ? ' Le début est placé.' : ''}`,
+    prompt: `${t('{set}. Montre que {W} A = {s}.', { set: d.setHtml, W, s: frT(d.s) })} ${hasInput ? t('Touche les blocs dans l\'ordre et complète les calculs.') : t('Touche les blocs dans l\'ordre.')}${placed.length ? ` ${t('Le début est placé.')}` : ''}`,
     blocks: rng.shuffle(blocks), goal: 'concl', order: todo, placed, decision,
-    hints: H(`Deux choses à montrer : ${frT(d.s)} ${d.sup ? 'majore' : 'minore'} A, et on peut s'approcher de ${frT(d.s)} autant qu'on veut.`,
-      d.indexed ? `Soit ε > 0. Pour n ≥ ▢, ${d.c}/n < ε.` : `Soit ε > 0. Posons x = ▢ ; alors x ∈ A et x ${d.sup ? '>' : '<'} ${frT(d.s)} ${d.sup ? '−' : '+'} ε.`,
+    hints: H(d.sup ? t('Deux choses à montrer : {s} majore A, et on peut s\'approcher de {s} autant qu\'on veut.', { s: frT(d.s) }) : t('Deux choses à montrer : {s} minore A, et on peut s\'approcher de {s} autant qu\'on veut.', { s: frT(d.s) }),
+      d.indexed ? t('Soit ε > 0. Pour n ≥ ▢, {c}/n < ε.', { c: d.c }) : t('Soit ε > 0. Posons x = ▢ ; alors x ∈ A et x {rel} {s} {op} ε.', { rel: d.sup ? '>' : '<', s: frT(d.s), op: d.sup ? '−' : '+' }),
       d.indexed ? `n ≥ ${MT(d.answer, { vars: ['ε'] })}` : `x = ${MT(d.answer, { vars: ['ε'] })}`),
     noHints: level === 5 || !!opts.exam,
     subgoals: SP_SUB,
@@ -538,38 +548,38 @@ function spItem(level, rng, opts = {}) {
 function spOpen(rng, opts) {
   const d = spData(rng, { indexed: rng.chance(0.3) });
   const W = d.sup ? 'Sup' : 'Inf';
-  const w = d.sup ? 'majorant' : 'minorant';
   const S = frT(d.s);
+  const up = d.sup;
   const p1 = mcq({
-    skill: SP, level: 4, prompt: `Première étape : pourquoi ${S} est-il un ${w} de A ?`,
+    skill: SP, level: 4, prompt: up ? t('Première étape : pourquoi {S} est-il un majorant de A ?', { S }) : t('Première étape : pourquoi {S} est-il un minorant de A ?', { S }),
     options: [
-      { html: d.indexed ? `Pour tout n ≥ 1, ${d.c}/n > 0, donc ${MT(d.term)} ${d.sup ? LT : '>'} ${S}` : `Pour tout x ∈ A, x ${d.sup ? '≤' : '≥'} ${S}`, correct: true },
-      { html: `Parce que ${S} ∈ A`, correct: false, rule: 'a1_sup_in_set' },
-      { html: d.indexed ? `Pour n = 1, le terme vaut ${frT(d.sup ? Number(d.s) - d.c : Number(d.s) + d.c)}, ${d.sup ? 'plus petit' : 'plus grand'} que ${S}` : `Il existe x ∈ A avec x ${d.sup ? LT : '>'} ${S}`, correct: false, rule: 'g9_proof_by_example' },
-      { html: `Parce que ${S} est ${d.sup ? 'le plus grand' : 'le plus petit'} élément de A`, correct: false, rule: 'a1_sup_in_set' },
+      { html: d.indexed ? t('Pour tout n ≥ 1, {c}/n > 0, donc {u} {rel} {S}', { c: d.c, u: MT(d.term), rel: up ? LT : '>', S }) : t('Pour tout x ∈ A, x {rel} {S}', { rel: up ? '≤' : '≥', S }), correct: true },
+      { html: t('Parce que {S} ∈ A', { S }), correct: false, rule: 'a1_sup_in_set' },
+      { html: d.indexed ? (up ? t('Pour n = 1, le terme vaut {v}, plus petit que {S}', { v: frT(Number(d.s) - d.c), S }) : t('Pour n = 1, le terme vaut {v}, plus grand que {S}', { v: frT(Number(d.s) + d.c), S })) : t('Il existe x ∈ A avec x {rel} {S}', { rel: up ? LT : '>', S }), correct: false, rule: 'g9_proof_by_example' },
+      { html: up ? t('Parce que {S} est le plus grand élément de A', { S }) : t('Parce que {S} est le plus petit élément de A', { S }), correct: false, rule: 'a1_sup_in_set' },
     ],
-    key: `${SP}:open1:${d.s}`, solution: [{ html: `Un ${w} est plus ${d.sup ? 'grand' : 'petit'} que <b>tous</b> les éléments de A.`, note: '' }],
+    key: `${SP}:open1:${d.s}`, solution: [{ html: up ? t('Un majorant est plus grand que <b>tous</b> les éléments de A.') : t('Un minorant est plus petit que <b>tous</b> les éléments de A.'), note: '' }],
   }, rng);
   const all = spBlocks(d, { rng, inputs: ['x'], decoys: 0 });
-  const blocks = [...all.filter((b) => ['eps', 'x', 'chk'].includes(b.id)), { id: 'd0', needs: [], html: `Prenons ε = 0,1 : x = ${S} ${d.sup ? '−' : '+'} 0,05 convient.`, distractor: 'g9_proof_by_example', why: 'Un exemple de ε ne prouve rien : il faut un x pour chaque ε > 0.' }];
+  const blocks = [...all.filter((b) => ['eps', 'x', 'chk'].includes(b.id)), { id: 'd0', needs: [], html: t('Prenons ε = 0,1 : x = {S} {op} 0,05 convient.', { S, op: up ? '−' : '+' }), distractor: 'g9_proof_by_example', why: t('Un exemple de ε ne prouve rien : il faut un x pour chaque ε > 0.') }];
   const p2 = blocksItem({
-    skill: SP, level: 4, mode: 'frame', prompt: `Deuxième étape : pour tout ε > 0, trouve un élément de A ${d.sup ? 'plus grand' : 'plus petit'} que ${S} ${d.sup ? '−' : '+'} ε. Touche les blocs dans l'ordre et complète.`,
+    skill: SP, level: 4, mode: 'frame', prompt: up ? t('Deuxième étape : pour tout ε > 0, trouve un élément de A plus grand que {S} − ε. Touche les blocs dans l\'ordre et complète.', { S }) : t('Deuxième étape : pour tout ε > 0, trouve un élément de A plus petit que {S} + ε. Touche les blocs dans l\'ordre et complète.', { S }),
     blocks: rng.shuffle(blocks), goal: 'chk', order: ['eps', 'x', 'chk'], noHints: true, subgoals: SP_SUB,
     solution: spSolution(all, ['eps', 'x', 'chk']), key: `${SP}:open2:${d.indexed ? d.term : d.set}`,
   });
   const p3 = mcq({
-    skill: SP, level: 4, prompt: 'Conclusion :',
+    skill: SP, level: 4, prompt: t('Conclusion :'),
     options: [
-      { html: `${S} = ${W} A, et A n'a pas de ${d.sup ? 'maximum' : 'minimum'}`, correct: true },
-      { html: `${S} = ${d.sup ? 'Max' : 'Min'} A`, correct: false, rule: 'a1_sup_in_set' },
-      { html: `${W} A = ${S} ${d.sup ? '−' : '+'} ε`, correct: false },
-      { html: 'On ne peut rien conclure sans fixer ε', correct: false, rule: 'g9_quant_order' },
+      { html: up ? t('{S} = Sup A, et A n\'a pas de maximum', { S }) : t('{S} = Inf A, et A n\'a pas de minimum', { S }), correct: true },
+      { html: `${S} = ${up ? 'Max' : 'Min'} A`, correct: false, rule: 'a1_sup_in_set' },
+      { html: `${W} A = ${S} ${up ? '−' : '+'} ε`, correct: false },
+      { html: t('On ne peut rien conclure sans fixer ε'), correct: false, rule: 'g9_quant_order' },
     ],
-    key: `${SP}:open3:${d.s}`, solution: [{ html: `${S} est un ${w}, et aucun nombre ${d.sup ? 'plus petit' : 'plus grand'} n'en est un : c'est le ${W}. ${S} ∉ A : pas de ${d.sup ? 'Max' : 'Min'}.`, note: '' }],
+    key: `${SP}:open3:${d.s}`, solution: [{ html: up ? t('{S} est un majorant, et aucun nombre plus petit n\'en est un : c\'est le Sup. {S} ∉ A : pas de Max.', { S }) : t('{S} est un minorant, et aucun nombre plus grand n\'en est un : c\'est le Inf. {S} ∉ A : pas de Min.', { S }), note: '' }],
   }, rng);
   return problemItem({
-    skill: SP, level: 4, prompt: `${d.setHtml}. Montre que ${W} A = ${S}.`,
-    parts: [{ item: p1, points: 0.5, title: `${S} est un ${w}` }, { item: p2, points: 1, title: 'Construire x(ε)' }, { item: p3, points: 0.5, title: 'Conclure' }],
+    skill: SP, level: 4, prompt: t('{set}. Montre que {W} A = {s}.', { set: d.setHtml, W, s: S }),
+    parts: [{ item: p1, points: 0.5, title: up ? t('{S} est un majorant', { S }) : t('{S} est un minorant', { S }) }, { item: p2, points: 1, title: t('Construire x(ε)') }, { item: p3, points: 0.5, title: t('Conclure') }],
     key: `open:${d.indexed ? d.term : d.set}:${d.sup}`, exam: { format: 'open', points: 2 }, expectedSec: 420,
   });
 }
@@ -577,18 +587,18 @@ function spOpen(rng, opts) {
 function spTf(rng) {
   const kind = rng.pick(['cat', 'cat', 'in', 'one', 'eps2']);
   if (kind === 'cat') {
-    return tfItem({ skill: SP, level: 4, statement: 'Soit A ⊂ ℝ non vide et majoré, et c = Sup A. Pour tout ε > 0, il existe x ∈ A tel que x + ε ≥ c.', truth: true, key: 'cat', exam: { format: 'tf', points: 1 },
-      explanation: 'Vrai : c − ε n\'est pas un majorant, donc un x ∈ A dépasse c − ε, et x + ε > c.' });
+    return tfItem({ skill: SP, level: 4, statement: t('Soit A ⊂ ℝ non vide et majoré, et c = Sup A. Pour tout ε > 0, il existe x ∈ A tel que x + ε ≥ c.'), truth: true, key: 'cat', exam: { format: 'tf', points: 1 },
+      explanation: t('Vrai : c − ε n\'est pas un majorant, donc un x ∈ A dépasse c − ε, et x + ε > c.') });
   }
   if (kind === 'eps2') {
-    return tfItem({ skill: SP, level: 4, statement: 'Pour montrer que s = Sup A, on peut prendre x = s − ε/2 quand A = ]−∞ ; s[.', truth: true, key: 'eps2', exam: { format: 'tf', points: 1 },
-      explanation: 'Vrai : s − ε/2 < s, donc il est dans A pour tout ε > 0, et s − ε/2 > s − ε. Le max(… ; …) ne sert que quand A est borné à gauche.' });
+    return tfItem({ skill: SP, level: 4, statement: t('Pour montrer que s = Sup A, on peut prendre x = s − ε/2 quand A = ]−∞ ; s[.'), truth: true, key: 'eps2', exam: { format: 'tf', points: 1 },
+      explanation: t('Vrai : s − ε/2 < s, donc il est dans A pour tout ε > 0, et s − ε/2 > s − ε. Le max(… ; …) ne sert que quand A est borné à gauche.') });
   }
   if (kind === 'in') {
-    return vfMcq(SP, 'Si s = Sup A, alors s ∈ A.', false, rng, { key: 'in', ruleIfTrue: 'a1_sup_in_set', why: 'Faux : Sup [0 ; 3[ = 3 ∉ [0 ; 3[.' });
+    return vfMcq(SP, t('Si s = Sup A, alors s ∈ A.'), false, rng, { key: 'in', ruleIfTrue: 'a1_sup_in_set', why: t('Faux : Sup [0 ; 3[ = 3 ∉ [0 ; 3[.') });
   }
-  return vfMcq(SP, 'Si s majore A et qu\'il existe un ε > 0 et un x ∈ A avec x > s − ε, alors s = Sup A.', false, rng, {
-    key: 'one', ruleIfTrue: 'g9_proof_by_example', why: 'Faux : il faut un tel x pour <b>tout</b> ε > 0. A = [0 ; 1] et s = 2 : avec ε = 5, x = 0 convient, mais Sup A = 1.',
+  return vfMcq(SP, t('Si s majore A et qu\'il existe un ε > 0 et un x ∈ A avec x > s − ε, alors s = Sup A.'), false, rng, {
+    key: 'one', ruleIfTrue: 'g9_proof_by_example', why: t('Faux : il faut un tel x pour <b>tout</b> ε > 0. A = [0 ; 1] et s = 2 : avec ε = 5, x = 0 convient, mais Sup A = 1.'),
   });
 }
 

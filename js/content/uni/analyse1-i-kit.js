@@ -4,6 +4,7 @@
 // of the conclusion part), a true/false as a multiple choice, and the
 // helpers of part e (lines with blanks, menus, parts) re-exported.
 
+import { t } from '../../i18n.js';
 import { mcq } from './kit.js';
 import { parse } from '../../cas/parse.js';
 import { limitOf, sameAsLimit } from '../../judges/limit.js';
@@ -31,40 +32,40 @@ export const nPow = (p) => ({ 1: 'n', 2: 'n^2', 3: 'n^3', '1/2': '√n', '3/2': 
 // 1/nᵖ in plain text for the prompts: 1/n², 1/√n, 1/n^(3/2).
 export const bHtml = (p) => ({ 1: '1/n', 2: '1/n²', 3: '1/n³', '1/2': '1/√n', '3/2': '1/n^(3/2)' }[p]);
 
-const NATURE_LABEL = { abs: 'converge absolument', semi: 'converge, pas absolument', div: 'diverge' };
+const NATURE_LABEL = { abs: t('converge absolument'), semi: t('converge, pas absolument'), div: t('diverge') };
 
 // right: 'abs' | 'semi' | 'div'; rules and whys of the wrong options.
-export function natureDecision(right, { rules = {}, whys = {}, prompt = 'Nature de la série ?' } = {}) {
+export function natureDecision(right, { rules = {}, whys = {}, prompt = t('Nature de la série ?') } = {}) {
   const opt = (id) => ({
     id, label: NATURE_LABEL[id], valid: id === right,
     ...(id !== right && rules[id] ? { rule: rules[id] } : {}),
-    why: whys[id] || (id === 'semi' ? 'Termes positifs (ou ρ < 1) : la convergence est absolue.' : 'Relis la limite et le critère.'),
+    why: whys[id] || (id === 'semi' ? t('Termes positifs (ou ρ < 1) : la convergence est absolue.') : t('Relis la limite et le critère.')),
   });
   return { kind: 'decision', prompt, options: ['abs', 'semi', 'div'].map(opt) };
 }
 
 export const CRITERIA = {
-  term: 'Condition nécessaire : le terme général ne tend pas vers 0',
-  cmp: 'Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ',
-  ratio: 'Critère de d\'Alembert : |aₙ₊₁/aₙ| → ρ',
-  root: 'Critère de Cauchy : ⁿ√|aₙ| → ρ',
-  leibniz: 'Comparaison pour Σ |aₙ|, puis le critère de Leibniz',
-  geo: 'Série géométrique : converge si et seulement si |q| < 1',
+  term: t('Condition nécessaire : le terme général ne tend pas vers 0'),
+  cmp: t('Comparaison : aₙ/bₙ → L ∈ ]0 ; +∞[ avec bₙ = 1/nᵖ'),
+  ratio: t('Critère de d\'Alembert : |aₙ₊₁/aₙ| → ρ'),
+  root: t('Critère de Cauchy : ⁿ√|aₙ| → ρ'),
+  leibniz: t('Comparaison pour Σ |aₙ|, puis le critère de Leibniz'),
+  geo: t('Série géométrique : converge si et seulement si |q| < 1'),
 };
 const CRIT_WHY = {
-  term: 'Le terme général tend vers 0 ici : la condition nécessaire ne conclut pas.',
-  cmp: 'Ce n\'est pas une comparaison qui a conclu ici.',
-  ratio: 'On n\'a pas calculé de rapport aₙ₊₁/aₙ.',
-  root: 'On n\'a pas pris de racine n-ième.',
-  leibniz: 'La série n\'est pas étudiée par Leibniz ici.',
-  geo: 'Ce n\'est pas une série géométrique.',
+  term: t('Le terme général tend vers 0 ici : la condition nécessaire ne conclut pas.'),
+  cmp: t('Ce n\'est pas une comparaison qui a conclu ici.'),
+  ratio: t('On n\'a pas calculé de rapport aₙ₊₁/aₙ.'),
+  root: t('On n\'a pas pris de racine n-ième.'),
+  leibniz: t('La série n\'est pas étudiée par Leibniz ici.'),
+  geo: t('Ce n\'est pas une série géométrique.'),
 };
 // « Quel critère ? »: the right one and three others, in a fixed order.
 export function criterionDecision(correct, others) {
   const ids = [correct, ...others.filter((x) => x !== correct)].slice(0, 4);
   const order = Object.keys(CRITERIA).filter((k) => ids.includes(k));
   return {
-    kind: 'decision', prompt: 'Quel critère conclut ?',
+    kind: 'decision', prompt: t('Quel critère conclut ?'),
     options: order.map((id) => ({ id, label: CRITERIA[id], valid: id === correct, why: CRIT_WHY[id] })),
   };
 }
@@ -73,8 +74,8 @@ export function criterionDecision(correct, others) {
 // multiple choice (spec §6).
 export function vfMcq(skill, statement, truth, rng, { key, why, level = 4, exam = true, ruleIfTrue = null }) {
   return mcq({
-    skill, level, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth }],
+    skill, level, prompt: `${t('Vrai ou faux ?')}<br>« ${statement} »`, keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth }],
     key: `${skill}:tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: exam ? { format: 'tf', points: 1 } : false,
   }, rng);
 }

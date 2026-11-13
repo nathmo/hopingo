@@ -16,6 +16,7 @@ import {
   MT, examTag, H, KEYS, TABLE, rd, lap, lapres, opt, mcqMulti, term, sumT, fac, q, qt,
   P, padd, pmul, pscale, deg, lin, zpoly, zpow, fracT, denPoly, pfd, pfdText, inverseText, residueText, factorsText, cText, integroResidual,
 } from './fourier-c-kit.js';
+import { t } from '../../i18n.js';
 
 const SKO = 'f-lap-ode';
 const SKI = 'f-lap-integro';
@@ -149,12 +150,12 @@ function odeData(rng, level) {
 
 // The wrong answers of the traps, as lines of the judge.
 function odeTraps(o) {
-  const t = { f_lap_deriv_ic: [o.Ysw, o.Y0].filter(Boolean) };
+  const tt = { f_lap_deriv_ic: [o.Ysw, o.Y0].filter(Boolean) };
   const sw = inverseText(pfd(o.Nsw, o.poles));
-  if (sw !== o.y) t.f_lap_deriv_ic.push(sw);
+  if (sw !== o.y) tt.f_lap_deriv_ic.push(sw);
   const shifted = inverseText(o.parts.map((x) => ({ ...x, p: new CQ(x.p.re.neg(), x.p.im) })));
-  if (shifted !== o.y && o.parts.some((x) => x.p.re.n !== 0)) t.f_lap_shift_sign = [shifted];
-  return t;
+  if (shifted !== o.y && o.parts.some((x) => x.p.re.n !== 0)) tt.f_lap_shift_sign = [shifted];
+  return tt;
 }
 
 function odeItem(level, rng, opts) {
@@ -170,34 +171,34 @@ function odeItem(level, rng, opts) {
       notes: level === 1 ? [`ℒ(${PRIMES_H[o.n]}) = ${lead}, ℒ(y′) = zY − y(0).`] : [],
       decisions: [{ kind: 'decision', prompt: `ℒ(${PRIMES_H[o.n]}) = ?`, levels: [3], options: [
         { id: 'right', label: lead, valid: true },
-        { id: 'swap', label: o.n === 2 ? 'z²Y − y(0) − z y′(0)' : `z^${o.n}Y − y(0) − … − z^${o.n - 1} y^(${o.n - 1})(0)`, valid: false, rule: 'f_lap_deriv_ic', why: 'La puissance de z la plus haute va avec y(0) : ℒ(y″) = z²Y − z y(0) − y′(0).' },
+        { id: 'swap', label: o.n === 2 ? 'z²Y − y(0) − z y′(0)' : `z^${o.n}Y − y(0) − … − z^${o.n - 1} y^(${o.n - 1})(0)`, valid: false, rule: 'f_lap_deriv_ic', why: t('La puissance de z la plus haute va avec y(0) : ℒ(y″) = z²Y − z y(0) − y′(0).') },
       ] }],
       lines: [
-        { math: eq, note: 'Transformer (LP2)', subgoal: 'transform', blank: [first], blank2: [eq.split('=')[0]] },
-        { math: `Y = ${o.Y}`, note: 'Isoler Y', subgoal: 'isolate', blank2: [o.Y] },
+        { math: eq, note: t('Transformer (LP2)'), subgoal: 'transform', blank: [first], blank2: [eq.split('=')[0]] },
+        { math: `Y = ${o.Y}`, note: t('Isoler Y'), subgoal: 'isolate', blank2: [o.Y] },
       ],
     },
     {
-      html: 'Puis on inverse :', ask: 'Y =', start: `Y = ${o.Y}`, judge: lap({ dir: 'inverse', unknown: 'Y', f: o.y, F: o.Y, traps }),
-      decisions: [{ kind: 'decision', prompt: 'Comment inverser ?', levels: [3], options: [
-        { id: 'des', label: 'Éléments simples, puis la table', valid: true, ref: true },
-        { id: 'res', label: 'Somme des résidus de Y(z)e^(zt)', valid: true },
-        { id: 'direct', label: 'Inverser le numérateur et le dénominateur séparément', valid: false, why: 'ℒ⁻¹ n\'est pas multiplicative : ℒ⁻¹(N/D) ≠ ℒ⁻¹(N)/ℒ⁻¹(D).' },
+      html: t('Puis on inverse :'), ask: 'Y =', start: `Y = ${o.Y}`, judge: lap({ dir: 'inverse', unknown: 'Y', f: o.y, F: o.Y, traps }),
+      decisions: [{ kind: 'decision', prompt: t('Comment inverser ?'), levels: [3], options: [
+        { id: 'des', label: t('Éléments simples, puis la table'), valid: true, ref: true },
+        { id: 'res', label: t('Somme des résidus de Y(z)e^(zt)'), valid: true },
+        { id: 'direct', label: t('Inverser le numérateur et le dénominateur séparément'), valid: false, why: t('ℒ⁻¹ n\'est pas multiplicative : ℒ⁻¹(N/D) ≠ ℒ⁻¹(N)/ℒ⁻¹(D).') },
       ] }],
       lines: [
-        { math: `Y = ${des}`, note: 'Éléments simples', subgoal: 'des', blank2: [des] },
-        { math: `y(t) = ${o.y}`, note: 'Table', subgoal: 'inverse', blank2: [o.y] },
+        { math: `Y = ${des}`, note: t('Éléments simples'), subgoal: 'des', blank2: [des] },
+        { math: `y(t) = ${o.y}`, note: t('Table'), subgoal: 'inverse', blank2: [o.y] },
       ],
     },
   ];
   return partsItem({
-    skill: SKO, level, prompt: `Résous par la transformée de Laplace : ${odeHtml(o)}.${TABLE()}`,
+    skill: SKO, level, prompt: t('Résous par la transformée de Laplace : {a}.{b}', { a: odeHtml(o), b: TABLE() }),
     parts, keys: KEYS,
-    hints: H(`ℒ(y″) = z²Y − z y(0) − y′(0) : transforme l'équation, isole Y, décompose et inverse.`, MT(eq), MT(`Y = ${des}`)),
+    hints: H(t('ℒ(y″) = z²Y − z y(0) − y′(0) : transforme l\'équation, isole Y, décompose et inverse.'), MT(eq), MT(`Y = ${des}`)),
     subgoals: [
-      { id: 'transform', label: 'transformer l\'équation', skill: SKO },
-      { id: 'isolate', label: 'isoler Y', skill: 'eq-both-sides' },
-      { id: 'des', label: 'éléments simples', skill: 'g0-pfd-simple' },
+      { id: 'transform', label: t('transformer l\'équation'), skill: SKO },
+      { id: 'isolate', label: t('isoler Y'), skill: 'eq-both-sides' },
+      { id: 'des', label: t('éléments simples'), skill: 'g0-pfd-simple' },
       { id: 'inverse', label: 'inverser', skill: 'f-lap-inv-des' },
     ],
     key: `${SKO}:${level}:${o.id}`, exam: examTag(opts, 6), fallback: o.fallback, noHints: level >= 5 || !!opts.exam,
@@ -206,16 +207,16 @@ function odeItem(level, rng, opts) {
 
 function odeMcq(rng, opts) {
   const o = odeData(rng, 4);
-  const t = odeTraps(o);
+  const tt = odeTraps(o);
   return mcqMulti({
     skill: SKO, level: 4, key: `mcq:${o.id}`, exam: examTag(opts),
-    prompt: `On résout ${odeHtml(o)} par Laplace (Y = ℒ(y)). Coche les affirmations justes.${TABLE()}`,
+    prompt: t('On résout {a} par Laplace (Y = ℒ(y)). Coche les affirmations justes.{b}', { a: odeHtml(o), b: TABLE() }),
     options: [
       opt(MT(transformedEq(o)), true),
       opt(MT(transformedEq(o, { swap: true })), false, 'f_lap_deriv_ic'),
       opt(MT(`Y = ${o.Y}`), true),
       opt(MT(`y(t) = ${o.y}`), true),
-      ...(t.f_lap_shift_sign ? [opt(MT(`y(t) = ${t.f_lap_shift_sign[0]}`), false, 'f_lap_shift_sign')] : [opt(MT(`Y = ${o.Ysw}`), false, 'f_lap_deriv_ic')]),
+      ...(tt.f_lap_shift_sign ? [opt(MT(`y(t) = ${tt.f_lap_shift_sign[0]}`), false, 'f_lap_shift_sign')] : [opt(MT(`Y = ${o.Ysw}`), false, 'f_lap_deriv_ic')]),
     ],
     solution: [{ html: `${MT(transformedEq(o))}, ${MT(`Y = ${pfdText(o.parts)}`)}, ${MT(`y(t) = ${o.y}`)}`, note: '' }],
     expectedSec: 240,
@@ -261,38 +262,38 @@ function integroItem(level, rng, opts) {
   const parts = [
     {
       html: null, start: `ℒ(${expA(d.a)})`, judge: lap({ f: expA(d.a), F: kern, traps: { f_lap_integro_kernel: [`1/${zMinus(-d.a)}`] } }),
-      notes: level === 1 ? [`L'intégrale est la convolution (u ∗ g)(t) avec le noyau g(t) = ${rd(expA(d.a))} : ℒ(u ∗ g) = U(z)G(z).`] : [],
-      decisions: [{ kind: 'decision', prompt: 'Quel est le noyau g de la convolution ?', levels: [2, 3], options: [
+      notes: level === 1 ? [t('L\'intégrale est la convolution (u ∗ g)(t) avec le noyau g(t) = {a} : ℒ(u ∗ g) = U(z)G(z).', { a: rd(expA(d.a)) })] : [],
+      decisions: [{ kind: 'decision', prompt: t('Quel est le noyau g de la convolution ?'), levels: [2, 3], options: [
         { id: 'right', label: `g(t) = ${rd(expA(d.a))}`, valid: true },
-        { id: 'neg', label: `g(t) = ${rd(expA(-d.a))}`, valid: false, rule: 'f_lap_integro_kernel', why: `L'intégrale est ∫₀ᵗ u(s) g(t − s) ds avec g(t) = ${rd(expA(d.a))}.` },
-        { id: 'both', label: `g(t) = ${rd(d.c)}${rd(expA(d.a))}u(t)`, valid: false, why: 'Le noyau est la fonction de t − s seule ; u reste dans la convolution.' },
+        { id: 'neg', label: `g(t) = ${rd(expA(-d.a))}`, valid: false, rule: 'f_lap_integro_kernel', why: t('L\'intégrale est ∫₀ᵗ u(s) g(t − s) ds avec g(t) = {a}.', { a: rd(expA(d.a)) }) },
+        { id: 'both', label: `g(t) = ${rd(d.c)}${rd(expA(d.a))}u(t)`, valid: false, why: t('Le noyau est la fonction de t − s seule ; u reste dans la convolution.') },
       ] }],
-      lines: [{ math: kern, note: 'Ligne L3', subgoal: 'kernel', blank: [zMinus(d.a).replace(/[()]/g, '')] }],
+      lines: [{ math: kern, note: t('Ligne L3'), subgoal: 'kernel', blank: [zMinus(d.a).replace(/[()]/g, '')] }],
     },
     {
-      html: 'Transforme l\'équation (LP2, LP6), puis isole U :', ask: '', start: 'U = ℒ(u)',
+      html: t('Transforme l\'équation (LP2, LP6), puis isole U :'), ask: '', start: 'U = ℒ(u)',
       judge: lap({ dir: 'inverse', unknown: 'U', f: u, F: U, final: 'transform', traps: { f_lap_deriv_ic: [`${d.K}/(z^2+${d.w * d.w})`] } }),
-      decisions: [{ kind: 'decision', prompt: 'Que devient l\'intégrale ?', levels: [3], options: [
-        { id: 'conv', label: `${d.c}U(z)G(z) (LP6, convolution)`, valid: true },
-        { id: 'prim', label: `${d.c}U(z)/z (LP3, primitive)`, valid: false, why: 'LP3 sert pour ∫₀ᵗ u(s) ds seul ; ici il y a le noyau g(t − s) : c\'est une convolution.' },
+      decisions: [{ kind: 'decision', prompt: t('Que devient l\'intégrale ?'), levels: [3], options: [
+        { id: 'conv', label: t('{c}U(z)G(z) (LP6, convolution)', { c: d.c }), valid: true },
+        { id: 'prim', label: t('{c}U(z)/z (LP3, primitive)', { c: d.c }), valid: false, why: t('LP3 sert pour ∫₀ᵗ u(s) ds seul ; ici il y a le noyau g(t − s) : c\'est une convolution.') },
       ] }],
       lines: [
-        { math: eq, note: 'Transformer', subgoal: 'transform', blank: [`zU-${d.A}`.replace('--', '+')], blank2: [eq.split('=')[0]] },
-        { math: `U = ${U}`, note: `Isoler U : (z ${d.a > 0 ? '−' : '+'} ${Math.abs(d.a)})(z ${d.a > 0 ? '+' : '−'} ${Math.abs(d.a)}) + ${d.c} = z² + ${d.w * d.w}`, subgoal: 'isolate', blank2: [U] },
+        { math: eq, note: t('Transformer'), subgoal: 'transform', blank: [`zU-${d.A}`.replace('--', '+')], blank2: [eq.split('=')[0]] },
+        { math: `U = ${U}`, note: t('Isoler U : (z {a} {b})(z {c} {b}) + {c2} = z² + {d}', { a: d.a > 0 ? '−' : '+', b: Math.abs(d.a), c: d.a > 0 ? '+' : '−', c2: d.c, d: d.w * d.w }), subgoal: 'isolate', blank2: [U] },
       ],
     },
     {
-      html: 'Puis on inverse :', ask: 'u(t) =', start: `U = ${U}`, judge: lap({ dir: 'inverse', unknown: 'U', f: u, F: U, traps: { f_sin_omega_factor: [sumT([term(d.A, `cos(${term(d.w, 't')})`), term(d.B * d.w, `sin(${term(d.w, 't')})`)])].filter((x) => d.w !== 1 && x !== u) } }),
-      lines: [{ math: `u(t) = ${u}`, note: 'Lignes L5 et L4', subgoal: 'inverse', blank: [u.split(/(?=[+-])/).at(-1).replace(/^\+/, '')], blank2: [u] }],
+      html: t('Puis on inverse :'), ask: 'u(t) =', start: `U = ${U}`, judge: lap({ dir: 'inverse', unknown: 'U', f: u, F: U, traps: { f_sin_omega_factor: [sumT([term(d.A, `cos(${term(d.w, 't')})`), term(d.B * d.w, `sin(${term(d.w, 't')})`)])].filter((x) => d.w !== 1 && x !== u) } }),
+      lines: [{ math: `u(t) = ${u}`, note: t('Lignes L5 et L4'), subgoal: 'inverse', blank: [u.split(/(?=[+-])/).at(-1).replace(/^\+/, '')], blank2: [u] }],
     },
   ];
   return partsItem({
-    skill: SKI, level, prompt: `Résous par la transformée de Laplace : ${html}.${TABLE()}`,
+    skill: SKI, level, prompt: t('Résous par la transformée de Laplace : {html}.{a}', { html, a: TABLE() }),
     parts, keys: KEYS,
-    hints: H('L\'intégrale est une convolution : ℒ(u ∗ g) = U(z)G(z).', `ℒ(${MT(expA(d.a))}) = ${MT(kern)}`, MT(eq)),
+    hints: H(t('L\'intégrale est une convolution : ℒ(u ∗ g) = U(z)G(z).'), `ℒ(${MT(expA(d.a))}) = ${MT(kern)}`, MT(eq)),
     subgoals: [
       { id: 'kernel', label: 'noyau', skill: SKI }, { id: 'transform', label: 'transformer', skill: SKI },
-      { id: 'isolate', label: 'isoler U', skill: SKI }, { id: 'inverse', label: 'inverser', skill: SKI },
+      { id: 'isolate', label: t('isoler U'), skill: SKI }, { id: 'inverse', label: 'inverser', skill: SKI },
     ],
     key: `${SKI}:${level}:${d.id}`, exam: examTag(opts, 3), fallback: d.fallback, noHints: level >= 5 || !!opts.exam,
   });
@@ -338,31 +339,31 @@ function residueParts(o, level) {
   const zb = String(-o.B);
   return [
     {
-      html: `Résidu de Y(z)e^(zt) en z = ${rd(za)} (pôle simple) :`, ask: 'Res =', start: `Res(${rd(za)})`, judge: lapres({ value: ra, z0: za }),
+      html: t('Résidu de Y(z)e^(zt) en z = {za} (pôle simple) :', { za: rd(za) }), ask: 'Res =', start: `Res(${rd(za)})`, judge: lapres({ value: ra, z0: za }),
       lines: [
-        { math: `${numT(o.N)}e^(z t)/${zpow(cq(-o.B), 2)}`, note: `(z ${'+'} ${o.A})Y(z)e^(zt) en z = ${rd(za)}`, subgoal: 'residues' },
-        { math: ra, note: 'Calculer', subgoal: 'residues', blank: [ra] },
+        { math: `${numT(o.N)}e^(z t)/${zpow(cq(-o.B), 2)}`, note: t('(z {a} {A})Y(z)e^(zt) en z = {za}', { a: '+', A: o.A, za: rd(za) }), subgoal: 'residues' },
+        { math: ra, note: t('Calculer'), subgoal: 'residues', blank: [ra] },
       ],
     },
     {
-      html: `Résidu en z = ${rd(zb)} (pôle double) :`, ask: 'Res =', start: `Res(${rd(zb)})`, judge: lapres({ value: rb, z0: zb }),
-      decisions: [{ kind: 'decision', prompt: 'Quelle formule ?', levels: [2, 3, 4], options: [
-        { id: 'double', label: 'd/dz[(z − z₀)²Y(z)e^(zt)] en z₀', valid: true },
-        { id: 'simple', label: 'lim (z − z₀)Y(z)e^(zt) quand z → z₀', valid: false, rule: 'c_simple_formula_double', why: `${rd(zb)} est un pôle double : la formule du pôle simple donne une limite infinie.` },
+      html: t('Résidu en z = {zb} (pôle double) :', { zb: rd(zb) }), ask: 'Res =', start: `Res(${rd(zb)})`, judge: lapres({ value: rb, z0: zb }),
+      decisions: [{ kind: 'decision', prompt: t('Quelle formule ?'), levels: [2, 3, 4], options: [
+        { id: 'double', label: t('d/dz[(z − z₀)²Y(z)e^(zt)] en z₀'), valid: true },
+        { id: 'simple', label: t('lim (z − z₀)Y(z)e^(zt) quand z → z₀'), valid: false, rule: 'c_simple_formula_double', why: t('{zb} est un pôle double : la formule du pôle simple donne une limite infinie.', { zb: rd(zb) }) },
       ] }],
       lines: [
-        { math: `d(${numT(o.N)}e^(z t)/${zpow(cq(-o.A), 1)}, z)`, note: 'Dériver, puis z = z₀', subgoal: 'residues' },
-        { math: rb, note: 'Calculer', subgoal: 'residues', blank: level === 1 ? [rb] : [], blank2: [rb] },
+        { math: `d(${numT(o.N)}e^(z t)/${zpow(cq(-o.A), 1)}, z)`, note: t('Dériver, puis z = z₀'), subgoal: 'residues' },
+        { math: rb, note: t('Calculer'), subgoal: 'residues', blank: level === 1 ? [rb] : [], blank2: [rb] },
       ],
     },
   ];
 }
 
 const ARC_DECISION = {
-  kind: 'decision', prompt: 'Pourquoi l\'intégrale sur l\'arc gauche C_R de Bromwich tend-elle vers 0 (t > 0) ?', options: [
-    { id: 'jordan', label: '|e^(zt)| = e^(γt)e^(tR cos θ), |Y| ≤ C/R et ∫ e^(tR cos θ) dθ ≤ π/(tR) (Jordan) : la borne est en 1/R', valid: true },
-    { id: 'triangle', label: '|(z + 1)²(z + 2)| ≤ (R + 1)²(R + 2), donc |Y| ≤ C/(R + 1)³ …', valid: false, rule: 'c_arc_triangle', why: 'Pour majorer |Y|, il faut minorer le dénominateur : |z + a| ≥ R − |a| (inégalité triangulaire inverse).' },
-    { id: 'ml', label: 'Longueur πR fois max |Y e^(zt)| ≤ C e^(γt)/R : la borne tend vers 0', valid: false, why: 'πR · C/R ne tend pas vers 0 : ici deg dénominateur = deg numérateur + 1, il faut le lemme de Jordan.' },
+  kind: 'decision', prompt: t('Pourquoi l\'intégrale sur l\'arc gauche C_R de Bromwich tend-elle vers 0 (t > 0) ?'), options: [
+    { id: 'jordan', label: t('|e^(zt)| = e^(γt)e^(tR cos θ), |Y| ≤ C/R et ∫ e^(tR cos θ) dθ ≤ π/(tR) (Jordan) : la borne est en 1/R'), valid: true },
+    { id: 'triangle', label: t('|(z + 1)²(z + 2)| ≤ (R + 1)²(R + 2), donc |Y| ≤ C/(R + 1)³ …'), valid: false, rule: 'c_arc_triangle', why: t('Pour majorer |Y|, il faut minorer le dénominateur : |z + a| ≥ R − |a| (inégalité triangulaire inverse).') },
+    { id: 'ml', label: t('Longueur πR fois max |Y e^(zt)| ≤ C e^(γt)/R : la borne tend vers 0'), valid: false, why: t('πR · C/R ne tend pas vers 0 : ici deg dénominateur = deg numérateur + 1, il faut le lemme de Jordan.') },
   ],
 };
 
@@ -375,30 +376,30 @@ function problemLines(level, rng, opts) {
       start: 'Y = ℒ(y)', judge: lap({ dir: 'inverse', unknown: 'Y', f: o.y, F: o.Y, final: 'transform', traps }),
       notes: level === 1 ? ['ℒ(y″) = z²Y − z y(0) − y′(0), ℒ(y′) = zY − y(0).'] : [],
       lines: [
-        { math: eq, note: 'Transformer', subgoal: 'transform', blank: [eq.split(/(?=[+-])/)[0]] },
-        { math: `Y = ${o.Y}`, note: 'Isoler Y', subgoal: 'isolate', blank2: [o.Y] },
+        { math: eq, note: t('Transformer'), subgoal: 'transform', blank: [eq.split(/(?=[+-])/)[0]] },
+        { math: `Y = ${o.Y}`, note: t('Isoler Y'), subgoal: 'isolate', blank2: [o.Y] },
       ],
     },
     ...residueParts(o, level),
     {
-      html: 'Somme des résidus (contour de Bromwich) :', ask: 'y(t) =', start: 'y(t)',
+      html: t('Somme des résidus (contour de Bromwich) :'), ask: 'y(t) =', start: 'y(t)',
       judge: lap({ dir: 'inverse', f: o.y, F: o.Y, traps }),
       decisions: [{ ...ARC_DECISION, levels: [2, 3, 4] }],
-      notes: level === 1 ? ['Sur l\'arc gauche, Jordan donne une borne en 1/R : l\'intégrale tend vers 0, et y(t) est la somme des résidus.'] : [],
-      lines: [{ math: `y(t) = ${o.y}`, note: `Vérifier : y(0) = ${rd(o.ics[0])}, y′(0) = ${rd(o.ics[1])}`, subgoal: 'check' }],
+      notes: level === 1 ? [t('Sur l\'arc gauche, Jordan donne une borne en 1/R : l\'intégrale tend vers 0, et y(t) est la somme des résidus.')] : [],
+      lines: [{ math: `y(t) = ${o.y}`, note: t('Vérifier : y(0) = {ics0}, y′(0) = {ics1}', { ics0: rd(o.ics[0]), ics1: rd(o.ics[1]) }), subgoal: 'check' }],
     },
   ];
   return { o, item: partsItem({
-    skill: SKP, level, prompt: `Résous ${odeHtml(o)} par la transformée de Laplace ; inverse Y par les résidus en justifiant le passage par le contour de Bromwich.${TABLE()}`,
+    skill: SKP, level, prompt: t('Résous {a} par la transformée de Laplace ; inverse Y par les résidus en justifiant le passage par le contour de Bromwich.{b}', { a: odeHtml(o), b: TABLE() }),
     parts, keys: KEYS,
-    hints: H('Transforme, isole Y, puis y(t) = somme des résidus de Y(z)e^(zt) : un pôle simple et un pôle double.', MT(eq), MT(`Y = ${o.Y}`)),
+    hints: H(t('Transforme, isole Y, puis y(t) = somme des résidus de Y(z)e^(zt) : un pôle simple et un pôle double.'), MT(eq), MT(`Y = ${o.Y}`)),
     subgoals: SUBP, key: `${SKP}:${level}:${o.id}`, exam: examTag(opts, 10), fallback: o.fallback, noHints: level >= 5 || !!opts.exam,
   }) };
 }
 const SUBP = [
-  { id: 'transform', label: 'transformer', skill: SKO }, { id: 'isolate', label: 'isoler Y', skill: SKO },
-  { id: 'residues', label: 'résidus', skill: 'f-lap-inv-res' }, { id: 'arc', label: 'arc de Bromwich', skill: 'c-arc-estimate' },
-  { id: 'check', label: 'vérifier', skill: SKP },
+  { id: 'transform', label: 'transformer', skill: SKO }, { id: 'isolate', label: t('isoler Y'), skill: SKO },
+  { id: 'residues', label: t('résidus'), skill: 'f-lap-inv-res' }, { id: 'arc', label: t('arc de Bromwich'), skill: 'c-arc-estimate' },
+  { id: 'check', label: t('vérifier'), skill: SKP },
 ];
 
 // The arc of Bromwich in blocks (2 points), with a decoy of c_arc_triangle.
@@ -408,21 +409,21 @@ function arcBlocks(o, level, opts, rng) {
   const E = (x) => `e<sup>${x}</sup>`;
   const INT = '∫<sub>π/2</sub><sup>3π/2</sup>';
   const blocks = [
-    { id: 'param', html: `Sur l'arc gauche ${CR} : z = γ + R${E('iθ')}, θ ∈ [π/2 ; 3π/2], avec γ &gt; γ₀.`, needs: [] },
-    { id: 'exp', html: `|${E('zt')}| = ${E('γt')}${E('tR cos θ')}, et cos θ ≤ 0 sur l'arc.`, needs: ['param'] },
-    { id: 'Y', html: `Chaque facteur de ${rd(den)} vérifie |z + a| ≥ |z| − |a| (inégalité triangulaire inverse) ; le dénominateur a un degré de plus que le numérateur : |Y(z)| ≤ C/R pour R grand.`, needs: ['param'] },
+    { id: 'param', html: t('Sur l\'arc gauche {CR} : z = γ + R{a}, θ ∈ [π/2 ; 3π/2], avec γ &gt; γ₀.', { CR, a: E('iθ') }), needs: [] },
+    { id: 'exp', html: t('|{a}| = {b}{c}, et cos θ ≤ 0 sur l\'arc.', { a: E('zt'), b: E('γt'), c: E('tR cos θ') }), needs: ['param'] },
+    { id: 'Y', html: t('Chaque facteur de {den} vérifie |z + a| ≥ |z| − |a| (inégalité triangulaire inverse) ; le dénominateur a un degré de plus que le numérateur : |Y(z)| ≤ C/R pour R grand.', { den: rd(den) }), needs: ['param'] },
     { id: 'bound', html: `|∫<sub>${CR}</sub> Y(z)${E('zt')} dz| ≤ (C/R) · ${E('γt')} · R ${INT} ${E('tR cos θ')} dθ.`, needs: ['exp', 'Y'] },
-    { id: 'jordan', html: `Jordan : ${INT} ${E('tR cos θ')} dθ ≤ π/(tR), donc la borne vaut πC${E('γt')}/(tR) → 0 quand R → ∞ (t &gt; 0).`, needs: ['bound'] },
-    { id: 'decoy', html: 'Sur l’arc, |z + a| ≤ |z| + |a|, donc 1/|z + a| ≤ 1/(|z| + |a|) et |Y(z)| ≤ C/R.', needs: [], distractor: 'c_arc_triangle', why: 'Pour majorer |Y|, on minore son dénominateur (|z + a| ≥ R − |a|) : une majoration du dénominateur ne borne pas |Y|.' },
+    { id: 'jordan', html: t('Jordan : {INT} {a} dθ ≤ π/(tR), donc la borne vaut πC{b}/(tR) → 0 quand R → ∞ (t &gt; 0).', { INT, a: E('tR cos θ'), b: E('γt') }), needs: ['bound'] },
+    { id: 'decoy', html: t('Sur l’arc, |z + a| ≤ |z| + |a|, donc 1/|z + a| ≤ 1/(|z| + |a|) et |Y(z)| ≤ C/R.'), needs: [], distractor: 'c_arc_triangle', why: t('Pour majorer |Y|, on minore son dénominateur (|z + a| ≥ R − |a|) : une majoration du dénominateur ne borne pas |Y|.') },
   ];
   const order = ['param', 'exp', 'Y', 'bound', 'jordan'];
   return blocksItem({
     skill: SKP, level, mode: 'order',
-    prompt: 'Montre que l\'intégrale de Y(z)e^(zt) sur l\'arc gauche C_R du contour de Bromwich tend vers 0 quand R → ∞ (t > 0). Touche les blocs dans l\'ordre.',
+    prompt: t('Montre que l\'intégrale de Y(z)e^(zt) sur l\'arc gauche C_R du contour de Bromwich tend vers 0 quand R → ∞ (t > 0). Touche les blocs dans l\'ordre.'),
     blocks: rng.shuffle(blocks), goal: 'jordan', order,
     solution: order.map((id) => ({ html: blocks.find((x) => x.id === id).html, note: '' })),
     hints: [], noHints: true,
-    subgoals: [{ id: 'arc', label: 'arc de Bromwich', skill: 'c-arc-estimate' }],
+    subgoals: [{ id: 'arc', label: t('arc de Bromwich'), skill: 'c-arc-estimate' }],
     key: `${o.id}:arc`, exam: opts.exam ? examTag(opts, 2) : false,
   });
 }
@@ -431,21 +432,22 @@ function problemFull(level, rng, opts) {
   const { o, item } = problemLines(5, rng, opts);
   // Part 1: transform and Y, the two residues (4 + 1 + 2 points).
   const segs = item.script;
-  const cut = segs.findIndex((l) => l.kind === 'segment' && /Somme des résidus/.test(l.html));
-  const first = { ...item, script: segs.slice(0, cut).filter((l) => l.kind !== 'decision' || !l.prompt.startsWith('Pourquoi')), prompt: '' };
+  // The texts are compared in the language shown (t()).
+  const cut = segs.findIndex((l) => l.kind === 'segment' && l.html === t('Somme des résidus (contour de Bromwich) :'));
+  const first = { ...item, script: segs.slice(0, cut).filter((l) => l.kind !== 'decision' || l.prompt !== t('Pourquoi l\'intégrale sur l\'arc gauche C_R de Bromwich tend-elle vers 0 (t > 0) ?')), prompt: '' };
   first.solution = undefined;
   const ode = { kind: 'ode', eq: odeText(o), unknown: 'y', v: 't', order: 2, ic: { x: 0, y: o.ics[0], dy: o.ics[1] } };
   const last = {
     ...item, start: { math: 'y' }, judge: ode, script: [{ kind: 'eq', math: `y = ${o.y}`, note: `y(0) = ${rd(o.ics[0])}, y′(0) = ${rd(o.ics[1])}`, subgoal: 'check' }],
-    prompt: 'Donne y(t) (la somme des résidus) ; elle doit vérifier l\'équation et les conditions initiales.', key: `${item.key}:y`, baits: [],
+    prompt: t('Donne y(t) (la somme des résidus) ; elle doit vérifier l\'équation et les conditions initiales.'), key: `${item.key}:y`, baits: [],
   };
   const fix = (it) => ({ ...it, solution: undefined, answerHtml: undefined });
   return problemItem({
     skill: SKP, level, prompt: item.prompt,
     parts: [
-      { item: relines(fix(first)), points: [4, 1, 2], title: 'Transformée, Y et résidus' },
-      { item: arcBlocks(o, level, opts, rng), points: 2, title: 'Arc de Bromwich' },
-      { item: relines(fix(last)), points: 1, title: 'Solution et vérification' },
+      { item: relines(fix(first)), points: [4, 1, 2], title: t('Transformée, Y et résidus') },
+      { item: arcBlocks(o, level, opts, rng), points: 2, title: t('Arc de Bromwich') },
+      { item: relines(fix(last)), points: 1, title: t('Solution et vérification') },
     ],
     key: o.id, exam: opts.exam ? examTag(opts, 10) : false, expectedSec: 1500, fallback: o.fallback,
   });

@@ -11,6 +11,7 @@
 import { parse, evaluate } from '../math/expr.js';
 import { solve } from '../math/solver.js';
 import { stepsItem, answerItem, computeMcq, coprimeNum, mathHtml } from './items.js';
+import { t } from '../i18n.js';
 
 const DENS = [2, 3, 4, 5, 6];
 
@@ -68,7 +69,7 @@ function fromPatterns(skill, patterns, fallback, opts = {}) {
     for (let i = 0; i < 400; i++) {
       const expr = fillMix(rng.pick(patterns[level]), rng);
       if (!acceptable(expr, opts)) continue;
-      return stepsItem(skill, level, expr, { mode: opts.mode?.(level) ?? modeFor(level), prompt: 'Calcule et donne le résultat sous forme irréductible.' });
+      return stepsItem(skill, level, expr, { mode: opts.mode?.(level) ?? modeFor(level), prompt: t('Calcule et donne le résultat sous forme irréductible.') });
     }
     return stepsItem(skill, level, fallback, { mode: modeFor(level) });
   };
@@ -84,7 +85,7 @@ GEN['pow-frac'] = (level, rng) => {
     const sign = level === 2 ? '-' : '';
     const e = rng.int(2, 3);
     return stepsItem('pow-frac', level, `(${sign}${n}/${d})^${e}`, {
-      mode: 'guided', prompt: 'Calcule.', solveOpts: { expandPowers: true },
+      mode: 'guided', prompt: t('Calcule.'), solveOpts: { expandPowers: true },
     });
   }
   if (level === 3) {
@@ -108,7 +109,7 @@ GEN['root-frac'] = (level, rng) => {
   if (level === 1) {
     const [n, d] = fraction(rng, [2, 3, 4, 5, 6, 7, 8, 9, 10]);
     const expr = `√(${n * n}/${d * d})`;
-    return answerItem('root-frac', level, `Calcule ${mathHtml(expr)}.`, `${n}/${d}`, {
+    return answerItem('root-frac', level, t('Calcule {e}.', { e: mathHtml(expr) }), `${n}/${d}`, {
       tree: expr, traps: [{ value: [n, d * d], rule: 'sqrt_numerator_only' }], key: expr,
     });
   }

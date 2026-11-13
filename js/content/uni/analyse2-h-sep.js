@@ -10,15 +10,16 @@ import { partsScript, tpl, sup } from './a2-kit.js';
 import { q, qt, sumT, polyT, scaleP, fac, rd, H, E, modeOf, mcq4, opt, tfOf } from './analyse2-h-kit.js';
 import { parse } from '../../cas/parse.js';
 import { evalFloat } from '../../cas/numeric.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-separable';
 const SUB = [
-  { id: 'constant-sol', label: 'solutions constantes', skill: SK },
-  { id: 'separate', label: 'séparer les variables', skill: SK },
-  { id: 'partial-frac', label: 'éléments simples', skill: 'a1-int-rational' },
-  { id: 'integrate', label: 'intégrer des deux côtés', skill: 'a1-int-direct' },
-  { id: 'ic', label: 'condition initiale', skill: SK },
-  { id: 'solve', label: 'isoler y', skill: SK },
+  { id: 'constant-sol', label: t('solutions constantes'), skill: SK },
+  { id: 'separate', label: t('séparer les variables'), skill: SK },
+  { id: 'partial-frac', label: t('éléments simples'), skill: 'a1-int-rational' },
+  { id: 'integrate', label: t('intégrer des deux côtés'), skill: 'a1-int-direct' },
+  { id: 'ic', label: t('condition initiale'), skill: SK },
+  { id: 'solve', label: t('isoler y'), skill: SK },
 ];
 const KEYS = ['calcx', 'calcfn', 'a2', 'anal'];
 
@@ -142,13 +143,13 @@ function data(rng) {
 }
 
 const CHOICES = [
-  { id: 'zeros', label: 'Chercher les zéros de h(y) : solutions constantes' },
-  { id: 'pf', label: 'Décomposer en éléments simples' },
-  { id: 'sep', label: 'Séparer : les y d\'un côté, les x de l\'autre' },
-  { id: 'int', label: 'Intégrer des deux côtés (une seule constante)' },
-  { id: 'ic', label: 'Appliquer la condition initiale' },
-  { id: 'solve', label: 'Isoler y' },
-  { id: 'twoC', label: 'Intégrer avec une constante de chaque côté', why: 'Deux constantes C₁ et C₂ se regroupent en une seule : C = C₂ − C₁.' },
+  { id: 'zeros', label: t('Chercher les zéros de h(y) : solutions constantes') },
+  { id: 'pf', label: t('Décomposer en éléments simples') },
+  { id: 'sep', label: t('Séparer : les y d\'un côté, les x de l\'autre') },
+  { id: 'int', label: t('Intégrer des deux côtés (une seule constante)') },
+  { id: 'ic', label: t('Appliquer la condition initiale') },
+  { id: 'solve', label: t('Isoler y') },
+  { id: 'twoC', label: t('Intégrer avec une constante de chaque côté'), why: t('Deux constantes C₁ et C₂ se regroupent en une seule : C = C₂ − C₁.') },
 ];
 
 function linesVariant(level, rng, opts) {
@@ -161,40 +162,40 @@ function linesVariant(level, rng, opts) {
   };
   const parts = [];
   const divide = {
-    kind: 'decision', prompt: `Avant de diviser par h(y) = ${hR(F.h)}, que faut-il faire ?`, options: [
-      { id: 'zeros', label: 'Chercher les zéros de h : ce sont des solutions constantes', valid: true },
-      { id: 'none', label: 'Rien : on divise directement', valid: false, rule: 'a2_ode_sep_lost_constant', why: 'Diviser par h(y) perd les solutions où h(y) = 0 : ce sont des solutions constantes, parfois la seule qui vérifie la condition initiale.' },
+    kind: 'decision', prompt: t('Avant de diviser par h(y) = {h}, que faut-il faire ?', { h: hR(F.h) }), options: [
+      { id: 'zeros', label: t('Chercher les zéros de h : ce sont des solutions constantes'), valid: true },
+      { id: 'none', label: t('Rien : on divise directement'), valid: false, rule: 'a2_ode_sep_lost_constant', why: t('Diviser par h(y) perd les solutions où h(y) = 0 : ce sont des solutions constantes, parfois la seule qui vérifie la condition initiale.') },
     ],
   };
-  const zerosNote = { kind: 'note', html: `h(y) = y s'annule en y = 0 : y ≡ 0 est une solution constante.${constant ? '' : ` Ici y(0) = ${rd(y0T)} ≠ 0.`}` };
+  const zerosNote = { kind: 'note', html: t('h(y) = y s\'annule en y = 0 : y ≡ 0 est une solution constante.') + (constant ? '' : ` ${t('Ici y(0) = {y0} ≠ 0.', { y0: rd(y0T) })}`) };
   const pre = F.h === 'y' ? [...(level === 2 || level === 3 ? [divide] : []), zerosNote] : [];
   if ((level >= 2 || constant) && F.h !== 'y') {
     parts.push({
-      html: 'Solutions constantes : les zéros de h.', ask: 'h(y) = 0 :', start: `${F.h} = 0`, judge: { kind: 'solset', v: 'y' },
-      pre: level === 2 || level === 3 ? [divide] : [], lines: [E(F.zeros, 'Zéros de h', 'constant-sol', 'zeros')],
+      html: t('Solutions constantes : les zéros de h.'), ask: t('h(y) = 0 :'), start: `${F.h} = 0`, judge: { kind: 'solset', v: 'y' },
+      pre: level === 2 || level === 3 ? [divide] : [], lines: [E(F.zeros, t('Zéros de h'), 'constant-sol', 'zeros')],
     });
   }
   if (constant) {
     parts.push({
-      html: `y(0) = ${rd(y0)} annule h : quelle est la solution ?`, ask: 'y =', start: F.eq, judge: ode, pre,
-      lines: [E(`y = ${y0}`, `y ≡ ${rd(y0)} est une solution, et la seule (unicité)`, 'ic', 'solve')],
+      html: t('y(0) = {y0} annule h : quelle est la solution ?', { y0: rd(y0) }), ask: 'y =', start: F.eq, judge: ode, pre,
+      lines: [E(`y = ${y0}`, t('y ≡ {y0} est une solution, et la seule (unicité)', { y0: rd(y0) }), 'ic', 'solve')],
     });
   } else {
-    if (F.pf) parts.push({ html: `Décompose ${MT(F.pf.start)} en éléments simples.`, ask: `${MT(F.pf.start)} =`, start: F.pf.start, judge: { kind: 'equiv', vars: ['y'], domain: { y: [-d.a + 0.1, d.a - 0.1] } }, lines: [E(F.pf.line, 'Éléments simples', 'partial-frac', 'pf')] });
+    if (F.pf) parts.push({ html: t('Décompose {f} en éléments simples.', { f: MT(F.pf.start) }), ask: `${MT(F.pf.start)} =`, start: F.pf.start, judge: { kind: 'equiv', vars: ['y'], domain: { y: [-d.a + 0.1, d.a - 0.1] } }, lines: [E(F.pf.line, t('Éléments simples'), 'partial-frac', 'pf')] });
     const icDecision = {
-      kind: 'decision', prompt: 'Appliquer la condition initiale maintenant, ou après avoir isolé y ?', options: [
-        { id: 'now', label: 'Maintenant : la constante est plus simple à trouver', valid: true, ref: true },
-        { id: 'later', label: 'Après avoir isolé y', valid: true, quality: 'poor', why: 'Juste aussi, mais la constante est souvent plus compliquée une fois y isolé.' },
+      kind: 'decision', prompt: t('Appliquer la condition initiale maintenant, ou après avoir isolé y ?'), options: [
+        { id: 'now', label: t('Maintenant : la constante est plus simple à trouver'), valid: true, ref: true },
+        { id: 'later', label: t('Après avoir isolé y'), valid: true, quality: 'poor', why: t('Juste aussi, mais la constante est souvent plus compliquée une fois y isolé.') },
       ],
     };
-    const lines = [E(F.sep, 'Séparer', 'separate', 'sep')];
-    if (level <= 3) lines.push(E(F.int, 'Intégrer des deux côtés', 'separate', 'int'));
-    lines.push(E(F.rel, 'Primitives, une seule constante', 'integrate', 'int'));
+    const lines = [E(F.sep, t('Séparer'), 'separate', 'sep')];
+    if (level <= 3) lines.push(E(F.int, t('Intégrer des deux côtés'), 'separate', 'int'));
+    lines.push(E(F.rel, t('Primitives, une seule constante'), 'integrate', 'int'));
     if (level === 3) lines.push(icDecision);
     lines.push(E(`C = ${F.C}`, `y(0) = ${rd(y0T)}`, 'ic', 'ic'));
-    if (F.mid) lines.push(E(F.mid, 'Le quotient est positif en x = 0 : on enlève |…| avec le signe +', 'solve', 'solve'));
-    lines.push(E(`y = ${F.y}`, 'Isoler y', 'solve', 'solve'));
-    if (level === 3) lines[0] = E(F.int, 'Séparer et intégrer', 'separate', 'sep');
+    if (F.mid) lines.push(E(F.mid, t('Le quotient est positif en x = 0 : on enlève |…| avec le signe +'), 'solve', 'solve'));
+    lines.push(E(`y = ${F.y}`, t('Isoler y'), 'solve', 'solve'));
+    if (level === 3) lines[0] = E(F.int, t('Séparer et intégrer'), 'separate', 'sep');
     if (level === 3) lines.splice(1, 1);
     if (level === 1) {
       const rel = lines.findIndex((l) => l.math === F.rel);
@@ -206,16 +207,16 @@ function linesVariant(level, rng, opts) {
       const rel = lines.findIndex((l) => l.math === F.rel);
       lines[rel] = { ...lines[rel], ...tpl(F.rel, [polyT(g.P)], { dvar: 'x' }) };
     }
-    parts.push({ html: level >= 2 || F.pf ? 'Sépare, intègre, puis applique la condition initiale.' : null, ask: 'y =', start: F.eq, judge: ode, pre: level >= 2 ? pre : [], lines });
+    parts.push({ html: level >= 2 || F.pf ? t('Sépare, intègre, puis applique la condition initiale.') : null, ask: 'y =', start: F.eq, judge: ode, pre: level >= 2 ? pre : [], lines });
   }
   const { start, judge, script } = partsScript(parts, level, CHOICES);
-  const given = level === 1 && !constant ? (F.zeros === '∅' ? ` h(y) = ${hR(F.h)} ne s'annule jamais : pas de solution constante.` : ` Les solutions constantes sont ${MT(F.zeros)} ; y(0) = ${MT(y0T)} n'en est pas une.`) : '';
+  const given = level === 1 && !constant ? (F.zeros === '∅' ? ` ${t('h(y) = {h} ne s\'annule jamais : pas de solution constante.', { h: hR(F.h) })}` : ` ${t('Les solutions constantes sont {z} ; y(0) = {y0} n\'en est pas une.', { z: MT(F.zeros), y0: MT(y0T) })}`) : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Résous ${MT(F.eq)}, y(0) = ${MT(y0T)}.${given}`,
-    hints: H('Repère les solutions constantes (zéros de h), puis mets les y d\'un côté et les x de l\'autre.',
-      `∫ dy/h(y) = ${F.prim} et ∫ g(x) dx = ${sup(polyT(g.P))}, plus une seule constante.`,
-      constant ? `y(0) = ${rd(y0)} annule h : y ≡ ${rd(y0)}.` : `${MT(F.rel)}, puis C = ${MT(F.C)}.`),
+    prompt: t('Résous {eq}, y(0) = {y0}.', { eq: MT(F.eq), y0: MT(y0T) }) + given,
+    hints: H(t('Repère les solutions constantes (zéros de h), puis mets les y d\'un côté et les x de l\'autre.'),
+      t('∫ dy/h(y) = {H} et ∫ g(x) dx = {G}, plus une seule constante.', { H: F.prim, G: sup(polyT(g.P)) }),
+      constant ? t('y(0) = {y0} annule h : y ≡ {y0}.', { y0: rd(y0) }) : t('{rel}, puis C = {C}.', { rel: MT(F.rel), C: MT(F.C) })),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${F.eq}:${y0T}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -227,7 +228,7 @@ function mcqVariant(level, rng, opts) {
   const kind = rng.pick(['lin', 'sq', 'atan', 'th', 'exp', 'const']);
   const c = rng.pick([1, 2, 3]);
   const cT = c === 1 ? '' : `${c}`;
-  const NO = { html: 'Le problème n\'a pas de solution', rule: 'a2_ode_sep_lost_constant' };
+  const NO = { html: t('Le problème n\'a pas de solution'), rule: 'a2_ode_sep_lost_constant' };
   let eq; let y0; let x1; let right; let wrongs; let why;
   if (kind === 'lin') {
     y0 = rng.pick([1, 2, 3, -1, -2]);
@@ -236,18 +237,18 @@ function mcqVariant(level, rng, opts) {
     x1 = c === 1 ? `ln(${k})` : `ln(${k})/${c}`;
     right = String(y0 * k);
     wrongs = [opt(String(k + y0 - 1), 'a2_ode_sep_constant_late'), opt(String(-y0 * k), 'a2_ode_sign_abs'), opt(String(y0 + k)), opt(String(y0 * k * k)), opt(qt(q(y0, k)))];
-    why = `ln|y| = ${cT}x + C, donc y = ${rd(y0)}e^(${cT}x) et y(${rd(x1)}) = ${rd(y0)}·${k} = ${rd(right)}.`;
+    why = t('ln|y| = {c}x + C, donc y = {y0}e^({c}x) et y({x1}) = {y0}·{k} = {r}.', { c: cT, y0: rd(y0), x1: rd(x1), k, r: rd(right) });
   } else if (kind === 'sq') {
     y0 = rng.pick([1, 2, -1, -2]);
     const c1 = rng.pick([1, 2]);
-    const xs = [q(1, 2), q(1, 4), q(-1, 2), q(-1), q(1, 3)].filter((t) => { const D = q(1).div(q(y0)).sub(t.mul(c1)); return D.n !== 0 && Math.sign(D.n) === Math.sign(y0) && q(1).div(q(y0)).add(t.mul(c1)).n !== 0; });
-    const t = rng.pick(xs);
+    const xs = [q(1, 2), q(1, 4), q(-1, 2), q(-1), q(1, 3)].filter((u) => { const D = q(1).div(q(y0)).sub(u.mul(c1)); return D.n !== 0 && Math.sign(D.n) === Math.sign(y0) && q(1).div(q(y0)).add(u.mul(c1)).n !== 0; });
+    const xq = rng.pick(xs);
     eq = `y'=${c1 === 1 ? '' : c1}y^2`;
-    x1 = qt(t);
-    const val = q(1).div(q(1).div(q(y0)).sub(t.mul(c1)));
+    x1 = qt(xq);
+    const val = q(1).div(q(1).div(q(y0)).sub(xq.mul(c1)));
     right = qt(val);
-    wrongs = [opt(qt(q(1).div(q(1).div(q(y0)).add(t.mul(c1))))), opt(qt(val.neg())), opt(qt(q(y0).add(t.mul(c1 * y0 * y0)))), opt(qt(val.add(1)))];
-    why = `−1/y = ${c1 === 1 ? '' : c1}x + C avec C = ${rd(qt(q(-1, y0)))}, donc y = 1/(${rd(qt(q(1).div(q(y0))))} − ${c1 === 1 ? '' : c1}x) et y(${rd(x1)}) = ${rd(right)}.`;
+    wrongs = [opt(qt(q(1).div(q(1).div(q(y0)).add(xq.mul(c1))))), opt(qt(val.neg())), opt(qt(q(y0).add(xq.mul(c1 * y0 * y0)))), opt(qt(val.add(1)))];
+    why = t('−1/y = {c}x + C avec C = {C}, donc y = 1/({a} − {c}x) et y({x1}) = {r}.', { c: c1 === 1 ? '' : c1, C: rd(qt(q(-1, y0))), a: rd(qt(q(1).div(q(y0)))), x1: rd(x1), r: rd(right) });
   } else if (kind === 'atan') {
     y0 = 0;
     const [frac, val, alt] = rng.pick([[4, '1', 'π/4'], [3, '√3', 'π/3'], [6, '√3/3', 'π/6']]);
@@ -255,7 +256,7 @@ function mcqVariant(level, rng, opts) {
     x1 = c === 1 ? `π/${frac}` : `π/${frac * c}`;
     right = val;
     wrongs = [opt(`arctan(${alt})`), opt(`-${val}`), opt(alt), opt('0')];
-    why = `arctan y = ${cT}x + C, C = 0, donc y = tan(${cT}x) et y(${rd(x1)}) = tan(${alt}) = ${val}.`;
+    why = t('arctan y = {c}x + C, C = 0, donc y = tan({c}x) et y({x1}) = tan({alt}) = {v}.', { c: cT, x1: rd(x1), alt, v: val });
   } else if (kind === 'th') {
     y0 = 0;
     const a = rng.pick([1, 2, 3]);
@@ -265,15 +266,15 @@ function mcqVariant(level, rng, opts) {
     const val = q(a * (k - 1), k + 1);
     right = qt(val);
     wrongs = [opt(qt(q(a * (k + 1), k - 1)), 'a2_ode_sign_abs'), opt(qt(q(k - 1, k + 1))), opt(String(a)), opt(qt(val.neg())), opt(qt(q(k - 1, 2)))];
-    why = `(1/${2 * a}) ln|(${a} + y)/(${a} − y)| = ${cT}x (C = 0), donc (${a} + y)/(${a} − y) = e^(${2 * a * c}x) = ${k} en x₁ : y = ${right}.`;
+    why = t('(1/{a2}) ln|({a} + y)/({a} − y)| = {c}x (C = 0), donc ({a} + y)/({a} − y) = e^({e}x) = {k} en x₁ : y = {r}.', { a2: 2 * a, a, c: cT, e: 2 * a * c, k, r: right });
   } else if (kind === 'exp') {
     y0 = 0;
-    const t = rng.pick([1, 2]);
+    const tt = rng.pick([1, 2]);
     eq = `y'=${cT}e^(-y)`;
-    x1 = String(t);
-    right = `ln(${1 + c * t})`;
-    wrongs = [opt(`ln(${c * t})`), opt(`-ln(${1 + c * t})`), opt(String(1 + c * t)), opt(`e^(${c * t})`)];
-    why = `e^y = ${cT}x + C, C = 1, donc y = ln(1 + ${cT}x) et y(${t}) = ln(${1 + c * t}).`;
+    x1 = String(tt);
+    right = `ln(${1 + c * tt})`;
+    wrongs = [opt(`ln(${c * tt})`), opt(`-ln(${1 + c * tt})`), opt(String(1 + c * tt)), opt(`e^(${c * tt})`)];
+    why = t('e^y = {c}x + C, C = 1, donc y = ln(1 + {c}x) et y({x1}) = ln({v}).', { c: cT, x1: tt, v: 1 + c * tt });
   } else {
     const a = rng.pick([1, 2, 3]);
     const k = rng.pick([2, 3]);
@@ -282,11 +283,11 @@ function mcqVariant(level, rng, opts) {
     x1 = `ln(${k})/${2 * a * c}`;
     right = String(y0);
     wrongs = [NO, opt(qt(q(a * (k - 1), k + 1)), 'a2_ode_sep_lost_constant'), opt(String(-y0)), opt('0')];
-    why = `h(${rd(y0)}) = 0 : y ≡ ${rd(y0)} est la solution (unicité), donc y(x₁) = ${rd(y0)}.`;
+    why = t('h({y0}) = 0 : y ≡ {y0} est la solution (unicité), donc y(x₁) = {y0}.', { y0: rd(y0) });
   }
   return mcq4({
     skill: SK, level, key: `${SK}:mcq:${eq}:${y0}:${x1}`, exam: examTag(opts),
-    prompt: `La solution de ${MT(eq)}, y(0) = ${rd(y0)} vérifie aussi y(${MT(x1)}) =`,
+    prompt: t('La solution de {eq}, y(0) = {y0} vérifie aussi y({x1}) =', { eq: MT(eq), y0: rd(y0), x1: MT(x1) }),
     right: MT(right), wrongs, fillers: [opt('1'), opt('-1'), opt('2')],
     solution: [{ html: why, note: '' }], expectedSec: 150,
   }, rng);
@@ -299,22 +300,22 @@ function statements(rng) {
   const g = k === 1 ? '2x' : k === 2 ? '3x^2' : '4x^3';
   const G = k === 1 ? 'x^2' : k === 2 ? 'x^3' : 'x^4';
   return [
-    { key: 'cos', truth: true, text: `La solution générale de y′ = cos(t)·e^(−y) est y = ln(sin t + C).`, why: 'Vrai : e^y dy = cos t dt, e^y = sin t + C, y = ln(sin t + C).' },
-    { key: 'zero', truth: true, text: 'Toute solution de y′ = y/x² sur ]0 ; +∞[ avec y(1) = 0 est la fonction nulle.', why: 'Vrai : y ≡ 0 est une solution, et elle est unique (f(x, y) = y/x² est Lipschitz en y sur ]0 ; +∞[).' },
+    { key: 'cos', truth: true, text: t('La solution générale de y′ = cos(t)·e^(−y) est y = ln(sin t + C).'), why: t('Vrai : e^y dy = cos t dt, e^y = sin t + C, y = ln(sin t + C).') },
+    { key: 'zero', truth: true, text: t('Toute solution de y′ = y/x² sur ]0 ; +∞[ avec y(1) = 0 est la fonction nulle.'), why: t('Vrai : y ≡ 0 est une solution, et elle est unique (f(x, y) = y/x² est Lipschitz en y sur ]0 ; +∞[).') },
     {
-      key: `late${k}`, truth: false, text: `Toutes les solutions de y′ = ${rd(g)}·y sont de la forme y = e^(${G}) + C.`, ruleIfTrue: 'a2_ode_sep_constant_late',
-      why: `Faux : ln|y| = ${G} + C donne y = K·e^(${G}) : la constante multiplie. Par exemple 2e^(${G}) n'est pas de la forme e^(${G}) + C.`,
-      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y'=${g}×y`, family: `e^(${G})+C`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: 'Une solution qui n\'est pas de cette forme : y(x) =', keys: KEYS }], answer: { y: `2e^(${G})` } },
+      key: `late${k}`, truth: false, text: t('Toutes les solutions de y′ = {g}·y sont de la forme y = e^({G}) + C.', { g: rd(g), G }), ruleIfTrue: 'a2_ode_sep_constant_late',
+      why: t('Faux : ln|y| = {G} + C donne y = K·e^({G}) : la constante multiplie. Par exemple 2e^({G}) n\'est pas de la forme e^({G}) + C.', { G }),
+      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: `y'=${g}×y`, family: `e^(${G})+C`, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: t('Une solution qui n\'est pas de cette forme : y(x) ='), keys: KEYS }], answer: { y: `2e^(${G})` } },
     },
     {
-      key: 'lost', truth: false, text: 'Toutes les solutions de y′ = y² sont de la forme y = −1/(x + C).', ruleIfTrue: 'a2_ode_sep_lost_constant',
-      why: 'Faux : y ≡ 0 est une solution (zéro de h(y) = y²), perdue en divisant par y².',
-      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: "y'=y^2", family: '-1/(x+C)', domain: { x: [0.1, 1] } }, ask: [{ v: 'y', label: 'Une solution qui n\'est pas de cette forme : y(x) =', keys: KEYS }], answer: { y: '0' } },
+      key: 'lost', truth: false, text: t('Toutes les solutions de y′ = y² sont de la forme y = −1/(x + C).'), ruleIfTrue: 'a2_ode_sep_lost_constant',
+      why: t('Faux : y ≡ 0 est une solution (zéro de h(y) = y²), perdue en divisant par y².'),
+      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: "y'=y^2", family: '-1/(x+C)', domain: { x: [0.1, 1] } }, ask: [{ v: 'y', label: t('Une solution qui n\'est pas de cette forme : y(x) ='), keys: KEYS }], answer: { y: '0' } },
     },
     {
-      key: 'nosol', truth: false, text: 'Le problème y′ = 4 − y², y(0) = 2 n\'a pas de solution, car on ne peut pas diviser par 4 − y².', ruleIfTrue: 'a2_ode_sep_lost_constant',
-      why: 'Faux : y ≡ 2 est une solution constante (4 − 2² = 0), et c\'est la seule.',
-      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: "y'=4-y^2", ic: { x: 0, y: 2 }, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: 'Une solution : y(x) =', keys: KEYS }], answer: { y: '2' } },
+      key: 'nosol', truth: false, text: t('Le problème y′ = 4 − y², y(0) = 2 n\'a pas de solution, car on ne peut pas diviser par 4 − y².'), ruleIfTrue: 'a2_ode_sep_lost_constant',
+      why: t('Faux : y ≡ 2 est une solution constante (4 − 2² = 0), et c\'est la seule.'),
+      counter: { kind: 'a2', prop: 'odeOutside', params: { eq: "y'=4-y^2", ic: { x: 0, y: 2 }, domain: { x: [-1, 1] } }, ask: [{ v: 'y', label: t('Une solution : y(x) ='), keys: KEYS }], answer: { y: '2' } },
     },
   ];
 }

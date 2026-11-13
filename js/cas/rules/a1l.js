@@ -20,6 +20,7 @@ import { toMathML } from '../mathml.js';
 import { evalFloat } from '../numeric.js';
 import { polarParts } from '../complex.js';
 import { lexFor, parseFormula, formulaText } from '../logic.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(typeof n === 'string' ? parse(n, { complex: true }) : n));
 const par = (e) => ({ t: 'paren', e });
@@ -68,7 +69,7 @@ export const RULES = [
   {
     id: 'a1_cplx_ik_mod', family: 'facts', tag: 'C', skill: 'a1-cplx-exam', repair: 'g8-algebraic',
     judges: ['complex'],
-    name: 'iᵏ réduit avec un mauvais modulo',
+    name: t('iᵏ réduit avec un mauvais modulo'),
     example: ['i¹⁵ = i', 'i¹⁵ = i³ = −i'],
     check: { judge: { kind: 'complex', complex: true }, prev: 'i^15', line: 'i' },
     // Each i^k replaced by i^(k mod 2), i^(k mod 3) or −i^(k mod 4). Only
@@ -84,12 +85,12 @@ export const RULES = [
       }
       return out;
     },
-    explain: () => 'On réduit l\'exposant de i modulo 4, car i⁴ = 1 : 15 = 4·3 + 3, donc i¹⁵ = i³ = −i. Les puissances de i reviennent tous les 4 : i, −1, −i, 1.',
+    explain: () => t('On réduit l\'exposant de i modulo 4, car i⁴ = 1 : 15 = 4·3 + 3, donc i¹⁵ = i³ = −i. Les puissances de i reviennent tous les 4 : i, −1, −i, 1.'),
   },
   {
     id: 'a1_polar_r_negative', family: 'notation', tag: 'C', skill: 'a1-cplx-exam', repair: 'g8-polar',
     judges: ['complex'],
-    name: 'Module négatif dans une forme polaire',
+    name: t('Module négatif dans une forme polaire'),
     example: ['−1 + i√3 = −2e^(−iπ/3), lu « r = 2, φ = −π/3 »', '−1 + i√3 = 2e^(2iπ/3)'],
     check: { judge: { kind: 'complex', complex: true }, prev: '-2e^(-iπ/3)', line: '2e^(-iπ/3)' },
     // −r·e^(iφ) read as r·e^(iφ): the sign − dropped.
@@ -107,12 +108,12 @@ export const RULES = [
       });
       return out;
     },
-    explain: (ctx = {}) => `Le module r d'une forme polaire est ≥ 0 : le signe − se met dans l'argument, car −1 = e^(iπ).${ctx.r ? ` Ici −${M(ctx.r)}·e^(i·${M(ctx.theta)}) = ${M(ctx.r)}·e^(i(${M(ctx.theta)} + π)).` : ' Par exemple −2e^(−iπ/3) = 2e^(2iπ/3).'}`,
+    explain: (ctx = {}) => t('Le module r d\'une forme polaire est ≥ 0 : le signe − se met dans l\'argument, car −1 = e^(iπ).{p1}', { p1: ctx.r ? t(' Ici −{r}·e^(i·{theta}) = {r2}·e^(i({theta2} + π)).', { r: M(ctx.r), theta: M(ctx.theta), r2: M(ctx.r), theta2: M(ctx.theta) }) : t(' Par exemple −2e^(−iπ/3) = 2e^(2iπ/3).') }),
   },
   {
     id: 'a1_zn_conj_r0', family: 'method', tag: 'C', skill: 'a1-cplx-zn-conj', repair: 'a1-cplx-zn-conj',
     judges: ['solset', 'complex'],
-    name: 'Division par r sans le cas r = 0',
+    name: t('Division par r sans le cas r = 0'),
     example: ['z³ = z̄ : S = {1 ; i ; −1 ; −i}', 'S = {0 ; 1 ; i ; −1 ; −i}'],
     check: { judge: { kind: 'solset', v: 'r', domain: '[0 ; +∞[' }, prev: 'r^3=r', line: 'r=1' },
     transform: (prev, ctx) => {
@@ -129,20 +130,20 @@ export const RULES = [
       const w = withoutZero(prev);
       return w ? [{ node: w, ctx: {} }] : [];
     },
-    explain: () => 'Avant de diviser par r, regarde r = 0 : z = 0 vérifie l\'équation (0ⁿ = 0̄ = 0). Il manque cette solution.',
+    explain: () => t('Avant de diviser par r, regarde r = 0 : z = 0 vérifie l\'équation (0ⁿ = 0̄ = 0). Il manque cette solution.'),
   },
   {
     id: 'a1_zn_conj_polynomial_count', family: 'meaning', tag: 'C', skill: 'a1-cplx-zn-conj', repair: 'a1-cplx-zn-conj',
     judges: [],
-    name: 'Nombre de solutions lu sur le degré apparent',
-    example: ['z⁵ = |z| a 5 solutions', 'z⁵ = |z| a 6 solutions : 0 et les 5 racines cinquièmes de 1'],
+    name: t('Nombre de solutions lu sur le degré apparent'),
+    example: [t('z⁵ = |z| a 5 solutions'), t('z⁵ = |z| a 6 solutions : 0 et les 5 racines cinquièmes de 1')],
     check: { bait: { skill: 'a1-cplx-zn-conj', exam: 'mcq' } },
-    explain: () => 'z̄ et |z| ne sont pas des polynômes en z : le théorème fondamental de l\'algèbre (n racines pour un polynôme de degré n) ne s\'applique pas. Il faut compter : z⁵ = |z| a 6 solutions, 0 et les 5 racines cinquièmes de 1.',
+    explain: () => t('z̄ et |z| ne sont pas des polynômes en z : le théorème fondamental de l\'algèbre (n racines pour un polynôme de degré n) ne s\'applique pas. Il faut compter : z⁵ = |z| a 6 solutions, 0 et les 5 racines cinquièmes de 1.'),
   },
   {
     id: 'a1_conj_arg_sign', family: 'sign', tag: 'E', skill: 'a1-cplx-zn-conj', repair: 'g8-algebraic',
     judges: ['complex'],
-    name: 'Conjugué écrit sans changer le signe de l\'argument',
+    name: t('Conjugué écrit sans changer le signe de l\'argument'),
     example: ['z̄ = r·e^(iφ)', 'z̄ = r·e^(−iφ)'],
     check: { judge: { kind: 'complex', complex: true, form: 'any', vars: ['r', 'φ'], domain: { r: [0.5, 3], φ: [-3, 3] } }, prev: 'conj(re^(iφ))', line: 're^(iφ)' },
     // conj(X) replaced by X.
@@ -154,13 +155,13 @@ export const RULES = [
       });
       return out;
     },
-    explain: () => 'Le conjugué change le signe de l\'argument : si z = r·e^(iφ), alors z̄ = r·e^(−iφ) (et a + bi devient a − bi). Avec le mauvais signe, zⁿ = z̄ devient zⁿ = z : ce n\'est plus la même équation.',
+    explain: () => t('Le conjugué change le signe de l\'argument : si z = r·e^(iφ), alors z̄ = r·e^(−iφ) (et a + bi devient a − bi). Avec le mauvais signe, zⁿ = z̄ devient zⁿ = z : ce n\'est plus la même équation.'),
   },
   {
     id: 'a1_cauchy_consecutive', family: 'logic', tag: 'E', skill: 'a1-defs', repair: 'a1-seq-monotone',
     judges: ['logic'],
-    name: 'Cauchy réduit à deux termes consécutifs',
-    example: ['(aₙ) de Cauchy ⇔ aₙ₊₁ − aₙ → 0', '∀ε > 0 ∃N ∀m, n ≥ N, |aₘ − aₙ| ≤ ε'],
+    name: t('Cauchy réduit à deux termes consécutifs'),
+    example: [t('(aₙ) de Cauchy ⇔ aₙ₊₁ − aₙ → 0'), '∀ε > 0 ∃N ∀m, n ≥ N, |aₘ − aₙ| ≤ ε'],
     check: {
       judge: { kind: 'logic', pieces: [{ text: 'ε > 0' }, { text: 'N ∈ ℕ' }, { text: 'm, n ≥ N' }, { text: '|a_m − a_n| ≤ ε' }, { text: 'n ≥ N' }, { text: '|a_(n+1) − a_n| ≤ ε' }] },
       prev: '∀ε > 0 ∃N ∈ ℕ ∀m, n ≥ N, |a_m − a_n| ≤ ε', line: '∀ε > 0 ∃N ∈ ℕ ∀n ≥ N, |a_(n+1) − a_n| ≤ ε',
@@ -173,14 +174,14 @@ export const RULES = [
       const wrong = text.replace(/∀\s*m\s*,\s*n\s*≥\s*N/, '∀n ≥ N').replace(/\|\s*a_m\s*[−-]\s*a_n\s*\|\s*≤\s*ε/, '|a_(n+1) − a_n| ≤ ε');
       return [{ node: parseFormula(wrong, lex), ctx: {} }];
     },
-    explain: () => 'Cauchy compare deux termes quelconques aₘ et aₙ au-delà du rang N, pas seulement deux voisins : Log(n + 1) − Log n → 0, mais Log n → +∞ n\'est pas de Cauchy.',
+    explain: () => t('Cauchy compare deux termes quelconques aₘ et aₙ au-delà du rang N, pas seulement deux voisins : Log(n + 1) − Log n → 0, mais Log n → +∞ n\'est pas de Cauchy.'),
   },
   {
     id: 'a1_equiv_zero_limit', family: 'rule', tag: 'E', skill: 'a1-proofs', repair: 'a1-ser-compare',
     judges: [],
-    name: 'Équivalent ℓ/n³ avec ℓ = 0',
-    example: ['bₙ → ℓ, donc bₙ/n³ ~ ℓ/n³', 'si ℓ = 0, passer par la borne |bₙ| ≤ M'],
+    name: t('Équivalent ℓ/n³ avec ℓ = 0'),
+    example: [t('bₙ → ℓ, donc bₙ/n³ ~ ℓ/n³'), t('si ℓ = 0, passer par la borne |bₙ| ≤ M')],
     check: { bait: { skill: 'a1-proofs', level: 4 } },
-    explain: () => 'Si ℓ = 0, ℓ/n³ = 0 n\'est équivalent à rien : « uₙ ~ 0 » voudrait dire uₙ = 0 à partir d\'un rang. Passe par la borne |bₙ| ≤ M, qui marche dans tous les cas.',
+    explain: () => t('Si ℓ = 0, ℓ/n³ = 0 n\'est équivalent à rien : « uₙ ~ 0 » voudrait dire uₙ = 0 à partir d\'un rang. Passe par la borne |bₙ| ≤ M, qui marche dans tous les cas.'),
   },
 ];

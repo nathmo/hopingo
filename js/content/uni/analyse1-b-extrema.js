@@ -11,23 +11,24 @@ import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { exactValue } from '../../cas/normal.js';
 import { N, H, E, examOf, kx, joinSum, lin, blanked, partsItem, mcqOf, ML, RD } from './analyse1-b-common.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a1-extrema-global';
 const KEYS = ['calcx', 'relation'];
 const SUB = [
-  { id: 'defined', label: 'bien définie : discriminant', skill: 'quad-formula' },
-  { id: 'deriv', label: 'dériver', skill: 'a1-deriv-rules' },
-  { id: 'crit', label: 'points critiques', skill: SK },
-  { id: 'values', label: 'évaluer les candidats', skill: SK },
-  { id: 'compare', label: 'comparer', skill: SK },
+  { id: 'defined', label: t('bien définie : discriminant'), skill: 'quad-formula' },
+  { id: 'deriv', label: t('dériver'), skill: 'a1-deriv-rules' },
+  { id: 'crit', label: t('points critiques'), skill: SK },
+  { id: 'values', label: t('évaluer les candidats'), skill: SK },
+  { id: 'compare', label: t('comparer'), skill: SK },
 ];
 const CHOICES = [
-  { id: 'defined', label: 'Vérifier que f est définie et continue sur [a ; b]' },
-  { id: 'deriv', label: 'Dériver f' },
-  { id: 'crit', label: 'Résoudre f′(x) = 0' },
-  { id: 'eval', label: 'Évaluer f en un candidat' },
-  { id: 'compare', label: 'Comparer les valeurs des candidats' },
-  { id: 'sign', label: 'Conclure avec le seul signe de f′', why: 'Le signe de f′ donne les extrema locaux ; pour les extrema globaux, on compare les valeurs de tous les candidats, bornes comprises.' },
+  { id: 'defined', label: t('Vérifier que f est définie et continue sur [a ; b]') },
+  { id: 'deriv', label: t('Dériver f') },
+  { id: 'crit', label: t('Résoudre f′(x) = 0') },
+  { id: 'eval', label: t('Évaluer f en un candidat') },
+  { id: 'compare', label: t('Comparer les valeurs des candidats') },
+  { id: 'sign', label: t('Conclure avec le seul signe de f′'), why: t('Le signe de f′ donne les extrema locaux ; pour les extrema globaux, on compare les valeurs de tous les candidats, bornes comprises.') },
 ];
 
 const fac = (c) => (c === 0 ? 'x' : `(${lin(c)})`);
@@ -130,23 +131,23 @@ const S = (d) => `[${RD(d.a)} ; ${RD(d.b)}]`;
 function candidatesDecision(d) {
   const L = (xs) => xs.map((x) => RD(x)).join(', ');
   return {
-    kind: 'decision', prompt: `Quels sont les candidats sur ${S(d)} ?`,
+    kind: 'decision', prompt: t('Quels sont les candidats sur {d} ?', { d: S(d) }),
     options: [
       { id: 'all', label: `x = ${L([d.a, d.c1, d.b])}`, valid: true },
-      { id: 'crit', label: `x = ${RD(d.c1)} seulement`, valid: false, rule: 'a1_extrema_bounds_forgotten', why: 'Les bornes du segment sont aussi des candidats.' },
-      { id: 'out', label: `x = ${L([d.a, d.c1, d.b, d.c2].sort((u, w) => u - w))}`, valid: false, why: `${RD(d.c2)} n'est pas dans ${S(d)}.` },
-      { id: 'ends', label: `x = ${L([d.a, d.b])} seulement`, valid: false, why: `f′(${RD(d.c1)}) = 0 avec ${RD(d.c1)} dans le segment : c'est un candidat.` },
+      { id: 'crit', label: t('x = {c1} seulement', { c1: RD(d.c1) }), valid: false, rule: 'a1_extrema_bounds_forgotten', why: t('Les bornes du segment sont aussi des candidats.') },
+      { id: 'out', label: `x = ${L([d.a, d.c1, d.b, d.c2].sort((u, w) => u - w))}`, valid: false, why: t('{c2} n\'est pas dans {d}.', { c2: RD(d.c2), d: S(d) }) },
+      { id: 'ends', label: t('x = {p1} seulement', { p1: L([d.a, d.b]) }), valid: false, why: t('f′({c1}) = 0 avec {c12} dans le segment : c\'est un candidat.', { c1: RD(d.c1), c12: RD(d.c1) }) },
     ],
   };
 }
 
 function continuityDecision(d) {
   return {
-    kind: 'decision', prompt: `Pourquoi f est-elle continue sur ${S(d)} ?`,
+    kind: 'decision', prompt: t('Pourquoi f est-elle continue sur {d} ?', { d: S(d) }),
     options: [
-      { id: 'pole', label: `Le dénominateur ne s'annule qu'en ${RD(d.pole)}, hors de ${S(d)}`, valid: true },
-      { id: 'rat', label: 'Une fraction rationnelle est continue sur ℝ', valid: false, why: `Elle n'est pas définie en ${RD(d.pole)}. Ici ce point est hors du segment, c'est cela qu'il faut dire.` },
-      { id: 'deriv', label: 'Parce que f′ existe', valid: false, why: 'C\'est vrai mais circulaire : f′ n\'existe que là où f est définie.' },
+      { id: 'pole', label: t('Le dénominateur ne s\'annule qu\'en {pole}, hors de {d}', { pole: RD(d.pole), d: S(d) }), valid: true },
+      { id: 'rat', label: t('Une fraction rationnelle est continue sur ℝ'), valid: false, why: t('Elle n\'est pas définie en {pole}. Ici ce point est hors du segment, c\'est cela qu\'il faut dire.', { pole: RD(d.pole) }) },
+      { id: 'deriv', label: t('Parce que f′ existe'), valid: false, why: t('C\'est vrai mais circulaire : f′ n\'existe que là où f est définie.') },
     ],
   };
 }
@@ -159,32 +160,32 @@ function extremaParts(d, level, { open = false } = {}) {
   if ((level >= 4 || open) && d.kind === 'quad') {
     parts.push({
       start: `${d.delta.r < 0 ? `(${d.delta.r})` : d.delta.r}^2-4×${d.delta.s}`,
-      judge: { kind: 'value', form: 'irreducible' }, html: `f est-elle définie sur ${S(d)} ? Discriminant du dénominateur ${ML(d.den)} :`, ask: 'Δ =',
-      lines: [E(N(d.delta.D), 'Δ < 0 : le dénominateur ne s\'annule pas', 'defined', 'defined')],
+      judge: { kind: 'value', form: 'irreducible' }, html: t('f est-elle définie sur {d} ? Discriminant du dénominateur {den} :', { d: S(d), den: ML(d.den) }), ask: 'Δ =',
+      lines: [E(N(d.delta.D), t('Δ < 0 : le dénominateur ne s\'annule pas'), 'defined', 'defined')],
     });
   }
   if ((level >= 4 || open) && d.kind === 'lin') before.push(continuityDecision(d));
   if (level >= 2) {
-    const line = E(d.fp, d.kind === 'cubic' ? 'Dériver, factoriser' : 'Règle du quotient, factoriser', 'deriv', 'deriv');
-    parts.push({ start: `d(${d.f})`, judge: { kind: 'equiv', vars: ['x'], domain: { x: [d.a, d.b] }, target: 'no-prime' }, html: 'Dérive f :', lines: [level === 2 ? blanked(line, [lin(d.c1)]) : line] });
+    const line = E(d.fp, d.kind === 'cubic' ? t('Dériver, factoriser') : t('Règle du quotient, factoriser'), 'deriv', 'deriv');
+    parts.push({ start: `d(${d.f})`, judge: { kind: 'equiv', vars: ['x'], domain: { x: [d.a, d.b] }, target: 'no-prime' }, html: t('Dérive f :'), lines: [level === 2 ? blanked(line, [lin(d.c1)]) : line] });
   }
   const [r1, r2] = [d.c1, d.c2].sort((u, w) => u - w);
-  const roots = E(`x=${N(r1)} ou x=${N(r2)}`, 'Racines', 'crit', 'crit');
+  const roots = E(`x=${N(r1)} ou x=${N(r2)}`, t('Racines'), 'crit', 'crit');
   parts.push({
-    start: `${d.num}=0`, judge: { kind: 'solset', v: 'x' }, html: level === 1 ? `f′(x) = ${ML(d.fp)}. Résous f′(x) = 0 :` : 'Résous f′(x) = 0 :',
-    lines: guided ? [E(`${d.kind === 'quad' ? kx(d.A, facs(d.c1, d.c2)) : d.kind === 'cubic' ? `3${facs(d.c1, d.c2)}` : facs(d.c1, d.c2)}=0`, 'Factoriser', 'crit', 'crit'), level === 1 ? blanked(roots, [N(r1), N(r2)]) : roots] : [roots],
+    start: `${d.num}=0`, judge: { kind: 'solset', v: 'x' }, html: level === 1 ? t('f′(x) = {fp}. Résous f′(x) = 0 :', { fp: ML(d.fp) }) : t('Résous f′(x) = 0 :'),
+    lines: guided ? [E(`${d.kind === 'quad' ? kx(d.A, facs(d.c1, d.c2)) : d.kind === 'cubic' ? `3${facs(d.c1, d.c2)}` : facs(d.c1, d.c2)}=0`, t('Factoriser'), 'crit', 'crit'), level === 1 ? blanked(roots, [N(r1), N(r2)]) : roots] : [roots],
   });
-  const pre = level === 2 || level >= 4 || open ? [candidatesDecision(d)] : [{ kind: 'note', html: `Candidats : les bornes ${RD(d.a)} et ${RD(d.b)}, et ${RD(d.c1)} (${RD(d.c2)} est hors de ${S(d)}).` }];
+  const pre = level === 2 || level >= 4 || open ? [candidatesDecision(d)] : [{ kind: 'note', html: t('Candidats : les bornes {a} et {b}, et {c1} ({c2} est hors de {d}).', { a: RD(d.a), b: RD(d.b), c1: RD(d.c1), c2: RD(d.c2), d: S(d) }) }];
   [d.a, d.c1, d.b].forEach((x, i) => {
     parts.push({
-      start: atText(d.f, x), judge: { kind: 'value', form: 'irreducible' }, html: i === 0 ? 'Évalue f aux candidats :' : 'Candidat suivant :', ask: `f(${RD(x)}) =`,
-      pre: i === 0 ? pre : [], lines: [E(N([d.fa, d.fc, d.fb][i]), 'Calculer', 'values', 'eval')],
+      start: atText(d.f, x), judge: { kind: 'value', form: 'irreducible' }, html: i === 0 ? t('Évalue f aux candidats :') : t('Candidat suivant :'), ask: `f(${RD(x)}) =`,
+      pre: i === 0 ? pre : [], lines: [E(N([d.fa, d.fc, d.fb][i]), t('Calculer'), 'values', 'eval')],
     });
   });
   const crit = [{ x: N(d.c1), y: N(d.fc) }];
   const ends = [{ x: N(d.a), y: N(d.fa) }, { x: N(d.b), y: N(d.fb) }];
-  parts.push({ start: 'M', judge: { kind: 'value', expect: N(max.y), extrema: { kind: 'max', crit, ends } }, html: `Maximum global de f sur ${S(d)} :`, ask: 'max f =', lines: [E(N(max.y), 'Comparer', 'compare', 'compare')] });
-  parts.push({ start: 'm', judge: { kind: 'value', expect: N(min.y), extrema: { kind: 'min', crit, ends } }, html: `Minimum global de f sur ${S(d)} :`, ask: 'min f =', lines: [E(N(min.y), 'Comparer', 'compare', 'compare')] });
+  parts.push({ start: 'M', judge: { kind: 'value', expect: N(max.y), extrema: { kind: 'max', crit, ends } }, html: t('Maximum global de f sur {d} :', { d: S(d) }), ask: 'max f =', lines: [E(N(max.y), t('Comparer'), 'compare', 'compare')] });
+  parts.push({ start: 'm', judge: { kind: 'value', expect: N(min.y), extrema: { kind: 'min', crit, ends } }, html: t('Minimum global de f sur {d} :', { d: S(d) }), ask: 'min f =', lines: [E(N(min.y), t('Comparer'), 'compare', 'compare')] });
   return { parts, before };
 }
 
@@ -195,11 +196,11 @@ function extremaLines(level, rng, opts) {
   const { parts, before } = extremaParts(d, open ? 5 : level, { open });
   const ex = extremes(d);
   const prompt = rng.chance(0.5)
-    ? `Soit f(x) = ${ML(d.f)} sur ${S(d)}. Trouve ses extrema globaux.`
-    : `Trouve le maximum et le minimum de f(x) = ${ML(d.f)} sur le segment ${S(d)}${open ? ' : montre d\'abord que f y est bien définie et continue' : ''}.`;
+    ? t('Soit f(x) = {f} sur {d}. Trouve ses extrema globaux.', { f: ML(d.f), d: S(d) })
+    : t('Trouve le maximum et le minimum de f(x) = {f} sur le segment {d}{p1}.', { f: ML(d.f), d: S(d), p1: open ? t(' : montre d\'abord que f y est bien définie et continue') : '' });
   return partsItem({
     skill: SK, level: open ? 4 : level, prompt, parts, before, choices: CHOICES,
-    hints: H('Trois sortes de candidats : les bornes, les points où f′ = 0, les points où f′ n\'existe pas.', `f′(x) = ${d.fp.replace(fac(d.c1), '▢').replace(/\^2/g, '²').replace(/-/g, ' − ').replace(/\+/g, ' + ')}`, `Compare f(${RD(d.a)}) = ${RD(N(d.fa))}, f(${RD(d.c1)}) = ${RD(N(d.fc))} et f(${RD(d.b)}) = ${RD(N(d.fb))} : max ${RD(N(ex.max.y))}, min ${RD(N(ex.min.y))}.`),
+    hints: H(t('Trois sortes de candidats : les bornes, les points où f′ = 0, les points où f′ n\'existe pas.'), `f′(x) = ${d.fp.replace(fac(d.c1), '▢').replace(/\^2/g, '²').replace(/-/g, ' − ').replace(/\+/g, ' + ')}`, t('Compare f({a}) = {p1}, f({c1}) = {p2} et f({b}) = {p3} : max {p4}, min {p5}.', { a: RD(d.a), p1: RD(N(d.fa)), c1: RD(d.c1), p2: RD(N(d.fc)), b: RD(d.b), p3: RD(N(d.fb)), p4: RD(N(ex.max.y)), p5: RD(N(ex.min.y)) })),
     subgoals: SUB, keys: KEYS, key: `${SK}:${d.f}:${d.a}:${d.b}:${level}`,
     exam: open ? examOf(opts, 7) : false, noHints: open || level === 5, fallback: d.fallback,
     expectedSec: open ? 600 : undefined,
@@ -211,15 +212,15 @@ function extremaLines(level, rng, opts) {
 function mcqVariant(rng, opts) {
   if (rng.chance(0.25)) {
     return mcqOf({
-      skill: SK, level: 4, prompt: 'f est deux fois dérivable sur ℝ et admet un minimum local en 0. Que peut-on affirmer ?',
+      skill: SK, level: 4, prompt: t('f est deux fois dérivable sur ℝ et admet un minimum local en 0. Que peut-on affirmer ?'),
       options: [
-        { html: 'f′(0) = 0 et f″(0) ≥ 0', correct: true },
-        { html: 'f′(0) = 0 et f″(0) > 0', correct: false },
-        { html: 'f″(0) > 0, sans rien sur f′(0)', correct: false },
-        { html: 'f′(0) = 0 et f″(0) ≤ 0', correct: false },
+        { html: t('f′(0) = 0 et f″(0) ≥ 0'), correct: true },
+        { html: t('f′(0) = 0 et f″(0) > 0'), correct: false },
+        { html: t('f″(0) > 0, sans rien sur f′(0)'), correct: false },
+        { html: t('f′(0) = 0 et f″(0) ≤ 0'), correct: false },
       ],
       key: 'mcq:local-min', expectedSec: 240, exam: examOf(opts),
-      solution: [{ html: 'Un extremum local intérieur donne f′(0) = 0. Si f″(0) < 0, ce serait un maximum strict : donc f″(0) ≥ 0. Mais f″(0) peut valoir 0 (x⁴ en 0).', note: '' }],
+      solution: [{ html: t('Un extremum local intérieur donne f′(0) = 0. Si f″(0) < 0, ce serait un maximum strict : donc f″(0) ≥ 0. Mais f″(0) peut valoir 0 (x⁴ en 0).'), note: '' }],
     }, rng);
   }
   const d = draw(rng, ['lin', 'cubic', 'quad']);
@@ -237,9 +238,9 @@ function mcqVariant(rng, opts) {
     { html: RD(N(right.neg())), correct: false },
   ];
   return mcqOf({
-    skill: SK, level: 4, prompt: `Quel est le ${kind === 'max' ? 'maximum' : 'minimum'} global de f(x) = ${ML(d.f)} sur ${S(d)} ?`,
+    skill: SK, level: 4, prompt: t('Quel est le {p1} global de f(x) = {f} sur {d} ?', { p1: kind === 'max' ? t('maximum') : t('minimum'), f: ML(d.f), d: S(d) }),
     options, key: `mcq:${d.f}:${d.a}:${d.b}`, expectedSec: 240, exam: examOf(opts),
-    solution: [{ html: `f′(x) = ${ML(d.fp)} s'annule en ${RD(d.c1)} (et en ${RD(d.c2)}, hors du segment). f(${RD(d.a)}) = ${RD(N(d.fa))}, f(${RD(d.c1)}) = ${RD(N(d.fc))}, f(${RD(d.b)}) = ${RD(N(d.fb))}.`, note: '' }],
+    solution: [{ html: t('f′(x) = {fp} s\'annule en {c1} (et en {c2}, hors du segment). f({a}) = {p1}, f({c12}) = {p2}, f({b}) = {p3}.', { fp: ML(d.fp), c1: RD(d.c1), c2: RD(d.c2), a: RD(d.a), p1: RD(N(d.fa)), c12: RD(d.c1), p2: RD(N(d.fc)), b: RD(d.b), p3: RD(N(d.fb)) }), note: '' }],
     fallback: d.fallback,
   }, rng);
 }

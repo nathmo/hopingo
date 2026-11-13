@@ -29,6 +29,7 @@ import { normalize, equalExact, exactValue, pretty } from './normal.js';
 import { evalFloat } from './numeric.js';
 import { close } from './equiv.js';
 import { polyOf } from './polyx.js';
+import { t as tl } from '../i18n.js';
 
 const fail = (msg) => { throw new ParseError(msg, 0); };
 
@@ -157,7 +158,7 @@ export function mmul(a, b) {
   if (b.k === 's') return Mx(a.rows.map((r) => r.map((x) => simp(mul(x, b.n)))), { vec: a.vec });
   const [m, p] = dimsOf(a);
   const [p2, n] = dimsOf(b);
-  if (p !== p2) fail(`Produit impossible : ${m}×${p} fois ${p2}×${n}.`);
+  if (p !== p2) fail(tl('Produit impossible : {a} fois {b}.', { a: `${m}×${p}`, b: `${p2}×${n}` }));
   const rows = [];
   for (let i = 0; i < m; i++) {
     const row = [];
@@ -175,10 +176,10 @@ export function madd(a, b, sign = 1) {
   const op = sign > 0 ? add : sub;
   if (a.k === 's' && b.k === 's') return S(simp(op(a.n, b.n)));
   if ((a.k === 's') !== (b.k === 's') && one1(a).k === 's' && one1(b).k === 's') return madd(one1(a), one1(b), sign);
-  if (a.k === 's' || b.k === 's') fail('On ne peut pas additionner un nombre et une matrice.');
+  if (a.k === 's' || b.k === 's') fail(tl('On ne peut pas additionner un nombre et une matrice.'));
   const [m, n] = dimsOf(a);
   const [m2, n2] = dimsOf(b);
-  if (m !== m2 || n !== n2) fail(`Somme impossible : ${m}×${n} et ${m2}×${n2}.`);
+  if (m !== m2 || n !== n2) fail(tl('Somme impossible : {a} et {b}.', { a: `${m}×${n}`, b: `${m2}×${n2}` }));
   return Mx(a.rows.map((r, i) => r.map((x, j) => simp(op(x, b.rows[i][j])))), { vec: a.vec });
 }
 
@@ -188,7 +189,7 @@ export const diagV = (items) => Mx(items.map((x, i) => items.map((_, j) => (i ==
 // Determinant by cofactors along the sparsest row (nodes; n ≤ 6).
 export function ndet(rows) {
   const n = rows.length;
-  if (rows.some((r) => r.length !== n)) fail('Le déterminant demande une matrice carrée.');
+  if (rows.some((r) => r.length !== n)) fail(tl('Le déterminant demande une matrice carrée.'));
   if (n === 0) return ONE;
   if (n === 1) return rows[0][0];
   if (n === 2) return simp(sub(mul(rows[0][0], rows[1][1]), mul(rows[0][1], rows[1][0])));
@@ -236,7 +237,7 @@ export function applyRowOp(rows, op) {
     case 'scale': R[op.i] = R[op.i].map((x) => simp(mul(op.k, x))); break;
     case 'add': R[op.i] = R[op.i].map((x, c) => simp(add(x, mul(op.k, rows[op.j][c])))); break;
     case 'combo': R[op.i] = R[op.i].map((x, c) => simp(add(mul(op.c, x), mul(op.k, rows[op.j][c])))); break;
-    default: fail('Opération inconnue.');
+    default: fail(tl('Opération inconnue.'));
   }
   return R;
 }
@@ -362,11 +363,11 @@ function matching(text, i) {
     if ('([{'.includes(text[k])) depth++;
     if (')]}'.includes(text[k])) depth--;
     if (depth === 0) {
-      if (text[k] !== close) fail(`Parenthèse mal fermée : « ${text[k]} ».`);
+      if (text[k] !== close) fail(tl('Parenthèse mal fermée : « {c} ».', { c: text[k] }));
       return k;
     }
   }
-  fail(`Il manque « ${close} ».`);
+  fail(tl('Il manque « {c} ».', { c: close }));
 }
 
 const FNS = ['det', 'diag', 'tr', 'Span', 'Vect', 'span', 'vect', 'rang', 'rg', 'exp']; // exp: step U8
@@ -416,7 +417,7 @@ function tokenizeM(text) {
     if (c === '√') { toks.push({ k: 'op', s: '√' }); i++; continue; }
     if ('+-·/^,='.includes(c)) { toks.push({ k: 'op', s: c }); i++; continue; }
     if (c === 'π') { toks.push({ k: 'sym', s: 'π' }); i++; continue; }
-    fail(`Je ne sais pas lire « ${c} » ici.`);
+    fail(tl('Je ne sais pas lire « {c} » ici.', { c }));
   }
   return toks;
 }
@@ -426,8 +427,8 @@ function tokenizeM(text) {
 // Entries and scalar groups go to the CAS parser.
 const scalarNode = (text, opts) => {
   const t = text.trim();
-  if (!t) fail('Une case est vide.');
-  if (/[[\]]/.test(t)) fail('Une case contient une matrice.');
+  if (!t) fail(tl('Une case est vide.'));
+  if (/[[\]]/.test(t)) fail(tl('Une case contient une matrice.'));
   return parse(t, { vars: opts.vars, complex: opts.complex });
 };
 
@@ -436,19 +437,19 @@ function matLiteral(inner, opts) {
   const parts = inner.startsWith('[') ? splitTop(inner, ',').map((s) => s.trim()) : [`[${inner}]`];
   let aug = null;
   const rows = parts.map((p) => {
-    if (!p.startsWith('[') || !p.endsWith(']')) fail('Écris chaque ligne entre crochets : [[1, 2], [3, 4]].');
+    if (!p.startsWith('[') || !p.endsWith(']')) fail(tl('Écris chaque ligne entre crochets : [[1, 2], [3, 4]].'));
     const body = p.slice(1, -1);
     const halves = splitTop(body, '|');
-    if (halves.length > 2) fail('Une seule barre | par ligne.');
+    if (halves.length > 2) fail(tl('Une seule barre | par ligne.'));
     const left = splitTop(halves[0], ',');
     if (halves.length === 2) {
-      if (aug !== null && aug !== left.length) fail('La barre | doit être au même endroit dans chaque ligne.');
+      if (aug !== null && aug !== left.length) fail(tl('La barre | doit être au même endroit dans chaque ligne.'));
       aug = left.length;
     }
     const cells = [...left, ...(halves.length === 2 ? splitTop(halves[1], ',') : [])];
     return cells.map((c) => scalarNode(c, opts));
   });
-  if (rows.some((r) => r.length !== rows[0].length)) fail('Toutes les lignes doivent avoir le même nombre de cases.');
+  if (rows.some((r) => r.length !== rows[0].length)) fail(tl('Toutes les lignes doivent avoir le même nombre de cases.'));
   return { op: 'lit', rows, aug };
 }
 
@@ -496,7 +497,7 @@ class P {
     while (this.isOp('^')) {
       this.next();
       const t = this.next();
-      if (!t) fail('Il manque l\'exposant.');
+      if (!t) fail(tl('Il manque l\'exposant.'));
       if (t.k === 'name' && (t.s === 'T')) base = { op: 'T', e: base };
       // A scalar to the power t (e^t, step U8); a matrix to the power t is Aᵀ.
       else if (t.k === 'sym' && t.s === 't' && base.op === 'num') base = { op: 'pow', e: base, k: sym('t') };
@@ -504,19 +505,19 @@ class P {
       else if (t.k === 'grp' && t.text.replace(/\s/g, '') === '-1') base = { op: 'inv', e: base };
       else if (t.k === 'op' && t.s === '-') {
         const n = this.next();
-        if (!n || n.k !== 'num') fail('Exposant illisible.');
+        if (!n || n.k !== 'num') fail(tl('Exposant illisible.'));
         base = n.s === '1' ? { op: 'inv', e: base } : { op: 'pow', e: { op: 'inv', e: base }, k: num(Number(n.s)) };
       } else if (t.k === 'num') base = { op: 'pow', e: base, k: num(Number(t.s)) };
       else if (t.k === 'sym') base = { op: 'pow', e: base, k: sym(t.s) };
       else if (t.k === 'grp') base = { op: 'pow', e: base, k: scalarNode(t.text, this.opts) };
-      else fail('Exposant illisible.');
+      else fail(tl('Exposant illisible.'));
     }
     return base;
   }
 
   atom() {
     const t = this.next();
-    if (!t) fail('La ligne s\'arrête trop tôt.');
+    if (!t) fail(tl('La ligne s\'arrête trop tôt.'));
     switch (t.k) {
       case 'mat': return matLiteral(t.text, this.opts);
       case 'vec': return { op: 'vec', items: splitTop(t.text, ';').map((s) => scalarNode(s, this.opts)) };
@@ -525,7 +526,7 @@ class P {
         if (/[[\]A-ZΣ(;]/.test(t.text.replace(/\b(det|tr|diag)\b/g, ''))) {
           const inner = new P(tokenizeM(t.text), this.opts);
           const e = inner.list();
-          if (inner.peek()) fail('Je n\'arrive pas à lire la parenthèse.');
+          if (inner.peek()) fail(tl('Je n\'arrive pas à lire la parenthèse.'));
           return { op: 'paren', e };
         }
         return { op: 'num', n: { t: 'paren', e: scalarNode(t.text, this.opts) } };
@@ -550,19 +551,19 @@ class P {
         // Euler's e (step U8: e^(2t)·(1 ; -2), e^(-2t)(I + tN)), unless the item names a letter e.
         if (t.s === 'e' && !this.opts.vars?.includes('e')) return { op: 'num', n: { t: 'const', name: 'e' } };
         const [name, subs] = t.s.split('_');
-        if (this.opts.vars && !this.opts.vars.includes(t.s) && !this.opts.vars.includes(name)) fail(`Je ne connais pas la lettre « ${t.s} » ici.`);
+        if (this.opts.vars && !this.opts.vars.includes(t.s) && !this.opts.vars.includes(name)) fail(tl('Je ne connais pas la lettre « {c} » ici.', { c: t.s }));
         return { op: 'num', n: subs ? sym(name, subs) : sym(name) };
       }
       case 'name': return t.s === 'I' || /^I_\d+$/.test(t.s) ? { op: 'I', n: t.s.includes('_') ? Number(t.s.split('_')[1]) : null } : { op: 'name', name: t.s };
       case 'fn': {
         const a = this.peek();
         if (t.s === 'span') {
-          if (!a || (a.k !== 'set' && a.k !== 'grp')) fail('Écris Span{u, v}.');
+          if (!a || (a.k !== 'set' && a.k !== 'grp')) fail(tl('Écris Span{u, v}.'));
           return this.atom();
         }
         if (t.s === 'diag') {
           const g = this.next();
-          if (!g || g.k !== 'grp') fail('Écris diag(1, 3).');
+          if (!g || g.k !== 'grp') fail(tl('Écris diag(1, 3).'));
           return { op: 'diag', items: splitTop(g.text, ',;').map((s) => scalarNode(s, this.opts)) };
         }
         const arg = this.power();
@@ -573,13 +574,13 @@ class P {
           // √2/2 is (√2)/2: a number right after √ is its whole radicand.
           if (this.peek()?.k === 'num') return { op: 'num', n: sqrtNode(num(Number(this.next().s))) };
           const a = this.atom();
-          if (a.op !== 'num') fail('√ s\'applique à un nombre.');
+          if (a.op !== 'num') fail(tl('√ s\'applique à un nombre.'));
           return { op: 'num', n: sqrtNode(a.n) };
         }
         if (t.s === '-') return { op: 'neg', e: this.power() };
-        fail(`Je ne m'attendais pas à « ${t.s} » ici.`);
+        fail(tl('Je ne m\'attendais pas à « {c} » ici.', { c: t.s }));
         break;
-      default: fail('Ligne illisible.');
+      default: fail(tl('Ligne illisible.'));
     }
     return null;
   }
@@ -589,7 +590,7 @@ export function parseExpr(text, opts = {}) {
   const t = normalizeMatText(text);
   const p = new P(tokenizeM(t), opts);
   const e = p.list();
-  if (p.peek()) fail(`Je n'arrive pas à lire la fin : « ${p.peek().s ?? p.peek().text ?? ''} ».`);
+  if (p.peek()) fail(tl('Je n\'arrive pas à lire la fin : « {c} ».', { c: p.peek().s ?? p.peek().text ?? '' }));
   return e;
 }
 
@@ -610,7 +611,7 @@ export function parseRowOp(text, opts = {}) {
   const sw = /^L_?(\d+)↔L_?(\d+)$/.exec(t);
   if (sw) return { kind: 'swap', i: Number(sw[1]) - 1, j: Number(sw[2]) - 1 };
   const m = /^L_?(\d+)←(.+)$/.exec(t);
-  if (!m) fail('Écris une opération comme L2 ← L2 − 3L1 ou L1 ↔ L3.');
+  if (!m) fail(tl('Écris une opération comme L2 ← L2 − 3L1 ou L1 ↔ L3.'));
   const i = Number(m[1]) - 1;
   // Terms of the right side: coefficient · L_k (/ divisor).
   const terms = [];
@@ -626,16 +627,16 @@ export function parseRowOp(text, opts = {}) {
   const coefs = new Map();
   for (const term of terms) {
     const tm = /^(.*?)L_?(\d+)(?:\/(.+))?$/.exec(term);
-    if (!tm) fail(`Je n'arrive pas à lire « ${term} » : écris par exemple 3L1.`);
+    if (!tm) fail(tl('Je n\'arrive pas à lire « {term} » : écris par exemple 3L1.', { term }));
     let k = parseCoef(tm[1], opts);
     if (tm[3]) k = div(k, scalarNode(tm[3], opts));
     const r = Number(tm[2]) - 1;
     coefs.set(r, coefs.has(r) ? simp(add(coefs.get(r), k)) : simp(k));
   }
   const others = [...coefs.keys()].filter((r) => r !== i);
-  if (others.length > 1) fail('Une opération combine au plus deux lignes.');
+  if (others.length > 1) fail(tl('Une opération combine au plus deux lignes.'));
   const c = coefs.has(i) ? coefs.get(i) : null;
-  if (!c) fail(`La ligne ${i + 1} doit apparaître à droite de la flèche.`);
+  if (!c) fail(tl('La ligne {i} doit apparaître à droite de la flèche.', { i: i + 1 }));
   if (!others.length) return { kind: 'scale', i, k: c };
   const j = others[0];
   const k = coefs.get(j);
@@ -647,7 +648,7 @@ export function parseRowOp(text, opts = {}) {
 
 export function parseMatLine(text, opts = {}) {
   const t = normalizeMatText(text);
-  if (!t) fail('La ligne est vide.');
+  if (!t) fail(tl('La ligne est vide.'));
   const line = { ops: [], assigns: [], body: null, label: null };
   let rest = t;
   // Operations first, then « : » and what they give.
@@ -669,7 +670,7 @@ export function parseMatLine(text, opts = {}) {
     }
     return line;
   }
-  if (parts.length > 1) fail('Sépare les vecteurs par des virgules, les composantes par « ; » entre parenthèses.');
+  if (parts.length > 1) fail(tl('Sépare les vecteurs par des virgules, les composantes par « ; » entre parenthèses.'));
   const sides = splitTop(rest, '=');
   if (sides.length > 1) {
     line.label = sides.slice(0, -1).join('=').trim();
@@ -700,12 +701,12 @@ export function evalAst(ast, env = {}, opts = {}, size = null) {
     case 'paren': return E(ast.e);
     case 'name': {
       const v = env[ast.name];
-      if (!v) fail(`Je ne connais pas ${ast.name.replace(/_(\w+)/, '$1')} ici.`);
+      if (!v) fail(tl('Je ne connais pas {name} ici.', { name: ast.name.replace(/_(\w+)/, '$1') }));
       return v;
     }
     case 'I': {
       const n = ast.n ?? size;
-      if (!n) fail('Je ne connais pas la taille de I : écris I_3.');
+      if (!n) fail(tl('Je ne connais pas la taille de I : écris I_3.'));
       return identityV(n);
     }
     case 'diag': return diagV(ast.items);
@@ -726,18 +727,18 @@ export function evalAst(ast, env = {}, opts = {}, size = null) {
     case 'div': {
       const a = E(ast.a);
       const b = E(ast.b);
-      if (b.k !== 's') fail('On ne divise pas par une matrice : multiplie par son inverse.');
-      if (isZeroScalar(b.n, opts)) fail('Division par zéro.');
+      if (b.k !== 's') fail(tl('On ne divise pas par une matrice : multiplie par son inverse.'));
+      if (isZeroScalar(b.n, opts)) fail(tl('Division par zéro.'));
       return a.k === 's' ? S(simp(div(a.n, b.n))) : Mx(a.rows.map((r) => r.map((x) => simp(div(x, b.n)))), { vec: a.vec });
     }
     case 'T': { const v = E(ast.e); if (v.k !== 'm') return v; return tr(v); }
     case 'inv': {
       const v = E(ast.e);
-      if (v.k === 's') { if (isZeroScalar(v.n, opts)) fail('Division par zéro.'); return S(simp(div(ONE, v.n))); }
+      if (v.k === 's') { if (isZeroScalar(v.n, opts)) fail(tl('Division par zéro.')); return S(simp(div(ONE, v.n))); }
       const [m, n] = dimsOf(v);
-      if (m !== n) fail('Seule une matrice carrée peut avoir un inverse.');
+      if (m !== n) fail(tl('Seule une matrice carrée peut avoir un inverse.'));
       const inv = ninverse(v, opts);
-      if (!inv) fail('Cette matrice n\'est pas inversible.');
+      if (!inv) fail(tl('Cette matrice n\'est pas inversible.'));
       return inv;
     }
     case 'pow': {
@@ -754,23 +755,23 @@ export function evalAst(ast, env = {}, opts = {}, size = null) {
       if (m === n && v.rows.every((r, i) => r.every((x, j) => i === j || isZeroScalar(x, opts)))) {
         return diagV(v.rows.map((r, i) => simp(pow(r[i], ast.k))));
       }
-      fail('Une puissance k d\'une matrice se calcule par Aᵏ = PDᵏP⁻¹.');
+      fail(tl('Une puissance k d\'une matrice se calcule par Aᵏ = PDᵏP⁻¹.'));
       break;
     }
-    case 'det': { const v = E(ast.e); if (v.k !== 'm') fail('det s\'applique à une matrice.'); return S(ndet(v.rows)); }
+    case 'det': { const v = E(ast.e); if (v.k !== 'm') fail(tl('det s\'applique à une matrice.')); return S(ndet(v.rows)); }
     case 'exp': { // step U8: exp of a scalar only (e^{At} is computed, not written exp(At))
       const v = E(ast.e);
-      if (v.k !== 's') fail('L\'exponentielle d\'une matrice se calcule : diagonalise, ou écris A = λI + N.');
+      if (v.k !== 's') fail(tl('L\'exponentielle d\'une matrice se calcule : diagonalise, ou écris A = λI + N.'));
       return S(simp({ t: 'fn', name: 'exp', args: [v.n] }));
     }
-    case 'tr': { const v = E(ast.e); if (v.k !== 'm') fail('tr s\'applique à une matrice.'); return S(simp(v.rows.reduce((s, r, i) => add(s, r[i]), ZERO))); }
+    case 'tr': { const v = E(ast.e); if (v.k !== 'm') fail(tl('tr s\'applique à une matrice.')); return S(simp(v.rows.reduce((s, r, i) => add(s, r[i]), ZERO))); }
     case 'rang': {
       const v = E(ast.e);
       const Aq = toQ(v);
-      if (!Aq) fail('Le rang se calcule sur une matrice de nombres.');
+      if (!Aq) fail(tl('Le rang se calcule sur une matrice de nombres.'));
       return S(num(pivotsOf(Aq.map((r) => r.map((x) => lit(x)))).length));
     }
-    default: fail('Expression illisible.');
+    default: fail(tl('Expression illisible.'));
   }
   return null;
 }

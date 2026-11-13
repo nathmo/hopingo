@@ -29,6 +29,7 @@ import { exactForm } from '../cas/exactform.js';
 import { closedNumber } from '../cas/closedform.js';
 import { diagnoseLine } from './diagnose.js';
 import * as FP from './fpvalue.js'; // step U9: {arith: 'fp', digits}
+import { t as tr } from '../i18n.js';
 
 const KIND = { parse: 'parse', same: 'same', ok: 'ok', done: 'done', wrong: 'wrong', simplify: 'stay' };
 
@@ -63,13 +64,13 @@ export function isFinal(cfg, node) {
   if (cfg.form === 'exact') return exactForm(node);
   // Step U4 (A1, bounds of a set): a number in closed form (e^(−1/2), 2√3).
   if (cfg.form === 'closed') return closedNumber(node);
-  if (cfg.form === 'deg') return isDegLiteral(node) || (isLiteral(node) && stripParen(node).t !== 'frac' ? "Écris l'unité : ° pour des degrés." : false);
+  if (cfg.form === 'deg') return isDegLiteral(node) || (isLiteral(node) && stripParen(node).t !== 'frac' ? tr("Écris l'unité : ° pour des degrés.") : false);
   if (!isLiteral(node)) return false;
   if ((cfg.form ?? 'irreducible') === 'any') return true;
   const n = stripParen(node.t === 'neg' ? node.e : node);
   if (n.t === 'frac') {
     const v = numValue(n);
-    return v && v.d === n.d.v.n ? true : 'Simplifie encore la fraction.';
+    return v && v.d === n.d.v.n ? true : tr('Simplifie encore la fraction.');
   }
   return true;
 }
@@ -98,11 +99,11 @@ function moduleTrap(cfg, prev, node) {
 }
 
 function judgeExpect(cfg, prev, node) {
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   const want = parse(String(cfg.expect));
   if (!sameValue(node, want, cfg)) {
     const diag = moduleTrap(cfg, prev, node);
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: 'Ce n\'est pas la bonne valeur.' };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: tr('Ce n\'est pas la bonne valeur.') };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
@@ -127,15 +128,15 @@ export function sumTerms(node) {
 }
 
 function judgeTerms(cfg, prev, node) {
-  if (sameLine(node, prev)) return { kind: 'same', node, message: "Avance d'au moins une étape." };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr("Avance d'au moins une étape.") };
   const want = cfg.terms.map((t) => exactValue(parse(String(t))));
   const got = sumTerms(node);
   if (!got) {
     // Not a Σ: wrong if its value is not the sum's, else to rewrite with Σ.
     const v = exactValue(node);
     const total = want.reduce((acc, x) => acc.add(x), want[0].sub(want[0]));
-    if (v && !v.eq(total)) return { kind: 'wrong', node, message: 'Ta ligne ne vaut pas la somme demandée.' };
-    return { kind: 'form', node, message: 'Écris la somme avec Σ : sum(terme, k, début, fin), avec des bornes entières.' };
+    if (v && !v.eq(total)) return { kind: 'wrong', node, message: tr('Ta ligne ne vaut pas la somme demandée.') };
+    return { kind: 'form', node, message: tr('Écris la somme avec Σ : sum(terme, k, début, fin), avec des bornes entières.') };
   }
   const same = (a, b) => a.length === b.length && a.every((q, i) => q.eq(b[i]));
   if (same(got, want)) return { kind: 'done', node };
@@ -144,10 +145,10 @@ function judgeTerms(cfg, prev, node) {
     || (got.length === want.length - 1 && same(got, want.slice(1)));
   const shown = (q) => toText(lit(q)).replace('-', '−');
   let message;
-  if (got.length !== want.length) message = `Ta somme a ${got.length} termes, il en faut ${want.length}.`;
+  if (got.length !== want.length) message = tr('Ta somme a {n} termes, il en faut {m}.', { n: got.length, m: want.length });
   else {
     const i = got.findIndex((q, k) => !q.eq(want[k]));
-    message = `Le terme n° ${i + 1} de ta somme vaut ${shown(got[i])}, il faut ${shown(want[i])}.`;
+    message = tr('Le terme n° {i} de ta somme vaut {got}, il faut {want}.', { i: i + 1, got: shown(got[i]), want: shown(want[i]) });
   }
   const rule = off ? 'g5_count_terms' : null;
   return { kind: 'wrong', node, rule, diag: rule ? { rules: [rule], ambiguous: 1, ctx: { got: got.length, want: want.length } } : null, message };
@@ -172,10 +173,10 @@ export function judgeLine(cfg, prev, input) {
     // The school evaluator knows no real powers (8^(1/3)): the CAS decides.
     if (kind === 'parse') return casJudge(cfg, prev, node);
     const out = { kind, node, diag: r.diag ?? null, rule: r.diag?.rules?.[0] ?? null };
-    if (kind === 'stay') out.message = 'C\'est juste, mais simplifie encore.';
+    if (kind === 'stay') out.message = tr('C\'est juste, mais simplifie encore.');
     if (kind === 'done' && !isSchoolLiteral(r.node)) out.kind = 'ok';
     if (kind === 'wrong') {
-      out.message = 'Ce n\'est pas la même valeur.';
+      out.message = tr('Ce n\'est pas la même valeur.');
       // A trap of the module (P(a) instead of P(−a)) says more than a
       // calculation slip.
       const diag = moduleTrap(cfg, prev, node);
@@ -188,13 +189,13 @@ export function judgeLine(cfg, prev, input) {
 
 // Exact comparison by the CAS, else in floating point.
 function casJudge(cfg, prev, node) {
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   const a = valueOf(prev);
   const b = valueOf(node);
   const equal = sameValue(prev, node, cfg);
   if (!equal) {
     const diag = moduleTrap(cfg, prev, node);
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: 'Ce n\'est pas la même valeur.' };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: tr('Ce n\'est pas la même valeur.') };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };

@@ -18,6 +18,7 @@ import { parse } from '../parse.js';
 import { toText, toReadable } from '../print.js';
 import { stripParen, walk, replaceAt, mapNode, dependsOn, canonFn, numValue } from '../ast.js';
 import { series, seriesToNode } from '../series.js';
+import { t } from '../../i18n.js';
 
 const ZERO = new Q(0);
 const isQ = (c) => c instanceof Q;
@@ -159,7 +160,7 @@ const leadText = (s) => {
 export const RULES = [
   {
     id: 'a1_dl_factorial_missing', family: 'facts', tag: 'E', skill: 'a1-dl-usual', repair: 'a1-dl-usual', judges: ['series', 'limit'],
-    name: 'Coefficients du DL sans le k!',
+    name: t('Coefficients du DL sans le k!'),
     example: ['eˣ = 1 + x + x² + x³ + x³·ε(x)', 'eˣ = 1 + x + x²/2 + x³/6 + x³·ε(x)'],
     check: { judge: { kind: 'series', v: 'x', at: 0, order: 3 }, prev: 'e^x', line: '1+x+x^2+x^3+x^3ε(x)' },
     transform: (prev, ctx) => {
@@ -176,11 +177,11 @@ export const RULES = [
       });
       return lim ? list : asCands(list, v, n);
     },
-    explain: () => 'Les coefficients du DL sont f⁽ᵏ⁾(0)/k! : eˣ = 1 + x + x²/2! + x³/3! + …, et non 1 + x + x² + x³. N\'oublie pas de diviser par k!.',
+    explain: () => t('Les coefficients du DL sont f⁽ᵏ⁾(0)/k! : eˣ = 1 + x + x²/2! + x³/3! + …, et non 1 + x + x² + x³. N\'oublie pas de diviser par k!.'),
   },
   {
     id: 'a1_dl_factor_out_constant', family: 'rule', tag: 'E', skill: 'a1-dl-usual', repair: 'a1-dl-usual', judges: ['series'],
-    name: '1/(1 + u) appliqué sans mettre la constante en facteur',
+    name: t('1/(1 + u) appliqué sans mettre la constante en facteur'),
     example: ['1/(4 + 3x) = 1 − 3x + 9x² + x²·ε(x)', '1/(4 + 3x) = (1/4)(1 − 3x/4 + 9x²/16) + x²·ε(x)'],
     check: { judge: { kind: 'series', v: 'x', at: 0, order: 2 }, prev: '1/(4+3x)', line: '1-3x+9x^2+x^2ε(x)' },
     transform: (prev, ctx) => {
@@ -201,12 +202,12 @@ export const RULES = [
       return asCands(list, v, n);
     },
     explain: (ctx = {}) => (ctx.b
-      ? `Le DL de 1/(1 + u) demande un 1 devant u. Écris d'abord ${ctx.g} = ${ctx.b}(1 + …) : la constante ${ctx.b} sort en facteur, et u est divisé par ${ctx.b}.`
-      : 'Le DL de 1/(1 + u) demande un 1 devant u : écris d\'abord 4 + 3x = 4(1 + 3x/4), puis applique le DL avec u = 3x/4.'),
+      ? t('Le DL de 1/(1 + u) demande un 1 devant u. Écris d\'abord {g} = {b}(1 + …) : la constante {b} sort en facteur, et u est divisé par {b}.', { g: ctx.g, b: ctx.b })
+      : t('Le DL de 1/(1 + u) demande un 1 devant u : écris d\'abord 4 + 3x = 4(1 + 3x/4), puis applique le DL avec u = 3x/4.')),
   },
   {
     id: 'a1_dl_remainder_wrong_order', family: 'notation', tag: 'E', skill: 'a1-dl-usual', repair: 'a1-dl-usual', judges: ['series'],
-    name: 'Reste écrit à un autre ordre que le dernier terme gardé',
+    name: t('Reste écrit à un autre ordre que le dernier terme gardé'),
     example: ['sin x = x − x³/6 + x⁵·ε(x)', 'sin x = x − x³/6 + x³·ε(x)'],
     check: { judge: { kind: 'series', v: 'x', at: 0, order: 3 }, prev: 'sin(x)', line: 'x-x^3/6+x^5ε(x)' },
     transform: (prev, ctx) => {
@@ -220,12 +221,12 @@ export const RULES = [
       }));
     },
     explain: (ctx = {}) => (ctx.n !== undefined
-      ? `Le reste se met à l'ordre du dernier terme calculé : tu as calculé jusqu'à x^${ctx.n}, donc le reste est x^${ctx.n}·ε(x). Avec x^${ctx.m}·ε(x), tu affirmes que les termes en x^${ctx.n + 1}… sont nuls.`
-      : 'Le reste se met à l\'ordre du dernier terme calculé : x − x³/6 + x³·ε(x). Un reste d\'un ordre plus haut affirme des termes nuls que tu n\'as pas calculés.'),
+      ? t('Le reste se met à l\'ordre du dernier terme calculé : tu as calculé jusqu\'à x^{n}, donc le reste est x^{n}·ε(x). Avec x^{m}·ε(x), tu affirmes que les termes en x^{p1}… sont nuls.', { n: ctx.n, m: ctx.m, p1: ctx.n + 1 })
+      : t('Le reste se met à l\'ordre du dernier terme calculé : x − x³/6 + x³·ε(x). Un reste d\'un ordre plus haut affirme des termes nuls que tu n\'as pas calculés.')),
   },
   {
     id: 'a1_dl_truncate_inner', family: 'method', tag: 'C', skill: 'a1-dl-compose', repair: 'a1-dl-ops', judges: ['series'],
-    name: 'Dans uᵏ, seul le terme principal de u est gardé',
+    name: t('Dans uᵏ, seul le terme principal de u est gardé'),
     example: ['sin(sin x) = x − x³/3 + x⁵/60 + x⁵·ε(x)', 'sin(sin x) = x − x³/3 + x⁵/10 + x⁵·ε(x)'],
     check: { judge: { kind: 'series', v: 'x', at: 0, order: 5 }, prev: 'sin(sin(x))', line: 'x-x^3/3+x^5/60+x^5ε(x)' },
     transform: (prev, ctx) => {
@@ -266,12 +267,12 @@ export const RULES = [
       if (all > 1) list.push({ node: each2, ctx: {} });
       return asCands(list, v, n);
     },
-    explain: (ctx = {}) => `Dans uᵏ, garde tous les termes de degré ≤ n, pas seulement le premier${ctx.u ? ` de u = ${ctx.u}` : ''} : dans (x − x³/6)³, le terme 3·x²·(−x³/6) = −x⁵/2 est d'ordre 5 et compte.`,
+    explain: (ctx = {}) => t('Dans uᵏ, garde tous les termes de degré ≤ n, pas seulement le premier{p1} : dans (x − x³/6)³, le terme 3·x²·(−x³/6) = −x⁵/2 est d\'ordre 5 et compte.', { p1: ctx.u ? t(' de u = {u}', { u: ctx.u }) : '' }),
   },
   {
     id: 'a1_dl_truncate_early', family: 'method', tag: 'E', skill: 'a1-dl-ops', repair: 'a1-dl-ops', judges: ['series'],
-    name: 'Un facteur développé à un ordre trop bas',
-    example: ['eˣ·sin x avec eˣ = 1 + x : x + x² − x³/6 + x³·ε(x)', 'eˣ·sin x = x + x² + x³/3 + x³·ε(x)'],
+    name: t('Un facteur développé à un ordre trop bas'),
+    example: [t('eˣ·sin x avec eˣ = 1 + x : x + x² − x³/6 + x³·ε(x)'), 'eˣ·sin x = x + x² + x³/3 + x³·ε(x)'],
     check: { judge: { kind: 'series', v: 'x', at: 0, order: 3 }, prev: 'e^x×sin(x)', line: 'x+x^2-x^3/6+x^3ε(x)' },
     transform: (prev, ctx) => {
       const v = vOf(ctx);
@@ -294,18 +295,18 @@ export const RULES = [
           const sl = sOf(top.l, v, n);
           const sr = sOf(top.r, v, n);
           if (j < 0 || !sl || !sr) continue;
-          list.push({ node: P(`(${truncText(sl, j)})×(${truncText(sr, j)})`), ctx: { f: 'chaque facteur', j } });
+          list.push({ node: P(`(${truncText(sl, j)})×(${truncText(sr, j)})`), ctx: { f: t('chaque facteur'), j } });
         }
       }
       return asCands(list, v, n);
     },
     explain: (ctx = {}) => (ctx.f
-      ? `Tu as arrêté ${ctx.f} à l'ordre ${ctx.j} : il manque des termes qui comptent dans le résultat. Développe chaque facteur assez loin (en tenant compte du premier terme de l'autre facteur).`
-      : 'sin x commence en x : pour avoir les x³ de eˣ·sin x, il faut eˣ jusqu\'à x². Développe chaque facteur assez loin.'),
+      ? t('Tu as arrêté {f} à l\'ordre {j} : il manque des termes qui comptent dans le résultat. Développe chaque facteur assez loin (en tenant compte du premier terme de l\'autre facteur).', { f: ctx.f, j: ctx.j })
+      : t('sin x commence en x : pour avoir les x³ de eˣ·sin x, il faut eˣ jusqu\'à x². Développe chaque facteur assez loin.')),
   },
   {
     id: 'a1_dl_cube_coeffs', family: 'distribute', tag: 'C', skill: 'a1-dl-ops', repair: 'lit-polynomial', judges: ['series'],
-    name: 'Puissance d\'un DL distribuée sur ses termes',
+    name: t('Puissance d\'un DL distribuée sur ses termes'),
     example: ['(1 + x + x²·ε(x))³ = 1 + x + x²·ε(x)', '(1 + x)³ = 1 + 3x + 3x² + …'],
     check: { judge: { kind: 'series', v: 'x', at: 0, order: 2 }, prev: '(1+2x+3x^2+x^2ε(x))^3', line: '1+8x+27x^2+x^2ε(x)' },
     transform: (prev, ctx) => {
@@ -335,11 +336,11 @@ export const RULES = [
       });
       return asCands(list, v, n);
     },
-    explain: (ctx = {}) => `Une puissance ne se distribue pas sur une somme : (a + bx + cx²)${ctx.k ? `^${ctx.k}` : '³'} se développe, avec tous les produits croisés. Par exemple (1 + x)³ = 1 + 3x + 3x² + x³.`,
+    explain: (ctx = {}) => t('Une puissance ne se distribue pas sur une somme : (a + bx + cx²){p1} se développe, avec tous les produits croisés. Par exemple (1 + x)³ = 1 + 3x + 3x² + x³.', { p1: ctx.k ? `^${ctx.k}` : '³' }),
   },
   {
     id: 'a1_dl_compose_nonzero_inner', family: 'rule', tag: 'C', skill: 'a1-dl-compose', repair: 'a1-dl-compose', judges: ['series'],
-    name: 'DL de f en 0 appliqué à u qui ne tend pas vers 0',
+    name: t('DL de f en 0 appliqué à u qui ne tend pas vers 0'),
     example: ['e^(1/(1 − x)) = 5/2 + 2x + 5x²/2 + x²·ε(x)', 'e^(1/(1 − x)) = e(1 + x + 3x²/2) + x²·ε(x)'],
     check: { judge: { kind: 'series', v: 'x', at: 0, order: 2 }, prev: 'e^(1/(1-x))', line: '5/2+2x+(5/2)x^2+x^2ε(x)' },
     transform: (prev, ctx) => {
@@ -353,14 +354,14 @@ export const RULES = [
       return asCands(list, v, n);
     },
     explain: (ctx = {}) => (ctx.g
-      ? `${ctx.g} tend vers ${ctx.c}, pas vers 0 : le DL de eᵘ en 0 ne s'applique pas à u = ${ctx.g}. Sors la constante : e^(${ctx.g}) = e^${ctx.c}·e^(${ctx.g} − ${ctx.c}).`
-      : '1/(1 − x) tend vers 1, pas vers 0 : le DL de eᵘ en 0 ne s\'applique pas. Sors e¹ : e^(1/(1 − x)) = e·e^(1/(1 − x) − 1).'),
+      ? t('{g} tend vers {c}, pas vers 0 : le DL de eᵘ en 0 ne s\'applique pas à u = {g}. Sors la constante : e^({g}) = e^{c}·e^({g} − {c}).', { g: ctx.g, c: ctx.c })
+      : t('1/(1 − x) tend vers 1, pas vers 0 : le DL de eᵘ en 0 ne s\'applique pas. Sors e¹ : e^(1/(1 − x)) = e·e^(1/(1 − x) − 1).')),
   },
   {
     // Step U4: the catalogue's skill and repair, a1-fn-limits.
     id: 'a1_ipe_in_sum', family: 'rule', tag: 'C', skill: 'a1-fn-limits', repair: 'a1-fn-limits', judges: ['limit'],
-    name: 'Équivalent remplacé dans une somme',
-    example: ['(x − sin x)/x³ avec sin x ~ x : (x − x)/x³ → 0', '(x − sin x)/x³ → 1/6'],
+    name: t('Équivalent remplacé dans une somme'),
+    example: [t('(x − sin x)/x³ avec sin x ~ x : (x − x)/x³ → 0'), '(x − sin x)/x³ → 1/6'],
     check: { judge: { kind: 'limit', v: 'x', to: '0' }, prev: '(x-sin(x))/x^3', line: '0' },
     transform: (prev, ctx) => {
       const v = vOf(ctx);
@@ -389,12 +390,12 @@ export const RULES = [
       }
       return out;
     },
-    explain: (ctx = {}) => `On ne remplace par un équivalent que dans un produit ou un quotient, jamais dans une somme${ctx.f ? ` : remplacer ${ctx.f} par ${ctx.u} fait disparaître le terme qui compte` : ''}. Dans x − sin x, les x s'annulent : il faut le terme suivant du DL.`,
+    explain: (ctx = {}) => t('On ne remplace par un équivalent que dans un produit ou un quotient, jamais dans une somme{p1}. Dans x − sin x, les x s\'annulent : il faut le terme suivant du DL.', { p1: ctx.f ? t(' : remplacer {f} par {u} fait disparaître le terme qui compte', { f: ctx.f, u: ctx.u }) : '' }),
   },
   {
     id: 'a1_dl_order_too_low', family: 'method', tag: 'E', skill: 'a1-dl-limits', repair: 'a1-dl-usual', judges: ['limit'],
-    name: 'DL pas assez long pour le dénominateur',
-    example: ['(eˣ − 1 − x)/x² avec eˣ = 1 + x + x·ε(x) : → 0', '(eˣ − 1 − x)/x² → 1/2 (DL d\'ordre 2)'],
+    name: t('DL pas assez long pour le dénominateur'),
+    example: [t('(eˣ − 1 − x)/x² avec eˣ = 1 + x + x·ε(x) : → 0'), t('(eˣ − 1 − x)/x² → 1/2 (DL d\'ordre 2)')],
     check: { judge: { kind: 'limit', v: 'x', to: '0' }, prev: '(e^x-1-x)/x^2', line: '0' },
     transform: (prev, ctx) => {
       const v = vOf(ctx);
@@ -409,12 +410,12 @@ export const RULES = [
       return [{ node: P('0'), ctx: { k: d - 1, m: 1, d } }];
     },
     explain: (ctx = {}) => (ctx.d
-      ? `Avec un DL d'ordre ${ctx.k}, il reste ε(x)/x${ctx.m > 1 ? `^${ctx.m}` : ''}, qui ne dit rien. Le dénominateur est en x^${ctx.d} : développe le numérateur jusqu'à x^${ctx.d}.`
-      : 'Un DL trop court laisse un ε(x)/x qui ne dit rien : développe le numérateur jusqu\'à la puissance du dénominateur.'),
+      ? t('Avec un DL d\'ordre {k}, il reste ε(x)/x{p1}, qui ne dit rien. Le dénominateur est en x^{d} : développe le numérateur jusqu\'à x^{d}.', { k: ctx.k, p1: ctx.m > 1 ? `^${ctx.m}` : '', d: ctx.d })
+      : t('Un DL trop court laisse un ε(x)/x qui ne dit rien : développe le numérateur jusqu\'à la puissance du dénominateur.')),
   },
   {
     id: 'a1_dl_read_factorial', family: 'rule', tag: 'C', skill: 'a1-dl-read', repair: 'a1-dl-read', judges: ['value'],
-    name: 'f⁽ᵏ⁾(a) lu comme le coefficient aₖ',
+    name: t('f⁽ᵏ⁾(a) lu comme le coefficient aₖ'),
     example: ['f = 7 − 5(x − 1)² + … : f″(1) = −5', 'f″(1) = 2!·(−5) = −10'],
     check: { judge: { kind: 'value', expect: '-10', read: { k: 2, a: '-5' } }, prev: 'f_2', line: '-5' },
     transform: (prev, ctx) => {
@@ -423,12 +424,12 @@ export const RULES = [
       return [{ node: P(r.a), ctx: { k: r.k, kf: fact(r.k) } }];
     },
     explain: (ctx = {}) => (ctx.k
-      ? `Le coefficient vaut f⁽ᵏ⁾(a)/k! : multiplie par ${ctx.k}! = ${ctx.kf}.`
-      : 'Le coefficient aₖ vaut f⁽ᵏ⁾(a)/k! : pour avoir f⁽ᵏ⁾(a), multiplie aₖ par k!.'),
+      ? t('Le coefficient vaut f⁽ᵏ⁾(a)/k! : multiplie par {k}! = {kf}.', { k: ctx.k, kf: ctx.kf })
+      : t('Le coefficient aₖ vaut f⁽ᵏ⁾(a)/k! : pour avoir f⁽ᵏ⁾(a), multiplie aₖ par k!.')),
   },
   {
     id: 'a1_dl_read_divide', family: 'rule', tag: 'E', skill: 'a1-dl-read', repair: 'a1-dl-read', judges: ['value'],
-    name: 'aₖ divisé par k! au lieu de multiplié',
+    name: t('aₖ divisé par k! au lieu de multiplié'),
     example: ['f⁽⁵⁾(0) = (47/40)/120', 'f⁽⁵⁾(0) = 120·47/40 = 141'],
     check: { judge: { kind: 'value', expect: '141', read: { k: 5, a: '47/40' } }, prev: 'f_5', line: '47/4800' },
     transform: (prev, ctx) => {
@@ -436,14 +437,14 @@ export const RULES = [
       if (!r) return [];
       return [{ node: P(`(${r.a})/${fact(r.k)}`), ctx: { k: r.k } }];
     },
-    explain: (ctx = {}) => `Tu as divisé par k! au lieu de multiplier : aₖ = f⁽ᵏ⁾(0)/k!, donc f⁽ᵏ⁾(0) = k!·aₖ${ctx.k ? ` = ${ctx.k}!·a${ctx.k}` : ''}.`,
+    explain: (ctx = {}) => t('Tu as divisé par k! au lieu de multiplier : aₖ = f⁽ᵏ⁾(0)/k!, donc f⁽ᵏ⁾(0) = k!·aₖ{p1}.', { p1: ctx.k ? ` = ${ctx.k}!·a${ctx.k}` : '' }),
   },
   {
     id: 'a1_taylor_rest_at_a', family: 'method', tag: 'E', skill: 'a1-taylor-rest', repair: 'a1-taylor-rest', judges: ['equiv'],
-    name: '|f⁽ⁿ⁺¹⁾| majoré par sa valeur en a',
-    example: ['eˣ sur [0 ; 0,1] : |f‴(c)| ≤ |f‴(0)| = 1', '|f‴(c)| ≤ e^0,1 ≤ 2'],
+    name: t('|f⁽ⁿ⁺¹⁾| majoré par sa valeur en a'),
+    example: [t('eˣ sur [0 ; 0,1] : |f‴(c)| ≤ |f‴(0)| = 1'), '|f‴(c)| ≤ e^0,1 ≤ 2'],
     check: { judge: { kind: 'equiv', vars: ['x'], domain: { x: [0, 0.5] }, rel: '≤', target: 'constant', taylorAt: ['1'] }, prev: '|e^x|', line: '1' },
     transform: (prev, ctx) => (ctx?.cfg?.taylorAt || []).map((t) => ({ node: P(t), ctx: { a: '0', x: ctx.cfg.taylorX } })),
-    explain: (ctx = {}) => `c est quelque part entre ${ctx.a ?? 'a'} et ${ctx.x ?? 'x'} : majore |f⁽ⁿ⁺¹⁾| sur tout l'intervalle, pas seulement en ${ctx.a ?? 'a'}.`,
+    explain: (ctx = {}) => t('c est quelque part entre {a} et {x} : majore |f⁽ⁿ⁺¹⁾| sur tout l\'intervalle, pas seulement en {a}.', { a: ctx.a ?? 'a', x: ctx.x ?? 'x' }),
   },
 ];

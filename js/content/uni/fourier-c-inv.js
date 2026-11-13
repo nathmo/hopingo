@@ -12,6 +12,7 @@ import {
   MT, examTag, H, KEYS, topTerms, TABLE, rd, lap, lapres, opt, mcqMulti, q,
   P, padd, pmul, pscale, ppow, lin, deg, zpoly, zpow, denText, denPoly, pfd, pfdText, inverseText, residueText, cText, factorsText,
 } from './fourier-c-kit.js';
+import { t } from '../../i18n.js';
 
 const SKD = 'f-lap-inv-des';
 const SKR = 'f-lap-inv-res';
@@ -101,10 +102,10 @@ function trapF(d) {
 }
 
 const FORMS = {
-  two: { right: '(Az + B)/(z² + ω₁²) + (Cz + D)/(z² + ω₂²)', wrong: 'A/(z² + ω₁²) + B/(z² + ω₂²)', why: 'Sur un trinôme irréductible, le numérateur est de la forme Az + B.' },
-  real: { right: 'A/(z − a) + B/(z − b) + …', wrong: 'A/((z − a)(z − b)…)', why: 'Un terme par pôle simple.' },
-  square: { right: '(A(z − a) + Bω)/((z − a)² + ω²) + C/(z − c)', wrong: 'A/((z − a)² + ω²) + C/(z − c)', why: 'Sur le trinôme irréductible, le numérateur est de degré 1 : on l\'écrit A(z − a) + Bω pour lire la table.' },
-  double: { right: 'A/(z − p) + B/(z − p)² + (Cz + D)/(z² + ω²)', wrong: 'B/(z − p)² + (Cz + D)/(z² + ω²)', why: 'Le pôle double demande deux termes, en 1/(z − p) et 1/(z − p)².' },
+  two: { right: '(Az + B)/(z² + ω₁²) + (Cz + D)/(z² + ω₂²)', wrong: 'A/(z² + ω₁²) + B/(z² + ω₂²)', why: t('Sur un trinôme irréductible, le numérateur est de la forme Az + B.') },
+  real: { right: 'A/(z − a) + B/(z − b) + …', wrong: 'A/((z − a)(z − b)…)', why: t('Un terme par pôle simple.') },
+  square: { right: '(A(z − a) + Bω)/((z − a)² + ω²) + C/(z − c)', wrong: 'A/((z − a)² + ω²) + C/(z − c)', why: t('Sur le trinôme irréductible, le numérateur est de degré 1 : on l\'écrit A(z − a) + Bω pour lire la table.') },
+  double: { right: 'A/(z − p) + B/(z − p)² + (Cz + D)/(z² + ω²)', wrong: 'B/(z − p)² + (Cz + D)/(z² + ω²)', why: t('Le pôle double demande deux termes, en 1/(z − p) et 1/(z − p)².') },
 };
 
 function desItem(level, rng, opts) {
@@ -115,29 +116,29 @@ function desItem(level, rng, opts) {
   const form = FORMS[d.fam];
   const hasSin = d.parts.some((x) => x.p.im.n > 0 && !x.p.im.eq(1) && x.c[0].im.n !== 0);
   const lines = [
-    { math: `F(z) = ${des}`, note: 'Éléments simples', subgoal: 'solve', blank: [topTerms(des).at(-1)], blank2: [des] },
-    ...(tab !== des && level <= 4 ? [{ math: `F(z) = ${tab}`, note: 'Forme de la table', subgoal: 'table' }] : []),
-    { math: `f(t) = ${d.f}`, note: 'Table, terme à terme', subgoal: 'inverse', blank2: [d.f] },
+    { math: `F(z) = ${des}`, note: t('Éléments simples'), subgoal: 'solve', blank: [topTerms(des).at(-1)], blank2: [des] },
+    ...(tab !== des && level <= 4 ? [{ math: `F(z) = ${tab}`, note: t('Forme de la table'), subgoal: 'table' }] : []),
+    { math: `f(t) = ${d.f}`, note: t('Table, terme à terme'), subgoal: 'inverse', blank2: [d.f] },
   ];
   const decisions = [
-    { kind: 'decision', prompt: 'Forme de la décomposition ?', levels: [2, 3], options: [
+    { kind: 'decision', prompt: t('Forme de la décomposition ?'), levels: [2, 3], options: [
       { id: 'right', label: form.right, valid: true },
       { id: 'wrong', label: form.wrong, valid: false, rule: 'g0_pfd_form', why: form.why },
     ] },
   ];
   if (hasSin) {
-    decisions.push({ kind: 'decision', prompt: 'Quelle fonction a pour transformée 1/(z² + ω²) ?', levels: [3], options: [
+    decisions.push({ kind: 'decision', prompt: t('Quelle fonction a pour transformée 1/(z² + ω²) ?'), levels: [3], options: [
       { id: 'sin', label: '(1/ω) sin(ωt)', valid: true },
-      { id: 'nofac', label: 'sin(ωt)', valid: false, rule: 'f_sin_omega_factor', why: 'ℒ(sin ωt) = ω/(z² + ω²) : il faut diviser par ω.' },
+      { id: 'nofac', label: 'sin(ωt)', valid: false, rule: 'f_sin_omega_factor', why: t('ℒ(sin ωt) = ω/(z² + ω²) : il faut diviser par ω.') },
     ] });
   }
   const judge = lap({ dir: 'inverse', f: d.f, F: d.F, traps });
   return partsItem({
-    skill: SKD, level, prompt: `Trouve f(t) telle que ℒ(f)(z) = F(z) = ${MT(d.Ffact)}.${TABLE()}`,
-    parts: [{ start: `F(z) = ${d.Ffact}`, judge, notes: level === 1 ? [`Forme : ${form.right}.`] : [], decisions, lines }],
+    skill: SKD, level, prompt: t('Trouve f(t) telle que ℒ(f)(z) = F(z) = {Ffact}.{a}', { Ffact: MT(d.Ffact), a: TABLE() }),
+    parts: [{ start: `F(z) = ${d.Ffact}`, judge, notes: level === 1 ? [t('Forme : {right}.', { right: form.right })] : [], decisions, lines }],
     keys: KEYS,
-    hints: H(`Décompose F en éléments simples réels (${form.right}), puis lis chaque terme dans la table.`, MT(`F(z) = ${des}`), MT(`f(t) = ${d.f}`)),
-    subgoals: [{ id: 'solve', label: 'éléments simples', skill: 'g0-pfd-general' }, { id: 'table', label: 'forme de la table', skill: 'f-lap-table' }, { id: 'inverse', label: 'inverser', skill: SKD }],
+    hints: H(t('Décompose F en éléments simples réels ({right}), puis lis chaque terme dans la table.', { right: form.right }), MT(`F(z) = ${des}`), MT(`f(t) = ${d.f}`)),
+    subgoals: [{ id: 'solve', label: t('éléments simples'), skill: 'g0-pfd-general' }, { id: 'table', label: t('forme de la table'), skill: 'f-lap-table' }, { id: 'inverse', label: 'inverser', skill: SKD }],
     key: `${SKD}:${level}:${d.id}`, exam: examTag(opts, 4), fallback: d.fallback, noHints: level >= 5 || !!opts.exam,
   });
 }
@@ -149,7 +150,7 @@ function desMcq(rng, opts) {
   const wrongDes = pfdText(d.parts.map((x) => ({ ...x, c: x.c.map((c) => c.neg()) })).slice(0, 1).concat(d.parts.slice(1)));
   return mcqMulti({
     skill: SKD, level: 4, key: `mcq:${d.id}`, exam: examTag(opts),
-    prompt: `Soit F(z) = ${MT(d.Ffact)} et f = ℒ⁻¹(F). Coche les affirmations justes.${TABLE()}`,
+    prompt: t('Soit F(z) = {Ffact} et f = ℒ⁻¹(F). Coche les affirmations justes.{a}', { Ffact: MT(d.Ffact), a: TABLE() }),
     options: [
       opt(MT(`f(t) = ${d.f}`), true),
       opt(MT(`F(z) = ${des}`), true),
@@ -158,7 +159,7 @@ function desMcq(rng, opts) {
       ...(wrongDes !== des ? [opt(MT(`F(z) = ${wrongDes}`), false)] : []),
       opt(MT(`f(t) = -(${d.f})`), false),
     ],
-    solution: [{ html: `${MT(`F(z) = ${des}`)}, donc ${MT(`f(t) = ${d.f}`)}`, note: '' }],
+    solution: [{ html: t('{a}, donc {b}', { a: MT(`F(z) = ${des}`), b: MT(`f(t) = ${d.f}`) }), note: '' }],
     expectedSec: 180,
   }, rng);
 }
@@ -218,8 +219,8 @@ function resItem(level, rng, opts) {
   const parts = [];
   parts.push({
     start: `${zpoly(d.D)} = 0`, judge: { kind: 'complex', form: 'set' },
-    notes: level === 1 ? [`Dénominateur factorisé : ${MT(factorsText(d.poles))}.`] : [],
-    lines: [{ math: polesText(d.poles), note: 'Pôles de F', subgoal: 'poles' }],
+    notes: level === 1 ? [t('Dénominateur factorisé : {a}.', { a: MT(factorsText(d.poles)) })] : [],
+    lines: [{ math: polesText(d.poles), note: t('Pôles de F'), subgoal: 'poles' }],
   });
   const sum = [];
   for (const x of d.poles) {
@@ -229,16 +230,16 @@ function resItem(level, rng, opts) {
     const formula = x.m === 1 ? stripped(d, x) : `d(${stripped(d, x)}, z)`;
     const z0 = zText(x.p);
     parts.push({
-      html: `Résidu de F(z)e^(zt) en z = ${rd(z0)} (pôle ${x.m === 1 ? 'simple' : 'double'}) :`, ask: 'Res =', start: `Res(${rd(z0)})`,
+      html: x.m === 1 ? t('Résidu de F(z)e^(zt) en z = {z0} (pôle simple) :', { z0: rd(z0) }) : t('Résidu de F(z)e^(zt) en z = {z0} (pôle double) :', { z0: rd(z0) }), ask: 'Res =', start: `Res(${rd(z0)})`,
       judge: lapres({ value, z0 }),
-      notes: level === 1 ? [x.m === 1 ? 'Pôle simple : (z − z₀)F(z)e^(zt), pris en z₀.' : 'Pôle double : d/dz[(z − z₀)²F(z)e^(zt)], pris en z₀.'] : [],
-      decisions: x.m === 2 ? [{ kind: 'decision', prompt: 'Quelle formule ?', levels: [2, 3], options: [
-        { id: 'double', label: 'd/dz[(z − z₀)²F(z)e^(zt)] en z₀', valid: true },
-        { id: 'simple', label: 'lim (z − z₀)F(z)e^(zt) quand z → z₀', valid: false, rule: 'c_simple_formula_double', why: `${rd(z0)} est un pôle double : (z − z₀)F(z) tend encore vers l'infini.` },
+      notes: level === 1 ? [x.m === 1 ? t('Pôle simple : (z − z₀)F(z)e^(zt), pris en z₀.') : t('Pôle double : d/dz[(z − z₀)²F(z)e^(zt)], pris en z₀.')] : [],
+      decisions: x.m === 2 ? [{ kind: 'decision', prompt: t('Quelle formule ?'), levels: [2, 3], options: [
+        { id: 'double', label: t('d/dz[(z − z₀)²F(z)e^(zt)] en z₀'), valid: true },
+        { id: 'simple', label: t('lim (z − z₀)F(z)e^(zt) quand z → z₀'), valid: false, rule: 'c_simple_formula_double', why: t('{z0} est un pôle double : (z − z₀)F(z) tend encore vers l\'infini.', { z0: rd(z0) }) },
       ] }] : [],
       lines: [
-        { math: formula, note: x.m === 1 ? 'en z = z₀' : 'dériver, puis z = z₀', subgoal: x.m === 1 ? 'res1' : 'res2' },
-        { math: value, note: 'Calculer', subgoal: x.m === 1 ? 'res1' : 'res2', blank: value.length < 14 ? [value] : [], blank2: [value] },
+        { math: formula, note: x.m === 1 ? t('en z = z₀') : t('dériver, puis z = z₀'), subgoal: x.m === 1 ? 'res1' : 'res2' },
+        { math: value, note: t('Calculer'), subgoal: x.m === 1 ? 'res1' : 'res2', blank: value.length < 14 ? [value] : [], blank2: [value] },
       ],
     });
   }
@@ -249,24 +250,24 @@ function resItem(level, rng, opts) {
     traps.f_lap_conj_pole = [{ line: without, ctx: { zbar: rd(zText(conj.p)) } }];
   }
   parts.push({
-    html: 'f(t) est la somme des résidus :', ask: 'f(t) =', start: 'f(t)',
+    html: t('f(t) est la somme des résidus :'), ask: 'f(t) =', start: 'f(t)',
     judge: lap({ dir: 'inverse', f: d.f, F: d.F, traps }),
-    decisions: conj ? [{ kind: 'decision', prompt: 'Quels résidus additionner ?', levels: [2, 3], options: [
-      { id: 'all', label: 'Ceux de tous les pôles, conjugués compris', valid: true },
-      { id: 'upper', label: 'Seulement ceux des pôles de partie imaginaire positive', valid: false, rule: 'f_lap_conj_pole', why: 'Le théorème des résidus compte tous les pôles à gauche de la droite de Bromwich : le conjugué donne le terme conjugué, et f est réelle.' },
+    decisions: conj ? [{ kind: 'decision', prompt: t('Quels résidus additionner ?'), levels: [2, 3], options: [
+      { id: 'all', label: t('Ceux de tous les pôles, conjugués compris'), valid: true },
+      { id: 'upper', label: t('Seulement ceux des pôles de partie imaginaire positive'), valid: false, rule: 'f_lap_conj_pole', why: t('Le théorème des résidus compte tous les pôles à gauche de la droite de Bromwich : le conjugué donne le terme conjugué, et f est réelle.') },
     ] }] : [],
-    lines: [{ math: `f(t) = ${d.f}`, note: conj ? 'Deux résidus conjugués : 2 Re' : 'La somme', subgoal: 'assemble' }],
+    lines: [{ math: `f(t) = ${d.f}`, note: conj ? t('Deux résidus conjugués : 2 Re') : t('La somme'), subgoal: 'assemble' }],
   });
   return partsItem({
-    skill: SKR, level, prompt: `Trouve f(t) = ℒ⁻¹(F)(t) par les résidus, pour F(z) = ${MT(d.F)}.`,
+    skill: SKR, level, prompt: t('Trouve f(t) = ℒ⁻¹(F)(t) par les résidus, pour F(z) = {F}.', { F: MT(d.F) }),
     parts, keys: KEYS,
-    hints: H('f(t) est la somme des résidus de F(z)e^(zt) en tous les pôles, y compris les conjugués.',
-      `Pôles : ${rd(polesText(d.poles))}. Pôle double : d/dz[(z − z₀)²F(z)e^(zt)] en z₀.`, MT(`f(t) = ${d.f}`)),
+    hints: H(t('f(t) est la somme des résidus de F(z)e^(zt) en tous les pôles, y compris les conjugués.'),
+      t('Pôles : {a}. Pôle double : d/dz[(z − z₀)²F(z)e^(zt)] en z₀.', { a: rd(polesText(d.poles)) }), MT(`f(t) = ${d.f}`)),
     subgoals: [
-      { id: 'poles', label: 'pôles', skill: 'c-singularities' },
-      { id: 'res1', label: 'résidu en un pôle simple', skill: 'c-res-simple' },
-      { id: 'res2', label: 'résidu en un pôle double', skill: 'c-res-multiple' },
-      { id: 'assemble', label: 'somme des résidus', skill: SKR },
+      { id: 'poles', label: t('pôles'), skill: 'c-singularities' },
+      { id: 'res1', label: t('résidu en un pôle simple'), skill: 'c-res-simple' },
+      { id: 'res2', label: t('résidu en un pôle double'), skill: 'c-res-multiple' },
+      { id: 'assemble', label: t('somme des résidus'), skill: SKR },
     ],
     key: `${SKR}:${level}:${d.id}`, exam: examTag(opts, 5), fallback: d.fallback, noHints: level >= 5 || !!opts.exam,
   });
@@ -282,15 +283,15 @@ function resMcq(rng, opts) {
   const lo = Math.min(...d.poles.map((y) => y.p.re.valueOf()));
   return mcqMulti({
     skill: SKR, level: 4, key: `mcq:${d.id}`, exam: examTag(opts),
-    prompt: `Soit F(z) = ${MT(d.F)} et f = ℒ⁻¹(F). Coche les affirmations justes.`,
+    prompt: t('Soit F(z) = {F} et f = ℒ⁻¹(F). Coche les affirmations justes.', { F: MT(d.F) }),
     options: [
       opt(MT(`f(t) = ${d.f}`), true),
-      opt(`Le résidu de F(z)e^(zt) en z = ${rd(zText(x.p))} vaut ${MT(residueText(part))}.`, true),
+      opt(t('Le résidu de F(z)e^(zt) en z = {a} vaut {b}.', { a: rd(zText(x.p)), b: MT(residueText(part)) }), true),
       ...(without ? [opt(MT(`f(t) = ${without}`), false, 'f_lap_conj_pole')] : [opt(MT(`f(t) = ${sum.slice(1).join('+').replace(/\+-/g, '-')}`), false)]),
-      opt(`L'abscisse de convergence de f est ${rd(d.g0)}.`, true),
-      ...(lo !== d.g0 ? [opt(`L'abscisse de convergence de f est ${rd(lo)}.`, false, 'f_lap_abscissa')] : [opt(`L'abscisse de convergence de f est ${rd(d.g0 + 1)}.`, false, 'f_lap_abscissa')]),
+      opt(t('L\'abscisse de convergence de f est {g0}.', { g0: rd(d.g0) }), true),
+      ...(lo !== d.g0 ? [opt(t('L\'abscisse de convergence de f est {lo}.', { lo: rd(lo) }), false, 'f_lap_abscissa')] : [opt(t('L\'abscisse de convergence de f est {a}.', { a: rd(d.g0 + 1) }), false, 'f_lap_abscissa')]),
     ],
-    solution: [{ html: `Pôles : ${rd(polesText(d.poles))} ; ${MT(`f(t) = ${d.f}`)}.`, note: '' }],
+    solution: [{ html: t('Pôles : {a} ; {b}.', { a: rd(polesText(d.poles)), b: MT(`f(t) = ${d.f}`) }), note: '' }],
     expectedSec: 240,
   }, rng);
 }

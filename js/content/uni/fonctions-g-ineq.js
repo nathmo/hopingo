@@ -21,6 +21,7 @@ import { solutionSet, setToNode, setEqual, minus, union, intersect, complement, 
 import { polyOf, polyNode, qCoeffs } from '../../cas/polyx.js';
 import { blankLine } from '../../judges/lines.js';
 import { MT, fr, linesItem, mcq, tfItem } from './kit.js';
+import { t } from '../../i18n.js';
 
 const V = 'x';
 const q = (n, d = 1) => new Q(n, d);
@@ -41,21 +42,21 @@ const pt = (text, v = V) => toText(polyNode(polyOf(parse(text)), v));
 const lin = (r, v = V) => { const R = Q.of(r); return R.n === 0 ? v : R.n < 0 ? `${v}+${N(R.neg())}` : `${v}-${N(R)}`; };
 const fac = (r, v = V) => (Q.of(r).n === 0 ? v : `(${lin(r, v)})`);
 // Brackets around a sum, for a numerator or a denominator.
-const br = (t) => (/[+-]/.test(t.slice(1)) ? `(${t})` : t);
+const br = (s) => (/[+-]/.test(s.slice(1)) ? `(${s})` : s);
 // The solution set of a condition, written in final form.
 const setOf = (text, cfg = {}) => solutionSet(typeof text === 'string' ? parse(text) : text, { v: V, ...cfg });
 const ST = (S) => toText(setToNode(S));
 const setText = (text, cfg) => ST(setOf(text, cfg));
 // B² written without useless brackets: x², (x + 3)².
 const squared = (b) => (/^[a-z]$/.test(b) ? `${b}^2` : `(${b})^2`);
-const RD = (t) => { try { return toReadable(parse(String(t))); } catch { return fr(String(t).replace(/×/g, '·')); } };
+const RD = (s) => { try { return toReadable(parse(String(s))); } catch { return fr(String(s).replace(/×/g, '·')); } };
 
 // A line with the sub-expressions written in `texts` left blank.
 function tpl(math, texts, opts = {}) {
   const node = parse(math, opts);
   const holes = [];
-  for (const t of texts) {
-    const want = toText(parse(t, opts));
+  for (const tx of texts) {
+    const want = toText(parse(tx, opts));
     let found = null;
     walk(node, (n) => {
       if (found) return false;
@@ -75,7 +76,7 @@ function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -107,7 +108,7 @@ function frontiers(node) {
 }
 
 const inter = (lo, hi) => (lo === null ? `]-∞;${N(hi)}[` : hi === null ? `[${N(lo)};+∞[` : `[${N(lo)};${N(hi)}[`);
-const caseHtml = (lo, hi) => (lo === null ? `Cas x < ${fr(N(hi))}` : hi === null ? `Cas x ≥ ${fr(N(lo))}` : `Cas ${fr(N(lo))} ≤ x < ${fr(N(hi))}`);
+const caseHtml = (lo, hi) => (lo === null ? t('Cas x < {b}', { b: fr(N(hi)) }) : hi === null ? t('Cas x ≥ {b}', { b: fr(N(lo)) }) : t('Cas {a} ≤ x < {b}', { a: fr(N(lo)), b: fr(N(hi)) }));
 
 // |A| replaced by A or −A, with the sign of A inside the case.
 function dropAbs(node, at) {
@@ -145,29 +146,29 @@ function absCases(startText, { order = 'up' } = {}) {
     const deg = cs ? cs.length - 1 : -1;
     const lines = [];
     const simp = cs ? `${toText(polyNode(P))}${REL_TEXT[rel.op]}0` : null;
-    lines.push({ math: rawText, act: 'abs', note: 'Ôter la valeur absolue dans ce cas', subgoal: 'case' });
+    lines.push({ math: rawText, act: 'abs', note: t('Ôter la valeur absolue dans ce cas'), subgoal: 'case' });
     let rawSet = setOf(rawText);
     if (deg === 2) {
-      if (simp && toText(unparen(parse(simp))) !== toText(unparen(parse(rawText)))) lines.push({ math: simp, act: 'reduce', note: 'Réduire', subgoal: 'reduce' });
-      lines.push({ math: ST(rawSet), act: 'solve', note: 'Résoudre', subgoal: 'solve' });
+      if (simp && toText(unparen(parse(simp))) !== toText(unparen(parse(rawText)))) lines.push({ math: simp, act: 'reduce', note: t('Réduire'), subgoal: 'reduce' });
+      lines.push({ math: ST(rawSet), act: 'solve', note: t('Résoudre'), subgoal: 'solve' });
     } else if (deg === 1) {
       const c1 = cs[1];
       const v = cs[0].neg().div(c1);
       const op = c1.n > 0 ? rel.op : FLIP[rel.op];
-      lines.push({ math: `x${REL_TEXT[op]}${N(v)}`, act: 'solve', note: c1.n < 0 && rel.op !== '=' ? 'Isoler x (on divise par un négatif : on retourne)' : 'Isoler x', subgoal: 'solve' });
+      lines.push({ math: `x${REL_TEXT[op]}${N(v)}`, act: 'solve', note: c1.n < 0 && rel.op !== '=' ? t('Isoler x (on divise par un négatif : on retourne)') : t('Isoler x'), subgoal: 'solve' });
     } else {
       // No x left: both sides are numbers (2 = 3, 0 ≤ 1).
       const side = (e) => toText(polyNode(polyOf(e)));
       const c = `${side(r.l)}${REL_TEXT[rel.op]}${side(r.r)}`;
-      lines.push({ math: c, act: 'solve', note: 'Réduire : il ne reste pas de x', subgoal: 'solve' });
+      lines.push({ math: c, act: 'solve', note: t('Réduire : il ne reste pas de x'), subgoal: 'solve' });
       rawSet = setOf(c);
     }
     const inCase = intersect(rawSet, setOf(dom));
     const last = lines[lines.length - 1];
     const lastFinal = (deg === 2 || (deg === 1 && rel.op === '=')) && setEqual(rawSet, inCase);
-    if (!lastFinal) lines.push({ math: ST(inCase), act: 'keep', note: 'Garder les solutions du cas', subgoal: 'keep' });
-    else if (deg === 1) last.note = 'Isoler x : la solution est dans le cas';
-    const key = (t) => toText(unparen(parse(t)));
+    if (!lastFinal) lines.push({ math: ST(inCase), act: 'keep', note: t('Garder les solutions du cas'), subgoal: 'keep' });
+    else if (deg === 1) last.note = t('Isoler x : la solution est dans le cas');
+    const key = (s) => toText(unparen(parse(s)));
     const dedup = lines.filter((l, j) => j === 0 || key(l.math) !== key(lines[j - 1].math));
     cases.push({ lo, hi, dom, html: caseHtml(lo, hi), lines: dedup.map((l) => ({ kind: 'eq', ...l })), raw: rawSet, set: inCase, rawText, deg });
   }
@@ -177,12 +178,12 @@ function absCases(startText, { order = 'up' } = {}) {
 
 // The parts of a case discussion: (frontier), one part per case, the union.
 const CASE_CHOICES = [
-  { id: 'frontier', label: 'Trouver où ce qui est dans |…| change de signe' },
-  { id: 'abs', label: 'Ôter la valeur absolue avec le signe du cas' },
-  { id: 'reduce', label: 'Réduire' },
-  { id: 'solve', label: 'Résoudre' },
-  { id: 'keep', label: 'Garder seulement les solutions du cas' },
-  { id: 'union', label: 'Réunir les cas' },
+  { id: 'frontier', label: t('Trouver où ce qui est dans |…| change de signe') },
+  { id: 'abs', label: t('Ôter la valeur absolue avec le signe du cas') },
+  { id: 'reduce', label: t('Réduire') },
+  { id: 'solve', label: t('Résoudre') },
+  { id: 'keep', label: t('Garder seulement les solutions du cas') },
+  { id: 'union', label: t('Réunir les cas') },
 ];
 function caseParts(startText, d, level, { frontier = false } = {}) {
   const parts = [];
@@ -191,19 +192,19 @@ function caseParts(startText, d, level, { frontier = false } = {}) {
     walk(parse(startText), (n) => { if (n.t === 'abs') args.push(n.e); return true; });
     const startF = args.map((a) => `${toText(a)}=0`).join(' ou ');
     const line = `{${d.fs.map(N).join(';')}}`;
-    const lines = [E(line, 'Là où |…| change d\'écriture', 'frontier', 'frontier')];
-    parts.push({ start: startF, judge: withMenus({ kind: 'solset', v: V }, level, startF, lines, CASE_CHOICES), html: 'Frontières des cas :', lines });
+    const lines = [E(line, t('Là où |…| change d\'écriture'), 'frontier', 'frontier')];
+    parts.push({ start: startF, judge: withMenus({ kind: 'solset', v: V }, level, startF, lines, CASE_CHOICES), html: t('Frontières des cas :'), lines });
   }
   d.cases.forEach((c, i) => {
     const judge = { kind: 'solset', v: V, domain: c.dom, inCase: true };
-    parts.push({ start: startText, judge: withMenus(judge, level, startText, c.lines, CASE_CHOICES), html: `${c.html} :`, lines: c.lines, idx: i });
+    parts.push({ start: startText, judge: withMenus(judge, level, startText, c.lines, CASE_CHOICES), html: t('{title} :', { title: c.html }), lines: c.lines, idx: i });
   });
   const names = d.cases.map((_, i) => `S_${i + 1}`);
   const sets = Object.fromEntries(d.cases.map((c, i) => [names[i], ST(c.set)]));
   const raw = Object.fromEntries(d.cases.map((c, i) => [names[i], ST(c.raw)]));
   const uStart = names.join('∪');
-  const uLines = [E(ST(d.answer), 'Réunir les cas', 'union', 'union')];
-  parts.push({ start: uStart, judge: withMenus({ kind: 'solset', v: V, sets, raw }, level, uStart, uLines, CASE_CHOICES), html: 'Réunion :', lines: uLines });
+  const uLines = [E(ST(d.answer), t('Réunir les cas'), 'union', 'union')];
+  parts.push({ start: uStart, judge: withMenus({ kind: 'solset', v: V, sets, raw }, level, uStart, uLines, CASE_CHOICES), html: t('Réunion :'), lines: uLines });
   return parts;
 }
 
@@ -224,17 +225,17 @@ export const HELP = { tpl, blanked, stepMenus, withMenus, partsScript, absCases,
 
 const RI = 'g1-rational-ineq';
 const RI_SUB = [
-  { id: 'domain', label: 'domaine', skill: RI },
-  { id: 'move', label: 'tout d\'un côté', skill: RI },
-  { id: 'common', label: 'même dénominateur', skill: 'rat-operations' },
-  { id: 'signs', label: 'signes', skill: 'g1-sign-table' },
+  { id: 'domain', label: t('domaine'), skill: RI },
+  { id: 'move', label: t('tout d\'un côté'), skill: RI },
+  { id: 'common', label: t('même dénominateur'), skill: 'rat-operations' },
+  { id: 'signs', label: t('signes'), skill: 'g1-sign-table' },
 ];
 const RI_CHOICES = [
-  { id: 'domain', label: 'Écrire le domaine (valeurs interdites)' },
-  { id: 'move', label: 'Tout passer du même côté' },
-  { id: 'mult', label: 'Multiplier par le dénominateur', rule: 'g1_mult_denominator', why: 'Le signe du dénominateur dépend de x : multiplier par lui retournerait l\'inégalité une partie du temps.' },
-  { id: 'common', label: 'Réduire au même dénominateur' },
-  { id: 'read', label: 'Lire l\'ensemble avec les signes' },
+  { id: 'domain', label: t('Écrire le domaine (valeurs interdites)') },
+  { id: 'move', label: t('Tout passer du même côté') },
+  { id: 'mult', label: t('Multiplier par le dénominateur'), rule: 'g1_mult_denominator', why: t('Le signe du dénominateur dépend de x : multiplier par lui retournerait l\'inégalité une partie du temps.') },
+  { id: 'common', label: t('Réduire au même dénominateur') },
+  { id: 'read', label: t('Lire l\'ensemble avec les signes') },
 ];
 const OPS = ['<', '≤', '>', '≥'];
 // k·(x − r) written after a sign: 2(x − 2), (x − 2), 2x.
@@ -269,10 +270,10 @@ function riData(rng, two) {
       const red = signedLin(c, p);
       poles = [r];
       lines = [
-        E(`D=ℝ∖{${r}}`, `Valeur interdite : ${fr(String(r))}`, 'domain', 'domain'),
-        E(`${frac}${k > 0 ? '-' : '+'}${Math.abs(k)}${op}0`, 'Tout d\'un côté', 'move', 'move'),
-        E(`(${numA}${k > 0 ? '-' : '+'}${times(k, den)})/${br(den)}${op}0`, 'Même dénominateur', 'common', 'common'),
-        E(`${br(red)}/${br(den)}${op}0`, 'Réduire le numérateur', 'common', 'common'),
+        E(`D=ℝ∖{${r}}`, t('Valeur interdite : {r}', { r: fr(String(r)) }), 'domain', 'domain'),
+        E(`${frac}${k > 0 ? '-' : '+'}${Math.abs(k)}${op}0`, t('Tout d\'un côté'), 'move', 'move'),
+        E(`(${numA}${k > 0 ? '-' : '+'}${times(k, den)})/${br(den)}${op}0`, t('Même dénominateur'), 'common', 'common'),
+        E(`${br(red)}/${br(den)}${op}0`, t('Réduire le numérateur'), 'common', 'common'),
       ];
       holes = [[times(k, den)], [red]];
       cand = `${br(numA)}${op}${k}${den === 'x' ? 'x' : `(${den})`}`;
@@ -294,10 +295,10 @@ function riData(rng, two) {
       const D2 = `${fac(r)}${fac(s)}`;
       const num = pt(`${c1}x+(${c0})`);
       lines = [
-        E(`D=ℝ∖{${poles.join(';')}}`, 'Valeurs interdites', 'domain', 'domain'),
-        E(`${A}-${B}${op}0`, 'Tout d\'un côté', 'move', 'move'),
-        E(`(${fac(-a)}${fac(s)}-${fac(-b)}${fac(r)})/(${D2})${op}0`, 'Même dénominateur', 'common', 'common'),
-        E(`${br(num)}/(${D2})${op}0`, 'Développer le numérateur', 'common', 'common'),
+        E(`D=ℝ∖{${poles.join(';')}}`, t('Valeurs interdites'), 'domain', 'domain'),
+        E(`${A}-${B}${op}0`, t('Tout d\'un côté'), 'move', 'move'),
+        E(`(${fac(-a)}${fac(s)}-${fac(-b)}${fac(r)})/(${D2})${op}0`, t('Même dénominateur'), 'common', 'common'),
+        E(`${br(num)}/(${D2})${op}0`, t('Développer le numérateur'), 'common', 'common'),
       ];
       holes = [[], [num]];
       cand = `${fac(-a)}${fac(s)}${op}${fac(-b)}${fac(r)}`;
@@ -306,7 +307,9 @@ function riData(rng, two) {
     if (!answer.parts.length) continue;
     const multSet = minus(setOf(cand), poleSet(poles));
     if (setEqual(multSet, answer)) continue;
-    lines.push(E(ST(answer), `Signes : valeur${poles.length > 1 ? 's' : ''} interdite${poles.length > 1 ? 's' : ''} ${poles.map((x) => fr(String(x))).join(' et ')}, zéro ${fr(String(p))}`, 'signs', 'read'));
+    lines.push(E(ST(answer), poles.length > 1
+      ? t('Signes : valeurs interdites {poles}, zéro {p}', { poles: poles.map((x) => fr(String(x))).join(t(' et ')), p: fr(String(p)) })
+      : t('Signes : valeur interdite {poles}, zéro {p}', { poles: poles.map((x) => fr(String(x))).join(t(' et ')), p: fr(String(p)) }), 'signs', 'read'));
     return { op, start, lines, poles, p, answer, multSet, holes };
   }
   return null;
@@ -321,25 +324,25 @@ function riItem(level, rng, opts = {}) {
   if (level === 1) {
     start = d.lines[3].math;
     script = [
-      { kind: 'note', html: `Bornes du tableau : ${d.poles.map((x) => fr(String(x))).join(', ')} (valeur interdite, ‖) et ${fr(String(d.p))} (zéro).` },
+      { kind: 'note', html: t('Bornes du tableau : {poles} (valeur interdite, ‖) et {p} (zéro).', { poles: d.poles.map((x) => fr(String(x))).join(', '), p: fr(String(d.p)) }) },
       blanked(d.lines[0], d.poles.map(String)),
       blanked(d.lines[4], [String(d.p)]),
     ];
   } else if (level === 2) {
     script = [d.lines[0], d.lines[1], blanked(d.lines[2], d.holes[0]), blanked(d.lines[3], d.holes[1]), d.lines[4]];
   } else if (level === 3) {
-    script = [{ kind: 'decision', prompt: 'Comment commences-tu ?', options: [
-      { id: 'mult', label: 'Multiplier les deux membres par le dénominateur', valid: false, rule: 'g1_mult_denominator', why: 'Le signe du dénominateur dépend de x : quand il est négatif, l\'inégalité se retourne.' },
-      { id: 'move', label: 'Tout passer à gauche et réduire au même dénominateur', valid: true },
+    script = [{ kind: 'decision', prompt: t('Comment commences-tu ?'), options: [
+      { id: 'mult', label: t('Multiplier les deux membres par le dénominateur'), valid: false, rule: 'g1_mult_denominator', why: t('Le signe du dénominateur dépend de x : quand il est négatif, l\'inégalité se retourne.') },
+      { id: 'move', label: t('Tout passer à gauche et réduire au même dénominateur'), valid: true },
     ] }, ...d.lines];
   }
   const sLines = script.filter((l) => l.kind === 'eq');
   return linesItem({
-    skill: RI, level, prompt: `Résous ${MT(start)}.`,
+    skill: RI, level, prompt: t('Résous {e}.', { e: MT(start) }),
     start, judge: withMenus(judge, level, start, sLines, RI_CHOICES), mode: modeOf(level), script,
     hints: level === 1
-      ? H('Le quotient change de signe en ses zéros et en ses valeurs interdites. Une valeur interdite est toujours exclue.', `Valeur interdite : ${d.poles.map((x) => fr(String(x))).join(', ')} ; zéro : ${fr(String(d.p))}`, MT(d.lines[4].math))
-      : H('Ne multiplie pas par le dénominateur : son signe change. Écris d\'abord le domaine, puis passe tout à gauche.', MT(d.lines[2].math), MT(d.lines[3].math)),
+      ? H(t('Le quotient change de signe en ses zéros et en ses valeurs interdites. Une valeur interdite est toujours exclue.'), t('Valeur interdite : {poles} ; zéro : {p}', { poles: d.poles.map((x) => fr(String(x))).join(', '), p: fr(String(d.p)) }), MT(d.lines[4].math))
+      : H(t('Ne multiplie pas par le dénominateur : son signe change. Écris d\'abord le domaine, puis passe tout à gauche.'), MT(d.lines[2].math), MT(d.lines[3].math)),
     subgoals: RI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${RI}:${level}:${start}`, exam: examOf(opts, 3),
   });
@@ -358,7 +361,7 @@ function riMcq(rng) {
     { html: MT(ST(union(d.answer, d.multSet))), correct: false },
   ]).slice(0, 4);
   return mcq({
-    skill: RI, level: 4, prompt: `Ensemble des solutions de ${MT(d.start)} :`, options, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
+    skill: RI, level: 4, prompt: t('Ensemble des solutions de {e} :', { e: MT(d.start) }), options, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
     solution: d.lines.map((l) => ({ html: MT(l.math), note: l.note })),
   }, rng);
 }
@@ -369,19 +372,19 @@ function riMcq(rng) {
 
 const PA = 'g1-param';
 const PA_SUB = [
-  { id: 'factor', label: 'factoriser', skill: 'fac-complete' },
-  { id: 'critical', label: 'valeur critique', skill: PA },
-  { id: 'divide', label: 'diviser selon le signe', skill: PA },
-  { id: 'sign', label: 'signe d\'un trinôme en m', skill: 'g1-rational-ineq' },
-  { id: 'lin', label: 'équation à paramètre', skill: 'param-linear' },
+  { id: 'factor', label: t('factoriser'), skill: 'fac-complete' },
+  { id: 'critical', label: t('valeur critique'), skill: PA },
+  { id: 'divide', label: t('diviser selon le signe'), skill: PA },
+  { id: 'sign', label: t('signe d\'un trinôme en m'), skill: 'g1-rational-ineq' },
+  { id: 'lin', label: t('équation à paramètre'), skill: 'param-linear' },
 ];
 const PA_CHOICES = [
-  { id: 'critical', label: 'Chercher les m qui annulent le coefficient de x' },
-  { id: 'factor', label: 'Factoriser le membre de droite' },
-  { id: 'pos', label: 'Diviser par un nombre positif' },
-  { id: 'neg', label: 'Diviser par un nombre négatif : retourner l\'inégalité' },
-  { id: 'zero', label: 'Remplacer m : le coefficient est nul' },
-  { id: 'write', label: 'Écrire l\'ensemble' },
+  { id: 'critical', label: t('Chercher les m qui annulent le coefficient de x') },
+  { id: 'factor', label: t('Factoriser le membre de droite') },
+  { id: 'pos', label: t('Diviser par un nombre positif') },
+  { id: 'neg', label: t('Diviser par un nombre négatif : retourner l\'inégalité') },
+  { id: 'zero', label: t('Remplacer m : le coefficient est nul') },
+  { id: 'write', label: t('Écrire l\'ensemble') },
 ];
 const coefM = (a) => (a === 0 ? 'm' : `(${lin(a, 'm')})`);
 const mPlus = (b) => pt(`m+(${b})`, 'm');
@@ -408,16 +411,16 @@ function paCases(d, level) {
   const cases = [];
   const ivSet = (o) => (o === '<' ? `]-∞;${mb}[` : o === '≤' ? `]-∞;${mb}]` : o === '>' ? `]${mb};+∞[` : `[${mb};+∞[`);
   if (eq) {
-    cases.push({ m: `ℝ∖{${A}}`, html: `Cas m ≠ ${fr(A)}`, lines: [E(`x=${mb}`, `Diviser par ${RD(d.cm)} ≠ 0`, 'divide', 'pos')] });
+    cases.push({ m: `ℝ∖{${A}}`, html: t('Cas m ≠ {a}', { a: fr(A) }), lines: [E(`x=${mb}`, t('Diviser par {c} ≠ 0', { c: RD(d.cm) }), 'divide', 'pos')] });
   } else {
-    cases.push({ m: `]${A};+∞[`, html: `Cas m > ${fr(A)}`, lines: [E(`x${op}${mb}`, `${RD(d.cm)} > 0 : on garde le sens`, 'divide', 'pos'), E(ivSet(op), 'Écrire l\'ensemble', 'divide', 'write')] });
-    cases.push({ m: `]-∞;${A}[`, html: `Cas m < ${fr(A)}`, lines: [E(`x${FLIP[op]}${mb}`, `${RD(d.cm)} < 0 : on retourne`, 'divide', 'neg'), E(ivSet(FLIP[op]), 'Écrire l\'ensemble', 'divide', 'write')] });
+    cases.push({ m: `]${A};+∞[`, html: t('Cas m > {a}', { a: fr(A) }), lines: [E(`x${op}${mb}`, t('{c} > 0 : on garde le sens', { c: RD(d.cm) }), 'divide', 'pos'), E(ivSet(op), t('Écrire l\'ensemble'), 'divide', 'write')] });
+    cases.push({ m: `]-∞;${A}[`, html: t('Cas m < {a}', { a: fr(A) }), lines: [E(`x${FLIP[op]}${mb}`, t('{c} < 0 : on retourne', { c: RD(d.cm) }), 'divide', 'neg'), E(ivSet(FLIP[op]), t('Écrire l\'ensemble'), 'divide', 'write')] });
   }
   const S0 = ['≤', '≥', '='].includes(op) ? 'ℝ' : '∅';
-  cases.push({ m: `{${A}}`, html: `Cas m = ${fr(A)}`, lines: [E(`0${op}0`, `0·x ${op} 0`, 'critical', 'zero'), E(S0, S0 === 'ℝ' ? 'Toujours vrai' : 'Jamais vrai', 'critical', 'write')] });
+  cases.push({ m: `{${A}}`, html: t('Cas m = {a}', { a: fr(A) }), lines: [E(`0${op}0`, `0·x ${op} 0`, 'critical', 'zero'), E(S0, S0 === 'ℝ' ? t('Toujours vrai') : t('Jamais vrai'), 'critical', 'write')] });
   return cases.map((c) => {
     const judge = { kind: 'solset', v: V, params: { m: c.m } };
-    return { start: factored, judge: withMenus(judge, level, factored, c.lines, PA_CHOICES), html: `${c.html} :`, lines: c.lines };
+    return { start: factored, judge: withMenus(judge, level, factored, c.lines, PA_CHOICES), html: t('{title} :', { title: c.html }), lines: c.lines };
   });
 }
 
@@ -426,11 +429,11 @@ function paItem(level, rng, opts = {}) {
   const eq = level <= 2 || level === 4 ? rng.chance(0.3) : false;
   const d = paData(rng, eq);
   const parts = [];
-  const fLine = E(d.factored, 'Factoriser', 'factor', 'factor');
+  const fLine = E(d.factored, t('Factoriser'), 'factor', 'factor');
   if (level >= 2) {
-    const crit = [E(`{${N(d.a)}}`, "Le coefficient de x s'annule", 'critical', 'critical')];
+    const crit = [E(`{${N(d.a)}}`, t('Le coefficient de x s\'annule'), 'critical', 'critical')];
     const cStart = `${lin(d.a, 'm')}=0`;
-    parts.push({ start: cStart, judge: withMenus({ kind: 'solset', v: 'm' }, level, cStart, crit, PA_CHOICES), html: 'Valeur critique de m :', lines: crit });
+    parts.push({ start: cStart, judge: withMenus({ kind: 'solset', v: 'm' }, level, cStart, crit, PA_CHOICES), html: t('Valeur critique de m :'), lines: crit });
   }
   const cases = paCases(d, level);
   if (level <= 2) for (const c of cases) c.lines = c.lines.map((l, i) => (i === 0 && l.math.startsWith('x') ? blanked(l, [d.mb]) : l));
@@ -442,10 +445,10 @@ function paItem(level, rng, opts = {}) {
   parts.push(...cases);
   const { start, judge, script } = partsScript(parts);
   return linesItem({
-    skill: PA, level, prompt: `Résous ${MT(d.start)} selon les valeurs du paramètre m.`,
+    skill: PA, level, prompt: t('Résous {e} selon les valeurs du paramètre m.', { e: MT(d.start) }),
     start, judge, mode: modeOf(level), script,
     declares: { vars: [V, 'm'] },
-    hints: H(`Que se passe-t-il si ${RD(lin(d.a, 'm'))} = 0 ? Et si ${RD(lin(d.a, 'm'))} < 0 ?`, `Cas m < ${fr(N(d.a))} : on divise par ${RD(lin(d.a, 'm'))} < 0, donc x … ${RD(d.mb)}`, d.eq ? MT(`x=${d.mb}`) : MT(`x${FLIP[d.op]}${d.mb}`)),
+    hints: H(t('Que se passe-t-il si {c} = 0 ? Et si {c} < 0 ?', { c: RD(lin(d.a, 'm')) }), t('Cas m < {a} : on divise par {c} < 0, donc x … {mb}', { a: fr(N(d.a)), c: RD(lin(d.a, 'm')), mb: RD(d.mb) }), d.eq ? MT(`x=${d.mb}`) : MT(`x${FLIP[d.op]}${d.mb}`)),
     subgoals: PA_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${PA}:${level}:${d.start}`, exam: examOf(opts, 4),
   });
@@ -464,13 +467,13 @@ function paQuadratic(rng, opts) {
   const prod = `${fac(r1, 'm')}${fac(r2, 'm')}`;
   const mk = (html, rel, lines) => ({ html, start: `(-2m)^2-4(${lm})${rel}0`, judge: { kind: 'solset', v: 'm' }, lines });
   const parts = [
-    mk('Deux solutions : Δ > 0.', '>', [E(`${tri}>0`, 'Diviser par 4', 'sign'), E(`${prod}>0`, 'Factoriser', 'sign'), E(setText(`${prod}>0`, { v: 'm' }), 'Signe du trinôme en m', 'sign')]),
-    mk('Une seule solution : Δ = 0.', '=', [E(`${prod}=0`, 'Diviser par 4, factoriser', 'sign'), E(setText(`${prod}=0`, { v: 'm' }), 'Résoudre', 'sign')]),
-    mk('Aucune solution : Δ < 0.', '<', [E(`${prod}<0`, 'Diviser par 4, factoriser', 'sign'), E(setText(`${prod}<0`, { v: 'm' }), 'Signe du trinôme en m', 'sign')]),
+    mk(t('Deux solutions : Δ > 0.'), '>', [E(`${tri}>0`, t('Diviser par 4'), 'sign'), E(`${prod}>0`, t('Factoriser'), 'sign'), E(setText(`${prod}>0`, { v: 'm' }), t('Signe du trinôme en m'), 'sign')]),
+    mk(t('Une seule solution : Δ = 0.'), '=', [E(`${prod}=0`, t('Diviser par 4, factoriser'), 'sign'), E(setText(`${prod}=0`, { v: 'm' }), t('Résoudre'), 'sign')]),
+    mk(t('Aucune solution : Δ < 0.'), '<', [E(`${prod}<0`, t('Diviser par 4, factoriser'), 'sign'), E(setText(`${prod}<0`, { v: 'm' }), t('Signe du trinôme en m'), 'sign')]),
   ];
   const { start, judge, script } = partsScript(parts);
   return linesItem({
-    skill: PA, level: 5, prompt: `Selon m, combien de solutions a l'équation ${MT(eqText)} ? Écris pour quels m Δ > 0, Δ = 0, Δ < 0.`,
+    skill: PA, level: 5, prompt: t('Selon m, combien de solutions a l\'équation {e} ? Écris pour quels m Δ > 0, Δ = 0, Δ < 0.', { e: MT(eqText) }),
     start, judge, mode: 'free', script, hints: [], declares: { vars: ['m'] },
     subgoals: PA_SUB, keys: KEYS, key: `${PA}:5:${eqText}`, exam: examOf(opts, 4),
   });
@@ -479,7 +482,7 @@ function paQuadratic(rng, opts) {
 function paMcq(rng) {
   const d = paData(rng, false);
   const m0 = d.a - rng.int(1, 3);
-  const sub = (t) => t.replace(/m/g, `(${m0})`);
+  const sub = (s) => s.replace(/m/g, `(${m0})`);
   const at = setText(sub(d.start));
   const kept = setText(`x${d.op}${sub(d.mb)}`);
   const options = uniq([
@@ -489,8 +492,8 @@ function paMcq(rng) {
     { html: MT('∅'), correct: false },
   ]);
   return mcq({
-    skill: PA, level: 4, prompt: `On résout ${MT(d.start)}. Pour m = ${fr(String(m0))}, l'ensemble des solutions est :`, options, key: `mcq:${d.start}:${m0}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `${MT(d.factored)} ; pour m = ${fr(String(m0))}, ${RD(lin(d.a, 'm'))} < 0 : on retourne.`, note: '' }],
+    skill: PA, level: 4, prompt: t('On résout {e}. Pour m = {m}, l\'ensemble des solutions est :', { e: MT(d.start), m: fr(String(m0)) }), options, key: `mcq:${d.start}:${m0}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('{e} ; pour m = {m}, {c} < 0 : on retourne.', { e: MT(d.factored), m: fr(String(m0)), c: RD(lin(d.a, 'm')) }), note: '' }],
   }, rng);
 }
 
@@ -500,16 +503,16 @@ function paMcq(rng) {
 
 const VI = 'g1-viete';
 const VI_SUB = [
-  { id: 'fk', label: 'calculer f(k)', skill: VI },
-  { id: 'cond', label: 'choisir la condition', skill: VI },
-  { id: 'solve', label: 'résoudre en m', skill: 'g1-trinome-sign' },
-  { id: 'param', label: 'trinôme à paramètre', skill: 'param-quadratic' },
+  { id: 'fk', label: t('calculer f(k)'), skill: VI },
+  { id: 'cond', label: t('choisir la condition'), skill: VI },
+  { id: 'solve', label: t('résoudre en m'), skill: 'g1-trinome-sign' },
+  { id: 'param', label: t('trinôme à paramètre'), skill: 'param-quadratic' },
 ];
 const VI_CHOICES = [
-  { id: 'compute', label: 'Calculer f(k) et réduire' },
-  { id: 'cond', label: 'Écrire la condition sur a·f(k)' },
-  { id: 'solve', label: 'Résoudre l\'inéquation en m' },
-  { id: 'write', label: 'Écrire l\'ensemble des m' },
+  { id: 'compute', label: t('Calculer f(k) et réduire') },
+  { id: 'cond', label: t('Écrire la condition sur a·f(k)') },
+  { id: 'solve', label: t('Résoudre l\'inéquation en m') },
+  { id: 'write', label: t('Écrire l\'ensemble des m') },
 ];
 const kk = (k) => (k < 0 ? `(${k})` : String(k));
 
@@ -530,7 +533,7 @@ function viData(rng, two) {
     if (cT === '0') continue;
     const bx = bT === '0' ? '' : /^-?\d*m$|^-?\d+$/.test(bT) ? `${bT.startsWith('-') ? '' : '+'}${bT}x` : `+(${bT})x`;
     const eqText = `${p === 0 ? 'm' : `(${aT})`}x^2${bx}${cT.startsWith('-') ? '' : '+'}${cT}=0`;
-    const pr = (t) => (/[+-]/.test(t) ? `(${t})` : t);
+    const pr = (s) => (/[+-]/.test(s) ? `(${s})` : s);
     const fRaw = (kv) => `${pr(aT)}×${kk(kv)}^2${bT === '0' ? '' : `+${pr(bT)}×${kk(kv)}`}+${pr(cT)}`;
     const d = { k, p, q: qq, aT, bT, cT, eqText, fRaw, fk: lin(qq, 'm') };
     if (!two) return d;
@@ -559,31 +562,31 @@ function viItem(level, rng, opts = {}) {
   const d = viData(rng, two) ?? viData(rng, false);
   const fJudge = { kind: 'equiv', vars: ['m'], domain: { m: [-3, 3] }, target: 'expanded' };
   const parts = [];
-  const fLines = [E(d.fk, 'Développer et réduire', 'fk', 'compute')];
+  const fLines = [E(d.fk, t('Développer et réduire'), 'fk', 'compute')];
   parts.push({ start: d.fRaw(d.k), judge: withMenus(fJudge, level, d.fRaw(d.k), fLines, VI_CHOICES), html: `f(${fr(String(d.k))}) =`, lines: level === 1 ? [blanked(fLines[0], [String(d.q)])] : fLines });
   let cStart = `${fac(d.p, 'm')}${fac(d.q, 'm')}<0`;
-  let cLines = [E(`${d.p}<m<${d.q}`, 'Signe du trinôme en m : entre les racines', 'solve', 'solve'), E(`]${d.p};${d.q}[`, 'Écrire l\'ensemble', 'solve', 'write')];
+  let cLines = [E(`${d.p}<m<${d.q}`, t('Signe du trinôme en m : entre les racines'), 'solve', 'solve'), E(`]${d.p};${d.q}[`, t('Écrire l\'ensemble'), 'solve', 'write')];
   if (d.k2 !== undefined) {
-    const f2Lines = [E(d.f2, 'Développer et réduire', 'fk', 'compute')];
+    const f2Lines = [E(d.f2, t('Développer et réduire'), 'fk', 'compute')];
     parts.push({ start: d.fRaw(d.k2), judge: withMenus(fJudge, level, d.fRaw(d.k2), f2Lines, VI_CHOICES), html: `f(${fr(String(d.k2))}) =`, lines: f2Lines });
     cStart = `${d.c1} et ${d.c2}`;
-    cLines = [E(`${d.p}<m<${d.q} et m∈${setText(d.c2, { v: 'm' })}`, 'Résoudre chaque condition', 'solve', 'solve'), E(ST(d.both), 'Intersecter', 'solve', 'write')];
+    cLines = [E(`${d.p}<m<${d.q} et m∈${setText(d.c2, { v: 'm' })}`, t('Résoudre chaque condition'), 'solve', 'solve'), E(ST(d.both), t('Intersecter'), 'solve', 'write')];
   }
-  const cPart = { start: cStart, judge: withMenus({ kind: 'solset', v: 'm' }, level, cStart, cLines, VI_CHOICES), html: d.k2 === undefined ? 'Condition a·f(k) < 0 :' : 'Conditions a·f(k₁) et a·f(k₂) :', lines: cLines };
+  const cPart = { start: cStart, judge: withMenus({ kind: 'solset', v: 'm' }, level, cStart, cLines, VI_CHOICES), html: d.k2 === undefined ? t('Condition a·f(k) < 0 :') : t('Conditions a·f(k₁) et a·f(k₂) :'), lines: cLines };
   if (level === 2) {
-    cPart.pre = [{ kind: 'decision', prompt: `Quelle condition dit que ${fr(String(d.k))} est entre les racines ?`, options: [
+    cPart.pre = [{ kind: 'decision', prompt: t('Quelle condition dit que {k} est entre les racines ?', { k: fr(String(d.k)) }), options: [
       { id: 'af', label: 'a·f(k) < 0', valid: true },
-      { id: 'f', label: 'f(k) < 0', valid: false, rule: 'g1_viete_a', why: 'Si a < 0, la parabole est tournée vers le bas : f(k) > 0 entre les racines. Il faut a·f(k) < 0.' },
-      { id: 'delta', label: 'Δ > 0', valid: false, why: 'Δ > 0 dit qu\'il y a deux racines, pas où est k.' },
+      { id: 'f', label: 'f(k) < 0', valid: false, rule: 'g1_viete_a', why: t('Si a < 0, la parabole est tournée vers le bas : f(k) > 0 entre les racines. Il faut a·f(k) < 0.') },
+      { id: 'delta', label: 'Δ > 0', valid: false, why: t('Δ > 0 dit qu\'il y a deux racines, pas où est k.') },
     ] }];
   }
   if (level === 1) cPart.lines = cLines.map((l, i) => (i === 1 ? blanked(l, [String(d.p), String(d.q)]) : l));
   parts.push(cPart);
-  const { start, judge, script } = partsScript(parts, level === 1 ? [{ kind: 'note', html: 'Rappel : k est entre les racines si et seulement si a·f(k) &lt; 0 ; k est à l\'extérieur si a·f(k) &gt; 0.' }] : []);
+  const { start, judge, script } = partsScript(parts, level === 1 ? [{ kind: 'note', html: t('Rappel : k est entre les racines si et seulement si a·f(k) &lt; 0 ; k est à l\'extérieur si a·f(k) &gt; 0.') }] : []);
   return linesItem({
-    skill: VI, level, prompt: `Pour quels m l'équation ${MT(d.eqText)} a-t-elle deux racines avec ${posText(d)} ?`,
+    skill: VI, level, prompt: t('Pour quels m l\'équation {e} a-t-elle deux racines avec {pos} ?', { e: MT(d.eqText), pos: posText(d) }),
     start, judge, mode: modeOf(level), script, declares: { vars: ['m'] },
-    hints: H(`${fr(String(d.k))} est entre les racines si et seulement si a·f(${fr(String(d.k))}) < 0, avec a = ${RD(d.aT)}.`, `f(${fr(String(d.k))}) = ${RD(d.fRaw(d.k))} = …`, MT(d.fk)),
+    hints: H(t('{k} est entre les racines si et seulement si a·f({k}) < 0, avec a = {a}.', { k: fr(String(d.k)), a: RD(d.aT) }), `f(${fr(String(d.k))}) = ${RD(d.fRaw(d.k))} = …`, MT(d.fk)),
     subgoals: VI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${VI}:${level}:${d.eqText}:${d.k2 ?? ''}`, exam: examOf(opts, 6),
   });
@@ -598,7 +601,7 @@ function viMcq(rng) {
     { html: MT(`[${d.p};${d.q}]`), correct: false },
   ]);
   return mcq({
-    skill: VI, level: 4, prompt: `Pour quels m l'équation ${MT(d.eqText)} a-t-elle deux racines avec ${posText(d)} ?`, options, key: `mcq:${d.eqText}`, exam: { format: 'mcq', points: 1 },
+    skill: VI, level: 4, prompt: t('Pour quels m l\'équation {e} a-t-elle deux racines avec {pos} ?', { e: MT(d.eqText), pos: posText(d) }), options, key: `mcq:${d.eqText}`, exam: { format: 'mcq', points: 1 },
     solution: [{ html: `a·f(${fr(String(d.k))}) = (${RD(d.aT)})(${RD(d.fk)}) < 0`, note: '' }],
   }, rng);
 }
@@ -610,12 +613,12 @@ function viMcq(rng) {
 const AE = 'g1-abs-eq';
 const AI = 'g1-abs-ineq';
 const caseSub = (skill, solveSkill) => [
-  { id: 'frontier', label: 'frontières des cas', skill },
-  { id: 'case', label: 'ôter la valeur absolue', skill: AE },
-  { id: 'reduce', label: 'réduire', skill },
-  { id: 'solve', label: 'résoudre', skill: solveSkill },
-  { id: 'keep', label: 'garder les solutions du cas', skill },
-  { id: 'union', label: 'réunir', skill: 'g9-intervals' },
+  { id: 'frontier', label: t('frontières des cas'), skill },
+  { id: 'case', label: t('ôter la valeur absolue'), skill: AE },
+  { id: 'reduce', label: t('réduire'), skill },
+  { id: 'solve', label: t('résoudre'), skill: solveSkill },
+  { id: 'keep', label: t('garder les solutions du cas'), skill },
+  { id: 'union', label: t('réunir'), skill: 'g9-intervals' },
 ];
 // Bounds of a set that are not exact fractions (surds, decimals).
 const rational = (S) => S.parts.every((p) => [p.lo, p.hi].every((b) => !Number.isFinite(b.x) || !!b.q));
@@ -652,7 +655,7 @@ function aeMulti(rng) {
     }
     const c = rng.int(0, 4);
     let lhs = '';
-    for (const t of terms) lhs += `${t.s < 0 ? '-' : lhs ? '+' : ''}|${absArg(t.p, t.q)}|`;
+    for (const tm of terms) lhs += `${tm.s < 0 ? '-' : lhs ? '+' : ''}|${absArg(tm.p, tm.q)}|`;
     const start = `${lhs}=${c}`;
     let d;
     try { d = absCases(start); } catch { continue; }
@@ -692,7 +695,7 @@ function caseItem(skill, level, rng, opts, data, { frontier = false, hints, sub,
   if (level === 1) parts = guidedCases(parts);
   const { start, judge, script } = partsScript(parts);
   return linesItem({
-    skill, level, prompt: prompt || `Résous ${MT(s0)}.`,
+    skill, level, prompt: prompt || t('Résous {e}.', { e: MT(s0) }),
     start, judge, mode: modeOf(level), script,
     hints, subgoals: sub, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${skill}:${level}:${s0}`, exam: examOf(opts, points),
@@ -704,7 +707,7 @@ function aeItem(level, rng, opts = {}) {
   const first = data.d.cases[0];
   return caseItem(AE, level, rng, opts, data, {
     frontier: level === 2,
-    hints: H(`Coupe là où ce qui est dans |…| change de signe : x = ${data.d.fs.map((f) => fr(N(f))).join(', ')}.`, `${first.html} : ${MT(first.rawText)}`, `Dans chaque cas, garde seulement les solutions qui sont dans le cas.`),
+    hints: H(t('Coupe là où ce qui est dans |…| change de signe : x = {xs}.', { xs: data.d.fs.map((f) => fr(N(f))).join(', ') }), t('{c} : {e}', { c: first.html, e: MT(first.rawText) }), t('Dans chaque cas, garde seulement les solutions qui sont dans le cas.')),
     sub: caseSub(AE, AE),
   });
 }
@@ -712,14 +715,15 @@ function aeItem(level, rng, opts = {}) {
 function aeExam(rng, exam) {
   if (exam === 'tf') {
     const c = rng.int(1, 5);
+    // s: the French statement, kept for the key; st: the statement shown.
     const bank = [
-      { s: `Pour tout x ∈ ℝ, |x − ${c}| = x − ${c}.`, truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: `|x-${c}|=x-${c}`, ask: [{ v: 'x', label: 'x =' }], answer: { x: '0' } }, why: `Faux : pour x = 0, |−${c}| = ${c}, mais 0 − ${c} = −${c}.`, rule: 'g1_abs_dropped' },
-      { s: 'Pour tous x, y ∈ ℝ, si |x| = |y|, alors x = y.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }, { q: '∀', v: 'y', dom: 'R' }], pred: '|x|=|y|⇒x=y', hyp: '|x|=|y|', ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer: { x: '1', y: '-1' } }, why: 'Faux : |1| = |−1| mais 1 ≠ −1.' },
-      { s: `Pour tout x ∈ ℝ, |${c} − x| = |x − ${c}|.`, truth: true, why: `Vrai : ${c} − x et x − ${c} sont opposés, et |−A| = |A|.` },
-      { s: `L'équation |x − ${c}| = −2 n'a aucune solution.`, truth: true, why: 'Vrai : une valeur absolue est toujours ≥ 0.' },
+      { s: `Pour tout x ∈ ℝ, |x − ${c}| = x − ${c}.`, st: t('Pour tout x ∈ ℝ, |x − {c}| = x − {c}.', { c }), truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: `|x-${c}|=x-${c}`, ask: [{ v: 'x', label: 'x =' }], answer: { x: '0' } }, why: t('Faux : pour x = 0, |−{c}| = {c}, mais 0 − {c} = −{c}.', { c }), rule: 'g1_abs_dropped' },
+      { s: 'Pour tous x, y ∈ ℝ, si |x| = |y|, alors x = y.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }, { q: '∀', v: 'y', dom: 'R' }], pred: '|x|=|y|⇒x=y', hyp: '|x|=|y|', ask: [{ v: 'x', label: 'x =' }, { v: 'y', label: 'y =' }], answer: { x: '1', y: '-1' } }, why: t('Faux : |1| = |−1| mais 1 ≠ −1.') },
+      { s: `Pour tout x ∈ ℝ, |${c} − x| = |x − ${c}|.`, st: t('Pour tout x ∈ ℝ, |{c} − x| = |x − {c}|.', { c }), truth: true, why: t('Vrai : {c} − x et x − {c} sont opposés, et |−A| = |A|.', { c }) },
+      { s: `L'équation |x − ${c}| = −2 n'a aucune solution.`, st: t('L\'équation |x − {c}| = −2 n\'a aucune solution.', { c }), truth: true, why: t('Vrai : une valeur absolue est toujours ≥ 0.') },
     ];
     const b = rng.pick(bank);
-    return tfItem({ skill: AE, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    return tfItem({ skill: AE, level: 4, statement: b.st ?? t(b.s), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const { start, d, p, q: qq, r, s } = aeData(rng);
   const A = absArg(p, qq);
@@ -734,8 +738,8 @@ function aeExam(rng, exam) {
     { html: MT('∅'), correct: false },
   ]).slice(0, 4);
   return mcq({
-    skill: AE, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
-    solution: d.cases.map((c) => ({ html: `${c.html} : ${MT(c.rawText)}, S = ${MT(ST(c.set))}`, note: '' })),
+    skill: AE, level: 4, prompt: t('Ensemble des solutions de {e} :', { e: MT(start) }), options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: d.cases.map((c) => ({ html: t('{c} : {e}, S = {s}', { c: c.html, e: MT(c.rawText), s: MT(ST(c.set)) }), note: '' })),
   }, rng);
 }
 
@@ -747,13 +751,13 @@ function aiChain(level, rng, opts) {
   const start = `|${lin(a)}|${op}${r}`;
   const lines = [
     E(`-${r}${op}${lin(a)}${op}${r}`, '|A| < r ⇔ −r < A < r', 'case', 'abs'),
-    E(`${a - r}${op}x${op}${a + r}`, `Ajouter ${fr(String(a))}`, 'solve', 'solve'),
-    E(setText(start), 'Écrire l\'intervalle', 'union', 'union'),
+    E(`${a - r}${op}x${op}${a + r}`, t('Ajouter {b}', { b: fr(String(a)) }), 'solve', 'solve'),
+    E(setText(start), t('Écrire l\'intervalle'), 'union', 'union'),
   ];
   return linesItem({
-    skill: AI, level, prompt: `Résous ${MT(start)}.`, start, judge: { kind: 'solset', v: V }, mode: modeOf(level),
+    skill: AI, level, prompt: t('Résous {e}.', { e: MT(start) }), start, judge: { kind: 'solset', v: V }, mode: modeOf(level),
     script: level === 1 ? [lines[0], blanked(lines[1], [String(a - r), String(a + r)]), lines[2]] : lines,
-    hints: H(`|A| ${op} ${r} ⇔ −${r} ${op} A ${op} ${r} : un encadrement.`, MT(lines[0].math), MT(lines[1].math)),
+    hints: H(t('|A| {op} {r} ⇔ −{r} {op} A {op} {r} : un encadrement.', { op, r }), MT(lines[0].math), MT(lines[1].math)),
     subgoals: caseSub(AI, AI), keys: KEYS, key: `${AI}:${level}:${start}`, exam: examOf(opts, 2),
   });
 }
@@ -770,14 +774,14 @@ function aiOr(level, rng, opts) {
   const hi = q(r - qq, p);
   const back = op === '>' ? '<' : '≤';
   const lines = [
-    E(`${A}${back}-${r} ou ${A}${op}${r}`, '|A| > r ⇔ A < −r ou A > r', 'case', 'abs'),
-    E(`x${back}${N(lo)} ou x${op}${N(hi)}`, 'Isoler x', 'solve', 'solve'),
-    E(setText(start), 'Écrire la réunion', 'union', 'union'),
+    E(`${A}${back}-${r} ou ${A}${op}${r}`, t('|A| > r ⇔ A < −r ou A > r'), 'case', 'abs'),
+    E(`x${back}${N(lo)} ou x${op}${N(hi)}`, t('Isoler x'), 'solve', 'solve'),
+    E(setText(start), t('Écrire la réunion'), 'union', 'union'),
   ];
   return linesItem({
-    skill: AI, level, prompt: `Résous ${MT(start)}.`, start, judge: { kind: 'solset', v: V }, mode: modeOf(level),
+    skill: AI, level, prompt: t('Résous {e}.', { e: MT(start) }), start, judge: { kind: 'solset', v: V }, mode: modeOf(level),
     script: level <= 2 ? [blanked(lines[0], [`-${r}`]), lines[1], lines[2]] : lines,
-    hints: H('|A| > r : A est loin de 0, d\'un côté « ou » de l\'autre.', MT(lines[0].math), MT(lines[1].math)),
+    hints: H(t('|A| > r : A est loin de 0, d\'un côté « ou » de l\'autre.'), MT(lines[0].math), MT(lines[1].math)),
     subgoals: caseSub(AI, AI), keys: KEYS, key: `${AI}:${level}:${start}`, exam: examOf(opts, 2),
   });
 }
@@ -814,7 +818,7 @@ function aiItem(level, rng, opts = {}) {
   const data = aiData(rng, level === 5 ? '-' : null) ?? aiData(rng, null);
   const c0 = data.d.cases[0];
   return caseItem(AI, level, rng, opts, data, {
-    hints: H('Un cas par signe de ce qui est dans |…|. Dans chaque cas, garde seulement les x du cas.', `${c0.html} : ${MT(c0.rawText)}`, `${c0.html} : solutions brutes ${MT(ST(c0.raw))}, dans le cas : ${MT(ST(c0.set))}`),
+    hints: H(t('Un cas par signe de ce qui est dans |…|. Dans chaque cas, garde seulement les x du cas.'), t('{c} : {e}', { c: c0.html, e: MT(c0.rawText) }), t('{c} : solutions brutes {raw}, dans le cas : {s}', { c: c0.html, raw: MT(ST(c0.raw)), s: MT(ST(c0.set)) })),
     sub: caseSub(AI, 'g1-trinome-sign'), points: 5,
   });
 }
@@ -829,8 +833,8 @@ function aiMcq(rng) {
     { html: MT(ST(d.cases[1].raw)), correct: false },
   ]).slice(0, 4);
   return mcq({
-    skill: AI, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
-    solution: d.cases.map((c) => ({ html: `${c.html} : ${MT(c.rawText)}, S = ${MT(ST(c.set))}`, note: '' })),
+    skill: AI, level: 4, prompt: t('Ensemble des solutions de {e} :', { e: MT(start) }), options, key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: d.cases.map((c) => ({ html: t('{c} : {e}, S = {s}', { c: c.html, e: MT(c.rawText), s: MT(ST(c.set)) }), note: '' })),
   }, rng);
 }
 
@@ -840,18 +844,18 @@ function aiMcq(rng) {
 
 const IE = 'g1-irr-eq';
 const IE_SUB = [
-  { id: 'cond', label: 'condition B ≥ 0 et carré', skill: IE },
-  { id: 'expand', label: 'développer', skill: IE },
-  { id: 'solve', label: 'résoudre', skill: 'fac-trinomial' },
-  { id: 'sort', label: 'trier', skill: IE },
-  { id: 'domain', label: 'domaine', skill: 'g1-domain' },
+  { id: 'cond', label: t('condition B ≥ 0 et carré'), skill: IE },
+  { id: 'expand', label: t('développer'), skill: IE },
+  { id: 'solve', label: t('résoudre'), skill: 'fac-trinomial' },
+  { id: 'sort', label: t('trier'), skill: IE },
+  { id: 'domain', label: t('domaine'), skill: 'g1-domain' },
 ];
 const IE_CHOICES = [
-  { id: 'cond', label: 'Écrire B ≥ 0 et élever au carré' },
-  { id: 'iso', label: 'Isoler une racine' },
-  { id: 'expand', label: 'Développer et réduire' },
-  { id: 'solve', label: 'Résoudre' },
-  { id: 'sort', label: 'Garder les solutions qui vérifient la condition' },
+  { id: 'cond', label: t('Écrire B ≥ 0 et élever au carré') },
+  { id: 'iso', label: t('Isoler une racine') },
+  { id: 'expand', label: t('Développer et réduire') },
+  { id: 'solve', label: t('Résoudre') },
+  { id: 'sort', label: t('Garder les solutions qui vérifient la condition') },
 ];
 
 // √A = B, B = ±x + s, A affine: A = B² has the roots x0 (B ≥ 0) and x1 (B < 0).
@@ -873,10 +877,10 @@ function ieData(rng) {
     const tri = pt(`(x-(${x0}))(x-(${x1}))`);
     const start = `sqrt(${A})=${B}`;
     const lines = [
-      E(`${B}≥0 et ${A}=${squared(B)}`, 'Condition B ≥ 0 et carré', 'cond', 'cond'),
-      E(`${cond} et ${tri}=0`, 'Développer, tout d\'un côté', 'expand', 'expand'),
-      E(`${cond} et (x=${x0} ou x=${x1})`, 'Résoudre', 'solve', 'solve'),
-      E(`{${x0}}`, `Trier : ${fr(String(x1))} ne vérifie pas ${RD(cond)}`, 'sort', 'sort'),
+      E(`${B}≥0 et ${A}=${squared(B)}`, t('Condition B ≥ 0 et carré'), 'cond', 'cond'),
+      E(`${cond} et ${tri}=0`, t('Développer, tout d\'un côté'), 'expand', 'expand'),
+      E(`${cond} et (x=${x0} ou x=${x1})`, t('Résoudre'), 'solve', 'solve'),
+      E(`{${x0}}`, t('Trier : {x} ne vérifie pas {c}', { x: fr(String(x1)), c: RD(cond) }), 'sort', 'sort'),
     ];
     return { start, lines, A, B, x0, x1, cond, tri };
   }
@@ -887,17 +891,17 @@ function ieData(rng) {
 function ieTwo(rng) {
   for (let i = 0; i < 200; i++) {
     const b = rng.int(2, 6);
-    const t = rng.pick([q(1), q(2), q(3), q(1, 2), q(3, 2)]);
-    const a = q(b * b).sub(t.mul(2 * b));
-    if (a.n <= 0 || t.valueOf() >= b || a.d !== 1) continue;
+    const tv = rng.pick([q(1), q(2), q(3), q(1, 2), q(3, 2)]);
+    const a = q(b * b).sub(tv.mul(2 * b));
+    if (a.n <= 0 || tv.valueOf() >= b || a.d !== 1) continue;
     const A = N(a);
     const start = `sqrt(x+${A})+√x=${b}`;
     const lines = [
-      E(`sqrt(x+${A})=${b}-√x`, 'Isoler une racine', 'cond', 'iso'),
-      E(`${b}-√x≥0 et x+${A}=${b * b}-${2 * b}√x+x`, 'Condition et carré', 'cond', 'cond'),
-      E(`√x≤${b} et ${2 * b}√x=${N(q(b * b).sub(a))}`, 'Réduire', 'expand', 'expand'),
-      E(`√x=${N(t)}`, 'Diviser', 'solve', 'solve'),
-      E(`x=${N(t.mul(t))}`, 'Élever au carré', 'sort', 'solve'),
+      E(`sqrt(x+${A})=${b}-√x`, t('Isoler une racine'), 'cond', 'iso'),
+      E(`${b}-√x≥0 et x+${A}=${b * b}-${2 * b}√x+x`, t('Condition et carré'), 'cond', 'cond'),
+      E(`√x≤${b} et ${2 * b}√x=${N(q(b * b).sub(a))}`, t('Réduire'), 'expand', 'expand'),
+      E(`√x=${N(tv)}`, t('Diviser'), 'solve', 'solve'),
+      E(`x=${N(tv.mul(tv))}`, t('Élever au carré'), 'sort', 'solve'),
     ];
     return { start, lines };
   }
@@ -909,8 +913,8 @@ function ieItem(level, rng, opts = {}) {
   if (level === 4 && rng.chance(1 / 3)) {
     const d = ieTwo(rng);
     return linesItem({
-      skill: IE, level, prompt: `Résous ${MT(d.start)}.`, start: d.start, judge: { kind: 'solset', v: V }, mode: 'free', script: d.lines,
-      hints: H('Isole d\'abord une racine, puis élève au carré avec la condition.', MT(d.lines[0].math), MT(d.lines[2].math)),
+      skill: IE, level, prompt: t('Résous {e}.', { e: MT(d.start) }), start: d.start, judge: { kind: 'solset', v: V }, mode: 'free', script: d.lines,
+      hints: H(t('Isole d\'abord une racine, puis élève au carré avec la condition.'), MT(d.lines[0].math), MT(d.lines[2].math)),
       subgoals: IE_SUB, keys: KEYS, key: `${IE}:${level}:${d.start}`, exam: examOf(opts, 2),
     });
   }
@@ -923,16 +927,16 @@ function ieItem(level, rng, opts = {}) {
   } else if (level === 2) {
     script = [blanked(d.lines[0], [`${d.B}≥0`]), ...d.lines.slice(1)];
   } else if (level === 3) {
-    script = [{ kind: 'decision', prompt: 'Comment te débarrasses-tu de la racine ?', options: [
-      { id: 'cond', label: `Écrire ${RD(d.B)} ≥ 0, puis élever au carré`, valid: true },
-      { id: 'square', label: 'Élever au carré directement', valid: true, quality: 'poor', state: { superset: true }, why: 'Juste si tu vérifies chaque solution dans l\'équation de départ à la fin : élever au carré peut en ajouter.' },
+    script = [{ kind: 'decision', prompt: t('Comment te débarrasses-tu de la racine ?'), options: [
+      { id: 'cond', label: t('Écrire {b} ≥ 0, puis élever au carré', { b: RD(d.B) }), valid: true },
+      { id: 'square', label: t('Élever au carré directement'), valid: true, quality: 'poor', state: { superset: true }, why: t('Juste si tu vérifies chaque solution dans l\'équation de départ à la fin : élever au carré peut en ajouter.') },
     ] }, ...d.lines];
   }
   const sLines = script.filter((l) => l.kind === 'eq');
   return linesItem({
-    skill: IE, level, prompt: `Résous ${MT(d.start)}.`,
+    skill: IE, level, prompt: t('Résous {e}.', { e: MT(d.start) }),
     start, judge: withMenus({ kind: 'solset', v: V }, level, start, sLines, IE_CHOICES), mode: modeOf(level), script,
-    hints: H(`Une racine carrée est ≥ 0 : il faut ${RD(d.B)} ≥ 0.`, `${RD(d.A)} = (${RD(d.B)})², donc ${RD(d.tri)} = 0`, MT(d.lines[2].math)),
+    hints: H(t('Une racine carrée est ≥ 0 : il faut {b} ≥ 0.', { b: RD(d.B) }), t('{a} = ({b})², donc {tri} = 0', { a: RD(d.A), b: RD(d.B), tri: RD(d.tri) }), MT(d.lines[2].math)),
     subgoals: IE_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${IE}:${level}:${d.start}`, exam: examOf(opts, 2),
   });
@@ -954,17 +958,17 @@ function ieQuadratic(rng, opts) {
     const start = `sqrt(${A})=${B}`;
     const dom = setText(`(x-(${u}))(x-(${w}))≥0`);
     const parts = [
-      { start: `sqrt(${A})`, judge: { kind: 'solset', v: V, exprDomain: true }, html: 'Domaine de la racine :', lines: [E(`${A}≥0`, 'Radicande ≥ 0', 'domain'), E(`${fac(u)}${fac(w)}≥0`, 'Factoriser', 'domain'), E(dom, 'Signe du trinôme', 'domain')] },
-      { start, judge: { kind: 'solset', v: V }, html: 'Équation :', lines: [
-        E(`${B}≥0 et ${A}=${squared(B)}`, 'Condition et carré', 'cond'),
-        E(`x≥${-s} et ${pt(`${pp - 2 * s}x`)}=${s * s - qq}`, 'Les x² s\'en vont', 'expand'),
-        E(`x≥${-s} et x=${N(v)}`, 'Résoudre', 'solve'),
-        E(`{${N(v)}}`, 'La condition est vérifiée', 'sort'),
+      { start: `sqrt(${A})`, judge: { kind: 'solset', v: V, exprDomain: true }, html: t('Domaine de la racine :'), lines: [E(`${A}≥0`, t('Radicande ≥ 0'), 'domain'), E(`${fac(u)}${fac(w)}≥0`, t('Factoriser'), 'domain'), E(dom, t('Signe du trinôme'), 'domain')] },
+      { start, judge: { kind: 'solset', v: V }, html: t('Équation :'), lines: [
+        E(`${B}≥0 et ${A}=${squared(B)}`, t('Condition et carré'), 'cond'),
+        E(`x≥${-s} et ${pt(`${pp - 2 * s}x`)}=${s * s - qq}`, t('Les x² s\'en vont'), 'expand'),
+        E(`x≥${-s} et x=${N(v)}`, t('Résoudre'), 'solve'),
+        E(`{${N(v)}}`, t('La condition est vérifiée'), 'sort'),
       ] },
     ];
     const ps = partsScript(parts);
     return linesItem({
-      skill: IE, level: 5, prompt: `Donne le domaine de ${MT(`sqrt(${A})`)}, puis résous ${MT(start)}.`,
+      skill: IE, level: 5, prompt: t('Donne le domaine de {r}, puis résous {e}.', { r: MT(`sqrt(${A})`), e: MT(start) }),
       start: ps.start, judge: ps.judge, mode: 'free', script: ps.script, hints: [],
       subgoals: IE_SUB, keys: KEYS, key: `${IE}:5:${start}`, exam: examOf(opts, 4),
     });
@@ -976,13 +980,14 @@ function ieExam(rng, exam) {
   if (exam === 'tf') {
     const c = rng.int(2, 6);
     const bank = [
-      { s: 'Pour tous a, b ∈ ℝ, si a² = b², alors a = b.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }], pred: 'a^2=b^2⇒a=b', hyp: 'a^2=b^2', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '-2', b: '2' } }, why: 'Faux : (−2)² = 2² mais −2 ≠ 2. C\'est pour cela qu\'élever au carré ajoute des solutions.', rule: 'g1_irr_extraneous' },
-      { s: 'Pour tout x ∈ ℝ, √(x²) = x.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'sqrt(x^2)=x', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: 'Faux : √((−1)²) = 1. En fait √(x²) = |x|.' },
-      { s: `Pour tout x ≥ 0, (√x)² = x.`, truth: true, why: 'Vrai : c\'est la définition de la racine carrée.' },
-      { s: `L'équation √x = −${c} n'a pas de solution.`, truth: true, why: 'Vrai : une racine carrée n\'est jamais négative.' },
+      { s: 'Pour tous a, b ∈ ℝ, si a² = b², alors a = b.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }], pred: 'a^2=b^2⇒a=b', hyp: 'a^2=b^2', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '-2', b: '2' } }, why: t('Faux : (−2)² = 2² mais −2 ≠ 2. C\'est pour cela qu\'élever au carré ajoute des solutions.'), rule: 'g1_irr_extraneous' },
+      { s: 'Pour tout x ∈ ℝ, √(x²) = x.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'sqrt(x^2)=x', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: t('Faux : √((−1)²) = 1. En fait √(x²) = |x|.') },
+      { s: `Pour tout x ≥ 0, (√x)² = x.`, truth: true, why: t('Vrai : c\'est la définition de la racine carrée.') },
+      // s: the French statement, kept for the key; st: the statement shown.
+      { s: `L'équation √x = −${c} n'a pas de solution.`, st: t('L\'équation √x = −{c} n\'a pas de solution.', { c }), truth: true, why: t('Vrai : une racine carrée n\'est jamais négative.') },
     ];
     const b = rng.pick(bank);
-    return tfItem({ skill: IE, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    return tfItem({ skill: IE, level: 4, statement: b.st ?? t(b.s), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const d = ieData(rng);
   const options = uniq([
@@ -992,7 +997,7 @@ function ieExam(rng, exam) {
     { html: MT('∅'), correct: false },
   ]);
   return mcq({
-    skill: IE, level: 4, prompt: `Ensemble des solutions de ${MT(d.start)} :`, options, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
+    skill: IE, level: 4, prompt: t('Ensemble des solutions de {e} :', { e: MT(d.start) }), options, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
     solution: d.lines.map((l) => ({ html: MT(l.math), note: l.note })),
   }, rng);
 }
@@ -1003,20 +1008,20 @@ function ieExam(rng, exam) {
 
 const II = 'g1-irr-ineq';
 const II_SUB = [
-  { id: 'cond', label: 'conditions de signe', skill: II },
-  { id: 'case', label: 'cas selon le signe', skill: 'g1-abs-ineq' },
-  { id: 'tri', label: 'signe du trinôme', skill: 'g1-trinome-sign' },
-  { id: 'square', label: 'élever au carré avec la condition', skill: 'g1-irr-eq' },
-  { id: 'keep', label: 'intersecter, réunir', skill: II },
+  { id: 'cond', label: t('conditions de signe'), skill: II },
+  { id: 'case', label: t('cas selon le signe'), skill: 'g1-abs-ineq' },
+  { id: 'tri', label: t('signe du trinôme'), skill: 'g1-trinome-sign' },
+  { id: 'square', label: t('élever au carré avec la condition'), skill: 'g1-irr-eq' },
+  { id: 'keep', label: t('intersecter, réunir'), skill: II },
 ];
 const II_CHOICES = [
-  { id: 'cond', label: 'Écrire les conditions de signe, puis élever au carré' },
-  { id: 'abs', label: 'Faire deux cas selon le signe du membre sans racine' },
-  { id: 'square', label: 'Élever au carré directement', rule: 'g1_square_no_cond', why: 'Les deux membres n\'ont pas toujours le même signe : on ne peut pas élever au carré sans condition.' },
-  { id: 'reduce', label: 'Réduire' },
-  { id: 'solve', label: 'Résoudre l\'inéquation' },
-  { id: 'keep', label: 'Garder les solutions du cas' },
-  { id: 'union', label: 'Réunir les cas' },
+  { id: 'cond', label: t('Écrire les conditions de signe, puis élever au carré') },
+  { id: 'abs', label: t('Faire deux cas selon le signe du membre sans racine') },
+  { id: 'square', label: t('Élever au carré directement'), rule: 'g1_square_no_cond', why: t('Les deux membres n\'ont pas toujours le même signe : on ne peut pas élever au carré sans condition.') },
+  { id: 'reduce', label: t('Réduire') },
+  { id: 'solve', label: t('Résoudre l\'inéquation') },
+  { id: 'keep', label: t('Garder les solutions du cas') },
+  { id: 'union', label: t('Réunir les cas') },
 ];
 const STRICT_OF = { '<': '>', '≤': '≥' };
 
@@ -1049,10 +1054,10 @@ function iiLeLines(d) {
   const tri = strict ? `${d.tri}>0` : `${d.tri}≥0`;
   const out = strict ? `(x<${d.r1} ou x>${d.r2})` : `(x≤${d.r1} ou x≥${d.r2})`;
   return [
-    E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}${squared(d.B)}`, 'A ≥ 0, B ≥ 0 et A ≤ B²', 'cond', 'cond'),
-    E(`x≥${-d.q} et ${xC} et ${tri}`, 'Simplifier', 'cond', 'reduce'),
-    E(`x≥${-d.q} et ${xC} et ${out}`, 'Signe du trinôme', 'tri', 'solve'),
-    E(ST(d.answer), 'Intersecter', 'keep', 'keep'),
+    E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}${squared(d.B)}`, t('A ≥ 0, B ≥ 0 et A ≤ B²'), 'cond', 'cond'),
+    E(`x≥${-d.q} et ${xC} et ${tri}`, t('Simplifier'), 'cond', 'reduce'),
+    E(`x≥${-d.q} et ${xC} et ${out}`, t('Signe du trinôme'), 'tri', 'solve'),
+    E(ST(d.answer), t('Intersecter'), 'keep', 'keep'),
   ];
 }
 
@@ -1063,17 +1068,17 @@ function iiGeParts(d, level) {
   const sq = d.op === '>' ? '<' : '≤';
   const casePosRaw = setOf(`${d.tri}${sq}0`);
   const casePos = intersect(casePosRaw, setOf(`x≥${-s}`));
-  const neg = [E(`${d.A}≥0`, 'B < 0 : vrai dès que la racine existe', 'case', 'abs'), E(ST(caseNeg), 'Garder les x du cas', 'keep', 'keep')];
-  const pos = [E(`${d.A}${d.op}${squared(d.B)}`, 'B ≥ 0 : élever au carré', 'square', 'square'), E(`${d.tri}${sq}0`, 'Réduire', 'tri', 'reduce'), E(ST(casePosRaw), 'Signe du trinôme', 'tri', 'solve')];
-  if (!setEqual(casePosRaw, casePos)) pos.push(E(ST(casePos), 'Garder les x du cas', 'keep', 'keep'));
+  const neg = [E(`${d.A}≥0`, t('B < 0 : vrai dès que la racine existe'), 'case', 'abs'), E(ST(caseNeg), t('Garder les x du cas'), 'keep', 'keep')];
+  const pos = [E(`${d.A}${d.op}${squared(d.B)}`, t('B ≥ 0 : élever au carré'), 'square', 'square'), E(`${d.tri}${sq}0`, t('Réduire'), 'tri', 'reduce'), E(ST(casePosRaw), t('Signe du trinôme'), 'tri', 'solve')];
+  if (!setEqual(casePosRaw, casePos)) pos.push(E(ST(casePos), t('Garder les x du cas'), 'keep', 'keep'));
   const parts = [
-    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `]-∞;${-s}[`, inCase: true }, level, d.start, neg, II_CHOICES), html: `Cas ${RD(d.B)} < 0 :`, lines: neg },
-    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `[${-s};+∞[`, inCase: true }, level, d.start, pos, II_CHOICES), html: `Cas ${RD(d.B)} ≥ 0 :`, lines: pos },
+    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `]-∞;${-s}[`, inCase: true }, level, d.start, neg, II_CHOICES), html: t('Cas {b} < 0 :', { b: RD(d.B) }), lines: neg },
+    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `[${-s};+∞[`, inCase: true }, level, d.start, pos, II_CHOICES), html: t('Cas {b} ≥ 0 :', { b: RD(d.B) }), lines: pos },
   ];
   const sets = { S_1: ST(caseNeg), S_2: ST(casePos) };
   const raw = { S_1: ST(setOf(`${d.A}≥0`)), S_2: ST(casePosRaw) };
-  const u = [E(ST(d.answer), 'Réunir', 'keep', 'union')];
-  parts.push({ start: 'S_1∪S_2', judge: withMenus({ kind: 'solset', v: V, sets, raw }, level, 'S_1∪S_2', u, II_CHOICES), html: 'Réunion :', lines: u });
+  const u = [E(ST(d.answer), t('Réunir'), 'keep', 'union')];
+  parts.push({ start: 'S_1∪S_2', judge: withMenus({ kind: 'solset', v: V, sets, raw }, level, 'S_1∪S_2', u, II_CHOICES), html: t('Réunion :'), lines: u });
   return parts;
 }
 
@@ -1105,26 +1110,26 @@ function iiQuadParts(d, level) {
     const bC = d.op === '<' ? `${d.B}>0` : `${d.B}≥0`;
     const xC = d.op === '<' ? `x>${-d.s}` : `x≥${-d.s}`;
     const lines = [
-      E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}${squared(d.B)}`, 'A ≥ 0, B ≥ 0 et A ≤ B²', 'cond', 'cond'),
-      E(`${out} et ${xC} et ${d.lin}${d.op}${d.c}`, 'Signe du trinôme ; les x² s\'en vont', 'tri', 'reduce'),
-      E(ST(d.answer), 'Intersecter', 'keep', 'keep'),
+      E(`${d.A}≥0 et ${bC} et ${d.A}${d.op}${squared(d.B)}`, t('A ≥ 0, B ≥ 0 et A ≤ B²'), 'cond', 'cond'),
+      E(`${out} et ${xC} et ${d.lin}${d.op}${d.c}`, t('Signe du trinôme ; les x² s\'en vont'), 'tri', 'reduce'),
+      E(ST(d.answer), t('Intersecter'), 'keep', 'keep'),
     ];
     return [{ start: d.start, judge: withMenus({ kind: 'solset', v: V }, level, d.start, lines, II_CHOICES), lines }];
   }
   const caseNeg = intersect(setOf(`${d.A}≥0`), setOf(`x<${-d.s}`));
   const posRaw = setOf(`${d.lin}${d.op}${d.c}`);
   const casePos = intersect(intersect(posRaw, setOf(`x≥${-d.s}`)), setOf(`${d.A}≥0`));
-  const neg = [E(`${d.A}≥0`, 'B < 0 : vrai dès que la racine existe', 'case', 'abs'), E(ST(setOf(`${d.A}≥0`)), 'Signe du trinôme', 'tri', 'solve')];
-  if (!setEqual(setOf(`${d.A}≥0`), caseNeg)) neg.push(E(ST(caseNeg), 'Garder les x du cas', 'keep', 'keep'));
-  const pos = [E(`${d.A}${d.op}${squared(d.B)}`, 'B ≥ 0 : élever au carré', 'square', 'square'), E(`${d.lin}${d.op}${d.c}`, 'Les x² s\'en vont', 'tri', 'reduce'), E(ST(posRaw), 'Isoler x', 'tri', 'solve')];
-  if (!setEqual(posRaw, casePos)) pos.push(E(ST(casePos), 'Garder les x du cas', 'keep', 'keep'));
+  const neg = [E(`${d.A}≥0`, t('B < 0 : vrai dès que la racine existe'), 'case', 'abs'), E(ST(setOf(`${d.A}≥0`)), t('Signe du trinôme'), 'tri', 'solve')];
+  if (!setEqual(setOf(`${d.A}≥0`), caseNeg)) neg.push(E(ST(caseNeg), t('Garder les x du cas'), 'keep', 'keep'));
+  const pos = [E(`${d.A}${d.op}${squared(d.B)}`, t('B ≥ 0 : élever au carré'), 'square', 'square'), E(`${d.lin}${d.op}${d.c}`, t('Les x² s\'en vont'), 'tri', 'reduce'), E(ST(posRaw), t('Isoler x'), 'tri', 'solve')];
+  if (!setEqual(posRaw, casePos)) pos.push(E(ST(casePos), t('Garder les x du cas'), 'keep', 'keep'));
   const sets = { S_1: ST(caseNeg), S_2: ST(casePos) };
   const raw = { S_1: ST(setOf(`${d.A}≥0`)), S_2: ST(posRaw) };
-  const u = [E(ST(d.answer), 'Réunir', 'keep', 'union')];
+  const u = [E(ST(d.answer), t('Réunir'), 'keep', 'union')];
   return [
-    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `]-∞;${-d.s}[`, inCase: true }, level, d.start, neg, II_CHOICES), html: `Cas ${RD(d.B)} < 0 :`, lines: neg },
-    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `[${-d.s};+∞[`, inCase: true }, level, d.start, pos, II_CHOICES), html: `Cas ${RD(d.B)} ≥ 0 :`, lines: pos },
-    { start: 'S_1∪S_2', judge: withMenus({ kind: 'solset', v: V, sets, raw }, level, 'S_1∪S_2', u, II_CHOICES), html: 'Réunion :', lines: u },
+    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `]-∞;${-d.s}[`, inCase: true }, level, d.start, neg, II_CHOICES), html: t('Cas {b} < 0 :', { b: RD(d.B) }), lines: neg },
+    { start: d.start, judge: withMenus({ kind: 'solset', v: V, domain: `[${-d.s};+∞[`, inCase: true }, level, d.start, pos, II_CHOICES), html: t('Cas {b} ≥ 0 :', { b: RD(d.B) }), lines: pos },
+    { start: 'S_1∪S_2', judge: withMenus({ kind: 'solset', v: V, sets, raw }, level, 'S_1∪S_2', u, II_CHOICES), html: t('Réunion :'), lines: u },
   ];
 }
 
@@ -1141,9 +1146,9 @@ function iiItem(level, rng, opts = {}) {
   } else if (level === 3) {
     d = iiSimple(rng, OPS);
     parts = d.op === '≤' || d.op === '<' ? [{ start: d.start, judge: withMenus({ kind: 'solset', v: V }, level, d.start, iiLeLines(d), II_CHOICES), lines: iiLeLines(d) }] : iiGeParts(d, level);
-    parts[0].pre = [{ kind: 'decision', prompt: 'Comment commences-tu ?', options: [
-      { id: 'square', label: 'Élever au carré directement', valid: false, rule: 'g1_square_no_cond', why: 'Les deux membres n\'ont pas toujours le même signe : élever au carré peut changer les solutions.' },
-      { id: 'signs', label: d.op === '≤' || d.op === '<' ? 'Écrire les conditions de signe, puis élever au carré' : 'Deux cas, selon le signe du membre sans racine', valid: true },
+    parts[0].pre = [{ kind: 'decision', prompt: t('Comment commences-tu ?'), options: [
+      { id: 'square', label: t('Élever au carré directement'), valid: false, rule: 'g1_square_no_cond', why: t('Les deux membres n\'ont pas toujours le même signe : élever au carré peut changer les solutions.') },
+      { id: 'signs', label: d.op === '≤' || d.op === '<' ? t('Écrire les conditions de signe, puis élever au carré') : t('Deux cas, selon le signe du membre sans racine'), valid: true },
     ] }];
   } else {
     d = iiQuad(rng, level === 5 ? ['≥', '>'] : OPS) ?? iiQuad(rng, OPS);
@@ -1151,9 +1156,9 @@ function iiItem(level, rng, opts = {}) {
   }
   const { start, judge, script } = partsScript(parts);
   return linesItem({
-    skill: II, level, prompt: `Résous ${MT(d.start)}.`,
+    skill: II, level, prompt: t('Résous {e}.', { e: MT(d.start) }),
     start, judge, mode: modeOf(level), script,
-    hints: H('Une racine est ≥ 0. On n\'élève au carré que si les deux membres sont ≥ 0 : sinon, deux cas.', d.op === '≤' || d.op === '<' ? `${RD(d.A)} ≥ 0 et ${RD(d.B)} ≥ 0 et ${RD(d.A)} ≤ (${RD(d.B)})²` : `Cas ${RD(d.B)} < 0 : vrai dès que ${RD(d.A)} ≥ 0.`, MT(script.find((l) => l.kind === 'eq').math)),
+    hints: H(t('Une racine est ≥ 0. On n\'élève au carré que si les deux membres sont ≥ 0 : sinon, deux cas.'), d.op === '≤' || d.op === '<' ? t('{a} ≥ 0 et {b} ≥ 0 et {a} ≤ ({b})²', { a: RD(d.A), b: RD(d.B) }) : t('Cas {b} < 0 : vrai dès que {a} ≥ 0.', { a: RD(d.A), b: RD(d.B) }), MT(script.find((l) => l.kind === 'eq').math)),
     subgoals: II_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${II}:${level}:${d.start}`, exam: examOf(opts, 6),
   });
@@ -1168,8 +1173,8 @@ function iiMcq(rng) {
     { html: MT(ST(setOf(`${d.tri}${d.op === '≤' || d.op === '<' ? '≥' : '≤'}0`))), correct: false },
   ]);
   return mcq({
-    skill: II, level: 4, prompt: `Ensemble des solutions de ${MT(d.start)} :`, options, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: d.op === '≤' || d.op === '<' ? `${RD(d.A)} ≥ 0, ${RD(d.B)} ≥ 0 et ${RD(d.A)} ≤ (${RD(d.B)})²` : 'Deux cas selon le signe de B.', note: '' }],
+    skill: II, level: 4, prompt: t('Ensemble des solutions de {e} :', { e: MT(d.start) }), options, key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: d.op === '≤' || d.op === '<' ? t('{a} ≥ 0, {b} ≥ 0 et {a} ≤ ({b})²', { a: RD(d.A), b: RD(d.B) }) : t('Deux cas selon le signe de B.'), note: '' }],
   }, rng);
 }
 
@@ -1179,16 +1184,16 @@ function iiMcq(rng) {
 
 const BO = 'g1-bound';
 const BO_SUB = [
-  { id: 'factor', label: 'factoriser', skill: 'fac-complete' },
-  { id: 'interval', label: '|x − a| ≤ r : encadrer x', skill: 'g1-abs-ineq' },
-  { id: 'bound', label: 'majorer chaque facteur', skill: BO },
+  { id: 'factor', label: t('factoriser'), skill: 'fac-complete' },
+  { id: 'interval', label: t('|x − a| ≤ r : encadrer x'), skill: 'g1-abs-ineq' },
+  { id: 'bound', label: t('majorer chaque facteur'), skill: BO },
 ];
 const BO_CHOICES = [
-  { id: 'factor', label: 'Factoriser pour faire apparaître |x − a|' },
-  { id: 'triangle', label: 'Inégalité triangulaire' },
-  { id: 'each', label: 'Majorer un facteur' },
-  { id: 'den', label: 'Minorer le dénominateur' },
-  { id: 'num', label: 'Majorer le numérateur' },
+  { id: 'factor', label: t('Factoriser pour faire apparaître |x − a|') },
+  { id: 'triangle', label: t('Inégalité triangulaire') },
+  { id: 'each', label: t('Majorer un facteur') },
+  { id: 'den', label: t('Minorer le dénominateur') },
+  { id: 'num', label: t('Majorer le numérateur') },
 ];
 const rT = (r) => (r.eq(1) ? '1' : r.d === 1 ? String(r.n) : `(${N(r)})`);
 
@@ -1207,9 +1212,9 @@ function boPoly(rng) {
     if (lo.valueOf() <= b && b <= hi.valueOf()) continue;
     const start = `|${E2}|`;
     const lines = [
-      E(`|${lin(a)}|×|${lin(b)}|`, 'Factoriser', 'factor', 'factor'),
+      E(`|${lin(a)}|×|${lin(b)}|`, t('Factoriser'), 'factor', 'factor'),
       E(`${rT(r)}×|${lin(b)}|`, `|${RD(lin(a))}| ≤ ${fr(N(r))}`, 'interval', 'each'),
-      E(N(C), `x ∈ [${fr(N(lo))} ; ${fr(N(hi))}], donc |${RD(lin(b))}| ≤ ${fr(N(q(Math.abs(a - b)).add(r)))}`, 'bound', 'each'),
+      E(N(C), t('x ∈ [{lo} ; {hi}], donc |{e}| ≤ {m}', { lo: fr(N(lo)), hi: fr(N(hi)), e: RD(lin(b)), m: fr(N(q(Math.abs(a - b)).add(r))) }), 'bound', 'each'),
     ];
     const hyp = `|${RD(lin(a))}| ≤ ${fr(N(r))}`;
     return { kind: 'poly', start, lines, lo, hi, C, bound: q(Math.ceil(C.valueOf())), hyp, a, b, r };
@@ -1233,8 +1238,8 @@ function boQuot(rng) {
     const den = lin(-c);
     const start = `|(x^2-${k})/${br(den)}|`;
     const lines = [
-      E(`|x^2-${k}|/${br(den)}`, `${RD(den)} > 0 sur l'intervalle`, 'interval', 'den'),
-      E(`${M.d === 1 ? N(M) : `(${N(M)})`}/${br(den)}`, `x² ∈ [${fr(N(lo.mul(lo)))} ; ${fr(N(hi.mul(hi)))}], donc |x² − ${k}| ≤ ${fr(N(M))}`, 'bound', 'num'),
+      E(`|x^2-${k}|/${br(den)}`, t('{d} > 0 sur l\'intervalle', { d: RD(den) }), 'interval', 'den'),
+      E(`${M.d === 1 ? N(M) : `(${N(M)})`}/${br(den)}`, t('x² ∈ [{lo} ; {hi}], donc |x² − {k}| ≤ {m}', { lo: fr(N(lo.mul(lo))), hi: fr(N(hi.mul(hi))), k, m: fr(N(M)) }), 'bound', 'num'),
       E(N(C), `${RD(den)} ≥ ${fr(N(lo.add(q(c))))}`, 'bound', 'den'),
     ];
     const hyp = `x ∈ [${fr(N(lo))} ; ${fr(N(hi))}]`;
@@ -1251,22 +1256,22 @@ function boItem(level, rng, opts = {}) {
   if (level === 1) script = [d.lines[0], d.lines[1], blanked(d.lines[2], [d.lines[2].math])];
   if (level === 2 && d.kind === 'poly') {
     script = [d.lines[0],
-      { kind: 'decision', prompt: `Comment majorer |${RD(lin(d.a))}| ?`, options: [
-        { id: 'r', label: `Par ${fr(N(d.r))}, l'hypothèse`, valid: true },
-        { id: 'a', label: `Par ${fr(N(d.a === 0 ? d.r.add(q(1)) : q(Math.abs(d.a)).add(d.r)))}`, valid: false, why: `L'hypothèse dit directement |${RD(lin(d.a))}| ≤ ${fr(N(d.r))}.` },
+      { kind: 'decision', prompt: t('Comment majorer |{e}| ?', { e: RD(lin(d.a)) }), options: [
+        { id: 'r', label: t('Par {r}, l\'hypothèse', { r: fr(N(d.r)) }), valid: true },
+        { id: 'a', label: t('Par {v}', { v: fr(N(d.a === 0 ? d.r.add(q(1)) : q(Math.abs(d.a)).add(d.r))) }), valid: false, why: t('L\'hypothèse dit directement |{e}| ≤ {r}.', { e: RD(lin(d.a)), r: fr(N(d.r)) }) },
       ] },
       d.lines[1],
-      { kind: 'decision', prompt: `Comment majorer |${RD(lin(d.b))}| sur [${fr(N(d.lo))} ; ${fr(N(d.hi))}] ?`, options: [
-        { id: 'max', label: `Par sa plus grande valeur sur l'intervalle, ${fr(N(q(Math.abs(d.a - d.b)).add(d.r)))}`, valid: true },
-        { id: 'min', label: `Par sa plus petite valeur sur l'intervalle`, valid: false, why: 'Pour majorer, il faut la plus grande valeur.' },
+      { kind: 'decision', prompt: t('Comment majorer |{e}| sur [{lo} ; {hi}] ?', { e: RD(lin(d.b)), lo: fr(N(d.lo)), hi: fr(N(d.hi)) }), options: [
+        { id: 'max', label: t('Par sa plus grande valeur sur l\'intervalle, {v}', { v: fr(N(q(Math.abs(d.a - d.b)).add(d.r))) }), valid: true },
+        { id: 'min', label: t('Par sa plus petite valeur sur l\'intervalle'), valid: false, why: t('Pour majorer, il faut la plus grande valeur.') },
       ] },
       d.lines[2]];
   }
-  const ask = free ? `Trouve une constante C telle que ${MT(d.start)} ≤ C pour ${d.hyp}.` : `Montre que si ${d.hyp}, alors ${MT(d.start)} ≤ ${fr(N(d.bound))}. Écris une chaîne de majorations.`;
+  const ask = free ? t('Trouve une constante C telle que {e} ≤ C pour {h}.', { e: MT(d.start), h: d.hyp }) : t('Montre que si {h}, alors {e} ≤ {b}. Écris une chaîne de majorations.', { h: d.hyp, e: MT(d.start), b: fr(N(d.bound)) });
   return linesItem({
     skill: BO, level, prompt: ask,
     start: d.start, judge: withMenus(judge, level, d.start, d.lines, BO_CHOICES), mode: modeOf(level), script,
-    hints: H(d.kind === 'poly' ? `Fais apparaître |${RD(lin(d.a))}|, que tu sais majorer.` : 'Majore le numérateur et minore le dénominateur.', MT(d.lines[0].math), MT(d.lines[1].math)),
+    hints: H(d.kind === 'poly' ? t('Fais apparaître |{e}|, que tu sais majorer.', { e: RD(lin(d.a)) }) : t('Majore le numérateur et minore le dénominateur.'), MT(d.lines[0].math), MT(d.lines[1].math)),
     subgoals: BO_SUB, keys: ['calc', 'ineq'], tapActions: level === 3 ? 'steps' : null,
     key: `${BO}:${level}:${d.start}:${d.hyp}`, exam: examOf(opts, 4),
   });
@@ -1278,14 +1283,15 @@ function boTf(rng) {
   const c = rng.int(1, 3);
   const wrong = q(1, hi * hi + c);
   const right = q(1, lo * lo + c);
+  // s: the French statement, kept for the key; st: the statement shown.
   const bank = [
-    { s: `Si x ∈ [${lo} ; ${hi}], alors 1/(x² + ${c}) ≤ ${fr(N(wrong))}.`, truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: `${lo}≤x≤${hi}⇒1/(x^2+${c})≤${N(wrong)}`, hyp: `${lo}≤x≤${hi}`, ask: [{ v: 'x', label: 'x =' }], answer: { x: String(lo) } }, why: `Faux : pour x = ${lo}, 1/(${lo * lo + c}) = ${fr(N(right))} > ${fr(N(wrong))}. Pour majorer 1/D, on minore D.`, rule: 'g1_bound_denominator' },
-      { s: `Si x ∈ [${lo} ; ${hi}], alors 1/(x² + ${c}) ≤ ${fr(N(right))}.`, truth: true, why: `Vrai : x² + ${c} ≥ ${lo * lo + c} sur l'intervalle.` },
-      { s: 'Pour tous a, b ∈ ℝ, |a − b| ≤ |a| − |b|.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }], pred: '|a-b|≤|a|-|b|', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '1', b: '-1' } }, why: 'Faux : a = 1, b = −1 donne 2 ≤ 0. L\'inégalité triangulaire est |a − b| ≤ |a| + |b|.', rule: 'g1_triangle_reverse' },
-      { s: 'Pour tous a, b ∈ ℝ, |a + b| ≤ |a| + |b|.', truth: true, why: 'Vrai : c\'est l\'inégalité triangulaire.' },
+    { s: `Si x ∈ [${lo} ; ${hi}], alors 1/(x² + ${c}) ≤ ${fr(N(wrong))}.`, st: t('Si x ∈ [{lo} ; {hi}], alors 1/(x² + {c}) ≤ {v}.', { lo, hi, c, v: fr(N(wrong)) }), truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: `${lo}≤x≤${hi}⇒1/(x^2+${c})≤${N(wrong)}`, hyp: `${lo}≤x≤${hi}`, ask: [{ v: 'x', label: 'x =' }], answer: { x: String(lo) } }, why: t('Faux : pour x = {lo}, 1/({d}) = {r} > {w}. Pour majorer 1/D, on minore D.', { lo, d: lo * lo + c, r: fr(N(right)), w: fr(N(wrong)) }), rule: 'g1_bound_denominator' },
+      { s: `Si x ∈ [${lo} ; ${hi}], alors 1/(x² + ${c}) ≤ ${fr(N(right))}.`, st: t('Si x ∈ [{lo} ; {hi}], alors 1/(x² + {c}) ≤ {v}.', { lo, hi, c, v: fr(N(right)) }), truth: true, why: t('Vrai : x² + {c} ≥ {d} sur l\'intervalle.', { c, d: lo * lo + c }) },
+      { s: 'Pour tous a, b ∈ ℝ, |a − b| ≤ |a| − |b|.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }], pred: '|a-b|≤|a|-|b|', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '1', b: '-1' } }, why: t('Faux : a = 1, b = −1 donne 2 ≤ 0. L\'inégalité triangulaire est |a − b| ≤ |a| + |b|.'), rule: 'g1_triangle_reverse' },
+      { s: 'Pour tous a, b ∈ ℝ, |a + b| ≤ |a| + |b|.', truth: true, why: t('Vrai : c\'est l\'inégalité triangulaire.') },
   ];
   const b = rng.pick(bank);
-  return tfItem({ skill: BO, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+  return tfItem({ skill: BO, level: 4, statement: b.st ?? t(b.s), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
 }
 
 // ======================================================================

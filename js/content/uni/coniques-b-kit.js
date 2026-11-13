@@ -6,6 +6,7 @@ import { Q } from '../../math/rational.js';
 import * as MX from '../../cas/matrix.js';
 import { q, qt, fq, sumT, nz, dot, pickW } from './geo-kit.js';
 import { analyzeConic } from '../../cas/conic.js';
+import { t } from '../../i18n.js';
 
 export const mtQ = (A) => `[${A.map((r) => `[${r.map(qt).join(',')}]`).join(',')}]`;
 export const matA = ([a, b, c]) => [[q(a), q(b).div(2)], [q(b).div(2), q(c)]];
@@ -49,8 +50,8 @@ export function natureOf(co) {
   return d.n < 0 ? 'hyp' : 'par';
 }
 export const NATURE_NAME = {
-  ell: 'une ellipse réelle', empty: 'l\'ensemble vide (ellipse imaginaire)', hyp: 'une hyperbole', par: 'une parabole',
-  pt: 'un point', lines: 'deux droites sécantes', par2: 'deux droites parallèles (ou confondues, ou rien)',
+  ell: t('une ellipse réelle'), empty: t('l\'ensemble vide (ellipse imaginaire)'), hyp: t('une hyperbole'), par: t('une parabole'),
+  pt: t('un point'), lines: t('deux droites sécantes'), par2: t('deux droites parallèles (ou confondues, ou rien)'),
 };
 
 // Text of a product of two lines (p₁x + q₁y + r₁)(p₂x + q₂y + r₂), expanded.

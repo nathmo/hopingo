@@ -14,6 +14,7 @@
 import {
   M, rd, term, joinT, CV, EQXY, KEYS_XY, linesOf, choice, opt, H, examTag, problemItem, multiOf,
 } from './cplx-a-kit.js';
+import { t } from '../../i18n.js';
 
 const KEYS = KEYS_XY;
 const eq = (math, note, subgoal, blank) => ({ math, note, subgoal, blank });
@@ -25,9 +26,9 @@ const pd = (f, v) => `pd(${f}, ${v})`;
 
 const CR = 'c-cauchy-riemann';
 const CR_SUB = [
-  { id: 'uv', label: 'u et v', skill: CR },
-  { id: 'partials', label: 'dérivées partielles', skill: 'a2-partials' },
-  { id: 'compare', label: 'comparer u_x et v_y, u_y et −v_x', skill: CR },
+  { id: 'uv', label: t('u et v'), skill: CR },
+  { id: 'partials', label: t('dérivées partielles'), skill: 'a2-partials' },
+  { id: 'compare', label: t('comparer u_x et v_y, u_y et −v_x'), skill: CR },
   { id: 'conclude', label: 'conclure', skill: CR },
 ];
 
@@ -104,56 +105,56 @@ function nonHoloData(rng) {
 }
 
 const CR_MENU = (right) => [
-  { id: 'uv', label: 'Remplacer z par x + iy, puis séparer partie réelle et partie imaginaire' },
-  { id: 'dx', label: 'Dériver par rapport à x (y est une constante)' },
-  { id: 'dy', label: 'Dériver par rapport à y (x est une constante)' },
-  { id: 'fp', label: 'f′(z) = u_x + i v_x, puis écrire en z' },
-  { id: 'sys', label: 'Résoudre u_x = v_y et u_y = −v_x' },
-  { id: 'abs', label: 'Prendre u = |f| et v = arg f', why: 'u et v sont les parties réelle et imaginaire de f.' },
-].map((o) => ({ ...o, valid: o.id === right, why: o.why || 'Ce n\'est pas l\'étape à faire maintenant.' }));
+  { id: 'uv', label: t('Remplacer z par x + iy, puis séparer partie réelle et partie imaginaire') },
+  { id: 'dx', label: t('Dériver par rapport à x (y est une constante)') },
+  { id: 'dy', label: t('Dériver par rapport à y (x est une constante)') },
+  { id: 'fp', label: t('f′(z) = u_x + i v_x, puis écrire en z') },
+  { id: 'sys', label: t('Résoudre u_x = v_y et u_y = −v_x') },
+  { id: 'abs', label: t('Prendre u = |f| et v = arg f'), why: t('u et v sont les parties réelle et imaginaire de f.') },
+].map((o) => ({ ...o, valid: o.id === right, why: o.why || t('Ce n\'est pas l\'étape à faire maintenant.') }));
 
 function crParts(d, level) {
   const split = CV({ vars: ['x', 'y'], real: ['x', 'y'], final: 'split' });
   const parts = [];
-  const uvLines = d.lines.map((m, i) => eq(m, i === 0 ? 'z = x + iy' : 'regrouper les termes en i', 'uv', i === d.lines.length - 1 ? [d.v === '0' ? d.u : d.v] : []));
+  const uvLines = d.lines.map((m, i) => eq(m, i === 0 ? 'z = x + iy' : t('regrouper les termes en i'), 'uv', i === d.lines.length - 1 ? [d.v === '0' ? d.u : d.v] : []));
   const start = d.start;
   if (level === 1) {
-    parts.push({ html: `On a ${M(`u = ${d.u}`)} et ${M(`v = ${d.v}`)}.`, ask: 'u_x =', start: pd(d.u, 'x'), judge: EQXY(), lines: [eq(d.ux, 'y constante', 'partials', [d.ux])], menu: CR_MENU('dx') });
+    parts.push({ html: t('On a {a} et {b}.', { a: M(`u = ${d.u}`), b: M(`v = ${d.v}`) }), ask: 'u_x =', start: pd(d.u, 'x'), judge: EQXY(), lines: [eq(d.ux, t('y constante'), 'partials', [d.ux])], menu: CR_MENU('dx') });
   } else {
     parts.push({
       start, judge: split, lines: uvLines, menu: CR_MENU('uv'),
       decisions: [{
-        kind: 'decision', prompt: 'Comment étudier f ?', levels: [3], options: [
-          { id: 'uv', label: 'Écrire u et v, puis vérifier Cauchy-Riemann', valid: true, ref: true },
+        kind: 'decision', prompt: t('Comment étudier f ?'), levels: [3], options: [
+          { id: 'uv', label: t('Écrire u et v, puis vérifier Cauchy-Riemann'), valid: true, ref: true },
           d.holo
-            ? { id: 'comp', label: 'Reconnaître une fonction holomorphe connue', valid: true, quality: 'poor', why: 'Juste, mais on demande ici de vérifier Cauchy-Riemann avec u et v.' }
-            : { id: 'comp', label: 'Reconnaître une fonction holomorphe connue', valid: false, rule: 'c_conj_not_holo', why: `${rd(d.name)} contient z̄, |z| ou Re z : ce n'est pas une composition de fonctions holomorphes.` },
+            ? { id: 'comp', label: t('Reconnaître une fonction holomorphe connue'), valid: true, quality: 'poor', why: t('Juste, mais on demande ici de vérifier Cauchy-Riemann avec u et v.') }
+            : { id: 'comp', label: t('Reconnaître une fonction holomorphe connue'), valid: false, rule: 'c_conj_not_holo', why: t('{name} contient z̄, |z| ou Re z : ce n\'est pas une composition de fonctions holomorphes.', { name: rd(d.name) }) },
         ],
       }],
     });
-    parts.push({ html: 'Les dérivées partielles :', ask: 'u_x =', start: pd(d.u, 'x'), judge: EQXY(), lines: [eq(d.ux, 'y constante', 'partials', [d.ux])], menu: CR_MENU('dx') });
+    parts.push({ html: t('Les dérivées partielles :'), ask: 'u_x =', start: pd(d.u, 'x'), judge: EQXY(), lines: [eq(d.ux, t('y constante'), 'partials', [d.ux])], menu: CR_MENU('dx') });
   }
-  parts.push({ html: 'Puis v_y :', ask: 'v_y =', start: pd(d.v, 'y'), judge: EQXY(), lines: [eq(d.vy, 'x constante', 'partials', [d.vy])], menu: CR_MENU('dy') });
-  parts.push({ html: 'u_y :', ask: 'u_y =', start: pd(d.u, 'y'), judge: EQXY(), lines: [eq(d.uy, 'x constante', 'partials', [d.uy])], menu: CR_MENU('dy') });
-  parts.push({ html: 'v_x :', ask: 'v_x =', start: pd(d.v, 'x'), judge: EQXY(), lines: [eq(d.vx, 'y constante', 'partials', [d.vx])], menu: CR_MENU('dx') });
+  parts.push({ html: t('Puis v_y :'), ask: 'v_y =', start: pd(d.v, 'y'), judge: EQXY(), lines: [eq(d.vy, t('x constante'), 'partials', [d.vy])], menu: CR_MENU('dy') });
+  parts.push({ html: 'u_y :', ask: 'u_y =', start: pd(d.u, 'y'), judge: EQXY(), lines: [eq(d.uy, t('x constante'), 'partials', [d.uy])], menu: CR_MENU('dy') });
+  parts.push({ html: 'v_x :', ask: 'v_x =', start: pd(d.v, 'x'), judge: EQXY(), lines: [eq(d.vx, t('y constante'), 'partials', [d.vx])], menu: CR_MENU('dx') });
   const compare = {
-    kind: 'decision', prompt: 'Les équations de Cauchy-Riemann sont :', options: [
-      { id: 'cr', label: 'u_x = v_y et u_y = −v_x', valid: true },
-      { id: 'sign', label: 'u_x = v_y et u_y = v_x', valid: false, rule: 'c_cr_sign', why: 'Le signe : u_y = −v_x.' },
-      { id: 'swap', label: 'u_x = u_y et v_x = v_y', valid: false, why: 'On compare la dérivée de u en x avec celle de v en y.' },
+    kind: 'decision', prompt: t('Les équations de Cauchy-Riemann sont :'), options: [
+      { id: 'cr', label: t('u_x = v_y et u_y = −v_x'), valid: true },
+      { id: 'sign', label: t('u_x = v_y et u_y = v_x'), valid: false, rule: 'c_cr_sign', why: t('Le signe : u_y = −v_x.') },
+      { id: 'swap', label: t('u_x = u_y et v_x = v_y'), valid: false, why: t('On compare la dérivée de u en x avec celle de v en y.') },
     ],
   };
   if (d.holo) {
     parts.push({
-      html: level <= 2 ? `u_x = v_y = ${M(d.ux)} et u_y = −v_x = ${M(d.uy)} partout : f est holomorphe sur ℂ, et f′ = u_x + i v_x.` : 'Conclus, et calcule la dérivée :', ask: 'f′(z) =',
+      html: level <= 2 ? t('u_x = v_y = {ux} et u_y = −v_x = {uy} partout : f est holomorphe sur ℂ, et f′ = u_x + i v_x.', { ux: M(d.ux), uy: M(d.uy) }) : t('Conclus, et calcule la dérivée :'), ask: 'f′(z) =',
       start: `${d.ux}+i(${d.vx})`, judge: CV({ vars: ['x', 'y', 'z'], real: ['x', 'y'], z: true, final: 'z' }), decisions: [compare],
-      lines: [eq(d.fp, 'écrire en z = x + iy', 'conclude', [d.fp])], menu: CR_MENU('fp'),
+      lines: [eq(d.fp, t('écrire en z = x + iy'), 'conclude', [d.fp])], menu: CR_MENU('fp'),
     });
   } else {
     parts.push({
-      html: 'Cauchy-Riemann n\'est vérifié qu\'aux points solutions du système :', ask: '⇔',
+      html: t('Cauchy-Riemann n\'est vérifié qu\'aux points solutions du système :'), ask: '⇔',
       start: d.sys, judge: { kind: 'system', vars: ['x', 'y'], solutions: [d.sol.map(String)] }, decisions: [compare],
-      lines: [eq(`x = ${d.sol[0]} ; y = ${d.sol[1]}`, 'un seul point : f n\'est holomorphe sur aucun ouvert', 'conclude', [String(d.sol[0]), String(d.sol[1])])], menu: CR_MENU('sys'),
+      lines: [eq(`x = ${d.sol[0]} ; y = ${d.sol[1]}`, t('un seul point : f n\'est holomorphe sur aucun ouvert'), 'conclude', [String(d.sol[0]), String(d.sol[1])])], menu: CR_MENU('sys'),
     });
   }
   // The first part's html when the item starts with u, v given.
@@ -164,9 +165,9 @@ function crLines(level, rng, opts, holo = rng.chance(0.55)) {
   const d = holo ? holoData(rng) : nonHoloData(rng);
   return linesOf({
     level, skill: CR, key: `${CR}:${level}:${d.key}`, keys: KEYS, subgoals: CR_SUB, exam: examTag(opts, 2.5),
-    prompt: `${M(`f(z) = ${d.name}`)}. Écris u et v, calcule leurs dérivées partielles et étudie les équations de Cauchy-Riemann.`,
+    prompt: t('{a}. Écris u et v, calcule leurs dérivées partielles et étudie les équations de Cauchy-Riemann.', { a: M(`f(z) = ${d.name}`) }),
     parts: crParts(d, level),
-    hints: H('Écris u = Re f et v = Im f en x et y, puis compare u_x avec v_y et u_y avec −v_x.', `${M(`u_x = ${d.ux}`)}, ${M(`v_y = ${d.vy}`)}`, d.holo ? `f′(z) = ${M(d.fp)}` : M(d.sys)),
+    hints: H(t('Écris u = Re f et v = Im f en x et y, puis compare u_x avec v_y et u_y avec −v_x.'), `${M(`u_x = ${d.ux}`)}, ${M(`v_y = ${d.vy}`)}`, d.holo ? `f′(z) = ${M(d.fp)}` : M(d.sys)),
   });
 }
 
@@ -177,8 +178,8 @@ function crProblem(level, rng, opts) {
   const [p1, p2] = first ? [a, b] : [b, a];
   return problemItem({
     skill: CR, level, key: `${level}:${p1.key}:${p2.key}`, exam: examTag(opts, 6),
-    prompt: 'Étudie l\'holomorphie des deux fonctions (Cauchy-Riemann).',
-    parts: [{ item: p1, points: 3, title: 'Première fonction' }, { item: p2, points: 3, title: 'Seconde fonction' }],
+    prompt: t('Étudie l\'holomorphie des deux fonctions (Cauchy-Riemann).'),
+    parts: [{ item: p1, points: 3, title: t('Première fonction') }, { item: p2, points: 3, title: t('Seconde fonction') }],
   });
 }
 
@@ -189,7 +190,7 @@ function crMcq(level, rng, opts) {
   if (opts.multi) {
     const pool = [...HOLO.map((f) => ({ html: M(`f(z) = ${f}`), correct: true })), ...NONHOLO.map(([f, r]) => ({ html: M(`f(z) = ${f}`), correct: false, rule: r }))];
     const s = multiOf(rng, pool.map((x) => ({ ...x, truth: x.correct })), 5);
-    return choice({ skill: CR, level, multi: true, key: `multi:${s.map((x) => pool.findIndex((y) => y.html === x.html)).join('')}`, exam: examTag(opts, 2), prompt: 'Cochez les fonctions holomorphes sur ℂ (z = x + iy).', options: s.map(({ truth, ...x }) => x) }, rng);
+    return choice({ skill: CR, level, multi: true, key: `multi:${s.map((x) => pool.findIndex((y) => y.html === x.html)).join('')}`, exam: examTag(opts, 2), prompt: t('Cochez les fonctions holomorphes sur ℂ (z = x + iy).'), options: s.map(({ truth, ...x }) => x) }, rng);
   }
   const right = rng.pick(HOLO);
   const wrongs = [];
@@ -197,9 +198,9 @@ function crMcq(level, rng, opts) {
   while (wrongs.length < 3) { const [f, r] = pool.splice(rng.int(0, pool.length - 1), 1)[0]; wrongs.push(opt(`f(z) = ${f}`, r)); }
   return choice({
     skill: CR, level, key: `mcq:${right}:${wrongs.map((w) => w.html.length).join('')}`, exam: examTag(opts, 2),
-    prompt: 'Laquelle de ces fonctions est holomorphe sur ℂ (z = x + iy) ?',
+    prompt: t('Laquelle de ces fonctions est holomorphe sur ℂ (z = x + iy) ?'),
     right: M(`f(z) = ${right}`), wrongs,
-    solution: [{ html: `${M(`f(z) = ${right}`)} est une composition de fonctions holomorphes. Pour z̄ : u_x = 1 ≠ v_y = −1.`, note: '' }],
+    solution: [{ html: t('{a} est une composition de fonctions holomorphes. Pour z̄ : u_x = 1 ≠ v_y = −1.', { a: M(`f(z) = ${right}`) }), note: '' }],
   }, rng);
 }
 
@@ -210,9 +211,9 @@ function crMcq(level, rng, opts) {
 const HC = 'c-harmonic-conj';
 const HC_SUB = [
   { id: 'harmonic', label: 'Δv = 0', skill: HC },
-  { id: 'integrate', label: 'u_x = v_y, intégrer en x', skill: HC },
-  { id: 'compare', label: 'u_y = −v_x fixe α(y)', skill: 'c-cauchy-riemann' },
-  { id: 'in-z', label: 'écrire f en z', skill: HC },
+  { id: 'integrate', label: t('u_x = v_y, intégrer en x'), skill: HC },
+  { id: 'compare', label: t('u_y = −v_x fixe α(y)'), skill: 'c-cauchy-riemann' },
+  { id: 'in-z', label: t('écrire f en z'), skill: HC },
 ];
 
 // v = Im f for f = a z² + b z³ + c z + e e^z + d i z² (+ g e^(z²)).
@@ -255,48 +256,48 @@ function hcParts(d, level) {
   const hasAlpha = d.a !== 0;
   const parts = [];
   {
-    parts.push({ html: 'v doit être harmonique :', ask: 'Δv =', start: lap, judge: EQXY('constant'), lines: lapLines, menu: HC_MENU('lap') });
+    parts.push({ html: t('v doit être harmonique :'), ask: 'Δv =', start: lap, judge: EQXY('constant'), lines: lapLines, menu: HC_MENU('lap') });
     parts.push({
-      html: 'u_x = v_y, intégré en x, puis u_y = −v_x :', ask: 'u =', start: `u = int(${d.vy}, x)`, judge: grad,
+      html: t('u_x = v_y, intégré en x, puis u_y = −v_x :'), ask: 'u =', start: `u = int(${d.vy}, x)`, judge: grad,
       decisions: [{
-        kind: 'decision', prompt: 'Comment trouver u ?', levels: [3], options: [
-          { id: 'cr', label: 'Intégrer les équations de Cauchy-Riemann', valid: true, ref: true },
-          { id: 'guess', label: 'Reconnaître Im de zⁿ, de e^z, de e^(z²)', valid: true },
-          { id: 'sign', label: 'Intégrer u_y = v_x', valid: false, rule: 'c_cr_sign', why: 'Cauchy-Riemann : u_y = −v_x.' },
+        kind: 'decision', prompt: t('Comment trouver u ?'), levels: [3], options: [
+          { id: 'cr', label: t('Intégrer les équations de Cauchy-Riemann'), valid: true, ref: true },
+          { id: 'guess', label: t('Reconnaître Im de zⁿ, de e^z, de e^(z²)'), valid: true },
+          { id: 'sign', label: t('Intégrer u_y = v_x'), valid: false, rule: 'c_cr_sign', why: t('Cauchy-Riemann : u_y = −v_x.') },
         ],
       }],
-      lines: [eq(`u = ${d.uint}+α(y)`, 'u_x = v_y, intégré en x', 'integrate', [d.uint]), eq(`u = ${d.u}+C`, 'u_y = −v_x fixe α(y)', 'compare', hasAlpha ? [term(-d.a, 'y^2')] : [d.uint])],
+      lines: [eq(`u = ${d.uint}+α(y)`, t('u_x = v_y, intégré en x'), 'integrate', [d.uint]), eq(`u = ${d.u}+C`, t('u_y = −v_x fixe α(y)'), 'compare', hasAlpha ? [term(-d.a, 'y^2')] : [d.uint])],
       menu: HC_MENU('int'),
     });
   }
   parts.push({
-    html: level <= 2 ? 'Sur l\'axe réel, f(x) = u(x, 0) + i v(x, 0) ; puis on remplace x par z :' : 'f = u + iv, écrite en z :', ask: 'f(z) =',
+    html: level <= 2 ? t('Sur l\'axe réel, f(x) = u(x, 0) + i v(x, 0) ; puis on remplace x par z :') : t('f = u + iv, écrite en z :'), ask: 'f(z) =',
     start: `${d.u}+C+i(${d.v})`, judge: CV({ vars: ['x', 'y', 'z', 'C'], real: ['x', 'y', 'C'], z: true, final: 'z' }),
     decisions: [{
-      kind: 'decision', prompt: 'La constante C est :', options: [
-        { id: 'real', label: 'réelle : Im f = v est imposée', valid: true },
-        { id: 'cplx', label: 'complexe quelconque', valid: false, rule: 'c_harmonic_const_imag', why: 'Une constante iC changerait v = Im f, qui est donnée.' },
+      kind: 'decision', prompt: t('La constante C est :'), options: [
+        { id: 'real', label: t('réelle : Im f = v est imposée'), valid: true },
+        { id: 'cplx', label: t('complexe quelconque'), valid: false, rule: 'c_harmonic_const_imag', why: t('Une constante iC changerait v = Im f, qui est donnée.') },
       ],
     }],
-    lines: [eq(`${d.fz}+C`, 'f(x) = u(x, 0) + i v(x, 0), puis x → z', 'in-z', [d.fz])],
+    lines: [eq(`${d.fz}+C`, t('f(x) = u(x, 0) + i v(x, 0), puis x → z'), 'in-z', [d.fz])],
     menu: HC_MENU('z'),
   });
   return parts;
 }
 const HC_MENU = (right) => [
-  { id: 'lap', label: 'Calculer v_xx + v_yy' },
-  { id: 'int', label: 'Intégrer u_x = v_y en x, puis u_y = −v_x' },
-  { id: 'z', label: 'Écrire f(x) = u(x, 0) + i v(x, 0), puis remplacer x par z' },
-  { id: 'sign', label: 'Intégrer u_y = v_x', rule: 'c_cr_sign', why: 'Cauchy-Riemann : u_y = −v_x.' },
-].map((o) => ({ ...o, valid: o.id === right, why: o.why || 'Ce n\'est pas l\'étape à faire maintenant.' }));
+  { id: 'lap', label: t('Calculer v_xx + v_yy') },
+  { id: 'int', label: t('Intégrer u_x = v_y en x, puis u_y = −v_x') },
+  { id: 'z', label: t('Écrire f(x) = u(x, 0) + i v(x, 0), puis remplacer x par z') },
+  { id: 'sign', label: t('Intégrer u_y = v_x'), rule: 'c_cr_sign', why: t('Cauchy-Riemann : u_y = −v_x.') },
+].map((o) => ({ ...o, valid: o.id === right, why: o.why || t('Ce n\'est pas l\'étape à faire maintenant.') }));
 
 function hcLines(level, rng, opts, big = false) {
   const d = hcData(rng, big) || FALLBACK;
   return linesOf({
     level, skill: HC, key: `${HC}:${level}:${d.key}`, keys: KEYS, subgoals: HC_SUB, exam: examTag(opts, 5), fallback: d.fallback,
-    prompt: `Trouve f holomorphe sur ℂ telle que ${M(`Im(f) = ${d.v}`)}, et écris-la en z.`,
+    prompt: t('Trouve f holomorphe sur ℂ telle que {a}, et écris-la en z.', { a: M(`Im(f) = ${d.v}`) }),
     parts: hcParts(d, level),
-    hints: H('Vérifie Δv = 0, puis u_x = v_y donne u à une fonction α(y) près ; u_y = −v_x fixe α.', M(`u = ${d.uint}+α(y)`), M(`u = ${d.u}+C`)),
+    hints: H(t('Vérifie Δv = 0, puis u_x = v_y donne u à une fonction α(y) près ; u_y = −v_x fixe α.'), M(`u = ${d.uint}+α(y)`), M(`u = ${d.u}+C`)),
   });
 }
 
@@ -309,32 +310,32 @@ function hcProblem(level, rng, opts) {
 }
 
 const HC_STATEMENTS = [
-  { html: `${M('v = x^2-y^2')} est la partie imaginaire d'une fonction holomorphe`, truth: true },
-  { html: `${M('v = x^2+y^2')} est la partie imaginaire d'une fonction holomorphe`, truth: false },
-  { html: 'si v est donnée, f est déterminée à une constante réelle près', truth: true },
-  { html: 'si v est donnée, f est déterminée à une constante complexe près', truth: false, rule: 'c_harmonic_const_imag' },
-  { html: `la partie réelle d'une fonction holomorphe est harmonique`, truth: true },
-  { html: `${M('u_y = v_x')} pour toute fonction holomorphe f = u + iv`, truth: false, rule: 'c_cr_sign' },
+  { html: t('{a} est la partie imaginaire d\'une fonction holomorphe', { a: M('v = x^2-y^2') }), truth: true },
+  { html: t('{a} est la partie imaginaire d\'une fonction holomorphe', { a: M('v = x^2+y^2') }), truth: false },
+  { html: t('si v est donnée, f est déterminée à une constante réelle près'), truth: true },
+  { html: t('si v est donnée, f est déterminée à une constante complexe près'), truth: false, rule: 'c_harmonic_const_imag' },
+  { html: t('la partie réelle d\'une fonction holomorphe est harmonique'), truth: true },
+  { html: t('{a} pour toute fonction holomorphe f = u + iv', { a: M('u_y = v_x') }), truth: false, rule: 'c_cr_sign' },
 ];
 
 function hcMcq(level, rng, opts) {
   if (opts.multi) {
     const s = multiOf(rng, HC_STATEMENTS, 5);
-    return choice({ skill: HC, level, multi: true, key: `multi:${s.map((x) => HC_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: 'Cochez les affirmations vraies.', options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
+    return choice({ skill: HC, level, multi: true, key: `multi:${s.map((x) => HC_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: t('Cochez les affirmations vraies.'), options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
   }
   let d = null;
   for (let k = 0; k < 50 && !(d && d.a); k++) d = hcData(rng);
   if (!d || !d.a) d = FALLBACK;
   return choice({
     skill: HC, level, key: `mcq:${d.key}`, exam: examTag(opts, 2), fallback: d.fallback,
-    prompt: `f est holomorphe sur ℂ et ${M(`Im(f) = ${d.v}`)}. Alors :`,
+    prompt: t('f est holomorphe sur ℂ et {a}. Alors :', { a: M(`Im(f) = ${d.v}`) }),
     right: `${M(`f(z) = ${d.fz}+C`)}, C ∈ ℝ`,
     wrongs: [
       { html: `${M(`f(z) = ${d.conjF}+C`)}, C ∈ ℝ`, rule: 'c_cr_sign' },
       { html: `${M(`f(z) = ${d.fz}+C`)}, C ∈ ℂ`, rule: 'c_harmonic_const_imag' },
       { html: `${M(`f(z) = i(${d.fz})+C`)}, C ∈ ℝ` },
     ],
-    solution: [{ html: `u = ${M(d.u)} + C par Cauchy-Riemann ; sur l'axe réel f(x) = u(x, 0) + i v(x, 0), donc ${M(`f(z) = ${d.fz}+C`)} avec C réel.`, note: '' }],
+    solution: [{ html: t('u = {u} + C par Cauchy-Riemann ; sur l\'axe réel f(x) = u(x, 0) + i v(x, 0), donc {a} avec C réel.', { u: M(d.u), a: M(`f(z) = ${d.fz}+C`) }), note: '' }],
     expectedSec: 150,
   }, rng);
 }

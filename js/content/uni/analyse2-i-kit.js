@@ -9,6 +9,7 @@ import { Q } from '../../math/rational.js';
 import { tokenize, normalizeText } from '../../cas/parse.js';
 import { MT, mcq } from './kit.js';
 import { N } from './analyse1-e-kit.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => new Q(n, d);
 const Z = q(0);
@@ -273,7 +274,7 @@ export function blankTail(math, piece) {
 // The level-3 menu of a part: the action `id` is the right one.
 export const menuOf = (choices, id) => choices.map((c) => ({
   id: c.id, label: c.label, valid: c.id === id,
-  why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+  why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
   ...(c.rule && c.id !== id ? { rule: c.rule } : {}),
 }));
 
@@ -292,8 +293,8 @@ export function mcq4(o, rng) {
 // counter-example), with the exam tag `tf`.
 export function vfMcq(skill, statement, truth, rng, { key, why, ruleIfTrue = null, ruleIfFalse = null, exam = true, level = 4 }) {
   return mcq({
-    skill, level, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth, rule: truth ? ruleIfFalse : null }],
+    skill, level, prompt: t('Vrai ou faux ?<br>« {statement} »', { statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth, rule: truth ? ruleIfFalse : null }],
     key: `${skill}:tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: exam ? { format: 'tf', points: 1 } : false,
   }, rng);
 }

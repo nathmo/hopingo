@@ -13,6 +13,7 @@
 import { statItem, coefItem, openItem, choice, tf, numCounter, H, SM, examTag } from './proba-kit.js';
 import { dataSet, sqDevs, tq, tqText, testConclusion, ciInterpret, quantileDecision, dec, val, sc, list } from './proba-d-kit.js';
 import { Phi, roundTo, phiTable, fInv } from '../../cas/stats.js';
+import { t } from '../../i18n.js';
 
 const pick = (rng, xs) => xs[rng.int(0, xs.length - 1)];
 const phiT = (z) => (z >= 0 ? (phiTable(roundTo(z, 3)) ?? roundTo(Phi(z), 3)) : 1 - (phiTable(roundTo(-z, 3)) ?? roundTo(Phi(-z), 3)));
@@ -24,8 +25,8 @@ const grid = (rng, lo, hi) => roundTo(rng.int(Math.round(lo / 0.025), Math.round
 
 const TS = 'p-test-setup';
 const TS_SUB = [
-  { id: 'hyp', label: 'hypothèses, côté, région, p-valeur', skill: TS },
-  { id: 'phi', label: 'lecture de Φ', skill: 'p-normal-std' },
+  { id: 'hyp', label: t('hypothèses, côté, région, p-valeur'), skill: TS },
+  { id: 'phi', label: t('lecture de Φ'), skill: 'p-normal-std' },
 ];
 // {q: question, par, v0 (shown), side: right | left | two, claim (H₀ in words)}
 const SCEN = [
@@ -43,23 +44,25 @@ const SCEN = [
   { q: 'Les contrôles radar font-ils baisser la vitesse moyenne μ, qui était de 50 km/h ?', par: 'μ', v0: '50', side: 'left', claim: 'la vitesse moyenne vaut 50 km/h' },
   { q: 'La consommation moyenne μ d’une voiture diffère-t-elle des 6 L/100 km annoncés ?', par: 'μ', v0: '6', side: 'two', claim: 'la consommation moyenne vaut 6 L/100 km' },
 ];
+// The questions and claims, shown in the language of the page.
+for (const s of SCEN) { s.q = t(s.q); s.claim = t(s.claim); }
 const OP = { right: '>', left: '<', two: '≠' };
-const pair = (s, h0op, h1op) => `H₀ : ${s.par} ${h0op} ${s.v0} contre H₁ : ${s.par} ${h1op} ${s.v0}`;
+const pair = (s, h0op, h1op) => t('H₀ : {par} {a} {v0} contre H₁ : {par} {b} {v0}', { par: s.par, a: h0op, b: h1op, v0: s.v0 });
 
 // The menu of hypotheses: the right pair, then the traps.
 function pairOptions(s, count) {
   const right = { id: 'ok', label: pair(s, '=', OP[s.side]), valid: true };
   const wrong = [];
   if (s.side !== 'two') {
-    wrong.push({ id: 'dir', label: pair(s, OP[s.side], '='), valid: false, rule: 'p_h0_direction', why: 'Ce que l’on veut établir va en H₁ ; H₀ garde l’égalité.' });
-    wrong.push({ id: 'two', label: pair(s, '=', '≠'), valid: false, rule: 'p_one_two_sided', why: `Seul un sens intéresse (« ${s.side === 'right' ? 'dépasse, augmente' : 'diminue, moins'} ») : le test est unilatéral.` });
-    wrong.push({ id: 'side', label: pair(s, '=', s.side === 'right' ? '<' : '>'), valid: false, rule: 'p_one_two_sided', why: 'H₁ va dans le sens de la question.' });
-    wrong.push({ id: 'neq', label: pair(s, '≠', '='), valid: false, rule: 'p_h0_direction', why: 'H₀ contient l’égalité : c’est elle que l’on suppose pour calculer.' });
+    wrong.push({ id: 'dir', label: pair(s, OP[s.side], '='), valid: false, rule: 'p_h0_direction', why: t('Ce que l’on veut établir va en H₁ ; H₀ garde l’égalité.') });
+    wrong.push({ id: 'two', label: pair(s, '=', '≠'), valid: false, rule: 'p_one_two_sided', why: s.side === 'right' ? t('Seul un sens intéresse (« dépasse, augmente ») : le test est unilatéral.') : t('Seul un sens intéresse (« diminue, moins ») : le test est unilatéral.') });
+    wrong.push({ id: 'side', label: pair(s, '=', s.side === 'right' ? '<' : '>'), valid: false, rule: 'p_one_two_sided', why: t('H₁ va dans le sens de la question.') });
+    wrong.push({ id: 'neq', label: pair(s, '≠', '='), valid: false, rule: 'p_h0_direction', why: t('H₀ contient l’égalité : c’est elle que l’on suppose pour calculer.') });
   } else {
-    wrong.push({ id: 'one', label: pair(s, '=', '>'), valid: false, rule: 'p_one_two_sided', why: 'La question ne privilégie aucun sens : test bilatéral.' });
-    wrong.push({ id: 'dir', label: pair(s, '≠', '='), valid: false, rule: 'p_h0_direction', why: 'H₀ contient l’égalité ; H₁ est ce que l’on cherche à établir.' });
-    wrong.push({ id: 'one2', label: pair(s, '=', '<'), valid: false, rule: 'p_one_two_sided', why: 'La question ne privilégie aucun sens : test bilatéral.' });
-    wrong.push({ id: 'ge', label: pair(s, '>', '≤'), valid: false, rule: 'p_h0_direction', why: 'H₀ garde l’égalité.' });
+    wrong.push({ id: 'one', label: pair(s, '=', '>'), valid: false, rule: 'p_one_two_sided', why: t('La question ne privilégie aucun sens : test bilatéral.') });
+    wrong.push({ id: 'dir', label: pair(s, '≠', '='), valid: false, rule: 'p_h0_direction', why: t('H₀ contient l’égalité ; H₁ est ce que l’on cherche à établir.') });
+    wrong.push({ id: 'one2', label: pair(s, '=', '<'), valid: false, rule: 'p_one_two_sided', why: t('La question ne privilégie aucun sens : test bilatéral.') });
+    wrong.push({ id: 'ge', label: pair(s, '>', '≤'), valid: false, rule: 'p_h0_direction', why: t('H₀ garde l’égalité.') });
   }
   return [right, ...wrong.slice(0, count - 1)];
 }
@@ -90,67 +93,67 @@ function tsItem(level, rng, profile, opts = {}) {
   const s = pick(rng, SCEN);
   if (opts.exam === 'mcq') {
     const o = pairOptions(s, 5);
-    return choice({ skill: TS, level: 4, key: `mcq:${SCEN.indexOf(s)}`, exam: examTag(opts), prompt: `${s.q} Quelles hypothèses tester ?`, right: o[0].label, wrongs: o.slice(1).map((x) => ({ html: x.label, rule: x.rule })), count: 5 }, rng);
+    return choice({ skill: TS, level: 4, key: `mcq:${SCEN.indexOf(s)}`, exam: examTag(opts), prompt: `${s.q} ${t('Quelles hypothèses tester ?')}`, right: o[0].label, wrongs: o.slice(1).map((x) => ({ html: x.label, rule: x.rule })), count: 5 }, rng);
   }
   if (opts.exam === 'tf') {
     if (rng.chance(0.5)) {
-      return tf({ skill: TS, key: 'pval-min', exam: examTag(opts), truth: true, statement: 'La p-valeur est la plus petite valeur de α pour laquelle on rejette H₀.', explanation: 'On rejette au niveau α exactement quand p_obs < α.' });
+      return tf({ skill: TS, key: 'pval-min', exam: examTag(opts), truth: true, statement: t('La p-valeur est la plus petite valeur de α pour laquelle on rejette H₀.'), explanation: t('On rejette au niveau α exactement quand p_obs < α.') });
     }
     const p = pick(rng, ['0,03', '0,02', '0,04']);
     return tf({
       skill: TS, key: `p-${p}`, exam: examTag(opts), truth: false, ruleIfTrue: 'p_reject_10_5',
-      statement: `Si p_obs = ${p}, on rejette H₀ au niveau 5 % et au niveau 1 %.`,
-      explanation: `${p} < 0,05 : rejet à 5 % ; mais ${p} > 0,01 : pas de rejet à 1 %.`,
-      counter: numCounter({ vars: [{ v: 'a', label: 'Un de ces deux niveaux où l’on ne rejette pas : α =' }], hyp: 'a=0,05∨a=0,01', pred: `${p}<a`, answer: { a: '0,01' } }),
+      statement: t('Si p_obs = {p}, on rejette H₀ au niveau 5 % et au niveau 1 %.', { p }),
+      explanation: t('{p} < 0,05 : rejet à 5 % ; mais {p} > 0,01 : pas de rejet à 1 %.', { p }),
+      counter: numCounter({ vars: [{ v: 'a', label: t('Un de ces deux niveaux où l’on ne rejette pas : α =') }], hyp: 'a=0,05∨a=0,01', pred: `${p}<a`, answer: { a: '0,01' } }),
     });
   }
   // t_obs: on the grid, on the side of H₁.
-  let t = grid(rng, 0.5, 3.5);
-  if (s.side === 'left') t = -t;
+  let tobs = grid(rng, 0.5, 3.5);
+  if (s.side === 'left') tobs = -tobs;
   const alpha = pick(rng, [5, 5, 1]);
-  const pv = pvalue(s.side, t);
+  const pv = pvalue(s.side, tobs);
   const zc = zCrit(s.side, alpha);
   const reject = pv.v < alpha / 100;
   if (Math.abs(pv.v - alpha / 100) < 0.004) return tsItem(level, rng, profile, opts);
   const count = level === 1 ? 3 : 5;
   const decisions = [
-    { prompt: 'Quelles hypothèses ?', options: pairOptions(s, count) },
-    { prompt: 'Le test est…', options: [
-      { id: 'side', label: s.side === 'two' ? 'bilatéral' : `unilatéral ${s.side === 'right' ? 'à droite' : 'à gauche'}`, valid: true },
-      { id: 'other', label: s.side === 'two' ? 'unilatéral' : 'bilatéral', valid: false, rule: 'p_one_two_sided', why: s.side === 'two' ? 'Aucun sens n’est privilégié.' : 'Un seul sens intéresse.' },
+    { prompt: t('Quelles hypothèses ?'), options: pairOptions(s, count) },
+    { prompt: t('Le test est…'), options: [
+      { id: 'side', label: s.side === 'two' ? t('bilatéral') : s.side === 'right' ? t('unilatéral à droite') : t('unilatéral à gauche'), valid: true },
+      { id: 'other', label: s.side === 'two' ? t('unilatéral') : t('bilatéral'), valid: false, rule: 'p_one_two_sided', why: s.side === 'two' ? t('Aucun sens n’est privilégié.') : t('Un seul sens intéresse.') },
     ] },
   ];
   const parts = [
     {
-      label: 't_c', name: 'tc', kind: 'stat', expect: val(zc.v), decimals: 3, accept: s.side === 'left' ? [...zc.acc, ...zc.acc.map((x) => `-${x}`)] : zc.acc, action: 'Région critique : le quantile de la loi normale',
+      label: 't_c', name: 'tc', kind: 'stat', expect: val(zc.v), decimals: 3, accept: s.side === 'left' ? [...zc.acc, ...zc.acc.map((x) => `-${x}`)] : zc.acc, action: t('Région critique : le quantile de la loi normale'),
       traps: { p_one_two_sided: [s.side === 'two' ? val(zCrit('right', alpha).v) : val(zCrit('two', alpha).v)] },
       decisions,
       lines: [{ math: zc.text, note: `R = ${s.side === 'two' ? `{|T| > ${zc.text}}` : s.side === 'right' ? `[${zc.text} ; +∞[` : `]−∞ ; −${zc.text}]`}`, subgoal: 'hyp', blank: [zc.text] }],
     },
     {
-      label: 'p_obs', name: 'p', kind: 'stat', expect: pv.expr, decimals: 3, ...pv.acc, action: 'p-valeur',
-      traps: { p_pvalue_two_sided: { values: [val(pv.one)], ctx: { t: dec(Math.abs(t), 3) } }, p_upper_tail: [val(1 - pv.v)] },
-      wrongActions: [{ label: s.side === 'two' ? 'p = 1 − Φ(|t_obs|)' : 'p = 2(1 − Φ(|t_obs|))', rule: 'p_pvalue_two_sided', why: s.side === 'two' ? 'Bilatéral : les écarts des deux côtés comptent, on double.' : 'Unilatéral : un seul côté compte.' }],
+      label: 'p_obs', name: 'p', kind: 'stat', expect: pv.expr, decimals: 3, ...pv.acc, action: t('p-valeur'),
+      traps: { p_pvalue_two_sided: { values: [val(pv.one)], ctx: { t: dec(Math.abs(tobs), 3) } }, p_upper_tail: [val(1 - pv.v)] },
+      wrongActions: [{ label: s.side === 'two' ? 'p = 1 − Φ(|t_obs|)' : 'p = 2(1 − Φ(|t_obs|))', rule: 'p_pvalue_two_sided', why: s.side === 'two' ? t('Bilatéral : les écarts des deux côtés comptent, on double.') : t('Unilatéral : un seul côté compte.') }],
       lines: [
-        { math: pv.line, note: s.side === 'two' ? 'Bilatéral : les deux queues' : 'Une queue', subgoal: 'hyp', blank: [dec(Math.abs(t), 3)] },
-        { math: pv.line.replace(/Φ\([^)]*\)/, dec(phiT(Math.abs(t)), 7).replace(/0+$/, '')), note: `Table : Φ(${dec(Math.abs(t), 3)}) = ${dec(phiT(Math.abs(t)), 7)}`, subgoal: 'phi', blank: [dec(phiT(Math.abs(t)), 7).replace(/0+$/, '')] },
+        { math: pv.line, note: s.side === 'two' ? t('Bilatéral : les deux queues') : t('Une queue'), subgoal: 'hyp', blank: [dec(Math.abs(tobs), 3)] },
+        { math: pv.line.replace(/Φ\([^)]*\)/, dec(phiT(Math.abs(tobs)), 7).replace(/0+$/, '')), note: t('Table : Φ({z}) = {v}', { z: dec(Math.abs(tobs), 3), v: dec(phiT(Math.abs(tobs)), 7) }), subgoal: 'phi', blank: [dec(phiT(Math.abs(tobs)), 7).replace(/0+$/, '')] },
         { math: dec(roundTo(pv.v, 4), 4), blank: [dec(roundTo(pv.v, 4), 4)] },
       ],
     },
   ];
   const interpret = level === 5
-    ? { prompt: `Un IC à ${100 - alpha} % pour ${s.par} ne contient pas ${s.v0}. Que dit le test bilatéral au niveau ${alpha} % ?`, options: [
-      { html: `Il rejette H₀ : ${s.par} = ${s.v0}.`, correct: true },
-      { html: 'Il ne rejette pas H₀ : on ne peut rien dire.', correct: false, rule: 'p_accept_h0' },
-      { html: `${s.par} = ${s.v0} a moins de ${alpha} % de chances d’être vrai.`, correct: false, rule: 'p_pvalue_h0' },
-      { html: `Il rejette H₀, et donc ${s.par} est très différent de ${s.v0}.`, correct: false, rule: 'p_significant_large' },
+    ? { prompt: t('Un IC à {l} % pour {par} ne contient pas {v0}. Que dit le test bilatéral au niveau {a} % ?', { l: 100 - alpha, par: s.par, v0: s.v0, a: alpha }), options: [
+      { html: t('Il rejette H₀ : {par} = {v0}.', { par: s.par, v0: s.v0 }), correct: true },
+      { html: t('Il ne rejette pas H₀ : on ne peut rien dire.'), correct: false, rule: 'p_accept_h0' },
+      { html: t('{par} = {v0} a moins de {a} % de chances d’être vrai.', { par: s.par, v0: s.v0, a: alpha }), correct: false, rule: 'p_pvalue_h0' },
+      { html: t('Il rejette H₀, et donc {par} est très différent de {v0}.', { par: s.par, v0: s.v0 }), correct: false, rule: 'p_significant_large' },
     ] }
     : testConclusion(reject, alpha, s.claim, { p: pv.v });
   return statItem({
-    skill: TS, level, key: `${level}:${SCEN.indexOf(s)}:${t}:${alpha}`,
-    prompt: `${s.q} On fait un test z au niveau ${alpha} % et on observe t_obs = ${sc(t, 3)}. Pose les hypothèses, donne la région critique et la p-valeur.`,
+    skill: TS, level, key: `${level}:${SCEN.indexOf(s)}:${tobs}:${alpha}`,
+    prompt: `${s.q} ${t('On fait un test z au niveau {a} % et on observe t_obs = {t}. Pose les hypothèses, donne la région critique et la p-valeur.', { a: alpha, t: sc(tobs, 3) })}`,
     parts, interpret,
-    hints: H('H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)).', SM(s.side === 'two' ? '2(1-Φ(□))' : '1-Φ(□)'), `p_obs = ${dec(roundTo(pv.v, 4), 4)}`),
+    hints: H(t('H₁ est ce que l’on veut montrer ; H₀ contient l’égalité. Bilatéral : p = 2(1 − Φ(|t_obs|)).'), SM(s.side === 'two' ? '2(1-Φ(□))' : '1-Φ(□)'), `p_obs = ${dec(roundTo(pv.v, 4), 4)}`),
     subgoals: TS_SUB, exam: examTag(opts),
   });
 }
@@ -161,10 +164,10 @@ function tsItem(level, rng, profile, opts = {}) {
 
 const TP = 'p-test-power';
 const TP_SUB = [
-  { id: 'crit', label: 'seuil sous H₀', skill: TS },
-  { id: 'std', label: 'standardiser, Φ', skill: 'p-normal-std' },
-  { id: 'q', label: 'quantile normal', skill: 'p-normal-inverse' },
-  { id: 'pow', label: 'β, puissance', skill: TP },
+  { id: 'crit', label: t('seuil sous H₀'), skill: TS },
+  { id: 'std', label: t('standardiser, Φ'), skill: 'p-normal-std' },
+  { id: 'q', label: t('quantile normal'), skill: 'p-normal-inverse' },
+  { id: 'pow', label: t('β, puissance'), skill: TP },
 ];
 const TP_CASES = [[10, 100], [10, 25], [5, 25], [20, 64], [20, 100], [10, 64], [5, 100], [20, 16]];
 
@@ -182,15 +185,15 @@ function tpData(rng) {
 
 function errorDecisions(d) {
   return [
-    { prompt: 'On garde H₀ alors que H₁ est vraie : quelle erreur ?', levels: [1, 2, 3, 4], options: [
-      { id: 't2', label: 'Une erreur de type 2 (probabilité β)', valid: true },
-      { id: 't1', label: 'Une erreur de type 1 (probabilité α)', valid: false, rule: 'p_type_errors_swap', why: 'Type 1 : rejeter H₀ vraie. Type 2 : garder H₀ fausse.' },
-      { id: 'none', label: 'Aucune erreur', valid: false, why: `H₁ est vraie (μ = ${dec(d.mu1)}) : garder H₀ est une erreur.` },
+    { prompt: t('On garde H₀ alors que H₁ est vraie : quelle erreur ?'), levels: [1, 2, 3, 4], options: [
+      { id: 't2', label: t('Une erreur de type 2 (probabilité β)'), valid: true },
+      { id: 't1', label: t('Une erreur de type 1 (probabilité α)'), valid: false, rule: 'p_type_errors_swap', why: t('Type 1 : rejeter H₀ vraie. Type 2 : garder H₀ fausse.') },
+      { id: 'none', label: t('Aucune erreur'), valid: false, why: t('H₁ est vraie (μ = {m}) : garder H₀ est une erreur.', { m: dec(d.mu1) }) },
     ] },
-    { prompt: `On rejette H₀ et en fait μ = ${dec(d.mu1)} : quelle erreur ?`, levels: [2, 3, 4, 5], options: [
-      { id: 'none', label: 'Aucune : la décision est juste', valid: true },
-      { id: 't1', label: 'Une erreur de type 1', valid: false, rule: 'p_error_when_correct', why: 'H₁ est vraie et on a rejeté H₀ : la décision est juste.' },
-      { id: 't2', label: 'Une erreur de type 2', valid: false, rule: 'p_type_errors_swap', why: 'Le type 2 est garder H₀ quand elle est fausse ; ici on l’a rejetée.' },
+    { prompt: t('On rejette H₀ et en fait μ = {m} : quelle erreur ?', { m: dec(d.mu1) }), levels: [2, 3, 4, 5], options: [
+      { id: 'none', label: t('Aucune : la décision est juste'), valid: true },
+      { id: 't1', label: t('Une erreur de type 1'), valid: false, rule: 'p_error_when_correct', why: t('H₁ est vraie et on a rejeté H₀ : la décision est juste.') },
+      { id: 't2', label: t('Une erreur de type 2'), valid: false, rule: 'p_type_errors_swap', why: t('Le type 2 est garder H₀ quand elle est fausse ; ici on l’a rejetée.') },
     ] },
   ];
 }
@@ -200,17 +203,17 @@ function tpParts(d) {
   const b = roundTo(d.beta, 4);
   return [
     {
-      label: 'se', name: 'se', kind: 'stat', expect: `${d.sigma}/√${d.n}`, decimals: 4, action: 'Erreur standard σ/√n', decisions: errorDecisions(d),
+      label: 'se', name: 'se', kind: 'stat', expect: `${d.sigma}/√${d.n}`, decimals: 4, action: t('Erreur standard σ/√n'), decisions: errorDecisions(d),
       lines: [{ math: `${d.sigma}/√(${d.n})`, note: 'σ/√n', subgoal: 'crit', blank: [String(d.n)] }, ...(seT !== `${d.sigma}/√(${d.n})` ? [{ math: seT, blank: [seT] }] : [])],
     },
     {
-      label: 't_c', name: 'tc', kind: 'stat', expect: val(d.zc.v), decimals: 3, accept: d.zc.acc, action: 'Seuil sous H₀ : z₁₋α',
+      label: 't_c', name: 'tc', kind: 'stat', expect: val(d.zc.v), decimals: 3, accept: d.zc.acc, action: t('Seuil sous H₀ : z₁₋α'),
       traps: { p_one_two_sided: [val(zCrit('two', d.a).v)] },
-      lines: [{ math: d.zc.text, note: `Unilatéral à ${d.a} % : Φ⁻¹(${dec(1 - d.a / 100, 2)})`, subgoal: 'q', blank: [d.zc.text] }],
+      lines: [{ math: d.zc.text, note: t('Unilatéral à {a} % : Φ⁻¹({p})', { a: d.a, p: dec(1 - d.a / 100, 2) }), subgoal: 'q', blank: [d.zc.text] }],
     },
     {
-      label: 'δ', name: 'dl', kind: 'stat', expect: `(${val(d.mu1)}-${d.mu0})/$se`, decimals: 3, action: 'Écart sous H₁ en erreurs standard',
-      lines: [{ math: `(${dec(d.mu1)}-${d.mu0})/${seT}`, note: 'Sous H₁, T ~ N(δ, 1)', subgoal: 'std', blank: [String(d.mu0)] }, { math: dec(d.delta, 3), blank: [dec(d.delta, 3)] }],
+      label: 'δ', name: 'dl', kind: 'stat', expect: `(${val(d.mu1)}-${d.mu0})/$se`, decimals: 3, action: t('Écart sous H₁ en erreurs standard'),
+      lines: [{ math: `(${dec(d.mu1)}-${d.mu0})/${seT}`, note: t('Sous H₁, T ~ N(δ, 1)'), subgoal: 'std', blank: [String(d.mu0)] }, { math: dec(d.delta, 3), blank: [dec(d.delta, 3)] }],
     },
     {
       label: 'β', name: 'beta', kind: 'stat', expect: 'Φ($tc-$dl)', decimals: 2, action: 'β = Pr₁(T < t_c)',
@@ -218,10 +221,10 @@ function tpParts(d) {
       lines: [{ math: `Φ(${d.zc.text}-${dec(d.delta, 3)})`, note: 'β = Φ(t_c − δ)', subgoal: 'std', blank: [dec(d.delta, 3)] }, { math: dec(b, 4), blank: [dec(b, 4)] }],
     },
     {
-      label: '1 − β', name: 'pw', kind: 'stat', expect: '1-$beta', decimals: 2, action: 'Puissance 1 − β',
+      label: '1 − β', name: 'pw', kind: 'stat', expect: '1-$beta', decimals: 2, action: t('Puissance 1 − β'),
       traps: { p_power_alpha: [val(1 - d.a / 100)], p_upper_tail: [val(d.beta)] },
-      wrongActions: [{ label: 'Puissance = 1 − α', rule: 'p_power_alpha', why: '1 − α se calcule sous H₀ ; la puissance se calcule sous H₁.' }],
-      lines: [{ math: `1-${dec(b, 4)}`, note: 'Puissance', subgoal: 'pow', blank: [dec(b, 4)] }, { math: dec(1 - b, 4), blank: [dec(1 - b, 4)] }],
+      wrongActions: [{ label: t('Puissance = 1 − α'), rule: 'p_power_alpha', why: t('1 − α se calcule sous H₀ ; la puissance se calcule sous H₁.') }],
+      lines: [{ math: `1-${dec(b, 4)}`, note: t('Puissance'), subgoal: 'pow', blank: [dec(b, 4)] }, { math: dec(1 - b, 4), blank: [dec(1 - b, 4)] }],
     },
   ];
 }
@@ -229,23 +232,23 @@ function tpParts(d) {
 function tpInterpret(d) {
   const pw = dec(roundTo(d.power * 100, 0), 0);
   return {
-    prompt: 'Interpréter la puissance : quelle phrase est juste ?',
+    prompt: t('Interpréter la puissance : quelle phrase est juste ?'),
     options: [
-      { html: `Si μ = ${dec(d.mu1)}, le test rejette H₀ pour environ ${pw} % des échantillons.`, correct: true },
-      { html: `La puissance vaut 1 − α = ${dec(1 - d.a / 100, 2)}.`, correct: false, rule: 'p_power_alpha' },
-      { html: 'β est la probabilité de rejeter H₀ alors qu’elle est vraie.', correct: false, rule: 'p_type_errors_swap' },
-      { html: `Rejeter H₀ quand μ = ${dec(d.mu1)} est une erreur de type 1.`, correct: false, rule: 'p_error_when_correct' },
+      { html: t('Si μ = {m}, le test rejette H₀ pour environ {pw} % des échantillons.', { m: dec(d.mu1), pw }), correct: true },
+      { html: t('La puissance vaut 1 − α = {p}.', { p: dec(1 - d.a / 100, 2) }), correct: false, rule: 'p_power_alpha' },
+      { html: t('β est la probabilité de rejeter H₀ alors qu’elle est vraie.'), correct: false, rule: 'p_type_errors_swap' },
+      { html: t('Rejeter H₀ quand μ = {m} est une erreur de type 1.', { m: dec(d.mu1) }), correct: false, rule: 'p_error_when_correct' },
     ],
   };
 }
 
 function tpItem(level, rng, profile, opts = {}) {
   const d = tpData(rng);
-  const story = `H₀ : μ = ${d.mu0} contre H₁ : μ = ${dec(d.mu1)} (unilatéral), σ = ${d.sigma} connu, n = ${d.n}, niveau α = ${d.a} %.`;
+  const story = t('H₀ : μ = {m0} contre H₁ : μ = {m1} (unilatéral), σ = {s} connu, n = {n}, niveau α = {a} %.', { m0: d.mu0, m1: dec(d.mu1), s: d.sigma, n: d.n, a: d.a });
   if (opts.exam === 'mcq') return tpMcq(rng, opts, d, story);
   if (opts.exam === 'tf') return tpTf(rng, opts);
   const parts = tpParts(d);
-  let prompt = `${story} Calcule β et la puissance du test z.`;
+  let prompt = `${story} ${t('Calcule β et la puissance du test z.')}`;
   if (level === 5) {
     const zb = 1.28;
     const dmu = d.mu1 - d.mu0;
@@ -254,19 +257,19 @@ function tpItem(level, rng, profile, opts = {}) {
     const alt = Math.ceil(((d.zc.v + 1.282) * d.sigma / dmu) ** 2 - 1e-9);
     if (Math.abs(raw - Math.round(raw)) > 0.05) {
       parts.push({
-        label: 'n', name: 'nmin', kind: 'stat', expect: String(nmin), decimals: 0, tol: 0.4, accept: [String(alt)], action: 'n pour une puissance de 0,9',
-        notes: ['n ≥ ((z₁₋α + z₀,₉)·σ/(μ₁ − μ₀))², avec z₀,₉ = Φ⁻¹(0,9) = 1,28 ; on arrondit vers le haut.'],
+        label: 'n', name: 'nmin', kind: 'stat', expect: String(nmin), decimals: 0, tol: 0.4, accept: [String(alt)], action: t('n pour une puissance de 0,9'),
+        notes: [t('n ≥ ((z₁₋α + z₀,₉)·σ/(μ₁ − μ₀))², avec z₀,₉ = Φ⁻¹(0,9) = 1,28 ; on arrondit vers le haut.')],
         lines: [{ math: String(nmin), note: `((${d.zc.text} + 1,28)·${d.sigma}/${dec(dmu)})² = ${dec(raw, 2)}`, subgoal: 'pow' }],
       });
-      prompt = `${story} Calcule β et la puissance, puis le plus petit n qui donne une puissance d’au moins 0,9.`;
+      prompt = `${story} ${t('Calcule β et la puissance, puis le plus petit n qui donne une puissance d’au moins 0,9.')}`;
     }
   }
   const o = {
     skill: TP, level, key: `${level}:${d.mu0}:${d.sigma}:${d.n}:${d.delta}:${d.a}`, prompt, parts,
-    hints: H('Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1).', SM(`Φ(${d.zc.text}-□)`), `β = ${dec(roundTo(d.beta, 4), 4)}, puissance ${dec(roundTo(d.power, 4), 4)}`),
+    hints: H(t('Le seuil se fixe sous H₀ ; la puissance se calcule sous H₁, où T ~ N(δ, 1).'), SM(`Φ(${d.zc.text}-□)`), t('β = {b}, puissance {p}', { b: dec(roundTo(d.beta, 4), 4), p: dec(roundTo(d.power, 4), 4) })),
     subgoals: TP_SUB, interpret: tpInterpret(d), exam: examTag(opts),
   };
-  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${story} Donne la puissance du test z (deux décimales).`, part: { label: '1 − β', kind: 'stat', expect: val(d.power), decimals: 2, ref: {}, lines: [{ math: dec(roundTo(d.power, 2), 2) }] } });
+  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${story} ${t('Donne la puissance du test z (deux décimales).')}`, part: { label: '1 − β', kind: 'stat', expect: val(d.power), decimals: 2, ref: {}, lines: [{ math: dec(roundTo(d.power, 2), 2) }] } });
   return statItem(o);
 }
 
@@ -276,26 +279,26 @@ function tpMcq(rng, opts, d, story) {
     const mu1 = mu0 + rng.int(3, 9);
     return choice({
       skill: TP, level: 4, key: `mcq-err:${mu0}:${mu1}`, exam: examTag(opts),
-      prompt: `On teste H₀ : μ = ${mu0} contre H₁ : μ > ${mu0}. On rejette H₀. En réalité, μ = ${mu1}. Quelle erreur a-t-on commise ?`,
-      right: 'Aucune erreur', wrongs: [{ html: 'Une erreur de type 1', rule: 'p_error_when_correct' }, { html: 'Une erreur de type 2', rule: 'p_type_errors_swap' }, { html: 'Les deux à la fois' }],
+      prompt: t('On teste H₀ : μ = {m0} contre H₁ : μ > {m0}. On rejette H₀. En réalité, μ = {m1}. Quelle erreur a-t-on commise ?', { m0: mu0, m1: mu1 }),
+      right: t('Aucune erreur'), wrongs: [{ html: t('Une erreur de type 1'), rule: 'p_error_when_correct' }, { html: t('Une erreur de type 2'), rule: 'p_type_errors_swap' }, { html: t('Les deux à la fois') }],
     }, rng);
   }
   const pw = (x) => dec(roundTo(x, 2), 2);
   return choice({
     skill: TP, level: 4, key: `mcq:${d.mu0}:${d.n}:${d.delta}:${d.a}`, exam: examTag(opts),
-    prompt: `${story} Quelle est la puissance du test z (deux décimales) ?`,
+    prompt: `${story} ${t('Quelle est la puissance du test z (deux décimales) ?')}`,
     right: pw(d.power), wrongs: [{ html: pw(1 - d.a / 100), rule: 'p_power_alpha' }, { html: pw(d.beta), rule: 'p_upper_tail' }],
     fillers: [{ html: pw(Phi(d.delta)) }, { html: pw(1 - Phi(d.zc.v)) }],
   }, rng);
 }
 
 function tpTf(rng, opts) {
-  if (rng.chance(0.5)) return tf({ skill: TP, key: 'n', exam: examTag(opts), truth: true, statement: 'À niveau α fixé, la puissance d’un test z augmente avec n.', explanation: 'δ = (μ₁ − μ₀)√n/σ grandit avec n, donc β = Φ(z₁₋α − δ) diminue.' });
+  if (rng.chance(0.5)) return tf({ skill: TP, key: 'n', exam: examTag(opts), truth: true, statement: t('À niveau α fixé, la puissance d’un test z augmente avec n.'), explanation: t('δ = (μ₁ − μ₀)√n/σ grandit avec n, donc β = Φ(z₁₋α − δ) diminue.') });
   return tf({
     skill: TP, key: 'alpha', exam: examTag(opts), truth: false, ruleIfTrue: 'p_power_alpha',
-    statement: 'Pour H₀ : μ = 100 contre H₁ : μ = 103, σ = 10, n = 100, au niveau 5 % (unilatéral), la puissance du test z vaut 0,95.',
-    explanation: 'δ = 3, β = Φ(1,645 − 3) = 1 − Φ(1,355) ≈ 0,09 : la puissance vaut environ 0,91, pas 1 − α.',
-    counter: numCounter({ vars: [{ v: 'p', label: 'La vraie puissance (deux décimales) :' }], hyp: '0,9<p∧p<0,92', pred: 'p=0,95', answer: { p: '0,91' } }),
+    statement: t('Pour H₀ : μ = 100 contre H₁ : μ = 103, σ = 10, n = 100, au niveau 5 % (unilatéral), la puissance du test z vaut 0,95.'),
+    explanation: t('δ = 3, β = Φ(1,645 − 3) = 1 − Φ(1,355) ≈ 0,09 : la puissance vaut environ 0,91, pas 1 − α.'),
+    counter: numCounter({ vars: [{ v: 'p', label: t('La vraie puissance (deux décimales) :') }], hyp: '0,9<p∧p<0,92', pred: 'p=0,95', answer: { p: '0,91' } }),
   });
 }
 
@@ -305,8 +308,8 @@ function tpTf(rng, opts) {
 
 const TZ = 'p-test-z';
 const TZ_SUB = [
-  { id: 'hyp', label: 'hypothèses, p-valeur', skill: TS },
-  { id: 'stat', label: 'statistique, décision', skill: TZ },
+  { id: 'hyp', label: t('hypothèses, p-valeur'), skill: TS },
+  { id: 'stat', label: t('statistique, décision'), skill: TZ },
   { id: 'clt', label: 'p̂ ≈ N(p, p(1 − p)/n)', skill: 'p-clt-binom' },
 ];
 // Proportions with a whole σ for the count: [n, p0, √(np0(1 − p0))].
@@ -318,39 +321,39 @@ function tzData(rng, kind) {
       const [n, p0, sc0] = pick(rng, PROP);
       const side = kind === 'prop' ? 'two' : pick(rng, ['right', 'left']);
       const dcount = rng.int(1, 3 * sc0) * (side === 'left' ? -1 : side === 'two' && rng.chance(0.4) ? -1 : 1);
-      const t = dcount / sc0;
+      const tv = dcount / sc0;
       // t with two decimals at most (on the grid of 0,05): no rounding to argue about.
-      if (Math.abs(roundTo(t / 0.05, 6) - Math.round(t / 0.05)) > 1e-6 || Math.abs(t) < 0.5 || Math.abs(t) > 3.2) continue;
+      if (Math.abs(roundTo(tv / 0.05, 6) - Math.round(tv / 0.05)) > 1e-6 || Math.abs(tv) < 0.5 || Math.abs(tv) > 3.2) continue;
       const kk = Math.round(n * p0 + dcount);
       const se = Math.sqrt(p0 * (1 - p0) / n);
-      return { kind, n, p0, k: kk, phat: kk / n, se, t, side, seLine: `√(${dec(p0)}×${dec(1 - p0)}/${n})`, seExpect: `√(${val(p0)}*${val(1 - p0)}/${n})`, stat: `(${dec(kk / n, 4)}-${dec(p0)})/$SE`, center: kk / n, h0: p0, sd0: Math.sqrt(p0 * (1 - p0)), par: 'p',
-        story: kind === 'prop' && p0 === 0.5 ? `Une pièce est lancée ${n} fois ; on obtient ${kk} piles. Est-elle équilibrée ? Test z bilatéral de H₀ : p = 0,5.`
-          : kind === 'prop' ? `Un fournisseur annonce ${dec(p0 * 100)} % de pièces défectueuses. Sur un lot de n = ${n} pièces, on en trouve ${kk}. Test z bilatéral de H₀ : p = ${dec(p0)}.` : `Sur n = ${n} unités, ${kk} présentent le caractère. On teste H₀ : p = ${dec(p0)} contre H₁ : p ${side === 'right' ? '>' : '<'} ${dec(p0)}.`,
-        claim: `p vaut ${dec(p0)}` };
+      return { kind, n, p0, k: kk, phat: kk / n, se, t: tv, side, seLine: `√(${dec(p0)}×${dec(1 - p0)}/${n})`, seExpect: `√(${val(p0)}*${val(1 - p0)}/${n})`, stat: `(${dec(kk / n, 4)}-${dec(p0)})/$SE`, center: kk / n, h0: p0, sd0: Math.sqrt(p0 * (1 - p0)), par: 'p',
+        story: kind === 'prop' && p0 === 0.5 ? t('Une pièce est lancée {n} fois ; on obtient {k} piles. Est-elle équilibrée ? Test z bilatéral de H₀ : p = 0,5.', { n, k: kk })
+          : kind === 'prop' ? t('Un fournisseur annonce {p} % de pièces défectueuses. Sur un lot de n = {n} pièces, on en trouve {k}. Test z bilatéral de H₀ : p = {p0}.', { p: dec(p0 * 100), n, k: kk, p0: dec(p0) }) : t('Sur n = {n} unités, {k} présentent le caractère. On teste H₀ : p = {p0} contre H₁ : p {op} {p0}.', { n, k: kk, p0: dec(p0), op: side === 'right' ? '>' : '<' }),
+        claim: t('p vaut {p0}', { p0: dec(p0) }) };
     }
   }
   if (kind === 'sigma' || kind === 'large') {
     const [sd, n] = kind === 'sigma' ? pick(rng, [[10, 16], [20, 25], [10, 25], [20, 100], [15, 36], [30, 100]]) : pick(rng, [[30, 225], [40, 400], [45, 900], [60, 400]]);
     const se = sd / Math.sqrt(n);
     const side = pick(rng, ['two', 'two', 'right']);
-    let t = rng.int(10, 60) * 0.05;
-    if (side === 'two' && rng.chance(0.4)) t = -t;
-    t = roundTo(t, 2);
+    let tv = rng.int(10, 60) * 0.05;
+    if (side === 'two' && rng.chance(0.4)) tv = -tv;
+    tv = roundTo(tv, 2);
     const mu0 = kind === 'sigma' ? 1000 : rng.int(50, 400);
-    const xbar = roundTo(mu0 + t * se, 6);
-    return { kind, n, mu0, xbar, se, t, side, sd, seLine: `${sd}/√(${n})`, seExpect: `${sd}/√${n}`, center: xbar, h0: mu0, par: 'μ',
-      story: kind === 'sigma' ? `Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = ${sd} connu. Sur n = ${n} compteurs (normaux), x̄ = ${dec(xbar, 4)}. Test z ${side === 'two' ? 'bilatéral' : 'unilatéral (H₁ : μ > 1 000)'}.` : `Sur n = ${n} observations (loi inconnue), x̄ = ${dec(xbar, 4)} et s = ${sd}. Test z asymptotique de H₀ : μ = ${mu0} ${side === 'two' ? '(bilatéral)' : 'contre H₁ : μ > ' + mu0}.`,
-      claim: `μ vaut ${mu0}` };
+    const xbar = roundTo(mu0 + tv * se, 6);
+    return { kind, n, mu0, xbar, se, t: tv, side, sd, seLine: `${sd}/√(${n})`, seExpect: `${sd}/√${n}`, center: xbar, h0: mu0, par: 'μ',
+      story: kind === 'sigma' ? (side === 'two' ? t('Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = {sd} connu. Sur n = {n} compteurs (normaux), x̄ = {x}. Test z bilatéral.', { sd, n, x: dec(xbar, 4) }) : t('Des compteurs de moyenne nominale μ₀ = 1 000 ; σ = {sd} connu. Sur n = {n} compteurs (normaux), x̄ = {x}. Test z unilatéral (H₁ : μ > 1 000).', { sd, n, x: dec(xbar, 4) })) : (side === 'two' ? t('Sur n = {n} observations (loi inconnue), x̄ = {x} et s = {sd}. Test z asymptotique de H₀ : μ = {m0} (bilatéral).', { n, x: dec(xbar, 4), sd, m0: mu0 }) : t('Sur n = {n} observations (loi inconnue), x̄ = {x} et s = {sd}. Test z asymptotique de H₀ : μ = {m0} contre H₁ : μ > {m0}.', { n, x: dec(xbar, 4), sd, m0: mu0 })),
+      claim: t('μ vaut {m0}', { m0: mu0 }) };
   }
   // Wald (EE-209): Poisson, I(λ̂) = n/λ̂.
   const [lh, se] = pick(rng, [[4, 0.2], [2.25, 0.15], [1.44, 0.12], [1, 0.1]]);
   const n = 100;
-  let t = roundTo(rng.int(20, 60) * 0.05, 2);
-  if (rng.chance(0.4)) t = -t;
-  const l0 = roundTo(lh - t * se, 6);
-  return { kind: 'wald', n, lh, se, t, side: 'two', mu0: l0, center: lh, h0: l0, par: 'λ', seLine: `√(${dec(lh)}/${n})`, seExpect: `√(${val(lh)}/${n})`,
-    story: `n = ${n} comptages de Poisson, λ̂ = x̄ = ${dec(lh)}. Test de Wald (EE-209) de H₀ : λ = ${dec(l0, 4)}, bilatéral : T = √(I(λ̂))·(λ̂ − λ₀) avec I(λ̂) = n/λ̂.`,
-    claim: `λ vaut ${dec(l0, 4)}` };
+  let tv = roundTo(rng.int(20, 60) * 0.05, 2);
+  if (rng.chance(0.4)) tv = -tv;
+  const l0 = roundTo(lh - tv * se, 6);
+  return { kind: 'wald', n, lh, se, t: tv, side: 'two', mu0: l0, center: lh, h0: l0, par: 'λ', seLine: `√(${dec(lh)}/${n})`, seExpect: `√(${val(lh)}/${n})`,
+    story: t('n = {n} comptages de Poisson, λ̂ = x̄ = {lh}. Test de Wald (EE-209) de H₀ : λ = {l0}, bilatéral : T = √(I(λ̂))·(λ̂ − λ₀) avec I(λ̂) = n/λ̂.', { n, lh: dec(lh), l0: dec(l0, 4) }),
+    claim: t('λ vaut {l0}', { l0: dec(l0, 4) }) };
 }
 
 function tzParts(d, alpha) {
@@ -361,30 +364,30 @@ function tzParts(d, alpha) {
   const usePv = d.kind === 'prop' || d.kind === 'propOne' || d.kind === 'wald';
   const parts = [
     {
-      label: 'se₀', name: 'SE', kind: 'stat', expect: d.seExpect, decimals: 4, action: 'Erreur standard sous H₀',
+      label: 'se₀', name: 'SE', kind: 'stat', expect: d.seExpect, decimals: 4, action: t('Erreur standard sous H₀'),
       traps: { p_se_forgot_sqrt_n: { values: [val(d.sd0 ?? d.sd ?? Math.sqrt(d.lh ?? 1))], ctx: { n: d.n, v: seT } } },
-      wrongActions: [{ label: 'Oublier la division par n', rule: 'p_se_forgot_sqrt_n', why: 'L’écart-type d’une moyenne (ou de p̂) est divisé par √n.' }],
-      lines: [{ math: d.seLine, note: d.kind === 'wald' ? 'se = 1/√I(λ̂) = √(λ̂/n)' : 'Sous H₀', subgoal: 'stat', blank: [String(d.n)] }, ...(seT !== d.seLine ? [{ math: seT, blank: [seT] }] : [])],
+      wrongActions: [{ label: t('Oublier la division par n'), rule: 'p_se_forgot_sqrt_n', why: t('L’écart-type d’une moyenne (ou de p̂) est divisé par √n.') }],
+      lines: [{ math: d.seLine, note: d.kind === 'wald' ? 'se = 1/√I(λ̂) = √(λ̂/n)' : t('Sous H₀'), subgoal: 'stat', blank: [String(d.n)] }, ...(seT !== d.seLine ? [{ math: seT, blank: [seT] }] : [])],
     },
     {
-      label: 't_obs', name: 't', kind: 'stat', expect: `(${val(d.center)}-${val(d.h0)})/$SE`, decimals: 2, action: 'Statistique t_obs',
-      lines: [{ math: `(${center}-${h0})/${seT}`, note: 'T = (estimation − valeur de H₀)/se', subgoal: 'stat', blank: [h0] }, { math: dec(roundTo(d.t, 2), 2), blank: [dec(roundTo(d.t, 2), 2)] }],
+      label: 't_obs', name: 't', kind: 'stat', expect: `(${val(d.center)}-${val(d.h0)})/$SE`, decimals: 2, action: t('Statistique t_obs'),
+      lines: [{ math: `(${center}-${h0})/${seT}`, note: t('T = (estimation − valeur de H₀)/se'), subgoal: 'stat', blank: [h0] }, { math: dec(roundTo(d.t, 2), 2), blank: [dec(roundTo(d.t, 2), 2)] }],
     },
   ];
   if (usePv) {
     parts.push({
-      label: 'p_obs', name: 'pv', kind: 'stat', expect: pv.expr.replace(/#phi\(([^)]*)\)/, (m, z) => `#phi(${d.side === 'left' ? '-' : ''}${d.side === 'two' ? 'abs($t)' : '$t'})`).replace('#phi(-$t)', '#phi(-$t)'), decimals: 3, ...pv.acc, action: 'p-valeur',
+      label: 'p_obs', name: 'pv', kind: 'stat', expect: pv.expr.replace(/#phi\(([^)]*)\)/, (m, z) => `#phi(${d.side === 'left' ? '-' : ''}${d.side === 'two' ? 'abs($t)' : '$t'})`).replace('#phi(-$t)', '#phi(-$t)'), decimals: 3, ...pv.acc, action: t('p-valeur'),
       traps: { p_pvalue_two_sided: { values: [val(pv.one)], ctx: { t: dec(Math.abs(d.t), 2) } }, p_upper_tail: [val(1 - pv.v)] },
-      wrongActions: [{ label: d.side === 'two' ? 'p = 1 − Φ(|t_obs|)' : 'p = 2(1 − Φ(|t_obs|))', rule: 'p_pvalue_two_sided', why: d.side === 'two' ? 'Bilatéral : on double.' : 'Unilatéral : une seule queue.' }],
-      lines: [{ math: pv.line, note: d.side === 'two' ? 'Bilatéral' : 'Unilatéral', subgoal: 'hyp', blank: [dec(Math.abs(roundTo(d.t, 2)), 3)] }, { math: dec(roundTo(pv.v, 4), 4), blank: [dec(roundTo(pv.v, 4), 4)] }],
+      wrongActions: [{ label: d.side === 'two' ? 'p = 1 − Φ(|t_obs|)' : 'p = 2(1 − Φ(|t_obs|))', rule: 'p_pvalue_two_sided', why: d.side === 'two' ? t('Bilatéral : on double.') : t('Unilatéral : une seule queue.') }],
+      lines: [{ math: pv.line, note: d.side === 'two' ? t('Bilatéral') : t('Unilatéral'), subgoal: 'hyp', blank: [dec(Math.abs(roundTo(d.t, 2)), 3)] }, { math: dec(roundTo(pv.v, 4), 4), blank: [dec(roundTo(pv.v, 4), 4)] }],
     });
     return { parts, reject: pv.v < alpha / 100, p: pv.v };
   }
   const zc = zCrit(d.side, alpha);
   parts.push({
-    label: 't_c', name: 'tc', kind: 'stat', expect: val(zc.v), decimals: 3, accept: zc.acc, action: 'Valeur critique',
+    label: 't_c', name: 'tc', kind: 'stat', expect: val(zc.v), decimals: 3, accept: zc.acc, action: t('Valeur critique'),
     traps: { p_one_two_sided: [val(zCrit(d.side === 'two' ? 'right' : 'two', alpha).v)] },
-    lines: [{ math: zc.text, note: d.side === 'two' ? `Bilatéral à ${alpha} %` : `Unilatéral à ${alpha} %`, subgoal: 'hyp', blank: [zc.text] }],
+    lines: [{ math: zc.text, note: d.side === 'two' ? t('Bilatéral à {a} %', { a: alpha }) : t('Unilatéral à {a} %', { a: alpha }), subgoal: 'hyp', blank: [zc.text] }],
   });
   const tt = roundTo(d.t, 2);
   return { parts, reject: d.side === 'two' ? Math.abs(tt) > zc.v : tt > zc.v, p: null };
@@ -401,19 +404,19 @@ function tzItem(level, rng, profile, opts = {}) {
   const tt = Math.abs(roundTo(d.t, 2));
   if (level < 5 && Math.abs(tt - (d.side === 'two' ? 1.96 : 1.645)) < 0.1) return tzItem(level, rng, profile, opts);
   const decisions = [
-    { prompt: 'Quel test ?', levels: [1, 2, 3], options: [
-      { id: 'z', label: d.kind.startsWith('prop') ? 'Test z d’une proportion' : d.kind === 'wald' ? 'Test de Wald (z sur le MLE)' : d.kind === 'sigma' ? 'Test z : σ est connu' : 'Test z asymptotique : n est grand', valid: true },
-      { id: 't', label: 'Test t de Student', valid: d.kind === 'large', quality: 'poor', why: d.kind === 'large' ? 'Pour n > 200, Student et la normale se confondent.' : d.kind === 'sigma' ? 'σ est connu : la loi normale exacte.' : 'Une proportion, n grand : la loi normale.' },
+    { prompt: t('Quel test ?'), levels: [1, 2, 3], options: [
+      { id: 'z', label: d.kind.startsWith('prop') ? t('Test z d’une proportion') : d.kind === 'wald' ? t('Test de Wald (z sur le MLE)') : d.kind === 'sigma' ? t('Test z : σ est connu') : t('Test z asymptotique : n est grand'), valid: true },
+      { id: 't', label: t('Test t de Student'), valid: d.kind === 'large', quality: 'poor', why: d.kind === 'large' ? t('Pour n > 200, Student et la normale se confondent.') : d.kind === 'sigma' ? t('σ est connu : la loi normale exacte.') : t('Une proportion, n grand : la loi normale.') },
     ].filter((o) => o.valid || o.why) },
   ];
   parts[0].decisions = decisions;
   const o = {
     skill: TZ, level, key: `${level}:${d.kind}:${d.n}:${d.center}:${d.h0}:${d.side}`,
-    prompt: `${d.story} Niveau 5 %.`, parts,
-    hints: H(d.kind.startsWith('prop') ? 'Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n).' : 'T = (estimation − valeur de H₀)/(erreur standard).', SM(`(${dec(d.center, 4)}-${dec(d.h0, 4)})/□`), `t_obs = ${dec(roundTo(d.t, 2), 2)}`),
+    prompt: `${d.story} ${t('Niveau 5 %.')}`, parts,
+    hints: H(d.kind.startsWith('prop') ? t('Sous H₀, l’écart-type de p̂ est √(p₀(1 − p₀)/n).') : t('T = (estimation − valeur de H₀)/(erreur standard).'), SM(`(${dec(d.center, 4)}-${dec(d.h0, 4)})/□`), `t_obs = ${dec(roundTo(d.t, 2), 2)}`),
     subgoals: TZ_SUB, interpret: testConclusion(reject, alpha, d.claim, { p }), exam: examTag(opts),
   };
-  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${d.story} Donne t_obs (deux décimales).`, part: { label: 't_obs', kind: 'stat', expect: val(d.t), decimals: 2, ref: {}, lines: [{ math: dec(roundTo(d.t, 2), 2) }] } });
+  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${d.story} ${t('Donne t_obs (deux décimales).')}`, part: { label: 't_obs', kind: 'stat', expect: val(d.t), decimals: 2, ref: {}, lines: [{ math: dec(roundTo(d.t, 2), 2) }] } });
   return statItem(o);
 }
 
@@ -424,19 +427,19 @@ function tzMcq(d, rng, opts) {
   const f = (x) => dec(roundTo(x, 3), 3);
   return choice({
     skill: TZ, level: 4, key: `mcq:${d.n}:${d.k}:${d.p0}`, exam: examTag(opts),
-    prompt: `${d.story} Quelle est la p-valeur ?`, right: f(pv.v),
+    prompt: `${d.story} ${t('Quelle est la p-valeur ?')}`, right: f(pv.v),
     wrongs: [{ html: f(pv.one), rule: 'p_pvalue_two_sided' }, { html: f(1 - pv.v), rule: 'p_upper_tail' }, { html: f(Math.max(pw, 0.0001)), rule: 'p_se_forgot_sqrt_n' }],
     fillers: [{ html: f(pv.v / 2) }, { html: f(Math.min(pv.v * 3, 0.9)) }],
   }, rng);
 }
 
 function tzTf(rng, opts) {
-  if (rng.chance(0.5)) return tf({ skill: TZ, key: 'ic', exam: examTag(opts), truth: true, statement: 'Un test z bilatéral à 5 % rejette H₀ : θ = θ₀ si et seulement si θ₀ est hors de l’IC à 95 % construit avec la même statistique.', explanation: 'L’IC à 95 % contient exactement les θ₀ que le test bilatéral à 5 % ne rejette pas.' });
+  if (rng.chance(0.5)) return tf({ skill: TZ, key: 'ic', exam: examTag(opts), truth: true, statement: t('Un test z bilatéral à 5 % rejette H₀ : θ = θ₀ si et seulement si θ₀ est hors de l’IC à 95 % construit avec la même statistique.'), explanation: t('L’IC à 95 % contient exactement les θ₀ que le test bilatéral à 5 % ne rejette pas.') });
   return tf({
     skill: TZ, key: 'n', exam: examTag(opts), truth: false, ruleIfTrue: 'p_se_forgot_sqrt_n',
-    statement: 'Pour un même écart p̂ − p₀, la statistique du test z d’une proportion est plus petite quand n est plus grand.',
-    explanation: 'T = (p̂ − p₀)·√n/√(p₀(1 − p₀)) grandit comme √n : avec 4 fois plus de données, T double.',
-    counter: numCounter({ vars: [{ v: 'a', label: 'Un petit n =', dom: 'N*' }, { v: 'b', label: 'Un n plus grand =', dom: 'N*' }], hyp: '0<a∧a<b', pred: '√b≤√a', answer: { a: '100', b: '400' } }),
+    statement: t('Pour un même écart p̂ − p₀, la statistique du test z d’une proportion est plus petite quand n est plus grand.'),
+    explanation: t('T = (p̂ − p₀)·√n/√(p₀(1 − p₀)) grandit comme √n : avec 4 fois plus de données, T double.'),
+    counter: numCounter({ vars: [{ v: 'a', label: t('Un petit n ='), dom: 'N*' }, { v: 'b', label: t('Un n plus grand ='), dom: 'N*' }], hyp: '0<a∧a<b', pred: '√b≤√a', answer: { a: '100', b: '400' } }),
   });
 }
 
@@ -446,10 +449,10 @@ function tzTf(rng, opts) {
 
 const T1 = 'p-test-t1';
 const T1_SUB = [
-  { id: 'desc', label: 'x̄ et s', skill: 'p-desc-summary' },
-  { id: 'test', label: 'test t', skill: T1 },
-  { id: 'z', label: 'démarche du test z', skill: TZ },
-  { id: 'ci', label: 'quantile de Student, s/√n', skill: 'p-ci-mean' },
+  { id: 'desc', label: t('x̄ et s'), skill: 'p-desc-summary' },
+  { id: 'test', label: t('test t'), skill: T1 },
+  { id: 'z', label: t('démarche du test z'), skill: TZ },
+  { id: 'ci', label: t('quantile de Student, s/√n'), skill: 'p-ci-mean' },
 ];
 
 // {xs, n, mean, s2, SS, mu0, t, nu, reject, pairs?}
@@ -483,47 +486,47 @@ function t1Parts(d, { raw = true, ci = false } = {}) {
   const m = d.pairs ? 'd̄' : 'x̄';
   if (raw) {
     parts.push({
-      label: m, name: 'xbar', kind: 'prob', expect: String(d.mean), action: d.pairs ? 'Moyenne des différences' : 'Moyenne x̄',
-      lines: [{ math: `(${d.xs.join('+')})/${d.n}`.replace(/\+-/g, '-'), note: 'Moyenne', subgoal: 'desc', blank: [String(d.n)] }, { math: String(d.mean), blank: [String(d.mean)] }],
+      label: m, name: 'xbar', kind: 'prob', expect: String(d.mean), action: d.pairs ? t('Moyenne des différences') : t('Moyenne x̄'),
+      lines: [{ math: `(${d.xs.join('+')})/${d.n}`.replace(/\+-/g, '-'), note: t('Moyenne'), subgoal: 'desc', blank: [String(d.n)] }, { math: String(d.mean), blank: [String(d.mean)] }],
     });
     parts.push({
-      label: d.pairs ? 's_d²' : 's²', name: 's2', kind: 'prob', expect: String(d.s2), action: 'Variance (÷ n − 1)',
+      label: d.pairs ? 's_d²' : 's²', name: 's2', kind: 'prob', expect: String(d.s2), action: t('Variance (÷ n − 1)'),
       traps: { p_sd_n: { values: [`${d.SS}/${d.n}`], ctx: { SS: d.SS, n: d.n, 'n−1': d.n - 1 } } },
-      lines: [{ math: `(${sqDevs(d.xs, d.mean)})/${d.n - 1}`, note: 'Écarts au carré, ÷ (n − 1)', subgoal: 'desc', blank: [String(d.n - 1)] }, { math: `${d.SS}/${d.n - 1}` }, { math: String(d.s2) }],
+      lines: [{ math: `(${sqDevs(d.xs, d.mean)})/${d.n - 1}`, note: t('Écarts au carré, ÷ (n − 1)'), subgoal: 'desc', blank: [String(d.n - 1)] }, { math: `${d.SS}/${d.n - 1}` }, { math: String(d.s2) }],
     });
   }
   const s2 = raw ? '$s2' : String(d.s2);
   const seT = dec(roundTo(d.se, 3), 3);
   const seFirst = `√(${d.s2}/${d.n})`;
   parts.push({
-    label: 's/√n', name: 'se', kind: 'stat', expect: `√(${s2}/${d.n})`, decimals: 3, action: 'Erreur standard s/√n',
-    lines: [{ math: seFirst, note: 'Erreur standard', subgoal: 'ci', blank: [String(d.n)] }, ...(seT !== seFirst ? [{ math: seT, blank: [seT] }] : [])],
+    label: 's/√n', name: 'se', kind: 'stat', expect: `√(${s2}/${d.n})`, decimals: 3, action: t('Erreur standard s/√n'),
+    lines: [{ math: seFirst, note: t('Erreur standard'), subgoal: 'ci', blank: [String(d.n)] }, ...(seT !== seFirst ? [{ math: seT, blank: [seT] }] : [])],
   });
   const xb = raw ? '$xbar' : String(d.mean);
   const tv = (d.mean - d.mu0) / Number(seT.replace(',', '.'));
   const tT = dec(roundTo(tv, 2), 2);
   parts.push({
-    label: 't_obs', name: 't', kind: 'stat', expect: `(${xb}-${d.mu0})/$se`, decimals: 2, action: 'Statistique t_obs',
+    label: 't_obs', name: 't', kind: 'stat', expect: `(${xb}-${d.mu0})/$se`, decimals: 2, action: t('Statistique t_obs'),
     traps: { p_se_forgot_sqrt_n: [val((d.mean - d.mu0) / Math.sqrt(d.s2))] },
     lines: [{ math: `(${d.mean}-${d.mu0})/${seT}`.replace('--', '+'), note: 'T = (x̄ − μ₀)/(s/√n)', subgoal: 'test', blank: [String(d.mu0)] }, { math: tT, blank: [tT] }],
   });
   parts.push({
-    label: 'ν', name: 'nu', kind: 'prob', expect: String(d.nu), action: 'Degrés de liberté n − 1',
+    label: 'ν', name: 'nu', kind: 'prob', expect: String(d.nu), action: t('Degrés de liberté n − 1'),
     traps: { p_df_wrong: { values: [String(d.n)], ctx: { 'ν': d.nu } } },
     lines: [{ math: String(d.nu), note: 'ν = n − 1', subgoal: 'test', blank: [String(d.nu)] }],
   });
   const tqn = tq(d.n);
   parts.push({
-    label: 't_c', name: 'tc', kind: 'stat', expect: `#t($nu,5)`, decimals: 3, action: 'Lire s₅(ν) dans la table 3',
+    label: 't_c', name: 'tc', kind: 'stat', expect: `#t($nu,5)`, decimals: 3, action: t('Lire s₅(ν) dans la table 3'),
     traps: { p_t_vs_z: { values: ['1.96'], ctx: { 'ν': d.nu } }, ...(tqn ? { p_df_wrong: { values: [val(tqn)], ctx: { 'ν': d.nu } } } : {}) },
     decisions: [quantileDecision(d.nu)],
-    wrongActions: [{ label: 'Prendre 1,96', rule: 'p_t_vs_z', why: 'σ est inconnu et n est petit : Student.' }],
-    lines: [{ math: tqText(d.nu), note: `Table 3, ν = ${d.nu}`, subgoal: 'ci', blank: [tqText(d.nu)] }],
+    wrongActions: [{ label: t('Prendre 1,96'), rule: 'p_t_vs_z', why: t('σ est inconnu et n est petit : Student.') }],
+    lines: [{ math: tqText(d.nu), note: t('Table 3, ν = {nu}', { nu: d.nu }), subgoal: 'ci', blank: [tqText(d.nu)] }],
   });
   if (ci) {
     const u = d.tc * Number(seT.replace(',', '.'));
     parts.push({
-      label: 'IC', name: 'ic', kind: 'stat', expect: [`${xb}-$tc*$se`, `${xb}+$tc*$se`], decimals: 2, action: 'IC à 95 % : x̄ ± t_c·s/√n',
+      label: 'IC', name: 'ic', kind: 'stat', expect: [`${xb}-$tc*$se`, `${xb}+$tc*$se`], decimals: 2, action: t('IC à 95 % : x̄ ± t_c·s/√n'),
       lines: [{ math: `[${d.mean}-${tqText(d.nu)}×${seT} ; ${d.mean}+${tqText(d.nu)}×${seT}]`, note: 'x̄ ± t_c·s/√n', subgoal: 'ci' }, { math: `[${dec(roundTo(d.mean - u, 2), 2)} ; ${dec(roundTo(d.mean + u, 2), 2)}]` }],
     });
   }
@@ -538,32 +541,32 @@ function t1Item(level, rng, profile, opts = {}) {
   const raw = level >= 2 || opts.exam === 'open';
   const parts = t1Parts(d, { raw, ci: opts.exam === 'open' });
   const what = paired ? 'la différence moyenne μ_d' : 'μ';
-  const claim = paired ? 'la différence moyenne est nulle' : `μ vaut ${d.mu0}`;
+  const claim = paired ? t('la différence moyenne est nulle') : t('μ vaut {m0}', { m0: d.mu0 });
   let story;
   if (paired) {
-    story = `Les mêmes ${d.n} personnes sont mesurées avant et après un traitement (avant ; après) : ${d.pairs.map(([a, b]) => `(${a} ; ${b})`).join(', ')}. Données supposées normales. Le traitement change-t-il la mesure ? Test bilatéral à 5 %.`;
-    parts[0].decisions = [{ prompt: 'Comment traiter ces données ?', options: [
-      { id: 'diff', label: 'Mêmes personnes : test t sur les différences après − avant', valid: true },
-      { id: 'two', label: 'Deux échantillons indépendants (avant, après)', valid: false, rule: 'p_paired_as_two', why: 'Les mêmes personnes sont mesurées deux fois : on teste les différences.' },
+    story = t('Les mêmes {n} personnes sont mesurées avant et après un traitement (avant ; après) : {pairs}. Données supposées normales. Le traitement change-t-il la mesure ? Test bilatéral à 5 %.', { n: d.n, pairs: d.pairs.map(([a, b]) => `(${a} ; ${b})`).join(', ') });
+    parts[0].decisions = [{ prompt: t('Comment traiter ces données ?'), options: [
+      { id: 'diff', label: t('Mêmes personnes : test t sur les différences après − avant'), valid: true },
+      { id: 'two', label: t('Deux échantillons indépendants (avant, après)'), valid: false, rule: 'p_paired_as_two', why: t('Les mêmes personnes sont mesurées deux fois : on teste les différences.') },
     ] }];
-    parts[0].lines[0].note = `Différences : ${list(d.xs)}`;
+    parts[0].lines[0].note = t('Différences : {xs}', { xs: list(d.xs) });
   } else if (raw) {
-    story = `Mesures supposées normales : ${list(d.xs)}. On teste H₀ : μ = ${d.mu0} contre H₁ : μ ≠ ${d.mu0} au niveau 5 %.`;
+    story = t('Mesures supposées normales : {xs}. On teste H₀ : μ = {m0} contre H₁ : μ ≠ {m0} au niveau 5 %.', { xs: list(d.xs), m0: d.mu0 });
   } else {
-    story = `Sur n = ${d.n} mesures normales, x̄ = ${d.mean} et s² = ${d.s2}. On teste H₀ : μ = ${d.mu0} contre H₁ : μ ≠ ${d.mu0} au niveau 5 %.`;
+    story = t('Sur n = {n} mesures normales, x̄ = {m} et s² = {s2}. On teste H₀ : μ = {m0} contre H₁ : μ ≠ {m0} au niveau 5 %.', { n: d.n, m: d.mean, s2: d.s2, m0: d.mu0 });
   }
   const o = {
     skill: T1, level, key: `${level}:${paired}:${d.xs.join(',')}:${d.mu0}`, prompt: story, parts,
-    hints: H('σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n.', SM(`(${d.mean}-${d.mu0})/□`), `t_obs = ${dec(roundTo(d.t, 2), 2)}, s₅(${d.nu}) = ${tqText(d.nu)}`),
+    hints: H(t('σ est inconnu : Student à n − 1 degrés de liberté, et l’erreur standard s/√n.'), SM(`(${d.mean}-${d.mu0})/□`), `t_obs = ${dec(roundTo(d.t, 2), 2)}, s₅(${d.nu}) = ${tqText(d.nu)}`),
     subgoals: T1_SUB, interpret: testConclusion(d.reject, 5, claim), exam: examTag(opts), fallback: d.fallback,
   };
   void what;
   if (opts.exam === 'open') {
-    return openItem({ ...o, exam: undefined, prompt: `${story} Puis donne l’IC à 95 % pour μ (deux décimales).`, title: 'Test t et IC' }, 10, rng);
+    return openItem({ ...o, exam: undefined, prompt: `${story} ${t('Puis donne l’IC à 95 % pour μ (deux décimales).')}`, title: t('Test t et IC') }, 10, rng);
   }
   if (opts.exam === 'coef') {
     const seT = roundTo(d.se, 3);
-    return coefItem({ ...o, prompt: `${story} Donne t_obs (deux décimales).`, part: { label: 't_obs', kind: 'stat', expect: val(d.t), accept: [val((d.mean - d.mu0) / seT)], decimals: 2, ref: {}, lines: [{ math: dec(roundTo(d.t, 2), 2) }] } });
+    return coefItem({ ...o, prompt: `${story} ${t('Donne t_obs (deux décimales).')}`, part: { label: 't_obs', kind: 'stat', expect: val(d.t), accept: [val((d.mean - d.mu0) / seT)], decimals: 2, ref: {}, lines: [{ math: dec(roundTo(d.t, 2), 2) }] } });
   }
   return statItem(o);
 }
@@ -573,19 +576,19 @@ function t1Mcq(d, rng, opts) {
   const tn = (d.mean - d.mu0) / Math.sqrt(d.SS / d.n / d.n);
   return choice({
     skill: T1, level: 4, key: `mcq:${d.xs.join(',')}:${d.mu0}`, exam: examTag(opts),
-    prompt: `Mesures supposées normales : ${list(d.xs)}. On teste H₀ : μ = ${d.mu0} contre H₁ : μ ≠ ${d.mu0}. Quelle est la valeur de t_obs ?`,
+    prompt: t('Mesures supposées normales : {xs}. On teste H₀ : μ = {m0} contre H₁ : μ ≠ {m0}. Quelle est la valeur de t_obs ?', { xs: list(d.xs), m0: d.mu0 }),
     right: f(d.t), wrongs: [{ html: f(tn), rule: 'p_sd_n' }, { html: f((d.mean - d.mu0) / Math.sqrt(d.s2)), rule: 'p_se_forgot_sqrt_n' }],
     fillers: [{ html: f(d.t * 2) }, { html: f(d.t / 2) }],
   }, rng);
 }
 
 function t1Tf(rng, opts) {
-  if (rng.chance(0.5)) return tf({ skill: T1, key: '1-5', exam: examTag(opts), truth: true, statement: 'Si un test rejette H₀ au niveau 1 %, il la rejette aussi au niveau 5 %.', explanation: 'p_obs < 0,01 entraîne p_obs < 0,05.' });
+  if (rng.chance(0.5)) return tf({ skill: T1, key: '1-5', exam: examTag(opts), truth: true, statement: t('Si un test rejette H₀ au niveau 1 %, il la rejette aussi au niveau 5 %.'), explanation: t('p_obs < 0,01 entraîne p_obs < 0,05.') });
   return tf({
     skill: T1, key: 'df', exam: examTag(opts), truth: false, ruleIfTrue: 'p_df_wrong',
-    statement: 'Le test t à un échantillon de n données utilise la loi de Student à n degrés de liberté.',
-    explanation: 'On estime μ par x̄ : on perd un degré de liberté, ν = n − 1.',
-    counter: numCounter({ vars: [{ v: 'n', label: 'Un nombre de données n =', dom: 'N*' }, { v: 'v', label: 'et le bon ν =', dom: 'N' }], hyp: 'n≥2∧v=n-1', pred: 'v=n', answer: { n: '5', v: '4' } }),
+    statement: t('Le test t à un échantillon de n données utilise la loi de Student à n degrés de liberté.'),
+    explanation: t('On estime μ par x̄ : on perd un degré de liberté, ν = n − 1.'),
+    counter: numCounter({ vars: [{ v: 'n', label: t('Un nombre de données n ='), dom: 'N*' }, { v: 'v', label: t('et le bon ν ='), dom: 'N' }], hyp: 'n≥2∧v=n-1', pred: 'v=n', answer: { n: '5', v: '4' } }),
   });
 }
 
@@ -595,9 +598,9 @@ function t1Tf(rng, opts) {
 
 const T2 = 'p-test-t2';
 const T2_SUB = [
-  { id: 'desc', label: 'résumés', skill: 'p-desc-summary' },
-  { id: 'test', label: 'test t poolé', skill: T2 },
-  { id: 't1', label: 'statistique t', skill: T1 },
+  { id: 'desc', label: t('résumés'), skill: 'p-desc-summary' },
+  { id: 'test', label: t('test t poolé'), skill: T2 },
+  { id: 't1', label: t('statistique t'), skill: T1 },
 ];
 
 function t2Data(rng, { raw = false, unequal = false } = {}) {
@@ -638,11 +641,11 @@ function t2Parts(d) {
   if (d.raw) {
     for (const [g, s] of [[1, d.a], [2, d.b]]) {
       parts.push({
-        label: `x̄${g === 1 ? '₁' : '₂'}`, name: `m${g}`, kind: 'prob', expect: String(s.mean), action: `Moyenne du groupe ${g}`,
-        lines: [{ math: `(${s.xs.join('+')})/${s.xs.length}`, note: `Groupe ${g}`, subgoal: 'desc' }, { math: String(s.mean) }],
+        label: `x̄${g === 1 ? '₁' : '₂'}`, name: `m${g}`, kind: 'prob', expect: String(s.mean), action: t('Moyenne du groupe {g}', { g }),
+        lines: [{ math: `(${s.xs.join('+')})/${s.xs.length}`, note: t('Groupe {g}', { g }), subgoal: 'desc' }, { math: String(s.mean) }],
       });
       parts.push({
-        label: `s${g === 1 ? '₁' : '₂'}²`, name: `v${g}`, kind: 'prob', expect: String(s.s2), action: `Variance du groupe ${g}`,
+        label: `s${g === 1 ? '₁' : '₂'}²`, name: `v${g}`, kind: 'prob', expect: String(s.s2), action: t('Variance du groupe {g}', { g }),
         lines: [{ math: `${s.SS}/${s.xs.length - 1}`, note: `Σ(x − x̄)² = ${s.SS}, ÷ (n − 1)`, subgoal: 'desc' }, { math: String(s.s2) }],
       });
     }
@@ -651,28 +654,28 @@ function t2Parts(d) {
   const v2 = d.raw ? '$v2' : String(d.b.s2);
   const Ft = dec(roundTo(d.ratio, 3), 3);
   parts.push({
-    label: 'F', name: 'F', kind: 'stat', expect: `${v1}/${v2}`, decimals: 3, action: 'Test F : s₁²/s₂²',
-    decisions: [{ prompt: 'Ces deux groupes sont-ils…', levels: [1, 2, 3], options: [
-      { id: 'ind', label: 'Deux échantillons indépendants (des individus différents)', valid: true },
-      { id: 'pair', label: 'Des données appariées : on teste les différences groupe par groupe', valid: false, rule: 'p_paired_as_two', why: 'Ce sont des individus différents (les tailles peuvent même différer) : pas de paires.' },
+    label: 'F', name: 'F', kind: 'stat', expect: `${v1}/${v2}`, decimals: 3, action: t('Test F : s₁²/s₂²'),
+    decisions: [{ prompt: t('Ces deux groupes sont-ils…'), levels: [1, 2, 3], options: [
+      { id: 'ind', label: t('Deux échantillons indépendants (des individus différents)'), valid: true },
+      { id: 'pair', label: t('Des données appariées : on teste les différences groupe par groupe'), valid: false, rule: 'p_paired_as_two', why: t('Ce sont des individus différents (les tailles peuvent même différer) : pas de paires.') },
     ] }],
     lines: [{ math: Ft, note: `F = s₁²/s₂² = ${d.a.s2}/${d.b.s2}`, subgoal: 'test' }],
   });
   const spq = frac((d.n1 - 1) * d.a.s2 + (d.n2 - 1) * d.b.s2, d.n1 + d.n2 - 2);
   const avg = (d.a.s2 + d.b.s2) / 2;
   parts.push({
-    label: 's_p²', name: 'sp2', kind: 'prob', expect: `((${d.n1}-1)*${v1}+(${d.n2}-1)*${v2})/(${d.n1 + d.n2 - 2})`, action: 'Variance poolée',
-    decisions: [{ prompt: `F = ${Ft} et l’énoncé donne F(${d.n1 - 1} ; ${d.n2 - 1}) entre ${dec(d.fLo, 3)} et ${dec(d.fHi, 3)} (95 %) :`, levels: [2, 3, 4, 5], options: [
-      { id: 'ok', label: 'Variances compatibles : le test t poolé convient', valid: true },
-      { id: 'no', label: 'Variances différentes : il faudrait le test de Welch', valid: false, why: `${Ft} est entre ${dec(d.fLo, 3)} et ${dec(d.fHi, 3)} : on ne rejette pas l’égalité des variances.` },
+    label: 's_p²', name: 'sp2', kind: 'prob', expect: `((${d.n1}-1)*${v1}+(${d.n2}-1)*${v2})/(${d.n1 + d.n2 - 2})`, action: t('Variance poolée'),
+    decisions: [{ prompt: t('F = {F} et l’énoncé donne F({a} ; {b}) entre {lo} et {hi} (95 %) :', { F: Ft, a: d.n1 - 1, b: d.n2 - 1, lo: dec(d.fLo, 3), hi: dec(d.fHi, 3) }), levels: [2, 3, 4, 5], options: [
+      { id: 'ok', label: t('Variances compatibles : le test t poolé convient'), valid: true },
+      { id: 'no', label: t('Variances différentes : il faudrait le test de Welch'), valid: false, why: t('{F} est entre {lo} et {hi} : on ne rejette pas l’égalité des variances.', { F: Ft, lo: dec(d.fLo, 3), hi: dec(d.fHi, 3) }) },
     ] }],
     traps: Math.abs(avg - d.sp2) > 1e-9 ? { p_pooled_average: { values: [val(avg)], ctx: { n1: d.n1, n2: d.n2 } } } : {},
-    wrongActions: [{ label: 'Faire la moyenne simple des deux variances', rule: 'p_pooled_average', why: 'Chaque variance pèse selon ses degrés de liberté.' }],
+    wrongActions: [{ label: t('Faire la moyenne simple des deux variances'), rule: 'p_pooled_average', why: t('Chaque variance pèse selon ses degrés de liberté.') }],
     lines: [{ math: spText(d), note: 's_p² = ((n₁ − 1)s₁² + (n₂ − 1)s₂²)/(n₁ + n₂ − 2)', subgoal: 'test', blank: [String(d.n1 + d.n2 - 2)] }, ...(spq !== spText(d) ? [{ math: spq, blank: [spq] }] : [])],
   });
   const seT = dec(roundTo(d.se, 3), 3);
   parts.push({
-    label: 'se', name: 'se', kind: 'stat', expect: `√($sp2*(1/${d.n1}+1/${d.n2}))`, decimals: 3, action: 'Erreur standard s_p·√(1/n₁ + 1/n₂)',
+    label: 'se', name: 'se', kind: 'stat', expect: `√($sp2*(1/${d.n1}+1/${d.n2}))`, decimals: 3, action: t('Erreur standard s_p·√(1/n₁ + 1/n₂)'),
     traps: { p_two_sample_se: [val(Math.sqrt(d.a.s2 + d.b.s2))] },
     lines: [{ math: `√(${spq}×(1/${d.n1}+1/${d.n2}))`, note: 'se', subgoal: 'test' }, { math: seT }],
   });
@@ -680,7 +683,7 @@ function t2Parts(d) {
   const m2 = d.raw ? '$m2' : String(d.b.mean);
   const tv = (d.a.mean - d.b.mean) / Number(seT.replace(',', '.'));
   parts.push({
-    label: 't_obs', name: 't', kind: 'stat', expect: `(${m1}-${m2})/$se`, decimals: 2, action: 'Statistique t_obs',
+    label: 't_obs', name: 't', kind: 'stat', expect: `(${m1}-${m2})/$se`, decimals: 2, action: t('Statistique t_obs'),
     lines: [{ math: `(${d.a.mean}-${d.b.mean})/${seT}`, note: 'T = (x̄₁ − x̄₂)/se', subgoal: 't1' }, { math: dec(roundTo(tv, 2), 2) }],
   });
   parts.push({
@@ -689,9 +692,9 @@ function t2Parts(d) {
     lines: [{ math: String(d.nu), note: 'ν = n₁ + n₂ − 2', subgoal: 'test', blank: [String(d.nu)] }],
   });
   parts.push({
-    label: 't_c', name: 'tc', kind: 'stat', expect: '#t($nu,5)', decimals: 3, action: 'Lire s₅(ν)',
+    label: 't_c', name: 'tc', kind: 'stat', expect: '#t($nu,5)', decimals: 3, action: t('Lire s₅(ν)'),
     traps: { p_t_vs_z: ['1.96'] },
-    lines: [{ math: tqText(d.nu), note: `Table 3, ν = ${d.nu}`, subgoal: 'test', blank: [tqText(d.nu)] }],
+    lines: [{ math: tqText(d.nu), note: t('Table 3, ν = {nu}', { nu: d.nu }), subgoal: 'test', blank: [tqText(d.nu)] }],
   });
   return parts;
 }
@@ -702,16 +705,16 @@ function t2Item(level, rng, profile, opts = {}) {
   const d = t2Data(rng, { raw, unequal: level >= 4 || opts.exam === 'mcq' || rng.chance(0.4) });
   if (opts.exam === 'mcq') return t2Mcq(d, rng, opts);
   const story = raw
-    ? `Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : ${list(d.a.xs)}. Groupe 2 : ${list(d.b.xs)}. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F(${d.n1 - 1} ; ${d.n2 - 1}) : ${dec(d.fLo, 3)} (2,5 %) et ${dec(d.fHi, 3)} (97,5 %).`
-    : `Deux groupes indépendants, supposés normaux : n₁ = ${d.n1}, x̄₁ = ${d.a.mean}, s₁² = ${d.a.s2} ; n₂ = ${d.n2}, x̄₂ = ${d.b.mean}, s₂² = ${d.b.s2}. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F(${d.n1 - 1} ; ${d.n2 - 1}) : ${dec(d.fLo, 3)} et ${dec(d.fHi, 3)}.`;
+    ? t('Deux groupes indépendants, supposés normaux de même variance. Groupe 1 : {g1}. Groupe 2 : {g2}. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). On donne les quantiles de F({a} ; {b}) : {lo} (2,5 %) et {hi} (97,5 %).', { g1: list(d.a.xs), g2: list(d.b.xs), a: d.n1 - 1, b: d.n2 - 1, lo: dec(d.fLo, 3), hi: dec(d.fHi, 3) })
+    : t('Deux groupes indépendants, supposés normaux : n₁ = {n1}, x̄₁ = {m1}, s₁² = {v1} ; n₂ = {n2}, x̄₂ = {m2}, s₂² = {v2}. On teste H₀ : μ₁ = μ₂ (bilatéral, 5 %). Quantiles de F({a} ; {b}) : {lo} et {hi}.', { n1: d.n1, m1: d.a.mean, v1: d.a.s2, n2: d.n2, m2: d.b.mean, v2: d.b.s2, a: d.n1 - 1, b: d.n2 - 1, lo: dec(d.fLo, 3), hi: dec(d.fHi, 3) });
   const parts = t2Parts(d);
   const o = {
     skill: T2, level, key: `${level}:${d.a.xs.join(',')}:${d.b.xs.join(',')}`, prompt: story, parts,
-    hints: H('Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2.', SM(`(${d.n1 - 1}×${d.a.s2}+${d.n2 - 1}×${d.b.s2})/□`), `s_p² = ${frac((d.n1 - 1) * d.a.s2 + (d.n2 - 1) * d.b.s2, d.n1 + d.n2 - 2).replace('/', ' / ')}`),
-    subgoals: T2_SUB, interpret: testConclusion(d.reject, 5, 'les deux moyennes sont égales'), exam: examTag(opts),
+    hints: H(t('Pondère chaque s² par ses degrés de liberté ; ν = n₁ + n₂ − 2.'), SM(`(${d.n1 - 1}×${d.a.s2}+${d.n2 - 1}×${d.b.s2})/□`), `s_p² = ${frac((d.n1 - 1) * d.a.s2 + (d.n2 - 1) * d.b.s2, d.n1 + d.n2 - 2).replace('/', ' / ')}`),
+    subgoals: T2_SUB, interpret: testConclusion(d.reject, 5, t('les deux moyennes sont égales')), exam: examTag(opts),
   };
-  if (opts.exam === 'open') return openItem({ ...o, exam: undefined, title: 'Test t à deux échantillons' }, 10, rng);
-  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${story} Donne la variance poolée s_p².`, part: { ...parts.find((p) => p.name === 'sp2'), decisions: [], expect: `((${d.n1}-1)*${d.a.s2}+(${d.n2}-1)*${d.b.s2})/(${d.n1 + d.n2 - 2})`, ref: {} } });
+  if (opts.exam === 'open') return openItem({ ...o, exam: undefined, title: t('Test t à deux échantillons') }, 10, rng);
+  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${story} ${t('Donne la variance poolée s_p².')}`, part: { ...parts.find((p) => p.name === 'sp2'), decisions: [], expect: `((${d.n1}-1)*${d.a.s2}+(${d.n2}-1)*${d.b.s2})/(${d.n1 + d.n2 - 2})`, ref: {} } });
   return statItem(o);
 }
 
@@ -720,7 +723,7 @@ function t2Mcq(d, rng, opts) {
   const avg = (d.a.s2 + d.b.s2) / 2;
   return choice({
     skill: T2, level: 4, key: `mcq:${d.a.xs.join(',')}:${d.b.xs.join(',')}`, exam: examTag(opts),
-    prompt: `Deux groupes indépendants, normaux de même variance : n₁ = ${d.n1}, x̄₁ = ${d.a.mean}, s₁² = ${d.a.s2} ; n₂ = ${d.n2}, x̄₂ = ${d.b.mean}, s₂² = ${d.b.s2}. Quelle est la statistique t_obs du test t poolé ?`,
+    prompt: t('Deux groupes indépendants, normaux de même variance : n₁ = {n1}, x̄₁ = {m1}, s₁² = {v1} ; n₂ = {n2}, x̄₂ = {m2}, s₂² = {v2}. Quelle est la statistique t_obs du test t poolé ?', { n1: d.n1, m1: d.a.mean, v1: d.a.s2, n2: d.n2, m2: d.b.mean, v2: d.b.s2 }),
     right: f(d.t),
     wrongs: [
       { html: f((d.a.mean - d.b.mean) / Math.sqrt(avg * (1 / d.n1 + 1 / d.n2))), rule: 'p_pooled_average' },
@@ -731,12 +734,12 @@ function t2Mcq(d, rng, opts) {
 }
 
 function t2Tf(rng, opts) {
-  if (rng.chance(0.5)) return tf({ skill: T2, key: 'var', exam: examTag(opts), truth: true, statement: 'Le test t à deux échantillons avec variance poolée suppose les deux variances égales.', explanation: 'D’où le test F qui le précède.' });
+  if (rng.chance(0.5)) return tf({ skill: T2, key: 'var', exam: examTag(opts), truth: true, statement: t('Le test t à deux échantillons avec variance poolée suppose les deux variances égales.'), explanation: t('D’où le test F qui le précède.') });
   return tf({
     skill: T2, key: 'df', exam: examTag(opts), truth: false, ruleIfTrue: 'p_df_wrong',
-    statement: 'Le test t poolé à deux échantillons de tailles n₁ et n₂ a n₁ + n₂ − 1 degrés de liberté.',
-    explanation: 'On estime deux moyennes : ν = n₁ + n₂ − 2.',
-    counter: numCounter({ vars: [{ v: 'a', label: 'n₁ =', dom: 'N*' }, { v: 'b', label: 'n₂ =', dom: 'N*' }, { v: 'v', label: 'le bon ν =', dom: 'N' }], hyp: 'a≥2∧b≥2∧v=a+b-2', pred: 'v=a+b-1', answer: { a: '5', b: '5', v: '8' } }),
+    statement: t('Le test t poolé à deux échantillons de tailles n₁ et n₂ a n₁ + n₂ − 1 degrés de liberté.'),
+    explanation: t('On estime deux moyennes : ν = n₁ + n₂ − 2.'),
+    counter: numCounter({ vars: [{ v: 'a', label: 'n₁ =', dom: 'N*' }, { v: 'b', label: 'n₂ =', dom: 'N*' }, { v: 'v', label: t('le bon ν ='), dom: 'N' }], hyp: 'a≥2∧b≥2∧v=a+b-2', pred: 'v=a+b-1', answer: { a: '5', b: '5', v: '8' } }),
   });
 }
 
@@ -746,13 +749,14 @@ function t2Tf(rng, opts) {
 
 const TT = 'p-test-two-prop';
 const TT_SUB = [
-  { id: 'z', label: 'test z', skill: TZ },
-  { id: 'pool', label: 'proportion poolée', skill: TT },
+  { id: 'z', label: t('test z'), skill: TZ },
+  { id: 'pool', label: t('proportion poolée'), skill: TT },
 ];
+// The first sentence of the story (with {k1}, {n1}, {k2}, {n2}) and H₀ in words.
 const CONTEXT = [
-  ['guérisons avec le traitement A', 'avec le traitement B', 'les deux traitements ont le même taux de guérison'],
-  ['pièces défectueuses de la machine 1', 'de la machine 2', 'les deux machines ont le même taux de défauts'],
-  ['« oui » dans la région 1', 'dans la région 2', 'les deux régions votent oui dans la même proportion'],
+  ['{k1} guérisons avec le traitement A sur n₁ = {n1}, et {k2} avec le traitement B sur n₂ = {n2}.', 'les deux traitements ont le même taux de guérison'],
+  ['{k1} pièces défectueuses de la machine 1 sur n₁ = {n1}, et {k2} de la machine 2 sur n₂ = {n2}.', 'les deux machines ont le même taux de défauts'],
+  ['{k1} « oui » dans la région 1 sur n₁ = {n1}, et {k2} dans la région 2 sur n₂ = {n2}.', 'les deux régions votent oui dans la même proportion'],
 ];
 
 function ttData(rng, oneSided) {
@@ -785,18 +789,18 @@ function ttParts(d) {
   return {
     reject: pv.v < 0.05, p: pv.v,
     parts: [
-      { label: 'p̂₁', name: 'p1', kind: 'prob', expect: `${d.k1}/${d.n1}`, action: 'Proportions', lines: [{ math: `${d.k1}/${d.n1}`, subgoal: 'z' }, { math: dec(d.p1, 2) }].filter((l, i) => i === 0 || dec(d.p1, 2) !== `${d.k1}/${d.n1}`) },
-      { label: 'p̂₂', name: 'p2', kind: 'prob', expect: `${d.k2}/${d.n2}`, action: 'Proportions', lines: [{ math: `${d.k2}/${d.n2}`, subgoal: 'z' }, { math: dec(d.p2, 2) }] },
+      { label: 'p̂₁', name: 'p1', kind: 'prob', expect: `${d.k1}/${d.n1}`, action: t('Proportions'), lines: [{ math: `${d.k1}/${d.n1}`, subgoal: 'z' }, { math: dec(d.p1, 2) }].filter((l, i) => i === 0 || dec(d.p1, 2) !== `${d.k1}/${d.n1}`) },
+      { label: 'p̂₂', name: 'p2', kind: 'prob', expect: `${d.k2}/${d.n2}`, action: t('Proportions'), lines: [{ math: `${d.k2}/${d.n2}`, subgoal: 'z' }, { math: dec(d.p2, 2) }] },
       {
-        label: 'p̂', name: 'pp', kind: 'prob', expect: `(${d.k1}+${d.k2})/(${d.n1}+${d.n2})`, action: 'Proportion poolée sous H₀',
-        decisions: [{ prompt: 'Sous H₀ : p₁ = p₂, comment estimer la proportion commune ?', options: [
-          { id: 'pool', label: 'Avec tous les individus : (k₁ + k₂)/(n₁ + n₂)', valid: true },
-          { id: 'sep', label: 'Garder p̂₁ et p̂₂ séparément dans l’erreur standard', valid: false, rule: 'p_two_prop_no_pool', why: 'Sous H₀ les deux proportions sont égales : le cours les estime ensemble.' },
+        label: 'p̂', name: 'pp', kind: 'prob', expect: `(${d.k1}+${d.k2})/(${d.n1}+${d.n2})`, action: t('Proportion poolée sous H₀'),
+        decisions: [{ prompt: t('Sous H₀ : p₁ = p₂, comment estimer la proportion commune ?'), options: [
+          { id: 'pool', label: t('Avec tous les individus : (k₁ + k₂)/(n₁ + n₂)'), valid: true },
+          { id: 'sep', label: t('Garder p̂₁ et p̂₂ séparément dans l’erreur standard'), valid: false, rule: 'p_two_prop_no_pool', why: t('Sous H₀ les deux proportions sont égales : le cours les estime ensemble.') },
         ] }],
-        lines: [{ math: `(${d.k1}+${d.k2})/(${d.n1}+${d.n2})`, note: 'Proportion poolée', subgoal: 'pool', blank: [String(d.n1 + d.n2)] }, { math: dec(d.p, 4) === pq ? pq : pq, blank: [pq] }].filter((l, i, a) => i === 0 || l.math !== a[0].math),
+        lines: [{ math: `(${d.k1}+${d.k2})/(${d.n1}+${d.n2})`, note: t('Proportion poolée'), subgoal: 'pool', blank: [String(d.n1 + d.n2)] }, { math: dec(d.p, 4) === pq ? pq : pq, blank: [pq] }].filter((l, i, a) => i === 0 || l.math !== a[0].math),
       },
       {
-        label: 'se', name: 'se', kind: 'stat', expect: `√($pp*(1-$pp)*(1/${d.n1}+1/${d.n2}))`, decimals: 4, action: 'Erreur standard poolée',
+        label: 'se', name: 'se', kind: 'stat', expect: `√($pp*(1-$pp)*(1/${d.n1}+1/${d.n2}))`, decimals: 4, action: t('Erreur standard poolée'),
         traps: {
           p_two_prop_no_pool: { values: [val(Math.sqrt(d.p1 * (1 - d.p1) / d.n1 + d.p2 * (1 - d.p2) / d.n2))], ctx: { p: dec(d.p, 4) } },
           p_two_sample_se: [val(Math.sqrt(d.p1 * (1 - d.p1) + d.p2 * (1 - d.p2)))],
@@ -804,13 +808,13 @@ function ttParts(d) {
         lines: [{ math: `√(${dec(d.p, 4)}×${dec(1 - d.p, 4)}×(1/${d.n1}+1/${d.n2}))`, note: 'se = √(p̂(1 − p̂)(1/n₁ + 1/n₂))', subgoal: 'pool' }, { math: seT }],
       },
       {
-        label: 't_obs', name: 't', kind: 'stat', expect: '($p1-$p2)/$se', decimals: 2, action: 'Statistique',
+        label: 't_obs', name: 't', kind: 'stat', expect: '($p1-$p2)/$se', decimals: 2, action: t('Statistique'),
         lines: [{ math: `(${dec(d.p1, 2)}-${dec(d.p2, 2)})/${seT}`, subgoal: 'z' }, { math: dec(tr, 2) }],
       },
       {
-        label: 'p_obs', name: 'pv', kind: 'stat', expect: d.oneSided ? '1-#phi($t)' : '2*(1-#phi(abs($t)))', decimals: 2, action: 'p-valeur',
+        label: 'p_obs', name: 'pv', kind: 'stat', expect: d.oneSided ? '1-#phi($t)' : '2*(1-#phi(abs($t)))', decimals: 2, action: t('p-valeur'),
         traps: { p_pvalue_two_sided: { values: [val(pv.one)], ctx: { t: dec(Math.abs(tr), 2) } } },
-        lines: [{ math: pv.line, note: d.oneSided ? 'Unilatéral' : 'Bilatéral', subgoal: 'z' }, { math: dec(roundTo(pv.v, 3), 3) }],
+        lines: [{ math: pv.line, note: d.oneSided ? t('Unilatéral') : t('Bilatéral'), subgoal: 'z' }, { math: dec(roundTo(pv.v, 3), 3) }],
       },
     ],
   };
@@ -819,12 +823,13 @@ function ttParts(d) {
 function ttItem(level, rng, profile, opts = {}) {
   if (opts.exam === 'tf') return ttTf(rng, opts);
   const d = ttData(rng, level === 5);
-  const [w1, w2, claim] = d.ctx;
-  const story = `${d.k1} ${w1} sur n₁ = ${d.n1}, et ${d.k2} ${w2} sur n₂ = ${d.n2}. On teste H₀ : p₁ = p₂ contre H₁ : p₁ ${d.oneSided ? '>' : '≠'} p₂ au niveau 5 %.`;
+  const [first, claimFr] = d.ctx;
+  const claim = t(claimFr);
+  const story = `${t(first, { k1: d.k1, n1: d.n1, k2: d.k2, n2: d.n2 })} ${d.oneSided ? t('On teste H₀ : p₁ = p₂ contre H₁ : p₁ > p₂ au niveau 5 %.') : t('On teste H₀ : p₁ = p₂ contre H₁ : p₁ ≠ p₂ au niveau 5 %.')}`;
   if (opts.exam === 'mcq') {
     const f = (x) => dec(roundTo(x, 4), 4);
     return choice({
-      skill: TT, level: 4, key: `mcq:${d.k1}:${d.n1}:${d.k2}:${d.n2}`, exam: examTag(opts), prompt: `${story} Quelle erreur standard utiliser sous H₀ ?`,
+      skill: TT, level: 4, key: `mcq:${d.k1}:${d.n1}:${d.k2}:${d.n2}`, exam: examTag(opts), prompt: `${story} ${t('Quelle erreur standard utiliser sous H₀ ?')}`,
       right: f(d.se), wrongs: [{ html: f(Math.sqrt(d.p1 * (1 - d.p1) / d.n1 + d.p2 * (1 - d.p2) / d.n2)), rule: 'p_two_prop_no_pool' }, { html: f(Math.sqrt(d.p1 * (1 - d.p1) + d.p2 * (1 - d.p2))), rule: 'p_two_sample_se' }],
       fillers: [{ html: f(d.se * 2) }, { html: f(Math.sqrt(d.p * (1 - d.p) / (d.n1 + d.n2))) }],
     }, rng);
@@ -832,19 +837,19 @@ function ttItem(level, rng, profile, opts = {}) {
   const { parts, reject, p } = ttParts(d);
   const o = {
     skill: TT, level, key: `${level}:${d.k1}:${d.n1}:${d.k2}:${d.n2}:${d.oneSided}`, prompt: story, parts,
-    hints: H('Sous H₀, les deux groupes ont la même proportion : estime-la avec tous les individus.', SM(`(${d.k1}+${d.k2})/□`), `p̂ = ${frac(d.k1 + d.k2, d.n1 + d.n2)}`),
+    hints: H(t('Sous H₀, les deux groupes ont la même proportion : estime-la avec tous les individus.'), SM(`(${d.k1}+${d.k2})/□`), `p̂ = ${frac(d.k1 + d.k2, d.n1 + d.n2)}`),
     subgoals: TT_SUB, interpret: testConclusion(reject, 5, claim, { p }), exam: examTag(opts),
   };
-  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${story} Donne la statistique t_obs (deux décimales).`, part: { label: 't_obs', kind: 'stat', expect: val(d.t), decimals: 2, accept: [], ref: {}, tol: 0.006, lines: [{ math: dec(roundTo(d.t, 2), 2) }] } });
+  if (opts.exam === 'coef') return coefItem({ ...o, prompt: `${story} ${t('Donne la statistique t_obs (deux décimales).')}`, part: { label: 't_obs', kind: 'stat', expect: val(d.t), decimals: 2, accept: [], ref: {}, tol: 0.006, lines: [{ math: dec(roundTo(d.t, 2), 2) }] } });
   return statItem(o);
 }
 
 function ttTf(rng, opts) {
-  if (rng.chance(0.4)) return tf({ skill: TT, key: 'eq', exam: examTag(opts), truth: true, statement: 'Quand n₁ = n₂, la proportion poolée est la moyenne de p̂₁ et p̂₂.', explanation: '(k₁ + k₂)/(2n) = (p̂₁ + p̂₂)/2.' });
+  if (rng.chance(0.4)) return tf({ skill: TT, key: 'eq', exam: examTag(opts), truth: true, statement: t('Quand n₁ = n₂, la proportion poolée est la moyenne de p̂₁ et p̂₂.'), explanation: '(k₁ + k₂)/(2n) = (p̂₁ + p̂₂)/2.' });
   return tf({
     skill: TT, key: 'avg', exam: examTag(opts), truth: false, ruleIfTrue: 'p_two_prop_no_pool',
-    statement: 'Sous H₀ : p₁ = p₂, on estime la proportion commune par la moyenne de p̂₁ = 0,2 et p̂₂ = 0,4, quels que soient n₁ et n₂.',
-    explanation: 'La proportion poolée pondère par les tailles : avec n₁ = 100 et n₂ = 300, p̂ = (20 + 120)/400 = 0,35, pas 0,3.',
+    statement: t('Sous H₀ : p₁ = p₂, on estime la proportion commune par la moyenne de p̂₁ = 0,2 et p̂₂ = 0,4, quels que soient n₁ et n₂.'),
+    explanation: t('La proportion poolée pondère par les tailles : avec n₁ = 100 et n₂ = 300, p̂ = (20 + 120)/400 = 0,35, pas 0,3.'),
     counter: numCounter({ vars: [{ v: 'a', label: 'n₁ =', dom: 'N*' }, { v: 'b', label: 'n₂ =', dom: 'N*' }], hyp: 'a>0∧b>0', pred: '(0,2a+0,4b)/(a+b)=0,3', answer: { a: '100', b: '300' } }),
   });
 }

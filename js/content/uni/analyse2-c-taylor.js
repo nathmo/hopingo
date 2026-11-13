@@ -17,15 +17,16 @@ import {
   q, qt, fq, H, nz, ML, RD, polyT, ptT,
   partsItem, examMcq, tfItem, vfMcq, a2Counter, coefLines, examTag,
 } from './analyse2-c-kit.js';
+import { t } from '../../i18n.js';
 
 const TY = 'a2-taylor2';
 const TY_SUB = [
-  { id: 'inner', label: 'u petit, composée', skill: 'a1-dl-compose' },
-  { id: 'outer-dl', label: 'DL de la fonction extérieure', skill: 'a1-dl-ops' },
-  { id: 'truncate', label: 'tronquer à l\'ordre 2', skill: 'a1-dl-compose' },
-  { id: 'derivs', label: 'dérivées partielles au point', skill: 'a2-partials' },
-  { id: 'compose', label: 'polynôme de Taylor', skill: TY },
-  { id: 'collect', label: 'regrouper', skill: TY },
+  { id: 'inner', label: t('u petit, composée'), skill: 'a1-dl-compose' },
+  { id: 'outer-dl', label: t('DL de la fonction extérieure'), skill: 'a1-dl-ops' },
+  { id: 'truncate', label: t('tronquer à l\'ordre 2'), skill: 'a1-dl-compose' },
+  { id: 'derivs', label: t('dérivées partielles au point'), skill: 'a2-partials' },
+  { id: 'compose', label: t('polynôme de Taylor'), skill: TY },
+  { id: 'collect', label: t('regrouper'), skill: TY },
 ];
 const XY = ['x', 'y'];
 
@@ -138,16 +139,16 @@ function dlLines(d, level) {
   const head = (rest) => `${c0.n === 0 ? '' : qt(c0)}${rest}`.replace(/^\+/, '');
   const lines = [];
   const uFull = cterm(c1, `(${d.U})`, c0.n === 0) + (c2.n === 0 ? '' : cterm(c2, `(${d.U})^2`, c0.n === 0 && c1.n === 0));
-  lines.push({ math: head(uFull), note: `${d.P.name} avec u = ${RD(d.U, XY)}`, subgoal: 'inner', blank: level === 1 ? [`(${d.U})`] : [] });
+  lines.push({ math: head(uFull), note: t('{f} avec u = {u}', { f: d.P.name, u: RD(d.U, XY) }), subgoal: 'inner', blank: level === 1 ? [`(${d.U})`] : [] });
   const quad = d.u.XX || d.u.XY || d.u.YY;
   if (c2.n !== 0 && quad) {
-    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${d.U1})^2`, c0.n === 0 && c1.n === 0)), note: `u² = (${RD(d.U1, XY)})² + (degré ≥ 3)`, subgoal: 'truncate', blank: level === 1 ? [`(${d.U1})^2`] : [] });
+    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${d.U1})^2`, c0.n === 0 && c1.n === 0)), note: t('u² = ({u})² + (degré ≥ 3)', { u: RD(d.U1, XY) }), subgoal: 'truncate', blank: level === 1 ? [`(${d.U1})^2`] : [] });
   }
   if (c2.n !== 0 && d.u.X !== 0 && d.u.Y !== 0) {
     const sq = polyT([{ c: q(d.u.X * d.u.X), e: [2, 0] }, { c: q(2 * d.u.X * d.u.Y), e: [1, 1] }, { c: q(d.u.Y * d.u.Y), e: [0, 2] }], XY);
-    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${sq})`, c0.n === 0 && c1.n === 0)), note: `(${RD(d.U1, XY)})² développé`, subgoal: 'compose' });
+    lines.push({ math: head(cterm(c1, `(${d.U})`, c0.n === 0) + cterm(c2, `(${sq})`, c0.n === 0 && c1.n === 0)), note: t('({u})² développé', { u: RD(d.U1, XY) }), subgoal: 'compose' });
   }
-  lines.push({ math: final(d), note: 'Termes regroupés', subgoal: 'collect' });
+  lines.push({ math: final(d), note: t('Termes regroupés'), subgoal: 'collect' });
   // A line equal to the previous one (nothing to develop) is dropped, and
   // the solution stops at the first line already in final form.
   const cfg = jetJudge(d);
@@ -164,17 +165,17 @@ function dlLines(d, level) {
 }
 
 const METHOD = {
-  kind: 'decision', prompt: 'Quelle méthode ?', levels: [3], options: [
-    { id: 'dl', label: 'DL à une variable de la fonction extérieure (u petit)', valid: true, ref: true },
-    { id: 'derivs', label: 'Les six dérivées partielles en (0, 0)', valid: true, why: 'Juste aussi, mais plus long : il faut dériver deux fois une composée.' },
-    { id: 'all', label: 'Développer u² en entier et tout garder', valid: false, rule: 'a2_taylor_no_truncate', why: 'p₂ ne garde que le degré ≤ 2 : les termes de degré 3 et 4 de u² partent dans le reste.' },
+  kind: 'decision', prompt: t('Quelle méthode ?'), levels: [3], options: [
+    { id: 'dl', label: t('DL à une variable de la fonction extérieure (u petit)'), valid: true, ref: true },
+    { id: 'derivs', label: t('Les six dérivées partielles en (0, 0)'), valid: true, why: t('Juste aussi, mais plus long : il faut dériver deux fois une composée.') },
+    { id: 'all', label: t('Développer u² en entier et tout garder'), valid: false, rule: 'a2_taylor_no_truncate', why: t('p₂ ne garde que le degré ≤ 2 : les termes de degré 3 et 4 de u² partent dans le reste.') },
   ],
 };
 const DL_MENU = [
-  { id: 'dl', label: 'Remplacer par le DL en u', valid: true },
-  { id: 'truncate', label: 'Tronquer : garder le degré ≤ 2', valid: true },
-  { id: 'collect', label: 'Développer et regrouper', valid: true },
-  { id: 'nohalf', label: 'Oublier le ½ du DL', valid: false, rule: 'a2_taylor_no_half', why: 'Le DL a ses coefficients : cos u = 1 − u²/2, eᵘ = 1 + u + u²/2.' },
+  { id: 'dl', label: t('Remplacer par le DL en u'), valid: true },
+  { id: 'truncate', label: t('Tronquer : garder le degré ≤ 2'), valid: true },
+  { id: 'collect', label: t('Développer et regrouper'), valid: true },
+  { id: 'nohalf', label: t('Oublier le ½ du DL'), valid: false, rule: 'a2_taylor_no_half', why: t('Le DL a ses coefficients : cos u = 1 − u²/2, eᵘ = 1 + u + u²/2.') },
 ];
 
 function dlItem(level, rng, opts = {}) {
@@ -182,19 +183,21 @@ function dlItem(level, rng, opts = {}) {
   const lines = dlLines(d, level);
   const parts = [
     { start: d.P.dl, judge: { kind: 'series', v: 'u', at: 0, order: 2 }, decisions: [METHOD],
-      notes: level <= 2 ? [`On pose u = ${ML(d.U)} : u(0, 0) = 0, donc u est petit près de (0, 0).`] : [],
-      menu: [{ id: 'dl', label: 'DL usuel à l\'ordre 2', valid: true }],
-      lines: [{ math: outerDL(d), note: 'DL usuel à l\'ordre 2', subgoal: 'outer-dl', blank: level === 1 ? [outerDL(d).replace(/\+o\(u\^2\)$/, '')] : [] }] },
-    { html: 'Le polynôme de Taylor d\'ordre 2 de f en (0, 0) :', ask: 'p₂ =', start: d.f, judge: jetJudge(d), menu: DL_MENU, lines },
+      notes: level <= 2 ? [t('On pose u = {u} : u(0, 0) = 0, donc u est petit près de (0, 0).', { u: ML(d.U) })] : [],
+      menu: [{ id: 'dl', label: t('DL usuel à l\'ordre 2'), valid: true }],
+      lines: [{ math: outerDL(d), note: t('DL usuel à l\'ordre 2'), subgoal: 'outer-dl', blank: level === 1 ? [outerDL(d).replace(/\+o\(u\^2\)$/, '')] : [] }] },
+    { html: t('Le polynôme de Taylor d\'ordre 2 de f en (0, 0) :'), ask: 'p₂ =', start: d.f, judge: jetJudge(d), menu: DL_MENU, lines },
   ];
   if (level === 5) {
-    parts.push({ html: 'Lis sur p₂ la dérivée croisée :', ask: '∂²f/∂x∂y(0, 0) =', start: 'f_xy', judge: { kind: 'value', expect: qt(d.d.fxy), taylor: { fxy: qt(d.d.fxy) } },
-      lines: [{ math: qt(d.d.fxy), note: 'Coefficient de xy = f_xy(0, 0)', subgoal: 'compose' }] });
+    parts.push({ html: t('Lis sur p₂ la dérivée croisée :'), ask: '∂²f/∂x∂y(0, 0) =', start: 'f_xy', judge: { kind: 'value', expect: qt(d.d.fxy), taylor: { fxy: qt(d.d.fxy) } },
+      lines: [{ math: qt(d.d.fxy), note: t('Coefficient de xy = f_xy(0, 0)'), subgoal: 'compose' }] });
   }
   return partsItem({
     skill: TY, level, parts, subgoals: TY_SUB, key: `${TY}:dl:${d.f}`, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(d.f)}. Calcule son polynôme de Taylor d'ordre 2 en (0, 0)${level === 5 ? ', puis ∂²f/∂x∂y(0, 0)' : ''}.`,
-    hints: H(`Écris f = ${d.P.name} avec u = ${ML(d.U)} petit, et utilise le DL de ${d.P.name} à l'ordre 2.`, d.c[2].n !== 0 ? `u² ne garde que (${ML(d.U1)})²` : 'Garde les termes de degré ≤ 2 de u', `p₂ = ${ML(final(d))}`),
+    prompt: level === 5
+      ? t('Soit f(x, y) = {f}. Calcule son polynôme de Taylor d\'ordre 2 en (0, 0), puis ∂²f/∂x∂y(0, 0).', { f: ML(d.f) })
+      : t('Soit f(x, y) = {f}. Calcule son polynôme de Taylor d\'ordre 2 en (0, 0).', { f: ML(d.f) }),
+    hints: H(t('Écris f = {phi} avec u = {u} petit, et utilise le DL de {phi} à l\'ordre 2.', { phi: d.P.name, u: ML(d.U) }), d.c[2].n !== 0 ? t('u² ne garde que ({u})²', { u: ML(d.U1) }) : t('Garde les termes de degré ≤ 2 de u'), `p₂ = ${ML(final(d))}`),
   });
 }
 
@@ -208,21 +211,23 @@ function derivItem(level, rng) {
   const D = d.d;
   const n = (x) => `(${qt(x)})`;
   const formula = `${qt(D.f)}+${n(D.fx)}${M.X}+${n(D.fy)}${M.Y}+(1/2)(2${n(D.fxy)}${M.X}${M.Y}+${n(D.fxx)}${M.XX}+${n(D.fyy)}${M.YY})`;
-  const val = (key, label, x) => ({ html: `${label}${pt} :`, ask: `${label}${pt} =`, start: key, judge: { kind: 'value', expect: qt(x) }, menu: [{ id: 'd', label: 'Dériver, puis remplacer par le point', valid: true }], lines: [{ math: qt(x), note: '', subgoal: 'derivs' }] });
+  const val = (key, label, x) => ({ html: `${label}${pt} :`, ask: `${label}${pt} =`, start: key, judge: { kind: 'value', expect: qt(x) }, menu: [{ id: 'd', label: t('Dériver, puis remplacer par le point'), valid: true }], lines: [{ math: qt(x), note: '', subgoal: 'derivs' }] });
   const parts = [
-    { start: 'f', judge: { kind: 'value', expect: qt(D.f) }, menu: [{ id: 'd', label: 'Remplacer par le point', valid: true }], lines: [{ math: qt(D.f), note: `f${pt}`, subgoal: 'derivs' }] },
+    { start: 'f', judge: { kind: 'value', expect: qt(D.f) }, menu: [{ id: 'd', label: t('Remplacer par le point'), valid: true }], lines: [{ math: qt(D.f), note: `f${pt}`, subgoal: 'derivs' }] },
     val('f_x', '∂f/∂x', D.fx), val('f_y', '∂f/∂y', D.fy), val('f_xx', '∂²f/∂x²', D.fxx), val('f_xy', '∂²f/∂x∂y', D.fxy), val('f_yy', '∂²f/∂y²', D.fyy),
-    { html: 'Le polynôme de Taylor :', ask: 'p₂ =', start: d.f, judge: jetJudge(d),
-      menu: [{ id: 'formula', label: 'p₂ = f + f_x·X + f_y·Y + ½(2f_xy·XY + f_xx·X² + f_yy·Y²)', valid: true }, { id: 'collect', label: 'Développer et regrouper', valid: true }, { id: 'nohalf', label: 'p₂ = f + f_x·X + f_y·Y + f_xx·X² + 2f_xy·XY + f_yy·Y²', valid: false, rule: 'a2_taylor_no_half', why: 'Les dérivées secondes sont divisées par 2 (comme f″/2 à une variable).' }],
+    { html: t('Le polynôme de Taylor :'), ask: 'p₂ =', start: d.f, judge: jetJudge(d),
+      menu: [{ id: 'formula', label: 'p₂ = f + f_x·X + f_y·Y + ½(2f_xy·XY + f_xx·X² + f_yy·Y²)', valid: true }, { id: 'collect', label: t('Développer et regrouper'), valid: true }, { id: 'nohalf', label: 'p₂ = f + f_x·X + f_y·Y + f_xx·X² + 2f_xy·XY + f_yy·Y²', valid: false, rule: 'a2_taylor_no_half', why: t('Les dérivées secondes sont divisées par 2 (comme f″/2 à une variable).') }],
       lines: [
         { math: formula, note: `X = ${a === 0 ? 'x' : `x − ${fq(a)}`.replace('− −', '+ ')}, Y = ${b === 0 ? 'y' : `y − ${fq(b)}`.replace('− −', '+ ')}`, subgoal: 'compose', blank: level <= 2 ? ['1/2', '2'] : [] },
-        { math: final(d), note: 'Le ½ et le 2 du terme croisé se simplifient : le coefficient de XY est f_xy', subgoal: 'collect' },
+        { math: final(d), note: t('Le ½ et le 2 du terme croisé se simplifient : le coefficient de XY est f_xy'), subgoal: 'collect' },
       ] },
   ];
   return partsItem({
     skill: TY, level, parts, subgoals: TY_SUB, key: `${TY}:derivs:${d.f}:${at}`, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(d.f)}. Calcule les dérivées partielles d'ordre 1 et 2 de f en ${pt}, puis son polynôme de Taylor d'ordre 2 en ${pt}${a || b ? `, en puissances de ${RD(M.X.replace(/^\((.*)\)$/, '$1'), XY)} et ${RD(M.Y.replace(/^\((.*)\)$/, '$1'), XY)}` : ''}.`,
-    hints: H('p₂ = f + f_x·X + f_y·Y + ½(f_xx·X² + 2f_xy·XY + f_yy·Y²), toutes les dérivées prises au point.', `f${pt} = ${fq(D.f)}, ∂f/∂x${pt} = ${fq(D.fx)}, ∂f/∂y${pt} = ${fq(D.fy)}`, `p₂ = ${ML(final(d))}`),
+    prompt: a || b
+      ? t('Soit f(x, y) = {f}. Calcule les dérivées partielles d\'ordre 1 et 2 de f en {pt}, puis son polynôme de Taylor d\'ordre 2 en {pt}, en puissances de {X} et {Y}.', { f: ML(d.f), pt, X: RD(M.X.replace(/^\((.*)\)$/, '$1'), XY), Y: RD(M.Y.replace(/^\((.*)\)$/, '$1'), XY) })
+      : t('Soit f(x, y) = {f}. Calcule les dérivées partielles d\'ordre 1 et 2 de f en {pt}, puis son polynôme de Taylor d\'ordre 2 en {pt}.', { f: ML(d.f), pt }),
+    hints: H(t('p₂ = f + f_x·X + f_y·Y + ½(f_xx·X² + 2f_xy·XY + f_yy·Y²), toutes les dérivées prises au point.'), `f${pt} = ${fq(D.f)}, ∂f/∂x${pt} = ${fq(D.fx)}, ∂f/∂y${pt} = ${fq(D.fy)}`, `p₂ = ${ML(final(d))}`),
   });
 }
 
@@ -249,7 +254,7 @@ function taylorMcq(level, rng, opts) {
   })();
   return examMcq({
     skill: TY, level, key: `${TY}:mcq:${d.f}`, fallback: d.fallback,
-    prompt: `Le polynôme de Taylor d'ordre 2 de f(x, y) = ${ML(d.f)} en (0, 0) est :`,
+    prompt: t('Le polynôme de Taylor d\'ordre 2 de f(x, y) = {f} en (0, 0) est :', { f: ML(d.f) }),
     right: P(k),
     wrongs: [
       { html: P({ ...k, XY: k.XY.mul(2) }), rule: 'a2_taylor_cross' },
@@ -265,23 +270,23 @@ function taylorCoef(level, rng, opts) {
   const d = taylorData(rng, { needXY: true, kinds: ['cos', 'exp', 'ln', 'inv'] });
   return coefLines({
     skill: TY, level, key: d.f, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(d.f)}. Que vaut ∂²f/∂x∂y(0, 0) ? (Lis-la sur le polynôme de Taylor d'ordre 2.)`,
+    prompt: t('Soit f(x, y) = {f}. Que vaut ∂²f/∂x∂y(0, 0) ? (Lis-la sur le polynôme de Taylor d\'ordre 2.)', { f: ML(d.f) }),
     label: 'f_xy', value: qt(d.d.fxy), judge: { taylor: { fxy: qt(d.d.fxy) } },
     exam: examTag(opts, 1), subgoals: TY_SUB,
-    solution: [{ html: `p₂ = ${ML(final(d))} : le coefficient de xy est f_xy(0, 0) = ${fq(d.d.fxy)}.`, note: '' }],
+    solution: [{ html: t('p₂ = {p} : le coefficient de xy est f_xy(0, 0) = {c}.', { p: ML(final(d)), c: fq(d.d.fxy) }), note: '' }],
   });
 }
 const TY_TF = [
-  { truth: true, key: 'grad', s: 'Si le polynôme de Taylor d\'ordre 2 de f ∈ C² en (0, 0) est p₂ = 2 + x² + 2y², alors ∇f(0, 0) = (0, 0).', why: 'Vrai : p₂ n\'a pas de terme de degré 1, donc f_x(0, 0) = f_y(0, 0) = 0 (2021 Q27).' },
-  { truth: true, key: 'sin', s: 'Le polynôme de Taylor d\'ordre 2 de 4 sin x cos x en (0, 0) est 4x.', why: 'Vrai : 4 sin x cos x = 2 sin 2x = 4x + O(x³) : pas de terme de degré 2 (2019 Q19).' },
-  { truth: false, key: 'min', s: 'Si (0, 0) est un point stationnaire de f ∈ C² et p₂ = 1 + x² − y², alors f a un minimum local en (0, 0).', why: 'Faux : x² − y² change de signe, (0, 0) est un point selle. Par exemple f = 1 + x² − y².' },
+  { truth: true, key: 'grad', s: t('Si le polynôme de Taylor d\'ordre 2 de f ∈ C² en (0, 0) est p₂ = 2 + x² + 2y², alors ∇f(0, 0) = (0, 0).'), why: t('Vrai : p₂ n\'a pas de terme de degré 1, donc f_x(0, 0) = f_y(0, 0) = 0 (2021 Q27).') },
+  { truth: true, key: 'sin', s: t('Le polynôme de Taylor d\'ordre 2 de 4 sin x cos x en (0, 0) est 4x.'), why: t('Vrai : 4 sin x cos x = 2 sin 2x = 4x + O(x³) : pas de terme de degré 2 (2019 Q19).') },
+  { truth: false, key: 'min', s: t('Si (0, 0) est un point stationnaire de f ∈ C² et p₂ = 1 + x² − y², alors f a un minimum local en (0, 0).'), why: t('Faux : x² − y² change de signe, (0, 0) est un point selle. Par exemple f = 1 + x² − y².') },
 ];
 function taylorTf(rng, opts) {
-  const t = rng.pick(TY_TF);
+  const tf = rng.pick(TY_TF);
   const exam = examTag(opts) || { format: 'tf', points: 1 };
   return tfItem({
-    skill: TY, level: 4, exam, key: t.key, truth: t.truth, statement: t.s, explanation: t.why,
-    counter: t.truth ? null : a2Counter('p2NotMin', { p2: '1+x^2-y^2' }, [['f', 'f(x, y) =']], { f: '1+x^2-y^2' }),
+    skill: TY, level: 4, exam, key: tf.key, truth: tf.truth, statement: tf.s, explanation: tf.why,
+    counter: tf.truth ? null : a2Counter('p2NotMin', { p2: '1+x^2-y^2' }, [['f', 'f(x, y) =']], { f: '1+x^2-y^2' }),
   });
 }
 

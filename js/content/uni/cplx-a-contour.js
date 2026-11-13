@@ -18,25 +18,26 @@ import { residue } from '../../cas/series.js';
 import {
   q, cq, M, rd, zt, piT, joinT, term, CV, CF, SETZ, KEYS, linesOf, choice, opt, H, examTag, problemItem, multiOf, pickK,
 } from './cplx-a-kit.js';
+import { t } from '../../i18n.js';
 
 const eq = (math, note, subgoal, blank) => ({ math, note, subgoal, blank });
 const KEYS_T = ['calc', 'cplx', 'calcfn', 'anal', 'vecto'];
 const fac = (n) => [1, 1, 2, 6, 24, 120][n];
 // A complex constant as a factor: 2, (1+i), i, (−1).
-const cf = (z) => { const t = zt(z); return /^\d+$/.test(t) || t === 'i' ? t : `(${t})`; };
+const cf = (z) => { const tt = zt(z); return /^\d+$/.test(tt) || tt === 'i' ? tt : `(${tt})`; };
 // Σ c_k t^k with exact complex coefficients, as text.
 const tPoly = (cs) => joinT(cs.map((c, k) => {
   if (c.isZero()) return '';
-  const t = zt(c);
-  if (k === 0) return t;
+  const tt = zt(c);
+  if (k === 0) return tt;
   const m = k === 1 ? 't' : `t^${k}`;
-  return t === '1' ? m : t === '-1' ? `-${m}` : `${cf(c)}${m}`;
+  return tt === '1' ? m : tt === '-1' ? `-${m}` : `${cf(c)}${m}`;
 }));
 // d·t: 2t, −2it, (1 − i)t.
 const linT = (d) => (d.im.n === 0 ? term(d.re, 't') : d.re.n === 0 ? term(d.im, 'it') : `(${zt(d)})t`);
 // A complex number as readable text: 1 + i, −2i.
-const rdc = (t) => rd(t).replace(/(\S)([+−])/g, '$1 $2 ');
-const iM = (t) => `<math><mrow>${t}</mrow></math>`;
+const rdc = (tt) => rd(tt).replace(/(\S)([+−])/g, '$1 $2 ');
+const iM = (tt) => `<math><mrow>${tt}</mrow></math>`;
 const oint = (contour) => iM(`<msub><mo>∮</mo><mrow>${contour}</mrow></msub><mi>f</mi><mo>(</mo><mi>z</mi><mo>)</mo><mspace width="0.2em"/><mi>d</mi><mi>z</mi>`);
 // MathML of |z − c| = R.
 function circleML(c, R) {
@@ -51,9 +52,9 @@ const circleT = (c, R) => `|${rdc(joinT(['z', zt(X(c).neg())]))}| = ${String(R).
 
 const CP = 'c-contour-param';
 const CP_SUB = [
-  { id: 'param', label: 'paramétrer γ', skill: 'v-curve-param' },
-  { id: 'deriv', label: 'γ′(t) et f(γ(t))', skill: CP },
-  { id: 'value', label: 'calculer l\'intégrale', skill: CP },
+  { id: 'param', label: t('paramétrer γ'), skill: 'v-curve-param' },
+  { id: 'deriv', label: t('γ′(t) et f(γ(t))'), skill: CP },
+  { id: 'value', label: t('calculer l\'intégrale'), skill: CP },
 ];
 const PTS = ['0', '1', 'i', '1+i', '2', '2i', '-1', '-i'];
 const FN = {
@@ -63,8 +64,8 @@ const FN = {
   abs2: { name: '|z|^2', of: (g) => `|${g}|^2`, holo: false },
   sq: { name: 'z^2', of: (g) => `(${g})^2`, holo: true },
 };
-const P = (t) => parse(t, { complex: true });
-const X = (t) => exactComplex(P(t), {});
+const P = (tt) => parse(tt, { complex: true });
+const X = (tt) => exactComplex(P(tt), {});
 
 // Segment p → q: {gamma, gp, fg (f(γ(t)) simplified), integrand, value}.
 function segData(rng, fn) {
@@ -114,7 +115,7 @@ function segData(rng, fn) {
     }
     return {
       kind: 'seg', fn, ps, qs, gamma, gp, t: [0, 1], hi: '1', fg, integrand, value: zt(value),
-      desc: `le segment de ${rdc(ps)} à ${rdc(qs)}`, line: `γ(t) = ${gamma}, t ∈ [0 ; 1]`, ref: gamma, key: `seg:${fn}:${ps}:${qs}`,
+      desc: t('le segment de {a} à {b}', { a: rdc(ps), b: rdc(qs) }), line: `γ(t) = ${gamma}, t ∈ [0 ; 1]`, ref: gamma, key: `seg:${fn}:${ps}:${qs}`,
     };
   }
   return null;
@@ -167,17 +168,17 @@ function circData(rng, fn) {
   }
   return {
     kind: 'circ', fn, z0s, R, gamma, gp, t: [0, '2π'], hi: '2π', fg, integrand, value,
-    desc: `le cercle ${circleT(z0s, R)}, parcouru une fois dans le sens positif`, line: `γ(t) = ${gamma}, t ∈ [0 ; 2π]`, ref: gamma, key: `circ:${fn}:${z0s}:${R}`,
+    desc: t('le cercle {a}, parcouru une fois dans le sens positif', { a: circleT(z0s, R) }), line: `γ(t) = ${gamma}, t ∈ [0 ; 2π]`, ref: gamma, key: `circ:${fn}:${z0s}:${R}`,
   };
 }
 
 const CP_MENU = (right) => [
-  { id: 'param', label: 'Segment : γ(t) = p + (q − p)t ; cercle : γ(t) = z₀ + Re^(it)' },
-  { id: 'deriv', label: 'Dériver γ par rapport à t' },
-  { id: 'subst', label: 'Remplacer z par γ(t) et multiplier par γ′(t)' },
-  { id: 'int', label: 'Intégrer en t' },
-  { id: 'nodz', label: 'Remplacer z par γ(t), sans γ′(t)', rule: 'c_contour_dz_forgot', why: 'dz = γ′(t) dt : le facteur γ′(t) est nécessaire.' },
-].map((o) => ({ ...o, valid: o.id === right, why: o.why || 'Ce n\'est pas l\'étape à faire maintenant.' }));
+  { id: 'param', label: t('Segment : γ(t) = p + (q − p)t ; cercle : γ(t) = z₀ + Re^(it)') },
+  { id: 'deriv', label: t('Dériver γ par rapport à t') },
+  { id: 'subst', label: t('Remplacer z par γ(t) et multiplier par γ′(t)') },
+  { id: 'int', label: t('Intégrer en t') },
+  { id: 'nodz', label: t('Remplacer z par γ(t), sans γ′(t)'), rule: 'c_contour_dz_forgot', why: t('dz = γ′(t) dt : le facteur γ′(t) est nécessaire.') },
+].map((o) => ({ ...o, valid: o.id === right, why: o.why || t('Ce n\'est pas l\'étape à faire maintenant.') }));
 
 function cpData(rng, level) {
   const pool = level <= 2 ? ['conj', 're', 'sq', 'conj', 'inv'] : ['conj', 're', 'im', 'abs2', 'sq', 'inv', 'conj'];
@@ -193,23 +194,23 @@ function cpParts(d, level) {
   const parts = [];
   if (level >= 2) {
     parts.push({
-      html: `γ est ${d.desc} :`, ask: 'γ(t) =', start: `γ : ${d.kind === 'seg' ? `segment de ${rdc(d.ps)} à ${rdc(d.qs)}` : `cercle de centre ${rdc(d.z0s)} et de rayon ${d.R}`}`,
+      html: t('γ est {desc} :', { desc: d.desc }), ask: 'γ(t) =', start: `γ : ${d.kind === 'seg' ? `segment de ${rdc(d.ps)} à ${rdc(d.qs)}` : `cercle de centre ${rdc(d.z0s)} et de rayon ${d.R}`}`,
       judge: { kind: 'param', complex: true, curve: { ref: d.ref, t: d.t, ...(d.kind === 'circ' ? { closed: true } : {}) } },
       lines: [eq(d.line, d.kind === 'seg' ? 'p + (q − p)t' : 'z₀ + Re^(it)', 'param', d.kind === 'seg' ? [d.gamma] : [d.gamma])], menu: CP_MENU('param'),
     });
   }
   parts.push({
-    html: level === 1 ? `γ(t) = ${M(d.gamma)}, t ∈ [0 ; ${rd(d.hi)}].` : 'Sa dérivée :', ask: 'γ′(t) =', start: `d(${d.gamma}, t)`, judge: tcfg(),
-    lines: [eq(d.gp, 'dériver en t', 'deriv', [d.gp])], menu: CP_MENU('deriv'),
+    html: level === 1 ? `γ(t) = ${M(d.gamma)}, t ∈ [0 ; ${rd(d.hi)}].` : t('Sa dérivée :'), ask: 'γ′(t) =', start: `d(${d.gamma}, t)`, judge: tcfg(),
+    lines: [eq(d.gp, t('dériver en t'), 'deriv', [d.gp])], menu: CP_MENU('deriv'),
   });
   parts.push({
-    html: `On remplace z par γ(t) dans f(z) = ${M(fname)}, et dz = γ′(t) dt :`, ask: 'f(γ(t)) γ′(t) =', start: fOfG,
+    html: t('On remplace z par γ(t) dans f(z) = {fname}, et dz = γ′(t) dt :', { fname: M(fname) }), ask: 'f(γ(t)) γ′(t) =', start: fOfG,
     judge: tcfg({ expect: `(${fOfG})·(${d.gp})`, traps: { c_contour_dz_forgot: [{ line: d.fg, ctx: { gp: rd(d.gp) } }] } }),
-    lines: [eq(d.integrand, 'f(γ(t))·γ′(t), simplifié', 'deriv', [d.integrand])], menu: CP_MENU('subst'),
+    lines: [eq(d.integrand, t('f(γ(t))·γ′(t), simplifié'), 'deriv', [d.integrand])], menu: CP_MENU('subst'),
   });
   parts.push({
-    html: 'Puis l\'intégrale en t :', ask: '∫_γ f(z) dz =', start: `int(${d.integrand}, t, 0, ${d.hi})`, judge: CV({ vars: ['t'] }),
-    lines: [eq(d.value, 'intégrer en t', 'value', [d.value])], menu: CP_MENU('int'),
+    html: t('Puis l\'intégrale en t :'), ask: '∫_γ f(z) dz =', start: `int(${d.integrand}, t, 0, ${d.hi})`, judge: CV({ vars: ['t'] }),
+    lines: [eq(d.value, t('intégrer en t'), 'value', [d.value])], menu: CP_MENU('int'),
   });
   return parts;
 }
@@ -219,9 +220,9 @@ function cpLines(level, rng, opts) {
   const fname = d.fn === 'inv' ? '1/z' : FN[d.fn].name;
   return linesOf({
     level, skill: CP, key: `${CP}:${level}:${d.key}`, keys: KEYS_T, subgoals: CP_SUB, exam: examTag(opts, 3),
-    prompt: `Calcule ∫_γ ${M(fname)} dz, où γ est ${d.desc}.`,
+    prompt: t('Calcule ∫_γ {fname} dz, où γ est {desc}.', { fname: M(fname), desc: d.desc }),
     parts: cpParts(d, level),
-    hints: H('∫_γ f(z) dz = ∫ f(γ(t)) γ′(t) dt : paramètre γ, dérive, remplace.', `γ(t) = ${M(d.gamma)}, γ′(t) = ${M(d.gp)}`, M(d.integrand)),
+    hints: H(t('∫_γ f(z) dz = ∫ f(γ(t)) γ′(t) dt : paramètre γ, dérive, remplace.'), `γ(t) = ${M(d.gamma)}, γ′(t) = ${M(d.gp)}`, M(d.integrand)),
   });
 }
 
@@ -231,27 +232,27 @@ function cpProblem(level, rng, opts) {
   const half = {
     kind: 'circ', fn: 'conj', gamma: `${a}+${a === 1 ? '' : a}e^(it)`, gp: `${a === 1 ? '' : a}ie^(it)`, t: [0, 'π'], hi: 'π',
     fg: `${a}+${a === 1 ? '' : a}e^(-it)`, integrand: `${a === 1 ? '' : a * a}i+${a === 1 ? '' : a * a}ie^(it)`, value: `-${2 * a * a}+${a * a === 1 ? '' : a * a}πi`,
-    desc: `le demi-cercle supérieur |z − ${a}| = ${a}, de ${2 * a} à 0`, line: `γ(t) = ${a}+${a === 1 ? '' : a}e^(it), t ∈ [0 ; π]`, ref: `${a}+${a === 1 ? '' : a}e^(it)`, key: `half:${a}`,
+    desc: t('le demi-cercle supérieur |z − {a}| = {a}, de {b} à 0', { a, b: 2 * a }), line: `γ(t) = ${a}+${a === 1 ? '' : a}e^(it), t ∈ [0 ; π]`, ref: `${a}+${a === 1 ? '' : a}e^(it)`, key: `half:${a}`,
     z0s: String(a), R: a,
   };
   const seg = {
     kind: 'seg', fn: 'conj', gamma: `${2 * a}-${2 * a}t`, gp: String(-2 * a), t: [0, 1], hi: '1', ps: String(2 * a), qs: '0',
     fg: `${2 * a}-${2 * a}t`, integrand: `${-4 * a * a}+${4 * a * a}t`, value: String(-2 * a * a),
-    desc: `le segment de ${2 * a} à 0`, line: `γ(t) = ${2 * a}-${2 * a}t, t ∈ [0 ; 1]`, ref: `${2 * a}-${2 * a}t`, key: `seg2:${a}`,
+    desc: t('le segment de {a} à 0', { a: 2 * a }), line: `γ(t) = ${2 * a}-${2 * a}t, t ∈ [0 ; 1]`, ref: `${2 * a}-${2 * a}t`, key: `seg2:${a}`,
   };
-  const mk = (d) => linesOf({ level: 4, skill: CP, key: `${CP}:5:${d.key}`, keys: KEYS_T, subgoals: CP_SUB, prompt: `∫_γ ${M('conj(z)')} dz, où γ est ${d.desc}.`, parts: cpParts(d, 4), hints: H('', '', '') });
+  const mk = (d) => linesOf({ level: 4, skill: CP, key: `${CP}:5:${d.key}`, keys: KEYS_T, subgoals: CP_SUB, prompt: t('∫_γ {a} dz, où γ est {desc}.', { a: M('conj(z)'), desc: d.desc }), parts: cpParts(d, 4), hints: H('', '', '') });
   const why = choice({
-    skill: CP, level, key: `5:why:${a}`, prompt: 'Les deux chemins ont les mêmes extrémités, mais les intégrales diffèrent. Pourquoi ?',
-    right: `${M('conj(z)')} n'est pas holomorphe (u_x = 1, v_y = −1) : l'intégrale dépend du chemin.`,
+    skill: CP, level, key: `5:why:${a}`, prompt: t('Les deux chemins ont les mêmes extrémités, mais les intégrales diffèrent. Pourquoi ?'),
+    right: t('{a} n\'est pas holomorphe (u_x = 1, v_y = −1) : l\'intégrale dépend du chemin.', { a: M('conj(z)') }),
     wrongs: [
-      { html: 'Les intégrales sont égales : il y a une erreur de calcul.', rule: 'c_conj_not_holo' },
-      { html: 'Le demi-cercle n\'est pas une courbe fermée.' },
-      { html: 'Le segment est parcouru dans le mauvais sens.' },
+      { html: t('Les intégrales sont égales : il y a une erreur de calcul.'), rule: 'c_conj_not_holo' },
+      { html: t('Le demi-cercle n\'est pas une courbe fermée.') },
+      { html: t('Le segment est parcouru dans le mauvais sens.') },
     ],
   }, rng);
   return problemItem({
-    skill: CP, level, key: `5:${a}`, exam: examTag(opts, 6), prompt: `Compare ∫ ${M('conj(z)')} dz de ${2 * a} à 0 sur deux chemins.`,
-    parts: [{ item: mk(half), points: 2.5, title: 'Le demi-cercle' }, { item: mk(seg), points: 2.5, title: 'Le segment' }, { item: why, points: 1, title: 'Conclusion' }],
+    skill: CP, level, key: `5:${a}`, exam: examTag(opts, 6), prompt: t('Compare ∫ {a} dz de {b} à 0 sur deux chemins.', { a: M('conj(z)'), b: 2 * a }),
+    parts: [{ item: mk(half), points: 2.5, title: t('Le demi-cercle') }, { item: mk(seg), points: 2.5, title: t('Le segment') }, { item: why, points: 1, title: t('Conclusion') }],
   });
 }
 
@@ -260,22 +261,22 @@ function cpMcq(level, rng, opts) {
   const R2 = R * R;
   if (opts.multi) {
     const pool = [
-      { html: `∮ sur ${M(`|z| = ${R}`)} de ${M('conj(z)')} dz vaut ${M(`${2 * R2}πi`)}`, truth: true },
-      { html: `∮ sur ${M(`|z| = ${R}`)} de ${M('conj(z)')} dz vaut 0`, truth: false, rule: 'c_conj_not_holo' },
-      { html: `∮ sur ${M(`|z| = ${R}`)} de ${M('z^2')} dz vaut 0`, truth: true },
-      { html: `∮ sur ${M(`|z| = ${R}`)} de dz/z vaut ${M('2πi')}`, truth: true },
-      { html: `∮ sur ${M(`|z| = ${R}`)} de ${M('|z|^2')} dz vaut ${M(`${2 * R2}π`)}`, truth: false },
-      { html: `sur γ(t) = ${M(`${R}e^(it)`)}, dz = ${M(`${R}ie^(it)`)} dt`, truth: true },
+      { html: t('∮ sur {a} de {b} dz vaut {c}', { a: M(`|z| = ${R}`), b: M('conj(z)'), c: M(`${2 * R2}πi`) }), truth: true },
+      { html: t('∮ sur {a} de {b} dz vaut 0', { a: M(`|z| = ${R}`), b: M('conj(z)') }), truth: false, rule: 'c_conj_not_holo' },
+      { html: t('∮ sur {a} de {b} dz vaut 0', { a: M(`|z| = ${R}`), b: M('z^2') }), truth: true },
+      { html: t('∮ sur {a} de dz/z vaut {b}', { a: M(`|z| = ${R}`), b: M('2πi') }), truth: true },
+      { html: t('∮ sur {a} de {b} dz vaut {c}', { a: M(`|z| = ${R}`), b: M('|z|^2'), c: M(`${2 * R2}π`) }), truth: false },
+      { html: t('sur γ(t) = {a}, dz = {b} dt', { a: M(`${R}e^(it)`), b: M(`${R}ie^(it)`) }), truth: true },
     ];
     const s = multiOf(rng, pool, 5);
-    return choice({ skill: CP, level, multi: true, key: `multi:${R}:${s.map((x) => pool.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: 'Cochez les affirmations vraies.', options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
+    return choice({ skill: CP, level, multi: true, key: `multi:${R}:${s.map((x) => pool.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: t('Cochez les affirmations vraies.'), options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
   }
   return choice({
     skill: CP, level, key: `mcq:${R}`, exam: examTag(opts, 2),
-    prompt: `∮ ${M('conj(z)')} dz sur le cercle ${M(`|z| = ${R}`)} (sens positif) vaut :`,
+    prompt: t('∮ {a} dz sur le cercle {b} (sens positif) vaut :', { a: M('conj(z)'), b: M(`|z| = ${R}`) }),
     right: M(`${2 * R2}πi`),
     wrongs: [opt('0', 'c_conj_not_holo'), opt('2πi'), opt(`${2 * R}π`), opt(`${R2 === 1 ? '' : R2}πi`)],
-    solution: [{ html: `γ(t) = ${M(`${R}e^(it)`)} : z̄ dz = ${M(`${R}e^(-it)·${R}ie^(it)`)} dt = ${M(`${R2}i`)} dt, intégré sur [0 ; 2π].`, note: '' }],
+    solution: [{ html: t('γ(t) = {a} : z̄ dz = {b} dt = {c} dt, intégré sur [0 ; 2π].', { a: M(`${R}e^(it)`), b: M(`${R}e^(-it)·${R}ie^(it)`), c: M(`${R2}i`) }), note: '' }],
   }, rng);
 }
 
@@ -285,9 +286,9 @@ function cpMcq(level, rng, opts) {
 
 const CT = 'c-cauchy-thm';
 const CT_SUB = [
-  { id: 'singularities', label: 'trouver les singularités', skill: CT },
-  { id: 'locate', label: 'les placer par rapport à Γ', skill: CT },
-  { id: 'hyp', label: 'hypothèses de Cauchy', skill: CT },
+  { id: 'singularities', label: t('trouver les singularités'), skill: CT },
+  { id: 'locate', label: t('les placer par rapport à Γ'), skill: CT },
+  { id: 'hyp', label: t('hypothèses de Cauchy'), skill: CT },
   { id: 'conclude', label: '∮ f dz = 0', skill: CT },
 ];
 
@@ -337,10 +338,10 @@ const placeDecision = (d, i) => {
   const w = d.where[i];
   const dd = Math.round(d.ds[i] * 100) / 100;
   return {
-    kind: 'decision', prompt: `${rd(s)} est à distance ${String(dd).replace('.', ',')} du centre ${rd(d.c)}, et le rayon vaut ${rT(d.R)} : ${rd(s)} est`, options: [
-      { id: 'in', label: 'dans le disque', valid: w === 'in', ...(w === 'in' ? {} : { rule: 'c_pole_outside_counted', why: `${String(dd).replace('.', ',')} > ${rT(d.R)} : ${rd(s)} est dehors.` }) },
-      { id: 'on', label: 'sur le cercle Γ', valid: w === 'on', ...(w === 'on' ? {} : { why: `${String(dd).replace('.', ',')} ≠ ${rT(d.R)}.` }) },
-      { id: 'out', label: 'hors du disque fermé', valid: w === 'out', ...(w === 'out' ? {} : { why: 'Compare la distance au rayon.' }) },
+    kind: 'decision', prompt: t('{s} est à distance {a} du centre {c}, et le rayon vaut {b} : {s} est', { s: rd(s), a: String(dd).replace('.', ','), c: rd(d.c), b: rT(d.R) }), options: [
+      { id: 'in', label: t('dans le disque'), valid: w === 'in', ...(w === 'in' ? {} : { rule: 'c_pole_outside_counted', why: t('{a} > {b} : {s} est dehors.', { a: String(dd).replace('.', ','), b: rT(d.R), s: rd(s) }) }) },
+      { id: 'on', label: t('sur le cercle Γ'), valid: w === 'on', ...(w === 'on' ? {} : { why: `${String(dd).replace('.', ',')} ≠ ${rT(d.R)}.` }) },
+      { id: 'out', label: t('hors du disque fermé'), valid: w === 'out', ...(w === 'out' ? {} : { why: t('Compare la distance au rayon.') }) },
     ],
   };
 };
@@ -349,39 +350,39 @@ function ctParts(d, level) {
   const parts = [];
   const contour = circleML(d.c, rT(d.R).replace(',', '.'));
   const conclude = {
-    kind: 'decision', prompt: 'Conclusion :', options: [
-      { id: 'cauchy', label: 'f est holomorphe sur un disque un peu plus grand que Γ (simplement connexe) : ∮ = 0 par Cauchy', valid: true },
-      { id: 'undef', label: 'L\'intégrale n\'est pas définie', valid: false, rule: 'c_pole_on_contour', why: 'Aucune singularité n\'est sur Γ.' },
-      { id: 'res', label: 'Il faut les résidus des singularités', valid: false, rule: 'c_pole_outside_counted', why: 'Les singularités sont hors du disque : elles ne comptent pas.' },
+    kind: 'decision', prompt: t('Conclusion :'), options: [
+      { id: 'cauchy', label: t('f est holomorphe sur un disque un peu plus grand que Γ (simplement connexe) : ∮ = 0 par Cauchy'), valid: true },
+      { id: 'undef', label: t('L\'intégrale n\'est pas définie'), valid: false, rule: 'c_pole_on_contour', why: t('Aucune singularité n\'est sur Γ.') },
+      { id: 'res', label: t('Il faut les résidus des singularités'), valid: false, rule: 'c_pole_outside_counted', why: t('Les singularités sont hors du disque : elles ne comptent pas.') },
     ],
   };
   const valuePart = {
-    html: level === 1 ? 'Place chaque singularité, puis conclus.' : 'Place les singularités par rapport à Γ, puis conclus :', ask: '∮_Γ f(z) dz =',
+    html: level === 1 ? t('Place chaque singularité, puis conclus.') : t('Place les singularités par rapport à Γ, puis conclus :'), ask: '∮_Γ f(z) dz =',
     start: 'I', judge: CV({ raw: { text: 'I', html: oint(contour) }, expect: '0', final: 'number' }),
     decisions: [...d.sings.map((s, i) => placeDecision(d, i)).slice(0, 2), conclude],
-    lines: [eq('0', 'théorème de Cauchy', 'conclude', ['0'])],
+    lines: [eq('0', t('théorème de Cauchy'), 'conclude', ['0'])],
     menu: [
-      { id: 'cauchy', label: 'Théorème de Cauchy : f holomorphe sur un domaine simplement connexe qui contient Γ', valid: true },
-      { id: 'res', label: 'Théorème des résidus avec toutes les singularités', valid: false, rule: 'c_pole_outside_counted', why: 'Les singularités hors du disque ne comptent pas.' },
+      { id: 'cauchy', label: t('Théorème de Cauchy : f holomorphe sur un domaine simplement connexe qui contient Γ'), valid: true },
+      { id: 'res', label: t('Théorème des résidus avec toutes les singularités'), valid: false, rule: 'c_pole_outside_counted', why: t('Les singularités hors du disque ne comptent pas.') },
     ],
   };
   if (level === 1) {
-    valuePart.html = `${d.kind === 'cos' ? 'Les singularités de f sont les π/2 + kπ, les plus proches de 0 étant ±π/2' : d.sings.length > 1 ? `Les singularités de f sont ${d.sings.map(rdc).join(' et ')}` : `La singularité de f est ${rdc(d.sings[0])}`}. ${valuePart.html}`;
+    valuePart.html = `${d.kind === 'cos' ? t('Les singularités de f sont les π/2 + kπ, les plus proches de 0 étant ±π/2') : d.sings.length > 1 ? t('Les singularités de f sont {a}', { a: d.sings.map(rdc).join(t(' et ')) }) : t('La singularité de f est {a}', { a: rdc(d.sings[0]) })}. ${valuePart.html}`;
     parts.push(valuePart);
     return parts;
   }
   if (d.kind === 'cos') {
     parts.push({
-      html: 'Les singularités sont les zéros du dénominateur :', ask: 'cos z = 0 ⇔', start: 'cos(z) = 0',
+      html: t('Les singularités sont les zéros du dénominateur :'), ask: 'cos z = 0 ⇔', start: 'cos(z) = 0',
       judge: CF({ sols: ['π/2'], period: 'π', periodText: 'kπ', final: 'family' }),
-      lines: [eq('z = π/2+kπ ; k ∈ ℤ', 'cos z = 0 ⇔ z = π/2 + kπ (aussi dans ℂ)', 'singularities', ['π/2'])],
-      menu: [{ id: 'zeros', label: 'Chercher les zéros du dénominateur', valid: true }, { id: 'none', label: 'cos z ne s\'annule pas', valid: false, why: 'cos(π/2) = 0.' }],
+      lines: [eq('z = π/2+kπ ; k ∈ ℤ', t('cos z = 0 ⇔ z = π/2 + kπ (aussi dans ℂ)'), 'singularities', ['π/2'])],
+      menu: [{ id: 'zeros', label: t('Chercher les zéros du dénominateur'), valid: true }, { id: 'none', label: t('cos z ne s\'annule pas'), valid: false, why: 'cos(π/2) = 0.' }],
     });
   } else {
     parts.push({
-      html: 'Les singularités sont les zéros du dénominateur :', ask: 'z :', start: `${/^\([^()]*\)$/.test(d.den) ? d.den.slice(1, -1) : d.den} = 0`, judge: SETZ,
-      lines: [eq(d.sings.map((s) => `z = ${s}`).join(' ou '), 'zéros du dénominateur', 'singularities', d.sings)],
-      menu: [{ id: 'zeros', label: 'Chercher les zéros du dénominateur', valid: true }, { id: 'num', label: 'Chercher les zéros du numérateur', valid: false, why: 'Les singularités sont là où le dénominateur s\'annule.' }],
+      html: t('Les singularités sont les zéros du dénominateur :'), ask: 'z :', start: `${/^\([^()]*\)$/.test(d.den) ? d.den.slice(1, -1) : d.den} = 0`, judge: SETZ,
+      lines: [eq(d.sings.map((s) => `z = ${s}`).join(' ou '), t('zéros du dénominateur'), 'singularities', d.sings)],
+      menu: [{ id: 'zeros', label: t('Chercher les zéros du dénominateur'), valid: true }, { id: 'num', label: t('Chercher les zéros du numérateur'), valid: false, why: t('Les singularités sont là où le dénominateur s\'annule.') }],
     });
   }
   parts.push(valuePart);
@@ -392,9 +393,9 @@ function ctLines(level, rng, opts) {
   const d = (rng.chance(0.25) ? ctCos(rng) : ctRational(rng, 'out')) || ctCos(rng);
   return linesOf({
     level, skill: CT, key: `${CT}:${level}:${d.key}`, keys: [...KEYS, 'set'], subgoals: CT_SUB, exam: examTag(opts, 3),
-    prompt: `Calcule ${oint(circleML(d.c, rT(d.R).replace(',', '.')))} pour ${M(`f(z) = ${d.f}`)} (sens positif).`,
+    prompt: t('Calcule {a} pour {b} (sens positif).', { a: oint(circleML(d.c, rT(d.R).replace(',', '.'))), b: M(`f(z) = ${d.f}`) }),
     parts: ctParts(d, level),
-    hints: H('Où sont les zéros du dénominateur ? Compare leur distance au centre avec le rayon.', d.kind === 'cos' ? `${M('cos(z) = 0')} ⇔ z = π/2 + kπ` : `singularités : ${d.sings.map(rd).join(', ')}`, 'Toutes sont hors du disque fermé : ∮ = 0 par le théorème de Cauchy.'),
+    hints: H(t('Où sont les zéros du dénominateur ? Compare leur distance au centre avec le rayon.'), d.kind === 'cos' ? `${M('cos(z) = 0')} ⇔ z = π/2 + kπ` : t('singularités : {a}', { a: d.sings.map(rd).join(', ') }), t('Toutes sont hors du disque fermé : ∮ = 0 par le théorème de Cauchy.')),
   });
 }
 
@@ -411,7 +412,7 @@ function ctMcq(level, rng, opts) {
     const s = multiOf(rng, CT_POOL.map(([f, w]) => ({ f, truth: w === 'zero', w })), 5);
     return choice({
       skill: CT, level, multi: true, key: `multi:${s.map((x) => x.f).join(',')}`, exam: examTag(opts, 2),
-      prompt: `Pour quelles fonctions ${oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>')} = 0 ?`,
+      prompt: t('Pour quelles fonctions {a} = 0 ?', { a: oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>') }),
       options: s.map((x) => ({ html: M(`f(z) = ${x.f}`), correct: x.truth, rule: x.w === 'undef' ? 'c_pole_on_contour' : null })),
     }, rng);
   }
@@ -420,10 +421,10 @@ function ctMcq(level, rng, opts) {
   const others = pickK(rng, CT_POOL.filter(([f, w]) => w === 'nonzero'), 2);
   return choice({
     skill: CT, level, key: `mcq:${right}:${undef[0]}:${others.map((x) => x[0]).join(',')}`, exam: examTag(opts, 2),
-    prompt: `Pour laquelle de ces fonctions a-t-on ${oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>')} = 0 par le théorème de Cauchy ?`,
+    prompt: t('Pour laquelle de ces fonctions a-t-on {a} = 0 par le théorème de Cauchy ?', { a: oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>') }),
     right: M(`f(z) = ${right}`),
     wrongs: [opt(`f(z) = ${undef[0]}`, 'c_pole_on_contour'), ...others.map(([f]) => opt(`f(z) = ${f}`))],
-    solution: [{ html: `Les singularités de ${M(right)} sont hors du disque fermé |z| ≤ 1 ; ${M(undef[0])} a une singularité sur le cercle.`, note: '' }],
+    solution: [{ html: t('Les singularités de {right} sont hors du disque fermé |z| ≤ 1 ; {undef0} a une singularité sur le cercle.', { right: M(right), undef0: M(undef[0]) }), note: '' }],
   }, rng);
 }
 
@@ -433,17 +434,17 @@ function ctProblem(level, rng, opts) {
   const order = pickK(rng, pick, 4);
   const parts = order.map(([f, w], i) => ({
     item: choice({
-      skill: CT, level, key: `5:${f}`, prompt: `${oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>')} pour ${M(`f(z) = ${f}`)} :`,
-      right: w === 'zero' ? 'vaut 0 par le théorème de Cauchy' : w === 'undef' ? 'n\'est pas définie : une singularité est sur le cercle' : 'demande les résidus : une singularité est dans le disque',
+      skill: CT, level, key: `5:${f}`, prompt: t('{a} pour {b} :', { a: oint('<mo>|</mo><mi>z</mi><mo>|</mo><mo>=</mo><mn>1</mn>'), b: M(`f(z) = ${f}`) }),
+      right: w === 'zero' ? t('vaut 0 par le théorème de Cauchy') : w === 'undef' ? t('n\'est pas définie : une singularité est sur le cercle') : t('demande les résidus : une singularité est dans le disque'),
       wrongs: [
-        w !== 'zero' ? { html: 'vaut 0 par le théorème de Cauchy', rule: w === 'undef' ? 'c_pole_on_contour' : null } : null,
-        w !== 'undef' ? { html: 'n\'est pas définie : une singularité est sur le cercle' } : null,
-        w !== 'nonzero' ? { html: 'demande les résidus : une singularité est dans le disque', rule: 'c_pole_outside_counted' } : null,
+        w !== 'zero' ? { html: t('vaut 0 par le théorème de Cauchy'), rule: w === 'undef' ? 'c_pole_on_contour' : null } : null,
+        w !== 'undef' ? { html: t('n\'est pas définie : une singularité est sur le cercle') } : null,
+        w !== 'nonzero' ? { html: t('demande les résidus : une singularité est dans le disque'), rule: 'c_pole_outside_counted' } : null,
       ],
     }, rng),
-    points: 1, title: `Fonction ${i + 1}`,
+    points: 1, title: t('Fonction {a}', { a: i + 1 }),
   }));
-  return problemItem({ skill: CT, level, key: `5:${order.map((x) => x[0]).join(',')}`, exam: examTag(opts, 4), prompt: 'Pour chaque fonction, que vaut l\'intégrale sur le cercle unité ?', parts });
+  return problemItem({ skill: CT, level, key: `5:${order.map((x) => x[0]).join(',')}`, exam: examTag(opts, 4), prompt: t('Pour chaque fonction, que vaut l\'intégrale sur le cercle unité ?'), parts });
 }
 
 // ======================================================================
@@ -452,7 +453,7 @@ function ctProblem(level, rng, opts) {
 
 const CFm = 'c-cauchy-formula';
 const CFm_SUB = [
-  { id: 'identify', label: 'identifier g et n', skill: CFm },
+  { id: 'identify', label: t('identifier g et n'), skill: CFm },
   { id: 'value', label: '2πi g⁽ⁿ⁾(z₀)/n!', skill: CFm },
 ];
 
@@ -533,16 +534,16 @@ function cfData(rng) {
 function cfParts(d, level) {
   const parts = [];
   const ndec = {
-    kind: 'decision', prompt: `La puissance de ${d.z0 === '0' ? 'z' : `(z − ${rd(d.z0)})`} est ${d.pw} : n =`, options: [
-      { id: 'n', label: `${d.n} (puissance n + 1)`, valid: true },
-      { id: 'n1', label: `${d.pw}`, valid: false, rule: 'c_cauchy_n_factor', why: `La puissance est n + 1 = ${d.pw}, donc n = ${d.n}.` },
+    kind: 'decision', prompt: t('La puissance de {a} est {pw} : n =', { a: d.z0 === '0' ? 'z' : `(z − ${rd(d.z0)})`, pw: d.pw }), options: [
+      { id: 'n', label: t('{n} (puissance n + 1)', { n: d.n }), valid: true },
+      { id: 'n1', label: `${d.pw}`, valid: false, rule: 'c_cauchy_n_factor', why: t('La puissance est n + 1 = {pw}, donc n = {n}.', { pw: d.pw, n: d.n }) },
     ],
   };
   if (d.n > 0) {
     parts.push({
-      html: level === 1 ? `g(z) = ${M(d.g)}, z₀ = ${rd(d.z0)} et n = ${d.n} : on dérive g ${d.n === 1 ? 'une fois' : `${d.n} fois`}.` : `On écrit l'intégrande g(z)/(z − z₀)^(n+1), puis on dérive g :`,
+      html: level === 1 ? (d.n === 1 ? t('g(z) = {g}, z₀ = {z0} et n = {n} : on dérive g une fois.', { g: M(d.g), z0: rd(d.z0), n: d.n }) : t('g(z) = {g}, z₀ = {z0} et n = {n} : on dérive g {n} fois.', { g: M(d.g), z0: rd(d.z0), n: d.n })) : t('On écrit l\'intégrande g(z)/(z − z₀)^(n+1), puis on dérive g :'),
       ask: `g⁽${d.n}⁾(z) =`, start: Array.from({ length: d.n }).reduce((s) => `d(${s}, z)`, d.g), judge: CV({ vars: ['z'], cz: ['z'], box: [-1, 1] }),
-      decisions: level === 1 ? [] : [ndec], lines: [eq(d.gn, d.n === 1 ? 'dériver une fois' : `dériver ${d.n} fois`, 'identify', [d.gn])],
+      decisions: level === 1 ? [] : [ndec], lines: [eq(d.gn, d.n === 1 ? t('dériver une fois') : t('dériver {n} fois', { n: d.n }), 'identify', [d.gn])],
       menu: CF_MENU('deriv'),
     });
   }
@@ -551,59 +552,59 @@ function cfParts(d, level) {
   if (d.n > 0) lines.push(eq(`2πi·${/^[\w^()π]+$/.test(d.gz0) && !d.gz0.startsWith('(') ? d.gz0 : `(${d.gz0})`}/${d.n}!`, `2πi g⁽ⁿ⁾(z₀)/n!`, 'value'));
   lines.push(eq(d.value, d.n > 0 ? '' : '2πi g(z₀)', 'value', [d.value]));
   parts.push({
-    html: d.n > 0 ? 'Formule de Cauchy :' : `g(z) = ${M(d.g)} est holomorphe et z₀ = ${rd(d.z0)} est à l'intérieur de Γ :`, ask: '∮_Γ f(z) dz =',
+    html: d.n > 0 ? t('Formule de Cauchy :') : t('g(z) = {g} est holomorphe et z₀ = {z0} est à l\'intérieur de Γ :', { g: M(d.g), z0: rd(d.z0) }), ask: '∮_Γ f(z) dz =',
     start: 'I', judge: CV({ raw: { text: 'I', html: oint(contour) }, expect: d.value, traps: { c_cauchy_n_factor: d.wrong } }),
     decisions: d.n === 0 && level > 1 ? [ndec] : [], lines, menu: CF_MENU('formula'),
   });
   return parts;
 }
 const CF_MENU = (right) => [
-  { id: 'deriv', label: 'Dériver g n fois' },
+  { id: 'deriv', label: t('Dériver g n fois') },
   { id: 'formula', label: 'f⁽ⁿ⁾(z₀) = n!/(2πi) ∮ f/(z − z₀)ⁿ⁺¹ : ∮ = 2πi g⁽ⁿ⁾(z₀)/n!' },
-  { id: 'zero', label: '∮ = 0 par le théorème de Cauchy', why: 'z₀ est une singularité à l\'intérieur de Γ.' },
-  { id: 'nofac', label: '∮ = 2πi g⁽ⁿ⁾(z₀) (sans n!)', rule: 'c_cauchy_n_factor', why: 'La formule divise par n!.' },
-].map((o) => ({ ...o, valid: o.id === right, why: o.why || 'Ce n\'est pas l\'étape à faire maintenant.' }));
+  { id: 'zero', label: t('∮ = 0 par le théorème de Cauchy'), why: t('z₀ est une singularité à l\'intérieur de Γ.') },
+  { id: 'nofac', label: t('∮ = 2πi g⁽ⁿ⁾(z₀) (sans n!)'), rule: 'c_cauchy_n_factor', why: t('La formule divise par n!.') },
+].map((o) => ({ ...o, valid: o.id === right, why: o.why || t('Ce n\'est pas l\'étape à faire maintenant.') }));
 
 function cfLines(level, rng, opts) {
   const d = cfData(rng);
   const contour = circleML(d.c, d.R);
   const dec = level === 3 ? [{
-    kind: 'decision', prompt: 'Quelle méthode ?', options: [
-      { id: 'zero', label: 'Cauchy : ∮ = 0', valid: false, why: `${rd(d.z0)} est une singularité à l'intérieur de Γ.` },
-      { id: 'formula', label: 'Formule intégrale de Cauchy', valid: true, ref: true },
-      { id: 'res', label: 'Théorème des résidus', valid: true, quality: 'poor', why: 'Juste aussi, mais la formule de Cauchy est directe ici.' },
+    kind: 'decision', prompt: t('Quelle méthode ?'), options: [
+      { id: 'zero', label: t('Cauchy : ∮ = 0'), valid: false, why: t('{z0} est une singularité à l\'intérieur de Γ.', { z0: rd(d.z0) }) },
+      { id: 'formula', label: t('Formule intégrale de Cauchy'), valid: true, ref: true },
+      { id: 'res', label: t('Théorème des résidus'), valid: true, quality: 'poor', why: t('Juste aussi, mais la formule de Cauchy est directe ici.') },
     ],
   }] : [];
   const parts = cfParts(d, level);
   parts[0].decisions = [...dec, ...(parts[0].decisions || [])];
   return linesOf({
     level, skill: CFm, key: `${CFm}:${level}:${d.key}`, keys: [...KEYS, 'calcx'], subgoals: CFm_SUB, exam: examTag(opts, 2), fallback: d.fallback,
-    prompt: `Calcule ${oint(contour)} pour ${M(`f(z) = ${d.f}`)} (sens positif).`,
+    prompt: t('Calcule {a} pour {b} (sens positif).', { a: oint(contour), b: M(`f(z) = ${d.f}`) }),
     parts,
-    hints: H('Écris l\'intégrande g(z)/(z − z₀)ⁿ⁺¹ avec g holomorphe : ∮ = 2πi g⁽ⁿ⁾(z₀)/n!.', `n = ${d.n}, g(z) = ${M(d.g)}, g⁽ⁿ⁾(z₀) = ${M(d.gz0)}`, M(d.value)),
+    hints: H(t('Écris l\'intégrande g(z)/(z − z₀)ⁿ⁺¹ avec g holomorphe : ∮ = 2πi g⁽ⁿ⁾(z₀)/n!.'), `n = ${d.n}, g(z) = ${M(d.g)}, g⁽ⁿ⁾(z₀) = ${M(d.gz0)}`, M(d.value)),
   });
 }
 
 const CF_STATEMENTS = [
   { html: `${M('f^(n)(z_0)')} = n!/(2πi) ∮ f(z)/(z − z₀)ⁿ⁺¹ dz`, truth: true },
   { html: `${M('f^(n)(z_0)')} = n!/(2πi) ∮ f(z)/(z − z₀)ⁿ dz`, truth: false, rule: 'c_cauchy_n_factor' },
-  { html: '∮ dz/(z − z₀) = 2πi pour un cercle autour de z₀ (sens positif)', truth: true },
-  { html: '∮ f(z)/(z − z₀) dz = 0 si f est holomorphe et z₀ intérieur à Γ', truth: false },
-  { html: '∮ f(z)/(z − z₀)² dz = 2πi f′(z₀) si f est holomorphe et z₀ intérieur à Γ', truth: true },
+  { html: t('∮ dz/(z − z₀) = 2πi pour un cercle autour de z₀ (sens positif)'), truth: true },
+  { html: t('∮ f(z)/(z − z₀) dz = 0 si f est holomorphe et z₀ intérieur à Γ'), truth: false },
+  { html: t('∮ f(z)/(z − z₀)² dz = 2πi f′(z₀) si f est holomorphe et z₀ intérieur à Γ'), truth: true },
   { html: '∮ f(z)/(z − z₀)³ dz = 2πi f″(z₀)', truth: false, rule: 'c_cauchy_n_factor' },
 ];
 
 function cfMcq(level, rng, opts) {
   if (opts.multi) {
     const s = multiOf(rng, CF_STATEMENTS, 5);
-    return choice({ skill: CFm, level, multi: true, key: `multi:${s.map((x) => CF_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: 'Γ est un cercle parcouru une fois dans le sens positif, f holomorphe sur un disque qui le contient. Cochez les affirmations vraies.', options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
+    return choice({ skill: CFm, level, multi: true, key: `multi:${s.map((x) => CF_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: t('Γ est un cercle parcouru une fois dans le sens positif, f holomorphe sur un disque qui le contient. Cochez les affirmations vraies.'), options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
   }
   let d = cfData(rng);
   for (let k = 0; k < 50 && d.n < 2; k++) d = cfData(rng);
   const contour = circleML(d.c, d.R);
   return choice({
     skill: CFm, level, key: `mcq:${d.key}`, exam: examTag(opts, 2), fallback: d.fallback,
-    prompt: `${oint(contour)} pour ${M(`f(z) = ${d.f}`)} vaut :`,
+    prompt: t('{a} pour {b} vaut :', { a: oint(contour), b: M(`f(z) = ${d.f}`) }),
     right: M(d.value),
     wrongs: [
       d.n >= 2 ? opt(d.noFac, 'c_cauchy_n_factor') : null,
@@ -619,13 +620,13 @@ function cfProblem(level, rng, opts) {
   const calc = cfLines(4, rng, {});
   const s = rng.pick([0, 1]);
   const st = choice({
-    skill: CFm, level, key: `5:st:${s}`, prompt: 'f est holomorphe sur un disque qui contient le cercle Γ (sens positif), z₀ à l\'intérieur. Quelle formule est juste ?',
+    skill: CFm, level, key: `5:st:${s}`, prompt: t('f est holomorphe sur un disque qui contient le cercle Γ (sens positif), z₀ à l\'intérieur. Quelle formule est juste ?'),
     right: CF_STATEMENTS[s === 0 ? 0 : 4].html,
     wrongs: [{ html: CF_STATEMENTS[1].html, rule: 'c_cauchy_n_factor' }, { html: CF_STATEMENTS[5].html, rule: 'c_cauchy_n_factor' }, { html: CF_STATEMENTS[3].html }],
   }, rng);
   return problemItem({
-    skill: CFm, level, key: `5:${calc.key}:${s}`, exam: examTag(opts, 3), prompt: 'La formule intégrale de Cauchy, puis un calcul.',
-    parts: [{ item: st, points: 1, title: 'La formule' }, { item: calc, points: 2, title: 'Le calcul' }],
+    skill: CFm, level, key: `5:${calc.key}:${s}`, exam: examTag(opts, 3), prompt: t('La formule intégrale de Cauchy, puis un calcul.'),
+    parts: [{ item: st, points: 1, title: t('La formule') }, { item: calc, points: 2, title: t('Le calcul') }],
   });
 }
 

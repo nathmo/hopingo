@@ -12,6 +12,7 @@
 import * as LF from '../cas/linalg-float.js';
 import * as MX from '../cas/matrix.js';
 import { readQ } from './linalg-examples.js';
+import { t } from '../i18n.js';
 
 const need = (message, rule = null) => ({ ok: false, message, rule });
 const square = (text, n) => {
@@ -29,42 +30,42 @@ const differ = (X, Y) => X.some((r, i) => r.some((x, j) => Math.abs(x - Y[i][j])
 export const PROPS = {
   absLessOneUnstable: (p, ans) => {
     const A = square(ans.A, p.n);
-    if (!A) return need(`Écris une matrice carrée A${p.n ? ` ${p.n}×${p.n}` : ''}, case par case.`);
-    if (rho(A) >= 1 - TOL) return need('Il faut que toutes les valeurs propres vérifient |λ| < 1.');
-    if (maxRe(A) < -TOL) return need('Avec cette matrice, toutes les Re λ sont < 0 : ẋ = Ax est stable. Prends une valeur propre positive, comme 1/2.', 'm_stab_discrete_in_cont');
+    if (!A) return need(p.n ? t('Écris une matrice carrée A {n}×{n}, case par case.', { n: p.n }) : t('Écris une matrice carrée A, case par case.'));
+    if (rho(A) >= 1 - TOL) return need(t('Il faut que toutes les valeurs propres vérifient |λ| < 1.'));
+    if (maxRe(A) < -TOL) return need(t('Avec cette matrice, toutes les Re λ sont < 0 : ẋ = Ax est stable. Prends une valeur propre positive, comme 1/2.'), 'm_stab_discrete_in_cont');
     return { ok: true };
   },
   traceNegUnstable: (p, ans) => {
     const A = square(ans.A, p.n);
-    if (!A) return need('Écris une matrice carrée A, case par case.');
-    if (!(MX.trace(A).valueOf() < 0)) return need('Il faut tr A < 0.');
-    if (maxRe(A) < -TOL) return need('Avec cette matrice, toutes les Re λ sont < 0 : ẋ = Ax est stable. Essaie des valeurs propres −3 et 1.');
+    if (!A) return need(t('Écris une matrice carrée A, case par case.'));
+    if (!(MX.trace(A).valueOf() < 0)) return need(t('Il faut tr A < 0.'));
+    if (maxRe(A) < -TOL) return need(t('Avec cette matrice, toutes les Re λ sont < 0 : ẋ = Ax est stable. Essaie des valeurs propres −3 et 1.'));
     return { ok: true };
   },
   reNegDiscreteUnstable: (p, ans) => {
     const A = square(ans.A, p.n);
-    if (!A) return need('Écris une matrice carrée A, case par case.');
-    if (maxRe(A) >= -TOL) return need('Il faut que toutes les valeurs propres aient Re λ < 0.');
-    if (rho(A) < 1 - TOL) return need('Avec cette matrice, toutes les |λ| < 1 : x_{k+1} = Ax_k est stable. Prends une valeur propre comme −2.', 'm_stab_cont_in_discrete');
+    if (!A) return need(t('Écris une matrice carrée A, case par case.'));
+    if (maxRe(A) >= -TOL) return need(t('Il faut que toutes les valeurs propres aient Re λ < 0.'));
+    if (rho(A) < 1 - TOL) return need(t('Avec cette matrice, toutes les |λ| < 1 : x_{k+1} = Ax_k est stable. Prends une valeur propre comme −2.'), 'm_stab_cont_in_discrete');
     return { ok: true };
   },
   expSumFails: (p, ans) => {
     const A = square(ans.A, p.n);
     const B = square(ans.B, p.n);
-    if (!A || !B || A.length !== B.length) return need('Écris deux matrices carrées A et B de même taille.');
+    if (!A || !B || A.length !== B.length) return need(t('Écris deux matrices carrées A et B de même taille.'));
     const lhs = LF.expm(MX.toNumbers(MX.add(A, B)));
     const rhs = LF.matmul(LF.expm(MX.toNumbers(A)), LF.expm(MX.toNumbers(B)));
     if (!differ(lhs, rhs)) {
       const commute = MX.equal(MX.mul(A, B), MX.mul(B, A));
-      return need(commute ? 'Ces matrices commutent (AB = BA) : alors e^{A+B} = e^A e^B. Prends-en qui ne commutent pas.' : 'Avec ces matrices, e^{A+B} = e^A e^B.', commute ? 'm_expm_sum' : null);
+      return need(commute ? t('Ces matrices commutent (AB = BA) : alors e^{A+B} = e^A e^B. Prends-en qui ne commutent pas.') : t('Avec ces matrices, e^{A+B} = e^A e^B.'), commute ? 'm_expm_sum' : null);
     }
     return { ok: true };
   },
   expEntrywise: (p, ans) => {
     const A = square(ans.A, p.n);
-    if (!A) return need('Écris une matrice carrée A, case par case.');
+    if (!A) return need(t('Écris une matrice carrée A, case par case.'));
     const F = MX.toNumbers(A);
     const E = LF.expm(F);
-    return differ(E, F.map((r) => r.map(Math.exp))) ? { ok: true } : need('Pour cette matrice, e^A est bien la matrice des e^{aᵢⱼ}.');
+    return differ(E, F.map((r) => r.map(Math.exp))) ? { ok: true } : need(t('Pour cette matrice, e^A est bien la matrice des e^{aᵢⱼ}.'));
   },
 };

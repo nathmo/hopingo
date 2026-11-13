@@ -8,6 +8,7 @@
 // neg {e}, pow {b, e}, frac {n, d}, paren {e}, sqrt {e}, eq {l, r}.
 
 import { Q, gcd } from './rational.js';
+import { t } from '../i18n.js';
 
 export class AlgError extends Error {}
 
@@ -401,7 +402,7 @@ export function factoredProblem(node, { complete = true } = {}) {
   const fs = productFactors(strip(node));
   const sums = fs.map((f) => (f.t === 'pow' ? f.b : f)).filter((f) => strip(f).t === 'bin' && ['+', '-'].includes(strip(f).op));
   const poweredSum = fs.length === 1 && fs[0].t === 'pow' && sums.length === 1;
-  if (fs.length < 2 && !poweredSum) return 'Écris l\'expression comme un produit de facteurs.';
+  if (fs.length < 2 && !poweredSum) return t('Écris l\'expression comme un produit de facteurs.');
   for (const f of fs) {
     if (f.t === 'num' || f.t === 'var' || (f.t === 'pow' && strip(f.b).t === 'var')) continue;
     const inner = f.t === 'pow' ? f.b : f;
@@ -411,13 +412,13 @@ export function factoredProblem(node, { complete = true } = {}) {
     }
     let p;
     try { p = toPoly(inner); } catch { return null; }
-    if (intContent(p) > 1) return `On peut encore mettre ${intContent(p)} en évidence dans ${printAlg(inner)}.`;
+    if (intContent(p) > 1) return t('On peut encore mettre {k} en évidence dans {e}.', { k: intContent(p), e: printAlg(inner) });
     const v = commonVar(p);
-    if (v) return `On peut encore mettre ${v} en évidence dans ${printAlg(inner)}.`;
+    if (v) return t('On peut encore mettre {k} en évidence dans {e}.', { k: v, e: printAlg(inner) });
     if (complete && p.vars.length === 1) {
       const x = p.vars[0];
-      if (p.degreeIn(x) === 2 && isRationalRootQuadratic(p.coeffs(x))) return `${printAlg(inner)} peut encore se factoriser.`;
-      if (p.degreeIn(x) > 2) return `${printAlg(inner)} peut encore se factoriser.`;
+      if (p.degreeIn(x) === 2 && isRationalRootQuadratic(p.coeffs(x))) return t('{e} peut encore se factoriser.', { e: printAlg(inner) });
+      if (p.degreeIn(x) > 2) return t('{e} peut encore se factoriser.', { e: printAlg(inner) });
     }
   }
   return null;

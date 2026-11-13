@@ -11,6 +11,7 @@ import { toReadable } from '../../cas/print.js';
 import { readWith, showWith } from '../../judges/index.js';
 import { linesItem, mcq, tfItem, examTag, MT } from './kit.js';
 import { partsScript, SEG, modeOf, H, E } from './analyse1-e-kit.js';
+import { t } from '../../i18n.js';
 
 export { linesItem, mcq, tfItem, examTag, MT, modeOf, H, E, SEG };
 export { problemItem, asProblem } from './kit-problem.js';
@@ -217,8 +218,8 @@ export function partsLines(o) {
 // counter-example has no checker), with the exam tag tf.
 export function vfMcq(skill, statement, truth, rng, { key, why, ruleIfTrue = null, ruleIfFalse = null, level = 4, exam = true }) {
   return mcq({
-    skill, level, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : ruleIfTrue }, { html: 'Faux', correct: !truth, rule: truth ? ruleIfFalse : null }],
+    skill, level, prompt: t('Vrai ou faux ?<br>« {s} »', { s: statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : ruleIfTrue }, { html: t('Faux'), correct: !truth, rule: truth ? ruleIfFalse : null }],
     key: `${skill}:tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: exam ? { format: 'tf', points: 1 } : false,
   }, rng);
 }
@@ -237,14 +238,14 @@ export function mcq4(o, rng) {
 // A decision line « Nature de … ? ».
 export function natureDecision(prompt, right, rules = {}, whys = {}) {
   const NAT = [
-    ['min', 'minimum local'], ['max', 'maximum local'], ['saddle', 'point selle'], ['none', 'la hessienne ne permet pas de conclure'],
+    ['min', t('minimum local')], ['max', t('maximum local')], ['saddle', t('point selle')], ['none', t('la hessienne ne permet pas de conclure')],
   ];
   return {
     kind: 'decision', prompt,
     options: NAT.map(([id, label]) => ({
       id, label, valid: id === right,
       ...(id !== right && rules[id] ? { rule: rules[id] } : {}),
-      why: whys[id] || 'Relis les signes de det H et de f_xx.',
+      why: whys[id] || t('Relis les signes de det H et de f_xx.'),
     })),
   };
 }

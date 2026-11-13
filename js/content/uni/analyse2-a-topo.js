@@ -22,6 +22,7 @@ import { problemItem } from './kit-problem.js';
 import { inSet, pointKind } from '../../judges/a2-examples-a.js';
 import { parse } from '../../cas/parse.js';
 import { toReadable } from '../../cas/print.js';
+import { t } from '../../i18n.js';
 
 const TOPO = 'a2-rn-topology';
 const BD = 'a2-rn-boundary';
@@ -194,13 +195,13 @@ function finish(S, partsAtoms, { union = false } = {}) {
   if (!cls.open && !cls.closed) traps.a2_topo_not_open_closed = { ...cls, closed: true };
   // The always-true inequality counted (a mixture of large and strict).
   if (!union && all.some((a) => a.trivial)) {
-    const t = conjClass(all, dim, { countTrivial: true });
-    traps.a2_topo_trivial_atom = { ...cls, open: t.open, closed: t.closed };
+    const tc = conjClass(all, dim, { countTrivial: true });
+    traps.a2_topo_trivial_atom = { ...cls, open: tc.open, closed: tc.closed };
   }
   // Bounded read on the variables that appear (a cylinder in ℝ³).
   if (!cls.bounded && dim === 3) {
-    const t = union ? partsAtoms.every((a) => boundedBy(a, dim, true)) : boundedBy(all, dim, true);
-    if (t) traps.a2_topo_cylinder = { ...cls, bounded: true };
+    const cyl = union ? partsAtoms.every((a) => boundedBy(a, dim, true)) : boundedBy(all, dim, true);
+    if (cyl) traps.a2_topo_cylinder = { ...cls, bounded: true };
   }
   return { S, dim, cls, w, traps, partsAtoms, union };
 }
@@ -264,19 +265,26 @@ export function topoSet(rng, { dim = null, pTriv = 0, combine = null } = {}) {
 // The set as HTML: E = {…}, or A, B and E = A ∩ B (A ∪ B).
 export function topoHtml(T) {
   if (T.combine) {
-    return `A = ${setML(T.dim, T.A)} et B = ${setML(T.dim, T.B)}, E = A ${T.combine === 'union' ? '∪' : '∩'} B`;
+    const v = { A: setML(T.dim, T.A), B: setML(T.dim, T.B) };
+    return T.combine === 'union' ? t('A = {A} et B = {B}, E = A ∪ B', v) : t('A = {A} et B = {B}, E = A ∩ B', v);
   }
   return `E = ${setML(T.dim, T.partsAtoms[0])}`;
 }
-const ocT = (c) => (c.open ? 'ouvert' : c.closed ? 'fermé' : 'ni ouvert ni fermé');
-export const classT = (c) => (c.closed && c.bounded ? 'fermé, borné : compact' : `${ocT(c)}, ${c.bounded ? 'borné' : 'non borné'}`);
+// The classification as option text: « fermé, non borné ».
+export const classT = (c) => {
+  if (c.closed && c.bounded) return t('fermé, borné : compact');
+  if (c.open) return c.bounded ? t('ouvert, borné') : t('ouvert, non borné');
+  if (c.closed) return t('fermé, non borné');
+  return c.bounded ? t('ni ouvert ni fermé, borné') : t('ni ouvert ni fermé, non borné');
+};
 const ALL_CLASSES = [false, true].flatMap((b) => [{ open: true, closed: false }, { open: false, closed: true }, { open: false, closed: false }].map((c) => ({ ...c, bounded: b })));
 
 // « E est … » as a sentence.
 export function classSentence(c) {
-  const oc = c.open ? 'E est ouvert' : c.closed ? 'E est fermé' : "E n'est ni ouvert ni fermé";
-  if (c.closed && c.bounded) return 'E est fermé et borné : compact';
-  return `${oc}, ${c.bounded ? 'borné' : 'non borné'} ; il n'est pas compact`;
+  if (c.closed && c.bounded) return t('E est fermé et borné : compact');
+  if (c.open) return c.bounded ? t('E est ouvert, borné ; il n\'est pas compact') : t('E est ouvert, non borné ; il n\'est pas compact');
+  if (c.closed) return t('E est fermé, non borné ; il n\'est pas compact');
+  return c.bounded ? t('E n\'est ni ouvert ni fermé, borné ; il n\'est pas compact') : t('E n\'est ni ouvert ni fermé, non borné ; il n\'est pas compact');
 }
 
 // Why: the atoms, then the witnesses.
@@ -285,17 +293,18 @@ function topoWhy(T) {
   const out = [];
   const all = T.partsAtoms.flat();
   const triv = all.filter((a) => a.trivial);
-  if (triv.length) out.push(`${MT(atomText(triv[0]), XYZ)} est toujours vraie : elle ne compte pas.`);
-  const others = triv.length ? ' autres' : '';
+  if (triv.length) out.push(t('{a} est toujours vraie : elle ne compte pas.', { a: MT(atomText(triv[0]), XYZ) }));
+  const others = triv.length > 0;
   if (!T.union) {
-    if (c.open) out.push(`Les${others} inégalités sont toutes strictes : E est ouvert.`);
-    else if (c.closed) out.push(`Les${others} inégalités sont toutes larges : E est fermé.`);
-    else out.push(`Il y a des inégalités larges et des inégalités strictes.`);
-  } else out.push(c.open ? 'Réunion de deux ouverts : ouvert.' : c.closed ? 'Réunion de deux fermés : fermé.' : 'On cherche des points du bord.');
-  if (T.w.bdIn && !c.open) out.push(`${ptT(T.w.bdIn)} est dans E et sur son bord : E n'est pas ouvert.`);
-  if (T.w.bdOut && !c.closed) out.push(`${ptT(T.w.bdOut)} est sur le bord de E, mais pas dans E : E n'est pas fermé.`);
-  out.push(c.bounded ? 'Chaque coordonnée est bornée : E est borné.' : `E n'est pas borné${T.dim === 3 && T.traps.a2_topo_cylinder ? " : une coordonnée n'apparaît dans aucune inégalité, elle est libre" : ''}.`);
-  out.push(`Donc ${classSentence(c)}.`);
+    if (c.open) out.push(others ? t('Les autres inégalités sont toutes strictes : E est ouvert.') : t('Les inégalités sont toutes strictes : E est ouvert.'));
+    else if (c.closed) out.push(others ? t('Les autres inégalités sont toutes larges : E est fermé.') : t('Les inégalités sont toutes larges : E est fermé.'));
+    else out.push(t('Il y a des inégalités larges et des inégalités strictes.'));
+  } else out.push(c.open ? t('Réunion de deux ouverts : ouvert.') : c.closed ? t('Réunion de deux fermés : fermé.') : t('On cherche des points du bord.'));
+  if (T.w.bdIn && !c.open) out.push(t('{p} est dans E et sur son bord : E n\'est pas ouvert.', { p: ptT(T.w.bdIn) }));
+  if (T.w.bdOut && !c.closed) out.push(t('{p} est sur le bord de E, mais pas dans E : E n\'est pas fermé.', { p: ptT(T.w.bdOut) }));
+  out.push(c.bounded ? t('Chaque coordonnée est bornée : E est borné.')
+    : T.dim === 3 && T.traps.a2_topo_cylinder ? t('E n\'est pas borné : une coordonnée n\'apparaît dans aucune inégalité, elle est libre.') : t('E n\'est pas borné.'));
+  out.push(t('Donc {s}.', { s: classSentence(c) }));
   return out.join(' ');
 }
 
@@ -320,14 +329,21 @@ function topoMcq(level, rng, { exam = false, pTriv = 0.3, dim = null, explain = 
   let help = '';
   if (explain) {
     const lines = T.partsAtoms[0].map((a) => {
-      if (a.trivial) return `${MT(atomText(a), XYZ)} : toujours vraie`;
-      const b = (a.bounds || []).length ? ` ; elle borne ${a.bounds.join(' et ')}` : a.side ? ` ; elle borne ${a.g} ${a.side === 'lo' ? 'par en bas' : 'par en haut'}` : ' ; elle ne borne rien';
-      return `${MT(atomText(a), XYZ)} : ${isStrict(a) ? 'stricte' : 'large'}${b}`;
+      const m = MT(atomText(a), XYZ);
+      if (a.trivial) return t('{a} : toujours vraie', { a: m });
+      const s = isStrict(a);
+      if ((a.bounds || []).length) {
+        const v = { a: m, v: a.bounds.reduce((x, y) => t('{a} et {b}', { a: x, b: y })) };
+        return s ? t('{a} : stricte ; elle borne {v}', v) : t('{a} : large ; elle borne {v}', v);
+      }
+      if (a.side === 'lo') return s ? t('{a} : stricte ; elle borne {g} par en bas', { a: m, g: a.g }) : t('{a} : large ; elle borne {g} par en bas', { a: m, g: a.g });
+      if (a.side) return s ? t('{a} : stricte ; elle borne {g} par en haut', { a: m, g: a.g }) : t('{a} : large ; elle borne {g} par en haut', { a: m, g: a.g });
+      return s ? t('{a} : stricte ; elle ne borne rien', { a: m }) : t('{a} : large ; elle ne borne rien', { a: m });
     });
     help = `<br>${lines.join('<br>')}`;
   }
   return mcq({
-    skill: TOPO, level, prompt: `${topoHtml(T)}.${help}<br>L'ensemble E est :`, options: classOptions(T, rng),
+    skill: TOPO, level, prompt: t('{set}.{help}<br>L\'ensemble E est :', { set: topoHtml(T), help }), options: classOptions(T, rng),
     key: `mcq:${sig(T)}`, solution: [{ html: topoWhy(T), note: '' }], expectedSec: 60,
     exam: exam ? { format: 'mcq', points: 1 } : false, fallback: !!T.fallback,
   }, rng);
@@ -336,6 +352,8 @@ function topoMcq(level, rng, { exam = false, pTriv = 0.3, dim = null, explain = 
 // Level 2: two sets in a table (ouvert, fermé, borné, compact), then why
 // one of them is not closed (or not open).
 const V = (b) => (b ? 'V' : 'F');
+// The letter V or F as shown (T or F in English).
+const VF = (x) => (x === 'V' ? t('V') : t('F'));
 // A MathML alttext taken out of its attribute is plain text again: the row
 // labels of a table are shown as text, so « &lt; » would show as such.
 const unescapeAlt = (t) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
@@ -351,29 +369,29 @@ function topoTable(level, rng) {
   const name = j === 0 ? 'E₁' : 'E₂';
   const notClosed = !T.cls.closed;
   const then = mcq({
-    skill: TOPO, level, prompt: `Pourquoi ${name} n'est-il pas ${notClosed ? 'fermé' : 'ouvert'} ?`,
+    skill: TOPO, level, prompt: notClosed ? t('Pourquoi {name} n\'est-il pas fermé ?', { name }) : t('Pourquoi {name} n\'est-il pas ouvert ?', { name }),
     options: notClosed
-      ? [{ html: `Le point ${ptT(T.w.bdOut)} est sur le bord de ${name}, mais pas dans ${name}.`, correct: true },
-        { html: `Il ${T.cls.open ? 'est ouvert' : 'n\'est pas ouvert'}.`, correct: false, rule: 'a2_topo_not_open_closed' },
-        { html: T.cls.bounded ? 'Il est borné.' : 'Il n\'est pas borné.', correct: false },
-        { html: T.w.bdIn ? `Le point ${ptT(T.w.bdIn)} est sur le bord et dans ${name}.` : `Le point ${ptT(T.w.interior || T.w.exterior)} n'est pas sur le bord.`, correct: false }]
-      : [{ html: `Le point ${ptT(T.w.bdIn)} est dans ${name} et sur son bord : aucune boule autour de lui ne reste dans ${name}.`, correct: true },
-        { html: 'Il est fermé.', correct: false, rule: 'a2_topo_not_open_closed' },
-        { html: T.cls.bounded ? 'Il est borné.' : 'Il n\'est pas borné.', correct: false },
-        { html: `Le point ${ptT(T.w.interior || T.w.exterior)} n'est pas sur le bord.`, correct: false }],
+      ? [{ html: t('Le point {p} est sur le bord de {name}, mais pas dans {name}.', { p: ptT(T.w.bdOut), name }), correct: true },
+        { html: T.cls.open ? t('Il est ouvert.') : t('Il n\'est pas ouvert.'), correct: false, rule: 'a2_topo_not_open_closed' },
+        { html: T.cls.bounded ? t('Il est borné.') : t('Il n\'est pas borné.'), correct: false },
+        { html: T.w.bdIn ? t('Le point {p} est sur le bord et dans {name}.', { p: ptT(T.w.bdIn), name }) : t('Le point {p} n\'est pas sur le bord.', { p: ptT(T.w.interior || T.w.exterior) }), correct: false }]
+      : [{ html: t('Le point {p} est dans {name} et sur son bord : aucune boule autour de lui ne reste dans {name}.', { p: ptT(T.w.bdIn), name }), correct: true },
+        { html: t('Il est fermé.'), correct: false, rule: 'a2_topo_not_open_closed' },
+        { html: T.cls.bounded ? t('Il est borné.') : t('Il n\'est pas borné.'), correct: false },
+        { html: t('Le point {p} n\'est pas sur le bord.', { p: ptT(T.w.interior || T.w.exterior) }), correct: false }],
     key: `why:${sig(T)}`, solution: [{ html: topoWhy(T), note: '' }],
   }, rng);
   return tableItem({
     skill: TOPO, level,
-    prompt: `${Ts.map((t, i) => topoHtml(t).replace(/^E/, i ? 'E₂' : 'E₁').replace(/E = A/, `E${i ? '₂' : '₁'} = A`)).join('.<br>')}.<br>Remplis le tableau : V (vrai) ou F (faux).`,
-    table: { cols: ['ouvert', 'fermé', 'borné', 'compact'], rows }, phi: { kind: 'truth', letters: ['O', 'F', 'B'], columns: ['O', 'F', 'B', 'F ∧ B'] },
+    prompt: t('{sets}.<br>Remplis le tableau : V (vrai) ou F (faux).', { sets: Ts.map((s, i) => topoHtml(s).replace(/^E/, i ? 'E₂' : 'E₁').replace(/E = A/, `E${i ? '₂' : '₁'} = A`)).join('.<br>') }),
+    table: { cols: [t('ouvert'), t('fermé'), t('borné'), t('compact')], rows }, phi: { kind: 'truth', letters: ['O', 'F', 'B'], columns: ['O', 'F', 'B', 'F ∧ B'] },
     answers, then,
-    hints: H('Inégalités toutes larges : fermé. Toutes strictes : ouvert. Un mélange : ni l\'un ni l\'autre. Compact = fermé et borné.',
-      `${name} : ${notClosed ? `le point ${ptT(T.w.bdOut)} du bord manque` : `le point ${ptT(T.w.bdIn)} du bord est dans ${name}`}.`,
-      Ts.map((t, i) => `E${i ? '₂' : '₁'} : ${classT(t.cls)}`).join(' ; ')),
-    solution: Ts.map((t, i) => ({ html: `E${i ? '₂' : '₁'} : ${topoWhy(t)}`, note: '' })),
+    hints: H(t('Inégalités toutes larges : fermé. Toutes strictes : ouvert. Un mélange : ni l\'un ni l\'autre. Compact = fermé et borné.'),
+      notClosed ? t('{name} : le point {p} du bord manque.', { name, p: ptT(T.w.bdOut) }) : t('{name} : le point {p} du bord est dans {name}.', { name, p: ptT(T.w.bdIn) }),
+      Ts.map((s, i) => `E${i ? '₂' : '₁'} : ${classT(s.cls)}`).join(' ; ')),
+    solution: Ts.map((s, i) => ({ html: `E${i ? '₂' : '₁'} : ${topoWhy(s)}`, note: '' })),
     baits: ['a2_topo_not_open_closed'],
-    key: Ts.map(sig).join('|'), expectedSec: 120, fallback: Ts.some((t) => t.fallback),
+    key: Ts.map(sig).join('|'), expectedSec: 120, fallback: Ts.some((s) => s.fallback),
   });
 }
 
@@ -384,16 +402,16 @@ function topoAtoms(level, rng) {
   const rows = atoms.map((a, i) => ({ id: `a${i}`, label: readable(atomText(a)), env: { L: !isStrict(a), S: isStrict(a), T: !!a.trivial }, cells: [0, 1, 2].map(() => ({ input: true, kind: 'tf' })) }));
   const answers = Object.fromEntries(rows.map((r) => [r.id, [r.env.L, r.env.S, r.env.T].map(V)]));
   const then = mcq({
-    skill: TOPO, level, prompt: `${topoHtml(T)}. L'ensemble E est :`, options: classOptions(T, rng),
+    skill: TOPO, level, prompt: t('{set}. L\'ensemble E est :', { set: topoHtml(T) }), options: classOptions(T, rng),
     key: `then:${sig(T)}`, solution: [{ html: topoWhy(T), note: '' }],
   }, rng);
   return tableItem({
-    skill: TOPO, level, prompt: `${topoHtml(T)}.<br>Pour chaque inégalité : est-elle large, stricte, toujours vraie ? (V ou F)`,
-    table: { cols: ['large', 'stricte', 'toujours vraie'], rows }, phi: { kind: 'truth', letters: ['L', 'S', 'T'], columns: ['L', 'S', 'T'] },
+    skill: TOPO, level, prompt: t('{set}.<br>Pour chaque inégalité : est-elle large, stricte, toujours vraie ? (V ou F)', { set: topoHtml(T) }),
+    table: { cols: [t('large'), t('stricte'), t('toujours vraie')], rows }, phi: { kind: 'truth', letters: ['L', 'S', 'T'], columns: ['L', 'S', 'T'] },
     answers, then,
-    hints: H('≤ et ≥ sont larges ; <, > et ≠ sont strictes. Une inégalité vraie pour tous les points n\'enlève rien.',
-      atoms.some((a) => a.trivial) ? `Regarde ${MT(atomText(atoms.find((a) => a.trivial)), XYZ)} : un carré est ≥ 0.` : 'Aucune inégalité n\'est toujours vraie ici.',
-      rows.map((r) => `${r.label} : ${answers[r.id].join(' ')}`).join(' ; ')),
+    hints: H(t('≤ et ≥ sont larges ; <, > et ≠ sont strictes. Une inégalité vraie pour tous les points n\'enlève rien.'),
+      atoms.some((a) => a.trivial) ? t('Regarde {a} : un carré est ≥ 0.', { a: MT(atomText(atoms.find((a) => a.trivial)), XYZ) }) : t('Aucune inégalité n\'est toujours vraie ici.'),
+      rows.map((r) => `${r.label} : ${answers[r.id].map(VF).join(' ')}`).join(' ; ')),
     solution: [{ html: topoWhy(T), note: '' }],
     baits: Object.keys(T.traps),
     key: `atoms:${sig(T)}`, expectedSec: 100, fallback: !!T.fallback,
@@ -413,16 +431,17 @@ function topoTf(level, rng, { exam = false } = {}) {
   const w = want === 'in' ? T.w.bdIn : T.w.bdOut;
   const counter = truth ? null : {
     kind: 'a2', prop: 'topoPoint', params: { set: T.S, want },
-    ask: [{ v: 'p', label: want === 'in' ? 'Un point de E sur le bord de E :' : 'Un point du bord de E qui n\'est pas dans E :', keys: ['calc', 'geo'] }],
+    ask: [{ v: 'p', label: want === 'in' ? t('Un point de E sur le bord de E :') : t('Un point du bord de E qui n\'est pas dans E :'), keys: ['calc', 'geo'] }],
     answer: { p: ptAns(w) },
   };
+  const set = topoHtml(T);
   return tfItem({
-    skill: TOPO, level, statement: `${topoHtml(T)}. L'ensemble E est ${what}.`, truth, counter,
+    skill: TOPO, level, statement: what === 'fermé' ? t('{set}. L\'ensemble E est fermé.', { set }) : what === 'ouvert' ? t('{set}. L\'ensemble E est ouvert.', { set }) : t('{set}. L\'ensemble E est compact.', { set }), truth, counter,
     ruleIfTrue: !truth && what === 'fermé' && !c.open ? 'a2_topo_not_open_closed' : null,
-    hints: H(want === 'in' ? 'E n\'est pas ouvert s\'il contient un point de son bord.' : 'E n\'est pas fermé s\'il lui manque un point de son bord.',
-      w ? `Regarde le point ${ptT(w)}.` : `Classe chaque inégalité : large ou stricte.`,
-      `E est ${classT(c)}.`),
-    explanation: `${truth ? 'Vrai' : 'Faux'}. ${topoWhy(T)}`,
+    hints: H(want === 'in' ? t('E n\'est pas ouvert s\'il contient un point de son bord.') : t('E n\'est pas fermé s\'il lui manque un point de son bord.'),
+      w ? t('Regarde le point {p}.', { p: ptT(w) }) : t('Classe chaque inégalité : large ou stricte.'),
+      t('E est {c}.', { c: classT(c) })),
+    explanation: truth ? t('Vrai. {why}', { why: topoWhy(T) }) : t('Faux. {why}', { why: topoWhy(T) }),
     exam: exam ? { format: 'tf', points: 1 } : false, key: `${what}:${sig(T)}`, fallback: !!T.fallback,
   });
 }
@@ -433,10 +452,10 @@ function topoTheory(rng) {
   const kind = rng.pick(['inter', 'union', 'notOpen', 'trivial', 'hb', 'rn', 'norms']);
   if (kind === 'notOpen') {
     return tfItem({
-      skill: TOPO, level: 4, statement: 'Une partie de ℝⁿ qui n\'est pas ouverte est fermée.', truth: false, exam, key: kind,
-      counter: { kind: 'a2', prop: 'bdReal', params: { test: 'neither' }, ask: [{ v: 'E', label: 'Dans ℝ : E =', keys: ['calc', 'set'] }], answer: { E: '[0 ; 1[' } },
+      skill: TOPO, level: 4, statement: t('Une partie de ℝⁿ qui n\'est pas ouverte est fermée.'), truth: false, exam, key: kind,
+      counter: { kind: 'a2', prop: 'bdReal', params: { test: 'neither' }, ask: [{ v: 'E', label: t('Dans ℝ : E ='), keys: ['calc', 'set'] }], answer: { E: '[0 ; 1[' } },
       ruleIfTrue: 'a2_topo_not_open_closed',
-      explanation: 'Faux : [0 ; 1[ n\'est ni ouvert (0 est dans E et sur son bord) ni fermé (1 est sur le bord et manque).',
+      explanation: t('Faux : [0 ; 1[ n\'est ni ouvert (0 est dans E et sur son bord) ni fermé (1 est sur le bord et manque).'),
     });
   }
   if (kind === 'trivial') {
@@ -445,17 +464,17 @@ function topoTheory(rng) {
     const k = rng.int(2, 20);
     return tfItem({
       skill: TOPO, level: 4, exam, key: `${kind}:${a}:${b}:${k}`, truth: true,
-      statement: `Pour a < −${k}, l'ensemble ${MT(`{1 ≥ -${a}x^2-${b}y^2 > a}`, { vars: ['x', 'y', 'a'] })} ⊂ ℝ² est ouvert.`,
+      statement: t('Pour a < −{k}, l\'ensemble {set} ⊂ ℝ² est ouvert.', { k, set: MT(`{1 ≥ -${a}x^2-${b}y^2 > a}`, { vars: ['x', 'y', 'a'] }) }),
       ruleIfFalse: 'a2_topo_trivial_atom',
-      explanation: `Vrai : 1 ≥ −${a}x² − ${b}y² est toujours vraie, elle n'enlève aucun point. Il reste ${a}x² + ${b}y² < −a, une inégalité stricte : l'intérieur d'une ellipse, ouvert.`,
+      explanation: t('Vrai : 1 ≥ −{a}x² − {b}y² est toujours vraie, elle n\'enlève aucun point. Il reste {a}x² + {b}y² < −a, une inégalité stricte : l\'intérieur d\'une ellipse, ouvert.', { a, b }),
     });
   }
   const T = {
-    inter: ['L\'intersection de deux fermés de ℝⁿ est fermée.', 'Vrai : le complémentaire est la réunion de deux ouverts, qui est ouverte.'],
-    union: ['La réunion de deux ouverts de ℝⁿ est ouverte.', 'Vrai : un point de la réunion est dans l\'un des deux, avec une boule autour de lui.'],
-    hb: ['Une partie fermée et bornée de ℝⁿ est compacte.', 'Vrai : c\'est la définition du cours (ou le théorème de Heine-Borel).'],
-    rn: ['ℝⁿ est à la fois ouvert et fermé.', 'Vrai : ℝⁿ et ∅ sont les seules parties à la fois ouvertes et fermées.'],
-    norms: ['Une partie de ℝ² ouverte pour la norme ‖·‖₁ est ouverte pour la norme ‖·‖₂.', 'Vrai : en dimension finie, toutes les normes donnent les mêmes ouverts (‖v‖₂ ≤ ‖v‖₁ ≤ √2·‖v‖₂).'],
+    inter: [t('L\'intersection de deux fermés de ℝⁿ est fermée.'), t('Vrai : le complémentaire est la réunion de deux ouverts, qui est ouverte.')],
+    union: [t('La réunion de deux ouverts de ℝⁿ est ouverte.'), t('Vrai : un point de la réunion est dans l\'un des deux, avec une boule autour de lui.')],
+    hb: [t('Une partie fermée et bornée de ℝⁿ est compacte.'), t('Vrai : c\'est la définition du cours (ou le théorème de Heine-Borel).')],
+    rn: [t('ℝⁿ est à la fois ouvert et fermé.'), t('Vrai : ℝⁿ et ∅ sont les seules parties à la fois ouvertes et fermées.')],
+    norms: [t('Une partie de ℝ² ouverte pour la norme ‖·‖₁ est ouverte pour la norme ‖·‖₂.'), t('Vrai : en dimension finie, toutes les normes donnent les mêmes ouverts (‖v‖₂ ≤ ‖v‖₁ ≤ √2·‖v‖₂).')],
   }[kind];
   return tfItem({ skill: TOPO, level: 4, statement: T[0], truth: true, exam, key: kind, explanation: T[1] });
 }
@@ -463,10 +482,10 @@ function topoTheory(rng) {
 function topoProblem(level, rng, exam) {
   const parts = [0, 1, 2, 3].map((i) => {
     const it = topoMcq(level, rng, { pTriv: i === 3 ? 0.8 : 0.3, dim: i % 2 ? 3 : 2 });
-    return { item: { ...it, prompt: it.prompt }, points: 1, title: `Ensemble ${i + 1}` };
+    return { item: { ...it, prompt: it.prompt }, points: 1, title: t('Ensemble {n}', { n: i + 1 }) };
   });
   return problemItem({
-    skill: TOPO, level, prompt: 'Pour chacun des quatre ensembles, choisis ce qu\'il est.', parts,
+    skill: TOPO, level, prompt: t('Pour chacun des quatre ensembles, choisis ce qu\'il est.'), parts,
     key: parts.map((p) => p.item.key).join('|'), exam: exam ? { format: 'open', points: 4 } : false, expectedSec: 360,
   });
 }
@@ -530,21 +549,25 @@ const bsig = (B) => B.S.parts.map((p) => p.map((a) => `${a.g}${a.op}${a.c}`).joi
 const bdHtml = (B) => `E = ${B.pieces.map(pieceML).join(' ∪ ')} ⊂ ℝ²`;
 
 // Pieces as words (the boundary is a list of them).
-const circT = (r) => `le cercle ${MT(`x^2+y^2 = ${SQ(r)}`, XY)}`;
-const pointT = (p) => `le point ${ptT(p)}`;
+const circML = (r) => MT(`x^2+y^2 = ${SQ(r)}`, XY);
+const circT = (r) => t('le cercle {c}', { c: circML(r) });
+const pointT = (p) => t('le point {p}', { p: ptT(p) });
+// Each piece also as « du cercle … » (« ∂E est formé du cercle … »).
 function bdPieces(B) {
   const out = [];
-  if (B.main.lo) out.push({ id: `c${B.main.lo}`, html: circT(B.main.lo), kind: 'circle' });
-  out.push({ id: `c${B.main.hi}`, html: circT(B.main.hi), kind: 'circle' });
-  for (const e of B.extras) out.push(e.kind === 'point' ? { id: `p${ptT(e.p)}`, html: pointT(e.p), kind: 'point', p: e.p } : { id: `c${e.r}`, html: circT(e.r), kind: 'circle' });
+  const circ = (r) => ({ id: `c${r}`, html: circT(r), of: t('du cercle {c}', { c: circML(r) }), kind: 'circle' });
+  if (B.main.lo) out.push(circ(B.main.lo));
+  out.push(circ(B.main.hi));
+  for (const e of B.extras) out.push(e.kind === 'point' ? { id: `p${ptT(e.p)}`, html: pointT(e.p), of: t('du point {p}', { p: ptT(e.p) }), kind: 'point', p: e.p } : circ(e.r));
   return out;
 }
-const interiorT = (B) => (B.main.lo ? `l'anneau ouvert ${MT(`${SQ(B.main.lo)} < x^2+y^2 < ${SQ(B.main.hi)}`, XY)}` : `le disque ouvert ${MT(`x^2+y^2 < ${SQ(B.main.hi)}`, XY)}`);
-const joinT = (xs) => (xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} et ${xs.at(-1)}`);
+const interiorT = (B) => (B.main.lo ? t('l\'anneau ouvert {s}', { s: MT(`${SQ(B.main.lo)} < x^2+y^2 < ${SQ(B.main.hi)}`, XY) }) : t('le disque ouvert {s}', { s: MT(`x^2+y^2 < ${SQ(B.main.hi)}`, XY) }));
+const joinT = (xs) => (xs.length <= 1 ? xs.join('') : t('{a} et {b}', { a: xs.slice(0, -1).join(', '), b: xs.at(-1) }));
 function bdWhy(B) {
   const pcs = bdPieces(B);
   const iso = B.extras.filter((e) => e.kind === 'point');
-  return `∂E est formé ${joinT(pcs.map((p) => p.html.replace(/^le /, 'du ')))}.${iso.length ? ` ${pointT(iso[0].p).replace(/^le/, 'Le')} est isolé : toute boule autour de lui contient ce point (dans E) et des points hors de E, il est dans le bord.` : ''} int E est ${interiorT(B)} ; adh E = E ∪ ∂E.`;
+  const isoT = iso.length ? ` ${t('Le point {p} est isolé : toute boule autour de lui contient ce point (dans E) et des points hors de E, il est dans le bord.', { p: ptT(iso[0].p) })}` : '';
+  return `${t('∂E est formé {list}.', { list: joinT(pcs.map((p) => p.of)) })}${isoT} ${t('int E est {i} ; adh E = E ∪ ∂E.', { i: interiorT(B) })}`;
 }
 
 // Level 1: which pieces are in ∂E (a column of V/F).
@@ -553,19 +576,19 @@ function bdPiecesTable(level, rng) {
   const pcs = bdPieces(B).map((p) => ({ ...p, in: true }));
   const decoys = [];
   const mid = B.main.lo ? SQ(B.main.lo) + 1 : 0;
-  if (B.main.lo && mid < SQ(B.main.hi)) decoys.push({ html: `le cercle ${MT(`x^2+y^2 = ${mid}`, XY)}`, in: false });
+  if (B.main.lo && mid < SQ(B.main.hi)) decoys.push({ html: t('le cercle {c}', { c: MT(`x^2+y^2 = ${mid}`, XY) }), in: false });
   decoys.push({ html: interiorT(B), in: false });
-  if (!B.main.lo) decoys.push({ html: 'l\'origine (0 ; 0)', in: false });
-  else if (!B.extras.some((e) => e.kind === 'point' && e.p[0] === 0 && e.p[1] === 0) && !B.extras.some((e) => e.kind === 'circle' && e.r === 1)) decoys.push({ html: 'l\'origine (0 ; 0)', in: false });
+  if (!B.main.lo) decoys.push({ html: t('l\'origine (0 ; 0)'), in: false });
+  else if (!B.extras.some((e) => e.kind === 'point' && e.p[0] === 0 && e.p[1] === 0) && !B.extras.some((e) => e.kind === 'circle' && e.r === 1)) decoys.push({ html: t('l\'origine (0 ; 0)'), in: false });
   const all = rng.shuffle([...pcs, ...decoys.slice(0, 2)]);
   const strip = (h) => unescapeAlt(h.replace(/<math[^>]*alttext="([^"]*)"[\s\S]*?<\/math>/g, '$1'));
   const rows = all.map((p, i) => ({ id: `r${i}`, label: strip(p.html), env: { B: p.in }, cells: [{ input: true, kind: 'tf' }] }));
   const answers = Object.fromEntries(rows.map((r) => [r.id, [V(r.env.B)]]));
   return tableItem({
-    skill: BD, level, prompt: `${bdHtml(B)}.<br>Chaque morceau est-il dans le bord ∂E ? (V ou F)`,
-    table: { cols: ['dans ∂E'], rows }, phi: { kind: 'truth', letters: ['B'], columns: ['B'] }, answers,
-    hints: H('Un point est dans ∂E si chaque boule autour de lui touche E et le complémentaire de E.',
-      'Les cercles qui limitent l\'anneau (ou le disque) sont dans le bord, qu\'ils soient dans E ou non. Un point isolé aussi.',
+    skill: BD, level, prompt: t('{set}.<br>Chaque morceau est-il dans le bord ∂E ? (V ou F)', { set: bdHtml(B) }),
+    table: { cols: [t('dans ∂E')], rows }, phi: { kind: 'truth', letters: ['B'], columns: ['B'] }, answers,
+    hints: H(t('Un point est dans ∂E si chaque boule autour de lui touche E et le complémentaire de E.'),
+      t('Les cercles qui limitent l\'anneau (ou le disque) sont dans le bord, qu\'ils soient dans E ou non. Un point isolé aussi.'),
       `∂E : ${joinT(pcs.map((p) => strip(p.html)))}.`),
     solution: [{ html: bdWhy(B), note: '' }],
     baits: B.extras.some((e) => e.kind === 'point') ? ['a2_bd_isolated'] : [],
@@ -589,7 +612,7 @@ function bdMcq(level, rng) {
   add(U(pcs.filter((p) => p.id !== `c${B.main.lo}` && p.kind !== 'point')));
   add(U([{ html: interiorT(B) }]));
   return mcq({
-    skill: BD, level, prompt: `${bdHtml(B)}. Que vaut le bord ∂E ?`, options: options.slice(0, 4),
+    skill: BD, level, prompt: t('{set}. Que vaut le bord ∂E ?', { set: bdHtml(B) }), options: options.slice(0, 4),
     key: `bd:${bsig(B)}`, solution: [{ html: bdWhy(B), note: '' }], expectedSec: 60,
   }, rng);
 }
@@ -605,7 +628,7 @@ function bdPoints(B, rng, n = 4) {
   for (const k of ['bdIn', 'bdOut', 'interior', 'exterior']) for (const p of kinds[k] || []) if (out.length < n && !out.some((o) => o.p === p)) out.push({ p, k });
   return rng.shuffle(out);
 }
-const KIND_T = { interior: 'intérieur', bdIn: 'sur le bord, dans E', bdOut: 'sur le bord, hors de E', exterior: 'extérieur' };
+const KIND_T = { interior: t('intérieur'), bdIn: t('sur le bord, dans E'), bdOut: t('sur le bord, hors de E'), exterior: t('extérieur') };
 
 // Level 3: four points, each interior, on ∂E in E, on ∂E out of E, exterior.
 function bdPointTable(level, rng) {
@@ -615,10 +638,10 @@ function bdPointTable(level, rng) {
   const rows = pts.map((o, i) => ({ id: `p${i}`, label: ptT(o.p), env: Object.fromEntries(['I', 'P', 'Q', 'X'].map((L, j) => [L, o.k === ks[j]])), cells: ks.map(() => ({ input: true, kind: 'tf' })) }));
   const answers = Object.fromEntries(rows.map((r) => [r.id, ['I', 'P', 'Q', 'X'].map((L) => V(r.env[L]))]));
   return tableItem({
-    skill: BD, level, prompt: `${bdHtml(B)}.<br>Pour chaque point, une seule case est V : intérieur, sur le bord et dans E, sur le bord et hors de E, ou extérieur.`,
-    table: { cols: ['intérieur', 'bord, dans E', 'bord, hors de E', 'extérieur'], rows }, phi: { kind: 'truth', letters: ['I', 'P', 'Q', 'X'], columns: ['I', 'P', 'Q', 'X'] }, answers,
-    hints: H('Calcule x² + y² pour chaque point et compare aux inégalités. Sur un cercle qui limite E, le point est au bord.',
-      'Un point isolé de E est sur le bord, et dans E.',
+    skill: BD, level, prompt: t('{set}.<br>Pour chaque point, une seule case est V : intérieur, sur le bord et dans E, sur le bord et hors de E, ou extérieur.', { set: bdHtml(B) }),
+    table: { cols: [t('intérieur'), t('bord, dans E'), t('bord, hors de E'), t('extérieur')], rows }, phi: { kind: 'truth', letters: ['I', 'P', 'Q', 'X'], columns: ['I', 'P', 'Q', 'X'] }, answers,
+    hints: H(t('Calcule x² + y² pour chaque point et compare aux inégalités. Sur un cercle qui limite E, le point est au bord.'),
+      t('Un point isolé de E est sur le bord, et dans E.'),
       pts.map((o) => `${ptT(o.p)} : ${KIND_T[o.k]}`).join(' ; ')),
     solution: [{ html: pts.map((o) => `${ptT(o.p)} : ${KIND_T[o.k]}`).join(' ; '), note: '' }, { html: bdWhy(B), note: '' }],
     baits: B.extras.some((e) => e.kind === 'point') ? ['a2_bd_isolated'] : [],
@@ -633,18 +656,18 @@ function bdThreeTable(level, rng) {
   const items = bdPieces(B).map((p) => ({ label: strip(p.html), d: true, i: false, a: true }));
   items.push({ label: strip(interiorT(B)), d: false, i: true, a: true });
   const mid = B.main.lo ? SQ(B.main.lo) + 1 : Math.max(1, SQ(B.main.hi) - 1);
-  if (mid < SQ(B.main.hi)) items.push({ label: `le cercle x² + y² = ${mid}`, d: false, i: true, a: true });
+  if (mid < SQ(B.main.hi)) items.push({ label: t('le cercle x² + y² = {n}', { n: mid }), d: false, i: true, a: true });
   const far = SQ(Math.max(B.main.hi, ...B.extras.map((e) => (e.kind === 'circle' ? e.r : Math.hypot(...e.p)))) + 1);
-  items.push({ label: `le cercle x² + y² = ${far}`, d: false, i: false, a: false });
+  items.push({ label: t('le cercle x² + y² = {n}', { n: far }), d: false, i: false, a: false });
   const chosen = rng.shuffle(items).slice(0, 5);
   const rows = chosen.map((o, i) => ({ id: `m${i}`, label: o.label, env: { D: o.d, I: o.i, A: o.a }, cells: [0, 1, 2].map(() => ({ input: true, kind: 'tf' })) }));
   const answers = Object.fromEntries(rows.map((r) => [r.id, [r.env.D, r.env.I, r.env.A].map(V)]));
   return tableItem({
-    skill: BD, level, prompt: `${bdHtml(B)}.<br>Chaque morceau est-il contenu dans ∂E, dans int E, dans adh E ? (V ou F)`,
-    table: { cols: ['dans ∂E', 'dans int E', 'dans adh E'], rows }, phi: { kind: 'truth', letters: ['D', 'I', 'A'], columns: ['D', 'I', 'A'] }, answers,
-    hints: H('int E = E sans son bord ; adh E = E avec son bord.',
+    skill: BD, level, prompt: t('{set}.<br>Chaque morceau est-il contenu dans ∂E, dans int E, dans adh E ? (V ou F)', { set: bdHtml(B) }),
+    table: { cols: [t('dans ∂E'), t('dans int E'), t('dans adh E')], rows }, phi: { kind: 'truth', letters: ['D', 'I', 'A'], columns: ['D', 'I', 'A'] }, answers,
+    hints: H(t('int E = E sans son bord ; adh E = E avec son bord.'),
       `∂E : ${joinT(bdPieces(B).map((p) => strip(p.html)))}.`,
-      rows.map((r) => `${r.label} : ${answers[r.id].join(' ')}`).join(' ; ')),
+      rows.map((r) => `${r.label} : ${answers[r.id].map(VF).join(' ')}`).join(' ; ')),
     solution: [{ html: bdWhy(B), note: '' }],
     baits: B.extras.some((e) => e.kind === 'point') ? ['a2_bd_isolated'] : [],
     key: `three:${bsig(B)}`, expectedSec: 120,
@@ -655,31 +678,31 @@ function bdThreeTable(level, rng) {
 const SET_KEYS = ['calc', 'set'];
 const askOf = (names) => names.map((v) => ({ v, label: v === 'p' ? 'p =' : `${v} =`, keys: v === 'p' ? ['calc'] : SET_KEYS }));
 const BD_TF = [
-  { id: 'incl', s: 'Si E ⊂ F, alors ∂E ⊂ ∂F.', truth: false, test: 'incl', answer: { E: ']0 ; 1[', F: ']-1 ; 2[', p: '0' }, why: 'Faux : E = ]0 ; 1[ ⊂ F = ]−1 ; 2[, 0 ∈ ∂E mais 0 ∉ ∂F (0 est intérieur à F).' },
-  { id: 'union', s: 'on a ∂(A ∪ B) = ∂A ∪ ∂B.', truth: false, test: 'union', answer: { A: '[0 ; 1]', B: '[1 ; 2]', p: '1' }, rule: 'a2_bd_union', why: 'Faux : A = [0 ; 1], B = [1 ; 2] ; 1 ∈ ∂A, mais 1 est intérieur à A ∪ B = [0 ; 2]. Seule l\'inclusion ∂(A ∪ B) ⊂ ∂A ∪ ∂B est vraie.' },
-  { id: 'inter', s: 'on a ∂(A ∩ B) = ∂A ∩ ∂B.', truth: false, test: 'inter', answer: { A: '[0 ; 2]', B: '[1 ; 3]', p: '1' }, why: 'Faux : A ∩ B = [1 ; 2], donc 1 ∈ ∂(A ∩ B), mais 1 ∉ ∂A.' },
-  { id: 'inside', s: 'on a ∂E ⊂ E.', truth: false, test: 'inside', answer: { E: ']0 ; 1[', p: '0' }, why: 'Faux : 0 est dans le bord de ]0 ; 1[, pas dans ]0 ; 1[. C\'est vrai seulement si E est fermé.' },
-  { id: 'intUnion', s: 'on a int(A ∪ B) = int A ∪ int B.', truth: false, test: 'intUnion', answer: { A: '[0 ; 1]', B: '[1 ; 2]', p: '1' }, why: 'Faux : 1 est intérieur à A ∪ B = [0 ; 2], mais ni à A = [0 ; 1] ni à B = [1 ; 2].' },
-  { id: 'closed', s: 'le bord ∂E est fermé.', truth: true, why: 'Vrai : ∂E = adh E ∖ int E, l\'intersection du fermé adh E et du fermé complémentaire de int E.' },
-  { id: 'compl', s: 'E et son complémentaire ℝⁿ ∖ E ont le même bord.', truth: true, why: 'Vrai : la définition (chaque boule touche E et son complémentaire) est symétrique.' },
-  { id: 'adh', s: 'on a adh E = E ∪ ∂E et int E = E ∖ ∂E.', truth: true, why: 'Vrai : ce sont les définitions du cours.' },
-  { id: 'fermé', s: 'Si E est fermé, alors ∂E ⊂ E.', truth: true, why: 'Vrai : E fermé ⇔ E = adh E = E ∪ ∂E.' },
-  { id: 'ouvert', s: 'Si E est ouvert, alors E ∩ ∂E = ∅.', truth: true, why: 'Vrai : chaque point de E a une boule dans E, il n\'est pas au bord.' },
-  { id: 'sub', s: 'on a ∂(A ∪ B) ⊂ ∂A ∪ ∂B.', truth: true, why: 'Vrai : un point qui n\'est au bord ni de A ni de B est intérieur ou extérieur à chacun, donc intérieur ou extérieur à A ∪ B.' },
+  { id: 'incl', s: t('Si E ⊂ F, alors ∂E ⊂ ∂F.'), truth: false, test: 'incl', answer: { E: ']0 ; 1[', F: ']-1 ; 2[', p: '0' }, why: t('Faux : E = ]0 ; 1[ ⊂ F = ]−1 ; 2[, 0 ∈ ∂E mais 0 ∉ ∂F (0 est intérieur à F).') },
+  { id: 'union', s: t('on a ∂(A ∪ B) = ∂A ∪ ∂B.'), truth: false, test: 'union', answer: { A: '[0 ; 1]', B: '[1 ; 2]', p: '1' }, rule: 'a2_bd_union', why: t('Faux : A = [0 ; 1], B = [1 ; 2] ; 1 ∈ ∂A, mais 1 est intérieur à A ∪ B = [0 ; 2]. Seule l\'inclusion ∂(A ∪ B) ⊂ ∂A ∪ ∂B est vraie.') },
+  { id: 'inter', s: t('on a ∂(A ∩ B) = ∂A ∩ ∂B.'), truth: false, test: 'inter', answer: { A: '[0 ; 2]', B: '[1 ; 3]', p: '1' }, why: t('Faux : A ∩ B = [1 ; 2], donc 1 ∈ ∂(A ∩ B), mais 1 ∉ ∂A.') },
+  { id: 'inside', s: t('on a ∂E ⊂ E.'), truth: false, test: 'inside', answer: { E: ']0 ; 1[', p: '0' }, why: t('Faux : 0 est dans le bord de ]0 ; 1[, pas dans ]0 ; 1[. C\'est vrai seulement si E est fermé.') },
+  { id: 'intUnion', s: t('on a int(A ∪ B) = int A ∪ int B.'), truth: false, test: 'intUnion', answer: { A: '[0 ; 1]', B: '[1 ; 2]', p: '1' }, why: t('Faux : 1 est intérieur à A ∪ B = [0 ; 2], mais ni à A = [0 ; 1] ni à B = [1 ; 2].') },
+  { id: 'closed', s: t('le bord ∂E est fermé.'), truth: true, why: t('Vrai : ∂E = adh E ∖ int E, l\'intersection du fermé adh E et du fermé complémentaire de int E.') },
+  { id: 'compl', s: t('E et son complémentaire ℝⁿ ∖ E ont le même bord.'), truth: true, why: t('Vrai : la définition (chaque boule touche E et son complémentaire) est symétrique.') },
+  { id: 'adh', s: t('on a adh E = E ∪ ∂E et int E = E ∖ ∂E.'), truth: true, why: t('Vrai : ce sont les définitions du cours.') },
+  { id: 'fermé', s: t('Si E est fermé, alors ∂E ⊂ E.'), truth: true, why: t('Vrai : E fermé ⇔ E = adh E = E ∪ ∂E.') },
+  { id: 'ouvert', s: t('Si E est ouvert, alors E ∩ ∂E = ∅.'), truth: true, why: t('Vrai : chaque point de E a une boule dans E, il n\'est pas au bord.') },
+  { id: 'sub', s: t('on a ∂(A ∪ B) ⊂ ∂A ∪ ∂B.'), truth: true, why: t('Vrai : un point qui n\'est au bord ni de A ni de B est intérieur ou extérieur à chacun, donc intérieur ou extérieur à A ∪ B.') },
 ];
 // « Pour toutes parties A, B de ℝⁿ », with the letters of the statement.
 function forAll(text) {
   const ls = [...new Set(text.match(/(?<![A-Za-zÀ-ÿ])[ABEF](?![A-Za-zÀ-ÿ])/g) || ['E'])].sort();
-  return ls.length === 1 ? `Pour toute partie ${ls[0]} de ℝⁿ` : `Pour toutes parties ${ls.join(', ')} de ℝⁿ`;
+  return ls.length === 1 ? t('Pour toute partie {l} de ℝⁿ', { l: ls[0] }) : t('Pour toutes parties {l} de ℝⁿ', { l: ls.join(', ') });
 }
 function bdTf(level, rng, { exam = false, pick = null, noHints = false } = {}) {
   const T = pick || rng.pick(BD_TF);
   const counter = T.truth ? null : { kind: 'a2', prop: 'bdReal', params: { test: T.test }, ask: askOf(Object.keys(T.answer)), answer: T.answer };
   return tfItem({
-    skill: BD, level, statement: `${forAll(T.s)} : ${/^[A-Z][a-zé]/.test(T.s) ? T.s.charAt(0).toLowerCase() : T.s.charAt(0)}${T.s.slice(1)}`, truth: T.truth, counter,
-    prompt: T.truth ? undefined : 'Vrai ou faux ? Si c\'est faux, donne un contre-exemple dans ℝ (n = 1) : des intervalles, et le point p qui pose problème.',
+    skill: BD, level, statement: t('{all} : {s}', { all: forAll(T.s), s: `${/^[A-Z][a-zé]/.test(T.s) ? T.s.charAt(0).toLowerCase() : T.s.charAt(0)}${T.s.slice(1)}` }), truth: T.truth, counter,
+    prompt: T.truth ? undefined : t('Vrai ou faux ? Si c\'est faux, donne un contre-exemple dans ℝ (n = 1) : des intervalles, et le point p qui pose problème.'),
     ruleIfTrue: T.rule || null,
-    hints: H('Essaie avec des intervalles de ℝ qui se touchent, ou un intervalle ouvert.', T.truth ? 'Pense à la définition : chaque boule touche E et son complémentaire.' : `Essaie ${Object.entries(T.answer).filter(([k]) => k !== 'p').map(([k, v]) => `${k} = ${v.replace(/-/g, '−')}`).join(', ')}.`, T.why),
+    hints: H(t('Essaie avec des intervalles de ℝ qui se touchent, ou un intervalle ouvert.'), T.truth ? t('Pense à la définition : chaque boule touche E et son complémentaire.') : t('Essaie {x}.', { x: Object.entries(T.answer).filter(([k]) => k !== 'p').map(([k, v]) => `${k} = ${v.replace(/-/g, '−')}`).join(', ') }), T.why),
     noHints: noHints || level === 5,
     explanation: T.why, exam: exam ? { format: 'tf', points: 1 } : false, key: T.id,
   });
@@ -697,7 +720,7 @@ function bdPointMcq(level, rng, exam) {
     const right = rng.pick(bd);
     const options = [{ html: ptT(right), correct: true }, ...other.slice(0, 3).map((p) => ({ html: ptT(p), correct: false }))];
     return mcq({
-      skill: BD, level, prompt: `${bdHtml(B)}. Lequel de ces points est dans le bord ∂E ?`, options,
+      skill: BD, level, prompt: t('{set}. Lequel de ces points est dans le bord ∂E ?', { set: bdHtml(B) }), options,
       key: `pt:${bsig(B)}:${ptT(right)}`, solution: [{ html: `${ptT(right)} : ${KIND_T[pointKind(B.S, right)]}. ${bdWhy(B)}`, note: '' }],
       exam: exam ? { format: 'mcq', points: 1 } : false, expectedSec: 60,
     }, rng);
@@ -709,8 +732,8 @@ function bdProblem(level, rng) {
   const falses = rng.shuffle(BD_TF.filter((t) => !t.truth));
   const trues = rng.shuffle(BD_TF.filter((t) => t.truth));
   const picks = rng.shuffle([falses[0], falses[1], trues[0]]);
-  const parts = picks.map((T, i) => ({ item: bdTf(5, rng, { pick: T, noHints: true }), points: 1, title: `Énoncé ${i + 1}` }));
-  return problemItem({ skill: BD, level, prompt: 'Trois énoncés sur le bord : vrai ou faux ? Donne un contre-exemple dans ℝ quand c\'est faux.', parts, key: picks.map((t) => t.id).join('+'), expectedSec: 300 });
+  const parts = picks.map((T, i) => ({ item: bdTf(5, rng, { pick: T, noHints: true }), points: 1, title: t('Énoncé {n}', { n: i + 1 }) }));
+  return problemItem({ skill: BD, level, prompt: t('Trois énoncés sur le bord : vrai ou faux ? Donne un contre-exemple dans ℝ quand c\'est faux.'), parts, key: picks.map((t) => t.id).join('+'), expectedSec: 300 });
 }
 
 export function boundaryItem(level, rng, profile, opts = {}) {

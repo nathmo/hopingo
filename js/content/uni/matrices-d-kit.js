@@ -13,6 +13,7 @@ import { blankLine } from '../../judges/lines.js';
 import { parseMatLine, evalAst, lineML, exprML, isLiteralAst } from '../../cas/matexpr.js';
 import { q, mt, vt, fq, qt, unimodular, matLines, pickCells } from './alglin-kit.js';
 import { eig2 } from './alglin-eig.js';
+import { t } from '../../i18n.js';
 
 export { q, mt, vt, fq, qt };
 
@@ -92,11 +93,11 @@ export function charLines(A, roots, { factored = true, subgoal = 'charpoly' } = 
   const [[a, b], [c, d]] = A;
   const bc = b.mul(c);
   const out = [
-    { math: `det${shiftT(A)}`, note: 'λ soustrait sur la diagonale', subgoal },
-    { math: `(${lamC(a)})(${lamC(d)})${bc.n >= 0 ? '-' : '+'}${qt(bc.n >= 0 ? bc : bc.neg())}`, note: 'Diagonale moins antidiagonale', subgoal },
+    { math: `det${shiftT(A)}`, note: t('λ soustrait sur la diagonale'), subgoal },
+    { math: `(${lamC(a)})(${lamC(d)})${bc.n >= 0 ? '-' : '+'}${qt(bc.n >= 0 ? bc : bc.neg())}`, note: t('Diagonale moins antidiagonale'), subgoal },
     { math: polyT(a.add(d), MX.det(A)), note: 'λ² − (tr A)λ + det A', subgoal },
   ];
-  if (factored && roots) out.push({ math: factoredT(roots), note: 'Factoriser', subgoal });
+  if (factored && roots) out.push({ math: factoredT(roots), note: t('Factoriser'), subgoal });
   // (−λ)(−λ) + 4 already reads as λ² + 4.
   return a.n === 0 && d.n === 0 ? out.filter((_, i) => i !== 1) : out;
 }
@@ -130,7 +131,7 @@ const sortDesc = (xs) => [...xs].sort((a, b) => q(b).valueOf() - q(a).valueOf())
 // (ÿ + aẏ + by = 0), P = [[1, 1], [λ₁, λ₂]]; else A = PDP⁻¹ (eig2).
 // c whole ≠ 0, x0 = P·c small.
 export function realSystem(rng, { companion = false, pool = [-4, -3, -2, -1, 1, 2, 3], max = 6, x0max = 6, discrete = false } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const [l1, l2] = sortDesc(rng.shuffle(pool).slice(0, 2).map((x) => q(x)));
     let A;
     let P;
@@ -157,7 +158,7 @@ export function realSystem(rng, { companion = false, pool = [-4, -3, -2, -1, 1, 
 // A = S·[[a, −b], [b, a]]·S⁻¹, eigenvalues a ± ib; real modes
 // e^{at}·S(cos bt ; sin bt) and e^{at}·S(−sin bt ; cos bt); x0 = S·c.
 export function complexSystem(rng, { as = [-2, -1, 0, 1], bs = [1, 2], max = 7 } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const a = rng.pick(as);
     const b = rng.pick(bs);
     const S = rng.chance(0.25) ? MX.identity(2) : unimodular(2, rng, { max: 2, swaps: false });
@@ -187,7 +188,7 @@ export function complexModes(d) {
 // A double eigenvalue λ of a 2 × 2 not diagonalisable: A = λI + N,
 // N = S·[[0, 1], [0, 0]]·S⁻¹ ≠ 0 (N² = 0). tri: N may be upper triangular.
 export function doubleSystem(rng, { lams = [-3, -2, -1, 1, 2], tri = true, max = 6 } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const l = q(rng.pick(lams));
     const S = rng.chance(tri ? 0.2 : 0) ? MX.identity(2) : unimodular(2, rng, { max: 2, swaps: false });
     const N = MX.mul(MX.mul(S, MX.mat([[0, rng.pick([1, 1, 2, -1])], [0, 0]])), MX.inverse(S));

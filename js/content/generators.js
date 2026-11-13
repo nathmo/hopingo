@@ -14,13 +14,14 @@ import { GEN as EQUATIONS } from './equations.js';
 import { GEN as FONCTIONS } from './fonctions.js';
 import { GEN as SECONDDEGRE } from './seconddegre.js';
 import { UNI_GEN } from './uni/generators.js';
+import { PHYS_GEN } from './physique/index.js';
 import { segmentsOf, templateOf } from '../judges/lines.js';
 import { readWith, textWith } from '../judges/index.js';
 import { parse as parseCas } from '../cas/parse.js';
 import { toReadable } from '../cas/print.js';
 import { asProblem } from './uni/kit-problem.js';
 
-const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS, ...FONCTIONS, ...SECONDDEGRE, ...UNI_GEN };
+const GEN = { ...CALCUL, ...FRACTIONS, ...RELATIFS, ...PUISSANCES, ...RACINES, ...MELANGES, ...ARITHMETIQUE, ...PROPORTION, ...ALGEBRE, ...EQUATIONS, ...FONCTIONS, ...SECONDDEGRE, ...PHYS_GEN, ...UNI_GEN };
 
 // The profile is optional: fact skills use it to pick from the student's
 // fact memory. opts.exam asks for an exam variant (spec §6).
@@ -169,6 +170,7 @@ export function describe(item) {
   if (item.type === 'fact') lines.push(`  ${strip(item.left)} [${item.expected}] ${strip(item.right)}`.replace(/\s+\[/, ' [') + (item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''));
   if (item.type === 'answer') lines.push(`  → ${item.expected}${item.form !== 'any' ? ` (${item.form})` : ''}${item.traps.length ? `   pièges attendus : ${item.traps.map((t) => `${t.value} [${t.rule}]`).join(', ')}` : ''}`);
   if (item.type === 'mcq') lines.push(`  ${item.options.map((o) => `${o.correct ? '✔' : '·'} ${strip(mathText(o.html))}${o.rule ? ` [${o.rule}]` : ''}`).join('   ')}`);
+  if (item.type === 'recipe') lines.push(`  [étapes ${item.active.join(', ')} · ${item.feedback} · ${item.sheet}] → ${item.problem.find} = ${item.problem.answerValue} ${item.problem.answerUnit}${item.shown ? `   (montré : ${item.shown.exprText}${item.shown.exprRight ? '' : ' ✗'}, ≈ ${item.shown.estimate}${item.shown.estimateRight ? '' : ' ✗'})` : ''}`);
   if (item.type === 'lines') lines.push(...describeLines(item));
   if (item.type === 'tf') lines.push(...describeTf(item));
   if (item.type === 'tokens') lines.push(...describeTokens(item));

@@ -18,6 +18,7 @@ import { closedNumber } from '../cas/closedform.js';
 import { Q } from '../math/rational.js';
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine } from './common.js';
+import { t as tr } from '../i18n.js';
 
 export const sign = '=';
 const vOf = (cfg) => cfg.v || 'x';
@@ -51,7 +52,7 @@ export const sameAsLimit = (cfg, a, b) => sameLimit(limitOf(cfg, a), limitOf(cfg
 const say = (r) => {
   if (r.value === '+inf') return '+∞';
   if (r.value === '-inf') return '−∞';
-  if (r.value === 'none') return 'rien (pas de limite)';
+  if (r.value === 'none') return tr('rien (pas de limite)');
   if (r.value instanceof Q) return r.value.toString().replace('-', '−');
   return String(Math.round(r.value * 1e4) / 1e4).replace('.', ',').replace('-', '−');
 };
@@ -77,21 +78,21 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const read = readLine({ ...cfg, vars: cfg.vars || [vOf(cfg)] }, input);
   if (read.error) return read.error;
   const { node } = read;
-  if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression (ou la valeur de la limite), sans « = ».' };
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (node.t === 'rel') return { kind: 'parse', node, message: tr('Écris seulement l\'expression (ou la valeur de la limite), sans « = ».') };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   let a = limitOf(cfg, prev);
   // Step U4 (A1, ratio test): cfg.value, the limit of a line that cannot be
   // computed (a sequence with n!), known from the item.
   if (a.value === null && cfg.value !== undefined) a = limitOf(cfg, parse(String(cfg.value)));
   const b = limitOf(cfg, node);
-  if (b.value === null) return { kind: 'stay', node, message: 'Je n\'arrive pas à calculer la limite de cette ligne : écris-la autrement.' };
+  if (b.value === null) return { kind: 'stay', node, message: tr('Je n\'arrive pas à calculer la limite de cette ligne : écris-la autrement.') };
   if (a.value !== null && !sameLimit(a, b)) {
     const diag = diagnoseLine('limit', prev, node, cfg, (cand, line) => sameAsLimit(cfg, cand, line));
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `La limite de ta ligne est ${say(b)}, mais celle de la ligne précédente est ${say(a)}.` };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: tr('La limite de ta ligne est {b}, mais celle de la ligne précédente est {a}.', { b: say(b), a: say(a) }) };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais {rest}', { rest: `${fin.charAt(0).toLowerCase()}${fin.slice(1)}` }) };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
 }

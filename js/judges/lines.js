@@ -24,6 +24,7 @@ import { tokenize, tryParse, parse, normalizeText } from '../cas/parse.js';
 import { equivalent, seedOf } from '../cas/equiv.js';
 import { toText } from '../cas/print.js';
 import { judgeFor, readWith } from './index.js';
+import { t as tr } from '../i18n.js';
 
 export function segmentsOf(item) {
   const segs = [{ start: item.start, judge: item.judge, html: null, lines: [] }];
@@ -107,7 +108,7 @@ export class LinesRun {
   // Judge one line. guided: the line fills the next reference line, so a
   // right but untidy line (stay) is fine: the next reference line tidies it.
   submit(input, { guided = false } = {}) {
-    if (this.done) return { kind: 'same', message: 'C\'est terminé.' };
+    if (this.done) return { kind: 'same', message: tr('C\'est terminé.') };
     const v = judgeFor(this.cfg).judgeLine(this.cfg, this.prev, input, this.state);
     if (v.kind === 'wrong') {
       this.mistakes += 1;
@@ -173,14 +174,14 @@ export class LinesRun {
   answerThen(opt, input) {
     const t = opt.then;
     const node = tryParse(String(input ?? ''), { vars: t.vars || ['x'] });
-    if (!node) return { kind: 'parse', message: "Je n'arrive pas à lire ta saisie." };
+    if (!node) return { kind: 'parse', message: tr('Je n\'arrive pas à lire ta saisie.') };
     const want = parse(t.expect, { vars: t.vars || ['x'] });
     const domain = t.domain || Object.fromEntries((t.vars || ['x']).map((v) => [v, [0.2, 2.5]]));
     let ok = false;
     try { ok = equivalent(node, want, { vars: t.vars || ['x'], domain, seed: seedOf(t.expect) }).equal; } catch { ok = false; }
     if (!ok) {
       this.mistakes += 1;
-      return { kind: 'wrong', node, message: t.why || "Ce n'est pas ce qu'il faut ici." };
+      return { kind: 'wrong', node, message: t.why || tr('Ce n\'est pas ce qu\'il faut ici.') };
     }
     if (t.store) this.state[t.store] = node;
     return { kind: 'ok', node };

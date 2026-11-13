@@ -21,6 +21,7 @@ import { DEFS as FA } from './fa.js';
 import { DEFS as FB } from './fb.js';
 import { DEFS as FC } from './fc.js';
 import { DEFS as FD } from './fd.js';
+import { t } from '../../i18n.js';
 
 export const META = [
   {"id": "v_rot_sign", "family": "sign", "tag": "C", "skill": "v-ops", "repair": "v-ops", "example": ["rot F = (0, 0, 2)", "(0, 0, −2) pour F = (y, −x, 0)"], "transformText": "Pour chaque composante i, remplacer ∂_aF_b − ∂_bF_a par son opposé (3 candidats), plus le vecteur entier opposé ; en 2D, ∂_yF₁ − ∂_xF₂.", "explainText": "« Ta composante {i} vaut {got}. L'ordre est ∂F₂/∂x − ∂F₁/∂y (on suit x, y, z en tournant) : cela donne {want}. » (Corrigé 2022 : erreur de signe dans rot, la plus fréquente.)", "part": "va"},
@@ -149,9 +150,11 @@ export function fill(text, ctx = {}) {
   return text.replace(/\{([^{}]*)\}/g, (_, k) => (ctx[k] !== undefined && ctx[k] !== null ? String(ctx[k]) : '…'));
 }
 
+// The texts shown (example, name, explanation) go through t(); the
+// catalogue's French stays the key.
 export const RULES = META.map((m) => {
   const d = DEFS[m.id];
-  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example, name: `Piège ${m.id}` };
-  if (!d) return { ...base, stub: true, judges: [], explain: (ctx) => fill(m.explainText, ctx) };
-  return { ...base, explain: (ctx) => fill(m.explainText, ctx), ...d };
+  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example.map((x) => t(x)), name: t('Piège {id}', { id: m.id }) };
+  if (!d) return { ...base, stub: true, judges: [], explain: (ctx) => fill(t(m.explainText), ctx) };
+  return { ...base, explain: (ctx) => fill(t(m.explainText), ctx), ...d };
 });

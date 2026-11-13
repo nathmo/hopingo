@@ -19,6 +19,7 @@
 
 import { parse } from '../../cas/parse.js';
 import { evalFloat } from '../../cas/numeric.js';
+import { t } from '../../i18n.js';
 
 const VARS = { heat: ['x', 't'], wave: ['x', 't'], half: ['x', 'y'] };
 
@@ -37,22 +38,22 @@ function heatIssue(s, u, series) {
   const c = s.c || 0;
   const h1 = 1e-4;
   const h2 = 5e-4;
-  for (const [fx, t] of [[0.23, 0.07], [0.41, 0.19], [0.66, 0.31], [0.87, 0.45]]) {
+  for (const [fx, tt] of [[0.23, 0.07], [0.41, 0.19], [0.66, 0.31], [0.87, 0.45]]) {
     const x = fx * L;
-    const U = u({ x, t });
-    const ut = (u({ x, t: t + h1 }) - u({ x, t: t - h1 })) / (2 * h1);
-    const uxx = (u({ x: x + h2, t }) - 2 * U + u({ x: x - h2, t })) / (h2 * h2);
-    const rhs = a({ t }) * uxx - c * U + src({ x });
-    if (!Number.isFinite(ut + rhs)) return 'La fonction ne se calcule pas dans la bande.';
-    if (!close(ut, rhs, Math.abs(ut) + Math.abs(a({ t }) * uxx) + Math.abs(c * U))) return `L'équation n'est pas vérifiée en (x ; t) = (${x.toFixed(2)} ; ${t}).`;
+    const U = u({ x, t: tt });
+    const ut = (u({ x, t: tt + h1 }) - u({ x, t: tt - h1 })) / (2 * h1);
+    const uxx = (u({ x: x + h2, t: tt }) - 2 * U + u({ x: x - h2, t: tt })) / (h2 * h2);
+    const rhs = a({ t: tt }) * uxx - c * U + src({ x });
+    if (!Number.isFinite(ut + rhs)) return t('La fonction ne se calcule pas dans la bande.');
+    if (!close(ut, rhs, Math.abs(ut) + Math.abs(a({ t: tt }) * uxx) + Math.abs(c * U))) return t('L\'équation n\'est pas vérifiée en (x ; t) = ({a} ; {t}).', { a: x.toFixed(2), t: tt });
   }
-  for (const t of [0.05, 0.3]) {
+  for (const tt of [0.05, 0.3]) {
     if (s.bc === 'D') {
-      if (!close(u({ x: 0, t }), 0, 1) || !close(u({ x: L, t }), 0, 1)) return `La condition de Dirichlet n'est pas vérifiée en t = ${t}.`;
+      if (!close(u({ x: 0, t: tt }), 0, 1) || !close(u({ x: L, t: tt }), 0, 1)) return t('La condition de Dirichlet n\'est pas vérifiée en t = {t}.', { t: tt });
     } else {
       for (const x of [0, L]) {
-        const ux = (u({ x: x + h1, t }) - u({ x: x - h1, t })) / (2 * h1);
-        if (!close(ux, 0, 1)) return `La condition de Neumann n'est pas vérifiée en x = ${x}, t = ${t}.`;
+        const ux = (u({ x: x + h1, t: tt }) - u({ x: x - h1, t: tt })) / (2 * h1);
+        if (!close(ux, 0, 1)) return t('La condition de Neumann n\'est pas vérifiée en x = {x}, t = {t}.', { x, t: tt });
       }
     }
   }
@@ -61,7 +62,7 @@ function heatIssue(s, u, series) {
   for (const fx of [0.3, 0.5, 0.7]) {
     const x = fx * L;
     const tol = series ? 2e-2 : 1e-6;
-    if (Math.abs(u({ x, t: t0 }) - ic({ x })) > tol * Math.max(1, Math.abs(ic({ x })))) return `La condition initiale n'est pas vérifiée en x = ${x.toFixed(2)}.`;
+    if (Math.abs(u({ x, t: t0 }) - ic({ x })) > tol * Math.max(1, Math.abs(ic({ x })))) return t('La condition initiale n\'est pas vérifiée en x = {a}.', { a: x.toFixed(2) });
   }
   return null;
 }
@@ -74,18 +75,18 @@ function waveIssue(s, u) {
   const h = 5e-4;
   const xs = L ? [0.21 * L, 0.48 * L, 0.77 * L] : [-1.3, 0.2, 0.9];
   for (const x of xs) {
-    for (const t of [0.13, 0.42]) {
-      const U = u({ x, t });
-      const utt = (u({ x, t: t + h }) - 2 * U + u({ x, t: t - h })) / (h * h);
-      const uxx = (u({ x: x + h, t }) - 2 * U + u({ x: x - h, t })) / (h * h);
-      if (!Number.isFinite(utt + uxx)) return 'La fonction ne se calcule pas.';
-      if (!close(utt, c2 * uxx, Math.abs(utt) + Math.abs(c2 * uxx))) return `L'équation des ondes n'est pas vérifiée en (x ; t) = (${x.toFixed(2)} ; ${t}).`;
+    for (const tt of [0.13, 0.42]) {
+      const U = u({ x, t: tt });
+      const utt = (u({ x, t: tt + h }) - 2 * U + u({ x, t: tt - h })) / (h * h);
+      const uxx = (u({ x: x + h, t: tt }) - 2 * U + u({ x: x - h, t: tt })) / (h * h);
+      if (!Number.isFinite(utt + uxx)) return t('La fonction ne se calcule pas.');
+      if (!close(utt, c2 * uxx, Math.abs(utt) + Math.abs(c2 * uxx))) return t('L\'équation des ondes n\'est pas vérifiée en (x ; t) = ({a} ; {t}).', { a: x.toFixed(2), t: tt });
     }
-    if (!close(u({ x, t: 0 }), ic({ x }), 1)) return `u(x, 0) n'est pas la condition initiale en x = ${x.toFixed(2)}.`;
+    if (!close(u({ x, t: 0 }), ic({ x }), 1)) return t('u(x, 0) n\'est pas la condition initiale en x = {a}.', { a: x.toFixed(2) });
     const ut = (u({ x, t: h }) - u({ x, t: -h })) / (2 * h);
-    if (Math.abs(ut - ic1({ x })) > 1e-3 * Math.max(1, Math.abs(ic1({ x })))) return `u_t(x, 0) n'est pas la condition donnée en x = ${x.toFixed(2)}.`;
+    if (Math.abs(ut - ic1({ x })) > 1e-3 * Math.max(1, Math.abs(ic1({ x })))) return t('u_t(x, 0) n\'est pas la condition donnée en x = {a}.', { a: x.toFixed(2) });
   }
-  if (L) for (const t of [0.2, 0.7]) if (!close(u({ x: 0, t }), 0, 1) || !close(u({ x: L, t }), 0, 1)) return `La condition de Dirichlet n'est pas vérifiée en t = ${t}.`;
+  if (L) for (const tt of [0.2, 0.7]) if (!close(u({ x: 0, t: tt }), 0, 1) || !close(u({ x: L, t: tt }), 0, 1)) return t('La condition de Dirichlet n\'est pas vérifiée en t = {t}.', { t: tt });
   return null;
 }
 
@@ -99,9 +100,9 @@ function diskIssue(s, u, vars) {
     const th = Math.atan2(y, x);
     const C = (dx, dy) => at(Math.hypot(x + dx, y + dy), Math.atan2(y + dy, x + dx));
     const lap = (C(h, 0) + C(-h, 0) + C(0, h) + C(0, -h) - 4 * at(r, th)) / (h * h);
-    if (!Number.isFinite(lap) || Math.abs(lap) > 1e-3) return `Δu ≠ 0 en (x ; y) = (${x} ; ${y}).`;
+    if (!Number.isFinite(lap) || Math.abs(lap) > 1e-3) return t('Δu ≠ 0 en (x ; y) = ({x} ; {y}).', { x, y });
   }
-  for (const th of [0.3, 1.7, 4]) if (!close(at(1, th), g({ 'θ': th }), 1)) return `u(1, θ) n'est pas la condition au bord en θ = ${th}.`;
+  for (const th of [0.3, 1.7, 4]) if (!close(at(1, th), g({ 'θ': th }), 1)) return t('u(1, θ) n\'est pas la condition au bord en θ = {th}.', { th });
   return null;
 }
 
@@ -111,21 +112,21 @@ function halfIssue(s, u) {
   for (const [x, y] of [[0.3, 0.2], [1.1, -0.7], [2.2, 1.4]]) {
     const U = u({ x, y });
     const lap = (u({ x: x + h, y }) + u({ x: x - h, y }) + u({ x, y: y + h }) + u({ x, y: y - h }) - 4 * U) / (h * h);
-    if (!Number.isFinite(lap) || Math.abs(lap) > 1e-3) return `Δu ≠ 0 en (x ; y) = (${x} ; ${y}).`;
+    if (!Number.isFinite(lap) || Math.abs(lap) > 1e-3) return t('Δu ≠ 0 en (x ; y) = ({x} ; {y}).', { x, y });
   }
-  for (const y of [-1.2, 0, 0.8]) if (!close(u({ x: 0, y }), g({ y }), 1)) return `u(0, y) n'est pas la condition au bord en y = ${y}.`;
-  if (!(Math.abs(u({ x: 40, y: 0.5 })) < 1)) return 'La solution n\'est pas bornée quand x → ∞.';
+  for (const y of [-1.2, 0, 0.8]) if (!close(u({ x: 0, y }), g({ y }), 1)) return t('u(0, y) n\'est pas la condition au bord en y = {y}.', { y });
+  if (!(Math.abs(u({ x: 40, y: 0.5 })) < 1)) return t('La solution n\'est pas bornée quand x → ∞.');
   return null;
 }
 
 export function pdeIssue(spec, text) {
   const vars = spec.vars || VARS[spec.kind] || ['x', 't'];
   let u;
-  try { u = fnOf(text, [...vars, 'n', 'k']); } catch (e) { return `Illisible : ${e.message}`; }
+  try { u = fnOf(text, [...vars, 'n', 'k']); } catch (e) { return t('Illisible : {message}', { message: e.message }); }
   const series = /sum\(/.test(text);
   if (spec.kind === 'heat') return heatIssue(spec, u, series);
   if (spec.kind === 'wave') return waveIssue(spec, u);
   if (spec.kind === 'disk') return diskIssue(spec, u, vars);
   if (spec.kind === 'half') return halfIssue(spec, u);
-  return `Sorte d'EDP inconnue : ${spec.kind}`;
+  return t('Sorte d\'EDP inconnue : {kind}', { kind: spec.kind });
 }

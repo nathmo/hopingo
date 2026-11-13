@@ -6,6 +6,7 @@
 // is the field, or the last line when the field is empty.
 
 import { h, html, play } from './dom.js';
+import { t } from '../i18n.js';
 import { renderChars } from './keypad.js';
 import { StepChain, stepSign } from '../judges/steps.js';
 import { RULE_BY_ID } from '../math/malrules.js';
@@ -27,19 +28,19 @@ export function mountSteps(item, input, { explain, onLines } = {}) {
     const ok = how === 'ok';
     history.appendChild(h(`div.step-line.${ok ? 'ok' : 'draft'}`, { 'data-text': text },
       h('span.eq', ok ? sign : '✎'), html(lineHtml(text)),
-      h(`span.step-tag${ok ? '.checked' : ''}`, ok ? '✓ vérifiée' : 'brouillon (non vérifiée)')));
+      h(`span.step-tag${ok ? '.checked' : ''}`, ok ? t('✓ vérifiée') : t('brouillon (non vérifiée)'))));
     history.scrollTop = history.scrollHeight;
   };
 
   function add() {
     const text = input.value;
-    if (!text) { input.flash(); say('<p>Écris d\'abord la ligne dans le champ, puis ajoute-la.</p>'); return; }
+    if (!text) { input.flash(); say(t('<p>Écris d\'abord la ligne dans le champ, puis ajoute-la.</p>')); return; }
     const v = chain.submit(text);
     if (v.kind === 'parse' || v.kind === 'same') { input.flash(); say(`<p>${v.message}</p>`); return; }
     if (v.kind === 'wrong') {
       play('bad');
       const named = v.rule && RULE_BY_ID[v.rule] ? explain?.(v.rule, v.diag) : '';
-      say(`<p><b>Cette étape est fausse.</b> ${v.message || ''}</p>${named || ''}<p class="muted">Corrige-la dans le champ.</p>`, 'bad');
+      say(`<p><b>${t('Cette étape est fausse.')}</b> ${v.message || ''}</p>${named || ''}<p class="muted">${t('Corrige-la dans le champ.')}</p>`, 'bad');
       return;
     }
     play(v.kind === 'ok' ? 'good' : 'tap');
@@ -47,16 +48,16 @@ export function mountSteps(item, input, { explain, onLines } = {}) {
     input.set('');
     if (v.message || v.note) say(`<p>${v.message || v.note}</p>`, v.kind === 'ok' ? 'good' : 'info'); else clear();
     copyBtn.hidden = false;
-    input.placeholder = 'ta ligne suivante, ou ta réponse';
+    input.placeholder = t('ta ligne suivante, ou ta réponse');
     input.render();
     onLines?.(chain.lines.length);
   }
 
-  const addBtn = h('button.btn.small.secondary.add-step', { type: 'button', onclick: () => add() }, '＋ Ajouter une étape');
-  const copyBtn = h('button.btn.small.ghost', { type: 'button', onclick: () => { if (chain.prev) input.set(chain.prev); } }, '⧉ Recopier la ligne');
+  const addBtn = h('button.btn.small.secondary.add-step', { type: 'button', onclick: () => add() }, t('＋ Ajouter une étape'));
+  const copyBtn = h('button.btn.small.ghost', { type: 'button', onclick: () => { if (chain.prev) input.set(chain.prev); } }, t('⧉ Recopier la ligne'));
   copyBtn.hidden = !chain.prev;
   const tools = h('div.step-tools.draft-tools', addBtn, copyBtn,
-    h('span.draft-hint', chain.checked ? 'Écris tes étapes ici : chacune est vérifiée.' : 'Écris tes étapes ici, au brouillon.'));
+    h('span.draft-hint', chain.checked ? t('Écris tes étapes ici : chacune est vérifiée.') : t('Écris tes étapes ici, au brouillon.')));
   return {
     chain, history, tools, feedback, add,
     // The answer when the field is empty: the last line.

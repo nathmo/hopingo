@@ -11,13 +11,14 @@ import { partsItem } from './geo-kit.js';
 import { problemItem } from './kit-problem.js';
 import { examTag } from './kit.js';
 import { q, H, ft, term, fac, overSqrt2pi, FML, mcqF, defBlocks, KEYS_FT, TABLE } from './fourier-b-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'f-ft-direct';
 const SUB = [
-  { id: 'parity', label: 'parité : forme en cos ou en sin', skill: SK },
-  { id: 'ipp', label: 'intégration par parties', skill: 'a1-int-parts' },
+  { id: 'parity', label: t('parité : forme en cos ou en sin'), skill: SK },
+  { id: 'ipp', label: t('intégration par parties'), skill: 'a1-int-parts' },
   { id: 'value', label: 'f̂(α)', skill: SK },
-  { id: 'zero', label: 'f̂(0) à part', skill: SK },
+  { id: 'zero', label: t('f̂(0) à part'), skill: SK },
 ];
 const EQA = { kind: 'equiv', vars: ['α'], domain: { α: [0.4, 3] }, target: 'no-int' };
 
@@ -30,7 +31,7 @@ function para(rng) {
   const ba = b === 1 ? 'α' : `${b}α`;
   return {
     id: `para:${b}:${c}`, parity: 'even', b, c,
-    fHtml: `${c === 1 ? '' : c}(${b * b} − x²) si |x| ≤ ${b}, 0 sinon`,
+    fHtml: t('{a}({b} − x²) si |x| ≤ {b2}, 0 sinon', { a: c === 1 ? '' : c, b: b * b, b2: b }),
     f: `H(${b}-abs(x))${P.startsWith('(') ? P : `(${P})`}`,
     F: `${2 * c}sqrt(2/π)(sin(${ba})-${ba} cos(${ba}))/α^3`,
     int: `int(${P}cos(α x), x, 0, ${b})`,
@@ -53,7 +54,7 @@ function tent(rng) {
   const ba = b === 1 ? 'α' : `${b}α`;
   return {
     id: `tent:${b}:${c}`, parity: 'even', b, c,
-    fHtml: `${c === 1 ? `${b} − |x|` : `${c}(${b} − |x|)`} si |x| ≤ ${b}, 0 sinon`,
+    fHtml: t('{a} si |x| ≤ {b}, 0 sinon', { a: c === 1 ? `${b} − |x|` : `${c}(${b} − |x|)`, b }),
     f: `H(${b}-abs(x))${term(c, `(${b}-abs(x))`).replace(/^(\d+)\(/, '($1)(')}`,
     F: `${c}sqrt(2/π)(1-cos(${ba}))/α^2`,
     int: `int(${P}cos(α x), x, 0, ${b})`,
@@ -76,7 +77,7 @@ function odd(rng) {
   const cx = term(c, 'x');
   return {
     id: `odd:${b}:${c}`, parity: 'odd', b, c,
-    fHtml: `${c === 1 ? '' : c}x si |x| ≤ ${b}, 0 sinon`,
+    fHtml: t('{a}x si |x| ≤ {b}, 0 sinon', { a: c === 1 ? '' : c, b }),
     f: `H(${b}-abs(x))${c === 1 ? 'x' : `(${c}x)`}`,
     F: `-${c === 1 ? "" : c}i sqrt(2/π)(sin(${ba})-${ba} cos(${ba}))/α^2`,
     int: `int(${cx} sin(α x), x, 0, ${b})`,
@@ -126,54 +127,54 @@ const parityLine = (d) => (d.parity === 'odd'
 function parts(d) {
   const ev = d.parity === 'even';
   const choose = {
-    kind: 'decision', prompt: 'Quelle forme de f̂ utiliser ?', options: [
-      { id: 'parity', label: ev ? 'f est paire : f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) dx' : 'f est impaire : f̂(α) = −i √(2/π) ∫₀^∞ f(x) sin(αx) dx', valid: true, ref: true },
-      { id: 'other', label: ev ? 'f est impaire : f̂(α) = −i √(2/π) ∫₀^∞ f(x) sin(αx) dx' : 'f est paire : f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) dx', valid: false, why: ev ? 'f(−x) = f(x) : f est paire, la partie en sin s\'annule.' : 'f(−x) = −f(x) : f est impaire, la partie en cos s\'annule.' },
-      { id: 'direct', label: 'La définition (1/√(2π)) ∫ f(x) e^(−iαx) dx sur ℝ', valid: true, quality: 'poor', why: 'Juste aussi, mais la parité divise le travail par deux et évite les complexes.' },
+    kind: 'decision', prompt: t('Quelle forme de f̂ utiliser ?'), options: [
+      { id: 'parity', label: ev ? t('f est paire : f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) dx') : t('f est impaire : f̂(α) = −i √(2/π) ∫₀^∞ f(x) sin(αx) dx'), valid: true, ref: true },
+      { id: 'other', label: ev ? t('f est impaire : f̂(α) = −i √(2/π) ∫₀^∞ f(x) sin(αx) dx') : t('f est paire : f̂(α) = √(2/π) ∫₀^∞ f(x) cos(αx) dx'), valid: false, why: ev ? t('f(−x) = f(x) : f est paire, la partie en sin s\'annule.') : t('f(−x) = −f(x) : f est impaire, la partie en cos s\'annule.') },
+      { id: 'direct', label: t('La définition (1/√(2π)) ∫ f(x) e^(−iαx) dx sur ℝ'), valid: true, quality: 'poor', why: t('Juste aussi, mais la parité divise le travail par deux et évite les complexes.') },
       d.table
-        ? { id: 'table', label: 'Lire la ligne F7 de la table', valid: true, quality: 'poor', why: 'La table donne le résultat ; ici on demande le calcul direct.' }
-        : { id: 'table', label: 'Lire une ligne de la table', valid: false, why: 'f n\'est pas une ligne de la table : on la calcule.' },
+        ? { id: 'table', label: t('Lire la ligne F7 de la table'), valid: true, quality: 'poor', why: t('La table donne le résultat ; ici on demande le calcul direct.') }
+        : { id: 'table', label: t('Lire une ligne de la table'), valid: false, why: t('f n\'est pas une ligne de la table : on la calcule.') },
     ],
   };
   const out = [{
     html: '', start: `f(x) = ${d.f}`, judge: ft({ f: d.f, F: d.F, final: 'any' }), // the formula by parity, an integral left: final here
     decisions: [choose],
     menu: [
-      { id: 'parity', label: ev ? 'Utiliser la parité (FP2)' : 'Utiliser l\'imparité (FP3)', valid: true },
-      { id: 'deriv', label: 'Dériver f', valid: false, why: 'On ne dérive rien : on intègre f contre e^(−iαx).' },
-      { id: 'zero', label: 'Calculer f̂(0) d\'abord', valid: false, why: 'D\'abord la formule pour α ≠ 0.' },
+      { id: 'parity', label: ev ? t('Utiliser la parité (FP2)') : t('Utiliser l\'imparité (FP3)'), valid: true },
+      { id: 'deriv', label: t('Dériver f'), valid: false, why: t('On ne dérive rien : on intègre f contre e^(−iαx).') },
+      { id: 'zero', label: t('Calculer f̂(0) d\'abord'), valid: false, why: t('D\'abord la formule pour α ≠ 0.') },
     ],
-    lines: [{ math: parityLine(d), note: ev ? 'FP2 : f paire' : 'FP3 : f impaire', subgoal: 'parity', blank: ['√(2/π)'], blank2: [ev ? 'cos(α x)' : 'sin(α x)'] }],
+    lines: [{ math: parityLine(d), note: ev ? t('FP2 : f paire') : t('FP3 : f impaire'), subgoal: 'parity', blank: ['√(2/π)'], blank2: [ev ? 'cos(α x)' : 'sin(α x)'] }],
   }, {
-    html: 'L\'intégrale, par parties (α ≠ 0) :', ask: 'Calcule l\'intégrale.', start: d.int, judge: EQA,
+    html: t('L\'intégrale, par parties (α ≠ 0) :'), ask: t('Calcule l\'intégrale.'), start: d.int, judge: EQA,
     menu: [
-      { id: 'ipp', label: 'Intégrer par parties', valid: true },
-      { id: 'sub', label: 'Changer de variable u = αx', valid: false, why: 'Il reste un produit polynôme × trigonométrique : c\'est une intégration par parties.' },
-      { id: 'prim', label: 'Écrire une primitive directe', valid: false, why: 'Le produit n\'a pas de primitive immédiate.' },
+      { id: 'ipp', label: t('Intégrer par parties'), valid: true },
+      { id: 'sub', label: t('Changer de variable u = αx'), valid: false, why: t('Il reste un produit polynôme × trigonométrique : c\'est une intégration par parties.') },
+      { id: 'prim', label: t('Écrire une primitive directe'), valid: false, why: t('Le produit n\'a pas de primitive immédiate.') },
     ],
     lines: [
-      { math: d.ipp1, note: 'Intégration par parties', subgoal: 'ipp', blank: d.ipp1Blank },
-      { math: d.I, note: d.table ? 'Encore une fois par parties : I = 1/w − (α²/w²) I' : 'Encore par parties', subgoal: 'ipp', blank: d.IBlank, blank2: d.IBlank },
+      { math: d.ipp1, note: t('Intégration par parties'), subgoal: 'ipp', blank: d.ipp1Blank },
+      { math: d.I, note: d.table ? t('Encore une fois par parties : I = 1/w − (α²/w²) I') : t('Encore par parties'), subgoal: 'ipp', blank: d.IBlank, blank2: d.IBlank },
     ],
   }, {
-    html: 'Donc :', ask: 'Écris f̂(α).', start: parityLine(d), judge: ft({ f: d.f, F: d.F, traps: { f_ipp_sign: [d.wrongF] } }),
-    menu: [{ id: 'value', label: 'Remplacer l\'intégrale par sa valeur', valid: true }, { id: 'table', label: 'Lire la table', valid: false, why: 'On a déjà l\'intégrale : il suffit de la remplacer.' }],
+    html: t('Donc :'), ask: t('Écris f̂(α).'), start: parityLine(d), judge: ft({ f: d.f, F: d.F, traps: { f_ipp_sign: [d.wrongF] } }),
+    menu: [{ id: 'value', label: t('Remplacer l\'intégrale par sa valeur'), valid: true }, { id: 'table', label: t('Lire la table'), valid: false, why: t('On a déjà l\'intégrale : il suffit de la remplacer.') }],
     lines: [{ math: d.Fline, note: 'α ≠ 0', subgoal: 'value' }],
   }];
   if (d.zeroStart) {
     out.push({
-      html: `En α = 0, la formule a ${d.den} au dénominateur :`, ask: 'Calcule f̂(0).', start: d.zeroStart, judge: { kind: 'definite' },
+      html: t('En α = 0, la formule a {den} au dénominateur :', { den: d.den }), ask: t('Calcule f̂(0).'), start: d.zeroStart, judge: { kind: 'definite' },
       decisions: [{
-        kind: 'decision', prompt: 'Comment obtenir f̂(0) ?', options: [
-          { id: 'direct', label: 'f̂(0) = (1/√(2π)) ∫ f(x) dx, calculée directement', valid: true, ref: true },
-          { id: 'formula', label: 'Remplacer α par 0 dans la formule', valid: false, rule: 'f_ft_alpha_zero', why: `Avec ${d.den} au dénominateur, la formule donne 0/0 en α = 0.` },
+        kind: 'decision', prompt: t('Comment obtenir f̂(0) ?'), options: [
+          { id: 'direct', label: t('f̂(0) = (1/√(2π)) ∫ f(x) dx, calculée directement'), valid: true, ref: true },
+          { id: 'formula', label: t('Remplacer α par 0 dans la formule'), valid: false, rule: 'f_ft_alpha_zero', why: t('Avec {den} au dénominateur, la formule donne 0/0 en α = 0.', { den: d.den }) },
         ],
       }],
       menu: [
-        { id: 'direct', label: 'Intégrer f directement', valid: true },
-        { id: 'formula', label: 'Remplacer α par 0 dans la formule', valid: false, rule: 'f_ft_alpha_zero', why: `Avec ${d.den} au dénominateur, la formule donne 0/0.` },
+        { id: 'direct', label: t('Intégrer f directement'), valid: true },
+        { id: 'formula', label: t('Remplacer α par 0 dans la formule'), valid: false, rule: 'f_ft_alpha_zero', why: t('Avec {den} au dénominateur, la formule donne 0/0.', { den: d.den }) },
       ],
-      lines: [{ math: d.zero, note: d.parity === 'odd' ? 'f impaire : ∫ f = 0' : 'f̂(0) = (1/√(2π))∫ f', subgoal: 'zero' }],
+      lines: [{ math: d.zero, note: d.parity === 'odd' ? t('f impaire : ∫ f = 0') : 'f̂(0) = (1/√(2π))∫ f', subgoal: 'zero' }],
     });
   }
   return out;
@@ -183,8 +184,8 @@ export function directLines(level, rng, opts = {}, d = directData(rng)) {
   const ev = d.parity === 'even';
   return partsItem({
     skill: SK, level, parts: parts(d),
-    prompt: `Calcule la transformée de Fourier de f(x) = ${d.fHtml}${d.zeroStart ? ', puis f̂(0)' : ''}.`,
-    hints: H(ev ? 'f est paire : prends la forme en cos sur [0 ; ∞[ (FP2), puis intègre par parties.' : 'f est impaire : prends la forme en sin (FP3), puis intègre par parties.',
+    prompt: d.zeroStart ? t('Calcule la transformée de Fourier de f(x) = {fHtml}, puis f̂(0).', { fHtml: d.fHtml }) : t('Calcule la transformée de Fourier de f(x) = {fHtml}.', { fHtml: d.fHtml }),
+    hints: H(ev ? t('f est paire : prends la forme en cos sur [0 ; ∞[ (FP2), puis intègre par parties.') : t('f est impaire : prends la forme en sin (FP3), puis intègre par parties.'),
       FML(parityLine(d)), FML(d.ipp1)),
     subgoals: SUB, keys: KEYS_FT, key: `${SK}:${level}:${d.id}`, exam: examTag(opts), noHints: level >= 5 || !!opts.exam,
   });
@@ -205,9 +206,9 @@ function mcqVariant(level, rng, opts) {
   ];
   return mcqF({
     skill: SK, level, exam: examTag(opts), key: `${SK}:mcq:${d.id}`,
-    prompt: `Soit f(x) = ${d.fHtml}. ${opts.exam ? 'Cochez les égalités vraies.' : 'Quelle égalité est vraie ?'}`,
+    prompt: opts.exam ? t('Soit f(x) = {fHtml}. Cochez les égalités vraies.', { fHtml: d.fHtml }) : t('Soit f(x) = {fHtml}. Quelle égalité est vraie ?', { fHtml: d.fHtml }),
     right: rng.shuffle(right), wrongs: rng.shuffle(wrongs),
-    solution: [{ html: `${FML(parityLine(d))}, puis par parties : ${FML(d.Fline)}${d.zeroStart ? ` ; f̂(0) = ${FML(d.zero)} se calcule à part` : ''}.`, note: '' }],
+    solution: [{ html: d.zeroStart ? t('{a}, puis par parties : {b} ; f̂(0) = {c} se calcule à part.', { a: FML(parityLine(d)), b: FML(d.Fline), c: FML(d.zero) }) : t('{a}, puis par parties : {b}.', { a: FML(parityLine(d)), b: FML(d.Fline) }), note: '' }],
     expectedSec: 150,
   }, rng);
 }
@@ -221,8 +222,8 @@ export function directProblem(level, rng, opts = {}) {
   const n = d.zeroStart ? 4 : 3;
   return problemItem({
     skill: SK, level,
-    prompt: `(i) Donne la définition de la transformée de Fourier, avec ses hypothèses. (ii) Calcule f̂ pour f(x) = ${d.fHtml}.${TABLE()}`,
-    parts: [{ item: def, points: 2, title: 'Définition de f̂' }, { item: calc, points: n === 4 ? [1, 1.5, 0.5, 1] : [1, 1.5, 0.5], title: 'Calcul de f̂' }],
+    prompt: t('(i) Donne la définition de la transformée de Fourier, avec ses hypothèses. (ii) Calcule f̂ pour f(x) = {fHtml}.{a}', { fHtml: d.fHtml, a: TABLE() }),
+    parts: [{ item: def, points: 2, title: t('Définition de f̂') }, { item: calc, points: n === 4 ? [1, 1.5, 0.5, 1] : [1, 1.5, 0.5], title: t('Calcul de f̂') }],
     key: `${d.id}:${level}`, exam: opts.exam ? { format: 'open', points: 2 + n } : false,
   });
 }

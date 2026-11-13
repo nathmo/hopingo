@@ -17,6 +17,7 @@ import {
   q, qt, fq, nz, H, vt, vr, sumT, eqT, rootT, partsItem, mcqD, examTag, MT, prim, linT, readable, blanks,
 } from './geo-kit.js';
 import { DeltaOf } from './coniques-b-kit.js';
+import { t } from '../../i18n.js';
 
 const MTxy = (t) => MT(t, { vars: ['x', 'y'] });
 // x − a as text: x, x - 2, x + 3.
@@ -44,9 +45,9 @@ function tidy6(co) {
 
 const FD = 'g10-conic-from-data';
 const FD_SUB = [
-  { id: 'def', label: 'écrire MF = e·d(M, D)', skill: FD },
-  { id: 'square', label: 'élever au carré', skill: 'g1-irr-eq' },
-  { id: 'recog', label: 'reconnaître la conique', skill: 'g10-ellipse' },
+  { id: 'def', label: t('écrire MF = e·d(M, D)'), skill: FD },
+  { id: 'square', label: t('élever au carré'), skill: 'g1-irr-eq' },
+  { id: 'recog', label: t('reconnaître la conique'), skill: 'g10-ellipse' },
 ];
 
 const E_FDE = [[1, 2], [2, 1], [1, 1]];
@@ -95,13 +96,13 @@ export function fdeData(rng, e = null) {
 
 const eS = (e) => (e[1] === 1 ? String(e[0]) : `${e[0]}/${e[1]}`);
 const DNAME = (d) => `${d.main} = ${fq(d.d)}`;
-const TYPE_NAME = { ell: 'une ellipse', hyp: 'une hyperbole', par: 'une parabole' };
+const TYPE_NAME = { ell: t('une ellipse'), hyp: t('une hyperbole'), par: t('une parabole') };
 
 const recogDecision = (type, e) => ({
-  kind: 'decision', prompt: `e = ${e[0] === e[1] ? '1' : eS(e)} : quelle conique ?`, options: [
-    { id: 'ell', label: 'e < 1 : une ellipse', valid: type === 'ell', rule: type === 'hyp' ? 'g10_e_inverted' : undefined, why: 'Regarde e : e < 1 ellipse, e = 1 parabole, e > 1 hyperbole.' },
-    { id: 'par', label: 'e = 1 : une parabole', valid: type === 'par', why: 'Regarde e : e < 1 ellipse, e = 1 parabole, e > 1 hyperbole.' },
-    { id: 'hyp', label: 'e > 1 : une hyperbole', valid: type === 'hyp', rule: type === 'ell' ? 'g10_e_inverted' : undefined, why: 'Regarde e : e < 1 ellipse, e = 1 parabole, e > 1 hyperbole.' },
+  kind: 'decision', prompt: t('e = {v1} : quelle conique ?', { v1: e[0] === e[1] ? '1' : eS(e) }), options: [
+    { id: 'ell', label: t('e < 1 : une ellipse'), valid: type === 'ell', rule: type === 'hyp' ? 'g10_e_inverted' : undefined, why: t('Regarde e : e < 1 ellipse, e = 1 parabole, e > 1 hyperbole.') },
+    { id: 'par', label: t('e = 1 : une parabole'), valid: type === 'par', why: t('Regarde e : e < 1 ellipse, e = 1 parabole, e > 1 hyperbole.') },
+    { id: 'hyp', label: t('e > 1 : une hyperbole'), valid: type === 'hyp', rule: type === 'ell' ? 'g10_e_inverted' : undefined, why: t('Regarde e : e < 1 ellipse, e = 1 parabole, e > 1 hyperbole.') },
   ],
 });
 
@@ -110,22 +111,22 @@ function fdeItem(level, rng, opts = {}) {
   const fde = { F: d.F.map(qt), D: { v: d.main, k: qt(d.d) }, e: d.e };
   const judge = { kind: 'conic', equation: d.red, target: 'standard', fde };
   const lines = [
-    { math: d.sqLine, note: 'Les deux membres sont positifs : élever au carré', subgoal: 'square', blank: [d.p === d.qq ? sq(d.main, d.d) : sq(d.main, d.d)] },
-    { math: d.mult, note: 'Développer', subgoal: 'square', blank: [d.mult.split(' = ')[1]] },
-    { math: d.red, note: 'Tout du même côté', subgoal: 'recog', blank: [] },
-    { math: d.std, note: 'Forme réduite : compléter les carrés', subgoal: 'recog', blank: d.type === 'par' ? [] : [String(d.a2), String(d.b2)] },
+    { math: d.sqLine, note: t('Les deux membres sont positifs : élever au carré'), subgoal: 'square', blank: [d.p === d.qq ? sq(d.main, d.d) : sq(d.main, d.d)] },
+    { math: d.mult, note: t('Développer'), subgoal: 'square', blank: [d.mult.split(' = ')[1]] },
+    { math: d.red, note: t('Tout du même côté'), subgoal: 'recog', blank: [] },
+    { math: d.std, note: t('Forme réduite : compléter les carrés'), subgoal: 'recog', blank: d.type === 'par' ? [] : [String(d.a2), String(d.b2)] },
   ];
   const parts = [{
-    html: `MF = e·d(M, D) avec M(x ; y), F = ${vr(d.F)}, D : ${DNAME(d).replace(/-/g, '−')}.`, ask: '', start: d.def, judge,
+    html: t('MF = e·d(M, D) avec M(x ; y), F = {v1}, D : {v2}.', { v1: vr(d.F), v2: DNAME(d).replace(/-/g, '−') }), ask: '', start: d.def, judge,
     menu: [
-      { id: 'def', label: 'Écrire MF et d(M, D), puis élever au carré', valid: true },
-      { id: 'inv', label: 'Écrire e·MF = d(M, D)', valid: false, rule: 'g10_e_inverted', why: 'La définition est MF = e·d(M, D) : le foyer est du côté du e.' },
-      { id: 'recog', label: 'Reconnaître la conique (forme réduite)', valid: true },
+      { id: 'def', label: t('Écrire MF et d(M, D), puis élever au carré'), valid: true },
+      { id: 'inv', label: t('Écrire e·MF = d(M, D)'), valid: false, rule: 'g10_e_inverted', why: t('La définition est MF = e·d(M, D) : le foyer est du côté du e.') },
+      { id: 'recog', label: t('Reconnaître la conique (forme réduite)'), valid: true },
     ],
     decisions: [
-      { levels: [2, 3], kind: 'decision', prompt: 'Quelle méthode ?', options: [
-        { id: 'fd', label: 'Foyer-directrice : MF = e·d(M, D)', valid: true, quality: 'good', ref: true },
-        { id: 'param', label: 'Forme réduite à paramètres (centre, a, b)', valid: true, quality: 'poor', why: 'Possible, mais il faut d\'abord trouver le centre et a à partir de F, D et e : la définition va plus vite ici.' },
+      { levels: [2, 3], kind: 'decision', prompt: t('Quelle méthode ?'), options: [
+        { id: 'fd', label: t('Foyer-directrice : MF = e·d(M, D)'), valid: true, quality: 'good', ref: true },
+        { id: 'param', label: t('Forme réduite à paramètres (centre, a, b)'), valid: true, quality: 'poor', why: t('Possible, mais il faut d\'abord trouver le centre et a à partir de F, D et e : la définition va plus vite ici.') },
       ] },
       recogDecision(d.type, d.e),
     ],
@@ -133,9 +134,9 @@ function fdeItem(level, rng, opts = {}) {
   }];
   return partsItem({
     skill: FD, level, parts, subgoals: FD_SUB,
-    prompt: `Trouve l'équation de la conique de foyer F${vr(d.F)}, de directrice D : ${DNAME(d).replace(/-/g, '−')} et d'excentricité e = ${d.e[0] === d.e[1] ? '1' : eS(d.e)}, puis nomme-la.`,
+    prompt: t('Trouve l\'équation de la conique de foyer F{v1}, de directrice D : {v2} et d\'excentricité e = {v3}, puis nomme-la.', { v1: vr(d.F), v2: DNAME(d).replace(/-/g, '−'), v3: d.e[0] === d.e[1] ? '1' : eS(d.e) }),
     hints: H(
-      'Écris la distance au foyer et la distance à la directrice, puis élève au carré.',
+      t('Écris la distance au foyer et la distance à la directrice, puis élève au carré.'),
       `${readable(d.sqLine.replace(/\(\d+\/\d+\)·/, ''))}`.replace(/\(([xy][^)]*)\)\^2\/(\d+)$/, '(□)²/$2'),
       readable(d.red),
     ),
@@ -172,17 +173,17 @@ function cfeItem(level, rng, opts = {}) {
   return partsItem({
     skill: FD, level, subgoals: FD_SUB,
     parts: [{
-      html: type === 'ell' ? 'Ellipse : c = ΩF, a = c/e, b² = a² − c².' : 'Hyperbole : c = ΩF, a = c/e, b² = c² − a².', ask: '', start: 'Γ', judge,
+      html: type === 'ell' ? t('Ellipse : c = ΩF, a = c/e, b² = a² − c².') : t('Hyperbole : c = ΩF, a = c/e, b² = c² − a².'), ask: '', start: 'Γ', judge,
       decisions: [recogDecision(type, [e.n, e.d])],
       lines: [
         { math: `c = ${c}`, note: `c = ΩF`, subgoal: 'def', blank: [String(c)] },
         { math: `a = ${a}`, note: `a = c/e = ${c}/(${fq(e)})`, subgoal: 'def', blank: [String(a)] },
         { math: `b = ${bT}`, note: type === 'ell' ? 'b² = a² − c²' : 'b² = c² − a²', subgoal: 'def', blank: [bT] },
-        { math: std, note: `Axe ${type === 'ell' ? 'focal' : 'réel'} parallèle à O${main}`, subgoal: 'recog', blank: [String(a * a), String(b2)] },
+        { math: std, note: type === 'ell' ? t('Axe focal parallèle à O{main}', { main }) : t('Axe réel parallèle à O{main}', { main }), subgoal: 'recog', blank: [String(a * a), String(b2)] },
       ],
     }],
-    prompt: `Une conique a pour centre Ω${vr(O)}, pour foyer F${vr(F)} et pour excentricité e = ${fq(e)}. Trouve son équation réduite.`,
-    hints: H('c = ΩF et e = c/a donnent a ; puis b² avec la relation de la conique.', `a = ${c}/(${fq(e)}) = □`, std.replace(/\^2/g, '²')),
+    prompt: t('Une conique a pour centre Ω{v1}, pour foyer F{v2} et pour excentricité e = {v3}. Trouve son équation réduite.', { v1: vr(O), v2: vr(F), v3: fq(e) }),
+    hints: H(t('c = ΩF et e = c/a donnent a ; puis b² avec la relation de la conique.'), `a = ${c}/(${fq(e)}) = □`, std.replace(/\^2/g, '²')),
     key: `${FD}:cfe:${vt(O)}${vt(F)}${e}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
 }
@@ -208,12 +209,12 @@ function cvpItem(level, rng, opts = {}) {
   return partsItem({
     skill: FD, level, subgoals: FD_SUB,
     parts: [
-      { html: 'a est la distance du centre au sommet. Que vaut b² ?', ask: 'b² =', start: 'b^2', judge: { kind: 'value', expect: String(b2) },
+      { html: t('a est la distance du centre au sommet. Que vaut b² ?'), ask: 'b² =', start: 'b^2', judge: { kind: 'value', expect: String(b2) },
         lines: [{ math: String(b2), note: `${a / 2}²/${a * a} + ${y0}²/b² = 1`, subgoal: 'def' }] },
-      { html: 'L\'équation réduite ?', ask: '', start: 'E', judge: { kind: 'conic', equation: red, target: 'standard' },
+      { html: t('L\'équation réduite ?'), ask: '', start: 'E', judge: { kind: 'conic', equation: red, target: 'standard' },
         lines: [{ math: std, note: '', subgoal: 'recog' }] },
     ],
-    prompt: `Une ellipse a pour centre Ω${vr(O)}, son grand axe parallèle à O${main}, un sommet en S${vr(S)}, et elle passe par P${vr(P)}. Trouve son équation réduite.`,
+    prompt: t('Une ellipse a pour centre Ω{v1}, son grand axe parallèle à O{main}, un sommet en S{v2}, et elle passe par P{v3}. Trouve son équation réduite.', { v1: vr(O), main, v2: vr(S), v3: vr(P) }),
     hints: [], noHints: true,
     key: `${FD}:cvp:${vt(O)}${vt(S)}${vt(P)}`, exam: opts.exam ? examTag(opts, 5) : false,
   });
@@ -234,11 +235,11 @@ function fromDataExam(rng, exam) {
   const fake = tidy6(add6(scale6(L, d.qq), sq6(d.main, d.d), -d.p));
   return mcqD({
     skill: FD, level: 4, key: `mcq:${d.def}`, exam: examTag({ exam }),
-    prompt: `Quelle est l'équation de la conique de foyer F${vr(d.F)}, de directrice D : ${DNAME(d).replace(/-/g, '−')} et d'excentricité e = ${eS(d.e)} ?`,
+    prompt: t('Quelle est l\'équation de la conique de foyer F{v1}, de directrice D : {v2} et d\'excentricité e = {v3} ?', { v1: vr(d.F), v2: DNAME(d).replace(/-/g, '−'), v3: eS(d.e) }),
     right: MTxy(d.red),
     wrongs: [{ html: MTxy(eqT(inv)), rule: 'g10_e_inverted' }, { html: MTxy(eqT(fake)), rule: null }],
     fillers: [{ html: MTxy(eqT(tidy6(add6(d.co, [0, 0, 0, 0, 0, 1])))) }, { html: MTxy(eqT(tidy6([d.co[2], d.co[1], d.co[0], d.co[4], d.co[3], d.co[5]]))) }],
-    solution: [{ html: `MF² = e²·d(M, D)² : ${MTxy(d.sqLine)}, donc ${MTxy(d.red)}.`, note: '' }],
+    solution: [{ html: t('MF² = e²·d(M, D)² : {v1}, donc {v2}.', { v1: MTxy(d.sqLine), v2: MTxy(d.red) }), note: '' }],
   }, rng);
 }
 
@@ -248,9 +249,9 @@ function fromDataExam(rng, exam) {
 
 const TG = 'g10-conic-tangent';
 const TG_SUB = [
-  { id: 'pt', label: 'point de contact', skill: 'g10-ellipse' },
-  { id: 'polar', label: 'polaire et points de contact', skill: 'g10-pole-polar' },
-  { id: 'tan', label: 'dédoubler l\'équation', skill: TG },
+  { id: 'pt', label: t('point de contact'), skill: 'g10-ellipse' },
+  { id: 'polar', label: t('polaire et points de contact'), skill: 'g10-pole-polar' },
+  { id: 'tan', label: t('dédoubler l\'équation'), skill: TG },
 ];
 
 // The tangent at T (a point of the conic co): x² → x₀x, xy → (x₀y + xy₀)/2,
@@ -307,9 +308,9 @@ function tangentConic(rng, kind) {
 }
 
 const TG_MENU = [
-  { id: 'dbl', label: 'Dédoubler : x² → x₀x, y² → y₀y, x → (x + x₀)/2', valid: true },
-  { id: 'bad', label: 'Remplacer x par x₀ dans les termes du 1er degré', valid: false, rule: 'g10_doubling_wrong', why: 'On dédouble chaque terme en gardant un x : x → (x + x₀)/2, sinon la droite ne passe plus par T.' },
-  { id: 'disc', label: 'Discriminant nul de l\'intersection', valid: true },
+  { id: 'dbl', label: t('Dédoubler : x² → x₀x, y² → y₀y, x → (x + x₀)/2'), valid: true },
+  { id: 'bad', label: t('Remplacer x par x₀ dans les termes du 1er degré'), valid: false, rule: 'g10_doubling_wrong', why: t('On dédouble chaque terme en gardant un x : x → (x + x₀)/2, sinon la droite ne passe plus par T.') },
+  { id: 'disc', label: t('Discriminant nul de l\'intersection'), valid: true },
 ];
 
 function atTItem(level, rng, opts = {}) {
@@ -325,31 +326,33 @@ function atTItem(level, rng, opts = {}) {
   const giveAbscissa = level === 3 && kind !== 'xy' && !T[1].eq(0) && !(cn.k ?? 0);
   if (giveAbscissa) {
     parts.push({
-      html: `Le point de contact T a pour abscisse ${fq(T[0])} et une ordonnée ${T[1].n > 0 ? 'positive' : 'négative'}.`, ask: 'T =', start: 'T',
+      html: T[1].n > 0 ? t('Le point de contact T a pour abscisse {v1} et une ordonnée positive.', { v1: fq(T[0]) }) : t('Le point de contact T a pour abscisse {v1} et une ordonnée négative.', { v1: fq(T[0]) }), ask: 'T =', start: 'T',
       judge: { kind: 'vector', expect: vt(T) },
       lines: [{ math: `T = ${vt(T)}`, note: `${cn.A === 1 ? '' : `${cn.A}·`}(${fq(T[0])})² ${cn.hyp ? '−' : '+'} ${cn.B}y² = ${cn.C}`, subgoal: 'pt' }],
     });
   }
   parts.push({
-    html: 'La tangente en T : dédouble l\'équation.', ask: 'tangente :', start: eq, judge, menu: TG_MENU,
+    html: t('La tangente en T : dédouble l\'équation.'), ask: t('tangente :'), start: eq, judge, menu: TG_MENU,
     lines: [
       { math: dd.text, note: 'x² → x₀x, y² → y₀y, xy → (x₀y + xy₀)/2, x → (x + x₀)/2', subgoal: 'tan', blank: [par(T[0]), par(T[1])], blank2: [par(T[0])] },
-      { math: tan, note: `Contrôle : T est sur la tangente`, subgoal: 'tan' },
+      { math: tan, note: t('Contrôle : T est sur la tangente'), subgoal: 'tan' },
     ],
   });
   return partsItem({
     skill: TG, level, parts, subgoals: TG_SUB,
     prompt: giveAbscissa
-      ? `Trouve la tangente à la conique ${MTxy(eq)} au point d'abscisse ${fq(T[0])} et d'ordonnée ${T[1].n > 0 ? 'positive' : 'négative'}.`
-      : `Trouve la tangente à la conique ${MTxy(eq)} au point T${vr(T)}.`,
-    hints: H('Dédouble : remplace un x par x₀ et un y par y₀ (x → (x + x₀)/2 dans les termes du 1er degré).', readable(templateOf(blanks(dd.text, [par(T[0]), par(T[1])])).replace(/×/g, '·')), readable(tan)),
+      ? (T[1].n > 0
+        ? t('Trouve la tangente à la conique {v1} au point d\'abscisse {v2} et d\'ordonnée positive.', { v1: MTxy(eq), v2: fq(T[0]) })
+        : t('Trouve la tangente à la conique {v1} au point d\'abscisse {v2} et d\'ordonnée négative.', { v1: MTxy(eq), v2: fq(T[0]) }))
+      : t('Trouve la tangente à la conique {v1} au point T{v2}.', { v1: MTxy(eq), v2: vr(T) }),
+    hints: H(t('Dédouble : remplace un x par x₀ et un y par y₀ (x → (x + x₀)/2 dans les termes du 1er degré).'), readable(templateOf(blanks(dd.text, [par(T[0]), par(T[1])])).replace(/×/g, '·')), readable(tan)),
     key: `${TG}:T:${eq}:${vt(T)}`, fallback: cn.fallback, exam: opts.exam ? examTag(opts) : false,
   });
 }
 
 // From a point Q: the polar, the two points of contact, the tangents.
 function fromQItem(level, rng, opts = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const cn = tangentConic(rng, rng.pick(['ell', 'hyp']));
     const co = cn.co.map((x) => q(x));
     const [T1, T2] = rng.shuffle([...cn.pts]).slice(0, 2).map((P) => P.map((x) => q(x)));
@@ -370,16 +373,16 @@ function fromQItem(level, rng, opts = {}) {
     return partsItem({
       skill: TG, level, subgoals: TG_SUB,
       parts: [
-        { html: 'La polaire de Q (dédoubler avec Q) passe par les points de contact.', ask: 'polaire :', start: eq, judge: { kind: 'geom', object: 'line2', ref: rowLine(pol.row) },
-          lines: [{ math: pol.text, note: 'Dédoubler avec Q', subgoal: 'polar' }, { math: rowLine(pol.row), note: '', subgoal: 'polar' }] },
-        { html: 'Intersecte-la avec la conique : le point de contact T₁ (le plus à gauche, ou le plus bas) ?', ask: 'T₁ =', start: 'T_1', judge: { kind: 'vector', expect: vt(P1) },
+        { html: t('La polaire de Q (dédoubler avec Q) passe par les points de contact.'), ask: t('polaire :'), start: eq, judge: { kind: 'geom', object: 'line2', ref: rowLine(pol.row) },
+          lines: [{ math: pol.text, note: t('Dédoubler avec Q'), subgoal: 'polar' }, { math: rowLine(pol.row), note: '', subgoal: 'polar' }] },
+        { html: t('Intersecte-la avec la conique : le point de contact T₁ (le plus à gauche, ou le plus bas) ?'), ask: 'T₁ =', start: 'T_1', judge: { kind: 'vector', expect: vt(P1) },
           lines: [{ math: `T_1 = ${vt(P1)}`, note: '', subgoal: 'polar' }] },
-        { html: 'Et T₂ ?', ask: 'T₂ =', start: 'T_2', judge: { kind: 'vector', expect: vt(P2) },
+        { html: t('Et T₂ ?'), ask: 'T₂ =', start: 'T_2', judge: { kind: 'vector', expect: vt(P2) },
           lines: [{ math: `T_2 = ${vt(P2)}`, note: '', subgoal: 'polar' }] },
-        { html: 'Les deux tangentes, (QT₁) et (QT₂) ?', ask: 'tangentes :', start: 'τ', judge: { kind: 'geom', object: 'line2', ref: tans, count: 2, ...(tangents ? { tangents } : {}) },
-          lines: [{ math: tans, note: 'Dédoubler en T₁ et en T₂', subgoal: 'tan' }] },
+        { html: t('Les deux tangentes, (QT₁) et (QT₂) ?'), ask: t('tangentes :'), start: 'τ', judge: { kind: 'geom', object: 'line2', ref: tans, count: 2, ...(tangents ? { tangents } : {}) },
+          lines: [{ math: tans, note: t('Dédoubler en T₁ et en T₂'), subgoal: 'tan' }] },
       ],
-      prompt: `Trouve les tangentes à la conique ${MTxy(eq)} issues du point Q${vr(Qp)}.`,
+      prompt: t('Trouve les tangentes à la conique {v1} issues du point Q{v2}.', { v1: MTxy(eq), v2: vr(Qp) }),
       hints: [], noHints: true,
       key: `${TG}:Q:${eq}:${vt(Qp)}`, fallback: cn.fallback, exam: opts.exam ? examTag(opts, 5) : false,
     });
@@ -406,11 +409,11 @@ function tangentExam(rng, exam) {
   ].filter((r) => r[0].n || r[1].n).map((r) => rowLine(r));
   return mcqD({
     skill: TG, level: 4, key: `mcq:${eqT(co)}:${vt(T)}`, exam: examTag({ exam }),
-    prompt: `Quelle est la tangente à la conique ${MTxy(eqT(co))} au point T${vr(T)} ?`,
+    prompt: t('Quelle est la tangente à la conique {v1} au point T{v2} ?', { v1: MTxy(eqT(co)), v2: vr(T) }),
     right: MTxy(right),
     wrongs: bad.map((t) => ({ html: MTxy(t), rule: 'g10_doubling_wrong' })),
     fillers: [{ html: MTxy(rowLine(dedouble(co, T).row.map((x, i) => (i === 2 ? x.add(1) : x)))) }, { html: MTxy(rowLine([dedouble(co, T).row[1].neg(), dedouble(co, T).row[0], q(0)])) }],
-    solution: [{ html: `Dédoubler en T : ${MTxy(dedouble(co, T).text)}, soit ${MTxy(right)}.`, note: '' }],
+    solution: [{ html: t('Dédoubler en T : {v1}, soit {v2}.', { v1: MTxy(dedouble(co, T).text), v2: MTxy(right) }), note: '' }],
     fallback: cn.fallback,
   }, rng);
 }
