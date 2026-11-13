@@ -49,7 +49,7 @@ export function checkPhys(item, raw) {
 
 // ---------- a formula with physics symbols: « v = √(2 E_c/m) » ----------
 // Item fields: variable, target (the expression, text), symbols (those the
-// keypad offers), isoTraps [{expr, rule}], numbersOk (default: only the
+// keypad offers), physIsoTraps [{expr, rule}], numbersOk (default: only the
 // numbers of the target are allowed).
 
 function sameFn(a, b, syms) {
@@ -76,7 +76,7 @@ export function checkPhysIso(item, raw) {
     if (extra.length && !item.numbersOk) return { kind: 'stay', message: t('C\'est juste, mais écris-le seulement avec des lettres.') };
     return { kind: 'done' };
   }
-  const trap = (item.isoTraps || []).find((x) => { try { return sameFn(iso.expr, parsePhys(x.expr, item.symbols), syms); } catch { return false; } });
+  const trap = (item.physIsoTraps || []).find((x) => { try { return sameFn(iso.expr, parsePhys(x.expr, item.symbols), syms); } catch { return false; } });
   return { kind: 'wrong', rule: trap?.rule ?? null };
 }
 

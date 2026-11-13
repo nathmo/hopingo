@@ -61,7 +61,7 @@ function checkItem(it, skill, where) {
     assert.equal(r.kind, 'wrong', `${where}: trap ${tr.value} accepted`);
     assert.equal(r.rule, tr.rule, `${where}: trap ${tr.value}`);
   }
-  for (const tr of it.isoTraps || []) {
+  for (const tr of it.physIsoTraps || []) {
     const r = check(it, `${it.variable} = ${tr.expr}`);
     assert.equal(r.kind, 'wrong', `${where}: trap ${tr.expr} accepted`);
     assert.equal(r.rule, tr.rule, `${where}: trap ${tr.expr}`);

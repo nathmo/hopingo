@@ -99,17 +99,17 @@ export function isoItem(skill, level, prompt, v, target, symbols, traps, { key, 
   const expected = `${v} = ${target}`;
   const item = {
     skill, level, type: 'answer', prompt, expected,
-    checker: 'physiso', variable: v, variableText: symText(v), target, symbols, isoTraps: [],
+    checker: 'physiso', variable: v, variableText: symText(v), target, symbols, physIsoTraps: [],
     form: 'any', traps: [], keys: isoKeys(symbols, target), suffix: '', figure: null,
     baits: [], solution, expectedSec: sec, key: `${skill}:${key}`,
     expectedHtml: F(expected, symbols),
   };
   for (const [expr, rule] of traps) {
-    item.isoTraps.push({ expr, rule });
+    item.physIsoTraps.push({ expr, rule });
     const r = checkPhysIso(item, `${v} = ${expr}`);
-    if (r.kind !== 'wrong' || r.rule !== rule) item.isoTraps.pop();
+    if (r.kind !== 'wrong' || r.rule !== rule) item.physIsoTraps.pop();
   }
-  item.baits = [...new Set(item.isoTraps.map((x) => x.rule))];
+  item.baits = [...new Set(item.physIsoTraps.map((x) => x.rule))];
   return item;
 }
 
