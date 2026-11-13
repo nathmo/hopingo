@@ -20,6 +20,7 @@ import { substVar } from '../cas/diff.js';
 import { Q } from '../math/rational.js';
 import { diagnoseLine } from './diagnose.js';
 import { parseOpts, sameLine, frNum } from './common.js';
+import { t as tr } from '../i18n.js';
 
 export const sign = '=';
 
@@ -130,7 +131,7 @@ function read(cfg, input) {
   try { node = parse(text, parseOpts(cfg)); } catch (e) { return { error: { kind: 'parse', message: e.message } }; }
   const allowed = new Set([...(cfg.vars || []), ...(cfg.param ? [cfg.param] : []), ...Object.keys(cfg.seq || {}).map((k) => `${k}_`)]);
   const unknown = [...symbolsIn(node)].filter((s) => !allowed.has(s));
-  if (unknown.length) return { error: { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici : la ligne doit être un nombre (les intégrales ont des bornes).` } };
+  if (unknown.length) return { error: { kind: 'parse', node, message: tr('Je ne connais pas la lettre « {c} » ici : la ligne doit être un nombre (les intégrales ont des bornes).', { c: unknown[0].replace(/_$/, '') }) } };
   return { node };
 }
 export const parseLine = (cfg, text) => read(cfg, text).node ?? parse(text, parseOpts(cfg));
@@ -139,21 +140,23 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const r = read(cfg, input);
   if (r.error) return r.error;
   const { node } = r;
-  if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression, sans « = » au milieu.' };
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (node.t === 'rel') return { kind: 'parse', node, message: tr('Écris seulement l\'expression, sans « = » au milieu.') };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   let c;
   try { c = compare(cfg, prev, node); } catch { c = { equal: false, undefined: true }; }
   if (!c.equal) {
     const diag = diagnoseLine('definite', prev, node, cfg, (cand, line) => sameValue(cfg, cand, line));
-    const at = c.n !== undefined ? ` (pour n = ${c.n})` : '';
+    const atN = c.n !== undefined;
     const message = c.undefined
-      ? `Je n'arrive pas à calculer la valeur de ta ligne${at} : une intégrale diverge ou une expression n'est pas définie.`
-      : `Ta ligne vaut ${frNum(c.values[1], 4)}${at}, mais la ligne précédente vaut ${frNum(c.values[0], 4)}.`;
+      ? (atN ? tr('Je n\'arrive pas à calculer la valeur de ta ligne (pour n = {n}) : une intégrale diverge ou une expression n\'est pas définie.', { n: c.n })
+        : tr('Je n\'arrive pas à calculer la valeur de ta ligne : une intégrale diverge ou une expression n\'est pas définie.'))
+      : (atN ? tr('Ta ligne vaut {b} (pour n = {n}), mais la ligne précédente vaut {a}.', { b: frNum(c.values[1], 4), n: c.n, a: frNum(c.values[0], 4) })
+        : tr('Ta ligne vaut {b}, mais la ligne précédente vaut {a}.', { b: frNum(c.values[1], 4), a: frNum(c.values[0], 4) }));
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais {rest}', { rest: `${fin.charAt(0).toLowerCase()}${fin.slice(1)}` }) };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
 }

@@ -4,10 +4,11 @@
 
 import { Q } from '../math/rational.js';
 import { Poly, gcdPoly, divmod } from './poly.js';
+import { t } from '../i18n.js';
 
 export class RatFun {
   constructor(n, d = Poly.const(1)) {
-    if (d.isZero) throw new RangeError('Division par zéro');
+    if (d.isZero) throw new RangeError(t('Division par zéro'));
     this.n = n;
     this.d = d;
   }
@@ -19,15 +20,15 @@ export class RatFun {
   sub(o) { return new RatFun(this.n.mul(o.d).sub(o.n.mul(this.d)), this.d.mul(o.d)); }
   mul(o) { return new RatFun(this.n.mul(o.n), this.d.mul(o.d)); }
   div(o) {
-    if (o.n.isZero) throw new RangeError('Division par zéro');
+    if (o.n.isZero) throw new RangeError(t('Division par zéro'));
     return new RatFun(this.n.mul(o.d), this.d.mul(o.n));
   }
   neg() { return new RatFun(this.n.neg(), this.d); }
 
   pow(k) {
-    if (!Number.isInteger(k)) throw new RangeError('Exposant entier attendu');
+    if (!Number.isInteger(k)) throw new RangeError(t('Exposant entier attendu'));
     if (k >= 0) return new RatFun(this.n.pow(k), this.d.pow(k));
-    if (this.n.isZero) throw new RangeError('Division par zéro');
+    if (this.n.isZero) throw new RangeError(t('Division par zéro'));
     return new RatFun(this.d.pow(-k), this.n.pow(-k));
   }
 

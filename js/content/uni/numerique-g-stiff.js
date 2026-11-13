@@ -17,13 +17,14 @@ import { readtableItem, vfMcq, H, blankBy } from './numerique-kit.js';
 import { R, nice } from './numerique-g-kit.js';
 import { stiffReadtable } from './numerique-g-stab.js';
 import { examTag } from './kit.js';
+import { t } from '../../i18n.js';
 
 const SF = 'n-ode-stiff';
 const SUB = [
-  { id: 'lambda', label: 'repérer le mode rapide', skill: SF },
+  { id: 'lambda', label: t('repérer le mode rapide'), skill: SF },
   { id: 'hmax', label: 'h < 2/|λ|', skill: 'n-ode-stability' },
-  { id: 'diagnose', label: 'stabilité, pas précision', skill: SF },
-  { id: 'choose', label: 'choisir un schéma implicite', skill: SF },
+  { id: 'diagnose', label: t('stabilité, pas précision'), skill: SF },
+  { id: 'choose', label: t('choisir un schéma implicite'), skill: SF },
 ];
 const FAST = [-50, -100, -500, -1000];
 const hmaxOf = (lam) => new Q(2, -lam);
@@ -41,10 +42,10 @@ function level1(rng) {
   const lam = rng.pick(FAST);
   return linesItem({
     skill: SF, level: 1, mode: 'guided', keys: ['calc'],
-    prompt: `u′ = ${R(lam)}(u − cos t), u(0) = 0. Après un court transitoire, u ≈ cos t, une fonction lisse. Quel est le plus grand pas h_max pour lequel Euler progressif est stable ?`,
+    prompt: t('u′ = {lam}(u − cos t), u(0) = 0. Après un court transitoire, u ≈ cos t, une fonction lisse. Quel est le plus grand pas h_max pour lequel Euler progressif est stable ?', { lam: R(lam) }),
     start: 'h_max', judge: { kind: 'value', expect: String(hmaxOf(lam)), form: 'irreducible', stab: { lambda: String(lam) } },
-    script: [{ kind: 'note', html: `Le mode rapide est λ = ${R(lam)} : Euler progressif est stable si |1 + hλ| &lt; 1.` }, ...hSeg(lam, true)],
-    hints: H('Compare la condition de stabilité au pas que la précision demanderait.', `h &lt; 2/□`, `h &lt; ${nice(hmaxOf(lam))} alors que la solution est lisse : c'est un problème raide.`),
+    script: [{ kind: 'note', html: t('Le mode rapide est λ = {lam} : Euler progressif est stable si |1 + hλ| &lt; 1.', { lam: R(lam) }) }, ...hSeg(lam, true)],
+    hints: H(t('Compare la condition de stabilité au pas que la précision demanderait.'), `h &lt; 2/□`, t('h &lt; {v1} alors que la solution est lisse : c\'est un problème raide.', { v1: nice(hmaxOf(lam)) })),
     subgoals: SUB, key: `${SF}:1:${lam}`, baits: ['n_stab_factor2'],
   });
 }
@@ -54,18 +55,18 @@ function level2(rng) {
   const slow = rng.pick([-1, -2]);
   return linesItem({
     skill: SF, level: 2, mode: 'guided', keys: ['calc'],
-    prompt: `u′ = Au avec A = diag(${R(slow)} ; ${R(lam)}) (rapport de raideur ${lam / slow}). Quel pas maximal impose la stabilité d'Euler progressif ?`,
+    prompt: t('u′ = Au avec A = diag({slow} ; {lam}) (rapport de raideur {v1}). Quel pas maximal impose la stabilité d\'Euler progressif ?', { slow: R(slow), lam: R(lam), v1: lam / slow }),
     start: 'h_max', judge: { kind: 'value', expect: String(hmaxOf(lam)), form: 'irreducible', stab: { lambda: String(lam) } },
     script: [
       {
-        kind: 'decision', prompt: 'Quelle valeur propre impose le pas ?', options: rng.shuffle([
-          { id: 'fast', label: `λ = ${R(lam)}, le mode rapide`, valid: true, ref: true },
-          { id: 'slow', label: `λ = ${R(slow)}, le mode lent qu'on veut suivre`, valid: false, why: `Chaque valeur propre doit vérifier |1 + hλ| &lt; 1 : la plus grande en module, ${R(lam)}, est la plus exigeante.` },
+        kind: 'decision', prompt: t('Quelle valeur propre impose le pas ?'), options: rng.shuffle([
+          { id: 'fast', label: t('λ = {lam}, le mode rapide', { lam: R(lam) }), valid: true, ref: true },
+          { id: 'slow', label: t('λ = {slow}, le mode lent qu\'on veut suivre', { slow: R(slow) }), valid: false, why: t('Chaque valeur propre doit vérifier |1 + hλ| &lt; 1 : la plus grande en module, {lam}, est la plus exigeante.', { lam: R(lam) }) },
         ]),
       },
       ...hSeg(lam, true, `|1 + h·(${R(lam)})| < 1`),
     ],
-    hints: H('Pour un système, chaque valeur propre doit vérifier |1 + hλ| &lt; 1 : la plus grande en module décide.', 'h &lt; 2/□', `h &lt; 2/${-lam} = ${nice(hmaxOf(lam))}.`),
+    hints: H(t('Pour un système, chaque valeur propre doit vérifier |1 + hλ| &lt; 1 : la plus grande en module décide.'), 'h &lt; 2/□', `h &lt; 2/${-lam} = ${nice(hmaxOf(lam))}.`),
     subgoals: SUB, key: `${SF}:2:${slow}:${lam}`, baits: ['n_stab_factor2'],
   });
 }
@@ -74,19 +75,19 @@ function level3(rng) {
   const lam = rng.pick(FAST);
   return linesItem({
     skill: SF, level: 3, mode: 'tap', keys: ['calc'],
-    prompt: `u′ = ${R(lam)}(u − cos t) sur [0 ; 10] : la solution est lisse après le transitoire, et la précision voulue demanderait h ≈ 0,1. Choisis le schéma, puis donne le pas maximal que demanderait Euler progressif.`,
+    prompt: t('u′ = {lam}(u − cos t) sur [0 ; 10] : la solution est lisse après le transitoire, et la précision voulue demanderait h ≈ 0,1. Choisis le schéma, puis donne le pas maximal que demanderait Euler progressif.', { lam: R(lam) }),
     start: 'h_max', judge: { kind: 'value', expect: String(hmaxOf(lam)), form: 'irreducible', stab: { lambda: String(lam) } },
     script: [
       {
-        kind: 'decision', prompt: 'Quel schéma choisis-tu ?', options: [
-          { id: 'er', label: 'Euler rétrograde (implicite), avec h ≈ 0,1 choisi pour la précision', valid: true, ref: true },
-          { id: 'ep', label: 'Euler progressif avec h = 0,1', valid: false, why: `Instable : il faut h &lt; 2/${-lam}.` },
-          { id: 'tol', label: 'Euler progressif, en réduisant la tolérance s\'il explose', valid: false, rule: 'n_stiff_accuracy', why: 'L\'explosion vient de la stabilité, pas de la précision : seul un pas h &lt; 2/|λ| la supprime.' },
+        kind: 'decision', prompt: t('Quel schéma choisis-tu ?'), options: [
+          { id: 'er', label: t('Euler rétrograde (implicite), avec h ≈ 0,1 choisi pour la précision'), valid: true, ref: true },
+          { id: 'ep', label: t('Euler progressif avec h = 0,1'), valid: false, why: t('Instable : il faut h &lt; 2/{v1}.', { v1: -lam }) },
+          { id: 'tol', label: t('Euler progressif, en réduisant la tolérance s\'il explose'), valid: false, rule: 'n_stiff_accuracy', why: t('L\'explosion vient de la stabilité, pas de la précision : seul un pas h &lt; 2/|λ| la supprime.') },
         ],
       },
       ...hSeg(lam, false),
     ],
-    hints: H('Un problème raide : la stabilité de l\'explicite impose un pas bien plus petit que la précision.', 'h_max = 2/□', `h_max = ${nice(hmaxOf(lam))} : choisis un schéma implicite.`),
+    hints: H(t('Un problème raide : la stabilité de l\'explicite impose un pas bien plus petit que la précision.'), 'h_max = 2/□', t('h_max = {v1} : choisis un schéma implicite.', { v1: nice(hmaxOf(lam)) })),
     subgoals: SUB, key: `${SF}:3:${lam}`, baits: ['n_stiff_accuracy'],
   });
 }
@@ -95,18 +96,18 @@ function level4(rng) {
   const { table, prompt } = stiffReadtable(rng);
   const question = mcq({
     skill: SF, level: 4, key: `${SF}:why`,
-    prompt: 'Pourquoi Euler progressif explose-t-il pour N = 20 et 24, alors que la solution est lisse ?',
+    prompt: t('Pourquoi Euler progressif explose-t-il pour N = 20 et 24, alors que la solution est lisse ?'),
     options: [
-      { html: 'Stabilité : h > 2/50 = 0,04, donc |1 − 50h| > 1', correct: true },
-      { html: 'Précision : il suffit de réduire la tolérance', correct: false, rule: 'n_stiff_accuracy' },
-      { html: 'La solution exacte explose elle aussi', correct: false },
-      { html: 'Les erreurs d\'arrondi de la machine', correct: false },
+      { html: t('Stabilité : h > 2/50 = 0,04, donc |1 − 50h| > 1'), correct: true },
+      { html: t('Précision : il suffit de réduire la tolérance'), correct: false, rule: 'n_stiff_accuracy' },
+      { html: t('La solution exacte explose elle aussi'), correct: false },
+      { html: t('Les erreurs d\'arrondi de la machine'), correct: false },
     ],
-    solution: [{ html: 'Le mode λ = −50 impose h &lt; 0,04 à Euler progressif : pour h = 0,05 et 0,0417, il explose. Euler rétrograde reste stable pour tout h.', note: '' }],
+    solution: [{ html: t('Le mode λ = −50 impose h &lt; 0,04 à Euler progressif : pour h = 0,05 et 0,0417, il explose. Euler rétrograde reste stable pour tout h.'), note: '' }],
   }, rng);
   return readtableItem({
     skill: SF, level: 4, key: 'why', prompt, table, question,
-    hints: H('Compare h à 2/|λ| = 2/50.', 'Pour h = 0,05 : |1 − 50h| = □', '|1 − 50·0,05| = 1,5 > 1 : instable.'),
+    hints: H(t('Compare h à 2/|λ| = 2/50.'), t('Pour h = 0,05 : |1 − 50h| = □'), t('|1 − 50·0,05| = 1,5 > 1 : instable.')),
     subgoals: SUB,
   });
 }
@@ -126,13 +127,13 @@ function level5(rng) {
   const dt = slow * lam;
   return linesItem({
     skill: SF, level: 5, mode: 'free', keys: ['calc', 'greek', 'set'], noHints: true,
-    prompt: `u′ = Au avec A = ${R(`[[${A[0].join(', ')}], [${A[1].join(', ')}]]`)}. Trouve les valeurs propres de A, puis le pas maximal d'Euler progressif.`,
+    prompt: t('u′ = Au avec A = {v1}. Trouve les valeurs propres de A, puis le pas maximal d\'Euler progressif.', { v1: R(`[[${A[0].join(', ')}], [${A[1].join(', ')}]]`) }),
     start: `λ^2-(${tr})λ+${dt}=0`, judge: { kind: 'solset', v: 'λ' },
     script: [
-      { kind: 'note', html: `det(A − λI) = λ² − (tr A)λ + det A, avec tr A = ${R(tr)} et det A = ${dt}.` },
-      { kind: 'eq', math: `{${lam} ; ${slow}}`, note: `Rapport de raideur ${lam / slow}`, subgoal: 'lambda' },
-      { kind: 'segment', html: 'Le pas maximal d\'Euler progressif :', ask: 'h_max =', start: { math: 'h_max' }, judge: { kind: 'value', expect: String(hmaxOf(lam)), form: 'irreducible', stab: { lambda: String(lam) } } },
-      ...hSeg(lam, false, `Le mode rapide λ = ${R(lam)} décide`),
+      { kind: 'note', html: t('det(A − λI) = λ² − (tr A)λ + det A, avec tr A = {tr} et det A = {dt}.', { tr: R(tr), dt }) },
+      { kind: 'eq', math: `{${lam} ; ${slow}}`, note: t('Rapport de raideur {v1}', { v1: lam / slow }), subgoal: 'lambda' },
+      { kind: 'segment', html: t('Le pas maximal d\'Euler progressif :'), ask: 'h_max =', start: { math: 'h_max' }, judge: { kind: 'value', expect: String(hmaxOf(lam)), form: 'irreducible', stab: { lambda: String(lam) } } },
+      ...hSeg(lam, false, t('Le mode rapide λ = {lam} décide', { lam: R(lam) })),
     ],
     hints: [], subgoals: SUB, key: `${SF}:5:${A.flat().join(',')}`, baits: [],
   });
@@ -141,8 +142,8 @@ function level5(rng) {
 function examTf(rng, opts) {
   return vfMcq({
     skill: SF, key: `${SF}:tf`, exam: examTag(opts), truth: false, ruleIfTrue: 'n_stiff_accuracy',
-    statement: 'Si Euler progressif explose sur un problème raide, il faut diminuer la tolérance demandée.',
-    explanation: 'Faux : c\'est une question de stabilité. Il faut h &lt; 2/|λ_rapide|, ou un schéma implicite.',
+    statement: t('Si Euler progressif explose sur un problème raide, il faut diminuer la tolérance demandée.'),
+    explanation: t('Faux : c\'est une question de stabilité. Il faut h &lt; 2/|λ_rapide|, ou un schéma implicite.'),
   }, rng);
 }
 

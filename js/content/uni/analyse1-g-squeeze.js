@@ -6,6 +6,7 @@
 // (c) (an + c·sin n)/(dn + e). The template ⌊nx⌋/n is left out (no integer
 // part in the CAS).
 
+import { t } from '../../i18n.js';
 import { linesItem, mcq, tfItem } from './kit.js';
 import { modeOf, H, E, assemble, blanked, uniq } from './analyse1-c-kit.js';
 import { M, LIMN, VAL, q, qt, qh, cv, lin, coef, seqCounter } from './analyse1-g-kit.js';
@@ -13,9 +14,9 @@ import { M, LIMN, VAL, q, qt, qh, cv, lin, coef, seqCounter } from './analyse1-g
 const SQ = 'a1-seq-squeeze';
 const KEYS = ['calc', 'calcfn', 'seq'];
 const SUB = [
-  { id: 'bound', label: 'minorer et majorer', skill: 'g1-bound' },
-  { id: 'lim', label: 'limites des bornes', skill: 'a1-seq-limits' },
-  { id: 'concl', label: 'conclure par les gendarmes', skill: SQ },
+  { id: 'bound', label: t('minorer et majorer'), skill: 'g1-bound' },
+  { id: 'lim', label: t('limites des bornes'), skill: 'a1-seq-limits' },
+  { id: 'concl', label: t('conclure par les gendarmes'), skill: SQ },
 ];
 
 // The bound parts' judges: cfg.other is the other bound (trap
@@ -38,29 +39,29 @@ function sumData(rng) {
     kind: 'sum', name: 'S_n', nameH: 'Sₙ', L, lo, hi, zero: '0',
     start: `sum(${An}/(${B}n^2+k),k,1,n)`,
     lo1: `${An}/(${B}n^2+n)`, hi1: `${An}/(${B}n^2+1)`,
-    loLines: [E(`sum(${An}/(${B}n^2+n),k,1,n)`, 'Chaque terme est au moins le plus petit (k = n)', 'bound', 'smallest'), E(lo, 'Il y a n termes égaux', 'bound', 'count')],
-    hiLines: [E(`sum(${An}/(${B}n^2+1),k,1,n)`, 'Chaque terme est au plus le plus grand (k = 1)', 'bound', 'largest'), E(hi, 'Il y a n termes égaux', 'bound', 'count')],
-    loLim: [E(`${a}/(${b}+1/n)`, 'Diviser par n²', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
-    hiLim: [E(`${a}/(${b}+1/n^2)`, 'Diviser par n²', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
+    loLines: [E(`sum(${An}/(${B}n^2+n),k,1,n)`, t('Chaque terme est au moins le plus petit (k = n)'), 'bound', 'smallest'), E(lo, t('Il y a n termes égaux'), 'bound', 'count')],
+    hiLines: [E(`sum(${An}/(${B}n^2+1),k,1,n)`, t('Chaque terme est au plus le plus grand (k = 1)'), 'bound', 'largest'), E(hi, t('Il y a n termes égaux'), 'bound', 'count')],
+    loLim: [E(`${a}/(${b}+1/n)`, t('Diviser par n²'), 'lim', 'divide'), E(qt(L), t('Passer à la limite'), 'lim', 'limit')],
+    hiLim: [E(`${a}/(${b}+1/n^2)`, t('Diviser par n²'), 'lim', 'divide'), E(qt(L), t('Passer à la limite'), 'lim', 'limit')],
     blankLo: [`${B}n^2+n`], blankHi: [`${B}n^2+1`], blankLim: ['1/n', '1/n^2'],
     lowChoice: {
-      prompt: 'Pour minorer Sₙ, on remplace chaque terme par :',
-      ok: `le plus petit, ${M(`${An}/(${B}n^2+n)`)} (k = n)`,
-      bad: `le plus grand, ${M(`${An}/(${B}n^2+1)`)} (k = 1)`,
+      prompt: t('Pour minorer Sₙ, on remplace chaque terme par :'),
+      ok: t('le plus petit, {u} (k = n)', { u: M(`${An}/(${B}n^2+n)`) }),
+      bad: t('le plus grand, {u} (k = 1)', { u: M(`${An}/(${B}n^2+1)`) }),
     },
     hints: [
-      'Chaque terme est entre le plus petit (k = n) et le plus grand (k = 1). Il y a n termes.',
+      t('Chaque terme est entre le plus petit (k = n) et le plus grand (k = 1). Il y a n termes.'),
       `${M(`n×${An}/(${B}n^2+□)`)} ≤ Sₙ ≤ ${M(`n×${An}/(${B}n^2+□)`)}`,
-      `${M(lo)} ≤ Sₙ ≤ ${M(hi)}, et les deux bornes tendent vers ${qh(L)}.`,
+      t('{lo} ≤ Sₙ ≤ {hi}, et les deux bornes tendent vers {L}.', { lo: M(lo), hi: M(hi), L: qh(L) }),
     ],
     choices: [
-      { id: 'smallest', label: 'Remplacer chaque terme par le plus petit (k = n)' },
-      { id: 'largest', label: 'Remplacer chaque terme par le plus grand (k = 1)' },
-      { id: 'count', label: 'Sommer les n termes égaux' },
-      { id: 'one', label: 'Garder un seul terme', rule: 'a1_sum_n_terms_as_one', why: 'Il y a n termes : la somme vaut n fois le terme.' },
-      { id: 'divide', label: 'Diviser le haut et le bas par n²' },
-      { id: 'limit', label: 'Passer à la limite' },
-      { id: 'conclude', label: 'Conclure par les gendarmes' },
+      { id: 'smallest', label: t('Remplacer chaque terme par le plus petit (k = n)') },
+      { id: 'largest', label: t('Remplacer chaque terme par le plus grand (k = 1)') },
+      { id: 'count', label: t('Sommer les n termes égaux') },
+      { id: 'one', label: t('Garder un seul terme'), rule: 'a1_sum_n_terms_as_one', why: t('Il y a n termes : la somme vaut n fois le terme.') },
+      { id: 'divide', label: t('Diviser le haut et le bas par n²') },
+      { id: 'limit', label: t('Passer à la limite') },
+      { id: 'conclude', label: t('Conclure par les gendarmes') },
     ],
   };
 }
@@ -82,28 +83,28 @@ function logData(rng) {
     return {
       kind: 'log', name: 'a_n', nameH: 'aₙ', L, lo, hi, zero: '0', gone: ['ln'],
       start: `ln(e^(${P}n)+${nq})/(${den})`,
-      loLines: [E(`ln(e^(${P}n))/(${den})`, `Log est croissant et ${nqH} ≥ 0`, 'bound', 'logLow'), E(lo, `Log(e^(${P}n)) = ${cv(p)}`, 'bound', 'simplify')],
-      hiLines: [E(`ln(2e^(${P}n))/(${den})`, `${nqH} ≤ e^(${cv(p)}) pour n ≥ 1`, 'bound', 'logHigh'), E(hi, `Log(2e^(${P}n)) = ${cv(p)} + Log 2`, 'bound', 'simplify')],
-      loLim: [E(`${p}/(${r}+${s}/n)`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
-      hiLim: [E(`(${p}+ln(2)/n)/(${r}+${s}/n)`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
+      loLines: [E(`ln(e^(${P}n))/(${den})`, t('Log est croissant et {nq} ≥ 0', { nq: nqH }), 'bound', 'logLow'), E(lo, `Log(e^(${P}n)) = ${cv(p)}`, 'bound', 'simplify')],
+      hiLines: [E(`ln(2e^(${P}n))/(${den})`, t('{nq} ≤ e^({p}) pour n ≥ 1', { nq: nqH, p: cv(p) }), 'bound', 'logHigh'), E(hi, `Log(2e^(${P}n)) = ${cv(p)} + Log 2`, 'bound', 'simplify')],
+      loLim: [E(`${p}/(${r}+${s}/n)`, t('Diviser par n'), 'lim', 'divide'), E(qt(L), t('Passer à la limite'), 'lim', 'limit')],
+      hiLim: [E(`(${p}+ln(2)/n)/(${r}+${s}/n)`, t('Diviser par n'), 'lim', 'divide'), E(qt(L), t('Passer à la limite'), 'lim', 'limit')],
       blankLo: [`${P}n`], blankHi: ['ln(2)'], blankLim: [`${s}/n`],
       lowChoice: {
-        prompt: `Pour minorer ${M(`ln(e^(${P}n)+${nq})`)} :`,
-        ok: `${M(`ln(e^(${P}n))`)}, en retirant ${M(nq)} ≥ 0`,
-        bad: `${M(`ln(2e^(${P}n))`)}, car ${M(nq)} ≤ ${M(`e^(${P}n)`)}`,
+        prompt: t('Pour minorer {u} :', { u: M(`ln(e^(${P}n)+${nq})`) }),
+        ok: t('{u}, en retirant {nq} ≥ 0', { u: M(`ln(e^(${P}n))`), nq: M(nq) }),
+        bad: t('{u}, car {nq} ≤ {e}', { u: M(`ln(2e^(${P}n))`), nq: M(nq), e: M(`e^(${P}n)`) }),
       },
       hints: [
-        `Coince ce qui est dans le Log : e^(${cv(p)}) ≤ e^(${cv(p)}) + ${nqH} ≤ 2e^(${cv(p)}), puis Log est croissant.`,
+        t('Coince ce qui est dans le Log : e^({p}) ≤ e^({p}) + {nq} ≤ 2e^({p}), puis Log est croissant.', { p: cv(p), nq: nqH }),
         `${M(`ln(e^(${P}n))/(${den})`)} ≤ aₙ ≤ ${M(`ln(□×e^(${P}n))/(${den})`)}`,
-        `${M(lo)} ≤ aₙ ≤ ${M(hi)} : les deux bornes tendent vers ${qh(L)}.`,
+        t('{lo} ≤ aₙ ≤ {hi} : les deux bornes tendent vers {L}.', { lo: M(lo), hi: M(hi), L: qh(L) }),
       ],
       choices: [
-        { id: 'logLow', label: `Retirer ${nqH} dans le Log` },
-        { id: 'logHigh', label: `Majorer ${nqH} par e^(${cv(p)}) dans le Log` },
-        { id: 'simplify', label: 'Simplifier Log(e^(…))' },
-        { id: 'divide', label: 'Diviser le haut et le bas par n' },
-        { id: 'limit', label: 'Passer à la limite' },
-        { id: 'conclude', label: 'Conclure par les gendarmes' },
+        { id: 'logLow', label: t('Retirer {nq} dans le Log', { nq: nqH }) },
+        { id: 'logHigh', label: t('Majorer {nq} par e^({p}) dans le Log', { nq: nqH, p: cv(p) }) },
+        { id: 'simplify', label: t('Simplifier Log(e^(…))') },
+        { id: 'divide', label: t('Diviser le haut et le bas par n') },
+        { id: 'limit', label: t('Passer à la limite') },
+        { id: 'conclude', label: t('Conclure par les gendarmes') },
       ],
     };
   }
@@ -125,26 +126,26 @@ function trigData(rng) {
   return {
     kind: 'trig', name: 'a_n', nameH: 'aₙ', L, lo, hi, zero: `-${c}/(${den})`, gone: ['sin', 'cos'], T,
     start: `(${A}n+${c}${T}(n))/(${den})`,
-    loLines: [E(lo, `${T} n ≥ −1 (et ${coef(d)}n ${e < 0 ? '−' : '+'} ${Math.abs(e)} > 0)`, 'bound', 'trig')],
+    loLines: [E(lo, t('{T} n ≥ −1 (et {d}n {op} {e} > 0)', { T, d: coef(d), op: e < 0 ? '−' : '+', e: Math.abs(e) }), 'bound', 'trig')],
     hiLines: [E(hi, `${T} n ≤ 1`, 'bound', 'trig')],
-    loLim: [E(`(${a}-${c}/n)/(${d}${eTxt})`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
-    hiLim: [E(`(${a}+${c}/n)/(${d}${eTxt})`, 'Diviser par n', 'lim', 'divide'), E(qt(L), 'Passer à la limite', 'lim', 'limit')],
+    loLim: [E(`(${a}-${c}/n)/(${d}${eTxt})`, t('Diviser par n'), 'lim', 'divide'), E(qt(L), t('Passer à la limite'), 'lim', 'limit')],
+    hiLim: [E(`(${a}+${c}/n)/(${d}${eTxt})`, t('Diviser par n'), 'lim', 'divide'), E(qt(L), t('Passer à la limite'), 'lim', 'limit')],
     blankLo: [`${A}n-${c}`], blankHi: [`${A}n+${c}`], blankLim: [`${c}/n`],
     lowChoice: {
-      prompt: `Pour minorer aₙ, on remplace ${T} n par :`,
+      prompt: t('Pour minorer aₙ, on remplace {T} n par :', { T }),
       ok: '−1', bad: '1', zero: true,
     },
     hints: [
-      `−1 ≤ ${T} n ≤ 1, et le dénominateur est positif : remplace ${T} n par −1, puis par 1.`,
+      t('−1 ≤ {T} n ≤ 1, et le dénominateur est positif : remplace {T} n par −1, puis par 1.', { T }),
       `${M(`(${A}n-□)/(${den})`)} ≤ aₙ ≤ ${M(`(${A}n+□)/(${den})`)}`,
-      `${M(lo)} ≤ aₙ ≤ ${M(hi)} : les deux bornes tendent vers ${qh(L)}.`,
+      t('{lo} ≤ aₙ ≤ {hi} : les deux bornes tendent vers {L}.', { lo: M(lo), hi: M(hi), L: qh(L) }),
     ],
     choices: [
-      { id: 'trig', label: `Encadrer ${T} n entre −1 et 1` },
-      { id: 'drop', label: `Dire que ${T} n n'a pas de limite`, rule: 'a1_bounded_times_zero', why: `${T} n est borné et il est divisé par une quantité qui tend vers l'infini : pas besoin de sa limite.` },
-      { id: 'divide', label: 'Diviser le haut et le bas par n' },
-      { id: 'limit', label: 'Passer à la limite' },
-      { id: 'conclude', label: 'Conclure par les gendarmes' },
+      { id: 'trig', label: t('Encadrer {T} n entre −1 et 1', { T }) },
+      { id: 'drop', label: t('Dire que {T} n n\'a pas de limite', { T }), rule: 'a1_bounded_times_zero', why: t('{T} n est borné et il est divisé par une quantité qui tend vers l\'infini : pas besoin de sa limite.', { T }) },
+      { id: 'divide', label: t('Diviser le haut et le bas par n') },
+      { id: 'limit', label: t('Passer à la limite') },
+      { id: 'conclude', label: t('Conclure par les gendarmes') },
     ],
   };
 }
@@ -163,18 +164,18 @@ function lowDecision(d) {
   return {
     kind: 'decision', prompt: c.prompt, options: [
       { id: 'low', label: c.ok, valid: true, ref: true },
-      { id: 'high', label: c.bad, valid: false, rule: 'a1_squeeze_wrong_direction', why: 'Ce serait un majorant : pour minorer, il faut prendre plus petit.' },
-      ...(c.zero ? [{ id: 'zero', label: '0', valid: false, why: `${d.T} n peut être négatif : 0 n'est pas un minorant.` }] : []),
+      { id: 'high', label: c.bad, valid: false, rule: 'a1_squeeze_wrong_direction', why: t('Ce serait un majorant : pour minorer, il faut prendre plus petit.') },
+      ...(c.zero ? [{ id: 'zero', label: '0', valid: false, why: t('{T} n peut être négatif : 0 n\'est pas un minorant.', { T: d.T }) }] : []),
     ],
   };
 }
 
 function concludeDecision(d) {
   return {
-    kind: 'decision', prompt: `Que conclure pour ${d.nameH} ?`, options: [
-      { id: 'squeeze', label: `${d.nameH} est coincée entre deux suites qui tendent toutes deux vers ${qh(d.L)}`, valid: true, ref: true },
-      { id: 'diff', label: `${d.nameH} est entre deux suites convergentes : elle converge, même si leurs limites diffèrent`, valid: false, rule: 'a1_squeeze_different_limits', why: 'Il faut que les deux bornes aient la même limite : 1 + (−1)ⁿ est entre 0 et 2 sans converger.' },
-      { id: 'bounded', label: `${d.nameH} est bornée, donc elle converge`, valid: false, rule: 'a1_bounded_implies_convergent', why: '(−1)ⁿ est bornée et ne converge pas : bornée ne suffit pas.' },
+    kind: 'decision', prompt: t('Que conclure pour {u} ?', { u: d.nameH }), options: [
+      { id: 'squeeze', label: t('{u} est coincée entre deux suites qui tendent toutes deux vers {L}', { u: d.nameH, L: qh(d.L) }), valid: true, ref: true },
+      { id: 'diff', label: t('{u} est entre deux suites convergentes : elle converge, même si leurs limites diffèrent', { u: d.nameH }), valid: false, rule: 'a1_squeeze_different_limits', why: t('Il faut que les deux bornes aient la même limite : 1 + (−1)ⁿ est entre 0 et 2 sans converger.') },
+      { id: 'bounded', label: t('{u} est bornée, donc elle converge', { u: d.nameH }), valid: false, rule: 'a1_bounded_implies_convergent', why: t('(−1)ⁿ est bornée et ne converge pas : bornée ne suffit pas.') },
     ],
   };
 }
@@ -185,16 +186,16 @@ function sqParts(d, level) {
   const hiLines = guided ? [...d.hiLines.slice(0, -1), blanked(d.hiLines.at(-1), d.blankHi)] : d.hiLines;
   const lim = (ls) => (level === 1 ? [blanked(ls[0], d.blankLim), ...ls.slice(1)] : ls);
   const parts = [];
-  const note = { kind: 'note', html: `Minorant donné : ${M(d.lo)} ≤ ${d.nameH} pour tout n ≥ 1.` };
+  const note = { kind: 'note', html: t('Minorant donné : {lo} ≤ {u} pour tout n ≥ 1.', { lo: M(d.lo), u: d.nameH }) };
   if (level >= 2) {
-    parts.push({ html: `Minore ${d.nameH} :`, start: d.start, judge: BOUND('≥', d, d.hi), lines: loLines, pre: level === 2 ? [lowDecision(d)] : [], choices: d.choices });
+    parts.push({ html: t('Minore {u} :', { u: d.nameH }), start: d.start, judge: BOUND('≥', d, d.hi), lines: loLines, pre: level === 2 ? [lowDecision(d)] : [], choices: d.choices });
   }
-  parts.push({ html: `Majore ${d.nameH} :`, start: d.start, judge: BOUND('≤', d, d.lo), lines: hiLines, pre: level === 1 ? [note] : [], choices: d.choices });
-  parts.push({ html: 'Limite du minorant :', start: d.lo, judge: LIMN(), lines: lim(d.loLim), choices: d.choices });
-  parts.push({ html: 'Limite du majorant :', start: d.hi, judge: LIMN(), lines: lim(d.hiLim), choices: d.choices });
+  parts.push({ html: t('Majore {u} :', { u: d.nameH }), start: d.start, judge: BOUND('≤', d, d.lo), lines: hiLines, pre: level === 1 ? [note] : [], choices: d.choices });
+  parts.push({ html: t('Limite du minorant :'), start: d.lo, judge: LIMN(), lines: lim(d.loLim), choices: d.choices });
+  parts.push({ html: t('Limite du majorant :'), start: d.hi, judge: LIMN(), lines: lim(d.hiLim), choices: d.choices });
   parts.push({
-    html: 'Conclusion :', start: `lim(${d.name},n,∞)`, judge: VAL(qt(d.L)),
-    lines: [E(qt(d.L), 'Gendarmes', 'concl', 'conclude')], pre: level <= 3 ? [concludeDecision(d)] : [], choices: d.choices,
+    html: t('Conclusion :'), start: `lim(${d.name},n,∞)`, judge: VAL(qt(d.L)),
+    lines: [E(qt(d.L), t('Gendarmes'), 'concl', 'conclude')], pre: level <= 3 ? [concludeDecision(d)] : [], choices: d.choices,
   });
   return parts;
 }
@@ -205,7 +206,7 @@ function sqLines(level, rng, opts = {}) {
   // The first part's judge is the item's: show « ≥ » from the start.
   return linesItem({
     skill: SQ, level,
-    prompt: `Calcule la limite de ${d.nameH} = ${M(d.start)} par les gendarmes : minore, majore, puis passe à la limite des deux bornes.`,
+    prompt: t('Calcule la limite de {u} = {s} par les gendarmes : minore, majore, puis passe à la limite des deux bornes.', { u: d.nameH, s: M(d.start) }),
     ...as, mode: modeOf(level), keys: KEYS, subgoals: SUB, tapActions: level === 3 ? 'steps' : null,
     hints: H(...d.hints),
     key: `${SQ}:${d.start}`, exam: opts.exam ? { format: opts.exam, points: 2 } : false, fallback: !!d.fallback,
@@ -223,13 +224,13 @@ function sqMcq(rng) {
     { html: pair(d.hi, d.nameH, d.lo), correct: false, rule: 'a1_squeeze_wrong_direction' },
   ];
   if (d.kind === 'sum') opts.push({ html: pair(d.lo1, d.nameH, d.hi1), correct: false, rule: 'a1_sum_n_terms_as_one' });
-  if (d.kind === 'trig') opts.push({ html: `Aucun : ${d.T} n n'a pas de limite, donc ${d.nameH} non plus`, correct: false, rule: 'a1_bounded_times_zero' });
-  if (d.kind === 'log') opts.push({ html: `${d.nameH} ≤ ${M(d.hi)} suffit : le majorant tend vers ${qh(d.L)}`, correct: false });
+  if (d.kind === 'trig') opts.push({ html: t('Aucun : {T} n n\'a pas de limite, donc {u} non plus', { T: d.T, u: d.nameH }), correct: false, rule: 'a1_bounded_times_zero' });
+  if (d.kind === 'log') opts.push({ html: t('{u} ≤ {hi} suffit : le majorant tend vers {L}', { u: d.nameH, hi: M(d.hi), L: qh(d.L) }), correct: false });
   opts.push({ html: pair(d.zero, d.nameH, d.hi), correct: false, rule: 'a1_squeeze_different_limits' });
   return mcq({
-    skill: SQ, level: 4, prompt: `Pour calculer la limite de ${d.nameH} = ${M(d.start)}, quel encadrement (pour tout n ≥ 1) permet de conclure par les gendarmes ?`,
+    skill: SQ, level: 4, prompt: t('Pour calculer la limite de {u} = {s}, quel encadrement (pour tout n ≥ 1) permet de conclure par les gendarmes ?', { u: d.nameH, s: M(d.start) }),
     options: uniq(opts).slice(0, 4), key: `mcq:${d.start}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: !!d.fallback,
-    solution: [{ html: `${pair(d.lo, d.nameH, d.hi)} : les deux bornes tendent vers ${qh(d.L)}, donc ${d.nameH} → ${qh(d.L)}.`, note: 'Gendarmes' }],
+    solution: [{ html: t('{pair} : les deux bornes tendent vers {L}, donc {u} → {L}.', { pair: pair(d.lo, d.nameH, d.hi), L: qh(d.L), u: d.nameH }), note: t('Gendarmes') }],
   }, rng);
 }
 
@@ -259,10 +260,10 @@ const TF = [
 ];
 
 function sqTf(rng) {
-  const t = rng.pick(TF);
+  const tf = rng.pick(TF);
   return tfItem({
-    skill: SQ, level: 4, truth: t.truth, key: t.key, statement: t.s, ruleIfTrue: t.truth ? null : t.rule,
-    counter: t.truth ? null : t.counter(), explanation: t.why, exam: { format: 'tf', points: 1 }, expectedSec: 60,
+    skill: SQ, level: 4, truth: tf.truth, key: tf.key, statement: t(tf.s), ruleIfTrue: tf.truth ? null : tf.rule,
+    counter: tf.truth ? null : tf.counter(), explanation: t(tf.why), exam: { format: 'tf', points: 1 }, expectedSec: 60,
   });
 }
 

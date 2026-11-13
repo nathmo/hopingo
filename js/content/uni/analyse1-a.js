@@ -25,6 +25,7 @@ import { MT, MM, linesItem, mcq, tfItem } from './kit.js';
 import { N, modeOf, H, E, examOf, uniqOptions, blanked, boxed, withMenus, segment, frN, vfMcq, hasSum, mulT, fracT } from './analyse1-a-kit.js';
 import { GEN as INV } from './analyse1-a-inv.js';
 import { GEN as C1 } from './analyse1-a-c1.js';
+import { t } from '../../i18n.js';
 
 // ======================================================================
 // a1-deriv-def
@@ -32,16 +33,16 @@ import { GEN as C1 } from './analyse1-a-c1.js';
 
 const DEF = 'a1-deriv-def';
 const DEF_SUB = {
-  deriv: { id: 'deriv', label: 'taux d\'accroissement', skill: DEF },
-  squeeze: { id: 'squeeze', label: 'gendarmes', skill: 'a1-seq-squeeze' },
-  sides: { id: 'sides', label: 'limites à gauche et à droite', skill: 'a1-fn-onesided' },
+  deriv: { id: 'deriv', label: t('taux d\'accroissement'), skill: DEF },
+  squeeze: { id: 'squeeze', label: t('gendarmes'), skill: 'a1-seq-squeeze' },
+  sides: { id: 'sides', label: t('limites à gauche et à droite'), skill: 'a1-fn-onesided' },
 };
 const DEF_CHOICES = [
-  { id: 'simplify', label: 'Simplifier le taux d\'accroissement' },
-  { id: 'squeeze', label: 'Gendarmes : majorer la partie bornée' },
-  { id: 'equiv', label: 'Remplacer par un équivalent (eᵘ − 1 ~ u, sin u ~ u)' },
-  { id: 'conclude', label: 'Conclure : calculer la limite' },
-  { id: 'formula', label: 'Dériver la formule de f, puis remplacer x par 0', rule: 'a1_derivable_from_formula', why: 'La formule de f′ ne vaut pas en 0 : en 0, on passe par le taux d\'accroissement.' },
+  { id: 'simplify', label: t('Simplifier le taux d\'accroissement') },
+  { id: 'squeeze', label: t('Gendarmes : majorer la partie bornée') },
+  { id: 'equiv', label: t('Remplacer par un équivalent (eᵘ − 1 ~ u, sin u ~ u)') },
+  { id: 'conclude', label: t('Conclure : calculer la limite') },
+  { id: 'formula', label: t('Dériver la formule de f, puis remplacer x par 0'), rule: 'a1_derivable_from_formula', why: t('La formule de f′ ne vaut pas en 0 : en 0, on passe par le taux d\'accroissement.') },
 ];
 const LIMIT = (dir) => ({ kind: 'limit', v: 'h', to: '0', ...(dir ? { dir } : {}) });
 const KEYS = ['calcx', 'calcfn', 'anal'];
@@ -61,12 +62,12 @@ function oscData(rng) {
   return {
     kind: 'osc', c, p, T, f, x0: '0', start: `(${hx(f)})/h`,
     lines: [
-      E(c ? `${c}+${rest}` : rest, 'Simplifier par h', 'deriv', 'simplify'),
-      E(String(c), `Gendarmes : |${p === 2 ? 'h' : 'h²'}·${T}(1/h)| ≤ ${p === 2 ? '|h|' : 'h²'} → 0`, 'squeeze', 'squeeze'),
+      E(c ? `${c}+${rest}` : rest, t('Simplifier par h'), 'deriv', 'simplify'),
+      E(String(c), t('Gendarmes : |{p1}·{T}(1/h)| ≤ {p2} → 0', { p1: p === 2 ? 'h' : 'h²', T, p2: p === 2 ? '|h|' : 'h²' }), 'squeeze', 'squeeze'),
     ],
     holes: [[p === 2 ? 'h' : 'h^2'], [rest]],
-    fShow: `${MT(f)} si x ≠ 0, et f(0) = 0`,
-    hint1: 'Écris (f(0 + h) − f(0))/h, simplifie par h, puis encadre la partie bornée.',
+    fShow: t('{f} si x ≠ 0, et f(0) = 0', { f: MT(f) }),
+    hint1: t('Écris (f(0 + h) − f(0))/h, simplifie par h, puis encadre la partie bornée.'),
   };
 }
 
@@ -82,10 +83,10 @@ function absData(rng) {
   ][k];
   return {
     kind: 'abs', c, f: D.f, x0: '0', start: D.start,
-    lines: [E(D.S, 'Simplifier par h', 'deriv', 'simplify'), E(String(c), '|h| → 0', 'deriv', 'conclude')],
+    lines: [E(D.S, t('Simplifier par h'), 'deriv', 'simplify'), E(String(c), '|h| → 0', 'deriv', 'conclude')],
     holes: [['|h|'], [D.S]],
     fShow: MT(D.f),
-    hint1: 'Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0.',
+    hint1: t('Écris (f(0 + h) − f(0))/h et simplifie par h : |h| reste, et |h| → 0.'),
   };
 }
 
@@ -96,11 +97,11 @@ function piece(rng, a) {
     const b = rng.pick([-3, -2, -1, 1, 2, 3]);
     const g = `${a === 1 ? '' : a === -1 ? '-' : a}x${b > 0 ? '+' : '-'}${Math.abs(b) === 1 ? '' : Math.abs(b)}x^2`;
     const S = `${a}${b > 0 ? '+' : '-'}${Math.abs(b) === 1 ? '' : Math.abs(b)}h`;
-    return { g, start: `(${hx(g)})/h`, lines: [E(S, 'Simplifier par h', 'deriv', 'simplify'), E(String(a), 'h → 0', 'sides', 'conclude')], hole: String(a) };
+    return { g, start: `(${hx(g)})/h`, lines: [E(S, t('Simplifier par h'), 'deriv', 'simplify'), E(String(a), 'h → 0', 'sides', 'conclude')], hole: String(a) };
   }
   const k = a === 1 ? '' : a === -1 ? '-' : String(a);
   const g = kind === 1 ? (a === 1 ? 'e^x-1' : `e^(${k}x)-1`) : `sin(${k}x)`;
-  return { g, start: `(${hx(g)})/h`, lines: [E(String(a), kind === 1 ? `eᵘ − 1 ~ u avec u = ${k.replace('-', '−')}h` : `sin u ~ u avec u = ${k.replace('-', '−')}h`, 'sides', 'equiv')], hole: null };
+  return { g, start: `(${hx(g)})/h`, lines: [E(String(a), kind === 1 ? t('eᵘ − 1 ~ u avec u = {p1}h', { p1: k.replace('-', '−') }) : t('sin u ~ u avec u = {p1}h', { p1: k.replace('-', '−') }), 'sides', 'equiv')], hole: null };
 }
 
 function sidesData(rng) {
@@ -113,8 +114,8 @@ function sidesData(rng) {
   for (let i = 0; i < 10 && L.g === R.g; i++) L = piece(rng, b);
   return {
     kind: 'sides', a, b, R, L, x0: '0',
-    fShow: `${MT(R.g)} si x ≥ 0, et ${MT(L.g)} si x < 0`,
-    hint1: 'Deux formules : calcule la dérivée à droite (h > 0) avec le morceau de droite, puis la dérivée à gauche (h < 0) avec celui de gauche.',
+    fShow: t('{g} si x ≥ 0, et {g2} si x < 0', { g: MT(R.g), g2: MT(L.g) }),
+    hint1: t('Deux formules : calcule la dérivée à droite (h > 0) avec le morceau de droite, puis la dérivée à gauche (h < 0) avec celui de gauche.'),
   };
 }
 
@@ -123,18 +124,18 @@ function defLines(level, rng, opts) {
   const d = pickKind === 'osc' ? oscData(rng) : pickKind === 'abs' ? absData(rng) : sidesData(rng);
   const mode = modeOf(level);
   const decision = level === 2 ? {
-    kind: 'decision', prompt: 'Comment trouver la limite du taux ?', options: [
-      { id: 'squeeze', label: 'Simplifier, puis gendarmes : la partie bornée est multipliée par une quantité qui tend vers 0', valid: d.kind === 'osc', why: 'Il n\'y a pas de partie bornée qui oscille ici.' },
-      { id: 'direct', label: 'Simplifier par h (ou un équivalent), puis passer à la limite', valid: d.kind !== 'osc', why: 'Après simplification, il reste une partie qui oscille : il faut l\'encadrer.' },
-      { id: 'bounded', label: '0 × (borné) est une forme indéterminée : la limite n\'existe pas', valid: false, rule: 'a1_bounded_times_zero', why: '0 × (borné) n\'est pas indéterminé : le produit tend vers 0.' },
-      { id: 'formula', label: 'Dériver la formule de f, puis remplacer x par 0', valid: false, rule: 'a1_derivable_from_formula', why: 'La formule de f′(x) ne vaut que pour x ≠ 0 : en 0, on passe par le taux d\'accroissement.' },
+    kind: 'decision', prompt: t('Comment trouver la limite du taux ?'), options: [
+      { id: 'squeeze', label: t('Simplifier, puis gendarmes : la partie bornée est multipliée par une quantité qui tend vers 0'), valid: d.kind === 'osc', why: t('Il n\'y a pas de partie bornée qui oscille ici.') },
+      { id: 'direct', label: t('Simplifier par h (ou un équivalent), puis passer à la limite'), valid: d.kind !== 'osc', why: t('Après simplification, il reste une partie qui oscille : il faut l\'encadrer.') },
+      { id: 'bounded', label: t('0 × (borné) est une forme indéterminée : la limite n\'existe pas'), valid: false, rule: 'a1_bounded_times_zero', why: t('0 × (borné) n\'est pas indéterminé : le produit tend vers 0.') },
+      { id: 'formula', label: t('Dériver la formule de f, puis remplacer x par 0'), valid: false, rule: 'a1_derivable_from_formula', why: t('La formule de f′(x) ne vaut que pour x ≠ 0 : en 0, on passe par le taux d\'accroissement.') },
     ],
   } : null;
   const prompt = d.kind === 'sides'
-    ? `Soit f(x) = ${d.fShow}. Calcule les dérivées à droite et à gauche de f en 0 par la définition, puis conclus.`
+    ? t('Soit f(x) = {fShow}. Calcule les dérivées à droite et à gauche de f en 0 par la définition, puis conclus.', { fShow: d.fShow })
     : rng.pick([
-      `Soit f(x) = ${d.fShow}. Calcule f′(0) par la définition.`,
-      `Soit f(x) = ${d.fShow}. Montre avec le taux d'accroissement que f est dérivable en 0, et donne f′(0).`,
+      t('Soit f(x) = {fShow}. Calcule f′(0) par la définition.', { fShow: d.fShow }),
+      t('Soit f(x) = {fShow}. Montre avec le taux d\'accroissement que f est dérivable en 0, et donne f′(0).', { fShow: d.fShow }),
     ]);
   const key = `${DEF}:${d.kind}:${d.f ?? `${d.R.g}|${d.L.g}`}:${level}`;
   if (d.kind !== 'sides') {
@@ -146,19 +147,19 @@ function defLines(level, rng, opts) {
     return linesItem({
       skill: DEF, level, prompt, start: d.start, judge: withMenus(LIMIT(), level, d.start, lines, DEF_CHOICES),
       mode, script, keys: KEYS, subgoals: subs, tapActions: level === 3 ? 'steps' : null,
-      hints: H(d.hint1, `= ${boxed(blanked(lines[0], d.holes[0]))}`, `${MT(lines[0].math)}, puis ${MT(lines[1].math)} : f′(0) = ${frN(d.c)}`),
+      hints: H(d.hint1, `= ${boxed(blanked(lines[0], d.holes[0]))}`, t('{p1}, puis {p2} : f′(0) = {c}', { p1: MT(lines[0].math), p2: MT(lines[1].math), c: frN(d.c) })),
       key, exam: examOf(opts),
     });
   }
   // Two sides, then the conclusion.
   const { R, L, a, b } = d;
   const ok = a === b;
-  const concl = ok ? E(String(a), `f′(0⁺) = f′(0⁻) = ${frN(a)}`, 'deriv', 'conclude') : E(String(a - b), `f′(0⁺) − f′(0⁻) = ${frN(a - b)} ≠ 0 : point anguleux`, 'deriv', 'conclude');
+  const concl = ok ? E(String(a), `f′(0⁺) = f′(0⁻) = ${frN(a)}`, 'deriv', 'conclude') : E(String(a - b), t('f′(0⁺) − f′(0⁻) = {p1} ≠ 0 : point anguleux', { p1: frN(a - b) }), 'deriv', 'conclude');
   const choose = {
-    kind: 'decision', prompt: 'f est-elle dérivable en 0 ?', options: [
-      { id: 'yes', label: `Oui : les deux dérivées latérales valent ${frN(a)}`, valid: ok, why: 'Les deux dérivées latérales ne sont pas égales.' },
-      { id: 'no', label: 'Non : les dérivées à gauche et à droite sont différentes', valid: !ok, why: 'Les deux dérivées latérales sont égales : f est dérivable en 0.' },
-      ...(ok ? [] : [{ id: 'mean', label: `Oui, et f′(0) = ${frN(new Q(a + b, 2))}, la moyenne des deux pentes`, valid: false, rule: 'a1_corner_missed', why: 'Deux pentes différentes : point anguleux, pas de dérivée.' }]),
+    kind: 'decision', prompt: t('f est-elle dérivable en 0 ?'), options: [
+      { id: 'yes', label: t('Oui : les deux dérivées latérales valent {a}', { a: frN(a) }), valid: ok, why: t('Les deux dérivées latérales ne sont pas égales.') },
+      { id: 'no', label: t('Non : les dérivées à gauche et à droite sont différentes'), valid: !ok, why: t('Les deux dérivées latérales sont égales : f est dérivable en 0.') },
+      ...(ok ? [] : [{ id: 'mean', label: t('Oui, et f′(0) = {p1}, la moyenne des deux pentes', { p1: frN(new Q(a + b, 2)) }), valid: false, rule: 'a1_corner_missed', why: t('Deux pentes différentes : point anguleux, pas de dérivée.') }]),
     ],
   };
   const rLines = R.lines.map((l) => ({ ...l }));
@@ -170,22 +171,22 @@ function defLines(level, rng, opts) {
   const valJ = withMenus({ kind: 'value', expect: String(ok ? a : a - b) }, level, valStart, [concl], DEF_CHOICES);
   const script = [
     ...hole(rLines, R),
-    segment('Dérivée à gauche : h < 0, avec le morceau de gauche.', null, L.start, segL),
+    segment(t('Dérivée à gauche : h < 0, avec le morceau de gauche.'), null, L.start, segL),
     ...hole(lLines, L),
-    segment('Conclusion.', ok ? 'f′(0) =' : 'f′(0⁺) − f′(0⁻) =', valStart, valJ),
+    segment(t('Conclusion.'), ok ? 'f′(0) =' : 'f′(0⁺) − f′(0⁻) =', valStart, valJ),
     ...(level <= 2 || level === 3 ? [choose] : []),
     concl,
   ];
   return linesItem({
     skill: DEF, level, prompt, start: R.start, judge: segR, mode, script, keys: KEYS,
     subgoals: [DEF_SUB.deriv, DEF_SUB.sides], tapActions: level === 3 ? 'steps' : null,
-    hints: H(d.hint1, `f′(0⁺) = lim ${MT(R.start)} = ${MT(R.lines[0].math)}…`, `f′(0⁺) = ${frN(a)}, f′(0⁻) = ${frN(b)} : ${ok ? `f′(0) = ${frN(a)}` : 'pas dérivable en 0'}.`),
+    hints: H(d.hint1, `f′(0⁺) = lim ${MT(R.start)} = ${MT(R.lines[0].math)}…`, `f′(0⁺) = ${frN(a)}, f′(0⁻) = ${frN(b)} : ${ok ? `f′(0) = ${frN(a)}` : t('pas dérivable en 0')}.`),
     key, exam: examOf(opts),
   });
 }
 
 // The level 5 and exam multiple choice: what can be said of f at 0.
-const S_DER = (v) => `f est dérivable en 0 et f′(0) = ${frN(v)}`;
+const S_DER = (v) => t('f est dérivable en 0 et f′(0) = {v}', { v: frN(v) });
 function defMcq(rng, opts = {}) {
   const k = rng.int(0, 5);
   let f;
@@ -199,29 +200,29 @@ function defMcq(rng, opts = {}) {
       ? (T === 'sin' ? '2x×sin(1/x)-cos(1/x)' : '2x×cos(1/x)+sin(1/x)')
       : (T === 'sin' ? '3x^2×sin(1/x)-x×cos(1/x)' : '3x^2×cos(1/x)+x×sin(1/x)');
     options = p === 2 ? [
-      { html: 'f est dérivable sur ℝ et f′(0) = 0, mais f′ n\'est pas continue en 0', correct: true },
-      { html: `f n'est pas dérivable en 0, car f′(x) = ${MT(fp)} n'a pas de limite en 0`, correct: false, rule: 'a1_derivable_from_formula' },
-      { html: 'f est de classe C¹ sur ℝ, car elle est dérivable sur ℝ', correct: false, rule: 'a1_c1_def_missing_cont' },
-      { html: `f n'est pas continue en 0, car ${T}(1/x) n'a pas de limite en 0`, correct: false, rule: 'a1_bounded_times_zero' },
+      { html: t('f est dérivable sur ℝ et f′(0) = 0, mais f′ n\'est pas continue en 0'), correct: true },
+      { html: t('f n\'est pas dérivable en 0, car f′(x) = {fp} n\'a pas de limite en 0', { fp: MT(fp) }), correct: false, rule: 'a1_derivable_from_formula' },
+      { html: t('f est de classe C¹ sur ℝ, car elle est dérivable sur ℝ'), correct: false, rule: 'a1_c1_def_missing_cont' },
+      { html: t('f n\'est pas continue en 0, car {T}(1/x) n\'a pas de limite en 0', { T }), correct: false, rule: 'a1_bounded_times_zero' },
     ] : [
-      { html: 'f est de classe C¹ sur ℝ et f′(0) = 0', correct: true },
-      { html: `f n'est pas dérivable en 0, car la formule f′(x) = ${MT(fp)} n'a pas de sens en 0`, correct: false, rule: 'a1_derivable_from_formula' },
-      { html: 'f est dérivable en 0, mais f′ n\'est pas continue en 0', correct: false },
-      { html: `f n'est pas continue en 0, car ${T}(1/x) n'a pas de limite en 0`, correct: false, rule: 'a1_bounded_times_zero' },
+      { html: t('f est de classe C¹ sur ℝ et f′(0) = 0'), correct: true },
+      { html: t('f n\'est pas dérivable en 0, car la formule f′(x) = {fp} n\'a pas de sens en 0', { fp: MT(fp) }), correct: false, rule: 'a1_derivable_from_formula' },
+      { html: t('f est dérivable en 0, mais f′ n\'est pas continue en 0'), correct: false },
+      { html: t('f n\'est pas continue en 0, car {T}(1/x) n\'a pas de limite en 0', { T }), correct: false, rule: 'a1_bounded_times_zero' },
     ];
     why = p === 2
-      ? `(f(h) − f(0))/h = h·${T}(1/h) → 0 (gendarmes) : f′(0) = 0. Pour x ≠ 0, f′(x) = ${MT(fp)} n'a pas de limite en 0 : f′ n'est pas continue en 0.`
-      : `(f(h) − f(0))/h = h²·${T}(1/h) → 0 : f′(0) = 0. Et f′(x) = ${MT(fp)} → 0 = f′(0) : f′ est continue.`;
+      ? t('(f(h) − f(0))/h = h·{T}(1/h) → 0 (gendarmes) : f′(0) = 0. Pour x ≠ 0, f′(x) = {fp} n\'a pas de limite en 0 : f′ n\'est pas continue en 0.', { T, fp: MT(fp) })
+      : t('(f(h) − f(0))/h = h²·{T}(1/h) → 0 : f′(0) = 0. Et f′(x) = {fp} → 0 = f′(0) : f′ est continue.', { T, fp: MT(fp) });
   } else if (k === 2) {
     const T = rng.pick(['sin', 'cos']);
     f = `x×${T}(1/x)`;
     options = [
-      { html: 'f est continue en 0, mais pas dérivable en 0', correct: true },
-      { html: `f n'est pas continue en 0, car ${T}(1/x) n'a pas de limite en 0`, correct: false, rule: 'a1_bounded_times_zero' },
+      { html: t('f est continue en 0, mais pas dérivable en 0'), correct: true },
+      { html: t('f n\'est pas continue en 0, car {T}(1/x) n\'a pas de limite en 0', { T }), correct: false, rule: 'a1_bounded_times_zero' },
       { html: S_DER(0), correct: false },
-      { html: 'f est dérivable à droite en 0 seulement', correct: false },
+      { html: t('f est dérivable à droite en 0 seulement'), correct: false },
     ];
-    why = `|x·${T}(1/x)| ≤ |x| → 0 : f est continue en 0. Mais (f(h) − f(0))/h = ${T}(1/h) n'a pas de limite : f n'est pas dérivable en 0.`;
+    why = t('|x·{T}(1/x)| ≤ |x| → 0 : f est continue en 0. Mais (f(h) − f(0))/h = {T}(1/h) n\'a pas de limite : f n\'est pas dérivable en 0.', { T });
   } else if (k === 3) {
     const a = rng.pick([1, 2, 3]);
     const b = rng.pick([-2, -1, 0].filter((x) => x !== a));
@@ -229,37 +230,37 @@ function defMcq(rng, opts = {}) {
     const L = b === 0 ? 'x^2' : `sin(${b === -1 ? '-' : b}x)`;
     f = `${R}|${L}`;
     options = [
-      { html: `f n'est pas dérivable en 0 : f′(0⁺) = ${frN(a)} et f′(0⁻) = ${frN(b)}`, correct: true },
+      { html: t('f n\'est pas dérivable en 0 : f′(0⁺) = {a} et f′(0⁻) = {b}', { a: frN(a), b: frN(b) }), correct: true },
       { html: S_DER(new Q(a + b, 2)), correct: false, rule: 'a1_corner_missed' },
       { html: S_DER(a), correct: false, rule: 'a1_corner_missed' },
-      { html: 'f n\'est pas continue en 0', correct: false },
+      { html: t('f n\'est pas continue en 0'), correct: false },
     ];
-    const show = `${MT(R)} si x ≥ 0, et ${MT(L)} si x < 0`;
-    why = `À droite, (h² + ${a === 1 ? '' : a}h)/h → ${a} ; à gauche, ${MT(hx(L))}/h → ${frN(b)}. Les deux pentes sont différentes : point anguleux.`;
-    return mcqOut(`Soit f(x) = ${show}. Que peut-on dire de f en 0 ?`, options, why, f, rng, opts);
+    const show = t('{R} si x ≥ 0, et {L} si x < 0', { R: MT(R), L: MT(L) });
+    why = t('À droite, (h² + {p1}h)/h → {a} ; à gauche, {p2}/h → {b}. Les deux pentes sont différentes : point anguleux.', { p1: a === 1 ? '' : a, a, p2: MT(hx(L)), b: frN(b) });
+    return mcqOut(t('Soit f(x) = {show}. Que peut-on dire de f en 0 ?', { show }), options, why, f, rng, opts);
   } else if (k === 4) {
     f = 'x×sin(e^(1/x)-1)';
     options = [
-      { html: 'f est dérivable à gauche en 0, mais pas à droite', correct: true },
-      { html: 'f est dérivable en 0', correct: false, rule: 'a1_corner_missed' },
-      { html: 'f est dérivable à droite en 0, mais pas à gauche', correct: false },
-      { html: 'f n\'est dérivable ni à gauche ni à droite en 0', correct: false, rule: 'a1_derivable_from_formula' },
+      { html: t('f est dérivable à gauche en 0, mais pas à droite'), correct: true },
+      { html: t('f est dérivable en 0'), correct: false, rule: 'a1_corner_missed' },
+      { html: t('f est dérivable à droite en 0, mais pas à gauche'), correct: false },
+      { html: t('f n\'est dérivable ni à gauche ni à droite en 0'), correct: false, rule: 'a1_derivable_from_formula' },
     ];
-    why = 'Le taux vaut sin(e^(1/h) − 1). Pour h → 0⁻, e^(1/h) → 0 et le taux tend vers sin(−1) : f′(0⁻) = −sin 1. Pour h → 0⁺, e^(1/h) → +∞ et le sinus oscille : pas de dérivée à droite.';
+    why = t('Le taux vaut sin(e^(1/h) − 1). Pour h → 0⁻, e^(1/h) → 0 et le taux tend vers sin(−1) : f′(0⁻) = −sin 1. Pour h → 0⁺, e^(1/h) → +∞ et le sinus oscille : pas de dérivée à droite.');
   } else {
     const p = rng.pick(['1/2', '2/3', '6/5', '3/2']);
     f = `|x|^(${p})×ln(|x|)`;
     const big = p === '6/5' || p === '3/2';
     options = [
       { html: S_DER(0), correct: big },
-      { html: 'f n\'est pas dérivable en 0 : le taux tend vers +∞ d\'un côté et −∞ de l\'autre', correct: !big },
-      { html: 'f n\'est pas dérivable en 0, car Log|x| → −∞', correct: false, rule: 'a1_derivable_from_formula' },
-      { html: 'f n\'est pas continue en 0', correct: false },
+      { html: t('f n\'est pas dérivable en 0 : le taux tend vers +∞ d\'un côté et −∞ de l\'autre'), correct: !big },
+      { html: t('f n\'est pas dérivable en 0, car Log|x| → −∞'), correct: false, rule: 'a1_derivable_from_formula' },
+      { html: t('f n\'est pas continue en 0'), correct: false },
     ];
-    why = `Le taux vaut |h|^(${p})·Log|h|/h, de valeur absolue |h|^(${p} − 1)·|Log|h||. ${big ? 'L\'exposant est > 0 : les puissances l\'emportent sur le logarithme, le taux tend vers 0.' : 'L\'exposant est < 0 : le taux tend vers −∞ à droite et +∞ à gauche.'}`;
-    return mcqOut(`Soit f(x) = ${MT(f)} si x ≠ 0, et f(0) = 0. Que peut-on dire de f en 0 ?`, options, why, f, rng, opts);
+    why = t('Le taux vaut |h|^({p})·Log|h|/h, de valeur absolue |h|^({p} − 1)·|Log|h||. {p1}', { p, p1: big ? t('L\'exposant est > 0 : les puissances l\'emportent sur le logarithme, le taux tend vers 0.') : t('L\'exposant est < 0 : le taux tend vers −∞ à droite et +∞ à gauche.') });
+    return mcqOut(t('Soit f(x) = {f} si x ≠ 0, et f(0) = 0. Que peut-on dire de f en 0 ?', { f: MT(f) }), options, why, f, rng, opts);
   }
-  return mcqOut(`Soit f(x) = ${MT(f)} si x ≠ 0, et f(0) = 0. Que peut-on dire de f en 0 ?`, options, why, f, rng, opts);
+  return mcqOut(t('Soit f(x) = {f} si x ≠ 0, et f(0) = 0. Que peut-on dire de f en 0 ?', { f: MT(f) }), options, why, f, rng, opts);
 }
 function mcqOut(prompt, options, why, f, rng, opts) {
   return mcq({
@@ -276,9 +277,9 @@ const DEF_TF = [
   { s: 'Si f est continue en x₀, alors f est dérivable en x₀.', truth: false, rule: 'a1_corner_missed', why: 'Faux : |x| est continue en 0, mais pas dérivable (dérivées latérales −1 et 1).' },
 ];
 function defTf(rng) {
-  const t = rng.pick(DEF_TF);
-  if (!t.truth) return vfMcq(DEF, t.s, false, t.rule, t.why, rng, t.s);
-  return tfItem({ skill: DEF, level: 4, statement: t.s, truth: true, key: t.s, explanation: t.why, exam: { format: 'tf', points: 1 } });
+  const tf = rng.pick(DEF_TF);
+  if (!tf.truth) return vfMcq(DEF, t(tf.s), false, tf.rule, t(tf.why), rng, tf.s);
+  return tfItem({ skill: DEF, level: 4, statement: t(tf.s), truth: true, key: tf.s, explanation: t(tf.why), exam: { format: 'tf', points: 1 } });
 }
 
 function derivDef(level, rng, profile, opts = {}) {
@@ -293,9 +294,9 @@ function derivDef(level, rng, profile, opts = {}) {
 
 const RUL = 'a1-deriv-rules';
 const RUL_SUB = {
-  rules: { id: 'rules', label: 'produit, quotient, chaîne', skill: 'g6-deriv-rules' },
-  arc: { id: 'arc', label: 'dérivées des fonctions arc', skill: 'g3-arc-def' },
-  hyp: { id: 'hyp', label: 'dérivées hyperboliques', skill: 'g2-hyp-def' },
+  rules: { id: 'rules', label: t('produit, quotient, chaîne'), skill: 'g6-deriv-rules' },
+  arc: { id: 'arc', label: t('dérivées des fonctions arc'), skill: 'g3-arc-def' },
+  hyp: { id: 'hyp', label: t('dérivées hyperboliques'), skill: 'g2-hyp-def' },
 };
 const RUL_DOMAIN = { x: [0.2, 0.9] };
 
@@ -395,7 +396,7 @@ const RULE_OPTIONS = [
   { id: 'product', label: '(uv)′ = u′v + uv′' }, { id: 'quotient', label: '(u/v)′ = (u′v − uv′)/v²' },
   { id: 'chain', label: '(f∘g)′ = f′(g)·g′' }, { id: 'sum', label: '(u + v)′ = u′ + v′' },
 ];
-const RULE_NAME = { product: 'Règle du produit', quotient: 'Règle du quotient', chain: 'Règle de chaîne' };
+const RULE_NAME = { product: t('Règle du produit'), quotient: t('Règle du quotient'), chain: t('Règle de chaîne') };
 const SHAPES = { 1: ['product', 'product', 'chain', 'quotient'], 2: ['product', 'product', 'chain', 'quotient'], 3: ['product', 'product', 'chain', 'quotient', 'chainExp'] };
 
 // f′ at 0 or 1 when it is a fraction (level 5).
@@ -422,20 +423,20 @@ function rulLines(level, rng, opts) {
   const key = `${RUL}:${d.f}:${level}`;
   const judge = { kind: 'equiv', vars: ['x'], dvar: 'x', domain: RUL_DOMAIN, target: 'no-prime', seed: seedOf(key) };
   const last = d.kind === 'arc' ? 'arc' : d.kind === 'hyp' ? 'hyp' : 'rules';
-  const finalLine = E(d.fp, 'Assembler', last, 'simplify');
+  const finalLine = E(d.fp, t('Assembler'), last, 'simplify');
   const P = d.parts;
   let script;
   if (level <= 2) {
     const ruleLine = E(P.line, RULE_NAME[d.rule], 'rules', d.rule);
     const firstFinal = equivFinal(judge, parse(ruleLine.math)) === true;
     const given = d.rule === 'chain'
-      ? `f(x) = ${MT(d.f)} est une composée ; la dérivée extérieure vaut ${MT(fracT(P.outer))}.`
+      ? t('f(x) = {f} est une composée ; la dérivée extérieure vaut {p1}.', { f: MT(d.f), p1: MT(fracT(P.outer)) })
       : `u = ${MT(P.u.t)}, v = ${MT(P.v.t)}${level === 1 ? `, u′ = ${MT(fracT(P.u.d))}, v′ = ${MT(fracT(P.v.d))}` : ''}.`;
     const choose = {
-      kind: 'decision', prompt: 'Quelle règle d\'abord ?', options: [
-        { id: 'product', label: 'Règle du produit', valid: d.rule === 'product', why: 'Ce n\'est pas un produit de deux fonctions de x.' },
-        { id: 'quotient', label: 'Règle du quotient', valid: d.rule === 'quotient', why: 'Il n\'y a pas de x au dénominateur.' },
-        { id: 'chain', label: 'Règle de chaîne', valid: d.rule === 'chain', why: 'Regarde l\'opération la plus extérieure : c\'est elle qui décide de la première règle.' },
+      kind: 'decision', prompt: t('Quelle règle d\'abord ?'), options: [
+        { id: 'product', label: t('Règle du produit'), valid: d.rule === 'product', why: t('Ce n\'est pas un produit de deux fonctions de x.') },
+        { id: 'quotient', label: t('Règle du quotient'), valid: d.rule === 'quotient', why: t('Il n\'y a pas de x au dénominateur.') },
+        { id: 'chain', label: t('Règle de chaîne'), valid: d.rule === 'chain', why: t('Regarde l\'opération la plus extérieure : c\'est elle qui décide de la première règle.') },
       ],
     };
     script = [
@@ -448,24 +449,24 @@ function rulLines(level, rng, opts) {
     const st = stepDeriv(fNode, 'x');
     const l1 = E(toText(st.node), RULE_NAME[d.rule], 'rules', d.rule);
     script = level === 3
-      ? [l1, { kind: 'rule', ask: 'Quelle règle as-tu utilisée en premier ?', correct: d.rule, options: RULE_OPTIONS }, finalLine]
+      ? [l1, { kind: 'rule', ask: t('Quelle règle as-tu utilisée en premier ?'), correct: d.rule, options: RULE_OPTIONS }, finalLine]
       : [l1, finalLine];
   }
   const subs = [RUL_SUB.rules, ...(last !== 'rules' ? [RUL_SUB[last]] : [])];
-  let prompt = rng.pick([`Dérive f(x) = ${MT(d.f)} sur ]0 ; 1[.`, `Calcule f′(x) pour f(x) = ${MT(d.f)}, x ∈ ]0 ; 1[.`]);
+  let prompt = rng.pick([t('Dérive f(x) = {f} sur ]0 ; 1[.', { f: MT(d.f) }), t('Calcule f′(x) pour f(x) = {f}, x ∈ ]0 ; 1[.', { f: MT(d.f) })]);
   if (nice) {
     const label = `f′(${nice.a})`;
-    script.push(segment(`Calcule maintenant ${label}.`, `${label} =`, nice.at, { kind: 'value', form: 'irreducible' }));
+    script.push(segment(t('Calcule maintenant {label}.', { label }), `${label} =`, nice.at, { kind: 'value', form: 'irreducible' }));
     script.push(E(N(nice.q), `${label} = ${frN(nice.q)}`, 'rules', 'simplify'));
-    prompt = `Soit f(x) = ${MT(d.f)}. Dérive f, puis calcule ${label}.`;
+    prompt = t('Soit f(x) = {f}. Dérive f, puis calcule {label}.', { f: MT(d.f), label });
   }
   return linesItem({
     skill: RUL, level, prompt, start, judge, mode: modeOf(level), script, keys: ['calcx', 'calcfn', 'explog', 'trig'],
     declares: { vars: ['x'], dvar: 'x' }, subgoals: subs, tapActions: level === 3 ? 'deriv' : null,
     hints: H(
-      d.rule === 'product' ? `Produit de deux facteurs : (uv)′ = u′v + uv′, avec u = ${MT(P.u.t)} et v = ${MT(P.v.t)}.`
-        : d.rule === 'quotient' ? `Quotient : (u/v)′ = (u′v − uv′)/v², avec u = ${MT(P.u.t)} et v = ${MT(P.v.t)}.`
-          : 'Composée : (f∘g)′ = f′(g)·g′. Arctg′ = 1/(1 + x²), Arcsin′ = 1/√(1 − x²), Argsh′ = 1/√(1 + x²), sinh′ = cosh.',
+      d.rule === 'product' ? t('Produit de deux facteurs : (uv)′ = u′v + uv′, avec u = {p1} et v = {p2}.', { p1: MT(P.u.t), p2: MT(P.v.t) })
+        : d.rule === 'quotient' ? t('Quotient : (u/v)′ = (u′v − uv′)/v², avec u = {p1} et v = {p2}.', { p1: MT(P.u.t), p2: MT(P.v.t) })
+          : t('Composée : (f∘g)′ = f′(g)·g′. Arctg′ = 1/(1 + x²), Arcsin′ = 1/√(1 − x²), Argsh′ = 1/√(1 + x²), sinh′ = cosh.'),
       `= ${boxed(blanked(E(P.line), P.holes))}`,
       `= ${MT(d.fp)}`,
     ),
@@ -495,7 +496,7 @@ function rulMcq(rng) {
   const extra = [d.fp.replace(/\+(?![^(]*\))/, '-'), `2×(${d.fp})`, `-(${d.fp})`, `(${d.fp})/2`].map((t) => parse(t));
   for (const n of extra) if (options.length < 4 && isNew(n)) options.push({ node: n, html: MM(pretty(n)), correct: false });
   return mcq({
-    skill: RUL, level: 4, prompt: `Quelle est la dérivée de f(x) = ${MT(d.f)} sur ]0 ; 1[ ?`,
+    skill: RUL, level: 4, prompt: t('Quelle est la dérivée de f(x) = {f} sur ]0 ; 1[ ?', { f: MT(d.f) }),
     options: uniqOptions(options.map(({ html, correct, rule }) => ({ html, correct, rule }))), key: `mcq:${d.f}`,
     exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: d.fallback,
     solution: [{ html: `f′(x) = ${MT(d.fp)}`, note: RULE_NAME[d.rule] }],
@@ -510,9 +511,9 @@ const RUL_TF = [
   { s: '(Argsh x)′ = 1/√(1 + x²).', truth: true, why: 'Vrai : Argsh x = Log(x + √(x² + 1)), de dérivée 1/√(x² + 1).' },
 ];
 function rulTf(rng) {
-  const t = rng.pick(RUL_TF);
-  if (!t.truth) return vfMcq(RUL, t.s, false, 'a1_arc_deriv_table', t.why, rng, t.s);
-  return tfItem({ skill: RUL, level: 4, statement: t.s, truth: true, key: t.s, explanation: t.why, exam: { format: 'tf', points: 1 } });
+  const tf = rng.pick(RUL_TF);
+  if (!tf.truth) return vfMcq(RUL, t(tf.s), false, 'a1_arc_deriv_table', t(tf.why), rng, tf.s);
+  return tfItem({ skill: RUL, level: 4, statement: t(tf.s), truth: true, key: tf.s, explanation: t(tf.why), exam: { format: 'tf', points: 1 } });
 }
 
 function derivRules(level, rng, profile, opts = {}) {

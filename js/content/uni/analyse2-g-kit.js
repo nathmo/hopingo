@@ -9,6 +9,7 @@ import { closedNumber } from '../../cas/closedform.js';
 import { MT as MTk } from './kit.js';
 import { toText } from '../../cas/print.js';
 import { blankLine } from '../../judges/lines.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => new Q(n, d);
 
@@ -232,8 +233,8 @@ export function blankLast(math, vars) {
 // checker fits a statement about coordinates or a formula): exam format tf.
 export function vfItem(mcqFn, { skill, statement, truth, rule = null, why, key }, rng) {
   return mcqFn({
-    skill, level: 4, prompt: `Vrai ou faux ?<br>« ${statement} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: truth, rule: truth ? null : rule }, { html: 'Faux', correct: !truth, rule: truth ? rule : null }],
+    skill, level: 4, prompt: t('Vrai ou faux ?<br>« {statement} »', { statement }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: truth, rule: truth ? null : rule }, { html: t('Faux'), correct: !truth, rule: truth ? rule : null }],
     key: `tf:${key}`, solution: [{ html: why, note: '' }], expectedSec: 60, exam: { format: 'tf', points: 1 },
   }, rng);
 }

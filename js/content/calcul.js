@@ -11,6 +11,7 @@
 
 import { answerItem, mcqItem } from './items.js';
 import { pickFact } from '../engine/facts.js';
+import { t } from '../i18n.js';
 
 // ---------- display ----------
 
@@ -34,22 +35,22 @@ const round = (x, step) => fix(Math.round(fix(x / step)) * step);
 // ---------- strategies, shown after a mistake ----------
 
 export function mulStrategy(a, b) {
-  const t = [10, 1, 2, 5, 9, 4, 3, 11, 6, 8, 12, 7].find((x) => x === a || x === b);
-  const n = t === a ? b : a;
+  const tab = [10, 1, 2, 5, 9, 4, 3, 11, 6, 8, 12, 7].find((x) => x === a || x === b);
+  const n = tab === a ? b : a;
   const r = a * b;
-  switch (t) {
-    case 10: return `× 10 : on ajoute un zéro. ${n} × 10 = ${r}.`;
-    case 1: return `Une fois ${n}, c'est ${n}.`;
-    case 2: return `× 2, c'est le double : ${n} + ${n} = ${r}.`;
-    case 5: return `× 5, c'est la moitié de × 10 : ${n} × 10 = ${n * 10}, et la moitié de ${n * 10} est ${r}.`;
-    case 9: return `× 9, c'est 10 fois moins une fois : ${n} × 10 − ${n} = ${n * 10} − ${n} = ${r}.`;
-    case 4: return `× 4, c'est le double du double : ${n} → ${2 * n} → ${r}.`;
-    case 3: return `× 3, c'est le double plus une fois : ${2 * n} + ${n} = ${r}.`;
-    case 11: return `× 11, c'est 10 fois plus une fois : ${n * 10} + ${n} = ${r}.`;
-    case 6: return `× 6, c'est 5 fois plus une fois : ${5 * n} + ${n} = ${r}.`;
-    case 8: return `× 8, c'est le double de × 4 : ${n} × 4 = ${4 * n}, et ${4 * n} × 2 = ${r}.`;
-    case 12: return `× 12, c'est 10 fois plus 2 fois : ${n * 10} + ${2 * n} = ${r}.`;
-    default: return `× 7, c'est 5 fois plus 2 fois : ${5 * n} + ${2 * n} = ${r}.`;
+  switch (tab) {
+    case 10: return t('× 10 : on ajoute un zéro. {n} × 10 = {r}.', { n, r });
+    case 1: return t('Une fois {n}, c\'est {n}.', { n });
+    case 2: return t('× 2, c\'est le double : {n} + {n} = {r}.', { n, r });
+    case 5: return t('× 5, c\'est la moitié de × 10 : {n} × 10 = {n10}, et la moitié de {n10} est {r}.', { n, n10: n * 10, r });
+    case 9: return t('× 9, c\'est 10 fois moins une fois : {n} × 10 − {n} = {n10} − {n} = {r}.', { n, n10: n * 10, r });
+    case 4: return t('× 4, c\'est le double du double : {n} → {n2} → {r}.', { n, n2: 2 * n, r });
+    case 3: return t('× 3, c\'est le double plus une fois : {n2} + {n} = {r}.', { n, n2: 2 * n, r });
+    case 11: return t('× 11, c\'est 10 fois plus une fois : {n10} + {n} = {r}.', { n, n10: n * 10, r });
+    case 6: return t('× 6, c\'est 5 fois plus une fois : {n5} + {n} = {r}.', { n, n5: 5 * n, r });
+    case 8: return t('× 8, c\'est le double de × 4 : {n} × 4 = {n4}, et {n4} × 2 = {r}.', { n, n4: 4 * n, r });
+    case 12: return t('× 12, c\'est 10 fois plus 2 fois : {n10} + {n2} = {r}.', { n10: n * 10, n2: 2 * n, r });
+    default: return t('× 7, c\'est 5 fois plus 2 fois : {n5} + {n2} = {r}.', { n5: 5 * n, n2: 2 * n, r });
   }
 }
 
@@ -61,8 +62,8 @@ export function squareStrategy(n) {
   else if (n === 20) s = '20² = 2² × 100 = 400.';
   else s = `${n}² = (20 + ${n - 20})² = 400 + 2 × 20 × ${n - 20} + ${n - 20}² = 400 + ${40 * (n - 20)} + ${(n - 20) ** 2} = ${r}.`;
   if (n % 10 === 5 && n > 10) {
-    const t = (n - 5) / 10;
-    s += ` Astuce des 5 : ${t} × ${t + 1} = ${t * (t + 1)}, puis on écrit 25 → ${r}.`;
+    const k = (n - 5) / 10;
+    s += ` ${t('Astuce des 5 : {k} × {k1} = {p}, puis on écrit 25 → {r}.', { k, k1: k + 1, p: k * (k + 1), r })}`;
   }
   return s;
 }
@@ -71,27 +72,27 @@ function addStrategy(a, b) {
   const big = Math.max(a, b);
   const small = Math.min(a, b);
   const sum = a + b;
-  if (a === b) return `C'est un double : ${a} + ${a} = ${sum}.`;
-  if (big - small === 1) return `Presque un double : ${small} + ${small} = ${2 * small}, plus 1 = ${sum}.`;
-  if (sum > 10) return `On fait 10 : ${big} + ${10 - big} = 10, puis 10 + ${sum - 10} = ${sum}.`;
-  return `On part du plus grand : ${big}, puis ${small} de plus → ${sum}.`;
+  if (a === b) return t('C\'est un double : {a} + {a} = {sum}.', { a, sum });
+  if (big - small === 1) return t('Presque un double : {s} + {s} = {s2}, plus 1 = {sum}.', { s: small, s2: 2 * small, sum });
+  if (sum > 10) return t('On fait 10 : {big} + {c} = 10, puis 10 + {rest} = {sum}.', { big, c: 10 - big, rest: sum - 10, sum });
+  return t('On part du plus grand : {big}, puis {small} de plus → {sum}.', { big, small, sum });
 }
 
 function subStrategy(c, b) {
   const d = c - b;
-  if (c > 10 && b > c - 10) return `On passe par 10 : ${c} − ${c - 10} = 10, puis 10 − ${b - (c - 10)} = ${d}. Vérifie : ${b} + ${d} = ${c}.`;
-  return `Pense à l'addition : ${b} + ${d} = ${c}, donc ${c} − ${b} = ${d}.`;
+  if (c > 10 && b > c - 10) return t('On passe par 10 : {c} − {c10} = 10, puis 10 − {rest} = {d}. Vérifie : {b} + {d} = {c}.', { c, c10: c - 10, rest: b - (c - 10), d, b });
+  return t('Pense à l\'addition : {b} + {d} = {c}, donc {c} − {b} = {d}.', { b, c, d });
 }
 
 function addSmallStrategy(a, b, plus) {
   if (plus) {
     const up = 10 - (a % 10);
-    if (b > up) return `On passe par la dizaine : ${a} + ${up} = ${a + up}, puis ${a + up} + ${b - up} = ${a + b}.`;
-    return `On ajoute aux unités : ${a} + ${b} = ${a + b}.`;
+    if (b > up) return t('On passe par la dizaine : {a} + {up} = {x}, puis {x} + {rest} = {r}.', { a, up, x: a + up, rest: b - up, r: a + b });
+    return t('On ajoute aux unités : {a} + {b} = {r}.', { a, b, r: a + b });
   }
   const down = a % 10;
-  if (b > down) return `On passe par la dizaine : ${a} − ${down} = ${a - down}, puis ${a - down} − ${b - down} = ${a - b}.`;
-  return `On retire aux unités : ${a} − ${b} = ${a - b}.`;
+  if (b > down) return t('On passe par la dizaine : {a} − {down} = {x}, puis {x} − {rest} = {r}.', { a, down, x: a - down, rest: b - down, r: a - b });
+  return t('On retire aux unités : {a} − {b} = {r}.', { a, b, r: a - b });
 }
 
 function addTwoStrategy(a, b, plus) {
@@ -101,12 +102,12 @@ function addTwoStrategy(a, b, plus) {
     const B = tens + 10;
     const d = B - b;
     return plus
-      ? `On arrondit puis on corrige : ${a} + ${B} − ${d} = ${a + B} − ${d} = ${a + b}.`
-      : `On arrondit puis on corrige : ${a} − ${B} + ${d} = ${a - B} + ${d} = ${a - b}.`;
+      ? t('On arrondit puis on corrige : {a} + {B} − {d} = {x} − {d} = {r}.', { a, B, d, x: a + B, r: a + b })
+      : t('On arrondit puis on corrige : {a} − {B} + {d} = {x} + {d} = {r}.', { a, B, d, x: a - B, r: a - b });
   }
   return plus
-    ? `Les dizaines, puis les unités : ${a} + ${tens} = ${a + tens}, puis ${a + tens} + ${u} = ${a + b}.`
-    : `Les dizaines, puis les unités : ${a} − ${tens} = ${a - tens}, puis ${a - tens} − ${u} = ${a - b}.`;
+    ? t('Les dizaines, puis les unités : {a} + {tens} = {x}, puis {x} + {u} = {r}.', { a, tens, x: a + tens, u, r: a + b })
+    : t('Les dizaines, puis les unités : {a} − {tens} = {x}, puis {x} − {u} = {r}.', { a, tens, x: a - tens, u, r: a - b });
 }
 
 // ---------- fact items ----------
@@ -125,7 +126,7 @@ function factItem(skill, level, { fact = null, left, right = '', expected, traps
   const expectedSec = sec ?? 3 + Math.max(0, digits - 2);
   return {
     skill, level, type: 'fact',
-    prompt: prompt || 'Calcule de tête.',
+    prompt: prompt || t('Calcule de tête.'),
     left, right, expected: String(expected), fact,
     traps: kept, strategy,
     baits: [...new Set(kept.map((t) => t.rule))],
@@ -136,7 +137,7 @@ function factItem(skill, level, { fact = null, left, right = '', expected, traps
 }
 
 const neighbours = (a, b) => [[a, b - 1], [a, b + 1], [a - 1, b], [a + 1, b]]
-  .map(([x, y]) => [x * y, 'fact_neighbor', `${x * y}, c'est ${x} × ${y} : un fait voisin. Ici, c'est ${a} × ${b}.`]);
+  .map(([x, y]) => [x * y, 'fact_neighbor', t('{p}, c\'est {x} × {y} : un fait voisin. Ici, c\'est {a} × {b}.', { p: x * y, x, y, a, b })]);
 
 function mulFact(a, b) {
   const [x, y] = a <= b ? [a, b] : [b, a];
@@ -146,7 +147,7 @@ function mulFact(a, b) {
       const [p, q] = rng.chance(0.5) ? [a, b] : [b, a];
       return factItem(skill, level, {
         fact: `mul:${x}x${y}`, left: m(num(p), op('×'), num(q), op('=')), expected: a * b,
-        traps: [...neighbours(p, q), [a + b, 'fact_add_for_mul', `${p} + ${q} = ${a + b} : ça, c'est une addition. ${p} × ${q}, c'est ${q} répété ${p} fois.`]],
+        traps: [...neighbours(p, q), [a + b, 'fact_add_for_mul', t('{p} + {q} = {s} : ça, c\'est une addition. {p} × {q}, c\'est {q} répété {p} fois.', { p, q, s: a + b })]],
         strategy: mulStrategy(a, b),
       });
     },
@@ -159,8 +160,8 @@ function divFact(a, b) {
     fact: `div:${c}:${a}`,
     make: (skill, level) => factItem(skill, level, {
       fact: `div:${c}:${a}`, left: m(num(c), op(':'), num(a), op('=')), expected: b,
-      traps: [b - 1, b + 1].map((v) => [v, 'fact_neighbor', `${a} × ${v} = ${a * v}, pas ${c}.`]),
-      strategy: `Chaque division cache une multiplication : ${c} : ${a} = ${b}, car ${a} × ${b} = ${c}.`,
+      traps: [b - 1, b + 1].map((v) => [v, 'fact_neighbor', t('{a} × {v} = {p}, pas {c}.', { a, v, p: a * v, c })]),
+      strategy: t('Chaque division cache une multiplication : {c} : {a} = {b}, car {a} × {b} = {c}.', { a, b, c }),
     }),
   };
 }
@@ -170,27 +171,27 @@ function missingFactorFact(a, b) {
   return {
     fact: `mis:${a}x?=${c}`,
     make: (skill, level) => factItem(skill, level, {
-      fact: `mis:${a}x?=${c}`, prompt: 'Trouve le nombre manquant.',
+      fact: `mis:${a}x?=${c}`, prompt: t('Trouve le nombre manquant.'),
       left: m(num(a), op('×')), right: m(op('='), num(c)), expected: b,
       traps: [
-        [c - a, 'missing_factor_subtract', `${c} − ${a} = ${c - a} : c'est une soustraction. On cherche combien de fois ${a} dans ${c}.`],
-        ...[b - 1, b + 1].map((v) => [v, 'fact_neighbor', `${a} × ${v} = ${a * v}, pas ${c}.`]),
+        [c - a, 'missing_factor_subtract', t('{c} − {a} = {d} : c\'est une soustraction. On cherche combien de fois {a} dans {c}.', { a, c, d: c - a })],
+        ...[b - 1, b + 1].map((v) => [v, 'fact_neighbor', t('{a} × {v} = {p}, pas {c}.', { a, v, p: a * v, c })]),
       ],
-      strategy: `On cherche combien de fois ${a} dans ${c} : ${c} : ${a} = ${b}, car ${a} × ${b} = ${c}.`,
+      strategy: t('On cherche combien de fois {a} dans {c} : {c} : {a} = {b}, car {a} × {b} = {c}.', { a, b, c }),
     }),
   };
 }
 
 function squareFact(n) {
   const r = n * n;
-  const t = Math.floor(n / 10);
+  const ten = Math.floor(n / 10);
   const u = n % 10;
   const traps = [
-    [2 * n, 'pow_times_exponent', `${n}² = ${n} × ${n}, pas ${n} × 2.`],
-    ...[n - 1, n + 1].map((k) => [n * k, 'fact_neighbor', `${n * k}, c'est ${n} × ${k}. Un carré, c'est ${n} × ${n}.`]),
+    [2 * n, 'pow_times_exponent', t('{n}² = {n} × {n}, pas {n} × 2.', { n })],
+    ...[n - 1, n + 1].map((k) => [n * k, 'fact_neighbor', t('{p}, c\'est {n} × {k}. Un carré, c\'est {n} × {n}.', { p: n * k, n, k })]),
   ];
-  if (n >= 10) traps.unshift([Number(`${t * t}${u * u}`), 'square_digits', `${n}² ne se fait pas chiffre par chiffre (${t}² puis ${u}²) : c'est ${n} × ${n} = ${r}.`]);
-  if (n > 10 && u) traps.unshift([(10 * t) ** 2 + u * u, 'pow_distribute_sum', `${n}² n'est pas ${10 * t}² + ${u}² : il manque le double produit, 2 × ${10 * t} × ${u} = ${20 * t * u}.`]);
+  if (n >= 10) traps.unshift([Number(`${ten * ten}${u * u}`), 'square_digits', t('{n}² ne se fait pas chiffre par chiffre ({t}² puis {u}²) : c\'est {n} × {n} = {r}.', { n, t: ten, u, r })]);
+  if (n > 10 && u) traps.unshift([(10 * ten) ** 2 + u * u, 'pow_distribute_sum', t('{n}² n\'est pas {t}² + {u}² : il manque le double produit, 2 × {t} × {u} = {p}.', { n, t: 10 * ten, u, p: 20 * ten * u })]);
   return {
     fact: `sq:${n}`,
     make: (skill, level) => factItem(skill, level, {
@@ -204,13 +205,13 @@ function rootFact(n) {
   return {
     fact: `rsq:${n}`,
     make: (skill, level) => factItem(skill, level, {
-      fact: `rsq:${n}`, prompt: 'Quel nombre au carré donne ce résultat ?',
+      fact: `rsq:${n}`, prompt: t('Quel nombre au carré donne ce résultat ?'),
       left: '', right: m(sup2, op('='), num(r)), expected: n,
       traps: [
-        [r / 2, 'sqrt_half', `${r} : 2 = ${r / 2}, mais on cherche le nombre qui, multiplié par lui-même, donne ${r}.`],
-        ...[n - 1, n + 1].map((k) => [k, 'fact_neighbor', `${k}² = ${k * k}, pas ${r}.`]),
+        [r / 2, 'sqrt_half', t('{r} : 2 = {h}, mais on cherche le nombre qui, multiplié par lui-même, donne {r}.', { r, h: r / 2 })],
+        ...[n - 1, n + 1].map((k) => [k, 'fact_neighbor', t('{k}² = {s}, pas {r}.', { k, s: k * k, r })]),
       ],
-      strategy: `${n} × ${n} = ${r}, donc ${n}² = ${r}. ${squareStrategy(n)}`,
+      strategy: `${t('{n} × {n} = {r}, donc {n}² = {r}.', { n, r })} ${squareStrategy(n)}`,
     }),
   };
 }
@@ -224,8 +225,8 @@ function addFact(a, b) {
       return factItem(skill, level, {
         fact: `add:${x}+${y}`, left: m(num(p), op('+'), num(q), op('=')), expected: a + b,
         traps: [
-          [a * b, 'fact_mul_for_add', `${p} × ${q} = ${a * b} : ça, c'est une multiplication. Ici, c'est ${p} + ${q}.`],
-          ...[a + b + 1, a + b - 1].map((v) => [v, 'count_off_by_one', `${v}, c'est à 1 près : ${p} + ${q} = ${a + b}.`]),
+          [a * b, 'fact_mul_for_add', t('{p} × {q} = {m} : ça, c\'est une multiplication. Ici, c\'est {p} + {q}.', { p, q, m: a * b })],
+          ...[a + b + 1, a + b - 1].map((v) => [v, 'count_off_by_one', t('{v}, c\'est à 1 près : {p} + {q} = {s}.', { v, p, q, s: a + b })]),
         ],
         strategy: addStrategy(a, b),
       });
@@ -237,13 +238,13 @@ function missingAddendFact(a, c) {
   return {
     fact: `mis:${a}+?=${c}`,
     make: (skill, level) => factItem(skill, level, {
-      fact: `mis:${a}+?=${c}`, prompt: 'Trouve le nombre manquant.',
+      fact: `mis:${a}+?=${c}`, prompt: t('Trouve le nombre manquant.'),
       left: m(num(a), op('+')), right: m(op('='), num(c)), expected: c - a,
       traps: [
-        [c + a, 'fact_add_for_sub', `${c} + ${a} = ${c + a} : on a additionné. On cherche ce qu'il faut ajouter à ${a} pour arriver à ${c}.`],
-        ...[c - a + 1, c - a - 1].map((v) => [v, 'count_off_by_one', `${a} + ${v} = ${a + v}, pas ${c}.`]),
+        [c + a, 'fact_add_for_sub', t('{c} + {a} = {s} : on a additionné. On cherche ce qu\'il faut ajouter à {a} pour arriver à {c}.', { a, c, s: c + a })],
+        ...[c - a + 1, c - a - 1].map((v) => [v, 'count_off_by_one', t('{a} + {v} = {s}, pas {c}.', { a, v, s: a + v, c })]),
       ],
-      strategy: `Combien pour aller de ${a} à ${c} ? ${subStrategy(c, a)}`,
+      strategy: `${t('Combien pour aller de {a} à {c} ?', { a, c })} ${subStrategy(c, a)}`,
     }),
   };
 }
@@ -254,8 +255,8 @@ function subFact(c, b) {
     make: (skill, level) => factItem(skill, level, {
       fact: `sub:${c}-${b}`, left: m(num(c), op('−'), num(b), op('=')), expected: c - b,
       traps: [
-        ...[c - b + 1, c - b - 1].map((v) => [v, 'count_off_by_one', `${v}, c'est à 1 près : ${b} + ${v} = ${b + v}, pas ${c}.`]),
-        [c + b, 'fact_add_for_sub', `${c} + ${b} = ${c + b} : on a additionné. Relis le signe : c'est ${c} − ${b}.`],
+        ...[c - b + 1, c - b - 1].map((v) => [v, 'count_off_by_one', t('{v}, c\'est à 1 près : {b} + {v} = {s}, pas {c}.', { v, b, s: b + v, c })]),
+        [c + b, 'fact_add_for_sub', t('{c} + {b} = {s} : on a additionné. Relis le signe : c\'est {c} − {b}.', { b, c, s: c + b })],
       ],
       strategy: subStrategy(c, b),
     }),
@@ -370,8 +371,8 @@ function addOneDigit(level, rng) {
   }
   const traps = [];
   const u = a % 10;
-  if (cross && plus) traps.push([a + b - 10, 'forget_carry', `${u} + ${b} = ${u + b} : ça fait ${u + b - 10} unités et <b>une dizaine de plus</b>, donc ${a + b}.`]);
-  if (cross && !plus) traps.push([a - u + Math.abs(u - b), 'sub_smaller_from_larger', `Aux unités, c'est ${u} − ${b}, pas ${b} − ${u}. Comme ${b} est plus grand que ${u}, on passe par la dizaine.`]);
+  if (cross && plus) traps.push([a + b - 10, 'forget_carry', t('{u} + {b} = {s} : ça fait {k} unités et <b>une dizaine de plus</b>, donc {r}.', { u, b, s: u + b, k: u + b - 10, r: a + b })]);
+  if (cross && !plus) traps.push([a - u + Math.abs(u - b), 'sub_smaller_from_larger', t('Aux unités, c\'est {u} − {b}, pas {b} − {u}. Comme {b} est plus grand que {u}, on passe par la dizaine.', { u, b })]);
   return factItem('cm-add1', level, {
     left: m(num(a), op(plus ? '+' : '−'), num(b), op('=')), expected: plus ? a + b : a - b,
     traps, strategy: addSmallStrategy(a, b, plus), sec: 6,
@@ -396,14 +397,14 @@ function addTwoDigits(level, rng) {
   const B = b - ub + 10;
   const traps = [];
   if (plus) {
-    if (carry) traps.push([a + b - 10, 'forget_carry', `${a % 10} + ${ub} = ${(a % 10) + ub} : ça fait <b>une dizaine de plus</b>, donc ${a + b}.`]);
-    if (ub >= 7) traps.push([a + B + (B - b), 'compensation_wrong_way', `En ajoutant ${B} au lieu de ${b}, on a ajouté ${B - b} de trop : il faut <b>retirer</b> ce surplus. ${a} + ${B} − ${B - b} = ${a + b}.`]);
+    if (carry) traps.push([a + b - 10, 'forget_carry', t('{ua} + {ub} = {s} : ça fait <b>une dizaine de plus</b>, donc {r}.', { ua: a % 10, ub, s: (a % 10) + ub, r: a + b })]);
+    if (ub >= 7) traps.push([a + B + (B - b), 'compensation_wrong_way', t('En ajoutant {B} au lieu de {b}, on a ajouté {d} de trop : il faut <b>retirer</b> ce surplus. {a} + {B} − {d} = {r}.', { a, b, B, d: B - b, r: a + b })]);
   } else {
     if (carry) {
-      traps.push([(Math.floor(a / 10) - Math.floor(b / 10)) * 10 + Math.abs((a % 10) - ub), 'sub_smaller_from_larger', `Aux unités, c'est ${a % 10} − ${ub}, pas ${ub} − ${a % 10}. On emprunte une dizaine, ou on passe par la dizaine.`]);
-      traps.push([a - b + 10, 'forget_carry', `On a emprunté une dizaine pour les unités : il faut aussi l'enlever aux dizaines, donc ${a - b}.`]);
+      traps.push([(Math.floor(a / 10) - Math.floor(b / 10)) * 10 + Math.abs((a % 10) - ub), 'sub_smaller_from_larger', t('Aux unités, c\'est {ua} − {ub}, pas {ub} − {ua}. On emprunte une dizaine, ou on passe par la dizaine.', { ua: a % 10, ub })]);
+      traps.push([a - b + 10, 'forget_carry', t('On a emprunté une dizaine pour les unités : il faut aussi l\'enlever aux dizaines, donc {r}.', { r: a - b })]);
     }
-    if (ub >= 7) traps.push([a - B - (B - b), 'compensation_wrong_way', `En retirant ${B} au lieu de ${b}, on a retiré ${B - b} de trop : il faut <b>rajouter</b> ce qui manque. ${a} − ${B} + ${B - b} = ${a - b}.`]);
+    if (ub >= 7) traps.push([a - B - (B - b), 'compensation_wrong_way', t('En retirant {B} au lieu de {b}, on a retiré {d} de trop : il faut <b>rajouter</b> ce qui manque. {a} − {B} + {d} = {r}.', { a, b, B, d: B - b, r: a - b })]);
   }
   return factItem('cm-add2', level, {
     left: m(num(a), op(plus ? '+' : '−'), num(b), op('=')), expected: plus ? a + b : a - b,
@@ -413,7 +414,13 @@ function addTwoDigits(level, rng) {
 
 // ---------- rounding ----------
 
-const PLACES = { 10: 'à la dizaine', 100: 'à la centaine', 1: 'à l’unité', 0.1: 'au dixième', 0.01: 'au centième' };
+const PLACES = {
+  10: 'Arrondis {x} à la dizaine.',
+  100: 'Arrondis {x} à la centaine.',
+  1: 'Arrondis {x} à l’unité.',
+  0.1: 'Arrondis {x} au dixième.',
+  0.01: 'Arrondis {x} au centième.',
+};
 
 function roundingItem(level, rng) {
   const step = { 1: 10, 2: 100, 3: 1, 4: 0.1, 5: rng.pick([1, 0.1, 0.01]) }[level];
@@ -433,11 +440,11 @@ function roundingItem(level, rng) {
   const cut = fix(Math.floor(fix(x / step)) * step);
   const den = step >= 1 ? 1 : Math.round(1 / step);
   const traps = cut !== r ? [{ value: [Math.round(cut * den), den], rule: 'round_truncate' }] : [];
-  return answerItem('cm-round', level, `Arrondis ${m(num(x))} ${PLACES[step]}.`, dec(r), {
+  return answerItem('cm-round', level, t(PLACES[step], { x: m(num(x)) }), dec(r), {
     keys: Number.isInteger(x) ? 'int' : 'dec',
     traps,
     solution: [
-      { math: dec(x), note: `Le chiffre qui décide est ${next} : de 0 à 4 on garde, de 5 à 9 on monte.` },
+      { math: dec(x), note: t('Le chiffre qui décide est {d} : de 0 à 4 on garde, de 5 à 9 on monte.', { d: next }) },
       { math: dec(r), note: '' },
     ],
     key: `${x}@${step}`,
@@ -494,9 +501,9 @@ function estimateItem(level, rng) {
   const values = [...new Set([est, fix(est * 10), fix(est * 100), fix(est / 10)])].filter((v) => v > 0).slice(0, 4);
   values.sort((x, y) => x - y);
   const options = values.map((v) => ({ html: m(num(v)), correct: v === est }));
-  return mcqItem('cm-estimate', level, `Sans calculer exactement : ${expr} vaut environ…`, options, rng, {
+  return mcqItem('cm-estimate', level, t('Sans calculer exactement : {e} vaut environ…', { e: expr }), options, rng, {
     keepOrder: true,
-    solution: [{ math: sol, note: 'On arrondit chaque nombre, puis on calcule.' }, { math: dec(est), note: '' }],
+    solution: [{ math: sol, note: t('On arrondit chaque nombre, puis on calcule.') }, { math: dec(est), note: '' }],
     key: expr,
     expectedSec: 10,
   });
@@ -513,14 +520,14 @@ function cleverItem(level, rng) {
     if (rng.chance(0.5)) {
       const n = rng.int(13, 49);
       expected = 2 * n;
-      prompt = `Le double de ${m(num(n))} ?`;
-      solution = [{ math: `${n}+${n}`, note: `Double des dizaines (${2 * (n - (n % 10))}) et des unités (${2 * (n % 10)}).` }, { math: String(expected), note: '' }];
+      prompt = t('Le double de {n} ?', { n: m(num(n)) });
+      solution = [{ math: `${n}+${n}`, note: t('Double des dizaines ({d}) et des unités ({u}).', { d: 2 * (n - (n % 10)), u: 2 * (n % 10) }) }, { math: String(expected), note: '' }];
       key = `double ${n}`;
     } else {
       const n = 2 * rng.int(12, 49);
       expected = n / 2;
-      prompt = `La moitié de ${m(num(n))} ?`;
-      solution = [{ math: `${n}÷2`, note: 'Moitié des dizaines, puis des unités.' }, { math: String(expected), note: '' }];
+      prompt = t('La moitié de {n} ?', { n: m(num(n)) });
+      solution = [{ math: `${n}÷2`, note: t('Moitié des dizaines, puis des unités.') }, { math: String(expected), note: '' }];
       key = `moitié ${n}`;
     }
   } else {
@@ -530,29 +537,29 @@ function cleverItem(level, rng) {
     if (level === 2) {
       a = 2 * rng.int(6, 49);
       b = 5;
-      lines = [[`${a}×10÷2`, '× 5, c\'est × 10 puis ÷ 2.'], [`${a * 10}÷2`, '']];
+      lines = [[`${a}×10÷2`, t('× 5, c\'est × 10 puis ÷ 2.')], [`${a * 10}÷2`, '']];
     } else if (level === 3) {
       a = 4 * rng.int(2, 24);
       b = 25;
-      lines = [[`${a}×100÷4`, '× 25, c\'est × 100 puis ÷ 4.'], [`${a * 100}÷4`, '']];
+      lines = [[`${a}×100÷4`, t('× 25, c\'est × 100 puis ÷ 4.')], [`${a * 100}÷4`, '']];
     } else if (level === 4) {
       a = rng.int(12, 49);
       b = rng.pick([9, 11]);
-      lines = [[`${a}×10${b === 9 ? '-' : '+'}${a}`, b === 9 ? '× 9, c\'est 10 fois moins une fois.' : '× 11, c\'est 10 fois plus une fois.'], [`${a * 10}${b === 9 ? '-' : '+'}${a}`, '']];
+      lines = [[`${a}×10${b === 9 ? '-' : '+'}${a}`, b === 9 ? t('× 9, c\'est 10 fois moins une fois.') : t('× 11, c\'est 10 fois plus une fois.')], [`${a * 10}${b === 9 ? '-' : '+'}${a}`, '']];
     } else if (rng.chance(0.5)) {
       a = rng.int(12, 48);
       b = 50;
-      lines = [[`${a}×100÷2`, '× 50, c\'est × 100 puis ÷ 2.'], [`${a * 100}÷2`, '']];
+      lines = [[`${a}×100÷2`, t('× 50, c\'est × 100 puis ÷ 2.')], [`${a * 100}÷2`, '']];
     } else {
       const c = 5 * rng.int(21, 99);
       expected = c / 5;
-      prompt = `Calcule de tête : ${m(num(c), op(':'), num(5))}`;
-      solution = [{ math: `${c}×2÷10`, note: '÷ 5, c\'est × 2 puis ÷ 10.' }, { math: `${2 * c}÷10`, note: '' }, { math: String(expected), note: '' }];
+      prompt = t('Calcule de tête : {e}', { e: m(num(c), op(':'), num(5)) });
+      solution = [{ math: `${c}×2÷10`, note: t('÷ 5, c\'est × 2 puis ÷ 10.') }, { math: `${2 * c}÷10`, note: '' }, { math: String(expected), note: '' }];
       key = `${c}:5`;
     }
     if (!prompt) {
       expected = a * b;
-      prompt = `Calcule de tête : ${m(num(a), op('×'), num(b))}`;
+      prompt = t('Calcule de tête : {e}', { e: m(num(a), op('×'), num(b)) });
       solution = [{ math: `${a}×${b}`, note: '' }, ...lines.map(([math, note]) => ({ math, note })), { math: String(expected), note: '' }];
       key = `${a}x${b}`;
     }

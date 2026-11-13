@@ -20,6 +20,7 @@ import { parse } from './parse.js';
 import { compileFloat, evalFloat } from './numeric.js';
 import { evalComplex } from './complex.js';
 import { contains, symbolsIn } from './ast.js';
+import { t as tr } from '../i18n.js';
 
 export const PARAM_LETTERS = ['t', 's', 'u', 'v', 'θ', 'φ', 'r', 'x', 'y', 'ρ', 'ψ'];
 const SUBDIG = { '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9' };
@@ -50,7 +51,7 @@ function readBounds(text, letters) {
   const num = (s) => {
     const n = parse(s, { vars: [] });
     const x = evalFloat(n, {});
-    if (!Number.isFinite(x)) throw new Error(`Je ne lis pas la borne « ${s} ».`);
+    if (!Number.isFinite(x)) throw new Error(tr('Je ne lis pas la borne « {s} ».', { s }));
     return x;
   };
   for (const piece of splitTop(text, [',', ' et ', ' pour '])) {
@@ -59,11 +60,11 @@ function readBounds(text, letters) {
     if (m) {
       const names = m[1].split(/[;,]/).map((s) => s.trim());
       const ivs = splitTop(m[2], ['×']);
-      if (names.length !== ivs.length) throw new Error('Il faut un intervalle par paramètre.');
+      if (names.length !== ivs.length) throw new Error(tr('Il faut un intervalle par paramètre.'));
       names.forEach((name, k) => {
-        if (!letters.includes(name)) throw new Error(`« ${name} » n'est pas un paramètre.`);
+        if (!letters.includes(name)) throw new Error(tr('« {name} » n\'est pas un paramètre.', { name }));
         const iv = /^[[\]]\s*(.+?)\s*;\s*(.+?)\s*[[\]]$/.exec(ivs[k]);
-        if (!iv) throw new Error('Écris l\'intervalle [a ; b], avec un point-virgule.');
+        if (!iv) throw new Error(tr('Écris l\'intervalle [a ; b], avec un point-virgule.'));
         out[name] = [num(iv[1]), num(iv[2])];
         order.push(name);
       });
@@ -75,7 +76,7 @@ function readBounds(text, letters) {
       order.push(m[2].trim());
       continue;
     }
-    throw new Error(`Je ne lis pas « ${piece} » : écris t ∈ [a ; b].`);
+    throw new Error(tr('Je ne lis pas « {s} » : écris t ∈ [a ; b].', { s: piece }));
   }
   return { bounds: out, order };
 }
@@ -103,15 +104,15 @@ export function readParam(text, { params = ['t'], complex = false } = {}) {
   let body = head;
   if (head) {
     const eq = splitTop(head, ['=']);
-    if (eq.length > 2) throw new Error('Une seule fois « = » : γ(t) = (… ; …).');
+    if (eq.length > 2) throw new Error(tr('Une seule fois « = » : γ(t) = (… ; …).'));
     if (eq.length === 2) {
       label = readLabel(eq[0]);
-      if (!label) throw new Error(`Je ne lis pas « ${eq[0]} » : écris γ(t) = (… ; …).`);
+      if (!label) throw new Error(tr('Je ne lis pas « {s} » : écris γ(t) = (… ; …).', { s: eq[0] }));
       body = eq[1];
     }
   }
   const names = label?.params?.length ? label.params : params;
-  for (const n of names) if (!PARAM_LETTERS.includes(n)) throw new Error(`« ${n} » n'est pas un paramètre.`);
+  for (const n of names) if (!PARAM_LETTERS.includes(n)) throw new Error(tr('« {name} » n\'est pas un paramètre.', { name: n }));
   let comps = null;
   let isComplex = false;
   if (body) {
@@ -123,10 +124,10 @@ export function readParam(text, { params = ['t'], complex = false } = {}) {
       const n = parse(body, { vars: names, complex: true });
       comps = [n];
       isComplex = true;
-    } else throw new Error('Écris les composantes entre parenthèses, séparées par « ; ».');
+    } else throw new Error(tr('Écris les composantes entre parenthèses, séparées par « ; ».'));
     for (const c of comps) {
       const bad = [...symbolsIn(c)].filter((s) => !names.includes(s));
-      if (bad.length) throw new Error(`Je ne connais pas « ${bad[0]} » ici : les paramètres sont ${names.join(', ')}.`);
+      if (bad.length) throw new Error(tr('Je ne connais pas « {c} » ici : les paramètres sont {names}.', { c: bad[0], names: names.join(', ') }));
     }
   }
   const { bounds, order } = tail ? readBounds(tail, PARAM_LETTERS) : { bounds: {}, order: [] };

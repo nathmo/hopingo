@@ -22,6 +22,7 @@ import {
 import { exactForm } from '../cas/exactform.js';
 import { stripParen } from '../cas/ast.js';
 import { diagnoseLine } from './diagnose.js';
+import { t as tr } from '../i18n.js';
 
 export const sign = '=';
 
@@ -47,7 +48,7 @@ export function expected(cfg) {
 function readStrict(cfg, text) {
   const t = normVecText(text).replace(/^=\s*/, '');
   const parts = splitTop(t, '=').map((s) => s.trim());
-  if (parts.some((p) => !p)) throw new Error('Un membre de ta ligne est vide.');
+  if (parts.some((p) => !p)) throw new Error(tr('Un membre de ta ligne est vide.'));
   const opts = vopts(cfg);
   const env = envOf(cfg);
   const members = [];
@@ -158,22 +159,22 @@ export function judgeLine(cfg, prev, input) {
   else {
     try { node = readStrict(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (!node.value) return { kind: 'form', node, message: 'Écris une valeur : un point, un vecteur ou un nombre.' };
+  if (!node.value) return { kind: 'form', node, message: tr('Écris une valeur : un point, un vecteur ou un nombre.') };
   // Members of one line must be equal.
   for (let i = 1; i < node.members.length; i++) {
     if (!sameVal(node.members[i - 1].value, node.members[i].value, cfg)) {
-      return { kind: 'wrong', node, message: `Les membres de ta ligne ne sont pas égaux : ${vText(node.members[i - 1].value)} ≠ ${vText(node.members[i].value)}.`, rule: null, diag: null };
+      return { kind: 'wrong', node, message: tr('Les membres de ta ligne ne sont pas égaux : {a} ≠ {b}.', { a: vText(node.members[i - 1].value), b: vText(node.members[i].value) }), rule: null, diag: null };
     }
   }
   const want = expected(cfg) ?? prev?.value;
-  if (!want) return { kind: 'form', node, message: 'Je ne sais pas à quoi comparer ta ligne.' };
-  if (cfg.expect === undefined && prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
-  if (cfg.multiple && isZeroVal(node.value)) return { kind: 'wrong', node, message: 'Le vecteur nul ne convient pas.' };
+  if (!want) return { kind: 'form', node, message: tr('Je ne sais pas à quoi comparer ta ligne.') };
+  if (cfg.expect === undefined && prev?.text && node.text === prev.text) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
+  if (cfg.multiple && isZeroVal(node.value)) return { kind: 'wrong', node, message: tr('Le vecteur nul ne convient pas.') };
   if (!sameAs(cfg, want, node.value)) {
     const diag = diagnoseLine('vector', prev, node, cfg, (c, n) => sameVal(c.value ?? c, n.value, cfg) || (cfg.multiple && isMultiple(c.value ?? c, n.value)));
-    let message = 'Ce n\'est pas la bonne valeur.';
-    if (want.k !== node.value.k) message = want.k === 'v' ? 'On attend un point ou un vecteur.' : 'On attend un nombre.';
-    else if (want.k === 'v' && want.items.length !== node.value.items.length) message = `On attend ${want.items.length} composantes.`;
+    let message = tr('Ce n\'est pas la bonne valeur.');
+    if (want.k !== node.value.k) message = want.k === 'v' ? tr('On attend un point ou un vecteur.') : tr('On attend un nombre.');
+    else if (want.k === 'v' && want.items.length !== node.value.items.length) message = tr('On attend {n} composantes.', { n: want.items.length });
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   const fin = isFinal(cfg, node);

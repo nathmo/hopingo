@@ -22,6 +22,7 @@ import {
   q, qt, fq, H, nz, ML, polyT, polyD, polyAt, ptT, vecT, rowT,
   partsItem, examMcq, vfMcq, tfItem, a2Counter, coefLines, examTag,
 } from './analyse2-c-kit.js';
+import { t } from '../../i18n.js';
 
 const UV = ['u', 'v'];
 const isInt = (x) => Number.isFinite(x) && Math.abs(x - Math.round(x)) < 1e-9;
@@ -35,9 +36,9 @@ const allCells = (m, n) => { const out = []; for (let i = 0; i < m; i++) for (le
 const CH = 'a2-chain';
 const CH_SUB = [
   { id: 'image', label: 'g(a)', skill: 'a2-partials' },
-  { id: 'outer', label: 'J_f en g(a)', skill: 'a2-partials' },
+  { id: 'outer', label: t('J_f en g(a)'), skill: 'a2-partials' },
   { id: 'inner', label: 'J_g(a)', skill: 'a2-partials' },
-  { id: 'product', label: 'produit matriciel', skill: 'l-mat-product' },
+  { id: 'product', label: t('produit matriciel'), skill: 'l-mat-product' },
 ];
 
 // A component of g: 1 or 2 monomials in u, v (uv, u², v², u, v), maybe a constant.
@@ -118,43 +119,43 @@ function chainItem(level, rng, opts = {}) {
   const outer = rowT([d.fb]);
   const prod = rowT([d.Jh]);
   const pointDec = {
-    kind: 'decision', prompt: 'En quel point évaluer J_f ?', levels: [3], options: [
-      { id: 'ga', label: `En g(a) = ${ptT(d.b)}`, valid: true, ref: true },
-      { id: 'a', label: `En a = ${ptT(d.a)}`, valid: false, rule: 'a2_chain_wrong_point', why: `f reçoit g(a) = ${ptT(d.b)}, pas a.` },
+    kind: 'decision', prompt: t('En quel point évaluer J_f ?'), levels: [3], options: [
+      { id: 'ga', label: t('En g(a) = {p}', { p: ptT(d.b) }), valid: true, ref: true },
+      { id: 'a', label: t('En a = {p}', { p: ptT(d.a) }), valid: false, rule: 'a2_chain_wrong_point', why: t('f reçoit g(a) = {p}, pas a.', { p: ptT(d.b) }) },
     ],
   };
   const orderDec = {
-    kind: 'decision', prompt: 'Dans quel ordre multiplier ?', levels: [3], options: [
+    kind: 'decision', prompt: t('Dans quel ordre multiplier ?'), levels: [3], options: [
       { id: 'fg', label: 'J_f(g(a))·J_g(a)', valid: true, ref: true },
-      { id: 'gf', label: 'J_g(a)·J_f(g(a))', valid: false, rule: 'l_compose_order', why: 'g est appliquée en premier : sa jacobienne est à droite. Ici J_g·J_f (2 × 2 fois 1 × 2) n\'a même pas de sens.' },
+      { id: 'gf', label: 'J_g(a)·J_f(g(a))', valid: false, rule: 'l_compose_order', why: t('g est appliquée en premier : sa jacobienne est à droite. Ici J_g·J_f (2 × 2 fois 1 × 2) n\'a même pas de sens.') },
     ],
   };
   const menuOf = (valid) => [
-    { id: 'image', label: 'Calculer le point image g(a)', valid: valid === 'image' },
-    { id: 'outer', label: 'Évaluer J_f au point g(a)', valid: valid === 'outer' },
-    { id: 'outer-a', label: 'Évaluer J_f au point a', valid: false, rule: 'a2_chain_wrong_point', why: 'f reçoit g(a), pas a.' },
-    { id: 'inner', label: 'Calculer J_g, puis l\'évaluer en a', valid: valid === 'inner' },
-    { id: 'product', label: 'Multiplier J_f(g(a))·J_g(a)', valid: valid === 'product' },
+    { id: 'image', label: t('Calculer le point image g(a)'), valid: valid === 'image' },
+    { id: 'outer', label: t('Évaluer J_f au point g(a)'), valid: valid === 'outer' },
+    { id: 'outer-a', label: t('Évaluer J_f au point a'), valid: false, rule: 'a2_chain_wrong_point', why: t('f reçoit g(a), pas a.') },
+    { id: 'inner', label: t('Calculer J_g, puis l\'évaluer en a'), valid: valid === 'inner' },
+    { id: 'product', label: t('Multiplier J_f(g(a))·J_g(a)'), valid: valid === 'product' },
   ];
   const parts = [
-    { start: 'g', judge: { kind: 'mat', expect: vecT(d.b) }, notes: level === 1 ? ['Étape 1 : le point image g(a).'] : [], menu: menuOf('image'),
+    { start: 'g', judge: { kind: 'mat', expect: vecT(d.b) }, notes: level === 1 ? [t('Étape 1 : le point image g(a).')] : [], menu: menuOf('image'),
       lines: [{ math: vecT(d.b), note: `g${ptT(d.a)}`, subgoal: 'image', cells: level === 1 ? [[0, 0], [1, 0]] : undefined }] },
-    { html: level === 1 ? 'Étape 2 : J_f là-bas, au point g(a).' : 'La jacobienne de f au point g(a) :', ask: `J_f${ptT(d.b)} =`, start: 'J_f', judge: { kind: 'mat', expect: outer, chain: ch }, decisions: [pointDec], menu: menuOf('outer'),
-      lines: [{ math: outer, note: `On remplace (x, y) par g(a) = ${ptT(d.b)}`, subgoal: 'outer', cells: level === 1 ? [[0, 0], [0, 1]] : undefined }] },
-    { html: level === 1 ? 'Étape 3 : J_g ici, d\'abord en (u, v)…' : 'La jacobienne de g :', ask: 'J_g(u, v) =', start: 'J_g', judge: { kind: 'mat', vars: UV, expect: JgSym }, menu: menuOf('inner'),
-      lines: [{ math: JgSym, note: 'Une ligne par composante de g', subgoal: 'inner', cells: level === 1 ? allCells(2, 2) : undefined }] },
-    { html: '… puis au point a :', ask: `J_g${ptT(d.a)} =`, start: 'J_g', judge: { kind: 'mat', expect: JgNum }, menu: menuOf('inner'),
+    { html: level === 1 ? t('Étape 2 : J_f là-bas, au point g(a).') : t('La jacobienne de f au point g(a) :'), ask: `J_f${ptT(d.b)} =`, start: 'J_f', judge: { kind: 'mat', expect: outer, chain: ch }, decisions: [pointDec], menu: menuOf('outer'),
+      lines: [{ math: outer, note: t('On remplace (x, y) par g(a) = {p}', { p: ptT(d.b) }), subgoal: 'outer', cells: level === 1 ? [[0, 0], [0, 1]] : undefined }] },
+    { html: level === 1 ? t('Étape 3 : J_g ici, d\'abord en (u, v)…') : t('La jacobienne de g :'), ask: 'J_g(u, v) =', start: 'J_g', judge: { kind: 'mat', vars: UV, expect: JgSym }, menu: menuOf('inner'),
+      lines: [{ math: JgSym, note: t('Une ligne par composante de g'), subgoal: 'inner', cells: level === 1 ? allCells(2, 2) : undefined }] },
+    { html: t('… puis au point a :'), ask: `J_g${ptT(d.a)} =`, start: 'J_g', judge: { kind: 'mat', expect: JgNum }, menu: menuOf('inner'),
       lines: [{ math: JgNum, note: '', subgoal: 'inner', cells: level === 1 ? allCells(2, 2) : undefined }] },
-    { html: 'Le produit J_h(a) = J_f(g(a))·J_g(a) :', ask: `J_h${ptT(d.a)} =`, start: 'J_h', judge: { kind: 'mat', expect: prod, chain: ch }, decisions: [orderDec], menu: menuOf('product'),
+    { html: t('Le produit J_h(a) = J_f(g(a))·J_g(a) :'), ask: `J_h${ptT(d.a)} =`, start: 'J_h', judge: { kind: 'mat', expect: prod, chain: ch }, decisions: [orderDec], menu: menuOf('product'),
       lines: [
-        { math: `${outer}·${JgNum}`, note: 'J_f(g(a)) à gauche, J_g(a) à droite', subgoal: 'product' },
-        { math: prod, note: 'Ligne fois colonnes', subgoal: 'product', cells: guided ? [[0, 0], [0, 1]] : undefined },
+        { math: `${outer}·${JgNum}`, note: t('J_f(g(a)) à gauche, J_g(a) à droite'), subgoal: 'product' },
+        { math: prod, note: t('Ligne fois colonnes'), subgoal: 'product', cells: guided ? [[0, 0], [0, 1]] : undefined },
       ] },
   ];
   return partsItem({
     skill: CH, level, parts, subgoals: CH_SUB, key: `${CH}:${d.f}:${d.g.map((c) => polyT(c, UV)).join('|')}:${d.a}`, fallback: d.fallback,
-    prompt: `Soit ${gML(d)} et f : ℝ² → ℝ différentiable, de jacobienne ${jfML(d)}. On pose h = f ∘ g. Calcule J_h${ptT(d.a)}.`,
-    hints: H('J_h(a) = J_f(g(a))·J_g(a) : commence par calculer g(a).', `J_f${ptT(d.b)} = ${MLmat(outer)}`, `J_h${ptT(d.a)} = ${MLmat(outer)}·${MLmat(JgNum)} = ${MLmat(prod)}`),
+    prompt: t('Soit {g} et f : ℝ² → ℝ différentiable, de jacobienne {jf}. On pose h = f ∘ g. Calcule J_h{a}.', { g: gML(d), jf: jfML(d), a: ptT(d.a) }),
+    hints: H(t('J_h(a) = J_f(g(a))·J_g(a) : commence par calculer g(a).'), `J_f${ptT(d.b)} = ${MLmat(outer)}`, `J_h${ptT(d.a)} = ${MLmat(outer)}·${MLmat(JgNum)} = ${MLmat(prod)}`),
   });
 }
 
@@ -171,7 +172,7 @@ function chainMcq(level, rng, opts) {
   const opt = (x) => ML(qt(x));
   return examMcq({
     skill: CH, level, key: `${CH}:mcq:${d.f}:${d.g.map((c) => polyT(c, UV)).join('|')}:${d.a}`, fallback: d.fallback,
-    prompt: `Soit ${gML(d)} et f : ℝ² → ℝ différentiable, de jacobienne ${jfML(d)}. On pose h = f ∘ g. Alors ${name} vaut :`,
+    prompt: t('Soit {g} et f : ℝ² → ℝ différentiable, de jacobienne {jf}. On pose h = f ∘ g. Alors {name} vaut :', { g: gML(d), jf: jfML(d), name }),
     right: opt(right),
     wrongs: [{ html: opt(w.atA), rule: 'a2_chain_wrong_point' }, { html: opt(w.noInner), rule: 'a2_chain_no_inner' }, { html: opt(w.order), rule: 'l_compose_order' }],
     fillers: [{ html: opt(right.neg()), rule: null }, { html: opt(right.add(1)), rule: null }, { html: opt(right.sub(2)), rule: null }],
@@ -183,7 +184,7 @@ function chainCoef(level, rng, opts) {
   const { j, name, w } = chainAsk(d, rng);
   return coefLines({
     skill: CH, level, key: `${d.f}:${d.g.map((c) => polyT(c, UV)).join('|')}:${d.a}:${j}`, fallback: d.fallback,
-    prompt: `Soit ${gML(d)} et f : ℝ² → ℝ différentiable, de jacobienne ${jfML(d)}. On pose h = f ∘ g. Calcule ${name}.`,
+    prompt: t('Soit {g} et f : ℝ² → ℝ différentiable, de jacobienne {jf}. On pose h = f ∘ g. Calcule {name}.', { g: gML(d), jf: jfML(d), name }),
     label: `h_${VAR_NAMES[j]}`, value: qt(d.Jh[j]),
     judge: { chain: { coefAtA: qt(w.atA), coefNoInner: qt(w.noInner), ga: ptT(d.b), a: ptT(d.a) } },
     exam: examTag(opts, 1), subgoals: CH_SUB,
@@ -191,14 +192,14 @@ function chainCoef(level, rng, opts) {
   });
 }
 const CH_TF = [
-  { truth: false, key: 'order', s: 'Pour g : ℝ² → ℝ² et f : ℝ² → ℝ différentiables, J_{f∘g}(a) = J_g(a)·J_f(g(a)).', why: 'Faux : J_{f∘g}(a) = J_f(g(a))·J_g(a). Ici J_g(a)·J_f(g(a)) (2 × 2 fois 1 × 2) n\'a même pas de sens.', ruleIfTrue: 'l_compose_order' },
-  { truth: true, key: 'curve', s: 'Si f : ℝ² → ℝ est différentiable et γ : ℝ → ℝ² dérivable, alors (f∘γ)′(t) = ∇f(γ(t))·γ′(t).', why: 'Vrai : c\'est la règle de chaîne pour une courbe (une jacobienne 1 × 2 fois une 2 × 1).' },
-  { truth: false, key: 'point', s: 'Pour h = f∘g, on a J_h(a) = J_f(a)·J_g(a).', why: 'Faux : f reçoit g(a), il faut J_f(g(a)).', ruleIfTrue: 'a2_chain_wrong_point' },
+  { truth: false, key: 'order', s: t('Pour g : ℝ² → ℝ² et f : ℝ² → ℝ différentiables, J_{f∘g}(a) = J_g(a)·J_f(g(a)).'), why: t('Faux : J_{f∘g}(a) = J_f(g(a))·J_g(a). Ici J_g(a)·J_f(g(a)) (2 × 2 fois 1 × 2) n\'a même pas de sens.'), ruleIfTrue: 'l_compose_order' },
+  { truth: true, key: 'curve', s: t('Si f : ℝ² → ℝ est différentiable et γ : ℝ → ℝ² dérivable, alors (f∘γ)′(t) = ∇f(γ(t))·γ′(t).'), why: t('Vrai : c\'est la règle de chaîne pour une courbe (une jacobienne 1 × 2 fois une 2 × 1).') },
+  { truth: false, key: 'point', s: t('Pour h = f∘g, on a J_h(a) = J_f(a)·J_g(a).'), why: t('Faux : f reçoit g(a), il faut J_f(g(a)).'), ruleIfTrue: 'a2_chain_wrong_point' },
 ];
 function chainGen(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return chainMcq(4, rng, opts);
   if (opts.exam === 'coef') return chainCoef(4, rng, opts);
-  if (opts.exam === 'tf') { const t = rng.pick(CH_TF); return vfMcq(CH, t.s, t.truth, rng, { key: t.key, why: t.why, ruleIfTrue: t.ruleIfTrue }); }
+  if (opts.exam === 'tf') { const tf = rng.pick(CH_TF); return vfMcq(CH, tf.s, tf.truth, rng, { key: tf.key, why: tf.why, ruleIfTrue: tf.ruleIfTrue }); }
   if (level === 5) return chainMcq(5, rng, opts);
   return chainItem(level, rng, opts);
 }
@@ -209,9 +210,9 @@ function chainGen(level, rng, profile, opts = {}) {
 
 const CP = 'a2-chain-polar';
 const CP_SUB = [
-  { id: 'coords', label: 'r et φ', skill: 'g3-identities' },
-  { id: 'chain', label: 'règle de chaîne en polaires', skill: CH },
-  { id: 'solve', label: 'système 2 × 2', skill: 'eq-systems' },
+  { id: 'coords', label: t('r et φ'), skill: 'g3-identities' },
+  { id: 'chain', label: t('règle de chaîne en polaires'), skill: CH },
+  { id: 'solve', label: t('système 2 × 2'), skill: 'eq-systems' },
 ];
 
 // Numbers a + b√s (s = 1, 2 or 3 for the whole item).
@@ -304,7 +305,7 @@ const IDENTITIES = [
   { id: 'r2', t: 'f̃_r² + r²·f̃_φ²', rule: 'a2_polar_grad_factor' },
   { id: 'rr', t: 'f̃_r²/r² + f̃_φ²', rule: null },
 ];
-const WHY_ID = 'f̃_φ = r(−sin φ·f_x + cos φ·f_y) contient un facteur r : f_x² + f_y² = f̃_r² + f̃_φ²/r².';
+const WHY_ID = t('f̃_φ = r(−sin φ·f_x + cos φ·f_y) contient un facteur r : f_x² + f_y² = f̃_r² + f̃_φ²/r².');
 
 function polarItem(level, rng, opts = {}) {
   const d = polarData(rng);
@@ -313,31 +314,31 @@ function polarItem(level, rng, opts = {}) {
   const fin = `(${d.fx.text()} ; ${d.fy.text()})`;
   const phiT = piText(new Q(d.deg, 180));
   const idDec = {
-    kind: 'decision', prompt: 'Laquelle de ces identités est juste ? f_x² + f_y² =', levels: [3],
+    kind: 'decision', prompt: t('Laquelle de ces identités est juste ? f_x² + f_y² ='), levels: [3],
     options: IDENTITIES.map((o) => ({ id: o.id, label: o.t, valid: !!o.valid, ...(o.valid ? { ref: true } : { why: WHY_ID }), ...(o.rule ? { rule: o.rule } : {}) })),
   };
-  const sysNote = `f̃_r = cos φ·a + sin φ·b et f̃_φ = −r sin φ·a + r cos φ·b, avec a = ∂f/∂x${pt}, b = ∂f/∂y${pt}, et J_f̃(${d.r0}, ${phiT.replace(/-/g, '−')}) = (${d.R.show()}, ${d.P.show()}).`;
+  const sysNote = t('f̃_r = cos φ·a + sin φ·b et f̃_φ = −r sin φ·a + r cos φ·b, avec a = ∂f/∂x{pt}, b = ∂f/∂y{pt}, et J_f̃({r}, {phi}) = ({R}, {P}).', { pt, r: d.r0, phi: phiT.replace(/-/g, '−'), R: d.R.show(), P: d.P.show() });
   const parts = [
-    { start: 'r', judge: { kind: 'value', expect: String(d.r0) }, menu: [{ id: 'r', label: 'r = √(x² + y²)', valid: true }, { id: 'phi', label: 'φ = arctan(y/x)', valid: false, why: 'Commence par r = √(x² + y²).' }],
+    { start: 'r', judge: { kind: 'value', expect: String(d.r0) }, menu: [{ id: 'r', label: 'r = √(x² + y²)', valid: true }, { id: 'phi', label: 'φ = arctan(y/x)', valid: false, why: t('Commence par r = √(x² + y²).') }],
       lines: [{ math: String(d.r0), note: 'r = √(x² + y²)', subgoal: 'coords', blank: level === 1 ? [String(d.r0)] : [] }] },
-    { html: 'L\'angle polaire du point :', ask: 'φ =', start: 'φ', judge: { kind: 'value', expect: phiT, form: 'exact' }, menu: [{ id: 'phi', label: 'cos φ = x/r et sin φ = y/r', valid: true }],
+    { html: t('L\'angle polaire du point :'), ask: 'φ =', start: 'φ', judge: { kind: 'value', expect: phiT, form: 'exact' }, menu: [{ id: 'phi', label: t('cos φ = x/r et sin φ = y/r'), valid: true }],
       lines: [{ math: phiT, note: 'cos φ = x/r, sin φ = y/r', subgoal: 'coords' }] },
-    { html: 'La règle de chaîne au point, puis le système à résoudre (a = ∂f/∂x, b = ∂f/∂y au point) :', ask: '', start: 'a = f_x ; b = f_y', judge: { kind: 'system', vars: ['a', 'b'], solutions: [[d.fx.text(), d.fy.text()]] },
+    { html: t('La règle de chaîne au point, puis le système à résoudre (a = ∂f/∂x, b = ∂f/∂y au point) :'), ask: '', start: 'a = f_x ; b = f_y', judge: { kind: 'system', vars: ['a', 'b'], solutions: [[d.fx.text(), d.fy.text()]] },
       decisions: [idDec], notes: level <= 2 ? [sysNote] : [],
       menu: [
         { id: 'chain', label: 'f̃_r = cos φ·f_x + sin φ·f_y ; f̃_φ = −r sin φ·f_x + r cos φ·f_y', valid: true },
-        { id: 'chain-r', label: 'f̃_r = cos φ·f_x + sin φ·f_y ; f̃_φ = −sin φ·f_x + cos φ·f_y', valid: false, rule: 'a2_polar_grad_factor', why: 'Dériver r cos φ par rapport à φ donne −r sin φ : le facteur r reste.' },
-        { id: 'solve', label: 'Résoudre le système 2 × 2', valid: true },
+        { id: 'chain-r', label: 'f̃_r = cos φ·f_x + sin φ·f_y ; f̃_φ = −sin φ·f_x + cos φ·f_y', valid: false, rule: 'a2_polar_grad_factor', why: t('Dériver r cos φ par rapport à φ donne −r sin φ : le facteur r reste.') },
+        { id: 'solve', label: t('Résoudre le système 2 × 2'), valid: true },
       ],
       lines: [
-        { math: sys, note: `En (r, φ) = (${d.r0}, ${phiT.replace(/-/g, '−')})`, subgoal: 'chain' },
-        ...(solved(d) ? [] : [{ math: fin, note: '(∂f/∂x ; ∂f/∂y) au point', subgoal: 'solve' }]),
+        { math: sys, note: t('En (r, φ) = ({r}, {phi})', { r: d.r0, phi: phiT.replace(/-/g, '−') }), subgoal: 'chain' },
+        ...(solved(d) ? [] : [{ math: fin, note: t('(∂f/∂x ; ∂f/∂y) au point'), subgoal: 'solve' }]),
       ] },
   ];
   return partsItem({
     skill: CP, level, parts, subgoals: CP_SUB, key: `${CP}:${d.F}:${d.r0}:${d.deg}`, fallback: d.fallback,
-    prompt: `Soit f : ℝ² → ℝ différentiable et f̃(r, φ) = f(r cos φ, r sin φ). On sait que J_f̃(r, φ) = (${ML(d.fr)}, ${ML(d.fp)}). Calcule ∇f${pt}.`,
-    hints: H('Écris le point en polaires, puis f̃_r = cos φ·f_x + sin φ·f_y et f̃_φ = −r sin φ·f_x + r cos φ·f_y ; résous pour f_x et f_y.', `En φ = ${phiT.replace(/-/g, '−')} : cos φ = ${d.c.show()}, sin φ = ${d.sn.show()} ; f̃_r = ${d.R.show()}, f̃_φ = ${d.P.show()}`, tidy(readable(sys))),
+    prompt: t('Soit f : ℝ² → ℝ différentiable et f̃(r, φ) = f(r cos φ, r sin φ). On sait que J_f̃(r, φ) = ({fr}, {fp}). Calcule ∇f{pt}.', { fr: ML(d.fr), fp: ML(d.fp), pt }),
+    hints: H(t('Écris le point en polaires, puis f̃_r = cos φ·f_x + sin φ·f_y et f̃_φ = −r sin φ·f_x + r cos φ·f_y ; résous pour f_x et f_y.'), t('En φ = {phi} : cos φ = {c}, sin φ = {s} ; f̃_r = {R}, f̃_φ = {P}', { phi: phiT.replace(/-/g, '−'), c: d.c.show(), s: d.sn.show(), R: d.R.show(), P: d.P.show() }), tidy(readable(sys))),
   });
 }
 
@@ -346,7 +347,7 @@ function polarMcq(level, rng, opts) {
     const [ok, ...bad] = IDENTITIES;
     return examMcq({
       skill: CP, level, key: `${CP}:mcq:identity`,
-      prompt: 'Soit f : ℝ² → ℝ différentiable et f̃(r, φ) = f(r cos φ, r sin φ), r > 0. Alors f_x² + f_y² vaut :',
+      prompt: t('Soit f : ℝ² → ℝ différentiable et f̃(r, φ) = f(r cos φ, r sin φ), r > 0. Alors f_x² + f_y² vaut :'),
       right: ok.t, wrongs: bad.map((o) => ({ html: o.t, rule: o.rule })),
       solution: [{ html: WHY_ID, note: '' }],
     }, rng, opts);
@@ -357,7 +358,7 @@ function polarMcq(level, rng, opts) {
   const r = d.r0;
   return examMcq({
     skill: CP, level, key: `${CP}:mcq:${d.F}:${d.r0}:${d.deg}`, fallback: d.fallback,
-    prompt: `Soit f : ℝ² → ℝ différentiable et f̃(r, φ) = f(r cos φ, r sin φ). On sait que J_f̃(r, φ) = (${ML(d.fr)}, ${ML(d.fp)}). Alors ∇f${pt} vaut :`,
+    prompt: t('Soit f : ℝ² → ℝ différentiable et f̃(r, φ) = f(r cos φ, r sin φ). On sait que J_f̃(r, φ) = ({fr}, {fp}). Alors ∇f{pt} vaut :', { fr: ML(d.fr), fp: ML(d.fp), pt }),
     right: V(d.fx, d.fy),
     wrongs: [
       { html: V(d.c.mul(d.R).sub(d.sn.mul(d.P)), d.sn.mul(d.R).add(d.c.mul(d.P))), rule: 'a2_polar_grad_factor' },
@@ -374,14 +375,13 @@ function polarMcq(level, rng, opts) {
 function polarTf(rng, opts) {
   const exam = examTag(opts) || { format: 'tf', points: 1 };
   const which = rng.int(0, 3);
-  const pre = 'Soit f : ℝ² → ℝ de classe C¹ et f̃(r, φ) = f(r cos φ, r sin φ), r > 0. Pour tout (r, φ) : ';
-  if (which === 0) return tfItem({ skill: CP, level: 4, exam, key: 'id', truth: true, statement: `${pre}f_x² + f_y² = f̃_r² + f̃_φ²/r².`, explanation: WHY_ID });
-  if (which === 1) return tfItem({ skill: CP, level: 4, exam, key: 'fr', truth: true, statement: `${pre}f̃_r = cos φ·f_x + sin φ·f_y (dérivées de f prises en (r cos φ, r sin φ)).`, explanation: 'Vrai : règle de chaîne, ∂(r cos φ)/∂r = cos φ et ∂(r sin φ)/∂r = sin φ.' });
+  if (which === 0) return tfItem({ skill: CP, level: 4, exam, key: 'id', truth: true, statement: t('Soit f : ℝ² → ℝ de classe C¹ et f̃(r, φ) = f(r cos φ, r sin φ), r > 0. Pour tout (r, φ) : f_x² + f_y² = f̃_r² + f̃_φ²/r².'), explanation: WHY_ID });
+  if (which === 1) return tfItem({ skill: CP, level: 4, exam, key: 'fr', truth: true, statement: t('Soit f : ℝ² → ℝ de classe C¹ et f̃(r, φ) = f(r cos φ, r sin φ), r > 0. Pour tout (r, φ) : f̃_r = cos φ·f_x + sin φ·f_y (dérivées de f prises en (r cos φ, r sin φ)).'), explanation: t('Vrai : règle de chaîne, ∂(r cos φ)/∂r = cos φ et ∂(r sin φ)/∂r = sin φ.') });
   const factor = which === 2 ? '1' : 'r^2';
   return tfItem({
     skill: CP, level: 4, exam, key: `false-${factor}`, truth: false, ruleIfTrue: 'a2_polar_grad_factor',
-    statement: `${pre}f_x² + f_y² = f̃_r² + ${factor === '1' ? '' : 'r²·'}f̃_φ².`,
-    explanation: `Faux : ${WHY_ID} Avec f = x : f̃ = r cos φ, en r = 2, φ = π/2 : f_x² + f_y² = 1, mais f̃_r² + ${factor === '1' ? '' : 'r²·'}f̃_φ² = ${factor === '1' ? 4 : 64}.`,
+    statement: t('Soit f : ℝ² → ℝ de classe C¹ et f̃(r, φ) = f(r cos φ, r sin φ), r > 0. Pour tout (r, φ) : f_x² + f_y² = f̃_r² + {f}f̃_φ².', { f: factor === '1' ? '' : 'r²·' }),
+    explanation: t('Faux : {why} Avec f = x : f̃ = r cos φ, en r = 2, φ = π/2 : f_x² + f_y² = 1, mais f̃_r² + {f}f̃_φ² = {v}.', { why: WHY_ID, f: factor === '1' ? '' : 'r²·', v: factor === '1' ? 4 : 64 }),
     counter: a2Counter('polarGradIdentity', { factor }, [['f', 'f(x, y) =']], { f: 'x' }),
   });
 }
@@ -398,9 +398,9 @@ function polarGen(level, rng, profile, opts = {}) {
 
 const LR = 'a2-laplacian-radial';
 const LR_SUB = [
-  { id: 'formula', label: 'formule du laplacien radial', skill: LR },
-  { id: 'derivs', label: 'g′ et g″', skill: 'g6-deriv-rules' },
-  { id: 'combine', label: 'simplifier', skill: 'rat-simplify' },
+  { id: 'formula', label: t('formule du laplacien radial'), skill: LR },
+  { id: 'derivs', label: t('g′ et g″'), skill: 'g6-deriv-rules' },
+  { id: 'combine', label: t('simplifier'), skill: 'rat-simplify' },
 ];
 const RV = ['r', 'α'];
 const eqR = (extra = {}) => ({ kind: 'equiv', vars: ['r'], domain: { r: [0.2, 3] }, target: 'no-prime', ...extra });
@@ -453,28 +453,28 @@ function radialItem(level, rng) {
   const subst = `${G.d2.includes('e^') ? G.d2 : `(${G.d2})`}+(${k}/r)×(${G.d1})`;
   const lapJ = eqR({ lap: { n, g: G.g }, target: 'short', goal: G.lap(k), slack: 4 });
   const dec = {
-    kind: 'decision', prompt: `f ne dépend que de r = ‖x‖ dans ℝ${n === 2 ? '²' : '³'}. Quelle formule ?`, levels: [2, 3],
+    kind: 'decision', prompt: t('f ne dépend que de r = ‖x‖ dans ℝ{n}. Quelle formule ?', { n: n === 2 ? '²' : '³' }), levels: [2, 3],
     options: [...new Set([k, 1, n, n - 2])].filter((x) => x >= 0).map((x) => ({
-      id: `k${x}`, label: `Δf = ${formulaT(x)}`, valid: x === k, ...(x === k ? { ref: true } : { rule: 'a2_laplacian_n', why: `En dimension ${n}, le coefficient de g′/r est n − 1 = ${k}.` }),
+      id: `k${x}`, label: `Δf = ${formulaT(x)}`, valid: x === k, ...(x === k ? { ref: true } : { rule: 'a2_laplacian_n', why: t('En dimension {n}, le coefficient de g′/r est n − 1 = {k}.', { n, k }) }),
     })),
   };
   const parts = [
-    { start: `d(${G.g},r)`, judge: eqR(), decisions: [dec], notes: level === 1 ? [`Δf = g″ + ((n − 1)/r)·g′, ici n − 1 = ${k}.`] : [],
-      menu: [{ id: 'd1', label: 'Dériver g', valid: true }],
+    { start: `d(${G.g},r)`, judge: eqR(), decisions: [dec], notes: level === 1 ? [t('Δf = g″ + ((n − 1)/r)·g′, ici n − 1 = {k}.', { k })] : [],
+      menu: [{ id: 'd1', label: t('Dériver g'), valid: true }],
       lines: [{ math: G.d1, note: 'g′(r)', subgoal: 'derivs', blank: level === 1 ? [G.d1] : [] }] },
-    { html: 'Puis g″ :', ask: 'g″(r) =', start: `d(${G.d1},r)`, judge: eqR(), menu: [{ id: 'd2', label: 'Dériver g′', valid: true }],
+    { html: t('Puis g″ :'), ask: 'g″(r) =', start: `d(${G.d1},r)`, judge: eqR(), menu: [{ id: 'd2', label: t('Dériver g′'), valid: true }],
       lines: [{ math: G.d2, note: 'g″(r)', subgoal: 'derivs', blank: level === 1 ? [G.d2] : [] }] },
-    { html: `Le laplacien en dimension ${n} :`, ask: 'Δf =', start: lapStart, judge: lapJ,
-      menu: [{ id: 'subst', label: `Remplacer g′ et g″ dans g″ + (${k}/r)·g′`, valid: true }, { id: 'one', label: 'Remplacer dans g″ + g′/r', valid: k === 1, ...(k === 1 ? {} : { rule: 'a2_laplacian_n', why: `En dimension ${n}, le coefficient est ${k}.` }) }, { id: 'simp', label: 'Simplifier', valid: true }],
+    { html: t('Le laplacien en dimension {n} :', { n }), ask: 'Δf =', start: lapStart, judge: lapJ,
+      menu: [{ id: 'subst', label: t('Remplacer g′ et g″ dans g″ + ({k}/r)·g′', { k }), valid: true }, { id: 'one', label: t('Remplacer dans g″ + g′/r'), valid: k === 1, ...(k === 1 ? {} : { rule: 'a2_laplacian_n', why: t('En dimension {n}, le coefficient est {k}.', { n, k }) }) }, { id: 'simp', label: t('Simplifier'), valid: true }],
       lines: [
         ...(JUDGES.equiv.isFinal(lapJ, readWith(lapJ, subst)) === false ? [{ math: subst, note: `g″ + (${k}/r)·g′`, subgoal: 'formula' }] : []),
-        { math: G.lap(k), note: 'Simplifié', subgoal: 'combine' },
+        { math: G.lap(k), note: t('Simplifié'), subgoal: 'combine' },
       ] },
   ];
   return partsItem({
     skill: LR, level, parts, subgoals: LR_SUB, key: `${LR}:${G.g}:${n}`,
-    prompt: `Dans ℝ${n === 2 ? '²' : '³'}, soit f = ${ML(cartOf(G, n))} = g(r) avec g(r) = ${ML(G.g)} et r = ‖x‖. Calcule g′, g″, puis Δf en fonction de r.`,
-    hints: H(`f dépend seulement de r : utilise Δf = g″ + ((n − 1)/r)·g′.`, `Ici n − 1 = ${k} ; g′ = ${ML(G.d1)}`, `Δf = ${ML(subst)} = ${ML(G.lap(k))}`),
+    prompt: t('Dans ℝ{n}, soit f = {f} = g(r) avec g(r) = {g} et r = ‖x‖. Calcule g′, g″, puis Δf en fonction de r.', { n: n === 2 ? '²' : '³', f: ML(cartOf(G, n)), g: ML(G.g) }),
+    hints: H(t('f dépend seulement de r : utilise Δf = g″ + ((n − 1)/r)·g′.'), t('Ici n − 1 = {k} ; g′ = {d}', { k, d: ML(G.d1) }), `Δf = ${ML(subst)} = ${ML(G.lap(k))}`),
   });
 }
 
@@ -487,19 +487,19 @@ function alphaItem(level, rng, n = rng.pick([2, 3])) {
   const sol = n === 2 ? 'α = 0' : `α = 0 ou α = ${2 - n}`;
   const parts = [
     { start, judge: { kind: 'equiv', vars: RV, domain: { r: [0.3, 3], α: [-3, 3] }, target: 'short', goal: `${factor}r^(α-2)`, slack: 4, lap: { n, g: 'r^α' } },
-      menu: [{ id: 'subst', label: `g′ = αr^(α−1), g″ = α(α − 1)r^(α−2), dans g″ + (${k}/r)·g′`, valid: true }, { id: 'fact', label: 'Mettre r^(α−2) en facteur', valid: true }],
+      menu: [{ id: 'subst', label: t('g′ = αr^(α−1), g″ = α(α − 1)r^(α−2), dans g″ + ({k}/r)·g′', { k }), valid: true }, { id: 'fact', label: t('Mettre r^(α−2) en facteur'), valid: true }],
       lines: [
         { math: `α(α-1)r^(α-2)+${k === 1 ? '' : k}αr^(α-2)`, note: `g″ + (${k}/r)·g′`, subgoal: 'formula' },
-        { math: `${factor}r^(α-2)`, note: 'r^(α−2) en facteur', subgoal: 'combine' },
+        { math: `${factor}r^(α-2)`, note: t('r^(α−2) en facteur'), subgoal: 'combine' },
       ] },
-    { html: 'Δf = 0 pour r > 0 :', ask: '', start: eq, judge: { kind: 'solset', v: 'α' }, menu: [{ id: 'solve', label: 'Résoudre en α (r^(α−2) ≠ 0)', valid: true }],
-      lines: [{ math: sol, note: n === 2 ? 'Seule la constante r⁰ = 1 : en dimension 2, c\'est ln r qui est harmonique' : 'r⁰ = 1 et r⁻¹ = 1/r', subgoal: 'formula' }] },
+    { html: t('Δf = 0 pour r > 0 :'), ask: '', start: eq, judge: { kind: 'solset', v: 'α' }, menu: [{ id: 'solve', label: t('Résoudre en α (r^(α−2) ≠ 0)'), valid: true }],
+      lines: [{ math: sol, note: n === 2 ? t('Seule la constante r⁰ = 1 : en dimension 2, c\'est ln r qui est harmonique') : t('r⁰ = 1 et r⁻¹ = 1/r'), subgoal: 'formula' }] },
   ];
   const R = n === 2 ? 'x² + y²' : 'x² + y² + z²';
   return partsItem({
     skill: LR, level, parts, subgoals: LR_SUB, key: `${LR}:alpha:${n}`,
-    prompt: `Dans ℝ${n === 2 ? '²' : '³'} privé de 0, pour quelles valeurs de α la fonction f = (${R})^(α/2) = r^α vérifie-t-elle Δf = 0 ? Calcule d'abord Δf.`,
-    hints: H('f = g(r) avec g = r^α : Δf = g″ + ((n − 1)/r)·g′.', `Δf = ${ML(`α(α-1)r^(α-2)+${k === 1 ? '' : k}αr^(α-2)`)}`, `Δf = ${ML(`${factor}r^(α-2)`)} = 0`),
+    prompt: t('Dans ℝ{n} privé de 0, pour quelles valeurs de α la fonction f = ({R})^(α/2) = r^α vérifie-t-elle Δf = 0 ? Calcule d\'abord Δf.', { n: n === 2 ? '²' : '³', R }),
+    hints: H(t('f = g(r) avec g = r^α : Δf = g″ + ((n − 1)/r)·g′.'), `Δf = ${ML(`α(α-1)r^(α-2)+${k === 1 ? '' : k}αr^(α-2)`)}`, `Δf = ${ML(`${factor}r^(α-2)`)} = 0`),
   });
 }
 
@@ -514,16 +514,16 @@ function polarLapItem(level, rng) {
   const fin = piece(m * m - k * k) || '0';
   const parts = [
     { start: `pd(${F},r,r)+(1/r)×pd(${F},r)+(1/r^2)×pd(${F},φ,φ)`, judge: { kind: 'equiv', vars: ['r', 'φ'], domain: { r: [0.3, 3], φ: [-3, 3] }, target: 'short', goal: fin, slack: 4 },
-      menu: [{ id: 'd', label: 'Calculer f̃_rr, f̃_r et f̃_φφ', valid: true }, { id: 'simp', label: 'Simplifier', valid: true }],
+      menu: [{ id: 'd', label: t('Calculer f̃_rr, f̃_r et f̃_φφ'), valid: true }, { id: 'simp', label: t('Simplifier'), valid: true }],
       lines: [
         { math: subst, note: 'f̃_rr + f̃_r/r + f̃_φφ/r²', subgoal: 'formula' },
-        ...(subst === fin ? [] : [{ math: fin, note: m === k ? `m = k : f est harmonique` : 'Simplifié', subgoal: 'combine' }]),
+        ...(subst === fin ? [] : [{ math: fin, note: m === k ? t('m = k : f est harmonique') : t('Simplifié'), subgoal: 'combine' }]),
       ] },
   ];
   return partsItem({
     skill: LR, level, parts, subgoals: [...LR_SUB], key: `${LR}:polar:${F}`,
-    prompt: `Soit f dont l'expression en polaires est f̃(r, φ) = ${ML(F)}. Calcule Δf avec Δf = f̃_rr + f̃_r/r + f̃_φφ/r².`,
-    hints: H('Dérive deux fois en r, une fois en r, deux fois en φ, puis combine.', `f̃_rr = ${ML(joinSum([rPow(m * (m - 1), m - 2) === '0' ? '' : `${rPow(m * (m - 1), m - 2)}×${cosT}`]))}, f̃_φφ = ${ML(`${rPow(-k * k, m)}×${cosT}`)}`, `Δf = ${ML(fin)}`),
+    prompt: t('Soit f dont l\'expression en polaires est f̃(r, φ) = {F}. Calcule Δf avec Δf = f̃_rr + f̃_r/r + f̃_φφ/r².', { F: ML(F) }),
+    hints: H(t('Dérive deux fois en r, une fois en r, deux fois en φ, puis combine.'), `f̃_rr = ${ML(joinSum([rPow(m * (m - 1), m - 2) === '0' ? '' : `${rPow(m * (m - 1), m - 2)}×${cosT}`]))}, f̃_φφ = ${ML(`${rPow(-k * k, m)}×${cosT}`)}`, `Δf = ${ML(fin)}`),
   });
 }
 
@@ -534,7 +534,7 @@ function lapMcq(level, rng, opts) {
   const ks = [...new Set([1, n, n - 2])].filter((x) => x !== k && x >= 0);
   return examMcq({
     skill: LR, level, key: `${LR}:mcq:${G.g}:${n}`,
-    prompt: `Dans ℝ${n === 2 ? '²' : '³'}, soit f = ${ML(cartOf(G, n))}, c'est-à-dire f = g(r) avec g(r) = ${ML(G.g)}. Alors, pour r ≠ 0, Δf vaut :`,
+    prompt: t('Dans ℝ{n}, soit f = {f}, c\'est-à-dire f = g(r) avec g(r) = {g}. Alors, pour r ≠ 0, Δf vaut :', { n: n === 2 ? '²' : '³', f: ML(cartOf(G, n)), g: ML(G.g) }),
     right: ML(G.lap(k)),
     wrongs: ks.map((x) => ({ html: ML(G.lap(x)), rule: 'a2_laplacian_n' })),
     fillers: [{ html: ML(G.d2), rule: null }, { html: ML(G.lap(k + 2)), rule: null }],
@@ -542,25 +542,25 @@ function lapMcq(level, rng, opts) {
   }, rng, opts);
 }
 const LR_TF = [
-  { truth: false, key: 'inv-r2', s: '1/r = 1/√(x² + y²) est harmonique sur ℝ² \\ {0}.', why: 'Faux : en dimension 2, Δ(1/r) = 2/r³ − 1/r³ = 1/r³ ≠ 0. C\'est ln r qui est harmonique dans ℝ² \\ {0}.', counter: { f: '1/√(x^2+y^2)', n: 2, ans: { x: '1', y: '0' } }, ruleIfTrue: 'a2_laplacian_n' },
-  { truth: true, key: 'inv-r3', s: '1/r = 1/√(x² + y² + z²) est harmonique sur ℝ³ \\ {0}.', why: 'Vrai : g″ + (2/r)g′ = 2/r³ − 2/r³ = 0.' },
-  { truth: true, key: 'ln', s: 'ln r = ln √(x² + y²) est harmonique sur ℝ² \\ {0}.', why: 'Vrai : g″ + g′/r = −1/r² + 1/r² = 0.' },
-  { truth: false, key: 'r2', s: 'r² = x² + y² + z² est harmonique sur ℝ³.', why: 'Faux : Δ(x² + y² + z²) = 2 + 2 + 2 = 6.', counter: { f: 'x^2+y^2+z^2', n: 3, ans: { x: '1', y: '0', z: '0' } } },
+  { truth: false, key: 'inv-r2', s: t('1/r = 1/√(x² + y²) est harmonique sur ℝ² \\ {0}.'), why: t('Faux : en dimension 2, Δ(1/r) = 2/r³ − 1/r³ = 1/r³ ≠ 0. C\'est ln r qui est harmonique dans ℝ² \\ {0}.'), counter: { f: '1/√(x^2+y^2)', n: 2, ans: { x: '1', y: '0' } }, ruleIfTrue: 'a2_laplacian_n' },
+  { truth: true, key: 'inv-r3', s: t('1/r = 1/√(x² + y² + z²) est harmonique sur ℝ³ \\ {0}.'), why: t('Vrai : g″ + (2/r)g′ = 2/r³ − 2/r³ = 0.') },
+  { truth: true, key: 'ln', s: t('ln r = ln √(x² + y²) est harmonique sur ℝ² \\ {0}.'), why: t('Vrai : g″ + g′/r = −1/r² + 1/r² = 0.') },
+  { truth: false, key: 'r2', s: t('r² = x² + y² + z² est harmonique sur ℝ³.'), why: t('Faux : Δ(x² + y² + z²) = 2 + 2 + 2 = 6.'), counter: { f: 'x^2+y^2+z^2', n: 3, ans: { x: '1', y: '0', z: '0' } } },
 ];
 function lapTf(rng, opts) {
-  const t = rng.pick(LR_TF);
+  const tf = rng.pick(LR_TF);
   const exam = examTag(opts) || { format: 'tf', points: 1 };
-  const vars = t.counter?.n === 3 ? ['x', 'y', 'z'] : ['x', 'y'];
+  const vars = tf.counter?.n === 3 ? ['x', 'y', 'z'] : ['x', 'y'];
   return tfItem({
-    skill: LR, level: 4, exam, key: t.key, truth: t.truth, statement: t.s, explanation: t.why, ruleIfTrue: t.ruleIfTrue || null,
-    counter: t.counter ? a2Counter('notHarmonic', { f: t.counter.f, n: t.counter.n }, vars.map((v) => [v, `${v} =`]), t.counter.ans) : null,
+    skill: LR, level: 4, exam, key: tf.key, truth: tf.truth, statement: tf.s, explanation: tf.why, ruleIfTrue: tf.ruleIfTrue || null,
+    counter: tf.counter ? a2Counter('notHarmonic', { f: tf.counter.f, n: tf.counter.n }, vars.map((v) => [v, `${v} =`]), tf.counter.ans) : null,
   });
 }
 function lapGen(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return lapMcq(4, rng, opts);
   if (opts.exam === 'tf') return lapTf(rng, opts);
   if (level === 5) return rng.chance(0.5) ? alphaItem(5, rng, rng.pick([2, 3])) : radialItem(5, rng);
-  if (level === 4) { const t = rng.int(0, 2); if (t === 1) return alphaItem(level, rng); if (t === 2) return polarLapItem(level, rng); }
+  if (level === 4) { const pick = rng.int(0, 2); if (pick === 1) return alphaItem(level, rng); if (pick === 2) return polarLapItem(level, rng); }
   return radialItem(level, rng);
 }
 

@@ -18,6 +18,7 @@
 // of the natural spline of sin (order 4). Exam: mcq (degrees of freedom),
 // tf.
 
+import { t } from '../../i18n.js';
 import { linesItem, mcq, tfItem, examTag } from './kit.js';
 import { mcqDistinct } from './alglin-kit.js';
 import { refCode, codeItem, holesFor, readtableItem, multiMcq, expText, blankBy, vfMcq } from './numerique-kit.js';
@@ -38,24 +39,24 @@ function split(script) {
   const [seg, ...rest] = script;
   return { start: seg.start.math, judge: seg.judge, script: seg.html ? [{ kind: 'note', html: seg.html }, ...rest] : rest };
 }
-const menuOf = (menu, id) => menu.map((o) => ({ id: o.id, label: o.label, valid: o.id === id, why: o.id === id ? undefined : 'Pas maintenant : ce n\'est pas l\'étape suivante.' }));
+const menuOf = (menu, id) => menu.map((o) => ({ id: o.id, label: o.label, valid: o.id === id, why: o.id === id ? undefined : t('Pas maintenant : ce n\'est pas l\'étape suivante.') }));
 
 // ======================================================================
 // n-interp-piecewise
 // ======================================================================
 
 const SUB_PW = [
-  { id: 'max', label: 'max|f″| sur [a ; b]', skill: 'a1-extrema-global' },
-  { id: 'bound', label: 'la borne h²/8·max|f″|', skill: PW },
-  { id: 'n', label: 'le nombre de sous-intervalles', skill: PW },
-  { id: 'eval', label: 'évaluer Π₁ʰf', skill: PW },
-  { id: 'error', label: 'erreur d\'interpolation de degré 1', skill: 'n-interp-error' },
+  { id: 'max', label: t('max|f″| sur [a ; b]'), skill: 'a1-extrema-global' },
+  { id: 'bound', label: t('la borne h²/8·max|f″|'), skill: PW },
+  { id: 'n', label: t('le nombre de sous-intervalles'), skill: PW },
+  { id: 'eval', label: t('évaluer Π₁ʰf'), skill: PW },
+  { id: 'error', label: t('erreur d\'interpolation de degré 1'), skill: 'n-interp-error' },
 ];
 const PMENU = [
-  { id: 'max', label: 'Majorer |f″| sur l\'intervalle' },
-  { id: 'h', label: 'Résoudre h²/8·max|f″| ≤ tol' },
-  { id: 'n', label: 'En déduire n' },
-  { id: 'eval', label: 'Interpoler sur le bon sous-intervalle' },
+  { id: 'max', label: t('Majorer |f″| sur l\'intervalle') },
+  { id: 'h', label: t('Résoudre h²/8·max|f″| ≤ tol') },
+  { id: 'n', label: t('En déduire n') },
+  { id: 'eval', label: t('Interpoler sur le bon sous-intervalle') },
 ];
 
 const polyF = (k, al) => `${k === 1 ? '' : k}x³${al ? ` + ${al === 1 ? '' : al}x²` : ''}`;
@@ -97,11 +98,11 @@ function pwBoundSegs(d, { guided = false, menu = false } = {}) {
   const g = (line) => (guided ? { ...line, ...blankBy(line.math, [line.math]) } : line);
   const M = (id) => (menu ? { menu: menuOf(PMENU, id) } : {});
   return [
-    { kind: 'segment', html: `M = max|f″| sur [0 ; ${d.b}].`, ask: 'M =', start: { math: 'M' }, judge: { kind: 'value', expect: String(d.M), form: 'irreducible', ...M('max') } },
-    g({ kind: 'eq', math: String(d.M), note: `f″(x) = ${6 * d.k}x${d.al ? ` + ${2 * d.al}` : ''} croît : maximum en x = ${d.b}`, subgoal: 'max' }),
+    { kind: 'segment', html: t('M = max|f″| sur [0 ; {b}].', { b: d.b }), ask: 'M =', start: { math: 'M' }, judge: { kind: 'value', expect: String(d.M), form: 'irreducible', ...M('max') } },
+    g({ kind: 'eq', math: String(d.M), note: t('f″(x) = {f} croît : maximum en x = {b}', { f: `${6 * d.k}x${d.al ? ` + ${2 * d.al}` : ''}`, b: d.b }), subgoal: 'max' }),
     { kind: 'segment', html: `h²/8·M ≤ ${dec(d.tol)} ⇔ h ≤ √(8·tol/M).`, ask: 'h =', start: { math: `√(8×${decT(d.tol)}/${d.M})` }, judge: { kind: 'value', form: 'irreducible', p1: { tol: decT(d.tol), M: String(d.M) }, ...M('h') } },
-    g({ kind: 'eq', math: String(d.h), note: `Le plus grand pas permis : ${dec(d.h)}`, subgoal: 'bound' }),
-    { kind: 'segment', html: `n = (b − a)/h sous-intervalles.`, ask: 'n =', start: { math: `${d.b}/(${d.h})` }, judge: { kind: 'value', form: 'irreducible', ...M('n') } },
+    g({ kind: 'eq', math: String(d.h), note: t('Le plus grand pas permis : {h}', { h: dec(d.h) }), subgoal: 'bound' }),
+    { kind: 'segment', html: t('n = (b − a)/h sous-intervalles.'), ask: 'n =', start: { math: `${d.b}/(${d.h})` }, judge: { kind: 'value', form: 'irreducible', ...M('n') } },
     g({ kind: 'eq', math: String(d.n), note: `n ≥ ${d.b}/${dec(d.h)}`, subgoal: 'n' }),
   ];
 }
@@ -111,23 +112,23 @@ function pwEvalSegs(e, { decision = false, menu = false } = {}) {
   const out = [];
   if (decision) {
     out.push({
-      kind: 'decision', prompt: `Dans quel sous-intervalle se trouve x* = ${fq(e.xstar)} ?`, options: e.xs.slice(0, -1).map((x, j) => ({
-        id: `s${j}`, label: `[${x} ; ${e.xs[j + 1]}]`, valid: j === i, ...(j === i ? { ref: true } : { why: `${fq(e.xstar)} n'est pas dans [${x} ; ${e.xs[j + 1]}].` }),
+      kind: 'decision', prompt: t('Dans quel sous-intervalle se trouve x* = {x} ?', { x: fq(e.xstar) }), options: e.xs.slice(0, -1).map((x, j) => ({
+        id: `s${j}`, label: `[${x} ; ${e.xs[j + 1]}]`, valid: j === i, ...(j === i ? { ref: true } : { why: t('{x} n\'est pas dans [{a} ; {b}].', { x: fq(e.xstar), a: x, b: e.xs[j + 1] }) }),
       })),
     });
   }
   const start = `${P(e.ys[i])}+(${P(e.ys[i + 1])}-${P(e.ys[i])})×(${P(e.xstar)}-${e.xs[i]})/(${e.xs[i + 1]}-${e.xs[i]})`;
-  out.unshift({ kind: 'segment', html: `Π₁ʰf(x*) : la droite entre (${e.xs[i]} ; ${fq(e.ys[i])}) et (${e.xs[i + 1]} ; ${fq(e.ys[i + 1])}).`, ask: `Π₁ʰf(${fq(e.xstar)}) =`, start: { math: start }, judge: { kind: 'value', form: 'irreducible', ...(menu ? { menu: menuOf(PMENU, 'eval') } : {}) } });
+  out.unshift({ kind: 'segment', html: t('Π₁ʰf(x*) : la droite entre ({x0} ; {y0}) et ({x1} ; {y1}).', { x0: e.xs[i], y0: fq(e.ys[i]), x1: e.xs[i + 1], y1: fq(e.ys[i + 1]) }), ask: `Π₁ʰf(${fq(e.xstar)}) =`, start: { math: start }, judge: { kind: 'value', form: 'irreducible', ...(menu ? { menu: menuOf(PMENU, 'eval') } : {}) } });
   out.push({ kind: 'eq', math: String(e.v), note: 'yᵢ + (yᵢ₊₁ − yᵢ)(x* − xᵢ)/(xᵢ₊₁ − xᵢ)', subgoal: 'eval' });
   return out;
 }
 
 const pwHints = (d) => H(
-  'Sur chaque morceau, c\'est l\'interpolation de degré 1 : l\'erreur fait intervenir f″ et h², avec le facteur 1/8.',
+  t('Sur chaque morceau, c\'est l\'interpolation de degré 1 : l\'erreur fait intervenir f″ et h², avec le facteur 1/8.'),
   `(h²/8)·${d.M} ≤ ${dec(d.tol)} ⇔ h² ≤ □`,
   `M = ${d.M}, h = ${dec(d.h)}, n = ${d.n}.`,
 );
-const evalText = (e) => `Données : ${e.xs.map((x, j) => `(${x} ; ${fq(e.ys[j])})`).join(', ')}.`;
+const evalText = (e) => t('Données : {pts}.', { pts: e.xs.map((x, j) => `(${x} ; ${fq(e.ys[j])})`).join(', ') });
 
 function pwLines(rng, level) {
   const d = pwData(rng);
@@ -138,9 +139,9 @@ function pwLines(rng, level) {
     const dec0 = script.find((l) => l.kind === 'decision');
     return linesItem({
       skill: PW, level, mode: 'tap', tapActions: 'menu', keys: KEYS,
-      prompt: `${evalText(e)} Calcule l'interpolant linéaire par morceaux Π₁ʰf en x* = ${fq(e.xstar)}. Choisis d'abord le sous-intervalle.`,
+      prompt: `${evalText(e)} ${t('Calcule l\'interpolant linéaire par morceaux Π₁ʰf en x* = {x}. Choisis d\'abord le sous-intervalle.', { x: fq(e.xstar) })}`,
       start, judge, script: [dec0, ...script.filter((l) => l !== dec0)],
-      hints: H('Π₁ʰf est la droite qui joint les deux nœuds voisins de x*.', `Π₁ʰf(x*) = ${fq(e.ys[e.i])} + (${fq(e.ys[e.i + 1])} − ${PR(e.ys[e.i])})·(x* − ${e.xs[e.i]})/□`, `Π₁ʰf(${fq(e.xstar)}) = ${fq(e.v)}.`),
+      hints: H(t('Π₁ʰf est la droite qui joint les deux nœuds voisins de x*.'), `Π₁ʰf(x*) = ${fq(e.ys[e.i])} + (${fq(e.ys[e.i + 1])} − ${PR(e.ys[e.i])})·(x* − ${e.xs[e.i]})/□`, `Π₁ʰf(${fq(e.xstar)}) = ${fq(e.v)}.`),
       subgoals: SUB_PW, key: `${PW}:3:${e.xs}:${e.ys}:${e.xstar}`,
     });
   }
@@ -149,10 +150,10 @@ function pwLines(rng, level) {
   let e = null;
   if (level === 4) { e = evalData(rng); extra = pwEvalSegs(e); extra[0] = { ...extra[0], html: `${evalText(e)} ${extra[0].html}` }; }
   const { start, judge, script } = split([...segs, ...extra]);
-  const given = level === 1 ? ` On donne f″(x) = ${6 * d.k}x${d.al ? ` + ${2 * d.al}` : ''}.` : '';
+  const given = level === 1 ? t(' On donne f″(x) = {f}.', { f: `${6 * d.k}x${d.al ? ` + ${2 * d.al}` : ''}` }) : '';
   return linesItem({
     skill: PW, level, mode: level <= 2 ? 'guided' : 'free', keys: KEYS,
-    prompt: `f(x) = ${polyF(d.k, d.al)} sur [0 ; ${d.b}], interpolée linéairement par morceaux avec un pas h. Combien de sous-intervalles faut-il au moins pour garantir une erreur ≤ ${dec(d.tol)} ? (max|f − Π₁ʰf| ≤ (h²/8)·max|f″|)${given}${level === 4 ? ' Puis évalue un interpolant.' : ''}`,
+    prompt: t('f(x) = {f} sur [0 ; {b}], interpolée linéairement par morceaux avec un pas h. Combien de sous-intervalles faut-il au moins pour garantir une erreur ≤ {tol} ? (max|f − Π₁ʰf| ≤ (h²/8)·max|f″|)', { f: polyF(d.k, d.al), b: d.b, tol: dec(d.tol) }) + given + (level === 4 ? t(' Puis évalue un interpolant.') : ''),
     start, judge, script,
     hints: pwHints(d), subgoals: SUB_PW, baits: ['n_p1_bound'],
     key: `${PW}:${level}:${d.k}:${d.al}:${d.b}:${d.h}${e ? `:${e.xs}:${e.ys}` : ''}`, fallback: d.fallback,
@@ -176,30 +177,30 @@ const P1H_TESTS = [
 let P1T = null;
 function p1Table() {
   P1T ||= p1Rows();
-  return { columns: ['n', 'erreur max', 'h²/8'], rows: P1T.map((r) => [String(r.n), expText(r.err, 3), expText(r.bound, 3)]) };
+  return { columns: ['n', t('erreur max'), 'h²/8'], rows: P1T.map((r) => [String(r.n), expText(r.err, 3), expText(r.bound, 3)]) };
 }
 
 function pw5(rng) {
-  const t = p1Table();
+  const tb = p1Table();
   const then = readtableItem({
     skill: PW, level: 5, key: 'sin',
-    prompt: 'Avec ce programme, on interpole f = sin sur [0 ; π] en n sous-intervalles (h = π/n). Erreur maximale et borne h²/8·max|f″| :',
-    table: t,
+    prompt: t('Avec ce programme, on interpole f = sin sur [0 ; π] en n sous-intervalles (h = π/n). Erreur maximale et borne h²/8·max|f″| :'),
+    table: tb,
     question: multiMcq({
       skill: PW, level: 5, key: `${PW}:5q`,
-      prompt: 'Que lit-on dans ce tableau ?',
+      prompt: t('Que lit-on dans ce tableau ?'),
       options: [
-        { html: 'L\'erreur est divisée par environ 4 quand n double : ordre 2', correct: true },
-        { html: 'La borne h²/8·max|f″| est respectée', correct: true },
-        { html: 'L\'erreur est divisée par 2 quand n double : ordre 1', correct: false },
-        { html: 'La borne est très pessimiste (10 fois trop grande)', correct: false },
+        { html: t('L\'erreur est divisée par environ 4 quand n double : ordre 2'), correct: true },
+        { html: t('La borne h²/8·max|f″| est respectée'), correct: true },
+        { html: t('L\'erreur est divisée par 2 quand n double : ordre 1'), correct: false },
+        { html: t('La borne est très pessimiste (10 fois trop grande)'), correct: false },
       ],
-      solution: [{ html: `${t.rows[0][1]} → ${t.rows[1][1]} : rapport ≈ 3,7, puis ≈ 3,9 et 4 : ordre 2. Chaque erreur est sous h²/8 (max|sin″| = 1).`, note: '' }],
+      solution: [{ html: t('{e0} → {e1} : rapport ≈ 3,7, puis ≈ 3,9 et 4 : ordre 2. Chaque erreur est sous h²/8 (max|sin″| = 1).', { e0: tb.rows[0][1], e1: tb.rows[1][1] }), note: '' }],
     }, rng),
   });
   return codeItem({
     skill: PW, level: 5, ref: P1H, blanks: holesFor(5, P1H), traps: P1H_TRAPS, rng,
-    prompt: 'Complète la fonction qui évalue en x l\'interpolant linéaire par morceaux des données (xs[i] ; ys[i]), les xs étant croissants.',
+    prompt: t('Complète la fonction qui évalue en x l\'interpolant linéaire par morceaux des données (xs[i] ; ys[i]), les xs étant croissants.'),
     tests: P1H_TESTS, then, hints: [], subgoals: SUB_PW, key: '5',
   });
 }
@@ -207,9 +208,9 @@ function pw5(rng) {
 function pwTf(rng, opts) {
   return tfItem({
     skill: PW, level: 4, key: 'half', exam: examTag(opts), truth: false,
-    statement: 'Diviser h par 2 divise par 2 l\'erreur max|f − Π₁ʰf| de l\'interpolation linéaire par morceaux.',
-    counter: { kind: 'num', prop: 'p1Ratio', params: {}, ask: [{ v: 'f', label: 'f(x) = (sur [0 ; 1])' }], answer: { f: 'x^2' } },
-    explanation: 'Faux : l\'erreur est en h²/8·max|f″| ; elle est divisée par 4. Pour f(x) = x² sur [0 ; 1], elle vaut exactement h²/4 : 1/64 pour h = 1/4, 1/256 pour h = 1/8.',
+    statement: t('Diviser h par 2 divise par 2 l\'erreur max|f − Π₁ʰf| de l\'interpolation linéaire par morceaux.'),
+    counter: { kind: 'num', prop: 'p1Ratio', params: {}, ask: [{ v: 'f', label: t('f(x) = (sur [0 ; 1])') }], answer: { f: 'x^2' } },
+    explanation: t('Faux : l\'erreur est en h²/8·max|f″| ; elle est divisée par 4. Pour f(x) = x² sur [0 ; 1], elle vaut exactement h²/4 : 1/64 pour h = 1/4, 1/256 pour h = 1/8.'),
   });
 }
 
@@ -218,17 +219,17 @@ function pwTf(rng, opts) {
 // ======================================================================
 
 const SUB_SP = [
-  { id: 'continuity', label: 'les raccords en 0', skill: SP },
-  { id: 'natural', label: 's″ = 0 aux bords', skill: SP },
-  { id: 'interp', label: 'les conditions d\'interpolation', skill: SP },
-  { id: 'solve', label: 'résoudre le système', skill: 'l-sys-echelon' },
-  { id: 'pieces', label: 'les deux morceaux', skill: SP },
-  { id: 'pw', label: 'interpolation par morceaux', skill: 'n-interp-piecewise' },
+  { id: 'continuity', label: t('les raccords en 0'), skill: SP },
+  { id: 'natural', label: t('s″ = 0 aux bords'), skill: SP },
+  { id: 'interp', label: t('les conditions d\'interpolation'), skill: SP },
+  { id: 'solve', label: t('résoudre le système'), skill: 'l-sys-echelon' },
+  { id: 'pieces', label: t('les deux morceaux'), skill: SP },
+  { id: 'pw', label: t('interpolation par morceaux'), skill: 'n-interp-piecewise' },
 ];
 const SMENU = [
-  { id: 'interp', label: 'Écrire les conditions d\'interpolation' },
-  { id: 'solve', label: 'Résoudre en b et c' },
-  { id: 'natural', label: 'Appliquer s″(±1) = 0' },
+  { id: 'interp', label: t('Écrire les conditions d\'interpolation') },
+  { id: 'solve', label: t('Résoudre en b et c') },
+  { id: 'natural', label: t('Appliquer s″(±1) = 0') },
 ];
 
 function spData(rng) {
@@ -255,7 +256,7 @@ const cub = (a, b, c, dd) => {
   if (!parts.length) return '0';
   return parts.map((p, i) => (i === 0 ? (p.neg ? `−${p.s}` : p.s) : `${p.neg ? '−' : '+'} ${p.s}`)).join(' ');
 };
-const piecesHtml = (d) => `s(x) = ${cub(d.a, d.b, d.c, d.d1)} sur [−1 ; 0] et ${cub(d.a, d.b, d.c, d.d2)} sur [0 ; 1]`;
+const piecesHtml = (d) => t('s(x) = {p1} sur [−1 ; 0] et {p2} sur [0 ; 1]', { p1: cub(d.a, d.b, d.c, d.d1), p2: cub(d.a, d.b, d.c, d.d2) });
 
 function spSegs(d, { guided = false, formulas = false, menu = false } = {}) {
   const g = (line) => (guided ? { ...line, ...blankBy(line.math, [line.math]) } : line);
@@ -267,7 +268,7 @@ function spSegs(d, { guided = false, formulas = false, menu = false } = {}) {
     seg('b', 'b =', d.b, 's(1) − s(−1) = 2b.', `(${P(d.yp)}-${P(d.ym)})/2`),
     g({ kind: 'eq', math: String(d.b), note: `(${fq(d.yp)} − ${PR(d.ym)})/2`, subgoal: 'solve' }),
     seg('c', 'c =', d.c, 's(1) + s(−1) = 2a + 4c/3.', `3×(${P(d.yp)}+${P(d.ym)}-2×${P(d.a)})/4`),
-    g({ kind: 'eq', math: String(d.c), note: 'Car d₂ = −d₁ : les termes en x³ s\'annulent dans la somme', subgoal: 'solve' }),
+    g({ kind: 'eq', math: String(d.c), note: t('Car d₂ = −d₁ : les termes en x³ s\'annulent dans la somme'), subgoal: 'solve' }),
     seg('d_1', 'd₁ =', d.d1, 's″(−1) = 2c − 6d₁ = 0.', `(${P(d.c)})/3`),
     g({ kind: 'eq', math: String(d.d1), note: 'd₁ = c/3', subgoal: 'natural' }),
     seg('d_2', 'd₂ =', d.d2, 's″(1) = 2c + 6d₂ = 0.', `-(${P(d.c)})/3`),
@@ -277,26 +278,26 @@ function spSegs(d, { guided = false, formulas = false, menu = false } = {}) {
 const menuIdOf = { a: 'interp', b: 'solve', c: 'solve', d_1: 'natural', d_2: 'natural' };
 
 const spHints = (d) => H(
-  'Écris les 3 conditions de raccord en 0 (valeur, pente, courbure : mêmes a, b, c), puis s″ = 0 aux deux bouts, puis les données.',
+  t('Écris les 3 conditions de raccord en 0 (valeur, pente, courbure : mêmes a, b, c), puis s″ = 0 aux deux bouts, puis les données.'),
   `s″(−1) = 2c − 6d₁ = □ ; s(1) − s(−1) = □·b`,
   `a = ${fq(d.a)}, b = ${fq(d.b)}, c = ${fq(d.c)}, d₁ = ${fq(d.d1)}, d₂ = ${fq(d.d2)}.`,
 );
-const SP_FORM = 's(x) = a + bx + cx² + d₁x³ sur [−1 ; 0] et a + bx + cx² + d₂x³ sur [0 ; 1] (les raccords C² en 0 donnent les mêmes a, b, c)';
+const SP_FORM = t('s(x) = a + bx + cx² + d₁x³ sur [−1 ; 0] et a + bx + cx² + d₂x³ sur [0 ; 1] (les raccords C² en 0 donnent les mêmes a, b, c)');
 
 function spLines(rng, level) {
   const d = spData(rng);
   const decisionNatural = {
-    kind: 'decision', prompt: 'Spline naturelle : quelles conditions aux bords x = −1 et x = 1 ?', options: [
+    kind: 'decision', prompt: t('Spline naturelle : quelles conditions aux bords x = −1 et x = 1 ?'), options: [
       { id: 'nat', label: 's″(−1) = s″(1) = 0', valid: true, ref: true },
-      { id: 'slope', label: 's′(−1) = s′(1) = 0', valid: false, rule: 'n_spline_natural_first', why: 'Spline naturelle : la courbure s″ est nulle aux bords, pas la pente.' },
-      { id: 'none', label: 'Aucune : les conditions d\'interpolation suffisent', valid: false, rule: 'n_spline_count', why: '4·2 = 8 inconnues, 3 raccords et 3 données : il reste 2 conditions à fixer.' },
+      { id: 'slope', label: 's′(−1) = s′(1) = 0', valid: false, rule: 'n_spline_natural_first', why: t('Spline naturelle : la courbure s″ est nulle aux bords, pas la pente.') },
+      { id: 'none', label: t('Aucune : les conditions d\'interpolation suffisent'), valid: false, rule: 'n_spline_count', why: t('4·2 = 8 inconnues, 3 raccords et 3 données : il reste 2 conditions à fixer.') },
     ],
   };
   const decisionExtra = {
-    kind: 'decision', prompt: 'Il reste 2 degrés de liberté. Lesquels fixent la spline naturelle ?', options: [
-      { id: 'nat', label: 'Courbure nulle aux deux bouts', valid: true, ref: true },
-      { id: 'clamp', label: 'Pentes imposées aux deux bouts', valid: false, rule: 'n_spline_natural_first', why: 'C\'est la spline « encastrée » : la naturelle a s″ = 0 aux bords.' },
-      { id: 'knot', label: 'Même cubique sur les deux morceaux (not-a-knot)', valid: false, why: 'C\'est une autre spline ; la naturelle a s″ = 0 aux bords.' },
+    kind: 'decision', prompt: t('Il reste 2 degrés de liberté. Lesquels fixent la spline naturelle ?'), options: [
+      { id: 'nat', label: t('Courbure nulle aux deux bouts'), valid: true, ref: true },
+      { id: 'clamp', label: t('Pentes imposées aux deux bouts'), valid: false, rule: 'n_spline_natural_first', why: t('C\'est la spline « encastrée » : la naturelle a s″ = 0 aux bords.') },
+      { id: 'knot', label: t('Même cubique sur les deux morceaux (not-a-knot)'), valid: false, why: t('C\'est une autre spline ; la naturelle a s″ = 0 aux bords.') },
     ],
   };
   const opts = level === 1 ? { guided: true, formulas: true } : level === 2 ? { guided: true } : level === 3 ? { menu: true } : {};
@@ -304,7 +305,7 @@ function spLines(rng, level) {
   const pre = level === 2 ? [decisionNatural] : level === 3 ? [decisionExtra] : [];
   return linesItem({
     skill: SP, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', keys: KEYS, ...(level === 3 ? { tapActions: 'menu' } : {}),
-    prompt: `Spline cubique naturelle des points ${ptsSp(d)} : ${SP_FORM}. Trouve a, b, c, d₁ et d₂.`,
+    prompt: t('Spline cubique naturelle des points {pts} : {form}. Trouve a, b, c, d₁ et d₂.', { pts: ptsSp(d), form: SP_FORM }),
     start, judge, script: [...pre, ...script, { kind: 'note', html: `${piecesHtml(d)}.` }],
     hints: spHints(d), subgoals: SUB_SP, baits: level === 2 || level === 3 ? ['n_spline_natural_first'] : [],
     key: `${SP}:${level}:${d.a}:${d.b}:${d.c}`, fallback: d.fallback,
@@ -318,17 +319,17 @@ function spTable() {
 }
 
 function sp5(rng) {
-  const t = spTable();
+  const tb = spTable();
   return readtableItem({
     skill: SP, level: 5, key: 'sin',
-    prompt: 'Spline cubique naturelle de sin sur [0 ; π], n sous-intervalles. Elle est exacte au bord, puisque sin″ = 0 en 0 et en π.',
-    table: t,
+    prompt: t('Spline cubique naturelle de sin sur [0 ; π], n sous-intervalles. Elle est exacte au bord, puisque sin″ = 0 en 0 et en π.'),
+    table: tb,
     question: mcqDistinct({
       skill: SP, level: 5, key: `${SP}:5q`,
-      prompt: 'Quel est l\'ordre de convergence observé ?',
-      right: '4 (rapport ≈ 16 quand n double)',
-      wrongs: [{ html: '16 (le rapport)' }, { html: '2 (comme l\'interpolation linéaire)' }, { html: '3 (le degré des morceaux)' }],
-      solution: [{ html: `${t.rows[0][1]}/${t.rows[1][1]} ≈ 17, puis ≈ 16 : 2⁴ = 16, donc ordre 4.`, note: '' }],
+      prompt: t('Quel est l\'ordre de convergence observé ?'),
+      right: t('4 (rapport ≈ 16 quand n double)'),
+      wrongs: [{ html: t('16 (le rapport)') }, { html: t('2 (comme l\'interpolation linéaire)') }, { html: t('3 (le degré des morceaux)') }],
+      solution: [{ html: t('{e0}/{e1} ≈ 17, puis ≈ 16 : 2⁴ = 16, donc ordre 4.', { e0: tb.rows[0][1], e1: tb.rows[1][1] }), note: '' }],
     }, rng),
     subgoals: SUB_SP,
   });
@@ -338,10 +339,10 @@ function spMcq(rng, opts) {
   const n = rng.pick([2, 3, 4, 5, 6]);
   return mcqDistinct({
     skill: SP, level: 4, key: `${SP}:mcq:${n}`, exam: examTag(opts),
-    prompt: `Une spline cubique interpole ${n + 1} points (donc ${n} sous-intervalles). On impose la continuité de s, s′ et s″ aux nœuds intérieurs. Combien de degrés de liberté reste-t-il ?`,
+    prompt: t('Une spline cubique interpole {n1} points (donc {n} sous-intervalles). On impose la continuité de s, s′ et s″ aux nœuds intérieurs. Combien de degrés de liberté reste-t-il ?', { n1: n + 1, n }),
     right: '2',
     wrongs: [{ html: '0', rule: 'n_spline_count' }, { html: '1', rule: 'n_spline_count' }, { html: '3', rule: 'n_spline_count' }],
-    solution: [{ html: `${4 * n} inconnues − 3·${n - 1} raccords − ${n + 1} données = 2.`, note: '' }],
+    solution: [{ html: t('{u} inconnues − 3·{r} raccords − {d} données = 2.', { u: 4 * n, r: n - 1, d: n + 1 }), note: '' }],
   }, rng);
 }
 
@@ -349,14 +350,14 @@ function spTf(rng, opts) {
   if (rng.chance(0.5)) {
     return vfMcq({
       skill: SP, level: 4, key: `${SP}:tf:slope`, exam: examTag(opts), truth: false, ruleIfTrue: 'n_spline_natural_first',
-      statement: 'Une spline cubique naturelle a une dérivée s′ nulle aux deux extrémités.',
-      explanation: 'Faux : c\'est s″ qui est nulle aux bords. Pour (−1 ; −1), (0 ; 1), (1 ; 1), s′(−1) = 1 + 3 − 3/2 = 5/2 ≠ 0.',
+      statement: t('Une spline cubique naturelle a une dérivée s′ nulle aux deux extrémités.'),
+      explanation: t('Faux : c\'est s″ qui est nulle aux bords. Pour (−1 ; −1), (0 ; 1), (1 ; 1), s′(−1) = 1 + 3 − 3/2 = 5/2 ≠ 0.'),
     }, rng);
   }
   return tfItem({
     skill: SP, level: 4, key: 'c2', exam: examTag(opts), truth: true,
-    statement: 'Une spline cubique est de classe C² sur [a ; b] : s, s′ et s″ sont continues aux nœuds.',
-    explanation: 'Vrai : ce sont les 3(n − 1) conditions de raccord.',
+    statement: t('Une spline cubique est de classe C² sur [a ; b] : s, s′ et s″ sont continues aux nœuds.'),
+    explanation: t('Vrai : ce sont les 3(n − 1) conditions de raccord.'),
   });
 }
 

@@ -13,14 +13,15 @@ import { examTag } from './kit.js';
 import { partsItem } from './geo-kit.js';
 import { problemItem } from './kit-problem.js';
 import { q, H, ft, fac, FML, mcqF, defBlocks, KEYS_FT, TABLE } from './fourier-b-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'f-ft-eq';
 const SUB = [
-  { id: 'table', label: 'f̂ par la table', skill: 'f-ft-table' },
-  { id: 'transform', label: 'transformer l\'équation', skill: SK },
-  { id: 'isolate', label: 'isoler û', skill: 'iso-formula' },
-  { id: 'simplify', label: 'simplifier la fraction', skill: 'rat-operations' },
-  { id: 'inverse', label: 'revenir en x', skill: 'f-ft-table' },
+  { id: 'table', label: t('f̂ par la table'), skill: 'f-ft-table' },
+  { id: 'transform', label: t('transformer l\'équation'), skill: SK },
+  { id: 'isolate', label: t('isoler û'), skill: 'iso-formula' },
+  { id: 'simplify', label: t('simplifier la fraction'), skill: 'rat-operations' },
+  { id: 'inverse', label: t('revenir en x'), skill: 'f-ft-table' },
 ];
 // (a, b, w): W² = w² + 2bw/a is a perfect square.
 const CASES = [[2, 3, 1], [4, 6, 1], [1, 4, 1], [2, 8, 1], [1, [3, 2], 1], [4, 5, 2], [1, 3, 2], [2, 6, 2], [3, 8, 3], [2, 9, 3]];
@@ -76,48 +77,48 @@ function parts(d) {
   return [{
     html: '', start: `f(x) = ${d.fT}`, judge: ft({ f: d.fT, F: d.fhat, traps: { f_table_line: [{ line: `f̂(α) = 1/(√(2π)(${d.w}+iα))`, ctx: { want: 'F7' } }] } }),
     notes: [],
-    menu: [{ id: 'table', label: 'Ligne F7 de la table', valid: true }, { id: 'F3', label: 'Ligne F3 de la table', valid: false, rule: 'f_table_line', why: 'F3 est e^(−wy) pour y > 0 seulement ; e^(−w|x|) est paire : F7.' }],
-    lines: [{ math: `f̂(α) = ${d.fhat}`, note: `Ligne F7 : e^(−w|y|) = w·e^(−|wy|)/w, w = ${d.w}`, subgoal: 'table', blank: [String(d.w * d.w)] }],
+    menu: [{ id: 'table', label: t('Ligne F7 de la table'), valid: true }, { id: 'F3', label: t('Ligne F3 de la table'), valid: false, rule: 'f_table_line', why: t('F3 est e^(−wy) pour y > 0 seulement ; e^(−w|x|) est paire : F7.') }],
+    lines: [{ math: `f̂(α) = ${d.fhat}`, note: t('Ligne F7 : e^(−w|y|) = w·e^(−|wy|)/w, w = {w}', { w: d.w }), subgoal: 'table', blank: [String(d.w * d.w)] }],
   }, {
-    html: 'L\'équation transformée :', ask: 'Transforme l\'équation, puis isole û.', start: d.start, judge: eqCfg,
+    html: t('L\'équation transformée :'), ask: t('Transforme l\'équation, puis isole û.'), start: d.start, judge: eqCfg,
     menu: [
-      { id: 'transform', label: 'Appliquer ℱ : ℱ(f ∗ u) = √(2π) f̂ û', valid: true },
-      { id: 'isolate', label: 'Isoler û', valid: true },
-      { id: 'inverse', label: 'Appliquer ℱ⁻¹ tout de suite', valid: false, rule: 'f_no_inverse', why: 'On ne connaît pas encore û : isole-le d\'abord.' },
+      { id: 'transform', label: t('Appliquer ℱ : ℱ(f ∗ u) = √(2π) f̂ û'), valid: true },
+      { id: 'isolate', label: t('Isoler û'), valid: true },
+      { id: 'inverse', label: t('Appliquer ℱ⁻¹ tout de suite'), valid: false, rule: 'f_no_inverse', why: t('On ne connaît pas encore û : isole-le d\'abord.') },
     ],
     lines: [
       { math: d.eqLine, note: 'ℱ(f ∗ u) = √(2π) f̂ û', subgoal: 'transform', blank: ['√(2π)'], blank2: [d.b.d === 1 ? String(d.b.n) : `(${d.b})`] },
-      { math: d.iso, note: 'Mettre û en facteur', subgoal: 'isolate' },
+      { math: d.iso, note: t('Mettre û en facteur'), subgoal: 'isolate' },
     ],
   }, {
-    html: 'On remplace f̂ et on simplifie (√(2π)·√(2/π) = 2) :', ask: 'Simplifie û(α).', start: d.sub0,
+    html: t('On remplace f̂ et on simplifie (√(2π)·√(2/π) = 2) :'), ask: t('Simplifie û(α).'), start: d.sub0,
     judge: { kind: 'equiv', vars: ['α'], domain: { α: [-3, 3] }, target: 'short', goal: d.sub2, slack: 0, traps: d.traps.simp },
     menu: [
-      { id: 'same', label: 'Mettre au même dénominateur', valid: true },
-      { id: 'factor', label: 'Mettre le coefficient de α² en facteur', valid: true },
-      { id: 'expand', label: 'Développer le numérateur', valid: false, why: 'Le numérateur est déjà simple : c\'est le dénominateur qu\'on réduit.' },
+      { id: 'same', label: t('Mettre au même dénominateur'), valid: true },
+      { id: 'factor', label: t('Mettre le coefficient de α² en facteur'), valid: true },
+      { id: 'expand', label: t('Développer le numérateur'), valid: false, why: t('Le numérateur est déjà simple : c\'est le dénominateur qu\'on réduit.') },
     ],
     lines: [
       { math: d.sub1, note: '√(2π)·√(2/π) = 2', subgoal: 'isolate', blank: [d.tb] },
-      { math: d.sub2, note: 'Même dénominateur', subgoal: 'simplify', blank: [d.tb], blank2: [d.tb] },
+      { math: d.sub2, note: t('Même dénominateur'), subgoal: 'simplify', blank: [d.tb], blank2: [d.tb] },
     ],
   }, {
-    html: 'Retour en x :', ask: 'Fais apparaître une ligne de la table, puis trouve u(x).', start: `û = ${d.sub2}`, judge: ft({ unknown: 'û', symbols: { 'f̂': d.fhat }, f: d.u, F: d.hat, dir: 'inverse', traps: d.traps.inv }),
+    html: t('Retour en x :'), ask: t('Fais apparaître une ligne de la table, puis trouve u(x).'), start: `û = ${d.sub2}`, judge: ft({ unknown: 'û', symbols: { 'f̂': d.fhat }, f: d.u, F: d.hat, dir: 'inverse', traps: d.traps.inv }),
     decisions: [{
-      kind: 'decision', prompt: 'Il reste à :', options: [
-        { id: 'F7', label: `reconnaître la ligne F7 (paire) avec w = ${d.W} et revenir en x`, valid: true, ref: true },
-        { id: 'stop', label: 'rien : la réponse est û', valid: false, rule: 'f_no_inverse', why: 'On demande u(x) : il faut revenir en x avec la table.' },
-        { id: 'F3', label: `lire la ligne F3 : u(x) = c·e^(−${d.W}x)`, valid: false, rule: 'f_table_half_line', why: 'F3 décrit une fonction nulle pour x < 0, de transformée non paire ; û est pair : ligne F7.' },
+      kind: 'decision', prompt: t('Il reste à :'), options: [
+        { id: 'F7', label: t('reconnaître la ligne F7 (paire) avec w = {W} et revenir en x', { W: d.W }), valid: true, ref: true },
+        { id: 'stop', label: t('rien : la réponse est û'), valid: false, rule: 'f_no_inverse', why: t('On demande u(x) : il faut revenir en x avec la table.') },
+        { id: 'F3', label: t('lire la ligne F3 : u(x) = c·e^(−{W}x)', { W: d.W }), valid: false, rule: 'f_table_half_line', why: t('F3 décrit une fonction nulle pour x < 0, de transformée non paire ; û est pair : ligne F7.') },
       ],
     }],
     menu: [
-      { id: 'F7', label: 'Ligne F7 de la table', valid: true },
-      { id: 'stop', label: 'Conclure : û est la réponse', valid: false, rule: 'f_no_inverse', why: 'On demande u(x).' },
-      { id: 'F3', label: 'Ligne F3 de la table', valid: false, rule: 'f_table_half_line', why: 'F3 est une demi-droite ; û est pair : F7.' },
+      { id: 'F7', label: t('Ligne F7 de la table'), valid: true },
+      { id: 'stop', label: t('Conclure : û est la réponse'), valid: false, rule: 'f_no_inverse', why: t('On demande u(x).') },
+      { id: 'F3', label: t('Ligne F3 de la table'), valid: false, rule: 'f_table_half_line', why: t('F3 est une demi-droite ; û est pair : F7.') },
     ],
     lines: [
-      { math: d.hatLine, note: `Coefficient de α² en facteur : W² = ${d.W * d.W}`, subgoal: 'simplify', blank: [String(d.W * d.W)], blank2: [String(d.W * d.W)] },
-      { math: d.uLine, note: `F7 avec w = ${d.W}, sur tout ℝ`, subgoal: 'inverse', blank: [`|x|`], blank2: [String(d.W)] },
+      { math: d.hatLine, note: t('Coefficient de α² en facteur : W² = {a}', { a: d.W * d.W }), subgoal: 'simplify', blank: [String(d.W * d.W)], blank2: [String(d.W * d.W)] },
+      { math: d.uLine, note: t('F7 avec w = {W}, sur tout ℝ', { W: d.W }), subgoal: 'inverse', blank: [`|x|`], blank2: [String(d.W)] },
     ],
   }];
 }
@@ -125,8 +126,8 @@ function parts(d) {
 export function eqLines(level, rng, opts = {}, d = eqData(rng)) {
   return partsItem({
     skill: SK, level, parts: parts(d),
-    prompt: `Trouve u : ℝ → ℝ telle que ${d.eqText}, avec f(x) = ${FML(d.fT)} (on suppose u intégrable).${TABLE()}`,
-    hints: H('Transforme : la convolution devient √(2π) f̂ û. Puis isole û, simplifie et reconnais une ligne de la table.',
+    prompt: t('Trouve u : ℝ → ℝ telle que {eqText}, avec f(x) = {a} (on suppose u intégrable).{b}', { eqText: d.eqText, a: FML(d.fT), b: TABLE() }),
+    hints: H(t('Transforme : la convolution devient √(2π) f̂ û. Puis isole û, simplifie et reconnais une ligne de la table.'),
       FML(`û (${d.a} + ${d.b.d === 1 ? d.b.n : `(${d.b})`}√(2π) · ${d.fhat}) = f̂`), FML(d.sub2)),
     subgoals: SUB, keys: KEYS_FT, key: `${SK}:${level}:${d.id}`, exam: examTag(opts), noHints: level >= 5 || !!opts.exam,
   });
@@ -136,12 +137,12 @@ export function eqLines(level, rng, opts = {}, d = eqData(rng)) {
 
 function eqProblem(level, rng, opts = {}) {
   const d = eqData(rng);
-  const def = defBlocks(SK, 4, rng, { noHints: true, subgoals: [{ id: 'definition', label: 'définition de f̂', skill: 'f-ft-direct' }] });
+  const def = defBlocks(SK, 4, rng, { noHints: true, subgoals: [{ id: 'definition', label: t('définition de f̂'), skill: 'f-ft-direct' }] });
   const calc = eqLines(5, rng, {}, d);
   return problemItem({
     skill: SK, level,
-    prompt: `(i) Donne la définition de la transformée de Fourier, avec ses hypothèses. (ii) Trouve u telle que ${d.eqText}, f(x) = ${FML(d.fT)}.${TABLE()}`,
-    parts: [{ item: def, points: 2, title: 'Définition de f̂' }, { item: calc, points: [1, 2, 1.5, 1.5], title: 'Résolution' }],
+    prompt: t('(i) Donne la définition de la transformée de Fourier, avec ses hypothèses. (ii) Trouve u telle que {eqText}, f(x) = {a}.{b}', { eqText: d.eqText, a: FML(d.fT), b: TABLE() }),
+    parts: [{ item: def, points: 2, title: t('Définition de f̂') }, { item: calc, points: [1, 2, 1.5, 1.5], title: t('Résolution') }],
     key: `${d.id}:${level}`, exam: opts.exam ? { format: 'open', points: 8 } : false,
   });
 }
@@ -160,9 +161,9 @@ function mcqVariant(level, rng, opts) {
   ];
   return mcqF({
     skill: SK, level, exam: examTag(opts), key: `${SK}:mcq:${d.id}`,
-    prompt: `u est intégrable et vérifie ${d.eqText} avec f(x) = ${FML(d.fT)}. ${opts.exam ? 'Cochez les affirmations vraies.' : 'Quelle affirmation est vraie ?'}${TABLE()}`,
+    prompt: opts.exam ? t('u est intégrable et vérifie {eqText} avec f(x) = {a}. Cochez les affirmations vraies.{b}', { eqText: d.eqText, a: FML(d.fT), b: TABLE() }) : t('u est intégrable et vérifie {eqText} avec f(x) = {a}. Quelle affirmation est vraie ?{b}', { eqText: d.eqText, a: FML(d.fT), b: TABLE() }),
     right: opts.exam ? rng.shuffle(right).slice(0, rng.pick([1, 2, 3])) : [right[rng.int(0, 1)]], wrongs: rng.shuffle(wrongs),
-    solution: [{ html: `${FML(d.eqLine)}, f̂ = ${FML(d.fhat)}, donc ${FML(d.hatLine)} et ${FML(d.uLine)}.`, note: '' }],
+    solution: [{ html: t('{a}, f̂ = {b}, donc {c} et {d}.', { a: FML(d.eqLine), b: FML(d.fhat), c: FML(d.hatLine), d: FML(d.uLine) }), note: '' }],
     expectedSec: 240,
   }, rng);
 }

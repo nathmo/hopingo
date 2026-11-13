@@ -4,6 +4,7 @@
 // sees its value, exact when it is a fraction.
 
 import { h } from './dom.js';
+import { t } from '../i18n.js';
 import { tryParse } from '../cas/parse.js';
 import { exactValue } from '../cas/normal.js';
 import { evalFloat } from '../cas/numeric.js';
@@ -25,7 +26,7 @@ export function calcValue(text) {
 
 export function calculator() {
   const out = h('span.calc-out', '');
-  const f = h('input.calc-in', { type: 'text', autocomplete: 'off', placeholder: 'Calculatrice : 3/2 − (9/4 − 2)/3', size: 28 });
+  const f = h('input.calc-in', { type: 'text', autocomplete: 'off', placeholder: t('Calculatrice : 3/2 − (9/4 − 2)/3'), size: 28 });
   f.addEventListener('input', () => { out.textContent = f.value.trim() ? `= ${calcValue(f.value) ?? '?'}` : ''; });
   return h('div.calc', h('span.calc-label', '🧮'), f, out);
 }

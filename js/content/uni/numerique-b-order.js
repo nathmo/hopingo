@@ -21,13 +21,14 @@ import {
   refCode, codeItem, holesFor, readtableItem, multiMcq, tableHtml, expText, H, blankBy, dec, vfMcq,
 } from './numerique-kit.js';
 import { mcq } from './kit.js';
+import { t } from '../../i18n.js';
 
 export const OR = 'n-order-read';
 const SUB = [
-  { id: 'ratio', label: 'un rapport rₚ', skill: OR },
-  { id: 'compare', label: 'p trop petit, p trop grand', skill: OR },
-  { id: 'conclude', label: 'l\'ordre et la constante', skill: OR },
-  { id: 'newton', label: 'les itérés de Newton', skill: 'n-newton' },
+  { id: 'ratio', label: t('un rapport rₚ'), skill: OR },
+  { id: 'compare', label: t('p trop petit, p trop grand'), skill: OR },
+  { id: 'conclude', label: t('l\'ordre et la constante'), skill: OR },
+  { id: 'newton', label: t('les itérés de Newton'), skill: 'n-newton' },
 ];
 const KEYS = ['calc'];
 
@@ -60,17 +61,17 @@ const METHODS = {
     const c = rng.pick([2, 3, 5, 6, 7]);
     const x0 = rng.pick([3, 4, 5]);
     const a = Math.sqrt(c);
-    return { kind: 'sq', p: 2, C: 1 / (2 * a), label: `la méthode de Newton sur f(x) = x² − ${c}, avec x⁽⁰⁾ = ${x0}`, short: `Newton, x² − ${c}`, d: run((x) => x - (x * x - c) / (2 * x), x0) };
+    return { kind: 'sq', p: 2, C: 1 / (2 * a), label: t('la méthode de Newton sur f(x) = x² − {c}, avec x⁽⁰⁾ = {x0}', { c, x0 }), short: `Newton, x² − ${c}`, d: run((x) => x - (x * x - c) / (2 * x), x0) };
   },
   cube(rng) {
     const c = rng.pick([2, 3, 5, 7, 10]);
     const x0 = rng.pick([2, 3]);
     const a = Math.cbrt(c);
-    return { kind: 'cube', p: 2, C: 1 / a, label: `la méthode de Newton sur f(x) = x³ − ${c}, avec x⁽⁰⁾ = ${x0}`, short: `Newton, x³ − ${c}`, d: run((x) => x - (x ** 3 - c) / (3 * x * x), x0) };
+    return { kind: 'cube', p: 2, C: 1 / a, label: t('la méthode de Newton sur f(x) = x³ − {c}, avec x⁽⁰⁾ = {x0}', { c, x0 }), short: `Newton, x³ − ${c}`, d: run((x) => x - (x ** 3 - c) / (3 * x * x), x0) };
   },
   fixed(rng) {
     const w = rng.pick([0.1, 0.15, 0.2, 0.3, 0.35]);
-    return { kind: 'fixed', p: 1, C: Math.abs(1 - 4 * w), label: `l'itération de point fixe x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ − ${dec(w)}(x⁽ᵏ⁾² − 4), avec x⁽⁰⁾ = 2,5`, short: `point fixe, ω = ${dec(w)}`, d: run((x) => x - w * (x * x - 4), 2.5) };
+    return { kind: 'fixed', p: 1, C: Math.abs(1 - 4 * w), label: t('l\'itération de point fixe x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ − {w}(x⁽ᵏ⁾² − 4), avec x⁽⁰⁾ = 2,5', { w: dec(w) }), short: t('point fixe, ω = {w}', { w: dec(w) }), d: run((x) => x - w * (x * x - 4), 2.5) };
   },
   double(rng) {
     const g = rng.pick([{ g: (x) => Math.exp(x), dg: (x) => Math.exp(x), t: 'eˣ' }, { g: (x) => x + 2, dg: () => 1, t: '(x + 2)' }, { g: (x) => 1 + x * x, dg: (x) => 2 * x, t: '(1 + x²)' }]);
@@ -78,20 +79,20 @@ const METHODS = {
     const x0 = a + rng.pick([1, 2]);
     const f = (x) => (x - a) ** 2 * g.g(x);
     const df = (x) => 2 * (x - a) * g.g(x) + (x - a) ** 2 * g.dg(x);
-    return { kind: 'double', p: 1, C: 0.5, label: `la méthode de Newton sur f(x) = (x − ${a})²·${g.t}, avec x⁽⁰⁾ = ${x0}`, short: `Newton, racine double`, d: run((x) => x - f(x) / df(x), x0) };
+    return { kind: 'double', p: 1, C: 0.5, label: t('la méthode de Newton sur f(x) = (x − {a})²·{g}, avec x⁽⁰⁾ = {x0}', { a, g: g.t, x0 }), short: t('Newton, racine double'), d: run((x) => x - f(x) / df(x), x0) };
   },
   secant(rng) {
     const c = rng.pick([2, 3, 5, 7]);
     const x0 = Math.floor(Math.sqrt(c));
     const f = (x) => x * x - c;
-    return { kind: 'secant', p: 'sec', C: null, label: `la méthode de la sécante sur f(x) = x² − ${c}, avec x⁽⁰⁾ = ${x0} et x⁽¹⁾ = ${x0 + 1}`, short: `sécante, x² − ${c}`, d: run((x, xp) => x - (f(x) * (x - xp)) / (f(x) - f(xp)), x0, x0 + 1) };
+    return { kind: 'secant', p: 'sec', C: null, label: t('la méthode de la sécante sur f(x) = x² − {c}, avec x⁽⁰⁾ = {x0} et x⁽¹⁾ = {x1}', { c, x0, x1: x0 + 1 }), short: t('sécante, x² − {c}', { c }), d: run((x, xp) => x - (f(x) * (x - xp)) / (f(x) - f(xp)), x0, x0 + 1) };
   },
 };
 
 const usable = (d) => d.map((x, k) => ({ x, k })).filter(({ x }) => x >= 1e-13 && x <= 1e-1);
 
 function method(rng, kinds, { roundoff = null } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const m = METHODS[rng.pick(kinds)](rng);
     const u = usable(m.d);
     if (u.length < 3) continue;
@@ -115,7 +116,7 @@ function method(rng, kinds, { roundoff = null } = {}) {
     return m;
   }
   const d = [5e-1, 2.037e-1, 3.536e-2, 1.010e-3, 8.107e-7, 5.216e-13];
-  return { kind: 'cube', p: 2, C: 0.79, Cread: 0.794, label: 'la méthode de Newton sur f(x) = x³ − 2, avec x⁽⁰⁾ = 2', short: 'Newton, x³ − 2', d, fallback: true };
+  return { kind: 'cube', p: 2, C: 0.79, Cread: 0.794, label: t('la méthode de Newton sur f(x) = x³ − {c}, avec x⁽⁰⁾ = {x0}', { c: 2, x0: 2 }), short: 'Newton, x³ − 2', d, fallback: true };
 }
 
 // The table: k, δₖ, and the ratios asked.
@@ -126,18 +127,16 @@ function table(m, ps = [1, 2, 3]) {
 }
 const rawTable = (m) => table(m, []);
 
-const pText = (m) => (m.p === 'sec' ? 'strictement entre 1 et 2' : `ordre ${m.p}`);
-
 function orderOptions(m) {
   const opts = [
-    { key: 1, html: 'Ordre 1 : r₁ se stabilise' },
-    { key: 2, html: 'Ordre 2 : r₂ se stabilise' },
-    { key: 3, html: 'Ordre 3 : r₃ se stabilise' },
-    { key: 'sec', html: 'Entre 1 et 2 : r₁ → 0 et r₂ → ∞' },
+    { key: 1, html: t('Ordre 1 : r₁ se stabilise') },
+    { key: 2, html: t('Ordre 2 : r₂ se stabilise') },
+    { key: 3, html: t('Ordre 3 : r₃ se stabilise') },
+    { key: 'sec', html: t('Entre 1 et 2 : r₁ → 0 et r₂ → ∞') },
   ];
   return opts.map((o) => ({
     html: o.html, correct: o.key === m.p,
-    ...(o.key === 1 && m.p !== 1 ? { html: 'Ordre 1 : r₁ tend vers une constante (0)', rule: 'n_order_simple_ratio' } : {}),
+    ...(o.key === 1 && m.p !== 1 ? { html: t('Ordre 1 : r₁ tend vers une constante (0)'), rule: 'n_order_simple_ratio' } : {}),
   }));
 }
 
@@ -145,20 +144,20 @@ function orderOptions(m) {
 
 function level1(rng) {
   const m = method(rng, ['sq', 'cube', 'fixed', 'double', 'secant'], { roundoff: false });
-  const t = table(m);
+  const tb = table(m);
   return readtableItem({
     skill: OR, level: 1, key: `1:${m.kind}:${m.d[0]}`,
-    prompt: `On applique ${m.label}. Le programme affiche les incréments δₖ = |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| et leurs rapports :`,
-    table: t,
+    prompt: t('On applique {method}. Le programme affiche les incréments δₖ = |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| et leurs rapports :', { method: m.label }),
+    table: tb,
     question: mcq({
       skill: OR, level: 1, key: `${OR}:1q:${m.kind}`, keepOrder: true,
-      prompt: 'Quel est l\'ordre de la méthode ?',
+      prompt: t('Quel est l\'ordre de la méthode ?'),
       options: orderOptions(m),
-      solution: [{ html: m.p === 'sec' ? 'r₁ tend vers 0 (p = 1 est trop petit) et r₂ vers l\'infini (p = 2 est trop grand) : l\'ordre est entre 1 et 2.' : `r${'₀₁₂₃'[m.p]} se stabilise vers ${dec(m.Cread, 2)} ≠ 0 : ${pText(m)}. Pour p plus petit, le rapport tend vers 0 ; pour p plus grand, vers l'infini.`, note: '' }],
+      solution: [{ html: m.p === 'sec' ? t('r₁ tend vers 0 (p = 1 est trop petit) et r₂ vers l\'infini (p = 2 est trop grand) : l\'ordre est entre 1 et 2.') : t('{r} se stabilise vers {c} ≠ 0 : ordre {p}. Pour p plus petit, le rapport tend vers 0 ; pour p plus grand, vers l\'infini.', { r: `r${'₀₁₂₃'[m.p]}`, c: dec(m.Cread, 2), p: m.p }), note: '' }],
     }, rng),
-    hints: H('Cherche le p pour lequel δₖ/δₖ₋₁ᵖ ne tend ni vers 0 ni vers l\'infini.',
-      'Regarde la dernière colonne qui ne tend ni vers 0 ni vers l\'infini : r₁ ? r₂ ? r₃ ?',
-      m.p === 'sec' ? 'r₁ → 0 et r₂ → ∞ : l\'ordre est entre 1 et 2.' : `r${'₀₁₂₃'[m.p]} ≈ ${dec(m.Cread, 2)} : ${pText(m)}.`),
+    hints: H(t('Cherche le p pour lequel δₖ/δₖ₋₁ᵖ ne tend ni vers 0 ni vers l\'infini.'),
+      t('Regarde la dernière colonne qui ne tend ni vers 0 ni vers l\'infini : r₁ ? r₂ ? r₃ ?'),
+      m.p === 'sec' ? t('r₁ → 0 et r₂ → ∞ : l\'ordre est entre 1 et 2.') : t('{r} ≈ {c} : ordre {p}.', { r: `r${'₀₁₂₃'[m.p]}`, c: dec(m.Cread, 2), p: m.p })),
     subgoals: SUB, baits: ['n_order_simple_ratio'], fallback: m.fallback,
   });
 }
@@ -176,12 +175,12 @@ function ratioParts(m, p, ks, level) {
     const expr = `${sci(m.d[k])}/(${sci(m.d[k - 1])})${p === 1 ? '' : `^${p}`}`;
     const v = dec(r2s(r), 2).replace('−', '-');
     return {
-      ...(i === 0 ? {} : { html: `Le rapport suivant, k = ${k} :` }), ask: `r${'₀₁₂₃'[p]} (k = ${k}) =`, start: `r_${k}`,
+      ...(i === 0 ? {} : { html: t('Le rapport suivant, k = {k} :', { k }) }), ask: `r${'₀₁₂₃'[p]} (k = ${k}) =`, start: `r_${k}`,
       judge: { kind: 'stat', expect: String(r2s(r)), tol: tolOf(r) },
-      menu: [{ id: 'ratio', label: `Diviser δ${'₀₁₂₃₄₅₆₇₈₉'[k]} par δ${'₀₁₂₃₄₅₆₇₈₉'[k - 1]}${p === 1 ? '' : '²'}`, valid: true }, { id: 'inv', label: `Diviser δ${'₀₁₂₃₄₅₆₇₈₉'[k - 1]} par δ${'₀₁₂₃₄₅₆₇₈₉'[k]}`, valid: false, why: 'Le rapport compare le nouvel incrément au précédent : δₖ au numérateur.' }],
+      menu: [{ id: 'ratio', label: t('Diviser {a} par {b}', { a: `δ${'₀₁₂₃₄₅₆₇₈₉'[k]}`, b: `δ${'₀₁₂₃₄₅₆₇₈₉'[k - 1]}${p === 1 ? '' : '²'}` }), valid: true }, { id: 'inv', label: t('Diviser {a} par {b}', { a: `δ${'₀₁₂₃₄₅₆₇₈₉'[k - 1]}`, b: `δ${'₀₁₂₃₄₅₆₇₈₉'[k]}` }), valid: false, why: t('Le rapport compare le nouvel incrément au précédent : δₖ au numérateur.') }],
       lines: [
         { math: expr, note: `δₖ/δₖ₋₁${p === 1 ? '' : '²'}`, subgoal: 'ratio', from: level <= 2 ? 1 : 9 },
-        { math: v, note: '2 chiffres significatifs suffisent', subgoal: 'ratio', blank: [v] },
+        { math: v, note: t('2 chiffres significatifs suffisent'), subgoal: 'ratio', blank: [v] },
       ],
     };
   });
@@ -190,19 +189,19 @@ function ratioParts(m, p, ks, level) {
 function orderPart(m, level) {
   const p = m.p;
   return {
-    html: 'Conclusion :', ask: 'p =', start: 'p', judge: { kind: 'value', expect: String(p), form: 'any' },
+    html: t('Conclusion :'), ask: 'p =', start: 'p', judge: { kind: 'value', expect: String(p), form: 'any' },
     decisions: [{
-      kind: 'decision', prompt: 'Que montrent les rapports ?', levels: [2, 3], options: p === 2 ? [
-        { id: 'two', label: 'r₂ se stabilise vers une constante non nulle : ordre 2', valid: true, ref: true },
-        { id: 'one', label: 'δₖ/δₖ₋₁ tend vers 0, donc la méthode est d\'ordre 1', valid: false, rule: 'n_order_simple_ratio', why: 'Pour p trop petit, le rapport tend vers 0 : il faut une constante non nulle.' },
-        { id: 'three', label: 'Ordre 3 : il faut que r₃ soit petit', valid: false, why: 'r₃ tend vers l\'infini : p = 3 est trop grand.' },
+      kind: 'decision', prompt: t('Que montrent les rapports ?'), levels: [2, 3], options: p === 2 ? [
+        { id: 'two', label: t('r₂ se stabilise vers une constante non nulle : ordre 2'), valid: true, ref: true },
+        { id: 'one', label: t('δₖ/δₖ₋₁ tend vers 0, donc la méthode est d\'ordre 1'), valid: false, rule: 'n_order_simple_ratio', why: t('Pour p trop petit, le rapport tend vers 0 : il faut une constante non nulle.') },
+        { id: 'three', label: t('Ordre 3 : il faut que r₃ soit petit'), valid: false, why: t('r₃ tend vers l\'infini : p = 3 est trop grand.') },
       ] : [
-        { id: 'one', label: 'r₁ se stabilise vers une constante non nulle (< 1) : ordre 1', valid: true, ref: true },
-        { id: 'two', label: 'Ordre 2 : les incréments diminuent vite', valid: false, why: 'Avec p = 2, le rapport tend vers l\'infini : p = 2 est trop grand.' },
+        { id: 'one', label: t('r₁ se stabilise vers une constante non nulle (< 1) : ordre 1'), valid: true, ref: true },
+        { id: 'two', label: t('Ordre 2 : les incréments diminuent vite'), valid: false, why: t('Avec p = 2, le rapport tend vers l\'infini : p = 2 est trop grand.') },
       ],
     }],
-    menu: [{ id: 'p', label: 'Conclure l\'ordre', valid: true }, { id: 'more', label: 'Calculer un autre rapport', valid: false, why: 'Deux rapports qui se stabilisent suffisent.' }],
-    lines: [{ math: String(p), note: p === 2 ? 'r₂ → constante non nulle' : 'r₁ → constante non nulle, < 1', subgoal: 'conclude', blank: [String(p)] }],
+    menu: [{ id: 'p', label: t('Conclure l\'ordre'), valid: true }, { id: 'more', label: t('Calculer un autre rapport'), valid: false, why: t('Deux rapports qui se stabilisent suffisent.') }],
+    lines: [{ math: String(p), note: p === 2 ? t('r₂ → constante non nulle') : t('r₁ → constante non nulle, < 1'), subgoal: 'conclude', blank: [String(p)] }],
   };
 }
 
@@ -210,9 +209,9 @@ function constPart(m) {
   const C = m.Cread;
   const v = dec(r2s(C), 2).replace('−', '-');
   return {
-    html: 'La constante : la limite du rapport.', ask: 'C ≈', start: 'C', judge: { kind: 'stat', expect: String(r2s(C)), tol: Math.max(0.12 * C, tolOf(C)) },
-    menu: [{ id: 'C', label: 'Lire la limite du rapport', valid: true }, { id: 'first', label: 'Prendre le premier rapport', valid: false, why: 'Le premier rapport est loin de la limite : on lit les dernières lignes utilisables.' }],
-    lines: [{ math: v, note: `les dernières lignes utilisables (r${'₀₁₂₃'[m.p]} ≈ ${dec(C, 3)})`, subgoal: 'conclude' }],
+    html: t('La constante : la limite du rapport.'), ask: 'C ≈', start: 'C', judge: { kind: 'stat', expect: String(r2s(C)), tol: Math.max(0.12 * C, tolOf(C)) },
+    menu: [{ id: 'C', label: t('Lire la limite du rapport'), valid: true }, { id: 'first', label: t('Prendre le premier rapport'), valid: false, why: t('Le premier rapport est loin de la limite : on lit les dernières lignes utilisables.') }],
+    lines: [{ math: v, note: t('les dernières lignes utilisables ({r} ≈ {c})', { r: `r${'₀₁₂₃'[m.p]}`, c: dec(C, 3) }), subgoal: 'conclude' }],
   };
 }
 
@@ -223,10 +222,10 @@ function level2(rng) {
   const parts = [...ratioParts(m, m.p, ks, 2), orderPart(m, 2)];
   return partsItem({
     skill: OR, level: 2, parts, subgoals: SUB, keys: KEYS, key: `${OR}:2:${m.kind}:${m.d[0]}`, fallback: m.fallback,
-    prompt: `On applique ${m.label}. Le programme affiche les incréments :${tableHtml(rawTable(m))}Calcule r${'₀₁₂₃'[m.p]} = δₖ/δₖ₋₁${m.p === 1 ? '' : '²'} sur deux lignes (2 chiffres significatifs), puis donne l'ordre p.`,
-    hints: H('Cherche le p pour lequel δₖ/δₖ₋₁ᵖ ne tend ni vers 0 ni vers l\'infini.',
+    prompt: t('On applique {method}. Le programme affiche les incréments :{table}Calcule {r} = {ratio} sur deux lignes (2 chiffres significatifs), puis donne l\'ordre p.', { method: m.label, table: tableHtml(rawTable(m)), r: `r${'₀₁₂₃'[m.p]}`, ratio: `δₖ/δₖ₋₁${m.p === 1 ? '' : '²'}` }),
+    hints: H(t('Cherche le p pour lequel δₖ/δₖ₋₁ᵖ ne tend ni vers 0 ni vers l\'infini.'),
       `r = δ${'₀₁₂₃₄₅₆₇₈₉'[ks[0]]}/(□)${m.p === 1 ? '' : '²'}`,
-      `r ≈ ${dec(ratio(m.d, ks[0], m.p), 2)} puis ${dec(ratio(m.d, ks[1], m.p), 2)} : ordre ${m.p}.`),
+      t('r ≈ {a} puis {b} : ordre {p}.', { a: dec(ratio(m.d, ks[0], m.p), 2), b: dec(ratio(m.d, ks[1], m.p), 2), p: m.p })),
   });
 }
 
@@ -234,22 +233,22 @@ function level2(rng) {
 
 function level3(rng) {
   const m = method(rng, ['sq', 'cube'], { roundoff: true });
-  const t = table(m, [2]);
+  const tb = table(m, [2]);
   const last = m.d.length - 1;
   const parts = [orderPart(m, 3), constPart(m)];
   parts[0].html = null;
   parts[0].decisions = [{
-    kind: 'decision', prompt: `La dernière ligne : δ${'₀₁₂₃₄₅₆₇₈₉'[last]} = ${expText(m.d[last], 3)}, r₂ = ${dec(ratio(m.d, last, 2), 2)}. Que faire ?`, options: [
-      { id: 'ignore', label: 'L\'ignorer : à δ ≈ 10⁻¹⁵, l\'arrondi domine', valid: true, ref: true },
-      { id: 'keep', label: 'La garder : c\'est la ligne la plus précise', valid: false, rule: 'n_order_roundoff_rows', why: 'À δ ≈ 10⁻¹⁵, la double précision ne garde plus de chiffre exact : le rapport n\'y a plus de sens.' },
+    kind: 'decision', prompt: t('La dernière ligne : {d} = {v}, r₂ = {r}. Que faire ?', { d: `δ${'₀₁₂₃₄₅₆₇₈₉'[last]}`, v: expText(m.d[last], 3), r: dec(ratio(m.d, last, 2), 2) }), options: [
+      { id: 'ignore', label: t('L\'ignorer : à δ ≈ 10⁻¹⁵, l\'arrondi domine'), valid: true, ref: true },
+      { id: 'keep', label: t('La garder : c\'est la ligne la plus précise'), valid: false, rule: 'n_order_roundoff_rows', why: t('À δ ≈ 10⁻¹⁵, la double précision ne garde plus de chiffre exact : le rapport n\'y a plus de sens.') },
     ],
   }, parts[0].decisions[0]];
   return partsItem({
     skill: OR, level: 3, parts, subgoals: SUB, keys: KEYS, key: `${OR}:3:${m.kind}:${m.d[0]}`, fallback: m.fallback,
-    prompt: `On applique ${m.label}. Le programme affiche :${tableHtml(t)}Décide quelles lignes lire, puis donne l'ordre p et la constante C. Choisis d'abord chaque action.`,
-    hints: H('Ne lis l\'ordre que sur les lignes où δ est bien au-dessus de 10⁻¹⁵.',
-      'r₂ se stabilise vers □ sur les lignes utilisables.',
-      `Ordre 2, C ≈ ${dec(m.Cread, 2)} (la dernière ligne est dominée par l'arrondi).`),
+    prompt: t('On applique {method}. Le programme affiche :{table}Décide quelles lignes lire, puis donne l\'ordre p et la constante C. Choisis d\'abord chaque action.', { method: m.label, table: tableHtml(tb) }),
+    hints: H(t('Ne lis l\'ordre que sur les lignes où δ est bien au-dessus de 10⁻¹⁵.'),
+      t('r₂ se stabilise vers □ sur les lignes utilisables.'),
+      t('Ordre 2, C ≈ {c} (la dernière ligne est dominée par l\'arrondi).', { c: dec(m.Cread, 2) })),
     baits: ['n_order_roundoff_rows', 'n_order_simple_ratio'],
   });
 }
@@ -275,11 +274,11 @@ function codeLevel(rng, level) {
   return codeItem({
     skill: OR, level, ref: RATIOS, blanks: level === 1 ? [1] : holesFor(level, RATIOS, { focus: 1 }), choice: level === 1 ? 1 : undefined,
     traps: R_TRAPS, fillers: R_FILL, wrong: R_WRONG, rng,
-    prompt: 'La fonction ratios reçoit la liste des incréments inc = [δ₀, δ₁, …] et un exposant p ; elle renvoie la liste des rapports rₚ = δₖ/δₖ₋₁ᵖ.',
+    prompt: t('La fonction ratios reçoit la liste des incréments inc = [δ₀, δ₁, …] et un exposant p ; elle renvoie la liste des rapports rₚ = δₖ/δₖ₋₁ᵖ.'),
     tests: R_TESTS,
-    hints: H('Le rapport compare chaque incrément au précédent élevé à la puissance p.',
+    hints: H(t('Le rapport compare chaque incrément au précédent élevé à la puissance p.'),
       'r.append(inc[k + 1] / □)',
-      'r.append(inc[k + 1] / inc[k] ** p), pour k de 0 à len(inc) − 2.'),
+      t('r.append(inc[k + 1] / inc[k] ** p), pour k de 0 à len(inc) − 2.')),
     subgoals: SUB, key: `${level}`,
   });
 }
@@ -291,10 +290,10 @@ function level4(rng) {
   parts[0].html = null;
   return partsItem({
     skill: OR, level: 4, parts, subgoals: SUB, keys: KEYS, key: `${OR}:4:${m.kind}:${m.d[0]}`, fallback: m.fallback,
-    prompt: `On applique ${m.label}. Le programme affiche les incréments :${tableHtml(rawTable(m))}Donne l'ordre p de la méthode et la constante C = lim δₖ/δₖ₋₁ᵖ (2 chiffres significatifs).`,
-    hints: H('Calcule r₁ puis r₂ sur les dernières lignes : lequel se stabilise vers une constante non nulle ?',
-      `r${'₀₁₂₃'[m.p]} sur les dernières lignes ≈ □`,
-      `Ordre ${m.p}, C ≈ ${dec(m.Cread, 2)}.`),
+    prompt: t('On applique {method}. Le programme affiche les incréments :{table}Donne l\'ordre p de la méthode et la constante C = lim δₖ/δₖ₋₁ᵖ (2 chiffres significatifs).', { method: m.label, table: tableHtml(rawTable(m)) }),
+    hints: H(t('Calcule r₁ puis r₂ sur les dernières lignes : lequel se stabilise vers une constante non nulle ?'),
+      t('{r} sur les dernières lignes ≈ □', { r: `r${'₀₁₂₃'[m.p]}` }),
+      t('Ordre {p}, C ≈ {c}.', { p: m.p, c: dec(m.Cread, 2) })),
     baits: ['n_order_simple_ratio'],
   });
 }
@@ -308,28 +307,27 @@ function twoMethods(rng) {
   const rows = Array.from({ length: n }, (_, k) => [String(k), a.d[k] !== undefined ? expText(a.d[k], 3) : '', b.d[k] !== undefined ? expText(b.d[k], 3) : '']);
   return { a, b, table: { columns: ['k', `δₖ (A : ${a.short})`, `δₖ (B : ${b.short})`], rows } };
 }
-function twoOptions(t) {
-  const bOrder = t.b.p === 'sec' ? 'entre 1 et 2' : 'd\'ordre 1';
+function twoOptions(tm) {
   return [
-    { html: 'A est d\'ordre 2', correct: true },
-    { html: `B est ${bOrder}`, correct: true },
-    { html: 'A est d\'ordre 1, puisque δₖ₊₁/δₖ tend vers 0', correct: false, rule: 'n_order_simple_ratio' },
-    { html: t.b.p === 'sec' ? 'B est d\'ordre 2' : 'B est d\'ordre 2', correct: false },
-    { html: 'Les deux méthodes ont le même ordre', correct: false },
+    { html: t('A est d\'ordre 2'), correct: true },
+    { html: tm.b.p === 'sec' ? t('B est entre 1 et 2') : t('B est d\'ordre 1'), correct: true },
+    { html: t('A est d\'ordre 1, puisque δₖ₊₁/δₖ tend vers 0'), correct: false, rule: 'n_order_simple_ratio' },
+    { html: t('B est d\'ordre 2'), correct: false },
+    { html: t('Les deux méthodes ont le même ordre'), correct: false },
   ];
 }
 
 function level5(rng) {
-  const t = twoMethods(rng);
+  const tm = twoMethods(rng);
   return readtableItem({
-    skill: OR, level: 5, key: `5:${t.a.kind}:${t.b.kind}:${t.a.d[0]}`,
-    prompt: `Deux méthodes, A (${t.a.label}) et B (${t.b.label}), donnent ces incréments :`,
-    table: t.table,
+    skill: OR, level: 5, key: `5:${tm.a.kind}:${tm.b.kind}:${tm.a.d[0]}`,
+    prompt: t('Deux méthodes, A ({a}) et B ({b}), donnent ces incréments :', { a: tm.a.label, b: tm.b.label }),
+    table: tm.table,
     question: multiMcq({
-      skill: OR, level: 5, key: `${OR}:5q`, prompt: 'Que peut-on en déduire ?', options: twoOptions(t),
-      solution: [{ html: `A : δₖ/δₖ₋₁² se stabilise, ordre 2. B : ${t.b.p === 'sec' ? 'δₖ/δₖ₋₁ → 0 mais δₖ/δₖ₋₁² → ∞, ordre entre 1 et 2 (sécante, ≈ 1,618)' : `δₖ/δₖ₋₁ → ${dec(t.b.C, 2)}, ordre 1`}.`, note: '' }],
+      skill: OR, level: 5, key: `${OR}:5q`, prompt: t('Que peut-on en déduire ?'), options: twoOptions(tm),
+      solution: [{ html: tm.b.p === 'sec' ? t('A : δₖ/δₖ₋₁² se stabilise, ordre 2. B : δₖ/δₖ₋₁ → 0 mais δₖ/δₖ₋₁² → ∞, ordre entre 1 et 2 (sécante, ≈ 1,618).') : t('A : δₖ/δₖ₋₁² se stabilise, ordre 2. B : δₖ/δₖ₋₁ → {c}, ordre 1.', { c: dec(tm.b.C, 2) }), note: '' }],
     }, rng),
-    subgoals: SUB, fallback: t.a.fallback || t.b.fallback,
+    subgoals: SUB, fallback: tm.a.fallback || tm.b.fallback,
   });
 }
 
@@ -337,23 +335,23 @@ function level5(rng) {
 
 function examMcq(rng, opts) {
   const m = method(rng, ['sq', 'cube', 'fixed', 'double'], { roundoff: false });
-  const t = { columns: ['k', ...m.d.map((_, k) => String(k))], rows: [['δₖ', ...m.d.map((x) => expText(x, 3))]] };
+  const tb = { columns: ['k', ...m.d.map((_, k) => String(k))], rows: [['δₖ', ...m.d.map((x) => expText(x, 3))]] };
   const options = m.p === 2 ? [
-    { html: 'La méthode converge quadratiquement pour ce point de départ', correct: true },
-    { html: 'La méthode converge quadratiquement quel que soit le point de départ', correct: false },
-    { html: 'La méthode est d\'ordre 1, puisque δₖ₊₁/δₖ tend vers 0', correct: false, rule: 'n_order_simple_ratio' },
-    { html: 'La méthode diverge', correct: false },
+    { html: t('La méthode converge quadratiquement pour ce point de départ'), correct: true },
+    { html: t('La méthode converge quadratiquement quel que soit le point de départ'), correct: false },
+    { html: t('La méthode est d\'ordre 1, puisque δₖ₊₁/δₖ tend vers 0'), correct: false, rule: 'n_order_simple_ratio' },
+    { html: t('La méthode diverge'), correct: false },
   ] : [
-    { html: 'La méthode converge linéairement (ordre 1)', correct: true },
-    { html: `Le rapport δₖ₊₁/δₖ tend vers environ ${dec(m.C, 1)}`, correct: true },
-    { html: 'La méthode converge quadratiquement', correct: false },
-    { html: 'La méthode diverge', correct: false },
+    { html: t('La méthode converge linéairement (ordre 1)'), correct: true },
+    { html: t('Le rapport δₖ₊₁/δₖ tend vers environ {c}', { c: dec(m.C, 1) }), correct: true },
+    { html: t('La méthode converge quadratiquement'), correct: false },
+    { html: t('La méthode diverge'), correct: false },
   ];
   return multiMcq({
     skill: OR, level: 4, key: `${OR}:exam:${m.kind}:${m.d[0]}`, exam: examTag(opts),
-    prompt: `Un programme affiche les incréments δₖ = |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| d'une méthode itérative :${tableHtml(t)}Que peut-on en déduire ?`,
+    prompt: t('Un programme affiche les incréments δₖ = |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| d\'une méthode itérative :{table}Que peut-on en déduire ?', { table: tableHtml(tb) }),
     options,
-    solution: [{ html: m.p === 2 ? 'δₖ₊₁/δₖ² se stabilise : convergence quadratique pour ce départ ; le tableau ne dit rien des autres départs.' : `δₖ₊₁/δₖ → ${dec(m.C, 2)} : convergence linéaire.`, note: '' }],
+    solution: [{ html: m.p === 2 ? t('δₖ₊₁/δₖ² se stabilise : convergence quadratique pour ce départ ; le tableau ne dit rien des autres départs.') : t('δₖ₊₁/δₖ → {c} : convergence linéaire.', { c: dec(m.C, 2) }), note: '' }],
   }, rng);
 }
 
@@ -361,13 +359,13 @@ function examTf(rng, opts) {
   return rng.chance(0.5)
     ? vfMcq({
       skill: OR, key: `${OR}:tf:r1`, exam: examTag(opts), truth: false, ruleIfTrue: 'n_order_simple_ratio',
-      statement: 'Si δₖ₊₁/δₖ → 0, la méthode est d\'ordre 1.',
-      explanation: 'Faux : pour Newton (ordre 2), δₖ₊₁/δₖ → 0 aussi. L\'ordre est le p pour lequel δₖ₊₁/δₖᵖ tend vers une constante non nulle ; un rapport qui tend vers 0 dit seulement que l\'ordre est > 1.',
+      statement: t('Si δₖ₊₁/δₖ → 0, la méthode est d\'ordre 1.'),
+      explanation: t('Faux : pour Newton (ordre 2), δₖ₊₁/δₖ → 0 aussi. L\'ordre est le p pour lequel δₖ₊₁/δₖᵖ tend vers une constante non nulle ; un rapport qui tend vers 0 dit seulement que l\'ordre est > 1.'),
     }, rng)
     : vfMcq({
       skill: OR, key: `${OR}:tf:slow`, exam: examTag(opts), truth: false,
-      statement: 'Une méthode d\'ordre 1 dont le rapport δₖ₊₁/δₖ tend vers 1 converge vite.',
-      explanation: 'Faux : l\'erreur n\'est multipliée que par ≈ 1 à chaque pas ; avec un rapport 0,99, il faut environ 230 pas pour gagner un facteur 10.',
+      statement: t('Une méthode d\'ordre 1 dont le rapport δₖ₊₁/δₖ tend vers 1 converge vite.'),
+      explanation: t('Faux : l\'erreur n\'est multipliée que par ≈ 1 à chaque pas ; avec un rapport 0,99, il faut environ 230 pas pour gagner un facteur 10.'),
     }, rng);
 }
 

@@ -15,6 +15,7 @@ import { tokenize } from '../../cas/parse.js';
 import { MT, mcq, linesItem, examTag } from './kit.js';
 import { LML, H, modeOf, blanks } from './geo-kit.js';
 import { problemItem } from './kit-problem.js';
+import { t } from '../../i18n.js';
 
 export { MT, mcq, linesItem, examTag, LML, H, modeOf, problemItem };
 
@@ -40,7 +41,7 @@ export function cm(c, body) {
   return `${C.n < 0 ? '-' : ''}(${Math.abs(C.n)}/${C.d})${body}`;
 }
 // Terms joined into a sum (empty terms skipped).
-export const sum = (terms) => terms.filter((t) => t && t !== '0').reduce((s, t) => (s ? (t.startsWith('-') ? `${s}${t}` : `${s}+${t}`) : t), '') || '0';
+export const sum = (terms) => terms.filter((tt) => tt && tt !== '0').reduce((s, tt) => (s ? (tt.startsWith('-') ? `${s}${tt}` : `${s}+${tt}`) : tt), '') || '0';
 // Polynomial Σ cₖ vᵏ, highest power first: [c0, c1, c2] → -r^2+2r+3.
 export function poly(cs, v) {
   const mono = (k) => (k === 0 ? '' : k === 1 ? v : `${v}^${k}`);
@@ -56,11 +57,11 @@ export function piT(c) {
   return C.d === 1 ? `${s}${top}` : `${s}${top}/${C.d}`;
 }
 // A text in parentheses unless it is a plain number or letter.
-export const par = (t) => (/^-?[0-9a-zπ]+(\/[0-9]+)?$/.test(t) && !/^-/.test(t) ? t : `(${t})`);
+export const par = (tt) => (/^-?[0-9a-zπ]+(\/[0-9]+)?$/.test(tt) && !/^-/.test(tt) ? tt : `(${tt})`);
 // Readable screen text: − and no ×.
-export const fr = (t) => String(t).replace(/-/g, '−');
+export const fr = (tt) => String(tt).replace(/-/g, '−');
 // Pretty form of a CAS text (for prompts).
-export const tidy = (t, vars = []) => { try { return toText(parse(t, { vars })); } catch { return t; } };
+export const tidy = (tt, vars = []) => { try { return toText(parse(tt, { vars })); } catch { return tt; } };
 
 // The MathML of a line as a given judge shows it.
 export const PML = (text, params) => LML({ kind: 'param', params, curve: { ref: '(t;t)', t: [0, 1] } }, text);
@@ -92,7 +93,7 @@ export function revSurf(o) {
     return `(${poly([a, b], 'r')})r ${body}`;
   };
   const N = [lin('cos(φ)'), lin('sin(φ)'), 'r'];
-  const neg = (t) => (t.startsWith('-') ? t.slice(1) : `-${t}`);
+  const neg = (tt) => (tt.startsWith('-') ? tt.slice(1) : `-${tt}`);
   const sigma = `(r cos(φ) ; r sin(φ) ; ${H})`;
   const params = order === 'rφ' ? ['r', 'φ'] : ['φ', 'r'];
   const rIv = ['0', o.rho];
@@ -104,7 +105,7 @@ export function revSurf(o) {
     Nup: `(${N.join(' ; ')})`,
     // |σ_r ∧ σ_φ| = r√(1 + h′²)
     norm: b.n === 0 ? (a.n === 0 ? 'r' : `r sqrt(${qs(a.mul(a).add(1))})`) : `r sqrt(1+${par(poly([c1, c2.mul(2)], 'r'))}^2)`,
-    normRaw: `sqrt(${N.map((t) => `(${t})^2`).join('+')})`,
+    normRaw: `sqrt(${N.map((tt) => `(${tt})^2`).join('+')})`,
     up: order === 'rφ',
     ref: { ref: sigma, u: box[0].map(num), v: box[1].map(num), params },
   };
@@ -127,7 +128,7 @@ export function sphSurf(o) {
   const pIv = ['0', '2π'];
   const box = order === 'θφ' ? [tIv, pIv] : [pIv, tIv];
   const Nout = [cm(R2, 'sin(θ)^2 cos(φ)'), cm(R2, 'sin(θ)^2 sin(φ)'), cm(R2, 'sin(θ)cos(θ)')];
-  const neg = (t) => `-${t}`;
+  const neg = (tt) => `-${tt}`;
   const s = {
     kind: 'sph', R, R2, top: o.top, order, params, sigma,
     st: `(${cm(R, 'cos(θ)cos(φ)')} ; ${cm(R, 'cos(θ)sin(φ)')} ; ${cm(-R, 'sin(θ)')})`,
@@ -135,7 +136,7 @@ export function sphSurf(o) {
     N: order === 'θφ' ? `(${Nout.join(' ; ')})` : `(${Nout.map(neg).join(' ; ')})`,
     Nout: `(${Nout.join(' ; ')})`,
     norm: cm(R2, 'sin(θ)'),
-    normRaw: `sqrt(${Nout.map((t) => `(${t})^2`).join('+')})`,
+    normRaw: `sqrt(${Nout.map((tt) => `(${tt})^2`).join('+')})`,
     up: order === 'θφ',
     ref: { ref: sigma, u: box[0].map(num), v: box[1].map(num), params },
     // The trap v_sphere_theta: sin θ and cos θ exchanged in σ.
@@ -149,9 +150,9 @@ export function sphSurf(o) {
   return s;
 }
 
-export function num(t) {
-  if (typeof t === 'number') return t;
-  return evalFloat(parse(String(t).replace(/√(\d+)/g, 'sqrt($1)'), {}), {});
+export function num(tt) {
+  if (typeof tt === 'number') return tt;
+  return evalFloat(parse(String(tt).replace(/√(\d+)/g, 'sqrt($1)'), {}), {});
 }
 
 // The parametrisation judge of a surface.
@@ -169,7 +170,7 @@ export function boundaryOf(s) {
   return sides.map((x, i) => ({ ...x, name: `Γ${i + 1}` }));
 }
 const PNAME = { r: 'r', φ: 'φ', θ: 'θ' };
-const sideDesc = (fixed, at, run, from, to) => `${PNAME[fixed]} = ${fr(at)}, ${PNAME[run]} de ${fr(from)} à ${fr(to)}`;
+const sideDesc = (fixed, at, run, from, to) => t('{a} = {b}, {c} de {d} à {e}', { a: PNAME[fixed], b: fr(at), c: PNAME[run], d: fr(from), e: fr(to) });
 
 function revSides(s) {
   const q2 = s.rho;
@@ -193,17 +194,17 @@ function revSides(s) {
   const top = `(0 ; 0 ; ${qs(s.h[0])})`;
   if (s.order === 'rφ') {
     return [
-      { desc: sideDesc('φ', '0', 'r', '0', q2), ...piece(meridian0), cancelsWith: full ? 2 : null, what: 'un arc dans le plan y = 0' },
-      { desc: sideDesc('r', q2, 'φ', '0', s.phi[1]), ...piece(circle), what: full ? 'le cercle du bord' : 'un demi-cercle' },
-      { desc: sideDesc('φ', s.phi[1], 'r', q2, '0'), ...piece(full ? back0 : backPi), cancelsWith: full ? 0 : null, what: 'un arc dans le plan y = 0' },
-      { desc: sideDesc('r', '0', 'φ', s.phi[1], '0'), point: top, what: `le point ${fr(top)}` },
+      { desc: sideDesc('φ', '0', 'r', '0', q2), ...piece(meridian0), cancelsWith: full ? 2 : null, what: t('un arc dans le plan y = 0') },
+      { desc: sideDesc('r', q2, 'φ', '0', s.phi[1]), ...piece(circle), what: full ? t('le cercle du bord') : t('un demi-cercle') },
+      { desc: sideDesc('φ', s.phi[1], 'r', q2, '0'), ...piece(full ? back0 : backPi), cancelsWith: full ? 0 : null, what: t('un arc dans le plan y = 0') },
+      { desc: sideDesc('r', '0', 'φ', s.phi[1], '0'), point: top, what: t('le point {a}', { a: fr(top) }) },
     ].map(finish);
   }
   return [
-    { desc: sideDesc('r', '0', 'φ', '0', s.phi[1]), point: top, what: `le point ${fr(top)}` },
-    { desc: sideDesc('φ', s.phi[1], 'r', '0', q2), ...piece(full ? meridian0 : meridianPi), cancelsWith: full ? 3 : null, what: 'un arc dans le plan y = 0' },
-    { desc: sideDesc('r', q2, 'φ', s.phi[1], '0'), ...piece(circleBack), what: full ? 'le cercle du bord' : 'un demi-cercle' },
-    { desc: sideDesc('φ', '0', 'r', q2, '0'), ...piece(back0), cancelsWith: full ? 1 : null, what: 'un arc dans le plan y = 0' },
+    { desc: sideDesc('r', '0', 'φ', '0', s.phi[1]), point: top, what: t('le point {a}', { a: fr(top) }) },
+    { desc: sideDesc('φ', s.phi[1], 'r', '0', q2), ...piece(full ? meridian0 : meridianPi), cancelsWith: full ? 3 : null, what: t('un arc dans le plan y = 0') },
+    { desc: sideDesc('r', q2, 'φ', s.phi[1], '0'), ...piece(circleBack), what: full ? t('le cercle du bord') : t('un demi-cercle') },
+    { desc: sideDesc('φ', '0', 'r', q2, '0'), ...piece(back0), cancelsWith: full ? 1 : null, what: t('un arc dans le plan y = 0') },
   ].map(finish);
 }
 
@@ -215,17 +216,17 @@ function sphSides(s) {
   const north = `(0 ; 0 ; ${R})`;
   if (s.order === 'θφ') {
     return [
-      { desc: sideDesc('φ', '0', 'θ', '0', s.top), ...piece(merid), cancelsWith: 2, what: 'un méridien' },
-      { desc: sideDesc('θ', s.top, 'φ', '0', '2π'), ...piece(eq), what: 'l\'équateur' },
-      { desc: sideDesc('φ', '2π', 'θ', s.top, '0'), ...piece(merid), cancelsWith: 0, what: 'le même méridien' },
-      { desc: sideDesc('θ', '0', 'φ', '2π', '0'), point: north, what: 'le pôle nord' },
+      { desc: sideDesc('φ', '0', 'θ', '0', s.top), ...piece(merid), cancelsWith: 2, what: t('un méridien') },
+      { desc: sideDesc('θ', s.top, 'φ', '0', '2π'), ...piece(eq), what: t('l\'équateur') },
+      { desc: sideDesc('φ', '2π', 'θ', s.top, '0'), ...piece(merid), cancelsWith: 0, what: t('le même méridien') },
+      { desc: sideDesc('θ', '0', 'φ', '2π', '0'), point: north, what: t('le pôle nord') },
     ].map(finish);
   }
   return [
-    { desc: sideDesc('θ', '0', 'φ', '0', '2π'), point: north, what: 'le pôle nord' },
-    { desc: sideDesc('φ', '2π', 'θ', '0', s.top), ...piece(merid), cancelsWith: 3, what: 'un méridien' },
-    { desc: sideDesc('θ', s.top, 'φ', '2π', '0'), ...piece(eqBack), what: 'l\'équateur' },
-    { desc: sideDesc('φ', '0', 'θ', s.top, '0'), ...piece(merid), cancelsWith: 1, what: 'le même méridien' },
+    { desc: sideDesc('θ', '0', 'φ', '0', '2π'), point: north, what: t('le pôle nord') },
+    { desc: sideDesc('φ', '2π', 'θ', '0', s.top), ...piece(merid), cancelsWith: 3, what: t('un méridien') },
+    { desc: sideDesc('θ', s.top, 'φ', '2π', '0'), ...piece(eqBack), what: t('l\'équateur') },
+    { desc: sideDesc('φ', '0', 'θ', s.top, '0'), ...piece(merid), cancelsWith: 1, what: t('le même méridien') },
   ].map(finish);
 }
 const piece = (c) => ({ ref: c.ref, t: c.t, closed: !!c.closed });

@@ -29,6 +29,7 @@ import { evalFloat } from '../cas/numeric.js';
 import { diff } from '../cas/diff.js';
 import { diagnoseLine } from './diagnose.js';
 import { sameLine } from './common.js';
+import { t } from '../i18n.js';
 
 // ---------- fcomplex ----------
 
@@ -67,7 +68,7 @@ function finalOf(cfg, node) {
   const v = complexValue(node);
   if (!v?.exact) return true;
   const short = complex.parseLine(cfg, shortText(v.exact.re, v.exact.im));
-  return size(node) <= size(short) + 1 ? true : 'Simplifie ce nombre.';
+  return size(node) <= size(short) + 1 ? true : t('Simplifie ce nombre.');
 }
 
 export const fcomplex = {
@@ -81,17 +82,17 @@ export const fcomplex = {
     else {
       try { node = complex.parseLine(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
     }
-    if (prev && sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+    if (prev && sameLine(node, prev)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
     const ref = cfg.expect !== undefined ? expectNode(cfg) : prev;
     let v;
     if (cfg.expect !== undefined && sameLine(node, ref)) v = { kind: 'ok', node };
     else v = complex.judgeLine(inner(cfg), ref, node, state);
     if (!['ok', 'done', 'stay'].includes(v.kind)) return v;
-    if (v.kind === 'stay' && /défini/.test(v.message || '')) return v;
+    if (v.kind === 'stay' && /défini|defined/.test(v.message || '')) return v;
     const fin = finalOf(cfg, node);
     if (fin === true) return { kind: 'done', node };
-    if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
-    if (cfg.form === 'realfn') return { kind: 'ok', node, message: 'Juste. Écris-la maintenant sans i : e^(iθ) + e^(−iθ) = 2cos θ.' };
+    if (typeof fin === 'string') return { kind: 'stay', node, message: t('C\'est juste, mais {a}{b}', { a: fin.charAt(0).toLowerCase(), b: fin.slice(1) }) };
+    if (cfg.form === 'realfn') return { kind: 'ok', node, message: t('Juste. Écris-la maintenant sans i : e^(iθ) + e^(−iθ) = 2cos θ.') };
     return { kind: 'ok', node };
   },
 };
@@ -102,8 +103,8 @@ const vOf = (cfg) => cfg.v || 'x';
 const LABEL = /^\s*[uφ](?:_\(?n\)?|_n)?\s*(?:\(\s*[a-z]\s*\))?\s*=/;
 
 function parseEigen(cfg, text) {
-  const t = String(text).replace(/^\s*=/, '').replace(LABEL, '');
-  return parse(t, { vars: [vOf(cfg), 'n'], dvar: vOf(cfg) });
+  const tt = String(text).replace(/^\s*=/, '').replace(LABEL, '');
+  return parse(tt, { vars: [vOf(cfg), 'n'], dvar: vOf(cfg) });
 }
 
 const ev = (n, env) => evalFloat(n, env, { guard: true });
@@ -125,18 +126,18 @@ function eigenIssue(cfg, phi) {
       const env = { [v]: x, n };
       const u = ev(phi, env);
       const u2 = ev(d2, env);
-      if (!Number.isFinite(u) || !Number.isFinite(u2)) return 'Ta fonction n\'est pas définie partout sur ]0 ; L[.';
+      if (!Number.isFinite(u) || !Number.isFinite(u2)) return t('Ta fonction n\'est pas définie partout sur ]0 ; L[.');
       big = Math.max(big, Math.abs(u));
-      if (!near0(-u2 - l * u, Math.abs(u2) + Math.abs(l * u))) return `Pour n = ${n}, ta fonction ne vérifie pas −u″ = λₙu.`;
+      if (!near0(-u2 - l * u, Math.abs(u2) + Math.abs(l * u))) return t('Pour n = {n}, ta fonction ne vérifie pas −u″ = λₙu.', { n });
     }
-    if (big < 1e-9) return `Pour n = ${n}, ta fonction est nulle : u = 0 n'est pas une fonction propre, on veut u ≠ 0.`;
+    if (big < 1e-9) return t('Pour n = {n}, ta fonction est nulle : u = 0 n\'est pas une fonction propre, on veut u ≠ 0.', { n });
     const bc = cfg.bc || ['D', 'D'];
     for (const [side, at] of [[0, 0], [1, L]]) {
       const env = { [v]: at, n };
       const val = bc[side] === 'D' ? ev(phi, env) : ev(d1, env);
       if (!near0(val, big)) {
         const where = side === 0 ? '0' : (cfg.Ltext || 'L');
-        return bc[side] === 'D' ? `Pour n = ${n}, u(${where}) ≠ 0 : la condition au bord n'est pas vérifiée.` : `Pour n = ${n}, u′(${where}) ≠ 0 : la condition au bord n'est pas vérifiée.`;
+        return bc[side] === 'D' ? t('Pour n = {n}, u({where}) ≠ 0 : la condition au bord n\'est pas vérifiée.', { n, where }) : t('Pour n = {n}, u′({where}) ≠ 0 : la condition au bord n\'est pas vérifiée.', { n, where });
       }
     }
   }
@@ -161,11 +162,11 @@ export const eigen = {
       try { node = parseEigen(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
     }
     const unknown = [...symbolsIn(node)].filter((s) => s !== vOf(cfg) && s !== 'n');
-    if (unknown.length) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici : écris uₙ avec ${vOf(cfg)} et n.` };
-    if (prev && sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
-    if (stripParen(node).t === 'rel') return { kind: 'parse', node, message: 'Écris seulement uₙ(x) = …' };
+    if (unknown.length) return { kind: 'parse', node, message: t('Je ne connais pas la lettre « {a} » ici : écris uₙ avec {b} et n.', { a: unknown[0].replace(/_$/, ''), b: vOf(cfg) }) };
+    if (prev && sameLine(node, prev)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
+    if (stripParen(node).t === 'rel') return { kind: 'parse', node, message: t('Écris seulement uₙ(x) = …') };
     let issue;
-    try { issue = eigenIssue(cfg, node); } catch { issue = 'Je n\'arrive pas à calculer ta fonction.'; }
+    try { issue = eigenIssue(cfg, node); } catch { issue = t('Je n\'arrive pas à calculer ta fonction.'); }
     if (issue) {
       const diag = diagnoseLine('eigen', prev, node, cfg, (cand, line) => { try { return toText(cand) === toText(line); } catch { return false; } });
       return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: issue };

@@ -26,6 +26,7 @@ import { exactValue } from '../cas/normal.js';
 import { evalFloat } from '../cas/numeric.js';
 import { Q } from '../math/rational.js';
 import * as S from '../cas/stats.js';
+import { t, tn } from '../i18n.js';
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -95,14 +96,14 @@ function readMember(cfg, text, ctx) {
     const name = m[2];
     const open = m.index + m[1].length + name.length;
     const close = closing(s, open);
-    if (close < 0) throw new ReadError('Une parenthèse n\'est pas fermée.');
+    if (close < 0) throw new ReadError(t('Une parenthèse n\'est pas fermée.'));
     const inner = s.slice(open + 1, close);
     const { parts } = splitTop(inner, CALLS[name] > 1 ? ',;' : ';');
     let args = parts;
     // « C(7,3) »: with one argument found, a decimal comma splits it.
     if (CALLS[name] === 2 && args.length === 1 && /^\d+,\d+$/.test(inner)) args = inner.split(',');
     if (args.length !== CALLS[name]) {
-      throw new ReadError(name === 'C' || name === 'A' ? `${name}(n, k) prend deux nombres.` : `${name === 'Ψ' ? 'Φ⁻¹' : name} prend ${CALLS[name]} argument${CALLS[name] > 1 ? 's' : ''}.`);
+      throw new ReadError(name === 'C' || name === 'A' ? t('{f}(n, k) prend deux nombres.', { f: name }) : tn(CALLS[name], '{f} prend {n} argument.', '{f} prend {n} arguments.', { f: name === 'Ψ' ? 'Φ⁻¹' : name }));
     }
     const read = args.map((a) => readMember(cfg, a, ctx));
     const id = ctx.items.length;
@@ -159,7 +160,7 @@ export function readStat(cfg, input) {
   body = body.replace(/□/g, () => `${nb++}`);
   const { parts, ops } = splitTop(body, '=≈');
   const ctx = { items: [], blanks: 0 };
-  if (parts.some((p) => !p)) throw new ReadError('Il manque un membre de chaque côté de « = ».');
+  if (parts.some((p) => !p)) throw new ReadError(t('Il manque un membre de chaque côté de « = ».'));
   const members = parts.map((p, i) => ({ ast: readMember(cfg, p, ctx), op: i === 0 ? '' : ops[i - 1] }));
   return { t: 'sline', text: raw, label, members };
 }
@@ -282,7 +283,7 @@ export function expected(cfg, state) {
   if (cfg.expect === undefined || cfg.expect === null) return null;
   const env = envOf(cfg, state);
   if (Array.isArray(cfg.expect)) {
-    const [lo, hi] = cfg.expect.map((t) => expected({ ...cfg, expect: t }, state));
+    const [lo, hi] = cfg.expect.map((e) => expected({ ...cfg, expect: e }, state));
     return lo && hi ? { q: null, x: NaN, lo: lo.x, hi: hi.x, interval: true } : null;
   }
   const text = String(cfg.expect);

@@ -19,32 +19,33 @@
 
 import { MT, H, fr, build, COEF, COEFK, KEYS, mcqMulti, q, V, vText } from './fourier-a-kit.js';
 import { examTag } from './kit.js';
+import { t } from '../../i18n.js';
 
 // ---------- f-parseval ----------
 
 const SKP = 'f-parseval';
 const SUBP = [
-  { id: 'lhs', label: 'membre de gauche (2/T)∫ f²', skill: SKP },
-  { id: 'rhs', label: 'carrés des coefficients', skill: SKP },
-  { id: 'substitute', label: 'sommes connues', skill: SKP },
-  { id: 'solve', label: 'isoler la somme', skill: 'eq-one-step' },
+  { id: 'lhs', label: t('membre de gauche (2/T)∫ f²'), skill: SKP },
+  { id: 'rhs', label: t('carrés des coefficients'), skill: SKP },
+  { id: 'substitute', label: t('sommes connues'), skill: SKP },
+  { id: 'solve', label: t('isoler la somme'), skill: 'eq-one-step' },
 ];
 const CHP = [
-  { id: 'lhs', label: 'Écrire (2/T)∫ f(x)² dx sur la période où f est donnée' },
-  { id: 'calc', label: 'Calculer l\'intégrale' },
-  { id: 'square', label: 'Élever le coefficient au carré' },
-  { id: 'subst', label: 'Remplacer les sommes connues' },
-  { id: 'solve', label: 'Isoler S' },
-  { id: 'nofactor', label: 'Écrire ∫ f² sans facteur', rule: 'f_parseval_factor', why: 'Avec la convention a₀/2, le membre de gauche est (2/T)∫ f², ici (1/π)∫.' },
+  { id: 'lhs', label: t('Écrire (2/T)∫ f(x)² dx sur la période où f est donnée') },
+  { id: 'calc', label: t('Calculer l\'intégrale') },
+  { id: 'square', label: t('Élever le coefficient au carré') },
+  { id: 'subst', label: t('Remplacer les sommes connues') },
+  { id: 'solve', label: t('Isoler S') },
+  { id: 'nofactor', label: t('Écrire ∫ f² sans facteur'), rule: 'f_parseval_factor', why: t('Avec la convention a₀/2, le membre de gauche est (2/T)∫ f², ici (1/π)∫.') },
 ];
 
 const sq = (c) => c * c;
-const Cπ = (c, t = 'π') => (c === 1 ? t : `${c}${t}`);
+const Cπ = (c, tt = 'π') => (c === 1 ? tt : `${c}${tt}`);
 const cxT = (c, body) => (c === 1 ? body : `${c}${body}`);
 
 // c·π^e as text for the CAS, reduced (2π²/3, 6π², π⁴/90), and for the screen.
 const T = (num, den, e = 0) => vText(V([[q(num, den), e]]));
-const sc = (t) => fr(t).replace(/\^2/g, '²').replace(/\^4/g, '⁴');
+const sc = (tt) => fr(tt).replace(/\^2/g, '²').replace(/\^4/g, '⁴');
 
 function parsevalData(id, c) {
   const c2 = sq(c);
@@ -52,7 +53,7 @@ function parsevalData(id, c) {
     case 'x': {
       const G = T(2 * c2, 3, 2);
       return {
-        id, def: `f(x) = ${cxT(c, 'x')} sur ]−π ; π[`, coefs: `a₀ = aₙ = 0, bₙ = ${2 * c}(−1)ⁿ⁺¹/n`,
+        id, def: t('f(x) = {a} sur ]−π ; π[', { a: cxT(c, 'x') }), coefs: `a₀ = aₙ = 0, bₙ = ${2 * c}(−1)ⁿ⁺¹/n`,
         lhsLine: `(1/π) int((${cxT(c, 'x')})^2, x, -π, π)`, G,
         wrong: { factor: `int((${cxT(c, 'x')})^2, x, -π, π)`, bounds: `(1/π) int((${cxT(c, 'x')})^2, x, 0, 2π)`, square: `(1/π) int(${cxT(c, 'x')}, x, -π, π)` },
         a0: null, coef: { name: 'bₙ²', start: `(${2 * c}(-1)^(n+1)/n)^2`, goal: `${4 * c2}/n^2`, wrongSq: `${2 * c}(-1)^(n+1)/n`, v: 'n' },
@@ -63,7 +64,7 @@ function parsevalData(id, c) {
       const G = T(2 * c2, 5, 4);
       const A = T(2 * c2, 9, 4);
       return {
-        id, def: `f(x) = ${cxT(c, 'x²')} sur ]−π ; π[`, coefs: `a₀ = ${sc(T(2 * c, 3, 2))}, aₙ = ${4 * c}(−1)ⁿ/n², bₙ = 0`,
+        id, def: t('f(x) = {a} sur ]−π ; π[', { a: cxT(c, 'x²') }), coefs: `a₀ = ${sc(T(2 * c, 3, 2))}, aₙ = ${4 * c}(−1)ⁿ/n², bₙ = 0`,
         lhsLine: `(1/π) int((${cxT(c, 'x^2')})^2, x, -π, π)`, G,
         wrong: { factor: `int((${cxT(c, 'x^2')})^2, x, -π, π)`, bounds: `(1/π) int((${cxT(c, 'x^2')})^2, x, 0, 2π)`, square: `(1/π) int(${cxT(c, 'x^2')}, x, -π, π)` },
         a0: { a0: T(2 * c, 3, 2), start: `(${T(2 * c, 3, 2)})^2/2`, value: A, wrong: T(4 * c2, 9, 4) },
@@ -75,7 +76,7 @@ function parsevalData(id, c) {
       const G = T(2 * c2, 3, 2);
       const A = T(c2, 2, 2);
       return {
-        id, def: `f(x) = ${cxT(c, '|x|')} sur ]−π ; π[`, coefs: `a₀ = ${sc(T(c, 1, 1))}, a₂ₖ = 0, a₂ₖ₊₁ = −${4 * c}/(π(2k + 1)²), bₙ = 0`,
+        id, def: t('f(x) = {a} sur ]−π ; π[', { a: cxT(c, '|x|') }), coefs: `a₀ = ${sc(T(c, 1, 1))}, a₂ₖ = 0, a₂ₖ₊₁ = −${4 * c}/(π(2k + 1)²), bₙ = 0`,
         lhsLine: `(2/π) int((${cxT(c, 'x')})^2, x, 0, π)`, G,
         wrong: { factor: `2 int((${cxT(c, 'x')})^2, x, 0, π)`, bounds: `(1/π) int((${cxT(c, 'x')})^2, x, 0, 2π)`, square: `(2/π) int(${cxT(c, 'x')}, x, 0, π)` },
         a0: { a0: T(c, 1, 1), start: `(${T(c, 1, 1)})^2/2`, value: A, wrong: T(c2, 1, 2) },
@@ -84,7 +85,7 @@ function parsevalData(id, c) {
       };
     }
     case 'step': return {
-      id, def: `f(x) = −${c} sur ]−π ; 0[ et f(x) = ${c} sur ]0 ; π[`, coefs: `a₀ = aₙ = 0, b₂ₖ = 0, b₂ₖ₊₁ = ${4 * c}/(π(2k + 1))`,
+      id, def: t('f(x) = −{c} sur ]−π ; 0[ et f(x) = {c} sur ]0 ; π[', { c }), coefs: `a₀ = aₙ = 0, b₂ₖ = 0, b₂ₖ₊₁ = ${4 * c}/(π(2k + 1))`,
       lhsLine: `(1/π) int(${c2}, x, -π, π)`, G: String(2 * c2),
       wrong: { factor: `int(${c2}, x, -π, π)`, bounds: null, square: `(2/π) int(${c}, x, 0, π)` },
       a0: null, coef: { name: 'b₂ₖ₊₁²', start: `(${4 * c}/(π (2k+1)))^2`, goal: `${16 * c2}/(π^2 (2k+1)^2)`, wrongSq: `${4 * c}/(π (2k+1))`, v: 'k' },
@@ -101,14 +102,14 @@ function lhsPart(d, level) {
     ...(d.wrong.bounds ? { f_parseval_bounds: [d.wrong.bounds] } : {}),
   };
   return {
-    html: 'Membre de gauche : G = (2/T)∫ f(x)² dx, sur la période où f est donnée.', ask: 'G =', start: 'G',
+    html: t('Membre de gauche : G = (2/T)∫ f(x)² dx, sur la période où f est donnée.'), ask: 'G =', start: 'G',
     judge: { kind: 'definite', known: { G: d.G }, traps },
-    pre: [level === 1 ? { kind: 'note', html: `T = 2π : G = (1/π)∫ f(x)² dx sur ]−π ; π[${d.id === 'abs' ? ' (f² est paire : (2/π)∫₀^π)' : ''}.` } : {
-      kind: 'decision', prompt: 'Le membre de gauche de Parseval ?', levels: [2, 3], options: [
-        { id: 'ok', label: '(1/π)∫ f(x)² dx sur ]−π ; π[', valid: true },
-        { id: 'nofactor', label: '∫ f(x)² dx sur ]−π ; π[', valid: false, rule: 'f_parseval_factor', why: 'Avec la convention a₀/2, c\'est (2/T)∫ f² : ici 2/T = 1/π.' },
-        { id: 'bounds', label: '(1/π)∫ f(x)² dx sur [0 ; 2π]', valid: false, rule: 'f_parseval_bounds', why: 'f est donnée par sa formule sur ]−π ; π[ : sur ]π ; 2π[, ce n\'est pas la même formule.' },
-        { id: 'square', label: '(1/π)∫ f(x) dx sur ]−π ; π[', valid: false, rule: 'f_parseval_square', why: 'Parseval porte sur les carrés : f², aₙ², bₙ².' },
+    pre: [level === 1 ? { kind: 'note', html: d.id === 'abs' ? t('T = 2π : G = (1/π)∫ f(x)² dx sur ]−π ; π[ (f² est paire : (2/π)∫₀^π).') : t('T = 2π : G = (1/π)∫ f(x)² dx sur ]−π ; π[.') } : {
+      kind: 'decision', prompt: t('Le membre de gauche de Parseval ?'), levels: [2, 3], options: [
+        { id: 'ok', label: t('(1/π)∫ f(x)² dx sur ]−π ; π['), valid: true },
+        { id: 'nofactor', label: t('∫ f(x)² dx sur ]−π ; π['), valid: false, rule: 'f_parseval_factor', why: t('Avec la convention a₀/2, c\'est (2/T)∫ f² : ici 2/T = 1/π.') },
+        { id: 'bounds', label: t('(1/π)∫ f(x)² dx sur [0 ; 2π]'), valid: false, rule: 'f_parseval_bounds', why: t('f est donnée par sa formule sur ]−π ; π[ : sur ]π ; 2π[, ce n\'est pas la même formule.') },
+        { id: 'square', label: t('(1/π)∫ f(x) dx sur ]−π ; π['), valid: false, rule: 'f_parseval_square', why: t('Parseval porte sur les carrés : f², aₙ², bₙ².') },
       ],
     }],
     lines: [
@@ -126,30 +127,30 @@ function parsevalItem(level, rng, opts) {
   const parts = [lhsPart(d, level)];
   if (d.a0) {
     parts.push({
-      html: `Le terme constant : a₀²/2, avec a₀ = ${sc(d.a0.a0)}.`, ask: 'a₀²/2 =', start: 'a_0^2/2',
+      html: t('Le terme constant : a₀²/2, avec a₀ = {a}.', { a: sc(d.a0.a0) }), ask: 'a₀²/2 =', start: 'a_0^2/2',
       judge: { kind: 'value', expect: d.a0.value, form: 'closed', traps: { f_parseval_a0: [d.a0.wrong] } },
       lines: [{ math: d.a0.start, note: 'a₀²/2', subgoal: 'rhs', act: 'square', from: 2 }, { math: d.a0.value, note: '', subgoal: 'rhs', act: 'calc', blank: [d.a0.value] }],
     });
   }
   const J = d.coef.v === 'n' ? COEF(d.coef.goal, { target: 'no-int', traps: { f_parseval_square: [d.coef.wrongSq] } }) : COEFK(d.coef.goal, { traps: { f_parseval_square: [d.coef.wrongSq] } });
-  parts.push({ html: `Le carré du coefficient, ${d.coef.name} :`, ask: `${d.coef.name} =`, start: d.coef.start, judge: J, lines: [{ math: d.coef.goal, note: 'Au carré', subgoal: 'rhs', act: 'square', blank: [d.coef.goal] }] });
+  parts.push({ html: t('Le carré du coefficient, {name} :', { name: d.coef.name }), ask: `${d.coef.name} =`, start: d.coef.start, judge: J, lines: [{ math: d.coef.goal, note: t('Au carré'), subgoal: 'rhs', act: 'square', blank: [d.coef.goal] }] });
   parts.push({
-    html: `Parseval donne ${d.eq}, avec S = ${d.Sshow}. Isole S :`, ask: 'S =', start: 'S',
+    html: t('Parseval donne {eq}, avec S = {Sshow}. Isole S :', { eq: d.eq, Sshow: d.Sshow }), ask: 'S =', start: 'S',
     judge: { kind: 'value', expect: d.S, form: 'closed' },
-    lines: [{ math: d.solve, note: 'Isoler S', subgoal: 'solve', act: 'solve', from: 2 }, { math: d.S, note: '', subgoal: 'solve', act: 'calc', blank: [d.S] }],
+    lines: [{ math: d.solve, note: t('Isoler S'), subgoal: 'solve', act: 'solve', from: 2 }, { math: d.S, note: '', subgoal: 'solve', act: 'calc', blank: [d.S] }],
   });
   if (level === 3) {
     parts[0].pre.unshift({
-      kind: 'decision', prompt: `Pour calculer S = ${d.Sshow}, quel outil ?`, options: [
-        { id: 'parseval', label: 'Parseval : les carrés des coefficients donnent S', valid: true },
-        { id: 'dirichlet', label: 'Dirichlet en un point', valid: false, why: `Dirichlet donne une somme des coefficients eux-mêmes (${d.coef.name.replace('²', '')}), pas de leurs carrés : ici, S vient des carrés.` },
+      kind: 'decision', prompt: t('Pour calculer S = {Sshow}, quel outil ?', { Sshow: d.Sshow }), options: [
+        { id: 'parseval', label: t('Parseval : les carrés des coefficients donnent S'), valid: true },
+        { id: 'dirichlet', label: t('Dirichlet en un point'), valid: false, why: t('Dirichlet donne une somme des coefficients eux-mêmes ({a}), pas de leurs carrés : ici, S vient des carrés.', { a: d.coef.name.replace('²', '') }) },
       ],
     });
   }
   return build({
     skill: SKP, level, parts, subgoals: SUBP, keys: KEYS, choices: CHP,
-    prompt: `${d.def}, 2π-périodique. Ses coefficients : ${d.coefs}. Avec l'égalité de Parseval, calcule S = ${d.Sshow}.`,
-    hints: H('(2/T)∫ f² = a₀²/2 + Σ (aₙ² + bₙ²), sur la période où f est donnée.', `G = ${MT(d.lhsLine)}`, `G = ${MT(d.G)}`),
+    prompt: t('{def}, 2π-périodique. Ses coefficients : {coefs}. Avec l\'égalité de Parseval, calcule S = {Sshow}.', { def: d.def, coefs: d.coefs, Sshow: d.Sshow }),
+    hints: H(t('(2/T)∫ f² = a₀²/2 + Σ (aₙ² + bₙ²), sur la période où f est donnée.'), `G = ${MT(d.lhsLine)}`, `G = ${MT(d.G)}`),
     key: `${SKP}:${level}:${id}:${c}`, exam: examTag(opts, 5),
   });
 }
@@ -162,24 +163,24 @@ function parsevalX3(level, rng, opts) {
   };
   const parts = [lhsPart(d, level)];
   parts.push({
-    html: 'Développe bₙ² :', ask: 'bₙ² =', start: '((-1)^(n+1)(2π^2/n-12/n^3))^2',
+    html: t('Développe bₙ² :'), ask: 'bₙ² =', start: '((-1)^(n+1)(2π^2/n-12/n^3))^2',
     judge: COEF('4π^4/n^2-48π^2/n^4+144/n^6', { traps: { f_parseval_expand: ['4π^4/n^2-144/n^6'], f_parseval_square: ['(-1)^(n+1)(2π^2/n-12/n^3)'] } }),
     lines: [{ math: '4π^4/n^2-48π^2/n^4+144/n^6', note: '(a − b)² = a² − 2ab + b²', subgoal: 'rhs', act: 'square' }],
   });
   parts.push({
-    html: 'Avec Σ 1/n² = π²/6 et Σ 1/n⁴ = π⁴/90, et S = Σ 1/n⁶ : Σ bₙ² =', ask: 'Σ bₙ² =', start: '4π^4(π^2/6)-48π^2(π^4/90)+144S',
+    html: t('Avec Σ 1/n² = π²/6 et Σ 1/n⁴ = π⁴/90, et S = Σ 1/n⁶ : Σ bₙ² ='), ask: 'Σ bₙ² =', start: '4π^4(π^2/6)-48π^2(π^4/90)+144S',
     judge: { kind: 'equiv', vars: ['S'], target: 'no-int', goal: '2π^6/15+144S' },
     lines: [{ math: '2π^6/15+144S', note: '2π⁶/3 − 8π⁶/15', subgoal: 'substitute', act: 'subst' }],
   });
   parts.push({
-    html: 'Parseval : 2π⁶/7 = 2π⁶/15 + 144S. Isole S :', ask: 'S =', start: 'S',
+    html: t('Parseval : 2π⁶/7 = 2π⁶/15 + 144S. Isole S :'), ask: 'S =', start: 'S',
     judge: { kind: 'value', expect: 'π^6/945', form: 'closed' },
-    lines: [{ math: '(2π^6/7-2π^6/15)/144', note: 'Isoler S', subgoal: 'solve', act: 'solve' }, { math: 'π^6/945', note: '', subgoal: 'solve', act: 'calc' }],
+    lines: [{ math: '(2π^6/7-2π^6/15)/144', note: t('Isoler S'), subgoal: 'solve', act: 'solve' }, { math: 'π^6/945', note: '', subgoal: 'solve', act: 'calc' }],
   });
   return build({
     skill: SKP, level, parts, subgoals: SUBP, keys: [...KEYS], choices: CHP,
-    prompt: 'f(x) = x³ sur ]−π ; π[, 2π-périodique : aₙ = 0 et bₙ = (−1)ⁿ⁺¹(2π²/n − 12/n³). On donne Σ 1/n² = π²/6 et Σ 1/n⁴ = π⁴/90. Avec Parseval, calcule S = Σ<sub>n≥1</sub> 1/n⁶.',
-    hints: H('(1/π)∫ f² = Σ bₙ² ; développe bₙ² sans oublier le double produit.', MT('(1/π) int(x^6, x, -π, π)'), MT('4π^4/n^2-48π^2/n^4+144/n^6')),
+    prompt: t('f(x) = x³ sur ]−π ; π[, 2π-périodique : aₙ = 0 et bₙ = (−1)ⁿ⁺¹(2π²/n − 12/n³). On donne Σ 1/n² = π²/6 et Σ 1/n⁴ = π⁴/90. Avec Parseval, calcule S = Σ<sub>n≥1</sub> 1/n⁶.'),
+    hints: H(t('(1/π)∫ f² = Σ bₙ² ; développe bₙ² sans oublier le double produit.'), MT('(1/π) int(x^6, x, -π, π)'), MT('4π^4/n^2-48π^2/n^4+144/n^6')),
     key: `${SKP}:${level}:x3`, exam: examTag(opts, 5),
   });
 }
@@ -201,8 +202,8 @@ function parsevalMcq(rng, opts) {
   ];
   return mcqMulti({
     skill: SKP, level: 4, key: `${SKP}:mcq:${id}:${c}`, exam: examTag(opts, 1), options,
-    prompt: `${d.def}, 2π-périodique : ${d.coefs}. Quelles égalités sont vraies ?`,
-    solution: [{ html: `Parseval : (2/T)∫ f² = a₀²/2 + Σ (aₙ² + bₙ²) sur ]−π ; π[ ; ici ${d.eq}, donc S = ${MT(d.S)}.`, note: '' }],
+    prompt: t('{def}, 2π-périodique : {coefs}. Quelles égalités sont vraies ?', { def: d.def, coefs: d.coefs }),
+    solution: [{ html: t('Parseval : (2/T)∫ f² = a₀²/2 + Σ (aₙ² + bₙ²) sur ]−π ; π[ ; ici {eq}, donc S = {S}.', { eq: d.eq, S: MT(d.S) }), note: '' }],
     expectedSec: 240,
   }, rng);
 }
@@ -211,16 +212,16 @@ function parsevalMcq(rng, opts) {
 
 const SKR = 'f-coef-relations';
 const SUBR = [
-  { id: 'hyp', label: 'hypothèses : g continue, périodique, C¹ par morceaux', skill: SKR },
+  { id: 'hyp', label: t('hypothèses : g continue, périodique, C¹ par morceaux'), skill: SKR },
   { id: 'relation', label: 'aₙ(h) = −bₙ(h′)/(nω)', skill: SKR },
-  { id: 'factor', label: 'la constante multiplicative', skill: SKR },
-  { id: 'a0', label: 'a₀ à part', skill: 'f-coef' },
+  { id: 'factor', label: t('la constante multiplicative'), skill: SKR },
+  { id: 'a0', label: t('a₀ à part'), skill: 'f-coef' },
 ];
 const CHR = [
-  { id: 'rel', label: 'Appliquer aₙ(h) = −bₙ(h′)/(nω)' },
-  { id: 'factor', label: 'Multiplier par la constante' },
-  { id: 'a0', label: 'Calculer a₀ à part' },
-  { id: 'all', label: 'Tout recalculer par parties', why: 'Juste, mais long : la relation donne le résultat en une ligne.' },
+  { id: 'rel', label: t('Appliquer aₙ(h) = −bₙ(h′)/(nω)') },
+  { id: 'factor', label: t('Multiplier par la constante') },
+  { id: 'a0', label: t('Calculer a₀ à part') },
+  { id: 'all', label: t('Tout recalculer par parties'), why: t('Juste, mais long : la relation donne le résultat en une ligne.') },
 ];
 const MS = [q(1, 4), q(1, 2), q(1), q(2), q(4)];
 
@@ -231,7 +232,7 @@ function relData(rng) {
 function relRaw(rng) {
   const kind = rng.pick(['x', 'x', 'x3', 'lin1']);
   const m = rng.pick(MS);
-  const mt = (t) => (m.eq(1) ? t : m.d === 1 ? `${m}${t}` : `${t}/${m.d}`);
+  const mt = (tt) => (m.eq(1) ? tt : m.d === 1 ? `${m}${tt}` : `${tt}/${m.d}`);
   if (kind === 'x') {
     // f = x, bₙ = 2(−1)ⁿ⁺¹/n ; h = x²/2 ; g = m·x² = 2m·h.
     const K = m.mul(2);
@@ -256,33 +257,33 @@ function relRaw(rng) {
     ag: vText(V([[m.mul(4), -2, 2, 1]])), a0start: `int(${mt('x^2')}, x, -1, 1)`, a0: vText(V([[m.mul(q(2, 3))]])), cont: 'g(−1) = g(1)',
   };
 }
-const fixT = (t) => t.replace(/\b1\(-1\)/g, '(-1)').replace(/^1\//, '1/').replace(/(\d+)\/(\d+)\(-1\)/g, '($1/$2)(-1)').replace(/(\d+)\/(\d+)π/g, '($1/$2)π').replace(/(\d+)\/(\d+)\//g, '($1/$2)/');
+const fixT = (tt) => tt.replace(/\b1\(-1\)/g, '(-1)').replace(/^1\//, '1/').replace(/(\d+)\/(\d+)\(-1\)/g, '($1/$2)(-1)').replace(/(\d+)\/(\d+)π/g, '($1/$2)π').replace(/(\d+)\/(\d+)\//g, '($1/$2)/');
 
 function relItem(level, rng, opts) {
   const d = relData(rng);
   const nw = d.w ? 'nπ' : 'n';
   const nwP = d.w ? '(nπ)' : 'n';
   const pre = [];
-  pre.push(level === 1 ? { kind: 'note', html: `Relation : si h est continue et ${d.T}-périodique, C¹ par morceaux, alors aₙ(h) = −bₙ(h′)/${nwP}.` } : {
-    kind: 'decision', prompt: `h = ${d.h} sur ${d.ivl}, h′ = ${d.fShow}. Que vaut aₙ(h) ?`, options: [
-      { id: 'ok', label: `aₙ(h) = −bₙ(h′)/${nwP} : h est continue (${d.cont.replace(/g/g, 'h')}) et C¹ par morceaux`, valid: true },
-      { id: 'sign', label: `aₙ(h) = bₙ(h′)/${nwP}`, valid: false, why: `Par parties, bₙ(h′) = −${nw}·aₙ(h) : le signe est −.` },
-      { id: 'times', label: `aₙ(h) = −${nw}·bₙ(h′)`, valid: false, why: `C'est l'inverse : dériver multiplie par ${nw}, intégrer divise.` },
-      { id: 'all', label: 'Recalculer aₙ(h) par parties', valid: true, quality: 'poor', why: 'Juste, mais la relation donne le résultat en une ligne.' },
+  pre.push(level === 1 ? { kind: 'note', html: t('Relation : si h est continue et {T}-périodique, C¹ par morceaux, alors aₙ(h) = −bₙ(h′)/{nwP}.', { T: d.T, nwP }) } : {
+    kind: 'decision', prompt: t('h = {h} sur {ivl}, h′ = {fShow}. Que vaut aₙ(h) ?', { h: d.h, ivl: d.ivl, fShow: d.fShow }), options: [
+      { id: 'ok', label: t('aₙ(h) = −bₙ(h′)/{nwP} : h est continue ({a}) et C¹ par morceaux', { nwP, a: d.cont.replace(/g/g, 'h') }), valid: true },
+      { id: 'sign', label: `aₙ(h) = bₙ(h′)/${nwP}`, valid: false, why: t('Par parties, bₙ(h′) = −{nw}·aₙ(h) : le signe est −.', { nw }) },
+      { id: 'times', label: `aₙ(h) = −${nw}·bₙ(h′)`, valid: false, why: t('C\'est l\'inverse : dériver multiplie par {nw}, intégrer divise.', { nw }) },
+      { id: 'all', label: t('Recalculer aₙ(h) par parties'), valid: true, quality: 'poor', why: t('Juste, mais la relation donne le résultat en une ligne.') },
     ],
   });
   if (level === 3 || level === 5) {
     pre.push({
-      kind: 'decision', prompt: `Et dans l'autre sens : peut-on dériver terme à terme la série de f(x) = ${d.fShow} (${d.T}-périodique) pour obtenir celle de f′ ?`, options: [
-        { id: 'no', label: `Non : le prolongement périodique de ${d.fShow} saute aux bords de ${d.ivl}`, valid: true },
-        { id: 'yes', label: 'Oui : aₙ(f′) = nω·bₙ(f) vaut toujours', valid: false, rule: 'f_termwise_deriv', why: `Le prolongement de ${d.fShow} est discontinu : la série dérivée ne converge pas vers f′. On ne dérive terme à terme que la série d'une fonction continue et périodique.` },
+      kind: 'decision', prompt: t('Et dans l\'autre sens : peut-on dériver terme à terme la série de f(x) = {fShow} ({T}-périodique) pour obtenir celle de f′ ?', { fShow: d.fShow, T: d.T }), options: [
+        { id: 'no', label: t('Non : le prolongement périodique de {fShow} saute aux bords de {ivl}', { fShow: d.fShow, ivl: d.ivl }), valid: true },
+        { id: 'yes', label: t('Oui : aₙ(f′) = nω·bₙ(f) vaut toujours'), valid: false, rule: 'f_termwise_deriv', why: t('Le prolongement de {fShow} est discontinu : la série dérivée ne converge pas vers f′. On ne dérive terme à terme que la série d\'une fonction continue et périodique.', { fShow: d.fShow }) },
       ],
     });
   }
   const mT = d.K.eq(1) ? '' : d.K.d === 1 ? String(d.K) : `(${d.K})`;
   const parts = [
     {
-      html: `Avec h = ${d.h} (h′ = ${d.fShow}, bₙ(h′) = ${d.bfShow}) :`, ask: 'aₙ(h) =', start: 'a_n',
+      html: t('Avec h = {h} (h′ = {fShow}, bₙ(h′) = {bfShow}) :', { h: d.h, fShow: d.fShow, bfShow: d.bfShow }), ask: 'aₙ(h) =', start: 'a_n',
       judge: { kind: 'prob', vars: ['n'], domain: { n: { int: [1, 40] } }, expect: d.ah, label: 'a_n' }, pre,
       lines: [{ math: fixT(d.ah), note: `−bₙ(h′)/${nwP}`, subgoal: 'relation', act: 'rel' }],
     },
@@ -295,13 +296,13 @@ function relItem(level, rng, opts) {
     });
   }
   parts.push({
-    html: 'a₀(g) se calcule à part :', ask: 'a₀ =', start: d.a0start, judge: { kind: 'definite' },
+    html: t('a₀(g) se calcule à part :'), ask: 'a₀ =', start: d.a0start, judge: { kind: 'definite' },
     lines: [{ math: fixT(d.a0), note: '(2/T)∫ g', subgoal: 'a0', act: 'a0', blank: [fixT(d.a0)] }],
   });
   return build({
     skill: SKR, level, parts, subgoals: SUBR, keys: KEYS, choices: CHR,
-    prompt: `f(x) = ${d.fShow} sur ${d.ivl}, ${d.T}-périodique, a pour coefficients aₙ = 0, bₙ = ${d.bfShow}. Sans recalculer d'intégrale par parties, donne les coefficients de g(x) = ${d.g} sur ${d.ivl} (prolongée par périodicité).`,
-    hints: H(`Par parties, aₙ(h) = −bₙ(h′)/${nwP} pour h continue et périodique ; puis la constante entre h et g ; a₀ à part.`, `aₙ(h) = −(${MT(d.bf)})/${nwP}`, `aₙ(h) = ${MT(d.ah)}`),
+    prompt: t('f(x) = {fShow} sur {ivl}, {T}-périodique, a pour coefficients aₙ = 0, bₙ = {bfShow}. Sans recalculer d\'intégrale par parties, donne les coefficients de g(x) = {g} sur {ivl} (prolongée par périodicité).', { fShow: d.fShow, ivl: d.ivl, T: d.T, bfShow: d.bfShow, g: d.g }),
+    hints: H(t('Par parties, aₙ(h) = −bₙ(h′)/{nwP} pour h continue et périodique ; puis la constante entre h et g ; a₀ à part.', { nwP }), `aₙ(h) = −(${MT(d.bf)})/${nwP}`, `aₙ(h) = ${MT(d.ah)}`),
     key: `${SKR}:${level}:${d.kind}:${d.m}`, exam: examTag(opts, 4),
   });
 }
@@ -312,14 +313,14 @@ function relMcq(rng, opts) {
     { html: `aₙ(g) = ${MT(d.ag)}`, correct: true },
     d.K.eq(1) ? null : { html: `aₙ(g) = ${MT(d.ah)}`, correct: false, rule: 'f_coef_relation_factor' },
     { html: `bₙ(g) = 0`, correct: true },
-    { html: `On obtient a₀(g) en prenant n = 0 dans aₙ(g)`, correct: false, rule: 'f_a0_separate' },
-    { html: `On peut dériver terme à terme la série de f(x) = ${d.fShow} pour obtenir celle de f′`, correct: false, rule: 'f_termwise_deriv' },
+    { html: t('On obtient a₀(g) en prenant n = 0 dans aₙ(g)'), correct: false, rule: 'f_a0_separate' },
+    { html: t('On peut dériver terme à terme la série de f(x) = {fShow} pour obtenir celle de f′', { fShow: d.fShow }), correct: false, rule: 'f_termwise_deriv' },
     { html: `a₀(g) = ${MT(d.a0)}`, correct: true },
   ];
   return mcqMulti({
     skill: SKR, level: 4, key: `${SKR}:mcq:${d.kind}:${d.m}`, exam: examTag(opts, 1), options,
-    prompt: `f(x) = ${d.fShow} sur ${d.ivl}, ${d.T}-périodique : aₙ = 0, bₙ = ${d.bfShow}. Soit g(x) = ${d.g} sur ${d.ivl}, prolongée par périodicité. Quelles affirmations sont vraies ?`,
-    solution: [{ html: `g est continue et paire : aₙ(g) = ${d.K.eq(1) ? '' : `${d.K}·`}aₙ(h) avec aₙ(h) = −bₙ(f)/(${d.w ? 'nπ' : 'n'}) ; a₀ se calcule à part : ${MT(d.a0)}.`, note: '' }],
+    prompt: t('f(x) = {fShow} sur {ivl}, {T}-périodique : aₙ = 0, bₙ = {bfShow}. Soit g(x) = {g} sur {ivl}, prolongée par périodicité. Quelles affirmations sont vraies ?', { fShow: d.fShow, ivl: d.ivl, T: d.T, bfShow: d.bfShow, g: d.g }),
+    solution: [{ html: t('g est continue et paire : aₙ(g) = {a}aₙ(h) avec aₙ(h) = −bₙ(f)/({b}) ; a₀ se calcule à part : {a0}.', { a: d.K.eq(1) ? '' : `${d.K}·`, b: d.w ? 'nπ' : 'n', a0: MT(d.a0) }), note: '' }],
     expectedSec: 200,
   }, rng);
 }

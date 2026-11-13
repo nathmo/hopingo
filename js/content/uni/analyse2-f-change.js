@@ -13,6 +13,7 @@ import { parse } from '../../cas/parse.js';
 import { stripParen } from '../../cas/ast.js';
 import { compileFloat } from '../../cas/numeric.js';
 import { makeRng } from '../random.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-change-var';
 const UV = { vars: ['u', 'v'] };
@@ -69,7 +70,7 @@ function hypData(rng) {
     jacStart: 'pd(x y,x)×pd(y/x,y)-pd(x y,y)×pd(y/x,x)', jacLines: ['y×1/x-x×(-y/x^2)', '2y/x', '2v'], jacUV: '2v', finalVars: ['u', 'v'],
     Jxy: 'x/(2y)', Juv: '1/(2v)', f: c.f, F: c.F, Fu: c.Fu, Fv: c.Fv, Fuv: c.Fuv,
     wrongF: [[2, ...{ 'x y': [1, 1], 1: [0, 1], 'y/x': [0, 2], 'y^2': [1, 2], 'x^2 y^2': [2, 1] }[c.f]]], wrongText: `${fUV === '1' ? '' : `${fUV}×`}2v`,
-    why: `les inégalités de D parlent de xy et de y/x`,
+    why: t('les inégalités de D parlent de xy et de y/x'),
   };
 }
 
@@ -84,7 +85,7 @@ function linData(rng) {
   const v2 = v1 + rng.int(1, 2);
   const Ut = linT([[a, 'x'], [b, 'y']]);
   const Vt = linT([[c, 'x'], [d, 'y']]);
-  const wrap = (t) => (/[+-]/.test(t.slice(1)) ? `(${t})` : t);
+  const wrap = (s) => (/[+-]/.test(s.slice(1)) ? `(${s})` : s);
   const fs = [
     { f: `${wrap(Ut)}${wrap(Vt)}`, G: [1, 1], Fu: 'u', Fv: 'v' },
     { f: `${wrap(Ut)}^2`, G: [2, 0], Fu: 'u^2', Fv: '1' },
@@ -107,7 +108,7 @@ function linData(rng) {
     Jxy: k === 1 ? '1' : `1/${k}`, Juv: k === 1 ? '1' : `1/${k}`, f: g.f, F: [[q(1, k), p, s]],
     Fu: k === 1 ? g.Fu : g.Fu === '1' ? `1/${k}` : `${g.Fu}/${k}`, Fv: g.Fv, Fuv: k === 1 ? mono : mono === '1' ? `1/${k}` : `${mono}/${k}`,
     wrongF: [[k, p, s]], wrongText: `${mono === '1' ? '' : `${mono}×`}${k}`, det, mat: [a, b, c, d],
-    why: `les inégalités de D parlent de ${R(Ut)} et de ${R(Vt)}`,
+    why: t('les inégalités de D parlent de {u} et de {v}', { u: R(Ut), v: R(Vt) }),
   };
 }
 
@@ -133,7 +134,7 @@ function hyp2Data(rng) {
     Jxy: '1/(2x^2+2y^2)', Juv: '1/(2x^2+2y^2)', f: g.f, F: [[q(1, 2), p, s]], Fu: g.Fu, Fv: g.Fv, Fuv: g.Fuv,
     // f·|jac| = 2G·(x² + y²)² = 2G·(u² + 4v²).
     wrongF: [[2, p + 2, s], [8, p, s + 2]], wrongText: `2${mono ? `${mono}×` : ''}(u^2+4v^2)`,
-    why: 'les inégalités de D parlent de x² − y² et de xy',
+    why: t('les inégalités de D parlent de x² − y² et de xy'),
   };
 }
 
@@ -150,20 +151,20 @@ function cvData(rng, kind) {
 }
 
 const SUB = [
-  { id: 'new-domain', label: 'le nouveau domaine D̃', skill: SK },
-  { id: 'jacobian', label: 'le jacobien ∂(u, v)/∂(x, y)', skill: 'a2-partials' },
+  { id: 'new-domain', label: t('le nouveau domaine D̃'), skill: SK },
+  { id: 'jacobian', label: t('le jacobien ∂(u, v)/∂(x, y)'), skill: 'a2-partials' },
   { id: 'invert', label: '|det J_G| = 1/|det ∂(u, v)/∂(x, y)|', skill: SK },
-  { id: 'rewrite', label: 'l\'intégrale en (u, v)', skill: SK },
-  { id: 'compute', label: 'le calcul', skill: 'a2-fubini-rect' },
+  { id: 'rewrite', label: t('l\'intégrale en (u, v)'), skill: SK },
+  { id: 'compute', label: t('le calcul'), skill: 'a2-fubini-rect' },
 ];
 const CHOICES = [
-  { id: 'dom', label: 'Écrire les inégalités de D avec u et v' },
-  { id: 'jac', label: 'Calculer det ∂(u, v)/∂(x, y)' },
-  { id: 'inv', label: 'Inverser : |det J_G| = 1/|det ∂(u, v)/∂(x, y)|' },
-  { id: 'noinv', label: 'Prendre |det ∂(u, v)/∂(x, y)| comme facteur', rule: 'a2_jacobian_inverse', why: '∂(u, v)/∂(x, y) est le jacobien de G⁻¹ : la formule demande celui de G, son inverse.' },
-  { id: 'rewrite', label: 'Écrire l\'intégrale sur D̃, facteur J compris' },
-  { id: 'sep', label: 'Séparer en produit de deux intégrales' },
-  { id: 'calc', label: 'Calculer' },
+  { id: 'dom', label: t('Écrire les inégalités de D avec u et v') },
+  { id: 'jac', label: t('Calculer det ∂(u, v)/∂(x, y)') },
+  { id: 'inv', label: t('Inverser : |det J_G| = 1/|det ∂(u, v)/∂(x, y)|') },
+  { id: 'noinv', label: t('Prendre |det ∂(u, v)/∂(x, y)| comme facteur'), rule: 'a2_jacobian_inverse', why: t('∂(u, v)/∂(x, y) est le jacobien de G⁻¹ : la formule demande celui de G, son inverse.') },
+  { id: 'rewrite', label: t('Écrire l\'intégrale sur D̃, facteur J compris') },
+  { id: 'sep', label: t('Séparer en produit de deux intégrales') },
+  { id: 'calc', label: t('Calculer') },
 ];
 
 function blankUV(line, holes) {
@@ -179,12 +180,12 @@ function changeItem(level, rng, opts) {
   const jac = { kind: 'equiv', vars: ['x', 'y', 'u', 'v'], subst: d.map, domain: eqDomain, target: 'only', finalVars: d.finalVars };
   const Jcfg = { kind: 'equiv', vars: ['x', 'y', 'u', 'v', 'J'], subst: { ...d.map, J: d.Jxy }, domain: eqDomain, target: 'any', cv: { jac: d.jacUV } };
   const def = { kind: 'definite', seq: { I: vText(d.value) }, nRange: [1, 1], cv: { jac: d.jacUV, wrong: d.wrongInt } };
-  let domL = E(d.newLine, 'D̃ : les inégalités de D, avec u et v', 'new-domain', 'dom');
-  let jacLs = d.jacLines.map((m, i) => E(m, i === 0 ? 'Dérivées partielles' : 'Simplifier', 'jacobian', 'jac'));
+  let domL = E(d.newLine, t('D̃ : les inégalités de D, avec u et v'), 'new-domain', 'dom');
+  let jacLs = d.jacLines.map((m, i) => E(m, i === 0 ? t('Dérivées partielles') : t('Simplifier'), 'jacobian', 'jac'));
   let JL = E(d.Juv, '|det J_G| = 1/|det ∂(u, v)/∂(x, y)|', 'invert', 'inv');
-  let rwL = E(d.uvInt, 'L\'intégrale sur D̃', 'rewrite', 'rewrite');
-  const sepL = E(d.sep, 'Séparer', 'compute', 'sep');
-  const valL = E(vText(d.value), 'Calculer', 'compute', 'calc');
+  let rwL = E(d.uvInt, t('L\'intégrale sur D̃'), 'rewrite', 'rewrite');
+  const sepL = E(d.sep, t('Séparer'), 'compute', 'sep');
+  const valL = E(vText(d.value), t('Calculer'), 'compute', 'calc');
   if (level === 1) {
     domL = blankUV(domL, [[0, 'hi'], [1, 'hi']]);
     if (d.kind === 'hyp') jacLs[0] = blanked(jacLs[0], ['-y/x^2'], { vars: ['x', 'y'] });
@@ -193,31 +194,32 @@ function changeItem(level, rng, opts) {
   }
   if (level === 2) { domL = blankUV(domL, [[1, 'lo']]); rwL = blanked(rwL, [d.Fuv], UV); }
   const dec = {
-    kind: 'decision', prompt: 'Quel changement de variables ?', options: [
+    kind: 'decision', prompt: t('Quel changement de variables ?'), options: [
       ...['hyp', 'lin', 'hyp2'].map((k) => {
         const lab = k === d.kind ? d.label : k === 'hyp' ? 'u = xy, v = y/x' : k === 'hyp2' ? 'u = x² − y², v = xy' : 'u = x + y, v = x − y';
-        return { id: k, label: lab, valid: k === d.kind, ...(k === d.kind ? {} : { why: `Regarde D : ${d.why}.` }) };
+        return { id: k, label: lab, valid: k === d.kind, ...(k === d.kind ? {} : { why: t('Regarde D : {why}.', { why: d.why }) }) };
       }),
-      { id: 'polar', label: 'Coordonnées polaires', valid: false, why: `D n'est ni un disque ni un secteur : ${d.why}.` },
+      { id: 'polar', label: t('Coordonnées polaires'), valid: false, why: t('D n\'est ni un disque ni un secteur : {why}.', { why: d.why }) },
     ],
   };
   const parts = [
     { start: d.region.join(' ; '), judge: dom, lines: [domL], pre: level === 3 ? [dec] : [] },
-    { html: 'Le jacobien du changement (u, v) en fonction de (x, y) :', ask: 'det ∂(u, v)/∂(x, y) =', start: d.jacStart, judge: jac, lines: jacLs },
-    { html: 'Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :', ask: 'J =', start: 'J', judge: Jcfg, lines: [JL] },
-    { html: 'L\'intégrale sur D̃, puis sa valeur :', ask: 'I =', start: 'I_D', judge: def, lines: [rwL, sepL, valL] },
+    { html: t('Le jacobien du changement (u, v) en fonction de (x, y) :'), ask: 'det ∂(u, v)/∂(x, y) =', start: d.jacStart, judge: jac, lines: jacLs },
+    { html: t('Le facteur J = |det J_G| de la formule, où G(u, v) = (x, y) est la réciproque :'), ask: 'J =', start: 'J', judge: Jcfg, lines: [JL] },
+    { html: t('L\'intégrale sur D̃, puis sa valeur :'), ask: 'I =', start: 'I_D', judge: def, lines: [rwL, sepL, valL] },
   ];
   const [first, ...rest] = parts;
   const menuOf = (p) => (level === 3 ? { ...p.judge, menus: stepMenus(p.start, p.lines, CHOICES) } : p.judge);
   const script = [...(first.pre || []), ...first.lines];
   for (const p of rest) script.push(SEG(p.html, p.ask, p.start, menuOf(p)), ...(p.pre || []), ...p.lines);
   const D = `D = {(x, y) : ${d.region.map(R).join(', ')}}`;
-  const pose = level === 3 ? 'Choisis un changement de variables (u, v) qui rend D rectangulaire' : `Pose ${d.label}`;
+  const pv = { f: d.f === '1' ? '' : MT(d.f), D, label: d.label };
   return linesItem({
     skill: SK, level, mode: modeOf(level), start: first.start, judge: menuOf(first), script,
-    prompt: `Calcule I<sub>D</sub> = ∬<sub>D</sub> ${d.f === '1' ? '' : MT(d.f)} dx dy, où ${D}. ${pose} : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.`,
-    hints: H(`${d.why.charAt(0).toUpperCase()}${d.why.slice(1)} : avec ${d.label}, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|.`,
-      `det ∂(u, v)/∂(x, y) = ${MT(d.jacUV, { vars: ['x', 'y', 'u', 'v'] })}, donc dx dy = du dv/|${R(d.jacUV)}|`,
+    prompt: level === 3 ? t('Calcule I<sub>D</sub> = ∬<sub>D</sub> {f} dx dy, où {D}. Choisis un changement de variables (u, v) qui rend D rectangulaire : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.', pv)
+      : t('Calcule I<sub>D</sub> = ∬<sub>D</sub> {f} dx dy, où {D}. Pose {label} : écris D̃ (les inégalités de D avec u et v), puis le jacobien, et calcule.', pv),
+    hints: H(t('{why} : avec {label}, D̃ est un rectangle. |det J_G| = 1/|det ∂(u, v)/∂(x, y)|.', { why: `${d.why.charAt(0).toUpperCase()}${d.why.slice(1)}`, label: d.label }),
+      t('det ∂(u, v)/∂(x, y) = {j}, donc dx dy = du dv/|{r}|', { j: MT(d.jacUV, { vars: ['x', 'y', 'u', 'v'] }), r: R(d.jacUV) }),
       `${MT(d.newLine, UV)} ; I = ${MT(d.uvInt)}`),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.kind}:${d.region.join(';')}:${d.f}`, exam: examTag(opts),
@@ -237,7 +239,7 @@ function fingerprint(rows) {
 const setHtml = (rows) => `D̃ = {(u, v) : ${rows.map(([lo, e, hi]) => MT(`${lo} ≤ ${e} ≤ ${hi}`, UV)).join(', ')}}`;
 
 function domainMcq(rng, opts, level) {
-  for (let t = 0; t < 200; t++) {
+  for (let tr = 0; tr < 200; tr++) {
     const [a, b, c, d] = rng.pick(MATS);
     const det = a * d - b * c;
     if (Math.abs(det) < 2) continue;
@@ -254,14 +256,14 @@ function domainMcq(rng, opts, level) {
     const crossed = [[p[0], Gy, p[1]], [r[0], Gx, r[1]]];
     const it = mcqV({
       skill: SK, level,
-      prompt: `Soit G(u, v) = (${R(Gx)} ; ${R(Gy)}) et D = [${nm(p[0])} ; ${p[1]}] × [${nm(r[0])} ; ${r[1]}] dans le plan (x, y). Pour écrire ∬<sub>D</sub> f(x, y) dx dy = ∬<sub>D̃</sub> f(G(u, v))·|det J_G| du dv, quel est D̃ ?`,
+      prompt: t('Soit G(u, v) = ({gx} ; {gy}) et D = {D} dans le plan (x, y). Pour écrire ∬<sub>D</sub> f(x, y) dx dy = ∬<sub>D̃</sub> f(G(u, v))·|det J_G| du dv, quel est D̃ ?', { gx: R(Gx), gy: R(Gy), D: `[${nm(p[0])} ; ${p[1]}] × [${nm(r[0])} ; ${r[1]}]` }),
       right: { html: setHtml(right), x: fingerprint(right) },
       wrongs: [
         { html: setHtml(direct), x: fingerprint(direct), rule: 'a2_changevar_domain_direction' },
         ...rng.shuffle([{ html: setHtml(same), x: fingerprint(same) }, { html: setHtml(crossed), x: fingerprint(crossed) }]),
       ],
       key: `${SK}:mcq:dom:${Gx}:${Gy}:${p}:${r}`, expectedSec: 150, exam: examTag(opts) || false,
-      solution: [{ html: `D̃ est l'ensemble des (u, v) que G envoie dans D : on écrit x = ${R(Gx)} ∈ [${nm(p[0])} ; ${p[1]}] et y = ${R(Gy)} ∈ [${nm(r[0])} ; ${r[1]}]. C'est G⁻¹(D), pas G(D).`, note: '' }],
+      solution: [{ html: t('D̃ est l\'ensemble des (u, v) que G envoie dans D : on écrit x = {gx} ∈ {I} et y = {gy} ∈ {J}. C\'est G⁻¹(D), pas G(D).', { gx: R(Gx), I: `[${nm(p[0])} ; ${p[1]}]`, gy: R(Gy), J: `[${nm(r[0])} ; ${r[1]}]` }), note: '' }],
     }, rng);
     if (it) return it;
   }
@@ -270,20 +272,20 @@ function domainMcq(rng, opts, level) {
 
 // ---------- the value, with the inverse jacobian as a distractor ----------
 function valueMcq(rng, opts, level) {
-  for (let t = 0; t < 200; t++) {
+  for (let tr = 0; tr < 200; tr++) {
     const d = cvData(rng);
     const wrong = intRect(d.wrongF, d.U, d.V);
     const forgot = vScale(d.value, d.kind === 'lin' ? Math.abs(d.det) : 2);
     const half = vScale(d.value, q(1, 2));
     const it = mcqV({
-      skill: SK, level, prompt: `Avec ${d.label}, que vaut ∬<sub>D</sub> ${MT(d.f)} dx dy, où D = {(x, y) : ${d.region.map(R).join(', ')}} ?`,
+      skill: SK, level, prompt: t('Avec {label}, que vaut ∬<sub>D</sub> {f} dx dy, où D = {(x, y) : {region}} ?', { label: d.label, f: MT(d.f), region: d.region.map(R).join(', ') }),
       right: { html: MT(vText(d.value)), x: vFloat(d.value) },
       wrongs: [
         { html: MT(vText(wrong)), x: vFloat(wrong), rule: 'a2_jacobian_inverse' },
         ...rng.shuffle([{ html: MT(vText(forgot)), x: vFloat(forgot), rule: d.kind === 'lin' ? 'a2_jacobian_forgot' : null }, { html: MT(vText(half)), x: vFloat(half) }]),
       ],
       key: `${SK}:mcq:val:${d.kind}:${d.region.join(';')}:${d.f}`, expectedSec: 240, exam: examTag(opts) || false,
-      solution: [{ html: `D̃ : ${MT(d.newLine, UV)} ; det ∂(u, v)/∂(x, y) = ${MT(d.jacUV, { vars: ['x', 'y', 'u', 'v'] })}, donc dx dy = du dv/|${R(d.jacUV)}| ; I = ${MT(d.uvInt)} = ${MT(vText(d.value))}.`, note: '' }],
+      solution: [{ html: t('D̃ : {D} ; det ∂(u, v)/∂(x, y) = {j}, donc dx dy = du dv/|{r}| ; I = {I} = {v}.', { D: MT(d.newLine, UV), j: MT(d.jacUV, { vars: ['x', 'y', 'u', 'v'] }), r: R(d.jacUV), I: MT(d.uvInt), v: MT(vText(d.value)) }), note: '' }],
     }, rng);
     if (it) return it;
   }
@@ -305,29 +307,29 @@ function vfItem(rng, level, exam) {
   let counter = null;
   let ruleIfTrue = null;
   if (kind === 'abs') {
-    statement = `Pour tous réels a, b non nuls, avec G(u, v) = (au ; bv), D̃ = [0 ; 1] × [0 ; 1] et D = G(D̃) : ∬<sub>D</sub> dx dy = ∬<sub>D̃</sub> ${truth ? '|det J_G|' : 'det J_G'} du dv.`;
-    why = 'C\'est la formule du changement de variables : avec la valeur absolue du jacobien. Ici det J_G = ab, et l\'aire de D vaut |ab|.';
+    statement = t('Pour tous réels a, b non nuls, avec G(u, v) = (au ; bv), D̃ = [0 ; 1] × [0 ; 1] et D = G(D̃) : ∬<sub>D</sub> dx dy = ∬<sub>D̃</sub> {J} du dv.', { J: truth ? '|det J_G|' : 'det J_G' });
+    why = t('C\'est la formule du changement de variables : avec la valeur absolue du jacobien. Ici det J_G = ab, et l\'aire de D vaut |ab|.');
     if (!truth) counter = refute([['a', 'R'], ['b', 'R']], 'abs(a b) = a b', { a: '-1', b: '1' });
   } else if (kind === 'hyp') {
-    statement = `Avec u = xy et v = y/x (x, y > 0), |det J_G| = ${truth ? '1/(2v)' : '2v'} en tout point, donc dx dy = ${truth ? 'du dv/(2v)' : '2v du dv'}.`;
-    why = 'det ∂(u, v)/∂(x, y) = y/x + y/x = 2v. C\'est le jacobien de G⁻¹ : |det J_G| = 1/(2v) = x/(2y), et dx dy = du dv/(2v).';
+    statement = t('Avec u = xy et v = y/x (x, y > 0), |det J_G| = {J} en tout point, donc dx dy = {dxdy}.', { J: truth ? '1/(2v)' : '2v', dxdy: truth ? 'du dv/(2v)' : '2v du dv' });
+    why = t('det ∂(u, v)/∂(x, y) = y/x + y/x = 2v. C\'est le jacobien de G⁻¹ : |det J_G| = 1/(2v) = x/(2y), et dx dy = du dv/(2v).');
     if (!truth) { counter = refute([['x', 'R+'], ['y', 'R+']], 'x/(2y) = 2y/x', { x: '1', y: '1' }); ruleIfTrue = 'a2_jacobian_inverse'; }
   } else if (kind === 'lin') {
-    statement = `Pour tout k > 0, avec u = kx et v = ky, on a dx dy = ${truth ? 'du dv/k²' : 'k² du dv'}.`;
-    why = 'det ∂(u, v)/∂(x, y) = k² : c\'est le jacobien de G⁻¹. Donc dx dy = du dv/k².';
+    statement = t('Pour tout k > 0, avec u = kx et v = ky, on a dx dy = {dxdy}.', { dxdy: truth ? 'du dv/k²' : 'k² du dv' });
+    why = t('det ∂(u, v)/∂(x, y) = k² : c\'est le jacobien de G⁻¹. Donc dx dy = du dv/k².');
     if (!truth) { counter = refute([['k', 'R+']], '1/k^2 = k^2', { k: '2' }); ruleIfTrue = 'a2_jacobian_inverse'; }
   } else if (kind === 'area') {
-    statement = `Pour tous m, n > 0, si G(u, v) = (mu ; nv), l'aire de G(D̃) vaut ${truth ? 'mn fois' : '1/(mn) fois'} l'aire de D̃.`;
-    why = 'det J_G = mn : aire(G(D̃)) = ∬<sub>D̃</sub> |det J_G| du dv = mn·aire(D̃).';
+    statement = t('Pour tous m, n > 0, si G(u, v) = (mu ; nv), l\'aire de G(D̃) vaut {k} fois l\'aire de D̃.', { k: truth ? 'mn' : '1/(mn)' });
+    why = t('det J_G = mn : aire(G(D̃)) = ∬<sub>D̃</sub> |det J_G| du dv = mn·aire(D̃).');
     if (!truth) { counter = refute([['m', 'R+'], ['n', 'R+']], '1/(m n) = m n', { m: '2', n: '1' }); ruleIfTrue = 'a2_jacobian_inverse'; }
   } else {
-    statement = `Pour tout k > 0, avec G(u, v) = (ku ; kv) et D = [0 ; 1] × [0 ; 1], le domaine D̃ de la formule ∬<sub>D</sub> f dx dy = ∬<sub>D̃</sub> f∘G·|det J_G| du dv est ${truth ? '[0 ; 1/k] × [0 ; 1/k]' : '[0 ; k] × [0 ; k]'}.`;
-    why = 'G va de D̃ vers D : D̃ est l\'ensemble des (u, v) envoyés dans D, c\'est-à-dire G⁻¹(D) = [0 ; 1/k] × [0 ; 1/k], et pas G(D).';
+    statement = t('Pour tout k > 0, avec G(u, v) = (ku ; kv) et D = [0 ; 1] × [0 ; 1], le domaine D̃ de la formule ∬<sub>D</sub> f dx dy = ∬<sub>D̃</sub> f∘G·|det J_G| du dv est {D}.', { D: truth ? '[0 ; 1/k] × [0 ; 1/k]' : '[0 ; k] × [0 ; k]' });
+    why = t('G va de D̃ vers D : D̃ est l\'ensemble des (u, v) envoyés dans D, c\'est-à-dire G⁻¹(D) = [0 ; 1/k] × [0 ; 1/k], et pas G(D).');
     if (!truth) { counter = refute([['k', 'R+']], 'k = 1/k', { k: '2' }); ruleIfTrue = 'a2_changevar_domain_direction'; }
   }
   return tfItem({
     skill: SK, level, statement, truth, counter, ruleIfTrue, explanation: why, key: `${kind}:${truth}`, exam, noHints: level >= 5,
-    hints: H('|det J_G| = 1/|det ∂(u, v)/∂(x, y)| : le jacobien de G, pas celui de G⁻¹.', 'D̃ = G⁻¹(D) : les (u, v) que G envoie dans D.', why),
+    hints: H(t('|det J_G| = 1/|det ∂(u, v)/∂(x, y)| : le jacobien de G, pas celui de G⁻¹.'), t('D̃ = G⁻¹(D) : les (u, v) que G envoie dans D.'), why),
   });
 }
 

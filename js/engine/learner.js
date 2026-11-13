@@ -9,6 +9,20 @@
 //   due     spaced review date once mastered; the interval grows on success.
 // Traps (known mistakes) activate after repeated evidence and clear after
 // correct answers to baiting questions on 3 different days.
+// Forgetting, beyond the clock of the reviews:
+//   - spoiled chapter: a mistake made in a later skill and named by a trap
+//     that belongs to an earlier, mastered skill (frac_add_across while
+//     doing algebra) is evidence against that earlier skill: its estimate
+//     drops a little and it is due for review at once. Two or three such
+//     mistakes and it is no longer mastered (event « spoiled »): it shows on
+//     the map and comes back on the path.
+//   - implicit review: a right answer, without hints, at level 3 or more in
+//     a skill uses its prerequisites. A mastered prerequisite that is due
+//     counts as reviewed (once a day): its interval grows ×1.5 (×2.5 after
+//     a real review).
+//   - solid: a skill whose review interval reached SOLID_DAYS (about four
+//     reviews passed in a row, spaced 2, 5, 12, 30, 75 days) is anchored in
+//     long-term memory; it still comes back, at most every 120 days.
 // Hints (spec §9.1): a right answer after a hint is not « fast », so it does
 // not raise the level; after two hints it counts as wrong for the mastery
 // estimate, but not as a mistake for the ladder. Skills with needsSolo are
@@ -28,6 +42,14 @@ const SLOW_DEMOTE_AFTER = 3; // slow answers in a row
 const SLOW_FACTOR = 1.6;
 const TRAP_ACTIVATE = 2;
 const TRAP_CLEAR_DAYS = 3;
+const SPOIL_WEIGHT = 0.5; // a mistake seen from a later skill counts half
+const SPOIL_BELOW = 0.8; // as for a mistake on the skill itself
+const IMPLICIT_GROWTH = 1.5;
+export const SOLID_DAYS = 60;
+const MAX_INTERVAL = 120;
+
+// Anchored in long-term memory (see the head of this file).
+export const isSolid = (st) => !!st?.mastered && (st.interval || 0) >= SOLID_DAYS;
 
 export function newSkillState() {
   return {
@@ -159,7 +181,10 @@ export function recordAnswer(profile, a) {
         st.level -= 1;
         events.push({ type: 'levelDown', skill: a.skill, level: st.level });
       } else if (!st.repair && SKILL_BY_ID[a.skill].prereqs.length) {
-        const target = weakestPrereq(profile, a.skill);
+        // The chapter the mistake comes from when a trap names it, else
+        // the weakest prerequisite.
+        const named = !a.correct && (a.rules || []).length === 1 && (a.ambiguous || 1) <= 1 ? trapHome(a.rules[0], a.skill) : null;
+        const target = named || weakestPrereq(profile, a.skill);
         if (target) {
           st.repair = target;
           const ts = skillState(profile, target);
@@ -174,6 +199,7 @@ export function recordAnswer(profile, a) {
   // Mastery and its loss.
   if (!st.mastered && st.level >= 4 && st.p >= MASTERY_P && (!needsSolo(a.skill) || st.solo)) {
     st.mastered = true;
+    st.spoiledBy = null;
     st.interval = 2;
     st.due = t + st.interval * DAY;
     events.push({ type: 'mastered', skill: a.skill });
@@ -192,9 +218,58 @@ export function recordAnswer(profile, a) {
     }
   }
 
+  // Earlier chapters: spoiled by their traps, refreshed by their use.
+  if (weight >= 1 && a.kind !== 'exam') {
+    if (!a.correct) events.push(...spoilEarlier(profile, a));
+    else if (!hints && a.level >= 3) implicitReview(profile, a.skill);
+  }
+
   // A hinted answer does not beat a trap.
   if (!(hints && a.correct)) events.push(...recordTraps(profile, a));
   return events;
+}
+
+// The earlier skill a trap belongs to, seen from the skill being practised:
+// its own skill, else (when the trap is this skill's) the skill it repairs.
+function trapHome(ruleId, skill) {
+  const r = RULE_BY_ID[ruleId];
+  if (!r) return null;
+  const home = r.skill !== skill ? r.skill : r.repair;
+  if (!home || home === skill || !SKILL_BY_ID[home]) return null;
+  return SKILL_BY_ID[home].index < SKILL_BY_ID[skill].index ? home : null;
+}
+
+// A mistake named by a trap of an earlier, known skill (see the head).
+// Only when the diagnosis is clear (one rule, not ambiguous).
+function spoilEarlier(profile, a) {
+  const rules = a.rules || [];
+  if (rules.length !== 1 || (a.ambiguous || 1) > 1) return [];
+  const home = trapHome(rules[0], a.skill);
+  const st = home && profile.skills[home];
+  if (!st || !(st.mastered || st.testedOut)) return [];
+  const p2 = bkt(st.p, false, 0.05);
+  st.p += SPOIL_WEIGHT * (p2 - st.p);
+  st.spoiledBy = a.skill;
+  if (st.mastered) st.due = Math.min(st.due || now(), now());
+  if (st.p >= SPOIL_BELOW) return [];
+  st.mastered = false;
+  st.testedOut = false;
+  st.interval = 1;
+  st.due = now() + DAY;
+  st.level = Math.max(2, st.level - 1);
+  return [{ type: 'spoiled', skill: home, from: a.skill, rule: rules[0] }];
+}
+
+// A right answer uses the prerequisites (see the head).
+function implicitReview(profile, skill) {
+  const today = dayKey();
+  for (const pid of SKILL_BY_ID[skill].prereqs) {
+    const st = profile.skills[pid];
+    if (!st || !isDue(st) || st.implicitDay === today) continue;
+    st.implicitDay = today;
+    st.interval = Math.min(MAX_INTERVAL, Math.round((st.interval || 2) * IMPLICIT_GROWTH));
+    st.due = now() + st.interval * DAY;
+  }
 }
 
 export function recordTraps(profile, a) {
@@ -237,7 +312,8 @@ export function finishReview(profile, skill, ratio) {
   const st = skillState(profile, skill);
   if (!st.mastered && ratio < 0.75) return;
   if (ratio >= 0.75) {
-    st.interval = Math.min(120, Math.round((st.interval || 2) * 2.5));
+    st.interval = Math.min(MAX_INTERVAL, Math.round((st.interval || 2) * 2.5));
+    st.spoiledBy = null;
     st.due = now() + st.interval * DAY;
   } else {
     st.interval = 1;
@@ -250,7 +326,7 @@ export function finishReview(profile, skill, ratio) {
 // ---------- the branching path (spec §8.4) ----------
 //
 // Each unit is a branch. nextFocus picks what « Continuer » practises:
-//   1. a skill waiting on repair;
+//   1. a skill waiting on repair, then a spoiled chapter;
 //   2. else the next skill of the branch the student pinned on the map;
 //   3. else it keeps at most 3 active branches (units started and not
 //      finished) and moves from one to the next at each lesson, so topics
@@ -315,6 +391,11 @@ export function newBranchSkill(profile, { pool = playable(profile), active = act
 // opts.unit: stay in this unit if it still has something to practise.
 export function nextFocus(profile, { unit = null } = {}) {
   for (const s of SKILLS) if (profile.skills[s.id]?.repair) return s.id;
+  // A spoiled chapter is redone before going on (see the head of the file).
+  for (const s of SKILLS) {
+    const st = profile.skills[s.id];
+    if (st?.spoiledBy && !st.mastered && isUnlocked(profile, s.id)) return s.id;
+  }
   const pool = playable(profile);
   if (!pool.length) return null;
   const heads = branchHeads(pool);

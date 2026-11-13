@@ -11,6 +11,7 @@ import { limit, targetOf } from '../limit.js';
 import { exactValue } from '../normal.js';
 import { toMathML } from '../mathml.js';
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(n));
 const fr = (x) => String(x).replace(/-/g, '−');
@@ -41,8 +42,8 @@ export const RULES = [
   {
     id: 'a1_bh_not_indeterminate', family: 'method', tag: 'C', skill: 'a1-bh', repair: 'a1-bh',
     judges: ['limit'],
-    name: 'Bernoulli-l\'Hôpital appliqué sans forme indéterminée',
-    example: ['(x + 1)/(x² + 3x + 1) en 0 : « = 1/3 par BH »', 'la limite est 1/1 = 1'],
+    name: t('Bernoulli-l\'Hôpital appliqué sans forme indéterminée'),
+    example: [t('(x + 1)/(x² + 3x + 1) en 0 : « = 1/3 par BH »'), t('la limite est 1/1 = 1')],
     check: { judge: { kind: 'limit', v: 'x', to: '0' }, prev: '(x+1)/(x^2+3x+1)', line: '1/(2x+3)' },
     transform: (prev, ctx) => {
       const fg = quotient(prev);
@@ -54,13 +55,13 @@ export const RULES = [
       return [{ node: div(diff(fg.f, s.v), dg), ctx: { n: say(s.lf), d: say(s.lg), L: isInf(s.lf) ? say(s.lf) : null, f: fg.f, g: fg.g } }];
     },
     explain: (ctx = {}) => (ctx.n
-      ? `Au point, le numérateur tend vers ${ctx.n} et le dénominateur vers ${ctx.d} : ce n'est pas une forme indéterminée, la limite se calcule directement${ctx.L ? '' : ` (${ctx.n}/${ctx.d})`}. BH ne s'applique qu'à 0/0 et ∞/∞.`
-      : 'Vérifie la forme avant d\'appliquer BH : si le numérateur et le dénominateur ont des limites finies et que celle du dénominateur n\'est pas 0, la limite se calcule directement. BH ne s\'applique qu\'à 0/0 et ∞/∞.'),
+      ? t('Au point, le numérateur tend vers {n} et le dénominateur vers {d} : ce n\'est pas une forme indéterminée, la limite se calcule directement{p1}. BH ne s\'applique qu\'à 0/0 et ∞/∞.', { n: ctx.n, d: ctx.d, p1: ctx.L ? '' : ` (${ctx.n}/${ctx.d})` })
+      : t('Vérifie la forme avant d\'appliquer BH : si le numérateur et le dénominateur ont des limites finies et que celle du dénominateur n\'est pas 0, la limite se calcule directement. BH ne s\'applique qu\'à 0/0 et ∞/∞.')),
   },
   {
     id: 'a1_bh_quotient_rule', family: 'rule', tag: 'E', skill: 'a1-bh', repair: 'a1-bh',
     judges: ['limit'],
-    name: 'BH : dériver le quotient au lieu du haut et du bas',
+    name: t('BH : dériver le quotient au lieu du haut et du bas'),
     example: ['lim f/g = lim (f/g)′', 'lim f/g = lim f′/g′'],
     check: { judge: { kind: 'limit', v: 'x', to: '0' }, prev: '(e^(2x)-1-2x)/x^2', line: '((2e^(2x)-2)×x^2-(e^(2x)-1-2x)×2x)/x^4' },
     transform: (prev, ctx) => {
@@ -71,21 +72,21 @@ export const RULES = [
       const node = div(sub(mul(diff(fg.f, s.v), fg.g), mul(fg.f, diff(fg.g, s.v))), pow(fg.g, lit(2)));
       return [{ node, ctx: { f: fg.f, g: fg.g } }];
     },
-    explain: (ctx = {}) => `BH dérive le haut et le bas séparément : lim f′/g′, pas la dérivée du quotient (f/g)′.${ctx.f ? ` Ici f′ = ${M(diff(ctx.f, 'x'))} et g′ = ${M(diff(ctx.g, 'x'))}.` : ''}`,
+    explain: (ctx = {}) => t('BH dérive le haut et le bas séparément : lim f′/g′, pas la dérivée du quotient (f/g)′.{p1}', { p1: ctx.f ? t(' Ici f′ = {p1} et g′ = {p2}.', { p1: M(diff(ctx.f, 'x')), p2: M(diff(ctx.g, 'x')) }) : '' }),
   },
   {
     id: 'a1_bh_converse', family: 'logic', tag: 'C', skill: 'a1-bh', repair: 'a1-bh',
     judges: [],
-    name: 'Réciproque de BH : « lim f′/g′ n\'existe pas, donc lim f/g non plus »',
-    example: ['lim g′/h′ n\'existe pas ⇒ lim g/h n\'existe pas', 'on ne peut rien conclure'],
+    name: t('Réciproque de BH : « lim f′/g′ n\'existe pas, donc lim f/g non plus »'),
+    example: [t('lim g′/h′ n\'existe pas ⇒ lim g/h n\'existe pas'), t('on ne peut rien conclure')],
     check: { bait: { skill: 'a1-bh', exam: 'tf' } },
-    explain: () => 'BH ne va que dans un sens : si lim f′/g′ existe, lim f/g aussi. Si lim f′/g′ n\'existe pas, on ne peut rien dire. Exemple : g = x²·sin(1/x), h = x ; g/h → 0, mais g′/h′ = 2x·sin(1/x) − cos(1/x) n\'a pas de limite.',
+    explain: () => t('BH ne va que dans un sens : si lim f′/g′ existe, lim f/g aussi. Si lim f′/g′ n\'existe pas, on ne peut rien dire. Exemple : g = x²·sin(1/x), h = x ; g/h → 0, mais g′/h′ = 2x·sin(1/x) − cos(1/x) n\'a pas de limite.'),
   },
   {
     id: 'a1_extrema_bounds_forgotten', family: 'method', tag: 'E', skill: 'a1-extrema-global', repair: 'a1-extrema-global',
     judges: ['value'],
-    name: 'Extrema globaux cherchés seulement parmi les points où f′ = 0',
-    example: ['max de x³ − 3x sur [0 ; 3] : « −2 » (seul point critique)', 'f(3) = 18'],
+    name: t('Extrema globaux cherchés seulement parmi les points où f′ = 0'),
+    example: [t('max de x³ − 3x sur [0 ; 3] : « −2 » (seul point critique)'), 'f(3) = 18'],
     check: { judge: { kind: 'value', expect: '18', extrema: { kind: 'max', crit: [{ x: '1', y: '-2' }], ends: [{ x: '0', y: '0' }, { x: '3', y: '18' }] } }, prev: 'M', line: '-2' },
     // cfg.extrema = {kind: 'max'|'min', crit: [{x, y}], ends: [{x, y}]}:
     // the extremum taken among the critical points only.
@@ -100,39 +101,39 @@ export const RULES = [
       return [{ node: parse(String(pick.y)), ctx: { c: pick.x, fc: pick.y, a: best?.x, fa: best?.y, kind: e.kind } }];
     },
     explain: (ctx = {}) => (ctx.a
-      ? `Sur un segment, les bornes sont aussi candidates : f(${fr(ctx.a)}) = ${fr(ctx.fa)} ${ctx.kind === 'min' ? 'est plus petit que' : 'dépasse'} f(${fr(ctx.c)}) = ${fr(ctx.fc)}.`
-      : 'Sur un segment [a ; b], les candidats sont les bornes, les points où f′ = 0 et ceux où f′ n\'existe pas : compare toutes leurs valeurs.'),
+      ? t('Sur un segment, les bornes sont aussi candidates : f({a}) = {fa} {p1} f({c}) = {fc}.', { a: fr(ctx.a), fa: fr(ctx.fa), p1: ctx.kind === 'min' ? t('est plus petit que') : t('dépasse'), c: fr(ctx.c), fc: fr(ctx.fc) })
+      : t('Sur un segment [a ; b], les candidats sont les bornes, les points où f′ = 0 et ceux où f′ n\'existe pas : compare toutes leurs valeurs.')),
   },
   {
     id: 'a1_rolle_without_hyp', family: 'logic', tag: 'C', skill: 'a1-mvt', repair: 'a1-mvt',
     judges: [],
-    name: 'Rolle appliqué sans ses hypothèses',
-    example: ['f(−1) = f(1) ⇒ ∃c : f′(c) = 0, pour f = |x|', 'hypothèse « f dérivable » manquante'],
+    name: t('Rolle appliqué sans ses hypothèses'),
+    example: [t('f(−1) = f(1) ⇒ ∃c : f′(c) = 0, pour f = |x|'), t('hypothèse « f dérivable » manquante')],
     check: { bait: { skill: 'a1-mvt' } },
-    explain: () => 'Rolle demande f continue sur [a ; b], dérivable sur ]a ; b[ et f(a) = f(b). Sans ces hypothèses, il n\'y a pas forcément de c : |x| sur [−1 ; 1] n\'est pas dérivable en 0, et sa pente n\'est jamais nulle.',
+    explain: () => t('Rolle demande f continue sur [a ; b], dérivable sur ]a ; b[ et f(a) = f(b). Sans ces hypothèses, il n\'y a pas forcément de c : |x| sur [−1 ; 1] n\'est pas dérivable en 0, et sa pente n\'est jamais nulle.'),
   },
   {
     id: 'a1_mvt_endpoints_values', family: 'rule', tag: 'E', skill: 'a1-mvt', repair: 'a1-mvt',
     judges: [],
-    name: 'Taux d\'accroissement encadré par les valeurs de f au lieu de f′',
-    example: ['encadrement par f(a) et f(b)', 'encadrement par les valeurs de f′'],
+    name: t('Taux d\'accroissement encadré par les valeurs de f au lieu de f′'),
+    example: [t('encadrement par f(a) et f(b)'), t('encadrement par les valeurs de f′')],
     check: { bait: { skill: 'a1-mvt' } },
-    explain: () => 'Le taux d\'accroissement (f(x) − f(y))/(x − y) est une valeur de f′ (TAF), pas de f : on encadre f′ sur l\'intervalle.',
+    explain: () => t('Le taux d\'accroissement (f(x) − f(y))/(x − y) est une valeur de f′ (TAF), pas de f : on encadre f′ sur l\'intervalle.'),
   },
   {
     id: 'a1_oblique_asymptote_slope_only', family: 'rule', tag: 'E', skill: 'a1-fn-study', repair: 'a1-fn-study',
     judges: [],
-    name: 'Asymptote oblique : la pente sans l\'ordonnée à l\'origine',
-    example: ['asymptote y = x', 'y = x + 1'],
+    name: t('Asymptote oblique : la pente sans l\'ordonnée à l\'origine'),
+    example: [t('asymptote y = x'), 'y = x + 1'],
     check: { bait: { skill: 'a1-fn-study' } },
-    explain: (ctx = {}) => `f(x)/x → ${ctx.m ? fr(ctx.m) : 'm'} donne la pente ; il faut encore p = lim (f(x) − mx)${ctx.p ? ` = ${fr(ctx.p)}` : ''}. Avec une division, p est le terme constant du quotient.`,
+    explain: (ctx = {}) => t('f(x)/x → {p1} donne la pente ; il faut encore p = lim (f(x) − mx){p2}. Avec une division, p est le terme constant du quotient.', { p1: ctx.m ? fr(ctx.m) : 'm', p2: ctx.p ? ` = ${fr(ctx.p)}` : '' }),
   },
   {
     id: 'a1_polar_slope_naive', family: 'rule', tag: 'E', skill: 'a1-polar-curve', repair: 'a1-param-curve',
     judges: [],
-    name: 'Pente d\'une courbe polaire prise égale à ρ̇',
+    name: t('Pente d\'une courbe polaire prise égale à ρ̇'),
     example: ['y′ = ρ̇', 'y′ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ)'],
     check: { bait: { skill: 'a1-polar-curve' } },
-    explain: () => 'ρ̇ dit comment le rayon change, pas la pente dans le plan. Dérive x = ρ cos φ et y = ρ sin φ : y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ).',
+    explain: () => t('ρ̇ dit comment le rayon change, pas la pente dans le plan. Dérive x = ρ cos φ et y = ρ sin φ : y′ = ẏ/ẋ = (ρ̇ sin φ + ρ cos φ)/(ρ̇ cos φ − ρ sin φ).'),
   },
 ];

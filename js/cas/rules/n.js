@@ -21,6 +21,7 @@ import { DEFS as E } from './ne.js';
 import { DEFS as F } from './nf.js';
 import { DEFS as G } from './ng.js';
 import { DEFS as H } from './nh.js';
+import { t } from '../../i18n.js';
 
 export const META = [
   {"id": "n_rel_by_approx", "family": "numeric", "tag": "E", "skill": "n-err-abs-rel", "repair": "n-err-abs-rel", "example": ["e_rel = 1/3000 ÷ 0,667", "÷ 2/3"], "transformText": "`wrongValues: |x − x̃|/|x̃|`", "explainText": "Tu as divisé par l'approximation {x̃}. L'erreur relative se rapporte à la valeur exacte {x}."},
@@ -123,9 +124,11 @@ export function fill(text, ctx = {}) {
   return text.replace(/\{([^{}]*)\}/g, (_, k) => (ctx[k] !== undefined && ctx[k] !== null ? String(ctx[k]) : '…'));
 }
 
+// The examples and the catalogue's explanation are shown: translated whole
+// (a math-only example is its own translation).
 export const RULES = META.map((m) => {
   const d = DEFS[m.id];
-  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example };
-  if (!d) return { ...base, name: `Piège ${m.id}`, stub: true, judges: [], explain: (ctx) => fill(m.explainText, ctx) };
-  return { ...base, explain: (ctx) => fill(m.explainText, ctx), ...d };
+  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example.map((e) => (e ? t(e) : e)) };
+  if (!d) return { ...base, name: t('Piège {id}', { id: m.id }), stub: true, judges: [], explain: (ctx) => fill(t(m.explainText), ctx) };
+  return { ...base, explain: (ctx) => fill(t(m.explainText), ctx), ...d };
 });

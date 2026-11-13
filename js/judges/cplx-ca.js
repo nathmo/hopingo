@@ -51,6 +51,7 @@ import { solutionsOf, sameSolutions } from './complex.js';
 import { diagnoseLine } from './diagnose.js';
 import { sameLine } from './common.js';
 import { makeRng } from '../content/random.js';
+import { t } from '../i18n.js';
 
 const fr = (s) => String(s).replace(/-/g, '−');
 const fnum = (x) => String(Math.round(x * 100) / 100).replace('.', ',').replace('-', '−');
@@ -99,12 +100,12 @@ function sumOf(n, env) {
   let im = 0;
   let small = 0;
   for (let k = Math.round(lo.re); k <= top; k++) {
-    const t = evalAt(n.e, { ...env, [n.k]: k });
-    if (!okC(t)) return NAN;
-    re += t.re;
-    im += t.im;
+    const tt = evalAt(n.e, { ...env, [n.k]: k });
+    if (!okC(tt)) return NAN;
+    re += tt.re;
+    im += tt.im;
     if (top === Infinity) {
-      const m = Math.hypot(t.re, t.im);
+      const m = Math.hypot(tt.re, tt.im);
       if (m > 1e8 || k - lo.re > 6000) return NAN;
       small = m <= 1e-14 * (1 + Math.hypot(re, im)) ? small + 1 : 0;
       if (small >= 4) break;
@@ -140,9 +141,9 @@ export function evalAt(node, env = {}) {
 const cvVars = (cfg) => [...new Set([...(cfg.vars || []), ...(cfg.real || []), ...(cfg.cz || []), ...(cfg.z ? ['z'] : [])])];
 
 function cvParse(cfg, text) {
-  const t = String(text).replace(/^\s*=/, '').trim();
-  if (cfg.raw && t === cfg.raw.text) return { t: 'raw', text: t, html: cfg.raw.html };
-  return parse(t, { vars: cvVars(cfg), complex: true });
+  const tt = String(text).replace(/^\s*=/, '').trim();
+  if (cfg.raw && tt === cfg.raw.text) return { t: 'raw', text: tt, html: cfg.raw.html };
+  return parse(tt, { vars: cvVars(cfg), complex: true });
 }
 
 const ENVS = new Map();
@@ -222,11 +223,11 @@ function sameValues(a, b) {
 export function trapLines(id, ctx) {
   const cfg = ctx?.cfg || {};
   const out = [];
-  for (const t of cfg.traps?.[id] || []) {
-    const text = typeof t === 'string' ? t : t.line;
+  for (const tt of cfg.traps?.[id] || []) {
+    const text = typeof tt === 'string' ? tt : tt.line;
     try {
       const node = cfg.kind === 'cvalue' ? cvParse(cfg, text) : cfg.kind === 'cfamily' ? cfParse(cfg, text) : parse(text, { vars: cfg.vars, complex: true });
-      out.push({ node, ctx: typeof t === 'string' ? {} : t.ctx || {} });
+      out.push({ node, ctx: typeof tt === 'string' ? {} : tt.ctx || {} });
     } catch { /* skip */ }
   }
   return out;
@@ -261,8 +262,8 @@ function tidy(node, letters = []) {
   if (!hasI(n) && !contains(n, (x) => ['int', 'sum', 'deriv', 'bracket', 'lim', 'abs', 'raw'].includes(x.t) || (x.t === 'fn' && BAD_FN.has(canonFn(x.name))))) {
     return realTidy(n, letters);
   }
-  for (const t of termsOf(n)) {
-    const { up, down } = factorsOf(t);
+  for (const tt of termsOf(n)) {
+    const { up, down } = factorsOf(tt);
     if (down.some((f) => hasI(f) && !contains(f, (y) => y.t === 'sym'))) return false;
     const cx = up.filter(hasI);
     for (const f of [...up, ...down].filter((x) => !hasI(x))) if (!realTidy(f, letters)) return false;
@@ -339,11 +340,11 @@ function monomialish(node, v, at) {
 
 function seriesForm(cfg, node) {
   const v = (cfg.real || ['z'])[0];
-  for (const t of termsOf(node)) {
-    const { up, down } = factorsOf(t);
+  for (const tt of termsOf(node)) {
+    const { up, down } = factorsOf(tt);
     const sums = [...up, ...down].filter((f) => contains(f, (y) => y.t === 'sum'));
     if (down.some((f) => contains(f, (y) => y.t === 'sum'))) return false;
-    if (!sums.length) { if (!monomialish(t, v, cfg.at)) return false; continue; }
+    if (!sums.length) { if (!monomialish(tt, v, cfg.at)) return false; continue; }
     if (sums.length > 1) return false;
     const s = stripParen(sums[0]);
     if (s.t !== 'sum') return false;
@@ -361,8 +362,8 @@ function pfdForm(cfg, node) {
     return !!p && [...p.vars()].every((x) => x === v) && coeffs(p, v).length === 2;
   };
   const seen = new Set();
-  for (const t of termsOf(node)) {
-    const { up, down } = factorsOf(t);
+  for (const tt of termsOf(node)) {
+    const { up, down } = factorsOf(tt);
     if (up.some((f) => contains(f, (y) => y.t === 'sym' && y.name === v))) return false;
     const dz = down.filter((f) => contains(f, (y) => y.t === 'sym' && y.name === v));
     if (dz.length !== 1 || !deg1(dz[0])) return false;
@@ -393,8 +394,8 @@ export function cvFinal(cfg, node) {
   // Numbers still to add or multiply (√(1 + 3), 2π·4/2, 3!).
   if (contains(node, (x) => x.t === 'fn' && x.name === 'fact')) return false;
   if (contains(node, (x) => x.t === 'bin' && (x.op === '+' || x.op === '-') && !!exactValue(x.l) && !!exactValue(x.r))) return false;
-  for (const t of termsOf(node)) {
-    const { up, down } = factorsOf(t);
+  for (const tt of termsOf(node)) {
+    const { up, down } = factorsOf(tt);
     if ([...up, ...down].filter((f) => f.t === 'num').length > 2) return false;
     if (up.filter((f) => f.t === 'num').length > 1) return false;
   }
@@ -420,11 +421,11 @@ function cvJudge(cfg, prev, input, state = {}) {
   else {
     try { node = cvParse(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (node.t === 'raw') return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (node.t === 'raw') return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const allowed = new Set(cvVars(cfg));
   const unknown = [...symbolsIn(node)].filter((s) => !allowed.has(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici.` };
-  if (prev && prev.t !== 'raw' && sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (unknown.length) return { kind: 'parse', node, message: t('Je ne connais pas la lettre « {a} » ici.', { a: unknown[0].replace(/_$/, '') }) };
+  if (prev && prev.t !== 'raw' && sameLine(node, prev)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   let refNode = prev;
   if (cfg.expect) { try { refNode = cvParse(cfg, cfg.expect); } catch { refNode = prev; } }
   const envs = envsOf(cfg);
@@ -440,16 +441,16 @@ function cvJudge(cfg, prev, input, state = {}) {
     if (bad >= 0) {
       const diag = diagnoseLine('cvalue', prev, node, cfg, same);
       const env = envs[bad];
-      const where = Object.keys(env).length ? ` (en ${Object.entries(env).filter(([k]) => !(cfg.z && k === 'z')).map(([k, v]) => `${k} = ${typeof v === 'number' ? fnum(v) : cText({ re: Math.round(v.re * 100) / 100, im: Math.round(v.im * 100) / 100 })}`).join(', ')})` : '';
+      const where = Object.keys(env).length ? t(' (en {a})', { a: Object.entries(env).filter(([k]) => !(cfg.z && k === 'z')).map(([k, v]) => `${k} = ${typeof v === 'number' ? fnum(v) : cText({ re: Math.round(v.re * 100) / 100, im: Math.round(v.im * 100) / 100 })}`).join(', ') }) : '';
       const msg = !b || !b[bad]
-        ? `Ta ligne n'est pas définie${where} : une série qui diverge, ou une division par 0 ?`
-        : `Ta ligne vaut ${say(b[bad])}, mais il faut ${say(a[bad])}${where}.`;
+        ? t('Ta ligne n\'est pas définie{where} : une série qui diverge, ou une division par 0 ?', { where })
+        : t('Ta ligne vaut {a}, mais il faut {b}{where}.', { a: say(b[bad]), b: say(a[bad]), where });
       return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: msg };
     }
-  } else if (!b || !b.some(Boolean)) return { kind: 'stay', node, message: 'Je n\'arrive pas à calculer cette ligne : écris-la autrement.' };
+  } else if (!b || !b.some(Boolean)) return { kind: 'stay', node, message: t('Je n\'arrive pas à calculer cette ligne : écris-la autrement.') };
   const fin = cvFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: t('C\'est juste, mais {a}{b}', { a: fin.charAt(0).toLowerCase(), b: fin.slice(1) }) };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
 }
@@ -477,10 +478,10 @@ const cfVars = (cfg) => [...new Set([...(cfg.vars || []), 'z', 'w', 'k'])];
 
 function cfParse(cfg, text) {
   if (text && typeof text === 'object') return text;
-  const t = String(text).replace(/^\s*(⟺|⇔|=)/, '').trim()
+  const tt = String(text).replace(/^\s*(⟺|⇔|=)/, '').trim()
     .replace(/\s*\(\s*k\s*∈\s*ℤ\s*\)\s*$/, ' ; k ∈ ℤ')
     .replace(/,\s*(k\s*∈\s*ℤ)\s*$/, ' ; $1');
-  return parse(t, { vars: cfVars(cfg), complex: true });
+  return parse(tt, { vars: cfVars(cfg), complex: true });
 }
 
 const PERIOD = new WeakMap();
@@ -555,21 +556,21 @@ function checkFamilies(cfg, fams) {
   const zero = (b) => cabs(b) < 1e-9;
   for (const f of fams) {
     if (zero(f.b)) {
-      if (!sols.some((s) => inFamily(f.a, s, P))) return { ok: false, message: `${cText(f.a)} n'est pas une solution.` };
+      if (!sols.some((s) => inFamily(f.a, s, P))) return { ok: false, message: t('{a} n\'est pas une solution.', { a: cText(f.a) }) };
       continue;
     }
     // Every member a + bk must be a solution: b a multiple of the period.
     const m = { re: (f.b.re * P.re + f.b.im * P.im) / (P.re * P.re + P.im * P.im), im: (f.b.im * P.re - f.b.re * P.im) / (P.re * P.re + P.im * P.im) };
     if (Math.abs(m.im) > 1e-7 || Math.abs(m.re - Math.round(m.re)) > 1e-7 || !sols.some((s) => inFamily(f.a, s, P))) {
       const bad = [f.a, { re: f.a.re + f.b.re, im: f.a.im + f.b.im }].find((x) => !sols.some((s) => inFamily(x, s, P)));
-      return { ok: false, message: `${cText(bad || f.a)} n'est pas une solution.` };
+      return { ok: false, message: t('{a} n\'est pas une solution.', { a: cText(bad || f.a) }) };
     }
   }
   for (const s of sols) {
     const met = fams.some((f) => !zero(f.b) && Math.abs(Math.abs(cabs(f.b) / cabs(P)) - 1) < 1e-7 && inFamily(f.a, s, P));
     if (!met) {
       const j = sols.indexOf(s);
-      return { ok: false, missing: true, z0: fr(cfg.sols[j]), message: `Il manque des solutions : tous les ${fr(cfg.sols[j])} + ${fr(cfg.periodText || '2kπi')}, k ∈ ℤ, sont solutions.` };
+      return { ok: false, missing: true, z0: fr(cfg.sols[j]), message: t('Il manque des solutions : tous les {a} + {b}, k ∈ ℤ, sont solutions.', { a: fr(cfg.sols[j]), b: fr(cfg.periodText || '2kπi') }) };
     }
   }
   return { ok: true };
@@ -602,18 +603,18 @@ function wRoots(cfg, node) {
 function cfCompare(cfg, node) {
   const c = classify(cfg, node);
   const ref = refOf(cfg);
-  if (!c) return { ok: false, unread: true, message: 'Je n\'arrive pas à lire cette ligne : une équation en z ou en w, ou « z = … + 2kπi ; k ∈ ℤ ».' };
-  if (c.kind === 'badK') return { ok: false, message: 'k parcourt les entiers : écris « k ∈ ℤ ».' };
+  if (!c) return { ok: false, unread: true, message: t('Je n\'arrive pas à lire cette ligne : une équation en z ou en w, ou « z = … + 2kπi ; k ∈ ℤ ».') };
+  if (c.kind === 'badK') return { ok: false, message: t('k parcourt les entiers : écris « k ∈ ℤ ».') };
   if (c.kind === 'family') {
     const fams = familiesOf(c.items);
-    if (!fams) return { ok: false, message: 'Une famille s\'écrit z₀ + 2kπi : je n\'arrive pas à lire la tienne.' };
+    if (!fams) return { ok: false, message: t('Une famille s\'écrit z₀ + 2kπi : je n\'arrive pas à lire la tienne.') };
     return { ...checkFamilies(cfg, fams), c, fams };
   }
   if (c.kind === 'zeq') {
     const pts = ref.sols.flatMap((s) => [s, { re: s.re + ref.period.re, im: s.im + ref.period.im }]);
     const h = holdsAt(c.node, 'z', pts);
-    if (h.identity) return { ok: false, message: 'Cette égalité est vraie pour tout z : ce n\'est plus l\'équation.', c };
-    if (!h.ok) return { ok: false, message: `${cText(h.at)} est solution de l'équation, mais pas de ta ligne.`, c };
+    if (h.identity) return { ok: false, message: t('Cette égalité est vraie pour tout z : ce n\'est plus l\'équation.'), c };
+    if (!h.ok) return { ok: false, message: t('{a} est solution de l\'équation, mais pas de ta ligne.', { a: cText(h.at) }), c };
     return { ok: true, c };
   }
   // In w.
@@ -622,14 +623,14 @@ function cfCompare(cfg, node) {
     if (!sameSolutions(R.map((z) => ({ re: z.re, im: z.im })), ref.roots)) {
       const miss = ref.roots.find((r) => !R.some((x) => near(x, r)));
       const extra = R.find((x) => !ref.roots.some((r) => near(x, r)));
-      return { ok: false, c, message: miss ? `w = ${cText(miss)} est solution, mais pas de ta ligne.` : `w = ${cText(extra)} est solution de ta ligne, mais pas de l'équation.` };
+      return { ok: false, c, message: miss ? t('w = {a} est solution, mais pas de ta ligne.', { a: cText(miss) }) : t('w = {a} est solution de ta ligne, mais pas de l\'équation.', { a: cText(extra) }) };
     }
     return { ok: true, c, poly: true };
   }
-  if (c.node.t !== 'rel') return { ok: false, unread: true, c, message: 'Écris une équation en w, ou ses solutions « w = … ou w = … ».' };
+  if (c.node.t !== 'rel') return { ok: false, unread: true, c, message: t('Écris une équation en w, ou ses solutions « w = … ou w = … ».') };
   const h = holdsAt(c.node, 'w', ref.roots);
-  if (h.identity) return { ok: false, c, message: 'Cette égalité est vraie pour tout w : ce n\'est plus l\'équation.' };
-  if (!h.ok) return { ok: false, c, message: `w = ${cText(h.at)} est solution, mais pas de ta ligne.` };
+  if (h.identity) return { ok: false, c, message: t('Cette égalité est vraie pour tout w : ce n\'est plus l\'équation.') };
+  if (!h.ok) return { ok: false, c, message: t('w = {a} est solution, mais pas de ta ligne.', { a: cText(h.at) }) };
   return { ok: true, c };
 }
 
@@ -676,7 +677,7 @@ function cfFinal(cfg, node) {
         if (contains(it, (x) => x.t === 'fn' && ['ln', 'arg', 'Arg'].includes(canonFn(x.name)) && hasI(x.args[0]))) return false;
     if (contains(it, (x) => x.t === 'fn' && ['ln'].includes(canonFn(x.name)) && (evalFloat(x.args[0], {}) <= 0 || !Number.isFinite(evalFloat(x.args[0], {}))))) return false;
   }
-  if (!c.hasK) return 'précise « k ∈ ℤ » à la fin de la ligne.';
+  if (!c.hasK) return t('précise « k ∈ ℤ » à la fin de la ligne.');
   return true;
 }
 
@@ -685,8 +686,8 @@ function cfJudge(cfg, prev, input, state = {}) {
   try { node = cfParse(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   const allowed = new Set(cfVars(cfg));
   const unknown = [...symbolsIn(node)].filter((s) => !allowed.has(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici.` };
-  if (prev && sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (unknown.length) return { kind: 'parse', node, message: t('Je ne connais pas la lettre « {a} » ici.', { a: unknown[0].replace(/_$/, '') }) };
+  if (prev && sameLine(node, prev)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const r = cfCompare(cfg, node);
   if (r.unread) return { kind: 'stay', node, message: r.message };
   if (!r.ok) {
@@ -695,7 +696,7 @@ function cfJudge(cfg, prev, input, state = {}) {
   }
   const fin = cfFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: t('C\'est juste, mais {fin}', { fin }) };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
 }

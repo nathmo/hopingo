@@ -10,14 +10,15 @@ import { parse } from '../../cas/parse.js';
 import { toMathML } from '../../cas/mathml.js';
 import { partsScript, tpl, sup } from './a2-kit.js';
 import { H, E, modeOf } from './analyse2-h-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'a2-ode-wronskian';
 const SUB = [
-  { id: 'check', label: 'vérifier que y₁ est solution', skill: 'a2-ode-structure' },
-  { id: 'normalize', label: 'normaliser : lire p(t)', skill: SK },
-  { id: 'abel', label: 'formule d\'Abel', skill: SK },
-  { id: 'reduce', label: 'réduction d\'ordre : (y₂/y₁)′ = W/y₁²', skill: SK },
-  { id: 'final', label: 'solution générale', skill: 'a2-ode-structure' },
+  { id: 'check', label: t('vérifier que y₁ est solution'), skill: 'a2-ode-structure' },
+  { id: 'normalize', label: t('normaliser : lire p(t)'), skill: SK },
+  { id: 'abel', label: t('formule d\'Abel'), skill: SK },
+  { id: 'reduce', label: t('réduction d\'ordre : (y₂/y₁)′ = W/y₁²'), skill: SK },
+  { id: 'final', label: t('solution générale'), skill: 'a2-ode-structure' },
 ];
 const KEYS = ['calcx', 'calcfn', 'a2', 'anal'];
 
@@ -34,19 +35,19 @@ const PAIRS = [
   { y1: 'e^t', eq: "y''-3y'+2y=0", lead: null, pRaw: '-3', p: '-3', W: 'e^(3t)', Wsign: 'e^(-3t)', Wraw: null, red: 'e^t', y2: 'e^(2t)', gen: 'C_1 e^t+C_2 e^(2t)', chk: ['d(d(e^t))-3d(e^t)+2e^t', 'e^t-3e^t+2e^t'], dom: [-2, 2], wrongGen: 'C_1 e^t+C_2 e^(-2t)', notSol: 'e^(-t)' },
 ];
 const TT = { vars: ['t'], dvar: 't' };
-const M = (t) => MT(t, TT);
+const M = (s) => MT(s, TT);
 // An equation in y(t), shown with y′ and y″ (not d/dt).
-const ME = (t) => toMathML(parse(t, { dvar: 't' }), { dvar: 't' });
+const ME = (s) => toMathML(parse(s, { dvar: 't' }), { dvar: 't' });
 
 const CHOICES = [
-  { id: 'check', label: 'Vérifier que y₁ est solution' },
-  { id: 'norm', label: 'Diviser par le coefficient de y″ : lire p' },
-  { id: 'abel', label: 'Formule d\'Abel : W = e^(−∫p)' },
-  { id: 'reduce', label: 'Réduction d\'ordre : (y₂/y₁)′ = W/y₁²' },
-  { id: 'y2', label: 'Intégrer : y₂ = y₁·∫W/y₁²' },
-  { id: 'gen', label: 'Solution générale y = C₁y₁ + C₂y₂' },
-  { id: 'calc', label: 'Calculer' },
-  { id: 'plus', label: 'Abel : W = e^(+∫p)', rule: 'a2_wronskian_abel_sign', why: 'W′ = −pW : la formule d\'Abel a un signe −.' },
+  { id: 'check', label: t('Vérifier que y₁ est solution') },
+  { id: 'norm', label: t('Diviser par le coefficient de y″ : lire p') },
+  { id: 'abel', label: t('Formule d\'Abel : W = e^(−∫p)') },
+  { id: 'reduce', label: t('Réduction d\'ordre : (y₂/y₁)′ = W/y₁²') },
+  { id: 'y2', label: t('Intégrer : y₂ = y₁·∫W/y₁²') },
+  { id: 'gen', label: t('Solution générale y = C₁y₁ + C₂y₂') },
+  { id: 'calc', label: t('Calculer') },
+  { id: 'plus', label: 'Abel : W = e^(+∫p)', rule: 'a2_wronskian_abel_sign', why: t('W′ = −pW : la formule d\'Abel a un signe −.') },
 ];
 
 function linesVariant(level, rng, opts) {
@@ -54,33 +55,34 @@ function linesVariant(level, rng, opts) {
   const dom = { t: d.dom };
   const eqv = (target, goal) => ({ kind: 'equiv', vars: ['t'], dvar: 't', domain: dom, target, ...(goal ? { goal } : {}) });
   const parts = [];
-  const chkLines = [E(d.chk[1], 'Dériver y₁', 'check', 'check'), E('0', 'Simplifier', 'check', 'calc')];
+  const chkLines = [E(d.chk[1], t('Dériver y₁'), 'check', 'check'), E('0', t('Simplifier'), 'check', 'calc')];
   parts.push({ start: d.chk[0], judge: eqv('goal', '0'), lines: chkLines });
   if (level >= 2) {
-    if (d.lead) parts.push({ html: `Divise par ${sup(d.lead)} : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.`, ask: 'p(t) =', start: `(${d.pRaw})/(${d.lead})`, judge: eqv('no-prime'), lines: [E(d.p, 'Simplifier', 'normalize', 'norm')] });
+    if (d.lead) parts.push({ html: t('Divise par {c} : p(t) est le coefficient de y′ dans y″ + p(t)y′ + q(t)y = 0.', { c: sup(d.lead) }), ask: 'p(t) =', start: `(${d.pRaw})/(${d.lead})`, judge: eqv('no-prime'), lines: [E(d.p, t('Simplifier'), 'normalize', 'norm')] });
     const abelDecision = {
-      kind: 'decision', prompt: 'Comment trouver une deuxième solution y₂ ?', options: [
-        { id: 'abel', label: 'Formule d\'Abel, puis (y₂/y₁)′ = W/y₁²', valid: true, ref: true },
-        { id: 'u', label: 'Poser y = y₁·u et remplacer dans l\'équation', valid: true, quality: 'poor', why: 'Juste aussi : on obtient une équation linéaire du 1er ordre en u′. Mais Abel donne W directement, c\'est plus court.' },
+      kind: 'decision', prompt: t('Comment trouver une deuxième solution y₂ ?'), options: [
+        { id: 'abel', label: t('Formule d\'Abel, puis (y₂/y₁)′ = W/y₁²'), valid: true, ref: true },
+        { id: 'u', label: t('Poser y = y₁·u et remplacer dans l\'équation'), valid: true, quality: 'poor', why: t('Juste aussi : on obtient une équation linéaire du 1er ordre en u′. Mais Abel donne W directement, c\'est plus court.') },
       ],
     };
     parts.push({
-      html: `Formule d'Abel : W = e^(−∫p) (à une constante près).`, ask: 'W =', start: `W = e^(-int(${d.p},t))`,
+      html: t('Formule d\'Abel : W = e^(−∫p) (à une constante près).'), ask: 'W =', start: `W = e^(-int(${d.p},t))`,
       judge: { kind: 'ode', eq: `W'=-(${d.p})W`, unknown: 'W', v: 't', order: 1, final: 'one', domain: dom, traps: { a2_wronskian_abel_sign: [`W = ${d.Wsign}`], ...(d.Wraw ? { a2_ode_if_not_normalized: [{ line: `W = ${d.Wraw}`, ctx: { coef: sup(d.lead), a: sup(d.p) } }] } : {}) } },
       pre: level === 3 ? [abelDecision] : [], lines: [E(`W = ${d.W}`, 'W = e^(−∫p)', 'abel', 'abel')],
     });
   }
-  parts.push({ html: 'Réduction d\'ordre : (y₂/y₁)′ = W/y₁².', ask: '(y₂/y₁)′ =', start: `(${d.W})/(${d.y1})^2`, judge: eqv('no-prime'), lines: [E(d.red, 'Simplifier', 'reduce', 'reduce')] });
-  const yLines = [E(`y_2 = ${d.y2}`, 'y₂ = y₁·∫ W/y₁² (sans constante)', 'final', 'y2'), E(`y = ${d.gen}`, 'y = C₁y₁ + C₂y₂', 'final', 'gen')];
+  parts.push({ html: t('Réduction d\'ordre : (y₂/y₁)′ = W/y₁².'), ask: '(y₂/y₁)′ =', start: `(${d.W})/(${d.y1})^2`, judge: eqv('no-prime'), lines: [E(d.red, t('Simplifier'), 'reduce', 'reduce')] });
+  const yLines = [E(`y_2 = ${d.y2}`, t('y₂ = y₁·∫ W/y₁² (sans constante)'), 'final', 'y2'), E(`y = ${d.gen}`, 'y = C₁y₁ + C₂y₂', 'final', 'gen')];
   if (level <= 2) yLines[0] = { ...yLines[0], ...tpl(yLines[0].math, [d.y2], { dvar: 't' }) };
-  parts.push({ html: 'Une deuxième solution, puis la solution générale.', ask: 'y =', start: d.eq, judge: { kind: 'ode', eq: d.eq, unknown: 'y', v: 't', order: 2, domain: dom }, lines: yLines });
+  parts.push({ html: t('Une deuxième solution, puis la solution générale.'), ask: 'y =', start: d.eq, judge: { kind: 'ode', eq: d.eq, unknown: 'y', v: 't', order: 2, domain: dom }, lines: yLines });
   const { start, judge, script } = partsScript(parts, level, CHOICES);
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `On considère ${ME(d.eq)}${d.dom[0] > 0 ? ` (t > ${d.dom[0] >= 1 ? '1' : '0'})` : ''}. Vérifie que y₁ = ${M(d.y1)} est une solution, puis trouve une deuxième solution y₂ et la solution générale.${level === 1 ? ` Le wronskien (formule d'Abel) vaut W = ${M(d.W)}.` : ''}`,
-    hints: H(`Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁².`,
+    prompt: t('On considère {eq}{dom}. Vérifie que y₁ = {y1} est une solution, puis trouve une deuxième solution y₂ et la solution générale.', { eq: ME(d.eq), dom: d.dom[0] > 0 ? ` (t > ${d.dom[0] >= 1 ? '1' : '0'})` : '', y1: M(d.y1) })
+      + (level === 1 ? ` ${t('Le wronskien (formule d\'Abel) vaut W = {W}.', { W: M(d.W) })}` : ''),
+    hints: H(t('Divise par le coefficient de y″ pour lire p, puis W = e^(−∫p) et (y₂/y₁)′ = W/y₁².'),
       `p = ${sup(d.p)}, W = ${M(d.W)} ; (y₂/y₁)′ = W/y₁² = ${M(`(${d.W})/(${d.y1})^2`)}.`,
-      `(y₂/y₁)′ = ${M(d.red)}, donc y₂ = ${M(d.y2)}.`),
+      t('(y₂/y₁)′ = {red}, donc y₂ = {y2}.', { red: M(d.red), y2: M(d.y2) })),
     subgoals: SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.eq}`, exam: examTag(opts),
   });
@@ -94,12 +96,12 @@ function mcqVariant(level, rng, opts) {
   const B = rng.chance(0.6);
   const y1 = A ? d.y1 : d.notSol;
   const gen = B ? d.gen : d.wrongGen;
-  const opt = (a, b) => ({ html: `A ${a ? 'vraie' : 'fausse'}, B ${b ? 'vraie' : 'fausse'}`, correct: a === A && b === B });
+  const opt = (a, b) => ({ html: a ? (b ? t('A vraie, B vraie') : t('A vraie, B fausse')) : (b ? t('A fausse, B vraie') : t('A fausse, B fausse')), correct: a === A && b === B });
   return mcq({
     skill: SK, level, key: `${SK}:mcq:${d.eq}:${A}:${B}`, exam: examTag(opts), keepOrder: true,
-    prompt: `On considère ${ME(d.eq)}${d.dom[0] > 0 ? ` (t > ${d.dom[0] >= 1 ? '1' : '0'})` : ''}.<br>A : ${M(y1)} est une solution.<br>B : la solution générale est y = ${M(gen)}.`,
+    prompt: t('On considère {eq}{dom}.<br>A : {y1} est une solution.<br>B : la solution générale est y = {gen}.', { eq: ME(d.eq), dom: d.dom[0] > 0 ? ` (t > ${d.dom[0] >= 1 ? '1' : '0'})` : '', y1: M(y1), gen: M(gen) }),
     options: [opt(true, true), opt(true, false), opt(false, true), opt(false, false)],
-    solution: [{ html: `${M(d.y1)} est une solution ; p = ${sup(d.p)}, W = ${M(d.W)}, (y₂/y₁)′ = ${M(d.red)}, y₂ = ${M(d.y2)} : y = ${M(d.gen)}.`, note: '' }],
+    solution: [{ html: t('{y1} est une solution ; p = {p}, W = {W}, (y₂/y₁)′ = {red}, y₂ = {y2} : y = {gen}.', { y1: M(d.y1), p: sup(d.p), W: M(d.W), red: M(d.red), y2: M(d.y2), gen: M(d.gen) }), note: '' }],
     expectedSec: 180,
   }, rng);
 }
@@ -107,17 +109,17 @@ function mcqVariant(level, rng, opts) {
 // ---------- V/F (no counter-example checker fits: 2-option multiple choice) ----------
 
 const VF = [
-  { key: 'zero', truth: true, text: 'Si y₁ et y₂ sont des solutions de y″ + p(t)y′ + q(t)y = 0 (p, q continues sur I) et W(y₁, y₂)(t₀) = 0 en un point t₀ de I, alors W ≡ 0 sur I.', why: 'Vrai : par Abel, W(t) = W(t₀)·e^(−∫p) = 0.' },
-  { key: 'sign', truth: false, text: 'Pour y″ + p(t)y′ + q(t)y = 0, W(t) = W(t₀)·e^(+∫ de t₀ à t de p).', ruleIfTrue: 'a2_wronskian_abel_sign', why: 'Faux : W′ = −pW, donc W(t) = W(t₀)·e^(−∫p).' },
-  { key: 'abs', truth: false, text: 't² et t|t| ont un wronskien nul sur ℝ, donc elles sont linéairement dépendantes sur [−1 ; 1].', why: 'Faux : W = 0, mais t|t| = t² sur [0 ; 1] et −t² sur [−1 ; 0] : aucune constante c ne donne t|t| = c·t² sur tout [−1 ; 1]. W ≡ 0 ne prouve la dépendance que pour deux solutions d\'une même équation.' },
-  { key: 'norm', truth: false, text: 'Pour t·y″ + y′ + y = 0 (t > 0), la formule d\'Abel donne W = W₀·e^(−∫ 1 dt) = W₀e^(−t).', ruleIfTrue: 'a2_ode_if_not_normalized', why: 'Faux : il faut diviser par t, p(t) = 1/t, donc W = W₀·e^(−ln t) = W₀/t.' },
-  { key: 'indep', truth: true, text: 'Deux solutions de y″ + p(t)y′ + q(t)y = 0 dont le wronskien ne s\'annule pas forment une base de l\'espace des solutions.', why: 'Vrai : elles sont indépendantes, et l\'espace est de dimension 2.' },
+  { key: 'zero', truth: true, text: t('Si y₁ et y₂ sont des solutions de y″ + p(t)y′ + q(t)y = 0 (p, q continues sur I) et W(y₁, y₂)(t₀) = 0 en un point t₀ de I, alors W ≡ 0 sur I.'), why: t('Vrai : par Abel, W(t) = W(t₀)·e^(−∫p) = 0.') },
+  { key: 'sign', truth: false, text: t('Pour y″ + p(t)y′ + q(t)y = 0, W(t) = W(t₀)·e^(+∫ de t₀ à t de p).'), ruleIfTrue: 'a2_wronskian_abel_sign', why: t('Faux : W′ = −pW, donc W(t) = W(t₀)·e^(−∫p).') },
+  { key: 'abs', truth: false, text: t('t² et t|t| ont un wronskien nul sur ℝ, donc elles sont linéairement dépendantes sur [−1 ; 1].'), why: t('Faux : W = 0, mais t|t| = t² sur [0 ; 1] et −t² sur [−1 ; 0] : aucune constante c ne donne t|t| = c·t² sur tout [−1 ; 1]. W ≡ 0 ne prouve la dépendance que pour deux solutions d\'une même équation.') },
+  { key: 'norm', truth: false, text: t('Pour t·y″ + y′ + y = 0 (t > 0), la formule d\'Abel donne W = W₀·e^(−∫ 1 dt) = W₀e^(−t).'), ruleIfTrue: 'a2_ode_if_not_normalized', why: t('Faux : il faut diviser par t, p(t) = 1/t, donc W = W₀·e^(−ln t) = W₀/t.') },
+  { key: 'indep', truth: true, text: t('Deux solutions de y″ + p(t)y′ + q(t)y = 0 dont le wronskien ne s\'annule pas forment une base de l\'espace des solutions.'), why: t('Vrai : elles sont indépendantes, et l\'espace est de dimension 2.') },
 ];
 function vfMcq(level, rng, opts) {
   const s = rng.pick(VF);
   return mcq({
-    skill: SK, level, prompt: `Vrai ou faux ?<br>« ${s.text} »`, keepOrder: true,
-    options: [{ html: 'Vrai', correct: s.truth, rule: s.truth ? null : s.ruleIfTrue || null }, { html: 'Faux', correct: !s.truth, rule: null }],
+    skill: SK, level, prompt: t('Vrai ou faux ?<br>« {statement} »', { statement: s.text }), keepOrder: true,
+    options: [{ html: t('Vrai'), correct: s.truth, rule: s.truth ? null : s.ruleIfTrue || null }, { html: t('Faux'), correct: !s.truth, rule: null }],
     key: `${SK}:tf:${s.key}`, solution: [{ html: s.why, note: '' }], expectedSec: 60, exam: opts?.exam ? { format: 'tf', points: 1 } : false,
   }, rng);
 }

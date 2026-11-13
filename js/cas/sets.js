@@ -28,6 +28,7 @@ import { exactValue, toRatFun } from './normal.js';
 import { evalFloat, compileFloat } from './numeric.js';
 import { diff } from './diff.js';
 import { qCoeffs, rationalRoots, discriminant } from './polyx.js';
+import { t as tr } from '../i18n.js';
 
 const TOL = 1e-9;
 const RANGE = 60; // integers of ℕ, ℤ considered
@@ -133,7 +134,7 @@ function boundOf(node) {
   const q = exactValue(n);
   if (q) return bq(q);
   const x = evalFloat(n, {});
-  if (!Number.isFinite(x)) throw new SetError('Une borne n\'est pas un nombre.');
+  if (!Number.isFinite(x)) throw new SetError(tr('Une borne n\'est pas un nombre.'));
   return { x, node: n };
 }
 
@@ -155,7 +156,7 @@ function namedSet(name, ctx) {
   if (name === 'ℝ' || name === 'ℚ' || name === 'ℂ') return ctx.universe ? integersIn(ctx.universe.lo, ctx.universe.hi) : REALS;
   if (name === 'ℕ') return integersIn(0, RANGE);
   if (name === 'ℤ') return integersIn(-RANGE, RANGE);
-  throw new SetError(`Ensemble inconnu : ${name}`);
+  throw new SetError(tr('Ensemble inconnu : {name}', { name }));
 }
 
 function evalSet(node, ctx) {
@@ -166,7 +167,7 @@ function evalSet(node, ctx) {
     const b = evalSet(n.r, ctx);
     return n.op === '∪' ? union(a, b) : n.op === '∩' ? intersect(a, b) : minus(a, b);
   }
-  if (n.t !== 'set') throw new SetError('Ce n\'est pas un ensemble.');
+  if (n.t !== 'set') throw new SetError(tr('Ce n\'est pas un ensemble.'));
   if (n.kind === 'named') return namedSet(n.name, ctx);
   if (n.kind === 'interval') {
     const S = normalize([{ lo: boundOf(n.lo), hi: boundOf(n.hi), loC: !n.loOpen, hiC: !n.hiOpen }]);
@@ -184,10 +185,10 @@ function evalSet(node, ctx) {
   // Image set: the variable is the one bound by « n ∈ ℕ » in the condition,
   // else the letter of the expression.
   const v = boundVar(n.cond) ?? [...letters(head)][0];
-  if (!v) throw new SetError('Je ne trouve pas la variable de l\'ensemble.');
+  if (!v) throw new SetError(tr('Je ne trouve pas la variable de l\'ensemble.'));
   const base = integersIn(-RANGE, RANGE);
   const E = solveCond(n.cond, { ...ctx, v, universe: { lo: -RANGE, hi: RANGE } }, base);
-  if (!isFiniteSet(E)) throw new SetError('Ensemble image trop grand.');
+  if (!isFiniteSet(E)) throw new SetError(tr('Ensemble image trop grand.'));
   const items = [];
   for (const b of points(E)) {
     const val = valueAt(head, v, b);
@@ -287,7 +288,7 @@ export function holds(node, ctx, b) {
       return a === c;
     }
     case 'list': return n.items.every((x) => holds(x, ctx, b));
-    default: throw new SetError('Ce n\'est pas une condition.');
+    default: throw new SetError(tr('Ce n\'est pas une condition.'));
   }
 }
 
@@ -774,33 +775,33 @@ export function finalForm(node, cfg = {}) {
   const parts = unionParts(n);
   if (parts.some((p) => p.t !== 'set' || p.kind === 'builder')) return false;
   if (parts.some((p) => p.kind === 'named' && !['∅', 'ℝ'].includes(p.name))) return false;
-  if (parts.length > 1 && parts.some((p) => p.kind === 'named')) return 'Simplifie la réunion : ∅ ou ℝ ne s\'écrivent pas avec d\'autres morceaux.';
+  if (parts.length > 1 && parts.some((p) => p.kind === 'named')) return tr('Simplifie la réunion : ∅ ou ℝ ne s\'écrivent pas avec d\'autres morceaux.');
   for (const p of parts) {
     if (p.kind === 'finite' && !p.items.every((x) => isNumberWritten(x, cfg.loose))) return false;
     if (p.kind === 'interval') {
       if (!isNumberWritten(p.lo, cfg.loose) || !isNumberWritten(p.hi, cfg.loose)) return false;
       const infClosed = (b, open) => !open && stripParen(b.t === 'neg' ? b.e : b).t === 'const' && stripParen(b.t === 'neg' ? b.e : b).name === 'inf';
-      if (infClosed(p.lo, p.loOpen) || infClosed(p.hi, p.hiOpen)) return '∞ n\'est pas un nombre : le crochet est toujours ouvert de son côté, ]−∞ ou +∞[.';
+      if (infClosed(p.lo, p.loOpen) || infClosed(p.hi, p.hiOpen)) return tr('∞ n\'est pas un nombre : le crochet est toujours ouvert de son côté, ]−∞ ou +∞[.');
     }
   }
   // Disjoint, sorted, not touching: each piece read alone, in order.
   const ctx = cfg.isCtx ? cfg : makeCtx(cfg);
   const sets = parts.map((p) => evalSet(p, ctx));
   // On a given interval (periodic cfgs), nothing written outside it.
-  if (cfg.periodic && ctx.within && cfg.domain && cfg.domain !== 'R' && minus(sets.reduce((acc, S) => union(acc, S), EMPTY), ctx.within).parts.length) return "Garde seulement la partie qui est dans l'intervalle.";
-  if (sets.some((S, i) => !S.parts.length && parts[i].kind !== 'named')) return 'Un des morceaux est vide : enlève-le.';
+  if (cfg.periodic && ctx.within && cfg.domain && cfg.domain !== 'R' && minus(sets.reduce((acc, S) => union(acc, S), EMPTY), ctx.within).parts.length) return tr("Garde seulement la partie qui est dans l'intervalle.");
+  if (sets.some((S, i) => !S.parts.length && parts[i].kind !== 'named')) return tr('Un des morceaux est vide : enlève-le.');
   for (let i = 0; i + 1 < sets.length; i++) {
     const a = sets[i];
     const b = sets[i + 1];
     if (!a.parts.length || !b.parts.length) continue;
-    if (a.parts[0].lo.x > b.parts[0].lo.x && !isFiniteSet(a) && !isFiniteSet(b)) return 'Range les intervalles dans l\'ordre croissant.';
+    if (a.parts[0].lo.x > b.parts[0].lo.x && !isFiniteSet(a) && !isFiniteSet(b)) return tr('Range les intervalles dans l\'ordre croissant.');
     const joined = union(a, b);
-    if (joined.parts.length < a.parts.length + b.parts.length) return 'Des morceaux se chevauchent ou se touchent : réunis-les en un seul intervalle.';
+    if (joined.parts.length < a.parts.length + b.parts.length) return tr('Des morceaux se chevauchent ou se touchent : réunis-les en un seul intervalle.');
   }
   if (sets.length > 1) {
     const all = sets.reduce((acc, S) => union(acc, S), EMPTY);
     const count = sets.reduce((s, S) => s + S.parts.length, 0);
-    if (all.parts.length < count) return 'Des morceaux se chevauchent ou se touchent : réunis-les en un seul intervalle.';
+    if (all.parts.length < count) return tr('Des morceaux se chevauchent ou se touchent : réunis-les en un seul intervalle.');
   }
   return true;
 }

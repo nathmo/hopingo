@@ -10,6 +10,7 @@ import { parse } from '../../cas/parse.js';
 import { blankLine } from '../../judges/lines.js';
 import { MT } from './kit.js';
 import { q, qt, mt, vt, MLm, ML, sub } from './alglin-kit.js';
+import { t } from '../../i18n.js';
 
 export { q, qt, mt, vt, MLm, ML, sub, MX, LF };
 
@@ -63,7 +64,7 @@ export function blanksOf(math, which) {
 
 // Menus of the « choose the action » mode: one valid action.
 export function menuOf(items, active) {
-  return items.map((o) => ({ id: o.id, label: o.label, valid: o.id === active, why: o.id === active ? undefined : o.why || 'Pas maintenant : ce n\'est pas l\'étape suivante.' }));
+  return items.map((o) => ({ id: o.id, label: o.label, valid: o.id === active, why: o.id === active ? undefined : o.why || t('Pas maintenant : ce n\'est pas l\'étape suivante.') }));
 }
 
 export const H = (a, b, c) => [{ level: 1, html: a }, { level: 2, html: b }, { level: 3, html: c }];

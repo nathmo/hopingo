@@ -20,6 +20,7 @@ import { mapNode } from '../ast.js';
 import { evalFloat } from '../numeric.js';
 import { exactValue } from '../normal.js';
 import { evalAst, parseExpr, parseMatLine, normalizeMatText, envOf, Mx, fromQ } from '../matexpr.js';
+import { t } from '../../i18n.js';
 
 // A line node of the judge odevec (js/judges/odevec.js reads its lines the
 // same way; importing it here would close a cycle through diagnose.js).
@@ -64,9 +65,9 @@ function doubleEig(A) {
 
 export const DEFS = {
   m_companion_sign: {
-    name: 'Matrice compagne sans changer les signes',
+    name: t('Matrice compagne sans changer les signes'),
     judges: ['mat'],
-    example: ['[[0, 1], [6, 5]] pour ÿ + 5ẏ + 6y = 0', '[[0, 1], [−6, −5]]'],
+    example: [t('[[0, 1], [6, 5]] pour ÿ + 5ẏ + 6y = 0'), '[[0, 1], [−6, −5]]'],
     transform(prev, ctx) {
       const c = ctx?.cfg?.companion;
       if (!c) return [];
@@ -78,12 +79,12 @@ export const DEFS = {
       return out.map(([x, y]) => ({ node: line([[new Q(0), new Q(1)], [x, y]]), ctx: { p: polyR(y.neg(), x.neg()), q: polyR(a, b), ddot } }));
     },
     explain: (ctx = {}) => (ctx.p
-      ? `${ctx.ddot} : la ligne du bas porte les coefficients <b>changés de signe</b>. Contrôle : le polynôme de ta matrice est ${ctx.p}, pas ${ctx.q}.`
-      : 'On isole ÿ : ÿ + 5ẏ + 6y = 0 donne ÿ = −6y − 5ẏ, donc la ligne du bas est (−6, −5). Contrôle : le polynôme caractéristique de la matrice compagne doit être celui de l\'équation.'),
+      ? t('{ddot} : la ligne du bas porte les coefficients <b>changés de signe</b>. Contrôle : le polynôme de ta matrice est {p}, pas {q}.', { ddot: ctx.ddot, p: ctx.p, q: ctx.q })
+      : t('On isole ÿ : ÿ + 5ẏ + 6y = 0 donne ÿ = −6y − 5ẏ, donc la ligne du bas est (−6, −5). Contrôle : le polynôme caractéristique de la matrice compagne doit être celui de l\'équation.')),
     check: { judge: { kind: 'mat', expect: '[[0,1],[-6,-5]]', companion: ['5', '6'] }, prev: 'A', line: '[[0,1],[6,5]]' },
   },
   m_modes_c_equals_x0: {
-    name: 'Coefficients des modes pris égaux à x(0)',
+    name: t('Coefficients des modes pris égaux à x(0)'),
     judges: ['odevec'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -106,33 +107,33 @@ export const DEFS = {
       }
       return out;
     },
-    explain: () => 'Les cᵢ sont les coordonnées de x(0) dans la base des vecteurs propres : il faut résoudre Pc = x(0), c₁v₁ + c₂v₂ = x(0). Ils ne sont égaux aux composantes de x(0) que si P = I.',
+    explain: () => t('Les cᵢ sont les coordonnées de x(0) dans la base des vecteurs propres : il faut résoudre Pc = x(0), c₁v₁ + c₂v₂ = x(0). Ils ne sont égaux aux composantes de x(0) que si P = I.'),
     check: { judge: { kind: 'odevec', A: '[[0,1],[-6,-5]]', x0: '(1 ; 0)', want: 'solution' }, prev: 'x(t) = c_1e^(-2t)(1 ; -2) + c_2e^(-3t)(1 ; -3)', line: 'c_1 = 1 ; c_2 = 0' },
   },
   m_stab_discrete_in_cont: {
-    name: 'Critère |λ| < 1 appliqué à ẋ = Ax',
+    name: t('Critère |λ| < 1 appliqué à ẋ = Ax'),
     judges: [],
     explain: (ctx = {}) => (ctx.λ
-      ? `En continu, le mode e^{λt} tend vers 0 si Re λ < 0. Avec λ = ${ctx.λ} > 0, il explose même si |λ| < 1.`
-      : 'En continu, le mode e^{λt} tend vers 0 si Re λ < 0 : |λ| < 1 est le critère des systèmes discrets. Avec λ = 1/2, e^{t/2} explose.'),
+      ? t('En continu, le mode e^{λt} tend vers 0 si Re λ < 0. Avec λ = {l} > 0, il explose même si |λ| < 1.', { l: ctx.λ })
+      : t('En continu, le mode e^{λt} tend vers 0 si Re λ < 0 : |λ| < 1 est le critère des systèmes discrets. Avec λ = 1/2, e^{t/2} explose.')),
     check: { bait: { skill: 'm-ode-modes', level: 2 } },
   },
   m_stab_cont_in_discrete: {
-    name: 'Critère Re λ < 0 appliqué à x_{k+1} = Ax_k',
+    name: t('Critère Re λ < 0 appliqué à x_{k+1} = Ax_k'),
     judges: [],
     explain: (ctx = {}) => (ctx.λ
-      ? `En discret, le mode est λᵏ : il tend vers 0 si |λ| < 1. Avec λ = ${ctx.λ}, |λ|ᵏ grandit.`
-      : 'En discret, le mode est λᵏ : il tend vers 0 si |λ| < 1, quel que soit le signe de λ. Avec λ = −2, Re λ < 0 mais |−2|ᵏ grandit.'),
+      ? t('En discret, le mode est λᵏ : il tend vers 0 si |λ| < 1. Avec λ = {l}, |λ|ᵏ grandit.', { l: ctx.λ })
+      : t('En discret, le mode est λᵏ : il tend vers 0 si |λ| < 1, quel que soit le signe de λ. Avec λ = −2, Re λ < 0 mais |−2|ᵏ grandit.')),
     check: { bait: { skill: 'm-discrete', level: 2 } },
   },
   m_stab_imag_part: {
-    name: 'Stabilité lue sur la partie imaginaire',
+    name: t('Stabilité lue sur la partie imaginaire'),
     judges: [],
-    explain: () => 'La partie imaginaire b de λ = a ± ib donne la fréquence des oscillations (cos bt, sin bt) ; c\'est la partie réelle a qui dit si elles s\'amortissent : e^{at} → 0 si a < 0.',
+    explain: () => t('La partie imaginaire b de λ = a ± ib donne la fréquence des oscillations (cos bt, sin bt) ; c\'est la partie réelle a qui dit si elles s\'amortissent : e^{at} → 0 si a < 0.'),
     check: { bait: { skill: 'm-ode-modes', level: 4 } },
   },
   m_discrete_exp: {
-    name: 'Modes discrets écrits e^{λk}',
+    name: t('Modes discrets écrits e^{λk}'),
     judges: ['odevec'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -142,11 +143,13 @@ export const DEFS = {
       const part = cfg.modes.map((m, i) => { const c = q(m.c); return c.n === 0 ? '' : term(m, `${i ? '+' : ''}(${qt(c)})`); }).join('');
       return [general, part].filter(Boolean).map((t) => lineOf(cfg, `x_k = ${t}`)).filter(Boolean).map((node) => ({ node, ctx: { λ: R(cfg.modes[0].l) } }));
     },
-    explain: (ctx = {}) => `En discret, chaque pas multiplie par λ : après k pas, λᵏ${ctx.λ ? ` = (${ctx.λ})ᵏ` : ''}, pas e^{λk}. L'exponentielle est le cas continu.`,
+    explain: (ctx = {}) => (ctx.λ
+      ? t('En discret, chaque pas multiplie par λ : après k pas, λᵏ = ({l})ᵏ, pas e^{λk}. L\'exponentielle est le cas continu.', { l: ctx.λ })
+      : t('En discret, chaque pas multiplie par λ : après k pas, λᵏ, pas e^{λk}. L\'exponentielle est le cas continu.')),
     check: { judge: { kind: 'odevec', A: '[[5/4,-3/4],[3/2,-1]]', discrete: true, x0: '(1 ; 0)', want: 'solution', modes: [{ l: '1/2', v: '(1 ; 1)', c: '2' }, { l: '-1/4', v: '(1 ; 2)', c: '-1' }] }, prev: 'x_k', line: 'x_k = 2e^(k/2)(1 ; 1) - e^(-k/4)(1 ; 2)' },
   },
   m_expm_entrywise: {
-    name: 'Exponentielle de chaque case',
+    name: t('Exponentielle de chaque case'),
     judges: ['odevec'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -156,17 +159,17 @@ export const DEFS = {
       const node = lineOf(cfg, `[${A.map((r) => `[${r.map(eT).join(',')}]`).join(',')}]`);
       return node ? [{ node, ctx: {} }] : [];
     },
-    explain: () => 'e^{At} = Σ (At)ᵏ/k!, pas la matrice des e^{aᵢⱼt}. Contrôle : en t = 0, ta matrice a des 1 partout, pas I.',
+    explain: () => t('e^{At} = Σ (At)ᵏ/k!, pas la matrice des e^{aᵢⱼt}. Contrôle : en t = 0, ta matrice a des 1 partout, pas I.'),
     check: { judge: { kind: 'odevec', A: '[[1,1],[-1,3]]', want: 'expm' }, prev: 'e^(At)', line: '[[e^t, e^t],[e^(-t), e^(3t)]]' },
   },
   m_expm_sum: {
-    name: 'e^{A+B} = e^A e^B sans AB = BA',
+    name: t('e^{A+B} = e^A e^B sans AB = BA'),
     judges: [],
-    explain: () => 'e^{A+B} = e^A e^B demande AB = BA. Contre-exemple : A = [[0, 1], [0, 0]], B = [[0, 0], [1, 0]] ne commutent pas, et e^{A+B} ≠ e^A e^B.',
+    explain: () => t('e^{A+B} = e^A e^B demande AB = BA. Contre-exemple : A = [[0, 1], [0, 0]], B = [[0, 0], [1, 0]] ne commutent pas, et e^{A+B} ≠ e^A e^B.'),
     check: { bait: { skill: 'm-expm', exam: 'tf' } },
   },
   m_expm_double_no_t: {
-    name: 'Terme tN oublié pour une valeur double',
+    name: t('Terme tN oublié pour une valeur double'),
     judges: ['odevec'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -183,7 +186,7 @@ export const DEFS = {
       const node = lineOf(cfg, `${eT(l)}·(${x0.map((r) => qt(r[0])).join(' ; ')})`);
       return node ? [{ node, ctx: c }] : [];
     },
-    explain: (ctx = {}) => `A n'est pas diagonalisable (N = A − ${ctx.λ ? `(${ctx.λ})` : 'λ'}I ≠ 0) : e^{At} = e^{λt}(I + tN). Contrôle : la dérivée de e^{λt}I vaut λe^{λt}I, pas Ae^{At}.`,
+    explain: (ctx = {}) => t('A n\'est pas diagonalisable (N = A − {l}I ≠ 0) : e^{At} = e^{λt}(I + tN). Contrôle : la dérivée de e^{λt}I vaut λe^{λt}I, pas Ae^{At}.', { l: ctx.λ ? `(${ctx.λ})` : 'λ' }),
     check: { judge: { kind: 'odevec', A: '[[1,1],[-1,3]]', want: 'expm' }, prev: 'e^(At)', line: 'e^(2t)·[[1,0],[0,1]]' },
   },
 };

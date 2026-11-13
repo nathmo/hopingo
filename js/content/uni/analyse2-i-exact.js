@@ -21,6 +21,7 @@ import { N, H, E, fr } from './analyse1-e-kit.js';
 import { assemble } from './analyse2-i-part.js';
 import { ML } from './alglin-kit.js';
 import { q, cmul, sum, expText, powText, blankMatches, blankValues, blankTail, mcq4, M } from './analyse2-i-kit.js';
+import { t } from '../../i18n.js';
 
 // ======================================================================
 // a2-ode-exact
@@ -31,7 +32,7 @@ const EX_SUB = [
   { id: 'test', label: 'M_y = N_x', skill: 'a2-partials' },
   { id: 'integrate', label: 'H = ∫ M dx', skill: EX },
   { id: 'adjust', label: 'φ(y)', skill: EX },
-  { id: 'ic', label: 'la constante', skill: EX },
+  { id: 'ic', label: t('la constante'), skill: EX },
 ];
 
 // Monomials c·xⁱyʲ: [{c, i, j}].
@@ -42,7 +43,7 @@ const dy = (ms) => ms.filter((m) => m.j > 0).map((m) => ({ c: m.c * m.j, i: m.i,
 const valAt = (ms, x, y) => ms.reduce((s, m) => s + m.c * x ** m.i * y ** m.j, 0);
 
 function exactData(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tr = 0; tr < 200; tr++) {
     const kind = rng.pick(['poly', 'poly', 'poly', 'atan', 'exp']);
     const x0 = rng.pick([0, 1, -1]);
     const y0 = rng.pick([1, -1, 2]);
@@ -95,10 +96,10 @@ const EX_FALLBACK = {
 };
 
 const EX_CHOICES = [
-  { id: 'My', label: 'Calculer ∂M/∂y' }, { id: 'Nx', label: 'Calculer ∂N/∂x' },
-  { id: 'intM', label: 'Intégrer M par rapport à x' }, { id: 'phi', label: 'Ajuster φ(y) avec N' },
-  { id: 'rel', label: 'Écrire H(x, y) = C' }, { id: 'consts', label: 'Fixer C avec la condition initiale' }, { id: 'final', label: 'Écrire la relation finale' },
-  { id: 'nophi', label: 'Écrire H = ∫ M dx = C directement', rule: 'a2_exact_phi_forgot', why: 'La « constante » d\'intégration en x dépend de y : il faut φ(y), fixée par H_y = N.' },
+  { id: 'My', label: t('Calculer ∂M/∂y') }, { id: 'Nx', label: t('Calculer ∂N/∂x') },
+  { id: 'intM', label: t('Intégrer M par rapport à x') }, { id: 'phi', label: t('Ajuster φ(y) avec N') },
+  { id: 'rel', label: t('Écrire H(x, y) = C') }, { id: 'consts', label: t('Fixer C avec la condition initiale') }, { id: 'final', label: t('Écrire la relation finale') },
+  { id: 'nophi', label: t('Écrire H = ∫ M dx = C directement'), rule: 'a2_exact_phi_forgot', why: t('La « constante » d\'intégration en x dépend de y : il faut φ(y), fixée par H_y = N.') },
 ];
 
 function exactParts(d, level) {
@@ -108,8 +109,8 @@ function exactParts(d, level) {
   const noPhi = d.phi === '0' ? [] : [`${d.H0} = C`, ...(d.C0noPhi !== null ? [`${d.H0} = ${typeof d.C0noPhi === 'number' ? N(q(d.C0noPhi)) : d.C0noPhi}`] : [])];
   const ode = { kind: 'ode', eq, order: 1, ic: { x: d.x0, y: d.y0 }, final: 'implicit', yRange: yr, firstIntegral: true, _exact: { noPhi, ctx: { N: fr(d.N), Hy: fr(d.Hy0), phi: fr(d.phi) } } };
   const xy = { kind: 'equiv', vars: ['x', 'y'], target: 'no-prime' };
-  const rel = [E(`${d.H} = C`, 'Les solutions vérifient H(x, y) = C', 'ic', 'rel'), E(`C = ${C0}`, `y(${fr(d.x0)}) = ${fr(d.y0)}`, 'ic', 'consts'), E(`${d.H} = ${C0}`, 'La relation cherchée', 'ic', 'final')];
-  const intL = E(`${d.H0}+C`, 'Primitive en x : la constante C peut dépendre de y (c\'est φ(y))', 'integrate', 'intM');
+  const rel = [E(`${d.H} = C`, t('Les solutions vérifient H(x, y) = C'), 'ic', 'rel'), E(`C = ${C0}`, `y(${fr(d.x0)}) = ${fr(d.y0)}`, 'ic', 'consts'), E(`${d.H} = ${C0}`, t('La relation cherchée'), 'ic', 'final')];
+  const intL = E(`${d.H0}+C`, t('Primitive en x : la constante C peut dépendre de y (c\'est φ(y))'), 'integrate', 'intM');
   const phiL = E(d.dphi, 'φ′(y) = N − ∂/∂y(∫ M dx)', 'adjust', 'phi');
   if (level <= 2) {
     Object.assign(rel[1], blankValues(rel[1].math));
@@ -117,22 +118,22 @@ function exactParts(d, level) {
     Object.assign(phiL, blankMatches(phiL.math, /-?\d+(?=[a-zA-Z])/g, 1));
   }
   const dec = { kind: 'decision', prompt: `∂M/∂y = ∂N/∂x ?`, options: [
-    { id: 'yes', label: 'Oui : l\'équation est exacte', valid: true },
-    { id: 'no', label: 'Non : elle n\'est pas exacte', valid: false, why: `${M(d.My)} = ${M(d.Nx)} : les deux dérivées sont égales.` },
+    { id: 'yes', label: t('Oui : l\'équation est exacte'), valid: true },
+    { id: 'no', label: t('Non : elle n\'est pas exacte'), valid: false, why: t('{a} = {b} : les deux dérivées sont égales.', { a: M(d.My), b: M(d.Nx) }) },
   ] };
-  const integ = { kind: 'decision', prompt: 'Pour trouver H :', options: [
-    { id: 'M', label: 'intégrer M par rapport à x, puis ajuster φ(y)', valid: true, ref: true },
-    { id: 'N', label: 'intégrer N par rapport à y, puis ajuster ψ(x)', valid: true, quality: 'poor', why: 'Juste aussi ; ici on intègre M en x, comme le corrigé.' },
-    { id: 'nophi', label: 'H = ∫ M dx, sans rien ajouter', valid: false, rule: 'a2_exact_phi_forgot', why: 'La « constante » d\'intégration en x peut dépendre de y : H = ∫ M dx + φ(y).' },
+  const integ = { kind: 'decision', prompt: t('Pour trouver H :'), options: [
+    { id: 'M', label: t('intégrer M par rapport à x, puis ajuster φ(y)'), valid: true, ref: true },
+    { id: 'N', label: t('intégrer N par rapport à y, puis ajuster ψ(x)'), valid: true, quality: 'poor', why: t('Juste aussi ; ici on intègre M en x, comme le corrigé.') },
+    { id: 'nophi', label: t('H = ∫ M dx, sans rien ajouter'), valid: false, rule: 'a2_exact_phi_forgot', why: t('La « constante » d\'intégration en x peut dépendre de y : H = ∫ M dx + φ(y).') },
   ] };
   return {
     eq,
     parts: [
-      { html: `Teste l'exactitude : ∂M/∂y avec M = ${M(d.M)}.`, start: `pd(${d.M},y)`, judge: xy, lines: [E(d.My, 'Dériver M par rapport à y', 'test', 'My')] },
-      { html: `∂N/∂x avec N = ${M(d.N)} :`, ask: '∂N/∂x =', start: `pd(${d.N},x)`, judge: xy, lines: [E(d.Nx, 'Dériver N par rapport à x', 'test', 'Nx')] },
-      { html: 'H = ∫ M dx (à une fonction φ(y) près) :', ask: 'H =', start: `int(${d.M},x)`, judge: { kind: 'antideriv', v: 'x', vars: ['x', 'y'] }, pre: level >= 2 ? [dec, ...(level >= 3 ? [integ] : [])] : [], lines: [intL] },
-      { html: `H_y doit valoir N : φ′(y) = N − ∂/∂y(${M(d.H0)}) :`, ask: 'φ′(y) =', start: `${d.N}-pd(${d.H0},y)`, judge: xy, lines: [phiL] },
-      { html: 'Les solutions, puis la condition initiale :', ask: 'relation :', start: eq, judge: ode, lines: rel },
+      { html: t('Teste l\'exactitude : ∂M/∂y avec M = {M}.', { M: M(d.M) }), start: `pd(${d.M},y)`, judge: xy, lines: [E(d.My, t('Dériver M par rapport à y'), 'test', 'My')] },
+      { html: t('∂N/∂x avec N = {N} :', { N: M(d.N) }), ask: '∂N/∂x =', start: `pd(${d.N},x)`, judge: xy, lines: [E(d.Nx, t('Dériver N par rapport à x'), 'test', 'Nx')] },
+      { html: t('H = ∫ M dx (à une fonction φ(y) près) :'), ask: 'H =', start: `int(${d.M},x)`, judge: { kind: 'antideriv', v: 'x', vars: ['x', 'y'] }, pre: level >= 2 ? [dec, ...(level >= 3 ? [integ] : [])] : [], lines: [intL] },
+      { html: t('H_y doit valoir N : φ′(y) = N − ∂/∂y({H}) :', { H: M(d.H0) }), ask: 'φ′(y) =', start: `${d.N}-pd(${d.H0},y)`, judge: xy, lines: [phiL] },
+      { html: t('Les solutions, puis la condition initiale :'), ask: t('relation :'), start: eq, judge: ode, lines: rel },
     ],
   };
 }
@@ -142,9 +143,9 @@ function exactItem(level, rng, opts, d) {
   const { start, judge, script } = assemble(parts, level, EX_CHOICES);
   return linesItem({
     skill: EX, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', start, judge, script,
-    prompt: `Résous ${M(`(${d.M})`)} dx + ${M(`(${d.N})`)} dy = 0 avec y(${fr(d.x0)}) = ${fr(d.y0)} : la solution vérifie une relation H(x, y) = C.`,
-    hints: H('Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y).',
-      `H = ${M(d.H0)} + φ(y), et H_y doit valoir ${M(d.N)}.`, `φ(y) = ${M(d.phi)} : ${M(`${d.H} = C`)}.`),
+    prompt: t('Résous {M} dx + {N} dy = 0 avec y({x0}) = {y0} : la solution vérifie une relation H(x, y) = C.', { M: M(`(${d.M})`), N: M(`(${d.N})`), x0: fr(d.x0), y0: fr(d.y0) }),
+    hints: H(t('Vérifie ∂M/∂y = ∂N/∂x, puis cherche H avec H_x = M : H = ∫ M dx + φ(y).'),
+      t('H = {H} + φ(y), et H_y doit valoir {N}.', { H: M(d.H0), N: M(d.N) }), `φ(y) = ${M(d.phi)} : ${M(`${d.H} = C`)}.`),
     subgoals: EX_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${EX}:${level}:${eq}:${d.x0}:${d.y0}`, exam: examTag(opts), fallback: !!d.fallback,
     baits: ['a2_exact_phi_forgot'],
@@ -162,9 +163,9 @@ function exactMcq(rng, opts, d) {
   wrongs.push({ html: M(`${d.H} = ${typeof d.C0 === 'number' ? N(q(-d.C0 || 1)) : C0.startsWith('-') ? C0.slice(1) : `-${C0}`}`) });
   const fillers = [{ html: M(`${d.H} = 0`) }, { html: M(`${d.H} = 1`) }, { html: M(`${d.H0} = 0`) }];
   return mcq4({
-    skill: EX, level: 4, prompt: `La solution de ${M(`(${d.M})`)} + ${M(`(${d.N})y'`)} = 0 avec y(${fr(d.x0)}) = ${fr(d.y0)} vérifie :`,
+    skill: EX, level: 4, prompt: t('La solution de {M} + {N} = 0 avec y({x0}) = {y0} vérifie :', { M: M(`(${d.M})`), N: M(`(${d.N})y'`), x0: fr(d.x0), y0: fr(d.y0) }),
     right, wrongs, fillers, key: `${EX}:mcq:${d.H}:${d.x0}:${d.y0}`,
-    solution: [{ html: `∂M/∂y = ${M(d.My)} = ∂N/∂x : exacte.`, note: '' }, { html: `H = ${M(d.H)}`, note: 'H_x = M, H_y = N' }, { html: right, note: '' }],
+    solution: [{ html: t('∂M/∂y = {My} = ∂N/∂x : exacte.', { My: M(d.My) }), note: '' }, { html: `H = ${M(d.H)}`, note: 'H_x = M, H_y = N' }, { html: right, note: '' }],
     exam: examTag(opts), expectedSec: 150, fallback: !!d.fallback,
   }, rng);
 }
@@ -181,16 +182,16 @@ export function genExact(level, rng, profile, opts = {}) {
 
 const SY = 'a2-ode-system';
 const SY_SUB = [
-  { id: 'eigval', label: 'valeurs propres', skill: 'l-eig-charpoly' },
-  { id: 'eigvec', label: 'vecteurs propres', skill: 'l-eig-space' },
+  { id: 'eigval', label: t('valeurs propres'), skill: 'l-eig-charpoly' },
+  { id: 'eigvec', label: t('vecteurs propres'), skill: 'l-eig-space' },
   { id: 'general', label: 'X = Σ Cᵢ e^(λᵢt) vᵢ', skill: SY },
-  { id: 'ic', label: 'les constantes', skill: SY },
+  { id: 'ic', label: t('les constantes'), skill: SY },
 ];
 
 const PAIRS = [[1, 1, 1, -1], [1, 0, 1, 1], [1, 1, 0, 1], [2, 1, 1, 1], [1, 2, 1, 1], [1, -1, 1, 1], [1, 1, 1, 2], [1, 0, 2, 1], [2, 1, 1, 0], [1, 1, -1, 1], [1, 2, 0, 1], [3, 1, 2, 1]];
 
 function systemData(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tr = 0; tr < 200; tr++) {
     const [a, b, c, e] = rng.pick(PAIRS); // P = [[a, b], [c, e]] (columns v₁ = (a, c), v₂ = (b, e))
     const det = a * e - b * c;
     if (![1, -1, 2, -2].includes(det)) continue;
@@ -215,9 +216,9 @@ const matT = (A) => `[[${A[0].join(',')}],[${A[1].join(',')}]]`;
 const vecT = (u, v) => `(${u} ; ${v})`;
 
 const SY_CHOICES = [
-  { id: 'eigval', label: 'Valeurs propres : det(A − λI) = 0' }, { id: 'eigvec', label: 'Un vecteur propre pour chaque λ' },
-  { id: 'general', label: 'X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂' }, { id: 'consts', label: 'Constantes avec X(0)' }, { id: 'final', label: 'Remplacer C₁ et C₂' },
-  { id: 'swap', label: 'Associer e^{λ₁t} au vecteur propre de λ₂', rule: 'a2_ode_system_order', why: 'Chaque exponentielle e^{λt} va avec un vecteur propre de la même valeur propre λ.' },
+  { id: 'eigval', label: t('Valeurs propres : det(A − λI) = 0') }, { id: 'eigvec', label: t('Un vecteur propre pour chaque λ') },
+  { id: 'general', label: 'X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂' }, { id: 'consts', label: t('Constantes avec X(0)') }, { id: 'final', label: t('Remplacer C₁ et C₂') },
+  { id: 'swap', label: t('Associer e^{λ₁t} au vecteur propre de λ₂'), rule: 'a2_ode_system_order', why: t('Chaque exponentielle e^{λt} va avec un vecteur propre de la même valeur propre λ.') },
 ];
 
 function systemItem(level, rng, opts, d) {
@@ -231,7 +232,7 @@ function systemItem(level, rng, opts, d) {
   const ode = { kind: 'ode', v: 't', system: { A: A.map((r) => r.map(String)), names: ['x', 'y'], X0: X0.map(String), swapped, ctx: { v: fr(vecT(b, e)), l: fr(l2), Av: fr(vecT(Av[0], Av[1])) } } };
   const bc = A[0][1] * A[1][0];
   const charT = `(${sum([String(A[0][0]), '-λ'])})(${sum([String(A[1][1]), '-λ'])})${bc === 0 ? '' : `${bc > 0 ? '-' : '+'}${Math.abs(bc)}`}=0`;
-  const gl = E(general, 'Chaque couple (λ, v) donne une solution e^{λt}v', 'general', 'general');
+  const gl = E(general, t('Chaque couple (λ, v) donne une solution e^{λt}v'), 'general', 'general');
   const cl = E(`C_1 = ${c1} ; C_2 = ${c2}`, `X(0) = ${fr(vecT(X0[0], X0[1]))}`, 'ic', 'consts');
   if (level <= 2) {
     Object.assign(gl, blankMatches(gl.math, /(?<=[=+]\s*|[^(^]-)\d*(?=C_)/g, level === 1 ? 1 : 2));
@@ -239,22 +240,22 @@ function systemItem(level, rng, opts, d) {
     Object.assign(cl, blankValues(cl.math, level === 1 ? 1 : null));
   }
   const parts = [];
-  if (level >= 2) parts.push({ html: 'Les valeurs propres de A :', start: charT, judge: { kind: 'solset', v: 'λ' }, lines: [E(`λ = ${Math.min(l1, l2)} ou λ = ${Math.max(l1, l2)}`, 'det(A − λI) = 0', 'eigval', 'eigval')] });
-  parts.push({ html: `Un vecteur propre v₁ pour λ₁ = ${fr(l1)} :`, ask: 'v₁ =', start: 'v_1', judge: { kind: 'eigvec', A: matT(A), lambda: String(l1) }, lines: [E(vecT(a, c), '(A − λ₁I)v₁ = 0', 'eigvec', 'eigvec')] });
-  parts.push({ html: `Un vecteur propre v₂ pour λ₂ = ${fr(l2)} :`, ask: 'v₂ =', start: 'v_2', judge: { kind: 'eigvec', A: matT(A), lambda: String(l2) }, lines: [E(vecT(b, e), '(A − λ₂I)v₂ = 0', 'eigvec', 'eigvec')] });
-  const dec = { kind: 'decision', prompt: 'Comment résoudre le système ?', options: [
-    { id: 'diag', label: 'Diagonaliser A : X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂', valid: true },
-    { id: 'elim', label: 'Éliminer y : une équation d\'ordre 2 en x', valid: true, quality: 'poor', why: 'Juste aussi, mais plus long à écrire en 2 × 2 : y se déduit de x′ ensuite.' },
+  if (level >= 2) parts.push({ html: t('Les valeurs propres de A :'), start: charT, judge: { kind: 'solset', v: 'λ' }, lines: [E(`λ = ${Math.min(l1, l2)} ou λ = ${Math.max(l1, l2)}`, 'det(A − λI) = 0', 'eigval', 'eigval')] });
+  parts.push({ html: t('Un vecteur propre v₁ pour λ₁ = {l} :', { l: fr(l1) }), ask: 'v₁ =', start: 'v_1', judge: { kind: 'eigvec', A: matT(A), lambda: String(l1) }, lines: [E(vecT(a, c), '(A − λ₁I)v₁ = 0', 'eigvec', 'eigvec')] });
+  parts.push({ html: t('Un vecteur propre v₂ pour λ₂ = {l} :', { l: fr(l2) }), ask: 'v₂ =', start: 'v_2', judge: { kind: 'eigvec', A: matT(A), lambda: String(l2) }, lines: [E(vecT(b, e), '(A − λ₂I)v₂ = 0', 'eigvec', 'eigvec')] });
+  const dec = { kind: 'decision', prompt: t('Comment résoudre le système ?'), options: [
+    { id: 'diag', label: t('Diagonaliser A : X = C₁e^{λ₁t}v₁ + C₂e^{λ₂t}v₂'), valid: true },
+    { id: 'elim', label: t('Éliminer y : une équation d\'ordre 2 en x'), valid: true, quality: 'poor', why: t('Juste aussi, mais plus long à écrire en 2 × 2 : y se déduit de x′ ensuite.') },
   ] };
   if (level === 3) parts[0].pre = [dec];
-  parts.push({ html: 'Les composantes de X, puis les constantes :', ask: 'X :', start: sysStart, judge: ode, lines: [gl, cl, E(final, 'X(t)', 'ic', 'final')] });
+  parts.push({ html: t('Les composantes de X, puis les constantes :'), ask: t('X :'), start: sysStart, judge: ode, lines: [gl, cl, E(final, 'X(t)', 'ic', 'final')] });
   const { start, judge, script } = assemble(parts, level, SY_CHOICES);
-  const given = level === 1 ? ` Les valeurs propres de A sont ${fr(l1)} et ${fr(l2)}.` : '';
+  const given = level === 1 ? ` ${t('Les valeurs propres de A sont {l1} et {l2}.', { l1: fr(l1), l2: fr(l2) })}` : '';
   return linesItem({
     skill: SY, level, mode: level <= 2 ? 'guided' : level === 3 ? 'tap' : 'free', start, judge, script,
-    prompt: `Résous X′ = AX avec A = ${ML(matT(A))} et X(0) = ${ML(vecT(X0[0], X0[1]))}, X = (x ; y). Écris chaque composante : x = … ; y = ….${given}`,
-    hints: H('Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v.',
-      `Les valeurs propres sont ${fr(l1)} et ${fr(l2)}, de vecteurs propres ${fr(vecT(a, c))} et ${fr(vecT(b, e))}.`, M(general)),
+    prompt: t('Résous X′ = AX avec A = {A} et X(0) = {X0}, X = (x ; y). Écris chaque composante : x = … ; y = ….', { A: ML(matT(A)), X0: ML(vecT(X0[0], X0[1])) }) + given,
+    hints: H(t('Diagonalise A : chaque couple (λ, v) donne une solution e^{λt}v.'),
+      t('Les valeurs propres sont {l1} et {l2}, de vecteurs propres {v1} et {v2}.', { l1: fr(l1), l2: fr(l2), v1: fr(vecT(a, c)), v2: fr(vecT(b, e)) }), M(general)),
     subgoals: SY_SUB, keys: [...A2_KEYS, 'mat'], tapActions: level === 3 ? 'steps' : null,
     key: `${SY}:${level}:${matT(A)}:${X0.join(',')}`, exam: examTag(opts), fallback: !!d.fallback,
     baits: ['a2_ode_system_order'],

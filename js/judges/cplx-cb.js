@@ -50,6 +50,7 @@ import { makeRng } from '../content/random.js';
 import * as seriesJudge from './series.js';
 import { series as seriesOf } from '../cas/series.js';
 import { evalFloat } from '../cas/numeric.js';
+import { t } from '../i18n.js';
 
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const mathWrap = (inner, display) => `<math${display ? ' display="block"' : ''}>${inner}</math>`;
@@ -62,16 +63,16 @@ const cOpts = (cfg) => ({ vars: [...(cfg.vars || [])], complex: true });
 
 // « Res = … », « I = … », « f̂(α) = … »: the value after the last top-level « = ».
 function dropLabel(text) {
-  const t = String(text).trim().replace(/^=\s*/, '');
+  const tt = String(text).trim().replace(/^=\s*/, '');
   let depth = 0;
   let at = -1;
-  for (let i = 0; i < t.length; i++) {
-    const c = t[i];
+  for (let i = 0; i < tt.length; i++) {
+    const c = tt[i];
     if ('([{'.includes(c)) depth++;
     else if (')]}'.includes(c)) depth--;
     else if (c === '=' && depth === 0) at = i;
   }
-  return at >= 0 ? t.slice(at + 1) : t;
+  return at >= 0 ? tt.slice(at + 1) : tt;
 }
 
 const EXPECT = new Map();
@@ -170,8 +171,8 @@ function ratzForm(node) {
   if (n.t === 'neg') n = stripParen(n.e);
   if (n.t === 'bin' && n.op === '×' && !contains(n.l, (x) => x.t === 'sym')) n = stripParen(n.r);
   if (n.t !== 'frac') return false;
-  if (contains(n.n, (x) => x.t === 'frac') || contains(n.d, (x) => x.t === 'frac')) return 'Réduis au même dénominateur : une seule fraction P(z)/Q(z).';
-  if (contains(n.d, (x) => x.t === 'pow' && stripParen(x.e).t === 'neg')) return 'Une seule fraction P(z)/Q(z).';
+  if (contains(n.n, (x) => x.t === 'frac') || contains(n.d, (x) => x.t === 'frac')) return t('Réduis au même dénominateur : une seule fraction P(z)/Q(z).');
+  if (contains(n.d, (x) => x.t === 'pow' && stripParen(x.e).t === 'neg')) return t('Une seule fraction P(z)/Q(z).');
   return true;
 }
 
@@ -204,32 +205,32 @@ function cvalJudge(cfg, prev, input, state = {}) {
   let node;
   if (input && typeof input === 'object') node = input;
   else {
-    if (isLabel(cfg, input)) return { kind: 'same', node: prev, message: 'Avance d\'au moins une étape.' };
+    if (isLabel(cfg, input)) return { kind: 'same', node: prev, message: t('Avance d\'au moins une étape.') };
     try { node = parse(dropLabel(input), cOpts(cfg)); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
   const allowed = new Set(cfg.vars || []);
   const unknown = [...symbolsIn(node)].filter((s) => !allowed.has(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici : écris une valeur${allowed.size ? ` (lettres permises : ${[...allowed].join(', ')})` : ''}.` };
+  if (unknown.length) return { kind: 'parse', node, message: t('Je ne connais pas la lettre « {a} » ici : écris une valeur{b}.', { a: unknown[0].replace(/_$/, ''), b: allowed.size ? t(' (lettres permises : {a})', { a: [...allowed].join(', ') }) : '' }) };
   const fromLabel = !!prev?.lbl;
   const ref = fromLabel ? expectOf(cfg) : prev;
-  if (!fromLabel && sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (!fromLabel && sameLine(node, prev)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const a = valuesOf(cfg, ref);
   const b = valuesOf(cfg, node);
-  if (!b) return { kind: 'stay', node, message: 'Ce nombre n\'est pas défini (division par 0 ?) : écris-le autrement.' };
+  if (!b) return { kind: 'stay', node, message: t('Ce nombre n\'est pas défini (division par 0 ?) : écris-le autrement.') };
   if (a && !a.every((x, k) => sameComplex(x, b[k], 1e-8))) {
     const diag = diagnoseLine('cval', ref, node, cfg, (cand, line) => sameValues(cfg, cand, line));
     const k = a.findIndex((x, i) => !sameComplex(x, b[i], 1e-8));
     const env = envsOf(cfg)[k];
-    const where = cfg.vars?.length ? ` (en ${cfg.vars.map((v) => `${v} = ${frNum(env[v], 2)}`).join(', ')})` : '';
+    const where = cfg.vars?.length ? t(' (en {a})', { a: cfg.vars.map((v) => `${v} = ${frNum(env[v], 2)}`).join(', ') }) : '';
     const say = (v) => cText(v.exact ?? v);
     const message = fromLabel
-      ? `Ta ligne vaut ${say(b[k])}${where} : ce n'est pas la bonne valeur.`
-      : `Ta ligne vaut ${say(b[k])}, mais la précédente vaut ${say(a[k])}${where}.`;
+      ? t('Ta ligne vaut {a}{where} : ce n\'est pas la bonne valeur.', { a: say(b[k]), where })
+      : t('Ta ligne vaut {a}, mais la précédente vaut {b}{where}.', { a: say(b[k]), b: say(a[k]), where });
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   const fin = cvalFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: t('C\'est juste, mais {a}{b}', { a: fin.charAt(0).toLowerCase(), b: fin.slice(1) }) };
   if ((cfg.form || 'algebraic') === 'algebraic' && !fin) {
     // Right, not yet a + bi: a step.
   }
@@ -308,7 +309,7 @@ const arcVars = (cfg) => new Set(['z', 'θ']);
 function arcFinal(cfg, node) {
   const s = symbolsIn(node);
   if ([...arcVars(cfg)].some((v) => s.has(v))) return false;
-  return s.has(rvOf(cfg)) ? true : 'Garde R : la borne doit dépendre du rayon.';
+  return s.has(rvOf(cfg)) ? true : t('Garde R : la borne doit dépendre du rayon.');
 }
 
 const piText = (th) => {
@@ -327,12 +328,12 @@ function arcJudge(cfg, prev, input, state = {}) {
   try { node = arcParse(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   const allowed = new Set(aOpts(cfg).vars);
   const unknown = [...symbolsIn(node)].filter((s) => !allowed.has(s));
-  if (unknown.length) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${unknown[0].replace(/_$/, '')} » ici : z est sur l'arc, |z| = ${rvOf(cfg)}.` };
-  if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement le membre de droite : le signe ' + (cfg.rel || '≤') + ' est déjà là.' };
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (unknown.length) return { kind: 'parse', node, message: t('Je ne connais pas la lettre « {a} » ici : z est sur l\'arc, |z| = {b}.', { a: unknown[0].replace(/_$/, ''), b: rvOf(cfg) }) };
+  if (node.t === 'rel') return { kind: 'parse', node, message: t('Écris seulement le membre de droite : le signe {rel} est déjà là.', { rel: cfg.rel || '≤' }) };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const A = arcValues(cfg, prev);
   const B = arcValues(cfg, node);
-  if (!Array.isArray(B)) return { kind: 'stay', node, message: 'Ta ligne prend des valeurs complexes : une majoration porte sur des modules |…|, des nombres réels.' };
+  if (!Array.isArray(B)) return { kind: 'stay', node, message: t('Ta ligne prend des valeurs complexes : une majoration porte sur des modules |…|, des nombres réels.') };
   const sgn = cfg.rel === '≥' ? -1 : 1;
   const envs = arcSamples(cfg);
   for (let i = 0; i < envs.length; i++) {
@@ -342,10 +343,12 @@ function arcJudge(cfg, prev, input, state = {}) {
     if (!Number.isFinite(b) || sgn * (a - b) > 1e-9 * (1 + Math.abs(a) + Math.abs(b))) {
       const diag = diagnoseLine('arcb', prev, node, cfg, (cand, line) => arcSame(cfg, cand, line));
       const e = envs[i];
-      const word = cfg.rel === '≥' ? 'plus grande' : 'plus petite';
-      const kind = cfg.rel === '≥' ? 'minoration' : 'majoration';
       const params = Object.keys(cfg.params || {}).map((p) => `, ${p} = ${frNum(e[p], 2)}`).join('');
-      return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `Pour z = ${rvOf(cfg)}e^(iθ) avec ${rvOf(cfg)} = ${frNum(e[rvOf(cfg)], 1)} et θ = ${piText(e.θ)}${params}, ta ligne vaut ${frNum(b, 4)}, ${word} que la précédente (${frNum(a, 4)}) : ce n'est pas une ${kind} sur tout l'arc.` };
+      const vars = { r: rvOf(cfg), rv: frNum(e[rvOf(cfg)], 1), th: piText(e.θ), params, b: frNum(b, 4), a: frNum(a, 4) };
+      const message = cfg.rel === '≥'
+        ? t('Pour z = {r}e^(iθ) avec {r} = {rv} et θ = {th}{params}, ta ligne vaut {b}, plus grande que la précédente ({a}) : ce n\'est pas une minoration sur tout l\'arc.', vars)
+        : t('Pour z = {r}e^(iθ) avec {r} = {rv} et θ = {th}{params}, ta ligne vaut {b}, plus petite que la précédente ({a}) : ce n\'est pas une majoration sur tout l\'arc.', vars);
+      return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
     }
   }
   const fin = arcFinal(cfg, node);
@@ -381,11 +384,11 @@ function sumTermsOf(n, out = []) {
   return out;
 }
 // The power k of a monomial c·v^k (numerically: t(2v)/t(v) = 2^k), or null.
-function monoPower(t, v) {
-  if ([...symbolsIn(t)].some((s) => s !== v)) return null;
-  const a = evalFloat(t, { [v]: 1.7 });
-  const b = evalFloat(t, { [v]: 3.4 });
-  const c = evalFloat(t, { [v]: 6.8 });
+function monoPower(tt, v) {
+  if ([...symbolsIn(tt)].some((s) => s !== v)) return null;
+  const a = evalFloat(tt, { [v]: 1.7 });
+  const b = evalFloat(tt, { [v]: 3.4 });
+  const c = evalFloat(tt, { [v]: 6.8 });
   if (![a, b, c].every((x) => Number.isFinite(x) && x !== 0)) return null;
   const k = Math.log2(b / a);
   if (!(b / a > 0) || Math.abs(k - Math.round(k)) > 1e-9 || Math.abs(Math.log2(c / b) - k) > 1e-9) return null;
@@ -394,18 +397,18 @@ function monoPower(t, v) {
 function laurFinal(cfg, node) {
   const v = lv(cfg);
   const terms = sumTermsOf(node);
-  const rems = terms.filter((t) => contains(t, (x) => x.t === 'eps'));
+  const rems = terms.filter((tt) => contains(tt, (x) => x.t === 'eps'));
   if (rems.length !== 1) return false;
   const ks = [];
-  for (const t of terms) {
-    if (rems.includes(t)) continue;
-    const k = monoPower(t, v);
+  for (const tt of terms) {
+    if (rems.includes(tt)) continue;
+    const k = monoPower(tt, v);
     if (k === null || ks.includes(k)) return false;
     ks.push(k);
   }
   let s;
   try { s = seriesOf(node, v, '+inf', (cfg.order ?? 3) + 6); } catch { return false; }
-  return s.order >= (cfg.order ?? 3) ? true : `Va plus loin : il faut les termes jusqu'à 1/${v}^${cfg.order ?? 3}.`;
+  return s.order >= (cfg.order ?? 3) ? true : t('Va plus loin : il faut les termes jusqu\'à 1/{v}^{a}.', { v, a: cfg.order ?? 3 });
 }
 function laurJudge(cfg, prev, input, state = {}) {
   let node;
@@ -414,9 +417,10 @@ function laurJudge(cfg, prev, input, state = {}) {
   if (v.message) {
     // h = 1/v: « le coefficient de h^k » is the coefficient of 1/v^k.
     const x = lv(cfg);
-    v.message = v.message.replace(/coefficient de \([a-z] − inf\)(?:\^(-?\d+))?/g, (m, k) => {
+    // (« coefficient of » once the series judge speaks English.)
+    v.message = v.message.replace(/coefficient (de|of) \([a-z] − inf\)(?:\^(-?\d+))?/g, (m, w, k) => {
       const n = k === undefined ? 1 : Number(k);
-      return `coefficient de ${n === 1 ? `1/${x}` : n > 0 ? `1/${x}^${n}` : n === -1 ? x : `${x}^${-n}`}`;
+      return `coefficient ${w} ${n === 1 ? `1/${x}` : n > 0 ? `1/${x}^${n}` : n === -1 ? x : `${x}^${-n}`}`;
     });
   }
   if (v.kind !== 'ok' && v.kind !== 'done' && v.kind !== 'stay') return v;

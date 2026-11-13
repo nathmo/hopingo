@@ -47,15 +47,16 @@ import { tryParse, parse } from '../cas/parse.js';
 import { exactValue } from '../cas/normal.js';
 import { evalFloat } from '../cas/numeric.js';
 import { mapNode, lit } from '../cas/ast.js';
+import { t } from '../i18n.js';
 
 export const NUM_KINDS = new Set(['scalar', 'secant', 'bisect', 'jacobi', 'gs', 'ode', 'gradient', 'divdiff']);
 
 // ---------- numbers ----------
 
-export const num = (t) => {
-  if (t === null || t === undefined) return null;
-  if (t instanceof Q || typeof t === 'number') return t;
-  const raw = String(t).trim().replace(/−/g, '-');
+export const num = (tq) => {
+  if (tq === null || tq === undefined) return null;
+  if (tq instanceof Q || typeof tq === 'number') return tq;
+  const raw = String(tq).trim().replace(/−/g, '-');
   // A long decimal (more digits than an exact fraction holds), or 1.5e-3.
   if (/^-?\d*[.,]?\d+([eE][+-]?\d+)?$/.test(raw) && (raw.replace(/\D/g, '').length > 14 || /[eE]/.test(raw))) return Number(raw.replace(',', '.'));
   const s = raw;
@@ -215,12 +216,12 @@ function stepLinear(phi, x, kind) {
   }
   return out;
 }
-const fAt = (phi, t, u) => evalAt(phi.f, { t, u }, ['t', 'u']);
+const fAt = (phi, tq, u) => evalAt(phi.f, { t: tq, u }, ['t', 'u']);
 // Solves u = c + w·f(t, u) (implicit schemes): exactly if f is affine in u.
-function solveImplicit(phi, t, c, w) {
-  const f0 = fAt(phi, t, isQ(c) ? new Q(0) : 0);
-  const f1 = fAt(phi, t, isQ(c) ? new Q(1) : 1);
-  const f2 = fAt(phi, t, isQ(c) ? new Q(2) : 2);
+function solveImplicit(phi, tq, c, w) {
+  const f0 = fAt(phi, tq, isQ(c) ? new Q(0) : 0);
+  const f1 = fAt(phi, tq, isQ(c) ? new Q(1) : 1);
+  const f2 = fAt(phi, tq, isQ(c) ? new Q(2) : 2);
   if (f0 === null || f1 === null || f2 === null) return null;
   const a = sub(f1, f0);
   if (same(sub(f2, f1), a, 1e-12)) {
@@ -229,9 +230,9 @@ function solveImplicit(phi, t, c, w) {
   }
   let u = fv(c);
   for (let k = 0; k < 60; k++) {
-    const F = u - fv(c) - fv(w) * fv(fAt(phi, fv(t), u));
+    const F = u - fv(c) - fv(w) * fv(fAt(phi, fv(tq), u));
     const h = 1e-7 * Math.max(1, Math.abs(u));
-    const dF = 1 - fv(w) * (fv(fAt(phi, fv(t), u + h)) - fv(fAt(phi, fv(t), u - h))) / (2 * h);
+    const dF = 1 - fv(w) * (fv(fAt(phi, fv(tq), u + h)) - fv(fAt(phi, fv(tq), u - h))) / (2 * h);
     const du = F / dF;
     u -= du;
     if (Math.abs(du) < 1e-15 * Math.max(1, Math.abs(u))) break;
@@ -239,16 +240,16 @@ function solveImplicit(phi, t, c, w) {
   return u;
 }
 // One ODE step from (t, u): {k1, k2, u} (k1, k2 for Heun / RK).
-export function stepOde(phi, t, u, k1In = null, k2In = null) {
+export function stepOde(phi, tq, u, k1In = null, k2In = null) {
   const h = num(phi.h);
-  const t1 = add(t, h);
+  const t1 = add(tq, h);
   const half = div(h, isQ(h) ? new Q(2) : 2);
   switch (phi.scheme) {
-    case 'EP': return { t: t1, u: add(u, mul(h, fAt(phi, t, u))) };
+    case 'EP': return { t: t1, u: add(u, mul(h, fAt(phi, tq, u))) };
     case 'ER': return { t: t1, u: solveImplicit(phi, t1, u, h) };
-    case 'CN': return { t: t1, u: solveImplicit(phi, t1, add(u, mul(half, fAt(phi, t, u))), half) };
+    case 'CN': return { t: t1, u: solveImplicit(phi, t1, add(u, mul(half, fAt(phi, tq, u))), half) };
     case 'Heun': {
-      const k1 = fAt(phi, t, u);
+      const k1 = fAt(phi, tq, u);
       const k1u = k1In ?? k1;
       const k2 = fAt(phi, t1, add(u, mul(h, k1u)));
       const k2u = k2In ?? k2;
@@ -256,7 +257,7 @@ export function stepOde(phi, t, u, k1In = null, k2In = null) {
     }
     case 'RK4': {
       const ht = fv(h);
-      const T = fv(t);
+      const T = fv(tq);
       const U = fv(u);
       const f = (a, b) => fv(fAt(phi, a, b));
       const a1 = f(T, U);
@@ -286,8 +287,8 @@ function alphaOf(phi, r) {
 }
 const sgn = (x) => (x === null ? null : Math.sign(fv(x)));
 export const signText = (x) => (sgn(x) > 0 ? '+' : sgn(x) < 0 ? '−' : '0');
-const signOf = (t) => {
-  const s = String(t ?? '').trim();
+const signOf = (tq) => {
+  const s = String(tq ?? '').trim();
   return s === '+' ? 1 : s === '−' || s === '-' ? -1 : s === '0' ? 0 : null;
 };
 
@@ -344,13 +345,13 @@ export function referenceRows(phi, n) {
       return rows;
     }
     case 'ode': {
-      let t = num(phi.t0);
+      let tq = num(phi.t0);
       let u = num(phi.u0);
-      rows.push({ t, u });
+      rows.push({ t: tq, u });
       for (let k = 1; k < n; k++) {
-        const s = stepOde(phi, t, u);
+        const s = stepOde(phi, tq, u);
         rows.push(s);
-        t = s.t;
+        tq = s.t;
         u = s.u;
       }
       return rows;
@@ -414,7 +415,7 @@ export function checkNum(item, values) {
         w.x = k === 0 ? num(phi.x0) : k === 1 ? num(phi.x1) : stepSecant(phi, mine[k - 2].x, prev.x);
         if (k >= 2 && !rule && mine[k].x !== null && !same(mine[k].x, w.x, tol) && k >= 3) {
           const frozen = stepSecant(phi, num(phi.x0), prev.x);
-          if (same(mine[k].x, frozen, tol)) { rule = 'n_secant_update'; message = 'La sécante utilise les deux derniers points.'; }
+          if (same(mine[k].x, frozen, tol)) { rule = 'n_secant_update'; message = t('La sécante utilise les deux derniers points.'); }
         }
         break;
       case 'bisect': {
@@ -424,7 +425,7 @@ export function checkNum(item, values) {
           if (sgn(fa) === sgn(fx)) { w.a = prev.x; w.b = prev.b; } else { w.a = prev.a; w.b = prev.x; }
           if (!rule && mine[k].a !== null && mine[k].b !== null && !(same(mine[k].a, w.a, tol) && same(mine[k].b, w.b, tol))) {
             const other = sgn(fa) === sgn(fx) ? [prev.a, prev.x] : [prev.x, prev.b];
-            if (same(mine[k].a, other[0], tol) && same(mine[k].b, other[1], tol)) { rule = 'n_bisect_wrong_half'; message = 'Garde la moitié où f change de signe : compare le signe de f(x) à celui de f(a).'; }
+            if (same(mine[k].a, other[0], tol) && same(mine[k].b, other[1], tol)) { rule = 'n_bisect_wrong_half'; message = t('Garde la moitié où f change de signe : compare le signe de f(x) à celui de f(a).'); }
           }
         }
         w.x = mine[k].a !== null && mine[k].b !== null ? div(add(mine[k].a, mine[k].b), isQ(mine[k].a) ? new Q(2) : 2) : null;
@@ -450,7 +451,7 @@ export function checkNum(item, values) {
           if (!rule && phi.kind === 'jacobi') {
             const gsRow = stepLinear(phi, xPrev, 'gs');
             if (cur.every((v, i) => v !== null && same(v, gsRow[i], tol)) && !cur.every((v, i) => same(v, w[`x${i + 1}`], tol))) {
-              rule = 'n_jacobi_uses_new'; message = 'Jacobi n\'utilise que les valeurs de l\'itération précédente.';
+              rule = 'n_jacobi_uses_new'; message = t('Jacobi n\'utilise que les valeurs de l\'itération précédente.');
             }
           }
         }
@@ -467,18 +468,18 @@ export function checkNum(item, values) {
           w.k2 = fAt(phi, add(prev.t, h), add(prev.u, mul(h, mine[k].k1)));
           if (!rule && mine[k].k2 !== null && !same(mine[k].k2, w.k2, tol)) {
             const noH = fAt(phi, add(prev.t, h), add(prev.u, mine[k].k1));
-            if (same(mine[k].k2, noH, tol)) { rule = 'n_heun_k2'; message = 'La prédiction est un pas d\'Euler : u + h·k₁.'; }
+            if (same(mine[k].k2, noH, tol)) { rule = 'n_heun_k2'; message = t('La prédiction est un pas d\'Euler : u + h·k₁.'); }
           }
         }
         if (!rule && mine[k].u !== null && w.u !== null && !same(mine[k].u, w.u, tol)) {
           const h = num(phi.h);
           if (phi.scheme === 'ER' || phi.scheme === 'CN') {
             const ep = add(prev.u, mul(h, fAt(phi, prev.t, prev.u)));
-            if (same(mine[k].u, ep, tol)) { rule = 'n_implicit_as_explicit'; message = 'Ce schéma est implicite : f est évaluée au nouveau point, il faut résoudre une équation en uₙ₊₁.'; }
+            if (same(mine[k].u, ep, tol)) { rule = 'n_implicit_as_explicit'; message = t('Ce schéma est implicite : f est évaluée au nouveau point, il faut résoudre une équation en uₙ₊₁.'); }
           }
           if (phi.scheme === 'EP') {
             const shifted = add(prev.u, mul(h, fAt(phi, add(prev.t, h), prev.u)));
-            if (same(mine[k].u, shifted, tol) && !same(shifted, w.u, tol)) { rule = 'n_euler_time_index'; message = 'Euler progressif : le temps et la valeur du même instant tₙ.'; }
+            if (same(mine[k].u, shifted, tol) && !same(shifted, w.u, tol)) { rule = 'n_euler_time_index'; message = t('Euler progressif : le temps et la valeur du même instant tₙ.'); }
           }
         }
         break;
@@ -497,7 +498,7 @@ export function checkNum(item, values) {
               const back = xp.map((xi, i) => sub(xi, mul(ap, rp[i])));
               const cur = vec(mine[k], 'x', n);
               if (cur.every((v, i) => v !== null && same(v, back[i], tol)) && !cur.every((v, i) => same(v, nx[i], tol))) {
-                rule = 'n_gradient_sign'; message = 'r = b − Ax = −∇Φ : on avance dans le sens de r, x + αr.';
+                rule = 'n_gradient_sign'; message = t('r = b − Ax = −∇Φ : on avance dans le sens de r, x + αr.');
               }
             }
           }
@@ -508,7 +509,7 @@ export function checkNum(item, values) {
         if (rs.every((v) => v !== null) && col(phi, 'alpha') >= 0) {
           w.alpha = alphaOf(phi, rs);
           if (!rule && mine[k].alpha !== null && !same(mine[k].alpha, w.alpha, tol) && same(mine[k].alpha, div(isQ(w.alpha) ? new Q(1) : 1, w.alpha), tol)) {
-            rule = 'n_optimal_step_inverted'; message = 'α = (r·r)/(r·Ar), pas l\'inverse.';
+            rule = 'n_optimal_step_inverted'; message = t('α = (r·r)/(r·Ar), pas l\'inverse.');
           }
         }
         break;
@@ -523,7 +524,7 @@ export function checkNum(item, values) {
           w[`d${o}`] = a !== null && b !== null ? div(sub(a, b), sub(xs[k], xs[k - o])) : null;
           if (!rule && o >= 2 && mine[k][`d${o}`] !== null && w[`d${o}`] !== null && !same(mine[k][`d${o}`], w[`d${o}`], tol)) {
             const bad = div(sub(a, b), sub(xs[k], xs[k - 1]));
-            if (same(mine[k][`d${o}`], bad, tol)) { rule = 'n_divdiff_denominator'; message = 'On divise par l\'écart des abscisses extrêmes.'; }
+            if (same(mine[k][`d${o}`], bad, tol)) { rule = 'n_divdiff_denominator'; message = t('On divise par l\'écart des abscisses extrêmes.'); }
           }
         }
         break;

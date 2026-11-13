@@ -15,6 +15,7 @@
 
 import { mapNode, walk, replaceAt, stripParen, contains, equalsStructural } from '../ast.js';
 import { toText } from '../print.js';
+import { t } from '../../i18n.js';
 
 const par = (e) => ({ t: 'paren', e });
 const isSym = (n, name) => n.t === 'sym' && n.name === name && !n.sub;
@@ -38,14 +39,14 @@ const T = (n) => toText(stripParen(n)).replace(/-/g, '−');
 export const RULES = [
   {
     id: 'g8_conj_root_nonreal', family: 'method', tag: 'E', skill: 'g8-poly', repair: 'g8-poly', judges: [],
-    name: 'Racine conjuguée sans coefficients réels',
-    example: ['i racine de z − i, donc −i aussi', 'non : z − i n\'a pas de coefficients réels'],
+    name: t('Racine conjuguée sans coefficients réels'),
+    example: [t('i racine de z − i, donc −i aussi'), t('non : z − i n\'a pas de coefficients réels')],
     check: { bait: { skill: 'g8-poly', exam: 'mcq' } },
-    explain: () => 'La règle de la conjuguée demande des coefficients réels. Ici un coefficient n\'est pas réel : calcule P(w̄), il n\'est pas nul.',
+    explain: () => t('La règle de la conjuguée demande des coefficients réels. Ici un coefficient n\'est pas réel : calcule P(w̄), il n\'est pas nul.'),
   },
   {
     id: 'g8_locus_sign', family: 'sign', tag: 'E', skill: 'g8-locus', repair: 'g8-locus', judges: ['poly'],
-    name: 'Mauvais point dans |z + a|',
+    name: t('Mauvais point dans |z + a|'),
     example: ['|z + 4|² = (x − 4)² + y²', '|z + 4|² = (x + 4)² + y²'],
     check: {
       judge: { kind: 'poly', mode: 'locus', cv: 'z', xy: ['x', 'y'], vars: ['z', 'x', 'y'], locus: { kind: 'line', a: 2, b: 1, c: 3 }, target: 'line' },
@@ -67,14 +68,14 @@ export const RULES = [
     },
     explain: (ctx = {}) => (ctx.a
       ? (ctx.op === '+'
-        ? `|z + ${ctx.a}| = |z − (−${ctx.a})| : c'est la distance au point d'affixe −${ctx.a}, pas ${ctx.a}.`
-        : `|z − ${ctx.a}| est la distance au point d'affixe ${ctx.a}, pas −${ctx.a}.`)
-      : '|z + a| = |z − (−a)| : c\'est la distance au point d\'affixe −a. |z + 4| est la distance au point (−4 ; 0).'),
+        ? t('|z + {a}| = |z − (−{a})| : c\'est la distance au point d\'affixe −{a}, pas {a}.', { a: ctx.a })
+        : t('|z − {a}| est la distance au point d\'affixe {a}, pas −{a}.', { a: ctx.a }))
+      : t('|z + a| = |z − (−a)| : c\'est la distance au point d\'affixe −a. |z + 4| est la distance au point (−4 ; 0).')),
   },
   {
     id: 'g8_ratio_order', family: 'geometry', tag: 'E', skill: 'g8-ratio-angle', repair: 'g8-ratio-angle', judges: ['complex'],
-    name: 'Quotient inversé : rapport et angle de AC⃗ vers AB⃗',
-    example: ['angle (AB⃗, AC⃗) = −π/4', 'angle (AB⃗, AC⃗) = π/4'],
+    name: t('Quotient inversé : rapport et angle de AC⃗ vers AB⃗'),
+    example: [t('angle (AB⃗, AC⃗) = −π/4'), t('angle (AB⃗, AC⃗) = π/4')],
     check: { judge: { kind: 'complex', form: 'algebraic', complex: true, ratio: true }, prev: '((3+7i)-(1+i))/((5+3i)-(1+i))', line: '(1-i)/2' },
     // (c − a)/(b − a) → (b − a)/(c − a); arg(q), |q| → arg(1/q), |1/q|.
     transform: (prev, ctx) => {
@@ -87,11 +88,11 @@ export const RULES = [
       });
       return [...quot, ...inv];
     },
-    explain: () => '(c − a)/(b − a) mesure l\'angle de AB⃗ vers AC⃗ et le rapport AC/AB. Le quotient inversé donne l\'angle opposé et le rapport inverse AB/AC.',
+    explain: () => t('(c − a)/(b − a) mesure l\'angle de AB⃗ vers AC⃗ et le rapport AC/AB. Le quotient inversé donne l\'angle opposé et le rapport inverse AB/AC.'),
   },
   {
     id: 'g8_rotation_about_origin', family: 'geometry', tag: 'E', skill: 'g8-transform', repair: 'g8-transform', judges: ['complex'],
-    name: 'Rotation écrite autour de 0',
+    name: t('Rotation écrite autour de 0'),
     example: ['z′ = e^(iθ)z + ω', 'z′ − ω = e^(iθ)(z − ω)'],
     check: { judge: { kind: 'complex', form: 'algebraic', complex: true, center: true }, prev: '(1+2i)-i(1+2i)', line: '1+2i' },
     // b = ω − aω → ω (z′ = az + ω) or aω (z′ = a(z + ω)).
@@ -105,12 +106,12 @@ export const RULES = [
       if (!same(r.l) && !same(r.r)) return [];
       return [{ node: n.l, ctx: { w: T(n.l) } }, { node: n.r, ctx: { w: T(n.l) } }];
     },
-    explain: (ctx = {}) => `Avec ta formule, le centre ${ctx.w ? `ω = ${ctx.w}` : 'ω'} n'est pas fixe : e^(iθ)ω + ω ≠ ω. On tourne z − ω, puis on rajoute ω : z′ = e^(iθ)(z − ω) + ω, donc b = ω − e^(iθ)ω.`,
+    explain: (ctx = {}) => t('Avec ta formule, le centre {w} n\'est pas fixe : e^(iθ)ω + ω ≠ ω. On tourne z − ω, puis on rajoute ω : z′ = e^(iθ)(z − ω) + ω, donc b = ω − e^(iθ)ω.', { w: ctx.w ? `ω = ${ctx.w}` : 'ω' }),
   },
   {
     id: 'g8_inversion_conj', family: 'rule', tag: 'E', skill: 'g8-inversion', repair: 'g8-inversion', judges: ['poly'],
-    name: 'w = 1/z̄ traité comme 1/z',
-    example: ['Im z = 1 et w = 1/z̄ : x² + (y + 1/2)² = 1/4', 'x² + (y − 1/2)² = 1/4'],
+    name: t('w = 1/z̄ traité comme 1/z'),
+    example: [t('Im z = 1 et w = 1/z̄ : x² + (y + 1/2)² = 1/4'), 'x² + (y − 1/2)² = 1/4'],
     check: {
       judge: { kind: 'poly', mode: 'locus', cv: 'w', xy: ['x', 'y'], vars: ['w', 'x', 'y'], inversion: true, locus: { kind: 'circle', c: [0, 0.5], r2: 0.25 }, exclude: [[0, 0]], target: 'circle' },
       prev: 'Im(1/conj(w))=1', line: 'x^2+(y+1/2)^2=1/4',
@@ -127,6 +128,6 @@ export const RULES = [
       node = mapNode(node, (n) => (isSym(n, CONJ) ? { t: 'sym', name: cv } : isSym(n, y) ? par({ t: 'neg', e: { t: 'sym', name: y } }) : n));
       return [{ node, ctx: {} }];
     },
-    explain: () => '1/z̄ et 1/z sont symétriques par rapport à l\'axe réel. Pour w = 1/z̄, on a z = 1/w̄ (et non 1/w) : ton image est la symétrique de la bonne.',
+    explain: () => t('1/z̄ et 1/z sont symétriques par rapport à l\'axe réel. Pour w = 1/z̄, on a z = 1/w̄ (et non 1/w) : ton image est la symétrique de la bonne.'),
   },
 ];

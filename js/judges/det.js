@@ -13,6 +13,7 @@ import { isExpanded } from '../cas/polyx.js';
 import { diagnoseLine } from './diagnose.js';
 import { readMat, mopts, wrongV, buildLine, text, input, litNum } from './matcommon.js';
 import * as polyJudge from './poly.js';
+import { t } from '../i18n.js';
 
 export { text, input };
 
@@ -58,11 +59,11 @@ export function judgeLine(cfg, prev, input) {
   let node = read.node;
   if (node.body && !node.raw) node = { ...node, ml: exprML(node.body), raw: true };
   const opts = mopts(cfg);
-  if (node.value?.k !== 's') return { kind: 'form', node, message: 'Écris une expression du déterminant (un nombre, ou des det[[…]]).' };
-  if (node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (node.value?.k !== 's') return { kind: 'form', node, message: t('Écris une expression du déterminant (un nombre, ou des det[[…]]).') };
+  if (node.text === prev.text) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   if (!sameScalar(node.value.n, prev.value.n, opts)) {
     const diag = diagnoseLine('det', prev, node, cfg, (c, n) => sameScalar(c.value?.n ?? c, n.value.n, opts));
-    return wrongV(node, 'Cette ligne n\'a pas la même valeur que la précédente.', diag);
+    return wrongV(node, t('Cette ligne n\'a pas la même valeur que la précédente.'), diag);
   }
   if (isFinal(cfg, node)) return { kind: 'done', node };
   return { kind: 'ok', node };

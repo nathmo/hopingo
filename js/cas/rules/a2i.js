@@ -16,6 +16,7 @@
 // wrongValues(item) gives the same wrong answers for multiple choices.
 
 import { parse } from '../parse.js';
+import { t } from '../../i18n.js';
 
 const P = (text, dvar = 'x') => parse(String(text), { dvar });
 const all = (texts, ctx, dvar) => (texts || []).map((t) => ({ node: P(t, dvar), ctx: ctx || {} }));
@@ -27,31 +28,33 @@ const PART = { kind: 'ode', eq: "u''+9u=sin(3x)", unknown: 'u', order: 2, ic: { 
 
 export const DEFS = {
   a2_ode_ic_before_particular: {
-    name: 'Conditions initiales posées sur y_h seule',
+    name: t('Conditions initiales posées sur y_h seule'),
     judges: ['ode'],
     transform: (prev, ctx) => all(ctx.cfg?._p?.icBefore, ctx.cfg?._p?.ctx, odeV(ctx)),
     wrongValues: (item) => item.wrong?.icBefore || [],
-    explain: (ctx = {}) => `Les conditions initiales portent sur la solution entière y = y_h + y_p, pas sur y_h seule.${ctx.which ? ` Avec ta solution, ${ctx.which}(0) = ${ctx.valeur} au lieu de ${ctx.want}.` : ' Écris d’abord y = y_h + y_p, puis fixe C₁ et C₂.'}`,
+    explain: (ctx = {}) => (ctx.which
+      ? t('Les conditions initiales portent sur la solution entière y = y_h + y_p, pas sur y_h seule. Avec ta solution, {which}(0) = {valeur} au lieu de {want}.', { which: ctx.which, valeur: ctx.valeur, want: ctx.want })
+      : t('Les conditions initiales portent sur la solution entière y = y_h + y_p, pas sur y_h seule. Écris d’abord y = y_h + y_p, puis fixe C₁ et C₂.')),
     check: {
       judge: { ...PART, eq: "u''+u=x", ic: { x: 0, y: 1, dy: 0 }, _p: { icBefore: ['C_1 = 1 ; C_2 = 0', 'u = cos(x)+x'], ctx: { which: 'u′', valeur: '1', want: '0' } } },
       prev: 'u = C_1 cos(x)+C_2 sin(x)+x', line: 'C_1 = 1 ; C_2 = 0',
     },
   },
   a2_ode_resonance_no_x: {
-    name: 'Résonance : facteur x oublié',
+    name: t('Résonance : facteur x oublié'),
     judges: ['ode'],
     transform: (prev, ctx) => all(ctx.cfg?._p?.res, ctx.cfg?._p?.ctx, odeV(ctx)),
     wrongValues: (item) => item.wrong?.res || [],
     explain: (ctx = {}) => (ctx.noX
-      ? `${ctx.noX} est une solution de l'équation homogène : remplacée dans l'équation, elle donne 0, jamais le second membre. Comme ${ctx.root} est racine de l'équation caractéristique, multiplie la forme par x : ${ctx.withX}.`
-      : 'A cos 3x + B sin 3x est une solution de l’équation homogène : elle donne 0. Comme 3i est racine, multiplie par x.'),
+      ? t('{noX} est une solution de l\'équation homogène : remplacée dans l\'équation, elle donne 0, jamais le second membre. Comme {root} est racine de l\'équation caractéristique, multiplie la forme par x : {withX}.', { noX: ctx.noX, root: ctx.root, withX: ctx.withX })
+      : t('A cos 3x + B sin 3x est une solution de l’équation homogène : elle donne 0. Comme 3i est racine, multiplie par x.')),
     check: {
       judge: { ...PART, _p: { res: ['u = C_1 cos(3x)+C_2 sin(3x)', 'u = (π/6)cos(3x)-(1/18)sin(3x)'] } },
       prev: "u''+9u=sin(3x)", line: 'u = C_1 cos(3x) + C_2 sin(3x)',
     },
   },
   a2_ode_yp_incomplete: {
-    name: 'Forme de y_p incomplète',
+    name: t('Forme de y_p incomplète'),
     judges: ['ode'],
     transform: (prev, ctx) => all(ctx.cfg?._p?.incomplete, ctx.cfg?._p?.ctx, odeV(ctx)),
     wrongValues: (item) => item.wrong?.incomplete || [],
@@ -61,7 +64,7 @@ export const DEFS = {
     },
   },
   a2_ode_method_separable_sum: {
-    name: 'Somme traitée comme un produit (séparable)',
+    name: t('Somme traitée comme un produit (séparable)'),
     judges: ['ode'],
     transform: (prev, ctx) => (ctx.cfg?._choose?.sep || []).map((s) => ({ node: odesep(s.P, s.Q, ctx.cfg), ctx: {} })),
     check: {
@@ -70,7 +73,7 @@ export const DEFS = {
     },
   },
   a2_ode_method_linear_nonlinear: {
-    name: 'Équation non linéaire traitée comme linéaire',
+    name: t('Équation non linéaire traitée comme linéaire'),
     judges: ['ode'],
     transform: (prev, ctx) => all(ctx.cfg?._choose?.mu, {}, odeV(ctx)),
     check: {
@@ -79,7 +82,7 @@ export const DEFS = {
     },
   },
   a2_ode_stability_boundary: {
-    name: 'Bornes comprises dans l\'ensemble de stabilité',
+    name: t('Bornes comprises dans l\'ensemble de stabilité'),
     judges: ['solset'],
     transform: (prev, ctx) => (ctx.cfg?._stab?.closed ? [{ node: P(ctx.cfg._stab.closed), ctx: ctx.cfg._stab.ctx || {} }] : []),
     wrongValues: (item) => (item.stab ? [item.stab.closed] : []),
@@ -89,7 +92,7 @@ export const DEFS = {
     },
   },
   a2_ode_stability_one_coef: {
-    name: 'Une seule des deux conditions p > 0, q > 0',
+    name: t('Une seule des deux conditions p > 0, q > 0'),
     judges: ['solset'],
     transform: (prev, ctx) => (ctx.cfg?._stab?.one || []).map((t) => ({ node: P(t), ctx: {} })),
     wrongValues: (item) => item.stab?.one || [],
@@ -99,7 +102,7 @@ export const DEFS = {
     },
   },
   a2_ode_stability_discriminant: {
-    name: 'Stabilité confondue avec Δ < 0',
+    name: t('Stabilité confondue avec Δ < 0'),
     judges: ['solset'],
     transform: (prev, ctx) => (ctx.cfg?._stab?.disc ? [{ node: P(ctx.cfg._stab.disc), ctx: {} }] : []),
     wrongValues: (item) => (item.stab?.disc ? [item.stab.disc] : []),
@@ -109,7 +112,7 @@ export const DEFS = {
     },
   },
   a2_exact_phi_forgot: {
-    name: 'φ(y) oubliée dans H',
+    name: t('φ(y) oubliée dans H'),
     judges: ['ode'],
     transform: (prev, ctx) => all(ctx.cfg?._exact?.noPhi, ctx.cfg?._exact?.ctx, odeV(ctx)),
     check: {
@@ -118,12 +121,12 @@ export const DEFS = {
     },
   },
   a2_ode_system_order: {
-    name: 'Vecteurs propres associés aux mauvaises valeurs propres',
+    name: t('Vecteurs propres associés aux mauvaises valeurs propres'),
     judges: ['ode'],
     transform: (prev, ctx) => (ctx.cfg?.system?.swapped ? [{ node: P(ctx.cfg.system.swapped, 't'), ctx: ctx.cfg.system.ctx || {} }] : []),
     explain: (ctx = {}) => (ctx.v
-      ? `${ctx.v} est vecteur propre pour λ = ${ctx.l} : il va avec e^{${ctx.l}t}. Vérifie : A${ctx.v} = ${ctx.Av} = ${ctx.l}·${ctx.v}.`
-      : 'Chaque exponentielle e^{λt} va avec un vecteur propre de la même valeur propre λ : (1, −1) est vecteur propre pour −1, il va avec e^{−t}.'),
+      ? t('{v} est vecteur propre pour λ = {l} : il va avec e^{{l}t}. Vérifie : A{v} = {Av} = {l}·{v}.', { v: ctx.v, l: ctx.l, Av: ctx.Av })
+      : t('Chaque exponentielle e^{λt} va avec un vecteur propre de la même valeur propre λ : (1, −1) est vecteur propre pour −1, il va avec e^{−t}.')),
     check: {
       judge: { kind: 'ode', v: 't', system: { A: [['1', '2'], ['2', '1']], names: ['x', 'y'], X0: ['2', '0'], swapped: 'x = C_1 e^(3t)+C_2 e^(-t) ; y = -C_1 e^(3t)+C_2 e^(-t)', ctx: { v: '(1 ; −1)', l: '−1', Av: '(−1 ; 1)' } } },
       prev: "x' = x+2y ; y' = 2x+y", line: 'x = C_1 e^(3t)+C_2 e^(-t) ; y = -C_1 e^(3t)+C_2 e^(-t)',

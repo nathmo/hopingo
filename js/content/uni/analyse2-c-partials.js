@@ -20,6 +20,7 @@ import {
   partsItem, examMcq, vfMcq, tfItem, a2Counter, examTag,
 } from './analyse2-c-kit.js';
 import { K_LIBRARY } from '../../judges/a2-examples.js';
+import { t } from '../../i18n.js';
 
 const VARS = ['x', 'y', 'z'];
 // A plane line already in final form (nothing left to develop).
@@ -115,8 +116,8 @@ function mapData(rng, { m, n, kinds = ['poly', 'sin', 'exp', 'quot'], pow = fals
 
 const PA = 'a2-partials';
 const PA_SUB = [
-  { id: 'row', label: 'dérivées partielles', skill: 'g6-deriv-rules' },
-  { id: 'evaluate', label: 'évaluer au point', skill: PA },
+  { id: 'row', label: t('dérivées partielles'), skill: 'g6-deriv-rules' },
+  { id: 'evaluate', label: t('évaluer au point'), skill: PA },
 ];
 const eqJ = (vars) => ({ kind: 'equiv', vars, domain: { x: [0.3, 2.5], y: [0.3, 2.5], z: [0.3, 2.5] }, target: 'no-prime' });
 const uML = (d) => `u(${d.vars.join(', ')}) = (${d.comps.map((c) => ML(c.f)).join(', ')})`;
@@ -131,29 +132,29 @@ function gradItem(level, rng, opts) {
   const firstTerm = (t) => (/^-?[^+-]+/.exec(t) || [''])[0];
   const blank = (t) => [c.parts ? c.parts[0].d[vars.indexOf(t)] : firstTerm(c.d[vars.indexOf(t)])].filter((s) => s && s !== '0');
   const parts = [
-    { start: `pd(${c.f},x)`, judge: eqJ(vars), notes: level === 1 ? ['On dérive en x : y est une constante.'] : [],
-      lines: [{ math: c.d[0], note: '∂f/∂x : y est une constante', subgoal: 'row', blank: blank('x') }] },
-    { html: 'Puis la dérivée par rapport à y :', ask: '∂f/∂y =', start: `pd(${c.f},y)`, judge: eqJ(vars),
-      lines: [{ math: c.d[1], note: '∂f/∂y : x est une constante', subgoal: 'row', blank: blank('y') }] },
-    { html: `Le gradient au point ${ptT(d.p)} :`, ask: `∇f${ptT(d.p)} =`, start: '∇f', judge: { kind: 'mat', expect: vecT([gx, gy]) },
-      lines: [{ math: vecT([gx, gy]), note: 'On remplace x et y par les coordonnées du point', subgoal: 'evaluate', cells: [[0, 0], [1, 0]] }] },
+    { start: `pd(${c.f},x)`, judge: eqJ(vars), notes: level === 1 ? [t('On dérive en x : y est une constante.')] : [],
+      lines: [{ math: c.d[0], note: t('∂f/∂x : y est une constante'), subgoal: 'row', blank: blank('x') }] },
+    { html: t('Puis la dérivée par rapport à y :'), ask: '∂f/∂y =', start: `pd(${c.f},y)`, judge: eqJ(vars),
+      lines: [{ math: c.d[1], note: t('∂f/∂y : x est une constante'), subgoal: 'row', blank: blank('y') }] },
+    { html: t('Le gradient au point {p} :', { p: ptT(d.p) }), ask: `∇f${ptT(d.p)} =`, start: '∇f', judge: { kind: 'mat', expect: vecT([gx, gy]) },
+      lines: [{ math: vecT([gx, gy]), note: t('On remplace x et y par les coordonnées du point'), subgoal: 'evaluate', cells: [[0, 0], [1, 0]] }] },
   ];
   return partsItem({
     skill: PA, level, parts, subgoals: PA_SUB, key: `${PA}:grad:${c.f}:${d.p}`, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(c.f)}. Calcule ∂f/∂x et ∂f/∂y, puis ∇f${ptT(d.p)}.`,
-    hints: H('∂f/∂x : dérive en x, y étant une constante (et inversement).', `∂f/∂x = ${ML(c.d[0])}`, `∇f${ptT(d.p)} = ${vecML([gx, gy])}`),
+    prompt: t('Soit f(x, y) = {f}. Calcule ∂f/∂x et ∂f/∂y, puis ∇f{p}.', { f: ML(c.f), p: ptT(d.p) }),
+    hints: H(t('∂f/∂x : dérive en x, y étant une constante (et inversement).'), `∂f/∂x = ${ML(c.d[0])}`, `∇f${ptT(d.p)} = ${vecML([gx, gy])}`),
   });
 }
 
 const NUMBERED = /\[\[\s*-?\d|\(\s*-?\d/;
-const SIZE_WHY = 'J_u a une ligne par composante de u et une colonne par variable.';
+const SIZE_WHY = t('J_u a une ligne par composante de u et une colonne par variable.');
 function sizeOptions(m, n) {
   const cands = [[m, n], [n, m], [m, n + 1], [m + 1, n]];
   const out = [];
   for (const [r, c] of cands) {
     if (out.some((o) => o.r === r && o.c === c)) continue;
     const ok = r === m && c === n;
-    out.push({ r, c, id: `${r}x${c}`, label: `${r} lignes, ${c} colonnes`, valid: ok, ...(ok ? { ref: true } : { why: SIZE_WHY }), ...(!ok && r === n && c === m ? { rule: 'a2_jacobian_transposed' } : {}) });
+    out.push({ r, c, id: `${r}x${c}`, label: t('{r} lignes, {c} colonnes', { r, c }), valid: ok, ...(ok ? { ref: true } : { why: SIZE_WHY }), ...(!ok && r === n && c === m ? { rule: 'a2_jacobian_transposed' } : {}) });
   }
   return out.slice(0, 3).map(({ r, c, ...o }) => o);
 }
@@ -162,7 +163,7 @@ function jacobianItem(level, rng, opts, { pow = false } = {}) {
   // A matrix with a number the content test can change (see wrongLine in tests/uni-check.js).
   let d = mapData(rng, { ...shape, pow });
   const symOf = (x) => `[${x.comps.map((c) => `[${c.d.join(',')}]`).join(',')}]`;
-  for (let t = 0; t < 40 && !NUMBERED.test(symOf(d)); t++) d = mapData(rng, { ...shape, pow });
+  for (let tries = 0; tries < 40 && !NUMBERED.test(symOf(d)); tries++) d = mapData(rng, { ...shape, pow });
   const { m, n, vars } = d;
   const sym = symOf(d);
   const num = rowT(d.J);
@@ -170,30 +171,30 @@ function jacobianItem(level, rng, opts, { pow = false } = {}) {
   const guided = level <= 2;
   const parts = [
     { start: 'J_u', judge: { kind: 'mat', vars, expect: sym },
-      decisions: [{ kind: 'decision', prompt: 'Quelle taille a J_u ?', levels: [3], options: sizeOptions(m, n) }],
-      notes: level <= 2 ? [`${m} composantes, ${n} variables : J_u est de taille ${size} (une ligne par composante, une colonne par variable).`] : [],
+      decisions: [{ kind: 'decision', prompt: t('Quelle taille a J_u ?'), levels: [3], options: sizeOptions(m, n) }],
+      notes: level <= 2 ? [t('{m} composantes, {n} variables : J_u est de taille {size} (une ligne par composante, une colonne par variable).', { m, n, size })] : [],
       menu: [
-        { id: 'rows', label: 'Ligne i : les dérivées partielles de uᵢ', valid: true },
-        { id: 'cols', label: 'Ligne i : les dérivées par rapport à la i-ème variable', valid: false, rule: 'a2_jacobian_transposed', why: SIZE_WHY },
+        { id: 'rows', label: t('Ligne i : les dérivées partielles de uᵢ'), valid: true },
+        { id: 'cols', label: t('Ligne i : les dérivées par rapport à la i-ème variable'), valid: false, rule: 'a2_jacobian_transposed', why: SIZE_WHY },
       ],
-      lines: [{ math: sym, note: `Une ligne par composante, une colonne par variable (${size})`, subgoal: 'row', cells: guided ? (level === 1 ? allCells(m, n).filter((_, k) => k % 2 === 0) : allCells(m, n)) : undefined }] },
-    { html: `Au point ${ptT(d.p)} :`, ask: `J_u${ptT(d.p)} =`, start: 'J_u', judge: { kind: 'mat', expect: num },
+      lines: [{ math: sym, note: t('Une ligne par composante, une colonne par variable ({size})', { size }), subgoal: 'row', cells: guided ? (level === 1 ? allCells(m, n).filter((_, k) => k % 2 === 0) : allCells(m, n)) : undefined }] },
+    { html: t('Au point {p} :', { p: ptT(d.p) }), ask: `J_u${ptT(d.p)} =`, start: 'J_u', judge: { kind: 'mat', expect: num },
       menu: [
-        { id: 'eval', label: 'Remplacer les variables par les coordonnées du point', valid: true },
-        { id: 'swap', label: 'Transposer la matrice', valid: false, rule: 'a2_jacobian_transposed', why: SIZE_WHY },
+        { id: 'eval', label: t('Remplacer les variables par les coordonnées du point'), valid: true },
+        { id: 'swap', label: t('Transposer la matrice'), valid: false, rule: 'a2_jacobian_transposed', why: SIZE_WHY },
       ],
-      lines: [{ math: num, note: 'On évalue chaque case au point', subgoal: 'evaluate', cells: guided ? allCells(m, n) : undefined }] },
+      lines: [{ math: num, note: t('On évalue chaque case au point'), subgoal: 'evaluate', cells: guided ? allCells(m, n) : undefined }] },
   ];
   return partsItem({
     skill: PA, level, parts, subgoals: PA_SUB, key: `${PA}:jac:${sym}:${d.p}`, fallback: d.fallback,
-    prompt: `Soit ${uML(d)}. Calcule la matrice jacobienne J_u, puis J_u${ptT(d.p)}.`,
-    hints: H(`Une ligne par composante, une colonne par variable : J_u est ${size}.`, `Ligne 1 : (${d.comps[0].d.map((t) => ML(t)).join(', ')})`, `J_u${ptT(d.p)} = ${MLmat(num)}`),
+    prompt: t('Soit {u}. Calcule la matrice jacobienne J_u, puis J_u{p}.', { u: uML(d), p: ptT(d.p) }),
+    hints: H(t('Une ligne par composante, une colonne par variable : J_u est {size}.', { size }), t('Ligne 1 : ({row})', { row: d.comps[0].d.map((s) => ML(s)).join(', ') }), `J_u${ptT(d.p)} = ${MLmat(num)}`),
   });
 }
 
 // Second derivatives and Schwarz (level 4).
 function schwarzItem(level, rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const P = polyComp(rng, 2, 3);
     const pxy = polyT(polyD(polyD(P.terms, 0), 1), VARS);
     if (P.d.some((x) => x === '0') || pxy === '0') continue;
@@ -208,14 +209,14 @@ function schwarzItem(level, rng) {
     const fx = joinSum([P.d[0], S.fx]);
     const fxy = joinSum([pxy, S.fxy]);
     const parts = [
-      { start: `pd(${f},x)`, judge: eqJ(['x', 'y']), lines: [{ math: fx, note: 'Dérivée en x', subgoal: 'row' }] },
-      { html: 'Dérive ∂f/∂x par rapport à y :', ask: '∂²f/∂y∂x =', start: `pd(${f},x,y)`, judge: eqJ(['x', 'y']), lines: [{ math: fxy, note: 'On dérive ∂f/∂x en y', subgoal: 'row' }] },
-      { html: 'Puis dans l’autre ordre (∂f/∂y, puis en x) :', ask: '∂²f/∂x∂y =', start: `pd(${f},y,x)`, judge: eqJ(['x', 'y']), lines: [{ math: fxy, note: 'Le même résultat : f est C², le théorème de Schwarz s’applique', subgoal: 'evaluate' }] },
+      { start: `pd(${f},x)`, judge: eqJ(['x', 'y']), lines: [{ math: fx, note: t('Dérivée en x'), subgoal: 'row' }] },
+      { html: t('Dérive ∂f/∂x par rapport à y :'), ask: '∂²f/∂y∂x =', start: `pd(${f},x,y)`, judge: eqJ(['x', 'y']), lines: [{ math: fxy, note: t('On dérive ∂f/∂x en y'), subgoal: 'row' }] },
+      { html: t('Puis dans l’autre ordre (∂f/∂y, puis en x) :'), ask: '∂²f/∂x∂y =', start: `pd(${f},y,x)`, judge: eqJ(['x', 'y']), lines: [{ math: fxy, note: t('Le même résultat : f est C², le théorème de Schwarz s’applique'), subgoal: 'evaluate' }] },
     ];
     return partsItem({
       skill: PA, level, parts, subgoals: PA_SUB, key: `${PA}:schwarz:${f}`,
-      prompt: `Soit f(x, y) = ${ML(f)}. Calcule ∂f/∂x, puis les deux dérivées croisées ∂²f/∂y∂x et ∂²f/∂x∂y.`,
-      hints: H('∂²f/∂y∂x : on dérive ∂f/∂x par rapport à y.', `∂f/∂x = ${ML(fx)}`, `∂²f/∂y∂x = ${ML(fxy)}`),
+      prompt: t('Soit f(x, y) = {f}. Calcule ∂f/∂x, puis les deux dérivées croisées ∂²f/∂y∂x et ∂²f/∂x∂y.', { f: ML(f) }),
+      hints: H(t('∂²f/∂y∂x : on dérive ∂f/∂x par rapport à y.'), `∂f/∂x = ${ML(fx)}`, `∂²f/∂y∂x = ${ML(fxy)}`),
     });
   }
   return jacobianItem(level, rng, {});
@@ -237,9 +238,9 @@ function partialsMcq(level, rng, opts) {
   ];
   return examMcq({
     skill: PA, level, key: `${PA}:mcq:${d.comps.map((c) => c.f).join('|')}:${d.p}`, fallback: d.fallback,
-    prompt: `Soit ${uML(d)}. La matrice jacobienne J_u${ptT(d.p)} vaut :`,
+    prompt: t('Soit {u}. La matrice jacobienne J_u{p} vaut :', { u: uML(d), p: ptT(d.p) }),
     right, wrongs, fillers,
-    solution: [{ html: `Une ligne par composante, une colonne par variable : J_u${ptT(d.p)} = ${right}.`, note: '' }],
+    solution: [{ html: t('Une ligne par composante, une colonne par variable : J_u{p} = {J}.', { p: ptT(d.p), J: right }), note: '' }],
   }, rng, opts);
 }
 
@@ -248,23 +249,23 @@ function partialsTf(level, rng, opts) {
   const which = rng.int(0, 3);
   const exam = examTag(opts) || { format: 'tf', points: 1 };
   if (which === 0) {
-    return tfItem({ skill: PA, level: 4, exam, key: 'schwarz', truth: true, statement: 'Si f ∈ C²(ℝ²), alors ∂/∂y(∂f/∂x) = ∂/∂x(∂f/∂y).', explanation: 'C\'est le théorème de Schwarz : pour f ∈ C², les dérivées croisées sont égales.' });
+    return tfItem({ skill: PA, level: 4, exam, key: 'schwarz', truth: true, statement: t('Si f ∈ C²(ℝ²), alors ∂/∂y(∂f/∂x) = ∂/∂x(∂f/∂y).'), explanation: t('C\'est le théorème de Schwarz : pour f ∈ C², les dérivées croisées sont égales.') });
   }
   if (which === 1) {
-    return tfItem({ skill: PA, level: 4, exam, key: 'diff', truth: true, statement: 'Si f ∈ C²(ℝ²), alors ∂f/∂x est différentiable.', explanation: 'f ∈ C² : ∂f/∂x est C¹, donc différentiable (2019 Q28).' });
+    return tfItem({ skill: PA, level: 4, exam, key: 'diff', truth: true, statement: t('Si f ∈ C²(ℝ²), alors ∂f/∂x est différentiable.'), explanation: t('f ∈ C² : ∂f/∂x est C¹, donc différentiable (2019 Q28).') });
   }
   if (which === 2) {
     return tfItem({
       skill: PA, level: 4, exam, key: 'xx-yy', truth: false,
-      statement: 'Si f ∈ C²(ℝ²), alors ∂²f/∂x² = ∂²f/∂y².',
-      explanation: 'Faux : pour f = x², ∂²f/∂x² = 2 et ∂²f/∂y² = 0. Schwarz parle des dérivées croisées, pas de celles-ci.',
+      statement: t('Si f ∈ C²(ℝ²), alors ∂²f/∂x² = ∂²f/∂y².'),
+      explanation: t('Faux : pour f = x², ∂²f/∂x² = 2 et ∂²f/∂y² = 0. Schwarz parle des dérivées croisées, pas de celles-ci.'),
       counter: a2Counter('fxxNeqFyy', {}, [['f', 'f(x, y) =']], { f: 'x^2' }),
     });
   }
   return tfItem({
     skill: PA, level: 4, exam, key: 'no-c2', truth: false, ruleIfTrue: 'a2_schwarz_no_c2',
-    statement: 'Si les dérivées croisées ∂²f/∂y∂x(0, 0) et ∂²f/∂x∂y(0, 0) existent, elles sont égales.',
-    explanation: 'Faux : il faut f ∈ C². Pour f = xy(x² − y²)/(x² + y²), prolongée par 0, les deux dérivées croisées en (0, 0) valent −1 et 1.',
+    statement: t('Si les dérivées croisées ∂²f/∂y∂x(0, 0) et ∂²f/∂x∂y(0, 0) existent, elles sont égales.'),
+    explanation: t('Faux : il faut f ∈ C². Pour f = xy(x² − y²)/(x² + y²), prolongée par 0, les deux dérivées croisées en (0, 0) valent −1 et 1.'),
     counter: a2Counter('knownFn', { want: ['K7'] }, [['f', 'f(x, y) =']], { f: K7 }),
   });
 }
@@ -275,9 +276,9 @@ function partialsGen(level, rng, profile, opts = {}) {
   if (level === 5) return partialsMcq(5, rng, opts);
   if (level === 1) return gradItem(level, rng, opts);
   if (level === 4) {
-    const t = rng.int(0, 2);
-    if (t === 0) return jacobianItem(level, rng, opts, { pow: true });
-    if (t === 1) return schwarzItem(level, rng);
+    const pick = rng.int(0, 2);
+    if (pick === 0) return jacobianItem(level, rng, opts, { pow: true });
+    if (pick === 1) return schwarzItem(level, rng);
   }
   return jacobianItem(level, rng, opts);
 }
@@ -289,9 +290,9 @@ function partialsGen(level, rng, profile, opts = {}) {
 const TG = 'a2-tangent-graph';
 const TG_SUB = [
   { id: 'value', label: 'f(a, b)', skill: PA },
-  { id: 'partials', label: 'dérivées partielles au point', skill: PA },
-  { id: 'plane', label: 'équation du plan', skill: 'g4-plane' },
-  { id: 'simplify', label: 'simplifier', skill: 'g4-plane' },
+  { id: 'partials', label: t('dérivées partielles au point'), skill: PA },
+  { id: 'plane', label: t('équation du plan'), skill: 'g4-plane' },
+  { id: 'simplify', label: t('simplifier'), skill: 'g4-plane' },
 ];
 // z = c + p(x − a) + r(y − b), its final form, and its texts.
 function graphPlane(c, fx, fy, a, b) {
@@ -355,50 +356,50 @@ function graphItem(level, rng, opts = {}) {
   const fin = graphFinal(c, fx, fy, a, b);
   const flip = b !== 0 ? [a, -b] : [-a, b];
   const pointDec = {
-    kind: 'decision', prompt: 'Par quel point passe le plan tangent ?', levels: [3], options: [
+    kind: 'decision', prompt: t('Par quel point passe le plan tangent ?'), levels: [3], options: [
       { id: 'p', label: `(${fq(a)} ; ${fq(b)} ; f${pt})`, valid: true, ref: true },
-      { id: 'flip', label: `(${fq(flip[0])} ; ${fq(flip[1])} ; f${ptT(flip)})`, valid: false, rule: 'a2_tangent_point_sign', why: `Le point de contact est au-dessus de ${pt}.` },
-      { id: 'zero', label: `(${fq(a)} ; ${fq(b)} ; 0)`, valid: false, why: 'Le point est sur le graphe : sa cote est f(a, b), pas 0.' },
+      { id: 'flip', label: `(${fq(flip[0])} ; ${fq(flip[1])} ; f${ptT(flip)})`, valid: false, rule: 'a2_tangent_point_sign', why: t('Le point de contact est au-dessus de {p}.', { p: pt }) },
+      { id: 'zero', label: `(${fq(a)} ; ${fq(b)} ; 0)`, valid: false, why: t('Le point est sur le graphe : sa cote est f(a, b), pas 0.') },
     ],
   };
   const valMenu = [
-    { id: 'subst', label: 'Remplacer x et y par les coordonnées du point', valid: true },
-    { id: 'plane', label: 'Écrire le plan tout de suite', valid: false, why: 'Il faut d\'abord les trois nombres f(a, b), f_x(a, b), f_y(a, b).' },
+    { id: 'subst', label: t('Remplacer x et y par les coordonnées du point'), valid: true },
+    { id: 'plane', label: t('Écrire le plan tout de suite'), valid: false, why: t('Il faut d\'abord les trois nombres f(a, b), f_x(a, b), f_y(a, b).') },
   ];
   const parts = [
     { start: 'f', judge: { kind: 'value', expect: qt(c) }, decisions: [pointDec], menu: valMenu,
       lines: [
-        { math: substT(d.terms, P), note: `On remplace x par ${fq(a)} et y par ${fq(b)}`, subgoal: 'value', from: level <= 2 ? 1 : 9 },
+        { math: substT(d.terms, P), note: t('On remplace x par {a} et y par {b}', { a: fq(a), b: fq(b) }), subgoal: 'value', from: level <= 2 ? 1 : 9 },
         { math: qt(c), note: `f${pt} = ${fq(c)}`, subgoal: 'value' },
       ] },
-    { html: `∂f/∂x = ${ML(polyT(d.dx))}, au point :`, ask: `∂f/∂x${pt} =`, start: 'f_x', judge: { kind: 'value', expect: qt(fx) }, menu: valMenu,
+    { html: t('∂f/∂x = {d}, au point :', { d: ML(polyT(d.dx)) }), ask: `∂f/∂x${pt} =`, start: 'f_x', judge: { kind: 'value', expect: qt(fx) }, menu: valMenu,
       lines: [{ math: qt(fx), note: '', subgoal: 'partials' }] },
-    { html: `∂f/∂y = ${ML(polyT(d.dy))}, au point :`, ask: `∂f/∂y${pt} =`, start: 'f_y', judge: { kind: 'value', expect: qt(fy) }, menu: valMenu,
+    { html: t('∂f/∂y = {d}, au point :', { d: ML(polyT(d.dy)) }), ask: `∂f/∂y${pt} =`, start: 'f_y', judge: { kind: 'value', expect: qt(fy) }, menu: valMenu,
       lines: [{ math: qt(fy), note: '', subgoal: 'partials' }] },
-    { html: 'Le plan tangent :', ask: 'π :', start: 'π', judge: { kind: 'geom', object: 'plane', ref: fin, tangent: tangentCfg(d) },
+    { html: t('Le plan tangent :'), ask: 'π :', start: 'π', judge: { kind: 'geom', object: 'plane', ref: fin, tangent: tangentCfg(d) },
       menu: [
         { id: 'formula', label: 'z = f(a, b) + f_x(a, b)(x − a) + f_y(a, b)(y − b)', valid: true },
-        { id: 'simplify', label: 'Développer et simplifier', valid: true },
-        { id: 'plus', label: 'z = f(a, b) + f_x(a, b)(x + a) + f_y(a, b)(y + b)', valid: false, rule: 'a2_tangent_point_sign', why: 'Le plan doit passer par (a, b, f(a, b)) : en x = a, y = b, il faut z = f(a, b).' },
-        { id: 'nof', label: 'z = f_x(a, b)(x − a) + f_y(a, b)(y − b)', valid: false, why: 'Le plan doit passer par (a, b, f(a, b)) : il manque f(a, b).' },
+        { id: 'simplify', label: t('Développer et simplifier'), valid: true },
+        { id: 'plus', label: 'z = f(a, b) + f_x(a, b)(x + a) + f_y(a, b)(y + b)', valid: false, rule: 'a2_tangent_point_sign', why: t('Le plan doit passer par (a, b, f(a, b)) : en x = a, y = b, il faut z = f(a, b).') },
+        { id: 'nof', label: 'z = f_x(a, b)(x − a) + f_y(a, b)(y − b)', valid: false, why: t('Le plan doit passer par (a, b, f(a, b)) : il manque f(a, b).') },
       ],
       lines: planeLines(
         { math: plane, note: 'z = f(a, b) + f_x(a, b)(x − a) + f_y(a, b)(y − b)', subgoal: 'plane', blank: [termT(fx, shiftT('x', a), true), termT(fy, shiftT('y', b), true)].filter(Boolean), blank2: [shiftT('x', a), shiftT('y', b)].filter((s) => s.length > 1) },
-        { math: fin, note: 'Développé', subgoal: 'simplify' },
+        { math: fin, note: t('Développé'), subgoal: 'simplify' },
       ) },
   ];
   // The derivatives are given at levels 1 and 2 (the parts ask their value).
-  if (level >= 3) { parts[1].html = 'La dérivée partielle par rapport à x, au point :'; parts[2].html = 'La dérivée partielle par rapport à y, au point :'; }
+  if (level >= 3) { parts[1].html = t('La dérivée partielle par rapport à x, au point :'); parts[2].html = t('La dérivée partielle par rapport à y, au point :'); }
   return partsItem({
     skill: TG, level, parts, subgoals: TG_SUB, key: `${TG}:${d.f}:${a},${b}`, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(d.f)}. Donne une équation du plan tangent au graphe de f au point (${fq(a)}, ${fq(b)}, f(${fq(a)}, ${fq(b)})).`,
-    hints: H('Il faut f(a, b), f_x(a, b) et f_y(a, b).', `z = ${fq(c)} + (…)(${RD(shiftT('x', a))}) + (…)(${RD(shiftT('y', b))})`, ML(plane)),
+    prompt: t('Soit f(x, y) = {f}. Donne une équation du plan tangent au graphe de f au point ({a}, {b}, f({a}, {b})).', { f: ML(d.f), a: fq(a), b: fq(b) }),
+    hints: H(t('Il faut f(a, b), f_x(a, b) et f_y(a, b).'), `z = ${fq(c)} + (…)(${RD(shiftT('x', a))}) + (…)(${RD(shiftT('y', b))})`, ML(plane)),
   });
 }
 
 // « Where is the tangent plane horizontal? » (level 4).
 function horizontalItem(level, rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const A = nz(rng, -2, 2);
     const B = rng.int(-2, 2);
     const C = nz(rng, -2, 2);
@@ -417,16 +418,16 @@ function horizontalItem(level, rng) {
     const parts = [
       { start: 'f_x = 0 ; f_y = 0', judge: { kind: 'system', vars: ['x', 'y'], solutions: [[qt(x0), qt(y0)]] },
         lines: [
-          { math: `${fx} = 0 ; ${fy} = 0`, note: 'Plan horizontal : ∇f = 0', subgoal: 'partials' },
-          { math: `(${qt(x0)} ; ${qt(y0)})`, note: 'On résout le système', subgoal: 'value' },
+          { math: `${fx} = 0 ; ${fy} = 0`, note: t('Plan horizontal : ∇f = 0'), subgoal: 'partials' },
+          { math: `(${qt(x0)} ; ${qt(y0)})`, note: t('On résout le système'), subgoal: 'value' },
         ] },
-      { html: 'La cote du point :', ask: `f${ptT([x0, y0])} =`, start: 'f', judge: { kind: 'value', expect: qt(z0) }, lines: [{ math: qt(z0), note: '', subgoal: 'value' }] },
-      { html: 'Le plan tangent en ce point :', ask: 'π :', start: 'π', judge: { kind: 'geom', object: 'plane', ref: `z = ${qt(z0)}` }, lines: [{ math: `z = ${qt(z0)}`, note: 'f_x = f_y = 0 : z = f(a, b)', subgoal: 'plane' }] },
+      { html: t('La cote du point :'), ask: `f${ptT([x0, y0])} =`, start: 'f', judge: { kind: 'value', expect: qt(z0) }, lines: [{ math: qt(z0), note: '', subgoal: 'value' }] },
+      { html: t('Le plan tangent en ce point :'), ask: 'π :', start: 'π', judge: { kind: 'geom', object: 'plane', ref: `z = ${qt(z0)}` }, lines: [{ math: `z = ${qt(z0)}`, note: 'f_x = f_y = 0 : z = f(a, b)', subgoal: 'plane' }] },
     ];
     return partsItem({
       skill: TG, level, parts, subgoals: TG_SUB, key: `${TG}:horiz:${f}`,
-      prompt: `Soit f(x, y) = ${ML(f)}. En quel point (a, b) le plan tangent au graphe de f est-il horizontal ? Donne ce point, puis l'équation du plan.`,
-      hints: H('Le plan z = f(a, b) + f_x(a, b)(x − a) + f_y(a, b)(y − b) est horizontal si f_x(a, b) = f_y(a, b) = 0.', `${ML(`${fx} = 0`)} et ${ML(`${fy} = 0`)}`, `(a ; b) = ${ptT([x0, y0])}`),
+      prompt: t('Soit f(x, y) = {f}. En quel point (a, b) le plan tangent au graphe de f est-il horizontal ? Donne ce point, puis l\'équation du plan.', { f: ML(f) }),
+      hints: H(t('Le plan z = f(a, b) + f_x(a, b)(x − a) + f_y(a, b)(y − b) est horizontal si f_x(a, b) = f_y(a, b) = 0.'), t('{a} et {b}', { a: ML(`${fx} = 0`), b: ML(`${fy} = 0`) }), `(a ; b) = ${ptT([x0, y0])}`),
     });
   }
   return graphItem(level, rng);
@@ -446,19 +447,19 @@ function graphMcq(level, rng, opts) {
   ];
   return examMcq({
     skill: TG, level, key: `${TG}:mcq:${d.f}:${a},${b}`, fallback: d.fallback,
-    prompt: `Soit f(x, y) = ${ML(d.f)}. Le plan tangent au graphe de f au point (${fq(a)}, ${fq(b)}, f(${fq(a)}, ${fq(b)})) a pour équation :`,
+    prompt: t('Soit f(x, y) = {f}. Le plan tangent au graphe de f au point ({a}, {b}, f({a}, {b})) a pour équation :', { f: ML(d.f), a: fq(a), b: fq(b) }),
     right, wrongs,
-    solution: [{ html: `f${ptT([a, b])} = ${fq(c)}, f_x = ${fq(fx)}, f_y = ${fq(fy)} : ${ML(graphPlane(c, fx, fy, a, b))}, soit ${right}.`, note: '' }],
+    solution: [{ html: t('{p} = {c}, f_x = {fx}, f_y = {fy} : {plane}, soit {right}.', { p: `f${ptT([a, b])}`, c: fq(c), fx: fq(fx), fy: fq(fy), plane: ML(graphPlane(c, fx, fy, a, b)), right }), note: '' }],
   }, rng, opts);
 }
 const TG_TF = [
-  { truth: true, key: 'min', s: 'Si f ∈ C¹, f(0, 0) = 3 et f a un minimum local en (0, 0), le plan tangent au graphe de f en (0, 0, 3) est z = 3.', why: 'Vrai : en un minimum local, ∇f(0, 0) = 0, donc z = f(0, 0) + 0 = 3 (2019 Q23).' },
-  { truth: false, key: 'normal', s: 'Le vecteur (f_x(a, b), f_y(a, b), 1) est normal au plan tangent au graphe de f en (a, b, f(a, b)).', why: 'Faux : le plan s\'écrit f_x(a, b)(x − a) + f_y(a, b)(y − b) − (z − f(a, b)) = 0 ; une normale est (f_x(a, b), f_y(a, b), −1).' },
-  { truth: true, key: 'curve', s: 'Le plan tangent au graphe de f en (a, b, f(a, b)) contient la tangente en x = a à la courbe z = f(x, b) tracée dans le plan y = b.', why: 'Vrai : dans le plan y = b, le plan tangent devient z = f(a, b) + f_x(a, b)(x − a), la tangente de x ↦ f(x, b).' },
+  { truth: true, key: 'min', s: t('Si f ∈ C¹, f(0, 0) = 3 et f a un minimum local en (0, 0), le plan tangent au graphe de f en (0, 0, 3) est z = 3.'), why: t('Vrai : en un minimum local, ∇f(0, 0) = 0, donc z = f(0, 0) + 0 = 3 (2019 Q23).') },
+  { truth: false, key: 'normal', s: t('Le vecteur (f_x(a, b), f_y(a, b), 1) est normal au plan tangent au graphe de f en (a, b, f(a, b)).'), why: t('Faux : le plan s\'écrit f_x(a, b)(x − a) + f_y(a, b)(y − b) − (z − f(a, b)) = 0 ; une normale est (f_x(a, b), f_y(a, b), −1).') },
+  { truth: true, key: 'curve', s: t('Le plan tangent au graphe de f en (a, b, f(a, b)) contient la tangente en x = a à la courbe z = f(x, b) tracée dans le plan y = b.'), why: t('Vrai : dans le plan y = b, le plan tangent devient z = f(a, b) + f_x(a, b)(x − a), la tangente de x ↦ f(x, b).') },
 ];
 function graphGen(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return graphMcq(4, rng, opts);
-  if (opts.exam === 'tf') { const t = rng.pick(TG_TF); return vfMcq(TG, t.s, t.truth, rng, { key: t.key, why: t.why }); }
+  if (opts.exam === 'tf') { const tf = rng.pick(TG_TF); return vfMcq(TG, tf.s, tf.truth, rng, { key: tf.key, why: tf.why }); }
   if (level === 5) return rng.chance(0.5) ? graphMcq(5, rng, opts) : graphItem(5, rng, opts);
   if (level === 4 && rng.chance(0.35)) return horizontalItem(level, rng);
   return graphItem(level, rng, opts);
@@ -473,7 +474,7 @@ const TL_SUB = [
   { id: 'gradient', label: '∇F', skill: PA },
   { id: 'evaluate', label: '∇F(p)', skill: PA },
   { id: 'plane', label: '∇F(p)·(x − p) = 0', skill: TL },
-  { id: 'simplify', label: 'simplifier', skill: 'g4-plane' },
+  { id: 'simplify', label: t('simplifier'), skill: 'g4-plane' },
 ];
 // A term of F: {f, d: [3 texts]}.
 function levelTerm(rng, p) {
@@ -544,39 +545,39 @@ function levelItem(level, rng, opts = {}) {
   const guided = level <= 2;
   const S = `${ML(d.F)} = ${fq(c)}`;
   const dec = {
-    kind: 'decision', prompt: 'Comment obtenir une normale au plan tangent ?', levels: [3], options: [
-      { id: 'level', label: 'S est la surface de niveau F = c : ∇F(p) est normal', valid: true, ref: true },
-      { id: 'graph', label: 'Résoudre en z, puis plan tangent au graphe', valid: true, quality: 'poor', why: 'Possible, mais résoudre en z est long (et pas toujours possible) : ∇F(p) donne directement une normale.' },
-      { id: 'rhs', label: 'Le plan est ∇F(p)·(x − p) = c', valid: false, rule: 'a2_tangent_level_rhs', why: 'Le plan passe par p : en x = p, ∇F(p)·(x − p) vaut 0, pas c.' },
+    kind: 'decision', prompt: t('Comment obtenir une normale au plan tangent ?'), levels: [3], options: [
+      { id: 'level', label: t('S est la surface de niveau F = c : ∇F(p) est normal'), valid: true, ref: true },
+      { id: 'graph', label: t('Résoudre en z, puis plan tangent au graphe'), valid: true, quality: 'poor', why: t('Possible, mais résoudre en z est long (et pas toujours possible) : ∇F(p) donne directement une normale.') },
+      { id: 'rhs', label: t('Le plan est ∇F(p)·(x − p) = c'), valid: false, rule: 'a2_tangent_level_rhs', why: t('Le plan passe par p : en x = p, ∇F(p)·(x − p) vaut 0, pas c.') },
     ],
   };
   const parts = [];
   if (level >= 2) {
     parts.push({ start: '∇F', judge: { kind: 'mat', vars: VARS, expect: grad }, decisions: [dec],
-      menu: [{ id: 'grad', label: 'Dériver F par rapport à x, à y, puis à z', valid: true }, { id: 'eval', label: 'Remplacer par le point d\'abord', valid: false, why: 'On dérive d\'abord, puis on remplace : sinon tout devient constant.' }],
+      menu: [{ id: 'grad', label: t('Dériver F par rapport à x, à y, puis à z'), valid: true }, { id: 'eval', label: t('Remplacer par le point d\'abord'), valid: false, why: t('On dérive d\'abord, puis on remplace : sinon tout devient constant.') }],
       lines: [{ math: grad, note: '∇F = (∂F/∂x, ∂F/∂y, ∂F/∂z)', subgoal: 'gradient', cells: level === 2 ? [[0, 0], [1, 0], [2, 0]] : undefined }] });
   }
-  parts.push({ html: level >= 2 ? `Au point p = ${ptT(p)} :` : '', ask: `∇F${ptT(p)} =`, start: '∇F', judge: { kind: 'mat', expect: vecT(n) },
-    menu: [{ id: 'eval', label: 'Remplacer x, y, z par les coordonnées de p', valid: true }],
-    lines: [{ math: vecT(n), note: 'On évalue au point', subgoal: 'evaluate', cells: guided ? [[0, 0], [1, 0], [2, 0]] : undefined }] });
-  parts.push({ html: 'Le plan tangent :', ask: 'π :', start: 'π', judge: { kind: 'geom', object: 'plane', ref: fin, level: { p: p.map(qt), n: n.map(qt), c: qt(c) }, tangent: { p: p.map(qt), n: n.map(qt) } },
+  parts.push({ html: level >= 2 ? t('Au point p = {p} :', { p: ptT(p) }) : '', ask: `∇F${ptT(p)} =`, start: '∇F', judge: { kind: 'mat', expect: vecT(n) },
+    menu: [{ id: 'eval', label: t('Remplacer x, y, z par les coordonnées de p'), valid: true }],
+    lines: [{ math: vecT(n), note: t('On évalue au point'), subgoal: 'evaluate', cells: guided ? [[0, 0], [1, 0], [2, 0]] : undefined }] });
+  parts.push({ html: t('Le plan tangent :'), ask: 'π :', start: 'π', judge: { kind: 'geom', object: 'plane', ref: fin, level: { p: p.map(qt), n: n.map(qt), c: qt(c) }, tangent: { p: p.map(qt), n: n.map(qt) } },
     menu: [
       { id: 'formula', label: '∇F(p)·(x − p) = 0', valid: true },
-      { id: 'simplify', label: 'Développer et simplifier', valid: true },
-      { id: 'rhs', label: '∇F(p)·(x − p) = c', valid: false, rule: 'a2_tangent_level_rhs', why: 'En x = p, le membre de gauche vaut 0 : le second membre est 0, pas c.' },
-      { id: 'plus', label: '∇F(p)·(x + p) = 0', valid: false, rule: 'a2_tangent_point_sign', why: 'Le plan doit passer par p : remplace x par p, tu dois obtenir 0.' },
+      { id: 'simplify', label: t('Développer et simplifier'), valid: true },
+      { id: 'rhs', label: '∇F(p)·(x − p) = c', valid: false, rule: 'a2_tangent_level_rhs', why: t('En x = p, le membre de gauche vaut 0 : le second membre est 0, pas c.') },
+      { id: 'plus', label: '∇F(p)·(x + p) = 0', valid: false, rule: 'a2_tangent_point_sign', why: t('Le plan doit passer par p : remplace x par p, tu dois obtenir 0.') },
     ],
     lines: planeLines(
       { math: plane, note: '∇F(p)·(x − p) = 0', subgoal: 'plane', blank: p.map((x, i) => shiftT(VARS[i], x)).filter((s) => s.length > 1), blank2: p.map((x, i) => shiftT(VARS[i], x)).filter((s) => s.length > 1) },
-      { math: fin, note: gcdOf(n) > 1 ? `Développé, puis divisé par ${gcdOf(n)}` : 'Développé', subgoal: 'simplify' },
+      { math: fin, note: gcdOf(n) > 1 ? t('Développé, puis divisé par {k}', { k: gcdOf(n) }) : t('Développé'), subgoal: 'simplify' },
     ) });
   const first = parts[0];
   if (level === 1) first.notes = [`∇F = ${MLmat(grad, { vars: VARS })}`];
   if (level === 1) first.decisions = [dec];
   return partsItem({
     skill: TL, level, parts, subgoals: TL_SUB, key: `${TL}:${d.F}:${p}`, fallback: d.fallback,
-    prompt: `Soit S la surface ${S}, et p = ${ptT(p)} ∈ S. Donne une équation cartésienne du plan tangent à S en p.`,
-    hints: H('Le gradient de F au point est normal à la surface.', `∇F${ptT(p)} = ${vecML(n.map(qt))}, puis ∇F(p)·(x − p) = 0.`, ML(plane)),
+    prompt: t('Soit S la surface {S}, et p = {p} ∈ S. Donne une équation cartésienne du plan tangent à S en p.', { S, p: ptT(p) }),
+    hints: H(t('Le gradient de F au point est normal à la surface.'), t('{g} = {n}, puis ∇F(p)·(x − p) = 0.', { g: `∇F${ptT(p)}`, n: vecML(n.map(qt)) }), ML(plane)),
   });
 }
 
@@ -591,19 +592,19 @@ function levelMcq(level, rng, opts) {
   const fillers = [0, 1, 2].filter((i) => n[i] !== 0).map((i) => ({ html: ML(levelFinal(n.map((x, j) => (j === i ? -x : x)), p)), rule: null }));
   return examMcq({
     skill: TL, level, key: `${TL}:mcq:${d.F}:${p}`, fallback: d.fallback,
-    prompt: `Le plan tangent à la surface ${ML(d.F)} = ${fq(c)} au point ${ptT(p)} a pour équation :`,
+    prompt: t('Le plan tangent à la surface {F} = {c} au point {p} a pour équation :', { F: ML(d.F), c: fq(c), p: ptT(p) }),
     right, wrongs, fillers,
-    solution: [{ html: `∇F${ptT(p)} = ${vecML(n.map(qt))} ; ${ML(levelPlane(n, p))}, soit ${right}.`, note: '' }],
+    solution: [{ html: t('{g} = {n} ; {plane}, soit {right}.', { g: `∇F${ptT(p)}`, n: vecML(n.map(qt)), plane: ML(levelPlane(n, p)), right }), note: '' }],
   }, rng, opts);
 }
 const TL_TF = [
-  { truth: true, key: 'curve', s: 'Si F(g(t)) = c pour tout t (g dérivable, F ∈ C¹), alors ∇F(g(t₀))·g′(t₀) = 0.', why: 'Vrai : on dérive F(g(t)) = c par la règle de chaîne : ∇F(g(t))·g′(t) = 0 (2021 Q25).' },
-  { truth: true, key: 'graph2d', s: 'Pour F(x, y) = y − f(x), avec f dérivable, ∇F(x₀, f(x₀)) est orthogonal à la tangente au graphe de f en x₀.', why: 'Vrai : ∇F = (−f′(x₀), 1) et la tangente a pour direction (1, f′(x₀)) : le produit scalaire est nul (2020 Q19).' },
-  { truth: false, key: 'tangent', s: 'Si ∇F(p) ≠ 0, le vecteur ∇F(p) est tangent à la surface F = c en p.', why: 'Faux : ∇F(p) est normal (orthogonal) à la surface en p ; le plan tangent est ∇F(p)·(x − p) = 0.' },
+  { truth: true, key: 'curve', s: t('Si F(g(t)) = c pour tout t (g dérivable, F ∈ C¹), alors ∇F(g(t₀))·g′(t₀) = 0.'), why: t('Vrai : on dérive F(g(t)) = c par la règle de chaîne : ∇F(g(t))·g′(t) = 0 (2021 Q25).') },
+  { truth: true, key: 'graph2d', s: t('Pour F(x, y) = y − f(x), avec f dérivable, ∇F(x₀, f(x₀)) est orthogonal à la tangente au graphe de f en x₀.'), why: t('Vrai : ∇F = (−f′(x₀), 1) et la tangente a pour direction (1, f′(x₀)) : le produit scalaire est nul (2020 Q19).') },
+  { truth: false, key: 'tangent', s: t('Si ∇F(p) ≠ 0, le vecteur ∇F(p) est tangent à la surface F = c en p.'), why: t('Faux : ∇F(p) est normal (orthogonal) à la surface en p ; le plan tangent est ∇F(p)·(x − p) = 0.') },
 ];
 function levelGen(level, rng, profile, opts = {}) {
   if (opts.exam === 'mcq') return levelMcq(4, rng, opts);
-  if (opts.exam === 'tf') { const t = rng.pick(TL_TF); return vfMcq(TL, t.s, t.truth, rng, { key: t.key, why: t.why }); }
+  if (opts.exam === 'tf') { const tf = rng.pick(TL_TF); return vfMcq(TL, tf.s, tf.truth, rng, { key: tf.key, why: tf.why }); }
   if (level === 5) return levelMcq(5, rng, opts);
   return levelItem(level, rng, opts);
 }

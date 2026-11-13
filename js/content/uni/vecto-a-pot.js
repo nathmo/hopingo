@@ -14,6 +14,7 @@ import {
   T, sum, sub, d, text, randPoly, isZero, nVars, dependsOn, at, ML, tupML, fieldML, ptT, q, fq,
   vParts, mcqD, opt, decision, act, H, examTag, problemItem,
 } from './vecto-a-kit.js';
+import { t } from '../../i18n.js';
 
 const PF = 'v-pot-find';
 const PL = 'v-pot-lambda';
@@ -25,7 +26,7 @@ const SPECIALS = [T(1, [0, 0, 0], 'sin', { k: 1, e: [1, 0, 1] }), T(1, [0, 0, 0]
 
 // φ in n variables: every variable used, a mixed term, a term without x.
 function phiOf(rng, n, { special = false, poly = false } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tt = 0; tt < 200; tt++) {
     let phi = randPoly(rng, n, rng.int(3, 4), { maxDeg: 3, minDeg: 1, coefs: [-3, -2, -1, 1, 2, 3, 4, 5] });
     if (special && !poly && rng.chance(0.5)) {
       const s = rng.pick(SPECIALS.filter((x) => n === 3 || !dependsOn(x, 2)));
@@ -46,7 +47,7 @@ function phiOf(rng, n, { special = false, poly = false } = {}) {
 
 // A point P with φ₀(P) whole, |φ₀(P)| ≤ 30 and ≠ 0.
 function pointFor(rng, phi, n) {
-  for (let t = 0; t < 60; t++) {
+  for (let tt = 0; tt < 60; tt++) {
     const P = [...Array(n).keys()].map(() => rng.int(-2, 3));
     const v = at(phi, [...P, 0, 0].slice(0, 3));
     if (v === null || v.d !== 1 || Math.abs(v.n) > 30 || v.n === 0) continue;
@@ -69,19 +70,19 @@ export function potential(D, { at: P = null } = {}) {
   const tall = text(phi);
   const vars = XYZ.slice(0, n);
   const lines = [];
-  lines.push({ math: `φ = ${t1} + ${unknown(n, 0)}`, note: `∫ F₁ dx = ${ML(t1)} : la « constante » dépend de ${n === 3 ? 'y et z' : 'y'}`, subgoal: 'integrate-x', blank: [t1] });
+  lines.push({ math: `φ = ${t1} + ${unknown(n, 0)}`, note: t('∫ F₁ dx = {a} : la « constante » dépend de {b}', { a: ML(t1), b: n === 3 ? t('y et z') : 'y' }), subgoal: 'integrate-x', blank: [t1] });
   if (n === 3) {
     const dy = text(d(G2, 1));
-    lines.push({ math: `φ = ${t12} + β(z)`, note: `∂φ/∂y = ${ML(text(d(G1, 1)))} + ∂α/∂y doit valoir F₂ : ∂α/∂y = ${ML(dy)}`, subgoal: 'compare-y', blank: G2.length ? [text(G2)] : [] });
+    lines.push({ math: `φ = ${t12} + β(z)`, note: t('∂φ/∂y = {a} + ∂α/∂y doit valoir F₂ : ∂α/∂y = {b}', { a: ML(text(d(G1, 1))), b: ML(dy) }), subgoal: 'compare-y', blank: G2.length ? [text(G2)] : [] });
     const dz = text(d(G3, 2));
-    lines.push({ math: `φ = ${tall} + C`, note: `∂φ/∂z = ${ML(text(d(sum(G1, G2), 2)))} + β′(z) doit valoir F₃ : β′(z) = ${ML(dz)}`, subgoal: 'compare-z', blank: G3.length ? [text(G3)] : [] });
+    lines.push({ math: `φ = ${tall} + C`, note: t('∂φ/∂z = {a} + β′(z) doit valoir F₃ : β′(z) = {b}', { a: ML(text(d(sum(G1, G2), 2))), b: ML(dz) }), subgoal: 'compare-z', blank: G3.length ? [text(G3)] : [] });
   } else {
-    lines.push({ math: `φ = ${tall} + C`, note: `∂φ/∂y = ${ML(text(d(G1, 1)))} + α′(y) doit valoir F₂ : α′(y) = ${ML(text(d(G2, 1)))}`, subgoal: 'compare-y', blank: G2.length ? [text(G2)] : [] });
+    lines.push({ math: `φ = ${tall} + C`, note: t('∂φ/∂y = {a} + α′(y) doit valoir F₂ : α′(y) = {b}', { a: ML(text(d(G1, 1))), b: ML(text(d(G2, 1))) }), subgoal: 'compare-y', blank: G2.length ? [text(G2)] : [] });
   }
   if (P) {
     const C = P.phi0.neg();
-    lines.push({ math: `C = ${C}`, note: `φ${ptT(P.P)} = ${fq(P.phi0)} + C doit valoir 0`, subgoal: 'constant', blank: [String(C)] });
-    lines.push({ math: `φ = ${text(sum(phi, [T(C, [0, 0, 0])]))}`, note: 'Le potentiel demandé', subgoal: 'final' });
+    lines.push({ math: `C = ${C}`, note: t('φ{a} = {b} + C doit valoir 0', { a: ptT(P.P), b: fq(P.phi0) }), subgoal: 'constant', blank: [String(C)] });
+    lines.push({ math: `φ = ${text(sum(phi, [T(C, [0, 0, 0])]))}`, note: t('Le potentiel demandé'), subgoal: 'final' });
   }
   // Traps.
   const traps = {};
@@ -98,27 +99,27 @@ export function potential(D, { at: P = null } = {}) {
 }
 
 const POT_MENU = (n, withAt) => [
-  act('int', `Intégrer F₁ en x, avec une fonction inconnue ${unknown(n, 0)}`),
-  act('cmp', 'Dériver φ en la variable suivante et comparer à la composante de F'),
-  ...(withAt ? [act('const', 'Fixer la constante avec la condition φ(P) = 0')] : []),
-  act('constC', 'Intégrer F₁ en x, avec une constante C', false, { rule: 'v_pot_const_fn', why: 'Ce qui ne dépend pas de x peut encore dépendre des autres variables.' }),
-  act('three', 'Additionner ∫F₁ dx, ∫F₂ dy et ∫F₃ dz', false, { rule: 'v_pot_double_count', why: 'Les termes mixtes seraient comptés plusieurs fois.' }),
+  act('int', t('Intégrer F₁ en x, avec une fonction inconnue {a}', { a: unknown(n, 0) })),
+  act('cmp', t('Dériver φ en la variable suivante et comparer à la composante de F')),
+  ...(withAt ? [act('const', t('Fixer la constante avec la condition φ(P) = 0'))] : []),
+  act('constC', t('Intégrer F₁ en x, avec une constante C'), false, { rule: 'v_pot_const_fn', why: t('Ce qui ne dépend pas de x peut encore dépendre des autres variables.') }),
+  act('three', t('Additionner ∫F₁ dx, ∫F₂ dy et ∫F₃ dz'), false, { rule: 'v_pot_double_count', why: t('Les termes mixtes seraient comptés plusieurs fois.') }),
 ];
 
 // ---------- v-pot-find ----------
 
 const PF_SUB = [
-  { id: 'integrate-x', label: 'intégrer F₁ en x', skill: PF },
-  { id: 'compare-y', label: 'comparer à F₂', skill: PF },
-  { id: 'compare-z', label: 'comparer à F₃', skill: PF },
-  { id: 'constant', label: 'fixer la constante', skill: PF },
-  { id: 'final', label: 'le potentiel', skill: PF },
+  { id: 'integrate-x', label: t('intégrer F₁ en x'), skill: PF },
+  { id: 'compare-y', label: t('comparer à F₂'), skill: PF },
+  { id: 'compare-z', label: t('comparer à F₃'), skill: PF },
+  { id: 'constant', label: t('fixer la constante'), skill: PF },
+  { id: 'final', label: t('le potentiel'), skill: PF },
   { id: 'value', label: 'φ(B) − φ(A)', skill: 'a1-int-direct' },
 ];
-const START_DECISION = decision('Par quelle variable commences-tu ?', [
-  { id: 'x', label: 'Intégrer F₁ en x', valid: true, ref: true },
-  { id: 'y', label: 'Intégrer F₂ en y', valid: true, quality: 'poor', why: 'Possible aussi : on suit ici l\'ordre x, y, z.' },
-  { id: 'all', label: 'Intégrer les trois composantes et additionner', valid: false, rule: 'v_pot_double_count', why: 'Les termes mixtes seraient comptés plusieurs fois.' },
+const START_DECISION = decision(t('Par quelle variable commences-tu ?'), [
+  { id: 'x', label: t('Intégrer F₁ en x'), valid: true, ref: true },
+  { id: 'y', label: t('Intégrer F₂ en y'), valid: true, quality: 'poor', why: t('Possible aussi : on suit ici l\'ordre x, y, z.') },
+  { id: 'all', label: t('Intégrer les trois composantes et additionner'), valid: false, rule: 'v_pot_double_count', why: t('Les termes mixtes seraient comptés plusieurs fois.') },
 ], { levels: [2] });
 
 function pfItem(level, rng, opts) {
@@ -126,7 +127,7 @@ function pfItem(level, rng, opts) {
   const withAt = level === 5 || opts.exam === 'open' || (level === 4 && rng.chance(0.5));
   let D;
   let P = null;
-  for (let t = 0; t < 50; t++) {
+  for (let tt = 0; tt < 50; tt++) {
     D = phiOf(rng, n, { special: level >= 3, poly: level === 5 });
     if (!withAt) break;
     P = pointFor(rng, D.phi, n);
@@ -149,22 +150,22 @@ function pfItem(level, rng, opts) {
     const phiA = at(D.phi, [...A, 0].slice(0, 3));
     const W = phiB.sub(phiA);
     parts.push({
-      html: 'Le travail le long de Γ :', ask: '∫_Γ F · dl =', start: 'W', judge: { kind: 'definite', vars: ['W'], known: { W: String(W) } },
-      decisions: [decision('Comment calcules-tu ce travail ?', [
-        { id: 'pot', label: 'Avec le potentiel : φ(B) − φ(A)', valid: true, ref: true },
-        { id: 'param', label: 'En paramétrant Γ', valid: true, quality: 'poor', why: 'Juste, mais très long ici : avec t⁹, le calcul devient lourd. F = ∇φ donne directement φ(B) − φ(A).' },
+      html: t('Le travail le long de Γ :'), ask: '∫_Γ F · dl =', start: 'W', judge: { kind: 'definite', vars: ['W'], known: { W: String(W) } },
+      decisions: [decision(t('Comment calcules-tu ce travail ?'), [
+        { id: 'pot', label: t('Avec le potentiel : φ(B) − φ(A)'), valid: true, ref: true },
+        { id: 'param', label: t('En paramétrant Γ'), valid: true, quality: 'poor', why: t('Juste, mais très long ici : avec t⁹, le calcul devient lourd. F = ∇φ donne directement φ(B) − φ(A).') },
       ])],
-      lines: [{ math: `(${phiB})-(${phiA})`, note: `φ(B) − φ(A), B = ${ptT(B)}, A = ${ptT(A)} (la constante s'en va)`, subgoal: 'value' }, { math: String(W), note: 'Le travail', subgoal: 'value' }],
+      lines: [{ math: `(${phiB})-(${phiA})`, note: t('φ(B) − φ(A), B = {a}, A = {b} (la constante s\'en va)', { a: ptT(B), b: ptT(A) }), subgoal: 'value' }, { math: String(W), note: t('Le travail'), subgoal: 'value' }],
     });
-    extra = ` Puis calcule ∫<sub>Γ</sub> F · dl, où Γ est la courbe γ(t) = ${tupML(n === 3 ? ['t', '2t^3', 't^9'] : ['t', '2t^3'])}, t ∈ [0 ; 1].`;
+    extra = t(' Puis calcule ∫<sub>Γ</sub> F · dl, où Γ est la courbe γ(t) = {a}, t ∈ [0 ; 1].', { a: tupML(n === 3 ? ['t', '2t^3', 't^9'] : ['t', '2t^3']) });
   }
   const FT = D.F.map((c) => text(c));
   const ex = opts.exam ? examTag(opts, 4) : false;
   return vParts({
     skill: PF, level, parts, subgoals: PF_SUB, exam: ex, fallback: D.fallback,
-    prompt: `Soit ${fieldML(FT)} sur ${n === 3 ? 'ℝ³' : 'ℝ²'} (convexe, et rot F = 0). Trouve φ telle que F = ∇φ${P ? ` et φ${ptT(P.P)} = 0` : ''}.${extra}`,
+    prompt: t('Soit {a} sur {b} (convexe, et rot F = 0). Trouve φ telle que F = ∇φ{c}.{extra}', { a: fieldML(FT), b: n === 3 ? 'ℝ³' : 'ℝ²', c: P ? t(' et φ{a} = 0', { a: ptT(P.P) }) : '', extra }),
     key: `${PF}:${level}:${FT.join('|')}:${P ? P.P : ''}`,
-    hints: H(`Intègre F₁ en x ; la « constante » dépend de ${n === 3 ? 'y et z : α(y, z)' : 'y : α(y)'}. Puis dérive en y et compare à F₂.`, `${ML(pot.lines[0].math)}`, `${ML(pot.lines[1].math)}`),
+    hints: H(t('Intègre F₁ en x ; la « constante » dépend de {a}. Puis dérive en y et compare à F₂.', { a: n === 3 ? t('y et z : α(y, z)') : 'y : α(y)' }), `${ML(pot.lines[0].math)}`, `${ML(pot.lines[1].math)}`),
   });
 }
 
@@ -172,10 +173,10 @@ function pfMcq(level, rng, opts) {
   const D = phiOf(rng, 3, { special: false });
   const pot = potential(D);
   const tr = pot.judge.traps;
-  const show = (t) => ML(t);
+  const show = (tt) => ML(tt);
   return mcqD({
     skill: PF, level, exam: examTag(opts), key: `${PF}:mcq:${text(D.phi)}`, fallback: D.fallback,
-    prompt: `Soit ${fieldML(D.F.map((c) => text(c)))}. Une fonction potentiel de F (F = ∇φ) est :`,
+    prompt: t('Soit {a}. Une fonction potentiel de F (F = ∇φ) est :', { a: fieldML(D.F.map((c) => text(c))) }),
     right: show(`φ = ${text(D.phi)}`),
     wrongs: [
       tr.v_pot_double_count && opt(show(tr.v_pot_double_count[0].line.replace(/ \+ C$/, '')), 'v_pot_double_count'),
@@ -183,7 +184,7 @@ function pfMcq(level, rng, opts) {
       opt(show(tr.v_potential_sign[0].line.replace(/ \+ C$/, '')), 'v_potential_sign'),
       tr.v_pot_poly_integral && opt(show(tr.v_pot_poly_integral[0].line.replace(/ \+ α\(y, z\)$/, '')), 'v_pot_poly_integral'),
     ].filter(Boolean),
-    solution: [{ html: `${ML(pot.lines[0].math)}, puis ${ML(pot.lines[1].math)}, et enfin ${ML(pot.lines[2].math)}. Vérification : ∇φ = F.`, note: '' }],
+    solution: [{ html: t('{a}, puis {b}, et enfin {c}. Vérification : ∇φ = F.', { a: ML(pot.lines[0].math), b: ML(pot.lines[1].math), c: ML(pot.lines[2].math) }), note: '' }],
   }, rng);
 }
 
@@ -191,12 +192,12 @@ function pfMcq(level, rng, opts) {
 
 const PL_SUB = [
   { id: 'rot', label: 'rot F', skill: 'v-ops' },
-  { id: 'solve', label: 'trouver λ', skill: PL },
-  { id: 'integrate-x', label: 'intégrer F₁ en x', skill: PF },
-  { id: 'compare-y', label: 'comparer à F₂', skill: PF },
-  { id: 'compare-z', label: 'comparer à F₃', skill: PF },
-  { id: 'constant', label: 'fixer la constante', skill: PF },
-  { id: 'final', label: 'le potentiel', skill: PF },
+  { id: 'solve', label: t('trouver λ'), skill: PL },
+  { id: 'integrate-x', label: t('intégrer F₁ en x'), skill: PF },
+  { id: 'compare-y', label: t('comparer à F₂'), skill: PF },
+  { id: 'compare-z', label: t('comparer à F₃'), skill: PF },
+  { id: 'constant', label: t('fixer la constante'), skill: PF },
+  { id: 'final', label: t('le potentiel'), skill: PF },
 ];
 const ROT_IDX = [[2, 1, 1, 2], [0, 2, 2, 0], [1, 0, 0, 1]];
 const SUBS = ['₁', '₂', '₃'];
@@ -206,8 +207,8 @@ const keyE = (e) => e.join(',');
 // a + λ·b as text: per monomial, the coefficient (bλ + a).
 function lamText(A, B) {
   const map = new Map();
-  for (const t of A) map.set(keyE(t.e), { e: t.e, a: t.c, b: q(0) });
-  for (const t of B) { const k = keyE(t.e); const o = map.get(k) || { e: t.e, a: q(0), b: q(0) }; o.b = o.b.add(t.c); map.set(k, o); }
+  for (const tt of A) map.set(keyE(tt.e), { e: tt.e, a: tt.c, b: q(0) });
+  for (const tt of B) { const k = keyE(tt.e); const o = map.get(k) || { e: tt.e, a: q(0), b: q(0) }; o.b = o.b.add(tt.c); map.set(k, o); }
   let out = '';
   for (const o of [...map.values()]) {
     if (o.a.n === 0 && o.b.n === 0) continue;
@@ -226,7 +227,7 @@ function lamText(A, B) {
 }
 
 function plData(rng) {
-  for (let t = 0; t < 200; t++) {
+  for (let tt = 0; tt < 200; tt++) {
     const { phi, F } = phiOf(rng, 3, { poly: true });
     const l0 = rng.pick([-2, -1, 1, 2, 3]);
     const mixed = phi.filter((x) => nVars(x) >= 2 && !x.f);
@@ -269,9 +270,9 @@ function rotPartL(D, i, first) {
   const dA = lamText(d(D.A[b], a), d(D.B[b], a));
   const dB = lamText(d(D.A[e], c), d(D.B[e], c));
   return {
-    html: first ? null : `Composante ${i + 1} de rot F :`, ask: `(rot F)${SUBS[i]} =`, start, judge,
-    lines: [{ math: `${dA}-(${dB})`, note: `∂F${SUBS[b]}/∂${XYZ[a]} − ∂F${SUBS[e]}/∂${XYZ[c]}`, subgoal: 'rot', blank: [dA, dB] }, { math: goal, note: 'On simplifie', subgoal: 'rot' }],
-    menu: [act('derive', 'Dériver, puis faire la différence (λ est une constante)'), act('swap', 'Échanger l\'ordre des deux dérivées', false, { rule: 'v_rot_sign', why: 'L\'ordre est fixé : x → y → z → x.' })],
+    html: first ? null : t('Composante {a} de rot F :', { a: i + 1 }), ask: `(rot F)${SUBS[i]} =`, start, judge,
+    lines: [{ math: `${dA}-(${dB})`, note: `∂F${SUBS[b]}/∂${XYZ[a]} − ∂F${SUBS[e]}/∂${XYZ[c]}`, subgoal: 'rot', blank: [dA, dB] }, { math: goal, note: t('On simplifie'), subgoal: 'rot' }],
+    menu: [act('derive', t('Dériver, puis faire la différence (λ est une constante)')), act('swap', t('Échanger l\'ordre des deux dérivées'), false, { rule: 'v_rot_sign', why: t('L\'ordre est fixé : x → y → z → x.') })],
   };
 }
 
@@ -281,17 +282,17 @@ function equationsOf(D) {
   D.rotB.forEach((rb, i) => {
     if (isZero(rb)) return;
     // One monomial of R is enough: its coefficient is c·(λ − λ₀).
-    const t = rb[0];
-    const ra = D.rotA[i].find((x) => keyE(x.e) === keyE(t.e));
+    const tt = rb[0];
+    const ra = D.rotA[i].find((x) => keyE(x.e) === keyE(tt.e));
     const a = ra ? ra.c : q(0);
-    eqs.push(`${t.c.eq(1) ? '' : t.c.eq(-1) ? '-' : t.c}λ${a.n === 0 ? '' : a.n > 0 ? `+${a}` : a}=0`);
+    eqs.push(`${tt.c.eq(1) ? '' : tt.c.eq(-1) ? '-' : tt.c}λ${a.n === 0 ? '' : a.n > 0 ? `+${a}` : a}=0`);
   });
   return [...new Set(eqs)];
 }
 
-const SUM_DECISION = decision('Comment écris-tu rot F = 0 ?', [
-  { id: 'comp', label: 'Chaque composante de rot F est nulle, pour tout (x, y, z)', valid: true, ref: true },
-  { id: 'sum', label: 'La somme des composantes de rot F est nulle', valid: false, rule: 'v_rot_scalar_sum', why: 'Une somme nulle ne dit pas que chaque terme est nul : rot F est un vecteur.' },
+const SUM_DECISION = decision(t('Comment écris-tu rot F = 0 ?'), [
+  { id: 'comp', label: t('Chaque composante de rot F est nulle, pour tout (x, y, z)'), valid: true, ref: true },
+  { id: 'sum', label: t('La somme des composantes de rot F est nulle'), valid: false, rule: 'v_rot_scalar_sum', why: t('Une somme nulle ne dit pas que chaque terme est nul : rot F est un vecteur.') },
 ], { levels: [2, 3, 4] });
 
 function plItem(level, rng, opts) {
@@ -299,23 +300,23 @@ function plItem(level, rng, opts) {
   const parts = [0, 1, 2].map((i) => rotPartL(D, i, i === 0));
   const eqs = equationsOf(D);
   parts.push({
-    html: 'Les équations, vraies pour tout (x, y, z) :', ask: 'λ :', start: eqs.join(' ∧ '),
+    html: t('Les équations, vraies pour tout (x, y, z) :'), ask: 'λ :', start: eqs.join(' ∧ '),
     judge: { kind: 'solset', v: 'λ', domain: 'R' },
     decisions: [SUM_DECISION],
-    lines: [{ math: `λ = ${D.l0}`, note: `ℝ³ est convexe : pour λ = ${fq(D.l0)}, F dérive d'un potentiel ; pour λ ≠ ${fq(D.l0)}, rot F ≠ 0 et non`, subgoal: 'solve', blank: [String(D.l0)] }],
+    lines: [{ math: `λ = ${D.l0}`, note: t('ℝ³ est convexe : pour λ = {a}, F dérive d\'un potentiel ; pour λ ≠ {a}, rot F ≠ 0 et non', { a: fq(D.l0) }), subgoal: 'solve', blank: [String(D.l0)] }],
   });
   const withPhi = level === 5 || opts.exam === 'open' || (level === 4 && rng.chance(0.5));
   let P = null;
   if (withPhi) {
     P = level === 5 || opts.exam === 'open' ? pointFor(rng, D.phi, 3) : null;
     const pot = potential({ phi: D.phi, F: D.F, n: 3 }, { at: P });
-    parts.push({ html: `Pour λ = ${fq(D.l0)}, trouve φ${P ? ` avec φ${ptT(P.P)} = 0` : ''} :`, ask: 'φ =', start: 'φ', judge: pot.judge, lines: pot.lines, menu: POT_MENU(3, !!P) });
+    parts.push({ html: t('Pour λ = {a}, trouve φ{b} :', { a: fq(D.l0), b: P ? t(' avec φ{a} = 0', { a: ptT(P.P) }) : '' }), ask: 'φ =', start: 'φ', judge: pot.judge, lines: pot.lines, menu: POT_MENU(3, !!P) });
   }
-  const prompt = `Soit F(x, y, z) = ${tupML(D.Ftext)} sur ℝ³, où λ est un réel. Pour quelles valeurs de λ F dérive-t-il d'un potentiel ?${withPhi ? ` Pour cette valeur, trouve φ telle que F = ∇φ${P ? ` et φ${ptT(P.P)} = 0` : ''}.` : ''}`;
+  const prompt = t('Soit F(x, y, z) = {a} sur ℝ³, où λ est un réel. Pour quelles valeurs de λ F dérive-t-il d\'un potentiel ?{b}', { a: tupML(D.Ftext), b: withPhi ? t(' Pour cette valeur, trouve φ telle que F = ∇φ{a}.', { a: P ? t(' et φ{a} = 0', { a: ptT(P.P) }) : '' }) : '' });
   const item = vParts({
     skill: PL, level, parts, subgoals: PL_SUB, exam: opts.exam ? examTag(opts, 6) : false, fallback: D.fallback,
     prompt, key: `${PL}:${level}:${D.Ftext.join('|')}:${P ? P.P : ''}`,
-    hints: H('rot F = 0 veut dire trois équations, vraies en tout point : une par composante.', `(rot F)${SUBS[D.rotB.findIndex((r) => !isZero(r))]} = ${ML(lamText(D.rotA[D.rotB.findIndex((r) => !isZero(r))], D.rotB[D.rotB.findIndex((r) => !isZero(r))]))}`, `${eqs.map((e) => ML(e)).join(' et ')} : λ = ${fq(D.l0)}`),
+    hints: H(t('rot F = 0 veut dire trois équations, vraies en tout point : une par composante.'), `(rot F)${SUBS[D.rotB.findIndex((r) => !isZero(r))]} = ${ML(lamText(D.rotA[D.rotB.findIndex((r) => !isZero(r))], D.rotB[D.rotB.findIndex((r) => !isZero(r))]))}`, `${eqs.map((e) => ML(e)).join(' et ')} : λ = ${fq(D.l0)}`),
   });
   if (opts.exam === 'open') {
     // Barème 2022 (6 pts): rot 2 (+1 for the domain, with λ), λ 1… here: rot 3, λ 1, φ 2.
@@ -331,11 +332,11 @@ function plMcq(level, rng, opts) {
   const S = sum(...D.rotB);
   return mcqD({
     skill: PL, level, exam: examTag(opts), key: `${PL}:mcq:${D.Ftext.join('|')}`, fallback: D.fallback,
-    prompt: `Soit F(x, y, z) = ${tupML(D.Ftext)} sur ℝ³. F dérive d'un potentiel si et seulement si :`,
+    prompt: t('Soit F(x, y, z) = {a} sur ℝ³. F dérive d\'un potentiel si et seulement si :', { a: tupML(D.Ftext) }),
     right: `λ = ${fq(l0)}`,
     wrongs: [opt(`λ = ${fq(-l0)}`, 'v_rot_sign'), isZero(S) ? null : opt(`λ = ${fq(l0)} ou ${ML(`${text(S)}=0`)}`, 'v_rot_scalar_sum'), opt(`λ = ${fq(l0 + 1)}`)],
-    fillers: [opt('pour aucune valeur de λ'), opt('pour toute valeur de λ')],
-    solution: [{ html: `rot F = (λ − ${fq(l0)})·${tupML(D.rotB.map((r) => text(r)))} : chaque composante doit être nulle en tout point, donc λ = ${fq(l0)}. ℝ³ est convexe : la condition suffit.`, note: '' }],
+    fillers: [opt(t('pour aucune valeur de λ')), opt(t('pour toute valeur de λ'))],
+    solution: [{ html: t('rot F = (λ − {a})·{b} : chaque composante doit être nulle en tout point, donc λ = {a}. ℝ³ est convexe : la condition suffit.', { a: fq(l0), b: tupML(D.rotB.map((r) => text(r))) }), note: '' }],
   }, rng);
 }
 

@@ -8,6 +8,7 @@
 // Outcome: {correct, rules, ambiguous, ops, answerHtml, explainHtml}
 
 import { h, html, play } from './dom.js';
+import { t, tn } from '../i18n.js';
 import { MathInput } from './keypad.js';
 import { keysForItem } from './keys-needed.js';
 import { figure, shadeFigure, numberLine } from './figures.js';
@@ -52,14 +53,14 @@ export function explainRule(ruleId, diag) {
     if (r.transform) body = r.explain(diag?.ctx ?? {});
     else body = r.op && diag?.A ? r.explain(diag.A, diag.B, diag.op) : r.explain();
   } catch { body = ''; }
-  if (!body) body = `Erreur typique : <b>${r.example[0]}</b> ✗ — juste : ${r.example[1]}. ${FAMILIES[r.family]?.hint ?? ''}`;
-  return `<div class="trap-explain"><div class="trap-tag">🪤 Piège : ${r.name}</div><p>${body}</p></div>`;
+  if (!body) body = `${t('Erreur typique : <b>{wrong}</b> ✗ — juste : {right}.', { wrong: r.example[0], right: r.example[1] })} ${FAMILIES[r.family]?.hint ?? ''}`;
+  return `<div class="trap-explain"><div class="trap-tag">🪤 ${t('Piège : {name}', { name: r.name })}</div><p>${body}</p></div>`;
 }
 
 export function solutionHtml(solution) {
   if (!solution?.length) return '';
   // Always open: the correction is the point of a mistake, not an option.
-  return `<div class="solution"><div class="sol-title">La correction</div>${solution
+  return `<div class="solution"><div class="sol-title">${t('La correction')}</div>${solution
     .map((l) => `<div class="sol-line">${l.html ?? M(l.math)}<span class="sol-note">${l.note || ''}</span></div>`).join('')}</div>`;
 }
 
@@ -157,7 +158,7 @@ MOUNTS.answer = (item, ctx, body) => {
   const input = new MathInput({
     // The item's keypad, and a « + » tab with what the question uses.
     keysets: keysForItem(item),
-    placeholder: 'Ta réponse',
+    placeholder: t('Ta réponse'),
     onChange: (v) => ctx.ready(v.length > 0 || !!steps?.chain.lines.length),
     onEnter: () => ctx.submit(),
   });
@@ -198,7 +199,7 @@ MOUNTS.answer = (item, ctx, body) => {
         input.flash();
         return { stayOpen: true, message: r.message };
       }
-      if (r.kind === 'simplify') return { stayOpen: true, message: 'C\'est juste ! Mais tu peux encore simplifier.' };
+      if (r.kind === 'simplify') return { stayOpen: true, message: t('C\'est juste ! Mais tu peux encore simplifier.') };
       if (r.kind === 'done' && !item.exact) return { correct: true };
       // Wrong: a known trap for this question, or a diagnosed mistake.
       const v = r.value ?? tryEvaluate(parse(value));
@@ -221,15 +222,15 @@ MOUNTS.eqlines = (item, ctx, body) => {
   let last = item.equation;
   const history = h('div.steps-history', h('div.step-line.first', html(algHtml(item.equation))));
   const move = h('div.step-label');
-  const input = new MathInput({ keysets: keysForItem(item, 'algeq'), placeholder: 'écris l\'équation suivante', onEnter: () => submit() });
+  const input = new MathInput({ keysets: keysForItem(item, 'algeq'), placeholder: t('écris l\'équation suivante'), onEnter: () => submit() });
   const row = h('div.step-line.current', h('span.eq', '⇔'), input.display);
   const feedback = h('div.step-feedback');
   let hintLevel = 0;
   const showMove = () => { move.textContent = item.showMoves ? (nextMove(parseAlg(last), x) || '') : ''; };
   const say = (msg, kind = 'info') => { feedback.className = `step-feedback ${kind}`; feedback.innerHTML = msg; };
   const tools = h('div.step-tools',
-    h('button.btn.small.ghost', { type: 'button', onclick: () => input.set(last) }, '⧉ Recopier la ligne'),
-    h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }, '💡 Indice'));
+    h('button.btn.small.ghost', { type: 'button', onclick: () => input.set(last) }, t('⧉ Recopier la ligne')),
+    h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }, t('💡 Indice')));
   body.append(history, move, row, tools, feedback);
   showMove();
   const addLine = (src, cls, note = '') => {
@@ -245,14 +246,14 @@ MOUNTS.eqlines = (item, ctx, body) => {
   const hint = () => {
     const step = solveLines(last, x)[0];
     if (!step) return;
-    if (hintLevel === 0) { hintLevel = 1; say(`<p><b>Indice :</b> ${step.note}</p>`); return; }
+    if (hintLevel === 0) { hintLevel = 1; say(`<p><b>${t('Indice :')}</b> ${step.note}</p>`); return; }
     state.revealed = true;
     hintLevel = 0;
     last = step.math;
     addLine(step.math, 'shown', step.note);
     input.set('');
     showMove();
-    say('<p>Voilà cette étape. À toi pour la suite !</p>');
+    say(t('<p>Voilà cette étape. À toi pour la suite !</p>'));
     if (isolatedValue(parseAlg(last), x)) finish();
   };
   const submit = () => {
@@ -263,7 +264,7 @@ MOUNTS.eqlines = (item, ctx, body) => {
       state.mistakes += 1;
       if (r.rule) state.rules.push(r.rule);
       play('bad');
-      const why = r.rule ? explainRule(r.rule, null) : '<p>Cette équation n\'a plus les mêmes solutions. Fais <b>la même opération des deux côtés</b>.</p>';
+      const why = r.rule ? explainRule(r.rule, null) : t('<p>Cette équation n\'a plus les mêmes solutions. Fais <b>la même opération des deux côtés</b>.</p>');
       say(why, 'bad');
       state.lockedUntil = Date.now() + 2500;
       return;
@@ -280,7 +281,7 @@ MOUNTS.eqlines = (item, ctx, body) => {
   };
   return {
     ownFlow: true,
-    footer: h('div.steps-footer', input.keypad(), h('button.btn.primary.wide', { onclick: submit }, 'Valider la ligne')),
+    footer: h('div.steps-footer', input.keypad(), h('button.btn.primary.wide', { onclick: submit }, t('Valider la ligne'))),
     onKey: (e) => { if (Date.now() >= state.lockedUntil) input.handleKey(e); },
   };
 };
@@ -305,13 +306,16 @@ MOUNTS.fact = (item, ctx, body) => {
     const full = `${item.left}<span class="m"><span class="m-num">${item.expected}</span></span>${item.right}`;
     // The trap is explained with this question's numbers when possible.
     const rule = trap && RULE_BY_ID[trap.rule];
-    const why = rule ? `<div class="trap-explain"><div class="trap-tag">🪤 Piège : ${rule.name}</div><p>${trap.note || rule.explain()}</p></div>` : '';
+    // Some rules explain only with operands (explain(A, B)): without them, the name alone.
+    let text = trap?.note || '';
+    if (rule && !text) { try { text = rule.explain() || ''; } catch { text = ''; } }
+    const why = rule ? `<div class="trap-explain"><div class="trap-tag">🪤 ${t('Piège : {name}', { name: rule.name })}</div>${text ? `<p>${text}</p>` : ''}</div>` : '';
     ctx.complete({
       correct: false,
       rules: trap ? [trap.rule] : [],
       ambiguous: 1,
       answerHtml: `<span class="fact-full">${full}</span>`,
-      explainHtml: `${why}<div class="fact-strategy"><b>💡 Astuce</b><p>${item.strategy}</p></div>`,
+      explainHtml: `${why}<div class="fact-strategy"><b>${t('💡 Astuce')}</b><p>${item.strategy}</p></div>`,
     });
   };
   const input = new MathInput({
@@ -332,15 +336,15 @@ MOUNTS.fact = (item, ctx, body) => {
 MOUNTS.shade = (item, ctx, body) => {
   const fig = shadeFigure(item.figure, (n) => ctx.ready(n > 0));
   body.appendChild(fig.el);
-  body.appendChild(h('p.hint-small', 'Touche les parts pour les colorier.'));
+  body.appendChild(h('p.hint-small', t('Touche les parts pour les colorier.')));
   return {
     check() {
       const n = fig.count();
       fig.el.classList.add('locked');
       if (n === item.target.count) return { correct: true };
       return wrongOutcome(item, {
-        answerHtml: `${item.target.count} parts sur ${item.figure.n}`,
-        extra: `<p>Tu as colorié ${n} part${n > 1 ? 's' : ''} sur ${item.figure.n}.</p>`,
+        answerHtml: tn(item.target.count, '{n} part sur {total}', '{n} parts sur {total}', { total: item.figure.n }),
+        extra: `<p>${tn(n, 'Tu as colorié {n} part sur {total}.', 'Tu as colorié {n} parts sur {total}.', { total: item.figure.n })}</p>`,
       });
     },
   };
@@ -352,7 +356,7 @@ MOUNTS.numberline = (item, ctx, body) => {
   let picked = null;
   const line = numberLine(item.line, { onPick: (v) => { picked = v; play('tap'); ctx.ready(true); } });
   body.appendChild(line.el);
-  body.appendChild(h('p.hint-small', 'Touche la droite pour placer le point.'));
+  body.appendChild(h('p.hint-small', t('Touche la droite pour placer le point.')));
   const target = evaluate(parse(item.target));
   return {
     check() {
@@ -367,7 +371,7 @@ MOUNTS.numberline = (item, ctx, body) => {
       right.el.classList.add('correction');
       return wrongOutcome(item, {
         answerHtml: M(item.target),
-        extra: `<p>Tu as placé ${M(picked.toString())}.</p>${right.el.outerHTML}`,
+        extra: `<p>${t('Tu as placé {x}.', { x: M(picked.toString()) })}</p>${right.el.outerHTML}`,
       });
     },
   };
@@ -378,7 +382,7 @@ MOUNTS.numberline = (item, ctx, body) => {
 MOUNTS.graphpoint = (item, ctx, body) => {
   let picked = null;
   const box = h('div.graph-box.pickable', { html: graphSvg({ ...item.grid, picks: true }) });
-  body.append(box, h('p.hint-small', 'Touche le point sur le quadrillage.'));
+  body.append(box, h('p.hint-small', t('Touche le point sur le quadrillage.')));
   box.querySelectorAll('.g-pick').forEach((c) => c.addEventListener('click', () => {
     box.querySelectorAll('.g-pick.on').forEach((o) => o.classList.remove('on'));
     c.classList.add('on');
@@ -397,7 +401,7 @@ MOUNTS.graphpoint = (item, ctx, body) => {
       return wrongOutcome(item, {
         rules: swapped ? ['graph_xy_swap'] : [],
         answerHtml: `(${show(X)} ; ${show(Y)})`,
-        extra: `<p>Tu as placé (${show(picked[0])} ; ${show(picked[1])}).</p><div class="graph-box">${graphSvg({ ...item.grid, points: [[X, Y, '✓']] })}</div>`,
+        extra: `<p>${t('Tu as placé {x}.', { x: `(${show(picked[0])} ; ${show(picked[1])})` })}</p><div class="graph-box">${graphSvg({ ...item.grid, points: [[X, Y, '✓']] })}</div>`,
       });
     },
   };
@@ -435,7 +439,7 @@ MOUNTS.match = (item, ctx, body) => {
         sel = null;
         if (matched === n) {
           setTimeout(() => ctx.complete(mistakes === 0 ? { correct: true } : wrongOutcome(item, {
-            extra: `<p>${mistakes} erreur${mistakes > 1 ? 's' : ''} d'association.</p>`,
+            extra: `<p>${tn(mistakes, '{n} erreur d\'association.', '{n} erreurs d\'association.')}</p>`,
           })), 350);
         }
       } else {
@@ -555,7 +559,7 @@ MOUNTS.steps = (item, ctx, body) => {
       tries = 0;
       cur.innerHTML = `<span class="eq">=</span><span class="m">${render(node)}</span>`;
       cur.querySelectorAll('.m-blank').forEach((el) => el.addEventListener('click', () => { active = Number(el.dataset.blank); paint(); }));
-      label.textContent = L === 0 ? 'Complète l\'étape.' : '';
+      label.textContent = L === 0 ? t('Complète l\'étape.') : '';
       paint();
     };
     const paint = () => {
@@ -592,9 +596,9 @@ MOUNTS.steps = (item, ctx, body) => {
       // Without a recognised trap, say which operation this step does.
       const opPath = nextOperationPath(prev);
       const sub = opPath ? getAt(prev, opPath) : null;
-      const what = sub ? `Calcule ${sub === prev ? '' : 'd\'abord '}<span class="m">${render(sub)}</span>.` : '';
-      const note = line.label && line.label !== 'On calcule.' ? ` <b>Indice :</b> ${line.label}` : '';
-      noteMistake(diag, `Pas tout à fait. ${what}${note || (what ? '' : ' Regarde bien l\'opération.')}`);
+      const what = sub ? t(sub === prev ? 'Calcule {x}.' : 'Calcule d\'abord {x}.', { x: `<span class="m">${render(sub)}</span>` }) : '';
+      const note = line.label && line.label !== 'On calcule.' && line.label !== t('On calcule.') ? ` <b>${t('Indice :')}</b> ${line.label}` : '';
+      noteMistake(diag, `${t('Pas tout à fait.')} ${what}${note || (what ? '' : ` ${t('Regarde bien l\'opération.')}`)}`);
       cur.querySelectorAll('.m-blank').forEach((el) => {
         const i = Number(el.dataset.blank);
         if (Number(values[i]) !== Number(blanks[i].expect)) el.classList.add('bad');
@@ -609,7 +613,7 @@ MOUNTS.steps = (item, ctx, body) => {
     setup();
     return withFooter({
       ownFlow: true,
-      footer: h('div.steps-footer', pad.keypad(), h('button.btn.primary.wide', { onclick: validate }, 'Valider l\'étape')),
+      footer: h('div.steps-footer', pad.keypad(), h('button.btn.primary.wide', { onclick: validate }, t('Valider l\'étape'))),
       onKey: (e) => {
         if (/^[0-9]$/.test(e.key) || (e.key === '-' && item.signed)) pad.press(e.key);
         else if (e.key === 'Backspace') pad.press('back');
@@ -629,8 +633,8 @@ MOUNTS.steps = (item, ctx, body) => {
     const ask = h('div.tap-ask');
     // Earlier states go in the history; the tappable line is the current one.
     history.firstChild.remove();
-    body.append(h('p.hint-small', 'Touche l\'opération à calculer en premier.'), exprBox, ask, feedback);
-    const input = new MathInput({ keys: item.tapKeys || 'frac', placeholder: 'résultat', onEnter: () => submit() });
+    body.append(h('p.hint-small', t('Touche l\'opération à calculer en premier.')), exprBox, ask, feedback);
+    const input = new MathInput({ keys: item.tapKeys || 'frac', placeholder: t('résultat'), onEnter: () => submit() });
     const paint = () => {
       exprBox.innerHTML = `<span class="m">${render(cur, { tap: !pending })}</span>`;
       exprBox.dataset.expr = print(cur);
@@ -663,9 +667,9 @@ MOUNTS.steps = (item, ctx, body) => {
       if (pending === 'simplify') {
         const r = judgeAnswer(evaluate(cur), input.value, { form: 'irreducible' });
         if (r.kind === 'done') { play('good'); pushPast(); cur = r.node; ask.innerHTML = ''; paint(); finish(); return; }
-        if (r.kind === 'simplify') { say('<p>C\'est mieux, mais on peut encore simplifier.</p>'); pushPast(); cur = r.node; paint(); input.set(''); return; }
+        if (r.kind === 'simplify') { say(t('<p>C\'est mieux, mais on peut encore simplifier.</p>')); pushPast(); cur = r.node; paint(); input.set(''); return; }
         tries++;
-        noteMistake(r.diag, 'Ce n\'est pas égal. Divise le numérateur et le dénominateur par un même nombre.');
+        noteMistake(r.diag, t('Ce n\'est pas égal. Divise le numérateur et le dénominateur par un même nombre.'));
         if (tries >= 2) { state.revealed = true; pushPast(); cur = lit(evaluate(cur)); ask.innerHTML = ''; paint(); finish(); }
         return;
       }
@@ -674,7 +678,7 @@ MOUNTS.steps = (item, ctx, body) => {
       if (r.kind === 'parse' || r.kind === 'unfinished') { input.flash(); say(`<p>${r.message}</p>`); return; }
       if (r.kind === 'wrong') {
         tries++;
-        noteMistake(r.diag, 'Ce n\'est pas le bon résultat. Regarde bien l\'opération.');
+        noteMistake(r.diag, t('Ce n\'est pas le bon résultat. Regarde bien l\'opération.'));
         if (tries < 2) return;
         state.revealed = true;
         apply(lit(evaluate(node)), 'shown');
@@ -701,7 +705,7 @@ MOUNTS.steps = (item, ctx, body) => {
           pending = 'simplify';
           tries = 0;
           input.set('');
-          ask.append(h('div.tap-sub', h('span', 'Simplifie :'), html(`<span class="m">${render(cur)}</span>`), h('span.eq', '='), input.display));
+          ask.append(h('div.tap-sub', h('span', t('Simplifie :')), html(`<span class="m">${render(cur)}</span>`), h('span.eq', '='), input.display));
           return paint();
         }
         paint();
@@ -713,7 +717,7 @@ MOUNTS.steps = (item, ctx, body) => {
     paint();
     return withFooter({
       ownFlow: true,
-      footer: h('div.steps-footer', input.keypad(), h('button.btn.primary.wide', { onclick: submit }, 'Valider')),
+      footer: h('div.steps-footer', input.keypad(), h('button.btn.primary.wide', { onclick: submit }, t('Valider'))),
       onKey: (e) => input.handleKey(e),
     });
   }
@@ -723,24 +727,24 @@ MOUNTS.steps = (item, ctx, body) => {
     let last = start;
     let wrongHere = 0;
     let hintLevel = 0;
-    const input = new MathInput({ keysets: keysForItem(item, item.keys || 'ops'), placeholder: 'écris la ligne suivante', onEnter: () => submit() });
+    const input = new MathInput({ keysets: keysForItem(item, item.keys || 'ops'), placeholder: t('écris la ligne suivante'), onEnter: () => submit() });
     const row = h('div.step-line.current', h('span.eq', '='), input.display);
     const tools = h('div.step-tools',
-      h('button.btn.small.ghost', { type: 'button', onclick: () => { input.set(print(last)); } }, '⧉ Recopier la ligne'),
-      h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }, '💡 Indice'));
+      h('button.btn.small.ghost', { type: 'button', onclick: () => { input.set(print(last)); } }, t('⧉ Recopier la ligne')),
+      h('button.btn.small.ghost', { type: 'button', onclick: () => hint() }, t('💡 Indice')));
     body.append(row, tools, feedback);
     const hint = () => {
       const step = nextStep(last);
       if (!step) return;
       if (hintLevel === 0) {
         hintLevel = 1;
-        say(`<p><b>Indice :</b> ${step.label}</p>`);
+        say(`<p><b>${t('Indice :')}</b> ${step.label}</p>`);
       } else {
         state.revealed = true;
         hintLevel = 0;
         last = step.node;
         addLine(step.node, 'shown', step.label);
-        say('<p>Voilà cette étape. À toi pour la suite !</p>');
+        say(t('<p>Voilà cette étape. À toi pour la suite !</p>'));
         input.set('');
         if (isLiteral(last) && (!item.requireIrreducible || isIrreducible(last))) finish();
       }
@@ -749,11 +753,11 @@ MOUNTS.steps = (item, ctx, body) => {
       if (!input.value) return;
       const r = judgeLine(last, input.value, { requireIrreducible: item.requireIrreducible });
       if (r.kind === 'parse') { input.flash(); say(`<p>${r.message}</p>`); return; }
-      if (r.kind === 'same') { say('<p>Cette ligne est la même que la précédente : fais au moins un calcul.</p>'); return; }
+      if (r.kind === 'same') { say(t('<p>Cette ligne est la même que la précédente : fais au moins un calcul.</p>')); return; }
       if (r.kind === 'wrong') {
         wrongHere++;
-        noteMistake(r.diag, 'Cette ligne n\'est plus égale à la précédente. Vérifie ton calcul.');
-        if (wrongHere >= 2) feedback.insertAdjacentHTML('beforeend', '<p class="muted">Tu peux demander un indice.</p>');
+        noteMistake(r.diag, t('Cette ligne n\'est plus égale à la précédente. Vérifie ton calcul.'));
+        if (wrongHere >= 2) feedback.insertAdjacentHTML('beforeend', t('<p class="muted">Tu peux demander un indice.</p>'));
         return;
       }
       play('good');
@@ -763,14 +767,14 @@ MOUNTS.steps = (item, ctx, body) => {
       hintLevel = 0;
       addLine(r.node, 'ok');
       input.set('');
-      if (r.kind === 'simplify') { say('<p>C\'est juste ! Simplifie encore pour finir.</p>', 'good'); return; }
+      if (r.kind === 'simplify') { say(t('<p>C\'est juste ! Simplifie encore pour finir.</p>'), 'good'); return; }
       feedback.innerHTML = '';
       feedback.className = 'step-feedback';
       if (r.kind === 'done') finish();
     };
     return withFooter({
       ownFlow: true,
-      footer: h('div.steps-footer', input.keypad(), h('button.btn.primary.wide', { onclick: submit }, 'Valider la ligne')),
+      footer: h('div.steps-footer', input.keypad(), h('button.btn.primary.wide', { onclick: submit }, t('Valider la ligne'))),
       onKey: (e) => input.handleKey(e),
     });
   }

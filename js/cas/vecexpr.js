@@ -25,6 +25,7 @@ import { exactValue } from './normal.js';
 import { evalFloat } from './numeric.js';
 import { simp, sameScalar } from './matexpr.js';
 import { Q } from '../math/rational.js';
+import { t as tr } from '../i18n.js';
 
 const fail = (msg, pos = 0) => { throw new ParseError(msg, pos); };
 
@@ -98,7 +99,7 @@ class VP {
           base = { op: 'pow', e: base, kNode: parse(inner) };
         } else {
           const m = /^-?\d+/.exec(this.rest());
-          if (!m) fail('Exposant illisible.', this.i);
+          if (!m) fail(tr('Exposant illisible.'), this.i);
           this.i += m[0].length;
           base = { op: 'pow', e: base, k: Number(m[0]) };
         }
@@ -121,13 +122,13 @@ class VP {
         depth--;
       }
     }
-    fail(`Il manque « ${close} ».`, start);
+    fail(tr('Il manque « {c} ».', { c: close }), start);
     return '';
   }
 
   atom() {
     const c = this.peek();
-    if (c === undefined) fail('La ligne s\'arrête trop tôt.', this.i);
+    if (c === undefined) fail(tr('La ligne s\'arrête trop tôt.'), this.i);
     const start = this.i;
     if (/[0-9]/.test(c)) {
       const m = /^\d+([.,]\d+)?/.exec(this.rest());
@@ -151,7 +152,7 @@ class VP {
     if (c === '‖') {
       this.i++;
       const end = this.s.indexOf('‖', this.i);
-      if (end < 0) fail('Ferme la norme avec ‖.', start);
+      if (end < 0) fail(tr('Ferme la norme avec ‖.'), start);
       const inner = this.s.slice(this.i, end);
       this.i = end + 1;
       return { op: 'norm', e: subParse(inner, this.opts) };
@@ -159,7 +160,7 @@ class VP {
     if (c === '|') {
       this.i++;
       const end = this.s.indexOf('|', this.i);
-      if (end < 0) fail('Ferme la valeur absolue avec |.', start);
+      if (end < 0) fail(tr('Ferme la valeur absolue avec |.'), start);
       const inner = this.s.slice(this.i, end);
       this.i = end + 1;
       return { op: 'abs', e: subParse(inner, this.opts) };
@@ -187,11 +188,11 @@ class VP {
       this.i += 4;
       const inner = this.group(')');
       const [a, b] = inner.split(',').map((x) => x.trim());
-      if (!a || !b) fail('Écris vec(A, B).', start);
+      if (!a || !b) fail(tr('Écris vec(A, B).'), start);
       return { op: 'vecAB', a: this.nameOf(a), b: this.nameOf(b) };
     }
     const m = /^([A-Za-zΩα-ω])('*)(_\d+|_[a-z])?/.exec(rest);
-    if (!m) fail(`Je ne sais pas lire « ${c} » ici.`, this.i);
+    if (!m) fail(tr('Je ne sais pas lire « {c} » ici.', { c }), this.i);
     this.i += m[0].length;
     const name = m[0];
     // Two point names side by side: the vector AB.
@@ -208,7 +209,7 @@ class VP {
 
   nameOf(t) {
     const n = normVecText(t);
-    if (!(this.opts.names || {})[n]) fail(`Je ne connais pas le point ${n.replace(/_(\d+)/, '$1')}.`);
+    if (!(this.opts.names || {})[n]) fail(tr('Je ne connais pas le point {name}.', { name: n.replace(/_(\d+)/, '$1') }));
     return n;
   }
 }
@@ -233,13 +234,13 @@ export function splitTop(text, seps) {
 function subParse(text, opts) {
   const p = new VP(text, opts);
   const e = p.sum();
-  if (p.peek() !== undefined) fail(`Je n'arrive pas à lire « ${p.rest()} ».`);
+  if (p.peek() !== undefined) fail(tr('Je n\'arrive pas à lire « {c} ».', { c: p.rest() }));
   return e;
 }
 
 export function parseVec(text, opts = {}) {
   const t = normVecText(text);
-  if (!t) fail('La ligne est vide.');
+  if (!t) fail(tr('La ligne est vide.'));
   return subParse(t, opts);
 }
 
@@ -264,10 +265,10 @@ export function evalVec(ast, env = {}, opts = {}) {
     case 'tuple': {
       const items = ast.items.map((x) => {
         const v = E(x);
-        if (isV(v)) fail('Une composante doit être un nombre.');
+        if (isV(v)) fail(tr('Une composante doit être un nombre.'));
         return simp(v.n);
       });
-      if (items.length > 3) fail('Au plus trois composantes.');
+      if (items.length > 3) fail(tr('Au plus trois composantes.'));
       return V(items);
     }
     case 'name': {
@@ -275,13 +276,13 @@ export function evalVec(ast, env = {}, opts = {}) {
       const base = ast.name.split('_')[0];
       if ((opts.params || []).includes(ast.name) || (opts.params || []).includes(base)) return S(sym(base, ast.name.includes('_') ? ast.name.split('_')[1] : undefined));
       if (ast.name === 'e' && opts.euler) return S({ t: 'const', name: 'e' });
-      fail(`Je ne connais pas ${ast.name.replace(/_(\w+)/, '$1')} ici.`);
+      fail(tr('Je ne connais pas {name} ici.', { name: ast.name.replace(/_(\w+)/, '$1') }));
       break;
     }
     case 'vecAB': {
       const a = env[ast.a];
       const b = env[ast.b];
-      if (!a || !b || !isV(a) || !isV(b)) fail(`Je ne connais pas les points ${ast.a} et ${ast.b}.`);
+      if (!a || !b || !isV(a) || !isV(b)) fail(tr('Je ne connais pas les points {a} et {b}.', { a: ast.a, b: ast.b }));
       return V(b.items.map((x, i) => simp(sub(x, a.items[i]))));
     }
     case 'neg': { const v = E(ast.e); return isV(v) ? V(v.items.map((x) => simp(neg(x)))) : S(neg(v.n)); }
@@ -289,9 +290,9 @@ export function evalVec(ast, env = {}, opts = {}) {
       const a = E(ast.a);
       const b = E(ast.b);
       const f = ast.op === 'add' ? add : sub;
-      if (isV(a) !== isV(b)) fail('On n\'additionne pas un nombre et un vecteur.');
+      if (isV(a) !== isV(b)) fail(tr('On n\'additionne pas un nombre et un vecteur.'));
       if (!isV(a)) return S(f(a.n, b.n));
-      if (a.items.length !== b.items.length) fail('Ces vecteurs n\'ont pas le même nombre de composantes.');
+      if (a.items.length !== b.items.length) fail(tr('Ces vecteurs n\'ont pas le même nombre de composantes.'));
       return V(a.items.map((x, i) => simp(f(x, b.items[i]))));
     }
     case 'mul': {
@@ -300,27 +301,27 @@ export function evalVec(ast, env = {}, opts = {}) {
       if (!isV(a) && !isV(b)) return S(mul(a.n, b.n));
       if (!isV(a)) return V(b.items.map((x) => simp(mul(a.n, x))));
       if (!isV(b)) return V(a.items.map((x) => simp(mul(x, b.n))));
-      if (a.items.length !== b.items.length) fail('Ces vecteurs n\'ont pas le même nombre de composantes.');
+      if (a.items.length !== b.items.length) fail(tr('Ces vecteurs n\'ont pas le même nombre de composantes.'));
       if (ast.how === '·') return S(dot(a, b));
       if (ast.how === '∧' || ast.how === '×') {
-        if (a.items.length !== 3) fail('Le produit vectoriel se calcule dans l\'espace (3 composantes).');
+        if (a.items.length !== 3) fail(tr('Le produit vectoriel se calcule dans l\'espace (3 composantes).'));
         return cross(a, b);
       }
-      fail('Entre deux vecteurs, écris · (produit scalaire) ou ∧ (produit vectoriel).');
+      fail(tr('Entre deux vecteurs, écris · (produit scalaire) ou ∧ (produit vectoriel).'));
       break;
     }
     case 'div': {
       const a = E(ast.a);
       const b = E(ast.b);
-      if (isV(b)) fail('On ne divise pas par un vecteur.');
-      if (sameScalar(b.n, num(0), { vars: opts.params })) fail('Division par zéro.');
+      if (isV(b)) fail(tr('On ne divise pas par un vecteur.'));
+      if (sameScalar(b.n, num(0), { vars: opts.params })) fail(tr('Division par zéro.'));
       return isV(a) ? V(a.items.map((x) => simp(div(x, b.n)))) : S(div(a.n, b.n));
     }
     case 'pow': {
       const v = E(ast.e);
       if (isV(v)) {
         if (ast.k === 2) return S(dot(v, v));
-        fail('Un vecteur n\'a pas de puissance (sauf u² = u·u).');
+        fail(tr('Un vecteur n\'a pas de puissance (sauf u² = u·u).'));
       }
       return S(pow(v.n, ast.kNode ?? num(ast.k)));
     }
@@ -336,15 +337,15 @@ export function evalVec(ast, env = {}, opts = {}) {
     }
     case 'sqrt': {
       const v = E(ast.e);
-      if (isV(v)) fail('√ s\'applique à un nombre.');
+      if (isV(v)) fail(tr('√ s\'applique à un nombre.'));
       return S(sqrtNode(v.n));
     }
     case 'fn': {
       const v = E(ast.e);
-      if (isV(v)) fail(`${ast.name} s'applique à un nombre.`);
+      if (isV(v)) fail(tr('{name} s\'applique à un nombre.', { name: ast.name }));
       return S(ast.name === 'sqrt' ? sqrtNode(v.n) : fn(ast.name, v.n));
     }
-    default: fail('Expression illisible.');
+    default: fail(tr('Expression illisible.'));
   }
   return null;
 }

@@ -17,6 +17,7 @@ import { parse, evaluate, print, renderText, render, walk } from '../math/expr.j
 import { solve } from '../math/solver.js';
 import { wrongAnswers } from '../math/diagnose.js';
 import { F } from '../math/malrules.js';
+import { t } from '../i18n.js';
 
 export const mathHtml = (s) => `<span class="m">${renderText(s)}</span>`;
 export const Fh = (n, d) => `<span class="m">${F(n, d)}</span>`;
@@ -50,7 +51,7 @@ export function stepsItem(skill, level, expr, { mode = 'free', irreducible = tru
   const signed = hasMinus(tree) || solution.some((l) => hasMinus(l.node));
   return {
     skill, level, type: 'steps',
-    prompt: prompt ?? (irreducible ? 'Calcule et donne le résultat sous forme irréductible.' : 'Calcule.'),
+    prompt: prompt ?? (irreducible ? t('Calcule et donne le résultat sous forme irréductible.') : t('Calcule.')),
     expr, mode, requireIrreducible: irreducible,
     signed,
     keys: hasPowerOrRoot(tree) ? 'opsx' : 'ops',
@@ -127,7 +128,7 @@ export function computeMcq(skill, level, expr, rng, opts = {}) {
   }
   if (opts.signed && right.n !== 0) add(right.neg());
   for (let k = 1; options.length < 4 && k < 10; k++) add(new Q(right.n + k, right.d));
-  return mcqItem(skill, level, opts.prompt || `Combien vaut ${mathHtml(expr)} ?`, options, rng, {
+  return mcqItem(skill, level, opts.prompt || t('Combien vaut {e} ?', { e: mathHtml(expr) }), options, rng, {
     solution: solutionOf(expr, opts.solveOpts), expectedSec: 15, key: expr,
   });
 }

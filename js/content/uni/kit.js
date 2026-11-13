@@ -10,6 +10,7 @@ import { trapAnswers } from '../../judges/diagnose.js';
 import { readWith, showWith, signOf } from '../../judges/index.js';
 import { segmentsOf } from '../../judges/lines.js';
 import { mcqItem } from '../items.js';
+import { t } from '../../i18n.js';
 
 export const MM = (node, display = false) => toMathML(node, { display: display ? 'block' : 'inline' });
 export const MT = (text, opts = {}, display = false) => MM(parse(text, opts), display);
@@ -23,7 +24,7 @@ function linesSolution(item) {
   const out = [];
   segmentsOf(item).forEach((seg, k) => {
     if (k > 0 && seg.html) out.push({ html: `<b>${seg.html}</b>`, note: '' });
-    out.push({ html: showWith(seg.judge, readWith(seg.judge, seg.start.math)), note: k === 0 ? 'Départ' : '' });
+    out.push({ html: showWith(seg.judge, readWith(seg.judge, seg.start.math)), note: k === 0 ? t('Départ') : '' });
     for (const l of seg.lines) {
       if (l.kind === 'eq') out.push({ html: `<span class="eq">${signOf(seg.judge)}</span> ${showWith(seg.judge, readWith(seg.judge, l.math))}`, note: l.note || '' });
       if (l.kind === 'note') out.push({ html: l.html, note: '' });
@@ -59,7 +60,7 @@ export function linesItem(o) {
   // Baits: the traps that replay on the first line, and the traps named by
   // the decision options.
   const decided = o.script.filter((l) => l.kind === 'decision').flatMap((l) => l.options.map((x) => x.rule)).filter(Boolean);
-  item.baits = o.baits || [...new Set([...trapAnswers(o.judge.kind, startNode, o.judge).map((t) => t.rule), ...decided])];
+  item.baits = o.baits || [...new Set([...trapAnswers(o.judge.kind, startNode, o.judge).map((x) => x.rule), ...decided])];
   item.solution = o.solution || linesSolution(item);
   item.answerHtml = o.answerHtml || item.solution[item.solution.length - 1]?.html.replace(/^<span class="eq">[^<]*<\/span> /, '');
   return item;
@@ -79,7 +80,7 @@ export function mcq(o, rng) {
 export function tfItem(o) {
   return {
     skill: o.skill, level: o.level, type: 'tf',
-    prompt: o.prompt || (o.decided ? 'Cet énoncé est faux. Donne un contre-exemple.' : 'Vrai ou faux ?'),
+    prompt: o.prompt || (o.decided ? t('Cet énoncé est faux. Donne un contre-exemple.') : t('Vrai ou faux ?')),
     statement: o.statement,
     truth: o.truth,
     decided: !!o.decided,
@@ -163,7 +164,7 @@ export function answerItem(o) {
   return {
     skill: o.skill, level: o.level, type: 'answer', prompt: o.prompt,
     expected: String(o.expected), form: 'any', keys: 'relfrac', traps: o.traps || [],
-    solution: o.solution || [], baits: [...new Set((o.traps || []).map((t) => t.rule))],
+    solution: o.solution || [], baits: [...new Set((o.traps || []).map((x) => x.rule))],
     key: `${o.skill}:coef:${o.key}`, expectedSec: o.expectedSec || 90,
     exam: o.exam || false, fallback: !!o.fallback,
   };

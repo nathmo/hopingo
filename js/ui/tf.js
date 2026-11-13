@@ -4,6 +4,7 @@
 // letters of a formula.
 
 import { h, html, play } from './dom.js';
+import { t as tr } from '../i18n.js';
 import { MathInput } from './keypad.js';
 import { keysFor } from './keys-needed.js';
 import { explainRule, solutionHtml } from './exercises.js';
@@ -28,14 +29,14 @@ export function mountTf(item, ctx, body) {
     if (correct) { ctx.complete({ correct: true, ...common }); return; }
     ctx.complete({
       correct: false, rules: rule ? [rule] : [], ambiguous: 1, ...common,
-      answerHtml: item.truth ? 'Vrai' : 'Faux',
+      answerHtml: item.truth ? tr('Vrai') : tr('Faux'),
       explainHtml: [rule ? explainRule(rule) : '', solutionHtml(item.solution)].join(''),
     });
   };
 
   function chooseTask() {
     const list = h('div.choices.tf-choices');
-    for (const [label, value] of [['Vrai', true], ['Faux', false]]) {
+    for (const [label, value] of [[tr('Vrai'), true], [tr('Faux'), false]]) {
       list.appendChild(h('button.choice', { type: 'button', onclick: () => choose(value) }, label));
     }
     stage.replaceChildren(list);
@@ -63,7 +64,7 @@ export function mountTf(item, ctx, body) {
             answers[l] = t === 'V';
             e.target.parentElement.querySelectorAll('button').forEach((b) => b.classList.toggle('selected', b === e.target));
           },
-        }, t));
+        }, t === 'V' ? tr('V') : tr('F')));
         rows.push(h('div.tf-counter-row', h('span.tf-label', `${l} :`), h('div.row', btns)));
       }
     } else if (usesGrid(c)) {
@@ -93,9 +94,9 @@ export function mountTf(item, ctx, body) {
       };
       footer.replaceChildren(inputs[0].input.keypad());
     }
-    const validate = h('button.btn.primary.wide', { type: 'button', onclick: () => (c.kind === 'truth' ? check() : onEnter()) }, 'Valider le contre-exemple');
+    const validate = h('button.btn.primary.wide', { type: 'button', onclick: () => (c.kind === 'truth' ? check() : onEnter()) }, tr('Valider le contre-exemple'));
     footer.append(validate);
-    stage.replaceChildren(h('div.step-label', item.decided ? 'Donne un contre-exemple.' : 'Faux, oui. Donne un contre-exemple :'), ...rows);
+    stage.replaceChildren(h('div.step-label', item.decided ? tr('Donne un contre-exemple.') : tr('Faux, oui. Donne un contre-exemple :')), ...rows);
     function check() {
       const r = checkCounter(c, answers);
       if (r.ok) { play('good'); finish(mistakes === 0); return; }

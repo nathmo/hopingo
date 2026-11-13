@@ -11,6 +11,7 @@
 // of steps for a precision 10⁻ᵏ; L5: the table alone, then the contracting
 // g among three (multiple choice). Exam: mcq (number of steps), tf.
 
+import { t } from '../../i18n.js';
 import { Q } from '../../math/rational.js';
 import { parse } from '../../cas/parse.js';
 import { exactValue } from '../../cas/normal.js';
@@ -21,9 +22,9 @@ import { H, E, SEG, fr, dec, uniqOptions, examMcq, tfTag } from './analyse1-k-ki
 
 const BIS = 'a1-bisection-fixpoint';
 const BIS_SUB = [
-  { id: 'ivt', label: 'TVI sur chaque moitié', skill: 'a1-fn-ivt' },
-  { id: 'steps', label: 'étapes de bissection', skill: BIS },
-  { id: 'contract', label: 'g contractante', skill: 'a1-mvt' },
+  { id: 'ivt', label: t('TVI sur chaque moitié'), skill: 'a1-fn-ivt' },
+  { id: 'steps', label: t('étapes de bissection'), skill: BIS },
+  { id: 'contract', label: t('g contractante'), skill: 'a1-mvt' },
 ];
 
 const at = (node, x) => exactValue(mapNode(node, (n) => (n.t === 'sym' && n.name === 'x' && !n.sub ? { t: 'paren', e: lit(x) } : n)));
@@ -82,7 +83,7 @@ function bisTable(d, level) {
       return k === 0 && j <= 1;
     };
     return {
-      row: { id: `r${k + 1}`, label: `${k + 1}`, cells: texts.map((t, j) => (given(j) ? { given: shows[j].replace('≈ ', '') } : { input: true })) },
+      row: { id: `r${k + 1}`, label: `${k + 1}`, cells: texts.map((x, j) => (given(j) ? { given: shows[j].replace('≈ ', '') } : { input: true })) },
       answers: texts,
     };
   });
@@ -137,32 +138,35 @@ function bisTableItem(level, rng, opts = {}) {
     const k = rng.int(2, 4);
     const n = stepsFor(1, k);
     then = answerItem({
-      skill: BIS, level, prompt: `Après n étapes, l'erreur est au plus (b − a)/2ⁿ = 1/2ⁿ. Combien d'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻${'⁰¹²³⁴⁵'[k]} ? n =`,
+      skill: BIS, level, prompt: t('Après n étapes, l\'erreur est au plus (b − a)/2ⁿ = 1/2ⁿ. Combien d\'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻{k} ? n =', { k: '⁰¹²³⁴⁵'[k] }),
       expected: n, traps: [{ value: String(k), rule: 'a1_bisection_count' }], key: `n:${k}`,
-      solution: [{ html: `1/2ⁿ ≤ 10⁻${'⁰¹²³⁴⁵'[k]} ⇔ 2ⁿ ≥ ${10 ** k} : 2^${n - 1} = ${2 ** (n - 1)} < ${10 ** k} ≤ 2^${n} = ${2 ** n}, donc n = ${n}.`, note: '' }],
+      solution: [{ html: t('{s}, donc n = {n}.', { s: `1/2ⁿ ≤ 10⁻${'⁰¹²³⁴⁵'[k]} ⇔ 2ⁿ ≥ ${10 ** k} : 2^${n - 1} = ${2 ** (n - 1)} < ${10 ** k} ≤ 2^${n} = ${2 ** n}`, n }), note: '' }],
     });
     baits = ['a1_bisection_count'];
   }
   if (level === 5) {
     const options = gs.map((g) => ({ html: `g(x) = ${MT(g.g)}`, correct: g.into && g.K < 0.9 }));
     then = mcq({
-      skill: BIS, level, prompt: `Pour approcher la racine par xₙ₊₁ = g(xₙ), quelle fonction g est contractante sur ${I} (g(${I}) ⊂ ${I} et |g′| < 1) ?`,
+      skill: BIS, level, prompt: t('Pour approcher la racine par xₙ₊₁ = g(xₙ), quelle fonction g est contractante sur {I} (g({I}) ⊂ {I} et |g′| < 1) ?', { I }),
       options, key: `${BIS}:g:${d.f}`,
-      solution: [{ html: gs.map((g) => `${MT(g.g)} : max |g′| ≈ ${fr(g.K.toFixed(2).replace('.', ','))}${g.into ? '' : ', et g ne garde pas ' + I}`).join(' ; '), note: '' }],
+      solution: [{ html: gs.map((g) => `${MT(g.g)} : max |g′| ≈ ${fr(g.K.toFixed(2).replace('.', ','))}${g.into ? '' : t(', et g ne garde pas {I}', { I })}`).join(' ; '), note: '' }],
     }, rng);
     then.noHints = true;
   }
   const r1 = d.rows[0];
-  const prompt = `Bissection pour f(x) = ${MT(d.f)} sur ${I} : f(${d.lo}) = ${fr(String(fa))} &lt; 0 et f(${d.hi}) = ${fr(String(fb))} &gt; 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe${level <= 2 ? ' (f(m) est donné)' : ''}. Arrondis f(m) à 10⁻⁴.`;
+  const pv = { f: MT(d.f), I, lo: d.lo, hi: d.hi, fa: fr(String(fa)), fb: fr(String(fb)) };
+  const prompt = level <= 2
+    ? t('Bissection pour f(x) = {f} sur {I} : f({lo}) = {fa} &lt; 0 et f({hi}) = {fb} &gt; 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe (f(m) est donné). Arrondis f(m) à 10⁻⁴.', pv)
+    : t('Bissection pour f(x) = {f} sur {I} : f({lo}) = {fa} &lt; 0 et f({hi}) = {fb} &gt; 0. Remplis le tableau : à chaque ligne, garde la moitié où f change de signe. Arrondis f(m) à 10⁻⁴.', pv);
   const solution = d.rows.map((r, k) => {
     const next = d.rows[k + 1] || d.next;
-    const kept = next ? `on garde [${D(next.a).show} ; ${D(next.b).show}]` : '';
-    return { html: `m = ${D(r.m).show}, f(m) ${fmText(r.fm).approx ? '≈' : '='} ${fmText(r.fm).show} ${r.fm.n < 0 ? '&lt; 0' : '&gt; 0'}${kept ? ` : ${kept}` : ''}`, note: `Étape ${k + 1}` };
+    const kept = next ? t('on garde [{a} ; {b}]', { a: D(next.a).show, b: D(next.b).show }) : '';
+    return { html: `m = ${D(r.m).show}, f(m) ${fmText(r.fm).approx ? '≈' : '='} ${fmText(r.fm).show} ${r.fm.n < 0 ? '&lt; 0' : '&gt; 0'}${kept ? ` : ${kept}` : ''}`, note: t('Étape {k}', { k: k + 1 }) };
   });
   return tableItem({
     skill: BIS, level, prompt, table, phi: { kind: 'bisection', f: d.f, a0: String(d.lo), b0: String(d.hi) }, answers, then, baits,
-    hints: H('Garde la moitié où f change de signe : si f(m) a le signe de f(a), on garde [m ; b], sinon [a ; m].',
-      `f(${D(r1.m).show}) ${r1.fm.n < 0 ? '&lt; 0' : '&gt; 0'} et f(${r1.fm.n < 0 ? d.hi : d.lo}) ${r1.fm.n < 0 ? '&gt; 0' : '&lt; 0'} : on garde [▢ ; ▢].`,
+    hints: H(t('Garde la moitié où f change de signe : si f(m) a le signe de f(a), on garde [m ; b], sinon [a ; m].'),
+      t('f({m}) {s1} et f({e}) {s2} : on garde [▢ ; ▢].', { m: D(r1.m).show, s1: r1.fm.n < 0 ? '&lt; 0' : '&gt; 0', e: r1.fm.n < 0 ? d.hi : d.lo, s2: r1.fm.n < 0 ? '&gt; 0' : '&lt; 0' }),
       solution.map((s) => s.html).join('<br>')),
     noHints: level === 5 || !!opts.exam, subgoals: BIS_SUB, solution,
     key: `${level}:${d.f}:${d.lo}`, exam: examTag(opts), fallback: !!d.fallback,
@@ -185,11 +189,11 @@ function bisTap(level, rng, opts = {}) {
     const L = `[${show(r.a)} ; ${show(r.m)}]`;
     const Rr = `[${show(r.m)} ; ${show(r.b)}]`;
     return {
-      kind: 'decision', prompt: `f(${show(r.m)}) ${fmText(r.fm).approx ? '≈' : '='} ${fmText(r.fm).show} : quelle moitié gardes-tu ?`,
+      kind: 'decision', prompt: t('{s} : quelle moitié gardes-tu ?', { s: `f(${show(r.m)}) ${fmText(r.fm).approx ? '≈' : '='} ${fmText(r.fm).show}` }),
       options: [
-        { id: 'left', label: `Garder ${L}`, valid: k === 'left', why: `f(${show(r.m)}) a le signe de f(${show(r.a)}) : f ne change pas de signe sur ${L}.` },
-        { id: 'right', label: `Garder ${Rr}`, valid: k === 'right', why: `f(${show(r.m)}) a le signe de f(${show(r.b)}) : f ne change pas de signe sur ${Rr}.` },
-        { id: 'stop', label: 'Arrêter', valid: false, why: last ? 'Garde d\'abord la bonne moitié.' : `L'intervalle mesure encore ${show(r.b.sub(r.a))} : la précision ${show(eps)} n'est pas atteinte.` },
+        { id: 'left', label: t('Garder {I}', { I: L }), valid: k === 'left', why: t('f({m}) a le signe de f({a}) : f ne change pas de signe sur {I}.', { m: show(r.m), a: show(r.a), I: L }) },
+        { id: 'right', label: t('Garder {I}', { I: Rr }), valid: k === 'right', why: t('f({m}) a le signe de f({a}) : f ne change pas de signe sur {I}.', { m: show(r.m), a: show(r.b), I: Rr }) },
+        { id: 'stop', label: t('Arrêter'), valid: false, why: last ? t('Garde d\'abord la bonne moitié.') : t('L\'intervalle mesure encore {w} : la précision {e} n\'est pas atteinte.', { w: show(r.b.sub(r.a)), e: show(eps) }) },
       ],
     };
   };
@@ -197,20 +201,20 @@ function bisTap(level, rng, opts = {}) {
   const next = d.rows[3];
   const script = [E(D(mid(0)).text, `m₁ = (${d.lo} + ${d.hi})/2`, 'steps')];
   for (let k = 1; k < 3; k++) {
-    script.push(SEG(`Étape ${k + 1}`, `m${'₁₂₃₄'[k]} =`, `m_${k + 1}`, { kind: 'value', expect: D(mid(k)).text, form: 'any' }), decision(rows[k - 1], false), E(D(mid(k)).text, 'Milieu de la moitié gardée', 'steps'));
+    script.push(SEG(t('Étape {k}', { k: k + 1 }), `m${'₁₂₃₄'[k]} =`, `m_${k + 1}`, { kind: 'value', expect: D(mid(k)).text, form: 'any' }), decision(rows[k - 1], false), E(D(mid(k)).text, t('Milieu de la moitié gardée'), 'steps'));
   }
-  script.push(SEG('Fin', 'c ≈', 'c', { kind: 'value', expect: D(next.m).text, form: 'any' }), decision(rows[2], true),
-    { kind: 'decision', prompt: `La moitié gardée mesure ${show(next.b.sub(next.a))}. Continuer ou arrêter ?`, options: [
-      { id: 'stop', label: `Arrêter : son milieu approche la racine à ${show(eps.div(new Q(2)))} près`, valid: true },
-      { id: 'go', label: 'Continuer', valid: false, why: `La précision demandée (${show(eps)}) est atteinte : la racine est à moins de ${show(eps.div(new Q(2)))} du milieu.` },
+  script.push(SEG(t('Fin'), 'c ≈', 'c', { kind: 'value', expect: D(next.m).text, form: 'any' }), decision(rows[2], true),
+    { kind: 'decision', prompt: t('La moitié gardée mesure {w}. Continuer ou arrêter ?', { w: show(next.b.sub(next.a)) }), options: [
+      { id: 'stop', label: t('Arrêter : son milieu approche la racine à {e} près', { e: show(eps.div(new Q(2))) }), valid: true },
+      { id: 'go', label: t('Continuer'), valid: false, why: t('La précision demandée ({e}) est atteinte : la racine est à moins de {h} du milieu.', { e: show(eps), h: show(eps.div(new Q(2))) }) },
     ] },
-    E(D(next.m).text, `Milieu de [${show(next.a)} ; ${show(next.b)}]`, 'steps'));
+    E(D(next.m).text, t('Milieu de [{a} ; {b}]', { a: show(next.a), b: show(next.b) }), 'steps'));
   return linesItem({
     skill: BIS, level, mode: 'tap', start: 'm_1', judge: { kind: 'value', expect: D(mid(0)).text, form: 'any' }, script,
-    prompt: `Bissection pour f(x) = ${MT(d.f)} sur ${I} : f(${d.lo}) = ${fr(String(fa))} &lt; 0, f(${d.hi}) = ${fr(String(fb))} &gt; 0. Précision voulue : un intervalle de longueur ≤ ${show(eps)}. À chaque étape, choisis la moitié, puis écris son milieu.`,
-    hints: H('Garde la moitié où f change de signe : compare le signe de f(m) à ceux de f(a) et f(b).',
-      `m₂ est le milieu de la moitié gardée : (a + b)/2 = ▢.`,
-      rows.map((r, k) => `m${'₁₂₃'[k]} = ${show(r.m)}`).join(', ') + `, puis c ≈ ${show(next.m)}.`),
+    prompt: t('Bissection pour f(x) = {f} sur {I} : f({lo}) = {fa} &lt; 0, f({hi}) = {fb} &gt; 0. Précision voulue : un intervalle de longueur ≤ {e}. À chaque étape, choisis la moitié, puis écris son milieu.', { f: MT(d.f), I, lo: d.lo, hi: d.hi, fa: fr(String(fa)), fb: fr(String(fb)), e: show(eps) }),
+    hints: H(t('Garde la moitié où f change de signe : compare le signe de f(m) à ceux de f(a) et f(b).'),
+      t('m₂ est le milieu de la moitié gardée : (a + b)/2 = ▢.'),
+      t('{ms}, puis c ≈ {c}.', { ms: rows.map((r, k) => `m${'₁₂₃'[k]} = ${show(r.m)}`).join(', '), c: show(next.m) })),
     subgoals: BIS_SUB, keys: ['calc'], tapActions: null,
     key: `${BIS}:${level}:tap:${d.f}:${d.lo}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -223,7 +227,7 @@ function bisMcq(rng, opts) {
   const [a, b] = rng.pick([[0, L], [1, 1 + L], [-L, 0]]);
   const sup = '⁰¹²³⁴⁵'[k];
   return examMcq({
-    skill: BIS, prompt: `On applique la bissection sur [${fr(a)} ; ${b}]. Après n étapes, l'erreur est au plus (b − a)/2ⁿ. Combien d'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻${sup} ?`,
+    skill: BIS, prompt: t('On applique la bissection sur [{a} ; {b}]. Après n étapes, l\'erreur est au plus (b − a)/2ⁿ. Combien d\'étapes faut-il au minimum pour garantir une erreur ≤ 10⁻{k} ?', { a: fr(a), b, k: sup }),
     options: uniqOptions([
       { html: `n = ${n}`, correct: true },
       { html: `n = ${k}`, correct: false, rule: 'a1_bisection_count' },
@@ -232,7 +236,7 @@ function bisMcq(rng, opts) {
       { html: `n = ${n + 2}`, correct: false },
     ]),
     key: `${BIS}:mcq:${L}:${k}:${a}`,
-    solution: [{ html: `${L}/2ⁿ ≤ 10⁻${sup} ⇔ 2ⁿ ≥ ${L * 10 ** k} : 2^${n - 1} = ${2 ** (n - 1)} < ${L * 10 ** k} ≤ 2^${n} = ${2 ** n}, donc n = ${n}.`, note: '' }],
+    solution: [{ html: t('{s}, donc n = {n}.', { s: `${L}/2ⁿ ≤ 10⁻${sup} ⇔ 2ⁿ ≥ ${L * 10 ** k} : 2^${n - 1} = ${2 ** (n - 1)} < ${L * 10 ** k} ≤ 2^${n} = ${2 ** n}`, n }), note: '' }],
   }, rng, opts);
 }
 
@@ -243,25 +247,25 @@ function bisTf(rng) {
     const m = (a + b) / 2;
     const mt = m === 0.5 ? '1/2' : String(m);
     return tfItem({
-      skill: BIS, level: 4, statement: `Si f(${fr(a)}) < 0 < f(${b}), la bissection sur [${fr(a)} ; ${b}] converge vers un zéro de f.`, truth: false,
+      skill: BIS, level: 4, statement: t('Si f({a}) < 0 < f({b}), la bissection sur [{a} ; {b}] converge vers un zéro de f.', { a: fr(a), b }), truth: false,
       counter: {
         kind: 'function', v: 'x',
         hyp: [{ p: 'positive', of: '-f', on: [String(a), String(a)], say: `f(${fr(a)}) < 0` }, { p: 'positive', on: [String(b), String(b)], say: `f(${b}) > 0` }],
-        concl: { p: 'zeroIn', on: [String(a), String(b)], say: `f a un zéro dans [${fr(a)} ; ${b}]` },
+        concl: { p: 'zeroIn', on: [String(a), String(b)], say: t('f a un zéro dans [{a} ; {b}]', { a: fr(a), b }) },
         ask: [{ v: 'f', label: 'f(x) =', keys: ['calc', 'calcfn'] }], answer: { f: m === 0 ? '1/x' : `1/(x-${mt})` },
       },
       ruleIfTrue: 'a1_ivt_no_continuity', key: `cont:${a}:${b}`, exam: tfTag,
-      explanation: `Faux sans continuité : f(x) = ${m === 0 ? '1/x' : `1/(x − ${fr(mt)})`} change de signe sur [${fr(a)} ; ${b}] mais n'a pas de zéro ; la bissection s'approche de ${fr(mt)}, où f n'est pas définie.`,
+      explanation: t('Faux sans continuité : f(x) = {f} change de signe sur [{a} ; {b}] mais n\'a pas de zéro ; la bissection s\'approche de {m}, où f n\'est pas définie.', { f: m === 0 ? '1/x' : `1/(x − ${fr(mt)})`, a: fr(a), b, m: fr(mt) }),
     });
   }
   if (kind === 'error') {
     const L = rng.pick([1, 2, 4]);
-    return tfItem({ skill: BIS, level: 4, statement: `Après n étapes de bissection sur [0 ; ${L}], le zéro est à moins de ${L}/2ⁿ du milieu du dernier intervalle.`, truth: true, key: `err:${L}`, exam: tfTag,
-      explanation: `Vrai : après n étapes, l'intervalle mesure ${L}/2ⁿ et contient le zéro ; le milieu en est même à ${L}/2ⁿ⁺¹ au plus.` });
+    return tfItem({ skill: BIS, level: 4, statement: t('Après n étapes de bissection sur [0 ; {L}], le zéro est à moins de {L}/2ⁿ du milieu du dernier intervalle.', { L }), truth: true, key: `err:${L}`, exam: tfTag,
+      explanation: t('Vrai : après n étapes, l\'intervalle mesure {L}/2ⁿ et contient le zéro ; le milieu en est même à {L}/2ⁿ⁺¹ au plus.', { L }) });
   }
   const k = rng.pick(['1/2', '2/3', '9/10']);
-  return tfItem({ skill: BIS, level: 4, statement: `Si g([a ; b]) ⊂ [a ; b] et |g′(x)| ≤ ${k} sur [a ; b], alors g a un unique point fixe dans [a ; b], limite de xₙ₊₁ = g(xₙ).`, truth: true, key: `fixed:${k}`, exam: tfTag,
-    explanation: `Vrai : par les accroissements finis, |g(x) − g(y)| ≤ ${k}·|x − y| : g est contractante, et le théorème du point fixe s'applique.` });
+  return tfItem({ skill: BIS, level: 4, statement: t('Si g([a ; b]) ⊂ [a ; b] et |g′(x)| ≤ {k} sur [a ; b], alors g a un unique point fixe dans [a ; b], limite de xₙ₊₁ = g(xₙ).', { k }), truth: true, key: `fixed:${k}`, exam: tfTag,
+    explanation: t('Vrai : par les accroissements finis, |g(x) − g(y)| ≤ {k}·|x − y| : g est contractante, et le théorème du point fixe s\'applique.', { k }) });
 }
 
 function bisItem(level, rng, profile, opts = {}) {

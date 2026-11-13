@@ -5,6 +5,7 @@
 // own cells. After the table, `then` (an item) is asked in the same place.
 
 import { h, html, play } from './dom.js';
+import { t } from '../i18n.js';
 import { explainRule, solutionHtml, mountExercise } from './exercises.js';
 import { hintsBox } from './tokens.js';
 import { checkTable } from '../judges/iter.js';
@@ -38,7 +39,7 @@ export function mountTable(item, ctx, body) {
       b.addEventListener('click', () => {
         const next = values[rowId][j] === 'V' ? 'F' : 'V';
         values[rowId][j] = next;
-        b.textContent = next;
+        b.textContent = t(next);
         b.classList.remove('right', 'wrong');
         play('tap');
       });
@@ -114,7 +115,7 @@ export function mountTable(item, ctx, body) {
       complete: (o) => ctx.complete({ ...o, correct: o.correct && mistakes === 0, hintsUsed: (o.hintsUsed || 0) + hints.used(), rules: [...rules, ...(o.rules || [])] }),
     };
     const ctrl = mountExercise(item.then, sub);
-    after.replaceChildren(h('div.lines-note.segment', 'Et maintenant :'), ctrl.el);
+    after.replaceChildren(h('div.lines-note.segment', t('Et maintenant :')), ctrl.el);
     if (ctrl.ownFlow) {
       footer.replaceChildren(ctrl.footer || '');
       keyHandler = ctrl.onKey || null;
@@ -124,7 +125,7 @@ export function mountTable(item, ctx, body) {
     footer.replaceChildren(ctrl.footer || '', h('button.btn.primary.wide', {
       type: 'button',
       onclick: () => { const o = ctrl.check(); if (o && !o.stayOpen) sub.complete(o); },
-    }, 'Valider'));
+    }, t('Valider')));
     keyHandler = ctrl.onKey || null;
   }
 
@@ -142,20 +143,20 @@ export function mountTable(item, ctx, body) {
     if (r.ok) {
       play('good');
       Object.values(fields).flat().forEach((el) => { if (el) el.disabled = true; });
-      if (item.then) { say('<p>Le tableau est juste.</p>', 'good'); thenTask(); return; }
+      if (item.then) { say(t('<p>Le tableau est juste.</p>'), 'good'); thenTask(); return; }
       ctx.complete(outcome(mistakes === 0));
       return;
     }
     const empty = Object.entries(fields).some(([rowId, els]) => (Array.isArray(els) ? els.some((el, j) => el && !values[rowId][j]) : !values.root));
-    if (empty && !Object.values(r.cells).flat().some((x) => x === false)) { say('<p>Remplis toutes les cases.</p>'); return; }
+    if (empty && !Object.values(r.cells).flat().some((x) => x === false)) { say(t('<p>Remplis toutes les cases.</p>')); return; }
     play('bad');
     mistakes++;
     if (r.rule) rules.push(r.rule);
-    say(r.rule ? explainRule(r.rule) : '<p>Les cases en rouge ne vont pas : chaque case se calcule à partir des cases d\'avant.</p>', 'bad');
+    say(r.rule ? explainRule(r.rule) : t('<p>Les cases en rouge ne vont pas : chaque case se calcule à partir des cases d\'avant.</p>'), 'bad');
     if (mistakes >= 3) ctx.complete(outcome(false));
   }
 
   let keyHandler = null;
-  footer.append(h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, 'Valider le tableau'));
+  footer.append(h('button.btn.primary.wide', { type: 'button', onclick: () => submit() }, t('Valider le tableau')));
   return { ownFlow: true, footer, onKey: (e) => keyHandler?.(e) };
 }

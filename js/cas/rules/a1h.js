@@ -16,6 +16,7 @@ import { evalFloat } from '../numeric.js';
 import { exactValue } from '../normal.js';
 import { toText, toReadable } from '../print.js';
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 
 const fr = (s) => String(s).replace(/-/g, '−');
 const isInf = (n) => { n = stripParen(n); return n.t === 'const' && n.name === 'inf'; };
@@ -50,7 +51,7 @@ export const RULES = [
   {
     id: 'a1_affine_rec_no_fixed_point', family: 'rule', tag: 'E', skill: 'a1-seq-affine', repair: 'a1-seq-affine',
     judges: ['equiv'],
-    name: 'Formule de aₙ₊₁ = q·aₙ + c sans passer par le point fixe',
+    name: t('Formule de aₙ₊₁ = q·aₙ + c sans passer par le point fixe'),
     example: ['aₙ = qⁿ·a₀ + c', 'aₙ = qⁿ·(a₀ − L) + L'],
     check: {
       judge: { kind: 'equiv', vars: ['n'], funcs: ['a'], defs: { a: '6-4/3^n' }, domain: { n: { int: [0, 12] } }, target: 'short', goal: '6-4/3^n', slack: 2, affine: { q: '1/3', c: 4, a0: 2, L: 6 } },
@@ -71,15 +72,15 @@ export const RULES = [
       });
     },
     explain: (ctx = {}) => (ctx.n !== undefined
-      ? `Teste n = ${ctx.n} : ta formule donne ${ctx.v}, mais a${['₀', '₁', '₂', '₃', '₄', '₅'][ctx.n]} = ${ctx.an}. Passe par l'écart au point fixe L = ${ctx.l} : aₙ = L + qⁿ·(a₀ − L).`
-      : 'qⁿ·a₀ + c ne vérifie pas la récurrence (teste n = 0 : on trouve a₀ + c). Passe par l\'écart au point fixe L : aₙ − L = qⁿ·(a₀ − L).'),
+      ? t('Teste n = {n} : ta formule donne {v}, mais a{p1} = {an}. Passe par l\'écart au point fixe L = {l} : aₙ = L + qⁿ·(a₀ − L).', { n: ctx.n, v: ctx.v, p1: ['₀', '₁', '₂', '₃', '₄', '₅'][ctx.n], an: ctx.an, l: ctx.l })
+      : t('qⁿ·a₀ + c ne vérifie pas la récurrence (teste n = 0 : on trouve a₀ + c). Passe par l\'écart au point fixe L : aₙ − L = qⁿ·(a₀ − L).')),
   },
   {
     id: 'a1_rec_limit_without_convergence', family: 'logic', tag: 'C', skill: 'a1-seq-rec-fixed',
     repair: 'a1-seq-monotone',
     judges: ['value', 'limit'],
-    name: 'Point fixe pris pour la limite sans prouver la convergence',
-    example: ['« L = f(L) ⇒ L = 2, donc aₙ → 2 »', 'la convergence d\'abord : monotone et bornée'],
+    name: t('Point fixe pris pour la limite sans prouver la convergence'),
+    example: [t('« L = f(L) ⇒ L = 2, donc aₙ → 2 »'), t('la convergence d\'abord : monotone et bornée')],
     check: { judge: { kind: 'value', expect: '4', recfix: { fixed: ['2', '4'], lim: '4', a0: '3' } }, prev: 'lim(a_n,n,∞)', line: '2' },
     // A fixed point that is not the limit.
     transform: (prev, ctx) => {
@@ -87,20 +88,20 @@ export const RULES = [
       if (!r) return [];
       return r.fixed.filter((x) => x !== r.lim).map((x) => ({ node: parse(x), ctx: { a0: fr(r.a0), lim: r.lim === '+∞' ? '+∞' : r.lim === '-∞' ? '−∞' : fr(r.lim), l: fr(x) } }));
     },
-    explain: (ctx = {}) => `L = f(L) donne les limites possibles si la suite converge, pas la preuve qu'elle converge.${ctx.lim ? ` Avec a₀ = ${ctx.a0}, elle tend vers ${ctx.lim}${ctx.l ? `, pas vers ${ctx.l}` : ''}.` : ' Montre d\'abord qu\'elle est monotone et bornée.'}`,
+    explain: (ctx = {}) => t('L = f(L) donne les limites possibles si la suite converge, pas la preuve qu\'elle converge.{p1}', { p1: ctx.lim ? t(' Avec a₀ = {a0}, elle tend vers {lim}{p1}.', { a0: ctx.a0, lim: ctx.lim, p1: ctx.l ? t(', pas vers {l}', { l: ctx.l }) : '' }) : t(' Montre d\'abord qu\'elle est monotone et bornée.') }),
   },
   {
     id: 'a1_monotone_by_f_increasing', family: 'rule', tag: 'E', skill: 'a1-seq-rec-fixed', repair: 'a1-seq-rec-fixed',
     judges: [],
-    name: 'Suite croissante parce que f est croissante',
-    example: ['f croissante, donc (aₙ) croissante', 'le sens dépend du signe de a₁ − a₀'],
+    name: t('Suite croissante parce que f est croissante'),
+    example: [t('f croissante, donc (aₙ) croissante'), t('le sens dépend du signe de a₁ − a₀')],
     check: { bait: { skill: 'a1-seq-rec-fixed' } },
-    explain: (ctx = {}) => `f croissante dit seulement que la suite est monotone. Elle monte si a₁ > a₀, elle descend si a₁ < a₀${ctx.a1 ? ` ; ici a₁ = ${fr(ctx.a1)} et a₀ = ${fr(ctx.a0)}` : ''}.`,
+    explain: (ctx = {}) => t('f croissante dit seulement que la suite est monotone. Elle monte si a₁ > a₀, elle descend si a₁ < a₀{p1}.', { p1: ctx.a1 ? t(' ; ici a₁ = {a1} et a₀ = {a0}', { a1: fr(ctx.a1), a0: fr(ctx.a0) }) : '' }),
   },
   {
     id: 'a1_geo_sum_start', family: 'rule', tag: 'E', skill: 'a1-ser-geo-tele', repair: 'g5-geom',
     judges: ['definite'],
-    name: 'Somme géométrique : 1/(1 − q) sans regarder le premier terme',
+    name: t('Somme géométrique : 1/(1 − q) sans regarder le premier terme'),
     example: ['Σ_{k≥2} (1/3)ᵏ = 3/2', 'Σ_{k≥2} (1/3)ᵏ = (1/9)/(1 − 1/3) = 1/6'],
     check: { judge: { kind: 'definite' }, prev: 'sum((1/3)^k,k,2,∞)', line: '3/2' },
     // A geometric Σ to ∞ that does not start at 0, started at 0.
@@ -110,12 +111,12 @@ export const RULES = [
       const lo = exactValue(n.lo);
       return [{ node: replaceAt(prev, path, { ...n, lo: lit(Q.of(0)) }), ctx: { t0: fr(exactValue(at(n.e, n.k, n.lo))?.toString() ?? toReadable(at(n.e, n.k, n.lo))), k0: lo ? fr(lo) : '' } }];
     }),
-    explain: (ctx = {}) => `1/(1 − q) vaut pour une somme qui commence à k = 0.${ctx.t0 ? ` Ici le premier terme est ${ctx.t0}` : ' Ici le premier terme est q^(k₀)'} : premier terme sur (1 − raison).`,
+    explain: (ctx = {}) => t('1/(1 − q) vaut pour une somme qui commence à k = 0.{p1} : premier terme sur (1 − raison).', { p1: ctx.t0 ? t(' Ici le premier terme est {t0}', { t0: ctx.t0 }) : t(' Ici le premier terme est q^(k₀)') }),
   },
   {
     id: 'a1_tele_wrong_terms', family: 'rule', tag: 'E', skill: 'a1-ser-geo-tele', repair: 'a1-ser-geo-tele',
     judges: ['definite', 'equiv'],
-    name: 'Série télescopique : un seul terme gardé quand le décalage vaut 2',
+    name: t('Série télescopique : un seul terme gardé quand le décalage vaut 2'),
     example: ['Σ (1/(k + 1) − 1/(k + 3)) = 1/2', '1/2 + 1/3'],
     check: { judge: { kind: 'definite' }, prev: 'sum(1/(k+1)-1/(k+3),k,1,∞)', line: '1/2' },
     // Σ (u(k) − u(k + p)), p ≥ 2: only u(lo) kept at the start (and u(N + p)
@@ -127,6 +128,6 @@ export const RULES = [
       if (contains(node, (x) => x.t === 'sum')) return [];
       return [{ node: replaceAt(prev, path, { t: 'paren', e: node }), ctx: { p } }];
     }),
-    explain: (ctx = {}) => `Le décalage est de ${ctx.p ?? 'p'} : les ${ctx.p ?? 'p'} premiers termes positifs ne sont jamais compensés, et les ${ctx.p ?? 'p'} derniers négatifs non plus. Écris les premiers termes de S_N pour les voir.`,
+    explain: (ctx = {}) => t('Le décalage est de {p} : les {p} premiers termes positifs ne sont jamais compensés, et les {p} derniers négatifs non plus. Écris les premiers termes de S_N pour les voir.', { p: ctx.p ?? 'p' }),
   },
 ];

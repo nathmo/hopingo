@@ -10,6 +10,7 @@ import { walk, lit, mapNode } from '../../cas/ast.js';
 import { exactValue } from '../../cas/normal.js';
 import { blankLine } from '../../judges/lines.js';
 import { linesItem } from './kit.js';
+import { t } from '../../i18n.js';
 
 export const V = 'x';
 export const q = (n, d = 1) => new Q(n, d);
@@ -37,8 +38,8 @@ export function tpl(math, texts, opts = {}) {
     });
     return found;
   };
-  for (const t of texts) {
-    const want = toText(parse(t, opts));
+  for (const tx of texts) {
+    const want = toText(parse(tx, opts));
     // A term after a minus sign: −12x is written « − 12x » in a sum.
     const found = find(want) ?? (want.startsWith('-') ? find(want.slice(1)) : null);
     if (found) holes.push(found);
@@ -54,7 +55,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -88,7 +89,7 @@ function mono(c, k, v = V) {
   if (C.d !== 1) return `${C.n < 0 ? '-' : ''}(${N(C.n < 0 ? C.neg() : C)})${xs}`;
   return `${N(C)}${xs}`;
 }
-export const joinSum = (terms) => terms.filter(Boolean).reduce((s, t) => (s ? (t.startsWith('-') ? `${s}${t}` : `${s}+${t}`) : t), '') || '0';
+export const joinSum = (terms) => terms.filter(Boolean).reduce((s, tm) => (s ? (tm.startsWith('-') ? `${s}${tm}` : `${s}+${tm}`) : tm), '') || '0';
 
 // coeffs from the highest degree down: [1, -3, -9, 2] → x^3-3x^2-9x+2.
 export function polyText(coeffs, v = V) {
@@ -168,5 +169,5 @@ export function tangentLines(fa, dfa, a, subgoal, word = 'f') {
   const fin = tangentFinal(fa, dfa, a);
   const rule = `y = ${word}(a) + ${word}′(a)(x − a)`;
   if (Q.of(a).n === 0 || Q.of(fa).n === 0) return [E(fin, rule, subgoal, 'line')];
-  return [E(tangentText(fa, dfa, a), rule, subgoal, 'line'), E(fin, 'Développer', subgoal, 'expand')];
+  return [E(tangentText(fa, dfa, a), rule, subgoal, 'line'), E(fin, t('Développer'), subgoal, 'expand')];
 }

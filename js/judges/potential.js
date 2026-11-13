@@ -25,6 +25,7 @@ import { evalFloat } from '../cas/numeric.js';
 import { toText } from '../cas/print.js';
 import { diagnoseLine } from './diagnose.js';
 import { Q } from '../math/rational.js';
+import { t } from '../i18n.js';
 
 const FUNCS = ['α', 'β', 'γ', 'g', 'h', 'k'];
 const funcsOf = (cfg) => cfg.funcs || FUNCS;
@@ -33,7 +34,7 @@ const popts = (cfg) => ({ vars: [...cfg.vars, 'C', nameOf(cfg), ...(cfg.params |
 
 const GRAD = new WeakMap();
 function gradOf(cfg) {
-  if (!GRAD.has(cfg)) GRAD.set(cfg, cfg.grad.map((t) => parse(t, popts(cfg))));
+  if (!GRAD.has(cfg)) GRAD.set(cfg, cfg.grad.map((tt) => parse(tt, popts(cfg))));
   return GRAD.get(cfg);
 }
 
@@ -60,7 +61,7 @@ export function readPotential(cfg, input) {
     const isName = (l.t === 'sym' && l.name === nameOf(cfg)) || (l.t === 'fn' && l.name === nameOf(cfg))
       || (l.t === 'bin' && l.op === '×' && stripParen(l.l).t === 'sym' && stripParen(l.l).name === nameOf(cfg));
     if (isName) return { expr: n.r, node };
-    throw new Error(`Écris ${nameOf(cfg)} = …`);
+    throw new Error(t('Écris {a} = …', { a: nameOf(cfg) }));
   }
   return { expr: node, node };
 }
@@ -90,7 +91,7 @@ export function checkPotential(cfg, expr) {
         const env = envAt(cfg, k);
         const a = evalFloat(dG, env);
         const b = evalFloat(F[i], env);
-        if (Number.isFinite(a) && Number.isFinite(b) && !close(a, b)) return { ok: false, v, message: `∂${nameOf(cfg)}/∂${v} ne donne pas F${i + 1} : en dérivant ta ligne en ${v}, on trouve ${toText(dG)}.` };
+        if (Number.isFinite(a) && Number.isFinite(b) && !close(a, b)) return { ok: false, v, message: t('∂{a}/∂{v} ne donne pas F{b} : en dérivant ta ligne en {v}, on trouve {c}.', { a: nameOf(cfg), v, b: i + 1, c: toText(dG) }) };
       }
       continue;
     }
@@ -103,7 +104,7 @@ export function checkPotential(cfg, expr) {
       for (const w of cfg.vars.filter((x) => !allowed.has(x))) {
         const r1 = evalFloat(R, { ...env, [w]: env[w] + 0.731 });
         if (Number.isFinite(r0) && Number.isFinite(r1) && !close(r0, r1)) {
-          return { ok: false, v, message: `Ta fonction inconnue ne peut pas compenser : F${i + 1} − ∂G/∂${v} dépend encore de ${w}.` };
+          return { ok: false, v, message: t('Ta fonction inconnue ne peut pas compenser : F{a} − ∂G/∂{v} dépend encore de {w}.', { a: i + 1, v, w }) };
         }
       }
     }
@@ -141,9 +142,9 @@ export function isFinalPotential(cfg, node, state = {}) {
   let r;
   try { r = readPotential(cfg, node); } catch { return false; }
   if (r.constant !== undefined) return !!cfg.at && state.fixed;
-  if (unknownsOf(cfg, r.expr).length) return 'Il reste une fonction inconnue.';
+  if (unknownsOf(cfg, r.expr).length) return t('Il reste une fonction inconnue.');
   if (cfg.at) {
-    if (symbolsIn(r.expr).has('C')) return 'La constante n\'est pas fixée : utilise la condition.';
+    if (symbolsIn(r.expr).has('C')) return t('La constante n\'est pas fixée : utilise la condition.');
     const v = valueAtP(cfg, r.expr);
     if (!close(v, num(cfg.at.value))) return false;
   }
@@ -155,14 +156,14 @@ export function judgePotential(cfg, prev, input, state = {}) {
   let r;
   try { r = readPotential(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   const node = r.node;
-  if (prev && toText(prev) === toText(node)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev && toText(prev) === toText(node)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   if (r.constant !== undefined) {
-    if (!cfg.at || !state.last) return { kind: 'form', node, message: 'Écris d\'abord φ avec sa constante.' };
+    if (!cfg.at || !state.last) return { kind: 'form', node, message: t('Écris d\'abord φ avec sa constante.') };
     const v = valueAtP(cfg, state.last, r.constant);
     if (close(v, num(cfg.at.value))) { state.fixed = true; return { kind: 'ok', node }; }
     const C0 = num(cfg.at.value) - valueAtP(cfg, state.last, 0);
     const rule = Math.abs(r.constant + C0) < 1e-9 ? 'v_pot_final_const' : null;
-    return { kind: 'wrong', node, rule, diag: rule ? { rules: [rule], ctx: { C: C0 }, all: [rule] } : null, message: `Avec C = ${String(r.constant).replace('.', ',')}, ${nameOf(cfg)}(P) ne vaut pas ${cfg.at.value}.` };
+    return { kind: 'wrong', node, rule, diag: rule ? { rules: [rule], ctx: { C: C0 }, all: [rule] } : null, message: t('Avec C = {a}, {b}(P) ne vaut pas {value}.', { a: String(r.constant).replace('.', ','), b: nameOf(cfg), value: cfg.at.value }) };
   }
   const chk = checkPotential(cfg, r.expr);
   if (!chk.ok) {
@@ -173,7 +174,7 @@ export function judgePotential(cfg, prev, input, state = {}) {
     const v = valueAtP(cfg, r.expr);
     if (!close(v, num(cfg.at.value))) {
       const diag = diagnoseLine('antideriv', prev, node, cfg, (cand, line) => toText(cand) === toText(line));
-      return { kind: 'wrong', node, rule: diag?.rules[0] ?? 'v_pot_final_const', diag: diag ?? { rules: ['v_pot_final_const'], ctx: {}, all: ['v_pot_final_const'] }, message: `${nameOf(cfg)}(P) vaut ${String(Math.round(v * 1e6) / 1e6).replace('.', ',')}, pas ${cfg.at.value} : vérifie la constante.` };
+      return { kind: 'wrong', node, rule: diag?.rules[0] ?? 'v_pot_final_const', diag: diag ?? { rules: ['v_pot_final_const'], ctx: {}, all: ['v_pot_final_const'] }, message: t('{a}(P) vaut {b}, pas {value} : vérifie la constante.', { a: nameOf(cfg), b: String(Math.round(v * 1e6) / 1e6).replace('.', ','), value: cfg.at.value }) };
     }
   }
   if (symbolsIn(r.expr).has('C')) state.last = r.expr;

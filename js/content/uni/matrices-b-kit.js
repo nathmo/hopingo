@@ -8,6 +8,7 @@ import { parse } from '../../cas/parse.js';
 import { walk } from '../../cas/ast.js';
 import { blankLine } from '../../judges/lines.js';
 import { q, qt, fq, matLines } from './alglin-kit.js';
+import { t } from '../../i18n.js';
 
 export const SUBS = '₀₁₂₃₄₅₆₇₈₉';
 export const sub = (n) => String(n).split('').map((d) => SUBS[d] ?? d).join('');
@@ -46,7 +47,7 @@ export const modeOf = (level) => (level <= 2 ? 'guided' : level === 3 ? 'tap' : 
 export const withMenu = (p, m) => ({ ...p, judge: { ...p.judge, menu: m } });
 // Menus of the tap mode: one valid action per part (the part's own id).
 export function menuOf(items, active) {
-  return items.map((o) => ({ id: o.id, label: o.label, valid: o.id === active, why: o.id === active ? undefined : o.why || 'Pas maintenant : ce n\'est pas l\'étape suivante.' }));
+  return items.map((o) => ({ id: o.id, label: o.label, valid: o.id === active, why: o.id === active ? undefined : o.why || t('Pas maintenant : ce n\'est pas l\'étape suivante.') }));
 }
 
 // A lines item made of parts {judge, start, html, ask, lines, pre?}: the
@@ -64,7 +65,7 @@ export function partsItem(o, parts) {
 const V2 = [[1, 1], [1, 2], [2, 1], [1, 3], [3, 1], [1, -1], [1, -2]];
 const V3 = [[[1, 1, 1], [1, -1, 0]], [[1, 2, 2], [2, 1, -2]], [[1, 1, 0], [1, -1, 1]], [[1, 0, 1], [1, 1, -1]], [[2, 1, 2], [1, 0, -1]], [[1, 1, 2], [1, 1, -1]]];
 export function symWhole(n, rng, { pos = false, max = 12, distinctAbs = false, nonDiag = true } = {}) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     let vs;
     if (n === 2) {
       const u = rng.pick(V2);

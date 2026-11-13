@@ -17,6 +17,7 @@ import { substVar } from '../diff.js';
 import { evalFloat } from '../numeric.js';
 import { limit } from '../limit.js';
 import { toText } from '../print.js';
+import { t } from '../../i18n.js';
 
 const P = (t, v = 'n') => parse(t, { vars: [v] });
 const par = (e) => ({ t: 'paren', e });
@@ -28,7 +29,7 @@ const limAt = (node, cfg) => {
 export const RULES = [
   {
     id: 'a1_squeeze_wrong_direction', family: 'sign', tag: 'C', skill: 'a1-seq-squeeze', repair: 'g1-bound', judges: ['equiv'],
-    name: 'Minorant et majorant échangés',
+    name: t('Minorant et majorant échangés'),
     example: ['Sₙ ≤ n²/(n² + n)', 'Sₙ ≥ n²/(n² + n)'],
     check: {
       judge: { kind: 'equiv', vars: ['n'], from: 1, rel: '≤', squeeze: { L: '1' }, other: 'n^2/(n^2+n)' },
@@ -40,21 +41,21 @@ export const RULES = [
       return [{ node: P(c.other), ctx: { other: c.other, rel: c.rel } }];
     },
     explain: (ctx = {}) => (ctx.rel
-      ? `Tu as écrit l'autre borne : elle est ${ctx.rel === '≤' ? 'plus petite que la suite, c\'est un minorant' : 'plus grande que la suite, c\'est un majorant'}. Pour majorer, prends le terme le plus grand ; pour minorer, le plus petit.`
-      : 'Minorant et majorant sont échangés : pour majorer une fraction positive, on prend le plus petit dénominateur ; pour minorer, le plus grand.'),
+      ? t('Tu as écrit l\'autre borne : elle est {p1}. Pour majorer, prends le terme le plus grand ; pour minorer, le plus petit.', { p1: ctx.rel === '≤' ? t('plus petite que la suite, c\'est un minorant') : t('plus grande que la suite, c\'est un majorant') })
+      : t('Minorant et majorant sont échangés : pour majorer une fraction positive, on prend le plus petit dénominateur ; pour minorer, le plus grand.')),
   },
   {
     id: 'a1_squeeze_different_limits', family: 'method', tag: 'C', skill: 'a1-seq-squeeze', repair: 'a1-seq-squeeze', judges: [],
-    name: 'Gendarmes avec deux bornes de limites différentes',
-    example: ['0 ≤ bₙ ≤ 2 ⇒ « bₙ converge »', 'des bornes qui ont la même limite'],
+    name: t('Gendarmes avec deux bornes de limites différentes'),
+    example: [t('0 ≤ bₙ ≤ 2 ⇒ « bₙ converge »'), t('des bornes qui ont la même limite')],
     check: { bait: { skill: 'a1-seq-squeeze', level: 2 } },
     explain: (ctx = {}) => (ctx.L1 !== undefined
-      ? `Tes bornes tendent vers ${ctx.L1} et ${ctx.L2} : elles ne coincent pas la suite. Cherche des bornes plus serrées.`
-      : 'Deux bornes de limites différentes ne coincent pas la suite : 1 + (−1)ⁿ est entre 0 et 2 sans converger. Il faut deux bornes de même limite.'),
+      ? t('Tes bornes tendent vers {L1} et {L2} : elles ne coincent pas la suite. Cherche des bornes plus serrées.', { L1: ctx.L1, L2: ctx.L2 })
+      : t('Deux bornes de limites différentes ne coincent pas la suite : 1 + (−1)ⁿ est entre 0 et 2 sans converger. Il faut deux bornes de même limite.')),
   },
   {
     id: 'a1_sum_n_terms_as_one', family: 'meaning', tag: 'E', skill: 'a1-seq-squeeze', repair: 'g5-sigma', judges: ['equiv'],
-    name: 'Une somme de n termes majorée par un seul terme',
+    name: t('Une somme de n termes majorée par un seul terme'),
     example: ['Σ_{k=1}^{n} n/(n² + k) ≤ n/(n² + 1)', 'Σ_{k=1}^{n} n/(n² + k) ≤ n·n/(n² + 1)'],
     check: { judge: { kind: 'equiv', vars: ['n'], from: 1, rel: '≤' }, prev: 'sum(n/(n^2+k),k,1,n)', line: 'n/(n^2+1)' },
     // A Σ up to n replaced by its first or its last term alone.
@@ -74,11 +75,11 @@ export const RULES = [
       });
       return out;
     },
-    explain: (ctx = {}) => `Il y a n termes${ctx.term ? `, chacun au plus ${ctx.term}` : ''} : la somme est au plus n fois le plus grand terme, pas le terme seul.`,
+    explain: (ctx = {}) => t('Il y a n termes{p1} : la somme est au plus n fois le plus grand terme, pas le terme seul.', { p1: ctx.term ? t(', chacun au plus {term}', { term: ctx.term }) : '' }),
   },
   {
     id: 'a1_indet_one_inf', family: 'rule', tag: 'E', skill: 'a1-seq-1inf', repair: 'a1-seq-1inf', judges: ['limit'],
-    name: '1^∞ pris pour 1',
+    name: t('1^∞ pris pour 1'),
     example: ['(1 + 2/n)ⁿ → 1', '(1 + 2/n)ⁿ = e^(n·Log(1 + 2/n)) → e²'],
     check: { judge: { kind: 'limit', v: 'n', to: '+∞', discrete: true }, prev: '(1+2/n)^n', line: '1' },
     // u^v with u → 1 and v → ∞: the base replaced by its limit 1.
@@ -93,11 +94,11 @@ export const RULES = [
       if (e !== '+inf' && e !== '-inf') return [];
       return [{ node: P('1'), ctx: { u: toText(s.b), w: toText(s.e) } }];
     },
-    explain: (ctx = {}) => `1^∞ est indéterminé : la base tend vers 1, mais l'exposant explose${ctx.u ? ` (${ctx.w})` : ''}. Écris e^(exposant·Log(base)), avec Log(1 + h) ≈ h.`,
+    explain: (ctx = {}) => t('1^∞ est indéterminé : la base tend vers 1, mais l\'exposant explose{p1}. Écris e^(exposant·Log(base)), avec Log(1 + h) ≈ h.', { p1: ctx.u ? ` (${ctx.w})` : '' }),
   },
   {
     id: 'a1_factorial_ratio', family: 'facts', tag: 'E', skill: 'a1-seq-ratio', repair: 'a1-seq-ratio', judges: ['equiv'],
-    name: '(m + k)!/m! simplifié en un seul facteur',
+    name: t('(m + k)!/m! simplifié en un seul facteur'),
     example: ['(2n + 2)!/(2n)! = 2n + 2', '(2n + 2)!/(2n)! = (2n + 2)(2n + 1)'],
     check: {
       judge: { kind: 'equiv', vars: ['n'], domain: { n: { int: [1, 12] } } },
@@ -122,25 +123,25 @@ export const RULES = [
       return out;
     },
     explain: (ctx = {}) => (ctx.A
-      ? `Entre (${ctx.B})! et (${ctx.A})!, il y a ${ctx.k} facteurs, pas un seul : (${ctx.A})! = (${ctx.A})·…·(${ctx.B} + 1)·(${ctx.B})!.`
-      : 'Entre (2n)! et (2n + 2)!, il y a deux facteurs : (2n + 2)!/(2n)! = (2n + 2)(2n + 1).'),
+      ? t('Entre ({B})! et ({A})!, il y a {k} facteurs, pas un seul : ({A})! = ({A})·…·({B} + 1)·({B})!.', { B: ctx.B, A: ctx.A, k: ctx.k })
+      : t('Entre (2n)! et (2n + 2)!, il y a deux facteurs : (2n + 2)!/(2n)! = (2n + 2)(2n + 1).')),
   },
   {
     id: 'a1_bounded_implies_convergent', family: 'meaning', tag: 'C', skill: 'a1-seq-monotone', repair: 'a1-seq-monotone', judges: [],
-    name: 'Bornée, donc convergente',
-    example: ['« (aₙ) est bornée, donc elle converge »', '(aₙ) monotone et bornée, donc elle converge'],
+    name: t('Bornée, donc convergente'),
+    example: [t('« (aₙ) est bornée, donc elle converge »'), t('(aₙ) monotone et bornée, donc elle converge')],
     check: { bait: { skill: 'a1-seq-monotone', level: 2 } },
-    explain: () => '(−1)ⁿ est bornée et ne converge pas. Il faut aussi la monotonie (ou deux bornes de même limite).',
+    explain: () => t('(−1)ⁿ est bornée et ne converge pas. Il faut aussi la monotonie (ou deux bornes de même limite).'),
   },
   {
     id: 'a1_limsup_as_sup', family: 'meaning', tag: 'E', skill: 'a1-seq-limsup', repair: 'a1-seq-limsup', judges: ['value'],
-    name: 'lim sup confondue avec le sup des termes',
-    example: ['lim sup aₙ = sup des termes = 5/2', 'lim sup aₙ = limite de la plus haute sous-suite = 1'],
+    name: t('lim sup confondue avec le sup des termes'),
+    example: [t('lim sup aₙ = sup des termes = 5/2'), t('lim sup aₙ = limite de la plus haute sous-suite = 1')],
     check: { judge: { kind: 'value', expect: '1', supTerms: '5/2' }, prev: 'L', line: '5/2' },
     transform: (prev, ctx) => {
       const s = ctx?.cfg?.supTerms;
       return s ? [{ node: parse(String(s)), ctx: { s } }] : [];
     },
-    explain: (ctx = {}) => `Le sup${ctx.s ? ` (${ctx.s.replace('-', '−')})` : ''} peut être atteint au début ; la lim sup ne regarde que les n grands : c'est la plus grande limite d'une sous-suite.`,
+    explain: (ctx = {}) => t('Le sup{p1} peut être atteint au début ; la lim sup ne regarde que les n grands : c\'est la plus grande limite d\'une sous-suite.', { p1: ctx.s ? ` (${ctx.s.replace('-', '−')})` : '' }),
   },
 ];

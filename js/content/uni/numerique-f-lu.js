@@ -21,14 +21,15 @@ import {
 import {
   refCode, codeItem, readtableItem, multiMcq, vfMcq, H, blankBy,
 } from './numerique-kit.js';
+import { t } from '../../i18n.js';
 
 const LU = 'n-lu';
 const SUB = [
-  { id: 'elim', label: 'éliminer', skill: 'l-mat-lu' },
-  { id: 'factors', label: 'L et U', skill: 'l-mat-lu' },
-  { id: 'pivot', label: 'pivot nul : permuter', skill: LU },
+  { id: 'elim', label: t('éliminer'), skill: 'l-mat-lu' },
+  { id: 'factors', label: t('L et U'), skill: 'l-mat-lu' },
+  { id: 'pivot', label: t('pivot nul : permuter'), skill: LU },
   { id: 'det', label: 'det A = Π uᵢᵢ / det P', skill: 'l-det-props' },
-  { id: 'cost', label: 'coûts', skill: LU },
+  { id: 'cost', label: t('coûts'), skill: LU },
 ];
 const KEYS = ['calc', 'greek'];
 const ij = (i, j) => `${sub(i + 1)}${sub(j + 1)}`;
@@ -39,7 +40,7 @@ const prod = (U) => U.reduce((s, r, i) => s.mul(r[i]), q(1));
 
 // A = LU without exchange, the operations of the elimination.
 function luData(rng, n = 3) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const { L, U, A, fallback } = luPair(n, rng, { fracL: rng.chance(0.4) });
     if (fallback) continue;
     const ops = [];
@@ -59,7 +60,7 @@ function luData(rng, n = 3) {
 
 // A zero pivot at step 2: rows 2 and 3 of LU exchanged, with ℓ₃₂ = 0.
 function pivotData(rng, n = 3) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const { L, U, fallback } = luPair(n, rng, {});
     if (fallback) continue;
     L[2][1] = q(0);
@@ -105,8 +106,8 @@ function gmB(A0) {
 }
 
 const detSeg = (d, { swapped = false } = {}) => [
-  { kind: 'segment', html: swapped ? 'det A : le produit des pivots, et le signe de l\'échange.' : 'det A, à partir des pivots de U.', ask: 'det A =', start: { math: 'D' }, judge: { kind: 'value', expect: qt(d.det), form: 'irreducible', ...(swapped ? { ludet: { prodU: qt(d.prodU) } } : {}) } },
-  { kind: 'eq', math: `${swapped ? '-' : ''}(${prodText(d.U)})`, note: swapped ? 'Un échange de lignes : det P = −1' : 'Produit de la diagonale de U', subgoal: 'det' },
+  { kind: 'segment', html: swapped ? t('det A : le produit des pivots, et le signe de l\'échange.') : t('det A, à partir des pivots de U.'), ask: 'det A =', start: { math: 'D' }, judge: { kind: 'value', expect: qt(d.det), form: 'irreducible', ...(swapped ? { ludet: { prodU: qt(d.prodU) } } : {}) } },
+  { kind: 'eq', math: `${swapped ? '-' : ''}(${prodText(d.U)})`, note: swapped ? t('Un échange de lignes : det P = −1') : t('Produit de la diagonale de U'), subgoal: 'det' },
   { kind: 'eq', math: qt(d.det), note: '', subgoal: 'det' },
 ];
 
@@ -121,24 +122,24 @@ function guided(rng, level) {
     const k = op.k.neg();
     const cands = [
       { id: 'ok', label: fq(k), valid: true, ref: true },
-      { id: 'neg', label: fq(k.neg()), valid: false, rule: 'l_lu_sign', why: `On a retranché ${fq(k)} fois la ligne ${op.j + 1} : ℓ = ${fq(k)}, avec ce signe.` },
-      { id: 'inv', label: fq(q(1).div(k)), valid: false, why: 'ℓᵢⱼ est le multiplicateur lui-même, pas son inverse.' },
+      { id: 'neg', label: fq(k.neg()), valid: false, rule: 'l_lu_sign', why: t('On a retranché {k} fois la ligne {j} : ℓ = {k}, avec ce signe.', { k: fq(k), j: op.j + 1 }) },
+      { id: 'inv', label: fq(q(1).div(k)), valid: false, why: t('ℓᵢⱼ est le multiplicateur lui-même, pas son inverse.') },
     ];
-    script.push({ kind: 'decision', prompt: `On a fait ${opR(op)}. Que vaut ${lName(op.i, op.j)} ?`, options: rng.shuffle(cands.filter((o, i) => cands.findIndex((x) => x.label === o.label) === i)) });
+    script.push({ kind: 'decision', prompt: t('On a fait {op}. Que vaut {l} ?', { op: opR(op), l: lName(op.i, op.j) }), options: rng.shuffle(cands.filter((o, i) => cands.findIndex((x) => x.label === o.label) === i)) });
   }
   const below = [];
   for (let i = 1; i < d.n; i++) for (let j = 0; j < i; j++) below.push([i, j]);
   script.push(
-    { kind: 'segment', html: 'Écris L et U.', start: { math: 'LU' }, judge: { kind: 'factor', A: mt(d.A), of: 'LU' } },
-    withCells({ kind: 'eq', math: `L = ${mt(d.L)}`, note: 'Sous la diagonale, les multiplicateurs', subgoal: 'factors' }, below),
-    withCells({ kind: 'eq', math: `U = ${mt(d.U)}`, note: 'La forme échelonnée', subgoal: 'factors' }, pickCells(d.U, [0, 1, 2], 2, rng).filter(([r, c]) => c >= r)),
+    { kind: 'segment', html: t('Écris L et U.'), start: { math: 'LU' }, judge: { kind: 'factor', A: mt(d.A), of: 'LU' } },
+    withCells({ kind: 'eq', math: `L = ${mt(d.L)}`, note: t('Sous la diagonale, les multiplicateurs'), subgoal: 'factors' }, below),
+    withCells({ kind: 'eq', math: `U = ${mt(d.U)}`, note: t('La forme échelonnée'), subgoal: 'factors' }, pickCells(d.U, [0, 1, 2], 2, rng).filter(([r, c]) => c >= r)),
     ...detSeg(d).map((l) => (l.kind === 'eq' && l.math === qt(d.det) ? { ...l, ...blankBy(qt(d.det), [qt(d.det)]) } : l)),
   );
   return matLines({
     skill: LU, level, mode: 'guided', keys: KEYS,
-    prompt: `Factorise A = ${MLm(d.A)} en A = LU sans échange de lignes, en notant chaque multiplicateur ℓᵢⱼ, puis calcule det A.`,
+    prompt: t('Factorise A = {A} en A = LU sans échange de lignes, en notant chaque multiplicateur ℓᵢⱼ, puis calcule det A.', { A: MLm(d.A) }),
     start: mt(d.A), judge: { kind: 'rowops', goal: 'echelon', lowerOnly: true }, script,
-    hints: H('Les multiplicateurs de Gauss sont les coefficients de L, sous la diagonale : Lᵢ ← Lᵢ − ℓᵢⱼLⱼ.',
+    hints: H(t('Les multiplicateurs de Gauss sont les coefficients de L, sous la diagonale : Lᵢ ← Lᵢ − ℓᵢⱼLⱼ.'),
       `${lName(d.ops[0].i, d.ops[0].j)} = a${ij(d.ops[0].i, 0)}/a₁₁ = □`,
       `L = ${MLm(d.L)}, U = ${MLm(d.U)}, det A = ${prodR(d.U)} = ${fq(d.det)}.`),
     subgoals: SUB, key: `${LU}:${level}:${mt(d.A)}`, baits: ['l_lu_sign'], fallback: d.fallback,
@@ -151,30 +152,32 @@ function pivotItem(rng, level) {
   const d = level === 4 && rng.chance(0.5) ? gmB() : pivotData(rng, level === 4 ? 4 : 3);
   const first = opLines(d.A, d.ops1, { note: (op) => `${opR(op)}`, subgoal: 'elim' });
   const after = first.length ? first.at(-1).result : d.A;
-  const swapLines = opLines(after, [d.swap], { note: 'Le pivot u₂₂ est nul : on échange les lignes 2 et 3', subgoal: 'pivot' });
+  const swapLines = opLines(after, [d.swap], { note: t('Le pivot u₂₂ est nul : on échange les lignes 2 et 3'), subgoal: 'pivot' });
   const rest = opLines(swapLines[0].result, d.rest, { note: (op) => `${opR(op)}`, subgoal: 'elim' });
   const decision = {
-    kind: 'decision', prompt: 'Le deuxième pivot est nul. Que fais-tu ?', options: rng.shuffle([
-      { id: 'swap', label: 'J\'échange la ligne 2 avec une ligne en dessous (PA = LU)', valid: true, ref: true },
-      { id: 'sing', label: 'J\'arrête : A est singulière', valid: false, rule: 'n_lu_zero_pivot', why: `Faux : det A = ${fq(d.det)} ≠ 0. Un pivot nul empêche seulement la LU sans échange.` },
-      { id: 'div', label: 'Je continue en divisant par ce pivot', valid: false, rule: 'n_lu_zero_pivot', why: 'On ne divise pas par 0 : on échange deux lignes.' },
+    kind: 'decision', prompt: t('Le deuxième pivot est nul. Que fais-tu ?'), options: rng.shuffle([
+      { id: 'swap', label: t('J\'échange la ligne 2 avec une ligne en dessous (PA = LU)'), valid: true, ref: true },
+      { id: 'sing', label: t('J\'arrête : A est singulière'), valid: false, rule: 'n_lu_zero_pivot', why: t('Faux : det A = {det} ≠ 0. Un pivot nul empêche seulement la LU sans échange.', { det: fq(d.det) }) },
+      { id: 'div', label: t('Je continue en divisant par ce pivot'), valid: false, rule: 'n_lu_zero_pivot', why: t('On ne divise pas par 0 : on échange deux lignes.') },
     ]),
   };
   const script = [...first, decision, ...swapLines, ...rest];
   if (level === 4) {
     script.push(
-      { kind: 'segment', html: 'Écris P, L et U, avec PA = LU.', start: { math: 'PLU' }, judge: { kind: 'factor', A: mt(d.A), of: 'PLU' } },
-      { kind: 'eq', math: `P = ${mt(d.P)} ; L = ${mt(d.L)} ; U = ${mt(d.U)}`, note: 'P échange les lignes 2 et 3 ; L garde les multiplicateurs, échangés avec les lignes', subgoal: 'factors' },
+      { kind: 'segment', html: t('Écris P, L et U, avec PA = LU.'), start: { math: 'PLU' }, judge: { kind: 'factor', A: mt(d.A), of: 'PLU' } },
+      { kind: 'eq', math: `P = ${mt(d.P)} ; L = ${mt(d.L)} ; U = ${mt(d.U)}`, note: t('P échange les lignes 2 et 3 ; L garde les multiplicateurs, échangés avec les lignes'), subgoal: 'factors' },
     );
   }
   const name = d.n === 4 ? 'B' : 'A';
   script.push(...detSeg(d, { swapped: true, name }));
   return matLines({
     skill: LU, level, mode: level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'rowops' : null, keys: KEYS,
-    prompt: `Échelonne ${name} = ${MLm(d.A)} par Gauss (Lᵢ ← Lᵢ − ℓLⱼ, ou un échange Lᵢ ↔ Lⱼ si un pivot s'annule)${level === 4 ? ', écris PA = LU' : ''}, puis calcule det ${name}.${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
+    prompt: level === 4
+      ? t('Échelonne {name} = {A} par Gauss (Lᵢ ← Lᵢ − ℓLⱼ, ou un échange Lᵢ ↔ Lⱼ si un pivot s\'annule), écris PA = LU, puis calcule det {name}.', { name, A: MLm(d.A) })
+      : t('Échelonne {name} = {A} par Gauss (Lᵢ ← Lᵢ − ℓLⱼ, ou un échange Lᵢ ↔ Lⱼ si un pivot s\'annule), puis calcule det {name}. Choisis d\'abord chaque action.', { name, A: MLm(d.A) }),
     start: mt(d.A), judge: { kind: 'rowops', goal: 'echelon' }, script,
-    hints: H('Si un pivot est nul, la matrice n\'est pas forcément singulière : on échange avec une ligne du dessous dont le coefficient n\'est pas nul.',
-      `Après l'échange, det ${name} = −(□)`,
+    hints: H(t('Si un pivot est nul, la matrice n\'est pas forcément singulière : on échange avec une ligne du dessous dont le coefficient n\'est pas nul.'),
+      t('Après l\'échange, det {name} = −(□)', { name }),
       `U = ${MLm(d.U)}, det ${name} = −(${prodR(d.U)}) = ${fq(d.det)}.`),
     subgoals: SUB, key: `${LU}:${level}:${mt(d.A)}`, baits: ['n_lu_zero_pivot', 'n_lu_det_permutation'], fallback: d.fallback,
   });
@@ -209,23 +212,23 @@ function costTable(rng, level) {
   const f = (x) => x.toExponential(1).replace(/e\+?(-?)(\d+)$/, (m, s, e) => `e${s || '+'}${e.padStart(2, '0')}`);
   const lu3 = (2 * n ** 3) / 3;
   const table = {
-    columns: ['étape', `opérations (n = ${n})`],
-    rows: [['factorisation A = LU', f(lu3)], ['une descente Ly = b', f(n * n)], ['une remontée Ux = y', f(n * n)], [`inverse A⁻¹ (n systèmes)`, f(2 * n ** 3)]],
+    columns: [t('étape'), t('opérations (n = {n})', { n })],
+    rows: [[t('factorisation A = LU'), f(lu3)], [t('une descente Ly = b'), f(n * n)], [t('une remontée Ux = y'), f(n * n)], [t('inverse A⁻¹ (n systèmes)'), f(2 * n ** 3)]],
   };
   return readtableItem({
     skill: LU, level, key: `costs:${n}`,
-    prompt: `Coût des étapes pour une matrice pleine n × n (n = ${n}). On doit résoudre Ax = b pour ${k} seconds membres b, avec la même A.`,
+    prompt: t('Coût des étapes pour une matrice pleine n × n (n = {n}). On doit résoudre Ax = b pour {k} seconds membres b, avec la même A.', { n, k }),
     table,
     question: multiMcq({
       skill: LU, level, key: `${LU}:costs:${n}`,
-      prompt: 'Que faut-il faire ?',
+      prompt: t('Que faut-il faire ?'),
       options: [
-        { html: 'Factoriser A = LU une seule fois, puis faire 10 descentes et 10 remontées', correct: true },
-        { html: `Le coût total est alors d'environ 2n³/3 + 20n² ≈ ${f(lu3 + 20 * n * n)} opérations`, correct: true },
-        { html: 'Calculer A⁻¹, puis faire 10 produits A⁻¹b : c\'est plus rapide', correct: false, rule: 'n_cost_inverse' },
-        { html: 'Refaire la factorisation pour chaque second membre', correct: false },
+        { html: t('Factoriser A = LU une seule fois, puis faire 10 descentes et 10 remontées'), correct: true },
+        { html: t('Le coût total est alors d\'environ 2n³/3 + 20n² ≈ {c} opérations', { c: f(lu3 + 20 * n * n) }), correct: true },
+        { html: t('Calculer A⁻¹, puis faire 10 produits A⁻¹b : c\'est plus rapide'), correct: false, rule: 'n_cost_inverse' },
+        { html: t('Refaire la factorisation pour chaque second membre'), correct: false },
       ],
-      solution: [{ html: 'La factorisation (≈ 2n³/3) ne dépend pas de b : on la fait une fois. Chaque second membre ne coûte ensuite que 2n². Calculer A⁻¹ revient à résoudre n systèmes (≈ 2n³) : c\'est plus cher, et moins précis.', note: '' }],
+      solution: [{ html: t('La factorisation (≈ 2n³/3) ne dépend pas de b : on la fait une fois. Chaque second membre ne coûte ensuite que 2n². Calculer A⁻¹ revient à résoudre n systèmes (≈ 2n³) : c\'est plus cher, et moins précis.'), note: '' }],
     }, rng),
   });
 }
@@ -233,7 +236,7 @@ function costTable(rng, level) {
 function codeLevel(rng) {
   return codeItem({
     skill: LU, level: 5, ref: LU_CODE, blanks: [0, 1], traps: LU_TRAPS, preludes: ['vec', 'mat'], rng,
-    prompt: 'Complète la factorisation A = LU sans pivot : L[i][k] est le multiplicateur de la ligne i, et la ligne i de U perd L[i][k] fois la ligne k.',
+    prompt: t('Complète la factorisation A = LU sans pivot : L[i][k] est le multiplicateur de la ligne i, et la ligne i de U perd L[i][k] fois la ligne k.'),
     tests: LU_TESTS, then: costTable(rng, 5),
     hints: [], subgoals: SUB, key: 'lu',
   });
@@ -250,7 +253,9 @@ function coefOf(rng, opts, level = 4) {
   const label = a.f === 'L' ? `l_${a.i + 1}${a.j + 1}` : `u_${a.i + 1}${a.j + 1}`;
   const nm = a.f === 'L' ? lName(a.i, a.j) : `u${ij(a.i, a.j)}`;
   return coefItem({
-    skill: LU, level, prompt: `On factorise A = ${MLm(d.A)} en A = LU sans échange (L unitriangulaire inférieure). Que vaut ${nm} ${a.f === 'L' ? 'dans L' : 'dans U'} ?`,
+    skill: LU, level, prompt: a.f === 'L'
+      ? t('On factorise A = {A} en A = LU sans échange (L unitriangulaire inférieure). Que vaut {nm} dans L ?', { A: MLm(d.A), nm })
+      : t('On factorise A = {A} en A = LU sans échange (L unitriangulaire inférieure). Que vaut {nm} dans U ?', { A: MLm(d.A), nm }),
     label, value: qt(a.v), key: `${mt(d.A)}:${label}`, exam: opts.exam ? examTag(opts) : false,
     askCoef: { label: nm, path: [a.i, a.j], factor: a.f }, traps: [{ rule: 'l_lu_sign' }], subgoals: SUB,
     solution: [{ html: `L = ${MLm(d.L)}, U = ${MLm(d.U)}`, note: '' }], fallback: d.fallback,
@@ -261,18 +266,18 @@ function examMcq(rng, opts) {
   if (rng.chance(0.5)) {
     return mcqDistinct({
       skill: LU, level: 4, key: `${LU}:mcq:inv`, exam: examTag(opts),
-      prompt: 'Pour résoudre Ax = b (A pleine, n grand), pourquoi utilise-t-on A\\b (une factorisation LU) plutôt que inv(A)*b ?',
-      right: 'A\\b factorise A une fois puis fait une descente et une remontée ; inv(A) revient à résoudre n systèmes',
-      wrongs: [{ html: 'inv(A)*b est plus rapide, mais moins précis', rule: 'n_cost_inverse' }, { html: 'Les deux coûtent la même chose : seule la précision change', rule: 'n_cost_inverse' }],
-      fillers: [{ html: 'A\\b ne marche que si A est symétrique' }],
-      solution: [{ html: 'La factorisation coûte ≈ 2n³/3, chaque substitution ≈ n² ; calculer A⁻¹ coûte ≈ 2n³ (n systèmes), puis le produit n² (série GM 8).', note: '' }],
+      prompt: t('Pour résoudre Ax = b (A pleine, n grand), pourquoi utilise-t-on A\\b (une factorisation LU) plutôt que inv(A)*b ?'),
+      right: t('A\\b factorise A une fois puis fait une descente et une remontée ; inv(A) revient à résoudre n systèmes'),
+      wrongs: [{ html: t('inv(A)*b est plus rapide, mais moins précis'), rule: 'n_cost_inverse' }, { html: t('Les deux coûtent la même chose : seule la précision change'), rule: 'n_cost_inverse' }],
+      fillers: [{ html: t('A\\b ne marche que si A est symétrique') }],
+      solution: [{ html: t('La factorisation coûte ≈ 2n³/3, chaque substitution ≈ n² ; calculer A⁻¹ coûte ≈ 2n³ (n systèmes), puis le produit n² (série GM 8).'), note: '' }],
     }, rng);
   }
   const d = pivotData(rng, 3);
   const right = d.det;
   return mcqDistinct({
     skill: LU, level: 4, key: `${LU}:mcq:det:${mt(d.A)}`, exam: examTag(opts),
-    prompt: `On échelonne A = ${MLm(d.A)} : il faut échanger les lignes 2 et 3, et l'on obtient U = ${MLm(d.U)}, avec PA = LU. Que vaut det A ?`,
+    prompt: t('On échelonne A = {A} : il faut échanger les lignes 2 et 3, et l\'on obtient U = {U}, avec PA = LU. Que vaut det A ?', { A: MLm(d.A), U: MLm(d.U) }),
     right: fq(right), wrongs: [{ html: fq(d.prodU), rule: 'n_lu_det_permutation' }],
     fillers: [{ html: fq(right.mul(2)) }, { html: '0' }, { html: fq(right.add(1)) }],
     solution: [{ html: `det A = Π uᵢᵢ / det P = (${prodR(d.U)})/(−1) = ${fq(right)}.`, note: '' }],
@@ -286,13 +291,13 @@ function examTf(rng, opts) {
     const d = k === 0 ? gmB() : pivotData(rng, 3);
     return tfL({
       skill: LU, key: `zero:${mt(d.A)}`, truth: false, exam: tag, ruleIfTrue: 'n_lu_zero_pivot',
-      statement: 'Si un pivot s\'annule pendant la factorisation LU sans pivot, alors A est singulière.',
+      statement: t('Si un pivot s\'annule pendant la factorisation LU sans pivot, alors A est singulière.'),
       counter: { kind: 'matOne', params: { want: 'notLUable' }, ask: [{ v: 'A', label: 'A =', shape: [d.n, d.n] }], answer: { A: mt(d.A) } },
-      explanation: `Faux : ${ML(mt(d.A))} a un deuxième pivot nul, mais det = ${fq(d.det)} ≠ 0 : on échange deux lignes (PA = LU).`,
+      explanation: t('Faux : {A} a un deuxième pivot nul, mais det = {det} ≠ 0 : on échange deux lignes (PA = LU).', { A: ML(mt(d.A)), det: fq(d.det) }),
     });
   }
-  if (k === 2) return vfMcq({ skill: LU, key: `${LU}:tf:10`, exam: tag, statement: 'Résoudre Ax = b pour 10 seconds membres b différents (même A) demande 10 factorisations LU.', truth: false, ruleIfTrue: 'n_cost_inverse', explanation: 'Faux : on factorise une fois (≈ 2n³/3), puis chaque second membre coûte une descente et une remontée (≈ 2n²).' }, rng);
-  return vfMcq({ skill: LU, key: `${LU}:tf:cost`, exam: tag, statement: 'Le coût de la factorisation LU d\'une matrice pleine n × n est O(n²).', truth: false, explanation: 'Faux : environ 2n³/3 opérations, donc O(n³). Ce sont les substitutions qui coûtent O(n²).' }, rng);
+  if (k === 2) return vfMcq({ skill: LU, key: `${LU}:tf:10`, exam: tag, statement: t('Résoudre Ax = b pour 10 seconds membres b différents (même A) demande 10 factorisations LU.'), truth: false, ruleIfTrue: 'n_cost_inverse', explanation: t('Faux : on factorise une fois (≈ 2n³/3), puis chaque second membre coûte une descente et une remontée (≈ 2n²).') }, rng);
+  return vfMcq({ skill: LU, key: `${LU}:tf:cost`, exam: tag, statement: t('Le coût de la factorisation LU d\'une matrice pleine n × n est O(n²).'), truth: false, explanation: t('Faux : environ 2n³/3 opérations, donc O(n³). Ce sont les substitutions qui coûtent O(n²).') }, rng);
 }
 
 export const GEN = {

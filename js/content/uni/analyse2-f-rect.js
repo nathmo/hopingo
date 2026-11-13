@@ -5,14 +5,15 @@
 
 import { MT, linesItem, tfItem, examTag, H, E, modeOf, blanked, partsScript, withMenus } from './a2-kit.js';
 import { A2_KEYS } from './a2-kit.js';
+import { t } from '../../i18n.js';
 import { problemItem } from './kit-problem.js';
 import { q, val, vRat, vMul, vAdd, vText, vFloat, vRatOf, swapXY, mcqV, vfMcq, R, pickW } from './analyse2-f-kit.js';
 
 const SK = 'a2-fubini-rect';
 const SUB = [
-  { id: 'separate', label: 'séparer en produit (ou choisir l\'ordre)', skill: SK },
-  { id: 'integrate', label: 'intégrer chaque facteur', skill: 'a1-int-direct' },
-  { id: 'combine', label: 'le résultat', skill: SK },
+  { id: 'separate', label: t('séparer en produit (ou choisir l\'ordre)'), skill: SK },
+  { id: 'integrate', label: t('intégrer chaque facteur'), skill: 'a1-int-direct' },
+  { id: 'combine', label: t('le résultat'), skill: SK },
 ];
 // The start line is I_D, the integral of the prompt (seq of the definite
 // judge): the student writes it in the order he chooses, and the traps of
@@ -53,7 +54,7 @@ ONE.push(
 function product(g, h) {
   const nums = [g, h].filter((p) => !p.den).map((p) => p.text);
   const dens = [g, h].filter((p) => p.den).map((p) => p.denText);
-  nums.sort((s, t) => (/^[xy](\^\d)?$/.test(t) ? 1 : 0) - (/^[xy](\^\d)?$/.test(s) ? 1 : 0));
+  nums.sort((s, u) => (/^[xy](\^\d)?$/.test(u) ? 1 : 0) - (/^[xy](\^\d)?$/.test(s) ? 1 : 0));
   const top = nums.length ? nums.join('×') : '1';
   if (!dens.length) return top;
   const wrap = (d) => (/^[a-z]$/.test(d) ? d : `(${d})`);
@@ -87,34 +88,34 @@ function sepTexts(d, inner) {
 const rect = (d) => `[${R(d.g.a)} ; ${R(d.g.b)}] × [${R(d.h.a)} ; ${R(d.h.b)}]`;
 
 const CHOICES = [
-  { id: 'prod', label: 'f = g(x)·h(y) sur un rectangle : produit de deux intégrales' },
-  { id: 'swap', label: 'Échanger l\'ordre d\'intégration (Fubini)' },
-  { id: 'inner', label: 'Intégrer l\'intégrale intérieure' },
-  { id: 'prim', label: 'Primitives, puis crochets' },
-  { id: 'calc', label: 'Calculer le nombre' },
-  { id: 'sym', label: 'Symétrie : l\'intégrale vaut 0', rule: 'a2_symmetry_wrong', why: 'Le domaine n\'est pas symétrique par rapport à un axe où f est impaire : aucune symétrie ne s\'applique.' },
+  { id: 'prod', label: t('f = g(x)·h(y) sur un rectangle : produit de deux intégrales') },
+  { id: 'swap', label: t('Échanger l\'ordre d\'intégration (Fubini)') },
+  { id: 'inner', label: t('Intégrer l\'intégrale intérieure') },
+  { id: 'prim', label: t('Primitives, puis crochets') },
+  { id: 'calc', label: t('Calculer le nombre') },
+  { id: 'sym', label: t('Symétrie : l\'intégrale vaut 0'), rule: 'a2_symmetry_wrong', why: t('Le domaine n\'est pas symétrique par rapport à un axe où f est impaire : aucune symétrie ne s\'applique.') },
 ];
 
 function sepItem(level, rng, opts) {
   const d = sepData(rng);
   const inner = rng.chance(0.5) ? 'y' : 'x';
-  const t = sepTexts(d, inner);
+  const tx = sepTexts(d, inner);
   let lines = [
-    E(`${t.Ix}×${t.Iy}`, 'Rectangle et f = g(x)·h(y) : produit', 'separate', 'prod'),
-    E(t.brk, 'Primitives', 'integrate', 'prim'),
-    E(t.value, 'Calculer', 'combine', 'calc'),
+    E(`${tx.Ix}×${tx.Iy}`, t('Rectangle et f = g(x)·h(y) : produit'), 'separate', 'prod'),
+    E(tx.brk, t('Primitives'), 'integrate', 'prim'),
+    E(tx.value, t('Calculer'), 'combine', 'calc'),
   ];
   if (level === 1) lines = [blanked(lines[0], [d.h.f('y')]), blanked(lines[1], [d.h.F('y')]), lines[2]];
   if (level === 2) lines = [blanked(lines[0], [d.g.f('x'), d.h.f('y')]), blanked(lines[1], [d.g.F('x'), d.h.F('y')]), lines[2]];
-  const judge = withMenus(defI(t.start), level, I_D, lines, CHOICES);
-  const note = level === 1 ? `<br>Ici f(x, y) = ${MT(d.g.f('x'))} · ${MT(d.h.f('y'))} : c'est un produit.` : '';
+  const judge = withMenus(defI(tx.start), level, I_D, lines, CHOICES);
+  const note = level === 1 ? t('<br>Ici f(x, y) = {g} · {h} : c\'est un produit.', { g: MT(d.g.f('x')), h: MT(d.h.f('y')) }) : '';
   return linesItem({
     skill: SK, level, mode: modeOf(level), start: I_D, judge, script: lines,
-    prompt: `Calcule I<sub>D</sub> = ${MT(t.start)}, l'intégrale de f(x, y) = ${MT(t.f)} sur le rectangle ${rect(d)}.${note}`,
-    hints: H('f est un produit g(x)·h(y) et le domaine est un rectangle : l\'intégrale double est le produit de deux intégrales simples.',
-      `= ${MT(t.Ix)} · ${MT(t.Iy)}`, `= ${MT(t.brk)} = ${MT(t.value)}`),
+    prompt: t('Calcule I<sub>D</sub> = {I}, l\'intégrale de f(x, y) = {f} sur le rectangle {rect}.', { I: MT(tx.start), f: MT(tx.f), rect: rect(d) }) + note,
+    hints: H(t('f est un produit g(x)·h(y) et le domaine est un rectangle : l\'intégrale double est le produit de deux intégrales simples.'),
+      `= ${MT(tx.Ix)} · ${MT(tx.Iy)}`, `= ${MT(tx.brk)} = ${MT(tx.value)}`),
     subgoals: SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
-    key: `${SK}:${level}:sep:${t.start}`, exam: examTag(opts), fallback: !!d.fallback,
+    key: `${SK}:${level}:sep:${tx.start}`, exam: examTag(opts), fallback: !!d.fallback,
     baits: level === 3 ? ['a2_symmetry_wrong'] : undefined,
   });
 }
@@ -142,33 +143,33 @@ function orderData(rng) {
 function orderItem(level, rng, opts) {
   const d0 = orderData(rng);
   const mirror = rng.chance(0.5);
-  const S = (t) => (mirror ? swapXY(t) : t);
+  const S = (s) => (mirror ? swapXY(s) : s);
   const d = { ...d0, f: S(d0.f), good: S(d0.good), bad: S(d0.bad), after: S(d0.after), prim: S(d0.prim), outer: S(d0.outer) };
   const B = mirror ? { x: d0.y, y: d0.x } : { x: d0.x, y: d0.y };
   const inner = (v) => `int(${d.f},${v},${B[v][0]},${B[v][1]})`;
   const start = `int(${inner(d.bad)},${d.good},${B[d.good][0]},${B[d.good][1]})`;
   const swapped = `int(${inner(d.good)},${d.bad},${B[d.bad][0]},${B[d.bad][1]})`;
   const o = d.outer;
-  const parts = `${MT(d.f)} en ${d.bad} demande une intégration par parties`;
+  const parts = { f: MT(d.f), bad: d.bad, good: d.good };
   let lines = [
-    E(swapped, `Rectangle : on peut intégrer d'abord en ${d.good}`, 'separate', 'swap'),
-    E(`int(${d.after},${o},${B[o][0]},${B[o][1]})`, `Intégrale en ${d.good}`, 'integrate', 'inner'),
-    E(`bracket(${d.prim},${o},${B[o][0]},${B[o][1]})`, 'Primitive', 'integrate', 'prim'),
-    E(d.value, 'Calculer', 'combine', 'calc'),
+    E(swapped, t('Rectangle : on peut intégrer d\'abord en {v}', { v: d.good }), 'separate', 'swap'),
+    E(`int(${d.after},${o},${B[o][0]},${B[o][1]})`, t('Intégrale en {v}', { v: d.good }), 'integrate', 'inner'),
+    E(`bracket(${d.prim},${o},${B[o][0]},${B[o][1]})`, t('Primitive'), 'integrate', 'prim'),
+    E(d.value, t('Calculer'), 'combine', 'calc'),
   ];
   if (level === 2) lines[1] = blanked(lines[1], [d.after]);
   const decision = {
-    kind: 'decision', prompt: 'Dans quel ordre intégrer ?', options: [
-      { id: 'good', label: `D'abord en ${d.good}`, valid: true, ref: true },
-      { id: 'bad', label: `D'abord en ${d.bad}, tel quel`, valid: true, quality: 'poor', why: `Juste, mais ${parts} ; en ${d.good} d'abord, c'est immédiat.` },
+    kind: 'decision', prompt: t('Dans quel ordre intégrer ?'), options: [
+      { id: 'good', label: t('D\'abord en {v}', { v: d.good }), valid: true, ref: true },
+      { id: 'bad', label: t('D\'abord en {v}, tel quel', { v: d.bad }), valid: true, quality: 'poor', why: t('Juste, mais {f} en {bad} demande une intégration par parties ; en {good} d\'abord, c\'est immédiat.', parts) },
     ],
   };
   const script = level === 2 || level === 3 ? [decision, ...lines] : lines;
   const judge = withMenus(defI(start), level, I_D, lines, CHOICES);
   return linesItem({
     skill: SK, level, mode: modeOf(level), start: I_D, judge, script,
-    prompt: `Calcule I<sub>D</sub> = ${MT(start)}. Le domaine est le rectangle [${R(B.x[0])} ; ${R(B.x[1])}] × [${R(B.y[0])} ; ${R(B.y[1])}] : choisis l'ordre qui évite les calculs.`,
-    hints: H(`Sur un rectangle, Fubini permet d'intégrer dans l'ordre qu'on veut. L'intégrale de ${parts} ; en ${d.good}, c'est immédiat.`,
+    prompt: t('Calcule I<sub>D</sub> = {I}. Le domaine est le rectangle {rect} : choisis l\'ordre qui évite les calculs.', { I: MT(start), rect: `[${R(B.x[0])} ; ${R(B.x[1])}] × [${R(B.y[0])} ; ${R(B.y[1])}]` }),
+    hints: H(t('Sur un rectangle, Fubini permet d\'intégrer dans l\'ordre qu\'on veut. L\'intégrale de {f} en {bad} demande une intégration par parties ; en {good}, c\'est immédiat.', parts),
       `= ${MT(swapped)} = ${MT(`int(${d.after},${o},${B[o][0]},${B[o][1]})`)}`, `= ${MT(lines[2].math)} = ${MT(d.value)}`),
     subgoals: SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:order:${start}`, exam: examTag(opts),
@@ -188,7 +189,7 @@ export function symStatement(rng, want) {
   const b = rng.pick([1, 2]);
   const c = rng.pick([1, 2]);
   const inX = rng.chance(0.4);
-  const S = (t) => (inX ? swapXY(t) : t);
+  const S = (s) => (inX ? swapXY(s) : s);
   const v = inX ? 'x' : 'y';
   const w = inX ? 'y' : 'x';
   const box = (lo, hi) => (inX ? `[${lo} ; ${hi}] × [0 ; ${b}]` : `[0 ; ${b}] × [${lo} ; ${hi}]`);
@@ -205,9 +206,9 @@ export function symStatement(rng, want) {
     const D = forAll ? box(sym ? '−c' : '0', 'c') : box(neg(c), c);
     return {
       kind, truth: sym, ruleIfTrue: sym ? null : 'a2_symmetry_wrong', key: `${kind}:${F}:${b}:${forAll ? 'c' : c}`,
-      statement: `${forAll ? 'Pour tout c > 0 : ' : ''}∬<sub>D</sub> ${MT(F)} dx dy = 0, où D = ${D}`,
-      why: sym ? `f change de signe quand ${v} devient −${v} (impaire en ${v}), et D est symétrique par rapport à ${v} = 0 : les deux moitiés se compensent.`
-        : `f est impaire en ${v}, mais D va de 0 à c en ${v} : il n'est pas symétrique. Pour c = 1, f > 0 à l'intérieur de D, donc l'intégrale est strictement positive.`,
+      statement: forAll ? t('Pour tout c > 0 : ∬<sub>D</sub> {f} dx dy = 0, où D = {D}', { f: MT(F), D }) : t('∬<sub>D</sub> {f} dx dy = 0, où D = {D}', { f: MT(F), D }),
+      why: sym ? t('f change de signe quand {v} devient −{v} (impaire en {v}), et D est symétrique par rapport à {v} = 0 : les deux moitiés se compensent.', { v })
+        : t('f est impaire en {v}, mais D va de 0 à c en {v} : il n\'est pas symétrique. Pour c = 1, f > 0 à l\'intérieur de D, donc l\'intégrale est strictement positive.', { v }),
       counter: sym ? null : counterOf(F, '0'),
     };
   }
@@ -215,8 +216,8 @@ export function symStatement(rng, want) {
     const F = S(rng.pick(EVEN_Y));
     return {
       kind, truth: false, ruleIfTrue: null, key: `${kind}:${F}:${b}`,
-      statement: `Pour tout c > 0 : ∬<sub>D</sub> ${MT(F)} dx dy = 0, où D = ${box('−c', 'c')}`,
-      why: `D est symétrique, mais f est paire en ${v} (elle ne change pas quand ${v} devient −${v}) : rien ne se compense. f > 0 sur D, donc l'intégrale est > 0.`,
+      statement: t('Pour tout c > 0 : ∬<sub>D</sub> {f} dx dy = 0, où D = {D}', { f: MT(F), D: box('−c', 'c') }),
+      why: t('D est symétrique, mais f est paire en {v} (elle ne change pas quand {v} devient −{v}) : rien ne se compense. f > 0 sur D, donc l\'intégrale est > 0.', { v }),
       counter: counterOf(F, '-c'),
     };
   }
@@ -225,8 +226,8 @@ export function symStatement(rng, want) {
     const Rr = rng.pick([1, 2, 3]);
     return {
       kind, truth: true, key: `${kind}:${f}:${Rr}`,
-      statement: `∬<sub>D</sub> ${MT(f)} dx dy = 0, où D est le disque x² + y² ≤ ${Rr * Rr}`,
-      why: 'Le disque est symétrique par rapport aux deux axes. Chaque terme de f est impair en x ou impair en y : son intégrale est nulle.',
+      statement: t('∬<sub>D</sub> {f} dx dy = 0, où D est le disque x² + y² ≤ {r2}', { f: MT(f), r2: Rr * Rr }),
+      why: t('Le disque est symétrique par rapport aux deux axes. Chaque terme de f est impair en x ou impair en y : son intégrale est nulle.'),
     };
   }
   // The unit ball (2021 Q19): only as a two-option multiple choice.
@@ -234,8 +235,8 @@ export function symStatement(rng, want) {
   const k = rng.pick([8, 6, 10]);
   return {
     kind, truth: false, key: `${kind}:${g}:${k}`,
-    statement: `∭<sub>B</sub> ${MT(g)} dV ≥ π/${k}, où B est la boule unité x² + y² + z² ≤ 1`,
-    why: `La boule est symétrique et l'intégrande est impair en une variable : l'intégrale vaut 0, qui n'est pas ≥ π/${k}.`,
+    statement: t('∭<sub>B</sub> {g} dV ≥ π/{k}, où B est la boule unité x² + y² + z² ≤ 1', { g: MT(g), k }),
+    why: t('La boule est symétrique et l\'intégrande est impair en une variable : l\'intégrale vaut 0, qui n\'est pas ≥ π/{k}.', { k }),
   };
 }
 
@@ -246,7 +247,7 @@ function symTf(rng, level, exam, want) {
   return tfItem({
     skill: SK, level, statement: s.statement, truth: s.truth, counter: s.counter, ruleIfTrue: s.ruleIfTrue,
     explanation: s.why, key: s.key, exam,
-    hints: H('Les deux conditions : f impaire en une variable, et D symétrique dans cette variable.', 'Remplace la variable par son opposé dans f, puis regarde les bornes de D.', s.why),
+    hints: H(t('Les deux conditions : f impaire en une variable, et D symétrique dans cette variable.'), t('Remplace la variable par son opposé dans f, puis regarde les bornes de D.'), s.why),
   });
 }
 
@@ -255,7 +256,7 @@ function valueMcq(rng, opts) {
   for (let i = 0; i < 200; i++) {
     const d = sepData(rng);
     if (d.fallback) break;
-    const t = sepTexts(d, 'y');
+    const tx = sepTexts(d, 'y');
     const x = vFloat(d.V);
     const wrongs = [];
     // The odd factor on a domain that is not symmetric: « 0 ».
@@ -266,14 +267,14 @@ function valueMcq(rng, opts) {
     const ratG = vRatOf(d.g.V);
     if (ratG) { const W = vMul(vRat(ratG.mul(2)), d.h.V); wrongs.push({ html: MT(vText(W)), x: vFloat(W) }); }
     const it = mcqV({
-      skill: SK, level: 4, prompt: `Que vaut ${MT(t.start)} ?`, right: { html: MT(t.value), x }, wrongs: rng.shuffle(wrongs),
-      key: `${SK}:mcq:${t.start}`, expectedSec: 150, exam: examTag(opts) || false,
-      solution: [{ html: `f est un produit sur un rectangle : ${MT(`${t.Ix}×${t.Iy}`)} = ${MT(t.value)}.`, note: '' }],
+      skill: SK, level: 4, prompt: t('Que vaut {I} ?', { I: MT(tx.start) }), right: { html: MT(tx.value), x }, wrongs: rng.shuffle(wrongs),
+      key: `${SK}:mcq:${tx.start}`, expectedSec: 150, exam: examTag(opts) || false,
+      solution: [{ html: t('f est un produit sur un rectangle : {p} = {v}.', { p: MT(`${tx.Ix}×${tx.Iy}`), v: MT(tx.value) }), note: '' }],
     }, rng);
     if (it) return it;
   }
   return mcqV({
-    skill: SK, level: 4, prompt: `Que vaut ${MT('int(int(x y,y,0,1),x,0,1)')} ?`, right: { html: MT('1/4'), x: 0.25 },
+    skill: SK, level: 4, prompt: t('Que vaut {I} ?', { I: MT('int(int(x y,y,0,1),x,0,1)') }), right: { html: MT('1/4'), x: 0.25 },
     wrongs: [{ html: MT('1/2'), x: 0.5 }, { html: MT('1'), x: 1 }, { html: MT('0'), x: 0, rule: 'a2_symmetry_wrong' }],
     key: `${SK}:mcq:fallback`, exam: examTag(opts) || false, fallback: true,
   }, rng);
@@ -282,11 +283,11 @@ function valueMcq(rng, opts) {
 // ---------- level 5: three V/F, then a computation ----------
 function soloProblem(rng, opts) {
   const kinds = rng.shuffle(['oddSym', 'oddNotSym', rng.pick(['evenSym', 'disk', 'ball'])]);
-  const vfs = kinds.map((k) => ({ item: symTf(rng, 5, false, k), points: 1, title: 'Symétrie : vrai ou faux ?' }));
+  const vfs = kinds.map((k) => ({ item: symTf(rng, 5, false, k), points: 1, title: t('Symétrie : vrai ou faux ?') }));
   const calc = rng.chance(0.7) ? sepItem(5, rng, {}) : orderItem(5, rng, {});
   return problemItem({
-    skill: SK, level: 5, prompt: 'Trois énoncés de symétrie, puis un calcul d\'intégrale double.',
-    parts: [...vfs, { item: calc, points: 3, title: 'Calcul' }],
+    skill: SK, level: 5, prompt: t('Trois énoncés de symétrie, puis un calcul d\'intégrale double.'),
+    parts: [...vfs, { item: calc, points: 3, title: t('Calcul') }],
     key: `5:${vfs.map((v) => v.item.key).join('|')}:${calc.key}`, exam: examTag(opts),
   });
 }

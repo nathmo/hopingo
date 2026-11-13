@@ -19,6 +19,7 @@ import { toText } from '../print.js';
 import { evalFloat } from '../numeric.js';
 import { polyOf, qCoeffs } from '../polyx.js';
 import { frNum } from '../../judges/common.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(typeof n === 'string' ? parse(n) : n));
 const par = (e) => ({ t: 'paren', e });
@@ -45,18 +46,18 @@ export const RULES = [
   {
     id: 'a1_supinf_on_values', family: 'meaning', tag: 'C', skill: 'a1-sup-inf', repair: 'a1-sup-inf',
     judges: [],
-    name: 'Inf ou Sup des valeurs de la fonction, au lieu des x',
-    example: ['A = {x > 0 : cos(1/x) > 0} : « Sup A = π/2 »', 'Sup A = +∞, Inf A = 0'],
+    name: t('Inf ou Sup des valeurs de la fonction, au lieu des x'),
+    example: [t('A = {x > 0 : cos(1/x) > 0} : « Sup A = π/2 »'), t('Sup A = +∞, Inf A = 0')],
     check: { bait: { skill: 'a1-sup-inf', exam: 'mcq' } },
     explain: (ctx = {}) => (ctx.u
-      ? `Tu as donné une borne des valeurs de ${ctx.u}. L'Inf et le Sup portent sur les x de A : quand ${ctx.u} parcourt ${ctx.U}, x parcourt ${ctx.X}.`
-      : 'Tu as donné une borne des valeurs de la fonction (ici u = 1/x). L\'Inf et le Sup portent sur les x de A : avec cos(1/x) > 0, u = 1/x reste sous π/2, mais x peut être aussi grand qu\'on veut et aussi proche de 0 qu\'on veut.'),
+      ? t('Tu as donné une borne des valeurs de {u}. L\'Inf et le Sup portent sur les x de A : quand {u} parcourt {U}, x parcourt {X}.', { u: ctx.u, U: ctx.U, X: ctx.X })
+      : t('Tu as donné une borne des valeurs de la fonction (ici u = 1/x). L\'Inf et le Sup portent sur les x de A : avec cos(1/x) > 0, u = 1/x reste sous π/2, mais x peut être aussi grand qu\'on veut et aussi proche de 0 qu\'on veut.')),
   },
   {
     id: 'a1_tan_monotone_range', family: 'rule', tag: 'C', skill: 'a1-sup-inf', repair: 'g3-arc-def',
     judges: ['solset'],
-    name: 'tan appliquée hors de ]−π/2 ; π/2[',
-    example: ['Arctg(1/x) < 2π/3 ⇒ 1/x < tan(2π/3) = −√3', 'la condition est toujours vraie'],
+    name: t('tan appliquée hors de ]−π/2 ; π/2['),
+    example: ['Arctg(1/x) < 2π/3 ⇒ 1/x < tan(2π/3) = −√3', t('la condition est toujours vraie')],
     check: { judge: { kind: 'solset', v: 'x', domain: 'ℝ∖{0}' }, prev: 'arctan(1/x)<2π/3', line: '1/x<-√3' },
     // tan applied to every member of a relation or a chain with Arctg,
     // although a constant member is outside ]−π/2 ; π/2[.
@@ -73,28 +74,28 @@ export const RULES = [
       }
       return [];
     },
-    explain: (ctx = {}) => `tan n'est croissante que sur ]−π/2 ; π/2[, et ${ctx.c ?? 'cette constante'} n'y est pas. Comme Arctg prend ses valeurs dans ]−π/2 ; π/2[, l'inégalité Arctg(…) < ${ctx.c ?? 'c'} est toujours vraie : enlève-la au lieu d'appliquer tan.`,
+    explain: (ctx = {}) => t('tan n\'est croissante que sur ]−π/2 ; π/2[, et {c} n\'y est pas. Comme Arctg prend ses valeurs dans ]−π/2 ; π/2[, l\'inégalité Arctg(…) < {c2} est toujours vraie : enlève-la au lieu d\'appliquer tan.', { c: ctx.c ?? t('cette constante'), c2: ctx.c ?? 'c' }),
   },
   {
     id: 'a1_sup_in_set', family: 'meaning', tag: 'E', skill: 'a1-sup-inf', repair: 'a1-sup-proof',
     judges: [],
-    name: 'Le Sup pris pour un élément de A (un Max)',
-    example: ['Sup [0 ; 3[ = 3 = Max', 'pas de Max'],
+    name: t('Le Sup pris pour un élément de A (un Max)'),
+    example: [t('Sup [0 ; 3[ = 3 = Max'), t('pas de Max')],
     check: { bait: { skill: 'a1-sup-proof', level: 3 } },
-    explain: (ctx = {}) => `Le Sup est le plus petit majorant ; il n'est pas forcément dans A. ${ctx.s ?? '3'} ∉ A, donc A n'a pas de maximum.`,
+    explain: (ctx = {}) => t('Le Sup est le plus petit majorant ; il n\'est pas forcément dans A. {s} ∉ A, donc A n\'a pas de maximum.', { s: ctx.s ?? '3' }),
   },
   {
     id: 'a1_n_depends_on_n', family: 'logic', tag: 'E', skill: 'a1-seq-eps-n', repair: 'a1-seq-eps-n-def',
     judges: ['delta'],
-    name: 'N(ε) qui dépend de n',
+    name: t('N(ε) qui dépend de n'),
     example: ['N(ε) = 5/(εn)', 'N(ε) = 5/ε'],
     check: { judge: { kind: 'delta', mode: 'N', f: '(3n+1)/(n+2)', L: '3', from: 1, rules: { dependsOnVar: 'a1_n_depends_on_n' } }, prev: 'N', line: '5/(ε×n)' },
-    explain: () => 'N doit être fixé dès que ε est donné : il ne peut pas dépendre de n. Majore d\'abord |aₙ − L| par une expression plus simple (c/n), puis résous c/n ≤ ε.',
+    explain: () => t('N doit être fixé dès que ε est donné : il ne peut pas dépendre de n. Majore d\'abord |aₙ − L| par une expression plus simple (c/n), puis résous c/n ≤ ε.'),
   },
   {
     id: 'a1_bound_wrong_direction', family: 'sign', tag: 'E', skill: 'a1-seq-eps-n', repair: 'g1-bound',
     judges: ['equiv'],
-    name: 'Majorer une fraction en agrandissant son dénominateur',
+    name: t('Majorer une fraction en agrandissant son dénominateur'),
     example: ['5/(n + 2) ≤ 5/(n + 3)', '5/(n + 2) ≤ 5/n'],
     check: { judge: { kind: 'equiv', vars: ['n'], rel: '≤', from: 1, simple: true }, prev: '5/(n+2)', line: '5/(n+3)' },
     // In a bound line (rel ≤): a/D → a/(D + k), a positive term added.
@@ -112,30 +113,30 @@ export const RULES = [
       });
     },
     explain: (ctx = {}) => (ctx.prev
-      ? `Pour agrandir ${ctx.prev}, il faut un dénominateur plus petit. Avec ${ctx.v} = 1 : ${ctx.prev} = ${ctx.a}, et ${ctx.cand} = ${ctx.b}, plus petit.`
-      : 'Pour agrandir 5/(n + 2), il faut un dénominateur plus petit : 5/(n + 2) ≤ 5/n. Avec n = 1 : 5/3 ≈ 1,67, et 5/(n + 3) = 1,25, plus petit.'),
+      ? t('Pour agrandir {prev}, il faut un dénominateur plus petit. Avec {v} = 1 : {prev} = {a}, et {cand} = {b}, plus petit.', { prev: ctx.prev, v: ctx.v, a: ctx.a, cand: ctx.cand, b: ctx.b })
+      : t('Pour agrandir 5/(n + 2), il faut un dénominateur plus petit : 5/(n + 2) ≤ 5/n. Avec n = 1 : 5/3 ≈ 1,67, et 5/(n + 3) = 1,25, plus petit.')),
   },
   {
     id: 'a1_limit_never_reached', family: 'meaning', tag: 'R', skill: 'a1-seq-eps-n', repair: 'a1-seq-eps-n-def',
     judges: [],
-    name: 'Une limite ne serait jamais atteinte',
-    example: ['« 0,999… < 1 » ; « la suite constante 3 ne tend pas vers 3 »', '0,999… = 1, et la suite constante 3 tend vers 3'],
+    name: t('Une limite ne serait jamais atteinte'),
+    example: [t('« 0,999… < 1 » ; « la suite constante 3 ne tend pas vers 3 »'), t('0,999… = 1, et la suite constante 3 tend vers 3')],
     check: { bait: { skill: 'a1-seq-eps-n', exam: 'tf' } },
-    explain: () => 'Une limite peut être atteinte (suite constante) ou pas (1/n → 0). Ce qui compte : |aₙ − L| finit sous tout ε > 0. Ainsi 0,999… = 1, la limite de 0,9 ; 0,99 ; 0,999 ; …',
+    explain: () => t('Une limite peut être atteinte (suite constante) ou pas (1/n → 0). Ce qui compte : |aₙ − L| finit sous tout ε > 0. Ainsi 0,999… = 1, la limite de 0,9 ; 0,99 ; 0,999 ; …'),
   },
   {
     id: 'a1_indet_inf_minus_inf', family: 'rule', tag: 'E', skill: 'a1-seq-limits', repair: 'a1-seq-limits',
     judges: [],
-    name: '∞ − ∞ pris pour 0 (suites)',
+    name: t('∞ − ∞ pris pour 0 (suites)'),
     example: ['√(n² + 4n) − n → 0', '√(n² + 4n) − n → 2'],
     check: { bait: { skill: 'a1-seq-limits', exam: 'mcq' } },
-    explain: () => '∞ − ∞ n\'est pas 0 : les deux termes grandissent presque à la même vitesse, et l\'écart peut tendre vers n\'importe quoi. Multiplie par la quantité conjuguée.',
+    explain: () => t('∞ − ∞ n\'est pas 0 : les deux termes grandissent presque à la même vitesse, et l\'écart peut tendre vers n\'importe quoi. Multiplie par la quantité conjuguée.'),
   },
   {
     id: 'a1_sqrt_sum_split', family: 'distribute', tag: 'E', skill: 'a1-seq-limits', repair: 'rat-simplify',
     judges: ['limit'],
-    name: 'Racine distribuée sur une somme',
-    example: ['√(n² + 4n) = n + 2√n', 'quantité conjuguée'],
+    name: t('Racine distribuée sur une somme'),
+    example: ['√(n² + 4n) = n + 2√n', t('quantité conjuguée')],
     check: { judge: { kind: 'limit', v: 'n', to: '+∞', discrete: true, vars: ['n'] }, prev: '√(n^2+4n)-n', line: 'n+2√n-n' },
     // √(A + B) → √A + √B.
     transform: (prev, ctx) => {
@@ -153,13 +154,13 @@ export const RULES = [
       return out;
     },
     explain: (ctx = {}) => (ctx.root
-      ? `Une racine ne se distribue pas sur une somme : teste ${ctx.v} = 1, ${ctx.root} = ${ctx.a}, mais ${ctx.split} = ${ctx.b}.`
-      : 'Une racine ne se distribue pas sur une somme : teste n = 1, √(1 + 4) = √5 ≈ 2,24, mais √1 + √4 = 3.'),
+      ? t('Une racine ne se distribue pas sur une somme : teste {v} = 1, {root} = {a}, mais {split} = {b}.', { v: ctx.v, root: ctx.root, a: ctx.a, split: ctx.split, b: ctx.b })
+      : t('Une racine ne se distribue pas sur une somme : teste n = 1, √(1 + 4) = √5 ≈ 2,24, mais √1 + √4 = 3.')),
   },
   {
     id: 'a1_dominant_term_wrong', family: 'rule', tag: 'E', skill: 'a1-seq-limits', repair: 'a1-seq-limits',
     judges: ['limit'],
-    name: 'Termes de plus bas degré gardés en +∞',
+    name: t('Termes de plus bas degré gardés en +∞'),
     example: ['(2n³ − n)/(5n³ + 7) → −1/7', '(2n³ − n)/(5n³ + 7) → 2/5'],
     check: { judge: { kind: 'limit', v: 'n', to: '+∞', discrete: true, vars: ['n'] }, prev: '(2n^3-n)/(5n^3+7)', line: '-1/7' },
     // A quotient of polynomials: the ratio of the lowest terms (as a number
@@ -186,14 +187,14 @@ export const RULES = [
         { node: parse(`(${term(p[i], i)})/(${term(q[j], j)})`, { vars: [v] }), ctx: ctx2 },
       ];
     },
-    explain: (ctx = {}) => `En +∞, ce sont les plus grandes puissances qui dominent : ${ctx.v ?? 'n'}${ctx.k ? `^${ctx.k}`.replace(/\^(\d)/, (m, d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]) : '³'} en haut et en bas. Divise en haut et en bas par cette puissance.`,
+    explain: (ctx = {}) => t('En +∞, ce sont les plus grandes puissances qui dominent : {v}{p1} en haut et en bas. Divise en haut et en bas par cette puissance.', { v: ctx.v ?? 'n', p1: ctx.k ? `^${ctx.k}`.replace(/\^(\d)/, (m, d) => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]) : '³' }),
   },
   {
     id: 'a1_lim_quotient_bn_nonzero', family: 'rule', tag: 'C', skill: 'a1-seq-limits', repair: 'a1-seq-limits',
     judges: [],
-    name: 'Règle du quotient appliquée avec lim bₙ = 0',
-    example: ['aₙ → 1, bₙ → 0 (bₙ ≠ 0) : « aₙ/bₙ converge »', 'aₙ/bₙ peut ne pas avoir de limite'],
+    name: t('Règle du quotient appliquée avec lim bₙ = 0'),
+    example: [t('aₙ → 1, bₙ → 0 (bₙ ≠ 0) : « aₙ/bₙ converge »'), t('aₙ/bₙ peut ne pas avoir de limite')],
     check: { bait: { skill: 'a1-seq-limits', exam: 'tf' } },
-    explain: () => 'La règle du quotient demande lim bₙ ≠ 0. bₙ ≠ 0 pour chaque n ne suffit pas : bₙ = (−1)ⁿ/n et aₙ = 1 donnent aₙ/bₙ = (−1)ⁿ·n, sans limite.',
+    explain: () => t('La règle du quotient demande lim bₙ ≠ 0. bₙ ≠ 0 pour chaque n ne suffit pas : bₙ = (−1)ⁿ/n et aₙ = 1 donnent aₙ/bₙ = (−1)ⁿ·n, sans limite.'),
   },
 ];

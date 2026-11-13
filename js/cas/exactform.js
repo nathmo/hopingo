@@ -8,6 +8,7 @@
 
 import { stripParen, contains } from './ast.js';
 import { numValue } from './ast.js';
+import { t as tr } from '../i18n.js';
 
 const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
 
@@ -32,11 +33,11 @@ function kindOf(x) {
   if (x.t === 'sqrt') {
     const e = stripParen(x.e);
     const m = intOf(e);
-    if (m === null) return e.t === 'frac' ? 'Écris la racine sans fraction dedans : √(a/b) = √a/√b, puis enlève la racine du dénominateur.' : null;
+    if (m === null) return e.t === 'frac' ? tr('Écris la racine sans fraction dedans : √(a/b) = √a/√b, puis enlève la racine du dénominateur.') : null;
     if (m < 0) return null;
     const r = Math.round(Math.sqrt(m));
-    if (r * r === m) return `Calcule la racine : √${m} = ${r}.`;
-    if (!squarefree(m)) return 'Simplifie la racine : sors les carrés (√8 = 2√2).';
+    if (r * r === m) return tr('Calcule la racine : √{n} = {r}.', { n: m, r });
+    if (!squarefree(m)) return tr('Simplifie la racine : sors les carrés (√8 = 2√2).');
     return `√${m}`;
   }
   return null;
@@ -56,7 +57,7 @@ function termOf(t) {
   }
   if (x.t === 'frac') {
     const d = intOf(x.d);
-    if (d === null) return termOf(x.d)?.kind?.startsWith?.('√') ? 'Enlève la racine du dénominateur : multiplie en haut et en bas par cette racine.' : null;
+    if (d === null) return termOf(x.d)?.kind?.startsWith?.('√') ? tr('Enlève la racine du dénominateur : multiplie en haut et en bas par cette racine.') : null;
     const top = termOf(x.n);
     if (!top || typeof top === 'string') return top;
     if (top.d !== 1) return null;
@@ -100,7 +101,7 @@ function sumOf(n) {
   for (const t of ts) if (!t || typeof t === 'string') return t;
   const kinds = new Set();
   for (const t of ts) {
-    if (kinds.has(t.kind)) return 'Regroupe les termes semblables.';
+    if (kinds.has(t.kind)) return tr('Regroupe les termes semblables.');
     kinds.add(t.kind);
   }
   return ts;

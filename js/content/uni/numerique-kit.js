@@ -24,6 +24,7 @@
 // Numbers: fmt (fractions kept), expText (2.032035e-02), fr (−, comma).
 
 import { tableItem, mcq, fr } from './kit.js';
+import { t } from '../../i18n.js';
 import { referenceRows, fmt, expText, fv } from '../../judges/iter-num.js';
 
 export { fmt, expText, fv, referenceRows };
@@ -120,8 +121,8 @@ def solve(A, b):
     return x
 `;
 
-export const SIG_VEC = ['zeros(n) : liste de n zéros', 'dot(u, v) : produit scalaire', 'norm(v) : norme euclidienne', 'math.sqrt, math.exp, math.log, math.sin, math.cos, math.pi'];
-export const SIG_MAT = ['zeros2(n, m) : matrice n × m de zéros', 'eye(n) : identité', 'copy2(A) : copie', 'matvec(A, x) : A·x', 'transpose(A)', 'matmul(A, B) : A·B', 'solve(A, b) : solution de Ax = b (comme A\\b)'];
+export const SIG_VEC = [t('zeros(n) : liste de n zéros'), t('dot(u, v) : produit scalaire'), t('norm(v) : norme euclidienne'), 'math.sqrt, math.exp, math.log, math.sin, math.cos, math.pi'];
+export const SIG_MAT = [t('zeros2(n, m) : matrice n × m de zéros'), t('eye(n) : identité'), t('copy2(A) : copie'), 'matvec(A, x) : A·x', 'transpose(A)', 'matmul(A, B) : A·B', t('solve(A, b) : solution de Ax = b (comme A\\b)')];
 
 // The reference program: «…» marks the holes. → {parts, answers}
 // parts: the text around the holes (parts.length = answers.length + 1).
@@ -180,10 +181,10 @@ export function codeItem(o) {
     if (o.choice === k) {
       const seen = new Set([R.answers[k]]);
       const options = [{ text: R.answers[k], correct: true }];
-      for (const t of [...(o.traps?.[k] || []), ...(o.fillers?.[k] || []).map((text) => ({ text }))]) {
-        if (options.length >= 4 || seen.has(t.text)) continue;
-        seen.add(t.text);
-        options.push({ text: t.text, correct: false, ...(t.rule ? { rule: t.rule } : {}) });
+      for (const tr of [...(o.traps?.[k] || []), ...(o.fillers?.[k] || []).map((text) => ({ text }))]) {
+        if (options.length >= 4 || seen.has(tr.text)) continue;
+        seen.add(tr.text);
+        options.push({ text: tr.text, correct: false, ...(tr.rule ? { rule: tr.rule } : {}) });
       }
       h.options = o.rng ? o.rng.shuffle(options) : options;
     }
@@ -191,7 +192,7 @@ export function codeItem(o) {
   });
   const exam = o.exam || false;
   const noHints = o.noHints ?? (o.level >= 5 || !!exam);
-  const baits = [...new Set(holes.flatMap((h) => [...h.traps.map((t) => t.rule), ...(h.options || []).map((x) => x.rule)]).filter(Boolean))];
+  const baits = [...new Set(holes.flatMap((h) => [...h.traps.map((x) => x.rule), ...(h.options || []).map((x) => x.rule)]).filter(Boolean))];
   return {
     skill: o.skill, level: o.level, type: 'code', lang: 'python',
     prompt: o.prompt,
@@ -202,7 +203,7 @@ export function codeItem(o) {
     then: o.then || null,
     hints: noHints ? [] : o.hints,
     noHints,
-    solution: o.solution || [{ html: codeHtml(R.text), note: 'Le programme complet' }],
+    solution: o.solution || [{ html: codeHtml(R.text), note: t('Le programme complet') }],
     subgoals: o.subgoals || [],
     baits: o.baits || baits,
     key: `${o.skill}:code:${o.key}`,
@@ -218,14 +219,14 @@ export function codeMcq(o, rng) {
   const k = o.hole;
   const options = [{ html: codeInline(R.answers[k]), correct: true }];
   const seen = new Set([R.answers[k]]);
-  for (const t of [...(o.traps?.[k] || []), ...(o.fillers?.[k] || []).map((text) => ({ text }))]) {
-    if (options.length >= 4 || seen.has(t.text)) continue;
-    seen.add(t.text);
-    options.push({ html: codeInline(t.text), correct: false, ...(t.rule ? { rule: t.rule } : {}) });
+  for (const tr of [...(o.traps?.[k] || []), ...(o.fillers?.[k] || []).map((text) => ({ text }))]) {
+    if (options.length >= 4 || seen.has(tr.text)) continue;
+    seen.add(tr.text);
+    options.push({ html: codeInline(tr.text), correct: false, ...(tr.rule ? { rule: tr.rule } : {}) });
   }
   return mcq({
     skill: o.skill, level: o.level ?? 4, key: `${o.skill}:codemcq:${o.key}`,
-    prompt: `${o.prompt}${codeHtml(o.excerpt ? o.excerpt(R, k) : sourceOf(R, [k]))}Que faut-il écrire à la place de ${codeInline('???')} ?`,
+    prompt: `${o.prompt}${codeHtml(o.excerpt ? o.excerpt(R, k) : sourceOf(R, [k]))}${t('Que faut-il écrire à la place de {q} ?', { q: codeInline('???') })}`,
     options, exam: o.exam || false, solution: o.solution || [{ html: codeHtml(R.text), note: '' }],
     multi: !!o.multi, expectedSec: o.expectedSec || 60,
   }, rng);
@@ -233,9 +234,9 @@ export function codeMcq(o, rng) {
 
 // ---------- tables to read ----------
 
-export function tableHtml(t) {
-  const head = `<tr>${t.columns.map((c) => `<th>${c}</th>`).join('')}</tr>`;
-  const body = t.rows.map((r) => `<tr>${r.map((c) => `<td>${c ?? ''}</td>`).join('')}</tr>`).join('');
+export function tableHtml(tb) {
+  const head = `<tr>${tb.columns.map((c) => `<th>${c}</th>`).join('')}</tr>`;
+  const body = tb.rows.map((r) => `<tr>${r.map((c) => `<td>${c ?? ''}</td>`).join('')}</tr>`).join('');
   return `<div class="table-wrap"><table class="u-table read-table">${head}${body}</table></div>`;
 }
 
@@ -261,7 +262,7 @@ export function readtableItem(o) {
 // A multiple choice with one or several right options (exam scale +1/N,
 // −1/M). options: [{html, correct, rule?}].
 export function multiMcq(o, rng) {
-  const it = mcq({ ...o, multi: true, prompt: `${o.prompt}<br><i>Une ou plusieurs réponses justes.</i>` }, rng);
+  const it = mcq({ ...o, multi: true, prompt: `${o.prompt}<br><i>${t('Une ou plusieurs réponses justes.')}</i>` }, rng);
   return it;
 }
 
@@ -270,9 +271,9 @@ export function multiMcq(o, rng) {
 export function vfMcq(o, rng) {
   return mcq({
     skill: o.skill, level: o.level ?? 4, key: o.key, keepOrder: true,
-    prompt: `Vrai ou faux ?<br>${o.statement}`,
-    options: [{ html: 'Vrai', correct: !!o.truth, ...(o.truth ? {} : o.ruleIfTrue ? { rule: o.ruleIfTrue } : {}) },
-      { html: 'Faux', correct: !o.truth, ...(o.truth && o.ruleIfFalse ? { rule: o.ruleIfFalse } : {}) }],
+    prompt: `${t('Vrai ou faux ?')}<br>${o.statement}`,
+    options: [{ html: t('Vrai'), correct: !!o.truth, ...(o.truth ? {} : o.ruleIfTrue ? { rule: o.ruleIfTrue } : {}) },
+      { html: t('Faux'), correct: !o.truth, ...(o.truth && o.ruleIfFalse ? { rule: o.ruleIfFalse } : {}) }],
     exam: o.exam || false,
     solution: o.solution || (o.explanation ? [{ html: o.explanation, note: '' }] : []),
   }, rng);
@@ -328,7 +329,7 @@ import { blankLine } from '../../judges/lines.js';
 // reading order) are blanks: {math, blanks}.
 export function blankBy(math, targets, opts = {}) {
   const node = parseCas(math, opts);
-  const want = targets.map((t) => textCas(parseCas(String(t), opts)));
+  const want = targets.map((x) => textCas(parseCas(String(x), opts)));
   const holes = [];
   const walk = (n) => {
     if (!n || typeof n !== 'object' || !want.length) return;

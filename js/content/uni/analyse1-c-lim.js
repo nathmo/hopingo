@@ -16,6 +16,7 @@ import {
 } from './analyse1-c-kit.js';
 import { uText, fText, rd, boxText } from './analyse1-c-dl.js';
 import { opData, opBuild } from './analyse1-c-ops.js';
+import { t } from '../../i18n.js';
 
 const LIMIT = { kind: 'limit', v: V, to: '0' };
 const qt = (c) => c.toString();
@@ -27,8 +28,8 @@ const paren = (c) => (c.n < 0 || c.d !== 1 ? `(${c.toString()})` : c.toString())
 
 const LI = 'a1-dl-limits';
 const LI_SUB = [
-  { id: 'dl', label: 'DL du numérateur et du dénominateur', skill: 'a1-dl-ops' },
-  { id: 'limit', label: 'passer à la limite', skill: LI },
+  { id: 'dl', label: t('DL du numérateur et du dénominateur'), skill: 'a1-dl-ops' },
+  { id: 'limit', label: t('passer à la limite'), skill: LI },
 ];
 
 // Every usual function call of a text replaced by its DL at order k (the
@@ -120,34 +121,34 @@ const fx = (t) => (/[+-]/.test(t.replace(/\([^()]*\)/g, '').slice(1)) ? `(${t})`
 const liStart = (d) => `${fx(d.N)}/${d.mono ? d.D : `(${d.D})`}`;
 
 const LI_CHOICES = (d) => [
-  { id: 'subst', label: 'Remplacer chaque fonction par son DL' },
-  { id: 'reduce', label: `Réduire : garder les termes jusqu'à ${xp(d.k)}` },
-  { id: 'quot', label: 'Écrire le quotient des deux DL' },
-  { id: 'divide', label: `Diviser le haut et le bas par ${xp(d.k)}` },
-  { id: 'limit', label: 'Passer à la limite (ε(x) → 0)' },
-  { id: 'low', label: `Développer seulement jusqu'à ${xp(d.k - 1)}`, rule: 'a1_dl_order_too_low', why: `Le dénominateur est en ${xp(d.k)} : il faut le numérateur jusqu'à ${xp(d.k)}.` },
+  { id: 'subst', label: t('Remplacer chaque fonction par son DL') },
+  { id: 'reduce', label: t('Réduire : garder les termes jusqu\'à {k}', { k: xp(d.k) }) },
+  { id: 'quot', label: t('Écrire le quotient des deux DL') },
+  { id: 'divide', label: t('Diviser le haut et le bas par {k}', { k: xp(d.k) }) },
+  { id: 'limit', label: t('Passer à la limite (ε(x) → 0)') },
+  { id: 'low', label: t('Développer seulement jusqu\'à {p1}', { p1: xp(d.k - 1) }), rule: 'a1_dl_order_too_low', why: t('Le dénominateur est en {k} : il faut le numérateur jusqu\'à {k2}.', { k: xp(d.k), k2: xp(d.k) }) },
 ];
 
 function liParts(d, level, { decision = null } = {}) {
   const series = { kind: 'series', v: V, at: 0, order: d.k };
   const choices = LI_CHOICES(d);
   const sN = substDL(d.N, d.k);
-  let nLines = [E(sN, 'DL de chaque fonction', 'dl', 'subst'), E(d.dlN, `DL du numérateur à l'ordre ${d.k}`, 'dl', 'reduce')];
+  let nLines = [E(sN, t('DL de chaque fonction'), 'dl', 'subst'), E(d.dlN, t('DL du numérateur à l\'ordre {k}', { k: d.k }), 'dl', 'reduce')];
   if (level <= 2) nLines = [nLines[0], { ...nLines[1], ...blankDL(d.dlN, () => 'coef') }];
   const parts = [{ html: '', start: d.N, judge: series, lines: nLines, choices, pre: decision ? [decision] : [] }];
   if (!d.mono) {
-    let dLines = [E(substDL(d.D, d.k), 'DL de chaque fonction', 'dl', 'subst'), E(d.dlD, `DL du dénominateur à l'ordre ${d.k}`, 'dl', 'reduce')];
+    let dLines = [E(substDL(d.D, d.k), t('DL de chaque fonction'), 'dl', 'subst'), E(d.dlD, t('DL du dénominateur à l\'ordre {k}', { k: d.k }), 'dl', 'reduce')];
     if (level <= 2) dLines = [dLines[0], { ...dLines[1], ...blankDL(d.dlD, () => 'coef') }];
-    parts.push({ html: `Le dénominateur ${MT(d.D)} à l'ordre ${d.k} :`, start: d.D, judge: series, lines: dLines, choices });
+    parts.push({ html: t('Le dénominateur {D} à l\'ordre {k} :', { D: MT(d.D), k: d.k }), start: d.D, judge: series, lines: dLines, choices });
   }
   const top = d.mono ? `${qt(d.cN)}+ε(x)` : `(${qt(d.cN)}+ε(x))/(${qt(d.cD)}+ε(x))`;
   let lLines = [
-    E(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`, 'Remplacer par les DL', 'limit', 'quot'),
-    E(top, `Diviser par ${xp(d.k)}`, 'limit', 'divide'),
+    E(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`, t('Remplacer par les DL'), 'limit', 'quot'),
+    E(top, t('Diviser par {k}', { k: xp(d.k) }), 'limit', 'divide'),
     E(qt(d.L), 'ε(x) → 0', 'limit', 'limit'),
   ];
   if (level === 1) lLines = [lLines[0], blanked(lLines[1], [qt(d.cN)]), lLines[2]];
-  parts.push({ html: 'La limite :', start: liStart(d), judge: LIMIT, lines: lLines, choices });
+  parts.push({ html: t('La limite :'), start: liStart(d), judge: LIMIT, lines: lLines, choices });
   return parts;
 }
 
@@ -159,17 +160,17 @@ function liItem(level, rng, profile, opts) {
   let decision = null;
   if (level === 2) {
     decision = {
-      kind: 'decision', prompt: 'À quel ordre développer le numérateur ?', options: rng.shuffle([
-        { id: 'low', label: `Ordre ${d.k - 1}`, valid: false, rule: 'a1_dl_order_too_low', why: `Il resterait ε(x)/x : le dénominateur est en ${xp(d.k)}, il faut aller jusqu'à ${xp(d.k)}.` },
-        { id: 'k', label: `Ordre ${d.k}`, valid: true, ref: true },
-        { id: 'high', label: `Ordre ${d.k + 1}`, valid: true, quality: 'poor', why: `Juste, mais le terme en ${xp(d.k + 1)} disparaît à la limite : l'ordre ${d.k} suffit.` },
+      kind: 'decision', prompt: t('À quel ordre développer le numérateur ?'), options: rng.shuffle([
+        { id: 'low', label: t('Ordre {p1}', { p1: d.k - 1 }), valid: false, rule: 'a1_dl_order_too_low', why: t('Il resterait ε(x)/x : le dénominateur est en {k}, il faut aller jusqu\'à {k2}.', { k: xp(d.k), k2: xp(d.k) }) },
+        { id: 'k', label: t('Ordre {k}', { k: d.k }), valid: true, ref: true },
+        { id: 'high', label: t('Ordre {p1}', { p1: d.k + 1 }), valid: true, quality: 'poor', why: t('Juste, mais le terme en {p1} disparaît à la limite : l\'ordre {k} suffit.', { p1: xp(d.k + 1), k: d.k }) },
       ]),
     };
   } else if (level >= 4) {
     decision = {
-      kind: 'decision', prompt: 'Quelle méthode ?', options: [
-        { id: 'dl', label: 'Développements limités', valid: true, ref: true },
-        { id: 'bh', label: 'Règle de Bernoulli-l\'Hôpital', valid: true, ...(d.k >= 3 ? { quality: 'poor', why: `Juste, mais il faudrait dériver ${d.k} fois le haut et le bas : les DL sont plus courts.` } : {}) },
+      kind: 'decision', prompt: t('Quelle méthode ?'), options: [
+        { id: 'dl', label: t('Développements limités'), valid: true, ref: true },
+        { id: 'bh', label: t('Règle de Bernoulli-l\'Hôpital'), valid: true, ...(d.k >= 3 ? { quality: 'poor', why: t('Juste, mais il faudrait dériver {k} fois le haut et le bas : les DL sont plus courts.', { k: d.k }) } : {}) },
       ],
     };
   }
@@ -178,9 +179,9 @@ function liItem(level, rng, profile, opts) {
   const start = liStart(d);
   return linesItem({
     skill: LI, level,
-    prompt: `Calcule ${MT(`lim(${start},x,0)`)} par développements limités.${level === 1 ? ` Développe à l'ordre ${d.k}.` : ''}`,
+    prompt: t('Calcule {p1} par développements limités.{p2}', { p1: MT(`lim(${start},x,0)`), p2: level === 1 ? t(' Développe à l\'ordre {k}.', { k: d.k }) : '' }),
     ...as, mode: modeOf(level),
-    hints: H(`Le dénominateur commence en ${xp(d.k)} : développe le numérateur jusqu'à ${xp(d.k)}.`, `${rd(d.N)} = □·${xp(d.k)} + ${xp(d.k)}·ε(x)`, `${MT(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`)} → ${MT(qt(d.L))}`),
+    hints: H(t('Le dénominateur commence en {k} : développe le numérateur jusqu\'à {k2}.', { k: xp(d.k), k2: xp(d.k) }), `${rd(d.N)} = □·${xp(d.k)} + ${xp(d.k)}·ε(x)`, `${MT(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`)} → ${MT(qt(d.L))}`),
     subgoals: LI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${LI}:${start}`, exam: examOf(opts), fallback: !!d.fallback,
   });
@@ -204,7 +205,7 @@ function liMcq(rng) {
   return mcq({
     skill: LI, level: 4, prompt: `${MT(`lim(${start},x,0)`)} =`, options: uniq(opts).slice(0, 4), key: `mcq:${start}`,
     exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: !!d.fallback,
-    solution: [{ html: `${MT(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`)} → ${MT(qt(d.L))}`, note: `DL à l'ordre ${d.k}` }],
+    solution: [{ html: `${MT(`(${d.dlN})/${d.mono ? d.D : `(${d.dlD})`}`)} → ${MT(qt(d.L))}`, note: t('DL à l\'ordre {k}', { k: d.k }) }],
   }, rng);
 }
 
@@ -216,33 +217,33 @@ function liTf(rng) {
     const f = `${uText(q(a))}${b < 0 ? '-' : '+'}${Math.abs(b) === 1 ? '' : Math.abs(b)}x^3+x^3ε(x)`;
     return tfItem({
       skill: LI, level: 4, truth: true, key: `exam:${f}`,
-      statement: `Si f(x) = ${rd(f)}, alors lim<sub>x→0</sub> (f(x) − ${rd(uText(q(a)))})/x² = 0.`,
-      explanation: `Vrai (examen 2018) : (f(x) − ${rd(uText(q(a)))})/x² = ${b}x + x·ε(x) → 0.`,
+      statement: t('Si f(x) = {f}, alors lim<sub>x→0</sub> (f(x) − {p1})/x² = 0.', { f: rd(f), p1: rd(uText(q(a))) }),
+      explanation: t('Vrai (examen 2018) : (f(x) − {p1})/x² = {b}x + x·ε(x) → 0.', { p1: rd(uText(q(a))), b }),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
   if (kind === 'cube') {
     return tfItem({
       skill: LI, level: 4, truth: true, key: 'cube',
-      statement: 'Pour tout réel b : si f(x) = x + bx³ + x³·ε(x), alors lim<sub>x→0</sub> (f(x) − x)/x³ = b.',
-      explanation: 'Vrai : (f(x) − x)/x³ = b + ε(x) → b.',
+      statement: t('Pour tout réel b : si f(x) = x + bx³ + x³·ε(x), alors lim<sub>x→0</sub> (f(x) − x)/x³ = b.'),
+      explanation: t('Vrai : (f(x) − x)/x³ = b + ε(x) → b.'),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
   if (kind === 'false2') {
     return tfItem({
       skill: LI, level: 4, truth: false, key: 'false2', ruleIfTrue: 'a1_dl_order_too_low',
-      statement: 'Pour tous réels a, b : si f(x) = ax + bx² + x²·ε(x), alors lim<sub>x→0</sub> f(x)/x² = b.',
+      statement: t('Pour tous réels a, b : si f(x) = ax + bx² + x²·ε(x), alors lim<sub>x→0</sub> f(x)/x² = b.'),
       counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }, { q: '∀', v: 'b', dom: 'R' }], pred: 'a=0', ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: { a: '1', b: '0' } },
-      explanation: 'Faux : si a ≠ 0, f(x)/x² = a/x + b + ε(x) n\'a pas de limite finie. Avec a = 1, b = 0 : f(x)/x² = 1/x + ε(x).',
+      explanation: t('Faux : si a ≠ 0, f(x)/x² = a/x + b + ε(x) n\'a pas de limite finie. Avec a = 1, b = 0 : f(x)/x² = 1/x + ε(x).'),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
   return tfItem({
     skill: LI, level: 4, truth: false, key: 'falseA', ruleIfTrue: 'a1_dl_factorial_missing',
-    statement: 'Pour tout réel a : lim<sub>x→0</sub> (e^(ax) − 1 − ax)/x² = a².',
+    statement: t('Pour tout réel a : lim<sub>x→0</sub> (e^(ax) − 1 − ax)/x² = a².'),
     counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }], pred: 'a^2/2=a^2', ask: [{ v: 'a', label: 'a =' }], answer: { a: '1' } },
-    explanation: 'Faux : e^(ax) = 1 + ax + a²x²/2 + x²·ε(x), donc la limite vaut a²/2. Avec a = 1 : 1/2 ≠ 1.',
+    explanation: t('Faux : e^(ax) = 1 + ax + a²x²/2 + x²·ε(x), donc la limite vaut a²/2. Avec a = 1 : 1/2 ≠ 1.'),
     exam: { format: 'tf', points: 1 }, expectedSec: 60,
   });
 }
@@ -253,8 +254,8 @@ function liTf(rng) {
 
 const RE = 'a1-dl-read';
 const RE_SUB = [
-  { id: 'dl', label: 'DL', skill: 'a1-dl-ops' },
-  { id: 'read', label: 'lire f⁽ᵏ⁾(a)', skill: RE },
+  { id: 'dl', label: t('DL'), skill: 'a1-dl-ops' },
+  { id: 'read', label: t('lire f⁽ᵏ⁾(a)'), skill: RE },
 ];
 const SUPS = { 1: '′', 2: '″', 3: '‴', 4: '⁽⁴⁾', 5: '⁽⁵⁾', 6: '⁽⁶⁾' };
 const dname = (k, a) => `f${SUPS[k]}(${a})`;
@@ -284,14 +285,14 @@ function readPart(k, a, c, level, html) {
   const judge = { kind: 'value', form: 'irreducible', expect: qt(want), read: { k, a: qt(c) } };
   let l1 = E(`${fact(k)}×${paren(c)}`, `${dname(k, a)} = ${k}!·a${k > 9 ? k : String.fromCharCode(0x2080 + k)}`, 'read', 'mult');
   if (level === 1) l1 = blanked(l1, [String(fact(k))]);
-  const lines = [l1, E(qt(want), 'Calculer', 'read', 'compute')];
+  const lines = [l1, E(qt(want), t('Calculer'), 'read', 'compute')];
   return { html, ask: `${dname(k, a)} =`, start: dlabel(k, a), judge, lines, choices: RE_CHOICES };
 }
 const RE_CHOICES = [
-  { id: 'mult', label: 'Multiplier le coefficient aₖ par k!' },
-  { id: 'compute', label: 'Calculer' },
-  { id: 'read', label: 'Prendre aₖ tel quel', rule: 'a1_dl_read_factorial', why: 'aₖ = f⁽ᵏ⁾(a)/k! : il faut multiplier par k!.' },
-  { id: 'divide', label: 'Diviser aₖ par k!', rule: 'a1_dl_read_divide', why: 'aₖ = f⁽ᵏ⁾(a)/k!, donc f⁽ᵏ⁾(a) = k!·aₖ : on multiplie.' },
+  { id: 'mult', label: t('Multiplier le coefficient aₖ par k!') },
+  { id: 'compute', label: t('Calculer') },
+  { id: 'read', label: t('Prendre aₖ tel quel'), rule: 'a1_dl_read_factorial', why: t('aₖ = f⁽ᵏ⁾(a)/k! : il faut multiplier par k!.') },
+  { id: 'divide', label: t('Diviser aₖ par k!'), rule: 'a1_dl_read_divide', why: t('aₖ = f⁽ᵏ⁾(a)/k!, donc f⁽ᵏ⁾(a) = k!·aₖ : on multiplie.') },
 ];
 
 // A DL given with chosen coefficients (a = 0 or 1).
@@ -320,14 +321,14 @@ function reItem(level, rng, profile, opts) {
   const g = givenData(rng);
   const ks = rng.shuffle(g.ks).slice(0, level === 3 ? 2 : 1).sort((x, y) => x - y);
   const dl = dlAt(g.cs, g.a, g.n);
-  const parts = ks.map((k, i) => readPart(k, g.a, g.cs[k], level, i ? `Puis ${dname(k, g.a)} :` : ''));
+  const parts = ks.map((k, i) => readPart(k, g.a, g.cs[k], level, i ? t('Puis {p1} :', { p1: dname(k, g.a) }) : ''));
   if (level === 2) {
     const k = ks[0];
     parts[0].pre = [{
-      kind: 'decision', prompt: `Comment obtenir ${dname(k, g.a)} à partir du coefficient a${String.fromCharCode(0x2080 + k)} ?`, options: rng.shuffle([
+      kind: 'decision', prompt: t('Comment obtenir {p1} à partir du coefficient a{p2} ?', { p1: dname(k, g.a), p2: String.fromCharCode(0x2080 + k) }), options: rng.shuffle([
         { id: 'mult', label: `${dname(k, g.a)} = ${k}!·a${String.fromCharCode(0x2080 + k)}`, valid: true, ref: true },
-        { id: 'read', label: `${dname(k, g.a)} = a${String.fromCharCode(0x2080 + k)}`, valid: false, rule: 'a1_dl_read_factorial', why: 'Le coefficient vaut f⁽ᵏ⁾(a)/k! : il faut multiplier par k!.' },
-        { id: 'divide', label: `${dname(k, g.a)} = a${String.fromCharCode(0x2080 + k)}/${k}!`, valid: false, rule: 'a1_dl_read_divide', why: 'aₖ = f⁽ᵏ⁾(a)/k!, donc f⁽ᵏ⁾(a) = k!·aₖ : on multiplie.' },
+        { id: 'read', label: `${dname(k, g.a)} = a${String.fromCharCode(0x2080 + k)}`, valid: false, rule: 'a1_dl_read_factorial', why: t('Le coefficient vaut f⁽ᵏ⁾(a)/k! : il faut multiplier par k!.') },
+        { id: 'divide', label: `${dname(k, g.a)} = a${String.fromCharCode(0x2080 + k)}/${k}!`, valid: false, rule: 'a1_dl_read_divide', why: t('aₖ = f⁽ᵏ⁾(a)/k!, donc f⁽ᵏ⁾(a) = k!·aₖ : on multiplie.') },
       ]),
     }];
   }
@@ -335,9 +336,9 @@ function reItem(level, rng, profile, opts) {
   const k0 = ks[0];
   return linesItem({
     skill: RE, level,
-    prompt: `f est de classe C<sup>${g.n}</sup> et f(x) = ${MT(dlAt(g.cs, g.a, g.n))} au voisinage de ${g.a}. Calcule ${ks.map((k) => dname(k, g.a)).join(' et ')}.`,
+    prompt: t('f est de classe C<sup>{n}</sup> et f(x) = {p1} au voisinage de {a}. Calcule {p2}.', { n: g.n, p1: MT(dlAt(g.cs, g.a, g.n)), a: g.a, p2: ks.map((k) => dname(k, g.a)).join(t(' et ')) }),
     ...as, mode: modeOf(level),
-    hints: H('Le coefficient de (x − a)ᵏ vaut f⁽ᵏ⁾(a)/k!.', `${dname(k0, g.a)} = □·${paren(g.cs[k0]).replace('-', '−')}`, `${dname(k0, g.a)} = ${fact(k0)}·${paren(g.cs[k0]).replace('-', '−')} = ${qt(g.cs[k0].mul(fact(k0))).replace('-', '−')}`),
+    hints: H(t('Le coefficient de (x − a)ᵏ vaut f⁽ᵏ⁾(a)/k!.'), `${dname(k0, g.a)} = □·${paren(g.cs[k0]).replace('-', '−')}`, `${dname(k0, g.a)} = ${fact(k0)}·${paren(g.cs[k0]).replace('-', '−')} = ${qt(g.cs[k0].mul(fact(k0))).replace('-', '−')}`),
     subgoals: RE_SUB, keys: ['calc'], tapActions: level === 3 ? 'steps' : null,
     key: `${RE}:${dl}:${ks.join(',')}`, exam: examOf(opts),
   });
@@ -354,25 +355,25 @@ function reComputed(level, rng, opts) {
   const ks = [n - 1, n];
   const parts = [
     { html: '', start: b.f, judge: { kind: 'series', v: V, at: 0, order: n }, lines: b.lines, choices: null },
-    ...ks.map((k) => readPart(k, 0, b.cs[k], level, `Déduis-en ${dname(k, 0)} :`)),
+    ...ks.map((k) => readPart(k, 0, b.cs[k], level, t('Déduis-en {p1} :', { p1: dname(k, 0) }))),
   ];
   const as = assemble(parts, level >= 4 ? 4 : level);
   const odd = ks.find((k) => isZero(b.cs[k]));
   return linesItem({
     skill: RE, level: exam ? 4 : level,
-    prompt: `Écris le DL d'ordre ${n} de f(x) = ${MT(b.f)} en 0, puis déduis-en ${ks.map((k) => dname(k, 0)).join(' et ')}.`,
+    prompt: t('Écris le DL d\'ordre {n} de f(x) = {f} en 0, puis déduis-en {p1}.', { n, f: MT(b.f), p1: ks.map((k) => dname(k, 0)).join(t(' et ')) }),
     ...as, mode: 'free',
-    hints: H(`D'abord le DL (produit ou quotient de DL usuels). Ensuite, le coefficient de xᵏ vaut f⁽ᵏ⁾(0)/k!${odd ? ' ; un coefficient nul donne une dérivée nulle' : ''}.`, boxText(blankDL(b.fin, (j) => (j > 0 ? 'coef' : false))), `${MT(b.fin)}, puis ${dname(n, 0)} = ${n}!·a${String.fromCharCode(0x2080 + n)}`),
+    hints: H(t('D\'abord le DL (produit ou quotient de DL usuels). Ensuite, le coefficient de xᵏ vaut f⁽ᵏ⁾(0)/k!{p1}.', { p1: odd ? t(' ; un coefficient nul donne une dérivée nulle') : '' }), boxText(blankDL(b.fin, (j) => (j > 0 ? 'coef' : false))), t('{fin}, puis {p1} = {n}!·a{p2}', { fin: MT(b.fin), p1: dname(n, 0), n, p2: String.fromCharCode(0x2080 + n) })),
     subgoals: RE_SUB, keys: KEYS, noHints: exam || level === 5,
     key: `${RE}:${b.f}:${n}`, exam: exam ? { format: 'open', points: 7 } : examOf(opts), fallback: !!d.fallback,
   });
 }
 
 const NATURE = [
-  { id: 'min', html: 'un minimum local' },
-  { id: 'max', html: 'un maximum local' },
-  { id: 'flat', html: 'un point d\'inflexion à tangente horizontale' },
-  { id: 'none', html: 'pas de point critique (f′(a) ≠ 0)' },
+  { id: 'min', html: t('un minimum local') },
+  { id: 'max', html: t('un maximum local') },
+  { id: 'flat', html: t('un point d\'inflexion à tangente horizontale') },
+  { id: 'none', html: t('pas de point critique (f′(a) ≠ 0)') },
 ];
 
 function reMcq(rng) {
@@ -390,11 +391,11 @@ function reMcq(rng) {
     const dl = dlAt(cs, a, 4);
     const right = NATURE.find((x) => x.id === kind);
     return mcq({
-      skill: RE, level: 4, prompt: `f est de classe C⁴ et f(x) = ${MT(dl)} au voisinage de ${a}. En ${a}, f a :`,
+      skill: RE, level: 4, prompt: t('f est de classe C⁴ et f(x) = {dl} au voisinage de {a}. En {a}, f a :', { dl: MT(dl), a }),
       // A flat point (a₂ = 0, a₃ ≠ 0) taken for an extremum.
       options: NATURE.map((x) => ({ html: x.html, correct: x.id === kind, ...(kind === 'flat' && (x.id === 'min' || x.id === 'max') ? { rule: 'g6_critical_is_extremum' } : {}) })), keepOrder: true, key: `nature:${dl}`,
       exam: { format: 'mcq', points: 1 }, expectedSec: 240,
-      solution: [{ html: kind === 'none' ? `a₁ = ${qt(c1)} ≠ 0 : f′(${a}) ≠ 0.` : kind === 'flat' ? `a₁ = a₂ = 0 et a₃ ≠ 0 : f(x) − f(${a}) change de signe en ${a}, avec une tangente horizontale.` : `a₁ = 0 et a₂ = ${qt(c2)} ${c2.n > 0 ? '>' : '<'} 0 : ${right.html}.`, note: '' }],
+      solution: [{ html: kind === 'none' ? `a₁ = ${qt(c1)} ≠ 0 : f′(${a}) ≠ 0.` : kind === 'flat' ? t('a₁ = a₂ = 0 et a₃ ≠ 0 : f(x) − f({a}) change de signe en {a}, avec une tangente horizontale.', { a }) : t('a₁ = 0 et a₂ = {c2} {p1} 0 : {html}.', { c2: qt(c2), p1: c2.n > 0 ? '>' : '<', html: right.html }), note: '' }],
     }, rng);
   }
   const g = givenData(rng);
@@ -409,7 +410,7 @@ function reMcq(rng) {
     { html: MT(qt(want.neg())), correct: false },
   ];
   return mcq({
-    skill: RE, level: 4, prompt: `f est de classe C<sup>${g.n}</sup> et f(x) = ${MT(dlAt(g.cs, g.a, g.n))} au voisinage de ${g.a}. ${dname(k, g.a)} =`,
+    skill: RE, level: 4, prompt: t('f est de classe C<sup>{n}</sup> et f(x) = {p1} au voisinage de {a}. {p2} =', { n: g.n, p1: MT(dlAt(g.cs, g.a, g.n)), a: g.a, p2: dname(k, g.a) }),
     options: uniq(opts).slice(0, 4), key: `mcq:${dlAt(g.cs, g.a, g.n)}:${k}`, exam: { format: 'mcq', points: 1 }, expectedSec: 240,
     solution: [{ html: `${dname(k, g.a)} = ${k}!·a${String.fromCharCode(0x2080 + k)} = ${fact(k)}·${paren(c)} = ${qt(want)}`.replace(/-/g, '−'), note: '' }],
   }, rng);
@@ -420,8 +421,8 @@ function reTf(rng) {
   if (kind === 'cn') {
     return tfItem({
       skill: RE, level: 4, truth: true, key: 'cn',
-      statement: 'Toute fonction de classe Cⁿ sur ]a ; b[ admet un DL d\'ordre n en tout point de ]a ; b[.',
-      explanation: 'Vrai : c\'est la formule de Taylor-Young, avec les coefficients f⁽ᵏ⁾(x₀)/k!.',
+      statement: t('Toute fonction de classe Cⁿ sur ]a ; b[ admet un DL d\'ordre n en tout point de ]a ; b[.'),
+      explanation: t('Vrai : c\'est la formule de Taylor-Young, avec les coefficients f⁽ᵏ⁾(x₀)/k!.'),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
@@ -433,16 +434,16 @@ function reTf(rng) {
   const naive = cs[0].add(cs[1].mul(3)).add(cs[2]);
   const truth = rng.chance(0.5) || naive.eq(right);
   const shown = truth ? right : naive;
-  const statement = `f est de classe C⁵ et f(x) = ${rd(dl)}. Alors f′(0) + 3f″(0) + f‴(0) = ${qt(shown).replace('-', '−')}.`;
-  const why = `f′(0) = a₁ = ${qt(cs[0])}, f″(0) = 2·a₂ = ${qt(cs[1].mul(2))}, f‴(0) = 6·a₃ = ${qt(cs[2].mul(6))} : la somme vaut ${qt(right)}.`.replace(/-/g, '−');
+  const statement = t('f est de classe C⁵ et f(x) = {dl}. Alors f′(0) + 3f″(0) + f‴(0) = {p1}.', { dl: rd(dl), p1: qt(shown).replace('-', '−') });
+  const why = t('f′(0) = a₁ = {p1}, f″(0) = 2·a₂ = {p2}, f‴(0) = 6·a₃ = {p3} : la somme vaut {right}.', { p1: qt(cs[0]), p2: qt(cs[1].mul(2)), p3: qt(cs[2].mul(6)), right: qt(right) }).replace(/-/g, '−');
   if (truth) {
-    return tfItem({ skill: RE, level: 4, truth: true, key: `combo:${dl}`, statement, explanation: `Vrai : ${why}`, exam: { format: 'tf', points: 1 }, expectedSec: 60 });
+    return tfItem({ skill: RE, level: 4, truth: true, key: `combo:${dl}`, statement, explanation: t('Vrai : {why}', { why }), exam: { format: 'tf', points: 1 }, expectedSec: 60 });
   }
   return {
     ...mcq({
-      skill: RE, level: 4, prompt: `Vrai ou faux ? <br>« ${statement} »`,
-      options: [{ html: 'Vrai', correct: false, rule: 'a1_dl_read_factorial' }, { html: 'Faux', correct: true }],
-      keepOrder: true, key: `tf:combo:${dl}`, expectedSec: 60, solution: [{ html: `Faux : ${why}`, note: '' }],
+      skill: RE, level: 4, prompt: t('Vrai ou faux ? <br>« {statement} »', { statement }),
+      options: [{ html: t('Vrai'), correct: false, rule: 'a1_dl_read_factorial' }, { html: t('Faux'), correct: true }],
+      keepOrder: true, key: `tf:combo:${dl}`, expectedSec: 60, solution: [{ html: t('Faux : {why}', { why }), note: '' }],
     }, rng),
     exam: { format: 'tf', points: 1 },
   };
@@ -454,9 +455,9 @@ function reTf(rng) {
 
 const TA = 'a1-taylor-rest';
 const TA_SUB = [
-  { id: 'taylor', label: 'polynôme de Taylor', skill: 'a1-dl-usual' },
-  { id: 'deriv', label: 'dérivée d\'ordre n + 1', skill: 'a1-deriv-rules' },
-  { id: 'bound', label: 'majorer le reste', skill: TA },
+  { id: 'taylor', label: t('polynôme de Taylor'), skill: 'a1-dl-usual' },
+  { id: 'deriv', label: t('dérivée d\'ordre n + 1'), skill: 'a1-deriv-rules' },
+  { id: 'bound', label: t('majorer le reste'), skill: TA },
 ];
 const X0S = [q(1, 10), q(1, 5), q(1, 2)];
 const binomH = (k) => { let c = q(1); for (let i = 0; i < k; i++) c = c.mul(q(1, 2).sub(i)).div(i + 1); return c; };
@@ -498,23 +499,23 @@ function taParts(d, level) {
   const parts = [];
   const choices = TA_CHOICES(d);
   if (level >= 3) {
-    parts.push({ html: '', start: T.f, judge: { kind: 'series', v: V, at: 0, order: n }, lines: [E(polyText(cs, { rem: n }), `DL d'ordre ${n} de ${T.name}`, 'taylor', 'taylor')], choices });
+    parts.push({ html: '', start: T.f, judge: { kind: 'series', v: V, at: 0, order: n }, lines: [E(polyText(cs, { rem: n }), t('DL d\'ordre {n} de {name}', { n, name: T.name }), 'taylor', 'taylor')], choices });
     const sub = joinTerms(cs.map((c, k) => (isZero(c) ? null : { neg: c.n < 0, text: k === 0 ? (c.n < 0 ? c.neg() : c).toString() : `${(c.n < 0 ? c.neg() : c).eq(1) ? '' : `(${(c.n < 0 ? c.neg() : c).toString()})`}${k === 1 ? X : `${X}^${k}`}` })).filter(Boolean));
-    if (cs.filter((c) => !isZero(c)).length > 1) parts.push({ html: `Approximation T<sub>${n}</sub>(${decText(x0).replace('.', ',')}) :`, ask: `T${String.fromCharCode(0x2080 + n)}(${decText(x0).replace('.', ',')}) =`, start: sub, judge: { kind: 'value', form: 'any' }, lines: [E(decText(d.Tx), 'Calculer', 'taylor', 'eval')], choices });
+    if (cs.filter((c) => !isZero(c)).length > 1) parts.push({ html: t('Approximation T<sub>{n}</sub>({p1}) :', { n, p1: decText(x0).replace('.', ',') }), ask: `T${String.fromCharCode(0x2080 + n)}(${decText(x0).replace('.', ',')}) =`, start: sub, judge: { kind: 'value', form: 'any' }, lines: [E(decText(d.Tx), t('Calculer'), 'taylor', 'eval')], choices });
   }
   if (level >= 2) {
-    const dl = E(T.deriv(m), `Dériver ${m} fois`, 'deriv', 'deriv');
-    parts.push({ html: `La dérivée d'ordre ${m} :`, ask: `f${SUPS[m]}(x) =`, start: `d(${T.f},x,${m})`, judge: { kind: 'equiv', vars: [V], domain: { x: [0, 1] }, target: 'no-prime' }, lines: [level === 2 ? blanked(dl, [T.deriv(m).match(/\(([^()]*)\)\(1\+x\)/)?.[1] ?? String(fact(m - 1))]) : dl], choices });
+    const dl = E(T.deriv(m), t('Dériver {m} fois', { m }), 'deriv', 'deriv');
+    parts.push({ html: t('La dérivée d\'ordre {m} :', { m }), ask: `f${SUPS[m]}(x) =`, start: `d(${T.f},x,${m})`, judge: { kind: 'equiv', vars: [V], domain: { x: [0, 1] }, target: 'no-prime' }, lines: [level === 2 ? blanked(dl, [T.deriv(m).match(/\(([^()]*)\)\(1\+x\)/)?.[1] ?? String(fact(m - 1))]) : dl], choices });
   }
   const Mopt = T.opt ? T.opt(x0) : d.M.valueOf();
-  const Mlines = [E(d.M.toString(), d.key === 'exp' ? `eˣ ≤ e^${decText(x0).replace('.', ',')} < 2 sur [0 ; ${decText(x0).replace('.', ',')}]` : `Majorer sur tout [0 ; ${decText(x0).replace('.', ',')}]`, 'bound', 'max')];
+  const Mlines = [E(d.M.toString(), d.key === 'exp' ? t('eˣ ≤ e^{p1} < 2 sur [0 ; {p2}]', { p1: decText(x0).replace('.', ','), p2: decText(x0).replace('.', ',') }) : t('Majorer sur tout [0 ; {p1}]', { p1: decText(x0).replace('.', ',') }), 'bound', 'max')];
   const at0 = T.at0 ? [T.at0().toString(), `${T.at0().toString()}×x^${m}/${fact(m)}`, d.B.div(d.M).mul(T.at0()).toString()] : null;
   parts.push({
-    html: `Majore |f${SUPS[m]}(x)| pour x ∈ [0 ; ${decText(x0).replace('.', ',')}] :`, ask: 'M =', start: `|${T.deriv(m)}|`,
+    html: t('Majore |f{p1}(x)| pour x ∈ [0 ; {p2}] :', { p1: SUPS[m], p2: decText(x0).replace('.', ',') }), ask: 'M =', start: `|${T.deriv(m)}|`,
     pre: level !== 2 ? [] : [{
-      kind: 'decision', prompt: `Où majorer |f${SUPS[m]}(c)| ?`, options: [
-        { id: 'all', label: `Sur tout [0 ; ${decText(x0).replace('.', ',')}] : c y est quelque part`, valid: true, ref: true },
-        { id: 'at0', label: 'En 0 seulement : le développement est fait en 0', valid: false, rule: 'a1_taylor_rest_at_a', why: 'c est entre 0 et x, pas forcément en 0 : il faut le maximum sur tout l\'intervalle.' },
+      kind: 'decision', prompt: t('Où majorer |f{p1}(c)| ?', { p1: SUPS[m] }), options: [
+        { id: 'all', label: t('Sur tout [0 ; {p1}] : c y est quelque part', { p1: decText(x0).replace('.', ',') }), valid: true, ref: true },
+        { id: 'at0', label: t('En 0 seulement : le développement est fait en 0'), valid: false, rule: 'a1_taylor_rest_at_a', why: t('c est entre 0 et x, pas forcément en 0 : il faut le maximum sur tout l\'intervalle.') },
       ],
     }],
     judge: { kind: 'equiv', vars: [V], domain: { x: [0, x0.valueOf()] }, rel: '≤', target: 'constant', bound: ratAbove(2 * Mopt), ...(at0 ? { taylorAt: at0, taylorX: decText(x0).replace('.', ',') } : {}) },
@@ -523,13 +524,13 @@ function taParts(d, level) {
   const Mt = d.M.eq(1) ? '' : `${paren(d.M)}×`;
   const Bopt = Mopt * x0.valueOf() ** m / fact(m);
   let bl = [
-    E(`${Mt}x^${m}/${fact(m)}`, `Lagrange : |R${String.fromCharCode(0x2080 + n)}(x)| ≤ M·${xp(m)}/${m}!`, 'bound', 'lagrange'),
+    E(`${Mt}x^${m}/${fact(m)}`, t('Lagrange : |R{p1}(x)| ≤ M·{m}/{m2}!', { p1: String.fromCharCode(0x2080 + n), m: xp(m), m2: m }), 'bound', 'lagrange'),
     E(`${Mt}${X}^${m}/${fact(m)}`, `x ≤ ${decText(x0).replace('.', ',')}`, 'bound', 'lagrange'),
-    E(d.B.toString(), 'Calculer', 'bound', 'compute'),
+    E(d.B.toString(), t('Calculer'), 'bound', 'compute'),
   ];
   if (level === 1) bl = [blanked(bl[0], [d.M.toString()]), bl[1], bl[2]];
   parts.push({
-    html: `Majore l'erreur |f(x) − T<sub>${n}</sub>(x)| pour x ∈ [0 ; ${decText(x0).replace('.', ',')}] :`, ask: '|Rₙ| ≤',
+    html: t('Majore l\'erreur |f(x) − T<sub>{n}</sub>(x)| pour x ∈ [0 ; {p1}] :', { n, p1: decText(x0).replace('.', ',') }), ask: '|Rₙ| ≤',
     start: `|${T.f}-(${Tn})|`,
     judge: { kind: 'equiv', vars: [V], domain: { x: [0, x0.valueOf()] }, rel: '≤', target: 'constant', bound: ratAbove(2 * Bopt), ...(at0 ? { taylorAt: at0, taylorX: decText(x0).replace('.', ',') } : {}) },
     lines: bl, choices,
@@ -538,13 +539,13 @@ function taParts(d, level) {
 }
 
 const TA_CHOICES = (d) => [
-  { id: 'taylor', label: `Écrire le polynôme de Taylor T${String.fromCharCode(0x2080 + d.n)}` },
-  { id: 'eval', label: 'Évaluer le polynôme en x₀' },
-  { id: 'deriv', label: `Dériver ${d.m} fois` },
-  { id: 'max', label: `Majorer |f${SUPS[d.m]}| sur tout l'intervalle` },
-  { id: 'at0', label: `Prendre |f${SUPS[d.m]}(0)|`, rule: 'a1_taylor_rest_at_a', why: 'c est quelque part entre 0 et x : il faut majorer sur tout l\'intervalle.' },
-  { id: 'lagrange', label: `Borne de Lagrange M·${xp(d.m)}/${d.m}!` },
-  { id: 'compute', label: 'Calculer' },
+  { id: 'taylor', label: t('Écrire le polynôme de Taylor T{p1}', { p1: String.fromCharCode(0x2080 + d.n) }) },
+  { id: 'eval', label: t('Évaluer le polynôme en x₀') },
+  { id: 'deriv', label: t('Dériver {m} fois', { m: d.m }) },
+  { id: 'max', label: t('Majorer |f{p1}| sur tout l\'intervalle', { p1: SUPS[d.m] }) },
+  { id: 'at0', label: t('Prendre |f{p1}(0)|', { p1: SUPS[d.m] }), rule: 'a1_taylor_rest_at_a', why: t('c est quelque part entre 0 et x : il faut majorer sur tout l\'intervalle.') },
+  { id: 'lagrange', label: t('Borne de Lagrange M·{m}/{m2}!', { m: xp(d.m), m2: d.m }) },
+  { id: 'compute', label: t('Calculer') },
 ];
 
 function taItem(level, rng, profile, opts) {
@@ -561,16 +562,16 @@ function taItem(level, rng, profile, opts) {
       const eps = rng.pick([3, 4, 5]);
       let nn = 0;
       while (fam.M(nn).mul(d.x0.pow(nn + 1)).div(fact(nn + 1)).valueOf() > 10 ** -eps && nn < 20) nn++;
-      parts.push({ html: `Avec ${fam.w} sur [0 ; ${x0t}], quel est le plus petit n tel que la borne de Lagrange garantisse |f(${x0t}) − Tₙ(${x0t})| ≤ 10<sup>−${eps}</sup> ?`, ask: 'n =', start: 'n', judge: { kind: 'value', form: 'irreducible', expect: String(nn) }, lines: [E(String(nn), 'Essayer n = 1, 2, 3…', 'bound')] });
+      parts.push({ html: t('Avec {w} sur [0 ; {x0t}], quel est le plus petit n tel que la borne de Lagrange garantisse |f({x0t}) − Tₙ({x0t})| ≤ 10<sup>−{eps}</sup> ?', { w: fam.w, x0t, eps }), ask: 'n =', start: 'n', judge: { kind: 'value', form: 'irreducible', expect: String(nn) }, lines: [E(String(nn), t('Essayer n = 1, 2, 3…'), 'bound')] });
     }
   }
   const as = assemble(parts, level);
-  const given = level <= 2 ? ` On donne T<sub>${d.n}</sub>(x) = ${MT(Tn)}${level === 1 ? ` et f${SUPS[d.m]}(x) = ${MT(d.T.deriv(d.m))}` : ''}.` : '';
+  const given = level <= 2 ? t(' On donne T<sub>{n}</sub>(x) = {Tn}{p1}.', { n: d.n, Tn: MT(Tn), p1: level === 1 ? t(' et f{p1}(x) = {p2}', { p1: SUPS[d.m], p2: MT(d.T.deriv(d.m)) }) : '' }) : '';
   return linesItem({
     skill: TA, level,
-    prompt: `On approche f(x) = ${MT(d.T.f)} par son polynôme de Taylor T<sub>${d.n}</sub> en 0, pour x ∈ [0 ; ${x0t}].${given} Majore l'erreur avec le reste de Lagrange.`,
+    prompt: t('On approche f(x) = {f} par son polynôme de Taylor T<sub>{n}</sub> en 0, pour x ∈ [0 ; {x0t}].{given} Majore l\'erreur avec le reste de Lagrange.', { f: MT(d.T.f), n: d.n, x0t, given }),
     ...as, mode: modeOf(level),
-    hints: H(`Reste de Lagrange : f(x) − T${String.fromCharCode(0x2080 + d.n)}(x) = f${SUPS[d.m]}(c)·${xp(d.m)}/${d.m}! avec c entre 0 et x. Majore |f${SUPS[d.m]}| sur tout [0 ; ${x0t}].`, `|R${String.fromCharCode(0x2080 + d.n)}| ≤ □·(${x0t})^${d.m}/${fact(d.m)}`, `|R${String.fromCharCode(0x2080 + d.n)}| ≤ ${d.M.toString()}·(${x0t})^${d.m}/${fact(d.m)} = ${d.B.toString()}`),
+    hints: H(t('Reste de Lagrange : f(x) − T{p1}(x) = f{p2}(c)·{m}/{m2}! avec c entre 0 et x. Majore |f{p2}| sur tout [0 ; {x0t}].', { p1: String.fromCharCode(0x2080 + d.n), p2: SUPS[d.m], m: xp(d.m), m2: d.m, x0t }), `|R${String.fromCharCode(0x2080 + d.n)}| ≤ □·(${x0t})^${d.m}/${fact(d.m)}`, `|R${String.fromCharCode(0x2080 + d.n)}| ≤ ${d.M.toString()}·(${x0t})^${d.m}/${fact(d.m)} = ${d.B.toString()}`),
     subgoals: TA_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${TA}:${d.T.f}:${d.n}:${d.x0.toString()}`, exam: examOf(opts), fallback: !!d.fallback,
   });
@@ -588,9 +589,9 @@ function taTf(rng) {
   ];
   const b = rng.pick(bank);
   return tfItem({
-    skill: TA, level: 4, truth: b.truth, key: b.s, statement: b.s, ruleIfTrue: b.truth ? null : 'a1_taylor_rest_at_a',
+    skill: TA, level: 4, truth: b.truth, key: b.s, statement: t(b.s), ruleIfTrue: b.truth ? null : 'a1_taylor_rest_at_a',
     counter: b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, hyp: '0≤x≤1', ask: [{ v: 'x', label: 'x =' }], answer: { x: b.ans } },
-    explanation: b.why, exam: { format: 'tf', points: 1 }, expectedSec: 60,
+    explanation: t(b.why), exam: { format: 'tf', points: 1 }, expectedSec: 60,
   });
 }
 

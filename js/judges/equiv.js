@@ -49,6 +49,7 @@ import { polyOf, qCoeffs, discriminant, sumTerms, productFactors, isExpanded } f
 import { diagnoseLine } from './diagnose.js';
 import { readLine, sameLine, frNum } from './common.js';
 import { jet, sameJet, monoText } from '../cas/jet.js';
+import { t as tr } from '../i18n.js';
 
 // Factors of a product, through brackets.
 function factors(n, out = []) {
@@ -68,22 +69,22 @@ export function presentationIssue(node) {
     if (isProduct(n) && !parentIsProduct) {
       const fs = factors(n);
       const nums = fs.filter((f) => numValue(f) || (f.t === 'neg' && numValue(f.e)));
-      if (nums.some((f) => numValue(f)?.n === 0)) { issue = 'Un produit par 0 vaut 0 : enlève ce terme.'; return; }
-      if (nums.some((f) => numValue(f)?.eq(1))) { issue = 'Enlève les « ·1 » : multiplier par 1 ne change rien.'; return; }
-      if (nums.length >= 2) { issue = 'Multiplie les nombres entre eux pour n\'en garder qu\'un.'; return; }
+      if (nums.some((f) => numValue(f)?.n === 0)) { issue = tr('Un produit par 0 vaut 0 : enlève ce terme.'); return; }
+      if (nums.some((f) => numValue(f)?.eq(1))) { issue = tr('Enlève les « ·1 » : multiplier par 1 ne change rien.'); return; }
+      if (nums.length >= 2) { issue = tr('Multiplie les nombres entre eux pour n\'en garder qu\'un.'); return; }
       fs.forEach((f) => visit(f, false));
       return;
     }
     if (n.t === 'bin' && (n.op === '+' || n.op === '-')) {
-      if (numValue(n.l)?.n === 0 || numValue(n.r)?.n === 0) { issue = 'Enlève les « + 0 ».'; return; }
+      if (numValue(n.l)?.n === 0 || numValue(n.r)?.n === 0) { issue = tr('Enlève les « + 0 ».'); return; }
     }
-    if (n.t === 'neg' && stripParen(n.e).t === 'neg') { issue = 'Simplifie les signes : −(−a) = a.'; return; }
+    if (n.t === 'neg' && stripParen(n.e).t === 'neg') { issue = tr('Simplifie les signes : −(−a) = a.'); return; }
     if (n.t === 'pow') {
       const k = numValue(n.e);
-      if (k?.eq(1)) { issue = 'Un exposant 1 ne sert à rien : x¹ = x.'; return; }
-      if (k?.n === 0) { issue = 'Un exposant 0 donne 1.'; return; }
+      if (k?.eq(1)) { issue = tr('Un exposant 1 ne sert à rien : x¹ = x.'); return; }
+      if (k?.n === 0) { issue = tr('Un exposant 0 donne 1.'); return; }
     }
-    if (n.t === 'frac' && numValue(n.d)?.eq(1)) { issue = 'Enlève le « /1 ».'; return; }
+    if (n.t === 'frac' && numValue(n.d)?.eq(1)) { issue = tr('Enlève le « /1 ».'); return; }
     for (const k of ['l', 'r', 'e', 'b', 'n', 'd']) if (n[k] && typeof n[k] === 'object' && n[k].t) visit(n[k], false);
     if (n.t === 'fn') n.args.forEach((a) => visit(a, false));
   };
@@ -110,7 +111,7 @@ function partialFractions(node) {
     if (!dc || !nc) return false;
     if (dc.length === 3 && discriminant(dc).n < 0) { if (nc.length > 2) return false; } else if (dc.length !== 2 || nc.length > 1) return false;
     const key = dp.canon() + (stripParen(t.d).t === 'pow' ? `^${toText(stripParen(t.d).e)}` : '');
-    if (dens.has(key)) return 'Regroupe les termes qui ont le même dénominateur.';
+    if (dens.has(key)) return tr('Regroupe les termes qui ont le même dénominateur.');
     dens.add(key);
   }
   return dens.size > 0 ? (presentationIssue(node) ?? true) : false;
@@ -176,7 +177,7 @@ function powersForm(node) {
     return true;
   };
   if (!visit(node, true)) return false;
-  return nums <= 1 ? (presentationIssue(node) ?? true) : 'Multiplie les nombres entre eux.';
+  return nums <= 1 ? (presentationIssue(node) ?? true) : tr('Multiplie les nombres entre eux.');
 }
 
 // c + a·ln(u) + …, each u a letter, x + c or a prime number, once.
@@ -192,7 +193,7 @@ function logExpanded(node) {
     const u = stripParen(stripParen(lns[0].node).args[0]);
     const k = numValue(u);
     if (k) {
-      if (k.eq(1)) return 'ln 1 = 0 : enlève ce terme.';
+      if (k.eq(1)) return tr('ln 1 = 0 : enlève ce terme.');
       if (!k.isInt() || !isPrime(k.n)) return false;
     } else if (!sym(u)) {
       const p = polyOf(u);
@@ -200,10 +201,10 @@ function logExpanded(node) {
       if (!cs || cs.length !== 2) return false;
     }
     const key = toText(u);
-    if (args.has(key)) return 'Regroupe les termes qui ont le même logarithme.';
+    if (args.has(key)) return tr('Regroupe les termes qui ont le même logarithme.');
     args.add(key);
   }
-  if (consts > 1) return 'Additionne les nombres entre eux.';
+  if (consts > 1) return tr('Additionne les nombres entre eux.');
   return presentationIssue(node) ?? true;
 }
 
@@ -328,23 +329,24 @@ function substOf(cfg) {
 }
 
 function witnessMessage(r, cfg) {
-  if (r.undecided) return 'Je n\'arrive pas à comparer cette ligne avec la précédente : vérifie qu\'elle est définie.';
-  if (!r.witness) return 'Cette ligne n\'est pas égale à la précédente.';
+  if (r.undecided) return tr('Je n\'arrive pas à comparer cette ligne avec la précédente : vérifie qu\'elle est définie.');
+  if (!r.witness) return tr('Cette ligne n\'est pas égale à la précédente.');
   const [v] = Object.keys(r.witness.env);
   const [a, b] = r.witness.values;
-  let at = v ? `En ${v} = ${frNum(r.witness.env[v])}, ` : '';
+  const vals = { a: frNum(a), b: frNum(b) };
   // Step U6: several variables, the point of the plane or of space.
   const names = Object.keys(r.witness.env);
-  if (names.length > 1) at = `En (${names.join(' ; ')}) = (${names.map((k) => frNum(r.witness.env[k])).join(' ; ')}), `;
-  return `${at}la ligne précédente vaut ${frNum(a)}, mais ta ligne vaut ${frNum(b)}.`;
+  if (names.length > 1) return tr('En ({names}) = ({xs}), la ligne précédente vaut {a}, mais ta ligne vaut {b}.', { ...vals, names: names.join(' ; '), xs: names.map((k) => frNum(r.witness.env[k])).join(' ; ') });
+  if (v) return tr('En {v} = {x}, la ligne précédente vaut {a}, mais ta ligne vaut {b}.', { ...vals, v, x: frNum(r.witness.env[v]) });
+  return tr('la ligne précédente vaut {a}, mais ta ligne vaut {b}.', vals);
 }
 
 export function judgeLine(cfg, prev, input, state = {}) {
   const read = readLine(cfg, input);
   if (read.error) return read.error;
   const { node } = read;
-  if (node.t === 'rel') return { kind: 'parse', node, message: 'Écris seulement l\'expression, sans « = » au milieu.' };
-  if (sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (node.t === 'rel') return { kind: 'parse', node, message: tr('Écris seulement l\'expression, sans « = » au milieu.') };
+  if (sameLine(node, prev)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   if (cfg.rel) return judgeBound(cfg, prev, node);
   if (cfg.jet) return judgeJet(cfg, prev, node); // step U6
   const opts = { vars: cfg.vars, domain: cfg.domain, seed: cfg.seed ?? seedOf(toText(prev)) };
@@ -359,7 +361,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais ${fin.charAt(0).toLowerCase()}${fin.slice(1)}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais {rest}', { rest: `${fin.charAt(0).toLowerCase()}${fin.slice(1)}` }) };
   state.lines = (state.lines || 0) + 1;
   return { kind: 'ok', node };
 }
@@ -438,8 +440,10 @@ function judgeBound(cfg, prev, node) {
     const opts = { vars: cfg.vars, domain: cfg.domain, seed: seedOf(toText(prev)) };
     const same = (cand, line) => equivalent(cand, line, opts).equal;
     const diag = diagnoseLine('equiv', prev, node, cfg, same);
-    const word = cfg.rel === '≥' ? 'plus grande' : 'plus petite';
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message: `En ${v} = ${frNum(w[v])}, ta ligne vaut ${small(w.b)}, ${word} que la précédente (${small(w.a)}) : ce n'est pas une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}.` };
+    const vals = { v, x: frNum(w[v]), b: small(w.b), a: small(w.a) };
+    const message = cfg.rel === '≥' ? tr('En {v} = {x}, ta ligne vaut {b}, plus grande que la précédente ({a}) : ce n\'est pas une minoration.', vals)
+      : tr('En {v} = {x}, ta ligne vaut {b}, plus petite que la précédente ({a}) : ce n\'est pas une majoration.', vals);
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, witness: w, message };
   }
   if (cfg.squeeze) return squeezeEnd(cfg, node, v);
   if (contains(node, (x) => x.t === 'sym' && x.name === v)) return cfg.simple && simpleBound(node, v) ? { kind: 'done', node } : { kind: 'ok', node };
@@ -447,9 +451,9 @@ function judgeBound(cfg, prev, node) {
   const val = q ? q.valueOf() : evalFloat(node, {});
   if (cfg.bound !== undefined) {
     const B = exactValue(parse(String(cfg.bound)))?.valueOf();
-    if ((cfg.rel === '≥' ? val < B : val > B) && Math.abs(val - B) > 1e-12) return { kind: 'stay', node, message: `C'est une ${cfg.rel === '≥' ? 'minoration' : 'majoration'}, mais elle ${cfg.rel === '≥' ? 'est plus petite' : 'dépasse'} la borne demandée : sois plus précis.` };
+    if ((cfg.rel === '≥' ? val < B : val > B) && Math.abs(val - B) > 1e-12) return { kind: 'stay', node, message: cfg.rel === '≥' ? tr('C\'est une minoration, mais elle est plus petite la borne demandée : sois plus précis.') : tr('C\'est une majoration, mais elle dépasse la borne demandée : sois plus précis.') };
   }
-  if (!TARGETS.constant(node)) return { kind: 'stay', node, message: "C'est juste, mais calcule ce nombre." };
+  if (!TARGETS.constant(node)) return { kind: 'stay', node, message: tr("C'est juste, mais calcule ce nombre.") };
   return { kind: 'done', node };
 }
 
@@ -467,9 +471,9 @@ function squeezeEnd(cfg, node, v) {
   if (r.value === null) return { kind: 'ok', node };
   const want = limit(parse(String(cfg.squeeze.L)), v, '+inf', undefined, { discrete: true });
   if (sameLimit(r, want)) return { kind: 'done', node };
-  const word = cfg.rel === '≥' ? 'minoration' : 'majoration';
-  const at = r.value === '+inf' ? '+∞' : r.value === '-inf' ? '−∞' : r.value === 'none' ? 'aucune limite' : frNum(typeof r.value === 'number' ? r.value : r.value.valueOf());
-  return { kind: 'stay', node, message: `C'est une ${word} juste, mais elle tend vers ${at}, et l'autre borne n'a pas cette limite : elle ne coince pas la suite. Cherche une borne plus serrée.` };
+  const at = r.value === '+inf' ? '+∞' : r.value === '-inf' ? '−∞' : r.value === 'none' ? tr('aucune limite') : frNum(typeof r.value === 'number' ? r.value : r.value.valueOf());
+  return { kind: 'stay', node, message: cfg.rel === '≥' ? tr('C\'est une minoration juste, mais elle tend vers {at}, et l\'autre borne n\'a pas cette limite : elle ne coince pas la suite. Cherche une borne plus serrée.', { at })
+    : tr('C\'est une majoration juste, mais elle tend vers {at}, et l\'autre borne n\'a pas cette limite : elle ne coince pas la suite. Cherche une borne plus serrée.', { at }) };
 }
 
 // ---------- Taylor polynomials of order 2 (step U6, A2 catalogue, a2-taylor2) ----------
@@ -491,15 +495,18 @@ function jetMemo(node, cfg) {
 function judgeJet(cfg, prev, node) {
   let a;
   let b;
-  try { b = jetMemo(node, cfg); } catch { return { kind: 'parse', node, message: 'Je n\'arrive pas à dériver cette ligne : écris-la avec des fonctions usuelles.' }; }
+  try { b = jetMemo(node, cfg); } catch { return { kind: 'parse', node, message: tr('Je n\'arrive pas à dériver cette ligne : écris-la avec des fonctions usuelles.') }; }
   try { a = jetMemo(prev, cfg); } catch { a = null; }
   const k = a ? sameJet(a, b) : null;
   if (k) {
     const same = (cand, line) => { try { return !sameJet(jetMemo(cand, cfg), jetMemo(line, cfg)); } catch { return false; } };
     const diag = diagnoseLine('equiv', prev, node, cfg, same);
     const o = jetOpts(cfg);
-    const what = k.split(',').every((x) => x === '0') ? 'Le terme constant' : `Le coefficient de ${monoText(k, o.vars, o.at)}`;
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `${what} ne va pas : il vaut ${frNum(a[k])} pour la ligne précédente, ${frNum(b[k])} pour ta ligne (développement d'ordre ${o.order} au point).` };
+    const vals = { a: frNum(a[k]), b: frNum(b[k]), order: o.order };
+    const message = k.split(',').every((x) => x === '0')
+      ? tr('Le terme constant ne va pas : il vaut {a} pour la ligne précédente, {b} pour ta ligne (développement d\'ordre {order} au point).', vals)
+      : tr('Le coefficient de {m} ne va pas : il vaut {a} pour la ligne précédente, {b} pour ta ligne (développement d\'ordre {order} au point).', { ...vals, m: monoText(k, o.vars, o.at) });
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
@@ -535,8 +542,8 @@ function taylorForm(node, cfg) {
   const order = cfg.jet?.order ?? 2;
   const ms = termsTop(stripParen(node)).map((t) => monoOf(t, vars));
   if (ms.some((m) => m === null)) return false;
-  if (ms.some((m) => m.deg > order)) return `Tronque : garde seulement les termes de degré ≤ ${order}.`;
-  if (new Set(ms.map((m) => m.key)).size < ms.length) return 'Regroupe les termes semblables.';
+  if (ms.some((m) => m.deg > order)) return tr('Tronque : garde seulement les termes de degré ≤ {order}.', { order });
+  if (new Set(ms.map((m) => m.key)).size < ms.length) return tr('Regroupe les termes semblables.');
   return presentationIssue(node) ?? true;
 }
 TARGETS.taylor2 = (node, cfg) => taylorForm(node, cfg);

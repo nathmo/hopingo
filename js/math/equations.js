@@ -3,6 +3,7 @@
 // operation, one side only, dividing one term only…).
 
 import { Q } from './rational.js';
+import { t } from '../i18n.js';
 import { parseAlg, tryParseAlg, toRat, Poly, printAlg, varsIn } from './algebra.js';
 
 const toNum = (q) => q.n / q.d;
@@ -97,14 +98,20 @@ const hasStructure = (n) => {
 export function nextMove(eqNode, x = 'x') {
   if (hasStructure(eqNode.l) || hasStructure(eqNode.r)) {
     const fracs = JSON.stringify(eqNode).includes('"t":"frac"');
-    return fracs ? 'Multiplie les deux membres par le dénominateur commun, pour enlever les fractions.' : 'Développe d\'abord les parenthèses.';
+    return fracs ? t('Multiplie les deux membres par le dénominateur commun, pour enlever les fractions.') : t('Développe d\'abord les parenthèses.');
   }
   const L = linear(eqNode.l, x);
   const R = linear(eqNode.r, x);
   if (!L || !R) return null;
-  if (!R.a.eq(0)) return `${R.a.n > 0 ? 'Soustrais' : 'Ajoute'} ${fmt(R.a.n < 0 ? R.a.neg() : R.a)}x des deux côtés, pour rassembler les ${x} à gauche.`;
-  if (!L.b.eq(0)) return `${L.b.n > 0 ? 'Soustrais' : 'Ajoute'} ${fmt(L.b.n < 0 ? L.b.neg() : L.b)} des deux côtés.`;
-  if (!L.a.eq(1)) return `Divise les deux côtés par ${fmt(L.a)}.`;
+  if (!R.a.eq(0)) {
+    const k = fmt(R.a.n < 0 ? R.a.neg() : R.a);
+    return R.a.n > 0 ? t('Soustrais {k}x des deux côtés, pour rassembler les {x} à gauche.', { k, x }) : t('Ajoute {k}x des deux côtés, pour rassembler les {x} à gauche.', { k, x });
+  }
+  if (!L.b.eq(0)) {
+    const k = fmt(L.b.n < 0 ? L.b.neg() : L.b);
+    return L.b.n > 0 ? t('Soustrais {k} des deux côtés.', { k }) : t('Ajoute {k} des deux côtés.', { k });
+  }
+  if (!L.a.eq(1)) return t('Divise les deux côtés par {k}.', { k: fmt(L.a) });
   return null;
 }
 
@@ -143,8 +150,8 @@ export function wrongMoves(eqNode, x = 'x') {
 // → {kind: parse|same|ok|done|wrong, message, rule, value}
 export function judgeEquationLine(prevSrc, input, { x = 'x', original = prevSrc } = {}) {
   const node = tryParseAlg(input);
-  if (!node) return { kind: 'parse', message: 'Je n\'arrive pas à lire cette ligne.' };
-  if (node.t !== 'eq') return { kind: 'parse', message: 'Écris une équation complète, avec « = ».' };
+  if (!node) return { kind: 'parse', message: t('Je n\'arrive pas à lire cette ligne.') };
+  if (node.t !== 'eq') return { kind: 'parse', message: t('Écris une équation complète, avec « = ».') };
   const prev = parseAlg(prevSrc);
   let target;
   let got;
@@ -152,14 +159,14 @@ export function judgeEquationLine(prevSrc, input, { x = 'x', original = prevSrc 
     target = solutionSet(parseAlg(original), x);
     got = solutionSet(node, x);
   } catch {
-    return { kind: 'parse', message: 'Cette équation est trop compliquée ici.' };
+    return { kind: 'parse', message: t('Cette équation est trop compliquée ici.') };
   }
   if (!sameSet(target, got)) {
     const v = got.kind === 'set' && got.values.length === 1 ? val(got.values[0]) : null;
     const move = v == null ? null : wrongMoves(prev, x).find((w) => Math.abs(w.value - v) < 1e-9);
     return { kind: 'wrong', rule: move?.rule ?? null };
   }
-  if (printAlg(node) === printAlg(prev)) return { kind: 'same', message: 'C\'est la même ligne : fais une transformation.' };
+  if (printAlg(node) === printAlg(prev)) return { kind: 'same', message: t('C\'est la même ligne : fais une transformation.') };
   if (isolatedValue(node, x)) return { kind: 'done', node };
   return { kind: 'ok', node };
 }
@@ -177,7 +184,7 @@ export function solveLines(src, x = 'x') {
     const L = linear(cur.l, x);
     const R = linear(cur.r, x);
     let next;
-    if (/Développe|Multiplie/.test(move)) {
+    if (hasStructure(cur.l) || hasStructure(cur.r)) {
       let A = L;
       let B = R;
       if (!A || !B) {
@@ -187,7 +194,7 @@ export function solveLines(src, x = 'x') {
         A = linOf(pl.n.scale(new Q(1).div(pl.d.constValue())), x);
         B = linOf(pr.n.scale(new Q(1).div(pr.d.constValue())), x);
       }
-      if (/Multiplie/.test(move)) {
+      if (JSON.stringify(cur).includes('"t":"frac"')) {
         const m = [A.a, A.b, B.a, B.b].reduce((acc, q) => lcmInt(acc, q.d), 1);
         A = { a: A.a.mul(m), b: A.b.mul(m) };
         B = { a: B.a.mul(m), b: B.b.mul(m) };

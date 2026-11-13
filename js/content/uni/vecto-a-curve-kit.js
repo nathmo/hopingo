@@ -7,6 +7,7 @@
 
 import { tokenize } from '../../cas/parse.js';
 import { q, qt, fq } from './vecto-a-kit.js';
+import { t } from '../../i18n.js';
 
 // ---------- polynomials in t, C = cos t, S = sin t ----------
 
@@ -41,7 +42,7 @@ export const constOf = (p) => p.get(PK(0, 0, 0)) || q(0);
 // A field component (terms of vecto-a-kit: {c, e: [a, b, c]}) at the point (X, Y, Z).
 export function compose(terms, X, Y, Z = pc(0)) {
   let out = P();
-  for (const t of terms) out = padd(out, pscale(pmul(pmul(ppow(X, t.e[0]), ppow(Y, t.e[1])), ppow(Z, t.e[2])), t.c));
+  for (const tt of terms) out = padd(out, pscale(pmul(pmul(ppow(X, tt.e[0]), ppow(Y, tt.e[1])), ppow(Z, tt.e[2])), tt.c));
   return out;
 }
 
@@ -181,7 +182,7 @@ export function segment(A, B) {
   return finish({
     kind: 'segment', A, B, dim: A.length, lo: 0, hi: 1, loT: '0', hiT: '1',
     P: A.map((a, i) => padd(pc(a), pt(D[i]))), dP: D.map((x) => pc(x)), speed, speedQ: speed ? q(r) : null,
-    desc: `le segment de A${ptR(A)} à B${ptR(B)}`,
+    desc: t('le segment de A{a} à B{b}', { a: ptR(A), b: ptR(B) }),
     rev: lineOf(B.map((b, i) => ptext(padd(pc(b), pt(D[i].neg())))), '0', '1'),
     bounds: lineOf(A.map((a, i) => ptext(padd(pc(a), pt(D[i])))), '0', '2'),
   });
@@ -202,7 +203,7 @@ export function axisSeg(axis, a, b) {
   return finish({
     kind: 'segment', A, B, dim: 2, lo, hi, loT: qt(lo), hiT: qt(hi),
     P: Pc, speed: '1', speedQ: q(1),
-    desc: `le segment de A${ptR(A)} à B${ptR(B)}`,
+    desc: t('le segment de A{a} à B{b}', { a: ptR(A), b: ptR(B) }),
     rev: lineOf(Rc.map(ptext), qt(-hi), qt(-lo)),
     bounds: lineOf(Pc.map(ptext), qt(lo), qt(hi + (hi - lo))),
   });
@@ -221,12 +222,12 @@ export function arc(c, R, s0, span, sign = 1) {
   const A = pts(s);
   const B = pts(s + sign * span);
   const full = span === 4;
-  const sense = sign > 0 ? 'positif (trigonométrique)' : 'négatif (horaire)';
-  const name = full ? 'le cercle' : span === 2 ? 'le demi-cercle' : 'le quart de cercle';
-  const centre = c[0] === 0 && c[1] === 0 ? 'centré en l\'origine' : `de centre ${ptR(c)}`;
+  const sense = sign > 0 ? t('positif (trigonométrique)') : t('négatif (horaire)');
+  const name = full ? t('le cercle') : span === 2 ? t('le demi-cercle') : t('le quart de cercle');
+  const centre = c[0] === 0 && c[1] === 0 ? t('centré en l\'origine') : t('de centre {a}', { a: ptR(c) });
   const desc = full
-    ? `le cercle ${centre} et de rayon ${R}, parcouru une fois dans le sens ${sense}`
-    : `${name} ${centre} et de rayon ${R}, de A${ptR(A)} à B${ptR(B)} dans le sens ${sense}`;
+    ? t('le cercle {centre} et de rayon {R}, parcouru une fois dans le sens {sense}', { centre, R, sense })
+    : t('{name} {centre} et de rayon {R}, de A{a} à B{b} dans le sens {sense}', { name, centre, R, a: ptR(A), b: ptR(B), sense });
   const revLo = sign > 0 ? -(s + span) : s - span;
   return finish({
     kind: 'arc', c, R, s, span, sign, dim: 2, closed: full, A, B,
@@ -253,7 +254,7 @@ export function graph(k, a, b) {
   return finish({
     kind: 'graph', k, dim: 2, lo, hi, loT: qt(lo), hiT: qt(hi), A, B,
     P: [X, ppow(X, k)], speed: null,
-    desc: `l'arc de la courbe y = x${k === 2 ? '²' : '³'} de A${ptR(A)} à B${ptR(B)}`,
+    desc: t('l\'arc de la courbe y = x{a} de A{b} à B{c}', { a: k === 2 ? '²' : '³', b: ptR(A), c: ptR(B) }),
     rev: lineOf([ptext(rX), ptext(ppow(rX, k))], qt(lo), qt(hi)),
     bounds: lineOf([ptext(X), ptext(ppow(X, k))], qt(lo), qt(hi + (hi - lo))),
   });
@@ -268,7 +269,7 @@ export function ellipse(a, b, span = 4) {
   return finish({
     kind: 'ellipse', a, b, span, dim: 2, closed: full, lo: 0, hi: (span * Math.PI) / 2, loT: '0', hiT: quarterT(span), A, B,
     P: [pC(a), pS(b)], speed: null,
-    desc: full ? `l'ellipse ${eqE} = 1, parcourue une fois dans le sens positif` : `l'arc de l'ellipse ${eqE} = 1 de A${ptR(A)} à B${ptR(B)} dans le sens positif`,
+    desc: full ? t('l\'ellipse {eqE} = 1, parcourue une fois dans le sens positif', { eqE }) : t('l\'arc de l\'ellipse {eqE} = 1 de A{a} à B{b} dans le sens positif', { eqE, a: ptR(A), b: ptR(B) }),
     rev: lineOf([ptext(pC(a)), ptext(pS(-b))], quarterT(-span), '0'),
     bounds: lineOf([ptext(pC(a)), ptext(pS(b))], '0', quarterT(full ? 8 : span * 2)),
   });
@@ -280,7 +281,7 @@ export function helix(k) {
   return finish({
     kind: 'helix', k, dim: 3, lo: 0, hi: 2 * Math.PI, loT: '0', hiT: '2π',
     P: [pC(1), pS(1), pt(k)], speed: `sqrt(${s2})`, speedQ: null,
-    desc: `l'hélice tracée sur le cylindre x² + y² = 1, qui monte de ${2 * k}π par tour : un tour de A(1 ; 0 ; 0) à B(1 ; 0 ; ${2 * k}π), dans le sens positif autour de l'axe z, à vitesse de montée constante`,
+    desc: t('l\'hélice tracée sur le cylindre x² + y² = 1, qui monte de {a}π par tour : un tour de A(1 ; 0 ; 0) à B(1 ; 0 ; {a}π), dans le sens positif autour de l\'axe z, à vitesse de montée constante', { a: 2 * k }),
     rev: lineOf(['cos(t)', '-sin(t)', `${k === 1 ? '' : k}(2π-t)`], '0', '2π'),
     bounds: lineOf(['cos(t)', 'sin(t)', `${k === 1 ? '' : k}t`], '0', '4π'),
   });
@@ -306,7 +307,7 @@ export function paramBlanks(math, parts = [], bounds = false) {
   const toks = tokenize(math, {});
   const starts = [];
   let compact = '';
-  for (const t of toks) { starts.push(compact.length); compact += t.s; }
+  for (const tt of toks) { starts.push(compact.length); compact += tt.s; }
   const out = [];
   const eqAt = compact.indexOf('=');
   const inAt = compact.indexOf('∈');
@@ -314,7 +315,7 @@ export function paramBlanks(math, parts = [], bounds = false) {
   for (const p0 of parts) {
     const p = typeof p0 === 'string' ? p0 : p0.s;
     let pc2;
-    try { pc2 = tokenize(p, {}).map((t) => t.s).join(''); } catch { continue; }
+    try { pc2 = tokenize(p, {}).map((tt) => tt.s).join(''); } catch { continue; }
     let at = typeof p0 === 'object' && p0.last ? compact.lastIndexOf(pc2) : compact.indexOf(pc2, from);
     // {s, last, skip}: the first `skip` characters (an operator) stay shown.
     if (at >= 0 && p0.skip) { at += p0.skip; pc2 = pc2.slice(p0.skip); }
@@ -329,9 +330,9 @@ export function paramBlanks(math, parts = [], bounds = false) {
   }
   if (bounds && inAt >= 0) {
     const iIn = starts.indexOf(inAt);
-    const open = toks.findIndex((t, k) => k > iIn && t.s === '[');
-    const semi = toks.findIndex((t, k) => k > open && t.s === ';');
-    const close = toks.findIndex((t, k) => k > semi && t.s === ']');
+    const open = toks.findIndex((tt, k) => k > iIn && tt.s === '[');
+    const semi = toks.findIndex((tt, k) => k > open && tt.s === ';');
+    const close = toks.findIndex((tt, k) => k > semi && tt.s === ']');
     if (open > 0 && semi > open + 1 && close > semi + 1) { out.push([open + 1, semi]); out.push([semi + 1, close]); }
   }
   out.sort((a, b) => a[0] - b[0]);

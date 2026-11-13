@@ -25,6 +25,7 @@ import { evalFloat } from '../cas/numeric.js';
 import { symbolsIn } from '../cas/ast.js';
 import { show as paramShow, lineMLOf } from './param.js';
 import { diagnoseLine } from './diagnose.js';
+import { t } from '../i18n.js';
 
 export const sign = '';
 
@@ -66,11 +67,11 @@ function readStrict(cfg, input) {
   if (/^(un\s+)?point$/i.test(b)) return { t: 'bline', text: String(input).trim(), names, what: 'point' };
   if (/annul/i.test(b)) return { t: 'bline', text: String(input).trim(), names, what: 'cancel' };
   const par = readParam(b, { params: cfg.params || ['t'] });
-  if (!par.comps) throw new Error('Écris le morceau : (… ; … ; …), t ∈ [a ; b].');
+  if (!par.comps) throw new Error(t('Écris le morceau : (… ; … ; …), t ∈ [a ; b].'));
   // A tuple without parameter: the image is a point.
   const free = par.comps.some((c) => [...symbolsIn(c)].length > 0);
   if (!free) return { t: 'bline', text: String(input).trim(), names, what: 'point', par };
-  if (!par.bounds[par.params[0]]) throw new Error('Donne aussi l\'intervalle du paramètre : t ∈ [a ; b].');
+  if (!par.bounds[par.params[0]]) throw new Error(t('Donne aussi l\'intervalle du paramètre : t ∈ [a ; b].'));
   return { t: 'bline', text: String(input).trim(), names, what: 'piece', par };
 }
 
@@ -128,51 +129,51 @@ export function judgeLine(cfg, prev, input, state = {}) {
   else {
     try { node = readStrict(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (node.what === 'raw') return { kind: 'parse', message: 'Écris un morceau du bord, « Γ1 : point » ou « Γ2 et Γ4 : s\'annulent ».' };
+  if (node.what === 'raw') return { kind: 'parse', message: t('Écris un morceau du bord, « Γ1 : point » ou « Γ2 et Γ4 : s\'annulent ».') };
   state.found = state.found || new Set();
   const sides = sidesOf(cfg);
   const byKey = new Map(sides.map((s) => [s.key, s]));
   const done = () => (kept(cfg).every((s) => state.found.has(s.key)) ? { kind: 'done', node } : { kind: 'ok', node });
-  for (const n of node.names) if (node.what !== 'union' && !byKey.has(n)) return { kind: 'parse', message: `Je ne connais pas le côté « ${n} ».` };
+  for (const n of node.names) if (node.what !== 'union' && !byKey.has(n)) return { kind: 'parse', message: t('Je ne connais pas le côté « {n} ».', { n }) };
 
   if (node.what === 'union') {
     const want = new Set(kept(cfg).map((s) => s.key));
     const got = new Set(node.names);
     const extra = [...got].filter((n) => !want.has(n));
-    if (extra.length) return wrong(node, 'v_boundary_pieces', `${extra[0]} ne fait pas partie du bord : il se réduit à un point ou s'annule.`, cfg, prev);
+    if (extra.length) return wrong(node, 'v_boundary_pieces', t('{s} ne fait pas partie du bord : il se réduit à un point ou s\'annule.', { s: extra[0] }), cfg, prev);
     const missing = [...want].filter((n) => !got.has(n));
-    if (missing.length) return wrong(node, 'v_boundary_pieces', `Il manque ${missing[0]}.`, cfg, prev);
+    if (missing.length) return wrong(node, 'v_boundary_pieces', t('Il manque {s}.', { s: missing[0] }), cfg, prev);
     const unwritten = [...want].filter((n) => !state.found.has(n));
-    if (unwritten.length) return { kind: 'form', node, message: `Écris d'abord le morceau ${unwritten[0]}, avec son sens.` };
+    if (unwritten.length) return { kind: 'form', node, message: t('Écris d\'abord le morceau {s}, avec son sens.', { s: unwritten[0] }) };
     return { kind: 'done', node };
   }
   if (node.what === 'point') {
-    if (!node.names.length) return { kind: 'form', node, message: 'Dis quel côté devient un point : « Γ1 : point ».' };
+    if (!node.names.length) return { kind: 'form', node, message: t('Dis quel côté devient un point : « Γ1 : point ».') };
     for (const n of node.names) {
       const s = byKey.get(n);
-      if (!s.point) return wrong(node, 'v_boundary_pieces', `${s.name} ne se réduit pas à un point.`, cfg, prev);
+      if (!s.point) return wrong(node, 'v_boundary_pieces', t('{s} ne se réduit pas à un point.', { s: s.name }), cfg, prev);
     }
-    return { kind: 'ok', node, message: 'Ce côté est retiré.' };
+    return { kind: 'ok', node, message: t('Ce côté est retiré.') };
   }
   if (node.what === 'cancel') {
-    if (node.names.length !== 2) return { kind: 'form', node, message: 'Nomme les deux côtés qui s\'annulent : « Γ2 et Γ4 : s\'annulent ».' };
+    if (node.names.length !== 2) return { kind: 'form', node, message: t('Nomme les deux côtés qui s\'annulent : « Γ2 et Γ4 : s\'annulent ».') };
     const [a, b] = node.names.map((n) => byKey.get(n));
-    if (!(canonName(a.cancels || '') === b.key || canonName(b.cancels || '') === a.key)) return wrong(node, 'v_boundary_pieces', `${a.name} et ${b.name} ne s'annulent pas.`, cfg, prev);
-    return { kind: 'ok', node, message: 'Ces deux côtés sont retirés.' };
+    if (!(canonName(a.cancels || '') === b.key || canonName(b.cancels || '') === a.key)) return wrong(node, 'v_boundary_pieces', t('{a} et {b} ne s\'annulent pas.', { a: a.name, b: b.name }), cfg, prev);
+    return { kind: 'ok', node, message: t('Ces deux côtés sont retirés.') };
   }
   // A piece.
   const m = matchPiece(cfg, node.par, node.names.length === 1 ? [byKey.get(node.names[0])] : sides);
   if (!m) {
     if (node.names.length === 1) {
       const s = byKey.get(node.names[0]);
-      if (s.point) return wrong(node, 'v_boundary_pieces', `${s.name} se réduit à un point : on le retire.`, cfg, prev);
+      if (s.point) return wrong(node, 'v_boundary_pieces', t('{s} se réduit à un point : on le retire.', { s: s.name }), cfg, prev);
     }
-    return wrong(node, null, 'Ce morceau n\'est pas un côté du bord.', cfg, prev);
+    return wrong(node, null, t('Ce morceau n\'est pas un côté du bord.'), cfg, prev);
   }
   const s = m.side;
-  if (s.cancels) return wrong(node, 'v_boundary_pieces', `${s.name} et ${s.cancels} ont la même image, parcourue dans les deux sens : ils s'annulent.`, cfg, prev);
-  if (m.orient < 0) return wrong(node, 'v_boundary_orient', `${s.name} est parcouru dans l'autre sens : suis le sens de σ(∂A).`, cfg, prev);
-  if (m.orient === 0 || (s.curve.closed && m.tours > 1.5)) return wrong(node, null, `${s.name} doit être parcouru une seule fois, dans un seul sens.`, cfg, prev);
+  if (s.cancels) return wrong(node, 'v_boundary_pieces', t('{a} et {b} ont la même image, parcourue dans les deux sens : ils s\'annulent.', { a: s.name, b: s.cancels }), cfg, prev);
+  if (m.orient < 0) return wrong(node, 'v_boundary_orient', t('{s} est parcouru dans l\'autre sens : suis le sens de σ(∂A).', { s: s.name }), cfg, prev);
+  if (m.orient === 0 || (s.curve.closed && m.tours > 1.5)) return wrong(node, null, t('{s} doit être parcouru une seule fois, dans un seul sens.', { s: s.name }), cfg, prev);
   state.found.add(s.key);
   return done();
 }

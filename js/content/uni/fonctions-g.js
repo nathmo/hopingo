@@ -23,6 +23,7 @@ import { exactValue } from '../../cas/normal.js';
 import { evalFloat } from '../../cas/numeric.js';
 import { expandFns } from '../../cas/sets.js';
 import { blankLine } from '../../judges/lines.js';
+import { t } from '../../i18n.js';
 import {
   MT, fr, linesItem, mcq, tfItem, blocksItem, tableItem,
 } from './kit.js';
@@ -67,14 +68,14 @@ function polyText(cs) {
 const setOf = (text, cfg = { v: V }) => solutionSet(parse(text, { vars: [V] }), cfg);
 const setText = (S) => toText(setToNode(S));
 const domText = (f, opts = {}) => setText(domainOf(expandFns(parse(f, { vars: [V], funcs: opts.funcs }), opts.defs, V), { v: V }));
-const RT = (t) => toReadable(unparen(parse(t, { vars: [V], funcs: ['f', 'g'] })));
+const RT = (s) => toReadable(unparen(parse(s, { vars: [V], funcs: ['f', 'g'] })));
 
 // A line with the sub-expressions written in `texts` left blank.
 function tpl(math, texts, opts = {}) {
   const node = parse(math, opts);
   const holes = [];
-  for (const t of texts) {
-    const want = toText(parse(t, opts));
+  for (const tx of texts) {
+    const want = toText(parse(tx, opts));
     let found = null;
     walk(node, (n) => {
       if (found) return false;
@@ -94,7 +95,7 @@ function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
     })),
   }));
 }
@@ -106,14 +107,14 @@ const withMenus = (judge, level, start, lines, choices) => (level === 3 ? { ...j
 
 const DOM = 'g1-domain';
 const DOM_SUB = [
-  { id: 'conds', label: 'écrire les conditions', skill: DOM },
-  { id: 'solve', label: 'résoudre chaque condition', skill: 'rat-domain' },
-  { id: 'combine', label: 'combiner en intervalles', skill: 'g9-intervals' },
+  { id: 'conds', label: t('écrire les conditions'), skill: DOM },
+  { id: 'solve', label: t('résoudre chaque condition'), skill: 'rat-domain' },
+  { id: 'combine', label: t('combiner en intervalles'), skill: 'g9-intervals' },
 ];
 const DOM_CHOICES = [
-  { id: 'conds', label: 'Écrire les conditions (racines, dénominateurs)' },
-  { id: 'solve', label: 'Résoudre chaque condition' },
-  { id: 'combine', label: 'Combiner : écrire D_f en intervalles' },
+  { id: 'conds', label: t('Écrire les conditions (racines, dénominateurs)') },
+  { id: 'solve', label: t('Résoudre chaque condition') },
+  { id: 'combine', label: t('Combiner : écrire D_f en intervalles') },
 ];
 
 // A radicand px + c whose root is a whole number or a half.
@@ -193,19 +194,19 @@ function domLevel5(rng, opts) {
     const Dt = setText(D);
     const inD = r >= -qq;
     const seg1 = [
-      E(`${lin(-qq)}≥0∧${lin(a)}≠0`, 'Conditions', 'conds'),
-      E(`x≥${-qq}∧x≠${a}`, 'Résoudre', 'solve'),
+      E(`${lin(-qq)}≥0∧${lin(a)}≠0`, t('Conditions'), 'conds'),
+      E(`x≥${-qq}∧x≠${a}`, t('Résoudre'), 'solve'),
       E(Dt, 'D_f', 'combine'),
     ];
     const eqStart = `${f}=0`;
     const sols = [r, -qq].sort((u, w) => u - w);
-    const seg2 = [E(`x=${sols[0]}∨x=${sols[1]}`, 'Un produit est nul si un facteur est nul', 'solve')];
-    if (!inD) seg2.push(E(`{${-qq}}`, `${fr(String(r))} n'est pas dans D_f`, 'conds'));
+    const seg2 = [E(`x=${sols[0]}∨x=${sols[1]}`, t('Un produit est nul si un facteur est nul'), 'solve')];
+    if (!inD) seg2.push(E(`{${-qq}}`, t('{r} n\'est pas dans D_f', { r: fr(String(r)) }), 'conds'));
     return linesItem({
       skill: DOM, level: 5,
-      prompt: `Soit f(x) = ${MT(f)}. Détermine D_f, puis résous f(x) = 0.`,
+      prompt: t('Soit f(x) = {f}. Détermine D_f, puis résous f(x) = 0.', { f: MT(f) }),
       start: f, judge: { kind: 'solset', v: V, exprDomain: true }, mode: 'free',
-      script: [...seg1, { kind: 'segment', html: 'Résous f(x) = 0 sur D_f :', start: { math: eqStart }, judge: { kind: 'solset', v: V, onDomain: true } }, ...seg2],
+      script: [...seg1, { kind: 'segment', html: t('Résous f(x) = 0 sur D_f :'), start: { math: eqStart }, judge: { kind: 'solset', v: V, onDomain: true } }, ...seg2],
       hints: [], subgoals: DOM_SUB, keys: KEYS, key: `${DOM}:5:${f}`, exam: examOf(opts),
     });
   }
@@ -218,9 +219,9 @@ function domItem(level, rng, opts = {}) {
   const condsText = d.conds.map((c) => c.text).join('∧');
   const solvedText = d.conds.map((c) => c.solved).join('∧');
   const lines = [
-    E(condsText, 'Écrire les conditions', 'conds', 'conds'),
-    E(solvedText, 'Résoudre chaque condition', 'solve', 'solve'),
-    E(d.Dtext, 'Combiner', 'combine', 'combine'),
+    E(condsText, t('Écrire les conditions'), 'conds', 'conds'),
+    E(solvedText, t('Résoudre chaque condition'), 'solve', 'solve'),
+    E(d.Dtext, t('Combiner'), 'combine', 'combine'),
   ];
   let start = d.f;
   let script = lines;
@@ -228,22 +229,22 @@ function domItem(level, rng, opts = {}) {
   if (level === 1) {
     start = condsText;
     const nums = d.conds.flatMap((c) => [...c.solved.matchAll(/[≥≤<>≠]=?(-?[\d/]+)/g)].map((m) => m[1]));
-    script = [{ kind: 'note', html: `Les conditions de ${MT(d.f)} sont écrites. Résous-les.` }, blanked(lines[1], [...new Set(nums)].slice(0, 2)), lines[2]];
+    script = [{ kind: 'note', html: t('Les conditions de {f} sont écrites. Résous-les.', { f: MT(d.f) }) }, blanked(lines[1], [...new Set(nums)].slice(0, 2)), lines[2]];
   } else if (level === 2) {
     script = [blanked(lines[0], d.conds.map((c) => c.left)), lines[1], lines[2]];
   } else if (level === 3) {
-    const cond0 = d.conds.map((c) => RT(c.text)).join(' et ');
+    const cond0 = d.conds.map((c) => RT(c.text)).join(t(' et '));
     const options = [{ id: 'right', label: cond0, valid: true }];
-    if (d.conds.length > 1) options.push({ id: 'one', label: RT(d.conds[d.conds.length - 1].text), valid: false, rule: 'g1_domain_partial', why: 'Il manque une condition : chaque racine et chaque dénominateur donne la sienne.' });
-    options.push({ id: 'num', label: `${cond0} et numérateur ≠ 0`, valid: false, why: 'Le numérateur peut être nul : 0 divisé par un nombre non nul existe.' });
-    if (d.conds.some((c) => c.text.includes('≥'))) options.push({ id: 'strict', label: d.conds.map((c) => RT(c.text.replace('≥', '>'))).join(' et '), valid: false, why: 'Une racine carrée de 0 existe : sous la racine, il faut ≥ 0 (> 0 seulement si la racine est au dénominateur).' });
-    script = [{ kind: 'decision', prompt: 'Quelles conditions écrire ?', options }, ...lines];
+    if (d.conds.length > 1) options.push({ id: 'one', label: RT(d.conds[d.conds.length - 1].text), valid: false, rule: 'g1_domain_partial', why: t('Il manque une condition : chaque racine et chaque dénominateur donne la sienne.') });
+    options.push({ id: 'num', label: t('{c} et numérateur ≠ 0', { c: cond0 }), valid: false, why: t('Le numérateur peut être nul : 0 divisé par un nombre non nul existe.') });
+    if (d.conds.some((c) => c.text.includes('≥'))) options.push({ id: 'strict', label: d.conds.map((c) => RT(c.text.replace('≥', '>'))).join(t(' et ')), valid: false, why: t('Une racine carrée de 0 existe : sous la racine, il faut ≥ 0 (> 0 seulement si la racine est au dénominateur).') });
+    script = [{ kind: 'decision', prompt: t('Quelles conditions écrire ?'), options }, ...lines];
   }
   const sLines = lines;
   return linesItem({
-    skill: DOM, level, prompt: `Détermine le domaine de définition de f(x) = ${MT(d.f)}.`,
+    skill: DOM, level, prompt: t('Détermine le domaine de définition de f(x) = {f}.', { f: MT(d.f) }),
     start, judge: withMenus(judge, level, start, sLines, DOM_CHOICES), mode: modeOf(level), script,
-    hints: H('Deux dangers : une racine carrée (ce qui est dessous doit être ≥ 0) et un dénominateur (≠ 0).', MT(condsText), MT(lines[1].math)),
+    hints: H(t('Deux dangers : une racine carrée (ce qui est dessous doit être ≥ 0) et un dénominateur (≠ 0).'), MT(condsText), MT(lines[1].math)),
     subgoals: DOM_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${DOM}:${level}:${d.f}`, exam: examOf(opts), fallback: !!d.fallback,
   });
@@ -252,14 +253,15 @@ function domItem(level, rng, opts = {}) {
 function domExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'La fonction x ↦ √(x²) n\'est définie que sur [0 ; +∞[.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x^2≥0⇒x≥0', hyp: 'x^2≥0', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: 'Faux : x² ≥ 0 pour tout x, donc √(x²) est définie sur ℝ. Par exemple √((−1)²) = 1.' },
-      { s: 'La fonction x ↦ 1/(x² + 1) est définie sur ℝ.', truth: true, why: 'Vrai : x² + 1 ≥ 1 ne s\'annule jamais.' },
-      { s: 'La fonction x ↦ √(x − 1)/(x − 2) est définie sur [1 ; +∞[.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x≥1⇒x≠2', hyp: 'x≥1', ask: [{ v: 'x', label: 'x =' }], answer: { x: '2' } }, why: 'Faux : en x = 2, le dénominateur est nul. D = [1 ; 2[ ∪ ]2 ; +∞[.', rule: 'g1_domain_partial' },
-      { s: 'La fonction x ↦ 1/√(x + 4) est définie sur [−4 ; +∞[.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x≥-4⇒x+4≠0', hyp: 'x≥-4', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-4' } }, why: 'Faux : en x = −4, on divise par √0 = 0. D = ]−4 ; +∞[.' },
-      { s: 'La fonction x ↦ √(4 − x²) est définie sur [−2 ; 2].', truth: true, why: 'Vrai : 4 − x² ≥ 0 ⇔ −2 ≤ x ≤ 2.' },
+      { s: 'La fonction x ↦ √(x²) n\'est définie que sur [0 ; +∞[.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x^2≥0⇒x≥0', hyp: 'x^2≥0', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-1' } }, why: t('Faux : x² ≥ 0 pour tout x, donc √(x²) est définie sur ℝ. Par exemple √((−1)²) = 1.') },
+      { s: 'La fonction x ↦ 1/(x² + 1) est définie sur ℝ.', truth: true, why: t('Vrai : x² + 1 ≥ 1 ne s\'annule jamais.') },
+      { s: 'La fonction x ↦ √(x − 1)/(x − 2) est définie sur [1 ; +∞[.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x≥1⇒x≠2', hyp: 'x≥1', ask: [{ v: 'x', label: 'x =' }], answer: { x: '2' } }, why: t('Faux : en x = 2, le dénominateur est nul. D = [1 ; 2[ ∪ ]2 ; +∞[.'), rule: 'g1_domain_partial' },
+      { s: 'La fonction x ↦ 1/√(x + 4) est définie sur [−4 ; +∞[.', truth: false, counter: { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: 'x≥-4⇒x+4≠0', hyp: 'x≥-4', ask: [{ v: 'x', label: 'x =' }], answer: { x: '-4' } }, why: t('Faux : en x = −4, on divise par √0 = 0. D = ]−4 ; +∞[.') },
+      { s: 'La fonction x ↦ √(4 − x²) est définie sur [−2 ; 2].', truth: true, why: t('Vrai : 4 − x² ≥ 0 ⇔ −2 ≤ x ≤ 2.') },
     ];
     const b = rng.pick(bank);
-    return tfItem({ skill: DOM, level: 4, statement: b.s, truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    // The key stays the French statement.
+    return tfItem({ skill: DOM, level: 4, statement: t(b.s), truth: b.truth, counter: b.counter || null, ruleIfTrue: b.truth ? null : b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const d = domData(rng, 2);
   const options = [{ html: MT(d.Dtext), correct: true }];
@@ -269,8 +271,8 @@ function domExam(rng, exam) {
   if (flipped !== d.Dtext) { try { setOf(flipped); options.push({ html: MT(flipped), correct: false, rule: 'g9_bracket' }); } catch { /* skip */ } }
   if (options.length < 4) options.push({ html: MT('ℝ'), correct: false });
   return mcq({
-    skill: DOM, level: 4, prompt: `Domaine de définition de f(x) = ${MT(d.f)} :`, options: uniq(options).slice(0, 4), key: `mcq:${d.f}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `${MT(d.conds.map((c) => c.text).join('∧'))} donne D_f = ${MT(d.Dtext)}.`, note: '' }],
+    skill: DOM, level: 4, prompt: t('Domaine de définition de f(x) = {f} :', { f: MT(d.f) }), options: uniq(options).slice(0, 4), key: `mcq:${d.f}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('{c} donne D_f = {d}.', { c: MT(d.conds.map((c) => c.text).join('∧')), d: MT(d.Dtext) }), note: '' }],
   }, rng);
 }
 
@@ -280,14 +282,14 @@ function domExam(rng, exam) {
 
 const CMP = 'g1-compose';
 const CMP_SUB = [
-  { id: 'subst', label: 'remplacer', skill: CMP },
-  { id: 'simplify', label: 'simplifier', skill: CMP },
-  { id: 'domain', label: 'domaine', skill: DOM },
+  { id: 'subst', label: t('remplacer'), skill: CMP },
+  { id: 'simplify', label: t('simplifier'), skill: CMP },
+  { id: 'domain', label: t('domaine'), skill: DOM },
 ];
 const CMP_CHOICES = [
-  { id: 'subst', label: 'Remplacer : la fonction intérieure d\'abord' },
-  { id: 'simplify', label: 'Simplifier' },
-  { id: 'domain', label: 'Écrire le domaine' },
+  { id: 'subst', label: t('Remplacer : la fonction intérieure d\'abord') },
+  { id: 'simplify', label: t('Simplifier') },
+  { id: 'domain', label: t('Écrire le domaine') },
 ];
 
 // Pairs (outer, inner): the raw writing, the simplified one, and the
@@ -375,24 +377,24 @@ const cmpJudge = (d) => {
   return { kind: 'equiv', vars: [V], funcs: ['f', 'g'], defs: d.defs, domain: { x: [a, b] }, target: 'short', goal: d.simple };
 };
 
-const MU = (t) => MT(toText(unparen(parse(t))));
-const fDisplay = (d) => `f(x) = ${MU(d.defs.f)} et g(x) = ${MU(d.defs.g)}`;
+const MU = (s) => MT(toText(unparen(parse(s))));
+const fDisplay = (d) => t('f(x) = {f} et g(x) = {g}', { f: MU(d.defs.f), g: MU(d.defs.g) });
 
 // The lines of one composition: replace, then simplify; then the domain.
 function cmpParts(d, level) {
   const innerText = d.defs[d.innerName];
   const outerName = d.innerName === 'f' ? 'g' : 'f';
   const first = `${outerName}(${innerText})`;
-  const clean = (t) => toText(unparen(parse(t, { funcs: ['f', 'g'] })));
+  const clean = (s) => toText(unparen(parse(s, { funcs: ['f', 'g'] })));
   const expr = [
-    E(clean(first), `${d.innerName} d'abord : ${d.innerName}(x) = ${RT(innerText)}`, 'subst', 'subst'),
-    E(d.raw, `Remplacer x par ${RT(innerText)} dans ${outerName}`, 'subst', 'subst'),
+    E(clean(first), t('{n} d\'abord : {n}(x) = {e}', { n: d.innerName, e: RT(innerText) }), 'subst', 'subst'),
+    E(d.raw, t('Remplacer x par {e} dans {o}', { e: RT(innerText), o: outerName }), 'subst', 'subst'),
   ];
   // The raw writing may already be the simple one.
-  if (clean(d.raw) !== clean(d.simple)) expr.push(E(d.simple, 'Simplifier', 'simplify', 'simplify'));
+  if (clean(d.raw) !== clean(d.simple)) expr.push(E(d.simple, t('Simplifier'), 'simplify', 'simplify'));
   if (level === 1 && expr[0]) expr[0] = blanked(expr[0], [toText(unparen(parse(innerText)))], { funcs: ['f', 'g'] });
   const domCond = domText(d.call, { funcs: ['f', 'g'], defs: d.defs });
-  const dom = [E(domCond, 'Domaine : x doit être dans le domaine de la fonction intérieure, et l\'expression brute définie', 'domain', 'domain')];
+  const dom = [E(domCond, t('Domaine : x doit être dans le domaine de la fonction intérieure, et l\'expression brute définie'), 'domain', 'domain')];
   return { expr, dom, domCond };
 }
 
@@ -403,16 +405,18 @@ function cmpItem(level, rng, opts = {}) {
   const judge = cmpJudge(d);
   const domJudge = { kind: 'solset', v: V, funcs: ['f', 'g'], defs: d.defs, exprDomain: true, simplified: d.simple };
   const script = [];
-  if (level <= 2) script.push({ kind: 'note', html: `Le domaine de ${d.name} est ${MT(d.D)}.` });
+  if (level <= 2) script.push({ kind: 'note', html: t('Le domaine de {name} est {d}.', { name: d.name, d: MT(d.D) }) });
   if (level === 3) {
-    script.push({ kind: 'decision', prompt: `Pour ${d.name}, quelle fonction applique-t-on d'abord ?`, options: [
-      { id: 'inner', label: `${d.innerName} d'abord`, valid: true },
-      { id: 'outer', label: `${d.innerName === 'f' ? 'g' : 'f'} d'abord`, valid: false, rule: 'g1_compose_order', why: `${d.name} : la fonction écrite à droite s'applique d'abord.` },
+    script.push({ kind: 'decision', prompt: t('Pour {name}, quelle fonction applique-t-on d\'abord ?', { name: d.name }), options: [
+      { id: 'inner', label: t('{n} d\'abord', { n: d.innerName }), valid: true },
+      { id: 'outer', label: t('{n} d\'abord', { n: d.innerName === 'f' ? 'g' : 'f' }), valid: false, rule: 'g1_compose_order', why: t('{name} : la fonction écrite à droite s\'applique d\'abord.', { name: d.name }) },
     ] });
   }
   script.push(...parts.expr);
-  if (level >= 3) script.push({ kind: 'segment', html: `Domaine de ${d.name} :`, start: { math: d.call }, judge: domJudge }, ...parts.dom);
-  let prompt = `${fDisplay(d)}. Calcule (${d.name})(x) et simplifie${level >= 3 ? ', puis donne son domaine' : ''}.`;
+  if (level >= 3) script.push({ kind: 'segment', html: t('Domaine de {name} :', { name: d.name }), start: { math: d.call }, judge: domJudge }, ...parts.dom);
+  let prompt = level >= 3
+    ? t('{fd}. Calcule ({name})(x) et simplifie, puis donne son domaine.', { fd: fDisplay(d), name: d.name })
+    : t('{fd}. Calcule ({name})(x) et simplifie.', { fd: fDisplay(d), name: d.name });
   if (both) {
     // The other order too.
     const e = { ...d, call: d.other.call, raw: d.other.raw, innerName: d.innerName === 'f' ? 'g' : 'f', name: d.name === 'g ∘ f' ? 'f ∘ g' : 'g ∘ f' };
@@ -420,15 +424,15 @@ function cmpItem(level, rng, opts = {}) {
     e.simple = match ? toText(unparen(parse(match.simple))) : d.other.raw;
     e.D = domText(e.call, { funcs: ['f', 'g'], defs: d.defs });
     const p2 = cmpParts(e, level);
-    script.push({ kind: 'segment', html: `Puis (${e.name})(x) :`, start: { math: e.call }, judge: cmpJudge(e) }, ...p2.expr,
-      { kind: 'segment', html: `Domaine de ${e.name} :`, start: { math: e.call }, judge: { ...domJudge, simplified: e.simple } }, ...p2.dom);
-    prompt = `${fDisplay(d)}. Calcule (${d.name})(x) et (${e.name})(x), simplifie, et donne leurs domaines.`;
+    script.push({ kind: 'segment', html: t('Puis ({name})(x) :', { name: e.name }), start: { math: e.call }, judge: cmpJudge(e) }, ...p2.expr,
+      { kind: 'segment', html: t('Domaine de {name} :', { name: e.name }), start: { math: e.call }, judge: { ...domJudge, simplified: e.simple } }, ...p2.dom);
+    prompt = t('{fd}. Calcule ({a})(x) et ({b})(x), simplifie, et donne leurs domaines.', { fd: fDisplay(d), a: d.name, b: e.name });
   }
   return linesItem({
     skill: CMP, level, prompt,
     start: d.call, judge: withMenus(judge, level, d.call, parts.expr, CMP_CHOICES), mode: modeOf(level), script,
     declares: { vars: [V], funcs: ['f', 'g'] },
-    hints: H(`${d.name} : on calcule d'abord ${d.innerName}(x), puis on l'envoie dans l'autre fonction.`, MT(parts.expr[0].math, { funcs: ['f', 'g'] }), MT(d.raw)),
+    hints: H(t('{name} : on calcule d\'abord {n}(x), puis on l\'envoie dans l\'autre fonction.', { name: d.name, n: d.innerName }), MT(parts.expr[0].math, { funcs: ['f', 'g'] }), MT(d.raw)),
     subgoals: CMP_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${CMP}:${level}:${d.defs.f}:${d.defs.g}:${d.call}`, exam: examOf(opts, 3),
   });
@@ -437,26 +441,27 @@ function cmpItem(level, rng, opts = {}) {
 function cmpExam(rng, exam) {
   if (exam === 'tf') {
     const a = rng.pick([2, 3]);
+    // s: the French statement, kept for the key; st: the statement shown.
     const bank = [
-      { s: `Pour f(x) = x² et g(x) = x + ${a}, on a f ∘ g = g ∘ f.`, truth: false, pred: `(x+${a})^2=x^2+${a}`, ans: '1', why: `Faux : (f ∘ g)(x) = (x + ${a})², (g ∘ f)(x) = x² + ${a}. En x = 1 : ${(1 + a) ** 2} ≠ ${1 + a}.` },
-      { s: `Pour f(x) = ${a}x et g(x) = x + 1, on a f ∘ g = g ∘ f.`, truth: false, pred: `${a}(x+1)=${a}x+1`, ans: '0', why: `Faux : ${a}(x + 1) ≠ ${a}x + 1.` },
-      { s: 'Pour f(x) = x + 2 et g(x) = x − 5, on a f ∘ g = g ∘ f.', truth: true, why: 'Vrai : les deux donnent x − 3.' },
-      { s: 'f ∘ g = g ∘ f pour toutes les fonctions f et g.', truth: false, pred: '(x+1)^2=x^2+1', ans: '1', with: 'f(x) = x², g(x) = x + 1', why: 'Faux : avec f(x) = x² et g(x) = x + 1, (f ∘ g)(1) = 4 mais (g ∘ f)(1) = 2.' },
+      { s: `Pour f(x) = x² et g(x) = x + ${a}, on a f ∘ g = g ∘ f.`, st: t('Pour f(x) = x² et g(x) = x + {a}, on a f ∘ g = g ∘ f.', { a }), truth: false, pred: `(x+${a})^2=x^2+${a}`, ans: '1', why: t('Faux : (f ∘ g)(x) = (x + {a})², (g ∘ f)(x) = x² + {a}. En x = 1 : {u} ≠ {v}.', { a, u: (1 + a) ** 2, v: 1 + a }) },
+      { s: `Pour f(x) = ${a}x et g(x) = x + 1, on a f ∘ g = g ∘ f.`, st: t('Pour f(x) = {a}x et g(x) = x + 1, on a f ∘ g = g ∘ f.', { a }), truth: false, pred: `${a}(x+1)=${a}x+1`, ans: '0', why: t('Faux : {a}(x + 1) ≠ {a}x + 1.', { a }) },
+      { s: 'Pour f(x) = x + 2 et g(x) = x − 5, on a f ∘ g = g ∘ f.', truth: true, why: t('Vrai : les deux donnent x − 3.') },
+      { s: 'f ∘ g = g ∘ f pour toutes les fonctions f et g.', truth: false, pred: '(x+1)^2=x^2+1', ans: '1', with: 'f(x) = x², g(x) = x + 1', why: t('Faux : avec f(x) = x² et g(x) = x + 1, (f ∘ g)(1) = 4 mais (g ∘ f)(1) = 2.') },
     ];
     const b = rng.pick(bank);
-    const counter = b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, ask: [{ v: 'x', label: b.with ? `Avec ${b.with}, une valeur x où f(g(x)) ≠ g(f(x)) : x =` : 'x =' }], answer: { x: b.ans } };
-    return tfItem({ skill: CMP, level: 4, statement: b.s, truth: b.truth, counter, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    const counter = b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, ask: [{ v: 'x', label: b.with ? t('Avec {w}, une valeur x où f(g(x)) ≠ g(f(x)) : x =', { w: b.with }) : 'x =' }], answer: { x: b.ans } };
+    return tfItem({ skill: CMP, level: 4, statement: b.st ?? t(b.s), truth: b.truth, counter, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const d = compData(rng);
   const options = [
-    { html: `${MU(d.simple)}, sur ${MT(d.D)}`, correct: true },
-    { html: `${MU(d.other.raw)}, sur ${MT(domText(d.other.call, { funcs: ['f', 'g'], defs: d.defs }))}`, correct: false, rule: 'g1_compose_order' },
+    { html: t('{e}, sur {d}', { e: MU(d.simple), d: MT(d.D) }), correct: true },
+    { html: t('{e}, sur {d}', { e: MU(d.other.raw), d: MT(domText(d.other.call, { funcs: ['f', 'g'], defs: d.defs })) }), correct: false, rule: 'g1_compose_order' },
   ];
-  if (d.Dsimple !== d.D) options.push({ html: `${MU(d.simple)}, sur ${MT(d.Dsimple)}`, correct: false, rule: 'g1_compose_domain' });
-  options.push({ html: `${MU(`(${d.defs.f})*(${d.defs.g})`)}, sur ${MT(d.D)}`, correct: false });
+  if (d.Dsimple !== d.D) options.push({ html: t('{e}, sur {d}', { e: MU(d.simple), d: MT(d.Dsimple) }), correct: false, rule: 'g1_compose_domain' });
+  options.push({ html: t('{e}, sur {d}', { e: MU(`(${d.defs.f})*(${d.defs.g})`), d: MT(d.D) }), correct: false });
   return mcq({
-    skill: CMP, level: 4, prompt: `${fDisplay(d)}. Alors (${d.name})(x) =`, options: uniq(options), key: `mcq:${d.defs.f}:${d.defs.g}:${d.call}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `(${d.name})(x) = ${MT(d.raw)} = ${MT(d.simple)}, sur ${MT(d.D)}.`, note: '' }],
+    skill: CMP, level: 4, prompt: t('{fd}. Alors ({name})(x) =', { fd: fDisplay(d), name: d.name }), options: uniq(options), key: `mcq:${d.defs.f}:${d.defs.g}:${d.call}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('({name})(x) = {raw} = {simple}, sur {d}.', { name: d.name, raw: MT(d.raw), simple: MT(d.simple), d: MT(d.D) }), note: '' }],
   }, rng);
 }
 
@@ -467,17 +472,17 @@ function cmpExam(rng, exam) {
 
 const INV = 'g1-inverse';
 const INV_SUB = [
-  { id: 'pose', label: 'poser y = f(x)', skill: INV },
-  { id: 'isolate', label: 'isoler x', skill: 'iso-formula' },
-  { id: 'solve', label: 'résoudre le 2e degré', skill: 'quad-formula' },
-  { id: 'branch', label: 'choisir la solution de l\'ensemble de départ', skill: INV },
-  { id: 'rename', label: 'renommer', skill: INV },
+  { id: 'pose', label: t('poser y = f(x)'), skill: INV },
+  { id: 'isolate', label: t('isoler x'), skill: 'iso-formula' },
+  { id: 'solve', label: t('résoudre le 2e degré'), skill: 'quad-formula' },
+  { id: 'branch', label: t('choisir la solution de l\'ensemble de départ'), skill: INV },
+  { id: 'rename', label: t('renommer'), skill: INV },
 ];
 const INV_CHOICES = [
-  { id: 'isolate', label: 'Isoler x (regrouper les termes en x)' },
-  { id: 'square', label: 'Faire apparaître un carré' },
-  { id: 'solve', label: 'Résoudre en x (les deux racines)' },
-  { id: 'branch', label: 'Garder la solution de l\'ensemble de départ' },
+  { id: 'isolate', label: t('Isoler x (regrouper les termes en x)') },
+  { id: 'square', label: t('Faire apparaître un carré') },
+  { id: 'solve', label: t('Résoudre en x (les deux racines)') },
+  { id: 'branch', label: t('Garder la solution de l\'ensemble de départ') },
 ];
 // The same affine text in the letter y.
 const affY = (p, c) => affine(p, c).replace(/x/g, 'y');
@@ -498,8 +503,8 @@ function invData(rng, kind) {
       const f = affine(a, b);
       const xy = a > 0 ? `(${affY(1, -b)})/${a}` : `(${affY(-1, b)})/${-a}`;
       const lines = [
-        E(`${affine(a, 0)}=${affY(1, -b)}`, b > 0 ? `Soustraire ${b}` : `Ajouter ${-b}`, 'isolate', 'isolate'),
-        E(`x=${xy}`, `Diviser par ${fr(N(a))}`, 'isolate', 'isolate'),
+        E(`${affine(a, 0)}=${affY(1, -b)}`, b > 0 ? t('Soustraire {b}', { b }) : t('Ajouter {b}', { b: -b }), 'isolate', 'isolate'),
+        E(`x=${xy}`, t('Diviser par {a}', { a: fr(N(a)) }), 'isolate', 'isolate'),
       ];
       return { kind, f, A: 'ℝ', B: 'ℝ', start: `${f}=y`, lines, xy, inv: xy.replace(/y/g, 'x'), dom: [-3, 3], den: String(Math.abs(a)) };
     }
@@ -517,12 +522,12 @@ function invData(rng, kind) {
       const lim = q(a, c);
       const A = `ℝ∖{${N(pole)}}`;
       const B = `ℝ∖{${N(lim)}}`;
-      const wrapT = (t) => (/^-?\d*[a-z]?$/.test(t) ? t : `(${t})`);
+      const wrapT = (s) => (/^-?\d*[a-z]?$/.test(s) ? s : `(${s})`);
       const xy = `${wrapT(affY(-d, b))}/(${affY(c, -a)})`;
       const lines = [
-        E(`${/^-?\d*x$/.test(den) ? `${den}y` : `y(${den})`}=${num}`, 'Multiplier par le dénominateur', 'isolate', 'isolate'),
-        E(`x(${affY(c, -a)})=${affY(-d, b)}`, 'Regrouper les termes en x', 'isolate', 'isolate'),
-        E(`x=${xy}`, `Diviser : ${toReadable(parse(affY(c, -a)))} ≠ 0 car y ≠ ${fr(N(lim))}`, 'isolate', 'isolate'),
+        E(`${/^-?\d*x$/.test(den) ? `${den}y` : `y(${den})`}=${num}`, t('Multiplier par le dénominateur'), 'isolate', 'isolate'),
+        E(`x(${affY(c, -a)})=${affY(-d, b)}`, t('Regrouper les termes en x'), 'isolate', 'isolate'),
+        E(`x=${xy}`, t('Diviser : {e} ≠ 0 car y ≠ {l}', { e: toReadable(parse(affY(c, -a))), l: fr(N(lim)) }), 'isolate', 'isolate'),
       ];
       const lo = lim.valueOf() + 0.3;
       return { kind, f, A, B, start: `${f}=y`, lines, xy, inv: xy.replace(/y/g, 'x'), dom: [lo, lo + 3], pole, lim };
@@ -540,11 +545,11 @@ function invData(rng, kind) {
       const keep = plusRoot(h, right ? 1 : -1, rad);
       const lose = plusRoot(h, right ? -1 : 1, rad);
       const lines = [];
-      if (kind === 'squareX') lines.push(E(`${sq}${plusK(k)}=y`, 'Faire apparaître un carré', 'isolate', 'square'));
-      if (k !== 0) lines.push(E(`${sq}=${rad}`, 'Isoler le carré', 'isolate', 'square'));
+      if (kind === 'squareX') lines.push(E(`${sq}${plusK(k)}=y`, t('Faire apparaître un carré'), 'isolate', 'square'));
+      if (k !== 0) lines.push(E(`${sq}=${rad}`, t('Isoler le carré'), 'isolate', 'square'));
       lines.push(
-        E(`x=${keep}∨x=${lose}`, 'Deux racines', 'solve', 'solve'),
-        E(`x=${keep}`, `x ${right ? '≥' : '≤'} ${fr(String(h))} : on garde la racine ${right ? '+' : '−'}`, 'branch', 'branch'),
+        E(`x=${keep}∨x=${lose}`, t('Deux racines'), 'solve', 'solve'),
+        E(`x=${keep}`, t('x {r} {h} : on garde la racine {s}', { r: right ? '≥' : '≤', h: fr(String(h)), s: right ? '+' : '−' }), 'branch', 'branch'),
       );
       return { kind, f, A, B, start: `${f}=y`, lines, xy: keep, inv: keep.replace(/y/g, 'x'), lose: lose.replace(/y/g, 'x'), dom: [k + 0.1, k + 4], h, k, right };
     }
@@ -555,10 +560,10 @@ function invData(rng, kind) {
     const yb = lin(b).replace('x', 'y');
     const xy = `(${yb})^2${plusK(a)}`;
     const lines = [
-      E(`sqrt(${lin(a)})=${yb}`, 'Isoler la racine', 'isolate', 'isolate'),
-      E(`${lin(a)}=(${yb})^2`, `Élever au carré : y ≥ ${fr(String(b))}, les deux membres sont ≥ 0`, 'isolate', 'square'),
+      E(`sqrt(${lin(a)})=${yb}`, t('Isoler la racine'), 'isolate', 'isolate'),
+      E(`${lin(a)}=(${yb})^2`, t('Élever au carré : y ≥ {b}, les deux membres sont ≥ 0', { b: fr(String(b)) }), 'isolate', 'square'),
     ];
-    if (a !== 0) lines.push(E(`x=${xy}`, 'Isoler x', 'isolate', 'isolate'));
+    if (a !== 0) lines.push(E(`x=${xy}`, t('Isoler x'), 'isolate', 'isolate'));
     return { kind: 'sqrt', f, A: `[${a};+∞[`, B: `[${b};+∞[`, start: `${f}=y`, lines, xy, inv: xy.replace(/y/g, 'x'), dom: [b + 0.1, b + 4] };
   }
   return null;
@@ -574,20 +579,20 @@ function invItem(level, rng, opts = {}) {
   const script = [];
   if (level === 3) {
     const at = lines.findIndex((l) => l.act === 'branch');
-    script.push(...lines.slice(0, at), { kind: 'decision', prompt: 'Quelle racine garder ?', options: [
+    script.push(...lines.slice(0, at), { kind: 'decision', prompt: t('Quelle racine garder ?'), options: [
       { id: 'keep', label: `x = ${RT(d.xy)}`, valid: true },
-      { id: 'lose', label: `x = ${RT(d.lose.replace(/x/g, 'y'))}`, valid: false, rule: 'g1_inverse_branch', why: `Cette racine est ${d.right ? '≤' : '≥'} ${fr(String(d.h))} : elle n'est pas dans l'ensemble de départ.` },
-      { id: 'both', label: 'Les deux', valid: false, why: 'f⁻¹(y) est un seul nombre : f est injective sur son ensemble de départ.' },
+      { id: 'lose', label: `x = ${RT(d.lose.replace(/x/g, 'y'))}`, valid: false, rule: 'g1_inverse_branch', why: t('Cette racine est {r} {h} : elle n\'est pas dans l\'ensemble de départ.', { r: d.right ? '≤' : '≥', h: fr(String(d.h)) }) },
+      { id: 'both', label: t('Les deux'), valid: false, why: t('f⁻¹(y) est un seul nombre : f est injective sur son ensemble de départ.') },
     ] }, ...lines.slice(at));
   } else script.push(...lines);
-  script.push({ kind: 'segment', html: 'Renomme la variable :', ask: 'f⁻¹(x) =', start: { math: d.xy }, judge: rename }, E(d.inv, 'Renommer y en x', 'rename'));
+  script.push({ kind: 'segment', html: t('Renomme la variable :'), ask: 'f⁻¹(x) =', start: { math: d.xy }, judge: rename }, E(d.inv, t('Renommer y en x'), 'rename'));
   const YO = { vars: [V, 'y'] };
   return linesItem({
     skill: INV, level,
-    prompt: `f : ${MT(d.A)} → ${MT(d.B)}, f(x) = ${MU(d.f)} est bijective. Résous y = f(x) en x, puis explicite f⁻¹.`,
+    prompt: t('f : {A} → {B}, f(x) = {f} est bijective. Résous y = f(x) en x, puis explicite f⁻¹.', { A: MT(d.A), B: MT(d.B), f: MU(d.f) }),
     start: d.start, judge: withMenus(judge, level, d.start, lines, INV_CHOICES), mode: modeOf(level), script,
     declares: { vars: [V, 'y'] },
-    hints: H(`Résous y = f(x) en x${d.A === 'ℝ' ? '' : `, puis garde la solution qui est dans ${fr(d.A)}`}.`, MT(lines[Math.max(0, lines.length - 2)].math, YO), MT(lines[lines.length - 1].math, YO)),
+    hints: H(d.A === 'ℝ' ? t('Résous y = f(x) en x.') : t('Résous y = f(x) en x, puis garde la solution qui est dans {A}.', { A: fr(d.A) }), MT(lines[Math.max(0, lines.length - 2)].math, YO), MT(lines[lines.length - 1].math, YO)),
     subgoals: INV_SUB, keys: [...KEYS, 'letters'], tapActions: level === 3 ? 'steps' : null,
     key: `${INV}:${level}:${d.f}:${d.A}`, exam: examOf(opts, 3),
   });
@@ -602,9 +607,9 @@ function invMcq(rng) {
   if (d.lose) options.push({ html: MU(d.lose), correct: false, rule: 'g1_inverse_branch' });
   options.push({ html: MU(d.f), correct: false });
   return mcq({
-    skill: INV, level: 4, prompt: `f : ${MT(d.A)} → ${MT(d.B)}, f(x) = ${MU(d.f)}. Alors f⁻¹(x) =`,
+    skill: INV, level: 4, prompt: t('f : {A} → {B}, f(x) = {f}. Alors f⁻¹(x) =', { A: MT(d.A), B: MT(d.B), f: MU(d.f) }),
     options: uniq(options), key: `mcq:${d.f}:${d.A}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `y = f(x) donne x = ${MT(d.xy, { vars: [V, 'y'] })} ; donc f⁻¹(x) = ${MU(d.inv)}.`, note: '' }],
+    solution: [{ html: t('y = f(x) donne x = {x} ; donc f⁻¹(x) = {inv}.', { x: MT(d.xy, { vars: [V, 'y'] }), inv: MU(d.inv) }), note: '' }],
   }, rng);
 }
 
@@ -615,16 +620,16 @@ function invMcq(rng) {
 
 const TRI = 'g1-trinome-sign';
 const TRI_SUB = [
-  { id: 'delta', label: 'discriminant', skill: 'quad-formula' },
-  { id: 'roots', label: 'racines', skill: 'quad-formula' },
-  { id: 'sign', label: 'signe du trinôme', skill: TRI },
-  { id: 'write', label: 'écrire l\'ensemble', skill: 'g9-intervals' },
+  { id: 'delta', label: t('discriminant'), skill: 'quad-formula' },
+  { id: 'roots', label: t('racines'), skill: 'quad-formula' },
+  { id: 'sign', label: t('signe du trinôme'), skill: TRI },
+  { id: 'write', label: t('écrire l\'ensemble'), skill: 'g9-intervals' },
 ];
 const TRI_CHOICES = [
-  { id: 'roots', label: 'Factoriser avec les racines' },
-  { id: 'sign', label: 'Signe de a : entre ou à l\'extérieur des racines' },
-  { id: 'write', label: 'Écrire S en intervalles' },
-  { id: 'move', label: 'Tout passer à gauche' },
+  { id: 'roots', label: t('Factoriser avec les racines') },
+  { id: 'sign', label: t('Signe de a : entre ou à l\'extérieur des racines') },
+  { id: 'write', label: t('Écrire S en intervalles') },
+  { id: 'move', label: t('Tout passer à gauche') },
 ];
 const RELS = ['<', '≤', '>', '≥'];
 const STRICT = { '<': true, '>': true, '≤': false, '≥': false };
@@ -680,13 +685,13 @@ function triItem(level, rng, opts = {}) {
   const S = setText(setOf(start));
   const judge = { kind: 'solset', v: V };
   let lines;
-  if (kind === 'none') lines = [E(S, `Δ = ${fr(String(deltaOf(d.cs)))} < 0 : le trinôme a partout le signe de a = ${fr(String(d.a))}`, 'sign', 'write')];
-  else if (kind === 'double') lines = [E(`${d.factored}${d.rel}0`, 'Δ = 0 : une racine double', 'roots', 'roots'), E(S, 'Un carré est ≥ 0', 'sign', 'write')];
+  if (kind === 'none') lines = [E(S, t('Δ = {delta} < 0 : le trinôme a partout le signe de a = {a}', { delta: fr(String(deltaOf(d.cs))), a: fr(String(d.a)) }), 'sign', 'write')];
+  else if (kind === 'double') lines = [E(`${d.factored}${d.rel}0`, t('Δ = 0 : une racine double'), 'roots', 'roots'), E(S, t('Un carré est ≥ 0'), 'sign', 'write')];
   else {
     lines = [
-      E(`${d.factored}${d.rel}0`, `Racines ${fr(N(d.roots[0]))} et ${fr(N(d.roots[1]))}`, 'roots', 'roots'),
-      E(triSignLine(d), d.a > 0 ? 'a > 0 : négatif entre les racines, positif à l\'extérieur' : 'a < 0 : positif entre les racines, négatif à l\'extérieur', 'sign', 'sign'),
-      E(S, 'Écrire S', 'write', 'write'),
+      E(`${d.factored}${d.rel}0`, t('Racines {r1} et {r2}', { r1: fr(N(d.roots[0])), r2: fr(N(d.roots[1])) }), 'roots', 'roots'),
+      E(triSignLine(d), d.a > 0 ? t('a > 0 : négatif entre les racines, positif à l\'extérieur') : t('a < 0 : positif entre les racines, négatif à l\'extérieur'), 'sign', 'sign'),
+      E(S, t('Écrire S'), 'write', 'write'),
     ];
   }
   let first = start;
@@ -699,15 +704,15 @@ function triItem(level, rng, opts = {}) {
     const right = polyText([s1, t1]);
     const left = polyText([d.cs[0], d.cs[1] + s1, d.cs[2] + t1]);
     first = `${left}${d.rel}${right}`;
-    script.push(E(start, 'Tout passer à gauche', 'roots', 'move'));
+    script.push(E(start, t('Tout passer à gauche'), 'roots', 'move'));
   }
   const withDelta = level >= 2 && level <= 3 && kind === 'two';
   if (level === 1) {
     const inside = (d.a > 0) === (d.rel === '<' || d.rel === '≤');
-    script.push({ kind: 'note', html: `Les racines de ${MT(d.poly)} sont ${fr(N(d.roots[0]))} et ${fr(N(d.roots[1]))}.` });
-    script.push({ kind: 'decision', prompt: `Où ${RT(d.poly)} est-il ${d.rel === '<' || d.rel === '≤' ? 'négatif' : 'positif'} ?`, options: [
-      { id: 'in', label: 'Entre les racines', valid: inside, rule: inside ? undefined : 'g1_trinome_sign_swap', why: `a = ${fr(String(d.a))} : entre les racines, le trinôme a le signe de −a.` },
-      { id: 'out', label: 'À l\'extérieur des racines', valid: !inside, rule: inside ? 'g1_trinome_sign_swap' : undefined, why: `a = ${fr(String(d.a))} : à l'extérieur des racines, le trinôme a le signe de a.` },
+    script.push({ kind: 'note', html: t('Les racines de {p} sont {r1} et {r2}.', { p: MT(d.poly), r1: fr(N(d.roots[0])), r2: fr(N(d.roots[1])) }) });
+    script.push({ kind: 'decision', prompt: d.rel === '<' || d.rel === '≤' ? t('Où {p} est-il négatif ?', { p: RT(d.poly) }) : t('Où {p} est-il positif ?', { p: RT(d.poly) }), options: [
+      { id: 'in', label: t('Entre les racines'), valid: inside, rule: inside ? undefined : 'g1_trinome_sign_swap', why: t('a = {a} : entre les racines, le trinôme a le signe de −a.', { a: fr(String(d.a)) }) },
+      { id: 'out', label: t('À l\'extérieur des racines'), valid: !inside, rule: inside ? 'g1_trinome_sign_swap' : undefined, why: t('a = {a} : à l\'extérieur des racines, le trinôme a le signe de a.', { a: fr(String(d.a)) }) },
     ] });
     script.push(blanked(lines[2], d.roots.map((r) => N(r))));
   } else if (level === 2) {
@@ -718,15 +723,15 @@ function triItem(level, rng, opts = {}) {
   let mainStart = first;
   let mainScript = script;
   if (withDelta) {
-    segs.push({ kind: 'segment', html: `Résous ${MT(start)}.`, start: { math: first }, judge: withMenus(judge, level, first, lines, TRI_CHOICES) }, ...script);
+    segs.push({ kind: 'segment', html: t('Résous {e}.', { e: MT(start) }), start: { math: first }, judge: withMenus(judge, level, first, lines, TRI_CHOICES) }, ...script);
     mainStart = deltaText(d.cs);
     mainScript = [E(String(deltaOf(d.cs)), 'Δ = b² − 4ac', 'delta')];
   }
   return linesItem({
-    skill: TRI, level, prompt: `Résous dans ℝ : ${MT(first)}.`,
+    skill: TRI, level, prompt: t('Résous dans ℝ : {e}.', { e: MT(first) }),
     start: mainStart, judge: withDelta ? deltaSeg : withMenus(judge, level, first, level === 5 ? script : lines, TRI_CHOICES), mode: modeOf(level),
     script: [...mainScript, ...segs],
-    hints: H('Le trinôme a le signe de a à l\'extérieur des racines, le signe contraire entre elles.', kind === 'two' ? MT(`${d.factored}${d.rel}0`) : `Δ = ${deltaOf(d.cs)}`, MT(lines[lines.length - 1].math)),
+    hints: H(t('Le trinôme a le signe de a à l\'extérieur des racines, le signe contraire entre elles.'), kind === 'two' ? MT(`${d.factored}${d.rel}0`) : `Δ = ${deltaOf(d.cs)}`, MT(lines[lines.length - 1].math)),
     subgoals: TRI_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${TRI}:${level}:${first}`, exam: examOf(opts),
   });
@@ -735,15 +740,15 @@ function triItem(level, rng, opts = {}) {
 function triExam(rng, exam) {
   if (exam === 'tf') {
     const bank = [
-      { s: 'x² + x + 1 > 0 pour tout x ∈ ℝ.', truth: true, why: 'Vrai : Δ = −3 < 0 et a = 1 > 0.' },
-      { s: '−x² + 4x − 5 < 0 pour tout x ∈ ℝ.', truth: true, why: 'Vrai : Δ = −4 < 0 et a = −1 < 0.' },
-      { s: 'x² − 3x + 2 > 0 pour tout x ∈ ℝ.', truth: false, pred: 'x^2-3x+2>0', ans: '3/2', why: 'Faux : entre les racines 1 et 2, le trinôme est négatif. En x = 3/2 : −1/4.', rule: 'g1_trinome_sign_swap' },
-      { s: 'x² ≥ 4 équivaut à x ≥ 2.', truth: false, pred: 'x^2≥4⇒x≥2', hyp: 'x^2≥4', ans: '-3', why: 'Faux : x = −3 vérifie x² ≥ 4. S = ]−∞ ; −2] ∪ [2 ; +∞[.' },
-      { s: '2x² − 8x + 8 ≤ 0 n\'a qu\'une solution.', truth: true, why: 'Vrai : 2(x − 2)² ≤ 0 seulement pour x = 2.' },
+      { s: 'x² + x + 1 > 0 pour tout x ∈ ℝ.', truth: true, why: t('Vrai : Δ = −3 < 0 et a = 1 > 0.') },
+      { s: '−x² + 4x − 5 < 0 pour tout x ∈ ℝ.', truth: true, why: t('Vrai : Δ = −4 < 0 et a = −1 < 0.') },
+      { s: 'x² − 3x + 2 > 0 pour tout x ∈ ℝ.', truth: false, pred: 'x^2-3x+2>0', ans: '3/2', why: t('Faux : entre les racines 1 et 2, le trinôme est négatif. En x = 3/2 : −1/4.'), rule: 'g1_trinome_sign_swap' },
+      { s: 'x² ≥ 4 équivaut à x ≥ 2.', truth: false, pred: 'x^2≥4⇒x≥2', hyp: 'x^2≥4', ans: '-3', why: t('Faux : x = −3 vérifie x² ≥ 4. S = ]−∞ ; −2] ∪ [2 ; +∞[.') },
+      { s: '2x² − 8x + 8 ≤ 0 n\'a qu\'une solution.', truth: true, why: t('Vrai : 2(x − 2)² ≤ 0 seulement pour x = 2.') },
     ];
     const b = rng.pick(bank);
     const counter = b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, ...(b.hyp ? { hyp: b.hyp } : {}), ask: [{ v: 'x', label: 'x =' }], answer: { x: b.ans } };
-    return tfItem({ skill: TRI, level: 4, statement: b.s, truth: b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    return tfItem({ skill: TRI, level: 4, statement: t(b.s), truth: b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const d = triData(rng);
   const start = `${d.poly}${d.rel}0`;
@@ -756,7 +761,7 @@ function triExam(rng, exam) {
     { html: MT(`{${N(d.roots[0])};${N(d.roots[1])}}`), correct: false },
   ];
   return mcq({
-    skill: TRI, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    skill: TRI, level: 4, prompt: t('Ensemble des solutions de {e} :', { e: MT(start) }), options: uniq(options), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
     solution: [{ html: `${MT(`${d.factored}${d.rel}0`)} : ${MT(S)}`, note: '' }],
   }, rng);
 }
@@ -768,9 +773,9 @@ function triExam(rng, exam) {
 
 const SGN = 'g1-sign-table';
 const SGN_SUB = [
-  { id: 'bounds', label: 'zéros et valeurs interdites', skill: SGN },
-  { id: 'rows', label: 'signe de chaque facteur', skill: TRI },
-  { id: 'read', label: 'lire l\'ensemble', skill: 'g9-intervals' },
+  { id: 'bounds', label: t('zéros et valeurs interdites'), skill: SGN },
+  { id: 'rows', label: t('signe de chaque facteur'), skill: TRI },
+  { id: 'read', label: t('lire l\'ensemble'), skill: 'g9-intervals' },
 ];
 
 // 2 to 4 factors x − r or r − x, one squared half of the time, one in the
@@ -833,7 +838,7 @@ function sgnTable(level, rng, opts = {}) {
   for (const f of d.factors) {
     const signs = factorSigns(f, d.bounds);
     const given = level === 1;
-    rows.push({ id: f.id, label: `${f.label}${f.den ? ' (dén.)' : ''}`, cells: signs.map((s) => (given ? { given: s } : { input: true, kind: 'sign' })) });
+    rows.push({ id: f.id, label: f.den ? t('{f} (dén.)', { f: f.label }) : f.label, cells: signs.map((s) => (given ? { given: s } : { input: true, kind: 'sign' })) });
     answers[f.id] = signs.map((s) => (given ? null : s));
     f.signs = signs;
   }
@@ -845,22 +850,24 @@ function sgnTable(level, rng, opts = {}) {
   rows.push({ id: 'f', label: 'f(x)', cells: fSigns.map(() => ({ input: true, kind: 'sign' })) });
   answers.f = fSigns;
   const then = linesItem({
-    skill: SGN, level, prompt: `Lis le tableau : résous ${MT(`${d.expr}${d.rel}0`)}.`,
+    skill: SGN, level, prompt: t('Lis le tableau : résous {e}.', { e: MT(`${d.expr}${d.rel}0`) }),
     start: `${d.expr}${d.rel}0`, judge: { kind: 'solset', v: V }, mode: 'free', noHints: true,
-    script: [E(d.Stext, 'Lire le tableau', 'read')], hints: [], subgoals: SGN_SUB, keys: KEYS,
+    script: [E(d.Stext, t('Lire le tableau'), 'read')], hints: [], subgoals: SGN_SUB, keys: KEYS,
     key: `${SGN}:then:${d.expr}${d.rel}`, exam: examOf(opts),
   });
   const hasEven = d.factors.some((f) => f.even);
   const line = (sig) => sig.join(' ');
   return tableItem({
     skill: SGN, level,
-    prompt: `Tableau de signes de f(x) = ${MU(d.expr)}.${boundsInput ? ' Place d\'abord les zéros et les valeurs interdites dans l\'ordre (ligne x).' : ''} Touche une case pour choisir + , − , 0 ou ‖.`,
+    prompt: boundsInput
+      ? t('Tableau de signes de f(x) = {f}. Place d\'abord les zéros et les valeurs interdites dans l\'ordre (ligne x). Touche une case pour choisir + , − , 0 ou ‖.', { f: MU(d.expr) })
+      : t('Tableau de signes de f(x) = {f}. Touche une case pour choisir + , − , 0 ou ‖.', { f: MU(d.expr) }),
     table: { cols, rows }, phi: { kind: 'signs', v: V, bounds: d.bounds.map(String), factors: d.factors.map((f) => ({ id: f.id, f: f.f, den: f.den, even: f.even })) },
     answers, then,
-    hints: H('Une ligne par facteur : il change de signe en sa racine, sauf s\'il est au carré. ‖ sous une valeur interdite.', `${d.factors[0].label} : ${line(d.factors[0].signs)}`, `f(x) : ${line(fSigns)}`),
+    hints: H(t('Une ligne par facteur : il change de signe en sa racine, sauf s\'il est au carré. ‖ sous une valeur interdite.'), `${d.factors[0].label} : ${line(d.factors[0].signs)}`, `f(x) : ${line(fSigns)}`),
     baits: hasEven ? ['g1_sign_even_root'] : [],
     subgoals: SGN_SUB, key: `${d.expr}:${level}`, exam: examOf(opts),
-    solution: [...d.factors.map((f) => ({ html: `${f.label} : ${line(f.signs)}`, note: '' })), { html: `f(x) : ${line(fSigns)}`, note: 'Règle des signes' }, { html: MT(d.Stext), note: `f(x) ${d.rel} 0` }],
+    solution: [...d.factors.map((f) => ({ html: `${f.label} : ${line(f.signs)}`, note: '' })), { html: `f(x) : ${line(fSigns)}`, note: t('Règle des signes') }, { html: MT(d.Stext), note: `f(x) ${d.rel} 0` }],
     noHints: level === 5 || !!opts.exam,
   });
 }
@@ -878,10 +885,10 @@ function sgnLevel5(rng, opts) {
     const fac = rs.map((r) => (r === 0 ? 'x' : `(${lin(r)})`)).join('');
     const S = setText(setOf(start));
     return linesItem({
-      skill: SGN, level: 5, prompt: `Résous dans ℝ : ${MT(start)}.`,
+      skill: SGN, level: 5, prompt: t('Résous dans ℝ : {e}.', { e: MT(start) }),
       start, judge: { kind: 'solset', v: V }, mode: 'free',
-      script: [E(`${fac}${rel}0`, 'Factoriser (racine évidente)', 'bounds'), E(S, 'Tableau de signes, puis lire', 'read')],
-      hints: [], subgoals: [...SGN_SUB, { id: 'factor', label: 'factoriser', skill: 'fac-complete' }], keys: KEYS,
+      script: [E(`${fac}${rel}0`, t('Factoriser (racine évidente)'), 'bounds'), E(S, t('Tableau de signes, puis lire'), 'read')],
+      hints: [], subgoals: [...SGN_SUB, { id: 'factor', label: t('factoriser'), skill: 'fac-complete' }], keys: KEYS,
       key: `${SGN}:5:${start}`, exam: examOf(opts, 3),
     });
   }
@@ -903,8 +910,8 @@ function sgnMcq(rng) {
   const strict = { '≥': '>', '>': '≥', '≤': '<', '<': '≤' }[d.rel];
   options.push({ html: MT(setText(setOf(`${d.expr}${strict}0`))), correct: false, rule: 'g9_bracket' });
   return mcq({
-    skill: SGN, level: 4, prompt: `Ensemble des solutions de ${MT(start)} :`, options: uniq(options).slice(0, 4), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `Tableau de signes : ${MT(d.Stext)}`, note: '' }],
+    skill: SGN, level: 4, prompt: t('Ensemble des solutions de {e} :', { e: MT(start) }), options: uniq(options).slice(0, 4), key: `mcq:${start}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('Tableau de signes : {s}', { s: MT(d.Stext) }), note: '' }],
   }, rng);
 }
 
@@ -915,18 +922,18 @@ function sgnMcq(rng) {
 
 const PAR = 'g1-parity-period';
 const PAR_SUB = [
-  { id: 'domain', label: 'domaine symétrique', skill: DOM },
-  { id: 'fmx', label: 'calculer f(−x)', skill: PAR },
-  { id: 'counter', label: 'contre-exemple', skill: 'g9-counterexample' },
-  { id: 'period', label: 'période', skill: 'g3-reduce' },
+  { id: 'domain', label: t('domaine symétrique'), skill: DOM },
+  { id: 'fmx', label: t('calculer f(−x)'), skill: PAR },
+  { id: 'counter', label: t('contre-exemple'), skill: 'g9-counterexample' },
+  { id: 'period', label: t('période'), skill: 'g3-reduce' },
 ];
 const PAR_CHOICES = [
-  { id: 'subst', label: 'Calculer f(−x) : remplacer x par −x' },
-  { id: 'simplify', label: 'Simplifier f(−x)' },
-  { id: 'test', label: 'Tester une valeur' },
-  { id: 'domain', label: 'Vérifier le domaine' },
+  { id: 'subst', label: t('Calculer f(−x) : remplacer x par −x') },
+  { id: 'simplify', label: t('Simplifier f(−x)') },
+  { id: 'test', label: t('Tester une valeur') },
+  { id: 'domain', label: t('Vérifier le domaine') },
 ];
-const PARITY = { even: 'paire', odd: 'impaire', none: 'ni paire ni impaire' };
+const PARITY = { even: t('paire'), odd: t('impaire'), none: t('ni paire ni impaire') };
 
 // A bank of functions: f, f(−x) simplified, parity.
 function parBank(rng) {
@@ -991,17 +998,17 @@ function perData(rng) {
 
 function perItem(level, rng, opts) {
   const d = perData(rng);
-  const val = (t) => ({ kind: 'value', form: 'exact', expect: t });
+  const val = (e) => ({ kind: 'value', form: 'exact', expect: e });
   const script = [
-    E(piText(d.p1), `Période de ${RT(d.s1)} : 2π/|a|`, 'period'),
-    { kind: 'segment', html: `Période de ${MT(d.s2)} :`, ask: 'T₂ =', start: { math: 'T_2' }, judge: val(piText(d.p2)) },
-    E(piText(d.p2), 'Période : 2π/|b|', 'period'),
-    { kind: 'segment', html: 'Plus petite période commune :', ask: 'T =', start: { math: 'T' }, judge: val(piText(d.T)) },
-    E(piText(d.T), 'Le plus petit nombre qui est un multiple des deux périodes', 'period'),
+    E(piText(d.p1), t('Période de {f} : 2π/|a|', { f: RT(d.s1) }), 'period'),
+    { kind: 'segment', html: t('Période de {f} :', { f: MT(d.s2) }), ask: 'T₂ =', start: { math: 'T_2' }, judge: val(piText(d.p2)) },
+    E(piText(d.p2), t('Période : 2π/|b|'), 'period'),
+    { kind: 'segment', html: t('Plus petite période commune :'), ask: 'T =', start: { math: 'T' }, judge: val(piText(d.T)) },
+    E(piText(d.T), t('Le plus petit nombre qui est un multiple des deux périodes'), 'period'),
   ];
   return linesItem({
-    skill: PAR, level, prompt: `Trouve la plus petite période de f(x) = ${MT(d.f)}.`, start: 'T_1', judge: val(piText(d.p1)), mode: level <= 2 ? 'guided' : 'free', script,
-    hints: H('La période de sin(ax) et de cos(ax) est 2π/|a|. Une somme a pour période le plus petit multiple commun.', `${piText(d.p1)} et ${piText(d.p2)}`, piText(d.T)),
+    skill: PAR, level, prompt: t('Trouve la plus petite période de f(x) = {f}.', { f: MT(d.f) }), start: 'T_1', judge: val(piText(d.p1)), mode: level <= 2 ? 'guided' : 'free', script,
+    hints: H(t('La période de sin(ax) et de cos(ax) est 2π/|a|. Une somme a pour période le plus petit multiple commun.'), t('{a} et {b}', { a: piText(d.p1), b: piText(d.p2) }), piText(d.T)),
     subgoals: PAR_SUB, keys: [...KEYS, 'trig'], key: `${PAR}:per:${d.f}`, exam: examOf(opts),
   });
 }
@@ -1013,32 +1020,32 @@ function parItem(level, rng, opts = {}) {
   const d = parData(rng, kinds);
   const defs = { f: d.f };
   const judge = { kind: 'equiv', vars: [V], funcs: ['f'], defs, domain: { x: [0.3, 2.5] }, target: 'short', goal: d.fm, slack: 0 };
-  const lines = [E(d.raw, 'Remplacer x par −x', 'fmx', 'subst')];
-  if (toText(unparen(parse(d.raw))) !== toText(unparen(parse(d.fm)))) lines.push(E(d.fm, 'Simplifier', 'fmx', 'simplify'));
+  const lines = [E(d.raw, t('Remplacer x par −x'), 'fmx', 'subst')];
+  if (toText(unparen(parse(d.raw))) !== toText(unparen(parse(d.fm)))) lines.push(E(d.fm, t('Simplifier'), 'fmx', 'simplify'));
   if (level === 2) lines[0] = blanked(lines[0], ['-x']);
   const script = [...lines];
-  const decision = { kind: 'decision', prompt: 'Donc f est :', options: [
-    { id: 'even', label: 'paire', valid: d.kind === 'even', why: d.kind === 'odd' ? 'f(−x) = −f(x) : c\'est la définition d\'une fonction impaire.' : 'f(−x) n\'est pas égal à f(x) pour tout x.' },
-    { id: 'odd', label: 'impaire', valid: d.kind === 'odd', why: d.kind === 'even' ? 'f(−x) = f(x) : c\'est la définition d\'une fonction paire.' : 'f(−x) n\'est pas égal à −f(x) pour tout x.' },
-    { id: 'none', label: 'ni paire ni impaire', valid: d.kind === 'none', why: 'Compare f(−x) avec f(x) et avec −f(x).' },
+  const decision = { kind: 'decision', prompt: t('Donc f est :'), options: [
+    { id: 'even', label: t('paire'), valid: d.kind === 'even', why: d.kind === 'odd' ? t('f(−x) = −f(x) : c\'est la définition d\'une fonction impaire.') : t('f(−x) n\'est pas égal à f(x) pour tout x.') },
+    { id: 'odd', label: t('impaire'), valid: d.kind === 'odd', why: d.kind === 'even' ? t('f(−x) = f(x) : c\'est la définition d\'une fonction paire.') : t('f(−x) n\'est pas égal à −f(x) pour tout x.') },
+    { id: 'none', label: t('ni paire ni impaire'), valid: d.kind === 'none', why: t('Compare f(−x) avec f(x) et avec −f(x).') },
   ] };
   if (d.kind === 'none') {
     const x0 = d.x0;
     script.push(
-      { kind: 'segment', html: `Contre-exemple : calcule f(${x0}) et f(−${x0}).`, ask: `f(${x0}) =`, start: { math: subst(d.f, String(x0)) }, judge: { kind: 'value' } }, decision,
+      { kind: 'segment', html: t('Contre-exemple : calcule f({x}) et f(−{x}).', { x: x0 }), ask: `f(${x0}) =`, start: { math: subst(d.f, String(x0)) }, judge: { kind: 'value' } }, decision,
       E(N(evalFloat(parse(d.f), { x: x0 })), `f(${x0})`, 'counter'),
       { kind: 'segment', html: '', ask: `f(−${x0}) =`, start: { math: subst(d.f, `-${x0}`) }, judge: { kind: 'value' } },
-      E(N(evalFloat(parse(d.f), { x: -x0 })), `f(−${x0}) n'est ni f(${x0}) ni −f(${x0})`, 'counter'),
+      E(N(evalFloat(parse(d.f), { x: -x0 })), t('f(−{x}) n\'est ni f({x}) ni −f({x})', { x: x0 }), 'counter'),
     );
   } else {
     const comb = d.kind === 'even' ? 'f(-x)-f(x)' : 'f(-x)+f(x)';
-    script.push({ kind: 'segment', html: d.kind === 'even' ? 'Vérifie : f(−x) − f(x) =' : 'Vérifie : f(−x) + f(x) =', ask: d.kind === 'even' ? 'f(−x) − f(x) =' : 'f(−x) + f(x) =', start: { math: comb }, judge: { kind: 'equiv', vars: [V], funcs: ['f'], defs, domain: { x: [0.3, 2.5] }, target: 'constant' } }, decision, E('0', 'Pour tout x : f est ' + PARITY[d.kind], 'fmx'));
+    script.push({ kind: 'segment', html: d.kind === 'even' ? t('Vérifie : f(−x) − f(x) =') : t('Vérifie : f(−x) + f(x) ='), ask: d.kind === 'even' ? 'f(−x) − f(x) =' : 'f(−x) + f(x) =', start: { math: comb }, judge: { kind: 'equiv', vars: [V], funcs: ['f'], defs, domain: { x: [0.3, 2.5] }, target: 'constant' } }, decision, E('0', t('Pour tout x : f est {p}', { p: PARITY[d.kind] }), 'fmx'));
   }
   return linesItem({
-    skill: PAR, level, prompt: `f(x) = ${MU(d.f)}, définie sur ℝ. Calcule f(−x), puis dis si f est paire, impaire ou ni l'une ni l'autre.`,
+    skill: PAR, level, prompt: t('f(x) = {f}, définie sur ℝ. Calcule f(−x), puis dis si f est paire, impaire ou ni l\'une ni l\'autre.', { f: MU(d.f) }),
     start: 'f(-x)', judge: withMenus(judge, level, 'f(-x)', lines, PAR_CHOICES), mode: modeOf(level), script,
     declares: { vars: [V], funcs: ['f'] },
-    hints: H('Calcule f(−x) et compare à f(x) et à −f(x).', MT(d.raw), MT(d.fm)),
+    hints: H(t('Calcule f(−x) et compare à f(x) et à −f(x).'), MT(d.raw), MT(d.fm)),
     subgoals: PAR_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${PAR}:${level}:${d.f}`, exam: examOf(opts),
   });
@@ -1051,18 +1058,18 @@ function parMcq1(rng) {
     const a = rng.int(1, 4);
     const f = rng.pick([`x^2/(x-${a})`, `sqrt(x)+x^2`, `x^3/(x+${a})`]);
     return mcq({
-      skill: PAR, level: 1, prompt: `f(x) = ${MU(f)}. f est :`,
+      skill: PAR, level: 1, prompt: t('f(x) = {f}. f est :', { f: MU(f) }),
       options: [
-        { html: 'ni paire ni impaire : son domaine n\'est pas symétrique', correct: true },
-        { html: 'paire', correct: false }, { html: 'impaire', correct: false },
-      ], key: `par1:${f}`, solution: [{ html: `D_f = ${MT(domText(f))} n'est pas symétrique par rapport à 0.`, note: '' }],
+        { html: t('ni paire ni impaire : son domaine n\'est pas symétrique'), correct: true },
+        { html: t('paire'), correct: false }, { html: t('impaire'), correct: false },
+      ], key: `par1:${f}`, solution: [{ html: t('D_f = {d} n\'est pas symétrique par rapport à 0.', { d: MT(domText(f)) }), note: '' }],
     }, rng);
   }
   const d = parData(rng, ['even', 'odd', 'none']);
   return mcq({
-    skill: PAR, level: 1, prompt: `f(x) = ${MU(d.f)} sur ℝ, et f(−x) = ${MU(d.fm)}. f est :`,
+    skill: PAR, level: 1, prompt: t('f(x) = {f} sur ℝ, et f(−x) = {fm}. f est :', { f: MU(d.f), fm: MU(d.fm) }),
     options: ['even', 'odd', 'none'].map((k) => ({ html: PARITY[k], correct: k === d.kind })), key: `par1:${d.f}`,
-    solution: [{ html: `f(−x) = ${MU(d.fm)} ${d.kind === 'even' ? '= f(x)' : d.kind === 'odd' ? '= −f(x)' : 'n\'est ni f(x) ni −f(x)'}.`, note: '' }],
+    solution: [{ html: `f(−x) = ${MU(d.fm)} ${d.kind === 'even' ? '= f(x)' : d.kind === 'odd' ? '= −f(x)' : t('n\'est ni f(x) ni −f(x)')}.`, note: '' }],
   }, rng);
 }
 
@@ -1070,14 +1077,15 @@ function parExam(rng, exam) {
   if (exam === 'tf') {
     const a = rng.int(1, 3);
     const bank = [
-      { s: `f(x) = x³ − ${a * a}x vérifie f(−${a}) = f(${a}). Donc f est paire.`, truth: false, pred: `(-x)^3-${a * a}(-x)=x^3-${a * a}x`, ans: String(a + 1), why: `Faux : une valeur ne suffit pas. f(−${a + 1}) = ${-((a + 1) ** 3 - a * a * (a + 1))} et f(${a + 1}) = ${(a + 1) ** 3 - a * a * (a + 1)}.`, rule: 'g1_parity_point' },
-      { s: 'x ↦ x·|x| est impaire.', truth: true, why: 'Vrai : (−x)·|−x| = −x·|x|.' },
-      { s: 'x ↦ cos(x) + x est paire.', truth: false, pred: 'cos(-x)+(-x)=cos(x)+x', ans: '1', why: 'Faux : f(−1) = cos 1 − 1 ≠ cos 1 + 1 = f(1).' },
-      { s: 'Une fonction impaire définie en 0 vérifie f(0) = 0.', truth: true, why: 'Vrai : f(0) = f(−0) = −f(0), donc f(0) = 0.' },
+      // s: the French statement, kept for the key; st: the statement shown.
+      { s: `f(x) = x³ − ${a * a}x vérifie f(−${a}) = f(${a}). Donc f est paire.`, st: t('f(x) = x³ − {aa}x vérifie f(−{a}) = f({a}). Donc f est paire.', { aa: a * a, a }), truth: false, pred: `(-x)^3-${a * a}(-x)=x^3-${a * a}x`, ans: String(a + 1), why: t('Faux : une valeur ne suffit pas. f(−{b}) = {u} et f({b}) = {v}.', { b: a + 1, u: -((a + 1) ** 3 - a * a * (a + 1)), v: (a + 1) ** 3 - a * a * (a + 1) }), rule: 'g1_parity_point' },
+      { s: 'x ↦ x·|x| est impaire.', truth: true, why: t('Vrai : (−x)·|−x| = −x·|x|.') },
+      { s: 'x ↦ cos(x) + x est paire.', truth: false, pred: 'cos(-x)+(-x)=cos(x)+x', ans: '1', why: t('Faux : f(−1) = cos 1 − 1 ≠ cos 1 + 1 = f(1).') },
+      { s: 'Une fonction impaire définie en 0 vérifie f(0) = 0.', truth: true, why: t('Vrai : f(0) = f(−0) = −f(0), donc f(0) = 0.') },
     ];
     const b = rng.pick(bank);
     const counter = b.truth ? null : { kind: 'refute', quants: [{ q: '∀', v: 'x', dom: 'R' }], pred: b.pred, ask: [{ v: 'x', label: 'x =' }], answer: { x: b.ans } };
-    return tfItem({ skill: PAR, level: 4, statement: b.s, truth: b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+    return tfItem({ skill: PAR, level: 4, statement: b.st ?? t(b.s), truth: b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
   }
   const d = perData(rng);
   const max = d.p1.cmp(d.p2) > 0 ? d.p1 : d.p2;
@@ -1086,8 +1094,8 @@ function parExam(rng, exam) {
   for (const w of [max, min, d.p1.mul(d.p2)]) if (!w.eq(d.T)) options.push({ html: piText(w), correct: false, rule: 'g1_period_sum' });
   if (options.length < 3) options.push({ html: piText(d.T.mul(q(2))), correct: false });
   return mcq({
-    skill: PAR, level: 4, prompt: `Plus petite période de f(x) = ${MT(d.f)} :`, options: uniq(options), key: `mcq:${d.f}`, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `Périodes ${piText(d.p1)} et ${piText(d.p2)} ; plus petit multiple commun : ${piText(d.T)}.`, note: '' }],
+    skill: PAR, level: 4, prompt: t('Plus petite période de f(x) = {f} :', { f: MT(d.f) }), options: uniq(options), key: `mcq:${d.f}`, exam: { format: 'mcq', points: 1 },
+    solution: [{ html: t('Périodes {a} et {b} ; plus petit multiple commun : {T}.', { a: piText(d.p1), b: piText(d.p2), T: piText(d.T) }), note: '' }],
   }, rng);
 }
 
@@ -1119,23 +1127,23 @@ function injBank(rng) {
       const A = `ℝ∖{${r}}`;
       return {
         kind, f, A, id: `h:${f}`,
-        statement: `f(x) = ${MU(f)} est injective sur ${MT(A)}`,
+        statement: t('f(x) = {f} est injective sur {A}', { f: MU(f), A: MT(A) }),
         steps: [
-          `Soient a, b ∈ ${MT(A)} tels que ${MT(`${fa}=${fb}`, AB)}.`,
-          `${MT(`(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})`, AB)} (produit en croix)`,
-          `${MT(`${-p * r}a+${qq}b=${-p * r}b+${qq}a`.replace(/\+-/g, '-'), AB)} (les termes en ab et les constantes s'éliminent)`,
-          `${MT(`${k}(b-a)=0`, AB)}, et ${fr(String(k))} ≠ 0, donc a = b.`,
-          `Donc f est injective sur ${MT(A)}.`,
+          t('Soient a, b ∈ {A} tels que {e}.', { A: MT(A), e: MT(`${fa}=${fb}`, AB) }),
+          t('{e} (produit en croix)', { e: MT(`(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})`, AB) }),
+          t('{e} (les termes en ab et les constantes s\'éliminent)', { e: MT(`${-p * r}a+${qq}b=${-p * r}b+${qq}a`.replace(/\+-/g, '-'), AB) }),
+          t('{e}, et {k} ≠ 0, donc a = b.', { e: MT(`${k}(b-a)=0`, AB), k: fr(String(k)) }),
+          t('Donc f est injective sur {A}.', { A: MT(A) }),
         ],
         inputs: [
-          { at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})`, ask: 'Produit en croix :', answer: `(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})` },
-          { at: 3, kind: 'rel', vars: ['a', 'b'], expect: `${k}(b-a)=0`, ask: 'Factorise :', answer: `${k}(b-a)=0` },
+          { at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})`, ask: t('Produit en croix :'), answer: `(${num.replace(/x/g, 'a')})(${lin(r).replace(/x/g, 'b')})=(${num.replace(/x/g, 'b')})(${lin(r).replace(/x/g, 'a')})` },
+          { at: 3, kind: 'rel', vars: ['a', 'b'], expect: `${k}(b-a)=0`, ask: t('Factorise :'), answer: `${k}(b-a)=0` },
         ],
         decoys: [
-          { html: 'f(0) ≠ f(1), donc f est injective.', rule: 'g9_proof_by_example', why: 'Deux valeurs ne prouvent pas un « pour tous a, b ».' },
-          { html: 'Si a = b, alors f(a) = f(b) : f est injective.', rule: 'g9_converse_contra', why: 'C\'est la réciproque : elle est vraie pour toute fonction. Il faut f(a) = f(b) ⇒ a = b.' },
+          { html: t('f(0) ≠ f(1), donc f est injective.'), rule: 'g9_proof_by_example', why: t('Deux valeurs ne prouvent pas un « pour tous a, b ».') },
+          { html: t('Si a = b, alors f(a) = f(b) : f est injective.'), rule: 'g9_converse_contra', why: t('C\'est la réciproque : elle est vraie pour toute fonction. Il faut f(a) = f(b) ⇒ a = b.') },
         ],
-        sub: { id: 'cross', label: 'produit en croix', skill: 'eq-proportion' },
+        sub: { id: 'cross', label: t('produit en croix'), skill: 'eq-proportion' },
       };
     }
   }
@@ -1150,20 +1158,20 @@ function injBank(rng) {
     const s2 = polyText([1, p]).replace('x', 'a+b');
     return {
       kind, f, A, id: `s:${f}:${A}`,
-      statement: `f(x) = ${MU(f)} est injective sur ${MT(A)}`,
+      statement: t('f(x) = {f} est injective sur {A}', { f: MU(f), A: MT(A) }),
       steps: [
-        `Soient a, b ∈ ${MT(A)} tels que ${MT(`${fa}=${fb}`, AB)}.`,
-        `${MT(`(a-b)(${s2})=0`, AB)} (tout à gauche, puis factoriser)`,
-        `Sur ${MT(A)}, a ${right ? '≥' : '≤'} ${fr(String(h))} et b ${right ? '≥' : '≤'} ${fr(String(h))}, donc ${MT(s2, AB)} ${right ? '≥' : '≤'} 0, avec égalité seulement si a = b = ${fr(String(h))}.`,
-        'Dans les deux cas, a − b = 0 : a = b.',
-        `Donc f est injective sur ${MT(A)}.`,
+        t('Soient a, b ∈ {A} tels que {e}.', { A: MT(A), e: MT(`${fa}=${fb}`, AB) }),
+        t('{e} (tout à gauche, puis factoriser)', { e: MT(`(a-b)(${s2})=0`, AB) }),
+        t('Sur {A}, a {r} {h} et b {r} {h}, donc {s} {r} 0, avec égalité seulement si a = b = {h}.', { A: MT(A), r: right ? '≥' : '≤', h: fr(String(h)), s: MT(s2, AB) }),
+        t('Dans les deux cas, a − b = 0 : a = b.'),
+        t('Donc f est injective sur {A}.', { A: MT(A) }),
       ],
-      inputs: [{ at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(a-b)(${s2})=0`, ask: 'Tout à gauche et factorise :', answer: `(a-b)(${s2})=0` }],
+      inputs: [{ at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(a-b)(${s2})=0`, ask: t('Tout à gauche et factorise :'), answer: `(a-b)(${s2})=0` }],
       decoys: [
-        { html: `${MT(`(a-b)(${s2})=0`, AB)}, donc a = b.`, rule: 'g1_inj_square', why: `Un produit nul : a = b <b>ou</b> ${toReadable(parse(s2))} = 0. Il faut utiliser l'ensemble ${fr(A)} pour écarter le second cas.` },
-        { html: 'f(0) ≠ f(1), donc f est injective.', rule: 'g9_proof_by_example', why: 'Deux valeurs ne prouvent pas un « pour tous a, b ».' },
+        { html: t('{e}, donc a = b.', { e: MT(`(a-b)(${s2})=0`, AB) }), rule: 'g1_inj_square', why: t('Un produit nul : a = b <b>ou</b> {s} = 0. Il faut utiliser l\'ensemble {A} pour écarter le second cas.', { s: toReadable(parse(s2)), A: fr(A) }) },
+        { html: t('f(0) ≠ f(1), donc f est injective.'), rule: 'g9_proof_by_example', why: t('Deux valeurs ne prouvent pas un « pour tous a, b ».') },
       ],
-      sub: { id: 'factor', label: 'factoriser', skill: 'fac-common' },
+      sub: { id: 'factor', label: t('factoriser'), skill: 'fac-common' },
     };
   }
   const c = rng.pick([1, 4, 9]);
@@ -1173,20 +1181,20 @@ function injBank(rng) {
   const A = right ? `[${s};+∞[` : `]-∞;${-s}]`;
   return {
     kind: 'man', f, A, id: `m:${c}:${right}`,
-    statement: `f(x) = ${MU(f)} est injective sur ${MT(A)}`,
+    statement: t('f(x) = {f} est injective sur {A}', { f: MU(f), A: MT(A) }),
     steps: [
-      `Soient a, b ∈ ${MT(A)} tels que ${MT(`a+${c}/a=b+${c}/b`, AB)}.`,
-      `${MT(`(a-b)(ab-${c})=0`, AB)} (multiplier par ab, puis factoriser)`,
-      `Sur ${MT(A)}, a et b ont le même signe et |a|, |b| ≥ ${s}, donc ab ≥ ${c}, avec ab = ${c} seulement si a = b = ${fr(String(right ? s : -s))}.`,
-      'Dans les deux cas, a − b = 0 : a = b.',
-      `Donc f est injective sur ${MT(A)}.`,
+      t('Soient a, b ∈ {A} tels que {e}.', { A: MT(A), e: MT(`a+${c}/a=b+${c}/b`, AB) }),
+      t('{e} (multiplier par ab, puis factoriser)', { e: MT(`(a-b)(ab-${c})=0`, AB) }),
+      t('Sur {A}, a et b ont le même signe et |a|, |b| ≥ {s}, donc ab ≥ {c}, avec ab = {c} seulement si a = b = {v}.', { A: MT(A), s, c, v: fr(String(right ? s : -s)) }),
+      t('Dans les deux cas, a − b = 0 : a = b.'),
+      t('Donc f est injective sur {A}.', { A: MT(A) }),
     ],
-    inputs: [{ at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(a-b)(ab-${c})=0`, ask: 'Multiplie par ab et factorise :', answer: `(a-b)(ab-${c})=0` }],
+    inputs: [{ at: 1, kind: 'rel', vars: ['a', 'b'], expect: `(a-b)(ab-${c})=0`, ask: t('Multiplie par ab et factorise :'), answer: `(a-b)(ab-${c})=0` }],
     decoys: [
-      { html: `${MT(`(a-b)(ab-${c})=0`, AB)}, donc a = b.`, rule: 'g1_inj_square', why: `Un produit nul : a = b <b>ou</b> ab = ${c}. Il faut l'ensemble de départ pour écarter ab = ${c}.` },
-      { html: 'f(0) ≠ f(1), donc f est injective.', rule: 'g9_proof_by_example', why: 'f n\'est même pas définie en 0, et deux valeurs ne prouvent rien.' },
+      { html: t('{e}, donc a = b.', { e: MT(`(a-b)(ab-${c})=0`, AB) }), rule: 'g1_inj_square', why: t('Un produit nul : a = b <b>ou</b> ab = {c}. Il faut l\'ensemble de départ pour écarter ab = {c}.', { c }) },
+      { html: t('f(0) ≠ f(1), donc f est injective.'), rule: 'g9_proof_by_example', why: t('f n\'est même pas définie en 0, et deux valeurs ne prouvent rien.') },
     ],
-    sub: { id: 'factor', label: 'factoriser', skill: 'fac-common' },
+    sub: { id: 'factor', label: t('factoriser'), skill: 'fac-common' },
   };
 }
 
@@ -1195,7 +1203,7 @@ function holeMcq(skill, pr, rng, k) {
   const shown = pr.steps.map((s, i) => (i === k ? '<b>…</b>' : s)).map((s) => `<div class="proof-line">${s}</div>`).join('');
   const d = pr.decoys[0];
   return mcq({
-    skill, level: 1, prompt: `Preuve : ${pr.statement}.${shown}Quel bloc manque ?`,
+    skill, level: 1, prompt: t('Preuve : {s}.{shown}Quel bloc manque ?', { s: pr.statement, shown }),
     options: [{ html: pr.steps[k], correct: true }, { html: d.html, correct: false, rule: d.rule }],
     key: `hole:${pr.id}:${k}`, solution: pr.steps.map((s) => ({ html: s, note: '' })),
   }, rng);
@@ -1209,7 +1217,9 @@ function proofBlocks(skill, pr, level, rng, opts, extra = {}) {
   pr.decoys.slice(0, n).forEach((d, i) => blocks.push({ id: `d${i}`, html: d.html, needs: [], distractor: d.rule, why: d.why }));
   return blocksItem({
     skill, level: opts.exam ? 4 : level, mode: withInput ? 'frame' : 'order',
-    prompt: `Montre que ${pr.statement}. Touche les blocs dans l'ordre de la preuve${withInput ? ' et complète les calculs' : ''}.`,
+    prompt: withInput
+      ? t('Montre que {s}. Touche les blocs dans l\'ordre de la preuve et complète les calculs.', { s: pr.statement })
+      : t('Montre que {s}. Touche les blocs dans l\'ordre de la preuve.', { s: pr.statement }),
     blocks: rng.shuffle(blocks), goal: `b${pr.steps.length - 1}`, order: pr.steps.map((_, i) => `b${i}`),
     decision: extra.decision || null,
     hints: extra.hints, noHints: level === 5 || !!opts.exam,
@@ -1222,14 +1232,14 @@ function injItem(level, rng, opts = {}) {
   const pr = injBank(rng);
   if (level === 1) return holeMcq(INJ, pr, rng, pr.kind === 'homog' ? 3 : 1);
   if (level === 2 && pr.kind === 'homog' && rng.chance(0.5)) pr.decoys.reverse();
-  const decision = level === 3 ? { prompt: `f(x) = ${toReadable(parse(pr.f))} est-elle injective sur ${fr(pr.A)} ?`, options: [
-    { id: 'yes', label: 'Oui : je pars de f(a) = f(b)', valid: true },
-    { id: 'no', label: 'Non : je cherche a ≠ b avec f(a) = f(b)', valid: false, why: 'Sur cet ensemble, f(a) = f(b) force a = b : elle est injective.' },
+  const decision = level === 3 ? { prompt: t('f(x) = {f} est-elle injective sur {A} ?', { f: toReadable(parse(pr.f)), A: fr(pr.A) }), options: [
+    { id: 'yes', label: t('Oui : je pars de f(a) = f(b)'), valid: true },
+    { id: 'no', label: t('Non : je cherche a ≠ b avec f(a) = f(b)'), valid: false, why: t('Sur cet ensemble, f(a) = f(b) force a = b : elle est injective.') },
   ] } : null;
   return proofBlocks(INJ, pr, level, rng, opts, {
     decision,
     hints: [
-      { level: 1, html: 'Pars de f(a) = f(b) et cherche à obtenir a = b.' },
+      { level: 1, html: t('Pars de f(a) = f(b) et cherche à obtenir a = b.') },
       { level: 2, html: pr.steps[1] },
       { level: 3, html: pr.steps[2] },
     ],
@@ -1239,17 +1249,18 @@ function injItem(level, rng, opts = {}) {
 
 function injTf(rng) {
   const bank = [
-    () => ({ s: `x ↦ x² est injective sur ${fr('[-1;2]')}.`, f: 'a^2', g: 'b^2', A: '[-1;2]', ans: { a: '-1', b: '1' }, why: 'Faux : f(−1) = f(1) = 1 avec −1 ≠ 1.', rule: 'g1_inj_square' }),
+    // s: the French statement, kept for the key; st: the statement shown.
+    () => ({ s: `x ↦ x² est injective sur ${fr('[-1;2]')}.`, st: t('x ↦ x² est injective sur {A}.', { A: fr('[-1;2]') }), f: 'a^2', g: 'b^2', A: '[-1;2]', ans: { a: '-1', b: '1' }, why: t('Faux : f(−1) = f(1) = 1 avec −1 ≠ 1.'), rule: 'g1_inj_square' }),
     () => {
       const h = rng.int(-2, 2);
       const d = rng.int(1, 2);
       const A = `[${h - d - 1};${h + d + 1}]`;
       const f = polyText([1, -2 * h, 0]);
-      return { s: `x ↦ ${toReadable(parse(f))} est injective sur ${fr(A)}.`, f: f.replace(/x/g, 'a'), g: f.replace(/x/g, 'b'), A, ans: { a: String(h - d), b: String(h + d) }, why: `Faux : f(${h - d}) = f(${h + d}), deux points symétriques par rapport à ${h}.`, rule: 'g1_inj_square' };
+      return { s: `x ↦ ${toReadable(parse(f))} est injective sur ${fr(A)}.`, st: t('x ↦ {f} est injective sur {A}.', { f: toReadable(parse(f)), A: fr(A) }), f: f.replace(/x/g, 'a'), g: f.replace(/x/g, 'b'), A, ans: { a: String(h - d), b: String(h + d) }, why: t('Faux : f({a}) = f({b}), deux points symétriques par rapport à {h}.', { a: h - d, b: h + d, h }), rule: 'g1_inj_square' };
     },
-    () => ({ s: 'x ↦ x³ est injective sur ℝ.', truth: true, why: 'Vrai : a³ = b³ ⇒ (a − b)(a² + ab + b²) = 0, et a² + ab + b² > 0 sauf si a = b = 0.' }),
-    () => ({ s: 'x ↦ (2x + 1)/(x − 3) est injective sur ℝ ∖ {3}.', truth: true, why: 'Vrai : f(a) = f(b) donne 7(b − a) = 0.' }),
-    () => ({ s: 'x ↦ |x − 1| est injective sur [0 ; 3].', f: '|a-1|', g: '|b-1|', A: '[0;3]', ans: { a: '0', b: '2' }, why: 'Faux : f(0) = f(2) = 1.' }),
+    () => ({ s: 'x ↦ x³ est injective sur ℝ.', truth: true, why: t('Vrai : a³ = b³ ⇒ (a − b)(a² + ab + b²) = 0, et a² + ab + b² > 0 sauf si a = b = 0.') }),
+    () => ({ s: 'x ↦ (2x + 1)/(x − 3) est injective sur ℝ ∖ {3}.', truth: true, why: t('Vrai : f(a) = f(b) donne 7(b − a) = 0.') }),
+    () => ({ s: 'x ↦ |x − 1| est injective sur [0 ; 3].', f: '|a-1|', g: '|b-1|', A: '[0;3]', ans: { a: '0', b: '2' }, why: t('Faux : f(0) = f(2) = 1.') }),
   ];
   const b = rng.pick(bank)();
   const counter = b.truth ? null : {
@@ -1257,7 +1268,7 @@ function injTf(rng) {
     pred: `(a∈${b.A}∧b∈${b.A}∧${b.f}=${b.g})⇒a=b`, hyp: `a∈${b.A}∧b∈${b.A}∧${b.f}=${b.g}`,
     ask: [{ v: 'a', label: 'a =' }, { v: 'b', label: 'b =' }], answer: b.ans,
   };
-  return tfItem({ skill: INJ, level: 4, statement: b.s, truth: !!b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
+  return tfItem({ skill: INJ, level: 4, statement: b.st ?? t(b.s), truth: !!b.truth, counter, ruleIfTrue: b.rule || null, key: b.s, explanation: b.why, exam: { format: 'tf', points: 1 } });
 }
 
 // Surjectivity proofs: y in B, an antecedent x, and x in A.
@@ -1273,24 +1284,24 @@ function surjBank(rng) {
     const inv = `(x${sg}sqrt(x^2-${4 * c}))/2`;
     return {
       kind: 'man', f: `x+${c}/x`, A, B, id: `sm:${c}:${right}`,
-      statement: `f : ${MT(A)} → ${MT(B)}, f(x) = ${MU(`x+${c}/x`)} est surjective, et explicite f⁻¹`,
+      statement: t('f : {A} → {B}, f(x) = {f} est surjective, et explicite f⁻¹', { A: MT(A), B: MT(B), f: MU(`x+${c}/x`) }),
       steps: [
-        `Soit y ${right ? '≥' : '≤'} ${fr(String(right ? m : -m))}. On cherche x ∈ ${MT(A)} avec ${MT(`x+${c}/x=y`, XY)}.`,
-        `${MT(`x^2-yx+${c}=0`, XY)} (multiplier par x ≠ 0)`,
-        `Δ = ${MT(`y^2-${4 * c}`, XY)} ≥ 0, car |y| ≥ ${m}.`,
-        `${MT(`x=(y+sqrt(y^2-${4 * c}))/2`, XY)} ou ${MT(`x=(y-sqrt(y^2-${4 * c}))/2`, XY)}.`,
-        `${MT(`(y${sg}sqrt(y^2-${4 * c}))/2`, XY)} ${right ? '≥' : '≤'} y/2 ${right ? '≥' : '≤'} ${fr(String(right ? s : -s))} : cette solution est dans ${MT(A)}.`,
-        'Donc f est surjective ; elle est aussi injective, donc bijective.',
+        t('Soit y {r} {v}. On cherche x ∈ {A} avec {e}.', { r: right ? '≥' : '≤', v: fr(String(right ? m : -m)), A: MT(A), e: MT(`x+${c}/x=y`, XY) }),
+        t('{e} (multiplier par x ≠ 0)', { e: MT(`x^2-yx+${c}=0`, XY) }),
+        t('Δ = {d} ≥ 0, car |y| ≥ {m}.', { d: MT(`y^2-${4 * c}`, XY), m }),
+        t('{a} ou {b}.', { a: MT(`x=(y+sqrt(y^2-${4 * c}))/2`, XY), b: MT(`x=(y-sqrt(y^2-${4 * c}))/2`, XY) }),
+        t('{e} {r} y/2 {r} {v} : cette solution est dans {A}.', { e: MT(`(y${sg}sqrt(y^2-${4 * c}))/2`, XY), r: right ? '≥' : '≤', v: fr(String(right ? s : -s)), A: MT(A) }),
+        t('Donc f est surjective ; elle est aussi injective, donc bijective.'),
         `f⁻¹(x) = ${MU(inv)}, x ∈ ${MT(B)}.`,
       ],
       inputs: [
-        { at: 1, kind: 'rel', vars: ['x', 'y'], expect: `x^2-yx+${c}=0`, ask: 'Équation en x :', answer: `x^2-yx+${c}=0` },
+        { at: 1, kind: 'rel', vars: ['x', 'y'], expect: `x^2-yx+${c}=0`, ask: t('Équation en x :'), answer: `x^2-yx+${c}=0` },
         { at: 2, kind: 'expr', vars: ['y'], expect: `y^2-${4 * c}`, ask: 'Δ =', answer: `y^2-${4 * c}` },
       ],
       decoys: [
-        { html: 'Δ ≥ 0 : une solution existe, donc f est surjective.', rule: 'g1_surj_domain', why: `Une solution existe, mais est-elle dans ${fr(A)} ? Il faut un antécédent dans l'ensemble de départ.` },
-        { html: `f⁻¹(x) = ${MU(`(x${right ? '-' : '+'}sqrt(x^2-${4 * c}))/2`)}.`, rule: 'g1_inverse_branch', why: `Cette racine n'est pas dans ${fr(A)}.` },
-        { html: `f⁻¹(x) = ${MU(`1/(x+${c}/x)`)}.`, rule: 'g1_inverse_reciprocal', why: 'f⁻¹ n\'est pas 1/f.' },
+        { html: t('Δ ≥ 0 : une solution existe, donc f est surjective.'), rule: 'g1_surj_domain', why: t('Une solution existe, mais est-elle dans {A} ? Il faut un antécédent dans l\'ensemble de départ.', { A: fr(A) }) },
+        { html: `f⁻¹(x) = ${MU(`(x${right ? '-' : '+'}sqrt(x^2-${4 * c}))/2`)}.`, rule: 'g1_inverse_branch', why: t('Cette racine n\'est pas dans {A}.', { A: fr(A) }) },
+        { html: `f⁻¹(x) = ${MU(`1/(x+${c}/x)`)}.`, rule: 'g1_inverse_reciprocal', why: t('f⁻¹ n\'est pas 1/f.') },
       ],
       choices: [B, right ? `[${s};+∞[` : `]-∞;${-s}]`, 'ℝ'],
       disc: true,
@@ -1308,23 +1319,23 @@ function surjBank(rng) {
     const bot = affY(1, -p);
     return {
       kind: 'homog', f, A, B, id: `sh:${f}`,
-      statement: `f : ${MT(A)} → ${MT(B)}, f(x) = ${MU(f)} est surjective, et explicite f⁻¹`,
+      statement: t('f : {A} → {B}, f(x) = {f} est surjective, et explicite f⁻¹', { A: MT(A), B: MT(B), f: MU(f) }),
       steps: [
-        `Soit y ≠ ${fr(String(p))}. On cherche x ≠ ${fr(String(r))} avec ${MT(`${f}=y`, XY)}.`,
+        t('Soit y ≠ {p}. On cherche x ≠ {r} avec {e}.', { p: fr(String(p)), r: fr(String(r)), e: MT(`${f}=y`, XY) }),
         `${MT(`y(${lin(r)})=${affine(p, qq)}`, XY)}`,
         `${MT(`x(${bot})=${top}`, XY)}`,
-        `y ≠ ${fr(String(p))}, donc ${MT(`x=(${top})/(${bot})`, XY)}.`,
-        `x ≠ ${fr(String(r))} : sinon ${MT(`${top}=${r}(${bot})`, XY)}, soit ${fr(String(p * r + qq))} = 0, impossible. La solution est dans ${MT(A)}.`,
-        'Donc f est surjective ; elle est aussi injective, donc bijective.',
+        t('y ≠ {p}, donc {e}.', { p: fr(String(p)), e: MT(`x=(${top})/(${bot})`, XY) }),
+        t('x ≠ {r} : sinon {e}, soit {k} = 0, impossible. La solution est dans {A}.', { r: fr(String(r)), e: MT(`${top}=${r}(${bot})`, XY), k: fr(String(p * r + qq)), A: MT(A) }),
+        t('Donc f est surjective ; elle est aussi injective, donc bijective.'),
         `f⁻¹(x) = ${MU(`(${top.replace(/y/g, 'x')})/(${bot.replace(/y/g, 'x')})`)}, x ≠ ${fr(String(p))}.`,
       ],
       inputs: [
-        { at: 1, kind: 'rel', vars: ['x', 'y'], expect: `y(${lin(r)})=${affine(p, qq)}`, ask: 'Multiplie par le dénominateur :', answer: `y(${lin(r)})=${affine(p, qq)}` },
-        { at: 2, kind: 'rel', vars: ['x', 'y'], expect: `x(${bot})=${top}`, ask: 'Regroupe les termes en x :', answer: `x(${bot})=${top}` },
+        { at: 1, kind: 'rel', vars: ['x', 'y'], expect: `y(${lin(r)})=${affine(p, qq)}`, ask: t('Multiplie par le dénominateur :'), answer: `y(${lin(r)})=${affine(p, qq)}` },
+        { at: 2, kind: 'rel', vars: ['x', 'y'], expect: `x(${bot})=${top}`, ask: t('Regroupe les termes en x :'), answer: `x(${bot})=${top}` },
       ],
       decoys: [
-        { html: 'On trouve une solution x, donc f est surjective.', rule: 'g1_surj_domain', why: `Cette solution est-elle différente de ${fr(String(r))} ? Il faut un antécédent dans l'ensemble de départ.` },
-        { html: `f⁻¹(x) = ${MU(`(${lin(r)})/(${affine(p, qq)})`)}.`, rule: 'g1_inverse_reciprocal', why: 'f⁻¹ n\'est pas 1/f.' },
+        { html: t('On trouve une solution x, donc f est surjective.'), rule: 'g1_surj_domain', why: t('Cette solution est-elle différente de {r} ? Il faut un antécédent dans l\'ensemble de départ.', { r: fr(String(r)) }) },
+        { html: `f⁻¹(x) = ${MU(`(${lin(r)})/(${affine(p, qq)})`)}.`, rule: 'g1_inverse_reciprocal', why: t('f⁻¹ n\'est pas 1/f.') },
       ],
       choices: [B, 'ℝ', `ℝ∖{${r}}`],
       disc: false,
@@ -1333,9 +1344,9 @@ function surjBank(rng) {
 }
 
 const SURJ_SUB = [
-  { id: 'disc', label: 'existence (discriminant)', skill: 'quad-formula' },
-  { id: 'inA', label: 'la solution est dans A', skill: 'g1-irr-ineq' },
-  { id: 'inv', label: 'réciproque', skill: INV },
+  { id: 'disc', label: t('existence (discriminant)'), skill: 'quad-formula' },
+  { id: 'inA', label: t('la solution est dans A'), skill: 'g1-irr-ineq' },
+  { id: 'inv', label: t('réciproque'), skill: INV },
 ];
 
 function surjItem(level, rng, opts = {}) {
@@ -1343,13 +1354,13 @@ function surjItem(level, rng, opts = {}) {
   if (level === 1) return holeMcq(SURJ, pr, rng, 4);
   let decision = null;
   if (level === 3) {
-    decision = { prompt: `Pour quel ensemble d'arrivée B la fonction f(x) = ${toReadable(parse(pr.f))}, définie sur ${fr(pr.A)}, est-elle surjective ?`, options: pr.choices.map((B, i) => ({ id: `B${i}`, label: fr(B), valid: i === 0, why: i === 0 ? '' : `Certains y de ${fr(B)} n'ont pas d'antécédent dans ${fr(pr.A)}.` })) };
+    decision = { prompt: t('Pour quel ensemble d\'arrivée B la fonction f(x) = {f}, définie sur {A}, est-elle surjective ?', { f: toReadable(parse(pr.f)), A: fr(pr.A) }), options: pr.choices.map((B, i) => ({ id: `B${i}`, label: fr(B), valid: i === 0, why: i === 0 ? '' : t('Certains y de {B} n\'ont pas d\'antécédent dans {A}.', { B: fr(B), A: fr(pr.A) }) })) };
     if (pr.choices[1] === pr.choices[0]) decision.options.splice(1, 1);
   }
   return proofBlocks(SURJ, pr, level, rng, opts, {
     decision,
     hints: [
-      { level: 1, html: `Il faut un antécédent <b>dans ${fr(pr.A)}</b>, pas seulement une solution.` },
+      { level: 1, html: t('Il faut un antécédent <b>dans {A}</b>, pas seulement une solution.', { A: fr(pr.A) }) },
       { level: 2, html: pr.steps[3] },
       { level: 3, html: pr.steps[4] },
     ],

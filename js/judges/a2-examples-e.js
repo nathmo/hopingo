@@ -19,6 +19,7 @@
 import { parse } from '../cas/parse.js';
 import { evalFloat } from '../cas/numeric.js';
 import { parseMatLine, evalAst } from '../cas/matexpr.js';
+import { t } from '../i18n.js';
 
 const VARS = ['x', 'y'];
 function fnOf(text) {
@@ -42,8 +43,8 @@ function around(f) {
   let below = false;
   for (const r of [0.05, 0.01, 0.002]) {
     for (let k = 0; k < 96; k++) {
-      const t = (2 * Math.PI * (k + 0.5)) / 96;
-      const d = f(r * Math.cos(t), r * Math.sin(t)) - f0;
+      const a = (2 * Math.PI * (k + 0.5)) / 96;
+      const d = f(r * Math.cos(a), r * Math.sin(a)) - f0;
       if (!Number.isFinite(d)) continue;
       const tol = 1e-12 * (1 + Math.abs(f0));
       if (d > tol) above = true;
@@ -54,50 +55,50 @@ function around(f) {
 }
 
 function stationary(f) {
-  if (!Number.isFinite(f(0, 0))) return 'Ta fonction n\'est pas définie en (0, 0).';
+  if (!Number.isFinite(f(0, 0))) return t('Ta fonction n\'est pas définie en (0, 0).');
   const g = gradAt(f);
-  if (!g.every(Number.isFinite) || Math.hypot(...g) > 1e-6) return 'Avec ta fonction, ∇f(0, 0) ≠ 0 : (0, 0) n\'est pas un point stationnaire.';
+  if (!g.every(Number.isFinite) || Math.hypot(...g) > 1e-6) return t('Avec ta fonction, ∇f(0, 0) ≠ 0 : (0, 0) n\'est pas un point stationnaire.');
   return null;
 }
 
 export const PROPS = {
   stationaryNotExtremum: (p, ans) => {
     const f = fnOf(ans.f);
-    if (!f) return { ok: false, message: 'Donne une fonction f(x, y).' };
+    if (!f) return { ok: false, message: t('Donne une fonction f(x, y).') };
     const bad = stationary(f);
     if (bad) return { ok: false, message: bad };
     const { above, below } = around(f);
     if (above && below) return { ok: true };
-    return { ok: false, rule: 'a2_stationary_is_extremum', message: `(0, 0) est ${above ? 'un minimum' : below ? 'un maximum' : 'un extremum'} local de ta fonction : ce n'est pas un contre-exemple. Pense à x² − y².` };
+    return { ok: false, rule: 'a2_stationary_is_extremum', message: above ? t('(0, 0) est un minimum local de ta fonction : ce n\'est pas un contre-exemple. Pense à x² − y².') : below ? t('(0, 0) est un maximum local de ta fonction : ce n\'est pas un contre-exemple. Pense à x² − y².') : t('(0, 0) est un extremum local de ta fonction : ce n\'est pas un contre-exemple. Pense à x² − y².') };
   },
   degenerateExtremum: (p, ans) => {
     const f = fnOf(ans.f);
-    if (!f) return { ok: false, message: 'Donne une fonction f(x, y).' };
+    if (!f) return { ok: false, message: t('Donne une fonction f(x, y).') };
     const bad = stationary(f);
     if (bad) return { ok: false, message: bad };
     const [a, b, c] = hessAt(f);
-    if (Math.abs(a * c - b * b) > 1e-4) return { ok: false, message: `Avec ta fonction, det H(0, 0) ≈ ${Math.round((a * c - b * b) * 1000) / 1000} ≠ 0.` };
+    if (Math.abs(a * c - b * b) > 1e-4) return { ok: false, message: t('Avec ta fonction, det H(0, 0) ≈ {d} ≠ 0.', { d: Math.round((a * c - b * b) * 1000) / 1000 }) };
     const { above, below } = around(f);
-    if (above && below) return { ok: false, rule: 'a2_hess_degenerate', message: '(0, 0) n\'est pas un extremum de ta fonction : l\'énoncé est vrai pour elle. Cherche une fonction à hessienne nulle qui a un minimum, comme x⁴ + y⁴.' };
+    if (above && below) return { ok: false, rule: 'a2_hess_degenerate', message: t('(0, 0) n\'est pas un extremum de ta fonction : l\'énoncé est vrai pour elle. Cherche une fonction à hessienne nulle qui a un minimum, comme x⁴ + y⁴.') };
     return { ok: true };
   },
   lagrangeNotExtremum: (p, ans) => {
     const f = fnOf(ans.f);
     const g = fnOf(ans.g);
-    if (!f || !g) return { ok: false, message: 'Donne f(x, y) et g(x, y).' };
-    if (!(Math.abs(g(0, 0)) < 1e-9)) return { ok: false, message: 'Il faut g(0, 0) = 0 : (0, 0) doit être sur la contrainte.' };
+    if (!f || !g) return { ok: false, message: t('Donne f(x, y) et g(x, y).') };
+    if (!(Math.abs(g(0, 0)) < 1e-9)) return { ok: false, message: t('Il faut g(0, 0) = 0 : (0, 0) doit être sur la contrainte.') };
     const gg = gradAt(g);
     const n2 = gg[0] * gg[0] + gg[1] * gg[1];
-    if (!(n2 > 1e-8)) return { ok: false, message: 'Il faut ∇g(0, 0) ≠ 0.' };
+    if (!(n2 > 1e-8)) return { ok: false, message: t('Il faut ∇g(0, 0) ≠ 0.') };
     const gf = gradAt(f);
-    if (Math.abs(gf[0] * gg[1] - gf[1] * gg[0]) > 1e-6 * (1 + Math.hypot(...gf))) return { ok: false, message: 'Avec ta fonction, ∇f(0, 0) n\'est pas un multiple de ∇g(0, 0).' };
+    if (Math.abs(gf[0] * gg[1] - gf[1] * gg[0]) > 1e-6 * (1 + Math.hypot(...gf))) return { ok: false, message: t('Avec ta fonction, ∇f(0, 0) n\'est pas un multiple de ∇g(0, 0).') };
     // Points of the curve near (0, 0): along the tangent, then back on g = 0.
-    const t = [-gg[1], gg[0]].map((x) => x / Math.sqrt(n2));
+    const tg = [-gg[1], gg[0]].map((x) => x / Math.sqrt(n2));
     const f0 = f(0, 0);
     let above = false;
     let below = false;
     for (const s of [0.05, -0.05, 0.02, -0.02, 0.005, -0.005]) {
-      let P = [s * t[0], s * t[1]];
+      let P = [s * tg[0], s * tg[1]];
       for (let k = 0; k < 30; k++) {
         const v = g(...P);
         const d = gradAt((x, y) => g(P[0] + x, P[1] + y));
@@ -111,7 +112,7 @@ export const PROPS = {
       if (diff < -1e-12) below = true;
     }
     if (above && below) return { ok: true };
-    return { ok: false, rule: 'a2_lagrange_no_compare', message: '(0, 0) est un extremum de f sur ta courbe : l\'énoncé est vrai pour cet exemple. Essaie f = y³ et g = y − x.' };
+    return { ok: false, rule: 'a2_lagrange_no_compare', message: t('(0, 0) est un extremum de f sur ta courbe : l\'énoncé est vrai pour cet exemple. Essaie f = y³ et g = y − x.') };
   },
   hess3: (p, ans) => {
     let H;
@@ -121,20 +122,20 @@ export const PROPS = {
       if (v.k !== 'm') throw new Error('not a matrix');
       H = v.rows.map((r) => r.map((n) => evalFloat(n, {})));
     } catch {
-      return { ok: false, message: 'Écris une matrice 3 × 3, par exemple [[−2, 0, 0], [0, 3, 0], [0, 0, 1/2]].' };
+      return { ok: false, message: t('Écris une matrice 3 × 3, par exemple [[−2, 0, 0], [0, 3, 0], [0, 0, 1/2]].') };
     }
-    if (H.length !== 3 || H.some((r) => r.length !== 3)) return { ok: false, message: 'Il faut une matrice 3 × 3.' };
-    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (Math.abs(H[i][j] - H[j][i]) > 1e-12) return { ok: false, message: 'Une hessienne est symétrique.' };
+    if (H.length !== 3 || H.some((r) => r.length !== 3)) return { ok: false, message: t('Il faut une matrice 3 × 3.') };
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) if (Math.abs(H[i][j] - H[j][i]) > 1e-12) return { ok: false, message: t('Une hessienne est symétrique.') };
     const d1 = H[0][0];
     const d2 = H[0][0] * H[1][1] - H[0][1] * H[1][0];
     const d3 = H[0][0] * (H[1][1] * H[2][2] - H[1][2] * H[2][1]) - H[0][1] * (H[1][0] * H[2][2] - H[1][2] * H[2][0]) + H[0][2] * (H[1][0] * H[2][1] - H[1][1] * H[2][0]);
-    if (p.fxx !== undefined && Math.abs(d1 - Number(p.fxx)) > 1e-9) return { ok: false, message: `Il faut f_xx = H₁₁ = ${p.fxx}.` };
-    if (p.det !== undefined && Math.abs(d3 - Number(p.det)) > 1e-9) return { ok: false, message: `Il faut det H = ${p.det} ; ta matrice a det H = ${Math.round(d3 * 1000) / 1000}.` };
-    if (p.detPos && !(d3 > 0)) return { ok: false, message: 'Il faut det H > 0.' };
+    if (p.fxx !== undefined && Math.abs(d1 - Number(p.fxx)) > 1e-9) return { ok: false, message: t('Il faut f_xx = H₁₁ = {v}.', { v: p.fxx }) };
+    if (p.det !== undefined && Math.abs(d3 - Number(p.det)) > 1e-9) return { ok: false, message: t('Il faut det H = {d} ; ta matrice a det H = {g}.', { d: p.det, g: Math.round(d3 * 1000) / 1000 }) };
+    if (p.detPos && !(d3 > 0)) return { ok: false, message: t('Il faut det H > 0.') };
     const negDef = d1 < 0 && d2 > 0 && d3 < 0;
     const posDef = d1 > 0 && d2 > 0 && d3 > 0;
-    if (p.claim === 'max' && negDef) return { ok: false, rule: 'a2_hess_partial_minors', message: 'Ta matrice est définie négative (Δ₁ < 0, Δ₂ > 0, Δ₃ < 0) : le point est bien un maximum. Prends Δ₂ < 0.' };
-    if (p.claim === 'min' && posDef) return { ok: false, rule: 'a2_hess_det_only', message: 'Ta matrice est définie positive : le point est bien un minimum. Prends deux valeurs propres négatives.' };
+    if (p.claim === 'max' && negDef) return { ok: false, rule: 'a2_hess_partial_minors', message: t('Ta matrice est définie négative (Δ₁ < 0, Δ₂ > 0, Δ₃ < 0) : le point est bien un maximum. Prends Δ₂ < 0.') };
+    if (p.claim === 'min' && posDef) return { ok: false, rule: 'a2_hess_det_only', message: t('Ta matrice est définie positive : le point est bien un minimum. Prends deux valeurs propres négatives.') };
     return { ok: true };
   },
 };

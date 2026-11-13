@@ -15,6 +15,7 @@ import {
 import { evalFloat } from '../cas/numeric.js';
 import { stripParen } from '../cas/ast.js';
 import * as M from '../cas/matrix.js';
+import { t } from '../i18n.js';
 
 export const mopts = (cfg = {}) => ({ vars: cfg.vars || [], complex: !!cfg.complex, names: cfg.names, ints: cfg.ints });
 
@@ -28,7 +29,7 @@ export function readMat(cfg, input) {
   try {
     return { node: buildLine(cfg, text) };
   } catch (e) {
-    return { error: { kind: 'parse', message: e instanceof ParseError || e instanceof RangeError || e instanceof SyntaxError ? e.message : `Je n'arrive pas à lire cette ligne (${e.message}).` } };
+    return { error: { kind: 'parse', message: e instanceof ParseError || e instanceof RangeError || e instanceof SyntaxError ? e.message : t('Je n\'arrive pas à lire cette ligne ({m}).', { m: e.message }) } };
   }
 }
 

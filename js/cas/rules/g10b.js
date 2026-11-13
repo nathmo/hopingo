@@ -13,6 +13,7 @@
 import { parse } from '../parse.js';
 import { vl, valueIn } from './g4a.js';
 import { readObject } from '../geomobj.js';
+import { t } from '../../i18n.js';
 
 // A line of the judge conic holding an equation (coefficients of x², xy,
 // y², x, y, 1, in X, Y when reduced).
@@ -26,7 +27,7 @@ function eval1(t) {
 export const RULES = [
   {
     id: 'g10_bhalf_matrix', family: 'linear', tag: 'E', skill: 'g10-conic-nature', repair: 'g10-conic-nature',
-    example: ['A = [[5, −6], [−6, 5]]', '[[5, −3], [−3, 5]]'], name: 'Coefficient de xy entier dans A',
+    example: ['A = [[5, −6], [−6, 5]]', '[[5, −3], [−3, 5]]'], name: t('Coefficient de xy entier dans A'),
     judges: ['det', 'value'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg || {};
@@ -43,12 +44,14 @@ export const RULES = [
       if (cfg.kind === 'value' && cfg.delta) return [{ node: parse(String(a * c - b * b)), ctx: { b, h: b / 2 } }];
       return [];
     },
-    explain: (ctx = {}) => `xᵀAx = ax² + 2a₁₂xy + cy² : le coefficient de xy est deux fois a₁₂. Hors de la diagonale de A, mets la moitié${ctx.b !== undefined ? ` : ${String(ctx.h).replace('-', '−')}, pas ${String(ctx.b).replace('-', '−')}` : ''}.`,
+    explain: (ctx = {}) => (ctx.b !== undefined
+      ? t('xᵀAx = ax² + 2a₁₂xy + cy² : le coefficient de xy est deux fois a₁₂. Hors de la diagonale de A, mets la moitié : {h}, pas {b}.', { h: String(ctx.h).replace('-', '−'), b: String(ctx.b).replace('-', '−') })
+      : t('xᵀAx = ax² + 2a₁₂xy + cy² : le coefficient de xy est deux fois a₁₂. Hors de la diagonale de A, mets la moitié.')),
     check: { judge: { kind: 'det', vars: ['λ'], target: 'factored', names: { A: '[[2,2],[2,-1]]' }, abc: ['2', '4', '-1'] }, prev: 'det(A-λI)', line: '(2-λ)(-1-λ)-16' },
   },
   {
     id: 'g10_eigvec_not_normed', family: 'linear', tag: 'E', skill: 'g10-conic-reduce', repair: 'l-eig-space',
-    example: ['15X² − 10Y² − 6 = 0', '3X² − 2Y² − 6 = 0'], name: 'Vecteurs propres non normés',
+    example: ['15X² − 10Y² − 6 = 0', '3X² − 2Y² − 6 = 0'], name: t('Vecteurs propres non normés'),
     judges: ['conic'],
     transform(prev, ctx) {
       const r = ctx?.cfg?.reduce;
@@ -56,12 +59,14 @@ export const RULES = [
       const fO = num(r.fO);
       return [{ node: cl(`${r.l1 * r.n}X^2 + ${r.l2 * r.n}Y^2 + ${fO} = 0`, [r.l1 * r.n, 0, r.l2 * r.n, 0, 0, fO]), ctx: { n: r.n } }];
     },
-    explain: (ctx = {}) => `Avec un vecteur propre non normé, le repère n'est pas orthonormé : X² est multiplié par le carré de sa norme${ctx.n ? ` (${ctx.n})` : ''}. Norme les vecteurs propres.`,
+    explain: (ctx = {}) => (ctx.n
+      ? t('Avec un vecteur propre non normé, le repère n\'est pas orthonormé : X² est multiplié par le carré de sa norme ({n}). Norme les vecteurs propres.', { n: ctx.n })
+      : t('Avec un vecteur propre non normé, le repère n\'est pas orthonormé : X² est multiplié par le carré de sa norme. Norme les vecteurs propres.')),
     check: { judge: { kind: 'conic', equation: '2x^2+4xy-y^2-6y-9=0', target: 'reduced', frame: { O: '(1;-1)', u1: '(2;1)/√5', u2: '(-1;2)/√5' }, reduce: { l1: 3, l2: -2, n: 5, f: '-9', fO: '-6' } }, prev: '2x^2+4xy-y^2-6y-9=0', line: '15X^2-10Y^2-6=0' },
   },
   {
     id: 'g10_constant_not_updated', family: 'rule', tag: 'E', skill: 'g10-conic-reduce', repair: 'g10-conic-reduce',
-    example: ['3X² − 2Y² − 9 = 0', '3X² − 2Y² − 6 = 0'], name: 'Constante de départ gardée',
+    example: ['3X² − 2Y² − 9 = 0', '3X² − 2Y² − 6 = 0'], name: t('Constante de départ gardée'),
     judges: ['conic', 'value'],
     transform(prev, ctx) {
       const r = ctx?.cfg?.reduce;
@@ -70,21 +75,25 @@ export const RULES = [
       if (ctx.cfg.kind === 'value') return [{ node: parse(String(f)), ctx: { f, fO: r.fO } }];
       return [{ node: cl(`${r.l1}X^2 + ${r.l2}Y^2 + ${f} = 0`, [r.l1, 0, r.l2, 0, 0, f]), ctx: { f, fO: r.fO } }];
     },
-    explain: (ctx = {}) => `Après la translation au centre, la constante est f(Ω)${ctx.fO !== undefined ? ` = ${String(ctx.fO).replace('-', '−')}` : ''}, pas le terme constant de départ${ctx.f !== undefined ? ` (${String(ctx.f).replace('-', '−')})` : ''}.`,
+    explain: (ctx = {}) => {
+      const fO = ctx.fO !== undefined ? ` = ${String(ctx.fO).replace('-', '−')}` : '';
+      const f = ctx.f !== undefined ? ` (${String(ctx.f).replace('-', '−')})` : '';
+      return t('Après la translation au centre, la constante est f(Ω){fO}, pas le terme constant de départ{f}.', { fO, f });
+    },
     check: { judge: { kind: 'conic', equation: '2x^2+4xy-y^2-6y-9=0', target: 'reduced', frame: { O: '(1;-1)', u1: '(2;1)/√5', u2: '(-1;2)/√5' }, reduce: { l1: 3, l2: -2, n: 5, f: '-9', fO: '-6' } }, prev: '2x^2+4xy-y^2-6y-9=0', line: '3X^2-2Y^2-9=0' },
   },
   {
     id: 'g10_det_sign_nature', family: 'geometry', tag: 'E', skill: 'g10-conic-nature', repair: 'g10-conic-nature',
-    example: ['δ > 0 ⇒ hyperbole', 'ellipse'], name: 'Genre lu à l\'envers sur le signe de δ',
+    example: [t('δ > 0 ⇒ hyperbole'), t('ellipse')], name: t('Genre lu à l\'envers sur le signe de δ'),
     judges: [],
-    explain: () => 'δ = λ₁λ₂. δ > 0 : les deux valeurs propres ont le même signe, comme dans X²/a² + Y²/b² = 1 : genre ellipse. δ < 0 : signes contraires, genre hyperbole.',
+    explain: () => t('δ = λ₁λ₂. δ > 0 : les deux valeurs propres ont le même signe, comme dans X²/a² + Y²/b² = 1 : genre ellipse. δ < 0 : signes contraires, genre hyperbole.'),
     check: { bait: { skill: 'g10-conic-nature', level: 2 } },
   },
   {
     id: 'g10_degenerate_ignored', family: 'method', tag: 'E', skill: 'g10-conic-nature', repair: 'g10-conic-nature',
-    example: ['« hyperbole » pour (x − y)(x + 2y) = 0', 'deux droites'], name: 'Δ = 0 oublié : conique dégénérée',
+    example: [t('« hyperbole » pour (x − y)(x + 2y) = 0'), t('deux droites')], name: t('Δ = 0 oublié : conique dégénérée'),
     judges: [],
-    explain: () => 'Ton Δ vaut 0 : la conique est dégénérée (un point, deux droites, ou rien). Calcule toujours Δ = det M avant de nommer la conique.',
+    explain: () => t('Ton Δ vaut 0 : la conique est dégénérée (un point, deux droites, ou rien). Calcule toujours Δ = det M avant de nommer la conique.'),
     check: { bait: { skill: 'g10-conic-nature', exam: 'tf' } },
   },
 ];
@@ -102,16 +111,16 @@ function listed(id) {
 RULES.push(
   {
     id: 'g10_foci_reduced_frame', family: 'geometry', tag: 'E', skill: 'g10-conic-frame-back', repair: 'g10-conic-frame-back',
-    example: ['F = (√5 ; 0)', '(3 ; 0)'], name: 'Coordonnées de Ru données pour Re',
+    example: ['F = (√5 ; 0)', '(3 ; 0)'], name: t('Coordonnées de Ru données pour Re'),
     judges: ['vector'], transform: listed('g10_foci_reduced_frame'),
-    explain: () => 'Ces coordonnées sont celles du repère réduit Ru. La question demande Re : F = Ω + X·u₁ + Y·u₂.',
+    explain: () => t('Ces coordonnées sont celles du repère réduit Ru. La question demande Re : F = Ω + X·u₁ + Y·u₂.'),
     check: { judge: { kind: 'vector', symbols: { Ω: '(1 ; -1)', u_1: '(2 ; 1)/√5', u_2: '(-1 ; 2)/√5' }, expect: '(3 ; 0)', trapPts: { g10_foci_reduced_frame: ['(√5 ; 0)'] } }, prev: 'F', line: '(√5 ; 0)' },
   },
   {
     id: 'g10_frame_back_transpose', family: 'linear', tag: 'E', skill: 'g10-conic-frame-back', repair: 'g10-conic-frame-back',
-    example: ['x = Ω + Pᵀ(X ; Y)', 'Ω + P(X ; Y)'], name: 'Retour avec Pᵀ au lieu de P',
+    example: ['x = Ω + Pᵀ(X ; Y)', 'Ω + P(X ; Y)'], name: t('Retour avec Pᵀ au lieu de P'),
     judges: ['vector'], transform: listed('g10_frame_back_transpose'),
-    explain: () => 'Les colonnes de P sont u₁ et u₂ : x = Ω + X·u₁ + Y·u₂ = Ω + P·(X ; Y). Avec Pᵀ, tu tournes dans le mauvais sens : ton point n\'est pas sur le bon axe.',
+    explain: () => t('Les colonnes de P sont u₁ et u₂ : x = Ω + X·u₁ + Y·u₂ = Ω + P·(X ; Y). Avec Pᵀ, tu tournes dans le mauvais sens : ton point n\'est pas sur le bon axe.'),
     check: { judge: { kind: 'vector', symbols: { Ω: '(1 ; -1)', u_1: '(2 ; 1)/√5', u_2: '(-1 ; 2)/√5' }, expect: '(3 ; 0)', trapPts: { g10_frame_back_transpose: ['(3 ; -2)'] } }, prev: 'F', line: '(3 ; -2)' },
   },
 );
@@ -125,7 +134,7 @@ function gRow(row) {
 RULES.push(
   {
     id: 'g10_e_inverted', family: 'rule', tag: 'E', skill: 'g10-conic-from-data', repair: 'g10-conic-from-data',
-    example: ['e·MF = d(M, D)', 'MF = e·d(M, D)'], name: 'Excentricité inversée',
+    example: ['e·MF = d(M, D)', 'MF = e·d(M, D)'], name: t('Excentricité inversée'),
     judges: ['conic'],
     // cfg.fde = {F: [x, y], D: {v: 'x' | 'y', k}, e: [p, q]}: MF = (q/p)·d instead of (p/q)·d.
     transform(prev, ctx) {
@@ -140,12 +149,17 @@ RULES.push(
       co[5] -= r * k * k;
       return [{ node: cl('', co, false), ctx: { e: `${f.e[0]}/${f.e[1]}`, inv: `${f.e[1]}/${f.e[0]}` } }];
     },
-    explain: (ctx = {}) => `La définition est MF = e·d(M, D)${ctx.e ? `, avec e = ${ctx.e}` : ''}. En échangeant e et 1/e${ctx.inv ? ` (${ctx.inv})` : ''}, une ellipse devient une hyperbole, et inversement.`,
+    explain: (ctx = {}) => {
+      const inv = ctx.inv ? ` (${ctx.inv})` : '';
+      return ctx.e
+        ? t('La définition est MF = e·d(M, D), avec e = {e}. En échangeant e et 1/e{inv}, une ellipse devient une hyperbole, et inversement.', { e: ctx.e, inv })
+        : t('La définition est MF = e·d(M, D). En échangeant e et 1/e{inv}, une ellipse devient une hyperbole, et inversement.', { inv });
+    },
     check: { judge: { kind: 'conic', equation: '3x^2 + 4y^2 - 48 = 0', target: 'standard', fde: { F: ['2', '0'], D: { v: 'x', k: '8' }, e: [1, 2] } }, prev: '3x^2 + 4y^2 - 48 = 0', line: '3x^2 - 60x - y^2 + 252 = 0' },
   },
   {
     id: 'g10_doubling_wrong', family: 'rule', tag: 'E', skill: 'g10-conic-tangent', repair: 'g10-conic-tangent',
-    example: ['x → x₀ (au lieu de (x + x₀)/2)', 'x → (x + x₀)/2'], name: 'Dédoublement faux',
+    example: [t('x → x₀ (au lieu de (x + x₀)/2)'), 'x → (x + x₀)/2'], name: t('Dédoublement faux'),
     judges: ['geom'],
     // cfg.dbl = {co: [a, b, c, d, e, f], T: [x₀, y₀]} (texts).
     transform(prev, ctx) {
@@ -159,7 +173,7 @@ RULES.push(
       ];
       return rows.filter((r) => r[0] || r[1]).map(gRow).filter(Boolean).map((node) => ({ node, ctx: {} }));
     },
-    explain: () => 'On dédouble chaque terme en gardant un x : x² → x₀x, xy → (x₀y + xy₀)/2, x → (x + x₀)/2. Ta droite ne passe pas par T.',
+    explain: () => t('On dédouble chaque terme en gardant un x : x² → x₀x, xy → (x₀y + xy₀)/2, x → (x + x₀)/2. Ta droite ne passe pas par T.'),
     check: { judge: { kind: 'geom', object: 'line2', ref: 'x + y - 3 = 0', dbl: { co: ['1', '0', '1', '2', '0', '-7'], T: ['1', '2'] } }, prev: 'x^2 + y^2 + 2x - 7 = 0', line: 'x + 2y - 5 = 0' },
   },
 );
@@ -167,21 +181,21 @@ RULES.push(
 RULES.push(
   {
     id: 'g10_family_division_by_zero', family: 'method', tag: 'E', skill: 'g10-conic-family', repair: 'g10-conic-family',
-    example: ['m = (1 − x)/y sans y ≠ 0', 'traiter y = 0 à part'], name: 'Division par une expression qui peut s\'annuler',
+    example: [t('m = (1 − x)/y sans y ≠ 0'), t('traiter y = 0 à part')], name: t('Division par une expression qui peut s\'annuler'),
     judges: [],
-    explain: () => 'Pour isoler m, tu as divisé par une expression en x et y : là où elle s\'annule, le cas est à traiter à part. Vérifie aussi que chaque point du lieu est bien le centre d\'une conique de la famille.',
+    explain: () => t('Pour isoler m, tu as divisé par une expression en x et y : là où elle s\'annule, le cas est à traiter à part. Vérifie aussi que chaque point du lieu est bien le centre d\'une conique de la famille.'),
     check: { bait: { skill: 'g10-conic-family', level: 3 } },
   },
   {
     id: 'g10_locus_square_condition', family: 'method', tag: 'E', skill: 'g10-locus', repair: 'g1-irr-eq',
-    example: ['l\'hyperbole entière', 'une seule branche'], name: 'Condition de signe oubliée en élevant au carré',
+    example: [t('l\'hyperbole entière'), t('une seule branche')], name: t('Condition de signe oubliée en élevant au carré'),
     judges: [],
-    explain: () => 'En élevant au carré, tu as ajouté les points où le membre de droite est négatif. Regarde la condition de signe : elle peut retirer une partie du lieu (une branche d\'hyperbole).',
+    explain: () => t('En élevant au carré, tu as ajouté les points où le membre de droite est négatif. Regarde la condition de signe : elle peut retirer une partie du lieu (une branche d\'hyperbole).'),
     check: { bait: { skill: 'g10-locus', exam: 'mcq' } },
   },
   {
     id: 'g10_homog_missing_t', family: 'rule', tag: 'E', skill: 'g10-homogeneous', repair: 'g10-homogeneous',
-    example: ['3x − 5', '3xt − 5t²'], name: 'Terme non homogénéisé',
+    example: ['3x − 5', '3xt − 5t²'], name: t('Terme non homogénéisé'),
     judges: ['equiv'],
     // cfg.homog: the equation before homogenising (text).
     transform(prev, ctx) {
@@ -189,7 +203,7 @@ RULES.push(
       if (!h) return [];
       try { return [{ node: parse(h, { vars: ['x', 'y', 't'] }), ctx: {} }]; } catch { return []; }
     },
-    explain: () => 'Chaque terme doit avoir le même degré : pour une conique, 3x devient 3xt et −5 devient −5t².',
+    explain: () => t('Chaque terme doit avoir le même degré : pour une conique, 3x devient 3xt et −5 devient −5t².'),
     check: { judge: { kind: 'equiv', vars: ['x', 'y', 't'], target: 'goal', goal: 'x^2-xy-2y^2+3xt-5t^2', domain: { x: [-2, 2], y: [-2, 2], t: [0.5, 2] }, homog: 'x^2-xy-2y^2+3x-5' }, prev: 't^2·((x/t)^2-(x/t)(y/t)-2(y/t)^2+3(x/t)-5)', line: 'x^2-xy-2y^2+3x-5' },
   },
 );

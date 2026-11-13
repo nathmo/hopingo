@@ -17,6 +17,7 @@
 // Σᵢ<ⱼ C[i][j]·vᵢ, ‖vⱼ‖² exact), cholesky(A) → {L, exact} | null.
 
 import { Q } from '../math/rational.js';
+import { t as tr } from '../i18n.js';
 
 const ZERO = new Q(0);
 const ONE = new Q(1);
@@ -25,7 +26,7 @@ export const q = (x) => (x instanceof Q ? x : typeof x === 'string' ? qText(x) :
 function qText(s) {
   const t = s.replace(/−/g, '-').trim();
   const m = /^(-?\d+)(?:\/(-?\d+))?$/.exec(t);
-  if (!m) throw new SyntaxError(`Nombre invalide : ${s}`);
+  if (!m) throw new SyntaxError(tr('Nombre invalide : {s}', { s }));
   return new Q(Number(m[1]), m[2] ? Number(m[2]) : 1);
 }
 
@@ -52,7 +53,7 @@ export const text = (A) => `[${A.map((r) => `[${r.map(String).join(',')}]`).join
 export function mul(A, B) {
   const [m, p] = dims(A);
   const n = B[0]?.length ?? 0;
-  if (B.length !== p) throw new RangeError('Tailles incompatibles');
+  if (B.length !== p) throw new RangeError(tr('Tailles incompatibles'));
   const out = zeros(m, n);
   for (let i = 0; i < m; i++) {
     for (let j = 0; j < n; j++) {
@@ -156,7 +157,7 @@ export const rank = (A) => echelon(A).pivots.length;
 export function det(A) {
   const n = A.length;
   if (n === 0) return ONE;
-  if (A.some((r) => r.length !== n)) throw new RangeError('Matrice non carrée');
+  if (A.some((r) => r.length !== n)) throw new RangeError(tr('Matrice non carrée'));
   const M = clone(A);
   let d = ONE;
   for (let c = 0; c < n; c++) {

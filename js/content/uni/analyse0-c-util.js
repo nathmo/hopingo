@@ -7,6 +7,7 @@ import { parse } from '../../cas/parse.js';
 import { toText, toReadable } from '../../cas/print.js';
 import { walk, lit, mapNode } from '../../cas/ast.js';
 import { blankLine } from '../../judges/lines.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => new Q(n, d);
 export const N = (x) => toText(lit(Q.of(x)));
@@ -34,10 +35,10 @@ export function polyText(cs, v = 'x') {
   for (let i = cs.length - 1; i >= 0; i--) {
     const c = Q.of(cs[i]);
     if (c.n === 0) continue;
-    let t;
-    if (i === 0) t = N(c);
-    else t = `${coefText(c)}${v}${i > 1 ? `^${i}` : ''}`;
-    out += out && !t.startsWith('-') ? `+${t}` : t;
+    let tx;
+    if (i === 0) tx = N(c);
+    else tx = `${coefText(c)}${v}${i > 1 ? `^${i}` : ''}`;
+    out += out && !tx.startsWith('-') ? `+${tx}` : tx;
   }
   return out || '0';
 }
@@ -89,8 +90,8 @@ export function atBlank(text, v, value, opts = {}) {
 export function tpl(math, texts, opts = {}) {
   const node = parse(math, opts);
   const holes = [];
-  for (const t of texts) {
-    const [text, k] = Array.isArray(t) ? t : [t, 0];
+  for (const tx of texts) {
+    const [text, k] = Array.isArray(tx) ? tx : [tx, 0];
     const want = toText(parse(text, opts));
     const found = [];
     walk(node, (n) => {
@@ -112,7 +113,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));

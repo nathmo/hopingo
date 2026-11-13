@@ -19,6 +19,7 @@ import { parse } from '../parse.js';
 import { toText } from '../print.js';
 import { evalFloat } from '../numeric.js';
 import { parseExpr, evalAst, toQ, Mx, fromQ, radicalNode } from '../matexpr.js';
+import { t } from '../../i18n.js';
 
 // ---------- exact helpers ----------
 
@@ -144,7 +145,7 @@ const SUPS = '⁰¹²³⁴⁵⁶⁷⁸⁹';
 
 export const DEFS = {
   l_orthodiag_no_normalize: {
-    name: 'Colonnes de Q non normalisées',
+    name: t('Colonnes de Q non normalisées'),
     judges: ['factor'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -159,12 +160,12 @@ export const DEFS = {
       return variants(cols).map((cs) => ({ node: mline(cfg._name, fromQ(MX.fromCols(cs))), ctx: c }));
     },
     explain: (ctx = {}) => (ctx.v
-      ? `${ctx.name ?? 'Q'} doit être orthogonale : ses colonnes doivent être de norme 1. Ici ${ctx.v} a pour norme ${ctx.n} : divise-le par ${ctx.n}.`
-      : 'Q doit être orthogonale : ses colonnes doivent être de norme 1. Divise chaque vecteur propre par sa norme, par exemple (3 ; 4) par 5.'),
+      ? t('{name} doit être orthogonale : ses colonnes doivent être de norme 1. Ici {v} a pour norme {n} : divise-le par {n}.', { name: ctx.name ?? 'Q', v: ctx.v, n: ctx.n })
+      : t('Q doit être orthogonale : ses colonnes doivent être de norme 1. Divise chaque vecteur propre par sa norme, par exemple (3 ; 4) par 5.')),
     check: { judge: { kind: 'factor', A: '[[11,-12],[-12,4]]', of: 'orthodiag' }, prev: 'A = QDQᵀ', line: 'Q = [[3,4],[4,-3]]' },
   },
   l_orthodiag_no_gs: {
-    name: 'Espace propre de dimension 2 sans Gram-Schmidt',
+    name: t('Espace propre de dimension 2 sans Gram-Schmidt'),
     judges: ['factor'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -179,20 +180,20 @@ export const DEFS = {
       return variants(cols).map((cs) => ({ node: mline('Q', fvalue(colsF(cs))), ctx: c }));
     },
     explain: (ctx = {}) => (ctx.u
-      ? `Deux vecteurs du même espace propre ne sont pas forcément orthogonaux : ${ctx.u} · ${ctx.v} = ${ctx.d}. Applique Gram-Schmidt dans l'espace propre, puis normalise.`
-      : 'Deux vecteurs du même espace propre ne sont pas forcément orthogonaux : (1 ; −1 ; 0) · (1 ; 0 ; −1) = 1. Applique Gram-Schmidt dans l\'espace propre.'),
+      ? t('Deux vecteurs du même espace propre ne sont pas forcément orthogonaux : {u} · {v} = {d}. Applique Gram-Schmidt dans l\'espace propre, puis normalise.', { u: ctx.u, v: ctx.v, d: ctx.d })
+      : t('Deux vecteurs du même espace propre ne sont pas forcément orthogonaux : (1 ; −1 ; 0) · (1 ; 0 ; −1) = 1. Applique Gram-Schmidt dans l\'espace propre.')),
     check: { judge: { kind: 'factor', A: '[[1,2,2],[2,1,2],[2,2,1]]', of: 'orthodiag' }, prev: 'A = QDQᵀ', line: 'Q = [[1/√2,1/√2,1/√3],[-1/√2,0,1/√3],[0,-1/√2,1/√3]]' },
   },
   l_sym_needed: {
-    name: 'Matrice non symétrique dite orthodiagonalisable',
+    name: t('Matrice non symétrique dite orthodiagonalisable'),
     judges: [],
     explain: (ctx = {}) => (ctx.a
-      ? `Orthodiagonalisable ⇔ symétrique : ici a₁₂ = ${ctx.a} ≠ a₂₁ = ${ctx.b}.`
-      : 'Orthodiagonalisable ⇔ symétrique : si A = QDQᵀ, alors Aᵀ = QDᵀQᵀ = A. Une matrice non symétrique peut être diagonalisable, mais jamais en base orthonormée.'),
+      ? t('Orthodiagonalisable ⇔ symétrique : ici a₁₂ = {a} ≠ a₂₁ = {b}.', { a: ctx.a, b: ctx.b })
+      : t('Orthodiagonalisable ⇔ symétrique : si A = QDQᵀ, alors Aᵀ = QDᵀQᵀ = A. Une matrice non symétrique peut être diagonalisable, mais jamais en base orthonormée.')),
     check: { bait: { skill: 'l-sym-orthodiag', exam: 'tf' } },
   },
   l_quadform_offdiag: {
-    name: 'Coefficient entier de xᵢxⱼ hors de la diagonale',
+    name: t('Coefficient entier de xᵢxⱼ hors de la diagonale'),
     judges: ['mat'],
     // cfg.quadform: the line is the matrix of a quadratic form, cfg.expect.
     transform(prev, ctx) {
@@ -207,18 +208,18 @@ export const DEFS = {
       return [{ node: { t: 'mline', ops: [], assigns: [], label: null, body: null, value: fromQ(B) }, ctx: { c: T(qt(B[k][l])), h: T(qt(A[k][l])), i: k + 1, j: l + 1 } }];
     },
     explain: (ctx = {}) => (ctx.c
-      ? `xᵀAx contient a${SUBS[ctx.i]}${SUBS[ctx.j]}·x${SUBS[ctx.i]}x${SUBS[ctx.j]} + a${SUBS[ctx.j]}${SUBS[ctx.i]}·x${SUBS[ctx.j]}x${SUBS[ctx.i]} : chaque case reçoit la moitié du coefficient du terme croisé, ${ctx.c}/2 = ${ctx.h}.`
-      : 'xᵀAx contient aᵢⱼxᵢxⱼ + aⱼᵢxⱼxᵢ = 2aᵢⱼxᵢxⱼ : chaque case hors de la diagonale reçoit la moitié du coefficient de xᵢxⱼ.'),
+      ? t('xᵀAx contient {terms} : chaque case reçoit la moitié du coefficient du terme croisé, {c}/2 = {h}.', { terms: `a${SUBS[ctx.i]}${SUBS[ctx.j]}·x${SUBS[ctx.i]}x${SUBS[ctx.j]} + a${SUBS[ctx.j]}${SUBS[ctx.i]}·x${SUBS[ctx.j]}x${SUBS[ctx.i]}`, c: ctx.c, h: ctx.h })
+      : t('xᵀAx contient aᵢⱼxᵢxⱼ + aⱼᵢxⱼxᵢ = 2aᵢⱼxᵢxⱼ : chaque case hors de la diagonale reçoit la moitié du coefficient de xᵢxⱼ.')),
     check: { judge: { kind: 'mat', expect: '[[1,5],[5,1]]', quadform: true }, prev: 'A', line: '[[1,10],[10,1]]' },
   },
   l_posdef_diag: {
-    name: 'Diagonale positive prise pour « définie positive »',
+    name: t('Diagonale positive prise pour « définie positive »'),
     judges: [],
-    explain: () => 'Une diagonale positive ne suffit pas. Contre-exemple : [[1, 2], [2, 1]] a une diagonale positive mais la valeur propre −1 : Q(1, −1) = −2. Il faut que toutes les valeurs propres soient > 0.',
+    explain: () => t('Une diagonale positive ne suffit pas. Contre-exemple : [[1, 2], [2, 1]] a une diagonale positive mais la valeur propre −1 : Q(1, −1) = −2. Il faut que toutes les valeurs propres soient > 0.'),
     check: { bait: { skill: 'l-sym-quadform', exam: 'tf' } },
   },
   l_svd_sigma_is_eig: {
-    name: 'Valeur singulière prise égale à λᵢ',
+    name: t('Valeur singulière prise égale à λᵢ'),
     judges: ['value', 'factor'],
     // value: cfg.sigma marks the lines « σᵢ = … » (cfg.expect is σᵢ);
     // factor: Σ with the eigenvalues of AᵀA on its diagonal.
@@ -243,12 +244,12 @@ export const DEFS = {
       return [{ node: mline('Σ', fromQ(S)), ctx: { l: T(qt(lams[0])), s: T(rootText(lams[0].valueOf())) } }];
     },
     explain: (ctx = {}) => (ctx.l
-      ? `Les valeurs singulières sont les <b>racines</b> des valeurs propres de AᵀA : σ = √${ctx.l} = ${ctx.s}, pas ${ctx.l}.`
-      : 'Les valeurs singulières sont les <b>racines</b> des valeurs propres de AᵀA : σᵢ = √λᵢ.'),
+      ? t('Les valeurs singulières sont les <b>racines</b> des valeurs propres de AᵀA : σ = √{l} = {s}, pas {l}.', { l: ctx.l, s: ctx.s })
+      : t('Les valeurs singulières sont les <b>racines</b> des valeurs propres de AᵀA : σᵢ = √λᵢ.')),
     check: { judge: { kind: 'value', expect: '6√2', form: 'exact', sigma: true }, prev: 'σ_1', line: '72' },
   },
   l_svd_no_sigma: {
-    name: 'uᵢ = Avᵢ sans diviser par σᵢ',
+    name: t('uᵢ = Avᵢ sans diviser par σᵢ'),
     judges: ['factor'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -275,12 +276,12 @@ export const DEFS = {
       });
     },
     explain: (ctx = {}) => (ctx.s
-      ? `‖Av₁‖ = σ₁ = ${ctx.s} : il faut diviser Av₁ = ${ctx.u} par σ₁ pour obtenir un vecteur unitaire, uᵢ = Avᵢ/σᵢ.`
-      : '‖Avᵢ‖ = σᵢ : il faut diviser Avᵢ par σᵢ pour obtenir un vecteur unitaire, uᵢ = Avᵢ/σᵢ.'),
+      ? t('‖Av₁‖ = σ₁ = {s} : il faut diviser Av₁ = {u} par σ₁ pour obtenir un vecteur unitaire, uᵢ = Avᵢ/σᵢ.', { s: ctx.s, u: ctx.u })
+      : t('‖Avᵢ‖ = σᵢ : il faut diviser Avᵢ par σᵢ pour obtenir un vecteur unitaire, uᵢ = Avᵢ/σᵢ.')),
     check: { judge: { kind: 'factor', A: '[[4,5,2],[0,3,6]]', of: 'SVD' }, prev: 'V = (1/3)·[[1,2,2],[2,1,-2],[2,-2,1]]', line: 'U = [[6,3],[6,-3]]' },
   },
   l_svd_uv_swap: {
-    name: 'Rôles de U et de V échangés',
+    name: t('Rôles de U et de V échangés'),
     judges: ['factor'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg;
@@ -301,28 +302,28 @@ export const DEFS = {
       return out.map((F) => ({ node: mline(cfg._name, fvalue(F)), ctx: c }));
     },
     explain: (ctx = {}) => (ctx.n
-      ? `V contient des vecteurs de ℝ${SUPS[ctx.n]} (l'espace de départ) : ce sont les vecteurs propres de AᵀA, qui est ${ctx.n}×${ctx.n}. Ceux de AAᵀ (${ctx.m}×${ctx.m}) vont dans U.`
-      : 'V contient des vecteurs de l\'espace de départ ℝⁿ : ce sont les vecteurs propres de AᵀA (n × n). Ceux de AAᵀ vont dans U.'),
+      ? t('V contient des vecteurs de ℝ{sn} (l\'espace de départ) : ce sont les vecteurs propres de AᵀA, qui est {n}×{n}. Ceux de AAᵀ ({m}×{m}) vont dans U.', { sn: SUPS[ctx.n], n: ctx.n, m: ctx.m })
+      : t('V contient des vecteurs de l\'espace de départ ℝⁿ : ce sont les vecteurs propres de AᵀA (n × n). Ceux de AAᵀ vont dans U.')),
     check: { judge: { kind: 'factor', A: '[[4,5,2],[0,3,6]]', of: 'SVD' }, prev: 'A = UΣVᵀ', line: 'V = (1/√2)·[[1,1],[1,-1]]' },
   },
   l_svd_sphere_boundary: {
-    name: 'Ellipse pleine ou bord seul',
+    name: t('Ellipse pleine ou bord seul'),
     judges: [],
     explain: (ctx = {}) => (ctx.full === false
-      ? 'Ici A est injective : chaque point de la sphère va sur le bord, l\'image est une ellipse (une courbe), pas une ellipse pleine.'
-      : 'A écrase une direction (son noyau) : les points de la sphère vont aussi à l\'intérieur de l\'ellipse. L\'image est l\'ellipse pleine.'),
+      ? t('Ici A est injective : chaque point de la sphère va sur le bord, l\'image est une ellipse (une courbe), pas une ellipse pleine.')
+      : t('A écrase une direction (son noyau) : les points de la sphère vont aussi à l\'intérieur de l\'ellipse. L\'image est l\'ellipse pleine.')),
     check: { bait: { skill: 'l-svd-sphere', exam: 'mcq' } },
   },
   l_proof_circular: {
-    name: 'Preuve qui suppose sa conclusion',
+    name: t('Preuve qui suppose sa conclusion'),
     judges: [],
-    explain: () => 'Ce bloc suppose déjà ce qu\'on veut montrer : la preuve tourne en rond. Une preuve part des hypothèses et arrive à la conclusion.',
+    explain: () => t('Ce bloc suppose déjà ce qu\'on veut montrer : la preuve tourne en rond. Une preuve part des hypothèses et arrive à la conclusion.'),
     check: { bait: { skill: 'l-proof-matrices', level: 2 } },
   },
   l_sym_orth_confusion: {
-    name: 'Symétrique et orthogonale confondues',
+    name: t('Symétrique et orthogonale confondues'),
     judges: [],
-    explain: () => 'Symétrique veut dire Aᵀ = A, pas AᵀA = I (ça, c\'est orthogonale). Les deux propriétés ne se remplacent pas l\'une l\'autre.',
+    explain: () => t('Symétrique veut dire Aᵀ = A, pas AᵀA = I (ça, c\'est orthogonale). Les deux propriétés ne se remplacent pas l\'une l\'autre.'),
     check: { bait: { skill: 'l-proof-spectral', level: 2 } },
   },
 };

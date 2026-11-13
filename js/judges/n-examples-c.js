@@ -8,6 +8,7 @@
 //                    3, not all aligned) passes through none of them
 
 import { fnOf, numberOf } from './n-examples-util.js';
+import { t } from '../i18n.js';
 
 // « (0 ; 0), (1 ; 1) » → [[0, 0], [1, 1]] or null.
 export function pointsOf(text) {
@@ -46,28 +47,28 @@ function p1Err(f, n) {
 export const PROPS = {
   interpDegreeLow(params, a) {
     const pts = pointsOf(a.pts);
-    if (!pts || pts.length !== 4) return { ok: false, message: 'Donne 4 points (x ; y), séparés par des virgules.' };
-    if (!distinctX(pts)) return { ok: false, message: 'Les abscisses doivent être distinctes.' };
+    if (!pts || pts.length !== 4) return { ok: false, message: t('Donne 4 points (x ; y), séparés par des virgules.') };
+    if (!distinctX(pts)) return { ok: false, message: t('Les abscisses doivent être distinctes.') };
     const c = divided(pts);
     const scale = Math.max(1, ...pts.map((p) => Math.abs(p[1])));
-    if (Math.abs(c[3]) > 1e-9 * scale) return { ok: false, message: 'Par ces 4 points passe un polynôme de degré exactement 3 : l\'énoncé est vrai pour eux.' };
+    if (Math.abs(c[3]) > 1e-9 * scale) return { ok: false, message: t('Par ces 4 points passe un polynôme de degré exactement 3 : l\'énoncé est vrai pour eux.') };
     return { ok: true };
   },
   p1Ratio(params, a) {
     const f = fnOf(a.f);
-    if (!f) return { ok: false, message: 'Donne une fonction f de x.' };
+    if (!f) return { ok: false, message: t('Donne une fonction f de x.') };
     const e4 = p1Err(f, 4);
     const e8 = p1Err(f, 8);
-    if (!Number.isFinite(e4) || !Number.isFinite(e8)) return { ok: false, message: 'f doit être définie sur [0 ; 1].' };
-    if (e4 < 1e-12) return { ok: false, message: 'Pour cette f, l\'interpolation est exacte : prends une fonction qui n\'est pas affine.' };
+    if (!Number.isFinite(e4) || !Number.isFinite(e8)) return { ok: false, message: t('f doit être définie sur [0 ; 1].') };
+    if (e4 < 1e-12) return { ok: false, message: t('Pour cette f, l\'interpolation est exacte : prends une fonction qui n\'est pas affine.') };
     const r = e4 / e8;
-    if (r > 1.8 && r < 2.2) return { ok: false, message: 'Pour cette f, l\'erreur est bien divisée par 2 environ.' };
+    if (r > 1.8 && r < 2.2) return { ok: false, message: t('Pour cette f, l\'erreur est bien divisée par 2 environ.') };
     return { ok: true };
   },
   lsNoPoint(params, a) {
     const pts = pointsOf(a.pts);
-    if (!pts || pts.length < 3) return { ok: false, message: 'Donne au moins 3 points (x ; y), séparés par des virgules.' };
-    if (new Set(pts.map((p) => p[0])).size < 2) return { ok: false, message: 'Il faut au moins deux abscisses différentes.' };
+    if (!pts || pts.length < 3) return { ok: false, message: t('Donne au moins 3 points (x ; y), séparés par des virgules.') };
+    if (new Set(pts.map((p) => p[0])).size < 2) return { ok: false, message: t('Il faut au moins deux abscisses différentes.') };
     const m = pts.length;
     const sx = pts.reduce((s, p) => s + p[0], 0);
     const sy = pts.reduce((s, p) => s + p[1], 0);
@@ -76,7 +77,7 @@ export const PROPS = {
     const d = m * sxx - sx * sx;
     const a1 = (m * sxy - sx * sy) / d;
     const a0 = (sy - a1 * sx) / m;
-    if (pts.some((p) => Math.abs(a0 + a1 * p[0] - p[1]) < 1e-9)) return { ok: false, message: 'La droite des moindres carrés de ces points passe par l\'un d\'eux.' };
+    if (pts.some((p) => Math.abs(a0 + a1 * p[0] - p[1]) < 1e-9)) return { ok: false, message: t('La droite des moindres carrés de ces points passe par l\'un d\'eux.') };
     return { ok: true };
   },
 };

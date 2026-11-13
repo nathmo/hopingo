@@ -14,6 +14,7 @@ import { parse } from '../../cas/parse.js';
 import {
   q, cq, M, rd, zt, piT, piIT, joinT, term, CV, CF, SETW, KEYS, linesOf, choice, opt, H, examTag, problemItem, multiOf,
 } from './cplx-a-kit.js';
+import { t } from '../../i18n.js';
 
 // ======================================================================
 // c-elem-fn
@@ -21,10 +22,10 @@ import {
 
 const EF = 'c-elem-fn';
 const EF_SUB = [
-  { id: 'modulus', label: 'module |z|', skill: 'g8-polar' },
-  { id: 'arg', label: 'argument principal', skill: 'g8-polar' },
+  { id: 'modulus', label: t('module |z|'), skill: 'g8-polar' },
+  { id: 'arg', label: t('argument principal'), skill: 'g8-polar' },
   { id: 'log', label: 'Log z = ln|z| + i Arg z', skill: EF },
-  { id: 'def', label: 'définition de z^α, cos z, e^z', skill: EF },
+  { id: 'def', label: t('définition de z^α, cos z, e^z'), skill: EF },
   { id: 'hyp', label: 'cos(iy) = cosh y', skill: 'g2-hyp-def' },
 ];
 
@@ -43,9 +44,9 @@ function logPoints() {
         const z = joinT([re, im]);
         const x = sa * (a === '√3' ? Math.sqrt(3) : Number(a));
         const y = sb * (b === '√3' ? Math.sqrt(3) : Number(b));
-        const t = Math.round((Math.atan2(y, x) / Math.PI) * 12);
+        const tt = Math.round((Math.atan2(y, x) / Math.PI) * 12);
         const [r, ln] = R_OF[a2 + b2];
-        out.push({ z, sq: `${a2}+${b2}`, zero: a2 === 0 || b2 === 0, r, ln, t: q(t, 12), negReal: b === '0' && sa < 0, posReal: b === '0' && sa > 0 });
+        out.push({ z, sq: `${a2}+${b2}`, zero: a2 === 0 || b2 === 0, r, ln, t: q(tt, 12), negReal: b === '0' && sa < 0, posReal: b === '0' && sa > 0 });
       }
     }
   }
@@ -66,15 +67,15 @@ const POW_Z1 = [['i', q(1, 2)], ['-1', q(1)], ['-i', q(-1, 2)]];
 const POW_A = [['i', 0, 1], ['2i', 0, 2], ['-i', 0, -1], ['1+i', 1, 1], ['i/2', 0, q(1, 2)]];
 const POW_Z2 = [['2i', '2', 'ln(2)', q(1, 2)], ['-4', '4', 'ln(4)', q(1)], ['4i', '4', 'ln(4)', q(1, 2)], ['-2i', '2', 'ln(2)', q(-1, 2)], ['1+i√3', '2', 'ln(2)', q(1, 3)], ['-4i', '4', 'ln(4)', q(-1, 2)]];
 // Exact cos and sin of tπ for t a multiple of 1/4 or 1/6 (texts).
-function cosSin(t) {
-  const k = ((Math.round(q(t).valueOf() * 12) % 24) + 24) % 24;
+function cosSin(tt) {
+  const k = ((Math.round(q(tt).valueOf() * 12) % 24) + 24) % 24;
   const C = { 0: '1', 2: '√3/2', 3: '√2/2', 4: '1/2', 6: '0', 8: '-1/2', 9: '-√2/2', 10: '-√3/2', 12: '-1', 14: '-√3/2', 15: '-√2/2', 16: '-1/2', 18: '0', 20: '1/2', 21: '√2/2', 22: '√3/2' };
   const S = { 0: '0', 2: '1/2', 3: '√2/2', 4: '√3/2', 6: '1', 8: '√3/2', 9: '√2/2', 10: '1/2', 12: '0', 14: '-1/2', 15: '-√2/2', 16: '-√3/2', 18: '-1', 20: '-√3/2', 21: '-√2/2', 22: '-1/2' };
   return C[k] !== undefined && S[k] !== undefined ? [C[k], S[k]] : null;
 }
 // m·(c + i s) as text, m a text factor ('' for 1, '√2', 'e^(-π/2)').
-function polarText(m, t) {
-  const cs = cosSin(t);
+function polarText(m, tt) {
+  const cs = cosSin(tt);
   if (!cs) return null;
   const [c, s] = cs;
   const mul = (x) => {
@@ -98,27 +99,27 @@ function polarText(m, t) {
 function powData(rng) {
   for (let k = 0; k < 200; k++) {
     if (rng.chance(0.65)) {
-      const [z, t] = rng.pick(POW_Z1);
+      const [z, tt] = rng.pick(POW_Z1);
       const [al, a, b] = rng.pick(POW_A);
       // e^(α·iθ) = e^(−bθπ)·e^(i·aθπ).
-      const mod = q(b).mul(t).neg();
-      const ang = q(a).mul(t);
+      const mod = q(b).mul(tt).neg();
+      const ang = q(a).mul(tt);
       const m = mod.n === 0 ? '' : `e^(${piT(mod)})`;
       const fin = polarText(m, ang);
       if (!fin || (a !== 0 && ang.d > 2 && m)) continue;
-      const logz = piIT(t);
+      const logz = piIT(tt);
       const exp1 = `e^(${al === 'i' ? 'i' : `(${al})`}·${logz.startsWith('-') ? `(${logz})` : logz})`;
       const lines = [`e^(${al === 'i' ? 'i' : `(${al})`}·Log(${z}))`, exp1];
       if (a !== 0 && mod.n !== 0) lines.push(`e^(${joinT([piT(mod), piIT(ang)])})`);
       lines.push(fin);
       return { kind: 'pow', z, al, start: `${z.length > 1 ? `(${z})` : z}^${al.length > 1 ? `(${al})` : al}`, lines, fin, key: `pow:${z}:${al}` };
     }
-    const [z, r, ln, t] = rng.pick(POW_Z2);
-    const ang = t.div(2);
+    const [z, r, ln, tt] = rng.pick(POW_Z2);
+    const ang = tt.div(2);
     const m = r === '4' ? '2' : '√2';
     const fin = polarText(m, ang);
     if (!fin) continue;
-    const lines = [`e^((1/2)·Log(${z}))`, `e^((1/2)(${joinT([ln, piIT(t)])}))`, `${m}e^(${piIT(ang)})`, fin];
+    const lines = [`e^((1/2)·Log(${z}))`, `e^((1/2)(${joinT([ln, piIT(tt)])}))`, `${m}e^(${piIT(ang)})`, fin];
     return { kind: 'pow', z, al: '1/2', start: `(${z})^(1/2)`, lines, fin, key: `sqrt:${z}` };
   }
   return { kind: 'pow', z: 'i', al: 'i', start: 'i^i', lines: ['e^(i·Log(i))', 'e^(i·(π/2)i)', 'e^(-π/2)'], fin: 'e^(-π/2)', key: 'pow:fallback', fallback: true };
@@ -143,13 +144,13 @@ function trigData(rng) {
 
 const EF_MENU = (right) => [
   { id: 'mod', label: '|a + bi| = √(a² + b²)' },
-  { id: 'arg', label: 'Arg z dans ]−π ; π], selon le quadrant' },
+  { id: 'arg', label: t('Arg z dans ]−π ; π], selon le quadrant') },
   { id: 'log', label: 'Log z = ln|z| + i Arg z' },
   { id: 'pow', label: 'z^α = e^(α Log z)' },
   { id: 'cos', label: 'cos z = (e^(iz) + e^(−iz))/2, sin z = (e^(iz) − e^(−iz))/(2i)' },
   { id: 'abs', label: '|e^z| = e^(Re z) : |e^(iy)| = 1' },
-  { id: 'branch', label: 'Prendre Arg dans [0 ; 2π[', rule: 'c_log_branch', why: 'L\'argument principal est dans ]−π ; π], pas dans [0 ; 2π[.' },
-].map((o) => ({ ...o, valid: o.id === right, why: o.why || 'Ce n\'est pas la formule à utiliser ici.' }));
+  { id: 'branch', label: t('Prendre Arg dans [0 ; 2π['), rule: 'c_log_branch', why: t('L\'argument principal est dans ]−π ; π], pas dans [0 ; 2π[.') },
+].map((o) => ({ ...o, valid: o.id === right, why: o.why || t('Ce n\'est pas la formule à utiliser ici.') }));
 
 const eq = (math, note, subgoal, blank) => ({ math, note, subgoal, blank });
 
@@ -162,20 +163,20 @@ function efLines(level, rng, opts) {
     const real = CV({ final: 'number' });
     const parts = [];
     const modLines = d.zero ? [eq(d.r, '|a + bi| = √(a² + b²)', 'modulus', [d.r])] : [eq(`√(${d.sq})`, '|a + bi| = √(a² + b²)', 'modulus', [d.sq]), eq(d.r, '', 'modulus', [d.r])];
-    const argLine = eq(piT(d.t), 'Arg z ∈ ]−π ; π], selon le quadrant de z', 'arg', [piT(d.t).replace(/^-/, '')]);
+    const argLine = eq(piT(d.t), t('Arg z ∈ ]−π ; π], selon le quadrant de z'), 'arg', [piT(d.t).replace(/^-/, '')]);
     const logLines = [eq(d.logT, 'Log z = ln|z| + i Arg z', 'log', [d.ln || piIT(d.t), piIT(d.t).replace(/^-/, '').replace(/^\((.*)\)i$/, '$1')].filter(Boolean))];
     if (level === 1) {
-      parts.push({ html: `On donne |z| = ${M(d.r)} et Arg z = ${M(piT(d.t))}.`, start: `Log(${d.z})`, judge: cfg, lines: logLines, menu: EF_MENU('log') });
+      parts.push({ html: t('On donne |z| = {r} et Arg z = {a}.', { r: M(d.r), a: M(piT(d.t)) }), start: `Log(${d.z})`, judge: cfg, lines: logLines, menu: EF_MENU('log') });
     } else {
       parts.push({ start: `|${d.z}|`, judge: real, lines: modLines, menu: EF_MENU('mod') });
-      parts.push({ html: 'L\'argument principal :', ask: 'Arg z =', start: `arg(${d.z})`, judge: real, lines: [argLine], menu: EF_MENU('arg') });
-      parts.push({ html: 'Le logarithme principal :', ask: 'Log z =', start: `Log(${d.z})`, judge: cfg, lines: level === 2 ? logLines : [eq(`ln(|${d.z}|)+i·arg(${d.z})`, 'Log z = ln|z| + i Arg z', 'log'), eq(d.logT, '', 'log')], menu: EF_MENU('log') });
+      parts.push({ html: t('L\'argument principal :'), ask: 'Arg z =', start: `arg(${d.z})`, judge: real, lines: [argLine], menu: EF_MENU('arg') });
+      parts.push({ html: t('Le logarithme principal :'), ask: 'Log z =', start: `Log(${d.z})`, judge: cfg, lines: level === 2 ? logLines : [eq(`ln(|${d.z}|)+i·arg(${d.z})`, 'Log z = ln|z| + i Arg z', 'log'), eq(d.logT, '', 'log')], menu: EF_MENU('log') });
     }
     return linesOf({
       ...L, skill: EF, key: `${EF}:${level}:${d.key}`,
-      prompt: `Calcule le logarithme principal ${M(`Log(${d.z})`)}${level === 1 ? '' : ' : d\'abord |z| et Arg z'}.`,
+      prompt: level === 1 ? t('Calcule le logarithme principal {a}.', { a: M(`Log(${d.z})`) }) : t('Calcule le logarithme principal {a} : d\'abord |z| et Arg z.', { a: M(`Log(${d.z})`) }),
       parts,
-      hints: H('Log z = ln|z| + i Arg z, avec Arg z dans ]−π ; π].', `Arg(${rd(d.z)}) = ${rd(piT(d.t))}, |z| = ${rd(d.r)}`, M(`Log(${d.z}) = ${d.logT}`)),
+      hints: H(t('Log z = ln|z| + i Arg z, avec Arg z dans ]−π ; π].'), `Arg(${rd(d.z)}) = ${rd(piT(d.t))}, |z| = ${rd(d.r)}`, M(`Log(${d.z}) = ${d.logT}`)),
     });
   }
   if (roll < 0.8) {
@@ -183,9 +184,9 @@ function efLines(level, rng, opts) {
     const lines = d.lines.map((m, i) => eq(m, i === 0 ? 'z^α = e^(α Log z)' : i === 1 ? 'Log z = ln|z| + i Arg z' : '', i === 0 ? 'def' : 'log', i === d.lines.length - 1 ? [d.fin] : i === 0 ? [`Log(${d.z})`] : []));
     return linesOf({
       ...L, skill: EF, key: `${EF}:${level}:${d.key}`, fallback: d.fallback,
-      prompt: `Calcule ${M(d.start)} (détermination principale), sous la forme a + bi.`,
+      prompt: t('Calcule {start} (détermination principale), sous la forme a + bi.', { start: M(d.start) }),
       parts: [{ start: d.start, judge: CV(), lines, menu: EF_MENU('pow') }],
-      hints: H('z^α = e^(α Log z) : commence par Log z = ln|z| + i Arg z.', M(lines[1].math), M(`${d.start} = ${d.fin}`)),
+      hints: H(t('z^α = e^(α Log z) : commence par Log z = ln|z| + i Arg z.'), M(lines[1].math), M(`${d.start} = ${d.fin}`)),
     });
   }
   const d = trigData(rng);
@@ -193,9 +194,9 @@ function efLines(level, rng, opts) {
   const lines = d.lines.map((m, i) => eq(m, i === 0 ? (isAbs ? '|e^z| = e^(Re z), |e^(iy)| = 1' : d.kind === 'cos' ? 'cos z = (e^(iz) + e^(−iz))/2' : 'sin z = (e^(iz) − e^(−iz))/(2i)') : i === 1 && !isAbs ? 'i·i = −1' : '', i === 0 ? 'def' : 'hyp', i === d.lines.length - 1 ? [d.fin] : []));
   return linesOf({
     ...L, skill: EF, key: `${EF}:${level}:${d.key}`,
-    prompt: isAbs ? `Calcule ${M(d.start)}.` : `Calcule ${M(d.start)} avec la définition par l'exponentielle.`,
+    prompt: isAbs ? t('Calcule {start}.', { start: M(d.start) }) : t('Calcule {start} avec la définition par l\'exponentielle.', { start: M(d.start) }),
     parts: [{ start: d.start, judge: CV(), lines, menu: EF_MENU(isAbs ? 'abs' : 'cos') }],
-    hints: H(isAbs ? '|e^(x + iy)| = eˣ·|e^(iy)|, et |e^(iy)| = 1.' : 'Remplace z par la définition avec e^(iz) ; i·i = −1.', M(lines[0].math), M(`${d.start} = ${d.fin}`)),
+    hints: H(isAbs ? t('|e^(x + iy)| = eˣ·|e^(iy)|, et |e^(iy)| = 1.') : t('Remplace z par la définition avec e^(iz) ; i·i = −1.'), M(lines[0].math), M(`${d.start} = ${d.fin}`)),
   });
 }
 
@@ -207,51 +208,51 @@ function efProblem(level, rng, opts) {
   const lines = [
     eq(c ? '|cos(x)cosh(y)-i·sin(x)sinh(y)|^2' : '|sin(x)cosh(y)+i·cos(x)sinh(y)|^2', c ? 'cos(x + iy) = cos x cosh y − i sin x sinh y' : 'sin(x + iy) = sin x cosh y + i cos x sinh y', 'def'),
     eq(c ? 'cos(x)^2cosh(y)^2+sin(x)^2sinh(y)^2' : 'sin(x)^2cosh(y)^2+cos(x)^2sinh(y)^2', '|a + bi|² = a² + b²', 'def'),
-    eq(c ? 'cos(x)^2+sinh(y)^2' : 'sin(x)^2+sinh(y)^2', 'cosh² = 1 + sinh², puis cos² + sin² = 1', 'hyp'),
+    eq(c ? 'cos(x)^2+sinh(y)^2' : 'sin(x)^2+sinh(y)^2', t('cosh² = 1 + sinh², puis cos² + sin² = 1'), 'hyp'),
   ];
   const part1 = linesOf({
     level: 4, skill: EF, key: `${EF}:${level}:mod:${fn}`, keys: [...KEYS, 'a2'],
-    prompt: `Montre que ${M(`|${fn}(x+iy)|^2 = ${lines[2].math}`)}.`,
+    prompt: t('Montre que {a}.', { a: M(`|${fn}(x+iy)|^2 = ${lines[2].math}`) }),
     parts: [{ start: `|${fn}(x+iy)|^2`, judge: cfg, lines }], subgoals: EF_SUB,
     hints: H('', '', ''),
   });
   const part2 = choice({
     skill: EF, level, key: `${level}:bounded:${fn}`,
-    prompt: `${fn} z est-elle bornée sur ℂ ?`,
-    right: `Non : ${M(`|${fn}(iy)|`)} ≥ ${M('|sinh(y)|')}, qui tend vers l'infini.`,
+    prompt: t('{fn} z est-elle bornée sur ℂ ?', { fn }),
+    right: t('Non : {a} ≥ {b}, qui tend vers l\'infini.', { a: M(`|${fn}(iy)|`), b: M('|sinh(y)|') }),
     wrongs: [
-      { html: `Oui : ${M(`|${fn}(z)| ≤ 1`)} comme sur ℝ.`, rule: 'c_cos_bounded' },
-      { html: `Oui, par ${M(`${fn}(x)^2+sinh(y)^2 ≤ 2`)}.`, rule: 'c_cos_bounded' },
-      { html: 'Seulement sur les droites horizontales y = 0.' },
+      { html: t('Oui : {a} comme sur ℝ.', { a: M(`|${fn}(z)| ≤ 1`) }), rule: 'c_cos_bounded' },
+      { html: t('Oui, par {a}.', { a: M(`${fn}(x)^2+sinh(y)^2 ≤ 2`) }), rule: 'c_cos_bounded' },
+      { html: t('Seulement sur les droites horizontales y = 0.') },
     ],
   }, rng);
   return problemItem({
-    skill: EF, level, prompt: `Module de ${fn} z, puis borne.`, key: `${EF}:${level}:${fn}`, exam: examTag(opts, 3),
-    parts: [{ item: part1, points: 2, title: `|${fn}(x + iy)|²` }, { item: part2, points: 1, title: `${fn} z bornée ?` }],
+    skill: EF, level, prompt: t('Module de {fn} z, puis borne.', { fn }), key: `${EF}:${level}:${fn}`, exam: examTag(opts, 3),
+    parts: [{ item: part1, points: 2, title: `|${fn}(x + iy)|²` }, { item: part2, points: 1, title: t('{fn} z bornée ?', { fn }) }],
   });
 }
 
 const EF_STATEMENTS = [
-  { html: `${M('|e^z| = e^(Re(z))')} pour tout z`, truth: true },
-  { html: `${M('e^z')} est périodique de période ${M('2πi')}`, truth: true },
-  { html: `cos z est bornée sur ℂ`, truth: false, rule: 'c_cos_bounded' },
-  { html: `${M('cos(iy) = cosh(y)')} pour tout y réel`, truth: true },
-  { html: `${M('i^i')} est un nombre réel`, truth: true },
+  { html: t('{a} pour tout z', { a: M('|e^z| = e^(Re(z))') }), truth: true },
+  { html: t('{a} est périodique de période {b}', { a: M('e^z'), b: M('2πi') }), truth: true },
+  { html: t('cos z est bornée sur ℂ'), truth: false, rule: 'c_cos_bounded' },
+  { html: t('{a} pour tout y réel', { a: M('cos(iy) = cosh(y)') }), truth: true },
+  { html: t('{a} est un nombre réel', { a: M('i^i') }), truth: true },
   { html: `${M('Log(-1) = -iπ')}`, truth: false, rule: 'c_log_branch' },
-  { html: `${M('Log(z_1z_2) = Log(z_1)+Log(z_2)')} pour tous z₁, z₂ non nuls`, truth: false, rule: 'c_log_branch' },
-  { html: `${M('√(z_1z_2) = √(z_1)√(z_2)')} pour tous z₁, z₂`, truth: false, rule: 'c_sqrt_i' },
-  { html: `l'équation ${M('e^z = 0')} a une solution`, truth: false },
-  { html: `${M('|sin(z)|')} ≤ 1 pour tout z`, truth: false, rule: 'c_cos_bounded' },
+  { html: t('{a} pour tous z₁, z₂ non nuls', { a: M('Log(z_1z_2) = Log(z_1)+Log(z_2)') }), truth: false, rule: 'c_log_branch' },
+  { html: t('{a} pour tous z₁, z₂', { a: M('√(z_1z_2) = √(z_1)√(z_2)') }), truth: false, rule: 'c_sqrt_i' },
+  { html: t('l\'équation {a} a une solution', { a: M('e^z = 0') }), truth: false },
+  { html: t('{a} ≤ 1 pour tout z', { a: M('|sin(z)|') }), truth: false, rule: 'c_cos_bounded' },
 ];
 
 function efMcq(level, rng, opts) {
   if (opts.multi) {
     const s = multiOf(rng, EF_STATEMENTS, 5);
-    return choice({ skill: EF, level, multi: true, key: `multi:${s.map((x) => EF_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: 'Cochez les affirmations vraies.', options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
+    return choice({ skill: EF, level, multi: true, key: `multi:${s.map((x) => EF_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: t('Cochez les affirmations vraies.'), options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
   }
   const d = logData(rng, 5);
-  const t = d.t;
-  const other = t.valueOf() > 0 ? t.sub(2) : t.add(2);
+  const tt = d.t;
+  const other = tt.valueOf() > 0 ? tt.sub(2) : tt.add(2);
   const lnBad = d.r === '√2' ? 'ln(2)' : d.r === '2' ? 'ln(4)' : d.r === '3' ? 'ln(9)' : d.r === '2√2' ? 'ln(8)' : 'ln(2)';
   return choice({
     skill: EF, level, key: `mcq:${d.key}`, exam: examTag(opts, 2),
@@ -259,11 +260,11 @@ function efMcq(level, rng, opts) {
     right: M(d.logT),
     wrongs: [
       opt(joinT([d.ln, piIT(other)]), 'c_log_branch'),
-      opt(joinT([lnBad, piIT(t)])),
-      t.n ? opt(joinT([d.ln, piIT(t.neg())])) : null,
-      opt(joinT([d.ln, piIT(t), '2kπi'])),
+      opt(joinT([lnBad, piIT(tt)])),
+      tt.n ? opt(joinT([d.ln, piIT(tt.neg())])) : null,
+      opt(joinT([d.ln, piIT(tt), '2kπi'])),
     ],
-    solution: [{ html: `|z| = ${M(d.r)}, Arg z = ${M(piT(t))} ∈ ]−π ; π], donc ${M(`Log(${d.z}) = ${d.logT}`)}.`, note: '' }],
+    solution: [{ html: t('|z| = {r}, Arg z = {a} ∈ ]−π ; π], donc {b}.', { r: M(d.r), a: M(piT(tt)), b: M(`Log(${d.z}) = ${d.logT}`) }), note: '' }],
   }, rng);
 }
 
@@ -273,30 +274,30 @@ function efMcq(level, rng, opts) {
 
 const EQ = 'c-equations';
 const EQ_SUB = [
-  { id: 'substitute', label: 'poser w = e^z', skill: EQ },
-  { id: 'polynomial', label: 'équation polynomiale en w', skill: EQ },
-  { id: 'roots', label: 'racines du trinôme', skill: 'g8-quadratic' },
+  { id: 'substitute', label: t('poser w = e^z'), skill: EQ },
+  { id: 'polynomial', label: t('équation polynomiale en w'), skill: EQ },
+  { id: 'roots', label: t('racines du trinôme'), skill: 'g8-quadratic' },
   { id: 'log', label: 'e^z = w ⟺ z = Log w + 2kπi', skill: 'c-elem-fn' },
 ];
 
 const W1 = ['1', '-1', 'i', '-i', '2', '-2', '1/2', '-1/2', '2i', '-2i', 'i/2', '-i/2', '3', '1/3', 'i/3', '-i/3', '3i', '-3i', '1+i', '1-i', '-1+i', '-1-i'];
-const parseCQ = (t) => exactComplex(parse(t, { complex: true }), {});
+const parseCQ = (tt) => exactComplex(parse(tt, { complex: true }), {});
 const LN = (r2) => ({ 1: '', 4: 'ln(2)', '1/4': '-ln(2)', 9: 'ln(3)', '1/9': '-ln(3)', 2: 'ln(√2)' })[String(r2)];
 // Log w as text, or null.
 function logText(w) {
   const r2 = w.abs2();
   const ln = LN(r2.toString());
   if (ln === undefined) return null;
-  const t = Math.round((carg(w.toFloat()) / Math.PI) * 4);
-  return joinT([ln, piIT(q(t, 4))]);
+  const tt = Math.round((carg(w.toFloat()) / Math.PI) * 4);
+  return joinT([ln, piIT(q(tt, 4))]);
 }
 // −i·Log w as text (z with w = e^(iz)).
 function logIText(w) {
   const r2 = w.abs2();
   const ln = LN(r2.toString());
   if (ln === undefined) return null;
-  const t = Math.round((carg(w.toFloat()) / Math.PI) * 4);
-  const re = piT(q(t, 4));
+  const tt = Math.round((carg(w.toFloat()) / Math.PI) * 4);
+  const re = piT(q(tt, 4));
   const im = ln ? (ln.startsWith('-') ? `i·${ln.slice(1)}` : `-i·${ln}`) : '';
   return joinT([re, im]);
 }
@@ -386,42 +387,42 @@ function eqParts(d, level) {
   const cfg1 = CF({ sols: d.sols, roots: d.roots, period: d.period, periodText: d.periodText, final: 'poly' });
   const cfg3 = CF({ sols: d.sols, roots: d.roots, period: d.period, periodText: d.periodText, final: 'family' });
   const decision = {
-    kind: 'decision', prompt: 'Quel changement de variable ?', levels: [2, 3], options: [
-      { id: 'ez', label: 'w = e^z', valid: hyp, ...(hyp ? {} : { why: 'cos z et sin z s\'écrivent avec e^(iz) : pose w = e^(iz).' }) },
-      { id: 'eiz', label: 'w = e^(iz)', valid: !hyp, ...(!hyp ? {} : { why: 'cosh z et sinh z s\'écrivent avec e^z : pose w = e^z.' }) },
-      { id: 'z2', label: 'w = z²', valid: false, why: 'L\'équation n\'est pas polynomiale en z.' },
+    kind: 'decision', prompt: t('Quel changement de variable ?'), levels: [2, 3], options: [
+      { id: 'ez', label: 'w = e^z', valid: hyp, ...(hyp ? {} : { why: t('cos z et sin z s\'écrivent avec e^(iz) : pose w = e^(iz).') }) },
+      { id: 'eiz', label: 'w = e^(iz)', valid: !hyp, ...(!hyp ? {} : { why: t('cosh z et sinh z s\'écrivent avec e^z : pose w = e^z.') }) },
+      { id: 'z2', label: 'w = z²', valid: false, why: t('L\'équation n\'est pas polynomiale en z.') },
     ],
   };
   const Dneg = d.D.im.n === 0 && d.D.re.n < 0;
-  const notes = Dneg ? [`Δ = ${rd(zt(d.D))} < 0 : ses racines carrées sont imaginaires (√(−a) = i√a).`] : [];
+  const notes = Dneg ? [t('Δ = {a} < 0 : ses racines carrées sont imaginaires (√(−a) = i√a).', { a: rd(zt(d.D)) })] : [];
   return [
     {
-      html: level <= 3 ? `${hyp ? 'cosh z = (w + 1/w)/2 et sinh z = (w − 1/w)/2' : d.kind === 'cos' ? 'cos z = (w + 1/w)/2' : 'sin z = (w − 1/w)/(2i)'}, avec ${d.sub} ≠ 0.` : '',
+      html: level <= 3 ? t('{a}, avec {sub} ≠ 0.', { a: hyp ? t('cosh z = (w + 1/w)/2 et sinh z = (w − 1/w)/2') : d.kind === 'cos' ? 'cos z = (w + 1/w)/2' : 'sin z = (w − 1/w)/(2i)', sub: d.sub }) : '',
       start: d.eqT, judge: cfg1, decisions: [decision],
       lines: [
         eq(d.subT, `${d.sub}`, 'substitute', ['w+1/w']),
-        eq(d.poly, 'multiplier par 2w (w ≠ 0), simplifier', 'polynomial', [d.poly.split(' = ')[0]]),
+        eq(d.poly, t('multiplier par 2w (w ≠ 0), simplifier'), 'polynomial', [d.poly.split(' = ')[0]]),
       ],
       menu: [
-        { id: 'sub', label: `Poser ${d.sub}`, valid: true },
-        { id: 'mult', label: 'Multiplier par 2w', valid: true },
-        { id: 'log', label: 'Prendre le Log des deux côtés', valid: false, why: 'Il faut d\'abord une équation en w.' },
+        { id: 'sub', label: t('Poser {sub}', { sub: d.sub }), valid: true },
+        { id: 'mult', label: t('Multiplier par 2w'), valid: true },
+        { id: 'log', label: t('Prendre le Log des deux côtés'), valid: false, why: t('Il faut d\'abord une équation en w.') },
       ],
     },
     {
-      html: 'Les racines du trinôme en w :', ask: 'w :', start: d.poly, judge: SETW, notes,
-      lines: [eq(`w = ${d.roots[0]} ou w = ${d.roots[1]}`, 'formule du trinôme', 'roots', d.roots)],
+      html: t('Les racines du trinôme en w :'), ask: 'w :', start: d.poly, judge: SETW, notes,
+      lines: [eq(`w = ${d.roots[0]} ou w = ${d.roots[1]}`, t('formule du trinôme'), 'roots', d.roots)],
       menu: [
-        { id: 'delta', label: 'Δ = b² − 4ac, puis (−b ± δ)/(2a) avec δ² = Δ', valid: true },
-        { id: 'sqrt', label: 'Prendre √Δ = −√|Δ| quand Δ < 0', valid: false, rule: 'c_sqrt_i', why: 'Si Δ < 0, ses racines carrées sont ±i√|Δ|.' },
+        { id: 'delta', label: t('Δ = b² − 4ac, puis (−b ± δ)/(2a) avec δ² = Δ'), valid: true },
+        { id: 'sqrt', label: t('Prendre √Δ = −√|Δ| quand Δ < 0'), valid: false, rule: 'c_sqrt_i', why: t('Si Δ < 0, ses racines carrées sont ±i√|Δ|.') },
       ],
     },
     {
-      html: level >= 4 ? 'Les solutions en z :' : hyp ? 'e^z = w ⟺ z = Log w + 2kπi :' : 'e^(iz) = w ⟺ iz = Log w + 2kπi ⟺ z = −i Log w + 2kπ :', ask: 'z :', start: `w = ${d.roots[0]} ou w = ${d.roots[1]}`, judge: cfg3,
+      html: level >= 4 ? t('Les solutions en z :') : hyp ? 'e^z = w ⟺ z = Log w + 2kπi :' : 'e^(iz) = w ⟺ iz = Log w + 2kπi ⟺ z = −i Log w + 2kπ :', ask: 'z :', start: `w = ${d.roots[0]} ou w = ${d.roots[1]}`, judge: cfg3,
       lines: [...(d.needLog && level !== 1 ? [eq(d.logLine, hyp ? 'z = Log w + 2kπi' : 'z = −i Log w + 2kπ', 'log')] : []), eq(d.fam, 'Log w = ln|w| + i Arg w', 'log', d.sols.filter((x) => x && x !== '0'))],
       menu: [
         { id: 'fam', label: hyp ? 'z = Log w + 2kπi, k ∈ ℤ' : 'z = −i Log w + 2kπ, k ∈ ℤ', valid: true },
-        { id: 'one', label: 'z = Log w (une seule solution)', valid: false, rule: 'c_exp_periodic', why: 'e^z est 2πi-périodique : il y a une famille de solutions.' },
+        { id: 'one', label: t('z = Log w (une seule solution)'), valid: false, rule: 'c_exp_periodic', why: t('e^z est 2πi-périodique : il y a une famille de solutions.') },
       ],
     },
   ];
@@ -432,26 +433,26 @@ function eqLines(level, rng, opts) {
   const parts = eqParts(d, level);
   return linesOf({
     level, skill: EQ, key: `${EQ}:${level}:${d.key}`, keys: [...KEYS, 'set'], exam: examTag(opts, 3), subgoals: EQ_SUB,
-    prompt: `Résous dans ℂ : ${M(d.eqT)}.`,
+    prompt: t('Résous dans ℂ : {eqT}.', { eqT: M(d.eqT) }),
     parts,
-    hints: H(`Pose ${d.sub} : ${d.kind === 'hyp' ? 'cosh z = (w + 1/w)/2, sinh z = (w − 1/w)/2' : d.kind === 'cos' ? 'cos z = (w + 1/w)/2' : 'sin z = (w − 1/w)/(2i)'}.`, `${M(d.poly)}, puis ${M(`w = ${d.roots[0]} ou w = ${d.roots[1]}`)}`, M(d.fam)),
+    hints: H(t('Pose {sub} : {a}.', { sub: d.sub, a: d.kind === 'hyp' ? 'cosh z = (w + 1/w)/2, sinh z = (w − 1/w)/2' : d.kind === 'cos' ? 'cos z = (w + 1/w)/2' : 'sin z = (w − 1/w)/(2i)' }), t('{poly}, puis {a}', { poly: M(d.poly), a: M(`w = ${d.roots[0]} ou w = ${d.roots[1]}`) }), M(d.fam)),
   });
 }
 
 const EQ_STATEMENTS = [
   { html: `${M('e^z = 1 ⇔ z = 2kπi')}, k ∈ ℤ`, truth: true },
-  { html: `${M('e^z = -1')} n'a pas de solution`, truth: false },
+  { html: t('{a} n\'a pas de solution', { a: M('e^z = -1') }), truth: false },
   { html: `${M('e^z = i ⇔ z = iπ/2')}`, truth: false, rule: 'c_exp_periodic' },
-  { html: `${M('cos(z) = 2')} a des solutions dans ℂ`, truth: true },
+  { html: t('{a} a des solutions dans ℂ', { a: M('cos(z) = 2') }), truth: true },
   { html: `${M('sinh(z) = 0 ⇔ z = kπi')}, k ∈ ℤ`, truth: true },
-  { html: `les racines carrées de ${M('-16')} sont ±4`, truth: false, rule: 'c_sqrt_i' },
-  { html: `${M('cosh(z) = 0')} n'a pas de solution`, truth: false },
+  { html: t('les racines carrées de {a} sont ±4', { a: M('-16') }), truth: false, rule: 'c_sqrt_i' },
+  { html: t('{a} n\'a pas de solution', { a: M('cosh(z) = 0') }), truth: false },
 ];
 
 function eqMcq(level, rng, opts) {
   if (opts.multi) {
     const s = multiOf(rng, EQ_STATEMENTS, 5);
-    return choice({ skill: EQ, level, multi: true, key: `multi:${s.map((x) => EQ_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: 'Cochez les affirmations vraies.', options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
+    return choice({ skill: EQ, level, multi: true, key: `multi:${s.map((x) => EQ_STATEMENTS.indexOf(x)).join('')}`, exam: examTag(opts, 2), prompt: t('Cochez les affirmations vraies.'), options: s.map((x) => ({ html: x.html, correct: x.truth, rule: x.truth ? null : x.rule ?? null })) }, rng);
   }
   const d = eqData(rng);
   const per = d.periodText;
@@ -461,10 +462,10 @@ function eqMcq(level, rng, opts) {
   const conjT = d.kind === 'hyp' ? `z = ${famT(logText(parseCQ(d.roots[0]).conj()), per)} ou z = ${famT(logText(parseCQ(d.roots[1]).conj()), per)} ; k ∈ ℤ` : `z = ${famT(logText(parseCQ(d.roots[0])), per)} ou z = ${famT(logText(parseCQ(d.roots[1])), per)} ; k ∈ ℤ`;
   return choice({
     skill: EQ, level, key: `mcq:${d.key}`, exam: examTag(opts, 2),
-    prompt: `L'ensemble des solutions de ${M(d.eqT)} est :`,
+    prompt: t('L\'ensemble des solutions de {eqT} est :', { eqT: M(d.eqT) }),
     right: M(d.fam),
     wrongs: [opt(pts, 'c_exp_periodic'), opt(halfT), opt(conjT)],
-    solution: [{ html: `${d.sub} : ${M(d.poly)}, ${M(`w = ${d.roots[0]} ou w = ${d.roots[1]}`)}, d'où ${M(d.fam)}.`, note: '' }],
+    solution: [{ html: t('{sub} : {poly}, {a}, d\'où {fam}.', { sub: d.sub, poly: M(d.poly), a: M(`w = ${d.roots[0]} ou w = ${d.roots[1]}`), fam: M(d.fam) }), note: '' }],
     expectedSec: 150,
   }, rng);
 }

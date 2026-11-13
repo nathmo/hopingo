@@ -14,14 +14,15 @@
 import { mcq, examTag } from './kit.js';
 import { refCode, codeItem, codeMcq, readtableItem, multiMcq, tableHtml } from './numerique-kit.js';
 import { H, pyValue, eText , withThen } from './numerique-h-kit.js';
+import { t } from '../../i18n.js';
 
 const BN = 'n-bvp-newton';
 const SUB = [
-  { id: 'F', label: 'le vecteur F', skill: BN },
-  { id: 'jacobian', label: 'la jacobienne DF', skill: 'n-newton-system' },
-  { id: 'spd', label: 'DF symétrique définie positive', skill: 'n-bvp-fd' },
+  { id: 'F', label: t('le vecteur F'), skill: BN },
+  { id: 'jacobian', label: t('la jacobienne DF'), skill: 'n-newton-system' },
+  { id: 'spd', label: t('DF symétrique définie positive'), skill: 'n-bvp-fd' },
   { id: 'cholesky', label: 'Cholesky tridiagonal', skill: 'm-cholesky' },
-  { id: 'solve', label: 'descente et remontée', skill: 'n-thomas' },
+  { id: 'solve', label: t('descente et remontée'), skill: 'n-thomas' },
 ];
 
 // g, its derivative (Python, with x[i] and x[0] / x[N - 1] spellings).
@@ -113,29 +114,29 @@ function data(rng) {
   return CACHE.get(k);
 }
 
-const hints = (d) => H('La jacobienne d\'un terme diagonal g(xᵢ) est diag(g′(xᵢ)) ; Cholesky : ℓᵢ₊₁,ᵢ₊₁² + ℓᵢ₊₁,ᵢ² = aᵢ₊₁.',
+const hints = (d) => H(t('La jacobienne d\'un terme diagonal g(xᵢ) est diag(g′(xᵢ)) ; Cholesky : ℓᵢ₊₁,ᵢ₊₁² + ℓᵢ₊₁,ᵢ² = aᵢ₊₁.'),
   `a[i] = 2*coeff + d/dx(□) ; a[i + 1] = math.sqrt(a[i + 1] - □)`,
-  `a[i] = 2*coeff + ${d.G.J('x[i]')}, b[i] contient ${d.G.F('x[i]')}, et a[i + 1] = math.sqrt(a[i + 1] - c[i] * c[i]).`);
+  t('a[i] = 2*coeff + {J}, b[i] contient {F}, et a[i + 1] = math.sqrt(a[i + 1] - c[i] * c[i]).', { J: d.G.J('x[i]'), F: d.G.F('x[i]') }));
 
-const PROMPT = (d) => `On résout F(x) = 0 avec F(x) = (N + 1)²·tridiag(−1, 2, −1)·x + (g(xᵢ))ᵢ, g(x) = ${d.G.g}, par Newton : DF(xⁿ)(xⁿ − xⁿ⁺¹) = F(xⁿ). DF est tridiagonale symétrique définie positive : on la factorise par Cholesky (a : diagonale de L, c : sous-diagonale de L), puis on résout L z = F et Lᵀ y = z, en place dans b. Traduction de exam1.m (2020), indices à partir de 0.`;
+const PROMPT = (d) => t('On résout F(x) = 0 avec F(x) = (N + 1)²·tridiag(−1, 2, −1)·x + (g(xᵢ))ᵢ, g(x) = {g}, par Newton : DF(xⁿ)(xⁿ − xⁿ⁺¹) = F(xⁿ). DF est tridiagonale symétrique définie positive : on la factorise par Cholesky (a : diagonale de L, c : sous-diagonale de L), puis on résout L z = F et Lᵀ y = z, en place dans b. Traduction de exam1.m (2020), indices à partir de 0.', { g: d.G.g });
 
 function stopsTable(d) {
   const n = Math.max(d.s9.length, d.s19.length);
   const rows = Array.from({ length: n }, (_, k) => [String(k + 1), d.s9[k] !== undefined ? eText(d.s9[k]) : '', d.s19[k] !== undefined ? eText(d.s19[k]) : '']);
-  return { columns: ['itération', 'stop, N = 9', 'stop, N = 19'], rows };
+  return { columns: [t('itération'), 'stop, N = 9', 'stop, N = 19'], rows };
 }
 function stopsQuestion(rng, d, level) {
   return multiMcq({
     skill: BN, level, key: `${BN}:stops:${d.G.g}`,
-    prompt: 'Le programme affiche stop = ‖xⁿ⁺¹ − xⁿ‖/‖xⁿ⁺¹‖ à chaque itération, pour N = 9 et N = 19 (départ x = 1). Que peut-on en déduire ?',
+    prompt: `${t('Le programme affiche stop = ‖xⁿ⁺¹ − xⁿ‖/‖xⁿ⁺¹‖ à chaque itération, pour N = 9 et N = 19 (départ x = 1).')} ${t('Que peut-on en déduire ?')}`,
     options: [
-      { html: 'Newton converge quadratiquement pour ce point de départ', correct: true },
-      { html: 'Le nombre d\'itérations ne dépend presque pas de N', correct: true },
-      { html: 'Newton converge quadratiquement quel que soit le point de départ', correct: false },
-      { html: 'Newton diverge', correct: false },
-      { html: 'La méthode est d\'ordre 1, car stop est divisé par plus de 10 à chaque pas', correct: false, rule: 'n_order_simple_ratio' },
+      { html: t('Newton converge quadratiquement pour ce point de départ'), correct: true },
+      { html: t('Le nombre d\'itérations ne dépend presque pas de N'), correct: true },
+      { html: t('Newton converge quadratiquement quel que soit le point de départ'), correct: false },
+      { html: t('Newton diverge'), correct: false },
+      { html: t('La méthode est d\'ordre 1, car stop est divisé par plus de 10 à chaque pas'), correct: false, rule: 'n_order_simple_ratio' },
     ],
-    solution: [{ html: 'Les exposants doublent (10⁻², 10⁻⁷, 10⁻¹⁵) : convergence quadratique, pour ce départ seulement.', note: '' }],
+    solution: [{ html: t('Les exposants doublent (10⁻², 10⁻⁷, 10⁻¹⁵) : convergence quadratique, pour ce départ seulement.'), note: '' }],
   }, rng);
 }
 
@@ -153,14 +154,14 @@ function codeLevel(level, rng) {
   else blanks = R.answers.map((_, k) => k);
   const then = level === 5 ? readtableItem({
     skill: BN, level, key: `${BN}:read:${d.G.g}`,
-    prompt: 'Le programme complet affiche les valeurs de stop :',
+    prompt: t('Le programme complet affiche les valeurs de stop :'),
     table: stopsTable(d), question: stopsQuestion(rng, d, level),
   }) : null;
   return withThen(codeItem({
     skill: BN, level, ref: R, blanks, choice, rng, traps: d.traps, wrong: WRONG,
     fillers: { 0: [d.G.Jraw('x[i]')], 2: [d.G.Jbad('x[i]')], 5: ['c[i]'], 7: ['d[i] * b[i]'] },
     preludes: ['vec'], maxSteps: 300000,
-    prompt: `${PROMPT(d)} ${level === 1 ? 'Choisis ce qui manque.' : 'Complète les trous.'}`,
+    prompt: level === 1 ? t('{p} Choisis ce qui manque.', { p: PROMPT(d) }) : t('{p} Complète les trous.', { p: PROMPT(d) }),
     tests: d.tests, then,
     hints: level >= 5 ? [] : hints(d), subgoals: SUB, key: `${level}:${d.G.g}:${blanks.join('')}`,
   }));
@@ -183,18 +184,19 @@ function examMcq(rng, opts) {
   }
   if (r === 2) {
     const qz = stopsQuestion(rng, d, 4);
-    return { ...qz, prompt: qz.prompt.replace(' Que peut-on', `${tableHtml(stopsTable(d))}Que peut-on`), exam: examTag(opts), key: `${BN}:examstops:${d.G.g}` };
+    const ask = t('Que peut-on en déduire ?');
+    return { ...qz, prompt: qz.prompt.replace(` ${ask}`, `${tableHtml(stopsTable(d))}${ask}`), exam: examTag(opts), key: `${BN}:examstops:${d.G.g}` };
   }
   return multiMcq({
     skill: BN, level: 4, key: `${BN}:unique:${d.G.g}`, exam: examTag(opts),
-    prompt: `F(x) = (N + 1)²·T·x + (g(xᵢ))ᵢ, T = tridiag(−1, 2, −1), g(x) = ${d.G.g} (g croissante). Cocher les affirmations vraies.`,
+    prompt: t('F(x) = (N + 1)²·T·x + (g(xᵢ))ᵢ, T = tridiag(−1, 2, −1), g(x) = {g} (g croissante). Cocher les affirmations vraies.', { g: d.G.g }),
     options: [
-      { html: 'DF(x) = (N + 1)²·T + diag(g′(xᵢ)) est symétrique définie positive', correct: true },
-      { html: 'Si F(x) = F(y) = 0, alors x = y', correct: true },
+      { html: t('DF(x) = (N + 1)²·T + diag(g′(xᵢ)) est symétrique définie positive'), correct: true },
+      { html: t('Si F(x) = F(y) = 0, alors x = y'), correct: true },
       { html: `DF(x) = (N + 1)²·T + diag(g(xᵢ))`, correct: false, rule: 'n_jacobian_vs_F' },
-      { html: 'Newton converge quel que soit le point de départ', correct: false },
+      { html: t('Newton converge quel que soit le point de départ'), correct: false },
     ],
-    solution: [{ html: '(N + 1)²(x − y)ᵀT(x − y) + Σ(g(xᵢ) − g(yᵢ))(xᵢ − yᵢ) = 0, deux termes ≥ 0 (T SDP, g croissante) : x = y.', note: '' }],
+    solution: [{ html: t('(N + 1)²(x − y)ᵀT(x − y) + Σ(g(xᵢ) − g(yᵢ))(xᵢ − yᵢ) = 0, deux termes ≥ 0 (T SDP, g croissante) : x = y.'), note: '' }],
   }, rng);
 }
 

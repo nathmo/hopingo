@@ -6,6 +6,7 @@
 // choice lets the student go on, and its reason comes with the next block.
 
 import { h, html, play } from './dom.js';
+import { t } from '../i18n.js';
 import { MathInput } from './keypad.js';
 import { keysFor } from './keys-needed.js';
 import { explainRule, solutionHtml } from './exercises.js';
@@ -77,10 +78,10 @@ export function mountBlocks(item, ctx, body) {
 
   // A block of the frame: the calculation is typed, then the block is placed.
   function askInput(b, btn) {
-    input = new MathInput({ keysets: keysFor(b.input.keys || ['calc', 'relation'], [b.input.answer ?? '']), placeholder: 'ton calcul', onEnter: () => send() });
+    input = new MathInput({ keysets: keysFor(b.input.keys || ['calc', 'relation'], [b.input.answer ?? '']), placeholder: t('ton calcul'), onEnter: () => send() });
     const send = () => { if (input.value) tap(b, btn, input.value); };
     stage.replaceChildren(h('div.step-label', b.input.ask), h('div.step-line.current', input.display));
-    footer.replaceChildren(input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: send }, 'Valider le calcul'));
+    footer.replaceChildren(input.keypad(), h('button.btn.primary.wide', { type: 'button', onclick: send }, t('Valider le calcul')));
   }
 
   function decisionTask() {
@@ -95,7 +96,7 @@ export function mountBlocks(item, ctx, body) {
           if (o.rule) rules.push(o.rule);
           b.classList.add('wrong');
           b.disabled = true;
-          say(o.rule ? explainRule(o.rule) : `<p>${o.why || 'Ce n\'est pas le bon choix.'}</p>`, 'bad');
+          say(o.rule ? explainRule(o.rule) : `<p>${o.why || t('Ce n\'est pas le bon choix.')}</p>`, 'bad');
           return;
         }
         play('tap');

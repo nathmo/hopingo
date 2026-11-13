@@ -20,6 +20,7 @@ import { mcq, examTag } from './kit.js';
 import { partsItem } from './geo-kit.js';
 import { refCode, codeItem, readtableItem, multiMcq } from './numerique-kit.js';
 import { q, qt, fq, H, menuOf, opts4, pyValue , withThen } from './numerique-h-kit.js';
+import { t } from '../../i18n.js';
 
 const FE = 'n-fem-hat';
 const KK = 'n-opt-kkt';
@@ -29,12 +30,12 @@ const KK = 'n-opt-kkt';
 // ======================================================================
 
 const FE_SUB = [
-  { id: 'weak', label: 'forme faible (intégration par parties)', skill: 'a1-int-parts' },
-  { id: 'space', label: 'l\'espace V', skill: FE },
+  { id: 'weak', label: t('forme faible (intégration par parties)'), skill: 'a1-int-parts' },
+  { id: 'space', label: t('l\'espace V'), skill: FE },
   { id: 'stiffness', label: '∫(φ′)²', skill: FE },
   { id: 'load', label: '∫fφ', skill: FE },
   { id: 'solve', label: 'α', skill: FE },
-  { id: 'matrix', label: 'la matrice tridiagonale', skill: 'n-bvp-fd' },
+  { id: 'matrix', label: t('la matrice tridiagonale'), skill: 'n-bvp-fd' },
 ];
 const CENTRES = [q(1, 2), q(1, 3), q(1, 4), q(2, 3), q(3, 4)];
 const FS = [
@@ -54,41 +55,41 @@ function feData(rng, { centred = false } = {}) {
   return { c, fd, K, F, al, s1, s2 };
 }
 const coefT = (k) => (k.eq(1) ? '' : k.d === 1 ? fq(k) : `(${fq(k)})`);
-const hatText = (d) => `φ₁ est la fonction chapeau de sommet (${fq(d.c)} ; 1) : φ₁ = ${coefT(d.s1)}x sur [0 ; ${fq(d.c)}], ${coefT(d.s2)}(1 − x) sur [${fq(d.c)} ; 1]`;
+const hatText = (d) => t('φ₁ est la fonction chapeau de sommet ({c} ; 1) : φ₁ = {s1}x sur [0 ; {c}], {s2}(1 − x) sur [{c} ; 1]', { c: fq(d.c), s1: coefT(d.s1), s2: coefT(d.s2) });
 
 function feVMcq(rng, level, exam) {
   const neumann = rng.chance(0.4);
-  const base = '{g continue sur [0 ; 1], g′ continue par morceaux';
+  const base = t('{g continue sur [0 ; 1], g′ continue par morceaux');
   const right = neumann ? `${base}, g(0) = 0}` : `${base}, g(0) = g(1) = 0}`;
   return mcq({
     skill: FE, level, key: `${FE}:V:${neumann}`, exam: exam || false,
-    prompt: `On écrit la forme faible de −u″ = f sur ]0 ; 1[, u(0) = 0, ${neumann ? 'u′(1) = 0' : 'u(1) = 0'} : trouver u ∈ V tel que ∫u′v′ = ∫fv pour tout v ∈ V. Quel est l'espace V ?`,
+    prompt: t('On écrit la forme faible de −u″ = f sur ]0 ; 1[, u(0) = 0, {v1} : trouver u ∈ V tel que ∫u′v′ = ∫fv pour tout v ∈ V. Quel est l\'espace V ?', { v1: neumann ? 'u′(1) = 0' : 'u(1) = 0' }),
     options: opts4(right, [
       { html: `${base}}`, rule: 'n_weak_space_bc' },
       { html: neumann ? `${base}, g(0) = g(1) = 0}` : `${base}, g(0) = 0}`, rule: 'n_weak_space_bc' },
       { html: `${base}, g′(0) = g′(1) = 0}`, rule: 'n_weak_space_bc' },
     ]),
-    solution: [{ html: neumann ? 'La condition de Dirichlet u(0) = 0 entre dans V ; la condition de Neumann u′(1) = 0 sort de l\'intégration par parties : elle est naturelle.' : 'Les deux conditions de Dirichlet entrent dans V : [u′v] s\'annule car v(0) = v(1) = 0.', note: '' }],
+    solution: [{ html: neumann ? t('La condition de Dirichlet u(0) = 0 entre dans V ; la condition de Neumann u′(1) = 0 sort de l\'intégration par parties : elle est naturelle.') : t('Les deux conditions de Dirichlet entrent dans V : [u′v] s\'annule car v(0) = v(1) = 0.'), note: '' }],
   }, rng);
 }
 
 function feParts(d, level) {
-  const MENU = [{ id: 'K', label: 'Calculer ∫(φ₁′)²' }, { id: 'F', label: 'Calculer ∫fφ₁' }, { id: 'al', label: 'Résoudre α·∫(φ₁′)² = ∫fφ₁' }];
+  const MENU = [{ id: 'K', label: 'Calculer ∫(φ₁′)²' }, { id: 'F', label: 'Calculer ∫fφ₁' }, { id: 'al', label: t('Résoudre α·∫(φ₁′)² = ∫fφ₁') }];
   const M = (id) => (level === 3 ? menuOf(MENU, id) : undefined);
   const lc = q(1).sub(d.c);
   return [
     {
-      html: `∫₀¹ (φ₁′)² : φ₁′ = ${fq(d.s1)} sur ]0 ; ${fq(d.c)}[, ${fq(d.s2.neg())} sur ]${fq(d.c)} ; 1[.`, ask: '∫(φ₁′)² =',
+      html: t('∫₀¹ (φ₁′)² : φ₁′ = {s1} sur ]0 ; {c}[, {v1} sur ]{c} ; 1[.', { s1: fq(d.s1), c: fq(d.c), v1: fq(d.s2.neg()) }), ask: '∫(φ₁′)² =',
       start: `(${qt(d.s1)})^2×${qt(d.c)}+(${qt(d.s2)})^2×${qt(lc)}`,
       judge: { kind: 'value', expect: qt(d.K), form: 'irreducible', ntraps: { n_hat_derivative: [...new Set(['2', qt(d.s1.mul(d.s1).add(d.s2.mul(d.s2)))])].filter((x) => x !== qt(d.K)) } },
       menu: M('K'),
-      lines: [{ math: qt(d.K), note: 'pente² × longueur, sur chaque morceau', subgoal: 'stiffness', blank: [qt(d.K)] }],
+      lines: [{ math: qt(d.K), note: t('pente² × longueur, sur chaque morceau'), subgoal: 'stiffness', blank: [qt(d.K)] }],
     },
     {
-      html: `∫₀¹ f·φ₁ avec f = ${d.fd.f}.`, ask: '∫fφ₁ =', start: 'F',
+      html: t('∫₀¹ f·φ₁ avec f = {f}.', { f: d.fd.f }), ask: '∫fφ₁ =', start: 'F',
       judge: { kind: 'value', expect: qt(d.F), form: 'irreducible' },
       menu: M('F'),
-      lines: [{ math: qt(d.F), note: d.fd.f === 'x' ? '∫₀ᶜ x²/c + ∫꜀¹ x(1 − x)/(1 − c)' : `${d.fd.f} × aire du triangle (base 1, hauteur 1)`, subgoal: 'load', blank: [qt(d.F)] }],
+      lines: [{ math: qt(d.F), note: d.fd.f === 'x' ? '∫₀ᶜ x²/c + ∫꜀¹ x(1 − x)/(1 − c)' : t('{f} × aire du triangle (base 1, hauteur 1)', { f: d.fd.f }), subgoal: 'load', blank: [qt(d.F)] }],
     },
     {
       html: 'u_h = αφ₁ et v = φ₁ : α·∫(φ₁′)² = ∫fφ₁.', ask: 'α =',
@@ -96,26 +97,28 @@ function feParts(d, level) {
       judge: { kind: 'value', expect: qt(d.al), form: 'irreducible', ntraps: { n_hat_derivative: [...new Set([qt(d.F.div(2)), qt(d.F.mul(2)), qt(d.F.div(d.s1.mul(d.s1).add(d.s2.mul(d.s2))))])].filter((x) => x !== qt(d.al)) } },
       menu: M('al'),
       decisions: [{
-        kind: 'decision', prompt: 'Quelle est la forme faible ?', options: [
-          { id: 'ok', label: '∫u′v′ = ∫fv pour tout v ∈ V', valid: true, ref: true },
-          { id: 'sign', label: '−∫u′v′ = ∫fv pour tout v ∈ V', valid: false, rule: 'n_weak_sign', why: '−∫u″v = −[u′v] + ∫u′v′, et [u′v] = 0 car v(0) = v(1) = 0.' },
-          { id: 'strong', label: '∫u″v = ∫fv pour tout v ∈ V', valid: false, why: 'On intègre par parties pour n\'avoir que des dérivées premières (u ∈ V n\'a pas de dérivée seconde).' },
+        kind: 'decision', prompt: t('Quelle est la forme faible ?'), options: [
+          { id: 'ok', label: t('∫u′v′ = ∫fv pour tout v ∈ V'), valid: true, ref: true },
+          { id: 'sign', label: t('−∫u′v′ = ∫fv pour tout v ∈ V'), valid: false, rule: 'n_weak_sign', why: t('−∫u″v = −[u′v] + ∫u′v′, et [u′v] = 0 car v(0) = v(1) = 0.') },
+          { id: 'strong', label: t('∫u″v = ∫fv pour tout v ∈ V'), valid: false, why: t('On intègre par parties pour n\'avoir que des dérivées premières (u ∈ V n\'a pas de dérivée seconde).') },
         ],
       }],
-      lines: [{ math: qt(d.al), note: `= u(${fq(d.c)}) : la méthode est exacte aux nœuds`, subgoal: 'solve', blank: [qt(d.al)] }],
+      lines: [{ math: qt(d.al), note: t('= u({c}) : la méthode est exacte aux nœuds', { c: fq(d.c) }), subgoal: 'solve', blank: [qt(d.al)] }],
     },
   ];
 }
 function feHints(d) {
-  return H('Avec u_h = αφ₁ et v = φ₁ : α·∫(φ₁′)² = ∫fφ₁.',
-    `φ₁′ vaut ${fq(d.s1)} puis ${fq(d.s2.neg())}, donc ∫(φ₁′)² = □`,
-    `∫(φ₁′)² = ${fq(d.K)}, ∫fφ₁ = ${fq(d.F)}, donc α = ${fq(d.al)}.`);
+  return H(t('Avec u_h = αφ₁ et v = φ₁ : α·∫(φ₁′)² = ∫fφ₁.'),
+    t('φ₁′ vaut {s1} puis {v1}, donc ∫(φ₁′)² = □', { s1: fq(d.s1), v1: fq(d.s2.neg()) }),
+    t('∫(φ₁′)² = {K}, ∫fφ₁ = {F}, donc α = {al}.', { K: fq(d.K), F: fq(d.F), al: fq(d.al) }));
 }
 function feLines(level, rng) {
   const d = feData(rng, { centred: level <= 2 && rng.chance(0.6) });
   return partsItem({
     skill: FE, level, key: `${FE}:${level}:${d.c}:${d.fd.f}`,
-    prompt: `−u″ = ${d.fd.f} sur ]0 ; 1[, u(0) = u(1) = 0. Galerkin avec V_h = span(φ₁), où ${hatText(d)}. Calcule u_h = αφ₁.${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
+    prompt: level === 3
+      ? t('−u″ = {f} sur ]0 ; 1[, u(0) = u(1) = 0. Galerkin avec V_h = span(φ₁), où {hat}. Calcule u_h = αφ₁. Choisis d\'abord chaque action.', { f: d.fd.f, hat: hatText(d) })
+      : t('−u″ = {f} sur ]0 ; 1[, u(0) = u(1) = 0. Galerkin avec V_h = span(φ₁), où {hat}. Calcule u_h = αφ₁.', { f: d.fd.f, hat: hatText(d) }),
     parts: feParts(d, level), keys: ['calc'], subgoals: FE_SUB, hints: feHints(d),
     baits: ['n_hat_derivative', 'n_weak_sign'],
   });
@@ -151,23 +154,23 @@ function feCode(level, rng) {
   });
   const then = readtableItem({
     skill: FE, level, key: `${FE}:read:${N}`,
-    prompt: `fem_hat(${N}) donne les coefficients uⱼ de u_h = Σ uⱼφⱼ ; on les compare à u(x) = x(1 − x)/2 aux nœuds xⱼ.`,
+    prompt: t('fem_hat({N}) donne les coefficients uⱼ de u_h = Σ uⱼφⱼ ; on les compare à u(x) = x(1 − x)/2 aux nœuds xⱼ.', { N }),
     table: { columns: ['xⱼ', 'uⱼ', 'u(xⱼ)'], rows },
     question: multiMcq({
       skill: FE, level, key: `${FE}:readq:${N}`,
-      prompt: 'Cocher les affirmations vraies.',
+      prompt: t('Cocher les affirmations vraies.'),
       options: [
-        { html: 'u_h(xⱼ) = uⱼ = u(xⱼ) : en 1D, la méthode est exacte aux nœuds', correct: true },
-        { html: 'La matrice de rigidité est K = (1/h)·tridiag(−1, 2, −1)', correct: true },
-        { html: 'La matrice de rigidité est K = (1/h²)·tridiag(−1, 2, −1)', correct: false, rule: 'n_bvp_h2_missing' },
-        { html: 'u_h = u sur tout [0 ; 1]', correct: false },
+        { html: t('u_h(xⱼ) = uⱼ = u(xⱼ) : en 1D, la méthode est exacte aux nœuds'), correct: true },
+        { html: t('La matrice de rigidité est K = (1/h)·tridiag(−1, 2, −1)'), correct: true },
+        { html: t('La matrice de rigidité est K = (1/h²)·tridiag(−1, 2, −1)'), correct: false, rule: 'n_bvp_h2_missing' },
+        { html: t('u_h = u sur tout [0 ; 1]'), correct: false },
       ],
-      solution: [{ html: 'Kᵢⱼ = ∫φᵢ′φⱼ′ = (1/h)·(2, −1) et Fᵢ = ∫φᵢ = h. Entre les nœuds, u_h est affine et u est une parabole.', note: '' }],
+      solution: [{ html: t('Kᵢⱼ = ∫φᵢ′φⱼ′ = (1/h)·(2, −1) et Fᵢ = ∫φᵢ = h. Entre les nœuds, u_h est affine et u est une parabole.'), note: '' }],
     }, rng),
   });
   return withThen(codeItem({
     skill: FE, level, ref: FEM, blanks: level === 5 ? [0, 1, 2] : [rng.pick([0, 2])], rng, traps: FEM_TRAPS, preludes: ['vec', 'mat'],
-    prompt: 'Complète la méthode des éléments finis P1 (N fonctions chapeau intérieures, h = 1/(N + 1)) : Kᵢⱼ = ∫φᵢ′φⱼ′, Fᵢ = ∫φᵢ.',
+    prompt: t('Complète la méthode des éléments finis P1 (N fonctions chapeau intérieures, h = 1/(N + 1)) : Kᵢⱼ = ∫φᵢ′φⱼ′, Fᵢ = ∫φᵢ.'),
     tests: FEM_TESTS, then, hints: [], subgoals: FE_SUB, key: `5:${N}`,
   }));
 }
@@ -177,7 +180,7 @@ function feExamMcq(rng, opts) {
   const d = feData(rng);
   return mcq({
     skill: FE, level: 4, key: `${FE}:al:${d.c}:${d.fd.f}`, exam: examTag(opts),
-    prompt: `−u″ = ${d.fd.f} sur ]0 ; 1[, u(0) = u(1) = 0, V₁ = span(φ₁), ${hatText(d)}. On cherche u₁ = αφ₁ par Galerkin. Que vaut α ?`,
+    prompt: t('−u″ = {f} sur ]0 ; 1[, u(0) = u(1) = 0, V₁ = span(φ₁), {d}. On cherche u₁ = αφ₁ par Galerkin. Que vaut α ?', { f: d.fd.f, d: hatText(d) }),
     options: opts4(fq(d.al), [
       { html: fq(d.F.div(2)), rule: 'n_hat_derivative' },
       { html: fq(d.F.mul(2)), rule: 'n_hat_derivative' },
@@ -199,20 +202,20 @@ function feGen(level, rng, profile, opts = {}) {
 // ======================================================================
 
 const KK_SUB = [
-  { id: 'lagrangian', label: 'le lagrangien', skill: 'a2-lagrange' },
+  { id: 'lagrangian', label: t('le lagrangien'), skill: 'a2-lagrange' },
   { id: 'stationarity', label: '∇ₓL = 0', skill: KK },
-  { id: 'cases', label: 'les deux cas de la complémentarité', skill: KK },
-  { id: 'gradient', label: 'gradient d\'une forme quadratique', skill: 'm-quad-gradient' },
+  { id: 'cases', label: t('les deux cas de la complémentarité'), skill: KK },
+  { id: 'gradient', label: t('gradient d\'une forme quadratique'), skill: 'm-quad-gradient' },
 ];
 
 function kkData(rng) {
-  for (let t = 0; t < 100; t++) {
+  for (let tries = 0; tries < 100; tries++) {
     const up = rng.chance(0.5); // x ≤ c (g = c − x) or x ≥ c (g = x − c)
     const a = rng.int(-4, 5);
     const c = rng.int(-2, 3);
     if (a === c) continue;
     const active = up ? a > c : a < c;
-    if (t < 50 && active !== rng.chance(0.5)) continue;
+    if (tries < 50 && active !== rng.chance(0.5)) continue;
     const g = up ? `${c}-x` : `x-${c}`.replace('--', '+');
     const sgn = up ? '+' : '-';
     const x = active ? c : a;
@@ -228,41 +231,41 @@ const fR = (d) => `½(x − ${fq(d.a)})²`.replace('− −', '+ ');
 const lin2 = (b) => [[b[0], 'q₁'], [b[1], 'q₂']].filter(([k]) => k !== 0).map(([k, v], i) => `${k < 0 ? (i ? ' − ' : '−') : i ? ' + ' : ''}${Math.abs(k) === 1 ? '' : Math.abs(k)}${v}`).join('');
 
 function kkParts(d, level) {
-  const MENU = [{ id: 'grad', label: 'Écrire ∂L/∂x = 0' }, { id: 'x', label: 'Traiter les deux cas : x' }, { id: 'lam', label: 'Puis λ' }];
+  const MENU = [{ id: 'grad', label: t('Écrire ∂L/∂x = 0') }, { id: 'x', label: t('Traiter les deux cas : x') }, { id: 'lam', label: t('Puis λ') }];
   const M = (id) => (level === 3 ? menuOf(MENU, id) : undefined);
   const wrongCase = d.active
-    ? { id: 'in', label: `Contrainte inactive : λ = 0, x = ${fq(d.a)}`, valid: false, why: `x = ${fq(d.a)} ne vérifie pas ${gR(d)}.` }
-    : { id: 'act', label: `Contrainte active : x = ${fq(d.c)}, λ = ${fq(d.up ? d.a - d.c : d.c - d.a)}`, valid: false, rule: 'n_kkt_multiplier_sign', why: `Le multiplicateur serait λ = ${fq(d.up ? d.a - d.c : d.c - d.a)} < 0 : ce point n'est pas un minimum sous contrainte.` };
+    ? { id: 'in', label: t('Contrainte inactive : λ = 0, x = {a}', { a: fq(d.a) }), valid: false, why: t('x = {a} ne vérifie pas {d}.', { a: fq(d.a), d: gR(d) }) }
+    : { id: 'act', label: t('Contrainte active : x = {c}, λ = {lam}', { c: fq(d.c), lam: fq(d.up ? d.a - d.c : d.c - d.a) }), valid: false, rule: 'n_kkt_multiplier_sign', why: t('Le multiplicateur serait λ = {v1} < 0 : ce point n\'est pas un minimum sous contrainte.', { v1: fq(d.up ? d.a - d.c : d.c - d.a) }) };
   const okCase = d.active
-    ? { id: 'act', label: `Contrainte active : x = ${fq(d.c)}, λ = ${d.lam}`, valid: true, ref: true }
-    : { id: 'in', label: `Contrainte inactive : λ = 0, x = ${fq(d.a)}`, valid: true, ref: true };
+    ? { id: 'act', label: t('Contrainte active : x = {c}, λ = {lam}', { c: fq(d.c), lam: d.lam }), valid: true, ref: true }
+    : { id: 'in', label: t('Contrainte inactive : λ = 0, x = {a}', { a: fq(d.a) }), valid: true, ref: true };
   return [
     {
-      html: `L(x, λ) = ${fR(d)} − λ·(${gR(d).replace(' ≥ 0', '')}). La stationnarité :`, ask: '∂L/∂x =',
+      html: t('L(x, λ) = {d} − λ·({v1}). La stationnarité :', { d: fR(d), v1: gR(d).replace(' ≥ 0', '') }), ask: '∂L/∂x =',
       start: `d(1/2×(x-${d.a})^2-λ×(${d.g}), x)`.replace('x--', 'x+'),
       judge: { kind: 'equiv', vars: ['x', 'λ'], domain: { x: [-3, 3], λ: [0, 3] }, target: 'no-prime', ntraps: { n_kkt_sign: [d.wrong] } },
       menu: M('grad'),
       decisions: level === 2 ? [{
-        kind: 'decision', prompt: 'Quelle est la condition de complémentarité ?', options: [
+        kind: 'decision', prompt: t('Quelle est la condition de complémentarité ?'), options: [
           { id: 'ok', label: `λ·(${gR(d).replace(' ≥ 0', '')}) = 0`, valid: true, ref: true },
-          { id: 'x', label: 'λ·x = 0', valid: false, rule: 'n_kkt_complementarity', why: 'Chaque multiplicateur multiplie sa contrainte g(x).' },
-          { id: 'sum', label: `λ + (${gR(d).replace(' ≥ 0', '')}) = 0`, valid: false, why: 'C\'est un produit nul : λ = 0 ou g(x) = 0.' },
+          { id: 'x', label: 'λ·x = 0', valid: false, rule: 'n_kkt_complementarity', why: t('Chaque multiplicateur multiplie sa contrainte g(x).') },
+          { id: 'sum', label: `λ + (${gR(d).replace(' ≥ 0', '')}) = 0`, valid: false, why: t('C\'est un produit nul : λ = 0 ou g(x) = 0.') },
         ],
       }] : [],
-      lines: [{ math: d.grad, note: `dérivée de ${fR(d)}, puis de −λ·g`, subgoal: 'stationarity', blank: [`${Math.abs(d.a)}`] }],
+      lines: [{ math: d.grad, note: t('dérivée de {d}, puis de −λ·g', { d: fR(d) }), subgoal: 'stationarity', blank: [`${Math.abs(d.a)}`] }],
     },
     {
-      html: 'Les deux cas : λ = 0, ou la contrainte active (g(x) = 0) ; on garde celui qui respecte g(x) ≥ 0 et λ ≥ 0.', ask: 'x =', start: 'x',
+      html: t('Les deux cas : λ = 0, ou la contrainte active (g(x) = 0) ; on garde celui qui respecte g(x) ≥ 0 et λ ≥ 0.'), ask: 'x =', start: 'x',
       judge: { kind: 'value', expect: String(d.x), form: 'irreducible' },
       menu: M('x'),
-      decisions: level >= 2 ? [{ kind: 'decision', prompt: 'Quel cas ?', options: [okCase, wrongCase] }] : [],
-      lines: [{ math: String(d.x), note: d.active ? `g(x) = 0` : 'λ = 0, donc x − a = 0', subgoal: 'cases', blank: [String(d.x)] }],
+      decisions: level >= 2 ? [{ kind: 'decision', prompt: t('Quel cas ?'), options: [okCase, wrongCase] }] : [],
+      lines: [{ math: String(d.x), note: d.active ? `g(x) = 0` : t('λ = 0, donc x − a = 0'), subgoal: 'cases', blank: [String(d.x)] }],
     },
     {
-      html: 'Le multiplicateur.', ask: 'λ =', start: 'λ',
+      html: t('Le multiplicateur.'), ask: 'λ =', start: 'λ',
       judge: { kind: 'value', expect: String(d.lam), form: 'irreducible' },
       menu: M('lam'),
-      lines: [{ math: String(d.lam), note: d.active ? 'par ∂L/∂x = 0, et λ ≥ 0' : 'contrainte inactive', subgoal: 'cases', blank: [String(d.lam)] }],
+      lines: [{ math: String(d.lam), note: d.active ? t('par ∂L/∂x = 0, et λ ≥ 0') : t('contrainte inactive'), subgoal: 'cases', blank: [String(d.lam)] }],
     },
   ];
 }
@@ -270,11 +273,13 @@ function kkLines(level, rng) {
   const d = kkData(rng);
   return partsItem({
     skill: KK, level, key: `${KK}:${level}:${d.up}:${d.a}:${d.c}`,
-    prompt: `Minimiser f(x) = ${fR(d)} sous la contrainte ${gR(d)}. Écris les conditions KKT et résous-les.${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
+    prompt: level === 3
+      ? t('Minimiser f(x) = {f} sous la contrainte {g}. Écris les conditions KKT et résous-les. Choisis d\'abord chaque action.', { f: fR(d), g: gR(d) })
+      : t('Minimiser f(x) = {f} sous la contrainte {g}. Écris les conditions KKT et résous-les.', { f: fR(d), g: gR(d) }),
     parts: kkParts(d, level), keys: ['calc', 'greek'], subgoals: KK_SUB,
-    hints: H('Écris ∇ₓL = 0, puis traite les deux cas de la complémentarité : λ = 0 ou contrainte active.',
+    hints: H(t('Écris ∇ₓL = 0, puis traite les deux cas de la complémentarité : λ = 0 ou contrainte active.'),
       `∂L/∂x = ${fR(d).slice(1).replace('²', '')} ${d.up ? '+' : '−'} □`,
-      d.active ? `Contrainte active : x = ${fq(d.c)}, λ = ${d.lam} ≥ 0.` : `λ = 0 et x = ${fq(d.a)}, qui respecte ${gR(d)}.`),
+      d.active ? t('Contrainte active : x = {c}, λ = {lam} ≥ 0.', { c: fq(d.c), lam: d.lam }) : t('λ = 0 et x = {a}, qui respecte {d}.', { a: fq(d.a), d: gR(d) })),
     baits: ['n_kkt_sign', 'n_kkt_complementarity', 'n_kkt_multiplier_sign'], fallback: d.fallback,
   });
 }
@@ -289,7 +294,7 @@ function kkEq(level, rng) {
   const qv = b.map((x) => mu.mul(x));
   const parts = [
     {
-      html: 'Le système KKT [[I, −Bᵀ], [B, 0]]·(q ; μ) = (0 ; c) donne q = μ·bᵀ, puis b·q = c. Le multiplicateur :', ask: 'μ =',
+      html: t('Le système KKT [[I, −Bᵀ], [B, 0]]·(q ; μ) = (0 ; c) donne q = μ·bᵀ, puis b·q = c. Le multiplicateur :'), ask: 'μ =',
       start: `(${qt(c)})/(${s})`, judge: { kind: 'value', expect: qt(mu), form: 'irreducible' },
       lines: [{ math: qt(mu), note: `μ·‖b‖² = c, ‖b‖² = ${s}`, subgoal: 'stationarity' }],
     },
@@ -304,9 +309,9 @@ function kkEq(level, rng) {
   ];
   return partsItem({
     skill: KK, level, key: `${KK}:eq:${b}:${mu}`,
-    prompt: `Minimiser ½(q₁² + q₂²) sous la contrainte ${lin2(b)} = ${fq(c)} (B = (${fq(b[0])}, ${fq(b[1])})), avec L = ½‖q‖² − μ(Bq − c).`,
+    prompt: t('Minimiser ½(q₁² + q₂²) sous la contrainte {b} = {c} (B = ({v1}, {v2})), avec L = ½‖q‖² − μ(Bq − c).', { b: lin2(b), c: fq(c), v1: fq(b[0]), v2: fq(b[1]) }),
     parts, keys: ['calc', 'greek'], subgoals: KK_SUB,
-    hints: H('∇_qL = q − Bᵀμ = 0, donc q = μBᵀ ; la contrainte donne μ.', `μ·((${fq(b[0])})² + (${fq(b[1])})²) = □`, `μ = ${fq(mu)}, q = (${fq(qv[0])} ; ${fq(qv[1])}).`),
+    hints: H(t('∇_qL = q − Bᵀμ = 0, donc q = μBᵀ ; la contrainte donne μ.'), `μ·((${fq(b[0])})² + (${fq(b[1])})²) = □`, `μ = ${fq(mu)}, q = (${fq(qv[0])} ; ${fq(qv[1])}).`),
     baits: [],
   });
 }
@@ -328,7 +333,7 @@ const KKT_TRAPS = { 1: [{ text: 'B[0][i]', rule: 'n_kkt_sign' }], 2: [{ text: '-
 function kkCode(level, rng) {
   return withThen(codeItem({
     skill: KK, level, ref: KKT, blanks: [0, 1, 2, 3], rng, traps: KKT_TRAPS, preludes: ['vec', 'mat'],
-    prompt: 'Complète la résolution du système KKT [[I, −Bᵀ], [B, 0]]·(q ; μ) = (0 ; c) pour min ½‖q‖² sous Bq = c (une contrainte).',
+    prompt: t('Complète la résolution du système KKT [[I, −Bᵀ], [B, 0]]·(q ; μ) = (0 ; c) pour min ½‖q‖² sous Bq = c (une contrainte).'),
     tests: [
       { expr: 'kkt_eq([[1, 1]], [2])', expect: '[1.0, 1.0, 1.0]', tol: 1e-12 },
       { expr: 'kkt_eq([[1, 1, 2]], [6])', expect: '[1.0, 1.0, 2.0, 1.0]', tol: 1e-12 },
@@ -342,39 +347,39 @@ function kkExamMcq(rng, opts) {
   if (r === 0) {
     return mcq({
       skill: KK, level: 4, key: `${KK}:grad`, exam: examTag(opts),
-      prompt: 'Minimiser f(x) = ½xᵀAx − bᵀx sous x + c ≥ 0 et −x + c ≥ 0 (x, c ∈ ℝⁿ), avec L = f − λ₁ᵀ(x + c) − λ₂ᵀ(−x + c). La condition de stationnarité est…',
+      prompt: t('Minimiser f(x) = ½xᵀAx − bᵀx sous x + c ≥ 0 et −x + c ≥ 0 (x, c ∈ ℝⁿ), avec L = f − λ₁ᵀ(x + c) − λ₂ᵀ(−x + c). La condition de stationnarité est…'),
       options: [
         { html: 'Ax − b − λ₁ + λ₂ = 0', correct: true },
         { html: 'Ax − b + λ₁ − λ₂ = 0', correct: false, rule: 'n_kkt_sign' },
         { html: 'Ax − b − λ₁ − λ₂ = 0', correct: false },
         { html: 'Ax + b − λ₁ + λ₂ = 0', correct: false },
       ],
-      solution: [{ html: '∇ₓL = Ax − b − λ₁ + λ₂ : la dérivée de −λ₁ᵀ(x + c) est −λ₁, celle de −λ₂ᵀ(−x + c) est +λ₂.', note: '' }],
+      solution: [{ html: t('∇ₓL = Ax − b − λ₁ + λ₂ : la dérivée de −λ₁ᵀ(x + c) est −λ₁, celle de −λ₂ᵀ(−x + c) est +λ₂.'), note: '' }],
     }, rng);
   }
   if (r === 1) {
     return mcq({
       skill: KK, level: 4, key: `${KK}:compl`, exam: examTag(opts),
-      prompt: 'Minimiser ½xᵀAx − bᵀx sous x + c ≥ 0 et −x + c ≥ 0 (x, c ∈ ℝⁿ), avec les multiplicateurs λ₁ ≥ 0 et λ₂ ≥ 0 de ces deux contraintes. Quelles sont les conditions de complémentarité ?',
+      prompt: t('Minimiser ½xᵀAx − bᵀx sous x + c ≥ 0 et −x + c ≥ 0 (x, c ∈ ℝⁿ), avec les multiplicateurs λ₁ ≥ 0 et λ₂ ≥ 0 de ces deux contraintes. Quelles sont les conditions de complémentarité ?'),
       options: [
         { html: '(λ₁)ᵢ(xᵢ + cᵢ) = 0 et (λ₂)ᵢ(cᵢ − xᵢ) = 0', correct: true },
         { html: '(λ₁)ᵢ(xᵢ − cᵢ) = 0 et (λ₂)ᵢ(xᵢ + cᵢ) = 0', correct: false, rule: 'n_kkt_complementarity' },
         { html: '(λ₁)ᵢ + (λ₂)ᵢ = 0', correct: false },
-        { html: '(λ₁)ᵢ(λ₂)ᵢ = 0 seulement', correct: false },
+        { html: t('(λ₁)ᵢ(λ₂)ᵢ = 0 seulement'), correct: false },
       ],
-      solution: [{ html: 'Chaque multiplicateur multiplie sa propre contrainte : λ₁ avec x + c, λ₂ avec c − x.', note: '' }],
+      solution: [{ html: t('Chaque multiplicateur multiplie sa propre contrainte : λ₁ avec x + c, λ₂ avec c − x.'), note: '' }],
     }, rng);
   }
   return multiMcq({
     skill: KK, level: 4, key: `${KK}:block`, exam: examTag(opts),
-    prompt: 'min ½‖q‖² sous Bq = c (B de taille m × n), avec L = ½‖q‖² − μᵀ(Bq − c). Cocher les affirmations vraies.',
+    prompt: t('min ½‖q‖² sous Bq = c (B de taille m × n), avec L = ½‖q‖² − μᵀ(Bq − c). Cocher les affirmations vraies.'),
     options: [
-      { html: 'Le système KKT est [[I, −Bᵀ], [B, 0]]·(q ; μ) = (0 ; c)', correct: true },
-      { html: 'Sa solution est unique si ker Bᵀ = {0}', correct: true },
-      { html: 'Le système KKT est [[I, Bᵀ], [B, 0]]·(q ; μ) = (0 ; c), avec ce L', correct: false, rule: 'n_kkt_sign' },
-      { html: 'Les multiplicateurs μ doivent être ≥ 0', correct: false, rule: 'n_kkt_multiplier_sign' },
+      { html: t('Le système KKT est [[I, −Bᵀ], [B, 0]]·(q ; μ) = (0 ; c)'), correct: true },
+      { html: t('Sa solution est unique si ker Bᵀ = {0}'), correct: true },
+      { html: t('Le système KKT est [[I, Bᵀ], [B, 0]]·(q ; μ) = (0 ; c), avec ce L'), correct: false, rule: 'n_kkt_sign' },
+      { html: t('Les multiplicateurs μ doivent être ≥ 0'), correct: false, rule: 'n_kkt_multiplier_sign' },
     ],
-    solution: [{ html: '∇_qL = q − Bᵀμ = 0 et Bq = c. Pour des égalités, μ n\'a pas de signe imposé ; si Bᵀμ = 0 force μ = 0, la solution est unique.', note: '' }],
+    solution: [{ html: t('∇_qL = q − Bᵀμ = 0 et Bq = c. Pour des égalités, μ n\'a pas de signe imposé ; si Bᵀμ = 0 force μ = 0, la solution est unique.'), note: '' }],
   }, rng);
 }
 

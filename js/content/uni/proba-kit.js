@@ -29,6 +29,7 @@ import { problemItem } from './kit-problem.js';
 import { mcq } from './kit.js';
 import { Q } from '../../math/rational.js';
 import { readStat, statML, labelML } from '../../judges/statline.js';
+import { t } from '../../i18n.js';
 
 export { H, modeOf, pickW, examTag, mcqD };
 
@@ -77,7 +78,7 @@ function menuOf(parts, k) {
   const out = [{ id: `a${k}`, label: p.action, valid: true }];
   parts.forEach((o, i) => {
     if (i === k || !o.action || o.action === p.action) return;
-    out.push({ id: `a${i}`, label: o.action, valid: false, why: i < k ? 'C\'est déjà fait.' : 'Pas encore : il faut d\'abord la valeur demandée maintenant.' });
+    out.push({ id: `a${i}`, label: o.action, valid: false, why: i < k ? t('C\'est déjà fait.') : t('Pas encore : il faut d\'abord la valeur demandée maintenant.') });
   });
   for (const [j, w] of (p.wrongActions || []).entries()) out.push({ id: `w${j}`, label: w.label, valid: false, why: w.why, rule: w.rule ?? undefined });
   // At most 4 options: the right one, then the wrong actions first.
@@ -139,8 +140,8 @@ export function openItem(o, points, rng) {
   // The first step is named by the problem's title, else by the first value asked (not by the whole statement).
   const parts = [{ item: lines, points: o.interpret ? points - 1 : points, title: o.title ?? o.parts[0]?.title ?? o.parts[0]?.label }];
   if (o.interpret) {
-    const it = mcq({ skill: o.skill, level: 5, prompt: o.interpret.prompt || 'Interpréter : quelle phrase est juste ?', options: o.interpret.options, key: `${o.key}:interpret`, exam: lines.exam }, rng);
-    parts.push({ item: it, points: 1, title: 'Interpréter' });
+    const it = mcq({ skill: o.skill, level: 5, prompt: o.interpret.prompt || t('Interpréter : quelle phrase est juste ?'), options: o.interpret.options, key: `${o.key}:interpret`, exam: lines.exam }, rng);
+    parts.push({ item: it, points: 1, title: t('Interpréter') });
   }
   return problemItem({ skill: o.skill, level: o.level ?? 5, prompt: o.prompt, parts, key: o.key, exam: lines.exam, fallback: o.fallback });
 }
@@ -152,30 +153,30 @@ export function openItem(o, points, rng) {
 const NUM_FRAC = /^\s*([−-]?)(\d+)\/(\d+)\s*$/;
 const NUM_DEC = /^\s*([−-]?)(\d+),(\d+)\s*$/;
 const NUM_INT = /^\s*[−-]?\d+\s*$/;
-function asQ(t) {
-  let m = NUM_FRAC.exec(t);
+function asQ(s) {
+  let m = NUM_FRAC.exec(s);
   if (m) return new Q((m[1] ? -1 : 1) * Number(m[2]), Number(m[3]));
-  m = NUM_DEC.exec(t);
+  m = NUM_DEC.exec(s);
   if (m && m[3].length <= 9) return new Q((m[1] ? -1 : 1) * Number(m[2] + m[3]), 10 ** m[3].length);
   return null;
 }
 function sameFormat(o) {
   const right = String(o.right ?? '');
   const all = [right, ...(o.wrongs || []).map((w) => String(w?.html ?? '')), ...(o.fillers || []).map((w) => String(w?.html ?? ''))];
-  const kinds = all.map((t) => (NUM_FRAC.test(t) ? 'f' : NUM_DEC.test(t) ? 'd' : NUM_INT.test(t) ? 'i' : 'x'));
+  const kinds = all.map((s) => (NUM_FRAC.test(s) ? 'f' : NUM_DEC.test(s) ? 'd' : NUM_INT.test(s) ? 'i' : 'x'));
   if (!(kinds.includes('f') && kinds.includes('d'))) return o;
   const toDec = NUM_DEC.test(right);
   const rd = toDec ? NUM_DEC.exec(right)[3].length : 0;
-  const conv = (t) => {
-    const q = asQ(t);
-    if (!q) return t;
+  const conv = (s) => {
+    const q = asQ(s);
+    if (!q) return s;
     if (toDec) {
-      if (!NUM_FRAC.test(t)) return t;
+      if (!NUM_FRAC.test(s)) return s;
       const ex = q.toDecimal();
       if (ex && ex.split(',')[1]?.length <= Math.max(rd, 4) + 2) return ex.replace('-', '−');
       return num(q.valueOf(), Math.max(rd, 4));
     }
-    if (!NUM_DEC.test(t)) return t;
+    if (!NUM_DEC.test(s)) return s;
     return (q.d === 1 ? String(q.n) : `${q.n}/${q.d}`).replace('-', '−');
   };
   const fix = (w) => (w && w.html !== undefined ? { ...w, html: conv(String(w.html)) } : w);

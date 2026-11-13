@@ -11,9 +11,10 @@ import {
   KEYS, q, qs, cm, sum, piT, pick, par, SG, H, MT, VML,
   vecJudge, defJudge, eqJudge, partsItem, examTag, choice, opt, decision, menu, problemItem,
 } from './vecto-b-kit.js';
+import { t } from '../../i18n.js';
 
 const XYZ = ['x', 'y', 'z'];
-const keyOf = (t) => toText(parse(t, {}));
+const keyOf = (tt) => toText(parse(tt, {}));
 
 // ---------- data ----------
 
@@ -32,7 +33,7 @@ function fieldD(rng) {
     oddCyl: sum([cm(2 * a, 'r cos(φ)'), cm(2 * b, 'r sin(φ)')]), id: `${a}${b}${k}${m}`,
   };
 }
-const Fhtml = (F) => `F = (${F.F.map((t) => MT(t)).join(', ')})`;
+const Fhtml = (F) => `F = (${F.F.map((tt) => MT(tt)).join(', ')})`;
 
 // Ω: cylinder r ≤ R, 0 ≤ z ≤ h, or cone k²r² ≤ z², 0 ≤ z ≤ h.
 function regionD(rng, kinds = ['cyl', 'cone']) {
@@ -40,12 +41,12 @@ function regionD(rng, kinds = ['cyl', 'cone']) {
   const h = pick(rng, [1, 2]);
   if (kind === 'cyl') {
     const R = pick(rng, [1, 2]);
-    return { kind, h, R, rTop: String(R), id: `cyl${R}${h}`, html: `le cylindre Ω = {x² + y² ≤ ${R * R}, 0 ≤ z ≤ ${h}}`, rMax: String(R), region: [`x^2+y^2 ≤ ${R * R}`, `0 ≤ z ≤ ${h}`], box: [[-R, R], [-R, R], [0, h]], area: (z) => q(R * R) };
+    return { kind, h, R, rTop: String(R), id: `cyl${R}${h}`, html: t('le cylindre Ω = {x² + y² ≤ {a}, 0 ≤ z ≤ {h}}', { a: R * R, h }), rMax: String(R), region: [`x^2+y^2 ≤ ${R * R}`, `0 ≤ z ≤ ${h}`], box: [[-R, R], [-R, R], [0, h]], area: (z) => q(R * R) };
   }
   const c = pick(rng, [1, 2]);
   const rTop = q(h, c);
   return {
-    kind, h, c, rTop: qs(rTop), id: `cone${c}${h}`, html: `le cône Ω = {${c === 1 ? 'x² + y²' : `${c * c}(x² + y²)`} ≤ z², 0 ≤ z ≤ ${h}}`, rMax: c === 1 ? 'z' : `z/${c}`,
+    kind, h, c, rTop: qs(rTop), id: `cone${c}${h}`, html: t('le cône Ω = {{a} ≤ z², 0 ≤ z ≤ {h}}', { a: c === 1 ? 'x² + y²' : `${c * c}(x² + y²)`, h }), rMax: c === 1 ? 'z' : `z/${c}`,
     region: [`${c * c}(x^2+y^2) ≤ z^2`, `0 ≤ z ≤ ${h}`], box: [[-Number(rTop), Number(rTop)], [-Number(rTop), Number(rTop)], [0, h]],
   };
 }
@@ -69,16 +70,16 @@ const tripleOf = (F, O, body = null) => `int(int(int((${body ?? sum([F.oddCyl, F
 
 const SUB_DIV = [
   SG('div', 'div F', 'v-ops'),
-  SG('bounds', 'bornes en cylindriques', 'a2-cyl-sph'),
-  SG('symmetry', 'termes impairs nuls par symétrie', 'v-div-thm'),
-  SG('value', 'intégrale triple', 'a2-cyl-sph'),
+  SG('bounds', t('bornes en cylindriques'), 'a2-cyl-sph'),
+  SG('symmetry', t('termes impairs nuls par symétrie'), 'v-div-thm'),
+  SG('value', t('intégrale triple'), 'a2-cyl-sph'),
 ];
 
 function divPart(F) {
   return {
-    html: 'Ω est borné régulier et F ∈ C¹ : ∬_∂Ω F · ν ds = ∭_Ω div F. D\'abord div F :', ask: 'div F =',
+    html: t('Ω est borné régulier et F ∈ C¹ : ∬_∂Ω F · ν ds = ∭_Ω div F. D\'abord div F :'), ask: 'div F =',
     start: `pd(${F.F[0]}, x) + pd(${F.F[1]}, y) + pd(${F.F[2]}, z)`, judge: eqJudge(XYZ),
-    menu: menu('div F = ∂F₁/∂x + ∂F₂/∂y + ∂F₃/∂z', [{ label: 'rot F', rule: 'v_div_rot_confuse', why: 'Le flux sortant, c\'est la divergence.' }]),
+    menu: menu('div F = ∂F₁/∂x + ∂F₂/∂y + ∂F₃/∂z', [{ label: 'rot F', rule: 'v_div_rot_confuse', why: t('Le flux sortant, c\'est la divergence.') }]),
     lines: [{ math: F.div, subgoal: 'div', blank: [F.even] }],
   };
 }
@@ -87,26 +88,26 @@ function divParts(F, O, level, o = {}) {
   const V = volumeD(F, O);
   const I = tripleOf(F, O);
   const parts = [divPart(F)];
-  parts[0].decisions = [decision('Comment calculer le flux sortant ?', [
-    { id: 'div', label: 'Théorème de la divergence : ∭_Ω div F', valid: true, ref: true },
-    { id: 'faces', label: `Face par face (${O.kind === 'cyl' ? 'deux disques et le côté' : 'le disque et le cône'}), avec la normale extérieure de chacune`, valid: true, quality: 'poor', why: 'Juste, mais il faut paramétrer chaque face et sa normale ; div F est simple, le volume est plus court.' },
+  parts[0].decisions = [decision(t('Comment calculer le flux sortant ?'), [
+    { id: 'div', label: t('Théorème de la divergence : ∭_Ω div F'), valid: true, ref: true },
+    { id: 'faces', label: t('Face par face ({a}), avec la normale extérieure de chacune', { a: O.kind === 'cyl' ? t('deux disques et le côté') : t('le disque et le cône') }), valid: true, quality: 'poor', why: t('Juste, mais il faut paramétrer chaque face et sa normale ; div F est simple, le volume est plus court.') },
   ], [3])];
   if (level >= 2) {
     parts.push({
-      html: 'Ω en coordonnées cylindriques (z, puis φ, puis r) :', ask: 'Ω :', start: 'Ω',
+      html: t('Ω en coordonnées cylindriques (z, puis φ, puis r) :'), ask: 'Ω :', start: 'Ω',
       judge: { kind: 'domain', coords: 'cyl', region: O.region, box: O.box, order: ['z', 'φ', 'r'], shape: 'cyl' },
       lines: [{ math: `0 ≤ z ≤ ${O.h} ; 0 ≤ φ ≤ 2π ; 0 ≤ r ≤ ${O.rMax}`, subgoal: 'bounds' }],
     });
   }
   const jacFree = tripleOf(F, O).replace(/\) r, r, 0/, '), r, 0');
   parts.push({
-    html: `∭_Ω div F, en cylindriques (dx dy dz = r dr dφ dz)${level <= 2 ? ` ; ∭ (${MT(F.odd)}) = 0 par symétrie` : ''} :`, ask: '∭_Ω div F =', start: I,
+    html: t('∭_Ω div F, en cylindriques (dx dy dz = r dr dφ dz){a} :', { a: level <= 2 ? t(' ; ∭ ({odd}) = 0 par symétrie', { odd: MT(F.odd) }) : '' }), ask: '∭_Ω div F =', start: I,
     judge: defJudge({ v_jacobian_volume: [{ line: jacFree, ctx: { jac: 'r' } }] }, { [keyOf(I)]: V.value }),
-    decisions: [decision(`Que vaut ∭_Ω (${MT(F.odd)}) dx dy dz ?`, [
-      { id: 'zero', label: '0 : Ω est symétrique par x ↦ −x et y ↦ −y, et x, y sont impairs', valid: true, ref: true },
-      { id: 'calc', label: 'On ne peut pas savoir sans le calculer', valid: true, quality: 'poor', why: 'On peut le calculer, mais Ω est symétrique : ∫ cos φ dφ = ∫ sin φ dφ = 0 sur [0 ; 2π].' },
+    decisions: [decision(t('Que vaut ∭_Ω ({odd}) dx dy dz ?', { odd: MT(F.odd) }), [
+      { id: 'zero', label: t('0 : Ω est symétrique par x ↦ −x et y ↦ −y, et x, y sont impairs'), valid: true, ref: true },
+      { id: 'calc', label: t('On ne peut pas savoir sans le calculer'), valid: true, quality: 'poor', why: t('On peut le calculer, mais Ω est symétrique : ∫ cos φ dφ = ∫ sin φ dφ = 0 sur [0 ; 2π].') },
     ], [2, 3, 4])],
-    menu: menu('Les termes en x et y s\'annulent ; intégrer le reste en r, φ, z avec le jacobien r', [{ label: 'Intégrer sans le jacobien r', rule: 'v_jacobian_volume', why: 'dx dy dz = r dr dφ dz.' }]),
+    menu: menu(t('Les termes en x et y s\'annulent ; intégrer le reste en r, φ, z avec le jacobien r'), [{ label: t('Intégrer sans le jacobien r'), rule: 'v_jacobian_volume', why: 'dx dy dz = r dr dφ dz.' }]),
     lines: [{ math: V.zLine, subgoal: 'symmetry' }, { math: V.value, subgoal: 'value', blank: [V.value] }],
   });
   return { parts, V };
@@ -119,8 +120,8 @@ function divItem(level, rng, opts) {
   const { parts, V } = divParts(F, O, level);
   return partsItem({
     skill: 'v-div-thm', level, parts, keys: KEYS,
-    prompt: `Soit ${Fhtml(F)} et ${O.html}. Calcule le flux sortant ∬_∂Ω F · ν ds.`,
-    hints: H('Calcule div F, puis intègre sur le volume, en cylindriques.', `Les termes en x et y s'annulent par symétrie ; ${MT(V.zLine, { vars: ['z'] })}.`, `${MT(V.zLine, { vars: ['z'] })} = ${MT(V.value)}.`),
+    prompt: t('Soit {a} et {html}. Calcule le flux sortant ∬_∂Ω F · ν ds.', { a: Fhtml(F), html: O.html }),
+    hints: H(t('Calcule div F, puis intègre sur le volume, en cylindriques.'), t('Les termes en x et y s\'annulent par symétrie ; {a}.', { a: MT(V.zLine, { vars: ['z'] }) }), `${MT(V.zLine, { vars: ['z'] })} = ${MT(V.value)}.`),
     subgoals: SUB_DIV, key: `v-div-thm:${level}:${F.id}:${O.id}`, exam: examTag(opts),
   });
 }
@@ -140,15 +141,15 @@ function divClosed(level, rng, opts) {
   const disc = q(-d * r2);
   const total = vol.sub(disc);
   const parts = [divPart(FF), {
-    html: `Ω = {0 ≤ z ≤ ${r2} − r²} est fermé par Σ et le disque D = {z = 0, r ≤ ${rho}}. ∭_Ω div F :`, ask: '∭_Ω div F =', start: I,
+    html: t('Ω = {0 ≤ z ≤ {r2} − r²} est fermé par Σ et le disque D = {z = 0, r ≤ {rho}}. ∭_Ω div F :', { r2, rho }), ask: '∭_Ω div F =', start: I,
     judge: defJudge({ v_jacobian_volume: [I.replace(/\) r, z, 0/, '), z, 0')] }, { [keyOf(I)]: piT(vol) }),
     lines: [{ math: piT(vol), subgoal: 'value' }],
   }, {
-    html: 'La normale extérieure à Ω sur le disque D (z = 0) :', ask: 'ν =', start: 'ν',
-    judge: vecJudge('(0 ; 0 ; -1)', [], { v_flux_normal_outward: [{ line: '(0 ; 0 ; 1)', ctx: { face: 'D (z = 0)', dir: 'le bas : ν = (0, 0, −1)' } }] }),
+    html: t('La normale extérieure à Ω sur le disque D (z = 0) :'), ask: 'ν =', start: 'ν',
+    judge: vecJudge('(0 ; 0 ; -1)', [], { v_flux_normal_outward: [{ line: '(0 ; 0 ; 1)', ctx: { face: 'D (z = 0)', dir: t('le bas : ν = (0, 0, −1)') } }] }),
     lines: [{ math: '(0 ; 0 ; -1)', subgoal: 'symmetry' }],
   }, {
-    html: `Le flux sortant par D : F · ν = −F₃(x, y, 0) = ${-d < 0 ? '−' : ''}${Math.abs(d)} :`, ask: '∬_D F · ν ds =', start: `int(int(${cm(-d, 'r')}, r, 0, ${rho}), φ, 0, 2π)`,
+    html: t('Le flux sortant par D : F · ν = −F₃(x, y, 0) = {a}{b} :', { a: -d < 0 ? '−' : '', b: Math.abs(d) }), ask: '∬_D F · ν ds =', start: `int(int(${cm(-d, 'r')}, r, 0, ${rho}), φ, 0, 2π)`,
     judge: defJudge({ v_flux_normal_outward: [piT(disc.neg())] }),
     lines: [{ math: piT(disc), subgoal: 'value' }],
   }, {
@@ -158,7 +159,7 @@ function divClosed(level, rng, opts) {
   }];
   return partsItem({
     skill: 'v-div-thm', level, parts, keys: KEYS,
-    prompt: `Soit ${Fhtml(FF)} et Σ = {z = ${r2} − x² − y², z ≥ 0}, orientée vers le haut. Σ n'est pas fermée : ferme-la par le disque D du plan z = 0 et calcule ∬_Σ F · ds par le théorème de la divergence.`,
+    prompt: t('Soit {a} et Σ = {z = {r2} − x² − y², z ≥ 0}, orientée vers le haut. Σ n\'est pas fermée : ferme-la par le disque D du plan z = 0 et calcule ∬_Σ F · ds par le théorème de la divergence.', { a: Fhtml(FF), r2 }),
     hints: [], subgoals: SUB_DIV, key: `v-div-thm:5:${F.id}:${d}:${rho}`, exam: examTag(opts),
   });
 }
@@ -172,13 +173,13 @@ function divMcq(level, rng, opts) {
   const c = al + be + ga;
   const F = [sum([cm(al, 'x'), 'y', 'cos(z)']), sum([cm(be, 'y'), 'x e^z']), sum([cm(ga, 'z'), 'x y'])];
   const v = q(c * R * R * h);
-  const show = (t) => MT(t, {});
+  const show = (tt) => MT(tt, {});
   return choice({
     skill: 'v-div-thm', level, key: `v-div-thm:mcq:${al}${be}${ga}${R}${h}`, exam: examTag(opts),
-    prompt: `Soit F = (${F.map((t) => MT(t)).join(', ')}) et Ω le cylindre {x² + y² ≤ ${R * R}, 0 ≤ z ≤ ${h}}, ν la normale extérieure. ∬_∂Ω F · ν ds =`,
+    prompt: t('Soit F = ({a}) et Ω le cylindre {x² + y² ≤ {b}, 0 ≤ z ≤ {h}}, ν la normale extérieure. ∬_∂Ω F · ν ds =', { a: F.map((tt) => MT(tt)).join(', '), b: R * R, h }),
     right: show(piT(v)),
     wrongs: [opt(show(piT(q(2 * c * R * h))), 'v_jacobian_volume'), c ? opt(show(piT(v.neg())), 'v_flux_normal_outward') : null, c ? opt(show('0'), 'v_div_rot_confuse') : opt(show(piT(q(R * R * h))), 'v_div_rot_confuse'), opt(show(piT(q((c || 1) * R * R * h * 2))))],
-    solution: [{ html: `div F = ${al} + ${be} + ${ga} = ${c}, donc ∬_∂Ω F · ν ds = ∭_Ω ${c} = ${c} · π · ${R * R} · ${h}.`, note: '' }],
+    solution: [{ html: t('div F = {al} + {be} + {ga} = {c}, donc ∬_∂Ω F · ν ds = ∭_Ω {c} = {c} · π · {a} · {h}.', { al, be, ga, c, a: R * R, h }), note: '' }],
     expectedSec: 120,
   }, rng);
 }
@@ -208,10 +209,10 @@ function verifyData(rng) {
 
 const SUB_VDIV = [
   SG('volume', '∭ div F', 'v-div-thm'),
-  SG('face-top', 'flux du disque', 'v-flux'),
-  SG('face-normal', 'normale extérieure du cône', 'v-flux'),
-  SG('face-cone', 'flux du cône', 'v-flux'),
-  SG('conclude', 'les deux membres', 'v-verify-div'),
+  SG('face-top', t('flux du disque'), 'v-flux'),
+  SG('face-normal', t('normale extérieure du cône'), 'v-flux'),
+  SG('face-cone', t('flux du cône'), 'v-flux'),
+  SG('conclude', t('les deux membres'), 'v-verify-div'),
 ];
 
 function verifyParts(D, level) {
@@ -219,38 +220,38 @@ function verifyParts(D, level) {
   const I = tripleOf(F, O);
   const V = volumeD({ ...F, k: 1 }, O);
   const volume = [divPart(F), {
-    html: '∭_Ω div F, en cylindriques (les termes en x et y s\'annulent par symétrie) :', ask: '∭_Ω div F =', start: I,
+    html: t('∭_Ω div F, en cylindriques (les termes en x et y s\'annulent par symétrie) :'), ask: '∭_Ω div F =', start: I,
     judge: defJudge({}, { [keyOf(I)]: piT(D.vol) }),
     lines: [{ math: V.zLine, subgoal: 'volume' }, { math: piT(D.vol), subgoal: 'volume' }],
   }];
   const topPart = {
-    html: `Le disque du haut z = ${O.h}, r ≤ ${qs(rT)}, ν = (0, 0, 1) : F · ν = ${F.m === 1 ? 'z' : `z${F.m === 2 ? '²' : '³'}`} = ${O.h ** F.m}. Son flux :`, ask: '∬ F · ν ds =', start: `int(int(${cm(O.h ** F.m, 'r')}, r, 0, ${qs(rT)}), φ, 0, 2π)`,
+    html: t('Le disque du haut z = {h}, r ≤ {a}, ν = (0, 0, 1) : F · ν = {b} = {c}. Son flux :', { h: O.h, a: qs(rT), b: F.m === 1 ? 'z' : `z${F.m === 2 ? '²' : '³'}`, c: O.h ** F.m }), ask: '∬ F · ν ds =', start: `int(int(${cm(O.h ** F.m, 'r')}, r, 0, ${qs(rT)}), φ, 0, 2π)`,
     judge: defJudge({ v_flux_normal_outward: [piT(D.top.neg())] }),
     lines: [{ math: piT(D.top), subgoal: 'face-top', blank: [piT(D.top)] }],
   };
   const normalPart = {
-    html: `Le cône σ(r, φ) = (r cos φ, r sin φ, ${D.zc.replace(/^1r$/, 'r')}), r ∈ [0 ; ${qs(rT)}], φ ∈ [0 ; 2π]. σ_r ∧ σ_φ = ${VML(D.Nin)} pointe vers l'intérieur (vers le haut). La normale extérieure :`, ask: 'N =', start: 'N',
-    judge: vecJudge(D.Nout, ['r', 'φ'], { v_flux_normal_outward: [{ line: D.Nin, ctx: { face: 'du cône', dir: 'le bas et l\'extérieur : l\'opposé de σ_r ∧ σ_φ' } }] }),
-    decisions: [decision('Quelle normale prendre sur le cône ?', [
-      { id: 'out', label: 'L\'opposé de σ_r ∧ σ_φ : elle sort de Ω', valid: true, ref: true },
-      { id: 'in', label: 'σ_r ∧ σ_φ telle quelle', valid: false, rule: 'v_flux_normal_outward', why: 'Sa 3e composante r > 0 : elle rentre dans Ω (le cône est sous le volume).' },
+    html: t('Le cône σ(r, φ) = (r cos φ, r sin φ, {a}), r ∈ [0 ; {b}], φ ∈ [0 ; 2π]. σ_r ∧ σ_φ = {c} pointe vers l\'intérieur (vers le haut). La normale extérieure :', { a: D.zc.replace(/^1r$/, 'r'), b: qs(rT), c: VML(D.Nin) }), ask: 'N =', start: 'N',
+    judge: vecJudge(D.Nout, ['r', 'φ'], { v_flux_normal_outward: [{ line: D.Nin, ctx: { face: t('du cône'), dir: t('le bas et l\'extérieur : l\'opposé de σ_r ∧ σ_φ') } }] }),
+    decisions: [decision(t('Quelle normale prendre sur le cône ?'), [
+      { id: 'out', label: t('L\'opposé de σ_r ∧ σ_φ : elle sort de Ω'), valid: true, ref: true },
+      { id: 'in', label: t('σ_r ∧ σ_φ telle quelle'), valid: false, rule: 'v_flux_normal_outward', why: t('Sa 3e composante r > 0 : elle rentre dans Ω (le cône est sous le volume).') },
     ], [2, 3, 4])],
     lines: [{ math: D.Nout, subgoal: 'face-normal', blank: ['-r'] }],
   };
   const conePart = {
-    html: 'Le flux sortant par le cône : F(σ) · N, puis l\'intégrale (∫ cos³φ dφ = ∫ sin³φ dφ = 0 sur [0 ; 2π]) :', ask: '∬ F · ds =', start: `int(int(${D.integrand}, r, 0, ${qs(rT)}), φ, 0, 2π)`,
+    html: t('Le flux sortant par le cône : F(σ) · N, puis l\'intégrale (∫ cos³φ dφ = ∫ sin³φ dφ = 0 sur [0 ; 2π]) :'), ask: '∬ F · ds =', start: `int(int(${D.integrand}, r, 0, ${qs(rT)}), φ, 0, 2π)`,
     judge: defJudge({ v_flux_normal_outward: [piT(D.cone.neg())] }),
     lines: [{ math: `int(int(${cm(-(O.c ** F.m), `r^${F.m + 1}`)}, r, 0, ${qs(rT)}), φ, 0, 2π)`, subgoal: 'face-cone' }, { math: piT(D.cone), subgoal: 'face-cone', blank: [piT(D.cone)] }],
   };
   const conclude = {
-    html: 'La somme des flux des faces :', ask: '∬_∂Ω F · ν ds =', start: `${piT(D.top)}+(${piT(D.cone)})`,
+    html: t('La somme des flux des faces :'), ask: '∬_∂Ω F · ν ds =', start: `${piT(D.top)}+(${piT(D.cone)})`,
     judge: defJudge({ v_flux_normal_outward: [piT(D.top.sub(D.cone))] }),
-    lines: [{ math: piT(D.vol), subgoal: 'conclude', note: '= ∭_Ω div F : les deux membres sont égaux' }],
+    lines: [{ math: piT(D.vol), subgoal: 'conclude', note: t('= ∭_Ω div F : les deux membres sont égaux') }],
   };
   return { volume, topPart, normalPart, conePart, conclude };
 }
 
-const vdPrompt = (D) => `Soit ${Fhtml(D.F)} et ${D.O.html}. Vérifie le théorème de la divergence : calcule ∭_Ω div F, puis le flux sortant par chaque face du bord (le disque du haut et le cône).`;
+const vdPrompt = (D) => t('Soit {a} et {html}. Vérifie le théorème de la divergence : calcule ∭_Ω div F, puis le flux sortant par chaque face du bord (le disque du haut et le cône).', { a: Fhtml(D.F), html: D.O.html });
 
 function verifyDivItem(level, rng, opts) {
   const D = verifyData(rng);
@@ -261,33 +262,33 @@ function verifyDivItem(level, rng, opts) {
   else if (level === 2) parts = [P.normalPart, P.conePart];
   else if (level === 3) parts = [P.topPart, P.normalPart, P.conePart, P.conclude];
   else parts = [...P.volume, P.topPart, P.normalPart, P.conePart, P.conclude];
-  const given = level <= 3 ? ` On donne ∭_Ω div F = ${MT(piT(D.vol))}.${level === 1 ? ` Le flux du cône vaut ${MT(piT(D.cone))}.` : ''}` : '';
+  const given = level <= 3 ? t(' On donne ∭_Ω div F = {a}.{b}', { a: MT(piT(D.vol)), b: level === 1 ? t(' Le flux du cône vaut {a}.', { a: MT(piT(D.cone)) }) : '' }) : '';
   return partsItem({
     skill: 'v-verify-div', level, parts, keys: KEYS,
     prompt: `${vdPrompt(D)}${given}`,
-    hints: H('Sur chaque face, prends la normale qui sort de Ω : (0, 0, 1) en haut, l\'opposé de σ_r ∧ σ_φ sur le cône.', `Disque : ∬ ${O_h(D)} ds = ${MT(piT(D.top))} ; cône : N = ${VML(D.Nout)}.`, `Flux du cône : ${MT(piT(D.cone))}, et ${MT(piT(D.top))} + (${MT(piT(D.cone))}) = ${MT(piT(D.vol))}.`),
+    hints: H(t('Sur chaque face, prends la normale qui sort de Ω : (0, 0, 1) en haut, l\'opposé de σ_r ∧ σ_φ sur le cône.'), t('Disque : ∬ {a} ds = {b} ; cône : N = {c}.', { a: O_h(D), b: MT(piT(D.top)), c: VML(D.Nout) }), t('Flux du cône : {a}, et {b} + ({a}) = {c}.', { a: MT(piT(D.cone)), b: MT(piT(D.top)), c: MT(piT(D.vol)) })),
     subgoals: SUB_VDIV, key: `v-verify-div:${level}:${D.id}`, exam: examTag(opts, 9),
   });
 }
 const O_h = (D) => `${D.O.h ** D.F.m}`;
 
 function verifyDivProblem(D, P, level, rng, opts) {
-  const one = (parts, title) => partsItem({ skill: 'v-verify-div', level: 4, parts, keys: KEYS, prompt: title, hints: [], noHints: true, subgoals: SUB_VDIV, key: `v-verify-div:p:${D.id}:${title.length}` });
+  const one = (parts, title) => partsItem({ skill: 'v-verify-div', level: 4, parts, keys: KEYS, prompt: t(title), hints: [], noHints: true, subgoals: SUB_VDIV, key: `v-verify-div:p:${D.id}:${title.length}` });
   const concl = choice({
     skill: 'v-verify-div', level: 4, key: `v-verify-div:concl:${D.id}`,
-    prompt: `∭_Ω div F = ${MT(piT(D.vol))} et le flux sortant total vaut ${MT(piT(D.top))} + (${MT(piT(D.cone))}). Conclusion :`,
-    right: `Les deux membres valent ${MT(piT(D.vol))} : le théorème est vérifié.`,
-    wrongs: [opt(`Les deux membres diffèrent de ${MT(piT(D.cone.mul(-2)))} : il faut changer la normale du cône.`, 'v_flux_normal_outward'), opt('Les deux membres diffèrent : F n\'est pas C¹.'), opt(`Le flux vaut ${MT(piT(D.top.sub(D.cone)))}.`, 'v_flux_normal_outward')],
+    prompt: t('∭_Ω div F = {a} et le flux sortant total vaut {b} + ({c}). Conclusion :', { a: MT(piT(D.vol)), b: MT(piT(D.top)), c: MT(piT(D.cone)) }),
+    right: t('Les deux membres valent {a} : le théorème est vérifié.', { a: MT(piT(D.vol)) }),
+    wrongs: [opt(t('Les deux membres diffèrent de {a} : il faut changer la normale du cône.', { a: MT(piT(D.cone.mul(-2))) }), 'v_flux_normal_outward'), opt(t('Les deux membres diffèrent : F n\'est pas C¹.')), opt(t('Le flux vaut {a}.', { a: MT(piT(D.top.sub(D.cone))) }), 'v_flux_normal_outward')],
   }, rng);
   return problemItem({
     skill: 'v-verify-div', level, key: `${D.id}`, exam: examTag(opts, 9),
-    prompt: `${vdPrompt(D)} (9 points)`,
+    prompt: t('{a} (9 points)', { a: vdPrompt(D) }),
     parts: [
       { item: one(P.volume, '∭_Ω div F'), points: [1, 2], title: '∭_Ω div F (3 pts)' },
-      { item: one([P.topPart], 'Le disque du haut'), points: 2, title: 'Le disque (2 pts)' },
-      { item: one([P.normalPart], 'La normale extérieure du cône'), points: 1.5, title: 'Normale du cône (1,5 pt)' },
-      { item: one([P.conePart], 'Le flux du cône'), points: 1.5, title: 'Flux du cône (1,5 pt)' },
-      { item: concl, points: 1, title: 'Conclusion (1 pt)' },
+      { item: one([P.topPart], 'Le disque du haut'), points: 2, title: t('Le disque (2 pts)') },
+      { item: one([P.normalPart], 'La normale extérieure du cône'), points: 1.5, title: t('Normale du cône (1,5 pt)') },
+      { item: one([P.conePart], 'Le flux du cône'), points: 1.5, title: t('Flux du cône (1,5 pt)') },
+      { item: concl, points: 1, title: t('Conclusion (1 pt)') },
     ],
   });
 }

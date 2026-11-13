@@ -18,13 +18,14 @@
 // f_no_inverse (stopping at û).
 
 import { parse } from '../parse.js';
+import { t } from '../../i18n.js';
 
 // The candidates of trap `id` in the judge's configuration.
-function fromCfg(id, ctx, read = (t) => t) {
+function fromCfg(id, ctx, read = (tt) => tt) {
   const list = ctx?.cfg?.traps?.[id] || [];
   const out = [];
-  for (const t of list) {
-    try { out.push({ node: read(typeof t === 'string' ? t : t.line), ctx: { ...(typeof t === 'string' ? {} : t.ctx || {}) } }); } catch { /* skip */ }
+  for (const tt of list) {
+    try { out.push({ node: read(typeof tt === 'string' ? tt : tt.line), ctx: { ...(typeof tt === 'string' ? {} : tt.ctx || {}) } }); } catch { /* skip */ }
   }
   return out;
 }
@@ -38,7 +39,7 @@ const EQ_START = '2û + 3√(2π) f̂ û = f̂';
 
 export const DEFS = {
   f_ft_norm: {
-    name: 'Transformée sans 1/√(2π)',
+    name: t('Transformée sans 1/√(2π)'),
     judges: ['transform'],
     transform: (prev, ctx) => {
       const cfg = ctx?.cfg || {};
@@ -49,37 +50,37 @@ export const DEFS = {
     check: { judge: F7, prev: 'e^(-abs(x))', line: 'f̂(α) = 2/(1+α^2)' },
   },
   f_ft_alpha_zero: {
-    name: 'f̂(0) lu dans la formule générale',
+    name: t('f̂(0) lu dans la formule générale'),
     judges: [],
-    explain: (ctx = {}) => `La formule a ${ctx.den || 'α'} au dénominateur : elle ne dit rien en α = 0. On calcule f̂(0) = (1/√(2π))∫ f(y) dy${ctx.want ? ` = ${ctx.want}` : ''}.`,
+    explain: (ctx = {}) => t('La formule a {a} au dénominateur : elle ne dit rien en α = 0. On calcule f̂(0) = (1/√(2π))∫ f(y) dy{b}.', { a: ctx.den || 'α', b: ctx.want ? ` = ${ctx.want}` : '' }),
     check: { bait: { skill: 'f-ft-direct', level: 4 } },
   },
   f_sqrt2pi_conv: {
-    name: 'ℱ(f ∗ u) = f̂ û sans √(2π)',
+    name: t('ℱ(f ∗ u) = f̂ û sans √(2π)'),
     judges: ['transform'],
     transform: (prev, ctx) => fromCfg('f_sqrt2pi_conv', ctx),
     check: { judge: { ...EQ, traps: { f_sqrt2pi_conv: ['û = f̂/(2+3f̂)'] } }, prev: EQ_START, line: 'û = f̂/(2 + 3f̂)' },
   },
   f_conv_coef_dropped: {
-    name: 'Coefficient de la convolution perdu',
+    name: t('Coefficient de la convolution perdu'),
     judges: ['transform'],
     transform: (prev, ctx) => fromCfg('f_conv_coef_dropped', ctx),
     check: { judge: { ...EQ, traps: { f_conv_coef_dropped: ['û = f̂/(2+√(2π)f̂)'] } }, prev: EQ_START, line: 'û = f̂/(2 + √(2π) f̂)' },
   },
   f_abs_dropped: {
-    name: 'Valeur absolue oubliée (e^(−w|x|))',
+    name: t('Valeur absolue oubliée (e^(−w|x|))'),
     judges: ['transform'],
     transform: (prev, ctx) => fromCfg('f_abs_dropped', ctx),
     check: { judge: { ...EQ, traps: { f_abs_dropped: ['u(x) = e^(-2x)/4'] } }, prev: 'û = (1/2)√(2/π)/(α^2+4)', line: 'u(x) = e^(-2x)/4' },
   },
   f_table_line: {
-    name: 'Ligne voisine de la table',
+    name: t('Ligne voisine de la table'),
     judges: ['transform'],
     transform: (prev, ctx) => fromCfg('f_table_line', ctx),
     check: { judge: { ...F7, traps: { f_table_line: [{ line: 'f̂(α) = 1/(√(2π)(1+iα))', ctx: { got: '1/(√(2π)(1 + iα))', want: 'F7' } }] } }, prev: 'e^(-abs(x))', line: 'f̂(α) = 1/(√(2π)(1+iα))' },
   },
   f_table_half_line: {
-    name: '« 0 sinon » oublié (ligne F3)',
+    name: t('« 0 sinon » oublié (ligne F3)'),
     judges: ['transform'],
     transform: (prev, ctx) => fromCfg('f_table_half_line', ctx),
     check: {
@@ -88,18 +89,18 @@ export const DEFS = {
     },
   },
   f_no_inverse: {
-    name: 'Réponse û au lieu de u',
+    name: t('Réponse û au lieu de u'),
     judges: [],
     check: { bait: { skill: 'f-ft-eq', level: 3 } },
   },
   f_rat_simplify: {
-    name: 'Fraction rationnelle mal réduite',
+    name: t('Fraction rationnelle mal réduite'),
     judges: ['transform', 'equiv'],
-    transform: (prev, ctx) => fromCfg('f_rat_simplify', ctx, ctx?.cfg?.kind === 'equiv' ? (t) => parse(t, { vars: ctx.cfg.vars }) : (t) => t),
+    transform: (prev, ctx) => fromCfg('f_rat_simplify', ctx, ctx?.cfg?.kind === 'equiv' ? (tt) => parse(tt, { vars: ctx.cfg.vars }) : (tt) => tt),
     check: { judge: { ...EQ, traps: { f_rat_simplify: ['û = √(2/π)/(2α^2+7)'] } }, prev: 'û = √(2/π)/(1+α^2)/(2+6/(1+α^2))', line: 'û = √(2/π)/(2α^2+7)' },
   },
   f_ft_shift_sign: {
-    name: 'Signe de la translation',
+    name: t('Signe de la translation'),
     judges: ['transform'],
     transform: (prev, ctx) => fromCfg('f_ft_shift_sign', ctx),
     check: {
@@ -117,7 +118,7 @@ export const DEFS = {
     },
   },
   f_ft_scale: {
-    name: 'w lu au lieu de w² (ligne F8)',
+    name: t('w lu au lieu de w² (ligne F8)'),
     judges: ['transform'],
     transform: (prev, ctx) => fromCfg('f_ft_scale', ctx),
     check: {
@@ -126,20 +127,20 @@ export const DEFS = {
     },
   },
   f_plancherel_factor: {
-    name: 'Plancherel avec un facteur 2π',
+    name: t('Plancherel avec un facteur 2π'),
     judges: ['definite'],
-    transform: (prev, ctx) => fromCfg('f_plancherel_factor', ctx, (t) => parse(t)),
-    explain: () => 'Avec la convention 1/√(2π), Plancherel n\'a pas de facteur : ∫ |f(x)|² dx = ∫ |f̂(α)|² dα.',
+    transform: (prev, ctx) => fromCfg('f_plancherel_factor', ctx, (tt) => parse(tt)),
+    explain: () => t('Avec la convention 1/√(2π), Plancherel n\'a pas de facteur : ∫ |f(x)|² dx = ∫ |f̂(α)|² dα.'),
     check: { judge: { kind: 'definite', known: { 'int(sin(α)^2/α^2,α,-∞,∞)': 'π' }, traps: { f_plancherel_factor: ['2π^2', '1/2'] } }, prev: 'int(sin(α)^2/α^2, α, -∞, ∞)', line: '2π^2' },
   },
   f_distrib_jump: {
-    name: 'δ du saut oublié',
+    name: t('δ du saut oublié'),
     judges: ['distrib'],
     transform: (prev, ctx) => fromCfg('f_distrib_jump', ctx),
     check: { judge: { kind: 'distrib', v: 't', ref: 'D(H(t)e^(-t))', final: 'dist', traps: { f_distrib_jump: [{ line: '-H(t)e^(-t)', ctx: { h: '1', a: '0' } }] } }, prev: 'D(H(t)e^(-t))', line: '-H(t)e^(-t)' },
   },
   f_distrib_sign: {
-    name: '⟨DT, φ⟩ = ⟨T, φ′⟩ sans le signe',
+    name: t('⟨DT, φ⟩ = ⟨T, φ′⟩ sans le signe'),
     judges: ['distrib'],
     transform: (prev, ctx) => fromCfg('f_distrib_sign', ctx),
     check: { judge: { kind: 'distrib', v: 't', ref: 'D(H(t)e^(-t))', final: 'dist', traps: { f_distrib_sign: ["int(e^(-t)φ'(t), t, 0, ∞)"] } }, prev: '⟨D(H(t)e^(-t)), φ⟩', line: "int(e^(-t) φ'(t), t, 0, ∞)" },

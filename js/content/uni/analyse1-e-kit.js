@@ -7,6 +7,7 @@ import { parse } from '../../cas/parse.js';
 import { toText } from '../../cas/print.js';
 import { walk, lit } from '../../cas/ast.js';
 import { blankLine } from '../../judges/lines.js';
+import { t } from '../../i18n.js';
 
 export const V = 'x';
 export const q = (n, d = 1) => new Q(n, d);
@@ -46,7 +47,7 @@ export function stepMenus(start, lines, choices) {
     at: i === 0 ? start : eqs[i - 1].math,
     options: choices.map((c) => ({
       id: c.id, label: c.label, valid: c.id === l.act,
-      why: c.why || 'Ce n\'est pas l\'étape à faire maintenant.',
+      why: c.why || t('Ce n\'est pas l\'étape à faire maintenant.'),
       ...(c.rule && c.id !== l.act ? { rule: c.rule } : {}),
     })),
   }));
@@ -99,10 +100,10 @@ export function verdictLines(right, { rules = {}, whys = {}, criteria, correct }
   const opt = (id, label) => ({
     id, label, valid: id === right,
     ...(id !== right && rules[id] ? { rule: rules[id] } : {}),
-    why: whys[id] || (id === 'semi' ? 'f garde un signe constant : |f| = ±f, la convergence est absolue.' : 'Relis le calcul ou la comparaison.'),
+    why: whys[id] || (id === 'semi' ? t('f garde un signe constant : |f| = ±f, la convergence est absolue.') : t('Relis le calcul ou la comparaison.')),
   });
   return [
-    { kind: 'decision', prompt: 'Nature de l\'intégrale ?', options: [opt('abs', 'converge absolument'), opt('semi', 'converge, pas absolument'), opt('div', 'diverge')] },
-    { kind: 'rule', ask: 'Quel critère ?', correct, options: criteria },
+    { kind: 'decision', prompt: t('Nature de l\'intégrale ?'), options: [opt('abs', t('converge absolument')), opt('semi', t('converge, pas absolument')), opt('div', t('diverge'))] },
+    { kind: 'rule', ask: t('Quel critère ?'), correct, options: criteria },
   ];
 }

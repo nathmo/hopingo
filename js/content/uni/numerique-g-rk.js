@@ -15,14 +15,15 @@ import { mcqDistinct } from './alglin-kit.js';
 import { refCode, codeItem, iterTable, H } from './numerique-kit.js';
 import { odeData, fShow, nice, problemText, gAt, R } from './numerique-g-kit.js';
 import { sqrtReadtable } from './numerique-g-euler.js';
+import { t } from '../../i18n.js';
 
 const RK = 'n-ode-rk';
 const SUB = [
   { id: 'k1', label: 'k₁ = f(tₙ, uₙ)', skill: RK },
-  { id: 'k2', label: 'k₂, la pente au point prédit', skill: RK },
+  { id: 'k2', label: t('k₂, la pente au point prédit'), skill: RK },
   { id: 'update', label: 'uₙ₊₁ = uₙ + h(k₁ + k₂)/2', skill: RK },
   { id: 'cn', label: 'Crank-Nicolson', skill: RK },
-  { id: 'euler', label: 'un pas d\'Euler (la prédiction)', skill: 'n-ode-euler' },
+  { id: 'euler', label: t('un pas d\'Euler (la prédiction)'), skill: 'n-ode-euler' },
 ];
 const KEYS = ['calc'];
 
@@ -43,21 +44,23 @@ function heunTable(rng, level) {
     const line = `(${d.u0}+(${h})/2×((${d.lam})×${d.u0}+${g0})+(${h})/2×${g1})/(1-(${h})/2×(${d.lam}))`;
     then = linesItem({
       skill: RK, level: 4, mode: 'free', keys: KEYS,
-      prompt: `Même problème, un pas de Crank-Nicolson : u₁ = u₀ + (h/2)(f(t₀, u₀) + f(t₁, u₁)). Combien vaut u₁ ?`,
+      prompt: t('Même problème, un pas de Crank-Nicolson : u₁ = u₀ + (h/2)(f(t₀, u₀) + f(t₁, u₁)). Combien vaut u₁ ?'),
       start: 'u_1', judge: { kind: 'value', expect: String(c1), form: 'irreducible', ode: d.phiOf('CN') },
       script: [
-        { kind: 'eq', math: line, note: 'u₁ figure des deux côtés : on l\'isole', subgoal: 'cn' },
-        { kind: 'eq', math: String(c1), note: 'u₁ par Crank-Nicolson', subgoal: 'cn' },
+        { kind: 'eq', math: line, note: t('u₁ figure des deux côtés : on l\'isole'), subgoal: 'cn' },
+        { kind: 'eq', math: String(c1), note: t('u₁ par Crank-Nicolson'), subgoal: 'cn' },
       ],
       hints: [], noHints: true, subgoals: SUB, key: `${RK}:4then:${d.f}:${h}:${d.u0}`,
     });
   }
   return iterTable({
     skill: RK, level, key: `${level}:${d.f}:${d.h}:${d.u0}`, n, cols: HEUN_COLS,
-    prompt: `${problemText(d)}. Méthode de Heun : k₁ = f(tₙ, uₙ), k₂ = f(tₙ₊₁, uₙ + h·k₁), uₙ₊₁ = uₙ + (h/2)(k₁ + k₂). ${level === 1 ? 'Remplis k₁ et k₂ (u₁ est donné).' : 'Remplis k₁, k₂ et uₙ.'}`,
+    prompt: level === 1
+      ? t('{pb}. Méthode de Heun : k₁ = f(tₙ, uₙ), k₂ = f(tₙ₊₁, uₙ + h·k₁), uₙ₊₁ = uₙ + (h/2)(k₁ + k₂). Remplis k₁ et k₂ (u₁ est donné).', { pb: problemText(d) })
+      : t('{pb}. Méthode de Heun : k₁ = f(tₙ, uₙ), k₂ = f(tₙ₊₁, uₙ + h·k₁), uₙ₊₁ = uₙ + (h/2)(k₁ + k₂). Remplis k₁, k₂ et uₙ.', { pb: problemText(d) }),
     phi, then,
     given: (k, id) => k === 0 || id === 't' || (level === 1 && id === 'u'),
-    hints: H('Heun : un pas d\'Euler pour prédire, puis la moyenne des deux pentes.',
+    hints: H(t('Heun : un pas d\'Euler pour prédire, puis la moyenne des deux pentes.'),
       `k₂ = f(${nice(d.h)} ; ${d.u0} + ${nice(d.h)}·□)`,
       `k₁ = ${nice(rows[1].k1)}, k₂ = ${nice(rows[1].k2)}, u₁ = ${nice(rows[1].u)}.`),
     subgoals: SUB, baits: ['n_heun_k2'], fallback: d.fallback,
@@ -66,7 +69,7 @@ function heunTable(rng, level) {
 
 // ---------- L3: recognise a scheme ----------
 
-const NAMES = { EP: 'Euler progressif', ER: 'Euler rétrograde', CN: 'Crank-Nicolson', Heun: 'Heun', none: 'Aucun de ces schémas' };
+const NAMES = { EP: t('Euler progressif'), ER: t('Euler rétrograde'), CN: 'Crank-Nicolson', Heun: 'Heun', none: t('Aucun de ces schémas') };
 const GENERIC = {
   EP: 'uₙ₊₁ = uₙ + h·f(tₙ, uₙ)',
   ER: 'uₙ₊₁ = uₙ + h·f(tₙ₊₁, uₙ₊₁)',
@@ -82,11 +85,11 @@ const GM = {
   none: 'uₙ₊₁ = uₙ + (Δt/2)·(−2uₙ + sin(nΔt·uₙ) + sin((n + 1)Δt·uₙ))',
 };
 const WHY = {
-  EP: 'la pente au début du pas seulement : explicite, ordre 1',
-  ER: 'la pente au nouveau point (tₙ₊₁, uₙ₊₁) : implicite, ordre 1',
-  CN: 'la moyenne des pentes aux deux bouts, uₙ₊₁ dans les deux membres : implicite, ordre 2',
-  Heun: 'la moyenne de la pente au début et de la pente au point prédit par Euler : explicite, ordre 2',
-  none: 'le second terme évalue f en (tₙ₊₁, uₙ) : ce n\'est ni Crank-Nicolson (il faudrait uₙ₊₁) ni Heun (il faudrait uₙ + h·f(tₙ, uₙ))',
+  EP: t('la pente au début du pas seulement : explicite, ordre 1'),
+  ER: t('la pente au nouveau point (tₙ₊₁, uₙ₊₁) : implicite, ordre 1'),
+  CN: t('la moyenne des pentes aux deux bouts, uₙ₊₁ dans les deux membres : implicite, ordre 2'),
+  Heun: t('la moyenne de la pente au début et de la pente au point prédit par Euler : explicite, ordre 2'),
+  none: t('le second terme évalue f en (tₙ₊₁, uₙ) : ce n\'est ni Crank-Nicolson (il faudrait uₙ₊₁) ni Heun (il faudrait uₙ + h·f(tₙ, uₙ))'),
 };
 
 function recognise(rng, level, opts = {}, forceGM = false) {
@@ -100,9 +103,11 @@ function recognise(rng, level, opts = {}, forceGM = false) {
   wrongs.sort((a, b) => (b.rule ? 1 : 0) - (a.rule ? 1 : 0));
   return mcqDistinct({
     skill: RK, level, key: `${RK}:rec:${gm ? 'gm' : 'f'}:${s}`, exam: opts.exam ? examTag(opts) : false,
-    prompt: `${gm ? 'Pour u′ = −u + sin(tu), tₙ = nΔt, on considère' : 'Pour u′ = f(t, u), on considère'} le schéma<br><b>${formula}</b><br>De quel schéma s'agit-il ?`,
+    prompt: gm
+      ? t('Pour u′ = −u + sin(tu), tₙ = nΔt, on considère le schéma<br><b>{formula}</b><br>De quel schéma s\'agit-il ?', { formula })
+      : t('Pour u′ = f(t, u), on considère le schéma<br><b>{formula}</b><br>De quel schéma s\'agit-il ?', { formula }),
     right: NAMES[s], wrongs: wrongs.slice(0, 3),
-    solution: [{ html: `${NAMES[s]} : ${WHY[s]}.`, note: '' }],
+    solution: [{ html: t('{name} : {why}.', { name: NAMES[s], why: WHY[s] }), note: '' }],
   }, rng);
 }
 
@@ -130,7 +135,7 @@ const TESTS = [
 function level5(rng) {
   return codeItem({
     skill: RK, level: 5, ref: HEUN, blanks: [0, 1], traps: TRAPS, wrong: { 1: 'u + h * (k1 + k2)' }, rng,
-    prompt: 'Complète la méthode de Heun : une prédiction par Euler, puis la moyenne des deux pentes.',
+    prompt: t('Complète la méthode de Heun : une prédiction par Euler, puis la moyenne des deux pentes.'),
     tests: TESTS, then: sqrtReadtable(rng, 5, { heun: true }),
     hints: [], subgoals: SUB, key: '5',
   });
@@ -146,7 +151,7 @@ function examMcq(rng, opts) {
   const bad = d.u0 + (h.valueOf() / 2) * (k1.valueOf() + d.lam * (d.u0 + k1.valueOf()));
   return mcqDistinct({
     skill: RK, level: 4, key: `${RK}:mcq:${d.lam}:${h}:${d.u0}`, exam: examTag(opts),
-    prompt: `u′ = ${fShow(d.lam, 0)}, u(0) = ${d.u0}, h = ${nice(h)}. Un pas de la méthode de Heun donne u₁ =`,
+    prompt: t('u′ = {v1}, u(0) = {u0}, h = {h}. Un pas de la méthode de Heun donne u₁ =', { v1: fShow(d.lam, 0), u0: d.u0, h: nice(h) }),
     right: nice(d.rows.Heun[1].u),
     wrongs: [
       { html: String(Number(bad.toPrecision(10))).replace('.', ',').replace('-', '−'), rule: 'n_heun_k2' },

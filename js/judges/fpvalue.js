@@ -12,6 +12,7 @@ import { fpEval, fl, fpText } from '../cas/fp.js';
 import { parse } from '../cas/parse.js';
 import { stripParen } from '../cas/ast.js';
 import { diagnoseLine } from './diagnose.js';
+import { t } from '../i18n.js';
 
 const p = (cfg) => cfg.digits ?? 4;
 
@@ -26,15 +27,15 @@ const literalOf = (n) => {
 
 // Significant digits written: « 0,01581 » → 4, « 31,64 » → 4, « 0,02 » → 1.
 export function sigWritten(text) {
-  const t = String(text).replace(',', '.').replace(/^[-−]/, '').replace(/e.*$/i, '');
-  const d = t.replace('.', '').replace(/^0+/, '');
+  const tq = String(text).replace(',', '.').replace(/^[-−]/, '').replace(/e.*$/i, '');
+  const d = tq.replace('.', '').replace(/^0+/, '');
   return d.length;
 }
 
 export function isFinal(cfg, node) {
   const lit = literalOf(node);
   if (lit === null) return false;
-  if (sigWritten(lit) > p(cfg)) return `Arrondis à ${p(cfg)} chiffres significatifs : ${fpText(fpEval(node, p(cfg)), p(cfg))}.`;
+  if (sigWritten(lit) > p(cfg)) return t('Arrondis à {cfg} chiffres significatifs : {v1}.', { cfg: p(cfg), v1: fpText(fpEval(node, p(cfg)), p(cfg)) });
   return true;
 }
 
@@ -44,7 +45,7 @@ export function judgeLine(cfg, prev, input) {
   const read = readLine({ ...cfg, vars: [] }, input);
   if (read.error) return read.error;
   const { node } = read;
-  if (prev && sameLine(node, prev)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev && sameLine(node, prev)) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const digits = p(cfg);
   const want = cfg.expect !== undefined ? fpEval(parse(String(cfg.expect)), digits) : fpEval(prev, digits);
   const got = fpEval(node, digits);
@@ -52,7 +53,7 @@ export function judgeLine(cfg, prev, input) {
     const diag = diagnoseLine('value', prev, node, cfg, (a, b) => same(fpEval(a, digits), fpEval(b, digits)));
     return {
       kind: 'wrong', node, rule: diag?.rules?.[0] ?? null, diag,
-      message: `Avec ${digits} chiffres significatifs, on obtient ${fpText(want, digits)} : arrondis après chaque opération.`,
+      message: t('Avec {digits} chiffres significatifs, on obtient {v1} : arrondis après chaque opération.', { digits, v1: fpText(want, digits) }),
     };
   }
   const fin = isFinal(cfg, node);

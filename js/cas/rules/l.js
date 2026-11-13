@@ -17,6 +17,7 @@ import { DEFS as VS } from './l-vs.js';
 import { DEFS as EIG } from './l-eig.js';
 import { DEFS as ORTH } from './l-orth.js';
 import { DEFS as SYM } from './l-sym.js';
+import { t } from '../../i18n.js';
 
 export const META = [
   { id: "l_rhs_forgotten", family: "linear", tag: "E", skill: "l-sys-augmented", repair: "l-sys-augmented", example: ["L2 ← L2 − 2L1 : [0, 1, 3 | 7]", "[0, 1, 3 | 1]"], transformText: "Appliquer op aux colonnes 1 à n de prev et recopier telle quelle la dernière colonne (ou la partie droite de [A | I])", explainText: "Tu as transformé les coefficients de la ligne {i}, mais pas son second membre : il reste {bᵢ} au lieu de {bᵢ + k·bⱼ}. Une équation se transforme en entier, des deux côtés du signe =." },
@@ -120,7 +121,9 @@ export function fill(text, ctx = {}) {
 
 export const RULES = META.map((m) => {
   const d = DEFS[m.id];
-  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example };
-  if (!d) return { ...base, name: `Piège ${m.id}`, stub: true, judges: [], explain: (ctx) => fill(m.explainText, ctx) };
-  return { ...base, explain: (ctx) => fill(m.explainText, ctx), ...d };
+  // The examples and the catalogue's explanation are shown: translated whole
+  // (a math-only example is its own translation).
+  const base = { id: m.id, family: m.family, tag: m.tag, skill: m.skill, repair: m.repair, example: m.example.map((e) => (e ? t(e) : e)) };
+  if (!d) return { ...base, name: t('Piège {id}', { id: m.id }), stub: true, judges: [], explain: (ctx) => fill(t(m.explainText), ctx) };
+  return { ...base, explain: (ctx) => fill(t(m.explainText), ctx), ...d };
 });

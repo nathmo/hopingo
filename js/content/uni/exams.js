@@ -12,6 +12,7 @@
 // Later steps (U6–U10) add their blueprints to this list.
 
 import { EXAM_ANALYSE1 } from './exams-analyse1.js';
+import { localize } from '../../i18n.js';
 
 export const EXAMS = [
   {
@@ -70,3 +71,6 @@ import { EXAM_ANALYSE3, EXAM_ANALYSE4 } from './exams-vcf.js';
 
 EXAMS.push(EXAM_ANALYSE3, EXAM_ANALYSE4);
 Object.assign(EXAM_BY_ID, { [EXAM_ANALYSE3.id]: EXAM_ANALYSE3, [EXAM_ANALYSE4.id]: EXAM_ANALYSE4 });
+
+// The title and the source note of every blueprint, in the interface's language.
+for (const e of EXAMS) localize(e, ['title', 'source']);

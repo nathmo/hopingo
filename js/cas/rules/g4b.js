@@ -15,6 +15,7 @@ import { lit } from '../ast.js';
 import { Q } from '../../math/rational.js';
 import { vl } from './g4a.js';
 import { cl } from './g10b.js';
+import { t } from '../../i18n.js';
 
 const gl = (dim, coefs) => ({ t: 'gline', text: '', obj: { kind: 'poly', dim, coefs } });
 
@@ -35,7 +36,7 @@ const toQ = (x) => { for (let d = 1; d <= 48; d++) { const n = Math.round(x * d)
 export const RULES = [
   {
     id: 'g4_square_constant', family: 'rule', tag: 'E', skill: 'g4-sphere', repair: 'quad-complete',
-    example: ['x² − 4x = (x − 2)²', '(x − 2)² − 4'], name: 'Constante du carré oubliée',
+    example: ['x² − 4x = (x − 2)²', '(x − 2)² − 4'], name: t('Constante du carré oubliée'),
     judges: ['geom', 'conic'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg || {};
@@ -51,12 +52,14 @@ export const RULES = [
       const node = cfg.kind === 'conic' ? cl('', bad, false) : gl(dim, bad);
       return [{ node, ctx: { extra: String(toQ(extra) ?? extra) } }];
     },
-    explain: (ctx = {}) => `(x − 2)² = x² − 4x + 4 : en écrivant le carré, tu as ajouté une constante, qu'il faut retirer${ctx.extra ? ` (ici, ${String(ctx.extra).replace('-', '−')} en tout)` : ''}. Ton rayon² est faux.`,
+    explain: (ctx = {}) => (ctx.extra
+      ? t('(x − 2)² = x² − 4x + 4 : en écrivant le carré, tu as ajouté une constante, qu\'il faut retirer (ici, {extra} en tout). Ton rayon² est faux.', { extra: String(ctx.extra).replace('-', '−') })
+      : t('(x − 2)² = x² − 4x + 4 : en écrivant le carré, tu as ajouté une constante, qu\'il faut retirer. Ton rayon² est faux.')),
     check: { judge: { kind: 'geom', object: 'circle', ref: 'x^2 + y^2 - 4x + 6y - 12 = 0' }, prev: 'x^2 + y^2 - 4x + 6y - 12 = 0', line: '(x - 2)^2 + (y + 3)^2 - 12 = 0' },
   },
   {
     id: 'g4_not_normalized', family: 'rule', tag: 'E', skill: 'g4-sphere', repair: 'g4-sphere',
-    example: ['3x² + 3y² + 42x − 6y + 75 = 0 : Ω = (−21 ; 3)', '(−7 ; 1)'], name: 'Centre lu sans diviser par le coefficient de x²',
+    example: ['3x² + 3y² + 42x − 6y + 75 = 0 : Ω = (−21 ; 3)', '(−7 ; 1)'], name: t('Centre lu sans diviser par le coefficient de x²'),
     judges: ['vector', 'geom'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg || {};
@@ -82,7 +85,9 @@ export const RULES = [
       });
       return [{ node: gl(dim, bad), ctx: { a: String(toQ(a)) } }];
     },
-    explain: (ctx = {}) => `Le centre se lit sur x² + y² + Dx + Ey + F = 0, avec 1 devant x². Divise d'abord toute l'équation par ${ctx.a ? ctx.a : 'le coefficient de x²'}.`,
+    explain: (ctx = {}) => (ctx.a
+      ? t('Le centre se lit sur x² + y² + Dx + Ey + F = 0, avec 1 devant x². Divise d\'abord toute l\'équation par {a}.', { a: ctx.a })
+      : t('Le centre se lit sur x² + y² + Dx + Ey + F = 0, avec 1 devant x². Divise d\'abord toute l\'équation par le coefficient de x².')),
     check: { judge: { kind: 'vector', expect: '(-7 ; 1)', circleEq: '3x^2 + 3y^2 + 42x - 6y + 75 = 0' }, prev: 'Ω', line: '(-21 ; 3)' },
   },
 ];
@@ -111,7 +116,7 @@ const fr = (x) => String(x).replace('-', '−');
 RULES.push(
   {
     id: 'g4_cross_middle_sign', family: 'sign', tag: 'E', skill: 'g4-cross', repair: 'g4-cross',
-    example: ['(2 ; −7 ; 1)', '(2 ; 7 ; 1)'], name: 'Signe de la 2e composante du produit vectoriel',
+    example: ['(2 ; −7 ; 1)', '(2 ; 7 ; 1)'], name: t('Signe de la 2e composante du produit vectoriel'),
     judges: ['vector'],
     transform(prev, ctx) {
       const c = ctx?.cfg?.cross;
@@ -120,12 +125,14 @@ RULES.push(
       if (n[1].n === 0) return [];
       return [{ node: vline([n[0], n[1].neg(), n[2]]), ctx: { c: fr(n[1]) } }];
     },
-    explain: (ctx = {}) => `La 2e composante est u₃v₁ − u₁v₃${ctx.c ? ` = ${ctx.c}` : ''}. Avec le développement par la 1re ligne, le cofacteur du milieu porte un signe −. Contrôle : ton vecteur n'est pas orthogonal à u⃗.`,
+    explain: (ctx = {}) => (ctx.c
+      ? t('La 2e composante est u₃v₁ − u₁v₃ = {c}. Avec le développement par la 1re ligne, le cofacteur du milieu porte un signe −. Contrôle : ton vecteur n\'est pas orthogonal à u⃗.', { c: ctx.c })
+      : t('La 2e composante est u₃v₁ − u₁v₃. Avec le développement par la 1re ligne, le cofacteur du milieu porte un signe −. Contrôle : ton vecteur n\'est pas orthogonal à u⃗.')),
     check: { judge: { kind: 'vector', symbols: { u: '(2 ; -1 ; 3)', v: '(1 ; 0 ; -2)' }, expect: 'u ∧ v', cross: [['2', '-1', '3'], ['1', '0', '-2']] }, prev: 'u ∧ v', line: '(2 ; -7 ; 1)' },
   },
   {
     id: 'g4_cross_commute', family: 'rule', tag: 'E', skill: 'g4-cross', repair: 'g4-cross',
-    example: ['v⃗ ∧ u⃗ = u⃗ ∧ v⃗', '−u⃗ ∧ v⃗'], name: 'Produit vectoriel pris comme commutatif',
+    example: ['v⃗ ∧ u⃗ = u⃗ ∧ v⃗', '−u⃗ ∧ v⃗'], name: t('Produit vectoriel pris comme commutatif'),
     judges: ['vector'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg || {};
@@ -138,12 +145,12 @@ RULES.push(
       const n = crossQ(qv(cfg.cross[0]), qv(cfg.cross[1]));
       return [{ node: vline(n.map((x) => x.neg())), ctx: {} }];
     },
-    explain: () => 'Le produit vectoriel change de signe quand on échange les facteurs : v⃗ ∧ u⃗ = −u⃗ ∧ v⃗, et u⃗ ∧ u⃗ = 0⃗.',
+    explain: () => t('Le produit vectoriel change de signe quand on échange les facteurs : v⃗ ∧ u⃗ = −u⃗ ∧ v⃗, et u⃗ ∧ u⃗ = 0⃗.'),
     check: { judge: { kind: 'vector', symbols: { u: '(2 ; -1 ; 3)', v: '(1 ; 0 ; -2)' }, expect: 'u ∧ v', cross: [['2', '-1', '3'], ['1', '0', '-2']] }, prev: 'u ∧ v', line: '(-2 ; -7 ; -1)' },
   },
   {
     id: 'g4_tetra_factor', family: 'rule', tag: 'E', skill: 'g4-triple', repair: 'g4-triple',
-    example: ['V = 24', '24/6 = 4'], name: 'Volume du tétraèdre sans le facteur 1/6',
+    example: ['V = 24', '24/6 = 4'], name: t('Volume du tétraèdre sans le facteur 1/6'),
     judges: ['value'],
     transform(prev, ctx) {
       const t = ctx?.cfg?.tetra;
@@ -151,12 +158,12 @@ RULES.push(
       const m = absQ(qOf(t.m));
       return [1, 2, 3].map((k) => ({ node: numNode(m.div(k)), ctx: { m: fr(m) } }));
     },
-    explain: (ctx = {}) => `${ctx.m ? `|${ctx.m}|` : '|[AB⃗, AC⃗, AD⃗]|'} est le volume du parallélépipède. Le tétraèdre en est le sixième : ½ pour la base triangulaire, ⅓ pour la pyramide.`,
+    explain: (ctx = {}) => t('{m} est le volume du parallélépipède. Le tétraèdre en est le sixième : ½ pour la base triangulaire, ⅓ pour la pyramide.', { m: ctx.m ? `|${ctx.m}|` : '|[AB⃗, AC⃗, AD⃗]|' }),
     check: { judge: { kind: 'value', expect: '4', tetra: { m: '24' } }, prev: 'V', line: '24' },
   },
   {
     id: 'g4_dist_no_norm', family: 'geometry', tag: 'E', skill: 'g4-dist-point', repair: 'g4-dist-point',
-    example: ['d = 9', '9/3'], name: 'Distance sans diviser par ‖n⃗‖',
+    example: ['d = 9', '9/3'], name: t('Distance sans diviser par ‖n⃗‖'),
     judges: ['value'],
     transform(prev, ctx) {
       const t = ctx?.cfg?.dist;
@@ -164,24 +171,28 @@ RULES.push(
       const e = qOf(t.e);
       return [absQ(e), e].map((x) => ({ node: numNode(x), ctx: { e: fr(e), n: t.n ? fr(t.n) : null } }));
     },
-    explain: (ctx = {}) => `${ctx.e ?? 'ax₀ + by₀ + cz₀ + d'} est la valeur de l'équation en P, pas une distance. Elle devient une distance après division par ‖n⃗‖${ctx.n ? ` = ${ctx.n}` : ''}, en valeur absolue.`,
+    explain: (ctx = {}) => (ctx.n
+      ? t('{e} est la valeur de l\'équation en P, pas une distance. Elle devient une distance après division par ‖n⃗‖ = {n}, en valeur absolue.', { e: ctx.e ?? 'ax₀ + by₀ + cz₀ + d', n: ctx.n })
+      : t('{e} est la valeur de l\'équation en P, pas une distance. Elle devient une distance après division par ‖n⃗‖, en valeur absolue.', { e: ctx.e ?? 'ax₀ + by₀ + cz₀ + d' })),
     check: { judge: { kind: 'value', expect: '3', dist: { e: '9', n: '3' } }, prev: 'd', line: '9' },
   },
   {
     id: 'g4_skew_any_points', family: 'geometry', tag: 'E', skill: 'g4-dist-skew', repair: 'g4-dist-skew',
-    example: ['d = ‖AB⃗‖', '|AB⃗·n⃗|/‖n⃗‖'], name: 'Distance prise entre deux points quelconques',
+    example: ['d = ‖AB⃗‖', '|AB⃗·n⃗|/‖n⃗‖'], name: t('Distance prise entre deux points quelconques'),
     judges: ['value'],
     transform(prev, ctx) {
       const t = ctx?.cfg?.skew;
       if (!t) return [];
       return [{ node: { t: 'sqrt', e: lit(qOf(t.ab2)) }, ctx: { ab2: String(t.ab2) } }];
     },
-    explain: (ctx = {}) => `A et B sont des points quelconques des droites${ctx.ab2 ? ` (AB = √${ctx.ab2})` : ''}. La distance est la plus courte : c'est la projection de AB⃗ sur n⃗ = u⃗ ∧ v⃗, |AB⃗·n⃗|/‖n⃗‖.`,
+    explain: (ctx = {}) => (ctx.ab2
+      ? t('A et B sont des points quelconques des droites (AB = √{ab2}). La distance est la plus courte : c\'est la projection de AB⃗ sur n⃗ = u⃗ ∧ v⃗, |AB⃗·n⃗|/‖n⃗‖.', { ab2: ctx.ab2 })
+      : t('A et B sont des points quelconques des droites. La distance est la plus courte : c\'est la projection de AB⃗ sur n⃗ = u⃗ ∧ v⃗, |AB⃗·n⃗|/‖n⃗‖.')),
     check: { judge: { kind: 'value', expect: '3', form: 'exact', skew: { ab2: '27' } }, prev: 'd', line: '√27' },
   },
   {
     id: 'g4_common_perp_one_condition', family: 'method', tag: 'E', skill: 'g4-common-perp', repair: 'g4-common-perp',
-    example: ['PQ⃗ ⟂ u⃗ seulement', 'PQ⃗ ⟂ u⃗ et v⃗'], name: "Une seule condition d'orthogonalité",
+    example: [t('PQ⃗ ⟂ u⃗ seulement'), t('PQ⃗ ⟂ u⃗ et v⃗')], name: t("Une seule condition d'orthogonalité"),
     judges: ['vector', 'value'],
     transform(prev, ctx) {
       const cfg = ctx?.cfg || {};
@@ -198,7 +209,7 @@ RULES.push(
         { node: vline(B.map((x, i) => x.add(t1.mul(v[i])))), ctx: {} },
       ];
     },
-    explain: () => "PQ⃗ doit être perpendiculaire aux deux droites : PQ⃗·u⃗ = 0 et PQ⃗·v⃗ = 0, un système en s et t. Ta ligne ne vérifie qu'une des deux conditions.",
+    explain: () => t("PQ⃗ doit être perpendiculaire aux deux droites : PQ⃗·u⃗ = 0 et PQ⃗·v⃗ = 0, un système en s et t. Ta ligne ne vérifie qu'une des deux conditions."),
     check: { judge: { kind: 'vector', expect: '(1 ; 0 ; 0)', perp: { A: ['-1', '1', '0'], u: ['2', '-1', '0'], B: ['4', '2', '1'], v: ['2', '0', '-1'] } }, prev: 'P', line: '(13/5 ; -4/5 ; 0)' },
   },
 );

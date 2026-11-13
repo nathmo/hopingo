@@ -16,12 +16,13 @@ import { Q } from '../../math/rational.js';
 import { matLines, mcqDistinct, tfL, withCells } from './alglin-kit.js';
 import { linesItem, examTag } from './kit.js';
 import { q, qt, mt, vt, MLm, sub, MX, R, fq, vR, rad, blankAll, menuOf, H, isqrt } from './matrices-c-kit.js';
+import { t } from '../../i18n.js';
 
 const LR = 'm-svd-lowrank';
 const SUB = [
   { id: 'svd', label: 'SVD', skill: 'l-svd-compute' },
-  { id: 'rank1', label: 'terme de rang 1', skill: 'm-rank1-proj' },
-  { id: 'err', label: 'erreurs', skill: LR },
+  { id: 'rank1', label: t('terme de rang 1'), skill: 'm-rank1-proj' },
+  { id: 'err', label: t('erreurs'), skill: LR },
 ];
 const KEYS = ['calc', 'greek'];
 
@@ -58,7 +59,7 @@ function shuffleFam(fam, rng) {
 // {A, m, n, terms: [{s, p, qv, sig2}] by σ decreasing}. shape: [m, n].
 export function svdData(rng, shape, { terms: want = null, max = 12 } = {}) {
   const [m, n] = shape;
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const fam = (d) => (d === 2 ? rng.pick(P2) : d === 3 ? rng.pick(Q3) : H4);
     const ps = shuffleFam(fam(m), rng);
     const qs = shuffleFam(fam(n), rng);
@@ -92,33 +93,33 @@ const lrCfg = (d, k) => ({ s2: d.terms.map((x) => String(x.sig2)), k });
 const errF2 = (d, k) => d.terms.slice(k).reduce((s, x) => s + x.sig2, 0);
 
 const MENU = [
-  { id: 'first', label: 'Former A₁ = σ₁u₁v₁ᵀ', why: 'A₁ est déjà écrite.' },
-  { id: 'err2', label: 'Erreur en norme 2', why: 'Il faut d\'abord A₁, ou cette erreur est déjà donnée.' },
-  { id: 'errF', label: 'Erreur de Frobenius', why: 'Pas maintenant.' },
-  { id: 'store', label: 'Coût de stockage', why: 'Pas maintenant.' },
+  { id: 'first', label: t('Former A₁ = σ₁u₁v₁ᵀ'), why: t('A₁ est déjà écrite.') },
+  { id: 'err2', label: t('Erreur en norme 2'), why: t('Il faut d\'abord A₁, ou cette erreur est déjà donnée.') },
+  { id: 'errF', label: t('Erreur de Frobenius'), why: t('Pas maintenant.') },
+  { id: 'store', label: t('Coût de stockage'), why: t('Pas maintenant.') },
 ];
 
 function a1Seg(d, { guided = false, menu = false } = {}) {
   const x = d.terms[0];
   const line = { kind: 'eq', math: mt(d.A1), note: `σ₁u₁v₁ᵀ = ${sigR(x)}·${unitR(x.p)}·${unitR(x.qv)}ᵀ`, subgoal: 'rank1' };
   return [
-    { kind: 'segment', html: 'A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.', ask: 'A₁ =', start: { math: 'A_1' }, judge: { kind: 'mat', expect: mt(d.A1), ...(menu ? { menu: menuOf(MENU, 'first') } : {}) } },
+    { kind: 'segment', html: t('A₁ = σ₁u₁v₁ᵀ, la meilleure approximation de rang 1.'), ask: 'A₁ =', start: { math: 'A_1' }, judge: { kind: 'mat', expect: mt(d.A1), ...(menu ? { menu: menuOf(MENU, 'first') } : {}) } },
     guided ? withCells(line, [[0, 0], [d.m - 1, d.n - 1]]) : line,
   ];
 }
 function err2Seg(d, { guided = false, menu = false, k = 1 } = {}) {
   const v = rad(q(d.terms[k].sig2));
-  const line = { kind: 'eq', math: v, note: `Le plus grand terme jeté : σ${sub(k + 1)}`, subgoal: 'err' };
+  const line = { kind: 'eq', math: v, note: t('Le plus grand terme jeté : σ{k}', { k: sub(k + 1) }), subgoal: 'err' };
   return [
-    { kind: 'segment', html: `L'erreur ‖A − A${sub(k)}‖₂.`, ask: `‖A − A${sub(k)}‖₂ =`, start: { math: `E_${k}` }, judge: { kind: 'value', expect: v, form: 'exact', lowrank: lrCfg(d, k), ...(menu ? { menu: menuOf(MENU, 'err2') } : {}) } },
+    { kind: 'segment', html: t('L\'erreur ‖A − A{k}‖₂.', { k: sub(k) }), ask: `‖A − A${sub(k)}‖₂ =`, start: { math: `E_${k}` }, judge: { kind: 'value', expect: v, form: 'exact', lowrank: lrCfg(d, k), ...(menu ? { menu: menuOf(MENU, 'err2') } : {}) } },
     guided ? { ...line, ...blankAll(v) } : line,
   ];
 }
 function errFSeg(d, { menu = false, k = 1 } = {}) {
   const v = rad(q(errF2(d, k)));
   return [
-    { kind: 'segment', html: `L'erreur de Frobenius ‖A − A${sub(k)}‖_F.`, ask: `‖A − A${sub(k)}‖_F =`, start: { math: `F_${k}` }, judge: { kind: 'value', expect: v, form: 'exact', lowrank: lrCfg(d, k), ...(menu ? { menu: menuOf(MENU, 'errF') } : {}) } },
-    { kind: 'eq', math: v, note: `√(${d.terms.slice(k).map((x) => x.sig2).join(' + ')}) : tous les termes jetés`, subgoal: 'err' },
+    { kind: 'segment', html: t('L\'erreur de Frobenius ‖A − A{k}‖_F.', { k: sub(k) }), ask: `‖A − A${sub(k)}‖_F =`, start: { math: `F_${k}` }, judge: { kind: 'value', expect: v, form: 'exact', lowrank: lrCfg(d, k), ...(menu ? { menu: menuOf(MENU, 'errF') } : {}) } },
+    { kind: 'eq', math: v, note: t('√({sum}) : tous les termes jetés', { sum: d.terms.slice(k).map((x) => x.sig2).join(' + ') }), subgoal: 'err' },
   ];
 }
 
@@ -135,21 +136,21 @@ function level12(rng, level) {
   const parts = [...a1Seg(d, { guided: true }), ...err2Seg(d, { guided: true })];
   if (level === 2) {
     parts.splice(1, 0, {
-      kind: 'decision', prompt: 'Quel terme garde-t-on pour la meilleure approximation de rang 1 ?', options: [
-        { id: 'big', label: `Celui de la plus grande valeur singulière, ${sigR(d.terms[0])}`, valid: true },
-        { id: 'first', label: `Celui écrit en premier (σ = ${sigR(d.terms[1])})`, valid: false, rule: 'm_rankk_wrong_sigma', why: `On garde le terme de plus grande valeur singulière : jeter ${sigR(d.terms[0])} coûterait une erreur ${sigR(d.terms[0])} au lieu de ${sigR(d.terms[1])}.` },
+      kind: 'decision', prompt: t('Quel terme garde-t-on pour la meilleure approximation de rang 1 ?'), options: [
+        { id: 'big', label: t('Celui de la plus grande valeur singulière, {s}', { s: sigR(d.terms[0]) }), valid: true },
+        { id: 'first', label: t('Celui écrit en premier (σ = {s})', { s: sigR(d.terms[1]) }), valid: false, rule: 'm_rankk_wrong_sigma', why: t('On garde le terme de plus grande valeur singulière : jeter {s1} coûterait une erreur {s1} au lieu de {s2}.', { s1: sigR(d.terms[0]), s2: sigR(d.terms[1]) }) },
       ],
     });
   }
   const { start, judge, script } = splitFirst(parts);
   const sum = level === 2
-    ? `A = ${sigR(d.terms[1])}·u₂v₂ᵀ + ${sigR(d.terms[0])}·u₁v₁ᵀ, avec ${termsR(d, order)}`
-    : `A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec ${termsR(d)}`;
+    ? t('A = {s2}·u₂v₂ᵀ + {s1}·u₁v₁ᵀ, avec {terms}', { s2: sigR(d.terms[1]), s1: sigR(d.terms[0]), terms: termsR(d, order) })
+    : t('A = σ₁u₁v₁ᵀ + σ₂u₂v₂ᵀ, avec {terms}', { terms: termsR(d) });
   return matLines({
     skill: LR, level, mode: 'guided', keys: KEYS,
-    prompt: `A = ${MLm(d.Aq)} a pour SVD ${sum}. Donne la meilleure approximation de rang 1 de A, puis l'erreur en norme 2.`,
+    prompt: t('A = {A} a pour SVD {sum}. Donne la meilleure approximation de rang 1 de A, puis l\'erreur en norme 2.', { A: MLm(d.Aq), sum }),
     start, judge, script, subgoals: SUB, key: `${LR}:${level}:${mt(d.Aq)}`, baits: ['m_rankk_wrong_sigma'],
-    hints: H('Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l\'erreur en norme 2 est la plus grande valeur singulière jetée.',
+    hints: H(t('Garde le terme σᵢuᵢvᵢᵀ de la plus grande valeur singulière ; l\'erreur en norme 2 est la plus grande valeur singulière jetée.'),
       `A₁ = ${sigR(d.terms[0])}·${unitR(d.terms[0].p)}·${unitR(d.terms[0].qv)}ᵀ = [[□, …], …]`,
       `A₁ = ${R(mt(d.A1))}, ‖A − A₁‖₂ = ${sigR(d.terms[1])}`),
     fallback: d.fallback,
@@ -163,16 +164,16 @@ function level3(rng) {
   const store = k * (d.m + d.n + 1);
   const parts = [
     ...a1Seg(d, { menu: true }), ...err2Seg(d, { menu: true }), ...errFSeg(d, { menu: true }),
-    { kind: 'segment', html: 'Combien de nombres faut-il stocker pour A₁ (σ₁, u₁ et v₁) ?', ask: 'stockage =', start: { math: 'N' }, judge: { kind: 'value', expect: String(store), form: 'irreducible', menu: menuOf(MENU, 'store') } },
-    { kind: 'eq', math: String(store), note: `k(m + n + 1) = 1·(${d.m} + ${d.n} + 1), au lieu de ${d.m * d.n}`, subgoal: 'err' },
+    { kind: 'segment', html: t('Combien de nombres faut-il stocker pour A₁ (σ₁, u₁ et v₁) ?'), ask: t('stockage ='), start: { math: 'N' }, judge: { kind: 'value', expect: String(store), form: 'irreducible', menu: menuOf(MENU, 'store') } },
+    { kind: 'eq', math: String(store), note: t('k(m + n + 1) = 1·({m} + {n} + 1), au lieu de {mn}', { m: d.m, n: d.n, mn: d.m * d.n }), subgoal: 'err' },
   ];
   const { start, judge, script } = splitFirst(parts);
   const sum = d.terms.map((_, i) => `σ${sub(i + 1)}u${sub(i + 1)}v${sub(i + 1)}ᵀ`).join(' + ');
   return matLines({
     skill: LR, level: 3, mode: 'tap', tapActions: 'menu', keys: KEYS,
-    prompt: `A = ${MLm(d.Aq)} = ${sum}, avec ${termsR(d)}. Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d'abord chaque action.`,
+    prompt: t('A = {A} = {sum}, avec {terms}. Donne A₁, les erreurs ‖A − A₁‖₂ et ‖A − A₁‖_F, puis le coût de stockage de A₁. Choisis d\'abord chaque action.', { A: MLm(d.Aq), sum, terms: termsR(d) }),
     start, judge, script, subgoals: SUB, key: `${LR}:3:${mt(d.Aq)}`, baits: ['m_rankk_wrong_sigma'],
-    hints: H('‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés.',
+    hints: H(t('‖A − A₁‖₂ est le plus grand σ jeté ; ‖A − A₁‖_F est la racine de la somme des carrés des σ jetés.'),
       `‖A − A₁‖_F = √(${d.terms.slice(1).map(() => '□').join(' + ')})`,
       `‖A − A₁‖₂ = ${sigR(d.terms[1])}, ‖A − A₁‖_F = ${radR2(errF2(d, 1))}`),
     fallback: d.fallback,
@@ -185,28 +186,28 @@ function level4(rng) {
   const AtA = MX.mul(MX.transpose(d.Aq), d.Aq);
   const qv = x.qv.map((v) => q(v));
   const parts = [
-    { kind: 'segment', html: 'σ₁, la plus grande valeur singulière : la racine de la plus grande valeur propre de AᵀA (ou de AAᵀ, plus petite).', ask: 'σ₁ =', start: { math: 'σ_1' }, judge: { kind: 'value', expect: rad(q(x.sig2)), form: 'exact', sigma: true } },
+    { kind: 'segment', html: t('σ₁, la plus grande valeur singulière : la racine de la plus grande valeur propre de AᵀA (ou de AAᵀ, plus petite).'), ask: 'σ₁ =', start: { math: 'σ_1' }, judge: { kind: 'value', expect: rad(q(x.sig2)), form: 'exact', sigma: true } },
     { kind: 'eq', math: rad(q(x.sig2)), note: `√${x.sig2}`, subgoal: 'svd' },
-    { kind: 'segment', html: `v₁ : un vecteur propre de AᵀA pour λ = ${x.sig2}.`, ask: 'v₁ ∝', start: { math: 'v_1' }, judge: { kind: 'eigvec', A: mt(AtA), lambda: String(x.sig2) } },
+    { kind: 'segment', html: t('v₁ : un vecteur propre de AᵀA pour λ = {l}.', { l: x.sig2 }), ask: 'v₁ ∝', start: { math: 'v_1' }, judge: { kind: 'eigvec', A: mt(AtA), lambda: String(x.sig2) } },
     { kind: 'eq', math: vt(qv), note: `(AᵀA − ${x.sig2}I)v = 0`, subgoal: 'svd' },
     ...a1Seg(d), ...err2Seg(d),
   ];
-  parts[5] = { ...parts[5], note: `A₁ = Av₁v₁ᵀ, avec v₁ = ${unitR(x.qv)}` };
+  parts[5] = { ...parts[5], note: t('A₁ = Av₁v₁ᵀ, avec v₁ = {v}', { v: unitR(x.qv) }) };
   const { start, judge, script } = splitFirst(parts);
   return matLines({
     skill: LR, level: 4, mode: 'free', keys: KEYS,
-    prompt: `A = ${MLm(d.Aq)}. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l'erreur ‖A − A₁‖₂.`,
+    prompt: t('A = {A}. Trouve σ₁ et v₁, puis la meilleure approximation de rang 1, A₁ = σ₁u₁v₁ᵀ = Av₁v₁ᵀ, et l\'erreur ‖A − A₁‖₂.', { A: MLm(d.Aq) }),
     start, judge, script, subgoals: SUB, key: `${LR}:4:${mt(d.Aq)}`, baits: ['l_svd_sigma_is_eig', 'm_rankk_wrong_sigma'],
-    hints: H('AᵀA = ' + R(mt(AtA)) + ' : ses valeurs propres sont les σᵢ² (et des 0).',
-      `σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire`,
-      `σ₁ = ${sigR(x)}, v₁ = ${unitR(x.qv)}, A₁ = ${R(mt(d.A1))}, erreur ${sigR(d.terms[1])}`),
+    hints: H(t('AᵀA = {m} : ses valeurs propres sont les σᵢ² (et des 0).', { m: R(mt(AtA)) }),
+      t('σ₁ = √□ ; A₁ = A·v₁v₁ᵀ avec v₁ unitaire'),
+      t('σ₁ = {s1}, v₁ = {v}, A₁ = {A1}, erreur {err}', { s1: sigR(x), v: unitR(x.qv), A1: R(mt(d.A1)), err: sigR(d.terms[1]) })),
     fallback: d.fallback,
   });
 }
 
 // L5: k minimal for ‖A − A_k‖_F / ‖A‖_F ≤ t, from the σᵢ of a 4 × 4.
 function level5(rng) {
-  for (let t = 0; t < 300; t++) {
+  for (let tries = 0; tries < 300; tries++) {
     const s = rng.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 4).sort((a, b) => b - a);
     const sig2 = s.map((x) => 16 * x * x); // ‖pᵢ‖ = ‖qᵢ‖ = 2
     const total = sig2.reduce((a, b) => a + b, 0);
@@ -225,14 +226,14 @@ function level5(rng) {
     const d = { terms: sig2.map((x) => ({ sig2: x })) };
     const script = [
       { kind: 'eq', math: String(total), note: 'Σσᵢ²', subgoal: 'err' },
-      { kind: 'segment', html: `k minimal pour ‖A − A<sub>k</sub>‖_F ≤ ${tPct} de ‖A‖_F.`, ask: 'k =', start: { math: 'k' }, judge: { kind: 'value', expect: String(k), form: 'irreducible' } },
+      { kind: 'segment', html: t('k minimal pour ‖A − A<sub>k</sub>‖_F ≤ {pct} de ‖A‖_F.', { pct: tPct }), ask: 'k =', start: { math: 'k' }, judge: { kind: 'value', expect: String(k), form: 'irreducible' } },
       { kind: 'eq', math: String(k), note: `Σ_{i>k} σᵢ² ≤ ${String(Math.round(tt * tt * 1e6) / 1e6).replace('.', ',')}·${total} = ${String(Math.round(tt * tt * total * 100) / 100).replace('.', ',')}`, subgoal: 'err' },
-      { kind: 'segment', html: `L'erreur ‖A − A<sub>${k}</sub>‖₂ pour ce k.`, ask: `‖A − A${sub(k)}‖₂ =`, start: { math: `E_${k}` }, judge: { kind: 'value', expect: err2, form: 'exact', lowrank: lrCfg(d, k) } },
+      { kind: 'segment', html: t('L\'erreur ‖A − A<sub>{k}</sub>‖₂ pour ce k.', { k }), ask: `‖A − A${sub(k)}‖₂ =`, start: { math: `E_${k}` }, judge: { kind: 'value', expect: err2, form: 'exact', lowrank: lrCfg(d, k) } },
       { kind: 'eq', math: err2, note: `σ${sub(k + 1)}`, subgoal: 'err' },
     ];
     return linesItem({
       skill: LR, level: 5, mode: 'free', keys: KEYS, noHints: true,
-      prompt: `Une image 4 × 4 a les valeurs singulières ${sig.map((v) => R(v)).join(', ')}. On veut la compresser par A<sub>k</sub> avec une erreur relative de Frobenius ‖A − A<sub>k</sub>‖_F/‖A‖_F ≤ ${tPct}. Donne ‖A‖_F², le plus petit k, puis ‖A − A<sub>k</sub>‖₂.`,
+      prompt: t('Une image 4 × 4 a les valeurs singulières {sig}. On veut la compresser par A<sub>k</sub> avec une erreur relative de Frobenius ‖A − A<sub>k</sub>‖_F/‖A‖_F ≤ {pct}. Donne ‖A‖_F², le plus petit k, puis ‖A − A<sub>k</sub>‖₂.', { sig: sig.map((v) => R(v)).join(', '), pct: tPct }),
       start: 'N', judge: { kind: 'value', expect: String(total), form: 'irreducible' }, script: [{ kind: 'note', html: '‖A‖_F² :' }, ...script],
       subgoals: SUB, key: `${LR}:5:${s.join(',')}:${tt}`, baits: ['m_rankk_wrong_sigma'],
     });
@@ -247,46 +248,48 @@ function examMcq(rng, exam) {
     const fro = errF2(d, 1);
     return mcqDistinct({
       skill: LR, level: 4, key: `mcq:err:${mt(d.Aq)}`, exam: examTag({ exam }),
-      prompt: `A = ${MLm(d.Aq)} a les valeurs singulières ${d.terms.map(sigR).join(', ')}. Que vaut ‖A − A₁‖₂, où A₁ est la meilleure approximation de rang 1 de A ?`,
+      prompt: t('A = {A} a les valeurs singulières {sig}. Que vaut ‖A − A₁‖₂, où A₁ est la meilleure approximation de rang 1 de A ?', { A: MLm(d.Aq), sig: d.terms.map(sigR).join(', ') }),
       right: sigR(s2),
       wrongs: [{ html: sigR(s1), rule: 'm_rankk_wrong_sigma' }, { html: R(String(s2.sig2)), rule: 'l_svd_sigma_is_eig' }, fro !== s2.sig2 ? { html: radR2(fro) } : null].filter(Boolean),
       fillers: [{ html: radR2(s1.sig2 - s2.sig2) }, { html: '0' }, { html: radR2(s1.sig2 + s2.sig2) }],
-      solution: [{ html: `A − A₁ = Σ_{i≥2} σᵢuᵢvᵢᵀ : sa plus grande valeur singulière est σ₂ = ${sigR(s2)}.`, note: '' }],
+      solution: [{ html: t('A − A₁ = Σ_{i≥2} σᵢuᵢvᵢᵀ : sa plus grande valeur singulière est σ₂ = {s2}.', { s2: sigR(s2) }), note: '' }],
     }, rng);
   }
   // The image of the unit sphere.
   const wide = rng.chance(0.5);
   const d = svdData(rng, wide ? [2, 3] : [3, 2]);
   const [s1, s2] = d.terms.map(sigR);
-  const right = wide ? `L'ellipse pleine (intérieur compris) de demi-axes ${s1} et ${s2}` : `Une ellipse (la courbe seule), de demi-axes ${s1} et ${s2}, dans un plan de ℝ³`;
-  const other = wide ? `Le bord de l'ellipse de demi-axes ${s1} et ${s2}, seulement` : `L'ellipse pleine de demi-axes ${s1} et ${s2}, dans un plan de ℝ³`;
+  const right = wide ? t('L\'ellipse pleine (intérieur compris) de demi-axes {s1} et {s2}', { s1, s2 }) : t('Une ellipse (la courbe seule), de demi-axes {s1} et {s2}, dans un plan de ℝ³', { s1, s2 });
+  const other = wide ? t('Le bord de l\'ellipse de demi-axes {s1} et {s2}, seulement', { s1, s2 }) : t('L\'ellipse pleine de demi-axes {s1} et {s2}, dans un plan de ℝ³', { s1, s2 });
   return mcqDistinct({
     skill: LR, level: 4, key: `mcq:sphere:${mt(d.Aq)}`, exam: examTag({ exam }),
-    prompt: `A = ${MLm(d.Aq)} (valeurs singulières ${s1} et ${s2}). Quelle est l'image par A de la sphère unité de ℝ${wide ? '³' : '²'} ?`,
+    prompt: wide
+      ? t('A = {A} (valeurs singulières {s1} et {s2}). Quelle est l\'image par A de la sphère unité de ℝ³ ?', { A: MLm(d.Aq), s1, s2 })
+      : t('A = {A} (valeurs singulières {s1} et {s2}). Quelle est l\'image par A de la sphère unité de ℝ² ?', { A: MLm(d.Aq), s1, s2 }),
     right,
-    wrongs: [{ html: other, rule: 'l_svd_sphere_boundary' }, { html: `Un cercle de rayon ${s1}` }, { html: wide ? `Un ellipsoïde de ℝ³ de demi-axes ${s1}, ${s2} et 0` : `Un ellipsoïde de ℝ³ de demi-axes ${s1}, ${s2} et 1` }],
-    solution: [{ html: wide ? 'A écrase une direction de ℝ³ (son noyau) : des points de la sphère vont à l\'intérieur, l\'image est l\'ellipse pleine.' : 'A est injective : chaque point du cercle va sur le bord de l\'ellipse, l\'image est la courbe seule.', note: '' }],
+    wrongs: [{ html: other, rule: 'l_svd_sphere_boundary' }, { html: t('Un cercle de rayon {s1}', { s1 }) }, { html: wide ? t('Un ellipsoïde de ℝ³ de demi-axes {s1}, {s2} et 0', { s1, s2 }) : t('Un ellipsoïde de ℝ³ de demi-axes {s1}, {s2} et 1', { s1, s2 }) }],
+    solution: [{ html: wide ? t('A écrase une direction de ℝ³ (son noyau) : des points de la sphère vont à l\'intérieur, l\'image est l\'ellipse pleine.') : t('A est injective : chaque point du cercle va sur le bord de l\'ellipse, l\'image est la courbe seule.'), note: '' }],
   }, rng);
 }
 
 function examTf(rng) {
   const exam = { format: 'tf', points: 1 };
   const k = rng.int(0, 3);
-  if (k === 0) return tfL({ skill: LR, key: 'norm2', truth: true, exam, statement: '‖A‖₂ = σ₁, la plus grande valeur singulière de A.', explanation: 'Vrai : ‖Ax‖ = ‖ΣVᵀx‖ ≤ σ₁‖x‖, avec égalité en x = v₁.' });
-  if (k === 1) return tfL({ skill: LR, key: 'frob', truth: true, exam, statement: '‖A‖_F² = Σ aᵢⱼ² = Σ σᵢ².', explanation: 'Vrai : ‖A‖_F² = tr(AᵀA), la somme des valeurs propres de AᵀA, qui sont les σᵢ².' });
+  if (k === 0) return tfL({ skill: LR, key: 'norm2', truth: true, exam, statement: t('‖A‖₂ = σ₁, la plus grande valeur singulière de A.'), explanation: t('Vrai : ‖Ax‖ = ‖ΣVᵀx‖ ≤ σ₁‖x‖, avec égalité en x = v₁.') });
+  if (k === 1) return tfL({ skill: LR, key: 'frob', truth: true, exam, statement: '‖A‖_F² = Σ aᵢⱼ² = Σ σᵢ².', explanation: t('Vrai : ‖A‖_F² = tr(AᵀA), la somme des valeurs propres de AᵀA, qui sont les σᵢ².') });
   if (k === 2) {
     return tfL({
       skill: LR, key: 'zeroing', truth: false, exam,
-      statement: 'La meilleure approximation de rang 1 d\'une matrice 2 × 2 s\'obtient en gardant sa case de plus grand module et en mettant les autres à 0.',
+      statement: t('La meilleure approximation de rang 1 d\'une matrice 2 × 2 s\'obtient en gardant sa case de plus grand module et en mettant les autres à 0.'),
       counter: { kind: 'mx', prop: 'lowRankNotZeroing', params: {}, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: '[[2,1],[1,1]]' } },
-      explanation: 'Faux : A_k garde les k plus grands termes σᵢuᵢvᵢᵀ, pas les plus grandes cases. Pour [[2, 1], [1, 1]], garder le 2 laisse une erreur ‖·‖₂ ≈ 1,62 > σ₂ ≈ 0,38.',
+      explanation: t('Faux : A_k garde les k plus grands termes σᵢuᵢvᵢᵀ, pas les plus grandes cases. Pour [[2, 1], [1, 1]], garder le 2 laisse une erreur ‖·‖₂ ≈ 1,62 > σ₂ ≈ 0,38.'),
     });
   }
   return tfL({
     skill: LR, key: 'frob-sigma', truth: false, exam, ruleIfTrue: 'm_rankk_wrong_sigma',
-    statement: 'Pour toute matrice A, ‖A − A₁‖_F = σ₂.',
+    statement: t('Pour toute matrice A, ‖A − A₁‖_F = σ₂.'),
     counter: { kind: 'mx', prop: 'frobNotSigma', params: {}, ask: [{ v: 'A', label: 'A =', shape: [3, 3] }], answer: { A: '[[3,0,0],[0,2,0],[0,0,1]]' } },
-    explanation: 'Faux : ‖A − A₁‖_F = √(σ₂² + σ₃² + …). Pour diag(3, 2, 1), c\'est √5 et non 2. C\'est ‖A − A₁‖₂ qui vaut σ₂.',
+    explanation: t('Faux : ‖A − A₁‖_F = √(σ₂² + σ₃² + …). Pour diag(3, 2, 1), c\'est √5 et non 2. C\'est ‖A − A₁‖₂ qui vaut σ₂.'),
   });
 }
 

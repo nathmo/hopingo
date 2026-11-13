@@ -10,6 +10,7 @@
 // Exam: tf only (weight 0).
 
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 import { mcq, examTag } from './kit.js';
 import { partsItem } from './geo-kit.js';
 import {
@@ -18,15 +19,15 @@ import {
 
 export const SC = 'n-secant';
 const SUB = [
-  { id: 'eval', label: 'f aux deux derniers points', skill: SC },
-  { id: 'iterate', label: 'un pas de la sécante', skill: SC },
-  { id: 'newton', label: 'Newton avec la pente de la corde', skill: 'n-newton' },
-  { id: 'order', label: 'l\'ordre lu sur les incréments', skill: 'n-order-read' },
+  { id: 'eval', label: t('f aux deux derniers points'), skill: SC },
+  { id: 'iterate', label: t('un pas de la sécante'), skill: SC },
+  { id: 'newton', label: t('Newton avec la pente de la corde'), skill: 'n-newton' },
+  { id: 'order', label: t('l\'ordre lu sur les incréments'), skill: 'n-order-read' },
 ];
 const KEYS = ['calc'];
 
 function data(rng, { maxD = 500 } = {}) {
-  for (let t = 0; t < 200; t++) {
+  for (let tries = 0; tries < 200; tries++) {
     const cube = rng.chance(0.35);
     const c = cube ? rng.pick([2, 3, 5]) : rng.pick([2, 3, 5, 6, 7]);
     const e = cube ? 3 : 2;
@@ -63,25 +64,25 @@ function stepPart(d, k, level, { first = false, decision = null } = {}) {
   const [u, v] = [d.xs[k - 2], d.xs[k - 1]];
   const xk = String(d.xs[k]);
   return {
-    ...(first ? {} : { html: `Le pas suivant, à partir de x⁽${sup(k - 2)}⁾ et x⁽${sup(k - 1)}⁾ :` }), ask: `x⁽${sup(k)}⁾ =`, start: `x_${k}`,
+    ...(first ? {} : { html: t('Le pas suivant, à partir de {a} et {b} :', { a: `x⁽${sup(k - 2)}⁾`, b: `x⁽${sup(k - 1)}⁾` }) }), ask: `x⁽${sup(k)}⁾ =`, start: `x_${k}`,
     judge: { kind: 'value', expect: xk, form: 'irreducible' },
     notes: level <= 2 ? [`f(${fmt(u)}) = ${fmt(d.f(u))}, f(${fmt(v)}) = ${fmt(d.f(v))}.`] : [],
     decisions: decision ? [decision] : [],
     menu: [
-      { id: 'last', label: `Utiliser x⁽${sup(k - 2)}⁾ et x⁽${sup(k - 1)}⁾`, valid: true },
-      { id: 'first', label: `Utiliser x⁽⁰⁾ et x⁽${sup(k - 1)}⁾`, valid: k === 2, ...(k === 2 ? {} : { rule: 'n_secant_update', why: 'La sécante utilise les deux derniers points.' }) },
+      { id: 'last', label: t('Utiliser {a} et {b}', { a: `x⁽${sup(k - 2)}⁾`, b: `x⁽${sup(k - 1)}⁾` }), valid: true },
+      { id: 'first', label: t('Utiliser {a} et {b}', { a: 'x⁽⁰⁾', b: `x⁽${sup(k - 1)}⁾` }), valid: k === 2, ...(k === 2 ? {} : { rule: 'n_secant_update', why: t('La sécante utilise les deux derniers points.') }) },
     ].filter((o, i) => i === 0 || k > 2),
     lines: [
-      { math: stepText(d, k), note: 'x − f(x)·(x − x_prec)/(f(x) − f(x_prec))', subgoal: 'eval' },
-      { math: xk, note: 'fraction irréductible', subgoal: 'iterate', blank: [xk] },
+      { math: stepText(d, k), note: t('x − f(x)·(x − x_prec)/(f(x) − f(x_prec))'), subgoal: 'eval' },
+      { math: xk, note: t('fraction irréductible'), subgoal: 'iterate', blank: [xk] },
     ],
   };
 }
 
 const updateDecision = {
-  kind: 'decision', prompt: 'Avec quels deux points calcules-tu x⁽³⁾ ?', levels: [2, 3], options: [
-    { id: 'last', label: 'x⁽¹⁾ et x⁽²⁾, les deux derniers', valid: true, ref: true },
-    { id: 'frozen', label: 'x⁽⁰⁾ et x⁽²⁾ : on garde le point de départ', valid: false, rule: 'n_secant_update', why: 'La sécante oublie le plus ancien point : elle utilise les deux derniers.' },
+  kind: 'decision', prompt: t('Avec quels deux points calcules-tu x⁽³⁾ ?'), levels: [2, 3], options: [
+    { id: 'last', label: t('x⁽¹⁾ et x⁽²⁾, les deux derniers'), valid: true, ref: true },
+    { id: 'frozen', label: t('x⁽⁰⁾ et x⁽²⁾ : on garde le point de départ'), valid: false, rule: 'n_secant_update', why: t('La sécante oublie le plus ancien point : elle utilise les deux derniers.') },
   ],
 };
 
@@ -90,9 +91,9 @@ function linesLevel(rng, level) {
   const parts = [stepPart(d, 2, level, { first: true }), stepPart(d, 3, level, { decision: updateDecision })];
   return partsItem({
     skill: SC, level, parts, subgoals: SUB, keys: KEYS, key: `${SC}:${level}:${d.fx}`, fallback: d.fallback,
-    prompt: `Méthode de la sécante pour ${d.fR}, avec x⁽⁰⁾ = ${d.x0} et x⁽¹⁾ = ${d.x1} : x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ − f(x⁽ᵏ⁾)·(x⁽ᵏ⁾ − x⁽ᵏ⁻¹⁾)/(f(x⁽ᵏ⁾) − f(x⁽ᵏ⁻¹⁾)). Calcule x⁽²⁾ et x⁽³⁾ (fractions exactes).${level === 3 ? ' Choisis d\'abord chaque action.' : ''}`,
-    hints: H('C\'est Newton avec f′ remplacée par la pente entre les deux derniers points.',
-      `pente = (f(${d.x1}) − f(${d.x0}))/(${d.x1} − ${d.x0}) = □`,
+    prompt: t('Méthode de la sécante pour {f}, avec x⁽⁰⁾ = {x0} et x⁽¹⁾ = {x1} : x⁽ᵏ⁺¹⁾ = x⁽ᵏ⁾ − f(x⁽ᵏ⁾)·(x⁽ᵏ⁾ − x⁽ᵏ⁻¹⁾)/(f(x⁽ᵏ⁾) − f(x⁽ᵏ⁻¹⁾)). Calcule x⁽²⁾ et x⁽³⁾ (fractions exactes).', { f: d.fR, x0: d.x0, x1: d.x1 }) + (level === 3 ? ` ${t('Choisis d\'abord chaque action.')}` : ''),
+    hints: H(t('C\'est Newton avec f′ remplacée par la pente entre les deux derniers points.'),
+      t('pente = (f({x1}) − f({x0}))/({x1} − {x0}) = □', { x0: d.x0, x1: d.x1 }),
       `x⁽²⁾ = ${fmt(d.xs[2])}, x⁽³⁾ = ${fmt(d.xs[3])}.`),
     baits: level >= 2 ? ['n_secant_update'] : [],
   });
@@ -105,23 +106,23 @@ function tableLevel(rng, level) {
   const n = level === 2 ? 4 : 5;
   const then = level === 4 ? mcq({
     skill: SC, level: 4, key: `${SC}:order`,
-    prompt: 'Les incréments de la sécante : r₁ = δₖ/δₖ₋₁ tend vers 0 et r₂ = δₖ/δₖ₋₁² vers l\'infini. Quel est son ordre ?',
+    prompt: t('Les incréments de la sécante : r₁ = δₖ/δₖ₋₁ tend vers 0 et r₂ = δₖ/δₖ₋₁² vers l\'infini. Quel est son ordre ?'),
     options: [
-      { html: 'Strictement entre 1 et 2 (≈ 1,618)', correct: true },
-      { html: 'Ordre 1, puisque δₖ/δₖ₋₁ tend vers 0', correct: false, rule: 'n_order_simple_ratio' },
-      { html: 'Ordre 2, comme Newton', correct: false },
-      { html: 'Ordre 3', correct: false },
+      { html: t('Strictement entre 1 et 2 (≈ 1,618)'), correct: true },
+      { html: t('Ordre 1, puisque δₖ/δₖ₋₁ tend vers 0'), correct: false, rule: 'n_order_simple_ratio' },
+      { html: t('Ordre 2, comme Newton'), correct: false },
+      { html: t('Ordre 3'), correct: false },
     ],
-    solution: [{ html: 'p = 1 est trop petit (r₁ → 0), p = 2 trop grand (r₂ → ∞) : l\'ordre est (1 + √5)/2 ≈ 1,618.', note: '' }],
+    solution: [{ html: t('p = 1 est trop petit (r₁ → 0), p = 2 trop grand (r₂ → ∞) : l\'ordre est (1 + √5)/2 ≈ 1,618.'), note: '' }],
   }, rng) : null;
   return iterTable({
     skill: SC, level, key: `${level}:${d.fx}`, n,
     phi: { kind: 'secant', f: d.fx, x0: String(d.x0), x1: String(d.x1), tol: 1e-7, sig: 2 },
     cols: [{ id: 'x', label: 'x⁽ᵏ⁾' }, { id: 'inc', label: 'δ = |x⁽ᵏ⁾ − x⁽ᵏ⁻¹⁾|', auto: true }],
     given: (k) => k <= 1,
-    prompt: `Méthode de la sécante pour ${d.fR}, avec x⁽⁰⁾ = ${d.x0} et x⁽¹⁾ = ${d.x1}. Remplis les itérés (fractions exactes, ou 8 chiffres significatifs) ; chaque ligne se calcule avec tes deux lignes d'avant.`,
+    prompt: t('Méthode de la sécante pour {f}, avec x⁽⁰⁾ = {x0} et x⁽¹⁾ = {x1}. Remplis les itérés (fractions exactes, ou 8 chiffres significatifs) ; chaque ligne se calcule avec tes deux lignes d\'avant.', { f: d.fR, x0: d.x0, x1: d.x1 }),
     then,
-    hints: H('Chaque ligne utilise les deux lignes précédentes : x − f(x)·(x − x_prec)/(f(x) − f(x_prec)).',
+    hints: H(t('Chaque ligne utilise les deux lignes précédentes : x − f(x)·(x − x_prec)/(f(x) − f(x_prec)).'),
       `x⁽²⁾ = ${d.x1} − f(${d.x1})·(${d.x1} − ${d.x0})/(f(${d.x1}) − f(${d.x0})) = □`,
       `x⁽²⁾ = ${fmt(d.xs[2])}, x⁽³⁾ = ${fmt(d.xs[3])}.`),
     subgoals: SUB, baits: level === 4 ? ['n_order_simple_ratio'] : [],
@@ -169,22 +170,22 @@ function level5(rng) {
   const inc = runSecant(f, d.x0, d.x1);
   const then = readtableItem({
     skill: SC, level: 5, key: `5:${d.fx}`,
-    prompt: `Le programme, appelé pour ${d.fR}, x⁽⁰⁾ = ${d.x0} et x⁽¹⁾ = ${d.x1}, affiche les incréments |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| :`,
+    prompt: t('Le programme, appelé pour {f}, x⁽⁰⁾ = {x0} et x⁽¹⁾ = {x1}, affiche les incréments |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| :', { f: d.fR, x0: d.x0, x1: d.x1 }),
     table: { columns: ['k', 'δₖ'], rows: inc.map((x, k) => [String(k + 1), expText(x, 3)]) },
     question: multiMcq({
-      skill: SC, level: 5, key: `${SC}:5q`, prompt: 'Que peut-on en déduire ?',
+      skill: SC, level: 5, key: `${SC}:5q`, prompt: t('Que peut-on en déduire ?'),
       options: [
-        { html: 'δₖ/δₖ₋₁ tend vers 0', correct: true },
-        { html: 'L\'ordre est strictement entre 1 et 2', correct: true },
-        { html: 'La méthode est d\'ordre 1, puisque δₖ/δₖ₋₁ tend vers 0', correct: false, rule: 'n_order_simple_ratio' },
-        { html: 'La méthode est d\'ordre 2', correct: false },
+        { html: t('δₖ/δₖ₋₁ tend vers 0'), correct: true },
+        { html: t('L\'ordre est strictement entre 1 et 2'), correct: true },
+        { html: t('La méthode est d\'ordre 1, puisque δₖ/δₖ₋₁ tend vers 0'), correct: false, rule: 'n_order_simple_ratio' },
+        { html: t('La méthode est d\'ordre 2'), correct: false },
       ],
-      solution: [{ html: 'r₁ → 0 (p = 1 trop petit) mais r₂ → ∞ (p = 2 trop grand) : l\'ordre de la sécante est (1 + √5)/2 ≈ 1,618.', note: '' }],
+      solution: [{ html: t('r₁ → 0 (p = 1 trop petit) mais r₂ → ∞ (p = 2 trop grand) : l\'ordre de la sécante est (1 + √5)/2 ≈ 1,618.'), note: '' }],
     }, rng),
   });
   return codeItem({
     skill: SC, level: 5, ref: SECANT, blanks: [0, 1, 2], traps: TRAPS, fillers: FILLERS, wrong: WRONG, rng,
-    prompt: 'Complète la méthode de la sécante : elle s\'arrête quand |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| < tol et renvoie [x, nombre d\'itérations].',
+    prompt: t('Complète la méthode de la sécante : elle s\'arrête quand |x⁽ᵏ⁺¹⁾ − x⁽ᵏ⁾| < tol et renvoie [x, nombre d\'itérations].'),
     tests: TESTS, then, hints: [], subgoals: SUB, key: `5:${d.fx}`, fallback: d.fallback,
   });
 }
@@ -193,13 +194,13 @@ function examTf(rng, opts) {
   return rng.chance(0.6)
     ? vfMcq({
       skill: SC, key: `${SC}:tf:order`, exam: examTag(opts), truth: false,
-      statement: 'La méthode de la sécante est d\'ordre 2, comme Newton.',
-      explanation: 'Faux : son ordre est (1 + √5)/2 ≈ 1,618. Sur les incréments, δₖ/δₖ₋₁ → 0 mais δₖ/δₖ₋₁² → ∞.',
+      statement: t('La méthode de la sécante est d\'ordre 2, comme Newton.'),
+      explanation: t('Faux : son ordre est (1 + √5)/2 ≈ 1,618. Sur les incréments, δₖ/δₖ₋₁ → 0 mais δₖ/δₖ₋₁² → ∞.'),
     }, rng)
     : vfMcq({
       skill: SC, key: `${SC}:tf:deriv`, exam: examTag(opts), truth: true,
-      statement: 'La méthode de la sécante n\'utilise pas la dérivée de f, mais demande deux points de départ.',
-      explanation: 'Vrai : f′ est remplacée par la pente de la corde entre les deux derniers itérés.',
+      statement: t('La méthode de la sécante n\'utilise pas la dérivée de f, mais demande deux points de départ.'),
+      explanation: t('Vrai : f′ est remplacée par la pente de la corde entre les deux derniers itérés.'),
     }, rng);
 }
 

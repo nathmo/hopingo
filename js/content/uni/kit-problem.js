@@ -11,6 +11,7 @@
 // splitPoints(total, weights) → points per step, in halves, summing to total.
 
 import { segmentsOf } from '../../judges/lines.js';
+import { t } from '../../i18n.js';
 
 const stepsOf = (item) => (item.type === 'lines' ? segmentsOf(item) : [null]);
 
@@ -48,8 +49,8 @@ export function problemItem(o) {
   const points = o.parts.map((p, i) => pointsOf(parts[i], p.points));
   // A title per step: the part's own title, then the segments' headings.
   const titles = o.parts.map((p, i) => stepsOf(parts[i]).map((seg, s) => {
-    if (s === 0) return p.title || (o.parts.length > 1 ? strip(parts[i].prompt) : 'Début du problème');
-    return (seg.html || '').replace(/\s*:\s*$/, '') || `Étape ${s + 1}`;
+    if (s === 0) return p.title || (o.parts.length > 1 ? strip(parts[i].prompt) : t('Début du problème'));
+    return (seg.html || '').replace(/\s*:\s*$/, '') || t('Étape {n}', { n: s + 1 });
   }));
   const solution = parts.flatMap((p, i) => [
     ...(o.parts.length > 1 ? [{ html: `<b>${o.parts[i].title || strip(p.prompt)}</b>`, note: '' }] : []),

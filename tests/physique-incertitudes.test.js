@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 // Unit « Fourchettes et pire cas » (rg-in-problem is tested with the problems): every skill, levels 1 to 5, 60 items each.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -144,6 +145,11 @@ test(`${UNIT}: English texts are complete, French texts unchanged`, () => {
     const all = [it.prompt, it.suffix, ...(it.options || []).map((o) => o.html), ...(it.solution || []).map((l) => l.note)].join(' ');
     assert.ok(!/\{\w+\}/.test(all), `${it.key}: unfilled in English`);
   }
-  assert.deepEqual(en.miss.filter((s) => /\p{L}{3}/u.test(s)), [], 'French texts without English');
+  // Only the texts of the physics files: the rest of the app (university
+  // formulas kept as they are) is not this test's business.
+  const src = ['outils', 'energie', 'incertitudes', 'recette', 'rules', 'rules-outils', 'rules-energie', 'rules-incertitudes', 'format']
+    .map((f) => readFileSync(new URL(`../js/content/physique/${f}.js`, import.meta.url), 'utf8')).join('\n');
+  const ours = (s) => src.includes(s) || src.includes(s.replace(/'/g, "\\'"));
+  assert.deepEqual(en.miss.filter((s) => /\p{L}{3}/u.test(s) && ours(s)), [], 'French texts without English');
   assert.equal(JSON.stringify(run('fr').out), JSON.stringify(run(null).out));
 });

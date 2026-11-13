@@ -36,6 +36,7 @@ import { evalFloat, compileFloat } from '../cas/numeric.js';
 import { diff, substVar } from '../cas/diff.js';
 import { heaviside, breakpoints } from '../cas/transforms.js';
 import { diagnoseLine } from './diagnose.js';
+import { t, tn } from '../i18n.js';
 
 export const sign = '=';
 
@@ -163,12 +164,12 @@ function takePairs(cfg, text) {
       if (chars[j] === '⟨') depth++;
       if (chars[j] === '⟩') { depth--; if (depth === 0) break; }
     }
-    if (depth !== 0) throw new Error('Un crochet ⟨ … ⟩ n\'est pas fermé.');
+    if (depth !== 0) throw new Error(t('Un crochet ⟨ … ⟩ n\'est pas fermé.'));
     const inner = chars.slice(i + 1, j).join('');
     const sides = splitTop(inner, [';', ',']);
-    if (sides.length !== 2) throw new Error('Écris ⟨T, φ⟩ : une distribution, une virgule, puis la fonction test.');
+    if (sides.length !== 2) throw new Error(t('Écris ⟨T, φ⟩ : une distribution, une virgule, puis la fonction test.'));
     const name = HOLES[holes.length];
-    if (!name) throw new Error('Trop de crochets dans un membre.');
+    if (!name) throw new Error(t('Trop de crochets dans un membre.'));
     holes.push({ name, T: readDist(cfg, sides[0]), test: parse(phiCalls(sides[1].trim(), vOf(cfg)), popts(cfg)), text: inner });
     out += ` ${name} `;
     i = j;
@@ -177,9 +178,9 @@ function takePairs(cfg, text) {
 }
 
 function readDist(cfg, text) {
-  const t = text.trim();
-  if (!t) throw new Error('Il manque la distribution dans ⟨ , ⟩.');
-  return parse(t, popts(cfg));
+  const tt = text.trim();
+  if (!tt) throw new Error(t('Il manque la distribution dans ⟨ , ⟩.'));
+  return parse(tt, popts(cfg));
 }
 
 const hasPhi = (node) => contains(node, (n) => n.t === 'fn' && n.name === 'φ');
@@ -192,7 +193,7 @@ function readMember(cfg, raw) {
   const allowed = new Set([vOf(cfg), 'δ', 'T', 'D', 'e', ...CONSTS, ...fnNames(cfg), ...HOLES.slice(0, holes.length), ...(cfg.eq ? [] : []), ...unknownsOf(cfg)]);
   for (const s of symbolsIn(node)) {
     const base = s.replace(/_$/, '');
-    if (!allowed.has(base) && !allowed.has(s)) throw new Error(`Je ne connais pas la lettre « ${base} » ici.`);
+    if (!allowed.has(base) && !allowed.has(s)) throw new Error(t('Je ne connais pas la lettre « {base} » ici.', { base }));
   }
   const kind = holes.length || hasPhi(node) ? 'value' : 'dist';
   return { node, raw: raw.trim(), holes, kind };
@@ -206,13 +207,13 @@ const isUnknownName = (cfg, n) => {
 
 function readStrict(cfg, input) {
   const text = norm(String(input).trim()).replace(/^=\s*/, '');
-  if (!text) throw new Error('Ta ligne est vide.');
+  if (!text) throw new Error(t('Ta ligne est vide.'));
   const parts = splitTop(text, ['=']).map((p) => p.trim());
-  if (parts.some((p) => !p)) throw new Error('Un membre de ta ligne est vide.');
+  if (parts.some((p) => !p)) throw new Error(t('Un membre de ta ligne est vide.'));
   let members = parts.map((p) => readMember(cfg, p));
   let label = null;
   if (members.length > 1 && isUnknownName(cfg, members[0].node)) { label = members[0]; members = members.slice(1); }
-  if (cfg.eq && !label) throw new Error(`Écris « ${cfg.unknown || 'y'} = … ».`);
+  if (cfg.eq && !label) throw new Error(t('Écris « {a} = … ».', { a: cfg.unknown || 'y' }));
   return { t: 'dline', text: String(input).trim(), label, members };
 }
 
@@ -419,14 +420,14 @@ function terms(node, out = []) {
 // T_g + Σ c δ_a with constants c.
 function normalDist(cfg, node) {
   const v = vOf(cfg);
-  for (const t of terms(node)) {
-    if (!singular(cfg, t)) continue;
-    const fs = factors(t.t === 'frac' ? t.n : t);
+  for (const tt of terms(node)) {
+    if (!singular(cfg, tt)) continue;
+    const fs = factors(tt.t === 'frac' ? tt.n : tt);
     const deltas = fs.filter((f) => f.t === 'sym' && f.name === 'δ');
     const others = fs.filter((f) => !(f.t === 'sym' && f.name === 'δ'));
     if (deltas.length !== 1) return false;
     if (others.some((f) => singular(cfg, f) || symbolsIn(f).has(v))) return false;
-    if (t.t === 'frac' && symbolsIn(t.d).has(v)) return false;
+    if (tt.t === 'frac' && symbolsIn(tt.d).has(v)) return false;
   }
   return true;
 }
@@ -455,9 +456,9 @@ export function isFinal(cfg, node) {
   if (cfg.eq) {
     const want = cfg.final || 'general';
     const r = constantsRank(cfg, last.node);
-    if (want === 'particular') return r === 0 ? true : 'Juste. Donne une seule solution, sans constante.';
+    if (want === 'particular') return r === 0 ? true : t('Juste. Donne une seule solution, sans constante.');
     if (r === cfg.eq.order) return true;
-    return r < cfg.eq.order ? `Juste, mais ce n'est qu'une solution : ajoute les solutions de l'équation homogène (${cfg.eq.order} constante${cfg.eq.order > 1 ? 's' : ''}).` : false;
+    return r < cfg.eq.order ? tn(cfg.eq.order, 'Juste, mais ce n\'est qu\'une solution : ajoute les solutions de l\'équation homogène ({n} constante).', 'Juste, mais ce n\'est qu\'une solution : ajoute les solutions de l\'équation homogène ({n} constantes).') : false;
   }
   const want = cfg.final || 'dist';
   if (want === 'any') return true;
@@ -482,16 +483,16 @@ export function judgeLine(cfg, prev, input, state = {}) {
   else {
     try { node = readStrict(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (node.raw) return { kind: 'parse', message: 'Je n\'arrive pas à lire ta ligne.' };
-  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (node.raw) return { kind: 'parse', message: t('Je n\'arrive pas à lire ta ligne.') };
+  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   for (const m of node.members) {
     const r = matches(cfg, m);
     if (r === 'yes') continue;
     const diag = diagnoseLine('distrib', prev, node, cfg, (cand, n) => sameAsCandidate(cfg, cand, n));
     const message = r === 'undefined'
-      ? 'Je ne peux pas calculer ta ligne sur une fonction test : vérifie l\'écriture (un produit de deux δ, ou D sans rien après ?).'
-      : cfg.eq ? `Ta fonction ne vérifie pas l'équation : teste-la sur une fonction φ.`
-        : m.kind === 'value' ? 'Sur une fonction test φ, ta ligne ne donne pas la même valeur.' : 'Ce n\'est pas la même distribution : sur une fonction test φ, elle ne donne pas la même valeur.';
+      ? t('Je ne peux pas calculer ta ligne sur une fonction test : vérifie l\'écriture (un produit de deux δ, ou D sans rien après ?).')
+      : cfg.eq ? t('Ta fonction ne vérifie pas l\'équation : teste-la sur une fonction φ.')
+        : m.kind === 'value' ? t('Sur une fonction test φ, ta ligne ne donne pas la même valeur.') : t('Ce n\'est pas la même distribution : sur une fonction test φ, elle ne donne pas la même valeur.');
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   const fin = isFinal(cfg, node);
@@ -511,9 +512,9 @@ const prettyPhi = (node) => mapNode(node, (n) => (n.t === 'deriv' && stripParen(
   ? { t: 'fn', name: `φ${'′'.repeat(n.n || 1)}`, args: stripParen(n.e).args } : n));
 
 function memberML(cfg, raw, blanks = null, offset = { n: 0 }) {
-  const { text: t, holes } = takePairs(cfg, raw);
+  const { text: tt, holes } = takePairs(cfg, raw);
   const mark = (node) => { if (blanks) walk(node, (x) => { if (x.t === 'blank') x.id = offset.n++; return true; }); return node; };
-  const node = mark(prettyPhi(parse(phiCalls(t, vOf(cfg)), popts(cfg))));
+  const node = mark(prettyPhi(parse(phiCalls(tt, vOf(cfg)), popts(cfg))));
   let ml = inner(toMathML(node, blanks ? { blanks } : {}));
   for (const h of holes) {
     const A = inner(toMathML(mark(h.T), blanks ? { blanks } : {}));

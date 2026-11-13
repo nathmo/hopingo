@@ -14,6 +14,7 @@ import {
   q, cn, cadd, csub, cmul, cscale, cfloat, ctext, cfac, closedOk, czero, angInt, piText, rPow, powInt, rLn, cln,
   fr, prod, rk, trig, jacJudge, domJudge, DEF, defKnown, SAME, blankChain, jacBlank, integrandML,
 } from './analyse2-g-kit.js';
+import { t } from '../../i18n.js';
 
 
 const SK = 'a2-polar-int';
@@ -46,9 +47,9 @@ export function boxOf(R2, sector) {
   const xs = [0];
   const ys = [0];
   for (let k = 0; k <= 64; k++) {
-    const t = Math.PI * (sector.a.valueOf() + ((sector.b.valueOf() - sector.a.valueOf()) * k) / 64);
-    xs.push(R * Math.cos(t));
-    ys.push(R * Math.sin(t));
+    const ang = Math.PI * (sector.a.valueOf() + ((sector.b.valueOf() - sector.a.valueOf()) * k) / 64);
+    xs.push(R * Math.cos(ang));
+    ys.push(R * Math.sin(ang));
   }
   const pad = (lo, hi) => [Math.floor((lo - 0.2) * 10) / 10, Math.ceil((hi + 0.2) * 10) / 10];
   return [pad(Math.min(...xs), Math.max(...xs)), pad(Math.min(...ys), Math.max(...ys))];
@@ -131,7 +132,7 @@ const FALLBACK = () => {
 export const regionML = (d) => MT(regionOf(d.R1, d.R2, d.sector).join(' ; '), { vars: ['x', 'y'] });
 
 // A factor in a note: (1/2 − e⁻¹/2), π/4.
-const noteFac = (v) => { const t = fr(sup(ctext(v).replace(/([0-9a-zπ)])([+-])/g, '$1 $2 '))); return v.length > 1 ? `(${t})` : t; };
+const noteFac = (v) => { const s = fr(sup(ctext(v).replace(/([0-9a-zπ)])([+-])/g, '$1 $2 '))); return v.length > 1 ? `(${s})` : s; };
 
 // The parts of the item.
 export function polarParts(d, level) {
@@ -141,14 +142,14 @@ export function polarParts(d, level) {
   const region = regionOf(R1, R2, sector);
   const ref = polarLine(R1, R2, sector);
   const dom = domJudge('polar', region, boxOf(R2, sector), ref);
-  const bounds = { html: 'Décris D en coordonnées polaires :', ask: 'D̃ :', start: region.join(' ; '), judge: dom,
-    lines: [E(ref, 'Rayon entre les cercles, angle entre les demi-droites', 'bounds', 'bounds')] };
+  const bounds = { html: t('Décris D en coordonnées polaires :'), ask: t('D̃ :'), start: region.join(' ; '), judge: dom,
+    lines: [E(ref, t('Rayon entre les cercles, angle entre les demi-droites'), 'bounds', 'bounds')] };
   if (level === 2) bounds.lines[0] = { ...bounds.lines[0], ...blankChain(ref, [[0, 'hi'], [1, 'hi']], PV.vars) };
   const F = polarIntegrand(f);
   const jac = jacJudge('polar', f.cart, { rMax: Math.max(3, R2 === 'e' ? 3 : R2) });
-  let jl = E(F, 'x = r cos φ, y = r sin φ, et dx dy = r dr dφ', 'jacobian', 'jac');
+  let jl = E(F, t('x = r cos φ, y = r sin φ, et dx dy = r dr dφ'), 'jacobian', 'jac');
   if (level === 1) jl = { ...jl, ...jacBlank(f.sub, 'r', jac.vars) }; else if (level === 2 && !f.special && f.p + 1 > 0) jl = blanked(jl, [rk(f.p + 1)], { vars: jac.vars });
-  const integrand = { html: 'Écris l\'intégrande en polaires, jacobien compris :', ask: 'f(r cos φ, r sin φ)·r =', start: f.cart, judge: jac, lines: [jl] };
+  const integrand = { html: t('Écris l\'intégrande en polaires, jacobien compris :'), ask: 'f(r cos φ, r sin φ)·r =', start: f.cart, judge: jac, lines: [jl] };
   const rad = radialOf(f);
   const H0 = angFactor(f.i, f.j);
   const start = `int(int(${F},r,${R1},${R2}),φ,${A},${B})`;
@@ -156,8 +157,8 @@ export function polarParts(d, level) {
   const brk = `bracket(${rad.prim},r,${R1},${R2})×bracket(${angPrim(f.i, f.j)},φ,${A},${B})`;
   const fin = ctext(d.value);
   const vals = [
-    E(sep, 'Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales', 'separate', 'sep'),
-    E(brk, 'Primitives', 'compute', 'prim'),
+    E(sep, t('Bornes constantes, produit g(r)·h(φ) : produit de deux intégrales'), 'separate', 'sep'),
+    E(brk, t('Primitives'), 'compute', 'prim'),
     E(fin, `${noteFac(d.rad)} · ${noteFac(d.ang)}`, 'compute', 'eval'),
   ];
   if (level === 1) {
@@ -165,28 +166,28 @@ export function polarParts(d, level) {
     vals[1] = blanked(vals[1], [rad.prim]);
   }
   if (level === 2) vals[1] = blanked(vals[1], [angPrim(f.i, f.j)]);
-  const value = { html: 'Calcule l\'intégrale :', ask: 'I =', start, judge: defKnown(start, d.value, { jacFactor: 'r' }), lines: vals };
+  const value = { html: t('Calcule l\'intégrale :'), ask: 'I =', start, judge: defKnown(start, d.value, { jacFactor: 'r' }), lines: vals };
   return level === 1 ? [integrand, value] : [bounds, integrand, value];
 }
 
 export const PI_SUB = [
-  { id: 'bounds', label: 'bornes en (r, φ)', skill: 'a2-domain-describe' },
-  { id: 'jacobian', label: 'intégrande et jacobien r', skill: 'a2-change-var' },
-  { id: 'separate', label: 'séparer en produit', skill: 'a2-fubini-rect' },
-  { id: 'compute', label: 'primitives et valeur', skill: 'a1-int-direct' },
+  { id: 'bounds', label: t('bornes en (r, φ)'), skill: 'a2-domain-describe' },
+  { id: 'jacobian', label: t('intégrande et jacobien r'), skill: 'a2-change-var' },
+  { id: 'separate', label: t('séparer en produit'), skill: 'a2-fubini-rect' },
+  { id: 'compute', label: t('primitives et valeur'), skill: 'a1-int-direct' },
 ];
 const PI_CHOICES = [
-  { id: 'bounds', label: 'Décrire D en polaires : bornes de φ et de r' },
-  { id: 'jac', label: 'Remplacer x = r cos φ, y = r sin φ et multiplier par r' },
-  { id: 'sep', label: 'Séparer en un produit de deux intégrales' },
-  { id: 'prim', label: 'Écrire les primitives' },
-  { id: 'eval', label: 'Évaluer et multiplier' },
-  { id: 'nojac', label: 'Remplacer x et y, sans facteur r', rule: 'a2_jacobian_forgot', why: 'dx dy = r dr dφ : sans le r, l\'aire d\'une petite case est fausse.' },
+  { id: 'bounds', label: t('Décrire D en polaires : bornes de φ et de r') },
+  { id: 'jac', label: t('Remplacer x = r cos φ, y = r sin φ et multiplier par r') },
+  { id: 'sep', label: t('Séparer en un produit de deux intégrales') },
+  { id: 'prim', label: t('Écrire les primitives') },
+  { id: 'eval', label: t('Évaluer et multiplier') },
+  { id: 'nojac', label: t('Remplacer x et y, sans facteur r'), rule: 'a2_jacobian_forgot', why: t('dx dy = r dr dφ : sans le r, l\'aire d\'une petite case est fausse.') },
 ];
 const COORD_DECISION = {
-  kind: 'decision', prompt: 'Quelles coordonnées ?', options: [
-    { id: 'polar', label: 'Polaires : D est un morceau de disque ou d\'anneau', valid: true },
-    { id: 'cart', label: 'Cartésiennes', valid: false, why: 'Les bornes de y seraient des racines √(R² − x²) : en polaires, elles sont constantes.' },
+  kind: 'decision', prompt: t('Quelles coordonnées ?'), options: [
+    { id: 'polar', label: t('Polaires : D est un morceau de disque ou d\'anneau'), valid: true },
+    { id: 'cart', label: t('Cartésiennes'), valid: false, why: t('Les bornes de y seraient des racines √(R² − x²) : en polaires, elles sont constantes.') },
   ],
 };
 
@@ -197,14 +198,14 @@ export function polarInt(level, rng, opts = {}) {
   const parts = polarParts(d, level);
   if (level === 3) parts[0].pre = [COORD_DECISION];
   const { start, judge, script } = partsScript(parts, level, PI_CHOICES);
-  const given = level === 1 ? ` En polaires : ${MT(polarLine(d.R1, d.R2, d.sector), PV)}.` : '';
+  const given = level === 1 ? ` ${t('En polaires : {D}.', { D: MT(polarLine(d.R1, d.R2, d.sector), PV) })}` : '';
   const F = polarIntegrand(d.f);
   return linesItem({
     skill: SK, level, mode: modeOf(level), start, judge, script,
-    prompt: `Calcule I = ∬<sub>D</sub> ${integrandML(d.f.cart, ['x', 'y'])} dx dy, avec D = {${regionML(d)}}.${given}`,
-    hints: H('D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ).',
-      `${MT(`int(int(${F},r,${d.R1},${d.R2}),φ,${piText(d.sector.a)},${piText(d.sector.b)})`, PV)}, puis sépare en produit.`,
-      `${MT(polarLine(d.R1, d.R2, d.sector), PV)} et l'intégrande ${MT(F, PV)}.`),
+    prompt: t('Calcule I = ∬<sub>D</sub> {f} dx dy, avec D = {{D}}.', { f: integrandML(d.f.cart, ['x', 'y']), D: regionML(d) }) + given,
+    hints: H(t('D est un morceau de disque : passe en polaires, sans oublier r (dx dy = r dr dφ).'),
+      t('{I}, puis sépare en produit.', { I: MT(`int(int(${F},r,${d.R1},${d.R2}),φ,${piText(d.sector.a)},${piText(d.sector.b)})`, PV) }),
+      t('{D} et l\'intégrande {F}.', { D: MT(polarLine(d.R1, d.R2, d.sector), PV), F: MT(F, PV) })),
     subgoals: PI_SUB, keys: A2_KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${SK}:${level}:${d.f.id}:${d.sector.id}:${d.R1}:${d.R2}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -227,19 +228,19 @@ export function e5Item(d, level, opts = {}) {
   const [bounds, integrand] = parts;
   bounds.lines[0].subgoal = 'bounds';
   const sepStart = `int(int(2r×ln(r),r,1,${d.R2}),φ,${piText(d.sector.a)},${piText(d.sector.b)})`;
-  const separation = { html: 'Sépare : l\'intégrale en φ se calcule tout de suite.', ask: 'I =', start: sepStart, judge: SAME,
+  const separation = { html: t('Sépare : l\'intégrale en φ se calcule tout de suite.'), ask: 'I =', start: sepStart, judge: SAME,
     lines: [E(`${cfac(d.ang)}×int(2r×ln(r),r,1,${d.R2})`, `∫ dφ = ${fr(L)}`, 'separate', 'sep')] };
-  const primitive = { html: 'Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) :', ask: 'F(r) =', start: 'int(2r×ln(r),r)',
+  const primitive = { html: t('Primitive de 2r ln r (par parties, u = ln r, v′ = 2r) :'), ask: 'F(r) =', start: 'int(2r×ln(r),r)',
     judge: { kind: 'antideriv', v: 'r', domain: { r: [0.5, 3] } },
-    lines: [E('r^2×ln(r)-int(r,r)', 'u = ln r, v = r² : ∫ uv′ = uv − ∫ u′v', 'parts', 'parts'), E('r^2×ln(r)-r^2/2+C', 'Primitive de r', 'parts', 'prim')] };
-  const value = { html: 'Valeur de l\'intégrale :', ask: 'I =', start: `${cfac(d.ang)}×bracket(r^2×ln(r)-r^2/2,r,1,${d.R2})`, judge: DEF({ jacFactor: 'r' }),
+    lines: [E('r^2×ln(r)-int(r,r)', 'u = ln r, v = r² : ∫ uv′ = uv − ∫ u′v', 'parts', 'parts'), E('r^2×ln(r)-r^2/2+C', t('Primitive de r'), 'parts', 'prim')] };
+  const value = { html: t('Valeur de l\'intégrale :'), ask: 'I =', start: `${cfac(d.ang)}×bracket(r^2×ln(r)-r^2/2,r,1,${d.R2})`, judge: DEF({ jacFactor: 'r' }),
     lines: [E(ctext(d.value), 'F(R) − F(1)', 'value', 'eval')] };
   const { start, judge, script } = partsScript([bounds, integrand, separation, primitive, value], level, PI_CHOICES);
   return linesItem({
     skill: SK, level, mode: 'free', start, judge, script,
-    prompt: `Calcule ∬<sub>D</sub> ${MT('ln(x^2+y^2)', { vars: ['x', 'y'] })} dx dy, avec D = {${regionML(d)}}.`,
+    prompt: t('Calcule ∬<sub>D</sub> {f} dx dy, avec D = {{D}}.', { f: MT('ln(x^2+y^2)', { vars: ['x', 'y'] }), D: regionML(d) }),
     hints: [], noHints: true,
-    subgoals: [...PI_SUB.slice(0, 3), { id: 'parts', label: 'primitive par parties', skill: 'a1-int-parts' }, { id: 'value', label: 'valeur', skill: SK }],
+    subgoals: [...PI_SUB.slice(0, 3), { id: 'parts', label: t('primitive par parties'), skill: 'a1-int-parts' }, { id: 'value', label: t('valeur'), skill: SK }],
     keys: A2_KEYS, key: `${SK}:E5:${d.sector.id}:${d.R2}`, exam: examTag(opts, 8),
   });
 }
@@ -249,7 +250,7 @@ function e5Problem(rng, opts) {
   const it = e5Item(d, 5, opts);
   return problemItem({
     skill: SK, level: 5, prompt: it.prompt, key: `E5:${d.sector.id}:${d.R2}`, exam: it.exam, expectedSec: 600,
-    parts: [{ item: { ...it, prompt: '' }, points: [1.5, 1.5, 1, 2, 2], title: 'Bornes en (r, φ)' }],
+    parts: [{ item: { ...it, prompt: '' }, points: [1.5, 1.5, 1, 2, 2], title: t('Bornes en (r, φ)') }],
   });
 }
 
@@ -296,11 +297,11 @@ export function polarMcq(rng, opts = {}) {
   }
   const F = polarIntegrand(d.f);
   return mcq({
-    skill: SK, level: 4, prompt: `∬<sub>D</sub> ${integrandML(d.f.cart, ['x', 'y'])} dx dy, avec D = {${regionML(d)}}, vaut :`,
+    skill: SK, level: 4, prompt: t('∬<sub>D</sub> {f} dx dy, avec D = {{D}}, vaut :', { f: integrandML(d.f.cart, ['x', 'y']), D: regionML(d) }),
     options: options.map(({ x, ...o }) => o),
     solution: [
-      { html: `D̃ : ${MT(polarLine(d.R1, d.R2, d.sector), PV)}`, note: 'Bornes en polaires' },
-      { html: MT(`int(int(${F},r,${d.R1},${d.R2}),φ,${piText(d.sector.a)},${piText(d.sector.b)})`, PV), note: 'Avec le jacobien r' },
+      { html: t('D̃ : {D}', { D: MT(polarLine(d.R1, d.R2, d.sector), PV) }), note: t('Bornes en polaires') },
+      { html: MT(`int(int(${F},r,${d.R1},${d.R2}),φ,${piText(d.sector.a)},${piText(d.sector.b)})`, PV), note: t('Avec le jacobien r') },
       { html: `= ${MT(ctext(d.value))}`, note: '' },
     ],
     key: `mcq:${d.f.id}:${d.sector.id}:${d.R1}:${d.R2}`, exam: examTag(opts, 3), fallback: !!d.fallback,

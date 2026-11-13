@@ -12,13 +12,14 @@ import { examTag } from './kit.js';
 import { partsItem } from './geo-kit.js';
 import { problemItem } from './kit-problem.js';
 import { H, ft, FML, mcqF, KEYS_FT, TABLE } from './fourier-b-kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'f-ft-table';
 const SUB = [
-  { id: 'complete-square', label: 'compléter le carré', skill: 'quad-complete' },
-  { id: 'rewrite', label: 'réécrire f avec une ligne de la table', skill: SK },
-  { id: 'table', label: 'ligne de la table', skill: SK },
-  { id: 'property', label: 'propriété (translation, dérivée…)', skill: SK },
+  { id: 'complete-square', label: t('compléter le carré'), skill: 'quad-complete' },
+  { id: 'rewrite', label: t('réécrire f avec une ligne de la table'), skill: SK },
+  { id: 'table', label: t('ligne de la table'), skill: SK },
+  { id: 'property', label: t('propriété (translation, dérivée…)'), skill: SK },
 ];
 
 // e^(c·iα) texts: the translation by a multiplies by e^(−iaα).
@@ -49,14 +50,14 @@ function square(rng) {
     pre: { start: expo, line: sqr, blank: [String(E)] },
     lines: [
       { math: `f(x) = ${eE(E)} e^(${sqr.replace(/[+-]\d+$/, '')})`.replace('=  e', '= e'), note: `f(x) = ${eE(E) || '1'}·g(x − ${a}), g(x) = e^(−${k === 1 ? '' : k}x²)`, subgoal: 'rewrite', blank: [xa(a)] },
-      { math: `f̂(α) = ${eE(E)} ${s} ℱ(${g})`, note: `Translation de ${a} : facteur e^(−${a === 1 ? '' : a === -1 ? '(−1)' : a}iα)`.replace('e^(−(−1)iα)', 'e^(iα)'), subgoal: 'property' },
-      { math: `f̂(α) = ${eE(E)} ${s} ${gaussF(k)}`, note: `Ligne F8 avec w² = ${k}`, subgoal: 'table', blank: [String(4 * k), sq(k)], blank2: [s || String(4 * k)] },
+      { math: `f̂(α) = ${eE(E)} ${s} ℱ(${g})`, note: t('Translation de {a} : facteur e^(−{b}iα)', { a, b: a === 1 ? '' : a === -1 ? '(−1)' : a }).replace('e^(−(−1)iα)', 'e^(iα)'), subgoal: 'property' },
+      { math: `f̂(α) = ${eE(E)} ${s} ${gaussF(k)}`, note: t('Ligne F8 avec w² = {k}', { k }), subgoal: 'table', blank: [String(4 * k), sq(k)], blank2: [s || String(4 * k)] },
     ],
     traps: {
       f_ft_shift_sign: [`f̂(α) = ${eE(E)} ${shiftT(-a)} ${gaussF(k)}`, `f̂(α) = ${eE(E)} ${shiftT(-a)} ℱ(${g})`],
       f_ft_scale: [{ line: `f̂(α) = ${eE(E)} ${s} e^(-α^2/${4 * k * k})/(${k}√2)`, ctx: {} }],
     },
-    hint1: 'Complète le carré dans l\'exposant, puis translation et ligne F8.',
+    hint1: t('Complète le carré dans l\'exposant, puis translation et ligne F8.'),
     hint2: FML(`ℱ(${g})(α) = e^(-α^2/(4·${k}))/√(2·${k})`),
     wrong: `${eE(E)} ${shiftT(-a)} ${gaussF(k)}`, wrongRule: 'f_ft_shift_sign',
   };
@@ -76,14 +77,14 @@ function absShift(rng) {
     f: `e^(-${wa})`,
     F: sval(s),
     lines: [
-      { math: `f̂(α) = ${s} ℱ(${g})`, note: `f(x) = g${xa(a).replace('-', ' − ').replace('+', ' + ')} : translation`, subgoal: 'property' },
-      { math: `f̂(α) = ${sval(s)}`, note: `Ligne F7 : e^(−${w === 1 ? '' : w}|y|) = ${w === 1 ? '' : w}·e^(−|${w === 1 ? '' : w}y|)/${w}`, subgoal: 'table', blank: [String(w * w)], blank2: [s] },
+      { math: `f̂(α) = ${s} ℱ(${g})`, note: t('f(x) = g{a} : translation', { a: xa(a).replace('-', ' − ').replace('+', ' + ') }), subgoal: 'property' },
+      { math: `f̂(α) = ${sval(s)}`, note: t('Ligne F7 : e^(−{a}|y|) = {a}·e^(−|{a}y|)/{w}', { a: w === 1 ? '' : w, w }), subgoal: 'table', blank: [String(w * w)], blank2: [s] },
     ],
     traps: {
       f_ft_shift_sign: [`f̂(α) = ${sval(shiftT(-a))}`],
       f_table_line: [{ line: `f̂(α) = ${s} 1/(√(2π)(${w}+iα))`, ctx: { got: `1/(√(2π)(${w} + iα))`, want: 'F7' } }],
     },
-    hint1: 'Translation, puis la ligne F7 (attention au facteur 1/|w|).',
+    hint1: t('Translation, puis la ligne F7 (attention au facteur 1/|w|).'),
     hint2: FML(`ℱ(${g})(α) = ${val}`),
     wrong: `${s} 1/(√(2π)(${w}+iα))`, wrongRule: 'f_table_line',
   };
@@ -100,11 +101,11 @@ function gaussX(rng) {
     f: `${xa(a)}e^(-${k === 1 ? '' : k}${xa(a)}^2)`,
     F: `${s} (${val})`,
     lines: [
-      { math: `f̂(α) = ${s} ℱ(x e^(-${k === 1 ? '' : k}x^2))`, note: 'Translation', subgoal: 'property' },
-      { math: `f̂(α) = ${s} (${val})`, note: `Ligne F9 avec w² = ${k}`, subgoal: 'table', blank: [k === 1 ? '2√2' : '8'], blank2: [s] },
+      { math: `f̂(α) = ${s} ℱ(x e^(-${k === 1 ? '' : k}x^2))`, note: t('Translation'), subgoal: 'property' },
+      { math: `f̂(α) = ${s} (${val})`, note: t('Ligne F9 avec w² = {k}', { k }), subgoal: 'table', blank: [k === 1 ? '2√2' : '8'], blank2: [s] },
     ],
     traps: { f_ft_shift_sign: [`f̂(α) = ${shiftT(-a)} (${val})`] },
-    hint1: 'Translation, puis la ligne F9 : y e^(−w²y²).',
+    hint1: t('Translation, puis la ligne F9 : y e^(−w²y²).'),
     hint2: FML(`ℱ(x e^(-${k === 1 ? '' : k}x^2)) = ${val}`),
     wrong: `${shiftT(-a)} (${val})`, wrongRule: 'f_ft_shift_sign',
   };
@@ -115,15 +116,15 @@ function deriv(rng) {
   const g = `e^(-${k === 1 ? '' : k}x^2)`;
   return {
     id: `der:${k}`, kind: 'deriv', table: 'F8',
-    fHtml: `${FML(`f(x) = -${2 * k}x e^(-${k === 1 ? '' : k}x^2)`)} (remarque : f = g′ avec g(x) = ${FML(g)})`,
+    fHtml: t('{a} (remarque : f = g′ avec g(x) = {b})', { a: FML(`f(x) = -${2 * k}x e^(-${k === 1 ? '' : k}x^2)`), b: FML(g) }),
     f: `-${2 * k}x e^(-${k === 1 ? '' : k}x^2)`,
     F: `iα ${gaussF(k)}`,
     lines: [
       { math: `f̂(α) = iα ℱ(${g})`, note: 'FP4 : ℱ(g′) = iα ĝ', subgoal: 'property' },
-      { math: `f̂(α) = iα ${gaussF(k)}`, note: `Ligne F8 avec w² = ${k}`, subgoal: 'table', blank: [String(4 * k), sq(k)], blank2: ['iα'] },
+      { math: `f̂(α) = iα ${gaussF(k)}`, note: t('Ligne F8 avec w² = {k}', { k }), subgoal: 'table', blank: [String(4 * k), sq(k)], blank2: ['iα'] },
     ],
     traps: { f_ft_deriv_sign: [`f̂(α) = -iα ${gaussF(k)}`, `f̂(α) = -iα ℱ(${g})`] },
-    hint1: 'f = g′ : ℱ(g′) = iα ĝ (FP4), puis la ligne F8.',
+    hint1: t('f = g′ : ℱ(g′) = iα ĝ (FP4), puis la ligne F8.'),
     hint2: FML(`ℱ(${g}) = ${gaussF(k)}`),
     wrong: `-iα ${gaussF(k)}`, wrongRule: 'f_ft_deriv_sign',
   };
@@ -135,18 +136,18 @@ function halfShift(rng) {
   const s = shiftT(a);
   return {
     id: `half:${w}:${a}`, kind: 'half', table: 'F3',
-    fHtml: `f(x) = ${FML(`e^(-${w === 1 ? '' : w}${xa(a)})`)} si x &gt; ${a}, 0 sinon`,
+    fHtml: t('f(x) = {a} si x &gt; {a2}, 0 sinon', { a: FML(`e^(-${w === 1 ? '' : w}${xa(a)})`), a2: a }),
     f: `H${xa(a)}e^(-${w === 1 ? '' : w}${xa(a)})`,
     F: `${s}/(√(2π)(${w}+iα))`,
     lines: [
-      { math: `f̂(α) = ${s} ℱ(H(x)e^(-${w === 1 ? '' : w}x))`, note: 'Translation', subgoal: 'property' },
-      { math: `f̂(α) = ${s}/(√(2π)(${w}+iα))`, note: `Ligne F3 avec w = ${w}`, subgoal: 'table', blank: [`${w}+iα`], blank2: [`${w}+iα`] },
+      { math: `f̂(α) = ${s} ℱ(H(x)e^(-${w === 1 ? '' : w}x))`, note: t('Translation'), subgoal: 'property' },
+      { math: `f̂(α) = ${s}/(√(2π)(${w}+iα))`, note: t('Ligne F3 avec w = {w}', { w }), subgoal: 'table', blank: [`${w}+iα`], blank2: [`${w}+iα`] },
     ],
     traps: {
       f_ft_shift_sign: [`f̂(α) = ${shiftT(-a)}/(√(2π)(${w}+iα))`],
       f_table_line: [{ line: `f̂(α) = ${s} √(2/π)/(α^2+${w * w})`, ctx: { want: 'F3' } }],
     },
-    hint1: 'Translation, puis la ligne F3 (fonction nulle pour y &lt; 0).',
+    hint1: t('Translation, puis la ligne F3 (fonction nulle pour y &lt; 0).'),
     hint2: FML(`ℱ(H(x)e^(-${w === 1 ? '' : w}x)) = 1/(√(2π)(${w}+iα))`),
     wrong: `${shiftT(-a)}/(√(2π)(${w}+iα))`, wrongRule: 'f_ft_shift_sign',
   };
@@ -164,11 +165,11 @@ function invF7(rng) {
     fHtml: `f̂(α) = ${FML(`${c}/(α^2+${w * w})`)}`,
     f: ans, F: `${c}/(α^2+${w * w})`,
     lines: [
-      { math: `f̂(α) = ${k} · √(2/π)/(α^2+${w * w})`, note: 'Faire apparaître la ligne F7', subgoal: 'rewrite', blank: ['√(π/2)'] },
-      { math: `f(x) = ${ans}`, note: `F7 avec w = ${w}, sur tout ℝ`, subgoal: 'table', blank: [String(w)], blank2: ['abs(x)'] },
+      { math: `f̂(α) = ${k} · √(2/π)/(α^2+${w * w})`, note: t('Faire apparaître la ligne F7'), subgoal: 'rewrite', blank: ['√(π/2)'] },
+      { math: `f(x) = ${ans}`, note: t('F7 avec w = {w}, sur tout ℝ', { w }), subgoal: 'table', blank: [String(w)], blank2: ['abs(x)'] },
     ],
     traps: { f_abs_dropped: [`f(x) = ${ans.replace('abs(x)', 'x')}`] },
-    hint1: 'Écris f̂ comme une constante fois √(2/π)/(α² + w²) : c\'est la ligne F7.',
+    hint1: t('Écris f̂ comme une constante fois √(2/π)/(α² + w²) : c\'est la ligne F7.'),
     hint2: FML(`${c}/(α^2+${w * w}) = ${k}·√(2/π)/(α^2+${w * w})`),
     wrong: `f(x) = ${ans.replace('abs(x)', 'x')}`, wrongRule: 'f_abs_dropped',
   };
@@ -182,11 +183,11 @@ function invF6(rng) {
     fHtml: `f̂(α) = ${FML(`e^(-${w === 1 ? '' : w}abs(α))`)}`,
     f: ans, F: `e^(-${w === 1 ? '' : w}abs(α))`,
     lines: [
-      { math: `f̂(α) = ${w === 1 ? '' : w}√(2/π) · √(π/2) e^(-${w === 1 ? '' : w}abs(α))/${w}`.replace('/1', ''), note: 'Faire apparaître la ligne F6', subgoal: 'rewrite', blank: ['√(2/π)'] },
-      { math: `f(x) = ${ans}`, note: `F6 avec w = ${w}`, subgoal: 'table', blank: [String(w * w)], blank2: [String(w * w)] },
+      { math: `f̂(α) = ${w === 1 ? '' : w}√(2/π) · √(π/2) e^(-${w === 1 ? '' : w}abs(α))/${w}`.replace('/1', ''), note: t('Faire apparaître la ligne F6'), subgoal: 'rewrite', blank: ['√(2/π)'] },
+      { math: `f(x) = ${ans}`, note: t('F6 avec w = {w}', { w }), subgoal: 'table', blank: [String(w * w)], blank2: [String(w * w)] },
     ],
     traps: { f_table_line: [{ line: `f(x) = e^(-${w === 1 ? '' : w}abs(x))`, ctx: { want: 'F6' } }] },
-    hint1: 'La ligne F6 a une exponentielle de |α| à droite : 1/(y² + w²) ↦ √(π/2) e^(−|wα|)/|w|.',
+    hint1: t('La ligne F6 a une exponentielle de |α| à droite : 1/(y² + w²) ↦ √(π/2) e^(−|wα|)/|w|.'),
     hint2: FML(`e^(-${w === 1 ? '' : w}abs(α)) = ${w === 1 ? '' : w}√(2/π)·√(π/2)e^(-${w === 1 ? '' : w}abs(α))/${w}`.replace('/1)', ')')),
     wrong: `f(x) = √(2/π)/(x^2+${w * w})`, wrongRule: 'f_table_line',
   };
@@ -201,11 +202,11 @@ function invF3(rng) {
     fHtml: `f̂(α) = ${FML(`${c}/(${w}+iα)`)}`,
     f: ans, F: `${c}/(${w}+iα)`,
     lines: [
-      { math: `f̂(α) = ${c === 1 ? '' : c}√(2π) · 1/(√(2π)(${w}+iα))`, note: 'Faire apparaître la ligne F3', subgoal: 'rewrite', blank: ['√(2π)'] },
-      { math: `f(x) = ${ans}`, note: `F3 avec w = ${w} : nulle pour x < 0`, subgoal: 'table', blank: ['H(x)'], blank2: ['H(x)'] },
+      { math: `f̂(α) = ${c === 1 ? '' : c}√(2π) · 1/(√(2π)(${w}+iα))`, note: t('Faire apparaître la ligne F3'), subgoal: 'rewrite', blank: ['√(2π)'] },
+      { math: `f(x) = ${ans}`, note: t('F3 avec w = {w} : nulle pour x < 0', { w }), subgoal: 'table', blank: ['H(x)'], blank2: ['H(x)'] },
     ],
     traps: { f_table_half_line: [`f(x) = ${ans.replace('H(x)', '')}`] },
-    hint1: 'La ligne F3 : e^(−wy) si y > 0, 0 sinon. Écris les deux cas (H(x) = 1 si x > 0, 0 sinon).',
+    hint1: t('La ligne F3 : e^(−wy) si y > 0, 0 sinon. Écris les deux cas (H(x) = 1 si x > 0, 0 sinon).'),
     hint2: FML(`${c}/(${w}+iα) = ${c === 1 ? '' : c}√(2π)·1/(√(2π)(${w}+iα))`),
     wrong: `f(x) = ${ans.replace('H(x)', '')}`, wrongRule: 'f_table_half_line',
   };
@@ -217,9 +218,9 @@ const lineChoice = (d) => {
   const rows = ['F3', 'F6', 'F7', 'F8', 'F9'].filter((r) => r !== d.table);
   const near = { F8: ['F9', 'F7'], F7: ['F3', 'F6'], F9: ['F8', 'F10'], F3: ['F7', 'F4'], F6: ['F7', 'F10'] }[d.table] || rows.slice(0, 2);
   return lineOpts({
-    kind: 'decision', prompt: 'Quelle ligne de la table ?', options: [
-      { id: d.table, label: `Ligne ${d.table}`, valid: true, ref: true },
-      ...near.map((r) => ({ id: r, label: `Ligne ${r}`, valid: false, rule: 'f_table_line', why: `La ligne ${r} ne décrit pas cette fonction : regarde la forme exacte (|y|, y > 0, y², w²).` })),
+    kind: 'decision', prompt: t('Quelle ligne de la table ?'), options: [
+      { id: d.table, label: t('Ligne {table}', { table: d.table }), valid: true, ref: true },
+      ...near.map((r) => ({ id: r, label: t('Ligne {r}', { r }), valid: false, rule: 'f_table_line', why: t('La ligne {r} ne décrit pas cette fonction : regarde la forme exacte (|y|, y > 0, y², w²).', { r }) })),
     ],
   });
 };
@@ -230,18 +231,18 @@ function tableParts(d, level) {
   if (d.pre) {
     parts.push({
       html: '', start: d.pre.start, judge: { kind: 'equiv', vars: ['x'], domain: { x: [-2, 2] }, target: 'any' },
-      menu: [{ id: 'square', label: 'Compléter le carré', valid: true }, { id: 'table', label: 'Lire la table', valid: false, why: 'Aucune ligne n\'a cette forme : complète d\'abord le carré.' }, { id: 'deriv', label: 'Dériver', valid: false, why: 'Rien à dériver ici.' }],
-      lines: [{ math: d.pre.line, note: 'Compléter le carré', subgoal: 'complete-square', blank: d.pre.blank }],
+      menu: [{ id: 'square', label: t('Compléter le carré'), valid: true }, { id: 'table', label: t('Lire la table'), valid: false, why: t('Aucune ligne n\'a cette forme : complète d\'abord le carré.') }, { id: 'deriv', label: t('Dériver'), valid: false, why: t('Rien à dériver ici.') }],
+      lines: [{ math: d.pre.line, note: t('Compléter le carré'), subgoal: 'complete-square', blank: d.pre.blank }],
     });
   }
   parts.push({
-    html: d.pre ? 'Donc :' : '', ask: d.pre ? 'Transforme f.' : undefined, start: `${d.dir === 'inverse' ? 'f̂(α)' : 'f(x)'} = ${d.dir === 'inverse' ? d.F : d.f}`, judge,
+    html: d.pre ? t('Donc :') : '', ask: d.pre ? t('Transforme f.') : undefined, start: `${d.dir === 'inverse' ? 'f̂(α)' : 'f(x)'} = ${d.dir === 'inverse' ? d.F : d.f}`, judge,
     decisions: level >= 2 ? [{ ...lineChoice(d), levels: [2, 3, 4, 5] }] : [],
-    notes: level === 1 ? [`Ligne ${d.table} de la table.`] : [],
+    notes: level === 1 ? [t('Ligne {table} de la table.', { table: d.table })] : [],
     menu: [
-      { id: 'table', label: `Utiliser la table et ${d.dir === 'inverse' ? 'reconnaître une ligne' : 'une propriété'}`, valid: true },
-      { id: 'direct', label: 'Calculer l\'intégrale de la définition', valid: false, why: 'Inutile : la table et les propriétés donnent la transformée sans intégrer.' },
-      { id: 'parity', label: 'Utiliser la parité', valid: false, why: d.kind === 'abs' || d.kind === 'square' ? 'f n\'est pas paire : son centre est déplacé.' : 'Ce n\'est pas le chemin le plus court ici.' },
+      { id: 'table', label: d.dir === 'inverse' ? t('Utiliser la table et reconnaître une ligne') : t('Utiliser la table et une propriété'), valid: true },
+      { id: 'direct', label: t('Calculer l\'intégrale de la définition'), valid: false, why: t('Inutile : la table et les propriétés donnent la transformée sans intégrer.') },
+      { id: 'parity', label: t('Utiliser la parité'), valid: false, why: d.kind === 'abs' || d.kind === 'square' ? t('f n\'est pas paire : son centre est déplacé.') : t('Ce n\'est pas le chemin le plus court ici.') },
     ],
     lines: d.lines,
   });
@@ -250,7 +251,7 @@ function tableParts(d, level) {
 
 export function tableLines(level, rng, opts = {}, d = null) {
   const data = d || (level >= 4 && !opts.exam && rng.chance(0.4) ? rng.pick(INVERSE)(rng) : rng.pick(FORWARD)(rng));
-  const ask = data.dir === 'inverse' ? `Trouve f telle que ${data.fHtml} (f définie sur tout ℝ).` : `Calcule la transformée de Fourier de ${data.fHtml}.`;
+  const ask = data.dir === 'inverse' ? t('Trouve f telle que {fHtml} (f définie sur tout ℝ).', { fHtml: data.fHtml }) : t('Calcule la transformée de Fourier de {fHtml}.', { fHtml: data.fHtml });
   return partsItem({
     skill: SK, level, parts: tableParts(data, level),
     prompt: `${ask}${TABLE()}`,
@@ -269,8 +270,8 @@ function tableProblem(level, rng, opts = {}) {
   const pts = (it) => (it.key.includes(':sq:') ? 4 : 3);
   return problemItem({
     skill: SK, level,
-    prompt: `Calcule la transformée de Fourier de chaque fonction, avec la table et les propriétés.${TABLE()}`,
-    parts: items.map((it, i) => ({ item: it, points: pts(it), title: `Fonction ${i + 1}` })),
+    prompt: t('Calcule la transformée de Fourier de chaque fonction, avec la table et les propriétés.{a}', { a: TABLE() }),
+    parts: items.map((it, i) => ({ item: it, points: pts(it), title: t('Fonction {a}', { a: i + 1 }) })),
     key: `${items.map((it) => it.key).join('+')}`, exam: opts.exam ? { format: 'open', points: items.reduce((s, it) => s + pts(it), 0) } : false,
   });
 }
@@ -290,9 +291,9 @@ function mcqVariant(level, rng, opts) {
   ];
   return mcqF({
     skill: SK, level, exam: examTag(opts), key: `${SK}:mcq:${a}:${b}`,
-    prompt: `Soit g(x) = ${FML(`e^(-${b === 1 ? '' : b}abs(x))`)} et h(x) = ${FML(`e^(-${a === 1 ? '' : a}abs(x))`)}. ${opts.exam ? 'Cochez les égalités vraies.' : 'Quelle égalité est vraie ?'}${TABLE()}`,
+    prompt: opts.exam ? t('Soit g(x) = {a} et h(x) = {b}. Cochez les égalités vraies.{c}', { a: FML(`e^(-${b === 1 ? '' : b}abs(x))`), b: FML(`e^(-${a === 1 ? '' : a}abs(x))`), c: TABLE() }) : t('Soit g(x) = {a} et h(x) = {b}. Quelle égalité est vraie ?{c}', { a: FML(`e^(-${b === 1 ? '' : b}abs(x))`), b: FML(`e^(-${a === 1 ? '' : a}abs(x))`), c: TABLE() }),
     right: opts.exam ? rng.shuffle(right).slice(0, rng.pick([2, 3])) : [right[rng.pick([0, 2])]], wrongs: rng.shuffle(wrongs),
-    solution: [{ html: `F7 : ĝ(α) = ${FML(`${b === 1 ? '' : b}√(2/π)/(α^2+${b * b})`)} ; ℱ(g ∗ h) = √(2π) ĝ ĥ, en 0 : √(2π)·(√(2/π)/${b})·(√(2/π)/${a}) = ${FML(`2√2/(${ab}√π)`)}.`, note: '' }],
+    solution: [{ html: t('F7 : ĝ(α) = {a} ; ℱ(g ∗ h) = √(2π) ĝ ĥ, en 0 : √(2π)·(√(2/π)/{b})·(√(2/π)/{a2}) = {c}.', { a: FML(`${b === 1 ? '' : b}√(2/π)/(α^2+${b * b})`), b, a2: a, c: FML(`2√2/(${ab}√π)`) }), note: '' }],
     expectedSec: 150,
   }, rng);
 }

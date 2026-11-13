@@ -26,6 +26,7 @@ import {
   q, qText, nz, modeOf, H, E, examOf, seg, xMinus, polyText, polyMul, polyEval, polyTrim,
   blanked, blankWhere, withMenus,
 } from './analyse0-b-kit.js';
+import { t } from '../../i18n.js';
 
 const KEYS = ['calcx', 'calcfn', 'anal', 'relation'];
 
@@ -42,7 +43,7 @@ function monoText(m, { x = 'x', y = 'y' } = {}) {
   const coef = !body ? qText(a) : a.eq(1) ? '' : `${qText(a)}`;
   return `${m.c.n < 0 ? '-' : ''}${coef}${body}`;
 }
-const joinTerms = (ts) => ts.filter((t) => t && t !== '0').reduce((s, t) => (s ? (t.startsWith('-') ? `${s}${t}` : `${s}+${t}`) : t), '') || '0';
+const joinTerms = (ts) => ts.filter((x) => x && x !== '0').reduce((s, x) => (s ? (x.startsWith('-') ? `${s}${x}` : `${s}+${x}`) : x), '') || '0';
 const polyXY = (ms, names) => joinTerms(ms.filter((m) => m.c.n !== 0).map((m) => monoText(m, names)));
 const dX = (ms) => ms.filter((m) => m.i > 0).map((m) => mono(m.c.mul(m.i), m.i - 1, m.j));
 const dY = (ms) => ms.filter((m) => m.j > 0).map((m) => mono(m.c.mul(m.j), m.i, m.j - 1));
@@ -59,10 +60,10 @@ function collect(ms) {
 // The polynomial in x obtained with y = m·x + h: coefficients [c0, c1, …].
 function onLine(ms, m, h) {
   let out = [q(0)];
-  for (const t of ms) {
-    let p = [t.c];
-    for (let k = 0; k < t.i; k++) p = polyMul(p, [q(0), q(1)]);
-    for (let k = 0; k < t.j; k++) p = polyMul(p, [Q.of(h), Q.of(m)]);
+  for (const tm of ms) {
+    let p = [tm.c];
+    for (let k = 0; k < tm.i; k++) p = polyMul(p, [q(0), q(1)]);
+    for (let k = 0; k < tm.j; k++) p = polyMul(p, [Q.of(h), Q.of(m)]);
     out = Array.from({ length: Math.max(out.length, p.length) }, (_, k) => (out[k] ?? q(0)).add(p[k] ?? q(0)));
   }
   return polyTrim(out);
@@ -86,8 +87,8 @@ function derivedLine(ms, yp = "y'") {
   for (const m of ms) {
     if (m.i) out.push(monoText(mono(m.c.mul(m.i), m.i - 1, m.j)));
     if (m.j) {
-      const t = mono(m.c.mul(m.j), m.i, m.j - 1);
-      const body = monoText(t);
+      const tm = mono(m.c.mul(m.j), m.i, m.j - 1);
+      const body = monoText(tm);
       if (yp === '1') out.push(body);
       else out.push(body === '1' ? yp : body === '-1' ? `-${yp}` : `${body}×${yp}`);
     }
@@ -116,19 +117,19 @@ function paramsFor(Fy) {
 
 const IM = 'g6-deriv-implicit';
 const IM_SUB = [
-  { id: 'point', label: 'trouver le point', skill: 'g0-factor-thm' },
-  { id: 'derive', label: 'dériver par rapport à x', skill: 'g6-deriv-rules' },
-  { id: 'isolate', label: 'isoler y′', skill: IM },
-  { id: 'slope', label: 'pente au point', skill: IM },
-  { id: 'tangent', label: 'tangente', skill: 'g6-tangent' },
+  { id: 'point', label: t('trouver le point'), skill: 'g0-factor-thm' },
+  { id: 'derive', label: t('dériver par rapport à x'), skill: 'g6-deriv-rules' },
+  { id: 'isolate', label: t('isoler y′'), skill: IM },
+  { id: 'slope', label: t('pente au point'), skill: IM },
+  { id: 'tangent', label: t('tangente'), skill: 'g6-tangent' },
 ];
 const IM_CHOICES = [
-  { id: 'point', label: 'Trouver y₀ : remplacer x par x₀ dans l\'équation' },
-  { id: 'derive', label: 'Dériver chaque terme par rapport à x (× y′ pour les termes en y)' },
-  { id: 'isolate', label: 'Isoler y′' },
-  { id: 'eval', label: 'Évaluer y′ en (x₀ ; y₀)' },
-  { id: 'tangent', label: 'Écrire la tangente y = y₀ + m(x − x₀)' },
-  { id: 'forget', label: 'Dériver les termes en y comme si y était x', rule: 'g6_implicit_yprime_forgot', why: 'y dépend de x : chaque terme en y dérivé donne un facteur y′ (règle de chaîne).' },
+  { id: 'point', label: t('Trouver y₀ : remplacer x par x₀ dans l\'équation') },
+  { id: 'derive', label: t('Dériver chaque terme par rapport à x (× y′ pour les termes en y)') },
+  { id: 'isolate', label: t('Isoler y′') },
+  { id: 'eval', label: t('Évaluer y′ en (x₀ ; y₀)') },
+  { id: 'tangent', label: t('Écrire la tangente y = y₀ + m(x − x₀)') },
+  { id: 'forget', label: t('Dériver les termes en y comme si y était x'), rule: 'g6_implicit_yprime_forgot', why: t('y dépend de x : chaque terme en y dérivé donne un facteur y′ (règle de chaîne).') },
 ];
 
 const MIXED = [[1, 1], [2, 1], [1, 2]];
@@ -183,7 +184,7 @@ function imShape(d) {
   const pEq = `${derivedLine(d.ms, 'p')}=0`;
   const fyPar = /[+-]/.test(FyT.slice(1)) ? `(${FyT})` : FyT;
   const isolated = `p(${FyT})=${negFx}`;
-  const sum = (t) => /[+-]/.test(t.slice(1));
+  const sum = (tm) => /[+-]/.test(tm.slice(1));
   const pFinal = `p=${negFx.startsWith('-') ? (sum(FxT) ? `-(${FxT})` : negFx) : sum(negFx) ? `(${negFx})` : negFx}/${fyPar}`;
   const slopeStart = `${negFx.startsWith('-') ? `-(${polyAt(collect(d.Fx), d.x0, d.y0)})` : `(${polyAt(collect(d.Fx).map((m) => mono(m.c.neg(), m.i, m.j)), d.x0, d.y0)})`}/(${polyAt(collect(d.Fy), d.x0, d.y0)})`;
   // y₀: the equation in y at x = x₀.
@@ -200,12 +201,12 @@ const imJudge = () => IMPLICIT();
 const isoJudge = (d) => ({ kind: 'solset', v: 'p', params: d.params });
 const tanJudge = { kind: 'equiv', vars: ['x'], target: 'expanded', domain: { x: [-3, 3] } };
 
-const derivSeg = (s, level) => seg('Dérive les deux membres par rapport à x. Le membre de droite est constant : sa dérivée est 0. y dépend de x : écris y′.', '0 =', `d(${s.P})`, withMenus(imJudge(), level, `d(${s.P})`, [E(s.derived, '', '', 'derive')], IM_CHOICES));
+const derivSeg = (s, level) => seg(t('Dérive les deux membres par rapport à x. Le membre de droite est constant : sa dérivée est 0. y dépend de x : écris y′.'), '0 =', `d(${s.P})`, withMenus(imJudge(), level, `d(${s.P})`, [E(s.derived, '', '', 'derive')], IM_CHOICES));
 
 function imHints(s) {
   const holed = blankWhere({ math: s.derived }, (n) => n.t === 'bin' && n.op === '×' && n.r?.t === 'deriv', IMPLICIT(), 1);
   return H(
-    'Dérive chaque terme ; chaque fois que tu dérives une expression en y, multiplie par y′. Puis isole y′.',
+    t('Dérive chaque terme ; chaque fois que tu dérives une expression en y, multiplie par y′. Puis isole y′.'),
     `${MT(holed.blanks ? templateOf(holed, parseOpts(IMPLICIT())) : s.derived, { vars: ['x', 'y', 'p'] })} = 0`,
     `y′ = ${MT(s.pFinal.replace(/^p=/, ''))}`,
   );
@@ -214,22 +215,22 @@ function imHints(s) {
 function imDecision(d, rng) {
   const mixed = d.ms.find((m) => m.i && m.j);
   if (mixed && rng.chance(0.5)) {
-    const t = monoText(mono(1, mixed.i, mixed.j));
+    const tm = monoText(mono(1, mixed.i, mixed.j));
     const right = derivedLine([mono(1, mixed.i, mixed.j)]);
     const xpart = monoText(mono(mixed.i, mixed.i - 1, mixed.j));
     return {
-      kind: 'decision', prompt: `Que vaut la dérivée de ${MT(t)} par rapport à x ?`, options: [
+      kind: 'decision', prompt: t('Que vaut la dérivée de {e} par rapport à x ?', { e: MT(tm) }), options: [
         { id: 'prod', label: MT(right), valid: true, ref: true },
-        { id: 'xy', label: MT(derivedLine([mono(1, mixed.i, mixed.j)]).replace(`${xpart}+`, '').replace(/^1\+/, '')), valid: false, rule: 'g6_implicit_xy', why: `${MT(t)} est un produit de deux fonctions de x : (uv)′ = u′v + uv′.` },
-        { id: 'zero', label: MT(xpart), valid: false, rule: 'g6_implicit_yprime_forgot', why: 'y dépend de x : sa dérivée y′ ne disparaît pas.' },
+        { id: 'xy', label: MT(derivedLine([mono(1, mixed.i, mixed.j)]).replace(`${xpart}+`, '').replace(/^1\+/, '')), valid: false, rule: 'g6_implicit_xy', why: t('{e} est un produit de deux fonctions de x : (uv)′ = u′v + uv′.', { e: MT(tm) }) },
+        { id: 'zero', label: MT(xpart), valid: false, rule: 'g6_implicit_yprime_forgot', why: t('y dépend de x : sa dérivée y′ ne disparaît pas.') },
       ],
     };
   }
   return {
-    kind: 'decision', prompt: `Que vaut la dérivée de ${MT('y^3')} par rapport à x ?`, options: [
+    kind: 'decision', prompt: t('Que vaut la dérivée de {e} par rapport à x ?', { e: MT('y^3') }), options: [
       { id: 'chain', label: MT("3y^2×y'"), valid: true, ref: true },
-      { id: 'forgot', label: MT('3y^2'), valid: false, rule: 'g6_implicit_yprime_forgot', why: 'y dépend de x : par la règle de chaîne, (y³)′ = 3y²·y′, comme (sin 3x)′ = 3cos 3x.' },
-      { id: 'zero', label: MT('0'), valid: false, why: 'y n\'est pas une constante : il dépend de x.' },
+      { id: 'forgot', label: MT('3y^2'), valid: false, rule: 'g6_implicit_yprime_forgot', why: t('y dépend de x : par la règle de chaîne, (y³)′ = 3y²·y′, comme (sin 3x)′ = 3cos 3x.') },
+      { id: 'zero', label: MT('0'), valid: false, why: t('y n\'est pas une constante : il dépend de x.') },
     ],
   };
 }
@@ -240,27 +241,27 @@ function imItem(level, rng, profile, opts = {}) {
   const d = imData(rng);
   const s = imShape(d);
   const key = `${IM}:${s.eq}:${d.x0}`;
-  const derive = E(s.derived, 'Dériver par rapport à x', 'derive', 'derive');
+  const derive = E(s.derived, t('Dériver par rapport à x'), 'derive', 'derive');
   const hints = imHints(s);
   const common = { skill: IM, level, subgoals: IM_SUB, keys: KEYS, hints, fallback: !!d.fallback, declares: { vars: ['x', 'y', 'p'] } };
-  const iso = [E(s.isolated, 'Regrouper les termes en p', 'isolate', 'isolate'), E(s.pFinal, 'Diviser', 'isolate', 'isolate')];
+  const iso = [E(s.isolated, t('Regrouper les termes en p'), 'isolate', 'isolate'), E(s.pFinal, t('Diviser'), 'isolate', 'isolate')];
   if (level === 1 && !opts.exam) {
     const line = blankWhere(derive, (n) => n.t === 'bin' && n.op === '×' && n.r?.t === 'deriv', {}, 2);
     return linesItem({
-      ...common, prompt: `Γ : ${MT(s.eq)}. y dépend de x : dérive les deux membres par rapport à x.`,
+      ...common, prompt: t('Γ : {e}. y dépend de x : dérive les deux membres par rapport à x.', { e: MT(s.eq) }),
       start: `d(${s.P})`, judge: imJudge(), mode: 'guided',
-      script: [{ kind: 'note', html: 'Le membre de droite est constant : sa dérivée est 0. Pour un terme en y, la règle de chaîne donne un facteur y′ : (y³)′ = 3y²·y′.' }, line],
+      script: [{ kind: 'note', html: t('Le membre de droite est constant : sa dérivée est 0. Pour un terme en y, la règle de chaîne donne un facteur y′ : (y³)′ = 3y²·y′.') }, line],
       key, exam: false,
     });
   }
   if (level === 2 && !opts.exam) {
     const line = blankWhere(derive, (n) => n.t === 'bin' && n.op === '×' && n.r?.t === 'deriv', {}, 1);
     return linesItem({
-      ...common, prompt: `Γ : ${MT(s.eq)}. Calcule y′ en fonction de x et de y.`,
+      ...common, prompt: t('Γ : {e}. Calcule y′ en fonction de x et de y.', { e: MT(s.eq) }),
       start: `d(${s.P})`, judge: imJudge(), mode: 'guided',
       script: [
         imDecision(d, rng), line,
-        seg('On note p = y′. Isole p :', null, s.pEq, isoJudge(d)),
+        seg(t('On note p = y′. Isole p :'), null, s.pEq, isoJudge(d)),
         blanked(iso[0], [s.FyT]), iso[1],
       ],
       key, exam: false,
@@ -269,38 +270,38 @@ function imItem(level, rng, profile, opts = {}) {
   if (level === 3 && !opts.exam) {
     const T = `(${fr(d.x0)} ; ${fr(d.y0)})`;
     return linesItem({
-      ...common, prompt: `Γ : ${MT(s.eq)}. Le point T${T} est sur Γ. Calcule y′, puis la pente de la tangente à Γ en T.`,
+      ...common, prompt: t('Γ : {e}. Le point T{T} est sur Γ. Calcule y′, puis la pente de la tangente à Γ en T.', { e: MT(s.eq), T }),
       start: `d(${s.P})`, judge: withMenus(imJudge(), 3, `d(${s.P})`, [derive], IM_CHOICES), mode: 'tap', tapActions: 'steps',
       script: [
         derive,
-        seg('On note p = y′. Isole p :', null, s.pEq, withMenus(isoJudge(d), 3, s.pEq, iso, IM_CHOICES)),
+        seg(t('On note p = y′. Isole p :'), null, s.pEq, withMenus(isoJudge(d), 3, s.pEq, iso, IM_CHOICES)),
         ...iso,
-        seg(`Pente en T${T} :`, `y′(${fr(d.x0)}) =`, s.slopeStart, withMenus({ kind: 'value', form: 'irreducible' }, 3, s.slopeStart, [E(qText(d.slope), '', '', 'eval')], IM_CHOICES)),
-        E(qText(d.slope), 'Calculer', 'slope', 'eval'),
+        seg(t('Pente en T{T} :', { T }), `y′(${fr(d.x0)}) =`, s.slopeStart, withMenus({ kind: 'value', form: 'irreducible' }, 3, s.slopeStart, [E(qText(d.slope), '', '', 'eval')], IM_CHOICES)),
+        E(qText(d.slope), t('Calculer'), 'slope', 'eval'),
       ],
       key, exam: false,
     });
   }
   // Levels 4, 5 and the open variant: the whole problem (MAN 2017 Q5).
   const yJudge = { kind: 'solset', v: 'y', subst: { x: String(d.x0) } };
-  const yLines = [E(s.yEq, `x = ${fr(d.x0)}`, 'point', 'point'), E(s.yFactor, 'Racine évidente, factoriser', 'point', 'point'), E(`y=${d.y0}`, 'Le trinôme n\'a pas de racine réelle', 'point', 'point')];
+  const yLines = [E(s.yEq, `x = ${fr(d.x0)}`, 'point', 'point'), E(s.yFactor, t('Racine évidente, factoriser'), 'point', 'point'), E(`y=${d.y0}`, t('Le trinôme n\'a pas de racine réelle'), 'point', 'point')];
   const T = `(${fr(d.x0)} ; ${fr(d.y0)})`;
   const prompt = rng.pick([
-    `Γ : ${MT(s.eq)}. Trouve l'équation de la tangente à Γ au point d'abscisse ${fr(d.x0)}.`,
-    `La courbe Γ a pour équation ${MT(s.eq)}. Détermine le point T de Γ d'abscisse ${fr(d.x0)}, puis la tangente à Γ en T.`,
+    t('Γ : {e}. Trouve l\'équation de la tangente à Γ au point d\'abscisse {x}.', { e: MT(s.eq), x: fr(d.x0) }),
+    t('La courbe Γ a pour équation {e}. Détermine le point T de Γ d\'abscisse {x}, puis la tangente à Γ en T.', { e: MT(s.eq), x: fr(d.x0) }),
   ]);
   return linesItem({
-    ...common, prompt: `${prompt} (Écris y′ pour la dérivée de y.)`,
+    ...common, prompt: `${prompt} ${t('(Écris y′ pour la dérivée de y.)')}`,
     start: s.eq, judge: yJudge, mode: 'free',
     script: [
       ...yLines,
       derivSeg(s, level), derive,
-      seg('On note p = y′. Isole p :', null, s.pEq, isoJudge(d)),
+      seg(t('On note p = y′. Isole p :'), null, s.pEq, isoJudge(d)),
       ...iso,
-      seg(`Pente en T${T} :`, `y′(${fr(d.x0)}) =`, s.slopeStart, { kind: 'value', form: 'irreducible' }),
-      E(qText(d.slope), 'Calculer', 'slope'),
-      seg(`Tangente en T${T} :`, 'y =', s.tangentStart, tanJudge),
-      E(s.tangent, 'Développer', 'tangent'),
+      seg(t('Pente en T{T} :', { T }), `y′(${fr(d.x0)}) =`, s.slopeStart, { kind: 'value', form: 'irreducible' }),
+      E(qText(d.slope), t('Calculer'), 'slope'),
+      seg(t('Tangente en T{T} :', { T }), 'y =', s.tangentStart, tanJudge),
+      E(s.tangent, t('Développer'), 'tangent'),
     ],
     noHints: level >= 5 || !!opts.exam,
     key, exam: examOf(opts, 3),
@@ -335,9 +336,9 @@ function imMcq(rng) {
     options.push({ html: MT(c.text), correct: !!c.correct, rule: c.rule || null });
   }
   return mcq({
-    skill: IM, level: 4, prompt: `Γ : ${MT(s.eq)}, où y dépend de x. En dérivant par rapport à x, on obtient :`, options,
+    skill: IM, level: 4, prompt: t('Γ : {e}, où y dépend de x. En dérivant par rapport à x, on obtient :', { e: MT(s.eq) }), options,
     key: `mcq:${s.eq}`, exam: { format: 'mcq', points: 1 }, fallback: !!d.fallback,
-    solution: [{ html: `${MT(`${s.derived}=0`)}, donc y′ = ${MT(s.pFinal.replace(/^p=/, ''))}.`, note: '' }],
+    solution: [{ html: t('{e}, donc y′ = {p}.', { e: MT(`${s.derived}=0`), p: MT(s.pFinal.replace(/^p=/, '')) }), note: '' }],
   }, rng);
 }
 
@@ -355,9 +356,9 @@ function imCoef(rng) {
   }
   const T = `(${fr(d.x0)} ; ${fr(d.y0)})`;
   return answerItem({
-    skill: IM, level: 4, prompt: `Le point T${T} est sur la courbe Γ : ${MT(s.eq)}. Quelle est la pente de la tangente à Γ en T ?`,
+    skill: IM, level: 4, prompt: t('Le point T{T} est sur la courbe Γ : {e}. Quelle est la pente de la tangente à Γ en T ?', { T, e: MT(s.eq) }),
     expected: qText(d.slope), traps, key: `${s.eq}:${d.x0}`, exam: { format: 'coef', points: 1 }, fallback: !!d.fallback,
-    solution: [{ html: `${MT(`${s.derived}=0`)}, donc y′ = ${MT(s.pFinal.replace(/^p=/, ''))} ; en T : y′ = ${MT(qText(d.slope))}.`, note: '' }],
+    solution: [{ html: t('{e}, donc y′ = {p} ; en T : y′ = {m}.', { e: MT(`${s.derived}=0`), p: MT(s.pFinal.replace(/^p=/, '')), m: MT(qText(d.slope)) }), note: '' }],
   });
 }
 
@@ -367,17 +368,17 @@ function imCoef(rng) {
 
 const CT = 'g6-common-tangent';
 const CT_SUB = [
-  { id: 'derive', label: 'dériver implicitement', skill: IM },
-  { id: 'slope', label: 'égaler la pente, T sur t', skill: CT },
-  { id: 'solve', label: 'résoudre', skill: 'eq-systems' },
-  { id: 'param', label: 'T sur Γ : le paramètre', skill: CT },
+  { id: 'derive', label: t('dériver implicitement'), skill: IM },
+  { id: 'slope', label: t('égaler la pente, T sur t'), skill: CT },
+  { id: 'solve', label: t('résoudre'), skill: 'eq-systems' },
+  { id: 'param', label: t('T sur Γ : le paramètre'), skill: CT },
 ];
 const CT_CHOICES = [
-  { id: 'derive', label: 'Dériver implicitement' },
-  { id: 'slope', label: 'Égaler la pente : y′ = m, et T sur t : y = mx + h' },
-  { id: 'solve', label: 'Résoudre l\'équation en x' },
-  { id: 'param', label: 'T sur Γ : trouver p' },
-  { id: 'forget', label: 'Dériver les termes en y comme si y était x', rule: 'g6_implicit_yprime_forgot', why: 'y dépend de x : chaque terme en y dérivé donne un facteur y′.' },
+  { id: 'derive', label: t('Dériver implicitement') },
+  { id: 'slope', label: t('Égaler la pente : y′ = m, et T sur t : y = mx + h') },
+  { id: 'solve', label: t('Résoudre l\'équation en x') },
+  { id: 'param', label: t('T sur Γ : trouver p') },
+  { id: 'forget', label: t('Dériver les termes en y comme si y était x'), rule: 'g6_implicit_yprime_forgot', why: t('y dépend de x : chaque terme en y dérivé donne un facteur y′.') },
 ];
 
 function ctData(rng) {
@@ -391,7 +392,7 @@ function ctData(rng) {
     if (!shapes.some(([a, b]) => b > 0)) continue;
     const ms = shapes.map(([a, b]) => mono(nz(rng, -3, 3), a, b));
     // The last coefficient makes E(x₀) = 0, E(x) = F_x + m·F_y on y = mx + h.
-    const e = (t) => evalXY(dX([t]), x0, y0).add(evalXY(dY([t]), x0, y0).mul(m));
+    const e = (tm) => evalXY(dX([tm]), x0, y0).add(evalXY(dY([tm]), x0, y0).mul(m));
     const last = ms[2];
     const unit = e(mono(1, last.i, last.j));
     if (unit.n === 0) continue;
@@ -400,7 +401,7 @@ function ctData(rng) {
     if (!c.isInt() || c.n === 0 || Math.abs(c.n) > 3) continue;
     ms[2] = mono(c, last.i, last.j);
     ms.sort((u, w) => (w.i + w.j) - (u.i + u.j) || w.i - u.i);
-    const E2 = onLine([...dX(ms), ...dY(ms).map((t) => mono(t.c.mul(m), t.i, t.j))], m, h);
+    const E2 = onLine([...dX(ms), ...dY(ms).map((tm) => mono(tm.c.mul(m), tm.i, tm.j))], m, h);
     if (E2.length !== 3) continue;
     // E = (x − x₀)(αx + δ): the other root −δ/α, not a whole number.
     const alpha = E2[2];
@@ -444,41 +445,41 @@ function ctItem(level, rng, profile, opts = {}) {
   const key = `${CT}:${s.gamma}:${s.tLine}`;
   const xJudge = { kind: 'solset', v: 'x', subst: { y: polyText([q(d.h), q(d.m)]) } };
   const pJudge = { kind: 'solset', v: 'p', subst: { x: String(d.x0), y: String(d.y0) } };
-  const derive = E(s.derived, 'Dériver implicitement', 'derive', 'derive');
-  const xLines = [E(s.Ex, `y′ = ${fr(d.m)}, et y = ${MT(polyText([q(d.h), q(d.m)]))} (T sur t)`, 'slope', 'slope'), E(s.fac, 'Factoriser', 'solve', 'solve'), E(s.sols, 'Produit nul', 'solve', 'solve')];
-  const pLines = [...(s.PT.n === 0 ? [] : [E(`${qText(s.PT)}+p=0`, `T${T} sur Γ`, 'param', 'param')]), E(`p=${qText(d.p)}`, 'Isoler p', 'param', 'param')];
+  const derive = E(s.derived, t('Dériver implicitement'), 'derive', 'derive');
+  const xLines = [E(s.Ex, t('y′ = {m}, et y = {l} (T sur t)', { m: fr(d.m), l: MT(polyText([q(d.h), q(d.m)])) }), 'slope', 'slope'), E(s.fac, t('Factoriser'), 'solve', 'solve'), E(s.sols, t('Produit nul'), 'solve', 'solve')];
+  const pLines = [...(s.PT.n === 0 ? [] : [E(`${qText(s.PT)}+p=0`, t('T{T} sur Γ', { T }), 'param', 'param')]), E(`p=${qText(d.p)}`, t('Isoler p'), 'param', 'param')];
   const pickT = {
-    kind: 'decision', prompt: 'Quel point T retiens-tu ?', options: [
-      { id: 'int', label: `x = ${fr(d.x0)}, donc T${T}`, valid: true, ref: true },
-      { id: 'frac', label: `x = ${fr(qText(d.x1))}, donc T${T1}`, valid: false, why: 'Ses coordonnées ne sont pas entières : l\'énoncé demande T à coordonnées entières.' },
+    kind: 'decision', prompt: t('Quel point T retiens-tu ?'), options: [
+      { id: 'int', label: t('x = {x}, donc T{T}', { x: fr(d.x0), T }), valid: true, ref: true },
+      { id: 'frac', label: t('x = {x}, donc T{T}', { x: fr(qText(d.x1)), T: T1 }), valid: false, why: t('Ses coordonnées ne sont pas entières : l\'énoncé demande T à coordonnées entières.') },
     ],
   };
   const conditions = {
-    kind: 'decision', prompt: 'Quelles conditions écris-tu pour T ?', options: [
-      { id: 'three', label: 'T ∈ Γ, T ∈ t, et la pente de Γ en T est celle de t', valid: true, ref: true },
-      { id: 'two', label: 'T ∈ Γ et T ∈ t seulement', valid: false, why: 'Une sécante passe aussi par des points de Γ : il faut encore que les pentes soient égales en T.' },
-      { id: 'slope', label: 'Seulement : la pente de Γ en T est celle de t', valid: false, why: 'Il faut aussi que T soit sur t et sur Γ : sinon on trouve une droite parallèle à t.' },
+    kind: 'decision', prompt: t('Quelles conditions écris-tu pour T ?'), options: [
+      { id: 'three', label: t('T ∈ Γ, T ∈ t, et la pente de Γ en T est celle de t'), valid: true, ref: true },
+      { id: 'two', label: t('T ∈ Γ et T ∈ t seulement'), valid: false, why: t('Une sécante passe aussi par des points de Γ : il faut encore que les pentes soient égales en T.') },
+      { id: 'slope', label: t('Seulement : la pente de Γ en T est celle de t'), valid: false, why: t('Il faut aussi que T soit sur t et sur Γ : sinon on trouve une droite parallèle à t.') },
     ],
   };
   const prompt = rng.pick([
-    `Γ : ${MT(s.gamma)} (p ∈ ℝ) et t : ${MT(s.tLine)}. Pour quelle valeur de p la droite t est-elle tangente à Γ en un point T à coordonnées entières ?`,
-    `Trouve p pour que la droite ${MT(s.tLine)} soit tangente à la courbe ${MT(s.gamma)} en un point T dont les coordonnées sont entières.`,
+    t('Γ : {g} (p ∈ ℝ) et t : {l}. Pour quelle valeur de p la droite t est-elle tangente à Γ en un point T à coordonnées entières ?', { g: MT(s.gamma), l: MT(s.tLine) }),
+    t('Trouve p pour que la droite {l} soit tangente à la courbe {g} en un point T dont les coordonnées sont entières.', { g: MT(s.gamma), l: MT(s.tLine) }),
   ]);
   const xSeg = (html) => seg(html, null, s.withM, withMenus(xJudge, level, s.withM, xLines, CT_CHOICES));
-  const pSeg = seg('T est sur Γ :', null, s.gamma, withMenus(pJudge, level, s.gamma, pLines, CT_CHOICES));
+  const pSeg = seg(t('T est sur Γ :'), null, s.gamma, withMenus(pJudge, level, s.gamma, pLines, CT_CHOICES));
   const common = { skill: CT, level, subgoals: CT_SUB, keys: KEYS, fallback: !!d.fallback, key, declares: { vars: ['x', 'y', 'p'] } };
   const hints = H(
-    'Trois conditions : T est sur Γ, T est sur t, et les pentes sont égales en T (y′ = pente de t).',
-    `${MT(s.Ex)}, donc x = …`,
+    t('Trois conditions : T est sur Γ, T est sur t, et les pentes sont égales en T (y′ = pente de t).'),
+    t('{e}, donc x = …', { e: MT(s.Ex) }),
     `T${T}, p = ${fr(qText(d.p))}`,
   );
   if (level === 1 && !opts.exam) {
     // y′ given: the conditions with holes.
     return linesItem({
-      ...common, prompt: `${prompt}<br>En dérivant : ${MT(`${s.derived}=0`)}.`,
+      ...common, prompt: `${prompt}<br>${t('En dérivant : {e}.', { e: MT(`${s.derived}=0`) })}`,
       start: s.withM, judge: xJudge, mode: 'guided', hints,
       script: [
-        { kind: 'note', html: `La pente de t est ${fr(d.m)} : on remplace y′ par ${fr(d.m)}. T est sur t : on remplace y par ${MT(polyText([q(d.h), q(d.m)]))}.` },
+        { kind: 'note', html: t('La pente de t est {m} : on remplace y′ par {m}. T est sur t : on remplace y par {l}.', { m: fr(d.m), l: MT(polyText([q(d.h), q(d.m)])) }) },
         blankWhere(xLines[0], (n) => n.t === 'bin' && n.op === '×' && ['sym'].includes(n.r?.t), {}, 1),
         xLines[1], xLines[2],
         pSeg, pickT,
@@ -491,14 +492,14 @@ function ctItem(level, rng, profile, opts = {}) {
   const script = [
     ...(level === 2 && !opts.exam ? [conditions] : []),
     level === 2 && !opts.exam ? blankWhere(derive, (n) => n.t === 'bin' && n.op === '×' && n.r?.t === 'deriv', {}, 1) : derive,
-    xSeg(`La pente de t est ${fr(d.m)} : y′ = ${fr(d.m)}. T est sur t : y = ${MT(polyText([q(d.h), q(d.m)]))}.`),
+    xSeg(t('La pente de t est {m} : y′ = {m}. T est sur t : y = {l}.', { m: fr(d.m), l: MT(polyText([q(d.h), q(d.m)])) })),
     ...(level === 2 && !opts.exam ? [blanked(xLines[0], [String(d.alpha)]), xLines[1], xLines[2]] : xLines),
     pSeg, pickT,
     ...pLines,
   ];
   // The decision of T comes before the lines of the part « T ∈ Γ ».
   return linesItem({
-    ...common, prompt: `${prompt}${level <= 4 && !opts.exam ? ' (Écris y′ pour la dérivée de y.)' : ''}`,
+    ...common, prompt: `${prompt}${level <= 4 && !opts.exam ? ` ${t('(Écris y′ pour la dérivée de y.)')}` : ''}`,
     start: `d(${s.P}+p)`, judge: derivJudge, mode: opts.exam ? 'free' : modeOf(level), tapActions: level === 3 && !opts.exam ? 'steps' : null,
     hints, noHints: level >= 5 || !!opts.exam, script, exam: examOf(opts, 4),
   });

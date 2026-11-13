@@ -5,6 +5,8 @@
 //      'op', 'newline', 'indent', 'dedent', 'eof'.
 // Errors are PyError with a French message and the line.
 
+import { t } from '../i18n.js';
+
 export class PyError extends Error {
   constructor(message, line = null, kind = 'error') {
     super(message);
@@ -12,7 +14,7 @@ export class PyError extends Error {
     this.kind = kind; // 'syntax' | 'error' | 'limit'
   }
   // « ligne 3 : nom inconnu : x »
-  get text() { return this.line ? `ligne ${this.line} : ${this.message}` : this.message; }
+  get text() { return this.line ? t('ligne {line} : {message}', { line: this.line, message: this.message }) : this.message; }
 }
 
 export const KEYWORDS = new Set([
@@ -51,7 +53,7 @@ export function tokenize(src) {
           indents.pop();
           out.push({ t: 'dedent', line: lineNo, col: 0 });
         }
-        if (width !== indents[indents.length - 1]) throw new PyError('indentation : ce bloc ne s\'aligne sur aucun bloc au-dessus', lineNo, 'syntax');
+        if (width !== indents[indents.length - 1]) throw new PyError(t('indentation : ce bloc ne s\'aligne sur aucun bloc au-dessus'), lineNo, 'syntax');
       }
     }
     while (i < line.length) {
@@ -69,7 +71,7 @@ export function tokenize(src) {
         const clean = text.replace(/_/g, '');
         if (/^\d+$/.test(clean)) out.push({ t: 'num', v: { int: BigInt(clean) }, line: lineNo, col });
         else out.push({ t: 'num', v: { float: Number(clean) }, line: lineNo, col });
-        if (/[A-Za-z_]/.test(line[i] || '')) throw new PyError(`erreur de syntaxe : « ${text}${line[i]} » n'est pas un nombre`, lineNo, 'syntax');
+        if (/[A-Za-z_]/.test(line[i] || '')) throw new PyError(t('erreur de syntaxe : « {text} » n\'est pas un nombre', { text: `${text}${line[i]}` }), lineNo, 'syntax');
         continue;
       }
       if (/[A-Za-z_À-ɏ]/.test(c)) {
@@ -85,13 +87,13 @@ export function tokenize(src) {
           if (line[j] === '\\' && j + 1 < line.length) { const e = line[j + 1]; s += e === 'n' ? '\n' : e === 't' ? '\t' : e; j += 2; continue; }
           s += line[j++];
         }
-        if (j >= line.length) throw new PyError('erreur de syntaxe : chaîne de caractères non fermée', lineNo, 'syntax');
+        if (j >= line.length) throw new PyError(t('erreur de syntaxe : chaîne de caractères non fermée'), lineNo, 'syntax');
         i = j + 1;
         out.push({ t: 'str', v: s, line: lineNo, col });
         continue;
       }
       const op = OPS.find((o) => line.startsWith(o, i));
-      if (!op) throw new PyError(`erreur de syntaxe : caractère inattendu « ${c} »`, lineNo, 'syntax');
+      if (!op) throw new PyError(t('erreur de syntaxe : caractère inattendu « {c} »', { c }), lineNo, 'syntax');
       i += op.length;
       if ('([{'.includes(op)) depth++;
       if (')]}'.includes(op)) depth = Math.max(0, depth - 1);
@@ -103,7 +105,7 @@ export function tokenize(src) {
     const last = out[out.length - 1];
     if (last && last.t !== 'newline' && last.t !== 'indent' && last.t !== 'dedent') out.push({ t: 'newline', line: lineNo, col: line.length + 1 });
   }
-  if (depth > 0) throw new PyError('erreur de syntaxe : une parenthèse ou un crochet n\'est pas fermé', lines.length, 'syntax');
+  if (depth > 0) throw new PyError(t('erreur de syntaxe : une parenthèse ou un crochet n\'est pas fermé'), lines.length, 'syntax');
   const end = lines.length;
   if (out.length && out[out.length - 1].t !== 'newline' && out[out.length - 1].t !== 'dedent') out.push({ t: 'newline', line: end, col: 0 });
   while (indents.length > 1) { indents.pop(); out.push({ t: 'dedent', line: end, col: 0 }); }

@@ -12,22 +12,23 @@
 
 import { MT, H, q, fr, mono, V, P, vMul, vScale, vText, vZero, vEven, pAt, ipp, ipvWrong, freq, build, COEF, COEFK, atN, kText, vOddText, KEYS, mcqMulti } from './fourier-a-kit.js';
 import { examTag } from './kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'f-sine-cosine';
 const SUB = [
-  { id: 'formula', label: 'formule de bₙ (prolongement impair)', skill: SK },
-  { id: 'ipp', label: 'intégration par parties', skill: 'a1-int-parts' },
-  { id: 'assemble', label: 'assembler bₙ', skill: SK },
+  { id: 'formula', label: t('formule de bₙ (prolongement impair)'), skill: SK },
+  { id: 'ipp', label: t('intégration par parties'), skill: 'a1-int-parts' },
+  { id: 'assemble', label: t('assembler bₙ'), skill: SK },
 ];
 
 export const SINE_CHOICES = [
-  { id: 'ipp', label: 'Intégrer par parties, u = le polynôme' },
-  { id: 'prim', label: 'Écrire une primitive' },
-  { id: 'eval', label: 'Évaluer aux bornes : sin(nπ) = 0, cos(nπ) = (−1)ⁿ' },
-  { id: 'simp', label: 'Simplifier' },
-  { id: 'odd', label: 'Remplacer n par 2k + 1 et simplifier' },
-  { id: 'sign', label: 'Primitive de sin(nx) : cos(nx)/n', rule: 'f_ipp_sign', why: 'La dérivée de cos(nx) est −n sin(nx) : une primitive de sin(nx) est −cos(nx)/n.' },
-  { id: 'half', label: 'Prendre le facteur 1/L devant l\'intégrale', rule: 'f_sine_wrong_factor', why: 'Le prolongement impair double l\'intégrale sur [0 ; L] : le facteur est 2/L.' },
+  { id: 'ipp', label: t('Intégrer par parties, u = le polynôme') },
+  { id: 'prim', label: t('Écrire une primitive') },
+  { id: 'eval', label: t('Évaluer aux bornes : sin(nπ) = 0, cos(nπ) = (−1)ⁿ') },
+  { id: 'simp', label: t('Simplifier') },
+  { id: 'odd', label: t('Remplacer n par 2k + 1 et simplifier') },
+  { id: 'sign', label: t('Primitive de sin(nx) : cos(nx)/n'), rule: 'f_ipp_sign', why: t('La dérivée de cos(nx) est −n sin(nx) : une primitive de sin(nx) est −cos(nx)/n.') },
+  { id: 'half', label: t('Prendre le facteur 1/L devant l\'intégrale'), rule: 'f_sine_wrong_factor', why: t('Le prolongement impair double l\'intégrale sur [0 ; L] : le facteur est 2/L.') },
 ];
 
 const cx = (c, body) => (c === 1 ? body : `${c}${body}`);
@@ -49,7 +50,7 @@ export function famOf(kind, c, L) {
   }[kind];
   const show = {
     x: cx(c, 'x'), one: String(c), x2: cx(c, 'x²'), xpx: cx(c, `x(${Lt} − x)`), quad2: c === 1 ? '2πx − x²' : `${c}(2πx − x²)`,
-    tri: c === 1 ? '2x sur [0 ; π/2] et 2π − 2x sur [π/2 ; π]' : `${2 * c}x sur [0 ; π/2] et ${2 * c}π − ${2 * c}x sur [π/2 ; π]`,
+    tri: c === 1 ? t('2x sur [0 ; π/2] et 2π − 2x sur [π/2 ; π]') : t('{a}x sur [0 ; π/2] et {a}π − {a}x sur [π/2 ; π]', { a: 2 * c }),
   }[kind];
   // f(0) and f(L), for the comparison at the ends (Dirichlet).
   const at0 = '0';
@@ -108,7 +109,7 @@ export function sineParts(f, { level, sub = { formula: 'formula', ipp: 'ipp', as
   };
   const lines = sc.lines.map((l, i) => {
     const last = i === sc.lines.length - 1;
-    const line = { math: l.math, note: { ipp: 'Par parties', prim: 'Primitive', eval: 'Aux bornes', simp: 'Simplifier' }[l.act], subgoal: last ? sub.assemble : sub.ipp, act: l.act };
+    const line = { math: l.math, note: { ipp: t('Par parties'), prim: t('Primitive'), eval: t('Aux bornes'), simp: t('Simplifier') }[l.act], subgoal: last ? sub.assemble : sub.ipp, act: l.act };
     if (l.piece) line.blank = [l.piece];
     if (last) { line.blank = [l.math]; line.blank2 = [l.math]; }
     return line;
@@ -116,7 +117,7 @@ export function sineParts(f, { level, sub = { formula: 'formula', ipp: 'ipp', as
   const parts = [{ html: 'bₙ :', ask: 'bₙ =', start: sc.start, judge: COEF(sc.goal, { traps }), lines }];
   if (sc.odd && level !== 1) {
     parts.push({
-      html: f.kind === 'tri' ? 'n pair : sin(nπ/2) = 0, donc bₙ = 0. Pour n = 2k + 1, sin((2k + 1)π/2) = (−1)ᵏ :' : 'n pair : bₙ = 0. Pour n impair, n = 2k + 1 :',
+      html: f.kind === 'tri' ? t('n pair : sin(nπ/2) = 0, donc bₙ = 0. Pour n = 2k + 1, sin((2k + 1)π/2) = (−1)ᵏ :') : t('n pair : bₙ = 0. Pour n impair, n = 2k + 1 :'),
       ask: 'b_(2k+1) =', start: sc.odd.start, judge: COEFK(sc.odd.goal),
       lines: [{ math: sc.odd.goal, note: f.kind === 'tri' ? 'sin((2k + 1)π/2) = (−1)ᵏ' : '(−1)^(2k+1) = −1', subgoal: sub.assemble, act: 'odd', blank: [sc.odd.goal] }],
     });
@@ -131,17 +132,17 @@ export function formulaDecision(f, kind = 'sin') {
   const K = f.L === 'π' ? '(2/π)' : f.L === 1 ? '2' : '';
   const half = f.L === 'π' ? '(1/π)' : f.L === 1 ? '' : '(1/2)';
   if (kind === 'sin') {
-    return { kind: 'decision', prompt: 'Série en sinus : quelle formule ?', options: [
-      { id: 'ok', label: `Prolongement impair : bₙ = ${K}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: true },
-      { id: 'half', label: `bₙ = ${half}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: `Le prolongement impair a la période ${f.L === 'π' ? '2π' : 2 * f.L} : sur [−${Lt} ; ${Lt}], f(x) sin(${arg}) est paire, l'intégrale vaut deux fois celle sur [0 ; ${Lt}]. Le facteur est 2/L.` },
-      { id: 'cos', label: `aₙ = ${K}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, why: 'C\'est la série en cosinus (prolongement pair). La série en sinus n\'a que des bₙ.' },
-      ...(f.L === 'π' ? [{ id: 'twopi', label: 'bₙ = (1/π)∫₀^2π f(x) sin(nx) dx', valid: false, rule: 'f_interval_02pi', why: 'f n\'est donnée que sur [0 ; π] : sur ]π ; 2π[, le prolongement impair vaut −f(2π − x), pas la formule de f.' }] : []),
+    return { kind: 'decision', prompt: t('Série en sinus : quelle formule ?'), options: [
+      { id: 'ok', label: t('Prolongement impair : bₙ = {K}∫₀^{Lt} f(x) sin({arg}) dx', { K, Lt, arg }), valid: true },
+      { id: 'half', label: `bₙ = ${half}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: t('Le prolongement impair a la période {a} : sur [−{Lt} ; {Lt}], f(x) sin({arg}) est paire, l\'intégrale vaut deux fois celle sur [0 ; {Lt}]. Le facteur est 2/L.', { a: f.L === 'π' ? '2π' : 2 * f.L, Lt, arg }) },
+      { id: 'cos', label: `aₙ = ${K}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, why: t('C\'est la série en cosinus (prolongement pair). La série en sinus n\'a que des bₙ.') },
+      ...(f.L === 'π' ? [{ id: 'twopi', label: 'bₙ = (1/π)∫₀^2π f(x) sin(nx) dx', valid: false, rule: 'f_interval_02pi', why: t('f n\'est donnée que sur [0 ; π] : sur ]π ; 2π[, le prolongement impair vaut −f(2π − x), pas la formule de f.') }] : []),
     ] };
   }
-  return { kind: 'decision', prompt: 'Série en cosinus : quelle formule ?', options: [
-    { id: 'ok', label: `Prolongement pair : a₀ et aₙ = ${K}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: true },
-    { id: 'half', label: `aₙ = ${half}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: 'Le prolongement pair double l\'intégrale sur [0 ; L] : le facteur est 2/L.' },
-    { id: 'sin', label: `bₙ = ${K}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, why: 'C\'est la série en sinus (prolongement impair). La série en cosinus n\'a que a₀ et des aₙ.' },
+  return { kind: 'decision', prompt: t('Série en cosinus : quelle formule ?'), options: [
+    { id: 'ok', label: t('Prolongement pair : a₀ et aₙ = {K}∫₀^{Lt} f(x) cos({arg}) dx', { K, Lt, arg }), valid: true },
+    { id: 'half', label: `aₙ = ${half}∫₀^${Lt} f(x) cos(${arg}) dx`, valid: false, rule: 'f_sine_wrong_factor', why: t('Le prolongement pair double l\'intégrale sur [0 ; L] : le facteur est 2/L.') },
+    { id: 'sin', label: `bₙ = ${K}∫₀^${Lt} f(x) sin(${arg}) dx`, valid: false, why: t('C\'est la série en sinus (prolongement impair). La série en cosinus n\'a que a₀ et des aₙ.') },
   ] };
 }
 
@@ -159,16 +160,16 @@ function cosineParts(f, level) {
   const goal = vText(ch.value);
   const lines = ch.lines.map((l, i) => {
     const last = i === ch.lines.length - 1;
-    const line = { math: l.math, note: { ipp: 'Par parties', prim: 'Primitive', eval: 'Aux bornes', simp: 'Simplifier' }[l.act], subgoal: last ? 'assemble' : 'ipp', act: l.act };
+    const line = { math: l.math, note: { ipp: t('Par parties'), prim: t('Primitive'), eval: t('Aux bornes'), simp: t('Simplifier') }[l.act], subgoal: last ? 'assemble' : 'ipp', act: l.act };
     if (l.piece) line.blank = [l.piece];
     if (last) { line.blank = [l.math]; line.blank2 = [l.math]; }
     return line;
   });
   const parts = [
     {
-      html: 'a₀ à part :', ask: 'a₀ =', start: `${Kp(K)}int(${pT}, x, 0, ${f.Lt})`, judge: { kind: 'definite' },
+      html: t('a₀ à part :'), ask: 'a₀ =', start: `${Kp(K)}int(${pT}, x, 0, ${f.Lt})`, judge: { kind: 'definite' },
       lines: [
-        { math: `${Kp(K)}bracket(${primT}, x, 0, ${f.Lt})`, note: 'Primitive', subgoal: 'formula', act: 'prim', blank: [primT] },
+        { math: `${Kp(K)}bracket(${primT}, x, 0, ${f.Lt})`, note: t('Primitive'), subgoal: 'formula', act: 'prim', blank: [primT] },
         { math: a0, note: 'a₀', subgoal: 'formula', act: 'eval', blank: [a0] },
       ],
     },
@@ -176,7 +177,7 @@ function cosineParts(f, level) {
   ];
   if (/\(1-\(-1\)\^n\)|\(\(-1\)\^n-1\)/.test(goal) && level !== 1) {
     const g = vOddText(ch.value);
-    parts.push({ html: 'n pair : aₙ = 0. Pour n impair, n = 2k + 1 :', ask: 'a_(2k+1) =', start: atN(goal, '2k+1'), judge: COEFK(g), lines: [{ math: g, note: '(−1)^(2k+1) = −1', subgoal: 'assemble', act: 'odd', blank: [g] }] });
+    parts.push({ html: t('n pair : aₙ = 0. Pour n impair, n = 2k + 1 :'), ask: 'a_(2k+1) =', start: atN(goal, '2k+1'), judge: COEFK(g), lines: [{ math: g, note: '(−1)^(2k+1) = −1', subgoal: 'assemble', act: 'odd', blank: [g] }] });
   }
   return { parts, goal };
 }
@@ -192,18 +193,19 @@ function linesVariant(level, rng, opts) {
   const parts = built.parts;
   const dec = formulaDecision(f, cosine ? 'cos' : 'sin');
   const ext = {
-    kind: 'decision', prompt: `On demande la série en ${cosine ? 'cosinus' : 'sinus'} de f : quel prolongement à [−${f.Lt} ; ${f.Lt}] ?`, levels: [3], options: [
-      { id: 'odd', label: 'Impair', valid: !cosine, why: 'Le prolongement impair donne une série en sinus ; on demande les cosinus.' },
-      { id: 'even', label: 'Pair', valid: cosine, why: 'Le prolongement pair donne une série en cosinus ; on demande les sinus.' },
+    kind: 'decision', prompt: cosine ? t('On demande la série en cosinus de f : quel prolongement à [−{Lt} ; {Lt}] ?', { Lt: f.Lt }) : t('On demande la série en sinus de f : quel prolongement à [−{Lt} ; {Lt}] ?', { Lt: f.Lt }), levels: [3], options: [
+      { id: 'odd', label: t('Impair'), valid: !cosine, why: t('Le prolongement impair donne une série en sinus ; on demande les cosinus.') },
+      { id: 'even', label: t('Pair'), valid: cosine, why: t('Le prolongement pair donne une série en cosinus ; on demande les sinus.') },
     ],
   };
-  parts[0].pre = level === 1 ? [{ kind: 'note', html: `Formule : ${dec.options[0].label}.` }] : [ext, dec];
+  parts[0].pre = level === 1 ? [{ kind: 'note', html: t('Formule : {a}.', { a: dec.options[0].label }) }] : [ext, dec];
   const T = f.L === 'π' ? '2π' : String(2 * f.L);
-  const name = cosine ? 'en cosinus' : 'en sinus';
   return build({
     skill: SK, level, parts, subgoals: SUB, keys: KEYS, choices: SINE_CHOICES,
-    prompt: `f(x) = ${fr(f.show)}${f.kind === 'tri' ? '' : ` sur [0 ; ${f.Lt}]`}. Calcule les coefficients de sa série ${name} (${cosine ? 'prolongement pair' : 'prolongement impair'}, période ${T}).`,
-    hints: H(cosine ? 'Prolongement pair : seulement a₀ et des aₙ, avec le facteur 2/L et l\'intégrale sur [0 ; L].' : 'Prolongement impair : seulement des bₙ, intégrale sur [0 ; L] avec le facteur 2/L.',
+    prompt: cosine
+      ? (f.kind === 'tri' ? t('f(x) = {a}. Calcule les coefficients de sa série en cosinus (prolongement pair, période {T}).', { a: fr(f.show), T }) : t('f(x) = {a} sur [0 ; {Lt}]. Calcule les coefficients de sa série en cosinus (prolongement pair, période {T}).', { a: fr(f.show), Lt: f.Lt, T }))
+      : (f.kind === 'tri' ? t('f(x) = {a}. Calcule les coefficients de sa série en sinus (prolongement impair, période {T}).', { a: fr(f.show), T }) : t('f(x) = {a} sur [0 ; {Lt}]. Calcule les coefficients de sa série en sinus (prolongement impair, période {T}).', { a: fr(f.show), Lt: f.Lt, T })),
+    hints: H(cosine ? t('Prolongement pair : seulement a₀ et des aₙ, avec le facteur 2/L et l\'intégrale sur [0 ; L].') : t('Prolongement impair : seulement des bₙ, intégrale sur [0 ; L] avec le facteur 2/L.'),
       `${cosine ? 'aₙ' : 'bₙ'} = ${MT(parts[cosine ? 1 : 0].start)}`,
       MT(parts[cosine ? 1 : 0].lines[0].math)),
     key: `${SK}:${level}:${cosine ? 'c' : 's'}:${f.id}`, exam: examTag(opts, 5),
@@ -220,11 +222,11 @@ function mcqVariant(rng, opts) {
     right2 && right2 !== sc.goal ? { html: `bₙ = ${MT(right2)}`, correct: true } : null,
     { html: `bₙ = ${MT(sc.wrongHalf)}`, correct: false, rule: 'f_sine_wrong_factor' },
     sc.wrongSign !== sc.goal ? { html: `bₙ = ${MT(sc.wrongSign)}`, correct: false, rule: 'f_ipp_sign' } : null,
-    sc.odd ? { html: `b₂ₖ = 0 et b₂ₖ₊₁ = ${MT(sc.odd.goal)}`, correct: true } : { html: 'bₙ = 0 pour n pair', correct: false },
+    sc.odd ? { html: t('b₂ₖ = 0 et b₂ₖ₊₁ = {goal}', { goal: MT(sc.odd.goal) }), correct: true } : { html: t('bₙ = 0 pour n pair'), correct: false },
   ];
   return mcqMulti({
     skill: SK, level: 4, key: `${SK}:mcq:${f.id}`, exam: examTag(opts, 1), options,
-    prompt: `f(x) = ${fr(f.show)} sur [0 ; ${f.Lt}]. Les coefficients de sa série en sinus vérifient :`,
+    prompt: t('f(x) = {a} sur [0 ; {Lt}]. Les coefficients de sa série en sinus vérifient :', { a: fr(f.show), Lt: f.Lt }),
     solution: [{ html: `bₙ = ${MT(sc.start)} = ${MT(sc.goal)}.`, note: '' }],
     expectedSec: 300,
   }, rng);

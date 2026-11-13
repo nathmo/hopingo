@@ -19,13 +19,14 @@ import { linesItem, mcq, examTag } from './kit.js';
 import { mcqDistinct, withCells } from './alglin-kit.js';
 import { refCode, codeItem, readtableItem, multiMcq, vfMcq, H, blankBy } from './numerique-kit.js';
 import { R, nice } from './numerique-g-kit.js';
+import { t } from '../../i18n.js';
 
 const IN = 'n-ode-implicit-newton';
 const SUB = [
-  { id: 'system', label: 'le système du schéma implicite', skill: 'n-ode-euler' },
-  { id: 'jacobian', label: 'la jacobienne', skill: 'n-newton-system' },
-  { id: 'evaluate', label: 'évaluer en x⁽⁰⁾ = uⁿ', skill: IN },
-  { id: 'solve', label: 'résoudre J·δ = F', skill: 'n-newton-system' },
+  { id: 'system', label: t('le système du schéma implicite'), skill: 'n-ode-euler' },
+  { id: 'jacobian', label: t('la jacobienne'), skill: 'n-newton-system' },
+  { id: 'evaluate', label: t('évaluer en x⁽⁰⁾ = uⁿ'), skill: IN },
+  { id: 'solve', label: t('résoudre J·δ = F'), skill: 'n-newton-system' },
 ];
 const KEYS = ['calc', 'greek'];
 
@@ -41,7 +42,7 @@ const vR = (v) => R(`(${v.map(qs).join(' ; ')})`);
 const mR = (M) => R(`[[${M[0].map(qs).join(', ')}], [${M[1].map(qs).join(', ')}]]`);
 
 function data(rng, { only } = {}) {
-  for (let t = 0; t < 100; t++) {
+  for (let tries = 0; tries < 100; tries++) {
     const gk = only || rng.pick(['sq', 'sq', 'one', 'four']);
     const G = GS[gk];
     const [u1, u2] = rng.pick([[1, 1], [1, 2], [2, 1]]).map((x) => new Q(x));
@@ -65,29 +66,29 @@ const f1Text = (d) => `x-${d.u1}+${d.h}×${d.G.text('y')}×x`;
 const f2Text = (d) => `y-${d.u2}+${d.h}×${d.G.text('x')}×y`;
 const f1Show = (d) => `f₁(x, y) = x − ${d.u1} + ${nice(d.h)}·${d.G.show('y')}·x`;
 const f2Show = (d) => `f₂(x, y) = y − ${d.u2} + ${nice(d.h)}·${d.G.show('x')}·y`;
-const intro = (d) => `Euler rétrograde pour ${sysShow(d)}, avec h = ${nice(d.h)} et uⁿ = ${vR([d.u1, d.u2])}. Les inconnues x = (x ; y) = uⁿ⁺¹ vérifient f(x) = 0, résolu par un pas de Newton depuis x⁽⁰⁾ = uⁿ.`;
+const intro = (d) => t('Euler rétrograde pour {d}, avec h = {h} et uⁿ = {v1}. Les inconnues x = (x ; y) = uⁿ⁺¹ vérifient f(x) = 0, résolu par un pas de Newton depuis x⁽⁰⁾ = uⁿ.', { d: sysShow(d), h: nice(d.h), v1: vR([d.u1, d.u2]) });
 
 // The parts J, F, x¹ (mat judge), with grid cells to fill when guided.
 function parts(d, { guided = false, withF = false } = {}) {
   const out = [
-    { kind: 'segment', html: `La jacobienne de f en x⁽⁰⁾ = ${vR([d.u1, d.u2])} :`, ask: 'J =', start: { math: 'J' }, judge: { kind: 'mat', expect: mt(d.J) } },
-    guided ? withCells({ kind: 'eq', math: mt(d.J), note: '∂fᵢ/∂x, ∂fᵢ/∂y, évaluées en uⁿ', subgoal: 'jacobian' }, [[0, 0], [0, 1]]) : { kind: 'eq', math: mt(d.J), note: '∂fᵢ/∂x, ∂fᵢ/∂y, évaluées en uⁿ', subgoal: 'jacobian' },
+    { kind: 'segment', html: t('La jacobienne de f en x⁽⁰⁾ = {v1} :', { v1: vR([d.u1, d.u2]) }), ask: 'J =', start: { math: 'J' }, judge: { kind: 'mat', expect: mt(d.J) } },
+    guided ? withCells({ kind: 'eq', math: mt(d.J), note: t('∂fᵢ/∂x, ∂fᵢ/∂y, évaluées en uⁿ'), subgoal: 'jacobian' }, [[0, 0], [0, 1]]) : { kind: 'eq', math: mt(d.J), note: t('∂fᵢ/∂x, ∂fᵢ/∂y, évaluées en uⁿ'), subgoal: 'jacobian' },
   ];
   if (withF) {
     out.push(
       { kind: 'segment', html: 'F(x⁽⁰⁾) = (f₁(uⁿ) ; f₂(uⁿ)) :', ask: 'F =', start: { math: 'F' }, judge: { kind: 'mat', expect: vt(d.F) } },
-      { kind: 'eq', math: vt(d.F), note: 'x = uⁿ : il reste h·g(·)·uᵢⁿ', subgoal: 'evaluate' },
+      { kind: 'eq', math: vt(d.F), note: t('x = uⁿ : il reste h·g(·)·uᵢⁿ'), subgoal: 'evaluate' },
     );
   }
   out.push(
-    { kind: 'segment', html: 'Résous J·δ = F, puis x⁽¹⁾ = x⁽⁰⁾ − δ :', ask: 'x⁽¹⁾ =', start: { math: 'x' }, judge: { kind: 'mat', expect: vt(d.x1) } },
+    { kind: 'segment', html: t('Résous J·δ = F, puis x⁽¹⁾ = x⁽⁰⁾ − δ :'), ask: 'x⁽¹⁾ =', start: { math: 'x' }, judge: { kind: 'mat', expect: vt(d.x1) } },
     guided ? withCells({ kind: 'eq', math: vt(d.x1), note: `δ = ${vR(d.delta)}`, subgoal: 'solve' }, [[0, 0]]) : { kind: 'eq', math: vt(d.x1), note: `δ = ${vR(d.delta)}`, subgoal: 'solve' },
   );
   return out;
 }
 
 function hintsOf(d) {
-  return H('Ligne i de J : les dérivées de fᵢ par rapport à x, puis à y, en x⁽⁰⁾ = uⁿ.',
+  return H(t('Ligne i de J : les dérivées de fᵢ par rapport à x, puis à y, en x⁽⁰⁾ = uⁿ.'),
     `J = [[1 + ${nice(d.h)}·g(${d.u2}), □], [□, 1 + ${nice(d.h)}·g(${d.u1})]]`,
     `J = ${mR(d.J)}, δ = ${vR(d.delta)}, x⁽¹⁾ = ${vR(d.x1)}.`);
 }
@@ -104,10 +105,10 @@ function linesLevel(rng, level) {
     judge = { kind: 'equiv', vars: ['x', 'y'] };
     const l1 = f1Text(d);
     script = [
-      { kind: 'note', html: 'Le schéma : x = u₁ⁿ + h·(−g(y)·x), donc f₁(x, y) = x − u₁ⁿ − h·(−g(y)·x).' },
-      { kind: 'eq', math: l1, ...blankBy(l1, [`${d.h}×${d.G.text('y')}×x`]), note: 'f₁ simplifiée', subgoal: 'system' },
-      { kind: 'segment', html: 'De même, f₂ :', ask: 'f₂ =', start: { math: `y-${d.u2}-${d.h}×(-${d.G.text('x')}×y)` }, judge: { kind: 'equiv', vars: ['x', 'y'] } },
-      { kind: 'eq', math: f2Text(d), ...blankBy(f2Text(d), [`${d.h}×${d.G.text('x')}×y`]), note: 'f₂ simplifiée', subgoal: 'system' },
+      { kind: 'note', html: t('Le schéma : x = u₁ⁿ + h·(−g(y)·x), donc f₁(x, y) = x − u₁ⁿ − h·(−g(y)·x).') },
+      { kind: 'eq', math: l1, ...blankBy(l1, [`${d.h}×${d.G.text('y')}×x`]), note: t('f₁ simplifiée'), subgoal: 'system' },
+      { kind: 'segment', html: t('De même, f₂ :'), ask: 'f₂ =', start: { math: `y-${d.u2}-${d.h}×(-${d.G.text('x')}×y)` }, judge: { kind: 'equiv', vars: ['x', 'y'] } },
+      { kind: 'eq', math: f2Text(d), ...blankBy(f2Text(d), [`${d.h}×${d.G.text('x')}×y`]), note: t('f₂ simplifiée'), subgoal: 'system' },
       ...all,
     ];
   } else {
@@ -117,10 +118,10 @@ function linesLevel(rng, level) {
     script = [{ kind: 'note', html: `${f1Show(d)} ; ${f2Show(d)}.` }];
     if (level === 3) {
       script.push({
-        kind: 'decision', prompt: 'Quel système résout-on à chaque pas d\'Euler rétrograde ?', options: rng.shuffle([
+        kind: 'decision', prompt: t('Quel système résout-on à chaque pas d\'Euler rétrograde ?'), options: rng.shuffle([
           { id: 'ok', label: `${f1Show(d)}, ${f2Show(d)}`, valid: true, ref: true },
-          { id: 'mix', label: `f₁(x, y) = x − ${d.u1} + ${nice(d.h)}·${d.G.show(`${d.u2}`)}·x, f₂(x, y) = y − ${d.u2} + ${nice(d.h)}·${d.G.show(`${d.u1}`)}·y`, valid: false, rule: 'n_implicit_as_explicit', why: 'Les termes non linéaires doivent porter sur les inconnues x et y (le nouveau point), pas sur uⁿ.' },
-          { id: 'new', label: 'f₁ = u₁ⁿ⁺¹ − u₁ⁿ + h·(u₂ⁿ⁺¹)²u₁ⁿ⁺¹, écrit en uⁿ⁺¹ sans inconnues nommées', valid: false, why: 'C\'est le schéma, mais Newton demande une fonction des inconnues (x, y) pour la dériver.' },
+          { id: 'mix', label: `f₁(x, y) = x − ${d.u1} + ${nice(d.h)}·${d.G.show(`${d.u2}`)}·x, f₂(x, y) = y − ${d.u2} + ${nice(d.h)}·${d.G.show(`${d.u1}`)}·y`, valid: false, rule: 'n_implicit_as_explicit', why: t('Les termes non linéaires doivent porter sur les inconnues x et y (le nouveau point), pas sur uⁿ.') },
+          { id: 'new', label: t('f₁ = u₁ⁿ⁺¹ − u₁ⁿ + h·(u₂ⁿ⁺¹)²u₁ⁿ⁺¹, écrit en uⁿ⁺¹ sans inconnues nommées'), valid: false, why: t('C\'est le schéma, mais Newton demande une fonction des inconnues (x, y) pour la dériver.') },
         ]),
       });
     }
@@ -128,7 +129,7 @@ function linesLevel(rng, level) {
   }
   return linesItem({
     skill: IN, level, mode, keys: KEYS,
-    prompt: `${intro(d)}${level === 2 ? ' Écris f₁ et f₂, puis fais le pas de Newton.' : ''}`,
+    prompt: level === 2 ? t('{intro} Écris f₁ et f₂, puis fais le pas de Newton.', { intro: intro(d) }) : intro(d),
     start, judge, script,
     hints: hintsOf(d),
     subgoals: SUB, key: `${IN}:${level}:${d.gk}:${d.u1}${d.u2}:${d.h}`, baits: level === 3 ? ['n_implicit_as_explicit'] : [], fallback: d.fallback,
@@ -161,23 +162,23 @@ const TESTS = [
 function energy(rng, level) {
   return multiMcq({
     skill: IN, level, key: `${IN}:energy`,
-    prompt: 'Pour la solution exacte de u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ :',
+    prompt: t('Pour la solution exacte de u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ :'),
     options: [
       { html: '½·d/dt(u₁² + u₂²) + 2u₁²u₂² = 0', correct: true },
       { html: 'u₁(1)² + u₂(1)² ≤ u₁(0)² + u₂(0)²', correct: true },
-      { html: 'u₁² + u₂² est constante', correct: false },
-      { html: 'u₁(t)² + u₂(t)² croît avec t', correct: false },
+      { html: t('u₁² + u₂² est constante'), correct: false },
+      { html: t('u₁(t)² + u₂(t)² croît avec t'), correct: false },
     ],
-    solution: [{ html: 'u₁u₁′ + u₂u₂′ = −u₁²u₂² − u₁²u₂² = −2u₁²u₂² ≤ 0 : l\'énergie ½(u₁² + u₂²) décroît.', note: '' }],
+    solution: [{ html: t('u₁u₁′ + u₂u₂′ = −u₁²u₂² − u₁²u₂² = −2u₁²u₂² ≤ 0 : l\'énergie ½(u₁² + u₂²) décroît.'), note: '' }],
   }, rng);
 }
 
 function level5(rng) {
   return codeItem({
     skill: IN, level: 5, ref: STEP, blanks: [0, 1, 2, 3, 4], traps: TRAPS, wrong: { 3: 'h * x1 * x2', 2: '1 - h * x2 * x2' }, rng,
-    prompt: 'Complète un pas de Newton pour Euler rétrograde sur u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ (les inconnues x1, x2 partent de uⁿ). solve(A, b) résout Ax = b.',
+    prompt: t('Complète un pas de Newton pour Euler rétrograde sur u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ (les inconnues x1, x2 partent de uⁿ). solve(A, b) résout Ax = b.'),
     preludes: ['vec', 'mat'], tests: TESTS,
-    then: readtableItem({ skill: IN, level: 5, key: 'energy', prompt: 'Une propriété du problème exact :', table: null, question: energy(rng, 5) }),
+    then: readtableItem({ skill: IN, level: 5, key: 'energy', prompt: t('Une propriété du problème exact :'), table: null, question: energy(rng, 5) }),
     hints: [], subgoals: SUB, key: '5',
   });
 }
@@ -192,7 +193,7 @@ function examMcq(rng, opts) {
     const pair = (x, y) => `a = ${nice(x)}, b = ${nice(y)}`;
     return mcqDistinct({
       skill: IN, level: 4, key: `${IN}:mcq:ab:${d.gk}:${d.u1}${d.u2}:${d.h}`, exam: examTag(opts),
-      prompt: `${intro(d)} La jacobienne en x⁽⁰⁾ est J = [[a, b], [c, d]]. Que valent a et b ?`,
+      prompt: t('{d} La jacobienne en x⁽⁰⁾ est J = [[a, b], [c, d]]. Que valent a et b ?', { d: intro(d) }),
       right: pair(a, b),
       wrongs: [
         { html: pair(new Q(2).sub(a), b.neg()) },
@@ -206,14 +207,14 @@ function examMcq(rng, opts) {
   const d = data(rng);
   return mcq({
     skill: IN, level: 4, key: `${IN}:mcq:sys:${d.gk}:${d.u1}${d.u2}`, exam: examTag(opts),
-    prompt: `Euler rétrograde pour ${sysShow(d)}, h = ${nice(d.h)}, uⁿ = ${vR([d.u1, d.u2])}. Les inconnues (x ; y) = uⁿ⁺¹ vérifient f(x, y) = 0 avec`,
+    prompt: t('Euler rétrograde pour {d}, h = {h}, uⁿ = {v1}. Les inconnues (x ; y) = uⁿ⁺¹ vérifient f(x, y) = 0 avec', { d: sysShow(d), h: nice(d.h), v1: vR([d.u1, d.u2]) }),
     options: [
       { html: `${f1Show(d)}, ${f2Show(d)}`, correct: true },
       { html: `f₁(x, y) = x − ${d.u1} + ${nice(d.h)}·${d.G.show(`${d.u2}`)}·x, f₂(x, y) = y − ${d.u2} + ${nice(d.h)}·${d.G.show(`${d.u1}`)}·y`, correct: false, rule: 'n_implicit_as_explicit' },
       { html: `f₁(x, y) = x − ${d.u1} − ${nice(d.h)}·${d.G.show('y')}·x, f₂(x, y) = y − ${d.u2} − ${nice(d.h)}·${d.G.show('x')}·y`, correct: false },
       { html: `f₁(x, y) = x − ${d.u1} + ${nice(d.h)}·${d.G.show('x')}·y, f₂(x, y) = y − ${d.u2} + ${nice(d.h)}·${d.G.show('y')}·x`, correct: false },
     ],
-    solution: [{ html: 'x = uⁿ + h·(−g(y)·x) : f₁ = x − u₁ⁿ + h·g(y)·x, et de même f₂.', note: '' }],
+    solution: [{ html: t('x = uⁿ + h·(−g(y)·x) : f₁ = x − u₁ⁿ + h·g(y)·x, et de même f₂.'), note: '' }],
   }, rng);
 }
 
@@ -221,15 +222,15 @@ function examTf(rng, opts) {
   if (rng.chance(0.5)) {
     return vfMcq({
       skill: IN, key: `${IN}:tf:sign`, exam: examTag(opts), truth: false, ruleIfTrue: 'n_newton_sys_sign',
-      statement: 'Dans le pas de Newton du schéma implicite, si J(x⁽⁰⁾)·δ = F(x⁽⁰⁾), alors x⁽¹⁾ = x⁽⁰⁾ + δ.',
-      explanation: 'Faux : DF(x⁽⁰⁾)(x⁽⁰⁾ − x⁽¹⁾) = F(x⁽⁰⁾), donc x⁽¹⁾ = x⁽⁰⁾ − δ.',
+      statement: t('Dans le pas de Newton du schéma implicite, si J(x⁽⁰⁾)·δ = F(x⁽⁰⁾), alors x⁽¹⁾ = x⁽⁰⁾ + δ.'),
+      explanation: t('Faux : DF(x⁽⁰⁾)(x⁽⁰⁾ − x⁽¹⁾) = F(x⁽⁰⁾), donc x⁽¹⁾ = x⁽⁰⁾ − δ.'),
     }, rng);
   }
   const k = rng.int(0, 1);
   return vfMcq({
     skill: IN, key: `${IN}:tf:energy:${k}`, exam: examTag(opts), truth: true,
-    statement: k ? 'La solution exacte de u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ vérifie ½·d/dt(u₁² + u₂²) + 2u₁²u₂² = 0.' : 'La solution exacte de u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ vérifie u₁(1)² + u₂(1)² ≤ u₁(0)² + u₂(0)².',
-    explanation: 'Vrai : u₁u₁′ + u₂u₂′ = −2u₁²u₂² ≤ 0, l\'énergie décroît.',
+    statement: k ? t('La solution exacte de u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ vérifie ½·d/dt(u₁² + u₂²) + 2u₁²u₂² = 0.') : t('La solution exacte de u₁′ = −u₂²u₁, u₂′ = −u₁²u₂ vérifie u₁(1)² + u₂(1)² ≤ u₁(0)² + u₂(0)².'),
+    explanation: t('Vrai : u₁u₁′ + u₂u₂′ = −2u₁²u₂² ≤ 0, l\'énergie décroît.'),
   }, rng);
 }
 

@@ -34,6 +34,7 @@ import { equivalent } from '../cas/equiv.js';
 import { diff } from '../cas/diff.js';
 import { stripParen } from '../cas/ast.js';
 import { floorTo, ceilTo } from '../cas/stats.js';
+import { t } from '../i18n.js';
 
 const squash = (s) => String(s ?? '').replace(/\s+/g, '');
 const close = (a, b) => Math.abs(a - b) <= 1e-9 * (1 + Math.abs(a) + Math.abs(b));
@@ -127,7 +128,7 @@ export function makeJudge(kind) {
       const lastExact = exact[exact.length - 1];
       const k = lastExact ? literalKind(lastExact.ast) : null;
       if (!k) {
-        if (ms.some((m) => m.op === '≈') && exact.length) return 'Donne aussi la valeur exacte (une fraction irréductible).';
+        if (ms.some((m) => m.op === '≈') && exact.length) return t('Donne aussi la valeur exacte (une fraction irréductible).');
         return false;
       }
       // 60/6: right, and a step (the next line simplifies it).
@@ -139,7 +140,7 @@ export function makeJudge(kind) {
     if (cfg.sig) {
       const s = sigDigits(last.ast);
       const ok = s === cfg.sig || (cfg.sigAlt && s === cfg.sigAlt);
-      if (!ok) return `C'est la bonne valeur, mais écris-la avec ${cfg.sig} chiffres significatifs.`;
+      if (!ok) return t('C\'est la bonne valeur, mais écris-la avec {n} chiffres significatifs.', { n: cfg.sig });
     }
     return true;
   }
@@ -149,19 +150,19 @@ export function makeJudge(kind) {
     try {
       node = readStat(cfg, input);
     } catch (e) {
-      return { kind: 'parse', message: e instanceof ReadError || e.message ? e.message : 'Je n\'arrive pas à lire cette ligne.' };
+      return { kind: 'parse', message: e instanceof ReadError || e.message ? e.message : t('Je n\'arrive pas à lire cette ligne.') };
     }
-    if (!node.members.length) return { kind: 'parse', node, message: 'Écris une valeur.' };
+    if (!node.members.length) return { kind: 'parse', node, message: t('Écris une valeur.') };
     if (prev?.t === 'sline' && prev.members?.length && squash(node.text) && squash(node.text) === squash(prev.text)) {
-      return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+      return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
     }
     if (cfg.vars?.length) return judgeExpr(cfg, prev, node);
     let want = expected(cfg, state);
     if (!want && prev?.t === 'sline' && prev.members.length) want = statValue(cfg, prev.members[prev.members.length - 1].ast, {});
-    if (!want) return { kind: 'wrong', node, message: 'Je ne sais pas quelle valeur attendre ici.' };
+    if (!want) return { kind: 'wrong', node, message: t('Je ne sais pas quelle valeur attendre ici.') };
     for (const m of node.members) {
       const v = statValue(cfg, m.ast, {});
-      if (!v) return { kind: 'wrong', node, message: 'Je n\'arrive pas à calculer cette ligne : vérifie les lettres et les parenthèses.' };
+      if (!v) return { kind: 'wrong', node, message: t('Je n\'arrive pas à calculer cette ligne : vérifie les lettres et les parenthèses.') };
       if (!matches(cfg, v, want, m, state)) {
         const diag = diagnose(cfg, prev, node, v);
         return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: wrongMessage(cfg, v, want) };
@@ -174,9 +175,9 @@ export function makeJudge(kind) {
   }
 
   function wrongMessage(cfg, v, want) {
-    if (v.interval || want.interval) return cfg.ciRule === 'outward' ? 'Ce ne sont pas les bonnes bornes : arrondis vers l\'extérieur, à la précision de u.' : 'Ce ne sont pas les bonnes bornes.';
-    if (kind === 'stat') return `Ce n'est pas la bonne valeur (à ${String(tolOf(cfg)).replace('.', ',')} près).`;
-    return 'Ce n\'est pas la bonne valeur.';
+    if (v.interval || want.interval) return cfg.ciRule === 'outward' ? t('Ce ne sont pas les bonnes bornes : arrondis vers l\'extérieur, à la précision de u.') : t('Ce ne sont pas les bonnes bornes.');
+    if (kind === 'stat') return t('Ce n\'est pas la bonne valeur (à {tol} près).', { tol: String(tolOf(cfg)).replace('.', ',') });
+    return t('Ce n\'est pas la bonne valeur.');
   }
 
   // The traps of the module whose wrong values match the student's.
@@ -197,14 +198,14 @@ export function makeJudge(kind) {
   function judgeExpr(cfg, prev, node) {
     let want = null;
     try { want = cfg.expect !== undefined ? expectedExpr(cfg) : prev?.members?.length ? prev.members[prev.members.length - 1].ast : null; } catch { want = null; }
-    if (!want) return { kind: 'wrong', node, message: 'Je ne sais pas quelle expression attendre ici.' };
+    if (!want) return { kind: 'wrong', node, message: t('Je ne sais pas quelle expression attendre ici.') };
     for (const m of node.members) {
       if (!sameExpr(cfg, exprOf(cfg, m.ast), exprOf(cfg, want))) {
         const diag = diagnoseLine(kind, prev, node, cfg, (cand) => {
           const c = cand?.members?.[cand.members.length - 1];
           return !!c && sameExpr(cfg, exprOf(cfg, c.ast), exprOf(cfg, m.ast));
         });
-        return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: cfg.upToConstant ? 'Ce n\'est pas la bonne expression (même à une constante près).' : 'Ce n\'est pas la bonne expression.' };
+        return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: cfg.upToConstant ? t('Ce n\'est pas la bonne expression (même à une constante près).') : t('Ce n\'est pas la bonne expression.') };
       }
     }
     const fin = finalOf(cfg, node);

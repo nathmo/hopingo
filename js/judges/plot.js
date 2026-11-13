@@ -12,6 +12,8 @@
 // checkPlot(item, answer) → {ok, parts: [{id, label, ok, message}], score}
 // (score: the share of the elements right).
 
+import { t } from '../i18n.js';
+
 const dist = (P, Q) => Math.hypot(P[0] - Q[0], P[1] - Q[1]);
 const lineDist = ([A, B, C], P) => Math.abs(A * P[0] + B * P[1] + C) / Math.hypot(A, B);
 
@@ -51,8 +53,8 @@ export function checkPlot(item, answer = {}) {
     const ok = p.kind === 'line' ? matchLines(want, got, tol.line) : matchPoints(want, got, tol.pos);
     let message = '';
     if (!ok) {
-      if (got.length !== want.length) message = `${p.label} : il en faut ${want.length}, tu en as placé ${got.length}.`;
-      else message = `${p.label} : pas au bon endroit.`;
+      if (got.length !== want.length) message = t('{label} : il en faut {n}, tu en as placé {m}.', { label: p.label, n: want.length, m: got.length });
+      else message = t('{label} : pas au bon endroit.', { label: p.label });
     }
     return { id: p.id, label: p.label, ok, message };
   });

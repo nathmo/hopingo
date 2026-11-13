@@ -30,6 +30,7 @@ import { compileFloat, evalFloat } from '../cas/numeric.js';
 import { solutionSet, contains01 } from '../cas/sets.js';
 import { frNum } from './common.js';
 import { diagnoseLine } from './diagnose.js';
+import { t as tr } from '../i18n.js';
 
 export const sign = '=';
 const EPS = 'ε';
@@ -77,7 +78,7 @@ function failure(cfg, node) {
   for (const eps of epsSamples(cfg)) {
     const d = g({ [EPS]: eps });
     if (cfg.mode === 'delta') {
-      if (!(d > 0) || !Number.isFinite(d)) return { eps, message: `Pour ε = ${say(eps)}, ton δ vaut ${Number.isFinite(d) ? say(d) : 'rien'} : il faut δ > 0.` };
+      if (!(d > 0) || !Number.isFinite(d)) return { eps, message: tr('Pour ε = {eps}, ton δ vaut {d} : il faut δ > 0.', { eps: say(eps), d: Number.isFinite(d) ? say(d) : tr('rien') }) };
       const f = compiled(cfg.f, v);
       const a = num(cfg.a);
       const L = num(cfg.L);
@@ -89,18 +90,18 @@ function failure(cfg, node) {
           const y = f({ [v]: x });
           if (!Number.isFinite(y)) continue;
           if (Math.abs(y - L) > eps * (1 + 1e-9) + 1e-12) {
-            return { eps, x, message: `Pour ε = ${say(eps)}, ton δ vaut ${say(d)} ; mais en ${v} = ${say(x)}, |f(${v}) − ${frNum(L, 3)}| = ${say(Math.abs(y - L))} > ε.` };
+            return { eps, x, message: tr('Pour ε = {eps}, ton δ vaut {d} ; mais en {v} = {x}, |f({v}) − {L}| = {y} > ε.', { eps: say(eps), d: say(d), v, x: say(x), L: frNum(L, 3), y: say(Math.abs(y - L)) }) };
           }
         }
       }
     } else if (cfg.mode === 'N' || (cfg.mode === 'sup' && cfg.index)) {
-      if (!Number.isFinite(d)) return { eps, message: `Pour ε = ${say(eps)}, ton ${cfg.mode === 'N' ? 'N' : 'n'} n'est pas un nombre.` };
+      if (!Number.isFinite(d)) return { eps, message: tr('Pour ε = {eps}, ton {who} n\'est pas un nombre.', { eps: say(eps), who: cfg.mode === 'N' ? 'N' : 'n' }) };
       const term = cfg.mode === 'N' ? cfg.f : cfg.index.term;
       const f = compiled(term, v);
       const L = cfg.mode === 'N' ? num(cfg.L) : num(cfg.s);
       const from = cfg.mode === 'N' ? (cfg.from ?? 0) : (cfg.index.from ?? 1);
       const n0 = Math.max(from, Math.ceil(d - 1e-9));
-      if (n0 > 1e12) return { eps, message: `Pour ε = ${say(eps)}, ton seuil est trop grand pour être vérifié : prends plus simple.` };
+      if (n0 > 1e12) return { eps, message: tr('Pour ε = {eps}, ton seuil est trop grand pour être vérifié : prends plus simple.', { eps: say(eps) }) };
       const ns = [];
       for (let k = 0; k <= 2000; k++) ns.push(n0 + k);
       for (let m = 2; n0 * m < 1e9; m *= 2) ns.push(n0 * m);
@@ -110,16 +111,19 @@ function failure(cfg, node) {
         const bad = cfg.mode === 'N' ? Math.abs(y - L) > eps * (1 + 1e-9) + 1e-12
           : cfg.inf ? !(y < L + eps) : !(y > L - eps);
         if (bad) {
-          const what = cfg.mode === 'N' ? `|a_${v} − ${frNum(L, 3)}| = ${say(Math.abs(y - L))} > ε` : cfg.inf ? `le terme vaut ${say(y)}, pas < ${say(L + eps)}` : `le terme vaut ${say(y)}, pas > ${say(L - eps)}`;
-          return { eps, n, message: `Pour ε = ${say(eps)}, ton seuil vaut ${say(d)} ; mais pour ${v} = ${n}, ${what}.` };
+          const vars = { eps: say(eps), d: say(d), v, n };
+          const message = cfg.mode === 'N' ? tr('Pour ε = {eps}, ton seuil vaut {d} ; mais pour {v} = {n}, |a_{v} − {L}| = {y} > ε.', { ...vars, L: frNum(L, 3), y: say(Math.abs(y - L)) })
+            : cfg.inf ? tr('Pour ε = {eps}, ton seuil vaut {d} ; mais pour {v} = {n}, le terme vaut {y}, pas < {b}.', { ...vars, y: say(y), b: say(L + eps) })
+              : tr('Pour ε = {eps}, ton seuil vaut {d} ; mais pour {v} = {n}, le terme vaut {y}, pas > {b}.', { ...vars, y: say(y), b: say(L - eps) });
+          return { eps, n, message };
         }
       }
     } else if (cfg.mode === 'sup') {
-      if (!Number.isFinite(d)) return { eps, message: `Pour ε = ${say(eps)}, ton x n'est pas un nombre.` };
+      if (!Number.isFinite(d)) return { eps, message: tr('Pour ε = {eps}, ton x n\'est pas un nombre.', { eps: say(eps) }) };
       const A = setOf(cfg.set);
-      if (!contains01(A, d)) return { eps, message: `Pour ε = ${say(eps)}, ton x vaut ${say(d)} : il n'est pas dans A.` };
+      if (!contains01(A, d)) return { eps, message: tr('Pour ε = {eps}, ton x vaut {d} : il n\'est pas dans A.', { eps: say(eps), d: say(d) }) };
       const s = num(cfg.s);
-      if (cfg.inf ? !(d < s + eps) : !(d > s - eps)) return { eps, message: `Pour ε = ${say(eps)}, ton x vaut ${say(d)} : il n'est pas ${cfg.inf ? `< s + ε = ${say(s + eps)}` : `> s − ε = ${say(s - eps)}`}.` };
+      if (cfg.inf ? !(d < s + eps) : !(d > s - eps)) return { eps, message: cfg.inf ? tr('Pour ε = {eps}, ton x vaut {d} : il n\'est pas < s + ε = {b}.', { eps: say(eps), d: say(d), b: say(s + eps) }) : tr('Pour ε = {eps}, ton x vaut {d} : il n\'est pas > s − ε = {b}.', { eps: say(eps), d: say(d), b: say(s - eps) }) };
     }
   }
   return null;
@@ -142,7 +146,7 @@ export function deltaCheck(cfg, input) {
   const syms = [...symbolsIn(node)];
   if (syms.includes(v) || syms.some((s) => s !== EPS)) {
     const who = cfg.mode === 'sup' && cfg.index ? 'n' : LETTER[cfg.mode];
-    return { ok: false, rule: cfg.rules?.dependsOnVar ?? null, depends: true, message: `${who} ne peut dépendre que de ε : il est choisi avant ${v}.` };
+    return { ok: false, rule: cfg.rules?.dependsOnVar ?? null, depends: true, message: tr('{who} ne peut dépendre que de ε : il est choisi avant {v}.', { who, v }) };
   }
   const f = failure(cfg, node);
   return f ? { ok: false, ...f } : { ok: true };
@@ -171,7 +175,7 @@ export function judgeLine(cfg, prev, input, state = {}) {
     try { node = parseLine(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
   const s = stripParen(node);
-  if (s.t === 'sym' && ['δ', 'N', 'x', 'n'].includes(s.name)) return { kind: 'same', node, message: 'Écris la valeur, en fonction de ε.' };
+  if (s.t === 'sym' && ['δ', 'N', 'x', 'n'].includes(s.name)) return { kind: 'same', node, message: tr('Écris la valeur, en fonction de ε.') };
   const r = deltaCheck(cfg, node);
   if (r.ok) { state.lines = (state.lines || 0) + 1; return { kind: 'done', node }; }
   if (r.depends) return { kind: 'wrong', node, rule: r.rule, diag: r.rule ? { rules: [r.rule], ambiguous: 1, ctx: {} } : null, message: r.message };

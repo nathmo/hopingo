@@ -20,6 +20,7 @@ import { symbolsIn, contains } from '../cas/ast.js';
 import { expandDerivs } from '../cas/diff.js';
 import { evalComplex, cabs } from '../cas/complex.js';
 import { diagnoseLine } from './diagnose.js';
+import { t } from '../i18n.js';
 
 export const sign = '=';
 
@@ -46,7 +47,7 @@ function splitTop(text) {
 function readStrict(cfg, input) {
   const text = String(input).trim().replace(/^=\s*/, '');
   let parts = splitTop(text);
-  if (parts.some((p) => !p)) throw new Error('Un membre de ta ligne est vide.');
+  if (parts.some((p) => !p)) throw new Error(t('Un membre de ta ligne est vide.'));
   if (parts.length > 1 && /^Res/.test(parts[0])) parts = parts.slice(1);
   const members = parts.map((p) => parse(p, popts(cfg)));
   return { t: 'rline', text, members };
@@ -83,8 +84,8 @@ export function valuesOf(cfg, node) {
   const s = sOf(cfg);
   const n = contains(node, (x) => x.t === 'deriv') ? expandDerivs(node) : node;
   const env0 = symbolsIn(n).has(s) ? { [s]: z0Of(cfg) } : {};
-  return T_POINTS.map((t) => {
-    const v = evalComplex(n, { ...env0, [vOf(cfg)]: t });
+  return T_POINTS.map((tt) => {
+    const v = evalComplex(n, { ...env0, [vOf(cfg)]: tt });
     return v && Number.isFinite(v.re) && Number.isFinite(v.im) ? v : null;
   });
 }
@@ -116,17 +117,17 @@ export function judgeLine(cfg, prev, input, state = {}) {
   const allowed = new Set([vOf(cfg), sOf(cfg)]);
   for (const m of node.members) {
     const extra = [...symbolsIn(m)].find((x) => !allowed.has(x));
-    if (extra) return { kind: 'parse', node, message: `Je ne connais pas la lettre « ${extra.replace(/_$/, '')} » ici : le résidu est une fonction de ${vOf(cfg)}.` };
+    if (extra) return { kind: 'parse', node, message: t('Je ne connais pas la lettre « {a} » ici : le résidu est une fonction de {b}.', { a: extra.replace(/_$/, ''), b: vOf(cfg) }) };
   }
-  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   const want = refValues(cfg);
   for (const m of node.members) {
     const got = valuesOf(cfg, m);
-    if (got.some((x) => !x)) return { kind: 'stay', node, message: `Ta ligne n'est pas définie en ${sOf(cfg)} = ${String(cfg.z0).replace(/-/g, '−')} : simplifie d'abord par le facteur du pôle.` };
+    if (got.some((x) => !x)) return { kind: 'stay', node, message: t('Ta ligne n\'est pas définie en {a} = {b} : simplifie d\'abord par le facteur du pôle.', { a: sOf(cfg), b: String(cfg.z0).replace(/-/g, '−') }) };
     if (!sameValues(got, want)) {
       const diag = diagnoseLine('lapres', prev, node, cfg, (cand, n) => sameAsCandidate(cfg, cand, n));
-      const t = T_POINTS[got.findIndex((x, k) => !close(x, want[k]))];
-      return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: `Ce n'est pas le résidu : en ${vOf(cfg)} = ${String(t).replace('.', ',')}, les valeurs diffèrent.` };
+      const tt = T_POINTS[got.findIndex((x, k) => !close(x, want[k]))];
+      return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: t('Ce n\'est pas le résidu : en {a} = {b}, les valeurs diffèrent.', { a: vOf(cfg), b: String(tt).replace('.', ',') }) };
     }
   }
   if (isFinal(cfg, node)) return { kind: 'done', node };

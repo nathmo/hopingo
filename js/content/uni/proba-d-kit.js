@@ -5,6 +5,7 @@
 
 import { dec, val, num } from './proba-kit.js';
 import { courseT, studentTable, Phi, roundTo } from '../../cas/stats.js';
+import { t } from '../../i18n.js';
 
 export { dec, val, num };
 
@@ -18,7 +19,7 @@ export const sc = (x, d = 4) => dec(x, d).replace('-', '−');
 // zeros), Σ dᵢ² divisible by n − 1 when s2int (s² a whole number).
 // → {xs (shuffled), mean, SS, s2}
 export function dataSet(rng, n, { lo = 5, hi = 60, maxDev = 6, s2int = true, minSS = 4 } = {}) {
-  for (let t = 0; t < 400; t++) {
+  for (let k = 0; k < 400; k++) {
     const devs = [];
     let pairs = Math.floor(n / 2);
     if (pairs > 1 && rng.chance(0.3)) pairs -= 1;
@@ -52,12 +53,12 @@ export { studentTable, Phi, roundTo };
 export function ciInterpret(level, of, lo, hi) {
   const I = `[${sc(lo)} ; ${sc(hi)}]`;
   return {
-    prompt: 'Interpréter : quelle phrase est juste ?',
+    prompt: t('Interpréter : quelle phrase est juste ?'),
     options: [
-      { html: `Si l’on refaisait l’expérience souvent, ${level} % des intervalles construits ainsi contiendraient ${of}.`, correct: true },
-      { html: `${of} est dans ${I} avec une probabilité de ${dec(level / 100, 3)}.`, correct: false, rule: 'p_ci_prob' },
-      { html: `${level} % des mesures sont dans ${I}.`, correct: false, rule: 'p_ci_data' },
-      { html: `La moyenne observée est dans l’intervalle avec une probabilité de ${dec(level / 100, 3)}.`, correct: false, rule: 'p_ci_xbar' },
+      { html: t('Si l’on refaisait l’expérience souvent, {level} % des intervalles construits ainsi contiendraient {of}.', { level, of }), correct: true },
+      { html: t('{of} est dans {I} avec une probabilité de {p}.', { of, I, p: dec(level / 100, 3) }), correct: false, rule: 'p_ci_prob' },
+      { html: t('{level} % des mesures sont dans {I}.', { level, I }), correct: false, rule: 'p_ci_data' },
+      { html: t('La moyenne observée est dans l’intervalle avec une probabilité de {p}.', { p: dec(level / 100, 3) }), correct: false, rule: 'p_ci_xbar' },
     ],
   };
 }
@@ -67,30 +68,30 @@ export function ciInterpret(level, of, lo, hi) {
 export function testConclusion(reject, alpha, claim, { p = null } = {}) {
   const a = `${dec(alpha, 2)} %`;
   const opts = reject ? [
-    { html: `On rejette H₀ au niveau ${a} : les données contredisent l’hypothèse que ${claim}.`, correct: true },
-    { html: `On ne rejette pas H₀ au niveau ${a} : les données sont compatibles avec l’hypothèse que ${claim}.`, correct: false, rule: 'p_pvalue_alpha_compare' },
-    { html: `La probabilité que H₀ soit vraie est inférieure à ${dec(alpha / 100, 3)}.`, correct: false, rule: 'p_pvalue_h0' },
+    { html: t('On rejette H₀ au niveau {a} : les données contredisent l’hypothèse que {claim}.', { a, claim }), correct: true },
+    { html: t('On ne rejette pas H₀ au niveau {a} : les données sont compatibles avec l’hypothèse que {claim}.', { a, claim }), correct: false, rule: 'p_pvalue_alpha_compare' },
+    { html: t('La probabilité que H₀ soit vraie est inférieure à {p}.', { p: dec(alpha / 100, 3) }), correct: false, rule: 'p_pvalue_h0' },
     p !== null && p > 0.01
-      ? { html: 'On rejetterait aussi H₀ au niveau 1 %.', correct: false, rule: 'p_reject_10_5' }
-      : { html: 'L’écart est significatif, donc il est important en pratique.', correct: false, rule: 'p_significant_large' },
+      ? { html: t('On rejetterait aussi H₀ au niveau 1 %.'), correct: false, rule: 'p_reject_10_5' }
+      : { html: t('L’écart est significatif, donc il est important en pratique.'), correct: false, rule: 'p_significant_large' },
   ] : [
-    { html: `On ne rejette pas H₀ au niveau ${a} : les données ne contredisent pas l’hypothèse que ${claim}.`, correct: true },
-    { html: `On rejette H₀ au niveau ${a}.`, correct: false, rule: 'p_pvalue_alpha_compare' },
-    { html: `Les données prouvent que ${claim}.`, correct: false, rule: 'p_accept_h0' },
-    { html: `H₀ est vraie avec une probabilité de ${dec(1 - alpha / 100, 3)}.`, correct: false, rule: 'p_pvalue_h0' },
+    { html: t('On ne rejette pas H₀ au niveau {a} : les données ne contredisent pas l’hypothèse que {claim}.', { a, claim }), correct: true },
+    { html: t('On rejette H₀ au niveau {a}.', { a }), correct: false, rule: 'p_pvalue_alpha_compare' },
+    { html: t('Les données prouvent que {claim}.', { claim }), correct: false, rule: 'p_accept_h0' },
+    { html: t('H₀ est vraie avec une probabilité de {p}.', { p: dec(1 - alpha / 100, 3) }), correct: false, rule: 'p_pvalue_h0' },
   ];
-  return { prompt: 'Conclure et interpréter : quelle phrase est juste ?', options: opts };
+  return { prompt: t('Conclure et interpréter : quelle phrase est juste ?'), options: opts };
 }
 
 // The decision « quel quantile ? » before the critical value of a t test (or CI).
 export function quantileDecision(nu, twoSided = true, { levels = [1, 2, 3], alpha = 5 } = {}) {
   const right = tq(nu, alpha);
   const opts = [
-    { id: 't', label: `Student à ν = ${nu} degrés de liberté, ${twoSided ? 'bilatéral' : 'unilatéral'} : ${dec(right, 3)}`, valid: true },
-    { id: 'z', label: `La loi normale : ${alpha === 5 ? '1,96' : '2,576'}`, valid: false, rule: 'p_t_vs_z', why: `σ est inconnu et ν = ${nu} < 200 : la loi de Student, plus large, remplace la normale.` },
+    { id: 't', label: twoSided ? t('Student à ν = {nu} degrés de liberté, bilatéral : {q}', { nu, q: dec(right, 3) }) : t('Student à ν = {nu} degrés de liberté, unilatéral : {q}', { nu, q: dec(right, 3) }), valid: true },
+    { id: 'z', label: t('La loi normale : {q}', { q: alpha === 5 ? '1,96' : '2,576' }), valid: false, rule: 'p_t_vs_z', why: t('σ est inconnu et ν = {nu} < 200 : la loi de Student, plus large, remplace la normale.', { nu }) },
   ];
-  if (tq(nu + 1, alpha)) opts.push({ id: 'df', label: `Student à ν = ${nu + 1} : ${dec(tq(nu + 1, alpha), 3)}`, valid: false, rule: 'p_df_wrong', why: `On perd un degré de liberté par paramètre estimé : ν = ${nu}.` });
-  return { prompt: 'Quel quantile ?', levels, options: opts };
+  if (tq(nu + 1, alpha)) opts.push({ id: 'df', label: t('Student à ν = {nu} : {q}', { nu: nu + 1, q: dec(tq(nu + 1, alpha), 3) }), valid: false, rule: 'p_df_wrong', why: t('On perd un degré de liberté par paramètre estimé : ν = {nu}.', { nu }) });
+  return { prompt: t('Quel quantile ?'), levels, options: opts };
 }
 
 // The quantile of Student written in a line: 2,306.

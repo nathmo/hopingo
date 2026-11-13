@@ -13,6 +13,7 @@
 // the student checks. Guided lines fix every cell but the blanks.
 
 import { h, play } from './dom.js';
+import { t as tr } from '../i18n.js';
 import { parseMatLine, evalAst, splitTop, normalizeMatText, applyRowOp, valueText, opText } from '../cas/matexpr.js';
 import { buildLine } from '../judges/matcommon.js';
 import { parse } from '../cas/parse.js';
@@ -96,7 +97,7 @@ export class MatrixInput {
     this.withOps = ops;
     this.apply = apply;
     this.display = h('div.mx-input');
-    this.textField = text ? h('input.mx-text', { type: 'text', autocomplete: 'off', spellcheck: 'false', placeholder: placeholder || (ops ? 'opération : L2 ← L2 − 3L1' : 'ou écris la ligne') }) : null;
+    this.textField = text ? h('input.mx-text', { type: 'text', autocomplete: 'off', spellcheck: 'false', placeholder: placeholder || (ops ? tr('opération : L2 ← L2 − 3L1') : tr('ou écris la ligne')) }) : null;
     this.gridBox = h('div.mx-grids');
     this.fixedText = null;
     if (this.textField) {
@@ -121,7 +122,7 @@ export class MatrixInput {
       for (let j = 0; j < cols; j++) {
         if (bar !== null && j === bar) table.append(h('span.mx-bar', '|'));
         const isBlank = !fixed || blanks?.some(([r, c]) => r === i && c === j);
-        const f = h('input.mx-cell', { type: 'text', autocomplete: 'off', inputmode: 'text', size: 3, 'aria-label': `ligne ${i + 1}, colonne ${j + 1}` });
+        const f = h('input.mx-cell', { type: 'text', autocomplete: 'off', inputmode: 'text', size: 3, 'aria-label': tr('ligne {i}, colonne {j}', { i: i + 1, j: j + 1 }) });
         if (!isBlank) { f.value = fixed[i][j]; f.readOnly = true; f.classList.add('fixed'); }
         f.addEventListener('input', () => this.changed());
         f.addEventListener('keydown', (e) => {
@@ -150,7 +151,7 @@ export class MatrixInput {
       this.grids.push(this.grid(s.rows, s.cols, { bar: s.bar, fixed, blanks }));
     }
     this.gridBox.replaceChildren(...this.grids.map((g) => g.box));
-    if (this.vectors && this.grids.length) this.gridBox.append(h('small.muted.mx-hint', this.shape.count > 1 ? 'Un vecteur par colonne.' : 'Les composantes du vecteur.'));
+    if (this.vectors && this.grids.length) this.gridBox.append(h('small.muted.mx-hint', this.shape.count > 1 ? tr('Un vecteur par colonne.') : tr('Les composantes du vecteur.')));
     this.display.replaceChildren(...[this.fixedText, this.textField, this.gridBox].filter(Boolean));
   }
 
@@ -255,9 +256,9 @@ export class MatrixInput {
     if (!this.template && this.grids.length === 1) {
       const btn = (label, f) => h('button.btn.small.ghost', { type: 'button', onclick: f }, label);
       out.append(h('div.row.mx-size',
-        h('small.muted', 'Taille :'),
-        btn('− ligne', () => this.resize(-1, 0)), btn('+ ligne', () => this.resize(1, 0)),
-        btn('− colonne', () => this.resize(0, -1)), btn('+ colonne', () => this.resize(0, 1))));
+        h('small.muted', tr('Taille :')),
+        btn(tr('− ligne'), () => this.resize(-1, 0)), btn(tr('+ ligne'), () => this.resize(1, 0)),
+        btn(tr('− colonne'), () => this.resize(0, -1)), btn(tr('+ colonne'), () => this.resize(0, 1))));
     }
     return out;
   }
@@ -300,7 +301,7 @@ export class MatrixInput {
     kind.addEventListener('change', refresh);
     refresh();
     return h('div.row.mx-opbar', kind, h('small', 'i'), i, h('small', 'j'), j, h('small', 'k'), k,
-      h('button.btn.small.secondary', { type: 'button', onclick: write }, this.apply ? 'Appliquer' : 'Écrire l\'opération'));
+      h('button.btn.small.secondary', { type: 'button', onclick: write }, this.apply ? tr('Appliquer') : tr('Écrire l\'opération')));
   }
 }
 

@@ -18,6 +18,7 @@ import { toText } from '../print.js';
 import { stripParen, mapNode, contains, walk } from '../ast.js';
 import { evalFloat } from '../numeric.js';
 import { chainsOf, varsOf } from '../../judges/domain.js';
+import { t } from '../../i18n.js';
 
 const par = (e) => ({ t: 'paren', e });
 const times = (a, b) => ({ t: 'bin', op: '×', l: par(a), r: par(b) });
@@ -173,19 +174,19 @@ function isGauss(prev) {
 }
 
 const GAUSS_WHY = {
-  π: "π, c'est l'intégrale double ∬ e^(−(x² + y²)) = (∫ e^(−x²) dx)². L'intégrale simple est sa racine : √π.",
-  '√π/2': "√π/2, c'est l'intégrale de 0 à +∞ seulement. Sur ℝ tout entier, la fonction paire donne le double : √π.",
-  '2√π': "Le carré de l'intégrale simple vaut π, donc l'intégrale vaut √π, pas 2√π : il n'y a pas de facteur 2.",
+  π: t("π, c'est l'intégrale double ∬ e^(−(x² + y²)) = (∫ e^(−x²) dx)². L'intégrale simple est sa racine : √π."),
+  '√π/2': t("√π/2, c'est l'intégrale de 0 à +∞ seulement. Sur ℝ tout entier, la fonction paire donne le double : √π."),
+  '2√π': t("Le carré de l'intégrale simple vaut π, donc l'intégrale vaut √π, pas 2√π : il n'y a pas de facteur 2."),
 };
-const POLAR_EXPLAIN = 'Une petite case en polaires a pour aire r dr dφ, pas dr dφ : le jacobien r multiplie l\'intégrande (r² sin θ en sphériques, r en cylindriques).';
+const POLAR_EXPLAIN = t('Une petite case en polaires a pour aire r dr dφ, pas dr dφ : le jacobien r multiplie l\'intégrande (r² sin θ en sphériques, r en cylindriques).');
 
 export const DEFS = {
   a2_jacobian_forgot: {
-    name: 'Jacobien oublié',
+    name: t('Jacobien oublié'),
     judges: ['equiv', 'definite'],
     transform: (prev, ctx) => [...jacForgotEquiv(prev, ctx), ...jacForgotDefinite(prev, ctx)],
     explain: (ctx = {}) => (ctx.jac && ctx.jac !== 'r'
-      ? `En sphériques, dV = r² sin θ dr dθ dφ : l'intégrande doit être multiplié par ${ctx.jac}, pas par r ni par 1.`
+      ? t('En sphériques, dV = r² sin θ dr dθ dφ : l\'intégrande doit être multiplié par {jac}, pas par r ni par 1.', { jac: ctx.jac })
       : POLAR_EXPLAIN),
     check: {
       judge: { kind: 'equiv', vars: ['x', 'y', 'r', 'φ'], subst: { x: 'r×cos(φ)', y: 'r×sin(φ)' }, jac: { from: 'y', factor: 'r' }, domain: { r: [0.1, 2], φ: [0, 6.28] }, target: 'only', finalVars: ['r', 'φ'] },
@@ -193,19 +194,19 @@ export const DEFS = {
     },
   },
   a2_polar_angle_bounds: {
-    name: 'Bornes de l\'angle',
+    name: t('Bornes de l\'angle'),
     judges: ['domain'],
     transform: (prev, ctx) => [...angleCandidates(prev, ctx, 'φ'), ...angleCandidates(prev, ctx, 'θ')],
     explain: (ctx = {}) => (ctx.right
-      ? `Ta borne de ${ctx.v} est ${ctx.wrong}, mais le domaine s'arrête à ${ctx.v} = ${ctx.right}. Dessine les demi-droites qui le bordent : y = x, c'est tg φ = 1, donc φ = π/4.`
-      : 'y ≤ x veut dire tg φ ≤ 1, donc φ ≤ π/4 : lis l\'angle sur le dessin, demi-droite par demi-droite.'),
+      ? t('Ta borne de {v} est {wrong}, mais le domaine s\'arrête à {v} = {right}. Dessine les demi-droites qui le bordent : y = x, c\'est tg φ = 1, donc φ = π/4.', { v: ctx.v, wrong: ctx.wrong, right: ctx.right })
+      : t('y ≤ x veut dire tg φ ≤ 1, donc φ ≤ π/4 : lis l\'angle sur le dessin, demi-droite par demi-droite.')),
     check: {
       judge: { kind: 'domain', coords: 'polar', region: ['x^2+y^2 ≤ 4', 'y ≥ 0', 'y ≤ x'], box: [[-0.2, 2.2], [-0.2, 2.2]], refLine: '0 ≤ φ ≤ π/4 ; 0 ≤ r ≤ 2' },
       prev: 'x^2+y^2 ≤ 4 ; 0 ≤ y ≤ x', line: '0 ≤ φ ≤ π/2 ; 0 ≤ r ≤ 2',
     },
   },
   a2_sph_theta_from_plane: {
-    name: 'θ mesuré depuis le plan xy',
+    name: t('θ mesuré depuis le plan xy'),
     judges: ['domain', 'equiv'],
     transform: (prev, ctx) => [...thetaFromPlane(prev, ctx), ...thetaFromPlaneEquiv(prev, ctx)],
     check: {
@@ -214,17 +215,17 @@ export const DEFS = {
     },
   },
   a2_improper_exponent: {
-    name: 'Seuil de convergence en dimension n',
+    name: t('Seuil de convergence en dimension n'),
     judges: [],
     // The verdict a student gets with the threshold of dimension 1.
     wrongValues: (item) => (item?.alpha !== undefined ? [{ value: (item.outside ? item.alpha > 1 : item.alpha < 1) ? 'converge' : 'diverge' }] : []),
     explain: (ctx = {}) => (ctx.n
-      ? `En dimension ${ctx.n}, le jacobien ajoute r^${ctx.n - 1} : on intègre r^(${ctx.n - 1} − α). Il faut α > ${ctx.n} loin de 0, α < ${ctx.n} près de 0.`
-      : 'En dimension n, le jacobien ajoute rⁿ⁻¹ : on intègre rⁿ⁻¹⁻ᵅ. Loin de 0, il faut α > n (et pas α > 1) ; près de 0, α < n.'),
+      ? t('En dimension {n}, le jacobien ajoute r^{n1} : on intègre r^({n1} − α). Il faut α > {n} loin de 0, α < {n} près de 0.', { n: ctx.n, n1: ctx.n - 1 })
+      : t('En dimension n, le jacobien ajoute rⁿ⁻¹ : on intègre rⁿ⁻¹⁻ᵅ. Loin de 0, il faut α > n (et pas α > 1) ; près de 0, α < n.')),
     check: { bait: { skill: 'a2-improper-multi', level: 3 } },
   },
   a2_gauss_sqrt: {
-    name: 'Gauss : π au lieu de √π',
+    name: t('Gauss : π au lieu de √π'),
     judges: ['definite'],
     transform: (prev) => (isGauss(prev) ? ['π', '√π/2', '2√π'].map((t) => ({ node: parse(t), ctx: { wrong: t } })) : []),
     wrongValues: () => ['π', '√π/2', '2√π'].map((value) => ({ value })),
@@ -232,7 +233,7 @@ export const DEFS = {
     check: { judge: { kind: 'definite' }, prev: 'int(e^(-x^2),x,-∞,∞)', line: 'π' },
   },
   a2_volume_surfaces_swapped: {
-    name: 'Surfaces du dessus et du dessous inversées',
+    name: t('Surfaces du dessus et du dessous inversées'),
     judges: ['domain', 'equiv', 'definite'],
     transform: (prev, ctx) => {
       const cfg = ctx.cfg || {};
@@ -242,8 +243,8 @@ export const DEFS = {
       return [{ node: neg(prev) }];
     },
     explain: (ctx = {}) => (ctx.haut
-      ? `La surface du dessus est z = ${ctx.haut} : z va de la surface du dessous à celle du dessus, sinon le volume est négatif ou vide.`
-      : 'Ton volume est négatif : tu as pris (dessous − dessus). Le volume est ∬ (dessus − dessous), la surface du dessus étant la plus haute au-dessus de R.'),
+      ? t('La surface du dessus est z = {haut} : z va de la surface du dessous à celle du dessus, sinon le volume est négatif ou vide.', { haut: ctx.haut })
+      : t('Ton volume est négatif : tu as pris (dessous − dessus). Le volume est ∬ (dessus − dessous), la surface du dessus étant la plus haute au-dessus de R.')),
     check: {
       judge: { kind: 'domain', coords: 'cyl', region: ['z ≥ x^2+y^2', 'z ≤ 8-x^2-y^2'], box: [[-2.2, 2.2], [-2.2, 2.2], [-0.2, 8.2]], volume: true, refLine: '0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; r^2 ≤ z ≤ 8-r^2' },
       prev: 'z = x^2+y^2 ; z = 8-x^2-y^2', line: '0 ≤ φ ≤ 2π ; 0 ≤ r ≤ 2 ; 8-r^2 ≤ z ≤ r^2',

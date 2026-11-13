@@ -1,6 +1,6 @@
 # Hopingo — le calcul en jouant
 
-A Duolingo-style practice app for mental arithmetic and times tables, fractions, signed numbers, powers and square roots (HarmoS 5H–11H and gymnase, French), now growing towards the first two years of EPFL (BA1–BA4, see `docs/plan-universite.md` and the implementation spec `docs/universite/README.md`). It is fully static, with no server: everything runs in the browser and progress is saved in `localStorage`.
+A Duolingo-style practice app for mental arithmetic and times tables, fractions, signed numbers, powers and square roots (HarmoS 5H–11H and gymnase, in French or English), now growing towards the first two years of EPFL (BA1–BA4, see `docs/plan-universite.md` and the implementation spec `docs/universite/README.md`). It is fully static, with no server: everything runs in the browser and progress is saved in `localStorage`.
 
 ## Run it
 
@@ -14,6 +14,10 @@ npm run smoke        # drives the app in headless Edge (dev tool, not in npm tes
 ```
 
 There are no dependencies and no build step.
+
+**Language.** Réglages → Langue (also on the first screen of a device) switches between French and English. It is a setting of the device (`localStorage` key `hopingo.lang`), not of a profile, and the page reloads. The app is written in French: every text shown goes through `t()` (`js/i18n.js`), which looks the French text up in `js/i18n/en/*.js` and falls back to the French when an entry is missing. Skill titles, descriptions and intro cards are translated in place when the catalogue loads (`localize`). `node tools/i18n-strings.js --check` counts the catalogue texts translated per unit; in the browser, `hopingoMissing()` lists the texts shown so far that have no translation. `HOPINGO_LANG=en` runs Node tools in English. Answers keep the French input language that the parsers and checkers read (decimal comma, « x = 2 ou x = 3 »); in English only what is shown changes: numbers are drawn with a decimal point, the keys « ou », « et » show « or », « and » (`showNumbers` in `js/i18n.js` for the page, `decimalComma` in `js/ui/keypad.js` for the answer field).
+
+**Saving.** Progress lives in `localStorage`. Réglages → « Télécharger la sauvegarde » downloads a small JSON file (`hopingo-<name>-<date>.json`); « Charger un fichier » (or « Charger une sauvegarde » on the first screen of a new device) loads it. Old `HOPINGO1-…` codes saved in a .txt file still load. See `exportFile` and `importSave` in `js/store.js`.
 
 **Test mode.** A profile named `nathmo` with the bee avatar (🐝) can open every skill on the map, to try any part of the tree. Everything else works as usual: answers are judged, mastery and traps are recorded, and the map still shows in grey (🔓) the skills the normal path would not have unlocked yet. See `isTester` and `canOpen` in `js/engine/learner.js`.
 
@@ -52,12 +56,17 @@ Push the folder to a repository, then go to **Settings → Pages → Deploy from
 | Placement | `js/engine/placement.js` | Quick binary-search skim from the student's year and track. From BA1 on, and with « Je connais déjà ce module » on the map, the search runs unit by unit. |
 | Rewards | `js/engine/rewards.js` | XP, daily goal, streak with freezes, badges. |
 
+**The map is a tree by school year** (`js/ui/screens/home.js`). One band per year (5H … 11H, gymnase, CMS, BA1 … BA4); in a band, one column per unit with its skills of that year. Columns that do not need each other stand side by side, and a column that needs another column of the same band goes on the line below. Inside a column, skills are in rows by prerequisite depth, so skills that do not need each other stand side by side too. The rail of years on the right scrolls the map fast (tap a year or drag along the rail) and follows the scrolling. The head of a column opens the unit: progress over all its years, pin the branch, « Je connais déjà ce module », its mock exams.
+
 **The path branches.** After the first mental arithmetic, several units are open at once. « Continuer » keeps up to 3 active branches and moves from one to the next at each lesson, so topics mix; a new branch starts with the skill that opens the most others, at the student's current level. A branch can be pinned on the map, any open skill can be started, and a closed skill shows the prerequisite it waits for. Prerequisites are only the skills the exercises really use.
 
 **Adapting to the student:**
 - **Difficulty:** each skill has a level from 1 to 5. Two fast correct answers move it up a level. Two mistakes, or three slow answers, move it down. "Slow" is measured against the student's own pace on that skill.
 - **Regression:** failing again at level 1 sends practice to the weakest prerequisite, marked 🧱/🩹 on the map, until that skill is solid.
 - **Spaced review:** mastered skills come back for review, and the interval ×2.5 after each success. Skills skipped by the placement skim are due right away, so the reviews confirm them.
+- **Spoiled chapters:** a mistake made in a later skill and named by a trap that belongs to an earlier, mastered skill (a fraction trap while doing algebra) is evidence against that earlier skill: its estimate drops and it is due for review at once; after two or three such mistakes it is no longer mastered (🔁 on the map) and « Continuer » redoes it first. When a student keeps failing at level 1, the repair goes to the chapter the trap names, else to the weakest prerequisite.
+- **Implicit review:** a right answer without hints at level 3 or more uses the skill's prerequisites: a mastered prerequisite that is due counts as reviewed (once a day, interval ×1.5).
+- **Solid (💎):** a skill whose review interval reached 60 days (about four reviews passed in a row: 2, 5, 12, 30, 75 days) is anchored in long-term memory. It still comes back, at most every 120 days, and its sheet on the map says when.
 - **Traps:** a mistake becomes a trap after it happens twice. It is beaten by answering the questions that bait it correctly on 3 different days.
 
 **Fast series** (times tables, sums to 20, squares, mental ± ):

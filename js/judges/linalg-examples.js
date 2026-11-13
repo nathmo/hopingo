@@ -26,6 +26,7 @@ import { parse, tryParse } from '../cas/parse.js';
 import { mapNode, lit } from '../cas/ast.js';
 import { closedHolds } from '../cas/sets.js';
 import { polyOf, qCoeffs } from '../cas/polyx.js';
+import { t } from '../i18n.js';
 
 const q = (n, d = 1) => new Q(n, d);
 const KINDS = ['matPair', 'matOne', 'vecFamily', 'setWitness', 'mapWitness', 'dims'];
@@ -56,14 +57,14 @@ const sizeOk = (A, n) => !n || (A.length === n && A[0].length === n);
 function pairMats(counter, answers) {
   const A = readQ(answers?.A)?.mat;
   const B = readQ(answers?.B)?.mat;
-  if (!A || !B) return { error: need('Écris deux matrices A et B, case par case.') };
+  if (!A || !B) return { error: need(t('Écris deux matrices A et B, case par case.')) };
   const { n, sizes } = counter.params || {};
   if (sizes) {
     if (A.length !== sizes[0][0] || A[0].length !== sizes[0][1] || B.length !== sizes[1][0] || B[0].length !== sizes[1][1]) {
-      return { error: need(`A doit être ${sizes[0][0]}×${sizes[0][1]} et B ${sizes[1][0]}×${sizes[1][1]}.`) };
+      return { error: need(t('A doit être {a} et B {b}.', { a: `${sizes[0][0]}×${sizes[0][1]}`, b: `${sizes[1][0]}×${sizes[1][1]}` })) };
     }
   } else if (!sizeOk(A, n) || !sizeOk(B, n) || !sq(A) || !sq(B) || A.length !== B.length) {
-    return { error: need(`A et B doivent être carrées de taille ${n ?? 'égale'}.`) };
+    return { error: need(n != null ? t('A et B doivent être carrées de taille {n}.', { n }) : t('A et B doivent être carrées de taille égale.')) };
   }
   return { A, B };
 }
@@ -104,38 +105,38 @@ function similarQ(A, B) {
 }
 
 const TESTS_PAIR = {
-  'AB=BA': ({ A, B }) => !eqM(MX.mul(A, B), MX.mul(B, A)) || 'Avec ces matrices, AB = BA : choisis-en qui ne commutent pas.',
+  'AB=BA': ({ A, B }) => !eqM(MX.mul(A, B), MX.mul(B, A)) || t('Avec ces matrices, AB = BA : choisis-en qui ne commutent pas.'),
   '(AB)^-1=A^-1B^-1': ({ A, B }) => {
     const Ai = MX.inverse(A); const Bi = MX.inverse(B);
-    if (!Ai || !Bi) return 'A et B doivent être inversibles.';
-    return !eqM(MX.inverse(MX.mul(A, B)), MX.mul(Ai, Bi)) || 'Avec ces matrices, (AB)⁻¹ = A⁻¹B⁻¹ : prends-en qui ne commutent pas.';
+    if (!Ai || !Bi) return t('A et B doivent être inversibles.');
+    return !eqM(MX.inverse(MX.mul(A, B)), MX.mul(Ai, Bi)) || t('Avec ces matrices, (AB)⁻¹ = A⁻¹B⁻¹ : prends-en qui ne commutent pas.');
   },
-  'det(A+B)=detA+detB': ({ A, B }) => !MX.det(MX.add(A, B)).eq(MX.det(A).add(MX.det(B))) || 'Avec ces matrices, det(A + B) = det A + det B.',
+  'det(A+B)=detA+detB': ({ A, B }) => !MX.det(MX.add(A, B)).eq(MX.det(A).add(MX.det(B))) || t('Avec ces matrices, det(A + B) = det A + det B.'),
   '(A+B)^2=A^2+2AB+B^2': ({ A, B }) => {
     const S = MX.add(A, B);
-    return !eqM(MX.mul(S, S), MX.add(MX.add(MX.mul(A, A), MX.scale(MX.mul(A, B), 2)), MX.mul(B, B))) || 'Avec ces matrices, l\'identité est vraie (elles commutent).';
+    return !eqM(MX.mul(S, S), MX.add(MX.add(MX.mul(A, A), MX.scale(MX.mul(A, B), 2)), MX.mul(B, B))) || t('Avec ces matrices, l\'identité est vraie (elles commutent).');
   },
   'AB=0⇒A=0ouB=0': ({ A, B }) => {
-    if (isZeroM(A) || isZeroM(B)) return 'A et B doivent être non nulles toutes les deux.';
-    return isZeroM(MX.mul(A, B)) || 'Il faut AB = 0.';
+    if (isZeroM(A) || isZeroM(B)) return t('A et B doivent être non nulles toutes les deux.');
+    return isZeroM(MX.mul(A, B)) || t('Il faut AB = 0.');
   },
-  '(AB)^T=A^TB^T': ({ A, B }) => !eqM(MX.transpose(MX.mul(A, B)), MX.mul(MX.transpose(A), MX.transpose(B))) || 'Avec ces matrices, (AB)ᵀ = AᵀBᵀ.',
+  '(AB)^T=A^TB^T': ({ A, B }) => !eqM(MX.transpose(MX.mul(A, B)), MX.mul(MX.transpose(A), MX.transpose(B))) || t('Avec ces matrices, (AB)ᵀ = AᵀBᵀ.'),
   'AB=I⇒BA=I': ({ A, B }) => {
     const AB = MX.mul(A, B);
-    if (!eqM(AB, MX.identity(AB.length))) return 'Il faut AB = I.';
+    if (!eqM(AB, MX.identity(AB.length))) return t('Il faut AB = I.');
     const BA = MX.mul(B, A);
-    return !eqM(BA, MX.identity(BA.length)) || 'Avec ces matrices, BA = I aussi.';
+    return !eqM(BA, MX.identity(BA.length)) || t('Avec ces matrices, BA = I aussi.');
   },
   'elemProduct': ({ A, B }) => {
     const n = A.length;
     const elem = (E) => !!MX.identifyRowOp(MX.identity(n), E) && MX.identifyRowOp(MX.identity(n), E).kind !== 'combo';
-    if (!elem(A) || !elem(B)) return 'A et B doivent être des matrices élémentaires (I après une seule opération).';
-    return !elem(MX.mul(A, B)) || 'Ce produit est encore élémentaire.';
+    if (!elem(A) || !elem(B)) return t('A et B doivent être des matrices élémentaires (I après une seule opération).');
+    return !elem(MX.mul(A, B)) || t('Ce produit est encore élémentaire.');
   },
-  sameRref: ({ A, B }) => (eqM(A, B) ? 'A et B doivent être différentes.' : MX.equal(MX.rref(A).R, MX.rref(B).R) || 'A et B n’ont pas la même forme réduite.'),
+  sameRref: ({ A, B }) => (eqM(A, B) ? t('A et B doivent être différentes.') : MX.equal(MX.rref(A).R, MX.rref(B).R) || t('A et B n’ont pas la même forme réduite.')),
   'eig(A+B)=eig(A)+eig(B)': ({ A, B }) => {
     const ea = splitEig(A); const eb = splitEig(B);
-    if (!ea || !eb) return 'Choisis des matrices à valeurs propres rationnelles (triangulaires, par exemple).';
+    if (!ea || !eb) return t('Choisis des matrices à valeurs propres rationnelles (triangulaires, par exemple).');
     const la = ea.flatMap(({ value, mult }) => Array(mult).fill(value));
     const lb = eb.flatMap(({ value, mult }) => Array(mult).fill(value));
     const cs = MX.charpoly(MX.add(A, B));
@@ -146,162 +147,162 @@ const TESTS_PAIR = {
       // Same polynomial: the sums are all roots, with multiplicity (n ≤ 4).
       return sums.every((s) => evalP(s).n === 0) && MX.charpoly(MX.diag(sums)).every((c, i) => c.eq(cs[i]));
     });
-    return !fits || 'Ici, les valeurs propres de A + B sont bien des sommes : choisis A et B sans vecteurs propres communs.';
+    return !fits || t('Ici, les valeurs propres de A + B sont bien des sommes : choisis A et B sans vecteurs propres communs.');
   },
   // section mat
   'A,B inv⇒A+B inv': ({ A, B }) => {
-    if (MX.det(A).n === 0 || MX.det(B).n === 0) return 'A et B doivent être inversibles.';
-    return MX.det(MX.add(A, B)).n === 0 || 'Ici A + B est inversible.';
+    if (MX.det(A).n === 0 || MX.det(B).n === 0) return t('A et B doivent être inversibles.');
+    return MX.det(MX.add(A, B)).n === 0 || t('Ici A + B est inversible.');
   },
   // section vs
   // A, B: the matrices of two bases B and C (vectors in columns), with
   // P_{C←B} = C⁻¹B different from B⁻¹C.
   'P_CB=B^-1C': ({ A, B }) => {
     const Ai = MX.inverse(A); const Bi = MX.inverse(B);
-    if (!Ai || !Bi) return 'Les colonnes de chaque matrice doivent former une base : les deux matrices doivent être inversibles.';
-    return !eqM(MX.mul(Bi, A), MX.mul(Ai, B)) || 'Pour ces deux bases, C⁻¹B = B⁻¹C : choisis-en d’autres.';
+    if (!Ai || !Bi) return t('Les colonnes de chaque matrice doivent former une base : les deux matrices doivent être inversibles.');
+    return !eqM(MX.mul(Bi, A), MX.mul(Ai, B)) || t('Pour ces deux bases, C⁻¹B = B⁻¹C : choisis-en d’autres.');
   },
 };
 
 const WANT_ONE = {
-  nilpotent: ({ A }) => (isZeroM(A) ? 'A ne doit pas être nulle.' : isZeroM(MX.mul(A, A)) || 'Il faut A² = 0.'),
+  nilpotent: ({ A }) => (isZeroM(A) ? t('A ne doit pas être nulle.') : isZeroM(MX.mul(A, A)) || t('Il faut A² = 0.')),
   notDiag: ({ A }) => {
-    if (!sq(A)) return 'A doit être carrée.';
+    if (!sq(A)) return t('A doit être carrée.');
     const d = diagonalisable(A);
     if (d === null) {
       const cs = MX.charpoly(A);
       if (A.length === 2 && cs[1].mul(cs[1]).sub(cs[2].mul(cs[0]).mul(4)).n < 0) return true;
-      return 'Choisis une matrice à valeurs propres entières (triangulaire, par exemple).';
+      return t('Choisis une matrice à valeurs propres entières (triangulaire, par exemple).');
     }
-    return !d || 'Cette matrice est diagonalisable.';
+    return !d || t('Cette matrice est diagonalisable.');
   },
   diagRepeated: ({ A }) => {
-    if (!sq(A)) return 'A doit être carrée.';
+    if (!sq(A)) return t('A doit être carrée.');
     const e = splitEig(A);
-    if (!e) return 'Choisis une matrice à valeurs propres entières.';
-    if (!e.some((x) => x.mult >= 2)) return 'Il faut une valeur propre multiple.';
-    return diagonalisable(A) || 'Cette matrice n\'est pas diagonalisable.';
+    if (!e) return t('Choisis une matrice à valeurs propres entières.');
+    if (!e.some((x) => x.mult >= 2)) return t('Il faut une valeur propre multiple.');
+    return diagonalisable(A) || t('Cette matrice n\'est pas diagonalisable.');
   },
   noRealEig: ({ A }) => {
-    if (A.length !== 2 || !sq(A)) return 'Prends une matrice 2×2.';
+    if (A.length !== 2 || !sq(A)) return t('Prends une matrice 2×2.');
     const cs = MX.charpoly(A);
-    return cs[1].mul(cs[1]).sub(cs[2].mul(cs[0]).mul(4)).n < 0 || 'Cette matrice a une valeur propre réelle.';
+    return cs[1].mul(cs[1]).sub(cs[2].mul(cs[0]).mul(4)).n < 0 || t('Cette matrice a une valeur propre réelle.');
   },
   orthCols: ({ A }) => {
     const C = MX.transpose(A);
-    if (C.some((c) => c.every((x) => x.n === 0))) return 'Les colonnes doivent être non nulles.';
-    if (C.some((u, i) => C.some((v, j) => j > i && MX.dot(u, v).n !== 0))) return 'Les colonnes doivent être orthogonales deux à deux.';
-    return !eqM(MX.mul(MX.transpose(A), A), MX.identity(A[0].length)) || 'Ces colonnes sont orthonormées : AᵀA = I.';
+    if (C.some((c) => c.every((x) => x.n === 0))) return t('Les colonnes doivent être non nulles.');
+    if (C.some((u, i) => C.some((v, j) => j > i && MX.dot(u, v).n !== 0))) return t('Les colonnes doivent être orthogonales deux à deux.');
+    return !eqM(MX.mul(MX.transpose(A), A), MX.identity(A[0].length)) || t('Ces colonnes sont orthonormées : AᵀA = I.');
   },
   detMinus1Orth: ({ A }) => {
-    if (!sq(A) || !eqM(MX.mul(MX.transpose(A), A), MX.identity(A.length))) return 'A doit être orthogonale (AᵀA = I).';
-    return MX.det(A).eq(-1) || 'Ici det A = 1.';
+    if (!sq(A) || !eqM(MX.mul(MX.transpose(A), A), MX.identity(A.length))) return t('A doit être orthogonale (AᵀA = I).');
+    return MX.det(A).eq(-1) || t('Ici det A = 1.');
   },
   eigspaceDim: ({ A }, p) => {
-    if (!sq(A) || (p.n && A.length !== p.n)) return `A doit être ${p.n}×${p.n}.`;
+    if (!sq(A) || (p.n && A.length !== p.n)) return t('A doit être {s}.', { s: `${p.n}×${p.n}` });
     // det(λI − A) = ∏(λ − r)^m, so det(A − λI) = (−1)ⁿ·that.
     let want = [q(1)];
     for (const [r, m] of p.poly) for (let i = 0; i < m; i++) want = polyMulLin(want, q(r));
     const cs = MX.charpoly(A);
     const sign = A.length % 2 ? q(-1) : q(1);
-    if (want.length !== cs.length || !want.every((c, i) => c.mul(sign).eq(cs[i]))) return 'Ton polynôme caractéristique n’est pas celui de l’énoncé.';
-    return geomDim(A, q(p.lambda)) !== p.dim || `Ici, l'espace propre de ${p.lambda} est bien de dimension ${p.dim}.`;
+    if (want.length !== cs.length || !want.every((c, i) => c.mul(sign).eq(cs[i]))) return t('Ton polynôme caractéristique n’est pas celui de l’énoncé.');
+    return geomDim(A, q(p.lambda)) !== p.dim || t('Ici, l\'espace propre de {l} est bien de dimension {d}.', { l: p.lambda, d: p.dim });
   },
-  singularAtA: ({ A }) => MX.det(MX.mul(MX.transpose(A), A)).n === 0 || 'Ici AᵀA est inversible.',
+  singularAtA: ({ A }) => MX.det(MX.mul(MX.transpose(A), A)).n === 0 || t('Ici AᵀA est inversible.'),
   symNotPD: ({ A }) => {
-    if (!MX.isSymmetric(A)) return 'A doit être symétrique.';
-    if (A.some((r, i) => r[i].n <= 0)) return 'La diagonale doit être positive.';
+    if (!MX.isSymmetric(A)) return t('A doit être symétrique.');
+    if (A.some((r, i) => r[i].n <= 0)) return t('La diagonale doit être positive.');
     for (let k = 1; k <= A.length; k++) if (MX.det(A.slice(0, k).map((r) => r.slice(0, k))).n <= 0) return true;
-    return 'Cette matrice est définie positive.';
+    return t('Cette matrice est définie positive.');
   },
   sameEigNotSimilar: ({ A }, p) => {
     const B = readQ(p.B).mat;
-    if (!sq(A) || A.length !== B.length) return `A doit être ${B.length}×${B.length}.`;
+    if (!sq(A) || A.length !== B.length) return t('A doit être {s}.', { s: `${B.length}×${B.length}` });
     const ca = MX.charpoly(A);
     const cb = MX.charpoly(B);
-    if (!ca.every((c, i) => c.eq(cb[i]))) return 'A doit avoir les mêmes valeurs propres (avec multiplicités) que la matrice de l\'énoncé.';
+    if (!ca.every((c, i) => c.eq(cb[i]))) return t('A doit avoir les mêmes valeurs propres (avec multiplicités) que la matrice de l\'énoncé.');
     const s = similarQ(A, B);
-    if (s === null) return 'Choisis une matrice à valeurs propres entières.';
-    return !s || 'Ces deux matrices sont semblables.';
+    if (s === null) return t('Choisis une matrice à valeurs propres entières.');
+    return !s || t('Ces deux matrices sont semblables.');
   },
   notLUable: ({ A }) => {
-    if (!sq(A) || MX.det(A).n === 0) return 'A doit être carrée et inversible.';
-    return !MX.lu(A) || 'Cette matrice a une factorisation LU sans échange.';
+    if (!sq(A) || MX.det(A).n === 0) return t('A doit être carrée et inversible.');
+    return !MX.lu(A) || t('Cette matrice a une factorisation LU sans échange.');
   },
   // Two echelon forms of the same matrix (answers A, E1, E2).
   echelonNotUnique: ({ A }, p, ans) => {
     const E1 = readQ(ans.E1)?.mat; const E2 = readQ(ans.E2)?.mat;
-    if (!E1 || !E2) return 'Écris A et deux formes échelonnées E1 et E2.';
-    if (!MX.isEchelon(E1) || !MX.isEchelon(E2)) return 'E1 et E2 doivent être échelonnées.';
-    if (!MX.rowEquivalent(A, E1) || !MX.rowEquivalent(A, E2)) return 'E1 et E2 doivent s\'obtenir de A par des opérations sur les lignes.';
-    return !eqM(E1, E2) || 'E1 et E2 sont égales.';
+    if (!E1 || !E2) return t('Écris A et deux formes échelonnées E1 et E2.');
+    if (!MX.isEchelon(E1) || !MX.isEchelon(E2)) return t('E1 et E2 doivent être échelonnées.');
+    if (!MX.rowEquivalent(A, E1) || !MX.rowEquivalent(A, E2)) return t('E1 et E2 doivent s\'obtenir de A par des opérations sur les lignes.');
+    return !eqM(E1, E2) || t('E1 et E2 sont égales.');
   },
   // The pivot columns of R do not span Col A.
   rrefColsNotBasis: ({ A }) => {
     const { R, pivots } = MX.rref(A);
     const cols = pivots.map((j) => MX.col(R, j));
     const span = MX.rank(MX.fromCols([...MX.transpose(A), ...cols])) === MX.rank(A) && MX.rank(MX.fromCols(cols)) === MX.rank(A);
-    return !span || 'Pour cette matrice, les colonnes pivots de R engendrent bien Col A.';
+    return !span || t('Pour cette matrice, les colonnes pivots de R engendrent bien Col A.');
   },
   // A and an echelon form E with different eigenvalues (answers A, E).
   echelonEigen: ({ A }, p, ans) => {
     const E = readQ(ans.E)?.mat;
-    if (!E || !sq(A)) return 'Écris une matrice carrée A et une forme échelonnée E de A.';
-    if (!MX.isEchelon(E) || !MX.rowEquivalent(A, E)) return 'E doit être une forme échelonnée de A.';
+    if (!E || !sq(A)) return t('Écris une matrice carrée A et une forme échelonnée E de A.');
+    if (!MX.isEchelon(E) || !MX.rowEquivalent(A, E)) return t('E doit être une forme échelonnée de A.');
     const ca = MX.charpoly(A); const ce = MX.charpoly(E);
-    return !ca.every((c, i) => c.eq(ce[i])) || 'Ici, A et E ont les mêmes valeurs propres.';
+    return !ca.every((c, i) => c.eq(ce[i])) || t('Ici, A et E ont les mêmes valeurs propres.');
   },
   // v is an eigenvector of A but not of Aᵀ (answers A, v).
   transposeEigvec: ({ A }, p, ans) => {
     const v = readQ(ans.v)?.vec;
-    if (!v || !sq(A) || v.length !== A.length || v.every((x) => x.n === 0)) return 'Écris A carrée et un vecteur v non nul de la bonne taille.';
+    if (!v || !sq(A) || v.length !== A.length || v.every((x) => x.n === 0)) return t('Écris A carrée et un vecteur v non nul de la bonne taille.');
     const prop = (M) => { const w = MX.matVec(M, v); return MX.rank(MX.fromCols([v, w])) <= 1; };
-    if (!prop(A)) return 'v doit être un vecteur propre de A.';
-    return !prop(MX.transpose(A)) || 'v est aussi un vecteur propre de Aᵀ.';
+    if (!prop(A)) return t('v doit être un vecteur propre de A.');
+    return !prop(MX.transpose(A)) || t('v est aussi un vecteur propre de Aᵀ.');
   },
   colPerpNotKer: ({ A }) => {
     if (A.length !== A[0].length) return true;
     const K = MX.kernel(A);
     const P = MX.kernel(MX.transpose(A));
     const span = (U, V) => U.length === V.length && (U.length === 0 || MX.rank(MX.fromCols([...U, ...V])) === U.length);
-    return !span(K, P) || 'Pour cette matrice, (Col A)⊥ = Ker A.';
+    return !span(K, P) || t('Pour cette matrice, (Col A)⊥ = Ker A.');
   },
   blockDet: ({ A }) => {
-    if (A.length !== 4 || A[0].length !== 4) return 'Écris une matrice 4×4.';
+    if (A.length !== 4 || A[0].length !== 4) return t('Écris une matrice 4×4.');
     const blk = (r, c) => A.slice(r, r + 2).map((row) => row.slice(c, c + 2));
     const f = MX.det(blk(0, 0)).mul(MX.det(blk(2, 2))).sub(MX.det(blk(0, 2)).mul(MX.det(blk(2, 0))));
-    return !MX.det(A).eq(f) || 'Pour cette matrice, la formule donne le bon déterminant.';
+    return !MX.det(A).eq(f) || t('Pour cette matrice, la formule donne le bon déterminant.');
   },
   // u ≠ 0 with Au = 0 (answers A, u).
   innerNotPD: ({ A }, p, ans) => {
     const u = readQ(ans.u)?.vec;
-    if (!u || u.length !== A[0].length) return 'Écris A et un vecteur u de la bonne taille.';
-    if (u.every((x) => x.n === 0)) return 'u doit être non nul.';
-    return MX.matVec(A, u).every((x) => x.n === 0) || 'Il faut Au = 0 : alors ⟨u, u⟩ = ‖Au‖² = 0.';
+    if (!u || u.length !== A[0].length) return t('Écris A et un vecteur u de la bonne taille.');
+    if (u.every((x) => x.n === 0)) return t('u doit être non nul.');
+    return MX.matVec(A, u).every((x) => x.n === 0) || t('Il faut Au = 0 : alors ⟨u, u⟩ = ‖Au‖² = 0.');
   },
   // B = EA (E invertible) whose rows have other relations than those of A.
   rowRelations: ({ A }, p, ans) => {
     const B = readQ(ans.B)?.mat;
-    if (!B || B.length !== A.length || B[0].length !== A[0].length) return 'Écris A et B de même taille.';
-    if (!MX.rowEquivalent(A, B)) return 'B doit s\'obtenir de A par des opérations sur les lignes.';
+    if (!B || B.length !== A.length || B[0].length !== A[0].length) return t('Écris A et B de même taille.');
+    if (!MX.rowEquivalent(A, B)) return t('B doit s\'obtenir de A par des opérations sur les lignes.');
     const ka = MX.kernel(MX.transpose(A));
     const kb = MX.kernel(MX.transpose(B));
     const same = ka.length === kb.length && (ka.length === 0 || MX.rank(MX.fromCols([...ka, ...kb])) === ka.length);
-    return !same || 'Les lignes de A et de B ont ici les mêmes relations.';
+    return !same || t('Les lignes de A et de B ont ici les mêmes relations.');
   },
   // section sys
   // Pivots in every row or not (rowsAll), in every column or not (colsAll),
   // and the shape: 'wide' (m < n), 'tall' (m > n), 'square'.
   pivots: ({ A }, p) => {
     const [m, n] = [A.length, A[0].length];
-    if (p.shape === 'wide' && m >= n) return 'A doit avoir moins de lignes que de colonnes.';
-    if (p.shape === 'tall' && m <= n) return 'A doit avoir plus de lignes que de colonnes.';
-    if (p.shape === 'square' && m !== n) return 'A doit être carrée.';
+    if (p.shape === 'wide' && m >= n) return t('A doit avoir moins de lignes que de colonnes.');
+    if (p.shape === 'tall' && m <= n) return t('A doit avoir plus de lignes que de colonnes.');
+    if (p.shape === 'square' && m !== n) return t('A doit être carrée.');
     const r = MX.rank(A);
-    if (p.rowsAll === true && r < m) return 'Il faut un pivot dans chaque ligne : Ax = b doit avoir une solution pour tout b.';
-    if (p.rowsAll === false && r === m) return 'Ici, chaque ligne a un pivot : Ax = b a une solution pour tout b.';
-    if (p.colsAll === true && r < n) return 'Il faut un pivot dans chaque colonne : Ax = 0 ne doit avoir que la solution nulle.';
-    if (p.colsAll === false && r === n) return 'Ici, chaque colonne a un pivot : Ax = 0 n\'a que la solution nulle.';
+    if (p.rowsAll === true && r < m) return t('Il faut un pivot dans chaque ligne : Ax = b doit avoir une solution pour tout b.');
+    if (p.rowsAll === false && r === m) return t('Ici, chaque ligne a un pivot : Ax = b a une solution pour tout b.');
+    if (p.colsAll === true && r < n) return t('Il faut un pivot dans chaque colonne : Ax = 0 ne doit avoir que la solution nulle.');
+    if (p.colsAll === false && r === n) return t('Ici, chaque colonne a un pivot : Ax = 0 n\'a que la solution nulle.');
     return true;
   },
   // Ax = 0 has infinitely many solutions and Ax = b none (answers A, b);
@@ -309,65 +310,65 @@ const WANT_ONE = {
   kerNoSolution: ({ A }, p, ans) => {
     const b = readQ(ans.b)?.vec;
     if (!b || b.length !== A.length) return `Écris b avec ${A.length} composantes.`;
-    if (p.wide && A.length >= A[0].length) return 'A doit avoir moins de lignes que de colonnes.';
+    if (p.wide && A.length >= A[0].length) return t('A doit avoir moins de lignes que de colonnes.');
     const r = MX.rank(A);
-    if (r === A[0].length) return 'Ici, Ax = 0 n\'a que la solution nulle.';
-    return MX.rank(MX.hcat(A, b.map((x) => [x]))) > r || 'Ici, Ax = b a des solutions.';
+    if (r === A[0].length) return t('Ici, Ax = 0 n\'a que la solution nulle.');
+    return MX.rank(MX.hcat(A, b.map((x) => [x]))) > r || t('Ici, Ax = b a des solutions.');
   },
   // section mat
-  singular: ({ A }) => (!sq(A) ? 'A doit être carrée.' : MX.det(A).n === 0 || 'Cette matrice est inversible.'),
+  singular: ({ A }) => (!sq(A) ? t('A doit être carrée.') : MX.det(A).n === 0 || t('Cette matrice est inversible.')),
   // section det
   // det A ≠ 0: then det(Aᵀ) ≠ −det A, a swap changes det, det(2A) ≠ 2·det A.
-  detNonZero: ({ A }) => (sq(A) ? MX.det(A).n !== 0 || 'Ici det A = 0 : l\'égalité est vraie pour cette matrice. Prends A inversible, par exemple I.' : 'A doit être carrée.'),
+  detNonZero: ({ A }) => (sq(A) ? MX.det(A).n !== 0 || t('Ici det A = 0 : l\'égalité est vraie pour cette matrice. Prends A inversible, par exemple I.') : t('A doit être carrée.')),
   // det A < 0: the area of the image of the unit square is |det A| ≠ det A.
-  detNegative: ({ A }) => (sq(A) ? MX.det(A).n < 0 || `Ici det A = ${MX.det(A)} : il faut un déterminant négatif.` : 'A doit être carrée.'),
+  detNegative: ({ A }) => (sq(A) ? MX.det(A).n < 0 || t('Ici det A = {d} : il faut un déterminant négatif.', { d: MX.det(A) }) : t('A doit être carrée.')),
   // det A = 0 with no zero row and no zero column.
   singularNoZeroLine: ({ A }) => {
-    if (!sq(A)) return 'A doit être carrée.';
-    if (A.some((r) => r.every((x) => x.n === 0)) || MX.transpose(A).some((c) => c.every((x) => x.n === 0))) return 'A ne doit avoir ni ligne nulle ni colonne nulle.';
-    return MX.det(A).n === 0 || 'Ici det A ≠ 0.';
+    if (!sq(A)) return t('A doit être carrée.');
+    if (A.some((r) => r.every((x) => x.n === 0)) || MX.transpose(A).some((c) => c.every((x) => x.n === 0))) return t('A ne doit avoir ni ligne nulle ni colonne nulle.');
+    return MX.det(A).n === 0 || t('Ici det A ≠ 0.');
   },
   // section eig
   // u and w eigenvectors of A, u + w not (answers A, u, w).
   sumNotEigvec: ({ A }, p, ans) => {
     const [u, w] = ['u', 'w'].map((k) => readQ(ans[k])?.vec);
-    if (!sq(A) || !u || !w || u.length !== A.length || w.length !== A.length) return 'Écris A carrée et deux vecteurs u, w de la bonne taille.';
+    if (!sq(A) || !u || !w || u.length !== A.length || w.length !== A.length) return t('Écris A carrée et deux vecteurs u, w de la bonne taille.');
     const prop = (v) => v.some((x) => x.n !== 0) && MX.rank(MX.fromCols([v, MX.matVec(A, v)])) <= 1;
-    if (!prop(u) || !prop(w)) return 'u et w doivent être des vecteurs propres de A (non nuls, Au = λu).';
-    return !prop(u.map((x, i) => x.add(w[i]))) || 'Ici, u + w est encore un vecteur propre.';
+    if (!prop(u) || !prop(w)) return t('u et w doivent être des vecteurs propres de A (non nuls, Au = λu).');
+    return !prop(u.map((x, i) => x.add(w[i]))) || t('Ici, u + w est encore un vecteur propre.');
   },
   // A² is not the matrix of the squares of the entries.
   entrywiseSquare: ({ A }) => {
-    if (!sq(A)) return 'A doit être carrée.';
-    return !eqM(MX.mul(A, A), A.map((r) => r.map((x) => x.mul(x)))) || 'Pour cette matrice, A² est bien la matrice des carrés.';
+    if (!sq(A)) return t('A doit être carrée.');
+    return !eqM(MX.mul(A, A), A.map((r) => r.map((x) => x.mul(x)))) || t('Pour cette matrice, A² est bien la matrice des carrés.');
   },
   // A 2 × 2 stochastic matrix (columns of sum 1, entries ≥ 0) whose x_k
   // does not tend to a limit independent of x₀ (other eigenvalue ±1).
   stochNoUniqueLimit: ({ A }) => {
-    if (A.length !== 2 || A[0].length !== 2) return 'Écris une matrice 2×2.';
-    if (A.flat().some((x) => x.n < 0)) return 'Les coefficients sont des probabilités : positifs.';
-    if (MX.transpose(A).some((c) => !c[0].add(c[1]).eq(q(1)))) return 'Chaque colonne doit sommer à 1.';
+    if (A.length !== 2 || A[0].length !== 2) return t('Écris une matrice 2×2.');
+    if (A.flat().some((x) => x.n < 0)) return t('Les coefficients sont des probabilités : positifs.');
+    if (MX.transpose(A).some((c) => !c[0].add(c[1]).eq(q(1)))) return t('Chaque colonne doit sommer à 1.');
     const mu = MX.trace(A).sub(q(1));
-    return Math.abs(mu.valueOf()) === 1 || `Ici l'autre valeur propre vaut ${mu} : |μ| < 1, et x_k tend vers le même état stationnaire pour tout x₀.`;
+    return Math.abs(mu.valueOf()) === 1 || t('Ici l\'autre valeur propre vaut {mu} : |μ| < 1, et x_k tend vers le même état stationnaire pour tout x₀.', { mu });
   },
   // section sym
   // Diagonalisable over ℝ (rational eigenvalues) but not symmetric: not
   // diagonalisable in an orthonormal basis.
   diagNotSym: ({ A }) => {
-    if (!sq(A)) return 'A doit être carrée.';
-    if (MX.isSymmetric(A)) return 'Cette matrice est symétrique : elle est diagonalisable en base orthonormée.';
+    if (!sq(A)) return t('A doit être carrée.');
+    if (MX.isSymmetric(A)) return t('Cette matrice est symétrique : elle est diagonalisable en base orthonormée.');
     const d = diagonalisable(A);
-    if (d === null) return 'Choisis une matrice à valeurs propres entières (triangulaire, par exemple).';
-    return d || 'Cette matrice n\'est pas diagonalisable.';
+    if (d === null) return t('Choisis une matrice à valeurs propres entières (triangulaire, par exemple).');
+    return d || t('Cette matrice n\'est pas diagonalisable.');
   },
   // Real eigenvalues, singular values ≠ their absolute values: the
   // eigenvalues of AᵀA (σᵢ²) are not those of A² (λᵢ²).
   svNotAbsEig: ({ A }) => {
-    if (!sq(A)) return 'A doit être carrée.';
-    if (!splitEig(A)) return 'Choisis une matrice à valeurs propres entières (triangulaire, par exemple).';
+    if (!sq(A)) return t('A doit être carrée.');
+    if (!splitEig(A)) return t('Choisis une matrice à valeurs propres entières (triangulaire, par exemple).');
     const a = MX.charpoly(MX.mul(MX.transpose(A), A));
     const b = MX.charpoly(MX.mul(A, A));
-    return !a.every((c, i) => c.eq(b[i])) || 'Pour cette matrice, les valeurs singulières sont bien les |λᵢ| (elle est symétrique, par exemple).';
+    return !a.every((c, i) => c.eq(b[i])) || t('Pour cette matrice, les valeurs singulières sont bien les |λᵢ| (elle est symétrique, par exemple).');
   },
 };
 
@@ -390,41 +391,41 @@ const WANT_FAMILY = {
   scaledDependent: (ans) => {
     const vs = readFamily(ans.F);
     const al = String(ans.alpha ?? '').split(/[;,]/).map((s) => s.trim()).filter(Boolean).map((s) => readQ(s)?.scalar);
-    if (!vs || !vs.length) return 'Écris des vecteurs v₁, v₂, … séparés par des virgules.';
-    if (al.length !== vs.length || al.some((x) => !x)) return `Écris ${vs.length} nombres α, séparés par « ; ».`;
-    if (MX.rank(MX.fromCols(vs)) !== vs.length) return 'Les vᵢ doivent être libres.';
+    if (!vs || !vs.length) return t('Écris des vecteurs v₁, v₂, … séparés par des virgules.');
+    if (al.length !== vs.length || al.some((x) => !x)) return t('Écris {n} nombres α, séparés par « ; ».', { n: vs.length });
+    if (MX.rank(MX.fromCols(vs)) !== vs.length) return t('Les vᵢ doivent être libres.');
     const ws = vs.map((v, i) => v.map((x) => x.mul(al[i])));
-    return MX.rank(MX.fromCols(ws)) < ws.length || 'Les αᵢvᵢ sont encore libres.';
+    return MX.rank(MX.fromCols(ws)) < ws.length || t('Les αᵢvᵢ sont encore libres.');
   },
   orthNotTransitive: (ans) => {
     const [u, v, w] = ['u', 'v', 'w'].map((k) => readQ(ans[k])?.vec);
-    if (!u || !v || !w || u.length !== v.length || v.length !== w.length) return 'Écris trois vecteurs u, v, w de même taille.';
-    if (MX.dot(u, v).n !== 0 || MX.dot(v, w).n !== 0) return 'Il faut u ⊥ v et v ⊥ w.';
-    return MX.dot(u, w).n !== 0 || 'Ici u ⊥ w aussi.';
+    if (!u || !v || !w || u.length !== v.length || v.length !== w.length) return t('Écris trois vecteurs u, v, w de même taille.');
+    if (MX.dot(u, v).n !== 0 || MX.dot(v, w).n !== 0) return t('Il faut u ⊥ v et v ⊥ w.');
+    return MX.dot(u, w).n !== 0 || t('Ici u ⊥ w aussi.');
   },
   spanNotPlane: (ans) => {
     const vs = readFamily(ans.F);
-    if (!vs || vs.length !== 2) return 'Écris deux vecteurs u, v.';
-    return MX.rank(MX.fromCols(vs)) < 2 || 'Ces deux vecteurs engendrent un plan.';
+    if (!vs || vs.length !== 2) return t('Écris deux vecteurs u, v.');
+    return MX.rank(MX.fromCols(vs)) < 2 || t('Ces deux vecteurs engendrent un plan.');
   },
   spanNotBasis: (ans, p) => {
     const vs = readFamily(ans.F);
-    if (!vs || vs.length !== p.n || vs.some((v) => v.length !== p.n)) return `Écris ${p.n} vecteurs de ℝ${'⁰¹²³⁴⁵⁶'[p.n]}.`;
-    return MX.rank(MX.fromCols(vs)) < p.n || 'Ces vecteurs forment une base.';
+    if (!vs || vs.length !== p.n || vs.some((v) => v.length !== p.n)) return t('Écris {n} vecteurs de {R}.', { n: p.n, R: `ℝ${'⁰¹²³⁴⁵⁶'[p.n]}` });
+    return MX.rank(MX.fromCols(vs)) < p.n || t('Ces vecteurs forment une base.');
   },
   indepNotBasis: (ans, p) => {
     const vs = readFamily(ans.F);
-    if (!vs || vs.some((v) => v.length !== p.n)) return `Écris des vecteurs de ℝ${'⁰¹²³⁴⁵⁶'[p.n]}.`;
-    if (MX.rank(MX.fromCols(vs)) !== vs.length) return 'La famille doit être libre.';
-    return vs.length < p.n || 'Cette famille est une base.';
+    if (!vs || vs.some((v) => v.length !== p.n)) return t('Écris des vecteurs de {R}.', { R: `ℝ${'⁰¹²³⁴⁵⁶'[p.n]}` });
+    if (MX.rank(MX.fromCols(vs)) !== vs.length) return t('La famille doit être libre.');
+    return vs.length < p.n || t('Cette famille est une base.');
   },
   // section sys
   // Three vectors, no two of them proportional, and yet linked.
   pairwiseFreeDependent: (ans) => {
     const vs = readFamily(ans.F);
-    if (!vs || vs.length !== 3 || vs.some((v) => v.length !== vs[0].length)) return 'Écris trois vecteurs de même taille.';
-    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) if (MX.rank(MX.fromCols([vs[i], vs[j]])) < 2) return 'Deux de tes vecteurs sont colinéaires.';
-    return MX.rank(MX.fromCols(vs)) < 3 || 'Ces trois vecteurs sont libres.';
+    if (!vs || vs.length !== 3 || vs.some((v) => v.length !== vs[0].length)) return t('Écris trois vecteurs de même taille.');
+    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) if (MX.rank(MX.fromCols([vs[i], vs[j]])) < 2) return t('Deux de tes vecteurs sont colinéaires.');
+    return MX.rank(MX.fromCols(vs)) < 3 || t('Ces trois vecteurs sont libres.');
   },
   // T(x) = (params.T: components in x_1 … x_n) is not linear: u, v with
   // T(u + v) ≠ T(u) + T(v); or u and a number c with T(cu) ≠ cT(u); or
@@ -433,27 +434,27 @@ const WANT_FAMILY = {
     const T = (x) => p.T.map((c) => readQ(c.replace(/x_(\d+)/g, (_, i) => `(${x[Number(i) - 1]})`))?.scalar);
     const same = (a, b) => a.every((x, i) => x && b[i] && x.eq(b[i]));
     const u = readQ(ans.u)?.vec;
-    if (!u || u.length !== p.n) return `Écris u avec ${p.n} composantes.`;
+    if (!u || u.length !== p.n) return t('Écris u avec {n} composantes.', { n: p.n });
     const cText = String(ans.c ?? '').trim();
     if (cText) {
       const c = readQ(cText)?.scalar;
-      if (!c) return 'Je n\'arrive pas à lire c.';
-      return !same(T(u.map((x) => x.mul(c))), T(u).map((y) => y.mul(c))) || 'Ici T(cu) = cT(u).';
+      if (!c) return t('Je n\'arrive pas à lire c.');
+      return !same(T(u.map((x) => x.mul(c))), T(u).map((y) => y.mul(c))) || t('Ici T(cu) = cT(u).');
     }
     const vText = String(ans.v ?? '').trim();
-    if (!vText) return u.every((x) => x.n === 0) ? (!same(T(u), u.map(() => q(0))) ? true : 'Ici T(0) = 0.') : 'Donne u et v (ou u et un nombre c).';
+    if (!vText) return u.every((x) => x.n === 0) ? (!same(T(u), u.map(() => q(0))) ? true : t('Ici T(0) = 0.')) : t('Donne u et v (ou u et un nombre c).');
     const v = readQ(vText)?.vec;
-    if (!v || v.length !== p.n) return `Écris v avec ${p.n} composantes.`;
-    return !same(T(u.map((x, i) => x.add(v[i]))), T(u).map((y, i) => y.add(T(v)[i]))) || 'Ici T(u + v) = T(u) + T(v).';
+    if (!v || v.length !== p.n) return t('Écris v avec {n} composantes.', { n: p.n });
+    return !same(T(u.map((x, i) => x.add(v[i]))), T(u).map((y, i) => y.add(T(v)[i]))) || t('Ici T(u + v) = T(u) + T(v).');
   },
   // section vs
   // One vector v of the family p.F (texts) outside Ker p.A (answer v).
   notInKer: (ans, p) => {
     const A = readQ(p.A).mat;
     const v = readQ(ans.v)?.vec;
-    if (!v || v.length !== A[0].length) return `Écris un vecteur à ${A[0].length} composantes.`;
-    if (!p.F.some((t) => readQ(t).vec.every((x, i) => x.eq(v[i])))) return 'Choisis un des vecteurs de la famille.';
-    return MX.matVec(A, v).some((x) => x.n !== 0) || 'Ce vecteur est bien dans Ker A : A·v = 0.';
+    if (!v || v.length !== A[0].length) return t('Écris un vecteur à {n} composantes.', { n: A[0].length });
+    if (!p.F.some((t) => readQ(t).vec.every((x, i) => x.eq(v[i])))) return t('Choisis un des vecteurs de la famille.');
+    return MX.matVec(A, v).some((x) => x.n !== 0) || t('Ce vecteur est bien dans Ker A : A·v = 0.');
   },
   // The coordinates c of p.x in the basis p.B (texts of vectors or
   // coordinate vectors): Σ cⱼbⱼ = x, and the component p.i of c is not
@@ -462,10 +463,10 @@ const WANT_FAMILY = {
     const B = p.B.map((t) => readQ(t).vec);
     const x = readQ(p.x).vec;
     const c = readQ(ans.c)?.vec;
-    if (!c || c.length !== B.length) return `Écris les ${B.length} coordonnées : (c₁ ; c₂ ; …).`;
+    if (!c || c.length !== B.length) return t('Écris les {n} coordonnées : (c₁ ; c₂ ; …).', { n: B.length });
     const s = x.map((_, k) => B.reduce((acc, b, j) => acc.add(b[k].mul(c[j])), q(0)));
-    if (!s.every((y, k) => y.eq(x[k]))) return 'Avec ces coordonnées, c₁b₁ + c₂b₂ + … ne redonne pas le vecteur.';
-    return !c[p.i].eq(q(p.claim)) || 'Avec ces coordonnées, la composante est bien celle de l’énoncé.';
+    if (!s.every((y, k) => y.eq(x[k]))) return t('Avec ces coordonnées, c₁b₁ + c₂b₂ + … ne redonne pas le vecteur.');
+    return !c[p.i].eq(q(p.claim)) || t('Avec ces coordonnées, la composante est bien celle de l’énoncé.');
   },
   // section orth
   // x ∈ W = Span{params.basis} closer to params.y than params.w (answer x).
@@ -474,28 +475,28 @@ const WANT_FAMILY = {
     const w = readQ(p.w).vec;
     const B = p.basis.map((t) => readQ(t).vec);
     const x = readQ(ans.x)?.vec;
-    if (!x || x.length !== y.length) return `Écris un vecteur x à ${y.length} composantes.`;
-    if (MX.rank(MX.fromCols([...B, x])) !== MX.rank(MX.fromCols(B))) return 'x doit être dans W : une combinaison des vecteurs de la base.';
+    if (!x || x.length !== y.length) return t('Écris un vecteur x à {n} composantes.', { n: y.length });
+    if (MX.rank(MX.fromCols([...B, x])) !== MX.rank(MX.fromCols(B))) return t('x doit être dans W : une combinaison des vecteurs de la base.');
     const d2 = (a) => { const r = y.map((v, i) => v.sub(a[i])); return MX.dot(r, r); };
-    return d2(w).sub(d2(x)).n > 0 || 'Ce point n\'est pas plus proche de y que w.';
+    return d2(w).sub(d2(x)).n > 0 || t('Ce point n\'est pas plus proche de y que w.');
   },
   // A basis of ℝⁿ that Gram-Schmidt (normalised) does not send to e₁, …, eₙ (answer F).
   gsNotCanonical: (ans, p) => {
     const vs = readFamily(ans.F);
-    if (!vs || vs.length !== p.n || vs.some((v) => v.length !== p.n)) return `Écris ${p.n} vecteurs de ℝ${'⁰¹²³⁴⁵⁶'[p.n]}.`;
+    if (!vs || vs.length !== p.n || vs.some((v) => v.length !== p.n)) return t('Écris {n} vecteurs de {R}.', { n: p.n, R: `ℝ${'⁰¹²³⁴⁵⁶'[p.n]}` });
     const g = MX.qrGS(MX.fromCols(vs));
-    if (!g) return 'Ta famille doit être une base : ses vecteurs doivent être libres.';
+    if (!g) return t('Ta famille doit être une base : ses vecteurs doivent être libres.');
     const V = MX.transpose(g.V);
-    return V.some((v, j) => v.some((x, i) => (i === j ? x.n <= 0 : x.n !== 0))) || 'Gram-Schmidt donne ici e₁, …, eₙ (après normalisation).';
+    return V.some((v, j) => v.some((x, i) => (i === j ? x.n <= 0 : x.n !== 0))) || t('Gram-Schmidt donne ici e₁, …, eₙ (après normalisation).');
   },
   // p ≠ 0 of degree ≤ params.deg, zero at every point of params.points (answer p, in t).
   polyNullAtPoints: (ans, p) => {
     const cs = coordsOf(ans.p, { poly: true, n: p.deg + 1 });
-    if (!cs) return `Écris un polynôme en t de degré au plus ${p.deg}.`;
-    if (cs.every((c) => c.n === 0)) return 'p doit être non nul.';
+    if (!cs) return t('Écris un polynôme en t de degré au plus {d}.', { d: p.deg });
+    if (cs.every((c) => c.n === 0)) return t('p doit être non nul.');
     const at = (x) => cs.reduceRight((s, c) => s.mul(q(x)).add(c), q(0));
     const bad = p.points.find((x) => at(x).n !== 0);
-    return bad === undefined || `Il faut p(${bad}) = 0.`;
+    return bad === undefined || t('Il faut p({x}) = 0.', { x: bad });
   },
 };
 
@@ -524,20 +525,20 @@ function inSet(xs, p) {
 function checkSetWitness(counter, ans) {
   const p = counter.params;
   const x = coordsOf(ans.x, p);
-  if (!x) return need('Je n\'arrive pas à lire x.');
+  if (!x) return need(t('Je n\'arrive pas à lire x.'));
   const hasY = ans.y !== undefined && String(ans.y).trim() !== '';
   const c = ans.c !== undefined && String(ans.c).trim() !== '' ? readQ(ans.c)?.scalar : null;
   // 0 ∉ H.
   if (!hasY && !c) {
-    if (x.some((v) => v.n !== 0)) return need('Donne deux éléments x et y de H (et éventuellement un nombre c).');
-    return inSet(x, p) ? need('Le vecteur nul est dans H.') : { ok: true };
+    if (x.some((v) => v.n !== 0)) return need(t('Donne deux éléments x et y de H (et éventuellement un nombre c).'));
+    return inSet(x, p) ? need(t('Le vecteur nul est dans H.')) : { ok: true };
   }
-  if (!inSet(x, p)) return need('x n\'est pas dans H.');
-  if (c) return inSet(x.map((v) => v.mul(c)), p) ? need('c·x est encore dans H.') : { ok: true };
+  if (!inSet(x, p)) return need(t('x n\'est pas dans H.'));
+  if (c) return inSet(x.map((v) => v.mul(c)), p) ? need(t('c·x est encore dans H.')) : { ok: true };
   const y = coordsOf(ans.y, p);
-  if (!y) return need('Je n\'arrive pas à lire y.');
-  if (!inSet(y, p)) return need('y n\'est pas dans H.');
-  return inSet(x.map((v, i) => v.add(y[i])), p) ? need('x + y est encore dans H : ce n\'est pas un contre-exemple.') : { ok: true };
+  if (!y) return need(t('Je n\'arrive pas à lire y.'));
+  if (!inSet(y, p)) return need(t('y n\'est pas dans H.'));
+  return inSet(x.map((v, i) => v.add(y[i])), p) ? need(t('x + y est encore dans H : ce n\'est pas un contre-exemple.')) : { ok: true };
 }
 
 function checkDims(counter, ans) {
@@ -545,17 +546,17 @@ function checkDims(counter, ans) {
   for (const k of ['m', 'n', 'r']) {
     if (ans[k] === undefined || String(ans[k]).trim() === '') continue;
     const v = Number(String(ans[k]).trim());
-    if (!Number.isInteger(v) || v < 0) return need(`${k} doit être un entier naturel.`);
+    if (!Number.isInteger(v) || v < 0) return need(t('{k} doit être un entier naturel.', { k }));
     vals[k] = v;
   }
   if (vals.m !== undefined && vals.m < 1) return need('m ≥ 1.');
   if (vals.n !== undefined && vals.n < 1) return need('n ≥ 1.');
-  if (vals.r !== undefined && vals.r > Math.min(vals.m ?? Infinity, vals.n ?? Infinity)) return need('Le rang est au plus min(m, n).');
+  if (vals.r !== undefined && vals.r > Math.min(vals.m ?? Infinity, vals.n ?? Infinity)) return need(t('Le rang est au plus min(m, n).'));
   for (const cond of counter.params.conds || []) {
     const node = mapNode(parse(cond, { vars: ['m', 'n', 'r'] }), (x) => (x.t === 'sym' && x.name in vals ? { t: 'paren', e: lit(q(vals[x.name])) } : x));
     let ok = false;
     try { ok = closedHolds(node, {}); } catch { ok = false; }
-    if (!ok) return need(`Il faut ${cond.replace(/<=/g, '≤').replace(/>=/g, '≥')}.`);
+    if (!ok) return need(t('Il faut {c}.', { c: cond.replace(/<=/g, '≤').replace(/>=/g, '≥') }));
   }
   return { ok: true };
 }
@@ -566,24 +567,24 @@ export function checkLinalg(counter, answers = {}) {
     case 'matPair': {
       const r = pairMats(counter, answers);
       if (r.error) return r.error;
-      const t = TESTS_PAIR[p.test];
-      if (!t) return need('Test inconnu.');
-      const v = t(r);
+      const test = TESTS_PAIR[p.test];
+      if (!test) return need(t('Test inconnu.'));
+      const v = test(r);
       return v === true ? { ok: true } : need(v);
     }
     case 'matOne': {
       const A = readQ(answers.A)?.mat;
-      if (!A) return need('Écris la matrice A, case par case.');
-      if (p.n && (A.length !== p.n || A[0].length !== (p.cols ?? p.n))) return need(`A doit être ${p.n}×${p.cols ?? p.n}.`);
-      const t = WANT_ONE[p.want];
-      if (!t) return need('Propriété inconnue.');
-      const v = t({ A }, p, answers);
+      if (!A) return need(t('Écris la matrice A, case par case.'));
+      if (p.n && (A.length !== p.n || A[0].length !== (p.cols ?? p.n))) return need(t('A doit être {s}.', { s: `${p.n}×${p.cols ?? p.n}` }));
+      const test = WANT_ONE[p.want];
+      if (!test) return need(t('Propriété inconnue.'));
+      const v = test({ A }, p, answers);
       return v === true ? { ok: true } : need(v);
     }
     case 'vecFamily': {
-      const t = WANT_FAMILY[p.want];
-      if (!t) return need('Propriété inconnue.');
-      const v = t(answers, p);
+      const test = WANT_FAMILY[p.want];
+      if (!test) return need(t('Propriété inconnue.'));
+      const v = test(answers, p);
       return v === true ? { ok: true } : need(v);
     }
     case 'setWitness': return checkSetWitness(counter, answers);
@@ -591,10 +592,10 @@ export function checkLinalg(counter, answers = {}) {
       const A = readQ(p.A).mat;
       const x = readQ(answers.x)?.vec;
       const y = readQ(answers.y)?.vec;
-      if (!x || !y || x.length !== A[0].length || y.length !== A[0].length) return need(`Écris deux vecteurs x et y à ${A[0].length} composantes.`);
-      if (x.every((v, i) => v.eq(y[i]))) return need('x et y doivent être différents.');
+      if (!x || !y || x.length !== A[0].length || y.length !== A[0].length) return need(t('Écris deux vecteurs x et y à {n} composantes.', { n: A[0].length }));
+      if (x.every((v, i) => v.eq(y[i]))) return need(t('x et y doivent être différents.'));
       const ax = MX.matVec(A, x); const ay = MX.matVec(A, y);
-      return ax.every((v, i) => v.eq(ay[i])) ? { ok: true } : need('Ici T(x) ≠ T(y).');
+      return ax.every((v, i) => v.eq(ay[i])) ? { ok: true } : need(t('Ici T(x) ≠ T(y).'));
     }
     case 'dims': return checkDims(counter, answers);
     default: return null;

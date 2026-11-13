@@ -11,11 +11,12 @@
 import { matLines, mcqDistinct, tfL } from './alglin-kit.js';
 import { linesItem, examTag } from './kit.js';
 import { mt, MLm, sub, MX, LF, R, blanksOf, blankAll, menuOf, H } from './matrices-c-kit.js';
+import { t } from '../../i18n.js';
 
 const GM = 'm-gershgorin';
 const SUB = [
-  { id: 'discs', label: 'disques', skill: GM },
-  { id: 'eig', label: 'valeurs propres', skill: 'l-eig-charpoly' },
+  { id: 'discs', label: t('disques'), skill: GM },
+  { id: 'eig', label: t('valeurs propres'), skill: 'l-eig-charpoly' },
 ];
 const KEYS = ['calc', 'calcfn'];
 const abs = Math.abs;
@@ -34,7 +35,7 @@ function oneEach(A, by) {
 }
 
 function gData(rng, { sym = rng.chance(0.5), by = 'rows', need = 'disjoint' } = {}) {
-  for (let t = 0; t < 400; t++) {
+  for (let tries = 0; tries < 400; tries++) {
     const diag = rng.shuffle([-6, -5, -4, -3, -2, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, 3);
     const A = diag.map((c, i) => diag.map((_, j) => (i === j ? c : 0)));
     for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
@@ -59,17 +60,17 @@ const rText = (A, i, by) => {
 };
 function radSeg(d, i, { guided = false, menu = false, by = d.by } = {}) {
   const Rr = radius(d.A, i, by);
-  const line = { kind: 'eq', math: rText(d.A, i, by), note: `${by === 'cols' ? 'Colonne' : 'Ligne'} ${i + 1}, sans la diagonale`, subgoal: 'discs' };
+  const line = { kind: 'eq', math: rText(d.A, i, by), note: by === 'cols' ? t('Colonne {i}, sans la diagonale', { i: i + 1 }) : t('Ligne {i}, sans la diagonale', { i: i + 1 }), subgoal: 'discs' };
   return [
-    { kind: 'segment', html: `Le disque ${i + 1} : centre a${sub(i + 1)}${sub(i + 1)} = ${R(d.A[i][i])}, rayon R${sub(i + 1)}.`, ask: `R${sub(i + 1)} =`, start: { math: `R_${i + 1}` }, judge: { kind: 'value', expect: String(Rr), form: 'irreducible', gersh: { A: mt(d.Aq), i, by }, ...(menu ? { menu: menuOf(MENU, 'radius') } : {}) } },
+    { kind: 'segment', html: t('Le disque {n} : centre a{i}{i} = {c}, rayon R{i}.', { n: i + 1, i: sub(i + 1), c: R(d.A[i][i]) }), ask: `R${sub(i + 1)} =`, start: { math: `R_${i + 1}` }, judge: { kind: 'value', expect: String(Rr), form: 'irreducible', gersh: { A: mt(d.Aq), i, by }, ...(menu ? { menu: menuOf(MENU, 'radius') } : {}) } },
     guided ? { ...line, ...blanksOf(rText(d.A, i, by), (by === 'cols' ? d.A.map((r) => r[i]) : d.A[i]).filter((_, j) => j !== i).slice(-1).map((x) => String(abs(x)))) } : line,
     guided ? { kind: 'eq', math: String(Rr), ...blankAll(String(Rr)), note: `D(${R(d.A[i][i])} ; ${Rr})`, subgoal: 'discs' } : { kind: 'eq', math: String(Rr), note: `D(${R(d.A[i][i])} ; ${Rr})`, subgoal: 'discs' },
   ];
 }
 const MENU = [
-  { id: 'radius', label: 'Sommer les |aᵢⱼ| hors de la diagonale', why: '' },
-  { id: 'diag', label: 'Sommer toute la ligne, diagonale comprise', why: 'La diagonale est le centre, pas une part du rayon.' },
-  { id: 'eig', label: 'Calculer les valeurs propres exactement', why: 'Inutile : les disques suffisent, et le polynôme de degré 3 n\'a pas de racine simple.' },
+  { id: 'radius', label: t('Sommer les |aᵢⱼ| hors de la diagonale'), why: '' },
+  { id: 'diag', label: t('Sommer toute la ligne, diagonale comprise'), why: t('La diagonale est le centre, pas une part du rayon.') },
+  { id: 'eig', label: t('Calculer les valeurs propres exactement'), why: t('Inutile : les disques suffisent, et le polynôme de degré 3 n\'a pas de racine simple.') },
 ];
 
 function splitFirst(script) {
@@ -82,10 +83,10 @@ const hasZero = (d, by = d.by) => d.A.some((r, i) => abs(r[i]) <= radius(d.A, i,
 function invDecision(d, by = d.by, show = true) {
   const z = hasZero(d, by);
   return {
-    kind: 'decision', prompt: show ? `Disques ${discsR(d, by)}. Que peut-on dire de A ?` : 'Avec tes disques, que peut-on dire de A ?', options: [
-      { id: 'inv', label: 'A est inversible : 0 n\'est dans aucun disque', valid: !z, why: z ? '0 est dans un disque : on ne peut rien conclure.' : undefined },
-      { id: 'none', label: 'On ne peut pas conclure : 0 est dans un disque', valid: z, why: z ? undefined : `|aᵢᵢ| > Rᵢ pour chaque i : 0 n'est dans aucun disque, donc 0 n'est pas valeur propre.` },
-      { id: 'sing', label: 'A n\'est pas inversible', valid: false, why: 'Les disques ne montrent jamais qu\'une valeur propre est nulle.' },
+    kind: 'decision', prompt: show ? t('Disques {discs}. Que peut-on dire de A ?', { discs: discsR(d, by) }) : t('Avec tes disques, que peut-on dire de A ?'), options: [
+      { id: 'inv', label: t('A est inversible : 0 n\'est dans aucun disque'), valid: !z, why: z ? t('0 est dans un disque : on ne peut rien conclure.') : undefined },
+      { id: 'none', label: t('On ne peut pas conclure : 0 est dans un disque'), valid: z, why: z ? undefined : t('|aᵢᵢ| > Rᵢ pour chaque i : 0 n\'est dans aucun disque, donc 0 n\'est pas valeur propre.') },
+      { id: 'sing', label: t('A n\'est pas inversible'), valid: false, why: t('Les disques ne montrent jamais qu\'une valeur propre est nulle.') },
     ],
   };
 }
@@ -101,10 +102,10 @@ function gItem(level, rng) {
     const lo = Math.min(...d.A.map((r, i) => r[i] - radius(d.A, i)));
     const hi = Math.max(...d.A.map((r, i) => r[i] + radius(d.A, i)));
     parts.push(
-      { kind: 'segment', html: 'A est symétrique : ses valeurs propres sont réelles. Une borne inférieure de la plus petite.', ask: 'λ_min ≥', start: { math: 'm' }, judge: { kind: 'value', expect: String(lo), form: 'irreducible' } },
-      { kind: 'eq', math: String(lo), note: 'Le bord gauche du disque le plus à gauche', subgoal: 'discs' },
-      { kind: 'segment', html: 'Une borne supérieure de la plus grande.', ask: 'λ_max ≤', start: { math: 'M' }, judge: { kind: 'value', expect: String(hi), form: 'irreducible' } },
-      { kind: 'eq', math: String(hi), note: 'Le bord droit du disque le plus à droite', subgoal: 'discs' },
+      { kind: 'segment', html: t('A est symétrique : ses valeurs propres sont réelles. Une borne inférieure de la plus petite.'), ask: 'λ_min ≥', start: { math: 'm' }, judge: { kind: 'value', expect: String(lo), form: 'irreducible' } },
+      { kind: 'eq', math: String(lo), note: t('Le bord gauche du disque le plus à gauche'), subgoal: 'discs' },
+      { kind: 'segment', html: t('Une borne supérieure de la plus grande.'), ask: 'λ_max ≤', start: { math: 'M' }, judge: { kind: 'value', expect: String(hi), form: 'irreducible' } },
+      { kind: 'eq', math: String(hi), note: t('Le bord droit du disque le plus à droite'), subgoal: 'discs' },
     );
   }
   const { start, judge, script } = splitFirst(parts);
@@ -112,12 +113,14 @@ function gItem(level, rng) {
   return matLines({
     skill: GM, level, mode: guided ? 'guided' : level === 3 ? 'tap' : 'free', tapActions: level === 3 ? 'menu' : null, keys: KEYS,
     prompt: level === 4
-      ? `A = ${MLm(d.Aq)}. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.`
-      : `A = ${MLm(d.Aq)}. Donne les disques de Gershgorin (par lignes)${level === 3 ? ', puis conclus. Choisis d\'abord chaque action' : ''}.`,
+      ? t('A = {A}. Donne les rayons des disques de Gershgorin (lignes), puis un encadrement des valeurs propres.', { A: MLm(d.Aq) })
+      : level === 3
+        ? t('A = {A}. Donne les disques de Gershgorin (par lignes), puis conclus. Choisis d\'abord chaque action.', { A: MLm(d.Aq) })
+        : t('A = {A}. Donne les disques de Gershgorin (par lignes).', { A: MLm(d.Aq) }),
     start, judge, script, subgoals: SUB, key: `${GM}:${level}:${mt(d.Aq)}`, baits: ['m_gersh_radius_diag'],
-    hints: H('Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale.',
+    hints: H(t('Centre : aᵢᵢ ; rayon : la somme des |aᵢⱼ| de la ligne, sans la diagonale.'),
       `R₂ = ${rText(d.A, 1, 'rows').replace(/\|[^|]*\|$/, '|□|')}`,
-      `${discsR(d)} (valeurs propres ≈ ${e.map((x) => R(x.toFixed(2).replace('.', ','))).join(' ; ')})`),
+      t('{discs} (valeurs propres ≈ {eig})', { discs: discsR(d), eig: e.map((x) => R(x.toFixed(2).replace('.', ','))).join(' ; ') })),
     fallback: d.fallback,
   });
 }
@@ -125,16 +128,16 @@ function gItem(level, rng) {
 // L2: rows or columns — the finer family.
 function gColumns(rng) {
   let d = null;
-  for (let t = 0; t < 400 && !d; t++) {
+  for (let tries = 0; tries < 400 && !d; tries++) {
     const c = gData(rng, { sym: false, by: 'cols' });
     if (!c.fallback && !disjoint(c.A, 'rows')) d = c;
   }
   if (!d) d = { ...gData(rng, { sym: false, by: 'cols' }), fallback: true };
   const decision = {
-    kind: 'decision', prompt: `Par lignes, les disques sont ${discsR(d, 'rows')} : ils se chevauchent. Que fais-tu ?`, options: [
-      { id: 'cols', label: 'Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres)', valid: true },
-      { id: 'rows', label: 'Garder les lignes', valid: true, quality: 'poor', why: 'Juste, mais les disques se chevauchent : on ne peut pas dire combien de valeurs propres chacun contient.' },
-      { id: 'diag', label: 'Agrandir les rayons avec la diagonale', valid: false, rule: 'm_gersh_radius_diag', why: 'La diagonale est le centre ; elle n\'entre jamais dans le rayon.' },
+    kind: 'decision', prompt: t('Par lignes, les disques sont {discs} : ils se chevauchent. Que fais-tu ?', { discs: discsR(d, 'rows') }), options: [
+      { id: 'cols', label: t('Recommencer par colonnes (A et Aᵀ ont les mêmes valeurs propres)'), valid: true },
+      { id: 'rows', label: t('Garder les lignes'), valid: true, quality: 'poor', why: t('Juste, mais les disques se chevauchent : on ne peut pas dire combien de valeurs propres chacun contient.') },
+      { id: 'diag', label: t('Agrandir les rayons avec la diagonale'), valid: false, rule: 'm_gersh_radius_diag', why: t('La diagonale est le centre ; elle n\'entre jamais dans le rayon.') },
     ],
   };
   const parts = [0, 1, 2].flatMap((i) => radSeg(d, i, { guided: true, by: 'cols' }));
@@ -142,10 +145,10 @@ function gColumns(rng) {
   const { start, judge, script } = splitFirst(parts);
   return matLines({
     skill: GM, level: 2, mode: 'guided', keys: KEYS,
-    prompt: `A = ${MLm(d.Aq)}. Trouve des disques de Gershgorin disjoints.`,
+    prompt: t('A = {A}. Trouve des disques de Gershgorin disjoints.', { A: MLm(d.Aq) }),
     start, judge, script, subgoals: SUB, key: `${GM}:2:${mt(d.Aq)}`, baits: ['m_gersh_radius_diag'],
-    hints: H('Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale.',
-      `R₁ (colonne 1) = ${rText(d.A, 0, 'cols').replace(/\|[^|]*\|$/, '|□|')}`, discsR(d, 'cols')),
+    hints: H(t('Les disques par colonnes ont pour rayon la somme des |aᵢⱼ| de la colonne, sans la diagonale.'),
+      t('R₁ (colonne 1) = {r}', { r: rText(d.A, 0, 'cols').replace(/\|[^|]*\|$/, '|□|') }), discsR(d, 'cols')),
     fallback: d.fallback,
   });
 }
@@ -156,18 +159,18 @@ function gDominant(rng) {
   const margin = Math.min(...d.A.map((r, i) => abs(r[i]) - radius(d.A, i)));
   const parts = [0, 1, 2].flatMap((i) => radSeg(d, i));
   parts.push(
-    { kind: 'segment', html: 'La plus petite marge minᵢ(|aᵢᵢ| − Rᵢ) : toute valeur propre vérifie |λ| ≥ cette marge.', ask: 'marge =', start: { math: 'm' }, judge: { kind: 'value', expect: String(margin), form: 'irreducible' } },
-    { kind: 'decision', prompt: 'A est-elle à diagonale strictement dominante ?', options: [
-      { id: 'yes', label: 'Oui : |aᵢᵢ| > Rᵢ pour chaque ligne', valid: true },
-      { id: 'no', label: 'Non', valid: false, why: `|aᵢᵢ| − Rᵢ ≥ ${margin} > 0 pour chaque ligne.` },
+    { kind: 'segment', html: t('La plus petite marge minᵢ(|aᵢᵢ| − Rᵢ) : toute valeur propre vérifie |λ| ≥ cette marge.'), ask: t('marge ='), start: { math: 'm' }, judge: { kind: 'value', expect: String(margin), form: 'irreducible' } },
+    { kind: 'decision', prompt: t('A est-elle à diagonale strictement dominante ?'), options: [
+      { id: 'yes', label: t('Oui : |aᵢᵢ| > Rᵢ pour chaque ligne'), valid: true },
+      { id: 'no', label: t('Non'), valid: false, why: t('|aᵢᵢ| − Rᵢ ≥ {margin} > 0 pour chaque ligne.', { margin }) },
     ] },
     invDecision(d),
-    { kind: 'eq', math: String(margin), note: 'Donc 0 n\'est pas valeur propre : A est inversible (et Jacobi converge, voir module N)', subgoal: 'discs' },
+    { kind: 'eq', math: String(margin), note: t('Donc 0 n\'est pas valeur propre : A est inversible (et Jacobi converge, voir module N)'), subgoal: 'discs' },
   );
   const { start, judge, script } = splitFirst(parts);
   return linesItem({
     skill: GM, level: 5, mode: 'free', keys: KEYS, noHints: true,
-    prompt: `A = ${MLm(d.Aq)}. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?`,
+    prompt: t('A = {A}. Donne les rayons de Gershgorin (lignes) et la plus petite marge minᵢ(|aᵢᵢ| − Rᵢ). A est-elle inversible ?', { A: MLm(d.Aq) }),
     start, judge, script, subgoals: SUB, key: `${GM}:5:${mt(d.Aq)}`, baits: ['m_gersh_radius_diag'], fallback: d.fallback,
   });
 }
@@ -179,11 +182,11 @@ function gMcq(rng, exam) {
   const signed = d.A[i].reduce((s, x, j) => s + (j === i ? 0 : x), 0);
   return mcqDistinct({
     skill: GM, level: 4, key: `mcq:${mt(d.Aq)}:${i}`, exam: examTag({ exam }),
-    prompt: `A = ${MLm(d.Aq)}. Quel est le disque de Gershgorin de la ligne ${i + 1} ?`,
+    prompt: t('A = {A}. Quel est le disque de Gershgorin de la ligne {i} ?', { A: MLm(d.Aq), i: i + 1 }),
     right: `D(${R(d.A[i][i])} ; ${Rr})`,
     wrongs: [{ html: `D(${R(d.A[i][i])} ; ${Rr + abs(d.A[i][i])})`, rule: 'm_gersh_radius_diag' }, { html: `D(${R(d.A[i][i])} ; ${R(signed)})` }, { html: `D(0 ; ${Rr})` }],
     fillers: [{ html: `D(${R(d.A[i][i])} ; ${radius(d.A, i, 'cols') + 1})` }, { html: `D(${R(Rr)} ; ${R(abs(d.A[i][i]))})` }],
-    solution: [{ html: `Centre a${sub(i + 1)}${sub(i + 1)} = ${R(d.A[i][i])}, rayon ${rText(d.A, i, 'rows')} = ${Rr} (sans la diagonale).`, note: '' }],
+    solution: [{ html: t('Centre a{i}{i} = {c}, rayon {sum} = {Rr} (sans la diagonale).', { i: sub(i + 1), c: R(d.A[i][i]), sum: rText(d.A, i, 'rows'), Rr }), note: '' }],
   }, rng);
 }
 
@@ -193,13 +196,13 @@ function gTf(rng) {
   if (k === 0) {
     return tfL({
       skill: GM, key: 'each-disc', truth: false, exam,
-      statement: 'Chaque disque de Gershgorin contient au moins une valeur propre.',
+      statement: t('Chaque disque de Gershgorin contient au moins une valeur propre.'),
       counter: { kind: 'mx', prop: 'gershEmptyDisc', params: {}, ask: [{ v: 'A', label: 'A =', shape: [2, 2] }], answer: { A: '[[0,1],[4,0]]' } },
-      explanation: 'Faux quand les disques se chevauchent : [[0, 1], [4, 0]] a les disques D(0 ; 1) et D(0 ; 4), et les valeurs propres ±2, hors de D(0 ; 1). Seule une union de disques disjointe des autres en contient le bon nombre.',
+      explanation: t('Faux quand les disques se chevauchent : [[0, 1], [4, 0]] a les disques D(0 ; 1) et D(0 ; 4), et les valeurs propres ±2, hors de D(0 ; 1). Seule une union de disques disjointe des autres en contient le bon nombre.'),
     });
   }
-  if (k === 1) return tfL({ skill: GM, key: 'dominant', truth: true, exam, statement: 'Une matrice à diagonale strictement dominante (|aᵢᵢ| > Σⱼ≠ᵢ |aᵢⱼ| pour chaque i) est inversible.', explanation: 'Vrai : 0 n\'est dans aucun disque de Gershgorin, donc 0 n\'est pas valeur propre.' });
-  return tfL({ skill: GM, key: 'radius', truth: true, exam, ruleIfFalse: 'm_gersh_radius_diag', statement: 'Le rayon du disque de Gershgorin de la ligne i ne contient pas |aᵢᵢ|.', explanation: 'Vrai : aᵢᵢ est le centre ; le rayon est Σⱼ≠ᵢ |aᵢⱼ|.' });
+  if (k === 1) return tfL({ skill: GM, key: 'dominant', truth: true, exam, statement: t('Une matrice à diagonale strictement dominante (|aᵢᵢ| > Σⱼ≠ᵢ |aᵢⱼ| pour chaque i) est inversible.'), explanation: t('Vrai : 0 n\'est dans aucun disque de Gershgorin, donc 0 n\'est pas valeur propre.') });
+  return tfL({ skill: GM, key: 'radius', truth: true, exam, ruleIfFalse: 'm_gersh_radius_diag', statement: t('Le rayon du disque de Gershgorin de la ligne i ne contient pas |aᵢᵢ|.'), explanation: t('Vrai : aᵢᵢ est le centre ; le rayon est Σⱼ≠ᵢ |aᵢⱼ|.') });
 }
 
 export function genGersh(level, rng, profile, opts = {}) {

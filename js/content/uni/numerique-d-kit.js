@@ -13,6 +13,7 @@
 // asks for that developed form.
 
 import { Q } from '../../math/rational.js';
+import { t } from '../../i18n.js';
 
 export const q = (n, d = 1) => (n instanceof Q ? n : new Q(n, d));
 export const R = (s) => String(s).replace(/-/g, '−');
@@ -96,10 +97,10 @@ export const readable = (t) => R(t.replace(/\^2/g, '²').replace(/\^3/g, '³').r
 // Formulas D_h f(x̄) = Σ cⱼ f(x̄ + kⱼh) / h for f′ (order 2): offsets and
 // letters of the coefficients, in the order of the formula.
 export const STENCILS = [
-  { id: 'back', ks: [0, -1, -2], name: 'rétrograde à trois points' },
-  { id: 'fwd', ks: [0, 1, 2], name: 'progressive à trois points' },
-  { id: 'cent', ks: [-1, 0, 1], name: 'centrée' },
-  { id: 'skew', ks: [-1, 0, 2], name: 'décentrée' },
+  { id: 'back', ks: [0, -1, -2], name: t('rétrograde à trois points') },
+  { id: 'fwd', ks: [0, 1, 2], name: t('progressive à trois points') },
+  { id: 'cent', ks: [-1, 0, 1], name: t('centrée') },
+  { id: 'skew', ks: [-1, 0, 2], name: t('décentrée') },
 ];
 export const LETTERS = ['α', 'β', 'γ'];
 
@@ -121,7 +122,7 @@ export function stencilData(s) {
   const c = solve3(M, [0, 1, 0]);
   const err = c.reduce((acc, cj, j) => acc.add(cj.mul(s.ks[j] ** 3).div(6)), new Q(0));
   // Proof constant: Σ |cⱼ kⱼ³|/6 (each remainder has its own ξ).
-  const C = c.reduce((acc, cj, j) => { const t = cj.mul(s.ks[j] ** 3).div(6); return acc.add(t.n < 0 ? t.neg() : t); }, new Q(0));
+  const C = c.reduce((acc, cj, j) => { const v = cj.mul(s.ks[j] ** 3).div(6); return acc.add(v.n < 0 ? v.neg() : v); }, new Q(0));
   return { ...s, c, err, C, rows: M };
 }
 // The formula as HTML: (3f(x̄) − 4f(x̄ − h) + f(x̄ − 2h))/(2h), over a common denominator.

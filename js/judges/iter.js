@@ -43,6 +43,7 @@ import { lexicon, parseFormula, truthOf } from '../cas/logic.js';
 import { closedHolds } from '../cas/sets.js';
 import { checkPower } from './iter-power.js'; // step U8: the power method
 import { checkNum, NUM_KINDS } from './iter-num.js'; // step U9: module N
+import { t as tr } from '../i18n.js';
 
 export const num = (t) => {
   if (t === null || t === undefined || String(t).trim() === '') return null;
@@ -85,7 +86,7 @@ function checkHorner(item, values) {
   // The root.
   if (rootCell?.input) {
     cells.root = eqQ(root, a);
-    if (!cells.root && root && root.eq(a.neg())) { rule = 'g0_horner_sign'; message = `Pour diviser par x − (${a}), on utilise ${a}.`; }
+    if (!cells.root && root && root.eq(a.neg())) { rule = 'g0_horner_sign'; message = tr('Pour diviser par x − ({a}), on utilise {a}.', { a }); }
   }
   // The coefficients.
   const coefRow = g.coef.map(num);
@@ -93,7 +94,7 @@ function checkHorner(item, values) {
   if (coefInputs) {
     coefRow.forEach((c, j) => mark('coef', j, eqQ(c, coefs[j])));
     const nonzero = coefs.filter((c) => c.n !== 0);
-    if (nonzero.length < n && nonzero.every((c, j) => eqQ(coefRow[j], c))) { rule ||= 'g0_horner_zero'; message ||= 'Il manque un coefficient nul : chaque puissance de x a sa case, même avec un 0.'; }
+    if (nonzero.length < n && nonzero.every((c, j) => eqQ(coefRow[j], c))) { rule ||= 'g0_horner_zero'; message ||= tr('Il manque un coefficient nul : chaque puissance de x a sa case, même avec un 0.'); }
   }
   const r = root ?? a;
   if (phi.kind === 'horner') {
@@ -219,7 +220,7 @@ function checkSigns(item, values) {
       const mine = g[f.id].map(sign);
       if (z >= 0 && (mine.every((x, j) => x === flipped[j]) || mine.every((x, j) => x === flippedL[j]))) {
         rule = 'g1_sign_even_root';
-        message = 'Un carré est toujours ≥ 0 : il ne change pas de signe en sa racine.';
+        message = tr('Un carré est toujours ≥ 0 : il ne change pas de signe en sa racine.');
       }
     }
   }
@@ -275,7 +276,7 @@ function checkBisection(item, values) {
       return okFm;
     });
     if (prev && want && a && b && !(eqQ(a, want[0]) && eqQ(b, want[1])) && ((eqQ(a, prev.m) && eqQ(b, prev.b)) || (eqQ(a, prev.a) && eqQ(b, prev.m)))) {
-      message ||= 'Garde la moitié où f change de signe : compare le signe de f(m) à celui de f(a).';
+      message ||= tr('Garde la moitié où f change de signe : compare le signe de f(m) à celui de f(a).');
     }
     prev = { a, b, m };
   }

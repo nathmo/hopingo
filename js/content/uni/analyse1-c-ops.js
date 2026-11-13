@@ -10,6 +10,7 @@ import {
 import { boxText, trapOptions, uText, plusU, fText, rd, substText, USUAL, coefOf } from './analyse1-c-dl.js';
 import { trapAnswers } from '../../judges/diagnose.js';
 import { parse } from '../../cas/parse.js';
+import { t } from '../../i18n.js';
 
 const US = 'a1-dl-usual';
 const cT = (c) => `(${c.toString()})`;
@@ -42,9 +43,9 @@ export function productLines(A, B, n) {
   const dup = terms.some((t, i) => i && terms[i - 1].k === t.k);
   const fin = dlText(`(${A})×(${B})`, n);
   const lines = [
-    E(`(${pa})×(${pb})`, 'DL des deux facteurs', 'factors', 'factors'),
-    ...(dup ? [E(joinTerms([...terms.map((t) => ({ neg: t.c.n < 0, text: termAbs(t.c, t.k) })), { neg: false, text: remText(n) }]), `Développer, garder les termes de degré ≤ ${n}`, 'expand', 'expand')] : []),
-    E(fin, dup ? 'Réduire' : `Développer, garder les termes de degré ≤ ${n}`, 'trunc', 'trunc'),
+    E(`(${pa})×(${pb})`, t('DL des deux facteurs'), 'factors', 'factors'),
+    ...(dup ? [E(joinTerms([...terms.map((t) => ({ neg: t.c.n < 0, text: termAbs(t.c, t.k) })), { neg: false, text: remText(n) }]), t('Développer, garder les termes de degré ≤ {n}', { n }), 'expand', 'expand')] : []),
+    E(fin, dup ? t('Réduire') : t('Développer, garder les termes de degré ≤ {n}', { n }), 'trunc', 'trunc'),
   ];
   return { lines, fin, pa, pb };
 }
@@ -59,25 +60,25 @@ export function quotientLines(Nt, Dt, n, { exactDen = false } = {}) {
   const cd = coefs(Dt, W);
   const one = Nt === '1';
   const lines = [];
-  if (!exactDen) lines.push(E(one ? `1/(${polyText(cd, { rem: W })})` : `(${polyText(cn, { rem: W })})/(${polyText(cd, { rem: W })})`, 'DL du numérateur et du dénominateur', 'factors', 'factors'));
+  if (!exactDen) lines.push(E(one ? `1/(${polyText(cd, { rem: W })})` : `(${polyText(cn, { rem: W })})/(${polyText(cd, { rem: W })})`, t('DL du numérateur et du dénominateur'), 'factors', 'factors'));
   const sn = cn.slice(v);
   const sd = cd.slice(v);
-  if (v > 0) lines.push(E(`(${polyText(sn, { rem: n })})/(${polyText(sd, { rem: n })})`, `Simplifier par x${v > 1 ? `^${v}` : ''}`, 'trunc', 'xfactor'));
+  if (v > 0) lines.push(E(`(${polyText(sn, { rem: n })})/(${polyText(sd, { rem: n })})`, t('Simplifier par x{p1}', { p1: v > 1 ? `^${v}` : '' }), 'trunc', 'xfactor'));
   const c = sd[0];
   const w = sd.map((x, k) => (k === 0 ? q(0) : x.div(c)));
   const front = c.eq(1) ? '' : `${cT(q(1).div(c))}×`;
   const num = one ? '' : `(${polyText(sn.slice(0, n + 1))})×`;
-  lines.push(E(`${front}${num}(${invText(w, n)})+${remText(n)}`, c.eq(1) ? '1/(1 + u) = 1 − u + u² − …' : `Constante ${c.toString().replace('-', '−')} en facteur, puis 1/(1 + u) = 1 − u + u² − …`, 'trunc', 'inverse'));
+  lines.push(E(`${front}${num}(${invText(w, n)})+${remText(n)}`, c.eq(1) ? '1/(1 + u) = 1 − u + u² − …' : t('Constante {p1} en facteur, puis 1/(1 + u) = 1 − u + u² − …', { p1: c.toString().replace('-', '−') }), 'trunc', 'inverse'));
   const fin = dlText(`(${Nt})/(${Dt})`, n);
-  lines.push(E(fin, `Développer, garder les termes de degré ≤ ${n}`, 'trunc', 'trunc'));
+  lines.push(E(fin, t('Développer, garder les termes de degré ≤ {n}', { n }), 'trunc', 'trunc'));
   return { lines, fin, v, c, w };
 }
 
 const OP = 'a1-dl-ops';
 const OP_SUB = [
-  { id: 'factors', label: 'DL des facteurs', skill: US },
-  { id: 'expand', label: 'développer', skill: 'lit-polynomial' },
-  { id: 'trunc', label: 'tronquer', skill: OP },
+  { id: 'factors', label: t('DL des facteurs'), skill: US },
+  { id: 'expand', label: t('développer'), skill: 'lit-polynomial' },
+  { id: 'trunc', label: t('tronquer'), skill: OP },
 ];
 const ex = (a) => (a.eq(1) ? 'e^x' : `e^(${uText(a)})`);
 const fn1 = (name, a) => `${name}(${uText(a)})`;
@@ -134,10 +135,10 @@ export function opData(rng, kinds, { n, den = 360 } = {}) {
 }
 
 const OP_CHOICES = (d) => [
-  { id: 'factors', label: d.kind === 'quot' ? 'Écrire le DL du numérateur et du dénominateur' : `Écrire le DL de chaque facteur à l'ordre ${d.n}` },
-  ...(d.kind === 'quot' ? [{ id: 'xfactor', label: 'Simplifier par la puissance de x du dénominateur' }, { id: 'inverse', label: 'Écrire 1/(1 + u) = 1 − u + u² − … (constante en facteur)' }] : [{ id: 'expand', label: 'Développer le produit, sans encore réduire' }]),
-  { id: 'trunc', label: `Développer, réduire et garder les termes de degré ≤ ${d.n}` },
-  { id: 'early', label: `Arrêter un facteur à ${xp(d.n - 1)}`, rule: 'a1_dl_truncate_early', why: 'Il manquerait des termes : chaque facteur doit aller assez loin pour donner tous les termes de degré ≤ n.' },
+  { id: 'factors', label: d.kind === 'quot' ? t('Écrire le DL du numérateur et du dénominateur') : t('Écrire le DL de chaque facteur à l\'ordre {n}', { n: d.n }) },
+  ...(d.kind === 'quot' ? [{ id: 'xfactor', label: t('Simplifier par la puissance de x du dénominateur') }, { id: 'inverse', label: t('Écrire 1/(1 + u) = 1 − u + u² − … (constante en facteur)') }] : [{ id: 'expand', label: t('Développer le produit, sans encore réduire') }]),
+  { id: 'trunc', label: t('Développer, réduire et garder les termes de degré ≤ {n}', { n: d.n }) },
+  { id: 'early', label: t('Arrêter un facteur à {p1}', { p1: xp(d.n - 1) }), rule: 'a1_dl_truncate_early', why: t('Il manquerait des termes : chaque facteur doit aller assez loin pour donner tous les termes de degré ≤ n.') },
 ];
 
 // The terms of a DL text (without the remainder), as texts.
@@ -181,17 +182,17 @@ function opItem(level, rng, profile, opts) {
   const judge = { kind: 'series', v: V, at: 0, order: d.n };
   // Level 2: how far to develop each piece.
   const pre = level !== 2 ? [] : [{
-    kind: 'decision', prompt: d.kind === 'prod' ? 'Jusqu\'où développer chaque facteur ?' : 'Jusqu\'où développer le numérateur et le dénominateur ?', options: rng.shuffle([
-      { id: 'n', label: `Jusqu'à ${xp(d.n + (b.v || 0))}`, valid: true, ref: true },
-      { id: 'early', label: `Jusqu'à ${xp(d.n + (b.v || 0) - 1)}`, valid: false, rule: 'a1_dl_truncate_early', why: `Il manquerait des termes de degré ${d.n} dans le résultat.` },
-      { id: 'deriv', label: `Ne pas développer : dériver ${d.n} fois`, valid: true, quality: 'poor', why: 'Juste (Taylor), mais bien plus long que de combiner les DL usuels.' },
+    kind: 'decision', prompt: d.kind === 'prod' ? t('Jusqu\'où développer chaque facteur ?') : t('Jusqu\'où développer le numérateur et le dénominateur ?'), options: rng.shuffle([
+      { id: 'n', label: t('Jusqu\'à {p1}', { p1: xp(d.n + (b.v || 0)) }), valid: true, ref: true },
+      { id: 'early', label: t('Jusqu\'à {p1}', { p1: xp(d.n + (b.v || 0) - 1) }), valid: false, rule: 'a1_dl_truncate_early', why: t('Il manquerait des termes de degré {n} dans le résultat.', { n: d.n }) },
+      { id: 'deriv', label: t('Ne pas développer : dériver {n} fois', { n: d.n }), valid: true, quality: 'poor', why: t('Juste (Taylor), mais bien plus long que de combiner les DL usuels.') },
     ]),
   }];
   const parts = [{ start: b.f, judge, lines: opBlanks(b, d, level), pre, choices: OP_CHOICES(d) }];
   const as = assemble(parts, level);
-  const method = d.kind === 'prod' ? `Multiplie les deux DL et ne garde que les termes de degré ≤ ${d.n}.` : `Développe le haut et le bas, mets le dénominateur sous la forme c(1 + u), puis 1/(1 + u) = 1 − u + u² − …${b.v ? ' Le dénominateur commence par x : simplifie d\'abord par x (il faut un ordre de plus en haut et en bas).' : ''}`;
+  const method = d.kind === 'prod' ? t('Multiplie les deux DL et ne garde que les termes de degré ≤ {n}.', { n: d.n }) : t('Développe le haut et le bas, mets le dénominateur sous la forme c(1 + u), puis 1/(1 + u) = 1 − u + u² − …{p1}', { p1: b.v ? t(' Le dénominateur commence par x : simplifie d\'abord par x (il faut un ordre de plus en haut et en bas).') : '' });
   return linesItem({
-    skill: OP, level, prompt: `Écris le DL d'ordre ${d.n} de ${MT(b.f)} en 0.`,
+    skill: OP, level, prompt: t('Écris le DL d\'ordre {n} de {f} en 0.', { n: d.n, f: MT(b.f) }),
     ...as, mode: modeOf(level),
     hints: H(method, boxText(blankDL(b.fin, (j) => (j > 0 ? 'coef' : false))), MT(b.fin)),
     subgoals: OP_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -212,7 +213,7 @@ function opMcq(rng) {
   const flip = polyText(b.cs.map((c, j) => (j === k ? c.neg() : c)), { rem: d.n });
   const options = uniq([{ html: rightHtml, correct: true }, ...sorted.slice(0, 2), { html: MT(flip), correct: false }, ...sorted.slice(2)]).slice(0, 4);
   return mcq({
-    skill: OP, level: 4, prompt: `Le DL d'ordre ${d.n} de ${MT(b.f)} en 0 est :`, options, key: `mcq:${b.f}:${d.n}`,
+    skill: OP, level: 4, prompt: t('Le DL d\'ordre {n} de {f} en 0 est :', { n: d.n, f: MT(b.f) }), options, key: `mcq:${b.f}:${d.n}`,
     exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: !!d.fallback,
     solution: b.lines.map((l) => ({ html: `= ${MT(l.math)}`, note: l.note })),
   }, rng);
@@ -223,28 +224,28 @@ function opTf(rng) {
   if (kind === 'cube' || kind === 'square') {
     const cube = kind === 'cube';
     const s = cube
-      ? 'Pour tous réels a, b, c : si f(x) = a + bx + cx² + x²·ε(x), alors f(x)³ = a³ + b³x + c³x² + x²·ε(x).'
-      : 'Pour tous réels b, c : si f(x) = 1 + bx + cx² + x²·ε(x), alors f(x)² = 1 + b²x + c²x² + x²·ε(x).';
+      ? t('Pour tous réels a, b, c : si f(x) = a + bx + cx² + x²·ε(x), alors f(x)³ = a³ + b³x + c³x² + x²·ε(x).')
+      : t('Pour tous réels b, c : si f(x) = 1 + bx + cx² + x²·ε(x), alors f(x)² = 1 + b²x + c²x² + x²·ε(x).');
     const quants = (cube ? ['a', 'b', 'c'] : ['b', 'c']).map((v) => ({ q: '∀', v, dom: 'R' }));
     return tfItem({
       skill: OP, level: 4, truth: false, key: kind, statement: s, ruleIfTrue: 'a1_dl_cube_coeffs',
       counter: { kind: 'refute', quants, pred: cube ? '3a^2b=b^3∧3a^2c+3a×b^2=c^3' : '2b=b^2∧2c+b^2=c^2', ask: quants.map((x) => ({ v: x.v, label: `${x.v} =` })), answer: cube ? { a: '1', b: '1', c: '0' } : { b: '1', c: '0' } },
-      explanation: cube ? 'Faux (examen 2021) : avec f = 1 + x, f³ = 1 + 3x + 3x² + x³, et non 1 + x. Une puissance ne se distribue pas sur une somme.' : 'Faux : avec f = 1 + x, f² = 1 + 2x + x², et non 1 + x. Il faut développer, avec les doubles produits.',
+      explanation: cube ? t('Faux (examen 2021) : avec f = 1 + x, f³ = 1 + 3x + 3x² + x³, et non 1 + x. Une puissance ne se distribue pas sur une somme.') : t('Faux : avec f = 1 + x, f² = 1 + 2x + x², et non 1 + x. Il faut développer, avec les doubles produits.'),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
   if (kind === 'prod') {
     return tfItem({
       skill: OP, level: 4, truth: true, key: 'prod',
-      statement: 'Si f(x) = x + x²·ε(x) et g(x) = 1 + x + x·ε(x), alors f(x)·g(x) = x + x² + x²·ε(x).',
-      explanation: 'Vrai : f commence en x, donc le reste x·ε(x) de g devient x²·ε(x) dans le produit ; x·(1 + x) = x + x² jusqu\'à l\'ordre 2.',
+      statement: t('Si f(x) = x + x²·ε(x) et g(x) = 1 + x + x·ε(x), alors f(x)·g(x) = x + x² + x²·ε(x).'),
+      explanation: t('Vrai : f commence en x, donc le reste x·ε(x) de g devient x²·ε(x) dans le produit ; x·(1 + x) = x + x² jusqu\'à l\'ordre 2.'),
       exam: { format: 'tf', points: 1 }, expectedSec: 60,
     });
   }
   return tfItem({
     skill: OP, level: 4, truth: true, key: 'inv',
-    statement: 'Si f(x) = 2 + 3x + x·ε(x), alors 1/f(x) = 1/2 − 3x/4 + x·ε(x).',
-    explanation: 'Vrai : 1/f = (1/2)·1/(1 + 3x/2 + x·ε(x)) = (1/2)(1 − 3x/2) + x·ε(x) = 1/2 − 3x/4 + x·ε(x).',
+    statement: t('Si f(x) = 2 + 3x + x·ε(x), alors 1/f(x) = 1/2 − 3x/4 + x·ε(x).'),
+    explanation: t('Vrai : 1/f = (1/2)·1/(1 + 3x/2 + x·ε(x)) = (1/2)(1 − 3x/2) + x·ε(x) = 1/2 − 3x/4 + x·ε(x).'),
     exam: { format: 'tf', points: 1 }, expectedSec: 60,
   });
 }
@@ -256,9 +257,9 @@ function opTf(rng) {
 const CO = 'a1-dl-compose';
 const CO_SUB = [
   { id: 'limit', label: 'u → 0', skill: CO },
-  { id: 'recenter', label: 'recentrer', skill: CO },
-  { id: 'subst', label: 'substituer', skill: CO },
-  { id: 'powers', label: 'puissances tronquées', skill: OP },
+  { id: 'recenter', label: t('recentrer'), skill: CO },
+  { id: 'subst', label: t('substituer'), skill: CO },
+  { id: 'powers', label: t('puissances tronquées'), skill: OP },
 ];
 const par = (g) => (/[+-]/.test(g.replace(/\([^()]*\)/g, '').slice(1)) ? `(${g})` : g);
 const OUTER = {
@@ -337,32 +338,32 @@ function coBuild(d) {
   const wrap = (t) => (e ? `e×(${t})+${rem}` : `${t}+${rem}`);
   if (d.c) {
     const l1 = d.Fk === 'exp' ? `e×e^(${G}+${rem})` : d.Fk === 'ln' ? `ln(1+(${G}+${rem}))` : `√(1+(${G}+${rem}))`;
-    lines.push(E(l1, d.Fk === 'exp' ? `${rd(d.g)} → 1 : on sort e¹` : `${rd(d.g)} = 1 + u avec u → 0`, 'recenter', 'recenter'));
+    lines.push(E(l1, d.Fk === 'exp' ? t('{g} → 1 : on sort e¹', { g: rd(d.g) }) : t('{g} = 1 + u avec u → 0', { g: rd(d.g) }), 'recenter', 'recenter'));
   }
-  lines.push(E(wrap(substPoly(O.c, G, v, n)), `DL de ${O.name} avec u = ${rd(G)}`, 'subst', 'subst'));
-  lines.push(E(wrap(truncPowers(O.c, gs, G, v, n)), `Puissances de u, termes de degré ≤ ${n}`, 'powers', 'powers'));
+  lines.push(E(wrap(substPoly(O.c, G, v, n)), t('DL de {name} avec u = {G}', { name: O.name, G: rd(G) }), 'subst', 'subst'));
+  lines.push(E(wrap(truncPowers(O.c, gs, G, v, n)), t('Puissances de u, termes de degré ≤ {n}', { n }), 'powers', 'powers'));
   // e^g = e·e^(g − 1): the coefficients of e^(g − 1), times e.
   const cs = e ? coefs(`e^(${G})`, n) : coefs(f, n);
   const fin = polyText(cs, { rem: n, K: e ? 'e' : '' });
-  lines.push(E(fin, 'Réduire', 'subst', 'reduce'));
+  lines.push(E(fin, t('Réduire'), 'subst', 'reduce'));
   return { f, gs, G, v, cs, fin, lines, e };
 }
 
 const CO_CHOICES = (d) => [
-  ...(d.c ? [{ id: 'recenter', label: d.Fk === 'exp' ? 'Sortir la constante : e^(g) = e·e^(g − 1)' : 'Écrire g = 1 + u avec u → 0' }] : []),
-  { id: 'subst', label: 'Remplacer u par son DL dans le DL de f' },
-  { id: 'powers', label: `Calculer u², u³… en gardant les termes de degré ≤ ${d.n}` },
-  { id: 'reduce', label: 'Réduire' },
-  d.c ? { id: 'direct', label: 'Remplacer u par g(x) directement dans le DL de f en 0', rule: 'a1_dl_compose_nonzero_inner', why: 'g(x) tend vers 1, pas vers 0 : le DL de f en 0 ne s\'applique pas à u = g(x).' }
-    : { id: 'lead', label: 'Dans uᵏ, ne garder que le premier terme de u', rule: 'a1_dl_truncate_inner', why: 'Dans uᵏ, les autres termes de u donnent aussi des termes de degré ≤ n.' },
+  ...(d.c ? [{ id: 'recenter', label: d.Fk === 'exp' ? t('Sortir la constante : e^(g) = e·e^(g − 1)') : t('Écrire g = 1 + u avec u → 0') }] : []),
+  { id: 'subst', label: t('Remplacer u par son DL dans le DL de f') },
+  { id: 'powers', label: t('Calculer u², u³… en gardant les termes de degré ≤ {n}', { n: d.n }) },
+  { id: 'reduce', label: t('Réduire') },
+  d.c ? { id: 'direct', label: t('Remplacer u par g(x) directement dans le DL de f en 0'), rule: 'a1_dl_compose_nonzero_inner', why: t('g(x) tend vers 1, pas vers 0 : le DL de f en 0 ne s\'applique pas à u = g(x).') }
+    : { id: 'lead', label: t('Dans uᵏ, ne garder que le premier terme de u'), rule: 'a1_dl_truncate_inner', why: t('Dans uᵏ, les autres termes de u donnent aussi des termes de degré ≤ n.') },
 ];
 
 // Level 2: can u = g(x) go straight into the DL of f at 0?
 function coDecision(d, rng) {
   return {
-    kind: 'decision', prompt: `Peut-on mettre u = ${rd(d.g)} directement dans le DL de ${OUTER[d.Fk].name} en 0 ?`, options: rng.shuffle([
-      { id: 'yes', label: 'Oui : u tend vers 0', valid: !d.c, ...(d.c ? { rule: 'a1_dl_compose_nonzero_inner', why: `${rd(d.g)} tend vers 1, pas vers 0 : il faut recentrer.` } : { ref: true }) },
-      { id: 'no', label: 'Non : u tend vers 1, il faut recentrer', valid: !!d.c, ...(d.c ? { ref: true } : { why: `${rd(d.g)} tend vers 0 : le DL de f en 0 s'applique directement.` }) },
+    kind: 'decision', prompt: t('Peut-on mettre u = {g} directement dans le DL de {p1} en 0 ?', { g: rd(d.g), p1: OUTER[d.Fk].name }), options: rng.shuffle([
+      { id: 'yes', label: t('Oui : u tend vers 0'), valid: !d.c, ...(d.c ? { rule: 'a1_dl_compose_nonzero_inner', why: t('{g} tend vers 1, pas vers 0 : il faut recentrer.', { g: rd(d.g) }) } : { ref: true }) },
+      { id: 'no', label: t('Non : u tend vers 1, il faut recentrer'), valid: !!d.c, ...(d.c ? { ref: true } : { why: t('{g} tend vers 0 : le DL de f en 0 s\'applique directement.', { g: rd(d.g) }) }) },
     ]),
   };
 }
@@ -380,8 +381,8 @@ function coParts(d, level, rng) {
   }
   const limit = { kind: 'limit', v: V, to: '0' };
   const parts = [
-    { start: d.g, judge: limit, lines: [E(String(d.c), d.c ? 'u ne tend pas vers 0 : il faudra recentrer' : 'u → 0 : le DL de f en 0 s\'applique', 'limit')] },
-    { html: `DL d'ordre ${d.n} de ${MT(b.f)} en 0 :`, start: b.f, judge: { kind: 'series', v: V, at: 0, order: d.n }, lines, choices: CO_CHOICES(d), pre: level !== 2 ? [] : [coDecision(d, rng)] },
+    { start: d.g, judge: limit, lines: [E(String(d.c), d.c ? t('u ne tend pas vers 0 : il faudra recentrer') : t('u → 0 : le DL de f en 0 s\'applique'), 'limit')] },
+    { html: t('DL d\'ordre {n} de {f} en 0 :', { n: d.n, f: MT(b.f) }), start: b.f, judge: { kind: 'series', v: V, at: 0, order: d.n }, lines, choices: CO_CHOICES(d), pre: level !== 2 ? [] : [coDecision(d, rng)] },
   ];
   return { b, parts };
 }
@@ -395,11 +396,11 @@ function coItem(level, rng, profile, opts) {
   const as = assemble(parts, level);
   const O = OUTER[d.Fk];
   const m1 = d.c
-    ? `${rd(d.g)} tend vers 1 : ${d.Fk === 'exp' ? 'sors e¹ avant d\'utiliser le DL de l\'exponentielle' : 'écris-le 1 + u avec u → 0'}.`
-    : `u = ${rd(d.g)} tend vers 0 : remplace u par son DL dans celui de ${O.name}, et garde dans uᵏ tous les termes de degré ≤ ${d.n}.`;
+    ? t('{g} tend vers 1 : {p1}.', { g: rd(d.g), p1: d.Fk === 'exp' ? t('sors e¹ avant d\'utiliser le DL de l\'exponentielle') : t('écris-le 1 + u avec u → 0') })
+    : t('u = {g} tend vers 0 : remplace u par son DL dans celui de {name}, et garde dans uᵏ tous les termes de degré ≤ {n}.', { g: rd(d.g), name: O.name, n: d.n });
   return linesItem({
     skill: CO, level,
-    prompt: `Vérifie d'abord la limite en 0 de u = ${MT(d.g)}, puis écris le DL d'ordre ${d.n} de ${MT(b.f)} en 0.`,
+    prompt: t('Vérifie d\'abord la limite en 0 de u = {g}, puis écris le DL d\'ordre {n} de {f} en 0.', { g: MT(d.g), n: d.n, f: MT(b.f) }),
     ...as, mode: modeOf(level),
     hints: H(m1, boxText(blankDL(b.fin, (i) => (i > 0 ? 'coef' : false))), MT(b.fin)),
     subgoals: CO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
@@ -423,7 +424,7 @@ function coMcq(rng) {
   const linText = polyText(lin, { rem: d.n, K: b.e ? 'e' : '' });
   const options = uniq([{ html: rightHtml, correct: true }, ...sorted.slice(0, 2), { html: MT(flip), correct: false }, { html: MT(linText), correct: false }, ...sorted.slice(2)]).slice(0, 4);
   return mcq({
-    skill: CO, level: 4, prompt: `Le DL d'ordre ${d.n} de ${MT(b.f)} en 0 est :`, options, key: `mcq:${b.f}:${d.n}`,
+    skill: CO, level: 4, prompt: t('Le DL d\'ordre {n} de {f} en 0 est :', { n: d.n, f: MT(b.f) }), options, key: `mcq:${b.f}:${d.n}`,
     exam: { format: 'mcq', points: 1 }, expectedSec: 240, fallback: !!d.fallback,
     solution: b.lines.map((l) => ({ html: `= ${MT(l.math)}`, note: l.note })),
   }, rng);
@@ -444,7 +445,7 @@ function coCoef(rng) {
     } catch { /* skip */ }
   }
   return answerItem({
-    skill: CO, level: 4, prompt: `Dans le DL de ${MT(b.f)} en 0, quel est le coefficient de ${MT(`x^${k}`)} ?`,
+    skill: CO, level: 4, prompt: t('Dans le DL de {f} en 0, quel est le coefficient de {p1} ?', { f: MT(b.f), p1: MT(`x^${k}`) }),
     expected: want.toString(), traps: traps.slice(0, 4), key: `${b.f}:${k}`, exam: { format: 'coef', points: 1 }, fallback: !!d.fallback,
     solution: b.lines.map((l) => ({ html: `= ${MT(l.math)}`, note: l.note })),
   });

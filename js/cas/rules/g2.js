@@ -14,6 +14,7 @@ import { toReadable } from '../print.js';
 import { exactValue } from '../normal.js';
 import { evalFloat } from '../numeric.js';
 import { solutionSet, points, isFiniteSet } from '../sets.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(n));
 const P = (t) => (typeof t === 'string' ? parse(t) : t);
@@ -82,7 +83,7 @@ const baseOf = (f) => (f.name === 'logb' ? exactValue(f.args[0]) : null);
 export const RULES = [
   {
     id: 'g2_exp_sum', family: 'distribute', tag: 'E', skill: 'g2-real-powers', repair: 'g2-real-powers', judges: ['equiv'],
-    name: 'Somme dans l\'exposant lue comme une somme de puissances',
+    name: t('Somme dans l\'exposant lue comme une somme de puissances'),
     example: ['e^(x+2) = eˣ + e²', 'e^(x+2) = eˣ·e²'],
     check: { judge: { kind: 'equiv', vars: ['x'], domain: { x: [-2, 2] } }, prev: 'e^(x+2)', line: 'e^x+e^2' },
     transform: (prev) => [
@@ -97,11 +98,11 @@ export const RULES = [
         return { node: { t: 'pow', b: a.b, e: bin('×', par(a.e), par(b.e)) }, ctx: { base: a.b } };
       }),
     ],
-    explain: () => 'Une somme dans l\'exposant donne un produit : a^(u + v) = aᵘ·aᵛ. Avec x = 0 : e² ≈ 7,4, mais e⁰ + e² ≈ 8,4.',
+    explain: () => t('Une somme dans l\'exposant donne un produit : a^(u + v) = aᵘ·aᵛ. Avec x = 0 : e² ≈ 7,4, mais e⁰ + e² ≈ 8,4.'),
   },
   {
     id: 'g2_power_power', family: 'rule', tag: 'E', skill: 'g2-real-powers', repair: 'pow-rules', judges: ['equiv'],
-    name: 'Puissance d\'une puissance : exposants additionnés',
+    name: t('Puissance d\'une puissance : exposants additionnés'),
     example: ['(a^(1/2))⁶ = a^(13/2)', '(a^(1/2))⁶ = a³'],
     check: { judge: { kind: 'equiv', vars: ['a'], domain: { a: [0.2, 4] } }, prev: '(a^(1/2))^6', line: 'a^(13/2)' },
     transform: (prev) => each(prev, (n) => n.t === 'pow' && stripParen(n.b).t === 'pow', (n) => {
@@ -109,35 +110,35 @@ export const RULES = [
       return { node: { t: 'pow', b: inner.b, e: bin('+', par(inner.e), par(n.e)) }, ctx: { p: inner.e, q: n.e } };
     }),
     explain: (ctx = {}) => (ctx.p
-      ? `(aᵖ)ᵠ : on multiplie les exposants, ${toReadable(stripParen(ctx.p))} fois ${toReadable(stripParen(ctx.q))}. On les additionne seulement pour un produit aᵖ·aᵠ.`
-      : '(aᵖ)ᵠ = aᵖᵠ : on multiplie les exposants. On les additionne seulement pour un produit aᵖ·aᵠ.'),
+      ? t('(aᵖ)ᵠ : on multiplie les exposants, {p} fois {q}. On les additionne seulement pour un produit aᵖ·aᵠ.', { p: toReadable(stripParen(ctx.p)), q: toReadable(stripParen(ctx.q)) })
+      : t('(aᵖ)ᵠ = aᵖᵠ : on multiplie les exposants. On les additionne seulement pour un produit aᵖ·aᵠ.')),
   },
   {
     id: 'g2_log_sum', family: 'distribute', tag: 'R', skill: 'g2-log-rules', repair: 'g2-log-rules', judges: ['equiv'],
-    name: 'ln d\'une somme découpé en somme de ln',
-    example: ['ln(a + b) = ln a + ln b', 'ln(a + b) ne se découpe pas'],
+    name: t('ln d\'une somme découpé en somme de ln'),
+    example: ['ln(a + b) = ln a + ln b', t('ln(a + b) ne se découpe pas')],
     check: { judge: { kind: 'equiv', vars: ['x'], domain: { x: [0.2, 5] } }, prev: 'ln(x+2)', line: 'ln(x)+ln(2)' },
     transform: (prev) => each(prev, (n) => (isLn(n) || n.t === 'fn' && n.name === 'logb') && sumParts(n.name === 'logb' ? n.args[1] : n.args[0])?.op === '+', (n) => {
       const s = sumParts(n.name === 'logb' ? n.args[1] : n.args[0]);
       const f = (a) => (n.name === 'logb' ? { t: 'fn', name: 'logb', args: [n.args[0], a] } : { t: 'fn', name: n.name, args: [a] });
       return { node: bin('+', f(s.l), f(s.r)), ctx: { arg: n.name === 'logb' ? n.args[1] : n.args[0] } };
     }),
-    explain: () => 'ln(a + b) n\'a pas de règle. Avec a = b = 1 : ln 2 ≈ 0,69, mais ln 1 + ln 1 = 0. La règle ln(uv) = ln u + ln v vaut pour un produit, pas pour une somme.',
+    explain: () => t('ln(a + b) n\'a pas de règle. Avec a = b = 1 : ln 2 ≈ 0,69, mais ln 1 + ln 1 = 0. La règle ln(uv) = ln u + ln v vaut pour un produit, pas pour une somme.'),
   },
   {
     id: 'g2_log_power', family: 'rule', tag: 'E', skill: 'g2-log-rules', repair: 'g2-log-rules', judges: ['equiv'],
-    name: 'ln(Aᵖ) lu comme (ln A)ᵖ',
+    name: t('ln(Aᵖ) lu comme (ln A)ᵖ'),
     example: ['ln(x³) = (ln x)³', 'ln(x³) = 3 ln x'],
     check: { judge: { kind: 'equiv', vars: ['x'], domain: { x: [0.2, 5] } }, prev: 'ln(x^3)', line: 'ln(x)^3' },
     transform: (prev) => each(prev, (n) => isLn(n) && stripParen(n.args[0]).t === 'pow', (n) => {
       const p = stripParen(n.args[0]);
       return { node: { t: 'pow', b: { t: 'fn', name: n.name, args: [p.b] }, e: p.e }, ctx: { e: p.e } };
     }),
-    explain: (ctx = {}) => `L'exposant sort devant le logarithme : ln(Aᵖ) = p·ln A. Avec x = e : ln(e³) = 3, mais (ln e)³ = 1.${ctx.e ? '' : ''}`,
+    explain: () => t('L\'exposant sort devant le logarithme : ln(Aᵖ) = p·ln A. Avec x = e : ln(e³) = 3, mais (ln e)³ = 1.'),
   },
   {
     id: 'g2_log_quotient', family: 'rule', tag: 'E', skill: 'g2-log-rules', repair: 'g2-log-rules', judges: ['equiv'],
-    name: 'ln A − ln B confondu avec ln A / ln B',
+    name: t('ln A − ln B confondu avec ln A / ln B'),
     example: ['ln a − ln b = ln a / ln b', 'ln a − ln b = ln(a/b)'],
     check: { judge: { kind: 'equiv', vars: ['x'], domain: { x: [0.2, 5] } }, prev: 'ln(x)-ln(2)', line: 'ln(x)/ln(2)' },
     transform: (prev) => [
@@ -147,12 +148,12 @@ export const RULES = [
         return { node: { t: 'frac', n: { t: 'fn', name: n.name, args: [f.n] }, d: { t: 'fn', name: n.name, args: [f.d] } } };
       }),
     ],
-    explain: () => 'ln(a/b) = ln a − ln b : une différence, pas un quotient. Par exemple ln 8 / ln 2 = 3, mais ln(8/2) = ln 4 ≈ 1,39.',
+    explain: () => t('ln(a/b) = ln a − ln b : une différence, pas un quotient. Par exemple ln 8 / ln 2 = 3, mais ln(8/2) = ln 4 ≈ 1,39.'),
   },
   {
     id: 'g2_exp_neg_t', family: 'method', tag: 'E', skill: 'g2-exp-eq', repair: 'g2-exp-eq', judges: ['solset'],
-    name: 'Racine t négative gardée : eˣ = −2',
-    example: ['t = −2 gardé : x = ln(−2)', 'eˣ = −2 n\'a pas de solution'],
+    name: t('Racine t négative gardée : eˣ = −2'),
+    example: [t('t = −2 gardé : x = ln(−2)'), t('eˣ = −2 n\'a pas de solution')],
     check: { judge: { kind: 'solset', v: 'x', subst: { t: 'e^x' } }, prev: 't^2-t-6=0', line: 'x=ln(3) ou x=ln(-2)' },
     transform: (prev, ctx) => {
       const cfg = ctx?.cfg || {};
@@ -168,11 +169,11 @@ export const RULES = [
       }
       return out;
     },
-    explain: (ctx = {}) => (ctx.t ? `eˣ est toujours > 0 : eˣ = ${toReadable(boundNode(ctx.t))} n'a pas de solution. Cette racine du trinôme est à rejeter.` : 'eˣ est toujours > 0 : une racine t ≤ 0 du trinôme ne donne aucun x.'),
+    explain: (ctx = {}) => (ctx.t ? t('eˣ est toujours > 0 : eˣ = {v} n\'a pas de solution. Cette racine du trinôme est à rejeter.', { v: toReadable(boundNode(ctx.t)) }) : t('eˣ est toujours > 0 : une racine t ≤ 0 du trinôme ne donne aucun x.')),
   },
   {
     id: 'g2_log_domain', family: 'method', tag: 'E', skill: 'g2-log-eq', repair: 'g1-domain', judges: ['solset'],
-    name: 'Solutions gardées hors du domaine',
+    name: t('Solutions gardées hors du domaine'),
     example: ['S = {−3 ; 3}', 'S = {3}'],
     check: { judge: { kind: 'solset', v: 'x', onDomain: true, logs: true }, prev: 'log_2(x-1)+log_2(x+1)=3', line: '{-3;3}' },
     transform: (prev, ctx) => {
@@ -180,22 +181,22 @@ export const RULES = [
       const merged = mergeLogs(prev);
       return [{ node: prev, ctx: {} }, { node: merged, ctx: {} }];
     },
-    explain: () => 'Une solution doit être dans le domaine : chaque logarithme doit exister. Remplace la valeur dans l\'équation de départ : un ln d\'un nombre ≤ 0 n\'existe pas.',
+    explain: () => t('Une solution doit être dans le domaine : chaque logarithme doit exister. Remplace la valeur dans l\'équation de départ : un ln d\'un nombre ≤ 0 n\'existe pas.'),
   },
   {
     id: 'g2_log_square_abs', family: 'rule', tag: 'E', skill: 'g2-log-eq', repair: 'g2-log-rules', judges: ['solset', 'equiv'],
-    name: 'ln(x²) = 2 ln x, sans valeur absolue',
+    name: t('ln(x²) = 2 ln x, sans valeur absolue'),
     example: ['ln(x²) = 2 ln x', 'ln(x²) = 2 ln|x|'],
     check: { judge: { kind: 'solset', v: 'x', onDomain: true }, prev: 'ln(x^2)=2ln(x+2)', line: '2ln(x)=2ln(x+2)' },
     transform: (prev) => each(prev, (n) => isLn(n) && stripParen(n.args[0]).t === 'pow' && exactValue(stripParen(n.args[0]).e)?.n % 2 === 0, (n) => {
       const p = stripParen(n.args[0]);
       return { node: bin('×', p.e, { t: 'fn', name: n.name, args: [p.b] }), ctx: { b: p.b } };
     }),
-    explain: () => 'ln((−2)²) = ln 4 existe, mais 2 ln(−2) non. Pour tout x ≠ 0 : ln(x²) = 2 ln|x|.',
+    explain: () => t('ln((−2)²) = ln 4 existe, mais 2 ln(−2) non. Pour tout x ≠ 0 : ln(x²) = 2 ln|x|.'),
   },
   {
     id: 'g2_base_lt1', family: 'sign', tag: 'E', skill: 'g2-ineq', repair: 'g2-ineq', judges: ['solset'],
-    name: 'Base < 1 : inégalité pas retournée',
+    name: t('Base < 1 : inégalité pas retournée'),
     example: ['log_{1/3}(2x − 1) > log_{1/3}(x + 2) → 2x − 1 > x + 2', '2x − 1 < x + 2'],
     check: { judge: { kind: 'solset', v: 'x', onDomain: true }, prev: 'log_(1/3)(2x-1)>log_(1/3)(x+2)', line: '2x-1>x+2' },
     transform: (prev) => {
@@ -212,11 +213,13 @@ export const RULES = [
       const inner = (f) => (f.t === 'fn' ? f.args[1] : f.e);
       return [{ node: { t: 'rel', op: n.op, l: inner(a), r: inner(b) }, ctx: { base: a.t === 'fn' ? a.args[0] : a.b } }];
     },
-    explain: (ctx = {}) => `Avec une base < 1${ctx.base ? ` (ici ${toReadable(stripParen(ctx.base))})` : ''}, la fonction est décroissante : le plus grand logarithme a le plus petit argument. Par exemple log_{1/3} 9 = −2 < log_{1/3} 3 = −1, alors que 9 > 3. L'inégalité se retourne.`,
+    explain: (ctx = {}) => (ctx.base
+      ? t('Avec une base < 1 (ici {b}), la fonction est décroissante : le plus grand logarithme a le plus petit argument. Par exemple log_{1/3} 9 = −2 < log_{1/3} 3 = −1, alors que 9 > 3. L\'inégalité se retourne.', { b: toReadable(stripParen(ctx.base)) })
+      : t('Avec une base < 1, la fonction est décroissante : le plus grand logarithme a le plus petit argument. Par exemple log_{1/3} 9 = −2 < log_{1/3} 3 = −1, alors que 9 > 3. L\'inégalité se retourne.')),
   },
   {
     id: 'g2_xx_lost_one', family: 'method', tag: 'E', skill: 'g2-xx', repair: 'g2-xx', judges: ['solset'],
-    name: 'Solution x = 1 perdue (division par ln x)',
+    name: t('Solution x = 1 perdue (division par ln x)'),
     example: ['S = {2}', 'S = {1 ; 2}'],
     check: { judge: { kind: 'solset', v: 'x', domain: ']0;+∞[' }, prev: '2x ln(x)=x^2 ln(x)', line: '2x=x^2' },
     transform: (prev, ctx) => {
@@ -242,11 +245,11 @@ export const RULES = [
       }
       return out;
     },
-    explain: () => 'x = 1 est solution : 1 à n\'importe quelle puissance vaut 1. On ne divise pas par ln x : c\'est le facteur ln x = 0 qui donne x = 1.',
+    explain: () => t('x = 1 est solution : 1 à n\'importe quelle puissance vaut 1. On ne divise pas par ln x : c\'est le facteur ln x = 0 qui donne x = 1.'),
   },
   {
     id: 'g2_hyp_trig_sign', family: 'sign', tag: 'E', skill: 'g2-hyp-formulas', repair: 'g2-hyp-def', judges: ['equiv'],
-    name: 'Signe de la trigonométrie dans une formule hyperbolique',
+    name: t('Signe de la trigonométrie dans une formule hyperbolique'),
     example: ['cosh 2x = cosh²x − sinh²x', 'cosh 2x = cosh²x + sinh²x'],
     check: { judge: { kind: 'equiv', vars: ['x'], domain: { x: [-2, 2] } }, prev: 'cosh(2x)', line: 'cosh(x)^2-sinh(x)^2' },
     transform: (prev) => {
@@ -264,11 +267,11 @@ export const RULES = [
       out.push(...each(prev, (n) => n.t === 'bin' && (n.op === '+' || n.op === '-') && contains(n.r, (m) => m.t === 'fn' && (m.name === 'sinh' || m.name === 'tanh')), (n) => ({ node: { ...n, op: n.op === '+' ? '-' : '+' } })));
       return out;
     },
-    explain: () => 'cosh²x − sinh²x vaut 1, pas cosh 2x. Les formules hyperboliques ont un + là où la trigonométrie a un − : cosh 2x = cosh²x + sinh²x. Refais le calcul avec les exponentielles pour t\'en convaincre.',
+    explain: () => t('cosh²x − sinh²x vaut 1, pas cosh 2x. Les formules hyperboliques ont un + là où la trigonométrie a un − : cosh 2x = cosh²x + sinh²x. Refais le calcul avec les exponentielles pour t\'en convaincre.'),
   },
   {
     id: 'g2_cosh_one_root', family: 'method', tag: 'E', skill: 'g2-hyp-eq', repair: 'g2-arg', judges: ['solset'],
-    name: 'cosh x = a : une seule solution gardée',
+    name: t('cosh x = a : une seule solution gardée'),
     example: ['cosh x = 5/3 : S = {ln 3}', 'S = {−ln 3 ; ln 3}'],
     check: { judge: { kind: 'solset', v: 'x', subst: { t: 'e^x' } }, prev: 't=3 ou t=1/3', line: 'x=ln(3)' },
     transform: (prev, ctx) => {
@@ -289,11 +292,11 @@ export const RULES = [
       }
       return out;
     },
-    explain: () => 'cosh est paire : si x est solution, −x aussi. La racine t < 1 du trinôme donne la solution négative (eˣ = 1/3 : x = −ln 3).',
+    explain: () => t('cosh est paire : si x est solution, −x aussi. La racine t < 1 du trinôme donne la solution négative (eˣ = 1/3 : x = −ln 3).'),
   },
   {
     id: 'g2_argsh_sign', family: 'sign', tag: 'E', skill: 'g2-arg', repair: 'g2-arg', judges: ['solset'],
-    name: 'Racine négative gardée pour eᵘ',
+    name: t('Racine négative gardée pour eᵘ'),
     example: ['eᵘ = y − √(y² + 1)', 'eᵘ = y + √(y² + 1)'],
     check: { judge: { kind: 'solset', v: 'u', subst: { t: 'e^u' }, params: { y: 'ℝ' } }, prev: 't^2-2yt-1=0', line: 't=y-sqrt(y^2+1)' },
     // With a parameter and t = eᵘ: the negative root alone gives no u at
@@ -306,7 +309,7 @@ export const RULES = [
       if (n.t === 'logic' && n.op === 'or') out.push({ node: n.l, ctx: {} }, { node: n.r, ctx: {} });
       return out;
     },
-    explain: () => 'y − √(y² + 1) est toujours < 0, car √(y² + 1) > |y|. Or eᵘ > 0 : seule la racine y + √(y² + 1) convient.',
+    explain: () => t('y − √(y² + 1) est toujours < 0, car √(y² + 1) > |y|. Or eᵘ > 0 : seule la racine y + √(y² + 1) convient.'),
   },
 ];
 

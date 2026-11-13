@@ -7,12 +7,14 @@
 // « Je passe cette étape » gives up the current step (no points) and goes on.
 
 import { h, html, play } from './dom.js';
+import { t, LANG } from '../i18n.js';
 import { mountLines } from './lines.js';
 import { ProblemRun, resumeRun, pendingOf } from '../judges/problem.js';
 import { solutionHtml } from './exercises.js';
 
-const fr = (x) => String(x).replace('.', ',');
-const pts = (x) => `${fr(x)} pt${x > 1 ? 's' : ''}`;
+// Decimal comma in French, point in English.
+const fr = (x) => (LANG === 'fr' ? String(x).replace('.', ',') : String(x));
+const pts = (x) => t(x > 1 ? '{x} pts' : '{x} pt', { x: fr(x) });
 
 export function mountProblem(item, ctx, body, mountPart) {
   const run = item.resumeLog ? resumeRun({ item, log: item.resumeLog }) : new ProblemRun(item);
@@ -38,13 +40,13 @@ export function mountProblem(item, ctx, body, mountPart) {
         const current = i === run.part && (!lr || lr.seg === s) && !run.done;
         const finished = i < run.part || run.done || (lr && (lr.done || s < lr.seg));
         const state = !finished ? (current ? '▶' : '·') : st.got === st.max ? '✔' : '✖';
-        const title = item.titles?.[i]?.[s] ?? `Étape ${s + 1}`;
+        const title = item.titles?.[i]?.[s] ?? t('Étape {n}', { n: s + 1 });
         rows.push(h(`div.problem-step${current ? '.current' : ''}${finished ? (st.got === st.max ? '.right' : '.missed') : ''}`,
           h('span.problem-mark', state), h('span.problem-title', html(title)),
           h('span.problem-points', finished ? `${fr(st.got)} / ${pts(st.max)}` : pts(st.max))));
       });
     });
-    board.replaceChildren(h('div.problem-head', h('b', 'Barème'), h('span', `${fr(sc.got)} / ${pts(sc.max)}`)), ...rows);
+    board.replaceChildren(h('div.problem-head', h('b', t('Barème')), h('span', `${fr(sc.got)} / ${pts(sc.max)}`)), ...rows);
   }
 
   function onChange() {
@@ -77,7 +79,7 @@ export function mountProblem(item, ctx, body, mountPart) {
         complete: (outcome) => answered(outcome),
       }, el);
       if (!ctrl.ownFlow) {
-        checkBtn = h('button.btn.primary.wide', { disabled: true, onclick: () => check() }, 'Vérifier');
+        checkBtn = h('button.btn.primary.wide', { disabled: true, onclick: () => check() }, t('Vérifier'));
       }
     }
     partBox.append(el);
@@ -86,7 +88,7 @@ export function mountProblem(item, ctx, body, mountPart) {
   }
 
   function paintTools() {
-    tools.replaceChildren(h('button.btn.small.ghost', { type: 'button', onclick: () => skip() }, 'Je passe cette étape'));
+    tools.replaceChildren(h('button.btn.small.ghost', { type: 'button', onclick: () => skip() }, t('Je passe cette étape')));
   }
 
   function check() {
@@ -98,7 +100,7 @@ export function mountProblem(item, ctx, body, mountPart) {
 
   function answered(outcome) {
     play(outcome.correct ? 'good' : 'bad');
-    if (!outcome.correct && outcome.answerHtml) partBox.append(h('div.fb-answer', h('small', 'Bonne réponse'), html(outcome.answerHtml)));
+    if (!outcome.correct && outcome.answerHtml) partBox.append(h('div.fb-answer', h('small', t('Bonne réponse')), html(outcome.answerHtml)));
     run.answer(outcome);
   }
 
@@ -117,7 +119,7 @@ export function mountProblem(item, ctx, body, mountPart) {
     tools.replaceChildren();
     const o = run.outcome();
     const sc = run.score();
-    const explain = `<p><b>Score : ${fr(sc.got)} / ${pts(sc.max)}</b></p>${solutionHtml(item.solution)}`;
+    const explain = `<p><b>${t('Score : {got} / {max}', { got: fr(sc.got), max: pts(sc.max) })}</b></p>${solutionHtml(item.solution)}`;
     ctx.complete({
       ...o,
       answerHtml: o.correct ? '' : `${fr(sc.got)} / ${pts(sc.max)}`,

@@ -37,6 +37,7 @@ import { quad } from '../cas/integrate.js';
 import { limit } from '../cas/limit.js';
 import { symbolsIn } from '../cas/ast.js';
 import { solutionSet, contains01, union, intersect, minus } from '../cas/sets.js';
+import { t } from '../i18n.js';
 
 const XYZ = ['x', 'y', 'z'];
 
@@ -52,18 +53,18 @@ export function fnOf(text, vars = XYZ) {
   }
   return CACHE.get(key);
 }
-const numOf = (t) => fnOf(String(t), [])({});
+const numOf = (s) => fnOf(String(s), [])({});
 
 // The student's expression in the letters `vars` only, compiled; or a message.
 function studentFn(text, vars) {
   const raw = String(text ?? '').replace(/^\s*[a-zA-Zγ]+(_?\d)?(\([a-z ,;]*\))?\s*=/, '').trim();
-  if (!raw) return { message: 'Écris ton exemple.' };
+  if (!raw) return { message: t('Écris ton exemple.') };
   const node = tryParse(raw, { vars });
-  if (!node) return { message: 'Je n\'arrive pas à lire ta saisie.' };
+  if (!node) return { message: t('Je n\'arrive pas à lire ta saisie.') };
   const extra = [...symbolsIn(node)].filter((s) => !vars.includes(s));
-  if (extra.length) return { message: `Écris une expression en ${vars.join(', ')} seulement.` };
+  if (extra.length) return { message: t('Écris une expression en {v} seulement.', { v: vars.join(', ') }) };
   let c;
-  try { c = compileFloat(node); } catch { return { message: 'Je n\'arrive pas à calculer avec ta saisie.' }; }
+  try { c = compileFloat(node); } catch { return { message: t('Je n\'arrive pas à calculer avec ta saisie.') }; }
   const f = (env) => { try { const v = c(env); return typeof v === 'number' ? v : NaN; } catch { return NaN; } };
   return { node, f };
 }
@@ -171,55 +172,55 @@ function bdReal(p, ans) {
   for (const k of ['A', 'B', 'E', 'F']) {
     if (ans[k] === undefined) continue;
     const S = realSet(ans[k]);
-    if (!S) return { ok: false, message: `Je n'arrive pas à lire ${k} : écris des intervalles, comme [0 ; 1] ou ]0 ; 1[ ∪ {3}.` };
+    if (!S) return { ok: false, message: t('Je n\'arrive pas à lire {k} : écris des intervalles, comme [0 ; 1] ou ]0 ; 1[ ∪ {3}.', { k }) };
     sets[k] = S;
   }
   if (p.test === 'neither') {
-    if (!sets.E) return { ok: false, message: 'Donne E.' };
+    if (!sets.E) return { ok: false, message: t('Donne {s}.', { s: 'E' }) };
     const S = sets.E;
     const fin = S.parts.flatMap((q) => [q.lo, q.hi]).filter((b) => Number.isFinite(b.x));
     const isIn = fin.some((b) => contains01(S, b.x));
     const isOut = fin.some((b) => !contains01(S, b.x));
-    if (!isIn) return { ok: false, message: 'Ton ensemble est ouvert : aucun point de son bord n\'est dedans.', rule: 'a2_topo_not_open_closed' };
-    if (!isOut) return { ok: false, message: 'Ton ensemble est fermé : il contient tout son bord.' };
+    if (!isIn) return { ok: false, message: t('Ton ensemble est ouvert : aucun point de son bord n\'est dedans.'), rule: 'a2_topo_not_open_closed' };
+    if (!isOut) return { ok: false, message: t('Ton ensemble est fermé : il contient tout son bord.') };
     return { ok: true };
   }
   const xs = readPoint(`(${ans.p ?? ''})`, 1);
-  if (!xs) return { ok: false, message: 'Donne le point p (un nombre).' };
+  if (!xs) return { ok: false, message: t('Donne le point p (un nombre).') };
   const x = xs[0];
   const { A, B, E, F } = sets;
   switch (p.test) {
     case 'incl':
-      if (!E || !F) return { ok: false, message: 'Donne E et F.' };
-      if (!isEmpty(minus(E, F))) return { ok: false, message: 'Il faut E ⊂ F.' };
-      if (!inBd(E, x)) return { ok: false, message: `${ans.p} n'est pas dans le bord de E.` };
-      if (inBd(F, x)) return { ok: false, message: `${ans.p} est aussi dans le bord de F.` };
+      if (!E || !F) return { ok: false, message: t('Donne {a} et {b}.', { a: 'E', b: 'F' }) };
+      if (!isEmpty(minus(E, F))) return { ok: false, message: t('Il faut E ⊂ F.') };
+      if (!inBd(E, x)) return { ok: false, message: t('{p} n\'est pas dans le bord de E.', { p: ans.p }) };
+      if (inBd(F, x)) return { ok: false, message: t('{p} est aussi dans le bord de F.', { p: ans.p }) };
       return { ok: true };
     case 'union': {
-      if (!A || !B) return { ok: false, message: 'Donne A et B.' };
-      if (!inBd(A, x) && !inBd(B, x)) return { ok: false, message: `${ans.p} n'est ni dans ∂A ni dans ∂B.` };
-      if (inBd(union(A, B), x)) return { ok: false, message: `${ans.p} est aussi dans ∂(A ∪ B).`, rule: 'a2_bd_union' };
+      if (!A || !B) return { ok: false, message: t('Donne {a} et {b}.', { a: 'A', b: 'B' }) };
+      if (!inBd(A, x) && !inBd(B, x)) return { ok: false, message: t('{p} n\'est ni dans ∂A ni dans ∂B.', { p: ans.p }) };
+      if (inBd(union(A, B), x)) return { ok: false, message: t('{p} est aussi dans ∂(A ∪ B).', { p: ans.p }), rule: 'a2_bd_union' };
       return { ok: true };
     }
     case 'inter': {
-      if (!A || !B) return { ok: false, message: 'Donne A et B.' };
+      if (!A || !B) return { ok: false, message: t('Donne {a} et {b}.', { a: 'A', b: 'B' }) };
       const l = inBd(intersect(A, B), x);
       const r = inBd(A, x) && inBd(B, x);
-      if (l === r) return { ok: false, message: `${ans.p} est ${l ? 'dans' : 'hors de'} ∂(A ∩ B) et ${r ? 'dans' : 'hors de'} ∂A ∩ ∂B : ce point ne sépare pas les deux ensembles.` };
+      if (l === r) return { ok: false, message: l ? t('{p} est dans ∂(A ∩ B) et dans ∂A ∩ ∂B : ce point ne sépare pas les deux ensembles.', { p: ans.p }) : t('{p} est hors de ∂(A ∩ B) et hors de ∂A ∩ ∂B : ce point ne sépare pas les deux ensembles.', { p: ans.p }) };
       return { ok: true };
     }
     case 'inside':
-      if (!E) return { ok: false, message: 'Donne E.' };
-      if (!inBd(E, x)) return { ok: false, message: `${ans.p} n'est pas dans le bord de E.` };
-      if (contains01(E, x)) return { ok: false, message: `${ans.p} est dans E.` };
+      if (!E) return { ok: false, message: t('Donne {s}.', { s: 'E' }) };
+      if (!inBd(E, x)) return { ok: false, message: t('{p} n\'est pas dans le bord de E.', { p: ans.p }) };
+      if (contains01(E, x)) return { ok: false, message: t('{p} est dans E.', { p: ans.p }) };
       return { ok: true };
     case 'intUnion': {
-      if (!A || !B) return { ok: false, message: 'Donne A et B.' };
-      if (!inInt(union(A, B), x)) return { ok: false, message: `${ans.p} n'est pas intérieur à A ∪ B.` };
-      if (inInt(A, x) || inInt(B, x)) return { ok: false, message: `${ans.p} est déjà intérieur à A ou à B.` };
+      if (!A || !B) return { ok: false, message: t('Donne {a} et {b}.', { a: 'A', b: 'B' }) };
+      if (!inInt(union(A, B), x)) return { ok: false, message: t('{p} n\'est pas intérieur à A ∪ B.', { p: ans.p }) };
+      if (inInt(A, x) || inInt(B, x)) return { ok: false, message: t('{p} est déjà intérieur à A ou à B.', { p: ans.p }) };
       return { ok: true };
     }
-    default: return { ok: false, message: 'Contre-exemple non vérifiable.' };
+    default: return { ok: false, message: t('Contre-exemple non vérifiable.') };
   }
 }
 
@@ -259,30 +260,30 @@ function vecSeq(p, ans) {
     nodes.push(s.node);
   }
   const conv = nodes.map(seqConverges);
-  if (conv.some((x) => x === null)) return { ok: false, message: 'Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.' };
+  if (conv.some((x) => x === null)) return { ok: false, message: t('Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.') };
   const all = conv.every(Boolean);
   switch (p.test) {
     case 'boundedNotConv': {
       const b = nodes.map(seqBounded);
-      if (b.some((x) => x === null)) return { ok: false, message: 'Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.' };
-      if (!b.every(Boolean)) return { ok: false, message: 'Ta suite n\'est pas bornée : une composante grandit sans limite.' };
-      if (all) return { ok: false, message: 'Chaque composante converge : ta suite converge.' };
+      if (b.some((x) => x === null)) return { ok: false, message: t('Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.') };
+      if (!b.every(Boolean)) return { ok: false, message: t('Ta suite n\'est pas bornée : une composante grandit sans limite.') };
+      if (all) return { ok: false, message: t('Chaque composante converge : ta suite converge.') };
       return { ok: true };
     }
     case 'oneConv':
-      if (!conv.some(Boolean)) return { ok: false, message: 'Aucune composante ne converge : ce n\'est pas l\'hypothèse.' };
-      if (all) return { ok: false, message: 'Chaque composante converge : ta suite converge.' };
+      if (!conv.some(Boolean)) return { ok: false, message: t('Aucune composante ne converge : ce n\'est pas l\'hypothèse.') };
+      if (all) return { ok: false, message: t('Chaque composante converge : ta suite converge.') };
       return { ok: true };
     case 'normConv': {
       const normNode = tryParse(`√(${names.map((k) => `(${String(ans[k]).replace(/^\s*[a-z]_?\d?\s*=/, '')})^2`).join('+')})`, { vars: ['n'] });
-      if (!normNode) return { ok: false, message: 'Je n\'arrive pas à lire ta saisie.' };
+      if (!normNode) return { ok: false, message: t('Je n\'arrive pas à lire ta saisie.') };
       const cn = seqConverges(normNode);
-      if (cn === null) return { ok: false, message: 'Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.' };
-      if (!cn) return { ok: false, message: 'La norme de ta suite ne converge pas.' };
-      if (all) return { ok: false, message: 'Chaque composante converge : ta suite converge.' };
+      if (cn === null) return { ok: false, message: t('Je n\'arrive pas à décider avec ton exemple : prends-en un plus simple.') };
+      if (!cn) return { ok: false, message: t('La norme de ta suite ne converge pas.') };
+      if (all) return { ok: false, message: t('Chaque composante converge : ta suite converge.') };
       return { ok: true };
     }
-    default: return { ok: false, message: 'Contre-exemple non vérifiable.' };
+    default: return { ok: false, message: t('Contre-exemple non vérifiable.') };
   }
 }
 
@@ -295,7 +296,7 @@ function curveFns(p, ans) {
     const s = studentFn(ans[k], ['t']);
     if (s.message) return { message: s.message };
     let d;
-    try { d = compileFloat(diff(s.node, 't')); } catch { return { message: 'Je n\'arrive pas à dériver ta courbe.' }; }
+    try { d = compileFloat(diff(s.node, 't')); } catch { return { message: t('Je n\'arrive pas à dériver ta courbe.') }; }
     out.push({ f: (t) => s.f({ t }), d: (t) => { try { return d({ t }); } catch { return NaN; } } });
   }
   return { comps: out };
@@ -305,11 +306,11 @@ function curveNotSmooth(p, ans) {
   const r = curveFns(p, ans);
   if (r.message) return { ok: false, message: r.message };
   const ts = Array.from({ length: 1201 }, (_, i) => -3 + i / 200);
-  for (const t of ts) {
-    for (const c of r.comps) if (!Number.isFinite(c.f(t)) || !Number.isFinite(c.d(t))) return { ok: false, message: `Ta courbe n'est pas de classe C¹ : en t = ${t}, elle (ou sa dérivée) n'est pas définie.` };
+  for (const tv of ts) {
+    for (const c of r.comps) if (!Number.isFinite(c.f(tv)) || !Number.isFinite(c.d(tv))) return { ok: false, message: t('Ta courbe n\'est pas de classe C¹ : en t = {t}, elle (ou sa dérivée) n\'est pas définie.', { t: tv }) };
   }
-  const zero = ts.find((t) => r.comps.every((c) => Math.abs(c.d(t)) < 1e-9));
-  if (zero === undefined) return { ok: false, message: 'γ′(t) ne s\'annule pas (sur [−3 ; 3]) : ta courbe est lisse.' };
+  const zero = ts.find((tv) => r.comps.every((c) => Math.abs(c.d(tv)) < 1e-9));
+  if (zero === undefined) return { ok: false, message: t('γ′(t) ne s\'annule pas (sur [−3 ; 3]) : ta courbe est lisse.') };
   return { ok: true };
 }
 
@@ -320,19 +321,19 @@ function arcCurve(p, ans) {
   const b = numOf(p.b ?? 1);
   const speed = (t) => Math.sqrt(r.comps.reduce((s, c) => s + c.d(t) ** 2, 0));
   const L = quad(speed, a, b);
-  if (!Number.isFinite(L)) return { ok: false, message: 'Je n\'arrive pas à calculer la longueur de ta courbe.' };
+  if (!Number.isFinite(L)) return { ok: false, message: t('Je n\'arrive pas à calculer la longueur de ta courbe.') };
   if (p.test === 'sum') {
-    const S = quad((t) => r.comps.reduce((s, c) => s + c.d(t), 0), a, b);
-    if (Math.abs(L - S) <= 1e-6 * (1 + Math.abs(L))) return { ok: false, message: 'Pour ta courbe, les deux nombres sont égaux : ce n\'est pas un contre-exemple.' };
+    const S = quad((tv) => r.comps.reduce((s, c) => s + c.d(tv), 0), a, b);
+    if (Math.abs(L - S) <= 1e-6 * (1 + Math.abs(L))) return { ok: false, message: t('Pour ta courbe, les deux nombres sont égaux : ce n\'est pas un contre-exemple.') };
     return { ok: true };
   }
   if (p.test === 'square') {
-    const S = quad((t) => r.comps.reduce((s, c) => s + c.d(t) ** 2, 0), a, b);
-    if (Math.abs(L - S) <= 1e-6 * (1 + Math.abs(L))) return { ok: false, message: 'Pour ta courbe, les deux nombres sont égaux : ce n\'est pas un contre-exemple.' };
+    const S = quad((tv) => r.comps.reduce((s, c) => s + c.d(tv) ** 2, 0), a, b);
+    if (Math.abs(L - S) <= 1e-6 * (1 + Math.abs(L))) return { ok: false, message: t('Pour ta courbe, les deux nombres sont égaux : ce n\'est pas un contre-exemple.') };
     return { ok: true };
   }
   const chord = Math.sqrt(r.comps.reduce((s, c) => s + (c.f(b) - c.f(a)) ** 2, 0));
-  if (L - chord <= 1e-6 * (1 + L)) return { ok: false, message: 'Ta courbe est un segment parcouru une fois : sa longueur est bien ‖γ(b) − γ(a)‖.' };
+  if (L - chord <= 1e-6 * (1 + L)) return { ok: false, message: t('Ta courbe est un segment parcouru une fois : sa longueur est bien ‖γ(b) − γ(a)‖.') };
   return { ok: true };
 }
 
@@ -379,7 +380,7 @@ function fnDomain(p, ans) {
   const baseV = P.base.map(val);
   const near = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => P.approach(k).map(val));
   if (baseV.some((v) => !Number.isFinite(v)) || near.flat().some((v) => !Number.isFinite(v))) {
-    return { ok: false, message: 'Ta fonction n\'est pas définie (donc pas continue) en certains points de D.' };
+    return { ok: false, message: t('Ta fonction n\'est pas définie (donc pas continue) en certains points de D.') };
   }
   const maxAbs = (vs) => Math.max(...vs.map(Math.abs));
   const b0 = Math.max(maxAbs(baseV), ...near.slice(0, 2).map(maxAbs));
@@ -388,18 +389,18 @@ function fnDomain(p, ans) {
   const unbounded = b8 > 1e6 || (b8 >= 1.4 * b4 && b4 >= 1.4 * b0 && b8 > 10);
   switch (p.test) {
     case 'unbounded':
-      if (!unbounded) return { ok: false, message: 'Ta fonction reste bornée sur D.' };
+      if (!unbounded) return { ok: false, message: t('Ta fonction reste bornée sur D.') };
       return { ok: true };
     case 'bounded':
-      if (unbounded || b8 > 2 * b0 + 1) return { ok: false, message: 'Ta fonction n\'est pas bornée sur D.' };
+      if (unbounded || b8 > 2 * b0 + 1) return { ok: false, message: t('Ta fonction n\'est pas bornée sur D.') };
       return { ok: true };
     case 'noMax': case 'noMin': {
       const M0 = Math.max(...baseV, ...near.slice(0, 3).flat());
       const M8 = Math.max(...near[7]);
-      if (!(M8 > M0 + 1e-7)) return { ok: false, message: `Ta fonction atteint son ${p.test === 'noMin' ? 'minimum' : 'maximum'} sur D (ou semble l'atteindre).` };
+      if (!(M8 > M0 + 1e-7)) return { ok: false, message: p.test === 'noMin' ? t('Ta fonction atteint son minimum sur D (ou semble l\'atteindre).') : t('Ta fonction atteint son maximum sur D (ou semble l\'atteindre).') };
       return { ok: true };
     }
-    default: return { ok: false, message: 'Contre-exemple non vérifiable.' };
+    default: return { ok: false, message: t('Contre-exemple non vérifiable.') };
   }
 }
 
@@ -411,18 +412,18 @@ function imageNotOpen(p, ans) {
   const grid = [];
   for (let i = -50; i <= 50; i++) for (let j = -50; j <= 50; j++) grid.push({ x: i / 5, y: j / 5 });
   const vs = grid.map((e) => s.f(e));
-  if (vs.some((v) => !Number.isFinite(v))) return { ok: false, message: 'Ta fonction n\'est pas définie partout sur ℝ².' };
+  if (vs.some((v) => !Number.isFinite(v))) return { ok: false, message: t('Ta fonction n\'est pas définie partout sur ℝ².') };
   const rings = [];
   for (const R of [20, 50, 100, 1000]) for (let i = 0; i < 72; i++) rings.push(s.f({ x: R * Math.cos((i * Math.PI) / 36 + 0.003), y: R * Math.sin((i * Math.PI) / 36 + 0.003) }));
-  if (rings.some((v) => !Number.isFinite(v))) return { ok: false, message: 'Ta fonction n\'est pas définie partout sur ℝ².' };
+  if (rings.some((v) => !Number.isFinite(v))) return { ok: false, message: t('Ta fonction n\'est pas définie partout sur ℝ².') };
   const m = Math.min(...vs);
   const M = Math.max(...vs);
   // The grid misses the exact extremum (sin x): a margin of 10⁻³ of the range.
-  const t = 1e-3 * (1e-6 + M - m);
+  const tol = 1e-3 * (1e-6 + M - m);
   const inner = (v) => grid.some((e, i) => vs[i] === v && Math.abs(e.x) < 9.5 && Math.abs(e.y) < 9.5);
-  const hasMin = inner(m) && rings.every((v) => v >= m - t);
-  const hasMax = inner(M) && rings.every((v) => v <= M + t);
-  if (!hasMin && !hasMax) return { ok: false, message: 'Ta fonction n\'atteint ni minimum ni maximum : son image est un intervalle ouvert.' };
+  const hasMin = inner(m) && rings.every((v) => v >= m - tol);
+  const hasMax = inner(M) && rings.every((v) => v <= M + tol);
+  if (!hasMin && !hasMax) return { ok: false, message: t('Ta fonction n\'atteint ni minimum ni maximum : son image est un intervalle ouvert.') };
   return { ok: true };
 }
 
@@ -430,18 +431,18 @@ export const PROPS = {
   topoPoint: (p, ans) => {
     const S = p.set;
     const pt = readPoint(ans.p, S.dim);
-    if (!pt) return { ok: false, message: `Donne un point de ℝ${S.dim === 3 ? '³' : '²'}, comme ${S.dim === 3 ? '(1 ; 0 ; 2)' : '(1 ; 0)'}.` };
+    if (!pt) return { ok: false, message: t('Donne un point de {R}, comme {ex}.', { R: `ℝ${S.dim === 3 ? '³' : '²'}`, ex: S.dim === 3 ? '(1 ; 0 ; 2)' : '(1 ; 0)' }) };
     const k = pointKind(S, pt);
     if (p.want === 'out') {
       if (k === 'bdOut') return { ok: true };
-      if (k === 'bdIn') return { ok: false, message: 'Ce point est bien sur le bord, mais il est dans E : il ne montre pas que E n\'est pas fermé. Cherche un point du bord qui manque.' };
-      if (k === 'interior') return { ok: false, message: 'Ce point est intérieur à E.' };
-      return { ok: false, message: 'Ce point n\'est pas sur le bord de E : une petite boule autour de lui ne touche pas E.' };
+      if (k === 'bdIn') return { ok: false, message: t('Ce point est bien sur le bord, mais il est dans E : il ne montre pas que E n\'est pas fermé. Cherche un point du bord qui manque.') };
+      if (k === 'interior') return { ok: false, message: t('Ce point est intérieur à E.') };
+      return { ok: false, message: t('Ce point n\'est pas sur le bord de E : une petite boule autour de lui ne touche pas E.') };
     }
     if (k === 'bdIn') return { ok: true };
-    if (k === 'bdOut') return { ok: false, message: 'Ce point est sur le bord, mais il n\'est pas dans E : il montre que E n\'est pas fermé, pas qu\'il n\'est pas ouvert.' };
-    if (k === 'interior') return { ok: false, message: 'Ce point est intérieur à E : une petite boule autour de lui reste dans E.' };
-    return { ok: false, message: 'Ce point n\'est pas dans E.' };
+    if (k === 'bdOut') return { ok: false, message: t('Ce point est sur le bord, mais il n\'est pas dans E : il montre que E n\'est pas fermé, pas qu\'il n\'est pas ouvert.') };
+    if (k === 'interior') return { ok: false, message: t('Ce point est intérieur à E : une petite boule autour de lui reste dans E.') };
+    return { ok: false, message: t('Ce point n\'est pas dans E.') };
   },
   bdReal,
   vecSeq,

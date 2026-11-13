@@ -19,6 +19,7 @@ import {
   cosT, sinT, polarToCz, principalT, piT, iPiT, expText, trigText, unitText, options, clean, bl, cq, iT, joinT, par,
 } from './complexes-a-kit.js';
 import { GEN as ROOTS } from './complexes-a-roots.js';
+import { t } from '../../i18n.js';
 
 const n2 = (z) => z.abs2().valueOf();
 const zt = cqText;
@@ -37,20 +38,20 @@ function prep(judge, lines, level, blanks = [], start = null) {
 
 const AL = 'g8-algebraic';
 const AL_SUB = [
-  { id: 'expand', label: 'développer', skill: 'lit-identities' },
+  { id: 'expand', label: t('développer'), skill: 'lit-identities' },
   { id: 'isq', label: 'i² = −1', skill: AL },
-  { id: 'group', label: 'regrouper', skill: AL },
-  { id: 'conj', label: 'conjugué du dénominateur', skill: AL },
-  { id: 'mod', label: 'module', skill: AL },
+  { id: 'group', label: t('regrouper'), skill: AL },
+  { id: 'conj', label: t('conjugué du dénominateur'), skill: AL },
+  { id: 'mod', label: t('module'), skill: AL },
 ];
 const AL_CHOICES = [
-  { id: 'expand', label: 'Développer' },
-  { id: 'isq', label: 'Remplacer i² par −1' },
-  { id: 'group', label: 'Regrouper les parties réelles et imaginaires' },
-  { id: 'conj', label: 'Multiplier en haut et en bas par le conjugué du dénominateur' },
-  { id: 'split', label: 'Diviser partie par partie', rule: 'g8_div_componentwise', why: 'On ne divise pas partie par partie : multiplie en haut et en bas par le conjugué du dénominateur.' },
-  { id: 'cycle', label: 'Utiliser i⁴ = 1 (cycle de 4)' },
-  { id: 'mod', label: 'Module : √(a² + b²)' },
+  { id: 'expand', label: t('Développer') },
+  { id: 'isq', label: t('Remplacer i² par −1') },
+  { id: 'group', label: t('Regrouper les parties réelles et imaginaires') },
+  { id: 'conj', label: t('Multiplier en haut et en bas par le conjugué du dénominateur') },
+  { id: 'split', label: t('Diviser partie par partie'), rule: 'g8_div_componentwise', why: t('On ne divise pas partie par partie : multiplie en haut et en bas par le conjugué du dénominateur.') },
+  { id: 'cycle', label: t('Utiliser i⁴ = 1 (cycle de 4)') },
+  { id: 'mod', label: t('Module : √(a² + b²)') },
 ];
 
 const randZ = (rng, m = 5) => cq(nz(rng, -m, m), nz(rng, -m, m));
@@ -68,9 +69,9 @@ function alData(kind, rng) {
       kind, value, z1, z2, z3, isq: String(Math.abs(b * d)),
       start: `${par(z1)}${par(z2)}${z3 ? `+(${zt(z3)})` : ''}`,
       lines: [
-        E(joinT([String(a * c), iT(a * d), iT(b * c), iT(b * d, '^2'), ...tail]), 'Développer', 'expand', 'expand'),
+        E(joinT([String(a * c), iT(a * d), iT(b * c), iT(b * d, '^2'), ...tail]), t('Développer'), 'expand', 'expand'),
         E(joinT([String(a * c), iT(a * d), iT(b * c), String(-b * d), ...tail]), 'i² = −1', 'isq', 'isq'),
-        E(zt(value), 'Regrouper', 'group', 'group'),
+        E(zt(value), t('Regrouper'), 'group', 'group'),
       ],
     };
   }
@@ -84,7 +85,7 @@ function alData(kind, rng) {
       lines: [
         E(joinT([String(a * a), iT(2 * a * b), iT(b * b, '^2')]), '(a + b)² = a² + 2ab + b²', 'expand', 'expand'),
         E(joinT([String(a * a), iT(2 * a * b), String(-b * b)]), 'i² = −1', 'isq', 'isq'),
-        E(zt(value), 'Regrouper', 'group', 'group'),
+        E(zt(value), t('Regrouper'), 'group', 'group'),
       ],
     };
   }
@@ -102,9 +103,9 @@ function alData(kind, rng) {
         kind, value, n, d, cd, N, D,
         start: `${top}/(${zt(d)})`,
         lines: [
-          E(`(${par(n)}(${zt(cd)}))/((${zt(d)})(${zt(cd)}))`, 'Conjugué du dénominateur', 'conj', 'conj'),
+          E(`(${par(n)}(${zt(cd)}))/((${zt(d)})(${zt(cd)}))`, t('Conjugué du dénominateur'), 'conj', 'conj'),
           E(`${N.re.n && N.im.n ? `(${zt(N)})` : zt(N)}/${D}`, `(${zt(d)})(${zt(cd)}) = ${D}`.replace(/-/g, '−'), 'expand', 'expand'),
-          E(zt(value), 'Diviser', 'group', 'group'),
+          E(zt(value), t('Diviser'), 'group', 'group'),
         ],
       };
     }
@@ -126,26 +127,26 @@ function alData(kind, rng) {
     kind: 'mod', value: cq(c), z, start: `|${zt(z)}|`,
     lines: [
       E(`√(${a0 * a0}+${b0 * b0})`, '|a + bi| = √(a² + b²)', 'mod', 'mod'),
-      E(`√${c * c}`, 'Additionner', 'mod', 'mod'),
-      E(String(c), 'Racine', 'mod', 'mod'),
+      E(`√${c * c}`, t('Additionner'), 'mod', 'mod'),
+      E(String(c), t('Racine'), 'mod', 'mod'),
     ],
   };
 }
 const termsOf3 = (z) => [z.re.n ? String(z.re.n) : '', z.im.n ? iT(z.im.n) : ''];
 
 function alHints(d) {
-  if (d.kind === 'quot') return H('Pour diviser, multiplie en haut et en bas par le conjugué du dénominateur.', `${M(`(${par(d.n)}(□))/${d.D}`)}`, M(zt(d.value)));
-  if (d.kind === 'pow') return H('Les puissances de i se répètent tous les 4 : i, −1, −i, 1. Écris l\'exposant n = 4k + r.', `${M(`(i^4)^${d.k}×i^${d.r}`)} = ${M(`1×i^${d.r}`)} = □`, M(zt(d.value)));
-  if (d.kind === 'mod') return H('|a + bi| = √(a² + b²) : c\'est une longueur (Pythagore).', `${M(d.lines[0].math)} = √□`, M(zt(d.value)));
-  return H('Développe comme avec des polynômes en i, puis remplace i² par −1.', `${M(d.lines[0].math)}, et ${M(d.kind === 'square' ? `${d.z.im.n * d.z.im.n}i^2` : 'i^2')} = □`, M(zt(d.value)));
+  if (d.kind === 'quot') return H(t('Pour diviser, multiplie en haut et en bas par le conjugué du dénominateur.'), `${M(`(${par(d.n)}(□))/${d.D}`)}`, M(zt(d.value)));
+  if (d.kind === 'pow') return H(t('Les puissances de i se répètent tous les 4 : i, −1, −i, 1. Écris l\'exposant n = 4k + r.'), `${M(`(i^4)^${d.k}×i^${d.r}`)} = ${M(`1×i^${d.r}`)} = □`, M(zt(d.value)));
+  if (d.kind === 'mod') return H(t('|a + bi| = √(a² + b²) : c\'est une longueur (Pythagore).'), `${M(d.lines[0].math)} = √□`, M(zt(d.value)));
+  return H(t('Développe comme avec des polynômes en i, puis remplace i² par −1.'), `${M(d.lines[0].math)}, et ${M(d.kind === 'square' ? `${d.z.im.n * d.z.im.n}i^2` : 'i^2')} = □`, M(zt(d.value)));
 }
 
 const AL_ASK = {
-  prod: 'Calcule et écris sous la forme a + bi :',
-  square: 'Développe et écris sous la forme a + bi :',
-  quot: 'Écris sous la forme a + bi :',
-  pow: 'Simplifie :',
-  mod: 'Calcule le module :',
+  prod: t('Calcule et écris sous la forme a + bi :'),
+  square: t('Développe et écris sous la forme a + bi :'),
+  quot: t('Écris sous la forme a + bi :'),
+  pow: t('Simplifie :'),
+  mod: t('Calcule le module :'),
 };
 
 function alItem(level, rng, opts = {}) {
@@ -164,10 +165,10 @@ function alItem(level, rng, opts = {}) {
   const lines = prep(judge, d.lines, level, blanks);
   const pre = [];
   if (level === 2 && d.kind === 'quot') {
-    pre.push({ kind: 'decision', prompt: 'Comment se débarrasser de i au dénominateur ?', options: [
-      { id: 'conj', label: `Multiplier en haut et en bas par le conjugué ${frs(zt(d.cd))}`, valid: true },
-      { id: 'split', label: 'Diviser la partie réelle par la partie réelle, et la partie imaginaire par la partie imaginaire', valid: false, rule: 'g8_div_componentwise', why: `Contrôle : le résultat fois ${frs(zt(d.d))} ne redonne pas ${frs(zt(d.n))}. On ne divise pas partie par partie.` },
-      { id: 'same', label: `Multiplier en haut et en bas par ${frs(zt(d.d))}`, valid: false, why: `(${frs(zt(d.d))})² n'est pas réel : il reste du i au dénominateur. C'est le conjugué qui donne un réel.` },
+    pre.push({ kind: 'decision', prompt: t('Comment se débarrasser de i au dénominateur ?'), options: [
+      { id: 'conj', label: t('Multiplier en haut et en bas par le conjugué {v1}', { v1: frs(zt(d.cd)) }), valid: true },
+      { id: 'split', label: t('Diviser la partie réelle par la partie réelle, et la partie imaginaire par la partie imaginaire'), valid: false, rule: 'g8_div_componentwise', why: t('Contrôle : le résultat fois {v1} ne redonne pas {v2}. On ne divise pas partie par partie.', { v1: frs(zt(d.d)), v2: frs(zt(d.n)) }) },
+      { id: 'same', label: t('Multiplier en haut et en bas par {v1}', { v1: frs(zt(d.d)) }), valid: false, why: t('({v1})² n\'est pas réel : il reste du i au dénominateur. C\'est le conjugué qui donne un réel.', { v1: frs(zt(d.d)) }) },
     ] });
   }
   const { start, judge: j, script } = partsScript([{ start: d.start, judge, pre, lines }], level, AL_CHOICES);
@@ -187,13 +188,13 @@ function alCombined(rng, opts) {
   const start = `${a.start}+i^${p.n}`;
   const first = a.kind === 'quot' ? a.lines[0].math : a.lines[0].math;
   const lines = clean(ALG, [
-    E(`${a.kind === 'quot' ? first : `(${first})`}+(i^4)^${p.k}×i^${p.r}`, a.kind === 'quot' ? 'Conjugué ; cycle de 4' : 'Développer ; cycle de 4', 'expand'),
-    E(`${par(a.value)}+i^${p.r}`, 'Calculer', 'isq'),
-    E(zt(value), 'Regrouper', 'group'),
+    E(`${a.kind === 'quot' ? first : `(${first})`}+(i^4)^${p.k}×i^${p.r}`, a.kind === 'quot' ? t('Conjugué ; cycle de 4') : t('Développer ; cycle de 4'), 'expand'),
+    E(`${par(a.value)}+i^${p.r}`, t('Calculer'), 'isq'),
+    E(zt(value), t('Regrouper'), 'group'),
   ], 'free');
   return linesItem({
     skill: AL, level: 5, mode: 'free', start, judge: ALG, script: lines,
-    prompt: `Écris sous la forme a + bi, sans aide : ${M(start)}`,
+    prompt: t('Écris sous la forme a + bi, sans aide : {start}', { start: M(start) }),
     hints: [], subgoals: AL_SUB, keys: KEYS,
     key: `${AL}:5:${start}`, exam: examTag(opts),
   });
@@ -237,24 +238,24 @@ function alMcq(rng) {
 // True or false: statements on z₁, z₂ ∈ ℂ; the false ones are refuted by
 // complex values (js/judges/counters-complex.js).
 const AL_TF = [
-  { s: '|z₁ + z₂| = |z₁| + |z₂|', pred: '|z+w|=|z|+|w|', truth: false, answer: { z: '1', w: '-1' }, why: 'Avec z₁ = 1 et z₂ = −1 : |0| = 0, mais |1| + |−1| = 2. Seule l\'inégalité |z₁ + z₂| ≤ |z₁| + |z₂| est vraie.' },
-  { s: '|z₁ − z₂| = |z₁| − |z₂|', pred: '|z-w|=|z|-|w|', truth: false, answer: { z: '1', w: '-1' }, why: 'Avec z₁ = 1 et z₂ = −1 : |2| = 2, mais |1| − |−1| = 0.' },
-  { s: '|z₁·z₂| = |z₁|·|z₂|', truth: true, why: 'Les modules se multiplient : |z₁z₂|² = z₁z₂·z̄₁z̄₂ = |z₁|²·|z₂|².' },
+  { s: '|z₁ + z₂| = |z₁| + |z₂|', pred: '|z+w|=|z|+|w|', truth: false, answer: { z: '1', w: '-1' }, why: t('Avec z₁ = 1 et z₂ = −1 : |0| = 0, mais |1| + |−1| = 2. Seule l\'inégalité |z₁ + z₂| ≤ |z₁| + |z₂| est vraie.') },
+  { s: '|z₁ − z₂| = |z₁| − |z₂|', pred: '|z-w|=|z|-|w|', truth: false, answer: { z: '1', w: '-1' }, why: t('Avec z₁ = 1 et z₂ = −1 : |2| = 2, mais |1| − |−1| = 0.') },
+  { s: '|z₁·z₂| = |z₁|·|z₂|', truth: true, why: t('Les modules se multiplient : |z₁z₂|² = z₁z₂·z̄₁z̄₂ = |z₁|²·|z₂|².') },
   { s: 'z₁·z̄₁ = |z₁|²', truth: true, why: '(a + bi)(a − bi) = a² − (bi)² = a² + b².' },
-  { s: 'Re(z₁·z₂) = Re(z₁)·Re(z₂)', pred: 'Re(z×w)=Re(z)×Re(w)', truth: false, answer: { z: 'i', w: 'i' }, why: 'Avec z₁ = z₂ = i : Re(i·i) = Re(−1) = −1, mais Re(i)·Re(i) = 0.' },
-  { s: 'conj(z₁ + z₂) = z̄₁ + z̄₂ et conj(z₁z₂) = z̄₁·z̄₂', truth: true, why: 'Le conjugué change le signe de i partout : il respecte les sommes et les produits.' },
-  { s: '|z₁|² = z₁²', pred: '|z|^2=z^2', truth: false, one: true, answer: { z: 'i' }, why: 'Avec z₁ = i : |i|² = 1, mais i² = −1. C\'est z₁·z̄₁ qui vaut |z₁|².' },
+  { s: 'Re(z₁·z₂) = Re(z₁)·Re(z₂)', pred: 'Re(z×w)=Re(z)×Re(w)', truth: false, answer: { z: 'i', w: 'i' }, why: t('Avec z₁ = z₂ = i : Re(i·i) = Re(−1) = −1, mais Re(i)·Re(i) = 0.') },
+  { s: 'conj(z₁ + z₂) = z̄₁ + z̄₂ et conj(z₁z₂) = z̄₁·z̄₂', truth: true, why: t('Le conjugué change le signe de i partout : il respecte les sommes et les produits.') },
+  { s: '|z₁|² = z₁²', pred: '|z|^2=z^2', truth: false, one: true, answer: { z: 'i' }, why: t('Avec z₁ = i : |i|² = 1, mais i² = −1. C\'est z₁·z̄₁ qui vaut |z₁|².') },
 ];
 
 function alTf(rng) {
-  const t = rng.pick(AL_TF);
-  const vars = t.one ? ['z'] : ['z', 'w'];
-  const ask = vars.map((v, k) => ({ v, label: `z${k ? '₂' : t.one ? '₁' : '₁'} =`, keys: ['calc', 'cplx'] }));
+  const tq = rng.pick(AL_TF);
+  const vars = tq.one ? ['z'] : ['z', 'w'];
+  const ask = vars.map((v, k) => ({ v, label: `z${k ? '₂' : tq.one ? '₁' : '₁'} =`, keys: ['calc', 'cplx'] }));
   return tfItem({
-    skill: AL, level: 4, statement: `Pour tous ${t.one ? 'z₁' : 'z₁, z₂'} ∈ ℂ : ${t.s}.`, truth: t.truth,
-    counter: t.truth ? null : { kind: 'complex', vars, pred: t.pred, ask, answer: t.answer },
-    ruleIfTrue: t.s.startsWith('|z₁ + z₂|') || t.s.startsWith('|z₁ −') ? 'g8_modulus_no_square' : null,
-    explanation: t.why, key: `${AL}:${t.s}`, exam: { format: 'tf', points: 1 },
+    skill: AL, level: 4, statement: t('Pour tous {v1} ∈ ℂ : {s}.', { v1: tq.one ? 'z₁' : 'z₁, z₂', s: tq.s }), truth: tq.truth,
+    counter: tq.truth ? null : { kind: 'complex', vars, pred: tq.pred, ask, answer: tq.answer },
+    ruleIfTrue: tq.s.startsWith('|z₁ + z₂|') || tq.s.startsWith('|z₁ −') ? 'g8_modulus_no_square' : null,
+    explanation: tq.why, key: `${AL}:${tq.s}`, exam: { format: 'tf', points: 1 },
   });
 }
 
@@ -276,9 +277,11 @@ function alCoef(rng) {
     if (!w.eq(v)) wrong.push({ value: w.toString(), rule: 'g8_div_componentwise' });
   }
   return answerItem({
-    skill: AL, level: 4, prompt: `Donne la partie ${re ? 'réelle' : 'imaginaire'} de ${M(d.start)}.`,
+    skill: AL, level: 4, prompt: re ? t('Donne la partie réelle de {z}.', { z: M(d.start) }) : t('Donne la partie imaginaire de {z}.', { z: M(d.start) }),
     expected: v.toString(), traps: wrong,
-    solution: [{ html: `${M(d.start)} = ${M(zt(d.value))} : partie ${re ? 'réelle' : 'imaginaire'} ${M(v.toString())}.`, note: '' }],
+    solution: [{ html: re
+      ? t('{z} = {w} : partie réelle {v}.', { z: M(d.start), w: M(zt(d.value)), v: M(v.toString()) })
+      : t('{z} = {w} : partie imaginaire {v}.', { z: M(d.start), w: M(zt(d.value)), v: M(v.toString()) }), note: '' }],
     key: d.start, exam: { format: 'coef', points: 1 },
   });
 }
@@ -289,20 +292,20 @@ function alCoef(rng) {
 
 const PO = 'g8-polar';
 const PO_SUB = [
-  { id: 'mod', label: 'module', skill: PO },
+  { id: 'mod', label: t('module'), skill: PO },
   { id: 'cossin', label: 'cos θ et sin θ', skill: 'g3-exact' },
-  { id: 'arg', label: 'quadrant, argument', skill: PO },
-  { id: 'exp', label: 'forme exponentielle', skill: PO },
+  { id: 'arg', label: t('quadrant, argument'), skill: PO },
+  { id: 'exp', label: t('forme exponentielle'), skill: PO },
 ];
 const PO_CHOICES = [
-  { id: 'mod', label: 'Module r = √(a² + b²)' },
+  { id: 'mod', label: t('Module r = √(a² + b²)') },
   { id: 'cossin', label: 'cos θ = a/r et sin θ = b/r' },
-  { id: 'arg', label: 'Lire le quadrant, puis θ' },
-  { id: 'atan', label: 'θ = arctan(b/a), sans regarder le quadrant', rule: 'g8_arg_quadrant', why: 'arctan(b/a) ne donne le bon angle que si a > 0.' },
-  { id: 'exp', label: 'Écrire r·e^(iθ)' },
-  { id: 'trig', label: 'Écrire r(cos θ + i sin θ)' },
-  { id: 'eval', label: 'Valeurs exactes de cos θ et sin θ, puis forme a + bi' },
-  { id: 'rules', label: 'Multiplier les modules, additionner les arguments' },
+  { id: 'arg', label: t('Lire le quadrant, puis θ') },
+  { id: 'atan', label: t('θ = arctan(b/a), sans regarder le quadrant'), rule: 'g8_arg_quadrant', why: t('arctan(b/a) ne donne le bon angle que si a > 0.') },
+  { id: 'exp', label: t('Écrire r·e^(iθ)') },
+  { id: 'trig', label: t('Écrire r(cos θ + i sin θ)') },
+  { id: 'eval', label: t('Valeurs exactes de cos θ et sin θ, puis forme a + bi') },
+  { id: 'rules', label: t('Multiplier les modules, additionner les arguments') },
 ];
 
 // r and θ = tπ with an exact a + bi.
@@ -311,41 +314,42 @@ const PI6 = [[new Sd(2), [1, 2, 4, 5, -1, -2, -4, -5]], [new Sd(4), [1, 2, 4, 5,
 function polarData(rng, { left = false, axes = true } = {}) {
   for (let k = 0; k < 200; k++) {
     let r;
-    let t;
+    let tq;
     if (axes && rng.chance(0.08)) {
       r = new Sd(rng.int(2, 4));
-      t = rng.pick([q(1, 2), q(-1, 2), q(1)]);
+      tq = rng.pick([q(1, 2), q(-1, 2), q(1)]);
     } else if (rng.chance(0.45)) {
       const [rr, ks] = rng.pick(PI4);
       r = rr;
-      t = q(rng.pick(ks), 4);
+      tq = q(rng.pick(ks), 4);
     } else {
       const [rr, ks] = rng.pick(PI6);
       r = rr;
-      t = q(rng.pick(ks), 6);
+      tq = q(rng.pick(ks), 6);
     }
-    const z = polarToCz(r, t);
+    const z = polarToCz(r, tq);
     if (left && !(z.re.sign() < 0 && !z.im.isZero())) continue;
-    return { r, t, z };
+    return { r, t: tq, z };
   }
   return { r: new Sd(2), t: q(2, 3), z: polarToCz(2, q(2, 3)), fallback: true };
 }
 const QUAD = (z) => (z.re.sign() > 0 ? (z.im.sign() >= 0 ? '1er' : '4e') : z.re.sign() < 0 ? (z.im.sign() >= 0 ? '2e' : '3e') : null);
+const QUAD_NAME = (q) => ({ '1er': t('1er quadrant'), '2e': t('2e quadrant'), '3e': t('3e quadrant'), '4e': t('4e quadrant') }[q]);
 
 // Module part: r = |z| = √(a² + b²).
-function modPart(z, r, level, html = 'Module : r = |z| =') {
+function modPart(z, r, level, html = t('Module : r = |z| =')) {
   const a2 = z.re.mul(z.re).p;
   const b2 = z.im.mul(z.im).p;
-  const lines = prep(ALG, [E(`√(${a2}+${b2})`, 'r = √(a² + b²)', 'mod', 'mod'), E(r.text(), 'Calculer', 'mod', 'mod')], level, [[], [r.text()]]);
+  const lines = prep(ALG, [E(`√(${a2}+${b2})`, 'r = √(a² + b²)', 'mod', 'mod'), E(r.text(), t('Calculer'), 'mod', 'mod')], level, [[], [r.text()]]);
   return { html, ask: 'r =', start: `|${czText(z)}|`, judge: ALG, lines };
 }
 
 function poAlgToExp(level, rng, opts) {
   const d = polarData(rng, { left: level === 2 || rng.chance(0.5) });
-  const { r, t, z } = d;
+  const { r, t: tq, z } = d;
   const zs = czText(z);
-  const c = cosT(t);
-  const s = sinT(t);
+  const c = cosT(tq);
+  const s = sinT(tq);
   const quad = QUAD(z);
   const parts = [];
   if (level !== 1) parts.push(modPart(z, r, level));
@@ -355,21 +359,21 @@ function poAlgToExp(level, rng, opts) {
   }
   const pre = [];
   if (level === 2 && quad) {
-    const wrongT = principalT(t.add(1));
-    pre.push({ kind: 'decision', prompt: `cos θ = ${fr(c.text())} et sin θ = ${fr(s.text())}. Dans quel quadrant est z ?`, options: [
-      { id: 'q', label: `${quad} quadrant`, valid: true },
-      ...['1er', '2e', '3e', '4e'].filter((x) => x !== quad).slice(0, 2).map((x) => ({ id: x, label: `${x} quadrant`, valid: false, why: `Le signe de a = ${fr(z.re.text())} et celui de b = ${fr(z.im.text())} donnent le ${quad} quadrant.` })),
-      ...(z.re.sign() < 0 ? [{ id: 'atan', label: `θ = arctan(b/a) = ${fr(piT(wrongT))}`, valid: false, rule: 'g8_arg_quadrant', why: `arctan donne un angle entre −π/2 et π/2 : ici a < 0, il faut ajouter ou retirer π.` }] : []),
+    const wrongT = principalT(tq.add(1));
+    pre.push({ kind: 'decision', prompt: t('cos θ = {v1} et sin θ = {v2}. Dans quel quadrant est z ?', { v1: fr(c.text()), v2: fr(s.text()) }), options: [
+      { id: 'q', label: QUAD_NAME(quad), valid: true },
+      ...['1er', '2e', '3e', '4e'].filter((x) => x !== quad).slice(0, 2).map((x) => ({ id: x, label: QUAD_NAME(x), valid: false, why: t('Le signe de a = {v1} et celui de b = {v2} donnent le {quad}.', { v1: fr(z.re.text()), v2: fr(z.im.text()), quad: QUAD_NAME(quad) }) })),
+      ...(z.re.sign() < 0 ? [{ id: 'atan', label: `θ = arctan(b/a) = ${fr(piT(wrongT))}`, valid: false, rule: 'g8_arg_quadrant', why: t('arctan donne un angle entre −π/2 et π/2 : ici a < 0, il faut ajouter ou retirer π.') }] : []),
     ] });
   }
-  parts.push({ html: level === 1 ? 'Argument : θ (dans ]−π ; π]) =' : 'Argument : θ = arg z (dans ]−π ; π]) =', ask: 'θ =', start: `arg(${zs})`, judge: ARG, pre, lines: prep(ARG, [E(piT(t), `${quad ?? 'Axe'} : θ = ${fr(piT(t))}`, 'arg', 'arg')], level) });
-  parts.push({ html: 'Forme exponentielle :', ask: 'z =', start: zs, judge: EXP, lines: prep(EXP, [E(expText(r, t), 'z = r·e^(iθ)', 'exp', 'exp')], level) });
-  const given = level === 1 ? ` On donne r = |z| = ${M(r.text())}.` : '';
+  parts.push({ html: level === 1 ? t('Argument : θ (dans ]−π ; π]) =') : t('Argument : θ = arg z (dans ]−π ; π]) ='), ask: 'θ =', start: `arg(${zs})`, judge: ARG, pre, lines: prep(ARG, [E(piT(tq), `${quad ?? 'Axe'} : θ = ${fr(piT(tq))}`, 'arg', 'arg')], level) });
+  parts.push({ html: t('Forme exponentielle :'), ask: 'z =', start: zs, judge: EXP, lines: prep(EXP, [E(expText(r, tq), 'z = r·e^(iθ)', 'exp', 'exp')], level) });
+  const given = level === 1 ? t(' On donne r = |z| = {v1}.', { v1: M(r.text()) }) : '';
   const { start, judge, script } = partsScript(parts, level, PO_CHOICES);
   return linesItem({
     skill: PO, level, mode: modeOf(level), start, judge, script,
-    prompt: `Écris z = ${M(zs)} sous forme exponentielle r·e^(iθ), avec θ dans ]−π ; π].${given}`,
-    hints: H('Calcule r = |z|, puis cos θ = a/r et sin θ = b/r : le signe de a et celui de b disent le quadrant.', `cos θ = ${M(c.text())} et sin θ = ${M(s.text())} : θ = □`, M(expText(r, t))),
+    prompt: t('Écris z = {zs} sous forme exponentielle r·e^(iθ), avec θ dans ]−π ; π].{given}', { zs: M(zs), given }),
+    hints: H(t('Calcule r = |z|, puis cos θ = a/r et sin θ = b/r : le signe de a et celui de b disent le quadrant.'), `cos θ = ${M(c.text())} et sin θ = ${M(s.text())} : θ = □`, M(expText(r, tq))),
     subgoals: PO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${PO}:${level}:a2e:${zs}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -377,18 +381,18 @@ function poAlgToExp(level, rng, opts) {
 
 function poExpToAlg(level, rng, opts) {
   const d = polarData(rng);
-  const { r, t, z } = d;
-  const ex = expText(r, t);
+  const { r, t: tq, z } = d;
+  const ex = expText(r, tq);
   const lines = prep(ALG, [
-    E(trigText(r, t), 'e^(iθ) = cos θ + i sin θ', 'cossin', 'trig'),
-    E(r.eq(1) ? unitText(t) : `${r.factor()}(${unitText(t)})`, 'Valeurs exactes', 'cossin', 'eval'),
-    E(czText(z), 'Développer', 'exp', 'eval'),
-  ], level, [[piT(t)], [unitText(t)], []]);
+    E(trigText(r, tq), 'e^(iθ) = cos θ + i sin θ', 'cossin', 'trig'),
+    E(r.eq(1) ? unitText(tq) : `${r.factor()}(${unitText(tq)})`, t('Valeurs exactes'), 'cossin', 'eval'),
+    E(czText(z), t('Développer'), 'exp', 'eval'),
+  ], level, [[piT(tq)], [unitText(tq)], []]);
   const { start, judge, script } = partsScript([{ start: ex, judge: ALG, lines }], level, PO_CHOICES);
   return linesItem({
     skill: PO, level, mode: modeOf(level), start, judge, script,
-    prompt: `Écris z = ${M(ex)} sous la forme a + bi.`,
-    hints: H('r·e^(iθ) = r(cos θ + i sin θ) : remplace cos θ et sin θ par leurs valeurs exactes.', `${M(ex)} = ${M(r.eq(1) ? 'cos(□)+i sin(□)' : `${r.factor()}(cos(□)+i sin(□))`)}`, M(czText(z))),
+    prompt: t('Écris z = {ex} sous la forme a + bi.', { ex: M(ex) }),
+    hints: H(t('r·e^(iθ) = r(cos θ + i sin θ) : remplace cos θ et sin θ par leurs valeurs exactes.'), `${M(ex)} = ${M(r.eq(1) ? 'cos(□)+i sin(□)' : `${r.factor()}(cos(□)+i sin(□))`)}`, M(czText(z))),
     subgoals: PO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${PO}:${level}:e2a:${ex}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -406,22 +410,22 @@ function poRules(level, rng, opts) {
     if (t1.n === 0 || t2.n === 0 || t1.eq(t2)) continue;
     const div = rng.chance(0.4);
     if (div && r1 % r2 !== 0) continue;
-    const t = div ? t1.sub(t2) : t1.add(t2);
-    if (t.n === 0 || t.valueOf() <= -1 || t.valueOf() > 1) continue;
+    const tq = div ? t1.sub(t2) : t1.add(t2);
+    if (tq.n === 0 || tq.valueOf() <= -1 || tq.valueOf() > 1) continue;
     const r = div ? r1 / r2 : r1 * r2;
     const e1 = expText(r1, t1);
     const e2 = expText(r2, t2);
     const start = div ? `(${e1})/(${e2})` : `${e1}×${e2}`;
     const sumT = `${piT(t1)}${div ? '-' : '+'}${t2.n < 0 ? `(${piT(t2)})` : piT(t2)}`;
     const lines = prep(EXP, [
-      E(`(${r1}${div ? '/' : '×'}${r2})e^(i(${sumT}))`, div ? 'Diviser les modules, soustraire les arguments' : 'Multiplier les modules, additionner les arguments', 'exp', 'rules'),
-      E(expText(r, t), 'Calculer', 'exp', 'rules'),
-    ], level, [[String(r2)], [piT(t)]]);
+      E(`(${r1}${div ? '/' : '×'}${r2})e^(i(${sumT}))`, div ? t('Diviser les modules, soustraire les arguments') : t('Multiplier les modules, additionner les arguments'), 'exp', 'rules'),
+      E(expText(r, tq), t('Calculer'), 'exp', 'rules'),
+    ], level, [[String(r2)], [piT(tq)]]);
     const { start: s0, judge, script } = partsScript([{ start, judge: EXP, lines }], level, PO_CHOICES);
     return linesItem({
       skill: PO, level, mode: modeOf(level), start: s0, judge, script,
-      prompt: `Écris sous forme exponentielle r·e^(iθ), avec θ dans ]−π ; π] : ${M(start)}`,
-      hints: H(`e^(iθ)·e^(iφ) = e^(i(θ + φ))${div ? ' et e^(iθ)/e^(iφ) = e^(i(θ − φ))' : ''} : on ${div ? 'divise' : 'multiplie'} les modules et on ${div ? 'soustrait' : 'additionne'} les arguments.`, `${M(start)} = ${M(`${r === 1 ? '' : r}e^(i(□))`)}`, M(expText(r, t))),
+      prompt: t('Écris sous forme exponentielle r·e^(iθ), avec θ dans ]−π ; π] : {start}', { start: M(start) }),
+      hints: H(div ? t('e^(iθ)·e^(iφ) = e^(i(θ + φ)) et e^(iθ)/e^(iφ) = e^(i(θ − φ)) : on divise les modules et on soustrait les arguments.') : t('e^(iθ)·e^(iφ) = e^(i(θ + φ)) : on multiplie les modules et on additionne les arguments.'), `${M(start)} = ${M(`${r === 1 ? '' : r}e^(i(□))`)}`, M(expText(r, tq))),
       subgoals: PO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
       key: `${PO}:${level}:rules:${start}`, exam: examTag(opts),
     });
@@ -436,8 +440,8 @@ function poCombined(rng, opts) {
     const a = polarData(rng, { axes: false });
     const b = polarData(rng, { axes: false });
     const div = rng.chance(0.6);
-    const t = div ? a.t.sub(b.t) : a.t.add(b.t);
-    if (t.n === 0 || t.valueOf() <= -1 || t.valueOf() > 1) continue;
+    const tq = div ? a.t.sub(b.t) : a.t.add(b.t);
+    if (tq.n === 0 || tq.valueOf() <= -1 || tq.valueOf() > 1) continue;
     const r = div ? (a.r.isRational() && b.r.isRational() ? new Sd(a.r.p.div(b.r.p)) : a.r.s === b.r.s ? new Sd(a.r.p.div(b.r.p)) : null) : a.r.mul(b.r);
     if (!r) continue;
     const za = czText(a.z);
@@ -446,12 +450,12 @@ function poCombined(rng, opts) {
     const ea = expText(a.r, a.t);
     const eb = expText(b.r, b.t);
     const lines = clean(EXP, [
-      E(div ? `(${ea})/(${eb})` : `${ea}×${eb}`, 'Forme exponentielle de chaque facteur', 'exp'),
-      E(expText(r, t), div ? 'Diviser les modules, soustraire les arguments' : 'Multiplier les modules, additionner les arguments', 'exp'),
+      E(div ? `(${ea})/(${eb})` : `${ea}×${eb}`, t('Forme exponentielle de chaque facteur'), 'exp'),
+      E(expText(r, tq), div ? t('Diviser les modules, soustraire les arguments') : t('Multiplier les modules, additionner les arguments'), 'exp'),
     ], 'free');
     return linesItem({
       skill: PO, level: 5, mode: 'free', start, judge: EXP, script: lines,
-      prompt: `Écris z = ${M(start)} sous forme exponentielle r·e^(iθ), θ dans ]−π ; π], sans aide.`,
+      prompt: t('Écris z = {start} sous forme exponentielle r·e^(iθ), θ dans ]−π ; π], sans aide.', { start: M(start) }),
       hints: [], subgoals: PO_SUB, keys: KEYS,
       key: `${PO}:5:${start}`, exam: examTag(opts),
     });
@@ -469,51 +473,51 @@ function poItem(level, rng, opts = {}) {
 }
 
 function poMcq(rng) {
-  const { r, t, z } = polarData(rng, { left: true, axes: false });
-  const right = { html: M(expText(r, t)) };
+  const { r, t: tq, z } = polarData(rng, { left: true, axes: false });
+  const right = { html: M(expText(r, tq)) };
   const wrongs = [
-    { html: M(expText(r, principalT(t.add(1)))), rule: 'g8_arg_quadrant' },
-    { html: M(expText(r.mul(r), t)) },
-    { html: M(expText(r, t.neg())) },
-    { html: M(expText(r, q(1, 2).sub(t))) },
+    { html: M(expText(r, principalT(tq.add(1)))), rule: 'g8_arg_quadrant' },
+    { html: M(expText(r.mul(r), tq)) },
+    { html: M(expText(r, tq.neg())) },
+    { html: M(expText(r, q(1, 2).sub(tq))) },
   ];
   return mcq({
-    skill: PO, level: 4, prompt: `Forme exponentielle de z = ${M(czText(z))} (θ dans ]−π ; π]) :`,
+    skill: PO, level: 4, prompt: t('Forme exponentielle de z = {v1} (θ dans ]−π ; π]) :', { v1: M(czText(z)) }),
     options: options(right, wrongs),
     key: `${PO}:mcq:${czText(z)}`, expectedSec: 90, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `r = ${M(r.text())}, cos θ = ${M(cosT(t).text())}, sin θ = ${M(sinT(t).text())} : ${QUAD(z)} quadrant, θ = ${M(piT(t))}.`, note: '' }],
+    solution: [{ html: `r = ${M(r.text())}, cos θ = ${M(cosT(tq).text())}, sin θ = ${M(sinT(tq).text())} : ${QUAD_NAME(QUAD(z))}, θ = ${M(piT(tq))}.`, note: '' }],
   }, rng);
 }
 
 const PO_TF = [
-  { s: 'Pour tout z = a + bi avec a ≠ 0 : arg z = arctan(b/a).', vars: ['z'], hyp: 'Re(z)≠0', pred: 'arg(z)=arctan(Im(z)/Re(z))', truth: false, answer: { z: '-1+i' }, rule: 'g8_arg_quadrant', why: 'Faux quand a < 0 : arg(−1 + i) = 3π/4, mais arctan(−1) = −π/4. Il faut corriger de π.' },
-  { s: 'Pour tous réels θ et φ : e^(iθ)·e^(iφ) = e^(i(θ + φ)).', truth: true, why: 'C\'est la règle d\'addition : cos(θ + φ) + i sin(θ + φ).' },
+  { s: 'Pour tout z = a + bi avec a ≠ 0 : arg z = arctan(b/a).', vars: ['z'], hyp: 'Re(z)≠0', pred: 'arg(z)=arctan(Im(z)/Re(z))', truth: false, answer: { z: '-1+i' }, rule: 'g8_arg_quadrant', why: t('Faux quand a < 0 : arg(−1 + i) = 3π/4, mais arctan(−1) = −π/4. Il faut corriger de π.') },
+  { s: 'Pour tous réels θ et φ : e^(iθ)·e^(iφ) = e^(i(θ + φ)).', truth: true, why: t('C\'est la règle d\'addition : cos(θ + φ) + i sin(θ + φ).') },
   { s: 'Pour tout réel θ : |e^(iθ)| = 1.', truth: true, why: '|cos θ + i sin θ| = √(cos²θ + sin²θ) = 1.' },
-  { s: 'Pour tout z ≠ 0 : z = |z|·e^(i·arg z).', truth: true, why: 'C\'est la forme exponentielle : r = |z| et θ = arg z.' },
-  { s: 'Pour tout réel θ : e^(iθ) + e^(−iθ) = 2cos θ.', truth: true, why: 'Les parties imaginaires i sin θ et −i sin θ s\'annulent.' },
-  { s: 'Pour tous z, w ≠ 0 : arg(z·w) = arg z + arg w (arguments dans ]−π ; π]).', vars: ['z', 'w'], pred: 'arg(z×w)=arg(z)+arg(w)', truth: false, answer: { z: '-1', w: '-1' }, why: 'Avec z = w = −1 : arg(1) = 0, mais π + π = 2π. L\'égalité n\'est vraie qu\'à 2π près.' },
-  { s: 'Pour tout z ≠ 0 : arg(−z) = arg z + π (arguments dans ]−π ; π]).', vars: ['z'], pred: 'arg(-z)=arg(z)+π', truth: false, answer: { z: 'i' }, why: 'Avec z = i : arg(−i) = −π/2, mais π/2 + π = 3π/2, qui n\'est pas dans ]−π ; π]. L\'égalité n\'est vraie qu\'à 2π près.' },
+  { s: 'Pour tout z ≠ 0 : z = |z|·e^(i·arg z).', truth: true, why: t('C\'est la forme exponentielle : r = |z| et θ = arg z.') },
+  { s: 'Pour tout réel θ : e^(iθ) + e^(−iθ) = 2cos θ.', truth: true, why: t('Les parties imaginaires i sin θ et −i sin θ s\'annulent.') },
+  { s: 'Pour tous z, w ≠ 0 : arg(z·w) = arg z + arg w (arguments dans ]−π ; π]).', vars: ['z', 'w'], pred: 'arg(z×w)=arg(z)+arg(w)', truth: false, answer: { z: '-1', w: '-1' }, why: t('Avec z = w = −1 : arg(1) = 0, mais π + π = 2π. L\'égalité n\'est vraie qu\'à 2π près.') },
+  { s: 'Pour tout z ≠ 0 : arg(−z) = arg z + π (arguments dans ]−π ; π]).', vars: ['z'], pred: 'arg(-z)=arg(z)+π', truth: false, answer: { z: 'i' }, why: t('Avec z = i : arg(−i) = −π/2, mais π/2 + π = 3π/2, qui n\'est pas dans ]−π ; π]. L\'égalité n\'est vraie qu\'à 2π près.') },
 ];
 
 function poTf(rng) {
-  const t = rng.pick(PO_TF);
+  const tq = rng.pick(PO_TF);
   const labels = { z: 'z =', w: 'w =' };
   return tfItem({
-    skill: PO, level: 4, statement: t.s, truth: t.truth,
-    counter: t.truth ? null : { kind: 'complex', vars: t.vars, hyp: t.hyp, pred: t.pred, ask: t.vars.map((v) => ({ v, label: labels[v], keys: ['calc', 'cplx'] })), answer: t.answer },
-    ruleIfTrue: t.rule || null,
-    explanation: t.why, key: `${PO}:${t.s}`, exam: { format: 'tf', points: 1 },
+    skill: PO, level: 4, statement: t(tq.s), truth: tq.truth,
+    counter: tq.truth ? null : { kind: 'complex', vars: tq.vars, hyp: tq.hyp, pred: tq.pred, ask: tq.vars.map((v) => ({ v, label: labels[v], keys: ['calc', 'cplx'] })), answer: tq.answer },
+    ruleIfTrue: tq.rule || null,
+    explanation: tq.why, key: `${PO}:${tq.s}`, exam: { format: 'tf', points: 1 },
   });
 }
 
 // coef: θ = arg z alone.
 function poCoef(rng) {
-  const { t, z } = polarData(rng, { left: rng.chance(0.6) });
+  const { t: tq, z } = polarData(rng, { left: rng.chance(0.6) });
   const zs = czText(z);
   return linesItem({
     skill: PO, level: 4, mode: 'free', start: `arg(${zs})`, judge: ARG,
-    script: [E(piT(t), `${QUAD(z) ?? 'axe'}`, 'arg')],
-    prompt: `Donne θ = arg z, dans ]−π ; π], pour z = ${M(zs)}.`,
+    script: [E(piT(tq), `${QUAD(z) ?? 'axe'}`, 'arg')],
+    prompt: t('Donne θ = arg z, dans ]−π ; π], pour z = {zs}.', { zs: M(zs) }),
     hints: [], subgoals: PO_SUB, keys: KEYS,
     key: `${PO}:coef:${zs}`, exam: { format: 'coef', points: 1 },
   });
@@ -525,17 +529,17 @@ function poCoef(rng) {
 
 const MO = 'g8-moivre';
 const MO_SUB = [
-  { id: 'exp', label: 'forme exponentielle', skill: 'g8-polar' },
-  { id: 'pow', label: 'élever module et argument', skill: MO },
-  { id: 'reduce', label: 'réduire l\'argument', skill: MO },
-  { id: 'alg', label: 'forme algébrique', skill: MO },
+  { id: 'exp', label: t('forme exponentielle'), skill: 'g8-polar' },
+  { id: 'pow', label: t('élever module et argument'), skill: MO },
+  { id: 'reduce', label: t('réduire l\'argument'), skill: MO },
+  { id: 'alg', label: t('forme algébrique'), skill: MO },
 ];
 const MO_CHOICES = [
-  { id: 'exp', label: 'Écrire z sous forme exponentielle' },
-  { id: 'pow', label: 'Élever : rⁿ et nθ' },
-  { id: 'powarg', label: 'Multiplier l\'argument par n, garder le module', rule: 'g8_moivre_modulus', why: 'Le module aussi est élevé à la puissance n.' },
-  { id: 'reduce', label: 'Ramener l\'argument dans ]−π ; π]' },
-  { id: 'alg', label: 'Revenir à la forme a + bi' },
+  { id: 'exp', label: t('Écrire z sous forme exponentielle') },
+  { id: 'pow', label: t('Élever : rⁿ et nθ') },
+  { id: 'powarg', label: t('Multiplier l\'argument par n, garder le module'), rule: 'g8_moivre_modulus', why: t('Le module aussi est élevé à la puissance n.') },
+  { id: 'reduce', label: t('Ramener l\'argument dans ]−π ; π]') },
+  { id: 'alg', label: t('Revenir à la forme a + bi') },
 ];
 
 const MO_Z = [
@@ -551,13 +555,13 @@ const rPow = (r, n) => (r.eq(1) ? '' : r.isRational() ? `${r.text()}^${n}` : `($
 
 function moData(rng) {
   for (let k = 0; k < 200; k++) {
-    const [r, t] = rng.pick(MO_Z);
+    const [r, tq] = rng.pick(MO_Z);
     const n = rng.int(5, 12);
     const rn = powSd(r, n);
     if (rn.value > 1024) continue;
-    const nt = t.mul(n);
+    const nt = tq.mul(n);
     const tp = principalT(nt);
-    return { r, t, n, rn, nt, tp, z: polarToCz(r, t), w: polarToCz(rn, tp) };
+    return { r, t: tq, n, rn, nt, tp, z: polarToCz(r, tq), w: polarToCz(rn, tp) };
   }
   return null;
 }
@@ -568,15 +572,15 @@ function moPower(level, rng, opts) {
   const start = `(${zs})^${d.n}`;
   const ex = expText(d.r, d.t);
   const raw = [
-    E(`(${ex})^${d.n}`, 'Forme exponentielle', 'exp', 'exp'),
+    E(`(${ex})^${d.n}`, t('Forme exponentielle'), 'exp', 'exp'),
     ...(d.r.eq(1) ? [] : [E(expText(rPow(d.r, d.n), d.nt), '(r·e^(iθ))ⁿ = rⁿ·e^(inθ)', 'pow', 'pow')]),
-    E(expText(d.rn, d.nt), d.r.eq(1) ? '(e^(iθ))ⁿ = e^(inθ)' : 'Calculer rⁿ', 'pow', 'pow'),
+    E(expText(d.rn, d.nt), d.r.eq(1) ? '(e^(iθ))ⁿ = e^(inθ)' : t('Calculer rⁿ'), 'pow', 'pow'),
     ...(d.nt.eq(d.tp) ? [] : [E(expText(d.rn, d.tp), turnsNote(d.nt, d.tp), 'reduce', 'reduce')]),
-    E(czText(d.w), 'Forme algébrique', 'alg', 'alg'),
+    E(czText(d.w), t('Forme algébrique'), 'alg', 'alg'),
   ];
   const blanks = raw.map((l) => {
     if (l.act === 'exp') return [iPiT(d.t)];
-    if (l.note === 'Calculer rⁿ') return [d.rn.text()];
+    if (l.note === t('Calculer rⁿ')) return [d.rn.text()];
     if (l.note === '(e^(iθ))ⁿ = e^(inθ)') return [iPiT(d.nt)];
     if (l.act === 'pow') return [iPiT(d.nt)];
     if (l.act === 'reduce') return [iPiT(d.tp)];
@@ -586,10 +590,10 @@ function moPower(level, rng, opts) {
   const pre = [];
   if (level === 2 && !d.nt.eq(d.tp)) {
     const turns = d.nt.sub(d.tp);
-    pre.push({ kind: 'decision', prompt: `Quel multiple de 2π faut-il retirer à ${fr(piT(d.nt))} pour arriver dans ]−π ; π] ?`, options: [
+    pre.push({ kind: 'decision', prompt: t('Quel multiple de 2π faut-il retirer à {v1} pour arriver dans ]−π ; π] ?', { v1: fr(piT(d.nt)) }), options: [
       { id: 'ok', label: fr(piT(turns)), valid: true },
-      { id: 'half', label: fr(piT(turns.sub(1))), valid: false, why: `On ne peut retirer que des tours entiers, des multiples de 2π. ${fr(piT(turns.sub(1)))} n'en est pas un : le signe change.` },
-      { id: 'one', label: '2π', valid: false, why: `${fr(piT(d.nt.sub(2)))} n'est pas encore dans ]−π ; π] : il faut retirer ${fr(piT(turns))}.` },
+      { id: 'half', label: fr(piT(turns.sub(1))), valid: false, why: t('On ne peut retirer que des tours entiers, des multiples de 2π. {v1} n\'en est pas un : le signe change.', { v1: fr(piT(turns.sub(1))) }) },
+      { id: 'one', label: '2π', valid: false, why: t('{v1} n\'est pas encore dans ]−π ; π] : il faut retirer {v2}.', { v1: fr(piT(d.nt.sub(2))), v2: fr(piT(turns)) }) },
     ].filter((o, i, a) => a.findIndex((x) => x.label === o.label) === i) });
   }
   // The decision comes just before the reduction (or the last line).
@@ -600,8 +604,10 @@ function moPower(level, rng, opts) {
   const { start: s0, judge, script } = partsScript([{ start, judge: ALG, lines }], level, MO_CHOICES);
   return linesItem({
     skill: MO, level, mode: modeOf(level), start: s0, judge, script,
-    prompt: `Calcule ${M(start)} et écris le résultat sous la forme a + bi.${level === 1 ? ` On donne ${M(zs)} = ${M(ex)}.` : ''}`,
-    hints: H('Passe en forme exponentielle : la puissance élève le module et multiplie l\'argument.', `${M(`(${ex})^${d.n}`)} = ${M(expText(d.r.eq(1) ? '' : '□', d.nt))}`, M(czText(d.w))),
+    prompt: level === 1
+      ? t('Calcule {s} et écris le résultat sous la forme a + bi. On donne {z} = {e}.', { s: M(start), z: M(zs), e: M(ex) })
+      : t('Calcule {s} et écris le résultat sous la forme a + bi.', { s: M(start) }),
+    hints: H(t('Passe en forme exponentielle : la puissance élève le module et multiplie l\'argument.'), `${M(`(${ex})^${d.n}`)} = ${M(expText(d.r.eq(1) ? '' : '□', d.nt))}`, M(czText(d.w))),
     subgoals: MO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${MO}:${level}:pow:${start}`, exam: examTag(opts), fallback: !!d.fallback,
   });
@@ -628,17 +634,17 @@ function moQuotient(level, rng, opts) {
     const e1 = expText(r, t1);
     const e2 = expText(r, t2);
     const raw = [
-      E(`((${e1})^${n1})/((${e2})^${n2})`, 'Formes exponentielles', 'exp', 'exp'),
-      E(expText(m ? rPow(r, m) : '', nt), 'Moivre : modules et arguments', 'pow', 'pow'),
-      ...(nt.eq(tp) ? [] : [E(expText(rm, tp), 'Réduire l\'argument', 'reduce', 'reduce')]),
-      E(czText(w), 'Forme algébrique', 'alg', 'alg'),
+      E(`((${e1})^${n1})/((${e2})^${n2})`, t('Formes exponentielles'), 'exp', 'exp'),
+      E(expText(m ? rPow(r, m) : '', nt), t('Moivre : modules et arguments'), 'pow', 'pow'),
+      ...(nt.eq(tp) ? [] : [E(expText(rm, tp), t('Réduire l\'argument'), 'reduce', 'reduce')]),
+      E(czText(w), t('Forme algébrique'), 'alg', 'alg'),
     ];
     const lines = prep(ALG, raw, level, raw.map((l) => (l.act === 'pow' ? [iPiT(nt)] : l.act === 'reduce' ? [iPiT(tp)] : l.act === 'exp' ? [iPiT(t1)] : [])));
     const { start: s0, judge, script } = partsScript([{ start, judge: ALG, lines }], level, MO_CHOICES);
     return linesItem({
       skill: MO, level, mode: modeOf(level), start: s0, judge, script,
-      prompt: `Calcule ${M(start)} et écris le résultat sous la forme a + bi${level === 5 ? ', sans aide' : ''}.`,
-      hints: H('Écris chaque nombre sous forme exponentielle : les modules se simplifient, les arguments se soustraient.', `${M(start)} = ${M(expText(m && !r.eq(1) ? '□' : '', nt))}`, M(czText(w))),
+      prompt: level === 5 ? t('Calcule {s} et écris le résultat sous la forme a + bi, sans aide.', { s: M(start) }) : t('Calcule {s} et écris le résultat sous la forme a + bi.', { s: M(start) }),
+      hints: H(t('Écris chaque nombre sous forme exponentielle : les modules se simplifient, les arguments se soustraient.'), `${M(start)} = ${M(expText(m && !r.eq(1) ? '□' : '', nt))}`, M(czText(w))),
       subgoals: MO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
       key: `${MO}:${level}:quot:${start}`, exam: examTag(opts),
     });
@@ -648,28 +654,30 @@ function moQuotient(level, rng, opts) {
 
 // The smallest n ≥ 1 such that zⁿ is a positive real.
 function moWhichN(level, rng, opts) {
-  const [r, t] = rng.pick(MO_Z.filter(([, tt]) => tt.d > 2));
-  const z = polarToCz(r, t);
+  const [r, tq] = rng.pick(MO_Z.filter(([, tt]) => tt.d > 2));
+  const z = polarToCz(r, tq);
   const zs = czText(z);
   // n·t ∈ 2ℤ: n = 2d/gcd(n_t, 2d).
   const g = (a, b) => (b ? g(b, a % b) : Math.abs(a));
-  const n = (2 * t.d) / g(t.n, 2 * t.d);
-  const ex = expText(r, t);
-  const nT = `n·${t.n < 0 ? `(${fr(piT(t))})` : fr(piT(t))}`;
-  const pre = level === 2 || level === 3 ? [{ kind: 'decision', prompt: `zⁿ = ${r.eq(1) ? '' : `${fr(r.text())}ⁿ·`}e^(inθ), avec θ = ${fr(piT(t))}. C'est un réel positif quand :`, options: [
-    { id: 'two', label: `${nT} est un multiple de 2π`, valid: true },
-    { id: 'pi', label: `${nT} est un multiple de π`, valid: false, why: 'Un multiple impair de π donne e^(iπ) = −1 : un réel négatif.' },
-    { id: 'half', label: `${nT} = π/2`, valid: false, why: 'e^(iπ/2) = i : c\'est un imaginaire pur.' },
+  const n = (2 * tq.d) / g(tq.n, 2 * tq.d);
+  const ex = expText(r, tq);
+  const nT = `n·${tq.n < 0 ? `(${fr(piT(tq))})` : fr(piT(tq))}`;
+  const pre = level === 2 || level === 3 ? [{ kind: 'decision', prompt: t('zⁿ = {v1}e^(inθ), avec θ = {v2}. C\'est un réel positif quand :', { v1: r.eq(1) ? '' : `${fr(r.text())}ⁿ·`, v2: fr(piT(tq)) }), options: [
+    { id: 'two', label: t('{nT} est un multiple de 2π', { nT }), valid: true },
+    { id: 'pi', label: t('{nT} est un multiple de π', { nT }), valid: false, why: t('Un multiple impair de π donne e^(iπ) = −1 : un réel négatif.') },
+    { id: 'half', label: `${nT} = π/2`, valid: false, why: t('e^(iπ/2) = i : c\'est un imaginaire pur.') },
   ] }] : [];
   const parts = [
-    { start: zs, judge: EXP, lines: prep(EXP, [E(ex, 'Forme exponentielle', 'exp', 'exp')], level) },
-    { html: `Plus petit entier n ≥ 1 tel que zⁿ soit un réel positif :`, ask: 'n =', start: 'n', judge: ASK(n), pre, lines: prep(ASK(n), [E(String(n), `${nT.replace('n', n)} = ${fr(piT(t.mul(n)))}`, 'pow', 'pow')], level) },
+    { start: zs, judge: EXP, lines: prep(EXP, [E(ex, t('Forme exponentielle'), 'exp', 'exp')], level) },
+    { html: t('Plus petit entier n ≥ 1 tel que zⁿ soit un réel positif :'), ask: 'n =', start: 'n', judge: ASK(n), pre, lines: prep(ASK(n), [E(String(n), `${nT.replace('n', n)} = ${fr(piT(tq.mul(n)))}`, 'pow', 'pow')], level) },
   ];
   const { start, judge, script } = partsScript(parts, level, MO_CHOICES);
   return linesItem({
     skill: MO, level, mode: modeOf(level), start, judge, script,
-    prompt: `Soit z = ${M(zs)}. Écris z sous forme exponentielle, puis trouve le plus petit entier n ≥ 1 tel que zⁿ soit un réel positif${level === 5 ? ', sans aide' : ''}.`,
-    hints: H('zⁿ = rⁿ·e^(inθ) est un réel positif quand nθ est un multiple de 2π.', `θ = ${M(piT(t))} : ${nT} = 2kπ, donc n = □`, `n = ${n}`),
+    prompt: level === 5
+      ? t('Soit z = {z}. Écris z sous forme exponentielle, puis trouve le plus petit entier n ≥ 1 tel que zⁿ soit un réel positif, sans aide.', { z: M(zs) })
+      : t('Soit z = {z}. Écris z sous forme exponentielle, puis trouve le plus petit entier n ≥ 1 tel que zⁿ soit un réel positif.', { z: M(zs) }),
+    hints: H(t('zⁿ = rⁿ·e^(inθ) est un réel positif quand nθ est un multiple de 2π.'), t('θ = {v1} : {nT} = 2kπ, donc n = □', { v1: M(piT(tq)), nT }), `n = ${n}`),
     subgoals: MO_SUB, keys: KEYS, tapActions: level === 3 ? 'steps' : null,
     key: `${MO}:${level}:n:${zs}`, exam: examTag(opts),
   });
@@ -700,29 +708,29 @@ function moMcq(rng) {
     skill: MO, level: 4, prompt: `${M(start)} =`,
     options: options(right, wrongs, [{ html: M(czText({ re: d.w.re.neg(), im: d.w.im.neg() })) }]),
     key: `${MO}:mcq:${start}`, expectedSec: 120, exam: { format: 'mcq', points: 1 },
-    solution: [{ html: `${M(czText(d.z))} = ${M(expText(d.r, d.t))}, donc ${M(start)} = ${M(expText(d.rn, d.nt))} = ${M(expText(d.rn, d.tp))} = ${M(czText(d.w))}.`, note: '' }],
+    solution: [{ html: t('{v1} = {v2}, donc {start} = {v3} = {v4} = {v5}.', { v1: M(czText(d.z)), v2: M(expText(d.r, d.t)), start: M(start), v3: M(expText(d.rn, d.nt)), v4: M(expText(d.rn, d.tp)), v5: M(czText(d.w)) }), note: '' }],
   }, rng);
 }
 
 const MO_TF = [
-  { s: 'Pour tout z ∈ ℂ et tout n ∈ ℕ* : |zⁿ| = |z|ⁿ.', truth: true, why: 'Les modules se multiplient : |z·z·…·z| = |z|·|z|·…·|z|.' },
-  { s: 'Pour tout z ∈ ℂ et tout n ∈ ℕ* : conj(zⁿ) = (z̄)ⁿ.', truth: true, why: 'Le conjugué respecte les produits.' },
-  { s: 'Pour tout z ≠ 0 et tout n ∈ ℕ* : arg(zⁿ) = n·arg z (arguments dans ]−π ; π]).', vars: ['z', 'n'], pred: 'arg(z^n)=n×arg(z)', truth: false, answer: { z: '-1', n: '2' }, why: 'Avec z = −1 et n = 2 : arg(1) = 0, mais 2·π = 2π. L\'égalité n\'est vraie qu\'à 2π près : il faut réduire.' },
-  { s: 'Pour tout n ∈ ℕ* : (1 + i)ⁿ n\'est pas réel.', vars: ['n'], pred: 'Im((1+i)^n)≠0', truth: false, answer: { n: '4' }, why: 'Avec n = 4 : (1 + i)⁴ = (√2)⁴·e^(iπ) = −4, réel.' },
-  { s: 'Pour tout n ∈ ℕ* : |(1 + i)ⁿ| = 2ⁿ.', vars: ['n'], pred: '|(1+i)^n|=2^n', truth: false, answer: { n: '1' }, why: '|1 + i| = √2 : |(1 + i)ⁿ| = (√2)ⁿ, et pas 2ⁿ (n = 1 : √2 ≠ 2).' },
+  { s: 'Pour tout z ∈ ℂ et tout n ∈ ℕ* : |zⁿ| = |z|ⁿ.', truth: true, why: t('Les modules se multiplient : |z·z·…·z| = |z|·|z|·…·|z|.') },
+  { s: 'Pour tout z ∈ ℂ et tout n ∈ ℕ* : conj(zⁿ) = (z̄)ⁿ.', truth: true, why: t('Le conjugué respecte les produits.') },
+  { s: 'Pour tout z ≠ 0 et tout n ∈ ℕ* : arg(zⁿ) = n·arg z (arguments dans ]−π ; π]).', vars: ['z', 'n'], pred: 'arg(z^n)=n×arg(z)', truth: false, answer: { z: '-1', n: '2' }, why: t('Avec z = −1 et n = 2 : arg(1) = 0, mais 2·π = 2π. L\'égalité n\'est vraie qu\'à 2π près : il faut réduire.') },
+  { s: 'Pour tout n ∈ ℕ* : (1 + i)ⁿ n\'est pas réel.', vars: ['n'], pred: 'Im((1+i)^n)≠0', truth: false, answer: { n: '4' }, why: t('Avec n = 4 : (1 + i)⁴ = (√2)⁴·e^(iπ) = −4, réel.') },
+  { s: 'Pour tout n ∈ ℕ* : |(1 + i)ⁿ| = 2ⁿ.', vars: ['n'], pred: '|(1+i)^n|=2^n', truth: false, answer: { n: '1' }, why: t('|1 + i| = √2 : |(1 + i)ⁿ| = (√2)ⁿ, et pas 2ⁿ (n = 1 : √2 ≠ 2).') },
   { s: '(1 + i)⁴ est réel.', truth: true, why: '(1 + i)⁴ = (√2·e^(iπ/4))⁴ = 4e^(iπ) = −4.' },
   { s: '(1 + i√3)³ est réel.', truth: true, why: '(1 + i√3)³ = (2e^(iπ/3))³ = 8e^(iπ) = −8.' },
   { s: '(√3 + i)⁶ est réel.', truth: true, why: '(√3 + i)⁶ = (2e^(iπ/6))⁶ = 64e^(iπ) = −64.' },
 ];
 
 function moTf(rng) {
-  const t = rng.pick(MO_TF);
+  const tq = rng.pick(MO_TF);
   const labels = { z: 'z =', n: 'n =' };
   return tfItem({
-    skill: MO, level: 4, statement: t.s, truth: t.truth,
-    counter: t.truth ? null : { kind: 'complex', vars: t.vars, doms: { n: 'N*' }, pred: t.pred, ask: t.vars.map((v) => ({ v, label: labels[v], keys: ['calc', 'cplx'] })), answer: t.answer },
-    ruleIfTrue: t.s.includes('2ⁿ') ? 'g8_moivre_modulus' : null,
-    explanation: t.why, key: `${MO}:${t.s}`, exam: { format: 'tf', points: 1 },
+    skill: MO, level: 4, statement: t(tq.s), truth: tq.truth,
+    counter: tq.truth ? null : { kind: 'complex', vars: tq.vars, doms: { n: 'N*' }, pred: tq.pred, ask: tq.vars.map((v) => ({ v, label: labels[v], keys: ['calc', 'cplx'] })), answer: tq.answer },
+    ruleIfTrue: tq.s.includes('2ⁿ') ? 'g8_moivre_modulus' : null,
+    explanation: tq.why, key: `${MO}:${tq.s}`, exam: { format: 'tf', points: 1 },
   });
 }
 
@@ -730,12 +738,12 @@ function moTf(rng) {
 function moCoef(rng) {
   for (let k = 0; k < 200; k++) {
     const d = moData(rng);
-    const ok = [['réelle', d.w.re], ['imaginaire', d.w.im]].filter(([, x]) => x.isRational());
+    const ok = [['re', d.w.re], ['im', d.w.im]].filter(([, x]) => x.isRational());
     if (!ok.length) continue;
     const [name, x] = rng.pick(ok);
     const start = `(${czText(d.z)})^${d.n}`;
     return answerItem({
-      skill: MO, level: 4, prompt: `Donne la partie ${name} de ${M(start)}.`,
+      skill: MO, level: 4, prompt: name === 're' ? t('Donne la partie réelle de {start}.', { start: M(start) }) : t('Donne la partie imaginaire de {start}.', { start: M(start) }),
       expected: x.p.toString(),
       solution: [{ html: `${M(start)} = ${M(expText(d.rn, d.tp))} = ${M(czText(d.w))}.`, note: '' }],
       key: start, exam: { format: 'coef', points: 1 },

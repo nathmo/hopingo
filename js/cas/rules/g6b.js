@@ -17,6 +17,7 @@ import { walk, replaceAt, mapNode, numValue, stripParen, dependsOn, symbolsIn, c
 import { diff } from '../diff.js';
 import { toMathML } from '../mathml.js';
 import { toText } from '../print.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(n));
 const par = (e) => ({ t: 'paren', e });
@@ -250,7 +251,7 @@ export const RULES = [
   {
     id: 'g6_ln_abs', family: 'calculus', tag: 'E', skill: 'g6-antideriv-usual', repair: 'g6-antideriv-usual',
     judges: ['antideriv'],
-    name: 'ln x au lieu de ln|x|',
+    name: t('ln x au lieu de ln|x|'),
     example: ['∫dx/x = ln x', '∫dx/x = ln|x|'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-3, 3] } }, prev: 'int(3x^2-4/x,x)', line: 'x^3-4ln(x)+C' },
     transform: (prev, ctx) => {
@@ -266,12 +267,12 @@ export const RULES = [
       }
       return out;
     },
-    explain: () => 'ln x n\'existe que pour x > 0. Ici la fonction à intégrer existe aussi pour x < 0 : une primitive valable des deux côtés de 0 est ln|x|, car (ln|x|)′ = 1/x pour tout x ≠ 0.',
+    explain: () => t('ln x n\'existe que pour x > 0. Ici la fonction à intégrer existe aussi pour x < 0 : une primitive valable des deux côtés de 0 est ln|x|, car (ln|x|)′ = 1/x pour tout x ≠ 0.'),
   },
   {
     id: 'g6_antideriv_power_minus_one', family: 'calculus', tag: 'E', skill: 'g6-antideriv-usual', repair: 'g6-antideriv-usual',
     judges: ['antideriv'],
-    name: 'Dériver au lieu d\'intégrer une puissance',
+    name: t('Dériver au lieu d\'intégrer une puissance'),
     example: ['∫x³ dx = 3x²', '∫x³ dx = x⁴/4'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-3, 3] } }, prev: 'int(x^3+2x,x)', line: '3x^2+2+C' },
     transform: (prev, ctx) => {
@@ -287,13 +288,15 @@ export const RULES = [
       }
       return out;
     },
-    explain: (ctx = {}) => `Pour intégrer une puissance, on <b>monte</b> l'exposant et on divise par le nouvel exposant : ∫xⁿ dx = xⁿ⁺¹/(n + 1). Tu as dérivé${ctx.term ? ` ${M(parse(ctx.term))}` : ''} à la place. Contrôle en dérivant ta ligne : tu dois retrouver la fonction à intégrer.`,
+    explain: (ctx = {}) => (ctx.term
+      ? t('Pour intégrer une puissance, on <b>monte</b> l\'exposant et on divise par le nouvel exposant : ∫xⁿ dx = xⁿ⁺¹/(n + 1). Tu as dérivé {e} à la place. Contrôle en dérivant ta ligne : tu dois retrouver la fonction à intégrer.', { e: M(parse(ctx.term)) })
+      : t('Pour intégrer une puissance, on <b>monte</b> l\'exposant et on divise par le nouvel exposant : ∫xⁿ dx = xⁿ⁺¹/(n + 1). Tu as dérivé à la place. Contrôle en dérivant ta ligne : tu dois retrouver la fonction à intégrer.')),
   },
   {
     id: 'g6_area_signed', family: 'calculus', tag: 'E', skill: 'g6-area', repair: 'g6-area',
     judges: ['definite'],
-    name: 'Aire prise comme intégrale avec son signe',
-    example: ['aire = ∫(bas − haut) = −32/3', 'aire = 32/3'],
+    name: t('Aire prise comme intégrale avec son signe'),
+    example: [t('aire = ∫(bas − haut) = −32/3'), t('aire = 32/3')],
     check: { judge: { kind: 'definite' }, prev: 'int(|x^2-2x-3|,x,-1,3)', line: 'int(x^2-2x-3,x,-1,3)' },
     transform: (prev) => {
       const out = [];
@@ -307,12 +310,12 @@ export const RULES = [
       });
       return out;
     },
-    explain: () => 'Une aire est positive. Sur chaque morceau, on intègre (courbe du haut − courbe du bas) : tu as soustrait la courbe du haut à celle du bas, ou intégré d\'un seul coup sur un intervalle où les courbes se croisent.',
+    explain: () => t('Une aire est positive. Sur chaque morceau, on intègre (courbe du haut − courbe du bas) : tu as soustrait la courbe du haut à celle du bas, ou intégré d\'un seul coup sur un intervalle où les courbes se croisent.'),
   },
   {
     id: 'g6_implicit_xy', family: 'calculus', tag: 'E', skill: 'g6-deriv-implicit', repair: 'g6-deriv-rules',
     judges: ['equiv'],
-    name: 'Dérivée de x·y prise comme x·y′ ou y′',
+    name: t('Dérivée de x·y prise comme x·y′ ou y′'),
     example: ['(xy)′ = x·y′', '(xy)′ = y + x·y′'],
     check: { judge: IMPLICIT_CFG, prev: 'd(x^2+x×y+y^3)', line: '2x+x×y\'+3y^2×y\'' },
     transform: (prev, ctx) => {
@@ -324,12 +327,14 @@ export const RULES = [
         (t) => mul(sym(imp.p), diff(diff(t, imp.y), imp.x)),
       ]);
     },
-    explain: (ctx = {}) => `${ctx.term ? `${M(ctx.term)}` : 'xy'} est un produit de deux fonctions de x (y dépend de x) : on applique la règle du produit, (xy)′ = 1·y + x·y′.${ctx.term ? ` Ici (${M(ctx.term)})′ = ${M(ctx.right)}.` : ''}`,
+    explain: (ctx = {}) => (ctx.term
+      ? t('{e} est un produit de deux fonctions de x (y dépend de x) : on applique la règle du produit, (xy)′ = 1·y + x·y′. Ici ({e})′ = {r}.', { e: M(ctx.term), r: M(ctx.right) })
+      : t('xy est un produit de deux fonctions de x (y dépend de x) : on applique la règle du produit, (xy)′ = 1·y + x·y′.')),
   },
   {
     id: 'g6_implicit_yprime_forgot', family: 'calculus', tag: 'E', skill: 'g6-deriv-implicit', repair: 'g6-deriv-rules',
     judges: ['equiv'],
-    name: 'Facteur y′ oublié en dérivant une expression en y',
+    name: t('Facteur y′ oublié en dérivant une expression en y'),
     example: ['(y³)′ = 3y²', '(y³)′ = 3y²·y′'],
     check: { judge: IMPLICIT_CFG, prev: 'd(x^2+x×y+y^3)', line: '2x+y+x×y\'+3y^2' },
     transform: (prev, ctx) => {
@@ -339,6 +344,8 @@ export const RULES = [
         (t) => add(diff(t, imp.x), mul(num(1), diff(t, imp.y))),
       ]);
     },
-    explain: (ctx = {}) => `y dépend de x : par la règle de chaîne, (y³)′ = 3y²·y′, comme (sin 3x)′ = 3cos 3x.${ctx.term ? ` Ici (${M(ctx.term)})′ = ${M(ctx.right)}.` : ''}`,
+    explain: (ctx = {}) => (ctx.term
+      ? t('y dépend de x : par la règle de chaîne, (y³)′ = 3y²·y′, comme (sin 3x)′ = 3cos 3x. Ici ({e})′ = {r}.', { e: M(ctx.term), r: M(ctx.right) })
+      : t('y dépend de x : par la règle de chaîne, (y³)′ = 3y²·y′, comme (sin 3x)′ = 3cos 3x.')),
   },
 ];

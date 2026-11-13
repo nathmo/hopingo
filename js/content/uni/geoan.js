@@ -5,13 +5,14 @@
 
 import { SKILLS } from './geoan.skills.js';
 import { mcq } from './kit.js';
+import { t } from '../../i18n.js';
 import { GEN as A } from './geoan-a.js';
 import { GEN as B } from './geoan-b.js';
 
 const stub = (s) => (level, rng, profile, opts = {}) => ({
   ...mcq({
-    skill: s.id, level, prompt: `${s.title} : bientôt.`, key: `${s.id}:stub`,
-    options: [{ html: "D'accord", correct: true }, { html: 'Plus tard', correct: false }],
+    skill: s.id, level, prompt: t('{title} : bientôt.', { title: s.title }), key: `${s.id}:stub`,
+    options: [{ html: t("D'accord"), correct: true }, { html: t('Plus tard'), correct: false }],
     exam: opts.exam ? { format: opts.exam, points: 1 } : false,
   }, rng),
   subgoals: s.prereqs.map((p) => ({ id: p, label: p, skill: p })),

@@ -11,18 +11,19 @@
 
 import { MT, H, q, fr, build, CKEYS, mcqMulti } from './fourier-a-kit.js';
 import { examTag } from './kit.js';
+import { t } from '../../i18n.js';
 
 const SK = 'f-coef-complex';
 const SUB = [
-  { id: 'read', label: 'lire les cₖ', skill: SK },
+  { id: 'read', label: t('lire les cₖ'), skill: SK },
   { id: 'convert', label: 'aₖ = cₖ + c₋ₖ, bₖ = i(cₖ − c₋ₖ)', skill: SK },
-  { id: 'list', label: 'coefficients non nuls', skill: SK },
+  { id: 'list', label: t('coefficients non nuls'), skill: SK },
 ];
 const CHOICES = [
-  { id: 'toR', label: 'aₖ = cₖ + c₋ₖ et bₖ = i(cₖ − c₋ₖ)' },
-  { id: 'toC', label: 'cₖ = (aₖ − ibₖ)/2 et c₋ₖ = (aₖ + ibₖ)/2' },
-  { id: 'simp', label: 'Calculer (i² = −1)' },
-  { id: 'noi', label: 'bₖ = cₖ − c₋ₖ', rule: 'f_coef_complex_convert', why: 'cₖ = (aₖ − ibₖ)/2 et c₋ₖ = (aₖ + ibₖ)/2 : cₖ − c₋ₖ = −ibₖ, donc bₖ = i(cₖ − c₋ₖ).' },
+  { id: 'toR', label: t('aₖ = cₖ + c₋ₖ et bₖ = i(cₖ − c₋ₖ)') },
+  { id: 'toC', label: t('cₖ = (aₖ − ibₖ)/2 et c₋ₖ = (aₖ + ibₖ)/2') },
+  { id: 'simp', label: t('Calculer (i² = −1)') },
+  { id: 'noi', label: 'bₖ = cₖ − c₋ₖ', rule: 'f_coef_complex_convert', why: t('cₖ = (aₖ − ibₖ)/2 et c₋ₖ = (aₖ + ibₖ)/2 : cₖ − c₋ₖ = −ibₖ, donc bₖ = i(cₖ − c₋ₖ).') },
 ];
 const SUBS = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇'];
 
@@ -36,9 +37,9 @@ export function cT(re, im) {
   if (R.n === 0) return `${I.n < 0 ? '-' : ''}${imT}`;
   return `${R}${I.n < 0 ? '-' : '+'}${imT}`;
 }
-const par = (t) => (/^[0-9]+(\/[0-9]+)?$/.test(t) ? t : `(${t})`);
+const par = (tt) => (/^[0-9]+(\/[0-9]+)?$/.test(tt) ? tt : `(${tt})`);
 // A coefficient before e^(…): '' for 1, '-' for −1, '3', '-2', '(1/2)', '(1-2i)'.
-const coefE = (t) => (t === '1' ? '' : t === '-1' ? '-' : /^-?[0-9]+$/.test(t) ? t : `(${t})`);
+const coefE = (tt) => (tt === '1' ? '' : tt === '-1' ? '-' : /^-?[0-9]+$/.test(tt) ? tt : `(${tt})`);
 
 const VALS = [1, 2, 3, -1, -2, q(3, 2), q(1, 2)];
 function data(rng) {
@@ -52,21 +53,21 @@ function data(rng) {
       return { k, a, b };
     });
     const c0 = q(rng.pick([0, 1, 2, 5, -1]));
-    if (terms.every((t) => t.a.n === 0 && t.b.n === 0)) continue;
+    if (terms.every((tt) => tt.a.n === 0 && tt.b.n === 0)) continue;
     return { k1, k2, terms, c0 };
   }
   return { k1: 1, k2: 3, terms: [{ k: 1, a: q(1), b: q(0) }, { k: 3, a: q(0), b: q(3) }], c0: q(0), fallback: true };
 }
 // cₖ = (aₖ − ibₖ)/2.
-const ck = (t) => ({ re: t.a.div(2), im: t.b.neg().div(2) });
+const ck = (tt) => ({ re: tt.a.div(2), im: tt.b.neg().div(2) });
 
 // The real form: c₀·… as a₀/2 = c₀: '5 + 2cos(3x) + 4sin(3x)'.
 function realText(d) {
   const parts = [];
   if (d.c0.n) parts.push(String(d.c0));
-  for (const t of d.terms) {
-    const kx = `${t.k === 1 ? '' : t.k}x`;
-    for (const [c, fn] of [[t.a, 'cos'], [t.b, 'sin']]) {
+  for (const tt of d.terms) {
+    const kx = `${tt.k === 1 ? '' : tt.k}x`;
+    for (const [c, fn] of [[tt.a, 'cos'], [tt.b, 'sin']]) {
       if (c.n === 0) continue;
       const cs = c.eq(1) ? '' : c.eq(-1) ? '-' : c.d === 1 ? String(c) : `(${c})`;
       parts.push(`${cs}${fn}(${kx})`);
@@ -78,41 +79,41 @@ function realText(d) {
 function expText(d) {
   const parts = [];
   if (d.c0.n) parts.push(String(d.c0));
-  for (const t of d.terms) {
-    const { re, im } = ck(t);
-    const kx = `${t.k === 1 ? '' : t.k}x`;
+  for (const tt of d.terms) {
+    const { re, im } = ck(tt);
+    const kx = `${tt.k === 1 ? '' : tt.k}x`;
     const p = cT(re, im);
     const m = cT(re, im.neg());
     if (p === '0') continue;
-    const ik = `${t.k === 1 ? '' : t.k}i x`;
+    const ik = `${tt.k === 1 ? '' : tt.k}i x`;
     parts.push(`${coefE(p)}e^(${ik})+${coefE(m)}e^(-${ik})`);
   }
   return parts.join('+').replace(/\+-/g, '-').replace(/\+\(-/g, '+(-');
 }
-const show = (t) => MT(t, { complex: true });
+const show = (tt) => MT(tt, { complex: true });
 
 // The parts of one frequency: toR (aₖ, bₖ from cₖ) or toC (cₖ, c₋ₖ from aₖ, bₖ).
-function partsOf(t, dir, level) {
-  const { re, im } = ck(t);
+function partsOf(tt, dir, level) {
+  const { re, im } = ck(tt);
   const cp = cT(re, im);
   const cm = cT(re, im.neg());
-  const s = SUBS[t.k];
+  const s = SUBS[tt.k];
   const J = (expect, traps = {}) => ({ kind: 'fcomplex', expect, form: 'algebraic', complex: true, traps });
   if (dir === 'toR') {
-    const aT = String(t.a);
-    const bT = String(t.b);
+    const aT = String(tt.a);
+    const bT = String(tt.b);
     return [
       {
-        html: `a${s} = c${s} + c₋${s} :`, ask: `a${s} =`, start: `a_${t.k}`,
-        judge: J(aT, { f_coef_complex_convert: [cT(t.b, 0)] }),
+        html: `a${s} = c${s} + c₋${s} :`, ask: `a${s} =`, start: `a_${tt.k}`,
+        judge: J(aT, { f_coef_complex_convert: [cT(tt.b, 0)] }),
         lines: [
           { math: `${par(cp)}+${par(cm)}`, note: `c${s} + c₋${s}`, subgoal: 'convert', act: 'toR', blank: [par(cm)] },
           { math: aT, note: '', subgoal: 'convert', act: 'simp', blank2: [aT] },
         ],
       },
       {
-        html: `b${s} = i(c${s} − c₋${s}) :`, ask: `b${s} =`, start: `b_${t.k}`,
-        judge: J(bT, { f_coef_complex_convert: [cT(0, t.b.neg()), aT] }),
+        html: `b${s} = i(c${s} − c₋${s}) :`, ask: `b${s} =`, start: `b_${tt.k}`,
+        judge: J(bT, { f_coef_complex_convert: [cT(0, tt.b.neg()), aT] }),
         lines: [
           { math: `i(${par(cp)}-${par(cm)})`, note: `i(c${s} − c₋${s})`, subgoal: 'convert', act: 'toR', blank: [par(cm)] },
           { math: bT, note: 'i² = −1', subgoal: 'convert', act: 'simp', blank2: [bT] },
@@ -121,23 +122,23 @@ function partsOf(t, dir, level) {
     ];
   }
   // (a − ib)/2 written out: '(2-4i)/2', '-3i/2', '(1+i)/2'.
-  const absB = t.b.n < 0 ? t.b.neg() : t.b;
+  const absB = tt.b.n < 0 ? tt.b.neg() : tt.b;
   const bi = absB.eq(1) ? 'i' : absB.d === 1 ? `${absB}i` : `(${absB})i`;
-  const minusIb = t.b.n === 0 ? '' : `${t.b.n > 0 ? '-' : '+'}${bi}`;
-  const formula = t.a.n === 0 ? `${t.b.n > 0 ? '-' : ''}${bi}/2` : t.b.n === 0 ? `${t.a.d === 1 ? t.a : `(${t.a})`}/2` : `(${t.a}${minusIb})/2`;
+  const minusIb = tt.b.n === 0 ? '' : `${tt.b.n > 0 ? '-' : '+'}${bi}`;
+  const formula = tt.a.n === 0 ? `${tt.b.n > 0 ? '-' : ''}${bi}/2` : tt.b.n === 0 ? `${tt.a.d === 1 ? tt.a : `(${tt.a})`}/2` : `(${tt.a}${minusIb})/2`;
   return [
     {
-      html: `c${s} = (a${s} − ib${s})/2 :`, ask: `c${s} =`, start: `c_${t.k}`,
-      judge: J(cp, { f_coef_complex_convert: [cT(t.a.div(2), t.b.div(2)), cT(t.a, t.b.neg())] }),
+      html: `c${s} = (a${s} − ib${s})/2 :`, ask: `c${s} =`, start: `c_${tt.k}`,
+      judge: J(cp, { f_coef_complex_convert: [cT(tt.a.div(2), tt.b.div(2)), cT(tt.a, tt.b.neg())] }),
       lines: [
-        ...(t.a.n === 0 || t.b.n === 0 ? [] : [{ math: formula, note: `(a${s} − ib${s})/2`, subgoal: 'read', act: 'toC', blank: t.b.n ? [bi] : [] }]),
+        ...(tt.a.n === 0 || tt.b.n === 0 ? [] : [{ math: formula, note: `(a${s} − ib${s})/2`, subgoal: 'read', act: 'toC', blank: tt.b.n ? [bi] : [] }]),
         { math: cp, note: '', subgoal: 'read', act: 'simp', blank2: [cp] },
       ],
     },
     {
-      html: `c₋${s} = (a${s} + ib${s})/2 = conj(c${s}) :`, ask: `c₋${s} =`, start: `c_(-${t.k})`,
+      html: `c₋${s} = (a${s} + ib${s})/2 = conj(c${s}) :`, ask: `c₋${s} =`, start: `c_(-${tt.k})`,
       judge: J(cm, { f_coef_complex_convert: [cp] }),
-      lines: [{ math: cm, note: 'Le conjugué : f est réelle', subgoal: 'read', act: 'simp', blank: [cm] }],
+      lines: [{ math: cm, note: t('Le conjugué : f est réelle'), subgoal: 'read', act: 'simp', blank: [cm] }],
     },
   ];
 }
@@ -151,49 +152,49 @@ function linesVariant(level, rng, opts) {
     parts.push(...partsOf(d.terms[0], 'toC', level));
     parts.push(...partsOf(d.terms[1], 'toR', level));
   } else {
-    for (const t of d.terms) {
-      if (t.a.n === 0 && t.b.n === 0) continue;
-      parts.push(...partsOf(t, dir, level));
+    for (const tt of d.terms) {
+      if (tt.a.n === 0 && tt.b.n === 0) continue;
+      parts.push(...partsOf(tt, dir, level));
       if (parts.length >= 2 && level <= 2) break;
     }
   }
   // a₀ = 2c₀ in the direction « vers les réels ».
   if ((dir === 'toR' || both) && d.c0.n) {
     parts.push({
-      html: 'Le terme constant : a₀/2 = c₀ :', ask: 'a₀ =', start: 'a_0',
+      html: t('Le terme constant : a₀/2 = c₀ :'), ask: 'a₀ =', start: 'a_0',
       judge: { kind: 'fcomplex', expect: String(d.c0.mul(2)), form: 'algebraic', complex: true, traps: { f_a0_separate: [{ line: String(d.c0), ctx: { kind: 'c0' } }] } },
       lines: [{ math: String(d.c0.mul(2)), note: 'a₀ = 2c₀', subgoal: 'convert', act: 'toR', blank: [String(d.c0.mul(2))] }],
     });
   }
-  const formula = dir === 'toR' && !both ? 'aₖ = cₖ + c₋ₖ et bₖ = i(cₖ − c₋ₖ)' : 'cₖ = (aₖ − ibₖ)/2, c₋ₖ = (aₖ + ibₖ)/2';
+  const formula = dir === 'toR' && !both ? t('aₖ = cₖ + c₋ₖ et bₖ = i(cₖ − c₋ₖ)') : 'cₖ = (aₖ − ibₖ)/2, c₋ₖ = (aₖ + ibₖ)/2';
   const decision = {
-    kind: 'decision', prompt: 'Dans quel sens convertir ?', levels: [2, 3, 4], options: [
-      { id: 'toR', label: 'Des cₖ vers les aₖ, bₖ : aₖ = cₖ + c₋ₖ, bₖ = i(cₖ − c₋ₖ)', valid: dir === 'toR', why: 'f est donnée en cosinus et sinus : on cherche les cₖ.' },
-      { id: 'toC', label: 'Des aₖ, bₖ vers les cₖ : cₖ = (aₖ − ibₖ)/2', valid: dir === 'toC', why: 'f est donnée avec des exponentielles : on lit les cₖ, et on cherche les aₖ, bₖ.' },
-      { id: 'noi', label: 'bₖ = cₖ − c₋ₖ', valid: false, rule: 'f_coef_complex_convert', why: 'cₖ − c₋ₖ = −ibₖ : il faut multiplier par i, bₖ = i(cₖ − c₋ₖ).' },
+    kind: 'decision', prompt: t('Dans quel sens convertir ?'), levels: [2, 3, 4], options: [
+      { id: 'toR', label: t('Des cₖ vers les aₖ, bₖ : aₖ = cₖ + c₋ₖ, bₖ = i(cₖ − c₋ₖ)'), valid: dir === 'toR', why: t('f est donnée en cosinus et sinus : on cherche les cₖ.') },
+      { id: 'toC', label: t('Des aₖ, bₖ vers les cₖ : cₖ = (aₖ − ibₖ)/2'), valid: dir === 'toC', why: t('f est donnée avec des exponentielles : on lit les cₖ, et on cherche les aₖ, bₖ.') },
+      { id: 'noi', label: 'bₖ = cₖ − c₋ₖ', valid: false, rule: 'f_coef_complex_convert', why: t('cₖ − c₋ₖ = −ibₖ : il faut multiplier par i, bₖ = i(cₖ − c₋ₖ).') },
     ],
   };
-  if (!both) parts[0].pre = [level === 1 ? { kind: 'note', html: `Formules : ${formula}.` } : decision];
+  if (!both) parts[0].pre = [level === 1 ? { kind: 'note', html: t('Formules : {formula}.', { formula }) } : decision];
   const given = both
     ? `f(x) = ${show(realText({ ...d, terms: [d.terms[0]], c0: q(0) }))} + ${show(expText({ ...d, terms: [d.terms[1]] }))}`
     : dir === 'toR' ? `f(x) = ${show(expText(d))}` : `f(x) = ${show(realText(d))}`;
-  const ask = both ? `Donne c${SUBS[d.terms[0].k]}, c₋${SUBS[d.terms[0].k]}, puis a${SUBS[d.terms[1].k]}, b${SUBS[d.terms[1].k]}${d.c0.n ? ' et a₀' : ''}.`
-    : dir === 'toR' ? 'Lis ses coefficients cₖ et donne ses coefficients réels aₖ, bₖ (convention a₀/2).' : 'Donne ses coefficients complexes cₖ (sans intégrer).';
+  const ask = both ? (d.c0.n ? t('Donne c{a}, c₋{a}, puis a{b}, b{b} et a₀.', { a: SUBS[d.terms[0].k], b: SUBS[d.terms[1].k] }) : t('Donne c{a}, c₋{a}, puis a{b}, b{b}.', { a: SUBS[d.terms[0].k], b: SUBS[d.terms[1].k] }))
+    : dir === 'toR' ? t('Lis ses coefficients cₖ et donne ses coefficients réels aₖ, bₖ (convention a₀/2).') : t('Donne ses coefficients complexes cₖ (sans intégrer).');
   return build({
     skill: SK, level, parts, subgoals: SUB, keys: CKEYS, choices: CHOICES,
     prompt: `${given}. ${ask}`,
-    hints: H('cos(kx) = (e^(ikx) + e^(−ikx))/2 et sin(kx) = (e^(ikx) − e^(−ikx))/(2i) : on lit les cₖ. Puis aₖ = cₖ + c₋ₖ, bₖ = i(cₖ − c₋ₖ).',
+    hints: H(t('cos(kx) = (e^(ikx) + e^(−ikx))/2 et sin(kx) = (e^(ikx) − e^(−ikx))/(2i) : on lit les cₖ. Puis aₖ = cₖ + c₋ₖ, bₖ = i(cₖ − c₋ₖ).'),
       `${parts[0].ask} ${show(parts[0].lines[0].math)}`,
       `${parts[0].ask} ${show(parts[0].lines[parts[0].lines.length - 1].math)}`),
-    key: `${SK}:${level}:${dir}:${d.c0}:${d.terms.map((t) => `${t.k}:${t.a}:${t.b}`).join(':')}`, exam: examTag(opts, 1), fallback: d.fallback,
+    key: `${SK}:${level}:${dir}:${d.c0}:${d.terms.map((tt) => `${tt.k}:${tt.a}:${tt.b}`).join(':')}`, exam: examTag(opts, 1), fallback: d.fallback,
   });
 }
 
 // Exam: several statements on the coefficients (« plusieurs réponses »).
 function mcqVariant(rng, opts) {
   let d = data(rng);
-  for (let i = 0; i < 200 && !d.terms.every((t) => t.b.n !== 0); i++) d = data(rng);
-  if (!d.terms.every((t) => t.b.n !== 0)) d = { k1: 1, k2: 3, terms: [{ k: 1, a: q(1), b: q(2) }, { k: 3, a: q(0), b: q(3) }], c0: q(2), fallback: true };
+  for (let i = 0; i < 200 && !d.terms.every((tt) => tt.b.n !== 0); i++) d = data(rng);
+  if (!d.terms.every((tt) => tt.b.n !== 0)) d = { k1: 1, k2: 3, terms: [{ k: 1, a: q(1), b: q(2) }, { k: 3, a: q(0), b: q(3) }], c0: q(2), fallback: true };
   const [t1, t2] = d.terms;
   const c1 = ck(t1);
   const c2 = ck(t2);
@@ -212,9 +213,9 @@ function mcqVariant(rng, opts) {
     options.push({ html: `a₀ = ${st(String(d.c0))}`, correct: d.c0.n === 0, rule: d.c0.n === 0 ? null : 'f_a0_separate' });
   }
   return mcqMulti({
-    skill: SK, level: 4, key: `${SK}:mcq:${d.c0}:${d.terms.map((t) => `${t.k}:${t.a}:${t.b}`).join(':')}`, exam: examTag(opts, 1), options,
-    prompt: `${real ? `f(x) = ${show(realText(d))}` : `f(x) = ${show(expText(d))}`}, 2π-périodique. Quelles affirmations sur ses coefficients sont vraies ?`,
-    solution: [{ html: `cₖ = (aₖ − ibₖ)/2 et c₋ₖ = conj(cₖ) : c${s1} = ${st(cT(c1.re, c1.im))}, c${s2} = ${st(cT(c2.re, c2.im))}, c₀ = ${st(String(d.c0))} (a₀ = 2c₀).`, note: '' }],
+    skill: SK, level: 4, key: `${SK}:mcq:${d.c0}:${d.terms.map((tt) => `${tt.k}:${tt.a}:${tt.b}`).join(':')}`, exam: examTag(opts, 1), options,
+    prompt: t('{a}, 2π-périodique. Quelles affirmations sur ses coefficients sont vraies ?', { a: real ? `f(x) = ${show(realText(d))}` : `f(x) = ${show(expText(d))}` }),
+    solution: [{ html: t('cₖ = (aₖ − ibₖ)/2 et c₋ₖ = conj(cₖ) : c{s1} = {a}, c{s2} = {b}, c₀ = {c} (a₀ = 2c₀).', { s1, a: st(cT(c1.re, c1.im)), s2, b: st(cT(c2.re, c2.im)), c: st(String(d.c0)) }), note: '' }],
     expectedSec: 150, fallback: d.fallback,
   }, rng);
 }

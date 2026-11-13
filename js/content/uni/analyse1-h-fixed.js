@@ -9,6 +9,7 @@
 // a1_rec_limit_without_convergence), or for a divergent sequence the
 // bound aₙ ≥ a₀ + n·δ whose limit is +∞ (limit, discrete).
 
+import { t } from '../../i18n.js';
 import { Q } from '../../math/rational.js';
 import { mcq, tfItem } from './kit.js';
 import {
@@ -18,18 +19,18 @@ import {
 const RF = 'a1-seq-rec-fixed';
 const KEYS = ['calc', 'seq', 'set', 'anal'];
 const SUB = [
-  { id: 'cand', label: 'candidats L = f(L)', skill: 'quad-formula' },
-  { id: 'sign', label: 'signe de f(x) − x', skill: 'g1-sign-table' },
-  { id: 'conclude', label: 'monotone et bornée', skill: 'a1-seq-monotone' },
+  { id: 'cand', label: t('candidats L = f(L)'), skill: 'quad-formula' },
+  { id: 'sign', label: t('signe de f(x) − x'), skill: 'g1-sign-table' },
+  { id: 'conclude', label: t('monotone et bornée'), skill: 'a1-seq-monotone' },
 ];
 const CHOICES = [
-  { id: 'solve', label: 'Résoudre L = f(L)' },
-  { id: 'sign', label: 'Signe de f(x) − x' },
-  { id: 'stable', label: 'Montrer f(I) ⊂ I' },
-  { id: 'conclude', label: 'Monotone et bornée, donc convergente' },
-  { id: 'diverge', label: 'Minorer aₙ par a₀ + n·δ' },
-  { id: 'terms', label: 'Calculer les premiers termes' },
-  { id: 'fixed', label: 'Prendre un point fixe comme limite', rule: 'a1_rec_limit_without_convergence', why: 'Un point fixe est seulement une limite possible : il faut d\'abord prouver que la suite converge.' },
+  { id: 'solve', label: t('Résoudre L = f(L)') },
+  { id: 'sign', label: t('Signe de f(x) − x') },
+  { id: 'stable', label: t('Montrer f(I) ⊂ I') },
+  { id: 'conclude', label: t('Monotone et bornée, donc convergente') },
+  { id: 'diverge', label: t('Minorer aₙ par a₀ + n·δ') },
+  { id: 'terms', label: t('Calculer les premiers termes') },
+  { id: 'fixed', label: t('Prendre un point fixe comme limite'), rule: 'a1_rec_limit_without_convergence', why: t('Un point fixe est seulement une limite possible : il faut d\'abord prouver que la suite converge.') },
 ];
 
 // {kind, l1, l2, s, p, a0, region}
@@ -97,28 +98,30 @@ function conclusionDecisions(d, B, T) {
   const fx = RD(T.f);
   const out = [];
   if (B.bound !== null) {
-    const ends = d.region === 'in' ? `f(${d.l1}) = ${d.l1} et f(${d.l2}) = ${d.l2}` : d.region === 'below' ? `f(0) = ${fr(fAt(d, 0))} ≥ 0 et f(${d.l1}) = ${d.l1}` : `f(${d.l2}) = ${d.l2}`;
-    out.push(decision(`a₀ = ${A0(d)} ∈ ${B.I}. Pourquoi aₙ ∈ ${B.I} pour tout n ?`, [
-      { id: 'ok', label: `f est croissante, ${ends} : f(I) ⊂ I, puis récurrence`, valid: true },
-      { id: 'sign', label: `Parce que f(x) − x garde un signe sur ${B.I}`, valid: false, why: 'Le signe de f(x) − x donne le sens de variation de la suite, pas une borne. La borne vient de f(I) ⊂ I.' },
-      { id: 'a0', label: `Parce que a₀ ∈ ${B.I}`, valid: false, why: 'Il faut aussi que f envoie I dans I, pour passer de aₙ à aₙ₊₁ (récurrence).' },
+    const ends = d.region === 'in' ? t('f({a}) = {a} et f({b}) = {b}', { a: d.l1, b: d.l2 }) : d.region === 'below' ? t('f(0) = {f0} ≥ 0 et f({a}) = {a}', { f0: fr(fAt(d, 0)), a: d.l1 }) : `f(${d.l2}) = ${d.l2}`;
+    out.push(decision(t('a₀ = {a0} ∈ {I}. Pourquoi aₙ ∈ {I} pour tout n ?', { a0: A0(d), I: B.I }), [
+      { id: 'ok', label: t('f est croissante, {ends} : f(I) ⊂ I, puis récurrence', { ends }), valid: true },
+      { id: 'sign', label: t('Parce que f(x) − x garde un signe sur {I}', { I: B.I }), valid: false, why: t('Le signe de f(x) − x donne le sens de variation de la suite, pas une borne. La borne vient de f(I) ⊂ I.') },
+      { id: 'a0', label: t('Parce que a₀ ∈ {I}', { I: B.I }), valid: false, why: t('Il faut aussi que f envoie I dans I, pour passer de aₙ à aₙ₊₁ (récurrence).') },
     ]));
     const up = B.dir > 0;
     const other = B.fixed.find((x) => x !== B.lim);
-    out.push(decision('Donc la suite (aₙ) :', [
-      { id: 'ok', label: `${up ? 'croît' : 'décroît'} (f(x) ${up ? '>' : '<'} x sur I) et est ${up ? 'majorée' : 'minorée'} par ${B.bound} : elle converge, vers ${B.lim}`, valid: true },
-      ...(up ? [] : [{ id: 'fup', label: 'croît, parce que f est croissante', valid: false, rule: 'a1_monotone_by_f_increasing', why: 'f croissante dit seulement que la suite est monotone. Ici a₁ = f(a₀) < a₀ : elle décroît.' }]),
-      { id: 'inf', label: `${up ? 'croît' : 'décroît'} et tend vers ${up ? '+∞' : '−∞'}`, valid: false, why: `Elle reste dans ${B.I} : elle est bornée de ce côté.` },
-      { id: 'bounded', label: `est ${B.I.includes('∞') ? `minorée par ${B.bound}` : `bornée (elle reste dans ${B.I})`} : elle converge`, valid: false, rule: 'a1_bounded_implies_convergent', why: 'Bornée ne suffit pas : (−1)ⁿ est bornée et ne converge pas. Il faut aussi la monotonie, donnée par le signe de f(x) − x.' },
-      ...(other ? [{ id: 'fixed', label: `converge vers ${other}, l'autre point fixe`, valid: false, rule: 'a1_rec_limit_without_convergence', why: `La suite reste dans ${B.I} et ${up ? 'croît' : 'décroît'} : elle ne peut pas aller vers ${other}.` }] : []),
+    const v = { b: B.bound, L: B.lim, I: B.I, o: other };
+    out.push(decision(t('Donc la suite (aₙ) :'), [
+      { id: 'ok', label: up ? t('croît (f(x) > x sur I) et est majorée par {b} : elle converge, vers {L}', v) : t('décroît (f(x) < x sur I) et est minorée par {b} : elle converge, vers {L}', v), valid: true },
+      ...(up ? [] : [{ id: 'fup', label: t('croît, parce que f est croissante'), valid: false, rule: 'a1_monotone_by_f_increasing', why: t('f croissante dit seulement que la suite est monotone. Ici a₁ = f(a₀) < a₀ : elle décroît.') }]),
+      { id: 'inf', label: up ? t('croît et tend vers +∞') : t('décroît et tend vers −∞'), valid: false, why: t('Elle reste dans {I} : elle est bornée de ce côté.', v) },
+      { id: 'bounded', label: B.I.includes('∞') ? t('est minorée par {b} : elle converge', v) : t('est bornée (elle reste dans {I}) : elle converge', v), valid: false, rule: 'a1_bounded_implies_convergent', why: t('Bornée ne suffit pas : (−1)ⁿ est bornée et ne converge pas. Il faut aussi la monotonie, donnée par le signe de f(x) − x.') },
+      ...(other ? [{ id: 'fixed', label: t('converge vers {o}, l\'autre point fixe', v), valid: false, rule: 'a1_rec_limit_without_convergence', why: up ? t('La suite reste dans {I} et croît : elle ne peut pas aller vers {o}.', v) : t('La suite reste dans {I} et décroît : elle ne peut pas aller vers {o}.', v) }] : []),
     ]));
     return out;
   }
   // Divergent: above the largest fixed point.
-  out.push(decision(`a₀ = ${A0(d)} > ${d.l2}. La suite (aₙ) :`, [
-    { id: 'ok', label: `croît (f(x) > x pour x > ${d.l2}) ; une limite serait un point fixe ≥ a₀, il n'y en a pas`, valid: true },
-    { id: 'fixed', label: `converge vers ${d.l2}, ${d.l1 === d.l2 ? 'le' : 'un'} point fixe`, valid: false, rule: 'a1_rec_limit_without_convergence', why: `Un point fixe est une limite possible, mais la suite croît à partir de a₀ = ${A0(d)} > ${d.l2} : elle s'en éloigne.` },
-    { id: 'bounded', label: `croît et elle est minorée par ${d.l2} : elle converge`, valid: false, why: 'Une suite croissante converge si elle est majorée, pas minorée.' },
+  const w = { a0: A0(d), l2: d.l2 };
+  out.push(decision(t('a₀ = {a0} > {l2}. La suite (aₙ) :', w), [
+    { id: 'ok', label: t('croît (f(x) > x pour x > {l2}) ; une limite serait un point fixe ≥ a₀, il n\'y en a pas', w), valid: true },
+    { id: 'fixed', label: d.l1 === d.l2 ? t('converge vers {l2}, le point fixe', w) : t('converge vers {l2}, un point fixe', w), valid: false, rule: 'a1_rec_limit_without_convergence', why: t('Un point fixe est une limite possible, mais la suite croît à partir de a₀ = {a0} > {l2} : elle s\'en éloigne.', w) },
+    { id: 'bounded', label: t('croît et elle est minorée par {l2} : elle converge', w), valid: false, why: t('Une suite croissante converge si elle est majorée, pas minorée.') },
   ]));
   return out;
 }
@@ -127,15 +130,15 @@ function conclusionDecisions(d, B, T) {
 function conclusionPart(d, B, level, label = '') {
   const T = texts(d);
   const pre = level === 1
-    ? [{ kind: 'note', html: B.bound !== null ? `f est croissante et f(I) ⊂ I pour I = ${B.I} : la suite reste dans I, elle ${B.dir > 0 ? 'croît' : 'décroît'} et elle est bornée.` : 'La suite croît et ne peut tendre vers aucun point fixe.' }]
+    ? [{ kind: 'note', html: B.bound !== null ? (B.dir > 0 ? t('f est croissante et f(I) ⊂ I pour I = {I} : la suite reste dans I, elle croît et elle est bornée.', { I: B.I }) : t('f est croissante et f(I) ⊂ I pour I = {I} : la suite reste dans I, elle décroît et elle est bornée.', { I: B.I })) : t('La suite croît et ne peut tendre vers aucun point fixe.') }]
     : conclusionDecisions(d, B, T);
   if (B.bound !== null) {
-    const line = E(B.lim, 'Monotone et bornée : la limite est un point fixe', 'conclude', 'conclude');
-    return part(`${label}Conclusion pour a₀ = ${A0(d)} :`, 'lim aₙ =', 'lim(a_n,n,∞)', { kind: 'value', expect: B.lim, recfix: recfix(d, B) }, [line], pre);
+    const line = E(B.lim, t('Monotone et bornée : la limite est un point fixe'), 'conclude', 'conclude');
+    return part(`${label}${t('Conclusion pour a₀ = {a0} :', { a0: A0(d) })}`, 'lim aₙ =', 'lim(a_n,n,∞)', { kind: 'value', expect: B.lim, recfix: recfix(d, B) }, [line], pre);
   }
   const delta = fAt(d, d.a0).sub(d.a0);
   const start = joinSum([N(d.a0), kx(delta, 'n')]);
-  return part(`${label}Pour x > ${d.l2}, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = ${fr(delta)}, donc aₙ ≥ ${RD(start, { vars: ['n'] })}. Limite de ce minorant :`, 'lim =', start,
+  return part(`${label}${t('Pour x > {l2}, f(x) − x croît : aₙ₊₁ − aₙ ≥ f(a₀) − a₀ = {d}, donc aₙ ≥ {s}. Limite de ce minorant :', { l2: d.l2, d: fr(delta), s: RD(start, { vars: ['n'] }) })}`, 'lim =', start,
     { kind: 'limit', v: 'n', vars: ['n'], to: '+∞', discrete: true, recfix: recfix(d, B) }, [E('+∞', 'aₙ → +∞', 'conclude', 'diverge')], pre);
 }
 
@@ -146,19 +149,19 @@ function fixedLines(level, rng, opts) {
   const parts = [];
   const g = level <= 2;
   if (level >= 2) {
-    const lines = level <= 3 ? [E(T.quad, d.kind === 'sqrt' ? 'Élever au carré (L ≥ 0)' : `Multiplier par ${d.s}`, 'cand', 'solve'), E(T.candEnd, 'Racines du trinôme', 'cand', 'solve')] : [E(T.candEnd, 'Points fixes', 'cand', 'solve')];
+    const lines = level <= 3 ? [E(T.quad, d.kind === 'sqrt' ? t('Élever au carré (L ≥ 0)') : t('Multiplier par {s}', { s: d.s }), 'cand', 'solve'), E(T.candEnd, t('Racines du trinôme'), 'cand', 'solve')] : [E(T.candEnd, t('Points fixes'), 'cand', 'solve')];
     if (level === 2) lines[1] = blanked(lines[1], [String(d.l2)]);
-    parts.push(part('Candidats : résous L = f(L).', 'L ∈', T.cand, { kind: 'solset', v: 'L' }, lines));
+    parts.push(part(t('Candidats : résous L = f(L).'), 'L ∈', T.cand, { kind: 'solset', v: 'L' }, lines));
   }
-  const sl = level <= 3 ? [E(T.signMid, d.kind === 'sqrt' ? 'Les deux membres sont positifs : élever au carré' : 'Même dénominateur', 'sign', 'sign'), E(T.signEnd, 'Signe du trinôme', 'sign', 'sign')] : [E(T.signEnd, 'Signe de f(x) − x', 'sign', 'sign')];
+  const sl = level <= 3 ? [E(T.signMid, d.kind === 'sqrt' ? t('Les deux membres sont positifs : élever au carré') : t('Même dénominateur'), 'sign', 'sign'), E(T.signEnd, t('Signe du trinôme'), 'sign', 'sign')] : [E(T.signEnd, t('Signe de f(x) − x'), 'sign', 'sign')];
   if (g) sl[1] = blanked(sl[1], d.l1 === d.l2 ? [String(d.l1)] : [String(d.l1), String(d.l2)].slice(0, level === 1 ? 2 : 1));
-  parts.push(part('Signe de f(x) − x :', 'f(x) > x ⇔', T.sign, { kind: 'solset', v: 'x' }, sl));
+  parts.push(part(t('Signe de f(x) − x :'), 'f(x) > x ⇔', T.sign, { kind: 'solset', v: 'x' }, sl));
   parts.push(conclusionPart(d, B, level));
-  const given = level === 1 ? ` Les points fixes de f sont ${d.l1 === d.l2 ? d.l1 : `${d.l1} et ${d.l2}`}.` : '';
-  const prompt = `On pose a₀ = ${A0(d)} et ${MN(T.rec)}. Étudie la suite : points fixes, sens de variation, limite.${given}`;
-  const hints = H('Trouve d\'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c\'est le signe de f(x) − x.',
+  const given = level === 1 ? ` ${t('Les points fixes de f sont {p}.', { p: d.l1 === d.l2 ? d.l1 : t('{a} et {b}', { a: d.l1, b: d.l2 }) })}` : '';
+  const prompt = `${t('On pose a₀ = {a0} et {rec}. Étudie la suite : points fixes, sens de variation, limite.', { a0: A0(d), rec: MN(T.rec) })}${given}`;
+  const hints = H(t('Trouve d\'abord les limites possibles (L = f(L)), puis regarde si la suite monte ou descend : c\'est le signe de f(x) − x.'),
     `f(x) − x > 0 ⇔ x ∈ ${RD(T.signEnd).replace(/\d+/, '▢')}`,
-    B.bound !== null ? `aₙ ∈ ${B.I}, ${B.dir > 0 ? 'croissante' : 'décroissante'} : aₙ → ${B.lim}` : 'aₙ ≥ a₀ + n·δ, donc aₙ → +∞');
+    B.bound !== null ? (B.dir > 0 ? t('aₙ ∈ {I}, croissante : aₙ → {L}', { I: B.I, L: B.lim }) : t('aₙ ∈ {I}, décroissante : aₙ → {L}', { I: B.I, L: B.lim })) : t('aₙ ≥ a₀ + n·δ, donc aₙ → +∞'));
   return partsItem({
     skill: RF, level, prompt, parts, choices: CHOICES, hints, subgoals: SUB, keys: KEYS,
     key: `${RF}:${level}:${T.rec}:${d.a0}`, exam: examOf(opts), fallback: d.fallback,
@@ -177,13 +180,13 @@ function twoStarts(rng, opts) {
   if (d2.region === 'above') d2.a0 = Q.of(d.l2 + 1);
   const T = texts(d);
   const parts = [
-    part('Candidats : résous L = f(L).', 'L ∈', T.cand, { kind: 'solset', v: 'L' }, [E(T.candEnd, 'Points fixes', 'cand', 'solve')]),
-    part('Signe de f(x) − x :', 'f(x) > x ⇔', T.sign, { kind: 'solset', v: 'x' }, [E(T.signEnd, 'Signe de f(x) − x', 'sign', 'sign')]),
+    part(t('Candidats : résous L = f(L).'), 'L ∈', T.cand, { kind: 'solset', v: 'L' }, [E(T.candEnd, t('Points fixes'), 'cand', 'solve')]),
+    part(t('Signe de f(x) − x :'), 'f(x) > x ⇔', T.sign, { kind: 'solset', v: 'x' }, [E(T.signEnd, t('Signe de f(x) − x'), 'sign', 'sign')]),
     conclusionPart(d, behaviour(d), 5, '(1) '),
     conclusionPart(d2, behaviour(d2), 5, '(2) '),
   ];
   return partsItem({
-    skill: RF, level: 5, prompt: `On pose ${MN(T.rec)}. Étudie la suite pour a₀ = ${A0(d)}, puis pour a₀ = ${A0(d2)}.`,
+    skill: RF, level: 5, prompt: t('On pose {rec}. Étudie la suite pour a₀ = {a}, puis pour a₀ = {b}.', { rec: MN(T.rec), a: A0(d), b: A0(d2) }),
     parts, hints: [], subgoals: SUB, keys: KEYS, key: `${RF}:5:${T.rec}:${d.a0}:${d2.a0}`, fallback: d.fallback,
   });
 }
@@ -196,13 +199,13 @@ function fixedMcq(rng, opts, level = 4) {
   const options = [{ html: `lim aₙ = ${say(B.lim)}`, correct: true }];
   for (const x of B.fixed) if (x !== B.lim) options.push({ html: `lim aₙ = ${fr(x)}`, correct: false, rule: 'a1_rec_limit_without_convergence' });
   if (B.lim !== '+∞') options.push({ html: 'lim aₙ = +∞', correct: false, rule: B.dir < 0 ? 'a1_monotone_by_f_increasing' : undefined });
-  else options.push({ html: 'La suite est bornée : elle converge', correct: false });
+  else options.push({ html: t('La suite est bornée : elle converge'), correct: false });
   options.push({ html: `lim aₙ = ${A0(d)}`, correct: false }, { html: 'lim aₙ = 0', correct: false }, { html: `lim aₙ = ${d.l2 + 1}`, correct: false });
   for (const o of options) if (!o.rule) delete o.rule;
   return mcqOf({
-    skill: RF, level, prompt: `On pose a₀ = ${A0(d)} et ${MN(T.rec)}. Que vaut la limite de (aₙ) ?`, options,
+    skill: RF, level, prompt: t('On pose a₀ = {a0} et {rec}. Que vaut la limite de (aₙ) ?', { a0: A0(d), rec: MN(T.rec) }), options,
     key: `${RF}:mcq:${T.rec}:${d.a0}`, expectedSec: 240, exam: examOf(opts), fallback: d.fallback,
-    solution: [{ html: `Points fixes : ${B.fixed.join(' et ')}. f(x) − x > 0 ⇔ x ∈ ${RD(T.signEnd)}. ${B.bound !== null ? `La suite reste dans ${B.I}, elle est monotone et bornée : aₙ → ${B.lim}.` : `La suite croît et ne peut tendre vers aucun point fixe : aₙ → +∞.`}`, note: '' }],
+    solution: [{ html: `${t('Points fixes : {p}. f(x) − x > 0 ⇔ x ∈ {s}.', { p: B.fixed.join(t(' et ')), s: RD(T.signEnd) })} ${B.bound !== null ? t('La suite reste dans {I}, elle est monotone et bornée : aₙ → {L}.', { I: B.I, L: B.lim }) : t('La suite croît et ne peut tendre vers aucun point fixe : aₙ → +∞.')}`, note: '' }],
   }, rng);
 }
 
@@ -213,9 +216,9 @@ function fixedTf(rng, opts) {
     const m = rng.pick([2, 3]);
     return tfItem({
       skill: RF, level: 4, truth: false, key: `single:${m}`, exam: examOf(opts), ruleIfTrue: 'a1_rec_limit_without_convergence',
-      statement: `La suite aₙ₊₁ = ${m}aₙ n'a qu'un point fixe, L = 0. Donc pour tout a₀ ∈ ℝ, elle converge vers 0.`,
+      statement: t('La suite aₙ₊₁ = {m}aₙ n\'a qu\'un point fixe, L = 0. Donc pour tout a₀ ∈ ℝ, elle converge vers 0.', { m }),
       counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }], pred: 'a=0', ask: A, answer: { a: '1' } },
-      explanation: `Faux : avec a₀ = 1, aₙ = ${m}ⁿ → +∞. Le point fixe est seulement la limite possible <i>si</i> la suite converge.`,
+      explanation: t('Faux : avec a₀ = 1, aₙ = {m}ⁿ → +∞. Le point fixe est seulement la limite possible <i>si</i> la suite converge.', { m }),
     });
   }
   const d = draw(rng, { kinds: [kind === 'mono' ? 'square' : kind === 'sqrt' ? 'sqrt' : kind], region: kind === 'mono' ? 'in' : null });
@@ -224,27 +227,27 @@ function fixedTf(rng, opts) {
   if (kind === 'sqrt') {
     return tfItem({
       skill: RF, level: 4, truth: true, key: `sqrt:${T.rec}`, exam: examOf(opts), fallback: d.fallback,
-      statement: `Pour tout a₀ ∈ ]${d.l1} ; ${d.l2}[, la suite ${rec} converge vers ${d.l2}.`,
-      explanation: `Vrai : f est croissante et f(]${d.l1} ; ${d.l2}[) ⊂ ]${d.l1} ; ${d.l2}[ ; f(x) > x sur cet intervalle : la suite croît, majorée par ${d.l2}. Sa limite est un point fixe > a₀ : ${d.l2}.`,
+      statement: t('Pour tout a₀ ∈ ]{a} ; {b}[, la suite {rec} converge vers {b}.', { a: d.l1, b: d.l2, rec }),
+      explanation: t('Vrai : f est croissante et f(]{a} ; {b}[) ⊂ ]{a} ; {b}[ ; f(x) > x sur cet intervalle : la suite croît, majorée par {b}. Sa limite est un point fixe > a₀ : {b}.', { a: d.l1, b: d.l2 }),
     });
   }
   if (kind === 'mono' && d.l1 !== d.l2 && d.l2 - d.l1 >= 1) {
     const mid = q(d.l1 + d.l2, 2);
     return tfItem({
       skill: RF, level: 4, truth: false, key: `mono:${T.rec}`, exam: examOf(opts), ruleIfTrue: 'a1_monotone_by_f_increasing', fallback: d.fallback,
-      statement: `f(x) = ${RD(T.f)} est croissante sur [0 ; +∞[. Donc pour tout a₀ ∈ ]${d.l1} ; ${d.l2}[, la suite ${rec} est croissante.`,
+      statement: t('f(x) = {f} est croissante sur [0 ; +∞[. Donc pour tout a₀ ∈ ]{a} ; {b}[, la suite {rec} est croissante.', { f: RD(T.f), a: d.l1, b: d.l2, rec }),
       counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R' }], pred: `a≤${d.l1}∨a≥${d.l2}`, hyp: `${d.l1}<a<${d.l2}`, ask: A, answer: { a: N(mid) } },
-      explanation: `Faux : sur ]${d.l1} ; ${d.l2}[, f(x) − x = (x − ${d.l1})(x − ${d.l2})/${d.s} < 0, donc a₁ < a₀ : la suite décroît (vers ${d.l1}). f croissante dit seulement qu'elle est monotone.`,
+      explanation: t('Faux : sur ]{a} ; {b}[, f(x) − x = (x − {a})(x − {b})/{s} < 0, donc a₁ < a₀ : la suite décroît (vers {a}). f croissante dit seulement qu\'elle est monotone.', { a: d.l1, b: d.l2, s: d.s }),
     });
   }
   const one = d.l1 === d.l2;
   return tfItem({
     skill: RF, level: 4, truth: false, key: `div:${T.rec}`, exam: examOf(opts), ruleIfTrue: 'a1_rec_limit_without_convergence', fallback: d.fallback,
     statement: one
-      ? `La suite ${rec} n'a qu'un point fixe, ${d.l1}. Donc pour tout a₀ ≥ 0, elle converge vers ${d.l1}.`
-      : `Pour tout a₀ ≥ 0, la suite ${rec} converge vers ${d.l1} ou vers ${d.l2}.`,
+      ? t('La suite {rec} n\'a qu\'un point fixe, {a}. Donc pour tout a₀ ≥ 0, elle converge vers {a}.', { rec, a: d.l1 })
+      : t('Pour tout a₀ ≥ 0, la suite {rec} converge vers {a} ou vers {b}.', { rec, a: d.l1, b: d.l2 }),
     counter: { kind: 'refute', quants: [{ q: '∀', v: 'a', dom: 'R+' }], pred: `a≤${d.l2}`, ask: A, answer: { a: String(d.l2 + 1) } },
-    explanation: `Faux : pour a₀ > ${d.l2}, f(x) > x et la suite croît ; une limite serait un point fixe > ${d.l2} : il n'y en a pas, donc aₙ → +∞.`,
+    explanation: t('Faux : pour a₀ > {b}, f(x) > x et la suite croît ; une limite serait un point fixe > {b} : il n\'y en a pas, donc aₙ → +∞.', { b: d.l2 }),
   });
 }
 

@@ -39,6 +39,7 @@ import { mapNode, symbolsIn, contains } from '../cas/ast.js';
 import { fourierAt, laplaceAt, valueAt, heaviside } from '../cas/transforms.js';
 import { C, evalComplex } from '../cas/complex.js';
 import { diagnoseLine } from './diagnose.js';
+import { t } from '../i18n.js';
 
 export const sign = '=';
 
@@ -87,11 +88,11 @@ function takeHoles(text, cfg) {
         if (chars[j] === '(') depth++;
         if (chars[j] === ')') { depth--; if (depth === 0) break; }
       }
-      if (depth !== 0) throw new Error('Une parenthèse de 𝓕(…) n\'est pas fermée.');
+      if (depth !== 0) throw new Error(t('Une parenthèse de 𝓕(…) n\'est pas fermée.'));
       const inner = chars.slice(i + 2, j).join('');
       const op = OPS[c];
       const name = HOLES[holes.length];
-      if (!name) throw new Error('Trop de 𝓕(…) dans une ligne.');
+      if (!name) throw new Error(t('Trop de 𝓕(…) dans une ligne.'));
       holes.push({ name, op, inner: parse(inner, popts(cfg)), text: inner });
       out += ` ${name} `;
       i = j + 1;
@@ -119,12 +120,12 @@ function readStrict(cfg, input) {
   if (hm) {
     const g = parse(hm[1], { vars: Object.keys(cfg.params || {}) });
     half = valueAt(g, cfg.params || {})?.re ?? NaN;
-    if (!Number.isFinite(half)) throw new Error('Je ne lis pas le demi-plan.');
+    if (!Number.isFinite(half)) throw new Error(t('Je ne lis pas le demi-plan.'));
     text = text.slice(0, hm.index).trim();
   }
   if (!text) return { t: 'tline', text: String(input).trim(), label: null, members: [], eq: null, half };
   const parts = splitTop(text, '=').map((p) => p.trim());
-  if (parts.some((p) => !p)) throw new Error('Un membre de ta ligne est vide.');
+  if (parts.some((p) => !p)) throw new Error(t('Un membre de ta ligne est vide.'));
   const unknown = cfg.unknown ? NFD(cfg.unknown) : null;
   let label = null;
   let rest = parts;
@@ -133,8 +134,8 @@ function readStrict(cfg, input) {
     rest = parts.slice(1);
   }
   const read = (p) => {
-    const { text: t, holes } = takeHoles(p, cfg);
-    const node = parse(t, { ...popts(cfg), vars: [...popts(cfg).vars, ...holes.map((h) => h.name)] });
+    const { text: tt, holes } = takeHoles(p, cfg);
+    const node = parse(tt, { ...popts(cfg), vars: [...popts(cfg).vars, ...holes.map((h) => h.name)] });
     return { node, raw: p, holes };
   };
   // An equation in the unknown.
@@ -145,7 +146,7 @@ function readStrict(cfg, input) {
   }
   const members = rest.map((p) => {
     const m = read(p);
-    if (unknown && symbolsIn(m.node).has(unknown)) throw new Error(`Écris une équation en ${cfg.unknown}, ou sa valeur.`);
+    if (unknown && symbolsIn(m.node).has(unknown)) throw new Error(t('Écris une équation en {unknown}, ou sa valeur.', { unknown: cfg.unknown }));
     return { ...m, kind: kindOf(cfg, m) };
   });
   return { t: 'tline', text: String(input).trim(), label, members, eq: null, half };
@@ -215,7 +216,7 @@ function refOf(cfg) {
   const [lo, hi] = cfg.domain || (cfg.transform === 'laplace' ? [0.05, 4] : [-3, 3]);
   const vPts = Array.from({ length: 8 }, (_, k) => lo + ((hi - lo) * (k + 0.5 + 0.1234 * ((k * 7) % 3))) / 8.4);
   const sym = {};
-  for (const [k, t] of Object.entries(cfg.symbols || {})) sym[NFD(k)] = parse(NFD(t), o);
+  for (const [k, tt] of Object.entries(cfg.symbols || {})) sym[NFD(k)] = parse(NFD(tt), o);
   const Fvals = sPts.map((s) => (F ? valueAt(F, { ...env, [sOf(cfg)]: s }) : transformAt(cfg, f, s, env)));
   const fvals = f ? vPts.map((x) => valueAt(f, { ...env, [vOf(cfg)]: x })) : null;
   const r = { f, F, sPts, vPts, Fvals, fvals, sym, env };
@@ -337,7 +338,7 @@ export function isFinal(cfg, node, state = {}) {
   if (w === 'function' && kind !== 'v') return false;
   if (w === 'transform' && symbolNames(cfg).some((n) => symbolsIn(last.node).has(n))) return false;
   if (cfg.halfPlane && w === 'transform' && node.half === null && state.half === undefined) {
-    return 'Juste. Donne aussi le demi-plan où la transformée existe : « Re z > … ».';
+    return t('Juste. Donne aussi le demi-plan où la transformée existe : « Re z > … ».');
   }
   return true;
 }
@@ -374,29 +375,29 @@ export function judgeLine(cfg, prev, input, state = {}) {
   else {
     try { node = readStrict(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
-  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: t('Avance d\'au moins une étape.') };
   // The half-plane.
   if (node.half !== null) {
     const g0 = cfg.gamma0 ?? 0;
     if (Math.abs(node.half - g0) > 1e-9) {
-      return { kind: 'wrong', node, rule: 'f_lap_abscissa', diag: { rules: ['f_lap_abscissa'], ctx: { g0: cfg.gamma0 ?? 0 }, all: ['f_lap_abscissa'] }, message: `La transformée existe pour Re z > ${String(g0).replace('.', ',')}, pas pour Re z > ${String(node.half).replace('.', ',')}.` };
+      return { kind: 'wrong', node, rule: 'f_lap_abscissa', diag: { rules: ['f_lap_abscissa'], ctx: { g0: cfg.gamma0 ?? 0 }, all: ['f_lap_abscissa'] }, message: t('La transformée existe pour Re z > {a}, pas pour Re z > {b}.', { a: String(g0).replace('.', ','), b: String(node.half).replace('.', ',') }) };
     }
     state.half = node.half;
-    if (!node.members.length && !node.eq) return { kind: 'ok', node, message: 'Le demi-plan est juste.' };
+    if (!node.members.length && !node.eq) return { kind: 'ok', node, message: t('Le demi-plan est juste.') };
   }
   if (node.eq) {
     if (equationHolds(cfg, node.eq)) return { kind: 'ok', node };
     const diag = diagnoseLine('transform', prev, node, cfg, (cand, n) => sameAsCandidate(cfg, cand, n));
-    return { kind: 'wrong', node, message: `Cette équation n'est pas vérifiée par la transformée de l'inconnue.`, rule: diag?.rules[0] ?? null, diag };
+    return { kind: 'wrong', node, message: t('Cette équation n\'est pas vérifiée par la transformée de l\'inconnue.'), rule: diag?.rules[0] ?? null, diag };
   }
   // Every member describes the reference pair.
   for (const m of node.members) {
     const r = matches(cfg, m);
     if (r === 'yes') continue;
-    if (r === 'mixed') return { kind: 'form', node, message: `Ta ligne mélange ${vOf(cfg)} et ${sOf(cfg)}.` };
+    if (r === 'mixed') return { kind: 'form', node, message: t('Ta ligne mélange {a} et {b}.', { a: vOf(cfg), b: sOf(cfg) }) };
     const diag = diagnoseLine('transform', prev, node, cfg, (cand, n) => sameAsCandidate(cfg, cand, n));
-    const message = r === 'undefined' ? 'Ta ligne n\'est pas définie partout où on la compare.'
-      : m.kind === 'v' ? `Ce n'est pas la bonne fonction de ${vOf(cfg)}.` : `Ce n'est pas la bonne transformée.`;
+    const message = r === 'undefined' ? t('Ta ligne n\'est pas définie partout où on la compare.')
+      : m.kind === 'v' ? t('Ce n\'est pas la bonne fonction de {a}.', { a: vOf(cfg) }) : t('Ce n\'est pas la bonne transformée.');
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message };
   }
   const fin = isFinal(cfg, node, state);

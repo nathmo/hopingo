@@ -15,6 +15,7 @@ import {
   lexFor, parseFormula, formulaText, formulaML, equivalentLogic, finalIssue, size, sameFormula, LogicError, strip,
 } from '../cas/logic.js';
 import { diagnoseLine } from './diagnose.js';
+import { t as tr } from '../i18n.js';
 
 export const parseLine = (cfg, text) => parseFormula(text, lexFor(cfg));
 export const show = (cfg, node, opts) => formulaML(node, lexFor(cfg), opts);
@@ -48,14 +49,14 @@ export function judgeLine(cfg, prev, input) {
   if (r.error) return r.error;
   const { node } = r;
   const lex = lexFor(cfg);
-  if (sameFormula(node, prev, lex)) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (sameFormula(node, prev, lex)) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   if (!equivalentLogic(prev, node)) {
     const diag = diagnoseLine('logic', prev, node, cfg, same);
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: 'Ta formule ne dit pas la même chose que la ligne précédente.' };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: tr('Ta formule ne dit pas la même chose que la ligne précédente.') };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais : ${fin}` };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais : {fin}', { fin }) };
   return { kind: 'ok', node };
 }
 
@@ -71,7 +72,7 @@ export function judgeTokens(item, input) {
   if (!equivalentLogic(node, target)) {
     const start = item.start ? parseLine(cfg, item.start) : target;
     const diag = diagnoseLine('logic', start, node, { ...cfg, task: item.task }, same);
-    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: item.wrongMessage || 'Ce n\'est pas la formule demandée.' };
+    return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: item.wrongMessage || tr('Ce n\'est pas la formule demandée.') };
   }
   // A contraposée or a réciproque must have that shape, not only its meaning.
   if (item.sides) {
@@ -79,10 +80,10 @@ export function judgeTokens(item, input) {
     while (m.t === 'q') m = strip(m.body);
     const lex = lexFor(cfg);
     const okShape = m.t === 'imp' && equivalentLogic(m.l, parseFormula(item.sides.l, lex)) && equivalentLogic(m.r, parseFormula(item.sides.r, lex));
-    if (!okShape) return { kind: 'stay', node, message: 'C\'est équivalent, mais ce n\'est pas la forme demandée : écris une implication « … ⇒ … » avec les bons côtés.' };
+    if (!okShape) return { kind: 'stay', node, message: tr('C\'est équivalent, mais ce n\'est pas la forme demandée : écris une implication « … ⇒ … » avec les bons côtés.') };
   }
   const fin = isFinal(cfg, node);
   if (fin === true) return { kind: 'done', node };
-  if (typeof fin === 'string') return { kind: 'stay', node, message: `C'est juste, mais : ${fin}` };
-  return { kind: 'stay', node, message: item.unfinished || 'C\'est juste, mais il reste un ¬ à faire entrer.' };
+  if (typeof fin === 'string') return { kind: 'stay', node, message: tr('C\'est juste, mais : {fin}', { fin }) };
+  return { kind: 'stay', node, message: item.unfinished || tr('C\'est juste, mais il reste un ¬ à faire entrer.') };
 }

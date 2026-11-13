@@ -6,15 +6,16 @@ import { Skim } from '../../engine/placement.js';
 import { applyPlacement, isSlow, newSkillState } from '../../engine/learner.js';
 import { makeRng } from '../../content/random.js';
 import { SKILL_BY_ID, SKILLS, UNITS } from '../../content/skills.js';
+import { t, tn } from '../../i18n.js';
 
 export function skimIntroScreen(root, _args, app) {
   const p = app.profile;
   root.append(h('div.page.center',
-    bubble(`Enchanté, <b>${p.name}</b> ! Pour ne pas te faire refaire ce que tu sais déjà, je te pose quelques questions rapides. Pas de stress : ça sert juste à choisir où commencer.`),
-    h('button.btn.primary.wide', { onclick: () => app.go('skim') }, 'Test rapide (2 minutes)'),
+    bubble(t('Enchanté, <b>{name}</b> ! Pour ne pas te faire refaire ce que tu sais déjà, je te pose quelques questions rapides. Pas de stress : ça sert juste à choisir où commencer.', { name: p.name })),
+    h('button.btn.primary.wide', { onclick: () => app.go('skim') }, t('Test rapide (2 minutes)')),
     h('button.btn.ghost.wide', {
       onclick: () => { applyPlacement(p, 0); app.save(); app.go('home'); },
-    }, 'Commencer depuis le début')));
+    }, t('Commencer depuis le début'))));
 }
 
 // args.unit: the placement of one unit only (« Je connais déjà ce module »).
@@ -26,7 +27,7 @@ export function skimScreen(root, args, app) {
   const body = h('main.lesson-body');
   const foot = h('footer.lesson-foot');
   const panel = h('div.feedback');
-  root.append(h('header.lesson-top', h('span.skim-title', unit ? `Test : ${unit.title}` : 'Test rapide'), bar), body, foot, panel);
+  root.append(h('header.lesson-top', h('span.skim-title', unit ? t('Test : {unit}', { unit: unit.title }) : t('Test rapide')), bar), body, foot, panel);
   let item;
   let ctrl;
   let t0;
@@ -50,9 +51,9 @@ export function skimScreen(root, args, app) {
     });
     body.append(ctrl.el);
     if (ctrl.footer) foot.append(ctrl.footer);
-    checkBtn = ctrl.ownFlow ? null : h('button.btn.primary.wide', { disabled: true, onclick: () => check() }, 'Vérifier');
+    checkBtn = ctrl.ownFlow ? null : h('button.btn.primary.wide', { disabled: true, onclick: () => check() }, t('Vérifier'));
     if (checkBtn) foot.append(checkBtn);
-    foot.append(h('button.btn.ghost.small', { onclick: () => shown({ correct: false, rules: [] }) }, 'Je ne sais pas encore'));
+    foot.append(h('button.btn.ghost.small', { onclick: () => shown({ correct: false, rules: [] }) }, t('Je ne sais pas encore')));
     t0 = performance.now();
   };
 
@@ -73,8 +74,8 @@ export function skimScreen(root, args, app) {
     play(o.correct ? 'good' : 'tap');
     panel.className = `feedback show ${o.correct ? 'good' : 'neutral'}`;
     panel.innerHTML = '';
-    panel.append(h('div.fb-head', h('h3', o.correct ? 'Bien !' : 'D\'accord, on verra ça ensemble.')),
-      h('button.btn.wide.primary', { onclick: next }, 'Suivant'));
+    panel.append(h('div.fb-head', h('h3', o.correct ? t('Bien !') : t('D\'accord, on verra ça ensemble.'))),
+      h('button.btn.wide.primary', { onclick: next }, t('Suivant')));
   };
 
   const finish = () => {
@@ -84,9 +85,12 @@ export function skimScreen(root, args, app) {
     const known = SKILLS.filter((s) => p.skills[s.id]?.testedOut && (!unit || s.unit === unit.id)).length;
     body.append(h('div.done',
       bubble(skill
-        ? `Merci ! ${known ? `Tu connais déjà <b>${known} étape${known > 1 ? 's' : ''}</b> du chemin : je les mets de côté (on les révisera vite fait). ` : ''}On commence par : <b>${SKILL_BY_ID[skill].title}</b>.`
-        : 'Impressionnant, tu sais déjà tout ! On va réviser pour garder tout ça.')));
-    foot.append(h('button.btn.primary.wide', { onclick: () => app.go('home') }, 'Voir mon chemin'));
+        ? (known
+          ? tn(known, 'Merci ! Tu connais déjà <b>{n} étape</b> du chemin : je les mets de côté (on les révisera vite fait). On commence par : <b>{skill}</b>.',
+            'Merci ! Tu connais déjà <b>{n} étapes</b> du chemin : je les mets de côté (on les révisera vite fait). On commence par : <b>{skill}</b>.', { skill: SKILL_BY_ID[skill].title })
+          : t('Merci ! On commence par : <b>{skill}</b>.', { skill: SKILL_BY_ID[skill].title }))
+        : t('Impressionnant, tu sais déjà tout ! On va réviser pour garder tout ça.'))));
+    foot.append(h('button.btn.primary.wide', { onclick: () => app.go('home') }, t('Voir mon chemin')));
   };
 
   const onKey = (e) => {

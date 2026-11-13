@@ -23,6 +23,7 @@ import { toMathML } from '../cas/mathml.js';
 import { toRatFun } from '../cas/normal.js';
 import { stripParen, unparen, mapNode } from '../cas/ast.js';
 import { diagnoseLine } from './diagnose.js';
+import { t as tr } from '../i18n.js';
 
 export const sign = '⇔';
 
@@ -78,9 +79,9 @@ export function geomML(t, dim = 2, bl = {}, counter = { n: 0 }) {
   const n = normGeomText(t);
   const label = /^([A-Za-zΩγΓπαβδ](?:_\d+|')?)\s*:\s*(.*)$/.exec(n);
   const body = label ? label[2] : n;
-  const ors = splitTop(body, '∨').map((p) => splitTop(p, '∧;').map((it) => itemML(it.trim(), dim, counter, bl)).join('<mspace width="0.6em"/><mtext>et</mtext><mspace width="0.6em"/>'));
+  const ors = splitTop(body, '∨').map((p) => splitTop(p, '∧;').map((it) => itemML(it.trim(), dim, counter, bl)).join(`<mspace width="0.6em"/><mtext>${tr('et')}</mtext><mspace width="0.6em"/>`));
   const head = label ? `<mi>${label[1].replace(/_(\d)/, '')}</mi><mo>:</mo>` : '';
-  return head + ors.join('<mspace width="0.6em"/><mtext>ou</mtext><mspace width="0.6em"/>');
+  return head + ors.join(`<mspace width="0.6em"/><mtext>${tr('ou')}</mtext><mspace width="0.6em"/>`);
 }
 export const templateML = (cfg, tpl, blanks = {}) => `<math><mrow>${geomML(tpl, dimOf(cfg), blanks)}</mrow></math>`;
 export function show(cfg, node, { display } = {}) {
@@ -119,9 +120,9 @@ function wholeCoprime(l, r) {
   try { rf = toRatFun({ t: 'bin', op: '-', l, r }).rf; } catch { return false; }
   if (!rf.d.isConst) return false;
   const cs = [...rf.n.terms.values()].map((x) => x.c.div(rf.d.constValue()));
-  if (cs.some((c) => c.d !== 1)) return 'Écris-la avec des coefficients entiers.';
+  if (cs.some((c) => c.d !== 1)) return tr('Écris-la avec des coefficients entiers.');
   const g = cs.reduce((acc, c) => gcd(acc, Math.abs(c.n)), 0);
-  if (g > 1) return `Simplifie : tous les coefficients sont divisibles par ${g}.`;
+  if (g > 1) return tr('Simplifie : tous les coefficients sont divisibles par {g}.', { g });
   return true;
 }
 const gcd = (a, b) => (b ? gcd(b, a % b) : a);
@@ -199,19 +200,28 @@ export function isFinal(cfg, node) {
 // ---------- judging ----------
 
 function wrongMessage(cfg, want, got) {
-  if (got.kind === 'empty') return 'Ton équation n\'a aucune solution.';
-  if (cfg.count === 2 && got.shape !== 'union' && got.kind === 'affine') return 'Il y a deux objets : il en manque un.';
+  if (got.kind === 'empty') return tr('Ton équation n\'a aucune solution.');
+  if (cfg.count === 2 && got.shape !== 'union' && got.kind === 'affine') return tr('Il y a deux objets : il en manque un.');
   if (want.kind === 'affine' && got.kind === 'affine') {
     const dw = affineDim(want);
     const dg = affineDim(got);
     if (dw !== dg) {
-      const name = (d) => (d === 0 ? 'un point' : d === 1 ? 'une droite' : 'un plan');
-      return `Ta ligne décrit ${name(dg)}, on cherche ${name(dw)}.`;
+      return DIM_MESSAGE[`${Math.min(dg, 2)}${Math.min(dw, 2)}`]?.() ?? tr('Ce n\'est pas le bon objet.');
     }
-    if (want.rows.length === 1 && want.rows[0].slice(0, -1).every((x, i) => x.eq(got.rows[0][i]))) return 'Bonne direction, mais ta droite (ou ton plan) ne passe pas par le bon point : vérifie la constante.';
+    if (want.rows.length === 1 && want.rows[0].slice(0, -1).every((x, i) => x.eq(got.rows[0][i]))) return tr('Bonne direction, mais ta droite (ou ton plan) ne passe pas par le bon point : vérifie la constante.');
   }
-  return 'Ce n\'est pas le bon objet.';
+  return tr('Ce n\'est pas le bon objet.');
 }
+// « Ta ligne décrit …, on cherche … » by the dimensions (got, wanted): 0 point, 1 line, 2 plane.
+const DIM_MESSAGE = {
+  '01': () => tr('Ta ligne décrit un point, on cherche une droite.'),
+  '02': () => tr('Ta ligne décrit un point, on cherche un plan.'),
+  '10': () => tr('Ta ligne décrit une droite, on cherche un point.'),
+  '12': () => tr('Ta ligne décrit une droite, on cherche un plan.'),
+  '20': () => tr('Ta ligne décrit un plan, on cherche un point.'),
+  '21': () => tr('Ta ligne décrit un plan, on cherche une droite.'),
+  '22': () => tr('Ta ligne décrit un plan, on cherche un plan.'),
+};
 
 export function judgeLine(cfg, prev, input) {
   let node;
@@ -220,8 +230,8 @@ export function judgeLine(cfg, prev, input) {
     try { node = readStrict(cfg, input); } catch (e) { return { kind: 'parse', message: e.message }; }
   }
   const want = reference(cfg) ?? prev?.obj;
-  if (!want) return { kind: 'form', node, message: 'Je ne sais pas à quoi comparer ta ligne.' };
-  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: 'Avance d\'au moins une étape.' };
+  if (!want) return { kind: 'form', node, message: tr('Je ne sais pas à quoi comparer ta ligne.') };
+  if (prev?.text && node.text === prev.text) return { kind: 'same', node, message: tr('Avance d\'au moins une étape.') };
   if (!sameObject(want, node.obj)) {
     const diag = diagnoseLine('geom', prev, node, cfg, (c, n) => sameObject(c.obj ?? c, n.obj));
     return { kind: 'wrong', node, rule: diag?.rules[0] ?? null, diag, message: wrongMessage(cfg, want, node.obj) };

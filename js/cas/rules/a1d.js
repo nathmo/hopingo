@@ -19,6 +19,7 @@ import { toMathML } from '../mathml.js';
 import { toText } from '../print.js';
 import { exactValue } from '../normal.js';
 import { evalFloat } from '../numeric.js';
+import { t } from '../../i18n.js';
 
 const M = (n) => toMathML(stripParen(n));
 const par = (e) => ({ t: 'paren', e });
@@ -136,7 +137,7 @@ export const RULES = [
   {
     id: 'a1_int_arctg_as_log', family: 'rule', tag: 'E', skill: 'a1-int-direct', repair: 'g6-antideriv-usual',
     judges: ['antideriv', 'definite'],
-    name: 'Arctg pris pour un Log',
+    name: t('Arctg pris pour un Log'),
     example: ['∫ 1/(1 + x²) dx = Log(1 + x²)', '∫ 1/(1 + x²) dx = Arctg x'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-3, 3] } }, prev: 'int(1/(1+x^2),x)', line: 'ln(1+x^2)+C' },
     // ∫ c/(u² + a) → κ·Log(u² + a): a sum of a positive number and a
@@ -154,13 +155,13 @@ export const RULES = [
       return ks.map((x) => ({ node: asPrim(I, mul(parse(String(x)), fn('ln', d))), ctx: { d, f } }));
     }),
     explain: (ctx = {}) => (ctx.d
-      ? `Dérive Log(${M(ctx.d)}) : tu obtiens ${M(diff(ctx.d, 'x'))}/(${M(ctx.d)}), pas ${M(ctx.f)}. Une fraction en 1/(1 + u²) donne un Arctg : ∫ u′/(1 + u²) = Arctg u.`
-      : 'Dérive Log(1 + x²) : 2x/(1 + x²), pas 1/(1 + x²). ∫ u′/(1 + u²) = Arctg u.'),
+      ? t('Dérive Log({d}) : tu obtiens {p1}/({d2}), pas {f}. Une fraction en 1/(1 + u²) donne un Arctg : ∫ u′/(1 + u²) = Arctg u.', { d: M(ctx.d), p1: M(diff(ctx.d, 'x')), d2: M(ctx.d), f: M(ctx.f) })
+      : t('Dérive Log(1 + x²) : 2x/(1 + x²), pas 1/(1 + x²). ∫ u′/(1 + u²) = Arctg u.')),
   },
   {
     id: 'a1_int_missing_inner_factor', family: 'rule', tag: 'E', skill: 'a1-int-direct', repair: 'a1-int-direct',
     judges: ['antideriv', 'definite'],
-    name: 'Facteur de u′ oublié dans une primitive',
+    name: t('Facteur de u′ oublié dans une primitive'),
     example: ['∫ x/(1 + x⁴) dx = Arctg(x²)', '∫ x/(1 + x⁴) dx = ½Arctg(x²)'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-3, 3] }, prims: { [toText(parse('x/(1+x^4)'))]: '(1/2)arctan(x^2)' } }, prev: 'int(x/(1+x^4),x)', line: 'arctan(x^2)+C' },
     // The item's primitive F of this integrand, times a wrong constant.
@@ -174,25 +175,25 @@ export const RULES = [
       });
     },
     explain: (ctx = {}) => (ctx.k === -1
-      ? 'Dérive ta primitive : le signe est faux. La dérivée de u, ici, est négative (−sin x pour cos x) : elle change le signe.'
+      ? t('Dérive ta primitive : le signe est faux. La dérivée de u, ici, est négative (−sin x pour cos x) : elle change le signe.')
       : ctx.k
-        ? `Dérive ta primitive : ${ctx.k > 1 ? `il y a un facteur ${ctx.k} de trop` : `il manque un facteur ${Math.round(1 / ctx.k)}`}. La dérivée de u apporte une constante : divise par elle.`
-        : 'Dérive Arctg(x²) : 2x/(1 + x⁴). Il y a un facteur 2 de trop : la primitive est ½Arctg(x²).'),
+        ? t('Dérive ta primitive : {p1}. La dérivée de u apporte une constante : divise par elle.', { p1: ctx.k > 1 ? t('il y a un facteur {k} de trop', { k: ctx.k }) : t('il manque un facteur {p1}', { p1: Math.round(1 / ctx.k) }) })
+        : t('Dérive Arctg(x²) : 2x/(1 + x⁴). Il y a un facteur 2 de trop : la primitive est ½Arctg(x²).')),
   },
   {
     id: 'a1_int_no_constant', family: 'notation', tag: 'E', skill: 'a1-int-direct', repair: 'a1-int-direct',
     judges: [],
-    name: 'Constante d\'intégration oubliée',
+    name: t('Constante d\'intégration oubliée'),
     example: ['∫ 2x dx = x²', '∫ 2x dx = x² + C'],
     // No transform: the antideriv judge answers `stay` (« N'oublie pas la
     // constante »); the items list the trap among their baits.
     check: { bait: { skill: 'a1-int-direct', level: 1 } },
-    explain: () => 'N\'oublie pas la constante : les primitives sont toutes de la forme F + C (par exemple x² + C pour 2x).',
+    explain: () => t('N\'oublie pas la constante : les primitives sont toutes de la forme F + C (par exemple x² + C pour 2x).'),
   },
   {
     id: 'a1_subst_dx_kept', family: 'rule', tag: 'E', skill: 'a1-int-subst', repair: 'a1-int-subst',
     judges: ['antideriv', 'definite'],
-    name: 'dx remplacé par dt sans le facteur φ′(t)',
+    name: t('dx remplacé par dt sans le facteur φ′(t)'),
     example: ['t = √x : ∫ dx/(√x(1 + √x)) = ∫ dt/(t(1 + t))', '∫ 2 dt/(1 + t)'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [0.2, 3] }, subst: { t: 'sqrt(x)' }, change: { t: 'sqrt(x)', x: 't^2' } }, prev: 'int(1/(√x(1+√x)),x)', line: 'int(1/(t(1+t)),t)' },
     transform: (prev, ctx = {}) => {
@@ -210,13 +211,13 @@ export const RULES = [
       });
     },
     explain: (ctx = {}) => (ctx.dphi
-      ? `Quand tu changes de variable, dx = ${M(ctx.dphi)} d${ctx.t} : ce facteur manque dans ton intégrale.`
-      : 'Avec t = √x, x = t² et dx = 2t dt : ce facteur 2t manque dans ton intégrale.'),
+      ? t('Quand tu changes de variable, dx = {dphi} d{p1} : ce facteur manque dans ton intégrale.', { dphi: M(ctx.dphi), p1: ctx.t })
+      : t('Avec t = √x, x = t² et dx = 2t dt : ce facteur 2t manque dans ton intégrale.')),
   },
   {
     id: 'a1_subst_bounds_kept', family: 'rule', tag: 'E', skill: 'a1-int-subst', repair: 'a1-int-subst',
     judges: ['definite'],
-    name: 'Bornes en x gardées après le changement de variable',
+    name: t('Bornes en x gardées après le changement de variable'),
     example: ['t = √x : ∫₁⁴ dx/(√x(1 + √x)) = ∫₁⁴ 2 dt/(1 + t)', '∫₁² 2 dt/(1 + t)'],
     check: { judge: { kind: 'definite', change: { t: 'sqrt(x)', x: 't^2' } }, prev: 'int(1/(√x(1+√x)),x,1,4)', line: 'int(2/(1+t),t,1,4)' },
     transform: (prev, ctx = {}) => {
@@ -234,37 +235,37 @@ export const RULES = [
       });
     },
     explain: (ctx = {}) => (ctx.a
-      ? `Les bornes changent avec la variable : quand x va de ${M(ctx.a)} à ${M(ctx.b)}, ${ctx.t} va de ${M(ctx.ta)} à ${M(ctx.tb)}.`
-      : 'Les bornes changent avec la variable : avec t = √x, quand x va de 1 à 4, t va de 1 à 2.'),
+      ? t('Les bornes changent avec la variable : quand x va de {a} à {b}, {p1} va de {ta} à {tb}.', { a: M(ctx.a), b: M(ctx.b), p1: ctx.t, ta: M(ctx.ta), tb: M(ctx.tb) })
+      : t('Les bornes changent avec la variable : avec t = √x, quand x va de 1 à 4, t va de 1 à 2.')),
   },
   {
     id: 'a1_ibp_sign', family: 'sign', tag: 'E', skill: 'a1-int-parts', repair: 'a1-int-parts',
     judges: ['antideriv', 'definite'],
-    name: 'Signe de la deuxième IPP pas distribué',
+    name: t('Signe de la deuxième IPP pas distribué'),
     example: ['x²e^(2x)/2 − ∫ x e^(2x) = x²e^(2x)/2 − x e^(2x)/2 − ∫ e^(2x)/2', '… + ∫ e^(2x)/2'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-2, 2] } }, prev: 'x^2×e^(2x)/2-int(x×e^(2x),x)', line: 'x^2×e^(2x)/2-x×e^(2x)/2-int(e^(2x)/2,x)' },
     // A − ∫u·v′ → A − u·v − ∫u′·v: the − does not reach the second term.
     transform: (prev) => eachInt(prev, (I) => ibpSplits(I.e, I.v).map(({ u, V }) => ({
       node: par(add(asPrim(I, mul(u, V)), intOf(I, mul(diff(u, I.v), V)))),
     })), (path) => subtracted(prev, path)),
-    explain: () => 'Le − devant la deuxième intégration par parties porte sur toute la parenthèse : A − (uv − ∫u′v) = A − uv <b>+</b> ∫u′v.',
+    explain: () => t('Le − devant la deuxième intégration par parties porte sur toute la parenthèse : A − (uv − ∫u′v) = A − uv <b>+</b> ∫u′v.'),
   },
   {
     id: 'a1_ibp_plus', family: 'rule', tag: 'E', skill: 'a1-int-parts', repair: 'a1-int-parts',
     judges: ['antideriv', 'definite'],
-    name: 'Formule d\'intégration par parties avec un +',
+    name: t('Formule d\'intégration par parties avec un +'),
     example: ['∫ uv′ = uv + ∫ u′v', '∫ uv′ = uv − ∫ u′v'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-2, 2] } }, prev: 'int(x×e^x,x)', line: 'x×e^x+int(e^x,x)' },
     transform: (prev) => eachInt(prev, (I) => ibpSplits(I.e, I.v).map(({ u, V }) => ({
       node: par(add(asPrim(I, mul(u, V)), intOf(I, mul(diff(u, I.v), V)))),
     })), (path) => !subtracted(prev, path)),
-    explain: () => 'Dérive uv : (uv)′ = u′v + uv′. Donc ∫ uv′ = uv <b>−</b> ∫ u′v.',
+    explain: () => t('Dérive uv : (uv)′ = u′v + uv′. Donc ∫ uv′ = uv <b>−</b> ∫ u′v.'),
   },
   {
     id: 'a1_int_product', family: 'distribute', tag: 'R', skill: 'a1-int-parts', repair: 'a1-int-direct',
     judges: ['antideriv', 'definite'],
-    name: 'Primitive d\'un produit prise comme produit des primitives',
-    example: ['∫ x²e^(2x) dx = (x³/3)(e^(2x)/2)', 'intégration par parties'],
+    name: t('Primitive d\'un produit prise comme produit des primitives'),
+    example: ['∫ x²e^(2x) dx = (x³/3)(e^(2x)/2)', t('intégration par parties')],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-2, 2] } }, prev: 'int(x^2×e^(2x),x)', line: '(x^3/3)×(e^(2x)/2)+C' },
     transform: (prev) => eachInt(prev, (I) => {
       const fs = factors(I.e).filter((x) => dependsOn(x, I.v));
@@ -275,12 +276,12 @@ export const RULES = [
       if (!a || !b) return null;
       return [{ node: asPrim(I, mul(product([...consts, par(a)]), par(b))), ctx: { a, b } }];
     }),
-    explain: (ctx = {}) => `La primitive d'un produit n'est pas le produit des primitives : dérive ${ctx.a ? `(${M(ctx.a)})·(${M(ctx.b)})` : '(x³/3)(e^(2x)/2)'}, c'est un produit, il y a deux termes, et aucun n'est la fonction de départ. Il faut une intégration par parties.`,
+    explain: (ctx = {}) => t('La primitive d\'un produit n\'est pas le produit des primitives : dérive {p1}, c\'est un produit, il y a deux termes, et aucun n\'est la fonction de départ. Il faut une intégration par parties.', { p1: ctx.a ? `(${M(ctx.a)})·(${M(ctx.b)})` : '(x³/3)(e^(2x)/2)' }),
   },
   {
     id: 'a1_ibp_boundary_term', family: 'rule', tag: 'C', skill: 'a1-int-parts', repair: 'a1-int-parts',
     judges: ['definite'],
-    name: 'Terme de bord [uv] oublié dans une IPP définie',
+    name: t('Terme de bord [uv] oublié dans une IPP définie'),
     example: ['∫₀¹ x eˣ dx = −∫₀¹ eˣ dx', '[x eˣ]₀¹ − ∫₀¹ eˣ dx'],
     check: { judge: { kind: 'definite' }, prev: 'int(x×e^x,x,0,1)', line: '-int(e^x,x,0,1)' },
     transform: (prev) => eachInt(prev, (I) => ibpSplits(I.e, I.v).map(({ u, V }) => {
@@ -289,13 +290,13 @@ export const RULES = [
       return { node: neg(intOf(I, mul(diff(u, I.v), V))), ctx: { a: I.lo, b: I.hi, val } };
     }), (path, I) => !!I.lo),
     explain: (ctx = {}) => (ctx.a && Number.isFinite(ctx.val)
-      ? `Le terme [uv] entre ${M(ctx.a)} et ${M(ctx.b)} vaut ${fr(ctx.val)} ici : il ne disparaît que si uv prend la même valeur aux deux bornes.`
-      : 'Il manque le terme de bord : ∫ₐᵇ uv′ = [uv]ₐᵇ − ∫ₐᵇ u′v. Il ne disparaît que si uv prend la même valeur aux deux bornes.'),
+      ? t('Le terme [uv] entre {a} et {b} vaut {val} ici : il ne disparaît que si uv prend la même valeur aux deux bornes.', { a: M(ctx.a), b: M(ctx.b), val: fr(ctx.val) })
+      : t('Il manque le terme de bord : ∫ₐᵇ uv′ = [uv]ₐᵇ − ∫ₐᵇ u′v. Il ne disparaît que si uv prend la même valeur aux deux bornes.')),
   },
   {
     id: 'a1_reduction_index', family: 'rule', tag: 'E', skill: 'a1-int-reduction', repair: 'a1-int-reduction',
     judges: ['definite'],
-    name: 'Coefficient décalé dans une formule de récurrence',
+    name: t('Coefficient décalé dans une formule de récurrence'),
     example: ['Jₙ = e − (n − 1)Jₙ₋₁', 'Jₙ = e − n·Jₙ₋₁'],
     check: { judge: { kind: 'definite', seq: { J: 'int(x^n×e^x,x,0,1)' }, param: 'n', recurrence: true }, prev: 'bracket(x^n×e^x,x,0,1)-n×int(x^(n-1)×e^x,x,0,1)', line: 'e-(n-1)×J_(n-1)' },
     // n·(∫ or J) → (n − 1)·… or (n + 1)·….
@@ -322,24 +323,24 @@ export const RULES = [
         const [name, text] = Object.entries(seq)[0];
         const p = ctx.cfg.param || 'n';
         const v = evalFloat(substVar(parse(text), p, num(1)), {});
-        if (Number.isFinite(v)) j1 = ` Teste n = 1 : ${name}₁ = ${fr(v)}.`;
+        if (Number.isFinite(v)) j1 = t(' Teste n = 1 : {name}₁ = {v}.', { name, v: fr(v) });
       }
-      return `u = xⁿ donne u′ = n·xⁿ⁻¹ : le coefficient est n, ni n − 1 ni n + 1.${j1}`;
+      return t('u = xⁿ donne u′ = n·xⁿ⁻¹ : le coefficient est n, ni n − 1 ni n + 1.{j1}', { j1 });
     },
   },
   {
     id: 'a1_des_wrong_form', family: 'rule', tag: 'E', skill: 'a1-int-rational', repair: 'g0-pfd-general',
     judges: [],
-    name: 'Mauvaise forme de la décomposition en éléments simples',
+    name: t('Mauvaise forme de la décomposition en éléments simples'),
     example: ['B/(x² + 2x + 5)', '(Bx + C)/(x² + 2x + 5)'],
     // A decision option of a1-int-rational (the form of the DES).
     check: { bait: { skill: 'a1-int-rational', level: 2 } },
-    explain: () => 'Sur un facteur de degré 2 sans racine, le numérateur est de degré 1 : Bx + C. Pour une racine double a, il faut A/(x − a) et B/(x − a)². Sans eux, le système n\'a pas de solution.',
+    explain: () => t('Sur un facteur de degré 2 sans racine, le numérateur est de degré 1 : Bx + C. Pour une racine double a, il faut A/(x − a) et B/(x − a)². Sans eux, le système n\'a pas de solution.'),
   },
   {
     id: 'a1_arctg_scale', family: 'rule', tag: 'E', skill: 'a1-int-rational', repair: 'a1-int-direct',
     judges: ['antideriv', 'definite'],
-    name: 'Arctg sans le facteur 1/a',
+    name: t('Arctg sans le facteur 1/a'),
     example: ['∫ dx/((x + 1)² + 4) = Arctg(x + 1)', '½Arctg((x + 1)/2)'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [-3, 3] } }, prev: 'int(1/((x+1)^2+4),x)', line: 'arctan(x+1)+C' },
     // ∫ c/(u² + a²) with a ≠ 1 → c·Arctg u, c·Arctg(u/a) or (c/a)·Arctg u.
@@ -360,13 +361,13 @@ export const RULES = [
         mul(div(c, a), fn('arctan', u)),
       ].map((G) => ({ node: asPrim(I, G), ctx: { a: Math.sqrt(s.valueOf()) } }));
     }),
-    explain: (ctx = {}) => `∫ du/(u² + a²) = (1/a)·Arctg(u/a) : le a apparaît deux fois.${ctx.a ? ` Ici a = ${fr(ctx.a)}.` : ''} Dérive ta ligne pour le voir.`,
+    explain: (ctx = {}) => t('∫ du/(u² + a²) = (1/a)·Arctg(u/a) : le a apparaît deux fois.{p1} Dérive ta ligne pour le voir.', { p1: ctx.a ? t(' Ici a = {a}.', { a: fr(ctx.a) }) : '' }),
   },
   {
     id: 'a1_int_log_of_denominator', family: 'rule', tag: 'E', skill: 'a1-int-rational', repair: 'a1-int-direct',
     judges: ['antideriv', 'definite'],
-    name: 'Log du dénominateur quel que soit le numérateur',
-    example: ['∫ (x + 5)/((x − 1)(x² + 2x + 5)) dx = Log|(x − 1)(x² + 2x + 5)|', 'décomposition en éléments simples'],
+    name: t('Log du dénominateur quel que soit le numérateur'),
+    example: ['∫ (x + 5)/((x − 1)(x² + 2x + 5)) dx = Log|(x − 1)(x² + 2x + 5)|', t('décomposition en éléments simples')],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [1.5, 4] } }, prev: 'int((x+5)/((x-1)(x^2+2x+5)),x)', line: 'ln(|(x-1)(x^2+2x+5)|)+C' },
     transform: (prev) => eachInt(prev, (I) => {
       const f = stripParen(I.e);
@@ -375,12 +376,12 @@ export const RULES = [
       if (d.t === 'sqrt') d = stripParen(d.e);
       return [{ node: asPrim(I, fn('ln', { t: 'abs', e: d })), ctx: { d } }];
     }),
-    explain: (ctx = {}) => `Log|Q| a pour dérivée Q′/Q${ctx.d ? `, ici ${M(diff(ctx.d, 'x'))}/(${M(ctx.d)})` : ''} : le numérateur n'est pas Q′. Il faut une autre méthode (décomposition en éléments simples, changement de variable).`,
+    explain: (ctx = {}) => t('Log|Q| a pour dérivée Q′/Q{p1} : le numérateur n\'est pas Q′. Il faut une autre méthode (décomposition en éléments simples, changement de variable).', { p1: ctx.d ? t(', ici {p1}/({d})', { p1: M(diff(ctx.d, 'x')), d: M(ctx.d) }) : '' }),
   },
   {
     id: 'a1_trig_subst_dx', family: 'rule', tag: 'E', skill: 'a1-int-trig', repair: 'a1-int-trig',
     judges: ['antideriv'],
-    name: 't = tan(x/2) sans le facteur 2/(1 + t²)',
+    name: t('t = tan(x/2) sans le facteur 2/(1 + t²)'),
     example: ['t = tan(x/2) : dx = dt', 'dx = 2 dt/(1 + t²)'],
     check: { judge: { kind: 'antideriv', v: 'x', domain: { x: [0.3, 2.8] }, subst: { t: 'tan(x/2)' } }, prev: 'int(1/sin(x),x)', line: 'int((1+t^2)/(2t),t)' },
     transform: (prev, ctx = {}) => {
@@ -398,12 +399,12 @@ export const RULES = [
         return [{ node: intOf(I, e, 't') }];
       });
     },
-    explain: () => 'Avec t = tan(x/2), x = 2 Arctg t, donc dx = 2 dt/(1 + t²) : ce facteur manque.',
+    explain: () => t('Avec t = tan(x/2), x = 2 Arctg t, donc dx = 2 dt/(1 + t²) : ce facteur manque.'),
   },
   {
     id: 'a1_hyper_identity_sign', family: 'sign', tag: 'E', skill: 'a1-int-hyper', repair: 'g2-hyp-formulas',
     judges: ['equiv', 'antideriv'],
-    name: 'Identité trigonométrique appliquée aux hyperboliques',
+    name: t('Identité trigonométrique appliquée aux hyperboliques'),
     example: ['2cosh²t = 2 − 2sinh²t', '2cosh²t = 2 + 2sinh²t'],
     check: { judge: { kind: 'equiv', vars: ['t'], domain: { t: [-2, 2] } }, prev: '2cosh(t)^2', line: '2-2sinh(t)^2' },
     // cos² + sin² = 1 used for cosh and sinh: cosh²u → 1 − sinh²u, sinh²u → 1 − cosh²u.
@@ -419,7 +420,7 @@ export const RULES = [
       });
       return out;
     },
-    explain: () => 'Pour les hyperboliques, c\'est cosh² − sinh² = 1, pas cosh² + sinh² = 1 : donc 1 + sinh²t = cosh²t.',
+    explain: () => t('Pour les hyperboliques, c\'est cosh² − sinh² = 1, pas cosh² + sinh² = 1 : donc 1 + sinh²t = cosh²t.'),
   },
 ];
 
