@@ -1667,7 +1667,7 @@ GEN['ph-conservation'] = (level, rng) => {
     const hc = pg(rng, 50, 120, 5);
     const h = hc / 100;
     const v = fix(Math.sqrt(2 * G * h));
-    return answer(sk, level, t('Une bille roule hors d\'une table de {h} de haut et tombe. Sans frottement, à quelle vitesse (verticale) touche-t-elle le sol, si elle part à l\'arrêt ?', { h: Q(hc, 'cm') }), v, 'm/s', {
+    return answer(sk, level, t('Une bille posée au bord d\'une table de {h} de haut tombe sans vitesse de départ. Sans frottement, à quelle vitesse touche-t-elle le sol ?', { h: Q(hc, 'cm') }), v, 'm/s', {
       traps: [[Math.sqrt(2 * G * hc), 'ph_not_si'], [2 * G * h, 'ph_forget_sqrt']],
       solution: [si(`${F('h')} = ${Q(hc, 'cm')} = ${Q(h, 'm')}`), ...consSol(Q(h, 'm'), v)],
       key: `table:${hc}`,

@@ -348,7 +348,7 @@ export default {
   "De quelle hauteur faut-il lâcher un objet, sans frottement, pour qu'il arrive au sol à {v} ?": 'From what height must an object be dropped, without friction, to hit the ground at {v}?',
   "Un skieur part à l'arrêt et descend {h} de dénivelé, sans frottement. Quelle est sa vitesse en bas, en km/h ?": 'A skier starts at rest and goes down a drop of {h}, without friction. What is his speed at the bottom, in km/h?',
   "Une voiture qui roule à {v} a autant d'énergie que si elle était tombée d'une certaine hauteur. Laquelle ? (Sans frottement.)": 'A car driving at {v} has as much energy as if it had fallen from a certain height. Which height? (Without friction.)',
-  "Une bille roule hors d'une table de {h} de haut et tombe. Sans frottement, à quelle vitesse (verticale) touche-t-elle le sol, si elle part à l'arrêt ?": 'A marble rolls off a table {h} high and falls. Without friction, at what (vertical) speed does it hit the ground, if it starts at rest?',
+  "Une bille posée au bord d'une table de {h} de haut tombe sans vitesse de départ. Sans frottement, à quelle vitesse touche-t-elle le sol ?": 'A marble resting on the edge of a table {h} high falls with no starting speed. Without friction, at what speed does it hit the ground?',
   "Deux sacs, l'un de {m1} et l'autre de {m2}, tombent de la même hauteur, sans frottement. Lequel touche le sol le plus vite ?": 'Two bags, one of {m1} and the other of {m2}, fall from the same height, without friction. Which one hits the ground faster?',
   'Aucun : même vitesse, car la masse se simplifie': 'Neither: same speed, because the mass cancels out',
   'Le sac de {m2} : il est plus lourd': 'The {m2} bag: it is heavier',
