@@ -40,14 +40,20 @@ export function judgePick(pb, src) {
   return { ok: false, rule: 'ph_decoy_formula', message: t('Aucune lettre de cette formule n\'est dans l\'énoncé : ni donnée, ni cherchée. Elle ne peut rien relier.'), syms };
 }
 
-// Leaving step 1: the formulas still missing.
+// Leaving step 1: only a formula of the path blocks. The other formulas that
+// share a letter may be kept (step 2 removes them) or left on the sheet.
+// The hint names a letter, not the formula.
 export function judgeStep1(pb, kept) {
-  const missing = step1Targets(pb).filter((f) => !kept.includes(f));
   const extra = kept.filter((f) => !step1Targets(pb).includes(f));
   if (extra.length) return { ok: false, rule: 'ph_decoy_formula', message: t('{f} n\'a aucune lettre en commun avec l\'énoncé.', { f: F(extra[0]) }) };
-  if (missing.length) {
-    const s = symsOfSrc(pb, missing[0]).find((x) => inStatement(pb, x));
-    return { ok: false, message: s ? t('Il manque une formule : {f} contient {s}, qui est dans l\'énoncé.', { f: F(missing[0]), s }) : t('Il manque une formule : {f} est sur le chemin.', { f: F(missing[0]) }) };
+  const missing = pb.formulas.find((f) => !kept.includes(f));
+  if (missing) {
+    const syms = symsOfSrc(pb, missing);
+    if (syms.includes(pb.find)) return { ok: false, message: t('Il te manque une formule : il en faut une qui contient {s}, ce qu\'on cherche.', { s: pb.find }) };
+    // Prefer a letter of the statement that no kept formula has yet.
+    const have = new Set(kept.flatMap((f) => symsOfSrc(pb, f)));
+    const s = syms.find((x) => inStatement(pb, x) && !have.has(x)) || syms.find((x) => inStatement(pb, x));
+    return { ok: false, message: s ? t('Il te manque une formule : il en faut une autre qui contient {s}.', { s }) : t('Il te manque une formule pour relier les données à ce qu\'on cherche.') };
   }
   return { ok: true };
 }

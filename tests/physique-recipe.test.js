@@ -27,6 +27,9 @@ test('the reference work passes every step, on every case', () => {
       const targets = step1Targets(pb);
       for (const f of targets) assert.ok(judgePick(pb, f).ok, `${where} pick ${f}`);
       assert.ok(judgeStep1(pb, targets).ok, where);
+      // Only the path is required: the other formulas sharing a letter may stay on the sheet.
+      assert.ok(judgeStep1(pb, [...pb.formulas]).ok, `${where} path only`);
+      for (const f of pb.formulas) assert.ok(!judgeStep1(pb, targets.filter((x) => x !== f)).ok, `${where} without ${f}`);
       for (const d of pb.data) assert.ok(judgeSI(d, typed(d.si, 6)).ok, `${where} SI ${d.sym}: ${typed(d.si, 6)}`);
       // 2: formulas of the path cannot be removed; decoys can.
       for (const f of pb.formulas) assert.ok(!judgeRemove(pb, f).ok, `${where} remove ${f}`);
